@@ -1,5 +1,5 @@
-C Added\soption\s-paramentityparsing\sto\sthe\s[dom\sparse]\smethod.\s[dom\nparse]\soption\sparsing\snow\suses\sTcl_GetIndexFromObj()\s(which\nadditionally\sfixes\sa\sminor\sbug\swith\sthe\scurrent\soption\sparsing).\nRemoved\san\sunused\svariable.\sImproved\serror\sreporting\sin\scase\sof\snot\nfound\sattribute.\sBetter\soptions\scheck\sfor\sthe\s'xslt'\smethods.\sChanged\nimplementation\sof\sthe\sdom\smethod\sisQName\sto\suse\sthe\slately\sintroduced\nAPI\sfunction\sdomIsQNAME.\n
-D 2003-04-09T19:59:04
+C Added\soption\s-paramentityparsing\sto\sthe\s[dom\sparse]\smethod.\s[dom\sparse]\soption\sparsing\snow\suses\sTcl_GetIndexFromObj()\s(which\sadditionally\sfixes\sa\sminor\sbug\swith\sthe\scurrent\soption\sparsing).\s\sAdded\s'package\srequire\stdom'\sto\sthe\ssyntax\sdecription\s(http://groups.yahoo.com/group/tdom/message/446).\n
+D 2003-04-09T20:01:17
 F CHANGES ca483fbc7c627b68977fc3eb6cf6798f42bca33c
 F ChangeLog 4b901cec6b84cec93869a3df97d0c29dae27ef1e
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -14,9 +14,9 @@ F configure-tcl8.0.5 7d6ad4c8b8ed59f09c2b10fcaa5c4ffbf3ead1e4 x
 F configure.in 7e64f2611d7269aaf7853d0923f644e5fcbefc36
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
-F doc/dom.html 83dd89d7972b00d2ed5b69383747ff93d586bbc9
-F doc/dom.n 775a1edb8d812a82a1c07252680dc5471ecc8ebe
-F doc/dom.xml b6f088b32e14a4d094829c041de1988e68d7bbab
+F doc/dom.html b1b1bf3fb033146e1a055868df01cd5e2a92b624
+F doc/dom.n 6a23b81e288e0046fa1b426b039382f364483138
+F doc/dom.xml 54e0fb6bc46baccd0b27309c978d7c491f3c8cb0
 F doc/domDoc.html 352415ff4776d3e1ff532dae8945ce06212febd4
 F doc/domDoc.n d5f2cb599bb1abe5ce4a167dc03c3e5de66d952d
 F doc/domDoc.xml 420edf41715156274ac43fe65932bb03747436cd
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 0231e6fe49f410907cf2e8f0ce585661c7ed276e
+P b1dd756571f650bf051befa0b9c11929c4bfbafe
 U rolf
-Z 2cfefd25fccce32b8534bb5f9286cc24
+Z 9c60cd5eb7ac82aee620bceb40e203fd
 # Remove this line to create a well-formed Fossil manifest.
