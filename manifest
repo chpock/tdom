@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2002-12-21T20:45:00
+C Reworked\sthe\swhite\sspace\sstripping\sfor\sXML\ssources\sa\sbit.\sBetter\swhite\nspace\shandling\sin\stoken\slists.\n
+D 2002-12-23T03:12:04
 F CHANGES 17f8fddea36060afdc3691cf6a989be83d353c40
 F ChangeLog 1d8c75a8a2efc9f5853011e33bf5bfd92f431f89
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -121,7 +121,7 @@ F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c dba7e77190826af093bbb0c4dc1f858687ef5983
 F generic/domxpath.c 2ed7412802fb55430d2060a0255ae9cd01aed629
 F generic/domxpath.h 2bbf18428f0a934a95d4262bd352cdfe4937e9cb
-F generic/domxslt.c 4e1779669b22c25cc9cd873a91cbc361a6a96494
+F generic/domxslt.c 37f49b43b875d95f429afd9d03b8ab92fbbc64bb
 F generic/domxslt.h 77d19235cbf254d3ba46ae28088fdcbf98a4856a
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -197,7 +197,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 868915c3d105977d7312c7230fe7e0ed15045664
+P c3782f2bbba54d04123db20e0cda7dcba4a38569
 U rolf
-Z e2e58e7e2a1983b08fb5f816ee2874d4
+Z a5e24cb0906e695aa02dcef8ca221ac5
 # Remove this line to create a well-formed Fossil manifest.
