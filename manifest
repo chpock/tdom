@@ -1,17 +1,17 @@
-C Bumped\sversion\sto\s0.8.0\salpha.\n
-D 2003-04-12T02:20:44
+C Bumped\sversion\sto\s0.8.0\s(alpha).\n
+D 2003-04-12T02:24:11
 F CHANGES 59cab3c950a08a20053aa26b3a8718c6efa8c913
 F ChangeLog cc7fa3c7ba6aadff157e002575c3d6bfb4a2cdd2
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 25204720818592a271aecc462432628b5a1862a4
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
-F README ab0f356f1f031c19070fe02712c6a66d1011b977
-F README.AOL 356ec76a2b5ea0d204d1c1a1f9321dc5616302b8
+F README 5a9c069dee183889e8d81ad355f5091ac97a1a5b
+F README.AOL 6b124cc7a7cae5fa901b9a2996dbdc5fe4085ba7
 F aclocal.m4 79e2f4aa6a138371f2d31f28355749e5019d7651
 F apps/xslt.tcl 33eaaf45b831e6613d528156f7f1bbc02fd9f849
-F configure 49a8b19b419ffa2fb87c1f550aa43f67bc89e160 x
-F configure-tcl8.0.5 7d6ad4c8b8ed59f09c2b10fcaa5c4ffbf3ead1e4 x
-F configure.in 7e64f2611d7269aaf7853d0923f644e5fcbefc36
+F configure e2a12b701e542383b6ccc3bc9e0cea1d6d0e232f x
+F configure-tcl8.0.5 de905df007af9d276ace4b08d3d2183656f90cb7 x
+F configure.in a1be0e51be1babb7e721723ab9f804ebfd35f693
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html b1b1bf3fb033146e1a055868df01cd5e2a92b624
@@ -153,8 +153,8 @@ F mac/PrecompHeaders/CoreHeadersMach-O.h 508208239a919a6dee4275f9148962a13faeb94
 F mac/PrecompHeaders/CoreHeadersMach-O.pch 60665d6a2787eb3dfda701baff12dd3d5029e7f5
 F mac/Prefix/expatPrefix.h d131932b0c668d4cdef1eebc35f1b5267882d00d
 F mac/Prefix/expatPrefix_OSX.h 51c7e40981af4b6b8b974bf4cc4c2f63968031e2
-F mac/Prefix/tDOMPrefix.h 0bf011d7a85636d06295bed367cdf5bd4862568c
-F mac/Prefix/tDOMPrefix_OSX.h 8763c9397965b41be92cbef218aa5e79533e09c7
+F mac/Prefix/tDOMPrefix.h a8e45947cc4d77e44f125b2e2e8d51828b685e3b
+F mac/Prefix/tDOMPrefix_OSX.h e3e10b1610b1ecfe64a1ce5ad5eaa078672f71e2
 F mac/Prefix/tncPrefix.h fb4033860688808a196991f8cce3d6dd81b5eb8e
 F mac/Prefix/tncPrefix_OSX.h 482e243e92a724d677c9e76f9eac956464252299
 F mac/Readme_Mac_Compiling 056f0af20fddfe4c08d0e0e2064c45068335611b
@@ -205,7 +205,7 @@ F tests/element.test feb714dae2010efc20dd12d4e7d7bc281b1a6ff4
 F tests/entity.test 8440a2109f4b250b539477b27c141f37ff19c3a3
 F tests/htmlreader.test d39e554d91ce48390e7b5743974b4fad8fc8eeb8
 F tests/i18n.test ad68655284ea0bf4f2c5a0acc098fd05587ba9a4
-F tests/loadtdom.tcl ae53eb1f069f63cf2baf696893507f0f50575275
+F tests/loadtdom.tcl 5e53e167c862051202df871ba249ab502e0ba38d
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
 F tests/parser.test 4f12b3904d42f192b5223be1a30be9692800fb3f
 F tests/pcdata.test d91fbfd9ca0feeff64d930c3b01355fc97ccd03e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P fdd34c6f6542699f2797e336cc4e74682e0ff4b6
+P edc7d63c4bc01d4e09e4f51e1fe0bde743510e64
 U rolf
-Z 53b35e97949b4a86a405623fd724b455
+Z 3f2ee565ea8bb797eb2b6cb694e700fc
 # Remove this line to create a well-formed Fossil manifest.
