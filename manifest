@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2004-09-13T17:29:54
+C Add\sdocumentation\sfor\s'selectNodes'\soption.\n
+D 2004-09-21T01:06:19
 F CHANGES 9113c39a3c8720f4e5e1b56bc4fe079ad319a58e
 F ChangeLog b53deb99ac42ead5a4ca7a6c6909feb171406a9b
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -17,9 +17,9 @@ F doc/category-index.html 2e1a41b03d31f42dd00a0c449f7f28db6227bbf2
 F doc/dom.html 240717c173dfe4022f800b64de96516fdeaf2b35
 F doc/dom.n 1f9953baae9ad799fab6f16ce1d5589ecbf962f1
 F doc/dom.xml c7d62493c61ff9f9b701d57e268818da805c1ba3
-F doc/domDoc.html 45f4b7e5ba6f759e3481ad78028cf0ffa62e1d89
-F doc/domDoc.n 5c2a3451aa968ccd49f6c52c7d3c136ec5b1d6e5
-F doc/domDoc.xml e1176862739f66cdb660af46bb5815f93ba0f72e
+F doc/domDoc.html 4b3632d1ffe9d7f008e0bdc08d41db2c221fea47
+F doc/domDoc.n 4e7ae0561a77a981c848e723065ad1efaf38a106
+F doc/domDoc.xml 04ca67ec8461a2811fe1db6fb21a184bb4951981
 F doc/domNode.html 020c8a4e469d1be9025ebfa9895eac644a5a420f
 F doc/domNode.n 9b6ece71049dc07c13ffdce4731fe97b89c95411
 F doc/domNode.xml b69610bbc93563cd3fcf75577e1c2f272ff2685d
@@ -230,7 +230,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 7a9fd4dba5aad1b25166fc817d33b2cfe92a0cf0
+P b4607b15a89b1f160c0981921939771109f1fa89
 U rolf
-Z 8deddba6809796aba7816d25c3357409
+Z c15a39dbb0d0208936788bde26fe081a
 # Remove this line to create a well-formed Fossil manifest.
