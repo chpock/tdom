@@ -1,5 +1,5 @@
-C Updated\sto\snew\sversion\snumber\s0.7.6.\n
-D 2003-03-23T01:19:27
+C Updated\sto\sthe\snew\sversion\snumber\s0.7.6\n
+D 2003-03-23T01:21:40
 F CHANGES 87334aee80e9af7a72560e564ddddb7bf97ca551
 F ChangeLog a67b8121cbc68d48ca423e30af3afcd44fd88557
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -162,6 +162,8 @@ F mac/macconfig.h b2b5d6e596f07f5d1ff60aab6df666b0acc46adb
 F mac/tDOM.exp d3cefd106ba630c4b283e89bd703754c845da3b4
 F mac/tDOM.prj.xml 46bd1d275171d95875d892c79c57025dedcf485a
 F mac/tDOM.r 26350d07913dd0ba88d8313bc71b92774a029e81
+F mac/tDOM/pkgIndex.tcl 946d3abc06360e9ff6ef9c5f90c953e949962ec3
+F mac/tDOM/tdom.tcl 09c254af11c857ba27594eba18cfaa14997369dd
 F mac/tDOM_OSX.prj.xml cd603331546b76de622b7312784f6744b08684d2
 F mac/tnc.exp b5221cfee6631ca94e46626dcd5c54e7e9cde7ba
 F mac/tnc.r ce718255e902d882f872087908dcd234fdc9fa51
@@ -224,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 2626074683d3e2d3bb3dd2729a5e044085696cc2
+P 1ada227abad80e510762f8f395cef76a23bee284
 U rolf
-Z d09e8a1ed6483478ed3ca80eedd42b53
+Z c3e4871bba38322ec47402a55d847135
 # Remove this line to create a well-formed Fossil manifest.
