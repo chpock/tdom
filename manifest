@@ -1,5 +1,5 @@
-C Collected\sthe\svarious\snodeSet\sResult\stypes\sinto\s"nodeSetResult"\s(there\nstill\sexists\sa\sseperate\semptyResult\stype).\sReworked\nxpathEvalStep.\sFixed\smemory\sleak\sin\sxpathMatches,\sadded\nrsAddNodeFast(),\sif\sit's\sknown\sfor\ssure,\sthat\sthe\snode\sto\sadd\sisn't\nalready\sin\sthe\snodeSet.\n
-D 2002-03-21T01:47:22
+C Removed\ssome\soverseen\sdebugging\scode.\n
+D 2002-03-22T00:14:22
 F apps/xslt.tcl e5c0a837a82ddf0aa21ddb51d5891acfd64469fc
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html c21ddc9a115a8a82ee1560949dc08a1bc41233b6
@@ -97,7 +97,7 @@ F generic/domalloc.c 9fd035f9fe601d2ed6ea00eef448f3165e8e54c5
 F generic/domalloc.h 2c5c6412831ffaff02d2a2d969adddbede8752b6
 F generic/domhtml.c e8cda5580aa8c3fe08e9f432a8482dd667c22e6e
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
-F generic/domxpath.c 7749c4fe4a1a15a8a1e94903b74540c660c65ffb
+F generic/domxpath.c 0e108b9cba73540fe42d463f74e9c216eaf2ad6e
 F generic/domxpath.h dfd8f333372a695bed37d97c0b314f7b76e24ea3
 F generic/domxslt.c 182b61ea9523541f49bedd3baefb7b19f9418799
 F generic/domxslt.h d8b3177418299ec4e3f1f92b736756e42d2dd3e1
@@ -157,7 +157,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f00c8a6439d579e8ed6f145efac074c28832c472
+P 0e6533ac59bc7c645a6eac727be6285b65ce3340
 U rolf
-Z 0ca700b5e69ed07117623bde9301e745
+Z 79d092f0b07aafe57e2cfbf00fd2792b
 # Remove this line to create a well-formed Fossil manifest.
