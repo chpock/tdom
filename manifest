@@ -1,5 +1,5 @@
-C Made\smodes\snamespace\saware.\n
-D 2002-05-10T21:52:32
+C Made\svariable/parameter\snamespace\saware.\n
+D 2002-05-11T16:57:28
 F apps/xslt.tcl e5c0a837a82ddf0aa21ddb51d5891acfd64469fc
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html c21ddc9a115a8a82ee1560949dc08a1bc41233b6
@@ -97,9 +97,9 @@ F generic/domalloc.c 467e64565316606786480be270804a2b31e95b5c
 F generic/domalloc.h c5fc1efc2030b9da65cea2c8690b0ea61f7bec16
 F generic/domhtml.c e8cda5580aa8c3fe08e9f432a8482dd667c22e6e
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
-F generic/domxpath.c 8079bb1a4a2a51dad47edf2aae73e1375879f41a
-F generic/domxpath.h a6ef4b50d0c9f377c4a38b9b6f3aed3c0b027904
-F generic/domxslt.c 7325b89e91b7ec86e4a33c1daa461e7ae3d9799f
+F generic/domxpath.c 343cea29200c5f9526aa2f4b8c636d53ed34a2f8
+F generic/domxpath.h 9aeae6b3988adf20a2b5d295c4bd8bb5b5386ed3
+F generic/domxslt.c 0c413232ea9205624179409655dfc18e135c20ac
 F generic/domxslt.h 4e41a3885354345ec29800c6c0f18ebd3fd0d2ce
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/nodecmd.c 60cfaefa435012d37a0bfe9fe115731c0efba17e
@@ -158,7 +158,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 58cd2844535cf054c32089012167bde49923978f
+P 80c514621e203c284f2231d2dcd352309a02ab4a
 U rolf
-Z 60cc278bd8218231d32041ad2885d308
+Z b4ecfb7764145ef40a5bdf1356a4c650
 # Remove this line to create a well-formed Fossil manifest.
