@@ -1,5 +1,5 @@
-C Added\smethods\snodeType,\sgetElementById,\sfirstChild,\slastChild,\nappendChild,\sremoveChild,\shasChildNodes,\schildNodes,\sownerDocument,\ninsertBefore,\sreplaceChild,\sappendFromList,\sappendXML,\sselectNodes,\nbaseURI,\sappendFromScript\sand\sinsertBeforeFromScript\sto\sdom\ndocs.\sBeside\sother\sthings,\sthis\sallows\smuch\seasier\shandling\sof\stop\nlevel\snodes.\sThe\sresult\stree\smay\snot\sbe\san\sXML\sdocument,\sbut\sa\sgeneral\nparsed\sentity.\n
-D 2004-07-28T03:39:35
+C Reworked\sinternal\sbase\sURI\shandling,\sto\sfix\sa\sbug\sof\sthe\sold\sapproach\nand\sto\sbe\scloser\sto\s(though\snot\sfully\ssupport)\swhat\sDOM\s3\ssay\sabout\nbase\sURI\shandling.\sImproved\serror\smsg\sfor\sgetAttribute,\sif\sattribute\nis\snot\sfound.\sChanged\sbehavior\sof\sgetElementByID:\sif\sno\selement\swith\nthe\sgiven\sid\sis\sfound,\sreturns\snow\sthe\semtpy\sstring,\snot\sa\sTCL_ERROR\n(more\sclose\sto\sDOM\srec,\sgetElementByID\snever\sraise\san\sexception).\sBug\nfix:\snodeName\snow\sreturns\sthe\sper\sDOM\srec\scorrect\svalues\sfor\scomment\nand\scdata\ssection\snodes\s(were\sas\syet\sreported\sas\sif\sthey\swhere\stext\nnodes)\n
+D 2004-07-28T03:41:12
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog 24c31ffaa165936891a37206a0bbe2e1b2916711
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -200,7 +200,7 @@ F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.test 91f4ca7d171ef8ddabeee9acd1c97618e60719bd
 F tests/domDoc.test ccf07bde1f49a0cf1cd35e2e1877faae8a5929cb
-F tests/domNode.test 90d3eb50349ebae68b1e5e7d3b31ceb21ab9a1a4
+F tests/domNode.test fe94d902ad8330f36fad13809c292557bc05b4e9
 F tests/domnamespace.test 7f6ff7ee11a6cb437240c07be18adc11fd876d46
 F tests/element.test 7da1983ecf71b5fa81bae0adfa1b74c8c21fbeff
 F tests/entity.test 8440a2109f4b250b539477b27c141f37ff19c3a3
@@ -228,7 +228,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P d5e3779d2c58d12d338b92fc59798e2c8e041e87
+P 497d487e77d9043a51687c8e291d234b12bff00b
 U rolf
-Z 2b38e03e1e312c34316282c3acfb09c0
+Z f99d6c2ba5f2d2170ac36751e2f412ec
 # Remove this line to create a well-formed Fossil manifest.
