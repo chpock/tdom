@@ -1,11 +1,11 @@
-C Fixed\sinvalid\sreference\sto\sTCL_DBGX\sat\sbuilding\stdomConfig.sh.\n
-D 2003-02-22T09:14:46
+C Added\sremark\sabout\sCC=gcc\sfor\sSolaris\sbuilds.\n
+D 2003-02-22T09:15:10
 F CHANGES d6cad9f44838aa2e42fdbd3e75313ddccbbeb32a
 F ChangeLog 06627b6618b9365f60138f6c1f3bb3f1334c301e
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 66a3f3c77f53f573bea7fc3e8620f6e19576c76e
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
-F README c61e1311b5a904cf82f6af8d272aef5dc22a8dee
+F README a6c61e573170a3ce1cdf154283d141ce67c66946
 F aclocal.m4 79e2f4aa6a138371f2d31f28355749e5019d7651
 F apps/xslt.tcl 33eaaf45b831e6613d528156f7f1bbc02fd9f849
 F configure d1013754f1107b90fa56773e727bd97345861fe6 x
@@ -197,7 +197,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 9e151a215cfce01097bef4202c1040d32b470050
+P c59d2bfd9996ddc8e6e9eca3cfef0bf935ee8a19
 U zoran
-Z f9ff3cf9d72e1f55baf5d254ca1f4389
+Z 3f9cc36d6a90b5f658a7ffb567f0e95c
 # Remove this line to create a well-formed Fossil manifest.
