@@ -1,5 +1,5 @@
-C New\s(experimental)\smethod\ssetObjectCommands.\sReworked\sinternal\sbase\nURI\shandling,\sto\sfix\sa\sbug\sof\sthe\sold\sapproach\sand\sto\sbe\scloser\sto\n(though\snot\sfully\ssupport)\swhat\sDOM\s3\ssay\sabout\sbase\sURI\shandling.\sNew\nmethod\screateDocumentNode.\sAdded\smethods\snodeType,\sgetElementById,\nfirstChild,\slastChild,\sappendChild,\sremoveChild,\shasChildNodes,\nchildNodes,\sownerDocument,\sinsertBefore,\sreplaceChild,\sappendFromList,\nappendXML,\sselectNodes,\sbaseURI,\sappendFromScript\sand\ninsertBeforeFromScript\sto\sdom\sdocs.\sBeside\sother\sthings,\sthis\sallows\nmuch\seasier\shandling\sof\stop\slevel\snodes.\sThe\sresult\stree\smay\snot\sbe\san\nXML\sdocument,\sbut\sa\sgeneral\sparsed\sentity.\sImproved\sspeed\sof\sthe\ngetAttribute\sshortcut\s'@attname'\s(and,\snot\sso\snotable,\sof\stcl\scoded\nmethods\sof\sthe\sdom,\sdomDoc\sand\sdomNode\scmds).\sCorrected\stypo\sin\ndomNode\susage\smsg\sfor\sgetElementByID.\sImproved\serror\smsg\sfor\ngetAttribute,\sif\sattribute\sis\snot\sfound.\sChanged\sbehavior\sof\ngetElementByID:\sif\sno\selement\swith\sthe\sgiven\sid\sis\sfound,\sreturns\snow\nthe\semtpy\sstring,\snot\sa\sTCL_ERROR\s(more\sclose\sto\sDOM\srec,\ngetElementByID\snever\sraise\san\sexception).\sBug\sfix:\snodeName\snow\nreturns\sthe\sper\sDOM\srec\scorrect\svalues\sfor\scomment\sand\scdata\ssection\nnodes\s(were\sas\syet\sreported\sas\sif\sthey\swhere\stext\snodes).\n
-D 2004-07-28T03:49:55
+C Reworked\sinternal\sbase\sURI\shandling,\sto\sfix\sa\sbug\sof\sthe\sold\sapproach\nand\sto\sbe\scloser\sto\s(though\snot\sfully\ssupport)\swhat\sDOM\s3\ssay\sabout\nbase\sURI\shandling.\sBetter\serror\smsg\sin\scase\sof\s'filename'\sand\snot\nvalid\sfile\sname.\n
+D 2004-07-28T03:52:42
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog 24c31ffaa165936891a37206a0bbe2e1b2916711
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -134,7 +134,7 @@ F generic/nodecmd.c bd617b5ad9643d207b2cbcae7c918df3db601af8
 F generic/nodecmd.h 93a8fe44e2d96e0a88fe2a94001e18c709ac7a81
 F generic/tcldom.c 11573f9eeab71f570f2039d0fa1afb26a111d07a
 F generic/tcldom.h 6f0f185ae010f9906b3107acdf879bca6924e0f0
-F generic/tclexpat.c 92384e204a13743dd84b4b5256ee5891e9fac7c2
+F generic/tclexpat.c 93a3d4c93360806dbbe04f90bfb7f1778ffc9fc0
 F generic/tclexpat.h 4af6a66cde1f493d0d7c2da1ef5da6295c1006db
 F generic/tdom.decls 760ad3234a869b8191436bd53370b812266d98d5
 F generic/tdom.h db128152fac506159243e47cb3a77cc7d9fe4360
@@ -228,7 +228,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 507cb84752ea437a7e14296fd4e4303b69c3568b
+P 76c8406dfe0475be1f176ece220f1100ac773101
 U rolf
-Z 1495631b3153e5dfc90bd4064af88b18
+Z ec6942c92faa73e2fb1016cc40ba7567
 # Remove this line to create a well-formed Fossil manifest.
