@@ -1,5 +1,5 @@
-C Reworked\sinsertBefore:\sBug\sfix:\sIf\sthe\srefNode\swas\sinvalid,\sthe\ninvolved\sdocuments\sgot\smangled.\sBug\sfix:\sDead\sloop,\sif\sthe\snode\sto\ninsert\swas\sthe\snode\sitself.\sBug\sfix:\sthe\srootNode\sof\snode's\sdocument\ncould\sbe\sused\sas\snode\sto\sinsert.\sBug\sfix:\sIt\swas\snot\spossible,\sto\ninsert\sa\snode\sbefore\srefNode,\swhich\swas\salready\sa\schildren\sof\nnode.\sBug\sfix:\sIt\swas\snot\spossible,\sto\sinsert\sa\ssibling\sof\nnode.\sFeature\senhancement:\sIf\sthe\srefnode\sis\sthe\sempty\sstring,\sthe\nnewNode\sis\sinserted\sat\sthe\send\sof\sthe\schildren\slist\sof\nnode.\sOptimization:\sAverage\sspeed\swas\sO(n/2)\s(n:\snumber\sof\schilds\sof\nnode)\sin\scase\sthe\snode\sto\sinsert\swas\sout\sof\sthe\stree,\sand\s0((n+m)/1)\n(m:\snumber\sof\snodes\sin\sthe\sfragments\slist)\sin\scase\sthe\snode\sto\sinsert\nwas\sout\sof\sthe\sfragments\slist.\sNow\sits\sO(1).\n
-D 2003-09-22T01:00:38
+C Reworked\sinsertBefore:\sBug\sfix:\sIf\sthe\srefNode\swas\sinvalid,\sthe\ninvolved\sdocuments\sgot\smangled.\sBug\sfix:\sDead\sloop,\sif\sthe\snode\sto\ninsert\swas\sthe\snode\sitself.\sBug\sfix:\sthe\srootNode\sof\snode's\sdocument\ncould\sbe\sused\sas\snode\sto\sinsert.\sBug\sfix:\sIt\swas\snot\spossible,\sto\ninsert\sa\snode\sbefore\srefNode,\swhich\swas\salready\sa\schildren\sof\nnode.\sBug\sfix:\sIt\swas\snot\spossible,\sto\sinsert\sa\ssibling\sof\nnode.\sFeature\senhancement:\sIf\sthe\srefnode\sis\sthe\sempty\sstring,\sthe\nnewNode\sis\sinserted\sat\sthe\send\sof\sthe\schildren\slist\sof\nnode.\sOptimization:\sAverage\sspeed\swas\sO(n/2)\s(n:\snumber\sof\schilds\sof\nnode)\sin\scase\sthe\snode\sto\sinsert\swas\sout\sof\sthe\stree,\sand\s0((n+m)/1)\n(m:\snumber\sof\snodes\sin\sthe\sfragments\slist)\sin\scase\sthe\snode\sto\sinsert\nwas\sout\sof\sthe\sfragments\slist.\sNow\sits\sO(1).\n\nRemoved\s'knownBug'\sconstraint\sfrom\stwo\stests,\swhich\sdocumented\sknown\nbugs,\sthat\sare\sfixed\sin\sthe\smeantime.\n
+D 2003-09-22T01:02:23
 F CHANGES fe6ea1684f6c197dca0608948aee32f3da6616b0
 F ChangeLog a1e0fdd0972c183065e68afcbba49c7fc4e3f690
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -198,7 +198,7 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
-F tests/dom.test e978634307398ca247189653877b0889ae49c629
+F tests/dom.test cbd48961895dc577bca783be6b91220d78e56520
 F tests/domCmd.test 7138ebc83f219ad942c0d69eae4a5cf3607a0b36
 F tests/domnamespace.test 7023cb113cf156381218b303eddcde3822f40a48
 F tests/element.test 7da1983ecf71b5fa81bae0adfa1b74c8c21fbeff
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P d3a05e7548276c6713315a432e63c7f692696608
+P 502f04d44198e66060c32514ca5ac48139519ca7
 U rolf
-Z 4b912c4a6c70fd74d7d0aba0a56c8170
+Z 9231487237ba7e0d4793995f8f170403
 # Remove this line to create a well-formed Fossil manifest.
