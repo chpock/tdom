@@ -1,5 +1,5 @@
-C Dummy\sconfig.h\sneeded\sfor\sexpat.\n
-D 2002-03-05T16:15:51
+C Freeze\sof\sactual\sstate,\sbefor\sfeeding\sstuff\sto\sJochen.\n
+D 2002-03-07T22:04:57
 F apps/xslt.tcl e5c0a837a82ddf0aa21ddb51d5891acfd64469fc
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html c21ddc9a115a8a82ee1560949dc08a1bc41233b6
@@ -126,7 +126,7 @@ F tests/data/i18n_1.xml 7b4282addd307b17940fffd818de016ca64311fa
 F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 19feaf3508b71cad195b145f2e3f3fb4f433a974
 F tests/doctype.test fc87e607acde7d3404c9c70221f8f24b1944f798
-F tests/dom.test e01d2b004a00481a071487b0d2390248bcfa24a9
+F tests/dom.test 0f69fe23b59db85936244b08ff2a43be455fe140
 F tests/domnamespace.test 1cf980a8d0269f84eeafc0a0850725b6184ba52d
 F tests/element.test ce1031e41f9ba75e1935c63985e741fc758d4ffd
 F tests/entity.test 69737ec15ca733dddd319f08f7d7f7cdd1ba2534
@@ -157,7 +157,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 4b3d9115e01cc23e40b2c00c893811cdea941c6b
+P 687ef565b94d93373e1887bec69fc4b4bad0e44b
 U rolf
-Z be630d25f132a0f6beff54313da78039
+Z 30ee410dafd38c5fcdb67a830d630e3a
 # Remove this line to create a well-formed Fossil manifest.
