@@ -1,7 +1,7 @@
-C Scripted\sxpath\sfunction\selement-available:\smoved\sxsl:output\sto\sthe\navaliable\selements,\ssince\sit's\sin\sfact\savaliable\sin\sthe\smeantime\s(with\nexception\sof\sthe\s'version'\sand\s'cdata-section-elements'\sattributes)\s-\nthe\soutput\soptions\scould\sbe\squeried\sfrom\sthe\sresult\sdoc,\sbut\sit's\sthe\nresponsibility\sof\sthe\sapplication,\sto\sserialize\sthe\stree\saccording\sto\sthat\nsettings.\n
-D 2005-01-11T15:57:19
+C See\sfile.\n
+D 2005-01-11T16:00:01
 F CHANGES 877db3f7a6fd1a5175636e84125230f5949491ac
-F ChangeLog 95a4cb9bdc20ca7a5ad33b77a3cc57915aab48a8
+F ChangeLog 6a89642f355c32a6fd136c74eb101efa12db70e1
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -233,7 +233,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 5d369f183684de98cd4025ad193d85ab0edff112
+P 3955ed2be73e03b86476ffde4fa0a4ed343a9baf
 U rolf
-Z 9caefa8c9d972b6a0cdb5f592af5879f
+Z 07348996c9bb30c4d0d621d1c222f28e
 # Remove this line to create a well-formed Fossil manifest.
