@@ -1,7 +1,7 @@
-C Fixed\shtml-2.1\sand\shtml-2.2.\s(This\shtml\sreader\sist\scrusty\sstuff...)\n
-D 2004-05-08T00:57:11
+C See\sfile.\n
+D 2004-05-08T00:57:47
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
-F ChangeLog 2cf3479ef4b027966f4771bef1cf6a11bd877829
+F ChangeLog 8cbbf5d3d02f33f3a3884a02015af3b936fe3609
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -227,7 +227,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 4f20b3aa56fec9380dcc794fd8d1f9c0ba2ecfd4
+P 64cb1af84b88c13bae2cb541383413b9be63c611
 U rolf
-Z 112ac828f06a33f0e1eafdd2901fc582
+Z 5553231c7148ed02ff85f16db2942d26
 # Remove this line to create a well-formed Fossil manifest.
