@@ -1,7 +1,7 @@
-C Replaced\sa\sC++\sstyle\scomment\swith\sa\sC\sstyle\scomment.\n
-D 2003-11-10T23:10:54
+C See\sfile.\n
+D 2003-11-10T23:11:08
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
-F ChangeLog 371f984c5f1642a59754d1cb5e3fa01a5800472b
+F ChangeLog f91a89c91a214e2c5018c650a1c5836ba31b2a3f
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f40dc6d529c6fa7bfdcfaabe8c990f2b221de81d
+P ff1ec962736bf9ef6e5141510aaf55d6596c7dce
 U rolf
-Z ebebf83f7a08d47dcec1fb54cc4b1d35
+Z 4571fb320cb73a3f101d417dd3600239
 # Remove this line to create a well-formed Fossil manifest.
