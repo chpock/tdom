@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2002-12-23T03:12:36
+C The\sxslt\smethod\snow\sunderstands\salso\sthe\soptions\n-ignoreUndeclaredParameters\sand\s-xsltmessagecmd.\n
+D 2002-12-27T23:40:05
 F CHANGES 17f8fddea36060afdc3691cf6a989be83d353c40
 F ChangeLog 97da6d516dbb05ffeda096b061e8827681208f62
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -16,12 +16,12 @@ F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html 9de79d4b6e264bc302e9399ae1b97d87ce1622ff
 F doc/dom.n 1c10b2545356eed5645a2013474c221471a3deee
 F doc/dom.xml a93c3468d324d8322b2510f669c7298845186297
-F doc/domDoc.html 0d7e5b0f216bd8c58f830100b156a38bf3734dcd
-F doc/domDoc.n cd76574be68e619e17157831ba6665553a8ffdab
-F doc/domDoc.xml 28d6fee82a8e390d93c1a91ec867ed32258e3cd8
-F doc/domNode.html 05160e57e8f53e8b5aa2abfdc0b5aadaf70ef9d1
-F doc/domNode.n a7bacf4ac16104799b07f896169a24f135be3f6c
-F doc/domNode.xml 7656b5cefc571588a58c7a741d06792d3370b82d
+F doc/domDoc.html f430e3c6b675b4760be9db4ebcbf46b80ff0eae4
+F doc/domDoc.n a3e5ed7dbdf16f52382c1f1f7b46e6de72bc4e77
+F doc/domDoc.xml c36540cad8f35ee3e8c9b0d4c479098e5fa8884e
+F doc/domNode.html 478919fe0545183e2a3512104555fd03eb517646
+F doc/domNode.n 079634b8588a41fe1018347f0dd7da8d42aa7d64
+F doc/domNode.xml b077f2d1409cccd328d37b7e82e8860f0f7ffaea
 F doc/expat.html 62c17dc1321972e4fca9d6fb0de749e45e76bbfb
 F doc/expat.n 27deb5422627ddc5b4d5360703792ae50c7c6148
 F doc/expat.xml c1c9b9ab07555d9fa7f3b8a2fe3719fa1a9ac006
@@ -121,13 +121,13 @@ F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c dba7e77190826af093bbb0c4dc1f858687ef5983
 F generic/domxpath.c 2ed7412802fb55430d2060a0255ae9cd01aed629
 F generic/domxpath.h 2bbf18428f0a934a95d4262bd352cdfe4937e9cb
-F generic/domxslt.c 37f49b43b875d95f429afd9d03b8ab92fbbc64bb
-F generic/domxslt.h 77d19235cbf254d3ba46ae28088fdcbf98a4856a
+F generic/domxslt.c a03f83db53b1482f8dff47e90b13b12b2725eb0f
+F generic/domxslt.h b3fd115f488087195b9e91b730950facc11b85fb
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 34b586ff917e7fcba2110f4201311f376d723a3e
 F generic/nodecmd.h 20210ad9b4a3bdd6055175beca7bfdd8bd318a3f
-F generic/tcldom.c e51cdf126ed6dc95493b8a60486dd10ec8db39bc
+F generic/tcldom.c 3a5a6e70c926816ccaddb768fabe754334c143e4
 F generic/tcldom.h b06a092266deed3a050a824a8f1963b91e4c3649
 F generic/tclexpat.c 59ef95feef8034596a036674a4e0118c0a9b59f2
 F generic/tclexpat.h 62e83591b9fff070825add84310f7f7cc8cff3b8
@@ -186,7 +186,7 @@ F tests/stackedhdl.test 4b3dafa96849dabf738ffb401585dac5a5aed550
 F tests/xmlsimple.test 44c53210c7048ca1843ecbce9f2132f6358504f2
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.test d62883b8d18f24d73f4a5b99f6ae636f5cee87fb
-F tests/xslt.test e15f56aa4eb9e05411c8b454df280eb3078db642
+F tests/xslt.test 6afc8548e7611ad2f282d5ef8ddea9318e7691a9
 F unix/tclAppInit.c 06b688c30d27d4be8925b05d1607cbee950bbd1c
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F win/makefile.vc ce3f2ddefe3353b9dd6a0a89069dadee2cce2a21
@@ -197,7 +197,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P d0a4e69e9c978a1d8333aabd22d0e013d11535e3
+P e9de6ca07a982e9ada4c2caea0d04f8bfa72cf64
 U rolf
-Z 81d99a62e47c13d67f5a7cee2a37cb96
+Z 12f1b923003b74732bdaff85013bd5d6
 # Remove this line to create a well-formed Fossil manifest.
