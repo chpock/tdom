@@ -1,5 +1,5 @@
-C Added\sdomIsQNAME.\sBug\sfix:\sFor\stextNodes\sgetLine/getColumn\smethod\nreport\sthe\sposition\sof\sthe\sfirst\schar\sof\sthe\stext\snode.\n
-D 2003-04-03T23:07:15
+C Added\sdomIsQNAME.\n
+D 2003-04-03T23:07:51
 F CHANGES ca483fbc7c627b68977fc3eb6cf6798f42bca33c
 F ChangeLog 9b46402cfd3e183119ed8fc82e897a951b9f7c1f
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -118,7 +118,7 @@ F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c abde5a82bf6098883ab554aa726f477e0b1caa8b
 F generic/aolstub.cpp 0f2fb53cc8ba2a4a5fc8f5fe2dbe94c51e65e9bf
 F generic/dom.c 5cd6911f1dabef7525bf4906f757e89f7d236042
-F generic/dom.h 16ce6dc106162c5f396134a0a29a77fb2857255e
+F generic/dom.h 3024c65b004baeeaaf9be0ebe6308e0c075483ae
 F generic/domalloc.c aa1ed647c34d707014f187fd6f68d7b87f97f791
 F generic/domalloc.h 5e94d96321fb4f926b6e2c8cf01b8a28c3d0be0f
 F generic/domhtml.c 54fdfbbe29a80c0c2d5dcb081dc2ab183f1baf98
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a4cd1d36a94c08aad2ab3c4a64165267170472cb
+P d6adb7f78cb233d0d885dad52e52c1fa7db1a78b
 U rolf
-Z bdcd31a08553c6b2acac4a91e99bc5f6
+Z dd2820c99e66d0fce70a1aafacbfc7bb
 # Remove this line to create a well-formed Fossil manifest.
