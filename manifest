@@ -1,5 +1,5 @@
-C Added\sbaseURI\smethod,\swhich\sreturns\sthe\scurrent\sbase\sURI\sand\shas\san\noptional\sargument\sto\sset\sthe\sbase\sURI.\sThis\senables\sXMLBase\ssupport\son\nscript\slevel.\s(The\sgetBaseURI\sis\sdeprecated.)\n
-D 2003-12-17T03:36:47
+C Added\sbaseURI\smethod,\swhich\sreturns\sthe\scurrent\sbase\sURI\sand\shas\san\soptional\sargument\sto\sset\sthe\sbase\sURI.\sThis\senables\sXMLBase\ssupport\son\sscript\slevel.\s(The\sgetBaseURI\sis\sdeprecated.)\n
+D 2003-12-17T03:38:02
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog af2feea2d2e78e0d70ecfa77b569d33447f83f54
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -20,9 +20,9 @@ F doc/dom.xml c199ed098aeace1893dc391dac9aabe89c224cf5
 F doc/domDoc.html 0f9ecf66cdd6c37d04bbd5317b68cf7df2058e67
 F doc/domDoc.n d247420f030bb7bf2750821adbe79d369e4122a3
 F doc/domDoc.xml c20eba1a0edaa5600090ad5f13acf365c93acc0d
-F doc/domNode.html ac2951fa2fa3852372026f27400719254bd9e367
-F doc/domNode.n 942c5fdd1dd9eff855d4f4df56e33a1bf32ab30d
-F doc/domNode.xml 680eb6ed3d6176b2c5fdc8788ec611ce042c4035
+F doc/domNode.html c7b85c67220a58d047828a98b7127dfccea96450
+F doc/domNode.n a04b31a10fe491fa2547f943d3850977edfa9803
+F doc/domNode.xml a2aabfb9d9c71ff9296be7d1ba472e9536d568f1
 F doc/expat.html 052d8ed7ad56b9c44fa77bb649334d31568cc630
 F doc/expat.n e3ab0f2cb0e016e7529bf33d3a06b6a9bd4ea633
 F doc/expat.xml 4d3dda0c9a0554d02951904eb42dd593d97b6601
@@ -227,7 +227,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 2e0e74af7be49f4ec425369ae4d2ffc63bef7bdf
+P 6fc03c62bde4afbb470fa4bb45a17b2ce50b36d0
 U rolf
-Z f342c42580ac454e968f46334c294b13
+Z adc864510e2d8821f4fd135e4c091110
 # Remove this line to create a well-formed Fossil manifest.
