@@ -1,7 +1,7 @@
-C Fix\sfor\sMT-enabled\stDOM:\sIf\sa\sdoc\swas\sattached\sto\smore\sthan\sone\nthread,\snodeCmd\screation\swas\sborken\s(only\sone\sthread\sgot\sa\snodeCmd\sfor\na\sgiven\snode).\n
-D 2005-02-26T13:25:19
+C See\sfile.\n
+D 2005-02-26T13:25:45
 F CHANGES 877db3f7a6fd1a5175636e84125230f5949491ac
-F ChangeLog f19bf4b901cdb92279d40425c619a75d9d18c2e0
+F ChangeLog 68bf632f053ba5c9e5f9508f8abc567f572b35e5
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 793035f18fb2ad53394e3cda31222b9197e93a3a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -233,7 +233,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 5cff7b495c112fd679c82ecb95a3a77d6ce24cf2
+P eff67db5ef80cc652af9fa77669604893f5ce47b
 U rolf
-Z 0e09c6fdc8813f4aca81d186bad13ac8
+Z 8997e7cb4a7602940bace55b6df42a99
 # Remove this line to create a well-formed Fossil manifest.
