@@ -1,5 +1,5 @@
-C Clean\sup,\sto\sdecrease\s(innocuous)\scompiler\swarnings\s(thanks\sto\sPat\nThoyts\sfor\striggering\sinput\sand\spatch).\n
-D 2005-01-07T15:08:04
+C Improved\sVC++\scompiler\smakefile.\sThanks\sto\sPat\sThoyts\sfor\ncontribution.\n
+D 2005-01-07T15:14:28
 F CHANGES 5bb7643fd67d14d82ee76b8584bd319aeebec7b2
 F ChangeLog ca3b3b68e24fd48557154e50e8e0e9b80baa8e78
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -222,7 +222,7 @@ F tests/xslt.test 84dd64ee742210484e99e0d7a4c019d70ccb2431
 F unix/CONFIG f1ba21ea548b8825d4c19f0f5f11a5369926559f
 F unix/tclAppInit.c 06b688c30d27d4be8925b05d1607cbee950bbd1c
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F win/makefile.vc 14cdae7e0da80475429e8b48209d8f4825aacf0a
+F win/makefile.vc 7511b0f55fbe4ef8f50998cc10ae158c09d0ffc3
 F win/makefile805.vc e7ad7a308ba2c86a435badb06672708cc8145b2c
 F win/mkd.bat 85d3fe58ce051a778447fb2bfc7384867d21cef0
 F win/pkgIndex.tcl cfc3de56cc42062ee9d722bb5521b4324fb8147c
@@ -230,7 +230,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 58221ebd8fc561ba8321b74fea9a6917ddbcbd42
+P 557cc56ed26d00e47bd40f685475f3e7db241eec
 U rolf
-Z b5a180b4cf9c829f03daa727ec1f9020
+Z 08e7f9f9e04aa88517445075571b9307
 # Remove this line to create a well-formed Fossil manifest.
