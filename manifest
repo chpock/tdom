@@ -1,7 +1,7 @@
-C Fixed\sridiculously\slong\sruntime\sof\scertain\s//\sexpr\son\scertain\ndocuments.\sDuring\sanalysis\sand\stesting,\sit\sturned\sout,\sthat\sit\swould\nhave\sbeen\san\seven\ssimpler\sapproach,\sto\ssimply\sexpand\sthe\sabbreviation\n//\sin\sthe\saccording\sproductions.\sThough,\sthe\schoosen\simplentation\nseems\soften\sto\sbe\s(slightly)\sfaster\sand\sis\sa\sstart\sto\scollect\nexperiences\swith\searly\spredicate\sevaluation.\n
-D 2002-11-03T14:32:55
+C See\sfile.\n
+D 2002-11-03T14:36:48
 F CHANGES 17f8fddea36060afdc3691cf6a989be83d353c40
-F ChangeLog 0b75226362ed9a4bb2f7b37bff5491153cdf062f
+F ChangeLog af25b6929c0f9fe4c30cd18b2b4751fea113ef3a
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 82507d67b3c1f0d68d77050f4281227377f7ecce
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -194,7 +194,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 12d5e1b529059bbf5b60e780951c471c33f4b299
+P fde4487199c56401d3a68409c734fb730425927c
 U rolf
-Z 9eb83bf44a10d62275e958459465db61
+Z 4453d52f5463697e2672f30702d69254
 # Remove this line to create a well-formed Fossil manifest.
