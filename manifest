@@ -1,5 +1,5 @@
-C New\sfiles\sneeded\sfor\sthe\stdom\sstubs\stable.\s(Under\sunix,\stDOM\sstill\nisn't\sbuild\sas\sstubs\senabled\sextension,\sbecause\sthat's\sa\slot\sof\sdefine\nhassle,\sas\slog\sas\sJochen\sneed\stcl8.0.5\ssupport.\sBut\sthe\sextension\nstubs\stable\sis\sneeded\sfor\sthe\sMS\splattform,\sto\smake\stDOM\sextensions\s-\nlike\stnc\s-\swork.)\n
-D 2002-05-15T19:42:19
+C Inital\scommit\n
+D 2002-05-15T20:15:57
 F apps/xslt.tcl e5c0a837a82ddf0aa21ddb51d5891acfd64469fc
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html c21ddc9a115a8a82ee1560949dc08a1bc41233b6
@@ -108,6 +108,7 @@ F generic/tcldom.c 6b751e8df342cb01d2b0ae036225231f01b186c9
 F generic/tcldom.h dfa17c8b51f63f5a5fda8fe7f3a7363924fe309c
 F generic/tclexpat.c d8a3bcd6d345117cad9bf3a9df6917739bc7c705
 F generic/tclexpat.h a1bb96ca9c3917ae707b794252de1bea6122de4e
+F generic/tdom.decls 7c024d1386ebc0eee7f70017554734b3926fa1fe
 F generic/tdom.h 2805adcc83044ace4c34127d6c46c65fd354e636
 F generic/tdomDecls.h a06f03a2516d73c687151f8a60d9333401455f2b
 F generic/tdomStubInit.c 0880c45f706b223d5e93109590b6b411a20e9671
@@ -162,7 +163,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 791381775213fa80c05df03d96cbdf67b26c1aa7
+P fcd3a5fdda634f2b66e29bd183fe069e5d1716a4
 U rolf
-Z e3ba59379f87f4419b9bec57c2f8e90d
+Z f31459e2f198252d60c0151b20c49a9c
 # Remove this line to create a well-formed Fossil manifest.
