@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2003-11-28T01:27:35
+C Also\supdated\sto\sverson\snr.\s0.8.0.\n
+D 2003-12-08T01:50:30
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog 532d84b924de426e40175a7a534ddfff9bf7f3e9
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -219,15 +219,15 @@ F tests/xslt.test 09589e5e4acbcffe12616ab1bca7f65e185b724b
 F unix/CONFIG 9e65bbe84330e49ce8f992c9bbf218c6eb0edb36
 F unix/tclAppInit.c 06b688c30d27d4be8925b05d1607cbee950bbd1c
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F win/makefile.vc e9881ff12e10d53055c4978d5175deba581611e7
-F win/makefile805.vc b83c0905ef9f65d5350e36252f86b1635c98417a
+F win/makefile.vc 14cdae7e0da80475429e8b48209d8f4825aacf0a
+F win/makefile805.vc e7ad7a308ba2c86a435badb06672708cc8145b2c
 F win/mkd.bat 85d3fe58ce051a778447fb2bfc7384867d21cef0
 F win/pkgIndex.tcl d5bb3431b6da7e2677293906274f7235820c45f1
 F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ceb4c394ffe8c1e3f047fe3b7bba3e97ec5c2f56
+P 602a50247f60651e59e40b6433d4e109894ba42c
 U rolf
-Z 3887b7b43ae175c49d9300fbe6c7112b
+Z c6180a7924384e46de5c6db7eddab417
 # Remove this line to create a well-formed Fossil manifest.
