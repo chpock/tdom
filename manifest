@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2003-10-09T00:22:15
+C Added\simplementation\sfor\snew\smethod\s"normalize"\s(and\sas\sa\sby-product\sa\nC\simplementation\sfor\sthe\smethod\sappendData).\n
+D 2003-10-10T00:20:06
 F CHANGES 228acdbe3e0f22f66f131cd33f2aaa77c06c5e8d
 F ChangeLog b362a48904f13e53901efe31e3352c171dc7b754
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -117,8 +117,8 @@ F extensions/tnc/tests/loadtnc.tcl 418f1bbca50993a9fe012728b50f0f8080cff2ab
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c 4eb5d817c334c641af2c76cdb7f30998b5c5b8ed
 F generic/aolstub.cpp 2ba5a8d1046b7d92c92917ad4e17f8d944b41167
-F generic/dom.c b7be5bc2453bfb858ff76f23e22938ffabe7824e
-F generic/dom.h a0549c5e118e1aa62b20f61fb0311c1c360b546c
+F generic/dom.c 0ec364e169acafab7511bddd9abb140d3a67d7f4
+F generic/dom.h acf43b1b23c8e413414df1b91faf8a743c9744a8
 F generic/domalloc.c aa1ed647c34d707014f187fd6f68d7b87f97f791
 F generic/domalloc.h 5e94d96321fb4f926b6e2c8cf01b8a28c3d0be0f
 F generic/domhtml.c 54fdfbbe29a80c0c2d5dcb081dc2ab183f1baf98
@@ -132,7 +132,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 0a7a17669c2789cb31ceb25b79a60684f7d5460f
 F generic/nodecmd.h 66edebe59c0f9f01da4d68de490c00e24b730e7c
-F generic/tcldom.c abfede8023e52182feb5359edcb8c86ce78ca19d
+F generic/tcldom.c f50663ec5ec2632e52528b0e064392c6d617638a
 F generic/tcldom.h 1c21383eabe24ac9bea93e4f5c66f9a64a7b68d1
 F generic/tclexpat.c 07e5fab1b7755dc6423de373e2b7289bbd0d53c9
 F generic/tclexpat.h 654f6d0b4b486841360bc9066c27212f6e8b6c63
@@ -199,7 +199,7 @@ F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.test 78d79b8f094f5929cd886ffe9551efcdd74564df
-F tests/domCmd.test 55a2f78bd52ae24d5a694ff559720659c40b32bf
+F tests/domCmd.test e9508dff7ce67beeca2214b89fbdb834675e8c75
 F tests/domnamespace.test 7f6ff7ee11a6cb437240c07be18adc11fd876d46
 F tests/element.test 7da1983ecf71b5fa81bae0adfa1b74c8c21fbeff
 F tests/entity.test 8440a2109f4b250b539477b27c141f37ff19c3a3
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 4cf12e5b6fce03a02c61451e89adc5b8bb574fc0
+P d6c62c3145aa4c61c453d10d28c7e64b6aa9ff7f
 U rolf
-Z c4f64aa665978c89d43034b7f5d86047
+Z d57be418fee0d2c54f66b5f48297a2b4
 # Remove this line to create a well-formed Fossil manifest.
