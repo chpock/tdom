@@ -1,5 +1,5 @@
-C Closed\sa\smemory\sleak\sin\snot().\n
-D 2002-04-01T04:24:13
+C Escape\s'\\n'\sin\sAttribute\sValues\swhile\sserializing,\sto\sfulfill\sthe\nnote\sin\sxslt\srec.\s7.1.3.\n
+D 2002-04-02T00:36:20
 F apps/xslt.tcl e5c0a837a82ddf0aa21ddb51d5891acfd64469fc
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html c21ddc9a115a8a82ee1560949dc08a1bc41233b6
@@ -104,7 +104,7 @@ F generic/domxslt.h d8b3177418299ec4e3f1f92b736756e42d2dd3e1
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/nodecmd.c 60cfaefa435012d37a0bfe9fe115731c0efba17e
 F generic/nodecmd.h c7c326adbbc6b3e6c8bdd4131b281eb216e9e5d2
-F generic/tcldom.c 07e54f58051a25119d4c4153181213cd5fd5bc31
+F generic/tcldom.c ed29c7f2c3f39df743aee41bdb6df4bd8ff94fac
 F generic/tcldom.h dfa17c8b51f63f5a5fda8fe7f3a7363924fe309c
 F generic/tclexpat.c d8a3bcd6d345117cad9bf3a9df6917739bc7c705
 F generic/tclexpat.h a1bb96ca9c3917ae707b794252de1bea6122de4e
@@ -158,7 +158,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P b11313f86ec0825f1fb471f6f7912112b35b46da
+P 1cf837119081dea1926e3d3ebc4cb84d15fcd315
 U rolf
-Z ddb9a84fe194bb77e976f406a4bb7e6e
+Z 586830c0e28790f77558b8987f6e7e20
 # Remove this line to create a well-formed Fossil manifest.
