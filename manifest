@@ -1,5 +1,5 @@
-C Added\snew\stnc\smethod\sgetValidateCmd.\sChanged\sto\suse\sthe\ssame\smemory\nallocator/free\sdefines\sas\sthe\stDOM\score.\sBumped\sthe\sversion\sto\s0.3.\n
-D 2003-02-22T21:06:46
+C Started\stest\ssuite\sfor\sthe\stcl\sinterface\sof\sthe\stnc\scommand\sand\sthe\nvalidator\scommands.\n
+D 2003-02-22T21:19:59
 F CHANGES d6cad9f44838aa2e42fdbd3e75313ddccbbeb32a
 F ChangeLog 633300e18284a84a60f287274613890bb6eeed48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -110,6 +110,9 @@ F extensions/tnc/makefile.vc d593aaf4078a7bd960713f71f3a2f07a1fd570bd
 F extensions/tnc/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
 F extensions/tnc/pkgIndex.tcl.in 37901ed24e06da45c7d7a17f255b6108925400f8
 F extensions/tnc/test.tcl d9d4c2a1dcd2a7a70096a2a1727f8600ff0c78fd
+F extensions/tnc/tests/all.tcl 845c9dab65c294c3570f69cc731d6fef62efbd03
+F extensions/tnc/tests/loadtnc.tcl 418f1bbca50993a9fe012728b50f0f8080cff2ab
+F extensions/tnc/tests/tnc.test c58ef682c5fe1408331b8f4258e24f23d5352019
 F extensions/tnc/tnc.c 7da4683c71177a424d8307f6afb52a4b61000c7c
 F generic/aolstub.cpp 0f2fb53cc8ba2a4a5fc8f5fe2dbe94c51e65e9bf
 F generic/dom.c 4ff109c7078583f82de5d5f11e664bc54c4ea970
@@ -197,7 +200,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 155f101390debb25f25cb1f51727fa1edde38c6d
+P 1aa803e20b87569c38933466be1736853da589d9
 U rolf
-Z 271c64d5e70ba88243a672d2785771e3
+Z cb6114f9a23c58f828f9d772da2586ed
 # Remove this line to create a well-formed Fossil manifest.
