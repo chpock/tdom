@@ -1,7 +1,7 @@
-C Don't\sallow\sthe\smethods\sparse,\sparsechannel,\sparsefile,\sfree\sand\sreset\nfrom\swithin\sa\scallback\sof\sthe\sparser\sbe\sused\sbut\sraise\sa\stcl\serror.\n
-D 2004-12-10T18:56:15
+C See\sfile.\n
+D 2004-12-10T18:58:41
 F CHANGES 5e1729ae568c08de4588a28d3584d862a29a2022
-F ChangeLog de4b735cff4c9459381bc170b5aebf0fd9fb77dd
+F ChangeLog 71151b6082f5902defd1cc895de7da4582e97fd3
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -230,7 +230,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ffcfdc386618ab102a83df1c3cf4990ee1493e51
+P a3f781423466a13412af526ced77f4170346c876
 U rolf
-Z 06b4e52c39c04cc74cbafc892edf484c
+Z 15cb7c2205669f6be16d55787c60460c
 # Remove this line to create a well-formed Fossil manifest.
