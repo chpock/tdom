@@ -1,5 +1,5 @@
-C See\sfile\n
-D 2003-05-16T14:40:04
+C Corrected\sthe\sdocumentation\sof\sthe\screateDocumentNS\smethod:\sthe\sargs\suri\sand\sdocElementName\swere\sdocumented\sin\sthe\swrong\sorder\s(reported\sby\sVico\sKlump).\sMinor\smarkup\schanges.\n
+D 2003-05-19T12:55:13
 F CHANGES 59cab3c950a08a20053aa26b3a8718c6efa8c913
 F ChangeLog 7b200d22ad99a66d4df2f64418dd04bd7caac2cf
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -14,9 +14,9 @@ F configure-tcl8.0.5 de905df007af9d276ace4b08d3d2183656f90cb7 x
 F configure.in a1be0e51be1babb7e721723ab9f804ebfd35f693
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
-F doc/dom.html b1b1bf3fb033146e1a055868df01cd5e2a92b624
-F doc/dom.n 6a23b81e288e0046fa1b426b039382f364483138
-F doc/dom.xml 54e0fb6bc46baccd0b27309c978d7c491f3c8cb0
+F doc/dom.html 0148c1f13ebd6b87fa4a7be1bea24b95690808b9
+F doc/dom.n 0a62d1ce6419735b71a83ad22892f7a028554f40
+F doc/dom.xml c199ed098aeace1893dc391dac9aabe89c224cf5
 F doc/domDoc.html ec56415dc6282448b0fe3427dec24c4dce348690
 F doc/domDoc.n 1db76a41071f43358a015ae86073c5bcfeb9d3c9
 F doc/domDoc.xml cf6075d105fc436387b379e945908d626938288d
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 6cb6245b08977a1b6ee607801f0cfd1008a13f43
-U zoran
-Z c0ecb0e6f4a9f2ecf2313817f5a090aa
+P 8c1949e1e2c78e32d8ed918a2da1847c68b36560
+U rolf
+Z 4de81b3d7f49c0f2a0ad3cbe3dd4f030
 # Remove this line to create a well-formed Fossil manifest.
