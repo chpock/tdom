@@ -1,5 +1,5 @@
-C Added\snew\sextension\spackage\s"tdomhtml"\sinstead\sof\shaving\sthe\ssole\sfile\nsomewhere\sin\stdom\slib\sarea\swhich\sneeds\sto\sget\sloaded\ssperately.\n
-D 2002-11-01T21:14:19
+C Now\spart\sof\sa\sseparate\sextension\sto\stdom.\n
+D 2002-11-01T21:19:45
 F CHANGES 9074b44a5e036ff42a8c3f6c2f5957cc76997b4c
 F ChangeLog 406b6ae0717a830bf0b14486da7ed0477ef175f0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -142,7 +142,6 @@ F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
 F generic/xmlsimple.c 2098b0d7cb77ae5e85f393552b8ebc6b60377fb9
 F generic/xmlsimple.h f2861868b0fed932c79f9e595bb875d261d97bd5
 F lib/tdom.tcl aef8cdea4e8b6c087d903379ca0f66b38bf07672
-F lib/tdomhtml.tcl f50d56a51edf9c2f1b814682629e6e6e2fd11cfa
 F tclconfig/ChangeLog 16d950c5f3b8b048a77b9671f3705d360f226759
 F tclconfig/README.txt c7a8a24b2782cd897a7608813161611f8e0521a0
 F tclconfig/ac_c_bigendian_cross.m4 d42e2f20b8ea4df7c29a8595f10489bfaab58096
@@ -195,7 +194,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P d465e9d75baee87ca88bad7470650bf1a15a5984
+P 283f266fb685060886d8a0fbe3ba890689a3d99b
 U zoran
-Z f62cccbd7620d28210cd867f88150787
+Z b490bad563573b6c508f3a3db7592388
 # Remove this line to create a well-formed Fossil manifest.
