@@ -1,7 +1,7 @@
-C Fixed\sbug\sreported\sby\sWilhelm\sKlink\n(http://groups.yahoo.com/group/tdom/message/404\ssee\stest\nxslt-4.1).\sAgain\sa\sproblem\s(sideeffect)\sof\srenumbering\nnode->nodeNumber\s(which\sis\snecessary\safter\smodification\sof\sthe\stree\nfor\ssome\sXPath\sexpr\sto\swork).\sThe\skeys\sof\sthe\sentries\sin\sthe\sbaseURIs\nhash\stable\sof\sthe\sdocuments\swhere\sthe\snodeNumber\sof\sthe\s(subtree\sroot)\nnodes\swith\snew\sbaseURI.\sSince\sthis\snodeNumber\sisn't\snecessarily\nconstant\sover\sthe\slifetime\sof\sa\snode\s(because\sof\sthe\spossibility\sof\nre-numbering\sthe\stree),\sthis\scould\snot\swork\sanymore.\sInstead\sthe\nnodeNumber,\swe\snow\suse\sthe\spointer\sto\sthe\snode\sstructure\sas\sKey\sfor\nthe\sbaseURIs\shash\stable.\sThis\spointers\sstay\salways\sconstant,\seven\sif\nthe\snodeNumber\schanges.\sAdditional\scode\swas\sadded\sto\sdomFreeNode(),\sto\nensure,\sthat\san\sentry\sin\sthe\sbaseURIs\shash\stable\sgets\sfreed,\sif\sthe\nrelated\snode\sis\sin\sdeed\sfreed.\sRemoved\sthe\syesterday\sadded\sreseting\sof\nthe\sdomUniqueNodeNr\scounter,\sbecause\sit\sturned\sout\sin\stesting,\sthat\nthere\sare\sproblems\swith\ssorting\sof\sresultSets,\swhich\sincludes\snodes\nfrom\sdifferent\sdocuments\s(which\smay\shappen\swith\ssome\sspecial\sXSLT\nconstructs\s(document()\scalls\swith\sa\snodeset\sas\sargument)).\sThe\nreseting\sof\sthe\sdomUniqueNodeNr\sis\sstill\sdesirable,\sbut\sit\sturned\sout,\nthat\sit\sshould\sbe\scarefully\sconsidered,\swhen\sit\sshould\sbe\sdone.\n
-D 2003-01-30T00:36:36
+C See\sfile.\n
+D 2003-01-30T00:38:09
 F CHANGES 92d5a67a9b11f538ccbece3c5d07ea8b20cb265a
-F ChangeLog f84548a49b14d24bdcf2b9387389077e64d45a26
+F ChangeLog 9484d07384dda356b424292fcff900bc77ebfbf3
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 14d751e87eea2482a6f81b2452ce50ce2292016d
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -197,7 +197,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 6b52088c2671a9d3ed0556fe0bed4935c3318925
+P d439fe172ce4e35c50c7f31ddccdac23fa0ac8c5
 U rolf
-Z fda8d94df857c2bb2cb7643e60fc5fc5
+Z 3d146ac504524835fe86416ebb665557
 # Remove this line to create a well-formed Fossil manifest.
