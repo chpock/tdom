@@ -1,5 +1,5 @@
-C See\sfile\n
-D 2003-03-08T15:48:01
+C Hegh....\n
+D 2003-03-08T15:48:33
 F CHANGES bedaded2db2b4b9c98267dec8dcfb01261cfbb9a
 F ChangeLog 4ef9e2661e8fc7e9d53cd22f028db66ad5d3bb72
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -9,9 +9,9 @@ F README a6c61e573170a3ce1cdf154283d141ce67c66946
 F README.AOL 7e9969511c9ae21a349b1da4b63b7eb113ee2d8f
 F aclocal.m4 79e2f4aa6a138371f2d31f28355749e5019d7651
 F apps/xslt.tcl 33eaaf45b831e6613d528156f7f1bbc02fd9f849
-F configure 6176dd5384627eebbbf4309d9dee146bf1f8c8a4 x
+F configure c752bfcba4d3c63e0001c9b4951247921883dd7d x
 F configure-tcl8.0.5 d1895768cd7b715e310dae9acb84d91603857f7a x
-F configure.in f35274f57de7407d8396794af0f0bed0fa970f7d
+F configure.in 86a3b4edc45e332742e46dae3e6fc54232895cf2
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html 9de79d4b6e264bc302e9399ae1b97d87ce1622ff
@@ -223,7 +223,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 9238bc913ad3f0549492eef843c46b18fc65b120
+P dac6b201ca388b93bbf7fa128226266f6dc9ac19
 U zoran
-Z d94a6edd0932936133f75fe17a8616bb
+Z 453f075a8e16608f0cb24719f99ea704
 # Remove this line to create a well-formed Fossil manifest.
