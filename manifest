@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2003-10-10T00:22:10
+C Forgot\sto\sremove\ssome\stesting/debugging\scode...\s:-(\n
+D 2003-10-10T00:25:42
 F CHANGES 228acdbe3e0f22f66f131cd33f2aaa77c06c5e8d
 F ChangeLog a2aad8f9549819ac8df8a2444e05abeab045289d
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -117,7 +117,7 @@ F extensions/tnc/tests/loadtnc.tcl 418f1bbca50993a9fe012728b50f0f8080cff2ab
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c 4eb5d817c334c641af2c76cdb7f30998b5c5b8ed
 F generic/aolstub.cpp 2ba5a8d1046b7d92c92917ad4e17f8d944b41167
-F generic/dom.c 0ec364e169acafab7511bddd9abb140d3a67d7f4
+F generic/dom.c 7e1dcf7093c4bb72d7c3f9151609e03131880925
 F generic/dom.h acf43b1b23c8e413414df1b91faf8a743c9744a8
 F generic/domalloc.c aa1ed647c34d707014f187fd6f68d7b87f97f791
 F generic/domalloc.h 5e94d96321fb4f926b6e2c8cf01b8a28c3d0be0f
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 652229bedb564466107e81586ff3b60f1c8e83b0
+P b614d3201e9d6d773b0e02cf00fb365e40894e92
 U rolf
-Z 69fafd6b6f7f62a304e2dbd5dadd1962
+Z 7a3b17d1a162810d098e98d9d4dfe745
 # Remove this line to create a well-formed Fossil manifest.
