@@ -1,7 +1,7 @@
-C Fixed\san\smistake\sin\sthe\slast\scheck-in:\sthe\schanged\sfile\swas\sxslt.text,\nnot\sxpath.test.\n
-D 2005-03-13T01:07:30
+C Grrr.\sAnd\sthe\sdate\swas\salso\swrong.\n
+D 2005-03-13T01:07:53
 F CHANGES 877db3f7a6fd1a5175636e84125230f5949491ac
-F ChangeLog d0d5bd2d2a8974ce85f0bc0d934b60718aedefbf
+F ChangeLog 9081d200ab243474242400dd0a9de0e397d6916a
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 793035f18fb2ad53394e3cda31222b9197e93a3a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -233,7 +233,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f25a93872c5b99edad5c5e3b88cb319f5e43b6a4
+P e1dbfb7887ba82c2b5b051762cd556a33369acba
 U rolf
-Z c0214fb4ad87a2591e884e1e18ca83c5
+Z c750019491175328958e12e7182494b3
 # Remove this line to create a well-formed Fossil manifest.
