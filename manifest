@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2004-05-26T01:56:39
+C Remove\sit\n
+D 2004-05-26T14:41:43
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog 96e6b5492b56580fc349d2cb916ee7096dd15e56
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -199,7 +199,6 @@ F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.test 2fac1464643dec499fbe55e4f807e799cf495b5b
-F tests/domCmd.test d2adcf178b0fe0f08701229793530b310bf81da2
 F tests/domDoc.test 8cd228b146bfb8b02c52845e51ff8a1ac50e6ef9
 F tests/domNode.test 90d3eb50349ebae68b1e5e7d3b31ceb21ab9a1a4
 F tests/domnamespace.test 7f6ff7ee11a6cb437240c07be18adc11fd876d46
@@ -229,7 +228,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f356b8809437770db1f74de2f9c81fa838e53762
+P d5704fb73ece15c49e420915d99f6533e2804187
 U rolf
-Z 43dc60e7927fd850cec063875d277ac6
+Z 88311c3da2208617d43a27773b475989
 # Remove this line to create a well-formed Fossil manifest.
