@@ -1,7 +1,7 @@
-C Bug\sfix:\sDon't\squash\swhite\sspace\sof\snon\swhite\sspace\sonly\scontent\sin\ntrim\smode.\n
-D 2003-12-11T13:35:22
+C See\sfile.\n
+D 2003-12-11T13:38:09
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
-F ChangeLog c518dc158e1fdfebeffaea84d49683ef184ea030
+F ChangeLog 9c86bbef32917a086c2b704ac48acc3db138b12a
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -227,7 +227,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 5d1e8fe7cdd2d5be3c97b504fc890dc5e4ef285b
+P 44db286071513fe00bbbb3c23c6fe5e23fa01c19
 U rolf
-Z d942151f2cd6843aa568a62e52ebe407
+Z 8b8c3bf0d4b0b9f7c11d8287c6d6e4f7
 # Remove this line to create a well-formed Fossil manifest.
