@@ -1,17 +1,17 @@
-C See\sfile\n
-D 2003-09-14T01:35:10
+C Made\smore\sTEA-2\scompatible\sby\sremoving\stcldomsh\sfrom\sdefault\sbuild\sand\nby\susing\ssome\smore\spre-calculated\svariables\sfrom\stcl.m4.\nThe\sconfigure\sregenerated\swith\sautoconf\s2.52.\n
+D 2003-09-14T11:06:59
 F CHANGES 59cab3c950a08a20053aa26b3a8718c6efa8c913
 F ChangeLog b50638e2a8a6ba073281a7711352a405132ac966
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
-F Makefile.in 25204720818592a271aecc462432628b5a1862a4
+F Makefile.in 64358ebf45a14d8790a7600985aa7be3a6178519
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
 F README 5a9c069dee183889e8d81ad355f5091ac97a1a5b
 F README.AOL 6b124cc7a7cae5fa901b9a2996dbdc5fe4085ba7
 F aclocal.m4 79e2f4aa6a138371f2d31f28355749e5019d7651
 F apps/xslt.tcl 36e6c834331ff2eaae4dbc8a9b360db5b9d51566
-F configure e2a12b701e542383b6ccc3bc9e0cea1d6d0e232f x
+F configure da2711ae3fbbb67ce42631459eca1f3ba8f7e078 x
 F configure-tcl8.0.5 a5d0c7988aaf04fb2fbba0746f84895b2b3f58de x
-F configure.in a1be0e51be1babb7e721723ab9f804ebfd35f693
+F configure.in 6eba5198630e84871d9d72f8d940987a35d76a58
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html 0148c1f13ebd6b87fa4a7be1bea24b95690808b9
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 63b1313111b62d262aa54a3fb99e776c4d1fe7b0
-U rolf
-Z 3f898b8dcb6b9ef23c988655472593fe
+P 63ed4d108cb57e6612e06c58723c9ff890cc323c
+U zoran
+Z 149a2e2842b787849a303b3e254917de
 # Remove this line to create a well-formed Fossil manifest.
