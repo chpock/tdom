@@ -1,5 +1,5 @@
-C Optimization:\sNow\shandles\sxsltVarFrames\sand\sxsltVariables\sas\sstacks,\ninstead\sof\sconstantly\smalloc/free\sit.\sOn\sthe\sway\sremoved\nxsltVariable->select\s(because\sit\sisn't\sused\sanywhere)\sand\srenamed\nxsltVariable->value\sto\sxsltVariable->node\s(because\sthat's,\sto\swhat\nthis\sstructur\smember\spoints).\n
-D 2002-04-10T02:48:35
+C Changed\s/\senhanced\snamespace\shandling\sand\snamespace\sinformation\nstorage.\sThe\snamespace\sfield\sof\sthe\sdomNode\sand\sdomAttributeNode\nstructurs\sis\sstill\sset.\sBut\sother\sthan\sup\sto\snow,\snamespace\sattributes\nare\snow\sstored\sin\sthe\sDOM\stree\sas\sother,\s'normal'\sattributes\salso,\nonly\swith\sthe\snodeFlag\sset\sto\s"IS_NS_NODE".\sIt\sis\staken\scare,\sthat\nevery\s'namespace\sattribute'\sis\sstored\sbefor\sany\s'normal'\sattribute\nnode,\sin\sthe\slist\sof\sthe\sattributes\sof\san\selement.\sThe\sstill\ssaved\nnamespace\sindex\sin\sthe\snamespace\sfield\sis\sused\sfor\sfast\saccess\sto\sthe\nnamespace\sinformation.\sTo\sspeed\sup\sthe\slook\sup\sof\sthe\snamespace\sinfo,\nan\selement\sor\sattributes\scontains\sto,\sthe\snamespace\sindex\sis\snow\sthe\nindex\snumber\s(plus\soffset\s1)\sof\sthe\scorresponding\snamespace\sinfo\sin\nthe\sdomDoc->namespaces\sarray.\sAll\sxpath\sexpressions\swith\sthe\sexception\nof\sthe\snamespace\saxes\s(still\snot\simplemented)\shave\sto\signore\sthis\n'namespace\sattributes'.\sWith\sthis\senhanced\sstorage\sof\snamespace\ndeclarations,\sit\sis\snow\spossible,\sto\sfind\sall\s"namespaces\sin\sscope"\sof\nan\selement\sby\sgoing\sup\sthe\sancestor-or-self\saxis\sand\sinspecting\sall\nnamespace\sdeclarations.\s(That\smay\sbe\sa\sbit\sexpensive,\sfor\sdocuments\nwith\slot\sof\snamespace\sdeclarations\sall\sover\sthe\splace\sor\sdeep\ndocuments.\sSomething\slike\nhttp://linux.rice.edu/~rahul/hbaker/ShallowBinding.html\s(thanks\sto\sJoe\nEnglish\sfor\sthat\surl)\sdescribes,\smay\sbe\san\sidea,\sif\sthis\snew\smechanism\nshould\snot\sscale\sgood\senough.)\n\nChanges\sat\sscript\slevel:\sspecial\sattributes\sused\sfor\sdeclaring\sXML\nnamespaces\sare\snow\sexposed\sand\scan\sbe\smanipulated\sjust\slike\sany\sother\nattribute.\s(That\sis\snow\saccording\sto\sthe\sDOM2\srec.)\sIt\sisn't\nguaranteed\s(as\sit\swas),\sthat\sthe\snecessary\snamespace\sdeclarations\sare\ncreated\sduring\sserializing.\s(That's\salso\sDOM2\scompliant,\sif\sI\sread\sit\nright,\seven\sif\sthis\sseems\sto\sbe\sa\sbit\sa\smessy\sidea.)\sBecause\sthe\sold\nbehavior\shave\ssome\sadvantages,\sfrom\sthe\sviepoint\sof\sa\sprogrammer,\sit\neventually\sshould\srestored\s(as\sdefault\sor\sas\s'asXML'\soption?).\n
+D 2002-04-19T18:55:36
 F apps/xslt.tcl e5c0a837a82ddf0aa21ddb51d5891acfd64469fc
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html c21ddc9a115a8a82ee1560949dc08a1bc41233b6
@@ -91,20 +91,20 @@ F extensions/tnc/pkgIndex.tcl.in f3ca1ee461a2ce4c6f7fae3ff078da261fab6e4b
 F extensions/tnc/tcl.m4 9404ac273b962ddaf946d3170c5183e55d0984b3
 F extensions/tnc/test.tcl efade8bcb9fd9e269ed5c259f3edf182bc917b72
 F extensions/tnc/tnc.c 88ead51574461280693295eaa7a483afd6f7b497
-F generic/dom.c 500ad08b087fbd4eafe8956ce522e2bcf9b6f609
-F generic/dom.h 2f3212f2e15fac2fbd3ae105a68d76fc4e2cdcf8
+F generic/dom.c 40d254dd0615d738179ef6111bbaa2fbb1105e3e
+F generic/dom.h eb0444ebb27e7ac606a799a35a298d6be7e605db
 F generic/domalloc.c 9fd035f9fe601d2ed6ea00eef448f3165e8e54c5
 F generic/domalloc.h 2c5c6412831ffaff02d2a2d969adddbede8752b6
 F generic/domhtml.c e8cda5580aa8c3fe08e9f432a8482dd667c22e6e
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
-F generic/domxpath.c dbaab6a773ace1c77a619db4ea6da1f5500ad181
+F generic/domxpath.c c6fde3fad595b159af258dddeef86e3ea162bb53
 F generic/domxpath.h dfd8f333372a695bed37d97c0b314f7b76e24ea3
-F generic/domxslt.c ce73c8f93ddebe2687b0920016db4817b54f8e45
+F generic/domxslt.c d9fe4c820ac5598173fd3e0dad9a746179304568
 F generic/domxslt.h 4e41a3885354345ec29800c6c0f18ebd3fd0d2ce
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/nodecmd.c 60cfaefa435012d37a0bfe9fe115731c0efba17e
 F generic/nodecmd.h c7c326adbbc6b3e6c8bdd4131b281eb216e9e5d2
-F generic/tcldom.c dbdecd0aa5dd0fdba01e9e7e0651accb02cd56f7
+F generic/tcldom.c 1da198e07f7c2b3fb3add9c943adfa0954785afb
 F generic/tcldom.h dfa17c8b51f63f5a5fda8fe7f3a7363924fe309c
 F generic/tclexpat.c d8a3bcd6d345117cad9bf3a9df6917739bc7c705
 F generic/tclexpat.h a1bb96ca9c3917ae707b794252de1bea6122de4e
@@ -158,7 +158,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P e3ba6d222a447f54424d83f06fb0a9f4aae3c309
+P e0fda7769a3a1f9a0e5e4cd4280f5e3dbaf45a57
 U rolf
-Z 7edcba8fc08f233a12bc63c59c3e8af7
+Z 2eab48310914d2cfd9a2e9e5237433a1
 # Remove this line to create a well-formed Fossil manifest.
