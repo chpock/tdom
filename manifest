@@ -1,7 +1,7 @@
-C toXPath\smethod:\sfixed\sbug\swith\snon-element\stop\slevel\snodes,\sclosed\smem\nleak.\n
-D 2004-09-02T17:07:53
+C See\sfile.\n
+D 2004-09-02T17:08:41
 F CHANGES 9113c39a3c8720f4e5e1b56bc4fe079ad319a58e
-F ChangeLog 6b9902146e3abc0483e64282b4c2ffecdcc6622e
+F ChangeLog 9d0e301710d9915b609075e497304e51745f357c
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -230,7 +230,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 407398a157222e35ce79d81c93e37bbffb9c4bdf
+P e5074c2f5d72b595bdc0f74e107812f2178698c8
 U rolf
-Z 4e798c5af1bdaa245d505d2d02652486
+Z b63b6c6b99c54048d20e128005cbc32e
 # Remove this line to create a well-formed Fossil manifest.
