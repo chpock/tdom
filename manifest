@@ -1,7 +1,7 @@
-C Proc\snewdoc:\sNew\soptional\sargument\s(list\sof\snames\sof\slocal\svariables)\nallows\sthe\suse\sof\slocal\svariables\s(in\sthe\sscope\sof\sthe\scaller\sof\nnewdoc)\sin\sthe\sscript\sargument\sof\snewdoc.\sContributed\sby\sChuck\sFerril.\n
-D 2003-04-20T10:50:00
+C See\sfile.\n
+D 2003-04-20T10:50:16
 F CHANGES 59cab3c950a08a20053aa26b3a8718c6efa8c913
-F ChangeLog fe95b6513940484b61bf6f6938365a5bf4461851
+F ChangeLog 6ae9827a69af55cb51c352be04034cea86d39868
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 25204720818592a271aecc462432628b5a1862a4
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f4b52968476207163d89dcf1bf3592d568292890
+P 8634886d0d40e9605a754062afe4fd7c62bd92a1
 U rolf
-Z 1cad6d4fbed19dc397cf37b20f7285c8
+Z fd5bb74ad237d1579b32200a7f565fbe
 # Remove this line to create a well-formed Fossil manifest.
