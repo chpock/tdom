@@ -1,7 +1,7 @@
-C Fixed\sa\sfew\ssimple\sparser\sseg\sfaults\sin\scase\sof\snot-wf\sinput.\sSee\nxmlconf/xmltest/not-wf/sa/022.xml,\sxmlconf/xmltest/not-wf/sa/042.xml\nfor\sexamples.\n
-D 2004-03-14T02:19:09
+C See\sfile.\n
+D 2004-03-14T02:21:49
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
-F ChangeLog 10f1df5bbab386a8141fc1f948cea523d4885041
+F ChangeLog 284eee645b6b98305498ea3ff1e9eeaf8291ba0b
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -227,7 +227,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P cbb29b4e519f0b07b3247ee777041c37d026c572
+P 09134befbe07195f12d57b4f51ac6d1e506d75ce
 U rolf
-Z 6c6b37a0a6c254c7e0f45b7524682417
+Z 965c5bcd3bdcd2fffd9b1d51ba4083c3
 # Remove this line to create a well-formed Fossil manifest.
