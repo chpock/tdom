@@ -1,9 +1,9 @@
-C See\sfile.\n
-D 2003-12-24T02:47:46
+C Doh!\sUndo\sthe\slast\schanges;\sI\sfixed\sthis\salready\s2003-10-12.\n
+D 2003-12-30T19:19:47
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog a4379644214ec83ac552cef90f9677871ef87cb7
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
-F Makefile.in 55e1868e1d480d30a962801cea5ae53d1858a238
+F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
 F README 5a9c069dee183889e8d81ad355f5091ac97a1a5b
 F README.AOL 6b124cc7a7cae5fa901b9a2996dbdc5fe4085ba7
@@ -101,7 +101,7 @@ F extensions/tdomhtml/doc/tdomhtml.n da39a3ee5e6b4b0d3255bfef95601890afd80709
 F extensions/tdomhtml/doc/tdomhtml.tmml da39a3ee5e6b4b0d3255bfef95601890afd80709
 F extensions/tdomhtml/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F extensions/tdomhtml/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
-F extensions/tdomhtml/pkgIndex.tcl.in 167fa26defee4a43c4b00c805f654fa6961fd9af
+F extensions/tdomhtml/pkgIndex.tcl.in 2612d2a8fd5a213a1379ad5570c229d82810dcb5
 F extensions/tdomhtml/tdomhtml.tcl 7d48c19d50f203ee71b3db15d0fc6077dc244798
 F extensions/tnc/Makefile.in 30472c194851090b3d1db0459d90ad9dff2c1ae8
 F extensions/tnc/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
@@ -227,7 +227,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P daa716781a7c36257e7433ecd74a403d1a23ef0c
+P 328f623e77ed90d56ac565eab466d1a98bf722fc
 U rolf
-Z 6a4e60b879cf536971f1ef0a9e274f99
+Z 8c5f2f1f4b1bffa40de5e8c6f0311370
 # Remove this line to create a well-formed Fossil manifest.
