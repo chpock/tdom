@@ -1,5 +1,5 @@
-C Package\sversion\sbumped\sto\s0.2.\n
-D 2002-08-19T00:27:58
+C Bug\sfix:\sfor\severy\snode\stype\sother\sthan\selement\snodes\sthe\stype\sgiven\sto\sa\stcl\scoded\sextension\sfunction\swas\s"attrnodes",\swhich\swas\scleary\swrong\sfor\stext\snodes\setc.\sAdded\serror\smsg,\sif\sthe\sresult\stype\sof\sthe\stcl\scoded\sXPath\sfunction\swas\snot\sknown.\n
+D 2002-08-19T00:33:49
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 90af78958d8b642862a15b9029b0bd8fad84da5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -115,7 +115,7 @@ F generic/domxslt.h 77d19235cbf254d3ba46ae28088fdcbf98a4856a
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/nodecmd.c c861712d44896adcee7923f25c6c0de3c7156fd7
 F generic/nodecmd.h 0225d87d05a9afc2ce0d5baf8966b076ffa71405
-F generic/tcldom.c 9f1a8694310730145818e5a6b0e336bac976461d
+F generic/tcldom.c 51b7fdc5d6b68935747fe5532eb4a8110f27546c
 F generic/tcldom.h b06a092266deed3a050a824a8f1963b91e4c3649
 F generic/tclexpat.c d4febc4e5be7d0788661fcd31194e9fc7c655347
 F generic/tclexpat.h 62e83591b9fff070825add84310f7f7cc8cff3b8
@@ -181,7 +181,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f5b11e72703689108a1dfdd494cd0084242e9616
+P 745b6729b7d55a1d4157671c974817bd4274744a
 U rolf
-Z 2bfd704dbdd58f53b2497c8a7404f842
+Z 6ec18d09a8acfc907fceca33cf70c546
 # Remove this line to create a well-formed Fossil manifest.
