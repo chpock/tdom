@@ -1,5 +1,5 @@
-C Changed\stest\saccording\sto\sthe\schanged\swording\sof\sthe\serror\smsg\sin\scase\nof\swrong\smode\sarg\sto\ssetObjectCommands.\n
-D 2004-07-28T17:22:26
+C [namespace\sexport]\sthe\spublic\sprocs\sin\s::tDOM.\sAdded\sa\sfew\smore\nencodings\sto\sIANAEncoding2TclEncoding.\n
+D 2004-07-28T18:50:53
 F CHANGES b33838f198622990fdd3e8852b5f7b78d7522faa
 F ChangeLog d6c6211438f8ff9efda7116cd1bbebb69476ea23
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -147,7 +147,7 @@ F generic/utf8conv.h e0d2756b2d77ad9a8508a0dcf7cce5e10fa4c9a5
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
 F generic/xmlsimple.c e90f4f81cef8d1348cdee96fd2b14712c696c150
 F generic/xmlsimple.h f2861868b0fed932c79f9e595bb875d261d97bd5
-F lib/tdom.tcl 932bb3d8da52466b68aa4e3a1e3d5e351459a437
+F lib/tdom.tcl ad9edde422d6a74d3f0f58d73664bfb3f8205df8
 F mac/PrecompHeaders/CoreHeadersMach-O.c e4406d8c34fcaea82d21e62c35012893b460dfd5
 F mac/PrecompHeaders/CoreHeadersMach-O.h 508208239a919a6dee4275f9148962a13faeb94d
 F mac/PrecompHeaders/CoreHeadersMach-O.pch 60665d6a2787eb3dfda701baff12dd3d5029e7f5
@@ -228,7 +228,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 244b7c26a286b60e77b535c201c38645d8ff0b73
+P 8df6514f41b8392d5dad1dacec605a0637e3399f
 U rolf
-Z eab711504f5b64712d7db844870fb5c7
+Z 37f4e2d502dc91a8c249fb1e35b4cb0f
 # Remove this line to create a well-formed Fossil manifest.
