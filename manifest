@@ -1,7 +1,7 @@
-C Added\sagain\ssome\srecently\simplemented\smethods\sto\sdomObj_usage\sand\nnode_usage,\swhich\sgot\saccidentally\sremoved\sby\sthe\slately\seditorial\nchanges.\n
-D 2003-10-17T19:34:40
+C See\sfile.\n
+D 2003-10-17T19:35:07
 F CHANGES 993140b623ef50267a92d858779d91eeaf39da4c
-F ChangeLog 26f7b2dd39c238d4ded4f9bcd41b906efa144fe9
+F ChangeLog 659745379568e284d279b7020145720d4b5cb422
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 317f0af5b2d42474fcbc303d395800669978e5ac
+P a45af57c1809728a460be5f4f4a5b883a8191500
 U rolf
-Z 4780d0168b8c77d6c17bfffb48dd4d4d
+Z 69e4ec69af373d4d52c0e81e741a2ee8
 # Remove this line to create a well-formed Fossil manifest.
