@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2005-01-10T20:44:30
+C Scripted\sxpath\sfunction\selement-available:\smoved\sxsl:output\sto\sthe\navaliable\selements,\ssince\sit's\sin\sfact\savaliable\sin\sthe\smeantime\s(with\nexception\sof\sthe\s'version'\sand\s'cdata-section-elements'\sattributes)\s-\nthe\soutput\soptions\scould\sbe\squeried\sfrom\sthe\sresult\sdoc,\sbut\sit's\sthe\nresponsibility\sof\sthe\sapplication,\sto\sserialize\sthe\stree\saccording\sto\sthat\nsettings.\n
+D 2005-01-11T15:57:19
 F CHANGES 877db3f7a6fd1a5175636e84125230f5949491ac
 F ChangeLog 95a4cb9bdc20ca7a5ad33b77a3cc57915aab48a8
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -149,7 +149,7 @@ F generic/utf8conv.h 4132db4e05ac30dcb78dc3b4799ae0a9ae8a057f
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
 F generic/xmlsimple.c cd286a1244ff8de163fe6514921eb8e90c5db462
 F generic/xmlsimple.h 803a2ab6e9a120436206c54140ae2c08107fd0b6
-F lib/tdom.tcl ad9edde422d6a74d3f0f58d73664bfb3f8205df8
+F lib/tdom.tcl 67ad7eb52c8f25154686dd91fa0197147f689b12
 F mac/PrecompHeaders/CoreHeadersMach-O.c e4406d8c34fcaea82d21e62c35012893b460dfd5
 F mac/PrecompHeaders/CoreHeadersMach-O.h 508208239a919a6dee4275f9148962a13faeb94d
 F mac/PrecompHeaders/CoreHeadersMach-O.pch 60665d6a2787eb3dfda701baff12dd3d5029e7f5
@@ -233,7 +233,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 3299c813f6002875f88fce69f9dd29f298959e2c
+P 5d369f183684de98cd4025ad193d85ab0edff112
 U rolf
-Z a073de42cb641750c4a7fb21ca15b49a
+Z 9caefa8c9d972b6a0cdb5f592af5879f
 # Remove this line to create a well-formed Fossil manifest.
