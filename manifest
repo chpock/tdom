@@ -1,5 +1,5 @@
-C Added\ssupport\sfor\sxsl:output\scdata-section-elements\sattribute.\sAdded\nmethod\scdataSectionElements\sto\sdomDocs,\sas\stcl\sinterface\sto\ncdata-section-elements.\n
-D 2005-02-03T18:27:31
+C Added\ssupport\sfor\sxsl:output\scdata-section-elements\sattribute.\sAdded\smethod\ncdataSectionElements\sto\sdomDocs,\sas\stcl\sinterface\sto\scdata-section-elements.\sAdded\sdocumentation\sfor\sthe\sdomDoc\smethod\sinternalSubset.\n
+D 2005-02-03T18:35:05
 F CHANGES 877db3f7a6fd1a5175636e84125230f5949491ac
 F ChangeLog 5f0d35a34960b910c17184c8c340c6c3f5458ca9
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -17,9 +17,9 @@ F doc/category-index.html 2e1a41b03d31f42dd00a0c449f7f28db6227bbf2
 F doc/dom.html b7bab0b6e2a570ef036e155a712d2da498c1842a
 F doc/dom.n 8e1b80d9fc9efb0724cb965de18ef09ed3b19d1b
 F doc/dom.xml 9dbbb9372f400918b3955fd411db4f8e0c9ab8a1
-F doc/domDoc.html 6155aca39a7daf882e766dfcaf3fdd839de9ac92
-F doc/domDoc.n 8c273b8f40a33d1fa0d1a449a6e9b477ef718bd0
-F doc/domDoc.xml f00cc350850f16cf7e912913adcee008108b36bb
+F doc/domDoc.html f82c7a7b02e7eb34e8044595e9d3e5fa80c65cd5
+F doc/domDoc.n 91b818e55f2f59f3b680b29245533639b22a4ab4
+F doc/domDoc.xml d18f2899987c516bed1b4e085afb93754c9237b4
 F doc/domNode.html 106e7f43b16584cc3a48aa514ab609fca3930853
 F doc/domNode.n be69a96717bcfdd7691156ca94ae3568dbe2197e
 F doc/domNode.xml 8ca6c9b2434a728b44c17da594a097432f2c597a
@@ -233,7 +233,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 28b1d4af234e90ff39039ba436731fd79c10d415
+P 6fb1633bd7326b1a5a55b74918b6f10e791de3aa
 U rolf
-Z b6dce6a35c0a2bdc26c4c04e6e513017
+Z 7738083494ea1885e5648f7814408388
 # Remove this line to create a well-formed Fossil manifest.
