@@ -1,5 +1,5 @@
-C Bug\sfix\sfor\sdocument()\sfunc,\sif\scalled\swith\s2\sargs\sand\sfirst\sarg\nevaluates\sto\sthe\sempty\sstring.\sImproved\serror\sreporting,\sif\san\sXSLT\nvariable\sis\stried\sto\sreset,\salthough\sthere\sis\salready\ssuch\sa\svariable\nin\sscope:\snow\sthe\sname\sof\sthe\svar\sis\salso\sreported\sin\sthe\serror\smsg.\n
-D 2003-10-24T00:51:54
+C Improved\serror\sreporting,\sif\san\sXSLT\svariable\sis\stried\sto\sreset,\nalthough\sthere\sis\salready\ssuch\sa\svariable\sin\sscope:\snow\sthe\sname\sof\nthe\svar\sis\salso\sreported\sin\sthe\serror\smsg.\n
+D 2003-10-24T00:53:24
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog f860cd99a930e1037e828a0cd9cbddca639756da
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -214,7 +214,7 @@ F tests/stackedhdl.test 4b3dafa96849dabf738ffb401585dac5a5aed550
 F tests/xmlsimple.test 44c53210c7048ca1843ecbce9f2132f6358504f2
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.test 07f72d47be6a7e37a3a3f535a113f6f922684349
-F tests/xslt.test 97de1ff573f458c58dd8ad7870ddd74bf5acf520
+F tests/xslt.test c224fc12a85a13600e4b21f6fdcbfb28f1bf04e3
 F unix/CONFIG 9e65bbe84330e49ce8f992c9bbf218c6eb0edb36
 F unix/tclAppInit.c 06b688c30d27d4be8925b05d1607cbee950bbd1c
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P cb1308db022a7853f35f2338aa1f3466f634adae
+P e16cd792570c4fb89fb7ac3bc4560a6dc54e90cc
 U rolf
-Z 11bc682bbba8a9bba5d13954b0a9ed9c
+Z 2a72944f0aaab15175e0a063d455c063
 # Remove this line to create a well-formed Fossil manifest.
