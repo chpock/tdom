@@ -1,7 +1,7 @@
-C Removed\slast\scomma\sin\senum\sXML_Status\sdeclaration,\sto\sprevent\scompiler\nerrors\s(xlc\son\sAIX\s64).\s(Current\sexpat\sCVS\shead\shas\sthe\ssame\sfix.)\n
-D 2005-04-04T19:03:47
+C See\sfile.\n
+D 2005-04-04T19:04:02
 F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
-F ChangeLog 62fa09583ec564d2334e1d1ea78d6cc89dc61e29
+F ChangeLog aa56b8aed3e7346a0f79eac51f02fd1efb80dc71
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 793035f18fb2ad53394e3cda31222b9197e93a3a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -233,7 +233,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 302d4d86196005fd4e28cf072244a99f015159ff
+P d05ccff18bc700586bf641b6914c221e0b02f8af
 U rolf
-Z 633e9d7d3fc38b03f347f496cc0e4c90
+Z b8fce1a32814f631e9018284dade563d
 # Remove this line to create a well-formed Fossil manifest.
