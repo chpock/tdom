@@ -1,6 +1,6 @@
-C Updated\sto\susing\sdomDoc\sxslt\smethod,\s-escapeNonASCII\sfor\sasXML\sand\sas\sHTML\sand\sadditionally\s-htmlEntities\sfor\sasHTML.\n
-D 2002-10-30T13:21:22
-F ChangeLog c7426456c8e195f73b20fa9d6615b8e7ab1cdf9e
+C Added\schanges\sfrom\s2002-10-29\sund\s2002-10-30.\n
+D 2002-10-30T13:28:53
+F ChangeLog 47d3efffec703502632552c88d2bba32fa461fe3
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 66936cbfa9580e3037d502f2e1d73aa112ed46d6
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -185,7 +185,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c8870f601dfb231a7f0c3a513b8d710b2ebac4ea
+P b2942824bac25f4f3b0f88da3dda5b38cc01a80f
 U rolf
-Z 19024a8b50e6751adf089ab6bffbe6e4
+Z 4c82a7dd0ed51ef377920b63a2cf50ca
 # Remove this line to create a well-formed Fossil manifest.
