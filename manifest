@@ -1,5 +1,5 @@
-C Link\sagainst\stDOM\s0.8.0.\n
-D 2004-08-10T19:49:35
+C Corrected\sa\sspelling\smistake\n
+D 2004-08-11T00:56:16
 F CHANGES b33838f198622990fdd3e8852b5f7b78d7522faa
 F ChangeLog 7448f18ba045a0ef1734a119a1946c611548e627
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -14,9 +14,9 @@ F configure-tcl8.0.5 a5d0c7988aaf04fb2fbba0746f84895b2b3f58de x
 F configure.in 4ea3774cd8870c2d58c9b2feb1441525d40bc49f
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
-F doc/dom.html ad4908d542c3866f0638168d0adf138c5754ecad
-F doc/dom.n 3b27862890403c91ed8f19c0ef950ed14b5dddac
-F doc/dom.xml a367d310fb0a9ebebec337fbbea4fed7a945f016
+F doc/dom.html 240717c173dfe4022f800b64de96516fdeaf2b35
+F doc/dom.n 1f9953baae9ad799fab6f16ce1d5589ecbf962f1
+F doc/dom.xml c7d62493c61ff9f9b701d57e268818da805c1ba3
 F doc/domDoc.html 45f4b7e5ba6f759e3481ad78028cf0ffa62e1d89
 F doc/domDoc.n 5c2a3451aa968ccd49f6c52c7d3c136ec5b1d6e5
 F doc/domDoc.xml e1176862739f66cdb660af46bb5815f93ba0f72e
@@ -228,7 +228,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 47da660a540717cf53a56b3b8f5faf80a166759e
+P 6c1d396a770815bc746e46743da918aca6bc6303
 U rolf
-Z 3759a301eb4e1e027e905edcd900934f
+Z 0fe9bc77994012f95ef54287395dc9ed
 # Remove this line to create a well-formed Fossil manifest.
