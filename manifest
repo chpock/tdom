@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2005-01-10T19:09:22
+C Corrected\stypo.\n
+D 2005-01-10T20:43:54
 F CHANGES 877db3f7a6fd1a5175636e84125230f5949491ac
 F ChangeLog e0715ee082b2dbfd735845f67b8554b582aef8fd
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -14,9 +14,9 @@ F configure-tcl8.0.5 a5d0c7988aaf04fb2fbba0746f84895b2b3f58de x
 F configure.in 4ea3774cd8870c2d58c9b2feb1441525d40bc49f
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html 2e1a41b03d31f42dd00a0c449f7f28db6227bbf2
-F doc/dom.html effd37d415a1aabf5903057bdf4e7f3724db02f8
-F doc/dom.n 97ec6b238634cbe64d48650fc6b8293b02fd1781
-F doc/dom.xml f560541a0f7ba7594494794a92bec6b45afd4f70
+F doc/dom.html b7bab0b6e2a570ef036e155a712d2da498c1842a
+F doc/dom.n 8e1b80d9fc9efb0724cb965de18ef09ed3b19d1b
+F doc/dom.xml 9dbbb9372f400918b3955fd411db4f8e0c9ab8a1
 F doc/domDoc.html 7f2b6520e0375a25fa462167b59682d9fa29a2e5
 F doc/domDoc.n a2e8bd7cc247c3d697d19be878d216e7af5d36f1
 F doc/domDoc.xml f7d294f3a00e287014ea6f6f5c1f6d211c20435f
@@ -233,7 +233,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 2a90ec4f84da8e38378e5e91532b62f60cfe3106
+P cec75cf5d0597025e981954a7f18949af645d537
 U rolf
-Z ad21c8d66bfeae326fc601ab23161305
+Z bd367347f2c716f87cc7265adf8183b2
 # Remove this line to create a well-formed Fossil manifest.
