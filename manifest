@@ -1,7 +1,7 @@
-C Bug\sfix\sfor\sreplaceChild:\sIf\sthe\snode\sto\sreplace\swas\swrong,\sthe\sdoc\ngot\smangled.\sBug\sfix\sfor\sappendChild,\sreplaceChild:\sthe\snew\snode\scould\nnot\sbe\sa\ssibling\sor\schild\sof\snode.\sSpeed\simprovment\sin\ssome\scases\sfor\nremoveChild,\sreplaceChild,\sappendChild.\n
-D 2003-09-27T23:24:54
+C See\sfile.\n
+D 2003-09-27T23:28:31
 F CHANGES 813a168a7b86886b7d8988978f2ae6a85e2f0663
-F ChangeLog 08d70f7654855aa9742e86fb0c36efae52f3bcbe
+F ChangeLog 0b790ffec670edca8c90b414b4a99d95fe5b71a1
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 9fe9d5783c508826425cc831636a172aa1716be3
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 0928bb8bfe4e0a42576636893822360d11f1fb8d
+P 181e84b4695a41e0db7b45f83a5690dd59648600
 U rolf
-Z 806b92db0c2a5c7c2450653487cf7686
+Z 6ee5aa746a6910772b99e12654b9da3a
 # Remove this line to create a well-formed Fossil manifest.
