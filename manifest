@@ -1,7 +1,7 @@
-C Fixed\serror\sreporting\sin\stDOM::extRefHandler.\n
-D 2003-07-06T22:43:54
+C See\sfile.\n
+D 2003-07-06T22:44:19
 F CHANGES 59cab3c950a08a20053aa26b3a8718c6efa8c913
-F ChangeLog 95ce6bf12c04feffbf95b46f1bda80927001b975
+F ChangeLog 9de7bdfb445e54683164a6d0a69e08c69dba697b
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 25204720818592a271aecc462432628b5a1862a4
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P d7127058c38c550be60eba5ad533d6b02c572965
+P 53412c65139075c4d963b4e3047b5e45a57d8636
 U rolf
-Z 08da2c21336c01ac4d57c6406cf8caf6
+Z 7fe223e2154e9fe0a71442918ab7a0cc
 # Remove this line to create a well-formed Fossil manifest.
