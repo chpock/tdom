@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2003-05-10T22:17:31
+C Switched\sto\suse\sXML_ParserCreate_MM(),\sto\sbe\sable\s(at\stDOM\sbuild\stime)\sto\smake\sthe\sexpat\sparser\suse\scustom\s*alloc/free()\sfunctions\s(macro\sMEM_SUITE\sin\sdom.h).\sFor\sTCL_MEM_DEBUG\sand\sNS_AOLSERVER\sbuilds\sthe\smem\sfunctions,\sused\sby\s\sthe\sparser\sdefault\snow\sto\sTcl_Alloc()/Tcl_Realloc()/Tcl_Free().\sSwitched\sto\sXML_FreeContentModel(),\sfor\sfreeing\sstored\selement\scontent\smodels.\n
+D 2003-05-16T11:52:55
 F CHANGES 59cab3c950a08a20053aa26b3a8718c6efa8c913
 F ChangeLog f5d4cdfab29e7e96b7f4957e6094172f754e8754
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -118,7 +118,7 @@ F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c 4eb5d817c334c641af2c76cdb7f30998b5c5b8ed
 F generic/aolstub.cpp 0f2fb53cc8ba2a4a5fc8f5fe2dbe94c51e65e9bf
 F generic/dom.c f69e0c968efdff4c8a19948ae8d562010d4241b5
-F generic/dom.h efebc341c66ff3bdfab209e014759578189652b9
+F generic/dom.h 6e80602f9d7174e85d945e8765307fee640eb688
 F generic/domalloc.c aa1ed647c34d707014f187fd6f68d7b87f97f791
 F generic/domalloc.h 5e94d96321fb4f926b6e2c8cf01b8a28c3d0be0f
 F generic/domhtml.c 54fdfbbe29a80c0c2d5dcb081dc2ab183f1baf98
@@ -126,15 +126,15 @@ F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c dba7e77190826af093bbb0c4dc1f858687ef5983
 F generic/domxpath.c e14c75997d9352a272adf657c73694b7ec99d8f6
 F generic/domxpath.h 2bbf18428f0a934a95d4262bd352cdfe4937e9cb
-F generic/domxslt.c 917c2195176fa25bbd917602c15ac38aaef7a1c3
+F generic/domxslt.c cf9a163cdd12f1ba66b7846dccecac8a48eb9136
 F generic/domxslt.h b60468a7092d4d5712b4a8776f3db51d4c03aa04
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c c2fe5b784c2ad83c904edd3d82050b8f7c7fc444
 F generic/nodecmd.h 20210ad9b4a3bdd6055175beca7bfdd8bd318a3f
-F generic/tcldom.c f50ad9bd09fb25f3eb348d6ee4375e20249bca63
+F generic/tcldom.c a2fe40ce94a57af1d894a2fc691d8ac6f04ac45c
 F generic/tcldom.h 1c21383eabe24ac9bea93e4f5c66f9a64a7b68d1
-F generic/tclexpat.c e08727e8e2bb87f023f8dd66135c00db3aa4f02a
+F generic/tclexpat.c c42fe2f39afcbb1c68050585fd45f939c0eac21f
 F generic/tclexpat.h 62e83591b9fff070825add84310f7f7cc8cff3b8
 F generic/tdom.decls fa90ba9b8d00f5b405ea68724d95ad79f64c424b
 F generic/tdom.h db128152fac506159243e47cb3a77cc7d9fe4360
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 71830d068c952dcc09b954746aa9b29dfe3a99c2
+P aa04611d6113c803dad84d52f4057925e1197408
 U rolf
-Z 89fb78cf7d9d47c59071392dc089e635
+Z 37bbf934145c753b3febcd7e7a1698d2
 # Remove this line to create a well-formed Fossil manifest.
