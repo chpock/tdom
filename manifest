@@ -1,5 +1,5 @@
-C Fixed\sa\smemory\sleak\s(handling\sof\selement\scontent\smodels).\n
-D 2002-05-22T16:40:22
+C Added\sdeleting\sof\sthe\screated\sparser\sobjects,\sfor\slesser\s'noise',\nwhile\smemory\sleak\sdebugging.\n
+D 2002-05-22T16:42:17
 F apps/xslt.tcl 1b9a65d5db054f01e4033883fa53a313d8e6d5fe
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html c21ddc9a115a8a82ee1560949dc08a1bc41233b6
@@ -124,16 +124,16 @@ F lib/domhtml.tcl 1ce01926d867282e27e87c08bb4c2b7875f4003b
 F lib/tdom.tcl 2b96eca275fc04f82d353577cdcc669721e60abd
 F tests/all 2736eca1748774d3dfbf558ed57e3b8c26f97008
 F tests/all.tcl 2a84081629096fae0bff9408f4779d1d57a7866d
-F tests/attribute.test 0dd4239f57309f79c7915cf2a8cbe29d0409f631
-F tests/cdata.test a1fca4aebb501105e32ba110a5c85c2f184eb824
-F tests/comment.test d44910aa709c181d9beee065ef2e27889b5a47e6
+F tests/attribute.test a26d96df1aaa0b0c282942b39414d3f36e6ce800
+F tests/cdata.test a7819fcbc81c05f8c99cdea5e35984efa5074ac2
+F tests/comment.test aa6c31516951c29ae7c6fabb51ec3c92b89e1b6b
 F tests/data/REC-xslt-19991116.xml d86bd1efbc1f810b2a6f74c0c182bd37ae5ee09d
 F tests/data/books.xml 0b1ae696b2bbc1035303f5637a6ef67f041d0b9e
 F tests/data/i18n_1.xml 7b4282addd307b17940fffd818de016ca64311fa
 F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
-F tests/decls.test d8c51ee7588f6bdb8fd8caea999fe546684d77cb
+F tests/decls.test 6b400d7cee373b81d057bf76f5ec3c6f2de75ec8
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
-F tests/doctype.test 7452a7aab0397d6dd1117b2e5145037109169c4d
+F tests/doctype.test 9ed82f3607b25f297bbb28bbcc6679ebd29066d2
 F tests/dom.test 8cc4e92e9825748f9c8f5c969e32d84dd3d53c0a
 F tests/domnamespace.test 1cf980a8d0269f84eeafc0a0850725b6184ba52d
 F tests/dtd-5.1.dtd 8f16a5c1ff5181e7136cd0d0f1255ae269c38e3c
@@ -148,7 +148,7 @@ F tests/element.test ade40cf96f550cc0b3279da25590b289a12b5a6a
 F tests/entity.test fe49eb1ddf401e453b1020c2e1c847683c604615
 F tests/i18n.test 78d8becc37fc83e0872f6301f5bbaebff024a822
 F tests/namespace.test 163958c942caffe6705493090be2c9e1d0b02e58
-F tests/parser.test f8e8b967f25f5fa11d8e855a7be315ff36309e23
+F tests/parser.test 495bfc4dd1c81bc4f6a62ba5808268330f39b22e
 F tests/pcdata.test 0176bf7c7551c658b3a87dc905171780ae14d7bc
 F tests/pi.test fce92888ad1f9b84aa5bb8196cbf35a7d7817e8c
 F tests/xmltest.test c6f5b4445b776ccb628ef9dc9ec5cd2659aa032a
@@ -173,7 +173,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P adc606e80255bca5ed712181f46425874d587200
+P 6b68d7b876cac9eb79eea736738b6187ec0155a7
 U rolf
-Z bf140abd031c3dfa985e741a77cb08e2
+Z cf3ef534a935a2578a02c5d36be1859a
 # Remove this line to create a well-formed Fossil manifest.
