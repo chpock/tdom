@@ -1,5 +1,5 @@
-C Corrected\sthe\scheck\sin\slog\sfor\sthe\sleast\scheck\sin...\n
-D 2002-04-09T01:17:26
+C xslt\srec\s5.2:\s"The\sstring-value\sof\san\selement\snode\sis\sthe\nconcatenation\sof\sthe\sstring-values\sof\sall\stext\snode\sdescendants\sof\sthe\nelement\snode\sin\sdocument\sorder."\s(Also\strue\sfor\sroot\snode.)\sThe\nxpathGetTextValue()\scould\snot\sused\sfor\srecursive\sgetting\sof\sthe\stext\nnode\sdescendants,\sbecause\sit\salso\sreturns\sthe\stext\svalue\sof\scomment\nand\sprocessing\sinstruction\snodes.\sxpathGetTextValueForElement()\sdoes,\nwhat\sthe\sspec\srequires.\n
+D 2002-04-09T01:59:50
 F apps/xslt.tcl e5c0a837a82ddf0aa21ddb51d5891acfd64469fc
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html c21ddc9a115a8a82ee1560949dc08a1bc41233b6
@@ -97,7 +97,7 @@ F generic/domalloc.c 9fd035f9fe601d2ed6ea00eef448f3165e8e54c5
 F generic/domalloc.h 2c5c6412831ffaff02d2a2d969adddbede8752b6
 F generic/domhtml.c e8cda5580aa8c3fe08e9f432a8482dd667c22e6e
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
-F generic/domxpath.c 232078c2dcc397f0cd691325bb87d822732b4282
+F generic/domxpath.c dbaab6a773ace1c77a619db4ea6da1f5500ad181
 F generic/domxpath.h dfd8f333372a695bed37d97c0b314f7b76e24ea3
 F generic/domxslt.c a73256c4374e4bb0d5933d57359b94da4d4b9725
 F generic/domxslt.h 4e41a3885354345ec29800c6c0f18ebd3fd0d2ce
@@ -158,7 +158,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 691495afd14a09c1b5bdb2895c5bb718a77e24c9
+P 78779edd389dd433c351118a455b6ee5963d4756
 U rolf
-Z 46336d9cae9334774ee6dfb2ec3bc248
+Z 1ed11c194b2f64dee77ebad421048a66
 # Remove this line to create a well-formed Fossil manifest.
