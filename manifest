@@ -1,7 +1,7 @@
-C Added\stwo\stests\sabout\stwo\ssubtleties\sof\sthe\sXPath\ssyntax:\swhite\sspace\nbetween\sthe\s$\sand\sa\svarname\sare\snot\sallowed,\swhile\swhite\sspace\sbetween\nthe\sbraces\sof\snode()\sis\sallowed.\n
-D 2005-03-13T01:06:39
+C See\sfile.\n
+D 2005-03-13T01:06:49
 F CHANGES 877db3f7a6fd1a5175636e84125230f5949491ac
-F ChangeLog 3e962872e1fffd037c0a9affa6ae41a32f13ebce
+F ChangeLog 645f86df015ee1408c7582725f282222221f0d5d
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 793035f18fb2ad53394e3cda31222b9197e93a3a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -233,7 +233,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 7c9d524443131296f8d39306271168720abb4b27
+P 0240a04ee8b70589cfc781a225e2f607b72a795e
 U rolf
-Z e831a30e8fb96745df9e3ffc5fcf927b
+Z c143bf444331af18c7867a1a442f34b9
 # Remove this line to create a well-formed Fossil manifest.
