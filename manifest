@@ -1,7 +1,7 @@
-C Improved\serror\sreporting,\sif\san\sXSLT\svariable\sis\stried\sto\sreset,\nalthough\sthere\sis\salready\ssuch\sa\svariable\sin\sscope:\snow\sthe\sname\sof\nthe\svar\sis\salso\sreported\sin\sthe\serror\smsg.\n
-D 2003-10-24T00:53:24
+C See\sfile.\n
+D 2003-10-24T00:53:52
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
-F ChangeLog f860cd99a930e1037e828a0cd9cbddca639756da
+F ChangeLog 24024647c2dd073540d6957c003836ee7f807e70
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P e16cd792570c4fb89fb7ac3bc4560a6dc54e90cc
+P 5963c051e21f1b069fb4db8a5d9b6c9fda3afff3
 U rolf
-Z 2a72944f0aaab15175e0a063d455c063
+Z 3a68c4359def0f1248181667f4e2ff43
 # Remove this line to create a well-formed Fossil manifest.
