@@ -1,5 +1,5 @@
-C Added\smethod\s'startBefore',\sto\scompare\sthe\srelative\sorder\sof\stwo\snodes\sout\sof\sthe\ssame\sdocument.\n
-D 2003-03-19T13:55:55
+C Added\sthis\sfile\s(used\sby\sthe\susage\sexample\sof\sxe).\n
+D 2003-03-19T14:03:27
 F CHANGES bedaded2db2b4b9c98267dec8dcfb01261cfbb9a
 F ChangeLog 446a9519a6f4745107c006547eadc4f8e95db6c9
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -193,6 +193,7 @@ F tests/data/dtd-6.5.dtd 961850932623ee218b1cc2cbf544662a9942f2ce
 F tests/data/dtd-6.6.dtd a1036539ff132635da3e368604b59651a47909e4
 F tests/data/i18n_1.xml 7b4282addd307b17940fffd818de016ca64311fa
 F tests/data/i18n_2.xml 4dc16d8ee2337fbd30061dd1159f6c49b2d0a52c
+F tests/data/mondial-europe.xml 61790f95c676755667358b6ddfc46eb8cc3f470b
 F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
@@ -225,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 10d8023a21c7da5c72354180bb05d2d63ffcc40f
+P 16f004bf75902450da66f872edc79833f39242c4
 U rolf
-Z eac98bba23d3bfee0a64f146976e5982
+Z 82ce8753b031c9fb233fcf47e4a7df1a
 # Remove this line to create a well-formed Fossil manifest.
