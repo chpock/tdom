@@ -1,7 +1,7 @@
-C Added\ssupport\sfor\sxsl:output\scdata-section-elements\sattribute.\sAdded\smethod\ncdataSectionElements\sto\sdomDocs,\sas\stcl\sinterface\sto\scdata-section-elements.\sAdded\sdocumentation\sfor\sthe\sdomDoc\smethod\sinternalSubset.\n
-D 2005-02-03T18:35:05
+C See\sfile.\n
+D 2005-02-03T18:44:20
 F CHANGES 877db3f7a6fd1a5175636e84125230f5949491ac
-F ChangeLog 5f0d35a34960b910c17184c8c340c6c3f5458ca9
+F ChangeLog f19bf4b901cdb92279d40425c619a75d9d18c2e0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 793035f18fb2ad53394e3cda31222b9197e93a3a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -233,7 +233,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 6fb1633bd7326b1a5a55b74918b6f10e791de3aa
+P 68ef504f345477fe7a49112ff72214ae924a02ea
 U rolf
-Z 7738083494ea1885e5648f7814408388
+Z cbbc08bbd689e59e8c9b1d8ab8e4193b
 # Remove this line to create a well-formed Fossil manifest.
