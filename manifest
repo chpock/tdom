@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2003-10-24T00:53:52
+C number()\sbug\sfix:\sNow\sworks\saccording\sto\sthe\sXPath\srec\sunderstanding\nof\sa\sNumber,\snot\swith\sthe\slibc\sunderstanding\sof\sa\sdouble.\sGlobalized\nthe\smacro\sIS_XML_WHITESPACE.\n
+D 2003-10-26T02:01:26
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog 24024647c2dd073540d6957c003836ee7f807e70
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -124,7 +124,7 @@ F generic/domalloc.h 5e94d96321fb4f926b6e2c8cf01b8a28c3d0be0f
 F generic/domhtml.c 9a7ec999da852d996d7ac9c936534b965039e4cf
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c 4cd8e6e228bd6c12c43d3b3e860a60f7ce507c34
-F generic/domxpath.c 3043714f283a2d24073167d3b7a6b34b443da744
+F generic/domxpath.c 3b718795359350870372e4250fff01869130913c
 F generic/domxpath.h ec29823825248b0df1076860593c83562727f132
 F generic/domxslt.c 0519fab7a27ca64161839a7dede81dd7553d0765
 F generic/domxslt.h b60468a7092d4d5712b4a8776f3db51d4c03aa04
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 5963c051e21f1b069fb4db8a5d9b6c9fda3afff3
+P 534205a214add4c5514b871ce435e97fcbb7acc8
 U rolf
-Z 3a68c4359def0f1248181667f4e2ff43
+Z 12417028dbbf427254fec6f2c1ef3e46
 # Remove this line to create a well-formed Fossil manifest.
