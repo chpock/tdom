@@ -1,7 +1,7 @@
-C Fixed\sproblems\sreported\sby\sOleg\sOleinick\svia\sprivate\smail.\n
-D 2002-10-31T11:53:14
+C See\sfile\n
+D 2002-10-31T20:20:47
 F CHANGES da39a3ee5e6b4b0d3255bfef95601890afd80709
-F ChangeLog d7856b342547a289b5b66a3e14b950014831ca93
+F ChangeLog 0e71528131b223a090fcd3e395d89f8a2b57a4a2
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 66936cbfa9580e3037d502f2e1d73aa112ed46d6
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -186,7 +186,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 49ba3aebe3235fb28c38abae3d9e456632ed86b2
-U rolf
-Z b11b2da62ad56532b89e6f62da3bb3c2
+P b44f6f216fe39cbb1366ca87ede0b9367d5d9060
+U zoran
+Z 78454cfc828fb830b5f4d6655416211e
 # Remove this line to create a well-formed Fossil manifest.
