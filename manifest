@@ -1,5 +1,5 @@
-C Added\ssome\s'selectNodes\s-namespaces'\stests.\n
-D 2005-01-06T19:21:26
+C Added\smethods\stransform\sand\sdelete\sto\sxsltCmds.\n
+D 2005-01-06T19:22:03
 F CHANGES 5e1729ae568c08de4588a28d3584d862a29a2022
 F ChangeLog c3eab0bf57005202de1934c3230c3f5489f5e668
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -17,9 +17,9 @@ F doc/category-index.html 2e1a41b03d31f42dd00a0c449f7f28db6227bbf2
 F doc/dom.html effd37d415a1aabf5903057bdf4e7f3724db02f8
 F doc/dom.n 97ec6b238634cbe64d48650fc6b8293b02fd1781
 F doc/dom.xml f560541a0f7ba7594494794a92bec6b45afd4f70
-F doc/domDoc.html 4b3632d1ffe9d7f008e0bdc08d41db2c221fea47
-F doc/domDoc.n 4e7ae0561a77a981c848e723065ad1efaf38a106
-F doc/domDoc.xml 04ca67ec8461a2811fe1db6fb21a184bb4951981
+F doc/domDoc.html 7f2b6520e0375a25fa462167b59682d9fa29a2e5
+F doc/domDoc.n a2e8bd7cc247c3d697d19be878d216e7af5d36f1
+F doc/domDoc.xml f7d294f3a00e287014ea6f6f5c1f6d211c20435f
 F doc/domNode.html 9da96586f4fe80094e48b99f9840d9173997435f
 F doc/domNode.n 26127754fccebdb2d4426d3cce28ae06def94206
 F doc/domNode.xml 7aafc3ace6d912aa9131aa2d6dc3137ab153534f
@@ -201,7 +201,7 @@ F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.test 289fc94c960bea16cdbdcc61630479ecc3d9bd40
-F tests/domDoc.test 3bb8c3237bd18a284a55e2693628b1ab33464f95
+F tests/domDoc.test ca9a1afe14b8800099d7a6197b0b42692b73fb47
 F tests/domNode.test 6b28d034692821a416c8d23976a68b5e286e2293
 F tests/domnamespace.test 7f6ff7ee11a6cb437240c07be18adc11fd876d46
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
@@ -230,7 +230,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 66fc2520993b28ff42c6f4a5a7c20d463fb0624b
+P dfe76f6946c3422a34b2d3ef12d671487bd66131
 U rolf
-Z dd9d46da7b4f978b8f2a25585ea15c2f
+Z c055e601a38304c765685825ab00d7c1
 # Remove this line to create a well-formed Fossil manifest.
