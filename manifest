@@ -1,7 +1,7 @@
-C Fixed\serror,\swhich\sprevents\sbuilding\s0.7.6\swith\n-DTCL_THREADS=1.\s(Arrrg.)\n
-D 2003-03-25T14:39:26
+C See\sfile.\n
+D 2003-03-25T14:41:55
 F CHANGES d44d15ceabd566af5f19c835840d1452a0c5a730
-F ChangeLog 2e88fff09d0978c40d5bcc6892def575b5085198
+F ChangeLog 81789f3dbdeb60dbfa4514a6a477da1b138a748f
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 25204720818592a271aecc462432628b5a1862a4
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 8a59bd662f5a5c751052c3906f6888c6b6f6a575
+P a433fa7ab158d2d43f096bf35cb3e406b72c3fa2
 U rolf
-Z 826df43459f0f1b1135ea4aa23e4bc61
+Z 18bb8d2b12a8b0b4237981a1038c5781
 # Remove this line to create a well-formed Fossil manifest.
