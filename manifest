@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2003-09-27T23:34:32
+C Changed\stype\sof\sdomNameSpaceIndex,\sdomNodeFlags,\sdomAttrFlags,\ndomDocFlags\sand\sinfo\sin\sdom*Node\sstructs\sfrom\sint\sto\sunsigned\nint.\sThis\sfixes\sbug\swith\sdocs\swith\smore\sthan\s128\sdifferent\snamespaces.\n
+D 2003-09-28T00:32:16
 F CHANGES 813a168a7b86886b7d8988978f2ae6a85e2f0663
 F ChangeLog 37aa6a8333111d26d5ec6cc0ae75fea912705c76
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -118,7 +118,7 @@ F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c 4eb5d817c334c641af2c76cdb7f30998b5c5b8ed
 F generic/aolstub.cpp 2ba5a8d1046b7d92c92917ad4e17f8d944b41167
 F generic/dom.c 2bb7dcb2bc89ff3120415083ada296e016842db1
-F generic/dom.h bcdd2648d42a6c6896b23bff2460e65facd5fb53
+F generic/dom.h 72f0ad63b883198323b473ae13e23639a19230b7
 F generic/domalloc.c aa1ed647c34d707014f187fd6f68d7b87f97f791
 F generic/domalloc.h 5e94d96321fb4f926b6e2c8cf01b8a28c3d0be0f
 F generic/domhtml.c 54fdfbbe29a80c0c2d5dcb081dc2ab183f1baf98
@@ -200,7 +200,7 @@ F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.test acc7ee5194c8cb231d77b2dba8398c12d26878c9
 F tests/domCmd.test 7138ebc83f219ad942c0d69eae4a5cf3607a0b36
-F tests/domnamespace.test 7023cb113cf156381218b303eddcde3822f40a48
+F tests/domnamespace.test 7f6ff7ee11a6cb437240c07be18adc11fd876d46
 F tests/element.test 7da1983ecf71b5fa81bae0adfa1b74c8c21fbeff
 F tests/entity.test 8440a2109f4b250b539477b27c141f37ff19c3a3
 F tests/htmlreader.test d39e554d91ce48390e7b5743974b4fad8fc8eeb8
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 8bf9c107c2041589993aa0c0cf23b4dc1ca74816
+P 9316872c5c8fd4b72fa7403a69d957c8eee0ce22
 U rolf
-Z 337255217608d0b41ca604841ed6f43b
+Z 8c79d33bc51f725886838abf63a9669c
 # Remove this line to create a well-formed Fossil manifest.
