@@ -1,5 +1,5 @@
-C Doh!\sUndo\sthe\slast\schanges;\sI\sfixed\sthis\salready\s2003-10-12.\n
-D 2003-12-30T19:19:47
+C Removed\ssuperfluous\scomma\sfrom\sthe\stdomMethod\senum,\swhich\sbothered\sthe\nAIX\sxlc\scompiler.\n
+D 2003-12-30T19:22:35
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog a4379644214ec83ac552cef90f9677871ef87cb7
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -117,7 +117,7 @@ F extensions/tnc/tests/loadtnc.tcl 418f1bbca50993a9fe012728b50f0f8080cff2ab
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c 4eb5d817c334c641af2c76cdb7f30998b5c5b8ed
 F generic/aolstub.cpp 2ba5a8d1046b7d92c92917ad4e17f8d944b41167
-F generic/dom.c 298cc4460146d8af1b5d49f2a7ac778f00012064
+F generic/dom.c 015bc25d64a602c486f38583f5d40837a06fc7da
 F generic/dom.h 4f51dc063cf696a60f8fdb843d3305b6e53397cb
 F generic/domalloc.c aa1ed647c34d707014f187fd6f68d7b87f97f791
 F generic/domalloc.h 5e94d96321fb4f926b6e2c8cf01b8a28c3d0be0f
@@ -227,7 +227,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 328f623e77ed90d56ac565eab466d1a98bf722fc
+P 2c422d33f6d74adc1819e32ed051b3db0f5ab9f0
 U rolf
-Z 8c5f2f1f4b1bffa40de5e8c6f0311370
+Z dd441e94ebbdf7359287cc867b446436
 # Remove this line to create a well-formed Fossil manifest.
