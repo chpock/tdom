@@ -1,5 +1,5 @@
-C Added\smethods\snodeType,\sgetElementById,\sfirstChild,\slastChild,\sappendChild,\sremoveChild,hasChildNodes,\schildNodes,\sownerDocument,\sinsertBefore,\s\s\s\s\s\s\s\s\s\sreplaceChild,\sappendFromList,\sappendXML,\sselectNodes,\sbaseURI,\sappendFromScript\sand\sinsertBeforeFromScript\sto\sdom\sdocs.\sBeside\sother\sthings,\sthis\sallows\smuch\seasier\shandling\sof\stop\slevel\snodes.\sThe\sresult\stree\smay\snot\sbe\san\sXML\sdocument,\sbut\sa\sgeneral\sparsed\sentity.\n
-D 2004-07-28T03:31:45
+C Changed\sbehavior\sof\sgetElementByID:\sif\sno\selement\swith\sthe\sgiven\sid\sis\sfound,\sreturns\snow\sthe\semtpy\sstring,\snot\sa\sTCL_ERROR\s(more\sclose\sto\sDOM\srec,\sgetElementByID\snever\sraise\san\sexception).\sBug\sfix:\snodeName\snow\sreturns\sthe\sper\sDOM\srec\scorrect\svalues\sfor\scomment\sand\scdata\ssection\snodes\s(were\sas\syet\sreported\sas\sif\sthey\swhere\stext\snodes).Corrected\sappendChild,\sinsertBefore,\sreplaceChild:\sthe\snew\schild\smust\snot\sbe\sout\sof\sthe\sfragment\snode,\sbut\scould\sbe\sa\snode\sout\sof\sthe\stree,\n
+D 2004-07-28T03:35:16
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog 24c31ffaa165936891a37206a0bbe2e1b2916711
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -20,9 +20,9 @@ F doc/dom.xml a367d310fb0a9ebebec337fbbea4fed7a945f016
 F doc/domDoc.html 45f4b7e5ba6f759e3481ad78028cf0ffa62e1d89
 F doc/domDoc.n 5c2a3451aa968ccd49f6c52c7d3c136ec5b1d6e5
 F doc/domDoc.xml e1176862739f66cdb660af46bb5815f93ba0f72e
-F doc/domNode.html c7b85c67220a58d047828a98b7127dfccea96450
-F doc/domNode.n a04b31a10fe491fa2547f943d3850977edfa9803
-F doc/domNode.xml a2aabfb9d9c71ff9296be7d1ba472e9536d568f1
+F doc/domNode.html 020c8a4e469d1be9025ebfa9895eac644a5a420f
+F doc/domNode.n 9b6ece71049dc07c13ffdce4731fe97b89c95411
+F doc/domNode.xml b69610bbc93563cd3fcf75577e1c2f272ff2685d
 F doc/expat.html 8abdb984e9703b45e08d5c82c671ed5f51c56077
 F doc/expat.n 03582fa9e0cef4846181605d3d5430416f9441ac
 F doc/expat.xml 4eb19bf447e1e7e9a36d773ec2d5bc531e34ff36
@@ -228,7 +228,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f508d3015bc52fb60f59d639da590b700c3e7cb3
+P b1f887f36f72bf25ef7beb7df2fbd7a51239a0f6
 U rolf
-Z 13ebc92471eec20c1b6f23f04a2cbfe2
+Z 9912a637e74dde4c2e7595fe9bb26112
 # Remove this line to create a well-formed Fossil manifest.
