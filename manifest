@@ -1,5 +1,5 @@
-C Fixed\sspelling\serror\sin\slast\sentry.\n
-D 2005-03-21T01:10:50
+C Fix\sin\sdomAppendNewElementNode(),\sdomAppendLiteralNode()\sand\ndomAppendNewTextNode():\sif\sthe\screated\snode\sis\sa\schild\sof\sdoc->root,\nset\sthe\sparentNode\saccording.\n
+D 2005-03-26T14:06:32
 F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
 F ChangeLog 7cfc33a5df57fbb24011376806f55c8391d08a9c
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -119,7 +119,7 @@ F extensions/tnc/tests/loadtnc.tcl 418f1bbca50993a9fe012728b50f0f8080cff2ab
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c 4eb5d817c334c641af2c76cdb7f30998b5c5b8ed
 F generic/aolstub.cpp 4162cbebdaa563e6dbfe2dbfab08058da2816f59
-F generic/dom.c 12145d79c9e661d1671bac7ac8fb1505507f102d
+F generic/dom.c e41218e39bc9ae47b5bbb572cd86b5075996ac24
 F generic/dom.h 3ce3d8bc19991250781367ecb808be653f20543f
 F generic/domalloc.c cd5103a1d0312c3b1e5d9db103d07d4a105008d7
 F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
@@ -218,7 +218,7 @@ F tests/tdomcmd.test ebfa377019b495972b13e00b85ff9ba55041a4b9
 F tests/xmlsimple.test ca697d11f34bfdd624caa70bf74abfe0e5bd775b
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.test 3b8ed5f301b6c143116e8e3384d5cd183e85f8fb
-F tests/xslt.test c28c7b4b682cee94e3edb6aa06373386a438f919
+F tests/xslt.test 7ea69ad54ad84aa9eb551d498f204b28570903c2
 F unix/CONFIG f9ef43e1b24e888d5df7af5b425cf66e07e9cc93
 F unix/tclAppInit.c 06b688c30d27d4be8925b05d1607cbee950bbd1c
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -233,7 +233,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 65f6c924cfcdcd7eb7a8c703bc4493f39e2dc54a
+P 09d39d9d79564f1fe315dc9bcbcc5a1bcb7f9e76
 U rolf
-Z 016deaa1f0b21655b808a09b7fbaacc4
+Z 6bd86f099ba47c0768beec42650cd8ce
 # Remove this line to create a well-formed Fossil manifest.
