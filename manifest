@@ -1,5 +1,5 @@
-C Made\stest\sresults\sindependent\sfrom\sthe\s(undefined)\sorder\sof\s[array\nget].\n
-D 2003-12-14T18:45:11
+C Build\sexpected\sresult\sof\ssome\stests\swith\s[list],\sinstead\sof\sproviding\na\sstring\srep.\sThis\shides\sthe\schanges\sin\slist\sstring\srep\sby\sTIP\s148,\sso\nthat\sthe\stests\swork\sboth\swith\spre-\sand\spost\sTIP\s148\stcl.\n
+D 2003-12-14T18:45:42
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog fdb32998259663fb487903a8470b0cf39f73bfb0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -198,7 +198,7 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
-F tests/dom.test 5e5bf65c89f08f040c30dda855419f4ec36498ba
+F tests/dom.test 98a504a76540f74084cf45f136b68ebf89827305
 F tests/domCmd.test d2adcf178b0fe0f08701229793530b310bf81da2
 F tests/domnamespace.test 7f6ff7ee11a6cb437240c07be18adc11fd876d46
 F tests/element.test 7da1983ecf71b5fa81bae0adfa1b74c8c21fbeff
@@ -227,7 +227,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P fe4f52e7bb69c71cae235d56aa4807dea4098f15
+P 64b8e2895fc4e6e7b1194bb334d078054cf40a1c
 U rolf
-Z 0a76735504fe1ef440fbf068ee5656bb
+Z 7201e8e49fba801d06a634b5374d3a65
 # Remove this line to create a well-formed Fossil manifest.
