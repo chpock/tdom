@@ -1,7 +1,7 @@
-C Fixed\sdomLocksDetach;\swas\swrongly\sunlocking\smutex\stwice\ninstead\sof\slocking\sit\son\sstart\sand\sunlocking\sit\son\sexit.\n
-D 2003-06-11T15:02:45
+C See\sfile\nCV:\s----------------------------------------------------------------------\n
+D 2003-06-11T15:04:14
 F CHANGES 59cab3c950a08a20053aa26b3a8718c6efa8c913
-F ChangeLog 8ef90b0aa1933c0567e50a86939fd607060e9046
+F ChangeLog 21f23fa65ebd6b68f6346bdc9651ff36a8317411
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 25204720818592a271aecc462432628b5a1862a4
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P b95af358d1356d009aa973f9e446b4d4b3931921
+P c10aa7098ba9d59432da9f8786d60bd81ce5bec1
 U zoran
-Z b649ee433d2333aaadf2bb286941ebda
+Z 066dc82f5231007c1ab8705140fc2f31
 # Remove this line to create a well-formed Fossil manifest.
