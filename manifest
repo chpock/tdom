@@ -1,5 +1,5 @@
-C Don't\sinclude\sPIs\sinside\sthe\sinternal\ssubset\sinto\sthe\stree.\s\sAdded\ndomDoc\smethods\somit-xml-declaration,\sindent,\sstandalone,\sencoding\sand\nmediaType.\sChanged\sparserObj\sbehavior:\sparser\sdon't\sneed\sa\sreset\scall\nafter\sa\sfinal\sparse\sor\sparsing\serror.\sAlways\suse\sdomPanic\sas\spanic\nfunction.\n
-D 2003-11-24T10:12:01
+C Added\sdomDoc\smethods\somit-xml-declaration,\sindent,\sstandalone,\nencoding\sand\smediaType.\n
+D 2003-11-24T10:12:50
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog 717daa3a3da1c0cc15de1215c1e87059932243f6
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -118,7 +118,7 @@ F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c 4eb5d817c334c641af2c76cdb7f30998b5c5b8ed
 F generic/aolstub.cpp 2ba5a8d1046b7d92c92917ad4e17f8d944b41167
 F generic/dom.c 410a986bbe7c4015c6dd686c534399ca2ba69833
-F generic/dom.h ef3465bbe8570a4f73e3656b85d2d817aa573627
+F generic/dom.h 4f51dc063cf696a60f8fdb843d3305b6e53397cb
 F generic/domalloc.c aa1ed647c34d707014f187fd6f68d7b87f97f791
 F generic/domalloc.h 5e94d96321fb4f926b6e2c8cf01b8a28c3d0be0f
 F generic/domhtml.c 9a7ec999da852d996d7ac9c936534b965039e4cf
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 7824526c34492e429658cdb6a6df40088c345659
+P f35159af3165af828ea8360013e7613dba1ce300
 U rolf
-Z 46abd1ed34dd5245af5a377e41a4ab1e
+Z 3ec590fae39f665a2801b1daf52c4ca7
 # Remove this line to create a well-formed Fossil manifest.
