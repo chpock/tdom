@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2003-11-26T17:01:01
+C Another\sfix,\sto\sensure\snamespace\sintegrity\sof\sthe\sresult\sdoc.\n
+D 2003-11-27T12:58:33
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog 4f748f0754d5e0cdb39553d94c699fe994cdcdb7
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -117,7 +117,7 @@ F extensions/tnc/tests/loadtnc.tcl 418f1bbca50993a9fe012728b50f0f8080cff2ab
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c 4eb5d817c334c641af2c76cdb7f30998b5c5b8ed
 F generic/aolstub.cpp 2ba5a8d1046b7d92c92917ad4e17f8d944b41167
-F generic/dom.c 410a986bbe7c4015c6dd686c534399ca2ba69833
+F generic/dom.c 53be3295250e4435d9e4db4ef60542833ec0a4eb
 F generic/dom.h 4f51dc063cf696a60f8fdb843d3305b6e53397cb
 F generic/domalloc.c aa1ed647c34d707014f187fd6f68d7b87f97f791
 F generic/domalloc.h 5e94d96321fb4f926b6e2c8cf01b8a28c3d0be0f
@@ -126,7 +126,7 @@ F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c 0c346e84edf3599a93b30abc0eafd3c86618f13c
 F generic/domxpath.c a3318697a7f8650f42b5de498f4604666978ac8f
 F generic/domxpath.h ec29823825248b0df1076860593c83562727f132
-F generic/domxslt.c 85ddb0a99f9727f949b8686bfbc9e89f7c4fb3f7
+F generic/domxslt.c 3f054ea30688c55303842e8d6b05fbf71882f9e1
 F generic/domxslt.h b60468a7092d4d5712b4a8776f3db51d4c03aa04
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -215,7 +215,7 @@ F tests/tdomcmd.test 16eed4ab07385bd7648ed470e13bb0baa6f0e092
 F tests/xmlsimple.test 44c53210c7048ca1843ecbce9f2132f6358504f2
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.test 732d4144cb20383f8becb5c311a6072d685bcb07
-F tests/xslt.test 31b95e91ce1584afe86160f2cffc26f18f47d296
+F tests/xslt.test 09589e5e4acbcffe12616ab1bca7f65e185b724b
 F unix/CONFIG 9e65bbe84330e49ce8f992c9bbf218c6eb0edb36
 F unix/tclAppInit.c 06b688c30d27d4be8925b05d1607cbee950bbd1c
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -227,7 +227,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 620ef29cbf34ba1e21781aeb44307768374daf3c
+P 22e05042472a7545945b072b56a38aa8dac37ad8
 U rolf
-Z b5a439f47479912e9ae951011caa86fb
+Z 847368ec058251c9c88f012e6f6e82d2
 # Remove this line to create a well-formed Fossil manifest.
