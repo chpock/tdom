@@ -1,5 +1,5 @@
-C Fixed\snode\snumbering\sto\suse\sdocument-private\snode-counter\swhen\scompiled\nwith\s-DTCL_THREADS.\sNode\sTcl-command\snames\sare\sstill\sdefined\sin\sthe\nusual\sfashion,\sby\susing\sthe\s(unsigned\sint)(domNode*)\sin\sorder\sto\sget\nunique\scommand\snames\swithin\sthe\sprocess\sand\saccross\sthread/interp\scombi.\n
-D 2002-06-21T10:38:24
+C Improved\sreuse\sof\snamespace\sindexes.\n
+D 2002-06-23T00:05:12
 F apps/xslt.tcl aceffee1914d4bf9b7a6a0a0a4b66fa7c4991fd5
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html c21ddc9a115a8a82ee1560949dc08a1bc41233b6
@@ -92,7 +92,7 @@ F extensions/tnc/pkgIndex.tcl.in f3ca1ee461a2ce4c6f7fae3ff078da261fab6e4b
 F extensions/tnc/tcl.m4 9404ac273b962ddaf946d3170c5183e55d0984b3
 F extensions/tnc/test.tcl efade8bcb9fd9e269ed5c259f3edf182bc917b72
 F extensions/tnc/tnc.c d1c8431c5ea72148aaca6b092f919a25270565d6
-F generic/dom.c 8788940d54160e2f4793406837abd866adc4645f
+F generic/dom.c 0c5b9d922381b53d6b945b72c7330c8dd0a18552
 F generic/dom.h abb5687585dba22395bbaeb7c5421ea6c7798b27
 F generic/domalloc.c 2ed8e10dd8a71b5a949e55885b3a5646e0cb6bc9
 F generic/domalloc.h a44bdf75c6e950f6f711ba9528030841aaa5d783
@@ -174,7 +174,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P cdc2797d0e28f1b68aedf070bbf76808814aaa67
-U zoran
-Z 7204d8b89b8a1281449c3ab0febe2882
+P 621b16c214190d649828278c0c53efb8d046a155
+U rolf
+Z 67c7a197464cd2647510472aae1e4829
 # Remove this line to create a well-formed Fossil manifest.
