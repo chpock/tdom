@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2004-09-29T11:41:50
+C First\s[load]\sthe\slib,\swhich\shas\s[package\sprovide\stdom],\sso\sthat\sa\n[package\srequire\stdom]\swithin\sthe\sscript\slib\sdoesn't\sloop.\n
+D 2004-09-29T12:18:48
 F CHANGES c148974e2232411cdad6dad69cdc6698b279f3e7
 F ChangeLog 3010f36bdd7933f2b67d92022de424c0b779d4b8
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -225,12 +225,12 @@ F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F win/makefile.vc 14cdae7e0da80475429e8b48209d8f4825aacf0a
 F win/makefile805.vc e7ad7a308ba2c86a435badb06672708cc8145b2c
 F win/mkd.bat 85d3fe58ce051a778447fb2bfc7384867d21cef0
-F win/pkgIndex.tcl 64b1862f240229424e781126938751f9591c0e59
+F win/pkgIndex.tcl cfc3de56cc42062ee9d722bb5521b4324fb8147c
 F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P b15c8c65bb4db0527316e4be509bb4bce7a27a05
+P 0dbc5d3fd5bbe62af888503b4663f6986ba43287
 U rolf
-Z b01c34b01d13bafebd65fd72b00b42ba
+Z 90212901fa326fd7e48732c85496ae21
 # Remove this line to create a well-formed Fossil manifest.
