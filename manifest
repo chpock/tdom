@@ -1,12 +1,12 @@
-C See\sfile.\n
-D 2005-01-11T18:00:07
+C Bumped\sversion\sto\s0.8.1\n
+D 2005-01-16T11:55:48
 F CHANGES 877db3f7a6fd1a5175636e84125230f5949491ac
 F ChangeLog d475c3c7254885be92d3944c5ccfef19758bb6f9
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
-F README d3ad02675e1a9bf15451140876f38ba4b677e2be
-F README.AOL ba21dadb076799fa327c4ff69184533b40f03003
+F README db21b67c7f4f97d6ed22bb7d2af948f5e8f2a644
+F README.AOL 44b39cf7002f8b39a76cc362784c7350fa8e326d
 F aclocal.m4 79e2f4aa6a138371f2d31f28355749e5019d7651
 F apps/xslt.tcl af84f844bafbce1f375ffe17552f2d77c01ef16b
 F configure d12ff589d122ae45870aac8c7fa163786161e22a x
@@ -155,8 +155,8 @@ F mac/PrecompHeaders/CoreHeadersMach-O.h 508208239a919a6dee4275f9148962a13faeb94
 F mac/PrecompHeaders/CoreHeadersMach-O.pch 60665d6a2787eb3dfda701baff12dd3d5029e7f5
 F mac/Prefix/expatPrefix.h d131932b0c668d4cdef1eebc35f1b5267882d00d
 F mac/Prefix/expatPrefix_OSX.h 51c7e40981af4b6b8b974bf4cc4c2f63968031e2
-F mac/Prefix/tDOMPrefix.h 5f7f098eca71a7d893161cbe1d1bd577583026d8
-F mac/Prefix/tDOMPrefix_OSX.h f283b24312d6759f50c94a610ad04de01322b4c7
+F mac/Prefix/tDOMPrefix.h b3d569107d83482f05fc02089c6a47221d6d1681
+F mac/Prefix/tDOMPrefix_OSX.h a23f6c8e66cfaf14a1ebcbbfad203e9648f41823
 F mac/Prefix/tncPrefix.h fb4033860688808a196991f8cce3d6dd81b5eb8e
 F mac/Prefix/tncPrefix_OSX.h 482e243e92a724d677c9e76f9eac956464252299
 F mac/Readme_Mac_Compiling 056f0af20fddfe4c08d0e0e2064c45068335611b
@@ -222,18 +222,18 @@ F tests/xslt.test 84dd64ee742210484e99e0d7a4c019d70ccb2431
 F unix/CONFIG f1ba21ea548b8825d4c19f0f5f11a5369926559f
 F unix/tclAppInit.c 06b688c30d27d4be8925b05d1607cbee950bbd1c
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F win/makefile.vc 7511b0f55fbe4ef8f50998cc10ae158c09d0ffc3
-F win/makefile805.vc e7ad7a308ba2c86a435badb06672708cc8145b2c
+F win/makefile.vc 1d68cec7ff966b9b3d3e67063ea1d7d6833571bd
+F win/makefile805.vc ec10512d888f7f3ca27a09aacfaddd951b420898
 F win/mkd.bat 85d3fe58ce051a778447fb2bfc7384867d21cef0
 F win/nmakehlp.c 31a5548b2bd3b53c2e292faa1dc0a093e26285c2
-F win/pkgIndex.tcl cfc3de56cc42062ee9d722bb5521b4324fb8147c
+F win/pkgIndex.tcl facc4cb2c59deb4799d5157ec2d260aab770d496
 F win/rules.vc 209cd65636302f20130e68a95cc4ae18a8b5d921
 F win/tdom.rc 2f20f0e71fce5f64ee6a44e97bc14f38dc6b4338
 F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 6f917aad9088a8a0e70951f5bb68f8506b4ddf5c
-U rolf
-Z c463146ebef0782fe312f452ed31f6a3
+P 8bd27969e0ffd70565d8e392ca3af4cd968abf9e
+U zv
+Z 7be5bd843c5641b2c7f9d6325e9a3986
 # Remove this line to create a well-formed Fossil manifest.
