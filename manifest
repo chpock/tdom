@@ -1,5 +1,5 @@
-C Removed\sfooter.xml\sand\sindex-chars.xml.\sThey\sare\snot\sneeded,\sif\sthe\sHTML\sdoc\sis\sbuild\swith\sthe\sstandard\stmml\stools.\n
-D 2002-07-28T17:14:59
+C Removed,\sbecause\sthis\sfile\sis\snot\sneeded\sto\sbuild\sthe\sman\spages\swith\sthe\sstandard\stmml\stools\sand\ssince\sthe\sman\spages\sare\snow\sbuild\swith\s-soelim,\sthe\sman\spages\seven\sdon't\sneed\sman.macros\s(so\s.so\sof\sthem\sanymore).\n
+D 2002-07-28T17:17:19
 F Makefile.in 90af78958d8b642862a15b9029b0bd8fad84da5a
 F aclocal.m4 a7c82deae42849a1eb4956222315c139329d4d55
 F apps/xslt.tcl aceffee1914d4bf9b7a6a0a0a4b66fa7c4991fd5
@@ -24,7 +24,6 @@ F doc/expatapi.n 600797053dd664f05cf4a7d2a691a200b4548b6b
 F doc/expatapi.xml d93d1ea7d4fbacd0729e731147a96e74863fdde9
 F doc/index.html 07e9315df3c3acbec8f86d814018fa3ae85e4c62
 F doc/keyword-index.html 98449a16e99c1d42db0dd25564d0cdf1461c1b24
-F doc/man.macros 8d66f10ca41746d526210ba962eb3ba465fcd7b1
 F doc/manpage.css 355082613fb5f65df33a8f5f8edd6b6e02dad84c
 F doc/tDOM.xml 35369df6a7d84d68cfb28692530ef9d1a8b8ca3e
 F doc/tdomcmd.html 0fab61836d5a45a4da340e65feb66cbf3fce526a
@@ -179,7 +178,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 8b287177a859e57d0b5395fd2898b0be19b25677
+P e3812f2935e2d638ff2db259a446f1553974ec3c
 U rolf
-Z 84713aa37e646b463c4f7aea6b11ae8f
+Z 92af1bab559278e6f232a647335c7f1f
 # Remove this line to create a well-formed Fossil manifest.
