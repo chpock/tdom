@@ -1,7 +1,7 @@
-C Added\sexample\show\sto\sbuild\stDOM\sas\smodule\sfor\sAOLserver\s4.x\n
-D 2005-01-16T11:59:47
+C Updated\sfile.\n
+D 2005-01-16T12:05:30
 F CHANGES 877db3f7a6fd1a5175636e84125230f5949491ac
-F ChangeLog d475c3c7254885be92d3944c5ccfef19758bb6f9
+F ChangeLog e3f1b7fdc60cb403313af91565a07e1ed73744c1
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 793035f18fb2ad53394e3cda31222b9197e93a3a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -233,7 +233,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 6b8ed8381a794e840a8fc88e7ddc912149f0dbdc
+P 1e3e501ba4ba4ed6e98e66264ac0b1e0c89177bd
 U zv
-Z 5e7a2bb1559c2b508dc038a4186a4679
+Z fb8ba4947177f6befffde7be939b3583
 # Remove this line to create a well-formed Fossil manifest.
