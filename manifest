@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2003-02-22T23:53:14
+C Updated\sto\sexpat\s1.95.6.\n
+D 2003-02-25T15:15:50
 F CHANGES bedaded2db2b4b9c98267dec8dcfb01261cfbb9a
 F ChangeLog 7bf375c7d0ed1c7d8fdf7e5fc43e00750fb964d3
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -63,7 +63,7 @@ F encodings/iso8859-9.enc f585c70a5589de39558dac016743ff85e0c5f032
 F encodings/koi8-r.enc 366c137c02e069b1a93fbb5d64b9120ea6e9ad1f
 F expat/COPYING c124ddcfd75522fa37dbce65c3f675726f164528
 F expat/Changes 49a5dce399039aae0cfee235aa2891260b3d2d8a
-F expat/README 0ca9dfb7faf3c7e37f2878dd96834828a3093ef7
+F expat/README 630eff768999e90d59c6e19784a5fb3db155bcb2
 F expat/VERSION aeaaf80e743fa5a27e367c67b7d317769d513ef7
 F expat/ascii.h ca59dc7b044451fe67b2611a98b546aacc10acb8
 F expat/asciitab.h 67462447978f02b8a78ce7f054da82ec88e7ffa4
@@ -200,7 +200,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 955041a024997474332e95b04473bc812c3834c0
+P a987fd45af5f7359475aebfccf9309ce0a7b427c
 U rolf
-Z 1b340360d831e9220cf359bdbb3f8576
+Z 715b0bb3e161ba7cf50e9d67c61c877f
 # Remove this line to create a well-formed Fossil manifest.
