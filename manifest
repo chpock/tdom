@@ -1,7 +1,7 @@
-C Fixed\svariable\stracing\sissues\sfor\snode\sobject\scommands.\nAllows\ssame\sthread\sto\smake\sseveral\s"attachDocument"\scalls\son\sthe\ssame\sdoc.\n
-D 2003-07-03T19:17:49
+C See\sfile\n
+D 2003-07-03T19:18:34
 F CHANGES 59cab3c950a08a20053aa26b3a8718c6efa8c913
-F ChangeLog b855d620581b3e61772fc7e47b1bf4c46675d005
+F ChangeLog 778645d0a46b14abe1a8edc3c7e6d871d34b8487
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 25204720818592a271aecc462432628b5a1862a4
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 149395b557b7ca4a39b68d4736baef031faad7b6
+P ed52b2f7fcd7db00643fbb21ae5d961e7a9eb3a7
 U zoran
-Z 2b34a1804ac019e6d880f3df1ff57365
+Z 663eeb442feadfb38953eedac04afc77
 # Remove this line to create a well-formed Fossil manifest.
