@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2004-03-26T00:37:19
+C Removed\ssuperfluous\sarg\sbaseURI\sfrom\sXML_SimpleParse().\n
+D 2004-05-08T00:24:17
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog 793359736d62a6eb2793797ef1f663e7a0b34603
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -145,7 +145,7 @@ F generic/tdominit.c f927e44f28e0a31416be8724c19542000987b0fc
 F generic/utf8conv.c fc01b4776a82c937252a7d2593a3d244916905f7
 F generic/utf8conv.h e0d2756b2d77ad9a8508a0dcf7cce5e10fa4c9a5
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
-F generic/xmlsimple.c 9097a7cd89317db7d2d31c14aba1adae412d73bd
+F generic/xmlsimple.c b0ba4a1dc28efcf6d7aadb6fc6af1c1dac83c6c1
 F generic/xmlsimple.h f2861868b0fed932c79f9e595bb875d261d97bd5
 F lib/tdom.tcl 932bb3d8da52466b68aa4e3a1e3d5e351459a437
 F mac/PrecompHeaders/CoreHeadersMach-O.c e4406d8c34fcaea82d21e62c35012893b460dfd5
@@ -227,7 +227,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ba7f75901844469464b6d73aca0614af1cce836d
+P 633220a331d5f5b2bfd96e4f353c0a14775ca8a2
 U rolf
-Z cb715c2cbeb67df490196fde15bc564c
+Z 92e8a521fea356160f39ac38b326bb76
 # Remove this line to create a well-formed Fossil manifest.
