@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2003-09-14T14:50:06
+C Fixed\sscripting\sbugs\sin\s::dom::domDoc::importNode\sand\n::dom::domNode::length.\n
+D 2003-09-14T17:06:46
 F CHANGES 59cab3c950a08a20053aa26b3a8718c6efa8c913
 F ChangeLog 4051156e2bbd69e7d61dbbaa9feacc194640637f
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -147,7 +147,7 @@ F generic/utf8conv.h e0d2756b2d77ad9a8508a0dcf7cce5e10fa4c9a5
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
 F generic/xmlsimple.c 6ba6fafefed880a8605acf8fc988843b95dfe6c9
 F generic/xmlsimple.h f2861868b0fed932c79f9e595bb875d261d97bd5
-F lib/tdom.tcl 26b00d8138e396a6a435f2e9ad3cb44d3bbc8369
+F lib/tdom.tcl 0a474014b7f721d3f07f62e4b90bc68e66e71057
 F mac/PrecompHeaders/CoreHeadersMach-O.c e4406d8c34fcaea82d21e62c35012893b460dfd5
 F mac/PrecompHeaders/CoreHeadersMach-O.h 508208239a919a6dee4275f9148962a13faeb94d
 F mac/PrecompHeaders/CoreHeadersMach-O.pch 60665d6a2787eb3dfda701baff12dd3d5029e7f5
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 8830f473cbf53c2691c6e46f61279449c64f1ece
+P f9d2ed4525eee6ef7662772fbd50ead5d6168f08
 U rolf
-Z 9cbe5ab6e5f412ac78818b6957977148
+Z c0249907d6c2092a47c3cc3767fd8e46
 # Remove this line to create a well-formed Fossil manifest.
