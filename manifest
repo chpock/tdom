@@ -1,5 +1,5 @@
-C Backported\sfrom\sHEAD:\s\sFixed\sa\sbug\sin\sxsl:number.\sIf\sthere\sis\sno\s'count'\sattribute\sgiven\sto\sxsl:number,\sit\smust\sdefault\sto\sthe\spattern\sthat\smatches\sany\snode\swith\sthe\ssame\snode\stype\sas\sthe\scurrent\snode\sand,\sif\sthe\scurrent\snode\shas\san\sexpanded-name,\swith\sthe\ssame\sexpanded-name\sas\sthe\scurrent\snode.\sBut\sin\scase\sof\sPROCESSING_INSTRUCTION_NODEs\sas\sthe\scurrent\snode\sand\sno\s'count'\sattribute,\sit\scounted\sall\spi's\sregardless\sof\sthe\sname.\sNow,\sthe\sname\sis\srespected,\sas\sit\sshould\sbe.\n
-D 2003-07-06T22:33:40
+C Backported\sfrom\sHEAD:\sAdded\san\sargument\scheck\sfor\sXSLTCmds.\n
+D 2003-07-06T22:34:47
 F CHANGES 59cab3c950a08a20053aa26b3a8718c6efa8c913
 F ChangeLog 9a7ce0bc530a287a88cc5cdce2244922ccc3faa6
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -132,7 +132,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c c2fe5b784c2ad83c904edd3d82050b8f7c7fc444
 F generic/nodecmd.h 20210ad9b4a3bdd6055175beca7bfdd8bd318a3f
-F generic/tcldom.c 90095a48f3837a40f8a3776acf9556e1ad5c8b68
+F generic/tcldom.c c306b428389826eb9c4610ef2ea5ab1ea0331432
 F generic/tcldom.h 1c21383eabe24ac9bea93e4f5c66f9a64a7b68d1
 F generic/tclexpat.c c42fe2f39afcbb1c68050585fd45f939c0eac21f
 F generic/tclexpat.h 62e83591b9fff070825add84310f7f7cc8cff3b8
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 66b65c5ffd6eb82deb4c070cac2b921dcfa2f52a f1436a6ee988b26d4e7ce9bc2450ea858eba8326
+P bf096e452ae696bcb4ce635b2cbe173029d47cce f1436a6ee988b26d4e7ce9bc2450ea858eba8326
 U rolf
-Z b061d97201d93d9d7583fa58288b3ae1
+Z 6390e2f6abfa2e68a5614c20e14b77c6
 # Remove this line to create a well-formed Fossil manifest.
