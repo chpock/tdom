@@ -1,7 +1,7 @@
-C Bug\sfix:\sSetting\sa\stop-level\sxslt\sparam\swith\s-parameters\sand\susing\nthis\sparam\sfor\ssetting\sanother\stop\slevel\svar\scould\send\sin\sseg\sfauld.\n
-D 2003-11-20T13:01:21
+C See\sfile.\n
+D 2003-11-20T13:01:40
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
-F ChangeLog f91a89c91a214e2c5018c650a1c5836ba31b2a3f
+F ChangeLog 717daa3a3da1c0cc15de1215c1e87059932243f6
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 08d28245c839083d9a32da68703499558b9d887b
+P 407a886de6f997edbc1de7d0b880052114363453
 U rolf
-Z fcd5598ce36338b822b7c1c7c7e46dc9
+Z ca32a2835fbb08bdaf190a27760da46f
 # Remove this line to create a well-formed Fossil manifest.
