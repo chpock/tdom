@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2002-11-01T00:47:55
+C Updated\sfunction-available,\scorrected\sridiculous\stypo\sby\smy\n(element-avaliable\s->\selement-available).\sSomewhat\sfixed\sand\supdated\nelement-available.\n
+D 2002-11-01T01:06:08
 F CHANGES 9074b44a5e036ff42a8c3f6c2f5957cc76997b4c
 F ChangeLog bfd26d6accff5576ffec40918826d765ca83a23a
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -132,7 +132,7 @@ F generic/utf8conv.h e0d2756b2d77ad9a8508a0dcf7cce5e10fa4c9a5
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
 F generic/xmlsimple.c 2098b0d7cb77ae5e85f393552b8ebc6b60377fb9
 F generic/xmlsimple.h f2861868b0fed932c79f9e595bb875d261d97bd5
-F lib/tdom.tcl e22949940d03b62d3a547cc2f115d8ec342abdf7
+F lib/tdom.tcl aef8cdea4e8b6c087d903379ca0f66b38bf07672
 F lib/tdomhtml.tcl f50d56a51edf9c2f1b814682629e6e6e2fd11cfa
 F tclconfig/ChangeLog 16d950c5f3b8b048a77b9671f3705d360f226759
 F tclconfig/README.txt c7a8a24b2782cd897a7608813161611f8e0521a0
@@ -186,7 +186,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P e27d352cebc10c64d67a83a4e9f6575afcc238ba
+P a038af3c6de8583b84e8b4526c93d8f2d0841ac1
 U rolf
-Z 20ce500f886a316dd2df097d035718b4
+Z ff2fecc728a8a3fc4652ef382ec99c1e
 # Remove this line to create a well-formed Fossil manifest.
