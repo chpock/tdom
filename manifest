@@ -1,13 +1,13 @@
-C First\simport.\sUsed\sfor\sextensions\sbuilding\n
-D 2002-08-03T20:52:19
+C Added\sdefinitions\sfor\sgenerating\sentries\sin\sthe\sconfig\sfile.\n
+D 2002-08-03T20:53:12
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 90af78958d8b642862a15b9029b0bd8fad84da5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
 F README e4d86d87598f5f20caea49c91a703df5fbda117a
 F aclocal.m4 a7c82deae42849a1eb4956222315c139329d4d55
 F apps/xslt.tcl aceffee1914d4bf9b7a6a0a0a4b66fa7c4991fd5
-F configure a648f3f7c7f599665be4490364af7a0673b5be22 x
-F configure.in b12147a1e718e274cba691caacb67986337536c3
+F configure 92081ae860333e48b22624b3b71f106cbc7d7719 x
+F configure.in 0045e642c2f321a99f4718795c548351f7a245b6
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html c21ddc9a115a8a82ee1560949dc08a1bc41233b6
@@ -182,7 +182,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P aa0bf0d9a02940cf97dd769cc88e6c28f1c9aae4
+P b42d6e52ff4cc49283b6bfd9308289e5b59d3d0c
 U zoran
-Z a577264b88886a5024805e225a0935af
+Z 9d066a11beeb7a85b01a9e37afd04965
 # Remove this line to create a well-formed Fossil manifest.
