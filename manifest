@@ -1,5 +1,5 @@
-C Added.\sContent\sis\sthe\sexpat\sversion\sused.\n
-D 2002-07-28T08:10:25
+C Now\smoved\sto\s../expat\sdirectory\n
+D 2002-07-28T08:11:39
 F apps/xslt.tcl aceffee1914d4bf9b7a6a0a0a4b66fa7c4991fd5
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
@@ -54,9 +54,6 @@ F encodings/iso8859-7.enc 1f75db4f7be40eb204fdb85057ca5f1d9a89f147
 F encodings/iso8859-8.enc 75ee0da275fe59752001d18b9f099ef446a6a577
 F encodings/iso8859-9.enc f585c70a5589de39558dac016743ff85e0c5f032
 F encodings/koi8-r.enc 366c137c02e069b1a93fbb5d64b9120ea6e9ad1f
-F expat-1.95.1/COPYING 44b3f40678d9430edf3fe639c6cd3685e70e627b
-F expat-1.95.1/Changes e85d4ab97b396405d51a29935497ad4875005dde
-F expat-1.95.1/README 0060d177278d1973d3355b5ca38b6a427a887ed8
 F expat-1.95.1/ascii.h 3aa53bac482cb1bcd21b08d7061b5afb515328c9
 F expat-1.95.1/asciitab.h 422108f80c04b40c327323688f987fbdf772a26d
 F expat-1.95.1/expat.h bdf008cd83fc4870239dad325d0f161cb7dd475c
@@ -66,13 +63,9 @@ F expat-1.95.1/nametab.h 7ebf9a02f20fe58ad2e6d0488acd620b1f534e9e
 F expat-1.95.1/utf8tab.h 8b8c8046b0208c41b1f9da5b0a5309419ef6e03b
 F expat-1.95.1/winconfig.h 6b2fa0e48c8271334a78b788a0d9274358919661
 F expat-1.95.1/xmlparse.c 2e81516db6006a3825fb1a701c1210fb26008ea7
-F expat-1.95.1/xmlparse.c.diff a5ce473925329d0d2a4ceb98e6d2eea06ae0ac51
 F expat-1.95.1/xmlrole.c 1e8b432d710f0ce8afdc3df7fc80ba1035bfab99
-F expat-1.95.1/xmlrole.h f7a208ac469ba8eb3e55242e855c0e02677b05c9
 F expat-1.95.1/xmltok.c 98a172be05b7822953b8c59b62259b63eb632198
-F expat-1.95.1/xmltok.h a6f0360c06f6f2b65784e9c56e7f4427a77c70e6
 F expat-1.95.1/xmltok_impl.c b7bc45bd9d4c33850e4f8ca54b297c4a6ac048b0
-F expat-1.95.1/xmltok_impl.h cb8cce4d3f128dc013901010b462d852b4d4d804
 F expat-1.95.1/xmltok_ns.c 1eaf04c2687c2cfab20a4efd29682b2a2fd8e3e8
 F expat/COPYING 44b3f40678d9430edf3fe639c6cd3685e70e627b
 F expat/Changes e85d4ab97b396405d51a29935497ad4875005dde
@@ -195,7 +188,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 416ed0f90d79ea63d78c5ded91c5b014837b4f95
+P 6983356974c31aa586db1c1d7c96e8d967f0600f
 U zoran
-Z 708457be677a022693d9c8ac550ec8e2
+Z eb082a6f4fe9fc37940c961bc03aca6d
 # Remove this line to create a well-formed Fossil manifest.
