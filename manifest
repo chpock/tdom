@@ -1,5 +1,5 @@
-C Fixed\sa\smem\sleak\swith\ssome\ssum()\scalls\swith\sNaN\sresult.\sFixed\sinvalid\nmemory\sread.\n
-D 2003-11-24T10:14:27
+C Added\sdomDoc\smethods\somit-xml-declaration,\sindent,\sstandalone,\nencoding\sand\smediaType.\sBug\sfix:\sseg\sfault\sfor\sdocument('')\swith\nstylesheet\stree\swith\sempty\sbaseURI.\sMinor\soptimizations.\sFixed\sinvalid\nmemory\sread.\n
+D 2003-11-24T10:15:54
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog 717daa3a3da1c0cc15de1215c1e87059932243f6
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -126,7 +126,7 @@ F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c 0c346e84edf3599a93b30abc0eafd3c86618f13c
 F generic/domxpath.c a3318697a7f8650f42b5de498f4604666978ac8f
 F generic/domxpath.h ec29823825248b0df1076860593c83562727f132
-F generic/domxslt.c 65bb3415baa9ed8dd85275317cc4be079f0b890a
+F generic/domxslt.c c8127681f4dfcbbdadd211f04372ec3c7b7b00d4
 F generic/domxslt.h b60468a7092d4d5712b4a8776f3db51d4c03aa04
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 4e3ff629a3d6a98581a96777e964b6c413dee419
+P b3e6e1268972584fa49bd8e90fdbd69654e5a704
 U rolf
-Z 07f0f607f8a5a1e33169e986dbd854c9
+Z c9f14d3264238116084a32d8276f5275
 # Remove this line to create a well-formed Fossil manifest.
