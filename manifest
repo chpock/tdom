@@ -1,9 +1,9 @@
-C See\sfile.\n
-D 2003-12-20T01:38:30
+C Bug\sfix:\sProtect\sagainst\sspaces\sin\sthe\spath\sto\sthe\spackage.\n
+D 2003-12-24T02:33:04
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog 4ed6f219f5abb8a7a1d92eb0a5004bcc35a3c26d
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
-F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
+F Makefile.in 55e1868e1d480d30a962801cea5ae53d1858a238
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
 F README 5a9c069dee183889e8d81ad355f5091ac97a1a5b
 F README.AOL 6b124cc7a7cae5fa901b9a2996dbdc5fe4085ba7
@@ -91,7 +91,7 @@ F extensions/example/example.c f02173d47391488af6038b6058b9a5a9fde033e5
 F extensions/example/exampletest.tcl 1a584be88a2e47d3147cfde5eff1b56b4d19525b
 F extensions/example/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F extensions/example/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
-F extensions/example/pkgIndex.tcl.in 110f575cbb8afc1220ce583fb88c787203c0554c
+F extensions/example/pkgIndex.tcl.in e6cc33c6f45df109209f4d8412cf2d5ea434e34e
 F extensions/example/tcl.m4 9404ac273b962ddaf946d3170c5183e55d0984b3
 F extensions/tdomhtml/CONFIG 7a3703be0e018ead9b6558ce6d82f356620dbfd8
 F extensions/tdomhtml/Makefile.in 1008fe906a0b7150e5b83f69e43a231886821db7
@@ -101,7 +101,7 @@ F extensions/tdomhtml/doc/tdomhtml.n da39a3ee5e6b4b0d3255bfef95601890afd80709
 F extensions/tdomhtml/doc/tdomhtml.tmml da39a3ee5e6b4b0d3255bfef95601890afd80709
 F extensions/tdomhtml/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F extensions/tdomhtml/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
-F extensions/tdomhtml/pkgIndex.tcl.in 2612d2a8fd5a213a1379ad5570c229d82810dcb5
+F extensions/tdomhtml/pkgIndex.tcl.in 167fa26defee4a43c4b00c805f654fa6961fd9af
 F extensions/tdomhtml/tdomhtml.tcl 7d48c19d50f203ee71b3db15d0fc6077dc244798
 F extensions/tnc/Makefile.in 30472c194851090b3d1db0459d90ad9dff2c1ae8
 F extensions/tnc/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
@@ -110,7 +110,7 @@ F extensions/tnc/configure.in be5144eab010e85e74dec0e86f64a1c41771b48b
 F extensions/tnc/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F extensions/tnc/makefile.vc 15dbc0560433b9b9d9357e5b68aa9e38ad0e15d9
 F extensions/tnc/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
-F extensions/tnc/pkgIndex.tcl.in 37901ed24e06da45c7d7a17f255b6108925400f8
+F extensions/tnc/pkgIndex.tcl.in 07737e9b13a87e6b687f644a0a518561eb30a9bc
 F extensions/tnc/test.tcl d9d4c2a1dcd2a7a70096a2a1727f8600ff0c78fd
 F extensions/tnc/tests/all.tcl 845c9dab65c294c3570f69cc731d6fef62efbd03
 F extensions/tnc/tests/loadtnc.tcl 418f1bbca50993a9fe012728b50f0f8080cff2ab
@@ -222,12 +222,12 @@ F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F win/makefile.vc 14cdae7e0da80475429e8b48209d8f4825aacf0a
 F win/makefile805.vc e7ad7a308ba2c86a435badb06672708cc8145b2c
 F win/mkd.bat 85d3fe58ce051a778447fb2bfc7384867d21cef0
-F win/pkgIndex.tcl acc03857b0132e3f880715e97c08f58bfd250e4d
+F win/pkgIndex.tcl 64b1862f240229424e781126938751f9591c0e59
 F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 1b784c6eaf5632705e520e01c36440009bfef55e
+P ac8f1090e4a6ad782345c797dd1e504d7225a6d2
 U rolf
-Z 8c101af627a8eb4efeb56fd8055146be
+Z 2a539616ec991b313ff45ccf1242f81b
 # Remove this line to create a well-formed Fossil manifest.
