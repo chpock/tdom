@@ -1,5 +1,5 @@
-C Added\snew\smethod\sinsertBeforeFromScript\sto\sdomNodes.\sBug\sfixes\sfor\nappendFromScript:\sIn\scase\sof\serror\sin\sthe\sscript,\sthe\stree\swill\snot\sbe\naltered.\sThe\sappendFromScript\smay\sonly\sbe\sused\sfor\sELEMENT_NODEs.\n
-D 2003-10-07T00:21:24
+C Added\snew\smethod\sinsertBeforeFromScript\sto\sdomNodes.\n
+D 2003-10-07T00:23:16
 F CHANGES ba07fd5cb974c6b2cddcdb4e65386705ec730f42
 F ChangeLog c7eec0c1d72e0fe75c8a494017c20b0c0500de1f
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -20,9 +20,9 @@ F doc/dom.xml c199ed098aeace1893dc391dac9aabe89c224cf5
 F doc/domDoc.html e091816186d342442f584162d3b04a9ccbcb23df
 F doc/domDoc.n 7b0a45350e86ea8bef0598b1dcd648429963b6ba
 F doc/domDoc.xml a5abb620b52c68ad484761b3f90a0ffad0f62e5d
-F doc/domNode.html 2f07f92f0c30ab5f71448345ad6feae5bc3c8744
-F doc/domNode.n 2f3de9b3042dc5f3846382e318d8427df024a49e
-F doc/domNode.xml eda70539cc881283ce430f8932ed7c4da3f3b23b
+F doc/domNode.html d1d67e16a8a039540661df0de6387290face52f7
+F doc/domNode.n 6aba2d9c4f549181cf6f466a039417e5182f343c
+F doc/domNode.xml 0893d9519bda738976d6d09f2c42dac9100a3a36
 F doc/expat.html 052d8ed7ad56b9c44fa77bb649334d31568cc630
 F doc/expat.n e3ab0f2cb0e016e7529bf33d3a06b6a9bd4ea633
 F doc/expat.xml 4d3dda0c9a0554d02951904eb42dd593d97b6601
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P cac0f22d649dbb39d584fbd594ea781045c2d714
+P d903e8efaa14c48b6249af5800af14e853a295e9
 U rolf
-Z b018e78bec7ae671dda5c3b11eab8ded
+Z e9fc7a47dacc06d8493f3708090ed671
 # Remove this line to create a well-formed Fossil manifest.
