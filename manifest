@@ -1,5 +1,5 @@
-C Minimal\sFix:\sdoubled\snamespaceURI\smethod\scorrected\sto\sprefix\n
-D 2002-03-14T01:27:10
+C Fixed\sthe\sFix\sof\sthe\slast\scommit.\n
+D 2002-03-14T13:28:37
 F apps/xslt.tcl e5c0a837a82ddf0aa21ddb51d5891acfd64469fc
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html c21ddc9a115a8a82ee1560949dc08a1bc41233b6
@@ -10,7 +10,7 @@ F doc/domDoc.n d23533433b48cb5e7c5732bdce2fa73451a8cc61
 F doc/domDoc.xml 2bd3e7d74ede1500044bdc0fd31b4a9332163ef3
 F doc/domNode.html 473817a83c4163111742c1de2af08ec4f1596205
 F doc/domNode.n 336ea92032607f8586ab71f864c33ba95a541beb
-F doc/domNode.xml a992331d6b9e7acecb5d4420fc6ee1d43d14a85d
+F doc/domNode.xml 15a5b02d0095f66f6b9f2808bde8bc306976ee0d
 F doc/expat.html 0f41343ba58a0359d2f0afd8d0cba82a62ce3d58
 F doc/expat.n af99cb144391169194acd682cb40e7547a74941a
 F doc/expat.xml 6a60726a13547624d4c8482848746adf7d05f069
@@ -157,7 +157,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 2fa449f347761cab3a77966baea0009bf90d699c
+P 7b7e247135deed8c46ea235f8b5fed05edccb3f0
 U rolf
-Z ed499e84bd979f0b7afdb757975c3a65
+Z a447d7c179c065d95c42ab792be026ba
 # Remove this line to create a well-formed Fossil manifest.
