@@ -1,5 +1,5 @@
-C Improved\sinteral\sfunction\sreportError(),\scan\snow\sbe\sused\swith\sall\skind\nof\snodes\snot\sonly\selement\snodes.\sImproved\sbehavior\sin\scase\sof\sdubious\nnumbering\s(negative\sroman\snumber\sor\slatin\sletters\sfall\sback\sto\sdefault\nlatin\snumbers).\sFixed\sa\spotential\smemory\sleak\s(in\scase\sof\soverwriting\nnamed\stemplates\swithout\smatch\sattribute\swith\san\sother\snamed\ntemplate).\sImproved\serror\sreports:\sfor\smore\sdetected\serrors\sthere\sis\nnow\sa\sline/column\snumber\sgiven.\sPlenty\sof\simprovements\sin\sdetecting\nerroneous\sstylesheets:\smore\schecks\sfor\sformat-number\sformatting\npatters\s(although\sespecically\sformat-number\spatterns\sare\sstill\sa\scan\nof\sworms),\sadded\sparameter\snumber\scheck\sfor\sadditional\sXPath\sfunction\ncurrent(),\stemplate,\sparamter,\svariable,\ssort,\schoose,\scopy,\sand\nmessage\selements.\n
-D 2003-04-03T23:05:19
+C Bug\sfix:\sDetects\snow\ssome\serroneous\sXPath\sexpressions.\sAdded\sparameter\nnumber\scheck\sto\sXPath\sfunctions\ssubstring\sand\sconcat\s(the\slast\stwo\nXPath\sfunctions,\swithout\ssuch\scheck,\sthey\smust\shave\sslipped\sthou\nsomehow,\sup\sto\snow).\n
+D 2003-04-03T23:06:10
 F CHANGES ca483fbc7c627b68977fc3eb6cf6798f42bca33c
 F ChangeLog 9b46402cfd3e183119ed8fc82e897a951b9f7c1f
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -124,7 +124,7 @@ F generic/domalloc.h 5e94d96321fb4f926b6e2c8cf01b8a28c3d0be0f
 F generic/domhtml.c 54fdfbbe29a80c0c2d5dcb081dc2ab183f1baf98
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c dba7e77190826af093bbb0c4dc1f858687ef5983
-F generic/domxpath.c 2ed7412802fb55430d2060a0255ae9cd01aed629
+F generic/domxpath.c e14c75997d9352a272adf657c73694b7ec99d8f6
 F generic/domxpath.h 2bbf18428f0a934a95d4262bd352cdfe4937e9cb
 F generic/domxslt.c ffaecff98792a2266ceb73048ffa791a64efefff
 F generic/domxslt.h b60468a7092d4d5712b4a8776f3db51d4c03aa04
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 8a74cc4c0cc100f2086230432ea501b3f34efd8a
+P 98a8b451d5d4a05bcd860d53c927921b87697be2
 U rolf
-Z 64527ab1532e589d1040ab74edcf73f3
+Z 4363b80632590e9f019ebaeb6a5fd8d4
 # Remove this line to create a well-formed Fossil manifest.
