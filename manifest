@@ -1,17 +1,17 @@
-C Added\smarker\sfor\s0.7.5\srelease.\sBeside\sthis\ssee\sfile.\n
-D 2003-03-22T00:25:56
+C Updated\sto\snew\sversion\snumber\s0.7.6.\n
+D 2003-03-22T01:31:59
 F CHANGES 87334aee80e9af7a72560e564ddddb7bf97ca551
 F ChangeLog 0cd333f849b5fd9d01dbb96c006b79239e3bad1f
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 25204720818592a271aecc462432628b5a1862a4
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
-F README a6c61e573170a3ce1cdf154283d141ce67c66946
-F README.AOL 7e9969511c9ae21a349b1da4b63b7eb113ee2d8f
+F README 64cad6cc1afbe60e80fd2df1f337efe9c3ec6a91
+F README.AOL 3c16be7ba31f87772026bdd146fa028980c901c1
 F aclocal.m4 79e2f4aa6a138371f2d31f28355749e5019d7651
 F apps/xslt.tcl 33eaaf45b831e6613d528156f7f1bbc02fd9f849
-F configure c752bfcba4d3c63e0001c9b4951247921883dd7d x
-F configure-tcl8.0.5 d1895768cd7b715e310dae9acb84d91603857f7a x
-F configure.in 86a3b4edc45e332742e46dae3e6fc54232895cf2
+F configure 0e684e95dfe1421a478b3db65129b9434b3d2cf4 x
+F configure-tcl8.0.5 05c691afaaaf2ff24701a2d3ef6f40054290e26b x
+F configure.in 572e97dd3cf3297adc2ac6cf48242cb1f76c6d0c
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html 83dd89d7972b00d2ed5b69383747ff93d586bbc9
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 7d7a0eaa64af0072c2b1e40f04f1e08857efbf06
+P 824de765e7e38a5ef3966bc3b837f32d59dd09bd
 U rolf
-Z a576cb8e2d15414c4f8394099324dd77
+Z 9c42eaaffef0d9b368b4297f5d4930ad
 # Remove this line to create a well-formed Fossil manifest.
