@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2003-03-19T14:14:55
+C Added\scode\sneeded\sto\shandle\seffects\sof\sthe\s-useForeignDTD\soption.\n
+D 2003-03-22T00:05:55
 F CHANGES 87334aee80e9af7a72560e564ddddb7bf97ca551
 F ChangeLog ba4e9c798f8168bf9c8ff3a2bda89f57c348c4e8
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -114,8 +114,8 @@ F extensions/tnc/pkgIndex.tcl.in 37901ed24e06da45c7d7a17f255b6108925400f8
 F extensions/tnc/test.tcl d9d4c2a1dcd2a7a70096a2a1727f8600ff0c78fd
 F extensions/tnc/tests/all.tcl 845c9dab65c294c3570f69cc731d6fef62efbd03
 F extensions/tnc/tests/loadtnc.tcl 418f1bbca50993a9fe012728b50f0f8080cff2ab
-F extensions/tnc/tests/tnc.test c58ef682c5fe1408331b8f4258e24f23d5352019
-F extensions/tnc/tnc.c 7da4683c71177a424d8307f6afb52a4b61000c7c
+F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
+F extensions/tnc/tnc.c abde5a82bf6098883ab554aa726f477e0b1caa8b
 F generic/aolstub.cpp 0f2fb53cc8ba2a4a5fc8f5fe2dbe94c51e65e9bf
 F generic/dom.c 1358431e8f5fbe94cf6ea61b7a3c13e43461f750
 F generic/dom.h 16ce6dc106162c5f396134a0a29a77fb2857255e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P b9bdea4b973802bbfd21f60de6848df4cd05d3c0
+P 3059d7be0c796142fc0fcdda359098b21d28312b
 U rolf
-Z fb87620e0517452450076cbede0d8b12
+Z d7ea7dcf652804eb7a788b5493f8d8e6
 # Remove this line to create a well-formed Fossil manifest.
