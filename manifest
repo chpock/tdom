@@ -1,7 +1,7 @@
-C Added\sdocumentation\sfor\smethod\snormalize.\n
-D 2003-10-10T20:14:38
-F CHANGES 228acdbe3e0f22f66f131cd33f2aaa77c06c5e8d
-F ChangeLog 02f548822f791f42af7cef402181abb180cea1ab
+C See\sfile.\n
+D 2003-10-10T20:15:06
+F CHANGES 993140b623ef50267a92d858779d91eeaf39da4c
+F ChangeLog d831ee415c27ff9c8151af950abf953e0c37057e
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P dc2b4ec7ea09acf9cbefe26ccb5307e7de9a3f06
+P e219c484f4ddc3dedca5f451d21c43a9eda56f1e
 U rolf
-Z 7b75ff537c41b92fade8862fca35fc49
+Z b5f31becbdf5b7dd80971dd52fd46b78
 # Remove this line to create a well-formed Fossil manifest.
