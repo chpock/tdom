@@ -1,5 +1,5 @@
-C fixed\stypo\s(Tcl8.0.x\scompile\sproblem)\n
-D 2002-06-20T12:21:41
+C fixed\sTcl8.0.x\scompile\sproblems\n
+D 2002-06-20T12:22:32
 F apps/xslt.tcl aceffee1914d4bf9b7a6a0a0a4b66fa7c4991fd5
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html c21ddc9a115a8a82ee1560949dc08a1bc41233b6
@@ -106,7 +106,7 @@ F generic/domxslt.h 77d19235cbf254d3ba46ae28088fdcbf98a4856a
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/nodecmd.c 0b9510a803b645bcad838571678ba31fab284835
 F generic/nodecmd.h 0225d87d05a9afc2ce0d5baf8966b076ffa71405
-F generic/tcldom.c 1ecf691833a74222321d14d73d5e0ea23c4a6a9e
+F generic/tcldom.c a86daa119944d91ee703e66b479d41ec94949bb4
 F generic/tcldom.h 0cace67e972eed7453ff64d091d314159cc37404
 F generic/tclexpat.c 9abbd41c60134b7ccdd3cb3cbd4c26e691f321b8
 F generic/tclexpat.h 62e83591b9fff070825add84310f7f7cc8cff3b8
@@ -174,7 +174,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P d7cf9c525f83fae994c7efb908c1d1c540f7f9bb
+P 243441d7da1b06f2740882a153ad6b61fb66c5d2
 U loewerj
-Z 790eeb747dc21f8fdaacf163c837ccf6
+Z f1007471e5cb67e20919d8cb51d3fcf2
 # Remove this line to create a well-formed Fossil manifest.
