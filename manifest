@@ -1,5 +1,5 @@
-C Fix\sin\sdomAppendNewElementNode(),\sdomAppendLiteralNode()\sand\ndomAppendNewTextNode():\sif\sthe\screated\snode\sis\sa\schild\sof\sdoc->root,\nset\sthe\sparentNode\saccording.\n
-D 2005-03-26T14:06:32
+C Removed\s(anyway\snot\scorrectly\sworking)\swork-around\sto\sset\sparent\sof\nthe\schilds\sof\sdoc->root\s(problem\snow\scorrectly\sfixed\sby\schanges\sin\ndom.c).\n
+D 2005-03-26T14:07:19
 F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
 F ChangeLog 7cfc33a5df57fbb24011376806f55c8391d08a9c
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -128,7 +128,7 @@ F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c 37ac0fa7c1657c929974cee597b711054a64dd1f
 F generic/domxpath.c 6a7a900d3290c7ee825de388dbb01e3dd2a6f578
 F generic/domxpath.h be91f9f94b7a4a40c38df9612b1feaecbd6644da
-F generic/domxslt.c 8ff135a3d711d4cc4e3a4fbfe54df84bdbe16bf7
+F generic/domxslt.c 5c717336b0359429e7221c9d3956a2f08d2cfdea
 F generic/domxslt.h 261176a8cb491de448189fcb9fa93bfcabda5e40
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -233,7 +233,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 09d39d9d79564f1fe315dc9bcbcc5a1bcb7f9e76
+P b97cb015ce9f397628df6e743580770eb1fd2182
 U rolf
-Z 6bd86f099ba47c0768beec42650cd8ce
+Z 9dd093037a2c6f53a55fc18a525d1c71
 # Remove this line to create a well-formed Fossil manifest.
