@@ -1,5 +1,5 @@
-C Added\sreader/writer\slocks\sfor\sthreaded\sbuilds\n
-D 2002-06-02T06:34:45
+C Added\sthread\ssafety\swith\scapability\sof\ssharing\sDOM\strees\sbetween\nthreads\sand\sability\sto\sread/write-lock\sDOM\sdocuments\n
+D 2002-06-02T06:36:23
 F apps/xslt.tcl 1b9a65d5db054f01e4033883fa53a313d8e6d5fe
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html c21ddc9a115a8a82ee1560949dc08a1bc41233b6
@@ -92,34 +92,34 @@ F extensions/tnc/pkgIndex.tcl.in f3ca1ee461a2ce4c6f7fae3ff078da261fab6e4b
 F extensions/tnc/tcl.m4 9404ac273b962ddaf946d3170c5183e55d0984b3
 F extensions/tnc/test.tcl efade8bcb9fd9e269ed5c259f3edf182bc917b72
 F extensions/tnc/tnc.c d1c8431c5ea72148aaca6b092f919a25270565d6
-F generic/dom.c 6d48159fc577c374a98f400c8aa0c740fc95d2cf
-F generic/dom.h 9c2e0634bbdee6eae0c7a06c8ada70c8fe8a1cfb
-F generic/domalloc.c 467e64565316606786480be270804a2b31e95b5c
-F generic/domalloc.h c5fc1efc2030b9da65cea2c8690b0ea61f7bec16
-F generic/domhtml.c e8cda5580aa8c3fe08e9f432a8482dd667c22e6e
+F generic/dom.c ed7ad6ed9a6bea09817d6a28c5ef9abdf1e68a95
+F generic/dom.h 8714da7dd6cc2153b1f6dd48566a60d66cbf30f9
+F generic/domalloc.c 2ed8e10dd8a71b5a949e55885b3a5646e0cb6bc9
+F generic/domalloc.h a44bdf75c6e950f6f711ba9528030841aaa5d783
+F generic/domhtml.c 8f0aea7320be82b49d27926b45e56abb962e71f1
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c d9240199412977604216263b92312b9da7acd6f4
-F generic/domxpath.c e14159cca2f11d5b79c0b97024a83f4cab7403d6
-F generic/domxpath.h 9aeae6b3988adf20a2b5d295c4bd8bb5b5386ed3
-F generic/domxslt.c 5edde7a68441682584e9ed77f21bcde6a84f6358
-F generic/domxslt.h 4e41a3885354345ec29800c6c0f18ebd3fd0d2ce
+F generic/domxpath.c 766e0498931ac30714caa6f3e1816541c88aa2dd
+F generic/domxpath.h e5f1bed4326a5b5b80b8e7c2ce514c0739683683
+F generic/domxslt.c 7c6cb9a5b22ae1fa6b625a5c7c57deb172b0ef19
+F generic/domxslt.h 77d19235cbf254d3ba46ae28088fdcbf98a4856a
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
-F generic/nodecmd.c 60cfaefa435012d37a0bfe9fe115731c0efba17e
-F generic/nodecmd.h c7c326adbbc6b3e6c8bdd4131b281eb216e9e5d2
-F generic/tcldom.c 8e243f79d11d595f87734bf8d36920f050e06b51
-F generic/tcldom.h dfa17c8b51f63f5a5fda8fe7f3a7363924fe309c
-F generic/tclexpat.c d1cc997b43ce23d4c19e410fa03762720098906f
-F generic/tclexpat.h 1800c59d89d873656a509f8d03ffb5417daf07e3
+F generic/nodecmd.c 0b9510a803b645bcad838571678ba31fab284835
+F generic/nodecmd.h 0225d87d05a9afc2ce0d5baf8966b076ffa71405
+F generic/tcldom.c 1ecf691833a74222321d14d73d5e0ea23c4a6a9e
+F generic/tcldom.h 0cace67e972eed7453ff64d091d314159cc37404
+F generic/tclexpat.c 9abbd41c60134b7ccdd3cb3cbd4c26e691f321b8
+F generic/tclexpat.h 62e83591b9fff070825add84310f7f7cc8cff3b8
 F generic/tdom.decls 7c024d1386ebc0eee7f70017554734b3926fa1fe
-F generic/tdom.h 2805adcc83044ace4c34127d6c46c65fd354e636
+F generic/tdom.h b43e499a66d269d87ae751faafa7d7f5584c58b7
 F generic/tdomDecls.h 207098defee329f3a967d9107b8f5d8aa4016b43
 F generic/tdomStubInit.c f712fd963fbd02b811b8a24b862b2a8bb98cafc9
 F generic/tdomStubLib.c b8e2a55da433d2bbca6cabf6eeecb76962925079
-F generic/tdominit.c 4fc7e689174812cf1e39f386b2226974db1ef35d
+F generic/tdominit.c e45dc8c6eab1da5fcd81921075ef965855ab2db8
 F generic/utf8conv.c fc01b4776a82c937252a7d2593a3d244916905f7
 F generic/utf8conv.h 673d53e1facc0941514c74d76fc3f6e4fa26a846
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
-F generic/xmlsimple.c 5a0671a6ea37d0ca13b4782d0f8f5a215871e5af
+F generic/xmlsimple.c ebe2e43a36ea3273eb6fb6a2416b7b50b3174373
 F generic/xmlsimple.h 07cac92419cb8ade05ad2d148314931a0b3a418a
 F lib/domhtml.tcl 1ce01926d867282e27e87c08bb4c2b7875f4003b
 F lib/tdom.tcl 2b96eca275fc04f82d353577cdcc669721e60abd
@@ -174,7 +174,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c7e52dd052af3d0d442b119b670758eacf5ba596
+P a9ea60df269cab75973a22b56cf4537525802398
 U zoran
-Z 3dbf7ae4cdacf195ea9b75b43ea0727a
+Z 575fc31cb6afb9ae1e8e231ccbb64ff7
 # Remove this line to create a well-formed Fossil manifest.
