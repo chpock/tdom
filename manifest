@@ -1,7 +1,7 @@
-C fixed\spreprocessor\sdirective\swhen\scompiling\sunder\sAOLserver\n
-D 2003-05-16T14:39:27
+C See\sfile\n
+D 2003-05-16T14:40:04
 F CHANGES 59cab3c950a08a20053aa26b3a8718c6efa8c913
-F ChangeLog 9626d6cf6d366015173fd644dd5aeaa512af31d0
+F ChangeLog 7b200d22ad99a66d4df2f64418dd04bd7caac2cf
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 25204720818592a271aecc462432628b5a1862a4
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 25004cbac0327a8d4b32e78172d63a0829a46d4c
+P 6cb6245b08977a1b6ee607801f0cfd1008a13f43
 U zoran
-Z de7d1f87e28ebd45ce4faa9fabbeb2a4
+Z c0ecb0e6f4a9f2ecf2313817f5a090aa
 # Remove this line to create a well-formed Fossil manifest.
