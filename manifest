@@ -1,7 +1,7 @@
-C Added\sfluff,\sto\sfix\sbuild\sproblemx\son\sAIX\sw/\sxlc\scompiler.\n
-D 2004-08-17T19:52:55
+C See\sfile.\n
+D 2004-08-17T19:53:09
 F CHANGES a8e3b007dbfd9ec1a0ab5be94129fab0fa30621d
-F ChangeLog b759f0a1519713e53b273fa06a8fe01e3ae38944
+F ChangeLog 533bb62dc6d01fab09eb327c8b023d31ca9c94d2
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -228,7 +228,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c55ee6bc39c7235de402bc095928036076ca21ee
+P 0d0da079bd721c7abba7021483a1df0d5bf8c6aa
 U rolf
-Z af3082055273de298c4383e36533c5ae
+Z 526fde50762f0b001525676f83e4210b
 # Remove this line to create a well-formed Fossil manifest.
