@@ -1,12 +1,12 @@
-C New\sset\sof\sfiles\n
-D 2003-03-08T09:32:52
+C Cosmetics\n
+D 2003-03-08T09:38:58
 F CHANGES bedaded2db2b4b9c98267dec8dcfb01261cfbb9a
 F ChangeLog e33b75fd6613da2463da411bff8394ab3fb047cd
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 66a3f3c77f53f573bea7fc3e8620f6e19576c76e
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
 F README a6c61e573170a3ce1cdf154283d141ce67c66946
-F README.AOL 2ad6f150c6b92ff827c020cf1389905e1bf74d25
+F README.AOL 7e9969511c9ae21a349b1da4b63b7eb113ee2d8f
 F aclocal.m4 79e2f4aa6a138371f2d31f28355749e5019d7651
 F apps/xslt.tcl 33eaaf45b831e6613d528156f7f1bbc02fd9f849
 F configure 0e812da8d5f16fc905ae01624e5b19215d6a7bc9 x
@@ -223,7 +223,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a7c169e0bda63092e9086fcaccbbb7764b08b74c
+P b3a0b2f57cf8ba5a811bde6e11d45de6e1d0ea1f
 U zoran
-Z 0a1b43a2de3d8a1149b0f73fa91c3e84
+Z 02d380c7479d295169c5b702779b67a2
 # Remove this line to create a well-formed Fossil manifest.
