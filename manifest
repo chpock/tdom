@@ -1,11 +1,12 @@
 C First\simport\n
-D 2003-03-06T14:07:19
+D 2003-03-06T14:22:07
 F CHANGES bedaded2db2b4b9c98267dec8dcfb01261cfbb9a
 F ChangeLog 64c0076de8f8fe4f51a67bbb2f18718186aeaf11
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 66a3f3c77f53f573bea7fc3e8620f6e19576c76e
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
 F README a6c61e573170a3ce1cdf154283d141ce67c66946
+F README.AOL 2ad6f150c6b92ff827c020cf1389905e1bf74d25
 F aclocal.m4 79e2f4aa6a138371f2d31f28355749e5019d7651
 F apps/xslt.tcl 33eaaf45b831e6613d528156f7f1bbc02fd9f849
 F configure 0e812da8d5f16fc905ae01624e5b19215d6a7bc9 x
@@ -146,6 +147,7 @@ F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
 F generic/xmlsimple.c 1af1d67cfb193a648147fdd5b6fa43f7faa8051e
 F generic/xmlsimple.h f2861868b0fed932c79f9e595bb875d261d97bd5
 F lib/tdom.tcl e27e239b2ab1f3e99b47cb444842aa5247b2ae54
+F macosx/README 691a736d3e9a6c9c956e96be30c1a3b03e02da4b
 F tclconfig/ChangeLog 16d950c5f3b8b048a77b9671f3705d360f226759
 F tclconfig/README.txt c7a8a24b2782cd897a7608813161611f8e0521a0
 F tclconfig/ac_c_bigendian_cross.m4 d42e2f20b8ea4df7c29a8595f10489bfaab58096
@@ -201,7 +203,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c747a35e0d88fe44c10682d1e799549a35df251c
+P 943c93879acdc29b6e0ac0602aff4d8b6369f395
 U zoran
-Z 8c0e64f95cd183a8079a6a68397369ee
+Z 4e3638b0d2598240deefa69e3685a7fa
 # Remove this line to create a well-formed Fossil manifest.
