@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2003-03-22T02:13:45
+C Updated\sfor\s0.7.6\srelease.\n
+D 2003-03-22T16:27:00
 F CHANGES 87334aee80e9af7a72560e564ddddb7bf97ca551
 F ChangeLog a67b8121cbc68d48ca423e30af3afcd44fd88557
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -108,7 +108,7 @@ F extensions/tnc/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
 F extensions/tnc/configure 0940b5d6ed055f3b5cfe57f8f7a9b48781c68495 x
 F extensions/tnc/configure.in be5144eab010e85e74dec0e86f64a1c41771b48b
 F extensions/tnc/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
-F extensions/tnc/makefile.vc d593aaf4078a7bd960713f71f3a2f07a1fd570bd
+F extensions/tnc/makefile.vc 357f364e0cc0d8ccb36b8354f614e3932e0b22e3
 F extensions/tnc/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
 F extensions/tnc/pkgIndex.tcl.in 37901ed24e06da45c7d7a17f255b6108925400f8
 F extensions/tnc/test.tcl d9d4c2a1dcd2a7a70096a2a1727f8600ff0c78fd
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 079c509dded08899a6c4e652c4d7a795210d79cf
+P 437ff62f6712bdc524e0deec596a93477a7581cf
 U rolf
-Z 82863fb7134dbf97beb8214bdffd63b5
+Z a6fb8b27c966a5c933ba2c82a5658ac1
 # Remove this line to create a well-formed Fossil manifest.
