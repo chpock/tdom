@@ -1,5 +1,5 @@
-C Fixed\srolfs\smail\saddress\sfor\sthe\slast\sfew\sentries.\n
-D 2004-08-17T19:54:53
+C Made\stDOM\swork\sout\sof\sthe\sbox\son\s64-bit\ssystems\slike\sItanium\s2\s(though\n--disable-tdomalloc\sconfigure\soption\sat\sbuild\stime\sis\sstill\sneeded).\n
+D 2004-08-19T01:06:06
 F CHANGES a8e3b007dbfd9ec1a0ab5be94129fab0fa30621d
 F ChangeLog eb08ac7fd277eefa6e05100cd2ce9b5a229d2d51
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -118,7 +118,7 @@ F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c 4eb5d817c334c641af2c76cdb7f30998b5c5b8ed
 F generic/aolstub.cpp 2ba5a8d1046b7d92c92917ad4e17f8d944b41167
 F generic/dom.c 282ea15197139c6493798f2977e6d11ba75a976b
-F generic/dom.h bb71b33f733c7043f493301b8a77ca97928a8b49
+F generic/dom.h b34c3b6ba6e1efe35db679119bc50efa803ccbdf
 F generic/domalloc.c 94e9e21e9b2a73586a6411693cdcce6061a96d23
 F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
 F generic/domhtml.c 88e0ea75868126e276c7ed2967f3237e90a76105
@@ -132,7 +132,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c bd617b5ad9643d207b2cbcae7c918df3db601af8
 F generic/nodecmd.h 93a8fe44e2d96e0a88fe2a94001e18c709ac7a81
-F generic/tcldom.c 9243619dae545dc64a9a1d427bf0dcf8fdca6fb2
+F generic/tcldom.c 98fb7c1c4f7f0856da4e8a0599530313e1e6ca7e
 F generic/tcldom.h 06811d33cf15dffcd56ac13ef6d67d0309347442
 F generic/tclexpat.c 93a3d4c93360806dbbe04f90bfb7f1778ffc9fc0
 F generic/tclexpat.h 4af6a66cde1f493d0d7c2da1ef5da6295c1006db
@@ -217,7 +217,7 @@ F tests/xmlsimple.test ca697d11f34bfdd624caa70bf74abfe0e5bd775b
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.test 9241a216eb885954686f672eeb92f508374b1279
 F tests/xslt.test 8f4c819e72e3633a135fd5531afcb759ae6324c8
-F unix/CONFIG 9e65bbe84330e49ce8f992c9bbf218c6eb0edb36
+F unix/CONFIG f1ba21ea548b8825d4c19f0f5f11a5369926559f
 F unix/tclAppInit.c 06b688c30d27d4be8925b05d1607cbee950bbd1c
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F win/makefile.vc 14cdae7e0da80475429e8b48209d8f4825aacf0a
@@ -228,7 +228,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 50ccd5b249a9df1ba6a689df9f069b50afda9cfa
+P 12b7b3da93f98412cab8cad220e8f53871d0cd24
 U rolf
-Z d4eac95be70f4249fe34824175b803f9
+Z 7c1f34d259571ba90cc19bd64bc2ab82
 # Remove this line to create a well-formed Fossil manifest.
