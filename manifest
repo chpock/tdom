@@ -1,5 +1,5 @@
-C Update\sto\sexpat-1.95.6.\n
-D 2003-02-09T16:30:40
+C Update\sto\sexpat\s1.95.6.\n
+D 2003-02-09T16:33:03
 F CHANGES 0029b9d0b0a7f54372728db4428fe8eb49b3699a
 F ChangeLog 5a665abe611e755533d10b079da943606e7d2dbf
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -67,7 +67,7 @@ F expat/README 0ca9dfb7faf3c7e37f2878dd96834828a3093ef7
 F expat/VERSION aeaaf80e743fa5a27e367c67b7d317769d513ef7
 F expat/ascii.h ca59dc7b044451fe67b2611a98b546aacc10acb8
 F expat/asciitab.h 67462447978f02b8a78ce7f054da82ec88e7ffa4
-F expat/expat.h 814b541d975907245234f31e1112b4776b86ed7c
+F expat/expat.h ec620f8ba02e3b9841a450933c185c03e32f7dcf
 F expat/iasciitab.h efc1dd92a1a1173bde671c54ddc772e4ca3de340
 F expat/internal.h f5b57765a975ca801bed18257be7c6c091218a31
 F expat/latin1tab.h a0655f4fc2de3cc5993319b0fcad636a906ca885
@@ -197,7 +197,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 5f744c8f11675da951757bdc924c40705e314e0d
+P 09c960a150df9533a71d60636cd1b7e1605eb9c0
 U rolf
-Z a44a74783791d5e4caca78c244c524b3
+Z 76e58903bac73635161169e43f9c2d38
 # Remove this line to create a well-formed Fossil manifest.
