@@ -1,5 +1,5 @@
-C Improved\sthe\serror\smsg,\sif\san\sunknown\sXPath\sfunction\swas\scalled:\snow\nreturn\salso,\swhich\sfunction\sis\sunknown.\n
-D 2002-09-03T21:00:59
+C Fix.\n
+D 2002-09-06T21:20:34
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in ffb39c47ad2dfcd69eaf5b57b32d22998f74a491
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -116,7 +116,7 @@ F generic/nodecmd.c c861712d44896adcee7923f25c6c0de3c7156fd7
 F generic/nodecmd.h 0225d87d05a9afc2ce0d5baf8966b076ffa71405
 F generic/tcldom.c 258f19f2b0df1e316f87400bcee302ed0d6b0d31
 F generic/tcldom.h b06a092266deed3a050a824a8f1963b91e4c3649
-F generic/tclexpat.c 25e598f172d1b0ad7df717f3b0aa97204bc772bc
+F generic/tclexpat.c 070347c4ee836e7eaf731dc87c7ecd0b5dca4b01
 F generic/tclexpat.h 62e83591b9fff070825add84310f7f7cc8cff3b8
 F generic/tdom.decls 7c024d1386ebc0eee7f70017554734b3926fa1fe
 F generic/tdom.h caf10edb3081c91d01abb883d8a2364cdd0dd840
@@ -182,7 +182,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f8700bbb5a60c0904659f53cb4f9da02cbb62cb7
+P 53688c2c651feb2eea5424218c6790e50041dc65
 U rolf
-Z a57ccdc6fe1554ec63bfbf24d9a32c37
+Z 9c2ff861f78aa6486a058413f1b71f21
 # Remove this line to create a well-formed Fossil manifest.
