@@ -1,5 +1,5 @@
-C Optimization\sfor\spredicate\shandling.\sNo\svisible\seffect\swith\sstandard\nxsltmark\stest\sfiles,\sbut\sa\slifesaver\sfor\sother\scases\sout\sof\sthe\nwild.\sFor\sexample,\sxmlconf.xml\s/\sxmlconformance.xsl\sout\sof\nhttp://www.oasis-open.org/committees/xml-conformance/suite-v1se/xmlconf-20010315.htm\nis\sspeeded\sup\smore\sthan\ssix\stimes.\n
-D 2002-05-19T00:41:02
+C Fixed\sa\smemory\sleak\s(handling\sof\selement\scontent\smodels).\n
+D 2002-05-22T16:40:22
 F apps/xslt.tcl 1b9a65d5db054f01e4033883fa53a313d8e6d5fe
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html c21ddc9a115a8a82ee1560949dc08a1bc41233b6
@@ -107,8 +107,8 @@ F generic/nodecmd.c 60cfaefa435012d37a0bfe9fe115731c0efba17e
 F generic/nodecmd.h c7c326adbbc6b3e6c8bdd4131b281eb216e9e5d2
 F generic/tcldom.c 6b751e8df342cb01d2b0ae036225231f01b186c9
 F generic/tcldom.h dfa17c8b51f63f5a5fda8fe7f3a7363924fe309c
-F generic/tclexpat.c d8a3bcd6d345117cad9bf3a9df6917739bc7c705
-F generic/tclexpat.h a1bb96ca9c3917ae707b794252de1bea6122de4e
+F generic/tclexpat.c d1cc997b43ce23d4c19e410fa03762720098906f
+F generic/tclexpat.h 1800c59d89d873656a509f8d03ffb5417daf07e3
 F generic/tdom.decls 7c024d1386ebc0eee7f70017554734b3926fa1fe
 F generic/tdom.h 2805adcc83044ace4c34127d6c46c65fd354e636
 F generic/tdomDecls.h 207098defee329f3a967d9107b8f5d8aa4016b43
@@ -173,7 +173,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 4299a6eab1894c0a2529e605d8c57c65192b9e01
+P adc606e80255bca5ed712181f46425874d587200
 U rolf
-Z 5dc0b8cf371e5f50ff33631044a03ca0
+Z bf140abd031c3dfa985e741a77cb08e2
 # Remove this line to create a well-formed Fossil manifest.
