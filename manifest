@@ -1,7 +1,7 @@
-C Changes,\sto\sprepare\sadding\sof\snode\screating\scmds,\swhich\screates\nnamespace\saware\snodes.\n
-D 2005-03-26T14:07:55
+C See\sfile.\n
+D 2005-03-26T14:08:53
 F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
-F ChangeLog 7cfc33a5df57fbb24011376806f55c8391d08a9c
+F ChangeLog 62fa09583ec564d2334e1d1ea78d6cc89dc61e29
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 793035f18fb2ad53394e3cda31222b9197e93a3a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -233,7 +233,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 61ee883ba895b4a2aeed632c0072f084fa38f85c
+P 18537ed52a4592730f967b8a8924d9333c6b26bf
 U rolf
-Z d861fb27f7142ec6dd80b157b764e07f
+Z 914e054b91aa7cd2405a93632c2e666f
 # Remove this line to create a well-formed Fossil manifest.
