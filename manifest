@@ -1,5 +1,5 @@
-C Renamed\s'startBefore'\smethod\sto\sthe\sbetter\sname\s'precedes'\sand\schanged\nbehavior:\sthe\smethod\snow\sreturns\ssimply\sa\sboolean\svalue.\n
-D 2003-03-22T00:14:37
+C Renamed\s'startBefore'\smethod\sto\sthe\sbetter\sname\s'precedes'\sand\schanged\sbehavior:\sthe\smethod\snow\sreturns\ssimply\sa\sboolean\svalue.\n
+D 2003-03-22T00:16:02
 F CHANGES 87334aee80e9af7a72560e564ddddb7bf97ca551
 F ChangeLog ba4e9c798f8168bf9c8ff3a2bda89f57c348c4e8
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -20,9 +20,9 @@ F doc/dom.xml b6f088b32e14a4d094829c041de1988e68d7bbab
 F doc/domDoc.html 352415ff4776d3e1ff532dae8945ce06212febd4
 F doc/domDoc.n d5f2cb599bb1abe5ce4a167dc03c3e5de66d952d
 F doc/domDoc.xml 420edf41715156274ac43fe65932bb03747436cd
-F doc/domNode.html 2dcb3716514ac5ec950e10342ca4a75be02a1cdf
-F doc/domNode.n 26c73979d10416a945dc67c6f9c257a85d553f15
-F doc/domNode.xml e914a0967e010fd06faa12d902fc937918151a02
+F doc/domNode.html 657b92b61cf9dfd25327a4f4bde722f1ccf0e552
+F doc/domNode.n 2bc048609bb84a8f89098550cea99847ae3b8007
+F doc/domNode.xml 07415f8038e7ab81cfdf0e2c722d793a6f9557f2
 F doc/expat.html 63e0631177c915249662ba3199f75f9bf4b6a794
 F doc/expat.n d7f31827cedfa8741ef4c22ffa801d9938a4c3f7
 F doc/expat.xml e0d99788197ed96b93c6740d7b39b8fff5763b9e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 4b30dbc927250a5a1b170ac3fbe39a98d20c12d0
+P 6dbe77ea42c50085c9ac20ac9dc059306efa3fd2
 U rolf
-Z 3e602400b2ebfd6a4d3e656262e89587
+Z 04ec9290ac5447b1e4145bb9818c13b3
 # Remove this line to create a well-formed Fossil manifest.
