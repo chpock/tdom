@@ -1,5 +1,5 @@
-C Added\soption\s-useForeignDTD\sto\sdom\sparse\sand\sexpat.\n
-D 2003-03-19T13:52:28
+C Added\smethod\s'startBefore',\sto\scompare\sthe\srelative\sorder\sof\stwo\snodes\sout\sof\sthe\ssame\sdocument.\n
+D 2003-03-19T13:55:55
 F CHANGES bedaded2db2b4b9c98267dec8dcfb01261cfbb9a
 F ChangeLog 446a9519a6f4745107c006547eadc4f8e95db6c9
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -20,9 +20,9 @@ F doc/dom.xml b6f088b32e14a4d094829c041de1988e68d7bbab
 F doc/domDoc.html 352415ff4776d3e1ff532dae8945ce06212febd4
 F doc/domDoc.n d5f2cb599bb1abe5ce4a167dc03c3e5de66d952d
 F doc/domDoc.xml 420edf41715156274ac43fe65932bb03747436cd
-F doc/domNode.html 478919fe0545183e2a3512104555fd03eb517646
-F doc/domNode.n 079634b8588a41fe1018347f0dd7da8d42aa7d64
-F doc/domNode.xml b077f2d1409cccd328d37b7e82e8860f0f7ffaea
+F doc/domNode.html 2dcb3716514ac5ec950e10342ca4a75be02a1cdf
+F doc/domNode.n 26c73979d10416a945dc67c6f9c257a85d553f15
+F doc/domNode.xml e914a0967e010fd06faa12d902fc937918151a02
 F doc/expat.html 63e0631177c915249662ba3199f75f9bf4b6a794
 F doc/expat.n d7f31827cedfa8741ef4c22ffa801d9938a4c3f7
 F doc/expat.xml e0d99788197ed96b93c6740d7b39b8fff5763b9e
@@ -225,7 +225,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f1e13ac49ceda98cfc084ca1e2888acd4d225d74
+P 10d8023a21c7da5c72354180bb05d2d63ffcc40f
 U rolf
-Z fe343d88fd02ba23761b76550c15d362
+Z eac98bba23d3bfee0a64f146976e5982
 # Remove this line to create a well-formed Fossil manifest.
