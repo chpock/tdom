@@ -1,5 +1,5 @@
-C First\sshort\sinstructions,\show\sto\screate\sHTML\sfiles\sand\sman\spages\sfrom\sthe\sTMML\sdocumentation.\n
-D 2002-07-11T23:35:28
+C A\sfew\smore\stests\sfor\ssetAttributeNS\n
+D 2002-07-11T23:37:46
 F apps/xslt.tcl aceffee1914d4bf9b7a6a0a0a4b66fa7c4991fd5
 F doc/README 73d3b3d952446a44e6395a5c4ec383ed42b42e23
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
@@ -139,7 +139,7 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 6b400d7cee373b81d057bf76f5ec3c6f2de75ec8
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 9ed82f3607b25f297bbb28bbcc6679ebd29066d2
-F tests/dom.test 2091129cbcebf058d7efbcd416643ae9f859a9f1
+F tests/dom.test d8ee44eadee90a0529020a02dede64efca5df48d
 F tests/domnamespace.test 1cf980a8d0269f84eeafc0a0850725b6184ba52d
 F tests/dtd-5.1.dtd 8f16a5c1ff5181e7136cd0d0f1255ae269c38e3c
 F tests/dtd-5.2.dtd 6a2dbcda86b1729c9789c40ea2d592fff9434939
@@ -180,7 +180,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 32264780156bc8cd7f0ece08de1a36df9c8338e1
+P 213b5ccd1bf54d39107a08090768a12e74d857dd
 U rolf
-Z 1351fe28f039c5c75ca136b1de9bec97
+Z 34981c8afd51f34baddd2d3bae069503
 # Remove this line to create a well-formed Fossil manifest.
