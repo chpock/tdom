@@ -1,5 +1,5 @@
-C Added\scheck\sfor\sbyte\sorder.\sDefine\sneeded\sby\sexpat\s1.95-4.\n
-D 2002-08-20T23:26:53
+C m4\smacros\sfor\sbyte\sorder\scheck.\sIt's\sout\souf\sthe\sexpat\s1.95-4\sdistribution\s(with\ssmall\smodification).\n
+D 2002-08-20T23:29:36
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 90af78958d8b642862a15b9029b0bd8fad84da5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -133,6 +133,7 @@ F lib/domhtml.tcl 1ce01926d867282e27e87c08bb4c2b7875f4003b
 F lib/tdom.tcl e3ede5bf84ef749263382d0b9cb8bc9a9d3d3a4e
 F tclconfig/ChangeLog 16d950c5f3b8b048a77b9671f3705d360f226759
 F tclconfig/README.txt c7a8a24b2782cd897a7608813161611f8e0521a0
+F tclconfig/ac_c_bigendian_cross.m4 d42e2f20b8ea4df7c29a8595f10489bfaab58096
 F tclconfig/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F tclconfig/tcl.m4 71f8690835637fc571099ec81d1c57ed98af7411
 F tdom.m4 6362938e20f54b2a5ad0d4c112d3653f627270d2
@@ -180,7 +181,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P d14d944e901c71a6ba4aac49fd75ac7eac1ccc3f
+P 50ccf9f14effd59dde2625311de1c10a6359d58a
 U rolf
-Z 301d5c8f1ea583b05aa98667d7b0dbe4
+Z 8924fdd1fb4d1b83b9ec57e1deedc682
 # Remove this line to create a well-formed Fossil manifest.
