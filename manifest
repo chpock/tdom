@@ -1,5 +1,5 @@
-C Handle\smultiple\s-namespaces\soption\sto\sselectNodes\smethod.\sAdded\nmethods\stransform\sand\sdelete\sto\sxsltCmds.\sEnsure,\sthat\sdocuments\ncreated\swith\sthe\s[dom\screateDocument*\smethods]\sare\screated\sas\sdocCmds\nin\scase\sof\s'auto'\screation\smode.\n
-D 2005-01-06T19:20:44
+C Added\ssome\s'selectNodes\s-namespaces'\stests.\n
+D 2005-01-06T19:21:26
 F CHANGES 5e1729ae568c08de4588a28d3584d862a29a2022
 F ChangeLog c3eab0bf57005202de1934c3230c3f5489f5e668
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -202,7 +202,7 @@ F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.test 289fc94c960bea16cdbdcc61630479ecc3d9bd40
 F tests/domDoc.test 3bb8c3237bd18a284a55e2693628b1ab33464f95
-F tests/domNode.test 406e5ca9686918d35d016731cb4ad45ffd3b2cc4
+F tests/domNode.test 6b28d034692821a416c8d23976a68b5e286e2293
 F tests/domnamespace.test 7f6ff7ee11a6cb437240c07be18adc11fd876d46
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
@@ -230,7 +230,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P cab4e74d398f39ca40066458acc70615b0af1fa5
+P 66fc2520993b28ff42c6f4a5a7c20d463fb0624b
 U rolf
-Z 1db5f45594dead4a66e70c6169b535c0
+Z dd9d46da7b4f978b8f2a25585ea15c2f
 # Remove this line to create a well-formed Fossil manifest.
