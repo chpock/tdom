@@ -1,7 +1,7 @@
-C Renamed\s'startBefore'\smethod\sto\sthe\sbetter\sname\s'precedes'\sand\schanged\sbehavior:\sthe\smethod\snow\sreturns\ssimply\sa\sboolean\svalue.\n
-D 2003-03-22T00:16:02
+C Added\smarker\sfor\s0.7.5\srelease.\sBeside\sthis\ssee\sfile.\n
+D 2003-03-22T00:25:56
 F CHANGES 87334aee80e9af7a72560e564ddddb7bf97ca551
-F ChangeLog ba4e9c798f8168bf9c8ff3a2bda89f57c348c4e8
+F ChangeLog 0cd333f849b5fd9d01dbb96c006b79239e3bad1f
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 25204720818592a271aecc462432628b5a1862a4
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 6dbe77ea42c50085c9ac20ac9dc059306efa3fd2
+P 7d7a0eaa64af0072c2b1e40f04f1e08857efbf06
 U rolf
-Z 04ec9290ac5447b1e4145bb9818c13b3
+Z a576cb8e2d15414c4f8394099324dd77
 # Remove this line to create a well-formed Fossil manifest.
