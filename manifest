@@ -1,5 +1,5 @@
-C Fixed\sa\sbug\sin\sthe\screation\sof\sthe\serror\smsg\sin\scase\sof\sparsing\serrors\nin\san\sexternal\sentity.\sAdded\soption\s-paramentityparsing\sto\sthe\s[dom\nparse]\smethod.\s[dom\sparse]\soption\sparsing\snow\suses\nTcl_GetIndexFromObj()\s(which\sadditionally\sfixes\sa\sminor\sbug\swith\sthe\ncurrent\soption\sparsing).\n
-D 2003-04-09T19:40:15
+C Added\soption\s-paramentityparsing\sto\sthe\s[dom\sparse]\smethod.\s[dom\nparse]\soption\sparsing\snow\suses\sTcl_GetIndexFromObj()\s(which\nadditionally\sfixes\sa\sminor\sbug\swith\sthe\scurrent\soption\sparsing).\n
+D 2003-04-09T19:56:08
 F CHANGES ca483fbc7c627b68977fc3eb6cf6798f42bca33c
 F ChangeLog 4b901cec6b84cec93869a3df97d0c29dae27ef1e
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -118,7 +118,7 @@ F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c abde5a82bf6098883ab554aa726f477e0b1caa8b
 F generic/aolstub.cpp 0f2fb53cc8ba2a4a5fc8f5fe2dbe94c51e65e9bf
 F generic/dom.c ee9c546c2469da7b7ff3df2ddf68c7e3020bb716
-F generic/dom.h 3024c65b004baeeaaf9be0ebe6308e0c075483ae
+F generic/dom.h efebc341c66ff3bdfab209e014759578189652b9
 F generic/domalloc.c aa1ed647c34d707014f187fd6f68d7b87f97f791
 F generic/domalloc.h 5e94d96321fb4f926b6e2c8cf01b8a28c3d0be0f
 F generic/domhtml.c 54fdfbbe29a80c0c2d5dcb081dc2ab183f1baf98
@@ -126,7 +126,7 @@ F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c dba7e77190826af093bbb0c4dc1f858687ef5983
 F generic/domxpath.c e14c75997d9352a272adf657c73694b7ec99d8f6
 F generic/domxpath.h 2bbf18428f0a934a95d4262bd352cdfe4937e9cb
-F generic/domxslt.c ffaecff98792a2266ceb73048ffa791a64efefff
+F generic/domxslt.c 7a02da86fa015404c9e491786b7268ad10e1c1ac
 F generic/domxslt.h b60468a7092d4d5712b4a8776f3db51d4c03aa04
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 2dd42f3330cd825717568d8e2a8c8493bfc28abe
+P 803d0d341be0dc80692aa559d324b56285fefc27
 U rolf
-Z 281e4aa991d793c187f246f1767c3bba
+Z 4dd69eddef9e479755370505bd650119
 # Remove this line to create a well-formed Fossil manifest.
