@@ -1,15 +1,15 @@
-C Fixed\stypo\son\sline\s328\s(node->document\s>>\snode->ownerDocument)\n
-D 2002-11-01T21:35:17
+C Added\sTCL_LD_SEARCH_FLAGS\soption\swhen\slinking\sthe\stdom\sshell.\sThis\sallows\nfor\ssimpler\shandling\swhen\sused\swith\sdynamic\slinker.\n
+D 2002-11-01T22:41:06
 F CHANGES 17f8fddea36060afdc3691cf6a989be83d353c40
 F ChangeLog 2a3645fbfc3009a21aeae39c174f6bc34fe1a7a7
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
-F Makefile.in 47f1ae9a9582fd06878b7dda3a33a55cea86cae4
+F Makefile.in 82507d67b3c1f0d68d77050f4281227377f7ecce
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
 F README 88df3a7c9bec8890e3f64625dcbd1190b520a014
-F aclocal.m4 a7c82deae42849a1eb4956222315c139329d4d55
+F aclocal.m4 79e2f4aa6a138371f2d31f28355749e5019d7651
 F apps/xslt.tcl e21f2dcd895c82e704ec856cf05c49d1079871e6
-F configure de5206a44e4dbdcf5000d823d88a695c114f998d x
-F configure.in bc713d92cafdcee6e6f359d8566945bedbfbb861
+F configure 2030d11ce3828968a0e2f7fc033c2505253a54ff x
+F configure.in 2881060a9d0beadee710819f9a912ac85404a4ba
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html 9de79d4b6e264bc302e9399ae1b97d87ce1622ff
@@ -194,7 +194,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 577afd3a4f03bf384de05945e2e85989f14c8549
+P 4ebeecc3762c9528f578c0507425228a4627672b
 U zoran
-Z d6d482350674640556ce4fb9c12b7247
+Z b509141d092ce486daf860107d402e46
 # Remove this line to create a well-formed Fossil manifest.
