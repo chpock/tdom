@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2004-08-16T03:18:37
+C Removed\sunused\svariables.\n
+D 2004-08-17T19:37:16
 F CHANGES a8e3b007dbfd9ec1a0ab5be94129fab0fa30621d
 F ChangeLog b759f0a1519713e53b273fa06a8fe01e3ae38944
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -124,7 +124,7 @@ F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
 F generic/domhtml.c 88e0ea75868126e276c7ed2967f3237e90a76105
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c 37ac0fa7c1657c929974cee597b711054a64dd1f
-F generic/domxpath.c 329ccee8bdbc3e9c14c1a3327ec71952bd240489
+F generic/domxpath.c 8946a81ee48f94ff497fbd64b4f15d63eac703bb
 F generic/domxpath.h a7eb51c0f163038b11f0e5288be6634264806285
 F generic/domxslt.c fdb82ba9920e839c771cfcdda7b36ec149b23964
 F generic/domxslt.h 261176a8cb491de448189fcb9fa93bfcabda5e40
@@ -132,7 +132,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c bd617b5ad9643d207b2cbcae7c918df3db601af8
 F generic/nodecmd.h 93a8fe44e2d96e0a88fe2a94001e18c709ac7a81
-F generic/tcldom.c b34de641799273b0e800e5fb47bf3072c9f26bdf
+F generic/tcldom.c 9243619dae545dc64a9a1d427bf0dcf8fdca6fb2
 F generic/tcldom.h 06811d33cf15dffcd56ac13ef6d67d0309347442
 F generic/tclexpat.c 93a3d4c93360806dbbe04f90bfb7f1778ffc9fc0
 F generic/tclexpat.h 4af6a66cde1f493d0d7c2da1ef5da6295c1006db
@@ -228,7 +228,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P e4e93d50efc9f5101a1402457bcf16db33dcdb4f
+P 199df0f1428477aaf5405b53cfad70b2d4837884
 U rolf
-Z d93d9bfc0f239a91e7986f6d28b44605
+Z bb3697c85542bfb39da63280e5803232
 # Remove this line to create a well-formed Fossil manifest.
