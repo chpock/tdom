@@ -1,5 +1,5 @@
-C Removed\sunused\svariables.\n
-D 2003-02-26T19:10:35
+C Improved\s::tDOM::xml(Read|Open)File.\sNow\shandles\salso\sutf-16\sfiles\nwith\sBOM\sright.\n
+D 2003-02-26T19:11:13
 F CHANGES bedaded2db2b4b9c98267dec8dcfb01261cfbb9a
 F ChangeLog 5dd688f224febae607f2ec588f99c95c466f2e4f
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -115,7 +115,7 @@ F extensions/tnc/tests/loadtnc.tcl 418f1bbca50993a9fe012728b50f0f8080cff2ab
 F extensions/tnc/tests/tnc.test c58ef682c5fe1408331b8f4258e24f23d5352019
 F extensions/tnc/tnc.c 7da4683c71177a424d8307f6afb52a4b61000c7c
 F generic/aolstub.cpp 0f2fb53cc8ba2a4a5fc8f5fe2dbe94c51e65e9bf
-F generic/dom.c 4ff109c7078583f82de5d5f11e664bc54c4ea970
+F generic/dom.c 06ec2fa38cd13a1a74a657e9306f88863be295de
 F generic/dom.h 7a2d4cf24a97b3a4ef31c4d23e6dfdce09ab31c8
 F generic/domalloc.c 614b3e4af2d4b7cd8dac5a9fd95b699a5e80264f
 F generic/domalloc.h 5e94d96321fb4f926b6e2c8cf01b8a28c3d0be0f
@@ -145,7 +145,7 @@ F generic/utf8conv.h e0d2756b2d77ad9a8508a0dcf7cce5e10fa4c9a5
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
 F generic/xmlsimple.c 1af1d67cfb193a648147fdd5b6fa43f7faa8051e
 F generic/xmlsimple.h f2861868b0fed932c79f9e595bb875d261d97bd5
-F lib/tdom.tcl 5742db59d5b4711e516866296b2f0db18988af54
+F lib/tdom.tcl e27e239b2ab1f3e99b47cb444842aa5247b2ae54
 F tclconfig/ChangeLog 16d950c5f3b8b048a77b9671f3705d360f226759
 F tclconfig/README.txt c7a8a24b2782cd897a7608813161611f8e0521a0
 F tclconfig/ac_c_bigendian_cross.m4 d42e2f20b8ea4df7c29a8595f10489bfaab58096
@@ -200,7 +200,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 16d442fdba9cc8f12a2572511a26cd8ad0832aed
+P 34d56d9c5f732b52c34559706b5e7046252312c7
 U rolf
-Z 5f60d5a0a442cfa573e973b6c6194f40
+Z 49367b72b841eedaa06704fc3aa45607
 # Remove this line to create a well-formed Fossil manifest.
