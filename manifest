@@ -1,5 +1,5 @@
-C Added\sdomDoc\smethods\somit-xml-declaration,\sindent,\sstandalone,\nencoding\sand\smediaType.\sBug\sfix:\sseg\sfault\sfor\sdocument('')\swith\nstylesheet\stree\swith\sempty\sbaseURI.\sMinor\soptimizations.\sFixed\sinvalid\nmemory\sread.\n
-D 2003-11-24T10:15:54
+C (Probably)\stemporarily\sdisabled\sautomatically\sclean\sup\sof\snodeObjCmds,\nto\swork\saround\sbug:\sStoring\sthe\ssame\snode\sin\sdifferent\sevaluation\ncontexts\swith\sthe\soptional\sobjVar\sargument\s(as\sin\s[$doc\ndocumentElement\sroot])\sat\sthe\ssame\stime\sdid\snot\swork.\sFixed\smem\sleak\nwith\s-externalentitycommand.\sFixed\smem\sleak\swith\sparsing\sxml\sdocument\nwith\sexternal\sentity\sand\sparsing\serror\sin\san\sexternal\sentity.\sMinor\ncode\sclean\sup.\sAlways\suse\sdomPanic\sas\spanic\sfunction.\n
+D 2003-11-24T10:17:25
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog 717daa3a3da1c0cc15de1215c1e87059932243f6
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -132,7 +132,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c d49ac5714a5b4b9a946cb6dd2229035abbc9500d
 F generic/nodecmd.h 66edebe59c0f9f01da4d68de490c00e24b730e7c
-F generic/tcldom.c 030fb4735cca19ac1aca60199b18f4b7cd08f8bf
+F generic/tcldom.c bd64b26d3c82e30c75b6c0f3d3445e5b7935ba49
 F generic/tcldom.h 6f0f185ae010f9906b3107acdf879bca6924e0f0
 F generic/tclexpat.c 85dab47ea74213acd346be398e31d59c2cdb669f
 F generic/tclexpat.h 08995ca5353bc8ebf593c160fcc433c8f6deebf2
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P b3e6e1268972584fa49bd8e90fdbd69654e5a704
+P 6c6717bce76d91ea2f62c513919284549337c887
 U rolf
-Z c9f14d3264238116084a32d8276f5275
+Z f981222cf76b33cb253a21dd73062953
 # Remove this line to create a well-formed Fossil manifest.
