@@ -1,5 +1,5 @@
-C Added\snew\sdomNode\smethod\sdisableOutputEscaping.\n
-D 2002-09-28T00:40:30
+C Added\sdocumentation\sfor\sthe\snew\sdomNode\smethod\sdisableOutputEscaping.\n
+D 2002-09-28T00:42:24
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in ffb39c47ad2dfcd69eaf5b57b32d22998f74a491
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -16,9 +16,9 @@ F doc/dom.xml 6079bc5fa271fd40c1c3d259784d1fb95140fc2a
 F doc/domDoc.html c703e9dcbe26b2e05f47a93601d58cb49b10ceb9
 F doc/domDoc.n c0e86e8bbaf4fe1b263cc3fd9632bc483dbda0da
 F doc/domDoc.xml 3e7e3ef01a6032912f2694071fa7a9ee8def2af4
-F doc/domNode.html 08661d491001f304afa9bd71d8f6be531d4d3cc4
-F doc/domNode.n 1ffcfc62bf653814450c4da6b2f1c155da579565
-F doc/domNode.xml 93dcf6fa1c459b5b4d72ac5a5c410df05f87a680
+F doc/domNode.html 62501cdb66d86e2a357bdc705d6b81fb25b8cdc1
+F doc/domNode.n 80273f0764ba7f08b9c36284a0e1036754297f10
+F doc/domNode.xml e45181fd185becc3a0bb197627b3500e4fd60540
 F doc/expat.html 0f41343ba58a0359d2f0afd8d0cba82a62ce3d58
 F doc/expat.n c5fb11ddc8e048a090406406d15f397fe799ac9f
 F doc/expat.xml 6a60726a13547624d4c8482848746adf7d05f069
@@ -182,7 +182,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P dde8a0bf1b8eacabcf41e751b675ad2305ff8372
+P 4573670b04a09de7c6db949816a6eec4bf4a42a4
 U rolf
-Z c4f67db13874ee40ed211062a7ace21a
+Z 59331d973e95c9a4b519855fee30ce8c
 # Remove this line to create a well-formed Fossil manifest.
