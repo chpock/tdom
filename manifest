@@ -1,7 +1,7 @@
-C Bug\sfix:\sIf\sthe\sparsing\sstate\sis\salready\snot\sTCL_OK\sreturn\sin\sthe\nnotstandalonehandler\simmediately\ssuccess,\sotherwise\sthe\serror\smsg\swill\nbe\soverwritten\swith\sa\sfalse\sdiagnostic.\sA\sfew\seditorial\schanges.\n
-D 2003-04-05T17:46:33
+C See\sfile.\n
+D 2003-04-05T17:46:56
 F CHANGES ca483fbc7c627b68977fc3eb6cf6798f42bca33c
-F ChangeLog a653ddb2ca4c0a763596392079e52224826f2ba3
+F ChangeLog 4b901cec6b84cec93869a3df97d0c29dae27ef1e
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 25204720818592a271aecc462432628b5a1862a4
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P d132a66738c26d5118a161c03cb7595895b0a976
+P 8cecf9b41907626f40f484b6f9563003a51a777c
 U rolf
-Z 33a53d3274aabbe1ae2ce9f2bff1e4af
+Z c912727d2d4b38650db53bb12a650d54
 # Remove this line to create a well-formed Fossil manifest.
