@@ -1,5 +1,5 @@
-C More\stests\sfor\sscript\serrors\sin\sexternal\sentity\shandler\sor\serrors\sin\nthe\srequested\sexternal\sentities.\n
-D 2004-07-28T03:44:10
+C New\s(experimental)\smethod\ssetObjectCommands.\sReworked\sinternal\sbase\nURI\shandling,\sto\sfix\sa\sbug\sof\sthe\sold\sapproach\sand\sto\sbe\scloser\sto\n(though\snot\sfully\ssupport)\swhat\sDOM\s3\ssay\sabout\sbase\sURI\nhandling.\sAdded\smethods\snodeType,\sgetElementById,\sfirstChild,\nlastChild,\sappendChild,\sremoveChild,\shasChildNodes,\schildNodes,\nownerDocument,\sinsertBefore,\sreplaceChild,\sappendFromList,\sappendXML,\nselectNodes,\sbaseURI,\sappendFromScript\sand\sinsertBeforeFromScript\sto\ndom\sdocs.\sBeside\sother\sthings,\sthis\sallows\smuch\seasier\shandling\sof\stop\nlevel\snodes.\sThe\sresult\stree\smay\snot\sbe\san\sXML\sdocument,\sbut\sa\sgeneral\nparsed\sentity.\n
+D 2004-07-28T03:46:15
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog 24c31ffaa165936891a37206a0bbe2e1b2916711
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -117,7 +117,7 @@ F extensions/tnc/tests/loadtnc.tcl 418f1bbca50993a9fe012728b50f0f8080cff2ab
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c 4eb5d817c334c641af2c76cdb7f30998b5c5b8ed
 F generic/aolstub.cpp 2ba5a8d1046b7d92c92917ad4e17f8d944b41167
-F generic/dom.c b8afbe70c357bb4650dd8439ee363947af582c18
+F generic/dom.c 6d4232ab189812445f676e4cef39fe33287fd0a5
 F generic/dom.h b3e1d0ebb93b52e3c4c53e5fc2ba672e4ea10f40
 F generic/domalloc.c aa1ed647c34d707014f187fd6f68d7b87f97f791
 F generic/domalloc.h 5e94d96321fb4f926b6e2c8cf01b8a28c3d0be0f
@@ -228,7 +228,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 0f334692af7e1851178b1f978c332848a7cab1c8
+P a40d2d0cf8a27545705ce5969c66673cf69725a3
 U rolf
-Z 4a6dff64c61cccb9538efd148f96848e
+Z 65d0737af3f7ecad450f65fbe2ab401d
 # Remove this line to create a well-formed Fossil manifest.
