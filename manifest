@@ -1,5 +1,5 @@
-C Inital\scommit\n
-D 2002-05-15T22:46:52
+C Export\stdom\sstubs\stable.\n
+D 2002-05-15T22:54:04
 F apps/xslt.tcl e5c0a837a82ddf0aa21ddb51d5891acfd64469fc
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html c21ddc9a115a8a82ee1560949dc08a1bc41233b6
@@ -158,14 +158,14 @@ F unix/tcl.m4 9404ac273b962ddaf946d3170c5183e55d0984b3
 F unix/tclAppInit.c 5dad9db4d949a8b242b50352e225ff2ce2e1e05b
 F unix/tdomConfig.sh.in b97f3efe61579bd447d2be4e4e26e9f9fc9317a5
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F win/makefile.vc a50420ebee53fd23de9b609c2b601d86133d3408
+F win/makefile.vc 78687501b7e93a4fb474f0e87590aca0a211470c
 F win/mkd.bat 85d3fe58ce051a778447fb2bfc7384867d21cef0
 F win/pkgIndex.tcl 5a49b2725f3c2bbf881b7d9a2e997d8f4f36f57e
 F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P caa786e427ce9efde1cb7173a38ac0ed189fbf93
+P c511c160a6ed8224d1fb1d927225fde551a5d7e3
 U rolf
-Z 9d588cf7a460479bbc735eccc9705cfe
+Z fc7c69adc7112bf2f4fc244ff9424dfe
 # Remove this line to create a well-formed Fossil manifest.
