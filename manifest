@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2003-12-09T14:20:51
+C Bug\sfix:\sDon't\squash\swhite\sspace\sof\snon\swhite\sspace\sonly\scontent\sin\ntrim\smode.\n
+D 2003-12-11T13:35:22
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog c518dc158e1fdfebeffaea84d49683ef184ea030
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -117,7 +117,7 @@ F extensions/tnc/tests/loadtnc.tcl 418f1bbca50993a9fe012728b50f0f8080cff2ab
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c 4eb5d817c334c641af2c76cdb7f30998b5c5b8ed
 F generic/aolstub.cpp 2ba5a8d1046b7d92c92917ad4e17f8d944b41167
-F generic/dom.c 1a74822b6af1f879d736a7d6c010ee5a887f7439
+F generic/dom.c 68985f18ec661da7028fc760f7462d7c5b15eed2
 F generic/dom.h 4f51dc063cf696a60f8fdb843d3305b6e53397cb
 F generic/domalloc.c aa1ed647c34d707014f187fd6f68d7b87f97f791
 F generic/domalloc.h 5e94d96321fb4f926b6e2c8cf01b8a28c3d0be0f
@@ -134,7 +134,7 @@ F generic/nodecmd.c d49ac5714a5b4b9a946cb6dd2229035abbc9500d
 F generic/nodecmd.h 66edebe59c0f9f01da4d68de490c00e24b730e7c
 F generic/tcldom.c a5bb46176bbafa3bc6e7f7494933da1a07523f40
 F generic/tcldom.h 6f0f185ae010f9906b3107acdf879bca6924e0f0
-F generic/tclexpat.c b3f4dc4f7c6c000411c89c5e65fa9b8009b334ed
+F generic/tclexpat.c 92384e204a13743dd84b4b5256ee5891e9fac7c2
 F generic/tclexpat.h 4af6a66cde1f493d0d7c2da1ef5da6295c1006db
 F generic/tdom.decls 760ad3234a869b8191436bd53370b812266d98d5
 F generic/tdom.h db128152fac506159243e47cb3a77cc7d9fe4360
@@ -199,7 +199,7 @@ F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.test 5e5bf65c89f08f040c30dda855419f4ec36498ba
-F tests/domCmd.test 96c554f954f171465158981bcdb14a83da6af1d4
+F tests/domCmd.test d2adcf178b0fe0f08701229793530b310bf81da2
 F tests/domnamespace.test 7f6ff7ee11a6cb437240c07be18adc11fd876d46
 F tests/element.test 7da1983ecf71b5fa81bae0adfa1b74c8c21fbeff
 F tests/entity.test 8440a2109f4b250b539477b27c141f37ff19c3a3
@@ -208,10 +208,10 @@ F tests/i18n.test ad68655284ea0bf4f2c5a0acc098fd05587ba9a4
 F tests/loadtdom.tcl 5e53e167c862051202df871ba249ab502e0ba38d
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
 F tests/parser.test ea379ac3d12b063059872ceda834b69a42c319f6
-F tests/pcdata.test d91fbfd9ca0feeff64d930c3b01355fc97ccd03e
+F tests/pcdata.test b1f5a31beb149eef4b7e2a9b75cd571ca271dc82
 F tests/pi.test 03bb450cd334ca0454a6c99ca3270092ba684833
 F tests/stackedhdl.test 4b3dafa96849dabf738ffb401585dac5a5aed550
-F tests/tdomcmd.test 16eed4ab07385bd7648ed470e13bb0baa6f0e092
+F tests/tdomcmd.test a062ae99a200e575233033cf0e1277668c5e1e44
 F tests/xmlsimple.test 44c53210c7048ca1843ecbce9f2132f6358504f2
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.test 732d4144cb20383f8becb5c311a6072d685bcb07
@@ -227,7 +227,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 593bdf17ef03b168f95216e13a8298ce4a32401d
+P 5d1e8fe7cdd2d5be3c97b504fc890dc5e4ef285b
 U rolf
-Z e49398d27c815105be532cb532b02714
+Z d942151f2cd6843aa568a62e52ebe407
 # Remove this line to create a well-formed Fossil manifest.
