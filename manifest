@@ -1,7 +1,7 @@
-C Included\s0.7.8\sfixes\sfrom\sthe\srel-0-7-branch\n
-D 2003-09-14T01:16:37
+C See\sfile\n
+D 2003-09-14T01:35:10
 F CHANGES 59cab3c950a08a20053aa26b3a8718c6efa8c913
-F ChangeLog 8a61c67419600e6aba4c8b281f470a5dc2d63dc4
+F ChangeLog b50638e2a8a6ba073281a7711352a405132ac966
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 25204720818592a271aecc462432628b5a1862a4
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 2117d656ffa82adbdadde2f66f967c7082ba7b0c
+P 63b1313111b62d262aa54a3fb99e776c4d1fe7b0
 U rolf
-Z e62086d5833788b8e6f510548a555b8f
+Z 3f898b8dcb6b9ef23c988655472593fe
 # Remove this line to create a well-formed Fossil manifest.
