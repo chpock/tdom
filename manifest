@@ -1,7 +1,7 @@
-C Optimization:\sImproved\scaching\sof\sexternal\sdocuments.\n
-D 2003-04-16T20:04:54
+C See\sfile.\n
+D 2003-04-16T20:05:32
 F CHANGES 59cab3c950a08a20053aa26b3a8718c6efa8c913
-F ChangeLog 31036fa47b2eeda3962acad6bd53ded7dbba298c
+F ChangeLog fe95b6513940484b61bf6f6938365a5bf4461851
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 25204720818592a271aecc462432628b5a1862a4
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 1cc368bd62a6237e175916e24331037a0fa4c239
+P 1240b0cab4ba693ade7a68e96b1c6c166faeeb55
 U rolf
-Z 0f8adaa00251428e489f09f1f179c5f0
+Z d5e2bf10fb61cb8c5543d2e32c0fdcf9
 # Remove this line to create a well-formed Fossil manifest.
