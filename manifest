@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2004-08-19T01:06:56
+C Update\sto\sexpat\s1.95.8.\n
+D 2004-08-21T03:23:43
 F CHANGES a8e3b007dbfd9ec1a0ab5be94129fab0fa30621d
 F ChangeLog 5ecb3f90b4d93bd9396f1f4405e7ebb616267982
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -62,24 +62,26 @@ F encodings/iso8859-7.enc 1f75db4f7be40eb204fdb85057ca5f1d9a89f147
 F encodings/iso8859-8.enc 75ee0da275fe59752001d18b9f099ef446a6a577
 F encodings/iso8859-9.enc f585c70a5589de39558dac016743ff85e0c5f032
 F encodings/koi8-r.enc 366c137c02e069b1a93fbb5d64b9120ea6e9ad1f
-F expat/COPYING c124ddcfd75522fa37dbce65c3f675726f164528
-F expat/Changes 0f88b6137270cc87c9d9445432f3b9e3701c3852
-F expat/README e9b1b1d17aa5c44b14b2298c27cc9982b2fa9ea4
-F expat/VERSION e99d1a29868d1196a5bad832bc1734f0c4720d58
+F expat/COPYING 1d1b2188d438cdbc2f3ea37317babce60134d61a
+F expat/Changes f2bb2778548512e2499b01c24869942a7359693f
+F expat/README 30eac3ffa775d13e924e6eb2fd02647e18efbd6e
+F expat/VERSION b4b32fffbb869b83ed11185cad2acc349717e3d3
 F expat/ascii.h ca59dc7b044451fe67b2611a98b546aacc10acb8
 F expat/asciitab.h 67462447978f02b8a78ce7f054da82ec88e7ffa4
-F expat/expat.h cf7d3a1a7e2db58db3a6c3e4f17d1a88c49d5214
+F expat/expat.h 3f5b3be54b7d94baac78f5581c187c419b9d02b4
+F expat/expat_external.h 3a044188de7bcc35e596a780bbab04c566bc07d4
 F expat/iasciitab.h efc1dd92a1a1173bde671c54ddc772e4ca3de340
 F expat/internal.h ca6418bdb052a1f2c2fc352fb5ddbd1e5d944773
 F expat/latin1tab.h a0655f4fc2de3cc5993319b0fcad636a906ca885
+F expat/macconfig.h 87e972880ef8ef8271c5ce1eb79662e1638290db
 F expat/nametab.h 7ebf9a02f20fe58ad2e6d0488acd620b1f534e9e
 F expat/utf8tab.h 4dc893a1f5286443647d5b5674774e13c8e21a11
 F expat/winconfig.h ee3682c201d1a1c91dbe08fb27c7833b1f9f51d7
-F expat/xmlparse.c d0fdfc6e5ac1ad4f93cd9eb5017171bc2ed63686
-F expat/xmlrole.c c876b58653e627eb3c6b8110f5f943ed3270b601
+F expat/xmlparse.c e7aaea601ae586e460c1a5af20d9090bc62a4f31
+F expat/xmlrole.c e1f004edd401c021da7e01443ebd7bcaf82a4a58
 F expat/xmlrole.h dce455a07e6f1e8958e0b0c4ae403c205a9c78f5
-F expat/xmltok.c 1a64480ac89e2214e6f20bdd5d0905f8a7b22545
-F expat/xmltok.h 07a9edd4a32a3e2cdaa5df0f8777aeceaa3ba418
+F expat/xmltok.c 1fd9f34acae144c395a01e704621bb1f317bf01e
+F expat/xmltok.h 30336a58bf4565b5f9cbd242393ba1ddd19239c2
 F expat/xmltok_impl.c 892435c7b1197f8eaa4eef4a61c17055a9d455f8
 F expat/xmltok_impl.h cb8cce4d3f128dc013901010b462d852b4d4d804
 F expat/xmltok_ns.c 9d6f498a7bb07eff086c798057ef37119b6f9463
@@ -228,7 +230,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c69e6f98cd197bbeff0e911a0a5b22ef9b941fa6
+P 3d08e75435910b1672f7fe444c23e55ca1a7043a
 U rolf
-Z 8d0d16b2c23996f4051d2da6f3404c3b
+Z d010b9c866e53493e4a495306feaa4c1
 # Remove this line to create a well-formed Fossil manifest.
