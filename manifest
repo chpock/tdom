@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2004-12-21T12:52:02
+C Added\sa\sfew\stests:\srelated\sto\screateNodeCmd\s(dom),\snode\stext\smethod\s(domNode),\schancing\scallback\sfrom\swithin\sa\scallback\s(element,\sparser)\sand\scatching\sof\srecursive\sxsl\sinclude/import\s(xslt).\n
+D 2005-01-06T18:21:00
 F CHANGES 5e1729ae568c08de4588a28d3584d862a29a2022
 F ChangeLog d8035ec4818473351d00c8bc2f0363e56167c410
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -200,17 +200,17 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
-F tests/dom.test 764b6608fcc3a72af6e641572d25a486adc92635
+F tests/dom.test 289fc94c960bea16cdbdcc61630479ecc3d9bd40
 F tests/domDoc.test 3bb8c3237bd18a284a55e2693628b1ab33464f95
 F tests/domNode.test 406e5ca9686918d35d016731cb4ad45ffd3b2cc4
 F tests/domnamespace.test 7f6ff7ee11a6cb437240c07be18adc11fd876d46
-F tests/element.test 7da1983ecf71b5fa81bae0adfa1b74c8c21fbeff
+F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
 F tests/htmlreader.test cc8fc7f538aa629d8b81d148c7523ec878e7696e
 F tests/i18n.test ad68655284ea0bf4f2c5a0acc098fd05587ba9a4
 F tests/loadtdom.tcl 5e53e167c862051202df871ba249ab502e0ba38d
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
-F tests/parser.test 4dc1be93f813debcb186873b62a846ff2a6b06ec
+F tests/parser.test ed2b78a1a4d6bca9f7e27154c2bbb4d3fb9aa734
 F tests/pcdata.test b1f5a31beb149eef4b7e2a9b75cd571ca271dc82
 F tests/pi.test 03bb450cd334ca0454a6c99ca3270092ba684833
 F tests/stackedhdl.test 4b3dafa96849dabf738ffb401585dac5a5aed550
@@ -218,7 +218,7 @@ F tests/tdomcmd.test ebfa377019b495972b13e00b85ff9ba55041a4b9
 F tests/xmlsimple.test ca697d11f34bfdd624caa70bf74abfe0e5bd775b
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.test 3b8ed5f301b6c143116e8e3384d5cd183e85f8fb
-F tests/xslt.test 8f4c819e72e3633a135fd5531afcb759ae6324c8
+F tests/xslt.test 84dd64ee742210484e99e0d7a4c019d70ccb2431
 F unix/CONFIG f1ba21ea548b8825d4c19f0f5f11a5369926559f
 F unix/tclAppInit.c 06b688c30d27d4be8925b05d1607cbee950bbd1c
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -230,7 +230,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a741ba098f1bb235c749da92951e3911c5d7d522
+P b1a6b651ae3954455e2c83552403d462c05b8475
 U rolf
-Z a6d9bf0685546db614082d78e137a4b7
+Z fed1c19bddf813f7bae2ff0c5a290b5f
 # Remove this line to create a well-formed Fossil manifest.
