@@ -1,5 +1,5 @@
-C Enhanced\sthe\snew\scget\smethod\sof\sparserObjs\sto\salso\sreport\sthe\sstate\sof\n-noexpand,\s-useForeignDTD,\s-paramentityparsing\s(those\sby\sdoing\sthe\nbookkeeping\swith\san\senhanced\sTclGenExpatInfo\sstruct,\sbecause\sthe\sexpat\nparser\sdo\snot\sproived\san\sAPI\sto\srequest\sthis\ssettings)\sand\n-namespace.\sImproved\sargument\scheck\sof\sthe\sparser\sobj\smethod\ncalls.\sOptimization\sfor\scalling\shandler\sscripts.\n
-D 2003-09-16T22:54:36
+C Added\sdocumentation\sfor\sthe\snow\simplemented\scget\smethod.\sAdded\sinformation\sabout\sthe\sdefault\sfor\sthe\s-paramentityparsing\soption.\n
+D 2003-09-16T22:56:19
 F CHANGES 59cab3c950a08a20053aa26b3a8718c6efa8c913
 F ChangeLog 6881867960e9fdb2907269ebe00e19fd1cd749b9
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -23,9 +23,9 @@ F doc/domDoc.xml cf6075d105fc436387b379e945908d626938288d
 F doc/domNode.html 657b92b61cf9dfd25327a4f4bde722f1ccf0e552
 F doc/domNode.n 2bc048609bb84a8f89098550cea99847ae3b8007
 F doc/domNode.xml 07415f8038e7ab81cfdf0e2c722d793a6f9557f2
-F doc/expat.html 63e0631177c915249662ba3199f75f9bf4b6a794
-F doc/expat.n d7f31827cedfa8741ef4c22ffa801d9938a4c3f7
-F doc/expat.xml e0d99788197ed96b93c6740d7b39b8fff5763b9e
+F doc/expat.html 052d8ed7ad56b9c44fa77bb649334d31568cc630
+F doc/expat.n e3ab0f2cb0e016e7529bf33d3a06b6a9bd4ea633
+F doc/expat.xml 4d3dda0c9a0554d02951904eb42dd593d97b6601
 F doc/expatapi.html c689ffde7bfb30b92af495dddd5bcb86833bee94
 F doc/expatapi.n 6b56b9d897f32d15a7cdac0e0c9b8c636c5b8d56
 F doc/expatapi.xml d93d1ea7d4fbacd0729e731147a96e74863fdde9
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 58a2c227034a2a06ebe3ff3cdbaea5d4eb69d53f
+P 46291ef7387e828938f6273239ab2b73cf6ff6a0
 U rolf
-Z 7fc803e7fda10eb9469414ec82fc2320
+Z 05354f854988aace830846046cadb825
 # Remove this line to create a well-formed Fossil manifest.
