@@ -1,7 +1,7 @@
-C Fixed\sflawed\stest,\swhich\sslipped\sthrou,\ssomehow.\n
-D 2005-03-21T01:08:37
+C See\sfile.\n
+D 2005-03-21T01:08:54
 F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
-F ChangeLog b52736d82cb4c2f0530e32c3b51f676632c8084f
+F ChangeLog 92847c0e168da1254dc180cea6d62d4485f5225e
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 793035f18fb2ad53394e3cda31222b9197e93a3a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -233,7 +233,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P aa91d3c654c3f3ef8e004d84987818f868510e82
+P 96d301a67fce0c471cfcef0989a9551cf1c5d2b8
 U rolf
-Z 6f6bb0c803767a1993940a124eecf4a5
+Z 6cbb9e946c73de99e62019d428f0459c
 # Remove this line to create a well-formed Fossil manifest.
