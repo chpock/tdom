@@ -1,7 +1,7 @@
-C Updated\sversion\sNr.\sto\s0.7.8.\n
-D 2003-07-07T19:53:26
+C Added\scontraint\sneed_uri,\sso\sthat\sthe\sfew\stests,\swhich\sneeds\sthe\stcllib\suri\spackage\sare\sskipped,\sif\sthe\suri\spackage\sisn't\spresent.\n
+D 2003-07-08T16:00:46
 F CHANGES 59cab3c950a08a20053aa26b3a8718c6efa8c913
-F ChangeLog 9de7bdfb445e54683164a6d0a69e08c69dba697b
+F ChangeLog 1c33dba991ef84f9ae54209cdddfda54a48d4a07
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 25204720818592a271aecc462432628b5a1862a4
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -175,7 +175,7 @@ F tclconfig/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F tclconfig/tcl.m4 eb8181163eef2deff6f44392aab268ea765d99a5
 F tdom.m4 6362938e20f54b2a5ad0d4c112d3653f627270d2
 F tdomConfig.sh.in bb068ad78eefdd9a8554f970b7266c78e976df0b
-F tests/all.tcl 424dfc1cced4a90edc56128796d15a9df8243d81
+F tests/all.tcl f17761fae4d5d3b026367fa320dceecc71113fee
 F tests/attribute.test 680563462d618d04d11b77fb6baf3073a77fc5c1
 F tests/cdata.test 9955e7f6bc93e5ae58fd14fa4d25c716b6d2f7e0
 F tests/comment.test 25ac780959e2c7220d3e92dac01dd5e14fd4acaa
@@ -199,7 +199,7 @@ F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.test e978634307398ca247189653877b0889ae49c629
-F tests/domCmd.test 06b3332e7decaa033a1fc9221a5f76a3a30918c0
+F tests/domCmd.test 7138ebc83f219ad942c0d69eae4a5cf3607a0b36
 F tests/domnamespace.test 7023cb113cf156381218b303eddcde3822f40a48
 F tests/element.test feb714dae2010efc20dd12d4e7d7bc281b1a6ff4
 F tests/entity.test 8440a2109f4b250b539477b27c141f37ff19c3a3
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 5e133f95201bcbf502a03043aa22c70b202eb89f
+P f02fa692612147f2d0dd21d693d210d669c90fd3
 U rolf
-Z 8738f8990e27ea958e2a550cb797d8a8
+Z b9444a1726996e3751528f465cd66f97
 # Remove this line to create a well-formed Fossil manifest.
