@@ -1,5 +1,5 @@
-C New\sversions\sof\sthe\sman\spages,\sgenerated\swith\sthe\s-soelim\soption\senabled\s(that\smeans,\sthe\sman.macros\sare\snot\sincluded\swith\s.so\sman.macros,\sbut\sin\sdeed\sincluded\sin\severy\sman\spage,\sas\sthe\stcl\score\sman\spages\salso\sdo,\sbecause\sof\ssome\sproblems\sat\ssome\ssystems\swith\sthe\s.so\sdirective).\n
-D 2002-07-28T17:20:47
+C Updated\sthe\s[package\sprovide\stdom\s<version>]\sto\sthe\spatch\slevel\sgiven\nby\sthe\sconfigure.\n
+D 2002-07-28T17:28:23
 F Makefile.in 90af78958d8b642862a15b9029b0bd8fad84da5a
 F aclocal.m4 a7c82deae42849a1eb4956222315c139329d4d55
 F apps/xslt.tcl aceffee1914d4bf9b7a6a0a0a4b66fa7c4991fd5
@@ -129,7 +129,7 @@ F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
 F generic/xmlsimple.c a48264a486a371823c9faf65ea7e8601da358552
 F generic/xmlsimple.h f2861868b0fed932c79f9e595bb875d261d97bd5
 F lib/domhtml.tcl 1ce01926d867282e27e87c08bb4c2b7875f4003b
-F lib/tdom.tcl 2b96eca275fc04f82d353577cdcc669721e60abd
+F lib/tdom.tcl e3ede5bf84ef749263382d0b9cb8bc9a9d3d3a4e
 F tclconfig/ChangeLog 16d950c5f3b8b048a77b9671f3705d360f226759
 F tclconfig/README.txt c7a8a24b2782cd897a7608813161611f8e0521a0
 F tclconfig/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
@@ -178,7 +178,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 4731c5683f11bc9bd1fc7affcc270eecafdc5396
+P 0cbcc81d53292304ee2f96bc3520d7062d05ee92
 U rolf
-Z c0545014dcde4b0dcca4d0d28f7de876
+Z 2a01c523de7685a672fc766f15215324
 # Remove this line to create a well-formed Fossil manifest.
