@@ -1,5 +1,5 @@
-C Removed\ssuperfluous\scomma\sfrom\sthe\stdomMethod\senum,\swhich\sbothered\sthe\nAIX\sxlc\scompiler.\n
-D 2003-12-30T19:22:35
+C Implemented\sthe\sspecial\sconstraints\son\scertain\sxpath\spattern/expr\s(no\ncurrent()\sfunc\sin\spattern,\sno\svar\sreferences\sin\stemplate\sand\skey\smatch\npattern\sand\skey\suse\sexpr,\sno\skey()\sfunc\sin\skey\smatch\spattern\sand\suse\nexpr.)\n\nEditorial\schange:\sRemoved\ssome\ssuperfluous\scasts\sto\s(char*)\sfrom\ntdomstrdup\sresult\s-\sits\sdefined\sto\sreturn\schar*.\n
+D 2003-12-30T19:24:12
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog a4379644214ec83ac552cef90f9677871ef87cb7
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -124,7 +124,7 @@ F generic/domalloc.h 5e94d96321fb4f926b6e2c8cf01b8a28c3d0be0f
 F generic/domhtml.c 9a7ec999da852d996d7ac9c936534b965039e4cf
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c 0c346e84edf3599a93b30abc0eafd3c86618f13c
-F generic/domxpath.c e8e8c346775937360cb670785069941e21fe6448
+F generic/domxpath.c 109579a3b9400b21727a1c7277a7ffee1be58e5d
 F generic/domxpath.h ec29823825248b0df1076860593c83562727f132
 F generic/domxslt.c b9cf94a301d168184a45fc6876b3aa0dd37e05de
 F generic/domxslt.h b60468a7092d4d5712b4a8776f3db51d4c03aa04
@@ -227,7 +227,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 2c422d33f6d74adc1819e32ed051b3db0f5ab9f0
+P ad392b6a4a6d0bcba411625f83363bdc8982ed6f
 U rolf
-Z dd441e94ebbdf7359287cc867b446436
+Z 42671d8d4349adcce4d72bd12681b83d
 # Remove this line to create a well-formed Fossil manifest.
