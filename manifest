@@ -1,7 +1,7 @@
-C Added\sdocumentation\sfor\sthe\s-cache\soption\sof\sthe\sselectNodes\smethod.\n
-D 2005-01-11T17:59:43
+C See\sfile.\n
+D 2005-01-11T18:00:07
 F CHANGES 877db3f7a6fd1a5175636e84125230f5949491ac
-F ChangeLog d219db42368843ec9aa5173474777ecf1593e208
+F ChangeLog d475c3c7254885be92d3944c5ccfef19758bb6f9
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -233,7 +233,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 160537cb1407983df8bd0a1a33995749a7b45fc4
+P 6f917aad9088a8a0e70951f5bb68f8506b4ddf5c
 U rolf
-Z 0c572e5d0e6fe83f9bad8cd1dd5e4365
+Z c463146ebef0782fe312f452ed31f6a3
 # Remove this line to create a well-formed Fossil manifest.
