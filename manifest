@@ -1,7 +1,7 @@
-C Fixed\sbug\sin\sthe\ssubtree\sskipping\sfeature\sof\sevent\shandlers.\sShould\sbe\smerged\swith\sHEAD.\n
-D 2003-07-06T22:36:00
+C See\sfile.\n
+D 2003-07-06T22:36:48
 F CHANGES 59cab3c950a08a20053aa26b3a8718c6efa8c913
-F ChangeLog 9a7ce0bc530a287a88cc5cdce2244922ccc3faa6
+F ChangeLog 95ce6bf12c04feffbf95b46f1bda80927001b975
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 25204720818592a271aecc462432628b5a1862a4
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a8f44917c49086989ae3b036c5474c862345afd1
+P d21e076a81a59c2d038a6086c29a489ca1999637
 U rolf
-Z ac9f2ab6e63fabd2d44b067f03adbd27
+Z 8d87a48c7fe45f8a9307fed85a559b74
 # Remove this line to create a well-formed Fossil manifest.
