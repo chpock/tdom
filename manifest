@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2003-04-03T23:08:35
+C Bug\sfix:\sIf\sthe\sparsing\sstate\sis\salready\snot\sTCL_OK\sreturn\sin\sthe\nnotstandalonehandler\simmediately\ssuccess,\sotherwise\sthe\serror\smsg\swill\nbe\soverwritten\swith\sa\sfalse\sdiagnostic.\sA\sfew\seditorial\schanges.\n
+D 2003-04-05T17:46:33
 F CHANGES ca483fbc7c627b68977fc3eb6cf6798f42bca33c
 F ChangeLog a653ddb2ca4c0a763596392079e52224826f2ba3
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -134,7 +134,7 @@ F generic/nodecmd.c c2fe5b784c2ad83c904edd3d82050b8f7c7fc444
 F generic/nodecmd.h 20210ad9b4a3bdd6055175beca7bfdd8bd318a3f
 F generic/tcldom.c 4175412ece853fdf28c65b87061f451014115959
 F generic/tcldom.h 1c21383eabe24ac9bea93e4f5c66f9a64a7b68d1
-F generic/tclexpat.c 98e58998ee06e68f8e054ebd021538e88dc9fc07
+F generic/tclexpat.c b82c1af8cd8b6e64ca0f6f8ec84d315efe455537
 F generic/tclexpat.h 62e83591b9fff070825add84310f7f7cc8cff3b8
 F generic/tdom.decls fa90ba9b8d00f5b405ea68724d95ad79f64c424b
 F generic/tdom.h db128152fac506159243e47cb3a77cc7d9fe4360
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 157305e7e9d3c49d21c068c1113a5385a5fb953e
+P d132a66738c26d5118a161c03cb7595895b0a976
 U rolf
-Z 97cdaa635443f0a05545b28eaa750b67
+Z 33a53d3274aabbe1ae2ce9f2bff1e4af
 # Remove this line to create a well-formed Fossil manifest.
