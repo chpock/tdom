@@ -1,5 +1,5 @@
-C Uses\sthe\snew\sdomIsComment,\sdomIsPINAME\sand\sdomIsPIValue\sAPI\sfunctions\nof\sdom.c.\sImproved\sxsl:processing-instruction\sprocessing\s(now\ninstantiating\sthe\scontent).\n
-D 2004-05-26T01:49:10
+C Minor\seditorial\schanges.\n
+D 2004-05-26T01:49:37
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog 6eafd0059347a55b4b6a4fc51c05cff5af0d081e
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -124,7 +124,7 @@ F generic/domalloc.h 5e94d96321fb4f926b6e2c8cf01b8a28c3d0be0f
 F generic/domhtml.c 88e0ea75868126e276c7ed2967f3237e90a76105
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c 0c346e84edf3599a93b30abc0eafd3c86618f13c
-F generic/domxpath.c d4bfbab71d60ee68330ad4c677364d51869e8935
+F generic/domxpath.c 0fb2d188ef220df3c85b8dd5306a369c337064b2
 F generic/domxpath.h 136ce5085cbc7bb8aae5bb8936d9fd8f360398c3
 F generic/domxslt.c d27f5f06921db84f6c216060f78af5683e5ed1e4
 F generic/domxslt.h b60468a7092d4d5712b4a8776f3db51d4c03aa04
@@ -228,7 +228,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 765372d765cc34db5296f2efd222fd4b888aa157
+P ef7e89aa783b0605796e62c29e0d0080b9517d54
 U rolf
-Z 859e9bf17a7756a1d5572e0c387359f4
+Z 003f49653e501fcfac64f8330355e987
 # Remove this line to create a well-formed Fossil manifest.
