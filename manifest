@@ -1,5 +1,5 @@
-C Changes\sneeded\sfor\sMS\sbuild.\n
-D 2002-05-15T22:56:36
+C Updated\safter\stdom.decls\schange\s(we\sdon't\shave\sa\shook).\n
+D 2002-05-15T23:21:35
 F apps/xslt.tcl e5c0a837a82ddf0aa21ddb51d5891acfd64469fc
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html c21ddc9a115a8a82ee1560949dc08a1bc41233b6
@@ -111,8 +111,8 @@ F generic/tclexpat.c d8a3bcd6d345117cad9bf3a9df6917739bc7c705
 F generic/tclexpat.h a1bb96ca9c3917ae707b794252de1bea6122de4e
 F generic/tdom.decls 7c024d1386ebc0eee7f70017554734b3926fa1fe
 F generic/tdom.h 2805adcc83044ace4c34127d6c46c65fd354e636
-F generic/tdomDecls.h a06f03a2516d73c687151f8a60d9333401455f2b
-F generic/tdomStubInit.c 0880c45f706b223d5e93109590b6b411a20e9671
+F generic/tdomDecls.h 207098defee329f3a967d9107b8f5d8aa4016b43
+F generic/tdomStubInit.c f712fd963fbd02b811b8a24b862b2a8bb98cafc9
 F generic/tdomStubLib.c b8e2a55da433d2bbca6cabf6eeecb76962925079
 F generic/tdominit.c 1a60367884652b362d7a8cb88cafa899183d9d61
 F generic/utf8conv.c fc01b4776a82c937252a7d2593a3d244916905f7
@@ -165,7 +165,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P cee75cca67edf12c3e38f25f9f211874d77b5df5
+P 9fde8342b28a1d2a21800c8c3ed732a7424ec43a
 U rolf
-Z 569f3f128f0f3405e2f183d857bcfab1
+Z 9cb15762ba73b0b7d38cd105489b6e4f
 # Remove this line to create a well-formed Fossil manifest.
