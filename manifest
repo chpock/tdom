@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2003-12-09T03:00:19
+C Improved\sregexp\sto\sextract\sencoding.\sCorrected\stypo.\n
+D 2003-12-09T14:20:38
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog df190dd44ef2315db84dfae97d581594ec643fef
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -147,7 +147,7 @@ F generic/utf8conv.h e0d2756b2d77ad9a8508a0dcf7cce5e10fa4c9a5
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
 F generic/xmlsimple.c 1a7fad084c47bfd1d4adcf5ce3bee4111a0a7186
 F generic/xmlsimple.h f2861868b0fed932c79f9e595bb875d261d97bd5
-F lib/tdom.tcl 0a474014b7f721d3f07f62e4b90bc68e66e71057
+F lib/tdom.tcl 932bb3d8da52466b68aa4e3a1e3d5e351459a437
 F mac/PrecompHeaders/CoreHeadersMach-O.c e4406d8c34fcaea82d21e62c35012893b460dfd5
 F mac/PrecompHeaders/CoreHeadersMach-O.h 508208239a919a6dee4275f9148962a13faeb94d
 F mac/PrecompHeaders/CoreHeadersMach-O.pch 60665d6a2787eb3dfda701baff12dd3d5029e7f5
@@ -227,7 +227,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 78d8620e9793a3eff8d4091b457497b50f647f24
+P 3af58d3d31024f92cd393ecfb22f80634b973d5c
 U rolf
-Z 2b7a2f2f8b66289e2cc48f2282eb2e04
+Z 1263684a567f3ad6bb50fd2b1c37eb24
 # Remove this line to create a well-formed Fossil manifest.
