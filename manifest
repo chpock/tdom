@@ -1,17 +1,17 @@
-C See\sfile.\n
-D 2003-03-25T14:41:55
+C Bumped\sthe\sversion\snumber\sto\s0.7.7.\n
+D 2003-03-25T22:31:52
 F CHANGES d44d15ceabd566af5f19c835840d1452a0c5a730
 F ChangeLog 81789f3dbdeb60dbfa4514a6a477da1b138a748f
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 25204720818592a271aecc462432628b5a1862a4
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
-F README 64cad6cc1afbe60e80fd2df1f337efe9c3ec6a91
-F README.AOL 3c16be7ba31f87772026bdd146fa028980c901c1
+F README ab0f356f1f031c19070fe02712c6a66d1011b977
+F README.AOL 356ec76a2b5ea0d204d1c1a1f9321dc5616302b8
 F aclocal.m4 79e2f4aa6a138371f2d31f28355749e5019d7651
 F apps/xslt.tcl 33eaaf45b831e6613d528156f7f1bbc02fd9f849
-F configure 5bbdf7a303de0de62b8a2df38072392ecf4b50ea x
-F configure-tcl8.0.5 05c691afaaaf2ff24701a2d3ef6f40054290e26b x
-F configure.in 53af592839e8607fb56e5c21aee485521b167818
+F configure 49a8b19b419ffa2fb87c1f550aa43f67bc89e160 x
+F configure-tcl8.0.5 7d6ad4c8b8ed59f09c2b10fcaa5c4ffbf3ead1e4 x
+F configure.in 7e64f2611d7269aaf7853d0923f644e5fcbefc36
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html 83dd89d7972b00d2ed5b69383747ff93d586bbc9
@@ -108,7 +108,7 @@ F extensions/tnc/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
 F extensions/tnc/configure 0940b5d6ed055f3b5cfe57f8f7a9b48781c68495 x
 F extensions/tnc/configure.in be5144eab010e85e74dec0e86f64a1c41771b48b
 F extensions/tnc/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
-F extensions/tnc/makefile.vc 357f364e0cc0d8ccb36b8354f614e3932e0b22e3
+F extensions/tnc/makefile.vc 15dbc0560433b9b9d9357e5b68aa9e38ad0e15d9
 F extensions/tnc/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
 F extensions/tnc/pkgIndex.tcl.in 37901ed24e06da45c7d7a17f255b6108925400f8
 F extensions/tnc/test.tcl d9d4c2a1dcd2a7a70096a2a1727f8600ff0c78fd
@@ -153,8 +153,8 @@ F mac/PrecompHeaders/CoreHeadersMach-O.h 508208239a919a6dee4275f9148962a13faeb94
 F mac/PrecompHeaders/CoreHeadersMach-O.pch 60665d6a2787eb3dfda701baff12dd3d5029e7f5
 F mac/Prefix/expatPrefix.h d131932b0c668d4cdef1eebc35f1b5267882d00d
 F mac/Prefix/expatPrefix_OSX.h 51c7e40981af4b6b8b974bf4cc4c2f63968031e2
-F mac/Prefix/tDOMPrefix.h efb19bafd71c1d4e07af7363184caf360293e9f8
-F mac/Prefix/tDOMPrefix_OSX.h 736b5b4c1f052a624767ced5ca312b81581ac4b9
+F mac/Prefix/tDOMPrefix.h 0bf011d7a85636d06295bed367cdf5bd4862568c
+F mac/Prefix/tDOMPrefix_OSX.h 8763c9397965b41be92cbef218aa5e79533e09c7
 F mac/Prefix/tncPrefix.h fb4033860688808a196991f8cce3d6dd81b5eb8e
 F mac/Prefix/tncPrefix_OSX.h 482e243e92a724d677c9e76f9eac956464252299
 F mac/Readme_Mac_Compiling 056f0af20fddfe4c08d0e0e2064c45068335611b
@@ -164,7 +164,7 @@ F mac/tDOM.prj.xml 46bd1d275171d95875d892c79c57025dedcf485a
 F mac/tDOM.r 26350d07913dd0ba88d8313bc71b92774a029e81
 F mac/tDOM/pkgIndex.tcl 946d3abc06360e9ff6ef9c5f90c953e949962ec3
 F mac/tDOM/tdom.tcl 09c254af11c857ba27594eba18cfaa14997369dd
-F mac/tDOM_OSX.prj.xml 7432a2ab9717e4ff01383198d39a729b1b6577ce
+F mac/tDOM_OSX.prj.xml 7876d8fba0620fa19fac268b8f195fb70d70497c
 F mac/tnc.exp b5221cfee6631ca94e46626dcd5c54e7e9cde7ba
 F mac/tnc.r ce718255e902d882f872087908dcd234fdc9fa51
 F macosx/README 00dec2531e5e466a5fab02bf2e5cfb3ca0ea650e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a433fa7ab158d2d43f096bf35cb3e406b72c3fa2
+P 4d6003df0ac10efe30b3f7b8256adb4aa2d40135
 U rolf
-Z 18bb8d2b12a8b0b4237981a1038c5781
+Z 29f385f89a2b4b0e0840f26d2f864066
 # Remove this line to create a well-formed Fossil manifest.
