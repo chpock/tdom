@@ -1,7 +1,7 @@
-C Improved\sregexp\sto\sextract\sencoding.\sCorrected\stypo.\n
-D 2003-12-09T14:20:38
+C See\sfile.\n
+D 2003-12-09T14:20:51
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
-F ChangeLog df190dd44ef2315db84dfae97d581594ec643fef
+F ChangeLog c518dc158e1fdfebeffaea84d49683ef184ea030
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -227,7 +227,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 3af58d3d31024f92cd393ecfb22f80634b973d5c
+P 593bdf17ef03b168f95216e13a8298ce4a32401d
 U rolf
-Z 1263684a567f3ad6bb50fd2b1c37eb24
+Z e49398d27c815105be532cb532b02714
 # Remove this line to create a well-formed Fossil manifest.
