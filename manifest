@@ -1,5 +1,5 @@
-C A\sNMTOKEN\sis\salways\s!=\sthe\sempty\sstring\s("");\sNMTOKENS\sare\salways\sat\nleast\sone\sNMTOKEN.\n
-D 2002-05-07T23:44:39
+C Futher\si18n-lization.\sMost\sbasic\sstuff\sin\sxpathLexer()\sshould\sbe\sdone\nno,\sthough\sthere\sis\smuch\sroom\sleft\sfor\soptimations.\n
+D 2002-05-09T01:17:52
 F apps/xslt.tcl e5c0a837a82ddf0aa21ddb51d5891acfd64469fc
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html c21ddc9a115a8a82ee1560949dc08a1bc41233b6
@@ -97,7 +97,7 @@ F generic/domalloc.c 467e64565316606786480be270804a2b31e95b5c
 F generic/domalloc.h c5fc1efc2030b9da65cea2c8690b0ea61f7bec16
 F generic/domhtml.c e8cda5580aa8c3fe08e9f432a8482dd667c22e6e
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
-F generic/domxpath.c f887839e23e272ab8464261e76869e29bdf67ae9
+F generic/domxpath.c 187888f08fa4473f223eab4b3f5e4a07290abc1a
 F generic/domxpath.h f2203508a1797db46ce0496e22d101d1ef3cbb87
 F generic/domxslt.c d4543daaf1d6ee962e3c73f1f6281469e7835fa1
 F generic/domxslt.h 4e41a3885354345ec29800c6c0f18ebd3fd0d2ce
@@ -158,7 +158,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 378cc65ccb8452a7d85cd05cb9204b90fb4fd93b
+P 559305970ea43ded7ef11ebb29749ee4f24d04f4
 U rolf
-Z 2f4373b71372671636984dd4151cfcf2
+Z 62a39c8d9daadb6b2afb7bced32ea482
 # Remove this line to create a well-formed Fossil manifest.
