@@ -1,5 +1,5 @@
-C Cosmetic\n
-D 2003-03-08T09:27:13
+C New\sset\sof\sfiles\n
+D 2003-03-08T09:32:52
 F CHANGES bedaded2db2b4b9c98267dec8dcfb01261cfbb9a
 F ChangeLog e33b75fd6613da2463da411bff8394ab3fb047cd
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -168,11 +168,11 @@ F mac/tDOM_OSX.prj.xml b73b6b1a1bcff740a6bc35f23a6e500a440a1716
 F mac/tnc.exp b5221cfee6631ca94e46626dcd5c54e7e9cde7ba
 F mac/tnc.r ef16947539a71667d8a2e9d801399489c6c60dae
 F macosx/README 00dec2531e5e466a5fab02bf2e5cfb3ca0ea650e
-F tclconfig/ChangeLog 16d950c5f3b8b048a77b9671f3705d360f226759
+F tclconfig/ChangeLog 64c2a2c22fc9ad19abb7f670fa2097573075ba5a
 F tclconfig/README.txt c7a8a24b2782cd897a7608813161611f8e0521a0
 F tclconfig/ac_c_bigendian_cross.m4 d42e2f20b8ea4df7c29a8595f10489bfaab58096
 F tclconfig/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
-F tclconfig/tcl.m4 71f8690835637fc571099ec81d1c57ed98af7411
+F tclconfig/tcl.m4 eb8181163eef2deff6f44392aab268ea765d99a5
 F tdom.m4 6362938e20f54b2a5ad0d4c112d3653f627270d2
 F tdomConfig.sh.in bb068ad78eefdd9a8554f970b7266c78e976df0b
 F tests/all.tcl 424dfc1cced4a90edc56128796d15a9df8243d81
@@ -223,7 +223,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 817310aa7023da3935d22b4ade37ef73ecbebe4f
+P a7c169e0bda63092e9086fcaccbbb7764b08b74c
 U zoran
-Z feb4f28dc656146983d531d4f27fdf10
+Z 0a1b43a2de3d8a1149b0f73fa91c3e84
 # Remove this line to create a well-formed Fossil manifest.
