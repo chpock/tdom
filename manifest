@@ -1,5 +1,5 @@
-C Implemented\soptional\sflag\s-disableOutputEscaping\sfor\sTEXT_NODE\ncreating\snodeCmds\sinside\sappendFromScript\sscripts.\sMinor\sbug\sfix:\snow\nerrorInfo\sis\sreturned,\sin\scase\sof\sscript\serrors\sinside\sa\nappendFromScript\sscript.\sEditorial\schange:\sremoved\sthe\slog\sinfo,\sas\sin\nall\sother\ssource\sfiles.\n
-D 2002-09-30T23:12:26
+C Changed\sgetElementsByTagName\sbehavior\sagain.\sNow\sit\sinspects\severy\nnode,\snamespaced\sor\snot\s(of\scourse\sonly\slooking\sat\sthe\stagname).\sThis\nshould\sbe\saccording\sto\sthe\sDOM\srec.\sBug\sfix\sfpr\sgetElementsByTagNameNS\nif\suri\sis\s""\s(no\snamespace).\n
+D 2002-09-30T23:17:39
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in ffb39c47ad2dfcd69eaf5b57b32d22998f74a491
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -114,7 +114,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c c809666b9316623e26b968e456fbfee954f8d31d
 F generic/nodecmd.h 0225d87d05a9afc2ce0d5baf8966b076ffa71405
-F generic/tcldom.c 6554486252b015ff8b060c5ba2697692f3d02fbc
+F generic/tcldom.c bb6931b2b8b66a5deff97f8f122f63a97f969819
 F generic/tcldom.h b06a092266deed3a050a824a8f1963b91e4c3649
 F generic/tclexpat.c 5920f376d971d29e33c6aa61249995e4a495aac3
 F generic/tclexpat.h 62e83591b9fff070825add84310f7f7cc8cff3b8
@@ -182,7 +182,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P e95a14224265b5c60fdfd1f95bf9dddc4d32bc98
+P 9b3f2ced935c56a6c43137c7cf507482209ba074
 U rolf
-Z dbc60ac3a7e77d263068942edcc8c281
+Z 121ba2a63617e8502ffcb665b4a55603
 # Remove this line to create a well-formed Fossil manifest.
