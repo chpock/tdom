@@ -1,7 +1,7 @@
-C Fixed\sparentNode\sof\sdocumentElement\sand\ssiblings\sof\sthe\sresult\stree.\n
-D 2003-11-26T17:00:11
+C See\sfile.\n
+D 2003-11-26T17:01:01
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
-F ChangeLog bbc4ff3e0f6075da5b63fc4967d6de0513d52c14
+F ChangeLog 4f748f0754d5e0cdb39553d94c699fe994cdcdb7
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -227,7 +227,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 897467a9b56e6fb685e959729cc8f21a2abf9fce
+P 620ef29cbf34ba1e21781aeb44307768374daf3c
 U rolf
-Z 0cf0f90b41c64c988bd821d351ad1cb3
+Z b5a439f47479912e9ae951011caa86fb
 # Remove this line to create a well-formed Fossil manifest.
