@@ -1,5 +1,5 @@
-C Better\scode\sfor\sxslt\s-parameter\shandling\n
-D 2002-05-23T22:27:07
+C Copy\sthe\sextResolver\sfor\severy\sdom\sdocument.\sThe\sreason,\swhy\sthis\sis\nneeded,\sis\sdeep\sinside\sof\stcl's\shandling\sof\sTcl_Obj's.\sInrecementing\nthe\sobj's\srefCounter\sdoesn't\sprotect\sthe\sobj\sto\s'shimmer'\s(to\schange\nhis\sinternal\srepresentation).\sTclCmdNameObj's\sdon't\sknow\show\sto\nregenerate\sthere\sstring\srepresentation,\sif\sthat\sstring\srep\swas\ninvalidated.\sIf\sthat\shappens,\stcl\spanics\swith\s"UpdateStringProc\sshould\nnot\sbe\sinvoked\sfor\stype\scmdName".\n
+D 2002-05-24T13:48:37
 F apps/xslt.tcl 1b9a65d5db054f01e4033883fa53a313d8e6d5fe
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html c21ddc9a115a8a82ee1560949dc08a1bc41233b6
@@ -92,7 +92,7 @@ F extensions/tnc/pkgIndex.tcl.in f3ca1ee461a2ce4c6f7fae3ff078da261fab6e4b
 F extensions/tnc/tcl.m4 9404ac273b962ddaf946d3170c5183e55d0984b3
 F extensions/tnc/test.tcl efade8bcb9fd9e269ed5c259f3edf182bc917b72
 F extensions/tnc/tnc.c d1c8431c5ea72148aaca6b092f919a25270565d6
-F generic/dom.c 1c49b0294b6e0208bac09b2131257628f61b5f89
+F generic/dom.c 6d48159fc577c374a98f400c8aa0c740fc95d2cf
 F generic/dom.h 9c2e0634bbdee6eae0c7a06c8ada70c8fe8a1cfb
 F generic/domalloc.c 467e64565316606786480be270804a2b31e95b5c
 F generic/domalloc.h c5fc1efc2030b9da65cea2c8690b0ea61f7bec16
@@ -173,7 +173,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 1a77be357872bb88145d05b418637f80cc15b6be
+P 1a0f855ef37cb4750613618cf8302a0430054083
 U rolf
-Z 48f784eaef0174f9e21d8715e6911f20
+Z bd2ee166b7c84d02be1aa4d6200c78a4
 # Remove this line to create a well-formed Fossil manifest.
