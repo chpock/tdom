@@ -1,5 +1,5 @@
-C Fixed\sthe\sfix\sabout\svar\sscopes\s-\sthe\sparameters\sset\swith\swith-param\nmust\sof\scourse\snot\sbe\svisible\sin\sthe\sscope\sof\sthe\scaller\s(call-template,\napply-templates).\sBetter\shandling\sof\serror\scases:\spop\sthe\svar\sframe\nalways\sbefor\schecking\sthe\sresult\scode\sof\sExecActions.\sThis\sshould\nguarantee\svar\smemory\scleanup\seven\sin\serror\scases\stherefor\sprevents\n(even\smore)\smemory\sleaks.\sDon't\sfree\sthe\sbaseURI's\ssubdoc\sentries\sfor\nthe\sxml\sand\sxslt\sdocument,\sbecause\sthis\sstrings\sare\sowned\sby\sthe\ndocuments.\n
-D 2002-05-26T19:55:36
+C Added\sdomlocks.c\sfile\n
+D 2002-06-02T06:31:55
 F apps/xslt.tcl 1b9a65d5db054f01e4033883fa53a313d8e6d5fe
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html c21ddc9a115a8a82ee1560949dc08a1bc41233b6
@@ -154,7 +154,7 @@ F tests/pi.test be4d564b0324686ffdfee9382b55db0aa47c1607
 F tests/xmltest.test c6f5b4445b776ccb628ef9dc9ec5cd2659aa032a
 F tests/xpath.test 296e7b74c3976f431f7284c2316eb33fcd69f08f
 F tests/xslt.test 9592531e9e0fe094bcdef4527b8bef154cff3238
-F unix/Makefile.in 9be69598d44d4f7af06c3f08f914fcb170e3265a
+F unix/Makefile.in 525517d2689c3eb03c18ae3a37b17dd294ba6f96
 F unix/aclocal.m4 8832288cc4da0b7b105ac9bf5a0b58a1cc73a02e
 F unix/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F unix/configure e33ae73436048370a9f63b4f4266e267900724e6 x
@@ -173,7 +173,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a95866d02a0dbf649021abe9348940a523f2c7dd
-U rolf
-Z 603687c31d1ab54c6aeaf2ec22c99746
+P adaa1ca752a44fff6f748edbf98615a4bb18ab6b
+U zoran
+Z c74304b18e8c7b97381b18daba4cf53a
 # Remove this line to create a well-formed Fossil manifest.
