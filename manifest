@@ -1,7 +1,7 @@
-C Fixed\suninitialized\smemory\sread\s(UMR)\sreport.\n
-D 2002-11-14T08:21:56
+C See\sfile\n
+D 2002-11-14T08:24:49
 F CHANGES 17f8fddea36060afdc3691cf6a989be83d353c40
-F ChangeLog 5a5d4a40e93c9b61a8fa50f40ccd5cf3bd957711
+F ChangeLog 23a79e598baeb11b0fbd7ae7d47e7a2c50788cc2
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 6cb770bec3e8cac7d99214d355484aa7ffa3c94d
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -195,7 +195,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P b1e475c1f847dc4385571b4ad3a1c3f10c37b866
+P 0f5d43a14fc09948c0a93ec1a6c3039eaf9e7fbe
 U zoran
-Z 274f247f5b3e5c4eee690d6c15f4f5a0
+Z 8f94ed45e0812dabed83575111778f65
 # Remove this line to create a well-formed Fossil manifest.
