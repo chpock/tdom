@@ -1,7 +1,7 @@
-C Attempt\sto\senforce\s(where\sfeasible)\sthe\sright\s78-char\smargin\n
-D 2003-10-17T08:45:37
+C See\sfile\n
+D 2003-10-17T08:46:29
 F CHANGES 993140b623ef50267a92d858779d91eeaf39da4c
-F ChangeLog 8e9e3dbc708edba7c3e33f8e8744cf16ba39fbf3
+F ChangeLog 26f7b2dd39c238d4ded4f9bcd41b906efa144fe9
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 3bd1b9e90c438a415d1e61430114a8c807951171
+P f06a13359160b10eb763fc03e28386ef9e8291ab
 U zoran
-Z 9106ba30aa8d8cb36f6f2a4597c6d4f2
+Z 04093acb409a33bba8c3afdac3b7d5ba
 # Remove this line to create a well-formed Fossil manifest.
