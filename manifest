@@ -1,7 +1,7 @@
-C Removed\straces\sof\stdomhtml.tcl;\sit\snow\slives\sin\sit's\sown\sextension.\n
-D 2002-11-01T21:26:57
-F CHANGES 9074b44a5e036ff42a8c3f6c2f5957cc76997b4c
-F ChangeLog 406b6ae0717a830bf0b14486da7ed0477ef175f0
+C See\sChangesLog\n
+D 2002-11-01T21:27:22
+F CHANGES 17f8fddea36060afdc3691cf6a989be83d353c40
+F ChangeLog 2a3645fbfc3009a21aeae39c174f6bc34fe1a7a7
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47f1ae9a9582fd06878b7dda3a33a55cea86cae4
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -194,7 +194,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 3029ae737950b7a526ca82e118a1100e9071495a
+P b3bbbbda5d2201a29e5542a6eff6d47ab8bd70dc
 U zoran
-Z 997ac1092981f30a8f64784ce215f597
+Z 95bff3171629a1db0ca0806ef50fe70e
 # Remove this line to create a well-formed Fossil manifest.
