@@ -1,7 +1,7 @@
-C Added\stest\swhich\sdocuments\sthe\sbug\sprior\sto\sdomxpath.c\sr1.63.\n
-D 2003-04-09T20:06:22
-F CHANGES ca483fbc7c627b68977fc3eb6cf6798f42bca33c
-F ChangeLog 4b901cec6b84cec93869a3df97d0c29dae27ef1e
+C See\sfile.\n
+D 2003-04-09T20:18:15
+F CHANGES 59cab3c950a08a20053aa26b3a8718c6efa8c913
+F ChangeLog cc7fa3c7ba6aadff157e002575c3d6bfb4a2cdd2
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 25204720818592a271aecc462432628b5a1862a4
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 34abc1809acb5625a2e6b922935bea4ab1e40ddc
+P 8c305216124e6ab3d7cd2c2c85e804e6fcade5a3
 U rolf
-Z e99ff8d9d542d78c10f2eb7b0f5fc43b
+Z df91527da9640192910ced812c676b12
 # Remove this line to create a well-formed Fossil manifest.
