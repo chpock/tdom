@@ -1,7 +1,7 @@
-C Switched\sback\sto\sTcl_Panic()\sin\sone\scase,\sto\smake\sMT\sbuilds\swork.\n
-D 2003-11-28T01:27:09
+C See\sfile.\n
+D 2003-11-28T01:27:35
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
-F ChangeLog 213d51e7d282247066033de79e3db601e78dba7e
+F ChangeLog 532d84b924de426e40175a7a534ddfff9bf7f3e9
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -227,7 +227,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f4c9cc0cdb295fd546ea0ef213e82010f1f94e35
+P ceb4c394ffe8c1e3f047fe3b7bba3e97ec5c2f56
 U rolf
-Z b181939b917bca27979da60bff07ff17
+Z 3887b7b43ae175c49d9300fbe6c7112b
 # Remove this line to create a well-formed Fossil manifest.
