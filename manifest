@@ -1,7 +1,7 @@
-C Bug\sfix:\sUnder\ssome\scircumstances\sit\swas\spossible,\sthat\san\sURI\schange\nfor\sa\ssubtree\swas\snot\sstored\sin\sthe\stree\s(resulting\sin\swrong\sbase\sURI\nfor\sthat\snodes).\n
-D 2003-10-26T17:46:46
+C See\sfile.\n
+D 2003-10-26T17:56:27
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
-F ChangeLog fed070a9e9174c29ea0dbb9b0325e6a8fa7337d4
+F ChangeLog a05388b4e5e2cafcbef5c4dc663e42890310d752
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 4457f995d6777ba7bc765d8de1843aacbe92d2c9
+P 023d387786a79da93bcbe849977546610a8f6e8c
 U rolf
-Z c2cf7881390f9c4592d9659c29cddc80
+Z 343a05de9a24940e874536b04da10c76
 # Remove this line to create a well-formed Fossil manifest.
