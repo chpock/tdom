@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2005-01-06T19:25:05
+C Clean\sup,\sto\sdecrease\s(innocuous)\scompiler\swarnings\s(thanks\sto\sPat\nThoyts\sfor\striggering\sinput\sand\spatch).\n
+D 2005-01-07T15:08:04
 F CHANGES 5bb7643fd67d14d82ee76b8584bd319aeebec7b2
 F ChangeLog ca3b3b68e24fd48557154e50e8e0e9b80baa8e78
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -119,24 +119,24 @@ F extensions/tnc/tests/loadtnc.tcl 418f1bbca50993a9fe012728b50f0f8080cff2ab
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c 4eb5d817c334c641af2c76cdb7f30998b5c5b8ed
 F generic/aolstub.cpp 2ba5a8d1046b7d92c92917ad4e17f8d944b41167
-F generic/dom.c eaddf03a539baa7988938332d4bd3056c5ef31b5
+F generic/dom.c 00fdc441c78f9f6ede8e9669855adf4b0d066d3c
 F generic/dom.h dbc0a1af91dc1ce0af0d904cdf2e84ecc14b7ef5
-F generic/domalloc.c 94e9e21e9b2a73586a6411693cdcce6061a96d23
+F generic/domalloc.c cd5103a1d0312c3b1e5d9db103d07d4a105008d7
 F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
 F generic/domhtml.c 88e0ea75868126e276c7ed2967f3237e90a76105
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c 37ac0fa7c1657c929974cee597b711054a64dd1f
-F generic/domxpath.c fe3b067ff31f314e369a6b11f54aeeb8fde177c0
+F generic/domxpath.c 5f823ce79d7172a6aade0b1209bd8d4128a75dd9
 F generic/domxpath.h 174e1b2c64557f4b2ba7276ab461c0c72ef46ff1
-F generic/domxslt.c 5723c1a9442157863e975d0b61363633ee6c9c47
+F generic/domxslt.c e7255b86385e8d603db6778452a5119ef5303b0f
 F generic/domxslt.h 261176a8cb491de448189fcb9fa93bfcabda5e40
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F generic/nodecmd.c bd617b5ad9643d207b2cbcae7c918df3db601af8
-F generic/nodecmd.h 93a8fe44e2d96e0a88fe2a94001e18c709ac7a81
-F generic/tcldom.c 46ddaed5544c32b8aa9466abb3de06eb5186d9f9
-F generic/tcldom.h 06811d33cf15dffcd56ac13ef6d67d0309347442
-F generic/tclexpat.c d8f699c9b8ff51241879973d1778486e6314be12
+F generic/nodecmd.c 4e92b088222b049473583333f60fdce7cc2e2132
+F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
+F generic/tcldom.c 8d5bf990dfdc2c29d2d8a587647346a0f98eeb43
+F generic/tcldom.h b1b1f6662c83849fb067d294d9d53bba6c07c22c
+F generic/tclexpat.c 02f7be81d9f98333b0b44b56dfdfb7af2bc7dfa6
 F generic/tclexpat.h 7ea0c8992809e1325c901821bc63831431e2c9f2
 F generic/tdom.decls 760ad3234a869b8191436bd53370b812266d98d5
 F generic/tdom.h db128152fac506159243e47cb3a77cc7d9fe4360
@@ -201,7 +201,7 @@ F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.test 289fc94c960bea16cdbdcc61630479ecc3d9bd40
-F tests/domDoc.test ca9a1afe14b8800099d7a6197b0b42692b73fb47
+F tests/domDoc.test a8a3723e9216385b028919177aaf764effaa0a97
 F tests/domNode.test 6b28d034692821a416c8d23976a68b5e286e2293
 F tests/domnamespace.test 7f6ff7ee11a6cb437240c07be18adc11fd876d46
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
@@ -230,7 +230,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 687db99f29fa7ac6d9c8d85ab5b5895a851f5f05
+P 58221ebd8fc561ba8321b74fea9a6917ddbcbd42
 U rolf
-Z 179ad52d3be82ee8280d5b62fe5d05d8
+Z b5a180b4cf9c829f03daa727ec1f9020
 # Remove this line to create a well-formed Fossil manifest.
