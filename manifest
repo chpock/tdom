@@ -1,7 +1,7 @@
-C xpath\sexpressions\sancestor-or-self::node()\sand\sparent::node()\sreturned\nwrong\sresult\sif\sthe\scontext\snode\sis\s/.\n
-D 2004-12-12T16:09:17
+C See\sfile.\n
+D 2004-12-12T16:09:56
 F CHANGES 5e1729ae568c08de4588a28d3584d862a29a2022
-F ChangeLog 71151b6082f5902defd1cc895de7da4582e97fd3
+F ChangeLog deb392f61807c631c234607ed7fb03464ce10107
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -230,7 +230,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 472f3f4e8f51ab59fa4fe99c8193a821f98306b3
+P 5fecb1d9872959780a48a1f81ae61c799a84afab
 U rolf
-Z d19cb42b0cf19d3321f756f08a6598a0
+Z e590c222300269199157401478e7471a
 # Remove this line to create a well-formed Fossil manifest.
