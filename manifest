@@ -1,5 +1,5 @@
-C Resolved\sTCL_DBGX\sin\stdomConfig.sh\sinstead\sof\spropagating\sthe\soriginal\nTcl\svalue.\sThis\smakes\slike\ssimpler\sfor\stdom\sextensions.\n
-D 2002-10-01T10:07:42
+C Added\sRCS\sstring\sto\scomment\n
+D 2002-10-01T11:00:28
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in ffb39c47ad2dfcd69eaf5b57b32d22998f74a491
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -157,22 +157,22 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
-F tests/dom.test c8225643a3559b537f827edd15b725b9af406ed7
-F tests/domnamespace.test 27e8d4f3ed64f472ca92f30c7b1e1141bde694e4
+F tests/dom.test 841b67b8dcd4b61cc07848419227197a8a510b2a
+F tests/domnamespace.test b6f082540f7d79f13176a200429879374552c70e
 F tests/element.test feb714dae2010efc20dd12d4e7d7bc281b1a6ff4
 F tests/entity.test e7462b5a56f8ae842443af6a29781158b948ea28
-F tests/htmlreader.test 40a5af71d4d202fdc5d905e38ac69ef4a74656ca
-F tests/i18n.test e5e3d9b5b0ed62db12ee9cde625c2b0e000f9290
+F tests/htmlreader.test a6d5a22659a58755c1a1b79dabe3a02ef868398a
+F tests/i18n.test ff76ec3dbd4e9ea6161fc5fa6b67f525b891a5dc
 F tests/loadtdom.tcl 81ea58bcaf7a088ac880bd166dc29cbbfa5231fb
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
 F tests/parser.test 39d7e5bdbbecd7f929a120223d24e7ab43444914
 F tests/pcdata.test d91fbfd9ca0feeff64d930c3b01355fc97ccd03e
 F tests/pi.test 03bb450cd334ca0454a6c99ca3270092ba684833
-F tests/stackedhdl.test e5c138308c1b1f34da561983ef2bef878c3dd8ed
-F tests/xmlsimple.test 30de3d233b6fe4fdcb06261d7fcbe8ab6d247854
+F tests/stackedhdl.test 4b3dafa96849dabf738ffb401585dac5a5aed550
+F tests/xmlsimple.test 6b7a72025fae3f6265bf51c5f67863b6b29ae339
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
-F tests/xpath.test cc2ba0e85e7e81bed4b6e162d08885aa75716925
-F tests/xslt.test 48ab8983d75bd3a40e7c0ca7f1c4e6c87de4beee
+F tests/xpath.test 1b9a66ad93eb1f5b949521e8c144a8485fbd1f66
+F tests/xslt.test b80fd842d4c328f1a52554bb58d9fc3912faf6cb
 F unix/tclAppInit.c 06b688c30d27d4be8925b05d1607cbee950bbd1c
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F win/makefile.vc 49b5882632a89fb6de35b348bacf8f98ebd114d6
@@ -182,7 +182,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 9b7a6d8de227745e40568fc9b9a3416c3ba7dc6c
+P 4de5447229fb46631481afd232dcabcf4e1f8602
 U zoran
-Z c89c7077461c74f8cd746e1bdccb2ff0
+Z 81bfbf2d08a0b29b3ce9ef86ef6eaa96
 # Remove this line to create a well-formed Fossil manifest.
