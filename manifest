@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2002-12-27T23:44:58
+C Added\sconversion\sof\sXSLT\sstylesheet\sDOM\strees\sto\s'cached'\sxslt\scmds\n(new\sdomDoc\smethod\stoXSLTcmd).\sWorks\sfor\snon\sthreaded\stcl;\sneeds\nadditional\swork\sfor\smulti-threaded\stcl\sand\sdocumentation.\n
+D 2003-01-11T00:18:53
 F CHANGES 2d549c07167571211eee81cd4de1f76b71a94680
 F ChangeLog 1703ea5c521f94dd92945a4671a8ed999e47b552
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -112,8 +112,8 @@ F extensions/tnc/pkgIndex.tcl.in 37901ed24e06da45c7d7a17f255b6108925400f8
 F extensions/tnc/test.tcl 46d33c15e885f69d643a1ffe95921d72f403a0d2
 F extensions/tnc/tnc.c eb10dfa0748cd6899509e1512d6a3f8bd87a25b1
 F generic/aolstub.cpp 0f2fb53cc8ba2a4a5fc8f5fe2dbe94c51e65e9bf
-F generic/dom.c b90639d7529d855ec9ca57ae31a56428613791a9
-F generic/dom.h 6e2e4c0c3376e757ef390df748675e9a0248ffcd
+F generic/dom.c 7b2cc7fc21ab3913cc07ede54f655bc85e62b760
+F generic/dom.h cff6293940e027709c3b4b5c67a86c3a9290848e
 F generic/domalloc.c 614b3e4af2d4b7cd8dac5a9fd95b699a5e80264f
 F generic/domalloc.h 5e94d96321fb4f926b6e2c8cf01b8a28c3d0be0f
 F generic/domhtml.c 54fdfbbe29a80c0c2d5dcb081dc2ab183f1baf98
@@ -122,12 +122,12 @@ F generic/domlock.c dba7e77190826af093bbb0c4dc1f858687ef5983
 F generic/domxpath.c 2ed7412802fb55430d2060a0255ae9cd01aed629
 F generic/domxpath.h 2bbf18428f0a934a95d4262bd352cdfe4937e9cb
 F generic/domxslt.c a03f83db53b1482f8dff47e90b13b12b2725eb0f
-F generic/domxslt.h b3fd115f488087195b9e91b730950facc11b85fb
+F generic/domxslt.h b60468a7092d4d5712b4a8776f3db51d4c03aa04
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 34b586ff917e7fcba2110f4201311f376d723a3e
 F generic/nodecmd.h 20210ad9b4a3bdd6055175beca7bfdd8bd318a3f
-F generic/tcldom.c 3a5a6e70c926816ccaddb768fabe754334c143e4
+F generic/tcldom.c 1b9af768ed358ba4c5a4aa8b400483b35fb0912b
 F generic/tcldom.h 887f9bad5712f88523eedf06567a37ce183f777c
 F generic/tclexpat.c 59ef95feef8034596a036674a4e0118c0a9b59f2
 F generic/tclexpat.h 62e83591b9fff070825add84310f7f7cc8cff3b8
@@ -197,7 +197,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 9e4ab919e440760adb247a1ba73b2aac53756454
+P 892a7f9a910c8ec5f6eb0853d55c8d6c5a3668d3
 U rolf
-Z ffe1c0ecf11cc6eb00026f98c4f05a34
+Z 8631f245fe58751110f2b868665bab79
 # Remove this line to create a well-formed Fossil manifest.
