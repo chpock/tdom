@@ -1,7 +1,7 @@
-C More\sfixes\sto\sensure\sns\sintegrity\sof\sxslt\sresult\strees.\n
-D 2003-12-15T01:22:18
+C See\sfile.\n
+D 2003-12-16T22:36:16
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
-F ChangeLog d2931e5f9b6303cd822b651f5063e02ba61aa20c
+F ChangeLog af2feea2d2e78e0d70ecfa77b569d33447f83f54
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -227,7 +227,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P fd41972ea3a65c00867bb8eef329c0c6e3027071
+P 823c06162532d089a8b782db970a32a47f713984
 U rolf
-Z d65bf06f005ccfd2f6829a3940e39587
+Z 1627324f8e37f8197310ec83357f3b1e
 # Remove this line to create a well-formed Fossil manifest.
