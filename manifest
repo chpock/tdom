@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2004-12-12T16:09:56
+C domAppendNewElementNode():\sSet\sthe\snamespace\sof\sa\sper\sxslt\ntransformation\sgenerated\snode\swrong\sunder\scertain\scircumstances.\sThis\nfixes\shttp://groups.yahoo.com/group/tdom/message/1008.\sRemoved\nleftover\s(former\slocal\sused)\sdefine\sTNODE.\n
+D 2004-12-21T02:12:33
 F CHANGES 5e1729ae568c08de4588a28d3584d862a29a2022
 F ChangeLog deb392f61807c631c234607ed7fb03464ce10107
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -119,7 +119,7 @@ F extensions/tnc/tests/loadtnc.tcl 418f1bbca50993a9fe012728b50f0f8080cff2ab
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c 4eb5d817c334c641af2c76cdb7f30998b5c5b8ed
 F generic/aolstub.cpp 2ba5a8d1046b7d92c92917ad4e17f8d944b41167
-F generic/dom.c 19220d649f4ec7b275c1ce8debbae522a30383aa
+F generic/dom.c eaddf03a539baa7988938332d4bd3056c5ef31b5
 F generic/dom.h dbc0a1af91dc1ce0af0d904cdf2e84ecc14b7ef5
 F generic/domalloc.c 94e9e21e9b2a73586a6411693cdcce6061a96d23
 F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
@@ -230,7 +230,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 5fecb1d9872959780a48a1f81ae61c799a84afab
+P ac54b13067326faf60e3fc652d7d041a1508598a
 U rolf
-Z e590c222300269199157401478e7471a
+Z de152e242dba0d2d268a644544843c65
 # Remove this line to create a well-formed Fossil manifest.
