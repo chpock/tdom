@@ -1,5 +1,5 @@
-C Started\stest\ssuite\sfor\sthe\stcl\sinterface\sof\sthe\stnc\scommand\sand\sthe\nvalidator\scommands.\n
-D 2003-02-22T21:19:59
+C Added\snew\stnc\smethod\sgetValidateCmd.\n
+D 2003-02-22T21:47:44
 F CHANGES d6cad9f44838aa2e42fdbd3e75313ddccbbeb32a
 F ChangeLog 633300e18284a84a60f287274613890bb6eeed48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -37,9 +37,9 @@ F doc/tdomcmd.n 087bbf0cf783376e39ff903a48bc377ce507b8f3
 F doc/tdomcmd.xml 1a3ad802ff6a3cc4c473f8a0e7f83fe1400d780c
 F doc/tmml.dtd 63259dc9f69f9104f1515be445b85b195a1fb990
 F doc/tmml.options b6deacf4d680fde4b90bc620161c1b151c5a5bc7
-F doc/tnc.html 1d712f1d867564127908798015cd4317849de964
-F doc/tnc.n d16ffab1a395fc97993be27f3f538165ac18f75d
-F doc/tnc.xml 3d72d70c722bc5f526a78573fb2fd7474719109b
+F doc/tnc.html e6ae47ff697f2280227fce945f39c0e2f6ac9d03
+F doc/tnc.n 147129ce67de3ac8758752bf9747ebf193f60626
+F doc/tnc.xml 9a687664923259ff45bd0cf4b69d4c65dc3f59f3
 F encodings/GenCompactCodings 5996a4e04bf65b44226c90260f7a19c30c077a7a x
 F encodings/ascii.enc dd83333dc1c838beb9102f063971ccc20cc4fd80
 F encodings/cp1250.enc 7df922c63044d958fc54a08305ec989e6cb04a40
@@ -200,7 +200,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 1aa803e20b87569c38933466be1736853da589d9
+P a2b9a24f386f909a50a36d1441f52ede9d248f7f
 U rolf
-Z cb6114f9a23c58f828f9d772da2586ed
+Z e64227f6e693aa063725ab5bc5dc3f32
 # Remove this line to create a well-formed Fossil manifest.
