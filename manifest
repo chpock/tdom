@@ -1,5 +1,5 @@
-C Minor\saddition.\n
-D 2003-11-24T10:06:50
+C Fixed\smemeory\sproblem,\sif\shandler\sscript\sreturn\sTCL_ERROR.\sMade\sthe\ncget\smethod\swork\sfor\sthe\sparser\srelated\soptions,\seven\sif\sthere\sare\sno\nhandler\sscripts\sset.\n
+D 2003-11-24T10:08:19
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog 717daa3a3da1c0cc15de1215c1e87059932243f6
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -207,7 +207,7 @@ F tests/htmlreader.test d39e554d91ce48390e7b5743974b4fad8fc8eeb8
 F tests/i18n.test ad68655284ea0bf4f2c5a0acc098fd05587ba9a4
 F tests/loadtdom.tcl 5e53e167c862051202df871ba249ab502e0ba38d
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
-F tests/parser.test c036f9b99a92a1f1a8273448c77dcfdf5bedb4b9
+F tests/parser.test ea379ac3d12b063059872ceda834b69a42c319f6
 F tests/pcdata.test d91fbfd9ca0feeff64d930c3b01355fc97ccd03e
 F tests/pi.test 03bb450cd334ca0454a6c99ca3270092ba684833
 F tests/stackedhdl.test 4b3dafa96849dabf738ffb401585dac5a5aed550
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 6391024643e21903e6cf55c99b855e55d686d5b7
+P 0acdbe0b00c1ce880b50b8a16691564b7c526c06
 U rolf
-Z 93530ca2242a3e3921a11b61bd9b5cf8
+Z ce643e2be50aca66d9f8919183556706
 # Remove this line to create a well-formed Fossil manifest.
