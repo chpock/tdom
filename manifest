@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2003-09-27T23:28:31
+C Bug\sfix:\spreceding-sibling\saxes\scould\sgive\swrong\sresults\sin\scase\sthe\ncontext\snode\sis\sa\schild\sof\srootNode\s(e.g\sthe\sdocumentElement).\n
+D 2003-09-27T23:33:57
 F CHANGES 813a168a7b86886b7d8988978f2ae6a85e2f0663
 F ChangeLog 0b790ffec670edca8c90b414b4a99d95fe5b71a1
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -124,7 +124,7 @@ F generic/domalloc.h 5e94d96321fb4f926b6e2c8cf01b8a28c3d0be0f
 F generic/domhtml.c 54fdfbbe29a80c0c2d5dcb081dc2ab183f1baf98
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c 491461026d79430c5990e9193e316362eef3a88f
-F generic/domxpath.c e14c75997d9352a272adf657c73694b7ec99d8f6
+F generic/domxpath.c ae5839d7908a08ca5b5fdfd802c5518419e018bf
 F generic/domxpath.h 2bbf18428f0a934a95d4262bd352cdfe4937e9cb
 F generic/domxslt.c 3e9e7e8ba8a82f9f1b3e790737ff16b7cd123512
 F generic/domxslt.h b60468a7092d4d5712b4a8776f3db51d4c03aa04
@@ -213,7 +213,7 @@ F tests/pi.test 03bb450cd334ca0454a6c99ca3270092ba684833
 F tests/stackedhdl.test 4b3dafa96849dabf738ffb401585dac5a5aed550
 F tests/xmlsimple.test 44c53210c7048ca1843ecbce9f2132f6358504f2
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
-F tests/xpath.test 4d25939017073d9bdf83a56a5be340bc560a3ce0
+F tests/xpath.test 2340e4b0bb468d976e27a6506d2cfb09e1662317
 F tests/xslt.test 97de1ff573f458c58dd8ad7870ddd74bf5acf520
 F unix/CONFIG 9e65bbe84330e49ce8f992c9bbf218c6eb0edb36
 F unix/tclAppInit.c 06b688c30d27d4be8925b05d1607cbee950bbd1c
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 181e84b4695a41e0db7b45f83a5690dd59648600
+P ca169b431a76903cde8e0f220ead376085f99854
 U rolf
-Z 6ee5aa746a6910772b99e12654b9da3a
+Z 9ae0ab4d5161c750d510f35ee6ae521b
 # Remove this line to create a well-formed Fossil manifest.
