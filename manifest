@@ -1,0 +1,141 @@
+C Initial\srevision\n
+D 2002-02-22T01:05:34
+F apps/xslt.tcl 35de2520d09cf04fc8422254af2e43c8a42d7c93
+F doc/INDEX.MAP de154ec1b8a8dd8f92678b59bcb4e0eaf2565018
+F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
+F doc/dom.html c21ddc9a115a8a82ee1560949dc08a1bc41233b6
+F doc/dom.n d865b47128bc6123b02575bc08ae25ddcaa389e8
+F doc/dom.xml 9fa274d82deb970d90897d6b3f9b32d48ba51606
+F doc/domDoc.html ded397ef08949cb5366bc7f0fb0ad4117ecfd7f7
+F doc/domDoc.n d23533433b48cb5e7c5732bdce2fa73451a8cc61
+F doc/domDoc.xml 2bd3e7d74ede1500044bdc0fd31b4a9332163ef3
+F doc/domNode.html 473817a83c4163111742c1de2af08ec4f1596205
+F doc/domNode.n 336ea92032607f8586ab71f864c33ba95a541beb
+F doc/domNode.xml bcb0024d0c98496eb9d9c6be9cbc85001e7ae6a4
+F doc/expat.html 0f41343ba58a0359d2f0afd8d0cba82a62ce3d58
+F doc/expat.n af99cb144391169194acd682cb40e7547a74941a
+F doc/expat.xml 6a60726a13547624d4c8482848746adf7d05f069
+F doc/expatapi.html 745a5f63158d568de1f479113e726b6de8a975d4
+F doc/expatapi.n 600797053dd664f05cf4a7d2a691a200b4548b6b
+F doc/expatapi.xml d93d1ea7d4fbacd0729e731147a96e74863fdde9
+F doc/footer.xml 03642339c4749bfdc563a3ced9c9046bd23c7b67
+F doc/index-chars.xml 8d5ff0b96a2c98b53ad543489dddcfc811bad317
+F doc/index.html 07e9315df3c3acbec8f86d814018fa3ae85e4c62
+F doc/keyword-index.html 98449a16e99c1d42db0dd25564d0cdf1461c1b24
+F doc/make-index.xsl a2aabf339127b11011cee9abaf4e240bae93fcb2
+F doc/man.macros 8d66f10ca41746d526210ba962eb3ba465fcd7b1
+F doc/manpage.css 47902c9f7c9d37086a5b30c2f3f52086d7ce1e89
+F doc/my-keyword-index.xsl a655558ec3c8cbc7ff0e47e5976e6ec1ce3a8c79
+F doc/navpages.xsl a4061de996ecf8088e194491abca0e0ddc72c8fc
+F doc/tDOM.xml 35369df6a7d84d68cfb28692530ef9d1a8b8ca3e
+F doc/tdomcmd.html 0fab61836d5a45a4da340e65feb66cbf3fce526a
+F doc/tdomcmd.n f2b6b4fbf5df532bda8b23fac644ea996b91f8ac
+F doc/tdomcmd.xml 1a3ad802ff6a3cc4c473f8a0e7f83fe1400d780c
+F doc/tmml.dtd 231befbf2bf04021bda22379eaefb8a6ed21add6
+F doc/tnc.html 156d5206a8423c346ef4649fe8980e3d527b4030
+F doc/tnc.n 39ddab036ce73c0ecd9ecc95541052bf8ea8cae2
+F doc/tnc.xml 9ffd50ab1b6881bf83c537bceb9d084519de6803
+F encodings/GenCompactCodings 5996a4e04bf65b44226c90260f7a19c30c077a7a x
+F encodings/ascii.enc dd83333dc1c838beb9102f063971ccc20cc4fd80
+F encodings/cp1250.enc 7df922c63044d958fc54a08305ec989e6cb04a40
+F encodings/cp1251.enc 8d55783f493737209a60f6e38ec40c68147126ac
+F encodings/cp1252.enc 0633974240801ad963997db22b7f18d75b22aee0
+F encodings/cp1253.enc 674867b44b1c1652155e17d9046963a62a8a8066
+F encodings/cp1254.enc fc9d1c66c6af1dfbc8386620d06039695ec2f52f
+F encodings/cp1255.enc 1b7c78f1c4cef2bbc55c5d6f5eaf15547448c4ec
+F encodings/cp1256.enc 1d407114de53d0d4349b5e3c3c8fd896d69f39f1
+F encodings/cp437.enc 3f725245c66050d39d9234baace9d047a3842944
+F encodings/cp850.enc 5ead37788d124d4ee49ec4b8aa1cf6aaa9c2849c
+F encodings/iso8859-1.enc a71b6380ea3d23dc0de11d3b8cea86a4c8063d47
+F encodings/iso8859-2.enc ff62eb5710fde11074a87daee9229bcf7f66d7a0
+F encodings/iso8859-3.enc b0bebedec53ffb894d9fb0d57f25ab2a459b6dd5
+F encodings/iso8859-4.enc cc1c2e6c35b005c17eb7b1a3d744983a86a75736
+F encodings/iso8859-5.enc f9f64bb6014068e2c0737186c694b8101dd9575e
+F encodings/iso8859-6.enc 32a22a6196c5cf7138caf49b4ce9b6b62d0e8ff5
+F encodings/iso8859-7.enc 1f75db4f7be40eb204fdb85057ca5f1d9a89f147
+F encodings/iso8859-8.enc 75ee0da275fe59752001d18b9f099ef446a6a577
+F encodings/iso8859-9.enc f585c70a5589de39558dac016743ff85e0c5f032
+F encodings/koi8-r.enc 366c137c02e069b1a93fbb5d64b9120ea6e9ad1f
+F expat-1.95.1/COPYING 44b3f40678d9430edf3fe639c6cd3685e70e627b
+F expat-1.95.1/Changes e85d4ab97b396405d51a29935497ad4875005dde
+F expat-1.95.1/README 0060d177278d1973d3355b5ca38b6a427a887ed8
+F expat-1.95.1/ascii.h 3aa53bac482cb1bcd21b08d7061b5afb515328c9
+F expat-1.95.1/asciitab.h 422108f80c04b40c327323688f987fbdf772a26d
+F expat-1.95.1/expat.h bdf008cd83fc4870239dad325d0f161cb7dd475c
+F expat-1.95.1/iasciitab.h 96cd6905da223ad4d6fd276a7dd2571c04d4b819
+F expat-1.95.1/latin1tab.h 068e6399417a18005a671557557528e818920b97
+F expat-1.95.1/nametab.h 7ebf9a02f20fe58ad2e6d0488acd620b1f534e9e
+F expat-1.95.1/utf8tab.h 8b8c8046b0208c41b1f9da5b0a5309419ef6e03b
+F expat-1.95.1/winconfig.h 6b2fa0e48c8271334a78b788a0d9274358919661
+F expat-1.95.1/xmlparse.c 2e81516db6006a3825fb1a701c1210fb26008ea7
+F expat-1.95.1/xmlparse.c.diff a5ce473925329d0d2a4ceb98e6d2eea06ae0ac51
+F expat-1.95.1/xmlrole.c 1e8b432d710f0ce8afdc3df7fc80ba1035bfab99
+F expat-1.95.1/xmlrole.h f7a208ac469ba8eb3e55242e855c0e02677b05c9
+F expat-1.95.1/xmltok.c 98a172be05b7822953b8c59b62259b63eb632198
+F expat-1.95.1/xmltok.h a6f0360c06f6f2b65784e9c56e7f4427a77c70e6
+F expat-1.95.1/xmltok_impl.c b7bc45bd9d4c33850e4f8ca54b297c4a6ac048b0
+F expat-1.95.1/xmltok_impl.h cb8cce4d3f128dc013901010b462d852b4d4d804
+F expat-1.95.1/xmltok_ns.c 1eaf04c2687c2cfab20a4efd29682b2a2fd8e3e8
+F extensions/example/Makefile.in 30f19a3287668a8d2c50d8cb39ebbac9c96416dd
+F extensions/example/aclocal.m4 8832288cc4da0b7b105ac9bf5a0b58a1cc73a02e
+F extensions/example/configure d0d1741e99a2095f94ecb2a9d5edcd1d1ed67422 x
+F extensions/example/configure.in 8dad6dcbfea45390c965bd6a4f30d80c63dc2566
+F extensions/example/example.c 47a9c859772f2a5105a298c2fb1f088d425d18a2
+F extensions/example/exampletest.tcl 82fb044adb381d725beb9b453cf1cca9d730945e
+F extensions/example/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
+F extensions/example/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
+F extensions/example/pkgIndex.tcl.in 110f575cbb8afc1220ce583fb88c787203c0554c
+F extensions/example/tcl.m4 9404ac273b962ddaf946d3170c5183e55d0984b3
+F extensions/tnc/Makefile.in a2f3d28c440c5cc02c4d7ad613dfd9d41359ab8c
+F extensions/tnc/aclocal.m4 8832288cc4da0b7b105ac9bf5a0b58a1cc73a02e
+F extensions/tnc/configure fdad2abfd30d8cf6009f10d202914797bd79c4d3 x
+F extensions/tnc/configure.in c2e7edd7d13d9ccb107d6293cc8aab10091edb30
+F extensions/tnc/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
+F extensions/tnc/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
+F extensions/tnc/pkgIndex.tcl.in f3ca1ee461a2ce4c6f7fae3ff078da261fab6e4b
+F extensions/tnc/tcl.m4 9404ac273b962ddaf946d3170c5183e55d0984b3
+F extensions/tnc/test.tcl efade8bcb9fd9e269ed5c259f3edf182bc917b72
+F extensions/tnc/tnc.c 2f39e54c5bf752f1e272446a88f55e796bf513f2
+F generic/dom.c f9d3a61e801a3acf16390054f8eb9b6d97f8593f
+F generic/dom.h 1ac71ae2e15f76922c07a06ac58c6d0b9f3fbd5f
+F generic/domalloc.c 9621d3affdf875a1ee094aedfd1317f6a908b866
+F generic/domalloc.h 2c5c6412831ffaff02d2a2d969adddbede8752b6
+F generic/domhtml.c e8cda5580aa8c3fe08e9f432a8482dd667c22e6e
+F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
+F generic/domxpath.c 368fa5f678509d2604a9cd4fabd9e33abbe90cfa
+F generic/domxpath.h 3f5319c07a25bc103a7be83939249a43b3e82f98
+F generic/domxslt.c 1e255793a44fca1f9808dde98e35222201e2d9d5
+F generic/domxslt.h d8b3177418299ec4e3f1f92b736756e42d2dd3e1
+F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
+F generic/nodecmd.c 60cfaefa435012d37a0bfe9fe115731c0efba17e
+F generic/nodecmd.h c7c326adbbc6b3e6c8bdd4131b281eb216e9e5d2
+F generic/tcldom.c 2c213e1928573e6577cf3c2f1ab456ab6b2d7c0e
+F generic/tcldom.h c2c4bfd858d52ae79b99bc62eb9714e525d09dc2
+F generic/tclexpat.c 8e2938794dfb3d0ad7408e05c5f0be17ad4fd334
+F generic/tclexpat.h f356e3e0dc08cbc3de75edac35bb4b9ce3f7c9b4
+F generic/tdominit.c a21f1f8afa63ce7c0783f1b620af3f40b87fe1f2
+F generic/utf8conv.c fc01b4776a82c937252a7d2593a3d244916905f7
+F generic/utf8conv.h 673d53e1facc0941514c74d76fc3f6e4fa26a846
+F generic/xmlsimple.c 5a0671a6ea37d0ca13b4782d0f8f5a215871e5af
+F generic/xmlsimple.h 07cac92419cb8ade05ad2d148314931a0b3a418a
+F lib/domhtml.tcl 1ce01926d867282e27e87c08bb4c2b7875f4003b
+F lib/tdom.tcl 53be8926ebb1e3afc60952b5fa4b3a616e9619b2
+F unix/Makefile.in 9be69598d44d4f7af06c3f08f914fcb170e3265a
+F unix/aclocal.m4 8832288cc4da0b7b105ac9bf5a0b58a1cc73a02e
+F unix/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
+F unix/configure d7ac67668742097099b4ebb051e3045e2900eb4c x
+F unix/configure.in 2648a1ec1b2148e23c549c99ea794945cb2e6b6a
+F unix/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
+F unix/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
+F unix/pkgIndex.tcl.in d5d912d994d81fb27c4551c6a460947539d2212c
+F unix/tcl.m4 9404ac273b962ddaf946d3170c5183e55d0984b3
+F unix/tclAppInit.c 5dad9db4d949a8b242b50352e225ff2ce2e1e05b
+F unix/tdomConfig.sh.in b97f3efe61579bd447d2be4e4e26e9f9fc9317a5
+F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
+F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
+F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
+F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
+T *sym-trunk *
+U rolf
+Z fc3034f352e31eda6872354f7e369153
+# Remove this line to create a well-formed Fossil manifest.
