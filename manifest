@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2003-01-29T02:42:03
+C Fixed\sbug\sreported\sby\sWilhelm\sKlink\n(http://groups.yahoo.com/group/tdom/message/404\ssee\stest\nxslt-4.1).\sAgain\sa\sproblem\s(sideeffect)\sof\srenumbering\nnode->nodeNumber\s(which\sis\snecessary\safter\smodification\sof\sthe\stree\nfor\ssome\sXPath\sexpr\sto\swork).\sThe\skeys\sof\sthe\sentries\sin\sthe\sbaseURIs\nhash\stable\sof\sthe\sdocuments\swhere\sthe\snodeNumber\sof\sthe\s(subtree\sroot)\nnodes\swith\snew\sbaseURI.\sSince\sthis\snodeNumber\sisn't\snecessarily\nconstant\sover\sthe\slifetime\sof\sa\snode\s(because\sof\sthe\spossibility\sof\nre-numbering\sthe\stree),\sthis\scould\snot\swork\sanymore.\sInstead\sthe\nnodeNumber,\swe\snow\suse\sthe\spointer\sto\sthe\snode\sstructure\sas\sKey\sfor\nthe\sbaseURIs\shash\stable.\sThis\spointers\sstay\salways\sconstant,\seven\sif\nthe\snodeNumber\schanges.\sAdditional\scode\swas\sadded\sto\sdomFreeNode(),\sto\nensure,\sthat\san\sentry\sin\sthe\sbaseURIs\shash\stable\sgets\sfreed,\sif\sthe\nrelated\snode\sis\sin\sdeed\sfreed.\sRemoved\sthe\syesterday\sadded\sreseting\sof\nthe\sdomUniqueNodeNr\scounter,\sbecause\sit\sturned\sout\sin\stesting,\sthat\nthere\sare\sproblems\swith\ssorting\sof\sresultSets,\swhich\sincludes\snodes\nfrom\sdifferent\sdocuments\s(which\smay\shappen\swith\ssome\sspecial\sXSLT\nconstructs\s(document()\scalls\swith\sa\snodeset\sas\sargument)).\sThe\nreseting\sof\sthe\sdomUniqueNodeNr\sis\sstill\sdesirable,\sbut\sit\sturned\sout,\nthat\sit\sshould\sbe\scarefully\sconsidered,\swhen\sit\sshould\sbe\sdone.\n
+D 2003-01-30T00:36:36
 F CHANGES 92d5a67a9b11f538ccbece3c5d07ea8b20cb265a
 F ChangeLog f84548a49b14d24bdcf2b9387389077e64d45a26
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -112,7 +112,7 @@ F extensions/tnc/pkgIndex.tcl.in 37901ed24e06da45c7d7a17f255b6108925400f8
 F extensions/tnc/test.tcl 46d33c15e885f69d643a1ffe95921d72f403a0d2
 F extensions/tnc/tnc.c eb10dfa0748cd6899509e1512d6a3f8bd87a25b1
 F generic/aolstub.cpp 0f2fb53cc8ba2a4a5fc8f5fe2dbe94c51e65e9bf
-F generic/dom.c eb0918435882246b93af1966e2fbda87400675d0
+F generic/dom.c 890e1879bb3f28fe4af95a6c48a8285a89e1a617
 F generic/dom.h f23165bb0f7943809069613faa0af03c8db133ef
 F generic/domalloc.c 614b3e4af2d4b7cd8dac5a9fd95b699a5e80264f
 F generic/domalloc.h 5e94d96321fb4f926b6e2c8cf01b8a28c3d0be0f
@@ -127,7 +127,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 34b586ff917e7fcba2110f4201311f376d723a3e
 F generic/nodecmd.h 20210ad9b4a3bdd6055175beca7bfdd8bd318a3f
-F generic/tcldom.c 08ef09150a0117a34bc1e21df0cce1deaa2e6f4a
+F generic/tcldom.c 5e1a6c1ad1ed54bc12cdbc7eba4e564f3761cb8a
 F generic/tcldom.h 887f9bad5712f88523eedf06567a37ce183f777c
 F generic/tclexpat.c 1849f2380a0eb44866cb7be46bb44c4f5375d77d
 F generic/tclexpat.h 62e83591b9fff070825add84310f7f7cc8cff3b8
@@ -140,7 +140,7 @@ F generic/tdominit.c 3ccbccd0009bd98f8776feb8ab3eb0bf5c6bc1e3
 F generic/utf8conv.c fc01b4776a82c937252a7d2593a3d244916905f7
 F generic/utf8conv.h e0d2756b2d77ad9a8508a0dcf7cce5e10fa4c9a5
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
-F generic/xmlsimple.c fad15850fbd516e02fd56199372a21eefc40bc2f
+F generic/xmlsimple.c 1af1d67cfb193a648147fdd5b6fa43f7faa8051e
 F generic/xmlsimple.h f2861868b0fed932c79f9e595bb875d261d97bd5
 F lib/tdom.tcl a95a1f1acaf101530b4d3bc4b28950351295fbec
 F tclconfig/ChangeLog 16d950c5f3b8b048a77b9671f3705d360f226759
@@ -186,7 +186,7 @@ F tests/stackedhdl.test 4b3dafa96849dabf738ffb401585dac5a5aed550
 F tests/xmlsimple.test 44c53210c7048ca1843ecbce9f2132f6358504f2
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.test 2286d9ee6f338a8f0debd0d39f5ab2fb344c3f3d
-F tests/xslt.test 6d4666af7660eada84e8da32451f979e7908b036
+F tests/xslt.test 97de1ff573f458c58dd8ad7870ddd74bf5acf520
 F unix/tclAppInit.c 06b688c30d27d4be8925b05d1607cbee950bbd1c
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F win/makefile.vc ce3f2ddefe3353b9dd6a0a89069dadee2cce2a21
@@ -197,7 +197,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 0f29634d2e12b94994ee0a6e699b2430edbf868e
+P 6b52088c2671a9d3ed0556fe0bed4935c3318925
 U rolf
-Z 2b6d1f4941a2d05ccb556cf56a57e19d
+Z fda8d94df857c2bb2cb7643e60fc5fc5
 # Remove this line to create a well-formed Fossil manifest.
