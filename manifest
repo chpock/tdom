@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2004-09-21T01:46:11
+C Added\sthe\swith\s0.8\sadded\sdoc\smethods\sto\sthe\sdoc_usage.\n
+D 2004-09-29T11:41:11
 F CHANGES c148974e2232411cdad6dad69cdc6698b279f3e7
 F ChangeLog ce8c666c661f50d3d40d8746ac7dfef3c9887cb7
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -134,7 +134,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c bd617b5ad9643d207b2cbcae7c918df3db601af8
 F generic/nodecmd.h 93a8fe44e2d96e0a88fe2a94001e18c709ac7a81
-F generic/tcldom.c 5b031666cd9acfa73d0db4b318d55313ec955345
+F generic/tcldom.c 8424cfb11a6ef1bfeb7ae8bc7e106556ae5e08ab
 F generic/tcldom.h 06811d33cf15dffcd56ac13ef6d67d0309347442
 F generic/tclexpat.c 93a3d4c93360806dbbe04f90bfb7f1778ffc9fc0
 F generic/tclexpat.h 4af6a66cde1f493d0d7c2da1ef5da6295c1006db
@@ -230,7 +230,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P b08cb7d2243324ecb0f94b816a5ba121b77acb43
+P a008835f1395dc3677c9395ae56ec98161f38768
 U rolf
-Z b199fb0140deb9bfe6815a9ba7334d82
+Z f3bf29c31d7bcc7845e4214b08ae719c
 # Remove this line to create a well-formed Fossil manifest.
