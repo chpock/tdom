@@ -1,6 +1,6 @@
-C Initial\srevision\n
+C tDOM0.7test\swith\sJochens\sfirst\sset\sof\spatches\n
 D 2002-02-22T01:05:34
-F apps/xslt.tcl 35de2520d09cf04fc8422254af2e43c8a42d7c93
+F apps/xslt.tcl a87e969cc0408ecb1e6a302f3ef961c826fdff59
 F doc/INDEX.MAP de154ec1b8a8dd8f92678b59bcb4e0eaf2565018
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html c21ddc9a115a8a82ee1560949dc08a1bc41233b6
@@ -96,30 +96,30 @@ F extensions/tnc/pkgIndex.tcl.in f3ca1ee461a2ce4c6f7fae3ff078da261fab6e4b
 F extensions/tnc/tcl.m4 9404ac273b962ddaf946d3170c5183e55d0984b3
 F extensions/tnc/test.tcl efade8bcb9fd9e269ed5c259f3edf182bc917b72
 F extensions/tnc/tnc.c 2f39e54c5bf752f1e272446a88f55e796bf513f2
-F generic/dom.c f9d3a61e801a3acf16390054f8eb9b6d97f8593f
-F generic/dom.h 1ac71ae2e15f76922c07a06ac58c6d0b9f3fbd5f
-F generic/domalloc.c 9621d3affdf875a1ee094aedfd1317f6a908b866
-F generic/domalloc.h 2c5c6412831ffaff02d2a2d969adddbede8752b6
+F generic/dom.c ff2ad8874c2d6bc8042b0ea356f1b0c9c9e11062
+F generic/dom.h bedc8f0a75ba01401df07669e89752ee2d190ad8
+F generic/domalloc.c 07aa9ddb708404ebd458836b202be2e3b891a92b
+F generic/domalloc.h 92f68fc51d175b3afd03476ef6b826d545c96efe
 F generic/domhtml.c e8cda5580aa8c3fe08e9f432a8482dd667c22e6e
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
-F generic/domxpath.c 368fa5f678509d2604a9cd4fabd9e33abbe90cfa
-F generic/domxpath.h 3f5319c07a25bc103a7be83939249a43b3e82f98
-F generic/domxslt.c 1e255793a44fca1f9808dde98e35222201e2d9d5
-F generic/domxslt.h d8b3177418299ec4e3f1f92b736756e42d2dd3e1
+F generic/domxpath.c 414435c76cc4650a28fd5f1bf69a041908634102
+F generic/domxpath.h c8a4c944046e99b5614c34166390d752c46585c6
+F generic/domxslt.c 28a90e2c16307f64c011c5d2eb6fb152886921cf
+F generic/domxslt.h f76f124ec1f656e63bd5292714c2044037c4a917
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
-F generic/nodecmd.c 60cfaefa435012d37a0bfe9fe115731c0efba17e
-F generic/nodecmd.h c7c326adbbc6b3e6c8bdd4131b281eb216e9e5d2
-F generic/tcldom.c 2c213e1928573e6577cf3c2f1ab456ab6b2d7c0e
-F generic/tcldom.h c2c4bfd858d52ae79b99bc62eb9714e525d09dc2
+F generic/nodecmd.c 7ebed1a1f96972a9ca9bac1d484c0d2602b20ad3
+F generic/nodecmd.h 77611f137707fd60e39ad6ba06fb43d8fecc2fd2
+F generic/tcldom.c 6df0a0dceea4434e373e0e1325272d37450e19a4
+F generic/tcldom.h 7afd7622f3f010a8f168223afe0663565793b8cc
 F generic/tclexpat.c 8e2938794dfb3d0ad7408e05c5f0be17ad4fd334
 F generic/tclexpat.h f356e3e0dc08cbc3de75edac35bb4b9ce3f7c9b4
-F generic/tdominit.c a21f1f8afa63ce7c0783f1b620af3f40b87fe1f2
-F generic/utf8conv.c fc01b4776a82c937252a7d2593a3d244916905f7
-F generic/utf8conv.h 673d53e1facc0941514c74d76fc3f6e4fa26a846
+F generic/tdominit.c cb1cc5f0cb7d0fac2a0e261b829d4d30950505ae
+F generic/utf8conv.c f2dffa255004f67f86326d1d409d687df4aca5e5
+F generic/utf8conv.h c867686e37bf78e9ff02a719ca7818eaa17e3bec
 F generic/xmlsimple.c 5a0671a6ea37d0ca13b4782d0f8f5a215871e5af
 F generic/xmlsimple.h 07cac92419cb8ade05ad2d148314931a0b3a418a
-F lib/domhtml.tcl 1ce01926d867282e27e87c08bb4c2b7875f4003b
-F lib/tdom.tcl 53be8926ebb1e3afc60952b5fa4b3a616e9619b2
+F lib/domhtml.tcl 78bd3af20d3941c3c129ac8581c02605de1b1664
+F lib/tdom.tcl eafb47d2e01aa0a92040ea017c05a6820737ed4d
 F unix/Makefile.in 9be69598d44d4f7af06c3f08f914fcb170e3265a
 F unix/aclocal.m4 8832288cc4da0b7b105ac9bf5a0b58a1cc73a02e
 F unix/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -132,10 +132,13 @@ F unix/tcl.m4 9404ac273b962ddaf946d3170c5183e55d0984b3
 F unix/tclAppInit.c 5dad9db4d949a8b242b50352e225ff2ce2e1e05b
 F unix/tdomConfig.sh.in b97f3efe61579bd447d2be4e4e26e9f9fc9317a5
 F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
-F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
+F xe/xe 27d63e8df90f351919916120c851388b447afefe x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-T *sym-trunk *
+P 98cd4affb5a91ca6200dc8b8fc4697099dc29380
+T *branch * demo
+T *sym-demo *
+T -sym-tdom-0.8.3-postrelease *
 U rolf
-Z fc3034f352e31eda6872354f7e369153
+Z 49310c36f307f62d8295dd81b78341af
 # Remove this line to create a well-formed Fossil manifest.
