@@ -1,5 +1,5 @@
-C Made\sformat-number()\si18n\saware\s(for\sTcl\s>=\s8.1).\sTogether\swith\sthat\nreworked\sformat-number\sa\sbit\sand\sfixed\ssome\sbugs.\sThis\sformat-number\nthingy\sis\sdefinitely\sone\sof\sthe\smore\sannoying\sparts\sof\sthe\sXSLT\nrec.\sSuch\sa\sfunctionality\sis\sundoubted\simportant,\sbut\sit\swas\sa\sbad\nidea,\sto\sspecify\sit\swith\sa\sreference\sto\sa\sJava\s1.1\sclass.\sWell,\sthe\nJava\sfolks\sdon't\scare,\sthey\sjust\suse\sthis\sclass\s(I\sassume).\sBut\swhat\nthe\slink\sto\sthe\sJava\s1.1\sdoc\sout\sof\sthe\sspec\sgives,\sis\sfar\saway\sfrom\sa\ncomplete\sdescription\sof\sthe\srequired\sbehavior\s(at\sleast\sfor\san\nimplementor).\sThe\sJava\sbooks\s(at\sleast,\sto\sone,\sI\ssaw)\sare\snot\sof\sany\nhelp;\stypically\sthey\sprovide\seven\slesser\sinfo.\sKay,\sin\scontrary,\sdoes\nprovide\sa\sbit\sadditional\sinfo\sin\shis\sXSLT\sProgrammer's\sReference,\sbut\nunfortunately\slet\salso\ssome\squestions\sopen.\sTherefor\sthe\sonly\sway\sin\nsome\scases\sis,\sto\sstudy\sthe\soutput\sof\sthe\sjava\sengines\sand\sto\stry\sto\nunderstand\sthere\sformating\srules.\n
-D 2002-10-13T00:02:04
+C Updated\sto\sthe\snew\sbuild\ssystem.\n
+D 2002-10-13T00:08:51
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 2086eca836d27f5319bc34c0c379fc1009993adf
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -79,12 +79,12 @@ F expat/xmltok.h 0f9875e54640d358620804a69fd24538b48a9f59
 F expat/xmltok_impl.c 69e6626353b85c8607bec638f22f97a2fe7eb7fe
 F expat/xmltok_impl.h cb8cce4d3f128dc013901010b462d852b4d4d804
 F expat/xmltok_ns.c 834a63b4c8f5ee7b7bd394e40296698bd23f8d5a
-F extensions/example/Makefile.in 30f19a3287668a8d2c50d8cb39ebbac9c96416dd
-F extensions/example/aclocal.m4 8832288cc4da0b7b105ac9bf5a0b58a1cc73a02e
-F extensions/example/configure d0d1741e99a2095f94ecb2a9d5edcd1d1ed67422 x
-F extensions/example/configure.in 8dad6dcbfea45390c965bd6a4f30d80c63dc2566
-F extensions/example/example.c 47a9c859772f2a5105a298c2fb1f088d425d18a2
-F extensions/example/exampletest.tcl 82fb044adb381d725beb9b453cf1cca9d730945e
+F extensions/example/Makefile.in 47ae1116b31d3abe63d45bacc895aaf9f214e9bc
+F extensions/example/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
+F extensions/example/configure 9cf7de834983ae7a48b569a7a26a048e20a6ac26 x
+F extensions/example/configure.in a51caf34cd20f58ea37efefd7911a3126c22ef1a
+F extensions/example/example.c f02173d47391488af6038b6058b9a5a9fde033e5
+F extensions/example/exampletest.tcl 1a584be88a2e47d3147cfde5eff1b56b4d19525b
 F extensions/example/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F extensions/example/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
 F extensions/example/pkgIndex.tcl.in 110f575cbb8afc1220ce583fb88c787203c0554c
@@ -183,7 +183,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 37983a92fcfc6a658632d57c5f54324b452fdee2
+P f4771d1e04b55c6db58bebd4227df5740d675eb9
 U rolf
-Z 1d227b11a469bf21554ccb604b5d38c1
+Z 7a231d8145d461dfafdf8ae50217a4c0
 # Remove this line to create a well-formed Fossil manifest.
