@@ -1,5 +1,5 @@
-C See\sfile\s(Where\sheading\sagainst\s0.7.5,\sfinally.\sThis\sVC++\s6.0\nmakefiles\sstill\sare\shacks\s-\sfor\sexample,\sthe\slink\s(hardcoded)\sagainst\ntcl8.3.\sBut\sanyway.)\n
-D 2002-11-13T01:08:18
+C Updated\sto\sthe\snew\sversion\snr\sand\sthe\slib\sname\sconvention\sof\sthe\snew\sTEA\s2\sbuild\ssystem.\n
+D 2002-11-13T01:08:56
 F CHANGES 17f8fddea36060afdc3691cf6a989be83d353c40
 F ChangeLog 5a5d4a40e93c9b61a8fa50f40ccd5cf3bd957711
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -105,7 +105,7 @@ F extensions/tnc/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
 F extensions/tnc/configure 028ddac3a9c0100305b4cda31f21fb43ea27be3b x
 F extensions/tnc/configure.in 87e9e7bf116ab5c527980522479cad68cb34c2a4
 F extensions/tnc/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
-F extensions/tnc/makefile.vc d262134b84d1b02441a12b8a8ed46ecaef1ecc6a
+F extensions/tnc/makefile.vc 1d7c6eef7a631325d9e09c7150fe6184f9e6b54f
 F extensions/tnc/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
 F extensions/tnc/pkgIndex.tcl.in 37901ed24e06da45c7d7a17f255b6108925400f8
 F extensions/tnc/test.tcl 46d33c15e885f69d643a1ffe95921d72f403a0d2
@@ -195,7 +195,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 5b93a81fd681a30f1e6028edd7e85cc5a0baf873
+P 82361a8c8350966b40b18404541246b2064146af
 U rolf
-Z e00fa09b75b14b1431deb7f2f951cc47
+Z 281010d9c8a2be88a397467c5b573c38
 # Remove this line to create a well-formed Fossil manifest.
