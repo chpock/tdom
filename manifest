@@ -1,5 +1,5 @@
-C Added\stest,\sthat\sdocuments\sthe\schildAppend\sbug\s(and\sthat\sit's\sfixed).\n
-D 2002-07-02T20:20:25
+C Fixed\sa\scompilation\serror\son\sAIX.\n
+D 2002-07-02T22:52:20
 F apps/xslt.tcl aceffee1914d4bf9b7a6a0a0a4b66fa7c4991fd5
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html c21ddc9a115a8a82ee1560949dc08a1bc41233b6
@@ -108,7 +108,7 @@ F generic/nodecmd.c 0ccc3a7b7e1f012a706574d2f7c123010d02df85
 F generic/nodecmd.h 0225d87d05a9afc2ce0d5baf8966b076ffa71405
 F generic/tcldom.c bc0c7a92a0bf8475ee9cb421cb896c53acae3a8c
 F generic/tcldom.h 0cace67e972eed7453ff64d091d314159cc37404
-F generic/tclexpat.c 6ced18a20d073a145c77a0a8aa832b079e88cd8a
+F generic/tclexpat.c 74c2baf09d7f2f869437891ac69eb1d086ee76eb
 F generic/tclexpat.h 62e83591b9fff070825add84310f7f7cc8cff3b8
 F generic/tdom.decls 7c024d1386ebc0eee7f70017554734b3926fa1fe
 F generic/tdom.h b43e499a66d269d87ae751faafa7d7f5584c58b7
@@ -174,7 +174,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P cf121768d4e7cb04c6bf595db58b44861f31924d
+P a0b24cf429020958ae01518cf0d2b8361f0b790f
 U rolf
-Z a6648edd6a40bb55da5d86ce8a32bae7
+Z 5fbda517fe5847cc1289da76b010593f
 # Remove this line to create a well-formed Fossil manifest.
