@@ -1,5 +1,5 @@
-C Added\stest\scase\swith\smark\sknownBug,\sto\snot\sforget\sabout\sthis.\n
-D 2004-01-29T19:25:10
+C Fixed\sa\sfew\ssimple\sparser\sseg\sfaults\sin\scase\sof\snot-wf\sinput.\sSee\nxmlconf/xmltest/not-wf/sa/022.xml,\sxmlconf/xmltest/not-wf/sa/042.xml\nfor\sexamples.\n
+D 2004-03-14T02:19:09
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog 10f1df5bbab386a8141fc1f948cea523d4885041
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -145,7 +145,7 @@ F generic/tdominit.c f927e44f28e0a31416be8724c19542000987b0fc
 F generic/utf8conv.c fc01b4776a82c937252a7d2593a3d244916905f7
 F generic/utf8conv.h e0d2756b2d77ad9a8508a0dcf7cce5e10fa4c9a5
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
-F generic/xmlsimple.c 1a7fad084c47bfd1d4adcf5ce3bee4111a0a7186
+F generic/xmlsimple.c 9097a7cd89317db7d2d31c14aba1adae412d73bd
 F generic/xmlsimple.h f2861868b0fed932c79f9e595bb875d261d97bd5
 F lib/tdom.tcl 932bb3d8da52466b68aa4e3a1e3d5e351459a437
 F mac/PrecompHeaders/CoreHeadersMach-O.c e4406d8c34fcaea82d21e62c35012893b460dfd5
@@ -227,7 +227,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 1b10c893024465676e313d1f50753ecbb95304e2
+P cbb29b4e519f0b07b3247ee777041c37d026c572
 U rolf
-Z e49301be3dad8d465c984e38e4160aec
+Z 6c6b37a0a6c254c7e0f45b7524682417
 # Remove this line to create a well-formed Fossil manifest.
