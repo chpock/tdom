@@ -1,7 +1,7 @@
-C Bug\sfix\sin\sthe\sxpath\slexer:\sIn\sa\sunion\sexpr,\sa\sNCName\stest\swith\sa\sname\nequal\sto\san\soperator\swas\swrongly\sinterpreted\sas\soperator.\n
-D 2003-10-22T15:33:47
+C See\sfile.\n
+D 2003-10-22T15:35:20
 F CHANGES 993140b623ef50267a92d858779d91eeaf39da4c
-F ChangeLog 2f37454cefc22ecbb4c702e790dcbaa81bc215de
+F ChangeLog e4f37587a21dc0938c00b439905272ac20175edb
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 155f1078496ba92db117a6d56903a4de7fddae21
+P c434fd2b4964779e441693d60cf8946d1a2b7404
 U rolf
-Z a0067e4397d350703084a212def49627
+Z 65006da12424ace9085b7f40681fff8e
 # Remove this line to create a well-formed Fossil manifest.
