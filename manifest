@@ -1,7 +1,7 @@
-C See\sfile.\n
-D 2005-03-21T01:08:54
+C Fixed\sspelling\serror\sin\slast\sentry.\n
+D 2005-03-21T01:10:50
 F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
-F ChangeLog 92847c0e168da1254dc180cea6d62d4485f5225e
+F ChangeLog 7cfc33a5df57fbb24011376806f55c8391d08a9c
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 793035f18fb2ad53394e3cda31222b9197e93a3a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -233,7 +233,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 96d301a67fce0c471cfcef0989a9551cf1c5d2b8
+P 65f6c924cfcdcd7eb7a8c703bc4493f39e2dc54a
 U rolf
-Z 6cbb9e946c73de99e62019d428f0459c
+Z 016deaa1f0b21655b808a09b7fbaacc4
 # Remove this line to create a well-formed Fossil manifest.
