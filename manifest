@@ -1,5 +1,5 @@
-C Fixed\sthe\sproblem\sof\s'changing\snode\sreferences'\sunder\ssome\ncircumstances\s(reported\sby\sWilhelm\sKlink).\sThis\salso\sdecrease\sthe\npossibility\sof\sa\spotential\sproblem\sfor\sextremely\slong\srunning\ssingle\nthreaded\stDOM\sapplications.\n
-D 2003-01-29T02:19:50
+C Fixed\sthe\sproblem\sof\s'changing\snode\sreferences'\sunder\ssome\ncircumstances\s(reported\sby\sWilhelm\sKlink).\sThis\salso\sdecrease\sthe\npossibility\sof\sa\spotential\sproblem\sfor\sextremely\slong\srunning\ssingle\nthreaded\stDOM\sapplications.\nFix\sfor\sthe\sproblem\swith\sownerDocument\sreported\sby\sOleg\sOleinick\s(see\ntest\sdom-29.1).\nFixed\sbug\swith\sCOMMENT_NODEs\swhile\susing\sthe\sasList\smethod\s(problem\nreported\sby\sRamon\sRibó).\sWhile\sat\sit,\salso\sadded\scode\sfor\shandling\nprocessing\sinstructions,\swhich\swas\salso\smissing,\sup\sto\snow.\n
+D 2003-01-29T02:21:38
 F CHANGES 2d549c07167571211eee81cd4de1f76b71a94680
 F ChangeLog 5b4d769299f996adfd122b4259d7a3b69dfa655b
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -170,7 +170,7 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
-F tests/dom.test de0588d1b47baf6853a52ca48362f6a8cd555ca3
+F tests/dom.test 72bc856165c03904d0105bed8598d7c25494b203
 F tests/domCmd.test cd4cfe75fefeb99ae04fdf88fe31dbfb35abfea6
 F tests/domnamespace.test 7023cb113cf156381218b303eddcde3822f40a48
 F tests/element.test feb714dae2010efc20dd12d4e7d7bc281b1a6ff4
@@ -197,7 +197,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 89d683fc46a8886a8b7ee1d15b016fc31fc6c19a
+P fdebe05f7123b6b25241d72e334bd79acecaf75d
 U rolf
-Z 9454476c9efeb27978798cea00109765
+Z 65959b71c87883aae6dd0d0a68d3c072
 # Remove this line to create a well-formed Fossil manifest.
