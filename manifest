@@ -1,5 +1,5 @@
-C mpatrol'ed\sand\svalgrind'ed\sthe\stests\sand\sfixed\sa\sclosed\sa\sfew\smemory\sleaks.\nCONSTyfied\stcldom_docTrace()\sand\stcldom_nodeTrace().\n
-D 2002-09-08T20:12:26
+C Code\schange\sto\spacify\sgcc\s-Wall.\n
+D 2002-09-10T13:47:22
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in ffb39c47ad2dfcd69eaf5b57b32d22998f74a491
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -114,7 +114,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c c861712d44896adcee7923f25c6c0de3c7156fd7
 F generic/nodecmd.h 0225d87d05a9afc2ce0d5baf8966b076ffa71405
-F generic/tcldom.c 15f30424cd59b8d5153c84c0ed32ee31e5ce48b3
+F generic/tcldom.c 3a38d05ca5e3d67b1d950f2a160de0a8e87310bf
 F generic/tcldom.h b06a092266deed3a050a824a8f1963b91e4c3649
 F generic/tclexpat.c 5920f376d971d29e33c6aa61249995e4a495aac3
 F generic/tclexpat.h 62e83591b9fff070825add84310f7f7cc8cff3b8
@@ -182,7 +182,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 1f8a0f0d1155a41c22d3d7e205579f7adeb5947d
+P 1e9eb8feafdd5e79e82e1f57fbc139b86c43ba66
 U rolf
-Z 90a5c276320b1970bc5a7e9c50000d65
+Z a8fd4c133229bc575e2024269321cce7
 # Remove this line to create a well-formed Fossil manifest.
