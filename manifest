@@ -1,5 +1,5 @@
-C See\sfile\n
-D 2003-10-17T08:46:29
+C Fixed\sdom\sparse\s-channel\soption,\swhich\sgot\saccidentally\sbroken,\sdue\sto\nthe\slately\sswitch\sfrom\sTcl_GetStringFromObj()\sto\sTcl_GetString().\n
+D 2003-10-17T19:32:41
 F CHANGES 993140b623ef50267a92d858779d91eeaf39da4c
 F ChangeLog 26f7b2dd39c238d4ded4f9bcd41b906efa144fe9
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -117,7 +117,7 @@ F extensions/tnc/tests/loadtnc.tcl 418f1bbca50993a9fe012728b50f0f8080cff2ab
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c 4eb5d817c334c641af2c76cdb7f30998b5c5b8ed
 F generic/aolstub.cpp 2ba5a8d1046b7d92c92917ad4e17f8d944b41167
-F generic/dom.c 970f05637edf62ae954b4bf3e1b3d6b0040ee6b2
+F generic/dom.c 131238c0158af9282356fe189b74d708e9cc5f48
 F generic/dom.h 573b6ffac46a793d9bb0a49d198bf1bb26626acb
 F generic/domalloc.c aa1ed647c34d707014f187fd6f68d7b87f97f791
 F generic/domalloc.h 5e94d96321fb4f926b6e2c8cf01b8a28c3d0be0f
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f06a13359160b10eb763fc03e28386ef9e8291ab
-U zoran
-Z 04093acb409a33bba8c3afdac3b7d5ba
+P ecba84b53464058523408294f2131dd9383b7ddb
+U rolf
+Z 9c487479c65a48e2ee14b41274328d32
 # Remove this line to create a well-formed Fossil manifest.
