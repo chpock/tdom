@@ -1,7 +1,7 @@
-C Bug\sfix:\sProtect\sagainst\sspaces\sin\sthe\spath\sto\sthe\spackage.\n
-D 2003-12-24T02:33:04
+C See\sfile.\n
+D 2003-12-24T02:47:46
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
-F ChangeLog 4ed6f219f5abb8a7a1d92eb0a5004bcc35a3c26d
+F ChangeLog a4379644214ec83ac552cef90f9677871ef87cb7
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 55e1868e1d480d30a962801cea5ae53d1858a238
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -227,7 +227,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ac8f1090e4a6ad782345c797dd1e504d7225a6d2
+P daa716781a7c36257e7433ecd74a403d1a23ef0c
 U rolf
-Z 2a539616ec991b313ff45ccf1242f81b
+Z 6a4e60b879cf536971f1ef0a9e274f99
 # Remove this line to create a well-formed Fossil manifest.
