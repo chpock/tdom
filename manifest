@@ -1,5 +1,5 @@
-C Updated\sto\sexpat\s1.95.6.\n
-D 2003-02-25T15:15:50
+C Applied\sproposed\spatch\sto\sinternal.h,\sto\sfix\scompiler\swarnings\swith\sgcc\son\ssolaris.\n
+D 2003-02-25T15:16:52
 F CHANGES bedaded2db2b4b9c98267dec8dcfb01261cfbb9a
 F ChangeLog 7bf375c7d0ed1c7d8fdf7e5fc43e00750fb964d3
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -64,12 +64,12 @@ F encodings/koi8-r.enc 366c137c02e069b1a93fbb5d64b9120ea6e9ad1f
 F expat/COPYING c124ddcfd75522fa37dbce65c3f675726f164528
 F expat/Changes 49a5dce399039aae0cfee235aa2891260b3d2d8a
 F expat/README 630eff768999e90d59c6e19784a5fb3db155bcb2
-F expat/VERSION aeaaf80e743fa5a27e367c67b7d317769d513ef7
+F expat/VERSION 051717be4392e0300e93a1574813233d00fc3e23
 F expat/ascii.h ca59dc7b044451fe67b2611a98b546aacc10acb8
 F expat/asciitab.h 67462447978f02b8a78ce7f054da82ec88e7ffa4
 F expat/expat.h ec620f8ba02e3b9841a450933c185c03e32f7dcf
 F expat/iasciitab.h efc1dd92a1a1173bde671c54ddc772e4ca3de340
-F expat/internal.h f5b57765a975ca801bed18257be7c6c091218a31
+F expat/internal.h c9fc11cd06a35f7252cd871164070bcbc227e0e7
 F expat/latin1tab.h a0655f4fc2de3cc5993319b0fcad636a906ca885
 F expat/nametab.h 7ebf9a02f20fe58ad2e6d0488acd620b1f534e9e
 F expat/utf8tab.h 4dc893a1f5286443647d5b5674774e13c8e21a11
@@ -200,7 +200,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a987fd45af5f7359475aebfccf9309ce0a7b427c
+P 272c05015d1531e6e6465cb30ec45cbe94f78821
 U rolf
-Z 715b0bb3e161ba7cf50e9d67c61c877f
+Z a975e3325f52e8750908711b69bcf4e1
 # Remove this line to create a well-formed Fossil manifest.
