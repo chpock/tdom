@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2005-01-06T18:21:27
+C Handle\smultiple\s-namespaces\soption\sto\sselectNodes\smethod.\sAdded\nmethods\stransform\sand\sdelete\sto\sxsltCmds.\sEnsure,\sthat\sdocuments\ncreated\swith\sthe\s[dom\screateDocument*\smethods]\sare\screated\sas\sdocCmds\nin\scase\sof\s'auto'\screation\smode.\n
+D 2005-01-06T19:20:44
 F CHANGES 5e1729ae568c08de4588a28d3584d862a29a2022
 F ChangeLog c3eab0bf57005202de1934c3230c3f5489f5e668
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -134,7 +134,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c bd617b5ad9643d207b2cbcae7c918df3db601af8
 F generic/nodecmd.h 93a8fe44e2d96e0a88fe2a94001e18c709ac7a81
-F generic/tcldom.c 8424cfb11a6ef1bfeb7ae8bc7e106556ae5e08ab
+F generic/tcldom.c 46ddaed5544c32b8aa9466abb3de06eb5186d9f9
 F generic/tcldom.h 06811d33cf15dffcd56ac13ef6d67d0309347442
 F generic/tclexpat.c d8f699c9b8ff51241879973d1778486e6314be12
 F generic/tclexpat.h 7ea0c8992809e1325c901821bc63831431e2c9f2
@@ -230,7 +230,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 330a5b833e5732efa8061c3bb5304b32bd3e7fa9
+P cab4e74d398f39ca40066458acc70615b0af1fa5
 U rolf
-Z de041b5e74d7927773eaa2331cfc2006
+Z 1db5f45594dead4a66e70c6169b535c0
 # Remove this line to create a well-formed Fossil manifest.
