@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2005-02-03T18:44:20
+C Fix\sfor\sMT-enabled\stDOM:\sIf\sa\sdoc\swas\sattached\sto\smore\sthan\sone\nthread,\snodeCmd\screation\swas\sborken\s(only\sone\sthread\sgot\sa\snodeCmd\sfor\na\sgiven\snode).\n
+D 2005-02-26T13:25:19
 F CHANGES 877db3f7a6fd1a5175636e84125230f5949491ac
 F ChangeLog f19bf4b901cdb92279d40425c619a75d9d18c2e0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -134,7 +134,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 4e92b088222b049473583333f60fdce7cc2e2132
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
-F generic/tcldom.c b23c346cc4ec17611375b6d63caa03c13ac65a32
+F generic/tcldom.c 7fe8137cb966799d74b56a8df41e25cc40454ca4
 F generic/tcldom.h b1b1f6662c83849fb067d294d9d53bba6c07c22c
 F generic/tclexpat.c 02f7be81d9f98333b0b44b56dfdfb7af2bc7dfa6
 F generic/tclexpat.h 7ea0c8992809e1325c901821bc63831431e2c9f2
@@ -233,7 +233,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 68ef504f345477fe7a49112ff72214ae924a02ea
+P 5cff7b495c112fd679c82ecb95a3a77d6ce24cf2
 U rolf
-Z cbbc08bbd689e59e8c9b1d8ab8e4193b
+Z 0e09c6fdc8813f4aca81d186bad13ac8
 # Remove this line to create a well-formed Fossil manifest.
