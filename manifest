@@ -1,5 +1,5 @@
-C Better\smemory\sclean\sup\sin\scase\sof\serroneous\sXPath\sexpression.\n
-D 2002-10-02T00:14:48
+C MutationEvent()\sis\sa\sdefine,\sthat\scurrently\sis\sreplaced\sto\sa\snoop\sby\nthe\spreprocessor.\sThey\sare\sa\spreparation\sfor\sDOM\s2\sevents.\sThere\sisn't\na\scallback\sto\stcl\slevel\sfor\sthem,\sup\sto\snow,\sbut\sJochen\sclaims,\sthat\nthey\sare\sat\sthe\saccording\splaces.\sRemoved\sa\serroneous\sMutationEvent(),\ninserted\sby\sme.\n
+D 2002-10-09T00:26:16
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 2086eca836d27f5319bc34c0c379fc1009993adf
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -99,7 +99,7 @@ F extensions/tnc/pkgIndex.tcl.in 37901ed24e06da45c7d7a17f255b6108925400f8
 F extensions/tnc/test.tcl efade8bcb9fd9e269ed5c259f3edf182bc917b72
 F extensions/tnc/tnc.c 08d7f3ff9a212f64311a44039da39b502d2da711
 F generic/aolstub.cpp e543ab5dfe8a4b7349cb11a40f13bf57d7ad7cc2
-F generic/dom.c cfaef2ebcccf428cf024ce54c1c7d91913f615e7
+F generic/dom.c 64bd25974ee7bf3b796eccf326e0dd3debcc58b9
 F generic/dom.h 340b76c40ea24e275e8b130aec63228b69cf0e47
 F generic/domalloc.c e6c09323b608d1ff59bf7a1d5f8e66641be98ab8
 F generic/domalloc.h 5e94d96321fb4f926b6e2c8cf01b8a28c3d0be0f
@@ -182,7 +182,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P e8db0b1af9538b673c8608f409171d91db29d3d9
+P cee59158674f7d96b3b257ec74e797d65816ddfb
 U rolf
-Z 318b491947af1816e93fd0a59cb95614
+Z 82715ded9966876d37d7ffde5ba8d80c
 # Remove this line to create a well-formed Fossil manifest.
