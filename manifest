@@ -1,5 +1,5 @@
-C Remove\sit\n
-D 2004-05-26T14:41:43
+C Test,\sif\sa\snon-mt\stDOM\sis\stried\sto\sload\sinto\sa\smt\stclsh.\n
+D 2004-07-09T01:15:56
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog 96e6b5492b56580fc349d2cb916ee7096dd15e56
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -141,7 +141,7 @@ F generic/tdom.h db128152fac506159243e47cb3a77cc7d9fe4360
 F generic/tdomDecls.h fc2a07f8db9c4c2c1d06322fa82dd27d92e947f9
 F generic/tdomStubInit.c fa037218373f882436fe5b3779bac64ec84f1fba
 F generic/tdomStubLib.c 5a19b7ad0cdf0464cfd1e10d8b2000c13b5ee4fb
-F generic/tdominit.c f927e44f28e0a31416be8724c19542000987b0fc
+F generic/tdominit.c e9cf80d0d379492e409bf1686aa4d6aaa142ac52
 F generic/utf8conv.c fc01b4776a82c937252a7d2593a3d244916905f7
 F generic/utf8conv.h e0d2756b2d77ad9a8508a0dcf7cce5e10fa4c9a5
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
@@ -228,7 +228,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P d5704fb73ece15c49e420915d99f6533e2804187
+P 7a9789ba15da80f1b9a1ee559682066f424ce9ea
 U rolf
-Z 88311c3da2208617d43a27773b475989
+Z e94760c774d255f45e68bc39cf0f4d7e
 # Remove this line to create a well-formed Fossil manifest.
