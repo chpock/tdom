@@ -1,7 +1,7 @@
-C insertBefore\smethod:\sFeature\senhancement:\sIf\sthe\srefnode\sis\sthe\sempty\s\s\s\s\s\s\s\s\sstring,\sthe\snewNode\sis\sinserted\sat\sthe\send\sof\sthe\schildren\slist\sof\snode.\n
-D 2003-09-22T01:04:48
-F CHANGES fe6ea1684f6c197dca0608948aee32f3da6616b0
-F ChangeLog a1e0fdd0972c183065e68afcbba49c7fc4e3f690
+C See\sfile.\n
+D 2003-09-22T01:05:38
+F CHANGES 813a168a7b86886b7d8988978f2ae6a85e2f0663
+F ChangeLog 7318fb3faf1f1003d8f76a1f1ce210e768c98702
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 9fe9d5783c508826425cc831636a172aa1716be3
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ee928a0701951bf40b7123775ad3a2c97e363ae8
+P 67b8a9f3b019500ecb8a20ee5585616cac0d796f
 U rolf
-Z e0dfa57979edfcfc2bdcb49064654434
+Z 07c7d9404ea09e1e7d3ccb4536703aa6
 # Remove this line to create a well-formed Fossil manifest.
