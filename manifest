@@ -1,5 +1,5 @@
-C Improved\s::tDOM::xml(Read|Open)File.\sNow\shandles\salso\sutf-16\sfiles\nwith\sBOM\sright.\n
-D 2003-02-26T19:11:13
+C Made\ssome\sfunctions\sstatic.\sRemoved\sa\sTODO\snote,\swhich\salready\swas\ndone.\sImproved\ssome\serror\smsgs\s(now\swith\sline/column\sinfo,\sif\navaliable).\sBug\sfix:\sxsltXPathFuncs\smust\sreturn\s-1\sto\ssignal\serror,\nbecause\sif\sthe\ssource\sof\sthe\sfunction\scall\swas\sinside\sof\sdomxslt.c\sthe\nresult\scode\s(rc)\scheck\srule\sis\src\s<\s0.\sFixed\stext\sin\sa\sxsl:attribute\nerror\smsg.\sFixed\smemory\sleak\sin\serror\scase\sin\sExecAction,\scase\nforEach.\sAdded\sa\smissing\sresult\scode\scheck\sin\sExecAction,\scase\nprocinstr.\sBug\sfix:\sEven\sliteral\sresult\selement\ssubtrees\sare\srelevant\nfor\sxslt\svariable\sscope\s(default\scase\sof\sExecAction).\sBug\sfix:\sthe\nexpression\scontext\sof\sthe\smatch\sexpr\sof\sa\sxsl:template\sis\sthe\nxsl:template\snode.\sNow\sthe\sxslt\swhite\sspace\sstripping\sis\sdone\sbefore\nthe\stop\slevel\sprocessing\s(was\sdone\safter\stoplevel\sprocessing).\n
+D 2003-02-26T19:43:41
 F CHANGES bedaded2db2b4b9c98267dec8dcfb01261cfbb9a
 F ChangeLog 5dd688f224febae607f2ec588f99c95c466f2e4f
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -124,7 +124,7 @@ F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c dba7e77190826af093bbb0c4dc1f858687ef5983
 F generic/domxpath.c 2ed7412802fb55430d2060a0255ae9cd01aed629
 F generic/domxpath.h 2bbf18428f0a934a95d4262bd352cdfe4937e9cb
-F generic/domxslt.c b0edfd2bac9d3d7c978d524629971dea528cc57a
+F generic/domxslt.c 5e7f9ff6ac49c113aeefcfe7df9f0cd6889255d5
 F generic/domxslt.h b60468a7092d4d5712b4a8776f3db51d4c03aa04
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -200,7 +200,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 34d56d9c5f732b52c34559706b5e7046252312c7
+P 858ccf022d5402499b07749956686501a608e624
 U rolf
-Z 49367b72b841eedaa06704fc3aa45607
+Z b29183033623ecdff53ba979245f787a
 # Remove this line to create a well-formed Fossil manifest.
