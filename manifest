@@ -1,7 +1,7 @@
-C Empty\sCDATA\ssections\sshould\snot\screate\sa\snode.\n
-D 2004-07-13T03:27:53
+C See\sfile.\n
+D 2004-07-13T03:28:51
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
-F ChangeLog a2315dd4e4753dd69c38dbf949df0a4fa7c71e60
+F ChangeLog cb72ab799c15eed8d96e9379cc7d9f9f0a691bb1
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -228,7 +228,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 82e6cb11bf76318a7c38e2f2fdd2020e6aee31f6
+P 3c4659e86a44f4c8d6075d1e48b2429d33cc1d86
 U rolf
-Z 70a25a9e544c082aae10ed7cec9e2415
+Z e2fac7458d622966ff8ea4d012440b69
 # Remove this line to create a well-formed Fossil manifest.
