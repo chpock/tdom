@@ -1,7 +1,7 @@
-C Also\supdated\sto\sverson\snr.\s0.8.0.\n
-D 2003-12-08T01:50:30
+C See\sfile.\n
+D 2003-12-08T01:51:02
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
-F ChangeLog 532d84b924de426e40175a7a534ddfff9bf7f3e9
+F ChangeLog f5d0a8859bffbc2ea2468f42cd01b5fd916e9528
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -227,7 +227,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 602a50247f60651e59e40b6433d4e109894ba42c
+P 9b0188eac70ac2e31aa1f29c1ed9f7de2b594088
 U rolf
-Z c6180a7924384e46de5c6db7eddab417
+Z ea21020828dc8373b8c9d9bdeb845c99
 # Remove this line to create a well-formed Fossil manifest.
