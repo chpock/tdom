@@ -1,5 +1,5 @@
-C Added\snew\sTEA-3\sbuild\n
-D 2005-01-16T11:56:31
+C Loads\s0.8.1\sfor\stesting\n
+D 2005-01-16T11:56:54
 F CHANGES 877db3f7a6fd1a5175636e84125230f5949491ac
 F ChangeLog d475c3c7254885be92d3944c5ccfef19758bb6f9
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -208,7 +208,7 @@ F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
 F tests/htmlreader.test cc8fc7f538aa629d8b81d148c7523ec878e7696e
 F tests/i18n.test ad68655284ea0bf4f2c5a0acc098fd05587ba9a4
-F tests/loadtdom.tcl 5e53e167c862051202df871ba249ab502e0ba38d
+F tests/loadtdom.tcl 409376620daf31ea4f4f723c9920a867b4b18ffa
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
 F tests/parser.test ed2b78a1a4d6bca9f7e27154c2bbb4d3fb9aa734
 F tests/pcdata.test b1f5a31beb149eef4b7e2a9b75cd571ca271dc82
@@ -233,7 +233,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 9b10717c76605a23040990f9ef7e68fba826dc95
+P 2707d1eae677209f9b28039c02239ca409283983
 U zv
-Z 8d84bb55962fa8fff55d27f4e519e8fe
+Z 3ffa00bbf20376774d2c7aed89cbdb4c
 # Remove this line to create a well-formed Fossil manifest.
