@@ -1,5 +1,5 @@
-C Fixed\ssmall,\sobvious\sbug\sin\sDBG\scode.\n
-D 2002-03-08T23:49:25
+C Introduced\sdistinction\sbetween\sXML\sName\sand\sXML\sNC\sName.\n
+D 2002-03-10T01:14:57
 F apps/xslt.tcl e5c0a837a82ddf0aa21ddb51d5891acfd64469fc
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html c21ddc9a115a8a82ee1560949dc08a1bc41233b6
@@ -92,7 +92,7 @@ F extensions/tnc/tcl.m4 9404ac273b962ddaf946d3170c5183e55d0984b3
 F extensions/tnc/test.tcl efade8bcb9fd9e269ed5c259f3edf182bc917b72
 F extensions/tnc/tnc.c 88ead51574461280693295eaa7a483afd6f7b497
 F generic/dom.c da7230e56a938da1f4312e93235299881b77b19b
-F generic/dom.h 908a024a7ad6997789d3ff3acec9637ed2fc294e
+F generic/dom.h e2e6f982baa462d097ba429810834c1530b2f24f
 F generic/domalloc.c 9fd035f9fe601d2ed6ea00eef448f3165e8e54c5
 F generic/domalloc.h 2c5c6412831ffaff02d2a2d969adddbede8752b6
 F generic/domhtml.c e8cda5580aa8c3fe08e9f432a8482dd667c22e6e
@@ -157,7 +157,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 916956c205b68895a3a39aa513f0f3eec7a58472
+P 6c5f7872945f6c918750ed36c29a049817c0e198
 U rolf
-Z 37cd53fffe77afc3f3fc6e8cc6b11e9e
+Z fdb73c3c78bece2e4078f98a8a150dd4
 # Remove this line to create a well-formed Fossil manifest.
