@@ -1,9 +1,9 @@
-C Forgot\sto\sremove\ssome\stesting/debugging\scode...\s:-(\n
-D 2003-10-10T00:25:42
+C Fixed\spkgIndex.tcl\sproblem,\sif\sthe\spath\sto\sthe\spackages\scontains\sa\nspace.\n
+D 2003-10-10T20:04:00
 F CHANGES 228acdbe3e0f22f66f131cd33f2aaa77c06c5e8d
 F ChangeLog a2aad8f9549819ac8df8a2444e05abeab045289d
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
-F Makefile.in 9fe9d5783c508826425cc831636a172aa1716be3
+F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
 F README 5a9c069dee183889e8d81ad355f5091ac97a1a5b
 F README.AOL 6b124cc7a7cae5fa901b9a2996dbdc5fe4085ba7
@@ -101,9 +101,9 @@ F extensions/tdomhtml/doc/tdomhtml.n da39a3ee5e6b4b0d3255bfef95601890afd80709
 F extensions/tdomhtml/doc/tdomhtml.tmml da39a3ee5e6b4b0d3255bfef95601890afd80709
 F extensions/tdomhtml/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F extensions/tdomhtml/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
-F extensions/tdomhtml/pkgIndex.tcl.in 63e36434ad491fe623737011f30da9cf4e93b735
+F extensions/tdomhtml/pkgIndex.tcl.in 2612d2a8fd5a213a1379ad5570c229d82810dcb5
 F extensions/tdomhtml/tdomhtml.tcl 7d48c19d50f203ee71b3db15d0fc6077dc244798
-F extensions/tnc/Makefile.in 99fad5a4c3d54725e916bf78c313c2c8a56f03c2
+F extensions/tnc/Makefile.in 30472c194851090b3d1db0459d90ad9dff2c1ae8
 F extensions/tnc/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
 F extensions/tnc/configure 0940b5d6ed055f3b5cfe57f8f7a9b48781c68495 x
 F extensions/tnc/configure.in be5144eab010e85e74dec0e86f64a1c41771b48b
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P b614d3201e9d6d773b0e02cf00fb365e40894e92
+P 35c8ac326990f4de574f2d0e2656cd2d60cf6526
 U rolf
-Z 7a3b17d1a162810d098e98d9d4dfe745
+Z 3824069f666cc7517e836ce2d62259ce
 # Remove this line to create a well-formed Fossil manifest.
