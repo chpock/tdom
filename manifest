@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2003-12-11T18:42:34
+C Made\stest\sresults\sindependent\sfrom\sthe\s(undefined)\sorder\sof\s[array\nget].\n
+D 2003-12-14T18:45:11
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog fdb32998259663fb487903a8470b0cf39f73bfb0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -176,7 +176,7 @@ F tclconfig/tcl.m4 797c9763056f87d41c4c1ab39b4a9128b9648143
 F tdom.m4 6362938e20f54b2a5ad0d4c112d3653f627270d2
 F tdomConfig.sh.in bb068ad78eefdd9a8554f970b7266c78e976df0b
 F tests/all.tcl a8d5d3e3adc6713f64d0c614b927bd21ca8df870
-F tests/attribute.test 680563462d618d04d11b77fb6baf3073a77fc5c1
+F tests/attribute.test 53ac8fb043e79b638c8c6f5e7da848f6103552d6
 F tests/cdata.test 5a1dc3bee6353700186d12f0d11b15914849c6be
 F tests/comment.test 25ac780959e2c7220d3e92dac01dd5e14fd4acaa
 F tests/data/REC-xslt-19991116.xml d86bd1efbc1f810b2a6f74c0c182bd37ae5ee09d
@@ -227,7 +227,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 56ba5cea1cf9d67538f6cd27a340559d75177b1a
+P fe4f52e7bb69c71cae235d56aa4807dea4098f15
 U rolf
-Z 870a684d5ff607beddb4cbe35d7d6931
+Z 0a76735504fe1ef440fbf068ee5656bb
 # Remove this line to create a well-formed Fossil manifest.
