@@ -1,7 +1,7 @@
-C Globalized\sthe\smacro\sIS_XML_WHITESPACE.\n
-D 2003-10-26T02:01:50
+C See\sfile.\n
+D 2003-10-26T02:02:26
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
-F ChangeLog 24024647c2dd073540d6957c003836ee7f807e70
+F ChangeLog fed070a9e9174c29ea0dbb9b0325e6a8fa7337d4
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c6a0b5c30cbf94c33b38baef9a43ebdb6efc5dc2
+P 3395bc4dafe23bd080c308ce4f74fc3223f200c2
 U rolf
-Z 9c028359d73bcfb630136a8dfc7ab742
+Z b9f9483c8a86fdb66581a0470724a91f
 # Remove this line to create a well-formed Fossil manifest.
