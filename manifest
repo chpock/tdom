@@ -1,5 +1,5 @@
-C Removed\sTEA_INIT\sbecause\swe\swo\snot\sneed\sit\sfor\sthis\sminimal\smake\n
-D 2003-03-06T15:52:06
+C Cosmetic\n
+D 2003-03-08T09:27:13
 F CHANGES bedaded2db2b4b9c98267dec8dcfb01261cfbb9a
 F ChangeLog e33b75fd6613da2463da411bff8394ab3fb047cd
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -167,7 +167,7 @@ F mac/tDOM.r ac612e0e6bfb3a5637405948874f66d791a6deb1
 F mac/tDOM_OSX.prj.xml b73b6b1a1bcff740a6bc35f23a6e500a440a1716
 F mac/tnc.exp b5221cfee6631ca94e46626dcd5c54e7e9cde7ba
 F mac/tnc.r ef16947539a71667d8a2e9d801399489c6c60dae
-F macosx/README 691a736d3e9a6c9c956e96be30c1a3b03e02da4b
+F macosx/README 00dec2531e5e466a5fab02bf2e5cfb3ca0ea650e
 F tclconfig/ChangeLog 16d950c5f3b8b048a77b9671f3705d360f226759
 F tclconfig/README.txt c7a8a24b2782cd897a7608813161611f8e0521a0
 F tclconfig/ac_c_bigendian_cross.m4 d42e2f20b8ea4df7c29a8595f10489bfaab58096
@@ -223,7 +223,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a0757227e3fa67518ff368ac2a48018a3b04b896
+P 817310aa7023da3935d22b4ade37ef73ecbebe4f
 U zoran
-Z c6c6e6623e5d609cd7076a7386fefa67
+Z feb4f28dc656146983d531d4f27fdf10
 # Remove this line to create a well-formed Fossil manifest.
