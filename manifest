@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2003-06-13T10:38:43
+C Added\scget\smethod\simplementation\sfor\sall\sparser\soptions\swith\sthe\nexceptions\sof\s-namespace,\s-useForeignDTD\sand\n-paramentityparsing.\sRevamped\sbehind\sthe\sscene\scode\sfor\shandling\sof\sthe\n-elementstartcommand,\s-elementendcommand\sand\s-characterdatacommand\noptions.\sUp\sto\snow,\sthe\sarguments\sto\sthis\soptions\smust\shave\sbeen\sthe\nname\sof\san\salready\sdefined\stcl\sproc.\sThis\sallowed\sa\sspecial\shigh\nperformance\scalling\sof\sthat\sprocs.\sThe\snew\scode\sbehaves\sexactly\sthe\nsame\sway\sfor\severy\sscript,\swhich\sworked\swith\sprevious\nversions.\sAdditionally\sit\sallows,\sto\sspecify\sa\snot\salready\sdefined\stcl\nproc\sand,\sprobably\smore\simportant,\sallows\s'arbitrary'\stcl\sscripts\sas\nargument\sto\sthat\soptions.\sAll\sin\sthis\scheckin\sin\sthe\swork\sof\sHarry\nMoreau\s(hmoreau@online.ie).\sMany\sthanks\sfor\sthis\scontribution.\n
+D 2003-09-14T00:17:32
 F CHANGES 59cab3c950a08a20053aa26b3a8718c6efa8c913
 F ChangeLog b855d620581b3e61772fc7e47b1bf4c46675d005
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -134,7 +134,7 @@ F generic/nodecmd.c c2fe5b784c2ad83c904edd3d82050b8f7c7fc444
 F generic/nodecmd.h 20210ad9b4a3bdd6055175beca7bfdd8bd318a3f
 F generic/tcldom.c c9511c84f1a333adb08c606f9aae1f20b0d98a2c
 F generic/tcldom.h 1c21383eabe24ac9bea93e4f5c66f9a64a7b68d1
-F generic/tclexpat.c c42fe2f39afcbb1c68050585fd45f939c0eac21f
+F generic/tclexpat.c e02830a8d37eea3de97440e9ecbad98b8f15cce7
 F generic/tclexpat.h 62e83591b9fff070825add84310f7f7cc8cff3b8
 F generic/tdom.decls 760ad3234a869b8191436bd53370b812266d98d5
 F generic/tdom.h db128152fac506159243e47cb3a77cc7d9fe4360
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 936d29eba13256e52dff9e9bbd6bcc4d7a921bee
+P f1436a6ee988b26d4e7ce9bc2450ea858eba8326
 U rolf
-Z dccb44853019ac5b5d44a113d5d1e687
+Z 9951027351e5e11ed49f1a22383caffb
 # Remove this line to create a well-formed Fossil manifest.
