@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2003-03-26T01:16:22
+C Improved\sinteral\sfunction\sreportError(),\scan\snow\sbe\sused\swith\sall\skind\nof\snodes\snot\sonly\selement\snodes.\sImproved\sbehavior\sin\scase\sof\sdubious\nnumbering\s(negative\sroman\snumber\sor\slatin\sletters\sfall\sback\sto\sdefault\nlatin\snumbers).\sFixed\sa\spotential\smemory\sleak\s(in\scase\sof\soverwriting\nnamed\stemplates\swithout\smatch\sattribute\swith\san\sother\snamed\ntemplate).\sImproved\serror\sreports:\sfor\smore\sdetected\serrors\sthere\sis\nnow\sa\sline/column\snumber\sgiven.\sPlenty\sof\simprovements\sin\sdetecting\nerroneous\sstylesheets:\smore\schecks\sfor\sformat-number\sformatting\npatters\s(although\sespecically\sformat-number\spatterns\sare\sstill\sa\scan\nof\sworms),\sadded\sparameter\snumber\scheck\sfor\sadditional\sXPath\sfunction\ncurrent(),\stemplate,\sparamter,\svariable,\ssort,\schoose,\scopy,\sand\nmessage\selements.\n
+D 2003-04-03T23:05:19
 F CHANGES ca483fbc7c627b68977fc3eb6cf6798f42bca33c
 F ChangeLog 9b46402cfd3e183119ed8fc82e897a951b9f7c1f
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -126,7 +126,7 @@ F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c dba7e77190826af093bbb0c4dc1f858687ef5983
 F generic/domxpath.c 2ed7412802fb55430d2060a0255ae9cd01aed629
 F generic/domxpath.h 2bbf18428f0a934a95d4262bd352cdfe4937e9cb
-F generic/domxslt.c 678dca48e13921d44ddb8a84d8770d90ab7532a8
+F generic/domxslt.c ffaecff98792a2266ceb73048ffa791a64efefff
 F generic/domxslt.h b60468a7092d4d5712b4a8776f3db51d4c03aa04
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 3e4fa7daf1ce176d8a220eec24c617fd2f4573e8
+P 8a74cc4c0cc100f2086230432ea501b3f34efd8a
 U rolf
-Z 64acea09557544a616007f2d8f56dd27
+Z 64527ab1532e589d1040ab74edcf73f3
 # Remove this line to create a well-formed Fossil manifest.
