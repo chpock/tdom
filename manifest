@@ -1,7 +1,7 @@
-C Using\sof\sa\snode\screating\scommand\soutside\sof\snode\scontext\safter\sthat\nnode\screating\scommand\swas\salready\sused\sin\snode\scontext\sdidn't\sraised\nerror\s(as\sit\sshould)\sbut\scould\shave\sall\skinds\sof\seffects\s(including\nseg\sfault).\n
-D 2005-03-11T18:16:47
+C Fixed\smess\screated\sby\susing\stwo\sdifferent\scheck\souts\sand\scommiting\nfrom\sboth\swithout\ssyncing.\n
+D 2005-03-13T00:48:09
 F CHANGES 877db3f7a6fd1a5175636e84125230f5949491ac
-F ChangeLog 68bf632f053ba5c9e5f9508f8abc567f572b35e5
+F ChangeLog 3e962872e1fffd037c0a9affa6ae41a32f13ebce
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 793035f18fb2ad53394e3cda31222b9197e93a3a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -233,7 +233,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 65002a1a5a0edff4f9ae30a29d6637d3650cd91b
+P 4d169116f2b52ba6a4998a677c6a5fe7eef22f88
 U rolf
-Z 1efc85756bf2ce79c29689bb3ac991c8
+Z c7cc847f686c18b883c4c51013703484
 # Remove this line to create a well-formed Fossil manifest.
