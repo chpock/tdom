@@ -1,5 +1,5 @@
-C Closed\sa\sfew\smemory\sleaks.\n
-D 2002-06-10T01:02:53
+C Mainly\smade\sxsl:decimal-format/format-number()\ssomewhat\swork\s(no\suser\ndefined\sper-mille\ssign\sat\sall\s(and\sno\sdetetection\seven\sof\sthe\sdefault\nper-mille\sspecial\schar\sfor\stcl8.0\susers)\sand\sonly\s7\sbit\sASCII\schars\nfor\sall\sother\sspecial\schars,\sbut\sat\sleast\sthat\sseems\sto\swork,\swith\nchanged\sdefault\sdecimal-format\sand\snamed\sdecimal-formats\sand\snamespaced\ndecimal-formats\sand\ssuch\sbells\sand\swhistles.\n
+D 2002-06-10T01:03:43
 F apps/xslt.tcl aceffee1914d4bf9b7a6a0a0a4b66fa7c4991fd5
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html c21ddc9a115a8a82ee1560949dc08a1bc41233b6
@@ -101,7 +101,7 @@ F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c d9240199412977604216263b92312b9da7acd6f4
 F generic/domxpath.c 3af9eccbba9e200d703d49a4890b962d35721a22
 F generic/domxpath.h e5f1bed4326a5b5b80b8e7c2ce514c0739683683
-F generic/domxslt.c 7c6cb9a5b22ae1fa6b625a5c7c57deb172b0ef19
+F generic/domxslt.c 775e33de19a9e0b153835dc302f8c6103660d918
 F generic/domxslt.h 77d19235cbf254d3ba46ae28088fdcbf98a4856a
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/nodecmd.c 0b9510a803b645bcad838571678ba31fab284835
@@ -174,7 +174,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c38384c9fa03e8aab61d48ddd38c82c88fd52337
+P 4c0c694345fe9d47e14100a68b282c9dc21d21c5
 U rolf
-Z 95fc8b5741f1c973951320aa69cb2fc7
+Z d3ac85fc08579ff251e1fa0394bece00
 # Remove this line to create a well-formed Fossil manifest.
