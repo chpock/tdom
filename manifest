@@ -1,5 +1,5 @@
-C node_usage\sand\sdomObj_usage\supdate.\n
-D 2002-10-30T15:54:31
+C Added\sproper\scast\sto\sarguments\spassed\sto\nFREE()\smacro\sto\savoid\scompiler\sbarking\sat\sus\n
+D 2002-10-30T17:13:24
 F ChangeLog add1ef7c35d71956cfbd4e6d3f9ccb4ffef1dd42
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 66936cbfa9580e3037d502f2e1d73aa112ed46d6
@@ -110,7 +110,7 @@ F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c 6ccd7856d011fd273b9f613d62a6790b7d9e93ab
 F generic/domxpath.c 970c96ee15982d5c3f1050979b48b7d71f21c1eb
 F generic/domxpath.h 4e113d912e5840da684d1fa341739f25051d37f1
-F generic/domxslt.c fb850461d3604b40819881e88b01d533e1845208
+F generic/domxslt.c 16a23d52f4ef34ae76929ffed66f72fec9e4ab80
 F generic/domxslt.h 77d19235cbf254d3ba46ae28088fdcbf98a4856a
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -185,7 +185,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 17581ec1e5314f05f6c39ecd815206cbf849502e
-U rolf
-Z c4b6561c7950758bf4be749b7cad14e0
+P f6c9b37856aaa6dbad9d0197796853237798b94b
+U zoran
+Z af4017707716e2a502c8b9d01eaef3d7
 # Remove this line to create a well-formed Fossil manifest.
