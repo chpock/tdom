@@ -1,5 +1,5 @@
-C Corrected\sindentation\sof\sthe\slast\sfew\sentries.\n
-D 2005-01-11T16:02:10
+C Added\sdocumentation\sfor\sthe\s-cache\soption\sof\sthe\sselectNodes\smethod.\n
+D 2005-01-11T17:59:43
 F CHANGES 877db3f7a6fd1a5175636e84125230f5949491ac
 F ChangeLog d219db42368843ec9aa5173474777ecf1593e208
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -17,12 +17,12 @@ F doc/category-index.html 2e1a41b03d31f42dd00a0c449f7f28db6227bbf2
 F doc/dom.html b7bab0b6e2a570ef036e155a712d2da498c1842a
 F doc/dom.n 8e1b80d9fc9efb0724cb965de18ef09ed3b19d1b
 F doc/dom.xml 9dbbb9372f400918b3955fd411db4f8e0c9ab8a1
-F doc/domDoc.html 7f2b6520e0375a25fa462167b59682d9fa29a2e5
-F doc/domDoc.n a2e8bd7cc247c3d697d19be878d216e7af5d36f1
-F doc/domDoc.xml f7d294f3a00e287014ea6f6f5c1f6d211c20435f
-F doc/domNode.html b98d8202b425a685defb1b04a2f0934090b1bf6f
-F doc/domNode.n b77b8956ecb88987058b82c567673f858476fd75
-F doc/domNode.xml 07d12f29349ebe032f814db194955cb55c97ce9b
+F doc/domDoc.html 6155aca39a7daf882e766dfcaf3fdd839de9ac92
+F doc/domDoc.n 8c273b8f40a33d1fa0d1a449a6e9b477ef718bd0
+F doc/domDoc.xml f00cc350850f16cf7e912913adcee008108b36bb
+F doc/domNode.html 106e7f43b16584cc3a48aa514ab609fca3930853
+F doc/domNode.n be69a96717bcfdd7691156ca94ae3568dbe2197e
+F doc/domNode.xml 8ca6c9b2434a728b44c17da594a097432f2c597a
 F doc/expat.html 257cc19bdf9df4e798bf4f7c6932332de983f81f
 F doc/expat.n d56bf5542ba2ae06e3850e75647a1931176df0a0
 F doc/expat.xml c1d7ffd536814ddcd137be95aa366cae5ad69a32
@@ -233,7 +233,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f55a568a01e0ad4abe79cd9ebab92d95f52d75c2
+P 160537cb1407983df8bd0a1a33995749a7b45fc4
 U rolf
-Z 652ded70c29c3ef06e79a55ad0858b1c
+Z 0c572e5d0e6fe83f9bad8cd1dd5e4365
 # Remove this line to create a well-formed Fossil manifest.
