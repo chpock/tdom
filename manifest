@@ -1,5 +1,5 @@
-C Minor\seditorial\schanges.\n
-D 2004-05-08T19:32:11
+C Changed\scvs\skeyword.\n
+D 2004-05-12T02:11:08
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog 8cbbf5d3d02f33f3a3884a02015af3b936fe3609
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -8,7 +8,7 @@ F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
 F README 5a9c069dee183889e8d81ad355f5091ac97a1a5b
 F README.AOL 6b124cc7a7cae5fa901b9a2996dbdc5fe4085ba7
 F aclocal.m4 79e2f4aa6a138371f2d31f28355749e5019d7651
-F apps/xslt.tcl ec09198fbb0ec5adbacc5994b3ef2e4a9ce09790
+F apps/xslt.tcl d9e382b86b89d59f65ca36f5571b47a91ce46d7a
 F configure d12ff589d122ae45870aac8c7fa163786161e22a x
 F configure-tcl8.0.5 a5d0c7988aaf04fb2fbba0746f84895b2b3f58de x
 F configure.in 4ea3774cd8870c2d58c9b2feb1441525d40bc49f
@@ -227,7 +227,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 4c171a2964e54ec36db480e186a7b1fe9ac737bf
+P 4716dc798af0a165efbb376fc7a751cb532ef1ed
 U rolf
-Z 5ef22f95fe176012a145ce13b55dddcf
+Z aef632413dbc3eedcdb6cd0aabb2f764
 # Remove this line to create a well-formed Fossil manifest.
