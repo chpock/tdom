@@ -1,5 +1,5 @@
-C Updated\sfor\s0.7.6\srelease.\n
-D 2003-03-22T16:27:00
+C tdomstub_BUILD_SPEC\smust\spoint\sto\sthe\splattform\sspecific\sbuild\sdir.\n
+D 2003-03-22T17:46:36
 F CHANGES 87334aee80e9af7a72560e564ddddb7bf97ca551
 F ChangeLog a67b8121cbc68d48ca423e30af3afcd44fd88557
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -11,7 +11,7 @@ F aclocal.m4 79e2f4aa6a138371f2d31f28355749e5019d7651
 F apps/xslt.tcl 33eaaf45b831e6613d528156f7f1bbc02fd9f849
 F configure 0e684e95dfe1421a478b3db65129b9434b3d2cf4 x
 F configure-tcl8.0.5 05c691afaaaf2ff24701a2d3ef6f40054290e26b x
-F configure.in 572e97dd3cf3297adc2ac6cf48242cb1f76c6d0c
+F configure.in 53af592839e8607fb56e5c21aee485521b167818
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html 83dd89d7972b00d2ed5b69383747ff93d586bbc9
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 437ff62f6712bdc524e0deec596a93477a7581cf
+P ba1800a649a099c15d47fb94beb9c33e309834c1
 U rolf
-Z a6fb8b27c966a5c933ba2c82a5658ac1
+Z 78fab7e0045a1c7a4608da9dd11b02f8
 # Remove this line to create a well-formed Fossil manifest.
