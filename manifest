@@ -1,5 +1,5 @@
-C Updated\sto\sthe\sversion\ssupplied\swith\stcl8.3.4\ssince\sit\scontains\nsetup\sfrom\s"-lpthread"\sfor\slib\n
-D 2002-06-02T06:32:33
+C Added\sTcl_StaticPackage\scall\n
+D 2002-06-02T06:33:47
 F apps/xslt.tcl 1b9a65d5db054f01e4033883fa53a313d8e6d5fe
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html c21ddc9a115a8a82ee1560949dc08a1bc41233b6
@@ -163,7 +163,7 @@ F unix/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F unix/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
 F unix/pkgIndex.tcl.in d5d912d994d81fb27c4551c6a460947539d2212c
 F unix/tcl.m4 a5aed00be99033c74db45c89097de6485760cbac
-F unix/tclAppInit.c 5dad9db4d949a8b242b50352e225ff2ce2e1e05b
+F unix/tclAppInit.c 32ea0778ca59b8314fea91f68a91c7ecaa1e5269
 F unix/tdomConfig.sh.in b97f3efe61579bd447d2be4e4e26e9f9fc9317a5
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F win/makefile.vc 78687501b7e93a4fb474f0e87590aca0a211470c
@@ -173,7 +173,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 575b3d81c4f81d075b792ee81ea6dce2f2a7d1e0
+P 0630d932dcdf4be3b4ca3a2048981da740178812
 U zoran
-Z 25b0ccbd85b42c330e3aec5f046a22f6
+Z 786c77f5b5598f425b7f098122d6e892
 # Remove this line to create a well-formed Fossil manifest.
