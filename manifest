@@ -1,5 +1,5 @@
-C Imported\sthe\slatest\sversion\sfrom\sSF\sproject.\n
-D 2003-09-14T11:08:14
+C Simplified.\sJust\sre-route\susers\sto\sthe\sunix\sbuild.\n
+D 2003-09-14T11:08:40
 F CHANGES 59cab3c950a08a20053aa26b3a8718c6efa8c913
 F ChangeLog b50638e2a8a6ba073281a7711352a405132ac966
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -167,7 +167,7 @@ F mac/tDOM/tdom.tcl 09c254af11c857ba27594eba18cfaa14997369dd
 F mac/tDOM_OSX.prj.xml 7876d8fba0620fa19fac268b8f195fb70d70497c
 F mac/tnc.exp b5221cfee6631ca94e46626dcd5c54e7e9cde7ba
 F mac/tnc.r ce718255e902d882f872087908dcd234fdc9fa51
-F macosx/README 00dec2531e5e466a5fab02bf2e5cfb3ca0ea650e
+F macosx/README 90fbbcf96747374a4c4a7b97766f0c6bafa7780e
 F tclconfig/ChangeLog 58ab3c66b3f35803afd929eec872fa2563bfafa9
 F tclconfig/README.txt c7a8a24b2782cd897a7608813161611f8e0521a0
 F tclconfig/ac_c_bigendian_cross.m4 d42e2f20b8ea4df7c29a8595f10489bfaab58096
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 8d1744303b18f311b56df922777d680b1ac7f95b
+P 2c69e019729356905a21382e56a045756618ba01
 U zoran
-Z 690ea3dac2d3c812b5f702f4634d2ddb
+Z 7d41d92d23965c5a605d8c06f244c998
 # Remove this line to create a well-formed Fossil manifest.
