@@ -1,5 +1,5 @@
-C Added\soption\s-paramentityparsing\sto\sthe\s[dom\sparse]\smethod.\s[dom\nparse]\soption\sparsing\snow\suses\sTcl_GetIndexFromObj()\s(which\nadditionally\sfixes\sa\sminor\sbug\swith\sthe\scurrent\soption\sparsing).\nAdded\stests\sfor\sthe\sinterface\sof\sthe\sxsltCmds.\n
-D 2003-04-09T19:57:49
+C Added\soption\s-paramentityparsing\sto\sthe\s[dom\sparse]\smethod.\s[dom\nparse]\soption\sparsing\snow\suses\sTcl_GetIndexFromObj()\s(which\nadditionally\sfixes\sa\sminor\sbug\swith\sthe\scurrent\soption\sparsing).\nRemoved\san\sunused\svariable.\sImproved\serror\sreporting\sin\scase\sof\snot\nfound\sattribute.\sBetter\soptions\scheck\sfor\sthe\s'xslt'\smethods.\sChanged\nimplementation\sof\sthe\sdom\smethod\sisQName\sto\suse\sthe\slately\sintroduced\nAPI\sfunction\sdomIsQNAME.\n
+D 2003-04-09T19:59:04
 F CHANGES ca483fbc7c627b68977fc3eb6cf6798f42bca33c
 F ChangeLog 4b901cec6b84cec93869a3df97d0c29dae27ef1e
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -132,7 +132,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c c2fe5b784c2ad83c904edd3d82050b8f7c7fc444
 F generic/nodecmd.h 20210ad9b4a3bdd6055175beca7bfdd8bd318a3f
-F generic/tcldom.c 4175412ece853fdf28c65b87061f451014115959
+F generic/tcldom.c f50ad9bd09fb25f3eb348d6ee4375e20249bca63
 F generic/tcldom.h 1c21383eabe24ac9bea93e4f5c66f9a64a7b68d1
 F generic/tclexpat.c b82c1af8cd8b6e64ca0f6f8ec84d315efe455537
 F generic/tclexpat.h 62e83591b9fff070825add84310f7f7cc8cff3b8
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P d3a1a78a9085b70ffbdae5a599898908cc4df7da
+P 0231e6fe49f410907cf2e8f0ce585661c7ed276e
 U rolf
-Z 0b404b9e784d4827d70dd33c7f145fd2
+Z 2cfefd25fccce32b8534bb5f9286cc24
 # Remove this line to create a well-formed Fossil manifest.
