@@ -1,5 +1,5 @@
-C A\sfew\sdocumentation\supdates\n
-D 2002-10-16T00:05:05
+C Minor\sbugfix\sfor\sattribute\screation.\n
+D 2002-10-16T00:08:44
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 2086eca836d27f5319bc34c0c379fc1009993adf
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -109,7 +109,7 @@ F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c 6ccd7856d011fd273b9f613d62a6790b7d9e93ab
 F generic/domxpath.c 9243cb5d1d7df70ecc58cf88e0605e84a28edd6e
 F generic/domxpath.h 4e113d912e5840da684d1fa341739f25051d37f1
-F generic/domxslt.c 243e7da274223c020f156b2cf3913f89bad0ca20
+F generic/domxslt.c c486c04aef6e9656cf30ed90239ec371302a0ee2
 F generic/domxslt.h 77d19235cbf254d3ba46ae28088fdcbf98a4856a
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -183,7 +183,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 976ea89d00f92cabf2d4819b6414fb9cc110e4eb
+P a7870ef6161f3f6a5edd1ccae4efa8001d491dd8
 U rolf
-Z 21daeff6f1635523ed95909e27b2f91d
+Z 4a39e4ed6c62bfd635294a3e701b2af0
 # Remove this line to create a well-formed Fossil manifest.
