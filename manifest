@@ -1,7 +1,7 @@
-C Fixed\ssome\smemory\sproblems,\smostly\sin\scase\sof\serroneous\sstylesheets.\n
-D 2003-03-26T01:14:42
+C See\sfile.\n
+D 2003-03-26T01:16:22
 F CHANGES ca483fbc7c627b68977fc3eb6cf6798f42bca33c
-F ChangeLog 710a0c64b6ba77d79429d626c7e430bc714f6742
+F ChangeLog 9b46402cfd3e183119ed8fc82e897a951b9f7c1f
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 25204720818592a271aecc462432628b5a1862a4
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 6713546dadda86148b44bf22bf8e503dd50ff301
+P 3e4fa7daf1ce176d8a220eec24c617fd2f4573e8
 U rolf
-Z 406c6602b7cf683258c39e42bb033d8f
+Z 64acea09557544a616007f2d8f56dd27
 # Remove this line to create a well-formed Fossil manifest.
