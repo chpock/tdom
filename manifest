@@ -1,5 +1,5 @@
-C xslt\srec\s5.2:\s"The\sstring-value\sof\san\selement\snode\sis\sthe\nconcatenation\sof\sthe\sstring-values\sof\sall\stext\snode\sdescendants\sof\sthe\nelement\snode\sin\sdocument\sorder."\s(Also\strue\sfor\sroot\snode.)\sThe\nxpathGetTextValue()\scould\snot\sused\sfor\srecursive\sgetting\sof\sthe\stext\nnode\sdescendants,\sbecause\sit\salso\sreturns\sthe\stext\svalue\sof\scomment\nand\sprocessing\sinstruction\snodes.\sxpathGetTextValueForElement()\sdoes,\nwhat\sthe\sspec\srequires.\n
-D 2002-04-09T01:59:50
+C Actual\sHEAD\sdoes\snot\scompile\s(!!\sarg).\sWith\sthis\s(intermediate)\sstate\nit\sshould.\sSome\sof\sthe\schanges\swill\sbe\sundo\sand\sreplaced\sby\sothers.\n
+D 2002-04-09T17:20:47
 F apps/xslt.tcl e5c0a837a82ddf0aa21ddb51d5891acfd64469fc
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html c21ddc9a115a8a82ee1560949dc08a1bc41233b6
@@ -91,7 +91,7 @@ F extensions/tnc/pkgIndex.tcl.in f3ca1ee461a2ce4c6f7fae3ff078da261fab6e4b
 F extensions/tnc/tcl.m4 9404ac273b962ddaf946d3170c5183e55d0984b3
 F extensions/tnc/test.tcl efade8bcb9fd9e269ed5c259f3edf182bc917b72
 F extensions/tnc/tnc.c 88ead51574461280693295eaa7a483afd6f7b497
-F generic/dom.c 176f5e8dcaa3f949f95f839212e26820ceb763e0
+F generic/dom.c 500ad08b087fbd4eafe8956ce522e2bcf9b6f609
 F generic/dom.h 2f3212f2e15fac2fbd3ae105a68d76fc4e2cdcf8
 F generic/domalloc.c 9fd035f9fe601d2ed6ea00eef448f3165e8e54c5
 F generic/domalloc.h 2c5c6412831ffaff02d2a2d969adddbede8752b6
@@ -158,7 +158,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 78779edd389dd433c351118a455b6ee5963d4756
+P 69ed879f486b71c6b691d9a912aea9c6e4180ea4
 U rolf
-Z 1ed11c194b2f64dee77ebad421048a66
+Z f6f30cedfbfeea9c3a1c8e3b3399dc35
 # Remove this line to create a well-formed Fossil manifest.
