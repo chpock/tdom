@@ -1,5 +1,5 @@
-C Removed\ssome\sold\sdefines\n
-D 2002-10-15T12:27:02
+C A\sfew\sdocumentation\supdates\n
+D 2002-10-16T00:05:05
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 2086eca836d27f5319bc34c0c379fc1009993adf
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -13,15 +13,15 @@ F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html 7812146ba73ccb90e0846d5ed8e3678faf6e34ec
 F doc/dom.n 2c659a5736300315ad2cbb8612c76f2c7c0e46b3
 F doc/dom.xml 6079bc5fa271fd40c1c3d259784d1fb95140fc2a
-F doc/domDoc.html c703e9dcbe26b2e05f47a93601d58cb49b10ceb9
-F doc/domDoc.n c0e86e8bbaf4fe1b263cc3fd9632bc483dbda0da
-F doc/domDoc.xml 3e7e3ef01a6032912f2694071fa7a9ee8def2af4
-F doc/domNode.html 62501cdb66d86e2a357bdc705d6b81fb25b8cdc1
-F doc/domNode.n 80273f0764ba7f08b9c36284a0e1036754297f10
-F doc/domNode.xml e45181fd185becc3a0bb197627b3500e4fd60540
-F doc/expat.html 0f41343ba58a0359d2f0afd8d0cba82a62ce3d58
-F doc/expat.n c5fb11ddc8e048a090406406d15f397fe799ac9f
-F doc/expat.xml 6a60726a13547624d4c8482848746adf7d05f069
+F doc/domDoc.html 64cdbc37c5ba78bda175cb5489c062ec541dbbee
+F doc/domDoc.n 778f7a73c0dc2c2ddc1c185a3ac5da15bc313616
+F doc/domDoc.xml 60e9c4c51ee5ca287b56c01cf9f0751743753858
+F doc/domNode.html 8618ae13ed7c5944ede353ad169b3edb1694e560
+F doc/domNode.n ca93b911127f39f6a64d4be2cc5ce0c1f63253a1
+F doc/domNode.xml ebc75caa606aaf00a5169d92412c8cbf064fdcea
+F doc/expat.html 174b17c099dcf63cf4eb484fe9999055f303bb5a
+F doc/expat.n dffbfb76328b10be530ff1f07de5006f2ef3e23c
+F doc/expat.xml 6dfbdba24a494979e298f87a93bc7055b16c50bf
 F doc/expatapi.html 745a5f63158d568de1f479113e726b6de8a975d4
 F doc/expatapi.n 6b56b9d897f32d15a7cdac0e0c9b8c636c5b8d56
 F doc/expatapi.xml d93d1ea7d4fbacd0729e731147a96e74863fdde9
@@ -183,7 +183,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P b1dc4a4d34e445f3d69679a0d8d9e31c23f9d73b
-U zoran
-Z e0de34fa4561b1cf5ad66c4d099cb9f0
+P 976ea89d00f92cabf2d4819b6414fb9cc110e4eb
+U rolf
+Z 21daeff6f1635523ed95909e27b2f91d
 # Remove this line to create a well-formed Fossil manifest.
