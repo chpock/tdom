@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2004-08-23T13:03:11
+C Regenerated\swith\scurrent\stmml\sHEAD,\sto\schange\sencoding\sfrom\sutf-8\sto\siso-8859-1.\n
+D 2004-08-31T01:56:18
 F CHANGES 9113c39a3c8720f4e5e1b56bc4fe079ad319a58e
 F ChangeLog 6b9902146e3abc0483e64282b4c2ffecdcc6622e
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -13,7 +13,7 @@ F configure d12ff589d122ae45870aac8c7fa163786161e22a x
 F configure-tcl8.0.5 a5d0c7988aaf04fb2fbba0746f84895b2b3f58de x
 F configure.in 4ea3774cd8870c2d58c9b2feb1441525d40bc49f
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
-F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
+F doc/category-index.html 2e1a41b03d31f42dd00a0c449f7f28db6227bbf2
 F doc/dom.html 240717c173dfe4022f800b64de96516fdeaf2b35
 F doc/dom.n 1f9953baae9ad799fab6f16ce1d5589ecbf962f1
 F doc/dom.xml c7d62493c61ff9f9b701d57e268818da805c1ba3
@@ -29,8 +29,8 @@ F doc/expat.xml 4eb19bf447e1e7e9a36d773ec2d5bc531e34ff36
 F doc/expatapi.html c689ffde7bfb30b92af495dddd5bcb86833bee94
 F doc/expatapi.n 6b56b9d897f32d15a7cdac0e0c9b8c636c5b8d56
 F doc/expatapi.xml d93d1ea7d4fbacd0729e731147a96e74863fdde9
-F doc/index.html 07e9315df3c3acbec8f86d814018fa3ae85e4c62
-F doc/keyword-index.html 98449a16e99c1d42db0dd25564d0cdf1461c1b24
+F doc/index.html 0fa236da33e1f5c60b5fb5111a9126fc0f345a2f
+F doc/keyword-index.html ae424b292a1efb90fbb7ad6fff7d01b35bc3c5af
 F doc/manpage.css 355082613fb5f65df33a8f5f8edd6b6e02dad84c
 F doc/tDOM.xml 35369df6a7d84d68cfb28692530ef9d1a8b8ca3e
 F doc/tdomcmd.html 29c11ba958dc7c59fee2908067080d30e4415bf0
@@ -230,7 +230,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 31fa51d7d61da07db09bd6223bb3176a3cd0ee44
+P 43b86131802375fe344ed911b69698291721c55f
 U rolf
-Z 95fa4960995cbe3a6fdec1d8ebf4147c
+Z 3a0dbd434d41683e2b166d2da48cf008
 # Remove this line to create a well-formed Fossil manifest.
