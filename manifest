@@ -1,7 +1,7 @@
-C Removed\shard\scoded\sversion\snumber,\suses\snow\sVERSION\sdefine\n
-D 2003-03-22T01:38:50
+C See\sfile.\n
+D 2003-03-22T02:07:53
 F CHANGES 87334aee80e9af7a72560e564ddddb7bf97ca551
-F ChangeLog 0cd333f849b5fd9d01dbb96c006b79239e3bad1f
+F ChangeLog 8918582723f1229628adb5f55d4e57148b968bfe
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 25204720818592a271aecc462432628b5a1862a4
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 35fe76bc881505a3f4e130b137dadba478578219
+P 1384262645162b820b1c14a8823dec3d115867f2
 U rolf
-Z 1893089f6d81d3069232aae519976067
+Z 52018c6a43d2fc3a7c6a59429c5c52f8
 # Remove this line to create a well-formed Fossil manifest.
