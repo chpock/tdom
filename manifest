@@ -1,7 +1,7 @@
-C Better\serror\smsg\sin\scase\sof\sXML\sparsing\serrors\sin\sexternal\sentities.\n
-D 2004-07-19T03:21:27
+C See\sfile.\n
+D 2004-07-19T03:21:43
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
-F ChangeLog 6fbe9bf0083d8b25f5b643d9b0d49bbd359c944f
+F ChangeLog 24c31ffaa165936891a37206a0bbe2e1b2916711
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -228,7 +228,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P d3a5b99bfd12763e5cf6f6b545e6f2f478d2f22e
+P 26b90837e9c83563b54622d6388ad9c235236edd
 U rolf
-Z 5e7a548c61eaa3166c4060fb6187e1e6
+Z c90046937944d5a9241bb24ae6f79fcb
 # Remove this line to create a well-formed Fossil manifest.
