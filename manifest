@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2003-04-12T02:28:08
+C Optimization:\sImproved\scaching\sof\sexternal\sdocuments.\n
+D 2003-04-16T20:04:54
 F CHANGES 59cab3c950a08a20053aa26b3a8718c6efa8c913
 F ChangeLog 31036fa47b2eeda3962acad6bd53ded7dbba298c
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -126,7 +126,7 @@ F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c dba7e77190826af093bbb0c4dc1f858687ef5983
 F generic/domxpath.c e14c75997d9352a272adf657c73694b7ec99d8f6
 F generic/domxpath.h 2bbf18428f0a934a95d4262bd352cdfe4937e9cb
-F generic/domxslt.c 7a02da86fa015404c9e491786b7268ad10e1c1ac
+F generic/domxslt.c 52637c1dd3296c478ffd4cd9f7a613e7c77b85aa
 F generic/domxslt.h b60468a7092d4d5712b4a8776f3db51d4c03aa04
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P b4ea22bb2bfcdc0cc9f921ee1e7e5fb4475827e6
+P 1cc368bd62a6237e175916e24331037a0fa4c239
 U rolf
-Z 8f927c9cea7f894c91d30730cea43a19
+Z 0f8adaa00251428e489f09f1f179c5f0
 # Remove this line to create a well-formed Fossil manifest.
