@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2003-10-23T10:35:28
+C Updated\sto\suse\sthe\snew\sasText\soption.\n
+D 2003-10-24T00:51:04
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog f860cd99a930e1037e828a0cd9cbddca639756da
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -8,7 +8,7 @@ F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
 F README 5a9c069dee183889e8d81ad355f5091ac97a1a5b
 F README.AOL 6b124cc7a7cae5fa901b9a2996dbdc5fe4085ba7
 F aclocal.m4 79e2f4aa6a138371f2d31f28355749e5019d7651
-F apps/xslt.tcl 36e6c834331ff2eaae4dbc8a9b360db5b9d51566
+F apps/xslt.tcl 87ef8384214fe375d3d6e7d135f84f2afef5642c
 F configure d12ff589d122ae45870aac8c7fa163786161e22a x
 F configure-tcl8.0.5 a5d0c7988aaf04fb2fbba0746f84895b2b3f58de x
 F configure.in 4ea3774cd8870c2d58c9b2feb1441525d40bc49f
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a1346da8f967e249cd6ad7dbeaf245f70e95ef16
+P 14723dd7dc9c053578fdd285bfc04116f4bac34e
 U rolf
-Z 662ccd71da60d896bac65e0443647996
+Z 53c2eb7f960619ffeaf4bcc4574803e1
 # Remove this line to create a well-formed Fossil manifest.
