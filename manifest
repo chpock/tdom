@@ -1,5 +1,5 @@
-C Replaced\sa\sfew\sexit()\scode\swith\sTcl_Panic(),\swhich\sensures,\sthat\seven\nwindows\susers\sget\sa\susefull\serror\smsg.\sAdded\soption\s-useForeignDTD\sto\ndom\sparse\sand\sexpat.\sFixed\spotential\smemory\sproblem\swhile\sprocessing\nerroneous\sstylesheet.\sImproved\serror\smsg\sin\scase\sof\sscript\serrors\sin\nthe\s-externalentitycommand\sscript.\sAdded\smethod\s'startBefore',\sto\ncompare\sthe\srelative\sorder\sof\stwo\snodes\sout\sof\sthe\ssame\sdocument.\n
-D 2003-03-19T13:50:29
+C Added\soption\s-useForeignDTD\sto\sdom\sparse\sand\sexpat.\n
+D 2003-03-19T13:52:28
 F CHANGES bedaded2db2b4b9c98267dec8dcfb01261cfbb9a
 F ChangeLog 446a9519a6f4745107c006547eadc4f8e95db6c9
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -14,18 +14,18 @@ F configure-tcl8.0.5 d1895768cd7b715e310dae9acb84d91603857f7a x
 F configure.in 86a3b4edc45e332742e46dae3e6fc54232895cf2
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
-F doc/dom.html 9de79d4b6e264bc302e9399ae1b97d87ce1622ff
-F doc/dom.n 1c10b2545356eed5645a2013474c221471a3deee
-F doc/dom.xml a93c3468d324d8322b2510f669c7298845186297
+F doc/dom.html 83dd89d7972b00d2ed5b69383747ff93d586bbc9
+F doc/dom.n 775a1edb8d812a82a1c07252680dc5471ecc8ebe
+F doc/dom.xml b6f088b32e14a4d094829c041de1988e68d7bbab
 F doc/domDoc.html 352415ff4776d3e1ff532dae8945ce06212febd4
 F doc/domDoc.n d5f2cb599bb1abe5ce4a167dc03c3e5de66d952d
 F doc/domDoc.xml 420edf41715156274ac43fe65932bb03747436cd
 F doc/domNode.html 478919fe0545183e2a3512104555fd03eb517646
 F doc/domNode.n 079634b8588a41fe1018347f0dd7da8d42aa7d64
 F doc/domNode.xml b077f2d1409cccd328d37b7e82e8860f0f7ffaea
-F doc/expat.html 62c17dc1321972e4fca9d6fb0de749e45e76bbfb
-F doc/expat.n 27deb5422627ddc5b4d5360703792ae50c7c6148
-F doc/expat.xml c1c9b9ab07555d9fa7f3b8a2fe3719fa1a9ac006
+F doc/expat.html 63e0631177c915249662ba3199f75f9bf4b6a794
+F doc/expat.n d7f31827cedfa8741ef4c22ffa801d9938a4c3f7
+F doc/expat.xml e0d99788197ed96b93c6740d7b39b8fff5763b9e
 F doc/expatapi.html c689ffde7bfb30b92af495dddd5bcb86833bee94
 F doc/expatapi.n 6b56b9d897f32d15a7cdac0e0c9b8c636c5b8d56
 F doc/expatapi.xml d93d1ea7d4fbacd0729e731147a96e74863fdde9
@@ -134,7 +134,7 @@ F generic/nodecmd.c c2fe5b784c2ad83c904edd3d82050b8f7c7fc444
 F generic/nodecmd.h 20210ad9b4a3bdd6055175beca7bfdd8bd318a3f
 F generic/tcldom.c 43cd0f97b8ffca413999b9c7c687864eb5fd517d
 F generic/tcldom.h 887f9bad5712f88523eedf06567a37ce183f777c
-F generic/tclexpat.c 8b9f2c9ff704dd5f3a57e15c915fff6be9b892ad
+F generic/tclexpat.c 98e58998ee06e68f8e054ebd021538e88dc9fc07
 F generic/tclexpat.h 62e83591b9fff070825add84310f7f7cc8cff3b8
 F generic/tdom.decls fa90ba9b8d00f5b405ea68724d95ad79f64c424b
 F generic/tdom.h db128152fac506159243e47cb3a77cc7d9fe4360
@@ -147,7 +147,7 @@ F generic/utf8conv.h e0d2756b2d77ad9a8508a0dcf7cce5e10fa4c9a5
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
 F generic/xmlsimple.c 1af1d67cfb193a648147fdd5b6fa43f7faa8051e
 F generic/xmlsimple.h f2861868b0fed932c79f9e595bb875d261d97bd5
-F lib/tdom.tcl e27e239b2ab1f3e99b47cb444842aa5247b2ae54
+F lib/tdom.tcl 82e68dfa21b7071c1e00aeea11fb4fbe1d78a84e
 F mac/PrecompHeaders/CoreHeadersMach-O.c e4406d8c34fcaea82d21e62c35012893b460dfd5
 F mac/PrecompHeaders/CoreHeadersMach-O.h 508208239a919a6dee4275f9148962a13faeb94d
 F mac/PrecompHeaders/CoreHeadersMach-O.pch 60665d6a2787eb3dfda701baff12dd3d5029e7f5
@@ -181,6 +181,8 @@ F tests/cdata.test 9955e7f6bc93e5ae58fd14fa4d25c716b6d2f7e0
 F tests/comment.test 25ac780959e2c7220d3e92dac01dd5e14fd4acaa
 F tests/data/REC-xslt-19991116.xml d86bd1efbc1f810b2a6f74c0c182bd37ae5ee09d
 F tests/data/books.xml 0b1ae696b2bbc1035303f5637a6ef67f041d0b9e
+F tests/data/domCmd1.dtd 2031a36d155dfac8f0a5ef3be69958d250f5459e
+F tests/data/domCmd2.dtd 42200fe458c04d2072e71d8fa00ade2cb1c59878
 F tests/data/dtd-5.1.dtd 8f16a5c1ff5181e7136cd0d0f1255ae269c38e3c
 F tests/data/dtd-5.2.dtd 6a2dbcda86b1729c9789c40ea2d592fff9434939
 F tests/data/dtd-6.1.dtd 705abb4c198575b4035af700a2943710318e3c83
@@ -223,7 +225,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 5d57e5e11263ae40ddd2e1824913ae2a1b79d06a
+P f1e13ac49ceda98cfc084ca1e2888acd4d225d74
 U rolf
-Z 5cc42941a825eb5f6a6db75a9106843c
+Z fe343d88fd02ba23761b76550c15d362
 # Remove this line to create a well-formed Fossil manifest.
