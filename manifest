@@ -1,5 +1,5 @@
-C Fixed\sa\sbug\sin\skey\shandling:\sEmpty\snode\ssets\sare\snot\s""\s(the\sempty\nstring)\sneither\sin\sthe\skey\sdata\sbuild\snor\sthe\skey()\sfunctions,\sbut\nsimply\sno\svalue.\sRemoved\sa\ssuperfluous\sstrcpy.\sSince\sthe\skey()\nimplementing\sfunction\suses\srsAddNode\s(which\sis\sfixed,\sin\sbetween\sand\nnow\shopefully\sin\sdeed\swork\sas\sexpected),\sthere's\sno\sneed\sto\ssort\sthe\nresult\snode\sset.\sThe\sfix\sof\srsAddNode\sdisclosed,\sthat\sa\spart\sof\sthe\nnumbering\scode\srelied\son\sthe\swrong\sbehavior\sof\srsAddNode\s(well,\ssince\nI\sknew,\sthrou\shand\schecking,\sthe\sright\sresults\sof\sreally\sa\scouple\sof\ntest\scases,\swhat\sthe\sright\sresult\sshould\sbe,\sit\sseems,\sI\smassaged\sthe\ncode\sas\slong,\suntil\sit\sgave\sthe\sexpected\sresult,\sdiscarding\sall\ndoubts,\swhy\sthis\sis\sthis\sobvious\swired\sway\sat\sthis\splace\s-\sI'm\nobviously\sa\sweak\shuman).\sFixed\sthis.\sUnfortunately,\sthe\sold\sway\smay\sbe\nway\smore\sfaster,\sfor\slot's\sof\snumbering\sin\sdeep\sdocuments.\sThere\smay\nbe\soptimization\spotential\sfor\sthis\scases,\syet\sagain,\sbut\sI\shave\sfirst\nto\sthing\sabout,\sif\sit's\sreally\swork\sin\sall\scases.\sExchanged\sa\sfew\nrsAddNode\swith\srsAddNodeFast,\swhich\sis\salmost\spointless\sin\sthis\ncases.\sThere're\sa\slot\sof\scases,\sin\swhich\sa\snode\sis\sadded\sto\sa\sfreshly\ninitialized\snodeset.\sThe\sadding\sof\sthis\snode\sto\sa\semtpy\snodeset\scould\nbe\sinlined,\sfor\sa\s(real\ssmall,\saccording\sto\smy\sprofiling)\seffect.\sBut\nI\spushed\stDOM\smore\sthan\s10\spercent\sover\sall\sin\sthe\sxsltmark,\sand\smade\nit\sat\sleast\smore\sthan\sdouble\sas\sfast\sas\sbefore\sfor\sbigger\sdocbook\ndocuments\sin\sthe\slast\sweek;\sI\somit\sthis\sfishing\sfor\slesser\sthen\sa\npercent\sspeed\sup\sfor\snow.\n
-D 2002-10-17T00:30:32
+C Added\sdocumentation\sfor\sthe\snew\smethods\sisName,\sisNCName,\sisQName\sand\sisCharData.\sAdded\sa\sbit\sdocumentation\sfor\sthe\screateNodeCmd\smethod\s(should\sbe\sproove\sreaded\sby\sZoran).\sAdded\sinformation\sabout\sthe\slimitations\sof\sthe\ssimple\sparser.\sSome\seditorial\schanges.\n
+D 2002-10-20T15:35:31
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 2086eca836d27f5319bc34c0c379fc1009993adf
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -10,9 +10,9 @@ F configure de5206a44e4dbdcf5000d823d88a695c114f998d x
 F configure.in bc713d92cafdcee6e6f359d8566945bedbfbb861
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
-F doc/dom.html 7812146ba73ccb90e0846d5ed8e3678faf6e34ec
-F doc/dom.n 2c659a5736300315ad2cbb8612c76f2c7c0e46b3
-F doc/dom.xml 6079bc5fa271fd40c1c3d259784d1fb95140fc2a
+F doc/dom.html d577b9042af417658359f99369d99140308504c8
+F doc/dom.n b77dd3dff14f9ddcc594197da197b475ebc60b7e
+F doc/dom.xml 7629d42c0eec1e35c9c33e2c7c14d75eb2763bf9
 F doc/domDoc.html 64cdbc37c5ba78bda175cb5489c062ec541dbbee
 F doc/domDoc.n 778f7a73c0dc2c2ddc1c185a3ac5da15bc313616
 F doc/domDoc.xml 60e9c4c51ee5ca287b56c01cf9f0751743753858
@@ -183,7 +183,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 051984cb16ac0ec14733c7e90fffdf871fb8104d
+P 6e6741bad7f52112b6e20b47174d7ed2a54abe6c
 U rolf
-Z 651dd057fbf9f8e9b254ebc0f7510ce7
+Z bfbcc2cb1b55d202a904b4328de6e34a
 # Remove this line to create a well-formed Fossil manifest.
