@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2003-02-27T02:31:21
+C Fixed\sbug\swith\susing\sthe\s'domNode'\scmd\swithout\sargument\s(spotted\sby\nBernard\sDesgraupes).\n
+D 2003-03-02T23:37:05
 F CHANGES bedaded2db2b4b9c98267dec8dcfb01261cfbb9a
 F ChangeLog fa7576a18f5fb5a0e6182e196a6fb5dc758e41ae
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -130,7 +130,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 34b586ff917e7fcba2110f4201311f376d723a3e
 F generic/nodecmd.h 20210ad9b4a3bdd6055175beca7bfdd8bd318a3f
-F generic/tcldom.c a1daed5f7b38fd9030d42f616cf41f4915764607
+F generic/tcldom.c 28140d27e65c1118739e3ab7b852f884107ad3b7
 F generic/tcldom.h 887f9bad5712f88523eedf06567a37ce183f777c
 F generic/tclexpat.c 8b9f2c9ff704dd5f3a57e15c915fff6be9b892ad
 F generic/tclexpat.h 62e83591b9fff070825add84310f7f7cc8cff3b8
@@ -173,7 +173,7 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
-F tests/dom.test b48fa24019b55f0b6e4f5641416d8d8e1b2548aa
+F tests/dom.test 3824dc5f19f7f853c518bfb085997e217af8d594
 F tests/domCmd.test 1b07b6c24d4838ae18d062449a9b6ac85f800347
 F tests/domnamespace.test 7023cb113cf156381218b303eddcde3822f40a48
 F tests/element.test feb714dae2010efc20dd12d4e7d7bc281b1a6ff4
@@ -200,7 +200,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 59b589e432d9f8d0f8270788bc555632eb423a9d
+P e78962ebbd64f9ed89d5bce31828f8d6009ac581
 U rolf
-Z 6f89d1ffe8bf2ad8ba01d829433aa1ce
+Z 218c196d489e36bd479502e560f95633
 # Remove this line to create a well-formed Fossil manifest.
