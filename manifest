@@ -1,7 +1,7 @@
-C Added\sthe\s'-namespaces'\soption\sto\sthe\sselectNdoes\smethod.\sNot\sresolved\snamespace\sprefixes\swithin\sthe\sxpath\sexpression\snow\sraises\san\serror.\n***\sPOTENTIAL\sINCOMPATIBILITY\s***\n
-D 2004-09-21T01:43:17
-F CHANGES 9113c39a3c8720f4e5e1b56bc4fe079ad319a58e
-F ChangeLog b53deb99ac42ead5a4ca7a6c6909feb171406a9b
+C See\sfile.\n
+D 2004-09-21T01:46:11
+F CHANGES c148974e2232411cdad6dad69cdc6698b279f3e7
+F ChangeLog ce8c666c661f50d3d40d8746ac7dfef3c9887cb7
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -230,7 +230,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P b0902bcbc3dcd8a7b265d48724a5f678c56c8c6c
+P b08cb7d2243324ecb0f94b816a5ba121b77acb43
 U rolf
-Z 877a1051d4bcbdfca1994f5ddb6d98c5
+Z b199fb0140deb9bfe6815a9ba7334d82
 # Remove this line to create a well-formed Fossil manifest.
