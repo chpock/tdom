@@ -1,7 +1,7 @@
-C Corrected\stypos\s(thanks\sto\sG.\sNeumann).\n
-D 2004-08-23T13:01:29
+C See\sfile.\n
+D 2004-08-23T13:03:11
 F CHANGES 9113c39a3c8720f4e5e1b56bc4fe079ad319a58e
-F ChangeLog 537c5433bc1bbe735fc48735e88b4fab964879db
+F ChangeLog 6b9902146e3abc0483e64282b4c2ffecdcc6622e
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -230,7 +230,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 34f04803c77e11781538da11e9a9617867f551e0
+P 31fa51d7d61da07db09bd6223bb3176a3cd0ee44
 U rolf
-Z e8469129f389ed1eacd97701820eb85c
+Z 95fa4960995cbe3a6fdec1d8ebf4147c
 # Remove this line to create a well-formed Fossil manifest.
