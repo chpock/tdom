@@ -1,5 +1,5 @@
-C Added\sa\snote\sto\sthe\s-externalentitycommand\soption\sof\sthe\sparse\smethod,\sthat\sthe\sprogrammer\sis\sresponsible\sfor\sclosing\sthe\schannel,\sif\sthe\sresolver\sscript\sreturns\sa\schannel.\n
-D 2004-10-26T01:05:50
+C Added\sdocumentation\sfor\sthe\s'-namespaces'\soption\sof\sthe\sselectNodes\smethod.\n
+D 2004-10-26T01:06:42
 F CHANGES 5e1729ae568c08de4588a28d3584d862a29a2022
 F ChangeLog 9d07286d21d95c0a323c7eb400d049c5f2ff9c9f
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -20,9 +20,9 @@ F doc/dom.xml f560541a0f7ba7594494794a92bec6b45afd4f70
 F doc/domDoc.html 4b3632d1ffe9d7f008e0bdc08d41db2c221fea47
 F doc/domDoc.n 4e7ae0561a77a981c848e723065ad1efaf38a106
 F doc/domDoc.xml 04ca67ec8461a2811fe1db6fb21a184bb4951981
-F doc/domNode.html 020c8a4e469d1be9025ebfa9895eac644a5a420f
-F doc/domNode.n 9b6ece71049dc07c13ffdce4731fe97b89c95411
-F doc/domNode.xml b69610bbc93563cd3fcf75577e1c2f272ff2685d
+F doc/domNode.html 9da96586f4fe80094e48b99f9840d9173997435f
+F doc/domNode.n 26127754fccebdb2d4426d3cce28ae06def94206
+F doc/domNode.xml 7aafc3ace6d912aa9131aa2d6dc3137ab153534f
 F doc/expat.html 8abdb984e9703b45e08d5c82c671ed5f51c56077
 F doc/expat.n 03582fa9e0cef4846181605d3d5430416f9441ac
 F doc/expat.xml 4eb19bf447e1e7e9a36d773ec2d5bc531e34ff36
@@ -230,7 +230,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P da2d774c77dc0827641258595ecad1ac75992a65
+P 8c5b6c13290a4aeeb8e9035dc49e221db21a3d99
 U rolf
-Z 388d16c177e14acc43aa9ccdb7842823
+Z 3951ad93829a91db9100a40711516efd
 # Remove this line to create a well-formed Fossil manifest.
