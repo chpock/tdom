@@ -1,7 +1,7 @@
-C Minor\sbug\sfix:\sSpecial\shandling\sis\sneeded,\sif\sxsl:copy-of\sis\sused,\sto\ncopy\snamespace\snodes.\n
-D 2003-11-01T00:54:03
+C See\sfile.\n
+D 2003-11-01T00:54:14
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
-F ChangeLog 5f35938a22210678b725a0c2163ff35902b7cc76
+F ChangeLog e9218cfe00c9b6d6015aac121321d4cd93aa8a39
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f394ce35cebfe94627eaac0374059fdb3231bca2
+P 9237989bb07a207f66c6486eccfb4d8dfca51bf1
 U rolf
-Z b95bd01a6a4dfaca413e16c86ed8e318
+Z af183acf944b569ed906eafa4eefb193
 # Remove this line to create a well-formed Fossil manifest.
