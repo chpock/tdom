@@ -1,5 +1,5 @@
-C Removed\sunused\svariables.\n
-D 2004-08-17T19:37:16
+C Added\sfluff,\sto\sfix\sbuild\sproblemx\son\sAIX\sw/\sxlc\scompiler.\n
+D 2004-08-17T19:52:55
 F CHANGES a8e3b007dbfd9ec1a0ab5be94129fab0fa30621d
 F ChangeLog b759f0a1519713e53b273fa06a8fe01e3ae38944
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -118,7 +118,7 @@ F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c 4eb5d817c334c641af2c76cdb7f30998b5c5b8ed
 F generic/aolstub.cpp 2ba5a8d1046b7d92c92917ad4e17f8d944b41167
 F generic/dom.c 282ea15197139c6493798f2977e6d11ba75a976b
-F generic/dom.h cb5cd1a96ac8aaa7c1ea936d727893d79ce45495
+F generic/dom.h bb71b33f733c7043f493301b8a77ca97928a8b49
 F generic/domalloc.c 94e9e21e9b2a73586a6411693cdcce6061a96d23
 F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
 F generic/domhtml.c 88e0ea75868126e276c7ed2967f3237e90a76105
@@ -228,7 +228,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 199df0f1428477aaf5405b53cfad70b2d4837884
+P c55ee6bc39c7235de402bc095928036076ca21ee
 U rolf
-Z bb3697c85542bfb39da63280e5803232
+Z af3082055273de298c4383e36533c5ae
 # Remove this line to create a well-formed Fossil manifest.
