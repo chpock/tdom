@@ -1,7 +1,7 @@
-C Made\stDOM\swork\sout\sof\sthe\sbox\son\s64-bit\ssystems\slike\sItanium\s2\s(though\n--disable-tdomalloc\sconfigure\soption\sat\sbuild\stime\sis\sstill\sneeded).\n
-D 2004-08-19T01:06:06
+C See\sfile.\n
+D 2004-08-19T01:06:56
 F CHANGES a8e3b007dbfd9ec1a0ab5be94129fab0fa30621d
-F ChangeLog eb08ac7fd277eefa6e05100cd2ce9b5a229d2d51
+F ChangeLog 5ecb3f90b4d93bd9396f1f4405e7ebb616267982
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -228,7 +228,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 12b7b3da93f98412cab8cad220e8f53871d0cd24
+P c69e6f98cd197bbeff0e911a0a5b22ef9b941fa6
 U rolf
-Z 7c1f34d259571ba90cc19bd64bc2ab82
+Z 8d0d16b2c23996f4051d2da6f3404c3b
 # Remove this line to create a well-formed Fossil manifest.
