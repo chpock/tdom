@@ -1,5 +1,5 @@
-C See\s2003-02-22\scomment\n
-D 2003-02-22T09:40:55
+C Added\stcldom_getNodeFromName(),\stcldom_getDocumentFromName()\sand\sthe\ndom.h\stypdefs\sto\sthe\stDOM\sstubs\stable.\sNeeded\sfor\sthe\snew\stnc\sfeature\n(and\selsewhere,\son\sthe\slong\srun).\n
+D 2003-02-22T20:52:01
 F CHANGES d6cad9f44838aa2e42fdbd3e75313ddccbbeb32a
 F ChangeLog 633300e18284a84a60f287274613890bb6eeed48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -127,14 +127,14 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 34b586ff917e7fcba2110f4201311f376d723a3e
 F generic/nodecmd.h 20210ad9b4a3bdd6055175beca7bfdd8bd318a3f
-F generic/tcldom.c 23b2adaa4dc760ac7b2887a21ba71ae531f1fa9a
+F generic/tcldom.c 01121ca3e32ae5d35a3e15075147097b4a0dd567
 F generic/tcldom.h 887f9bad5712f88523eedf06567a37ce183f777c
 F generic/tclexpat.c 1849f2380a0eb44866cb7be46bb44c4f5375d77d
 F generic/tclexpat.h 62e83591b9fff070825add84310f7f7cc8cff3b8
-F generic/tdom.decls 7c024d1386ebc0eee7f70017554734b3926fa1fe
-F generic/tdom.h caf10edb3081c91d01abb883d8a2364cdd0dd840
-F generic/tdomDecls.h 207098defee329f3a967d9107b8f5d8aa4016b43
-F generic/tdomStubInit.c 7075ce0ef2e15f3f55894df524d5635f89010045
+F generic/tdom.decls fa90ba9b8d00f5b405ea68724d95ad79f64c424b
+F generic/tdom.h db128152fac506159243e47cb3a77cc7d9fe4360
+F generic/tdomDecls.h 0a5749623be3efdca3f0ba31a8b88ff72f992ffb
+F generic/tdomStubInit.c a626e8ce48b543ec817d852e0ea1fcc19a740fd1
 F generic/tdomStubLib.c e6e3f0c71f2db466f1924fe3a984dff7db65df9f
 F generic/tdominit.c 3ccbccd0009bd98f8776feb8ab3eb0bf5c6bc1e3
 F generic/utf8conv.c fc01b4776a82c937252a7d2593a3d244916905f7
@@ -197,7 +197,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P e2e1b1875445a9d21cd04a37ae6ded034521b0bb
-U zoran
-Z 60f77b5aced49140afde3d267e83d6f0
+P 75977d17b421dadad36540ebac0d4c24d7d75098
+U rolf
+Z 7e8461ae1c3237e0cd2bbbe8c97219ed
 # Remove this line to create a well-formed Fossil manifest.
