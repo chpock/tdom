@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2003-11-01T00:54:14
+C Added\sa\sfew\stests\srelated\sto\sdeclarations\sto\schapter\s4.2\sand\s4.4\sin\nthe\serrata\sto\sthe\sXPath\srec.\n
+D 2003-11-03T00:19:54
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog e9218cfe00c9b6d6015aac121321d4cd93aa8a39
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -213,7 +213,7 @@ F tests/pi.test 03bb450cd334ca0454a6c99ca3270092ba684833
 F tests/stackedhdl.test 4b3dafa96849dabf738ffb401585dac5a5aed550
 F tests/xmlsimple.test 44c53210c7048ca1843ecbce9f2132f6358504f2
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
-F tests/xpath.test 07f72d47be6a7e37a3a3f535a113f6f922684349
+F tests/xpath.test 732d4144cb20383f8becb5c311a6072d685bcb07
 F tests/xslt.test c224fc12a85a13600e4b21f6fdcbfb28f1bf04e3
 F unix/CONFIG 9e65bbe84330e49ce8f992c9bbf218c6eb0edb36
 F unix/tclAppInit.c 06b688c30d27d4be8925b05d1607cbee950bbd1c
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 9237989bb07a207f66c6486eccfb4d8dfca51bf1
+P c034eb6da9b2d1089bafa9763851c788fb531fd2
 U rolf
-Z af183acf944b569ed906eafa4eefb193
+Z 76726e41bf5231cd840feabc9d0d8397
 # Remove this line to create a well-formed Fossil manifest.
