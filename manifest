@@ -1,7 +1,7 @@
-C Added\san\sargument\scheck\sfor\sXSLTCmds.\n
-D 2003-06-13T10:38:28
+C See\sfile.\n
+D 2003-06-13T10:38:43
 F CHANGES 59cab3c950a08a20053aa26b3a8718c6efa8c913
-F ChangeLog 062b086bcd8a783a78d4aaffeee5a254d626965d
+F ChangeLog b855d620581b3e61772fc7e47b1bf4c46675d005
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 25204720818592a271aecc462432628b5a1862a4
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 10e814d3c781cbd448ebe5ddf7761e3fd5aeb851
+P 936d29eba13256e52dff9e9bbd6bcc4d7a921bee
 U rolf
-Z 629d80c4551ced2fff8511f45b3a0140
+Z dccb44853019ac5b5d44a113d5d1e687
 # Remove this line to create a well-formed Fossil manifest.
