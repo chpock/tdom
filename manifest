@@ -1,7 +1,7 @@
-C Reworked\sinternal\sbase\sURI\shandling,\sto\sfix\sa\sbug\sof\sthe\sold\sapproach\nand\sto\sbe\scloser\sto\s(though\snot\sfully\ssupport)\swhat\sDOM\s3\ssay\sabout\nbase\sURI\shandling.\sBetter\serror\smsg\sin\scase\sof\s'filename'\sand\snot\nvalid\sfile\sname.\n
-D 2004-07-28T03:52:42
-F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
-F ChangeLog 24c31ffaa165936891a37206a0bbe2e1b2916711
+C See\sfile.\n
+D 2004-07-28T03:56:54
+F CHANGES 14d1329e26cf855a067dfc4d1bee0a03b9e9b0f5
+F ChangeLog d6c6211438f8ff9efda7116cd1bbebb69476ea23
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -228,7 +228,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 76c8406dfe0475be1f176ece220f1100ac773101
+P a62f1de8360b300d29e2b6f25952006bd122cee4
 U rolf
-Z ec6942c92faa73e2fb1016cc40ba7567
+Z 4e75018ce821a9be2d0e513790a64cc9
 # Remove this line to create a well-formed Fossil manifest.
