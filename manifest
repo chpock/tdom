@@ -1,5 +1,5 @@
-C Bug\sfix\sfor\sattribute\svalue\stemplates.\sShould\snow\shandle\scases\nlike\sattr="}}"\sand\sattr="{{"\sright.\n
-D 2002-04-05T16:47:13
+C Added\sa\sfew\smore\srsAddNodeFast\sand\scheckRsAddNode.\n
+D 2002-04-06T00:44:09
 F apps/xslt.tcl e5c0a837a82ddf0aa21ddb51d5891acfd64469fc
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html c21ddc9a115a8a82ee1560949dc08a1bc41233b6
@@ -97,7 +97,7 @@ F generic/domalloc.c 9fd035f9fe601d2ed6ea00eef448f3165e8e54c5
 F generic/domalloc.h 2c5c6412831ffaff02d2a2d969adddbede8752b6
 F generic/domhtml.c e8cda5580aa8c3fe08e9f432a8482dd667c22e6e
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
-F generic/domxpath.c 748b49d9277f51af316e5a37f0d7dab083360155
+F generic/domxpath.c 232078c2dcc397f0cd691325bb87d822732b4282
 F generic/domxpath.h dfd8f333372a695bed37d97c0b314f7b76e24ea3
 F generic/domxslt.c a2616bcdd21e91c3f0b8829ae5402a58d1aec38d
 F generic/domxslt.h d8b3177418299ec4e3f1f92b736756e42d2dd3e1
@@ -158,7 +158,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P bc13e06b3793612ea39de13e674fb281d5e84310
+P 18a313771b9785aefed5db334f819cd5c77a4cfa
 U rolf
-Z 269bb414cf442fb27537b68fc5e6ac28
+Z f972928fa05e779208a8343c09632761
 # Remove this line to create a well-formed Fossil manifest.
