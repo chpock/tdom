@@ -1,5 +1,5 @@
-C Fixed\sa\spossible\sinvalid\smemory\sread.\n
-D 2002-10-31T00:22:00
+C Fixed\smemory\sleak\swith\spreceding-sibling\saxes.\sMassaged\srscopy\scode,\nto\spacify\smemory\sdebugger.\sRemoved\sold\s(dead)\scode.\n
+D 2002-10-31T00:25:41
 F ChangeLog add1ef7c35d71956cfbd4e6d3f9ccb4ffef1dd42
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 66936cbfa9580e3037d502f2e1d73aa112ed46d6
@@ -108,7 +108,7 @@ F generic/domalloc.h 5e94d96321fb4f926b6e2c8cf01b8a28c3d0be0f
 F generic/domhtml.c 54fdfbbe29a80c0c2d5dcb081dc2ab183f1baf98
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c 6ccd7856d011fd273b9f613d62a6790b7d9e93ab
-F generic/domxpath.c 970c96ee15982d5c3f1050979b48b7d71f21c1eb
+F generic/domxpath.c c0b85b9e7b4e49ebb9c0f45319c8eb40ce9f4baa
 F generic/domxpath.h 4e113d912e5840da684d1fa341739f25051d37f1
 F generic/domxslt.c 16a23d52f4ef34ae76929ffed66f72fec9e4ab80
 F generic/domxslt.h 77d19235cbf254d3ba46ae28088fdcbf98a4856a
@@ -185,7 +185,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 93918db222a2f790e8faec45309fce33995d81ea
+P a94300e910114115495ed2af92f0fdd3ebbe684d
 U rolf
-Z 88019e62ccccd97a71a87213d6404bef
+Z 5c0927cb79180a8efbc21661c9cef0fc
 # Remove this line to create a well-formed Fossil manifest.
