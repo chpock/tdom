@@ -1,5 +1,5 @@
-C Fixed\seditorial\sslip\sthrou.\n
-D 2003-03-23T02:07:09
+C Final\stweaking\sfor\s0.7.6.\n
+D 2003-03-24T19:57:21
 F CHANGES 87334aee80e9af7a72560e564ddddb7bf97ca551
 F ChangeLog e4fed2b4c6416c1f8b1549c19cbb15079257ba4d
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -153,10 +153,10 @@ F mac/PrecompHeaders/CoreHeadersMach-O.h 508208239a919a6dee4275f9148962a13faeb94
 F mac/PrecompHeaders/CoreHeadersMach-O.pch 60665d6a2787eb3dfda701baff12dd3d5029e7f5
 F mac/Prefix/expatPrefix.h d131932b0c668d4cdef1eebc35f1b5267882d00d
 F mac/Prefix/expatPrefix_OSX.h 51c7e40981af4b6b8b974bf4cc4c2f63968031e2
-F mac/Prefix/tDOMPrefix.h d7f827cc39ebec1cc31123cfeed4b7980464ce1e
-F mac/Prefix/tDOMPrefix_OSX.h 3543f26ea0571a638222b0b2432279fd117e65af
-F mac/Prefix/tncPrefix.h de9a8e9890e527d7beaad32d1258ce9f7ca0025c
-F mac/Prefix/tncPrefix_OSX.h a9db03d4e522b79362babd80a95f7a851b3e970b
+F mac/Prefix/tDOMPrefix.h efb19bafd71c1d4e07af7363184caf360293e9f8
+F mac/Prefix/tDOMPrefix_OSX.h 736b5b4c1f052a624767ced5ca312b81581ac4b9
+F mac/Prefix/tncPrefix.h fb4033860688808a196991f8cce3d6dd81b5eb8e
+F mac/Prefix/tncPrefix_OSX.h 482e243e92a724d677c9e76f9eac956464252299
 F mac/Readme_Mac_Compiling 056f0af20fddfe4c08d0e0e2064c45068335611b
 F mac/macconfig.h b2b5d6e596f07f5d1ff60aab6df666b0acc46adb
 F mac/tDOM.exp d3cefd106ba630c4b283e89bd703754c845da3b4
@@ -164,7 +164,7 @@ F mac/tDOM.prj.xml 46bd1d275171d95875d892c79c57025dedcf485a
 F mac/tDOM.r 26350d07913dd0ba88d8313bc71b92774a029e81
 F mac/tDOM/pkgIndex.tcl 946d3abc06360e9ff6ef9c5f90c953e949962ec3
 F mac/tDOM/tdom.tcl 09c254af11c857ba27594eba18cfaa14997369dd
-F mac/tDOM_OSX.prj.xml cd603331546b76de622b7312784f6744b08684d2
+F mac/tDOM_OSX.prj.xml 7432a2ab9717e4ff01383198d39a729b1b6577ce
 F mac/tnc.exp b5221cfee6631ca94e46626dcd5c54e7e9cde7ba
 F mac/tnc.r ce718255e902d882f872087908dcd234fdc9fa51
 F macosx/README 00dec2531e5e466a5fab02bf2e5cfb3ca0ea650e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 64b2c2958abb6371c1ab7c24364e962999ab526f
+P c90afec5b8475126b94cdef0ba03fa17bd582f93
 U rolf
-Z 5bca45244ce96370b0fc0c2dac6096bb
+Z 3d22478a49d7ab4c3d3121a6fc4814bd
 # Remove this line to create a well-formed Fossil manifest.
