@@ -1,5 +1,5 @@
-C Added\snew\smethods\sisName,\sisNCName,\sisQName\sand\sisCharData\sto\sthe\s'dom'\scommand.\n
-D 2002-10-20T15:57:18
+C Done\ssome\sproof-reading.\sCorresponding\sdom.n\sand\sdom.html\sshould\sbe\ssynced.\n
+D 2002-10-22T06:45:18
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 2086eca836d27f5319bc34c0c379fc1009993adf
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -12,7 +12,7 @@ F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html d577b9042af417658359f99369d99140308504c8
 F doc/dom.n b77dd3dff14f9ddcc594197da197b475ebc60b7e
-F doc/dom.xml 7629d42c0eec1e35c9c33e2c7c14d75eb2763bf9
+F doc/dom.xml d4dc37115f1b4f0401c7209c434b8adcc6427741
 F doc/domDoc.html 64cdbc37c5ba78bda175cb5489c062ec541dbbee
 F doc/domDoc.n 778f7a73c0dc2c2ddc1c185a3ac5da15bc313616
 F doc/domDoc.xml 60e9c4c51ee5ca287b56c01cf9f0751743753858
@@ -184,7 +184,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c01edd680e748de97c357c40ca9bee17acdd367b
-U rolf
-Z 91106b4be8f469d64df7f545099c6568
+P 0e9f53dac9bfd863c603470773045d906712be0f
+U zoran
+Z 302c3564fdd218acafcabdaa47ea0eaf
 # Remove this line to create a well-formed Fossil manifest.
