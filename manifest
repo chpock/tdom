@@ -1,5 +1,5 @@
-C Improved\sVC++\scompiler\smakefile.\sThanks\sto\sPat\sThoyts\sfor\ncontribution.\n
-D 2005-01-07T15:14:28
+C Added\sthis\sfiles.\sThanks\sto\sPat\sThoyts\sfor\scontribution.\n
+D 2005-01-07T15:16:12
 F CHANGES 5bb7643fd67d14d82ee76b8584bd319aeebec7b2
 F ChangeLog ca3b3b68e24fd48557154e50e8e0e9b80baa8e78
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -225,12 +225,15 @@ F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F win/makefile.vc 7511b0f55fbe4ef8f50998cc10ae158c09d0ffc3
 F win/makefile805.vc e7ad7a308ba2c86a435badb06672708cc8145b2c
 F win/mkd.bat 85d3fe58ce051a778447fb2bfc7384867d21cef0
+F win/nmakehlp.c 31a5548b2bd3b53c2e292faa1dc0a093e26285c2
 F win/pkgIndex.tcl cfc3de56cc42062ee9d722bb5521b4324fb8147c
+F win/rules.vc 209cd65636302f20130e68a95cc4ae18a8b5d921
+F win/tdom.rc 2f20f0e71fce5f64ee6a44e97bc14f38dc6b4338
 F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 557cc56ed26d00e47bd40f685475f3e7db241eec
+P 1dc6acc00d8f003709ebfbf06d7198adab39f569
 U rolf
-Z 08e7f9f9e04aa88517445075571b9307
+Z 46ca564c1ae078775e02e01db4b6897c
 # Remove this line to create a well-formed Fossil manifest.
