@@ -1,7 +1,7 @@
-C domAppendNewElementNode():\sSet\sthe\snamespace\sof\sa\sper\sxslt\ntransformation\sgenerated\snode\swrong\sunder\scertain\scircumstances.\sThis\nfixes\shttp://groups.yahoo.com/group/tdom/message/1008.\sRemoved\nleftover\s(former\slocal\sused)\sdefine\sTNODE.\n
-D 2004-12-21T02:12:33
+C See\sfile.\n
+D 2004-12-21T02:13:02
 F CHANGES 5e1729ae568c08de4588a28d3584d862a29a2022
-F ChangeLog deb392f61807c631c234607ed7fb03464ce10107
+F ChangeLog 9ee228775a5c0334242d16800d4e9b811bef562c
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -230,7 +230,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ac54b13067326faf60e3fc652d7d041a1508598a
+P 2c65ed39b622b32d0df07ab0d2f98b9295086530
 U rolf
-Z de152e242dba0d2d268a644544843c65
+Z da5a204a352d0c5fab815135ea213743
 # Remove this line to create a well-formed Fossil manifest.
