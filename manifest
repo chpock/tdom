@@ -1,5 +1,5 @@
-C Minimal\scode\stweaking,\sneeded\sfor\sVC++\s6.0\sbuild.\n
-D 2002-10-13T00:54:46
+C A\sfew\sminor\s(and\smostly\snot\seven\snotable)\soptimizations,\spartly\sof\ndubious\svalue.\sAt\sleast\sthe\simproved\smatch\spattern\spredicates\noptimizations\spoint\sto\sthe\sright\sdirection\s(and\sare\sreal\swinner\sfor\nsome\sstylesheets\sand\sreal\sbig\sinput\sdata),\seven\sif\sthis\shole\spredicate\noptimization\sbusiness\sshould\sreworked\sto\sa\smore\sgeneral\ssolution,\ninstead\sof\sthe\scurrent\s'handle\ssome\scommon\scases\sand\stry\sto\sbe\son\sthe\nsecure\sside\sfor\sall\sother'\sapproach.\n
+D 2002-10-14T23:56:06
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 2086eca836d27f5319bc34c0c379fc1009993adf
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -107,7 +107,7 @@ F generic/domalloc.h 5e94d96321fb4f926b6e2c8cf01b8a28c3d0be0f
 F generic/domhtml.c 98fd5bb233b74b41b16a6abdca441727eb038a9e
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c 6ccd7856d011fd273b9f613d62a6790b7d9e93ab
-F generic/domxpath.c 485534cdee9ae73bfdcb1404de63f2027a39ce51
+F generic/domxpath.c 9243cb5d1d7df70ecc58cf88e0605e84a28edd6e
 F generic/domxpath.h 4e113d912e5840da684d1fa341739f25051d37f1
 F generic/domxslt.c 243e7da274223c020f156b2cf3913f89bad0ca20
 F generic/domxslt.h 77d19235cbf254d3ba46ae28088fdcbf98a4856a
@@ -183,7 +183,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P fd09eaa5538f9f7a0a94d4559e090671e0204122
+P 4a8cfb72476f5bdefd05ceaf4977582e542a50c0
 U rolf
-Z 3013efe37ab87f63561782c9cf455ef4
+Z c4d4dafe1a15a8608a9d9156463a80ab
 # Remove this line to create a well-formed Fossil manifest.
