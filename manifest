@@ -1,7 +1,7 @@
-C Fix\sfor\sthe\stemplate\spriority\scalculation\sand\sclearing\sout\sof\nxpathGetPrio().\n
-D 2004-03-26T00:36:48
+C See\sfile.\n
+D 2004-03-26T00:37:19
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
-F ChangeLog 284eee645b6b98305498ea3ff1e9eeaf8291ba0b
+F ChangeLog 793359736d62a6eb2793797ef1f663e7a0b34603
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -227,7 +227,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 47d859b6913dd2f062867c381b444931b1f3e0a0
+P ba7f75901844469464b6d73aca0614af1cce836d
 U rolf
-Z 4d7eb1f0c90a686ca6b7f859b5d914d3
+Z cb715c2cbeb67df490196fde15bc564c
 # Remove this line to create a well-formed Fossil manifest.
