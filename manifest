@@ -1,5 +1,5 @@
-C See\sfile\n
-D 2002-11-15T19:39:47
+C Fixed\sbugs,\swhich\sonly\sraised\sthere\shead\sif\scompiled\sagainst\stcl8.0.5.\n
+D 2002-11-16T01:23:50
 F CHANGES 17f8fddea36060afdc3691cf6a989be83d353c40
 F ChangeLog a9941af3978d33ccc2d38b4c0ed2c08c64fc1acd
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -126,7 +126,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 34b586ff917e7fcba2110f4201311f376d723a3e
 F generic/nodecmd.h 20210ad9b4a3bdd6055175beca7bfdd8bd318a3f
-F generic/tcldom.c 6ab7504938727de0c9dc34cfe92b81ec63df05bf
+F generic/tcldom.c c230803513247a14730c71106524d1d050b32a8e
 F generic/tcldom.h b06a092266deed3a050a824a8f1963b91e4c3649
 F generic/tclexpat.c 59ef95feef8034596a036674a4e0118c0a9b59f2
 F generic/tclexpat.h 62e83591b9fff070825add84310f7f7cc8cff3b8
@@ -195,7 +195,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f1b90ac63a60817ae2b8dd33947ccc00ee7daf60
-U zoran
-Z 0fcb3f096b10f9669faac3676a095376
+P f832de9a41d9b521ac459b63fb111289621496fb
+U rolf
+Z 6af279ff0e0c85f9411f3218066a3adf
 # Remove this line to create a well-formed Fossil manifest.
