@@ -1,5 +1,5 @@
-C Changed\scvs\skeyword.\n
-D 2004-05-12T16:11:37
+C Added\sisPIName,\sisComment,\sisCDATA\sand\sisPIValue\smethod\sto\sthe\sdom\scommand.\sCreated\snew\sglobal(thread\swide)\sflags\sfor\sname\sand\svalue\schecks\s(Names\sand\sFQ\sNames\s(element,\sattribute\sand\sprocessing\sinstruction\snames),text\snodes,\scomments,\sCDATA\ssections\sand\sprocessing\sinstruction\svalues).\sNew\smethods\ssetNameCheck\sand\ssetTextCheck\sto\scontrol\sthis\sflags.\n
+D 2004-05-26T01:42:13
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog 6eafd0059347a55b4b6a4fc51c05cff5af0d081e
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -14,9 +14,9 @@ F configure-tcl8.0.5 a5d0c7988aaf04fb2fbba0746f84895b2b3f58de x
 F configure.in 4ea3774cd8870c2d58c9b2feb1441525d40bc49f
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
-F doc/dom.html 0148c1f13ebd6b87fa4a7be1bea24b95690808b9
-F doc/dom.n 0a62d1ce6419735b71a83ad22892f7a028554f40
-F doc/dom.xml c199ed098aeace1893dc391dac9aabe89c224cf5
+F doc/dom.html e869e6d8ea6870749c0fa31a89fa3287630d5588
+F doc/dom.n 10d439aace4077b92641e55df1e196fae99942b7
+F doc/dom.xml 25dbf61abad51ff628720578ee4e632cf0dbb02f
 F doc/domDoc.html 0f9ecf66cdd6c37d04bbd5317b68cf7df2058e67
 F doc/domDoc.n d247420f030bb7bf2750821adbe79d369e4122a3
 F doc/domDoc.xml c20eba1a0edaa5600090ad5f13acf365c93acc0d
@@ -227,7 +227,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 9f510a232ed0eb9ba5d93697ad6858cc6280665d
+P b7bd91a7efc18ff7f98b5889531921394752d056
 U rolf
-Z 1c6494545eb17fc847a6f0b92f257041
+Z 3763a4fd0267c9a70db79b031e057001
 # Remove this line to create a well-formed Fossil manifest.
