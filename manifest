@@ -1,5 +1,5 @@
-C Added\sexplicit\smemory\sclean\sup\sof\sthe\snodecmd\sstack,\sto\sreduce\s'noice'\nwhile\smemory\sleak\sdebugging.\n
-D 2003-03-19T13:47:42
+C Replaced\sa\sfew\sexit()\scode\swith\sTcl_Panic(),\swhich\sensures,\sthat\seven\nwindows\susers\sget\sa\susefull\serror\smsg.\sAdded\soption\s-useForeignDTD\sto\ndom\sparse\sand\sexpat.\sFixed\spotential\smemory\sproblem\swhile\sprocessing\nerroneous\sstylesheet.\sImproved\serror\smsg\sin\scase\sof\sscript\serrors\sin\nthe\s-externalentitycommand\sscript.\sAdded\smethod\s'startBefore',\sto\ncompare\sthe\srelative\sorder\sof\stwo\snodes\sout\sof\sthe\ssame\sdocument.\n
+D 2003-03-19T13:50:29
 F CHANGES bedaded2db2b4b9c98267dec8dcfb01261cfbb9a
 F ChangeLog 446a9519a6f4745107c006547eadc4f8e95db6c9
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -132,7 +132,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c c2fe5b784c2ad83c904edd3d82050b8f7c7fc444
 F generic/nodecmd.h 20210ad9b4a3bdd6055175beca7bfdd8bd318a3f
-F generic/tcldom.c 28140d27e65c1118739e3ab7b852f884107ad3b7
+F generic/tcldom.c 43cd0f97b8ffca413999b9c7c687864eb5fd517d
 F generic/tcldom.h 887f9bad5712f88523eedf06567a37ce183f777c
 F generic/tclexpat.c 8b9f2c9ff704dd5f3a57e15c915fff6be9b892ad
 F generic/tclexpat.h 62e83591b9fff070825add84310f7f7cc8cff3b8
@@ -223,7 +223,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 7a8fadc97a6020ab77b927bfc7715e3d6ada6484
+P 5d57e5e11263ae40ddd2e1824913ae2a1b79d06a
 U rolf
-Z 3aa4e416e3176c166302760d3b04d4aa
+Z 5cc42941a825eb5f6a6db75a9106843c
 # Remove this line to create a well-formed Fossil manifest.
