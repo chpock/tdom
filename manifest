@@ -1,5 +1,5 @@
-C Fixed\smemory\sleak\s(in\stemplate\sclean\sup;\sintroduced\swith\sthe\snew\ntemplate\smatching\shandling).\n
-D 2002-10-31T00:28:53
+C Corrected\stext\sof\san\serror\smsg.\n
+D 2002-10-31T00:31:06
 F ChangeLog add1ef7c35d71956cfbd4e6d3f9ccb4ffef1dd42
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 66936cbfa9580e3037d502f2e1d73aa112ed46d6
@@ -118,7 +118,7 @@ F generic/nodecmd.c efee6b4e07c64795c8224c122b74dc401e43d0e4
 F generic/nodecmd.h 20210ad9b4a3bdd6055175beca7bfdd8bd318a3f
 F generic/tcldom.c 3c02811bed5da74b06140f8b266a21b0a2b72d76
 F generic/tcldom.h b06a092266deed3a050a824a8f1963b91e4c3649
-F generic/tclexpat.c 5920f376d971d29e33c6aa61249995e4a495aac3
+F generic/tclexpat.c 59ef95feef8034596a036674a4e0118c0a9b59f2
 F generic/tclexpat.h 62e83591b9fff070825add84310f7f7cc8cff3b8
 F generic/tdom.decls 7c024d1386ebc0eee7f70017554734b3926fa1fe
 F generic/tdom.h caf10edb3081c91d01abb883d8a2364cdd0dd840
@@ -185,7 +185,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a577ce8226d2a7229a43ab9fc1d21572256381ae
+P 9771d8bef6a6fb750c83ad828390bac023e1e621
 U rolf
-Z 81dfe4e7e0606f1b8ec81a05ca0e0c2a
+Z ec1e2588f367e5787b998c960db33df4
 # Remove this line to create a well-formed Fossil manifest.
