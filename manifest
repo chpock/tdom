@@ -1,5 +1,5 @@
-C Added\sdocumentation\sfor\sthe\stoXSLTcmd\smethod\sand\sthe\sresulting\sxsltCmds.\sCorrected\sthe\sdocumentation\sfor\sthe\sxslt\smethod\s(missed\s-ignoreUndeclaredParameters\sand\s-xsltmessagecmd\sin\sthe\smethod\ssyntax).\n
-D 2003-04-09T20:02:32
+C Fixed\sa\sbug\sin\sthe\svalue\sparsing\sof\sthe\s-paramentityparsing\soption.\n
+D 2003-04-09T20:05:02
 F CHANGES ca483fbc7c627b68977fc3eb6cf6798f42bca33c
 F ChangeLog 4b901cec6b84cec93869a3df97d0c29dae27ef1e
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -134,7 +134,7 @@ F generic/nodecmd.c c2fe5b784c2ad83c904edd3d82050b8f7c7fc444
 F generic/nodecmd.h 20210ad9b4a3bdd6055175beca7bfdd8bd318a3f
 F generic/tcldom.c f50ad9bd09fb25f3eb348d6ee4375e20249bca63
 F generic/tcldom.h 1c21383eabe24ac9bea93e4f5c66f9a64a7b68d1
-F generic/tclexpat.c b82c1af8cd8b6e64ca0f6f8ec84d315efe455537
+F generic/tclexpat.c e08727e8e2bb87f023f8dd66135c00db3aa4f02a
 F generic/tclexpat.h 62e83591b9fff070825add84310f7f7cc8cff3b8
 F generic/tdom.decls fa90ba9b8d00f5b405ea68724d95ad79f64c424b
 F generic/tdom.h db128152fac506159243e47cb3a77cc7d9fe4360
@@ -207,7 +207,7 @@ F tests/htmlreader.test d39e554d91ce48390e7b5743974b4fad8fc8eeb8
 F tests/i18n.test ad68655284ea0bf4f2c5a0acc098fd05587ba9a4
 F tests/loadtdom.tcl ae53eb1f069f63cf2baf696893507f0f50575275
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
-F tests/parser.test 39d7e5bdbbecd7f929a120223d24e7ab43444914
+F tests/parser.test 4f12b3904d42f192b5223be1a30be9692800fb3f
 F tests/pcdata.test d91fbfd9ca0feeff64d930c3b01355fc97ccd03e
 F tests/pi.test 03bb450cd334ca0454a6c99ca3270092ba684833
 F tests/stackedhdl.test 4b3dafa96849dabf738ffb401585dac5a5aed550
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 7ceca71c15d57888b091b8e0c285514d06717200
+P 953bfabb7d5274708656cec103b00f503345df2a
 U rolf
-Z 805672c130ea9febac0b9547aa5d52f1
+Z 0a848a9e17dd900fe4a9cfdefd4c2833
 # Remove this line to create a well-formed Fossil manifest.
