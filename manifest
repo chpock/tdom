@@ -1,7 +1,7 @@
-C Removed\snot\sused\svars.\n
-D 2003-10-12T01:59:11
+C See\sfile.\n
+D 2003-10-12T01:59:59
 F CHANGES 993140b623ef50267a92d858779d91eeaf39da4c
-F ChangeLog d831ee415c27ff9c8151af950abf953e0c37057e
+F ChangeLog 8e9e3dbc708edba7c3e33f8e8744cf16ba39fbf3
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 7f2fefd0c2b7164fbbd284aae0922c08db02e777
+P fc30d07ea296c3015af134535a9245f1c2dba059
 U rolf
-Z 0ccbb4a9d4cbc4f1fab6b28ec69d59e5
+Z 481b6de31d7e5cea5b737a0d41af9d0f
 # Remove this line to create a well-formed Fossil manifest.
