@@ -1,5 +1,5 @@
-C Added\snew\smethod\s'asText'\sto\sdomDocs\sand\sdomNodes.\sRenamed\nxpathGetTextValue()\sto\sxpathGetStringValue(),\sto\sbe\smore\saccording\sto\nthe\svocabular\sof\sthe\sXPath\srec.\n
-D 2003-10-04T19:06:06
+C Added\snew\smethod\s'asText'\sto\sdomDocs\sand\sdomNodes.\sRenamed\spathGetTextValue()\sto\sxpathGetStringValue(),\sto\sbe\smore\saccording\sto\sthe\svocabular\sof\sthe\sXPath\srec.\n
+D 2003-10-04T19:08:13
 F CHANGES 813a168a7b86886b7d8988978f2ae6a85e2f0663
 F ChangeLog 7b4651cf5e47a494093eba712963fc26a6e58b24
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -17,12 +17,12 @@ F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html 0148c1f13ebd6b87fa4a7be1bea24b95690808b9
 F doc/dom.n 0a62d1ce6419735b71a83ad22892f7a028554f40
 F doc/dom.xml c199ed098aeace1893dc391dac9aabe89c224cf5
-F doc/domDoc.html ec56415dc6282448b0fe3427dec24c4dce348690
-F doc/domDoc.n 1db76a41071f43358a015ae86073c5bcfeb9d3c9
-F doc/domDoc.xml cf6075d105fc436387b379e945908d626938288d
-F doc/domNode.html 11e0554bdf74c31b2e10fcedeb5948589f377a78
-F doc/domNode.n 073611bb474ddb35d18b7ff22dec507b2b2c5629
-F doc/domNode.xml b6208d1215e89a225c3a2db9b7a96c50f9247b9d
+F doc/domDoc.html e091816186d342442f584162d3b04a9ccbcb23df
+F doc/domDoc.n 7b0a45350e86ea8bef0598b1dcd648429963b6ba
+F doc/domDoc.xml a5abb620b52c68ad484761b3f90a0ffad0f62e5d
+F doc/domNode.html 2f07f92f0c30ab5f71448345ad6feae5bc3c8744
+F doc/domNode.n 2f3de9b3042dc5f3846382e318d8427df024a49e
+F doc/domNode.xml eda70539cc881283ce430f8932ed7c4da3f3b23b
 F doc/expat.html 052d8ed7ad56b9c44fa77bb649334d31568cc630
 F doc/expat.n e3ab0f2cb0e016e7529bf33d3a06b6a9bd4ea633
 F doc/expat.xml 4d3dda0c9a0554d02951904eb42dd593d97b6601
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 0ba57953f2e1a03a17ae65e1b8830746b8b9c9bc
+P 08d7ad7cbc9035a67717ed2965b2357118db4066
 U rolf
-Z f94002e0a8a7c12120805abe14f7c911
+Z e287264095e40267417ef2f2417e5122
 # Remove this line to create a well-formed Fossil manifest.
