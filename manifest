@@ -1,5 +1,5 @@
-C Fix\sfor\sthe\sformat-number()\scode.\sFix\sfor\sthe\snotorious\s(notorious\nwhat?\s-\sHm,\sto\scomplicated,\sto\sslow)\svariable/parameter\shandling.\sIn\ncases\slike\n<xsl:call-template\sname="PrintNSPrefix">\n\s\s\s<xsl:with-param\sname="prefix">\n\s\s\s\s\s\s<xsl:call-template\sname="GetElementPrefix">\n\s\s\s\s\s\s\s\s\s<xsl:with-param\sname="element"\sselect="$element"/>\n\s\s\s\s\s\s</xsl:call-template>\n\s\s\s</xsl:with-param>\n</xsl:call-template>\nie\swe\scall\sa\stemplate\swith\sa\sparameter,\swhich\ssetting\stemplate\ncalls\sanother\stemplate,\sthere\swas\sa\svar\sscope\sproblem.\sCode\sto\shandle\ndifferences\sbetween\snode\sand\sattrnode\sstructures\sat\sa\sfew\splaces.\n
-D 2002-08-04T23:47:37
+C Add\sthe\s'build-in'\snamespace\sprefix\s"xml"\salso\sfor\sdocuments\sparsed\nwith\sthe\ssimple\sparser.\n
+D 2002-08-04T23:49:50
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 90af78958d8b642862a15b9029b0bd8fad84da5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -129,7 +129,7 @@ F generic/tdominit.c f63527d1fac4e59918112a5827f4517622172ab7
 F generic/utf8conv.c fc01b4776a82c937252a7d2593a3d244916905f7
 F generic/utf8conv.h e0d2756b2d77ad9a8508a0dcf7cce5e10fa4c9a5
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
-F generic/xmlsimple.c a48264a486a371823c9faf65ea7e8601da358552
+F generic/xmlsimple.c 2098b0d7cb77ae5e85f393552b8ebc6b60377fb9
 F generic/xmlsimple.h f2861868b0fed932c79f9e595bb875d261d97bd5
 F lib/domhtml.tcl 1ce01926d867282e27e87c08bb4c2b7875f4003b
 F lib/tdom.tcl e3ede5bf84ef749263382d0b9cb8bc9a9d3d3a4e
@@ -182,7 +182,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 12bab8d6990ba4f8192005c868fed5d5be053c91
+P 88aeb96b3f57157306da6aedbd55af72155e6c55
 U rolf
-Z fc2ec1c3ff032bf0da0e3560bee65b38
+Z aa5437b8567cf2f85f5af9e59ffbf963
 # Remove this line to create a well-formed Fossil manifest.
