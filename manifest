@@ -1,5 +1,5 @@
-C Added\sa\sfew\stests\srelated\sto\sdeclarations\sto\schapter\s4.2\sand\s4.4\sin\nthe\serrata\sto\sthe\sXPath\srec.\n
-D 2003-11-03T00:19:54
+C Fixed\smemory\sleak,\sif\sfloor\sor\sceiling\sare\scalled\swith\snon-numbers.\n
+D 2003-11-03T00:20:30
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog e9218cfe00c9b6d6015aac121321d4cd93aa8a39
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -124,7 +124,7 @@ F generic/domalloc.h 5e94d96321fb4f926b6e2c8cf01b8a28c3d0be0f
 F generic/domhtml.c 9a7ec999da852d996d7ac9c936534b965039e4cf
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c 4cd8e6e228bd6c12c43d3b3e860a60f7ce507c34
-F generic/domxpath.c 3b718795359350870372e4250fff01869130913c
+F generic/domxpath.c 7c2d942168640f0900ac69daec525d2cd4013f77
 F generic/domxpath.h ec29823825248b0df1076860593c83562727f132
 F generic/domxslt.c 8014a8a28633531d5527a31c43f90fee8798a475
 F generic/domxslt.h b60468a7092d4d5712b4a8776f3db51d4c03aa04
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c034eb6da9b2d1089bafa9763851c788fb531fd2
+P a7464f9aa0e2a1c4b37344df2ff6a8d4dd15004d
 U rolf
-Z 76726e41bf5231cd840feabc9d0d8397
+Z 25624dd2610663f968d0c6b52a1ccd86
 # Remove this line to create a well-formed Fossil manifest.
