@@ -1,5 +1,5 @@
-C Documented\snew\s-returnNodeCmd\soption\sof\sthe\screateNodeCmd\smethod.\sMinor\seditorial\schanges.\n
-D 2002-10-30T00:21:33
+C Documented\snew\s-escapeNonASCII\soption\sof\sthe\sasXML\sand\sasHTML\smethods\sand\snew\s-htmlEntities\soption\sof\sthe\sasHTML\smethod.\sDocumented\snew\sxslt\smethod.\sMinor\seditorial\schanges.\n
+D 2002-10-30T00:25:05
 F ChangeLog c7426456c8e195f73b20fa9d6615b8e7ab1cdf9e
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 66936cbfa9580e3037d502f2e1d73aa112ed46d6
@@ -14,10 +14,10 @@ F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html 9de79d4b6e264bc302e9399ae1b97d87ce1622ff
 F doc/dom.n 1c10b2545356eed5645a2013474c221471a3deee
 F doc/dom.xml a93c3468d324d8322b2510f669c7298845186297
-F doc/domDoc.html 64cdbc37c5ba78bda175cb5489c062ec541dbbee
-F doc/domDoc.n 778f7a73c0dc2c2ddc1c185a3ac5da15bc313616
-F doc/domDoc.xml 60e9c4c51ee5ca287b56c01cf9f0751743753858
-F doc/domNode.html 8618ae13ed7c5944ede353ad169b3edb1694e560
+F doc/domDoc.html e2cc55ec4623a1698bf821def32ebd7e870042e9
+F doc/domDoc.n 115453bbf0c1d61bf4e8995a427326ed91cd610a
+F doc/domDoc.xml d9b7d66741100b9fa6e5cd1c4753f7283c285886
+F doc/domNode.html 26e68fbaf749614e6a44b07ba883fc2a99606a6d
 F doc/domNode.n ca93b911127f39f6a64d4be2cc5ce0c1f63253a1
 F doc/domNode.xml ebc75caa606aaf00a5169d92412c8cbf064fdcea
 F doc/expat.html 174b17c099dcf63cf4eb484fe9999055f303bb5a
@@ -185,7 +185,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 6c93e4035de58a74abfdcefdb74d001b1a4f325f
+P ebc96762acd1552307af8a2854fc02a15c514596
 U rolf
-Z e6847e55313902fe15c9a2c2892a684a
+Z 03d76ab0d4b756f6a91940c73572df45
 # Remove this line to create a well-formed Fossil manifest.
