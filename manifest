@@ -1,5 +1,5 @@
-C Enhanced\sthe\snew\scget\smethod\sof\sparserObjs\sto\salso\sreport\sthe\sstate\sof\n-noexpand,\s-useForeignDTD,\s-paramentityparsing\s(those\sby\sdoing\sthe\nbookkeeping\swith\san\senhanced\sTclGenExpatInfo\sstruct,\sbecause\sthe\sexpat\nparser\sdo\snot\sproived\san\sAPI\sto\srequest\sthis\ssettings)\sand\s-namespace.\n
-D 2003-09-16T22:53:58
+C Enhanced\sthe\snew\scget\smethod\sof\sparserObjs\sto\salso\sreport\sthe\sstate\sof\n-noexpand,\s-useForeignDTD,\s-paramentityparsing\s(those\sby\sdoing\sthe\nbookkeeping\swith\san\senhanced\sTclGenExpatInfo\sstruct,\sbecause\sthe\sexpat\nparser\sdo\snot\sproived\san\sAPI\sto\srequest\sthis\ssettings)\sand\n-namespace.\sImproved\sargument\scheck\sof\sthe\sparser\sobj\smethod\ncalls.\sOptimization\sfor\scalling\shandler\sscripts.\n
+D 2003-09-16T22:54:36
 F CHANGES 59cab3c950a08a20053aa26b3a8718c6efa8c913
 F ChangeLog 6881867960e9fdb2907269ebe00e19fd1cd749b9
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -134,7 +134,7 @@ F generic/nodecmd.c e55fc727ca806a5956bd3bebfeffa4b86287a86e
 F generic/nodecmd.h 20210ad9b4a3bdd6055175beca7bfdd8bd318a3f
 F generic/tcldom.c 763373e399e6b558fe4b44c8bd7dff87f316e477
 F generic/tcldom.h 1c21383eabe24ac9bea93e4f5c66f9a64a7b68d1
-F generic/tclexpat.c 7631c91ce61c5ae2a7062ef51e1f5835d4fc5c76
+F generic/tclexpat.c d4cd61e7fa6d98d5e99b5f8c1ff75a0a86cd731b
 F generic/tclexpat.h 654f6d0b4b486841360bc9066c27212f6e8b6c63
 F generic/tdom.decls 760ad3234a869b8191436bd53370b812266d98d5
 F generic/tdom.h db128152fac506159243e47cb3a77cc7d9fe4360
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c75d4d0c1e21c165fab17e3c0aad6dddda8fd947
+P 58a2c227034a2a06ebe3ff3cdbaea5d4eb69d53f
 U rolf
-Z 6a23a1e5e28304d3c050f4dd9b2028a0
+Z 7fc803e7fda10eb9469414ec82fc2320
 # Remove this line to create a well-formed Fossil manifest.
