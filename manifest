@@ -1,7 +1,7 @@
-C Reworked\sthe\swhite\sspace\sstripping\sfor\sXML\ssources\sa\sbit.\sBetter\swhite\nspace\shandling\sin\stoken\slists.\n
-D 2002-12-23T03:12:04
+C See\sfile.\n
+D 2002-12-23T03:12:36
 F CHANGES 17f8fddea36060afdc3691cf6a989be83d353c40
-F ChangeLog 1d8c75a8a2efc9f5853011e33bf5bfd92f431f89
+F ChangeLog 97da6d516dbb05ffeda096b061e8827681208f62
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 14d751e87eea2482a6f81b2452ce50ce2292016d
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -197,7 +197,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c3782f2bbba54d04123db20e0cda7dcba4a38569
+P d0a4e69e9c978a1d8333aabd22d0e013d11535e3
 U rolf
-Z a5e24cb0906e695aa02dcef8ca221ac5
+Z 81d99a62e47c13d67f5a7cee2a37cb96
 # Remove this line to create a well-formed Fossil manifest.
