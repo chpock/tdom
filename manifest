@@ -1,5 +1,5 @@
-C Updated\sto\sthe\snew\sversion\snr\sand\sthe\slib\sname\sconvention\sof\sthe\snew\sTEA\s2\sbuild\ssystem.\n
-D 2002-11-13T01:08:56
+C Fixed\suninitialized\smemory\sread\s(UMR)\sreport.\n
+D 2002-11-14T08:21:56
 F CHANGES 17f8fddea36060afdc3691cf6a989be83d353c40
 F ChangeLog 5a5d4a40e93c9b61a8fa50f40ccd5cf3bd957711
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -126,7 +126,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 34b586ff917e7fcba2110f4201311f376d723a3e
 F generic/nodecmd.h 20210ad9b4a3bdd6055175beca7bfdd8bd318a3f
-F generic/tcldom.c 739be03ad3d1612df1c520f14b45d7f1d57dd086
+F generic/tcldom.c 056c76d3112f69dcbcc08c1b3fc80ce629306dac
 F generic/tcldom.h b06a092266deed3a050a824a8f1963b91e4c3649
 F generic/tclexpat.c 59ef95feef8034596a036674a4e0118c0a9b59f2
 F generic/tclexpat.h 62e83591b9fff070825add84310f7f7cc8cff3b8
@@ -195,7 +195,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 82361a8c8350966b40b18404541246b2064146af
-U rolf
-Z 281010d9c8a2be88a397467c5b573c38
+P b1e475c1f847dc4385571b4ad3a1c3f10c37b866
+U zoran
+Z 274f247f5b3e5c4eee690d6c15f4f5a0
 # Remove this line to create a well-formed Fossil manifest.
