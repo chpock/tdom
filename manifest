@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2004-07-13T03:33:15
+C Bug\sfix:\sCheck,\sif\srefnode\sgiven\sto\sinsertBeforeFromScript\sis\svalid.\n
+D 2004-07-19T03:20:55
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog 6fbe9bf0083d8b25f5b643d9b0d49bbd359c944f
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -130,7 +130,7 @@ F generic/domxslt.c 19cad6679971146d986d41b39f96127c86c52a16
 F generic/domxslt.h b60468a7092d4d5712b4a8776f3db51d4c03aa04
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F generic/nodecmd.c 149fc3a40724be5c27c73ad609429860dd674226
+F generic/nodecmd.c bd617b5ad9643d207b2cbcae7c918df3db601af8
 F generic/nodecmd.h 93a8fe44e2d96e0a88fe2a94001e18c709ac7a81
 F generic/tcldom.c 5e925f9fb95060f32f189ca2f5711a6b2906f417
 F generic/tcldom.h 6f0f185ae010f9906b3107acdf879bca6924e0f0
@@ -228,7 +228,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 85260eca8035afba00e7c2c0f2b9f0538c830e74
+P 75bce633fc2b0b654de3904f0c1a1e0e391e1d93
 U rolf
-Z 43ed5d089309a5f49e42164166af3618
+Z 1f7fb2ed47042580e8689140727b2830
 # Remove this line to create a well-formed Fossil manifest.
