@@ -1,17 +1,17 @@
-C Uses\sPACKAGE_NAME\sand\sPACKAGE_VERSION\sinstead\sof\shard-coded\sstrings\n
-D 2005-01-16T11:57:57
+C Added\sTEA-3\ssupport\n
+D 2005-01-16T11:59:16
 F CHANGES 877db3f7a6fd1a5175636e84125230f5949491ac
 F ChangeLog d475c3c7254885be92d3944c5ccfef19758bb6f9
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
-F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
+F Makefile.in 793035f18fb2ad53394e3cda31222b9197e93a3a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
 F README db21b67c7f4f97d6ed22bb7d2af948f5e8f2a644
 F README.AOL 44b39cf7002f8b39a76cc362784c7350fa8e326d
 F aclocal.m4 79e2f4aa6a138371f2d31f28355749e5019d7651
 F apps/xslt.tcl af84f844bafbce1f375ffe17552f2d77c01ef16b
-F configure d12ff589d122ae45870aac8c7fa163786161e22a x
+F configure dc868febdb7209c8ac2754fe8f039a2b4040318c x
 F configure-tcl8.0.5 a5d0c7988aaf04fb2fbba0746f84895b2b3f58de x
-F configure.in 4ea3774cd8870c2d58c9b2feb1441525d40bc49f
+F configure.in 1f565ffbdcbb4595d84844038f24e64a84a7d860
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html 2e1a41b03d31f42dd00a0c449f7f28db6227bbf2
 F doc/dom.html b7bab0b6e2a570ef036e155a712d2da498c1842a
@@ -175,7 +175,7 @@ F tclconfig/README.txt c7a8a24b2782cd897a7608813161611f8e0521a0
 F tclconfig/ac_c_bigendian_cross.m4 d42e2f20b8ea4df7c29a8595f10489bfaab58096
 F tclconfig/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F tclconfig/tcl.m4 f07e10d3c686229b9d3adcb23f62dc7d6ef6f9a9
-F tdom.m4 6362938e20f54b2a5ad0d4c112d3653f627270d2
+F tdom.m4 ec863bf4e76bcf40d9d41d75f6586d2fcff0ad0a
 F tdomConfig.sh.in bb068ad78eefdd9a8554f970b7266c78e976df0b
 F tests/all.tcl a8d5d3e3adc6713f64d0c614b927bd21ca8df870
 F tests/attribute.test 53ac8fb043e79b638c8c6f5e7da848f6103552d6
@@ -233,7 +233,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 0980d4a5ef88ce968e23746f6cd514f26941c7fb
+P 15c12b1b4441e0b8922fa8d0a94091dd53d84182
 U zv
-Z d3268cdffa18c5cd022f052509b92ba2
+Z e48e290366c23b40e8f3addbf83a40c4
 # Remove this line to create a well-formed Fossil manifest.
