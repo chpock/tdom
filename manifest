@@ -1,5 +1,5 @@
-C Fixed\stypo.\n
-D 2003-12-17T03:39:26
+C Also\supdated\sto\snew\sversion\snr\s0.8.0.\n
+D 2003-12-20T01:38:03
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog 60551519e5444f9498279623a246d202e1c4422b
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -222,12 +222,12 @@ F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F win/makefile.vc 14cdae7e0da80475429e8b48209d8f4825aacf0a
 F win/makefile805.vc e7ad7a308ba2c86a435badb06672708cc8145b2c
 F win/mkd.bat 85d3fe58ce051a778447fb2bfc7384867d21cef0
-F win/pkgIndex.tcl d5bb3431b6da7e2677293906274f7235820c45f1
+F win/pkgIndex.tcl acc03857b0132e3f880715e97c08f58bfd250e4d
 F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ca659ba188fcea17f65407a3d5a422264035900d
+P 8b94b3c8cca3d6a7ad7adfb9b3f0c44a5f880b9e
 U rolf
-Z 3f99a62916197dc95dc1db0496685a4c
+Z a5e5a48f0ead06f4af3724e2736d5b2a
 # Remove this line to create a well-formed Fossil manifest.
