@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2005-02-26T13:25:45
+C Using\sof\sa\snode\screating\scommand\soutside\sof\snode\scontext\safter\sthat\nnode\screating\scommand\swas\salready\sused\sin\snode\scontext\sdidn't\sraised\nerror\s(as\sit\sshould)\sbut\scould\shave\sall\skinds\sof\seffects\s(including\nseg\sfault).\n
+D 2005-03-11T18:16:47
 F CHANGES 877db3f7a6fd1a5175636e84125230f5949491ac
 F ChangeLog 68bf632f053ba5c9e5f9508f8abc567f572b35e5
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -132,7 +132,7 @@ F generic/domxslt.c 8ff135a3d711d4cc4e3a4fbfe54df84bdbe16bf7
 F generic/domxslt.h 261176a8cb491de448189fcb9fa93bfcabda5e40
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F generic/nodecmd.c 4e92b088222b049473583333f60fdce7cc2e2132
+F generic/nodecmd.c 7c4d9a30ff5a38b20ce409f1c763abe177dce9bd
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
 F generic/tcldom.c 7fe8137cb966799d74b56a8df41e25cc40454ca4
 F generic/tcldom.h b1b1f6662c83849fb067d294d9d53bba6c07c22c
@@ -200,7 +200,7 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
-F tests/dom.test 289fc94c960bea16cdbdcc61630479ecc3d9bd40
+F tests/dom.test 5b0417d461186391f4b47082a730aac0c6343e87
 F tests/domDoc.test ff69586fd5c15c4cc0275d2b5f16861383e0b4ee
 F tests/domNode.test 00e272ceeeb849f16d06612199438c3019fb952d
 F tests/domnamespace.test 7f6ff7ee11a6cb437240c07be18adc11fd876d46
@@ -233,7 +233,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P eff67db5ef80cc652af9fa77669604893f5ce47b
+P 65002a1a5a0edff4f9ae30a29d6637d3650cd91b
 U rolf
-Z 8997e7cb4a7602940bace55b6df42a99
+Z 1efc85756bf2ce79c29689bb3ac991c8
 # Remove this line to create a well-formed Fossil manifest.
