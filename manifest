@@ -1,5 +1,5 @@
-C There's\ssomething\swrong,\swith\sthe\sheader\sfiles\s(well,\sat\sleast\sVC++6.0\nthinks\sso).\sSeems,\sit\sworks\sin\sthis\sinclude\sorder.\n
-D 2002-05-16T13:16:00
+C Updated\stests\sto\sthe\schanged\screateDocumentNS\ssyntax.\sAdded\ssome\stests.\n
+D 2002-05-16T17:10:01
 F apps/xslt.tcl e5c0a837a82ddf0aa21ddb51d5891acfd64469fc
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html c21ddc9a115a8a82ee1560949dc08a1bc41233b6
@@ -134,7 +134,7 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 19feaf3508b71cad195b145f2e3f3fb4f433a974
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test fc87e607acde7d3404c9c70221f8f24b1944f798
-F tests/dom.test e5d05206b2802da2d8288f2a20cffd384392332a
+F tests/dom.test 8cc4e92e9825748f9c8f5c969e32d84dd3d53c0a
 F tests/domnamespace.test 1cf980a8d0269f84eeafc0a0850725b6184ba52d
 F tests/element.test ce1031e41f9ba75e1935c63985e741fc758d4ffd
 F tests/entity.test 69737ec15ca733dddd319f08f7d7f7cdd1ba2534
@@ -165,7 +165,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P bda233a9c964bbdc8b9b028bc8b3d6ac67ec31cc
+P e60fa09baf9c84d03b4d2c655898a9b9be83c806
 U rolf
-Z b4905fa2652eecdc3bbe43ae2477d701
+Z db210125bc18bf48f650c1801954c340
 # Remove this line to create a well-formed Fossil manifest.
