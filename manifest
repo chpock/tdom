@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2003-02-22T21:55:14
+C Small\scorrections.\n
+D 2003-02-22T23:41:21
 F CHANGES bedaded2db2b4b9c98267dec8dcfb01261cfbb9a
 F ChangeLog d1aa89dc974021912408ae4b5f5dab7e5485c771
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -153,9 +153,9 @@ F tclconfig/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F tclconfig/tcl.m4 71f8690835637fc571099ec81d1c57ed98af7411
 F tdom.m4 6362938e20f54b2a5ad0d4c112d3653f627270d2
 F tdomConfig.sh.in bb068ad78eefdd9a8554f970b7266c78e976df0b
-F tests/all.tcl 8c194ef32259e09d159580532fca58920ba6122a
+F tests/all.tcl 424dfc1cced4a90edc56128796d15a9df8243d81
 F tests/attribute.test 680563462d618d04d11b77fb6baf3073a77fc5c1
-F tests/cdata.test 9246e7b6da1bd86267135da7038a785182e21e06
+F tests/cdata.test 9955e7f6bc93e5ae58fd14fa4d25c716b6d2f7e0
 F tests/comment.test 25ac780959e2c7220d3e92dac01dd5e14fd4acaa
 F tests/data/REC-xslt-19991116.xml d86bd1efbc1f810b2a6f74c0c182bd37ae5ee09d
 F tests/data/books.xml 0b1ae696b2bbc1035303f5637a6ef67f041d0b9e
@@ -173,14 +173,14 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
-F tests/dom.test 72bc856165c03904d0105bed8598d7c25494b203
+F tests/dom.test b48fa24019b55f0b6e4f5641416d8d8e1b2548aa
 F tests/domCmd.test 1b07b6c24d4838ae18d062449a9b6ac85f800347
 F tests/domnamespace.test 7023cb113cf156381218b303eddcde3822f40a48
 F tests/element.test feb714dae2010efc20dd12d4e7d7bc281b1a6ff4
 F tests/entity.test e7462b5a56f8ae842443af6a29781158b948ea28
 F tests/htmlreader.test d39e554d91ce48390e7b5743974b4fad8fc8eeb8
 F tests/i18n.test ad68655284ea0bf4f2c5a0acc098fd05587ba9a4
-F tests/loadtdom.tcl 6fbe2d4f9521e516750c9d6c6e787723049c3f17
+F tests/loadtdom.tcl ae53eb1f069f63cf2baf696893507f0f50575275
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
 F tests/parser.test 39d7e5bdbbecd7f929a120223d24e7ab43444914
 F tests/pcdata.test d91fbfd9ca0feeff64d930c3b01355fc97ccd03e
@@ -200,7 +200,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 0ecf226b17e62060a6d9bae4b39fab8dbffce27f
+P cc43f2700a90b064861332453847787e4feaeef0
 U rolf
-Z 006e1fe44775496cd81cb9ceb08940db
+Z 7218c8094e31d867ac0e46dc2ea6a6a0
 # Remove this line to create a well-formed Fossil manifest.
