@@ -1,5 +1,5 @@
-C Copy\sthe\sextResolver\sfor\severy\sdom\sdocument.\sThe\sreason,\swhy\sthis\sis\nneeded,\sis\sdeep\sinside\sof\stcl's\shandling\sof\sTcl_Obj's.\sInrecementing\nthe\sobj's\srefCounter\sdoesn't\sprotect\sthe\sobj\sto\s'shimmer'\s(to\schange\nhis\sinternal\srepresentation).\sTclCmdNameObj's\sdon't\sknow\show\sto\nregenerate\sthere\sstring\srepresentation,\sif\sthat\sstring\srep\swas\ninvalidated.\sIf\sthat\shappens,\stcl\spanics\swith\s"UpdateStringProc\sshould\nnot\sbe\sinvoked\sfor\stype\scmdName".\n
-D 2002-05-24T13:48:37
+C Closed\ssome\sreally\sbig\sleaks\s(incomplete\scleanup\sof\ssubdocs).\sPlus\sbetter\scleanup\sin\scase\sof\sxslt\serrors.\n
+D 2002-05-24T13:51:19
 F apps/xslt.tcl 1b9a65d5db054f01e4033883fa53a313d8e6d5fe
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html c21ddc9a115a8a82ee1560949dc08a1bc41233b6
@@ -100,7 +100,7 @@ F generic/domhtml.c e8cda5580aa8c3fe08e9f432a8482dd667c22e6e
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domxpath.c e14159cca2f11d5b79c0b97024a83f4cab7403d6
 F generic/domxpath.h 9aeae6b3988adf20a2b5d295c4bd8bb5b5386ed3
-F generic/domxslt.c f43afb6ea9df54fde76a98d6ef04923eaff0b121
+F generic/domxslt.c 40c9e73101bdf61a0874bd08aa01a10808b687c0
 F generic/domxslt.h 4e41a3885354345ec29800c6c0f18ebd3fd0d2ce
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/nodecmd.c 60cfaefa435012d37a0bfe9fe115731c0efba17e
@@ -173,7 +173,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 1a0f855ef37cb4750613618cf8302a0430054083
+P 45964023c80f06285f9399dbc50a090c183d2807
 U rolf
-Z bd2ee166b7c84d02be1aa4d6200c78a4
+Z 68417c1f5d04ee90d240baa9775b9e41
 # Remove this line to create a well-formed Fossil manifest.
