@@ -1,5 +1,5 @@
-C Final\stweaking\sfor\s0.7.6.\n
-D 2003-03-24T19:57:21
+C Updated\sto\san\safter\s1.95.6\sversion,\swhich\nfixes\sthe\sproblem,\sthat\ssome\scompilers\shad\swith\sthe\s1.95.6\nversion.\n
+D 2003-03-24T20:01:03
 F CHANGES 87334aee80e9af7a72560e564ddddb7bf97ca551
 F ChangeLog e4fed2b4c6416c1f8b1549c19cbb15079257ba4d
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -68,7 +68,7 @@ F expat/README 630eff768999e90d59c6e19784a5fb3db155bcb2
 F expat/VERSION 051717be4392e0300e93a1574813233d00fc3e23
 F expat/ascii.h ca59dc7b044451fe67b2611a98b546aacc10acb8
 F expat/asciitab.h 67462447978f02b8a78ce7f054da82ec88e7ffa4
-F expat/expat.h ec620f8ba02e3b9841a450933c185c03e32f7dcf
+F expat/expat.h c9b9f845ccd3ad205a1c1c6d09efc0314ffe2855
 F expat/iasciitab.h efc1dd92a1a1173bde671c54ddc772e4ca3de340
 F expat/internal.h 27fdab3b6634972030805428a4266525974ecca1
 F expat/latin1tab.h a0655f4fc2de3cc5993319b0fcad636a906ca885
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c90afec5b8475126b94cdef0ba03fa17bd582f93
+P c3f651a34bbafc1ed62b5a5864d6d0c49d7b303c
 U rolf
-Z 3d22478a49d7ab4c3d3121a6fc4814bd
+Z 13b075d73c4e37e28d87281e78df1940
 # Remove this line to create a well-formed Fossil manifest.
