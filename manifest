@@ -1,5 +1,5 @@
-C Added\sdocument\smethod\sselectNodesNamespaces,\sto\sprovide\sa\sdocument\nglobal\sXPath\sprefix/namespace\smapping.\n
-D 2005-03-18T02:17:43
+C Fixed\sflawed\stest,\swhich\sslipped\sthrou,\ssomehow.\n
+D 2005-03-21T01:08:37
 F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
 F ChangeLog b52736d82cb4c2f0530e32c3b51f676632c8084f
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -201,7 +201,7 @@ F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.test 5b0417d461186391f4b47082a730aac0c6343e87
-F tests/domDoc.test dd1a5915b5e5ad8159c68e6f0a35586179f5f3d6
+F tests/domDoc.test e2cc5658f003d1b15ce73fd543924122a62fcd98
 F tests/domNode.test 00e272ceeeb849f16d06612199438c3019fb952d
 F tests/domnamespace.test 7f6ff7ee11a6cb437240c07be18adc11fd876d46
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
@@ -233,7 +233,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f5786b685b34d5cc43cbfa3531f2c848d3d2f605
+P aa91d3c654c3f3ef8e004d84987818f868510e82
 U rolf
-Z 4d77d3713b4a20eea167b94460e650e4
+Z 6f6bb0c803767a1993940a124eecf4a5
 # Remove this line to create a well-formed Fossil manifest.
