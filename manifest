@@ -1,5 +1,5 @@
-C Fixed\sbroken\stest\starget\n
-D 2002-11-06T13:24:48
+C HTML\sserializer:\sNo\scontent\sescaping\sfor\sthe\sHTML\stags\sscript\sand\nstyle,\saccording\sto\sXSLT\srec\s16.2.\sFixed\sa\smemory\sproblem\sduring\ninterp\sdeletion.\n
+D 2002-11-09T01:46:24
 F CHANGES 17f8fddea36060afdc3691cf6a989be83d353c40
 F ChangeLog 2c7b906e87d61987bf3b44be27dc5a1255c754bc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -126,7 +126,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 34b586ff917e7fcba2110f4201311f376d723a3e
 F generic/nodecmd.h 20210ad9b4a3bdd6055175beca7bfdd8bd318a3f
-F generic/tcldom.c dd0167045d3f1700744caf738c7c0092d1422b14
+F generic/tcldom.c 739be03ad3d1612df1c520f14b45d7f1d57dd086
 F generic/tcldom.h b06a092266deed3a050a824a8f1963b91e4c3649
 F generic/tclexpat.c 59ef95feef8034596a036674a4e0118c0a9b59f2
 F generic/tclexpat.h 62e83591b9fff070825add84310f7f7cc8cff3b8
@@ -195,7 +195,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 678f7df00cd61f301f988f30452965d75083bca9
-U zoran
-Z ea24c3848f0ec46bee9bee2df799db85
+P b353cce0c1fb82c6ef62f3f83cb3c32dbe606cb2
+U rolf
+Z d5dd18aa9ecc280d98f91666a771647f
 # Remove this line to create a well-formed Fossil manifest.
