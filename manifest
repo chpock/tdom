@@ -1,5 +1,5 @@
-C Added\sthis\sfile.\sIncludes\smostly\sthe\stests\sout\sof\sthe\sold\sdom.test.\n\nAdded\sisPIName,\sisComment,\sisCDATA\sand\sisPIValue\smethod\sto\sthe\sdom\ncommand.\sCreated\snew\sglobal\s(thread\swide)\sflags\sfor\sname\sand\svalue\nchecks\s(Names\sand\sFQ\sNames\s(element,\sattribute\sand\sprocessing\ninstruction\snames),\stext\snodes,\scomments,\sCDATA\ssections\sand\nprocessing\sinstruction\svalues).\sNew\smethods\ssetNameCheck\sand\nsetTextCheck\sto\scontrol\sthis\sflags.\n
-D 2004-05-26T01:45:20
+C Adapted\sto\sthe\snew\stest\sfiles\sname\sschema.\n
+D 2004-05-26T01:46:13
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog 6eafd0059347a55b4b6a4fc51c05cff5af0d081e
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -212,7 +212,7 @@ F tests/parser.test ea379ac3d12b063059872ceda834b69a42c319f6
 F tests/pcdata.test b1f5a31beb149eef4b7e2a9b75cd571ca271dc82
 F tests/pi.test 03bb450cd334ca0454a6c99ca3270092ba684833
 F tests/stackedhdl.test 4b3dafa96849dabf738ffb401585dac5a5aed550
-F tests/tdomcmd.test a062ae99a200e575233033cf0e1277668c5e1e44
+F tests/tdomcmd.test ebfa377019b495972b13e00b85ff9ba55041a4b9
 F tests/xmlsimple.test 44c53210c7048ca1843ecbce9f2132f6358504f2
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.test 732d4144cb20383f8becb5c311a6072d685bcb07
@@ -228,7 +228,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 16ace97189cf29288e32ec7ca08ed22ca2e9fcd4
+P a2d01a98322d04920b386dd0347ed1eb8dc6c949
 U rolf
-Z 6032a0afc7d1fe1cca88b84c8ee609ac
+Z 3d6340daaa8b5f30dcc8cd7e298e2033
 # Remove this line to create a well-formed Fossil manifest.
