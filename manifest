@@ -1,5 +1,5 @@
-C Simplified.\sJust\sre-route\susers\sto\sthe\sunix\sbuild.\n
-D 2003-09-14T11:08:40
+C Cleanup\sof\sexample\sbuild\ssetups\n
+D 2003-09-14T11:09:08
 F CHANGES 59cab3c950a08a20053aa26b3a8718c6efa8c913
 F ChangeLog b50638e2a8a6ba073281a7711352a405132ac966
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -215,7 +215,7 @@ F tests/xmlsimple.test 44c53210c7048ca1843ecbce9f2132f6358504f2
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.test 4d25939017073d9bdf83a56a5be340bc560a3ce0
 F tests/xslt.test 97de1ff573f458c58dd8ad7870ddd74bf5acf520
-F unix/CONFIG 9c61fa42f6f6253202787ef908e84a80d68448bf
+F unix/CONFIG 9e65bbe84330e49ce8f992c9bbf218c6eb0edb36
 F unix/tclAppInit.c 06b688c30d27d4be8925b05d1607cbee950bbd1c
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F win/makefile.vc e9881ff12e10d53055c4978d5175deba581611e7
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 2c69e019729356905a21382e56a045756618ba01
+P 4f3d88accfe335f9386ac8a1a665643a6eede66d
 U zoran
-Z 7d41d92d23965c5a605d8c06f244c998
+Z 45d1cae40bf21f82a9e4e3b7dc2a4402
 # Remove this line to create a well-formed Fossil manifest.
