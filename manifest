@@ -1,5 +1,5 @@
-C Added\sconversion\sof\sXSLT\sstylesheet\sDOM\strees\sto\s'cached'\sxslt\scmds\n(new\sdomDoc\smethod\stoXSLTcmd).\sWorks\sfor\snon\sthreaded\stcl;\sneeds\nadditional\swork\sfor\smulti-threaded\stcl\sand\sdocumentation.\n
-D 2003-01-11T00:18:53
+C Added\sconversion\sof\sXSLT\sstylesheet\sDOM\strees\sto\s'cached'\sxslt\scmds\n(new\sdomDoc\smethod\stoXSLTcmd).\sWorks\sfor\snon\sthreaded\stcl;\sneeds\nadditional\swork\sfor\smulti-threaded\stcl\sand\sdocumentation.\sFixed\sa\sbug\nintroduced\sduring\srework\sof\sthe\swhite\sspace\sstripping\sfor\sXML\ssources.\n
+D 2003-01-11T00:20:17
 F CHANGES 2d549c07167571211eee81cd4de1f76b71a94680
 F ChangeLog 1703ea5c521f94dd92945a4671a8ed999e47b552
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -121,7 +121,7 @@ F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c dba7e77190826af093bbb0c4dc1f858687ef5983
 F generic/domxpath.c 2ed7412802fb55430d2060a0255ae9cd01aed629
 F generic/domxpath.h 2bbf18428f0a934a95d4262bd352cdfe4937e9cb
-F generic/domxslt.c a03f83db53b1482f8dff47e90b13b12b2725eb0f
+F generic/domxslt.c b54a3d5c1a26db92211cd6965cbb48d3be10348a
 F generic/domxslt.h b60468a7092d4d5712b4a8776f3db51d4c03aa04
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -197,7 +197,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 892a7f9a910c8ec5f6eb0853d55c8d6c5a3668d3
+P 0587720af1fbe83468ce119772779051603bf886
 U rolf
-Z 8631f245fe58751110f2b868665bab79
+Z 0fb5be2edcf9d3a406aa89779760b0e8
 # Remove this line to create a well-formed Fossil manifest.
