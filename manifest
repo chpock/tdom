@@ -1,5 +1,5 @@
-C Added\sdocumentation\sfor\sthe\snew\smethods\sisName,\sisNCName,\sisQName\sand\sisCharData.\sAdded\sa\sbit\sdocumentation\sfor\sthe\screateNodeCmd\smethod\s(should\sbe\sproove\sreaded\sby\sZoran).\sAdded\sinformation\sabout\sthe\slimitations\sof\sthe\ssimple\sparser.\sSome\seditorial\schanges.\n
-D 2002-10-20T15:35:31
+C Added\sfor\sdom\scommand\srelated\stests.\sMoved\ssome\stests\sfrom\sdom.test;\sadded\stests\sfor\sisName,\sisNCName,\sisQName\sand\sisCharData.\n
+D 2002-10-20T15:37:46
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 2086eca836d27f5319bc34c0c379fc1009993adf
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -159,6 +159,7 @@ F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.test 841b67b8dcd4b61cc07848419227197a8a510b2a
+F tests/domCmd.test ccaae091c5e55a71534b9e813c27a71c7b1cb896
 F tests/domnamespace.test b6f082540f7d79f13176a200429879374552c70e
 F tests/element.test feb714dae2010efc20dd12d4e7d7bc281b1a6ff4
 F tests/entity.test e7462b5a56f8ae842443af6a29781158b948ea28
@@ -183,7 +184,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 6e6741bad7f52112b6e20b47174d7ed2a54abe6c
+P e0224d942ab84f92f6dbdd9d6d0bc8aab81267ce
 U rolf
-Z bfbcc2cb1b55d202a904b4328de6e34a
+Z d4cf8d15abecc382b5aa5f7e45342577
 # Remove this line to create a well-formed Fossil manifest.
