@@ -1,5 +1,5 @@
-C Added\sBernard\sfiles\sfor\sCodeWarrior\sbuild\n
-D 2003-03-06T14:24:05
+C First\simport\sof\sBernard\sfiles\sfor\sCodeWarrior\n
+D 2003-03-06T14:25:52
 F CHANGES bedaded2db2b4b9c98267dec8dcfb01261cfbb9a
 F ChangeLog f04552e1474334c0148001b4a077b5f3e14071d5
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -147,8 +147,19 @@ F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
 F generic/xmlsimple.c 1af1d67cfb193a648147fdd5b6fa43f7faa8051e
 F generic/xmlsimple.h f2861868b0fed932c79f9e595bb875d261d97bd5
 F lib/tdom.tcl e27e239b2ab1f3e99b47cb444842aa5247b2ae54
+F mac/PrecompHeaders/CoreHeadersMach-O.c e4406d8c34fcaea82d21e62c35012893b460dfd5
+F mac/PrecompHeaders/CoreHeadersMach-O.h 508208239a919a6dee4275f9148962a13faeb94d
+F mac/PrecompHeaders/CoreHeadersMach-O.pch 60665d6a2787eb3dfda701baff12dd3d5029e7f5
+F mac/Prefix/expatPrefix.h d131932b0c668d4cdef1eebc35f1b5267882d00d
+F mac/Prefix/expatPrefix_OSX.h 51c7e40981af4b6b8b974bf4cc4c2f63968031e2
+F mac/Prefix/tDOMPrefix.h d7f827cc39ebec1cc31123cfeed4b7980464ce1e
+F mac/Prefix/tDOMPrefix_OSX.h 3543f26ea0571a638222b0b2432279fd117e65af
+F mac/Prefix/tncPrefix.h de9a8e9890e527d7beaad32d1258ce9f7ca0025c
+F mac/Prefix/tncPrefix_OSX.h a9db03d4e522b79362babd80a95f7a851b3e970b
 F mac/Readme_Mac_Compiling 056f0af20fddfe4c08d0e0e2064c45068335611b
 F mac/macconfig.h b2b5d6e596f07f5d1ff60aab6df666b0acc46adb
+F mac/tDOM.0.7.5/pkgIndex.tcl ad4ab6388d821c9839bd5d3d4bc824cd5b95db02
+F mac/tDOM.0.7.5/tdom.tcl 0f78844396469748451ec106e0e53630d387ee6b
 F mac/tDOM.exp d3cefd106ba630c4b283e89bd703754c845da3b4
 F mac/tDOM.prj.xml 46bd1d275171d95875d892c79c57025dedcf485a
 F mac/tDOM.r ac612e0e6bfb3a5637405948874f66d791a6deb1
@@ -211,7 +222,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 520460eb2776f410698bb34a4158a86e8e90e965
+P b0a821471acd3ba51e9ec4f53ef27cf775a06425
 U zoran
-Z 6d4b15dd51535bff74f2faf522cad774
+Z 47bbafde70f389c80269ac104b169444
 # Remove this line to create a well-formed Fossil manifest.
