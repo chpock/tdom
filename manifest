@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2003-03-25T22:46:26
+C Bumped\sthe\sversion\snumber\sto\s0.7.7.\n
+D 2003-03-25T22:48:49
 F CHANGES ca483fbc7c627b68977fc3eb6cf6798f42bca33c
 F ChangeLog 710a0c64b6ba77d79429d626c7e430bc714f6742
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -218,7 +218,7 @@ F tests/xslt.test 97de1ff573f458c58dd8ad7870ddd74bf5acf520
 F unix/CONFIG 9c61fa42f6f6253202787ef908e84a80d68448bf
 F unix/tclAppInit.c 06b688c30d27d4be8925b05d1607cbee950bbd1c
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F win/makefile.vc 7aee3bcb48c157c3102505c4a9e342492240a370
+F win/makefile.vc 2703e52acb9856c2b1dfbd5acdf46248e43fb6c8
 F win/makefile805.vc 8cd517f49e180fa45c47f7548d0cf1181d09d171
 F win/mkd.bat 85d3fe58ce051a778447fb2bfc7384867d21cef0
 F win/pkgIndex.tcl d5bb3431b6da7e2677293906274f7235820c45f1
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P b7ba190d3c272916875e1c68f6cb421249af4e1b
+P 504b0a44b59fd5035f763d376792561d10eb3f62
 U rolf
-Z 14e3341efe89f3a1e90dea24f81f85a8
+Z 507131560e87099b059414ecf6019123
 # Remove this line to create a well-formed Fossil manifest.
