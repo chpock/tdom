@@ -1,5 +1,5 @@
-C Added\smethod\s'startBefore',\sto\scompare\sthe\srelative\sorder\sof\stwo\snodes\nout\sof\sthe\ssame\sdocument.\sAdded\sa\sreminder\sfor\sa\sminor\sknown\smemory\nproblem.\n
-D 2003-03-19T14:05:11
+C Added\soption\s-useForeignDTD\sto\sdom\sparse\sand\sexpat.\n
+D 2003-03-19T14:08:02
 F CHANGES bedaded2db2b4b9c98267dec8dcfb01261cfbb9a
 F ChangeLog 446a9519a6f4745107c006547eadc4f8e95db6c9
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -199,10 +199,10 @@ F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.test d3cc646215e6bbfe878cc074a7f52366e3fa5ad9
-F tests/domCmd.test 1b07b6c24d4838ae18d062449a9b6ac85f800347
+F tests/domCmd.test cf21b0ba55982fb2faee616ad555dedc668ee4bc
 F tests/domnamespace.test 7023cb113cf156381218b303eddcde3822f40a48
 F tests/element.test feb714dae2010efc20dd12d4e7d7bc281b1a6ff4
-F tests/entity.test e7462b5a56f8ae842443af6a29781158b948ea28
+F tests/entity.test 8440a2109f4b250b539477b27c141f37ff19c3a3
 F tests/htmlreader.test d39e554d91ce48390e7b5743974b4fad8fc8eeb8
 F tests/i18n.test ad68655284ea0bf4f2c5a0acc098fd05587ba9a4
 F tests/loadtdom.tcl ae53eb1f069f63cf2baf696893507f0f50575275
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 8bce07abd4f15ca6149dfd5bd108bc2a874f04b9
+P 5ce44fc040ed1dea60fa333a46e6276c4085541f
 U rolf
-Z 24d6f81cc57aa73a2c4bde74ca3a7eb6
+Z 14a704c578eb133dc4ffe10ae025c414
 # Remove this line to create a well-formed Fossil manifest.
