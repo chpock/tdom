@@ -1,5 +1,5 @@
-C Implemented\sthe\sspecial\sconstraints\son\scertain\sxpath\spattern/expr\s(no\ncurrent()\sfunc\sin\spattern,\sno\svar\sreferences\sin\stemplate\sand\skey\smatch\npattern\sand\skey\suse\sexpr,\sno\skey()\sfunc\sin\skey\smatch\spattern\sand\suse\nexpr.)\n\nEditorial\schange:\sRemoved\ssome\ssuperfluous\scasts\sto\s(char*)\sfrom\ntdomstrdup\sresult\s-\sits\sdefined\sto\sreturn\schar*.\n
-D 2003-12-30T19:24:12
+C Implemented\sthe\sspecial\sconstraints\son\scertain\sxpath\spattern/expr\s(no\ncurrent()\sfunc\sin\spattern,\sno\svar\sreferences\sin\stemplate\sand\skey\smatch\npattern\sand\skey\suse\sexpr,\sno\skey()\sfunc\sin\skey\smatch\spattern\sand\suse\nexpr.)\n
+D 2003-12-30T19:24:29
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog a4379644214ec83ac552cef90f9677871ef87cb7
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -125,8 +125,8 @@ F generic/domhtml.c 9a7ec999da852d996d7ac9c936534b965039e4cf
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c 0c346e84edf3599a93b30abc0eafd3c86618f13c
 F generic/domxpath.c 109579a3b9400b21727a1c7277a7ffee1be58e5d
-F generic/domxpath.h ec29823825248b0df1076860593c83562727f132
-F generic/domxslt.c b9cf94a301d168184a45fc6876b3aa0dd37e05de
+F generic/domxpath.h 136ce5085cbc7bb8aae5bb8936d9fd8f360398c3
+F generic/domxslt.c 80ca29e24b62443b3444436d2062d31f64493150
 F generic/domxslt.h b60468a7092d4d5712b4a8776f3db51d4c03aa04
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -215,7 +215,7 @@ F tests/tdomcmd.test a062ae99a200e575233033cf0e1277668c5e1e44
 F tests/xmlsimple.test 44c53210c7048ca1843ecbce9f2132f6358504f2
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.test 732d4144cb20383f8becb5c311a6072d685bcb07
-F tests/xslt.test 334f27e4bf266c046a134a4acc6bd6dc4a6cae1c
+F tests/xslt.test 8994c2d9ecb9e7ef0c55926c23e1443c5c858899
 F unix/CONFIG 9e65bbe84330e49ce8f992c9bbf218c6eb0edb36
 F unix/tclAppInit.c 06b688c30d27d4be8925b05d1607cbee950bbd1c
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -227,7 +227,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ad392b6a4a6d0bcba411625f83363bdc8982ed6f
+P 14a732182d75281c1ecd24702544f8b859756df2
 U rolf
-Z 42671d8d4349adcce4d72bd12681b83d
+Z 79bdf9eddee758e64f32703a0f4962ff
 # Remove this line to create a well-formed Fossil manifest.
