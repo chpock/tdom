@@ -1,7 +1,7 @@
-C Added\sthis\sfiles.\sThanks\sto\sPat\sThoyts\sfor\scontribution.\n
-D 2005-01-07T15:16:12
-F CHANGES 5bb7643fd67d14d82ee76b8584bd319aeebec7b2
-F ChangeLog ca3b3b68e24fd48557154e50e8e0e9b80baa8e78
+C See\sfile.\n
+D 2005-01-07T15:16:42
+F CHANGES 877db3f7a6fd1a5175636e84125230f5949491ac
+F ChangeLog c4c42e0116945a28206e721d5b0c5e6f3ce20d62
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -233,7 +233,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 1dc6acc00d8f003709ebfbf06d7198adab39f569
+P 0d4188b8209a638bc21ffd087a3a5ca341afc1eb
 U rolf
-Z 46ca564c1ae078775e02e01db4b6897c
+Z 49150df4d51a376002d92e238cf243c6
 # Remove this line to create a well-formed Fossil manifest.
