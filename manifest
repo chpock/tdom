@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2003-11-20T13:01:40
+C Permanently\sadded\sforced\smemory\sclean\sup.\n
+D 2003-11-24T10:03:42
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog 717daa3a3da1c0cc15de1215c1e87059932243f6
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -175,7 +175,7 @@ F tclconfig/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F tclconfig/tcl.m4 797c9763056f87d41c4c1ab39b4a9128b9648143
 F tdom.m4 6362938e20f54b2a5ad0d4c112d3653f627270d2
 F tdomConfig.sh.in bb068ad78eefdd9a8554f970b7266c78e976df0b
-F tests/all.tcl 7afdc9282c3ac89363cddd0db12b7448f751d9ae
+F tests/all.tcl a8d5d3e3adc6713f64d0c614b927bd21ca8df870
 F tests/attribute.test 680563462d618d04d11b77fb6baf3073a77fc5c1
 F tests/cdata.test 5a1dc3bee6353700186d12f0d11b15914849c6be
 F tests/comment.test 25ac780959e2c7220d3e92dac01dd5e14fd4acaa
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 407a886de6f997edbc1de7d0b880052114363453
+P 40ec1092621ee9b13d847f82a5f865d7a2cb007f
 U rolf
-Z ca32a2835fbb08bdaf190a27760da46f
+Z bd0e8556d74be32a8c8b3f358f8a10ee
 # Remove this line to create a well-formed Fossil manifest.
