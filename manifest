@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2002-11-18T00:44:56
+C Fixed\sa\stypo.\n
+D 2002-11-18T01:03:28
 F CHANGES 17f8fddea36060afdc3691cf6a989be83d353c40
 F ChangeLog de14de560a5f1ad3666c32c997aed2288b2529a0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -36,9 +36,9 @@ F doc/tdomcmd.n 087bbf0cf783376e39ff903a48bc377ce507b8f3
 F doc/tdomcmd.xml 1a3ad802ff6a3cc4c473f8a0e7f83fe1400d780c
 F doc/tmml.dtd 63259dc9f69f9104f1515be445b85b195a1fb990
 F doc/tmml.options b6deacf4d680fde4b90bc620161c1b151c5a5bc7
-F doc/tnc.html 371e72b6b6adc4f7a1edb8f5c6928fe61d00211b
-F doc/tnc.n 7f264dbc53ce78b85fa95e325cac1b5dbb0d8141
-F doc/tnc.xml b7ef92900cf7f37d9aa06444af0963af10abbb0d
+F doc/tnc.html 1d712f1d867564127908798015cd4317849de964
+F doc/tnc.n d16ffab1a395fc97993be27f3f538165ac18f75d
+F doc/tnc.xml 3d72d70c722bc5f526a78573fb2fd7474719109b
 F encodings/GenCompactCodings 5996a4e04bf65b44226c90260f7a19c30c077a7a x
 F encodings/ascii.enc dd83333dc1c838beb9102f063971ccc20cc4fd80
 F encodings/cp1250.enc 7df922c63044d958fc54a08305ec989e6cb04a40
@@ -195,7 +195,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 98a0311a6827f64a8976fa4b2c717058c9ba747f
+P d08dacc8eb9cef6bc5ef5852e6bb4c2856042ecb
 U rolf
-Z 2d65e537984c8fd7cebb58457daa1562
+Z f851921b2397bf24bc2848400ce49423
 # Remove this line to create a well-formed Fossil manifest.
