@@ -1,7 +1,7 @@
-C Added\sa\sfew\stests:\srelated\sto\screateNodeCmd\s(dom),\snode\stext\smethod\s(domNode),\schancing\scallback\sfrom\swithin\sa\scallback\s(element,\sparser)\sand\scatching\sof\srecursive\sxsl\sinclude/import\s(xslt).\n
-D 2005-01-06T18:21:00
+C See\sfile.\n
+D 2005-01-06T18:21:27
 F CHANGES 5e1729ae568c08de4588a28d3584d862a29a2022
-F ChangeLog d8035ec4818473351d00c8bc2f0363e56167c410
+F ChangeLog c3eab0bf57005202de1934c3230c3f5489f5e668
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -230,7 +230,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P b1a6b651ae3954455e2c83552403d462c05b8475
+P 330a5b833e5732efa8061c3bb5304b32bd3e7fa9
 U rolf
-Z fed1c19bddf813f7bae2ff0c5a290b5f
+Z de041b5e74d7927773eaa2331cfc2006
 # Remove this line to create a well-formed Fossil manifest.
