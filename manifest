@@ -1,7 +1,7 @@
-C Added\scast\sto\s(char*)\swhen\scalling\sTcl_Free\son\sFREE\smacro.\nThis\savoids\ssome\scompiler\swarnings.\n
-D 2003-02-22T09:38:20
+C See\s2003-02-22\scomment\n
+D 2003-02-22T09:40:55
 F CHANGES d6cad9f44838aa2e42fdbd3e75313ddccbbeb32a
-F ChangeLog 06627b6618b9365f60138f6c1f3bb3f1334c301e
+F ChangeLog 633300e18284a84a60f287274613890bb6eeed48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 66a3f3c77f53f573bea7fc3e8620f6e19576c76e
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -197,7 +197,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 43e91df26ee99d482529a35a11d4ceb29e2cd4e9
+P e2e1b1875445a9d21cd04a37ae6ded034521b0bb
 U zoran
-Z fb84306472967a5352af351766279ddc
+Z 60f77b5aced49140afde3d267e83d6f0
 # Remove this line to create a well-formed Fossil manifest.
