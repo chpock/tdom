@@ -1,5 +1,5 @@
-C Editorial/typo\sfixes.\n
-D 2002-08-20T23:41:16
+C Was\sneeded\sby\sexpat\s1.95.1.\sThe\snew\s1.95-4\shas\srenamed\sthis\sto\sexpat_config.h.\n
+D 2002-08-20T23:43:30
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in ffb39c47ad2dfcd69eaf5b57b32d22998f74a491
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -99,7 +99,6 @@ F extensions/tnc/pkgIndex.tcl.in 37901ed24e06da45c7d7a17f255b6108925400f8
 F extensions/tnc/test.tcl efade8bcb9fd9e269ed5c259f3edf182bc917b72
 F extensions/tnc/tnc.c 08d7f3ff9a212f64311a44039da39b502d2da711
 F generic/aolstub.cpp e543ab5dfe8a4b7349cb11a40f13bf57d7ad7cc2
-F generic/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/dom.c adf503f1287c6906e5194beaa663c2eef111d0e1
 F generic/dom.h 364339b258e5b1649d3072a4e762ffb232e9ede5
 F generic/domalloc.c e6c09323b608d1ff59bf7a1d5f8e66641be98ab8
@@ -181,7 +180,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a551b99b29f62b1cb14678e0ce90bb89d6da7dbc
+P 999508dd49b7648537300b9c63f966bd4bfd23ba
 U rolf
-Z 67082c3f2ed1336ac2bf2f9640080f72
+Z 5b9242c1b55458533c2ed175eddd030e
 # Remove this line to create a well-formed Fossil manifest.
