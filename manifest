@@ -1,5 +1,5 @@
-C Adjusted\sthe\ssize\sof\sthe\shash\stable\sfor\sthe\sknown\sentities.\n
-D 2002-10-20T15:53:05
+C Added\snew\smethods\sisName,\sisNCName,\sisQName\sand\sisCharData\sto\sthe\s'dom'\scommand.\n
+D 2002-10-20T15:57:18
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 2086eca836d27f5319bc34c0c379fc1009993adf
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -115,7 +115,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c f8436a3180f7062c38c50b146d92af210bd8da53
 F generic/nodecmd.h 0225d87d05a9afc2ce0d5baf8966b076ffa71405
-F generic/tcldom.c e4e430c34d697a96e1f49a769325203d39892dac
+F generic/tcldom.c fa1bce01b4555b6440385364303d1e2502a82828
 F generic/tcldom.h b06a092266deed3a050a824a8f1963b91e4c3649
 F generic/tclexpat.c 5920f376d971d29e33c6aa61249995e4a495aac3
 F generic/tclexpat.h 62e83591b9fff070825add84310f7f7cc8cff3b8
@@ -184,7 +184,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 54810a31e19d524b302a1382b43db4a980cbecf6
+P c01edd680e748de97c357c40ca9bee17acdd367b
 U rolf
-Z 355ccefedc5eb787adee84c049b8fd69
+Z 91106b4be8f469d64df7f545099c6568
 # Remove this line to create a well-formed Fossil manifest.
