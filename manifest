@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2003-05-16T11:54:18
+C Fixed\sto\scompile\scorrectly\swhen\s-NS_AOLSERVER\sdefined.\nAlso\sfixed\ssome\sobvious\stypos\s(Zoran)\sin\sdom.h\s(phew!)\n
+D 2003-05-16T14:36:26
 F CHANGES 59cab3c950a08a20053aa26b3a8718c6efa8c913
 F ChangeLog 9626d6cf6d366015173fd644dd5aeaa512af31d0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -116,9 +116,9 @@ F extensions/tnc/tests/all.tcl 845c9dab65c294c3570f69cc731d6fef62efbd03
 F extensions/tnc/tests/loadtnc.tcl 418f1bbca50993a9fe012728b50f0f8080cff2ab
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c 4eb5d817c334c641af2c76cdb7f30998b5c5b8ed
-F generic/aolstub.cpp 0f2fb53cc8ba2a4a5fc8f5fe2dbe94c51e65e9bf
+F generic/aolstub.cpp c2d8175f82b54880123512c53f43aa3c36f12991
 F generic/dom.c f69e0c968efdff4c8a19948ae8d562010d4241b5
-F generic/dom.h 6e80602f9d7174e85d945e8765307fee640eb688
+F generic/dom.h bcdd2648d42a6c6896b23bff2460e65facd5fb53
 F generic/domalloc.c aa1ed647c34d707014f187fd6f68d7b87f97f791
 F generic/domalloc.h 5e94d96321fb4f926b6e2c8cf01b8a28c3d0be0f
 F generic/domhtml.c 54fdfbbe29a80c0c2d5dcb081dc2ab183f1baf98
@@ -136,12 +136,12 @@ F generic/tcldom.c a2fe40ce94a57af1d894a2fc691d8ac6f04ac45c
 F generic/tcldom.h 1c21383eabe24ac9bea93e4f5c66f9a64a7b68d1
 F generic/tclexpat.c c42fe2f39afcbb1c68050585fd45f939c0eac21f
 F generic/tclexpat.h 62e83591b9fff070825add84310f7f7cc8cff3b8
-F generic/tdom.decls fa90ba9b8d00f5b405ea68724d95ad79f64c424b
+F generic/tdom.decls 760ad3234a869b8191436bd53370b812266d98d5
 F generic/tdom.h db128152fac506159243e47cb3a77cc7d9fe4360
-F generic/tdomDecls.h 0a5749623be3efdca3f0ba31a8b88ff72f992ffb
-F generic/tdomStubInit.c a626e8ce48b543ec817d852e0ea1fcc19a740fd1
-F generic/tdomStubLib.c e6e3f0c71f2db466f1924fe3a984dff7db65df9f
-F generic/tdominit.c 3ccbccd0009bd98f8776feb8ab3eb0bf5c6bc1e3
+F generic/tdomDecls.h fc2a07f8db9c4c2c1d06322fa82dd27d92e947f9
+F generic/tdomStubInit.c fa037218373f882436fe5b3779bac64ec84f1fba
+F generic/tdomStubLib.c 5a19b7ad0cdf0464cfd1e10d8b2000c13b5ee4fb
+F generic/tdominit.c a937d83076e4a98a66fc6417b7abd2e9861469c5
 F generic/utf8conv.c fc01b4776a82c937252a7d2593a3d244916905f7
 F generic/utf8conv.h e0d2756b2d77ad9a8508a0dcf7cce5e10fa4c9a5
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 9afca81854fb70af5eab653f11eef13f16ae68cc
-U rolf
-Z cd34fb18170ad05dc6c4199d2b15975c
+P 5d9166cf3994289488f4dc84ef35df8b80309dc6
+U zoran
+Z 0a2929c9da98c7f60387200bf4813a32
 # Remove this line to create a well-formed Fossil manifest.
