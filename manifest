@@ -1,7 +1,7 @@
-C Fixed\smemory\sleak,\sif\sfloor\sor\sceiling\sare\scalled\swith\snon-numbers.\n
-D 2003-11-03T00:20:30
+C See\sfile.\n
+D 2003-11-03T00:21:02
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
-F ChangeLog e9218cfe00c9b6d6015aac121321d4cd93aa8a39
+F ChangeLog 371f984c5f1642a59754d1cb5e3fa01a5800472b
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a7464f9aa0e2a1c4b37344df2ff6a8d4dd15004d
+P d543bb73af6b02e72a0d54a31bae6ff6522bf143
 U rolf
-Z 25624dd2610663f968d0c6b52a1ccd86
+Z 3d069d29effaedfd3cafbd5a921f1944
 # Remove this line to create a well-formed Fossil manifest.
