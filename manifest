@@ -1,5 +1,6 @@
-C Added\sthe\s*bare\sbones*\sREADME.\n
-D 2002-08-02T21:19:00
+C Added\sthis\sfile.\sIt\sreferences\sthe\sMPL\s1.1\sso\swe\smight\sadd\sthis\sone\salso.\n
+D 2002-08-02T21:19:59
+F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 90af78958d8b642862a15b9029b0bd8fad84da5a
 F README e4d86d87598f5f20caea49c91a703df5fbda117a
 F aclocal.m4 a7c82deae42849a1eb4956222315c139329d4d55
@@ -179,7 +180,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 0689db81014a8f35f2c83c22f83d3b8141e54da9
+P 4204a31929c1b8ad2affc5d23b76e9f292db9951
 U zoran
-Z 6bd10a71fbc2140cf42209e455370d3d
+Z 5c6a055169b78c8aa5b262cd907f9ca0
 # Remove this line to create a well-formed Fossil manifest.
