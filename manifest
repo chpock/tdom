@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2004-05-08T00:57:47
+C Fixed\stypos\sin\scomment.\n
+D 2004-05-08T18:12:47
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog 8cbbf5d3d02f33f3a3884a02015af3b936fe3609
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -215,7 +215,7 @@ F tests/tdomcmd.test a062ae99a200e575233033cf0e1277668c5e1e44
 F tests/xmlsimple.test 44c53210c7048ca1843ecbce9f2132f6358504f2
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.test 732d4144cb20383f8becb5c311a6072d685bcb07
-F tests/xslt.test 8994c2d9ecb9e7ef0c55926c23e1443c5c858899
+F tests/xslt.test 414eefcddf82ba443fd14d9e7ca050c1224d0c8d
 F unix/CONFIG 9e65bbe84330e49ce8f992c9bbf218c6eb0edb36
 F unix/tclAppInit.c 06b688c30d27d4be8925b05d1607cbee950bbd1c
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -227,7 +227,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 64cb1af84b88c13bae2cb541383413b9be63c611
+P 1d150e8fddcdf9873b8d4a2ccfa60e47d116b681
 U rolf
-Z 5553231c7148ed02ff85f16db2942d26
+Z 059048919c67c6294e30b6d652e46df0
 # Remove this line to create a well-formed Fossil manifest.
