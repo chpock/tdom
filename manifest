@@ -1,7 +1,7 @@
-C Update\sto\sexpat\s1.95.7.\n
-D 2003-10-23T10:34:43
-F CHANGES 993140b623ef50267a92d858779d91eeaf39da4c
-F ChangeLog e4f37587a21dc0938c00b439905272ac20175edb
+C See\sfile.\n
+D 2003-10-23T10:35:28
+F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
+F ChangeLog f860cd99a930e1037e828a0cd9cbddca639756da
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 58205ebba239bf6217c17ed1b67d426605ada3c2
+P a1346da8f967e249cd6ad7dbeaf245f70e95ef16
 U rolf
-Z a4814c3e41477e9f24af0b125bcd9310
+Z 662ccd71da60d896bac65e0443647996
 # Remove this line to create a well-formed Fossil manifest.
