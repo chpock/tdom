@@ -1,5 +1,5 @@
-C Not\svalid\sany\smore,\sbecause\sof\sthe\schange\sfrom\sexpat\s1.95.1\sto\s1.95.4.\s(I\swonder,\swhat\sit\swas\sin\sthe\sfirst\splace.)\n
-D 2002-08-20T23:23:03
+C Update\sfrom\sexpat\s1.95.1\sto\s1.95.4.\n
+D 2002-08-20T23:24:30
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 90af78958d8b642862a15b9029b0bd8fad84da5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -58,26 +58,26 @@ F encodings/iso8859-7.enc 1f75db4f7be40eb204fdb85057ca5f1d9a89f147
 F encodings/iso8859-8.enc 75ee0da275fe59752001d18b9f099ef446a6a577
 F encodings/iso8859-9.enc f585c70a5589de39558dac016743ff85e0c5f032
 F encodings/koi8-r.enc 366c137c02e069b1a93fbb5d64b9120ea6e9ad1f
-F expat/COPYING 44b3f40678d9430edf3fe639c6cd3685e70e627b
-F expat/Changes e85d4ab97b396405d51a29935497ad4875005dde
-F expat/README 0060d177278d1973d3355b5ca38b6a427a887ed8
-F expat/VERSION fab6087f72aeb99623c9c088a0f6d64b6219960b
-F expat/ascii.h 3aa53bac482cb1bcd21b08d7061b5afb515328c9
-F expat/asciitab.h 422108f80c04b40c327323688f987fbdf772a26d
-F expat/expat.h bdf008cd83fc4870239dad325d0f161cb7dd475c
-F expat/iasciitab.h 96cd6905da223ad4d6fd276a7dd2571c04d4b819
-F expat/latin1tab.h 068e6399417a18005a671557557528e818920b97
+F expat/COPYING c124ddcfd75522fa37dbce65c3f675726f164528
+F expat/Changes f9dd56febb746ad25adf0ed54a7f20a7b674bd04
+F expat/README db19e05f2a9f91af966d5d44e8483b682cbc0ae2
+F expat/VERSION 9ff0e46da217769113e2e52efe145f20161bac52
+F expat/ascii.h affdeeec2a69adf31783fe5417ad2ed30924bfa3
+F expat/asciitab.h 67462447978f02b8a78ce7f054da82ec88e7ffa4
+F expat/expat.h b5f1e7e6ca91df4fd8d8fdbacadd072c23708b23
+F expat/iasciitab.h efc1dd92a1a1173bde671c54ddc772e4ca3de340
+F expat/latin1tab.h a0655f4fc2de3cc5993319b0fcad636a906ca885
 F expat/nametab.h 7ebf9a02f20fe58ad2e6d0488acd620b1f534e9e
-F expat/utf8tab.h 8b8c8046b0208c41b1f9da5b0a5309419ef6e03b
-F expat/winconfig.h 6b2fa0e48c8271334a78b788a0d9274358919661
-F expat/xmlparse.c 2e81516db6006a3825fb1a701c1210fb26008ea7
-F expat/xmlrole.c 1e8b432d710f0ce8afdc3df7fc80ba1035bfab99
-F expat/xmlrole.h f7a208ac469ba8eb3e55242e855c0e02677b05c9
-F expat/xmltok.c 98a172be05b7822953b8c59b62259b63eb632198
-F expat/xmltok.h a6f0360c06f6f2b65784e9c56e7f4427a77c70e6
-F expat/xmltok_impl.c b7bc45bd9d4c33850e4f8ca54b297c4a6ac048b0
+F expat/utf8tab.h 4dc893a1f5286443647d5b5674774e13c8e21a11
+F expat/winconfig.h ee3682c201d1a1c91dbe08fb27c7833b1f9f51d7
+F expat/xmlparse.c 031cf2d3f442e16f2a2eab72630af12763d925de
+F expat/xmlrole.c cdef0949390c21e41b8ce850715e9face05185ba
+F expat/xmlrole.h b0fd9b53140cb6abce3c00e49b1b0661e2804e81
+F expat/xmltok.c 61e6cee0df2d0060c6b8e53c9f18d0bd0e9233c1
+F expat/xmltok.h 6d320bc57dcb75db09ed371a310d53b439cf5440
+F expat/xmltok_impl.c 5eb08f1d0738cfc2a0fb4b169132e9d4f7a0181f
 F expat/xmltok_impl.h cb8cce4d3f128dc013901010b462d852b4d4d804
-F expat/xmltok_ns.c 1eaf04c2687c2cfab20a4efd29682b2a2fd8e3e8
+F expat/xmltok_ns.c 71c2b732d1d53811efad00a9fd14d6a7b7f280ad
 F extensions/example/Makefile.in 30f19a3287668a8d2c50d8cb39ebbac9c96416dd
 F extensions/example/aclocal.m4 8832288cc4da0b7b105ac9bf5a0b58a1cc73a02e
 F extensions/example/configure d0d1741e99a2095f94ecb2a9d5edcd1d1ed67422 x
@@ -180,7 +180,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 3636f23b8c4369c015e00561776aeb98a00e7c0b
+P 552e8be4737de6b72483a1b1b19b8229634a9b89
 U rolf
-Z 42c55d48c79fd834d79d1ce832f58bdb
+Z 42ed3b96bfc94a19dcdc943384de4b02
 # Remove this line to create a well-formed Fossil manifest.
