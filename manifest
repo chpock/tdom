@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2003-02-21T20:06:19
+C Fixed\sinvalid\sreference\sto\sTCL_DBGX\sat\sbuilding\stdomConfig.sh.\n
+D 2003-02-22T09:14:46
 F CHANGES d6cad9f44838aa2e42fdbd3e75313ddccbbeb32a
 F ChangeLog 06627b6618b9365f60138f6c1f3bb3f1334c301e
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -8,9 +8,9 @@ F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
 F README c61e1311b5a904cf82f6af8d272aef5dc22a8dee
 F aclocal.m4 79e2f4aa6a138371f2d31f28355749e5019d7651
 F apps/xslt.tcl 33eaaf45b831e6613d528156f7f1bbc02fd9f849
-F configure 2295f2eb0e5bb00cdcc69ad07a0b0e0a82116e6f x
+F configure d1013754f1107b90fa56773e727bd97345861fe6 x
 F configure-tcl8.0.5 d1895768cd7b715e310dae9acb84d91603857f7a x
-F configure.in 2093bab7aacde216fcbf652f88ee487e0c10ca4b
+F configure.in cf7d02719211aba891e195992329daa6eb10f3d1
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html fb9e71a3b204fdcc169c562ea7b8345cdd3d96b9
 F doc/dom.html 9de79d4b6e264bc302e9399ae1b97d87ce1622ff
@@ -197,7 +197,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P d2918070f84a686cd6c09b06788fc1439314d3e1
-U rolf
-Z ab216c5f7bf0ddcee32172cc7f4b2f82
+P 9e151a215cfce01097bef4202c1040d32b470050
+U zoran
+Z f9ff3cf9d72e1f55baf5d254ca1f4389
 # Remove this line to create a well-formed Fossil manifest.
