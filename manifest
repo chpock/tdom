@@ -1,5 +1,5 @@
-C Added\soption\s-paramentityparsing\sto\sthe\s[dom\sparse]\smethod.\s[dom\nparse]\soption\sparsing\snow\suses\sTcl_GetIndexFromObj()\s(which\nadditionally\sfixes\sa\sminor\sbug\swith\sthe\scurrent\soption\sparsing).\n
-D 2003-04-09T19:56:08
+C Added\soption\s-paramentityparsing\sto\sthe\s[dom\sparse]\smethod.\s[dom\nparse]\soption\sparsing\snow\suses\sTcl_GetIndexFromObj()\s(which\nadditionally\sfixes\sa\sminor\sbug\swith\sthe\scurrent\soption\sparsing).\nAdded\stests\sfor\sthe\sinterface\sof\sthe\sxsltCmds.\n
+D 2003-04-09T19:57:49
 F CHANGES ca483fbc7c627b68977fc3eb6cf6798f42bca33c
 F ChangeLog 4b901cec6b84cec93869a3df97d0c29dae27ef1e
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -199,7 +199,7 @@ F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.test e978634307398ca247189653877b0889ae49c629
-F tests/domCmd.test cf21b0ba55982fb2faee616ad555dedc668ee4bc
+F tests/domCmd.test 06b3332e7decaa033a1fc9221a5f76a3a30918c0
 F tests/domnamespace.test 7023cb113cf156381218b303eddcde3822f40a48
 F tests/element.test feb714dae2010efc20dd12d4e7d7bc281b1a6ff4
 F tests/entity.test 8440a2109f4b250b539477b27c141f37ff19c3a3
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 803d0d341be0dc80692aa559d324b56285fefc27
+P d3a1a78a9085b70ffbdae5a599898908cc4df7da
 U rolf
-Z 4dd69eddef9e479755370505bd650119
+Z 0b404b9e784d4827d70dd33c7f145fd2
 # Remove this line to create a well-formed Fossil manifest.
