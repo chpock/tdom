@@ -1,5 +1,5 @@
-C A\sfew\sminor\s(and\smostly\snot\seven\snotable)\soptimizations,\spartly\sof\ndubious\svalue.\sAt\sleast\sthe\simproved\smatch\spattern\spredicates\noptimizations\spoint\sto\sthe\sright\sdirection\s(and\sare\sreal\swinner\sfor\nsome\sstylesheets\sand\sreal\sbig\sinput\sdata),\seven\sif\sthis\shole\spredicate\noptimization\sbusiness\sshould\sreworked\sto\sa\smore\sgeneral\ssolution,\ninstead\sof\sthe\scurrent\s'handle\ssome\scommon\scases\sand\stry\sto\sbe\son\sthe\nsecure\sside\sfor\sall\sother'\sapproach.\n
-D 2002-10-14T23:56:06
+C Removed\ssome\sold\sdefines\n
+D 2002-10-15T12:27:02
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 2086eca836d27f5319bc34c0c379fc1009993adf
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -99,7 +99,7 @@ F extensions/tnc/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
 F extensions/tnc/pkgIndex.tcl.in 37901ed24e06da45c7d7a17f255b6108925400f8
 F extensions/tnc/test.tcl efade8bcb9fd9e269ed5c259f3edf182bc917b72
 F extensions/tnc/tnc.c eb10dfa0748cd6899509e1512d6a3f8bd87a25b1
-F generic/aolstub.cpp e543ab5dfe8a4b7349cb11a40f13bf57d7ad7cc2
+F generic/aolstub.cpp 0f2fb53cc8ba2a4a5fc8f5fe2dbe94c51e65e9bf
 F generic/dom.c 88d1aac25f68338554ec64d807885b6a3c895930
 F generic/dom.h 340b76c40ea24e275e8b130aec63228b69cf0e47
 F generic/domalloc.c e6c09323b608d1ff59bf7a1d5f8e66641be98ab8
@@ -183,7 +183,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 4a8cfb72476f5bdefd05ceaf4977582e542a50c0
-U rolf
-Z c4d4dafe1a15a8608a9d9156463a80ab
+P b1dc4a4d34e445f3d69679a0d8d9e31c23f9d73b
+U zoran
+Z e0de34fa4561b1cf5ad66c4d099cb9f0
 # Remove this line to create a well-formed Fossil manifest.
