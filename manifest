@@ -1,5 +1,5 @@
-C Added\scode\sneeded\sto\shandle\seffects\sof\sthe\s-useForeignDTD\soption.\n
-D 2003-03-22T00:05:55
+C Renamed\s'startBefore'\smethod\sto\sthe\sbetter\sname\s'precedes'\sand\schanged\nbehavior:\sthe\smethod\snow\sreturns\ssimply\sa\sboolean\svalue.\n
+D 2003-03-22T00:14:37
 F CHANGES 87334aee80e9af7a72560e564ddddb7bf97ca551
 F ChangeLog ba4e9c798f8168bf9c8ff3a2bda89f57c348c4e8
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -132,7 +132,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c c2fe5b784c2ad83c904edd3d82050b8f7c7fc444
 F generic/nodecmd.h 20210ad9b4a3bdd6055175beca7bfdd8bd318a3f
-F generic/tcldom.c 43cd0f97b8ffca413999b9c7c687864eb5fd517d
+F generic/tcldom.c 7dcbe432c6a1470e35d80df87d00c8ee2ac8035a
 F generic/tcldom.h 887f9bad5712f88523eedf06567a37ce183f777c
 F generic/tclexpat.c 98e58998ee06e68f8e054ebd021538e88dc9fc07
 F generic/tclexpat.h 62e83591b9fff070825add84310f7f7cc8cff3b8
@@ -198,7 +198,7 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
-F tests/dom.test d3cc646215e6bbfe878cc074a7f52366e3fa5ad9
+F tests/dom.test e978634307398ca247189653877b0889ae49c629
 F tests/domCmd.test cf21b0ba55982fb2faee616ad555dedc668ee4bc
 F tests/domnamespace.test 7023cb113cf156381218b303eddcde3822f40a48
 F tests/element.test feb714dae2010efc20dd12d4e7d7bc281b1a6ff4
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 3059d7be0c796142fc0fcdda359098b21d28312b
+P 4b30dbc927250a5a1b170ac3fbe39a98d20c12d0
 U rolf
-Z d7ea7dcf652804eb7a788b5493f8d8e6
+Z 3e602400b2ebfd6a4d3e656262e89587
 # Remove this line to create a well-formed Fossil manifest.
