@@ -1,5 +1,5 @@
-C New\sfile:\ssourced\sby\sall.tcl\sand\sall\stest\sfiles\sto\senforce\s(and\sensure),\sthat\s\sthe\stcltest\spackage\sand\sthe\snewest\stdom\sbuild\sare\savailible\sin\sthe\sinterpreter.\n
-D 2002-07-28T23:17:34
+C Added\sthe\sinclusion\sof\sloadtdom.tcl\sand\sadjusted\sbaseURI\s/\sload\sof\sexternal\sfiles\swhere\snecessary.\n
+D 2002-07-28T23:20:37
 F Makefile.in 90af78958d8b642862a15b9029b0bd8fad84da5a
 F aclocal.m4 a7c82deae42849a1eb4956222315c139329d4d55
 F apps/xslt.tcl aceffee1914d4bf9b7a6a0a0a4b66fa7c4991fd5
@@ -135,32 +135,32 @@ F tclconfig/README.txt c7a8a24b2782cd897a7608813161611f8e0521a0
 F tclconfig/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F tclconfig/tcl.m4 71f8690835637fc571099ec81d1c57ed98af7411
 F tdom.m4 da2d4aa0ade8e7364ec24deed26f3841fb4869dc
-F tests/all.tcl 2a84081629096fae0bff9408f4779d1d57a7866d
-F tests/attribute.test a26d96df1aaa0b0c282942b39414d3f36e6ce800
-F tests/cdata.test a7819fcbc81c05f8c99cdea5e35984efa5074ac2
-F tests/comment.test aa6c31516951c29ae7c6fabb51ec3c92b89e1b6b
+F tests/all.tcl e06b71e9a696b4e38eed1a5e8c5d4abefbeccf88
+F tests/attribute.test 680563462d618d04d11b77fb6baf3073a77fc5c1
+F tests/cdata.test 9246e7b6da1bd86267135da7038a785182e21e06
+F tests/comment.test 25ac780959e2c7220d3e92dac01dd5e14fd4acaa
 F tests/data/REC-xslt-19991116.xml d86bd1efbc1f810b2a6f74c0c182bd37ae5ee09d
 F tests/data/books.xml 0b1ae696b2bbc1035303f5637a6ef67f041d0b9e
 F tests/data/i18n_1.xml 7b4282addd307b17940fffd818de016ca64311fa
 F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
-F tests/decls.test 6b400d7cee373b81d057bf76f5ec3c6f2de75ec8
+F tests/decls.test be4ca80f9eb657ad2d0713bcd32dfed3126135e8
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
-F tests/doctype.test 9ed82f3607b25f297bbb28bbcc6679ebd29066d2
-F tests/dom.test d8ee44eadee90a0529020a02dede64efca5df48d
-F tests/domnamespace.test 1cf980a8d0269f84eeafc0a0850725b6184ba52d
-F tests/element.test 7ee4061e2417fd5ff7207c2b28c0946da4d5d7c0
-F tests/entity.test 184c90b48bb6596bf221ceb2ca0e1eeb886a11e0
-F tests/htmlreader.test 428e2639092ac48f9583ced039fd391f0d5955dc
-F tests/i18n.test 3e30e6855559ece94d3137b71b3e6c0cf27a41c3
+F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
+F tests/dom.test 9b7277584a2ebd7819bd5f81a6239d8885fb4f31
+F tests/domnamespace.test 3d0c781df1bc869eed7273a5ca3143e689f389a1
+F tests/element.test feb714dae2010efc20dd12d4e7d7bc281b1a6ff4
+F tests/entity.test e7462b5a56f8ae842443af6a29781158b948ea28
+F tests/htmlreader.test 40a5af71d4d202fdc5d905e38ac69ef4a74656ca
+F tests/i18n.test e5e3d9b5b0ed62db12ee9cde625c2b0e000f9290
 F tests/loadtdom.tcl 81ea58bcaf7a088ac880bd166dc29cbbfa5231fb
-F tests/namespace.test 92898430b86a6595878ab7a73550f014718c671d
-F tests/parser.test bc7183bf61d94e17a475878cc59a7255a52f5c4d
-F tests/pcdata.test dc0691dc3e2e9048560595bccd271801567ba9bd
-F tests/pi.test be4d564b0324686ffdfee9382b55db0aa47c1607
-F tests/xmlsimple.test 289fd085efab8db814318dded1b047ddc0ad3deb
-F tests/xmltest.test c6f5b4445b776ccb628ef9dc9ec5cd2659aa032a
-F tests/xpath.test 27ed25b784f9fc5658eab59ad61ca5a1f7e92adc
-F tests/xslt.test 142ca48e6d9e1eda354188ce07b8193b3144cf26
+F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
+F tests/parser.test 39d7e5bdbbecd7f929a120223d24e7ab43444914
+F tests/pcdata.test d91fbfd9ca0feeff64d930c3b01355fc97ccd03e
+F tests/pi.test 03bb450cd334ca0454a6c99ca3270092ba684833
+F tests/xmlsimple.test 30de3d233b6fe4fdcb06261d7fcbe8ab6d247854
+F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
+F tests/xpath.test f2aa3c5b5cb69f6d5ad9daf36bf0d0f262b8bff6
+F tests/xslt.test 48ab8983d75bd3a40e7c0ca7f1c4e6c87de4beee
 F unix/tclAppInit.c 06b688c30d27d4be8925b05d1607cbee950bbd1c
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F win/makefile.vc 49b5882632a89fb6de35b348bacf8f98ebd114d6
@@ -170,7 +170,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P da09dc365d6d7a0c76d10eae1db01f519b632e67
+P c131ac18a4016415231a124fea3c60b1785ec23d
 U rolf
-Z 75c61fe25e32cc821e6dff500b8292b3
+Z 8b29ff783eeb60364cfab0c1a48b598d
 # Remove this line to create a well-formed Fossil manifest.
