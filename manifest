@@ -1,5 +1,5 @@
-C Public\sand\ssystem\sidentifier\sinformation\sare\snow\sstored\s(if\sparsed\nwith\sthe\sexpat\sparser\sor\sgenerated\sby\sthe\sxslt\sengine,\sif\sgiven),\nexposed\sto\sthe\sscript\slevel\s(even\swritable,\smore\sthan\sDOM\s2\sallows)\nand\swill\sbe,\son\sdemand,\srespected\swhile\sserializing.\n\nBug\sfix:\sinvalid\smemory\sread.\n
-D 2003-02-09T02:15:10
+C Public\sand\ssystem\sidentifier\sinformation\sare\snow\sstored\s(if\sparsed\nwith\sthe\sexpat\sparser\sor\sgenerated\sby\sthe\sxslt\sengine,\sif\sgiven),\nexposed\sto\sthe\sscript\slevel\s(even\swritable,\smore\sthan\sDOM\s2\sallows)\nand\swill\sbe,\son\sdemand,\srespected\swhile\sserializing.\n
+D 2003-02-09T02:17:33
 F CHANGES 92d5a67a9b11f538ccbece3c5d07ea8b20cb265a
 F ChangeLog 9484d07384dda356b424292fcff900bc77ebfbf3
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -113,7 +113,7 @@ F extensions/tnc/test.tcl 46d33c15e885f69d643a1ffe95921d72f403a0d2
 F extensions/tnc/tnc.c eb10dfa0748cd6899509e1512d6a3f8bd87a25b1
 F generic/aolstub.cpp 0f2fb53cc8ba2a4a5fc8f5fe2dbe94c51e65e9bf
 F generic/dom.c 7ddd58fec6bfc448091090bbdf6b4699979fdad1
-F generic/dom.h f23165bb0f7943809069613faa0af03c8db133ef
+F generic/dom.h 5df16e528e98b504a616ad47cb8897f63343df6b
 F generic/domalloc.c 614b3e4af2d4b7cd8dac5a9fd95b699a5e80264f
 F generic/domalloc.h 5e94d96321fb4f926b6e2c8cf01b8a28c3d0be0f
 F generic/domhtml.c 54fdfbbe29a80c0c2d5dcb081dc2ab183f1baf98
@@ -171,7 +171,7 @@ F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.test 72bc856165c03904d0105bed8598d7c25494b203
-F tests/domCmd.test cd4cfe75fefeb99ae04fdf88fe31dbfb35abfea6
+F tests/domCmd.test 1b07b6c24d4838ae18d062449a9b6ac85f800347
 F tests/domnamespace.test 7023cb113cf156381218b303eddcde3822f40a48
 F tests/element.test feb714dae2010efc20dd12d4e7d7bc281b1a6ff4
 F tests/entity.test e7462b5a56f8ae842443af6a29781158b948ea28
@@ -197,7 +197,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 885f793791603594e2b1f0a367ff88be73ba3235
+P 57286a402a4dad15b01d020dca4db56db4a45e8e
 U rolf
-Z d7f788bf4c7e768dadab751375b43e00
+Z bcefd2d1f7bc2ffb5f3b06c38c0cc0ac
 # Remove this line to create a well-formed Fossil manifest.
