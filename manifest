@@ -1,5 +1,5 @@
-C Changed\sparserObj\sbehavior:\sparser\sdon't\sneed\sa\sreset\scall\safter\sa\nfinal\sparse\sor\sparsing\serror.\sFixed\smemeory\sproblem,\sif\shandler\sscript\nreturn\sTCL_ERROR.\sMade\sthe\scget\smethod\swork\sfor\sthe\sparser\srelated\noptions,\seven\sif\sthere\sare\sno\shandler\sscripts\sset.\sAlways\suse\sdomPanic\nas\spanic\sfunction.\n
-D 2003-11-24T10:24:02
+C Changed\sparserObj\sbehavior:\sparser\sdon't\sneed\sa\sreset\scall\safter\sa\nfinal\sparse\sor\sparsing\serror.\n
+D 2003-11-24T10:25:15
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
 F ChangeLog 717daa3a3da1c0cc15de1215c1e87059932243f6
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -135,7 +135,7 @@ F generic/nodecmd.h 66edebe59c0f9f01da4d68de490c00e24b730e7c
 F generic/tcldom.c bd64b26d3c82e30c75b6c0f3d3445e5b7935ba49
 F generic/tcldom.h 6f0f185ae010f9906b3107acdf879bca6924e0f0
 F generic/tclexpat.c b3f4dc4f7c6c000411c89c5e65fa9b8009b334ed
-F generic/tclexpat.h 08995ca5353bc8ebf593c160fcc433c8f6deebf2
+F generic/tclexpat.h 4af6a66cde1f493d0d7c2da1ef5da6295c1006db
 F generic/tdom.decls 760ad3234a869b8191436bd53370b812266d98d5
 F generic/tdom.h db128152fac506159243e47cb3a77cc7d9fe4360
 F generic/tdomDecls.h fc2a07f8db9c4c2c1d06322fa82dd27d92e947f9
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 62ed272244086bfb36c636797b474cb8f542c9ed
+P 325c92cf38f1870c0537de75f48404ca8158eeb1
 U rolf
-Z c01758caefc76f132bc0f258c54cc6cd
+Z 68d4bac6a9aa0faf4733f262fb1bfaba
 # Remove this line to create a well-formed Fossil manifest.
