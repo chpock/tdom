@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2003-10-08T16:17:01
+C Made\scode\srobust\sagainst\srenaming\sof\sdomDoc\scmds\s(well,\sunlikely,\snot\nto\ssay\svery\sunlikely,\sbut\sat\sleast\sit\salso\ssimplified\scode\sand\sreduced\nobj\ssize\sby\sa\sfew\sbytes).\sChanged\ssharedDocs\shash\stable\s(only\sMT\nbuild)\sfrom\sTCL_STRING_KEYS\sto\sTCL_ONE_WORD_KEYS.\n
+D 2003-10-09T00:21:25
 F CHANGES 228acdbe3e0f22f66f131cd33f2aaa77c06c5e8d
 F ChangeLog 9aa8f5d76f72af3cc1d10fed0206f841b913992b
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -132,7 +132,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 0a7a17669c2789cb31ceb25b79a60684f7d5460f
 F generic/nodecmd.h 66edebe59c0f9f01da4d68de490c00e24b730e7c
-F generic/tcldom.c 7917b5f6d37fdeaba91deea6d7d84b186d6abc56
+F generic/tcldom.c abfede8023e52182feb5359edcb8c86ce78ca19d
 F generic/tcldom.h 1c21383eabe24ac9bea93e4f5c66f9a64a7b68d1
 F generic/tclexpat.c 07e5fab1b7755dc6423de373e2b7289bbd0d53c9
 F generic/tclexpat.h 654f6d0b4b486841360bc9066c27212f6e8b6c63
@@ -199,7 +199,7 @@ F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.test 78d79b8f094f5929cd886ffe9551efcdd74564df
-F tests/domCmd.test 18404cef0e498de74611d48d8b7249146554a1b0
+F tests/domCmd.test 55a2f78bd52ae24d5a694ff559720659c40b32bf
 F tests/domnamespace.test 7f6ff7ee11a6cb437240c07be18adc11fd876d46
 F tests/element.test 7da1983ecf71b5fa81bae0adfa1b74c8c21fbeff
 F tests/entity.test 8440a2109f4b250b539477b27c141f37ff19c3a3
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a6cdb344f3bbbdfd05bfff6dbb918bff593b5825
+P c13c20759dbeebfb000e46259ec9cf02b769431c
 U rolf
-Z db9c79cfc88a3657f8bf389d1a37b1c0
+Z 35602ef44c6c8ba16b5961820436474a
 # Remove this line to create a well-formed Fossil manifest.
