@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2005-03-26T14:08:53
+C Removed\slast\scomma\sin\senum\sXML_Status\sdeclaration,\sto\sprevent\scompiler\nerrors\s(xlc\son\sAIX\s64).\s(Current\sexpat\sCVS\shead\shas\sthe\ssame\sfix.)\n
+D 2005-04-04T19:03:47
 F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
 F ChangeLog 62fa09583ec564d2334e1d1ea78d6cc89dc61e29
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -68,7 +68,7 @@ F expat/README 30eac3ffa775d13e924e6eb2fd02647e18efbd6e
 F expat/VERSION b4b32fffbb869b83ed11185cad2acc349717e3d3
 F expat/ascii.h ca59dc7b044451fe67b2611a98b546aacc10acb8
 F expat/asciitab.h 67462447978f02b8a78ce7f054da82ec88e7ffa4
-F expat/expat.h 3f5b3be54b7d94baac78f5581c187c419b9d02b4
+F expat/expat.h 779ae5ab605fbc4f1fc94269744cc77f15d0847d
 F expat/expat_external.h 3a044188de7bcc35e596a780bbab04c566bc07d4
 F expat/iasciitab.h efc1dd92a1a1173bde671c54ddc772e4ca3de340
 F expat/internal.h ca6418bdb052a1f2c2fc352fb5ddbd1e5d944773
@@ -233,7 +233,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 18537ed52a4592730f967b8a8924d9333c6b26bf
+P 302d4d86196005fd4e28cf072244a99f015159ff
 U rolf
-Z 914e054b91aa7cd2405a93632c2e666f
+Z 633e9d7d3fc38b03f347f496cc0e4c90
 # Remove this line to create a well-formed Fossil manifest.
