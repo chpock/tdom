@@ -1,7 +1,7 @@
-C Fix,\sto\sensure\snamespace\sintegrity\sof\sthe\sresult\sdoc.\n
-D 2003-11-26T16:00:41
+C See\sfile.\n
+D 2003-11-26T16:01:21
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
-F ChangeLog 9314369ea6970b4bb2cac96609dff25b35c85260
+F ChangeLog bbc4ff3e0f6075da5b63fc4967d6de0513d52c14
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -227,7 +227,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 0e3c1ad006472161c4abfd1648c84dc4acb12059
+P 8893c786c261aa3a9a141d607ff40920c4e25468
 U rolf
-Z cf71890a5553c856d1d38222edc07ad6
+Z 4631b2c066b13fe6d6fef24338feb0b8
 # Remove this line to create a well-formed Fossil manifest.
