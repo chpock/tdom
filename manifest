@@ -1,7 +1,7 @@
-C Used\s!=\sinstead\sof\sthe\smodern\s'ne',\sfor\solder\stcl\sversions.\n
-D 2003-07-08T16:17:03
+C Removed\sdomAppendChild1\sin\sfavour\sof\sdomAppendChild\n
+D 2003-07-08T19:14:08
 F CHANGES 59cab3c950a08a20053aa26b3a8718c6efa8c913
-F ChangeLog 1c33dba991ef84f9ae54209cdddfda54a48d4a07
+F ChangeLog 8f41c7f1bed97a0412fbf7341a87e62b79a8aed4
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 25204720818592a271aecc462432628b5a1862a4
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -130,7 +130,7 @@ F generic/domxslt.c 42aff08fe87aee79313039cb3a4412fb3c96108d
 F generic/domxslt.h b60468a7092d4d5712b4a8776f3db51d4c03aa04
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F generic/nodecmd.c c2fe5b784c2ad83c904edd3d82050b8f7c7fc444
+F generic/nodecmd.c e55fc727ca806a5956bd3bebfeffa4b86287a86e
 F generic/nodecmd.h 20210ad9b4a3bdd6055175beca7bfdd8bd318a3f
 F generic/tcldom.c c306b428389826eb9c4610ef2ea5ab1ea0331432
 F generic/tcldom.h 1c21383eabe24ac9bea93e4f5c66f9a64a7b68d1
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c6138985fa867ed3ec49b1a2159ec949962e70bf
-U rolf
-Z 1cf53150c511c599429b44833fe651bc
+P 368c84013a558540b84a0771e5a35c28b856d889
+U zoran
+Z f85303cea8585729ff71b21aaca1b05e
 # Remove this line to create a well-formed Fossil manifest.
