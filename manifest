@@ -1,7 +1,7 @@
-C Added\sbaseURI\smethod,\swhich\sreturns\sthe\scurrent\sbase\sURI\sand\shas\san\soptional\sargument\sto\sset\sthe\sbase\sURI.\sThis\senables\sXMLBase\ssupport\son\sscript\slevel.\s(The\sgetBaseURI\sis\sdeprecated.)\n
-D 2003-12-17T03:38:02
+C See\sfile.\n
+D 2003-12-17T03:38:54
 F CHANGES 147549e6fbd2a6b78a94393b3f3e1071ac585a71
-F ChangeLog af2feea2d2e78e0d70ecfa77b569d33447f83f54
+F ChangeLog ff448fe943a15c3589e036473852725704adc812
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 47a15054fd18604bef361d7012f3e07e1f59ed5a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -227,7 +227,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 6fc03c62bde4afbb470fa4bb45a17b2ce50b36d0
+P 50bb03d137e02afa27e93f1a45c007009eda51c3
 U rolf
-Z adc864510e2d8821f4fd135e4c091110
+Z b6b090803612a16cc7326cffb2cf2dbd
 # Remove this line to create a well-formed Fossil manifest.
