@@ -1,5 +1,5 @@
-C Removed\sbogus\scode\s(which\smay\snot\sharm\scompliance,\sbut\sspeed\sin\sa\sfew\scases).\n
-D 2002-10-17T00:07:05
+C Fixed\sa\sbug\sin\skey\shandling:\sEmpty\snode\ssets\sare\snot\s""\s(the\sempty\nstring)\sneither\sin\sthe\skey\sdata\sbuild\snor\sthe\skey()\sfunctions,\sbut\nsimply\sno\svalue.\sRemoved\sa\ssuperfluous\sstrcpy.\sSince\sthe\skey()\nimplementing\sfunction\suses\srsAddNode\s(which\sis\sfixed,\sin\sbetween\sand\nnow\shopefully\sin\sdeed\swork\sas\sexpected),\sthere's\sno\sneed\sto\ssort\sthe\nresult\snode\sset.\sThe\sfix\sof\srsAddNode\sdisclosed,\sthat\sa\spart\sof\sthe\nnumbering\scode\srelied\son\sthe\swrong\sbehavior\sof\srsAddNode\s(well,\ssince\nI\sknew,\sthrou\shand\schecking,\sthe\sright\sresults\sof\sreally\sa\scouple\sof\ntest\scases,\swhat\sthe\sright\sresult\sshould\sbe,\sit\sseems,\sI\smassaged\sthe\ncode\sas\slong,\suntil\sit\sgave\sthe\sexpected\sresult,\sdiscarding\sall\ndoubts,\swhy\sthis\sis\sthis\sobvious\swired\sway\sat\sthis\splace\s-\sI'm\nobviously\sa\sweak\shuman).\sFixed\sthis.\sUnfortunately,\sthe\sold\sway\smay\sbe\nway\smore\sfaster,\sfor\slot's\sof\snumbering\sin\sdeep\sdocuments.\sThere\smay\nbe\soptimization\spotential\sfor\sthis\scases,\syet\sagain,\sbut\sI\shave\sfirst\nto\sthing\sabout,\sif\sit's\sreally\swork\sin\sall\scases.\sExchanged\sa\sfew\nrsAddNode\swith\srsAddNodeFast,\swhich\sis\salmost\spointless\sin\sthis\ncases.\sThere're\sa\slot\sof\scases,\sin\swhich\sa\snode\sis\sadded\sto\sa\sfreshly\ninitialized\snodeset.\sThe\sadding\sof\sthis\snode\sto\sa\semtpy\snodeset\scould\nbe\sinlined,\sfor\sa\s(real\ssmall,\saccording\sto\smy\sprofiling)\seffect.\sBut\nI\spushed\stDOM\smore\sthan\s10\spercent\sover\sall\sin\sthe\sxsltmark,\sand\smade\nit\sat\sleast\smore\sthan\sdouble\sas\sfast\sas\sbefore\sfor\sbigger\sdocbook\ndocuments\sin\sthe\slast\sweek;\sI\somit\sthis\sfishing\sfor\slesser\sthen\sa\npercent\sspeed\sup\sfor\snow.\n
+D 2002-10-17T00:30:32
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 2086eca836d27f5319bc34c0c379fc1009993adf
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -109,7 +109,7 @@ F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c 6ccd7856d011fd273b9f613d62a6790b7d9e93ab
 F generic/domxpath.c 970c96ee15982d5c3f1050979b48b7d71f21c1eb
 F generic/domxpath.h 4e113d912e5840da684d1fa341739f25051d37f1
-F generic/domxslt.c c486c04aef6e9656cf30ed90239ec371302a0ee2
+F generic/domxslt.c c89e91edeea368215d864cb8af1345c7a6bbd94e
 F generic/domxslt.h 77d19235cbf254d3ba46ae28088fdcbf98a4856a
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -183,7 +183,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input f9bfb526b00a5c77c8a5f8ad54fe8b06d868e570
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c4edde30c3c78437bcb4e3b8fafe29e595cf920d
+P 051984cb16ac0ec14733c7e90fffdf871fb8104d
 U rolf
-Z 2ad0fbeeae7dc3982d7eb8d65e2673ff
+Z 651dd057fbf9f8e9b254ebc0f7510ce7
 # Remove this line to create a well-formed Fossil manifest.
