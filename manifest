@@ -1,5 +1,5 @@
-C Changed\slock\scaching\sto\saccomodate\sfor\nsituation\swith\shuge\snumber\sof\screated\sdocumnents\n
-D 2003-10-17T08:43:36
+C Added\s"dom\sdetachDocument"\sand\simplemented\ssupport\sfor\sdomDoc\scommand\n
+D 2003-10-17T08:44:22
 F CHANGES 993140b623ef50267a92d858779d91eeaf39da4c
 F ChangeLog 8e9e3dbc708edba7c3e33f8e8744cf16ba39fbf3
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -132,7 +132,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 0a7a17669c2789cb31ceb25b79a60684f7d5460f
 F generic/nodecmd.h 66edebe59c0f9f01da4d68de490c00e24b730e7c
-F generic/tcldom.c 10e34b91e4db0fad029c32203b8885fe7d7ecf1a
+F generic/tcldom.c 17f28ac279b4017ff0c4c9a44813588bce58788b
 F generic/tcldom.h 1c21383eabe24ac9bea93e4f5c66f9a64a7b68d1
 F generic/tclexpat.c 3f02d30faacfa67be6b40b2252d65b0965ddbe5e
 F generic/tclexpat.h 08995ca5353bc8ebf593c160fcc433c8f6deebf2
@@ -226,7 +226,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 0cc90ecb27673f3b58b59f2b1c1ee406776a97ed
+P be54f999f24bb1779f3eb605a875bbd975e9fccc
 U zoran
-Z ff8fa46bd45ddc031007bc5f4566c158
+Z 03217ae0050aaed4233721d2270c5b78
 # Remove this line to create a well-formed Fossil manifest.
