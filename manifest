@@ -1,5 +1,5 @@
-C Updated\sto\srequest\stdom\s0.8.1.\n
-D 2005-04-11T01:43:54
+C Deleted.\n
+D 2005-04-11T02:00:59
 F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
 F ChangeLog 1e20d053c0da35b9ec6556a75dfeab69c5c43d30
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -170,9 +170,7 @@ F mac/tDOM_OSX.prj.xml 7876d8fba0620fa19fac268b8f195fb70d70497c
 F mac/tnc.exp b5221cfee6631ca94e46626dcd5c54e7e9cde7ba
 F mac/tnc.r ce718255e902d882f872087908dcd234fdc9fa51
 F macosx/README 90fbbcf96747374a4c4a7b97766f0c6bafa7780e
-F tclconfig/ChangeLog 46024c84cdc7abb330ecd048d1084117ad821461
 F tclconfig/README.txt c7a8a24b2782cd897a7608813161611f8e0521a0
-F tclconfig/ac_c_bigendian_cross.m4 d42e2f20b8ea4df7c29a8595f10489bfaab58096
 F tclconfig/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F tclconfig/tcl.m4 dd77b8d90b60a10c1d35114967590a4d0d958802
 F tdom.m4 cbfd81cca82c423fe36b8e40fcf0f1e9d656d3b3
@@ -233,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 707f0d9f5012db1a81cf6a13bca681f42b550aef
+P 20871bd9408ceadb98fe592087af604130949bd4
 U rolf
-Z 4a549541b8caef5118b345c3aee7febf
+Z b93b0fb583a0291a243488e7c8e699a1
 # Remove this line to create a well-formed Fossil manifest.
