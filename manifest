@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2005-04-11T02:02:19
+C Use\s@AR@,\sas\sin\sTEA\s3.2.\n
+D 2005-04-11T12:21:38
 F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
 F ChangeLog 598e233bfe127c53102c931d8faa8d52a4fe0d51
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -105,7 +105,7 @@ F extensions/tdomhtml/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F extensions/tdomhtml/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
 F extensions/tdomhtml/pkgIndex.tcl.in 2612d2a8fd5a213a1379ad5570c229d82810dcb5
 F extensions/tdomhtml/tdomhtml.tcl 7d48c19d50f203ee71b3db15d0fc6077dc244798
-F extensions/tnc/Makefile.in d343d30f4bf5046db679a33392f5dc33da1c79ef
+F extensions/tnc/Makefile.in 0e6ae60c643a4aedfde26db7e2148a5ff23edfc2
 F extensions/tnc/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
 F extensions/tnc/configure ab19b3167b0111226d75d6a78762a5c7b5db5878 x
 F extensions/tnc/configure.in f6e722fad832a5f476e17a25e3890be51556a713
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P cb109fbb358ae8b340b4bf2eb310a39d2b10364d
+P 4c23538244a6e161b3e9d4b840e977c280660d40
 U rolf
-Z a365ce1d6e863bf04770ee324cf52b77
+Z 0e88f9657dad03f134b81f4cd6dcebcc
 # Remove this line to create a well-formed Fossil manifest.
