@@ -1,17 +1,17 @@
-C See\sfile.\n
-D 2005-04-04T19:04:02
+C Updated\sto\suse\sTEA\s3.2.\sThanks\sto\sDaniel\sA.\sSteffen\sand\sAndreas\sKupries\sfor\sinput.\n
+D 2005-04-11T01:39:46
 F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
-F ChangeLog aa56b8aed3e7346a0f79eac51f02fd1efb80dc71
+F ChangeLog 1e20d053c0da35b9ec6556a75dfeab69c5c43d30
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
-F Makefile.in 793035f18fb2ad53394e3cda31222b9197e93a3a
+F Makefile.in ed07060f9a78149372cb23260b1a4c7cba062779
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
 F README db21b67c7f4f97d6ed22bb7d2af948f5e8f2a644
 F README.AOL 44b39cf7002f8b39a76cc362784c7350fa8e326d
 F aclocal.m4 79e2f4aa6a138371f2d31f28355749e5019d7651
 F apps/xslt.tcl af84f844bafbce1f375ffe17552f2d77c01ef16b
-F configure dc868febdb7209c8ac2754fe8f039a2b4040318c x
+F configure c154c99176497c3204f63e6d3800f9916156a0a1 x
 F configure-tcl8.0.5 a5d0c7988aaf04fb2fbba0746f84895b2b3f58de x
-F configure.in 1f565ffbdcbb4595d84844038f24e64a84a7d860
+F configure.in f54f79e95c510869652c62194273229ac7ea8507
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html 2e1a41b03d31f42dd00a0c449f7f28db6227bbf2
 F doc/dom.html b7bab0b6e2a570ef036e155a712d2da498c1842a
@@ -105,10 +105,10 @@ F extensions/tdomhtml/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F extensions/tdomhtml/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
 F extensions/tdomhtml/pkgIndex.tcl.in 2612d2a8fd5a213a1379ad5570c229d82810dcb5
 F extensions/tdomhtml/tdomhtml.tcl 7d48c19d50f203ee71b3db15d0fc6077dc244798
-F extensions/tnc/Makefile.in 30472c194851090b3d1db0459d90ad9dff2c1ae8
+F extensions/tnc/Makefile.in d343d30f4bf5046db679a33392f5dc33da1c79ef
 F extensions/tnc/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
-F extensions/tnc/configure 0940b5d6ed055f3b5cfe57f8f7a9b48781c68495 x
-F extensions/tnc/configure.in be5144eab010e85e74dec0e86f64a1c41771b48b
+F extensions/tnc/configure ab19b3167b0111226d75d6a78762a5c7b5db5878 x
+F extensions/tnc/configure.in f6e722fad832a5f476e17a25e3890be51556a713
 F extensions/tnc/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F extensions/tnc/makefile.vc f1c34510338e7e42c845f7ea5ff2136f5364ac5b
 F extensions/tnc/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
@@ -117,7 +117,7 @@ F extensions/tnc/test.tcl d9d4c2a1dcd2a7a70096a2a1727f8600ff0c78fd
 F extensions/tnc/tests/all.tcl 845c9dab65c294c3570f69cc731d6fef62efbd03
 F extensions/tnc/tests/loadtnc.tcl 418f1bbca50993a9fe012728b50f0f8080cff2ab
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
-F extensions/tnc/tnc.c 4eb5d817c334c641af2c76cdb7f30998b5c5b8ed
+F extensions/tnc/tnc.c 89ab2f2742181e818741dc224ed1918ee4c0cc1b
 F generic/aolstub.cpp 4162cbebdaa563e6dbfe2dbfab08058da2816f59
 F generic/dom.c e41218e39bc9ae47b5bbb572cd86b5075996ac24
 F generic/dom.h 3ce3d8bc19991250781367ecb808be653f20543f
@@ -174,9 +174,9 @@ F tclconfig/ChangeLog 46024c84cdc7abb330ecd048d1084117ad821461
 F tclconfig/README.txt c7a8a24b2782cd897a7608813161611f8e0521a0
 F tclconfig/ac_c_bigendian_cross.m4 d42e2f20b8ea4df7c29a8595f10489bfaab58096
 F tclconfig/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
-F tclconfig/tcl.m4 f07e10d3c686229b9d3adcb23f62dc7d6ef6f9a9
-F tdom.m4 ec863bf4e76bcf40d9d41d75f6586d2fcff0ad0a
-F tdomConfig.sh.in bb068ad78eefdd9a8554f970b7266c78e976df0b
+F tclconfig/tcl.m4 dd77b8d90b60a10c1d35114967590a4d0d958802
+F tdom.m4 cbfd81cca82c423fe36b8e40fcf0f1e9d656d3b3
+F tdomConfig.sh.in ef22a48fdb07a1b2726dacd7dd0c1860b2370e2d
 F tests/all.tcl a8d5d3e3adc6713f64d0c614b927bd21ca8df870
 F tests/attribute.test 53ac8fb043e79b638c8c6f5e7da848f6103552d6
 F tests/cdata.test 5a1dc3bee6353700186d12f0d11b15914849c6be
@@ -233,7 +233,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P d05ccff18bc700586bf641b6914c221e0b02f8af
+P 7bde8b1c6ccd52a219c9118c61f033fefe240402
 U rolf
-Z b8fce1a32814f631e9018284dade563d
+Z e2d1ebe9ed440e2d5ebe96c3c97a1653
 # Remove this line to create a well-formed Fossil manifest.
