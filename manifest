@@ -1,7 +1,7 @@
-C Bug\sfix:\sexpat\sparser\smethod\sparsechannel\sdidn't\s(depending\son\sthe\nencoding\sof\sthe\schannel)\sreported\sparsing\serrors.\n
-D 2005-05-02T13:18:57
+C See\sfile.\n
+D 2005-05-02T13:20:05
 F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
-F ChangeLog 598e233bfe127c53102c931d8faa8d52a4fe0d51
+F ChangeLog d47b477dab9dc4b8ee202116006b51f29808d3a4
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in ed07060f9a78149372cb23260b1a4c7cba062779
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 2d9aa5194296407e1498c79cb3753f20e2c7a3ab
+P 71c78179dba6816792aec8aa017d764508a5aad7
 U rolf
-Z 50d089043fd0c04937131faaa6cdf12d
+Z d9ac429a4986a55e78ff920647f31975
 # Remove this line to create a well-formed Fossil manifest.
