@@ -1,7 +1,7 @@
-C Fix:\sdomNode\snodeValue\s$newValue\sdidn't\scheck\sthe\snewValue\sfor\sbeing\nvalid\spcdata.\n
-D 2005-05-12T17:11:32
+C See\sfile.\n
+D 2005-05-12T17:11:59
 F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
-F ChangeLog d47b477dab9dc4b8ee202116006b51f29808d3a4
+F ChangeLog ac9048ff347194f62ca74d7f1dc387d7c324b941
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in ed07060f9a78149372cb23260b1a4c7cba062779
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 13bf90cb4ca8d1f47cdc60a65f76511b57e22191
+P 0a6e18b84c716b208c94096acb7bbe8dd0bf4c5c
 U rolf
-Z 5d1d4eda0c70f73d587f0f3d035c696a
+Z 442a50e6ccc9f59975d32d7c37dba19d
 # Remove this line to create a well-formed Fossil manifest.
