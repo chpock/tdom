@@ -1,5 +1,5 @@
-C Internal\sdispersion:\sCleaned\sup\srootNode/toplevel\snodes\sconnection,\sadded\snew\sfunction\sdomSetDocumentElement.\n
-D 2005-06-10T00:20:30
+C Internal\sdispersion:\sCleaned\sup\srootNode/toplevel\snodes\sconnection,\sadded\snew\sfunction\sdomSetDocumentElement.\sClosed\smemory\sleak\sin\scase\sof\snot\swell-formed\sinput\sto\sthe\ssimple\sor\shtml\sparser.\n
+D 2005-06-10T00:21:22
 F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
 F ChangeLog ef41f5437a54c2e2311f7a39b49d4f6dd4885e9b
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -134,7 +134,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c f048687d9a40a09eff1a6871707e87a2bf277f15
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
-F generic/tcldom.c c339ee4d7438430321f310f2b53935d3846608ff
+F generic/tcldom.c 32047b9784fc231be532a94682469fc0585b2b6c
 F generic/tcldom.h b1b1f6662c83849fb067d294d9d53bba6c07c22c
 F generic/tclexpat.c 1b2fa68347cf4dbdfca78ea088d80c695b095bd5
 F generic/tclexpat.h 7ea0c8992809e1325c901821bc63831431e2c9f2
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 59269725bfea6341be3e5d621182464b74797739
+P 7988ebf1b019f655c594b7a2e256ef0e37b0c4f7
 U rolf
-Z 96bf81ad1396f6f983c2a82f91be0eb2
+Z 0736d75ddee4981f02a6b889b7adb9fd
 # Remove this line to create a well-formed Fossil manifest.
