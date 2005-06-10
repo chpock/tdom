@@ -1,5 +1,5 @@
-C Added\stest,\sto\sdocument\shandling\sof\swhite\sspace\soutside\sthe\sdocument\nelement\seven\sin\scase\sof\s-keepEmpties\s(it's\smarkup\swhite\sspace\sand\swill\nbe\sremoved).\n
-D 2005-06-10T00:33:26
+C Added\sa\sfew\stests.\n
+D 2005-06-10T00:36:49
 F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
 F ChangeLog ef41f5437a54c2e2311f7a39b49d4f6dd4885e9b
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -199,12 +199,12 @@ F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.test 7fa1288f3be298fe24d1d059ba16b3dc73777589
-F tests/domDoc.test e2cc5658f003d1b15ce73fd543924122a62fcd98
+F tests/domDoc.test 51db98bc6248b02ec83c61d5b68d70f0900b5418
 F tests/domNode.test c76068457b8a20723eb9813db3e4277aae5e7db9
 F tests/domnamespace.test 7f6ff7ee11a6cb437240c07be18adc11fd876d46
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
-F tests/htmlreader.test 5e800eff4979d0a6f1f816bddaac409bce6a63e0
+F tests/htmlreader.test c84e1b15c240514ccde023987600257d3d57d53c
 F tests/i18n.test ad68655284ea0bf4f2c5a0acc098fd05587ba9a4
 F tests/loadtdom.tcl 409376620daf31ea4f4f723c9920a867b4b18ffa
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
@@ -213,7 +213,7 @@ F tests/pcdata.test b1f5a31beb149eef4b7e2a9b75cd571ca271dc82
 F tests/pi.test 03bb450cd334ca0454a6c99ca3270092ba684833
 F tests/stackedhdl.test 4b3dafa96849dabf738ffb401585dac5a5aed550
 F tests/tdomcmd.test ebfa377019b495972b13e00b85ff9ba55041a4b9
-F tests/xmlsimple.test ca697d11f34bfdd624caa70bf74abfe0e5bd775b
+F tests/xmlsimple.test 38ca7b8d078e2a344d73c4c6e3748e8604c07b51
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.test 3b8ed5f301b6c143116e8e3384d5cd183e85f8fb
 F tests/xslt.test 7ea69ad54ad84aa9eb551d498f204b28570903c2
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 82165d42d41f5360dc75c10136f75a6dd42a589f
+P dcd1541d6ca0e96cb873fe6238ea95cfe96f3580
 U rolf
-Z 051677ab5693e122344358007ea7e06e
+Z 78041cf11cdf86d2106fa4629340d883
 # Remove this line to create a well-formed Fossil manifest.
