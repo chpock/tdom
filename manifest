@@ -1,5 +1,5 @@
-C Internal\sdispersion:\sCleaned\sup\srootNode/toplevel\snodes\sconnection,\sadded\snew\sfunction\sdomSetDocumentElement.\sClosed\smemory\sleak\sin\scase\sof\snot\swell-formed\sinput\sto\sthe\ssimple\sor\shtml\sparser.\n
-D 2005-06-10T00:21:22
+C Removed\sunused\svariable.\n
+D 2005-06-10T00:21:57
 F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
 F ChangeLog ef41f5437a54c2e2311f7a39b49d4f6dd4885e9b
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -125,7 +125,7 @@ F generic/domalloc.c cd5103a1d0312c3b1e5d9db103d07d4a105008d7
 F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
 F generic/domhtml.c b561b6331c32a77e103b4fc3f3b7bc0e5bc18369
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
-F generic/domlock.c 37ac0fa7c1657c929974cee597b711054a64dd1f
+F generic/domlock.c b9543b7f1066118a5bcd0d2fa30acda6d247f15a
 F generic/domxpath.c 6a7a900d3290c7ee825de388dbb01e3dd2a6f578
 F generic/domxpath.h be91f9f94b7a4a40c38df9612b1feaecbd6644da
 F generic/domxslt.c 8427cda4e1ad91e1b106f3035c120b5adc5f335c
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 7988ebf1b019f655c594b7a2e256ef0e37b0c4f7
+P 2d252a117c2a49d571b40071421cc02c4b0ba34a
 U rolf
-Z 0736d75ddee4981f02a6b889b7adb9fd
+Z ab8a6ca9f307e7052a6ed92ae7ec7fb8
 # Remove this line to create a well-formed Fossil manifest.
