@@ -1,5 +1,5 @@
-C Added\sfunction\sdomPreviousSibling().\n
-D 2005-08-20T01:31:27
+C Bug\sfix:\sUse\sdomPreviousSibling()\sin\sxsltNumber()\sto\sprevent\serroneous\nresults,\sif\sattribute\snodes\sare\sinvolved\sin\sthe\snumbering.\n
+D 2005-08-20T01:33:23
 F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
 F ChangeLog a76a8a917373f89b09681bb839be2dc94ce64b79
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -128,7 +128,7 @@ F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c b9543b7f1066118a5bcd0d2fa30acda6d247f15a
 F generic/domxpath.c 6a7a900d3290c7ee825de388dbb01e3dd2a6f578
 F generic/domxpath.h be91f9f94b7a4a40c38df9612b1feaecbd6644da
-F generic/domxslt.c 8427cda4e1ad91e1b106f3035c120b5adc5f335c
+F generic/domxslt.c b3ac2e00c6ec6f8f3cf5b7462882821b5d205e53
 F generic/domxslt.h 261176a8cb491de448189fcb9fa93bfcabda5e40
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 00d886476500ca65845321d786822bc0a0d18f5d
+P 234b84b7bd5e906ab7f6b6c4e4eba61c68e6609e
 U rolf
-Z 020b288fb34b45b5bd923062a5227cc6
+Z b1054b22014b399435816e6d27246156
 # Remove this line to create a well-formed Fossil manifest.
