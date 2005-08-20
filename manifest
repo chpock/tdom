@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2005-06-10T00:38:44
+C Added\sfunction\sdomPreviousSibling().\n
+D 2005-08-20T01:31:27
 F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
 F ChangeLog a76a8a917373f89b09681bb839be2dc94ce64b79
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -119,8 +119,8 @@ F extensions/tnc/tests/loadtnc.tcl 418f1bbca50993a9fe012728b50f0f8080cff2ab
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c 89ab2f2742181e818741dc224ed1918ee4c0cc1b
 F generic/aolstub.cpp 4162cbebdaa563e6dbfe2dbfab08058da2816f59
-F generic/dom.c 7982414bb79688623f4ebb4e82dfc8def8728688
-F generic/dom.h 56a0bc86b83f56441700af85764a447db73fa23e
+F generic/dom.c df79a0106022ba402ff38792f5e745a41a490fca
+F generic/dom.h fa23be85db1f1a87bc38fac1d9474f245dedeb26
 F generic/domalloc.c cd5103a1d0312c3b1e5d9db103d07d4a105008d7
 F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
 F generic/domhtml.c b561b6331c32a77e103b4fc3f3b7bc0e5bc18369
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P beff6b3d3352eddac61b9684f5873e88df8d5b6b
+P 00d886476500ca65845321d786822bc0a0d18f5d
 U rolf
-Z 66e7e06d5787fb1954b47a097dfa8156
+Z 020b288fb34b45b5bd923062a5227cc6
 # Remove this line to create a well-formed Fossil manifest.
