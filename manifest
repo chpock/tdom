@@ -1,7 +1,7 @@
-C Removed\stests\sabout\smt-ness\sof\stclsh/tdom,\sdue\sto\spopular\sdemand.\sMt\ncompiled\stDOM\snow\swill\sload\sinto\snon-mt\stclsh,\sas\swill\sa\snon-mt\ncompiled\stDOM\sinto\sa\smt\stclsh.\nNOTES:\nUsing\sa\snon-mt\stDOM\swithin\sonly\sone\sthread\sof\sa\smt\stclsh\sshould\swork\njust\sfine.\sBut\snever\sever\suse\sa\snon-mt\stDOM\sin\sseveral\sthreads\sof\sa\smt\ntclsh.\sThat\smay\scrash\srandomly.\sUse,\show\ssurprising,\san\smt-enabled\ntDOM\sfor\sthat.\sThis\swill\swork\sfine.\nUsing\sa\smt\saware\stDOM\swithin\sa\snon-tm\stclsh\sis\slittle\sbit\sslower\sand\nmemory\sdemanding.\sIt\swill\salso\shave\sa\sfew\smethods,\sthat\sare\nsuperfluous\swith\sthe\snon-tm\stcl\scontext.\sIt\sshould\salways\swork,\sbut\nfor\sbest\sresults\suse\sa\snon-mt\stDOM\swith\snon-mt\stclsh.\n
-D 2005-08-25T22:59:49
+C See\sfile.\n
+D 2005-08-25T23:00:05
 F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
-F ChangeLog de32ff5ca2486db92d23168a0774f5a808dad840
+F ChangeLog 72d62ab6376a1a1fbff5f7a9bf74249a960860b9
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in ed07060f9a78149372cb23260b1a4c7cba062779
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 832f1a9aa5442ef5076af36962d3c79d7b2970cb
+P 1871fb2c18b775d85a764216d84c561a9e88931a
 U rolf
-Z 41cfc273bb9ca7103a96ab5d825172b8
+Z 1a6286164054e5ef881a4dbf6d98a1db
 # Remove this line to create a well-formed Fossil manifest.
