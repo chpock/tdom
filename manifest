@@ -1,7 +1,7 @@
-C Improvement\sof\sthe\sbuild\ssystem.\sNow\sworks\salso\swith\sthe\stool\scombination\scygwin/TEA/VC++.\sThanks\sto\sAndreas\sKupries\sfor\shis\spatch.\n
-D 2005-09-12T22:07:17
+C See\sfile.\n
+D 2005-09-12T22:08:24
 F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
-F ChangeLog 5dd0c43564e8874ccd0e239eeaa1028f260c45cc
+F ChangeLog 45fbd2ffb131f8b40a515b20795c5993202c7d99
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in ed07060f9a78149372cb23260b1a4c7cba062779
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 4481b1b0f71ff828dc4c89ffb1a3f8315f4aa1f2
+P 08094ff26d874e5211870cb04a9793c251c5dac9
 U rolf
-Z 1ecb3a9a780ea03affaf7144154e6249
+Z f9dbc8ea636c507f5ecb789c455e3555
 # Remove this line to create a well-formed Fossil manifest.
