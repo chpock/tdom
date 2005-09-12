@@ -1,7 +1,7 @@
-C Bug\sfix:\sThe\snamespace\saxis\swill\sbe\semtpy\sunless\sthe\scontext\snode\sis\nan\selement.\n
-D 2005-09-12T22:11:45
+C See\sfile.\n
+D 2005-09-12T22:12:05
 F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
-F ChangeLog 45fbd2ffb131f8b40a515b20795c5993202c7d99
+F ChangeLog 749defc3cbef27d7bd13d04fe2b1fe6ac2dd93ce
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in ed07060f9a78149372cb23260b1a4c7cba062779
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 270ec05e2b1e3b7986ae749cb004c97ee52f0662
+P 5d5240f9eef98023105ac0be50b80cd54f98bd73
 U rolf
-Z d78c917e1b97430f8ff603bea21ae6db
+Z ee8bb8cb2051fbb23fd96282c6360286
 # Remove this line to create a well-formed Fossil manifest.
