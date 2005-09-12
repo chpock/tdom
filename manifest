@@ -1,5 +1,5 @@
-C Spelling\scorrection\sof\sthe\slast\scheck-in.\n
-D 2005-08-25T23:05:04
+C Improvement\sof\sthe\sbuild\ssystem.\sNow\sworks\salso\swith\sthe\stool\scombination\scygwin/TEA/VC++.\sThanks\sto\sAndreas\sKupries\sfor\shis\spatch.\n
+D 2005-09-12T22:07:17
 F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
 F ChangeLog 5dd0c43564e8874ccd0e239eeaa1028f260c45cc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -7,9 +7,9 @@ F Makefile.in ed07060f9a78149372cb23260b1a4c7cba062779
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
 F README db21b67c7f4f97d6ed22bb7d2af948f5e8f2a644
 F README.AOL 44b39cf7002f8b39a76cc362784c7350fa8e326d
-F aclocal.m4 79e2f4aa6a138371f2d31f28355749e5019d7651
+F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/xslt.tcl c0b218bdeae3d209bf6766ea8f01e174d33190f3
-F configure c154c99176497c3204f63e6d3800f9916156a0a1 x
+F configure f310b8a3e8a9a146c42b718fa8e6a76c2a7726ec x
 F configure-tcl8.0.5 a5d0c7988aaf04fb2fbba0746f84895b2b3f58de x
 F configure.in f54f79e95c510869652c62194273229ac7ea8507
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
@@ -107,8 +107,8 @@ F extensions/tdomhtml/pkgIndex.tcl.in 2612d2a8fd5a213a1379ad5570c229d82810dcb5
 F extensions/tdomhtml/tdomhtml.tcl 7d48c19d50f203ee71b3db15d0fc6077dc244798
 F extensions/tnc/Makefile.in 0e6ae60c643a4aedfde26db7e2148a5ff23edfc2
 F extensions/tnc/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
-F extensions/tnc/configure ab19b3167b0111226d75d6a78762a5c7b5db5878 x
-F extensions/tnc/configure.in f6e722fad832a5f476e17a25e3890be51556a713
+F extensions/tnc/configure 6b268a0f5453260d1ae20fbdd7fdd3f08d29cda8 x
+F extensions/tnc/configure.in 15aa7459780292151ab48ede505e8665510fdb43
 F extensions/tnc/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F extensions/tnc/makefile.vc f1c34510338e7e42c845f7ea5ff2136f5364ac5b
 F extensions/tnc/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
@@ -173,8 +173,8 @@ F macosx/README 90fbbcf96747374a4c4a7b97766f0c6bafa7780e
 F tclconfig/README.txt 7f7cb8e286f598b05a8beba463f5f31898bdfd1e
 F tclconfig/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F tclconfig/tcl.m4 dd77b8d90b60a10c1d35114967590a4d0d958802
-F tdom.m4 cbfd81cca82c423fe36b8e40fcf0f1e9d656d3b3
-F tdomConfig.sh.in ef22a48fdb07a1b2726dacd7dd0c1860b2370e2d
+F tdom.m4 bf71b5c7bfa6b62b5cb1ea9f8cea4a05fb609cf5
+F tdomConfig.sh.in 5756c6b431179e49852a607cc2ca01e5381da905
 F tests/all.tcl a8d5d3e3adc6713f64d0c614b927bd21ca8df870
 F tests/attribute.test 53ac8fb043e79b638c8c6f5e7da848f6103552d6
 F tests/cdata.test 5a1dc3bee6353700186d12f0d11b15914849c6be
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P cc2e897e70eb600685ea65abfbac715ef72019d8
+P 4481b1b0f71ff828dc4c89ffb1a3f8315f4aa1f2
 U rolf
-Z 9a261d6017c56c51de5d7f448d7720bc
+Z 1ecb3a9a780ea03affaf7144154e6249
 # Remove this line to create a well-formed Fossil manifest.
