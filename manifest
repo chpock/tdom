@@ -1,7 +1,7 @@
-C id()\son\san\sempty\snode\sset\sshould\sreturn\san\sempty\sstring,\saccording\sto\nthe\srec,\snot\sraise\san\serror,\sas\sit\sdid\sup\sto\snow.\sFixed\sa\smemory\sleak\nin\sconcat()\sin\sthe\scase\sof\sxpath\sexpressions\sas\sarguments,\swhich\sraise\nerror.\sNormally,\sXPath\sexpressions\sdoens't\sraise\serror\sat\sall;\sthat's\nhow\sXPath\sis\sdesigned.\sThat\sis\sunfortunately\snot\scompletely\strue\swith\ncurrent\stDOM,\sbecause\sof\sa\sfew\sbuggy\sreturns\sin\sthe\stDOM\sXPath\nfunction\simplementations\s(to\sbe\sfixed\squickly),\sbecause,\stDOM\sdoesn't\ndo\san\sas\srigoros\sas\spossible\sargument\scheck\sat\sXPath\sexpression\nparsing\stime\s(that\swill\schange)\sand\sbecause\sof\suser\sdefined\sXPath\nextension\sfunctions.\n
-D 2005-09-17T00:18:39
+C See\sfile.\n
+D 2005-09-17T00:18:58
 F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
-F ChangeLog bb804b586467cb95a80480faf1534ee56c0cdac2
+F ChangeLog 15f2a5bffef5a0bcd54bda81259501ef461f62c7
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in ed07060f9a78149372cb23260b1a4c7cba062779
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 535084eb59eb44974fb6f6ea65f4297a37c3a2d2
+P 88f05466f1fac3d985806f3f04e14256c5f8fb60
 U rolf
-Z f6f19df8376d1d670b0b0ec96f13c344
+Z 5b6971979d4afedf85e19927c8d853f1
 # Remove this line to create a well-formed Fossil manifest.
