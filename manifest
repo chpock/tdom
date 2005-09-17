@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2005-09-16T00:25:25
+C id()\son\san\sempty\snode\sset\sshould\sreturn\san\sempty\sstring,\saccording\sto\nthe\srec,\snot\sraise\san\serror,\sas\sit\sdid\sup\sto\snow.\sFixed\sa\smemory\sleak\nin\sconcat()\sin\sthe\scase\sof\sxpath\sexpressions\sas\sarguments,\swhich\sraise\nerror.\sNormally,\sXPath\sexpressions\sdoens't\sraise\serror\sat\sall;\sthat's\nhow\sXPath\sis\sdesigned.\sThat\sis\sunfortunately\snot\scompletely\strue\swith\ncurrent\stDOM,\sbecause\sof\sa\sfew\sbuggy\sreturns\sin\sthe\stDOM\sXPath\nfunction\simplementations\s(to\sbe\sfixed\squickly),\sbecause,\stDOM\sdoesn't\ndo\san\sas\srigoros\sas\spossible\sargument\scheck\sat\sXPath\sexpression\nparsing\stime\s(that\swill\schange)\sand\sbecause\sof\suser\sdefined\sXPath\nextension\sfunctions.\n
+D 2005-09-17T00:18:39
 F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
 F ChangeLog bb804b586467cb95a80480faf1534ee56c0cdac2
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -126,7 +126,7 @@ F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
 F generic/domhtml.c b561b6331c32a77e103b4fc3f3b7bc0e5bc18369
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c b9543b7f1066118a5bcd0d2fa30acda6d247f15a
-F generic/domxpath.c 00a52636f304236caa2b532f8107ffa9f654d0e5
+F generic/domxpath.c 586e86daad2ee4465701bfb8b77a0e0fb0b6da08
 F generic/domxpath.h be91f9f94b7a4a40c38df9612b1feaecbd6644da
 F generic/domxslt.c b3bfe6684a74925214a8ee1e12f8144fc42e5476
 F generic/domxslt.h 261176a8cb491de448189fcb9fa93bfcabda5e40
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 3c5664414888c03a20cca7f8bec6247128889392
+P 535084eb59eb44974fb6f6ea65f4297a37c3a2d2
 U rolf
-Z 5db270dfd2f5cdab932d3625f733fdd7
+Z f6f19df8376d1d670b0b0ec96f13c344
 # Remove this line to create a well-formed Fossil manifest.
