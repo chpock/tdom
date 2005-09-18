@@ -1,7 +1,7 @@
-C Improved\sdetection/reporting\sof\sXPath\ssyntax\serrors.\sFixed\stwo\smemory\nleaks\sin\sthe\sXPath\sparser\sin\scase\sof\skind\sof\serroneous\sXPath\nexpressions.\n
-D 2005-09-18T23:42:29
+C See\sfile.\n
+D 2005-09-18T23:43:05
 F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
-F ChangeLog 0ce4f0781cad4b52399fb79b9c014dab4017628f
+F ChangeLog 695c3d3f71ac55a635006985df9a34b6772461c7
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in ed07060f9a78149372cb23260b1a4c7cba062779
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f0b804376dae42c44fb733e4fd5d0db0f57ed707
+P 8cf25a61b6252899f825abbcb979c2e00528d14e
 U rolf
-Z 9f0e011b91bb1d111b3f4264bdba1887
+Z e523daec2b5f04a96ea1b258220ef680
 # Remove this line to create a well-formed Fossil manifest.
