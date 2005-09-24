@@ -1,7 +1,7 @@
-C Doh!\sThe\scode\sdetected\sill\sgrouping-size\svalues\sand\sset\serrMsg\naccordingly,\sbut\sdidn't\spropagate\sthe\serror.\sFixed.\sDo\smemory\scleanup\nafter\sdetecting\swrong\sxsl:number\slevel\sattribute\svalue.\sFixed\smemory\nleak\sin\scase\sof\sincorrect\sxslt\sattributes\sof\sincluded\sor\simported\nxsl:stylesheet\selements.\sFixed\smemory\sleak\sin\scase\sof\ssyntactically\nwrong\sxsl:key\suse\sattribute\sXPath\sexpression.\sFixed\smemory\sleak\sin\ncase\sof\stoplevel\sparameter\sor\svariables\swhich\sare\ssyntactically\nincorrect,\sbecause\sthey\shave\sboth\sa\sselect\sattribute\sand\scontent.\n
-D 2005-09-24T16:51:48
+C See\sfile.\n
+D 2005-09-24T16:52:05
 F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
-F ChangeLog b7da4a8aff33f84eeb59f6efcd6201c349ba9e36
+F ChangeLog 413426b7ad057565454e2e9e4dda18d615d0b417
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in ed07060f9a78149372cb23260b1a4c7cba062779
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 53b65a7af47ec4f74d7e387d70cf612c44224508
+P ca646d660189f227adfff7af6b3c8b9822524f15
 U rolf
-Z 10106914333e629101a0c00f1ec4695f
+Z 5dedc43b998e8e301c7cf1bdeda54eda
 # Remove this line to create a well-formed Fossil manifest.
