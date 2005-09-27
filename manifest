@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2005-09-24T16:52:05
+C Added\sa\stest\scase,\sreported\sby\sRichard\sSuchenwirth,\swhich\scrashes\n0.8.0,\sbut\sraises\serror\swith\scurrent\scvs\shead,\swithout\sany\smem\nproblems.\n
+D 2005-09-27T16:43:07
 F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
 F ChangeLog 413426b7ad057565454e2e9e4dda18d615d0b417
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -204,7 +204,7 @@ F tests/domNode.test c76068457b8a20723eb9813db3e4277aae5e7db9
 F tests/domnamespace.test 7f6ff7ee11a6cb437240c07be18adc11fd876d46
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
-F tests/htmlreader.test c84e1b15c240514ccde023987600257d3d57d53c
+F tests/htmlreader.test 5265b07566e7b929f3fcc230a9200d82cabf2a22
 F tests/i18n.test ad68655284ea0bf4f2c5a0acc098fd05587ba9a4
 F tests/loadtdom.tcl 409376620daf31ea4f4f723c9920a867b4b18ffa
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ca646d660189f227adfff7af6b3c8b9822524f15
+P 9a6bd2ff4ae1953861d5f9a8cccf0f56d057e8d4
 U rolf
-Z 5dedc43b998e8e301c7cf1bdeda54eda
+Z 223f2a6192d58527d2a5c20e48fa2267
 # Remove this line to create a well-formed Fossil manifest.
