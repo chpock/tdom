@@ -1,7 +1,7 @@
-C Added\sa\stest\sfor\sthe\sspecial\shandling\sof\sthe\scontent\sof\sscript/style\ntags\sin\scase\sof\sasHTML.\n
-D 2005-12-03T13:14:04
+C See\sfile.\n
+D 2005-12-03T13:14:20
 F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
-F ChangeLog bd6bc47bf82c6c71e3f87de066a81d9d9b5a086e
+F ChangeLog 062ecfbbf7afd8f29c5a88fc3cf461e50ccd31b1
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in ed07060f9a78149372cb23260b1a4c7cba062779
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 748bc149ec4047fd5a1593be609631d6415d988d
+P 7064f907ba767cec28da2f8d24f63344f810daef
 U rolf
-Z a120f41e377956f3450785ddd4fa1361
+Z 8dee2d1a70acfcbad3ea8d11f8fa1239
 # Remove this line to create a well-formed Fossil manifest.
