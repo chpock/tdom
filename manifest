@@ -1,7 +1,7 @@
-C Fixed\sbug\sin\snamespace\shandling\sin\sxsl:copy-of.\n
-D 2005-12-10T21:09:11
+C See\sfile.\n
+D 2005-12-10T21:10:44
 F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
-F ChangeLog 062ecfbbf7afd8f29c5a88fc3cf461e50ccd31b1
+F ChangeLog 8968e5d649452be2e37ca250ff16545a6f91d51b
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in ed07060f9a78149372cb23260b1a4c7cba062779
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 5176d9984b9c831341c1e73351b704b3e5076501
+P d3f39e05528610917cc2de483ab4cfec3b03b807
 U rolf
-Z ce6ba6e042155f4affe4835f26c10d9e
+Z b2e263bd90a9f868c742396c4d9b4319
 # Remove this line to create a well-formed Fossil manifest.
