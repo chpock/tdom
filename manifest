@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2005-12-10T21:10:44
+C Fixed\smarkup\serrors.\n
+D 2006-01-06T01:57:55
 F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
 F ChangeLog 8968e5d649452be2e37ca250ff16545a6f91d51b
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -17,9 +17,9 @@ F doc/category-index.html 2e1a41b03d31f42dd00a0c449f7f28db6227bbf2
 F doc/dom.html b7bab0b6e2a570ef036e155a712d2da498c1842a
 F doc/dom.n 8e1b80d9fc9efb0724cb965de18ef09ed3b19d1b
 F doc/dom.xml 9dbbb9372f400918b3955fd411db4f8e0c9ab8a1
-F doc/domDoc.html 8ffefe0d3eac83266ee8bd9f986f0de2f6ac7f27
-F doc/domDoc.n 1ad28c70f73f7b4368c1770987044313d2d267d5
-F doc/domDoc.xml 6acfff78b1fb2c49f521178e8dcde89144db4561
+F doc/domDoc.html f30f37b8c81fe90e4b66c7eab01aef1a8b068ffa
+F doc/domDoc.n 45e02ad7d1b9b8d87ca62f72ae1b28e39bbd8bca
+F doc/domDoc.xml 995f3b1f3764c13af8b2a8df7c6c45ac0210ce89
 F doc/domNode.html f43204fc1796cb4c3f968ae07c241e1a3c1f19cc
 F doc/domNode.n f3fcd2eba4ce6877fb7f4970720b9366c760bcfe
 F doc/domNode.xml 72268d335645b4bfbeffb992a299a26a7995ade1
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P d3f39e05528610917cc2de483ab4cfec3b03b807
+P ef90570e5a589a4786e4b8678abddc38629fd028
 U rolf
-Z b2e263bd90a9f868c742396c4d9b4319
+Z 63497297fdeb7e876207c54a72bb3415
 # Remove this line to create a well-formed Fossil manifest.
