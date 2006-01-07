@@ -1,7 +1,7 @@
-C Fixed\sa\srounding\sbug\sof\sformat-number()\n(http://groups.yahoo.com/group/tdom/message/1217).\n
-D 2006-01-07T23:57:42
+C See\sfile.\n
+D 2006-01-07T23:58:08
 F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
-F ChangeLog 6e995548ed99281a04cdd679b2fbaa62a823c210
+F ChangeLog c0bbce2355ef3aadfe5e29811ae28b388374bff5
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in ed07060f9a78149372cb23260b1a4c7cba062779
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P e1e4c2c5f7b8d32d1fc53c4c0d31f14cf1a20da5
+P a9884cb91957248a3982d1b82ee18f512c76f409
 U rolf
-Z beaf5621d9f966f49e3495c44f8b5baf
+Z 11244efe0b1be5dcea229ab1d2adeb53
 # Remove this line to create a well-formed Fossil manifest.
