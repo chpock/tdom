@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2006-01-07T23:58:08
+C Fixed\sa\srounding\sbug\sof\sformat-number()\n(http://groups.yahoo.com/group/tdom/message/1217).\n
+D 2006-01-08T00:26:25
 F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
 F ChangeLog c0bbce2355ef3aadfe5e29811ae28b388374bff5
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -216,7 +216,7 @@ F tests/tdomcmd.test ebfa377019b495972b13e00b85ff9ba55041a4b9
 F tests/xmlsimple.test 38ca7b8d078e2a344d73c4c6e3748e8604c07b51
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.test 8b9bb55f4b24b0e6b35479de21e9c0274e0de34f
-F tests/xslt.test 14ad8e6e3ef6d52cd788d178a424eecf11fa245e
+F tests/xslt.test ac911f7934116c56be54fae007346d77ee380f33
 F unix/CONFIG f9ef43e1b24e888d5df7af5b425cf66e07e9cc93
 F unix/tclAppInit.c 06b688c30d27d4be8925b05d1607cbee950bbd1c
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a9884cb91957248a3982d1b82ee18f512c76f409
+P 602ea7d933b12d0a6c27d6956ddd645b1a468795
 U rolf
-Z 11244efe0b1be5dcea229ab1d2adeb53
+Z 30ce9953c37c9feefe21f098d854b6dc
 # Remove this line to create a well-formed Fossil manifest.
