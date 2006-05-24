@@ -1,7 +1,7 @@
-C Fix\sof\sthe\sisQName\smethod:\sStrings\swith\svalid\sprefix\sand\nnon-NCNameStart\schar\sas\sfirst\schar\safter\sthe\s':'\swasn't\sdetected\sas\ninvalid\sQName.\n
-D 2006-05-24T11:32:08
+C See\sfile.\n
+D 2006-05-24T11:32:51
 F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
-F ChangeLog 500aeb618d915672f4168c627ee1e78713c91a94
+F ChangeLog 501b6378cfdd9e954976df1b8266f84a6f277b14
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in ed07060f9a78149372cb23260b1a4c7cba062779
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 0550334accbe2b49c04f93b33f76f33c526758cb
+P 4333e15e90ae983f7ab658b12fbd7ec313dfc3ae
 U rolf
-Z 2781bf0d50ee35182b3faf8279d678bc
+Z 19237624146bd2a08eb86f0800b047c4
 # Remove this line to create a well-formed Fossil manifest.
