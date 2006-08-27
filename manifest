@@ -1,17 +1,17 @@
-C See\sfile.\n
-D 2006-05-24T11:32:51
-F CHANGES 929f713a43eac12cbd571edcb6e7887f4f6d536b
+C Updated\sthe\sTEA\sbuild\ssystem\sto\s3.5.\n
+D 2006-08-27T21:12:55
+F CHANGES ab903d5c3cbf13af70de6ca054b689c22e075762
 F ChangeLog 501b6378cfdd9e954976df1b8266f84a6f277b14
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
-F Makefile.in ed07060f9a78149372cb23260b1a4c7cba062779
+F Makefile.in 7fb68a58255d5a0a4b4e19384d23e107619a6303
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
 F README db21b67c7f4f97d6ed22bb7d2af948f5e8f2a644
 F README.AOL 44b39cf7002f8b39a76cc362784c7350fa8e326d
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/xslt.tcl c0b218bdeae3d209bf6766ea8f01e174d33190f3
-F configure f310b8a3e8a9a146c42b718fa8e6a76c2a7726ec x
+F configure f45a5f596fcea6be1749913cb35189261238e494 x
 F configure-tcl8.0.5 a5d0c7988aaf04fb2fbba0746f84895b2b3f58de x
-F configure.in f54f79e95c510869652c62194273229ac7ea8507
+F configure.in 3d908dafc9d8a1c59ed97365bb0d28e22c6837f9
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html 2e1a41b03d31f42dd00a0c449f7f28db6227bbf2
 F doc/dom.html b7bab0b6e2a570ef036e155a712d2da498c1842a
@@ -105,14 +105,14 @@ F extensions/tdomhtml/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F extensions/tdomhtml/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
 F extensions/tdomhtml/pkgIndex.tcl.in 2612d2a8fd5a213a1379ad5570c229d82810dcb5
 F extensions/tdomhtml/tdomhtml.tcl 7d48c19d50f203ee71b3db15d0fc6077dc244798
-F extensions/tnc/Makefile.in 0e6ae60c643a4aedfde26db7e2148a5ff23edfc2
+F extensions/tnc/Makefile.in 833ec683aa3f29c8fb502c236ff132b588b62741
 F extensions/tnc/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
-F extensions/tnc/configure 6b268a0f5453260d1ae20fbdd7fdd3f08d29cda8 x
-F extensions/tnc/configure.in 15aa7459780292151ab48ede505e8665510fdb43
+F extensions/tnc/configure 033445bdab5a2ab920998209593f7d7a8f74bab9 x
+F extensions/tnc/configure.in a5769e5de99d4398c58e03f98fb4d7efc42e1693
 F extensions/tnc/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F extensions/tnc/makefile.vc f1c34510338e7e42c845f7ea5ff2136f5364ac5b
 F extensions/tnc/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
-F extensions/tnc/pkgIndex.tcl.in 07737e9b13a87e6b687f644a0a518561eb30a9bc
+F extensions/tnc/pkgIndex.tcl.in 23d89e64f210ae912cfdda71f85af66f3547a4b4
 F extensions/tnc/test.tcl d9d4c2a1dcd2a7a70096a2a1727f8600ff0c78fd
 F extensions/tnc/tests/all.tcl 845c9dab65c294c3570f69cc731d6fef62efbd03
 F extensions/tnc/tests/loadtnc.tcl 418f1bbca50993a9fe012728b50f0f8080cff2ab
@@ -170,9 +170,9 @@ F mac/tDOM_OSX.prj.xml 7876d8fba0620fa19fac268b8f195fb70d70497c
 F mac/tnc.exp b5221cfee6631ca94e46626dcd5c54e7e9cde7ba
 F mac/tnc.r ce718255e902d882f872087908dcd234fdc9fa51
 F macosx/README 90fbbcf96747374a4c4a7b97766f0c6bafa7780e
-F tclconfig/README.txt 7f7cb8e286f598b05a8beba463f5f31898bdfd1e
+F tclconfig/README.txt 0cc1320e06852a0e5fb2bc611ef7d00a3d05b483
 F tclconfig/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
-F tclconfig/tcl.m4 dd77b8d90b60a10c1d35114967590a4d0d958802
+F tclconfig/tcl.m4 4a5204fb9f94aeff08ba1ef9c30e858a800638c9
 F tdom.m4 bf71b5c7bfa6b62b5cb1ea9f8cea4a05fb609cf5
 F tdomConfig.sh.in 5756c6b431179e49852a607cc2ca01e5381da905
 F tests/all.tcl a8d5d3e3adc6713f64d0c614b927bd21ca8df870
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 4333e15e90ae983f7ab658b12fbd7ec313dfc3ae
+P 1cbe237abe0575e5280fc0b9eed628bf8762cc38
 U rolf
-Z 19237624146bd2a08eb86f0800b047c4
+Z 9e34904f8e554f68426db500b151434a
 # Remove this line to create a well-formed Fossil manifest.
