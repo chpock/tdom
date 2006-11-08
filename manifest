@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2006-08-27T21:47:46
+C Fixed\sseg\sfault\sin\sXPath\sexpr\sparser\sfor\sa\scertain\skind\sof\serroneous\nXPath\sexpressions.\n
+D 2006-11-08T00:19:35
 F CHANGES ab903d5c3cbf13af70de6ca054b689c22e075762
 F ChangeLog 0cc40a08b6e92094ed3e1a8192005e8de91bf9cd
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -126,7 +126,7 @@ F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
 F generic/domhtml.c b561b6331c32a77e103b4fc3f3b7bc0e5bc18369
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c b9543b7f1066118a5bcd0d2fa30acda6d247f15a
-F generic/domxpath.c f7bcf5493dd102e023f3f67a7b6c79a3ba8bcb3e
+F generic/domxpath.c 02cbae620bd3ea2a7e4042248ef9ef0a1df7c250
 F generic/domxpath.h 7d22ea92d7726e9b0e125f77d525f991e9bc25a9
 F generic/domxslt.c 4cf46f971110a52628f28e924c4c68de9af8f80a
 F generic/domxslt.h 261176a8cb491de448189fcb9fa93bfcabda5e40
@@ -215,7 +215,7 @@ F tests/stackedhdl.test 4b3dafa96849dabf738ffb401585dac5a5aed550
 F tests/tdomcmd.test ebfa377019b495972b13e00b85ff9ba55041a4b9
 F tests/xmlsimple.test 38ca7b8d078e2a344d73c4c6e3748e8604c07b51
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
-F tests/xpath.test 8b9bb55f4b24b0e6b35479de21e9c0274e0de34f
+F tests/xpath.test 5fd5f171f5fe543b3eb02069b77dac2d3e656df3
 F tests/xslt.test ac911f7934116c56be54fae007346d77ee380f33
 F unix/CONFIG f9ef43e1b24e888d5df7af5b425cf66e07e9cc93
 F unix/tclAppInit.c 06b688c30d27d4be8925b05d1607cbee950bbd1c
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 034a85acb87767b598e4f360d90989fc573ba123
+P d6b799ebb38479d668818842f60e658de3bdb0f8
 U rolf
-Z b5d30961cdb4cda5468819ef36540b4b
+Z 5d04f995feeb118338d66e0c3d9ddd26
 # Remove this line to create a well-formed Fossil manifest.
