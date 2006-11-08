@@ -1,7 +1,7 @@
-C Fixed\sseg\sfault\sin\sXPath\sexpr\sparser\sfor\sa\scertain\skind\sof\serroneous\nXPath\sexpressions.\n
-D 2006-11-08T00:19:35
+C See\sfile.\n
+D 2006-11-08T00:20:06
 F CHANGES ab903d5c3cbf13af70de6ca054b689c22e075762
-F ChangeLog 0cc40a08b6e92094ed3e1a8192005e8de91bf9cd
+F ChangeLog 68f754e0c4bbb475bdacf8e62839c4df5cad66ef
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 7fb68a58255d5a0a4b4e19384d23e107619a6303
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P d6b799ebb38479d668818842f60e658de3bdb0f8
+P 7a36c0d78724e3ecda8e00bec7ca15272bb69527
 U rolf
-Z 5d04f995feeb118338d66e0c3d9ddd26
+Z deb39362fc666f3a98d88ece05ef467b
 # Remove this line to create a well-formed Fossil manifest.
