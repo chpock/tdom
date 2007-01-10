@@ -1,5 +1,5 @@
-C Don't\scall\starget\sinstall-doc\swhile\sinstalling\s-\sthe\stnc\sdoc\sis\sin\sthe\ntop\slevel\sdoc\sdir.\n
-D 2007-01-10T18:14:44
+C Fixed\sthe\sname\sof\sthe\sshared\slib.\n
+D 2007-01-10T18:15:10
 F CHANGES ab903d5c3cbf13af70de6ca054b689c22e075762
 F ChangeLog eaa005d3ffab127022ec0125172ff6e02d5c2e5c
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -112,7 +112,7 @@ F extensions/tnc/configure.in a5769e5de99d4398c58e03f98fb4d7efc42e1693
 F extensions/tnc/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F extensions/tnc/makefile.vc f1c34510338e7e42c845f7ea5ff2136f5364ac5b
 F extensions/tnc/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
-F extensions/tnc/pkgIndex.tcl.in 23d89e64f210ae912cfdda71f85af66f3547a4b4
+F extensions/tnc/pkgIndex.tcl.in a7fe1310d98af2b87cbbb2d876b5ea569f3bcd9b
 F extensions/tnc/test.tcl d9d4c2a1dcd2a7a70096a2a1727f8600ff0c78fd
 F extensions/tnc/tests/all.tcl 845c9dab65c294c3570f69cc731d6fef62efbd03
 F extensions/tnc/tests/loadtnc.tcl 418f1bbca50993a9fe012728b50f0f8080cff2ab
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 4d9e87bcdbc32dae75aefd29f3401e7f9bc04f68
+P 12288e9463898ba9bf456c9d4da048c1181cc817
 U rolf
-Z dcaffd5f9d9b487a76c46be10403cb4e
+Z f84ad4597ae29528805ead0f0a5f2d4b
 # Remove this line to create a well-formed Fossil manifest.
