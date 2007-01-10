@@ -1,7 +1,7 @@
-C Fixed\sthe\sname\sof\sthe\sshared\slib.\n
-D 2007-01-10T18:15:10
+C See\sfile.\n
+D 2007-01-10T18:15:22
 F CHANGES ab903d5c3cbf13af70de6ca054b689c22e075762
-F ChangeLog eaa005d3ffab127022ec0125172ff6e02d5c2e5c
+F ChangeLog 36f9749ae462abf584d64b31521468b814e48f9e
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 7404a6b5af8056d62175453eed1187db02bb5d1c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 12288e9463898ba9bf456c9d4da048c1181cc817
+P fc23a77adf0dfaa23309d469ba830752d6df1b63
 U rolf
-Z f84ad4597ae29528805ead0f0a5f2d4b
+Z 7264b94823e2e3e9b59fb9fac5ba2ed1
 # Remove this line to create a well-formed Fossil manifest.
