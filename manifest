@@ -1,7 +1,7 @@
-C The\sbuild\stool\scombination\sTEA/cygwin/VC++\sneeds\sa\scrude\shack.\n
-D 2007-01-16T00:16:34
+C See\sfile.\n
+D 2007-01-16T00:16:58
 F CHANGES ab903d5c3cbf13af70de6ca054b689c22e075762
-F ChangeLog da5fb775589ad0255ca23bcc13b30d882c320aaa
+F ChangeLog e8aa44a30d8576555b69fc9a72a722d1ba86b753
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 7404a6b5af8056d62175453eed1187db02bb5d1c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 122a61e08b54ae6d05614942d5642bea88821ae7
+P 4ece8812d43d88b0f0a43bce66d90c7a537c55b0
 U rolf
-Z 2d05fc0ddd8612dd4ff75f372015cf68
+Z df5c698dc095e69a134b39540f39ba75
 # Remove this line to create a well-formed Fossil manifest.
