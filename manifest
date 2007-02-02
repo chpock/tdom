@@ -1,7 +1,7 @@
-C Corrected\sspelling\serror\sin\stdom.m4,\sre-generatedconfigure.\sThanks\sto\sLarry\sVirden\sfor\sreporting.\n
-D 2007-02-02T15:21:42
+C See\sfile.\n
+D 2007-02-02T15:22:25
 F CHANGES ab903d5c3cbf13af70de6ca054b689c22e075762
-F ChangeLog e8aa44a30d8576555b69fc9a72a722d1ba86b753
+F ChangeLog b8b3b7aacb610cd3174a9b6702481fedbf19912e
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 7404a6b5af8056d62175453eed1187db02bb5d1c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 5bcce284e1be06b84d7011f2d9eb3191f3ae5b9f
+P 128d38605b5628485c6306b3bad0142f887d584a
 U rolf
-Z ce6c76536f6c470027a842b66c993b01
+Z 08be1514034dd37341a51016ddad8e9c
 # Remove this line to create a well-formed Fossil manifest.
