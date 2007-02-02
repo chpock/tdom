@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2007-01-16T00:16:58
+C Corrected\sspelling\serror\sin\stdom.m4,\sre-generatedconfigure.\sThanks\sto\sLarry\sVirden\sfor\sreporting.\n
+D 2007-02-02T15:21:42
 F CHANGES ab903d5c3cbf13af70de6ca054b689c22e075762
 F ChangeLog e8aa44a30d8576555b69fc9a72a722d1ba86b753
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -9,7 +9,7 @@ F README db21b67c7f4f97d6ed22bb7d2af948f5e8f2a644
 F README.AOL 44b39cf7002f8b39a76cc362784c7350fa8e326d
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/xslt.tcl c0b218bdeae3d209bf6766ea8f01e174d33190f3
-F configure f45a5f596fcea6be1749913cb35189261238e494 x
+F configure cce174b946275210c445dbc670bc18f7930c6757 x
 F configure-tcl8.0.5 a5d0c7988aaf04fb2fbba0746f84895b2b3f58de x
 F configure.in 3d908dafc9d8a1c59ed97365bb0d28e22c6837f9
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
@@ -173,7 +173,7 @@ F macosx/README 90fbbcf96747374a4c4a7b97766f0c6bafa7780e
 F tclconfig/README.txt 0cc1320e06852a0e5fb2bc611ef7d00a3d05b483
 F tclconfig/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F tclconfig/tcl.m4 4a5204fb9f94aeff08ba1ef9c30e858a800638c9
-F tdom.m4 bf71b5c7bfa6b62b5cb1ea9f8cea4a05fb609cf5
+F tdom.m4 21038e39af6135240e005cbc32e9ba29f2fada48
 F tdomConfig.sh.in 5756c6b431179e49852a607cc2ca01e5381da905
 F tests/all.tcl a8d5d3e3adc6713f64d0c614b927bd21ca8df870
 F tests/attribute.test 53ac8fb043e79b638c8c6f5e7da848f6103552d6
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 4ece8812d43d88b0f0a43bce66d90c7a537c55b0
+P 5bcce284e1be06b84d7011f2d9eb3191f3ae5b9f
 U rolf
-Z df5c698dc095e69a134b39540f39ba75
+Z ce6c76536f6c470027a842b66c993b01
 # Remove this line to create a well-formed Fossil manifest.
