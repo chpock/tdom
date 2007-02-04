@@ -1,5 +1,5 @@
-C Modified\sthe\stdom.m4\sconfigure\smacros\sto\suse\sthe\scurrent\sdocumentation\nstyle\sof\sTEA\sin\scase\sof\sconfigure\s--help.\sFixed\sa\sbug\sin\sthe\nTDOM_ENABLE_DTD.\sRe-generated\sconfigure\sand\stnc\sconfigure.\sAdded\ssome\nexplanations\sabout\sthe\stDOM\sspecific\sconfigure\soptions\sto\sunix/CONFIG\nand\san\spointer\sto\sthat\sto\sREADME.\n
-D 2007-02-04T19:36:45
+C Minor\seditorial\schanges.\n
+D 2007-02-04T19:40:08
 F CHANGES ab903d5c3cbf13af70de6ca054b689c22e075762
 F ChangeLog b8b3b7aacb610cd3174a9b6702481fedbf19912e
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -117,7 +117,7 @@ F extensions/tnc/test.tcl d9d4c2a1dcd2a7a70096a2a1727f8600ff0c78fd
 F extensions/tnc/tests/all.tcl 845c9dab65c294c3570f69cc731d6fef62efbd03
 F extensions/tnc/tests/loadtnc.tcl 418f1bbca50993a9fe012728b50f0f8080cff2ab
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
-F extensions/tnc/tnc.c 89ab2f2742181e818741dc224ed1918ee4c0cc1b
+F extensions/tnc/tnc.c a1874ce449a978ba7e89b97adad5962d08309c2a
 F generic/aolstub.cpp 4162cbebdaa563e6dbfe2dbfab08058da2816f59
 F generic/dom.c c83a57b21f7751b3807d65a30c679c6f40050ed6
 F generic/dom.h 24c62481627afe868cab6444ca45adc4fbd829c6
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 33f0ef70e37ea628694882d4fa8f0fef7cb56fbf
+P 275873924732568feab1e30178edacbd3dc291fa
 U rolf
-Z a2ec254c1c4195b1701926459cb46a28
+Z c287099566bd07cb6d97acab33fd1aea
 # Remove this line to create a well-formed Fossil manifest.
