@@ -1,7 +1,7 @@
-C Modified\sthe\stdom.m4\sconfigure\smacros\sto\suse\sthe\scurrent\sdocumentation\nstyle\sof\sTEA\sin\scase\sof\sconfigure\s--help.\sFixed\sa\sbug\sin\sthe\nTDOM_ENABLE_DTD.\sRe-generated\sconfigure\sand\stnc\sconfigure.\sAdded\ssome\nexplanations\sabout\sthe\stDOM\sspecific\sconfigure\soptions\sto\sunix/CONFIG\nand\sa\spointer\sto\sthat\sto\sREADME.\n
-D 2007-02-04T19:44:34
+C See\sfile.\n
+D 2007-02-04T19:45:53
 F CHANGES ab903d5c3cbf13af70de6ca054b689c22e075762
-F ChangeLog b8b3b7aacb610cd3174a9b6702481fedbf19912e
+F ChangeLog da722c122927ad96bd8262299d4cbf11890c61d2
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 7404a6b5af8056d62175453eed1187db02bb5d1c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 8a6220e6657a1982a5a9365b03aa081fcd93b5ed
+P 57121ebec7ec86b40a7986e31c1c9bd3c7c19812
 U rolf
-Z b8417fdef5d13d10cd302633c5d6b319
+Z ba42bc772e2bb6f9e1ec0b128d54cfa8
 # Remove this line to create a well-formed Fossil manifest.
