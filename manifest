@@ -1,11 +1,11 @@
-C See\sfile.\n
-D 2007-02-02T15:22:25
+C Modified\sthe\stdom.m4\sconfigure\smacros\sto\suse\sthe\scurrent\sdocumentation\nstyle\sof\sTEA\sin\scase\sof\sconfigure\s--help.\sFixed\sa\sbug\sin\sthe\nTDOM_ENABLE_DTD.\sRe-generated\sconfigure\sand\stnc\sconfigure.\sAdded\ssome\nexplanations\sabout\sthe\stDOM\sspecific\sconfigure\soptions\sto\sunix/CONFIG\nand\san\spointer\sto\sthat\sto\sREADME.\n
+D 2007-02-04T19:36:45
 F CHANGES ab903d5c3cbf13af70de6ca054b689c22e075762
 F ChangeLog b8b3b7aacb610cd3174a9b6702481fedbf19912e
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 7404a6b5af8056d62175453eed1187db02bb5d1c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
-F README db21b67c7f4f97d6ed22bb7d2af948f5e8f2a644
+F README 3335cb48811be23b597bf33c9dafae79b810ffa9
 F README.AOL 44b39cf7002f8b39a76cc362784c7350fa8e326d
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/xslt.tcl c0b218bdeae3d209bf6766ea8f01e174d33190f3
@@ -107,7 +107,7 @@ F extensions/tdomhtml/pkgIndex.tcl.in 2612d2a8fd5a213a1379ad5570c229d82810dcb5
 F extensions/tdomhtml/tdomhtml.tcl 7d48c19d50f203ee71b3db15d0fc6077dc244798
 F extensions/tnc/Makefile.in 6ef49788e056cece697d4c0c012245b97fc62a28
 F extensions/tnc/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
-F extensions/tnc/configure 033445bdab5a2ab920998209593f7d7a8f74bab9 x
+F extensions/tnc/configure 076aeba6412cce7625c837538266a839c9d7ea7d x
 F extensions/tnc/configure.in bc00f3abf948e33ac2b6034d9db0d0858af27ade
 F extensions/tnc/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F extensions/tnc/makefile.vc f1c34510338e7e42c845f7ea5ff2136f5364ac5b
@@ -173,7 +173,7 @@ F macosx/README 90fbbcf96747374a4c4a7b97766f0c6bafa7780e
 F tclconfig/README.txt 0cc1320e06852a0e5fb2bc611ef7d00a3d05b483
 F tclconfig/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F tclconfig/tcl.m4 4a5204fb9f94aeff08ba1ef9c30e858a800638c9
-F tdom.m4 21038e39af6135240e005cbc32e9ba29f2fada48
+F tdom.m4 b49b8d5a49fd757397d964e73d111777c52ad714
 F tdomConfig.sh.in 5756c6b431179e49852a607cc2ca01e5381da905
 F tests/all.tcl a8d5d3e3adc6713f64d0c614b927bd21ca8df870
 F tests/attribute.test 53ac8fb043e79b638c8c6f5e7da848f6103552d6
@@ -217,7 +217,7 @@ F tests/xmlsimple.test 38ca7b8d078e2a344d73c4c6e3748e8604c07b51
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.test 5fd5f171f5fe543b3eb02069b77dac2d3e656df3
 F tests/xslt.test ac911f7934116c56be54fae007346d77ee380f33
-F unix/CONFIG f9ef43e1b24e888d5df7af5b425cf66e07e9cc93
+F unix/CONFIG f8524aa918f16b8aba265595da4dcb04c95d37cb
 F unix/tclAppInit.c 06b688c30d27d4be8925b05d1607cbee950bbd1c
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F win/makefile.vc 34be276e9b137bcdbe4ddca4093db8353cdf0381
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 128d38605b5628485c6306b3bad0142f887d584a
+P 33f0ef70e37ea628694882d4fa8f0fef7cb56fbf
 U rolf
-Z 08be1514034dd37341a51016ddad8e9c
+Z a2ec254c1c4195b1701926459cb46a28
 # Remove this line to create a well-formed Fossil manifest.
