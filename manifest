@@ -1,7 +1,7 @@
-C Fixed\sbug\sin\sxsl:fallback\shandling.\n
-D 2007-02-04T19:54:30
+C See\sfile.\n
+D 2007-02-04T19:55:00
 F CHANGES ab903d5c3cbf13af70de6ca054b689c22e075762
-F ChangeLog da722c122927ad96bd8262299d4cbf11890c61d2
+F ChangeLog 83c5fee023903f922ad09e499f73c9b970ae1c3d
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 7404a6b5af8056d62175453eed1187db02bb5d1c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 45bcc639c6e08abf217a8639ef30430e86c6a7c2
+P 7c656e1620e3c070e1846249d71c1fa0498986d9
 U rolf
-Z 726d592607e32b2904f07b1612260295
+Z 18fa83b78d9933bf4f4eac15a34d1908
 # Remove this line to create a well-formed Fossil manifest.
