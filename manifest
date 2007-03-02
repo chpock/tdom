@@ -1,7 +1,7 @@
-C Fixed\s(at\sleast\sfor\smost\sof\sthe\scases)\sbug\sin\stest\starget,\sin\scase\sthe\nuser\sbuilds\sin\sa\sdir\selsewhere.\n
-D 2007-03-02T23:43:53
+C See\sfile.\n
+D 2007-03-02T23:44:36
 F CHANGES ab903d5c3cbf13af70de6ca054b689c22e075762
-F ChangeLog 71f072d5356e9ce737a426b03437c220ed4cd041
+F ChangeLog 15a337623399ac71bf609845d8e55d4c89e6a25e
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 6f230818705e277b1e56f6e9e5566952a7aa544c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c38607bb3d94e893931d52511f80cb0ddd9da0ef
+P 44599740384a8fd1f2aa677810a278570ca62e93
 U rolf
-Z ef328af0ad12a9aded45a46cdd9d068f
+Z dd54df7b62a56a60f67baf16dd84938c
 # Remove this line to create a well-formed Fossil manifest.
