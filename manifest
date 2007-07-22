@@ -1,7 +1,7 @@
-C Fix\sfor\sproblem\sreported\sby\shttp://tech.groups.yahoo.com/group/tdom/message/1666\n
-D 2007-07-22T23:45:45
+C See\sfile.\n
+D 2007-07-22T23:50:26
 F CHANGES ab903d5c3cbf13af70de6ca054b689c22e075762
-F ChangeLog 7524f92e83fcddf07f194273b393ac8c60e394af
+F ChangeLog 89c71d65f4dc4a2086e41a71814eaaf36f4a2141
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 6f230818705e277b1e56f6e9e5566952a7aa544c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P b536ac904b0283b92de97fbc07ad4c936d7d151b
+P bf1ece8716375a027cbb3863377569fe088405b0
 U rolf
-Z ea8d7d4f4d3e88e859507c48f12d3f97
+Z 3a574b9af56323c732ea855ebd573d96
 # Remove this line to create a well-formed Fossil manifest.
