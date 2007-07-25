@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2007-07-22T23:50:26
+C Added\sa\sfew\stests\srelated\sto\swhite-space\sin\sXPath\sexpressions.\n
+D 2007-07-25T12:12:22
 F CHANGES ab903d5c3cbf13af70de6ca054b689c22e075762
 F ChangeLog 89c71d65f4dc4a2086e41a71814eaaf36f4a2141
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -215,7 +215,7 @@ F tests/stackedhdl.test 4b3dafa96849dabf738ffb401585dac5a5aed550
 F tests/tdomcmd.test ebfa377019b495972b13e00b85ff9ba55041a4b9
 F tests/xmlsimple.test 38ca7b8d078e2a344d73c4c6e3748e8604c07b51
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
-F tests/xpath.test 5fd5f171f5fe543b3eb02069b77dac2d3e656df3
+F tests/xpath.test 0e46e1efa242e9985e4c810a23c865a27bfee74c
 F tests/xslt.test ac911f7934116c56be54fae007346d77ee380f33
 F unix/CONFIG f8524aa918f16b8aba265595da4dcb04c95d37cb
 F unix/tclAppInit.c 06b688c30d27d4be8925b05d1607cbee950bbd1c
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P bf1ece8716375a027cbb3863377569fe088405b0
+P fbfe73de5f8dd9c868bcdcb0849e804d45fee6f1
 U rolf
-Z 3a574b9af56323c732ea855ebd573d96
+Z b0fdfc9ed748b1bb45e75b42e469c466
 # Remove this line to create a well-formed Fossil manifest.
