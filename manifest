@@ -1,7 +1,7 @@
-C Fix\sfor\sthe\s-externalentitycommand\sproblems\son\s(some)\s64-bit\nplattforms.\n
-D 2007-07-25T15:27:15
+C See\sfile.\n
+D 2007-07-25T15:27:28
 F CHANGES ab903d5c3cbf13af70de6ca054b689c22e075762
-F ChangeLog f784aabe214f9473aa8822c4d99e779910ca8737
+F ChangeLog 79a0d67d985ea3aad1f0b42a48c84f0d0b85124f
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 6f230818705e277b1e56f6e9e5566952a7aa544c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ecdd09eca58e0b0dd7e713825747455aa02fb251
+P 65346f35d71022e72a4ac32da8f63e81f85f819b
 U rolf
-Z f3bd4a1dd847a6ecfb3cf529f9ccb401
+Z 9373cfe31d30f818061128c051050487
 # Remove this line to create a well-formed Fossil manifest.
