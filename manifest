@@ -1,7 +1,7 @@
-C Updated\sto\sTEA\s3.6.\sRebuild\sconfigure.\n
-D 2007-07-26T23:51:57
+C See\sfile.\n
+D 2007-07-26T23:52:38
 F CHANGES ab903d5c3cbf13af70de6ca054b689c22e075762
-F ChangeLog bcd2fac2b9f900313a60281de5a83c4f2d0c129b
+F ChangeLog 6583feb8bbcb79f5349cb89dea434d8d8a31fcad
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 6f230818705e277b1e56f6e9e5566952a7aa544c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 7799570581c432711264ad9c539fc0fdb12f7080
+P 14aa2aca24fb504b645403f506391ee47f0690cc
 U rolf
-Z 712dba067317522907a16b3c4b9492c7
+Z 5660596c79ed0dc1a782214bc806d694
 # Remove this line to create a well-formed Fossil manifest.
