@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2007-07-26T23:46:11
+C Updated\sto\sTEA\s3.6.\sRebuild\sconfigure.\n
+D 2007-07-26T23:51:57
 F CHANGES ab903d5c3cbf13af70de6ca054b689c22e075762
 F ChangeLog bcd2fac2b9f900313a60281de5a83c4f2d0c129b
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -107,8 +107,8 @@ F extensions/tdomhtml/pkgIndex.tcl.in 2612d2a8fd5a213a1379ad5570c229d82810dcb5
 F extensions/tdomhtml/tdomhtml.tcl 7d48c19d50f203ee71b3db15d0fc6077dc244798
 F extensions/tnc/Makefile.in 6ef49788e056cece697d4c0c012245b97fc62a28
 F extensions/tnc/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
-F extensions/tnc/configure 076aeba6412cce7625c837538266a839c9d7ea7d x
-F extensions/tnc/configure.in bc00f3abf948e33ac2b6034d9db0d0858af27ade
+F extensions/tnc/configure 3577dc3d481e4e0d2d48253973c205e77f2bfbaa x
+F extensions/tnc/configure.in 1bd703b6ea3fe483b08be378bee5ef88ff52a390
 F extensions/tnc/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F extensions/tnc/makefile.vc f1c34510338e7e42c845f7ea5ff2136f5364ac5b
 F extensions/tnc/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
@@ -231,7 +231,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 23a07048b39a2bd08ffeae5454624c542a5d4b32
+P 7799570581c432711264ad9c539fc0fdb12f7080
 U rolf
-Z 9666f5787f629e3caadbde72f1bec36e
+Z 712dba067317522907a16b3c4b9492c7
 # Remove this line to create a well-formed Fossil manifest.
