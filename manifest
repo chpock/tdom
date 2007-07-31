@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2007-07-31T00:25:04
+C Bug\sfix:\sfloats\sin\sxpath\sexpressions\sstarting\swith\s.\scould\shave\san\nadditional\s(erroneous)\sdot\sin\sit\swithout\sdetection.\n
+D 2007-07-31T00:57:46
 F CHANGES ab903d5c3cbf13af70de6ca054b689c22e075762
 F ChangeLog 81c6d2ea6fc12c27c59ca7b385ada8cf5716a8f3
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -127,7 +127,7 @@ F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
 F generic/domhtml.c a1f9dc98dcb5b3d710a01e3922742f87028eac85
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c b9543b7f1066118a5bcd0d2fa30acda6d247f15a
-F generic/domxpath.c b4842c777ac7e1ae365366e6e81c35f6740288e9
+F generic/domxpath.c 7b723cc157088527df74a0d337769443e8cc4409
 F generic/domxpath.h 7d22ea92d7726e9b0e125f77d525f991e9bc25a9
 F generic/domxslt.c 2491d850468db35fb6fba474a33c0a8f570e8f11
 F generic/domxslt.h 261176a8cb491de448189fcb9fa93bfcabda5e40
@@ -216,7 +216,7 @@ F tests/stackedhdl.test 4b3dafa96849dabf738ffb401585dac5a5aed550
 F tests/tdomcmd.test ebfa377019b495972b13e00b85ff9ba55041a4b9
 F tests/xmlsimple.test 38ca7b8d078e2a344d73c4c6e3748e8604c07b51
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
-F tests/xpath.test 0e46e1efa242e9985e4c810a23c865a27bfee74c
+F tests/xpath.test 033353f2ffc95df0feb69ab9834fb2d048315fb5
 F tests/xslt.test ac911f7934116c56be54fae007346d77ee380f33
 F unix/CONFIG f8524aa918f16b8aba265595da4dcb04c95d37cb
 F unix/tclAppInit.c 06b688c30d27d4be8925b05d1607cbee950bbd1c
@@ -232,7 +232,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 8ef882fd3e71461a698e91ec7cc87e12a899464e
+P 07090a77a3d1c5890d802b459bc83148933ffadf
 U rolf
-Z 50f9dbc62394517e92ce794bf71803d2
+Z da2f06b125bf27c57553d195eca0a0cf
 # Remove this line to create a well-formed Fossil manifest.
