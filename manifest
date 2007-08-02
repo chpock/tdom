@@ -1,7 +1,7 @@
-C Added\sdoc\smethod\srenameNode,\swithout\sXML\snamespace\sawareness.\sThere\nwill\sbe\sa\sfinal\s(XML\snamespace\saware)\smethod\simplementation\safter\n0.8.2,\stherefore,\sthis\swill\sslip\sin\sas\shidden\sor\s'unsupported'\sand\sat\nleast\sundocumented\smethod.\n
-D 2007-08-02T23:43:41
+C See\sfile.\n
+D 2007-08-02T23:44:01
 F CHANGES ab903d5c3cbf13af70de6ca054b689c22e075762
-F ChangeLog 6f477bd135197cc13a765e6c9dd182631f3a54bb
+F ChangeLog 75a76144a6b6eb1ecec00b3ac1db4d36bcce3aba
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 6f230818705e277b1e56f6e9e5566952a7aa544c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -232,7 +232,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a475d9f6c26cc8acc84e33eb3fe1bc2cb091287f
+P 5f42d91a2e5d669d595496a4c3a469a1d9f214ce
 U rolf
-Z e22b3f5e6585ee33b36974b2f9f09934
+Z 061e6acd6935cd4fde3dbab14e7ecdfa
 # Remove this line to create a well-formed Fossil manifest.
