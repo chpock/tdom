@@ -1,7 +1,7 @@
-C Added\sdocumentation\sto\sthe\snew\svariable\sreferences\sfeature\sof\sthe\sselectNodes\smethod,\sfor\sthe\sdeleteXPathCache\smethod\sand\sthe\s-escapeAllQuot\soption\sof\sthe\sasXML\smethod.\n
-D 2007-08-05T17:04:29
+C See\sfile.\n
+D 2007-08-05T17:04:54
 F CHANGES ab903d5c3cbf13af70de6ca054b689c22e075762
-F ChangeLog d87721975878e8d78df7895a2b7be86e78250649
+F ChangeLog 4ca2cc2a532e8cf05de3338107685796d363de83
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 6f230818705e277b1e56f6e9e5566952a7aa544c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -232,7 +232,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 35cc194bdad9e8fb35aa8bfdf3682b8a87617c35
+P 06328981a1e5d8051be152031431f358c8f0fe0b
 U rolf
-Z 7976d813404a5f0517fa5cef5121b6a6
+Z 20bde4f48ab44ebc1465e8a04efdb168
 # Remove this line to create a well-formed Fossil manifest.
