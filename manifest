@@ -1,7 +1,7 @@
-C Variable\sreferences\s(at\sthe\splaces\sallowed\sby\sthe\sXPath\ssyntax)\swill\snow\sbe\sresoved\sas\sTcl\svariables,\srelative\sto\sthe\sscope\sof\sthe\sexpression.\sIgnoring\sthe\sXPath\ssyntax\srules\sat\sthis\spoint,\sany\svalid\sTcl\svariable\sname\swill\s\s\swork.\n
-D 2007-08-05T01:15:59
+C See\sfile.\n
+D 2007-08-05T01:17:03
 F CHANGES ab903d5c3cbf13af70de6ca054b689c22e075762
-F ChangeLog 75a76144a6b6eb1ecec00b3ac1db4d36bcce3aba
+F ChangeLog c3480651fa4c86a6170257d4975d33aee9638030
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 6f230818705e277b1e56f6e9e5566952a7aa544c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -232,7 +232,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P b13684706a22ae0d343bf6f3452bb39145b92719
+P 3843d517af0a9a8b784a82cc08236804aaf47616
 U rolf
-Z 40418f3507b146801419df3bc43600b5
+Z 320b72ed9f2d42db12a0fe28dd7e7c47
 # Remove this line to create a well-formed Fossil manifest.
