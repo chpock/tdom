@@ -1,7 +1,7 @@
-C Added\smethod\sdeleteXPathCache:\sbasic\scontrol\sover\sthe\sxpath\sexpression\ncache.\n
-D 2007-08-05T02:11:41
+C See\sfile.\n
+D 2007-08-05T02:12:24
 F CHANGES ab903d5c3cbf13af70de6ca054b689c22e075762
-F ChangeLog c3480651fa4c86a6170257d4975d33aee9638030
+F ChangeLog 900ceef5bdfb037885a64baf2d3a85d9f1c5f0b9
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 6f230818705e277b1e56f6e9e5566952a7aa544c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -232,7 +232,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 12a65f673590498947d22892e188988684c99266
+P 4ff79014b6ef34877dcfde2b30fc811863c4f6f4
 U rolf
-Z fc9ff0749667cc7def30b505a9a8b476
+Z d22f632dd7fb6901ff66239ec7f63b31
 # Remove this line to create a well-formed Fossil manifest.
