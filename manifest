@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2007-08-02T23:44:01
+C Variable\sreferences\s(at\sthe\splaces\sallowed\sby\sthe\sXPath\ssyntax)\swill\snow\sbe\sresoved\sas\sTcl\svariables,\srelative\sto\sthe\sscope\sof\sthe\sexpression.\sIgnoring\sthe\sXPath\ssyntax\srules\sat\sthis\spoint,\sany\svalid\sTcl\svariable\sname\swill\s\s\swork.\n
+D 2007-08-05T01:15:59
 F CHANGES ab903d5c3cbf13af70de6ca054b689c22e075762
 F ChangeLog 75a76144a6b6eb1ecec00b3ac1db4d36bcce3aba
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -127,15 +127,15 @@ F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
 F generic/domhtml.c a1f9dc98dcb5b3d710a01e3922742f87028eac85
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c b9543b7f1066118a5bcd0d2fa30acda6d247f15a
-F generic/domxpath.c 7b723cc157088527df74a0d337769443e8cc4409
-F generic/domxpath.h 7d22ea92d7726e9b0e125f77d525f991e9bc25a9
-F generic/domxslt.c 2491d850468db35fb6fba474a33c0a8f570e8f11
+F generic/domxpath.c 08a6fa7bbb52942b10cb03ff5ace92739d1773dc
+F generic/domxpath.h 2f106e98c7b324b9701a5fb486774b008935f39d
+F generic/domxslt.c e4282cce84c718adbbfbbbe1d584e23e19acd600
 F generic/domxslt.h 261176a8cb491de448189fcb9fa93bfcabda5e40
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c f048687d9a40a09eff1a6871707e87a2bf277f15
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
-F generic/tcldom.c 6fc5aff96ae874c61ac314f24e7db48f7674b4df
+F generic/tcldom.c d178298d8b3e52948746b735d07f5b47e598d4fa
 F generic/tcldom.h b1b1f6662c83849fb067d294d9d53bba6c07c22c
 F generic/tclexpat.c 5c7c8dfc1e1594fa4977fdf70ed20d8fb777f0eb
 F generic/tclexpat.h 7ea0c8992809e1325c901821bc63831431e2c9f2
@@ -216,7 +216,7 @@ F tests/stackedhdl.test 4b3dafa96849dabf738ffb401585dac5a5aed550
 F tests/tdomcmd.test ebfa377019b495972b13e00b85ff9ba55041a4b9
 F tests/xmlsimple.test 38ca7b8d078e2a344d73c4c6e3748e8604c07b51
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
-F tests/xpath.test 033353f2ffc95df0feb69ab9834fb2d048315fb5
+F tests/xpath.test 792f26ba22a8b147ad388dea4bff8f9a6da664a4
 F tests/xslt.test ac911f7934116c56be54fae007346d77ee380f33
 F unix/CONFIG f8524aa918f16b8aba265595da4dcb04c95d37cb
 F unix/tclAppInit.c 06b688c30d27d4be8925b05d1607cbee950bbd1c
@@ -232,7 +232,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 5f42d91a2e5d669d595496a4c3a469a1d9f214ce
+P b13684706a22ae0d343bf6f3452bb39145b92719
 U rolf
-Z 061e6acd6935cd4fde3dbab14e7ecdfa
+Z 40418f3507b146801419df3bc43600b5
 # Remove this line to create a well-formed Fossil manifest.
