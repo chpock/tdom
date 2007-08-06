@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2007-08-05T19:34:18
+C Corrected\san\serror\smsg.\n
+D 2007-08-06T23:55:08
 F CHANGES 4bf85848cba5fbdf67b57a7cdfecfdd07a693e5c
 F ChangeLog 096cfa1d931ce01f6935471dc4c1894fcf9135f3
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -120,7 +120,7 @@ F extensions/tnc/tests/loadtnc.tcl 418f1bbca50993a9fe012728b50f0f8080cff2ab
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c 7694bbf12f1126ac9b2a228b29cb8f9484f71e67
 F generic/aolstub.cpp 4162cbebdaa563e6dbfe2dbfab08058da2816f59
-F generic/dom.c dabf8a54055d444e798c0901e24da246f5dd72cc
+F generic/dom.c 9cf8729dd65dfdcc4e7c464907b91045f581bbc9
 F generic/dom.h 24c62481627afe868cab6444ca45adc4fbd829c6
 F generic/domalloc.c cd5103a1d0312c3b1e5d9db103d07d4a105008d7
 F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
@@ -232,7 +232,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 42acc3a56c1f7a167003322b133543806364401a
+P 7e56787f3d17a0ab1df4c91c0582b02054ec8bd9
 U rolf
-Z 9fd81d9400bd9420d99f521af37f142b
+Z deed7179f9bf2798c4e3be205f161bbb
 # Remove this line to create a well-formed Fossil manifest.
