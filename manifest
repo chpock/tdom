@@ -1,7 +1,7 @@
-C Brought\sin\ssync\swith\stdom\score.\n
-D 2007-08-07T18:09:20
+C See\sfile.\n
+D 2007-08-07T18:09:37
 F CHANGES 4bf85848cba5fbdf67b57a7cdfecfdd07a693e5c
-F ChangeLog 8e6d5fa3e184b98997c4bd29c6d5ce2117946b82
+F ChangeLog ca36b66fa9e0894f0f4495d27eda2f26c173122f
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 6f230818705e277b1e56f6e9e5566952a7aa544c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -232,7 +232,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 6f42ee9aa9474876a169ea76b5d469d95c81f222
+P 37a883998f2e33b03b233788e45fe1139ab349a4
 U rolf
-Z f95d9ba0d7043c2c33d897106834cb99
+Z 44d524755807ef5482ee2d0c1616f24c
 # Remove this line to create a well-formed Fossil manifest.
