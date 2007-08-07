@@ -1,7 +1,7 @@
-C Correction\sfor\s64\sbit\ssystems.\n
-D 2007-08-07T20:32:15
+C See\sfile.\n
+D 2007-08-07T20:32:30
 F CHANGES 4bf85848cba5fbdf67b57a7cdfecfdd07a693e5c
-F ChangeLog 9dadab41da12b846fdd46b8de9b6dfcdde3e64f2
+F ChangeLog 333a1a082e0a4dd32e5286d882c94b7d90f14319
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 6f230818705e277b1e56f6e9e5566952a7aa544c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -232,7 +232,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 5754fc9ae93177a516ae04d403536414e857d942
+P ef534410d7e4b407295b8560b65242faee42c33b
 U rolf
-Z 781d4780135048af4625abc490b49cfb
+Z ac1874c19104be37a4c7bb4497bd6ebb
 # Remove this line to create a well-formed Fossil manifest.
