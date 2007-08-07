@@ -1,7 +1,7 @@
-C Fixed\sa\swrong\sfunction\ssignature.\n
-D 2007-08-07T17:26:09
+C See\sfile.\n
+D 2007-08-07T17:26:46
 F CHANGES 4bf85848cba5fbdf67b57a7cdfecfdd07a693e5c
-F ChangeLog a9544987fd1c377ef636d1c5cf4b1ab6c314e3ae
+F ChangeLog e317ab1bf654e107fa5ca17da3a609b0d95439db
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 6f230818705e277b1e56f6e9e5566952a7aa544c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -232,7 +232,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P e2883d0b25528a71991b708365a53affb3812117
+P 3ca432a232ee59a13692d15df0ce571f457b88b6
 U rolf
-Z d08fc2e5c2dc448e10a87c5b3ca71f12
+Z 9ce65ce511b32e447be5b3f809cc68fb
 # Remove this line to create a well-formed Fossil manifest.
