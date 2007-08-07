@@ -1,7 +1,7 @@
-C Compiler\spacifying.\n
-D 2007-08-07T17:54:16
+C See\sfile.\n
+D 2007-08-07T17:54:33
 F CHANGES 4bf85848cba5fbdf67b57a7cdfecfdd07a693e5c
-F ChangeLog b210892d7d0b091a4f8f16e886f366962388d17c
+F ChangeLog 8e6d5fa3e184b98997c4bd29c6d5ce2117946b82
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 6f230818705e277b1e56f6e9e5566952a7aa544c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -232,7 +232,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 4648b6e89468f72be1bbeb737a6f9200e83ddbc9
+P 6bb6d68fde4100e083c39a2fb1671cb5a0212a47
 U rolf
-Z 925f23d93138161c47a490d446f2bfd9
+Z 30ca58786cb5ba087df8b6bc1c83f401
 # Remove this line to create a well-formed Fossil manifest.
