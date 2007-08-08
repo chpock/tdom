@@ -1,7 +1,7 @@
-C Another\schange\sneeded,\sto\scomplete\sthe\snew\stype\sof\ndomDoc->documentNumber.\n
-D 2007-08-08T15:52:38
+C See\sfile.\n
+D 2007-08-08T15:52:49
 F CHANGES 4bf85848cba5fbdf67b57a7cdfecfdd07a693e5c
-F ChangeLog 2fdf3dfb8d7d883f4322ef3caecef99867bfa318
+F ChangeLog ad46a8377f034824943282fd376cc43e879b59a6
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 6f230818705e277b1e56f6e9e5566952a7aa544c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -232,7 +232,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P b3fe57ee36788b4aeec811babf3fef4368134151
+P 44a3ae9ffd6b248a5db36469a322214a1af04766
 U rolf
-Z e8a46bec2bb0e13856c3828fe01334be
+Z c51babbbef7bb96ec54603d78c8beeb1
 # Remove this line to create a well-formed Fossil manifest.
