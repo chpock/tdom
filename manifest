@@ -1,7 +1,7 @@
-C Fixed\seditorial\smistake\sin\scomment.\n
-D 2007-08-10T22:46:45
+C See\sfile.\n
+D 2007-08-10T22:46:58
 F CHANGES 4bf85848cba5fbdf67b57a7cdfecfdd07a693e5c
-F ChangeLog 6863cffc6f6b0bb759d2a06f7e9a8efc4032a0d0
+F ChangeLog 2bed721272e3efc28dc3e2dfae19e372a47bf19d
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 6f230818705e277b1e56f6e9e5566952a7aa544c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -232,7 +232,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P bddfeb7bfb67938c3edd2b53ea40f1b3fa1c1e7d
+P f20f436aeb403bcb0866f24f423d738a2051f86d
 U rolf
-Z 3f2b1415919a3e492735bbfe8cf9ae67
+Z bf3e4edb77d273835742c20c3e1c07c8
 # Remove this line to create a well-formed Fossil manifest.
