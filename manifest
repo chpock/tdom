@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2007-08-11T22:20:27
+C Removed\sirritating\sbreaks\sin\sTDOM_PATH_CONFIG.\n
+D 2007-08-11T23:08:46
 F CHANGES 1b1979a63b95eb6885ac58f9972522dccaecdef8
 F ChangeLog f7dd04335cb7c1afb449aa271725c01f8fa7d0d7
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -174,7 +174,7 @@ F macosx/README 90fbbcf96747374a4c4a7b97766f0c6bafa7780e
 F tclconfig/README.txt 2be8064970040790733c3adc94cae41426d945a6
 F tclconfig/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F tclconfig/tcl.m4 bbd05ac99ff914d9acc349ad510ca4a2fd13999d
-F tdom.m4 b49b8d5a49fd757397d964e73d111777c52ad714
+F tdom.m4 c7457ab82432de10d0d3a3dbe7728554472330aa
 F tdomConfig.sh.in 5756c6b431179e49852a607cc2ca01e5381da905
 F tests/all.tcl a8d5d3e3adc6713f64d0c614b927bd21ca8df870
 F tests/attribute.test 53ac8fb043e79b638c8c6f5e7da848f6103552d6
@@ -232,7 +232,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P fcd1946f1b308982ed0432b59cc86f09167cdf4d
+P 35882199d9cf1ccf0527e53fa15b7af5ab01390b
 U rolf
-Z 31d4afbbc28d88399e77acaca73c5bd1
+Z bb90b4e8a271a56a09654bda25cdb17e
 # Remove this line to create a well-formed Fossil manifest.
