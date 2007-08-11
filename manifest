@@ -1,7 +1,7 @@
-C Tweaks\sto\sbuild\stnc\swith\swin/msys/mingw.\n
-D 2007-08-11T23:10:31
+C See\sfile.\n
+D 2007-08-11T23:11:13
 F CHANGES 1b1979a63b95eb6885ac58f9972522dccaecdef8
-F ChangeLog f7dd04335cb7c1afb449aa271725c01f8fa7d0d7
+F ChangeLog 18c69a4e60afbc1ff884ab71c977d36361beae0d
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 6f230818705e277b1e56f6e9e5566952a7aa544c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -232,7 +232,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 084ad3d90af1a06dba2153916895ac17be649416
+P 93fa66332f73a355bf6666245ec24caad32bd53c
 U rolf
-Z 2b1da3aae6597efb03f27d1153c86519
+Z 0d18ae50f1ae554b725a78b3bb0dceac
 # Remove this line to create a well-formed Fossil manifest.
