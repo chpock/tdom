@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2007-08-11T00:12:08
+C Code\scosmetic.\n
+D 2007-08-11T00:39:41
 F CHANGES 1b1979a63b95eb6885ac58f9972522dccaecdef8
 F ChangeLog 4e0fe1e8202dadeea83c3a0dbf5583ea6e6b3a8f
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -129,7 +129,7 @@ F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c b9543b7f1066118a5bcd0d2fa30acda6d247f15a
 F generic/domxpath.c 6a69cf98e477e9625d779bda8ee42d38945b0818
 F generic/domxpath.h 2f106e98c7b324b9701a5fb486774b008935f39d
-F generic/domxslt.c f9d801f6a1608c8e18f460333087f52891bad9c5
+F generic/domxslt.c 4d7224fd977af765aa587e60a52aff7122a5f68a
 F generic/domxslt.h 261176a8cb491de448189fcb9fa93bfcabda5e40
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -232,7 +232,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 576601d1aba1e118752a2269c0919bc0859e62a9
+P 144a742fb925dbb94d287f500e56b1e5e3c852ea
 U rolf
-Z bc5522691047dc06e58365fc9278648c
+Z ae4d94a747dc137c76214e435663d7ac
 # Remove this line to create a well-formed Fossil manifest.
