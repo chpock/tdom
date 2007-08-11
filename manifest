@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2007-08-10T22:46:58
+C Fixed\sbuild\sproblem\swith\sthe\sbuild\senvironment\swin/msys/mingw.\n
+D 2007-08-11T00:00:26
 F CHANGES 4bf85848cba5fbdf67b57a7cdfecfdd07a693e5c
 F ChangeLog 2bed721272e3efc28dc3e2dfae19e372a47bf19d
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -138,9 +138,9 @@ F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
 F generic/tcldom.c ef085b8846f300a72d463f683676bd88452e03b1
 F generic/tcldom.h b1b1f6662c83849fb067d294d9d53bba6c07c22c
 F generic/tclexpat.c d977e9c8350fa19e3be8b0bf9f83a4fd779023bf
-F generic/tclexpat.h 7ea0c8992809e1325c901821bc63831431e2c9f2
+F generic/tclexpat.h d6cf71d3528e65fb11c9823ffef59c9e3743f41e
 F generic/tdom.decls d825af72ec3fd2ae4ebb1d7f883bde6e3613c914
-F generic/tdom.h 0fd3f543b4a3a4314fc17027010d6777301c7772
+F generic/tdom.h ce5839cdddbde35ac016a6033415c73082b2f87c
 F generic/tdomDecls.h dd20e4afe55f21c8a845bc593806fa2d606b18eb
 F generic/tdomStubInit.c fa037218373f882436fe5b3779bac64ec84f1fba
 F generic/tdomStubLib.c ce8c360d8b3f40ebfdbe2e3150369a33f7ee33dd
@@ -232,7 +232,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f20f436aeb403bcb0866f24f423d738a2051f86d
+P a40a203b672e2eba552f0a89c90f049a14a2c56e
 U rolf
-Z bf3e4edb77d273835742c20c3e1c07c8
+Z adba5dd6ee2efd17d1ae28cea3dd77a4
 # Remove this line to create a well-formed Fossil manifest.
