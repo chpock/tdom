@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2007-08-11T00:39:59
+C Rewritten\sfrom\sthe\sscratch.\n
+D 2007-08-11T22:15:03
 F CHANGES 1b1979a63b95eb6885ac58f9972522dccaecdef8
 F ChangeLog 3e06929d0c71e563c607ea046f0dfe9f192cf011
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -143,7 +143,7 @@ F generic/tdom.decls d825af72ec3fd2ae4ebb1d7f883bde6e3613c914
 F generic/tdom.h ce5839cdddbde35ac016a6033415c73082b2f87c
 F generic/tdomDecls.h dd20e4afe55f21c8a845bc593806fa2d606b18eb
 F generic/tdomStubInit.c fa037218373f882436fe5b3779bac64ec84f1fba
-F generic/tdomStubLib.c ce8c360d8b3f40ebfdbe2e3150369a33f7ee33dd
+F generic/tdomStubLib.c 5e051f1a7b5a76b42190f219bee0eac48418c3b0
 F generic/tdominit.c a45a625ad3cc3449dd075d3fe62d97bd703846f0
 F generic/utf8conv.c 8d58daa846a0b715df1736720cf9031e924988f2
 F generic/utf8conv.h 4132db4e05ac30dcb78dc3b4799ae0a9ae8a057f
@@ -232,7 +232,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 8257fa162cb8a3f38f8f0aaf3b730ceb7f21b857
+P 2b38339d0a7f64d17f77da5ff2581808411fab88
 U rolf
-Z 936199fefc517aebe2d547d7290b3b8d
+Z cda37f0fc1f0bbe0ac13f2932ff1f12c
 # Remove this line to create a well-formed Fossil manifest.
