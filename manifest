@@ -1,7 +1,7 @@
-C Fixed\sbuild\sproblem\swith\sthe\sbuild\senvironment\swin/msys/mingw.\n
-D 2007-08-11T00:00:26
+C See\sfile.\n
+D 2007-08-11T00:01:04
 F CHANGES 4bf85848cba5fbdf67b57a7cdfecfdd07a693e5c
-F ChangeLog 2bed721272e3efc28dc3e2dfae19e372a47bf19d
+F ChangeLog efa89271d30843c769c208c1b48439857272495a
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 6f230818705e277b1e56f6e9e5566952a7aa544c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -232,7 +232,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a40a203b672e2eba552f0a89c90f049a14a2c56e
+P cd06b33d20bbb6253ce8242772bf0c1421eb094c
 U rolf
-Z adba5dd6ee2efd17d1ae28cea3dd77a4
+Z 80026cd57935c7ce5cb9d6f337d5a27d
 # Remove this line to create a well-formed Fossil manifest.
