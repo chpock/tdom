@@ -1,7 +1,7 @@
-C Updated\sthe\sasXML\srelated\sparts\sof\sthe\sdoc\sand\snode\scmd\susage\nmsg.\sCorrected\sa\stypo\sin\sthe\serror\smsg\sin\scase\sof\swrong\s#\sof\sargs\sto\nasXML.\n
-D 2007-08-12T11:55:25
+C See\sfile.\n
+D 2007-08-12T11:55:37
 F CHANGES 1b1979a63b95eb6885ac58f9972522dccaecdef8
-F ChangeLog 79c361eb012e282b54ae53fdfa8c58e442efbdb9
+F ChangeLog a91955a2bb1d00f9be01ba6a803c2c6dade53360
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 6f230818705e277b1e56f6e9e5566952a7aa544c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -232,7 +232,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f273b0e834d7f6e94f3a611817b77bffdf54a938
+P f5076031cad3fa7f4129097b56594ff3cadb9198
 U rolf
-Z 51fef21a6a0846b59023e78a756da4f8
+Z fd4b4ff8be6804a031198d605aba9713
 # Remove this line to create a well-formed Fossil manifest.
