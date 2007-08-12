@@ -1,7 +1,7 @@
-C Ensure\sthat\sthe\snew\scode\sbuild\salso\swith\stcl8.0.x\s(although\sthat\sold\nversions\sdoesn't\shave\sextension\sstubs\stables.)\n
-D 2007-08-12T11:29:25
+C See\sfile.\n
+D 2007-08-12T11:30:51
 F CHANGES 1b1979a63b95eb6885ac58f9972522dccaecdef8
-F ChangeLog 18c69a4e60afbc1ff884ab71c977d36361beae0d
+F ChangeLog 79c361eb012e282b54ae53fdfa8c58e442efbdb9
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 6f230818705e277b1e56f6e9e5566952a7aa544c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -232,7 +232,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a7cde3fcae0cd659fbe92ce165a68550fde5e1be
+P addc00e739edf6cd321066046e6aa2f09711c0ea
 U rolf
-Z 97ac657a31f49f5af4ecea202bc503ac
+Z abc0ff34ef1fc38da96b0c55cb9fe834
 # Remove this line to create a well-formed Fossil manifest.
