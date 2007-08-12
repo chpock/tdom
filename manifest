@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2007-08-11T23:11:13
+C Ensure\sthat\sthe\snew\scode\sbuild\salso\swith\stcl8.0.x\s(although\sthat\sold\nversions\sdoesn't\shave\sextension\sstubs\stables.)\n
+D 2007-08-12T11:29:25
 F CHANGES 1b1979a63b95eb6885ac58f9972522dccaecdef8
 F ChangeLog 18c69a4e60afbc1ff884ab71c977d36361beae0d
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -143,7 +143,7 @@ F generic/tdom.decls d825af72ec3fd2ae4ebb1d7f883bde6e3613c914
 F generic/tdom.h ce5839cdddbde35ac016a6033415c73082b2f87c
 F generic/tdomDecls.h dd20e4afe55f21c8a845bc593806fa2d606b18eb
 F generic/tdomStubInit.c fa037218373f882436fe5b3779bac64ec84f1fba
-F generic/tdomStubLib.c 5e051f1a7b5a76b42190f219bee0eac48418c3b0
+F generic/tdomStubLib.c 669854629a698ec7d3f15c10edae36569cf43fc3
 F generic/tdominit.c a45a625ad3cc3449dd075d3fe62d97bd703846f0
 F generic/utf8conv.c 8d58daa846a0b715df1736720cf9031e924988f2
 F generic/utf8conv.h 4132db4e05ac30dcb78dc3b4799ae0a9ae8a057f
@@ -232,7 +232,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 93fa66332f73a355bf6666245ec24caad32bd53c
+P a7cde3fcae0cd659fbe92ce165a68550fde5e1be
 U rolf
-Z 0d18ae50f1ae554b725a78b3bb0dceac
+Z 97ac657a31f49f5af4ecea202bc503ac
 # Remove this line to create a well-formed Fossil manifest.
