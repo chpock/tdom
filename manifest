@@ -1,17 +1,17 @@
-C See\sfile.\n
-D 2007-08-14T23:22:47
+C Bumped\sversion\sto\s0.8.3.\n
+D 2007-08-15T20:53:09
 F CHANGES 1b1979a63b95eb6885ac58f9972522dccaecdef8
 F ChangeLog f230c7b975b87b0a68e06245b03ca2262fea4bb3
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 6f230818705e277b1e56f6e9e5566952a7aa544c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
-F README fc47ea3df2490dfa9d8998330d598e06b5564950
-F README.AOL 57b0bb9b9849318bff4b11f18f5e13b3a3fae13d
+F README ef5eb9652a1e9479708e1c5e3a3078ef54361ad5
+F README.AOL a4faf5f85723467a8d8ca406f8aca855a18441b1
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/xslt.tcl c0b218bdeae3d209bf6766ea8f01e174d33190f3
-F configure e7eb3b6e284458036dbb53a749baafe32e8c0adb x
-F configure-tcl8.0.5 c5a38acf69688be2125dd594811860453a20769e x
-F configure.in 6bf1832fc0572efe144ff474284b5c7af3784496
+F configure 78c2ce10a9a788cb2ea070fa79a765f1b60b0451 x
+F configure-tcl8.0.5 db1a666545d519c42e229d245224d456a84c798a x
+F configure.in dbfa438f307fc04046decd8151987d3607660e69
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html 2e1a41b03d31f42dd00a0c449f7f28db6227bbf2
 F doc/dom.html b7bab0b6e2a570ef036e155a712d2da498c1842a
@@ -156,8 +156,8 @@ F mac/PrecompHeaders/CoreHeadersMach-O.h 508208239a919a6dee4275f9148962a13faeb94
 F mac/PrecompHeaders/CoreHeadersMach-O.pch 60665d6a2787eb3dfda701baff12dd3d5029e7f5
 F mac/Prefix/expatPrefix.h d131932b0c668d4cdef1eebc35f1b5267882d00d
 F mac/Prefix/expatPrefix_OSX.h 51c7e40981af4b6b8b974bf4cc4c2f63968031e2
-F mac/Prefix/tDOMPrefix.h cb91f9741b9073065ab0da523b565d8431da649d
-F mac/Prefix/tDOMPrefix_OSX.h 63f462020a839d75b7c632e01ac4fe3a1da1f675
+F mac/Prefix/tDOMPrefix.h 093c51485f124ca2a4f960d56b757f19013d887a
+F mac/Prefix/tDOMPrefix_OSX.h 7d6f3dbbe257394be429f466671cf44d43abd124
 F mac/Prefix/tncPrefix.h fb4033860688808a196991f8cce3d6dd81b5eb8e
 F mac/Prefix/tncPrefix_OSX.h 482e243e92a724d677c9e76f9eac956464252299
 F mac/Readme_Mac_Compiling 056f0af20fddfe4c08d0e0e2064c45068335611b
@@ -207,7 +207,7 @@ F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
 F tests/htmlreader.test 97b58b763204125a6ba1e40a7a57df89f38159aa
 F tests/i18n.test ad68655284ea0bf4f2c5a0acc098fd05587ba9a4
-F tests/loadtdom.tcl 498f7a7a88014fd4e3a91a73a3f3c33706cfed13
+F tests/loadtdom.tcl 0c4bf09a86aaaffe220b3f77fc728598bb6ca440
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
 F tests/parser.test c2011c520c9433d4f7895abf01a734d939edfcbb
 F tests/pcdata.test b1f5a31beb149eef4b7e2a9b75cd571ca271dc82
@@ -221,8 +221,8 @@ F tests/xslt.test ac911f7934116c56be54fae007346d77ee380f33
 F unix/CONFIG f8524aa918f16b8aba265595da4dcb04c95d37cb
 F unix/tclAppInit.c 4e6d456a0e9f83692f118cb8c940d061c95e83e3
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F win/makefile.vc 201f44b0ba4416af06fdd69414a6df1c4e4886ee
-F win/makefile805.vc 3333890a87b05fbb56f6258e74356b4571e4495e
+F win/makefile.vc 3645a055a6a35d3502cd2973fbcd07a5d1f72126
+F win/makefile805.vc 9456ed2d305d6231d930202f684929e967b05f40
 F win/mkd.bat 85d3fe58ce051a778447fb2bfc7384867d21cef0
 F win/nmakehlp.c 31a5548b2bd3b53c2e292faa1dc0a093e26285c2
 F win/pkgIndex.tcl d86c860150f70875a60a7788a8a3e80539d7e209
@@ -232,7 +232,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 4852addeb4c566afd1278472a1f2d6971e5cf812
+P 61c43e99fc0c67b97a412ad2b8dc543bbd5e2a93
 U rolf
-Z d7d51c4ecbeb213fc9a449b06c51edfc
+Z 77a000a5c573670ada84e16250daf648
 # Remove this line to create a well-formed Fossil manifest.
