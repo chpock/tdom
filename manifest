@@ -1,7 +1,7 @@
-C Bumped\sversion\sto\s0.8.3.\n
-D 2007-08-15T20:53:09
+C See\sfile.\n
+D 2007-08-15T21:05:51
 F CHANGES 1b1979a63b95eb6885ac58f9972522dccaecdef8
-F ChangeLog f230c7b975b87b0a68e06245b03ca2262fea4bb3
+F ChangeLog 16cd598443f00706fe4ff6ec7d2a919bc9e71430
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 6f230818705e277b1e56f6e9e5566952a7aa544c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -232,7 +232,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 61c43e99fc0c67b97a412ad2b8dc543bbd5e2a93
+P 8e7e1eb103c013e760dc91029ff0934f460d3e5d
 U rolf
-Z 77a000a5c573670ada84e16250daf648
+Z ece351e2ec6b35796bc7725c6b990676
 # Remove this line to create a well-formed Fossil manifest.
