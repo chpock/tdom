@@ -1,7 +1,7 @@
-C New\sdefault\sbuild:\s--disable-tdomalloc.\n
-D 2007-08-15T21:42:12
+C See\sfile.\n
+D 2007-08-15T21:44:39
 F CHANGES 2e6ba51cc80a711e875b6db1d2326795216a4949
-F ChangeLog 1627a514a7e034bb603d84821b5ed34c8a5049f4
+F ChangeLog 0dea7467061707cd34d66cda6467618320036d52
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 6f230818705e277b1e56f6e9e5566952a7aa544c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -232,7 +232,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P b13b9c529aef802ac8f8d42b114a6ac8e9aab6ef
+P 1cc5318f8e12bf9f0b441ef9e484e9242e775cd4
 U rolf
-Z 1a0b41a292d6b4e07ce8adfac485cc46
+Z 8c920b079056eaa9b2b1e4b604b57e5f
 # Remove this line to create a well-formed Fossil manifest.
