@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2007-08-15T21:40:48
+C New\sdefault\sbuild:\s--disable-tdomalloc.\n
+D 2007-08-15T21:42:12
 F CHANGES 2e6ba51cc80a711e875b6db1d2326795216a4949
 F ChangeLog 1627a514a7e034bb603d84821b5ed34c8a5049f4
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -218,7 +218,7 @@ F tests/xmlsimple.test 38ca7b8d078e2a344d73c4c6e3748e8604c07b51
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.test 792f26ba22a8b147ad388dea4bff8f9a6da664a4
 F tests/xslt.test ac911f7934116c56be54fae007346d77ee380f33
-F unix/CONFIG 1dcb1d4f397bcd772744660287460611a111d201
+F unix/CONFIG 789192e463910e1b9dd7e65f6338390d2bf1f68a
 F unix/tclAppInit.c 4e6d456a0e9f83692f118cb8c940d061c95e83e3
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F win/makefile.vc 3645a055a6a35d3502cd2973fbcd07a5d1f72126
@@ -232,7 +232,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 984d64380ab621834306b667478e4724b3ec7557
+P b13b9c529aef802ac8f8d42b114a6ac8e9aab6ef
 U rolf
-Z afc0c8ed421befc4394b1f8412ce45ce
+Z 1a0b41a292d6b4e07ce8adfac485cc46
 # Remove this line to create a well-formed Fossil manifest.
