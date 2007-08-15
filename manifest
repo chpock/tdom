@@ -1,7 +1,7 @@
-C See\sfile.\n
-D 2007-08-15T21:44:39
+C Doh!\sIt's\sstill\s2007-08-15!\n
+D 2007-08-15T21:49:13
 F CHANGES 2e6ba51cc80a711e875b6db1d2326795216a4949
-F ChangeLog 0dea7467061707cd34d66cda6467618320036d52
+F ChangeLog 6d543eb202083574fb520f61bbaaceaf43db38d2
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 6f230818705e277b1e56f6e9e5566952a7aa544c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -232,7 +232,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 1cc5318f8e12bf9f0b441ef9e484e9242e775cd4
+P bce82384276387306f487e10c36f591111cf2e9b
 U rolf
-Z 8c920b079056eaa9b2b1e4b604b57e5f
+Z bddd5ff42ca8506dc34f062554bbb82b
 # Remove this line to create a well-formed Fossil manifest.
