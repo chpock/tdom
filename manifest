@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2007-08-15T21:07:01
+C New\sdefault\sbuild:\s--disable-tdomalloc.\n
+D 2007-08-15T21:40:11
 F CHANGES 2e6ba51cc80a711e875b6db1d2326795216a4949
 F ChangeLog 973b30cad237bc5483bbed9536a9fa6e33417cdb
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -9,9 +9,9 @@ F README ef5eb9652a1e9479708e1c5e3a3078ef54361ad5
 F README.AOL a4faf5f85723467a8d8ca406f8aca855a18441b1
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/xslt.tcl c0b218bdeae3d209bf6766ea8f01e174d33190f3
-F configure 78c2ce10a9a788cb2ea070fa79a765f1b60b0451 x
+F configure aa37c2fa1c4253c2d34eda4247940f7b6316bc05 x
 F configure-tcl8.0.5 db1a666545d519c42e229d245224d456a84c798a x
-F configure.in dbfa438f307fc04046decd8151987d3607660e69
+F configure.in faef225b29f1d74babf7154173fd10878e7a50ba
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html 2e1a41b03d31f42dd00a0c449f7f28db6227bbf2
 F doc/dom.html b7bab0b6e2a570ef036e155a712d2da498c1842a
@@ -174,7 +174,7 @@ F macosx/README 90fbbcf96747374a4c4a7b97766f0c6bafa7780e
 F tclconfig/README.txt 2be8064970040790733c3adc94cae41426d945a6
 F tclconfig/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F tclconfig/tcl.m4 bbd05ac99ff914d9acc349ad510ca4a2fd13999d
-F tdom.m4 c7457ab82432de10d0d3a3dbe7728554472330aa
+F tdom.m4 b8845f683bca92452bad287ce3f599bd3acadbe8
 F tdomConfig.sh.in 5756c6b431179e49852a607cc2ca01e5381da905
 F tests/all.tcl a8d5d3e3adc6713f64d0c614b927bd21ca8df870
 F tests/attribute.test 53ac8fb043e79b638c8c6f5e7da848f6103552d6
@@ -218,7 +218,7 @@ F tests/xmlsimple.test 38ca7b8d078e2a344d73c4c6e3748e8604c07b51
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.test 792f26ba22a8b147ad388dea4bff8f9a6da664a4
 F tests/xslt.test ac911f7934116c56be54fae007346d77ee380f33
-F unix/CONFIG f8524aa918f16b8aba265595da4dcb04c95d37cb
+F unix/CONFIG 1dcb1d4f397bcd772744660287460611a111d201
 F unix/tclAppInit.c 4e6d456a0e9f83692f118cb8c940d061c95e83e3
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F win/makefile.vc 3645a055a6a35d3502cd2973fbcd07a5d1f72126
@@ -232,7 +232,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P fb0051746ce3e250b7f23ecaca1ad4452b26b0f2
+P 549783a37663ae4fc0cbcb07544a336d3eba270e
 U rolf
-Z f24f3312c0d59c1ab0c6cfa1b3ea5699
+Z 4419b90db384a26c51bb8a88885408ac
 # Remove this line to create a well-formed Fossil manifest.
