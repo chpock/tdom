@@ -1,7 +1,7 @@
-C More\sconstification\sand\sclean\sup.\n
-D 2007-08-18T12:51:46
+C See\sfile.\n
+D 2007-08-18T12:52:08
 F CHANGES 2e6ba51cc80a711e875b6db1d2326795216a4949
-F ChangeLog b020514d7edff55d2c13f62bc8353f19bca940f2
+F ChangeLog 7f0bb27990a992b67d1de9a6c26a542a3d7d3022
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 6f230818705e277b1e56f6e9e5566952a7aa544c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -232,7 +232,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c77a449cd11339dd545f0201042c6f5510710b37
+P a3bd6b44700574bb97165982ff56310ef36892f8
 U rolf
-Z 3f32688c8b6aa3389e78ab60f3cf6dfd
+Z d9b4d419b77d66602f6434356e831d8b
 # Remove this line to create a well-formed Fossil manifest.
