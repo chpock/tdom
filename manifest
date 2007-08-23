@@ -1,7 +1,7 @@
-C Fixed\sbug\striggered\sby\sinvalid\sXSLT\sXPath\spattern\s(normal\sXPath\sexpr\n(via\sselectNodes)\swasn't\sinfected).\n
-D 2007-08-23T16:34:18
+C See\sfile.\n
+D 2007-08-23T16:35:48
 F CHANGES 2e6ba51cc80a711e875b6db1d2326795216a4949
-F ChangeLog 79755c1101d37307aca5be5f5cfb62fd67595c7e
+F ChangeLog ea87b1048960c54b9f37f34c92417dd18db6eb0c
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 6f230818705e277b1e56f6e9e5566952a7aa544c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -232,7 +232,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 7614ab937ddd2fb97542e15597eb502bb205db76
+P 5d08962991550694a73dc6d2c2d21e3b1357da9f
 U rolf
-Z 5e1a4184848e38bc436c079a6b4152ab
+Z 64ebd6a7f3e6802acff1b27ed6a8f07c
 # Remove this line to create a well-formed Fossil manifest.
