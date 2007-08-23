@@ -1,5 +1,5 @@
-C Fixed\sbug\striggered\sby\sinvalid\sXSLT\sXPath\spattern\s(normal\sXPath\sexpr\n(via\sselectNodes)\swasn't\sinfected).\sChecked\sthe\scode\sfor\ssimilar\sspots\nand\sfixed\sa\sfew.\sReplaced\sa\sfprintf(stderr,\s..)\scalled\sin\san\n'impossible'\scase\swith\sa\smore\sappropriate\sdomPanic\scall.\n
-D 2007-08-23T16:33:36
+C Fixed\sbug\striggered\sby\sinvalid\sXSLT\sXPath\spattern\s(normal\sXPath\sexpr\n(via\sselectNodes)\swasn't\sinfected).\n
+D 2007-08-23T16:34:18
 F CHANGES 2e6ba51cc80a711e875b6db1d2326795216a4949
 F ChangeLog 79755c1101d37307aca5be5f5cfb62fd67595c7e
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -199,7 +199,7 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
-F tests/dom.test 62f9b7f50eb67d96c081a3a130c8915de9082f65
+F tests/dom.test a4e3d72b851558c2d79fc00ab682be78c9c821c1
 F tests/domDoc.test a8dafc3de526bc974891a2c317662e4f7fc4cf48
 F tests/domNode.test baff5c55f2e72703f6210a041c8344308408d82d
 F tests/domnamespace.test 7f6ff7ee11a6cb437240c07be18adc11fd876d46
@@ -214,10 +214,10 @@ F tests/pcdata.test b1f5a31beb149eef4b7e2a9b75cd571ca271dc82
 F tests/pi.test 03bb450cd334ca0454a6c99ca3270092ba684833
 F tests/stackedhdl.test 4b3dafa96849dabf738ffb401585dac5a5aed550
 F tests/tdomcmd.test ebfa377019b495972b13e00b85ff9ba55041a4b9
-F tests/xmlsimple.test 38ca7b8d078e2a344d73c4c6e3748e8604c07b51
+F tests/xmlsimple.test b9ca923fb971af2b6170f35a887922e488db928d
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
-F tests/xpath.test 792f26ba22a8b147ad388dea4bff8f9a6da664a4
-F tests/xslt.test ac911f7934116c56be54fae007346d77ee380f33
+F tests/xpath.test 034c709485846d959dd206e028cfe73e1190dab7
+F tests/xslt.test 107f246169806545055f08425d5950d9efb0b6a5
 F unix/CONFIG 789192e463910e1b9dd7e65f6338390d2bf1f68a
 F unix/tclAppInit.c 4e6d456a0e9f83692f118cb8c940d061c95e83e3
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -232,7 +232,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 22f69747ad85a6ea2526e334261492f29acc28f9
+P 7614ab937ddd2fb97542e15597eb502bb205db76
 U rolf
-Z 6c85b4535ab40722867706675b56fac5
+Z 5e1a4184848e38bc436c079a6b4152ab
 # Remove this line to create a well-formed Fossil manifest.
