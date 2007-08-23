@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2007-08-18T19:45:14
+C Fixed\sbug\striggered\sby\sinvalid\sXSLT\sXPath\spattern\s(normal\sXPath\sexpr\n(via\sselectNodes)\swasn't\sinfected).\sChecked\sthe\scode\sfor\ssimilar\sspots\nand\sfixed\sa\sfew.\sReplaced\sa\sfprintf(stderr,\s..)\scalled\sin\san\n'impossible'\scase\swith\sa\smore\sappropriate\sdomPanic\scall.\n
+D 2007-08-23T16:33:36
 F CHANGES 2e6ba51cc80a711e875b6db1d2326795216a4949
 F ChangeLog 79755c1101d37307aca5be5f5cfb62fd67595c7e
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -127,7 +127,7 @@ F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
 F generic/domhtml.c ebfa2c40ac445d8c58dddfd49860b330e7157884
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c b9543b7f1066118a5bcd0d2fa30acda6d247f15a
-F generic/domxpath.c 621b4abb9edc064057f4b05a1e0e4a8ac9d64f64
+F generic/domxpath.c 756cd0b1b7e1496ce605dfc049a872ba63365bc4
 F generic/domxpath.h 7e8429eba12dafe72cf9fe60c838db889ca4c7d1
 F generic/domxslt.c c8fac8eb7dc58f0793d97cc3ec8b8ba592915c46
 F generic/domxslt.h 261176a8cb491de448189fcb9fa93bfcabda5e40
@@ -232,7 +232,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P beb97872f79c1383be7ad36d77e47bb55c8d56c4
+P 22f69747ad85a6ea2526e334261492f29acc28f9
 U rolf
-Z 8ceb97bf0f5429492d60a3ef1e4e9ba5
+Z 6c85b4535ab40722867706675b56fac5
 # Remove this line to create a well-formed Fossil manifest.
