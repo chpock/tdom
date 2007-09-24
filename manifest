@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2007-09-24T23:31:23
+C Updated.\s(Thanks\sto\sPat\sThoyts.)\n
+D 2007-09-24T23:35:22
 F CHANGES 2e6ba51cc80a711e875b6db1d2326795216a4949
 F ChangeLog 68be808c8102585b34e57498c620ba036d88ed85
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -221,18 +221,18 @@ F tests/xslt.test 107f246169806545055f08425d5950d9efb0b6a5
 F unix/CONFIG 789192e463910e1b9dd7e65f6338390d2bf1f68a
 F unix/tclAppInit.c 4e6d456a0e9f83692f118cb8c940d061c95e83e3
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F win/makefile.vc 3645a055a6a35d3502cd2973fbcd07a5d1f72126
+F win/makefile.vc 1241b5ab941948c494c7542f2e6facf6921c2db6
 F win/makefile805.vc 9456ed2d305d6231d930202f684929e967b05f40
 F win/mkd.bat 85d3fe58ce051a778447fb2bfc7384867d21cef0
-F win/nmakehlp.c 31a5548b2bd3b53c2e292faa1dc0a093e26285c2
+F win/nmakehlp.c 604c15fe6ebf3bb5f1cf54dd43801b9ae89fd653
 F win/pkgIndex.tcl 95f43bef978a72e8ceda0c97edac4ed8333b2327
-F win/rules.vc 209cd65636302f20130e68a95cc4ae18a8b5d921
-F win/tdom.rc 2f20f0e71fce5f64ee6a44e97bc14f38dc6b4338
+F win/rules.vc 45b10bfc82b91ffa3c166e159d1f926a39c4e2ed
+F win/tdom.rc 46fe2071b1b93040adeb66d98da6b72d270055c7
 F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a4268b4f7d7455b723a4626510a94e2f6af4a84f
+P cb867d5532b1928c0332921a05ebd48be4b7453c
 U rolf
-Z 321e7b096286d2dac64cc1a3d46e3c8d
+Z 268344d6161a7ab5174e9321baee2852
 # Remove this line to create a well-formed Fossil manifest.
