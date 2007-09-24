@@ -1,7 +1,7 @@
-C Fixes\stnc\sbuilding\sagainst\suninstalled\stdom\s(Thanks\sto\sDaniel\sA.\sSteffen.)\n
-D 2007-09-24T23:30:29
+C See\sfile.\n
+D 2007-09-24T23:31:23
 F CHANGES 2e6ba51cc80a711e875b6db1d2326795216a4949
-F ChangeLog ea87b1048960c54b9f37f34c92417dd18db6eb0c
+F ChangeLog 68be808c8102585b34e57498c620ba036d88ed85
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 6f230818705e277b1e56f6e9e5566952a7aa544c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -232,7 +232,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 0e9efad7459bf1e69eb2e1a96e10d1e416d9f8cb
+P a4268b4f7d7455b723a4626510a94e2f6af4a84f
 U rolf
-Z 5028fe73e6d923beb55f974a9b727c0d
+Z 321e7b096286d2dac64cc1a3d46e3c8d
 # Remove this line to create a well-formed Fossil manifest.
