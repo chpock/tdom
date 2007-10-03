@@ -1,7 +1,7 @@
-C makefile.vc\sgenerated\sa\spkgIndex.tcl\sfile,\sthat\sdidn't\swork\sin\scase\sof\nspaces\sin\sthe\sinstall\spath.\sThanks\sto\sKoen\sDanckaert.\n
-D 2007-10-03T11:16:08
+C See\sfile.\n
+D 2007-10-03T11:16:20
 F CHANGES 2e6ba51cc80a711e875b6db1d2326795216a4949
-F ChangeLog f3516e7df2e8f085153f76d5a15d7130a7ba55ee
+F ChangeLog b9f49720a6948086fc10318a37658163e3b2525d
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 6f230818705e277b1e56f6e9e5566952a7aa544c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -235,7 +235,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 220f9aa9b27ffea4670ae928e30dcac4b051ded9
+P 030301a147058f4357c292688ac44062901b46b2
 U rolf
-Z fd6ff994d17c9e6ebe5d74771f2f413f
+Z 84a5978146d2bdedaf9c1e550a48f5a8
 # Remove this line to create a well-formed Fossil manifest.
