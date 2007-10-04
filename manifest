@@ -1,7 +1,7 @@
-C Fixed\stest\sdomDoc-1.2:\sTest\swas\sbroken\sin\scase\sof\slocale\s!=\sISO-8859-1\n(or\s-15).\n
-D 2007-10-04T17:48:22
+C See\sfile.\n
+D 2007-10-04T17:48:49
 F CHANGES 2e6ba51cc80a711e875b6db1d2326795216a4949
-F ChangeLog b9f49720a6948086fc10318a37658163e3b2525d
+F ChangeLog 707d887a05482700fcc4988172af8ab9eef00e55
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 6f230818705e277b1e56f6e9e5566952a7aa544c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -235,7 +235,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 68b613a1f122bfbd0a5d411f662d53bc253a295c
+P 7d6119c645f91ee9fcc68899f8a0c85fdd060960
 U rolf
-Z 831385dbbf2b028af348694204f5a0ef
+Z 68938778babd9e2b478264486549a881
 # Remove this line to create a well-formed Fossil manifest.
