@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2007-10-03T11:16:20
+C Fixed\stest\sdomDoc-1.2:\sTest\swas\sbroken\sin\scase\sof\slocale\s!=\sISO-8859-1\n(or\s-15).\n
+D 2007-10-04T17:48:22
 F CHANGES 2e6ba51cc80a711e875b6db1d2326795216a4949
 F ChangeLog b9f49720a6948086fc10318a37658163e3b2525d
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -201,7 +201,7 @@ F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.test a4e3d72b851558c2d79fc00ab682be78c9c821c1
-F tests/domDoc.test a8dafc3de526bc974891a2c317662e4f7fc4cf48
+F tests/domDoc.test d2c9f2625549d1c8f4f392e3acafbb79a6d00c6b
 F tests/domNode.bench 25c205110bf8456202b7abe031abb72db8ae8db2
 F tests/domNode.test baff5c55f2e72703f6210a041c8344308408d82d
 F tests/domnamespace.test 7f6ff7ee11a6cb437240c07be18adc11fd876d46
@@ -235,7 +235,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 030301a147058f4357c292688ac44062901b46b2
+P 68b613a1f122bfbd0a5d411f662d53bc253a295c
 U rolf
-Z 84a5978146d2bdedaf9c1e550a48f5a8
+Z 831385dbbf2b028af348694204f5a0ef
 # Remove this line to create a well-formed Fossil manifest.
