@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2007-10-04T17:48:49
+C Fixed\shandling\sof\sattributes\swithout\svalue.\sNow,\san\sattribute\swithout\nvalue\sgets\sthe\sattribute\sname\sas\svalue.\n
+D 2007-10-08T16:23:02
 F CHANGES 2e6ba51cc80a711e875b6db1d2326795216a4949
 F ChangeLog 707d887a05482700fcc4988172af8ab9eef00e55
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -124,7 +124,7 @@ F generic/dom.c 162019374c1299747041e7fc026e85393bac023c
 F generic/dom.h 1e97da27969d4faccec912f332b2d9877076d835
 F generic/domalloc.c 55e9eeff19cc54cf3956a7013883ead07efd3593
 F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
-F generic/domhtml.c ebfa2c40ac445d8c58dddfd49860b330e7157884
+F generic/domhtml.c a2297a003dfcf572d49fd8df6007bf6b95c9a8c2
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c b9543b7f1066118a5bcd0d2fa30acda6d247f15a
 F generic/domxpath.c 756cd0b1b7e1496ce605dfc049a872ba63365bc4
@@ -207,7 +207,7 @@ F tests/domNode.test baff5c55f2e72703f6210a041c8344308408d82d
 F tests/domnamespace.test 7f6ff7ee11a6cb437240c07be18adc11fd876d46
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
-F tests/htmlreader.test 97b58b763204125a6ba1e40a7a57df89f38159aa
+F tests/htmlreader.test 9012ce2b739ed4237c13144a68b7cb43be4a1a1c
 F tests/i18n.test ad68655284ea0bf4f2c5a0acc098fd05587ba9a4
 F tests/loadtdom.tcl 0c4bf09a86aaaffe220b3f77fc728598bb6ca440
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
@@ -235,7 +235,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 7d6119c645f91ee9fcc68899f8a0c85fdd060960
+P 0141ef9e02a94c841979a21d809de8d4898e0fb8
 U rolf
-Z 68938778babd9e2b478264486549a881
+Z 66c352294cd311c24b15131996a546dd
 # Remove this line to create a well-formed Fossil manifest.
