@@ -1,7 +1,7 @@
-C Fixed\shandling\sof\sattributes\swithout\svalue.\sNow,\san\sattribute\swithout\nvalue\sgets\sthe\sattribute\sname\sas\svalue.\n
-D 2007-10-08T16:23:02
+C See\sfile.\n
+D 2007-10-08T16:23:47
 F CHANGES 2e6ba51cc80a711e875b6db1d2326795216a4949
-F ChangeLog 707d887a05482700fcc4988172af8ab9eef00e55
+F ChangeLog e659c92217d528baa78b815f31503c0665e3e584
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 6f230818705e277b1e56f6e9e5566952a7aa544c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -235,7 +235,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 0141ef9e02a94c841979a21d809de8d4898e0fb8
+P d11d12aebe87f1b47f8091b9041a8d5e1b5ec703
 U rolf
-Z 66c352294cd311c24b15131996a546dd
+Z 2815a5d588c81f4f18fc748b3c62567e
 # Remove this line to create a well-formed Fossil manifest.
