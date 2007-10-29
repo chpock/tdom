@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2007-10-08T16:23:47
+C Fixed\sdocumentation\serror\sin\sthe\sdocumentation\sof\sthe\sreplaceChild\smethod.\n
+D 2007-10-29T19:07:37
 F CHANGES 2e6ba51cc80a711e875b6db1d2326795216a4949
 F ChangeLog e659c92217d528baa78b815f31503c0665e3e584
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -17,12 +17,12 @@ F doc/category-index.html 2e1a41b03d31f42dd00a0c449f7f28db6227bbf2
 F doc/dom.html b7bab0b6e2a570ef036e155a712d2da498c1842a
 F doc/dom.n 8e1b80d9fc9efb0724cb965de18ef09ed3b19d1b
 F doc/dom.xml 9dbbb9372f400918b3955fd411db4f8e0c9ab8a1
-F doc/domDoc.html d74ffbe339fbeaee40155a9bbcd0c7ab4cfc05e9
-F doc/domDoc.n ee1a48a3ecce9595ffba148afa3e032c1e02f0bf
-F doc/domDoc.xml bfe39aacbf52cf51e738e87d48ebe974b0775e56
-F doc/domNode.html 98c68df759f96ebf1c65a77ce4124cf743e952be
-F doc/domNode.n 965619d69504d680fb50e4812e656f9bfe6b01ee
-F doc/domNode.xml 27aa47a94bb165b551747e597cbb774ce7f49f6e
+F doc/domDoc.html 83f22153c8d171b1526a47ff4a70878d7cd322be
+F doc/domDoc.n 68355fb64b7b7ad189d2bfd5b57933f9e07391be
+F doc/domDoc.xml 723bc12d07172ab478008fc5823e2ceda2b721c7
+F doc/domNode.html f28b1ad10316cfadac3403d7b92844118113cf72
+F doc/domNode.n 0e765d7c4de07ccd45afa03380e860586c09a2f0
+F doc/domNode.xml 07b2602d2800767623af3dde011ad0f36c1474f3
 F doc/expat.html 257cc19bdf9df4e798bf4f7c6932332de983f81f
 F doc/expat.n d56bf5542ba2ae06e3850e75647a1931176df0a0
 F doc/expat.xml c1d7ffd536814ddcd137be95aa366cae5ad69a32
@@ -235,7 +235,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P d11d12aebe87f1b47f8091b9041a8d5e1b5ec703
+P 9d006c9b1291003b215ae19d86bbcb1ad83961ce
 U rolf
-Z 2815a5d588c81f4f18fc748b3c62567e
+Z fcb26d2105cc33b16182a17515d73318
 # Remove this line to create a well-formed Fossil manifest.
