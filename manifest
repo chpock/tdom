@@ -1,7 +1,7 @@
-C Fixed\sdocumentation\serror\sin\sthe\sdocumentation\sof\sthe\sreplaceChild\smethod.\n
-D 2007-10-29T19:07:37
+C See\sfile.\n
+D 2007-10-29T19:10:25
 F CHANGES 2e6ba51cc80a711e875b6db1d2326795216a4949
-F ChangeLog e659c92217d528baa78b815f31503c0665e3e584
+F ChangeLog 23e62fdb55198de05d38bc74aa85ffa77e9a1810
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 6f230818705e277b1e56f6e9e5566952a7aa544c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -235,7 +235,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 9d006c9b1291003b215ae19d86bbcb1ad83961ce
+P 335a3354eda9a2868a785935981a79c013087653
 U rolf
-Z fcb26d2105cc33b16182a17515d73318
+Z 555c274fb5bdd3c1e3c6ef15357b6a25
 # Remove this line to create a well-formed Fossil manifest.
