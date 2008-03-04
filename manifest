@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2008-03-04T20:35:34
+C Added\sa\scast,\sto\spacify\spicky\scompliers.\n
+D 2008-03-04T20:52:47
 F CHANGES 2e6ba51cc80a711e875b6db1d2326795216a4949
 F ChangeLog 220dc02fafa7180fffb794d4300b815370da3207
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -124,7 +124,7 @@ F generic/dom.c f559dcf788c71142d98565366803af40ef198fb4
 F generic/dom.h 1e97da27969d4faccec912f332b2d9877076d835
 F generic/domalloc.c 55e9eeff19cc54cf3956a7013883ead07efd3593
 F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
-F generic/domhtml.c 00a7874b73223c7d38f9b9aa039e2c03eacd7c29
+F generic/domhtml.c 8a0379032b192a5faf3e632f7e4c0ce87217b984
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c b9543b7f1066118a5bcd0d2fa30acda6d247f15a
 F generic/domxpath.c 756cd0b1b7e1496ce605dfc049a872ba63365bc4
@@ -235,7 +235,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ed2de2fd5cc78f7d267bf409228305af26869d16
+P 5abde0c7a32db378ba3046b4feceb4884872d8c4
 U rolf
-Z 7538af92e6ff52574f6847f8b73afd79
+Z 5f8d659ff04fdf624b1b170ac2e3f87c
 # Remove this line to create a well-formed Fossil manifest.
