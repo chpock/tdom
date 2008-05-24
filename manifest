@@ -1,7 +1,7 @@
-C The\sXPath\sfunction\selement-available()\sshould,\saroding\sto\sthe\srec,\nreturn\strue\s"if\sand\sonly\sif\sthe\s<argument>\sis\sthe\sname\sof\san\ninstruction".\sThat\sis,\snot\sfor\sall\sknown\sXSLT\selements.\n
-D 2008-05-24T21:59:58
+C See\sfile.\n
+D 2008-05-24T22:01:11
 F CHANGES 2e6ba51cc80a711e875b6db1d2326795216a4949
-F ChangeLog c07a7a64b8c73875519aabfc1a84bdd8dd218cf7
+F ChangeLog ac1e907974b55f85d176160a3dce04bf57051bc6
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 6f230818705e277b1e56f6e9e5566952a7aa544c
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -235,10 +235,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 1b5b7e10e4155943a37c92ff9572bb844d0d38d7
-T *branch * origin
-T *sym-origin *
-T -sym-tdom-0.8.3-postrelease *
+P eb05498afc649a1e6b6bf6cb86d81ed9d9609a15
 U rolf
-Z a1cd7405c1e365f8079f378a5dada87c
+Z 7dcd12733ca64d5d6213a655c9772d4d
 # Remove this line to create a well-formed Fossil manifest.
