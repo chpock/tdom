@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2008-03-04T21:04:00
+C The\sXPath\sfunction\selement-available()\sshould,\saroding\sto\sthe\srec,\nreturn\strue\s"if\sand\sonly\sif\sthe\s<argument>\sis\sthe\sname\sof\san\ninstruction".\sThat\sis,\snot\sfor\sall\sknown\sXSLT\selements.\n
+D 2008-05-24T21:59:58
 F CHANGES 2e6ba51cc80a711e875b6db1d2326795216a4949
 F ChangeLog c07a7a64b8c73875519aabfc1a84bdd8dd218cf7
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -150,7 +150,7 @@ F generic/utf8conv.h 4132db4e05ac30dcb78dc3b4799ae0a9ae8a057f
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
 F generic/xmlsimple.c 589088cef981e35614eb2d8d8a4fc2adcb4b7de6
 F generic/xmlsimple.h 803a2ab6e9a120436206c54140ae2c08107fd0b6
-F lib/tdom.tcl 67ad7eb52c8f25154686dd91fa0197147f689b12
+F lib/tdom.tcl 6622f60e568d6cf658746174e189197f857e59c5
 F mac/PrecompHeaders/CoreHeadersMach-O.c e4406d8c34fcaea82d21e62c35012893b460dfd5
 F mac/PrecompHeaders/CoreHeadersMach-O.h 508208239a919a6dee4275f9148962a13faeb94d
 F mac/PrecompHeaders/CoreHeadersMach-O.pch 60665d6a2787eb3dfda701baff12dd3d5029e7f5
@@ -235,7 +235,10 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 43b903a3b0ad98eff171889392bd8824b493398f
+P 1b5b7e10e4155943a37c92ff9572bb844d0d38d7
+T *branch * origin
+T *sym-origin *
+T -sym-tdom-0.8.3-postrelease *
 U rolf
-Z 10c7b204741e952b33b9f2fa1b85132e
+Z a1cd7405c1e365f8079f378a5dada87c
 # Remove this line to create a well-formed Fossil manifest.
