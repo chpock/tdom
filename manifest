@@ -1,7 +1,7 @@
-C Added\smissing\sspace\sin\starget\spkgIndex.tcl-hand.\sThanks\sto\sGustaf\nNeumann\sfor\sreporting\sthe\sproblem\sand\sproviding\sa\sfix.\n
-D 2008-08-27T11:39:36
+C See\sfile.\n
+D 2008-08-27T11:40:00
 F CHANGES 2e6ba51cc80a711e875b6db1d2326795216a4949
-F ChangeLog ac1e907974b55f85d176160a3dce04bf57051bc6
+F ChangeLog 11e2f54e07abc08b4149e83f80418fea6fb89c73
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in f73951ceac2950882c568f272020f20ee09c8883
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -235,7 +235,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P b4d7122edf0e95492e7b5d6f0a4c60f6146a2f71
+P f72751fb5734cfb3f8fcad40b91ea08406ea9348
 U rolf
-Z 5a4957268e23610c531a5a1058388beb
+Z b713422ef5aab25bdcb55d8bdce890f5
 # Remove this line to create a well-formed Fossil manifest.
