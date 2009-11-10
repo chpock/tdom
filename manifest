@@ -1,5 +1,5 @@
-C See\sfile.\n
-D 2008-08-27T11:40:00
+C Fix\sfor\spossible\sDoS\sattack\s(see\sCVE-2009-3720)\n
+D 2009-11-10T20:47:27
 F CHANGES 2e6ba51cc80a711e875b6db1d2326795216a4949
 F ChangeLog 11e2f54e07abc08b4149e83f80418fea6fb89c73
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -83,7 +83,7 @@ F expat/xmlrole.c c9bd795e4196f86f8d3c6b047fbd5ec8c1a54bf4
 F expat/xmlrole.h dce455a07e6f1e8958e0b0c4ae403c205a9c78f5
 F expat/xmltok.c 8807e561080c94f66639781a480c6bc878eaff0c
 F expat/xmltok.h 6d641f501819fe4454ac2a190de7c5708401e1a9
-F expat/xmltok_impl.c 5669d5679ca979b8c6d33c3828668b37a98a3cb9
+F expat/xmltok_impl.c b8245050078056847fb57205f1d20a4d7ac8dc9b
 F expat/xmltok_impl.h cb8cce4d3f128dc013901010b462d852b4d4d804
 F expat/xmltok_ns.c 8aec1b3ad754d262d3b1ba44b3abb5171c3e21f8
 F extensions/example/Makefile.in 47ae1116b31d3abe63d45bacc895aaf9f214e9bc
@@ -235,7 +235,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f72751fb5734cfb3f8fcad40b91ea08406ea9348
+P 171f741ae82eaac79996a1a730456003fe3ffde7
 U rolf
-Z b713422ef5aab25bdcb55d8bdce890f5
+Z 6494ed884cabc908055d426cae7d346b
 # Remove this line to create a well-formed Fossil manifest.
