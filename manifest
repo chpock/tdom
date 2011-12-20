@@ -1,5 +1,5 @@
-C as\sper\semail\sexchange\swith\sRichard\sHipp\son\sMarch\s29th,\s2011,\swe\scan\smove\nthe\slicense\sof\shis\svery\sold\sXML\sparsing\scode\s(from\sTMML)\sinto\spublic\sdomain:\n"\sCall\sit\spublic\sdomain.\s\sDo\swhatever\syou\slike\swith\sit.\s\s(Just\splease\sremove\nmy\sname\sfrom\sthe\scomment.)\s"\sdrh@sqlite.org\n
-D 2011-03-30T16:17:21
+C fix\sminor\sgrammar\stypo\sin\sdomDoc\n
+D 2011-12-20T00:54:50
 F CHANGES 2e6ba51cc80a711e875b6db1d2326795216a4949
 F ChangeLog 970f3dfdf0877a26585f554f0657bbd42bee0acd
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -17,9 +17,9 @@ F doc/category-index.html 2e1a41b03d31f42dd00a0c449f7f28db6227bbf2
 F doc/dom.html b7bab0b6e2a570ef036e155a712d2da498c1842a
 F doc/dom.n 8e1b80d9fc9efb0724cb965de18ef09ed3b19d1b
 F doc/dom.xml 9dbbb9372f400918b3955fd411db4f8e0c9ab8a1
-F doc/domDoc.html 83f22153c8d171b1526a47ff4a70878d7cd322be
-F doc/domDoc.n 68355fb64b7b7ad189d2bfd5b57933f9e07391be
-F doc/domDoc.xml 723bc12d07172ab478008fc5823e2ceda2b721c7
+F doc/domDoc.html fb860dd0a570e18e86e832ec9a657cf2cbe85caf
+F doc/domDoc.n 816ef5658c640581c00efd0b403889a41372f993
+F doc/domDoc.xml dca6969d1a7a88d8dd63db29dcf545aad31fab9f
 F doc/domNode.html f28b1ad10316cfadac3403d7b92844118113cf72
 F doc/domNode.n 0e765d7c4de07ccd45afa03380e860586c09a2f0
 F doc/domNode.xml 07b2602d2800767623af3dde011ad0f36c1474f3
@@ -235,10 +235,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 3e8527de8c638b8c81023798378752d022cc254e
-T *branch * trunk
-T *sym-trunk *
-T -sym-origin *
-U jolo@osslab-jl.emea.hpqcorp.net
-Z 385c3f356ea2ca57c797038c3564e84c
+P 1968382659aff27fd0fe03f019e32396c0e74c9c
+U jeff@bovine.net
+Z 33a99a15f77a8684d5f963fb317e7333
 # Remove this line to create a well-formed Fossil manifest.
