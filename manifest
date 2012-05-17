@@ -1,5 +1,5 @@
-C fix\sminor\sgrammar\stypo\sin\sdomDoc\n
-D 2011-12-20T00:54:50
+C Fixed\swrong\ssize\son\smemcpy\son\s64\sbit\s(when\ssizeof(int)!=sizeof(int*))\n
+D 2012-05-17T20:30:04
 F CHANGES 2e6ba51cc80a711e875b6db1d2326795216a4949
 F ChangeLog 970f3dfdf0877a26585f554f0657bbd42bee0acd
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -129,7 +129,7 @@ F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c b9543b7f1066118a5bcd0d2fa30acda6d247f15a
 F generic/domxpath.c 756cd0b1b7e1496ce605dfc049a872ba63365bc4
 F generic/domxpath.h 7e8429eba12dafe72cf9fe60c838db889ca4c7d1
-F generic/domxslt.c 205419502d0651beb5be7d6d17713f440224d622
+F generic/domxslt.c e26a720dfe0814e8115a58b255a6224a12b209a2
 F generic/domxslt.h 261176a8cb491de448189fcb9fa93bfcabda5e40
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -235,7 +235,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 1968382659aff27fd0fe03f019e32396c0e74c9c
-U jeff@bovine.net
-Z 33a99a15f77a8684d5f963fb317e7333
+P 22a1a70a314aced6838dd0cd8fbab044767de209
+U rolf@point.pointsman.de
+Z d33706bcb195a94d81b3b5a068f393f9
 # Remove this line to create a well-formed Fossil manifest.
