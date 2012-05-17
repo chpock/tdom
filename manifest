@@ -1,5 +1,5 @@
-C Fixed\swrong\ssize\son\smemcpy\son\s64\sbit\s(when\ssizeof(int)!=sizeof(int*))\n
-D 2012-05-17T20:30:04
+C Compatibility\swith\sTcl\s8.6\s-\sBeginning\swith\s8.6,\sinterp->errorLine\nisn't\spublic\svisible\sanymore\s(TIP\s330).\n
+D 2012-05-17T21:12:16
 F CHANGES 2e6ba51cc80a711e875b6db1d2326795216a4949
 F ChangeLog 970f3dfdf0877a26585f554f0657bbd42bee0acd
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -121,7 +121,7 @@ F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c ce5c166d3ecf8e8452d6899bae98d349bc4624e5
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
 F generic/dom.c f559dcf788c71142d98565366803af40ef198fb4
-F generic/dom.h 1e97da27969d4faccec912f332b2d9877076d835
+F generic/dom.h 0d762442419ad4583b594d8275e1809156ff16f3
 F generic/domalloc.c 55e9eeff19cc54cf3956a7013883ead07efd3593
 F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
 F generic/domhtml.c d80e84904e355ae1a5078461d1c91d6bc8591d10
@@ -135,7 +135,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c f048687d9a40a09eff1a6871707e87a2bf277f15
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
-F generic/tcldom.c 41617828313d4716360d47854d325c1bb0e540c5
+F generic/tcldom.c 0825516d87a3ee01c9736a38d98a41951a2cf103
 F generic/tcldom.h b1b1f6662c83849fb067d294d9d53bba6c07c22c
 F generic/tclexpat.c ac9139ffa611723ec751a2697eaf5e7e5c61734f
 F generic/tclexpat.h d6cf71d3528e65fb11c9823ffef59c9e3743f41e
@@ -235,7 +235,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 22a1a70a314aced6838dd0cd8fbab044767de209
+P c62dffee03dda9d09f1eb377b9c8eaab327f544f
 U rolf@point.pointsman.de
-Z d33706bcb195a94d81b3b5a068f393f9
+Z c384caf50128957e5135eca68acbf6b9
 # Remove this line to create a well-formed Fossil manifest.
