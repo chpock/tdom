@@ -1,7 +1,7 @@
-C Compatibility\swith\sTcl\s8.6\s-\sBeginning\swith\s8.6,\sinterp->errorLine\nisn't\spublic\svisible\sanymore\s(TIP\s330).\n
-D 2012-05-17T21:12:16
+C Updated\n
+D 2012-05-17T21:21:53
 F CHANGES 2e6ba51cc80a711e875b6db1d2326795216a4949
-F ChangeLog 970f3dfdf0877a26585f554f0657bbd42bee0acd
+F ChangeLog 5ade901c95b234cc85501f13eeee64443263f93a
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in f73951ceac2950882c568f272020f20ee09c8883
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -235,7 +235,7 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c62dffee03dda9d09f1eb377b9c8eaab327f544f
+P 411908be4f5277ef3fead3872034587b62c2704b
 U rolf@point.pointsman.de
-Z c384caf50128957e5135eca68acbf6b9
+Z 1bab499d9fef2da73982664aa9f20ac7
 # Remove this line to create a well-formed Fossil manifest.
