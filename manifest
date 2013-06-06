@@ -1,17 +1,17 @@
-C Update\sto\sexpat\s2.1.0.
-D 2013-05-16T00:03:38.226
+C Updated\sTEA\sfor\stdom\score.\stcldomsh\sseg\sfault\smakes\sthat\sretarded.
+D 2013-06-06T01:49:01.699
 F CHANGES c62cc9cdfd14a9170937aabdf9d459ad983eec45
 F ChangeLog 5ade901c95b234cc85501f13eeee64443263f93a
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
-F Makefile.in f73951ceac2950882c568f272020f20ee09c8883
+F Makefile.in d70f5f17f8a580c8c1de061ba769807a1af8eb6a
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
-F README ef5eb9652a1e9479708e1c5e3a3078ef54361ad5
+F README 898b19870f39b3014ede29f6e5ea8db1f592e429
 F README.AOL a4faf5f85723467a8d8ca406f8aca855a18441b1
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/xslt.tcl c0b218bdeae3d209bf6766ea8f01e174d33190f3
-F configure aa37c2fa1c4253c2d34eda4247940f7b6316bc05 x
+F configure c7db3237d7fcd3d29d6168678eb5f667cf1450c1 x
 F configure-tcl8.0.5 db1a666545d519c42e229d245224d456a84c798a x
-F configure.in faef225b29f1d74babf7154173fd10878e7a50ba
+F configure.in 3b25670bfcbf2c2fa2af5f5d38bb2fe3e0475f3e
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html 2e1a41b03d31f42dd00a0c449f7f28db6227bbf2
 F doc/dom.html b7bab0b6e2a570ef036e155a712d2da498c1842a
@@ -109,7 +109,7 @@ F extensions/tdomhtml/tdomhtml.tcl 7d48c19d50f203ee71b3db15d0fc6077dc244798
 F extensions/tnc/Makefile.in 6ef49788e056cece697d4c0c012245b97fc62a28
 F extensions/tnc/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
 F extensions/tnc/configure d5d0f57426f9dab83a3600891ef407717411bf35 x
-F extensions/tnc/configure.in 64527d4d9155e5939751eaa7d77b4fbb20902f01
+F extensions/tnc/configure.in 5bdd97df34b26fe15afd84c4ccf8ec006259323a
 F extensions/tnc/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F extensions/tnc/makefile.vc c8d5523cb2a2ced5fd41831e122f32e40df98d76
 F extensions/tnc/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
@@ -171,9 +171,9 @@ F mac/tDOM_OSX.prj.xml 7876d8fba0620fa19fac268b8f195fb70d70497c
 F mac/tnc.exp b5221cfee6631ca94e46626dcd5c54e7e9cde7ba
 F mac/tnc.r ce718255e902d882f872087908dcd234fdc9fa51
 F macosx/README 90fbbcf96747374a4c4a7b97766f0c6bafa7780e
-F tclconfig/README.txt 2be8064970040790733c3adc94cae41426d945a6
-F tclconfig/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
-F tclconfig/tcl.m4 bbd05ac99ff914d9acc349ad510ca4a2fd13999d
+F tclconfig/README.txt 180f4215d59309ec5645aa5f4565557dac484945
+F tclconfig/install-sh bdd5e293591621ae60d9824d86a4b1c5f22c3d00 x
+F tclconfig/tcl.m4 77652577e7a7c2ca5656a93e6fbfd61614846893
 F tdom.m4 16b2d73709211f7fce3c6c3ddfcd5c39b49132bb
 F tdomConfig.sh.in 5756c6b431179e49852a607cc2ca01e5381da905
 F tests/all-bench.tcl 38bc7b4c88f5d679b2fce6c9c2b2ea7d8ad18e90
@@ -222,7 +222,7 @@ F tests/xpath.bench 228b4b5bb2101bc425a4c7b206e2af03e4adaef2
 F tests/xpath.test 034c709485846d959dd206e028cfe73e1190dab7
 F tests/xslt.test 107f246169806545055f08425d5950d9efb0b6a5
 F unix/CONFIG 789192e463910e1b9dd7e65f6338390d2bf1f68a
-F unix/tclAppInit.c 4e6d456a0e9f83692f118cb8c940d061c95e83e3
+F unix/tclAppInit.c ab1a55428e4e64a11b1176fefcccb629ce5082ab
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F win/makefile.vc c02ca520821d6b575c7237d0a782391aa3916409
 F win/makefile805.vc 9456ed2d305d6231d930202f684929e967b05f40
@@ -235,8 +235,11 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a84222855971c9f1397f8126a0aba9dd03e20eca
-R 76d1daeeae3f57586403ba1e70850ca7
+P 90dd28722d5ab962fe0503808979d8a3aee0dced
+R f205c06e42063fd0e8288a4d441a7395
+T *branch * tea-update
+T *sym-tea-update *
+T -sym-trunk *
 U rolf
-Z e06108de9d314b96b7b5c6cfafcf0228
+Z 65d633aed30e241cae847c9cd77c9d33
 # Remove this line to create a well-formed Fossil manifest.
