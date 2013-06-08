@@ -1,9 +1,9 @@
-C Updated\sTEA\sfor\stdom\score.\stcldomsh\sseg\sfault\smakes\sthat\sretarded.
-D 2013-06-06T01:49:01.699
+C Started\stea\supdate\sof\sextensions.
+D 2013-06-08T12:15:32.931
 F CHANGES c62cc9cdfd14a9170937aabdf9d459ad983eec45
 F ChangeLog 5ade901c95b234cc85501f13eeee64443263f93a
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
-F Makefile.in d70f5f17f8a580c8c1de061ba769807a1af8eb6a
+F Makefile.in 353ba9b7489bae3d55e99f65022c6510789dc29e
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
 F README 898b19870f39b3014ede29f6e5ea8db1f592e429
 F README.AOL a4faf5f85723467a8d8ca406f8aca855a18441b1
@@ -106,11 +106,11 @@ F extensions/tdomhtml/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F extensions/tdomhtml/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
 F extensions/tdomhtml/pkgIndex.tcl.in 2612d2a8fd5a213a1379ad5570c229d82810dcb5
 F extensions/tdomhtml/tdomhtml.tcl 7d48c19d50f203ee71b3db15d0fc6077dc244798
-F extensions/tnc/Makefile.in 6ef49788e056cece697d4c0c012245b97fc62a28
+F extensions/tnc/Makefile.in fff10db0bbe3655dbf6e54ed9032fecb7d94ee9d
 F extensions/tnc/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
-F extensions/tnc/configure d5d0f57426f9dab83a3600891ef407717411bf35 x
-F extensions/tnc/configure.in 5bdd97df34b26fe15afd84c4ccf8ec006259323a
-F extensions/tnc/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
+F extensions/tnc/configure 187ad29af7418d594b04dbc4df8336a2276cf752 x
+F extensions/tnc/configure.in 8990fba96ca7f89fd3d4df3a6a40a45490ee2dea
+F extensions/tnc/install-sh bdd5e293591621ae60d9824d86a4b1c5f22c3d00 x
 F extensions/tnc/makefile.vc c8d5523cb2a2ced5fd41831e122f32e40df98d76
 F extensions/tnc/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
 F extensions/tnc/pkgIndex.tcl.in 6c224c2cdbb494f621ec008f96fe4a552a79a7b7
@@ -235,11 +235,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 90dd28722d5ab962fe0503808979d8a3aee0dced
-R f205c06e42063fd0e8288a4d441a7395
-T *branch * tea-update
-T *sym-tea-update *
-T -sym-trunk *
+P f5d136bd2fe656636f6e965268180f4671ac4c81
+R 0ab8f70ba9c9e9c8f981cc62fae75819
 U rolf
-Z 65d633aed30e241cae847c9cd77c9d33
+Z 9ab93fc6e12db4d92f84cd5c150d1cd9
 # Remove this line to create a well-formed Fossil manifest.
