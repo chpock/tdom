@@ -1,5 +1,5 @@
-C Started\stea\supdate\sof\sextensions.
-D 2013-06-08T12:15:32.931
+C More\swork\son\stea\supdate\sfor\sextensions.
+D 2013-06-13T21:29:29.556
 F CHANGES c62cc9cdfd14a9170937aabdf9d459ad983eec45
 F ChangeLog 5ade901c95b234cc85501f13eeee64443263f93a
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -86,20 +86,20 @@ F expat/xmltok.h 6d641f501819fe4454ac2a190de7c5708401e1a9
 F expat/xmltok_impl.c cbfe8fdfa343df14a0edab56620f15b3c317b4c8
 F expat/xmltok_impl.h cb8cce4d3f128dc013901010b462d852b4d4d804
 F expat/xmltok_ns.c 8aec1b3ad754d262d3b1ba44b3abb5171c3e21f8
-F extensions/example/Makefile.in 47ae1116b31d3abe63d45bacc895aaf9f214e9bc
+F extensions/example/Makefile.in fff10db0bbe3655dbf6e54ed9032fecb7d94ee9d
 F extensions/example/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
-F extensions/example/configure 9cf7de834983ae7a48b569a7a26a048e20a6ac26 x
-F extensions/example/configure.in a51caf34cd20f58ea37efefd7911a3126c22ef1a
-F extensions/example/example.c f02173d47391488af6038b6058b9a5a9fde033e5
-F extensions/example/exampletest.tcl 1a584be88a2e47d3147cfde5eff1b56b4d19525b
+F extensions/example/configure e0b85a7c1484c298cf43aed91b4452a3347126e7 x
+F extensions/example/configure.in 6064e7a99c4bb1296a4f1d00949ec603895cafd4
+F extensions/example/example.c a102b477f6237c24305566cc4c9d087dcea9b5c8
+F extensions/example/exampletest.tcl c699cc2c17a2baa598e56b2e760ddfaeb5769e8e
 F extensions/example/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F extensions/example/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
 F extensions/example/pkgIndex.tcl.in e6cc33c6f45df109209f4d8412cf2d5ea434e34e
 F extensions/example/tcl.m4 9404ac273b962ddaf946d3170c5183e55d0984b3
 F extensions/tdomhtml/CONFIG 7a3703be0e018ead9b6558ce6d82f356620dbfd8
 F extensions/tdomhtml/Makefile.in 1008fe906a0b7150e5b83f69e43a231886821db7
-F extensions/tdomhtml/configure 08aabaa397827a76ce6728f51ab71c3361c7e9a6 x
-F extensions/tdomhtml/configure.in e64b9e2e9ad075b03f748c31a675e250b017c816
+F extensions/tdomhtml/configure 860b39cea2e8d514bd1047c4b4dca061edcedc48 x
+F extensions/tdomhtml/configure.in 22c8425b9c44c0583ccbadaf3ea3cc7185987ceb
 F extensions/tdomhtml/doc/tdomhtml.n da39a3ee5e6b4b0d3255bfef95601890afd80709
 F extensions/tdomhtml/doc/tdomhtml.tmml da39a3ee5e6b4b0d3255bfef95601890afd80709
 F extensions/tdomhtml/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
@@ -108,15 +108,15 @@ F extensions/tdomhtml/pkgIndex.tcl.in 2612d2a8fd5a213a1379ad5570c229d82810dcb5
 F extensions/tdomhtml/tdomhtml.tcl 7d48c19d50f203ee71b3db15d0fc6077dc244798
 F extensions/tnc/Makefile.in fff10db0bbe3655dbf6e54ed9032fecb7d94ee9d
 F extensions/tnc/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
-F extensions/tnc/configure 187ad29af7418d594b04dbc4df8336a2276cf752 x
-F extensions/tnc/configure.in 8990fba96ca7f89fd3d4df3a6a40a45490ee2dea
+F extensions/tnc/configure 1dde3eac56f5775e7251643f7e3c34caf32fafe5 x
+F extensions/tnc/configure.in dd21abf5e009277f508ffae78c8f656a302bb3d8
 F extensions/tnc/install-sh bdd5e293591621ae60d9824d86a4b1c5f22c3d00 x
 F extensions/tnc/makefile.vc c8d5523cb2a2ced5fd41831e122f32e40df98d76
 F extensions/tnc/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
 F extensions/tnc/pkgIndex.tcl.in 6c224c2cdbb494f621ec008f96fe4a552a79a7b7
 F extensions/tnc/test.tcl 545cdec17e6702cef9f79184fdf1ce0166b8c412
 F extensions/tnc/tests/all.tcl 845c9dab65c294c3570f69cc731d6fef62efbd03
-F extensions/tnc/tests/loadtnc.tcl 418f1bbca50993a9fe012728b50f0f8080cff2ab
+F extensions/tnc/tests/loadtnc.tcl 5593f03afb20c5344f72d3770404667753a8b759
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c ce5c166d3ecf8e8452d6899bae98d349bc4624e5
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
@@ -235,8 +235,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f5d136bd2fe656636f6e965268180f4671ac4c81
-R 0ab8f70ba9c9e9c8f981cc62fae75819
+P d0ce231bf90e41310a9cd723bb5a3188e154ff29
+R f408e34af239c2969b0f2389535438a6
 U rolf
-Z 9ab93fc6e12db4d92f84cd5c150d1cd9
+Z 48870b8877d2df5c283e8e719a78087d
 # Remove this line to create a well-formed Fossil manifest.
