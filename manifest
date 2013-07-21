@@ -1,9 +1,9 @@
-C More\swork\son\stea\supdate\sfor\sextensions.
-D 2013-06-13T21:29:29.556
+C Build\sof\sworking\stcldomsh\sfinally\srestored.
+D 2013-07-21T15:25:55.820
 F CHANGES c62cc9cdfd14a9170937aabdf9d459ad983eec45
 F ChangeLog 5ade901c95b234cc85501f13eeee64443263f93a
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
-F Makefile.in 353ba9b7489bae3d55e99f65022c6510789dc29e
+F Makefile.in 3965f5b535b48290240151057611b376495aadec
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
 F README 898b19870f39b3014ede29f6e5ea8db1f592e429
 F README.AOL a4faf5f85723467a8d8ca406f8aca855a18441b1
@@ -222,7 +222,7 @@ F tests/xpath.bench 228b4b5bb2101bc425a4c7b206e2af03e4adaef2
 F tests/xpath.test 034c709485846d959dd206e028cfe73e1190dab7
 F tests/xslt.test 107f246169806545055f08425d5950d9efb0b6a5
 F unix/CONFIG 789192e463910e1b9dd7e65f6338390d2bf1f68a
-F unix/tclAppInit.c ab1a55428e4e64a11b1176fefcccb629ce5082ab
+F unix/tclAppInit.c a1655c51127aed18d069010f234a378fceacb2a6
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F win/makefile.vc c02ca520821d6b575c7237d0a782391aa3916409
 F win/makefile805.vc 9456ed2d305d6231d930202f684929e967b05f40
@@ -235,8 +235,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P d0ce231bf90e41310a9cd723bb5a3188e154ff29
-R f408e34af239c2969b0f2389535438a6
+P 7dab1bfb78975fe13f5e1f133371b962f5a93e27
+R cec46f895e8b7cd9730c9e568ffbc122
 U rolf
-Z 48870b8877d2df5c283e8e719a78087d
+Z d90d0151b270a271053cc59e6a21ddfe
 # Remove this line to create a well-formed Fossil manifest.
