@@ -1,5 +1,5 @@
-C Updated\sTEA\sbuild\ssystem\sof\stdom\sitself\sand\sthe\sextensions\s(merged\sfrom\sbranch\s"tea-update").
-D 2013-07-21T16:36:33.263
+C Test\sdocumenting\sthe\sseg\sfault\sreported\sby\shttps://github.com/tDOM/tdom/issues/16.
+D 2013-08-15T01:16:25.417
 F CHANGES c62cc9cdfd14a9170937aabdf9d459ad983eec45
 F ChangeLog 5ade901c95b234cc85501f13eeee64443263f93a
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -220,7 +220,7 @@ F tests/xmlsimple.test b9ca923fb971af2b6170f35a887922e488db928d
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.bench 228b4b5bb2101bc425a4c7b206e2af03e4adaef2
 F tests/xpath.test 034c709485846d959dd206e028cfe73e1190dab7
-F tests/xslt.test 107f246169806545055f08425d5950d9efb0b6a5
+F tests/xslt.test 6e45630052ea7d36c1714e89e4fdb4f673279a93
 F unix/CONFIG 789192e463910e1b9dd7e65f6338390d2bf1f68a
 F unix/tclAppInit.c a1655c51127aed18d069010f234a378fceacb2a6
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -235,8 +235,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 90dd28722d5ab962fe0503808979d8a3aee0dced 21aeb4698d9d23e9d8d015b174be0c443b46bcc5
-R aa6f291ddf31878d9510367e1e7dad90
+P 67628d28e2b2ce6c090966e37e84b9b16e91e2e8
+R de9130c3b61db0d61877edce49cc3494
 U rolf
-Z 742a58bdf370640eac2971997b00b2fe
+Z 6c63950d9879a665dcedee6f9df255cb
 # Remove this line to create a well-formed Fossil manifest.
