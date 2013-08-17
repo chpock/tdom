@@ -1,7 +1,7 @@
-C Fixed\smemory\scorruption\sin\scase\sof\sscripted\sxpath\sfunction\swith\san\sattribute\sas\scontext\snode\s(reported\sby\shttps://github.com/tDOM/tdom/issues/16).
-D 2013-08-16T14:59:28.789
-F CHANGES c62cc9cdfd14a9170937aabdf9d459ad983eec45
-F ChangeLog 5ade901c95b234cc85501f13eeee64443263f93a
+C Noted\sthe\sTEA\supdate\sin\sCHANGES.\sDeclared\sChangelog\sas\sobsolete.
+D 2013-08-17T12:49:50.820
+F CHANGES 9c018c818aa03b51e9ca61ca4daacab9a49b1867
+F ChangeLog 19fffd7ad46ca791bfad1bc0eeaca95d5bc9e519
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 3965f5b535b48290240151057611b376495aadec
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -235,8 +235,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 97f6f2f627d82e9e29ad07de027a01b47c7fd10d
-R 884e440da5716819593bd7b7a5f09f35
+P d5664646d62588d0828c30d67a56c87e50ba91eb
+R df56ff8bf9559514dd9bca063bf542fd
 U rolf
-Z de2438e642c59d023cbec83612529988
+Z daa75e6f990a5284bf10c0906f1aa488
 # Remove this line to create a well-formed Fossil manifest.
