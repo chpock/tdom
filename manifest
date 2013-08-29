@@ -1,5 +1,5 @@
-C Raise\sthe\slimit\sof\smaximum\snumber\sof\sdifferent\sxml\snamespace\sdeclarations\swithin\san\sxml\sdocument.
-D 2013-08-28T12:50:32.358
+C Added\sconfigure\sswitch\sto\sbuild\stdom\swith\sthe\sold\s(much\ssmaller)\slimit\sof\sdifferent\sXML\snamespace\sdeclarations\swithin\sone\sdocument\swhile\sbuilding\sa\sdom\stree\s(and\srestore\sthe\sold\slesser\smemory\sdemands).
+D 2013-08-29T14:44:44.728
 F CHANGES 9c018c818aa03b51e9ca61ca4daacab9a49b1867
 F ChangeLog 19fffd7ad46ca791bfad1bc0eeaca95d5bc9e519
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -9,9 +9,9 @@ F README 898b19870f39b3014ede29f6e5ea8db1f592e429
 F README.AOL a4faf5f85723467a8d8ca406f8aca855a18441b1
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/xslt.tcl c0b218bdeae3d209bf6766ea8f01e174d33190f3
-F configure c7db3237d7fcd3d29d6168678eb5f667cf1450c1 x
+F configure 884226e868c92b537044f8b862e5cbaaa02d833d x
 F configure-tcl8.0.5 db1a666545d519c42e229d245224d456a84c798a x
-F configure.in 3b25670bfcbf2c2fa2af5f5d38bb2fe3e0475f3e
+F configure.in 6ebf813c36d308f02470cee6c1b3373fd433f6e3
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html 2e1a41b03d31f42dd00a0c449f7f28db6227bbf2
 F doc/dom.html b7bab0b6e2a570ef036e155a712d2da498c1842a
@@ -174,7 +174,7 @@ F macosx/README 90fbbcf96747374a4c4a7b97766f0c6bafa7780e
 F tclconfig/README.txt 180f4215d59309ec5645aa5f4565557dac484945
 F tclconfig/install-sh bdd5e293591621ae60d9824d86a4b1c5f22c3d00 x
 F tclconfig/tcl.m4 77652577e7a7c2ca5656a93e6fbfd61614846893
-F tdom.m4 16b2d73709211f7fce3c6c3ddfcd5c39b49132bb
+F tdom.m4 e3e1d375233abace4462b7666ff77b166021015c
 F tdomConfig.sh.in 5756c6b431179e49852a607cc2ca01e5381da905
 F tests/all-bench.tcl 38bc7b4c88f5d679b2fce6c9c2b2ea7d8ad18e90
 F tests/all.tcl a8d5d3e3adc6713f64d0c614b927bd21ca8df870
@@ -235,11 +235,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 6c1a36e58f450b95ac99b190f238a64f5c980552
-R d0003b724b95b5f61d93f831ff71c6fb
-T *branch * more-xml-ns
-T *sym-more-xml-ns *
-T -sym-trunk *
+P a689b0c326c503da3d86628bb73d7012064de27d
+R 44500fd26bdcb9eaf2d9cd969ee3aba7
 U rolf
-Z e5f3bb42e843702efaf8d3a6c8647e8b
+Z 8e4c2d226aa4b75937b378f509d837b5
 # Remove this line to create a well-formed Fossil manifest.
