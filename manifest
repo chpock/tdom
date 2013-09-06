@@ -1,5 +1,5 @@
-C Raised\sthe\slimit\sof\smaximum\snumber\sof\sdifferent\sXML\snamespaceses\nwithin\sone\sDOM\stree\sto\swhat\sa\ssigned\sint\scan\shold.\sNew\sconfigure\nswitch\s--enable-lessns\srestores\sold\scode.\sThis\smay\smean\s(depending\son\nthe\sused\smalloc)\sthat\sthe\sDOM\stree\sof\san\sXML\sfile\smay\sneed\sa\sbit\smore\nmemory\s(even\sif\syou\sdon't\shave\sany\sXML\snamespace\sdeclaration\swithin\nyour\sdocuments)\sthan\sbefore.
-D 2013-08-31T18:23:20.403
+C Fixed\stoXPath,\swhich\sdidn't\sworked\sat\sall\sfor\snamespaced\snodes\swithout\na\sprefix\sand\swith\snamespaced\snodes\swith\sprefix\snot\sfor\spatholotical\ncases.\sBecause\sthe\sstring\sresult\sof\sthe\stoXPath\smethod\schanged\seven\sin\ncases,\swhich\sdid\swork\sthere\sis\sa\snew\soption\s-legacy,\sthat\sreturns\sthe\nold\sstring\svalue.The\s-legacy\soption\swill\sgo\saway,\sin\sfuture\sclean\sups,\nif\sit\sshow.
+D 2013-09-06T22:36:08.004
 F CHANGES c1c5e1bd7fcc14059abdfbe742ee8693f9c7db6c
 F ChangeLog 19fffd7ad46ca791bfad1bc0eeaca95d5bc9e519
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -127,15 +127,15 @@ F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
 F generic/domhtml.c ee07c45f886021e54a92d0bbe5bc6c575020d79e
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c b9543b7f1066118a5bcd0d2fa30acda6d247f15a
-F generic/domxpath.c 756cd0b1b7e1496ce605dfc049a872ba63365bc4
-F generic/domxpath.h 7e8429eba12dafe72cf9fe60c838db889ca4c7d1
+F generic/domxpath.c de6749f1c569c1458df3e6e43652074816d0600e
+F generic/domxpath.h 4a4e79af6478301643e69c4a98b99bec7e5eae49
 F generic/domxslt.c e26a720dfe0814e8115a58b255a6224a12b209a2
 F generic/domxslt.h 261176a8cb491de448189fcb9fa93bfcabda5e40
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c f048687d9a40a09eff1a6871707e87a2bf277f15
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
-F generic/tcldom.c 1bd3cb71b52662dd18ac10d88f448a2a2b3dcb07
+F generic/tcldom.c 8f7124b91678acf239907ba46b5034fc4c6acee7
 F generic/tcldom.h b1b1f6662c83849fb067d294d9d53bba6c07c22c
 F generic/tclexpat.c ac9139ffa611723ec751a2697eaf5e7e5c61734f
 F generic/tclexpat.h d6cf71d3528e65fb11c9823ffef59c9e3743f41e
@@ -203,7 +203,7 @@ F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.test a4e3d72b851558c2d79fc00ab682be78c9c821c1
 F tests/domDoc.test d2c9f2625549d1c8f4f392e3acafbb79a6d00c6b
 F tests/domNode.bench 25c205110bf8456202b7abe031abb72db8ae8db2
-F tests/domNode.test baff5c55f2e72703f6210a041c8344308408d82d
+F tests/domNode.test 51ae6e43cbffbe9a98aedef3c92a194060644626
 F tests/domnamespace.test 7f6ff7ee11a6cb437240c07be18adc11fd876d46
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
@@ -235,8 +235,11 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 6c1a36e58f450b95ac99b190f238a64f5c980552 dd4f2b0aaeac6fc5351e725e9e198442a74f90f7
-R 46991322fef90ef5cffc45ca8056a3bb
+P 981c0340e2a9fe293562b363cd71a88925430584
+R d9ac6c2722528d5556b1523e74e8f8c0
+T *branch * toXPath
+T *sym-toXPath *
+T -sym-trunk *
 U rolf
-Z 2644fb2037525bc472c91485875c1fec
+Z d27269bb1f739967b90e9f2a3e916b05
 # Remove this line to create a well-formed Fossil manifest.
