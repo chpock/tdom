@@ -1,5 +1,5 @@
-C Bug\sfix:\sapply-imports\scould\srun\swild,\sif\sthere\sis\san\soverwritten\ntemplate\swith\sthe\ssame\simport\sprecedence.
-D 2013-09-08T22:47:45.542
+C Skeleton\sto\srun\sthe\sOASIS\sxslt\s1.0\stest\ssuite.
+D 2013-09-08T23:32:31.756
 F CHANGES c1c5e1bd7fcc14059abdfbe742ee8693f9c7db6c
 F ChangeLog 19fffd7ad46ca791bfad1bc0eeaca95d5bc9e519
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -176,6 +176,7 @@ F tclconfig/install-sh bdd5e293591621ae60d9824d86a4b1c5f22c3d00 x
 F tclconfig/tcl.m4 77652577e7a7c2ca5656a93e6fbfd61614846893
 F tdom.m4 e3e1d375233abace4462b7666ff77b166021015c
 F tdomConfig.sh.in 5756c6b431179e49852a607cc2ca01e5381da905
+F tests/OASIS-suite.tcl 44ddc4b1e89a2405d33354fdc00c48dceba44529
 F tests/all-bench.tcl 38bc7b4c88f5d679b2fce6c9c2b2ea7d8ad18e90
 F tests/all.tcl a8d5d3e3adc6713f64d0c614b927bd21ca8df870
 F tests/attribute.test 53ac8fb043e79b638c8c6f5e7da848f6103552d6
@@ -235,8 +236,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 981c0340e2a9fe293562b363cd71a88925430584
-R b4460c49562fdb1ca5a16f907c447828
+P da559675c5df99f5d40563f0e693ec1c2ad91b10
+R ae5fff4f100b58afbfeb202bc948f885
 U rolf
-Z a987ae6fab32f75ca3b23abb9cd604fe
+Z 815646175c5899442c77148f12f16c13
 # Remove this line to create a well-formed Fossil manifest.
