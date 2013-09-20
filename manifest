@@ -1,5 +1,5 @@
-C Updated\sfrom\strunk.
-D 2013-09-20T21:18:52.759
+C More\stests.\sMinimal\sdocumentation.
+D 2013-09-20T23:35:41.260
 F CHANGES c1c5e1bd7fcc14059abdfbe742ee8693f9c7db6c
 F ChangeLog 19fffd7ad46ca791bfad1bc0eeaca95d5bc9e519
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -20,9 +20,9 @@ F doc/dom.xml 9dbbb9372f400918b3955fd411db4f8e0c9ab8a1
 F doc/domDoc.html fb860dd0a570e18e86e832ec9a657cf2cbe85caf
 F doc/domDoc.n 816ef5658c640581c00efd0b403889a41372f993
 F doc/domDoc.xml dca6969d1a7a88d8dd63db29dcf545aad31fab9f
-F doc/domNode.html f28b1ad10316cfadac3403d7b92844118113cf72
-F doc/domNode.n 0e765d7c4de07ccd45afa03380e860586c09a2f0
-F doc/domNode.xml 07b2602d2800767623af3dde011ad0f36c1474f3
+F doc/domNode.html dfbfbf8d08c697fb1b5828c9035b3d4cff09cc01
+F doc/domNode.n 775b5d43f4c4dd24f2ef3a86c069d2f2485a3a50
+F doc/domNode.xml 14f83ddbccc57d1e30bd1b1ca16c6854ffb4a950
 F doc/expat.html 257cc19bdf9df4e798bf4f7c6932332de983f81f
 F doc/expat.n d56bf5542ba2ae06e3850e75647a1931176df0a0
 F doc/expat.xml c1d7ffd536814ddcd137be95aa366cae5ad69a32
@@ -204,7 +204,7 @@ F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.test a4e3d72b851558c2d79fc00ab682be78c9c821c1
 F tests/domDoc.test d2c9f2625549d1c8f4f392e3acafbb79a6d00c6b
 F tests/domNode.bench 25c205110bf8456202b7abe031abb72db8ae8db2
-F tests/domNode.test d0dfffbc28878b4d2d7eff8e475d3e189d9252b9
+F tests/domNode.test 879b42884ea36e8c47f601967f071b72f29fabbf
 F tests/domnamespace.test 7f6ff7ee11a6cb437240c07be18adc11fd876d46
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
@@ -236,8 +236,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P e799d2e8c50960212912598017938c9381538727 5bb0267890697f88feb4031c52102f24f66916bd
-R 2e22c63d50ce058b6ce4d71db0eb2261
+P 697274d2320406a83a53b07a9a3476cf674b9f74
+R 545c24a0a27df76bf8a4b820aefba6e8
 U rolf
-Z c6d1ebc717c98def4115b30e77db48cb
+Z 4d8f1c3ed5762d10ec2eee36faf473f9
 # Remove this line to create a well-formed Fossil manifest.
