@@ -1,5 +1,5 @@
-C Basic\stmml\scleanup.
-D 2013-09-24T00:24:01.329
+C Added\sINDEX.MAP\sto\sbe\smore\sin\ssync\swith\sREADME.
+D 2013-09-24T00:27:57.611
 F CHANGES c1c5e1bd7fcc14059abdfbe742ee8693f9c7db6c
 F ChangeLog 19fffd7ad46ca791bfad1bc0eeaca95d5bc9e519
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -12,6 +12,7 @@ F apps/xslt.tcl ac4a75ba2f05e26d4ea6f92547983caa80fc6d55
 F configure 884226e868c92b537044f8b862e5cbaaa02d833d x
 F configure-tcl8.0.5 db1a666545d519c42e229d245224d456a84c798a x
 F configure.in 6ebf813c36d308f02470cee6c1b3373fd433f6e3
+F doc/INDEX.MAP 58c84dac5202a451c9a9b52a6646ee2682ebfc63
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html 2e1a41b03d31f42dd00a0c449f7f28db6227bbf2
 F doc/dom.html b7bab0b6e2a570ef036e155a712d2da498c1842a
@@ -236,8 +237,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 80ce5f7895a2f83e5ecb3af1c1a8230562646fe3
-R d4b9ced80719cfee136c0a7e77f2a4a6
+P b1f1aba98e049858cf028a22921dea4b64f82740
+R bf1f355a9ae9b28e343bbf4897ccbd1d
 U rolf
-Z c2c5892f144982e74247870cb5036f1a
+Z f1f50427a4e14285b1f583d06f7d5378
 # Remove this line to create a well-formed Fossil manifest.
