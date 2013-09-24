@@ -1,5 +1,5 @@
-C Integrated\stoXPath\sbug\sfix.
-D 2013-09-20T23:44:47.116
+C Editorial\schange.
+D 2013-09-24T00:20:38.667
 F CHANGES c1c5e1bd7fcc14059abdfbe742ee8693f9c7db6c
 F ChangeLog 19fffd7ad46ca791bfad1bc0eeaca95d5bc9e519
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -204,7 +204,7 @@ F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.test a4e3d72b851558c2d79fc00ab682be78c9c821c1
 F tests/domDoc.test d2c9f2625549d1c8f4f392e3acafbb79a6d00c6b
 F tests/domNode.bench 25c205110bf8456202b7abe031abb72db8ae8db2
-F tests/domNode.test 879b42884ea36e8c47f601967f071b72f29fabbf
+F tests/domNode.test 38f4a2c13422b3b9f5cb0bbe43681d6f38ef13b8
 F tests/domnamespace.test 7f6ff7ee11a6cb437240c07be18adc11fd876d46
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
@@ -236,9 +236,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 5bb0267890697f88feb4031c52102f24f66916bd 9da0732eb41ac11b83a8594cab170dad52a2a02f
-R 545c24a0a27df76bf8a4b820aefba6e8
-T +closed 9da0732eb41ac11b83a8594cab170dad52a2a02f
+P 85d99b56afae51a7e2129c3f06ee89f6d16fbaf6
+R e3ba74d7371820e42cd2a505e4434fd8
 U rolf
-Z 9bca31dc50b9be081aa15b3ea6a5fb84
+Z 73d9df7b4fde0fbb0950bacdd718bdcb
 # Remove this line to create a well-formed Fossil manifest.
