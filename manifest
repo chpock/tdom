@@ -1,5 +1,5 @@
-C Editorial\schange.
-D 2013-09-24T00:20:38.667
+C Basic\stmml\scleanup.
+D 2013-09-24T00:24:01.329
 F CHANGES c1c5e1bd7fcc14059abdfbe742ee8693f9c7db6c
 F ChangeLog 19fffd7ad46ca791bfad1bc0eeaca95d5bc9e519
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -19,23 +19,23 @@ F doc/dom.n 8e1b80d9fc9efb0724cb965de18ef09ed3b19d1b
 F doc/dom.xml 9dbbb9372f400918b3955fd411db4f8e0c9ab8a1
 F doc/domDoc.html fb860dd0a570e18e86e832ec9a657cf2cbe85caf
 F doc/domDoc.n 816ef5658c640581c00efd0b403889a41372f993
-F doc/domDoc.xml dca6969d1a7a88d8dd63db29dcf545aad31fab9f
+F doc/domDoc.xml ebf9a26ae90f0ea0ed59cbe32e06ef509bbe29a6
 F doc/domNode.html dfbfbf8d08c697fb1b5828c9035b3d4cff09cc01
 F doc/domNode.n 775b5d43f4c4dd24f2ef3a86c069d2f2485a3a50
-F doc/domNode.xml 14f83ddbccc57d1e30bd1b1ca16c6854ffb4a950
+F doc/domNode.xml c0d5956de3b77b70a5381468962dec6e4e0174b6
 F doc/expat.html 257cc19bdf9df4e798bf4f7c6932332de983f81f
 F doc/expat.n d56bf5542ba2ae06e3850e75647a1931176df0a0
-F doc/expat.xml c1d7ffd536814ddcd137be95aa366cae5ad69a32
+F doc/expat.xml 8718c1981c3cb0459ca37fd16e60136579c2a510
 F doc/expatapi.html c689ffde7bfb30b92af495dddd5bcb86833bee94
 F doc/expatapi.n 6b56b9d897f32d15a7cdac0e0c9b8c636c5b8d56
-F doc/expatapi.xml d93d1ea7d4fbacd0729e731147a96e74863fdde9
+F doc/expatapi.xml 82ad1cfa27e60658976cb03d8e7a11d42558651b
 F doc/index.html 0fa236da33e1f5c60b5fb5111a9126fc0f345a2f
 F doc/keyword-index.html ae424b292a1efb90fbb7ad6fff7d01b35bc3c5af
 F doc/manpage.css 355082613fb5f65df33a8f5f8edd6b6e02dad84c
 F doc/tDOM.xml 35369df6a7d84d68cfb28692530ef9d1a8b8ca3e
 F doc/tdomcmd.html 29c11ba958dc7c59fee2908067080d30e4415bf0
 F doc/tdomcmd.n 087bbf0cf783376e39ff903a48bc377ce507b8f3
-F doc/tdomcmd.xml 1a3ad802ff6a3cc4c473f8a0e7f83fe1400d780c
+F doc/tdomcmd.xml fa7bb2424b54e7180148f53557f4059673103c9a
 F doc/tmml.dtd 63259dc9f69f9104f1515be445b85b195a1fb990
 F doc/tmml.options b6deacf4d680fde4b90bc620161c1b151c5a5bc7
 F doc/tnc.html e6ae47ff697f2280227fce945f39c0e2f6ac9d03
@@ -236,8 +236,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 85d99b56afae51a7e2129c3f06ee89f6d16fbaf6
-R e3ba74d7371820e42cd2a505e4434fd8
+P 80ce5f7895a2f83e5ecb3af1c1a8230562646fe3
+R d4b9ced80719cfee136c0a7e77f2a4a6
 U rolf
-Z 73d9df7b4fde0fbb0950bacdd718bdcb
+Z c2c5892f144982e74247870cb5036f1a
 # Remove this line to create a well-formed Fossil manifest.
