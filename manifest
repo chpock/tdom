@@ -1,5 +1,5 @@
-C Document\sgithub\sissue\s14.
-D 2013-11-02T00:33:14.490
+C Corrected\ssome\stest\snames.
+D 2013-11-03T01:07:06.951
 F CHANGES e57d820a26f56d2d794a90b31c276e99c0d7bd60
 F ChangeLog 19fffd7ad46ca791bfad1bc0eeaca95d5bc9e519
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -206,7 +206,7 @@ F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.test bfb6e9034d1eaaacd6ca3256734df703dbf89242
 F tests/domDoc.test d2c9f2625549d1c8f4f392e3acafbb79a6d00c6b
 F tests/domNode.bench 25c205110bf8456202b7abe031abb72db8ae8db2
-F tests/domNode.test c49b1f8fdcd49f9767299145895c0de63f5199ce
+F tests/domNode.test 4f5c78e62ce12e5f9b58e806d0d568370ed4704c
 F tests/domnamespace.test 7f6ff7ee11a6cb437240c07be18adc11fd876d46
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 9ab65ed6fc1bd4181b1a2c41aadc1a5e55cb0db8
-R f79a5f809efbb87444368d110b072800
+P d2c4737409fcb4e4f3fd0e1f442b8a7c729a0298
+R 32c4ebf900c7a0055745b6e6e7f15a3b
 U rolf
-Z 2860b94dd8617a245f25ea24869727f8
+Z 611f3a4e11d0ccdd68d1084906679568
 # Remove this line to create a well-formed Fossil manifest.
