@@ -1,5 +1,5 @@
-C Corrected\ssome\stest\snames.
-D 2013-11-03T01:07:06.951
+C Improved\shandling\sof\snode\sdeletion\sin\smt\sbuilds\s(fixed\smemory\scorruption,\sif\sdocument\sis\sattached\smore\sthan\sone\stime\sand\sdeleted\snode\sis\sother\sthan\sELEMENT_NODE\stype,\sfixed\smemory\sclean\sup).\sStill\sroom\sfor\simprovement.
+D 2013-11-03T22:06:09.593
 F CHANGES e57d820a26f56d2d794a90b31c276e99c0d7bd60
 F ChangeLog 19fffd7ad46ca791bfad1bc0eeaca95d5bc9e519
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -122,8 +122,8 @@ F extensions/tnc/tests/loadtnc.tcl 5593f03afb20c5344f72d3770404667753a8b759
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c ce5c166d3ecf8e8452d6899bae98d349bc4624e5
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
-F generic/dom.c 091fd9d18467eb95274f0ae82416f83f69e12a4e
-F generic/dom.h 67e604979131855b5dac364053b146481838b242
+F generic/dom.c 4b5f809926f5c579ba1364ce80b9a89baf29ceaa
+F generic/dom.h 5ce0dacba20c3d80eae8396e98e6ab112dbf1877
 F generic/domalloc.c 55e9eeff19cc54cf3956a7013883ead07efd3593
 F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
 F generic/domhtml.c ee07c45f886021e54a92d0bbe5bc6c575020d79e
@@ -206,7 +206,7 @@ F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.test bfb6e9034d1eaaacd6ca3256734df703dbf89242
 F tests/domDoc.test d2c9f2625549d1c8f4f392e3acafbb79a6d00c6b
 F tests/domNode.bench 25c205110bf8456202b7abe031abb72db8ae8db2
-F tests/domNode.test 4f5c78e62ce12e5f9b58e806d0d568370ed4704c
+F tests/domNode.test 801f176e6abf5eefcc69d72ff898c7b8c8d9d660
 F tests/domnamespace.test 7f6ff7ee11a6cb437240c07be18adc11fd876d46
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P d2c4737409fcb4e4f3fd0e1f442b8a7c729a0298
-R 32c4ebf900c7a0055745b6e6e7f15a3b
+P 10f0972864bfdebad691a13d7510c579c4eebdb3
+R be265c55890ed908b54850c91fdea829
 U rolf
-Z 611f3a4e11d0ccdd68d1084906679568
+Z f29bf7ba5838fea1f6fc9b01e92b3aa4
 # Remove this line to create a well-formed Fossil manifest.
