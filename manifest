@@ -1,5 +1,5 @@
-C Improved\shandling\sof\snode\sdeletion\sin\smt\sbuilds\s(fixed\smemory\scorruption,\sif\sdocument\sis\sattached\smore\sthan\sone\stime\sand\sdeleted\snode\sis\sother\sthan\sELEMENT_NODE\stype,\sfixed\smemory\sclean\sup).\sStill\sroom\sfor\simprovement.
-D 2013-11-03T22:06:09.593
+C Make\stdom\scross-compile\son\slinux\sfor\swindows\s(w32/w64)\swith\smingw-w64.
+D 2013-12-04T23:39:33.185
 F CHANGES e57d820a26f56d2d794a90b31c276e99c0d7bd60
 F ChangeLog 19fffd7ad46ca791bfad1bc0eeaca95d5bc9e519
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -120,7 +120,7 @@ F extensions/tnc/test.tcl 545cdec17e6702cef9f79184fdf1ce0166b8c412
 F extensions/tnc/tests/all.tcl 845c9dab65c294c3570f69cc731d6fef62efbd03
 F extensions/tnc/tests/loadtnc.tcl 5593f03afb20c5344f72d3770404667753a8b759
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
-F extensions/tnc/tnc.c ce5c166d3ecf8e8452d6899bae98d349bc4624e5
+F extensions/tnc/tnc.c f6344d94a0b2a0c7d779d154fde296b027e79524
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
 F generic/dom.c 4b5f809926f5c579ba1364ce80b9a89baf29ceaa
 F generic/dom.h 5ce0dacba20c3d80eae8396e98e6ab112dbf1877
@@ -138,9 +138,9 @@ F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c f048687d9a40a09eff1a6871707e87a2bf277f15
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
 F generic/tcldom.c 903855c6e886c0513f1320a261c0709239705f7f
-F generic/tcldom.h b1b1f6662c83849fb067d294d9d53bba6c07c22c
+F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
 F generic/tclexpat.c ac9139ffa611723ec751a2697eaf5e7e5c61734f
-F generic/tclexpat.h d6cf71d3528e65fb11c9823ffef59c9e3743f41e
+F generic/tclexpat.h 3d6bba349c0f6757c85ab6e7c59cf9bdf48b1d6b
 F generic/tdom.decls d825af72ec3fd2ae4ebb1d7f883bde6e3613c914
 F generic/tdom.h ce5839cdddbde35ac016a6033415c73082b2f87c
 F generic/tdomDecls.h dd20e4afe55f21c8a845bc593806fa2d606b18eb
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 10f0972864bfdebad691a13d7510c579c4eebdb3
-R be265c55890ed908b54850c91fdea829
+P a77a36200332d768d565c7c50708aae645b01bba
+R a2db3be6f4024630111c854866c28984
 U rolf
-Z f29bf7ba5838fea1f6fc9b01e92b3aa4
+Z 41f349fe1472e734f4af16146b57de06
 # Remove this line to create a well-formed Fossil manifest.
