@@ -1,5 +1,5 @@
-C Make\stdom\scross-compile\son\slinux\sfor\swindows\s(w32/w64)\swith\smingw-w64.
-D 2013-12-04T23:39:33.185
+C Gardening.
+D 2013-12-05T00:33:32.594
 F CHANGES e57d820a26f56d2d794a90b31c276e99c0d7bd60
 F ChangeLog 19fffd7ad46ca791bfad1bc0eeaca95d5bc9e519
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -92,7 +92,7 @@ F extensions/example/Makefile.in fff10db0bbe3655dbf6e54ed9032fecb7d94ee9d
 F extensions/example/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
 F extensions/example/configure e0b85a7c1484c298cf43aed91b4452a3347126e7 x
 F extensions/example/configure.in 6064e7a99c4bb1296a4f1d00949ec603895cafd4
-F extensions/example/example.c 6439233d81d03a6ed09577107e0785927422572e
+F extensions/example/example.c a8d16832ce63ed38438e6d0ef12299c288bce3f4
 F extensions/example/exampletest.tcl c699cc2c17a2baa598e56b2e760ddfaeb5769e8e
 F extensions/example/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F extensions/example/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
@@ -118,9 +118,9 @@ F extensions/tnc/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
 F extensions/tnc/pkgIndex.tcl.in 6c224c2cdbb494f621ec008f96fe4a552a79a7b7
 F extensions/tnc/test.tcl 545cdec17e6702cef9f79184fdf1ce0166b8c412
 F extensions/tnc/tests/all.tcl 845c9dab65c294c3570f69cc731d6fef62efbd03
-F extensions/tnc/tests/loadtnc.tcl 5593f03afb20c5344f72d3770404667753a8b759
+F extensions/tnc/tests/loadtnc.tcl cfa540b5ef97905dbb1776d833e7c004236ec958
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
-F extensions/tnc/tnc.c f6344d94a0b2a0c7d779d154fde296b027e79524
+F extensions/tnc/tnc.c 2fbb29213aa05f68ed59ea00e0b5adb30c6fa5f4
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
 F generic/dom.c 4b5f809926f5c579ba1364ce80b9a89baf29ceaa
 F generic/dom.h 5ce0dacba20c3d80eae8396e98e6ab112dbf1877
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a77a36200332d768d565c7c50708aae645b01bba
-R a2db3be6f4024630111c854866c28984
+P 0026eb9d33eda3e43eb390a8c156095ec686c330
+R 3413ad4c358dc389228f866bdf9e9389
 U rolf
-Z 41f349fe1472e734f4af16146b57de06
+Z 4bfef3cc69f186e30ab20007cdb1c94c
 # Remove this line to create a well-formed Fossil manifest.
