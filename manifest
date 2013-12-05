@@ -1,5 +1,5 @@
-C Gardening.
-D 2013-12-05T00:33:32.594
+C More\sgardening\s...\s:-}
+D 2013-12-05T00:35:49.601
 F CHANGES e57d820a26f56d2d794a90b31c276e99c0d7bd60
 F ChangeLog 19fffd7ad46ca791bfad1bc0eeaca95d5bc9e519
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -118,7 +118,7 @@ F extensions/tnc/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
 F extensions/tnc/pkgIndex.tcl.in 6c224c2cdbb494f621ec008f96fe4a552a79a7b7
 F extensions/tnc/test.tcl 545cdec17e6702cef9f79184fdf1ce0166b8c412
 F extensions/tnc/tests/all.tcl 845c9dab65c294c3570f69cc731d6fef62efbd03
-F extensions/tnc/tests/loadtnc.tcl cfa540b5ef97905dbb1776d833e7c004236ec958
+F extensions/tnc/tests/loadtnc.tcl 9472a546f30972f5ea6d16880ed57e709556ce88
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c 2fbb29213aa05f68ed59ea00e0b5adb30c6fa5f4
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 0026eb9d33eda3e43eb390a8c156095ec686c330
-R 3413ad4c358dc389228f866bdf9e9389
+P 8d14c9884b9eb3037e43d1d1be48c102d00a4513
+R 192128060ee9c9abaaa29b5fa5a75db2
 U rolf
-Z 4bfef3cc69f186e30ab20007cdb1c94c
+Z a82c2ba0923b2fd5e67656a0012c3590
 # Remove this line to create a well-formed Fossil manifest.
