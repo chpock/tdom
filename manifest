@@ -1,5 +1,5 @@
-C Worked\sthrough\scompiler\swarnings,\sremoved\sor\scleand\sup\ssome\scruft.\sLess\snoisier\sbuild\s(at\sleast\sfor\smy\scurrent\stool\schain).
-D 2013-12-06T23:12:19.661
+C New\sfeature:\sparsing\smay\sbe\saborted\sby\sthe\sapplication.\sDom\sbuilding\swill\sbe\saborted\sby\sreturning\snon\sTCL_OK\sfrom\sfeedback\scmd\s(nc).
+D 2013-12-08T22:58:35.018
 F CHANGES e57d820a26f56d2d794a90b31c276e99c0d7bd60
 F ChangeLog 19fffd7ad46ca791bfad1bc0eeaca95d5bc9e519
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -122,7 +122,7 @@ F extensions/tnc/tests/loadtnc.tcl 9472a546f30972f5ea6d16880ed57e709556ce88
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c e30dc44a8be8b99c9772daf5cafb3714d8550c37
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
-F generic/dom.c 2da55119849a2cfb40e75dbde2e65f0f4fdb440a
+F generic/dom.c 961525c3719b27a03152a8876338b36a3df33ffe
 F generic/dom.h 5ce0dacba20c3d80eae8396e98e6ab112dbf1877
 F generic/domalloc.c 55e9eeff19cc54cf3956a7013883ead07efd3593
 F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
@@ -238,8 +238,11 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P d168f6f959b90d177c4e242b88fe106539db55da
-R 0dfc845f9f8919d0f445ad05b1f89781
+P 99765c41e56650f0935ed683e16d2a9009624643
+R 6111f14b9961b9c95fa78b0b1b65425e
+T *branch * abortableParse
+T *sym-abortableParse *
+T -sym-trunk *
 U rolf
-Z e056a5866d1e146efc4aa88cdfbc7d24
+Z 99f92957a2d383c987ca3bfa248d9ba2
 # Remove this line to create a well-formed Fossil manifest.
