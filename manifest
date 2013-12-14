@@ -1,5 +1,5 @@
-C Fixes\sand\simprovements\sin\scase\sof\sexternal\sentities.
-D 2013-12-14T15:40:57.719
+C Added\sanother\stest.
+D 2013-12-14T15:45:14.092
 F CHANGES e57d820a26f56d2d794a90b31c276e99c0d7bd60
 F ChangeLog 19fffd7ad46ca791bfad1bc0eeaca95d5bc9e519
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -203,7 +203,7 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
-F tests/dom.test 9ffd6492a71b5ff2b04a6a564c84807405bad951
+F tests/dom.test f42ee303e73de50c248a24463c5a6ab8d885574c
 F tests/domDoc.test d2c9f2625549d1c8f4f392e3acafbb79a6d00c6b
 F tests/domNode.bench 25c205110bf8456202b7abe031abb72db8ae8db2
 F tests/domNode.test 801f176e6abf5eefcc69d72ff898c7b8c8d9d660
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P b9ee71529961bdec348c5ce51ea900499d39b0a4
-R e2bd3bf42bf8f4e84ec2b7aa7590b182
+P 5cdd39dc5a3b059215f90bb59427f40becdd1617
+R e8171dca1d2de0cd68853a27d3dee08a
 U rolf
-Z c8f019713c17052f4c4576df67222940
+Z 94af512432f2ba42dcbe11cda7fa0253
 # Remove this line to create a well-formed Fossil manifest.
