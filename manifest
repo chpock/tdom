@@ -1,5 +1,5 @@
-C Futher\swork.
-D 2013-12-14T02:50:42.621
+C Fixes\sand\simprovements\sin\scase\sof\sexternal\sentities.
+D 2013-12-14T15:40:57.719
 F CHANGES e57d820a26f56d2d794a90b31c276e99c0d7bd60
 F ChangeLog 19fffd7ad46ca791bfad1bc0eeaca95d5bc9e519
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -122,7 +122,7 @@ F extensions/tnc/tests/loadtnc.tcl 9472a546f30972f5ea6d16880ed57e709556ce88
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c e30dc44a8be8b99c9772daf5cafb3714d8550c37
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
-F generic/dom.c 40dca8ca327f72975f180173941b6d39c6070cf8
+F generic/dom.c 46b2c9e5d7452bffdc60591becd286f34f01db4c
 F generic/dom.h ef7967a6c8e51515fb72c9f2d047e4326a6b8b39
 F generic/domalloc.c 55e9eeff19cc54cf3956a7013883ead07efd3593
 F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
@@ -203,7 +203,7 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
-F tests/dom.test 9dc26f71899fb061183065654f8ce7ec495dc550
+F tests/dom.test 9ffd6492a71b5ff2b04a6a564c84807405bad951
 F tests/domDoc.test d2c9f2625549d1c8f4f392e3acafbb79a6d00c6b
 F tests/domNode.bench 25c205110bf8456202b7abe031abb72db8ae8db2
 F tests/domNode.test 801f176e6abf5eefcc69d72ff898c7b8c8d9d660
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P fd2b6b294aa08cdfd09119757250c2adccb7752c
-R da7a3c13fae6efa7e08eb60219980b67
+P b9ee71529961bdec348c5ce51ea900499d39b0a4
+R e2bd3bf42bf8f4e84ec2b7aa7590b182
 U rolf
-Z 4e9c96bd53208b6476fe12098ded11a6
+Z c8f019713c17052f4c4576df67222940
 # Remove this line to create a well-formed Fossil manifest.
