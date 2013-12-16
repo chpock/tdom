@@ -1,5 +1,5 @@
-C Improved\serror\smsg\shandling\sfor\srecursive\sexternal\sentities.
-D 2013-12-16T01:12:05.824
+C Correted\stest\sdescription.
+D 2013-12-16T10:37:38.135
 F CHANGES e57d820a26f56d2d794a90b31c276e99c0d7bd60
 F ChangeLog 19fffd7ad46ca791bfad1bc0eeaca95d5bc9e519
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -203,7 +203,7 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
-F tests/dom.test e734fa4b191c6d217efeb1b9c6a9b4c900c74731
+F tests/dom.test 84e8dcd5d050d00e0e5b662682f73aaf45ef46ee
 F tests/domDoc.test d2c9f2625549d1c8f4f392e3acafbb79a6d00c6b
 F tests/domNode.bench 25c205110bf8456202b7abe031abb72db8ae8db2
 F tests/domNode.test 801f176e6abf5eefcc69d72ff898c7b8c8d9d660
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 847fe0e7c5d7fa71304474d12aeacab457aa162e
-R 96a2a0727f380a958df1978292079e05
+P 4b9e2193350fedc17618a86ac40c98f1cbbb4acc
+R 67126d95208d5bbcb14d618b413dd438
 U rolf
-Z d13e6b291bf5c2e618634205d1ce7a77
+Z 50a0e1df532a7a2f782a760719bc2881
 # Remove this line to create a well-formed Fossil manifest.
