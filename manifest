@@ -1,7 +1,7 @@
-C Updated\sCHANGES.
-D 2013-12-20T14:28:57.030
+C Added\spointer\sto\sthe\sCHANGES\sfile.
+D 2013-12-20T14:36:53.456
 F CHANGES 60eb4f70ac31f48d5c496df7d372c1eceb048c79
-F ChangeLog 19fffd7ad46ca791bfad1bc0eeaca95d5bc9e519
+F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 3965f5b535b48290240151057611b376495aadec
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 611c50075f5a7fdbc41cf0afb496d8f73d72437f
-R 893fe4a669bf24fa9859f3aff665974d
+P 38bc0537ec738587a9f63cad53274edcc65618b5
+R 7083d262c6625a395c9e533cbd3a5914
 U rolf
-Z 59870e3ac38acee335db0b97a9fc785a
+Z bcca527e668efd61fbb73bb4a30931e2
 # Remove this line to create a well-formed Fossil manifest.
