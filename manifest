@@ -1,6 +1,6 @@
-C Added\soption\s-feedbackcmd\sto\sthe\sdom\sparse\smethod.\sThis\soption\sallows\sto\sspecify\sa\sscript,\swhich\swill\sbe\scalled\sas\sfeedback\scommand.\sFor\sbackward\scompatibility,\sif\sno\s-feedbackcmd\sis\sgiven,\sbut\sthere\sis\sa\stcl\sproc\snamed\s::dom::domParseFeedback\sthen\sthis\sproc\sis\sused\sas\s-feedbackcmd.\sIf\sthere\sisn't\ssuch\sa\sproc\sand\s-feedbackAfter\sis\sused,\sit\sis\san\serror\sto\snot\salso\suse\s-feedbackcmd.\sA\sreturn\s-code\sbreak\sfrom\sthe\s-feedbackcmd\scauses\sthe\sparser\sto\salmost\simmediatly\sabort\sparsing\sand\slet\sthe\s[dom\sparse]\scall\sreturn\sthe\sempty\sstring\s(instead\sof\sa\sdocument)\sand\sno\serror.\sFor\sexpat\sparser\sobjects:\sIf\sa\shandler\sscript\sreturns\s-code\sreturn,\sthen\sparsing\sis\saborted,\sbut\sno\serror\sis\sraised.
-D 2013-12-20T14:09:37.539
-F CHANGES e57d820a26f56d2d794a90b31c276e99c0d7bd60
+C Updated\sCHANGES.
+D 2013-12-20T14:28:57.030
+F CHANGES 60eb4f70ac31f48d5c496df7d372c1eceb048c79
 F ChangeLog 19fffd7ad46ca791bfad1bc0eeaca95d5bc9e519
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 3965f5b535b48290240151057611b376495aadec
@@ -238,9 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 99765c41e56650f0935ed683e16d2a9009624643 55c9bb16813490cb2be213884b9da004d066aac0
-R 851aedf3cf25bcb0e4c5e9dc38f5f414
-T +closed 55c9bb16813490cb2be213884b9da004d066aac0
+P 611c50075f5a7fdbc41cf0afb496d8f73d72437f
+R 893fe4a669bf24fa9859f3aff665974d
 U rolf
-Z d6dc2c21786b451d61c2ba488e1cd63c
+Z 59870e3ac38acee335db0b97a9fc785a
 # Remove this line to create a well-formed Fossil manifest.
