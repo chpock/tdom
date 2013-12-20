@@ -1,5 +1,5 @@
-C Added\soption\s-feedbackcmd\sto\sthe\sdom\sparse\smethod.\sThis\soption\sallows\sto\sspecify\sa\sscript,\swhich\swill\sbe\scalled\sas\sfeedback\scommand.\sFor\sbackward\scompatibility,\sif\sno\s-feedbackcmd\sis\sgiven,\sbut\sthere\sis\sa\stcl\sproc\snamed\s::dom::domParseFeedback\sthen\sthis\sproc\sis\sused\sas\s-feedbackcmd.\sIf\sthere\sisn't\ssuch\sa\sproc\sand\s-feedbackAfter\sis\sused,\sit\sis\san\serror\sto\snot\salso\suse\s-feedbackcmd.
-D 2013-12-19T18:31:43.889
+C Added\sdocumentation\sfor\s-feedbackcmd.
+D 2013-12-20T01:48:01.368
 F CHANGES e57d820a26f56d2d794a90b31c276e99c0d7bd60
 F ChangeLog 19fffd7ad46ca791bfad1bc0eeaca95d5bc9e519
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -15,9 +15,9 @@ F configure.in 6ebf813c36d308f02470cee6c1b3373fd433f6e3
 F doc/INDEX.MAP 58c84dac5202a451c9a9b52a6646ee2682ebfc63
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html 2e1a41b03d31f42dd00a0c449f7f28db6227bbf2
-F doc/dom.html 6447838f44bf17eee5e75ce7f71f54565284a687
-F doc/dom.n 9810e4317b2fb37c1fb5178fd4cf9eba1457da85
-F doc/dom.xml 65e024815d6f50c1fc198308e4337e20e7266c91
+F doc/dom.html aeb70f5cd593f961d2722edc67b1e57e9291ef13
+F doc/dom.n 63ea696683531ea59f7cbe8e022eeb7cd3ab2920
+F doc/dom.xml 21d3a8b0c9a48c34bd0fe866fbe3654a9e7836a1
 F doc/domDoc.html 4be0105bdf49a5a921ea4450c0c7a60faba1fcf5
 F doc/domDoc.n 56f3c13de7161ad958b73273d5106ac585879f94
 F doc/domDoc.xml ebf9a26ae90f0ea0ed59cbe32e06ef509bbe29a6
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 7e27b29b15cd16cae97840e9a6f837f3d353b447
-R 3b4c41203ea2b50b6be297f947738f97
+P db8378c2504800fc40c161707943485e5ecd8790
+R 9dd96936556bde18c4868aa9a3e462cf
 U rolf
-Z 581a4222ce4360a42e8f40d392a3d49e
+Z 65e2b7373123e5b16b79b6e041923aff
 # Remove this line to create a well-formed Fossil manifest.
