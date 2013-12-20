@@ -1,5 +1,5 @@
-C Handler\sscript\sreturn\scodes\sother\sthan\s-code\sok,\s-code\scontinue\sor\s-code\sbreak\scauses\sparse\sabort\s(via\sXML_StopParser).\sNew\sfeature:\sIf\sa\shandler\sscript\sreturns\s-code\sreturn,\sthen\sparsing\sis\saborted,\sbut\sno\serror\sis\sraised.
-D 2013-12-20T03:45:59.565
+C Documented\sbehaviour\sof\sthe\snew,\sspecial\shandled\shandler\sscript\sreturn\scode\s-return.\sAdded\ssome\stest.
+D 2013-12-20T13:48:19.602
 F CHANGES e57d820a26f56d2d794a90b31c276e99c0d7bd60
 F ChangeLog 19fffd7ad46ca791bfad1bc0eeaca95d5bc9e519
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -24,9 +24,9 @@ F doc/domDoc.xml ebf9a26ae90f0ea0ed59cbe32e06ef509bbe29a6
 F doc/domNode.html 7b85c62bb2cab64c4ceb18df3d9e64b1d35dbab7
 F doc/domNode.n 62f7dcb38a1157583cedccffc7d1f2746a5e5c1b
 F doc/domNode.xml c0d5956de3b77b70a5381468962dec6e4e0174b6
-F doc/expat.html 99149eb5a48aafa3d60fe9652652c5506bb58bcc
-F doc/expat.n d5dcd591f7da0e68dfaa6b04f204d4e7e8fe9fc8
-F doc/expat.xml 8718c1981c3cb0459ca37fd16e60136579c2a510
+F doc/expat.html 733c67afdc222e737e34ce035a58cdb12ccc9010
+F doc/expat.n 4b934ab147b361db6a851d54429903e0a384c012
+F doc/expat.xml 4717c62a61718428989a65ecd0dbf3116093ef16
 F doc/expatapi.html 78fdb0648daa4334ff26c538433cfe4606a6ce50
 F doc/expatapi.n 6b56b9d897f32d15a7cdac0e0c9b8c636c5b8d56
 F doc/expatapi.xml 82ad1cfa27e60658976cb03d8e7a11d42558651b
@@ -38,7 +38,7 @@ F doc/tdomcmd.html 47caca6634bfb67f095145f433b0b297fdfb31f4
 F doc/tdomcmd.n 087bbf0cf783376e39ff903a48bc377ce507b8f3
 F doc/tdomcmd.xml fa7bb2424b54e7180148f53557f4059673103c9a
 F doc/tmml.dtd 63259dc9f69f9104f1515be445b85b195a1fb990
-F doc/tmml.options b6deacf4d680fde4b90bc620161c1b151c5a5bc7
+F doc/tmml.options 8a76115c6e9725e8dae55b3005e8ba9878023bbd
 F doc/tmml.rnc 65a2a69ac3347b19aa57e70bb127a4923f5dfc95
 F doc/tnc.html 1a77360e159e02ba7c2c5328e8691f25c03bcfe0
 F doc/tnc.n 147129ce67de3ac8758752bf9747ebf193f60626
@@ -139,7 +139,7 @@ F generic/nodecmd.c fff479358cd9d391f83ebad7ef7b1e02cdbf9a90
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
 F generic/tcldom.c 4496d478ce45966e3ffa18235ff8d67865d45dda
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
-F generic/tclexpat.c d76a1483388493e8fc9477717d13e7ad444e442b
+F generic/tclexpat.c 51492eae3c75691ca8b51af50f58bd96ba9c42df
 F generic/tclexpat.h 3d6bba349c0f6757c85ab6e7c59cf9bdf48b1d6b
 F generic/tdom.decls d825af72ec3fd2ae4ebb1d7f883bde6e3613c914
 F generic/tdom.h ce5839cdddbde35ac016a6033415c73082b2f87c
@@ -214,10 +214,10 @@ F tests/htmlreader.test 0fffea0d73efb2ccf5e3a807e68b437f55a152d2
 F tests/i18n.test ad68655284ea0bf4f2c5a0acc098fd05587ba9a4
 F tests/loadtdom.tcl 0c4bf09a86aaaffe220b3f77fc728598bb6ca440
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
-F tests/parser.test 05804b67707adad758202bfe9eaa3e8c3d89313c
+F tests/parser.test 50411701a0499aac17e007924f07662f824b2674
 F tests/pcdata.test b1f5a31beb149eef4b7e2a9b75cd571ca271dc82
 F tests/pi.test 03bb450cd334ca0454a6c99ca3270092ba684833
-F tests/stackedhdl.test 4b3dafa96849dabf738ffb401585dac5a5aed550
+F tests/stackedhdl.test f70d086d4d22735450d593bc795114483f19a650
 F tests/tdomcmd.test ebfa377019b495972b13e00b85ff9ba55041a4b9
 F tests/xmlsimple.test b9ca923fb971af2b6170f35a887922e488db928d
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 45571cd469353ea72cfe2dc4633d383e0a0bab56
-R ded7deb6aaa2c9782530789fa7647b1a
+P f8cab498308356ad0e6c3bcbbbf7a31ebdbcbf7b
+R 851aedf3cf25bcb0e4c5e9dc38f5f414
 U rolf
-Z 55a31854a6e0fde3dee361851372bb2d
+Z 99bf7b5a867acb4b5963970f56e6b872
 # Remove this line to create a well-formed Fossil manifest.
