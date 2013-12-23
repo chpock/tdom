@@ -1,5 +1,5 @@
-C Some\smore\sminor\smodifications\sto\smake\stdom\shandle\s4\sbyte\sutf-8\scharacters\sright\s(if\sone\sgets\sthem\sinto\sa\sdom\stree,\sby\scharacter\sentities\swithin\sthe\sxml\sor\susing\sparsefile).\sStill,\saccessing\ssuch\spcdata\sbeyond\sBMP\swith\sdom\smethods\sor\sxpath\squeries\sand\susing\sthe\sresult\sat\sscript\slevel\swill\snot\swork\scorrectly\swith\scurrent\stcl\sdefault\sbuild\s(mangled\sresults\swithout\snotification\sby\serror).
-D 2013-12-22T18:16:52.230
+C Handled\sthis\smess\seven\sfurther.\sNew\sdom\sfeatureinfo\ssubcommand\sisBMPCharData,\sto\scheck,\sif\sa\sstring\shas\sonly\scharacters\sout\sof\sthe\sBMP.\sWith\sTCL_UTF_MAX\s>\s3\seven\s4\sbyte\sutf-8\scharacter\swill\sbe\sserialized\sas\scharacter\sentities\sonly\swith\s-escapeNonASCII.\sWith\sTCL_UTF_MAX\s=\s3\s(the\sdefault\sof\sthe\score)\s4\sbyte\sutf-8\scharacter\swill\salways\sbe\sserialized\sals\scharacter\sentities,\seven\sif\s-escapeNonASCII\sis\snot\sgiven.\sIf\stDOM\swas\sbuild\sagainst\sa\score\swith\sother\sTCL_UTF_MAX\sthen\sthe\sinterpreter,\swhich\s[load]s\sit,\sit\scomplains\sand\sraises\serror.\sNew\sdom\sfeatureinfo\ssubcommand\sTCL_UTF_MAX,\swhich\sreturns\sthe\sTCL_UTF_MAX\svalue\sof\sthe\stcl\score,\stDOM\swas\sbuild\swith.
+D 2013-12-23T02:19:19.436
 F CHANGES 60eb4f70ac31f48d5c496df7d372c1eceb048c79
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -15,9 +15,9 @@ F configure.in 6ebf813c36d308f02470cee6c1b3373fd433f6e3
 F doc/INDEX.MAP 58c84dac5202a451c9a9b52a6646ee2682ebfc63
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html 2e1a41b03d31f42dd00a0c449f7f28db6227bbf2
-F doc/dom.html aeb70f5cd593f961d2722edc67b1e57e9291ef13
-F doc/dom.n 63ea696683531ea59f7cbe8e022eeb7cd3ab2920
-F doc/dom.xml 21d3a8b0c9a48c34bd0fe866fbe3654a9e7836a1
+F doc/dom.html 83dfe6dd1af390a57cf4c22903524682aaecf161
+F doc/dom.n e26a09c8817ed9e7a4e80add4c1a3e2a4a672479
+F doc/dom.xml 1d6f8d06308b448ee3b28e3262f8b76cc0bb6b57
 F doc/domDoc.html 4be0105bdf49a5a921ea4450c0c7a60faba1fcf5
 F doc/domDoc.n 56f3c13de7161ad958b73273d5106ac585879f94
 F doc/domDoc.xml ebf9a26ae90f0ea0ed59cbe32e06ef509bbe29a6
@@ -122,8 +122,8 @@ F extensions/tnc/tests/loadtnc.tcl 9472a546f30972f5ea6d16880ed57e709556ce88
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c e30dc44a8be8b99c9772daf5cafb3714d8550c37
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
-F generic/dom.c 936d22cf83c491adf841caaad62c158e8455d073
-F generic/dom.h 37e2fb63a6dc1e448b43bd455eaea794f5a61ef1
+F generic/dom.c 0203e218e13d1c7a25bfc7c9abba769fb5228024
+F generic/dom.h 59c5be516f6b6140f944cdcdf2c42deb5b35d60f
 F generic/domalloc.c 55e9eeff19cc54cf3956a7013883ead07efd3593
 F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
 F generic/domhtml.c ee07c45f886021e54a92d0bbe5bc6c575020d79e
@@ -137,7 +137,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c fff479358cd9d391f83ebad7ef7b1e02cdbf9a90
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
-F generic/tcldom.c 356b507309d1529ba3f7c93b6a709261ddc3524f
+F generic/tcldom.c e75bde6367fe21d638f33103e2e2758dfd61280c
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
 F generic/tclexpat.c 51492eae3c75691ca8b51af50f58bd96ba9c42df
 F generic/tclexpat.h 3d6bba349c0f6757c85ab6e7c59cf9bdf48b1d6b
@@ -146,7 +146,7 @@ F generic/tdom.h ce5839cdddbde35ac016a6033415c73082b2f87c
 F generic/tdomDecls.h dd20e4afe55f21c8a845bc593806fa2d606b18eb
 F generic/tdomStubInit.c fa037218373f882436fe5b3779bac64ec84f1fba
 F generic/tdomStubLib.c 669854629a698ec7d3f15c10edae36569cf43fc3
-F generic/tdominit.c a45a625ad3cc3449dd075d3fe62d97bd703846f0
+F generic/tdominit.c 636ea9b9bed57a40ca9c610563ab3e61f6bd30b5
 F generic/utf8conv.c 8d58daa846a0b715df1736720cf9031e924988f2
 F generic/utf8conv.h 4132db4e05ac30dcb78dc3b4799ae0a9ae8a057f
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
@@ -211,7 +211,7 @@ F tests/domnamespace.test 7f6ff7ee11a6cb437240c07be18adc11fd876d46
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
 F tests/htmlreader.test 0fffea0d73efb2ccf5e3a807e68b437f55a152d2
-F tests/i18n.test edfec94ecd566a8c923a3d76a30f6984db0f9cb6
+F tests/i18n.test 6c74e49ce5ae4f0b23314056eb706e5f64b481d5
 F tests/loadtdom.tcl 0c4bf09a86aaaffe220b3f77fc728598bb6ca440
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
 F tests/parser.test 50411701a0499aac17e007924f07662f824b2674
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 24d35f6835464e826133cbbddbb22c7da27d0d30
-R b875f84946d38ca04159d5978726bdeb
+P 57d6c144ccf87141e6571ee38489444d26771c27
+R f57415bd9c58fcb83c97bbc8dc4f3d84
 U rolf
-Z 54f2a5c631f8a8c60a2b924679bcd58e
+Z ba96cb85f66b5d2f756e610854ae641c
 # Remove this line to create a well-formed Fossil manifest.
