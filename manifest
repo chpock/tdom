@@ -1,5 +1,5 @@
-C More\stests\sin\sthis\sarea.
-D 2013-12-23T22:27:55.335
+C Improved\scheck\sfor\sbinary\scompatibility.
+D 2013-12-24T01:00:37.558
 F CHANGES 60eb4f70ac31f48d5c496df7d372c1eceb048c79
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -146,7 +146,7 @@ F generic/tdom.h ce5839cdddbde35ac016a6033415c73082b2f87c
 F generic/tdomDecls.h dd20e4afe55f21c8a845bc593806fa2d606b18eb
 F generic/tdomStubInit.c fa037218373f882436fe5b3779bac64ec84f1fba
 F generic/tdomStubLib.c 669854629a698ec7d3f15c10edae36569cf43fc3
-F generic/tdominit.c 636ea9b9bed57a40ca9c610563ab3e61f6bd30b5
+F generic/tdominit.c 7889ba91e2bc08cd031d77a0a00a7821d5738db5
 F generic/utf8conv.c 8d58daa846a0b715df1736720cf9031e924988f2
 F generic/utf8conv.h 4132db4e05ac30dcb78dc3b4799ae0a9ae8a057f
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ab3fea493c04275c229fa6925fbf89a0cc56f274
-R 0c2fe20a28acebd05e9856a468b6e08e
+P 0061b5291426f19fc4ece9e369ec1fa059d5cd99
+R 4027e7d3b17971c4edbbb864fbcd33dd
 U rolf
-Z 2fb1febf33386b666e853366c504ec55
+Z 98a95bc3e184fb70efa33ef606a9fd7b
 # Remove this line to create a well-formed Fossil manifest.
