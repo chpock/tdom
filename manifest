@@ -1,5 +1,5 @@
-C Added\spointer\sto\sthe\sCHANGES\sfile.
-D 2013-12-20T14:36:53.456
+C Improvment\sof\shandling\sof\scharacters\sbeyond\sBMP.
+D 2013-12-24T01:07:27.128
 F CHANGES 60eb4f70ac31f48d5c496df7d372c1eceb048c79
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -15,9 +15,9 @@ F configure.in 6ebf813c36d308f02470cee6c1b3373fd433f6e3
 F doc/INDEX.MAP 58c84dac5202a451c9a9b52a6646ee2682ebfc63
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html 2e1a41b03d31f42dd00a0c449f7f28db6227bbf2
-F doc/dom.html aeb70f5cd593f961d2722edc67b1e57e9291ef13
-F doc/dom.n 63ea696683531ea59f7cbe8e022eeb7cd3ab2920
-F doc/dom.xml 21d3a8b0c9a48c34bd0fe866fbe3654a9e7836a1
+F doc/dom.html 83dfe6dd1af390a57cf4c22903524682aaecf161
+F doc/dom.n e26a09c8817ed9e7a4e80add4c1a3e2a4a672479
+F doc/dom.xml 1d6f8d06308b448ee3b28e3262f8b76cc0bb6b57
 F doc/domDoc.html 4be0105bdf49a5a921ea4450c0c7a60faba1fcf5
 F doc/domDoc.n 56f3c13de7161ad958b73273d5106ac585879f94
 F doc/domDoc.xml ebf9a26ae90f0ea0ed59cbe32e06ef509bbe29a6
@@ -122,22 +122,22 @@ F extensions/tnc/tests/loadtnc.tcl 9472a546f30972f5ea6d16880ed57e709556ce88
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c e30dc44a8be8b99c9772daf5cafb3714d8550c37
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
-F generic/dom.c 7a58c0473f210cb42b7f2e536c8c98beb432d7e2
-F generic/dom.h ee3ee722d30f1682aa658af806e176f2e6fc5316
+F generic/dom.c 0203e218e13d1c7a25bfc7c9abba769fb5228024
+F generic/dom.h 59c5be516f6b6140f944cdcdf2c42deb5b35d60f
 F generic/domalloc.c 55e9eeff19cc54cf3956a7013883ead07efd3593
 F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
 F generic/domhtml.c ee07c45f886021e54a92d0bbe5bc6c575020d79e
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domlock.c b9543b7f1066118a5bcd0d2fa30acda6d247f15a
-F generic/domxpath.c 6d56c7c84e4ae9a13ee240ee82a883960ac40ea9
+F generic/domxpath.c 12c13c9b2df8edf5932c5e5e93826c825da38a37
 F generic/domxpath.h 4a4e79af6478301643e69c4a98b99bec7e5eae49
-F generic/domxslt.c f211e6d9ee5fb48bc53773493fa465d1561876a0
+F generic/domxslt.c 8d83f1df1e9acf57f0b0086ef40730b54b4bd153
 F generic/domxslt.h 261176a8cb491de448189fcb9fa93bfcabda5e40
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c fff479358cd9d391f83ebad7ef7b1e02cdbf9a90
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
-F generic/tcldom.c 4496d478ce45966e3ffa18235ff8d67865d45dda
+F generic/tcldom.c e75bde6367fe21d638f33103e2e2758dfd61280c
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
 F generic/tclexpat.c 51492eae3c75691ca8b51af50f58bd96ba9c42df
 F generic/tclexpat.h 3d6bba349c0f6757c85ab6e7c59cf9bdf48b1d6b
@@ -146,7 +146,7 @@ F generic/tdom.h ce5839cdddbde35ac016a6033415c73082b2f87c
 F generic/tdomDecls.h dd20e4afe55f21c8a845bc593806fa2d606b18eb
 F generic/tdomStubInit.c fa037218373f882436fe5b3779bac64ec84f1fba
 F generic/tdomStubLib.c 669854629a698ec7d3f15c10edae36569cf43fc3
-F generic/tdominit.c a45a625ad3cc3449dd075d3fe62d97bd703846f0
+F generic/tdominit.c 7889ba91e2bc08cd031d77a0a00a7821d5738db5
 F generic/utf8conv.c 8d58daa846a0b715df1736720cf9031e924988f2
 F generic/utf8conv.h 4132db4e05ac30dcb78dc3b4799ae0a9ae8a057f
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
@@ -211,7 +211,7 @@ F tests/domnamespace.test 7f6ff7ee11a6cb437240c07be18adc11fd876d46
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
 F tests/htmlreader.test 0fffea0d73efb2ccf5e3a807e68b437f55a152d2
-F tests/i18n.test ad68655284ea0bf4f2c5a0acc098fd05587ba9a4
+F tests/i18n.test f5493417c35c973a0d8651c3c13d5d4e8272f6bf
 F tests/loadtdom.tcl 0c4bf09a86aaaffe220b3f77fc728598bb6ca440
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
 F tests/parser.test 50411701a0499aac17e007924f07662f824b2674
@@ -238,8 +238,9 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 38bc0537ec738587a9f63cad53274edcc65618b5
-R 7083d262c6625a395c9e533cbd3a5914
+P 104046edbb275103257bf050f1ec50dbbf7dee89 f8a539484c6ab56f8cc0c42da3e07774cb5cedda
+R 4027e7d3b17971c4edbbb864fbcd33dd
+T +closed f8a539484c6ab56f8cc0c42da3e07774cb5cedda
 U rolf
-Z bcca527e668efd61fbb73bb4a30931e2
+Z 3d34c235fb27b15c17d9488d4501fb8d
 # Remove this line to create a well-formed Fossil manifest.
