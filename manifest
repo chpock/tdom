@@ -1,5 +1,5 @@
-C More\s#ifdefery,\sto\shandle\stip\s388\schanges\sto\stcl.h.
-D 2013-12-27T21:56:53.256
+C Start\stdom\sTcl_ObjType\sreform.
+D 2013-12-28T14:51:00.532
 F CHANGES 60eb4f70ac31f48d5c496df7d372c1eceb048c79
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -137,7 +137,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c fff479358cd9d391f83ebad7ef7b1e02cdbf9a90
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
-F generic/tcldom.c 237dec9a38e2af248e73f1953041ea6b5d0f41ae
+F generic/tcldom.c 736a469a411a355d340ca6bf6f81f11d52d48aee
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
 F generic/tclexpat.c 51492eae3c75691ca8b51af50f58bd96ba9c42df
 F generic/tclexpat.h 3d6bba349c0f6757c85ab6e7c59cf9bdf48b1d6b
@@ -238,8 +238,11 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ea86851d906245d414aa9299ee82e2666b286d6b
-R fd11eaa1a78d13358003e98b654fd4ca
+P ebe56a30011220fd85e07010cb676b8952f452b3
+R 63dd17a64b3ff3c79582be9ca0197bd2
+T *branch * tdomNodeType
+T *sym-tdomNodeType *
+T -sym-trunk *
 U rolf
-Z b784db7aba10282e43eced3ab0d74460
+Z 514d75ae8dccf12c9396e52406a32428
 # Remove this line to create a well-formed Fossil manifest.
