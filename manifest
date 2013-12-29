@@ -1,5 +1,5 @@
-C Start\stdom\sTcl_ObjType\sreform.
-D 2013-12-28T14:51:00.532
+C Update\sfrom\strunk.
+D 2013-12-29T01:29:32.711
 F CHANGES 60eb4f70ac31f48d5c496df7d372c1eceb048c79
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -203,7 +203,7 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
-F tests/dom.test a7dfdd9ef7e9e30812072cf0d64c2949f8d21dd1
+F tests/dom.test 79822803d3948ab33439f6f34a250e38a69881f8
 F tests/domDoc.test d2c9f2625549d1c8f4f392e3acafbb79a6d00c6b
 F tests/domNode.bench 25c205110bf8456202b7abe031abb72db8ae8db2
 F tests/domNode.test 801f176e6abf5eefcc69d72ff898c7b8c8d9d660
@@ -238,11 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ebe56a30011220fd85e07010cb676b8952f452b3
-R 63dd17a64b3ff3c79582be9ca0197bd2
-T *branch * tdomNodeType
-T *sym-tdomNodeType *
-T -sym-trunk *
+P 06841faa5b7f724246bdb06046d79c73e59ac172 12ce2296e4793b71cb119cf9a5bf7cdb224016c2
+R af8a6f83441cfc2c3ed3370d898c2548
 U rolf
-Z 514d75ae8dccf12c9396e52406a32428
+Z 3ad6547a361b2d348da9325a87391293
 # Remove this line to create a well-formed Fossil manifest.
