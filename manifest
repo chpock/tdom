@@ -1,5 +1,5 @@
-C Made\stcldom_returnNodeOjb\sstatic.
-D 2014-01-01T04:03:45.810
+C Enhanced\sbench\ssuite.
+D 2014-01-01T22:08:41.688
 F CHANGES 60eb4f70ac31f48d5c496df7d372c1eceb048c79
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -203,7 +203,7 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
-F tests/dom.bench aaa8b6913eca9c749a993c22c3ad8de69328bddf
+F tests/dom.bench 53a2bd61133d0a6acbb2a61794da74f7e7ba9b6a
 F tests/dom.test 79822803d3948ab33439f6f34a250e38a69881f8
 F tests/domDoc.test d2c9f2625549d1c8f4f392e3acafbb79a6d00c6b
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
@@ -239,8 +239,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 9b93825de261b12410a81da1d133ff4eb81f75ae
-R 960a54c54c1510659b20bd0cf1dfd606
+P 40b95f4a60988aec7d2f845f9a08bb97a7c618ac
+R 16cb4861b65290868228694228f5958d
 U rolf
-Z e8f626cc7526b26c7c9bc739f5dcfd45
+Z b55f0a0aa869ada20a832b48ecb9b530
 # Remove this line to create a well-formed Fossil manifest.
