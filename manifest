@@ -1,5 +1,5 @@
-C Minor\stest\ssuite\scorrection\sand\saddition.
-D 2013-12-29T01:25:03.146
+C Improved\sspeed\sof\soperations\sin\snode\stoken\smode\snotable.\sThis\sis\sachieved\sby\sintroducing\sa\sTcl_Obj\stype\stdomNodeType.\sTcl_Objs\sof\styp\stdomNodeType\sare\screated\swithout\sstring\srepresentation,\ssaving\smalloc\scosts\suntil\sstring\srepresentation\sisn't\sneeded\s(which\sis\stypical).\sAdditionally,\sDOM\snode\sidentification\sfrom\stoken\sis\sfaster\swith\stdomNodeType\sTcl_Objs.
+D 2014-01-10T01:11:14.995
 F CHANGES 60eb4f70ac31f48d5c496df7d372c1eceb048c79
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -137,7 +137,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c fff479358cd9d391f83ebad7ef7b1e02cdbf9a90
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
-F generic/tcldom.c 237dec9a38e2af248e73f1953041ea6b5d0f41ae
+F generic/tcldom.c 21fad84be9ce185e8fb1547a76e98d22730bbd7e
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
 F generic/tclexpat.c 51492eae3c75691ca8b51af50f58bd96ba9c42df
 F generic/tclexpat.h 3d6bba349c0f6757c85ab6e7c59cf9bdf48b1d6b
@@ -203,9 +203,10 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/defs.tcl 18866d895a18c1db7a0094d8817b887deb244301
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
+F tests/dom.bench 53a2bd61133d0a6acbb2a61794da74f7e7ba9b6a
 F tests/dom.test 79822803d3948ab33439f6f34a250e38a69881f8
 F tests/domDoc.test d2c9f2625549d1c8f4f392e3acafbb79a6d00c6b
-F tests/domNode.bench 25c205110bf8456202b7abe031abb72db8ae8db2
+F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test 801f176e6abf5eefcc69d72ff898c7b8c8d9d660
 F tests/domnamespace.test 7f6ff7ee11a6cb437240c07be18adc11fd876d46
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
@@ -238,8 +239,9 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ebe56a30011220fd85e07010cb676b8952f452b3
-R 43979d93176f8bff55afd83c94a08b89
+P 12ce2296e4793b71cb119cf9a5bf7cdb224016c2 7148e122400fd1732180d312a49b904fbab56925
+R 16cb4861b65290868228694228f5958d
+T +closed 7148e122400fd1732180d312a49b904fbab56925
 U rolf
-Z 3b696183cc786af7bf5b8c28476fd99d
+Z 86a763dd129e481a21982948dc5e82a2
 # Remove this line to create a well-formed Fossil manifest.
