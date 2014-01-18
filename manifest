@@ -1,5 +1,5 @@
-C Improved\sspeed\sof\soperations\sin\snode\stoken\smode\snotable.\sThis\sis\sachieved\sby\sintroducing\sa\sTcl_Obj\stype\stdomNodeType.\sTcl_Objs\sof\styp\stdomNodeType\sare\screated\swithout\sstring\srepresentation,\ssaving\smalloc\scosts\suntil\sstring\srepresentation\sisn't\sneeded\s(which\sis\stypical).\sAdditionally,\sDOM\snode\sidentification\sfrom\stoken\sis\sfaster\swith\stdomNodeType\sTcl_Objs.
-D 2014-01-10T01:11:14.995
+C Removed\sunused\sdefine.
+D 2014-01-18T18:39:48.057
 F CHANGES 60eb4f70ac31f48d5c496df7d372c1eceb048c79
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -122,7 +122,7 @@ F extensions/tnc/tests/loadtnc.tcl 9472a546f30972f5ea6d16880ed57e709556ce88
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c e30dc44a8be8b99c9772daf5cafb3714d8550c37
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
-F generic/dom.c 0203e218e13d1c7a25bfc7c9abba769fb5228024
+F generic/dom.c 9bf34e095790db254942387d414ab8b9270c0e4c
 F generic/dom.h 59c5be516f6b6140f944cdcdf2c42deb5b35d60f
 F generic/domalloc.c 55e9eeff19cc54cf3956a7013883ead07efd3593
 F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
@@ -239,9 +239,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 12ce2296e4793b71cb119cf9a5bf7cdb224016c2 7148e122400fd1732180d312a49b904fbab56925
-R 16cb4861b65290868228694228f5958d
-T +closed 7148e122400fd1732180d312a49b904fbab56925
+P 8f70a39a92fbcec1b3db14f71677526439fb66b0
+R 16beefeb25154f8c114f9466b4d20cf9
 U rolf
-Z 86a763dd129e481a21982948dc5e82a2
+Z 1babaa0cc9a86b9e071e5cf85aa5dba6
 # Remove this line to create a well-formed Fossil manifest.
