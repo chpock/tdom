@@ -1,5 +1,5 @@
 C Added\sminimal\sxslt\sdoc\stests.
-D 2014-05-01T12:16:35.939
+D 2014-05-01T12:28:06.533
 F CHANGES 60eb4f70ac31f48d5c496df7d372c1eceb048c79
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -224,7 +224,7 @@ F tests/xmlsimple.test b9ca923fb971af2b6170f35a887922e488db928d
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.bench 228b4b5bb2101bc425a4c7b206e2af03e4adaef2
 F tests/xpath.test 034c709485846d959dd206e028cfe73e1190dab7
-F tests/xslt.test b4f05e956714ca767133cfc399330b0b85c2d0ec
+F tests/xslt.test 32703fca7030961058300a9116cad6e5d8037d2a
 F unix/CONFIG 789192e463910e1b9dd7e65f6338390d2bf1f68a
 F unix/tclAppInit.c a1655c51127aed18d069010f234a378fceacb2a6
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -239,8 +239,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P cbd75ded2b1421bac2c8d3299e01282efaa3b6e6
-R e5414f177c18872cc3c153f75c23882b
+P d05e85a15f89a69f019c2037a30dc303ed0188ac
+R e710df88a0546996e5195faa60708769
 U rolf
-Z 149c52fa7ea3e554731dd53bd59df6aa
+Z d7732cde191a9f0e003a934dd5804d44
 # Remove this line to create a well-formed Fossil manifest.
