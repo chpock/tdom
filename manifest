@@ -1,5 +1,5 @@
-C Fixed\sseg\sfault,\sif\sexpat\sparser\scmd\smethod\sget\sis\scalled\swithout\sargument.
-D 2014-10-02T21:45:37.976
+C added\sa\s"parser\sdefaultcurrent"\ssubcommand\sthat\scalls\sXML_DefaultCurrent
+D 2014-10-02T22:57:17.775
 F CHANGES 60eb4f70ac31f48d5c496df7d372c1eceb048c79
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -139,7 +139,7 @@ F generic/nodecmd.c fff479358cd9d391f83ebad7ef7b1e02cdbf9a90
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
 F generic/tcldom.c 21fad84be9ce185e8fb1547a76e98d22730bbd7e
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
-F generic/tclexpat.c 8338f95790ee4786039f0d27253f4a960909fa80
+F generic/tclexpat.c 611d6a2c7a0f0b701a99052f2eedb63c019e2aa6
 F generic/tclexpat.h 3d6bba349c0f6757c85ab6e7c59cf9bdf48b1d6b
 F generic/tdom.decls d825af72ec3fd2ae4ebb1d7f883bde6e3613c914
 F generic/tdom.h ce5839cdddbde35ac016a6033415c73082b2f87c
@@ -238,8 +238,11 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P dd0926133d51a6a707cf5f56fc5bf686965dffea
-R 5ed1801f2f74518030dbba5316ae7646
-U rolf
-Z ed1c00cd9e2686fee502765c19df394c
+P a5417947d1286148b840cfb8f5b2042f56ee2e35
+R 1a15008a64d9e5f68153d2e2f8f8c862
+T *branch * parser-defaultcurrent
+T *sym-parser-defaultcurrent *
+T -sym-trunk *
+U evilotto
+Z 2d75034531e929517414317b68fd171f
 # Remove this line to create a well-formed Fossil manifest.
