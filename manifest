@@ -1,5 +1,5 @@
-C Editorial\schange.
-D 2014-10-02T23:09:12.929
+C Fixed\sa\sseg\sfault\sif\stdom\s$parser\senable\sis\scalled\sin\sa\scallback\sof\sthe\sparser\sit\sworks\son.
+D 2014-10-03T00:07:40.943
 F CHANGES 60eb4f70ac31f48d5c496df7d372c1eceb048c79
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -122,7 +122,7 @@ F extensions/tnc/tests/loadtnc.tcl 9472a546f30972f5ea6d16880ed57e709556ce88
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c e30dc44a8be8b99c9772daf5cafb3714d8550c37
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
-F generic/dom.c 9bf34e095790db254942387d414ab8b9270c0e4c
+F generic/dom.c 4e0dd699132fe48b7b98a5c07481a7278f43910e
 F generic/dom.h 59c5be516f6b6140f944cdcdf2c42deb5b35d60f
 F generic/domalloc.c 55e9eeff19cc54cf3956a7013883ead07efd3593
 F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
@@ -218,7 +218,7 @@ F tests/parser.test a7db3cc0ac08e59f2b467cf623e52f396d7ad489
 F tests/pcdata.test b1f5a31beb149eef4b7e2a9b75cd571ca271dc82
 F tests/pi.test 03bb450cd334ca0454a6c99ca3270092ba684833
 F tests/stackedhdl.test f70d086d4d22735450d593bc795114483f19a650
-F tests/tdomcmd.test ebfa377019b495972b13e00b85ff9ba55041a4b9
+F tests/tdomcmd.test b3ec8a3f2c99305aae381989727ac707db2dea58
 F tests/xmlsimple.test b9ca923fb971af2b6170f35a887922e488db928d
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.bench 228b4b5bb2101bc425a4c7b206e2af03e4adaef2
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a5417947d1286148b840cfb8f5b2042f56ee2e35
-R a9735a217d70440ecd126c6ebff20bf9
+P 4afd32f53586ed98fb3643ed023442e4dcefb7cc
+R c770042f2851246a6a8210e4ff5254bb
 U rolf
-Z 6615960d134eb9b4417bd16092dc0d8b
+Z 931c9f553d6f35b874be6b3c4edd3c78
 # Remove this line to create a well-formed Fossil manifest.
