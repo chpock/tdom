@@ -1,5 +1,5 @@
-C Added\sa\sfirst\stest\sof\sthe\snew\sdefaultcurrent\smethod.
-D 2014-10-03T23:46:08.667
+C Reworked\sparser\scmd\smethod\sdefaultcurrent\sto\swork\smuch\ssimpler.\sInstead\sof\sgetting\sthe\sresult\sof\sthe\smethod\sby\sanother\shandler,\swhich\smay\sbe,\ssince\sits\sthere,\sget\scalled\sotherwise\salso\s(so\syou\smay\shave\sto\sflag,\sthat\sthis\shandler\sis\scalled\sby\sdefaultcurrent)\sjust\sreturn\scurrentdefault.
+D 2014-10-07T23:50:32.173
 F CHANGES 60eb4f70ac31f48d5c496df7d372c1eceb048c79
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -139,8 +139,8 @@ F generic/nodecmd.c fff479358cd9d391f83ebad7ef7b1e02cdbf9a90
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
 F generic/tcldom.c 21fad84be9ce185e8fb1547a76e98d22730bbd7e
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
-F generic/tclexpat.c 611d6a2c7a0f0b701a99052f2eedb63c019e2aa6
-F generic/tclexpat.h 3d6bba349c0f6757c85ab6e7c59cf9bdf48b1d6b
+F generic/tclexpat.c 0fbb629964dd6955dab656193b3fe93815e2b600
+F generic/tclexpat.h 179f45341fdaf515d821a0c0a7283f7344922499
 F generic/tdom.decls d825af72ec3fd2ae4ebb1d7f883bde6e3613c914
 F generic/tdom.h ce5839cdddbde35ac016a6033415c73082b2f87c
 F generic/tdomDecls.h dd20e4afe55f21c8a845bc593806fa2d606b18eb
@@ -214,7 +214,7 @@ F tests/htmlreader.test 0fffea0d73efb2ccf5e3a807e68b437f55a152d2
 F tests/i18n.test f5493417c35c973a0d8651c3c13d5d4e8272f6bf
 F tests/loadtdom.tcl bf298e4effa2a7de7380687911994f762c0f0c84
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
-F tests/parser.test 8193a896192a6ef2059db32f7095f9bf3dec759b
+F tests/parser.test dc5a8ad7d7e6a24d750134c312eec8e66d1de2d5
 F tests/pcdata.test b1f5a31beb149eef4b7e2a9b75cd571ca271dc82
 F tests/pi.test 03bb450cd334ca0454a6c99ca3270092ba684833
 F tests/stackedhdl.test f70d086d4d22735450d593bc795114483f19a650
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 0cb35638d175eb8daa500b02de1cb6784a89c917
-R 656091de0006dfd560ae5c3ceebdc1bb
+P e47ccd2f2fa9bb8f06717a448bf5dc21dec169be
+R a56d1c74381502d63906e34d9382accd
 U rolf
-Z ddac6ba003386fc9065b20e33fec8de9
+Z 37be930e960d24239185015d7496064f
 # Remove this line to create a well-formed Fossil manifest.
