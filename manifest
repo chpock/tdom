@@ -1,5 +1,5 @@
-C Tried\sto\sdocument\sdefaultcurrent.
-D 2014-10-08T00:28:16.076
+C Renamend\smethod\sdefaultcurrent\sto\scurrentmarkup.
+D 2014-10-08T00:45:40.940
 F CHANGES 60eb4f70ac31f48d5c496df7d372c1eceb048c79
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -26,7 +26,7 @@ F doc/domNode.n 62f7dcb38a1157583cedccffc7d1f2746a5e5c1b
 F doc/domNode.xml c0d5956de3b77b70a5381468962dec6e4e0174b6
 F doc/expat.html 733c67afdc222e737e34ce035a58cdb12ccc9010
 F doc/expat.n 4b934ab147b361db6a851d54429903e0a384c012
-F doc/expat.xml 5a6099a77d7733711497911284122aa27af909a7
+F doc/expat.xml 208b1586d55e3d2c5362384228eba51dad7d6f70
 F doc/expatapi.html 78fdb0648daa4334ff26c538433cfe4606a6ce50
 F doc/expatapi.n 6b56b9d897f32d15a7cdac0e0c9b8c636c5b8d56
 F doc/expatapi.xml 82ad1cfa27e60658976cb03d8e7a11d42558651b
@@ -139,8 +139,8 @@ F generic/nodecmd.c fff479358cd9d391f83ebad7ef7b1e02cdbf9a90
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
 F generic/tcldom.c 21fad84be9ce185e8fb1547a76e98d22730bbd7e
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
-F generic/tclexpat.c d9e53d0c6bd777db5ee04f9b42d1a25413340cfc
-F generic/tclexpat.h 179f45341fdaf515d821a0c0a7283f7344922499
+F generic/tclexpat.c 160a30a6e9f0db703d18d6d0c824f112b72d4cba
+F generic/tclexpat.h 8f9e3a25362429f45b13ce0d1fafd4d1f6d41f38
 F generic/tdom.decls d825af72ec3fd2ae4ebb1d7f883bde6e3613c914
 F generic/tdom.h ce5839cdddbde35ac016a6033415c73082b2f87c
 F generic/tdomDecls.h dd20e4afe55f21c8a845bc593806fa2d606b18eb
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P fb8b793fef3cb16203cd47987f8b5d9ea9705ed9
-R f7a65a2b4c6404a832e81d93ca44746c
+P 358cff26da3cffa38450b165498d6e53e110b38e
+R 4a7a051d650e551a88cd707d8a6da611
 U rolf
-Z a90baa97c6645a033bc13c6f9f6cec4b
+Z d0d291f4fd714d3b58422143973aa4ec
 # Remove this line to create a well-formed Fossil manifest.
