@@ -1,5 +1,5 @@
-C Reworked\sparser\scmd\smethod\sdefaultcurrent\sto\swork\smuch\ssimpler.\sInstead\sof\sgetting\sthe\sresult\sof\sthe\smethod\sby\sanother\shandler,\swhich\smay\sbe,\ssince\sits\sthere,\sget\scalled\sotherwise\salso\s(so\syou\smay\shave\sto\sflag,\sthat\sthis\shandler\sis\scalled\sby\sdefaultcurrent)\sjust\sreturn\scurrentdefault.
-D 2014-10-07T23:50:32.173
+C Merged\sfrom\strunk.
+D 2014-10-08T00:06:00.445
 F CHANGES 60eb4f70ac31f48d5c496df7d372c1eceb048c79
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -122,7 +122,7 @@ F extensions/tnc/tests/loadtnc.tcl 9472a546f30972f5ea6d16880ed57e709556ce88
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c e30dc44a8be8b99c9772daf5cafb3714d8550c37
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
-F generic/dom.c 9bf34e095790db254942387d414ab8b9270c0e4c
+F generic/dom.c 4e0dd699132fe48b7b98a5c07481a7278f43910e
 F generic/dom.h 59c5be516f6b6140f944cdcdf2c42deb5b35d60f
 F generic/domalloc.c 55e9eeff19cc54cf3956a7013883ead07efd3593
 F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
@@ -139,7 +139,7 @@ F generic/nodecmd.c fff479358cd9d391f83ebad7ef7b1e02cdbf9a90
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
 F generic/tcldom.c 21fad84be9ce185e8fb1547a76e98d22730bbd7e
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
-F generic/tclexpat.c 0fbb629964dd6955dab656193b3fe93815e2b600
+F generic/tclexpat.c d9e53d0c6bd777db5ee04f9b42d1a25413340cfc
 F generic/tclexpat.h 179f45341fdaf515d821a0c0a7283f7344922499
 F generic/tdom.decls d825af72ec3fd2ae4ebb1d7f883bde6e3613c914
 F generic/tdom.h ce5839cdddbde35ac016a6033415c73082b2f87c
@@ -214,11 +214,11 @@ F tests/htmlreader.test 0fffea0d73efb2ccf5e3a807e68b437f55a152d2
 F tests/i18n.test f5493417c35c973a0d8651c3c13d5d4e8272f6bf
 F tests/loadtdom.tcl bf298e4effa2a7de7380687911994f762c0f0c84
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
-F tests/parser.test dc5a8ad7d7e6a24d750134c312eec8e66d1de2d5
+F tests/parser.test 04f7997a79200a429914b91eca529fda3093e098
 F tests/pcdata.test b1f5a31beb149eef4b7e2a9b75cd571ca271dc82
 F tests/pi.test 03bb450cd334ca0454a6c99ca3270092ba684833
 F tests/stackedhdl.test f70d086d4d22735450d593bc795114483f19a650
-F tests/tdomcmd.test ebfa377019b495972b13e00b85ff9ba55041a4b9
+F tests/tdomcmd.test b3ec8a3f2c99305aae381989727ac707db2dea58
 F tests/xmlsimple.test b9ca923fb971af2b6170f35a887922e488db928d
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.bench 228b4b5bb2101bc425a4c7b206e2af03e4adaef2
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P e47ccd2f2fa9bb8f06717a448bf5dc21dec169be
-R a56d1c74381502d63906e34d9382accd
+P f5b29530ef43a415e333f5cb1054eae790ab7ed4 dd44c6e0e043ab81b88799ae550c21f16c4117a2
+R 4a332dc0300bab553e3c5d4678910415
 U rolf
-Z 37be930e960d24239185015d7496064f
+Z b71c3ced7e00740227cf8fb8fb392841
 # Remove this line to create a well-formed Fossil manifest.
