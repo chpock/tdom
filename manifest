@@ -1,5 +1,5 @@
-C Renamend\smethod\sdefaultcurrent\sto\scurrentmarkup.
-D 2014-10-08T00:45:40.940
+C Update\sparser.test\sto\sthe\snew\smethod\sname\scurrentmarkup\s(in\sfact,\smissed\sto\ssave\sthe\sfile\sprior\sto\scommit\sthe\smethod\sname\schange.
+D 2014-10-09T15:38:24.360
 F CHANGES 60eb4f70ac31f48d5c496df7d372c1eceb048c79
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -214,7 +214,7 @@ F tests/htmlreader.test 0fffea0d73efb2ccf5e3a807e68b437f55a152d2
 F tests/i18n.test f5493417c35c973a0d8651c3c13d5d4e8272f6bf
 F tests/loadtdom.tcl bf298e4effa2a7de7380687911994f762c0f0c84
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
-F tests/parser.test 04f7997a79200a429914b91eca529fda3093e098
+F tests/parser.test 40be432b618d5aeab19a1573a502f9202563833c
 F tests/pcdata.test b1f5a31beb149eef4b7e2a9b75cd571ca271dc82
 F tests/pi.test 03bb450cd334ca0454a6c99ca3270092ba684833
 F tests/stackedhdl.test f70d086d4d22735450d593bc795114483f19a650
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 358cff26da3cffa38450b165498d6e53e110b38e
-R 4a7a051d650e551a88cd707d8a6da611
+P 0337e934eab5d45f788652e6263c0ce83beb63ba
+R e47ebee7e6b3257951d06ed45714c535
 U rolf
-Z d0d291f4fd714d3b58422143973aa4ec
+Z 84684ddced9bb7d0efc7749d8d6c11c7
 # Remove this line to create a well-formed Fossil manifest.
