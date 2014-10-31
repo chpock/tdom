@@ -1,5 +1,5 @@
-C Added\sconfigure\soption\s--with-expat,\sto\sbuild\sand\slink\sagainst\sthe\ssystem\sor\sa\scustom\sexpat\slib.\sDefault\sis,\sto\suse\sthe\sincluded\ssources.
-D 2014-10-16T23:17:09.902
+C Added\sat\sleast\sone\stest\sfor\sthe\sexpat\sparser\scmd\smethod\sparsefile.
+D 2014-10-31T17:54:15.078
 F CHANGES 60eb4f70ac31f48d5c496df7d372c1eceb048c79
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -214,7 +214,7 @@ F tests/htmlreader.test 0fffea0d73efb2ccf5e3a807e68b437f55a152d2
 F tests/i18n.test f5493417c35c973a0d8651c3c13d5d4e8272f6bf
 F tests/loadtdom.tcl bf298e4effa2a7de7380687911994f762c0f0c84
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
-F tests/parser.test a7db3cc0ac08e59f2b467cf623e52f396d7ad489
+F tests/parser.test 29306f2ce0e23ebb4930a0430940ad4a9e1d11ae
 F tests/pcdata.test b1f5a31beb149eef4b7e2a9b75cd571ca271dc82
 F tests/pi.test 03bb450cd334ca0454a6c99ca3270092ba684833
 F tests/stackedhdl.test f70d086d4d22735450d593bc795114483f19a650
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P dd44c6e0e043ab81b88799ae550c21f16c4117a2
-R 57cc41b3c530a88fd12cb92dead2b536
+P e008f28a6e6fc93283814e11fbd0cc64cd72972e
+R 373affa3b42097e912d6a9a8a7e6ad22
 U rolf
-Z 716a90b7d7d74543bc88b6bead469b9c
+Z cb0140a222eb82f6cd0a145547125cec
 # Remove this line to create a well-formed Fossil manifest.
