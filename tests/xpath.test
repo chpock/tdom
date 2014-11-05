@@ -451,6 +451,16 @@ test xpath-4.18 {error stack in tcl coded additional XPath function} {
 } {1 {Tcl error while executing XPATH extension function 'errorStack':
 Some error}}
 
+proc ::dom::xpathFunc::stringReturn {args} {return x}
+
+test xpath-4.19 {tcl coded additional XPath function - return implicit string result} {
+    $root selectNodes stringReturn(.)
+} {x}
+
+test xpath-4.20 {tcl coded additional XPath function - return implicit string result} {
+    $root selectNodes stringReturn()
+} {x}
+
 test xpath-5.1 {erroneous XPath expr: missing right brace in predicate} {
     set result [catch {$root selectNodes {*[1}} errMsg]
     list $result $errMsg
