@@ -461,6 +461,14 @@ test xpath-4.20 {tcl coded additional XPath function - return implicit string re
     $root selectNodes stringReturn()
 } {x}
 
+proc ::dom::xpathFunc::ctxNode {ctxNode args} {
+    return [list "nodes" $ctxNode]
+}
+
+test xpath-4.21 {tcl coded additional XPath function - return node} {
+    $root selectNodes {string(ctxNode()/node())} 
+} {Foo}
+
 test xpath-5.1 {erroneous XPath expr: missing right brace in predicate} {
     set result [catch {$root selectNodes {*[1}} errMsg]
     list $result $errMsg

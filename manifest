@@ -1,5 +1,5 @@
-C Fixed\sa\sbug\sin\sthe\simplicit\sstring\sresult\sshort\sreturn\spath\sof\stcl\sscripted\sadditional\sXPath\sfunctions.
-D 2014-11-05T23:53:57.443
+C A\snode\sset\sreturned\sfrom\sa\stcl\sscripted\sXPath\sfunction\sis\sa\sXPath\snode\sset,\sas\sreturned\sfrom\sany\sXPath\sexpression.
+D 2014-11-06T00:27:51.016
 F CHANGES 60eb4f70ac31f48d5c496df7d372c1eceb048c79
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -222,7 +222,7 @@ F tests/tdomcmd.test b3ec8a3f2c99305aae381989727ac707db2dea58
 F tests/xmlsimple.test b9ca923fb971af2b6170f35a887922e488db928d
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.bench 228b4b5bb2101bc425a4c7b206e2af03e4adaef2
-F tests/xpath.test 41db86dba322a3f241b99c8684923cd27b326284
+F tests/xpath.test 99f01294eab7c2fe0bea0074bf478f3368b16bdc
 F tests/xslt.test 33224c9c36777a14ca86ddf87a93a441964b655f
 F unix/CONFIG 789192e463910e1b9dd7e65f6338390d2bf1f68a
 F unix/tclAppInit.c a1655c51127aed18d069010f234a378fceacb2a6
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 0f71f6ce74ff6beca624cf789c50e785aa9f7762
-R df6525c9ea0bb81505934d5630675efd
+P 55e2fefda5fefd260ef84bb62b62abfb5e974467
+R eaf0fd991e43019c91c6cbe214123cc1
 U rolf
-Z dbd7909afcc29e3750dc611c7dd748e9
+Z 98fd5c3c760e8993ce5dc95d2ecd3d11
 # Remove this line to create a well-formed Fossil manifest.
