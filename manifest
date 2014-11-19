@@ -1,5 +1,5 @@
-C More\sscripted\sXPath\sfunction\stests.
-D 2014-11-06T01:35:46.244
+C Cleaned\sup\stest\snaming,\sremoved\sa\sfew\sduplicated\stests.
+D 2014-11-19T21:59:25.602
 F CHANGES 60eb4f70ac31f48d5c496df7d372c1eceb048c79
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -183,7 +183,7 @@ F tests/all-bench.tcl 38bc7b4c88f5d679b2fce6c9c2b2ea7d8ad18e90
 F tests/all.tcl a8d5d3e3adc6713f64d0c614b927bd21ca8df870
 F tests/attribute.test 53ac8fb043e79b638c8c6f5e7da848f6103552d6
 F tests/cdata.test 5a1dc3bee6353700186d12f0d11b15914849c6be
-F tests/comment.test 25ac780959e2c7220d3e92dac01dd5e14fd4acaa
+F tests/comment.test ff9d1abbbcde4d3532bf93b1eb7e819997fa8178
 F tests/data/REC-xslt-19991116.xml d86bd1efbc1f810b2a6f74c0c182bd37ae5ee09d
 F tests/data/books.xml 0b1ae696b2bbc1035303f5637a6ef67f041d0b9e
 F tests/data/domCmd1.dtd 2031a36d155dfac8f0a5ef3be69958d250f5459e
@@ -204,10 +204,10 @@ F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.bench 53a2bd61133d0a6acbb2a61794da74f7e7ba9b6a
 F tests/dom.test 79822803d3948ab33439f6f34a250e38a69881f8
-F tests/domDoc.test d2c9f2625549d1c8f4f392e3acafbb79a6d00c6b
+F tests/domDoc.test 2e6872b870c0a8fb269f13a81ebe8931e8a9cdb1
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test 801f176e6abf5eefcc69d72ff898c7b8c8d9d660
-F tests/domnamespace.test 7f6ff7ee11a6cb437240c07be18adc11fd876d46
+F tests/domnamespace.test 5757d461a29799bfcaea076811cc2910b8c8caa1
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
 F tests/htmlreader.test 0fffea0d73efb2ccf5e3a807e68b437f55a152d2
@@ -215,9 +215,9 @@ F tests/i18n.test f5493417c35c973a0d8651c3c13d5d4e8272f6bf
 F tests/loadtdom.tcl bf298e4effa2a7de7380687911994f762c0f0c84
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
 F tests/parser.test 49358fca95fbb656a1c428fc421b6f0fe718eeb0
-F tests/pcdata.test b1f5a31beb149eef4b7e2a9b75cd571ca271dc82
+F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 03bb450cd334ca0454a6c99ca3270092ba684833
-F tests/stackedhdl.test f70d086d4d22735450d593bc795114483f19a650
+F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
 F tests/tdomcmd.test b3ec8a3f2c99305aae381989727ac707db2dea58
 F tests/xmlsimple.test b9ca923fb971af2b6170f35a887922e488db928d
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 00c36ac1c9046d0aac489ee6aefae110fb4f2b4f
-R 908321278e8c53f05fdf755a01b7c081
+P 9f3c84cdb3d64734ea0a4768cb598dbcffda6356
+R 4a2fb11ba3b95949d828d07de92d5a57
 U rolf
-Z dab619bf7f025019fcf50b9261283f85
+Z c49ed956ef9fbeb052fd6da7ffe04240
 # Remove this line to create a well-formed Fossil manifest.

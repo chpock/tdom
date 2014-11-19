@@ -125,17 +125,6 @@ test stackedhdl-1.6 {two handlers for element start} {
     list $::count $::charcount
 } {6 12}
 
-test stackedhdl-1.6 {two handlers for element start} {
-    catch {unset ::count} 
-    catch {unset ::charcount}
-    set p [expat]
-    $p configure -handlerset charcount -elementstartcommand CharCount \
-                 -elementendcommand CharCount
-    $p configure -elementstartcommand Count -elementendcommand Count
-    $p parse {<root><a/><a></a></root>}
-    list $::count $::charcount
-} {6 12}
-
 test stackedhdl-1.7 {two handlers for element start} {
     catch {unset ::count} 
     catch {unset ::charcount}
@@ -241,7 +230,7 @@ test stackedhdl-2.5 {return -code return with tcl and C coded handler} -setup {
     set result
 } -result {0 2 {<doc><e/><e class="return"/></doc>} 0 3 <doc><e/><e/><e/></doc>}
 
-test stackedhdl-2.4 {return -code error with tcl and C coded handler} -setup {
+test stackedhdl-2.6 {return -code error with tcl and C coded handler} -setup {
     catch {unset started}
 } -body {
     set p [expat -elementstartcommand Start]

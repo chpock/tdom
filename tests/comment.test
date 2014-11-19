@@ -85,7 +85,7 @@ test comment-1.3 {Simple comment, within PCDATA} {
     list $::comment $::result $::element
 } {{This is a comment} {surrounding  PCDATA} 0}
 
-test comment-1.3 {Simple comment, no white space} {
+test comment-1.4 {Simple comment, no white space} {
     set ::result {}
     set ::comment {}
     set ::element 0
@@ -103,7 +103,7 @@ test comment-1.3 {Simple comment, no white space} {
     list $::comment $::result $::element
 } {comment {} 0}
 
-test comment-1.4 {comment, with nested element} {
+test comment-1.5 {comment, with nested element} {
     set ::result {}
     set ::comment {}
     set ::element 0
