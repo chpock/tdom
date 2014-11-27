@@ -1428,6 +1428,7 @@ int tcldom_xpathFuncCallBack (
             if (listLen == 1) {
                 rsSetString(result, Tcl_GetString(resultPtr));
                 res = XPATH_OK;
+                Tcl_ResetResult(interp);
                 goto funcCallCleanup;
             }
             if (listLen != 2) {

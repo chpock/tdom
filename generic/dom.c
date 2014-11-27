@@ -5343,6 +5343,13 @@ TclTdomObjCmd (dummy, interp, objc, objv)
         return TCL_ERROR;
 
     case m_enable:
+        expat = GetExpatInfo (interp, objv[1]);
+        if (expat->parsingState != 0) {
+            Tcl_SetResult (interp, 
+                           "Parser is not in init or reset state.", NULL);
+            return TCL_ERROR;
+        }
+
         handlerSet = CHandlerSetCreate ("tdom");
         handlerSet->ignoreWhiteCDATAs       = 1;
         handlerSet->resetProc               = tdom_resetProc;
@@ -5358,8 +5365,6 @@ TclTdomObjCmd (dummy, interp, objc, objv)
         handlerSet->entityDeclCommand       = entityDeclHandler;
         handlerSet->startDoctypeDeclCommand = startDoctypeDeclHandler;
         handlerSet->endDoctypeDeclCommand   = endDoctypeDeclHandler;
-
-        expat = GetExpatInfo (interp, objv[1]);
 
         info = (tdomCmdReadInfo *) MALLOC (sizeof (tdomCmdReadInfo));
         info->parser            = expat->parser;
