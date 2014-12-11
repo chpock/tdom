@@ -1,5 +1,5 @@
-C Merged\sfrom\strunk.
-D 2014-11-27T14:58:43.778
+C Added\ssome\swords\sof\sdocumentation\sfor\sthe\snew\sparse\soption\s-ignorexmlns.
+D 2014-12-11T15:32:54.159
 F CHANGES 60eb4f70ac31f48d5c496df7d372c1eceb048c79
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -17,7 +17,7 @@ F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html 2e1a41b03d31f42dd00a0c449f7f28db6227bbf2
 F doc/dom.html 83dfe6dd1af390a57cf4c22903524682aaecf161
 F doc/dom.n e26a09c8817ed9e7a4e80add4c1a3e2a4a672479
-F doc/dom.xml 1d6f8d06308b448ee3b28e3262f8b76cc0bb6b57
+F doc/dom.xml 2d883a167212621563c75fd1545578fd7c0df02d
 F doc/domDoc.html 4be0105bdf49a5a921ea4450c0c7a60faba1fcf5
 F doc/domDoc.n 56f3c13de7161ad958b73273d5106ac585879f94
 F doc/domDoc.xml ebf9a26ae90f0ea0ed59cbe32e06ef509bbe29a6
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 7f6a517aba6840f053f50a610d3ac31598732e47 34b677ad0b292870f77dd322704ab22a6ba7bc52
-R bd67834c7d8918fb063d9dd4db4ee870
+P a154b27b05fdf7780dd4929abc8911d231376f03
+R 19953d5170ad6ecfc52100ee2dc462e4
 U rolf
-Z 07a93b3b14905d0f7a80c22a08613d32
+Z dfee5e82b6431793edd7de01a46b01b5
 # Remove this line to create a well-formed Fossil manifest.
