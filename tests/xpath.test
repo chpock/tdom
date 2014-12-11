@@ -5,7 +5,7 @@
 # Tested commands and object commands:
 #    xpath-1.*: Function tests
 #    xpath-2.*: i18n
-#    xpath-3.*: NaN/Inf
+#    xpath-3.*: NaN/Inf, number conversion
 #    xpath-4.*: Tcl coded XPath functions and additional Tcl coded
 #               XPath functions
 #    xpath-5.*: XPath lexer/parser tests
@@ -262,6 +262,36 @@ test xpath-3.34 {Infinity plus -Infinity} {
 test xpath-3.35 {Infinity minus -Infinity} {
     $root selectNodes {(1 div 0) - (-1 div 0)}
 } {Infinity}
+
+$doc delete
+
+set doc [dom parse {<a>
+    <b>
+        <number>1</number>
+    </b>
+    <b>
+        <number>4</number>
+    </b>
+    <b>
+        <number>6</number>
+    </b>
+    <b>
+        <number>7</number>
+    </b>
+    <b>
+        <number>0xA</number>
+    </b>
+    <b>
+        <number>0xB</number>
+    </b>
+    </a>}]
+test xpath-3.36 {number conversion} {
+    $doc selectNodes {count(/a/b[number>4])}
+} {2}
+
+test xpath-3.37 {number conversion} {
+    $doc selectNodes {count(/a/b[4<number])}
+} {2}
 
 $doc delete
 

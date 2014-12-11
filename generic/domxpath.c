@@ -2420,39 +2420,68 @@ int xpathFuncBoolean (
     }
 }
 
-static int
-xpathIsNumber (
-    char *str
+static double xpathStringToNumber (
+    char *str,
+    int  *NaN
     )
 {
     int dotseen = 0;
-    
-    while (*str && IS_XML_WHITESPACE(*str)) str++;
-    if (!*str) return 0;
-    if (*str == '-') {
-        str++;
-        if (!*str) return 0;
-    } else if (*str == '.') {
+    double d;
+    char *pc, *tailptr;
+
+    /* 
+       Just to use strtod() isn't sufficient for a few reasons:
+       - strtod() accepts a leading - or +, but XPath allows only a
+         leading -
+       - strtod() accepts the string represention of a hexadecimal
+         number, but XPath does not
+       - strtod() accepts an optional exponent but XPath does not
+       - strtod() accepts leading whitespace including \f and \v, but
+         XPath doesn't allow this characters. Since this two
+         characters are not legal XML characters, they can not be part
+         of a DOM tree and therefor there isn't a problem with XPath
+         expressions on DOM trees or in XSLT. But on tcl level it's
+         possible, to feed that characters literal into the XPath
+         engine.
+    */
+    *NaN = 0;
+    pc = str;
+    while (*pc && IS_XML_WHITESPACE(*pc)) pc++;
+    if (!*pc) goto returnNaN;
+    if (*pc == '-') {
+        pc++;
+        if (!*pc) goto returnNaN;
+    } else if (*pc == '.') {
         dotseen = 1;
-        str++;
-        if (!*str) return 0;
+        pc++;
+        if (!*pc) goto returnNaN;
     }
-    if (!isdigit((unsigned char)*str)) return 0;
-    while (*str) {
-        if (isdigit((unsigned char)*str)) {
-            str++;
+    if (!isdigit((unsigned char)*pc)) goto returnNaN;
+    while (*pc) {
+        if (isdigit((unsigned char)*pc)) {
+            pc++;
             continue;
         }
-        if (*str == '.' && !dotseen) {
+        if (*pc == '.' && !dotseen) {
             dotseen = 1;
-            str++;
+            pc++;
             continue;
         }
         break;
     }
-    while (*str && IS_XML_WHITESPACE(*str)) str++;
-    if (*str) return 0;
-    else return 1;
+    while (*pc && IS_XML_WHITESPACE(*pc)) pc++;
+    if (*pc) goto returnNaN;
+
+    /* If we are here str is a number string, as XPath expects it. Now
+       we just use strtod(), to get the number */
+    d = strtod (str, &tailptr);
+    if (d == 0.0 && tailptr == str) goto returnNaN;
+    else if (IS_NAN(d)) goto returnNaN;
+    return d;
+
+    returnNaN:
+    *NaN = 2;
+    return strtod ("nan", &tailptr);
 }
 
 /*----------------------------------------------------------------------------
@@ -2465,7 +2494,7 @@ double xpathFuncNumber (
 )
 {
     double d;
-    char   tmp[80], *pc, *tailptr;
+    char  *pc, *tailptr;
 
     *NaN = 0;
     switch (rs->type) {
@@ -2503,68 +2532,12 @@ double xpathFuncNumber (
 #   endif
 #endif
         case StringResult:
-              if (!xpathIsNumber (rs->string)) {
-                  d = strtod ("nan", &tailptr);
-                  *NaN = 2;
-                  return d;
-              }
-              strncpy(tmp, rs->string, (rs->string_len<79) ? rs->string_len : 79);
-              tmp[(rs->string_len<79) ? rs->string_len : 79] = '\0';
-              d = strtod (tmp, &tailptr);
-              if (d == 0.0 && tailptr == tmp) {
-                  d = strtod ("nan", &tailptr);
-                  *NaN = 2;
-              } else
-              if (IS_NAN(d)) {
-                  *NaN = 2;
-              } else
-              if (tailptr) {
-                  while (*tailptr) {
-                      switch (*tailptr) {
-                      case ' ' :
-                      case '\n':
-                      case '\r':
-                      case '\t': tailptr++; continue;
-                      default: break; /*do nothing */
-                      }
-                      d = strtod ("nan", &tailptr);
-                      *NaN = 2;
-                      break;
-                  }
-              }
-              return d;
+            return xpathStringToNumber(rs->string, NaN);
         case xNodeSetResult:
-              pc = xpathFuncString(rs);
-              if (!xpathIsNumber (pc)) {
-                  d = strtod ("nan", &tailptr);
-                  *NaN = 2;
-                  FREE(pc);
-                  return d;
-              }
-              d = strtod (pc, &tailptr);
-              if (d == 0.0 && tailptr == pc) {
-                  d = strtod ("nan", &tailptr);
-                  *NaN = 2;
-              } else
-              if (IS_NAN(d)) {
-                  *NaN = 2;
-              } else
-              if (tailptr) {
-                  while (*tailptr) {
-                      switch (*tailptr) {
-                      case ' ' :
-                      case '\n':
-                      case '\r':
-                      case '\t': tailptr++; continue;
-                      default: break; /*do nothing */
-                      }
-                      d = strtod ("nan", &tailptr);
-                      *NaN = 2;
-                      break;
-                  }
-              }
-              FREE(pc);
-              return d;
+            pc = xpathFuncString(rs);
+            d = xpathStringToNumber(pc, NaN);
+            FREE(pc);
+            return d;
         default:
               DBG(fprintf(stderr, "funcNumber: default: 0.0\n");)
               d = strtod ("nan", &tailptr);
@@ -2743,28 +2716,6 @@ char * xpathFuncStringForNode (
 
     return xpathGetStringValue (node, &len);
 }
-
-/*----------------------------------------------------------------------------
-|   xpathFuncNumberForNode
-|
-\---------------------------------------------------------------------------*/
-double xpathFuncNumberForNode (
-    domNode *node,
-    int      *NaN
-)
-{
-    char        *pc;
-    int          len, rc;
-    double       d;
-
-    *NaN = 0;
-    pc = xpathGetStringValue (node, &len);
-    rc = sscanf (pc,"%lf", &d);
-    if (rc != 1) *NaN = 2;
-    FREE(pc);
-    return d;
-}
-
 
 /*----------------------------------------------------------------------------
 |   xpathArity
@@ -4701,7 +4652,9 @@ static int xpathEvalStep (
                     break;
                 }
                 for (i=0; i < pleftResult->nr_nodes; i++) {
-                    dLeft = xpathFuncNumberForNode (pleftResult->nodes[i], &NaN);
+                    leftStr = xpathFuncStringForNode (pleftResult->nodes[i]);
+                    dLeft = xpathStringToNumber (leftStr, &NaN);
+                    FREE(leftStr);
                     if (NaN) continue;
                     if (step->type == Equal) res = (dLeft == dRight);
                     else                     res = (dLeft != dRight);
@@ -4810,7 +4763,6 @@ static int xpathEvalStep (
              rsPrint(&rightResult);
         )
         res = 0;
-
         if (   leftResult.type == xNodeSetResult
             || rightResult.type == xNodeSetResult) {
             if (leftResult.type == xNodeSetResult) {
@@ -4822,6 +4774,7 @@ static int xpathEvalStep (
                 prightResult = &leftResult;
                 switchResult = 1;
             }
+
             switch (prightResult->type) {
             case EmptyResult:
                 res = 0;
@@ -4832,10 +4785,14 @@ static int xpathEvalStep (
                      rsPrint(prightResult);
                 )
                 for (i=0; i < pleftResult->nr_nodes; i++) {
-                    dLeft = xpathFuncNumberForNode (pleftResult->nodes[i], &NaN);
+                    leftStr = xpathFuncStringForNode (pleftResult->nodes[i]);
+                    dLeft = xpathStringToNumber (leftStr, &NaN);
+                    FREE(leftStr);
                     if (NaN) continue;
                     for (j=0; j < prightResult->nr_nodes; j++) {
-                        dRight = xpathFuncNumberForNode (prightResult->nodes[j], &NaN);
+                        rightStr = xpathFuncStringForNode (prightResult->nodes[j]);
+                        dRight = xpathStringToNumber (rightStr, &NaN);
+                        FREE(rightStr);
                         if (NaN)  continue;
                         if (switchResult) {
                             dTmp   = dLeft;
@@ -4882,7 +4839,9 @@ static int xpathEvalStep (
 #endif
                 }
                 for (i=0; i < pleftResult->nr_nodes; i++) {
-                    dLeft = xpathFuncNumberForNode (pleftResult->nodes[i], &NaN);
+                    leftStr = xpathFuncStringForNode (pleftResult->nodes[i]);
+                    dLeft = xpathStringToNumber (leftStr, &NaN);
+                    FREE (leftStr);
                     if (NaN) continue;
                     if (switchResult) {
                         dTmp   = dLeft;
@@ -5048,7 +5007,6 @@ static int xpathEvalPredicate (
             *docOrder = savedDocOrder;
             DBG( fprintf(stderr, "after eval for Predicate: \n"); )
             DBG( rsPrint( &predResult); )
-
             if (predResult.type == RealResult) {
                 predResult.type = IntResult;
                 predResult.intvalue = xpathRound(predResult.realvalue);
