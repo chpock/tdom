@@ -1339,6 +1339,7 @@ Production(PathExpr)
             ast b;
             Consume(SLASHSLASH);
             b = Recurse(RelativeLocationPath);
+            if (!b) return NULL;
             if (b->type == AxisChild) {
                 b->type = AxisDescendant;
             } else {
@@ -1672,6 +1673,7 @@ Production(RelativeLocationPath)
             ast b;
             Consume(SLASHSLASH);
             b = Recurse(Step);
+            if (!b) return NULL;
             if (b->type == AxisChild) {
                 b->type = AxisDescendant;
             } else {

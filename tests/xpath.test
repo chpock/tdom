@@ -807,6 +807,13 @@ test xpath-5.27 {erroneous XPath expr} {
     set result
 } {1}
 
+test xpath-5.28 {afl-fuzz} {
+    set doc [dom parse <a/>]
+    set result [catch {$doc selectNodes {@a//b::*}}]
+    $doc delete
+    set result
+} {1}
+
 set doc [dom parse {
 <root>
   <asub>asub2</asub>
