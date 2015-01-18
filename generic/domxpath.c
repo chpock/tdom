@@ -610,7 +610,6 @@ static ast AddChildWithEvalSteps( ast m, ast child ) {
 static void freeAst (ast t)
 {
     ast tmp;
-
     while (t) {
         tmp = t->next;
         if (t->strvalue) FREE(t->strvalue);
@@ -1595,6 +1594,7 @@ static int IsStepPredOptimizable (ast a) {
         if (b->type != ExecFunction 
             || b->intvalue != f_position) return 0;
         b = b->next;
+        if (!b) return 0;
         if (b->type != Int) return 0;
         if (a->type == Less) return b->intvalue;
         else                 return b->intvalue + 1;
@@ -1605,6 +1605,7 @@ static int IsStepPredOptimizable (ast a) {
         if (b->type != Int) return 0;
         left = b->intvalue;
         b = b->next;
+        if (!b) return 0;
         if (b->type != ExecFunction 
             || b->intvalue != f_position) return 0;
         if (a->type == Greater) return left;
@@ -1613,10 +1614,12 @@ static int IsStepPredOptimizable (ast a) {
         b = a->child;
         if (!b) return 0;
         if (b->type == Int
+            && b->next
             && b->next->type == ExecFunction
             && b->next->intvalue == f_position) return b->intvalue;
         if (b->type == ExecFunction
             && b->intvalue == f_position
+            && b->next
             && b->next->type == Int) return b->next->intvalue;
         return 0;
     default: return 0;
@@ -1800,6 +1803,7 @@ static int checkStepPatternPredOptimizability ( ast a , int *max) {
             if (b
                 && b->type == ExecFunction
                 && b->intvalue == f_position
+                && b->next
                 && b->next->type == Int) {
                 if (a->type == Less) *max = b->next->intvalue;
                 else *max = b->next->intvalue + 1;
@@ -1812,6 +1816,7 @@ static int checkStepPatternPredOptimizability ( ast a , int *max) {
             b = a->child;
             if (b
                 && b->type == Int 
+                && b->next
                 && b->next->type == ExecFunction
                 && b->next->intvalue == f_position) {
                 if (a->type == Greater) *max = b->intvalue;
@@ -1824,6 +1829,7 @@ static int checkStepPatternPredOptimizability ( ast a , int *max) {
             b = a->child;
             if (b
                 && b->type == Int
+                && b->next
                 && b->next->type == ExecFunction
                 && b->next->intvalue == f_position) {
                 *max = b->intvalue;
@@ -1832,6 +1838,7 @@ static int checkStepPatternPredOptimizability ( ast a , int *max) {
             if (b
                 && b->type == ExecFunction 
                 && b->intvalue == f_position
+                && b->next
                 && b->next->type == Int) {
                 *max = b->next->intvalue;
                 return 0;

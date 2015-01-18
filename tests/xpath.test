@@ -807,9 +807,16 @@ test xpath-5.27 {erroneous XPath expr} {
     set result
 } {1}
 
-test xpath-5.28 {afl-fuzz} {
+test xpath-5.28 {afl-fuzz found seg faulting 'xpath expr'} {
     set doc [dom parse <a/>]
     set result [catch {$doc selectNodes {@a//b::*}}]
+    $doc delete
+    set result
+} {1}
+
+test xpath-5.29 {afl-fuzz found seg faulting 'xpath expr'} {
+    set doc [dom parse <a/>]
+    set result [catch {$doc selectNodes {a[1=a::a]}}]
     $doc delete
     set result
 } {1}
