@@ -544,9 +544,9 @@ test xpath-5.1 {erroneous XPath expr: missing right brace in predicate} {
 } {1 {Predicate: Expected "RBRACKET" for '*[1' 
 
 Parsed symbols:
-     0 WCARDNAME        0    0.000     0  *
-     1 LBRACKET         0    0.000     1  
-     2 INTNUMBER        1    1.000     2  }}
+     0 WCARDNAME        0 0.000e+00     0  *
+     1 LBRACKET         0 0.000e+00     1  
+     2 INTNUMBER        1 1.000e+00     2  }}
 
 test xpath-5.2 {erroneous XPath expr: missing right brace in predicate} {
     set result [catch {$root selectNodes {*[1][@attr}} errMsg]
@@ -554,12 +554,12 @@ test xpath-5.2 {erroneous XPath expr: missing right brace in predicate} {
 } {1 {Predicate: Expected "RBRACKET" for '*[1][@attr' 
 
 Parsed symbols:
-     0 WCARDNAME        0    0.000     0  *
-     1 LBRACKET         0    0.000     1  
-     2 INTNUMBER        1    1.000     2  
-     3 RBRACKET         0    0.000     3  
-     4 LBRACKET         0    0.000     4  
-     5 ATTRIBUTE        0    0.000     9  attr}}
+     0 WCARDNAME        0 0.000e+00     0  *
+     1 LBRACKET         0 0.000e+00     1  
+     2 INTNUMBER        1 1.000e+00     2  
+     3 RBRACKET         0 0.000e+00     3  
+     4 LBRACKET         0 0.000e+00     4  
+     5 ATTRIBUTE        0 0.000e+00     9  attr}}
 
 test xpath-5.3 {erroneous XPath expr: missing left brace in predicate} {
     catch {$root selectNodes {*1]}}
@@ -817,6 +817,13 @@ test xpath-5.28 {afl-fuzz found seg faulting 'xpath expr'} {
 test xpath-5.29 {afl-fuzz found seg faulting 'xpath expr'} {
     set doc [dom parse <a/>]
     set result [catch {$doc selectNodes {a[1=a::a]}}]
+    $doc delete
+    set result
+} {1}
+
+test xpath-5.30 {afl-fuzz found seg faulting 'xpath expr'} {
+    set doc [dom parse <a/>]
+    set result [catch {$doc selectNodes {99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999@d}}]
     $doc delete
     set result
 } {1}

@@ -2282,7 +2282,7 @@ int xpathParse (
         memmove(*errMsg + len+6+newlen, "' ", 3);
 
         for (i=0; tokens[i].token != EOS; i++) {
-            sprintf(tmp, "%s\n%3s%3d %-12s %5d %8.3f %5d  ",
+            sprintf(tmp, "%s\n%3s%3d %-12s %5d %.3e %5d  ",
                          (i==0) ? "\n\nParsed symbols:" : "",
                          (i==l) ? "-->" : "   ",
                           i,
