@@ -1360,7 +1360,7 @@ int tcldom_xpathFuncCallBack (
 
     if (strlen(functionName) > 199) {
         *errMsg = (char*)MALLOC (80 + strlen (functionName));
-        strcpy (*errMsg, "Unreasonable long XPath function: \"");
+        strcpy (*errMsg, "Unreasonable long XPath function name: \"");
         strcat (*errMsg, functionName);
         strcat (*errMsg, "\"!");
         return XPATH_EVAL_ERR;
