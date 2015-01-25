@@ -69,6 +69,7 @@
 #include <math.h>
 #include <limits.h>
 #include <ctype.h>
+#include <errno.h>
 #include <dom.h>
 #include <domxpath.h>
 #include <domxslt.h>
@@ -177,7 +178,7 @@ typedef struct {
 
     Token  token;
     char  *strvalue;
-    int    intvalue;
+    long   intvalue;
     double realvalue;
     int    pos;
 
@@ -272,11 +273,11 @@ void rsPrint ( xpathResultSet *rs ) {
              break;
 
         case BoolResult:
-             fprintf(stderr, "boolean result: %d \n", rs->intvalue);
+             fprintf(stderr, "boolean result: %ld \n", rs->intvalue);
              break;
 
         case IntResult:
-             fprintf(stderr, "int result: %d \n", rs->intvalue);
+             fprintf(stderr, "int result: %ld \n", rs->intvalue);
              break;
 
         case RealResult:
@@ -355,12 +356,12 @@ void rsSetInf ( xpathResultSet *rs ) {
 void rsSetNInf ( xpathResultSet *rs ) {
     rs->type = NInfResult;
 }
-void rsSetInt ( xpathResultSet *rs, int i) {
+void rsSetInt ( xpathResultSet *rs, long i) {
 
     rs->type = IntResult;
     rs->intvalue = i;
 }
-void rsSetBool ( xpathResultSet *rs, int i) {
+void rsSetBool ( xpathResultSet *rs, long i) {
 
     rs->type = BoolResult;
     rs->intvalue = (i ? 1 : 0);
@@ -535,7 +536,7 @@ static ast New2( astType type, ast a, ast b ) {
     return t;
 }
 
-static ast NewInt( int i ) {
+static ast NewInt( long i ) {
     ast t = NEWCONS;
 
     t->type      = Int;
@@ -627,7 +628,7 @@ void printAst (int depth, ast t)
         fprintf(stderr, "%s ", astType2str[t->type]);
         switch (t->type) {
 
-            case Int :        fprintf(stderr, "%d", t->intvalue);   break;
+            case Int :        fprintf(stderr, "%ld", t->intvalue);   break;
             case Real:        fprintf(stderr, "%f", t->realvalue);  break;
             case IsElement:
             case IsFQElement:
@@ -1078,7 +1079,13 @@ static XPathTokens xpathLexer (
                            save = xpath[i];
                            xpath[i] = '\0';
                            if (token == INTNUMBER) {
-                               tokens[l].intvalue = atoi(ps);
+                               errno = 0;
+                               tokens[l].intvalue = strtol(ps, NULL, 10);
+                               if (errno == ERANGE 
+                                   && ( tokens[l].intvalue == LONG_MAX 
+                                        || tokens[l].intvalue == LONG_MIN)) {
+                                   token = REALNUMBER;
+                               }
                            }
                            tokens[l].realvalue = (double)atof(ps);
                            xpath[i--] = save;
@@ -1576,9 +1583,9 @@ EndProduction
 |   Step  production
 |
 \----------------------------------------------------------------*/
-static int IsStepPredOptimizable (ast a) {
+static long IsStepPredOptimizable (ast a) {
     ast b;
-    int left;
+    long left;
     
     /* Must be called with a != NULL */
     DBG (
@@ -1763,7 +1770,7 @@ static int usesPositionInformation ( ast a) {
 }
 
 /* Must be called with a != NULL */
-static int checkStepPatternPredOptimizability ( ast a , int *max) {
+static int checkStepPatternPredOptimizability ( ast a , long *max) {
     ast b;
 
     switch (a->type) {
@@ -1863,8 +1870,8 @@ static int checkStepPatternPredOptimizability ( ast a , int *max) {
 }
 
 /* Must be called with a != NULL */
-static int IsStepPatternPredOptimizable ( ast a, int *max ) {
-    int f;
+static long IsStepPatternPredOptimizable ( ast a, long *max ) {
+    long f;
 
     *max = 0;
     f = checkStepPatternPredOptimizability(a, max);
@@ -1920,7 +1927,8 @@ Production(StepPattern)
     }
     {
         ast b = NULL, c = NULL, aCopy = NULL;
-        int stepIsOptimizable = 1, isFirst = 1, max, savedmax;
+        int stepIsOptimizable = 1, isFirst = 1;
+        long max, savedmax;
         while (LA==LBRACKET) {
             b = Recurse (Predicate);
             if (!b) return NULL;
@@ -2282,7 +2290,7 @@ int xpathParse (
         memmove(*errMsg + len+6+newlen, "' ", 3);
 
         for (i=0; tokens[i].token != EOS; i++) {
-            sprintf(tmp, "%s\n%3s%3d %-12s %5d %.3e %5d  ",
+            sprintf(tmp, "%s\n%3s%3d %-12s %5ld %.3e %5d  ",
                          (i==0) ? "\n\nParsed symbols:" : "",
                          (i==l) ? "-->" : "   ",
                           i,
@@ -2417,7 +2425,7 @@ int xpathFuncBoolean (
 )
 {
     switch (rs->type) {
-        case BoolResult:         return ( rs->intvalue         );
+        case BoolResult:         return ( rs->intvalue ? 1 : 0 );
         case IntResult:          return ( rs->intvalue ? 1 : 0 );
         case RealResult:         return ((rs->realvalue != 0.0 ) && !IS_NAN (rs->realvalue));
         case StringResult:       return ( rs->string_len > 0   );
@@ -2669,7 +2677,7 @@ char * xpathFuncString (
             if (rs->intvalue) return (tdomstrdup("true"));
                          else return (tdomstrdup("false"));
         case IntResult:
-            sprintf(tmp, "%d", rs->intvalue);
+            sprintf(tmp, "%ld", rs->intvalue);
             return (tdomstrdup(tmp));
 
         case RealResult:
