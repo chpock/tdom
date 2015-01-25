@@ -1358,6 +1358,13 @@ int tcldom_xpathFuncCallBack (
     DBG(fprintf(stderr, "tcldom_xpathFuncCallBack functionName=%s "
                 "position=%d argc=%d\n", functionName, position, argc);)
 
+    if (strlen(functionName) > 199) {
+        *errMsg = (char*)MALLOC (80 + strlen (functionName));
+        strcpy (*errMsg, "Unreasonable long XPath function: \"");
+        strcat (*errMsg, functionName);
+        strcat (*errMsg, "\"!");
+        return XPATH_EVAL_ERR;
+    }
     sprintf (tclxpathFuncName, "::dom::xpathFunc::%s", functionName);
     DBG(fprintf(stderr, "testing %s\n", tclxpathFuncName);)
     rc = Tcl_GetCommandInfo (interp, tclxpathFuncName, &cmdInfo);

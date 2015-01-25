@@ -1,5 +1,5 @@
-C Fixed\s/\sbetter\shandling\sof\sover-\sor\sunderflow\sintegers\sgiven\sliteral\swithin\sthe\sxpath\sexpression.
-D 2015-01-25T00:09:40.990
+C Still\shardening\sthe\sxpath\sengine\sagainst\srandom\sinput.
+D 2015-01-25T01:01:39.617
 F CHANGES 60eb4f70ac31f48d5c496df7d372c1eceb048c79
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -137,7 +137,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c fff479358cd9d391f83ebad7ef7b1e02cdbf9a90
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
-F generic/tcldom.c 4fa36c7e90a45553bd3487c4e042abb4345b9b0a
+F generic/tcldom.c 58bde9a2935ff997803aab865be5ce7ce85c07bc
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
 F generic/tclexpat.c b23fa4b7c5dd2064dffad2eb71779ca5002b2949
 F generic/tclexpat.h 3d6bba349c0f6757c85ab6e7c59cf9bdf48b1d6b
@@ -222,7 +222,7 @@ F tests/tdomcmd.test b3ec8a3f2c99305aae381989727ac707db2dea58
 F tests/xmlsimple.test b9ca923fb971af2b6170f35a887922e488db928d
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.bench 228b4b5bb2101bc425a4c7b206e2af03e4adaef2
-F tests/xpath.test 52b9a556706187bdead89eaf46e237517c5c88b9
+F tests/xpath.test 758cd668899805b2442e2acd1ff59850c352d309
 F tests/xslt.test f8cfa6308a53e0fb59f7f9e16a0d04fb505ffad2
 F unix/CONFIG 789192e463910e1b9dd7e65f6338390d2bf1f68a
 F unix/tclAppInit.c a1655c51127aed18d069010f234a378fceacb2a6
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 9bec85810d176a08a7a7847e0957b7cc81b136ee
-R 0c7b43206556736a3d407a3d916b4228
+P a34b1c1dff9fde8dc15eabcfab775287c535bf41
+R 61332ca5aba242f3cf8cd7fd83faca3a
 U rolf
-Z 0d0a0b7140022c0ceeeec7804d55e357
+Z 056526ab0fc092ee75a6ca58d2103ac2
 # Remove this line to create a well-formed Fossil manifest.

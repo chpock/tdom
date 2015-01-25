@@ -842,6 +842,13 @@ test xpath-5.32 {Limits} {
     set result
 } {2e+19}
 
+test xpath-5.33 {afl-fuzz found seg faulting 'xpath expr'} {
+    set doc [dom parse <a/>]
+    set result [catch {$doc selectNodes "[string repeat Q 1380](1)"}]
+    $doc delete
+    set result
+} {1}
+
 set doc [dom parse {
 <root>
   <asub>asub2</asub>
