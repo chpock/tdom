@@ -1,5 +1,5 @@
-C Better\serror\smsg.
-D 2015-01-25T13:17:41.722
+C Instrumentation\sof\stcldomsh,\sto\sbe\sable\sto\suse\safl-fuzz\sto\shammer\son\sthe\sXPath\sengine\s(well,\sto\shammer\son\sthe\sXPath\sParser/Lexer/Error\sReporting,\smostly,\sI\sguess).
+D 2015-02-14T20:36:30.968
 F CHANGES 60eb4f70ac31f48d5c496df7d372c1eceb048c79
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -9,9 +9,9 @@ F README 898b19870f39b3014ede29f6e5ea8db1f592e429
 F README.AOL a4faf5f85723467a8d8ca406f8aca855a18441b1
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/xslt.tcl ac4a75ba2f05e26d4ea6f92547983caa80fc6d55
-F configure d7b3e84834cdee90aa514bcfc31cdacbe2aff90c x
+F configure 40e6c5a7fc217cb0fe77b1780d6012cb928f94b4 x
 F configure-tcl8.0.5 db1a666545d519c42e229d245224d456a84c798a x
-F configure.in 6bd9cb6e6ca1a373f5e237de4de7252fac13dc69
+F configure.in dc4fb10c8a223ab174cedee903b5915abd1b696c
 F doc/INDEX.MAP 58c84dac5202a451c9a9b52a6646ee2682ebfc63
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html 2e1a41b03d31f42dd00a0c449f7f28db6227bbf2
@@ -225,7 +225,7 @@ F tests/xpath.bench 228b4b5bb2101bc425a4c7b206e2af03e4adaef2
 F tests/xpath.test 758cd668899805b2442e2acd1ff59850c352d309
 F tests/xslt.test f8cfa6308a53e0fb59f7f9e16a0d04fb505ffad2
 F unix/CONFIG 789192e463910e1b9dd7e65f6338390d2bf1f68a
-F unix/tclAppInit.c a1655c51127aed18d069010f234a378fceacb2a6
+F unix/tclAppInit.c b0decd8c45aaf7609837a175c155612b204c47c6
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F win/makefile.vc c02ca520821d6b575c7237d0a782391aa3916409
 F win/makefile805.vc 9456ed2d305d6231d930202f684929e967b05f40
@@ -238,8 +238,11 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P cda6ae28c12574824a531153b2cbb184ba26ab16
-R 4c67fec3f8fc0a2e397697ee104897b1
+P 6bb4eda2c7fd2380d7ee089df463b44630071a25
+R eb8b04eaa9287a93e5c006012a8aa7f3
+T *branch * fuzzer-instrumentation
+T *sym-fuzzer-instrumentation *
+T -sym-trunk *
 U rolf
-Z ed4c81807ba7fe5a55cd0122a848bbc2
+Z 6ec6541b4a20778a37728c63aeb0ffa2
 # Remove this line to create a well-formed Fossil manifest.

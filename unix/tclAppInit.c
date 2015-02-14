@@ -32,6 +32,7 @@
 \---------------------------------------------------------------------------*/
 
 #include "tcl.h"
+#include "tclInt.h"
 
 #ifndef MODULE_SCOPE
 #   define MODULE_SCOPE extern
@@ -42,6 +43,7 @@ MODULE_SCOPE int main(int, char **);
 extern int Tdom_Init _ANSI_ARGS_((Tcl_Interp *interp));
 extern int Tdom_SafeInit _ANSI_ARGS_((Tcl_Interp *interp));
 
+#define MAX_SCRIPT_SIZE 10000
 /*----------------------------------------------------------------------------
 |   main
 |
@@ -64,13 +66,54 @@ int
 Tcl_AppInit(interp)
     Tcl_Interp *interp;
 {
-    if ((Tcl_Init)(interp) == TCL_ERROR) {
-        return TCL_ERROR;
-    }
+    char script[MAX_SCRIPT_SIZE];
+    char init[] = "set doc [dom parse <doc/>]";
+    int argc;
+    Tcl_Channel input;
+    Tcl_Obj *xpath;
+    
+    /* What Tcl_Init() does it not needed for this purpose, but slows
+     * down things notable. */
+    /* if ((Tcl_Init)(interp) == TCL_ERROR) { */
+    /*     return TCL_ERROR; */
+    /* } */
     if (Tdom_Init(interp) == TCL_ERROR) {
         return TCL_ERROR;
     }
     Tcl_StaticPackage(interp, "tdom", Tdom_Init, Tdom_SafeInit);
-    Tcl_SetVar(interp, "tcl_rcFileName", "~/.tcldomshrc", TCL_GLOBAL_ONLY);
-    return TCL_OK;
+
+    Tcl_GetIntFromObj(interp, 
+                      Tcl_GetVar2Ex(interp, "argc", NULL, 
+                                    TCL_GLOBAL_ONLY),
+                      &argc);
+    if (argc != 0) {
+        fprintf(stderr, "Wrong nr of args. Expecting 1 arg, a XPath"
+                " expression, but given %d.\n", argc + 1);
+        exit(1);
+    }
+    
+    if (Tcl_EvalEx(interp, init, -1, 0) != TCL_OK) {
+        fprintf(stderr, "Error during init:\n%s\n", 
+                Tcl_GetString(Tcl_GetObjResult(interp)));
+        exit(2);
+    }
+    input = Tcl_GetStdChannel(TCL_STDIN);
+    if (input == NULL) {
+        fprintf(stderr, "No stdin input.\n");
+        exit(3);
+    }
+    xpath = Tcl_NewObj();
+    Tcl_ReadChars(input, xpath, -1, 0);
+    if (snprintf(script, MAX_SCRIPT_SIZE, "$doc selectNodes {%s}",
+                 Tcl_GetString(xpath)) >= MAX_SCRIPT_SIZE) {
+        fprintf(stderr, "Resulting script would be too large.\n");
+        exit(3);
+    }
+    if (Tcl_EvalEx(interp, script, -1, 0) != TCL_OK) {
+        fprintf(stderr, "Script error:\n%s\n",
+                Tcl_GetString(Tcl_GetObjResult(interp)));
+        exit(4);
+    }
+    fprintf(stdout, "%s\n", Tcl_GetString(Tcl_GetObjResult(interp)));
+    exit(0);
 }

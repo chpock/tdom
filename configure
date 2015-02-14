@@ -650,6 +650,7 @@ CELIB_DIR
 AR
 SHARED_BUILD
 TCL_THREADS
+TCL_TOP_DIR_NATIVE
 TCL_INCLUDES
 PKG_OBJECTS
 PKG_SOURCES
@@ -5695,7 +5696,64 @@ $as_echo "${ac_cv_c_tclh}" >&6; }
 
 
 
-#TEA_PRIVATE_TCL_HEADERS
+
+    # Allow for --with-tclinclude to take effect and define ${ac_cv_c_tclh}
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for Tcl private include files" >&5
+$as_echo_n "checking for Tcl private include files... " >&6; }
+
+    TCL_SRC_DIR_NATIVE=`${CYGPATH} ${TCL_SRC_DIR}`
+    TCL_TOP_DIR_NATIVE=\"${TCL_SRC_DIR_NATIVE}\"
+
+    # Check to see if tcl<Plat>Port.h isn't already with the public headers
+    # Don't look for tclInt.h because that resides with tcl.h in the core
+    # sources, but the <plat>Port headers are in a different directory
+    if test "${TEA_PLATFORM}" = "windows" -a \
+	-f "${ac_cv_c_tclh}/tclWinPort.h"; then
+	result="private headers found with public headers"
+    elif test "${TEA_PLATFORM}" = "unix" -a \
+	-f "${ac_cv_c_tclh}/tclUnixPort.h"; then
+	result="private headers found with public headers"
+    else
+	TCL_GENERIC_DIR_NATIVE=\"${TCL_SRC_DIR_NATIVE}/generic\"
+	if test "${TEA_PLATFORM}" = "windows"; then
+	    TCL_PLATFORM_DIR_NATIVE=\"${TCL_SRC_DIR_NATIVE}/win\"
+	else
+	    TCL_PLATFORM_DIR_NATIVE=\"${TCL_SRC_DIR_NATIVE}/unix\"
+	fi
+	# Overwrite the previous TCL_INCLUDES as this should capture both
+	# public and private headers in the same set.
+	# We want to ensure these are substituted so as not to require
+	# any *_NATIVE vars be defined in the Makefile
+	TCL_INCLUDES="-I${TCL_GENERIC_DIR_NATIVE} -I${TCL_PLATFORM_DIR_NATIVE}"
+	if test "`uname -s`" = "Darwin"; then
+            # If Tcl was built as a framework, attempt to use
+            # the framework's Headers and PrivateHeaders directories
+            case ${TCL_DEFS} in
+	    	*TCL_FRAMEWORK*)
+		    if test -d "${TCL_BIN_DIR}/Headers" -a \
+			    -d "${TCL_BIN_DIR}/PrivateHeaders"; then
+			TCL_INCLUDES="-I\"${TCL_BIN_DIR}/Headers\" -I\"${TCL_BIN_DIR}/PrivateHeaders\" ${TCL_INCLUDES}"
+		    else
+			TCL_INCLUDES="${TCL_INCLUDES} ${TCL_INCLUDE_SPEC} `echo "${TCL_INCLUDE_SPEC}" | sed -e 's/Headers/PrivateHeaders/'`"
+		    fi
+	            ;;
+	    esac
+	    result="Using ${TCL_INCLUDES}"
+	else
+	    if test ! -f "${TCL_SRC_DIR}/generic/tclInt.h" ; then
+		as_fn_error $? "Cannot find private header tclInt.h in ${TCL_SRC_DIR}" "$LINENO" 5
+	    fi
+	    result="Using srcdir found in tclConfig.sh: ${TCL_SRC_DIR}"
+	fi
+    fi
+
+
+
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: ${result}" >&5
+$as_echo "${result}" >&6; }
+
 
 #TEA_PUBLIC_TK_HEADERS
 #TEA_PRIVATE_TK_HEADERS
