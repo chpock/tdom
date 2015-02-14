@@ -3942,7 +3942,7 @@ static int ExecAction (
     xpathResultSet  rs, nodeList;
     char           *str, *str2, *select, *pc, *nsAT, *out;
     const char     *mode, *modeURI, *localName, *uri, *nsStr;
-    char            prefix[MAX_PREFIX_LEN];
+    char            prefix[MAX_PREFIX_LEN], tmpErr[200];
     int             rc, b, i, len, terminate, chooseState, disableEsc = 0;
     double          currentPrio, currentPrec;
     Tcl_HashEntry  *h;
@@ -4839,7 +4839,7 @@ static int ExecAction (
             CHECK_RC;
 
             str2 = xpathGetStringValue(fragmentNode, &len);
-            xs->xsltMsgCB (xs->xsltMsgClientData, str2, len, terminate);
+            rc = xs->xsltMsgCB (xs->xsltMsgClientData, str2, len, terminate);
             FREE(str2);
             xs->lastNode = savedLastNode;
             domDeleteNode (fragmentNode, NULL, NULL);
@@ -4848,8 +4848,17 @@ static int ExecAction (
                              " \"terminate\"=\"yes\"", errMsg);
                 return -1;
             }
-            return 0;
-
+            switch (rc) {
+            case 0: return 0;
+            case 3: 
+                reportError (actionNode, "", errMsg);
+                return -1;
+            default:
+                sprintf (tmpErr, "Error while executing message callback."
+                         " Message callback result code: %d", rc);
+                reportError (actionNode, tmpErr, errMsg);
+                return -1;
+            }
         case namespaceAlias: 
             reportError (actionNode, "xsl:namespaceAlias is only allowed"
                          " at toplevel.", errMsg);

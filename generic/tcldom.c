@@ -1526,7 +1526,7 @@ int tcldom_xpathFuncCallBack (
 |
 \---------------------------------------------------------------------------*/
 static
-void tcldom_xsltMsgCB (
+int tcldom_xsltMsgCB (
     void *clientData,
     char *str,
     int   length,
@@ -1535,9 +1535,10 @@ void tcldom_xsltMsgCB (
 {
     XsltMsgCBInfo *msgCBInfo = (XsltMsgCBInfo *)clientData;
     Tcl_Obj       *cmdPtr;
-
+    int            rc;
+    
     if (msgCBInfo->msgcmd == NULL) {
-        return;
+        return 0;
     }
     
     cmdPtr = Tcl_DuplicateObj(msgCBInfo->msgcmd);
@@ -1545,7 +1546,7 @@ void tcldom_xsltMsgCB (
     if (Tcl_ListObjAppendElement(msgCBInfo->interp, cmdPtr, 
                                  Tcl_NewStringObj(str, length)) != TCL_OK) {
         Tcl_DecrRefCount(cmdPtr);
-        return;
+        return 1;
     }
     if (terminate) {
         Tcl_ListObjAppendElement(msgCBInfo->interp, cmdPtr,
@@ -1554,9 +1555,13 @@ void tcldom_xsltMsgCB (
         Tcl_ListObjAppendElement(msgCBInfo->interp, cmdPtr,
                                  Tcl_NewBooleanObj(0));
     }
-    Tcl_GlobalEvalObj(msgCBInfo->interp, cmdPtr);
+    rc = Tcl_GlobalEvalObj(msgCBInfo->interp, cmdPtr);
     Tcl_DecrRefCount(cmdPtr);
-    return;
+    switch (rc) {
+    case TCL_OK: return 0;
+    case TCL_BREAK: return 3;
+    default: return rc;
+    }
 }
 
 /*----------------------------------------------------------------------------
