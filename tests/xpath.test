@@ -849,6 +849,29 @@ test xpath-5.33 {afl-fuzz found seg faulting 'xpath expr'} {
     set result
 } {1}
 
+test xpath-5.34 {tcl var resolution in expr} {
+    set doc [dom parse [::tDOM::xmlReadFile ~/tmp/tdomtest.xml]]
+    set which 2
+    set node [$doc selectNodes {
+        (/MIME_INFO/MIME[substring(MIME_SOURCE,
+                                   string-length(MIME_SOURCE) - 2) = 'gif'
+                         or 
+                         substring(MIME_SOURCE,
+                                   string-length(MIME_SOURCE) - 2) = 'jpg'
+                         or
+                         substring(MIME_SOURCE,
+                                   string-length(MIME_SOURCE) - 2) = 'png'
+                         or
+                         substring(MIME_SOURCE,
+                                   string-length(MIME_SOURCE) - 2) = 'bmp'])[$which]
+    }]
+    set result [llength $node]
+    $doc delete
+    set result
+} {1}
+
+
+
 set doc [dom parse {
 <root>
   <asub>asub2</asub>

@@ -1,5 +1,5 @@
-C Document:\sdetecting\snode\sfrom\sstring\stoken\sisnt\sreliable.
-D 2015-02-27T02:04:58.647
+C Documented:\sUsing\stcl\svar\sreference\sin\sexpr\spredicate.
+D 2015-02-27T02:31:17.022
 F CHANGES 60eb4f70ac31f48d5c496df7d372c1eceb048c79
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -222,7 +222,7 @@ F tests/tdomcmd.test b3ec8a3f2c99305aae381989727ac707db2dea58
 F tests/xmlsimple.test b9ca923fb971af2b6170f35a887922e488db928d
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.bench 41d24b5b9b7b4593d002b3c6486cd36061f823bb
-F tests/xpath.test 758cd668899805b2442e2acd1ff59850c352d309
+F tests/xpath.test fc31211d91bb1125b0a5a656ca24c5bb91cef8c2
 F tests/xslt.test f8cfa6308a53e0fb59f7f9e16a0d04fb505ffad2
 F unix/CONFIG 789192e463910e1b9dd7e65f6338390d2bf1f68a
 F unix/tclAppInit.c a1655c51127aed18d069010f234a378fceacb2a6
@@ -238,9 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c6c85b25c29418fea11e5c4790a079f242524674
-Q +2de2b4f0a1ca2e2b44bc8ec8fbe92fa1fdf531e2
-R 593be9152b2aea7c5c1cdb6a9cbcb105
+P b41c199b1ee12f781b225068c98b0d82f07417a6
+R 9f6a005a9b513cdd2c2dca0b54387faf
 U rolf
-Z b5d6be0c72e486a932c754a8da65cf94
+Z 65f58a1837ed5d1a8f60759e0f1ec06f
 # Remove this line to create a well-formed Fossil manifest.
