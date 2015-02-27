@@ -53,7 +53,7 @@ source [file join [file dir [info script]] loadtdom.tcl]
 
 testConstraint threaded [info exists tcl_platform(threaded)]
 
-test domNode-1.1 {to less arguments to domNode command} {
+test domNode-1.1 {too less arguments to nodecmd} {
     set doc [dom createDocument "root"]
     set root [$doc documentElement]
     set result [catch {$root}]
@@ -61,7 +61,7 @@ test domNode-1.1 {to less arguments to domNode command} {
     set result
 } {1}
 
-test domNode-1.2 {to less arguments to domNode command} {
+test domNode-1.2 {too less arguments to domNode token} {
     set doc [dom createDocument "root"]
     set root [$doc documentElement]
     set result [catch {domNode $root}]
@@ -69,7 +69,7 @@ test domNode-1.2 {to less arguments to domNode command} {
     set result
 } {1}
 
-test domNode-1.3 {to less arguments to domNode command} {
+test domNode-1.3 {too less arguments to domNode command} {
     catch {domNode}
 } {1}
 
@@ -83,6 +83,18 @@ test domNode-1.4 {rename of domNodeObj cmd} {knownBug} {
     catch {my_domNode nodeName} errMsg
     lappend result $errMsg
 } {1 0}    
+
+test domNode-1.5 {domNode command: invalid token} {
+    set xml {<doc><e>1</e><e>2</e></doc>}
+
+    set doc [dom parse $xml]
+    set root [domDoc $doc documentElement]
+    set invalidToken [domNode $root firstChild]
+    lappend invalidToken foo
+    set result [catch {domNode $invalidToken selectNodes string(.)}]
+    $doc delete
+    set result
+} {1}
 
 set doc [dom parse {<root xmlns="rootdefaultNS">
     <elem1 xmlns="elem1NS"><elem11/></elem1>
