@@ -54,4 +54,32 @@ bench -desc "path with predicate - cached" -pre {
 }
 
 
+namespace eval ::dom {
+    namespace eval  xpathFunc {
+    }
+}
+
+proc ::dom::xpathFunc::myfunc {args} {
+    return "foo"
+}
+
+dom createNodeCmd elementNode e1
+
+foreach nrOf {1 10 20 30 40 50 60} {
+
+    bench -desc "Tcl scripted XPath func with $nrOf nodes in the current nodelist" -pre {
+        dom createDocument root doc
+        $doc documentElement root
+        $root appendFromScript {
+            for {set x 0} {$x < $nrOf} {incr x} {
+                e1
+            }
+        }
+    } -body {
+        $root selectNodes {e1[myfunc() = '']}
+    } -post {
+        $doc delete
+    }
+
+}
 

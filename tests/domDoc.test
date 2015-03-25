@@ -723,18 +723,6 @@ test domDoc-10.3 {getElementById} -setup $getElementByIdSetup -body {
     $doc delete
 } -result that
 
-test domDoc-10.3 {getElementById} -setup $getElementByIdSetup -body {
-    set root [$doc documentElement]
-    set elemNode [$root selectNodes {elem[2]}]
-    if {![$elemNode hasAttribute id]} {
-        error "error in the test code"
-    }
-    $elemNode setAttribute id "new"
-    [$doc getElementById "new"] getAttribute name
-} -cleanup {
-    $doc delete
-} -result that
-
 test domDoc-10.4 {getElementById} -setup $getElementByIdSetup -body {
     set root [$doc documentElement]
     set elemNode [$root selectNodes {elem[2]}]

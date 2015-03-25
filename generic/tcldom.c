@@ -559,7 +559,8 @@ SetTdomNodeFromAny(
     Tcl_CmdInfo  cmdInfo;
     domNode     *node = NULL;
     char        *nodeName;
-    
+    char         eolcheck;
+
     if (objPtr->typePtr == &tdomNodeType) {
         return TCL_OK;
     }
@@ -571,7 +572,7 @@ SetTdomNodeFromAny(
             return TCL_ERROR;
         }
     }
-    if (sscanf(&nodeName[7], "%p", &node) != 1) {
+    if (sscanf(&nodeName[7], "%p%1c", &node, &eolcheck) != 1) {
         if (!Tcl_GetCommandInfo(interp, nodeName, &cmdInfo)) {
             if (interp) {
                 SetResult("parameter not a domNode!");
@@ -1023,7 +1024,8 @@ domNode * tcldom_getNodeFromObj (
     Tcl_CmdInfo  cmdInfo;
     domNode     *node = NULL;
     char        *nodeName;
-    
+    char         eolcheck;
+
     GetTcldomTSD()
 
     if (nodeObj->typePtr == &tdomNodeType) {
@@ -1042,7 +1044,7 @@ domNode * tcldom_getNodeFromObj (
         SetResult("parameter not a domNode!");
         return NULL;
     }
-    if (sscanf(&nodeName[7], "%p", &node) != 1) {
+    if (sscanf(&nodeName[7], "%p%1c", &node, &eolcheck) != 1) {
         if (!Tcl_GetCommandInfo(interp, nodeName, &cmdInfo)) {
             SetResult("parameter not a domNode!");
             return NULL;
@@ -1070,12 +1072,13 @@ domNode * tcldom_getNodeFromName (
 {
     Tcl_CmdInfo  cmdInfo;
     domNode     *node = NULL;
+    char         eolcheck;
 
     if (strncmp(nodeName, "domNode", 7)) {
         *errMsg = "parameter not a domNode!";
         return NULL;
     }
-    if (sscanf(&nodeName[7], "%p", &node) != 1) {
+    if (sscanf(&nodeName[7], "%p%1c", &node, &eolcheck) != 1) {
         if (!Tcl_GetCommandInfo(interp, nodeName, &cmdInfo)) {
            *errMsg = "parameter not a domNode!";
            return NULL;
@@ -1104,12 +1107,13 @@ domDocument * tcldom_getDocumentFromName (
     Tcl_CmdInfo  cmdInfo;
     domDocument *doc = NULL;
     int          shared = 1;
-    
+    char         eolcheck;
+
     if (strncmp(docName, "domDoc", 6)) {
         *errMsg = "parameter not a domDoc!";
         return NULL;
     }
-    if (sscanf(&docName[6], "%p", &doc) != 1) {
+    if (sscanf(&docName[6], "%p%1c", &doc, &eolcheck) != 1) {
         if (!Tcl_GetCommandInfo(interp, docName, &cmdInfo)) {
             *errMsg = "parameter not a domDoc!";
             return NULL;
@@ -1358,6 +1362,13 @@ int tcldom_xpathFuncCallBack (
     DBG(fprintf(stderr, "tcldom_xpathFuncCallBack functionName=%s "
                 "position=%d argc=%d\n", functionName, position, argc);)
 
+    if (strlen(functionName) > 199) {
+        *errMsg = (char*)MALLOC (80 + strlen (functionName));
+        strcpy (*errMsg, "Unreasonable long XPath function name: \"");
+        strcat (*errMsg, functionName);
+        strcat (*errMsg, "\"!");
+        return XPATH_EVAL_ERR;
+    }
     sprintf (tclxpathFuncName, "::dom::xpathFunc::%s", functionName);
     DBG(fprintf(stderr, "testing %s\n", tclxpathFuncName);)
     rc = Tcl_GetCommandInfo (interp, tclxpathFuncName, &cmdInfo);
@@ -1423,6 +1434,7 @@ int tcldom_xpathFuncCallBack (
             if (listLen == 1) {
                 rsSetString(result, Tcl_GetString(resultPtr));
                 res = XPATH_OK;
+                Tcl_ResetResult(interp);
                 goto funcCallCleanup;
             }
             if (listLen != 2) {

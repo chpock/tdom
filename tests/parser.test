@@ -11,6 +11,8 @@
 #    parser-7.*: parser reset
 #    parser-8.*: parser free
 #    parser-9.*: parser parse
+#    parser-10.*: return code 'return' from callback
+#    parser-11.*: parser input from filename
 #
 # Copyright (c) 1999-2000 Zveno Pty Ltd.
 # Copyright (c) 2002-2005 Rolf Ade
@@ -178,6 +180,28 @@ test parser-1.13 {parser configure} {
     $p parse {<root><a/><b/></root>}
     list $::esh_1_13_1 $::esh_1_13_2
 } {0 3}
+
+test parser-1.14 {parser get} {
+    catch {rename parser-1.14 {}}
+    set parser [expat parser-1.14]
+    set result [catch {$parser get}]
+    $parser free
+    set result
+} {1}
+test parser-1.15 {parser get} {
+    catch {rename parser-1.15 {}}
+    set parser [expat parser-1.15]
+    set result [catch {$parser get foo bar}]
+    $parser free
+    set result
+} {1}
+test parser-1.16 {parser get} {
+    catch {rename parser-1.16 {}}
+    set parser [expat parser-1.16]
+    set result [$parser get -currentbytecount]
+    $parser free
+    set result
+} {0}
 
 # Test break return code from callback
 
@@ -546,6 +570,17 @@ test parser-10.2 {return -code return in callback} {
 </Test>}} errMsg]
     lappend result $errcode $::started(Element)
 } {0 2 0 3}
+
+test parser-11.1 {parse channel input} {
+    catch {unset ::count}
+
+    catch {rename parser-11.1 {}}
+    set parser [::xml::parser parser-11.1 -elementstartcommand Count]
+    set file [file join [pwd] [file dir [info script]] data/books.xml]
+    $parser parsefile $file
+    set ::count
+} {42}
+
 
 foreach parser [info commands xmlparser*] {
     $parser free
