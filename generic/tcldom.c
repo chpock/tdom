@@ -2873,11 +2873,14 @@ void tcldom_treeAsXML (
 
     attrs = node->firstAttr;
     while (attrs) {
-        if (indentAttrs) {
-            writeChars(xmlString, chan, "\n ", 2);
+        if (indentAttrs > -1) {
+            writeChars(xmlString, chan, "\n", 1);
             if ((indent != -1) && doIndent) {
                 for(i=0; i<level; i++) {
                     writeChars(xmlString, chan, "        ", indent);
+                }
+                if (indentAttrs) {
+                    writeChars(xmlString, chan, "        ", indentAttrs);
                 }
             }
         } else {
@@ -3024,7 +3027,7 @@ static int serializeAsXML (
     Tcl_Channel    chan = (Tcl_Channel) NULL;
     Tcl_HashEntry *h;
     Tcl_DString    dStr;
-    int            indentAttrs = 0;
+    int            indentAttrs = -1;
 
     static CONST84 char *asXMLOptions[] = {
         "-indent", "-channel", "-escapeNonASCII", "-doctypeDeclaration",
@@ -3041,7 +3044,7 @@ static int serializeAsXML (
                          "?-indent <0..8>? ?-channel <channelID>? "
                          "?-escapeNonASCII? ?-escapeAllQuot? "
                          "?-doctypeDeclaration <boolean>? "
-			 "?-indentAttrs?");
+			 "?-indentAttrs <0..8>?");
         return TCL_ERROR;
     }
     indent = 4;
@@ -3073,9 +3076,23 @@ static int serializeAsXML (
             break;
 
         case m_indentAttrs:
-            indentAttrs = 1;
-            objc--;
-            objv++;
+            if (objc < 4) {
+                SetResult("-indentAttrs must have an argument "
+                          "(0..8 or 'no'/'none')");
+                return TCL_ERROR;
+            }
+            if (strcmp("none", Tcl_GetString(objv[3]))==0) {
+                indentAttrs = -1;
+            }
+            else if (strcmp("no", Tcl_GetString(objv[3]))==0) {
+                indentAttrs = -1;
+            }
+            else if (Tcl_GetIntFromObj(interp, objv[3], &indentAttrs) != TCL_OK) {
+                SetResult( "indentAttrs must be an integer (0..8) or 'no'/'none'");
+                return TCL_ERROR;
+            }
+            objc -= 2;
+            objv += 2;
             break;
 
         case m_channel:

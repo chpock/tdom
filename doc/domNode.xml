@@ -441,7 +441,8 @@ character reference in decimal representation. If the option
 <m>-escapeAllQuot</m> is given, quotation marks will be escaped with
 &amp;quot; even in text content of elements.  If the option
 <m>-indentAttr</m> is given, then attributes will each be separated 
-with newlines and indented to the same level as the parent node.</desc>
+with newlines and indented to the same level as the parent node plus
+        the value given as argument to <m>-indentAttr</m> (0..8).</desc>
       </commanddef>
 
       <commanddef>
