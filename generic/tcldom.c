@@ -3091,6 +3091,8 @@ static int serializeAsXML (
                 SetResult( "indentAttrs must be an integer (0..8) or 'no'/'none'");
                 return TCL_ERROR;
             }
+            if (indentAttrs > 8) indentAttrs = 8;
+            if (indentAttrs < 0) indentAttrs = 0;
             objc -= 2;
             objv += 2;
             break;

@@ -1,5 +1,5 @@
-C Added\soption\s-indentAttrs\sto\sthe\sdomDoc/domNode\smethod\sasXML.
-D 2015-03-26T01:23:10.556
+C Enforce\svalue\srange\sfor\s-indentAttrs\svalue.
+D 2015-03-26T11:29:25.094
 F CHANGES 60eb4f70ac31f48d5c496df7d372c1eceb048c79
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -137,7 +137,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c fff479358cd9d391f83ebad7ef7b1e02cdbf9a90
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
-F generic/tcldom.c fb1be49be475cd08b139363e7aecd206892dafa9
+F generic/tcldom.c 9df2299164a74f0b46e3edaee1a7daa222ad27b4
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
 F generic/tclexpat.c b23fa4b7c5dd2064dffad2eb71779ca5002b2949
 F generic/tclexpat.h 3d6bba349c0f6757c85ab6e7c59cf9bdf48b1d6b
@@ -238,9 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a57050673a0abb826f8c30c3ce1baaf5472e98a1 ca5b82767d5c5422d8375bb9e05ad34c0d4acc21
-R 15d7d7dd7644be19425328b036456a3f
-T +closed ca5b82767d5c5422d8375bb9e05ad34c0d4acc21
+P 3245a04ed5aa4f5d8f5c3785c044acced74c8934
+R 402cdea426367d83836d68a1495bc006
 U rolf
-Z 2e451a8dd363cb42906b0da6f578edb6
+Z 44b3e1c722232692b88add4ffbd3e830
 # Remove this line to create a well-formed Fossil manifest.
