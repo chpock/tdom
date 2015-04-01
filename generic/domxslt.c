@@ -1897,7 +1897,7 @@ static int buildKeyInfoForDoc (
             node = (domNode*) node->firstAttr;
             continue;
         }
-        if ((node->nodeType == ATTRIBUTE_NODE)) {
+        if (node->nodeType == ATTRIBUTE_NODE) {
             if (((domAttrNode*)node)->nextSibling) {
                 node = (domNode*) ((domAttrNode*)node)->nextSibling;
                 continue;

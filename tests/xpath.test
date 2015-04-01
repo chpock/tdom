@@ -5,7 +5,7 @@
 # Tested commands and object commands:
 #    xpath-1.*: Function tests
 #    xpath-2.*: i18n
-#    xpath-3.*: NaN/Inf
+#    xpath-3.*: NaN/Inf, number conversion
 #    xpath-4.*: Tcl coded XPath functions and additional Tcl coded
 #               XPath functions
 #    xpath-5.*: XPath lexer/parser tests
@@ -265,6 +265,36 @@ test xpath-3.35 {Infinity minus -Infinity} {
 
 $doc delete
 
+set doc [dom parse {<a>
+    <b>
+        <number>1</number>
+    </b>
+    <b>
+        <number>4</number>
+    </b>
+    <b>
+        <number>6</number>
+    </b>
+    <b>
+        <number>7</number>
+    </b>
+    <b>
+        <number>0xA</number>
+    </b>
+    <b>
+        <number>0xB</number>
+    </b>
+    </a>}]
+test xpath-3.36 {number conversion} {
+    $doc selectNodes {count(/a/b[number>4])}
+} {2}
+
+test xpath-3.37 {number conversion} {
+    $doc selectNodes {count(/a/b[4<number])}
+} {2}
+
+$doc delete
+
 set doc [dom parse {<root xmlns:myNS="myNS">Foo</root>}]
 set root [$doc documentElement]
 
@@ -514,9 +544,9 @@ test xpath-5.1 {erroneous XPath expr: missing right brace in predicate} {
 } {1 {Predicate: Expected "RBRACKET" for '*[1' 
 
 Parsed symbols:
-     0 WCARDNAME        0    0.000     0  *
-     1 LBRACKET         0    0.000     1  
-     2 INTNUMBER        1    1.000     2  }}
+     0 WCARDNAME        0 0.000e+00     0  *
+     1 LBRACKET         0 0.000e+00     1  
+     2 INTNUMBER        1 1.000e+00     2  }}
 
 test xpath-5.2 {erroneous XPath expr: missing right brace in predicate} {
     set result [catch {$root selectNodes {*[1][@attr}} errMsg]
@@ -524,12 +554,12 @@ test xpath-5.2 {erroneous XPath expr: missing right brace in predicate} {
 } {1 {Predicate: Expected "RBRACKET" for '*[1][@attr' 
 
 Parsed symbols:
-     0 WCARDNAME        0    0.000     0  *
-     1 LBRACKET         0    0.000     1  
-     2 INTNUMBER        1    1.000     2  
-     3 RBRACKET         0    0.000     3  
-     4 LBRACKET         0    0.000     4  
-     5 ATTRIBUTE        0    0.000     9  attr}}
+     0 WCARDNAME        0 0.000e+00     0  *
+     1 LBRACKET         0 0.000e+00     1  
+     2 INTNUMBER        1 1.000e+00     2  
+     3 RBRACKET         0 0.000e+00     3  
+     4 LBRACKET         0 0.000e+00     4  
+     5 ATTRIBUTE        0 0.000e+00     9  attr}}
 
 test xpath-5.3 {erroneous XPath expr: missing left brace in predicate} {
     catch {$root selectNodes {*1]}}
@@ -776,6 +806,67 @@ test xpath-5.27 {erroneous XPath expr} {
     $doc delete
     set result
 } {1}
+
+test xpath-5.28 {afl-fuzz found seg faulting 'xpath expr'} {
+    set doc [dom parse <a/>]
+    set result [catch {$doc selectNodes {@a//b::*}}]
+    $doc delete
+    set result
+} {1}
+
+test xpath-5.29 {afl-fuzz found seg faulting 'xpath expr'} {
+    set doc [dom parse <a/>]
+    set result [catch {$doc selectNodes {a[1=a::a]}}]
+    $doc delete
+    set result
+} {1}
+
+test xpath-5.30 {afl-fuzz found seg faulting 'xpath expr'} {
+    set doc [dom parse <a/>]
+    set result [catch {$doc selectNodes [string repeate 9 239]@d}]
+    $doc delete
+    set result
+} {1}
+
+test xpath-5.31 {Limits} {
+    set doc [dom parse <a/>]
+    set result [$doc selectNodes {999999999999999 + 999999999999999}]
+    $doc delete
+    set result
+} {1999999999999998.0}
+
+test xpath-5.32 {Limits} {
+    set doc [dom parse <a/>]
+    set result [$doc selectNodes {9999999999999999999 + 9999999999999999999}]
+    $doc delete
+    set result
+} {2e+19}
+
+test xpath-5.33 {afl-fuzz found seg faulting 'xpath expr'} {
+    set doc [dom parse <a/>]
+    set result [catch {$doc selectNodes "[string repeat Q 1380](1)"}]
+    $doc delete
+    set result
+} {1}
+
+test xpath-5.34 {tcl var resolution in expr} {
+    set doc [dom parse {<doc><e att="1"/><e att="2"/><e att="3"/></doc>}]
+    set which 2
+    # Tcl var value is always seen as string by the xpath engine. Any
+    # non empty string is always true
+    set node [$doc selectNodes {/doc/e[$which]}]
+    set result [llength $node]
+    # If another xpath data type is needed, cast explictly
+    set node [$doc selectNodes {/doc/e[number($which)]}]
+    lappend result [llength $node]
+    lappend result [$node @att]
+    set which ""
+    # Empty string is false, by xpath converting rules
+    set node [$doc selectNodes {/doc/e[$which]}]
+    lappend result [llength $node]
+    $doc delete
+    set result
+} {3 1 2 0}
 
 set doc [dom parse {
 <root>

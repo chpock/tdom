@@ -559,7 +559,8 @@ SetTdomNodeFromAny(
     Tcl_CmdInfo  cmdInfo;
     domNode     *node = NULL;
     char        *nodeName;
-    
+    char         eolcheck;
+
     if (objPtr->typePtr == &tdomNodeType) {
         return TCL_OK;
     }
@@ -571,7 +572,7 @@ SetTdomNodeFromAny(
             return TCL_ERROR;
         }
     }
-    if (sscanf(&nodeName[7], "%p", &node) != 1) {
+    if (sscanf(&nodeName[7], "%p%1c", &node, &eolcheck) != 1) {
         if (!Tcl_GetCommandInfo(interp, nodeName, &cmdInfo)) {
             if (interp) {
                 SetResult("parameter not a domNode!");
@@ -1023,7 +1024,8 @@ domNode * tcldom_getNodeFromObj (
     Tcl_CmdInfo  cmdInfo;
     domNode     *node = NULL;
     char        *nodeName;
-    
+    char         eolcheck;
+
     GetTcldomTSD()
 
     if (nodeObj->typePtr == &tdomNodeType) {
@@ -1042,7 +1044,7 @@ domNode * tcldom_getNodeFromObj (
         SetResult("parameter not a domNode!");
         return NULL;
     }
-    if (sscanf(&nodeName[7], "%p", &node) != 1) {
+    if (sscanf(&nodeName[7], "%p%1c", &node, &eolcheck) != 1) {
         if (!Tcl_GetCommandInfo(interp, nodeName, &cmdInfo)) {
             SetResult("parameter not a domNode!");
             return NULL;
@@ -1070,12 +1072,13 @@ domNode * tcldom_getNodeFromName (
 {
     Tcl_CmdInfo  cmdInfo;
     domNode     *node = NULL;
+    char         eolcheck;
 
     if (strncmp(nodeName, "domNode", 7)) {
         *errMsg = "parameter not a domNode!";
         return NULL;
     }
-    if (sscanf(&nodeName[7], "%p", &node) != 1) {
+    if (sscanf(&nodeName[7], "%p%1c", &node, &eolcheck) != 1) {
         if (!Tcl_GetCommandInfo(interp, nodeName, &cmdInfo)) {
            *errMsg = "parameter not a domNode!";
            return NULL;
@@ -1104,12 +1107,13 @@ domDocument * tcldom_getDocumentFromName (
     Tcl_CmdInfo  cmdInfo;
     domDocument *doc = NULL;
     int          shared = 1;
-    
+    char         eolcheck;
+
     if (strncmp(docName, "domDoc", 6)) {
         *errMsg = "parameter not a domDoc!";
         return NULL;
     }
-    if (sscanf(&docName[6], "%p", &doc) != 1) {
+    if (sscanf(&docName[6], "%p%1c", &doc, &eolcheck) != 1) {
         if (!Tcl_GetCommandInfo(interp, docName, &cmdInfo)) {
             *errMsg = "parameter not a domDoc!";
             return NULL;
@@ -1363,6 +1367,13 @@ int tcldom_xpathFuncCallBack (
     DBG(fprintf(stderr, "tcldom_xpathFuncCallBack functionName=%s "
                 "position=%d argc=%d\n", functionName, position, argc);)
 
+    if (strlen(functionName) > 199) {
+        *errMsg = (char*)MALLOC (80 + strlen (functionName));
+        strcpy (*errMsg, "Unreasonable long XPath function name: \"");
+        strcat (*errMsg, functionName);
+        strcat (*errMsg, "\"!");
+        return XPATH_EVAL_ERR;
+    }
     sprintf (tclxpathFuncName, "::dom::xpathFunc::%s", functionName);
     DBG(fprintf(stderr, "testing %s\n", tclxpathFuncName);)
     rc = Tcl_GetCommandInfo (interp, tclxpathFuncName, &cmdInfo);
@@ -2736,7 +2747,8 @@ void tcldom_treeAsXML (
     int         escapeNonASCII,
     int         doctypeDeclaration,
     int         cdataChild,
-    int         escapeAllQuot
+    int         escapeAllQuot,
+    int         indentAttrs
 )
 {
     domAttrNode   *attrs;
@@ -2781,7 +2793,7 @@ void tcldom_treeAsXML (
         while (child) {
             tcldom_treeAsXML(xmlString, child, indent, level, doIndent, chan,
                              escapeNonASCII, doctypeDeclaration, 0,
-                             escapeAllQuot);
+                             escapeAllQuot, indentAttrs);
             child = child->nextSibling;
         }
         return;
@@ -2866,7 +2878,19 @@ void tcldom_treeAsXML (
 
     attrs = node->firstAttr;
     while (attrs) {
-        writeChars(xmlString, chan, " ", 1);
+        if (indentAttrs > -1) {
+            writeChars(xmlString, chan, "\n", 1);
+            if ((indent != -1) && doIndent) {
+                for(i=0; i<level; i++) {
+                    writeChars(xmlString, chan, "        ", indent);
+                }
+                if (indentAttrs) {
+                    writeChars(xmlString, chan, "        ", indentAttrs);
+                }
+            }
+        } else {
+            writeChars(xmlString, chan, " ", 1);
+        }
         writeChars(xmlString, chan, attrs->nodeName, -1);
         writeChars(xmlString, chan, "=\"", 2);
         tcldom_AppendEscaped(xmlString, chan, attrs->nodeValue, 
@@ -2921,7 +2945,7 @@ void tcldom_treeAsXML (
             first = 0;
             tcldom_treeAsXML(xmlString, child, indent, level+1, doIndent,
                              chan, escapeNonASCII, doctypeDeclaration,
-                             cdataChild, escapeAllQuot);
+                             cdataChild, escapeAllQuot, indentAttrs);
             doIndent = 0;
             if (  (child->nodeType == ELEMENT_NODE)
                 ||(child->nodeType == PROCESSING_INSTRUCTION_NODE)
@@ -3008,22 +3032,24 @@ static int serializeAsXML (
     Tcl_Channel    chan = (Tcl_Channel) NULL;
     Tcl_HashEntry *h;
     Tcl_DString    dStr;
+    int            indentAttrs = -1;
 
     static CONST84 char *asXMLOptions[] = {
         "-indent", "-channel", "-escapeNonASCII", "-doctypeDeclaration",
-        "-escapeAllQuot", 
+        "-escapeAllQuot", "-indentAttrs",
         NULL
     };
     enum asXMLOption {
         m_indent, m_channel, m_escapeNonASCII, m_doctypeDeclaration,
-        m_escapeAllQuot
+        m_escapeAllQuot, m_indentAttrs
     };
     
     if (objc > 10) {
         Tcl_WrongNumArgs(interp, 2, objv,
                          "?-indent <0..8>? ?-channel <channelID>? "
                          "?-escapeNonASCII? ?-escapeAllQuot? "
-                         "?-doctypeDeclaration <boolean>?");
+                         "?-doctypeDeclaration <boolean>? "
+			 "?-indentAttrs <0..8>?");
         return TCL_ERROR;
     }
     indent = 4;
@@ -3050,6 +3076,28 @@ static int serializeAsXML (
                 SetResult( "indent must be an integer (0..8) or 'no'/'none'");
                 return TCL_ERROR;
             }
+            objc -= 2;
+            objv += 2;
+            break;
+
+        case m_indentAttrs:
+            if (objc < 4) {
+                SetResult("-indentAttrs must have an argument "
+                          "(0..8 or 'no'/'none')");
+                return TCL_ERROR;
+            }
+            if (strcmp("none", Tcl_GetString(objv[3]))==0) {
+                indentAttrs = -1;
+            }
+            else if (strcmp("no", Tcl_GetString(objv[3]))==0) {
+                indentAttrs = -1;
+            }
+            else if (Tcl_GetIntFromObj(interp, objv[3], &indentAttrs) != TCL_OK) {
+                SetResult( "indentAttrs must be an integer (0..8) or 'no'/'none'");
+                return TCL_ERROR;
+            }
+            if (indentAttrs > 8) indentAttrs = 8;
+            if (indentAttrs < 0) indentAttrs = 0;
             objc -= 2;
             objv += 2;
             break;
@@ -3134,7 +3182,8 @@ static int serializeAsXML (
         }
     }
     tcldom_treeAsXML(resultPtr, node, indent, 0, 1, chan, escapeNonASCII,
-                     doctypeDeclaration, cdataChild, escapeAllQuot);
+                     doctypeDeclaration, cdataChild, 
+                     escapeAllQuot, indentAttrs);
     Tcl_SetObjResult(interp, resultPtr);
     return TCL_OK;
 }

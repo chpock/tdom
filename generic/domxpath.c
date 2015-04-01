@@ -69,6 +69,7 @@
 #include <math.h>
 #include <limits.h>
 #include <ctype.h>
+#include <errno.h>
 #include <dom.h>
 #include <domxpath.h>
 #include <domxslt.h>
@@ -177,7 +178,7 @@ typedef struct {
 
     Token  token;
     char  *strvalue;
-    int    intvalue;
+    long   intvalue;
     double realvalue;
     int    pos;
 
@@ -272,11 +273,11 @@ void rsPrint ( xpathResultSet *rs ) {
              break;
 
         case BoolResult:
-             fprintf(stderr, "boolean result: %d \n", rs->intvalue);
+             fprintf(stderr, "boolean result: %ld \n", rs->intvalue);
              break;
 
         case IntResult:
-             fprintf(stderr, "int result: %d \n", rs->intvalue);
+             fprintf(stderr, "int result: %ld \n", rs->intvalue);
              break;
 
         case RealResult:
@@ -355,12 +356,12 @@ void rsSetInf ( xpathResultSet *rs ) {
 void rsSetNInf ( xpathResultSet *rs ) {
     rs->type = NInfResult;
 }
-void rsSetInt ( xpathResultSet *rs, int i) {
+void rsSetInt ( xpathResultSet *rs, long i) {
 
     rs->type = IntResult;
     rs->intvalue = i;
 }
-void rsSetBool ( xpathResultSet *rs, int i) {
+void rsSetBool ( xpathResultSet *rs, long i) {
 
     rs->type = BoolResult;
     rs->intvalue = (i ? 1 : 0);
@@ -535,7 +536,7 @@ static ast New2( astType type, ast a, ast b ) {
     return t;
 }
 
-static ast NewInt( int i ) {
+static ast NewInt( long i ) {
     ast t = NEWCONS;
 
     t->type      = Int;
@@ -610,7 +611,6 @@ static ast AddChildWithEvalSteps( ast m, ast child ) {
 static void freeAst (ast t)
 {
     ast tmp;
-
     while (t) {
         tmp = t->next;
         if (t->strvalue) FREE(t->strvalue);
@@ -628,7 +628,7 @@ void printAst (int depth, ast t)
         fprintf(stderr, "%s ", astType2str[t->type]);
         switch (t->type) {
 
-            case Int :        fprintf(stderr, "%d", t->intvalue);   break;
+            case Int :        fprintf(stderr, "%ld", t->intvalue);   break;
             case Real:        fprintf(stderr, "%f", t->realvalue);  break;
             case IsElement:
             case IsFQElement:
@@ -1079,7 +1079,13 @@ static XPathTokens xpathLexer (
                            save = xpath[i];
                            xpath[i] = '\0';
                            if (token == INTNUMBER) {
-                               tokens[l].intvalue = atoi(ps);
+                               errno = 0;
+                               tokens[l].intvalue = strtol(ps, NULL, 10);
+                               if (errno == ERANGE 
+                                   && ( tokens[l].intvalue == LONG_MAX 
+                                        || tokens[l].intvalue == LONG_MIN)) {
+                                   token = REALNUMBER;
+                               }
                            }
                            tokens[l].realvalue = (double)atof(ps);
                            xpath[i--] = save;
@@ -1309,7 +1315,7 @@ Production(FilterExpr)
     while (LA==LBRACKET) {
         ast b;
         b = Recurse(Predicate);
-        if (!b) return NULL;
+        if (!b) return a;
         Append( a, New1WithEvalSteps( Pred, b));
     }
 EndProduction
@@ -1339,6 +1345,7 @@ Production(PathExpr)
             ast b;
             Consume(SLASHSLASH);
             b = Recurse(RelativeLocationPath);
+            if (!b) return a;
             if (b->type == AxisChild) {
                 b->type = AxisDescendant;
             } else {
@@ -1576,9 +1583,9 @@ EndProduction
 |   Step  production
 |
 \----------------------------------------------------------------*/
-static int IsStepPredOptimizable (ast a) {
+static long IsStepPredOptimizable (ast a) {
     ast b;
-    int left;
+    long left;
     
     /* Must be called with a != NULL */
     DBG (
@@ -1594,6 +1601,7 @@ static int IsStepPredOptimizable (ast a) {
         if (b->type != ExecFunction 
             || b->intvalue != f_position) return 0;
         b = b->next;
+        if (!b) return 0;
         if (b->type != Int) return 0;
         if (a->type == Less) return b->intvalue;
         else                 return b->intvalue + 1;
@@ -1604,6 +1612,7 @@ static int IsStepPredOptimizable (ast a) {
         if (b->type != Int) return 0;
         left = b->intvalue;
         b = b->next;
+        if (!b) return 0;
         if (b->type != ExecFunction 
             || b->intvalue != f_position) return 0;
         if (a->type == Greater) return left;
@@ -1612,10 +1621,12 @@ static int IsStepPredOptimizable (ast a) {
         b = a->child;
         if (!b) return 0;
         if (b->type == Int
+            && b->next
             && b->next->type == ExecFunction
             && b->next->intvalue == f_position) return b->intvalue;
         if (b->type == ExecFunction
             && b->intvalue == f_position
+            && b->next
             && b->next->type == Int) return b->next->intvalue;
         return 0;
     default: return 0;
@@ -1644,7 +1655,7 @@ Production(Step)
         }
         while (LA==LBRACKET) {
             b = Recurse (Predicate);
-            if (!b) return NULL;
+            if (!b) return a;
             if (isFirst) {
                 a->intvalue = IsStepPredOptimizable (b);
                 DBG (fprintf (stderr, "step type %s, intvalue: %d\n", astType2str[a->type], a->intvalue);)
@@ -1672,6 +1683,7 @@ Production(RelativeLocationPath)
             ast b;
             Consume(SLASHSLASH);
             b = Recurse(Step);
+            if (!b) return a;
             if (b->type == AxisChild) {
                 b->type = AxisDescendant;
             } else {
@@ -1758,7 +1770,7 @@ static int usesPositionInformation ( ast a) {
 }
 
 /* Must be called with a != NULL */
-static int checkStepPatternPredOptimizability ( ast a , int *max) {
+static int checkStepPatternPredOptimizability ( ast a , long *max) {
     ast b;
 
     switch (a->type) {
@@ -1798,6 +1810,7 @@ static int checkStepPatternPredOptimizability ( ast a , int *max) {
             if (b
                 && b->type == ExecFunction
                 && b->intvalue == f_position
+                && b->next
                 && b->next->type == Int) {
                 if (a->type == Less) *max = b->next->intvalue;
                 else *max = b->next->intvalue + 1;
@@ -1810,6 +1823,7 @@ static int checkStepPatternPredOptimizability ( ast a , int *max) {
             b = a->child;
             if (b
                 && b->type == Int 
+                && b->next
                 && b->next->type == ExecFunction
                 && b->next->intvalue == f_position) {
                 if (a->type == Greater) *max = b->intvalue;
@@ -1822,6 +1836,7 @@ static int checkStepPatternPredOptimizability ( ast a , int *max) {
             b = a->child;
             if (b
                 && b->type == Int
+                && b->next
                 && b->next->type == ExecFunction
                 && b->next->intvalue == f_position) {
                 *max = b->intvalue;
@@ -1830,6 +1845,7 @@ static int checkStepPatternPredOptimizability ( ast a , int *max) {
             if (b
                 && b->type == ExecFunction 
                 && b->intvalue == f_position
+                && b->next
                 && b->next->type == Int) {
                 *max = b->next->intvalue;
                 return 0;
@@ -1854,8 +1870,8 @@ static int checkStepPatternPredOptimizability ( ast a , int *max) {
 }
 
 /* Must be called with a != NULL */
-static int IsStepPatternPredOptimizable ( ast a, int *max ) {
-    int f;
+static long IsStepPatternPredOptimizable ( ast a, long *max ) {
+    long f;
 
     *max = 0;
     f = checkStepPatternPredOptimizability(a, max);
@@ -1911,10 +1927,11 @@ Production(StepPattern)
     }
     {
         ast b = NULL, c = NULL, aCopy = NULL;
-        int stepIsOptimizable = 1, isFirst = 1, max, savedmax;
+        int stepIsOptimizable = 1, isFirst = 1;
+        long max, savedmax;
         while (LA==LBRACKET) {
             b = Recurse (Predicate);
-            if (!b) return NULL;
+            if (!b) return a;
             if (stepIsOptimizable) {
                 if (!IsStepPatternPredOptimizable(b, &max)) 
                     stepIsOptimizable = 0;
@@ -2240,7 +2257,7 @@ int xpathParse (
     }
     DDBG(
         for (i=0; tokens[i].token != EOS; i++) {
-            fprintf(stderr, "%3d %-12s %5d %8.3f %5d  %s\n",
+            fprintf(stderr, "%3d %-12s %5ld %8.3f %5d  %s\n",
                             i,
                             token2str[tokens[i].token-LPAR],
                             tokens[i].intvalue,
@@ -2273,7 +2290,7 @@ int xpathParse (
         memmove(*errMsg + len+6+newlen, "' ", 3);
 
         for (i=0; tokens[i].token != EOS; i++) {
-            sprintf(tmp, "%s\n%3s%3d %-12s %5d %8.3f %5d  ",
+            sprintf(tmp, "%s\n%3s%3d %-12s %5ld %.3e %5d  ",
                          (i==0) ? "\n\nParsed symbols:" : "",
                          (i==l) ? "-->" : "   ",
                           i,
@@ -2408,7 +2425,7 @@ int xpathFuncBoolean (
 )
 {
     switch (rs->type) {
-        case BoolResult:         return ( rs->intvalue         );
+        case BoolResult:         return ( rs->intvalue ? 1 : 0 );
         case IntResult:          return ( rs->intvalue ? 1 : 0 );
         case RealResult:         return ((rs->realvalue != 0.0 ) && !IS_NAN (rs->realvalue));
         case StringResult:       return ( rs->string_len > 0   );
@@ -2420,39 +2437,68 @@ int xpathFuncBoolean (
     }
 }
 
-static int
-xpathIsNumber (
-    char *str
+static double xpathStringToNumber (
+    char *str,
+    int  *NaN
     )
 {
     int dotseen = 0;
-    
-    while (*str && IS_XML_WHITESPACE(*str)) str++;
-    if (!*str) return 0;
-    if (*str == '-') {
-        str++;
-        if (!*str) return 0;
-    } else if (*str == '.') {
+    double d;
+    char *pc, *tailptr;
+
+    /* 
+       Just to use strtod() isn't sufficient for a few reasons:
+       - strtod() accepts a leading - or +, but XPath allows only a
+         leading -
+       - strtod() accepts the string represention of a hexadecimal
+         number, but XPath does not
+       - strtod() accepts an optional exponent but XPath does not
+       - strtod() accepts leading whitespace including \f and \v, but
+         XPath doesn't allow this characters. Since this two
+         characters are not legal XML characters, they can not be part
+         of a DOM tree and therefor there isn't a problem with XPath
+         expressions on DOM trees or in XSLT. But on tcl level it's
+         possible, to feed that characters literal into the XPath
+         engine.
+    */
+    *NaN = 0;
+    pc = str;
+    while (*pc && IS_XML_WHITESPACE(*pc)) pc++;
+    if (!*pc) goto returnNaN;
+    if (*pc == '-') {
+        pc++;
+        if (!*pc) goto returnNaN;
+    } else if (*pc == '.') {
         dotseen = 1;
-        str++;
-        if (!*str) return 0;
+        pc++;
+        if (!*pc) goto returnNaN;
     }
-    if (!isdigit((unsigned char)*str)) return 0;
-    while (*str) {
-        if (isdigit((unsigned char)*str)) {
-            str++;
+    if (!isdigit((unsigned char)*pc)) goto returnNaN;
+    while (*pc) {
+        if (isdigit((unsigned char)*pc)) {
+            pc++;
             continue;
         }
-        if (*str == '.' && !dotseen) {
+        if (*pc == '.' && !dotseen) {
             dotseen = 1;
-            str++;
+            pc++;
             continue;
         }
         break;
     }
-    while (*str && IS_XML_WHITESPACE(*str)) str++;
-    if (*str) return 0;
-    else return 1;
+    while (*pc && IS_XML_WHITESPACE(*pc)) pc++;
+    if (*pc) goto returnNaN;
+
+    /* If we are here str is a number string, as XPath expects it. Now
+       we just use strtod(), to get the number */
+    d = strtod (str, &tailptr);
+    if (d == 0.0 && tailptr == str) goto returnNaN;
+    else if (IS_NAN(d)) goto returnNaN;
+    return d;
+
+    returnNaN:
+    *NaN = 2;
+    return strtod ("nan", &tailptr);
 }
 
 /*----------------------------------------------------------------------------
@@ -2465,7 +2511,7 @@ double xpathFuncNumber (
 )
 {
     double d;
-    char   tmp[80], *pc, *tailptr;
+    char  *pc, *tailptr;
 
     *NaN = 0;
     switch (rs->type) {
@@ -2503,68 +2549,12 @@ double xpathFuncNumber (
 #   endif
 #endif
         case StringResult:
-              if (!xpathIsNumber (rs->string)) {
-                  d = strtod ("nan", &tailptr);
-                  *NaN = 2;
-                  return d;
-              }
-              strncpy(tmp, rs->string, (rs->string_len<79) ? rs->string_len : 79);
-              tmp[(rs->string_len<79) ? rs->string_len : 79] = '\0';
-              d = strtod (tmp, &tailptr);
-              if (d == 0.0 && tailptr == tmp) {
-                  d = strtod ("nan", &tailptr);
-                  *NaN = 2;
-              } else
-              if (IS_NAN(d)) {
-                  *NaN = 2;
-              } else
-              if (tailptr) {
-                  while (*tailptr) {
-                      switch (*tailptr) {
-                      case ' ' :
-                      case '\n':
-                      case '\r':
-                      case '\t': tailptr++; continue;
-                      default: break; /*do nothing */
-                      }
-                      d = strtod ("nan", &tailptr);
-                      *NaN = 2;
-                      break;
-                  }
-              }
-              return d;
+            return xpathStringToNumber(rs->string, NaN);
         case xNodeSetResult:
-              pc = xpathFuncString(rs);
-              if (!xpathIsNumber (pc)) {
-                  d = strtod ("nan", &tailptr);
-                  *NaN = 2;
-                  FREE(pc);
-                  return d;
-              }
-              d = strtod (pc, &tailptr);
-              if (d == 0.0 && tailptr == pc) {
-                  d = strtod ("nan", &tailptr);
-                  *NaN = 2;
-              } else
-              if (IS_NAN(d)) {
-                  *NaN = 2;
-              } else
-              if (tailptr) {
-                  while (*tailptr) {
-                      switch (*tailptr) {
-                      case ' ' :
-                      case '\n':
-                      case '\r':
-                      case '\t': tailptr++; continue;
-                      default: break; /*do nothing */
-                      }
-                      d = strtod ("nan", &tailptr);
-                      *NaN = 2;
-                      break;
-                  }
-              }
-              FREE(pc);
-              return d;
+            pc = xpathFuncString(rs);
+            d = xpathStringToNumber(pc, NaN);
+            FREE(pc);
+            return d;
         default:
               DBG(fprintf(stderr, "funcNumber: default: 0.0\n");)
               d = strtod ("nan", &tailptr);
@@ -2687,7 +2677,7 @@ char * xpathFuncString (
             if (rs->intvalue) return (tdomstrdup("true"));
                          else return (tdomstrdup("false"));
         case IntResult:
-            sprintf(tmp, "%d", rs->intvalue);
+            sprintf(tmp, "%ld", rs->intvalue);
             return (tdomstrdup(tmp));
 
         case RealResult:
@@ -2743,28 +2733,6 @@ char * xpathFuncStringForNode (
 
     return xpathGetStringValue (node, &len);
 }
-
-/*----------------------------------------------------------------------------
-|   xpathFuncNumberForNode
-|
-\---------------------------------------------------------------------------*/
-double xpathFuncNumberForNode (
-    domNode *node,
-    int      *NaN
-)
-{
-    char        *pc;
-    int          len, rc;
-    double       d;
-
-    *NaN = 0;
-    pc = xpathGetStringValue (node, &len);
-    rc = sscanf (pc,"%lf", &d);
-    if (rc != 1) *NaN = 2;
-    FREE(pc);
-    return d;
-}
-
 
 /*----------------------------------------------------------------------------
 |   xpathArity
@@ -4701,7 +4669,9 @@ static int xpathEvalStep (
                     break;
                 }
                 for (i=0; i < pleftResult->nr_nodes; i++) {
-                    dLeft = xpathFuncNumberForNode (pleftResult->nodes[i], &NaN);
+                    leftStr = xpathFuncStringForNode (pleftResult->nodes[i]);
+                    dLeft = xpathStringToNumber (leftStr, &NaN);
+                    FREE(leftStr);
                     if (NaN) continue;
                     if (step->type == Equal) res = (dLeft == dRight);
                     else                     res = (dLeft != dRight);
@@ -4810,7 +4780,6 @@ static int xpathEvalStep (
              rsPrint(&rightResult);
         )
         res = 0;
-
         if (   leftResult.type == xNodeSetResult
             || rightResult.type == xNodeSetResult) {
             if (leftResult.type == xNodeSetResult) {
@@ -4822,6 +4791,7 @@ static int xpathEvalStep (
                 prightResult = &leftResult;
                 switchResult = 1;
             }
+
             switch (prightResult->type) {
             case EmptyResult:
                 res = 0;
@@ -4832,10 +4802,14 @@ static int xpathEvalStep (
                      rsPrint(prightResult);
                 )
                 for (i=0; i < pleftResult->nr_nodes; i++) {
-                    dLeft = xpathFuncNumberForNode (pleftResult->nodes[i], &NaN);
+                    leftStr = xpathFuncStringForNode (pleftResult->nodes[i]);
+                    dLeft = xpathStringToNumber (leftStr, &NaN);
+                    FREE(leftStr);
                     if (NaN) continue;
                     for (j=0; j < prightResult->nr_nodes; j++) {
-                        dRight = xpathFuncNumberForNode (prightResult->nodes[j], &NaN);
+                        rightStr = xpathFuncStringForNode (prightResult->nodes[j]);
+                        dRight = xpathStringToNumber (rightStr, &NaN);
+                        FREE(rightStr);
                         if (NaN)  continue;
                         if (switchResult) {
                             dTmp   = dLeft;
@@ -4882,7 +4856,9 @@ static int xpathEvalStep (
 #endif
                 }
                 for (i=0; i < pleftResult->nr_nodes; i++) {
-                    dLeft = xpathFuncNumberForNode (pleftResult->nodes[i], &NaN);
+                    leftStr = xpathFuncStringForNode (pleftResult->nodes[i]);
+                    dLeft = xpathStringToNumber (leftStr, &NaN);
+                    FREE (leftStr);
                     if (NaN) continue;
                     if (switchResult) {
                         dTmp   = dLeft;
@@ -5048,7 +5024,6 @@ static int xpathEvalPredicate (
             *docOrder = savedDocOrder;
             DBG( fprintf(stderr, "after eval for Predicate: \n"); )
             DBG( rsPrint( &predResult); )
-
             if (predResult.type == RealResult) {
                 predResult.type = IntResult;
                 predResult.intvalue = xpathRound(predResult.realvalue);

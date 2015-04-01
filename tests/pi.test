@@ -18,46 +18,41 @@ proc PI {target data args} {
 test pi-1.1 {PI} {
     set ::result {}
 
-    catch {rename xml::pi-1.1 {}}
     set parser [xml::parser pi-1.1 \
 	-processinginstructioncommand PI]
     $parser parse {<?xml version="1.0"?>
 <!DOCTYPE Test>
 <Test><?Test This is a processing instruction?></Test>
 }
+    $parser free
     set ::result
 } {Test {This is a processing instruction}}
 
 test pi-1.2 {PI: missing trailing ?} {
     set ::result {}
 
-    catch {rename xml::pi-1.2 {}}
     set parser [xml::parser pi-1.2 \
 	-processinginstructioncommand PI]
     set returncode [catch {$parser parse {<?xml version="1.0"?>
 <!DOCTYPE Test>
 <Test><?Test This is a syntax error></Test>
 }} msg]
-
+    $parser free
     list $returncode [regexp {error "unclosed token" at.+} $msg]
 } {1 1}
 
 test pi-2.1 {PI with special characters} {
     set ::result {}
 
-    catch {rename xml::pi-2.1 {}}
     set parser [xml::parser pi-2.1 \
 	-processinginstructioncommand PI]
     $parser parse {<?xml version="1.0"?>
 <!DOCTYPE Test>
 <Test><?Test [if !VMLRender]?></Test>
 }
+    $parser free
     set ::result
 } {Test {[if !VMLRender]}}
-
-foreach parser [info commands pi-*] {
-    $parser free
-}
 
 # cleanup
 ::tcltest::cleanupTests

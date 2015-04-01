@@ -118,7 +118,7 @@ test domDoc-1.10 {asXML - unknown option} {
     catch {$doc asXML -fooOption 1} errMsg
     $doc delete
     set errMsg
-} {bad option "-fooOption": must be -indent, -channel, -escapeNonASCII, -doctypeDeclaration, or -escapeAllQuot}
+} {bad option "-fooOption": must be -indent, -channel, -escapeNonASCII, -doctypeDeclaration, -escapeAllQuot, or -indentAttrs}
 
 test domDoc-1.11 {asXML - non boolean value to -doctypeDeclaration} {
     set doc [dom parse {<!DOCTYPE root SYSTEM "file:///boo.baz"><root/>}]
@@ -210,6 +210,16 @@ test domDoc-1.20 {asXML - indentation of comments} {
     <e1/>
     <!--Comment 2-->
 </doc>
+}
+
+test domDoc-1.21 {asXML -indentAttrs} {
+    set doc [dom parse {<Element attr1="val1" attr2="val2"/>}]
+    set result [$doc asXML -indentAttrs 4]
+    $doc delete
+    set result
+} {<Element
+    attr1="val1"
+    attr2="val2"/>
 }
 
 set doc [dom parse <root/>]
