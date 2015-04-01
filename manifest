@@ -1,5 +1,5 @@
-C Documented\sparser\scmd\smethod\scurrentmarkup\smore\sprecisely.
-D 2015-04-01T19:13:58.515
+C Corrected\stypo.
+D 2015-04-01T21:35:27.628
 F CHANGES 60eb4f70ac31f48d5c496df7d372c1eceb048c79
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -140,7 +140,7 @@ F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
 F generic/tcldom.c 9df2299164a74f0b46e3edaee1a7daa222ad27b4
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
 F generic/tclexpat.c b4f90758301e71b2cc435de5071d21ca40fa502a
-F generic/tclexpat.h 8f9e3a25362429f45b13ce0d1fafd4d1f6d41f38
+F generic/tclexpat.h 3fb4df4c023d1f625ec9c5783c4fc1d1e4e0b8bb
 F generic/tdom.decls d825af72ec3fd2ae4ebb1d7f883bde6e3613c914
 F generic/tdom.h ce5839cdddbde35ac016a6033415c73082b2f87c
 F generic/tdomDecls.h dd20e4afe55f21c8a845bc593806fa2d606b18eb
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 4bb38582f85bfb7d00d0813ef48515fcec0169e0
-R 78883a891a21e6e2388c0debac2e299d
+P e6bbca7bff6cf396203d3402c48d6a3d0910f900
+R eef129a9b0131fc67b6a012a0f155f9e
 U rolf
-Z 1d4333621d714c04aa8bf91cf0b13c07
+Z 93ea4e585cad61e3f89e40621ebf6bb3
 # Remove this line to create a well-formed Fossil manifest.
