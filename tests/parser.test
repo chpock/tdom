@@ -11,11 +11,12 @@
 #    parser-7.*: parser reset
 #    parser-8.*: parser free
 #    parser-9.*: parser parse
-#    parser-10.*: return code 'error' from callback
-#    parser-11.*: parser currentmarkup
+#    parser-10.*: return code 'return' from callback
+#    parser-11.*: parser input from filename
+#    parser-12.*: parser currentmarkup
 #
 # Copyright (c) 1999-2000 Zveno Pty Ltd.
-# Copyright (c) 2002-2005 Rolf Ade
+# Copyright (c) 2002-2015 Rolf Ade
 #
 # $Id$
 
@@ -571,23 +572,34 @@ test parser-10.2 {return -code return in callback} {
     lappend result $errcode $::started(Element)
 } {0 2 0 3}
 
-proc elementstart-11.1 {parser args} {
+test parser-11.1 {parse channel input} {
+    catch {unset ::count}
+
+    catch {rename parser-11.1 {}}
+    set parser [::xml::parser parser-11.1 -elementstartcommand Count]
+    set file [file join [pwd] [file dir [info script]] data/books.xml]
+    $parser parsefile $file
+    set ::count
+} {42}
+
+
+proc elementstart-12.1 {parser argsb} {
     global result
     append result [$parser currentmarkup]
 }
 
-proc elementend-11.1 {parser args} {
+proc elementend-12.1 {parser args} {
     global result
     append result [$parser currentmarkup]
 }
 
-test parser-11.1 {currentmarkup method} {
+test parser-12.1 {currentmarkup method} {
     catch {unset result}
     set result ""
-    set p [expat parser-11.1 -noexpand]
+    set p [expat parser-12.1 -noexpand]
     $p configure \
-        -elementstartcommand [list elementstart-11.1 $p] \
-        -elementendcommand [list elementend-11.1 $p]
+        -elementstartcommand [list elementstart-12.1 $p] \
+        -elementendcommand [list elementend-12.1 $p]
     $p parse {<root rootatt="rootatt">text<a
         a_att1="a_att1"
         a_att2 = "a_att2"/><b>more text</b></root>}
@@ -597,16 +609,16 @@ test parser-11.1 {currentmarkup method} {
         a_att1="a_att1"
         a_att2 = "a_att2"/><b></b></root>}
 
-proc characterdata-11.2 {parser data} {
+proc characterdata-12.2 {parser data} {
     global result
     append result [$parser currentmarkup]
 }
-test parser-11.2 {currentmarkup method} {
+test parser-12.2 {currentmarkup method} {
     catch {unset result}
     set result ""
-    set p [expat parser-11.2]
+    set p [expat parser-12.2]
     $p configure \
-        -characterdatacommand [list characterdata-11.2 $p] 
+        -characterdatacommand [list characterdata-12.2 $p] 
     $p parse {<root rootatt="rootatt">text<a
         a_att1="a_att1"
         a_att2 = "a_att2"/><b>more text</b></root>}
@@ -614,31 +626,31 @@ test parser-11.2 {currentmarkup method} {
     set result
 } {}
 
-test parser-11.3 {currentmarkup method} {
-    set p [expat parser-11.3]
+test parser-12.3 {currentmarkup method} {
+    set p [expat parser-12.3]
     set result [$p currentmarkup]
     $p free
     set result
 } {}
 
-proc elementstart-11.4 {parser handlerset args} {
+proc elementstart-12.4 {parser handlerset args} {
     global result
     append result "$handlerset: [$parser currentmarkup]\n"
 }
-proc elementend-11.4 {parser handlerset args} {
+proc elementend-12.4 {parser handlerset args} {
     global result
     append result "$handlerset: [$parser currentmarkup]\n"
 }
-test parser-11.4 {currentmarkup method - multiple handler set} {
+test parser-12.4 {currentmarkup method - multiple handler set} {
     catch {unset result}
     set result ""
-    set p [expat parser-11.4]
+    set p [expat parser-12.4]
     $p configure \
-        -elementstartcommand [list elementstart-11.4 $p default] \
-        -elementendcommand [list elementend-11.4 $p default] \
+        -elementstartcommand [list elementstart-12.4 $p default] \
+        -elementendcommand [list elementend-12.4 $p default] \
         -handlerset "additional" \
-        -elementstartcommand [list elementstart-11.4 $p "additional"] \
-        -elementendcommand [list elementend-11.4 $p "additional"]
+        -elementstartcommand [list elementstart-12.4 $p "additional"] \
+        -elementendcommand [list elementend-12.4 $p "additional"]
     $p parse {<root rootatt="rootatt">text<a
         a_att1="a_att1"
         a_att2 = "a_att2"/><b>more text</b></root>}

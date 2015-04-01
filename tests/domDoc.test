@@ -118,7 +118,7 @@ test domDoc-1.10 {asXML - unknown option} {
     catch {$doc asXML -fooOption 1} errMsg
     $doc delete
     set errMsg
-} {bad option "-fooOption": must be -indent, -channel, -escapeNonASCII, -doctypeDeclaration, or -escapeAllQuot}
+} {bad option "-fooOption": must be -indent, -channel, -escapeNonASCII, -doctypeDeclaration, -escapeAllQuot, or -indentAttrs}
 
 test domDoc-1.11 {asXML - non boolean value to -doctypeDeclaration} {
     set doc [dom parse {<!DOCTYPE root SYSTEM "file:///boo.baz"><root/>}]
@@ -210,6 +210,16 @@ test domDoc-1.20 {asXML - indentation of comments} {
     <e1/>
     <!--Comment 2-->
 </doc>
+}
+
+test domDoc-1.21 {asXML -indentAttrs} {
+    set doc [dom parse {<Element attr1="val1" attr2="val2"/>}]
+    set result [$doc asXML -indentAttrs 4]
+    $doc delete
+    set result
+} {<Element
+    attr1="val1"
+    attr2="val2"/>
 }
 
 set doc [dom parse <root/>]
@@ -710,18 +720,6 @@ test domDoc-10.2 {getElementById - only IDs at parsing time will be found} \
     } -cleanup {
         $doc delete
     } -result {}
-
-test domDoc-10.3 {getElementById} -setup $getElementByIdSetup -body {
-    set root [$doc documentElement]
-    set elemNode [$root selectNodes {elem[2]}]
-    if {![$elemNode hasAttribute id]} {
-        error "error in the test code"
-    }
-    $elemNode setAttribute id "new"
-    [$doc getElementById "new"] getAttribute name
-} -cleanup {
-    $doc delete
-} -result that
 
 test domDoc-10.3 {getElementById} -setup $getElementByIdSetup -body {
     set root [$doc documentElement]

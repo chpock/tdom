@@ -97,7 +97,7 @@ typedef struct astElem {
     struct astElem *child;
     struct astElem *next;
     char           *strvalue;
-    int             intvalue;
+    long            intvalue;
     double          realvalue;
 } astElem;
 
@@ -119,7 +119,7 @@ typedef struct xpathResultSet {
     xpathResultType type;
     char           *string;
     int             string_len;
-    int             intvalue;
+    long            intvalue;
     double          realvalue;          
     domNode       **nodes;
     int             nr_nodes;
@@ -200,8 +200,8 @@ char * xpathGetStringValue (domNode *node, int *strLen);
 
 char * xpathNodeToXPath  (domNode *node, int legacy);
     
-void rsSetBool      ( xpathResultSet *rs, int          i    );
-void rsSetInt       ( xpathResultSet *rs, int          i    );
+void rsSetBool      ( xpathResultSet *rs, long         i    );
+void rsSetInt       ( xpathResultSet *rs, long         i    );
 void rsSetReal      ( xpathResultSet *rs, double       d    );
 void rsSetString    ( xpathResultSet *rs, const char  *s    );
 void rsAddNode      ( xpathResultSet *rs, domNode     *node );

@@ -110,7 +110,7 @@ usually a result of a XSLT transformation.</desc>
         </commanddef>
 
       <commanddef>
-        <command><method>asXML</method> <option>?-indent none/1..8?</option> <option>?-channel channelId?</option> <option>?-escapeNonASCII?</option> <option>?-doctypeDeclaration &lt;boolean&gt;?</option> <option>?-escapeAllQuot?</option></command>
+        <command><method>asXML</method> <option>?-indent none/1..8?</option> <option>?-channel channelId?</option> <option>?-escapeNonASCII?</option> <option>?-doctypeDeclaration &lt;boolean&gt;?</option> <option>?-escapeAllQuot?</option> <option>?-indentAttrs?</option></command>
         <desc>Returns the DOM tree as an (optional indented) XML
 string or sends the output directly to the given channelId. If the
 option <m>-escapeNonASCII</m> is given, every non 7 bit ASCII
@@ -122,7 +122,10 @@ is, to do not. The DOCTYPE name will always be the element name of the
 document element. An external entity declaration of the external
 subset is only emitted, if the document has a system identifier. If
 the option <m>-escapeAllQuot</m> is given, quotation marks will be
-escaped with &amp;quot; even in text content of elements.</desc>
+escaped with &amp;quot; even in text content of elements. If the option
+<m>-indentAttrs</m> is given, then attributes will each be separated 
+with newlines and indented to the same level as the parent node plus
+        the value given as argument to <m>-indentAttrs</m> (0..8).</desc>
 
       </commanddef>
 
@@ -416,7 +419,9 @@ legal according to the rules of the XPath syntax to put an XPath
 variable. The value of the variable is substituted for the variable
 name. Ignoring the syntax rules of XPath the Tcl variable name may be
 any legal Tcl var name: local variables, global variables, array
-entries and so on.</p>
+entries and so on.  The value will always be seen as string literal by
+the xpath engine. Cast the value explicitly with the according xpath
+functions (number(), boolean()) to another data type, if needed.</p>
 
 <p>The option <m>-namespaces</m> expects a tcl list with prefix /
 namespace pairs as argument. If this option is not given, then any
