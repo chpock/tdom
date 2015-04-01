@@ -1315,7 +1315,7 @@ Production(FilterExpr)
     while (LA==LBRACKET) {
         ast b;
         b = Recurse(Predicate);
-        if (!b) return NULL;
+        if (!b) return a;
         Append( a, New1WithEvalSteps( Pred, b));
     }
 EndProduction
@@ -1345,7 +1345,7 @@ Production(PathExpr)
             ast b;
             Consume(SLASHSLASH);
             b = Recurse(RelativeLocationPath);
-            if (!b) return NULL;
+            if (!b) return a;
             if (b->type == AxisChild) {
                 b->type = AxisDescendant;
             } else {
@@ -1655,7 +1655,7 @@ Production(Step)
         }
         while (LA==LBRACKET) {
             b = Recurse (Predicate);
-            if (!b) return NULL;
+            if (!b) return a;
             if (isFirst) {
                 a->intvalue = IsStepPredOptimizable (b);
                 DBG (fprintf (stderr, "step type %s, intvalue: %d\n", astType2str[a->type], a->intvalue);)
@@ -1683,7 +1683,7 @@ Production(RelativeLocationPath)
             ast b;
             Consume(SLASHSLASH);
             b = Recurse(Step);
-            if (!b) return NULL;
+            if (!b) return a;
             if (b->type == AxisChild) {
                 b->type = AxisDescendant;
             } else {
@@ -1931,7 +1931,7 @@ Production(StepPattern)
         long max, savedmax;
         while (LA==LBRACKET) {
             b = Recurse (Predicate);
-            if (!b) return NULL;
+            if (!b) return a;
             if (stepIsOptimizable) {
                 if (!IsStepPatternPredOptimizable(b, &max)) 
                     stepIsOptimizable = 0;
@@ -2257,7 +2257,7 @@ int xpathParse (
     }
     DDBG(
         for (i=0; tokens[i].token != EOS; i++) {
-            fprintf(stderr, "%3d %-12s %5d %8.3f %5d  %s\n",
+            fprintf(stderr, "%3d %-12s %5ld %8.3f %5d  %s\n",
                             i,
                             token2str[tokens[i].token-LPAR],
                             tokens[i].intvalue,
