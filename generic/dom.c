@@ -5376,6 +5376,7 @@ TclTdomObjCmd (dummy, interp, objc, objv)
         Tcl_DStringInit (info->cdata);
         info->encoding_8bit     = 0;
         info->storeLineColumn   = 0;
+        info->ignorexmlns       = 0;
         info->feedbackAfter     = 0;
         info->feedbackCmd       = NULL;
         info->nextFeedbackPosition = 0;

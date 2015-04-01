@@ -1,5 +1,5 @@
-C Merged\sfrom\strunk.
-D 2015-04-01T23:00:54.542
+C Initialize\signorexmlns\sfor\stdom\scmd.
+D 2015-04-01T23:10:41.323
 F CHANGES 60eb4f70ac31f48d5c496df7d372c1eceb048c79
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -122,7 +122,7 @@ F extensions/tnc/tests/loadtnc.tcl 9472a546f30972f5ea6d16880ed57e709556ce88
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c e30dc44a8be8b99c9772daf5cafb3714d8550c37
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
-F generic/dom.c 486eb5c84a17466b2f9424ea4632810bed3fc059
+F generic/dom.c 819617680989337cf8db51df8316bfdf9c9eaf41
 F generic/dom.h 707e26843ad7b343289c47ac075437579986f5dc
 F generic/domalloc.c 55e9eeff19cc54cf3956a7013883ead07efd3593
 F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 8a3978d54800f7651beaeaa693b97113bf197e1a 65c1350cd786b22369153a6a0b632bc935e8c9a4
-R 9f8d8bd1055c9eb26405080ab4bfaf33
+P 4ac7a71245cb2ff35edeb06cca77d7c5a3fe350d
+R 99956e0a326a10f43d25c041e90f571e
 U rolf
-Z f4e2f7ca6dbc2d59c40373696741a89c
+Z b26d4d65ed95944077053eff06c8c130
 # Remove this line to create a well-formed Fossil manifest.
