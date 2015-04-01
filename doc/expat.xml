@@ -591,9 +591,10 @@ named handler set is returned.</p>
           <command><cmd>parser</cmd> <method>currentmarkup</method></command>
 
           <desc><p>Returns the current markup as found in the XML, if
-          called from within one of its markup event handler
-          script. Otherwise it return the empty string.
-          </p></desc>
+          called from within one of its markup event handler script
+          (-elementstartcommand, -elementendcommand, -commentcommand
+          and -processinginstructioncommand). Otherwise it return the
+          empty string.</p></desc>
         </commanddef>
 
         <commanddef>
