@@ -661,6 +661,16 @@ CurrentmarkupCommand(userData, s, len)
         return;
     }
   
+    if (expat->cdata) {
+        /* TclGenExpatCharacterDataHandler() was called and
+         * initialized expat->cdata, but expat->cdata isn't reset by
+         * TclExpatDispatchPCDATA(), so we're called from
+         * -characterdatacommand and return the empty string by
+         * definition. */
+        expat->currentmarkup = NULL;
+        expat->currentmarkuplen = 0;
+        return;
+    }
     expat->currentmarkup = s;
     expat->currentmarkuplen = len;
     return;
@@ -1232,7 +1242,6 @@ TclExpatConfigure (interp, expat, objc, objv)
             activeTclHandlerSet->elementstartclientData 
                 = cmdInfo.objClientData;
         } else {
-            /* hmoreau 22 May 2003 */
             activeTclHandlerSet->elementstartObjProc = NULL;
         }
 	break;
@@ -1251,7 +1260,6 @@ TclExpatConfigure (interp, expat, objc, objv)
             activeTclHandlerSet->elementendObjProc = cmdInfo.objProc;
             activeTclHandlerSet->elementendclientData = cmdInfo.objClientData;
         } else {
-            /* hmoreau 22 May 2003 */
             activeTclHandlerSet->elementendObjProc = NULL;
         }
 	break;
@@ -1294,7 +1302,6 @@ TclExpatConfigure (interp, expat, objc, objv)
             activeTclHandlerSet->datacommandObjProc = cmdInfo.objProc;
             activeTclHandlerSet->datacommandclientData = cmdInfo.objClientData;
         } else {
-            /* hmoreau 22 May 2003 */
             activeTclHandlerSet->datacommandObjProc = NULL;
         }
 	break;
@@ -2787,7 +2794,7 @@ TclExpatDispatchPCDATA(expat)
       activeCHandlerSet = activeCHandlerSet->nextHandlerSet;
   }
   Tcl_DecrRefCount (expat->cdata);
-  expat->cdata = 0;
+  expat->cdata = NULL;
   return;
 }
 

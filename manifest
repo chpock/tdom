@@ -1,5 +1,5 @@
-C Merged\sfrom\strunk.
-D 2015-04-01T00:44:59.001
+C Handle\scalls\sfrom\s-characterdatacommand.\sAdded\stests.
+D 2015-04-01T03:01:05.541
 F CHANGES 60eb4f70ac31f48d5c496df7d372c1eceb048c79
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -139,7 +139,7 @@ F generic/nodecmd.c fff479358cd9d391f83ebad7ef7b1e02cdbf9a90
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
 F generic/tcldom.c 9df2299164a74f0b46e3edaee1a7daa222ad27b4
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
-F generic/tclexpat.c 3033e0ac799d680dd1f1cc9169da877f4f793ce3
+F generic/tclexpat.c b4f90758301e71b2cc435de5071d21ca40fa502a
 F generic/tclexpat.h 8f9e3a25362429f45b13ce0d1fafd4d1f6d41f38
 F generic/tdom.decls d825af72ec3fd2ae4ebb1d7f883bde6e3613c914
 F generic/tdom.h ce5839cdddbde35ac016a6033415c73082b2f87c
@@ -214,7 +214,7 @@ F tests/htmlreader.test 0fffea0d73efb2ccf5e3a807e68b437f55a152d2
 F tests/i18n.test f5493417c35c973a0d8651c3c13d5d4e8272f6bf
 F tests/loadtdom.tcl bf298e4effa2a7de7380687911994f762c0f0c84
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
-F tests/parser.test 52d15e914181746e6f3c1b0a4bc07682497fc79d
+F tests/parser.test 4dcb340748c4bb032367ce1553ba127af7464ad9
 F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 03bb450cd334ca0454a6c99ca3270092ba684833
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 3cc840358e261f488b74ae1d34ca4a8a2605687b ac03b8c44e88333bb3cfeecc82cfcf1f97f5891f
-R 92ba6a339c3acb81bfdeecf5c2fd8d66
+P 9a616f0d215c0dd1070af80367a44bc7d3c2324e
+R 2647e643353333e7bf07c76616e4281c
 U rolf
-Z 4f0464333ae7f4a8f7c7f346fb7cd125
+Z 725a916a1decdf2065d2b553cbdd04d0
 # Remove this line to create a well-formed Fossil manifest.

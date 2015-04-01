@@ -583,7 +583,7 @@ test parser-11.1 {parse channel input} {
 } {42}
 
 
-proc elementstart-12.1 {parser argsb} {
+proc elementstart-12.1 {parser args} {
     global result
     append result [$parser currentmarkup]
 }
@@ -656,7 +656,56 @@ test parser-12.4 {currentmarkup method - multiple handler set} {
         a_att2 = "a_att2"/><b>more text</b></root>}
     $p free
     set result
-} {}
+} {default: <root rootatt="rootatt">
+additional: <root rootatt="rootatt">
+default: <a
+        a_att1="a_att1"
+        a_att2 = "a_att2"/>
+additional: <a
+        a_att1="a_att1"
+        a_att2 = "a_att2"/>
+default: 
+additional: 
+default: <b>
+additional: <b>
+default: </b>
+additional: </b>
+default: </root>
+additional: </root>
+}
+
+proc elementstart-12.5 {parser args} {
+    global result
+    append result "[$parser currentmarkup]"
+}
+test parser-12.5 {currentmarkup method - empty element shortcut -elementstartcommand} {
+    catch {unset result}
+    set result ""
+    set p [expat parser-12.5]
+    $p configure \
+        -elementstartcommand [list elementstart-12.5 $p] 
+    $p parse {<root><elem/></root>}
+    $p free
+    set result
+} {<root><elem/>}
+
+proc elementend-12.6 {parser args} {
+    global result
+    if {[$parser currentmarkup] eq ""} {
+        append result "<elementend called, but currentmarkup return empty string>"
+    }
+    append result "[$parser currentmarkup]"
+}
+test parser-12.6 {currentmarkup method - empty element shortcut -elementendcommand} {
+    catch {unset result}
+    set result ""
+    set p [expat parser-12.6]
+    $p configure \
+        -elementendcommand [list elementend-12.6 $p] 
+    $p parse {<root><elem/></root>}
+    $p free
+    set result
+} {<elementend called, but currentmarkup return empty string></root>}
     
 foreach parser [info commands xmlparser*] {
     $parser free
@@ -664,6 +713,65 @@ foreach parser [info commands xmlparser*] {
 foreach parser [info commands parser-*] {
     $parser free
 }
+
+proc elementdeclcommand-12.7 {parser args} {
+    global result
+    append result "elementdeclcommand: [$parser currentmarkup]"
+}
+
+proc entitydeclcommand-12.7 {parser args} {
+    global result
+    append result "entitydeclcommand: [$parser currentmarkup]"
+}
+
+test parser-12.7 {currentmarkup method - not for doctype markup handler} {
+    catch {unset result}
+    set result ""
+    set p [expat parser-12.7]
+    $p configure \
+        -elementdeclcommand [list elementdeclcommand-12.7 $p] \
+        -entitydeclcommand [list entitydeclcommand-12.7 $p]
+    $p parse {<!DOCTYPE test [
+<!ELEMENT test (#PCDATA) >
+<!ENTITY % xx '&#37;zz;'>
+<!ENTITY % zz '&#60;!ENTITY tricky "error-prone" >' >
+%xx;
+]>
+<test>This sample shows a &tricky; method.</test>}
+    $p free
+    set result
+} {elementdeclcommand: entitydeclcommand: entitydeclcommand: }
+
+proc pi-12.8 {parser args} {
+    global result
+    append result "pi: [$parser currentmarkup]"
+}
+test parser-12.8 {currentmarkup method - processing instruction} {
+    catch {unset result}
+    set result ""
+    set p [expat parser-12.8]
+    $p configure \
+        -processinginstructioncommand [list pi-12.8 $p]
+    $p parse {<doc><?xml-stylesheet type="text/xsl" href="style.xsl"?></doc>}
+    $p free
+    set result
+} {pi: <?xml-stylesheet type="text/xsl" href="style.xsl"?>}
+
+proc comment-12.9 {parser args} {
+    global result
+    append result "comment: [$parser currentmarkup]"
+}
+test parser-12.9 {currentmarkup method - comment} {
+    catch {unset result}
+    set result ""
+    set p [expat parser-12.9]
+    $p configure \
+        -commentcommand [list comment-12.9 $p]
+    $p parse {<doc><!-- A comment --></doc>}
+    $p free
+    set result
+} {comment: <!-- A comment -->}
+
 
 # cleanup
 ::tcltest::cleanupTests
