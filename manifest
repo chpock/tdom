@@ -1,5 +1,5 @@
-C Corrected\stypo.
-D 2015-04-01T21:35:27.628
+C Added\slokal\sclean-up\sto\severy\stest\s(as\sit\sshould\sbe)\sand\sremoved\sgeneral\sclean-up,\swhich\swas\sinterfered\sby\sother\stest\shelper\sprocs.
+D 2015-04-01T21:46:29.232
 F CHANGES 60eb4f70ac31f48d5c496df7d372c1eceb048c79
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -216,7 +216,7 @@ F tests/loadtdom.tcl bf298e4effa2a7de7380687911994f762c0f0c84
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
 F tests/parser.test 4dcb340748c4bb032367ce1553ba127af7464ad9
 F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
-F tests/pi.test 03bb450cd334ca0454a6c99ca3270092ba684833
+F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
 F tests/tdomcmd.test b3ec8a3f2c99305aae381989727ac707db2dea58
 F tests/xmlsimple.test b9ca923fb971af2b6170f35a887922e488db928d
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P e6bbca7bff6cf396203d3402c48d6a3d0910f900
-R eef129a9b0131fc67b6a012a0f155f9e
+P 6f3daefad3d879af9965ea65b742b9f6de15ef74
+R c1e12f2cd614d17fd95b4f0c47d329ae
 U rolf
-Z 93ea4e585cad61e3f89e40621ebf6bb3
+Z 98e37d45b7f8aeced26a1666d00d3386
 # Remove this line to create a well-formed Fossil manifest.
