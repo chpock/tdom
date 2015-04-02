@@ -849,6 +849,25 @@ test xpath-5.33 {afl-fuzz found seg faulting 'xpath expr'} {
     set result
 } {1}
 
+test xpath-5.34 {tcl var resolution in expr} {
+    set doc [dom parse {<doc><e att="1"/><e att="2"/><e att="3"/></doc>}]
+    set which 2
+    # Tcl var value is always seen as string by the xpath engine. Any
+    # non empty string is always true
+    set node [$doc selectNodes {/doc/e[$which]}]
+    set result [llength $node]
+    # If another xpath data type is needed, cast explictly
+    set node [$doc selectNodes {/doc/e[number($which)]}]
+    lappend result [llength $node]
+    lappend result [$node @att]
+    set which ""
+    # Empty string is false, by xpath converting rules
+    set node [$doc selectNodes {/doc/e[$which]}]
+    lappend result [llength $node]
+    $doc delete
+    set result
+} {3 1 2 0}
+
 set doc [dom parse {
 <root>
   <asub>asub2</asub>

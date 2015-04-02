@@ -96,6 +96,18 @@ test domNode-1.5 {domNode command: invalid token} {
     set result
 } {1}
 
+test domNode-1.6 {domNode command: invalid token} {
+    set xml {<doc><e>1</e><e>2</e></doc>}
+
+    set doc [dom parse $xml]
+    set root [domDoc $doc documentElement]
+    set invalidToken [domNode $root firstChild]
+    append invalidToken "\n"
+    set result [catch {domNode $invalidToken selectNodes string(.)}]
+    $doc delete
+    set result
+} {1}
+
 set doc [dom parse {<root xmlns="rootdefaultNS">
     <elem1 xmlns="elem1NS"><elem11/></elem1>
     <elem2 xmlns="elem2NS"/>
