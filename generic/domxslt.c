@@ -4824,8 +4824,8 @@ static int ExecAction (
             else if (strcmp (str, "yes") == 0) terminate = 1;
             else if (strcmp (str, "no")  == 0) terminate = 0;
             else {
-                reportError (actionNode, "Value for terminate should equal"
-                             " 'yes' or 'no'", errMsg);
+                reportError (actionNode, "Allowed values for the 'terminate'"
+                             "attribute: 'yes' or 'no'", errMsg);
                 return -1;
             }
             fragmentNode = domNewElementNode(xs->resultDoc, "",

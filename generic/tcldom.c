@@ -3527,7 +3527,7 @@ static int applyXSLT (
     Tcl_Obj       *objPtr, *localListPtr = (Tcl_Obj *)NULL;
     int            i, result, length, optionIndex;
     int            ignoreUndeclaredParameters = 0;
-    domDocument   *xsltDoc, *xmlDoc, *resultDoc;
+    domDocument   *xsltDoc, *xmlDoc, *resultDoc = NULL;
     XsltMsgCBInfo  xsltMsgInfo;
 
     static char *method_usage = 
@@ -3651,7 +3651,7 @@ static int applyXSLT (
         Tcl_DecrRefCount(xsltMsgInfo.msgcmd);
     }
     return tcldom_returnDocumentObj(interp, resultDoc, (objc == 2),
-                                     (objc == 2) ? objv[1] : NULL, 1, 0);
+                                    (objc == 2) ? objv[1] : NULL, 1, 0);
             
  applyXSLTCleanUP:
     if (localListPtr) {
