@@ -3641,6 +3641,9 @@ static int applyXSLT (
     if (result < 0) {
         SetResult( errMsg );
         FREE(errMsg);
+        if (objc == 2) {
+            Tcl_SetVar (interp, Tcl_GetString(objv[1]), "", 0);
+        }
         goto applyXSLTCleanUP;
     }
     if (parameters) {

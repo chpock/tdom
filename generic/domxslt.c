@@ -7630,6 +7630,7 @@ int xsltProcess (
     xsltPopVarFrame (xs);
     xpathRSFree( &nodeList );
     domFreeDocument (xs->resultDoc, NULL, NULL);
+    xs->resultDoc = NULL;
     if (xsltCmdData) {
         xsltResetState (xs);
     } else {

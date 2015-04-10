@@ -251,7 +251,12 @@ in the stylesheet. The actual command consists of the script, given as argument
 to the option, appended with the XML Fragment from instantiating the
 xsl:message element content as string (as if the XPath string() function would
 have been applied to the XML Fragment) and a flag, which indicates, if the
-xsl:message has an attribute "terminate" with the value "yes".</p>
+xsl:message has an attribute "terminate" with the value "yes". If the
+called script returns anything else then TCL_OK then the xslt
+transformation will be aborted, returning error. If the called script
+returns -code break, the error message is empty, otherwise the result
+code is reported. In case of terminated transformation, the outputVar,
+if given, is set to the empty string.</p>
 </desc>
       </commanddef>
 
