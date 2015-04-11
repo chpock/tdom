@@ -548,6 +548,100 @@ test xslt-2.20 {xslt top level parameter: use top level param to set a top level
     set result
 } {<out>the parameter value</out>}
 
+proc xslt-2.21-xsltmsgcmd {msg terminate} {
+    global result
+    if {$msg eq "3"} {
+        return -code break
+    }
+    append result $msg
+}
+
+test xslt-2.21 {xslt -xsltmessagecmd return code break} {
+    set result ""
+    set xml [dom parse {<doc><e/><e/><e/><e/></doc>}]
+    set xslt [dom parse {<xsl:stylesheet 
+        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+        version="1.0">
+        <xsl:template match="e">
+          <xsl:message><xsl:value-of select="position()"/></xsl:message>
+        </xsl:template>
+        </xsl:stylesheet>}]
+    catch {$xml xslt -xsltmessagecmd xslt-2.21-xsltmsgcmd $xslt resultDoc} errMsg
+    append result $resultDoc $errMsg
+    $xml delete
+    $xslt delete
+    set result
+} {12}
+
+test xslt-2.22 {xslt -xsltmessagecmd return code break} {
+    set result ""
+    set xml [dom parse {<doc><e/><e/><e/><e/></doc>}]
+    set xslt [dom parse {<xsl:stylesheet 
+        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+        version="1.0">
+        <xsl:template match="e">
+          <xsl:message><xsl:value-of select="position()"/></xsl:message>
+        </xsl:template>
+        </xsl:stylesheet>}]
+    set resultDoc "untouched"
+    catch {$xml xslt -ignoreUndeclaredParameters -xsltmessagecmd xslt-2.21-xsltmsgcmd $xslt resultDoc} errMsg
+    append result $resultDoc
+    $xml delete
+    $xslt delete
+    set result
+} {12}
+
+test xslt-2.23 {xslt outputVar} {
+    set result ""
+    set xml [dom parse {<doc/>}]
+    set xslt [dom parse {<xsl:stylesheet 
+        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+        version="1.0">
+        <xsl:template match="/">
+        <resultDoc/>
+        </xsl:template>
+        </xsl:stylesheet>}]
+    set resultDoc "untouched"
+    catch {$xml xslt -foo $xslt resultDoc} errMsg
+    append result $resultDoc
+    $xml delete
+    $xslt delete
+    set result
+} {untouched}
+
+test xslt-2.24 {xslt outputVar} {
+    set xml [dom parse {<doc/>}]
+    set xslt [dom parse {<xsl:stylesheet 
+        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+        version="1.0">
+        <xsl:template match="/">
+        <resultDoc/>
+        </xsl:template>
+        </xsl:stylesheet>}]
+    set result [catch {$xml xslt -foo $xslt }]
+    $xml delete
+    $xslt delete
+    set result
+} {1}
+
+test xslt-2.25 {xslt outputVar} {
+    set xml [dom parse {<doc/>}]
+    set xslt [dom parse {<xsl:stylesheet 
+        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+        version="1.0">
+        <xsl:template match="/">
+        <xsl:message>Here</xsl:message>
+        <resultDoc/>
+        </xsl:template>
+        </xsl:stylesheet>}]
+    $xml xslt $xslt resultDoc
+    $xml delete
+    $xslt delete
+    set result [$resultDoc asXML -indent none]
+    $resultDoc delete
+    set result
+} {<resultDoc/>}
+
 test xslt-3.1 {xslt variable scope} {
     set xml [dom parse {<root/>}]
     set xslt [dom parse {<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">

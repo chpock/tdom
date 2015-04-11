@@ -70,7 +70,7 @@
 #include <domxpath.h>
 
 
-typedef void (*xsltMsgCB) (void *clientData, char *str, 
+typedef int (*xsltMsgCB) (void *clientData, char *str, 
                           int length, int terminate);
 
 /*----------------------------------------------------------------------------
