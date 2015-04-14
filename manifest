@@ -1,5 +1,5 @@
-C Changed\sbehavior\swrt\sto\sresult\scode\sof\san\scalled\s-xsltmessagecmd\sscript.\sUp\sto\snow,\sthe\sresult\scode\sof\sthat\sscript\sevaluation\swas\signored.\sNow,\sany\sother\sreturn\scode\sof\sthat\sscript\sthen\sTCL_OK\sterminates\sthe\sxslt\stransformation\sand\sreturns\serror.\sPurposefull\sterminaion\smay\sbe\ssignaled\swith\sreturn\s-code\sbreak,\sfor\swhich\sthe\serror\smessage\swill\sbe\sempty.
-D 2015-04-11T00:22:20.151
+C Added\sargument\scheck\sfor\sthe\sboolean\sexpecting\stdom\scmd\soption\ssetter\smethods.\sFixed\sthe\signorexmlns\smethod.
+D 2015-04-14T23:43:54.793
 F CHANGES 60eb4f70ac31f48d5c496df7d372c1eceb048c79
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -122,7 +122,7 @@ F extensions/tnc/tests/loadtnc.tcl 9472a546f30972f5ea6d16880ed57e709556ce88
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c e30dc44a8be8b99c9772daf5cafb3714d8550c37
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
-F generic/dom.c 819617680989337cf8db51df8316bfdf9c9eaf41
+F generic/dom.c 163ee9ffc7328cf533a1bf5a448746b3f31bccee
 F generic/dom.h 707e26843ad7b343289c47ac075437579986f5dc
 F generic/domalloc.c 55e9eeff19cc54cf3956a7013883ead07efd3593
 F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 1fddc58c071e17e719597348bed4592fb94b1eb7 be9cfa8f2d8ac6163a66f8239add6d915616c0b3
-R 4c740a751d3e25043ee1f0b82b2449e8
+P 8438342bf7eb7ef7635c6cd535becace42f1a4fe
+R 9b411a75cf2e3a52cd5861c996ac42e0
 U rolf
-Z 8803a16b75c2bfc5e2a5e2a88c68bb54
+Z ac3a00f3a9f658caa8f842ae9cb638da
 # Remove this line to create a well-formed Fossil manifest.

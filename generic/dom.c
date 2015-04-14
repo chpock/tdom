@@ -5458,7 +5458,9 @@ TclTdomObjCmd (dummy, interp, objc, objv)
         }
         Tcl_SetIntObj (Tcl_GetObjResult (interp), info->storeLineColumn);
         if (objc == 4) {
-            Tcl_GetBooleanFromObj (interp, objv[3], &bool);
+            if (Tcl_GetBooleanFromObj (interp, objv[3], &bool) != TCL_OK) {
+                return TCL_ERROR;
+            }
             info->storeLineColumn = bool;
         }
         info->tdomStatus = 1;
@@ -5507,7 +5509,9 @@ TclTdomObjCmd (dummy, interp, objc, objv)
             return TCL_ERROR;
         }
         Tcl_SetIntObj (Tcl_GetObjResult (interp), info->ignoreWhiteSpaces);
-        Tcl_GetBooleanFromObj (interp, objv[3], &bool);
+        if (Tcl_GetBooleanFromObj (interp, objv[3], &bool) != TCL_OK) {
+            return TCL_ERROR;
+        }
         info->ignoreWhiteSpaces = !bool;
         handlerSet->ignoreWhiteCDATAs = !bool;
         info->tdomStatus = 1;
@@ -5521,8 +5525,10 @@ TclTdomObjCmd (dummy, interp, objc, objv)
         }
         Tcl_SetIntObj (Tcl_GetObjResult (interp), info->ignorexmlns);
         if (objc == 4) {
-            Tcl_GetBooleanFromObj (interp, objv[3], &bool);
-            info->storeLineColumn = bool;
+            if (Tcl_GetBooleanFromObj (interp, objv[3], &bool) != TCL_OK) {
+                return TCL_ERROR;
+            }
+            info->ignorexmlns = bool;
         }
         info->tdomStatus = 1;
         break;
