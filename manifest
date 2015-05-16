@@ -1,5 +1,5 @@
-C Added\sargument\scheck\sfor\sthe\sboolean\sexpecting\stdom\scmd\soption\ssetter\smethods.\sFixed\sthe\signorexmlns\smethod.
-D 2015-04-14T23:43:54.793
+C Brought\sinfo\stext\sfiles\sof\sthe\sincluded\sexpat\sversion\sin\ssync\swith\sthe\sactually\sused\sversion\s2.1.0.\sMissed\sto\scopy\sthis\sfiles,\swhile\supdating\sthe\scode\sto\sexpat\s2.1.0.
+D 2015-05-16T21:00:16.882
 F CHANGES 60eb4f70ac31f48d5c496df7d372c1eceb048c79
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -65,8 +65,8 @@ F encodings/iso8859-8.enc 75ee0da275fe59752001d18b9f099ef446a6a577
 F encodings/iso8859-9.enc f585c70a5589de39558dac016743ff85e0c5f032
 F encodings/koi8-r.enc 366c137c02e069b1a93fbb5d64b9120ea6e9ad1f
 F expat/COPYING fd02365360c1936fdd069b08d29c16c6b16e4ea4
-F expat/Changes 800ed77268b2f9e284bcebdd43af7743fac3e59e
-F expat/README 6c08927f6ca2abacce17a5d268340adb7b785b54
+F expat/Changes cc5760bb3bfa85ea0694fbbd68ed544e769e22b5
+F expat/README f7e725a555e7717101d2bae644187530903f18ef
 F expat/VERSION 62c60fbfab305c9bb72463233826af4841015429
 F expat/amigaconfig.h f5dcf53ee80bc0f4d72163df05fde7182d54b5d9
 F expat/ascii.h f15a4854a9041dd9383f14d7aeb991da2f52b6b7
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 8438342bf7eb7ef7635c6cd535becace42f1a4fe
-R 9b411a75cf2e3a52cd5861c996ac42e0
+P c5f26a45cf0dec26b72dea7a1ede027b9c3e7be3
+R 7af84fd922fdb89f725b1fbdfb8ea7f5
 U rolf
-Z ac3a00f3a9f658caa8f842ae9cb638da
+Z fef122c37d7a4efed8f5d114fbd8ae6c
 # Remove this line to create a well-formed Fossil manifest.
