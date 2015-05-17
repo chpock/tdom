@@ -1,6 +1,6 @@
-C Brought\sinfo\stext\sfiles\sof\sthe\sincluded\sexpat\sversion\sin\ssync\swith\sthe\sactually\sused\sversion\s2.1.0.\sMissed\sto\scopy\sthis\sfiles,\swhile\supdating\sthe\scode\sto\sexpat\s2.1.0.
-D 2015-05-16T21:00:16.882
-F CHANGES 60eb4f70ac31f48d5c496df7d372c1eceb048c79
+C Brought\sCHANGES\sup\sto\sdate.
+D 2015-05-17T00:27:33.443
+F CHANGES c7b54b810141d8c9ea4b6b28a7b3d285ce1d2eeb
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 3965f5b535b48290240151057611b376495aadec
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c5f26a45cf0dec26b72dea7a1ede027b9c3e7be3
-R 7af84fd922fdb89f725b1fbdfb8ea7f5
+P 8dfb0f574a45a2dba2bc8de9cb86266337c2bdb9
+R d03bd15fc29307b06c4a1558a416ea06
 U rolf
-Z fef122c37d7a4efed8f5d114fbd8ae6c
+Z 80e30442ff6529e792cea3a6f2bc1385
 # Remove this line to create a well-formed Fossil manifest.
