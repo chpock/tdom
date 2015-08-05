@@ -6256,7 +6256,7 @@ int tcldom_EvalLocked (
     int          flag
 )
 {
-    int ret = TCL_OK;
+    int ret;
     domlock *dl = doc->lock;
 
     domLocksLock(dl, flag);
