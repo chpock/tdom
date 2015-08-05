@@ -3187,12 +3187,13 @@ static int xsltAddTemplate (
         domSplitQName (str, prefix, &localName);
         if (prefix[0] != '\0') {
             ns = domLookupPrefix (node, prefix);
-            if (!ns) {
+            if (ns) {
+                tpl->modeURI = ns->uri;
+            } else {
                 reportError (node, "The prefix of the \"mode\" attribute value"
                              " isn't bound to a namespace.", errMsg);
                 rc = -1;
             }
-            tpl->modeURI = ns->uri;
         }
         tpl->mode = localName;
         if (rc < 0) {
