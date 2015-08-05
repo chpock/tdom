@@ -7404,7 +7404,6 @@ xsltCompileStylesheet (
         StripXSLTSpace (xsltDoc->rootNode);
         precedence = 1.0;
         precedenceLowBound = 0.0;
-        rc = 0;
         rc = processTopLevel (xpathFuncClientData, node, xs, precedence, 
                               &precedenceLowBound, errMsg);
         if (rc != 0) goto error;
