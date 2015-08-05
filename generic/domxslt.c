@@ -5847,7 +5847,6 @@ addExclExtNS (
         if (d != 1.0) {
             reportError (xsltRoot, "Strange \"version\" value.", errMsg);
             return -1;
-            docData->fwCmpProcessing = 0;
         }
     }
 
