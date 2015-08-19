@@ -3832,7 +3832,7 @@ static int xpathEvalStep (
                     DBG(fprintf(stderr, 
                       "AxisChild: after node taking child '%s' domNode%p \n",
                                 child->nodeName, child);)
-                    rsAddNodeFast( result, child);
+                    checkRsAddNode( result, child);
                     count++;
                 }
                 child = child->nextSibling;
@@ -3845,7 +3845,7 @@ static int xpathEvalStep (
                     DBG(fprintf(stderr,
                       "AxisChild: after node taking child '%s' domNode%p \n",
                                 child->nodeName, child);)
-                    rsAddNodeFast( result, child);
+                    checkRsAddNode( result, child);
                 }
                 child = child->nextSibling;
             }
@@ -3998,12 +3998,12 @@ static int xpathEvalStep (
         *docOrder = 1;
         DBG(fprintf(stderr, "AxisSelf :: \n");)
         if (xpathNodeTest(ctxNode, step)) {
-            checkRsAddNode( result, ctxNode);
+            rsAddNode( result, ctxNode);
         }
         break;
 
     case GetContextNode:
-        checkRsAddNode( result, ctxNode);
+        rsAddNode( result, ctxNode);
         break;
 
     case AxisAttribute:
@@ -4018,7 +4018,7 @@ static int xpathEvalStep (
                 attr = ctxNode->firstAttr;
                 while (attr) {
                     if (!(attr->nodeFlags & IS_NS_NODE)) {
-                        rsAddNodeFast (result, (domNode *)attr);
+                        checkRsAddNode (result, (domNode *)attr);
                     }
                     attr = attr->nextSibling;
                 }
@@ -4028,7 +4028,7 @@ static int xpathEvalStep (
                     attr = attr->nextSibling;
                 while (attr) {
                     if (xpathNodeTest( (domNode*)attr, step)) {
-                        rsAddNodeFast (result, (domNode *)attr);
+                        checkRsAddNode (result, (domNode *)attr);
                     }
                     attr = attr->nextSibling;
                 }
@@ -4040,7 +4040,7 @@ static int xpathEvalStep (
                 attr = attr->nextSibling;
             while (attr) {
                 if (xpathNodeTest ( (domNode*)attr, step)) {
-                    rsAddNodeFast (result, (domNode *)attr);
+                    checkRsAddNode (result, (domNode *)attr);
                 }
                 attr = attr->nextSibling;
             }
@@ -4087,19 +4087,22 @@ static int xpathEvalStep (
         *docOrder = 0;
         xpathRSInit (&tResult);
         if (step->type == AxisAncestorOrSelf) {
-            if (xpathNodeTest(ctxNode, step))
+            if (xpathNodeTest(ctxNode, step)) {
                 rsAddNodeFast(&tResult, ctxNode);
+            }
         }
         if (ctxNode->nodeType == ATTRIBUTE_NODE) {
             ctxNode = ((domAttrNode *)ctxNode)->parentNode;
-            if (xpathNodeTest(ctxNode, step))
+            if (xpathNodeTest(ctxNode, step)) {
                 rsAddNodeFast(&tResult, ctxNode);
+            }
         }
         startingNode = ctxNode;
         while (ctxNode->parentNode) {
             ctxNode = ctxNode->parentNode;
-            if (xpathNodeTest(ctxNode, step))
+            if (xpathNodeTest(ctxNode, step)) {
                 rsAddNodeFast(&tResult, ctxNode);
+            }
         }
         if (startingNode != ctxNode->ownerDocument->rootNode) {
             if (xpathNodeTest (ctxNode->ownerDocument->rootNode, step)) {
@@ -4317,7 +4320,7 @@ static int xpathEvalStep (
                     }
                 }
                 if (rc) {attr = attr->nextSibling; continue;}
-                rsAddNodeFast (result, (domNode *)attr);
+                checkRsAddNode (result, (domNode *)attr);
                 attr = attr->nextSibling;
             }
 

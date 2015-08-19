@@ -951,6 +951,36 @@ test xpath-7.6 {parent axis on /} {
     set result
 } {0 0 0}
 
+test xpath-7.7 {Document order in complexer // expresions} -setup {
+    set doc [dom parse {
+    <doc>
+    <a>
+        <b>1</b>
+        <a>
+            <b>11</b>
+        </a>
+        <b>2</b>
+    </a>
+    <a>
+        <a>
+            <b>22</b>
+        </a>
+        <b>3</b>
+        <b>4</b>
+        <a>
+            <b>33</b>
+        </a>
+    </a>
+</doc>}]} -body {
+    set result [list]
+    foreach node [$doc selectNodes //a/b] {
+        lappend result [$node selectNodes string()]
+    }
+    join $result " - "
+} -cleanup {
+    $doc delete
+} -result {1 - 11 - 2 - 22 - 3 - 4 - 33}
+
 # cleanup
 ::tcltest::cleanupTests
 return
