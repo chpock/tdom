@@ -3856,9 +3856,6 @@ static int xpathEvalStep (
         break;
 
     case SlashSlash:
-        if (step->intvalue) predLimit = 1;
-        else predLimit = 0;
-        predLimit = 0;
         xpathRSInit (&tResult);
         node = ctxNode->firstChild;
         while (node) {
@@ -3872,27 +3869,8 @@ static int xpathEvalStep (
             }
             if (xpathNodeTest(node, step)) {
                 rsAddNodeFast( &tResult, node);
-                if (predLimit) {
-                    count++;
-                    if (count >= step->intvalue) break;
-                }
             }
             node = node->nextSibling;
-        }
-        if (node) {
-            node = node->nextSibling;
-            while (node) {
-                if (node->nodeType == ELEMENT_NODE) {
-                    rc = xpathEvalStep (step, node, exprContext, position,
-                                        nodeList, cbs, result, docOrder,
-                                        errMsg);
-                    if (rc) {
-                        xpathRSFree (&tResult);
-                        return rc;
-                    }
-                }
-                node = node->nextSibling;
-            }
         }
         rc = xpathEvalPredicate (step->next, exprContext, result, &tResult,
                                   cbs, docOrder, errMsg);
