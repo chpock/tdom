@@ -25,7 +25,7 @@ set matchfile [list]
 set matchcatalog [list]
 
 proc putsUsage {{channel stderr}} {
-    puts $channel "usage: $argv0 ?options? path/to/catalog.xml"
+    puts $channel "usage: $::argv0 ?options? path/to/catalog.xml"
     puts $channel "where options can be:"
     puts $channel "-loglevel <int>"
     puts $channel "-skip patternlist"
@@ -70,7 +70,7 @@ proc processArgs {argc argv} {
                 set matchcatalog $value
             }
             "-loglevel" {
-                if {![string is interger -strict $value]} {
+                if {[string is integer -strict $value]} {
                     set loglevel $value
                 } else {
                     putsUsage
