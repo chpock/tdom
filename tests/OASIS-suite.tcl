@@ -1,7 +1,7 @@
-
 # Helper script to run xslt 1.0 conformance test suite created by the
 # OASIS XSLT / XPath Conformance Technical Committee. 
 
+catch {source uri.tcl}
 package require tdom
 
 # The following is not needed, given, that tDOM is correctly
@@ -23,27 +23,32 @@ set match [list]
 set matchgroup [list]
 set matchfile [list]
 set matchcatalog [list]
+set verbose 0
 
 proc putsUsage {{channel stderr}} {
     puts $channel "usage: $::argv0 ?options? path/to/catalog.xml"
     puts $channel "where options can be:"
     puts $channel "-loglevel <int>"
     puts $channel "-skip patternlist"
+    puts $channel "-skipid patternlist"
     puts $channel "-match patternlist"
     puts $channel "-matchgroup patternlist"
     puts $channel "-matchfile patternlist"
     puts $channel "-matchcatalog patternlist"
+    puts $channel "-verbose <boolean>"
 }
 
 proc processArgs {argc argv} {
     global catalogfile
     global skip
+    global skipid
     global match
     global matchgroup
     global matchfile
     global matchcatalog
     global loglevel
-
+    global verbose
+    
     if {$argc == 0 || $argc % 2 == 0} {
         putsUsage
         exit 1
@@ -66,12 +71,23 @@ proc processArgs {argc argv} {
             "-skip" {
                 set skip $value
             }
+            "-skipid" {
+                set skipid $value
+            }
             "-matchcatalog" {
                 set matchcatalog $value
             }
             "-loglevel" {
                 if {[string is integer -strict $value]} {
                     set loglevel $value
+                } else {
+                    putsUsage
+                    exit 1
+                }
+            }
+            "-verbose" {
+                if {[string is boolean -strict $value]} {
+                    set verbose $value
                 } else {
                     putsUsage
                     exit 1
@@ -197,7 +213,8 @@ proc runTest {testcase} {
     global infoset
     global compareOK
     global compareDIFF
-
+    global verbose
+    
     set filepath [$testcase selectNodes string(file-path)]
     if {![runFilepath $filepath]} {
         return
@@ -220,6 +237,27 @@ proc runTest {testcase} {
     }
     set xmlfile [$scenario selectNodes \
                      {string(input-file[@role="principal-data"])}]
+    set xslfile [$scenario selectNodes \
+                     {string(input-file[@role="principal-stylesheet"])}]
+    set purpose [$testcase selectNodes string(purpose)]
+    if {![runPurpose $purpose]} {
+        return
+    }
+    if {[skip $purpose]} {
+        log 1 "Skipping $filepath: $purpose"
+        return
+    }
+    if {[skipid [$testcase @id "<noid>"]]} {
+        log 1 "Skipping id [$testcase @id "<noid>"]"
+        return
+    }
+    if {![runXslfile $xslfile]} {
+        log 1 "Skipping xslfile $xslfile"
+        return
+    }
+    if {$verbose} {
+        puts [$testcase @id "<no-id>!!"]
+    }
     set xmlfile [file join $catalogDir $majorpath $filepath $xmlfile]
     if {![file readable $xmlfile]} {
         set xmlfile [findFile $xmlfile \
@@ -230,11 +268,6 @@ proc runTest {testcase} {
                      {string(input-file[@role="principal-data"])}]"
             return
         }
-    }
-    set xslfile [$scenario selectNodes \
-                     {string(input-file[@role="principal-stylesheet"])}]
-    if {![runXslfile $xslfile]} {
-        return
     }
     if {![file readable $xslfile]} {
         set xslfile [findFile $xslfile \
@@ -254,17 +287,9 @@ proc runTest {testcase} {
         set xmloutfile [file join $catalogDir $majorpath "REF_OUT" $filepath \
                             $xmlout]
     }
-    set purpose [$testcase selectNodes string(purpose)]
-    if {![runPurpose $purpose]} {
-        return
-    }
-    if {[skip $purpose]} {
-        log 1 "Skipping $filepath: $purpose"
-        return
-    }
     if {[catch {
         set xmldoc [dom parse -baseurl [baseURL $xmlfile] \
-                        -externalentitycommand extRefHandler \
+                        -externalentitycommand ::tDOM::extRefHandler \
                         -keepEmpties \
                         [xmlReadFile $xmlfile] ]
     } errMsg]} {
