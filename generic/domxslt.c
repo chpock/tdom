@@ -208,7 +208,8 @@ typedef struct xsltAttrSet {
     const char * name;
     const char * uri;
     domNode    * content;
-
+    int          inUse;
+    
     struct xsltAttrSet *next;
 
 } xsltAttrSet;
@@ -3297,17 +3298,34 @@ static int ExecUseAttributeSets (
                 }
             }
             if (rc) {
+                if (attrSet->inUse) {
+                    attrSet->inUse = 0;
+                    *pc = save;
+                    reportError(actionNode, "Circular reference "
+                                "to attribute set", errMsg);
+                    return -1;
+                }
+                attrSet->inUse = 1;
                 str = getAttr (attrSet->content, "use-attribute-sets",
                                a_useAttributeSets);
                 if (str) {
                     rc = ExecUseAttributeSets (xs, context, currentNode,
                                                currentPos, attrSet->content,
                                                str, errMsg);
-                    CHECK_RC;
+                    if (rc < 0) {
+                        attrSet->inUse = 0;
+                        *pc = save;
+                        return rc;
+                    }
                 }
                 rc = ExecActions(xs, context, currentNode, currentPos,
                                  attrSet->content->firstChild, errMsg);
-                CHECK_RC;
+                attrSet->inUse = 0;
+                if (rc < 0) {
+                    attrSet->inUse = 0;
+                    *pc = save;
+                    return rc;
+                }
             }
             attrSet = attrSet->next;
         }
@@ -6274,6 +6292,7 @@ static int processTopLevel (
                     attrSet->next    = NULL;
                     attrSet->content = node;
                     attrSet->name    = localName;
+                    attrSet->inUse   = 0;
                     if (ns) {
                         attrSet->uri = ns->uri;
                     } else {
