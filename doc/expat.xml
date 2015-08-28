@@ -14,7 +14,7 @@
 -->
 
     <synopsis>
-      <syntax><cmd>package require tdom</cmd>
+      <syntax>package require tdom
 
 <cmd>expat</cmd> ?<m>parsername</m>? ?<m>-namespace</m>? ?<m>arg arg ..</m>
 

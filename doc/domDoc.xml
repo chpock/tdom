@@ -13,7 +13,7 @@
   
   -->
   <synopsis>
-    <syntax><cmd>domDocObjCmd</cmd> <m>method</m> ?<m>arg arg ...</m>?</syntax>
+    <syntax>domDocObjCmd <m>method</m> ?<m>arg arg ...</m>?</syntax>
   </synopsis>
 
   <section>
@@ -230,6 +230,7 @@ default is the empty list.</desc>
       <commanddef>
         <command><method>xslt</method> <option>?-parameters
 parameterList?</option> <option>?-ignoreUndeclaredParameters?</option>
+<option>?-maxApplyDepth int?</option>
 <option>?-xsltmessagecmd script?</option> <m>stylesheet</m> <m>?outputVar?</m></command>
         <desc>Applies an XSLT transformation on the whole document of the node
 object using the XSLT <m>stylesheet</m> (given as domDoc). Returns a document
@@ -245,6 +246,11 @@ names in the <m>parameterList</m> given to the <m>-parameters</m> options that
 are not declared as top-level parameters in the stylesheet are silently
 ignored. Without this option, an error is raised, if the user tries to set a
 top-level parameter, which is not declared in the stylesheet.</p>
+
+<p>The option <m>-maxApplyDepth</m> expects a positiv integer as
+argument. By default, the xslt engine allows xslt templates to nest up
+to 3000 levels (and raises error if they nest deeper). This limit can
+be set by the <m>-maxApplyDepth</m> option.</p>
 
 <p>The <m>-xsltmessagecmd</m> option sets a callback for xslt:message elements
 in the stylesheet. The actual command consists of the script, given as argument
@@ -281,6 +287,7 @@ domDoc cmd and all nodeCmds of the document.
   <commanddef>
     <command><method>transform</method> <option>?-parameters
 parameterList?</option> <option>?-ignoreUndeclaredParameters?</option>
+<option>?-maxApplyDepth int?</option> 
 <option>?-xsltmessagecmd script?</option> <m>domDoc</m> <m>?outputVar?</m></command>          
 
         <desc>Applies XSLT transformation on the document
@@ -297,6 +304,11 @@ names in the <m>parameterList</m> given to the <m>-parameters</m> options that
 are not declared as top-level parameters in the stylesheet are silently
 ignored. Without this option, an error is raised, if the user tries to set a
 top-level parameter, which is not declared in the stylesheet.</p>
+
+<p>The option <m>-maxApplyDepth</m> expects a positiv integer as
+argument. By default, the xslt engine allows xslt templates to nest up
+to 3000 levels (and raises error if they nest deeper). This limit can
+be set by the <m>-maxApplyDepth</m> option.</p>
 
 <p>The <m>-xsltmessagecmd</m> option sets a callback for xslt:message elements
 in the stylesheet. The actual command consists of the script, given as argument

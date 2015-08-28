@@ -11,7 +11,6 @@
     <MAN id="domDoc" title="domDoc"/>
     <DEF cat="manpage" name="domDoc" manpage="domDoc"/>
     <DEF cat="cmd" name="domDoc" manpage="domDoc"/>
-    <DEF cat="cmd" name="domDocObjCmd" manpage="domDoc"/>
     <KWD name="DOM node creation" manpage="domDoc"/>
     <KWD name="document element" manpage="domDoc"/>
     <MAN id="domNode" title="domNode"/>
@@ -25,7 +24,6 @@
     <MAN id="expat" title="expat"/>
     <DEF cat="manpage" name="expat" manpage="expat"/>
     <DEF cat="cmd" name="expat" manpage="expat"/>
-    <DEF cat="cmd" name="package require tdom" manpage="expat"/>
     <DEF cat="cmd" name="expat" manpage="expat"/>
     <DEF cat="cmd" name="xml::parser" manpage="expat"/>
     <KWD name="SAX" manpage="expat"/>

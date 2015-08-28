@@ -1,5 +1,5 @@
-C Added\slimit\s(default\s3000)\sfor\sdepth\sof\snesting\sxslt\sapply\stemplates.\sAdded\s-maxApplyDepth\soption\sto\sxslt\stransformation,\sto\sset\sthis\slimit.
-D 2015-08-28T17:45:45.540
+C Added\sdocumentation\sfor\sthe\snew\sxslt\stransformation\soption\s-maxApplyDepth.\sRegenerated\sman\sand\shtml\sfiles.\sOther\sminor\sdoc\stweaks.
+D 2015-08-28T17:52:28.302
 F CHANGES c7b54b810141d8c9ea4b6b28a7b3d285ce1d2eeb
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -12,35 +12,35 @@ F apps/xslt.tcl ac4a75ba2f05e26d4ea6f92547983caa80fc6d55
 F configure d7b3e84834cdee90aa514bcfc31cdacbe2aff90c x
 F configure-tcl8.0.5 db1a666545d519c42e229d245224d456a84c798a x
 F configure.in 6bd9cb6e6ca1a373f5e237de4de7252fac13dc69
-F doc/INDEX.MAP 58c84dac5202a451c9a9b52a6646ee2682ebfc63
+F doc/INDEX.MAP 1583e09fcd279d86bc422cbd59f28a1e5ffa4f54
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
-F doc/category-index.html 2e1a41b03d31f42dd00a0c449f7f28db6227bbf2
-F doc/dom.html 83dfe6dd1af390a57cf4c22903524682aaecf161
-F doc/dom.n e26a09c8817ed9e7a4e80add4c1a3e2a4a672479
+F doc/category-index.html ace146a955ddcd2224127bddc4ed11d0e5d87302
+F doc/dom.html 1041ff80ceb56bbf8e5a0e57694bbe6897853fff
+F doc/dom.n 8833a1f8d0e1eb8c80fff4428fa8da6bf8898749
 F doc/dom.xml 2d883a167212621563c75fd1545578fd7c0df02d
-F doc/domDoc.html 4be0105bdf49a5a921ea4450c0c7a60faba1fcf5
-F doc/domDoc.n 56f3c13de7161ad958b73273d5106ac585879f94
-F doc/domDoc.xml e69101c25a44819b80ac2aa262963fb2948c2f58
-F doc/domNode.html 7b85c62bb2cab64c4ceb18df3d9e64b1d35dbab7
-F doc/domNode.n 62f7dcb38a1157583cedccffc7d1f2746a5e5c1b
-F doc/domNode.xml 463633a6c5c110b95a5ae126b9c413b3fa3b9540
-F doc/expat.html 733c67afdc222e737e34ce035a58cdb12ccc9010
-F doc/expat.n 4b934ab147b361db6a851d54429903e0a384c012
-F doc/expat.xml 3939cdeab4fe5d31b3d605c822bcb3abeef2a0e4
-F doc/expatapi.html 78fdb0648daa4334ff26c538433cfe4606a6ce50
+F doc/domDoc.html cbd85bb277c72d375d5df17b69dd3797cf2d6851
+F doc/domDoc.n ce2e90706f46852fe5e30bd506a692f22417f381
+F doc/domDoc.xml 71781399985b6c6bb34ce3963c111a1562ce56a5
+F doc/domNode.html 49e4f5765259b4411eded605531a54ec0052b57a
+F doc/domNode.n ba60bce02546fae00a89aea0757328651584c757
+F doc/domNode.xml 7cb87cd33e30a6b7a46d5585331b898f8e5a1148
+F doc/expat.html b0f131647c66c4d82308f60895435afc238c24b4
+F doc/expat.n 1532a92db725e1d28a357484fe9105ebe7fb778c
+F doc/expat.xml cc280131ede8000bcfe6d79ead52b0852076a55d
+F doc/expatapi.html 6b824c3b77190c06300ef56b952ed2b2fc966214
 F doc/expatapi.n 6b56b9d897f32d15a7cdac0e0c9b8c636c5b8d56
 F doc/expatapi.xml 82ad1cfa27e60658976cb03d8e7a11d42558651b
-F doc/index.html 0fa236da33e1f5c60b5fb5111a9126fc0f345a2f
-F doc/keyword-index.html ae424b292a1efb90fbb7ad6fff7d01b35bc3c5af
+F doc/index.html d4cbad3c643cbd9d537ba27631c5388becf30dbe
+F doc/keyword-index.html 13fbf9d99d07a6fa533154437c51c8c884fa7fbc
 F doc/manpage.css 3b4ec1d641048933a7e6bffc659de9519030a959
 F doc/tDOM.xml 35369df6a7d84d68cfb28692530ef9d1a8b8ca3e
-F doc/tdomcmd.html 47caca6634bfb67f095145f433b0b297fdfb31f4
+F doc/tdomcmd.html ba0fd80d6dfd6dc6ca0ba0158da728755289bd68
 F doc/tdomcmd.n 087bbf0cf783376e39ff903a48bc377ce507b8f3
 F doc/tdomcmd.xml fa7bb2424b54e7180148f53557f4059673103c9a
 F doc/tmml.dtd 63259dc9f69f9104f1515be445b85b195a1fb990
 F doc/tmml.options 8a76115c6e9725e8dae55b3005e8ba9878023bbd
 F doc/tmml.rnc 65a2a69ac3347b19aa57e70bb127a4923f5dfc95
-F doc/tnc.html 1a77360e159e02ba7c2c5328e8691f25c03bcfe0
+F doc/tnc.html 068f329b8c06745b4c1b7c34d943376d9df08183
 F doc/tnc.n 147129ce67de3ac8758752bf9747ebf193f60626
 F doc/tnc.xml 9a687664923259ff45bd0cf4b69d4c65dc3f59f3
 F encodings/GenCompactCodings 5996a4e04bf65b44226c90260f7a19c30c077a7a x
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f77308141140a112d59bd5dab6a006f08001748b
-R 26c115bb794e999d744fe256f122e85f
+P a52f940880bab23826ce20fa495fd08cbfe14e1b
+R bfa8ce693e3a6d4b14185de10cca6028
 U rolf
-Z 4c463cf0a6ce2a74a4cf4e1fe4d94d98
+Z b8c046a69bcb5060c60c9fd319e04194
 # Remove this line to create a well-formed Fossil manifest.

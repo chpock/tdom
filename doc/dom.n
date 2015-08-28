@@ -316,6 +316,19 @@ entity (including the external subset) will be resolved and parsed. The value
 "notstandalone" means, that all external entities will be resolved and parsed,
 with the execption of documents, which explicitly states standalone="yes" in
 their XML declaration.
+.IP "\fB-ignorexmlns\fR"
+It is recommended, that you not use this
+option. If this option is given, no node within the
+created DOM tree will be internally marked as placed
+into an XML Namespace, even if there is a default
+namespace in scope for un-prefixed elements or even if
+the element has a defined namespace prefix. One
+consequence is of this is, that XPath node expressions
+on such a DOM tree doesn't work as expected. Prefixed
+element nodes can't be selected and element nodes
+without prefix will be seen by XPath expressions as if
+they haven't any namespace (no matter if they in fact
+in a default namespace).
 .PP
 .RE
 .TP

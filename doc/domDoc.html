@@ -4,16 +4,15 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0xb33e90">NAME</a> · <a href="#SECTid0xbdcc00">SYNOPSIS</a> · <a href="#SECTid0xbd6c70">DESCRIPTION </a> · <a href="#SECTid0xc270c0">SEE ALSO</a> · <a href="#SECTid0xc27450">KEYWORDS</a>
+<a href="#SECTid0xd3bcc0">NAME</a> · <a href="#SECTid0xcbe3d0">SYNOPSIS</a> · <a href="#SECTid0xdbecb0">DESCRIPTION </a> · <a href="#SECTid0xe1c0f0">SEE ALSO</a> · <a href="#SECTid0xe1c480">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0xb33e90">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0xd3bcc0">NAME</a></h2><p class="namesection">
 <b class="names">domDoc - </b><br>Manipulates an instance of a DOM document object</p>
   
-  <h2><a name="SECTid0xbdcc00">SYNOPSIS</a></h2><pre class="syntax">
-<b class="cmd">domDocObjCmd</b> <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
+  <h2><a name="SECTid0xcbe3d0">SYNOPSIS</a></h2><pre class="syntax">domDocObjCmd <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
 
-  <h2><a name="SECTid0xbd6c70">DESCRIPTION </a></h2><p>This command manipulates one particular instance of a document
+  <h2><a name="SECTid0xdbecb0">DESCRIPTION </a></h2><p>This command manipulates one particular instance of a document
 object. <i class="m">method</i> indicates a specific method of the document class. These
 methods should closely conform to the W3C recommendation "Document Object Model
 (Core) Level 1" (<a href="http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html">http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html</a>). Look
@@ -111,7 +110,7 @@ usually a result of a XSLT transformation.</dd>
 
       
         <dt>
-<b class="method">asXML</b> <b class="option">?-indent none/1..8?</b> <b class="option">?-channel channelId?</b> <b class="option">?-escapeNonASCII?</b> <b class="option">?-doctypeDeclaration &lt;boolean&gt;?</b> <b class="option">?-escapeAllQuot?</b>
+<b class="method">asXML</b> <b class="option">?-indent none/1..8?</b> <b class="option">?-channel channelId?</b> <b class="option">?-escapeNonASCII?</b> <b class="option">?-doctypeDeclaration &lt;boolean&gt;?</b> <b class="option">?-escapeAllQuot?</b> <b class="option">?-indentAttrs?</b>
 </dt>
         <dd>Returns the DOM tree as an (optional indented) XML
 string or sends the output directly to the given channelId. If the
@@ -124,7 +123,10 @@ is, to do not. The DOCTYPE name will always be the element name of the
 document element. An external entity declaration of the external
 subset is only emitted, if the document has a system identifier. If
 the option <i class="m">-escapeAllQuot</i> is given, quotation marks will be
-escaped with &amp;quot; even in text content of elements.</dd>
+escaped with &amp;quot; even in text content of elements. If the option
+<i class="m">-indentAttrs</i> is given, then attributes will each be separated 
+with newlines and indented to the same level as the parent node plus
+        the value given as argument to <i class="m">-indentAttrs</i> (0..8).</dd>
 
       
 
@@ -242,6 +244,7 @@ default is the empty list.</dd>
         <dt>
 <b class="method">xslt</b> <b class="option">?-parameters
 parameterList?</b> <b class="option">?-ignoreUndeclaredParameters?</b>
+<b class="option">?-maxApplyDepth int?</b>
 <b class="option">?-xsltmessagecmd script?</b> <i class="m">stylesheet</i> <i class="m">?outputVar?</i>
 </dt>
         <dd>Applies an XSLT transformation on the whole document of the node
@@ -259,12 +262,22 @@ are not declared as top-level parameters in the stylesheet are silently
 ignored. Without this option, an error is raised, if the user tries to set a
 top-level parameter, which is not declared in the stylesheet.</p>
 
+<p>The option <i class="m">-maxApplyDepth</i> expects a positiv integer as
+argument. By default, the xslt engine allows xslt templates to nest up
+to 3000 levels (and raises error if they nest deeper). This limit can
+be set by the <i class="m">-maxApplyDepth</i> option.</p>
+
 <p>The <i class="m">-xsltmessagecmd</i> option sets a callback for xslt:message elements
 in the stylesheet. The actual command consists of the script, given as argument
 to the option, appended with the XML Fragment from instantiating the
 xsl:message element content as string (as if the XPath string() function would
 have been applied to the XML Fragment) and a flag, which indicates, if the
-xsl:message has an attribute "terminate" with the value "yes".</p>
+xsl:message has an attribute "terminate" with the value "yes". If the
+called script returns anything else then TCL_OK then the xslt
+transformation will be aborted, returning error. If the called script
+returns -code break, the error message is empty, otherwise the result
+code is reported. In case of terminated transformation, the outputVar,
+if given, is set to the empty string.</p>
 </dd>
       
 
@@ -291,6 +304,7 @@ domDoc cmd and all nodeCmds of the document.
     <dt>
 <b class="method">transform</b> <b class="option">?-parameters
 parameterList?</b> <b class="option">?-ignoreUndeclaredParameters?</b>
+<b class="option">?-maxApplyDepth int?</b> 
 <b class="option">?-xsltmessagecmd script?</b> <i class="m">domDoc</i> <i class="m">?outputVar?</i>
 </dt>          
 
@@ -308,6 +322,11 @@ names in the <i class="m">parameterList</i> given to the <i class="m">-parameter
 are not declared as top-level parameters in the stylesheet are silently
 ignored. Without this option, an error is raised, if the user tries to set a
 top-level parameter, which is not declared in the stylesheet.</p>
+
+<p>The option <i class="m">-maxApplyDepth</i> expects a positiv integer as
+argument. By default, the xslt engine allows xslt templates to nest up
+to 3000 levels (and raises error if they nest deeper). This limit can
+be set by the <i class="m">-maxApplyDepth</i> option.</p>
 
 <p>The <i class="m">-xsltmessagecmd</i> option sets a callback for xslt:message elements
 in the stylesheet. The actual command consists of the script, given as argument
@@ -460,7 +479,9 @@ legal according to the rules of the XPath syntax to put an XPath
 variable. The value of the variable is substituted for the variable
 name. Ignoring the syntax rules of XPath the Tcl variable name may be
 any legal Tcl var name: local variables, global variables, array
-entries and so on.</p>
+entries and so on.  The value will always be seen as string literal by
+the xpath engine. Cast the value explicitly with the according xpath
+functions (number(), boolean()) to another data type, if needed.</p>
 
 <p>The option <i class="m">-namespaces</i> expects a tcl list with prefix /
 namespace pairs as argument. If this option is not given, then any
@@ -551,9 +572,9 @@ tried to be executed. This allows quick method additions on Tcl level.</p><p>New
 are not moved into the tree they are automaticaly deleted, when the whole
 document gets deleted.</p>
 
-    <h2><a name="SECTid0xc270c0">SEE ALSO</a></h2><p class="seealso">dom, domNode</p>
+    <h2><a name="SECTid0xe1c0f0">SEE ALSO</a></h2><p class="seealso">dom, domNode</p>
 
-    <h2><a name="SECTid0xc27450">KEYWORDS</a></h2><p class="keywords">
+    <h2><a name="SECTid0xe1c480">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-DOMnodecreation">DOM node creation</a>, <a class="keyword" href="keyword-index.html#KW-documentelement">document element</a>
 </p>
 

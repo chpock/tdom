@@ -4,17 +4,17 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x1ed39a0">NAME</a> · <a href="#SECTid0x1ed3be0">SYNOPSIS</a> · <a href="#SECTid0x1ef8bb0">DESCRIPTION </a> · <a href="#SECTid0x1f11640">KEYWORDS</a>
+<a href="#SECTid0xdf7d10">NAME</a> · <a href="#SECTid0xdfca70">SYNOPSIS</a> · <a href="#SECTid0xe01c40">DESCRIPTION </a> · <a href="#SECTid0xe24230">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x1ed39a0">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0xdf7d10">NAME</a></h2><p class="namesection">
 <b class="names">dom - </b><br>Create an in-memory DOM tree from XML</p>
   
-  <h2><a name="SECTid0x1ed3be0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0xdfca70">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">dom</b> <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
 
-  <h2><a name="SECTid0x1ef8bb0">DESCRIPTION </a></h2><p>This command provides the creation of complete DOM trees in memory. In
+  <h2><a name="SECTid0xe01c40">DESCRIPTION </a></h2><p>This command provides the creation of complete DOM trees in memory. In
 the usual case a string containing a XML information is parsed and converted
 into a DOM tree. <i class="m">method</i> indicates a specific subcommand. </p><p>The valid methods are:</p><dl class="commandlist">
         
@@ -193,6 +193,24 @@ entity (including the external subset) will be resolved and parsed. The value
 "notstandalone" means, that all external entities will be resolved and parsed,
 with the execption of documents, which explicitly states standalone="yes" in
 their XML declaration.</dd>
+              
+
+
+              
+                <dt><b>-ignorexmlns</b></dt>
+                <dd>It is recommended, that you not use this
+                option. If this option is given, no node within the
+                created DOM tree will be internally marked as placed
+                into an XML Namespace, even if there is a default
+                namespace in scope for un-prefixed elements or even if
+                the element has a defined namespace prefix. One
+                consequence is of this is, that XPath node expressions
+                on such a DOM tree doesn't work as expected. Prefixed
+                element nodes can't be selected and element nodes
+                without prefix will be seen by XPath expressions as if
+                they haven't any namespace (no matter if they in fact
+                in a default namespace).
+                </dd>
               
 
             </dl>
@@ -520,7 +538,7 @@ recommendation. Otherwise it returns 0.</dd>
         
     </dl>
 
-<h2><a name="SECTid0x1f11640">KEYWORDS</a></h2><p class="keywords">
+<h2><a name="SECTid0xe24230">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-XML">XML</a>, <a class="keyword" href="keyword-index.html#KW-DOM">DOM</a>, <a class="keyword" href="keyword-index.html#KW-document">document</a>, <a class="keyword" href="keyword-index.html#KW-node">node</a>, <a class="keyword" href="keyword-index.html#KW-parsing">parsing</a>
 </p>
 </div><hr class="navsep"><div class="navbar" align="center">
