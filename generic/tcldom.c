@@ -77,6 +77,8 @@
 
 #define MAX_REWRITE_ARGS 50
 
+#define MAX_XSLT_APPLY_DEPTH 3000
+
 #define SetResult(str) Tcl_ResetResult(interp); \
                      Tcl_SetStringObj(Tcl_GetObjResult(interp), (str), -1)
 
@@ -3527,25 +3529,28 @@ static int applyXSLT (
     Tcl_Obj       *objPtr, *localListPtr = (Tcl_Obj *)NULL;
     int            i, result, length, optionIndex;
     int            ignoreUndeclaredParameters = 0;
+    int            maxApplyDepth = MAX_XSLT_APPLY_DEPTH;
     domDocument   *xsltDoc, *xmlDoc, *resultDoc = NULL;
     XsltMsgCBInfo  xsltMsgInfo;
 
     static char *method_usage = 
         "wrong # args: should be \"nodeObj xslt ?-parameters parameterList? "
-        "?-ignoreUndeclaredParameters? ?-xsltmessagecmd cmd? xsltDocNode "
-        "?varname?\"";
+        "?-ignoreUndeclaredParameters? ?-maxApplyDepth int? "
+        "?-xsltmessagecmd cmd? xsltDocNode ?varname?\"";
 
     static char *cmd_usage = 
         "wrong # args: should be \"?-parameters parameterList? "
-        "?-ignoreUndeclaredParameters? ?-xsltmessagecmd cmd? <xmlDocObj> "
-        "?objVar?\"";
+        "?-ignoreUndeclaredParameters? ?-maxApplyDepth int? "
+        "?-xsltmessagecmd cmd? <xmlDocObj> ?objVar?\"";
 
     static CONST84 char *xsltOptions[] = {
-        "-parameters", "-ignoreUndeclaredParameters", "-xsltmessagecmd", NULL
+        "-parameters", "-ignoreUndeclaredParameters",
+        "-maxApplyDepth", "-xsltmessagecmd", NULL
     };
 
     enum xsltOption {
-        m_parmeters, m_ignoreUndeclaredParameters, m_xsltmessagecmd
+        m_parmeters, m_ignoreUndeclaredParameters, m_maxApplyDepth,
+        m_xsltmessagecmd
     };
 
     xsltMsgInfo.interp = interp;
@@ -3595,6 +3600,23 @@ static int applyXSLT (
             objc -= 2;
             objv += 2;
             break;
+
+        case m_maxApplyDepth:
+            if (objc < 3) {SetResult(usage); goto applyXSLTCleanUP;}
+            if (Tcl_GetIntFromObj(interp, objv[1], &maxApplyDepth)
+                != TCL_OK) {
+                SetResult("-maxApplyDepth requires a positive integer "
+                          "as argument");
+                goto applyXSLTCleanUP;
+            }
+            if (maxApplyDepth < 1) {
+                SetResult("-maxApplyDepth requires a positive integer "
+                          "as argument");
+                goto applyXSLTCleanUP;
+            }
+            objc -= 2;
+            objv += 2;
+            break;
         
         case m_ignoreUndeclaredParameters:
             if (objc < 2) {SetResult(usage); goto applyXSLTCleanUP;}
@@ -3633,10 +3655,11 @@ static int applyXSLT (
         xsltDoc = NULL;
     }
     result = xsltProcess(xsltDoc, node, clientData, parameters, 
-                          ignoreUndeclaredParameters,
-                          tcldom_xpathFuncCallBack,  interp,
-                          tcldom_xsltMsgCB, &xsltMsgInfo,
-                          &errMsg, &resultDoc);
+                         ignoreUndeclaredParameters,
+                         maxApplyDepth,
+                         tcldom_xpathFuncCallBack,  interp,
+                         tcldom_xsltMsgCB, &xsltMsgInfo,
+                         &errMsg, &resultDoc);
 
     if (result < 0) {
         SetResult( errMsg );

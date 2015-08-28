@@ -371,6 +371,8 @@ typedef struct xsltNSAlias
 typedef struct {
 
     xsltTemplate      * templates;
+    int                 nestedApplyTemplates;
+    int                 maxNestedApplyTemplates;
     Tcl_HashTable       namedTemplates;
     Tcl_HashTable       isElementTpls;
     xsltWSInfo          wsInfo;
@@ -764,7 +766,6 @@ static int xsltAddExternalDocument (
         fprintf (stderr, "xsltAddExternalDocument: baseURI '%s'\n", baseURI);
         fprintf (stderr, "xsltAddExternalDocument: systemID '%s'\n", str);
     )
-
     found = 0;
     sdoc = xs->subDocs;
     if (str) {
@@ -781,8 +782,8 @@ static int xsltAddExternalDocument (
     }
     if (!found) {
         if (!xs->xsltDoc->extResolver) {
-            *errMsg = tdomstrdup("need resolver Script to include Stylesheet! "
-                                 "(use \"-externalentitycommand\")");
+            *errMsg = tdomstrdup("Need resolver script for document() calls. "
+                                 "(Use \"-externalentitycommand\")");
             return -1;
         }
         extDocument = getExternalDocument (
@@ -5507,6 +5508,12 @@ static int ApplyTemplates (
     int        i, rc, needNewVarFrame = 1;
 
     if (nodeList->type == xNodeSetResult) {
+        if (xs->nestedApplyTemplates > xs->maxNestedApplyTemplates) {
+            *errMsg = tdomstrdup("Maximum nested apply templates reached "
+                                 "(potential infinite template recursion?).");
+            return -1;
+        }
+        xs->nestedApplyTemplates++;
         savedLastNode = xs->lastNode;
         for (i=0; i < nodeList->nr_nodes; i++) {
             if (needNewVarFrame) {
@@ -5538,6 +5545,7 @@ static int ApplyTemplates (
             xsltPopVarFrame (xs);
         }
         xs->lastNode = savedLastNode;
+        xs->nestedApplyTemplates--;
     } else {
         TRACE("ApplyTemplates: nodeList not a NodeSetResult !!!\n");
         DBG(rsPrint(nodeList);)
@@ -5915,6 +5923,11 @@ getExternalDocument (
                              "to access itself.");
         return NULL;
     }
+    DBG(
+        fprintf (stderr, "getExternalDocument: baseURI '%s'\n", baseURI);
+        fprintf (stderr, "getExternalDocument: systemID '%s'\n", href);
+    )
+    
     cmdPtr = Tcl_NewStringObj (xsltDoc->extResolver, -1);
     Tcl_IncrRefCount (cmdPtr);
     if (baseURI) {
@@ -7445,6 +7458,7 @@ int xsltProcess (
     void              * xsltCmdData,
     char             ** parameters,
     int                 ignoreUndeclaredParameters,
+    int                 maxApplyDepth,
     xpathFuncCallback   funcCB,
     void              * xpathFuncClientData,
     xsltMsgCB           xsltMsgCB,
@@ -7471,7 +7485,9 @@ int xsltProcess (
                                                   1, errMsg);
         if (!xs) return -1;
     }
-
+    xs->maxNestedApplyTemplates = maxApplyDepth;
+    xs->nestedApplyTemplates = 0;
+    
     if (xmlNode->nodeType == DOCUMENT_NODE) {
         xmlNode = ((domDocument *)xmlNode)->rootNode;
     } else {

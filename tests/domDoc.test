@@ -367,7 +367,7 @@ test domDoc-3.3 {toXSLTcmd} {
     $resultDoc delete
     rename $xsltCmd {}
     set result
-} {1 {bad option "-bogusOption": must be -parameters, -ignoreUndeclaredParameters, or -xsltmessagecmd} 0 {param1Default param2Default param3Default }}
+} {1 {bad option "-bogusOption": must be -parameters, -ignoreUndeclaredParameters, -maxApplyDepth, or -xsltmessagecmd} 0 {param1Default param2Default param3Default }}
 
 test domDoc-3.4 {toXSLTcmd} {
     set xslt [dom parse -keepEmpties $xslt1]
@@ -376,7 +376,7 @@ test domDoc-3.4 {toXSLTcmd} {
     set result [catch {$xsltCmd -xsltmessagecmd msgCmd1} errMsg]
     rename $xsltCmd {}
     lappend result $errMsg
-} {1 {wrong # args: should be "?-parameters parameterList? ?-ignoreUndeclaredParameters? ?-xsltmessagecmd cmd? <xmlDocObj> ?objVar?"}}
+} {1 {wrong # args: should be "?-parameters parameterList? ?-ignoreUndeclaredParameters? ?-maxApplyDepth int? ?-xsltmessagecmd cmd? <xmlDocObj> ?objVar?"}}
 
 test domDoc-3.5 {toXSLTcmd} {
     set xslt [dom parse -keepEmpties $xslt1]
@@ -385,7 +385,7 @@ test domDoc-3.5 {toXSLTcmd} {
     set result [catch {$xsltCmd $doc resultDoc bogus} errMsg]
     rename $xsltCmd {}
     lappend result $errMsg
-} {1 {wrong # args: should be "?-parameters parameterList? ?-ignoreUndeclaredParameters? ?-xsltmessagecmd cmd? <xmlDocObj> ?objVar?"}}
+} {1 {wrong # args: should be "?-parameters parameterList? ?-ignoreUndeclaredParameters? ?-maxApplyDepth int? ?-xsltmessagecmd cmd? <xmlDocObj> ?objVar?"}}
 
 test domDoc-3.6 {toXSLTcmd} {
     set xslt [dom parse -keepEmpties $xslt1]

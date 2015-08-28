@@ -642,6 +642,22 @@ test xslt-2.25 {xslt outputVar} {
     set result
 } {<resultDoc/>}
 
+test xslt-2.26 {xslt -maxApplyDepth option} {
+    set xml [dom parse {<e><e><e><e></e></e></e></e>}]
+    set xslt [dom parse {<xsl:stylesheet 
+        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+        version="1.0">
+        <xsl:template match="e">
+        <xsl:text>e</xsl:text>
+        <xsl:apply-templates select="e"/>
+        </xsl:template>
+        </xsl:stylesheet>}]
+    catch {$xml xslt -maxApplyDepth 3 $xslt} errMsg
+    $xml delete
+    $xslt delete
+    set errMsg
+} "Maximum nested apply templates reached (potential infinite template recursion?)."
+
 test xslt-3.1 {xslt variable scope} {
     set xml [dom parse {<root/>}]
     set xslt [dom parse {<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
