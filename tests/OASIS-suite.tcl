@@ -2,6 +2,7 @@
 # OASIS XSLT / XPath Conformance Technical Committee. 
 
 catch {source uri.tcl}
+package require uri
 package require tdom
 
 # The following is not needed, given, that tDOM is correctly
@@ -100,7 +101,47 @@ proc processArgs {argc argv} {
 
 set compareOK 0
 set compareDIFF 0
+set compareFAILED 0
 set failedOK 0
+set failedXML 0
+set failedXSLT 0
+set failedProcessing 0
+set notFailed 0
+
+proc extRefHandler {base systemId publicId} {
+    variable usageCounter
+
+    set absolutURI [uri::resolve $base $systemId]
+    incr usageCounter($absolutURI)
+    if {$usageCounter($absolutURI) > 10} {
+        error "Cirular import/include?"
+    }
+    switch $systemId {
+        "notfound.xml" {
+            return [list string $absolutURI "<notfound/>"]
+        }
+    }
+    array set uriData [uri::split $absolutURI]
+    switch $uriData(scheme) {
+        file {
+            if {[catch {
+                set xmlstr [xmlReadFile $uriData(path)]
+            }]} {
+                set pathlist [file split $uriData(path)]
+                set file [findFile [lindex $pathlist end] [lrange $pathlist 0 end-1]]
+                if {$file ne ""} {
+                    set xmlstr [xmlReadFile $file]
+                }
+                error "not resolved external entity. Base: $base SystemID: $systemId"
+            }
+            return [list string $absolutURI [xmlReadFile $uriData(path)]]
+        }
+        default {
+            error "can only handle file URI's"
+        }
+    }
+}
+
 
 # This is the callback proc for xslt:message elements. This proc is
 # called once every time an xslt:message element is encountered during
@@ -191,8 +232,14 @@ proc runTest {testcase} {
     variable infoset
     variable compareOK
     variable compareDIFF
+    variable compareFAILED
     variable failedOK
+    variable failedXML
+    variable failedXSLT
+    variable failedProcessing
+    variable notFailed
     variable verbose
+    variable usageCounter
     
     set filepath [$testcase selectNodes string(file-path)]
     if {![checkAgainstPattern $matchgroup $filepath]} {
@@ -263,12 +310,14 @@ proc runTest {testcase} {
         set xmloutfile [file join $catalogDir $majorpath "REF_OUT" $filepath \
                             $xmlout]
     }
+    array unset usageCounter
     if {[catch {
         set xmldoc [dom parse -baseurl [baseURL $xmlfile] \
-                        -externalentitycommand ::tDOM::extRefHandler \
+                        -externalentitycommand extRefHandler \
                         -keepEmpties \
                         [xmlReadFile $xmlfile] ]
     } errMsg]} {
+        incr failedXML
         log 0 "Unable to parse xml file '$xmlfile'. Reason:\n$errMsg"
         return
     }
@@ -280,6 +329,7 @@ proc runTest {testcase} {
                          [xmlReadFile $xslfile] ]
     } errMsg]} {
         dom setStoreLineColumn 0
+        incr failedXSLT
         log 0 "Unable to parse xsl file '$xslfile'. Reason:\n$errMsg"
         return
     }
@@ -289,11 +339,14 @@ proc runTest {testcase} {
              errMsg]} {
         if {$operation eq "execution-error"} {
             incr failedOK
+            log 2 $errMsg
         } else {
+            incr failedProcessing
             log 0 $errMsg
         }
     } else {
         if {$operation eq "execution-error"} {
+            incr notFailed
             log 0 "$xslfile - test should have failed, but didn't."
         }
     }
@@ -317,6 +370,7 @@ proc runTest {testcase} {
             $refinfosetdoc delete
             $resultinfosetdoc delete
         } else {
+            incr compareFAILED
             log 3 "Unable to parse REF doc. Reason:\n$errMsg"
         }
     }
@@ -329,8 +383,13 @@ proc runTests {catalogRoot} {
     variable majorpath
     variable compareOK
     variable compareDIFF
+    variable compareFAILED
     variable failedOK
-
+    variable failedXML
+    variable failedXSLT
+    variable failedProcessing
+    variable notFailed
+    
     foreach testcatalog [$catalogRoot selectNodes test-catalog] {
         if {![matchcatalog [$testcatalog @submitter]]} {
             continue
@@ -341,8 +400,13 @@ proc runTests {catalogRoot} {
         }
     }
     log 0 "Finished."
+    log 0 "XML parse failed: $failedXML"
+    log 0 "XSLT parse failed: $failedXSLT"
+    log 0 "Processing failed: $failedProcessing"
     log 0 "Compare OK: $compareOK"
     log 0 "Compare FAIL: $compareDIFF"
+    log 0 "Compare BROKEN: $compareFAILED"
+    log 0 "Not found errors: $notFailed"
     log 0 "Failed OK: $failedOK"
 }
 

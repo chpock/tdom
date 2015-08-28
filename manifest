@@ -1,5 +1,5 @@
-C More\swork\son\sand\swith\sOASIS-suite.tcl.
-D 2015-08-25T22:19:06.448
+C More\sdetailed\sreport\sand\sand\smore\sfancy\sexternal\sentity\sresolver\sfor\sOASIS-suite.tcl.
+D 2015-08-28T14:56:39.950
 F CHANGES c7b54b810141d8c9ea4b6b28a7b3d285ce1d2eeb
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -178,7 +178,7 @@ F tclconfig/install-sh bdd5e293591621ae60d9824d86a4b1c5f22c3d00 x
 F tclconfig/tcl.m4 77652577e7a7c2ca5656a93e6fbfd61614846893
 F tdom.m4 c710a69bfe91757e9695d851043c704421a13918
 F tdomConfig.sh.in 5756c6b431179e49852a607cc2ca01e5381da905
-F tests/OASIS-suite.tcl e97f9a1079b63c1e90900a25673225010ed0a935
+F tests/OASIS-suite.tcl c71eab00ca0ca3cff438a0bdcd35ee7d66b14565
 F tests/all-bench.tcl 38bc7b4c88f5d679b2fce6c9c2b2ea7d8ad18e90
 F tests/all.tcl a8d5d3e3adc6713f64d0c614b927bd21ca8df870
 F tests/attribute.test 53ac8fb043e79b638c8c6f5e7da848f6103552d6
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 44ca1203dec8e7174418d9b33868fe798bdd3eee
-R d03609a3ccccc1b725252ad81e88ee24
+P e68b5e234fc573e06b7d41182523a18215bf9f60
+R f8e6445272ed2bce321e23917917863c
 U rolf
-Z 27ba0a42432ff59c61d7a3b5268c0536
+Z ff8fed26cf75818c7d0564199d97d0dd
 # Remove this line to create a well-formed Fossil manifest.
