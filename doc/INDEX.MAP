@@ -2,7 +2,6 @@
     <MAN id="dom" title="dom"/>
     <DEF cat="manpage" name="dom" manpage="dom"/>
     <DEF cat="cmd" name="dom" manpage="dom"/>
-    <DEF cat="cmd" name="dom" manpage="dom"/>
     <KWD name="XML" manpage="dom"/>
     <KWD name="DOM" manpage="dom"/>
     <KWD name="document" manpage="dom"/>
@@ -23,7 +22,6 @@
     <KWD name="parsing" manpage="domNode"/>
     <MAN id="expat" title="expat"/>
     <DEF cat="manpage" name="expat" manpage="expat"/>
-    <DEF cat="cmd" name="expat" manpage="expat"/>
     <DEF cat="cmd" name="expat" manpage="expat"/>
     <DEF cat="cmd" name="xml::parser" manpage="expat"/>
     <KWD name="SAX" manpage="expat"/>

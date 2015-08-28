@@ -1,5 +1,5 @@
-C Added\sdocumentation\sfor\sthe\snew\sxslt\stransformation\soption\s-maxApplyDepth.\sRegenerated\sman\sand\shtml\sfiles.\sOther\sminor\sdoc\stweaks.
-D 2015-08-28T17:52:28.302
+C More\sdoc\stweaks.
+D 2015-08-28T21:55:29.591
 F CHANGES c7b54b810141d8c9ea4b6b28a7b3d285ce1d2eeb
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -12,9 +12,9 @@ F apps/xslt.tcl ac4a75ba2f05e26d4ea6f92547983caa80fc6d55
 F configure d7b3e84834cdee90aa514bcfc31cdacbe2aff90c x
 F configure-tcl8.0.5 db1a666545d519c42e229d245224d456a84c798a x
 F configure.in 6bd9cb6e6ca1a373f5e237de4de7252fac13dc69
-F doc/INDEX.MAP 1583e09fcd279d86bc422cbd59f28a1e5ffa4f54
+F doc/INDEX.MAP c8e767983bcea4bbd53ecdbf3d78cb044996e9bc
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
-F doc/category-index.html ace146a955ddcd2224127bddc4ed11d0e5d87302
+F doc/category-index.html 60f5d127c5500cb90a997dd7744dba39589bb3dd
 F doc/dom.html 1041ff80ceb56bbf8e5a0e57694bbe6897853fff
 F doc/dom.n 8833a1f8d0e1eb8c80fff4428fa8da6bf8898749
 F doc/dom.xml 2d883a167212621563c75fd1545578fd7c0df02d
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a52f940880bab23826ce20fa495fd08cbfe14e1b
-R bfa8ce693e3a6d4b14185de10cca6028
+P fe3d23e7ad013b100c3953c804c1a533abc108bd
+R ac65cd46a366aaf51b3b7713ab07777e
 U rolf
-Z b8c046a69bcb5060c60c9fd319e04194
+Z 486686e4f827ed019152b28889b964f5
 # Remove this line to create a well-formed Fossil manifest.
