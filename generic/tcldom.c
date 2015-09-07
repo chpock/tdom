@@ -2649,6 +2649,7 @@ void tcldom_treeAsHTML (
                                  ((domTextNode*)node)->valueLength, 0,
                                  escapeNonASCII, htmlEntities, 0);
         }
+        return;
     }
 
     if (node->nodeType == COMMENT_NODE) {

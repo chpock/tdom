@@ -1,5 +1,5 @@
-C More\sdoc\stweaks.
-D 2015-08-28T21:55:29.591
+C Fixed\sHTML\sserialization\sof\sCDATA\sSections.
+D 2015-09-07T14:08:51.076
 F CHANGES c7b54b810141d8c9ea4b6b28a7b3d285ce1d2eeb
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -137,7 +137,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c fff479358cd9d391f83ebad7ef7b1e02cdbf9a90
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
-F generic/tcldom.c 73fdc09525286ff4f67a0e24b48c89901e6bf736
+F generic/tcldom.c 33268c300084a47d89d26bcb9c5aa5a1bc45bcee
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
 F generic/tclexpat.c b4f90758301e71b2cc435de5071d21ca40fa502a
 F generic/tclexpat.h 3fb4df4c023d1f625ec9c5783c4fc1d1e4e0b8bb
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P fe3d23e7ad013b100c3953c804c1a533abc108bd
-R ac65cd46a366aaf51b3b7713ab07777e
+P d44a180b35456b8e809380f88d38e68be634900a
+R 267a7373c5dc077b1cdfa50fe6cb6dd9
 U rolf
-Z 486686e4f827ed019152b28889b964f5
+Z 9c30bb03df4386bd9d29ff310c12becf
 # Remove this line to create a well-formed Fossil manifest.
