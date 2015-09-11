@@ -1,6 +1,6 @@
-C Fixed\sHTML\sserialization\sof\sCDATA\sSections.
-D 2015-09-07T14:08:51.076
-F CHANGES c7b54b810141d8c9ea4b6b28a7b3d285ce1d2eeb
+C Added\soptions\s-xmlDeclaration\sand\s-encString\sto\sthe\sasXML\smethod\sof\sthe\sdomDoc\sand\sdomNode\scommands.
+D 2015-09-11T00:44:48.082
+F CHANGES 5b8018400c04dbb6e27e67934ccd6ab20323a9e7
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 3965f5b535b48290240151057611b376495aadec
@@ -20,10 +20,10 @@ F doc/dom.n 8833a1f8d0e1eb8c80fff4428fa8da6bf8898749
 F doc/dom.xml 2d883a167212621563c75fd1545578fd7c0df02d
 F doc/domDoc.html cbd85bb277c72d375d5df17b69dd3797cf2d6851
 F doc/domDoc.n ce2e90706f46852fe5e30bd506a692f22417f381
-F doc/domDoc.xml 71781399985b6c6bb34ce3963c111a1562ce56a5
+F doc/domDoc.xml 612fc4bee4109b73084c4d9eb5ec9d40fee2a8d0
 F doc/domNode.html 49e4f5765259b4411eded605531a54ec0052b57a
 F doc/domNode.n ba60bce02546fae00a89aea0757328651584c757
-F doc/domNode.xml 7cb87cd33e30a6b7a46d5585331b898f8e5a1148
+F doc/domNode.xml f60741ad48e67bc5c530d9e719320aec4b47c10f
 F doc/expat.html b0f131647c66c4d82308f60895435afc238c24b4
 F doc/expat.n 1532a92db725e1d28a357484fe9105ebe7fb778c
 F doc/expat.xml cc280131ede8000bcfe6d79ead52b0852076a55d
@@ -137,7 +137,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c fff479358cd9d391f83ebad7ef7b1e02cdbf9a90
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
-F generic/tcldom.c 33268c300084a47d89d26bcb9c5aa5a1bc45bcee
+F generic/tcldom.c 3a53ac985a15644da2e3311c09c4cb0aaf4cc402
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
 F generic/tclexpat.c b4f90758301e71b2cc435de5071d21ca40fa502a
 F generic/tclexpat.h 3fb4df4c023d1f625ec9c5783c4fc1d1e4e0b8bb
@@ -204,7 +204,7 @@ F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.bench 53a2bd61133d0a6acbb2a61794da74f7e7ba9b6a
 F tests/dom.test 874dc2cdfe6f83a05386805475c521e671e94b85
-F tests/domDoc.test a4696796abe4c5905bfe1576b7058f592d0cdf40
+F tests/domDoc.test ff26d5193483764310207b0ed2864e1942a1e517
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test c2a8fd480f318e2c5f227b8a8c56be7ecc32dbca
 F tests/domnamespace.test bd80dfb5fb1637a0ae5007e949e7eab5c4e2f849
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P d44a180b35456b8e809380f88d38e68be634900a
-R 267a7373c5dc077b1cdfa50fe6cb6dd9
+P 230278ccf5f3a4dccacfd896207af13415e6bfe0
+R 41d396b4b32c074fcf6a2c76c9572b3f
 U rolf
-Z 9c30bb03df4386bd9d29ff310c12becf
+Z 6fe241473cdaa9c5270e325b4b62ad41
 # Remove this line to create a well-formed Fossil manifest.

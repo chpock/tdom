@@ -118,7 +118,7 @@ test domDoc-1.10 {asXML - unknown option} {
     catch {$doc asXML -fooOption 1} errMsg
     $doc delete
     set errMsg
-} {bad option "-fooOption": must be -indent, -channel, -escapeNonASCII, -doctypeDeclaration, -escapeAllQuot, or -indentAttrs}
+} {bad option "-fooOption": must be -indent, -channel, -escapeNonASCII, -doctypeDeclaration, -xmlDeclaration, -encString, -escapeAllQuot, or -indentAttrs}
 
 test domDoc-1.11 {asXML - non boolean value to -doctypeDeclaration} {
     set doc [dom parse {<!DOCTYPE root SYSTEM "file:///boo.baz"><root/>}]
@@ -221,6 +221,78 @@ test domDoc-1.21 {asXML -indentAttrs} {
     attr1="val1"
     attr2="val2"/>
 }
+
+test domDoc-1.22 {asXML} {
+    set doc [dom createDocument doc]
+    set result [$doc asXML]
+    $doc delete
+    set result
+} {<doc/>
+}
+
+test domDoc-1.23 {asXML -xmlDeclaration} {
+    set doc [dom createDocument doc]
+    set result [$doc asXML -xmlDeclaration 1]
+    $doc delete
+    set result
+} {<?xml version="1.0"?>
+<doc/>
+}
+
+test domDoc-1.23 {asXML -xmlDeclaration} {
+    set doc [dom createDocument doc]
+    set result [$doc asXML -xmlDeclaration 1]
+    $doc delete
+    set result
+} {<?xml version="1.0"?>
+<doc/>
+}
+
+test domDoc-1.24 {asXML just -encString without -xmlDeclaration} {
+    set doc [dom createDocument doc]
+    set result [$doc asXML -encString foo]
+    $doc delete
+    set result
+} {<doc/>
+}
+
+test domDoc-1.25 {asXML -xmlDeclaration -encString} {
+    set doc [dom createDocument doc]
+    set result [$doc asXML -xmlDeclaration 1 -encString foo]
+    $doc delete
+    set result
+} {<?xml version="1.0" encoding="foo"?>
+<doc/>
+} 
+
+test domDoc-1.26 {asXML -xmlDeclaration, encoding set by encoding method} {
+    set doc [dom createDocument doc]
+    $doc encoding "foo"
+    set result [$doc asXML -xmlDeclaration 1]
+    $doc delete
+    set result
+} {<?xml version="1.0" encoding="foo"?>
+<doc/>
+}    
+
+test domDoc-1.27 {asXML -xmlDeclaration -encString} {
+    set doc [dom createDocument doc]
+    set result [catch {
+        [$doc asXML -xmlDeclaration 1 -encString foo \
+             -encString bar -wrongOption]
+    }]
+    $doc delete
+    set result
+} 1 
+
+test domDoc-1.28 {asXML -xmlDeclaration not xml compliant -encString} {
+    set doc [dom createDocument doc]
+    set result [$doc asXML -xmlDeclaration 1 -encString 1\u2345]
+    $doc delete
+    set result
+} [subst -nocommands -novariables {<?xml version="1.0" encoding="1\u2345"?>
+<doc/>
+}]
 
 set doc [dom parse <root/>]
 

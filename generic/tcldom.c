@@ -2754,6 +2754,8 @@ void tcldom_treeAsXML (
     Tcl_Channel chan,
     int         escapeNonASCII,
     int         doctypeDeclaration,
+    int         xmlDeclaration,
+    Tcl_Obj    *encString,
     int         cdataChild,
     int         escapeAllQuot,
     int         indentAttrs
@@ -2768,6 +2770,23 @@ void tcldom_treeAsXML (
     Tcl_HashEntry *h;
     Tcl_DString    dStr;
 
+    if (xmlDeclaration) {
+        writeChars(xmlString, chan, "<?xml version=\"1.0\"", 19);
+        if (encString) {
+            writeChars(xmlString, chan, " encoding=\"", 11);
+            writeChars(xmlString, chan,
+                       Tcl_GetString(encString), -1);
+            writeChars(xmlString, chan, "\"", 1);
+        } else if (node->nodeType == DOCUMENT_NODE &&
+                   ((domDocument*) node)->doctype &&
+                   ((domDocument*) node)->doctype->encoding) {
+            writeChars(xmlString, chan, " encoding=\"", 11);
+            writeChars(xmlString, chan,
+                       ((domDocument*) node)->doctype->encoding, -1);
+            writeChars(xmlString, chan, "\"", 1);
+        }
+        writeChars(xmlString, chan, "?>\n", 3);
+    }
     if (node->nodeType == DOCUMENT_NODE) {
         doc = (domDocument*) node;
         if (doctypeDeclaration && doc->documentElement) {
@@ -2800,7 +2819,7 @@ void tcldom_treeAsXML (
         child = doc->rootNode->firstChild;
         while (child) {
             tcldom_treeAsXML(xmlString, child, indent, level, doIndent, chan,
-                             escapeNonASCII, doctypeDeclaration, 0,
+                             escapeNonASCII, doctypeDeclaration, 0, NULL, 0,
                              escapeAllQuot, indentAttrs);
             child = child->nextSibling;
         }
@@ -2952,8 +2971,8 @@ void tcldom_treeAsXML (
             }
             first = 0;
             tcldom_treeAsXML(xmlString, child, indent, level+1, doIndent,
-                             chan, escapeNonASCII, doctypeDeclaration,
-                             cdataChild, escapeAllQuot, indentAttrs);
+                             chan, escapeNonASCII, doctypeDeclaration, 0,
+                             NULL, cdataChild, escapeAllQuot, indentAttrs);
             doIndent = 0;
             if (  (child->nodeType == ELEMENT_NODE)
                 ||(child->nodeType == PROCESSING_INSTRUCTION_NODE)
@@ -3035,8 +3054,9 @@ static int serializeAsXML (
     char          *channelId, prefix[MAX_PREFIX_LEN];
     const char    *localName;
     int            indent, mode, escapeNonASCII = 0, doctypeDeclaration = 0;
+    int            xmlDeclaration = 0;
     int            optionIndex, cdataChild, escapeAllQuot = 0;
-    Tcl_Obj       *resultPtr;
+    Tcl_Obj       *resultPtr, *encString = NULL;
     Tcl_Channel    chan = (Tcl_Channel) NULL;
     Tcl_HashEntry *h;
     Tcl_DString    dStr;
@@ -3044,27 +3064,19 @@ static int serializeAsXML (
 
     static CONST84 char *asXMLOptions[] = {
         "-indent", "-channel", "-escapeNonASCII", "-doctypeDeclaration",
-        "-escapeAllQuot", "-indentAttrs",
+        "-xmlDeclaration", "-encString", "-escapeAllQuot", "-indentAttrs",
         NULL
     };
     enum asXMLOption {
         m_indent, m_channel, m_escapeNonASCII, m_doctypeDeclaration,
-        m_escapeAllQuot, m_indentAttrs
+        m_xmlDeclaration, m_encString, m_escapeAllQuot, m_indentAttrs
     };
     
-    if (objc > 10) {
-        Tcl_WrongNumArgs(interp, 2, objv,
-                         "?-indent <0..8>? ?-channel <channelID>? "
-                         "?-escapeNonASCII? ?-escapeAllQuot? "
-                         "?-doctypeDeclaration <boolean>? "
-			 "?-indentAttrs <0..8>?");
-        return TCL_ERROR;
-    }
     indent = 4;
     while (objc > 2) {
         if (Tcl_GetIndexFromObj(interp, objv[2], asXMLOptions, "option", 0,
                                &optionIndex) != TCL_OK) {
-            return TCL_ERROR;
+            goto cleanup;
         }
         switch ((enum asXMLOption) optionIndex) {
 
@@ -3072,7 +3084,7 @@ static int serializeAsXML (
             if (objc < 4) {
                 SetResult("-indent must have an argument "
                           "(0..8 or 'no'/'none')");
-                return TCL_ERROR;
+                goto cleanup;
             }
             if (strcmp("none", Tcl_GetString(objv[3]))==0) {
                 indent = -1;
@@ -3082,7 +3094,7 @@ static int serializeAsXML (
             }
             else if (Tcl_GetIntFromObj(interp, objv[3], &indent) != TCL_OK) {
                 SetResult( "indent must be an integer (0..8) or 'no'/'none'");
-                return TCL_ERROR;
+                goto cleanup;
             }
             objc -= 2;
             objv += 2;
@@ -3092,7 +3104,7 @@ static int serializeAsXML (
             if (objc < 4) {
                 SetResult("-indentAttrs must have an argument "
                           "(0..8 or 'no'/'none')");
-                return TCL_ERROR;
+                goto cleanup;
             }
             if (strcmp("none", Tcl_GetString(objv[3]))==0) {
                 indentAttrs = -1;
@@ -3102,7 +3114,7 @@ static int serializeAsXML (
             }
             else if (Tcl_GetIntFromObj(interp, objv[3], &indentAttrs) != TCL_OK) {
                 SetResult( "indentAttrs must be an integer (0..8) or 'no'/'none'");
-                return TCL_ERROR;
+                goto cleanup;
             }
             if (indentAttrs > 8) indentAttrs = 8;
             if (indentAttrs < 0) indentAttrs = 0;
@@ -3113,18 +3125,18 @@ static int serializeAsXML (
         case m_channel:
             if (objc < 4) {
                 SetResult("-channel must have a channeldID as argument");
-                return TCL_ERROR;
+                goto cleanup;
             }
             channelId = Tcl_GetString(objv[3]);
             chan = Tcl_GetChannel(interp, channelId, &mode);
             if (chan == (Tcl_Channel) NULL) {
                 SetResult("-channel must have a channeldID as argument");
-                return TCL_ERROR;
+                goto cleanup;
             }
             if ((mode & TCL_WRITABLE) == 0) {
                 Tcl_AppendResult(interp, "channel \"", channelId,
-                                "\" wasn't opened for writing", (char*)NULL);
-                return TCL_ERROR;
+                                "\" isnt't opened for writing", (char*)NULL);
+                goto cleanup;
             }
             objc -= 2;
             objv += 2;
@@ -3140,21 +3152,50 @@ static int serializeAsXML (
             if (node->nodeType != DOCUMENT_NODE) {
                 SetResult("-doctypeDeclaration as flag to the method "
                           "'asXML' is only allowed for domDocCmds");
-                return TCL_ERROR;
+                goto cleanup;
             }
             if (objc < 4) {
                 SetResult("-doctypeDeclaration must have a boolean value "
                           "as argument");
-                return TCL_ERROR;
+                goto cleanup;
             }
             if (Tcl_GetBooleanFromObj(interp, objv[3], &doctypeDeclaration)
                 != TCL_OK) {
-                return TCL_ERROR;
+                goto cleanup;
             }
             objc -= 2;
             objv += 2;
             break;
 
+        case m_xmlDeclaration:
+            if (objc < 4) {
+                SetResult("-xmlDeclaration must have a boolean value "
+                          "as argument");
+                goto cleanup;
+            }
+            if (Tcl_GetBooleanFromObj(interp, objv[3], &xmlDeclaration)
+                != TCL_OK) {
+                goto cleanup;
+            }
+            objc -= 2;
+            objv += 2;
+            break;
+
+        case m_encString:
+            if (objc < 4) {
+                SetResult("-encString must have a string "
+                          "as argument");
+                goto cleanup;
+            }
+            if (encString) {
+                Tcl_DecrRefCount(encString);
+            }
+            encString = objv[3];
+            Tcl_IncrRefCount(encString);
+            objc -= 2;
+            objv += 2;
+            break;
+            
         case m_escapeAllQuot:
             escapeAllQuot = 1;
             objc -= 1;
@@ -3190,10 +3231,18 @@ static int serializeAsXML (
         }
     }
     tcldom_treeAsXML(resultPtr, node, indent, 0, 1, chan, escapeNonASCII,
-                     doctypeDeclaration, cdataChild, 
-                     escapeAllQuot, indentAttrs);
+                     doctypeDeclaration, xmlDeclaration, encString,
+                     cdataChild, escapeAllQuot, indentAttrs);
     Tcl_SetObjResult(interp, resultPtr);
+    if (encString) {
+        Tcl_DecrRefCount(encString);
+    }
     return TCL_OK;
+cleanup:
+    if (encString) {
+        Tcl_DecrRefCount(encString);
+    }
+    return TCL_ERROR;
 }
 
 /*----------------------------------------------------------------------------

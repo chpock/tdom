@@ -1,4 +1,9 @@
 
+2015-09-11 Rolf Ade  <rolf@pointsman.de>
+
+        Added options -xmlDeclaration and -encString to the asXML
+        method of the domDoc and domNode commands.
+
 2015-04-11 Rolf Ade  <rolf@pointsman.de>
 
         Changed behavior wrt to result code of a called
