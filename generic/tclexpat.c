@@ -42,9 +42,7 @@
 
 #ifdef _MSC_VER
 #include <io.h>
-#endif
-
-#ifdef _POSIX_SOURCE
+#else
 #include <unistd.h>
 #endif
 

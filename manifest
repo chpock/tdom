@@ -1,5 +1,5 @@
-C Fixed\slong\sstanding\sproblem:\sReport\sundefined\sxml\snamespace\sprefixes\sas\sparsing\serror.
-D 2016-05-12T16:28:18.587
+C If\snot\son\swindows\sinclude\sunistd.h\sunconditional.\sFixes\sa\swarning\son\sFreeBSD.
+D 2016-05-12T16:45:00.168
 F CHANGES 5b8018400c04dbb6e27e67934ccd6ab20323a9e7
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -139,7 +139,7 @@ F generic/nodecmd.c fff479358cd9d391f83ebad7ef7b1e02cdbf9a90
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
 F generic/tcldom.c 3a53ac985a15644da2e3311c09c4cb0aaf4cc402
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
-F generic/tclexpat.c b4f90758301e71b2cc435de5071d21ca40fa502a
+F generic/tclexpat.c ad5e78e67086c54c8e6d995e4704177e75497b13
 F generic/tclexpat.h 3fb4df4c023d1f625ec9c5783c4fc1d1e4e0b8bb
 F generic/tdom.decls d825af72ec3fd2ae4ebb1d7f883bde6e3613c914
 F generic/tdom.h ce5839cdddbde35ac016a6033415c73082b2f87c
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 400d92fee58f0a7f22e2a5511ff36d827b64225d
-R 65afebf98f2c573277f17145cb050ad0
+P 6d4a7d62c130526f1be89dc6db38ad09c009b4ea
+R 42d091096bc7712f3b67468c0052a1ae
 U rolf
-Z a4b4d9b9e39f9ecad78a0803bb979826
+Z 11d1524c7e8e00f9949c2b9fd8778463
 # Remove this line to create a well-formed Fossil manifest.
