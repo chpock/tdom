@@ -311,7 +311,7 @@ AC_DEFUN(TDOM_PATH_EXPAT, [
         TEA_ADD_INCLUDES([-I${srcdir}/expat])
     else
         AC_MSG_RESULT([Using shared expat found in ${ac_cv_c_expat}])
-        TEA_ADD_INCLUDES(${ac_cv_c_expat}/include)
+        TEA_ADD_INCLUDES(-I${ac_cv_c_expat}/include)
         TEA_ADD_LIBS([-lexpat])
     fi
 ])
