@@ -1,5 +1,5 @@
-C Added\soptions\s-xmlDeclaration\sand\s-encString\sto\sthe\sasXML\smethod\sof\sthe\sdomDoc\sand\sdomNode\scommands.
-D 2015-09-11T00:44:48.082
+C Fixed\slong\sstanding\sproblem:\sReport\sundefined\sxml\snamespace\sprefixes\sas\sparsing\serror.
+D 2016-05-12T16:28:18.587
 F CHANGES 5b8018400c04dbb6e27e67934ccd6ab20323a9e7
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -122,7 +122,7 @@ F extensions/tnc/tests/loadtnc.tcl 9472a546f30972f5ea6d16880ed57e709556ce88
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c e30dc44a8be8b99c9772daf5cafb3714d8550c37
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
-F generic/dom.c 163ee9ffc7328cf533a1bf5a448746b3f31bccee
+F generic/dom.c 2cf83fbbaefad3ef7aa05992178ae58d2242f54f
 F generic/dom.h 707e26843ad7b343289c47ac075437579986f5dc
 F generic/domalloc.c 55e9eeff19cc54cf3956a7013883ead07efd3593
 F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
@@ -203,7 +203,7 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.bench 53a2bd61133d0a6acbb2a61794da74f7e7ba9b6a
-F tests/dom.test 874dc2cdfe6f83a05386805475c521e671e94b85
+F tests/dom.test ce4acfc3fe588b7fd33e8988e302e85a73bcc7ee
 F tests/domDoc.test ff26d5193483764310207b0ed2864e1942a1e517
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test c2a8fd480f318e2c5f227b8a8c56be7ecc32dbca
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 230278ccf5f3a4dccacfd896207af13415e6bfe0
-R 41d396b4b32c074fcf6a2c76c9572b3f
+P 400d92fee58f0a7f22e2a5511ff36d827b64225d
+R 65afebf98f2c573277f17145cb050ad0
 U rolf
-Z 6fe241473cdaa9c5270e325b4b62ad41
+Z a4b4d9b9e39f9ecad78a0803bb979826
 # Remove this line to create a well-formed Fossil manifest.

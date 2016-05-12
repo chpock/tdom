@@ -482,6 +482,53 @@ test dom-2.27 {parse -ignorexmlns} {
     set result
 } {doc foo.bar child foo.bar 0 doc {} child {} 1}
 
+test dom-2.28 {parse document with undeclared xml prefix} {
+    catch {dom parse {<doc><foo:e/></doc>}} errMsg
+    string range $errMsg 0 30
+} {Namespace prefix is not defined}
+
+# This is an expat bug. If XML_StopParser is called in the
+# elementstarthandler function for the document element and there
+# isn't anything else in the document then this document element, then
+# the XML_Parse() return code doesn't reflects this. This is an edge
+# case, see the next test below.
+test dom-2.29 {parse not well-formed document with undeclared xml prefix} {knownBug} {
+    catch {dom parse {<foo:e/>}} errMsg
+    string range $errMsg 0 30
+} {Namespace prefix is not defined}
+
+test dom-2.30 {parse document with undeclared xml prefix} {
+    catch {dom parse {<foo:e><a/></foo:e>}} errMsg
+    string range $errMsg 0 30
+} {Namespace prefix is not defined}
+
+proc dom-2.31 {base systemId publicId} {
+    switch $publicId {
+        "e1" {
+            # Not well-formed
+            set data "<foo:e/>"
+        }
+        default {
+            error "unknown public ID"
+        }
+    }
+    return [list "string" $base $data]
+}
+test dom-2.31 {parse document with undeclared xml prefix} {
+    catch {dom parse -externalentitycommand dom-2.31 \
+                {<!DOCTYPE doc [<!ENTITY e1 PUBLIC "e1" "e1.xml">]>
+                    <doc>&e1;</doc>}
+    } errMsg
+    string range $errMsg 0 30
+} {Namespace prefix is not defined}
+    
+test dom-2.32 {parse document with undeclared xml prefix and -ignorexmlns} {
+    set doc [dom parse -ignorexmlns {<foo:e><a/></foo:e>}]
+    set result [[$doc documentElement] nodeName]
+    $doc delete
+    set result
+} {foo:e}
+
 test dom-3.1 {isName} {
     dom isName ":foo"
 } {1}
