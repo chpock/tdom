@@ -379,7 +379,8 @@ test parser-4.1 {error in callback} {
 <Element class="error"/>
 <Element>Should not see this data</Element>
 </Test>
-}} result]
+    }} result]
+    puts $result
     list $errcode $::started(Element)
 } {1 2}
 
@@ -457,8 +458,7 @@ test parser-5.4 {parse channel - error raised in handler} {
     catch {parser-5.4 parsefile $file} errMsg
     parser-5.4 free
     set errMsg
-} "Error raised by elementstart-5.4
-"
+} "Error raised by elementstart-5.4"
 
 test parser-6.1 {reuse parser} {
     catch {rename parser-6.1 {}}
@@ -607,8 +607,7 @@ test parser-11.2 {parse parsefile - error raised in handler} {
     catch {parser-11.2 parsefile $file} errMsg
     parser-11.2 free
     set errMsg
-} "Error raised by elementstart-11.2
-"
+} "Error raised by elementstart-11.2"
 
 proc elementstart-12.1 {parser args} {
     global result

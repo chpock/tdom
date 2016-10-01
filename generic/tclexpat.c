@@ -960,14 +960,8 @@ TclExpatParse (interp, expat, data, len, type)
           do {
               bytesread = Tcl_Read (channel, buf, sizeof (buf));
               done = bytesread < sizeof (buf);
-              if (done) {
-                  result = XML_Parse (expat->parser, buf, bytesread, done);
-              } else {
-                  if (!XML_Parse (expat->parser, buf, bytesread, done)) {
-                      result = 0;
-                      break;
-                  }
-              }
+              result = XML_Parse (expat->parser, buf, bytesread, done);
+              if (result != XML_STATUS_OK) break;
           } while (!done);
       } else {
           bufObj = Tcl_NewObj();
@@ -977,10 +971,8 @@ TclExpatParse (interp, expat, data, len, type)
               len = Tcl_ReadChars (channel, bufObj, 1024, 0);
               done = (len < 1024);
               str = Tcl_GetStringFromObj (bufObj, &len);
-              if (!XML_Parse (expat->parser, str, len, done)) {
-                  result = 0;
-                  break;
-              }
+              result = XML_Parse (expat->parser, str, len, done);
+              if (result != XML_STATUS_OK) break;
           } while (!done);
           /* In case of a parsing error we need the string rep of the
              bufObj until the error reporting is done (otherwise,
@@ -995,14 +987,8 @@ TclExpatParse (interp, expat, data, len, type)
       do {
           bytesread = Tcl_Read (channel, buf, sizeof (buf));
           done = bytesread < sizeof (buf);
-          if (done) {
-              result = XML_Parse (expat->parser, buf, bytesread, done);
-          } else {
-              if (!XML_Parse (expat->parser, buf, bytesread, done)) {
-                  result = 0;
-                      break;
-              }
-          }
+          result = XML_Parse (expat->parser, buf, bytesread, done);
+          if (result != XML_STATUS_OK) break;
       } while (!done);
 #endif /* !TclOnly8Bits */
       expat->parsingState = 1;
@@ -1037,13 +1023,9 @@ TclExpatParse (interp, expat, data, len, type)
               expat->parsingState = 1;
               return TCL_ERROR;
           }
-          if (!XML_ParseBuffer (parser, nread, nread == 0)) {
+          result = XML_ParseBuffer (parser, nread, nread == 0);
+          if (result != XML_STATUS_OK || !nread) {
               close (fd);
-              result = 0;
-              break;
-          }
-          if (nread == 0) {
-              close(fd);
               break;
           }
       }
@@ -3456,10 +3438,8 @@ TclGenExpatExternalEntityRefHandler(parser, openEntityNames, base, systemId,
           do {
               len = Tcl_Read (chan, buf, sizeof (buf));
               done = len < sizeof (buf);
-              if (!XML_Parse (extparser, buf, len, done)) {
-                  result = 0;
-                  break;
-              }
+              result = !XML_Parse (extparser, buf, len, done);
+              if (result != XML_STATUS_OK) break;
           } while (!done);
           Tcl_UnregisterChannel (expat->interp, chan);
           break;
@@ -3500,13 +3480,9 @@ TclGenExpatExternalEntityRefHandler(parser, openEntityNames, base, systemId,
                                          ERROR_IN_EXTREFHANDLER);
                   return 0;
               }
-              if (!XML_ParseBuffer (extparser, nread, nread == 0)) {
+              result = XML_ParseBuffer (extparser, nread, nread == 0);
+              if (result != XML_STATUS_OK || !nread) {
                   close (fd);
-                  result = 0;
-                  break;
-              }
-              if (nread == 0) {
-                  close(fd);
                   break;
               }
           }
