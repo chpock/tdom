@@ -1,5 +1,5 @@
-C Updated\sto\sexpat\s2.2.0.
-D 2016-10-01T17:54:47.462
+C Added\stests\sfor\sbug\sreported\sin\sb7fcebac73.
+D 2016-10-01T19:12:57.967
 F CHANGES 5b8018400c04dbb6e27e67934ccd6ab20323a9e7
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -214,7 +214,7 @@ F tests/htmlreader.test 0fffea0d73efb2ccf5e3a807e68b437f55a152d2
 F tests/i18n.test f5493417c35c973a0d8651c3c13d5d4e8272f6bf
 F tests/loadtdom.tcl bf298e4effa2a7de7380687911994f762c0f0c84
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
-F tests/parser.test 4dcb340748c4bb032367ce1553ba127af7464ad9
+F tests/parser.test b11061d4fa7b2525ccbff9fbffcf0a7b8e71497d
 F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 3ef47f8eca9d03c10cb49e448c59db776ff4de50
-R f3ec4db35616cdaeac6c0294b1523e7e
+P 9e5f3982f6777aa026bf68a38bcd836899bc4a3d
+R d48d2068ec06f00608cd9f10fd6e8ac6
 U rolf
-Z 5ac96f0f350f11c70a1da812bf8d5dff
+Z 9e65b208f43f915a686aabb8f10b0a1e
 # Remove this line to create a well-formed Fossil manifest.

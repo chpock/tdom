@@ -446,6 +446,20 @@ test parser-5.3 {parse channel - xml wrong} -setup {
     removeFile parser.xml
 } -result 1
 
+proc elementstart-5.4 {args} {
+    error "Error raised by elementstart-5.4"
+}
+
+test parser-5.4 {parse channel - error raised in handler} {
+    catch {parser-5.4 free}
+    ::xml::parser parser-5.4 -elementstartcommand elementstart-5.4
+    set file [file join [pwd] [file dir [info script]] data/books.xml]
+    catch {parser-5.4 parsefile $file} errMsg
+    parser-5.4 free
+    set errMsg
+} "Error raised by elementstart-5.4
+"
+
 test parser-6.1 {reuse parser} {
     catch {rename parser-6.1 {}}
     set parser [expat parser-6.1 -baseurl file:///foo/bar]
@@ -572,7 +586,7 @@ test parser-10.2 {return -code return in callback} {
     lappend result $errcode $::started(Element)
 } {0 2 0 3}
 
-test parser-11.1 {parse channel input} {
+test parser-11.1 {parse parsefile} {
     catch {unset ::count}
 
     catch {rename parser-11.1 {}}
@@ -582,6 +596,19 @@ test parser-11.1 {parse channel input} {
     set ::count
 } {42}
 
+proc elementstart-11.2 {args} {
+    error "Error raised by elementstart-11.2"
+}
+
+test parser-11.2 {parse parsefile - error raised in handler} {
+    catch {parser-11.2 free}
+    ::xml::parser parser-11.2 -elementstartcommand elementstart-11.2
+    set file [file join [pwd] [file dir [info script]] data/books.xml]
+    catch {parser-11.2 parsefile $file} errMsg
+    parser-11.2 free
+    set errMsg
+} "Error raised by elementstart-11.2
+"
 
 proc elementstart-12.1 {parser args} {
     global result
