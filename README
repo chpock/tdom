@@ -1,7 +1,7 @@
 
 
               tDOM - a XML/DOM/XPath/XSLT implementation for Tcl
-                          (Version 0.8.3)
+                          (Version 0.8.4)
 
 		    Jochen Loewer (loewerj@hotmail.com)
                        Rolf Ade (rolf@pointsman.de)
@@ -60,6 +60,9 @@ COMPILING/USING tDOM
 
     Alternatively, you can build the tDOM package in just about any
     directory elsewhere on the fileystem (since TEA-compatible).
+
+    Don't build against Tcl 8.6.2 (or Tcl 8.5.16). This tcl releases
+    had bugs in the I/O system, that may bite you while using tDOM.
     
     You might also want to do "../configure --help" to get list of all
     supported options of the configure script. In the "unix" directory

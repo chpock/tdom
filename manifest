@@ -1,46 +1,46 @@
-C Fixed\s[b7fcebac73].
-D 2016-10-01T22:38:33.761
+C Pre-release\sbranch.
+D 2016-10-02T12:32:33.379
 F CHANGES 5b8018400c04dbb6e27e67934ccd6ab20323a9e7
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 3965f5b535b48290240151057611b376495aadec
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
-F README 898b19870f39b3014ede29f6e5ea8db1f592e429
+F README e56f2a815184d3c9d11f295be9774555a91bc6a2
 F README.AOL a4faf5f85723467a8d8ca406f8aca855a18441b1
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/xslt.tcl ac4a75ba2f05e26d4ea6f92547983caa80fc6d55
 F configure 3b7e472cef9c60cad6e2419dadc8af9525ee2a79 x
 F configure-tcl8.0.5 db1a666545d519c42e229d245224d456a84c798a x
-F configure.in 6bd9cb6e6ca1a373f5e237de4de7252fac13dc69
+F configure.in f9c1ca210c7ecf39c1e2c14fce06650daa162965
 F doc/INDEX.MAP c8e767983bcea4bbd53ecdbf3d78cb044996e9bc
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html 60f5d127c5500cb90a997dd7744dba39589bb3dd
-F doc/dom.html 1041ff80ceb56bbf8e5a0e57694bbe6897853fff
+F doc/dom.html 7b27485e957b3905c7e989f135c8bdb49125e0b5
 F doc/dom.n 8833a1f8d0e1eb8c80fff4428fa8da6bf8898749
 F doc/dom.xml 2d883a167212621563c75fd1545578fd7c0df02d
-F doc/domDoc.html cbd85bb277c72d375d5df17b69dd3797cf2d6851
-F doc/domDoc.n ce2e90706f46852fe5e30bd506a692f22417f381
+F doc/domDoc.html 0eee5ce350480d603d78599048f8e0433b8a1899
+F doc/domDoc.n 0b81627a098c63deeaa9fd679476b05f80330cbd
 F doc/domDoc.xml 612fc4bee4109b73084c4d9eb5ec9d40fee2a8d0
-F doc/domNode.html 49e4f5765259b4411eded605531a54ec0052b57a
-F doc/domNode.n ba60bce02546fae00a89aea0757328651584c757
+F doc/domNode.html 9a633886b21105a96e82dad3b542bf5104b06072
+F doc/domNode.n 1d57d3b9fd29476113e7ddf606824877c121c91d
 F doc/domNode.xml f60741ad48e67bc5c530d9e719320aec4b47c10f
-F doc/expat.html b0f131647c66c4d82308f60895435afc238c24b4
+F doc/expat.html 9060874cb790733e65e3427347acc5f99079a15d
 F doc/expat.n 1532a92db725e1d28a357484fe9105ebe7fb778c
 F doc/expat.xml cc280131ede8000bcfe6d79ead52b0852076a55d
-F doc/expatapi.html 6b824c3b77190c06300ef56b952ed2b2fc966214
+F doc/expatapi.html 765d62f9574fa3f2d9eed1edd8f8285c04ee0b96
 F doc/expatapi.n 6b56b9d897f32d15a7cdac0e0c9b8c636c5b8d56
 F doc/expatapi.xml 82ad1cfa27e60658976cb03d8e7a11d42558651b
 F doc/index.html d4cbad3c643cbd9d537ba27631c5388becf30dbe
 F doc/keyword-index.html 13fbf9d99d07a6fa533154437c51c8c884fa7fbc
 F doc/manpage.css 3b4ec1d641048933a7e6bffc659de9519030a959
 F doc/tDOM.xml 35369df6a7d84d68cfb28692530ef9d1a8b8ca3e
-F doc/tdomcmd.html ba0fd80d6dfd6dc6ca0ba0158da728755289bd68
+F doc/tdomcmd.html 67642482fb4eb5478a1f6466437a8dba07973633
 F doc/tdomcmd.n 087bbf0cf783376e39ff903a48bc377ce507b8f3
 F doc/tdomcmd.xml fa7bb2424b54e7180148f53557f4059673103c9a
 F doc/tmml.dtd 63259dc9f69f9104f1515be445b85b195a1fb990
 F doc/tmml.options 8a76115c6e9725e8dae55b3005e8ba9878023bbd
 F doc/tmml.rnc 65a2a69ac3347b19aa57e70bb127a4923f5dfc95
-F doc/tnc.html 068f329b8c06745b4c1b7c34d943376d9df08183
+F doc/tnc.html dfcf0f8e4b5d0592266ce22cd8ee60e76dfd2d3c
 F doc/tnc.n 147129ce67de3ac8758752bf9747ebf193f60626
 F doc/tnc.xml 9a687664923259ff45bd0cf4b69d4c65dc3f59f3
 F encodings/GenCompactCodings 5996a4e04bf65b44226c90260f7a19c30c077a7a x
@@ -118,7 +118,7 @@ F extensions/tnc/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
 F extensions/tnc/pkgIndex.tcl.in 6c224c2cdbb494f621ec008f96fe4a552a79a7b7
 F extensions/tnc/test.tcl 545cdec17e6702cef9f79184fdf1ce0166b8c412
 F extensions/tnc/tests/all.tcl 845c9dab65c294c3570f69cc731d6fef62efbd03
-F extensions/tnc/tests/loadtnc.tcl 9472a546f30972f5ea6d16880ed57e709556ce88
+F extensions/tnc/tests/loadtnc.tcl 833d935830d3576cbb865ae97ea9de8ad7eaefa2
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c e30dc44a8be8b99c9772daf5cafb3714d8550c37
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
@@ -227,19 +227,22 @@ F tests/xslt.test ed74e863288df75b4cccdac880984653952cbe68
 F unix/CONFIG 789192e463910e1b9dd7e65f6338390d2bf1f68a
 F unix/tclAppInit.c a1655c51127aed18d069010f234a378fceacb2a6
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F win/makefile.vc c02ca520821d6b575c7237d0a782391aa3916409
+F win/makefile.vc 5cad4c29f886601f8373b1ebe5eb7dee988bef6a
 F win/makefile805.vc 9456ed2d305d6231d930202f684929e967b05f40
 F win/mkd.bat 85d3fe58ce051a778447fb2bfc7384867d21cef0
 F win/nmakehlp.c 604c15fe6ebf3bb5f1cf54dd43801b9ae89fd653
-F win/pkgIndex.tcl 95f43bef978a72e8ceda0c97edac4ed8333b2327
+F win/pkgIndex.tcl 373e1ce3d2d7ab89441158dc78ee8c6cd7ccaa76
 F win/rules.vc 45b10bfc82b91ffa3c166e159d1f926a39c4e2ed
 F win/tdom.rc 46fe2071b1b93040adeb66d98da6b72d270055c7
 F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 9fd45f15ab9030f18ce8b3d78343844fb2f0c2cb
-R cfb131d89cfd9124522dbc8ca92c0c06
+P df00b99009f9959317c1dbf242e7b29d53aee7d1
+R 27c97be04a94aca62a2c0d3c27affe24
+T *branch * prepare-relese
+T *sym-prepare-relese *
+T -sym-trunk *
 U rolf
-Z 4973fd3fd7a51bfee3ed77469903bce6
+Z dae16bffed62da826711ba787b479026
 # Remove this line to create a well-formed Fossil manifest.

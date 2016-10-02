@@ -4,14 +4,14 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0xdf7d10">NAME</a> · <a href="#SECTid0xdfcad0">SYNOPSIS</a> · <a href="#SECTid0xdd3590">ARGUMENTS</a> · <a href="#SECTid0xdd5650">DESCRIPTION</a> · <a href="#SECTid0xe13300">SEE ALSO</a> · <a href="#SECTid0xe135a0">KEYWORDS</a>
+<a href="#SECTid0x139c8b0">NAME</a> Â· <a href="#SECTid0x13eb870">SYNOPSIS</a> Â· <a href="#SECTid0x137b620">ARGUMENTS</a> Â· <a href="#SECTid0x137d6e0">DESCRIPTION</a> Â· <a href="#SECTid0x13b1f40">SEE ALSO</a> Â· <a href="#SECTid0x13b21e0">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-    <h2><a name="SECTid0xdf7d10">NAME</a></h2><p class="namesection">
+    <h2><a name="SECTid0x139c8b0">NAME</a></h2><p class="namesection">
 <b class="names">CheckExpatParserObj, CHandlerSetInstall, CHandlerSetRemove,
          CHandlerSetCreate, CHandlerSetGetUserData, GetExpatInfo - </b><br>Functions to create, install and remove expat parser object
 extensions.</p>
-  <h2><a name="SECTid0xdfcad0">SYNOPSIS</a></h2><pre class="syntax">#include &lt;tclexpat.h&gt;
+  <h2><a name="SECTid0x13eb870">SYNOPSIS</a></h2><pre class="syntax">#include &lt;tclexpat.h&gt;
 
 int 
 <b class="fun">CheckExpatParserObj</b> (<a href="#ARG-interp"><i>interp</i></a>, <a href="#ARG-nameObj"><i>nameObj</i></a>)  
@@ -35,33 +35,33 @@ TclGenExpatInfo*
 <b class="fun">GetExpatInfo</b> (<a href="#ARG-interp"><i>interp</i></a>, <a href="#ARG-expatObj"><i>expatObj</i></a>)
 </pre>
 
-  <h2><a name="SECTid0xdd3590">ARGUMENTS</a></h2><div class="arglist"><table width="100%" rules="none" cellpadding="5%">
+  <h2><a name="SECTid0x137b620">ARGUMENTS</a></h2><div class="arglist"><table width="100%" rules="none" cellpadding="5%">
 <thead><tr class="heading">
 <th width="20%">Type</th><th width="70%">Name</th><th width="10%">Mode</th>
 </tr></thead><tr class="syntax">
 <td class="type" width="20%" align="left">Tcl_Interp</td><td class="name" width="70%" align="left"><a name="ARG-interp">*interp</a></td><td class="mode" width="10%" align="center">in</td>
 </tr><tr class="desc">
-<td class="padding" width="20%"> </td><td class="argdesc" width="80%" align="left" colspan="2">Interpreter with the expat parser object.</td>
+<td class="padding" width="20%">Â </td><td class="argdesc" width="80%" align="left" colspan="2">Interpreter with the expat parser object.</td>
 </tr><tr class="syntax">
 <td class="type" width="20%" align="left">Tcl_Obj</td><td class="name" width="70%" align="left"><a name="ARG-expatObj">*expatObj</a></td><td class="mode" width="10%" align="center">in</td>
 </tr><tr class="desc">
-<td class="padding" width="20%"> </td><td class="argdesc" width="80%" align="left" colspan="2">A Tcl Object containing the command name of the expat parser object to be queried or modified.</td>
+<td class="padding" width="20%">Â </td><td class="argdesc" width="80%" align="left" colspan="2">A Tcl Object containing the command name of the expat parser object to be queried or modified.</td>
 </tr><tr class="syntax">
 <td class="type" width="20%" align="left">char</td><td class="name" width="70%" align="left"><a name="ARG-handlerSetName">*handlerSetName</a></td><td class="mode" width="10%" align="center">in</td>
 </tr><tr class="desc">
-<td class="padding" width="20%"> </td><td class="argdesc" width="80%" align="left" colspan="2">Identifier of the handler set.</td>
+<td class="padding" width="20%">Â </td><td class="argdesc" width="80%" align="left" colspan="2">Identifier of the handler set.</td>
 </tr><tr class="syntax">
 <td class="type" width="20%" align="left">CHandlerSet</td><td class="name" width="70%" align="left"><a name="ARG-handlerSet">*handlerSet</a></td><td class="mode" width="10%" align="center">in</td>
 </tr><tr class="desc">
-<td class="padding" width="20%"> </td><td class="argdesc" width="80%" align="left" colspan="2">Pointer to a C handler set.</td>
+<td class="padding" width="20%">Â </td><td class="argdesc" width="80%" align="left" colspan="2">Pointer to a C handler set.</td>
 </tr><tr class="syntax">
 <td class="type" width="20%" align="left">Tcl_Obj</td><td class="name" width="70%" align="left"><a name="ARG-nameObj">*nameObj</a></td><td class="mode" width="10%" align="center"></td>
 </tr><tr class="desc">
-<td class="padding" width="20%"> </td><td class="argdesc" width="80%" align="left" colspan="2">A Tcl Object containing the name of a expat parser object</td>
+<td class="padding" width="20%">Â </td><td class="argdesc" width="80%" align="left" colspan="2">A Tcl Object containing the name of a expat parser object</td>
 </tr>
 </table></div>
 
-  <h2><a name="SECTid0xdd5650">DESCRIPTION</a></h2><p>The functions described in this manual allows to add C level coded event
+  <h2><a name="SECTid0x137d6e0">DESCRIPTION</a></h2><p>The functions described in this manual allows to add C level coded event
 handler to an tDOM Tcl expat parser objects. A tDOM Tcl expat parser object is
 able to have several Tcl scripts and C functions associated with an specific
 event. If the event occurs, first the Tcl scripts then the C functions
@@ -199,11 +199,11 @@ status of the parser object.</p><p>See the simple but full functionally example 
 dir or the more complex example tnc in the extensions/tnc dir (a simple DTD
 validation extension).</p>
 
-  <h2><a name="SECTid0xe13300">SEE ALSO</a></h2><p class="seealso">expat</p>
+  <h2><a name="SECTid0x13b1f40">SEE ALSO</a></h2><p class="seealso">expat</p>
 
-  <h2><a name="SECTid0xe135a0">KEYWORDS</a></h2><p class="keywords"><a class="keyword" href="keyword-index.html#KW-Chandlerset">C handler set</a></p>
+  <h2><a name="SECTid0x13b21e0">KEYWORDS</a></h2><p class="keywords"><a class="keyword" href="keyword-index.html#KW-Chandlerset">C handler set</a></p>
 </div><hr class="navsep"><div class="navbar" align="center">
-<a class="navaid" href="index.html">Contents</a> · <a class="navaid" href="category-index.html">Index</a> · <a class="navaid" href="keyword-index.html">Keywords</a>
+<a class="navaid" href="index.html">Contents</a> Â· <a class="navaid" href="category-index.html">Index</a> Â· <a class="navaid" href="keyword-index.html">Keywords</a>
 </div>
 </body>
 </html>

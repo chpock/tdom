@@ -4,21 +4,21 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0xdd2ac0">NAME</a> · <a href="#SECTid0xdfcc60">SYNOPSIS</a> · <a href="#SECTid0xe169a0">DESCRIPTION</a> · <a href="#SECTid0xdc1500">BUGS</a> · <a href="#SECTid0xdc1e40">KEYWORDS</a>
+<a href="#SECTid0x1409a40">NAME</a> Â· <a href="#SECTid0x132e810">SYNOPSIS</a> Â· <a href="#SECTid0x132e670">DESCRIPTION</a> Â· <a href="#SECTid0x13bdd50">BUGS</a> Â· <a href="#SECTid0x13be6c0">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0xdd2ac0">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x1409a40">NAME</a></h2><p class="namesection">
 <b class="names">tnc - </b><br>tnc is an expat parser object extension, that validates the XML
 stream against the document DTD while parsing.</p>
   
-  <h2><a name="SECTid0xdfcc60">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x132e810">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 package require tnc
 
 set parser [expat]
 
 tnc $parser enable</pre>
 
-  <h2><a name="SECTid0xe169a0">DESCRIPTION</a></h2><p>
+  <h2><a name="SECTid0x132e670">DESCRIPTION</a></h2><p>
 <i class="m">tnc</i> adds the C handler set "tnc" to a tcl expat parser
 obj. This handler set is a simple DTD validator. If the validator detects a
 validation error, it sets the interp result, signals error and stops
@@ -120,7 +120,7 @@ it. Returns the empty string.</dd>
       
     </dl>
 
-  <h2><a name="SECTid0xdc1500">BUGS</a></h2><p>The validation error reports could be much more informative and
+  <h2><a name="SECTid0x13bdd50">BUGS</a></h2><p>The validation error reports could be much more informative and
 user-friendly.</p><p>The validator doesn't detect ambiguous content models (see XML
 recomendation Section 3.2.1 and Appendix E). Most Java validators also doesn't,
 but handle such content models right anyhow. Tnc does not; if your DTD has
@@ -129,12 +129,12 @@ such (not completely XML spec compliant) DTDs.</p><p>It isn't possible to valida
 XML Declaration</p><p>Violations of the validity constraints Proper Group/PE Nesting and
 Proper Conditional Section/PE Nesting are not detected. They could only happen
 inside a invalid DTD, not in the content of a document.</p>
-  <h2><a name="SECTid0xdc1e40">KEYWORDS</a></h2><p class="keywords">
+  <h2><a name="SECTid0x13be6c0">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-Validation">Validation</a>, <a class="keyword" href="keyword-index.html#KW-DTD">DTD</a>
 </p>
   
 </div><hr class="navsep"><div class="navbar" align="center">
-<a class="navaid" href="index.html">Contents</a> · <a class="navaid" href="category-index.html">Index</a> · <a class="navaid" href="keyword-index.html">Keywords</a>
+<a class="navaid" href="index.html">Contents</a> Â· <a class="navaid" href="category-index.html">Index</a> Â· <a class="navaid" href="keyword-index.html">Keywords</a>
 </div>
 </body>
 </html>
