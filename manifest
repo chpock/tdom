@@ -1,5 +1,5 @@
-C Removed\sbuild\sstuff\sfor\smac\sos\s8/9.\sI\shave\sno\sway\sto\stest\sthis\sand\sprobably\snobody\suses\sthis\sanymore.
-D 2016-10-02T12:59:29.297
+C Regenerated\sconfigure.
+D 2016-10-03T21:25:59.237
 F CHANGES 5b8018400c04dbb6e27e67934ccd6ab20323a9e7
 F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -9,7 +9,7 @@ F README e56f2a815184d3c9d11f295be9774555a91bc6a2
 F README.AOL a4faf5f85723467a8d8ca406f8aca855a18441b1
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/xslt.tcl ac4a75ba2f05e26d4ea6f92547983caa80fc6d55
-F configure 3b7e472cef9c60cad6e2419dadc8af9525ee2a79 x
+F configure 2b5c5321cbbc92be94393945c2793c5bc24afe38 x
 F configure-tcl8.0.5 db1a666545d519c42e229d245224d456a84c798a x
 F configure.in f9c1ca210c7ecf39c1e2c14fce06650daa162965
 F doc/INDEX.MAP c8e767983bcea4bbd53ecdbf3d78cb044996e9bc
@@ -219,8 +219,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 6e4626b0b00812d69b1fe6e6182eb93523dd16f1
-R c99f82161cfc5f4163ad12ca13a78f19
+P 63d1763330541c6a55ed2770004b01c59f10a525
+R 2d98f117c1325b413dc8f0074dce00c7
 U rolf
-Z 1b1b41ce42badc6eba08c1aade163a2c
+Z a61050ff0760e4bdcce5366a07c9dfbb
 # Remove this line to create a well-formed Fossil manifest.
