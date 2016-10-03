@@ -1,7 +1,7 @@
-C Regenerated\sconfigure.
-D 2016-10-03T21:25:59.237
-F CHANGES 5b8018400c04dbb6e27e67934ccd6ab20323a9e7
-F ChangeLog 7de4bf41eb1901d49aa33df0737ef3715333e8fc
+C Updated\sCHANGES.\sReplaced\sthe\scurrently\snot\supdated\sgithub\smirror\swith\sthe\stDOM\smirror\sat\score.tcl.tk.
+D 2016-10-03T21:36:00.837
+F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
+F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 3965f5b535b48290240151057611b376495aadec
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -219,8 +219,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 63d1763330541c6a55ed2770004b01c59f10a525
-R 2d98f117c1325b413dc8f0074dce00c7
+P 6e83087b3a931540bdd34f8338c239b10ed77e8d
+R c46221cdeea1659ff483fedef1d47c57
 U rolf
-Z a61050ff0760e4bdcce5366a07c9dfbb
+Z b65140cb18cf7b8ccdbc1d4d4fa88c4e
 # Remove this line to create a well-formed Fossil manifest.
