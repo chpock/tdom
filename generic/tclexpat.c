@@ -3438,7 +3438,7 @@ TclGenExpatExternalEntityRefHandler(parser, openEntityNames, base, systemId,
           do {
               len = Tcl_Read (chan, buf, sizeof (buf));
               done = len < sizeof (buf);
-              result = !XML_Parse (extparser, buf, len, done);
+              result = XML_Parse (extparser, buf, len, done);
               if (result != XML_STATUS_OK) break;
           } while (!done);
           Tcl_UnregisterChannel (expat->interp, chan);
