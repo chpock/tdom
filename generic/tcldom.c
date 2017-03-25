@@ -50,6 +50,7 @@
 #include <domxslt.h>
 #include <xmlsimple.h>
 #include <domhtml.h>
+#include <domhtml5.h>
 #include <nodecmd.h>
 #include <tcldom.h>
 
@@ -5578,6 +5579,9 @@ int tcldom_parse (
     int          ignoreWhiteSpaces   = 1;
     int          takeSimpleParser    = 0;
     int          takeHTMLParser      = 0;
+#ifdef TDOM_HAVE_GUMBO
+    int          takeGUMBOParser     = 0;
+#endif
     int          setVariable         = 0;
     int          ignorexmlns         = 0;
     int          feedbackAfter       = 0;
@@ -5594,14 +5598,21 @@ int tcldom_parse (
         "-keepEmpties",           "-simple",        "-html",
         "-feedbackAfter",         "-channel",       "-baseurl",
         "-externalentitycommand", "-useForeignDTD", "-paramentityparsing",
-        "-feedbackcmd",           "-ignorexmlns",
-        NULL
+        "-feedbackcmd",           
+#ifdef TDOM_HAVE_GUMBO
+        "-html5",
+#endif
+        "-ignorexmlns",  NULL
     };
     enum parseOption {
         o_keepEmpties,            o_simple,         o_html,
         o_feedbackAfter,          o_channel,        o_baseurl,
         o_externalentitycommand,  o_useForeignDTD,  o_paramentityparsing,
-        o_feedbackcmd,            o_ignorexmlns
+        o_feedbackcmd,
+#ifdef TDOM_HAVE_GUMBO
+        o_htmlfive,
+#endif
+        o_ignorexmlns
     };
 
     static CONST84 char *paramEntityParsingValues[] = {
@@ -5615,7 +5626,7 @@ int tcldom_parse (
         EXPAT_PARAMENTITYPARSINGNEVER,
         EXPAT_PARAMENTITYPARSINGNOTSTANDALONE
     };
-    
+
     while (objc > 1) {
         option = Tcl_GetString(objv[1]);
         if (option[0] != '-') {
@@ -5637,9 +5648,27 @@ int tcldom_parse (
             objv++;  objc--; continue;
 
         case o_html:
+#ifdef TDOM_HAVE_GUMBO
+            if (takeGUMBOParser) {
+                SetResult("The options -html and -html5 are mutually"
+                          " exclusive.");
+                return TCL_ERROR;
+            }
+#endif            
             takeSimpleParser = 1;
             takeHTMLParser = 1;
             objv++;  objc--; continue;
+
+#ifdef TDOM_HAVE_GUMBO
+        case o_htmlfive:
+            if (takeHTMLParser) {
+                SetResult("The options -html and -html5 are mutually"
+                          " exclusive.");
+                return TCL_ERROR;
+            }
+            takeGUMBOParser = 1;
+            objv++;  objc--; continue;
+#endif
             
         case o_feedbackAfter:
             objv++; objc--;
@@ -5794,7 +5823,7 @@ int tcldom_parse (
         }
         xml_string = NULL;
         xml_string_len = 0;
-        if (takeSimpleParser || takeHTMLParser) {
+        if (takeSimpleParser || takeHTMLParser || takeGUMBOParser) {
             Tcl_AppendResult(interp, "simple and/or HTML parser(s) "
                              " don't support channel reading", NULL);
             return TCL_ERROR;
@@ -5805,6 +5834,17 @@ int tcldom_parse (
         }
     }
 
+#ifdef TDOM_HAVE_GUMBO
+    if (takeGUMBOParser) {
+        int  byteIndex;
+        
+        doc = HTML_GumboParseDocument(xml_string, ignoreWhiteSpaces,
+                                       &byteIndex, &errStr);
+        return tcldom_returnDocumentObj (interp, doc, setVariable, newObjName,
+                                         1, 0);
+    }
+#endif
+    
     if (takeSimpleParser) {
         char s[50];
         int  byteIndex, i;
@@ -5963,12 +6003,18 @@ int tcldom_featureinfo (
         "expatversion",      "expatmajorversion",  "expatminorversion",
         "expatmicroversion", "dtd",                "ns",
         "unknown",           "tdomalloc",          "lessns",
+#ifdef TDOM_HAVE_GUMBO
+        "html5",
+#endif        
         "TCL_UTF_MAX",        NULL
     };
     enum feature {
         o_expatversion,      o_expatmajorversion,  o_expatminorversion,
         o_expatmicroversion, o_dtd,                o_ns,
         o_unknown,           o_tdomalloc,          o_lessns,
+#ifdef TDOM_HAVE_GUMBO
+        o_html5,
+#endif        
         o_TCL_UTF_MAX
     };
 
@@ -6024,6 +6070,14 @@ int tcldom_featureinfo (
         break;
     case o_lessns:
 #ifdef TDOM_LESS_NS
+        result = 1;
+#else
+        result = 0;
+#endif
+        SetBooleanResult(result);
+        break;
+    case o_html5:
+#ifdef TDOM_HAVE_GUMBO
         result = 1;
 #else
         result = 0;

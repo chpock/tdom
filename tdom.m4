@@ -206,6 +206,53 @@ AC_DEFUN(TDOM_ENABLE_LESS_NS, [
 ])
 
 #------------------------------------------------------------------------
+# TDOM_ENABLE_HTML5 --
+#
+#   Building with gumbo support for HTML5 parsing (dom parse -html5)
+#
+# Arguments:
+#   None
+#   
+# Results:
+#
+#   Adds the following arguments to configure:
+#       --enable-html5=yes|no
+#
+#   Defines the following vars:
+#
+#   Sets the following vars:
+#
+#------------------------------------------------------------------------
+
+AC_DEFUN(TDOM_ENABLE_HTML5, [
+    AC_MSG_CHECKING([whether to enable support for HTML5 parsing (using gumbo)])
+    AC_ARG_ENABLE(html5,
+        AC_HELP_STRING([--enable-html5],
+            [build with HTML5 parsing support (default: off)]),
+        [tcl_ok=$enableval], [tcl_ok=no])
+
+    if test "${enable_html5+set}" = set; then
+        enableval="$enable_html5"
+        tcl_ok=$enableval
+    else
+        tcl_ok=no
+    fi
+    HTML5_LIBS=""
+    if test "$tcl_ok" = "yes" ; then
+        HAVEGUMBO=`pkg-config --exists gumbo && echo "1"`
+        if test "$HAVEGUMBO" = "1" ; then
+            AC_MSG_RESULT([yes])
+            AC_DEFINE(TDOM_HAVE_GUMBO)
+            HTML5_LIBS="`pkg-config --cflags --libs gumbo`"
+        else
+            AC_MSG_ERROR([The required lib gumbo not found])
+        fi
+    else    
+        AC_MSG_RESULT([no])
+    fi
+])
+
+#------------------------------------------------------------------------
 # TDOM_PATH_AOLSERVER
 #
 #   Allows the building with support for AOLserver 

@@ -736,6 +736,7 @@ enable_option_checking
 with_tcl
 with_aol
 with_expat
+enable_html5
 with_tclinclude
 enable_threads
 enable_shared
@@ -1369,6 +1370,7 @@ Optional Features:
   --disable-option-checking  ignore unrecognized --enable/--with options
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
+  --enable-html5          build with HTML5 parsing support (default: off)
   --enable-threads        build with threads
   --enable-shared         build and link with shared libraries (default: on)
   --enable-64bit          enable 64bit support (default: off)
@@ -5452,6 +5454,45 @@ $as_echo "Using shared expat found in ${ac_cv_c_expat}" >&6; }
     fi
 
 
+#--------------------------------------------------------------------
+# Add HTML5 parsing support.
+#--------------------------------------------------------------------
+
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable support for HTML5 parsing (using gumbo)" >&5
+$as_echo_n "checking whether to enable support for HTML5 parsing (using gumbo)... " >&6; }
+    # Check whether --enable-html5 was given.
+if test "${enable_html5+set}" = set; then :
+  enableval=$enable_html5; tcl_ok=$enableval
+else
+  tcl_ok=no
+fi
+
+
+    if test "${enable_html5+set}" = set; then
+        enableval="$enable_html5"
+        tcl_ok=$enableval
+    else
+        tcl_ok=no
+    fi
+    HTML5_LIBS=""
+    if test "$tcl_ok" = "yes" ; then
+        HAVEGUMBO=`pkg-config --exists gumbo && echo "1"`
+        if test "$HAVEGUMBO" = "1" ; then
+            { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+            $as_echo "#define TDOM_HAVE_GUMBO 1" >>confdefs.h
+
+            HTML5_LIBS="`pkg-config --cflags --libs gumbo`"
+        else
+            as_fn_error $? "The required lib gumbo not found" "$LINENO" 5
+        fi
+    else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+    fi
+
+
 #-----------------------------------------------------------------------
 # __CHANGE__
 # Specify the C source files to compile in TEA_ADD_SOURCES,
@@ -5467,6 +5508,7 @@ $as_echo "Using shared expat found in ${ac_cv_c_expat}" >&6; }
                  generic/utf8conv.c  \
                  generic/dom.c       \
                  generic/domhtml.c   \
+                 generic/domhtml5.c  \
                  generic/domxpath.c  \
                  generic/domxslt.c   \
                  generic/domlock.c   \
@@ -5527,7 +5569,7 @@ $as_echo "Using shared expat found in ${ac_cv_c_expat}" >&6; }
 
 
 
-    vars="${AOL_LIBS}"
+    vars="${AOL_LIBS} ${HTML5_LIBS}"
     for i in $vars; do
 	if test "${TEA_PLATFORM}" = "windows" -a "$GCC" = "yes" ; then
 	    # Convert foo.lib to -lfoo for GCC.  No-op if not *.lib
