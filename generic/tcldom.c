@@ -5823,7 +5823,11 @@ int tcldom_parse (
         }
         xml_string = NULL;
         xml_string_len = 0;
-        if (takeSimpleParser || takeHTMLParser || takeGUMBOParser) {
+        if (takeSimpleParser || takeHTMLParser
+#ifdef TDOM_HAVE_GUMBO
+                || takeGUMBOParser
+#endif
+            ) {
             Tcl_AppendResult(interp, "simple and/or HTML parser(s) "
                              " don't support channel reading", NULL);
             return TCL_ERROR;
@@ -6003,18 +6007,14 @@ int tcldom_featureinfo (
         "expatversion",      "expatmajorversion",  "expatminorversion",
         "expatmicroversion", "dtd",                "ns",
         "unknown",           "tdomalloc",          "lessns",
-#ifdef TDOM_HAVE_GUMBO
         "html5",
-#endif        
         "TCL_UTF_MAX",        NULL
     };
     enum feature {
         o_expatversion,      o_expatmajorversion,  o_expatminorversion,
         o_expatmicroversion, o_dtd,                o_ns,
         o_unknown,           o_tdomalloc,          o_lessns,
-#ifdef TDOM_HAVE_GUMBO
         o_html5,
-#endif        
         o_TCL_UTF_MAX
     };
 

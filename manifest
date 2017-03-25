@@ -1,5 +1,5 @@
-C Added\san\sexperimental\sdom\sparse\s-html5\soption,\sthat\suses\sthe\sgumbo\slibrary\s(https://github.com/google/gumbo-parser)\sto\sgenerate\sa\stdon\sDOM\stree\sout\sof\s(html5)\sinput.\sIt's\sdisabled,\sby\sdefault,\senable\sit\swith\s../configure\s--enable-html5.\sThis\slink\sagainst\sthe\sgumbo\slib\sand\stherefor\srequire\sthat\sto\sbe\sinstalled.
-D 2017-03-25T01:18:20.337
+C Made\sit\sbuild\salso\swith\sjust\sthe\sdefault\s../configure\sagain.
+D 2017-03-25T01:32:11.000
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -139,7 +139,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c fff479358cd9d391f83ebad7ef7b1e02cdbf9a90
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
-F generic/tcldom.c 20789d7c5b22ea19cc1ecdde6ce3b6d71d0b2dfc
+F generic/tcldom.c 57df81edff90cf94aafe119c09cd7e737198d4c7
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
 F generic/tclexpat.c 069180212797fc14bdb0a08bcd1ad3461406975c
 F generic/tclexpat.h 3fb4df4c023d1f625ec9c5783c4fc1d1e4e0b8bb
@@ -241,11 +241,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 1d978619f547ddf2c887ddeadb8d77b31f5d75ee
-R 98a324fa87126a4d445b88f116221d8e
-T *branch * html5_by_gumbo
-T *sym-html5_by_gumbo *
-T -sym-trunk *
+P 5f8d95de29467edfa06118838f663b30ca0ac1b1
+R 7cf774a729db23e1ba09c146294519e6
 U rolf
-Z 2e2af4f953ccb35be60b9deabadd52c3
+Z e8b0205aaf3d88ea01aa51056a062396
 # Remove this line to create a well-formed Fossil manifest.
