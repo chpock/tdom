@@ -540,7 +540,7 @@ empty string.</desc>
   </commandlist>
 
       <p>Otherwise, if an unknown method name is given, the command with the
-same name as the given metho within the namespace <samp>::dom::domDoc</samp> is
+same name as the given method within the namespace <samp>::dom::domDoc</samp> is
 tried to be executed. This allows quick method additions on Tcl level.</p>
 
       <p>Newly created nodes are appended to a hidden fragment list. If they

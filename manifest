@@ -1,5 +1,5 @@
-C Introduced\sdue\san\sediting\smistake\sin\s[df00b99009]\sparsing\sof\sexternal\sentities,\sthat\sare\sfeeded\sback\sinto\sthe\sparsing\sengine\sas\schannel\sby\sthe\sscripted\sexternal\sentities\sresolver,\sraised\swrongly\serror\sfor\swell-formed\sentities\sand\svice\sversa.\sFixed.
-D 2016-10-08T23:11:50.843
+C Added\sa\sfew\stests.\sBit\sminor\sgardening.
+D 2017-03-27T20:29:17.594
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -20,7 +20,7 @@ F doc/dom.n 8833a1f8d0e1eb8c80fff4428fa8da6bf8898749
 F doc/dom.xml 2d883a167212621563c75fd1545578fd7c0df02d
 F doc/domDoc.html cbd85bb277c72d375d5df17b69dd3797cf2d6851
 F doc/domDoc.n ce2e90706f46852fe5e30bd506a692f22417f381
-F doc/domDoc.xml 612fc4bee4109b73084c4d9eb5ec9d40fee2a8d0
+F doc/domDoc.xml 76595eadb249338bd3943eccbf5e0fcdff355c64
 F doc/domNode.html 49e4f5765259b4411eded605531a54ec0052b57a
 F doc/domNode.n ba60bce02546fae00a89aea0757328651584c757
 F doc/domNode.xml f60741ad48e67bc5c530d9e719320aec4b47c10f
@@ -206,7 +206,7 @@ F tests/dom.bench 53a2bd61133d0a6acbb2a61794da74f7e7ba9b6a
 F tests/dom.test ce4acfc3fe588b7fd33e8988e302e85a73bcc7ee
 F tests/domDoc.test ff26d5193483764310207b0ed2864e1942a1e517
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
-F tests/domNode.test c2a8fd480f318e2c5f227b8a8c56be7ecc32dbca
+F tests/domNode.test 9c68f0ed49eee97ea98ba4e6e6baee8944d0117f
 F tests/domnamespace.test bd80dfb5fb1637a0ae5007e949e7eab5c4e2f849
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
@@ -238,8 +238,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 267416996f79a82ffa58523faaec9b21e259038e
-R a2f624ec3f11413489f30e929d8eeb94
+P 1d978619f547ddf2c887ddeadb8d77b31f5d75ee
+R efff7db8b958518137e55c8276d058b7
 U rolf
-Z 4f85dbc309a162340ffbeaae1c41776c
+Z 5abd5e205b6378aea887fccd8b37a449
 # Remove this line to create a well-formed Fossil manifest.
