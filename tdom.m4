@@ -235,12 +235,7 @@ AC_DEFUN(TDOM_ENABLE_HTML5, [
         enableval="$enable_html5"
         tcl_ok=$enableval
     else
-        HAVEGUMBO=`pkg-config --exists gumbo && echo "1"`
-        if test "$HAVEGUMBO" = "1" ; then
-           tcl_ok=yes
-        else
-           tcl_ok=no
-        fi
+        tcl_ok=no
     fi
     HTML5_LIBS=""
     if test "$tcl_ok" = "yes" ; then

@@ -355,11 +355,11 @@ then the command is processed in the same way as
 
       <commanddef>
         <command><method>normalize</method> <m>?-forXPath?</m></command>
-        <desc>Puts all Text nodes in the document
+        <desc>Puts all text nodes in the document
 into a "normal" form where only structure (e.g., elements,
 comments, processing instructions and CDATA
-sections) separates Text nodes, i.e., there
-are neither adjacent Text nodes nor empty Text nodes. If the option
+sections) separates text nodes, i.e., there
+are neither adjacent text nodes nor empty text nodes. If the option
 <m>-forXPath</m> is given, all CDATA sections in the nodes are
 converted to text nodes, as a first step before the
 normalization. </desc>

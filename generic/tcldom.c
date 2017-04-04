@@ -5840,10 +5840,8 @@ int tcldom_parse (
 
 #ifdef TDOM_HAVE_GUMBO
     if (takeGUMBOParser) {
-        int  byteIndex;
-        
         doc = HTML_GumboParseDocument(xml_string, ignoreWhiteSpaces,
-                                       &byteIndex, &errStr);
+                                      ignorexmlns);
         return tcldom_returnDocumentObj (interp, doc, setVariable, newObjName,
                                          1, 0);
     }

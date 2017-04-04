@@ -23,6 +23,8 @@
 
 #ifdef TDOM_HAVE_GUMBO
 
+#define MAX_TAG_LEN 201
+
 /*----------------------------------------------------------------------------
 |   Includes
 |
@@ -32,11 +34,23 @@
 #include "gumbo.h"
 #include <assert.h>
 
+static const char *xhtml = "http://www.w3.org/1999/xhtml";
+static const char *svg = "http://www.w3.org/2000/svg";
+static const char *mathml = "http://www.w3.org/1998/Math/MathML";
+static const char *xlink = "http://www.w3.org/1999/xlink";
+
+#ifdef DEBUG
+# define DBG(x) x
+#else
+# define DBG(x) 
+#endif
+
 static void
 convertGumboToDom (
     domNode *parent,
     GumboNode *gumboParent,
-    int ignoreWhiteSpaces
+    int ignoreWhiteSpaces,
+    int ignorexmlns
     ) 
 {
     int i, j, hnew;
@@ -44,10 +58,16 @@ convertGumboToDom (
     GumboNode *child;
     GumboElement *gumboElm;
     GumboAttribute *gumboAtt;
+    const char *tag;
+    const char *attValue;
+    const char *attUri = NULL;
+    char buf[MAX_TAG_LEN];
     domNode *node;
+    domNS *ns;
     domNodeType nodeType = ALL_NODES;
-    domAttrNode *attr;
+    domAttrNode *attr = NULL;
     Tcl_HashEntry *h;
+    const char *elmns = NULL;
     
     for (i = 0; i < children->length; ++i) {
         child = (GumboNode*) (children->data[i]);
@@ -59,15 +79,51 @@ convertGumboToDom (
         case GUMBO_NODE_ELEMENT:
         case GUMBO_NODE_TEMPLATE:
             gumboElm = &child->v.element;
-            
-            /* Ignore namespaces, for now. That's probably what most
-             * users want, anyway. Otherwise, XPath selecting nodes
-             * inside of svg or math elements would need namespaced
-             * expressions. */
-            
-            node = domNewElementNode (parent->ownerDocument,
-                                      gumbo_normalized_tagname(gumboElm->tag),
-                                      ELEMENT_NODE);
+            tag = gumbo_normalized_tagname(gumboElm->tag);
+            if (!domIsNAME(tag)) {
+                gumbo_tag_from_original_text(&gumboElm->original_tag);
+                if (gumboElm->original_tag.length < MAX_TAG_LEN - 1) {
+                    strncpy(&buf[0],
+                            gumboElm->original_tag.data,
+                            gumboElm->original_tag.length);
+                    buf[gumboElm->original_tag.length] = '\0';
+                    Tcl_UtfToLower(&buf[0]);
+                    if (!domIsNAME(&buf[0])) {
+                        DBG(fprintf (stderr, "invalid tag name '%s'\n", tag););
+                        continue;
+                    }
+                    tag = &buf[0];
+                } else {
+                    /* Just skip this subtree */
+                    DBG(fprintf(stderr, "long tag: %d bytes\n", gumboElm->original_tag.length););
+                    continue;
+                }
+            }
+            if (!ignorexmlns) {
+                switch (gumboElm->tag_namespace) {
+                case GUMBO_NAMESPACE_HTML:
+                    elmns = xhtml;
+                    break;
+                case GUMBO_NAMESPACE_SVG:
+                    elmns = svg;
+                    break;
+                case GUMBO_NAMESPACE_MATHML:
+                    elmns = mathml;
+                    break;
+                default:
+                    /* do nothing */
+                    break;
+                }
+            }
+            if (elmns == NULL) {
+                node = domNewElementNode (parent->ownerDocument, tag,
+                                          ELEMENT_NODE);
+            } else {
+                DBG(fprintf (stderr, "namespaced node %s\n", tag););
+                node = domNewElementNodeNS (parent->ownerDocument, tag,
+                                            elmns, ELEMENT_NODE);
+            }
+            domAppendChild(parent, node);
             for (j = 0; j < gumboElm->attributes.length; ++j) {
                 gumboAtt = gumboElm->attributes.data[j];
                 /* This is to ensure the same behavior as the -html
@@ -80,35 +136,132 @@ convertGumboToDom (
                  * works.*/
                 if (gumboAtt->original_value.data[0] != '"'
                     && gumboAtt->original_value.data[0] != '\'') {
-                    attr = domSetAttribute (node, gumboAtt->name,
-                                            gumboAtt->name);
+                    attValue = gumboAtt->name;
                 } else {
-                    attr = domSetAttribute (node, gumboAtt->name,
-                                            gumboAtt->value);
+                    attValue = gumboAtt->value;
                 }
-                if (!strcmp(gumboAtt->name, "id")) {
-                    if (!node->ownerDocument->ids) {
-                        node->ownerDocument->ids = (Tcl_HashTable *)
-                            MALLOC (sizeof (Tcl_HashTable));
-                        Tcl_InitHashTable (
-                            node->ownerDocument->ids,
-                            TCL_STRING_KEYS);
+
+                if (ignorexmlns) {
+                    if (gumboAtt->attr_namespace != GUMBO_ATTR_NAMESPACE_NONE) {
+                        if (gumboAtt->original_name.length < MAX_TAG_LEN - 1) {
+                            strncpy(&buf[0],
+                                    gumboAtt->original_name.data,
+                                    gumboAtt->original_name.length);
+                            buf[gumboAtt->original_name.length] = '\0';
+                            Tcl_UtfToLower(&buf[0]);
+                            DBG(fprintf (stderr, "original att name: %s\n",
+                                         &buf[0]););
+                            if (!domIsNAME(&buf[0])) {
+                                DBG(fprintf (stderr, "invalid att name '%s'\n", tag););
+                                continue;
+                            }
+                            domSetAttribute(node, &buf[0], attValue);
+                        } else {
+                            continue;
+                        }
+                    } else {
+                        attr = domSetAttribute (node, gumboAtt->name, attValue);
                     }
-                    h = Tcl_CreateHashEntry (
-                        node->ownerDocument->ids,
-                        gumboAtt->value,
-                        &hnew);
-                    /* How to resolve in case of dublicates?  We
-                       follow, what the core dom building code does:
-                       the first value in document order wins. */
-                    if (hnew) {
-                        Tcl_SetHashValue (h, node);
-                        attr->nodeFlags |= IS_ID_ATTRIBUTE;
+                } else {
+                    attUri = NULL;
+                    switch (gumboAtt->attr_namespace) {
+                    case GUMBO_ATTR_NAMESPACE_XLINK:
+                        DBG(fprintf (stderr, "GUMBO_ATTR_NAMESPACE_XLINK\n"););
+                        attUri = xlink;
+                        break;
+                    case GUMBO_ATTR_NAMESPACE_XMLNS:
+                        DBG(fprintf (stderr, "GUMBO_ATTR_NAMESPACE_XMLNS\n"););
+                        if (attValue[5] == ':') {
+                            ns = domLookupPrefix (node, &(attValue[6]));
+                        } else {
+                            ns = domLookupPrefix (node, "");
+                        }
+                        DBG(fprintf (stderr, "xmns att name: %s\n att value %s\n",
+                                     gumboAtt->name,
+                                     attValue););
+                        if (ns) {
+                            if (strcmp(ns->uri, attValue) == 0) {
+                                /* Namespace already in scope. Skip
+                                 * this attribute to prevent invalid
+                                 * double attributes and unnecessary
+                                 * namespace declarations. */
+                                DBG(fprintf (stderr, "namespace %s already in scope\n",
+                                             attValue););
+                                continue;
+                            }
+                        }
+                        if (gumboAtt->original_name.length < MAX_TAG_LEN - 1) {
+                            strncpy(&buf[0],
+                                    gumboAtt->original_name.data,
+                                    gumboAtt->original_name.length);
+                            buf[gumboAtt->original_name.length] = '\0';
+                            Tcl_UtfToLower(&buf[0]);
+                            DBG(fprintf (stderr, "original att name: %s\n",
+                                         &buf[0]););
+                            if (!domIsNAME(&buf[0])) {
+                                DBG(fprintf (stderr, "invalid att name '%s'\n", tag););
+                                continue;
+                            }
+                            domSetAttributeNS(node, &buf[0], attValue, NULL, 1);
+                        }
+                        continue;
+                    case GUMBO_ATTR_NAMESPACE_XML:
+                        /* The xml namespace is always in scope, nothing
+                         * to do. */
+                        continue;
+                    default:
+                        break;
+                    }
+
+                    if (attUri) {
+                        if (gumboAtt->original_name.length < MAX_TAG_LEN - 1) {
+                            strncpy(&buf[0],
+                                    gumboAtt->original_name.data,
+                                    gumboAtt->original_name.length);
+                            buf[gumboAtt->original_name.length] = '\0';
+                            Tcl_UtfToLower(&buf[0]);
+                            DBG(fprintf (stderr, "original att name: %s\n",
+                                         &buf[0]););
+                            if (!domIsNAME(&buf[0])) {
+                                DBG(fprintf (stderr, "invalid att name '%s'\n", tag););
+                                continue;
+                            }
+                        } else {
+                            continue;
+                        }
+                        DBG(fprintf (stderr, "name: %s value %s\n", &buf[0], attValue););
+                        attr = domSetAttributeNS (node, &buf[0],
+                                                  attValue, xlink, 0);
+                        DBG(fprintf(stderr, "attr: %p\n", attr););
+                    } else {
+                        attr = domSetAttribute (node, gumboAtt->name,
+                                                attValue);
+                    }
+                }
+                if (attr) {
+                    if (strcmp(gumboAtt->name, "id") == 0) {
+                        if (!node->ownerDocument->ids) {
+                            node->ownerDocument->ids = (Tcl_HashTable *)
+                                MALLOC (sizeof (Tcl_HashTable));
+                            Tcl_InitHashTable (
+                                node->ownerDocument->ids,
+                                TCL_STRING_KEYS);
+                        }
+                        h = Tcl_CreateHashEntry (
+                            node->ownerDocument->ids,
+                            gumboAtt->value,
+                            &hnew);
+                        /* How to resolve in case of dublicates?  We
+                           follow, what the core dom building code does:
+                           the first value in document order wins. */
+                        if (hnew) {
+                            Tcl_SetHashValue (h, node);
+                            attr->nodeFlags |= IS_ID_ATTRIBUTE;
+                        }
                     }
                 }
             }
-            domAppendChild(parent, node);
-            convertGumboToDom(node, child, ignoreWhiteSpaces);
+            convertGumboToDom(node, child, ignoreWhiteSpaces, ignorexmlns);
             break;
         case GUMBO_NODE_WHITESPACE:
             if (ignoreWhiteSpaces) {
@@ -135,14 +288,20 @@ convertGumboToDom (
 
 domDocument *
 HTML_GumboParseDocument (
-    char   *html,              /* Complete text of the file being parsed.  */
+    char   *html,              /* Complete text of the XML being parsed.  */
     int     ignoreWhiteSpaces,
-    int    *pos,
-    char  **errStr
-) {
+    int     ignorexmlns
+    ) {
     domDocument *doc = domCreateDoc(NULL, 0);
     GumboOutput *output = gumbo_parse(html);
-    convertGumboToDom (doc->rootNode, output->document, ignoreWhiteSpaces);
+    GumboDocument* doctype = & output->document->v.document;
+    /* Generate and populate doctype info. */
+    doc->doctype = (domDocInfo *)MALLOC(sizeof(domDocInfo));
+    memset(doc->doctype, 0,(sizeof(domDocInfo)));
+    doc->doctype->publicId = tdomstrdup(doctype->public_identifier);
+    doc->doctype->systemId = tdomstrdup(doctype->system_identifier);
+    convertGumboToDom (doc->rootNode, output->document, ignoreWhiteSpaces,
+                       ignorexmlns);
     domSetDocumentElement (doc);
     gumbo_destroy_output(&kGumboDefaultOptions, output);    
     return doc;
