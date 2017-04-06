@@ -1309,6 +1309,7 @@ HTML_SimpleParse (
                        the first value in document order wins. */
                     if (hnew) {
                         Tcl_SetHashValue (h, node);
+                        attrnode->nodeFlags |= IS_ID_ATTRIBUTE;
                     }
                 }
                 if (node->firstAttr) {

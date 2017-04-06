@@ -79,7 +79,28 @@ character references.</desc>
                 <desc>If <m>-html</m> is specified, a fast HTML parser is 
 used, which tries to even parse badly formed HTML into a DOM tree.</desc>
               </optdef>
-       
+
+              <optdef>
+                <optname>-html5</optname>
+                <desc>This option is only available, if tDOM was build
+                with --enable-html5. Try the <m>featureinfo</m> method
+                if you need to know, if this feature is build in. If
+                <m>-html5</m> is specified, the gumbo lib html5 parser
+                (https://github.com/google/gumbo-parser) is used, to
+                build the DOM tree. This is, as far as it goes, XML
+                namespace aware. Since this probably isn't wanted by a
+                lot of users and adds only burden for no good in a lot
+                of use cases <m>-html5</m> can be combined with
+                <m>-ignorexmlns</m>, in which case all nodes and
+                attributes in the DOM tree are not in an XML
+                namespace. All tag and attribute names in the DOM tree
+                will be lower case, even for foreign elements not in
+                the xhtml, svg or mathml namespace. The DOM tree may
+                include nodes, that the parser inserted, because they
+                are implied by the context (as &lt;head&gt;,
+                &lt;tbody&gt;, etc.).</desc>
+              </optdef>
+              
               <optdef>
                 <optname>-keepEmpties</optname> 
                 <desc>If <m>-keepEmpties</m> is
@@ -498,6 +519,11 @@ recommendation. Otherwise it returns 0.</desc>
                     <optname>TCL_UTF_MAX</optname>
                     <desc>Returns the TCL_UTF_MAX value of the tcl
                     core, tDOM was build with as integer</desc>
+                </optdef>
+                <optdef>
+                    <optname>html5</optname>
+                    <desc>Returns as boolean, if build with
+                    <m>--enable-html5</m>.</desc>
                 </optdef>
             </optlist>
             </desc>   

@@ -237,6 +237,24 @@ character references.
 .IP "\fB-html\fR"
 If \fI-html\fR is specified, a fast HTML parser is
 used, which tries to even parse badly formed HTML into a DOM tree.
+.IP "\fB-html5\fR"
+This option is only available, if tDOM was build
+with --enable-html5. Try the \fIfeatureinfo\fR method
+if you need to know, if this feature is build in. If
+\&\fI-html5\fR is specified, the gumbo lib html5 parser
+(https://github.com/google/gumbo-parser) is used, to
+build the DOM tree. This is, as far as it goes, XML
+namespace aware. Since this probably isn't wanted by a
+lot of users and adds only burden for no good in a lot
+of use cases \fI-html5\fR can be combined with
+\&\fI-ignorexmlns\fR, in which case all nodes and
+attributes in the DOM tree are not in an XML
+namespace. All tag and attribute names in the DOM tree
+will be lower case, even for foreign elements not in
+the xhtml, svg or mathml namespace. The DOM tree may
+include nodes, that the parser inserted, because they
+are implied by the context (as <head>,
+<tbody>, etc.).
 .IP "\fB-keepEmpties\fR"
 If \fI-keepEmpties\fR is
 specified, text nodes, which contain only whitespaces, will be part of the
@@ -567,6 +585,9 @@ Returns as boolean, if build with
 .IP "\fBTCL_UTF_MAX\fR"
 Returns the TCL_UTF_MAX value of the tcl
 core, tDOM was build with as integer
+.IP "\fBhtml5\fR"
+Returns as boolean, if build with
+\&\fI--enable-html5\fR.
 .RE
 .SH KEYWORDS
 XML, DOM, document, node, parsing

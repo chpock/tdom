@@ -4,17 +4,17 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0xdf7d10">NAME</a> · <a href="#SECTid0xdfca70">SYNOPSIS</a> · <a href="#SECTid0xe01c40">DESCRIPTION </a> · <a href="#SECTid0xe24230">KEYWORDS</a>
+<a href="#SECTid0x2421210">NAME</a> Â· <a href="#SECTid0x243f1a0">SYNOPSIS</a> Â· <a href="#SECTid0x250a780">DESCRIPTION </a> Â· <a href="#SECTid0x2562d80">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0xdf7d10">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x2421210">NAME</a></h2><p class="namesection">
 <b class="names">dom - </b><br>Create an in-memory DOM tree from XML</p>
   
-  <h2><a name="SECTid0xdfca70">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x243f1a0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">dom</b> <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
 
-  <h2><a name="SECTid0xe01c40">DESCRIPTION </a></h2><p>This command provides the creation of complete DOM trees in memory. In
+  <h2><a name="SECTid0x250a780">DESCRIPTION </a></h2><p>This command provides the creation of complete DOM trees in memory. In
 the usual case a string containing a XML information is parsed and converted
 into a DOM tree. <i class="m">method</i> indicates a specific subcommand. </p><p>The valid methods are:</p><dl class="commandlist">
         
@@ -70,7 +70,28 @@ character references.</dd>
                 <dd>If <i class="m">-html</i> is specified, a fast HTML parser is 
 used, which tries to even parse badly formed HTML into a DOM tree.</dd>
               
-       
+
+              
+                <dt><b>-html5</b></dt>
+                <dd>This option is only available, if tDOM was build
+                with --enable-html5. Try the <i class="m">featureinfo</i> method
+                if you need to know, if this feature is build in. If
+                <i class="m">-html5</i> is specified, the gumbo lib html5 parser
+                (https://github.com/google/gumbo-parser) is used, to
+                build the DOM tree. This is, as far as it goes, XML
+                namespace aware. Since this probably isn't wanted by a
+                lot of users and adds only burden for no good in a lot
+                of use cases <i class="m">-html5</i> can be combined with
+                <i class="m">-ignorexmlns</i>, in which case all nodes and
+                attributes in the DOM tree are not in an XML
+                namespace. All tag and attribute names in the DOM tree
+                will be lower case, even for foreign elements not in
+                the xhtml, svg or mathml namespace. The DOM tree may
+                include nodes, that the parser inserted, because they
+                are implied by the context (as &lt;head&gt;,
+                &lt;tbody&gt;, etc.).</dd>
+              
+              
               
                 <dt><b>-keepEmpties</b></dt> 
                 <dd>If <i class="m">-keepEmpties</i> is
@@ -533,16 +554,21 @@ recommendation. Otherwise it returns 0.</dd>
                     <dd>Returns the TCL_UTF_MAX value of the tcl
                     core, tDOM was build with as integer</dd>
                 
+                
+                    <dt><b>html5</b></dt>
+                    <dd>Returns as boolean, if build with
+                    <i class="m">--enable-html5</i>.</dd>
+                
             </dl>
             </dd>   
         
     </dl>
 
-<h2><a name="SECTid0xe24230">KEYWORDS</a></h2><p class="keywords">
+<h2><a name="SECTid0x2562d80">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-XML">XML</a>, <a class="keyword" href="keyword-index.html#KW-DOM">DOM</a>, <a class="keyword" href="keyword-index.html#KW-document">document</a>, <a class="keyword" href="keyword-index.html#KW-node">node</a>, <a class="keyword" href="keyword-index.html#KW-parsing">parsing</a>
 </p>
 </div><hr class="navsep"><div class="navbar" align="center">
-<a class="navaid" href="index.html">Contents</a> · <a class="navaid" href="category-index.html">Index</a> · <a class="navaid" href="keyword-index.html">Keywords</a>
+<a class="navaid" href="index.html">Contents</a> Â· <a class="navaid" href="category-index.html">Index</a> Â· <a class="navaid" href="keyword-index.html">Keywords</a>
 </div>
 </body>
 </html>
