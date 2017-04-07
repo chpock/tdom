@@ -49,6 +49,7 @@
 #include <domxpath.h>
 #include <domxslt.h>
 #include <xmlsimple.h>
+#include <domjson.h>
 #include <domhtml.h>
 #include <domhtml5.h>
 #include <nodecmd.h>
@@ -5577,6 +5578,7 @@ int tcldom_parse (
     CONST84 char *interpResult;
     int          optionIndex, value, xml_string_len, mode;
     int          ignoreWhiteSpaces   = 1;
+    int          takeJSONParser      = 0;
     int          takeSimpleParser    = 0;
     int          takeHTMLParser      = 0;
 #ifdef TDOM_HAVE_GUMBO
@@ -5598,7 +5600,7 @@ int tcldom_parse (
         "-keepEmpties",           "-simple",        "-html",
         "-feedbackAfter",         "-channel",       "-baseurl",
         "-externalentitycommand", "-useForeignDTD", "-paramentityparsing",
-        "-feedbackcmd",           
+        "-feedbackcmd",           "-json",
 #ifdef TDOM_HAVE_GUMBO
         "-html5",
 #endif
@@ -5608,7 +5610,7 @@ int tcldom_parse (
         o_keepEmpties,            o_simple,         o_html,
         o_feedbackAfter,          o_channel,        o_baseurl,
         o_externalentitycommand,  o_useForeignDTD,  o_paramentityparsing,
-        o_feedbackcmd,
+        o_feedbackcmd,            o_json,
 #ifdef TDOM_HAVE_GUMBO
         o_htmlfive,
 #endif
@@ -5643,6 +5645,10 @@ int tcldom_parse (
             ignoreWhiteSpaces = 0;
             objv++;  objc--; continue;
 
+        case o_json:
+            takeJSONParser = 1;
+            objv++;  objc--; continue;
+            
         case o_simple:
             takeSimpleParser = 1;
             objv++;  objc--; continue;
@@ -5823,12 +5829,12 @@ int tcldom_parse (
         }
         xml_string = NULL;
         xml_string_len = 0;
-        if (takeSimpleParser || takeHTMLParser
+        if (takeSimpleParser || takeHTMLParser || takeJSONParser
 #ifdef TDOM_HAVE_GUMBO
                 || takeGUMBOParser
 #endif
             ) {
-            Tcl_AppendResult(interp, "simple and/or HTML parser(s) "
+            Tcl_AppendResult(interp, "simple, JSON or HTML parser(s) "
                              " don't support channel reading", NULL);
             return TCL_ERROR;
         }
@@ -5846,6 +5852,16 @@ int tcldom_parse (
                                          1, 0);
     }
 #endif
+    
+    if (takeJSONParser) {
+        doc = JSON_Parse (xml_string, NULL, &status);
+        if (!doc) {
+            Tcl_AppendResult (interp, "Input isn't JSON.", NULL);
+            return TCL_ERROR;
+        }
+        return tcldom_returnDocumentObj (interp, doc, setVariable, newObjName,
+                                         1, 0);
+    }
     
     if (takeSimpleParser) {
         char s[50];

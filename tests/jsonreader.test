@@ -1,0 +1,60 @@
+# Features covered: JSON parser
+#
+# This file contains a collection of tests for the JSON parser.
+# Tested functionalities:
+#    json-1.*: JSON syntax tests
+#    json-2.*: Valid JSON, that could not parsed into DOM
+# Copyright (c) 2017 Rolf Ade.
+
+source [file join [file dir [info script]] loadtdom.tcl]
+
+test json-1.1 {Parse JSON} {
+    set doc [dom parse -json {{"a":"avalue","b":"bvalue","c":0.123}}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} "<a>avalue</a><b>bvalue</b><c>0.123</c>"
+
+test json-1.2 {Parse JSON} {
+    set doc [dom parse -json { {"a" : [ "avalue" ] } }]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<a json:typehint="array">avalue</a>}
+
+test json-1.3 {Parse JSON} {
+    set doc [dom parse -json {{"a":"a value","b":"1value"}}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} "<a>a value</a><b>1value</b>"
+
+test json-1.4 {Parse JSON - nested object} {
+    set doc [dom parse -json {{"a":{"aa":"aavalue","bb":"bbvalue"},"b":"bvalue","c":0.123}}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} "<a><aa>aavalue</aa><bb>bbvalue</bb></a><b>bvalue</b><c>0.123</c>"
+
+test json-1.5 {Parse JSON - array} {
+    set doc [dom parse -json {{"a": [1,2,3,4,"abc"]}}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} "<a>1</a><a>2</a><a>3</a><a>4</a><a>abc</a>"
+
+test json-1.6 {Parse JSON - array in nested object} {
+    set doc [dom parse -json {{"a":{"aa":[1,2,3,4,"abc"]},"b":"bvalue"}}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} "<a><aa>1</aa><aa>2</aa><aa>3</aa><aa>4</aa><aa>abc</aa></a><b>bvalue</b>"
+
+test json-2.1 {invalid xml name} {
+    catch {set doc [dom parse -json {{"a":"a value","1b":"1value"}}]}
+} 1
+
+test json-2.2 {invalid xml name} {
+    catch {set doc [dom parse -json {{"a b":"a value","1b":"1value"}}]}
+} 1
+

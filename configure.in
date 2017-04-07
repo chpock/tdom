@@ -100,6 +100,7 @@ TEA_ADD_SOURCES([generic/xmlsimple.c \
                  generic/dom.c       \
                  generic/domhtml.c   \
                  generic/domhtml5.c  \
+                 generic/domjson.c   \
                  generic/domxpath.c  \
                  generic/domxslt.c   \
                  generic/domlock.c   \
