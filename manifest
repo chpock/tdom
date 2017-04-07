@@ -1,5 +1,5 @@
-C Integrate\sthe\snew\s-html5\soption\sof\s[dom\sparse].\sBuilds\son\sonly\son\slinux\swithout\stoo\smuch\sfussing\saround\sand\sis\sdisabled\sby\sdefault.
-D 2017-04-06T23:55:40.397
+C Corrected\sheader\scomment.
+D 2017-04-07T01:25:11.559
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -212,7 +212,7 @@ F tests/domNode.test 9c68f0ed49eee97ea98ba4e6e6baee8944d0117f
 F tests/domnamespace.test bd80dfb5fb1637a0ae5007e949e7eab5c4e2f849
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
-F tests/html5reader.test 8a4fe7a566d99d54c2dd8c15ea1608308db821fd
+F tests/html5reader.test f839da02dd4b1227a2ee3bae9abfba983951d9ad
 F tests/htmlreader.test 0fffea0d73efb2ccf5e3a807e68b437f55a152d2
 F tests/i18n.test f5493417c35c973a0d8651c3c13d5d4e8272f6bf
 F tests/loadtdom.tcl bf298e4effa2a7de7380687911994f762c0f0c84
@@ -241,9 +241,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c577fbde37b51e0bcdfbbf5e92bb4854dedc2f00 15f1033a6fb886fd89b09f7f3590b906cc2eeb6c
-R 43ea218691c06bbf78a5246c56e689e2
-T +closed 15f1033a6fb886fd89b09f7f3590b906cc2eeb6c
+P f7671c27a35581ec1fd14afad6f7e8ddbd7824a0
+R d9159e5aadac05efc6aaa3d9dfa4b592
 U rolf
-Z cf1a19055bd12fb6026958a7d7d9b4ca
+Z 028aab298e98067768ad42c1c9ac2ffd
 # Remove this line to create a well-formed Fossil manifest.
