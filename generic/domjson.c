@@ -82,6 +82,9 @@ static int jsonParseString (
     DBG(fprintf(stderr, "jsonParseString start: '%s'\n", &json[i]););
     if (json[i] == '"') {
         i++;
+        if (json[i] == '"') {
+            return i;
+        }
         if (needName) {
             if (!isNameStart(&json[i])) return JSON_INVALID_XML_NAME;
         } else {
@@ -197,7 +200,7 @@ static int jsonParseValue(
             if (first && json[i] == ']') {
                 /* empty array */
                 DBG(fprintf(stderr,"Empty JSON array.\n"););
-                domSetAttributeNS (parent, "json:typehint", "array", tdomns, 0);
+                domSetAttributeNS (parent, "json:typehint", "array", tdomns, 1);
                 return i+1;
             }
             j = jsonParseValue (node, json, i);
@@ -208,7 +211,7 @@ static int jsonParseValue(
             skipspace(i);
             if (json[i] == ']') {
                 if (first) {
-                    domSetAttributeNS (parent, "json:typehint", "array", tdomns, 0);
+                    domSetAttributeNS (parent, "json:typehint", "array", tdomns, 1);
                 }
                 DBG(fprintf(stderr,"JSON array end\n"););
                 return i+1;
@@ -245,17 +248,25 @@ static int jsonParseValue(
     } else if (c == 'n'
                && strncmp (json+i, "null", 4) == 0
                && !isalnum(json[i+4])) {
-        domSetAttributeNS (parent, "json:typehint", "null", tdomns, 0);
+        domSetAttributeNS (parent, "json:typehint", "null", tdomns, 1);
         return i+4;
     } else if (c == 't'
                && strncmp (json+i, "true", 4) == 0
                && !isalnum(json[i+4])) {
-        domSetAttributeNS (parent, "json:typehint", "true", tdomns, 0);
+        domSetAttributeNS (parent, "json:typehint", "boolean", tdomns, 1);
+        domAppendChild (parent,
+                        (domNode *) domNewTextNode (
+                            parent->ownerDocument,
+                            "true", 4, TEXT_NODE));
         return i+4;
     } else if (c == 'f'
                && strncmp (json+i, "false", 5) == 0
                && !isalnum(json[i+5])) {
-        domSetAttributeNS (parent, "json:typehint", "false", tdomns, 0);
+        domSetAttributeNS (parent, "json:typehint", "boolean", tdomns, 1);
+        domAppendChild (parent,
+                        (domNode *) domNewTextNode (
+                            parent->ownerDocument,
+                            "false", 5, TEXT_NODE));
         return i+5;
     } else if (c == '-' || (c>='0' && c<='9')) {
         /* Parse number */
@@ -315,6 +326,7 @@ JSON_Parse (
     if (documentElement) {
         root = domNewElementNode(doc, documentElement, ELEMENT_NODE);
         domAppendChild(doc->rootNode, root);
+        domSetAttributeNS (root, "xmlns:json", tdomns, NULL, 0);
     } else {
         root = doc->rootNode;
     }

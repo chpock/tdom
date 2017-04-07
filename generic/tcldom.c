@@ -5573,6 +5573,7 @@ int tcldom_parse (
     GetTcldomTSD()
 
     char        *xml_string, *option, *errStr, *channelId, *baseURI = NULL;
+    char        *jsonRoot = NULL;
     Tcl_Obj     *extResolver = NULL;
     Tcl_Obj     *feedbackCmd = NULL;
     CONST84 char *interpResult;
@@ -5600,7 +5601,7 @@ int tcldom_parse (
         "-keepEmpties",           "-simple",        "-html",
         "-feedbackAfter",         "-channel",       "-baseurl",
         "-externalentitycommand", "-useForeignDTD", "-paramentityparsing",
-        "-feedbackcmd",           "-json",
+        "-feedbackcmd",           "-json",          "-jsonroot"
 #ifdef TDOM_HAVE_GUMBO
         "-html5",
 #endif
@@ -5610,7 +5611,7 @@ int tcldom_parse (
         o_keepEmpties,            o_simple,         o_html,
         o_feedbackAfter,          o_channel,        o_baseurl,
         o_externalentitycommand,  o_useForeignDTD,  o_paramentityparsing,
-        o_feedbackcmd,            o_json,
+        o_feedbackcmd,            o_json,           o_jsonroot,
 #ifdef TDOM_HAVE_GUMBO
         o_htmlfive,
 #endif
@@ -5648,6 +5649,22 @@ int tcldom_parse (
         case o_json:
             takeJSONParser = 1;
             objv++;  objc--; continue;
+            
+        case o_jsonroot:
+            objv++; objc--;
+            if (objc > 1) {
+                jsonRoot = Tcl_GetString(objv[1]);
+            } else {
+                SetResult("The \"dom parse\" option \"-jsonroot\" "
+                          "expects the document element name of the "
+                          "DOM tree to create as argument.");
+                return TCL_ERROR;
+            }
+            if (!domIsNAME(jsonRoot)) {
+                SetResult("-jsonroot value: not a valid element name");
+                return TCL_ERROR;
+            }
+            objv++; objc--; continue;
             
         case o_simple:
             takeSimpleParser = 1;
@@ -5854,7 +5871,7 @@ int tcldom_parse (
 #endif
     
     if (takeJSONParser) {
-        doc = JSON_Parse (xml_string, NULL, &status);
+        doc = JSON_Parse (xml_string, jsonRoot, &status);
         if (!doc) {
             Tcl_AppendResult (interp, "Input isn't JSON.", NULL);
             return TCL_ERROR;

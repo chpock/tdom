@@ -20,7 +20,7 @@ test json-1.2 {Parse JSON} {
     set result [$doc asXML -indent none]
     $doc delete
     set result
-} {<a json:typehint="array">avalue</a>}
+} {<a xmlns:json="http://tdom.org/json" json:typehint="array">avalue</a>}
 
 test json-1.3 {Parse JSON} {
     set doc [dom parse -json {{"a":"a value","b":"1value"}}]
@@ -43,12 +43,26 @@ test json-1.5 {Parse JSON - array} {
     set result
 } "<a>1</a><a>2</a><a>3</a><a>4</a><a>abc</a>"
 
-test json-1.6 {Parse JSON - array in nested object} {
+test json-1.6 {Parse JSON - true, false, null} {
+    set doc [dom parse -json {{"a":true,"b":false,"c":null,"d":"true","e":""}}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<a xmlns:json="http://tdom.org/json" json:typehint="boolean">true</a><b xmlns:json="http://tdom.org/json" json:typehint="boolean">false</b><c xmlns:json="http://tdom.org/json" json:typehint="null"/><d>true</d><e></e>}
+
+test json-1.7 {Parse JSON - array in nested object} {
     set doc [dom parse -json {{"a":{"aa":[1,2,3,4,"abc"]},"b":"bvalue"}}]
     set result [$doc asXML -indent none]
     $doc delete
     set result
 } "<a><aa>1</aa><aa>2</aa><aa>3</aa><aa>4</aa><aa>abc</aa></a><b>bvalue</b>"
+
+test json-1.8 {Parse JSON - true, false, null} {
+    set doc [dom parse -json -jsonroot "JSONObject" {{"a":true,"b":false,"c":null,"d":"true","e":""}}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<JSONObject xmlns:json="http://tdom.org/json"><a json:typehint="boolean">true</a><b json:typehint="boolean">false</b><c json:typehint="null"/><d>true</d><e></e></JSONObject>}
 
 test json-2.1 {invalid xml name} {
     catch {set doc [dom parse -json {{"a":"a value","1b":"1value"}}]}
