@@ -24,8 +24,6 @@
 #include <dom.h>
 #include <ctype.h>
 
-typedef unsigned int u32;
-
 static const char jsonIsSpace[] = {
   0, 0, 0, 0, 0, 0, 0, 0,     0, 1, 1, 0, 0, 1, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0,     0, 0, 0, 0, 0, 0, 0, 0,
@@ -46,6 +44,8 @@ static const char jsonIsSpace[] = {
 };
 #define skipspace(x)  while (jsonIsSpace[(unsigned char)json[(x)]]) { (x)++; }
 
+#define rc(i) if (*status != JSON_OK && *status != JSON_NEED_JSON_NS) return (i);
+
 static const char *tdomns = "http://tdom.org/json";
 
 /*
@@ -57,11 +57,30 @@ static int jsonIs4Hex(const char *z){
   return 1;
 }
 
-/* The meaning of parsing return values */
-#define JSON_SYNTAX_ERR -1
-#define JSON_NEED_UNESCAPING -2
-#define JSON_INVALID_XML_NAME -3
-#define JSON_INVALID_XML_CHAR -4
+/* The meaning of parsing status values */
+typedef enum {
+    JSON_OK,
+    JSON_NEED_JSON_NS,
+    JSON_EXPECT_OBJECT,
+    JSON_SYNTAX_ERR,
+    JSON_NEED_UNESCAPING,
+    JSON_INVALID_XML_NAME,
+    JSON_INVALID_XML_CHAR
+} JSONParseState;
+
+// Error sting constants, indexed by JSONParseState.
+static const char *JSONParseStateStr[] = {
+    "OK",
+    "Internal: result tree needs tdom json XML namespace",
+    "JSON_EXPECT_OBJECT",
+    "JSON syntax error",
+    "JSON input need unescapeing",
+    "JSON_INVALID_XML_NAME",
+    "JSON input includes characters not possible in an XML document."
+};
+    
+#define errReturn(i,j) {*status = j; return (i);}
+    
 
 /* #define DEBUG */
 #ifdef DEBUG
@@ -73,7 +92,8 @@ static int jsonIs4Hex(const char *z){
 static int jsonParseString (
     char *json,
     int   i,
-    int   needName
+    int   needName,
+    JSONParseState  *status
     )
 {
     char c;
@@ -86,18 +106,17 @@ static int jsonParseString (
             return i;
         }
         if (needName) {
-            if (!isNameStart(&json[i])) return JSON_INVALID_XML_NAME;
+            if (!isNameStart(&json[i])) errReturn(i,JSON_INVALID_XML_NAME);
         } else {
             if ((clen = UTF8_CHAR_LEN(json[i])) == 0)
-                return JSON_SYNTAX_ERR;
-            if (!UTF8_XMLCHAR(&json[i],clen)) {
-                return JSON_INVALID_XML_CHAR;
-            }
+                errReturn(i,JSON_SYNTAX_ERR);
+            if (!UTF8_XMLCHAR(&json[i],clen)) 
+                errReturn(i,JSON_INVALID_XML_CHAR);
         }
         i++;
         for(;;) {
             c = json[i];
-            if (c == '\0') return JSON_SYNTAX_ERR;
+            if (c == '\0') errReturn(i,JSON_SYNTAX_ERR);
             if (c == '\\') {
                 c = json[i+1];
                 if (needName) {
@@ -105,34 +124,33 @@ static int jsonParseString (
                         /* Need to unescape. For now, we don't support
                          * unescaping JSON strings and return an
                          * approriate error code */
-                        return JSON_NEED_UNESCAPING;
+                        errReturn(i,JSON_NEED_UNESCAPING);
                     } else {
-                        return JSON_INVALID_XML_NAME;
+                        errReturn(i,JSON_INVALID_XML_NAME);
                     }
                 } else {
                     if (c == '"' || c == '\\' || c == '/' || c == 'b'
                         || c == 'f' || c == 'n' || c == 'r' || c == 't'
                         || (c == 'u' && jsonIs4Hex(json+i+2))) {
-                        return JSON_NEED_UNESCAPING;
-                    } else {
-                        return JSON_SYNTAX_ERR;
-                    } 
+                        errReturn(i,JSON_NEED_UNESCAPING);
+                    } else errReturn(i,JSON_SYNTAX_ERR);
                 }
             }
             if (c == '"') {
                 return i;
             }
             if (needName) {
-                if (!isNameChar(&json[i])) return JSON_INVALID_XML_NAME;
+                if (!isNameChar(&json[i]))
+                    errReturn(i,JSON_INVALID_XML_NAME);
             }
             if ((clen = UTF8_CHAR_LEN(json[i])) == 0)
-                return JSON_SYNTAX_ERR;
+                errReturn(i,JSON_SYNTAX_ERR);
             if (!needName && !UTF8_XMLCHAR(&json[i],clen))
-                return JSON_INVALID_XML_CHAR;
+                errReturn(i,JSON_INVALID_XML_CHAR);
             i += clen;
         }
     } else {
-        return JSON_SYNTAX_ERR;
+        errReturn(i,JSON_SYNTAX_ERR);
     }
 }
 
@@ -142,7 +160,8 @@ static int jsonParseString (
 static int jsonParseValue(
     domNode *parent,
     char    *json,
-    int      i
+    int      i,
+    JSONParseState *status
     )
 {
     char c, save;
@@ -154,6 +173,7 @@ static int jsonParseValue(
     skipspace(i);
     if ((c = json[i]) == '{' ) {
         /* Parse object */
+        if (*status == JSON_EXPECT_OBJECT) *status = JSON_OK;
         i++;
         for (;;) {
             skipspace(i);
@@ -164,10 +184,8 @@ static int jsonParseValue(
                 /* domSetAttributeNS (parent, "json:type", "object", tdomns, 0); */
                 return i+1;
             }
-            j = jsonParseString (json, i, 1);
-            if (j < 0) {
-                return j;
-            }
+            j = jsonParseString (json, i, 1, status);
+            rc(j);
             save = json[j];
             json[j] = '\0';
             DBG(fprintf(stderr, "New object member '%s'\n", &json[i+1]););
@@ -177,19 +195,19 @@ static int jsonParseValue(
             json[j] = save;
             i = j+1;
             skipspace(i);
-            if (json[i] != ':') return JSON_SYNTAX_ERR;
+            if (json[i] != ':') errReturn(i,JSON_SYNTAX_ERR);
             i++;
             skipspace(i);
-            j = jsonParseValue (node, json, i);
-            if (j < 0) {
-                return j;
-            };
+            j = jsonParseValue (node, json, i, status);
+            rc(j);
             i = j;
             skipspace(i);
             if (json[i] == '}') return i+1;
             if (json[i] == ',') {first = 0; i++; continue;}
-            return JSON_SYNTAX_ERR;
+            errReturn(i,JSON_SYNTAX_ERR);
         }
+    } else if (*status == JSON_EXPECT_OBJECT) {
+        return i;
     } else if (c == '[') {
         /* Parse array */
         i++;
@@ -201,17 +219,17 @@ static int jsonParseValue(
                 /* empty array */
                 DBG(fprintf(stderr,"Empty JSON array.\n"););
                 domSetAttributeNS (parent, "json:typehint", "array", tdomns, 1);
+                *status = JSON_NEED_JSON_NS;
                 return i+1;
             }
-            j = jsonParseValue (node, json, i);
-            if (j < 0) {
-                return j;
-            }
+            j = jsonParseValue (node, json, i, status);
+            rc(j);
             i = j;
             skipspace(i);
             if (json[i] == ']') {
                 if (first) {
                     domSetAttributeNS (parent, "json:typehint", "array", tdomns, 1);
+                    *status = JSON_NEED_JSON_NS;
                 }
                 DBG(fprintf(stderr,"JSON array end\n"););
                 return i+1;
@@ -230,14 +248,12 @@ static int jsonParseValue(
                 i++;
                 continue;
             }
-            return JSON_SYNTAX_ERR;
+            errReturn(i,JSON_SYNTAX_ERR);
         }
     } else if (c =='"') {
         /* Parse string */
-        j = jsonParseString (json, i, 0);
-        if (j < 0) {
-            return j;
-        }
+        j = jsonParseString (json, i, 0, status);
+        rc(j);
         DBG(save = json[j];json[j] = '\0';fprintf(stderr, "New text node '%s'\n", &json[i+1]);json[j] = save;);
         domAppendChild (parent,
                         (domNode *) domNewTextNode (
@@ -249,11 +265,13 @@ static int jsonParseValue(
                && strncmp (json+i, "null", 4) == 0
                && !isalnum(json[i+4])) {
         domSetAttributeNS (parent, "json:typehint", "null", tdomns, 1);
+        *status = JSON_NEED_JSON_NS;
         return i+4;
     } else if (c == 't'
                && strncmp (json+i, "true", 4) == 0
                && !isalnum(json[i+4])) {
         domSetAttributeNS (parent, "json:typehint", "boolean", tdomns, 1);
+        *status = JSON_NEED_JSON_NS;
         domAppendChild (parent,
                         (domNode *) domNewTextNode (
                             parent->ownerDocument,
@@ -263,6 +281,7 @@ static int jsonParseValue(
                && strncmp (json+i, "false", 5) == 0
                && !isalnum(json[i+5])) {
         domSetAttributeNS (parent, "json:typehint", "boolean", tdomns, 1);
+        *status = JSON_NEED_JSON_NS;
         domAppendChild (parent,
                         (domNode *) domNewTextNode (
                             parent->ownerDocument,
@@ -272,27 +291,27 @@ static int jsonParseValue(
         /* Parse number */
         int seenDP = 0;
         int seenE = 0;
-        if (c == '0' && json[i+1] == '0') return JSON_SYNTAX_ERR;
+        if (c == '0' && json[i+1] == '0') errReturn(i+1,JSON_SYNTAX_ERR);
         j = i+1;
         for(;; j++){
             c = json[j];
             if (c >= '0' && c <= '9') continue;
             if (c == '.') {
-                if (json[j-1] == '-') return JSON_SYNTAX_ERR;
-                if (seenDP) return JSON_SYNTAX_ERR;
+                if (json[j-1] == '-') errReturn(j,JSON_SYNTAX_ERR);
+                if (seenDP) errReturn(j,JSON_SYNTAX_ERR);
                 seenDP = 1;
                 continue;
             }
             if (c == 'e' || c == 'E') {
-                if (json[j-1] < '0') return JSON_SYNTAX_ERR;
-                if (seenE) return JSON_SYNTAX_ERR;
+                if (json[j-1] < '0') errReturn(j,JSON_SYNTAX_ERR);
+                if (seenE) errReturn(j,JSON_SYNTAX_ERR);
                 seenDP = seenE = 1;
                 c = json[j+1];
                 if (c == '+' || c == '-') {
                     j++;
                     c = json[j+1];
                 }
-                if (c < '0' || c > '9') return JSON_SYNTAX_ERR;
+                if (c < '0' || c > '9') errReturn(j,JSON_SYNTAX_ERR);
                 continue;
             }
             break;
@@ -307,7 +326,7 @@ static int jsonParseValue(
     } else if (c == '\0') {
         return 0;   /* End of input */
     } else {
-        return JSON_SYNTAX_ERR;
+        errReturn(i,JSON_SYNTAX_ERR);
     }
 }
 
@@ -316,29 +335,42 @@ domDocument *
 JSON_Parse (
     char *json,    /* Complete text of the json string being parsed */
     char *documentElement, /* name of the root element, may be NULL */
-    int  *errNr 
+    char **errStr,
+    int  *byteIndex
     )
 {
     domDocument *doc = domCreateDoc (NULL, 0);
     domNode *root;
-    u32 pos = 0;
+    JSONParseState status;
+    int pos = 0;
     
+    status = JSON_OK;
     if (documentElement) {
         root = domNewElementNode(doc, documentElement, ELEMENT_NODE);
         domAppendChild(doc->rootNode, root);
         domSetAttributeNS (root, "xmlns:json", tdomns, NULL, 0);
     } else {
         root = doc->rootNode;
+        status = JSON_EXPECT_OBJECT;
     }
     skipspace(pos);
-    *errNr = jsonParseValue (root, json, pos);
-    if (*errNr > 0) {
-        pos = *errNr;
+    *byteIndex = jsonParseValue (root, json, pos, &status );
+    if (status != JSON_OK && status != JSON_NEED_JSON_NS) goto reportError;
+    if (*byteIndex > 0) {
+        pos = *byteIndex;
         skipspace(pos);
     }
-    if (json[pos] != '\0' || *errNr < 0) {
-        domFreeDocument (doc, NULL, NULL);
-        doc = NULL;
+    if (json[pos] != '\0') {
+        pos = *byteIndex;
+        goto reportError;
     }
+    if (status != JSON_NEED_JSON_NS) {
+        domRemoveAttribute(root, "xmlns:json");
+    }
+    return doc;
+reportError:
+    domFreeDocument (doc, NULL, NULL);
+    doc = NULL;
+    *errStr = (char *)JSONParseStateStr[status];
     return doc;
 }

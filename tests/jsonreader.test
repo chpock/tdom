@@ -64,11 +64,21 @@ test json-1.8 {Parse JSON - true, false, null} {
     set result
 } {<JSONObject xmlns:json="http://tdom.org/json"><a json:typehint="boolean">true</a><b json:typehint="boolean">false</b><c json:typehint="null"/><d>true</d><e></e></JSONObject>}
 
+test json-1.9 {JSON syntax error} {
+    set result [catch {dom parse -json {{"a" "a value"}}} errMsg]
+    list $result $errMsg
+} {1 {error "JSON syntax error" at position 5
+"{"a" " <--Error-- a value"}"}}
+
 test json-2.1 {invalid xml name} {
-    catch {set doc [dom parse -json {{"a":"a value","1b":"1value"}}]}
-} 1
+    set result [catch {dom parse -json {{"a":"a value","1b":"1value"}}} errMsg]
+    list $result $errMsg
+} {1 {error "JSON_INVALID_XML_NAME" at position 16
+"{"a":"a value","1 <--Error-- b":"1value"}"}}
 
 test json-2.2 {invalid xml name} {
-    catch {set doc [dom parse -json {{"a b":"a value","1b":"1value"}}]}
-} 1
+    set result [catch {set doc [dom parse -json {{"a b":"a value","1b":"1value"}}]} errMsg]
+    list $result $errMsg
+} {1 {error "JSON_INVALID_XML_NAME" at position 3
+"{"a  <--Error-- b":"a value","1b":"1value"}"}}
 

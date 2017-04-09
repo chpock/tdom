@@ -5601,7 +5601,7 @@ int tcldom_parse (
         "-keepEmpties",           "-simple",        "-html",
         "-feedbackAfter",         "-channel",       "-baseurl",
         "-externalentitycommand", "-useForeignDTD", "-paramentityparsing",
-        "-feedbackcmd",           "-json",          "-jsonroot"
+        "-feedbackcmd",           "-json",          "-jsonroot",
 #ifdef TDOM_HAVE_GUMBO
         "-html5",
 #endif
@@ -5871,13 +5871,38 @@ int tcldom_parse (
 #endif
     
     if (takeJSONParser) {
-        doc = JSON_Parse (xml_string, jsonRoot, &status);
-        if (!doc) {
-            Tcl_AppendResult (interp, "Input isn't JSON.", NULL);
+        char s[50];
+        int byteIndex, i;
+
+        errStr = NULL;
+
+        doc = JSON_Parse (xml_string, jsonRoot, &errStr, &byteIndex);
+        if (doc) {
+            return tcldom_returnDocumentObj (interp, doc, setVariable,
+                                             newObjName, 1, 0);
+        } else {
+            Tcl_ResetResult(interp);
+            sprintf(s, "%d", byteIndex);
+            Tcl_AppendResult(interp, "error \"", errStr, "\" at position ", 
+                             s, NULL);
+            Tcl_AppendResult(interp, "\n\"", NULL);
+            s[1] = '\0';
+            for (i=-20; i < 40; i++) {
+                if (byteIndex+i>=0) {
+                    if (xml_string[byteIndex+i]) {
+                        s[0] = xml_string[byteIndex+i];
+                        Tcl_AppendResult(interp, s, NULL);
+                        if (i==0) {
+                            Tcl_AppendResult(interp, " <--Error-- ", NULL);
+                        }
+                    } else {
+                        break;
+                    }
+                }
+            }
+            Tcl_AppendResult(interp, "\"",NULL);
             return TCL_ERROR;
         }
-        return tcldom_returnDocumentObj (interp, doc, setVariable, newObjName,
-                                         1, 0);
     }
     
     if (takeSimpleParser) {
