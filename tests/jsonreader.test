@@ -4,6 +4,7 @@
 # Tested functionalities:
 #    json-1.*: JSON syntax tests
 #    json-2.*: Valid JSON, that could not parsed into DOM
+#    json-3.*: JSON unescaping
 # Copyright (c) 2017 Rolf Ade.
 
 source [file join [file dir [info script]] loadtdom.tcl]
@@ -82,3 +83,25 @@ test json-2.2 {invalid xml name} {
 } {1 {error "JSON_INVALID_XML_NAME" at position 3
 "{"a  <--Error-- b":"a value","1b":"1value"}"}}
 
+test json-3.1 {Unescaping} {
+    set doc [dom parse -json {{"a":"a\nvalue","b":"value\tvalue"}}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} "<a>a
+value</a><b>value\tvalue</b>"
+
+test json-3.2 {Unescaping} {
+    set doc [dom parse -json {{"a":"a\nvalue", "b":"12\u0077\u2221ec"}}]
+    set result [$doc asXML -indent none -escapeNonASCII]
+    $doc delete
+    set result
+} "<a>a
+value</a><b>12w&#8737;ec</b>"
+
+test json-3.3 {Unescaping} {
+    set doc [dom parse -json {{"a":"\u0077\u2221"}}]
+    set result [$doc asXML -indent none -escapeNonASCII]
+    $doc delete
+    set result
+} "<a>w&#8737;</a>"
