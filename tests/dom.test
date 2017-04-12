@@ -529,6 +529,13 @@ test dom-2.32 {parse document with undeclared xml prefix and -ignorexmlns} {
     set result
 } {foo:e}
 
+test dom-2.33 {end of options option} {
+    set doc [dom parse -json -- -0.123]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} -0.123
+
 test dom-3.1 {isName} {
     dom isName ":foo"
 } {1}

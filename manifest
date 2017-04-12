@@ -1,5 +1,5 @@
-C Added\s"--"\sas\soptional\sflag\sto\s[dom\sparse\s...],\ssignaling\sthe\send\sof\soptions.
-D 2017-04-12T21:09:53.029
+C With\s[dom\sparse\s-json\s...]\sfor\sthe\sfirst\stime\svalid\sinput\scould\sstart\swith\s'-'.
+D 2017-04-12T22:38:26.981
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -207,7 +207,7 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.bench 53a2bd61133d0a6acbb2a61794da74f7e7ba9b6a
-F tests/dom.test ce4acfc3fe588b7fd33e8988e302e85a73bcc7ee
+F tests/dom.test b0c89be3e771ab49cb2c054b69af076eec5ec104
 F tests/domDoc.test ff26d5193483764310207b0ed2864e1942a1e517
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test 9c68f0ed49eee97ea98ba4e6e6baee8944d0117f
@@ -244,8 +244,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P bca3f461d563e83ce32eebdcae175fbd5973f498
-R dd8831c38b934ecddc1226422ff2fa90
+P e98ace106ff295b4efa78acdb6dfe6ce5d4667f0
+R 8e6f278e0226562cd14f19d869404ff9
 U rolf
-Z f7c7162262243c5e624f2ed4933f6e60
+Z 87b1207d5e0f4f009c4b2939eee8e895
 # Remove this line to create a well-formed Fossil manifest.
