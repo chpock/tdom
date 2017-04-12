@@ -5605,7 +5605,7 @@ int tcldom_parse (
 #ifdef TDOM_HAVE_GUMBO
         "-html5",
 #endif
-        "-ignorexmlns",  NULL
+        "-ignorexmlns",           "--",             NULL
     };
     enum parseOption {
         o_keepEmpties,            o_simple,         o_html,
@@ -5615,7 +5615,7 @@ int tcldom_parse (
 #ifdef TDOM_HAVE_GUMBO
         o_htmlfive,
 #endif
-        o_ignorexmlns
+        o_ignorexmlns,            o_LAST
     };
 
     static CONST84 char *paramEntityParsingValues[] = {
@@ -5818,7 +5818,11 @@ int tcldom_parse (
             ignorexmlns = 1;
             objv++;  objc--; continue;
 
+        case o_LAST:
+            objv++;  objc--; break;
+            
         }
+        if ((enum parseOption) optionIndex == o_LAST) break;
     }
 
     if (feedbackAfter && !feedbackCmd) {
