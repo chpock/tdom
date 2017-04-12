@@ -57,7 +57,7 @@ static const char *tdomns = "http://tdom.org/json";
 typedef enum {
     JSON_OK,
     JSON_NEED_JSON_NS,
-    JSON_EXPECT_OBJECT,
+    JSON_NO_ARRAY,
     JSON_SYNTAX_ERR,
     JSON_INVALID_XML_NAME,
     JSON_INVALID_XML_CHAR
@@ -67,7 +67,7 @@ typedef enum {
 static const char *JSONParseStateStr[] = {
     "OK",
     "Internal: result tree needs tdom json XML namespace",
-    "JSON_EXPECT_OBJECT",
+    "JSON_NO_ARRAY",
     "JSON syntax error",
     "JSON_INVALID_XML_NAME",
     "JSON input includes characters not possible in an XML document."
@@ -107,56 +107,53 @@ static int jsonParseString (
     JSONParse *jparse
     )
 {
-    char c;
-    int clen, j, k, savedStart;
+    unsigned char c;
+    int clen, j, k, savedStart, firstchar = 1;
     unsigned int u;
     
     DBG(fprintf(stderr, "jsonParseString start: '%s'\n", &json[i]););
     if (jparse->len) jparse->buf[0] = 0;
     savedStart = i;
+
+    if (json[i] != '"') {
+        errReturn(i,JSON_SYNTAX_ERR);
+    }
+    i++;
     if (json[i] == '"') {
-        i++;
-        if (json[i] == '"') {
-            return i;
+        if (needName) {
+            /* The empty string isn't a valid XML element name */
+            errReturn(i,JSON_INVALID_XML_NAME);
         }
-        if (json[i] == '\\') {
-            if (json[i+1] != 'u' || !jsonIs4Hex(&json[i+2])) {
-                errReturn(i,JSON_INVALID_XML_NAME);
-            }
+        return i;
+    }
+    for(;;) {
+        c = json[i];
+        /* Unescaped control characters are not allowed in JSON
+         * strings. */
+        if (c <= 0x1f) {
+            errReturn(i,JSON_SYNTAX_ERR);
+        }
+        if (c == '\\') {
             goto unescape;
         }
-        if (needName) {
-            if (!isNameStart(&json[i])) errReturn(i,JSON_INVALID_XML_NAME);
-        } else {
-            if ((clen = UTF8_CHAR_LEN(json[i])) == 0)
-                errReturn(i,JSON_SYNTAX_ERR);
-            if (!UTF8_XMLCHAR(&json[i],clen)) 
-                errReturn(i,JSON_INVALID_XML_CHAR);
+        if (c == '"') {
+            return i;
         }
-        i++;
-        for(;;) {
-            c = json[i];
-            /* Unescaped control characters are not allowed in JSON
-             * strings. */
-            if (c <= 0x1f) errReturn(i,JSON_SYNTAX_ERR);
-            if (c == '\\') {
-                goto unescape;
-            }
-            if (c == '"') {
-                return i;
-            }
-            if (needName) {
+        if (needName) {
+            if (firstchar) {
+                if (!isNameStart(&json[i]))
+                    errReturn(i,JSON_INVALID_XML_NAME);
+            } else {
                 if (!isNameChar(&json[i]))
                     errReturn(i,JSON_INVALID_XML_NAME);
             }
-            if ((clen = UTF8_CHAR_LEN(json[i])) == 0)
-                errReturn(i,JSON_SYNTAX_ERR);
-            if (!needName && !UTF8_XMLCHAR(&json[i],clen))
-                errReturn(i,JSON_INVALID_XML_CHAR);
-            i += clen;
         }
-    } else {
-        errReturn(i,JSON_SYNTAX_ERR);
+        if ((clen = UTF8_CHAR_LEN(c)) == 0)
+            errReturn(i,JSON_SYNTAX_ERR);
+        if (!UTF8_XMLCHAR(&json[i],clen))
+            errReturn(i,JSON_INVALID_XML_CHAR);
+        i += clen;
+        firstchar = 0;
     }
     unescape:
     /* If we here, then i points to the first backslash in the string
@@ -167,36 +164,7 @@ static int jsonParseString (
         memcpy (jparse->buf, &json[savedStart+1], i-savedStart);
     }
     j = i-savedStart-1;
-    /* i-savedStart >= 1 - verbal assert */
-    if (i-savedStart == 1) {
-        /* First character of the JSON string is \u escaped (and the
-         * following 4 chars are valid hex chars, that's already
-         * tested) , every other escape is a JSON_INVALID_XML_NAME
-         * error and already reported. */
-        u = 0;
-        for (k = 2; k < 6; k++) {
-            c = json[i+k];
-            if (c <= '9') u = u*16 + c - '0';
-            else if (c <= 'F') u = u*16 + c - 'A' + 10;
-            else u = u*16 + c - 'a' + 10;
-        }
-        if (u <= 0x7f) {
-            jparse->buf[j++] = (char)u;
-            clen = 1;
-        } else if (u <= 0x7ff) {
-            jparse->buf[j++] = (char)(0xc0 | (u>>6));
-            jparse->buf[j++] = 0x80 | (u&0x3f);
-            clen = 2;
-        } else {
-            jparse->buf[j++] = (char)(0xe0 | (u>>12));
-            jparse->buf[j++] = 0x80 | ((u>>6)&0x3f);
-            jparse->buf[j++] = 0x80 | (u&0x3f);
-            clen = 3;
-        }
-        if (needName && !isNameStart(jparse->buf + i))
-            errReturn(i,JSON_INVALID_XML_NAME);
-        i += 6;
-    }
+    if (j == 0) firstchar = 1;
     for(;;) {
         c = json[i];
         /* Unescaped control characters are not allowed in JSON
@@ -208,7 +176,7 @@ static int jsonParseString (
         }
         if (c == '\\') {
             c = json[i+1];
-            if (c == 'u') {
+            if (c == 'u' && jsonIs4Hex(&json[i+2])) {
                 u = 0;
                 for (k = 2; k < 6; k++) {
                     c = json[i+k];
@@ -232,7 +200,13 @@ static int jsonParseString (
                 }
                 i += 6;
             } else {
-                if (c == 'b') {
+                if (c == '\\') {
+                    c = '\\';
+                } else if (c == '"') {
+                    c = '"';
+                } else if (c == '/') {
+                    c = '/';
+                } else if (c == 'b') {
                     c = '\b';
                 } else if (c == 'f') {
                     c = '\f';
@@ -243,18 +217,25 @@ static int jsonParseString (
                 } else if (c == 't') {
                     c = '\t';
                 } else {
-                    errReturn(i,JSON_SYNTAX_ERR);
+                    errReturn(i+1,JSON_SYNTAX_ERR);
                 }
                 jparse->buf[j++] = c;
                 clen = 1;
                 i += 2;
             }
             if (needName) {
-                if (!isNameChar(jparse->buf+j-clen))
-                    errReturn(i,JSON_INVALID_XML_NAME);
+                if (firstchar) {
+                    if (needName && !isNameStart(jparse->buf+j-clen))
+                        errReturn(i-1,JSON_INVALID_XML_NAME);
+                } else {
+                    if (!isNameChar(jparse->buf+j-clen))
+                        errReturn(i-1,JSON_INVALID_XML_NAME);
+                }
+            } else {
+                if (!UTF8_XMLCHAR(jparse->buf+j-clen,clen))
+                    errReturn(i-1,JSON_INVALID_XML_CHAR);
             }
-            if (!UTF8_XMLCHAR(jparse->buf+j-clen,clen))
-                errReturn(i,JSON_INVALID_XML_CHAR);
+            firstchar = 0;
             continue;
         }
         if (c == '"') {
@@ -272,6 +253,7 @@ static int jsonParseString (
         for (k = 0; k < clen; k++) {
             jparse->buf[j++] = json[i+k];
         }
+        firstchar = 0;
         i += clen;
     }
 }
@@ -296,7 +278,6 @@ static int jsonParseValue(
     skipspace(i);
     if ((c = json[i]) == '{' ) {
         /* Parse object */
-        if (jparse->status == JSON_EXPECT_OBJECT) jparse->status = JSON_OK;
         i++;
         for (;;) {
             skipspace(i);
@@ -337,8 +318,6 @@ static int jsonParseValue(
             if (json[i] == ',') {first = 0; i++; continue;}
             errReturn(i,JSON_SYNTAX_ERR);
         }
-    } else if (jparse->status == JSON_EXPECT_OBJECT) {
-        return i;
     } else if (c == '[') {
         /* Parse array */
         i++;
@@ -383,6 +362,7 @@ static int jsonParseValue(
     } else if (c =='"') {
         /* Parse string */
         j = jsonParseString (json, i, 0, jparse);
+        DBG(fprintf(stderr, "String parsing result: %s\n", JSONParseState[jparse->status]));
         rc(j);
         if (jparse->len && jparse->buf[0]) {
             DBG(fprintf(stderr, "New unescaped text node '%s'\n", jparse->buf));
@@ -430,7 +410,11 @@ static int jsonParseValue(
         /* Parse number */
         int seenDP = 0;
         int seenE = 0;
-        if (c == '0' && json[i+1] == '0') errReturn(i+1,JSON_SYNTAX_ERR);
+        if( c<='0' ){
+            j = (c == '-' ? i+1 : i);
+            if (json[j] == '0' && json[j+1] >= '0' && json[j+1] <= '9' )
+                errReturn(j+1,JSON_SYNTAX_ERR);
+        }
         j = i+1;
         for(;; j++){
             c = json[j];
@@ -455,6 +439,8 @@ static int jsonParseValue(
             }
             break;
         }
+        /* Catches a plain '-' without following digits */
+        if( json[j-1]<'0' ) errReturn(j-1,JSON_SYNTAX_ERR);
         DBG(save = json[j];json[j] = '\0';fprintf(stderr, "New text node '%s'\n", &json[i]);json[j] = save;);
         domAppendChild(parent,
                        (domNode *) domNewTextNode (
@@ -486,15 +472,25 @@ JSON_Parse (
     jparse.status = JSON_OK;
     jparse.buf = NULL;
     jparse.len = 0;
+
+    skipspace(pos);
+    if (json[pos] == '\0') {
+        *byteIndex = pos;
+        jparse.status = JSON_SYNTAX_ERR;
+        goto reportError;
+    }
     if (documentElement) {
         root = domNewElementNode(doc, documentElement, ELEMENT_NODE);
         domAppendChild(doc->rootNode, root);
         domSetAttributeNS (root, "xmlns:json", tdomns, NULL, 0);
     } else {
+        if (json[pos] == '[') {
+            *byteIndex = pos;
+            jparse.status = JSON_NO_ARRAY;
+            goto reportError;
+        }
         root = doc->rootNode;
-        jparse.status = JSON_EXPECT_OBJECT;
     }
-    skipspace(pos);
     *byteIndex = jsonParseValue (root, json, pos, &jparse );
     if (jparse.status != JSON_OK && jparse.status != JSON_NEED_JSON_NS)
         goto reportError;
@@ -503,6 +499,7 @@ JSON_Parse (
         skipspace(pos);
     }
     if (json[pos] != '\0') {
+        *byteIndex = pos;
         goto reportError;
     }
     if (jparse.status != JSON_NEED_JSON_NS) {

@@ -5,6 +5,7 @@
 #    json-1.*: JSON syntax tests
 #    json-2.*: Valid JSON, that could not parsed into DOM
 #    json-3.*: JSON unescaping
+#    json-4.*: Unicode
 # Copyright (c) 2017 Rolf Ade.
 
 source [file join [file dir [info script]] loadtdom.tcl]
@@ -71,6 +72,36 @@ test json-1.9 {JSON syntax error} {
 } {1 {error "JSON syntax error" at position 5
 "{"a" " <--Error-- a value"}"}}
 
+test json-1.10 {JSON syntax error} {
+    set result [catch {dom parse -json {{"a":00.23}}} errMsg]
+    list $result $errMsg
+} {1 {error "JSON syntax error" at position 6
+"{"a":00 <--Error-- .23}"}}
+
+test json-1.11 {JSON syntax error} {
+    set result [catch {dom parse -json {{"a":-00.23}}} errMsg]
+    list $result $errMsg
+} {1 {error "JSON syntax error" at position 7
+"{"a":-00 <--Error-- .23}"}}
+
+test json-1.12 {JSON syntax error} {
+    set result [catch {dom parse -json {{"a":.23}}} errMsg]
+    list $result $errMsg
+} {1 {error "JSON syntax error" at position 5
+"{"a":. <--Error-- 23}"}}
+
+test json-1.13 {JSON syntax error} {
+    set result [catch {dom parse -json {{"a":-.23}}} errMsg]
+    list $result $errMsg
+} {1 {error "JSON syntax error" at position 6
+"{"a":-. <--Error-- 23}"}}
+
+test json-1.14 {JSON syntax error} {
+    set result [catch {dom parse -json {{"a":-}}} errMsg]
+    list $result $errMsg
+} {1 {error "JSON syntax error" at position 5
+"{"a":- <--Error-- }"}}
+
 test json-2.1 {invalid xml name} {
     set result [catch {dom parse -json {{"a":"a value","1b":"1value"}}} errMsg]
     list $result $errMsg
@@ -105,3 +136,44 @@ test json-3.3 {Unescaping} {
     $doc delete
     set result
 } "<a>w&#8737;</a>"
+
+test json-3.4 {unescaping} {
+    set doc [dom parse -jsonroot json -json {["\\a"]}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<json xmlns:json="http://tdom.org/json" json:typehint="array">\a</json>}
+
+test json-3.5 {unescaping} {
+    set result [catch {dom parse -json {{"this":"a\lb"}}} errMsg]
+    list $result $errMsg
+} {1 {error "JSON syntax error" at position 11
+"{"this":"a\l <--Error-- b"}"}}
+
+test json-3.6 {unescaping} {
+    set doc [dom parse -json {{"this":"a\nbc"}}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<this>a
+bc</this>} 
+
+test json-3.7 {unescaping} {
+    set doc [dom parse -json {{"this":"a\u0077\t\u0078bc"}}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} "<this>aw\txbc</this>"
+
+test json-3.8 {unescaping} {
+    set result [catch {dom parse -json {{"this":"a\u0000b"}}} errMsg]
+    list $result $errMsg
+} {1 {error "JSON input includes characters not possible in an XML document." at position 15
+"{"this":"a\u0000 <--Error-- b"}"}}
+
+test json-3.9 {unescaping} {
+    set doc [dom parse -json {{"this":"a\u0077","that":"\t\u0078bc"}}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} "<this>aw</this><that>\txbc</that>"
