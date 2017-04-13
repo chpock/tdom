@@ -1597,6 +1597,10 @@ test dom-11.4 {featureinfo - dtd} -body {
     dom featureinfo dtd
 } -match regexp -result {(0|1)}
 
+test dom-11.5 {featureinfo - jsonmaxnesting} {
+    dom featureinfo jsonmaxnesting
+} 2000
+
 proc ::dom::domParseFeedback {} {
     return -code break
 }

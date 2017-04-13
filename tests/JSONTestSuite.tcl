@@ -24,15 +24,9 @@ if {$argc} {
     set dir [pwd]
 }
 
-# This one suffer from using a recursive parser without deepth limit
-set skipfile {
-    n_structure_100000_opening_arrays.json
-    n_structure_open_array_object.json
-}
-# This one suffer from building up a DOM tree, that if serialized with
-# asXML could be parsed back into the DOM representation. Not all
-# chars allowed in JSON strings are allowed as element names or in XML
-# char data.
+set skipfile [list]
+# Not all chars allowed in JSON strings are allowed as element names
+# or in XML char data.
 foreach file {
     y_string_escaped_control_character.json
     y_string_null_escape.json

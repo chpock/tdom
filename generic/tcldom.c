@@ -203,7 +203,10 @@ static char dom_usage[] =
     "        ?-externalentitycommand <cmd>?               \n"
     "        ?-useForeignDTD <boolean>?                   \n"
     "        ?-paramentityparsing <none|always|standalone>\n"
-    "        ?-simple? ?-html? ?<xml>? ?<objVar>?         \n"
+    "        ?-simple? ?-html? ?-html5? ?-json?           \n"
+    "        ?-jsonmaxnesting <#nr>?                      \n"
+    "        ?-jsonroot name?                             \n"
+    "        ?<xml|html|json>? ?<objVar>?                 \n"
     "    createDocument docElemName ?objVar?              \n"
     "    createDocumentNS uri docElemName ?objVar?        \n"
     "    createDocumentNode ?objVar?                      \n"
@@ -5578,6 +5581,7 @@ int tcldom_parse (
     Tcl_Obj     *feedbackCmd = NULL;
     CONST84 char *interpResult;
     int          optionIndex, value, xml_string_len, mode;
+    int          jsonmaxnesting = JSON_MAX_NESTING;
     int          ignoreWhiteSpaces   = 1;
     int          takeJSONParser      = 0;
     int          takeSimpleParser    = 0;
@@ -5605,7 +5609,8 @@ int tcldom_parse (
 #ifdef TDOM_HAVE_GUMBO
         "-html5",
 #endif
-        "-ignorexmlns",           "--",             NULL
+        "-jsonmaxnesting",        "-ignorexmlns",   "--",
+        NULL
     };
     enum parseOption {
         o_keepEmpties,            o_simple,         o_html,
@@ -5615,7 +5620,7 @@ int tcldom_parse (
 #ifdef TDOM_HAVE_GUMBO
         o_htmlfive,
 #endif
-        o_ignorexmlns,            o_LAST
+        o_jsonmaxnesting,         o_ignorexmlns,    o_LAST
     };
 
     static CONST84 char *paramEntityParsingValues[] = {
@@ -5818,6 +5823,24 @@ int tcldom_parse (
             ignorexmlns = 1;
             objv++;  objc--; continue;
 
+        case o_jsonmaxnesting:
+            objv++; objc--;
+            if (objc < 2) {
+                SetResult("The \"dom parse\" option \"-jsonmaxnesting\" "
+                          "requires an integer as argument.");
+                return TCL_ERROR;
+            }
+            if (Tcl_GetIntFromObj(interp, objv[1], &jsonmaxnesting)
+                != TCL_OK) {
+                SetResult("-jsonmaxnesting must have an integer argument");
+                return TCL_ERROR;
+            }
+            if (jsonmaxnesting < 0) {
+                SetResult("The value of -jsonmaxnesting cannot be negativ");
+                return TCL_ERROR;
+            }
+            objv++;  objc--; continue;
+                        
         case o_LAST:
             objv++;  objc--; break;
             
@@ -5880,7 +5903,8 @@ int tcldom_parse (
 
         errStr = NULL;
 
-        doc = JSON_Parse (xml_string, jsonRoot, &errStr, &byteIndex);
+        doc = JSON_Parse (xml_string, jsonRoot, jsonmaxnesting, &errStr,
+                          &byteIndex);
         if (doc) {
             return tcldom_returnDocumentObj (interp, doc, setVariable,
                                              newObjName, 1, 0);
@@ -6067,14 +6091,14 @@ int tcldom_featureinfo (
         "expatversion",      "expatmajorversion",  "expatminorversion",
         "expatmicroversion", "dtd",                "ns",
         "unknown",           "tdomalloc",          "lessns",
-        "html5",
+        "html5",             "jsonmaxnesting",
         "TCL_UTF_MAX",        NULL
     };
     enum feature {
         o_expatversion,      o_expatmajorversion,  o_expatminorversion,
         o_expatmicroversion, o_dtd,                o_ns,
         o_unknown,           o_tdomalloc,          o_lessns,
-        o_html5,
+        o_html5,             o_jsonmaxnesting,
         o_TCL_UTF_MAX
     };
 
@@ -6144,6 +6168,10 @@ int tcldom_featureinfo (
 #endif
         SetBooleanResult(result);
         break;
+    case o_jsonmaxnesting:
+        SetIntResult(JSON_MAX_NESTING);
+        break;
+        
     case o_TCL_UTF_MAX:
         SetIntResult(TCL_UTF_MAX);
         break;

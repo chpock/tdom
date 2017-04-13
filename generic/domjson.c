@@ -58,6 +58,7 @@ typedef enum {
     JSON_OK,
     JSON_NEED_JSON_NS,
     JSON_NO_ARRAY,
+    JSON_MAX_NESTING_REACHED,
     JSON_SYNTAX_ERR,
     JSON_INVALID_XML_NAME,
     JSON_INVALID_XML_CHAR
@@ -67,15 +68,18 @@ typedef enum {
 static const char *JSONParseStateStr[] = {
     "OK",
     "Internal: result tree needs tdom json XML namespace",
-    "JSON_NO_ARRAY",
+    "A JSON string with an array at top level cannot be parsed without a -jsonroot",
+    "Maximum JSON object/array nesting depth exceeded",
     "JSON syntax error",
-    "JSON_INVALID_XML_NAME",
+    "JSON object name that cannot be an XML element name",
     "JSON input includes characters not possible in an XML document."
 };
 
 typedef struct 
 {
     JSONParseState status;
+    int  nestingDepth;
+    int  maxnesting;
     char *buf;
     int len;
 } JSONParse;
@@ -99,6 +103,10 @@ static int jsonIs4Hex(const char *z){
   for (i=0; i<4; i++) if (!isxdigit(z[i])) return 0;
   return 1;
 }
+
+/* Parse a single JSON string which begins (with the starting '"') at
+ * json[i]. Return the index of the closing '"' of the string
+ * parsed. */
 
 static int jsonParseString (
     char *json,
@@ -278,16 +286,20 @@ static int jsonParseValue(
     skipspace(i);
     if ((c = json[i]) == '{' ) {
         /* Parse object */
+        if (++jparse->nestingDepth > jparse->maxnesting)
+            errReturn(i,JSON_MAX_NESTING_REACHED);
         i++;
+        skipspace(i);
+        if (json[i] == '}') {
+            /* Empty object. */
+            /* Needed is only one type attribute for empty elements,
+             * either for object or array, the not typed must be the
+             * other one. */
+            /* domSetAttributeNS (parent, "json:type", "object", tdomns, 0); */
+            jparse->nestingDepth--;
+            return i+1;
+        }
         for (;;) {
-            skipspace(i);
-            if (first && json[i] == '}') {
-                /* Needed is only one type attribute for empty elements,
-                 * either for object or array, the not typed must be the
-                 * other one. */
-                /* domSetAttributeNS (parent, "json:type", "object", tdomns, 0); */
-                return i+1;
-            }
             j = jsonParseString (json, i, 1, jparse);
             rc(j);
             if (jparse->len && jparse->buf[0]) {
@@ -314,12 +326,20 @@ static int jsonParseValue(
             rc(j);
             i = j;
             skipspace(i);
-            if (json[i] == '}') return i+1;
-            if (json[i] == ',') {first = 0; i++; continue;}
+            if (json[i] == '}') {
+                jparse->nestingDepth--;
+                return i+1;
+            }
+            if (json[i] == ',') {
+                i++; skipspace(i);
+                continue;
+            }
             errReturn(i,JSON_SYNTAX_ERR);
         }
     } else if (c == '[') {
         /* Parse array */
+        if (++jparse->nestingDepth > jparse->maxnesting)
+            errReturn(i,JSON_MAX_NESTING_REACHED);
         i++;
         node = parent;
         for (;;) {
@@ -330,6 +350,7 @@ static int jsonParseValue(
                 DBG(fprintf(stderr,"Empty JSON array.\n"););
                 domSetAttributeNS (parent, "json:typehint", "array", tdomns, 1);
                 jparse->status = JSON_NEED_JSON_NS;
+                jparse->nestingDepth--;
                 return i+1;
             }
             i = jsonParseValue (node, json, i, jparse);
@@ -341,6 +362,7 @@ static int jsonParseValue(
                     jparse->status = JSON_NEED_JSON_NS;
                 }
                 DBG(fprintf(stderr,"JSON array end\n"););
+                jparse->nestingDepth--;
                 return i+1;
             }
             if (json[i] == ',') {
@@ -460,6 +482,7 @@ domDocument *
 JSON_Parse (
     char *json,    /* Complete text of the json string being parsed */
     char *documentElement, /* name of the root element, may be NULL */
+    int   maxnesting,
     char **errStr,
     int  *byteIndex
     )
@@ -470,6 +493,8 @@ JSON_Parse (
     int pos = 0;
     
     jparse.status = JSON_OK;
+    jparse.nestingDepth = 0;
+    jparse.maxnesting = maxnesting;
     jparse.buf = NULL;
     jparse.len = 0;
 
@@ -486,7 +511,11 @@ JSON_Parse (
     } else {
         if (json[pos] == '[') {
             *byteIndex = pos;
-            jparse.status = JSON_NO_ARRAY;
+            if (maxnesting == 0) {
+                jparse.status = JSON_MAX_NESTING_REACHED;
+            } else {
+                jparse.status = JSON_NO_ARRAY;
+            }
             goto reportError;
         }
         root = doc->rootNode;
