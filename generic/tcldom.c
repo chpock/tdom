@@ -245,6 +245,7 @@ static char doc_usage[] =
     "    asXML ?-indent <none,0..8>? ?-channel <channel>? ?-escapeNonASCII? ?-escapeAllQuot? ?-doctypeDeclaration <boolean>?\n"
     "    asHTML ?-channel <channelId>? ?-escapeNonASCII? ?-htmlEntities?\n"
     "    asText                                  \n"
+    "    asJSON ?-indent <none,0..8>?            \n"
     "    getDefaultOutputMethod                  \n"
     "    publicId ?publicId?                     \n"
     "    systemId ?systemId?                     \n"
@@ -340,6 +341,7 @@ static char node_usage[] =
     "    asXML ?-indent <none,0..8>? ?-channel <channel>? ?-escapeNonASCII? ?-escapeAllQuot? ?-doctypeDeclaration <boolean>?\n"
     "    asHTML ?-channel <channelId>? ?-escapeNonASCII? ?-htmlEntities?\n"
     "    asText                       \n"
+    "    asJSON ?-indent <none,0..8>? \n"
     "    appendFromList nestedList    \n"
     "    appendFromScript script      \n"
     "    insertBeforeFromScript script ref \n"
@@ -2139,6 +2141,30 @@ Tcl_Obj * tcldom_treeAsTclList (
     return Tcl_NewListObj(3, objv);
 }
 
+/*----------------------------------------------------------------------------
+|   tcldom_treeAsJSON
+|
+\---------------------------------------------------------------------------*/
+static
+void tcldom_treeAsJSON (
+    Tcl_Obj     *JSONString,
+    domNode     *node,
+    Tcl_Channel  channel,
+    int          indent
+)
+{
+    domNode     *child;
+    domAttrNode *attr;
+
+
+    child = node->firstChild;
+    if (child->nodeType == TEXT_NODE) {
+        attr = node->firstAttr;
+        while (attr) {
+        }
+    }
+    
+}
 
 /*----------------------------------------------------------------------------
 |   tcldom_AppendEscaped
@@ -3349,6 +3375,96 @@ static int serializeAsHTML (
 }
 
 /*----------------------------------------------------------------------------
+|   serializeAsJSON
+|
+\---------------------------------------------------------------------------*/
+static int serializeAsJSON (
+    domNode    *node,
+    Tcl_Interp *interp,
+    int         objc,
+    Tcl_Obj    *CONST objv[]
+)
+{
+    char       *channelId;
+    int         optionIndex, mode, indent = 4;
+    Tcl_Obj    *resultPtr;
+    Tcl_Channel chan = (Tcl_Channel) NULL;
+
+    static CONST84 char *asJSONOptions[] = {
+        "-channel", "-indent",
+        NULL
+    };
+    enum asJSONOption {
+        m_channel, m_indent
+    };
+
+    if (node->nodeType != ELEMENT_NODE) {
+        SetResult("Not an element node.\n");
+        return TCL_ERROR;
+    }
+    
+    if (objc > 5) {
+        Tcl_WrongNumArgs(interp, 2, objv,
+                         "?-channel <channelId>? "
+                         "?-indent <none,0..8>?");
+        return TCL_ERROR;
+    }
+    while (objc > 2) {
+        if (Tcl_GetIndexFromObj(interp, objv[2], asJSONOptions, "option", 
+                                0, &optionIndex) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        switch ((enum asJSONOption) optionIndex) {
+
+        case m_channel:
+            if (objc < 4) {
+                SetResult("-channel must have a channeldID as argument");
+                return TCL_ERROR;
+            }
+            channelId = Tcl_GetString(objv[3]);
+            chan = Tcl_GetChannel(interp, channelId, &mode);
+            if (chan == (Tcl_Channel) NULL) {
+                SetResult("-channel must have a channeldID as argument");
+                return TCL_ERROR;
+            }
+            if ((mode & TCL_WRITABLE) == 0) {
+                Tcl_AppendResult(interp, "channel \"", channelId,
+                                "\" wasn't opened for writing", (char*)NULL);
+                return TCL_ERROR;
+            }
+            objc -= 2;
+            objv += 2;
+            break;
+
+        case m_indent:
+            if (objc < 4) {
+                SetResult("-indent must have an argument "
+                          "(0..8 or 'no'/'none')");
+                return TCL_ERROR;
+            }
+            if (strcmp("none", Tcl_GetString(objv[3]))==0) {
+                indent = -1;
+            }
+            else if (strcmp("no", Tcl_GetString(objv[3]))==0) {
+                indent = -1;
+            }
+            else if (Tcl_GetIntFromObj(interp, objv[3], &indent) != TCL_OK) {
+                SetResult( "indent must be an integer (0..8) or 'no'/'none'");
+                return TCL_ERROR;
+            }
+            objc -= 2;
+            objv += 2;
+            break;
+        }
+    }
+    resultPtr = Tcl_NewStringObj("", 0);
+    tcldom_treeAsJSON(resultPtr, node, chan, indent);
+    Tcl_AppendResult(interp, Tcl_GetString(resultPtr), NULL);
+    Tcl_DecrRefCount(resultPtr);
+    return TCL_OK;
+}
+
+/*----------------------------------------------------------------------------
 |   cdataSectionElements
 |
 \---------------------------------------------------------------------------*/
@@ -3891,6 +4007,7 @@ int tcldom_NodeObjCmd (
         "getElementsByTagName",              "getElementsByTagNameNS",
         "disableOutputEscaping",             "precedes",         "asText",
         "insertBeforeFromScript",            "normalize",        "baseURI",
+        "asJSON",
 #ifdef TCL_THREADS
         "readlock",        "writelock",
 #endif
@@ -3912,7 +4029,8 @@ int tcldom_NodeObjCmd (
         m_xslt,            m_toXPath,        m_delete,          m_getElementById,
         m_getElementsByTagName,              m_getElementsByTagNameNS,
         m_disableOutputEscaping,             m_precedes,        m_asText,
-        m_insertBeforeFromScript,            m_normalize,       m_baseURI
+        m_insertBeforeFromScript,            m_normalize,       m_baseURI,
+        m_asJSON
 #ifdef TCL_THREADS
         ,m_readlock,        m_writelock
 #endif
@@ -4181,6 +4299,12 @@ int tcldom_NodeObjCmd (
             }
             break;
 
+        case m_asJSON:
+            if (serializeAsJSON(node, interp, objc, objv) != TCL_OK) {
+                return TCL_ERROR;
+            }
+            break;
+            
         case m_getAttribute:
             CheckArgs(3,4,2,"attrName ?defaultValue?");
             if (node->nodeType != ELEMENT_NODE) {
@@ -4915,7 +5039,7 @@ int tcldom_DocObjCmd (
         "childNodes",      "ownerDocument",              "insertBefore",
         "replaceChild",    "appendFromList",             "appendXML",
         "selectNodes",     "baseURI",                    "appendFromScript",
-        "insertBeforeFromScript",
+        "insertBeforeFromScript",                        "asJSON",
 #ifdef TCL_THREADS
         "readlock",        "writelock",                  "renumber",
 #endif
@@ -4940,7 +5064,7 @@ int tcldom_DocObjCmd (
         m_childNodes,       m_ownerDocument,              m_insertBefore,
         m_replaceChild,     m_appendFromList,             m_appendXML,
         m_selectNodes,      m_baseURI,                    m_appendFromScript,
-        m_insertBeforeFromScript
+        m_insertBeforeFromScript,                         m_asJSON
 #ifdef TCL_THREADS
        ,m_readlock,         m_writelock,                  m_renumber
 #endif
@@ -5361,6 +5485,7 @@ int tcldom_DocObjCmd (
         case m_ownerDocument:
         case m_selectNodes:
         case m_baseURI:
+        case m_asJSON:
         case m_getElementById:
             /* We dispatch the method call to tcldom_NodeObjCmd */
             if (TSD(domCreateCmdMode) == DOM_CREATECMDMODE_AUTO) {
