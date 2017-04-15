@@ -2142,31 +2142,6 @@ Tcl_Obj * tcldom_treeAsTclList (
 }
 
 /*----------------------------------------------------------------------------
-|   tcldom_treeAsJSON
-|
-\---------------------------------------------------------------------------*/
-static
-void tcldom_treeAsJSON (
-    Tcl_Obj     *JSONString,
-    domNode     *node,
-    Tcl_Channel  channel,
-    int          indent
-)
-{
-    domNode     *child;
-    domAttrNode *attr;
-
-
-    child = node->firstChild;
-    if (child->nodeType == TEXT_NODE) {
-        attr = node->firstAttr;
-        while (attr) {
-        }
-    }
-    
-}
-
-/*----------------------------------------------------------------------------
 |   tcldom_AppendEscaped
 |
 \---------------------------------------------------------------------------*/
@@ -3034,6 +3009,117 @@ void tcldom_treeAsXML (
         } else {
             writeChars(xmlString, chan, ">",   1);
         }
+    }
+}
+
+/*----------------------------------------------------------------------------
+|   tcldom_AppendEscapedJSON
+|
+\---------------------------------------------------------------------------*/
+static
+void tcldom_AppendEscapedJSON (
+    Tcl_Obj    *jstring,
+    Tcl_Channel chan,
+    char       *value,
+    int         value_length,
+)
+{
+    char  buf[APESC_BUF_SIZE+80], *b, *bLimit,  *pc, *pc1, *pEnd, charRef[10];
+    int   charDone, i;
+    int   clen = 0;
+    int   unicode;
+    Tcl_UniChar uniChar;
+
+    b = buf;
+    bLimit = b + APESC_BUF_SIZE;
+    pc = pEnd = value;
+    if (value_length != -1) {
+        pEnd = pc + value_length;
+    }
+    AP('"');
+    while (
+        (value_length == -1 && *pc)
+        || (value_length != -1 && pc != pEnd)
+    ) {
+        AP(pc);
+        if (b >= bLimit) {
+            writeChars(xmlString, chan, buf, b - buf);
+            b = buf;
+        }
+        pc++;
+    }
+    AP('"');
+    writeChars(xmlString, chan, buf, b - buf);
+}
+
+/*----------------------------------------------------------------------------
+|   tcldom_treeAsJSON
+|
+\---------------------------------------------------------------------------*/
+static
+void tcldom_treeAsJSON (
+    Tcl_Obj     *jstring,
+    domNode     *node,
+    Tcl_Channel  channel,
+    int          indent
+)
+{
+    domNode     *child;
+    domTextNode *textnode;
+    domAttrNode *attr;
+
+
+    child = node->firstChild;
+    while (child) {
+        switch (child->nodeType) {
+        case CDATA_SECTION_NODE:
+        case TEXT_NODE:
+            textnode = (domTextNode *)child;
+            attr = getAttributeNS (node, tdomnsjson, "typehint");
+            if (attr) {
+                if (strcmp("null", attr->nodeValue) == 0
+                    && strcmp("null", textnode->nodeValue) == 0) {
+                    writeChars(jstring, channel, "null",4);
+                    break;
+                } else if (strcmp("true", attr->nodeValue) == 0
+                    && strcmp("true", textnode->nodeValue) == 0) {
+                    writeChars(jstring, channel, "true",4);
+                    break;
+                } else if (strcmp("false", attr->nodeValue) == 0
+                    && strcmp("false", textnode->nodeValue) == 0) {
+                    writeChars(jstring, channel, "false",4);
+                    break;
+                }
+            }
+            tcldom_AppendEscapedJSON (jstring, channel, textnode->nodeValue,
+                                      textnode->valueLength);
+            break;
+        case ELEMENT_NODE:
+            attr = getAttributeNS (child, tdomnsjson, "typehint");
+            if (attr) {
+                if (strcmp("array", attr-nodeValue) == 0) {
+                    writeChars(jstring, channel, "[", 1);
+                    child = child->firstChild;
+                    while (child) {
+                        tcldom_treeAsJSON (jstring, child, channel, indent);
+                        writeChars(jstring, channel, ",", 1);
+                        child = child->nextSibling;
+                    }
+                    writeChars(jstring, channel, "]", 1);
+                }
+            }
+            if (child->nextSibling
+                && child->nodeName == child->nextSibling->nodeName) {
+                writeChars(jstring, channel, "[", 1);
+                
+            } else {
+            }
+            break;
+        default:
+            /* Ignore them */
+            break;
+        }
+        child = child->nextSibling;
     }
 }
 

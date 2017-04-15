@@ -103,6 +103,13 @@ test json-1.14 {JSON syntax error} {
 } {1 {error "JSON syntax error" at position 5
 "{"a":- <--Error-- }"}}
 
+test json-1.15 {Parse JSON - nested object} {
+    set doc [dom parse -json -jsonroot obj {["a",["aa","bb"],"b"]}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} "<a><aa>aavalue</aa><bb>bbvalue</bb></a><b>bvalue</b><c>0.123</c>"
+
 test json-2.1 {invalid xml name} {
     set result [catch {dom parse -json {{"a":"a value","1b":"1value"}}} errMsg]
     list $result $errMsg

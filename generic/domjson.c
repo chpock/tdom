@@ -51,8 +51,6 @@ static const char jsonIsSpace[] = {
 
 #define rc(i) if (jparse->status != JSON_OK && jparse->status != JSON_NEED_JSON_NS) return (i);
 
-static const char *tdomns = "http://tdom.org/json";
-
 /* The meaning of parse state values */
 typedef enum {
     JSON_OK,
@@ -295,7 +293,7 @@ static int jsonParseValue(
             /* Needed is only one type attribute for empty elements,
              * either for object or array, the not typed must be the
              * other one. */
-            /* domSetAttributeNS (parent, "json:type", "object", tdomns, 0); */
+            /* domSetAttributeNS (parent, "json:type", "object", tdomnsjson, 0); */
             jparse->nestingDepth--;
             return i+1;
         }
@@ -348,7 +346,8 @@ static int jsonParseValue(
             if (first && json[i] == ']') {
                 /* empty array */
                 DBG(fprintf(stderr,"Empty JSON array.\n"););
-                domSetAttributeNS (parent, "json:typehint", "array", tdomns, 1);
+                domSetAttributeNS (parent, "json:typehint", "array",
+                                   tdomnsjson, 1);
                 jparse->status = JSON_NEED_JSON_NS;
                 jparse->nestingDepth--;
                 return i+1;
@@ -358,7 +357,8 @@ static int jsonParseValue(
             skipspace(i);
             if (json[i] == ']') {
                 if (first) {
-                    domSetAttributeNS (parent, "json:typehint", "array", tdomns, 1);
+                    domSetAttributeNS (parent, "json:typehint", "array",
+                                       tdomnsjson, 1);
                     jparse->status = JSON_NEED_JSON_NS;
                 }
                 DBG(fprintf(stderr,"JSON array end\n"););
@@ -405,13 +405,13 @@ static int jsonParseValue(
     } else if (c == 'n'
                && strncmp (json+i, "null", 4) == 0
                && !isalnum(json[i+4])) {
-        domSetAttributeNS (parent, "json:typehint", "null", tdomns, 1);
+        domSetAttributeNS (parent, "json:typehint", "null", tdomnsjson, 1);
         jparse->status = JSON_NEED_JSON_NS;
         return i+4;
     } else if (c == 't'
                && strncmp (json+i, "true", 4) == 0
                && !isalnum(json[i+4])) {
-        domSetAttributeNS (parent, "json:typehint", "boolean", tdomns, 1);
+        domSetAttributeNS (parent, "json:typehint", "boolean", tdomnsjson, 1);
         jparse->status = JSON_NEED_JSON_NS;
         domAppendChild (parent,
                         (domNode *) domNewTextNode (
@@ -421,7 +421,7 @@ static int jsonParseValue(
     } else if (c == 'f'
                && strncmp (json+i, "false", 5) == 0
                && !isalnum(json[i+5])) {
-        domSetAttributeNS (parent, "json:typehint", "boolean", tdomns, 1);
+        domSetAttributeNS (parent, "json:typehint", "boolean", tdomnsjson, 1);
         jparse->status = JSON_NEED_JSON_NS;
         domAppendChild (parent,
                         (domNode *) domNewTextNode (
@@ -507,7 +507,7 @@ JSON_Parse (
     if (documentElement) {
         root = domNewElementNode(doc, documentElement, ELEMENT_NODE);
         domAppendChild(doc->rootNode, root);
-        domSetAttributeNS (root, "xmlns:json", tdomns, NULL, 0);
+        domSetAttributeNS (root, "xmlns:json", tdomnsjson, NULL, 0);
     } else {
         if (json[pos] == '[') {
             *byteIndex = pos;
