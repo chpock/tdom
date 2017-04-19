@@ -3021,7 +3021,7 @@ void tcldom_AppendEscapedJSON (
     Tcl_Obj    *jstring,
     Tcl_Channel chan,
     char       *value,
-    int         value_length,
+    int         value_length
 )
 {
     char  buf[APESC_BUF_SIZE+80], *b, *bLimit,  *pc, *pc1, *pEnd, charRef[10];
@@ -3041,15 +3041,15 @@ void tcldom_AppendEscapedJSON (
         (value_length == -1 && *pc)
         || (value_length != -1 && pc != pEnd)
     ) {
-        AP(pc);
+        AP(*pc);
         if (b >= bLimit) {
-            writeChars(xmlString, chan, buf, b - buf);
+            writeChars(jstring, chan, buf, b - buf);
             b = buf;
         }
         pc++;
     }
     AP('"');
-    writeChars(xmlString, chan, buf, b - buf);
+    writeChars(jstring, chan, buf, b - buf);
 }
 
 /*----------------------------------------------------------------------------
@@ -3075,7 +3075,7 @@ void tcldom_treeAsJSON (
         case CDATA_SECTION_NODE:
         case TEXT_NODE:
             textnode = (domTextNode *)child;
-            attr = getAttributeNS (node, tdomnsjson, "typehint");
+            attr = domGetAttributeNodeNS (node, tdomnsjson, "typehint");
             if (attr) {
                 if (strcmp("null", attr->nodeValue) == 0
                     && strcmp("null", textnode->nodeValue) == 0) {
@@ -3095,9 +3095,9 @@ void tcldom_treeAsJSON (
                                       textnode->valueLength);
             break;
         case ELEMENT_NODE:
-            attr = getAttributeNS (child, tdomnsjson, "typehint");
+            attr = domGetAttributeNodeNS (child, tdomnsjson, "typehint");
             if (attr) {
-                if (strcmp("array", attr-nodeValue) == 0) {
+                if (strcmp("array", attr->nodeValue) == 0) {
                     writeChars(jstring, channel, "[", 1);
                     child = child->firstChild;
                     while (child) {

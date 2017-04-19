@@ -27,6 +27,7 @@
  * (https://www.sqlite.org/src/artifact/312b4ddf4c7399dc) */
 
 #include <dom.h>
+#include <domjson.h>
 #include <ctype.h>
 
 static const char jsonIsSpace[] = {
@@ -49,12 +50,11 @@ static const char jsonIsSpace[] = {
 };
 #define skipspace(x)  while (jsonIsSpace[(unsigned char)json[(x)]]) { (x)++; }
 
-#define rc(i) if (jparse->status != JSON_OK && jparse->status != JSON_NEED_JSON_NS) return (i);
+#define rc(i) if (jparse->status != JSON_OK) return (i);
 
 /* The meaning of parse state values */
 typedef enum {
     JSON_OK,
-    JSON_NEED_JSON_NS,
     JSON_NO_ARRAY,
     JSON_MAX_NESTING_REACHED,
     JSON_SYNTAX_ERR,
@@ -65,7 +65,6 @@ typedef enum {
 // Error sting constants, indexed by JSONParseState.
 static const char *JSONParseStateStr[] = {
     "OK",
-    "Internal: result tree needs tdom json XML namespace",
     "A JSON string with an array at top level cannot be parsed without a -jsonroot",
     "Maximum JSON object/array nesting depth exceeded",
     "JSON syntax error",
@@ -78,6 +77,8 @@ typedef struct
     JSONParseState status;
     int  nestingDepth;
     int  maxnesting;
+    int  needjsonNS;
+    char *arrItemElm;
     char *buf;
     int len;
 } JSONParse;
@@ -339,34 +340,29 @@ static int jsonParseValue(
         if (++jparse->nestingDepth > jparse->maxnesting)
             errReturn(i,JSON_MAX_NESTING_REACHED);
         i++;
-        node = parent;
+        skipspace(i);
+        if (json[i] == ']') {
+            /* empty array */
+            DBG(fprintf(stderr,"Empty JSON array.\n"););
+            domSetAttributeNS (parent, "json:typehint", "array",
+                               tdomnsjson, 1);
+            jparse->needjsonNS = 1;
+            jparse->nestingDepth--;
+            return i+1;
+        }
+        if (parent->parentNode) 
+            node = parent;
+        else {
+            node = domNewElementNode (parent->ownerDocument,
+                                      jparse->arrItemElm,
+                                      ELEMENT_NODE);
+        }
         for (;;) {
             DBG(fprintf(stderr, "Next array value node '%s'\n", &json[i]););
-            skipspace(i);
-            if (first && json[i] == ']') {
-                /* empty array */
-                DBG(fprintf(stderr,"Empty JSON array.\n"););
-                domSetAttributeNS (parent, "json:typehint", "array",
-                                   tdomnsjson, 1);
-                jparse->status = JSON_NEED_JSON_NS;
-                jparse->nestingDepth--;
-                return i+1;
-            }
             i = jsonParseValue (node, json, i, jparse);
             rc(i);
             skipspace(i);
-            if (json[i] == ']') {
-                if (first) {
-                    domSetAttributeNS (parent, "json:typehint", "array",
-                                       tdomnsjson, 1);
-                    jparse->status = JSON_NEED_JSON_NS;
-                }
-                DBG(fprintf(stderr,"JSON array end\n"););
-                jparse->nestingDepth--;
-                return i+1;
-            }
             if (json[i] == ',') {
-                first = 0;
                 node = domNewElementNode (parent->ownerDocument,
                                           parent->nodeName,
                                           ELEMENT_NODE);
@@ -406,13 +402,13 @@ static int jsonParseValue(
                && strncmp (json+i, "null", 4) == 0
                && !isalnum(json[i+4])) {
         domSetAttributeNS (parent, "json:typehint", "null", tdomnsjson, 1);
-        jparse->status = JSON_NEED_JSON_NS;
+        jparse->needjsonNS = 1;
         return i+4;
     } else if (c == 't'
                && strncmp (json+i, "true", 4) == 0
                && !isalnum(json[i+4])) {
         domSetAttributeNS (parent, "json:typehint", "boolean", tdomnsjson, 1);
-        jparse->status = JSON_NEED_JSON_NS;
+        jparse->needjsonNS = 1;
         domAppendChild (parent,
                         (domNode *) domNewTextNode (
                             parent->ownerDocument,
@@ -422,7 +418,7 @@ static int jsonParseValue(
                && strncmp (json+i, "false", 5) == 0
                && !isalnum(json[i+5])) {
         domSetAttributeNS (parent, "json:typehint", "boolean", tdomnsjson, 1);
-        jparse->status = JSON_NEED_JSON_NS;
+        jparse->needjsonNS = 1;
         domAppendChild (parent,
                         (domNode *) domNewTextNode (
                             parent->ownerDocument,
@@ -489,12 +485,16 @@ JSON_Parse (
 {
     domDocument *doc = domCreateDoc (NULL, 0);
     domNode *root;
+    Tcl_HashEntry *h;
     JSONParse jparse;
-    int pos = 0;
-    
+    int hnew, pos = 0;
+
+    h = Tcl_CreateHashEntry(&HASHTAB(doc, tdom_tagNames), "item", &hnew);
     jparse.status = JSON_OK;
     jparse.nestingDepth = 0;
     jparse.maxnesting = maxnesting;
+    jparse.needjsonNS = 0;
+    jparse.arrItemElm = (char*)&h->key;
     jparse.buf = NULL;
     jparse.len = 0;
 
@@ -509,20 +509,10 @@ JSON_Parse (
         domAppendChild(doc->rootNode, root);
         domSetAttributeNS (root, "xmlns:json", tdomnsjson, NULL, 0);
     } else {
-        if (json[pos] == '[') {
-            *byteIndex = pos;
-            if (maxnesting == 0) {
-                jparse.status = JSON_MAX_NESTING_REACHED;
-            } else {
-                jparse.status = JSON_NO_ARRAY;
-            }
-            goto reportError;
-        }
         root = doc->rootNode;
     }
     *byteIndex = jsonParseValue (root, json, pos, &jparse );
-    if (jparse.status != JSON_OK && jparse.status != JSON_NEED_JSON_NS)
-        goto reportError;
+    if (jparse.status != JSON_OK) goto reportError;
     if (*byteIndex > 0) {
         pos = *byteIndex;
         skipspace(pos);
@@ -531,7 +521,7 @@ JSON_Parse (
         *byteIndex = pos;
         goto reportError;
     }
-    if (jparse.status != JSON_NEED_JSON_NS) {
+    if (!jparse.needjsonNS) {
         domRemoveAttribute(root, "xmlns:json");
     }
     if (jparse.len > 0) {
