@@ -1993,7 +1993,7 @@ int tcldom_appendFromTclList (
         return TCL_ERROR;
     }
     CheckName (interp, tag_name, "tag", 0);
-    newnode = domNewElementNode(node->ownerDocument, tag_name, ELEMENT_NODE);
+    newnode = domNewElementNode(node->ownerDocument, tag_name);
     domAppendChild(node, newnode);
 
     /*------------------------------------------------------------------------
@@ -5056,7 +5056,7 @@ int tcldom_DocObjCmd (
             CheckArgs(3,4,2,"elementName ?newObjVar?");
             tag = Tcl_GetString(objv[2]);
             CheckName (interp, tag, "tag", 0);
-            n = domNewElementNode(doc, tag, ELEMENT_NODE);
+            n = domNewElementNode(doc, tag);
             return tcldom_setInterpAndReturnVar(interp, n, (objc == 4),
                                         (objc == 4) ? objv[3] : NULL);
 
@@ -5065,7 +5065,7 @@ int tcldom_DocObjCmd (
             uri = Tcl_GetString(objv[2]);
             tag = Tcl_GetString(objv[3]);
             CheckName (interp, tag, "full qualified tag", 1);
-            n = domNewElementNodeNS(doc, tag, uri, ELEMENT_NODE);
+            n = domNewElementNodeNS(doc, tag, uri);
             return tcldom_setInterpAndReturnVar(interp, n, (objc == 5),
                                         (objc == 5) ? objv[4] : NULL);
 
