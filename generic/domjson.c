@@ -304,15 +304,14 @@ static int jsonParseValue(
             if (jparse->len && jparse->buf[0]) {
                 DBG(fprintf(stderr, "New object member '%s'\n", jparse->buf););
                 node = domNewElementNode (parent->ownerDocument,
-                                          jparse->buf, ELEMENT_NODE);
+                                          jparse->buf);
                 domAppendChild (parent, node);
                 jparse->buf[0] = 0;
             } else {
                 save = json[j];
                 json[j] = '\0';
                 DBG(fprintf(stderr, "New object member '%s'\n", &json[i+1]););
-                node = domNewElementNode (parent->ownerDocument, &json[i+1],
-                                          ELEMENT_NODE);
+                node = domNewElementNode (parent->ownerDocument, &json[i+1]);
                 domAppendChild (parent, node);
                 json[j] = save;
             }
@@ -354,8 +353,7 @@ static int jsonParseValue(
             node = parent;
         else {
             node = domNewElementNode (parent->ownerDocument,
-                                      jparse->arrItemElm,
-                                      ELEMENT_NODE);
+                                      jparse->arrItemElm);
         }
         for (;;) {
             DBG(fprintf(stderr, "Next array value node '%s'\n", &json[i]););
@@ -364,8 +362,7 @@ static int jsonParseValue(
             skipspace(i);
             if (json[i] == ',') {
                 node = domNewElementNode (parent->ownerDocument,
-                                          parent->nodeName,
-                                          ELEMENT_NODE);
+                                          parent->nodeName);
                 if (parent->parentNode) {
                     domAppendChild (parent->parentNode, node);
                 } else {
@@ -505,7 +502,7 @@ JSON_Parse (
         goto reportError;
     }
     if (documentElement) {
-        root = domNewElementNode(doc, documentElement, ELEMENT_NODE);
+        root = domNewElementNode(doc, documentElement);
         domAppendChild(doc->rootNode, root);
         domSetAttributeNS (root, "xmlns:json", tdomnsjson, NULL, 0);
     } else {

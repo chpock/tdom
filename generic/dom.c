@@ -4511,8 +4511,7 @@ domNewProcessingInstructionNode(
 domNode *
 domNewElementNode(
     domDocument *doc,
-    const char  *tagName,
-    domNodeType  nodeType		
+    const char  *tagName
 )
 {
     domNode       *node;
@@ -4522,7 +4521,7 @@ domNewElementNode(
     h = Tcl_CreateHashEntry(&HASHTAB(doc, tdom_tagNames), tagName, &hnew);
     node = (domNode*) domAlloc(sizeof(domNode));
     memset(node, 0, sizeof(domNode));
-    node->nodeType      = nodeType;
+    node->nodeType      = ELEMENT_NODE;
     node->nodeFlags     = 0;
     node->namespace     = 0;
     node->nodeNumber    = NODE_NO(doc);
@@ -4549,8 +4548,7 @@ domNode *
 domNewElementNodeNS (
     domDocument *doc,
     const char  *tagName,
-    const char  *uri,
-    domNodeType  nodeType		
+    const char  *uri
 )
 {
     domNode       *node;
@@ -4563,7 +4561,7 @@ domNewElementNodeNS (
     h = Tcl_CreateHashEntry(&HASHTAB(doc, tdom_tagNames), tagName, &hnew);
     node = (domNode*) domAlloc(sizeof(domNode));
     memset(node, 0, sizeof(domNode));
-    node->nodeType      = nodeType;
+    node->nodeType      = ELEMENT_NODE;
     node->nodeFlags     = 0;
     node->namespace     = 0;
     node->nodeNumber    = NODE_NO(doc);
@@ -4617,7 +4615,7 @@ domCloneNode (
 					 tnode->nodeType);
     }
 
-    n = domNewElementNode(node->ownerDocument, node->nodeName, node->nodeType);
+    n = domNewElementNode(node->ownerDocument, node->nodeName);
     n->namespace = node->namespace;
 
 

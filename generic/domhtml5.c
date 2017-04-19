@@ -116,12 +116,10 @@ convertGumboToDom (
                 }
             }
             if (elmns == NULL) {
-                node = domNewElementNode (parent->ownerDocument, tag,
-                                          ELEMENT_NODE);
+                node = domNewElementNode (parent->ownerDocument, tag);
             } else {
                 DBG(fprintf (stderr, "namespaced node %s\n", tag););
-                node = domNewElementNodeNS (parent->ownerDocument, tag,
-                                            elmns, ELEMENT_NODE);
+                node = domNewElementNodeNS (parent->ownerDocument, tag);
             }
             domAppendChild(parent, node);
             for (j = 0; j < gumboElm->attributes.length; ++j) {
