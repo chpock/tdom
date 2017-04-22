@@ -50,12 +50,11 @@ static const char jsonIsSpace[] = {
 };
 #define skipspace(x)  while (jsonIsSpace[(unsigned char)json[(x)]]) { (x)++; }
 
-#define rc(i) if (jparse->status != JSON_OK) return (i);
+#define rc(i) if (jparse->state != JSON_OK) return (i);
 
 /* The meaning of parse state values */
 typedef enum {
     JSON_OK,
-    JSON_NO_ARRAY,
     JSON_MAX_NESTING_REACHED,
     JSON_SYNTAX_ERR,
     JSON_INVALID_XML_NAME,
@@ -65,16 +64,22 @@ typedef enum {
 // Error sting constants, indexed by JSONParseState.
 static const char *JSONParseStateStr[] = {
     "OK",
-    "A JSON string with an array at top level cannot be parsed without a -jsonroot",
     "Maximum JSON object/array nesting depth exceeded",
     "JSON syntax error",
     "JSON object name that cannot be an XML element name",
     "JSON input includes characters not possible in an XML document."
 };
 
+typedef enum {
+    JSON_START,
+    JSON_ARRAY,
+    JSON_OBJECT
+} JSONWithin;
+
 typedef struct 
 {
-    JSONParseState status;
+    JSONParseState state;
+    JSONWithin within;
     int  nestingDepth;
     int  maxnesting;
     int  needjsonNS;
@@ -84,7 +89,7 @@ typedef struct
 } JSONParse;
 
 
-#define errReturn(i,j) {jparse->status = j; return (i);}
+#define errReturn(i,j) {jparse->state = j; return (i);}
     
 
 /* #define DEBUG */
@@ -279,7 +284,8 @@ static int jsonParseValue(
     int j;
     int first = 1;
     domNode *node;
-
+    JSONWithin savedWithin = jparse->within;
+    
     DBG(fprintf(stderr, "jsonParseValue start: '%s'\n", &json[i]););
     if (jparse->len) jparse->buf[0] = 0;
     skipspace(i);
@@ -298,6 +304,7 @@ static int jsonParseValue(
             jparse->nestingDepth--;
             return i+1;
         }
+        jparse->within = JSON_OBJECT;
         for (;;) {
             j = jsonParseString (json, i, 1, jparse);
             rc(j);
@@ -326,6 +333,7 @@ static int jsonParseValue(
             skipspace(i);
             if (json[i] == '}') {
                 jparse->nestingDepth--;
+                jparse->within = savedWithin;
                 return i+1;
             }
             if (json[i] == ',') {
@@ -349,20 +357,34 @@ static int jsonParseValue(
             jparse->nestingDepth--;
             return i+1;
         }
-        if (parent->parentNode) 
+        if (jparse->within == JSON_OBJECT) {
             node = parent;
-        else {
+        } else {
             node = domNewElementNode (parent->ownerDocument,
                                       jparse->arrItemElm);
-        }
+            domAppendChild(parent, node);
+            parent = node;
+        } 
+        jparse->within = JSON_ARRAY;
         for (;;) {
             DBG(fprintf(stderr, "Next array value node '%s'\n", &json[i]););
+            skipspace(i);
             i = jsonParseValue (node, json, i, jparse);
             rc(i);
             skipspace(i);
+            if (json[i] == ']') {
+                if (first) {
+                    domSetAttributeNS (node, "json:typehint", "array",
+                                       tdomnsjson, 1);
+                    jparse->needjsonNS = 1;
+                }
+                jparse->within = savedWithin;
+                return i+1;
+            }
             if (json[i] == ',') {
-                node = domNewElementNode (parent->ownerDocument,
-                                          parent->nodeName);
+                first = 0;
+                node = domNewElementNode (node->ownerDocument,
+                                          node->nodeName);
                 if (parent->parentNode) {
                     domAppendChild (parent->parentNode, node);
                 } else {
@@ -377,7 +399,7 @@ static int jsonParseValue(
     } else if (c =='"') {
         /* Parse string */
         j = jsonParseString (json, i, 0, jparse);
-        DBG(fprintf(stderr, "String parsing result: %s\n", JSONParseState[jparse->status]));
+        DBG(fprintf(stderr, "String parsing result: %s\n", JSONParseState[jparse->state]));
         rc(j);
         if (jparse->len && jparse->buf[0]) {
             DBG(fprintf(stderr, "New unescaped text node '%s'\n", jparse->buf));
@@ -487,7 +509,8 @@ JSON_Parse (
     int hnew, pos = 0;
 
     h = Tcl_CreateHashEntry(&HASHTAB(doc, tdom_tagNames), "item", &hnew);
-    jparse.status = JSON_OK;
+    jparse.state = JSON_OK;
+    jparse.within = JSON_START;
     jparse.nestingDepth = 0;
     jparse.maxnesting = maxnesting;
     jparse.needjsonNS = 0;
@@ -498,7 +521,7 @@ JSON_Parse (
     skipspace(pos);
     if (json[pos] == '\0') {
         *byteIndex = pos;
-        jparse.status = JSON_SYNTAX_ERR;
+        jparse.state = JSON_SYNTAX_ERR;
         goto reportError;
     }
     if (documentElement) {
@@ -509,7 +532,7 @@ JSON_Parse (
         root = doc->rootNode;
     }
     *byteIndex = jsonParseValue (root, json, pos, &jparse );
-    if (jparse.status != JSON_OK) goto reportError;
+    if (jparse.state != JSON_OK) goto reportError;
     if (*byteIndex > 0) {
         pos = *byteIndex;
         skipspace(pos);
@@ -531,6 +554,6 @@ reportError:
     }
     domFreeDocument (doc, NULL, NULL);
     doc = NULL;
-    *errStr = (char *)JSONParseStateStr[jparse.status];
+    *errStr = (char *)JSONParseStateStr[jparse.state];
     return doc;
 }
