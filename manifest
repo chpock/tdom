@@ -1,5 +1,5 @@
-C More\swork\sin\sprogress.\sSaved\sfor\stransport.
-D 2017-04-22T13:26:29.940
+C Adjust\stests\saccording\sto\show\sthe\scode\snow\sworks.
+D 2017-04-24T00:05:18.428
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -218,7 +218,7 @@ F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
 F tests/html5reader.test f839da02dd4b1227a2ee3bae9abfba983951d9ad
 F tests/htmlreader.test 0fffea0d73efb2ccf5e3a807e68b437f55a152d2
 F tests/i18n.test f5493417c35c973a0d8651c3c13d5d4e8272f6bf
-F tests/jsonreader.test ab101ebe85db1af74d4c2c081e3b4e5193936acb
+F tests/jsonreader.test 1061d0365930fe9b64b3ed46d8692349dd575914
 F tests/loadtdom.tcl bf298e4effa2a7de7380687911994f762c0f0c84
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
 F tests/parser.test 7ab920967c1dcf32f1c2fa618e12395d3b734c3a
@@ -245,8 +245,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 71f5139f11a7461a68e4f10c135d7ca6f9ffda4f
-R 8d97d67edae44af601debd8bc17f34e9
+P 6b4b6bb48586d43ecfdc22c4fa0305c500eb6985
+R b9a4d27f82e14e76a07aab9b67eb6107
 U rolf
-Z d83d728e33b972a185bad67734b6f99c
+Z 723472cb6e835bbc9fd66b2f79dd6d95
 # Remove this line to create a well-formed Fossil manifest.

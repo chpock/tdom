@@ -104,11 +104,11 @@ test json-1.14 {JSON syntax error} {
 "{"a":- <--Error-- }"}}
 
 test json-1.15 {Parse JSON - nested object} {
-    set doc [dom parse -json -jsonroot obj {["a",["aa","bb"],"b"]}]
+    set doc [dom parse -json {["a",["aa","bb"],"b"]}]
     set result [$doc asXML -indent none]
     $doc delete
     set result
-} "<a><aa>aavalue</aa><bb>bbvalue</bb></a><b>bvalue</b><c>0.123</c>"
+} "<item>a</item><item><item>aa</item><item>bb</item></item><item>b</item>"
 
 test json-2.1 {invalid xml name} {
     set result [catch {dom parse -json {{"a":"a value","1b":"1value"}}} errMsg]
@@ -150,7 +150,14 @@ test json-3.4 {unescaping} {
     set result [$doc asXML -indent none]
     $doc delete
     set result
-} {<json xmlns:json="http://tdom.org/json" json:typehint="array">\a</json>}
+} {<json xmlns:json="http://tdom.org/json"><item json:typehint="array">\a</item></json>}
+
+test json-3.4.1 {unescaping} {
+    set doc [dom parse -jsonroot json -json {["\\a","\u0071"]}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<json><item>\a</item><item>q</item></json>}
 
 test json-3.5 {unescaping} {
     set result [catch {dom parse -json {{"this":"a\lb"}}} errMsg]
