@@ -1999,7 +1999,7 @@ int tcldom_appendFromTclList (
         return TCL_ERROR;
     }
     CheckName (interp, tag_name, "tag", 0);
-    newnode = domNewElementNode(node->ownerDocument, tag_name, ELEMENT_NODE);
+    newnode = domNewElementNode(node->ownerDocument, tag_name);
     domAppendChild(node, newnode);
 
     /*------------------------------------------------------------------------
@@ -2139,31 +2139,6 @@ Tcl_Obj * tcldom_treeAsTclList (
     objv[2] = childList;
 
     return Tcl_NewListObj(3, objv);
-}
-
-/*----------------------------------------------------------------------------
-|   tcldom_treeAsJSON
-|
-\---------------------------------------------------------------------------*/
-static
-void tcldom_treeAsJSON (
-    Tcl_Obj     *JSONString,
-    domNode     *node,
-    Tcl_Channel  channel,
-    int          indent
-)
-{
-    domNode     *child;
-    domAttrNode *attr;
-
-
-    child = node->firstChild;
-    if (child->nodeType == TEXT_NODE) {
-        attr = node->firstAttr;
-        while (attr) {
-        }
-    }
-    
 }
 
 /*----------------------------------------------------------------------------
@@ -3034,6 +3009,117 @@ void tcldom_treeAsXML (
         } else {
             writeChars(xmlString, chan, ">",   1);
         }
+    }
+}
+
+/*----------------------------------------------------------------------------
+|   tcldom_AppendEscapedJSON
+|
+\---------------------------------------------------------------------------*/
+static
+void tcldom_AppendEscapedJSON (
+    Tcl_Obj    *jstring,
+    Tcl_Channel chan,
+    char       *value,
+    int         value_length
+)
+{
+    char  buf[APESC_BUF_SIZE+80], *b, *bLimit,  *pc, *pc1, *pEnd, charRef[10];
+    int   charDone, i;
+    int   clen = 0;
+    int   unicode;
+    Tcl_UniChar uniChar;
+
+    b = buf;
+    bLimit = b + APESC_BUF_SIZE;
+    pc = pEnd = value;
+    if (value_length != -1) {
+        pEnd = pc + value_length;
+    }
+    AP('"');
+    while (
+        (value_length == -1 && *pc)
+        || (value_length != -1 && pc != pEnd)
+    ) {
+        AP(*pc);
+        if (b >= bLimit) {
+            writeChars(jstring, chan, buf, b - buf);
+            b = buf;
+        }
+        pc++;
+    }
+    AP('"');
+    writeChars(jstring, chan, buf, b - buf);
+}
+
+/*----------------------------------------------------------------------------
+|   tcldom_treeAsJSON
+|
+\---------------------------------------------------------------------------*/
+static
+void tcldom_treeAsJSON (
+    Tcl_Obj     *jstring,
+    domNode     *node,
+    Tcl_Channel  channel,
+    int          indent
+)
+{
+    domNode     *child;
+    domTextNode *textnode;
+    domAttrNode *attr;
+
+
+    child = node->firstChild;
+    while (child) {
+        switch (child->nodeType) {
+        case CDATA_SECTION_NODE:
+        case TEXT_NODE:
+            textnode = (domTextNode *)child;
+            attr = domGetAttributeNodeNS (node, tdomnsjson, "typehint");
+            if (attr) {
+                if (strcmp("null", attr->nodeValue) == 0
+                    && strcmp("null", textnode->nodeValue) == 0) {
+                    writeChars(jstring, channel, "null",4);
+                    break;
+                } else if (strcmp("true", attr->nodeValue) == 0
+                    && strcmp("true", textnode->nodeValue) == 0) {
+                    writeChars(jstring, channel, "true",4);
+                    break;
+                } else if (strcmp("false", attr->nodeValue) == 0
+                    && strcmp("false", textnode->nodeValue) == 0) {
+                    writeChars(jstring, channel, "false",4);
+                    break;
+                }
+            }
+            tcldom_AppendEscapedJSON (jstring, channel, textnode->nodeValue,
+                                      textnode->valueLength);
+            break;
+        case ELEMENT_NODE:
+            attr = domGetAttributeNodeNS (child, tdomnsjson, "typehint");
+            if (attr) {
+                if (strcmp("array", attr->nodeValue) == 0) {
+                    writeChars(jstring, channel, "[", 1);
+                    child = child->firstChild;
+                    while (child) {
+                        tcldom_treeAsJSON (jstring, child, channel, indent);
+                        writeChars(jstring, channel, ",", 1);
+                        child = child->nextSibling;
+                    }
+                    writeChars(jstring, channel, "]", 1);
+                }
+            }
+            if (child->nextSibling
+                && child->nodeName == child->nextSibling->nodeName) {
+                writeChars(jstring, channel, "[", 1);
+                
+            } else {
+            }
+            break;
+        default:
+            /* Ignore them */
+            break;
+        }
+        child = child->nextSibling;
     }
 }
 
@@ -5184,7 +5270,7 @@ int tcldom_DocObjCmd (
             CheckArgs(3,4,2,"elementName ?newObjVar?");
             tag = Tcl_GetString(objv[2]);
             CheckName (interp, tag, "tag", 0);
-            n = domNewElementNode(doc, tag, ELEMENT_NODE);
+            n = domNewElementNode(doc, tag);
             return tcldom_setInterpAndReturnVar(interp, n, (objc == 4),
                                         (objc == 4) ? objv[3] : NULL);
 
@@ -5193,7 +5279,7 @@ int tcldom_DocObjCmd (
             uri = Tcl_GetString(objv[2]);
             tag = Tcl_GetString(objv[3]);
             CheckName (interp, tag, "full qualified tag", 1);
-            n = domNewElementNodeNS(doc, tag, uri, ELEMENT_NODE);
+            n = domNewElementNodeNS(doc, tag, uri);
             return tcldom_setInterpAndReturnVar(interp, n, (objc == 5),
                                         (objc == 5) ? objv[4] : NULL);
 

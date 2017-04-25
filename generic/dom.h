@@ -764,13 +764,11 @@ domTextNode *  domNewTextNode    (domDocument *doc,
                                   domNodeType  nodeType);
 
 domNode *      domNewElementNode (domDocument *doc,
-                                  const char  *tagName,
-                                  domNodeType  nodeType);
+                                  const char  *tagName);
 		
 domNode *      domNewElementNodeNS (domDocument *doc,
                                     const char  *tagName,
-                                    const char  *uri,
-                                    domNodeType  nodeType);
+                                    const char  *uri);
 
 domProcessingInstructionNode * domNewProcessingInstructionNode (
                                   domDocument *doc,

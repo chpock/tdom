@@ -2767,8 +2767,7 @@ static int xsltSetVar (
             xpathRSInit (&rs);
             rsSetString (&rs, "");
         } else {
-            fragmentNode = domNewElementNode(xs->resultDoc, "",
-                                             ELEMENT_NODE);
+            fragmentNode = domNewElementNode(xs->resultDoc, "");
             savedLastNode = xs->lastNode;
             xs->lastNode = fragmentNode;
             /* process the children as well */
@@ -4286,7 +4285,7 @@ static int ExecAction (
 
             savedLastNode = xs->lastNode;
             xs->lastNode  = domNewElementNode (xs->resultDoc,
-                                               "container", ELEMENT_NODE);
+                                               "container");
             xsltPushVarFrame (xs);
             rc = ExecActions(xs, context, currentNode, currentPos,
                              actionNode->firstChild, errMsg);
@@ -4455,7 +4454,7 @@ static int ExecAction (
             break;
 
         case comment:
-            fragmentNode = domNewElementNode(xs->resultDoc, "", ELEMENT_NODE);
+            fragmentNode = domNewElementNode(xs->resultDoc, "");
             savedLastNode = xs->lastNode;
             xs->lastNode = fragmentNode;
             xsltPushVarFrame (xs);
@@ -4848,8 +4847,7 @@ static int ExecAction (
                              "attribute: 'yes' or 'no'", errMsg);
                 return -1;
             }
-            fragmentNode = domNewElementNode(xs->resultDoc, "",
-                                             ELEMENT_NODE);
+            fragmentNode = domNewElementNode(xs->resultDoc, "");
             savedLastNode = xs->lastNode;
             xs->lastNode = fragmentNode;
             xsltPushVarFrame (xs);
@@ -4947,7 +4945,7 @@ static int ExecAction (
                              " missing mandatory attribute \"name\".", errMsg);
                 return -1;
             }
-            fragmentNode = domNewElementNode(xs->resultDoc, "", ELEMENT_NODE);
+            fragmentNode = domNewElementNode(xs->resultDoc, "");
             savedLastNode = xs->lastNode;
             xs->lastNode = fragmentNode;
             xsltPushVarFrame (xs);

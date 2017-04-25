@@ -3,6 +3,8 @@
 # define JSON_MAX_NESTING 2000
 #endif
 
+static const char *tdomnsjson = "http://tdom.org/json";
+
 domDocument *
 JSON_Parse (
     char *json,    /* Complete text of the json string being parsed */
