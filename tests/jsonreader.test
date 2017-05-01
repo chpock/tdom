@@ -7,6 +7,7 @@
 #    json-3.*: JSON unescaping
 #    json-4.*: Unicode
 #    json-5.*: Max nesting
+#    json-6.*: asJSON
 # Copyright (c) 2017 Rolf Ade.
 
 source [file join [file dir [info script]] loadtdom.tcl]
@@ -51,7 +52,7 @@ test json-1.6 {Parse JSON - true, false, null} {
     set result [$doc asXML -indent none]
     $doc delete
     set result
-} {<a xmlns:json="http://tdom.org/json" json:typehint="boolean">true</a><b xmlns:json="http://tdom.org/json" json:typehint="boolean">false</b><c xmlns:json="http://tdom.org/json" json:typehint="null"/><d>true</d><e></e>}
+} {<a xmlns:json="http://tdom.org/json" json:typehint="boolean">true</a><b xmlns:json="http://tdom.org/json" json:typehint="boolean">false</b><c xmlns:json="http://tdom.org/json" json:typehint="null">null</c><d>true</d><e></e>}
 
 test json-1.7 {Parse JSON - array in nested object} {
     set doc [dom parse -json {{"a":{"aa":[1,2,3,4,"abc"]},"b":"bvalue"}}]
@@ -65,7 +66,7 @@ test json-1.8 {Parse JSON - true, false, null} {
     set result [$doc asXML -indent none]
     $doc delete
     set result
-} {<JSONObject xmlns:json="http://tdom.org/json"><a json:typehint="boolean">true</a><b json:typehint="boolean">false</b><c json:typehint="null"/><d>true</d><e></e></JSONObject>}
+} {<JSONObject xmlns:json="http://tdom.org/json"><a json:typehint="boolean">true</a><b json:typehint="boolean">false</b><c json:typehint="null">null</c><d>true</d><e></e></JSONObject>}
 
 test json-1.9 {JSON syntax error} {
     set result [catch {dom parse -json {{"a" "a value"}}} errMsg]
@@ -255,3 +256,35 @@ test json-5.6 {-jsonmaxnesting} {
 <four>b</four>
 <four>c</four>
 }
+
+set jsons {
+    {{"a":"avalue","b":"bvalue","c":0.123}}
+    {{"a":["avalue"]}}
+    {{"a":"a value","b":"1value"}}
+    {{"a":{"aa":"aavalue","bb":"bbvalue"},"b":"bvalue","c":0.123}}
+    {{"a":[1,2,3,4,"abc"]}}
+    {{"a":true,"b":false,"c":null,"d":"true","e":""}}
+    {{"a":{"aa":[1,2,3,4,"abc"]},"b":"bvalue"}}
+    {{"a":true,"b":false,"c":null,"d":"true","e":""}}
+    {["a",["aa","bb"],"b"]}
+    {{"a":"a\nvalue","b":"value\tvalue"}}
+    {["\\a"]}
+    {{"this":"a\nbc"}}
+    {{"this":{"foo":"that"}}}
+    {{"this":{"foo":"that","bar":"grill"},"two":"value","three":{"t1":"t1value","t2":"t2value"},"four":["a","b","c"]}}
+}
+test json-6.1 {asJSON} {
+    set failedlist [list]
+    set ind 0
+    foreach json $jsons {
+        set doc [dom parse -json -jsonroot o $json]
+        set out [[$doc documentElement] asJSON]
+        if {$json ne $out} {
+            lappend failedlist "$ind : '$json' : '$out'"
+        }
+        incr ind
+    }
+    set failedlist
+} {}
+
+                 

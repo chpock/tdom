@@ -396,7 +396,7 @@ static int jsonParseValue(
             }
             errReturn(i,JSON_SYNTAX_ERR);
         }
-    } else if (c =='"') {
+    } else if (c == '"') {
         /* Parse string */
         j = jsonParseString (json, i, 0, jparse);
         DBG(fprintf(stderr, "String parsing result: %s\n", JSONParseState[jparse->state]));
@@ -410,6 +410,10 @@ static int jsonParseValue(
                                 TEXT_NODE));
         } else {
             DBG(save = json[j];json[j] = '\0';fprintf(stderr, "New text node '%s'\n", &json[i+1]);json[j] = save;);
+            /* TODO: Since no unescaping was necessary, we have to
+             * check, if the JSON string would be also a valid JSON
+             * number. If yes, we should set the typehint "string" at
+             * the parent. */
             domAppendChild (parent,
                             (domNode *) domNewTextNode (
                                 parent->ownerDocument,
@@ -422,6 +426,10 @@ static int jsonParseValue(
                && !isalnum(json[i+4])) {
         domSetAttributeNS (parent, "json:typehint", "null", tdomnsjson, 1);
         jparse->needjsonNS = 1;
+        domAppendChild (parent,
+                        (domNode *) domNewTextNode (
+                            parent->ownerDocument,
+                            "null", 4, TEXT_NODE));
         return i+4;
     } else if (c == 't'
                && strncmp (json+i, "true", 4) == 0
@@ -447,13 +455,13 @@ static int jsonParseValue(
         /* Parse number */
         int seenDP = 0;
         int seenE = 0;
-        if( c<='0' ){
+        if (c<='0') {
             j = (c == '-' ? i+1 : i);
-            if (json[j] == '0' && json[j+1] >= '0' && json[j+1] <= '9' )
+            if (json[j] == '0' && json[j+1] >= '0' && json[j+1] <= '9')
                 errReturn(j+1,JSON_SYNTAX_ERR);
         }
         j = i+1;
-        for(;; j++){
+        for (;; j++) {
             c = json[j];
             if (c >= '0' && c <= '9') continue;
             if (c == '.') {
@@ -547,6 +555,7 @@ JSON_Parse (
     if (jparse.len > 0) {
         FREE (jparse.buf);
     }
+    domSetDocumentElement (doc);
     return doc;
 reportError:
     if (jparse.len > 0) {
