@@ -52,37 +52,39 @@ static const char jsonIsSpace[] = {
 
 #define rc(i) if (jparse->state != JSON_OK) return (i);
 
+#define JSON_ARRAY 1
+#define JSON_OBJECT 2
+#define JSON_NULL 3
+#define JSON_TRUE 4
+#define JSON_FALSE 5
+#define JSON_STRING 6
+#define JSON_NUMBER 7
+
 /* The meaning of parse state values */
 typedef enum {
     JSON_OK,
     JSON_MAX_NESTING_REACHED,
     JSON_SYNTAX_ERR,
-    JSON_INVALID_XML_NAME,
-    JSON_INVALID_XML_CHAR
 } JSONParseState;
 
-// Error sting constants, indexed by JSONParseState.
+/* Error string constants, indexed by JSONParseState. */
 static const char *JSONParseStateStr[] = {
     "OK",
     "Maximum JSON object/array nesting depth exceeded",
     "JSON syntax error",
-    "JSON object name that cannot be an XML element name",
-    "JSON input includes characters not possible in an XML document."
 };
 
 typedef enum {
     JSON_START,
-    JSON_ARRAY,
-    JSON_OBJECT
+    JSON_WITHIN_ARRAY,
+    JSON_WITHIN_OBJECT
 } JSONWithin;
 
-typedef struct 
-{
+typedef struct {
     JSONParseState state;
     JSONWithin within;
     int  nestingDepth;
     int  maxnesting;
-    int  needjsonNS;
     char *arrItemElm;
     char *buf;
     int len;
@@ -115,12 +117,11 @@ static int jsonIs4Hex(const char *z){
 static int jsonParseString (
     char *json,
     int   i,
-    int   needName,
     JSONParse *jparse
     )
 {
     unsigned char c;
-    int clen, j, k, savedStart, firstchar = 1;
+    int clen, j, k, savedStart;
     unsigned int u;
     
     DBG(fprintf(stderr, "jsonParseString start: '%s'\n", &json[i]););
@@ -132,10 +133,6 @@ static int jsonParseString (
     }
     i++;
     if (json[i] == '"') {
-        if (needName) {
-            /* The empty string isn't a valid XML element name */
-            errReturn(i,JSON_INVALID_XML_NAME);
-        }
         return i;
     }
     for(;;) {
@@ -151,21 +148,9 @@ static int jsonParseString (
         if (c == '"') {
             return i;
         }
-        if (needName) {
-            if (firstchar) {
-                if (!isNameStart(&json[i]))
-                    errReturn(i,JSON_INVALID_XML_NAME);
-            } else {
-                if (!isNameChar(&json[i]))
-                    errReturn(i,JSON_INVALID_XML_NAME);
-            }
-        }
         if ((clen = UTF8_CHAR_LEN(c)) == 0)
             errReturn(i,JSON_SYNTAX_ERR);
-        if (!UTF8_XMLCHAR(&json[i],clen))
-            errReturn(i,JSON_INVALID_XML_CHAR);
         i += clen;
-        firstchar = 0;
     }
     unescape:
     /* If we here, then i points to the first backslash in the string
@@ -176,7 +161,6 @@ static int jsonParseString (
         memcpy (jparse->buf, &json[savedStart+1], i-savedStart);
     }
     j = i-savedStart-1;
-    if (j == 0) firstchar = 1;
     for(;;) {
         c = json[i];
         /* Unescaped control characters are not allowed in JSON
@@ -235,37 +219,17 @@ static int jsonParseString (
                 clen = 1;
                 i += 2;
             }
-            if (needName) {
-                if (firstchar) {
-                    if (needName && !isNameStart(jparse->buf+j-clen))
-                        errReturn(i-1,JSON_INVALID_XML_NAME);
-                } else {
-                    if (!isNameChar(jparse->buf+j-clen))
-                        errReturn(i-1,JSON_INVALID_XML_NAME);
-                }
-            } else {
-                if (!UTF8_XMLCHAR(jparse->buf+j-clen,clen))
-                    errReturn(i-1,JSON_INVALID_XML_CHAR);
-            }
-            firstchar = 0;
             continue;
         }
         if (c == '"') {
             jparse->buf[j] = '\0';
             return i;
         }
-        if (needName) {
-            if (!isNameChar(&json[i]))
-                errReturn(i,JSON_INVALID_XML_NAME);
-        }
         if ((clen = UTF8_CHAR_LEN(json[i])) == 0)
             errReturn(i,JSON_SYNTAX_ERR);
-        if (!needName && !UTF8_XMLCHAR(&json[i],clen))
-            errReturn(i,JSON_INVALID_XML_CHAR);
         for (k = 0; k < clen; k++) {
             jparse->buf[j++] = json[i+k];
         }
-        firstchar = 0;
         i += clen;
     }
 }
@@ -284,6 +248,7 @@ static int jsonParseValue(
     int j;
     int first = 1;
     domNode *node;
+    domTextNode *newTextNode;
     JSONWithin savedWithin = jparse->within;
     
     DBG(fprintf(stderr, "jsonParseValue start: '%s'\n", &json[i]););
@@ -297,13 +262,12 @@ static int jsonParseValue(
         skipspace(i);
         if (json[i] == '}') {
             /* Empty object. */
-            /* domSetAttributeNS (parent, "json:type", "member", tdomnsjson, 0); */
             jparse->nestingDepth--;
             return i+1;
         }
-        jparse->within = JSON_OBJECT;
+        jparse->within = JSON_WITHIN_OBJECT;
         for (;;) {
-            j = jsonParseString (json, i, 1, jparse);
+            j = jsonParseString (json, i, jparse);
             rc(j);
             if (jparse->len && jparse->buf[0]) {
                 DBG(fprintf(stderr, "New object member '%s'\n", jparse->buf););
@@ -348,13 +312,11 @@ static int jsonParseValue(
         if (json[i] == ']') {
             /* empty array */
             DBG(fprintf(stderr,"Empty JSON array.\n"););
-            domSetAttributeNS (parent, "json:typehint", "array",
-                               tdomnsjson, 1);
-            jparse->needjsonNS = 1;
+            parent->info = JSON_ARRAY;
             jparse->nestingDepth--;
             return i+1;
         }
-        if (jparse->within == JSON_OBJECT) {
+        if (jparse->within == JSON_WITHIN_OBJECT) {
             node = parent;
         } else {
             node = domNewElementNode (parent->ownerDocument,
@@ -362,7 +324,7 @@ static int jsonParseValue(
             domAppendChild(parent, node);
             parent = node;
         } 
-        jparse->within = JSON_ARRAY;
+        jparse->within = JSON_WITHIN_ARRAY;
         for (;;) {
             DBG(fprintf(stderr, "Next array value node '%s'\n", &json[i]););
             skipspace(i);
@@ -371,9 +333,7 @@ static int jsonParseValue(
             skipspace(i);
             if (json[i] == ']') {
                 if (first) {
-                    domSetAttributeNS (node, "json:typehint", "array",
-                                       tdomnsjson, 1);
-                    jparse->needjsonNS = 1;
+                    node->info = JSON_ARRAY;
                 }
                 jparse->within = savedWithin;
                 return i+1;
@@ -395,58 +355,46 @@ static int jsonParseValue(
         }
     } else if (c == '"') {
         /* Parse string */
-        j = jsonParseString (json, i, 0, jparse);
-        DBG(fprintf(stderr, "String parsing result: %s\n", JSONParseState[jparse->state]));
+        j = jsonParseString (json, i, jparse);
         rc(j);
         if (jparse->len && jparse->buf[0]) {
             DBG(fprintf(stderr, "New unescaped text node '%s'\n", jparse->buf));
-            domAppendChild (parent,
-                            (domNode *) domNewTextNode (
-                                parent->ownerDocument,
-                                jparse->buf, strlen(jparse->buf),
-                                TEXT_NODE));
+            newTextNode = domNewTextNode (parent->ownerDocument,
+                                          jparse->buf, strlen(jparse->buf),
+                                          TEXT_NODE);
+            newTextNode->info = JSON_STRING;
+            domAppendChild (parent, (domNode *) newTextNode);
         } else {
             DBG(save = json[j];json[j] = '\0';fprintf(stderr, "New text node '%s'\n", &json[i+1]);json[j] = save;);
-            /* TODO: Since no unescaping was necessary, we have to
-             * check, if the JSON string would be also a valid JSON
-             * number. If yes, we should set the typehint "string" at
-             * the parent. */
-            domAppendChild (parent,
-                            (domNode *) domNewTextNode (
-                                parent->ownerDocument,
-                                &json[i+1], j-i-1,
-                                TEXT_NODE));
+            newTextNode = domNewTextNode (parent->ownerDocument,
+                                          &json[i+1], j-i-1, TEXT_NODE);
+            newTextNode->info = JSON_STRING;
+            domAppendChild (parent, (domNode *) newTextNode);
         }
         return j+1;
     } else if (c == 'n'
                && strncmp (json+i, "null", 4) == 0
                && !isalnum(json[i+4])) {
-        domSetAttributeNS (parent, "json:typehint", "null", tdomnsjson, 1);
-        jparse->needjsonNS = 1;
-        domAppendChild (parent,
-                        (domNode *) domNewTextNode (
-                            parent->ownerDocument,
-                            "null", 4, TEXT_NODE));
+        newTextNode = domNewTextNode (parent->ownerDocument, "null", 4,
+                                      TEXT_NODE);
+        newTextNode->info = JSON_NULL;
+        domAppendChild (parent, (domNode *) newTextNode);
         return i+4;
     } else if (c == 't'
                && strncmp (json+i, "true", 4) == 0
                && !isalnum(json[i+4])) {
-        domSetAttributeNS (parent, "json:typehint", "boolean", tdomnsjson, 1);
-        jparse->needjsonNS = 1;
-        domAppendChild (parent,
-                        (domNode *) domNewTextNode (
-                            parent->ownerDocument,
-                            "true", 4, TEXT_NODE));
+        newTextNode = domNewTextNode (parent->ownerDocument, "true", 4,
+                                      TEXT_NODE);
+        newTextNode->info = JSON_TRUE;
+        domAppendChild (parent, (domNode *) newTextNode);
         return i+4;
     } else if (c == 'f'
                && strncmp (json+i, "false", 5) == 0
                && !isalnum(json[i+5])) {
-        domSetAttributeNS (parent, "json:typehint", "boolean", tdomnsjson, 1);
-        jparse->needjsonNS = 1;
-        domAppendChild (parent,
-                        (domNode *) domNewTextNode (
-                            parent->ownerDocument,
-                            "false", 5, TEXT_NODE));
+        newTextNode = domNewTextNode (parent->ownerDocument, "false", 5,
+                                      TEXT_NODE);
+        newTextNode->info = JSON_FALSE;
+        domAppendChild (parent, (domNode *) newTextNode);
         return i+5;
     } else if (c == '-' || (c>='0' && c<='9')) {
         /* Parse number */
@@ -518,7 +466,6 @@ JSON_Parse (
     jparse.within = JSON_START;
     jparse.nestingDepth = 0;
     jparse.maxnesting = maxnesting;
-    jparse.needjsonNS = 0;
     jparse.arrItemElm = (char*)&h->key;
     jparse.buf = NULL;
     jparse.len = 0;
@@ -532,7 +479,6 @@ JSON_Parse (
     if (documentElement) {
         root = domNewElementNode(doc, documentElement);
         domAppendChild(doc->rootNode, root);
-        domSetAttributeNS (root, "xmlns:json", tdomnsjson, NULL, 0);
     } else {
         root = doc->rootNode;
     }
@@ -545,9 +491,6 @@ JSON_Parse (
     if (json[pos] != '\0') {
         *byteIndex = pos;
         goto reportError;
-    }
-    if (!jparse.needjsonNS) {
-        domRemoveAttribute(root, "xmlns:json");
     }
     if (jparse.len > 0) {
         FREE (jparse.buf);
