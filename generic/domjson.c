@@ -297,10 +297,7 @@ static int jsonParseValue(
         skipspace(i);
         if (json[i] == '}') {
             /* Empty object. */
-            /* Needed is only one type attribute for empty elements,
-             * either for object or array, the not typed must be the
-             * other one. */
-            /* domSetAttributeNS (parent, "json:type", "object", tdomnsjson, 0); */
+            /* domSetAttributeNS (parent, "json:type", "member", tdomnsjson, 0); */
             jparse->nestingDepth--;
             return i+1;
         }

@@ -3024,11 +3024,9 @@ void tcldom_AppendEscapedJSON (
     int         value_length
 )
 {
-    char  buf[APESC_BUF_SIZE+80], *b, *bLimit,  *pc, *pc1, *pEnd, charRef[10];
-    int   charDone, i;
+    char  buf[APESC_BUF_SIZE+80], *b, *bLimit,  *pc, *pEnd;
+    int   i;
     int   clen = 0;
-    int   unicode;
-    Tcl_UniChar uniChar;
 
     b = buf;
     bLimit = b + APESC_BUF_SIZE;
@@ -3212,7 +3210,7 @@ void tcldom_treeAsJSON (
     if (arrayContent) {
         item = child;
         while (item && strcmp (item->nodeName, "item") == 0) {
-            attr = gettypehint (child);
+            attr = gettypehint (item);
             if (attr) break;
             item = item->nextSibling;
             while (item && item->nodeType != ELEMENT_NODE) {
@@ -3222,7 +3220,21 @@ void tcldom_treeAsJSON (
             if (item) continue;
             /* We're at the end of all child nodes and every element
              * name is the array item name: This is a nested array. */
-            isArray= 1;
+            isArray = 1;
+        }
+        /* Is child the only element child and has the array item
+         * name, has it an array typehint? */
+        item = child->nextSibling;
+        while (item) {
+            if (item->nodeType == ELEMENT_NODE) break;
+            item = item->nextSibling;
+        }
+        if (!item) {
+            /* child is the only element child */
+            attr = gettypehint (child);
+            if (attr && strcmp ("array", attr->nodeValue) == 0) {
+                isArray = 1;
+            }
         }
         if (isArray) {
             writeChars (jstring, channel, "[", 1);
