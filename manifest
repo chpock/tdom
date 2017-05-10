@@ -1,5 +1,5 @@
-C Let's\simplement\sit\smuch\ssimpler\sand\swithout\sfactitious\slimitations.
-D 2017-05-09T23:47:58.843
+C See\s-\swhy\sthis\slimits\sto\sXML\sname\sand\schar\sdata\srules.
+D 2017-05-10T00:24:33.832
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -218,7 +218,7 @@ F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
 F tests/html5reader.test f839da02dd4b1227a2ee3bae9abfba983951d9ad
 F tests/htmlreader.test 0fffea0d73efb2ccf5e3a807e68b437f55a152d2
 F tests/i18n.test f5493417c35c973a0d8651c3c13d5d4e8272f6bf
-F tests/jsonreader.test 3ced6353389e4acd3dc39991cf06492160bac0cb
+F tests/jsonreader.test 04dea98930fcd41d30a92064a5fde91cc39ced5f
 F tests/loadtdom.tcl bf298e4effa2a7de7380687911994f762c0f0c84
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
 F tests/parser.test 7ab920967c1dcf32f1c2fa618e12395d3b734c3a
@@ -245,8 +245,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 96c82f8a343cb1527d1014af9c7969413336baed
-R c4644bbbc27caad6ecf4f6621a1ea8c6
+P 0e69127b1032503b957daa1d6fdaa308041241de
+R 9e1f96254cbab3d59f1c8243c39096c9
 U rolf
-Z d4e5edf1016957a1d1ba85c10ba73841
+Z 6a36a7755b4539669eb55613d4ee1f9d
 # Remove this line to create a well-formed Fossil manifest.

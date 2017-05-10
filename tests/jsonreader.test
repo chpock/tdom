@@ -24,7 +24,7 @@ test json-1.2 {Parse JSON} {
     set result [$doc asXML -indent none]
     $doc delete
     set result
-} {<a xmlns:json="http://tdom.org/json" json:typehint="array">avalue</a>}
+} {<a>avalue</a>}
 
 test json-1.3 {Parse JSON} {
     set doc [dom parse -json {{"a":"a value","b":"1value"}}]
@@ -52,7 +52,7 @@ test json-1.6 {Parse JSON - true, false, null} {
     set result [$doc asXML -indent none]
     $doc delete
     set result
-} {<a xmlns:json="http://tdom.org/json" json:typehint="boolean">true</a><b xmlns:json="http://tdom.org/json" json:typehint="boolean">false</b><c xmlns:json="http://tdom.org/json" json:typehint="null">null</c><d>true</d><e></e>}
+} {<a>true</a><b>false</b><c>null</c><d>true</d><e></e>}
 
 test json-1.7 {Parse JSON - array in nested object} {
     set doc [dom parse -json {{"a":{"aa":[1,2,3,4,"abc"]},"b":"bvalue"}}]
@@ -66,7 +66,7 @@ test json-1.8 {Parse JSON - true, false, null} {
     set result [$doc asXML -indent none]
     $doc delete
     set result
-} {<JSONObject xmlns:json="http://tdom.org/json"><a json:typehint="boolean">true</a><b json:typehint="boolean">false</b><c json:typehint="null">null</c><d>true</d><e></e></JSONObject>}
+} {<JSONObject><a>true</a><b>false</b><c>null</c><d>true</d><e></e></JSONObject>}
 
 test json-1.9 {JSON syntax error} {
     set result [catch {dom parse -json {{"a" "a value"}}} errMsg]
@@ -112,16 +112,13 @@ test json-1.15 {Parse JSON - nested object} {
 } "<item>a</item><item><item>aa</item><item>bb</item></item><item>b</item>"
 
 test json-2.1 {invalid xml name} {
-    set result [catch {dom parse -json {{"a":"a value","1b":"1value"}}} errMsg]
-    list $result $errMsg
-} {1 {error "JSON object name that cannot be an XML element name" at position 16
-"{"a":"a value","1 <--Error-- b":"1value"}"}}
-
-test json-2.2 {invalid xml name} {
-    set result [catch {set doc [dom parse -json {{"a b":"a value","1b":"1value"}}]} errMsg]
-    list $result $errMsg
-} {1 {error "JSON object name that cannot be an XML element name" at position 3
-"{"a  <--Error-- b":"a value","1b":"1value"}"}}
+    set doc [dom parse -json {{"a":"a value","1b":"1value", "a\nb":"a\nb", "":"empty string"}}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<a>a value</a><1b>1value</1b><a
+b>a\nb</a
+b><>empty string</>}
 
 test json-3.1 {Unescaping} {
     set doc [dom parse -json {{"a":"a\nvalue","b":"value\tvalue"}}]
@@ -151,7 +148,7 @@ test json-3.4 {unescaping} {
     set result [$doc asXML -indent none]
     $doc delete
     set result
-} {<json xmlns:json="http://tdom.org/json"><item json:typehint="array">\a</item></json>}
+} {<json><item>\a</item></json>}
 
 test json-3.4.1 {unescaping} {
     set doc [dom parse -jsonroot json -json {["\\a","\u0071"]}]
@@ -182,10 +179,11 @@ test json-3.7 {unescaping} {
 } "<this>aw\txbc</this>"
 
 test json-3.8 {unescaping} {
-    set result [catch {dom parse -json {{"this":"a\u0000b"}}} errMsg]
-    list $result $errMsg
-} {1 {error "JSON input includes characters not possible in an XML document." at position 15
-"{"this":"a\u0000 <--Error-- b"}"}}
+    set doc [dom parse -json {{"this":"a\u000b"}}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} "<this>a\u000b</this>"
 
 test json-3.9 {unescaping} {
     set doc [dom parse -json {{"this":"a\u0077","that":"\t\u0078bc"}}]
