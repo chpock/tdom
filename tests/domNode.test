@@ -199,6 +199,13 @@ test domNode-2.11 {selectNodes - -cache option} {
     list $r1 $r2 $r3 $r4 $r5 $r6
 } {1 1 1 1 1 1}
 
+test domNode-2.12 {selectNodes - -cache option} {
+     # Second usage of an invalid XPath expr with -cache 1
+     # See 97c0994ae4
+     catch {$root selectNodes -cache 1 "/foo bar"}
+     catch {$root selectNodes -cache 1 "/foo bar"}
+} 1
+
 $doc delete
 
 test domNode-3.1 {repetitived documentElement with objVar, then delete} {

@@ -5189,7 +5189,7 @@ int xpathEval (
     xpathResultSet nodeList;
     int            rc, hnew = 1, docOrder = 1;
     ast            t;
-    Tcl_HashEntry *h;
+    Tcl_HashEntry *h = NULL;
 
     *errMsg = NULL;
     if (cache) {
@@ -5198,7 +5198,12 @@ int xpathEval (
     if (hnew) {
         rc = xpathParse(xpath, exprContext, XPATH_EXPR, prefixMappings,
                         parseVarCB, &t, errMsg);
-        CHECK_RC;
+        if (rc) {
+            if (h != NULL) {
+                Tcl_DeleteHashEntry(h);
+            }
+            return rc;
+        }
         if (cache) {
             Tcl_SetHashValue(h, t);
         }
