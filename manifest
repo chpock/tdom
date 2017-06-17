@@ -1,5 +1,5 @@
-C Don't\sput\ssyntaxically\swrong\sXPath\sexpressions\sinto\sthe\scache.\sFix\sfor\s[97c0994ae4].
-D 2017-06-16T00:36:08.963
+C Fix\sseg\sfault\sof\sremoveAttributeNS,\sif\sthere\sis\sa\snot\snamespaced\sattribute\swith\sthe\ssame\slocalname\sas\sthe\sattribute\sto\sremove.
+D 2017-06-17T01:03:42.399
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -122,7 +122,7 @@ F extensions/tnc/tests/loadtnc.tcl 9472a546f30972f5ea6d16880ed57e709556ce88
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c e30dc44a8be8b99c9772daf5cafb3714d8550c37
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
-F generic/dom.c 59d29b47f4f9e5e165040c5454ab05387e35e30e
+F generic/dom.c 72cf822c4f059119efad24726e161377823eb2f9
 F generic/dom.h 6e967a3b38384b60e7dde1d856b2ee305e7ab6f2
 F generic/domalloc.c 55e9eeff19cc54cf3956a7013883ead07efd3593
 F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
@@ -208,7 +208,7 @@ F tests/dom.bench 53a2bd61133d0a6acbb2a61794da74f7e7ba9b6a
 F tests/dom.test ce4acfc3fe588b7fd33e8988e302e85a73bcc7ee
 F tests/domDoc.test ff26d5193483764310207b0ed2864e1942a1e517
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
-F tests/domNode.test 620871e6f08ab7db3094cec09ff819d90fabdc25
+F tests/domNode.test 474c227c0fccef28dc6d8ad115e40586be1999f0
 F tests/domnamespace.test bd80dfb5fb1637a0ae5007e949e7eab5c4e2f849
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
@@ -241,8 +241,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c7e9aae2522d1661646406377fbcf64bcc10768b
-R 3a474509a899c65ddacb3ea813cb8bf5
+P 5b9f6c7c6d005987ad2878b95149ba0d51ba9924
+R 0f1ee7ab389a2ba161e59c06d0d1aa2d
 U rolf
-Z bb3b90f0bec827262ea5aa0107188aa2
+Z 7cd8074a2e2c00ad7771db659a8a3684
 # Remove this line to create a well-formed Fossil manifest.
