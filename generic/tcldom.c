@@ -374,6 +374,15 @@ const Tcl_ObjType tdomNodeType = {
     SetTdomNodeFromAny
 };
 
+typedef struct tcldom_ParseVarData {
+    ast t;
+    Tcl_Interp * interp;
+    int          allocated;
+    int          used; 
+    Tcl_Parse    parse[1];
+} tcldom_ParseVarData;
+
+
 /*----------------------------------------------------------------------------
 |   Prototypes for procedures defined later in this file:
 |
@@ -1577,39 +1586,71 @@ int tcldom_xsltMsgCB (
 }
 
 /*----------------------------------------------------------------------------
-|   tcldom_xpathResolveVar
+|   tcldom_xpathParseVar
 |
 \---------------------------------------------------------------------------*/
-static
-char * tcldom_xpathResolveVar (
+int tcldom_xpathParseVar (
     void  *clientData,
     char  *strToParse,
     int   *offset,
     char **errMsg
     )
 {
-    CONST char *varValue;
-    CONST char *termPtr;
-    Tcl_Interp *interp = (Tcl_Interp *) clientData;
-    
+    tcldom_ParseVarData *pvcd = clientData;
+    int idx, rc, res, size;
+    idx = pvcd->used;
     *offset = 0;
-    varValue = Tcl_ParseVar(interp, strToParse, &termPtr);
-    if (varValue) {
-        *offset = termPtr - strToParse;
-        /* If strToParse start with a single '$' without a following
-         * var name (according to tcl var name rules), Tcl_ParseVar()
-         * doesn't report a parsing error but returns just a pointer
-         * to a static string "$". */ 
-        if (*offset == 1) {
-            *errMsg = tdomstrdup ("Missing var name after '$'.");
-            varValue = NULL;
-        }
-    } else {
-        *errMsg = tdomstrdup (Tcl_GetStringResult(interp));
+    if (idx == pvcd->allocated) {
+        pvcd = REALLOC(pvcd, sizeof(
+            tcldom_ParseVarData) + (pvcd->allocated * 2 - 1) * sizeof(Tcl_Parse));
+        pvcd->allocated = pvcd->allocated * 2;
     }
-    Tcl_ResetResult (interp);
-    return (char*)varValue;
+    rc = Tcl_ParseVarName(pvcd->interp, strToParse, -1, &pvcd->parse[idx], 0);
+
+    if (rc != TCL_OK) {
+        *errMsg = tdomstrdup (Tcl_GetStringResult(pvcd->interp));
+        res = -1;
+        goto cleanup0;
+    }
+
+    if (pvcd->parse[idx].numTokens > 1) {
+        for (size = 0; size < pvcd->parse[idx].numTokens; size++) {
+            *offset += pvcd->parse[idx].tokenPtr[size].size;
+            size += pvcd->parse[idx].tokenPtr[size].numComponents;
+        }
+        res = idx++;
+    } else if (pvcd->parse[pvcd->used].numTokens == 1) {
+        /* If strToParse starts with a single '$' without a following var name
+         * (according to tcl var name rules), Tcl_ParseVarName() doesn't report
+         * a parsing error adds just one token to the parse structure .
+         */ 
+        *errMsg = tdomstrdup ("Missing var name after '$'.");
+        res = -1;
+    } else {
+        *errMsg = tdomstrdup (Tcl_GetStringResult(pvcd->interp));
+        res = -1;
+    }
+    cleanup0:
+        return res;
 }
+
+
+int tcldom_xpathGetVar (tcldom_ParseVarData * pvcd, int id,
+    xpathResultSet *result, char  **errMsg) {
+    int res;
+    Tcl_Obj *scriptres = NULL;
+    scriptres = Tcl_EvalTokens(
+        pvcd->interp, pvcd->parse[id].tokenPtr, pvcd->parse[id].numTokens);
+    if (scriptres == NULL) {
+        *errMsg = tdomstrdup(Tcl_GetStringResult(pvcd->interp));
+        res = TCL_ERROR;
+    } else {
+        res = TCL_OK;
+        rsSetString(result, Tcl_GetStringFromObj(scriptres,NULL));
+    }
+    return res;
+}
+
 
 /*----------------------------------------------------------------------------
 |   tcldom_selectNodes
@@ -1625,7 +1666,9 @@ int tcldom_selectNodes (
 {
     char          *xpathQuery, *typeVar, *option;
     char          *errMsg = NULL, **mappings = NULL;
-    int            rc, i, len, optionIndex, localmapping, cache = 0;
+    int            hnew = 1, rc = TCL_OK, i, len, optionIndex, localmapping, cache = 0;
+    Tcl_HashEntry *h = NULL;
+    tcldom_ParseVarData *pvcd;
     xpathResultSet rs;
     Tcl_Obj       *type, *objPtr;
     xpathCBs       cbs;
@@ -1671,6 +1714,13 @@ int tcldom_selectNodes (
                    of the prefixMappings list members.
                    If we, at some day, allow to evaluate tcl scripts during
                    xpath lexing/parsing, this must be revisited. */
+
+                /*
+                    Actually, prior to the commit that includes this note,
+                    scripts were in fact potentially evaluated during xpath
+                    lexing parsing, as tcldom_xpathParseVar called
+                    Tcl_ParseVar.  Now it calls Tcl_ParseVarName instead.
+                        - PYK 2017-06-20 */
                 mappings[i] = Tcl_GetString (objPtr);
             }
             mappings[len] = NULL;
@@ -1699,20 +1749,22 @@ int tcldom_selectNodes (
             FREE (mappings);
         }
         SetResult("Wrong # of arguments.");
-        return TCL_ERROR;
+        rc = TCL_ERROR;
+        goto cleanup0;
     }
 
     xpathQuery = Tcl_GetString(objv[1]);
 
     xpathRSInit(&rs);
 
-    cbs.funcCB         = tcldom_xpathFuncCallBack;
-    cbs.funcClientData = interp;
-    cbs.varCB          = NULL;
-    cbs.varClientData  = NULL;
+    pvcd = MALLOC(sizeof(tcldom_ParseVarData) + 7 * sizeof(Tcl_Parse));
+    pvcd->t = NULL;
+    pvcd->interp = interp;
+    pvcd->allocated = 8;
+    pvcd->used = 0;
 
-    parseVarCB.parseVarCB         = tcldom_xpathResolveVar;
-    parseVarCB.parseVarClientData = interp;
+    parseVarCB.parseVarCB         = tcldom_xpathParseVar;
+    parseVarCB.parseVarClientData = pvcd;
     
     if (mappings == NULL) {
         mappings = node->ownerDocument->prefixNSMappings;
@@ -1720,33 +1772,47 @@ int tcldom_selectNodes (
     } else {
         localmapping = 1;
     }
+
     if (cache) {
         if (!node->ownerDocument->xpathCache) {
             node->ownerDocument->xpathCache = MALLOC (sizeof (Tcl_HashTable));
             Tcl_InitHashTable (node->ownerDocument->xpathCache,
                                TCL_STRING_KEYS);
         }
-        rc = xpathEval (node, node, xpathQuery, mappings, &cbs, &parseVarCB,
-                        node->ownerDocument->xpathCache, &errMsg, &rs);
-    } else {
-        rc = xpathEval (node, node, xpathQuery, mappings, &cbs, &parseVarCB,
-                        NULL, &errMsg, &rs);
+        h = Tcl_CreateHashEntry (
+            node->ownerDocument->xpathCache, xpathQuery, &hnew);
+        if (hnew) {
+            rc = xpathParse(xpathQuery, node, XPATH_EXPR, mappings,
+                &parseVarCB, &pvcd->t, &errMsg);
+            if (rc != XPATH_OK) {
+                Tcl_DeleteHashEntry(h);
+                rc = TCL_ERROR;
+                goto cleanup1;
+            }
+            Tcl_SetHashValue(h, pvcd);
+        } else {
+            pvcd = Tcl_GetHashValue(h);
+        }
+    }
+    
+    else {
+            rc = xpathParse(xpathQuery, node, XPATH_EXPR, mappings,
+                &parseVarCB, &pvcd->t, &errMsg);
+            if (rc != XPATH_OK) {
+                rc = TCL_ERROR;
+                goto cleanup1;
+            }
     }
 
+    cbs.funcCB         = tcldom_xpathFuncCallBack;
+    cbs.funcClientData = interp;
+    cbs.varCB          = (void (*)())tcldom_xpathGetVar;
+    cbs.varClientData  = pvcd;
+    rc = xpathEval (node, node, pvcd->t, (void *)&cbs, &errMsg, &rs);
+
     if (rc != XPATH_OK) {
-        xpathRSFree(&rs);
-        SetResult(errMsg);
-        DBG(fprintf(stderr, "errMsg = %s \n", errMsg);)
-        if (errMsg) {
-            FREE(errMsg);
-        }
-        if (localmapping && mappings) {
-            FREE(mappings);
-        }
-        return TCL_ERROR;
-    }
-    if (errMsg) {
-        FREE(errMsg);
+        rc = TCL_ERROR;
+        goto cleanup2;
     }
     typeVar = NULL;
     if (objc > 2) {
@@ -1762,11 +1828,31 @@ int tcldom_selectNodes (
     }
     Tcl_DecrRefCount(type);
 
-    xpathRSFree( &rs );
-    if (localmapping && mappings) {
-        FREE (mappings);
+    cleanup2:
+
+    if (!cache) {
+        xpathFreeAst(pvcd->t);
     }
-    return TCL_OK;
+    xpathRSFree(&rs);
+
+    cleanup1:
+
+    if (!cache) {
+        FREE(pvcd);
+    }
+
+    cleanup0:
+
+    if (localmapping && mappings) {
+        FREE(mappings);
+    }
+
+    if (errMsg) {
+        SetResult(errMsg);
+        DBG(fprintf(stderr, "errMsg = %s \n", errMsg);)
+        FREE(errMsg);
+    }
+    return rc;
 }
 
 /*----------------------------------------------------------------------------
@@ -3536,6 +3622,7 @@ static int deleteXPathCache (
 {
     Tcl_HashEntry *h;
     Tcl_HashSearch search;
+    tcldom_ParseVarData *pvcd;
     
     CheckArgs (2,3,0, "<domDoc> deleteXPathCache ?xpathQuery?");
     if (objc == 3) {
@@ -3544,7 +3631,9 @@ static int deleteXPathCache (
         }
         h = Tcl_FindHashEntry (doc->xpathCache, Tcl_GetString(objv[2]));
         if (h) {
-            xpathFreeAst((ast)Tcl_GetHashValue (h));
+            pvcd = Tcl_GetHashValue(h);
+            xpathFreeAst(pvcd->t);
+            FREE(pvcd);
             Tcl_DeleteHashEntry (h);
         }
         return TCL_OK;
@@ -3554,7 +3643,9 @@ static int deleteXPathCache (
     }
     h = Tcl_FirstHashEntry (doc->xpathCache, &search);
     while (h) {
-        xpathFreeAst((ast)Tcl_GetHashValue (h));
+        pvcd = Tcl_GetHashValue(h);
+        xpathFreeAst(pvcd->t);
+        FREE(pvcd);
         h = Tcl_NextHashEntry (&search);
     }
     Tcl_DeleteHashTable (doc->xpathCache);

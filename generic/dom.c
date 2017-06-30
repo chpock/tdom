@@ -2865,17 +2865,8 @@ domFreeDocument (
     FREE (doc->baseURIs);
     
     /*-----------------------------------------------------------
-    | delete xpath cache hash table
+    | delete resolver name
     \-----------------------------------------------------------*/
-    if (doc->xpathCache) {
-        entryPtr = Tcl_FirstHashEntry (doc->xpathCache, &search);
-        while (entryPtr) {
-            xpathFreeAst((ast)Tcl_GetHashValue (entryPtr));
-            entryPtr = Tcl_NextHashEntry (&search);
-        }
-        Tcl_DeleteHashTable (doc->xpathCache);
-        FREE (doc->xpathCache);
-    }
 
     if (doc->extResolver) {
         FREE (doc->extResolver);

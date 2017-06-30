@@ -80,7 +80,7 @@
 |
 \---------------------------------------------------------------------------*/
 #define JDBG(x)
-#define DBG(x)           
+#define DBG(x)
 #define DDBG(x)          
 #define TRACE(x)         DDBG(fprintf(stderr,(x)))
 #define TRACE1(x,a)      DDBG(fprintf(stderr,(x),(a)))
@@ -160,6 +160,7 @@ typedef enum {
     PIPE, PLUS, MINUS, EQUAL, NOTEQ, LT, LTE, GT, GTE,
     AND, OR, MOD, DIV, MULTIPLY, FUNCTION, VARIABLE,
     FQVARIABLE, WCARDNAME, COMMENT, TEXT, PINSTR, NODE, AXISNAME, 
+    EXTERNALVAR,
     EOS
 } Token;
 
@@ -170,6 +171,7 @@ static char *token2str[] = {
     "PIPE", "PLUS", "MINUS", "EQUAL", "NOTEQ", "LT", "LTE", "GT", "GTE",
     "AND", "OR", "MOD", "DIV", "MULTIPLY", "FUNCTION", "VARIABLE",
     "FQVARIABLE", "WCARDNAME", "COMMENT", "TEXT", "PI", "NODE", "AXISNAME",
+    "EXTERNALVAR",
     "EOS"
 };
 
@@ -207,7 +209,7 @@ static char *astType2str[] = {
 
     "CombinePath", "IsRoot", "ToParent", "ToAncestors", "FillNodeList",
     "FillWithCurrentNode",
-    "ExecIdKey"
+    "ExecIdKey", "GetExternalVar"
 };
 
 /*----------------------------------------------------------------------------
@@ -547,6 +549,19 @@ static ast NewInt( long i ) {
     t->next = t->child = NULL;
     return t;
 }
+
+static ast NewTypedInt( astType type, long i ) {
+    ast t = NEWCONS;
+
+    t->type      = type;
+    t->strvalue  = NULL;
+    t->intvalue  = i;
+    t->realvalue = 0.0;
+
+    t->next = t->child = NULL;
+    return t;
+}
+
 static ast NewReal( double r ) {
     ast t = NEWCONS;
 
@@ -637,7 +652,7 @@ void printAst (int depth, ast t)
             case ExecFunction:
             case Literal:
             case GetFQVar:
-            case GetVar:      fprintf(stderr, "'%s'", t->strvalue); break;
+            case GetVar:      fprintf(stderr, "'%ld'", t->intvalue); break;
 
             default: break;
         }
@@ -676,9 +691,10 @@ static XPathTokens xpathLexer (
 )
 {
     int  l, allocated;
-    int  i, k, start, offset;
+    int  i, k, start, size;
     char delim, *ps, save, tmpErr[80];
     const char *uri;
+    int cbres;
     XPathTokens tokens;
     int token = EOS;
 
@@ -839,14 +855,14 @@ static XPathTokens xpathLexer (
                        }; break;
 
             case '$':  if (varParseCB) {
-                           ps = (varParseCB->parseVarCB) (
+                           cbres = (varParseCB->parseVarCB) (
                                     varParseCB->parseVarClientData, &xpath[i],
-                                    &offset, errMsg
+                                    &size, errMsg
                                   );
-                           if (ps) {
-                               token = LITERAL;
-                               tokens[l].strvalue = tdomstrdup (ps);
-                               i += offset - 1;
+                           if (cbres >= 0) {
+                               token=EXTERNALVAR;
+                               tokens[l].intvalue = cbres;
+                               i += size - 1;
                            } else {
                                return tokens;
                            }
@@ -1261,7 +1277,11 @@ getFunctionTag (char *funcName)
 \----------------------------------------------------------------*/
 Production(FilterExpr)
 
-    if (LA==VARIABLE) {
+    if (LA==EXTERNALVAR) {
+        Consume(EXTERNALVAR);
+        a = NewTypedInt( GetExternalVar, INTVAL);
+
+    } else if (LA==VARIABLE) {
         Consume(VARIABLE);
         a = NewStr( GetVar, STRVAL);
 
@@ -1329,6 +1349,7 @@ Production(PathExpr)
 
     if ( (LA==VARIABLE)
        ||(LA==FQVARIABLE)
+       ||(LA==EXTERNALVAR)
        ||(LA==LPAR)
        ||(LA==LITERAL)
        ||(LA==INTNUMBER)
@@ -2243,14 +2264,14 @@ int xpathParse (
 )
 {
     XPathTokens tokens;
-    int  i, l, len, newlen, slen;
+    int  i, l, len, newlen, slen, status;
     int  useNamespaceAxis = 0;
     char tmp[200];
 
     DDBG(fprintf(stderr, "\nLex output following tokens for '%s':\n", xpath);)
     *errMsg = NULL;
     tokens = xpathLexer(xpath, exprContext, prefixMappings, &useNamespaceAxis, 
-                        varParseCB, errMsg);
+            varParseCB, errMsg);
     if (*errMsg != NULL) {
         if (tokens != NULL) xpathFreeTokens (tokens);
         return XPATH_LEX_ERR;
@@ -2269,7 +2290,6 @@ int xpathParse (
     )
     l = 0;
 
-    *t = NULL;
     if (type == XPATH_EXPR || type == XPATH_KEY_USE_EXPR) {
         *t = OrExpr (&l, tokens, errMsg);
     } else {
@@ -3720,7 +3740,7 @@ xpathEvalFunction (
             Tcl_DStringFree (&dStr);
             return XPATH_EVAL_ERR;
         }
-        /* fall throu */
+        /* fall through */
            
     default:
         if (cbs->funcCB == NULL) {
@@ -3811,6 +3831,8 @@ static int xpathEvalStep (
     double           dLeft = 0.0, dRight = 0.0, dTmp;
     char            *leftStr = NULL, *rightStr = NULL;
     astType          savedAstType;
+    xpathVarCallback varCB = cbs->varCB;
+    xpathExternalVarCallback externalVarCB = cbs->varCB; 
 
     if (result->type == EmptyResult) useFastAdd = 1;
     else useFastAdd = 0;
@@ -4314,20 +4336,24 @@ static int xpathEvalStep (
         }
         break;
 
+    case GetExternalVar:
+        rc = externalVarCB(
+            cbs->varClientData, step->intvalue, result, errMsg);
+        CHECK_RC;
+        break;
+
     case GetFQVar:
     case GetVar:
-        if (cbs->varCB) {
-            if (step->type == GetFQVar) {
-                leftStr  = step->child->strvalue;
-                rightStr = step->strvalue;
-            } else {
-                leftStr  = step->strvalue;
-                rightStr = NULL;
-            }
-            rc = (cbs->varCB)(cbs->varClientData, leftStr, rightStr, result,
-                              errMsg);
-            CHECK_RC;
+        if (step->type == GetFQVar) {
+            leftStr  = step->child->strvalue;
+            rightStr = step->strvalue;
+        } else {
+            leftStr  = step->strvalue;
+            rightStr = NULL;
         }
+        rc = varCB(
+            cbs->varClientData, leftStr, rightStr, result, errMsg);
+        CHECK_RC;
         break;
 
     case Literal:
@@ -5177,48 +5203,20 @@ int xpathEvalSteps (
 int xpathEval (
     domNode          * node,
     domNode          * exprContext,
-    char             * xpath,
-    char            ** prefixMappings,
-    xpathCBs         * cbs,
-    xpathParseVarCB  * parseVarCB,
-    Tcl_HashTable    * cache,
+    ast                t,
+    xpathCBs         * cbs, 
     char            ** errMsg,
     xpathResultSet   * result
 )
 {
     xpathResultSet nodeList;
     int            rc, hnew = 1, docOrder = 1;
-    ast            t;
-    Tcl_HashEntry *h = NULL;
 
-    *errMsg = NULL;
-    if (cache) {
-        h = Tcl_CreateHashEntry (cache, xpath, &hnew);
-    }
-    if (hnew) {
-        rc = xpathParse(xpath, exprContext, XPATH_EXPR, prefixMappings,
-                        parseVarCB, &t, errMsg);
-        if (rc) {
-            if (h != NULL) {
-                Tcl_DeleteHashEntry(h);
-            }
-            return rc;
-        }
-        if (cache) {
-            Tcl_SetHashValue(h, t);
-        }
-    } else {
-        t = (ast)Tcl_GetHashValue(h);
-    }
-    
     xpathRSInit( &nodeList);
     rsAddNodeFast( &nodeList, node);
 
     rc = xpathEvalSteps( t, &nodeList, node, exprContext, 0, &docOrder, cbs,
                          result, errMsg);
-    if (!cache) {
-        freeAst(t);
-    }
     xpathRSFree( &nodeList );
     CHECK_RC;
 

@@ -87,7 +87,7 @@ typedef enum {
         
     CombinePath, IsRoot, ToParent, ToAncestors, FillNodeList,
     FillWithCurrentNode,
-    ExecIdKey
+    ExecIdKey, GetExternalVar
     
 } astType;
 
@@ -138,18 +138,23 @@ typedef int (*xpathFuncCallback)
 typedef int (*xpathVarCallback) 
                 (void *clientData, char *variableName, char *varURI,
                  xpathResultSet *result, char  **errMsg);
+
+typedef int (*xpathExternalVarCallback) 
+        (void *clientData, int id, xpathResultSet *result, char  **errMsg);
                               
 typedef struct xpathCBs {               /* all xpath callbacks + clientData */
 
-    xpathVarCallback    varCB;
+    void              (*varCB)();
     void              * varClientData;
     xpathFuncCallback   funcCB;
     void              * funcClientData;
 
 } xpathCBs;
 
-typedef char * (*xpathParseVarCallback)
+
+typedef int (*xpathParseVarCallback)
     (void *clientData, char *strToParse, int *offset, char **errMsg);
+
 
 typedef struct xpathParseVarCB {
     xpathParseVarCallback parseVarCB;
@@ -171,10 +176,8 @@ int    xpathParse   (char *xpath, domNode *exprContext, xpathExprType type,
                      ast *t, char **errMsg);
 void   xpathFreeAst (ast t);
 double xpathGetPrio (ast t);
-int    xpathEval    (domNode *node, domNode *exprContext, char *xpath, 
-                     char **prefixMappings, xpathCBs *cbs,
-                     xpathParseVarCB *parseVarCB, Tcl_HashTable *catch, 
-                     char **errMsg, xpathResultSet *rs);
+int    xpathEval    (domNode *node, domNode *exprContext, ast t,
+                        xpathCBs *cbs, char **errMsg, xpathResultSet *rs);
 int    xpathMatches (ast steps, domNode * exprContext, domNode *nodeToMatch,
                      xpathCBs *cbs, char **errMsg 
                     );

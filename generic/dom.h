@@ -43,7 +43,7 @@
 #include <domalloc.h>
 
 /*
- * tDOM provides it's own memory allocator which is optimized for
+ * tDOM provides its own memory allocator which is optimized for
  * low heap usage. It uses the native Tcl allocator underneath,
  * though, but it is not very MT-friendly. Therefore, you might
  * use the (normal) Tcl allocator with USE_NORMAL_ALLOCATOR
