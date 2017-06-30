@@ -2759,7 +2759,8 @@ domFreeDocument (
     int           i, dontfree = 0;
     Tcl_HashEntry *entryPtr;
     Tcl_HashSearch search;
-
+    tcldom_ParseVarData *pvcd;
+    
     if (doc->nodeFlags & DONT_FREE) {
         doc->nodeFlags &= ~DONT_FREE;
         dontfree = 1;
@@ -2864,6 +2865,21 @@ domFreeDocument (
     Tcl_DeleteHashTable (doc->baseURIs);
     FREE (doc->baseURIs);
     
+    /*-----------------------------------------------------------
+    | delete xpath cache hash table
+    \-----------------------------------------------------------*/
+    if (doc->xpathCache) {
+        entryPtr = Tcl_FirstHashEntry (doc->xpathCache, &search);
+        while (entryPtr) {
+            pvcd = (tcldom_ParseVarData *)Tcl_GetHashValue (entryPtr);
+            xpathFreeAst (pvcd->t);
+            FREE (pvcd);
+            entryPtr = Tcl_NextHashEntry (&search);
+        }
+        Tcl_DeleteHashTable (doc->xpathCache);
+        FREE (doc->xpathCache);
+    }
+
     /*-----------------------------------------------------------
     | delete resolver name
     \-----------------------------------------------------------*/

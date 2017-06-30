@@ -868,6 +868,73 @@ test xpath-5.34 {tcl var resolution in expr} {
     set result
 } {3 1 2 0}
 
+test xpath-5.35 {tcl var resolution in xpath expr} {
+    set doc [dom parse {<doc><e>1</e><e>2</e><e>3</e><e>4</e></doc>}]
+    set node [$doc documentElement] 
+    set i 2
+    set result [list]
+    lappend result [$node selectNodes -cache 1 {string(*[position()=$i])}]
+    set i 3
+    lappend result [$node selectNodes -cache 1 {string(*[position()=$i])}]
+    $doc delete
+    set result
+} {2 3}
+
+test xpath-5.36 {tcl var resolution in xpath expr} {
+    set doc [dom parse {<doc><e>1</e><e>2</e><e>3</e><e>4</e></doc>}]
+    set node [$doc documentElement] 
+    set i 2
+    set result [list]
+    lappend result [$node selectNodes {string(*[position()=$i])}]
+    set i 3
+    lappend result [$node selectNodes {string(*[position()=$i])}]
+    $doc delete
+    set result
+} {2 3}
+
+proc xpath-5.37 {node} {
+    set i 4
+    return [$node selectNodes -cache 1 {string(*[position()=$i])}]
+}
+test xpath-5.37 {tcl var resolution in xpath expr} {
+    set doc [dom parse {<doc><e>1</e><e>2</e><e>3</e><e>4</e></doc>}]
+    set node [$doc documentElement] 
+    set i 2
+    set result [list]
+    lappend result [$node selectNodes -cache 1 {string(*[position()=$i])}]
+    lappend result [xpath-5.37 $node]
+    set i 3
+    $doc delete
+    set result
+} {2 4}
+
+test xpath-5.38 {tcl var resolution in xpath expr} {
+    set doc [dom parse <doc/>]
+    set xpath "/doc"
+    for {set i 1} {$i <= 100} {incr i} {
+        set var$i $i
+        append xpath "/e\[\$var$i\]"
+    }
+    set result [$doc selectNodes $xpath]
+    $doc delete
+} {}
+
+test xpath-5.39 {tcl var resolution in xpath expr} {
+    set xml {
+        <doc>
+        <e att="a" elm="1"/>
+        <e att="a" elm="2"/>
+        <e att="b" elm="3"/>
+        <e att="b" elm="4"/>
+        </doc>
+    }
+    set doc [dom parse $xml]
+    set attvalue "b"
+    set pos 2
+    set result [[$doc selectNodes {/doc/e[@att=$attvalue][position()=$pos]}] asXML -indent none]
+    $doc delete
+} {<e att="b" elm="4"/>}
+
 set doc [dom parse {
 <root>
   <asub>asub2</asub>

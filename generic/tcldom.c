@@ -374,15 +374,6 @@ const Tcl_ObjType tdomNodeType = {
     SetTdomNodeFromAny
 };
 
-typedef struct tcldom_ParseVarData {
-    ast t;
-    Tcl_Interp * interp;
-    int          allocated;
-    int          used; 
-    Tcl_Parse    parse[1];
-} tcldom_ParseVarData;
-
-
 /*----------------------------------------------------------------------------
 |   Prototypes for procedures defined later in this file:
 |
@@ -1619,6 +1610,7 @@ int tcldom_xpathParseVar (
             size += pvcd->parse[idx].tokenPtr[size].numComponents;
         }
         res = idx++;
+        ((tcldom_ParseVarData *)clientData)->used  = idx;
     } else if (pvcd->parse[pvcd->used].numTokens == 1) {
         /* If strToParse starts with a single '$' without a following var name
          * (according to tcl var name rules), Tcl_ParseVarName() doesn't report
@@ -1749,23 +1741,13 @@ int tcldom_selectNodes (
             FREE (mappings);
         }
         SetResult("Wrong # of arguments.");
-        rc = TCL_ERROR;
-        goto cleanup0;
+        return TCL_ERROR;
     }
 
     xpathQuery = Tcl_GetString(objv[1]);
 
     xpathRSInit(&rs);
 
-    pvcd = MALLOC(sizeof(tcldom_ParseVarData) + 7 * sizeof(Tcl_Parse));
-    pvcd->t = NULL;
-    pvcd->interp = interp;
-    pvcd->allocated = 8;
-    pvcd->used = 0;
-
-    parseVarCB.parseVarCB         = tcldom_xpathParseVar;
-    parseVarCB.parseVarClientData = pvcd;
-    
     if (mappings == NULL) {
         mappings = node->ownerDocument->prefixNSMappings;
         localmapping = 0;
@@ -1782,9 +1764,19 @@ int tcldom_selectNodes (
         h = Tcl_CreateHashEntry (
             node->ownerDocument->xpathCache, xpathQuery, &hnew);
         if (hnew) {
+            pvcd = MALLOC(sizeof(tcldom_ParseVarData) + 7 * sizeof(Tcl_Parse));
+            pvcd->t = NULL;
+            pvcd->interp = interp;
+            pvcd->allocated = 8;
+            pvcd->used = 0;
+
+            parseVarCB.parseVarCB         = tcldom_xpathParseVar;
+            parseVarCB.parseVarClientData = pvcd;
+    
             rc = xpathParse(xpathQuery, node, XPATH_EXPR, mappings,
                 &parseVarCB, &pvcd->t, &errMsg);
             if (rc != XPATH_OK) {
+                FREE (pvcd);
                 Tcl_DeleteHashEntry(h);
                 rc = TCL_ERROR;
                 goto cleanup1;
@@ -1793,15 +1785,22 @@ int tcldom_selectNodes (
         } else {
             pvcd = Tcl_GetHashValue(h);
         }
-    }
+    } else {
+        pvcd = MALLOC(sizeof(tcldom_ParseVarData) + 7 * sizeof(Tcl_Parse));
+        pvcd->t = NULL;
+        pvcd->interp = interp;
+        pvcd->allocated = 8;
+        pvcd->used = 0;
+
+        parseVarCB.parseVarCB         = tcldom_xpathParseVar;
+        parseVarCB.parseVarClientData = pvcd;
     
-    else {
-            rc = xpathParse(xpathQuery, node, XPATH_EXPR, mappings,
-                &parseVarCB, &pvcd->t, &errMsg);
-            if (rc != XPATH_OK) {
-                rc = TCL_ERROR;
-                goto cleanup1;
-            }
+        rc = xpathParse(xpathQuery, node, XPATH_EXPR, mappings,
+                        &parseVarCB, &pvcd->t, &errMsg);
+        if (rc != XPATH_OK) {
+            rc = TCL_ERROR;
+            goto cleanup1;
+        }
     }
 
     cbs.funcCB         = tcldom_xpathFuncCallBack;
@@ -1840,8 +1839,6 @@ int tcldom_selectNodes (
     if (!cache) {
         FREE(pvcd);
     }
-
-    cleanup0:
 
     if (localmapping && mappings) {
         FREE(mappings);

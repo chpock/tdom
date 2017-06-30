@@ -103,6 +103,18 @@ typedef struct astElem {
 
 typedef astElem *ast;
 
+/*--------------------------------------------------------------------------
+|   tcldom_ParseVarData
+|
+\-------------------------------------------------------------------------*/
+
+typedef struct tcldom_ParseVarData {
+    ast t;
+    Tcl_Interp * interp;
+    int          allocated;
+    int          used; 
+    Tcl_Parse    parse[1];
+} tcldom_ParseVarData;
 
 /*----------------------------------------------------------------------------
 |   Types for XPath result set

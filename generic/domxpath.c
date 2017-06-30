@@ -2264,7 +2264,7 @@ int xpathParse (
 )
 {
     XPathTokens tokens;
-    int  i, l, len, newlen, slen, status;
+    int  i, l, len, newlen, slen;
     int  useNamespaceAxis = 0;
     char tmp[200];
 
