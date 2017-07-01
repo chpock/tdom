@@ -2873,6 +2873,8 @@ domFreeDocument (
         while (entryPtr) {
             pvcd = (tcldom_ParseVarData *)Tcl_GetHashValue (entryPtr);
             xpathFreeAst (pvcd->t);
+            FREE (pvcd->parse);
+            FREE (pvcd->objs);
             FREE (pvcd);
             entryPtr = Tcl_NextHashEntry (&search);
         }

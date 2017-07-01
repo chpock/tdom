@@ -113,7 +113,8 @@ typedef struct tcldom_ParseVarData {
     Tcl_Interp * interp;
     int          allocated;
     int          used; 
-    Tcl_Parse    parse[1];
+    Tcl_Parse   *parse;
+    Tcl_Obj     **objs;
 } tcldom_ParseVarData;
 
 /*----------------------------------------------------------------------------

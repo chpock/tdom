@@ -933,6 +933,7 @@ test xpath-5.39 {tcl var resolution in xpath expr} {
     set pos 2
     set result [[$doc selectNodes {/doc/e[@att=$attvalue][position()=$pos]}] asXML -indent none]
     $doc delete
+    set result
 } {<e att="b" elm="4"/>}
 
 set doc [dom parse {
