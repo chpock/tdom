@@ -911,9 +911,9 @@ test xpath-5.37 {tcl var resolution in xpath expr} {
 test xpath-5.38 {tcl var resolution in xpath expr} {
     set doc [dom parse <doc/>]
     set xpath "/doc"
-    for {set i 1} {$i <= 100} {incr i} {
+    for {set i 1} {$i <= 20} {incr i} {
         set var$i $i
-        append xpath "/e\[\$var$i\]"
+        append xpath "/e\[position()=\$var$i\]"
     }
     set result [$doc selectNodes $xpath]
     $doc delete
@@ -935,6 +935,86 @@ test xpath-5.39 {tcl var resolution in xpath expr} {
     $doc delete
     set result
 } {<e att="b" elm="4"/>}
+
+test xpath-5.40 {tcl var resolution in xpath expr} {
+    set doc [dom parse {<doc><e>1</e><e>2</e><e>3</e><e>4</e></doc>}]
+    # What this test tests depend on NUM_STATIC_TOKENS. Which is 20 in
+    # the tcl core distribution at the time, this test was written.
+    unset -nocomplain a
+    for {set i 0} {$i < 25} {} {
+        set a($i) [incr i]
+    }
+    set a(25) 2
+    set xpath "string(/doc/e\[position()="
+    for {set i 0} {$i < 26} {incr i} {
+        append xpath "\$a("
+    }
+    append xpath 0
+    for {set i 0} {$i < 26} {incr i} {
+        append xpath ")"
+    }
+    append xpath "\])"
+    set result [$doc selectNodes $xpath]
+    lappend result [$doc selectNodes -cache 1 $xpath]
+    $doc delete
+    set result
+} {2 2}
+
+test xpath-5.41 {tcl var resolution in xpath expr} {
+    set doc [dom parse {<doc><e>1</e><e>2</e><e>3</e><e>4</e></doc>}]
+    # What this test tests depend on NUM_STATIC_TOKENS.
+    unset -nocomplain a
+    for {set i 0} {$i < 25} {} {
+        set a($i) [incr i]
+    }
+    set a(25) 2
+    set xpath "/doc"
+    for {set i 1} {$i <= 20} {incr i} {
+        set var$i $i
+        append xpath "/e\[position()=\$var$i\]"
+    }
+    append xpath "/e\[position()="
+    for {set i 0} {$i < 26} {incr i} {
+        append xpath "\$a("
+    }
+    append xpath 0
+    for {set i 0} {$i < 26} {incr i} {
+        append xpath ")"
+    }
+    append xpath "\]"
+    set result [$doc selectNodes $xpath]
+    append result [$doc selectNodes -cache 1 $xpath]
+    $doc delete
+    set result
+} ""
+
+test xpath-5.42 {tcl var resolution in xpath expr} {
+    set doc [dom parse {<doc><e>1</e><e>2</e><e>3</e><e>4</e></doc>}]
+    # What this test tests depend on NUM_STATIC_TOKENS.
+    unset -nocomplain a
+    for {set i 0} {$i < 25} {} {
+        set a($i) [incr i]
+    }
+    set a(25) 2
+    set xpath "/doc/e\[position()="
+    for {set i 0} {$i < 26} {incr i} {
+        append xpath "\$a("
+    }
+    append xpath 0
+    for {set i 0} {$i < 26} {incr i} {
+        append xpath ")"
+    }
+    append xpath "\]"
+    for {set i 1} {$i <= 20} {incr i} {
+        set var$i $i
+        append xpath "/e\[position()=\$var$i\]"
+    }
+    puts $xpath
+    set result [$doc selectNodes $xpath]
+    append result [$doc selectNodes -cache 1 $xpath]
+    $doc delete
+    set result
+} ""
 
 set doc [dom parse {
 <root>

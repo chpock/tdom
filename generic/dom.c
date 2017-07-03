@@ -2873,6 +2873,11 @@ domFreeDocument (
         while (entryPtr) {
             pvcd = (tcldom_ParseVarData *)Tcl_GetHashValue (entryPtr);
             xpathFreeAst (pvcd->t);
+            for (i = 0; i < pvcd->used ; i++) {
+                if (pvcd->parse[i].tokenPtr != pvcd->parse[i].staticTokens) {
+                    Tcl_Free ((char *)pvcd->parse[i].tokenPtr);
+                }
+            }
             FREE (pvcd->parse);
             FREE (pvcd->objs);
             FREE (pvcd);

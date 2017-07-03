@@ -5210,7 +5210,7 @@ int xpathEval (
 )
 {
     xpathResultSet nodeList;
-    int            rc, hnew = 1, docOrder = 1;
+    int            rc, docOrder = 1;
 
     xpathRSInit( &nodeList);
     rsAddNodeFast( &nodeList, node);

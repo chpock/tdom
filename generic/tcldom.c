@@ -1588,12 +1588,16 @@ int tcldom_xpathParseVar (
     )
 {
     tcldom_ParseVarData *pvcd = clientData;
-    int idx, rc, res, size;
+    int idx, rc, res, size, i;
+    
     idx = pvcd->used;
     *offset = 0;
     if (idx == pvcd->allocated) {
         pvcd->parse = REALLOC (pvcd->parse,
                                sizeof (Tcl_Parse) * pvcd->allocated * 2);
+        for (i = 0; i < pvcd->allocated; i++) {
+            pvcd->parse[i].tokenPtr = pvcd->parse[i].staticTokens;
+        }
         pvcd->objs = REALLOC (pvcd->objs,
                               sizeof (Tcl_Obj*) * pvcd->allocated * 2);
         pvcd->allocated = pvcd->allocated * 2;
@@ -1612,7 +1616,7 @@ int tcldom_xpathParseVar (
             size += pvcd->parse[idx].tokenPtr[size].numComponents;
         }
         res = idx++;
-        ((tcldom_ParseVarData *)clientData)->used  = idx;
+        pvcd->used = idx;
     } else if (pvcd->parse[pvcd->used].numTokens == 1) {
         /* If strToParse starts with a single '$' without a following var name
          * (according to tcl var name rules), Tcl_ParseVarName() doesn't report
@@ -1655,7 +1659,7 @@ int tcldom_selectNodes (
 {
     char          *xpathQuery, *typeVar, *option;
     char          *errMsg = NULL, **mappings = NULL;
-    int            hnew = 1, rc = TCL_OK, i, j, len, optionIndex;
+    int            hnew = 0, rc = TCL_OK, i, j, len, optionIndex;
     int            localmapping, cache = 0;
     Tcl_HashEntry *h = NULL;
     tcldom_ParseVarData *pvcd = NULL;
@@ -1781,9 +1785,11 @@ int tcldom_selectNodes (
         rc = xpathParse(xpathQuery, node, XPATH_EXPR, mappings,
                         &parseVarCB, &pvcd->t, &errMsg);
         if (rc != XPATH_OK) {
-            FREE (pvcd);
-            Tcl_DeleteHashEntry(h);
+            if (cache && hnew) {
+                Tcl_DeleteHashEntry(h);
+            }
             rc = TCL_ERROR;
+            pvcd->t = NULL;
             goto cleanup1;
         }
     }
@@ -1842,6 +1848,11 @@ int tcldom_selectNodes (
 
     if (!cache) {
         xpathFreeAst(pvcd->t);
+        for (i = 0; i < pvcd->used ; i++) {
+            if (pvcd->parse[i].tokenPtr != pvcd->parse[i].staticTokens) {
+                Tcl_Free ((char *)pvcd->parse[i].tokenPtr);
+            }
+        }
         FREE(pvcd->parse);
         FREE(pvcd->objs);
         FREE(pvcd);
