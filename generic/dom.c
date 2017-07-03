@@ -2879,6 +2879,7 @@ domFreeDocument (
                 }
             }
             FREE (pvcd->parse);
+            FREE (pvcd->staticTokenPtr);
             FREE (pvcd->objs);
             FREE (pvcd);
             entryPtr = Tcl_NextHashEntry (&search);

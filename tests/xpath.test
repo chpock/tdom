@@ -1009,7 +1009,6 @@ test xpath-5.42 {tcl var resolution in xpath expr} {
         set var$i $i
         append xpath "/e\[position()=\$var$i\]"
     }
-    puts $xpath
     set result [$doc selectNodes $xpath]
     append result [$doc selectNodes -cache 1 $xpath]
     $doc delete

@@ -114,6 +114,7 @@ typedef struct tcldom_ParseVarData {
     int          allocated;
     int          used; 
     Tcl_Parse   *parse;
+    int         *staticTokenPtr;
     Tcl_Obj     **objs;
 } tcldom_ParseVarData;
 

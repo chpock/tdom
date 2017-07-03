@@ -1593,11 +1593,22 @@ int tcldom_xpathParseVar (
     idx = pvcd->used;
     *offset = 0;
     if (idx == pvcd->allocated) {
+        for (i = 0; i < pvcd->allocated; i++) {
+            if (pvcd->parse[i].tokenPtr == pvcd->parse[i].staticTokens) {
+                pvcd->staticTokenPtr[i] = 1;
+            } else {
+                pvcd->staticTokenPtr[i] = 0;
+            }
+        }
         pvcd->parse = REALLOC (pvcd->parse,
                                sizeof (Tcl_Parse) * pvcd->allocated * 2);
         for (i = 0; i < pvcd->allocated; i++) {
-            pvcd->parse[i].tokenPtr = pvcd->parse[i].staticTokens;
+            if (pvcd->staticTokenPtr[i]) {
+                pvcd->parse[i].tokenPtr = pvcd->parse[i].staticTokens;
+            }
         }
+        pvcd->staticTokenPtr = REALLOC (pvcd->staticTokenPtr,
+                                        sizeof (int) * pvcd->allocated * 2);
         pvcd->objs = REALLOC (pvcd->objs,
                               sizeof (Tcl_Obj*) * pvcd->allocated * 2);
         pvcd->allocated = pvcd->allocated * 2;
@@ -1777,6 +1788,7 @@ int tcldom_selectNodes (
         pvcd->allocated = 8;
         pvcd->used = 0;
         pvcd->parse = MALLOC (sizeof (Tcl_Parse) * 8);
+        pvcd->staticTokenPtr = MALLOC (sizeof (int) * 8);
         pvcd->objs = MALLOC (sizeof (Tcl_Obj*) * 8);
 
         parseVarCB.parseVarCB         = tcldom_xpathParseVar;
@@ -1846,7 +1858,7 @@ int tcldom_selectNodes (
     
     cleanup1:
 
-    if (!cache) {
+    if (!cache || (cache && hnew && rc != XPATH_OK)) {
         xpathFreeAst(pvcd->t);
         for (i = 0; i < pvcd->used ; i++) {
             if (pvcd->parse[i].tokenPtr != pvcd->parse[i].staticTokens) {
@@ -1854,6 +1866,7 @@ int tcldom_selectNodes (
             }
         }
         FREE(pvcd->parse);
+        FREE(pvcd->staticTokenPtr);
         FREE(pvcd->objs);
         FREE(pvcd);
     }
@@ -3635,6 +3648,7 @@ static int deleteXPathCache (
     Tcl_Obj     *CONST objv[] 
     )
 {
+    int i;
     Tcl_HashEntry *h;
     Tcl_HashSearch search;
     tcldom_ParseVarData *pvcd;
@@ -3648,6 +3662,14 @@ static int deleteXPathCache (
         if (h) {
             pvcd = Tcl_GetHashValue(h);
             xpathFreeAst(pvcd->t);
+            for (i = 0; i < pvcd->used ; i++) {
+                if (pvcd->parse[i].tokenPtr != pvcd->parse[i].staticTokens) {
+                    Tcl_Free ((char *)pvcd->parse[i].tokenPtr);
+                }
+            }
+            FREE(pvcd->parse);
+            FREE(pvcd->staticTokenPtr);
+            FREE(pvcd->objs);
             FREE(pvcd);
             Tcl_DeleteHashEntry (h);
         }
@@ -3660,6 +3682,14 @@ static int deleteXPathCache (
     while (h) {
         pvcd = Tcl_GetHashValue(h);
         xpathFreeAst(pvcd->t);
+        for (i = 0; i < pvcd->used ; i++) {
+            if (pvcd->parse[i].tokenPtr != pvcd->parse[i].staticTokens) {
+                Tcl_Free ((char *)pvcd->parse[i].tokenPtr);
+            }
+        }
+        FREE(pvcd->parse);
+        FREE(pvcd->staticTokenPtr);
+        FREE(pvcd->objs);
         FREE(pvcd);
         h = Tcl_NextHashEntry (&search);
     }
