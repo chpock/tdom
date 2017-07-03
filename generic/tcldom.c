@@ -1658,7 +1658,7 @@ int tcldom_selectNodes (
     int            hnew = 1, rc = TCL_OK, i, j, len, optionIndex;
     int            localmapping, cache = 0;
     Tcl_HashEntry *h = NULL;
-    tcldom_ParseVarData *pvcd;
+    tcldom_ParseVarData *pvcd = NULL;
     xpathResultSet rs;
     Tcl_Obj       *type, *objPtr, *scriptres;
     xpathCBs       cbs;
@@ -1762,32 +1762,12 @@ int tcldom_selectNodes (
         }
         h = Tcl_CreateHashEntry (
             node->ownerDocument->xpathCache, xpathQuery, &hnew);
-        if (hnew) {
-            pvcd = MALLOC(sizeof (tcldom_ParseVarData));
-            pvcd->t = NULL;
-            pvcd->interp = interp;
-            pvcd->allocated = 8;
-            pvcd->used = 0;
-            pvcd->parse = MALLOC (sizeof (Tcl_Parse) * 8);
-            pvcd->objs = MALLOC (sizeof (Tcl_Obj*) * 8);
-            
-            parseVarCB.parseVarCB         = tcldom_xpathParseVar;
-            parseVarCB.parseVarClientData = pvcd;
-    
-            rc = xpathParse(xpathQuery, node, XPATH_EXPR, mappings,
-                &parseVarCB, &pvcd->t, &errMsg);
-            if (rc != XPATH_OK) {
-                FREE (pvcd);
-                Tcl_DeleteHashEntry(h);
-                rc = TCL_ERROR;
-                goto cleanup1;
-            }
-            Tcl_SetHashValue(h, pvcd);
-        } else {
+        if (!hnew) {
             pvcd = Tcl_GetHashValue(h);
         }
-    } else {
-        pvcd = MALLOC(sizeof(tcldom_ParseVarData) + 7 * sizeof(Tcl_Parse));
+    }
+    if (!pvcd) {
+        pvcd = MALLOC(sizeof (tcldom_ParseVarData));
         pvcd->t = NULL;
         pvcd->interp = interp;
         pvcd->allocated = 8;
@@ -1801,9 +1781,14 @@ int tcldom_selectNodes (
         rc = xpathParse(xpathQuery, node, XPATH_EXPR, mappings,
                         &parseVarCB, &pvcd->t, &errMsg);
         if (rc != XPATH_OK) {
+            FREE (pvcd);
+            Tcl_DeleteHashEntry(h);
             rc = TCL_ERROR;
             goto cleanup1;
         }
+    }
+    if (cache && hnew) {
+        Tcl_SetHashValue(h, pvcd);
     }
 
     for (i = 0; i < pvcd->used ; i++) {
@@ -1847,9 +1832,6 @@ int tcldom_selectNodes (
 
     cleanup2:
 
-    if (!cache) {
-        xpathFreeAst(pvcd->t);
-    }
     xpathRSFree(&rs);
 
     for (i = 0 ; i < pvcd->used; i++) {
@@ -1858,7 +1840,8 @@ int tcldom_selectNodes (
     
     cleanup1:
 
-        if (!cache) {
+    if (!cache) {
+        xpathFreeAst(pvcd->t);
         FREE(pvcd->parse);
         FREE(pvcd->objs);
         FREE(pvcd);

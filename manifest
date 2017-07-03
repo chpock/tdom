@@ -1,5 +1,5 @@
-C Work\sin\sprogress.
-D 2017-07-01T14:17:39.486
+C Still\swork\sin\sprogress.
+D 2017-07-03T00:21:36.490
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -139,7 +139,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c fff479358cd9d391f83ebad7ef7b1e02cdbf9a90
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
-F generic/tcldom.c 3571c81eccf0b2853005a20b33adf5a5481674ab
+F generic/tcldom.c 27a751672f946db9cdff6568bd46b70b2dddcbe7
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
 F generic/tclexpat.c 069180212797fc14bdb0a08bcd1ad3461406975c
 F generic/tclexpat.h 3fb4df4c023d1f625ec9c5783c4fc1d1e4e0b8bb
@@ -241,11 +241,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 41e23c35eaf26a430c958253776527497a7f5aac
-R bab34c1188f5de197eb6446470462efe
-T *branch * wip
-T *sym-wip *
-T -sym-pyk-parsexquery *
+P 42b8823f76e32fa40cbffea9e2911023f0300a55
+R 80cfae4b0bb42bb47eb548c961b3195c
 U rolf
-Z 1c22a2b3534a471d0f37431d048f0090
+Z 6203651ee15be14248d663f904c42b23
 # Remove this line to create a well-formed Fossil manifest.
