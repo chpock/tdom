@@ -1,5 +1,5 @@
-C Fix\sseg\sfault\sof\sremoveAttributeNS,\sif\sthere\sis\sa\snot\snamespaced\sattribute\swith\sthe\ssame\slocalname\sas\sthe\sattribute\sto\sremove.
-D 2017-06-17T01:03:42.399
+C Fixed\sthe\s'latent\sbug'\smentioned\sin\sticket\s[d0405aff34].
+D 2017-07-05T00:22:15.317
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -139,7 +139,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c fff479358cd9d391f83ebad7ef7b1e02cdbf9a90
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
-F generic/tcldom.c 476047a3af213765ef136daa96cc6a9b6e0cb764
+F generic/tcldom.c 9bd0814d13abc0dfc791dc5464a2fce41dcf9420
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
 F generic/tclexpat.c 069180212797fc14bdb0a08bcd1ad3461406975c
 F generic/tclexpat.h 3fb4df4c023d1f625ec9c5783c4fc1d1e4e0b8bb
@@ -206,7 +206,7 @@ F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.bench 53a2bd61133d0a6acbb2a61794da74f7e7ba9b6a
 F tests/dom.test ce4acfc3fe588b7fd33e8988e302e85a73bcc7ee
-F tests/domDoc.test ff26d5193483764310207b0ed2864e1942a1e517
+F tests/domDoc.test 19a23398be6a4639153ce6d91f94cc177363f9d3
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test 474c227c0fccef28dc6d8ad115e40586be1999f0
 F tests/domnamespace.test bd80dfb5fb1637a0ae5007e949e7eab5c4e2f849
@@ -225,7 +225,7 @@ F tests/tdomcmd.test b3ec8a3f2c99305aae381989727ac707db2dea58
 F tests/xmlsimple.test b9ca923fb971af2b6170f35a887922e488db928d
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.bench 41d24b5b9b7b4593d002b3c6486cd36061f823bb
-F tests/xpath.test d27dad4a46bb23a1851dab39feb095150ce612e3
+F tests/xpath.test 5cfa98ef17798b62e2b57c1145ae2dc826a45fbe
 F tests/xslt.test ed74e863288df75b4cccdac880984653952cbe68
 F unix/CONFIG 789192e463910e1b9dd7e65f6338390d2bf1f68a
 F unix/tclAppInit.c a1655c51127aed18d069010f234a378fceacb2a6
@@ -241,8 +241,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 5b9f6c7c6d005987ad2878b95149ba0d51ba9924
-R 0f1ee7ab389a2ba161e59c06d0d1aa2d
+P db3e95cb77cee9f7df7ead30015c24a8175d2881
+R 5dc2eff2f6ef7fcc33770e3879cf840c
 U rolf
-Z 7cd8074a2e2c00ad7771db659a8a3684
+Z ad8f1d109765d127100899a26b7c376a
 # Remove this line to create a well-formed Fossil manifest.

@@ -1075,6 +1075,35 @@ test domDoc-20.5 {selectNodes with -namespaces option} {
     set result
 } [list tdom:doc tdom:doc "" empty]
 
+test domDoc-20.6 {selectNodes with -namespaces option} {
+    set doc [dom createDocumentNS "http://tdom.org" tdom:doc]
+    set node [$doc selectNodes \
+                  -namespaces {foo bar} \
+                  -namespaces {a b c d} \
+                  -namespaces {tdom http://tdom.org} \
+                  tdom:doc]
+    set result [$node nodeName]
+    set node [$doc selectNodes \
+                  -namespaces {myPrefix http://tdom.org} \
+                  myPrefix:doc]
+    lappend result [$node nodeName]
+    lappend result [$doc selectNodes -namespaces {} doc typeVar]
+    lappend result $typeVar
+    $doc delete
+    set result
+} [list tdom:doc tdom:doc "" empty]
+
+test domDoc-20.7 {selectNodes with -namespaces option} {
+    set doc [dom createDocumentNS "http://tdom.org" tdom:doc]
+    catch {set node [$doc selectNodes \
+                         -namespaces {foo bar} \
+                         -namespaces {a b c d} \
+                         -namespaces {wrong_not_pair} \
+                         tdom:doc]} errMsg
+    $doc delete
+    set errMsg
+} {The "-namespaces" option requires a 'prefix namespace' pairs list as argument}
+
 test domDoc-21.1 {baseURI} {
     set doc [dom createDocumentNode]
     set result [$doc baseURI]
