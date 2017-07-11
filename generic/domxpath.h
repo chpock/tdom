@@ -110,7 +110,8 @@ typedef astElem *ast;
 
 typedef struct tcldom_ParseVarData {
     ast t;
-    Tcl_Interp * interp;
+    Tcl_Interp  *interp;
+    Tcl_Obj     *query;
     int          allocated;
     int          used; 
     Tcl_Parse   *parse;

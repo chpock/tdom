@@ -1783,6 +1783,8 @@ int tcldom_selectNodes (
     }
     if (!pvcd) {
         pvcd = MALLOC(sizeof (tcldom_ParseVarData));
+        pvcd->query = objv[1];
+        Tcl_IncrRefCount(objv[1]);
         pvcd->t = NULL;
         pvcd->interp = interp;
         pvcd->allocated = 8;
@@ -1865,6 +1867,7 @@ int tcldom_selectNodes (
                 Tcl_Free ((char *)pvcd->parse[i].tokenPtr);
             }
         }
+        Tcl_DecrRefCount(pvcd->query);
         FREE(pvcd->parse);
         FREE(pvcd->staticTokenPtr);
         FREE(pvcd->objs);
@@ -3667,6 +3670,7 @@ static int deleteXPathCache (
                     Tcl_Free ((char *)pvcd->parse[i].tokenPtr);
                 }
             }
+            Tcl_DecrRefCount(pvcd->query);
             FREE(pvcd->parse);
             FREE(pvcd->staticTokenPtr);
             FREE(pvcd->objs);
@@ -3687,6 +3691,7 @@ static int deleteXPathCache (
                 Tcl_Free ((char *)pvcd->parse[i].tokenPtr);
             }
         }
+        Tcl_DecrRefCount(pvcd->query);
         FREE(pvcd->parse);
         FREE(pvcd->staticTokenPtr);
         FREE(pvcd->objs);
