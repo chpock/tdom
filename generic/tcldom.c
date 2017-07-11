@@ -1631,9 +1631,10 @@ int tcldom_selectNodes (
 {
     char          *xpathQuery, *typeVar, *option;
     char          *errMsg = NULL, **mappings = NULL;
-    int            rc, i, len, optionIndex, localmapping, cache = 0;
+    int            rc, i, len, optionIndex, localmapping = 0, cache = 0;
+    int            mappingListObjLen;
     xpathResultSet rs;
-    Tcl_Obj       *type, *objPtr;
+    Tcl_Obj       *type, *objPtr, *objPtr1, *mappingListObj;
     xpathCBs       cbs;
     xpathParseVarCB parseVarCB;
 
@@ -1663,23 +1664,28 @@ int tcldom_selectNodes (
             if (rc != TCL_OK || (len % 2) != 0) {
                 SetResult ("The \"-namespaces\" option requires a 'prefix"
                            " namespace' pairs list as argument");
-                return TCL_ERROR;
+                rc = TCL_ERROR;
+                goto cleanup;
             }
             if (mappings) {
+                for (i = 0; i < mappingListObjLen; i++) {
+                    Tcl_ListObjIndex (interp, mappingListObj, i, &objPtr1);
+                    Tcl_DecrRefCount (objPtr1);
+                }
+                Tcl_DecrRefCount (mappingListObj);
                 FREE (mappings);
             }
             mappings = MALLOC (sizeof (char *) * (len + 1));
+            localmapping = 1;
             for (i = 0; i < len; i++) {
                 Tcl_ListObjIndex (interp, objv[2], i, &objPtr);
-                /* The prefixMappings array is only used at xpath expr
-                   compile time. (And every needed info is strdup'ed.)
-                   So, we don't need to fiddle around with the refcounts
-                   of the prefixMappings list members.
-                   If we, at some day, allow to evaluate tcl scripts during
-                   xpath lexing/parsing, this must be revisited. */
+                Tcl_IncrRefCount (objPtr);
                 mappings[i] = Tcl_GetString (objPtr);
             }
             mappings[len] = NULL;
+            mappingListObj = objv[2];
+            Tcl_IncrRefCount (mappingListObj);
+            mappingListObjLen = len;
             objc -= 2;
             objv += 2;
             break;
@@ -1701,11 +1707,9 @@ int tcldom_selectNodes (
         }
     }
     if (objc != 2 && objc != 3) {
-        if (mappings) {
-            FREE (mappings);
-        }
         SetResult("Wrong # of arguments.");
-        return TCL_ERROR;
+        rc = TCL_ERROR;
+        goto cleanup;
     }
 
     xpathQuery = Tcl_GetString(objv[1]);
@@ -1722,10 +1726,8 @@ int tcldom_selectNodes (
     
     if (mappings == NULL) {
         mappings = node->ownerDocument->prefixNSMappings;
-        localmapping = 0;
-    } else {
-        localmapping = 1;
     }
+
     if (cache) {
         if (!node->ownerDocument->xpathCache) {
             node->ownerDocument->xpathCache = MALLOC (sizeof (Tcl_HashTable));
@@ -1746,12 +1748,11 @@ int tcldom_selectNodes (
         if (errMsg) {
             FREE(errMsg);
         }
-        if (localmapping && mappings) {
-            FREE(mappings);
-        }
-        return TCL_ERROR;
+        rc = TCL_ERROR;
+        goto cleanup;
     }
     if (errMsg) {
+        fprintf (stderr, "Why this: '%s'\n", errMsg);
         FREE(errMsg);
     }
     typeVar = NULL;
@@ -1766,13 +1767,20 @@ int tcldom_selectNodes (
     if (typeVar) {
         Tcl_SetVar(interp,typeVar, Tcl_GetString(type), 0);
     }
+    rc = TCL_OK;
     Tcl_DecrRefCount(type);
 
     xpathRSFree( &rs );
-    if (localmapping && mappings) {
+cleanup:
+    if (localmapping) {
+        for (i = 0; i < mappingListObjLen; i++) {
+            Tcl_ListObjIndex (interp, mappingListObj, i, &objPtr1);
+            Tcl_DecrRefCount (objPtr1);
+        }
+        Tcl_DecrRefCount (mappingListObj);
         FREE (mappings);
     }
-    return TCL_OK;
+    return rc;
 }
 
 /*----------------------------------------------------------------------------
@@ -4481,6 +4489,7 @@ int tcldom_NodeObjCmd (
             return applyXSLT(node, interp, NULL, objc, objv);
 
         case m_selectNodes:
+            CheckArgs(4,6
             return tcldom_selectNodes (interp, node, --objc, ++objv);
 
         case m_find:
@@ -5429,7 +5438,7 @@ int tcldom_DocObjCmd (
         return cmdInfo.objProc(cmdInfo.objClientData, interp, objc, mobjv);
     }
 
-    CheckArgs (2,10,1,dom_usage);
+    CheckArgs (2,10,1,doc_usage);
     Tcl_ResetResult (interp);
 
     /*----------------------------------------------------------------------

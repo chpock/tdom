@@ -4474,7 +4474,7 @@ static int ExecAction (
             }
             str = xpathGetStringValue (fragmentNode, &len);
             if (!domIsComment (str)) {
-                reportError (actionNode, "Invalide comment value", errMsg);
+                reportError (actionNode, "Invalid comment value", errMsg);
                 domDeleteNode (fragmentNode, NULL, NULL);
                 FREE(str);
                 return -1;
@@ -4967,7 +4967,7 @@ static int ExecAction (
             }
             str = xpathGetStringValue (fragmentNode, &len);
             if (!domIsPIValue (str)) {
-                reportError (actionNode, "Invalide processing instruction "
+                reportError (actionNode, "Invalid processing instruction "
                              "value", errMsg);
                 domDeleteNode (fragmentNode, NULL, NULL);
                 FREE(str);

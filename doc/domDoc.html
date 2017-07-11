@@ -4,15 +4,15 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0xe3d210">NAME</a> · <a href="#SECTid0xf264e0">SYNOPSIS</a> · <a href="#SECTid0xf269c0">DESCRIPTION </a> · <a href="#SECTid0xf80c10">SEE ALSO</a> · <a href="#SECTid0xf80fa0">KEYWORDS</a>
+<a href="#SECTid0x1129210">NAME</a> · <a href="#SECTid0x12124e0">SYNOPSIS</a> · <a href="#SECTid0x12129c0">DESCRIPTION </a> · <a href="#SECTid0x126cda0">SEE ALSO</a> · <a href="#SECTid0x126d130">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0xe3d210">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x1129210">NAME</a></h2><p class="namesection">
 <b class="names">domDoc - </b><br>Manipulates an instance of a DOM document object</p>
   
-  <h2><a name="SECTid0xf264e0">SYNOPSIS</a></h2><pre class="syntax">domDocObjCmd <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
+  <h2><a name="SECTid0x12124e0">SYNOPSIS</a></h2><pre class="syntax">domDocObjCmd <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
 
-  <h2><a name="SECTid0xf269c0">DESCRIPTION </a></h2><p>This command manipulates one particular instance of a document
+  <h2><a name="SECTid0x12129c0">DESCRIPTION </a></h2><p>This command manipulates one particular instance of a document
 object. <i class="m">method</i> indicates a specific method of the document class. These
 methods should closely conform to the W3C recommendation "Document Object Model
 (Core) Level 1" (<a href="http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html">http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html</a>). Look
@@ -523,21 +523,23 @@ namespace definitions in scope of the context node will be used to
 resolve the prefix, as usual.</p>
 
 <p>If the <i class="m">-cache</i> option is used with a true value, then the
-<i class="m">xpathQuery</i> will be looked up in a document specific cache. If the query
-is found, then the stored pre-compiled query will be used. If the
-query isn't found, it will be pre-compiled and stored in the cache,
-for use in further calls. Please notice, that the <i class="m">xpathQuery</i> as given as
-string is used as key for the cache. This means, that equal XPath
-expressions, which differ only in white space are treated as
+<i class="m">xpathQuery</i> will be looked up in a document specific cache. If
+the query is found, then the stored pre-compiled query will be used.
+If the query isn't found, it will be compiled and stored in the cache,
+for use in further calls. Please notice, that the <i class="m">xpathQuery</i> as
+given as string is used as key for the cache. This means, that equal
+XPath expressions, which differ only in white space are treated as
 different cache entries. Special care is needed, if the XPath
-expression includes namespace prefixes. During pre-compilation, the
-prefixes will be resolved first to the prefix / namespace pairs of
-the <i class="m">-namespaces</i> option, if given, and to the namespaces
-in scope of the context node at pre-compilation time. If the XPath
-is found in the cache, neither the <i class="m">-namespaces</i> option nor
-the namespaces in scope of the context node will be taken in
-account but the already resolved (stored) namespaces will be used
-for the query.</p>
+expression includes namespace prefixes or references to tcl variables.
+Both namespace prefixes and tcl variable references will be resolved
+according to the XML prefix namespace mappings and tcl variable values
+at expression compilation time. If the same XPath expression is used
+later on in a context with other XML prefix namespace mappings or
+values of the used tcl variables, make sure to first remove the
+compiled expression from the cache with the help of the
+<b class="method">deleteXPathCache</b> method, to force a recompilation.
+Without using the <i class="m">-cache</i> option such consideration is never
+needed.</p>
 
 <p>Examples:</p>
           <pre class="example">set paragraphNodes [$node selectNodes {chapter[3]//para[@type='warning' or @type='error'} ]
@@ -592,14 +594,14 @@ empty string.</dd>
       
 
   </dl><p>Otherwise, if an unknown method name is given, the command with the
-same name as the given metho within the namespace <tt class="samp">::dom::domDoc</tt> is
+same name as the given method within the namespace <tt class="samp">::dom::domDoc</tt> is
 tried to be executed. This allows quick method additions on Tcl level.</p><p>Newly created nodes are appended to a hidden fragment list. If they
 are not moved into the tree they are automaticaly deleted, when the whole
 document gets deleted.</p>
 
-    <h2><a name="SECTid0xf80c10">SEE ALSO</a></h2><p class="seealso">dom, domNode</p>
+    <h2><a name="SECTid0x126cda0">SEE ALSO</a></h2><p class="seealso">dom, domNode</p>
 
-    <h2><a name="SECTid0xf80fa0">KEYWORDS</a></h2><p class="keywords">
+    <h2><a name="SECTid0x126d130">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-DOMnodecreation">DOM node creation</a>, <a class="keyword" href="keyword-index.html#KW-documentelement">document element</a>
 </p>
 

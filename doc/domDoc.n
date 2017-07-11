@@ -551,21 +551,23 @@ namespace definitions in scope of the context node will be used to
 resolve the prefix, as usual.
 .PP
 If the \fI-cache\fR option is used with a true value, then the
-\&\fIxpathQuery\fR will be looked up in a document specific cache. If the query
-is found, then the stored pre-compiled query will be used. If the
-query isn't found, it will be pre-compiled and stored in the cache,
-for use in further calls. Please notice, that the \fIxpathQuery\fR as given as
-string is used as key for the cache. This means, that equal XPath
-expressions, which differ only in white space are treated as
+\&\fIxpathQuery\fR will be looked up in a document specific cache. If
+the query is found, then the stored pre-compiled query will be used.
+If the query isn't found, it will be compiled and stored in the cache,
+for use in further calls. Please notice, that the \fIxpathQuery\fR as
+given as string is used as key for the cache. This means, that equal
+XPath expressions, which differ only in white space are treated as
 different cache entries. Special care is needed, if the XPath
-expression includes namespace prefixes. During pre-compilation, the
-prefixes will be resolved first to the prefix / namespace pairs of
-the \fI-namespaces\fR option, if given, and to the namespaces
-in scope of the context node at pre-compilation time. If the XPath
-is found in the cache, neither the \fI-namespaces\fR option nor
-the namespaces in scope of the context node will be taken in
-account but the already resolved (stored) namespaces will be used
-for the query.
+expression includes namespace prefixes or references to tcl variables.
+Both namespace prefixes and tcl variable references will be resolved
+according to the XML prefix namespace mappings and tcl variable values
+at expression compilation time. If the same XPath expression is used
+later on in a context with other XML prefix namespace mappings or
+values of the used tcl variables, make sure to first remove the
+compiled expression from the cache with the help of the
+\&\fBdeleteXPathCache\fP method, to force a recompilation.
+Without using the \fI-cache\fR option such consideration is never
+needed.
 .PP
 Examples:
 
@@ -606,7 +608,7 @@ from the cache, if it is there. The method always returns an
 empty string.
 .PP
 Otherwise, if an unknown method name is given, the command with the
-same name as the given metho within the namespace \fB::dom::domDoc\fR is
+same name as the given method within the namespace \fB::dom::domDoc\fR is
 tried to be executed. This allows quick method additions on Tcl level.
 .PP
 Newly created nodes are appended to a hidden fragment list. If they

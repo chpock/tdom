@@ -199,6 +199,13 @@ test domNode-2.11 {selectNodes - -cache option} {
     list $r1 $r2 $r3 $r4 $r5 $r6
 } {1 1 1 1 1 1}
 
+test domNode-2.12 {selectNodes - -cache option} {
+     # Second usage of an invalid XPath expr with -cache 1
+     # See 97c0994ae4
+     catch {$root selectNodes -cache 1 "/foo bar"}
+     catch {$root selectNodes -cache 1 "/foo bar"}
+} 1
+
 $doc delete
 
 test domNode-3.1 {repetitived documentElement with objVar, then delete} {
@@ -2013,7 +2020,10 @@ set doc [dom parse {<root attr2="ab &amp; zu"
                           attr3=""
                           foo:attr1="ns attr"
                           xmlns:foo="http://tdom.org/ns"
-                          worble2="second attr with 2 in it's name">
+                          worble2="second attr with 2 in it's name"
+                          xmlns:bar="http://tdom.org/bar"
+                          thisatt="thisatt value no ns"
+                          bar:thisatt="thisatt value">
 text child</root>}]
 set root [$doc documentElement]
 test domNode-19.2 {removeAttribute} {
@@ -2037,6 +2047,10 @@ test domNode-19.5 {removeAttributeNS} {
 test domNode-19.6 {removeAttributeNS} {
     catch {$root removeAttributeNS http://tdom.org attr1}
 } {1}
+
+test domNode-19.7 {removeAttributeNS} {
+     catch {$root removeAttributeNS http://tdom.org/bar thisatt}
+} {0}
 
 $doc delete
 

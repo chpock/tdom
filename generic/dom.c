@@ -3240,7 +3240,7 @@ domRemoveAttributeNS (
         domSplitQName (attr->nodeName, prefix, &str);
         if (strcmp(localName,str)==0) {
             ns = domGetNamespaceByIndex(node->ownerDocument, attr->namespace);
-            if (strcmp(ns->uri, uri)==0) {
+            if (ns && strcmp(ns->uri, uri)==0) {
                 if (previous) {
                     previous->nextSibling = attr->nextSibling;
                 } else {

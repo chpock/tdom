@@ -381,21 +381,23 @@ namespace definitions in scope of the context node will be used to
 resolve the prefix, as usual.</p>
 
 <p>If the <m>-cache</m> option is used with a true value, then the
-<m>xpathQuery</m> will be looked up in a document specific cache. If the query
-is found, then the stored pre-compiled query will be used. If the
-query isn't found, it will be pre-compiled and stored in the cache,
-for use in further calls. Please notice, that the <m>xpathQuery</m> as given as
-string is used as key for the cache. This means, that equal XPath
-expressions, which differ only in white space are treated as
+<m>xpathQuery</m> will be looked up in a document specific cache. If
+the query is found, then the stored pre-compiled query will be used.
+If the query isn't found, it will be compiled and stored in the cache,
+for use in further calls. Please notice, that the <m>xpathQuery</m> as
+given as string is used as key for the cache. This means, that equal
+XPath expressions, which differ only in white space are treated as
 different cache entries. Special care is needed, if the XPath
-expression includes namespace prefixes. During pre-compilation, the
-prefixes will be resolved first to the prefix / namespace pairs of
-the <m>-namespaces</m> option, if given, and to the namespaces
-in scope of the context node at pre-compilation time. If the XPath
-is found in the cache, neither the <m>-namespaces</m> option nor
-the namespaces in scope of the context node will be taken in
-account but the already resolved (stored) namespaces will be used
-for the query.</p>
+expression includes namespace prefixes or references to tcl variables.
+Both namespace prefixes and tcl variable references will be resolved
+according to the XML prefix namespace mappings and tcl variable values
+at expression compilation time. If the same XPath expression is used
+later on in a context with other XML prefix namespace mappings or
+values of the used tcl variables, make sure to first remove the
+compiled expression from the cache with the help of the
+<method>deleteXPathCache</method> method, to force a recompilation.
+Without using the <m>-cache</m> option such consideration is never
+needed.</p>
 
 <p>Examples:</p>
           <example>set paragraphNodes [$node selectNodes {chapter[3]//para[@type='warning' or @type='error'} ]
