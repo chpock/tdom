@@ -1,5 +1,5 @@
-C Added\sa\srandom\stest.
-D 2017-07-11T00:13:59.162
+C Removed\sbuild\sbreaking\sartifact,\sintroduced\swith\s[518504411f16].
+D 2017-07-11T22:24:21.116
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -139,7 +139,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c fff479358cd9d391f83ebad7ef7b1e02cdbf9a90
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
-F generic/tcldom.c 9bd0814d13abc0dfc791dc5464a2fce41dcf9420
+F generic/tcldom.c 976cfe8cbdbf3323cac43443cd11b53f2a69a820
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
 F generic/tclexpat.c 069180212797fc14bdb0a08bcd1ad3461406975c
 F generic/tclexpat.h 3fb4df4c023d1f625ec9c5783c4fc1d1e4e0b8bb
@@ -241,8 +241,9 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 8ebfc15ac4ef9c979513a4ff6f25e2d75bd8887b
-R 1acc0f5c93131bc3735d14b6892e9d73
+P c121a72ec539387d47e56cab74905e6386ed8bf7
+Q +fd02176cecdb3c9c1deaab77c715e5ca1808d501
+R 0f91db006d6319341d75ef273e418ca0
 U rolf
-Z cd42c84e144f6f01431f9b5e4ff9e24f
+Z 86681c48e96a0453f5edd1e161058829
 # Remove this line to create a well-formed Fossil manifest.
