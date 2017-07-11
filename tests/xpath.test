@@ -1018,6 +1018,25 @@ test xpath-5.42 {tcl var resolution in xpath expr} {
     set result
 } ""
 
+test xpath-5.43 {XPath is commutative} {
+    set xml {
+<doc>
+  <e>
+    <ee>eins</ee>
+  </e>
+  <e>
+    <ee>zwei</ee>
+  </e>
+</doc>}
+    set doc [dom parse $xml]
+    set result [expr {[$doc selectNodes {doc/e[ee='zwei']}]
+                      == [$doc selectNodes {doc/e['zwei'=ee]}]}]
+    lappend result [llength [$doc selectNodes {doc/e[ee='zwei']}]]
+    lappend result [$doc selectNodes {string(doc/e[ee='zwei'])}]
+    $doc delete
+    set result
+} {1 1 zwei}
+
 set doc [dom parse {
 <root>
   <asub>asub2</asub>

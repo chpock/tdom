@@ -1,5 +1,5 @@
-C Clarified\sthe\sselectNodes\sdocumentation:\smentioned\sthe\spotential\spitfall\swith\susing\stcl\svariable\sreferences\sin\sxpath\sexpressions,\sif\susing\sthe\s-cache\s1\soption.
-D 2017-07-05T23:02:52.720
+C Added\sa\srandom\stest.
+D 2017-07-11T00:13:59.162
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -225,7 +225,7 @@ F tests/tdomcmd.test b3ec8a3f2c99305aae381989727ac707db2dea58
 F tests/xmlsimple.test b9ca923fb971af2b6170f35a887922e488db928d
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.bench 41d24b5b9b7b4593d002b3c6486cd36061f823bb
-F tests/xpath.test 5cfa98ef17798b62e2b57c1145ae2dc826a45fbe
+F tests/xpath.test 5d3869e2eae23963892e3ca1c0afd4b1c2f65b63
 F tests/xslt.test ed74e863288df75b4cccdac880984653952cbe68
 F unix/CONFIG 789192e463910e1b9dd7e65f6338390d2bf1f68a
 F unix/tclAppInit.c a1655c51127aed18d069010f234a378fceacb2a6
@@ -241,8 +241,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 0e97114f76758472f37f34aeeedfee41ca9e1be1
-R f5ebb5b2e136ac5fae6d3b8f7fffab49
+P 8ebfc15ac4ef9c979513a4ff6f25e2d75bd8887b
+R 1acc0f5c93131bc3735d14b6892e9d73
 U rolf
-Z d0ec5aa3680fdad175192766e5d22606
+Z cd42c84e144f6f01431f9b5e4ff9e24f
 # Remove this line to create a well-formed Fossil manifest.
