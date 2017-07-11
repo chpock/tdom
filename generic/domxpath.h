@@ -115,9 +115,9 @@ typedef struct tcldom_ParseVarData {
     int          allocated;
     int          used; 
     Tcl_Parse   *parse;
-    int         *staticTokenPtr;
     Tcl_Obj     **objs;
 } tcldom_ParseVarData;
+void tcldom_freepvcd(tcldom_ParseVarData *pvcd);
 
 /*----------------------------------------------------------------------------
 |   Types for XPath result set

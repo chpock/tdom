@@ -2878,10 +2878,7 @@ domFreeDocument (
                     Tcl_Free ((char *)pvcd->parse[i].tokenPtr);
                 }
             }
-            FREE (pvcd->parse);
-            FREE (pvcd->staticTokenPtr);
-            FREE (pvcd->objs);
-            FREE (pvcd);
+            tcldom_freepvcd(pvcd);
             entryPtr = Tcl_NextHashEntry (&search);
         }
         Tcl_DeleteHashTable (doc->xpathCache);
