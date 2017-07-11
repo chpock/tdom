@@ -4489,7 +4489,6 @@ int tcldom_NodeObjCmd (
             return applyXSLT(node, interp, NULL, objc, objv);
 
         case m_selectNodes:
-            CheckArgs(4,6
             return tcldom_selectNodes (interp, node, --objc, ++objv);
 
         case m_find:
