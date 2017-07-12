@@ -908,6 +908,23 @@ test xpath-5.37 {tcl var resolution in xpath expr} {
     set result
 } {2 4}
 
+proc xpath-5.37.1 {node} {
+    set xpathexpr string
+    append xpathexpr {(*[position()=$i])}
+    set i 2
+    return [$node selectNodes -cache 1 $xpathexpr]
+}
+test xpath-5.37.1 {tcl var resolution in xpath expr} {
+    set doc [dom parse {<doc><e>1</e><e>2</e><e>3</e><e>4</e></doc>}]
+    set node [$doc documentElement] 
+    set i 4
+    set result [list]
+    lappend result [xpath-5.37.1 $node]
+    lappend result [$node selectNodes -cache 1 {string(*[position()=$i])}]
+    $doc delete
+    set result
+} {2 4}
+
 test xpath-5.38 {tcl var resolution in xpath expr} {
     set doc [dom parse <doc/>]
     set xpath "/doc"

@@ -1,5 +1,5 @@
-C Remove\sstaticTokenPtr\sfrom\stcldom_ParseVarData\sand\suse\sNULL\sas\sthe\sfixup\smarker\ninstead.
-D 2017-07-11T23:01:25.209
+C Added\sa\stest,\swhich\sshows\sthe\sproblem\sthat\swas\sfixed\sby\s[ccc182cde5].
+D 2017-07-12T12:23:54.044
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -225,7 +225,7 @@ F tests/tdomcmd.test b3ec8a3f2c99305aae381989727ac707db2dea58
 F tests/xmlsimple.test b9ca923fb971af2b6170f35a887922e488db928d
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.bench 41d24b5b9b7b4593d002b3c6486cd36061f823bb
-F tests/xpath.test dcd24be39c9a7800f638582ff97adb43b0a396af
+F tests/xpath.test 562a5832d181505619624625f5ff66e6bdeb907d
 F tests/xslt.test ed74e863288df75b4cccdac880984653952cbe68
 F unix/CONFIG 789192e463910e1b9dd7e65f6338390d2bf1f68a
 F unix/tclAppInit.c a1655c51127aed18d069010f234a378fceacb2a6
@@ -241,8 +241,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ccc182cde5bf7f5f86d08b2f02e8093117b71331
-R 945446922addb672f6a68b14739ba085
-U yorick
-Z 61c75bc644d09438bb8eac584c494413
+P e6cf5cb8354a7ee9c6dd93a4070bd6e4123c599e
+R c41aaa52f44507b026bb7cdc0116642c
+U rolf
+Z cbe0d60e5311ff9a46e18cb1e932bf11
 # Remove this line to create a well-formed Fossil manifest.
