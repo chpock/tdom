@@ -113,18 +113,22 @@ typedef struct tcldom_ParseVarData {
     Tcl_Interp  *interp;
     Tcl_Obj     *query;
     int          allocated;
-    int          used; 
-    Tcl_Parse   *parse;
-    Tcl_Obj     **objs;
+    int          used;
 } tcldom_ParseVarData;
-void tcldom_freepvcd(tcldom_ParseVarData *pvcd);
+
+typedef struct tcldom_ParsedVar {
+    Tcl_Parse   parse;
+    Tcl_Obj    *value;
+} tcldom_ParsedVar;
+
+void tcldom_FreePvcd(tcldom_ParseVarData *pvcd);
 
 /*----------------------------------------------------------------------------
 |   Types for XPath result set
 |
 \---------------------------------------------------------------------------*/
 typedef enum { 
-    EmptyResult, BoolResult, IntResult, RealResult, StringResult, 
+    EmptyResult, BoolResult, IntResult, RealResult, StringResult,
     xNodeSetResult, NaNResult, InfResult, NInfResult
 } xpathResultType;
 
@@ -135,7 +139,7 @@ typedef struct xpathResultSet {
     char           *string;
     int             string_len;
     long            intvalue;
-    double          realvalue;          
+    double          realvalue;
     domNode       **nodes;
     int             nr_nodes;
     int             allocated;

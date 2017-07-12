@@ -160,6 +160,9 @@
 #define DOM_CREATECMDMODE_CMDS 1
 #define DOM_CREATECMDMODE_TOKENS 2
 
+#define getparse(pvcd, idx) ((tcldom_ParsedVar *)((pvcd) + 1))[(idx)].parse
+#define getobj(pvcd, idx) ((tcldom_ParsedVar *)((pvcd) + 1))[(idx)].value
+
 /*----------------------------------------------------------------------------
 |   Module Globals
 |
@@ -1587,44 +1590,45 @@ int tcldom_xpathParseVar (
     char **errMsg
     )
 {
-    tcldom_ParseVarData *pvcd = clientData;
+    tcldom_ParseVarData **pvcdPtr = clientData;
+    tcldom_ParseVarData *pvcd = *pvcdPtr;
     int idx, rc, res, size, i;
     
     idx = pvcd->used;
     *offset = 0;
     if (idx == pvcd->allocated) {
         for (i = 0; i < pvcd->allocated; i++) {
-            if (pvcd->parse[i].tokenPtr == pvcd->parse[i].staticTokens) {
-                pvcd->parse[i].tokenPtr = NULL;
+            if (getparse(pvcd, i).tokenPtr == getparse(pvcd, i).staticTokens) {
+                getparse(pvcd, i).tokenPtr = NULL;
             }
         }
-        pvcd->parse = REALLOC (pvcd->parse,
-                               sizeof (Tcl_Parse) * pvcd->allocated * 2);
+        *pvcdPtr = REALLOC (pvcd,
+                               sizeof (tcldom_ParseVarData) + sizeof(tcldom_ParsedVar) * pvcd->allocated * 2);
+        pvcd = *pvcdPtr;
+
         for (i = 0; i < pvcd->allocated; i++) {
-            if (pvcd->parse[i].tokenPtr == NULL) {
-                pvcd->parse[i].tokenPtr = pvcd->parse[i].staticTokens;
+            if (getparse(pvcd, i).tokenPtr == NULL) {
+                getparse(pvcd, i).tokenPtr = getparse(pvcd, i).staticTokens;
             }
         }
-        pvcd->objs = REALLOC (pvcd->objs,
-                              sizeof (Tcl_Obj*) * pvcd->allocated * 2);
         pvcd->allocated = pvcd->allocated * 2;
     }
     rc = Tcl_ParseVarName(pvcd->interp, strToParse, -1,
-                          &(pvcd->parse[idx]), 0);
+                          &(getparse(pvcd, idx)), 0);
     if (rc != TCL_OK) {
         *errMsg = tdomstrdup (Tcl_GetStringResult(pvcd->interp));
         res = -1;
         goto cleanup0;
     }
 
-    if (pvcd->parse[idx].numTokens > 1) {
-        for (size = 0; size < pvcd->parse[idx].numTokens; size++) {
-            *offset += pvcd->parse[idx].tokenPtr[size].size;
-            size += pvcd->parse[idx].tokenPtr[size].numComponents;
+    if (getparse(pvcd, idx).numTokens > 1) {
+        for (size = 0; size < getparse(pvcd, idx).numTokens; size++) {
+            *offset += getparse(pvcd, idx).tokenPtr[size].size;
+            size += getparse(pvcd, idx).tokenPtr[size].numComponents;
         }
         res = idx++;
         pvcd->used = idx;
-    } else if (pvcd->parse[pvcd->used].numTokens == 1) {
+    } else if (getparse(pvcd, pvcd->used).numTokens == 1) {
         /* If strToParse starts with a single '$' without a following var name
          * (according to tcl var name rules), Tcl_ParseVarName() doesn't report
          * a parsing error adds just one token to the parse structure .
@@ -1647,7 +1651,7 @@ int tcldom_xpathGetVar (
     char  **errMsg
     )
 {
-    rsSetString (result, Tcl_GetString(pvcd->objs[id]));
+    rsSetString (result, Tcl_GetString(getobj(pvcd, id)));
     return TCL_OK;
 }
 
@@ -1664,6 +1668,7 @@ int tcldom_selectNodes (
     Tcl_Obj    *CONST objv[]
 )
 {
+    ast           t;
     char          *xpathQuery, *typeVar, *option;
     char          *errMsg = NULL, **mappings = NULL;
     int            hnew = 0, rc = TCL_OK, i, j, len, optionIndex;
@@ -1778,21 +1783,22 @@ int tcldom_selectNodes (
         }
     }
     if (!pvcd) {
-        pvcd = MALLOC(sizeof (tcldom_ParseVarData));
+        pvcd = MALLOC(sizeof (tcldom_ParseVarData) + sizeof (tcldom_ParsedVar) * 8);
         pvcd->query = objv[1];
         Tcl_IncrRefCount(objv[1]);
         pvcd->t = NULL;
         pvcd->interp = interp;
         pvcd->allocated = 8;
         pvcd->used = 0;
-        pvcd->parse = MALLOC (sizeof (Tcl_Parse) * 8);
-        pvcd->objs = MALLOC (sizeof (Tcl_Obj*) * 8);
 
         parseVarCB.parseVarCB         = tcldom_xpathParseVar;
-        parseVarCB.parseVarClientData = pvcd;
+        parseVarCB.parseVarClientData = &pvcd;
     
         rc = xpathParse(xpathQuery, node, XPATH_EXPR, mappings,
-                        &parseVarCB, &pvcd->t, &errMsg);
+                        &parseVarCB, &t, &errMsg);
+        /* The storage for pvcd may be reallocated during xpathParse, so assign
+         * the t after parsing */
+        pvcd->t = t;
         if (rc != XPATH_OK) {
             if (cache && hnew) {
                 Tcl_DeleteHashEntry(h);
@@ -1807,18 +1813,18 @@ int tcldom_selectNodes (
     }
 
     for (i = 0; i < pvcd->used ; i++) {
-        tokenData = pvcd->parse[i];
+        tokenData = getparse(pvcd, i);
         scriptres = Tcl_EvalTokens(interp, tokenData.tokenPtr,
                                    tokenData.numTokens);
         if (scriptres == NULL) {
             errMsg = tdomstrdup(Tcl_GetStringResult(interp));
             for (j = 0; j < i; j++) {
-                Tcl_DecrRefCount (pvcd->objs[j]);
+                Tcl_DecrRefCount (getobj(pvcd, j));
             }
             rc = TCL_ERROR;
             goto cleanup1;
         }
-        pvcd->objs[i] = scriptres;
+        getobj(pvcd, i) = scriptres;
     }
         
     cbs.funcCB         = tcldom_xpathFuncCallBack;
@@ -1850,19 +1856,13 @@ int tcldom_selectNodes (
     xpathRSFree(&rs);
 
     for (i = 0 ; i < pvcd->used; i++) {
-        Tcl_DecrRefCount (pvcd->objs[i]);
+        Tcl_DecrRefCount (getobj(pvcd, i));
     }
     
     cleanup1:
 
     if (!cache || (cache && hnew && rc != XPATH_OK)) {
-        xpathFreeAst(pvcd->t);
-        for (i = 0; i < pvcd->used ; i++) {
-            if (pvcd->parse[i].tokenPtr != pvcd->parse[i].staticTokens) {
-                Tcl_Free ((char *)pvcd->parse[i].tokenPtr);
-            }
-        }
-        tcldom_freepvcd(pvcd);
+        tcldom_FreePvcd(pvcd);
     }
 
     if (localmapping && mappings) {
@@ -1877,10 +1877,15 @@ int tcldom_selectNodes (
     return rc;
 }
 
-void tcldom_freepvcd(tcldom_ParseVarData *pvcd) {
+void tcldom_FreePvcd(tcldom_ParseVarData *pvcd) {
+    int i;
+    xpathFreeAst (pvcd->t);
+    for (i = 0; i < pvcd->used ; i++) {
+        if (getparse(pvcd, i).tokenPtr != getparse(pvcd, i).staticTokens) {
+            Tcl_FreeParse(&(getparse(pvcd, i)));
+        }
+    }
     Tcl_DecrRefCount(pvcd->query);
-    FREE(pvcd->parse);
-    FREE(pvcd->objs);
     FREE(pvcd);
 }
 
@@ -3662,13 +3667,7 @@ static int deleteXPathCache (
         h = Tcl_FindHashEntry (doc->xpathCache, Tcl_GetString(objv[2]));
         if (h) {
             pvcd = Tcl_GetHashValue(h);
-            xpathFreeAst(pvcd->t);
-            for (i = 0; i < pvcd->used ; i++) {
-                if (pvcd->parse[i].tokenPtr != pvcd->parse[i].staticTokens) {
-                    Tcl_Free ((char *)pvcd->parse[i].tokenPtr);
-                }
-            }
-            tcldom_freepvcd(pvcd);
+            tcldom_FreePvcd(pvcd);
             Tcl_DeleteHashEntry (h);
         }
         return TCL_OK;
@@ -3679,13 +3678,7 @@ static int deleteXPathCache (
     h = Tcl_FirstHashEntry (doc->xpathCache, &search);
     while (h) {
         pvcd = Tcl_GetHashValue(h);
-        xpathFreeAst(pvcd->t);
-        for (i = 0; i < pvcd->used ; i++) {
-            if (pvcd->parse[i].tokenPtr != pvcd->parse[i].staticTokens) {
-                Tcl_Free ((char *)pvcd->parse[i].tokenPtr);
-            }
-        }
-        tcldom_freepvcd(pvcd);
+        tcldom_FreePvcd(pvcd);
         h = Tcl_NextHashEntry (&search);
     }
     Tcl_DeleteHashTable (doc->xpathCache);
