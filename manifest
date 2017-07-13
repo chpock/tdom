@@ -1,5 +1,5 @@
-C Still\saccept\san\sescaped\sslash\s(\\/)\sas\sslash\sin\sinput\s(as\srequired\sby\sthe\sspec),\sbut\sdon't\sescape\sslash\sin\sserialization,\sbecause\sa\sslash\sisn't\srequired\sto\sbe\sescaped\sin\sinput\s(it\sjust\scan\sbe).
-D 2017-07-13T19:11:04.754
+C Fix\sin\sJSON\sunescaping.
+D 2017-07-13T21:57:44.988
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -130,7 +130,7 @@ F generic/domhtml.c fb2ac1d58234012990a4109ac0d4bc2bdf54efbd
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domhtml5.c 1d20aa3f1406b468fa4981987fcd2460759f4a43
 F generic/domhtml5.h 5cca562a556e7662f2dce222640c32abb2777146
-F generic/domjson.c 5314a52a018349ea99573f37249fa21c8d1bea59
+F generic/domjson.c ab569adfdff146e92806b9bbe7e80aa050969276
 F generic/domjson.h ea731d3ed7b28c839ebc09b9296cb5620477a510
 F generic/domlock.c b9543b7f1066118a5bcd0d2fa30acda6d247f15a
 F generic/domxpath.c c55b71340823a4b4a70e9b73ee21152fc51ff93c
@@ -218,7 +218,7 @@ F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
 F tests/html5reader.test f839da02dd4b1227a2ee3bae9abfba983951d9ad
 F tests/htmlreader.test 0fffea0d73efb2ccf5e3a807e68b437f55a152d2
 F tests/i18n.test f5493417c35c973a0d8651c3c13d5d4e8272f6bf
-F tests/jsonreader.test eb4d18b32623734a2f2006584a3348043156c69f
+F tests/jsonreader.test 02c758a5dffd66ca9b8d831046f55572cb9de70c
 F tests/loadtdom.tcl bf298e4effa2a7de7380687911994f762c0f0c84
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
 F tests/parser.test 7ab920967c1dcf32f1c2fa618e12395d3b734c3a
@@ -245,8 +245,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P e4b57e31b60c443bd184b1b5f1af462100bce58f
-R 765509675aaba0e29d028be639c00461
+P 65e76f96e03811951f9aff4ba6f081792cca23fc
+R 19fca28b5c0b6e31df1d21e80cb8712e
 U rolf
-Z 138fc4541ebac96784f1590365a17722
+Z 0240a32711f41d12975636753d2d9690
 # Remove this line to create a well-formed Fossil manifest.

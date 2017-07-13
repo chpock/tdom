@@ -111,7 +111,7 @@ static int jsonParseString (
     unsigned int u;
     
     DBG(fprintf(stderr, "jsonParseString start: '%s'\n", &json[i]););
-    if (jparse->len) jparse->buf[0] = 0;
+    if (jparse->len) jparse->buf[0] = '\0';
     savedStart = i;
 
     if (json[i] != '"') {
@@ -123,6 +123,7 @@ static int jsonParseString (
     }
     for(;;) {
         c = json[i];
+        DBG(fprintf (stderr, "Looking at '%c'\n", c););
         /* Unescaped control characters are not allowed in JSON
          * strings. */
         if (c <= 0x1f) {
@@ -139,16 +140,18 @@ static int jsonParseString (
         i += clen;
     }
     unescape:
+    DBG(fprintf (stderr, "Continue with unescaping ..\n"););
     /* If we here, then i points to the first backslash in the string
      * to parse */
     if (i - savedStart > jparse->len - 200) {
         jparse->buf = REALLOC(jparse->buf, i-savedStart+200);
         jparse->len = i-savedStart+200;
-        memcpy (jparse->buf, &json[savedStart+1], i-savedStart);
     }
+    memcpy (jparse->buf, &json[savedStart+1], i-savedStart);
     j = i-savedStart-1;
     for(;;) {
         c = json[i];
+        DBG(fprintf (stderr, "Looking at '%c'\n", c););
         /* Unescaped control characters are not allowed in JSON
          * strings. */
         if (c <= 0x1f) errReturn(i,JSON_SYNTAX_ERR);
@@ -202,7 +205,6 @@ static int jsonParseString (
                     errReturn(i+1,JSON_SYNTAX_ERR);
                 }
                 jparse->buf[j++] = c;
-                clen = 1;
                 i += 2;
             }
             continue;
@@ -272,6 +274,7 @@ static int jsonParseValue(
             } else {
                 save = json[j];
                 json[j] = '\0';
+                DBG(fprintf(stderr, "New object member '%s'\n", jparse->buf););
                 DBG(fprintf(stderr, "New object member '%s'\n", &json[i+1]););
                 node = domNewElementNode (parent->ownerDocument, &json[i+1]);
                 domAppendChild (parent, node);

@@ -118,7 +118,8 @@ test json-2.1 {invalid xml name} {
     $doc delete
     set result
 } {<a>a value</a><1b>1value</1b><a
-b>a\nb</a
+b>a
+b</a
 b><>empty string</>}
 
 test json-3.1 {Unescaping} {
@@ -265,7 +266,9 @@ set jsons {
     {{"a":true,"b":false,"c":null,"d":"true","e":""}}
     {["a",["aa","bb"],"b"]}
     {{"a":"a\nvalue","b":"value\tvalue"}}
-    {["\\a"]}
+    {["\\\\a"]}
+    {["a\"b"]}
+    {{"b":"a \"b c\" d","b":"a \"b c\" d"}}
     {{"this":"a\nbc"}}
     {{"this":{"foo":"that"}}}
     {{"this":{"foo":"that","bar":"grill"},"two":"value","three":{"t1":"t1value","t2":"t2value"},"four":["a","b","c"]}}
@@ -281,6 +284,7 @@ set jsons {
     {""}
     {[[[[["a"]]]]]}
     {{"x":[{"id":"foo"}]}}
+    {"http://foo.bar"}
 }
 test json-6.1 {asJSON} {
     set failedlist [list]
@@ -295,6 +299,14 @@ test json-6.1 {asJSON} {
     }
     set failedlist
 } {}
+
+test json-6.2 {asJSON - slash will not be escaped while serializing} {
+    set doc [dom parse -json {"http:\/\/foo.bar"}]
+    set result [$doc asJSON]
+    $doc delete
+    set result
+} {"http://foo.bar"}
+
 
 test json-7.1 {jsonType} {
     set doc [dom parse {<j>foo</j>}]
