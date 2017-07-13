@@ -249,9 +249,9 @@ static int jsonParseValue(
                                       JSON_OBJECT_CONTAINER);
             node->info = JSON_OBJECT;
             domAppendChild(parent, node);
+            parent = node;
         } else {
             parent->info  = JSON_OBJECT;
-            node = parent;
         }
         skipspace(i);
         if (json[i] == '}') {

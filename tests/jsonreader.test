@@ -278,13 +278,14 @@ set jsons {
     {[]}
     {""}
     {[[[[["a"]]]]]}
+    {{"x":[{"id":"foo"}]}}
 }
 test json-6.1 {asJSON} {
     set failedlist [list]
     set ind 0
     foreach json $jsons {
-        set doc [dom parse -json -jsonroot o $json]
-        set out [[$doc documentElement] asJSON]
+        set doc [dom parse -json $json]
+        set out [$doc asJSON]
         if {$json ne $out} {
             lappend failedlist "$ind : '$json' : '$out'"
         }
