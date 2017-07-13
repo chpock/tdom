@@ -3062,8 +3062,6 @@ void tcldom_AppendEscapedJSON (
                 AP('\\'); AP('\\');
             } else if (*pc == '"') {
                 AP('\\'); AP('"');
-            } else if (*pc == '/') {
-                AP('\\'); AP('/');
             } else if (*pc == '\b') {
                 AP('\\'); AP('b');
             } else if (*pc == '\f') {

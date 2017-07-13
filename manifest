@@ -1,5 +1,5 @@
-C Fixed\sbug\sin\sbuild\stree\sin\scase\sof\snested\sempty\sarray\sas\selement\sof\san\sarray.
-D 2017-07-13T12:13:42.414
+C Still\saccept\san\sescaped\sslash\s(\\/)\sas\sslash\sin\sinput\s(as\srequired\sby\sthe\sspec),\sbut\sdon't\sescape\sslash\sin\sserialization,\sbecause\sa\sslash\sisn't\srequired\sto\sbe\sescaped\sin\sinput\s(it\sjust\scan\sbe).
+D 2017-07-13T19:11:04.754
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -141,7 +141,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c fff479358cd9d391f83ebad7ef7b1e02cdbf9a90
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
-F generic/tcldom.c e2e3371dc98bb229447fec5bdfbe3b107357770b
+F generic/tcldom.c 5e74fac428e841f74228ebb78d4cdd1d835d719c
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
 F generic/tclexpat.c 069180212797fc14bdb0a08bcd1ad3461406975c
 F generic/tclexpat.h 3fb4df4c023d1f625ec9c5783c4fc1d1e4e0b8bb
@@ -245,8 +245,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f6a78d360b03a3eb989c758db86c80571ca1f54a
-R af2a44acece3be3e4ea31e581f5462db
+P e4b57e31b60c443bd184b1b5f1af462100bce58f
+R 765509675aaba0e29d028be639c00461
 U rolf
-Z 2af666af640f9819982e3ad70c19ab48
+Z 138fc4541ebac96784f1590365a17722
 # Remove this line to create a well-formed Fossil manifest.
