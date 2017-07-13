@@ -8,6 +8,7 @@
 #    json-4.*: Unicode
 #    json-5.*: Max nesting
 #    json-6.*: asJSON
+#    json-7.*: jsonType
 # Copyright (c) 2017 Rolf Ade.
 
 source [file join [file dir [info script]] loadtdom.tcl]
@@ -45,7 +46,7 @@ test json-1.5 {Parse JSON - array} {
     set result [$doc asXML -indent none]
     $doc delete
     set result
-} "<a>1</a><a>2</a><a>3</a><a>4</a><a>abc</a>"
+} "<a>1234abc</a>"
 
 test json-1.6 {Parse JSON - true, false, null} {
     set doc [dom parse -json {{"a":true,"b":false,"c":null,"d":"true","e":""}}]
@@ -59,7 +60,7 @@ test json-1.7 {Parse JSON - array in nested object} {
     set result [$doc asXML -indent none]
     $doc delete
     set result
-} "<a><aa>1</aa><aa>2</aa><aa>3</aa><aa>4</aa><aa>abc</aa></a><b>bvalue</b>"
+} "<a><aa>1234abc</aa></a><b>bvalue</b>"
 
 test json-1.8 {Parse JSON - true, false, null} {
     set doc [dom parse -json -jsonroot "JSONObject" {{"a":true,"b":false,"c":null,"d":"true","e":""}}]
@@ -109,7 +110,7 @@ test json-1.15 {Parse JSON - nested object} {
     set result [$doc asXML -indent none]
     $doc delete
     set result
-} "<item>a</item><item><item>aa</item><item>bb</item></item><item>b</item>"
+} "a<arraycontainer>aabb</arraycontainer>b"
 
 test json-2.1 {invalid xml name} {
     set doc [dom parse -json {{"a":"a value","1b":"1value", "a\nb":"a\nb", "":"empty string"}}]
@@ -148,14 +149,14 @@ test json-3.4 {unescaping} {
     set result [$doc asXML -indent none]
     $doc delete
     set result
-} {<json><item>\a</item></json>}
+} {<json>\a</json>}
 
 test json-3.4.1 {unescaping} {
     set doc [dom parse -jsonroot json -json {["\\a","\u0071"]}]
     set result [$doc asXML -indent none]
     $doc delete
     set result
-} {<json><item>\a</item><item>q</item></json>}
+} {<json>\aq</json>}
 
 test json-3.5 {unescaping} {
     set result [catch {dom parse -json {{"this":"a\lb"}}} errMsg]
@@ -250,9 +251,7 @@ test json-5.6 {-jsonmaxnesting} {
     <t1>t1value</t1>
     <t2>t2value</t2>
 </three>
-<four>a</four>
-<four>b</four>
-<four>c</four>
+<four>abc</four>
 }
 
 set jsons {
@@ -270,6 +269,15 @@ set jsons {
     {{"this":"a\nbc"}}
     {{"this":{"foo":"that"}}}
     {{"this":{"foo":"that","bar":"grill"},"two":"value","three":{"t1":"t1value","t2":"t2value"},"four":["a","b","c"]}}
+    {"only a string"}
+    {null}
+    {1.23}
+    {true}
+    {false}
+    {{}}
+    {[]}
+    {""}
+    {[[[[["a"]]]]]}
 }
 test json-6.1 {asJSON} {
     set failedlist [list]
@@ -285,4 +293,14 @@ test json-6.1 {asJSON} {
     set failedlist
 } {}
 
-                 
+test json-7.1 {jsonType} {
+    set doc [dom parse {<j>foo</j>}]
+    set root [$doc documentElement]
+    set result [list]
+    lappend result [$root asJSON]
+    lappend result [$root jsonType]
+    $root jsonType 1
+    lappend result [$root asJSON]
+    $doc delete
+    set result
+} {{"foo"} 0 {["foo"]}}

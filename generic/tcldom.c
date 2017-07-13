@@ -352,6 +352,7 @@ static char node_usage[] =
     "    precedes node                \n"
     "    normalize ?-forXPath?        \n"
     "    xslt ?-parameters parameterList? <xsltDocNode>\n"
+    "    jsonType ?jsonType?          \n"
     TDomThreaded(
     "    readlock                     \n"
     "    writelock                    \n"
@@ -388,6 +389,10 @@ const Tcl_ObjType tdomNodeType = {
 static Tcl_VarTraceProc  tcldom_docTrace;
 
 static Tcl_CmdDeleteProc tcldom_docCmdDeleteProc;
+
+static void tcldom_treeAsJSON(Tcl_Obj *jstring, domNode *node,
+                              Tcl_Channel channel, int indent,
+                              int inside);
 
 #ifdef TCL_THREADS
 
@@ -3088,8 +3093,125 @@ void tcldom_AppendEscapedJSON (
     writeChars(jstring, chan, buf, b - buf);
 }
 
-#define gettypehint(n) n->firstAttr ? \
-    domGetAttributeNodeNS (n, tdomnsjson, "typehint") : NULL
+static
+void tcldom_childsAsJSON (
+    Tcl_Obj     *jstring,
+    domNode     *node, /* Must be an ELEMENT_NODE */
+    Tcl_Channel  channel,
+    int          indent,
+    int          inside
+    )
+{
+    domNode   *child, *nextChild;
+    int effectivParentType = 0;
+    int first = 1;
+
+    child = node->firstChild;
+    while (child
+           && child->nodeType != TEXT_NODE
+           && child->nodeType != ELEMENT_NODE) {
+        child = child->nextSibling;
+    }
+
+    if (node->info != JSON_ARRAY && node->info != JSON_OBJECT) {
+        /* Need 'heuristic rule' to decide, what to do. */
+        switch (inside) {
+        case JSON_OBJECT:
+            /* The childs, we serialize are the value of an object member */
+            if (child == NULL) {
+                /* No content at all. This could be an empty string,
+                 * an empty object or an empty array. We default to
+                 * empty string. */
+                writeChars(jstring, channel, "\"\"",2);
+                return;
+            }
+            break;
+        case JSON_START:
+        case JSON_ARRAY:
+            /* The childs, we serialize are the value of an array
+             * element. The arg node is a container for either a
+             * (nested, in case of JSON_ARRAY) array or an object. */
+            if (child == NULL) {
+                /* Empty array or empty object. Look, if the name of
+                 * the container gives a hint.*/
+                if (strcmp (node->nodeName, JSON_OBJECT_CONTAINER)==0) {
+                    effectivParentType = JSON_OBJECT;
+                    break;
+                }
+                if (strcmp (node->nodeName, JSON_ARRAY_CONTAINER)==0) {
+                    effectivParentType = JSON_ARRAY;
+                    break;
+                }
+                /* If we here, heuristics didn't helped. We have to
+                 * default to something. Let's say ... */
+                effectivParentType = JSON_ARRAY;
+            }
+            break;
+        }
+        if (child) {
+            if (child->nodeType == ELEMENT_NODE) {
+                /* If the first 'relevant' child node is ELEMENT_NODE,
+                 * we assume the childs represent a nested JSON object. */
+                effectivParentType = JSON_OBJECT;
+            } else {
+                /* If we are here, the first 'relevant' child is a
+                 * text node. If there is any other 'relevant' child,
+                 * we assume the value to be an array. Otherwise (only
+                 * single 'relevant' child is a text node), this is
+                 * any of string, true, false null. Child may have a
+                 * type hint. */
+                nextChild = child->nextSibling;
+                while (nextChild
+                       && nextChild->nodeType != TEXT_NODE
+                       && nextChild->nodeType) {
+                    nextChild = nextChild->nextSibling;
+                }
+                if (nextChild) {
+                    effectivParentType = JSON_ARRAY;
+                } else {
+                    /* Exactly one 'relevant' child node, a text node. */
+                    tcldom_treeAsJSON (jstring, child, channel, indent,
+                                       JSON_ARRAY);
+                    return;
+                }
+            }
+        }
+    } else {
+        effectivParentType = node->info;
+    }
+        
+    switch (effectivParentType) {
+    case JSON_ARRAY:
+        writeChars(jstring, channel, "[",1);
+        while (child) {
+            if (first) {
+                first = 0;
+            } else {
+                writeChars(jstring, channel, ",", 1);
+            }
+            tcldom_treeAsJSON (jstring, child, channel, indent, JSON_ARRAY);
+            child = child->nextSibling;
+        }
+        writeChars(jstring, channel, "]",1);
+        break;
+    case JSON_OBJECT:
+        writeChars(jstring, channel, "{",1);
+        while (child) {
+            if (first) {
+                first = 0;
+            } else {
+                writeChars(jstring, channel, ",", 1);
+            }
+            tcldom_treeAsJSON (jstring, child, channel, indent, JSON_OBJECT);
+            child = child->nextSibling;
+        }
+        writeChars(jstring, channel, "}",1);
+        break;
+    default:
+        break;
+    }
+}
+
 
 /*----------------------------------------------------------------------------
 |   tcldom_treeAsJSON
@@ -3098,252 +3220,72 @@ void tcldom_AppendEscapedJSON (
 static
 void tcldom_treeAsJSON (
     Tcl_Obj     *jstring,
-    domNode     *node,
+    domNode     *node,  /* Must not be NULL */
     Tcl_Channel  channel,
     int          indent,
-    int          arrayContent
+    int          inside
     )
 {
-    domNode     *child, *item;
     domTextNode *textNode;
-    domAttrNode *attr;
-    int          isnumber = 0, isArray = 0;
-    char         c;
-    
-    child = node->firstChild;
-    if (!child) {
+
+    switch (node->nodeType) {
+    case TEXT_NODE:
+        if (inside == JSON_OBJECT) {
+            /* We're inside a JSON object. A text node can not be
+             * meaningful interpreted as member of an object. Ignore
+             * the node */
+            return;
+        }
+        textNode = (domTextNode *) node;
+        switch (node->info) {
+        case JSON_NUMBER:
+            writeChars(jstring, channel, textNode->nodeValue,
+                       textNode->valueLength);
+            break;
+        case JSON_NULL:
+            writeChars(jstring, channel, "null",4);
+            break;
+        case JSON_TRUE:
+            writeChars(jstring, channel, "true",4);
+            break;
+        case JSON_FALSE:
+            writeChars(jstring, channel, "false",5);
+            break;
+        case JSON_STRING:
+            /* Fall through */
+        default:
+            tcldom_AppendEscapedJSON (jstring, channel,
+                                      textNode->nodeValue,
+                                      textNode->valueLength);
+            break;
+        };
+        break;
+    case ELEMENT_NODE:
+        switch (inside) {
+        case JSON_OBJECT:
+            /* Write the member name and recurse to the childs for the
+             * value. */
+            tcldom_AppendEscapedJSON (jstring, channel,
+                                      node->nodeName, -1);
+            writeChars (jstring, channel, ":", 1);
+            tcldom_childsAsJSON (jstring, node, channel, indent, inside);
+            break;
+        case JSON_ARRAY:
+            /* Since we're already inside of an array, the element can
+               only be interpreted as a container for a nested JSON
+               object. */
+            tcldom_childsAsJSON (jstring, node, channel, indent, inside);
+            break;
+        case JSON_START:
+            tcldom_childsAsJSON (jstring, node, channel, indent, inside);            
+            break;
+        }
+        break;
+    default:
+        /* Any other node types (COMMENT_NODE, CDATA_SECTION_NODE, 
+           PROCESSING_INSTRUCTION_NODE) are ignored. */
         return;
     }
-
-    /* 
-       We ignore any node types other than text or element nodes. The
-       first non-ignored child decides: 
-
-       - If it is a TEXT_NODE, then this first non-ignored child will
-         be serialized to either string, number, true, false or
-         null. Every other following child nodes are ignored.
-
-       - If it is an ELEMENT_NODE, then this child and every following
-         ELEMENT_NODE childs will be serialized to either an JSON
-         object or a JSON array (while ignoring any other kind of
-         nodes, including TEXT_NODEs).
-    */
-
-    while (1) {
-        if (child->nodeType == ELEMENT_NODE) {
-            break;
-        }
-        if (child->nodeType == TEXT_NODE) {
-            textNode = (domTextNode *)child;
-            if (textNode->valueLength == 0) goto done;
-            c = textNode->nodeValue[0];
-            if (c == '-' || (c>='0' && c<='9')) {
-                int seenDP = 0;
-                int seenE = 0;
-                int i = 0;
-                if (c<='0') {
-                    i = (c == '-' ? 1 : 0);
-                    if (textNode->valueLength > i
-                        && textNode->nodeValue[i] == '0'
-                        && textNode->nodeValue[i+1] >= '0'
-                        && textNode->nodeValue[i+1] <= '9')
-                        goto done;
-                }
-                if (c == '-' && textNode->valueLength == 1) goto done;
-                while (++i < textNode->valueLength) {
-                    c = textNode->nodeValue[i];
-                    if (c >= '0' && c <= '9') continue;
-                    if (c == '.') {
-                        if (i == 1 && textNode->nodeValue[0] == '-') goto done;
-                        if (seenDP) goto done;
-                        continue;
-                    }
-                    if (c == 'e' || c == 'E') {
-                        if (i == 1 && textNode->nodeValue[0] == '-') goto done;
-                        if (seenE) goto done;
-                        if (++i >= textNode->valueLength) goto done;
-                        c = textNode->nodeValue[i];
-                        if (c == '+' || c == '-') {
-                            if (++i >= textNode->valueLength) goto done;
-                            i++;
-                            c = textNode->nodeValue[i];
-                        }
-                        if (c < '0' || c > '9') goto done;
-                        continue;
-                    }
-                    goto done;
-                }
-                isnumber = 1;
-            }
-        done:
-            attr = gettypehint (node);
-            if (attr) {
-                if (isnumber) {
-                    if (strcmp("string", attr->nodeValue) == 0)
-                        isnumber = 0;
-                } else {
-                    if (textNode->valueLength == 4
-                        && strcmp("null", attr->nodeValue) == 0
-                        && strncmp("null", textNode->nodeValue, 4) == 0) {
-                        writeChars(jstring, channel, "null",4);
-                        return;
-                    } else if (strcmp("boolean", attr->nodeValue) == 0) {
-                        if (textNode->valueLength == 4
-                            && strncmp("true", textNode->nodeValue, 4) == 0) {
-                            writeChars(jstring, channel, "true",4);
-                            return;
-                        } else if (textNode->valueLength == 5
-                                   && strncmp("false", textNode->nodeValue, 5)
-                                   == 0) {
-                            writeChars(jstring, channel, "false",5);
-                            return;
-                        }
-                    }
-                }
-            }
-            if (isnumber) {
-                writeChars(jstring, channel, textNode->nodeValue,
-                           textNode->valueLength);
-            } else {
-                tcldom_AppendEscapedJSON (jstring, channel,
-                                          textNode->nodeValue,
-                                          textNode->valueLength);
-            }
-            return;
-        }    
-        child = child->nextSibling;
-        if (!child) return;
-    }
-    /* Since we're here, we have either an object or an array */
-    if (arrayContent) {
-        item = child;
-        while (item && strcmp (item->nodeName, "item") == 0) {
-            attr = gettypehint (item);
-            if (attr) break;
-            item = item->nextSibling;
-            while (item && item->nodeType != ELEMENT_NODE) {
-                item = item->nextSibling;
-                continue;
-            }
-            if (item) continue;
-            /* We're at the end of all child nodes and every element
-             * name is the array item name: This is a nested array. */
-            isArray = 1;
-        }
-        /* Is child the only element child and has the array item
-         * name, has it an array typehint? */
-        item = child->nextSibling;
-        while (item) {
-            if (item->nodeType == ELEMENT_NODE) break;
-            item = item->nextSibling;
-        }
-        if (!item) {
-            /* child is the only element child */
-            attr = gettypehint (child);
-            if (attr && strcmp ("array", attr->nodeValue) == 0) {
-                isArray = 1;
-            }
-        }
-        if (isArray) {
-            writeChars (jstring, channel, "[", 1);
-            item = child;
-            while (item) {
-                tcldom_treeAsJSON (jstring, item, channel, indent, 1);
-                item = item->nextSibling;
-                while (item && item->nodeType != ELEMENT_NODE) {
-                    item = item->nextSibling;
-                    continue;
-                }
-                if (item) {
-                    writeChars (jstring, channel, ",", 1);
-                }
-            }
-            writeChars (jstring, channel, "]", 1);            
-            return;
-        }
-    }
-    writeChars (jstring, channel, "{", 1);
-    while (child) {
-        writeChars (jstring, channel, "\"", 1);
-        writeChars (jstring, channel, child->nodeName, -1);
-        writeChars (jstring, channel, "\":", 2);
-        attr = gettypehint (child);
-        if (attr && strcmp("array", attr->nodeValue) == 0) {
-            writeChars(jstring, channel, "[", 1);
-            tcldom_treeAsJSON (jstring, child, channel, indent, 1);
-            writeChars(jstring, channel, "]", 1);
-            child = child->nextSibling;
-            while (child && child->nodeType != ELEMENT_NODE) {
-                child = child->nextSibling;
-                continue;
-            }
-            if (child) writeChars (jstring, channel, ",", 1);
-            continue;
-        }
-        if (attr && strcmp ("member", attr->nodeValue) == 0) {
-            tcldom_treeAsJSON (jstring, child, channel, indent, 0);
-            child = child->nextSibling;
-            while (child && child->nodeType != ELEMENT_NODE) {
-                child = child->nextSibling;
-                continue;
-            }
-            if (child) writeChars (jstring, channel, ",", 1);
-            continue;
-        }
-
-        /* Look ahead, if the next element child has the same name and is not typehinted. */
-        item = child->nextSibling;
-        while (item) {
-            if (item->nodeType != ELEMENT_NODE) {
-                item = item->nextSibling;
-                continue;
-            }
-            attr = gettypehint (item);
-            if (attr) {
-                break;
-            }
-            if (strcmp(item->nodeName, child->nodeName) != 0) {
-                break;
-            }
-            isArray = 1;
-            writeChars (jstring, channel, "[", 1);
-            tcldom_treeAsJSON (jstring, child, channel, indent, 1);
-            writeChars (jstring, channel, ",", 1);
-            tcldom_treeAsJSON (jstring, item, channel, indent, 1);
-            item = item->nextSibling;
-            while (item) {
-                if (item->nodeType != ELEMENT_NODE) {
-                    item = item->nextSibling;
-                    continue;
-                }
-                attr = gettypehint (item);
-                if (attr) {
-                    break;
-                }
-                if (strcmp(item->nodeName, child->nodeName) != 0) {
-                    break;
-                }
-                writeChars (jstring, channel, ",", 1);
-                tcldom_treeAsJSON (jstring, item, channel, indent, 1);
-                item = item->nextSibling;
-            }
-            writeChars (jstring, channel, "]", 1);
-            child = item;
-            break;
-        }
-        if (isArray) {
-            isArray = 0;
-            continue;
-        }
-        tcldom_treeAsJSON (jstring, child, channel, indent, 0);
-        child = child->nextSibling;
-        while (child && child->nodeType != ELEMENT_NODE) {
-            child = child->nextSibling;
-            continue;
-        }
-        if (child) writeChars (jstring, channel, ",", 1);
-    }
-    writeChars (jstring, channel, "}", 1);
 }
 
 /*----------------------------------------------------------------------------
@@ -3767,7 +3709,7 @@ static int serializeAsJSON (
         }
     }
     resultPtr = Tcl_NewStringObj("", 0);
-    tcldom_treeAsJSON(resultPtr, node, chan, indent, 1);
+    tcldom_treeAsJSON(resultPtr, node, chan, indent, JSON_START);
     Tcl_AppendResult(interp, Tcl_GetString(resultPtr), NULL);
     Tcl_DecrRefCount(resultPtr);
     return TCL_OK;
@@ -4293,7 +4235,7 @@ int tcldom_NodeObjCmd (
                  *str, *attr_name, *attr_val, *filter;
     const char  *localName, *uri, *nsStr;
     int          result, length, methodIndex, i, line, column;
-    int          nsIndex, bool, hnew, legacy;
+    int          nsIndex, bool, hnew, legacy, jsonTypeNumber;
     Tcl_Obj     *namePtr, *resultPtr;
     Tcl_Obj     *mobjv[MAX_REWRITE_ARGS];
     Tcl_CmdInfo  cmdInfo;
@@ -4316,7 +4258,7 @@ int tcldom_NodeObjCmd (
         "getElementsByTagName",              "getElementsByTagNameNS",
         "disableOutputEscaping",             "precedes",         "asText",
         "insertBeforeFromScript",            "normalize",        "baseURI",
-        "asJSON",
+        "asJSON",          "jsonType", 
 #ifdef TCL_THREADS
         "readlock",        "writelock",
 #endif
@@ -4339,9 +4281,9 @@ int tcldom_NodeObjCmd (
         m_getElementsByTagName,              m_getElementsByTagNameNS,
         m_disableOutputEscaping,             m_precedes,        m_asText,
         m_insertBeforeFromScript,            m_normalize,       m_baseURI,
-        m_asJSON
+        m_asJSON,          m_jsonType
 #ifdef TCL_THREADS
-        ,m_readlock,        m_writelock
+        ,m_readlock,       m_writelock
 #endif
     };
 
@@ -5290,6 +5232,25 @@ int tcldom_NodeObjCmd (
             domNormalize (node, bool, tcldom_deleteNode, interp);
             return TCL_OK;
 
+        case m_jsonType:
+            CheckArgs (2,3,2, "?jsonType?");
+            if (objc == 3) {
+                if (Tcl_GetIntFromObj(interp, objv[2], &jsonTypeNumber)
+                    != TCL_OK) {
+                    SetResult("jsonType must be a integer betwenn 0 and 7");
+                    return TCL_ERROR;
+                }
+                if (jsonTypeNumber < 0 || jsonTypeNumber > 7) {
+                    SetResult("jsonType must be a integer betwenn 0 and 7");
+                    return TCL_ERROR;
+                }
+                node->info = jsonTypeNumber;
+                SetIntResult(jsonTypeNumber);
+                return TCL_OK;
+            }
+            SetIntResult(node->info);
+            return TCL_OK;
+            
         TDomThreaded(
         case m_writelock:
             CheckArgs(3,3,2,"script");
