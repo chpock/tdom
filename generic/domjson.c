@@ -304,12 +304,6 @@ static int jsonParseValue(
         i++;
         skipspace(i);
         parent->info = JSON_ARRAY;
-        if (json[i] == ']') {
-            /* empty array */
-            DBG(fprintf(stderr,"Empty JSON array.\n"););
-            jparse->nestingDepth--;
-            return i+1;
-        }
         if (jparse->within == JSON_WITHIN_ARRAY) {
             node = domNewElementNode (parent->ownerDocument,
                                       JSON_ARRAY_CONTAINER);
@@ -317,6 +311,12 @@ static int jsonParseValue(
             domAppendChild(parent, node);
         } else {
             node = parent;
+        }
+        if (json[i] == ']') {
+            /* empty array */
+            DBG(fprintf(stderr,"Empty JSON array.\n"););
+            jparse->nestingDepth--;
+            return i+1;
         }
         jparse->within = JSON_WITHIN_ARRAY;
         for (;;) {
