@@ -3124,7 +3124,6 @@ void tcldom_childsAsJSON (
                 return;
             }
             break;
-        case JSON_START:
         case JSON_ARRAY:
             /* The childs, we serialize are the value of an array
              * element. The arg node is a container for either a
@@ -3143,6 +3142,11 @@ void tcldom_childsAsJSON (
                 /* If we here, heuristics didn't helped. We have to
                  * default to something. Let's say ... */
                 effectivParentType = JSON_ARRAY;
+            }
+            break;
+        case JSON_START:
+            if (child == NULL) {
+                return;
             }
             break;
         }
@@ -4233,7 +4237,7 @@ int tcldom_NodeObjCmd (
                  *str, *attr_name, *attr_val, *filter;
     const char  *localName, *uri, *nsStr;
     int          result, length, methodIndex, i, line, column;
-    int          nsIndex, bool, hnew, legacy, jsonTypeNumber;
+    int          nsIndex, bool, hnew, legacy, jsonType;
     Tcl_Obj     *namePtr, *resultPtr;
     Tcl_Obj     *mobjv[MAX_REWRITE_ARGS];
     Tcl_CmdInfo  cmdInfo;
@@ -4285,7 +4289,17 @@ int tcldom_NodeObjCmd (
 #endif
     };
 
-
+    static const char *jsonTypes[] = {
+        "NONE",
+        "ARRAY",
+        "OBJECT",
+        "NULL",
+        "TRUE",
+        "FALSE",
+        "STRING",
+        "NUMBER"
+    };
+    
     node = (domNode*) clientData;
     if (TSD(domCreateCmdMode) == DOM_CREATECMDMODE_AUTO) {
         TSD(dontCreateObjCommands) = 0;
@@ -5233,20 +5247,30 @@ int tcldom_NodeObjCmd (
         case m_jsonType:
             CheckArgs (2,3,2, "?jsonType?");
             if (objc == 3) {
-                if (Tcl_GetIntFromObj(interp, objv[2], &jsonTypeNumber)
-                    != TCL_OK) {
-                    SetResult("jsonType must be a integer betwenn 0 and 7");
+                str = Tcl_GetString(objv[2]);
+                switch (str[0]) {
+                case 'A': if (strcmp (str, "ARRAY")==0)  jsonType = 1; break;
+                case 'O': if (strcmp (str, "OBJECT")==0) jsonType = 2; break;
+                case 'N': if (strcmp (str, "NULL")==0)   {jsonType = 3; break;}
+                          if (strcmp (str, "NUMBER")==0) jsonType = 7; break;
+                case 'T': if (strcmp (str, "TRUE")==0)   jsonType = 4; break;
+                case 'F': if (strcmp (str, "FALSE")==0)  jsonType = 5; break;
+                case 'S': if (strcmp (str, "STRING")==0) jsonType = 6; break;
+                default:
+                    SetResult("The jsonType argument must be one out of "
+                              "this List: ARRAY OBJECT NULL TRUE FALSE "
+                              "STRING NUMBER");
                     return TCL_ERROR;
                 }
-                if (jsonTypeNumber < 0 || jsonTypeNumber > 7) {
-                    SetResult("jsonType must be a integer betwenn 0 and 7");
-                    return TCL_ERROR;
-                }
-                node->info = jsonTypeNumber;
-                SetIntResult(jsonTypeNumber);
+                node->info = jsonType;
+                SetIntResult(jsonType);
                 return TCL_OK;
             }
-            SetIntResult(node->info);
+            if (node->info < 0 || node->info > 7) {
+                SetResult(jsonTypes[0]);
+            } else {
+                SetResult(jsonTypes[node->info]);
+            }
             return TCL_OK;
             
         TDomThreaded(
@@ -5308,6 +5332,7 @@ int tcldom_DocObjCmd (
         "replaceChild",    "appendFromList",             "appendXML",
         "selectNodes",     "baseURI",                    "appendFromScript",
         "insertBeforeFromScript",                        "asJSON",
+        "jsonType",
 #ifdef TCL_THREADS
         "readlock",        "writelock",                  "renumber",
 #endif
@@ -5332,7 +5357,8 @@ int tcldom_DocObjCmd (
         m_childNodes,       m_ownerDocument,              m_insertBefore,
         m_replaceChild,     m_appendFromList,             m_appendXML,
         m_selectNodes,      m_baseURI,                    m_appendFromScript,
-        m_insertBeforeFromScript,                         m_asJSON
+        m_insertBeforeFromScript,                         m_asJSON,
+        m_jsonType
 #ifdef TCL_THREADS
        ,m_readlock,         m_writelock,                  m_renumber
 #endif
@@ -5754,6 +5780,7 @@ int tcldom_DocObjCmd (
         case m_selectNodes:
         case m_baseURI:
         case m_asJSON:
+        case m_jsonType:
         case m_getElementById:
             /* We dispatch the method call to tcldom_NodeObjCmd */
             if (TSD(domCreateCmdMode) == DOM_CREATECMDMODE_AUTO) {

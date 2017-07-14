@@ -314,8 +314,28 @@ test json-7.1 {jsonType} {
     set result [list]
     lappend result [$root asJSON]
     lappend result [$root jsonType]
-    $root jsonType 1
+    $root jsonType ARRAY
     lappend result [$root asJSON]
     $doc delete
     set result
-} {{"foo"} 0 {["foo"]}}
+} {{"foo"} NONE {["foo"]}}
+
+test json-7.2 {jsonType} {
+    set doc [dom createDocumentNode]
+    set result [$doc jsonType]
+    lappend result [$doc asJSON]
+    lappend result [catch {$doc jsonType foo}]
+    $doc jsonType ARRAY
+    lappend result [$doc asJSON]
+    $doc jsonType OBJECT
+    lappend result [$doc asJSON]
+    $doc delete
+    set result
+} {NONE {} 1 {[]} {{}}}
+    
+    
+    set root [$doc documentElement]
+    set result [list]
+    lappend result [$root asJSON]
+    lappend result [$root jsonType]
+    

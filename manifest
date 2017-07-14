@@ -1,5 +1,5 @@
-C Fix\sin\sJSON\sunescaping.
-D 2017-07-13T21:57:44.988
+C Changed\sjsonType\sto\ssymbolic\snames.\sDomDocs\snow\salso\smay\shave\sa\sjsontype.\sOther\sminor\stweaks.
+D 2017-07-14T00:44:17.815
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -141,7 +141,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c fff479358cd9d391f83ebad7ef7b1e02cdbf9a90
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
-F generic/tcldom.c 5e74fac428e841f74228ebb78d4cdd1d835d719c
+F generic/tcldom.c d13b06d430a7cfba05b9a0c2543808bd78b6c7de
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
 F generic/tclexpat.c 069180212797fc14bdb0a08bcd1ad3461406975c
 F generic/tclexpat.h 3fb4df4c023d1f625ec9c5783c4fc1d1e4e0b8bb
@@ -218,7 +218,7 @@ F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
 F tests/html5reader.test f839da02dd4b1227a2ee3bae9abfba983951d9ad
 F tests/htmlreader.test 0fffea0d73efb2ccf5e3a807e68b437f55a152d2
 F tests/i18n.test f5493417c35c973a0d8651c3c13d5d4e8272f6bf
-F tests/jsonreader.test 02c758a5dffd66ca9b8d831046f55572cb9de70c
+F tests/jsonreader.test f68a31cbe83d852f89e1ea0204bdbc9cf420cedb
 F tests/loadtdom.tcl bf298e4effa2a7de7380687911994f762c0f0c84
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
 F tests/parser.test 7ab920967c1dcf32f1c2fa618e12395d3b734c3a
@@ -245,8 +245,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 65e76f96e03811951f9aff4ba6f081792cca23fc
-R 19fca28b5c0b6e31df1d21e80cb8712e
+P 7b3b9a981731729ed3466c619a17ebf63a65e1ca
+R 3347979737c95b0797cd87ce4329075e
 U rolf
-Z 0240a32711f41d12975636753d2d9690
+Z 9d1af053315d0a9350c90340331ae61a
 # Remove this line to create a well-formed Fossil manifest.
