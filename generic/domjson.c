@@ -473,6 +473,7 @@ JSON_Parse (
     }
     if (json[pos] != '\0') {
         *byteIndex = pos;
+        jparse.state = JSON_SYNTAX_ERR;
         goto reportError;
     }
     if (jparse.len > 0) {
