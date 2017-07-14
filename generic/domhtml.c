@@ -1344,7 +1344,8 @@ HTML_SimpleParse (
                 case 'l':  if (!strcmp(node->nodeName,"link"))     hasContent = 0; break;
                 case 'm':  if (!strcmp(node->nodeName,"meta"))     hasContent = 0; break;
                 case 'p':  if (!strcmp(node->nodeName,"param"))    hasContent = 0; break;
-                case 's':  if (!strcmp(node->nodeName,"spacer"))   hasContent = 0; break; /*ext*/
+                case 's':  if (!strcmp(node->nodeName,"spacer") ||                        /*ext*/
+                               !strcmp(node->nodeName,"source"))   hasContent = 0; break; /*html5*/
             }
 
             if (*x=='/') {
