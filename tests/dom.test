@@ -1520,6 +1520,7 @@ namespace eval nodeCmds {
     dom createNodeCmd cdataNode   cdata
     dom createNodeCmd piNode      pi
     dom createNodeCmd parserNode  parser
+    dom createNodeCmd -tagName foo elementNode bar
 }
 
 test dom-10.1 {createNodeCmd} {
@@ -1578,6 +1579,16 @@ test dom-10.5 {node creating command called outside domNode context} {
         }} errMsg]
     lappend result $errMsg
 } {{<docRoot><e1>Some text</e1></docRoot>} 1 {called outside domNode context}}
+
+test dom-10.6 {createNodeCmd - option -tagName} {
+    set doc [dom createDocumentNode]
+    $doc appendFromScript {
+        nodeCmds::bar {}
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<foo/>}
 
 namespace delete nodeCmds
 

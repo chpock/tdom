@@ -4289,7 +4289,7 @@ int tcldom_NodeObjCmd (
 #endif
     };
 
-    static const char *jsonTypes[] = {
+    static CONST84 char *jsonTypes[] = {
         "NONE",
         "ARRAY",
         "OBJECT",
