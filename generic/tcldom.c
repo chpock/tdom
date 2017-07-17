@@ -4289,17 +4289,6 @@ int tcldom_NodeObjCmd (
 #endif
     };
 
-    static CONST84 char *jsonTypes[] = {
-        "NONE",
-        "ARRAY",
-        "OBJECT",
-        "NULL",
-        "TRUE",
-        "FALSE",
-        "STRING",
-        "NUMBER"
-    };
-    
     node = (domNode*) clientData;
     if (TSD(domCreateCmdMode) == DOM_CREATECMDMODE_AUTO) {
         TSD(dontCreateObjCommands) = 0;
@@ -5246,21 +5235,31 @@ int tcldom_NodeObjCmd (
 
         case m_jsonType:
             CheckArgs (2,3,2, "?jsonType?");
+            if (node->nodeType != ELEMENT_NODE
+                && node->nodeType != TEXT_NODE) {
+                SetResult("Only element and text nodes may have a JSON type.");
+                return TCL_ERROR;
+            }
             if (objc == 3) {
-                str = Tcl_GetString(objv[2]);
-                switch (str[0]) {
-                case 'A': if (strcmp (str, "ARRAY")==0)  jsonType = 1; break;
-                case 'O': if (strcmp (str, "OBJECT")==0) jsonType = 2; break;
-                case 'N': if (strcmp (str, "NULL")==0)   {jsonType = 3; break;}
-                          if (strcmp (str, "NUMBER")==0) jsonType = 7; break;
-                case 'T': if (strcmp (str, "TRUE")==0)   jsonType = 4; break;
-                case 'F': if (strcmp (str, "FALSE")==0)  jsonType = 5; break;
-                case 'S': if (strcmp (str, "STRING")==0) jsonType = 6; break;
-                default:
-                    SetResult("The jsonType argument must be one out of "
-                              "this List: ARRAY OBJECT NULL TRUE FALSE "
-                              "STRING NUMBER");
+                if (Tcl_GetIndexFromObj (interp, objv[2], jsonTypes,
+                                         "jsonType", 0, &jsonType)
+                    != TCL_OK) {
                     return TCL_ERROR;
+                }
+                if (node->nodeType == ELEMENT_NODE) {
+                    if (jsonType > 2) {
+                        SetResult("For an element node the jsonType argument "
+                                  "must be one out of this list: ARRAY OBJECT NONE.");
+                        return TCL_ERROR;
+                    }
+                } else {
+                    /* Text nodes */
+                    if (jsonType < 3) {
+                        SetResult("For a text node the jsonType argument must be "
+                                  "one out of this list: TRUE FALSE NULL NUMBER "
+                                  "STRING NONE");
+                        return TCL_ERROR;
+                    }
                 }
                 node->info = jsonType;
                 SetIntResult(jsonType);
@@ -5883,20 +5882,37 @@ int tcldom_createDocumentNode (
     Tcl_Obj    * const objv[]
 )
 {
-    int          setVariable = 0;
+    int          setVariable = 0, jsonType = 0, index;
     domDocument *doc;
     Tcl_Obj     *newObjName = NULL;
 
-
-    CheckArgs(1,2,1,"?newObjVar?");
+    static CONST84 char *options[] = {"-jsonType", NULL};
+    
+    CheckArgs(1,4,1,"?-jsonType jsonType? ?newObjVar?");
 
     if (objc == 2) {
         newObjName = objv[1];
         setVariable = 1;
     }
+    if (objc > 2) {
+        if (Tcl_GetIndexFromObj(interp, objv[1], options, "option",
+                                0, &index) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        Tcl_ResetResult(interp);
+            if (Tcl_GetIndexFromObj(interp, objv[2], jsonTypes, "jsonType",
+                                0, &jsonType) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        if (objc == 4) {
+            newObjName = objv[3];
+            setVariable = 1;
+        }
+    }
 
     doc = domCreateDoc(NULL, 0);
-
+    doc->rootNode->info = jsonType;
+    
     return tcldom_returnDocumentObj(interp, doc, setVariable, newObjName, 1,
                                     0);
 }

@@ -9,6 +9,7 @@
 #    json-5.*: Max nesting
 #    json-6.*: asJSON
 #    json-7.*: jsonType
+#    json-7.*: appendFromScript
 # Copyright (c) 2017 Rolf Ade.
 
 source [file join [file dir [info script]] loadtdom.tcl]
@@ -111,6 +112,23 @@ test json-1.15 {Parse JSON - nested object} {
     $doc delete
     set result
 } "a<arraycontainer>aabb</arraycontainer>b"
+
+set notJsons {
+    {{null}}
+    {{1.23}}
+    {{"string"}}
+    {{"e":}}
+}
+test json-1.16 {Invalid input} {
+    set result ""
+    set ind 0
+    foreach notJson $notJsons {
+        if {![catch {dom parse -json $notJson docNode} errMsg]} {
+            lappend result $errMsg
+        }
+    }
+    set result
+} ""
 
 test json-2.1 {invalid xml name} {
     set doc [dom parse -json {{"a":"a value","1b":"1value", "a\nb":"a\nb", "":"empty string"}}]
@@ -307,7 +325,6 @@ test json-6.2 {asJSON - slash will not be escaped while serializing} {
     set result
 } {"http://foo.bar"}
 
-
 test json-7.1 {jsonType} {
     set doc [dom parse {<j>foo</j>}]
     set root [$doc documentElement]
@@ -332,10 +349,34 @@ test json-7.2 {jsonType} {
     $doc delete
     set result
 } {NONE {} 1 {[]} {{}}}
-    
-    
+
+namespace eval nodeCmds {
+    dom createNodeCmd elementNode e1
+    dom createNodeCmd -jsonType ARRAY elementNode jae1
+    dom createNodeCmd elementNode e2
+    dom createNodeCmd commentNode c
+    dom createNodeCmd textNode    t
+    dom createNodeCmd cdataNode   cdata
+    dom createNodeCmd piNode      pi
+}
+
+test json-8.1 {appendFromScript} {knownBug} {
+    set doc [dom createDocumentNode]
+    $doc appendFromScript {
+        nodeCmds::e1
+    }
+    set result [$doc asJSON]
     set root [$doc documentElement]
-    set result [list]
+    lappend result [$root asJSON]
+    $doc removeChild [$doc firstChild]
+    $doc appendFromScript {
+        nodeCmds::jae1
+    }
+    lappend result [$doc asJSON]
+    set root [$doc documentElement]
     lappend result [$root asJSON]
     lappend result [$root jsonType]
-    
+    puts [$root nodeName]
+    $doc delete
+    set result
+} {}
