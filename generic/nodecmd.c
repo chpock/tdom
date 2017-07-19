@@ -622,15 +622,12 @@ nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
     }
     Tcl_DStringAppend(&cmdName, Tcl_GetString(objv[2]), -1);
 
-    nodeInfo = (NodeInfo *) MALLOC (sizeof (NodeInfo));
-    nodeInfo->namespace = NULL;
     Tcl_ResetResult (interp);
     switch ((enum subCmd)index) {
     case ELM_NODE: 
         if (!jsonType) {
             if (!tcldom_nameCheck(interp, namespaceTail(objv[2]),
                                   "tag", 0)) {
-                FREE (nodeInfo);
                 return TCL_ERROR;
             }
             if (checkName && checkCharData) {
@@ -643,6 +640,12 @@ nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
                 type = ELEMENT_NODE;
             }
         } else {
+            if (jsonType > 2) {
+                Tcl_SetResult(interp, "For an element node the jsonType"
+                              " argument must be one out of this list: ARRAY"
+                              " OBJECT NONE.", NULL);
+                return TCL_ERROR;
+            }
             type = ELEMENT_NODE;
         }
         break;
@@ -657,6 +660,12 @@ nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
                 type = TEXT_NODE;
             }
         } else {
+            if (jsonType < 3 && jsonType > 0) {
+                Tcl_SetResult(interp, "For a text node the jsonType "
+                              "argument must be one out of this list: "
+                              "TRUE FALSE NULL NUMBER STRING NONE",
+                              NULL);
+            }
             type = TEXT_NODE;
         }
         break;
@@ -689,7 +698,15 @@ nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
         Tcl_SetResult (interp, "Invalid/unexpected node type", NULL);
         return TCL_ERROR;
     }
+
+    if (jsonType && type != ELEMENT_NODE && type != TEXT_NODE) {
+        Tcl_SetResult(interp, "Only element and text nodes may have a "
+                      "JSON type.", NULL);
+        return TCL_ERROR;        
+    }
     
+    nodeInfo = (NodeInfo *) MALLOC (sizeof (NodeInfo));
+    nodeInfo->namespace = NULL;
     nodeInfo->type = type;
     if (nodecmd) {
         nodeInfo->type *= -1; /* Signal this fact */

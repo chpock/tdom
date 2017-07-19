@@ -5307,7 +5307,7 @@ int tcldom_NodeObjCmd (
                     }
                 } else {
                     /* Text nodes */
-                    if (jsonType < 3) {
+                    if (jsonType < 3 && jsonType > 0) {
                         SetResult("For a text node the jsonType argument must be "
                                   "one out of this list: TRUE FALSE NULL NUMBER "
                                   "STRING NONE");
