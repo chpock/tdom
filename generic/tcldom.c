@@ -3103,7 +3103,7 @@ void tcldom_childsAsJSON (
     )
 {
     domNode   *child, *nextChild;
-    int effectivParentType = 0;
+    int i, effectivParentType = 0;
     int first = 1;
 
     child = node->firstChild;
@@ -3191,8 +3191,16 @@ void tcldom_childsAsJSON (
         while (child) {
             if (first) {
                 first = 0;
+                level++;
             } else {
                 writeChars(jstring, channel, ",", 1);
+            }
+            if (indent > -1) {
+                writeChars(jstring, channel, "\n", 1);
+                if (first) level++;
+                for (i = 0; i < level; i++) {
+                    writeChars(jstring, channel, "        ", indent);
+                }
             }
             tcldom_treeAsJSON (jstring, child, channel, indent,
                                level, JSON_ARRAY);
@@ -3203,6 +3211,13 @@ void tcldom_childsAsJSON (
                 child = child->nextSibling;
             }
         }
+        if (indent > -1 && first == 0) {
+            writeChars(jstring, channel, "\n", 1);
+            level--;
+            for (i = 0; i < level; i++) {
+                writeChars(jstring, channel, "        ", indent);
+            }
+        }
         writeChars(jstring, channel, "]",1);
         break;
     case JSON_OBJECT:
@@ -3210,8 +3225,16 @@ void tcldom_childsAsJSON (
         while (child) {
             if (first) {
                 first = 0;
+                level++;
             } else {
                 writeChars(jstring, channel, ",", 1);
+            }
+            if (indent > -1) {
+                writeChars(jstring, channel, "\n", 1);
+                if (first) level++;
+                for (i = 0; i < level; i++) {
+                    writeChars(jstring, channel, "        ", indent);
+                }
             }
             tcldom_treeAsJSON (jstring, child, channel, indent,
                                level, JSON_OBJECT);
@@ -3220,6 +3243,13 @@ void tcldom_childsAsJSON (
              * semantically sense. */
             while (child && child->nodeType != ELEMENT_NODE) {
                 child = child->nextSibling;
+            }
+        }
+        if (indent > -1 && first == 0) {
+            writeChars(jstring, channel, "\n", 1);
+            level--;
+            for (i = 0; i < level; i++) {
+                writeChars(jstring, channel, "        ", indent);
             }
         }
         writeChars(jstring, channel, "}",1);
@@ -3658,7 +3688,7 @@ static int serializeAsJSON (
 )
 {
     char       *channelId;
-    int         optionIndex, mode, indent = 4;
+    int         optionIndex, mode, indent = -1;
     Tcl_Obj    *resultPtr;
     Tcl_Channel chan = (Tcl_Channel) NULL;
 
@@ -3723,7 +3753,11 @@ static int serializeAsJSON (
             else if (Tcl_GetIntFromObj(interp, objv[3], &indent) != TCL_OK) {
                 SetResult( "indent must be an integer (0..8) or 'no'/'none'");
                 return TCL_ERROR;
+            } else if (indent < 0 || indent > 8) {
+                SetResult( "indent must be an integer (0..8) or 'no'/'none'");
+                return TCL_ERROR;
             }
+                
             objc -= 2;
             objv += 2;
             break;
