@@ -6075,9 +6075,7 @@ int tcldom_parse (
     int          takeJSONParser      = 0;
     int          takeSimpleParser    = 0;
     int          takeHTMLParser      = 0;
-#ifdef TDOM_HAVE_GUMBO
     int          takeGUMBOParser     = 0;
-#endif
     int          setVariable         = 0;
     int          ignorexmlns         = 0;
     int          feedbackAfter       = 0;
@@ -6141,6 +6139,11 @@ int tcldom_parse (
             objv++;  objc--; continue;
 
         case o_json:
+            if (takeGUMBOParser || takeHTMLParser) {
+                SetResult("The options -html, -html5 and -json are "
+                          "mutually exclusive.");
+                return TCL_ERROR;
+            }
             takeJSONParser = 1;
             objv++;  objc--; continue;
             
@@ -6165,22 +6168,20 @@ int tcldom_parse (
             objv++;  objc--; continue;
 
         case o_html:
-#ifdef TDOM_HAVE_GUMBO
-            if (takeGUMBOParser) {
-                SetResult("The options -html and -html5 are mutually"
-                          " exclusive.");
+            if (takeGUMBOParser || takeJSONParser) {
+                SetResult("The options -html, -html5 and -json are "
+                          "mutually exclusive.");
                 return TCL_ERROR;
             }
-#endif            
             takeSimpleParser = 1;
             takeHTMLParser = 1;
             objv++;  objc--; continue;
 
 #ifdef TDOM_HAVE_GUMBO
         case o_htmlfive:
-            if (takeHTMLParser) {
-                SetResult("The options -html and -html5 are mutually"
-                          " exclusive.");
+            if (takeHTMLParser || takeJSONParser) {
+                SetResult("The options -html, -html5 and -json are "
+                          "mutually exclusive.");
                 return TCL_ERROR;
             }
             takeGUMBOParser = 1;
