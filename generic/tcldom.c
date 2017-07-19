@@ -392,6 +392,7 @@ static Tcl_CmdDeleteProc tcldom_docCmdDeleteProc;
 
 static void tcldom_treeAsJSON(Tcl_Obj *jstring, domNode *node,
                               Tcl_Channel channel, int indent,
+                              int level,
                               int inside);
 
 #ifdef TCL_THREADS
@@ -3097,6 +3098,7 @@ void tcldom_childsAsJSON (
     domNode     *node, /* Must be an ELEMENT_NODE */
     Tcl_Channel  channel,
     int          indent,
+    int          level,
     int          inside
     )
 {
@@ -3111,75 +3113,76 @@ void tcldom_childsAsJSON (
         child = child->nextSibling;
     }
 
-    if (node->info != JSON_ARRAY && node->info != JSON_OBJECT) {
+    if (node->info == JSON_ARRAY || node->info == JSON_OBJECT) {
+        effectivParentType = node->info;
+    } else if (child == NULL) {
         /* Need 'heuristic rule' to decide, what to do. */
         switch (inside) {
         case JSON_OBJECT:
-            /* The childs, we serialize are the value of an object member */
-            if (child == NULL) {
-                /* No content at all. This could be an empty string,
-                 * an empty object or an empty array. We default to
-                 * empty string. */
-                writeChars(jstring, channel, "\"\"",2);
-                return;
-            }
-            break;
+            /* The childs to serialize are the value of an object member. */
+            /* No content at all. This could be an empty string,
+             * an empty object or an empty array. We default to
+             * empty string. */
+            writeChars(jstring, channel, "\"\"",2);
+            return;
         case JSON_ARRAY:
             /* The childs, we serialize are the value of an array
              * element. The arg node is a container for either a
              * (nested, in case of JSON_ARRAY) array or an object. */
-            if (child == NULL) {
-                /* Empty array or empty object. Look, if the name of
-                 * the container gives a hint.*/
-                if (strcmp (node->nodeName, JSON_OBJECT_CONTAINER)==0) {
-                    effectivParentType = JSON_OBJECT;
-                    break;
-                }
-                if (strcmp (node->nodeName, JSON_ARRAY_CONTAINER)==0) {
-                    effectivParentType = JSON_ARRAY;
-                    break;
-                }
-                /* If we here, heuristics didn't helped. We have to
-                 * default to something. Let's say ... */
-                effectivParentType = JSON_ARRAY;
+            /* Empty array or empty object. Look, if the name of
+             * the container gives a hint.*/
+            if (strcmp (node->nodeName, JSON_OBJECT_CONTAINER)==0) {
+                effectivParentType = JSON_OBJECT;
+                break;
             }
+            if (strcmp (node->nodeName, JSON_ARRAY_CONTAINER)==0) {
+                effectivParentType = JSON_ARRAY;
+                break;
+            }
+            /* If we here, heuristics didn't helped. We have to
+             * default to something. Let's say ... */
+            effectivParentType = JSON_ARRAY;
             break;
         case JSON_START:
-            if (child == NULL) {
-                return;
-            }
+            return;
             break;
         }
-        if (child) {
-            if (child->nodeType == ELEMENT_NODE) {
-                /* If the first 'relevant' child node is ELEMENT_NODE,
-                 * we assume the childs represent a nested JSON object. */
-                effectivParentType = JSON_OBJECT;
-            } else {
-                /* If we are here, the first 'relevant' child is a
-                 * text node. If there is any other 'relevant' child,
-                 * we assume the value to be an array. Otherwise (only
-                 * single 'relevant' child is a text node), this is
-                 * any of string, true, false null. Child may have a
-                 * type hint. */
-                nextChild = child->nextSibling;
-                while (nextChild
-                       && nextChild->nodeType != TEXT_NODE
-                       && nextChild->nodeType) {
-                    nextChild = nextChild->nextSibling;
-                }
-                if (nextChild) {
+    } else {
+        if (child->nodeType == ELEMENT_NODE) {
+            /* The first 'relevant' child node is ELEMENT_NODE */
+            if (inside == JSON_ARRAY) {
+                if (strcmp (node->nodeName, JSON_ARRAY_CONTAINER)) {
                     effectivParentType = JSON_ARRAY;
                 } else {
-                    /* Exactly one 'relevant' child node, a text node. */
-                    tcldom_treeAsJSON (jstring, child, channel, indent,
-                                       JSON_ARRAY);
-                    return;
+                    /* we assume the childs represent a nested JSON
+                     * object. */
+                    effectivParentType = JSON_OBJECT;
                 }
+            } else {
+                effectivParentType = JSON_OBJECT;
+            }
+        } else {
+            /* If we are here, the first 'relevant' child is a
+             * text node. If there is any other 'relevant' child,
+             * we assume the value to be an array. Otherwise (only
+             * single 'relevant' child is a text node), this is
+             * any of string, true, false null. Child may have a
+             * type hint. */
+            nextChild = child->nextSibling;
+            while (nextChild
+                   && nextChild->nodeType != TEXT_NODE
+                   && nextChild->nodeType != ELEMENT_NODE) {
+                nextChild = nextChild->nextSibling;
+            }
+            if (nextChild) {
+                effectivParentType = JSON_ARRAY;
+            } else {
+                /* Exactly one 'relevant' child node, a text node. */
+                tcldom_treeAsJSON (jstring, child, channel, indent,
+                                   level, JSON_ARRAY);
+                return;
             }
         }
-    } else {
-        effectivParentType = node->info;
     }
         
     switch (effectivParentType) {
@@ -3191,8 +3194,14 @@ void tcldom_childsAsJSON (
             } else {
                 writeChars(jstring, channel, ",", 1);
             }
-            tcldom_treeAsJSON (jstring, child, channel, indent, JSON_ARRAY);
+            tcldom_treeAsJSON (jstring, child, channel, indent,
+                               level, JSON_ARRAY);
             child = child->nextSibling;
+            while (child
+                   && child->nodeType != TEXT_NODE
+                   && child->nodeType != ELEMENT_NODE) {
+                child = child->nextSibling;
+            }
         }
         writeChars(jstring, channel, "]",1);
         break;
@@ -3204,8 +3213,14 @@ void tcldom_childsAsJSON (
             } else {
                 writeChars(jstring, channel, ",", 1);
             }
-            tcldom_treeAsJSON (jstring, child, channel, indent, JSON_OBJECT);
+            tcldom_treeAsJSON (jstring, child, channel, indent,
+                               level, JSON_OBJECT);
             child = child->nextSibling;
+            /* Inside of a JSON_OBJECT, only element childs make
+             * semantically sense. */
+            while (child && child->nodeType != ELEMENT_NODE) {
+                child = child->nextSibling;
+            }
         }
         writeChars(jstring, channel, "}",1);
         break;
@@ -3225,6 +3240,7 @@ void tcldom_treeAsJSON (
     domNode     *node,  /* Must not be NULL */
     Tcl_Channel  channel,
     int          indent,
+    int          level,
     int          inside
     )
 {
@@ -3270,16 +3286,19 @@ void tcldom_treeAsJSON (
             tcldom_AppendEscapedJSON (jstring, channel,
                                       node->nodeName, -1);
             writeChars (jstring, channel, ":", 1);
-            tcldom_childsAsJSON (jstring, node, channel, indent, inside);
+            tcldom_childsAsJSON (jstring, node, channel, indent,
+                                 level, inside);
             break;
         case JSON_ARRAY:
             /* Since we're already inside of an array, the element can
                only be interpreted as a container for a nested JSON
                object. */
-            tcldom_childsAsJSON (jstring, node, channel, indent, inside);
+            tcldom_childsAsJSON (jstring, node, channel, indent,
+                                 level, inside);
             break;
         case JSON_START:
-            tcldom_childsAsJSON (jstring, node, channel, indent, inside);            
+            tcldom_childsAsJSON (jstring, node, channel, indent,
+                                 level, inside);            
             break;
         }
         break;
@@ -3711,7 +3730,7 @@ static int serializeAsJSON (
         }
     }
     resultPtr = Tcl_NewStringObj("", 0);
-    tcldom_treeAsJSON(resultPtr, node, chan, indent, JSON_START);
+    tcldom_treeAsJSON(resultPtr, node, chan, indent, 0, JSON_START);
     Tcl_AppendResult(interp, Tcl_GetString(resultPtr), NULL);
     Tcl_DecrRefCount(resultPtr);
     return TCL_OK;

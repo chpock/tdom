@@ -1,5 +1,5 @@
-C Added\s-jsonType\soption\sto\sthe\screateDocumentNode\smethod.\sIntermediatly\sgardening.
-D 2017-07-17T23:28:18.176
+C More\swork\son\sthe\sJSON\sserializer\sto\sensure,\sthat\sserializing\sany\s(not\sjson\stype\shinted)\sDOM\stree\sresults\sin\svalid\sJSON\sstring.
+D 2017-07-19T13:26:48.166
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -122,7 +122,7 @@ F extensions/tnc/tests/loadtnc.tcl 9472a546f30972f5ea6d16880ed57e709556ce88
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c e30dc44a8be8b99c9772daf5cafb3714d8550c37
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
-F generic/dom.c 72cf822c4f059119efad24726e161377823eb2f9
+F generic/dom.c 910ea5c7d1a3de5a71afd640d4e30d417ef218bf
 F generic/dom.h 6e967a3b38384b60e7dde1d856b2ee305e7ab6f2
 F generic/domalloc.c 55e9eeff19cc54cf3956a7013883ead07efd3593
 F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
@@ -141,7 +141,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 5a1a2884398982829a1f45d6ef53d52aa2394d52
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
-F generic/tcldom.c 54dcaa31c207c698007ad30dcac6ab41dfb494e5
+F generic/tcldom.c c508c3322a37caea023ed2e6449a981977496aaa
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
 F generic/tclexpat.c 069180212797fc14bdb0a08bcd1ad3461406975c
 F generic/tclexpat.h 3fb4df4c023d1f625ec9c5783c4fc1d1e4e0b8bb
@@ -218,7 +218,7 @@ F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
 F tests/html5reader.test f839da02dd4b1227a2ee3bae9abfba983951d9ad
 F tests/htmlreader.test 0fffea0d73efb2ccf5e3a807e68b437f55a152d2
 F tests/i18n.test f5493417c35c973a0d8651c3c13d5d4e8272f6bf
-F tests/jsonreader.test 52af16e05e150af775030eb86ac1cbb0b3a3cd8f
+F tests/jsonreader.test 730e16d6a4c7a78ec62d5c03a55b4d170f884cf1
 F tests/loadtdom.tcl bf298e4effa2a7de7380687911994f762c0f0c84
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
 F tests/parser.test 7ab920967c1dcf32f1c2fa618e12395d3b734c3a
@@ -245,8 +245,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P de1782fd97c86969ac93543c8aff01997378d750
-R a49d30e34e6cffa9e27293a431d8df31
+P 57a3a1ce1ce458a944098768287a285dca6e9ea9
+R 7ae74e7edbf12f90d109df8d6252b881
 U rolf
-Z a40efdd0192cbdbde570c39f87a4b325
+Z e2d14a1f0e67d70d985a8289186febc0
 # Remove this line to create a well-formed Fossil manifest.

@@ -325,6 +325,20 @@ test json-6.2 {asJSON - slash will not be escaped while serializing} {
     set result
 } {"http://foo.bar"}
 
+test json-6.3 {asJSON - docNode serialization} {
+    dom createDocumentNode docNode
+    set result [$docNode asJSON]
+    $docNode delete
+    set result
+} {}
+
+test json-6.4 {asJSON - doc serialization} {
+    dom createDocument root docNode
+    set result [$docNode asJSON]
+    $docNode delete
+    set result
+} {{"root":""}}
+
 test json-7.1 {jsonType} {
     set doc [dom parse {<j>foo</j>}]
     set root [$doc documentElement]
@@ -360,12 +374,13 @@ namespace eval nodeCmds {
     dom createNodeCmd piNode      pi
 }
 
-test json-8.1 {appendFromScript} {knownBug} {
+test json-8.1 {appendFromScript} {
     set doc [dom createDocumentNode]
     $doc appendFromScript {
         nodeCmds::e1
     }
-    set result [$doc asJSON]
+    set result [list]
+    lappend result [$doc asJSON]
     set root [$doc documentElement]
     lappend result [$root asJSON]
     $doc removeChild [$doc firstChild]
@@ -376,7 +391,6 @@ test json-8.1 {appendFromScript} {knownBug} {
     set root [$doc documentElement]
     lappend result [$root asJSON]
     lappend result [$root jsonType]
-    puts [$root nodeName]
     $doc delete
     set result
-} {}
+} {{{"e1":""}} {} {{"jae1":[]}} {[]} ARRAY}
