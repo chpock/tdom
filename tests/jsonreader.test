@@ -130,6 +130,21 @@ test json-1.16 {Invalid input} {
     set result
 } ""
 
+test json-1.17 {Literal binary 0 (NUL, '\0') is not allowed in input} {
+    catch {dom parse -json "\"a\u0000\""}
+} 1
+
+test json-1.18 {Escaped binary 0 (NUL, '\0') is OK} {
+    dom parse -json "\"a\\u0000\"" doc
+    set result [$doc asJSON]
+    $doc delete
+    set result
+} "\"a\\u0000\""
+
+test json-1.19 {Invalid input - uncompled \u escape} {
+    catch {dom parse -json {"ab\u00"}}
+} 1
+
 test json-2.1 {invalid xml name} {
     set doc [dom parse -json {{"a":"a value","1b":"1value", "a\nb":"a\nb", "":"empty string"}}]
     set result [$doc asXML -indent none]

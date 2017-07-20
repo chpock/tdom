@@ -135,6 +135,8 @@ static int jsonParseString (
         if (c == '"') {
             return i;
         }
+        if (c == 0xC0 && (unsigned char)json[i+1] == 0x80)
+            errReturn(i,JSON_SYNTAX_ERR);
         if ((clen = UTF8_CHAR_LEN(c)) == 0)
             errReturn(i,JSON_SYNTAX_ERR);
         i += clen;
@@ -155,7 +157,7 @@ static int jsonParseString (
         /* Unescaped control characters are not allowed in JSON
          * strings. */
         if (c <= 0x1f) errReturn(i,JSON_SYNTAX_ERR);
-        if (jparse->len - j < 4) {
+        if (jparse->len - j < 8) {
             jparse->buf = REALLOC (jparse->buf, jparse->len * 2);
             jparse->len *= 2;
         }
