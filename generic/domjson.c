@@ -123,7 +123,7 @@ static int jsonParseString (
     }
     for(;;) {
         c = json[i];
-        DBG(fprintf (stderr, "Looking at '%c'\n", c););
+        DBG(fprintf (stderr, "Looking at '%d'\n", c););
         /* Unescaped control characters are not allowed in JSON
          * strings. */
         if (c <= 0x1f) {
@@ -170,9 +170,14 @@ static int jsonParseString (
                     else u = u*16 + c - 'a' + 10;
                 }
                 if (u <= 0x7f) {
-                    
-                    jparse->buf[j++] = (char)u;
-                    clen = 1;
+                    if (u == 0) {
+                        jparse->buf[j++] = (char)0xC0;
+                        jparse->buf[j++] = (char)0x80;
+                        clen = 2;
+                    } else {
+                        jparse->buf[j++] = (char)u;
+                        clen = 1;
+                    }
                 } else if (u <= 0x7ff) {
                     jparse->buf[j++] = (char)(0xc0 | (u>>6));
                     jparse->buf[j++] = 0x80 | (u&0x3f);

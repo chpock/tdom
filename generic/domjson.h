@@ -26,19 +26,6 @@ typedef enum {
 #define JSON_NUMBER 7
 
 
-static CONST84 char *jsonTypes[] = {
-    "NONE",
-    "ARRAY",
-    "OBJECT",
-    "NULL",
-    "TRUE",
-    "FALSE",
-    "STRING",
-    "NUMBER",
-    NULL
-};
-    
-
 domDocument *
 JSON_Parse (
     char *json,    /* Complete text of the json string being parsed */

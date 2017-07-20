@@ -359,6 +359,18 @@ static char node_usage[] =
     )
 ;
 
+static CONST84 char *jsonTypes[] = {
+    "NONE",
+    "ARRAY",
+    "OBJECT",
+    "NULL",
+    "TRUE",
+    "FALSE",
+    "STRING",
+    "NUMBER",
+    NULL
+};
+
 /*----------------------------------------------------------------------------
 |   Types
 |
@@ -3073,14 +3085,23 @@ void tcldom_AppendEscapedJSON (
                 AP('\\'); AP('r');
             } else if (*pc == '\t') {
                 AP('\\'); AP('t');
+            } else if ((unsigned char)*pc < 0x20) {
+                AP('\\'); AP('u'); AP('0'); AP('0');
+                AP('0' + (*pc>>4));
+                AP("0123456789abcdef"[*pc&0xf]);
             } else {
                 AP(*pc);
             }
             pc++;
         } else {
-            for (i = 0; i < clen; i++) {
-                AP(*pc);
-                pc++;
+            if ((unsigned char)*pc == 0xC0 && (unsigned char)*(pc+1) == 0x80) {
+                AP('\\');AP('u');AP('0');AP('0');AP('0');AP('0');
+                pc++;pc++;
+            } else {
+                for (i = 0; i < clen; i++) {
+                    AP(*pc);
+                    pc++;
+                }
             }
         }
         if (b >= bLimit) {
