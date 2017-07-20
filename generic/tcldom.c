@@ -3146,41 +3146,32 @@ void tcldom_childsAsJSON (
              * empty string. */
             writeChars(jstring, channel, "\"\"",2);
             return;
+        case JSON_START:
         case JSON_ARRAY:
             /* The childs, we serialize are the value of an array
-             * element. The arg node is a container for either a
+             * element. The node is a container for either a
              * (nested, in case of JSON_ARRAY) array or an object. */
-            /* Empty array or empty object. Look, if the name of
-             * the container gives a hint.*/
-            if (strcmp (node->nodeName, JSON_OBJECT_CONTAINER)==0) {
-                effectivParentType = JSON_OBJECT;
-                break;
-            }
+            /* Look, if the name of the container gives a hint.*/
             if (strcmp (node->nodeName, JSON_ARRAY_CONTAINER)==0) {
                 effectivParentType = JSON_ARRAY;
                 break;
             }
             /* If we here, heuristics didn't helped. We have to
              * default to something. Let's say ... */
-            effectivParentType = JSON_ARRAY;
-            break;
-        case JSON_START:
-            return;
+            effectivParentType = JSON_OBJECT;
             break;
         }
     } else {
         if (child->nodeType == ELEMENT_NODE) {
             /* The first 'relevant' child node is ELEMENT_NODE */
+            effectivParentType = JSON_OBJECT;
             if (inside == JSON_ARRAY) {
-                if (strcmp (node->nodeName, JSON_ARRAY_CONTAINER)) {
+                /* Though, if we inside of an array and the node name
+                 * of the first 'relevant' child is the array
+                 * container element, we assume an array (with a
+                 * nested array as first value of that array. */
+                if (strcmp (child->nodeName, JSON_ARRAY_CONTAINER))
                     effectivParentType = JSON_ARRAY;
-                } else {
-                    /* we assume the childs represent a nested JSON
-                     * object. */
-                    effectivParentType = JSON_OBJECT;
-                }
-            } else {
-                effectivParentType = JSON_OBJECT;
             }
         } else {
             /* If we are here, the first 'relevant' child is a
@@ -3198,7 +3189,8 @@ void tcldom_childsAsJSON (
             if (nextChild) {
                 effectivParentType = JSON_ARRAY;
             } else {
-                /* Exactly one 'relevant' child node, a text node. */
+                /* Exactly one 'relevant' child node, a text node;
+                 * serialize it as simple token value. */
                 tcldom_treeAsJSON (jstring, child, channel, indent,
                                    level, JSON_ARRAY);
                 return;
@@ -3296,7 +3288,10 @@ void tcldom_treeAsJSON (
     )
 {
     domTextNode *textNode;
-
+    int i, seenDP, seenE;
+    unsigned char c;
+    char *num;
+    
     switch (node->nodeType) {
     case TEXT_NODE:
         if (inside == JSON_OBJECT) {
@@ -3308,8 +3303,59 @@ void tcldom_treeAsJSON (
         textNode = (domTextNode *) node;
         switch (node->info) {
         case JSON_NUMBER:
+            /* Check, if the text value is a JSON number and fall back
+             * to string token, if not. This is to ensure, the
+             * serialization is always a valid JSON string. */
+            if (textNode->valueLength == 0) goto notANumber;
+            seenDP = 0;
+            seenE = 0;
+            i = 0;
+            num = textNode->nodeValue;
+            c = num[0];
+            if (!(c == '-' || (c>='0' && c<='9'))) goto notANumber;
+            if (c<='0') {
+                i = (c == '-' ? i+1 : i);
+                if (i+1 < textNode->valueLength) {
+                    if (num[i] == '0' && num[i+1] >= '0' && num[i+1] <= '9') {
+                        goto notANumber;
+                    }
+                }
+            }
+            i = 1;
+            for (; i < textNode->valueLength; i++) {
+                c = num[i];
+                if (c >= '0' && c <= '9') continue;
+                if (c == '.') {
+                    if (num[i-1] == '-') goto notANumber;
+                    if (seenDP) goto notANumber;
+                    seenDP = 1;
+                    continue;
+                }
+                if (c == 'e' || c == 'E') {
+                    if (num[i-1] < '0') goto notANumber;
+                    if (seenE) goto notANumber;
+                    seenDP = seenE = 1;
+                    c = num[i+1];
+                    if (c == '+' || c == '-') {
+                        i++;
+                        c = num[i+1];
+                    }
+                    if (c < '0' || c > '9') goto notANumber;
+                    continue;
+                }
+                break;
+            }
+            /* Catches a plain '-' without following digits */
+            if (num[i-1] < '0') goto notANumber;
+            /* Catches trailing chars */
+            if (i < textNode->valueLength) goto notANumber;
             writeChars(jstring, channel, textNode->nodeValue,
                        textNode->valueLength);
+            break;
+            notANumber:
+            tcldom_AppendEscapedJSON (jstring, channel,
+                                      textNode->nodeValue,
+                                      textNode->valueLength);
             break;
         case JSON_NULL:
             writeChars(jstring, channel, "null",4);
@@ -3328,7 +3374,7 @@ void tcldom_treeAsJSON (
                                       textNode->valueLength);
             break;
         };
-        break;
+        return;
     case ELEMENT_NODE:
         switch (inside) {
         case JSON_OBJECT:
@@ -3343,7 +3389,7 @@ void tcldom_treeAsJSON (
         case JSON_ARRAY:
             /* Since we're already inside of an array, the element can
                only be interpreted as a container for a nested JSON
-               object. */
+               object or array. */
             tcldom_childsAsJSON (jstring, node, channel, indent,
                                  level, inside);
             break;
@@ -3352,7 +3398,7 @@ void tcldom_treeAsJSON (
                                  level, inside);            
             break;
         }
-        break;
+        return;
     default:
         /* Any other node types (COMMENT_NODE, CDATA_SECTION_NODE, 
            PROCESSING_INSTRUCTION_NODE) are ignored. */

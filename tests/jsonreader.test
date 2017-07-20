@@ -14,6 +14,21 @@
 
 source [file join [file dir [info script]] loadtdom.tcl]
 
+
+namespace eval nodeCmds {
+    dom createNodeCmd elementNode e1
+    dom createNodeCmd -jsonType ARRAY elementNode jae1
+    dom createNodeCmd elementNode e2
+    dom createNodeCmd commentNode c
+    dom createNodeCmd textNode    t
+    dom createNodeCmd -jsonType TRUE textNode true
+    dom createNodeCmd -jsonType FALSE textNode false
+    dom createNodeCmd -jsonType NULL textNode null
+    dom createNodeCmd -jsonType NUMBER textNode number
+    dom createNodeCmd cdataNode   cdata
+    dom createNodeCmd piNode      pi
+}
+
 test json-1.1 {Parse JSON} {
     set doc [dom parse -json {{"a":"avalue","b":"bvalue","c":0.123}}]
     set result [$doc asXML -indent none]
@@ -144,6 +159,16 @@ test json-1.18 {Escaped binary 0 (NUL, '\0') is OK} {
 test json-1.19 {Invalid input - uncompled \u escape} {
     catch {dom parse -json {"ab\u00"}}
 } 1
+
+test json-1.20 {Escaped binary 0} {
+    dom parse -json "\"a\\u0000\"" doc
+    set textvalue [$doc selectNodes string(node())]
+    set result [string length $textvalue]
+    binary scan $textvalue c2 result2
+    lappend result {*}$result2
+    $doc delete
+    set result
+} {2 97 0}
 
 test json-2.1 {invalid xml name} {
     set doc [dom parse -json {{"a":"a value","1b":"1value", "a\nb":"a\nb", "":"empty string"}}]
@@ -345,7 +370,7 @@ test json-6.3 {asJSON - docNode serialization} {
     set result [$docNode asJSON]
     $docNode delete
     set result
-} {}
+} {{}}
 
 test json-6.4 {asJSON - doc serialization} {
     dom createDocument root docNode
@@ -384,17 +409,7 @@ test json-7.2 {jsonType} {
     lappend result [$doc asJSON]
     $doc delete
     set result
-} {NONE {} 1 {[]} {{}}}
-
-namespace eval nodeCmds {
-    dom createNodeCmd elementNode e1
-    dom createNodeCmd -jsonType ARRAY elementNode jae1
-    dom createNodeCmd elementNode e2
-    dom createNodeCmd commentNode c
-    dom createNodeCmd textNode    t
-    dom createNodeCmd cdataNode   cdata
-    dom createNodeCmd piNode      pi
-}
+} {NONE {{}} 1 {[]} {{}}}
 
 test json-8.1 {appendFromScript} {
     set doc [dom createDocumentNode]
@@ -415,4 +430,42 @@ test json-8.1 {appendFromScript} {
     lappend result [$root jsonType]
     $doc delete
     set result
-} {{{"e1":""}} {} {{"jae1":[]}} {[]} ARRAY}
+} {{{"e1":""}} {{}} {{"jae1":[]}} {[]} ARRAY}
+
+test json-8.2 {appendFromScript} {
+    set doc [dom createDocumentNode]
+    $doc appendFromScript {
+        nodeCmds::t "some string"
+    }
+    set result [$doc asJSON]
+    $doc delete
+    set result
+} {"some string"}
+
+test json-8.3 {appendFromScript} {
+    set doc [dom createDocumentNode]
+    $doc appendFromScript {
+        nodeCmds::t ""
+        nodeCmds::true ""
+        nodeCmds::false ""
+        nodeCmds::null ""
+    }
+    set result [$doc asJSON]
+    $doc delete
+    set result
+} {["",true,false,null]}
+
+test json-8.4 {appendFromScript - text node with type NUMBER} {
+    set doc [dom createDocumentNode]
+    $doc appendFromScript {
+        nodeCmds::number ""
+        nodeCmds::number "0"
+        nodeCmds::number "123456789012345678901234567890.12345679e-0003"
+        nodeCmds::number "42 "
+        nodeCmds::number " 42"
+        nodeCmds::number "-"
+    }
+    set result [$doc asJSON]
+    $doc delete
+    set result
+} {["",0,123456789012345678901234567890.12345679e-0003,"42 "," 42","-"]}
