@@ -115,18 +115,18 @@ used, which tries to even parse badly formed HTML into a DOM tree.</desc>
                 tree. The JSON serialization of this document (with
                 the domDoc method <m>asJSON</m>) is the same JSON
                 information as the <m>data</m>, preserving JSON
-                datatypes, allowing not unique member names of objects
+                datatypes, allowing non-unique member names of objects
                 while preserving their order and the full range of
                 JSON string values. JSON datatype handling is done
                 with an additional property "sticking" at the doc and
-                tree nodes. This properties aren't contained in an XML
+                tree nodes. This property isn't contained in an XML
                 serialization of the document. If you need to store
                 the JSON data represented by a document, store the
                 JSON serialization and parse it back from there. Apart
                 from this JSON type information the returned doc
                 command or handle is an ordinary DOM doc, which may be
                 investigated or modified with the full range of the
-                doc and node methods. Please note, that the element
+                doc and node methods. Please note that the element
                 node names and the text node values within the tree
                 may be outside of what the appropriate XML productions
                 allow.</desc>

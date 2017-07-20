@@ -21,6 +21,7 @@ if {$argc} {
         set file $path
     }
 } else {
+    set path ""
     set dir [pwd]
 }
 

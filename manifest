@@ -1,5 +1,5 @@
-C Started\sdocumentation.\sAdjusted\sthe\scode\sto\sdo,\swhat\sthe\sdoc\ssay.
-D 2017-07-20T22:33:33.826
+C Some\sproof-reading.
+D 2017-07-20T23:42:23.968
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -17,10 +17,10 @@ F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html 60f5d127c5500cb90a997dd7744dba39589bb3dd
 F doc/dom.html 6a69d902757c07fcad52dc2cf57e197913816eb6
 F doc/dom.n f67480e7795346967fa02b2fd9a1cf7731f34d75
-F doc/dom.xml a085ce4e5ac6ce907e41989b75772fbd5ac97dd1
+F doc/dom.xml f40193945e3f0d87d27ec703338d5fa6e0acdb1c
 F doc/domDoc.html 13f1c5a31db849a096dca94e3b26f80fbaf09194
 F doc/domDoc.n 7da0ccc4bbabee4daa92ea750925716c07bcba70
-F doc/domDoc.xml 898e4138e6d981bf8775133e06deee9feff1b306
+F doc/domDoc.xml decd36e22ff77f77e2f8e996bb7e3d03bbf491a4
 F doc/domNode.html 2a07904089144bbb149346eb9a736ae001c1e189
 F doc/domNode.n 16062590c5b9dc85f2ee15bf585896ea487b5fee
 F doc/domNode.xml 3dc09cf9c00e95501f09009a51af05ac5271e5c6
@@ -182,7 +182,7 @@ F tclconfig/install-sh bdd5e293591621ae60d9824d86a4b1c5f22c3d00 x
 F tclconfig/tcl.m4 77652577e7a7c2ca5656a93e6fbfd61614846893
 F tdom.m4 9156eb062710ee9b4bd9b75bfedd5d1012d1e926
 F tdomConfig.sh.in 5756c6b431179e49852a607cc2ca01e5381da905
-F tests/JSONTestSuite.tcl bbd6f3f4629036d0c2bb132c524fbc1c1bfa5833
+F tests/JSONTestSuite.tcl 907228f9bd31855951b9033df74c9c15778765af
 F tests/OASIS-suite.tcl c71eab00ca0ca3cff438a0bdcd35ee7d66b14565
 F tests/all-bench.tcl 38bc7b4c88f5d679b2fce6c9c2b2ea7d8ad18e90
 F tests/all.tcl a8d5d3e3adc6713f64d0c614b927bd21ca8df870
@@ -245,8 +245,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 3c29d95f88b9a4a76b46e6a1e867a37ede5681b7
-R 9015f89b6d253dda1215611adbc3027c
+P 86b81a0c23947fd9fc82b13078d301a98c6367ce
+R 6bbbadc7286ff0f8121b88262b928be9
 U rolf
-Z bce8691720f1cb5f26854850a897dd51
+Z 91677cd633e50f9f6c66ff09dfda32a6
 # Remove this line to create a well-formed Fossil manifest.
