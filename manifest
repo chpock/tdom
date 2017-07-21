@@ -1,5 +1,5 @@
-C Some\sproof-reading.
-D 2017-07-20T23:42:23.968
+C Added\smore\sdocumentation.
+D 2017-07-21T12:50:56.951
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -17,13 +17,13 @@ F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html 60f5d127c5500cb90a997dd7744dba39589bb3dd
 F doc/dom.html 6a69d902757c07fcad52dc2cf57e197913816eb6
 F doc/dom.n f67480e7795346967fa02b2fd9a1cf7731f34d75
-F doc/dom.xml f40193945e3f0d87d27ec703338d5fa6e0acdb1c
+F doc/dom.xml c278a2ee6f2da38d8dffe5a7a7e71d15e447ecac
 F doc/domDoc.html 13f1c5a31db849a096dca94e3b26f80fbaf09194
 F doc/domDoc.n 7da0ccc4bbabee4daa92ea750925716c07bcba70
 F doc/domDoc.xml decd36e22ff77f77e2f8e996bb7e3d03bbf491a4
 F doc/domNode.html 2a07904089144bbb149346eb9a736ae001c1e189
 F doc/domNode.n 16062590c5b9dc85f2ee15bf585896ea487b5fee
-F doc/domNode.xml 3dc09cf9c00e95501f09009a51af05ac5271e5c6
+F doc/domNode.xml c2333353f6779eddba1d12af67844177a61b7eaf
 F doc/expat.html b0f131647c66c4d82308f60895435afc238c24b4
 F doc/expat.n 1532a92db725e1d28a357484fe9105ebe7fb778c
 F doc/expat.xml cc280131ede8000bcfe6d79ead52b0852076a55d
@@ -139,7 +139,7 @@ F generic/domxslt.c 9127e45e5c83ad2c4bee7ff00eb1410e69546782
 F generic/domxslt.h c068da9c518ad5e2a543874c18166065f0bf2bbc
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F generic/nodecmd.c 9dce4b8dbcf47d2ef3c47f90b55144e783d085ae
+F generic/nodecmd.c 457ea343f24e76d69545d19e2fdbb00b0e3bd722
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
 F generic/tcldom.c c37bca7caf4155468fb1f646f95406927a913cd0
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
@@ -245,8 +245,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 86b81a0c23947fd9fc82b13078d301a98c6367ce
-R 6bbbadc7286ff0f8121b88262b928be9
+P 68f0eddeb0cb57134ce7fdd8a39785e3d6256d3e
+R 097fa5a8e6ce9f974d8700b41846f7e1
 U rolf
-Z 91677cd633e50f9f6c66ff09dfda32a6
+Z f6de269efc6306943dab0c4e751f47cc
 # Remove this line to create a well-formed Fossil manifest.

@@ -625,8 +625,22 @@ if given, is set to the empty string.</p>
         <desc>Returns the value of the attribute <m>attrName</m>.  Short cut
 for <m>getAttribute</m>.</desc>
       </commanddef>
+
+      <commanddef>
+        <command><method>jsonType</method> <m>?OBJECT|ARRAY|NONE)|(STRING|NUMBER|TRUE|FALSE|NULL|NONE)?</m></command>
+        <desc>Only element and text nodes may have a JSON type and
+        only this types of nodes support the <m>jsonType</m> method;
+        the other node types return error if called with this method.
+        Returns the jsonType of the node. If the optional argument is
+        given, the JSON type of the node is set to the given type and
+        returned. Valid type arguments for element nodes are OBJECT,
+        ARRAY and NONE. Valid type arguments for text nodes are
+        STRING, NUMBER, TRUE, FALSE, NULL and NONE.</desc>
+      </commanddef>
+
     </commandlist>
 
+    
     <p>Otherwise, if an unknown method name is given, the command with the same
 name as the given method within the namespace <l>::dom::domNode</l> is tried to
 be executed. This allows quick method additions on Tcl level.</p>

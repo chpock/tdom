@@ -524,6 +524,7 @@ nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
     int             checkCharData;      /* Flag: Data checks? */
 {
     int index, ret, type, nodecmd = 0, jsonType = 0;
+    int isElement = 0;
     char *nsName, buf[64];
     Tcl_Obj *tagName = NULL ;
     Tcl_DString cmdName;
@@ -625,6 +626,7 @@ nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
     Tcl_ResetResult (interp);
     switch ((enum subCmd)index) {
     case ELM_NODE: 
+        isElement = 1;
         if (!jsonType) {
             if (!tcldom_nameCheck(interp, namespaceTail(objv[2]),
                                   "tag", 0)) {
@@ -699,6 +701,12 @@ nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
         return TCL_ERROR;
     }
 
+    if (tagName && !isElement) {
+        Tcl_SetResult(interp, "The -tagName option is allowed only for "
+                      "element node commands.", NULL);
+        return TCL_ERROR;        
+    }
+    
     if (jsonType && type != ELEMENT_NODE && type != TEXT_NODE) {
         Tcl_SetResult(interp, "Only element and text nodes may have a "
                       "JSON type.", NULL);
