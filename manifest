@@ -1,5 +1,5 @@
-C Added\sdocumentation\sfor\sthe\snew\sXPath\ssyntax\sextension.
-D 2017-07-21T22:09:13.757
+C Corrected\smarkup.
+D 2017-07-21T22:24:45.991
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -20,7 +20,7 @@ F doc/dom.n f67480e7795346967fa02b2fd9a1cf7731f34d75
 F doc/dom.xml c278a2ee6f2da38d8dffe5a7a7e71d15e447ecac
 F doc/domDoc.html 13f1c5a31db849a096dca94e3b26f80fbaf09194
 F doc/domDoc.n 7da0ccc4bbabee4daa92ea750925716c07bcba70
-F doc/domDoc.xml decd36e22ff77f77e2f8e996bb7e3d03bbf491a4
+F doc/domDoc.xml c441c27c7ba922c84f0a17433e1b1a880407f1d4
 F doc/domNode.html 2a07904089144bbb149346eb9a736ae001c1e189
 F doc/domNode.n 16062590c5b9dc85f2ee15bf585896ea487b5fee
 F doc/domNode.xml f76514d54cc898ac97f4348ed0c4ccf04ea40eaa
@@ -245,8 +245,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 407b3fac54bccc272ada3708a7c000e51aed9727
-R a31ae74f8c77bcf3703df3642e0ae71a
+P 199814dab5f2ed6c051da754c753115935ee4349
+R a00075c5f4bbebf9ce1924a79b7fc51f
 U rolf
-Z e20a1b2bfc2044b719a100834f90236e
+Z c9668eba56905402eeab7ea4619f9261
 # Remove this line to create a well-formed Fossil manifest.
