@@ -1037,6 +1037,47 @@ test xpath-5.43 {XPath is commutative} {
     set result
 } {1 1 zwei}
 
+test xpath-5.44 {Element name injected with tcl variable} {
+    set doc [dom parse -json {{"member name with spaces":"the value"}}]
+    set nodeName "member name with spaces"
+    set node [$doc selectNodes %nodeName]
+    set result [list]
+    lappend result [$node nodeName]
+    lappend result [$doc selectNodes string(%nodeName)]
+    set node [$doc selectNodes /%nodeName]
+    lappend result [$node nodeName]
+    $doc delete
+    set result
+} {{member name with spaces} {the value} {member name with spaces}}
+
+test xpath-5.45 {Element name injected with tcl variable} {
+    set doc [dom parse -json {{"a":{"with spaces":"the value"},"a":{"with spaces":"another value"}}}]
+    set nodeName "with spaces"
+    set node [$doc selectNodes {a[%nodeName='another value']}]
+    set result [list]
+    lappend result [$node nodeName]
+    lappend result [$doc selectNodes {string(a[%nodeName='another value'])}]
+    $doc delete
+    set result
+} {a {another value}}
+
+test xpath-5.46 {Element name injected with tcl variable - wrong xpath syntax} {
+    set doc [dom parse -json {{"a":{"with spaces":"the value"},"a":{"with spaces":"another value"}}}]
+    set result [catch {$doc selectNodes {a[b %nodeName='another value']}} errMsg]
+    lappend result $errMsg
+    $doc delete
+    set result
+} {1 {Predicate: Expected "RBRACKET" for 'a[b %nodeName='another value']' 
+
+Parsed symbols:
+     0 WCARDNAME        0 0.000e+00     0  a
+     1 LBRACKET         0 0.000e+00     1  
+     2 WCARDNAME        0 0.000e+00     2  b
+-->  3 WCARDNAME        0 0.000e+00    12  with spaces
+     4 EQUAL            0 0.000e+00    13  
+     5 LITERAL          0 0.000e+00    28  another value
+     6 RBRACKET         0 0.000e+00    29  }}
+    
 set doc [dom parse {
 <root>
   <asub>asub2</asub>

@@ -894,6 +894,23 @@ static XPathTokens xpathLexer (
                        }
                        break;
 
+            case '%':  if (!varParseCB) {
+                           *errMsg = tdomstrdup ("Unexpected char '%'");
+                           return tokens;
+                       }
+                       ps = (varParseCB->parseVarCB) (
+                                varParseCB->parseVarClientData, &xpath[i],
+                                &offset, errMsg
+                              );
+                       if (ps) {
+                           token = WCARDNAME;
+                           tokens[l].strvalue = tdomstrdup (ps);
+                           i += offset - 1;
+                       } else {
+                           return tokens;
+                       }
+                       break;
+                
             case '.':  if (xpath[i+1] == '.') {
                            token = DOTDOT;
                            i++;

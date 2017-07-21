@@ -523,10 +523,10 @@ nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
     int             checkName;          /* Flag: Name checks? */
     int             checkCharData;      /* Flag: Data checks? */
 {
-    int index, ret, type, nodecmd = 0, jsonType = 0;
+    int index, ret, type, nodecmd = 0, jsonType = 0, haveJsonType = 0;
     int isElement = 0;
     char *nsName, buf[64];
-    Tcl_Obj *tagName = NULL ;
+    Tcl_Obj *tagName = NULL;
     Tcl_DString cmdName;
     NodeInfo *nodeInfo;
 
@@ -585,6 +585,7 @@ nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
                                      1, &jsonType) != TCL_OK) {
                 return TCL_ERROR;
             }
+            haveJsonType = 1;
             objc -= 2;
             objv += 2;
             break;
@@ -627,7 +628,7 @@ nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
     switch ((enum subCmd)index) {
     case ELM_NODE: 
         isElement = 1;
-        if (!jsonType) {
+        if (!haveJsonType) {
             if (!tcldom_nameCheck(interp, namespaceTail(objv[2]),
                                   "tag", 0)) {
                 return TCL_ERROR;
@@ -655,7 +656,7 @@ nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
         type = PARSER_NODE;
         break;
     case TXT_NODE: 
-        if (!jsonType) {
+        if (!haveJsonType) {
             if (checkCharData) {
                 type = TEXT_NODE_CHK;
             } else {
@@ -707,7 +708,7 @@ nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
         return TCL_ERROR;        
     }
     
-    if (jsonType && type != ELEMENT_NODE && type != TEXT_NODE) {
+    if (haveJsonType && type != ELEMENT_NODE && type != TEXT_NODE) {
         Tcl_SetResult(interp, "Only element and text nodes may have a "
                       "JSON type.", NULL);
         return TCL_ERROR;        

@@ -1,5 +1,5 @@
-C Added\smore\sdocumentation.
-D 2017-07-21T12:50:56.951
+C Last\sneeded\smajor\sfeature\sadded:\sA\ssyntax\sto\s'inject'\sany\spossible\selement\sname\sinto\san\sxpath\sexpression.\sLacking\smore\sinput\sfrom\sinterested\sparties\sI\stook\sthe\s%varname\sapproach\s(similar\sto\s$varname\sapproach\sfor\sinjection\sof\sliterals)\sbecause\sit\sseems\sit's\salmost\sbindly\ssimple\sto\simplement.
+D 2017-07-21T14:34:54.871
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -133,13 +133,13 @@ F generic/domhtml5.h 5cca562a556e7662f2dce222640c32abb2777146
 F generic/domjson.c a0fc3dfb64039df70fbebe3a97ecc9bac902f30c
 F generic/domjson.h b10c42af9ef7fc9d0ad4fac733ef6461df0cdd90
 F generic/domlock.c b9543b7f1066118a5bcd0d2fa30acda6d247f15a
-F generic/domxpath.c c55b71340823a4b4a70e9b73ee21152fc51ff93c
+F generic/domxpath.c fafd984539cdb080d63e095dd4dfc4bf3a64426e
 F generic/domxpath.h 5481cdcb9248c50fb99cfba6d602572453897938
 F generic/domxslt.c 9127e45e5c83ad2c4bee7ff00eb1410e69546782
 F generic/domxslt.h c068da9c518ad5e2a543874c18166065f0bf2bbc
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F generic/nodecmd.c 457ea343f24e76d69545d19e2fdbb00b0e3bd722
+F generic/nodecmd.c 91aa873ca8a9bdf17a0294f19cb3be4cd05dc97e
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
 F generic/tcldom.c c37bca7caf4155468fb1f646f95406927a913cd0
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
@@ -183,7 +183,7 @@ F tclconfig/tcl.m4 77652577e7a7c2ca5656a93e6fbfd61614846893
 F tdom.m4 9156eb062710ee9b4bd9b75bfedd5d1012d1e926
 F tdomConfig.sh.in 5756c6b431179e49852a607cc2ca01e5381da905
 F tests/JSONTestSuite.tcl 907228f9bd31855951b9033df74c9c15778765af
-F tests/OASIS-suite.tcl c71eab00ca0ca3cff438a0bdcd35ee7d66b14565
+F tests/OASIS-suite.tcl d463d51057eaaec870588c244157d3d22096bd75
 F tests/all-bench.tcl 38bc7b4c88f5d679b2fce6c9c2b2ea7d8ad18e90
 F tests/all.tcl a8d5d3e3adc6713f64d0c614b927bd21ca8df870
 F tests/attribute.test 53ac8fb043e79b638c8c6f5e7da848f6103552d6
@@ -229,7 +229,7 @@ F tests/tdomcmd.test b3ec8a3f2c99305aae381989727ac707db2dea58
 F tests/xmlsimple.test b9ca923fb971af2b6170f35a887922e488db928d
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.bench 41d24b5b9b7b4593d002b3c6486cd36061f823bb
-F tests/xpath.test 5d3869e2eae23963892e3ca1c0afd4b1c2f65b63
+F tests/xpath.test c46bd3a37bf5710769ab46a3d170ca34aa3e9615
 F tests/xslt.test ed74e863288df75b4cccdac880984653952cbe68
 F unix/CONFIG 789192e463910e1b9dd7e65f6338390d2bf1f68a
 F unix/tclAppInit.c a1655c51127aed18d069010f234a378fceacb2a6
@@ -245,8 +245,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 68f0eddeb0cb57134ce7fdd8a39785e3d6256d3e
-R 097fa5a8e6ce9f974d8700b41846f7e1
+P 839c42ea9d7fa5f104423eafce8ee7168ecddc12
+R 13426270c1b9c020f76bd87713383601
 U rolf
-Z f6de269efc6306943dab0c4e751f47cc
+Z 89f4ff783f2d3c6613f028121e21895b
 # Remove this line to create a well-formed Fossil manifest.

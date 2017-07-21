@@ -148,7 +148,10 @@ proc extRefHandler {base systemId publicId} {
 # processing the stylesheet. The callback proc simply sends the text
 # message to stderr.
 proc xsltmsgcmd {msg terminate} {
-    puts stderr "xslt message: '$msg'"
+    variable loglevel
+    if ($loglevel >= 0) {
+        puts stderr "xslt message: '$msg'"
+    }
 }
 
 proc readCatalog {catalogPath} {
@@ -399,6 +402,8 @@ proc runTests {catalogRoot} {
             runTest $testcase
         }
     }
+    # Always output the summary
+    variable loglevel 0
     log 0 "Finished."
     log 0 "XML parse failed: $failedXML"
     log 0 "XSLT parse failed: $failedXSLT"
