@@ -1077,7 +1077,40 @@ Parsed symbols:
      4 EQUAL            0 0.000e+00    13  
      5 LITERAL          0 0.000e+00    28  another value
      6 RBRACKET         0 0.000e+00    29  }}
-    
+
+test xpath-5.47 {Element name injected with tcl variable} {
+    set doc [dom parse -json {{"a":{"":"the value"},"a":{"":"another value"}}}]
+    set nodeName ""
+    set node [$doc selectNodes {a[%nodeName='another value']}]
+    set result [list]
+    lappend result [$node nodeName]
+    lappend result [$doc selectNodes {string(a[%nodeName='another value'])}]
+    $doc delete
+    set result
+} {a {another value}}
+
+test xpath-5.46 {Element name injected with tcl variable} {
+    set doc [dom parse -json {{"a":{"a\u0001b":"the value"},"a":{"a\u0001b":"another value"}}}]
+    set nodeName "a\u0001b"
+    set node [$doc selectNodes {a[%nodeName='another value']}]
+    set result [list]
+    lappend result [$node nodeName]
+    lappend result [$doc selectNodes {string(a[%nodeName='another value'])}]
+    $doc delete
+    set result
+} {a {another value}}
+
+test xpath-5.47 {Element name injected with tcl variable} {
+    set doc [dom parse -json {{"a":{"a\u0000b":"the value"},"a":{"a\u0000b":"another value"}}}]
+    set nodeName "a\u0000b"
+    set node [$doc selectNodes {a[%nodeName='another value']}]
+    set result [list]
+    lappend result [$node nodeName]
+    lappend result [$doc selectNodes {string(a[%nodeName='another value'])}]
+    $doc delete
+    set result
+} {a {another value}}
+
 set doc [dom parse {
 <root>
   <asub>asub2</asub>
