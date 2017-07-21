@@ -1,7 +1,8 @@
-
 # Helper script to run xslt 1.0 conformance test suite created by the
 # OASIS XSLT / XPath Conformance Technical Committee. 
 
+catch {source uri.tcl}
+package require uri
 package require tdom
 
 # The following is not needed, given, that tDOM is correctly
@@ -23,9 +24,10 @@ set match [list]
 set matchgroup [list]
 set matchfile [list]
 set matchcatalog [list]
+set verbose 0
 
 proc putsUsage {{channel stderr}} {
-    puts $channel "usage: $argv0 ?options? path/to/catalog.xml"
+    puts $channel "usage: $::argv0 ?options? path/to/catalog.xml"
     puts $channel "where options can be:"
     puts $channel "-loglevel <int>"
     puts $channel "-skip patternlist"
@@ -33,17 +35,19 @@ proc putsUsage {{channel stderr}} {
     puts $channel "-matchgroup patternlist"
     puts $channel "-matchfile patternlist"
     puts $channel "-matchcatalog patternlist"
+    puts $channel "-verbose <boolean>"
 }
 
 proc processArgs {argc argv} {
-    global catalogfile
-    global skip
-    global match
-    global matchgroup
-    global matchfile
-    global matchcatalog
-    global loglevel
-
+    variable catalogfile
+    variable skip
+    variable match
+    variable matchgroup
+    variable matchfile
+    variable matchcatalog
+    variable loglevel
+    variable verbose
+    
     if {$argc == 0 || $argc % 2 == 0} {
         putsUsage
         exit 1
@@ -70,8 +74,16 @@ proc processArgs {argc argv} {
                 set matchcatalog $value
             }
             "-loglevel" {
-                if {![string is interger -strict $value]} {
+                if {[string is integer -strict $value]} {
                     set loglevel $value
+                } else {
+                    putsUsage
+                    exit 1
+                }
+            }
+            "-verbose" {
+                if {[string is boolean -strict $value]} {
+                    set verbose $value
                 } else {
                     putsUsage
                     exit 1
@@ -89,18 +101,62 @@ proc processArgs {argc argv} {
 
 set compareOK 0
 set compareDIFF 0
+set compareFAILED 0
+set failedOK 0
+set failedXML 0
+set failedXSLT 0
+set failedProcessing 0
+set notFailed 0
+
+proc extRefHandler {base systemId publicId} {
+    variable usageCounter
+
+    set absolutURI [uri::resolve $base $systemId]
+    incr usageCounter($absolutURI)
+    if {$usageCounter($absolutURI) > 10} {
+        error "Cirular import/include?"
+    }
+    switch $systemId {
+        "notfound.xml" {
+            return [list string $absolutURI "<notfound/>"]
+        }
+    }
+    array set uriData [uri::split $absolutURI]
+    switch $uriData(scheme) {
+        file {
+            if {[catch {
+                set xmlstr [xmlReadFile $uriData(path)]
+            }]} {
+                set pathlist [file split $uriData(path)]
+                set file [findFile [lindex $pathlist end] [lrange $pathlist 0 end-1]]
+                if {$file ne ""} {
+                    set xmlstr [xmlReadFile $file]
+                }
+                error "not resolved external entity. Base: $base SystemID: $systemId"
+            }
+            return [list string $absolutURI [xmlReadFile $uriData(path)]]
+        }
+        default {
+            error "can only handle file URI's"
+        }
+    }
+}
+
 
 # This is the callback proc for xslt:message elements. This proc is
 # called once every time an xslt:message element is encountered during
 # processing the stylesheet. The callback proc simply sends the text
 # message to stderr.
 proc xsltmsgcmd {msg terminate} {
-    puts stderr "xslt message: '$msg'"
+    variable loglevel
+    if ($loglevel >= 0) {
+        puts stderr "xslt message: '$msg'"
+    }
 }
 
 proc readCatalog {catalogPath} {
-    global catalogDir
-    global infoset
+    variable catalogDir
+    variable infoset
 
     set fd [open $catalogPath]
     set doc [dom parse -channel $fd]
@@ -113,6 +169,9 @@ proc readCatalog {catalogPath} {
 }
 
 proc checkAgainstPattern {patternlist text} {
+    if {![llength $patternlist]} {
+        return 1
+    }
     foreach pattern $patternlist {
         if {[string match $pattern $text]} {
             return 1
@@ -121,41 +180,17 @@ proc checkAgainstPattern {patternlist text} {
     return 0
 }
 
-proc runFilepath {filepath} {
-    global matchgroup
+proc skip {id} {
+    variable skip
 
-    if {![llength $matchgroup]} {
-        return 1
+    if {![llength $skip]} {
+        return 0
     }
-    return [checkAgainstPattern $matchgroup $filepath]
-}
-
-proc runXslfile {xslfile} {
-    global matchfile
-
-    if {![llength $matchfile]} {
-        return 1
-    }
-    return [checkAgainstPattern $matchfile $xslfile]
-}
-
-proc runPurpose {purpose} {
-    global match
-
-    if {![llength $match]} {
-        return 1
-    }
-    return [checkAgainstPattern $match $purpose]
-}
-
-proc skip {purpose} {
-    global skip
-
-    return [checkAgainstPattern $skip $purpose]
+    return [checkAgainstPattern $skip $id]
 }
 
 proc matchcatalog {testcatalog} {
-    global matchcatalog
+    variable matchcatalog
 
     if {![llength $matchcatalog]} {
         return 1
@@ -164,7 +199,7 @@ proc matchcatalog {testcatalog} {
 }
 
 proc log {level text {detail ""}} {
-    global loglevel
+    variable loglevel
 
     if {$level <= $loglevel} {
         puts $text
@@ -192,14 +227,25 @@ proc findFile {filename path} {
 }
 
 proc runTest {testcase} {
-    global catalogDir
-    global majorpath
-    global infoset
-    global compareOK
-    global compareDIFF
-
+    variable catalogDir
+    variable majorpath
+    variable matchgroup
+    variable matchfile
+    variable match
+    variable infoset
+    variable compareOK
+    variable compareDIFF
+    variable compareFAILED
+    variable failedOK
+    variable failedXML
+    variable failedXSLT
+    variable failedProcessing
+    variable notFailed
+    variable verbose
+    variable usageCounter
+    
     set filepath [$testcase selectNodes string(file-path)]
-    if {![runFilepath $filepath]} {
+    if {![checkAgainstPattern $matchgroup $filepath]} {
         return
     }
     set scenario [$testcase selectNodes scenario]
@@ -220,6 +266,24 @@ proc runTest {testcase} {
     }
     set xmlfile [$scenario selectNodes \
                      {string(input-file[@role="principal-data"])}]
+    set xslfile [$scenario selectNodes \
+                     {string(input-file[@role="principal-stylesheet"])}]
+    set testid [$testcase @id "<no-id>"]
+    if {![checkAgainstPattern $match $testid]} {
+        return
+    }
+    if {[skip $testid]} {
+        log 1 "Skipping test id $testid (filepath: $filepath)"
+        return
+    }
+
+    if {![checkAgainstPattern $matchfile $xslfile]} {
+        log 1 "Skipping xslfile $xslfile"
+        return
+    }
+    if {$verbose} {
+        puts [$testcase @id "<no-id>!!"]
+    }
     set xmlfile [file join $catalogDir $majorpath $filepath $xmlfile]
     if {![file readable $xmlfile]} {
         set xmlfile [findFile $xmlfile \
@@ -230,11 +294,6 @@ proc runTest {testcase} {
                      {string(input-file[@role="principal-data"])}]"
             return
         }
-    }
-    set xslfile [$scenario selectNodes \
-                     {string(input-file[@role="principal-stylesheet"])}]
-    if {![runXslfile $xslfile]} {
-        return
     }
     if {![file readable $xslfile]} {
         set xslfile [findFile $xslfile \
@@ -254,20 +313,14 @@ proc runTest {testcase} {
         set xmloutfile [file join $catalogDir $majorpath "REF_OUT" $filepath \
                             $xmlout]
     }
-    set purpose [$testcase selectNodes string(purpose)]
-    if {![runPurpose $purpose]} {
-        return
-    }
-    if {[skip $purpose]} {
-        log 1 "Skipping $filepath: $purpose"
-        return
-    }
+    array unset usageCounter
     if {[catch {
         set xmldoc [dom parse -baseurl [baseURL $xmlfile] \
                         -externalentitycommand extRefHandler \
                         -keepEmpties \
                         [xmlReadFile $xmlfile] ]
     } errMsg]} {
+        incr failedXML
         log 0 "Unable to parse xml file '$xmlfile'. Reason:\n$errMsg"
         return
     }
@@ -279,6 +332,7 @@ proc runTest {testcase} {
                          [xmlReadFile $xslfile] ]
     } errMsg]} {
         dom setStoreLineColumn 0
+        incr failedXSLT
         log 0 "Unable to parse xsl file '$xslfile'. Reason:\n$errMsg"
         return
     }
@@ -286,11 +340,16 @@ proc runTest {testcase} {
     set resultDoc ""
     if {[catch {$xmldoc xslt -xsltmessagecmd xsltmsgcmd $xsltdoc resultDoc} \
              errMsg]} {
-        if {$operation ne "execution-error"} {
+        if {$operation eq "execution-error"} {
+            incr failedOK
+            log 2 $errMsg
+        } else {
+            incr failedProcessing
             log 0 $errMsg
         }
     } else {
         if {$operation eq "execution-error"} {
+            incr notFailed
             log 0 "$xslfile - test should have failed, but didn't."
         }
     }
@@ -314,6 +373,7 @@ proc runTest {testcase} {
             $refinfosetdoc delete
             $resultinfosetdoc delete
         } else {
+            incr compareFAILED
             log 3 "Unable to parse REF doc. Reason:\n$errMsg"
         }
     }
@@ -323,10 +383,16 @@ proc runTest {testcase} {
 }
 
 proc runTests {catalogRoot} {
-    global majorpath
-    global compareOK
-    global compareDIFF
-
+    variable majorpath
+    variable compareOK
+    variable compareDIFF
+    variable compareFAILED
+    variable failedOK
+    variable failedXML
+    variable failedXSLT
+    variable failedProcessing
+    variable notFailed
+    
     foreach testcatalog [$catalogRoot selectNodes test-catalog] {
         if {![matchcatalog [$testcatalog @submitter]]} {
             continue
@@ -336,9 +402,17 @@ proc runTests {catalogRoot} {
             runTest $testcase
         }
     }
+    # Always output the summary
+    variable loglevel 0
     log 0 "Finished."
+    log 0 "XML parse failed: $failedXML"
+    log 0 "XSLT parse failed: $failedXSLT"
+    log 0 "Processing failed: $failedProcessing"
     log 0 "Compare OK: $compareOK"
     log 0 "Compare FAIL: $compareDIFF"
+    log 0 "Compare BROKEN: $compareFAILED"
+    log 0 "Not found errors: $notFailed"
+    log 0 "Failed OK: $failedOK"
 }
 
 processArgs $argc $argv

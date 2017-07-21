@@ -14,7 +14,7 @@
 -->
 
     <synopsis>
-      <syntax><cmd>package require tdom</cmd>
+      <syntax>package require tdom
 
 <cmd>expat</cmd> ?<m>parsername</m>? ?<m>-namespace</m>? ?<m>arg arg ..</m>
 
@@ -585,6 +585,16 @@ parser.</p>
           <p>If the -handlerset option is used, the configuration for the
 named handler set is returned.</p>
           </desc>
+        </commanddef>
+
+        <commanddef>
+          <command><cmd>parser</cmd> <method>currentmarkup</method></command>
+
+          <desc><p>Returns the current markup as found in the XML, if
+          called from within one of its markup event handler script
+          (-elementstartcommand, -elementendcommand, -commentcommand
+          and -processinginstructioncommand). Otherwise it return the
+          empty string.</p></desc>
         </commanddef>
 
         <commanddef>

@@ -2,8 +2,8 @@
 NOTICE: This file isn't kept up to date anymore. Look at the timeline
 of the leading fossil repository
 (https://46.163.78.80/cgi-bin/repros/tdom/timeline) or at the backup
-github repository at https://github.com/tDOM/tdom for detailed lists
-of code changes.
+repository at https://core.tcl.tk/tdom/timeline for detailed lists of
+code changes.
 
 User interface changes/enhancements and other important changes will
 still be documented in the CHANGES file.
@@ -2094,7 +2094,7 @@ still be documented in the CHANGES file.
 
         * generic/tcldom.c
         * tests/dom.test: Fixed bug with COMMENT_NODEs while using the
-          asList method (problem reported by Ramon Ribó). While at it,
+          asList method (problem reported by Ramon RibÃ³). While at it,
           also added code for handling processing instructions, which
           was also missing, up to now.
 

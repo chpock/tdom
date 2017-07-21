@@ -208,7 +208,8 @@ typedef struct xsltAttrSet {
     const char * name;
     const char * uri;
     domNode    * content;
-
+    int          inUse;
+    
     struct xsltAttrSet *next;
 
 } xsltAttrSet;
@@ -370,6 +371,8 @@ typedef struct xsltNSAlias
 typedef struct {
 
     xsltTemplate      * templates;
+    int                 nestedApplyTemplates;
+    int                 maxNestedApplyTemplates;
     Tcl_HashTable       namedTemplates;
     Tcl_HashTable       isElementTpls;
     xsltWSInfo          wsInfo;
@@ -763,7 +766,6 @@ static int xsltAddExternalDocument (
         fprintf (stderr, "xsltAddExternalDocument: baseURI '%s'\n", baseURI);
         fprintf (stderr, "xsltAddExternalDocument: systemID '%s'\n", str);
     )
-
     found = 0;
     sdoc = xs->subDocs;
     if (str) {
@@ -780,8 +782,8 @@ static int xsltAddExternalDocument (
     }
     if (!found) {
         if (!xs->xsltDoc->extResolver) {
-            *errMsg = tdomstrdup("need resolver Script to include Stylesheet! "
-                                 "(use \"-externalentitycommand\")");
+            *errMsg = tdomstrdup("Need resolver script for document() calls. "
+                                 "(Use \"-externalentitycommand\")");
             return -1;
         }
         extDocument = getExternalDocument (
@@ -1897,7 +1899,7 @@ static int buildKeyInfoForDoc (
             node = (domNode*) node->firstAttr;
             continue;
         }
-        if ((node->nodeType == ATTRIBUTE_NODE)) {
+        if (node->nodeType == ATTRIBUTE_NODE) {
             if (((domAttrNode*)node)->nextSibling) {
                 node = (domNode*) ((domAttrNode*)node)->nextSibling;
                 continue;
@@ -2765,8 +2767,7 @@ static int xsltSetVar (
             xpathRSInit (&rs);
             rsSetString (&rs, "");
         } else {
-            fragmentNode = domNewElementNode(xs->resultDoc, "",
-                                             ELEMENT_NODE);
+            fragmentNode = domNewElementNode(xs->resultDoc, "");
             savedLastNode = xs->lastNode;
             xs->lastNode = fragmentNode;
             /* process the children as well */
@@ -3187,12 +3188,13 @@ static int xsltAddTemplate (
         domSplitQName (str, prefix, &localName);
         if (prefix[0] != '\0') {
             ns = domLookupPrefix (node, prefix);
-            if (!ns) {
+            if (ns) {
+                tpl->modeURI = ns->uri;
+            } else {
                 reportError (node, "The prefix of the \"mode\" attribute value"
                              " isn't bound to a namespace.", errMsg);
                 rc = -1;
             }
-            tpl->modeURI = ns->uri;
         }
         tpl->mode = localName;
         if (rc < 0) {
@@ -3296,17 +3298,34 @@ static int ExecUseAttributeSets (
                 }
             }
             if (rc) {
+                if (attrSet->inUse) {
+                    attrSet->inUse = 0;
+                    *pc = save;
+                    reportError(actionNode, "Circular reference "
+                                "to attribute set", errMsg);
+                    return -1;
+                }
+                attrSet->inUse = 1;
                 str = getAttr (attrSet->content, "use-attribute-sets",
                                a_useAttributeSets);
                 if (str) {
                     rc = ExecUseAttributeSets (xs, context, currentNode,
                                                currentPos, attrSet->content,
                                                str, errMsg);
-                    CHECK_RC;
+                    if (rc < 0) {
+                        attrSet->inUse = 0;
+                        *pc = save;
+                        return rc;
+                    }
                 }
                 rc = ExecActions(xs, context, currentNode, currentPos,
                                  attrSet->content->firstChild, errMsg);
-                CHECK_RC;
+                attrSet->inUse = 0;
+                if (rc < 0) {
+                    attrSet->inUse = 0;
+                    *pc = save;
+                    return rc;
+                }
             }
             attrSet = attrSet->next;
         }
@@ -3942,7 +3961,7 @@ static int ExecAction (
     xpathResultSet  rs, nodeList;
     char           *str, *str2, *select, *pc, *nsAT, *out;
     const char     *mode, *modeURI, *localName, *uri, *nsStr;
-    char            prefix[MAX_PREFIX_LEN];
+    char            prefix[MAX_PREFIX_LEN], tmpErr[200];
     int             rc, b, i, len, terminate, chooseState, disableEsc = 0;
     double          currentPrio, currentPrec;
     Tcl_HashEntry  *h;
@@ -4266,7 +4285,7 @@ static int ExecAction (
 
             savedLastNode = xs->lastNode;
             xs->lastNode  = domNewElementNode (xs->resultDoc,
-                                               "container", ELEMENT_NODE);
+                                               "container");
             xsltPushVarFrame (xs);
             rc = ExecActions(xs, context, currentNode, currentPos,
                              actionNode->firstChild, errMsg);
@@ -4435,7 +4454,7 @@ static int ExecAction (
             break;
 
         case comment:
-            fragmentNode = domNewElementNode(xs->resultDoc, "", ELEMENT_NODE);
+            fragmentNode = domNewElementNode(xs->resultDoc, "");
             savedLastNode = xs->lastNode;
             xs->lastNode = fragmentNode;
             xsltPushVarFrame (xs);
@@ -4455,7 +4474,7 @@ static int ExecAction (
             }
             str = xpathGetStringValue (fragmentNode, &len);
             if (!domIsComment (str)) {
-                reportError (actionNode, "Invalide comment value", errMsg);
+                reportError (actionNode, "Invalid comment value", errMsg);
                 domDeleteNode (fragmentNode, NULL, NULL);
                 FREE(str);
                 return -1;
@@ -4824,12 +4843,11 @@ static int ExecAction (
             else if (strcmp (str, "yes") == 0) terminate = 1;
             else if (strcmp (str, "no")  == 0) terminate = 0;
             else {
-                reportError (actionNode, "Value for terminate should equal"
-                             " 'yes' or 'no'", errMsg);
+                reportError (actionNode, "Allowed values for the 'terminate'"
+                             "attribute: 'yes' or 'no'", errMsg);
                 return -1;
             }
-            fragmentNode = domNewElementNode(xs->resultDoc, "",
-                                             ELEMENT_NODE);
+            fragmentNode = domNewElementNode(xs->resultDoc, "");
             savedLastNode = xs->lastNode;
             xs->lastNode = fragmentNode;
             xsltPushVarFrame (xs);
@@ -4839,7 +4857,7 @@ static int ExecAction (
             CHECK_RC;
 
             str2 = xpathGetStringValue(fragmentNode, &len);
-            xs->xsltMsgCB (xs->xsltMsgClientData, str2, len, terminate);
+            rc = xs->xsltMsgCB (xs->xsltMsgClientData, str2, len, terminate);
             FREE(str2);
             xs->lastNode = savedLastNode;
             domDeleteNode (fragmentNode, NULL, NULL);
@@ -4848,8 +4866,17 @@ static int ExecAction (
                              " \"terminate\"=\"yes\"", errMsg);
                 return -1;
             }
-            return 0;
-
+            switch (rc) {
+            case 0: return 0;
+            case 3: 
+                reportError (actionNode, "", errMsg);
+                return -1;
+            default:
+                sprintf (tmpErr, "Error while executing message callback."
+                         " Message callback result code: %d", rc);
+                reportError (actionNode, tmpErr, errMsg);
+                return -1;
+            }
         case namespaceAlias: 
             reportError (actionNode, "xsl:namespaceAlias is only allowed"
                          " at toplevel.", errMsg);
@@ -4918,7 +4945,7 @@ static int ExecAction (
                              " missing mandatory attribute \"name\".", errMsg);
                 return -1;
             }
-            fragmentNode = domNewElementNode(xs->resultDoc, "", ELEMENT_NODE);
+            fragmentNode = domNewElementNode(xs->resultDoc, "");
             savedLastNode = xs->lastNode;
             xs->lastNode = fragmentNode;
             xsltPushVarFrame (xs);
@@ -4940,7 +4967,7 @@ static int ExecAction (
             }
             str = xpathGetStringValue (fragmentNode, &len);
             if (!domIsPIValue (str)) {
-                reportError (actionNode, "Invalide processing instruction "
+                reportError (actionNode, "Invalid processing instruction "
                              "value", errMsg);
                 domDeleteNode (fragmentNode, NULL, NULL);
                 FREE(str);
@@ -5479,6 +5506,12 @@ static int ApplyTemplates (
     int        i, rc, needNewVarFrame = 1;
 
     if (nodeList->type == xNodeSetResult) {
+        if (xs->nestedApplyTemplates > xs->maxNestedApplyTemplates) {
+            *errMsg = tdomstrdup("Maximum nested apply templates reached "
+                                 "(potential infinite template recursion?).");
+            return -1;
+        }
+        xs->nestedApplyTemplates++;
         savedLastNode = xs->lastNode;
         for (i=0; i < nodeList->nr_nodes; i++) {
             if (needNewVarFrame) {
@@ -5510,6 +5543,7 @@ static int ApplyTemplates (
             xsltPopVarFrame (xs);
         }
         xs->lastNode = savedLastNode;
+        xs->nestedApplyTemplates--;
     } else {
         TRACE("ApplyTemplates: nodeList not a NodeSetResult !!!\n");
         DBG(rsPrint(nodeList);)
@@ -5838,7 +5872,6 @@ addExclExtNS (
         if (d != 1.0) {
             reportError (xsltRoot, "Strange \"version\" value.", errMsg);
             return -1;
-            docData->fwCmpProcessing = 0;
         }
     }
 
@@ -5888,6 +5921,11 @@ getExternalDocument (
                              "to access itself.");
         return NULL;
     }
+    DBG(
+        fprintf (stderr, "getExternalDocument: baseURI '%s'\n", baseURI);
+        fprintf (stderr, "getExternalDocument: systemID '%s'\n", href);
+    )
+    
     cmdPtr = Tcl_NewStringObj (xsltDoc->extResolver, -1);
     Tcl_IncrRefCount (cmdPtr);
     if (baseURI) {
@@ -5983,7 +6021,7 @@ getExternalDocument (
     }
     /* keep white space, no fiddling with the encoding (is this
        a good idea?) */
-    doc = domReadDocument (parser, xmlstring, len, 0, 0, storeLineColumn, 0,
+    doc = domReadDocument (parser, xmlstring, len, 0, 0, storeLineColumn, 0, 0,
                            NULL, chan, extbase, extResolver, 0, 
                            (int) XML_PARAM_ENTITY_PARSING_ALWAYS, interp,
                            &resultcode);
@@ -6265,6 +6303,7 @@ static int processTopLevel (
                     attrSet->next    = NULL;
                     attrSet->content = node;
                     attrSet->name    = localName;
+                    attrSet->inUse   = 0;
                     if (ns) {
                         attrSet->uri = ns->uri;
                     } else {
@@ -7395,7 +7434,6 @@ xsltCompileStylesheet (
         StripXSLTSpace (xsltDoc->rootNode);
         precedence = 1.0;
         precedenceLowBound = 0.0;
-        rc = 0;
         rc = processTopLevel (xpathFuncClientData, node, xs, precedence, 
                               &precedenceLowBound, errMsg);
         if (rc != 0) goto error;
@@ -7418,6 +7456,7 @@ int xsltProcess (
     void              * xsltCmdData,
     char             ** parameters,
     int                 ignoreUndeclaredParameters,
+    int                 maxApplyDepth,
     xpathFuncCallback   funcCB,
     void              * xpathFuncClientData,
     xsltMsgCB           xsltMsgCB,
@@ -7444,7 +7483,9 @@ int xsltProcess (
                                                   1, errMsg);
         if (!xs) return -1;
     }
-
+    xs->maxNestedApplyTemplates = maxApplyDepth;
+    xs->nestedApplyTemplates = 0;
+    
     if (xmlNode->nodeType == DOCUMENT_NODE) {
         xmlNode = ((domDocument *)xmlNode)->rootNode;
     } else {
@@ -7621,6 +7662,7 @@ int xsltProcess (
     xsltPopVarFrame (xs);
     xpathRSFree( &nodeList );
     domFreeDocument (xs->resultDoc, NULL, NULL);
+    xs->resultDoc = NULL;
     if (xsltCmdData) {
         xsltResetState (xs);
     } else {

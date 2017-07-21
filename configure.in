@@ -79,6 +79,12 @@ TDOM_PATH_AOLSERVER
 
 TDOM_PATH_EXPAT
 
+#--------------------------------------------------------------------
+# Add HTML5 parsing support.
+#--------------------------------------------------------------------
+
+TDOM_ENABLE_HTML5
+
 #-----------------------------------------------------------------------
 # __CHANGE__
 # Specify the C source files to compile in TEA_ADD_SOURCES,
@@ -93,6 +99,8 @@ TEA_ADD_SOURCES([generic/xmlsimple.c \
                  generic/utf8conv.c  \
                  generic/dom.c       \
                  generic/domhtml.c   \
+                 generic/domhtml5.c  \
+                 generic/domjson.c   \
                  generic/domxpath.c  \
                  generic/domxslt.c   \
                  generic/domlock.c   \
@@ -103,7 +111,7 @@ TEA_ADD_SOURCES([generic/xmlsimple.c \
                  generic/tdomStubInit.c])
 TEA_ADD_HEADERS([generic/tdom.h])
 TEA_ADD_INCLUDES([-I${srcdir}/generic ${AOL_INCLUDES}])
-TEA_ADD_LIBS([${AOL_LIBS}])
+TEA_ADD_LIBS([${AOL_LIBS} ${HTML5_LIBS}])
 TEA_ADD_CFLAGS([])
 TEA_ADD_STUB_SOURCES([generic/tdomStubLib.c])
 TEA_ADD_TCL_SOURCES([lib/tdom.tcl])

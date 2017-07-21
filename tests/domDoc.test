@@ -118,7 +118,7 @@ test domDoc-1.10 {asXML - unknown option} {
     catch {$doc asXML -fooOption 1} errMsg
     $doc delete
     set errMsg
-} {bad option "-fooOption": must be -indent, -channel, -escapeNonASCII, -doctypeDeclaration, or -escapeAllQuot}
+} {bad option "-fooOption": must be -indent, -channel, -escapeNonASCII, -doctypeDeclaration, -xmlDeclaration, -encString, -escapeAllQuot, or -indentAttrs}
 
 test domDoc-1.11 {asXML - non boolean value to -doctypeDeclaration} {
     set doc [dom parse {<!DOCTYPE root SYSTEM "file:///boo.baz"><root/>}]
@@ -211,6 +211,88 @@ test domDoc-1.20 {asXML - indentation of comments} {
     <!--Comment 2-->
 </doc>
 }
+
+test domDoc-1.21 {asXML -indentAttrs} {
+    set doc [dom parse {<Element attr1="val1" attr2="val2"/>}]
+    set result [$doc asXML -indentAttrs 4]
+    $doc delete
+    set result
+} {<Element
+    attr1="val1"
+    attr2="val2"/>
+}
+
+test domDoc-1.22 {asXML} {
+    set doc [dom createDocument doc]
+    set result [$doc asXML]
+    $doc delete
+    set result
+} {<doc/>
+}
+
+test domDoc-1.23 {asXML -xmlDeclaration} {
+    set doc [dom createDocument doc]
+    set result [$doc asXML -xmlDeclaration 1]
+    $doc delete
+    set result
+} {<?xml version="1.0"?>
+<doc/>
+}
+
+test domDoc-1.23 {asXML -xmlDeclaration} {
+    set doc [dom createDocument doc]
+    set result [$doc asXML -xmlDeclaration 1]
+    $doc delete
+    set result
+} {<?xml version="1.0"?>
+<doc/>
+}
+
+test domDoc-1.24 {asXML just -encString without -xmlDeclaration} {
+    set doc [dom createDocument doc]
+    set result [$doc asXML -encString foo]
+    $doc delete
+    set result
+} {<doc/>
+}
+
+test domDoc-1.25 {asXML -xmlDeclaration -encString} {
+    set doc [dom createDocument doc]
+    set result [$doc asXML -xmlDeclaration 1 -encString foo]
+    $doc delete
+    set result
+} {<?xml version="1.0" encoding="foo"?>
+<doc/>
+} 
+
+test domDoc-1.26 {asXML -xmlDeclaration, encoding set by encoding method} {
+    set doc [dom createDocument doc]
+    $doc encoding "foo"
+    set result [$doc asXML -xmlDeclaration 1]
+    $doc delete
+    set result
+} {<?xml version="1.0" encoding="foo"?>
+<doc/>
+}    
+
+test domDoc-1.27 {asXML -xmlDeclaration -encString} {
+    set doc [dom createDocument doc]
+    set result [catch {
+        [$doc asXML -xmlDeclaration 1 -encString foo \
+             -encString bar -wrongOption]
+    }]
+    $doc delete
+    set result
+} 1 
+
+test domDoc-1.28 {asXML -xmlDeclaration not xml compliant -encString} {
+    set doc [dom createDocument doc]
+    set result [$doc asXML -xmlDeclaration 1 -encString 1\u2345]
+    $doc delete
+    set result
+} [subst -nocommands -novariables {<?xml version="1.0" encoding="1\u2345"?>
+<doc/>
+}]
 
 set doc [dom parse <root/>]
 
@@ -357,7 +439,7 @@ test domDoc-3.3 {toXSLTcmd} {
     $resultDoc delete
     rename $xsltCmd {}
     set result
-} {1 {bad option "-bogusOption": must be -parameters, -ignoreUndeclaredParameters, or -xsltmessagecmd} 0 {param1Default param2Default param3Default }}
+} {1 {bad option "-bogusOption": must be -parameters, -ignoreUndeclaredParameters, -maxApplyDepth, or -xsltmessagecmd} 0 {param1Default param2Default param3Default }}
 
 test domDoc-3.4 {toXSLTcmd} {
     set xslt [dom parse -keepEmpties $xslt1]
@@ -366,7 +448,7 @@ test domDoc-3.4 {toXSLTcmd} {
     set result [catch {$xsltCmd -xsltmessagecmd msgCmd1} errMsg]
     rename $xsltCmd {}
     lappend result $errMsg
-} {1 {wrong # args: should be "?-parameters parameterList? ?-ignoreUndeclaredParameters? ?-xsltmessagecmd cmd? <xmlDocObj> ?objVar?"}}
+} {1 {wrong # args: should be "?-parameters parameterList? ?-ignoreUndeclaredParameters? ?-maxApplyDepth int? ?-xsltmessagecmd cmd? <xmlDocObj> ?objVar?"}}
 
 test domDoc-3.5 {toXSLTcmd} {
     set xslt [dom parse -keepEmpties $xslt1]
@@ -375,7 +457,7 @@ test domDoc-3.5 {toXSLTcmd} {
     set result [catch {$xsltCmd $doc resultDoc bogus} errMsg]
     rename $xsltCmd {}
     lappend result $errMsg
-} {1 {wrong # args: should be "?-parameters parameterList? ?-ignoreUndeclaredParameters? ?-xsltmessagecmd cmd? <xmlDocObj> ?objVar?"}}
+} {1 {wrong # args: should be "?-parameters parameterList? ?-ignoreUndeclaredParameters? ?-maxApplyDepth int? ?-xsltmessagecmd cmd? <xmlDocObj> ?objVar?"}}
 
 test domDoc-3.6 {toXSLTcmd} {
     set xslt [dom parse -keepEmpties $xslt1]
@@ -992,6 +1074,35 @@ test domDoc-20.5 {selectNodes with -namespaces option} {
     $doc delete
     set result
 } [list tdom:doc tdom:doc "" empty]
+
+test domDoc-20.6 {selectNodes with -namespaces option} {
+    set doc [dom createDocumentNS "http://tdom.org" tdom:doc]
+    set node [$doc selectNodes \
+                  -namespaces {foo bar} \
+                  -namespaces {a b c d} \
+                  -namespaces {tdom http://tdom.org} \
+                  tdom:doc]
+    set result [$node nodeName]
+    set node [$doc selectNodes \
+                  -namespaces {myPrefix http://tdom.org} \
+                  myPrefix:doc]
+    lappend result [$node nodeName]
+    lappend result [$doc selectNodes -namespaces {} doc typeVar]
+    lappend result $typeVar
+    $doc delete
+    set result
+} [list tdom:doc tdom:doc "" empty]
+
+test domDoc-20.7 {selectNodes with -namespaces option} {
+    set doc [dom createDocumentNS "http://tdom.org" tdom:doc]
+    catch {set node [$doc selectNodes \
+                         -namespaces {foo bar} \
+                         -namespaces {a b c d} \
+                         -namespaces {wrong_not_pair} \
+                         tdom:doc]} errMsg
+    $doc delete
+    set errMsg
+} {The "-namespaces" option requires a 'prefix namespace' pairs list as argument}
 
 test domDoc-21.1 {baseURI} {
     set doc [dom createDocumentNode]

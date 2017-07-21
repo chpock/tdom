@@ -70,7 +70,7 @@
 #include <domxpath.h>
 
 
-typedef void (*xsltMsgCB) (void *clientData, char *str, 
+typedef int (*xsltMsgCB) (void *clientData, char *str, 
                           int length, int terminate);
 
 /*----------------------------------------------------------------------------
@@ -82,6 +82,7 @@ int xsltProcess (domDocument       * xsltDoc,
                  void              * xsltCmdData,
                  char             ** parameters,
                  int                 ignoreUndeclaredParameters,
+                 int                 maxApplyDepth,
                  xpathFuncCallback   funcCB,
                  void              * xpathFuncClientData,
                  xsltMsgCB           xsltMsgCB,

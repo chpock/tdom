@@ -4,17 +4,17 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0xbfa130">NAME</a> · <a href="#SECTid0xb35060">SYNOPSIS</a> · <a href="#SECTid0xc044c0"> DESCRIPTION </a> · <a href="#SECTid0xc30d50">SEE ALSO</a> · <a href="#SECTid0xc310e0">KEYWORDS</a>
+<a href="#SECTid0x20b2210">NAME</a> Â· <a href="#SECTid0x20d0160">SYNOPSIS</a> Â· <a href="#SECTid0x215b720"> DESCRIPTION </a> Â· <a href="#SECTid0x21fbed0">SEE ALSO</a> Â· <a href="#SECTid0x21fc260">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0xbfa130">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x20b2210">NAME</a></h2><p class="namesection">
 <b class="names">domNode - </b><br>Manipulates an instance of a DOM node object</p>
 
 
 
-  <h2><a name="SECTid0xb35060">SYNOPSIS</a></h2><pre class="syntax"> $nodeObject <i class="m">method</i>  <i class="m">arg arg ...</i>
+  <h2><a name="SECTid0x20d0160">SYNOPSIS</a></h2><pre class="syntax"> $nodeObject <i class="m">method</i>  <i class="m">arg arg ...</i>
 </pre>
-  <h2><a name="SECTid0xc044c0"> DESCRIPTION </a></h2><p>This command manipulates one particular instance of a DOM node object.
+  <h2><a name="SECTid0x215b720"> DESCRIPTION </a></h2><p>This command manipulates one particular instance of a DOM node object.
 <i class="m">method</i> indicates a specific method of the node class. These methods
 should closely conform to the W3C recommendation "Document Object Model
 (Core) Level 1" (<a href="http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html">http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html</a>)
@@ -411,7 +411,10 @@ legal according to the rules of the XPath syntax to put an XPath
 variable. The value of the variable is substituted for the variable
 name. Ignoring the syntax rules of XPath the Tcl variable name may be
 any legal Tcl var name: local variables, global variables, array
-entries and so on.</p>
+entries and so on. The value will always be seen as string literal by
+the xpath engine. Cast the value explicitly with the according xpath
+functions (number(), boolean()) to another data type, if needed.
+</p>
 
 <p>The option <i class="m">-namespaces</i> expects a tcl list with prefix /
 namespace pairs as argument. If this option is not given, then any
@@ -428,21 +431,23 @@ namespace definitions in scope of the context node will be used to
 resolve the prefix, as usual.</p>
 
 <p>If the <i class="m">-cache</i> option is used with a true value, then the
-<i class="m">xpathQuery</i> will be looked up in a document specific cache. If the query
-is found, then the stored pre-compiled query will be used. If the
-query isn't found, it will be pre-compiled and stored in the cache,
-for use in further calls. Please notice, that the <i class="m">xpathQuery</i> as given as
-string is used as key for the cache. This means, that equal XPath
-expressions, which differ only in white space are treated as
+<i class="m">xpathQuery</i> will be looked up in a document specific cache. If
+the query is found, then the stored pre-compiled query will be used.
+If the query isn't found, it will be compiled and stored in the cache,
+for use in further calls. Please notice, that the <i class="m">xpathQuery</i> as
+given as string is used as key for the cache. This means, that equal
+XPath expressions, which differ only in white space are treated as
 different cache entries. Special care is needed, if the XPath
-expression includes namespace prefixes. During pre-compilation, the
-prefixes will be resolved first to the prefix / namespace pairs of
-the <i class="m">-namespaces</i> option, if given, and to the namespaces
-in scope of the context node at pre-compilation time. If the XPath
-is found in the cache, neither the <i class="m">-namespaces</i> option nor
-the namespaces in scope of the context node will be taken in
-account but the already resolved (stored) namespaces will be used
-for the query.</p>
+expression includes namespace prefixes or references to tcl variables.
+Both namespace prefixes and tcl variable references will be resolved
+according to the XML prefix namespace mappings and tcl variable values
+at expression compilation time. If the same XPath expression is used
+later on in a context with other XML prefix namespace mappings or
+values of the used tcl variables, make sure to first remove the
+compiled expression from the cache with the help of the
+<b class="method">deleteXPathCache</b> method, to force a recompilation.
+Without using the <i class="m">-cache</i> option such consideration is never
+needed.</p>
 
 <p>Examples:</p>
           <pre class="example">set paragraphNodes [$node selectNodes {chapter[3]//para[@type='warning' or @type='error'} ]
@@ -477,18 +482,42 @@ nested Tcl list.</dd>
 
       
         <dt>
-<b class="method">asXML</b> <b class="option">?-indent none/1..8?</b>
-<b class="option">?-channel channelId?</b> <b class="option">?-escapeNonASCII?</b><b class="option">?-escapeAllQuot?</b>
+<b class="method">asXML</b> <b class="option">?-indent none/1..8?</b> <b class="option">?-channel channelId?</b> <b class="option">?-escapeNonASCII?</b> <b class="option">-xmlDeclaration &lt;boolean&gt;?</b> <b class="option">-encString &lt;string&gt;</b> <b class="option">?-escapeAllQuot?</b> <b class="option">?-indentAttrs?</b>
 </dt>
+        <dd>
+<p>Returns the DOM substree starting from the current
+        node as the root node of the result as an (optional indented)
+        XML string or sends the output directly to the given
+        channelId.</p>
 
-        <dd>Returns the DOM substree starting from the current node
-as the root node of the result as an (optional indented) XML string or
-sends the output directly to the given channelId. If the option
-<i class="m">-escapeNonASCII</i> is given, every non 7 bit ASCII character in
-attribute values or element PCDATA content will be escaped as
-character reference in decimal representation. If the option
-<i class="m">-escapeAllQuot</i> is given, quotation marks will be escaped with
-&amp;quot; even in text content of elements.</dd>
+        <p>If the option <i class="m">-escapeNonASCII</i> is given,
+        every non 7 bit ASCII character in attribute values or element
+        PCDATA content will be escaped as character reference in
+        decimal representation.</p>
+
+        <p>The flag <i class="m">-xmlDeclaration</i> determines, whether there
+        will be an XML Declaration and a newline emitted before
+        anything else. The default is, to do not. If this flag is
+        given with a true argument then</p>
+
+        <p>
+<i class="m">-encString</i> sets the encoding value in the XML
+        Declaration. Otherwise, this option is ignored. Please note,
+        that this option just enhance the string representation of the
+        generated XML Declaration with an encoding information string,
+        nothing more. It's up to the user to handle encoding in case
+        of writing to a channel or reparsing.</p>
+            
+        <p>If the option <i class="m">-escapeAllQuot</i> is given,
+        quotation marks will be escaped with &amp;quot; even in text
+        content of elements.</p>
+
+        <p>If the option <i class="m">-indentAttrs</i> is
+        given, then attributes will each be separated with newlines
+        and indented to the same level as the parent node plus the
+        value given as argument to <i class="m">-indentAttrs</i> (0..8).</p>
+</dd>
+
       
 
       
@@ -633,6 +662,7 @@ normalization. </dd>
         <dt>
 <b class="method">xslt</b> <b class="option">?-parameters
 parameterList?</b> <b class="option">?-ignoreUndeclaredParameters?</b>
+<b class="option">?-maxApplyDepth int?</b>
 <b class="option">?-xsltmessagecmd script?</b> <i class="m">stylesheet</i> <i class="m">?outputVar?</i>
 </dt>
         <dd>Applies an XSLT transformation on the document using the XSLT
@@ -650,12 +680,22 @@ are not declared as top-level parameters in the stylesheet are silently
 ignored. Without this option, an error is raised, if the user tries to set a
 top-level parameter, which is not declared in the stylesheet.</p>
 
+<p>The option <i class="m">-maxApplyDepth</i> expects a positiv integer as
+argument. By default, the xslt engine allows xslt templates to nest up
+to 3000 levels (and raises error if they nest deeper). This limit can
+be set by the <i class="m">-maxApplyDepth</i> option.</p>
+
 <p>The <i class="m">-xsltmessagecmd</i> option sets a callback for xslt:message elements
 in the stylesheet. The actual command consists of the script, given as argument
 to the option, appended with the XML Fragment from instantiating the
 xsl:message element content as string (as if the XPath string() function would
 have been applied to the XML Fragment) and a flag, which indicates, if the
-xsl:message has an attribute "terminate" with the value "yes".</p>
+xsl:message has an attribute "terminate" with the value "yes". If the
+called script returns anything else then TCL_OK then the xslt
+transformation will be aborted, returning error. If the called script
+returns -code break, the error message is empty, otherwise the result
+code is reported. In case of terminated transformation, the outputVar,
+if given, is set to the empty string.</p>
 </dd>
       
 
@@ -669,14 +709,14 @@ name as the given method within the namespace <tt class="l">::dom::domNode</tt> 
 be executed. This allows quick method additions on Tcl level.</p>
 
 
-  <h2><a name="SECTid0xc30d50">SEE ALSO</a></h2><p class="seealso">dom, domDoc</p>
+  <h2><a name="SECTid0x21fbed0">SEE ALSO</a></h2><p class="seealso">dom, domDoc</p>
   
-  <h2><a name="SECTid0xc310e0">KEYWORDS</a></h2><p class="keywords">
+  <h2><a name="SECTid0x21fc260">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-XML">XML</a>, <a class="keyword" href="keyword-index.html#KW-DOM">DOM</a>, <a class="keyword" href="keyword-index.html#KW-document">document</a>, <a class="keyword" href="keyword-index.html#KW-node">node</a>, <a class="keyword" href="keyword-index.html#KW-parsing">parsing</a>
 </p>
   
 </div><hr class="navsep"><div class="navbar" align="center">
-<a class="navaid" href="index.html">Contents</a> · <a class="navaid" href="category-index.html">Index</a> · <a class="navaid" href="keyword-index.html">Keywords</a>
+<a class="navaid" href="index.html">Contents</a> Â· <a class="navaid" href="category-index.html">Index</a> Â· <a class="navaid" href="keyword-index.html">Keywords</a>
 </div>
 </body>
 </html>

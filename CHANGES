@@ -1,3 +1,46 @@
+
+2016-10-01 Rolf Ade  <rolf@pointsman.de>
+
+        Updated to expat 2.2.0.
+
+2015-09-11 Rolf Ade  <rolf@pointsman.de>
+
+        Added options -xmlDeclaration and -encString to the asXML
+        method of the domDoc and domNode commands.
+
+2015-04-11 Rolf Ade  <rolf@pointsman.de>
+
+        Changed behavior wrt to result code of a called
+        -xsltmessagecmd script. Up to now, the result code of that
+        script evaluation was ignored. Now, any other return code of
+        that script then TCL_OK terminates the xslt transformation and
+        returns error. Purposeful termination may be signaled with
+        return -code break, for which the error message will be empty.
+
+2015-04-01 Rolf Ade  <rolf@pointsman.de>
+
+        Added new expat parser cmd method currentmarkup. 
+
+2015-03-26 Rolf Ade  <rolf@pointsman.de>
+
+        Added option -indentAttrs to the domDoc/domNode method
+        asXML. Thanks goes to evilotto.
+
+2014-10-16 Rolf Ade  <rolf@pointsman.de>
+	
+        Added configure option --with-expat, to build and link against
+        the system or a custom expat lib. Default is, to use the
+        included sources.
+
+2014-01-01 Rolf Ade  <rolf@pointsman.de>
+
+        Rework so some basic internals, for (even) more efficiency of
+        token mode.
+
+2013-12-24 Rolf Ade  <rolf@pointsman.de>
+
+        Improved handling of characters beyond BMP. 
+        
 2013-12-20 Rolf Ade  <rolf@pointsman.de>
 
         Added option -feedbackcmd to the dom parse method. This option

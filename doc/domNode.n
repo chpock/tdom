@@ -425,7 +425,9 @@ legal according to the rules of the XPath syntax to put an XPath
 variable. The value of the variable is substituted for the variable
 name. Ignoring the syntax rules of XPath the Tcl variable name may be
 any legal Tcl var name: local variables, global variables, array
-entries and so on.
+entries and so on. The value will always be seen as string literal by
+the xpath engine. Cast the value explicitly with the according xpath
+functions (number(), boolean()) to another data type, if needed.
 .PP
 The option \fI-namespaces\fR expects a tcl list with prefix /
 namespace pairs as argument. If this option is not given, then any
@@ -442,21 +444,23 @@ namespace definitions in scope of the context node will be used to
 resolve the prefix, as usual.
 .PP
 If the \fI-cache\fR option is used with a true value, then the
-\&\fIxpathQuery\fR will be looked up in a document specific cache. If the query
-is found, then the stored pre-compiled query will be used. If the
-query isn't found, it will be pre-compiled and stored in the cache,
-for use in further calls. Please notice, that the \fIxpathQuery\fR as given as
-string is used as key for the cache. This means, that equal XPath
-expressions, which differ only in white space are treated as
+\&\fIxpathQuery\fR will be looked up in a document specific cache. If
+the query is found, then the stored pre-compiled query will be used.
+If the query isn't found, it will be compiled and stored in the cache,
+for use in further calls. Please notice, that the \fIxpathQuery\fR as
+given as string is used as key for the cache. This means, that equal
+XPath expressions, which differ only in white space are treated as
 different cache entries. Special care is needed, if the XPath
-expression includes namespace prefixes. During pre-compilation, the
-prefixes will be resolved first to the prefix / namespace pairs of
-the \fI-namespaces\fR option, if given, and to the namespaces
-in scope of the context node at pre-compilation time. If the XPath
-is found in the cache, neither the \fI-namespaces\fR option nor
-the namespaces in scope of the context node will be taken in
-account but the already resolved (stored) namespaces will be used
-for the query.
+expression includes namespace prefixes or references to tcl variables.
+Both namespace prefixes and tcl variable references will be resolved
+according to the XML prefix namespace mappings and tcl variable values
+at expression compilation time. If the same XPath expression is used
+later on in a context with other XML prefix namespace mappings or
+values of the used tcl variables, make sure to first remove the
+compiled expression from the cache with the help of the
+\&\fBdeleteXPathCache\fP method, to force a recompilation.
+Without using the \fI-cache\fR option such consideration is never
+needed.
 .PP
 Examples:
 
@@ -485,15 +489,41 @@ XML.
 \&\fRReturns the DOM substree starting form the current node as a
 nested Tcl list.
 .TP
-\&\fB\fBasXML\fP \fB?-indent none/1..8?\fP \fB?-channel channelId?\fP \fB?-escapeNonASCII?\fP\fB?-escapeAllQuot?\fP
-\&\fRReturns the DOM substree starting from the current node
-as the root node of the result as an (optional indented) XML string or
-sends the output directly to the given channelId. If the option
-\&\fI-escapeNonASCII\fR is given, every non 7 bit ASCII character in
-attribute values or element PCDATA content will be escaped as
-character reference in decimal representation. If the option
-\&\fI-escapeAllQuot\fR is given, quotation marks will be escaped with
-&quot; even in text content of elements.
+\&\fB\fBasXML\fP \fB?-indent none/1..8?\fP \fB?-channel channelId?\fP \fB?-escapeNonASCII?\fP \fB-xmlDeclaration <boolean>?\fP \fB-encString <string>\fP \fB?-escapeAllQuot?\fP \fB?-indentAttrs?\fP
+\&\fR
+.RS
+.PP
+Returns the DOM substree starting from the current
+node as the root node of the result as an (optional indented)
+XML string or sends the output directly to the given
+channelId.
+.PP
+If the option \fI-escapeNonASCII\fR is given,
+every non 7 bit ASCII character in attribute values or element
+PCDATA content will be escaped as character reference in
+decimal representation.
+.PP
+The flag \fI-xmlDeclaration\fR determines, whether there
+will be an XML Declaration and a newline emitted before
+anything else. The default is, to do not. If this flag is
+given with a true argument then
+.PP
+\&\fI-encString\fR sets the encoding value in the XML
+Declaration. Otherwise, this option is ignored. Please note,
+that this option just enhance the string representation of the
+generated XML Declaration with an encoding information string,
+nothing more. It's up to the user to handle encoding in case
+of writing to a channel or reparsing.
+.PP
+If the option \fI-escapeAllQuot\fR is given,
+quotation marks will be escaped with &quot; even in text
+content of elements.
+.PP
+If the option \fI-indentAttrs\fR is
+given, then attributes will each be separated with newlines
+and indented to the same level as the parent node plus the
+value given as argument to \fI-indentAttrs\fR (0..8).
+.RE
 .TP
 \&\fB\fBasHTML\fP \fB?-channel channelId?\fP \fB?-escapeNonASCII?\fP  \fB?-htmlEntities?\fP
 \&\fRReturns the DOM substree starting from the current node as the
@@ -582,7 +612,7 @@ are neither adjacent Text nodes nor empty Text nodes. If the option
 converted to text nodes, as a first step before the
 normalization.
 .TP
-\&\fB\fBxslt\fP \fB?-parameters parameterList?\fP \fB?-ignoreUndeclaredParameters?\fP \fB?-xsltmessagecmd script?\fP \fIstylesheet\fB \fI?outputVar?\fB
+\&\fB\fBxslt\fP \fB?-parameters parameterList?\fP \fB?-ignoreUndeclaredParameters?\fP \fB?-maxApplyDepth int?\fP \fB?-xsltmessagecmd script?\fP \fIstylesheet\fB \fI?outputVar?\fB
 \&\fRApplies an XSLT transformation on the document using the XSLT
 \&\fIstylesheet\fR (given as domDoc). Returns a document object containing the
 result document of that transformation and stores it in the optional
@@ -599,12 +629,22 @@ are not declared as top-level parameters in the stylesheet are silently
 ignored. Without this option, an error is raised, if the user tries to set a
 top-level parameter, which is not declared in the stylesheet.
 .PP
+The option \fI-maxApplyDepth\fR expects a positiv integer as
+argument. By default, the xslt engine allows xslt templates to nest up
+to 3000 levels (and raises error if they nest deeper). This limit can
+be set by the \fI-maxApplyDepth\fR option.
+.PP
 The \fI-xsltmessagecmd\fR option sets a callback for xslt:message elements
 in the stylesheet. The actual command consists of the script, given as argument
 to the option, appended with the XML Fragment from instantiating the
 xsl:message element content as string (as if the XPath string() function would
 have been applied to the XML Fragment) and a flag, which indicates, if the
-xsl:message has an attribute "terminate" with the value "yes".
+xsl:message has an attribute "terminate" with the value "yes". If the
+called script returns anything else then TCL_OK then the xslt
+transformation will be aborted, returning error. If the called script
+returns -code break, the error message is empty, otherwise the result
+code is reported. In case of terminated transformation, the outputVar,
+if given, is set to the empty string.
 .RE
 .TP
 \&\fB\fI@attrName\fB

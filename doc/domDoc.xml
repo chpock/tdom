@@ -13,7 +13,7 @@
   
   -->
   <synopsis>
-    <syntax><cmd>domDocObjCmd</cmd> <m>method</m> ?<m>arg arg ...</m>?</syntax>
+    <syntax>domDocObjCmd <m>method</m> ?<m>arg arg ...</m>?</syntax>
   </synopsis>
 
   <section>
@@ -110,19 +110,44 @@ usually a result of a XSLT transformation.</desc>
         </commanddef>
 
       <commanddef>
-        <command><method>asXML</method> <option>?-indent none/1..8?</option> <option>?-channel channelId?</option> <option>?-escapeNonASCII?</option> <option>?-doctypeDeclaration &lt;boolean&gt;?</option> <option>?-escapeAllQuot?</option></command>
-        <desc>Returns the DOM tree as an (optional indented) XML
-string or sends the output directly to the given channelId. If the
-option <m>-escapeNonASCII</m> is given, every non 7 bit ASCII
-character in attribute values or element PCDATA content will be
-escaped as character reference in decimal representation. The flag
-<m>-doctypeDeclaration</m> determines, whether there will be a DOCTYPE
-declaration emitted before the first node of the document. The default
-is, to do not. The DOCTYPE name will always be the element name of the
-document element. An external entity declaration of the external
-subset is only emitted, if the document has a system identifier. If
-the option <m>-escapeAllQuot</m> is given, quotation marks will be
-escaped with &amp;quot; even in text content of elements.</desc>
+        <command><method>asXML</method> <option>?-indent none/1..8?</option> <option>?-channel channelId?</option> <option>?-escapeNonASCII?</option> <option>?-doctypeDeclaration &lt;boolean&gt;?</option> <option>-xmlDeclaration &lt;boolean&gt;?</option> <option>-encString &lt;string&gt;</option> <option>?-escapeAllQuot?</option> <option>?-indentAttrs?</option></command>
+        <desc><p>Returns the DOM tree as an (optional indented) XML
+        string or sends the output directly to the given
+        channelId.</p>
+
+        <p>If the option <m>-escapeNonASCII</m> is given,
+        every non 7 bit ASCII character in attribute values or element
+        PCDATA content will be escaped as character reference in
+        decimal representation.</p>
+
+        <p>The flag <m>-doctypeDeclaration</m>
+        determines, whether there will be a DOCTYPE declaration
+        emitted before the first node of the document. The default is,
+        to do not. The DOCTYPE name will always be the element name of
+        the document element. An external entity declaration of the
+        external subset is only emitted, if the document has a system
+        identifier.</p>
+
+        <p>The flag <m>-xmlDeclaration</m> determines, whether there
+        will be an XML Declaration and a newline emitted before
+        anything else. The default is, to do not. If this flag is
+        given with a true argument then</p>
+
+        <p><m>-encString</m> sets the encoding value in the XML
+        Declaration. Otherwise, this option is ignored. Please note,
+        that this option just enhance the string representation of the
+        generated XML Declaration with an encoding information string,
+        nothing more. It's up to the user to handle encoding in case
+        of writing to a channel or reparsing.</p>
+            
+        <p>If the option <m>-escapeAllQuot</m> is given,
+        quotation marks will be escaped with &amp;quot; even in text
+        content of elements.</p>
+
+        <p>If the option <m>-indentAttrs</m> is
+        given, then attributes will each be separated with newlines
+        and indented to the same level as the parent node plus the
+        value given as argument to <m>-indentAttrs</m> (0..8).</p></desc>
 
       </commanddef>
 
@@ -155,6 +180,82 @@ order without any escaping. In effect, this is what the xslt output method
 "text" (XSLT 1.0 recommendation, section 16.3) does.</desc>
       </commanddef>
 
+      <commanddef>
+        <command><method>asJSON</method> <option>?-indent none/0..8?</option> <option>?-channel channelId?</option></command>
+          <desc><p>The asJSON method serializes the tree into a valid
+          JSON data string. In general this may be a lossy
+          serialization. For this serialization all comment, character
+          data sections and processing instruction nodes, all
+          attributes and all XML namespaces are ignored. Only element
+          and text nodes may be reflected in the generated JSON
+          serialization. Appropriate JSON data type information of a
+          node will be respected.</p>
+
+          <p>If an element node has the JSON type OBJECT then every
+          element node child of this element will be serializend as
+          member of that object, with the node name of the child as
+          the member name and the relevant childs of that child as the
+          value. Every other child nodes will be ignored.</p>
+
+          <p>If an element node has the JSON type ARRAY then the text
+          and element node childs of that element node are serialized
+          as the consecutive values of the array. Element node childs
+          of an ARRAY element will be container nodes for nested ARRAY
+          or OBJECT values.</p>
+
+          <p>Text nodes with the JSON types TRUE, FALSE or NULL will
+          be serialized to the corresponding JSON token without
+          looking at the value of the text node. A text node without
+          JSON type will always be serialized as a JSON string token.
+          A text node with JSON type NUMBER will be serialized as JSON
+          number token if the text node value is in fact a valid JSON
+          number and as a JSON string if not.</p>
+
+          <p>If an element node doesn't has a JSON type then the
+          serialization of its childs is determined by the following
+          rules:</p>
+
+          <p>Only text and element node child are relevant. If the
+          element node to serialize is the member of a JSON object and
+          there is no relevant child node the value of that member
+          will be an empty JSON string. If the only relevant child
+          node of this element node is a text node then the JSON
+          value of that text node will be the value of the object
+          member. If the element has more than one relevant child
+          nodes and the first one is a text node then the relevant
+          childs will be serialized as JSON array. If the only
+          relevant child node is an element node or the first relevant
+          child is an element node and the node name of that only or
+          first relevant child isn't equal to the array container node
+          name all element node childs will be serialized as the
+          members of a JSON object (while ignoring any intermixed text
+          nodes). If the only or first relevant child is an element
+          node and the node name of this child is equal to the array
+          container element name then all relevant childs will be
+          serialized as the values of a JSON array.</p>
+
+          <p>If the element to serialize is a value of a JSON array
+          and the node name of this element isn't equal to the array
+          container node name that element will be seen as a
+          container node for a JSON object and all element node childs
+          will be serialized as the members of that array while
+          ignoring any text node childs. If the element to serialize
+          is a value of a JSON array and the node name of this element
+          is equal to the array container node name, all relevant
+          childs will be serialized as JSON array.</p>
+
+          <p>If the <m>-channel</m> option is given the serialization
+          isn't returned as string but send directly to the channel,
+          given as argument to the option.</p>
+
+          <p>If the <m>-indent</m> option is given and the argument
+          given to this option isn't "none" then the returned JSON
+          string is "pretty-printed". The numeric argument to this
+          option defines the number of spaces for any indentation
+          level. The default is to not emit any additional
+          white space.</desc>
+      </commanddef>
+      
       <commanddef>
         <command><method>publicId</method> <m>?publicId?</m></command>
         <desc>Returns the public identifier of the doctype declaration of the
@@ -227,6 +328,7 @@ default is the empty list.</desc>
       <commanddef>
         <command><method>xslt</method> <option>?-parameters
 parameterList?</option> <option>?-ignoreUndeclaredParameters?</option>
+<option>?-maxApplyDepth int?</option>
 <option>?-xsltmessagecmd script?</option> <m>stylesheet</m> <m>?outputVar?</m></command>
         <desc>Applies an XSLT transformation on the whole document of the node
 object using the XSLT <m>stylesheet</m> (given as domDoc). Returns a document
@@ -243,12 +345,22 @@ are not declared as top-level parameters in the stylesheet are silently
 ignored. Without this option, an error is raised, if the user tries to set a
 top-level parameter, which is not declared in the stylesheet.</p>
 
+<p>The option <m>-maxApplyDepth</m> expects a positiv integer as
+argument. By default, the xslt engine allows xslt templates to nest up
+to 3000 levels (and raises error if they nest deeper). This limit can
+be set by the <m>-maxApplyDepth</m> option.</p>
+
 <p>The <m>-xsltmessagecmd</m> option sets a callback for xslt:message elements
 in the stylesheet. The actual command consists of the script, given as argument
 to the option, appended with the XML Fragment from instantiating the
 xsl:message element content as string (as if the XPath string() function would
 have been applied to the XML Fragment) and a flag, which indicates, if the
-xsl:message has an attribute "terminate" with the value "yes".</p>
+xsl:message has an attribute "terminate" with the value "yes". If the
+called script returns anything else then TCL_OK then the xslt
+transformation will be aborted, returning error. If the called script
+returns -code break, the error message is empty, otherwise the result
+code is reported. In case of terminated transformation, the outputVar,
+if given, is set to the empty string.</p>
 </desc>
       </commanddef>
 
@@ -273,6 +385,7 @@ domDoc cmd and all nodeCmds of the document.
   <commanddef>
     <command><method>transform</method> <option>?-parameters
 parameterList?</option> <option>?-ignoreUndeclaredParameters?</option>
+<option>?-maxApplyDepth int?</option> 
 <option>?-xsltmessagecmd script?</option> <m>domDoc</m> <m>?outputVar?</m></command>          
 
         <desc>Applies XSLT transformation on the document
@@ -289,6 +402,11 @@ names in the <m>parameterList</m> given to the <m>-parameters</m> options that
 are not declared as top-level parameters in the stylesheet are silently
 ignored. Without this option, an error is raised, if the user tries to set a
 top-level parameter, which is not declared in the stylesheet.</p>
+
+<p>The option <m>-maxApplyDepth</m> expects a positiv integer as
+argument. By default, the xslt engine allows xslt templates to nest up
+to 3000 levels (and raises error if they nest deeper). This limit can
+be set by the <m>-maxApplyDepth</m> option.</p>
 
 <p>The <m>-xsltmessagecmd</m> option sets a callback for xslt:message elements
 in the stylesheet. The actual command consists of the script, given as argument
@@ -313,11 +431,11 @@ then the command is processed in the same way as
 
       <commanddef>
         <command><method>normalize</method> <m>?-forXPath?</m></command>
-        <desc>Puts all Text nodes in the document
+        <desc>Puts all text nodes in the document
 into a "normal" form where only structure (e.g., elements,
 comments, processing instructions and CDATA
-sections) separates Text nodes, i.e., there
-are neither adjacent Text nodes nor empty Text nodes. If the option
+sections) separates text nodes, i.e., there
+are neither adjacent text nodes nor empty text nodes. If the option
 <m>-forXPath</m> is given, all CDATA sections in the nodes are
 converted to text nodes, as a first step before the
 normalization. </desc>
@@ -416,7 +534,9 @@ legal according to the rules of the XPath syntax to put an XPath
 variable. The value of the variable is substituted for the variable
 name. Ignoring the syntax rules of XPath the Tcl variable name may be
 any legal Tcl var name: local variables, global variables, array
-entries and so on.</p>
+entries and so on.  The value will always be seen as string literal by
+the xpath engine. Cast the value explicitly with the according xpath
+functions (number(), boolean()) to another data type, if needed.</p>
 
 <p>The option <m>-namespaces</m> expects a tcl list with prefix /
 namespace pairs as argument. If this option is not given, then any
@@ -433,21 +553,23 @@ namespace definitions in scope of the context node will be used to
 resolve the prefix, as usual.</p>
 
 <p>If the <m>-cache</m> option is used with a true value, then the
-<m>xpathQuery</m> will be looked up in a document specific cache. If the query
-is found, then the stored pre-compiled query will be used. If the
-query isn't found, it will be pre-compiled and stored in the cache,
-for use in further calls. Please notice, that the <m>xpathQuery</m> as given as
-string is used as key for the cache. This means, that equal XPath
-expressions, which differ only in white space are treated as
+<m>xpathQuery</m> will be looked up in a document specific cache. If
+the query is found, then the stored pre-compiled query will be used.
+If the query isn't found, it will be compiled and stored in the cache,
+for use in further calls. Please notice, that the <m>xpathQuery</m> as
+given as string is used as key for the cache. This means, that equal
+XPath expressions, which differ only in white space are treated as
 different cache entries. Special care is needed, if the XPath
-expression includes namespace prefixes. During pre-compilation, the
-prefixes will be resolved first to the prefix / namespace pairs of
-the <m>-namespaces</m> option, if given, and to the namespaces
-in scope of the context node at pre-compilation time. If the XPath
-is found in the cache, neither the <m>-namespaces</m> option nor
-the namespaces in scope of the context node will be taken in
-account but the already resolved (stored) namespaces will be used
-for the query.</p>
+expression includes namespace prefixes or references to tcl variables.
+Both namespace prefixes and tcl variable references will be resolved
+according to the XML prefix namespace mappings and tcl variable values
+at expression compilation time. If the same XPath expression is used
+later on in a context with other XML prefix namespace mappings or
+values of the used tcl variables, make sure to first remove the
+compiled expression from the cache with the help of the
+<method>deleteXPathCache</method> method, to force a recompilation.
+Without using the <m>-cache</m> option such consideration is never
+needed.</p>
 
 <p>Examples:</p>
           <example>set paragraphNodes [$node selectNodes {chapter[3]//para[@type='warning' or @type='error'} ]
@@ -496,7 +618,7 @@ empty string.</desc>
   </commandlist>
 
       <p>Otherwise, if an unknown method name is given, the command with the
-same name as the given metho within the namespace <samp>::dom::domDoc</samp> is
+same name as the given method within the namespace <samp>::dom::domDoc</samp> is
 tried to be executed. This allows quick method additions on Tcl level.</p>
 
       <p>Newly created nodes are appended to a hidden fragment list. If they

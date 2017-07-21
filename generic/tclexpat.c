@@ -42,9 +42,7 @@
 
 #ifdef _MSC_VER
 #include <io.h>
-#endif
-
-#ifdef _POSIX_SOURCE
+#else
 #include <unistd.h>
 #endif
 
@@ -553,54 +551,43 @@ TclExpatInitializeParser(interp, expat, resetOptions)
      */
 
     XML_SetElementHandler(expat->parser,
-                          (XML_StartElementHandler) TclGenExpatElementStartHandler,
-                          (XML_EndElementHandler) TclGenExpatElementEndHandler);
+                          TclGenExpatElementStartHandler,
+                          TclGenExpatElementEndHandler);
     XML_SetNamespaceDeclHandler(expat->parser,
-                                (XML_StartNamespaceDeclHandler) TclGenExpatStartNamespaceDeclHandler,
-                                (XML_EndNamespaceDeclHandler) TclGenExpatEndNamespaceDeclHandler);
+                                TclGenExpatStartNamespaceDeclHandler,
+                                TclGenExpatEndNamespaceDeclHandler);
     XML_SetCharacterDataHandler(expat->parser,
-                                (XML_CharacterDataHandler) TclGenExpatCharacterDataHandler);
+                                TclGenExpatCharacterDataHandler);
     XML_SetProcessingInstructionHandler(expat->parser,
-                                        (XML_ProcessingInstructionHandler) TclGenExpatProcessingInstructionHandler);
-    XML_SetDefaultHandlerExpand(expat->parser,
-                                (XML_DefaultHandler) TclGenExpatDefaultHandler);
-    
+                                        TclGenExpatProcessingInstructionHandler);
+    XML_SetDefaultHandlerExpand(expat->parser, TclGenExpatDefaultHandler);
     XML_SetNotationDeclHandler(expat->parser,
-                               (XML_NotationDeclHandler) TclGenExpatNotationDeclHandler);
+                               TclGenExpatNotationDeclHandler);
     XML_SetExternalEntityRefHandler(expat->parser,
-                                    (XML_ExternalEntityRefHandler) TclGenExpatExternalEntityRefHandler);
+                                    TclGenExpatExternalEntityRefHandler);
     XML_SetUnknownEncodingHandler(expat->parser,
-                                  (XML_UnknownEncodingHandler) TclGenExpatUnknownEncodingHandler,
+                                  TclGenExpatUnknownEncodingHandler,
                                   (void *) expat);
-    
-    
     XML_SetCommentHandler(expat->parser, TclGenExpatCommentHandler);
-    
-    XML_SetNotStandaloneHandler(expat->parser, TclGenExpatNotStandaloneHandler);
-    
-    XML_SetCdataSectionHandler(expat->parser, TclGenExpatStartCdataSectionHandler,
+    XML_SetNotStandaloneHandler(expat->parser, 
+                                TclGenExpatNotStandaloneHandler);
+    XML_SetCdataSectionHandler(expat->parser, 
+                               TclGenExpatStartCdataSectionHandler,
                                TclGenExpatEndCdataSectionHandler);
-    
     XML_SetElementDeclHandler(expat->parser, TclGenExpatElementDeclHandler);
-    
     XML_SetAttlistDeclHandler(expat->parser, TclGenExpatAttlistDeclHandler);
-    
     XML_SetDoctypeDeclHandler(expat->parser,
                               TclGenExpatStartDoctypeDeclHandler,
                               TclGenExpatEndDoctypeDeclHandler);
-    
     XML_SetXmlDeclHandler (expat->parser, TclGenExpatXmlDeclHandler);
-    
     XML_SetEntityDeclHandler (expat->parser,
                               TclGenExpatEntityDeclHandler);
     if (expat->noexpand) {
-        XML_SetDefaultHandlerExpand(expat->parser, NULL);
         XML_SetDefaultHandler(expat->parser,
-                              (XML_DefaultHandler) TclGenExpatDefaultHandler);
+                              TclGenExpatDefaultHandler);
     } else {
-        XML_SetDefaultHandler(expat->parser, NULL);
         XML_SetDefaultHandlerExpand(expat->parser,
-                              (XML_DefaultHandler) TclGenExpatDefaultHandler);
+                                    TclGenExpatDefaultHandler);
     }
     
     XML_SetUserData(expat->parser, (void *) expat);
@@ -648,6 +635,50 @@ TclExpatFreeParser(expat)
 /*
  *----------------------------------------------------------------------------
  *
+ * CurrentmarkupCommand --
+ *
+ *	Set as defaultHandler prior to XML_Currentmarkup() call.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	Stores the markup context in expapt->currentmarkup.
+ *
+ *----------------------------------------------------------------------------
+ */
+static void
+CurrentmarkupCommand(userData, s, len)
+     void *userData;
+     CONST char *s;
+     int len;
+{
+    TclGenExpatInfo *expat = (TclGenExpatInfo *) userData;
+
+    if (expat->status != TCL_OK) {
+        return;
+    }
+  
+    if (expat->cdata) {
+        /* TclGenExpatCharacterDataHandler() was called and
+         * initialized expat->cdata, but expat->cdata isn't reset by
+         * TclExpatDispatchPCDATA(), so we're called from
+         * -characterdatacommand and return the empty string by
+         * definition. */
+        expat->currentmarkup = NULL;
+        expat->currentmarkuplen = 0;
+        return;
+    }
+    expat->currentmarkup = s;
+    expat->currentmarkuplen = len;
+    return;
+}
+
+
+
+/*
+ *----------------------------------------------------------------------------
+ *
  * TclExpatInstanceCmd --
  *
  *	Implements instance command for expat class objects.
@@ -673,11 +704,11 @@ TclExpatInstanceCmd (clientData, interp, objc, objv)
   int len = 0, optionIndex, result = TCL_OK;
 
   static CONST84 char *options[] = {
-      "configure", "cget", "free", "get",
+      "configure", "cget", "currentmarkup", "free", "get",
       "parse", "parsechannel", "parsefile", "reset", NULL
   };
   enum options {
-      EXPAT_CONFIGURE, EXPAT_CGET, EXPAT_FREE, EXPAT_GET,
+      EXPAT_CONFIGURE, EXPAT_CGET, EXPAT_CURRENTMARKUP, EXPAT_FREE, EXPAT_GET,
       EXPAT_PARSE, EXPAT_PARSECHANNEL, EXPAT_PARSEFILE, EXPAT_RESET
   };
 
@@ -709,6 +740,36 @@ TclExpatInstanceCmd (clientData, interp, objc, objv)
 
         CheckArgs (3,5,2, "?-handlerset handlersetname? switch");
         result = TclExpatCget(interp, expat, objc - 2, objv + 2);
+        break;
+
+    case EXPAT_CURRENTMARKUP:
+
+        CheckArgs (2,2,1, "");
+        if (expat->parsingState < 2) {
+            Tcl_ResetResult(expat->interp);
+            break;
+        }
+        
+        XML_SetDefaultHandlerExpand(expat->parser,
+                                    CurrentmarkupCommand);
+        XML_DefaultCurrent(expat->parser);
+        if (expat->currentmarkuplen) {
+            Tcl_SetObjResult(expat->interp, 
+                             Tcl_NewStringObj(expat->currentmarkup,
+                                              expat->currentmarkuplen));
+        } else {
+            Tcl_ResetResult(expat->interp);
+        }
+        expat->currentmarkup = NULL;
+        expat->currentmarkuplen = 0;
+        if (expat->noexpand) {
+            XML_SetDefaultHandler(expat->parser,
+                                  TclGenExpatDefaultHandler);
+        } else {
+            XML_SetDefaultHandlerExpand(expat->parser,
+                                        TclGenExpatDefaultHandler);
+        }
+        result = TCL_OK;
         break;
 
     case EXPAT_FREE:
@@ -899,14 +960,8 @@ TclExpatParse (interp, expat, data, len, type)
           do {
               bytesread = Tcl_Read (channel, buf, sizeof (buf));
               done = bytesread < sizeof (buf);
-              if (done) {
-                  result = XML_Parse (expat->parser, buf, bytesread, done);
-              } else {
-                  if (!XML_Parse (expat->parser, buf, bytesread, done)) {
-                      result = 0;
-                      break;
-                  }
-              }
+              result = XML_Parse (expat->parser, buf, bytesread, done);
+              if (result != XML_STATUS_OK) break;
           } while (!done);
       } else {
           bufObj = Tcl_NewObj();
@@ -916,10 +971,8 @@ TclExpatParse (interp, expat, data, len, type)
               len = Tcl_ReadChars (channel, bufObj, 1024, 0);
               done = (len < 1024);
               str = Tcl_GetStringFromObj (bufObj, &len);
-              if (!XML_Parse (expat->parser, str, len, done)) {
-                  result = 0;
-                  break;
-              }
+              result = XML_Parse (expat->parser, str, len, done);
+              if (result != XML_STATUS_OK) break;
           } while (!done);
           /* In case of a parsing error we need the string rep of the
              bufObj until the error reporting is done (otherwise,
@@ -934,14 +987,8 @@ TclExpatParse (interp, expat, data, len, type)
       do {
           bytesread = Tcl_Read (channel, buf, sizeof (buf));
           done = bytesread < sizeof (buf);
-          if (done) {
-              result = XML_Parse (expat->parser, buf, bytesread, done);
-          } else {
-              if (!XML_Parse (expat->parser, buf, bytesread, done)) {
-                  result = 0;
-                      break;
-              }
-          }
+          result = XML_Parse (expat->parser, buf, bytesread, done);
+          if (result != XML_STATUS_OK) break;
       } while (!done);
 #endif /* !TclOnly8Bits */
       expat->parsingState = 1;
@@ -976,13 +1023,9 @@ TclExpatParse (interp, expat, data, len, type)
               expat->parsingState = 1;
               return TCL_ERROR;
           }
-          if (!XML_ParseBuffer (parser, nread, nread == 0)) {
+          result = XML_ParseBuffer (parser, nread, nread == 0);
+          if (result != XML_STATUS_OK || !nread) {
               close (fd);
-              result = 0;
-              break;
-          }
-          if (nread == 0) {
-              close(fd);
               break;
           }
       }
@@ -1179,7 +1222,6 @@ TclExpatConfigure (interp, expat, objc, objv)
             activeTclHandlerSet->elementstartclientData 
                 = cmdInfo.objClientData;
         } else {
-            /* hmoreau 22 May 2003 */
             activeTclHandlerSet->elementstartObjProc = NULL;
         }
 	break;
@@ -1198,7 +1240,6 @@ TclExpatConfigure (interp, expat, objc, objv)
             activeTclHandlerSet->elementendObjProc = cmdInfo.objProc;
             activeTclHandlerSet->elementendclientData = cmdInfo.objClientData;
         } else {
-            /* hmoreau 22 May 2003 */
             activeTclHandlerSet->elementendObjProc = NULL;
         }
 	break;
@@ -1241,7 +1282,6 @@ TclExpatConfigure (interp, expat, objc, objv)
             activeTclHandlerSet->datacommandObjProc = cmdInfo.objProc;
             activeTclHandlerSet->datacommandclientData = cmdInfo.objClientData;
         } else {
-            /* hmoreau 22 May 2003 */
             activeTclHandlerSet->datacommandObjProc = NULL;
         }
 	break;
@@ -1508,14 +1548,11 @@ TclExpatConfigure (interp, expat, objc, objv)
             return TCL_ERROR;
         }
         if (bool) {
-            XML_SetDefaultHandlerExpand(expat->parser, NULL);
-            XML_SetDefaultHandler(expat->parser,
-                        (XML_DefaultHandler) TclGenExpatDefaultHandler);
-        }
-        else {
-            XML_SetDefaultHandler(expat->parser, NULL);
-            XML_SetDefaultHandlerExpand(expat->parser,
-                        (XML_DefaultHandler) TclGenExpatDefaultHandler);
+            XML_SetDefaultHandler( expat->parser,
+                                   TclGenExpatDefaultHandler);
+        } else {
+            XML_SetDefaultHandlerExpand( expat->parser,
+                                         TclGenExpatDefaultHandler);
         }
         expat->noexpand = bool;
         break;
@@ -2737,7 +2774,7 @@ TclExpatDispatchPCDATA(expat)
       activeCHandlerSet = activeCHandlerSet->nextHandlerSet;
   }
   Tcl_DecrRefCount (expat->cdata);
-  expat->cdata = 0;
+  expat->cdata = NULL;
   return;
 }
 
@@ -3401,10 +3438,8 @@ TclGenExpatExternalEntityRefHandler(parser, openEntityNames, base, systemId,
           do {
               len = Tcl_Read (chan, buf, sizeof (buf));
               done = len < sizeof (buf);
-              if (!XML_Parse (extparser, buf, len, done)) {
-                  result = 0;
-                  break;
-              }
+              result = XML_Parse (extparser, buf, len, done);
+              if (result != XML_STATUS_OK) break;
           } while (!done);
           Tcl_UnregisterChannel (expat->interp, chan);
           break;
@@ -3445,13 +3480,9 @@ TclGenExpatExternalEntityRefHandler(parser, openEntityNames, base, systemId,
                                          ERROR_IN_EXTREFHANDLER);
                   return 0;
               }
-              if (!XML_ParseBuffer (extparser, nread, nread == 0)) {
+              result = XML_ParseBuffer (extparser, nread, nread == 0);
+              if (result != XML_STATUS_OK || !nread) {
                   close (fd);
-                  result = 0;
-                  break;
-              }
-              if (nread == 0) {
-                  close(fd);
                   break;
               }
           }

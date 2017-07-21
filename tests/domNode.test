@@ -53,7 +53,7 @@ source [file join [file dir [info script]] loadtdom.tcl]
 
 testConstraint threaded [info exists tcl_platform(threaded)]
 
-test domNode-1.1 {to less arguments to domNode command} {
+test domNode-1.1 {too less arguments to nodecmd} {
     set doc [dom createDocument "root"]
     set root [$doc documentElement]
     set result [catch {$root}]
@@ -61,7 +61,7 @@ test domNode-1.1 {to less arguments to domNode command} {
     set result
 } {1}
 
-test domNode-1.2 {to less arguments to domNode command} {
+test domNode-1.2 {too less arguments to domNode token} {
     set doc [dom createDocument "root"]
     set root [$doc documentElement]
     set result [catch {domNode $root}]
@@ -69,7 +69,7 @@ test domNode-1.2 {to less arguments to domNode command} {
     set result
 } {1}
 
-test domNode-1.3 {to less arguments to domNode command} {
+test domNode-1.3 {too less arguments to domNode command} {
     catch {domNode}
 } {1}
 
@@ -83,6 +83,30 @@ test domNode-1.4 {rename of domNodeObj cmd} {knownBug} {
     catch {my_domNode nodeName} errMsg
     lappend result $errMsg
 } {1 0}    
+
+test domNode-1.5 {domNode command: invalid token} {
+    set xml {<doc><e>1</e><e>2</e></doc>}
+
+    set doc [dom parse $xml]
+    set root [domDoc $doc documentElement]
+    set invalidToken [domNode $root firstChild]
+    lappend invalidToken foo
+    set result [catch {domNode $invalidToken selectNodes string(.)}]
+    $doc delete
+    set result
+} {1}
+
+test domNode-1.6 {domNode command: invalid token} {
+    set xml {<doc><e>1</e><e>2</e></doc>}
+
+    set doc [dom parse $xml]
+    set root [domDoc $doc documentElement]
+    set invalidToken [domNode $root firstChild]
+    append invalidToken "\n"
+    set result [catch {domNode $invalidToken selectNodes string(.)}]
+    $doc delete
+    set result
+} {1}
 
 set doc [dom parse {<root xmlns="rootdefaultNS">
     <elem1 xmlns="elem1NS"><elem11/></elem1>
@@ -174,6 +198,13 @@ test domNode-2.11 {selectNodes - -cache option} {
     set r6 [catch {$root selectNodes -cache 0 ""}]
     list $r1 $r2 $r3 $r4 $r5 $r6
 } {1 1 1 1 1 1}
+
+test domNode-2.12 {selectNodes - -cache option} {
+     # Second usage of an invalid XPath expr with -cache 1
+     # See 97c0994ae4
+     catch {$root selectNodes -cache 1 "/foo bar"}
+     catch {$root selectNodes -cache 1 "/foo bar"}
+} 1
 
 $doc delete
 
@@ -353,6 +384,17 @@ test domNode-4.16 {setAttributeNS - set multiple Attributes at once} {
     $doc delete
     set result
 } {<p1:root xmlns:p1="uri1" xmlns:p2="uri2" p1:a1="1" p1:a2="2" p2:a3="3" a4="4"/>
+}
+
+test domNode-4.17 {setAttributeNS - set multiple Attribute with NS atts undermixed at once} {
+    set doc [dom createDocumentNS uri1 "p1:root"]
+    set root [$doc documentElement]
+    $root setAttributeNS "" xmlns:p2 uri2
+    $root setAttributeNS uri1 p1:a1 1 "" xmlns uri3 uri1 p1:a2 2 "" xmlns:p4 uri4 uri4 p4:a1 a1 uri2 p2:a3 3 "" a4 4
+    set result [$root asXML]
+    $doc delete
+    set result
+} {<p1:root xmlns:p1="uri1" xmlns:p2="uri2" xmlns="uri3" xmlns:p4="uri4" p1:a1="1" p1:a2="2" p4:a1="a1" p2:a3="3" a4="4"/>
 }
 
 test domNode-5.1 {removeChild} {
@@ -1854,11 +1896,22 @@ test domNode-16.11 {getAttribute shortcut with default} {
 test domNode-16.12 {getAttribute shortcut - attr dosen't exists and no default} {
     catch {$root @notPresent}
 } {1}
-
 $doc delete
 
-# Yea, it's the same string as above. I just love to have the
-# data near by the tests, to reduce confusion and silly errors
+set doc [dom parse {<root attr1="bingbaz"
+    foo:attr1="ns attr"
+    xmlns:foo="http://tdom.org/ns1"
+    worble2="second attr with 2 in it's name"
+    xmlns="uri2"/>}]
+set root [$doc documentElement]
+test domNode-16.13 {getAttribute} {
+    $root getAttribute xmlns
+} {uri2}
+test domNode-16.14 {getAttribute} {
+    $root getAttribute xmlns:foo
+} {http://tdom.org/ns1}
+$doc delete
+
 set xml {
 <root>
   text node <b>text</b><!-- comment1 -->
@@ -1929,20 +1982,50 @@ test domNode-18.7 {attributes} {
 # DOM extension there is nothing in the rec, which could help to argue.
 # Therefore, it's the way, it is.
 
-test domNode-18.7 {attributes} {
+test domNode-18.8 {attributes} {
     $root attributes *tdom*
 } {}
 
-test domNode-18.8 {attributes} {
+test domNode-18.9 {attributes} {
     $root attributes foo*
 } {{attr1 foo http://tdom.org/ns}}
 
-# still the doc from befor 18.1
+$doc delete
+set doc [dom parse {<root attr1="bingbaz"
+    foo:attr1="ns attr"
+    xmlns:foo="http://tdom.org/ns1"
+    worble2="second attr with 2 in it's name"
+    xmlns="uri2"/>}]
+set root [$doc documentElement]
+test domNode-18.10 {attributes} {
+    $root attributes
+} {{foo foo {}} {xmlns {} {}} attr1 {attr1 foo http://tdom.org/ns1} worble2}
+$doc delete
+
+set doc [dom parse {<root attr1="bingbaz"
+                          attr2="ab &amp; zu"
+                          attr3=""
+                          foo:attr1="ns attr"
+                          xmlns:foo="http://tdom.org/ns"
+                          worble2="second attr with 2 in it's name">
+text child</root>}]
+set root [$doc documentElement]
 test domNode-19.1 {removeAttribute} {
     $root removeAttribute attr1
     $root attributes attr1
 } {}
 
+$doc delete
+set doc [dom parse {<root attr2="ab &amp; zu"
+                          attr3=""
+                          foo:attr1="ns attr"
+                          xmlns:foo="http://tdom.org/ns"
+                          worble2="second attr with 2 in it's name"
+                          xmlns:bar="http://tdom.org/bar"
+                          thisatt="thisatt value no ns"
+                          bar:thisatt="thisatt value">
+text child</root>}]
+set root [$doc documentElement]
 test domNode-19.2 {removeAttribute} {
     catch {$root removeAttribute attr1} errMsg
     set errMsg
@@ -1964,6 +2047,10 @@ test domNode-19.5 {removeAttributeNS} {
 test domNode-19.6 {removeAttributeNS} {
     catch {$root removeAttributeNS http://tdom.org attr1}
 } {1}
+
+test domNode-19.7 {removeAttributeNS} {
+     catch {$root removeAttributeNS http://tdom.org/bar thisatt}
+} {0}
 
 $doc delete
 

@@ -849,6 +849,268 @@ test xpath-5.33 {afl-fuzz found seg faulting 'xpath expr'} {
     set result
 } {1}
 
+test xpath-5.34 {tcl var resolution in expr} {
+    set doc [dom parse {<doc><e att="1"/><e att="2"/><e att="3"/></doc>}]
+    set which 2
+    # Tcl var value is always seen as string by the xpath engine. Any
+    # non empty string is always true
+    set node [$doc selectNodes {/doc/e[$which]}]
+    set result [llength $node]
+    # If another xpath data type is needed, cast explictly
+    set node [$doc selectNodes {/doc/e[number($which)]}]
+    lappend result [llength $node]
+    lappend result [$node @att]
+    set which ""
+    # Empty string is false, by xpath converting rules
+    set node [$doc selectNodes {/doc/e[$which]}]
+    lappend result [llength $node]
+    $doc delete
+    set result
+} {3 1 2 0}
+
+test xpath-5.35 {tcl var resolution in xpath expr} {
+    set doc [dom parse {<doc><e>1</e><e>2</e><e>3</e><e>4</e></doc>}]
+    set node [$doc documentElement] 
+    set i 2
+    set result [list]
+    lappend result [$node selectNodes -cache 1 {string(*[position()=$i])}]
+    set i 3
+    lappend result [$node selectNodes -cache 1 {string(*[position()=$i])}]
+    $doc delete
+    set result
+} {2 2}
+
+test xpath-5.36 {tcl var resolution in xpath expr} {
+    set doc [dom parse {<doc><e>1</e><e>2</e><e>3</e><e>4</e></doc>}]
+    set node [$doc documentElement] 
+    set i 2
+    set result [list]
+    lappend result [$node selectNodes {string(*[position()=$i])}]
+    set i 3
+    lappend result [$node selectNodes {string(*[position()=$i])}]
+    $doc delete
+    set result
+} {2 3}
+
+proc xpath-5.37 {node} {
+    set i 4
+    return [$node selectNodes -cache 1 {string(*[position()=$i])}]
+}
+test xpath-5.37 {tcl var resolution in xpath expr} {
+    set doc [dom parse {<doc><e>1</e><e>2</e><e>3</e><e>4</e></doc>}]
+    set node [$doc documentElement] 
+    set i 2
+    set result [list]
+    lappend result [$node selectNodes -cache 1 {string(*[position()=$i])}]
+    lappend result [xpath-5.37 $node]
+    set i 3
+    $doc delete
+    set result
+} {2 2}
+
+test xpath-5.38 {tcl var resolution in xpath expr} {
+    set doc [dom parse <doc/>]
+    set xpath "/doc"
+    for {set i 1} {$i <= 20} {incr i} {
+        set var$i $i
+        append xpath "/e\[position()=\$var$i\]"
+    }
+    set result [$doc selectNodes $xpath]
+    $doc delete
+} {}
+
+test xpath-5.39 {tcl var resolution in xpath expr} {
+    set xml {
+        <doc>
+        <e att="a" elm="1"/>
+        <e att="a" elm="2"/>
+        <e att="b" elm="3"/>
+        <e att="b" elm="4"/>
+        </doc>
+    }
+    set doc [dom parse $xml]
+    set attvalue "b"
+    set pos 2
+    set result [[$doc selectNodes {/doc/e[@att=$attvalue][position()=$pos]}] asXML -indent none]
+    $doc delete
+    set result
+} {<e att="b" elm="4"/>}
+
+test xpath-5.40 {tcl var resolution in xpath expr} {
+    set doc [dom parse {<doc><e>1</e><e>2</e><e>3</e><e>4</e></doc>}]
+    # What this test tests depend on NUM_STATIC_TOKENS. Which is 20 in
+    # the tcl core distribution at the time, this test was written.
+    unset -nocomplain a
+    for {set i 0} {$i < 25} {} {
+        set a($i) [incr i]
+    }
+    set a(25) 2
+    set xpath "string(/doc/e\[position()="
+    for {set i 0} {$i < 26} {incr i} {
+        append xpath "\$a("
+    }
+    append xpath 0
+    for {set i 0} {$i < 26} {incr i} {
+        append xpath ")"
+    }
+    append xpath "\])"
+    set result [$doc selectNodes $xpath]
+    lappend result [$doc selectNodes -cache 1 $xpath]
+    $doc delete
+    unset a
+    set result
+} {2 2}
+
+test xpath-5.41 {tcl var resolution in xpath expr} {
+    set doc [dom parse {<doc><e>1</e><e>2</e><e>3</e><e>4</e></doc>}]
+    # What this test tests depend on NUM_STATIC_TOKENS.
+    unset -nocomplain a
+    for {set i 0} {$i < 25} {} {
+        set a($i) [incr i]
+    }
+    set a(25) 2
+    set xpath "/doc"
+    for {set i 1} {$i <= 20} {incr i} {
+        set var$i $i
+        append xpath "/e\[position()=\$var$i\]"
+    }
+    append xpath "/e\[position()="
+    for {set i 0} {$i < 26} {incr i} {
+        append xpath "\$a("
+    }
+    append xpath 0
+    for {set i 0} {$i < 26} {incr i} {
+        append xpath ")"
+    }
+    append xpath "\]"
+    set result [$doc selectNodes $xpath]
+    append result [$doc selectNodes -cache 1 $xpath]
+    $doc delete
+    unset a
+    set result
+} ""
+
+test xpath-5.42 {tcl var resolution in xpath expr} {
+    set doc [dom parse {<doc><e>1</e><e>2</e><e>3</e><e>4</e></doc>}]
+    # What this test tests depend on NUM_STATIC_TOKENS.
+    unset -nocomplain a
+    for {set i 0} {$i < 25} {} {
+        set a($i) [incr i]
+    }
+    set a(25) 2
+    set xpath "/doc/e\[position()="
+    for {set i 0} {$i < 26} {incr i} {
+        append xpath "\$a("
+    }
+    append xpath 0
+    for {set i 0} {$i < 26} {incr i} {
+        append xpath ")"
+    }
+    append xpath "\]"
+    for {set i 1} {$i <= 20} {incr i} {
+        set var$i $i
+        append xpath "/e\[position()=\$var$i\]"
+    }
+    set result [$doc selectNodes $xpath]
+    append result [$doc selectNodes -cache 1 $xpath]
+    $doc delete
+    unset a
+    set result
+} ""
+
+test xpath-5.43 {XPath is commutative} {
+    set xml {
+<doc>
+  <e>
+    <ee>eins</ee>
+  </e>
+  <e>
+    <ee>zwei</ee>
+  </e>
+</doc>}
+    set doc [dom parse $xml]
+    set result [expr {[$doc selectNodes {doc/e[ee='zwei']}]
+                      == [$doc selectNodes {doc/e['zwei'=ee]}]}]
+    lappend result [llength [$doc selectNodes {doc/e[ee='zwei']}]]
+    lappend result [$doc selectNodes {string(doc/e[ee='zwei'])}]
+    $doc delete
+    set result
+} {1 1 zwei}
+
+test xpath-5.44 {Element name injected with tcl variable} {
+    set doc [dom parse -json {{"member name with spaces":"the value"}}]
+    set nodeName "member name with spaces"
+    set node [$doc selectNodes %nodeName]
+    set result [list]
+    lappend result [$node nodeName]
+    lappend result [$doc selectNodes string(%nodeName)]
+    set node [$doc selectNodes /%nodeName]
+    lappend result [$node nodeName]
+    $doc delete
+    set result
+} {{member name with spaces} {the value} {member name with spaces}}
+
+test xpath-5.45 {Element name injected with tcl variable} {
+    set doc [dom parse -json {{"a":{"with spaces":"the value"},"a":{"with spaces":"another value"}}}]
+    set nodeName "with spaces"
+    set node [$doc selectNodes {a[%nodeName='another value']}]
+    set result [list]
+    lappend result [$node nodeName]
+    lappend result [$doc selectNodes {string(a[%nodeName='another value'])}]
+    $doc delete
+    set result
+} {a {another value}}
+
+test xpath-5.46 {Element name injected with tcl variable - wrong xpath syntax} {
+    set doc [dom parse -json {{"a":{"with spaces":"the value"},"a":{"with spaces":"another value"}}}]
+    set result [catch {$doc selectNodes {a[b %nodeName='another value']}} errMsg]
+    lappend result $errMsg
+    $doc delete
+    set result
+} {1 {Predicate: Expected "RBRACKET" for 'a[b %nodeName='another value']' 
+
+Parsed symbols:
+     0 WCARDNAME        0 0.000e+00     0  a
+     1 LBRACKET         0 0.000e+00     1  
+     2 WCARDNAME        0 0.000e+00     2  b
+-->  3 WCARDNAME        0 0.000e+00    12  with spaces
+     4 EQUAL            0 0.000e+00    13  
+     5 LITERAL          0 0.000e+00    28  another value
+     6 RBRACKET         0 0.000e+00    29  }}
+
+test xpath-5.47 {Element name injected with tcl variable} {
+    set doc [dom parse -json {{"a":{"":"the value"},"a":{"":"another value"}}}]
+    set nodeName ""
+    set node [$doc selectNodes {a[%nodeName='another value']}]
+    set result [list]
+    lappend result [$node nodeName]
+    lappend result [$doc selectNodes {string(a[%nodeName='another value'])}]
+    $doc delete
+    set result
+} {a {another value}}
+
+test xpath-5.46 {Element name injected with tcl variable} {
+    set doc [dom parse -json {{"a":{"a\u0001b":"the value"},"a":{"a\u0001b":"another value"}}}]
+    set nodeName "a\u0001b"
+    set node [$doc selectNodes {a[%nodeName='another value']}]
+    set result [list]
+    lappend result [$node nodeName]
+    lappend result [$doc selectNodes {string(a[%nodeName='another value'])}]
+    $doc delete
+    set result
+} {a {another value}}
+
+test xpath-5.47 {Element name injected with tcl variable} {
+    set doc [dom parse -json {{"a":{"a\u0000b":"the value"},"a":{"a\u0000b":"another value"}}}]
+    set nodeName "a\u0000b"
+    set node [$doc selectNodes {a[%nodeName='another value']}]
+    set result [list]
+    lappend result [$node nodeName]
+    lappend result [$doc selectNodes {string(a[%nodeName='another value'])}]
+    $doc delete
+    set result
+} {a {another value}}
+
 set doc [dom parse {
 <root>
   <asub>asub2</asub>
@@ -931,6 +1193,36 @@ test xpath-7.6 {parent axis on /} {
     $doc delete
     set result
 } {0 0 0}
+
+test xpath-7.7 {Document order in complexer // expresions} -setup {
+    set doc [dom parse {
+    <doc>
+    <a>
+        <b>1</b>
+        <a>
+            <b>11</b>
+        </a>
+        <b>2</b>
+    </a>
+    <a>
+        <a>
+            <b>22</b>
+        </a>
+        <b>3</b>
+        <b>4</b>
+        <a>
+            <b>33</b>
+        </a>
+    </a>
+</doc>}]} -body {
+    set result [list]
+    foreach node [$doc selectNodes //a/b] {
+        lappend result [$node selectNodes string()]
+    }
+    join $result " - "
+} -cleanup {
+    $doc delete
+} -result {1 - 11 - 2 - 22 - 3 - 4 - 33}
 
 # cleanup
 ::tcltest::cleanupTests

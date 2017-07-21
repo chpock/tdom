@@ -163,7 +163,7 @@ Database Class:	\\fB\\$3\\fR
 expat \- Creates an instance of an expat parser object
 .SH SYNOPSIS
 .nf
-\&\fBpackage require tdom\fP
+package require tdom
 
 \&\fBexpat\fP ?\fIparsername\fR? ?\fI-namespace\fR? ?\fIarg arg ..\fR
 
@@ -723,6 +723,17 @@ parser.
 .PP
 If the -handlerset option is used, the configuration for the
 named handler set is returned.
+.RE
+.TP
+\&\fB\fBparser\fP \fBcurrentmarkup\fP
+\&\fR
+.RS
+.PP
+Returns the current markup as found in the XML, if
+called from within one of its markup event handler script
+(-elementstartcommand, -elementendcommand, -commentcommand
+and -processinginstructioncommand). Otherwise it return the
+empty string.
 .RE
 .TP
 \&\fB\fBparser\fP \fBfree\fP
