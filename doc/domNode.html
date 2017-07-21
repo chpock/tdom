@@ -4,17 +4,17 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x20b2210">NAME</a> · <a href="#SECTid0x20d0160">SYNOPSIS</a> · <a href="#SECTid0x215b720"> DESCRIPTION </a> · <a href="#SECTid0x21fbed0">SEE ALSO</a> · <a href="#SECTid0x21fc260">KEYWORDS</a>
+<a href="#SECTid0xb275d0">NAME</a> · <a href="#SECTid0xb558b0">SYNOPSIS</a> · <a href="#SECTid0xad87e0"> DESCRIPTION </a> · <a href="#SECTid0xb81b10">SEE ALSO</a> · <a href="#SECTid0xb81ea0">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x20b2210">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0xb275d0">NAME</a></h2><p class="namesection">
 <b class="names">domNode - </b><br>Manipulates an instance of a DOM node object</p>
 
 
 
-  <h2><a name="SECTid0x20d0160">SYNOPSIS</a></h2><pre class="syntax"> $nodeObject <i class="m">method</i>  <i class="m">arg arg ...</i>
+  <h2><a name="SECTid0xb558b0">SYNOPSIS</a></h2><pre class="syntax"> $nodeObject <i class="m">method</i>  <i class="m">arg arg ...</i>
 </pre>
-  <h2><a name="SECTid0x215b720"> DESCRIPTION </a></h2><p>This command manipulates one particular instance of a DOM node object.
+  <h2><a name="SECTid0xad87e0"> DESCRIPTION </a></h2><p>This command manipulates one particular instance of a DOM node object.
 <i class="m">method</i> indicates a specific method of the node class. These methods
 should closely conform to the W3C recommendation "Document Object Model
 (Core) Level 1" (<a href="http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html">http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html</a>)
@@ -404,17 +404,25 @@ of attribute name / value pairs. If <i class="m">typeVar</i> is given
 the result type name is stored into that variable (empty,
 bool, number, string, nodes, attrnodes or mixed).</p>
 
-<p>The argument <i class="m">xpathQuery</i> has to be a valid XPath
-expression. However, there is one exception to that rule. Tcl variable
-names can appear in the XPath statement at any position where it is
-legal according to the rules of the XPath syntax to put an XPath
-variable. The value of the variable is substituted for the variable
-name. Ignoring the syntax rules of XPath the Tcl variable name may be
-any legal Tcl var name: local variables, global variables, array
-entries and so on. The value will always be seen as string literal by
-the xpath engine. Cast the value explicitly with the according xpath
-functions (number(), boolean()) to another data type, if needed.
-</p>
+<p>The argument <i class="m">xpathQuery</i> has to be a valid XPath expression.
+However there are a few exceptions to that rule. Tcl variable
+references (in the usual tcl syntax: $varname) may appear in the XPath
+statement at any position where it is legal according to the rules of
+the XPath syntax to put an XPath variable. Ignoring the syntax rules of
+XPath the Tcl variable name may be any legal Tcl var name: local
+variables, global variables, array entries and so on. The value will
+always be seen as string literal by the xpath engine. Cast the value
+explicitly with the according xpath functions (number(), boolean()) to
+another data type, if needed.</p>
+
+<p>Simmilar to the above descibed way to inject literals in a secure
+way into the XPath expression using tcl variable references there is a
+syntax to inject element names from tcl variables. At every place
+where the XPath syntax allows a node test there could be a tcl
+variable reference (in any form), just the leading $ replaced with %.
+This allows to select nodes with 'strange' (invalid, according to the
+appropriate XML production rule) node names which may be needed in
+case of working with JSON data.</p>
 
 <p>The option <i class="m">-namespaces</i> expects a tcl list with prefix /
 namespace pairs as argument. If this option is not given, then any
@@ -704,14 +712,29 @@ if given, is set to the empty string.</p>
         <dd>Returns the value of the attribute <i class="m">attrName</i>.  Short cut
 for <i class="m">getAttribute</i>.</dd>
       
+
+      
+        <dt>
+<b class="method">jsonType</b> <i class="m">?OBJECT|ARRAY|NONE)|(STRING|NUMBER|TRUE|FALSE|NULL|NONE)?</i>
+</dt>
+        <dd>Only element and text nodes may have a JSON type and
+        only this types of nodes support the <i class="m">jsonType</i> method;
+        the other node types return error if called with this method.
+        Returns the jsonType of the node. If the optional argument is
+        given, the JSON type of the node is set to the given type and
+        returned. Valid type arguments for element nodes are OBJECT,
+        ARRAY and NONE. Valid type arguments for text nodes are
+        STRING, NUMBER, TRUE, FALSE, NULL and NONE.</dd>
+      
+
     </dl><p>Otherwise, if an unknown method name is given, the command with the same
 name as the given method within the namespace <tt class="l">::dom::domNode</tt> is tried to
 be executed. This allows quick method additions on Tcl level.</p>
 
 
-  <h2><a name="SECTid0x21fbed0">SEE ALSO</a></h2><p class="seealso">dom, domDoc</p>
+  <h2><a name="SECTid0xb81b10">SEE ALSO</a></h2><p class="seealso">dom, domDoc</p>
   
-  <h2><a name="SECTid0x21fc260">KEYWORDS</a></h2><p class="keywords">
+  <h2><a name="SECTid0xb81ea0">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-XML">XML</a>, <a class="keyword" href="keyword-index.html#KW-DOM">DOM</a>, <a class="keyword" href="keyword-index.html#KW-document">document</a>, <a class="keyword" href="keyword-index.html#KW-node">node</a>, <a class="keyword" href="keyword-index.html#KW-parsing">parsing</a>
 </p>
   
