@@ -1073,7 +1073,7 @@ Parsed symbols:
      0 WCARDNAME        0 0.000e+00     0  a
      1 LBRACKET         0 0.000e+00     1  
      2 WCARDNAME        0 0.000e+00     2  b
--->  3 WCARDNAME        0 0.000e+00    12  with spaces
+-->  3 WCARDNAME        1 0.000e+00    12  with spaces
      4 EQUAL            0 0.000e+00    13  
      5 LITERAL          0 0.000e+00    28  another value
      6 RBRACKET         0 0.000e+00    29  }}
@@ -1089,7 +1089,7 @@ test xpath-5.47 {Element name injected with tcl variable} {
     set result
 } {a {another value}}
 
-test xpath-5.46 {Element name injected with tcl variable} {
+test xpath-5.48 {Element name injected with tcl variable} {
     set doc [dom parse -json {{"a":{"a\u0001b":"the value"},"a":{"a\u0001b":"another value"}}}]
     set nodeName "a\u0001b"
     set node [$doc selectNodes {a[%nodeName='another value']}]
@@ -1100,7 +1100,7 @@ test xpath-5.46 {Element name injected with tcl variable} {
     set result
 } {a {another value}}
 
-test xpath-5.47 {Element name injected with tcl variable} {
+test xpath-5.49 {Element name injected with tcl variable} {
     set doc [dom parse -json {{"a":{"a\u0000b":"the value"},"a":{"a\u0000b":"another value"}}}]
     set nodeName "a\u0000b"
     set node [$doc selectNodes {a[%nodeName='another value']}]
@@ -1110,6 +1110,71 @@ test xpath-5.47 {Element name injected with tcl variable} {
     $doc delete
     set result
 } {a {another value}}
+
+test xpath-5.50 {Element name injected with tcl variable} {
+    set doc [dom parse -json {{"a":"1","*":"2","c":"3"}}]
+    set nodeName "*"
+    set result [llength [$doc selectNodes %nodeName]]
+    $doc delete
+    set result
+} {1}
+
+test xpath-5.51 {Element name injected with tcl variable} {
+    set doc [dom parse -json {{"member name with spaces":"the value"}}]
+    set nodeName "member name with spaces"
+    set node [$doc selectNodes %nodeName]
+    set result [list]
+    lappend result [$node nodeName]
+    lappend result [$doc selectNodes string(%nodeName)]
+    set node [$doc selectNodes child::%nodeName]
+    lappend result [$node nodeName]
+    $doc delete
+    set result
+} {{member name with spaces} {the value} {member name with spaces}}
+
+test xpath-5.52 {Element name injected with tcl variable} {
+    set doc [dom parse -json {{"a:b":"value"}}]
+    set nodeName "a:b"
+    set result [$doc selectNodes string(%nodeName)]
+    $doc delete
+    set result
+} {value}
+
+test xpath-5.53 {Element name injected with tcl variable} {
+    set doc [dom parse -json {{"a:b":"value"}}]
+    set nodeName "a:b"
+    set result [$doc selectNodes string(child::%nodeName)]
+    $doc delete
+    set result
+} {value}
+
+test xpath-5.54 {Element name injected with tcl variable} {
+    set doc [dom parse -json {{"a:b":"value"}}]
+    set nodeName "a:b"
+    set result [$doc selectNodes string(descendant-or-self::%nodeName)]
+    $doc delete
+    set result
+} {value}
+
+test xpath-5.55 {Element name injected with tcl variable} {
+    set doc [dom parse <a><b/></a>]
+    set nodeName "a/b"
+    set result [llength [$doc selectNodes %nodeName]]
+    lappend result [llength [$doc selectNodes a/b]]
+    $doc delete
+    set result
+} {0 1}
+
+test xpath-5.56 {Element name injected with tcl variable} {
+    set doc [dom parse -json {{"a":{"a/b":"a/b"},"a":{"a":{"b":"b"}}}}]
+    set nodeName0 "a"
+    set nodeName1 "a/b"
+    set result [list]
+    lappend result [$doc selectNodes string(%nodeName0/%nodeName1)]
+    lappend result [$doc selectNodes string(a/a/b)]
+    $doc delete
+    set result
+} {a/b b}
 
 set doc [dom parse {
 <root>
