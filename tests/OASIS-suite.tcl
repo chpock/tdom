@@ -149,7 +149,7 @@ proc extRefHandler {base systemId publicId} {
 # message to stderr.
 proc xsltmsgcmd {msg terminate} {
     variable loglevel
-    if ($loglevel >= 0) {
+    if {$loglevel >= 0} {
         puts stderr "xslt message: '$msg'"
     }
 }
