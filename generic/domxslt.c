@@ -3241,7 +3241,7 @@ static int xsltAddTemplate (
                    is cleand up. */
                 tpl->match = NULL;
             } else {
-                free ((char*)tpl);
+                FREE ((char*)tpl);
             }
             return rc;
         }
@@ -6655,7 +6655,7 @@ static int processTopLevel (
                                  NULL, &(keyInfo->matchAst), errMsg);
                 if (rc < 0) {
                     reportError (node, *errMsg, errMsg);
-                    free ((char*)keyInfo);
+                    FREE ((char*)keyInfo);
                     return rc;
                 }
                 keyInfo->use       = use;
@@ -6664,7 +6664,7 @@ static int processTopLevel (
                 if (rc < 0) {
                     reportError (node, *errMsg, errMsg);
                     xpathFreeAst (keyInfo->matchAst);
-                    free ((char*)keyInfo);
+                    FREE ((char*)keyInfo);
                     return rc;
                 }
                 domSplitQName (name, prefix, &localName);

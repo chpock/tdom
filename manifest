@@ -1,5 +1,5 @@
-C Added\sknowledge\sabout\sthe\s(HTML5)\stag\s"source"\sto\sthe\shtml\sparser.
-D 2017-07-14T12:24:06.268
+C Use\sthe\smalloc\sdefines\sconsistent\sall\sover\sthe\splace,\sotherwise\ssome\smemory\schecking\sapproaches\s(like\sthe\sone\sincluded\sin\sthe\stcl\score)\sreport\sfalse\spositives.
+D 2017-07-27T13:11:11.835
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -133,7 +133,7 @@ F generic/domhtml5.h 5cca562a556e7662f2dce222640c32abb2777146
 F generic/domlock.c b9543b7f1066118a5bcd0d2fa30acda6d247f15a
 F generic/domxpath.c c55b71340823a4b4a70e9b73ee21152fc51ff93c
 F generic/domxpath.h 5481cdcb9248c50fb99cfba6d602572453897938
-F generic/domxslt.c 9127e45e5c83ad2c4bee7ff00eb1410e69546782
+F generic/domxslt.c 53ebbac5b6d230a814213726aa46c49c731bce01
 F generic/domxslt.h c068da9c518ad5e2a543874c18166065f0bf2bbc
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -241,8 +241,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ab13e17c8695f7636cb91af652455f17f7bbd74b
-R cabfcb18e092306155767a31691f0fdd
+P ea10f0d3f292c508c8c5783f517e8b19eb7ea826
+R 824c4ee20739c1716bd49bfb2eef7a9c
 U rolf
-Z 0b59f9e46149b06cfaa4ebd9927e2efa
+Z fee174c465a1ba4d0cc0ad6b894a216b
 # Remove this line to create a well-formed Fossil manifest.
