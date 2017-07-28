@@ -380,7 +380,6 @@ test parser-4.1 {error in callback} {
 <Element>Should not see this data</Element>
 </Test>
     }} result]
-    puts $result
     list $errcode $::started(Element)
 } {1 2}
 

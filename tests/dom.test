@@ -529,6 +529,13 @@ test dom-2.32 {parse document with undeclared xml prefix and -ignorexmlns} {
     set result
 } {foo:e}
 
+test dom-2.33 {end of options option} {
+    set doc [dom parse -json -- -0.123]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} -0.123
+
 test dom-3.1 {isName} {
     dom isName ":foo"
 } {1}
@@ -1448,6 +1455,42 @@ test dom-8.6 {createDocumentNode} {
     set result
 } {<root><child1/><child2/>some text<child3/></root>}
 
+test dom-8.7 {createDocumentNode} {
+    dom createDocumentNode docNode
+    dom createDocumentNode docNode
+    $docNode delete
+    set result ""
+} ""
+
+test dom-8.8 {createDocumentNode} {
+    dom createDocumentNode -jsonType ARRAY docNode
+    set result [$docNode jsonType]
+    $docNode delete
+    set result
+} ARRAY
+
+test dom-8.9 {createDocumentNode} {
+    set docNode [dom createDocumentNode -jsonType NUMBER]
+    set result [$docNode jsonType]
+    $docNode delete
+    set result
+} NUMBER
+
+test dom-8.10 {createDocumentNode} {
+    catch {dom createDocumentNode -foo NULL docNode} errMsg
+    set errMsg
+} {bad option "-foo": must be -jsonType}
+
+test dom-8.10 {createDocumentNode} {
+    catch {dom createDocumentNode -foo NULL docNode} errMsg
+    set errMsg
+} {bad option "-foo": must be -jsonType}
+
+test dom-8.11 {createDocumentNode} {
+    catch {dom createDocumentNode -jsonType FOO docNode} errMsg
+    set errMsg
+} {bad jsonType "FOO": must be NONE, ARRAY, OBJECT, NULL, TRUE, FALSE, STRING, or NUMBER}
+
 test dom-9.1 {setObjectCommands} {
     dom setObjectCommands
 } {automatic}
@@ -1513,11 +1556,12 @@ namespace eval nodeCmds {
     dom createNodeCmd cdataNode   cdata
     dom createNodeCmd piNode      pi
     dom createNodeCmd parserNode  parser
+    dom createNodeCmd -tagName foo elementNode bar
 }
 
 test dom-10.1 {createNodeCmd} {
     llength [info commands nodeCmds::*]
-} {7}
+} {8}
 
 namespace eval nodeCmds {
     rename e1 {}
@@ -1527,6 +1571,7 @@ namespace eval nodeCmds {
     rename cdata {}
     rename pi {}
     rename parser {}
+    rename bar {}
 }
 
 test dom-10.2 {createNodeCmd} {
@@ -1572,6 +1617,19 @@ test dom-10.5 {node creating command called outside domNode context} {
     lappend result $errMsg
 } {{<docRoot><e1>Some text</e1></docRoot>} 1 {called outside domNode context}}
 
+namespace eval nodeCmds {
+    dom createNodeCmd -tagName foo elementNode bar
+}
+test dom-10.6 {createNodeCmd - option -tagName} {
+    set doc [dom createDocumentNode]
+    $doc appendFromScript {
+        nodeCmds::bar {}
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<foo/>}
+
 namespace delete nodeCmds
 
 test dom-11.1 {featureinfo - expatversion} -body {
@@ -1589,6 +1647,10 @@ test dom-11.3 {featureinfo - expatmajorversion} -body {
 test dom-11.4 {featureinfo - dtd} -body {
     dom featureinfo dtd
 } -match regexp -result {(0|1)}
+
+test dom-11.5 {featureinfo - jsonmaxnesting} {
+    dom featureinfo jsonmaxnesting
+} 2000
 
 proc ::dom::domParseFeedback {} {
     return -code break

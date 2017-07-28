@@ -1286,8 +1286,7 @@ startElement(
                 node->namespace = info->document->rootNode->firstAttr->namespace;
             } else {
                 /* Since where here, this means, the element has a
-                   up to now not declared namespace prefix. We probably
-                   should return this as an error, shouldn't we?*/
+                   up to now not declared namespace prefix. */
                 Tcl_SetResult (info->interp, "Namespace prefix is not "
                                "defined", NULL);
                 XML_StopParser(info->parser, 0);

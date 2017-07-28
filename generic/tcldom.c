@@ -49,6 +49,7 @@
 #include <domxpath.h>
 #include <domxslt.h>
 #include <xmlsimple.h>
+#include <domjson.h>
 #include <domhtml.h>
 #include <domhtml5.h>
 #include <nodecmd.h>
@@ -202,7 +203,10 @@ static char dom_usage[] =
     "        ?-externalentitycommand <cmd>?               \n"
     "        ?-useForeignDTD <boolean>?                   \n"
     "        ?-paramentityparsing <none|always|standalone>\n"
-    "        ?-simple? ?-html? ?<xml>? ?<objVar>?         \n"
+    "        ?-simple? ?-html? ?-html5? ?-json?           \n"
+    "        ?-jsonmaxnesting <#nr>?                      \n"
+    "        ?-jsonroot name?                             \n"
+    "        ?<xml|html|json>? ?<objVar>?                 \n"
     "    createDocument docElemName ?objVar?              \n"
     "    createDocumentNS uri docElemName ?objVar?        \n"
     "    createDocumentNode ?objVar?                      \n"
@@ -241,6 +245,7 @@ static char doc_usage[] =
     "    asXML ?-indent <none,0..8>? ?-channel <channel>? ?-escapeNonASCII? ?-escapeAllQuot? ?-doctypeDeclaration <boolean>?\n"
     "    asHTML ?-channel <channelId>? ?-escapeNonASCII? ?-htmlEntities?\n"
     "    asText                                  \n"
+    "    asJSON ?-indent <none,0..8>?            \n"
     "    getDefaultOutputMethod                  \n"
     "    publicId ?publicId?                     \n"
     "    systemId ?systemId?                     \n"
@@ -336,6 +341,7 @@ static char node_usage[] =
     "    asXML ?-indent <none,0..8>? ?-channel <channel>? ?-escapeNonASCII? ?-escapeAllQuot? ?-doctypeDeclaration <boolean>?\n"
     "    asHTML ?-channel <channelId>? ?-escapeNonASCII? ?-htmlEntities?\n"
     "    asText                       \n"
+    "    asJSON ?-indent <none,0..8>? \n"
     "    appendFromList nestedList    \n"
     "    appendFromScript script      \n"
     "    insertBeforeFromScript script ref \n"
@@ -346,11 +352,24 @@ static char node_usage[] =
     "    precedes node                \n"
     "    normalize ?-forXPath?        \n"
     "    xslt ?-parameters parameterList? <xsltDocNode>\n"
+    "    jsonType ?jsonType?          \n"
     TDomThreaded(
     "    readlock                     \n"
     "    writelock                    \n"
     )
 ;
+
+static CONST84 char *jsonTypes[] = {
+    "NONE",
+    "ARRAY",
+    "OBJECT",
+    "NULL",
+    "TRUE",
+    "FALSE",
+    "STRING",
+    "NUMBER",
+    NULL
+};
 
 /*----------------------------------------------------------------------------
 |   Types
@@ -382,6 +401,11 @@ const Tcl_ObjType tdomNodeType = {
 static Tcl_VarTraceProc  tcldom_docTrace;
 
 static Tcl_CmdDeleteProc tcldom_docCmdDeleteProc;
+
+static void tcldom_treeAsJSON(Tcl_Obj *jstring, domNode *node,
+                              Tcl_Channel channel, int indent,
+                              int level,
+                              int inside);
 
 #ifdef TCL_THREADS
 
@@ -2143,7 +2167,6 @@ Tcl_Obj * tcldom_treeAsTclList (
     return Tcl_NewListObj(3, objv);
 }
 
-
 /*----------------------------------------------------------------------------
 |   tcldom_AppendEscaped
 |
@@ -3016,6 +3039,374 @@ void tcldom_treeAsXML (
 }
 
 /*----------------------------------------------------------------------------
+|   tcldom_AppendEscapedJSON
+|
+\---------------------------------------------------------------------------*/
+static
+void tcldom_AppendEscapedJSON (
+    Tcl_Obj    *jstring,
+    Tcl_Channel chan,
+    char       *value,
+    int         value_length
+)
+{
+    char  buf[APESC_BUF_SIZE+80], *b, *bLimit,  *pc, *pEnd;
+    int   i;
+    int   clen = 0;
+
+    b = buf;
+    bLimit = b + APESC_BUF_SIZE;
+    pc = pEnd = value;
+    if (value_length != -1) {
+        pEnd = pc + value_length;
+    }
+    AP('"');
+    while (
+        (value_length == -1 && *pc)
+        || (value_length != -1 && pc != pEnd)
+    ) {
+        clen = UTF8_CHAR_LEN(*pc);
+        if (!clen) {
+            /* This would be invalid utf-8 encoding. */
+            clen = 1;
+        }
+        if (clen == 1) {
+            if (*pc == '\\') {
+                AP('\\'); AP('\\');
+            } else if (*pc == '"') {
+                AP('\\'); AP('"');
+            } else if (*pc == '\b') {
+                AP('\\'); AP('b');
+            } else if (*pc == '\f') {
+                AP('\\'); AP('f');
+            } else if (*pc == '\n') {
+                AP('\\'); AP('n');
+            } else if (*pc == '\r') {
+                AP('\\'); AP('r');
+            } else if (*pc == '\t') {
+                AP('\\'); AP('t');
+            } else if ((unsigned char)*pc < 0x20) {
+                AP('\\'); AP('u'); AP('0'); AP('0');
+                AP('0' + (*pc>>4));
+                AP("0123456789abcdef"[*pc&0xf]);
+            } else {
+                AP(*pc);
+            }
+            pc++;
+        } else {
+            if ((unsigned char)*pc == 0xC0 && (unsigned char)*(pc+1) == 0x80) {
+                AP('\\');AP('u');AP('0');AP('0');AP('0');AP('0');
+                pc++;pc++;
+            } else {
+                for (i = 0; i < clen; i++) {
+                    AP(*pc);
+                    pc++;
+                }
+            }
+        }
+        if (b >= bLimit) {
+            writeChars(jstring, chan, buf, b - buf);
+            b = buf;
+        }
+    }
+    AP('"');
+    writeChars(jstring, chan, buf, b - buf);
+}
+
+static
+void tcldom_childsAsJSON (
+    Tcl_Obj     *jstring,
+    domNode     *node, /* Must be an ELEMENT_NODE */
+    Tcl_Channel  channel,
+    int          indent,
+    int          level,
+    int          inside
+    )
+{
+    domNode   *child, *nextChild;
+    int i, effectivParentType = 0;
+    int first = 1;
+
+    child = node->firstChild;
+    while (child
+           && child->nodeType != TEXT_NODE
+           && child->nodeType != ELEMENT_NODE) {
+        child = child->nextSibling;
+    }
+
+    if (node->info == JSON_ARRAY || node->info == JSON_OBJECT) {
+        effectivParentType = node->info;
+    } else if (child == NULL) {
+        /* Need 'heuristic rule' to decide, what to do. */
+        switch (inside) {
+        case JSON_OBJECT:
+            /* The childs to serialize are the value of an object member. */
+            /* No content at all. This could be an empty string,
+             * an empty object or an empty array. We default to
+             * empty string. */
+            writeChars(jstring, channel, "\"\"",2);
+            return;
+        case JSON_START:
+        case JSON_ARRAY:
+            /* The childs, we serialize are the value of an array
+             * element. The node is a container for either a
+             * (nested, in case of JSON_ARRAY) array or an object. */
+            /* Look, if the name of the container gives a hint.*/
+            if (strcmp (node->nodeName, JSON_ARRAY_CONTAINER)==0) {
+                effectivParentType = JSON_ARRAY;
+                break;
+            }
+            /* If we here, heuristics didn't helped. We have to
+             * default to something. Let's say ... */
+            effectivParentType = JSON_OBJECT;
+            break;
+        }
+    } else {
+        if (child->nodeType == ELEMENT_NODE) {
+            /* The first 'relevant' child node is ELEMENT_NODE */
+            effectivParentType = JSON_OBJECT;
+            if (inside == JSON_ARRAY) {
+                /* Though, if we inside of an array and the node name
+                 * of the first 'relevant' child is the array
+                 * container element, we assume an array (with a
+                 * nested array as first value of that array. */
+                if (strcmp (child->nodeName, JSON_ARRAY_CONTAINER))
+                    effectivParentType = JSON_ARRAY;
+            }
+        } else {
+            /* If we are here, the first 'relevant' child is a
+             * text node. If there is any other 'relevant' child,
+             * we assume the value to be an array. Otherwise (only
+             * single 'relevant' child is a text node), this is
+             * any of string, true, false null. Child may have a
+             * type hint. */
+            nextChild = child->nextSibling;
+            while (nextChild
+                   && nextChild->nodeType != TEXT_NODE
+                   && nextChild->nodeType != ELEMENT_NODE) {
+                nextChild = nextChild->nextSibling;
+            }
+            if (nextChild) {
+                effectivParentType = JSON_ARRAY;
+            } else {
+                /* Exactly one 'relevant' child node, a text node;
+                 * serialize it as simple token value. */
+                tcldom_treeAsJSON (jstring, child, channel, indent,
+                                   level, JSON_ARRAY);
+                return;
+            }
+        }
+    }
+        
+    switch (effectivParentType) {
+    case JSON_ARRAY:
+        writeChars(jstring, channel, "[",1);
+        while (child) {
+            if (first) {
+                first = 0;
+                level++;
+            } else {
+                writeChars(jstring, channel, ",", 1);
+            }
+            if (indent > -1) {
+                writeChars(jstring, channel, "\n", 1);
+                if (first) level++;
+                for (i = 0; i < level; i++) {
+                    writeChars(jstring, channel, "        ", indent);
+                }
+            }
+            tcldom_treeAsJSON (jstring, child, channel, indent,
+                               level, JSON_ARRAY);
+            child = child->nextSibling;
+            while (child
+                   && child->nodeType != TEXT_NODE
+                   && child->nodeType != ELEMENT_NODE) {
+                child = child->nextSibling;
+            }
+        }
+        if (indent > -1 && first == 0) {
+            writeChars(jstring, channel, "\n", 1);
+            level--;
+            for (i = 0; i < level; i++) {
+                writeChars(jstring, channel, "        ", indent);
+            }
+        }
+        writeChars(jstring, channel, "]",1);
+        break;
+    case JSON_OBJECT:
+        writeChars(jstring, channel, "{",1);
+        while (child) {
+            if (first) {
+                first = 0;
+                level++;
+            } else {
+                writeChars(jstring, channel, ",", 1);
+            }
+            if (indent > -1) {
+                writeChars(jstring, channel, "\n", 1);
+                if (first) level++;
+                for (i = 0; i < level; i++) {
+                    writeChars(jstring, channel, "        ", indent);
+                }
+            }
+            tcldom_treeAsJSON (jstring, child, channel, indent,
+                               level, JSON_OBJECT);
+            child = child->nextSibling;
+            /* Inside of a JSON_OBJECT, only element childs make
+             * semantically sense. */
+            while (child && child->nodeType != ELEMENT_NODE) {
+                child = child->nextSibling;
+            }
+        }
+        if (indent > -1 && first == 0) {
+            writeChars(jstring, channel, "\n", 1);
+            level--;
+            for (i = 0; i < level; i++) {
+                writeChars(jstring, channel, "        ", indent);
+            }
+        }
+        writeChars(jstring, channel, "}",1);
+        break;
+    default:
+        break;
+    }
+}
+
+
+/*----------------------------------------------------------------------------
+|   tcldom_treeAsJSON
+|
+\---------------------------------------------------------------------------*/
+static
+void tcldom_treeAsJSON (
+    Tcl_Obj     *jstring,
+    domNode     *node,  /* Must not be NULL */
+    Tcl_Channel  channel,
+    int          indent,
+    int          level,
+    int          inside
+    )
+{
+    domTextNode *textNode;
+    int i, seenDP, seenE;
+    unsigned char c;
+    char *num;
+    
+    switch (node->nodeType) {
+    case TEXT_NODE:
+        if (inside == JSON_OBJECT) {
+            /* We're inside a JSON object. A text node can not be
+             * meaningful interpreted as member of an object. Ignore
+             * the node */
+            return;
+        }
+        textNode = (domTextNode *) node;
+        switch (node->info) {
+        case JSON_NUMBER:
+            /* Check, if the text value is a JSON number and fall back
+             * to string token, if not. This is to ensure, the
+             * serialization is always a valid JSON string. */
+            if (textNode->valueLength == 0) goto notANumber;
+            seenDP = 0;
+            seenE = 0;
+            i = 0;
+            num = textNode->nodeValue;
+            c = num[0];
+            if (!(c == '-' || (c>='0' && c<='9'))) goto notANumber;
+            if (c<='0') {
+                i = (c == '-' ? i+1 : i);
+                if (i+1 < textNode->valueLength) {
+                    if (num[i] == '0' && num[i+1] >= '0' && num[i+1] <= '9') {
+                        goto notANumber;
+                    }
+                }
+            }
+            i = 1;
+            for (; i < textNode->valueLength; i++) {
+                c = num[i];
+                if (c >= '0' && c <= '9') continue;
+                if (c == '.') {
+                    if (num[i-1] == '-') goto notANumber;
+                    if (seenDP) goto notANumber;
+                    seenDP = 1;
+                    continue;
+                }
+                if (c == 'e' || c == 'E') {
+                    if (num[i-1] < '0') goto notANumber;
+                    if (seenE) goto notANumber;
+                    seenDP = seenE = 1;
+                    c = num[i+1];
+                    if (c == '+' || c == '-') {
+                        i++;
+                        c = num[i+1];
+                    }
+                    if (c < '0' || c > '9') goto notANumber;
+                    continue;
+                }
+                break;
+            }
+            /* Catches a plain '-' without following digits */
+            if (num[i-1] < '0') goto notANumber;
+            /* Catches trailing chars */
+            if (i < textNode->valueLength) goto notANumber;
+            writeChars(jstring, channel, textNode->nodeValue,
+                       textNode->valueLength);
+            break;
+            notANumber:
+            tcldom_AppendEscapedJSON (jstring, channel,
+                                      textNode->nodeValue,
+                                      textNode->valueLength);
+            break;
+        case JSON_NULL:
+            writeChars(jstring, channel, "null",4);
+            break;
+        case JSON_TRUE:
+            writeChars(jstring, channel, "true",4);
+            break;
+        case JSON_FALSE:
+            writeChars(jstring, channel, "false",5);
+            break;
+        case JSON_STRING:
+            /* Fall through */
+        default:
+            tcldom_AppendEscapedJSON (jstring, channel,
+                                      textNode->nodeValue,
+                                      textNode->valueLength);
+            break;
+        };
+        return;
+    case ELEMENT_NODE:
+        switch (inside) {
+        case JSON_OBJECT:
+            /* Write the member name and recurse to the childs for the
+             * value. */
+            tcldom_AppendEscapedJSON (jstring, channel,
+                                      node->nodeName, -1);
+            writeChars (jstring, channel, ":", 1);
+            tcldom_childsAsJSON (jstring, node, channel, indent,
+                                 level, inside);
+            break;
+        case JSON_ARRAY:
+            /* Since we're already inside of an array, the element can
+               only be interpreted as a container for a nested JSON
+               object or array. */
+            tcldom_childsAsJSON (jstring, node, channel, indent,
+                                 level, inside);
+            break;
+        case JSON_START:
+            tcldom_childsAsJSON (jstring, node, channel, indent,
+                                 level, inside);            
+            break;
+        }
+        return;
+    default:
+        /* Any other node types (COMMENT_NODE, CDATA_SECTION_NODE, 
+           PROCESSING_INSTRUCTION_NODE) are ignored. */
+        return;
+    }
+}
+
+/*----------------------------------------------------------------------------
 |   findBaseURI
 |
 \---------------------------------------------------------------------------*/
@@ -3347,6 +3738,100 @@ static int serializeAsHTML (
     resultPtr = Tcl_NewStringObj("", 0);
     tcldom_treeAsHTML(resultPtr, node, chan, escapeNonASCII, htmlEntities,
                       doctypeDeclaration, 0);
+    Tcl_AppendResult(interp, Tcl_GetString(resultPtr), NULL);
+    Tcl_DecrRefCount(resultPtr);
+    return TCL_OK;
+}
+
+/*----------------------------------------------------------------------------
+|   serializeAsJSON
+|
+\---------------------------------------------------------------------------*/
+static int serializeAsJSON (
+    domNode    *node,
+    Tcl_Interp *interp,
+    int         objc,
+    Tcl_Obj    *CONST objv[]
+)
+{
+    char       *channelId;
+    int         optionIndex, mode, indent = -1;
+    Tcl_Obj    *resultPtr;
+    Tcl_Channel chan = (Tcl_Channel) NULL;
+
+    static CONST84 char *asJSONOptions[] = {
+        "-channel", "-indent",
+        NULL
+    };
+    enum asJSONOption {
+        m_channel, m_indent
+    };
+
+    if (node->nodeType != ELEMENT_NODE) {
+        SetResult("Not an element node.\n");
+        return TCL_ERROR;
+    }
+    
+    if (objc > 5) {
+        Tcl_WrongNumArgs(interp, 2, objv,
+                         "?-channel <channelId>? "
+                         "?-indent <none,0..8>?");
+        return TCL_ERROR;
+    }
+    while (objc > 2) {
+        if (Tcl_GetIndexFromObj(interp, objv[2], asJSONOptions, "option", 
+                                0, &optionIndex) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        switch ((enum asJSONOption) optionIndex) {
+
+        case m_channel:
+            if (objc < 4) {
+                SetResult("-channel must have a channeldID as argument");
+                return TCL_ERROR;
+            }
+            channelId = Tcl_GetString(objv[3]);
+            chan = Tcl_GetChannel(interp, channelId, &mode);
+            if (chan == (Tcl_Channel) NULL) {
+                SetResult("-channel must have a channeldID as argument");
+                return TCL_ERROR;
+            }
+            if ((mode & TCL_WRITABLE) == 0) {
+                Tcl_AppendResult(interp, "channel \"", channelId,
+                                "\" wasn't opened for writing", (char*)NULL);
+                return TCL_ERROR;
+            }
+            objc -= 2;
+            objv += 2;
+            break;
+
+        case m_indent:
+            if (objc < 4) {
+                SetResult("-indent must have an argument "
+                          "(0..8 or 'no'/'none')");
+                return TCL_ERROR;
+            }
+            if (strcmp("none", Tcl_GetString(objv[3]))==0) {
+                indent = -1;
+            }
+            else if (strcmp("no", Tcl_GetString(objv[3]))==0) {
+                indent = -1;
+            }
+            else if (Tcl_GetIntFromObj(interp, objv[3], &indent) != TCL_OK) {
+                SetResult( "indent must be an integer (0..8) or 'no'/'none'");
+                return TCL_ERROR;
+            } else if (indent < 0 || indent > 8) {
+                SetResult( "indent must be an integer (0..8) or 'no'/'none'");
+                return TCL_ERROR;
+            }
+                
+            objc -= 2;
+            objv += 2;
+            break;
+        }
+    }
+    resultPtr = Tcl_NewStringObj("", 0);
+    tcldom_treeAsJSON(resultPtr, node, chan, indent, 0, JSON_START);
     Tcl_AppendResult(interp, Tcl_GetString(resultPtr), NULL);
     Tcl_DecrRefCount(resultPtr);
     return TCL_OK;
@@ -3872,7 +4357,7 @@ int tcldom_NodeObjCmd (
                  *str, *attr_name, *attr_val, *filter;
     const char  *localName, *uri, *nsStr;
     int          result, length, methodIndex, i, line, column;
-    int          nsIndex, bool, hnew, legacy;
+    int          nsIndex, bool, hnew, legacy, jsonType;
     Tcl_Obj     *namePtr, *resultPtr;
     Tcl_Obj     *mobjv[MAX_REWRITE_ARGS];
     Tcl_CmdInfo  cmdInfo;
@@ -3895,6 +4380,7 @@ int tcldom_NodeObjCmd (
         "getElementsByTagName",              "getElementsByTagNameNS",
         "disableOutputEscaping",             "precedes",         "asText",
         "insertBeforeFromScript",            "normalize",        "baseURI",
+        "asJSON",          "jsonType", 
 #ifdef TCL_THREADS
         "readlock",        "writelock",
 #endif
@@ -3916,12 +4402,12 @@ int tcldom_NodeObjCmd (
         m_xslt,            m_toXPath,        m_delete,          m_getElementById,
         m_getElementsByTagName,              m_getElementsByTagNameNS,
         m_disableOutputEscaping,             m_precedes,        m_asText,
-        m_insertBeforeFromScript,            m_normalize,       m_baseURI
+        m_insertBeforeFromScript,            m_normalize,       m_baseURI,
+        m_asJSON,          m_jsonType
 #ifdef TCL_THREADS
-        ,m_readlock,        m_writelock
+        ,m_readlock,       m_writelock
 #endif
     };
-
 
     node = (domNode*) clientData;
     if (TSD(domCreateCmdMode) == DOM_CREATECMDMODE_AUTO) {
@@ -4185,6 +4671,12 @@ int tcldom_NodeObjCmd (
             }
             break;
 
+        case m_asJSON:
+            if (serializeAsJSON(node, interp, objc, objv) != TCL_OK) {
+                return TCL_ERROR;
+            }
+            break;
+            
         case m_getAttribute:
             CheckArgs(3,4,2,"attrName ?defaultValue?");
             if (node->nodeType != ELEMENT_NODE) {
@@ -4861,6 +5353,45 @@ int tcldom_NodeObjCmd (
             domNormalize (node, bool, tcldom_deleteNode, interp);
             return TCL_OK;
 
+        case m_jsonType:
+            CheckArgs (2,3,2, "?jsonType?");
+            if (node->nodeType != ELEMENT_NODE
+                && node->nodeType != TEXT_NODE) {
+                SetResult("Only element and text nodes may have a JSON type.");
+                return TCL_ERROR;
+            }
+            if (objc == 3) {
+                if (Tcl_GetIndexFromObj (interp, objv[2], jsonTypes,
+                                         "jsonType", 0, &jsonType)
+                    != TCL_OK) {
+                    return TCL_ERROR;
+                }
+                if (node->nodeType == ELEMENT_NODE) {
+                    if (jsonType > 2) {
+                        SetResult("For an element node the jsonType argument "
+                                  "must be one out of this list: ARRAY OBJECT NONE.");
+                        return TCL_ERROR;
+                    }
+                } else {
+                    /* Text nodes */
+                    if (jsonType < 3 && jsonType > 0) {
+                        SetResult("For a text node the jsonType argument must be "
+                                  "one out of this list: TRUE FALSE NULL NUMBER "
+                                  "STRING NONE");
+                        return TCL_ERROR;
+                    }
+                }
+                node->info = jsonType;
+                SetIntResult(jsonType);
+                return TCL_OK;
+            }
+            if (node->info < 0 || node->info > 7) {
+                SetResult(jsonTypes[0]);
+            } else {
+                SetResult(jsonTypes[node->info]);
+            }
+            return TCL_OK;
+            
         TDomThreaded(
         case m_writelock:
             CheckArgs(3,3,2,"script");
@@ -4919,7 +5450,8 @@ int tcldom_DocObjCmd (
         "childNodes",      "ownerDocument",              "insertBefore",
         "replaceChild",    "appendFromList",             "appendXML",
         "selectNodes",     "baseURI",                    "appendFromScript",
-        "insertBeforeFromScript",
+        "insertBeforeFromScript",                        "asJSON",
+        "jsonType",
 #ifdef TCL_THREADS
         "readlock",        "writelock",                  "renumber",
 #endif
@@ -4944,7 +5476,8 @@ int tcldom_DocObjCmd (
         m_childNodes,       m_ownerDocument,              m_insertBefore,
         m_replaceChild,     m_appendFromList,             m_appendXML,
         m_selectNodes,      m_baseURI,                    m_appendFromScript,
-        m_insertBeforeFromScript
+        m_insertBeforeFromScript,                         m_asJSON,
+        m_jsonType
 #ifdef TCL_THREADS
        ,m_readlock,         m_writelock,                  m_renumber
 #endif
@@ -5365,6 +5898,8 @@ int tcldom_DocObjCmd (
         case m_ownerDocument:
         case m_selectNodes:
         case m_baseURI:
+        case m_asJSON:
+        case m_jsonType:
         case m_getElementById:
             /* We dispatch the method call to tcldom_NodeObjCmd */
             if (TSD(domCreateCmdMode) == DOM_CREATECMDMODE_AUTO) {
@@ -5467,20 +6002,37 @@ int tcldom_createDocumentNode (
     Tcl_Obj    * const objv[]
 )
 {
-    int          setVariable = 0;
+    int          setVariable = 0, jsonType = 0, index;
     domDocument *doc;
     Tcl_Obj     *newObjName = NULL;
 
-
-    CheckArgs(1,2,1,"?newObjVar?");
+    static CONST84 char *options[] = {"-jsonType", NULL};
+    
+    CheckArgs(1,4,1,"?-jsonType jsonType? ?newObjVar?");
 
     if (objc == 2) {
         newObjName = objv[1];
         setVariable = 1;
     }
+    if (objc > 2) {
+        if (Tcl_GetIndexFromObj(interp, objv[1], options, "option",
+                                0, &index) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        Tcl_ResetResult(interp);
+            if (Tcl_GetIndexFromObj(interp, objv[2], jsonTypes, "jsonType",
+                                0, &jsonType) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        if (objc == 4) {
+            newObjName = objv[3];
+            setVariable = 1;
+        }
+    }
 
     doc = domCreateDoc(NULL, 0);
-
+    doc->rootNode->info = jsonType;
+    
     return tcldom_returnDocumentObj(interp, doc, setVariable, newObjName, 1,
                                     0);
 }
@@ -5580,16 +6132,17 @@ int tcldom_parse (
     GetTcldomTSD()
 
     char        *xml_string, *option, *errStr, *channelId, *baseURI = NULL;
+    char        *jsonRoot = NULL;
     Tcl_Obj     *extResolver = NULL;
     Tcl_Obj     *feedbackCmd = NULL;
     CONST84 char *interpResult;
     int          optionIndex, value, xml_string_len, mode;
+    int          jsonmaxnesting = JSON_MAX_NESTING;
     int          ignoreWhiteSpaces   = 1;
+    int          takeJSONParser      = 0;
     int          takeSimpleParser    = 0;
     int          takeHTMLParser      = 0;
-#ifdef TDOM_HAVE_GUMBO
     int          takeGUMBOParser     = 0;
-#endif
     int          setVariable         = 0;
     int          ignorexmlns         = 0;
     int          feedbackAfter       = 0;
@@ -5606,21 +6159,22 @@ int tcldom_parse (
         "-keepEmpties",           "-simple",        "-html",
         "-feedbackAfter",         "-channel",       "-baseurl",
         "-externalentitycommand", "-useForeignDTD", "-paramentityparsing",
-        "-feedbackcmd",           
+        "-feedbackcmd",           "-json",          "-jsonroot",
 #ifdef TDOM_HAVE_GUMBO
         "-html5",
 #endif
-        "-ignorexmlns",  NULL
+        "-jsonmaxnesting",        "-ignorexmlns",   "--",
+        NULL
     };
     enum parseOption {
         o_keepEmpties,            o_simple,         o_html,
         o_feedbackAfter,          o_channel,        o_baseurl,
         o_externalentitycommand,  o_useForeignDTD,  o_paramentityparsing,
-        o_feedbackcmd,
+        o_feedbackcmd,            o_json,           o_jsonroot,
 #ifdef TDOM_HAVE_GUMBO
         o_htmlfive,
 #endif
-        o_ignorexmlns
+        o_jsonmaxnesting,         o_ignorexmlns,    o_LAST
     };
 
     static CONST84 char *paramEntityParsingValues[] = {
@@ -5651,27 +6205,50 @@ int tcldom_parse (
             ignoreWhiteSpaces = 0;
             objv++;  objc--; continue;
 
+        case o_json:
+            if (takeGUMBOParser || takeHTMLParser) {
+                SetResult("The options -html, -html5 and -json are "
+                          "mutually exclusive.");
+                return TCL_ERROR;
+            }
+            takeJSONParser = 1;
+            objv++;  objc--; continue;
+            
+        case o_jsonroot:
+            objv++; objc--;
+            if (objc > 1) {
+                jsonRoot = Tcl_GetString(objv[1]);
+            } else {
+                SetResult("The \"dom parse\" option \"-jsonroot\" "
+                          "expects the document element name of the "
+                          "DOM tree to create as argument.");
+                return TCL_ERROR;
+            }
+            if (!domIsNAME(jsonRoot)) {
+                SetResult("-jsonroot value: not a valid element name");
+                return TCL_ERROR;
+            }
+            objv++; objc--; continue;
+            
         case o_simple:
             takeSimpleParser = 1;
             objv++;  objc--; continue;
 
         case o_html:
-#ifdef TDOM_HAVE_GUMBO
-            if (takeGUMBOParser) {
-                SetResult("The options -html and -html5 are mutually"
-                          " exclusive.");
+            if (takeGUMBOParser || takeJSONParser) {
+                SetResult("The options -html, -html5 and -json are "
+                          "mutually exclusive.");
                 return TCL_ERROR;
             }
-#endif            
             takeSimpleParser = 1;
             takeHTMLParser = 1;
             objv++;  objc--; continue;
 
 #ifdef TDOM_HAVE_GUMBO
         case o_htmlfive:
-            if (takeHTMLParser) {
-                SetResult("The options -html and -html5 are mutually"
-                          " exclusive.");
+            if (takeHTMLParser || takeJSONParser) {
+                SetResult("The options -html, -html5 and -json are "
+                          "mutually exclusive.");
                 return TCL_ERROR;
             }
             takeGUMBOParser = 1;
@@ -5803,7 +6380,29 @@ int tcldom_parse (
             ignorexmlns = 1;
             objv++;  objc--; continue;
 
+        case o_jsonmaxnesting:
+            objv++; objc--;
+            if (objc < 2) {
+                SetResult("The \"dom parse\" option \"-jsonmaxnesting\" "
+                          "requires an integer as argument.");
+                return TCL_ERROR;
+            }
+            if (Tcl_GetIntFromObj(interp, objv[1], &jsonmaxnesting)
+                != TCL_OK) {
+                SetResult("-jsonmaxnesting must have an integer argument");
+                return TCL_ERROR;
+            }
+            if (jsonmaxnesting < 0) {
+                SetResult("The value of -jsonmaxnesting cannot be negativ");
+                return TCL_ERROR;
+            }
+            objv++;  objc--; continue;
+                        
+        case o_LAST:
+            objv++;  objc--; break;
+            
         }
+        if ((enum parseOption) optionIndex == o_LAST) break;
     }
 
     if (feedbackAfter && !feedbackCmd) {
@@ -5831,12 +6430,12 @@ int tcldom_parse (
         }
         xml_string = NULL;
         xml_string_len = 0;
-        if (takeSimpleParser || takeHTMLParser
+        if (takeSimpleParser || takeHTMLParser || takeJSONParser
 #ifdef TDOM_HAVE_GUMBO
                 || takeGUMBOParser
 #endif
             ) {
-            Tcl_AppendResult(interp, "simple and/or HTML parser(s) "
+            Tcl_AppendResult(interp, "simple, JSON or HTML parser(s) "
                              " don't support channel reading", NULL);
             return TCL_ERROR;
         }
@@ -5854,6 +6453,42 @@ int tcldom_parse (
                                          1, 0);
     }
 #endif
+    
+    if (takeJSONParser) {
+        char s[50];
+        int byteIndex, i;
+
+        errStr = NULL;
+
+        doc = JSON_Parse (xml_string, jsonRoot, jsonmaxnesting, &errStr,
+                          &byteIndex);
+        if (doc) {
+            return tcldom_returnDocumentObj (interp, doc, setVariable,
+                                             newObjName, 1, 0);
+        } else {
+            Tcl_ResetResult(interp);
+            sprintf(s, "%d", byteIndex);
+            Tcl_AppendResult(interp, "error \"", errStr, "\" at position ", 
+                             s, NULL);
+            Tcl_AppendResult(interp, "\n\"", NULL);
+            s[1] = '\0';
+            for (i=-20; i < 40; i++) {
+                if (byteIndex+i>=0) {
+                    if (xml_string[byteIndex+i]) {
+                        s[0] = xml_string[byteIndex+i];
+                        Tcl_AppendResult(interp, s, NULL);
+                        if (i==0) {
+                            Tcl_AppendResult(interp, " <--Error-- ", NULL);
+                        }
+                    } else {
+                        break;
+                    }
+                }
+            }
+            Tcl_AppendResult(interp, "\"",NULL);
+            return TCL_ERROR;
+        }
+    }
     
     if (takeSimpleParser) {
         char s[50];
@@ -6013,14 +6648,14 @@ int tcldom_featureinfo (
         "expatversion",      "expatmajorversion",  "expatminorversion",
         "expatmicroversion", "dtd",                "ns",
         "unknown",           "tdomalloc",          "lessns",
-        "html5",
+        "html5",             "jsonmaxnesting",
         "TCL_UTF_MAX",        NULL
     };
     enum feature {
         o_expatversion,      o_expatmajorversion,  o_expatminorversion,
         o_expatmicroversion, o_dtd,                o_ns,
         o_unknown,           o_tdomalloc,          o_lessns,
-        o_html5,
+        o_html5,             o_jsonmaxnesting,
         o_TCL_UTF_MAX
     };
 
@@ -6090,6 +6725,10 @@ int tcldom_featureinfo (
 #endif
         SetBooleanResult(result);
         break;
+    case o_jsonmaxnesting:
+        SetIntResult(JSON_MAX_NESTING);
+        break;
+        
     case o_TCL_UTF_MAX:
         SetIntResult(TCL_UTF_MAX);
         break;

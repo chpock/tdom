@@ -5510,6 +5510,7 @@ $as_echo "no" >&6; }
                  generic/dom.c       \
                  generic/domhtml.c   \
                  generic/domhtml5.c  \
+                 generic/domjson.c   \
                  generic/domxpath.c  \
                  generic/domxslt.c   \
                  generic/domlock.c   \
