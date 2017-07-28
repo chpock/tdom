@@ -293,6 +293,10 @@ test xpath-3.37 {number conversion} {
     $doc selectNodes {count(/a/b[4<number])}
 } {2}
 
+test xpath-3.38 {mod by a float that casts to integer 0} {
+    $doc selectNodes { 2 mod 0.2}
+} {NaN}
+
 $doc delete
 
 set doc [dom parse {<root xmlns:myNS="myNS">Foo</root>}]

@@ -4483,7 +4483,7 @@ static int xpathEvalStep (
             }
             break;
         case Mod:
-            if (dRight == 0.0) {
+            if ((int)dRight == 0) {
                 rsSetNaN (result);
             } else {
                 rsSetInt  (result, ((int)dLeft) % ((int)dRight));
