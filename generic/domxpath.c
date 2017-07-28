@@ -905,6 +905,13 @@ static XPathTokens xpathLexer (
                        if (ps) {
                            token = WCARDNAME;
                            tokens[l].strvalue = tdomstrdup (ps);
+                           /* We kind of misuse the (in case of
+                            * WCARDNAME token otherwise not used)
+                            * intvalue to mark this WCARDNAME token
+                            * to be meant as literal - this is to
+                            * distinguish between '*' as wildcard and
+                            * as literal element name. */
+                           tokens[l].intvalue = 1;
                            i += offset - 1;
                        } else {
                            return tokens;
@@ -1178,6 +1185,7 @@ Production(NodeTest)
     } else {
         Consume(WCARDNAME);
         a = NewStr (IsElement, STRVAL);
+        a->intvalue = INTVAL;
     }
 EndProduction
 
@@ -2179,7 +2187,9 @@ int xpathParsePostProcess (
     while (t) {
         DBG(printAst (4, t);)
         if (t->type == AxisNamespace) {
-            if (t->child->type == IsElement && t->child->strvalue[0] != '*') {
+            if (t->child->type == IsElement
+                && t->child->strvalue[0] != '*'
+                && t->child->intvalue == 0) {
                 uri = domLookupPrefixWithMappings (exprContext, 
                                                    t->child->strvalue, 
                                                    prefixMappings);
@@ -2364,7 +2374,8 @@ int xpathNodeTest (
         if (node->nodeType == ELEMENT_NODE) {
             if ((step->child->strvalue[0] == '*') &&
                 (step->child->strvalue[1] == '\0') &&
-                (node->ownerDocument->rootNode != node)) return 1;
+                (node->ownerDocument->rootNode != node) &&
+                (step->child->intvalue == 0)) return 1;
             if (node->namespace) return 0;
             return (strcmp(node->nodeName, step->child->strvalue)==0);
         }
@@ -5301,7 +5312,8 @@ int xpathMatches (
                         xpathRSFree (&nodeList); return 0;
                     }
                     if ((step->child->strvalue[0] != '*') ||
-                        (step->child->strvalue[1] != '\0'))
+                        (step->child->strvalue[1] != '\0') ||
+                        (step->child->intvalue != 0))
                     {
                         if (nodeToMatch->namespace) return 0;
                         if (strcmp(nodeToMatch->nodeName, step->child->strvalue)!=0) {
@@ -5345,7 +5357,8 @@ int xpathMatches (
                     xpathRSFree (&nodeList); return 0;
                 }
                 if ((step->strvalue[0] != '*') ||
-                    (step->strvalue[1] != '\0'))
+                    (step->strvalue[1] != '\0') ||
+                    (step->intvalue != 0))
                 {
                     if (nodeToMatch->namespace) return 0;
                     if (strcmp(nodeToMatch->nodeName, step->strvalue)!=0) {
@@ -5701,7 +5714,7 @@ double xpathGetPrio (
 
     if (steps->next == NULL) {
         if (steps->type == IsElement) {
-            if (strcmp(steps->strvalue, "*")==0) {
+            if (strcmp(steps->strvalue, "*")==0 && steps->intvalue==0) {
                 return -0.5;
             } else {
                 return 0.0;

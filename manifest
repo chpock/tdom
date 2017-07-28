@@ -1,5 +1,5 @@
-C Merged\sfrom\sbranch\sjson.
-D 2017-07-21T14:47:09.982
+C Merged\sfrom\strunk.
+D 2017-07-28T11:49:23.504
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -15,15 +15,15 @@ F configure.in 8bef5f78a95cdf27f0f8bd86765c01eb2a9a7c27
 F doc/INDEX.MAP c8e767983bcea4bbd53ecdbf3d78cb044996e9bc
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html 60f5d127c5500cb90a997dd7744dba39589bb3dd
-F doc/dom.html 6a69d902757c07fcad52dc2cf57e197913816eb6
-F doc/dom.n f67480e7795346967fa02b2fd9a1cf7731f34d75
+F doc/dom.html 60b871c6f7d3e28078846bfbade37ee86cb74a78
+F doc/dom.n 14934ed33594b20de1663ba1f1cc2cfcc2aec9b7
 F doc/dom.xml c278a2ee6f2da38d8dffe5a7a7e71d15e447ecac
-F doc/domDoc.html 13f1c5a31db849a096dca94e3b26f80fbaf09194
-F doc/domDoc.n 7da0ccc4bbabee4daa92ea750925716c07bcba70
-F doc/domDoc.xml decd36e22ff77f77e2f8e996bb7e3d03bbf491a4
-F doc/domNode.html 2a07904089144bbb149346eb9a736ae001c1e189
-F doc/domNode.n 16062590c5b9dc85f2ee15bf585896ea487b5fee
-F doc/domNode.xml c2333353f6779eddba1d12af67844177a61b7eaf
+F doc/domDoc.html 87fba2f97b90749be5ac8c9496f27a0344b39463
+F doc/domDoc.n 954b9968965115cf0d9b748e52a8db9eba9bbcca
+F doc/domDoc.xml c441c27c7ba922c84f0a17433e1b1a880407f1d4
+F doc/domNode.html 4b30a8ff2b510b4b7471fd7e582a736fb15926a1
+F doc/domNode.n c304932090fdc5ecdf05e28314a923ba7ac401bf
+F doc/domNode.xml f76514d54cc898ac97f4348ed0c4ccf04ea40eaa
 F doc/expat.html b0f131647c66c4d82308f60895435afc238c24b4
 F doc/expat.n 1532a92db725e1d28a357484fe9105ebe7fb778c
 F doc/expat.xml cc280131ede8000bcfe6d79ead52b0852076a55d
@@ -126,16 +126,16 @@ F generic/dom.c 910ea5c7d1a3de5a71afd640d4e30d417ef218bf
 F generic/dom.h 6e967a3b38384b60e7dde1d856b2ee305e7ab6f2
 F generic/domalloc.c 55e9eeff19cc54cf3956a7013883ead07efd3593
 F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
-F generic/domhtml.c fb2ac1d58234012990a4109ac0d4bc2bdf54efbd
+F generic/domhtml.c c2893b476ea83dba3820f908b6bc2e29a26b5a97
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domhtml5.c 1d20aa3f1406b468fa4981987fcd2460759f4a43
 F generic/domhtml5.h 5cca562a556e7662f2dce222640c32abb2777146
 F generic/domjson.c a0fc3dfb64039df70fbebe3a97ecc9bac902f30c
 F generic/domjson.h b10c42af9ef7fc9d0ad4fac733ef6461df0cdd90
 F generic/domlock.c b9543b7f1066118a5bcd0d2fa30acda6d247f15a
-F generic/domxpath.c fafd984539cdb080d63e095dd4dfc4bf3a64426e
+F generic/domxpath.c 641234be0c02d98f8b5b828979ac02e6ae4c6b5b
 F generic/domxpath.h 5481cdcb9248c50fb99cfba6d602572453897938
-F generic/domxslt.c 9127e45e5c83ad2c4bee7ff00eb1410e69546782
+F generic/domxslt.c 4584b45fe757aeebc622558c151a9d2329466260
 F generic/domxslt.h c068da9c518ad5e2a543874c18166065f0bf2bbc
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -183,7 +183,7 @@ F tclconfig/tcl.m4 77652577e7a7c2ca5656a93e6fbfd61614846893
 F tdom.m4 9156eb062710ee9b4bd9b75bfedd5d1012d1e926
 F tdomConfig.sh.in 5756c6b431179e49852a607cc2ca01e5381da905
 F tests/JSONTestSuite.tcl 907228f9bd31855951b9033df74c9c15778765af
-F tests/OASIS-suite.tcl d463d51057eaaec870588c244157d3d22096bd75
+F tests/OASIS-suite.tcl 428c0f45f780f5f942c46babd9287277ad0caaed
 F tests/all-bench.tcl 38bc7b4c88f5d679b2fce6c9c2b2ea7d8ad18e90
 F tests/all.tcl a8d5d3e3adc6713f64d0c614b927bd21ca8df870
 F tests/attribute.test 53ac8fb043e79b638c8c6f5e7da848f6103552d6
@@ -229,8 +229,8 @@ F tests/tdomcmd.test b3ec8a3f2c99305aae381989727ac707db2dea58
 F tests/xmlsimple.test b9ca923fb971af2b6170f35a887922e488db928d
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.bench 41d24b5b9b7b4593d002b3c6486cd36061f823bb
-F tests/xpath.test 738d6b63928bb3f95fe86457c6d80a37ea34903c
-F tests/xslt.test ed74e863288df75b4cccdac880984653952cbe68
+F tests/xpath.test 2e9215c75ea6c2459db3e244e56ffe1b75535ae8
+F tests/xslt.test 5863a9a228ceb7e8cf03888068b3d1e0f7b883b7
 F unix/CONFIG 789192e463910e1b9dd7e65f6338390d2bf1f68a
 F unix/tclAppInit.c b0decd8c45aaf7609837a175c155612b204c47c6
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -245,8 +245,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 69b07cdbed9fff49a8fbcc46a0cc4c99f5554f7b 407b3fac54bccc272ada3708a7c000e51aed9727
-R 104deb422269d7024ab7613aae4dab34
+P 59f4155c8f8eb1e448775d1dfd29b35f90ed6884 3ec9f3b32f50e1b3961f5e624b3bee5e472449aa
+R dd0f845ab96d17524045a4cbbf7d08b4
 U rolf
-Z 8dd3a52303e0eca43d422f52195138b5
+Z 9f6f5cae56d4d77ed6646eef19f5a46d
 # Remove this line to create a well-formed Fossil manifest.

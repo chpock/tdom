@@ -4,15 +4,15 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x1129210">NAME</a> · <a href="#SECTid0x12124e0">SYNOPSIS</a> · <a href="#SECTid0x12129c0">DESCRIPTION </a> · <a href="#SECTid0x126cda0">SEE ALSO</a> · <a href="#SECTid0x126d130">KEYWORDS</a>
+<a href="#SECTid0xa2ebe0">NAME</a> · <a href="#SECTid0xa4db80">SYNOPSIS</a> · <a href="#SECTid0xad8760">DESCRIPTION </a> · <a href="#SECTid0xb75940">SEE ALSO</a> · <a href="#SECTid0xb75cd0">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x1129210">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0xa2ebe0">NAME</a></h2><p class="namesection">
 <b class="names">domDoc - </b><br>Manipulates an instance of a DOM document object</p>
   
-  <h2><a name="SECTid0x12124e0">SYNOPSIS</a></h2><pre class="syntax">domDocObjCmd <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
+  <h2><a name="SECTid0xa4db80">SYNOPSIS</a></h2><pre class="syntax">domDocObjCmd <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
 
-  <h2><a name="SECTid0x12129c0">DESCRIPTION </a></h2><p>This command manipulates one particular instance of a document
+  <h2><a name="SECTid0xad8760">DESCRIPTION </a></h2><p>This command manipulates one particular instance of a document
 object. <i class="m">method</i> indicates a specific method of the document class. These
 methods should closely conform to the W3C recommendation "Document Object Model
 (Core) Level 1" (<a href="http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html">http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html</a>). Look
@@ -186,6 +186,86 @@ order without any escaping. In effect, this is what the xslt output method
 "text" (XSLT 1.0 recommendation, section 16.3) does.</dd>
       
 
+      
+        <dt>
+<b class="method">asJSON</b> <b class="option">?-indent none/0..8?</b> <b class="option">?-channel channelId?</b>
+</dt>
+          <dd>
+<p>The asJSON method serializes the tree into a valid
+          JSON data string. In general this may be a lossy
+          serialization. For this serialization all comment, character
+          data sections and processing instruction nodes, all
+          attributes and all XML namespaces are ignored. Only element
+          and text nodes may be reflected in the generated JSON
+          serialization. Appropriate JSON data type information of a
+          node will be respected.</p>
+
+          <p>If an element node has the JSON type OBJECT then every
+          element node child of this element will be serializend as
+          member of that object, with the node name of the child as
+          the member name and the relevant childs of that child as the
+          value. Every other child nodes will be ignored.</p>
+
+          <p>If an element node has the JSON type ARRAY then the text
+          and element node childs of that element node are serialized
+          as the consecutive values of the array. Element node childs
+          of an ARRAY element will be container nodes for nested ARRAY
+          or OBJECT values.</p>
+
+          <p>Text nodes with the JSON types TRUE, FALSE or NULL will
+          be serialized to the corresponding JSON token without
+          looking at the value of the text node. A text node without
+          JSON type will always be serialized as a JSON string token.
+          A text node with JSON type NUMBER will be serialized as JSON
+          number token if the text node value is in fact a valid JSON
+          number and as a JSON string if not.</p>
+
+          <p>If an element node doesn't has a JSON type then the
+          serialization of its childs is determined by the following
+          rules:</p>
+
+          <p>Only text and element node child are relevant. If the
+          element node to serialize is the member of a JSON object and
+          there is no relevant child node the value of that member
+          will be an empty JSON string. If the only relevant child
+          node of this element node is a text node then the JSON
+          value of that text node will be the value of the object
+          member. If the element has more than one relevant child
+          nodes and the first one is a text node then the relevant
+          childs will be serialized as JSON array. If the only
+          relevant child node is an element node or the first relevant
+          child is an element node and the node name of that only or
+          first relevant child isn't equal to the array container node
+          name all element node childs will be serialized as the
+          members of a JSON object (while ignoring any intermixed text
+          nodes). If the only or first relevant child is an element
+          node and the node name of this child is equal to the array
+          container element name then all relevant childs will be
+          serialized as the values of a JSON array.</p>
+
+          <p>If the element to serialize is a value of a JSON array
+          and the node name of this element isn't equal to the array
+          container node name that element will be seen as a
+          container node for a JSON object and all element node childs
+          will be serialized as the members of that array while
+          ignoring any text node childs. If the element to serialize
+          is a value of a JSON array and the node name of this element
+          is equal to the array container node name, all relevant
+          childs will be serialized as JSON array.</p>
+
+          <p>If the <i class="m">-channel</i> option is given the serialization
+          isn't returned as string but send directly to the channel,
+          given as argument to the option.</p>
+
+          <p>If the <i class="m">-indent</i> option is given and the argument
+          given to this option isn't "none" then the returned JSON
+          string is "pretty-printed". The numeric argument to this
+          option defines the number of spaces for any indentation
+          level. The default is to not emit any additional
+          white space.</p>
+</dd>
+      
+      
       
         <dt>
 <b class="method">publicId</b> <i class="m">?publicId?</i>
@@ -599,9 +679,9 @@ tried to be executed. This allows quick method additions on Tcl level.</p><p>New
 are not moved into the tree they are automaticaly deleted, when the whole
 document gets deleted.</p>
 
-    <h2><a name="SECTid0x126cda0">SEE ALSO</a></h2><p class="seealso">dom, domNode</p>
+    <h2><a name="SECTid0xb75940">SEE ALSO</a></h2><p class="seealso">dom, domNode</p>
 
-    <h2><a name="SECTid0x126d130">KEYWORDS</a></h2><p class="keywords">
+    <h2><a name="SECTid0xb75cd0">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-DOMnodecreation">DOM node creation</a>, <a class="keyword" href="keyword-index.html#KW-documentelement">document element</a>
 </p>
 

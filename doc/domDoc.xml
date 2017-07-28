@@ -253,7 +253,7 @@ order without any escaping. In effect, this is what the xslt output method
           string is "pretty-printed". The numeric argument to this
           option defines the number of spaces for any indentation
           level. The default is to not emit any additional
-          white space.</desc>
+          white space.</p></desc>
       </commanddef>
       
       <commanddef>

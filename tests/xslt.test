@@ -1317,6 +1317,22 @@ test xslt-8.8 {Almost minimal xslt 1.0 stylesheet} {
     set result
 } {}
 
+test xslt-8.9 {format-number} {knownBug} {
+    set xmlDoc [dom parse <doc/>]
+    set xsltDoc [dom parse {<xsl:stylesheet
+        xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+        <xsl:template match="/">
+        <out><xsl:value-of select="format-number(1.0, '000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000')"/></out>
+        </xsl:template>
+        </xsl:stylesheet>}]
+    $xmlDoc xslt $xsltDoc resultDoc
+    set result [$resultDoc asXML -indent none]
+    $xmlDoc delete
+    $xsltDoc delete
+    $resultDoc delete
+    set result <out>001</out>
+} {<out>001</out>}
+
 proc ::dom::xpathFunc::xslt-9.1 {ctxNode pos nodeListType nodeList args} {
     if {[llength $ctxNode] != 2} {
         error "::dom::xpathFunc::xslt-9.1: expected parent node / attribute \
