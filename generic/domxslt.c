@@ -1374,7 +1374,7 @@ static int xsltFormatNumber (
     Tcl_UniChar prefix1[800], prefix2[800], suffix1[800], suffix2[800];
     Tcl_UniChar save = '\0', save1, t, *prefix, *suffix, n[800], f[800];
     Tcl_UniChar uniCharNull = '\0';
-    char stmp[240], ftmp[80];
+    char stmp[240], ftmp[80], *tstr;
     char wrongFormat[] = "Unable to interpret format pattern.";
     int i, j, k, l, zl, g, nHash, nZero, fHash, fZero, gLen, isNeg;
     int prefixMinux, percentMul = 0, perMilleMul = 0;
@@ -1735,12 +1735,11 @@ static int xsltFormatNumber (
         Tcl_DStringFree (&dbStr);
     )
     Tcl_DStringSetLength (&dStr, 0);
-    *resultStr = tdomstrdup(
-        Tcl_UniCharToUtfDString(
-            (Tcl_UniChar*)Tcl_DStringValue (&s),
-            Tcl_UniCharLen((Tcl_UniChar*)Tcl_DStringValue(&s)), &dStr
-            )
+    tstr = Tcl_UniCharToUtfDString(
+        (Tcl_UniChar*)Tcl_DStringValue (&s),
+        Tcl_UniCharLen((Tcl_UniChar*)Tcl_DStringValue(&s)), &dStr
         );
+    *resultStr = tdomstrdup(tstr);
     Tcl_DStringFree (&dStr);
     Tcl_DStringFree (&s);
     *resultLen = strlen(*resultStr);

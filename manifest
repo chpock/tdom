@@ -1,5 +1,5 @@
-C Merged\sJSON\ssupport\sinto\strunk.
-D 2017-07-28T10:20:24.843
+C Small\srewrite,\sto\sprevent\sdouble\sevaluation\sin\sdefine\sin\scase\sof\sTCL_MEM_DEBUG\sdefined.\sAdded\sknownBug\stag\sto\sthe\stest,\sthat\sdemonstrates\sthe\scurrent\slimits\sto\sxsltFormatNumber.\sProblem\sis\sunderstood,\sbut\sthe\ssolution\sneeds\ssome\srework,\swhich\sis\spostponed,\sfor\snow.
+D 2017-07-28T10:51:31.048
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -135,7 +135,7 @@ F generic/domjson.h b10c42af9ef7fc9d0ad4fac733ef6461df0cdd90
 F generic/domlock.c b9543b7f1066118a5bcd0d2fa30acda6d247f15a
 F generic/domxpath.c 641234be0c02d98f8b5b828979ac02e6ae4c6b5b
 F generic/domxpath.h 5481cdcb9248c50fb99cfba6d602572453897938
-F generic/domxslt.c 53ebbac5b6d230a814213726aa46c49c731bce01
+F generic/domxslt.c 4584b45fe757aeebc622558c151a9d2329466260
 F generic/domxslt.h c068da9c518ad5e2a543874c18166065f0bf2bbc
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -230,7 +230,7 @@ F tests/xmlsimple.test b9ca923fb971af2b6170f35a887922e488db928d
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.bench 41d24b5b9b7b4593d002b3c6486cd36061f823bb
 F tests/xpath.test 2e9215c75ea6c2459db3e244e56ffe1b75535ae8
-F tests/xslt.test e4bf15864c9393ab35f3fe2ebba8ca50b2dd723e
+F tests/xslt.test 5863a9a228ceb7e8cf03888068b3d1e0f7b883b7
 F unix/CONFIG 789192e463910e1b9dd7e65f6338390d2bf1f68a
 F unix/tclAppInit.c a1655c51127aed18d069010f234a378fceacb2a6
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -245,9 +245,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 127b775ae789439fa432dc2d17d409b4cc209d2d 6ef22b30ddd9178cbe35f7fce47684567594cd51
-R cbd23c384824c0a28c08cc64f5a90612
-T +closed 6ef22b30ddd9178cbe35f7fce47684567594cd51
+P 68e470ad0999de5b507103bdfa240ebf129ee847
+R e957c8330b4f05b1518fe74d5e63b18e
 U rolf
-Z 953cc4b02e899a1e046067b7f1ec1df3
+Z 41c74b776be20e85c8c03946082182f9
 # Remove this line to create a well-formed Fossil manifest.

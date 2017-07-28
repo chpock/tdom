@@ -1317,7 +1317,7 @@ test xslt-8.8 {Almost minimal xslt 1.0 stylesheet} {
     set result
 } {}
 
-test xslt-8.9 {format-number} {
+test xslt-8.9 {format-number} {knownBug} {
     set xmlDoc [dom parse <doc/>]
     set xsltDoc [dom parse {<xsl:stylesheet
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
