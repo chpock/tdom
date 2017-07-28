@@ -1,5 +1,5 @@
-C Merged\sfrom\strunk.
-D 2017-07-28T11:49:23.504
+C Changed\sto\sswitch\seasily\s(though\sby\scode\sediting)\sbetween\sXPath\sparser\s/\slexer\sand\sJSON\sparser\stesting.
+D 2017-07-28T16:10:07.429
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -232,7 +232,7 @@ F tests/xpath.bench 41d24b5b9b7b4593d002b3c6486cd36061f823bb
 F tests/xpath.test 2e9215c75ea6c2459db3e244e56ffe1b75535ae8
 F tests/xslt.test 5863a9a228ceb7e8cf03888068b3d1e0f7b883b7
 F unix/CONFIG 789192e463910e1b9dd7e65f6338390d2bf1f68a
-F unix/tclAppInit.c b0decd8c45aaf7609837a175c155612b204c47c6
+F unix/tclAppInit.c 6f59f4b04f7facc1774289fa9f8d6a9523fca233
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F win/makefile.vc c02ca520821d6b575c7237d0a782391aa3916409
 F win/makefile805.vc 9456ed2d305d6231d930202f684929e967b05f40
@@ -245,8 +245,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 59f4155c8f8eb1e448775d1dfd29b35f90ed6884 3ec9f3b32f50e1b3961f5e624b3bee5e472449aa
-R dd0f845ab96d17524045a4cbbf7d08b4
+P 3cf44b6370e4f0d45b53b8465e4390d5c1916c4a
+R 56377a069f1ddc6c0ef2a8a0c602fe40
 U rolf
-Z 9f6f5cae56d4d77ed6646eef19f5a46d
+Z 0c717489d9a8faf5c2c1c4ae1a2fa3d6
 # Remove this line to create a well-formed Fossil manifest.

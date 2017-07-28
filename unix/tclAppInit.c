@@ -68,11 +68,10 @@ Tcl_AppInit(interp)
 {
     char script[MAX_SCRIPT_SIZE];
     char init[] = "set doc [dom parse <doc/>]";
-    int argc;
     Tcl_Channel input;
-    Tcl_Obj *xpath;
+    Tcl_Obj *data;
     
-    /* What Tcl_Init() does it not needed for this purpose, but slows
+    /* What Tcl_Init() does is not needed for this purpose but slow
      * down things notable. */
     /* if ((Tcl_Init)(interp) == TCL_ERROR) { */
     /*     return TCL_ERROR; */
@@ -82,33 +81,35 @@ Tcl_AppInit(interp)
     }
     Tcl_StaticPackage(interp, "tdom", Tdom_Init, Tdom_SafeInit);
 
-    Tcl_GetIntFromObj(interp, 
-                      Tcl_GetVar2Ex(interp, "argc", NULL, 
-                                    TCL_GLOBAL_ONLY),
-                      &argc);
-    if (argc != 0) {
-        fprintf(stderr, "Wrong nr of args. Expecting 1 arg, a XPath"
-                " expression, but given %d.\n", argc + 1);
-        exit(1);
-    }
-    
-    if (Tcl_EvalEx(interp, init, -1, 0) != TCL_OK) {
-        fprintf(stderr, "Error during init:\n%s\n", 
-                Tcl_GetString(Tcl_GetObjResult(interp)));
-        exit(2);
-    }
     input = Tcl_GetStdChannel(TCL_STDIN);
     if (input == NULL) {
         fprintf(stderr, "No stdin input.\n");
         exit(3);
     }
-    xpath = Tcl_NewObj();
-    Tcl_ReadChars(input, xpath, -1, 0);
-    if (snprintf(script, MAX_SCRIPT_SIZE, "$doc selectNodes {%s}",
-                 Tcl_GetString(xpath)) >= MAX_SCRIPT_SIZE) {
-        fprintf(stderr, "Resulting script would be too large.\n");
-        exit(3);
+    data = Tcl_NewObj();
+    Tcl_ReadChars(input, data, -1, 0);
+
+    if (1) {
+        /* Test xpath lexer / parser */
+        if (Tcl_EvalEx(interp, init, -1, 0) != TCL_OK) {
+            fprintf(stderr, "Error during init:\n%s\n", 
+                    Tcl_GetString(Tcl_GetObjResult(interp)));
+            exit(2);
+        }
+        if (snprintf(script, MAX_SCRIPT_SIZE, "$doc selectNodes {%s}",
+                     Tcl_GetString(data)) >= MAX_SCRIPT_SIZE) {
+            fprintf(stderr, "Resulting script would be too large.\n");
+            exit(3);
+        }
+    } else {
+        if (snprintf(script, MAX_SCRIPT_SIZE,
+                     "dom parse -json -- {%s} doc;$doc asJSON",
+                     Tcl_GetString(data)) >= MAX_SCRIPT_SIZE) {
+            fprintf(stderr, "Resulting script would be too large.\n");
+            exit(3);
+        }
     }
+    
     if (Tcl_EvalEx(interp, script, -1, 0) != TCL_OK) {
         fprintf(stderr, "Script error:\n%s\n",
                 Tcl_GetString(Tcl_GetObjResult(interp)));
