@@ -1,5 +1,5 @@
-C Fixed\sa\sSIGFPE\sin\scase\sof\sa\sfloat\sthat\scasts\sto\sinteger\s0\son\sthe\sright\sside\sof\sa\smod.
-D 2017-07-28T22:28:25.995
+C Removed\sall\sthat\sTCL_UTF_MAX\scruft,\sthat\stries\sto\sdo\sthe\sright\sthing.\sThis\sis\sall\sa\sdubious\shack\swithout\sproper\score\ssupport.\sUntil\swe\shave\sthat\s(if\sever)\sit's\sthe\sresponsibility\sof\sthe\suser\sto\snot\smix\score\sand\sbinary\sextension\sbuild\swith\sdifferent\sTUM.
+D 2017-07-29T12:21:47.326
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -141,7 +141,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 91aa873ca8a9bdf17a0294f19cb3be4cd05dc97e
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
-F generic/tcldom.c c37bca7caf4155468fb1f646f95406927a913cd0
+F generic/tcldom.c 200ff0e388552f1c15ef0f5ec2f7a2d2f4bcef8c
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
 F generic/tclexpat.c 069180212797fc14bdb0a08bcd1ad3461406975c
 F generic/tclexpat.h 3fb4df4c023d1f625ec9c5783c4fc1d1e4e0b8bb
@@ -150,7 +150,7 @@ F generic/tdom.h ce5839cdddbde35ac016a6033415c73082b2f87c
 F generic/tdomDecls.h dd20e4afe55f21c8a845bc593806fa2d606b18eb
 F generic/tdomStubInit.c fa037218373f882436fe5b3779bac64ec84f1fba
 F generic/tdomStubLib.c 669854629a698ec7d3f15c10edae36569cf43fc3
-F generic/tdominit.c 7889ba91e2bc08cd031d77a0a00a7821d5738db5
+F generic/tdominit.c fc4e5f13d29a419304451679b7f79fbe228a45f2
 F generic/utf8conv.c 8d58daa846a0b715df1736720cf9031e924988f2
 F generic/utf8conv.h 4132db4e05ac30dcb78dc3b4799ae0a9ae8a057f
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
@@ -217,7 +217,7 @@ F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
 F tests/html5reader.test f839da02dd4b1227a2ee3bae9abfba983951d9ad
 F tests/htmlreader.test 0fffea0d73efb2ccf5e3a807e68b437f55a152d2
-F tests/i18n.test f5493417c35c973a0d8651c3c13d5d4e8272f6bf
+F tests/i18n.test 085cc18a881d5d6952267c28cd319dcc72aadbd1
 F tests/jsonreader.test 1c49ae572bc71e23b4ba88ed256c7af0f9342bb8
 F tests/loadtdom.tcl bf298e4effa2a7de7380687911994f762c0f0c84
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
@@ -245,8 +245,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 3ec9f3b32f50e1b3961f5e624b3bee5e472449aa
-R 4584abf25ffb915fce63e210a4777005
+P 8c247cfc5406695d6055fdc9f8fb57c1c1a63be7
+R 7488b67656b28e4b165443de52116e51
 U rolf
-Z 163b36329a76a862d4368d0a4cf72502
+Z 3bf48748bf219e2eb5433abce838712c
 # Remove this line to create a well-formed Fossil manifest.
