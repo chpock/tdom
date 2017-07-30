@@ -3187,7 +3187,11 @@ xpathEvalFunction (
         }
         leftStr = xpathFuncString (&leftResult);
         if (ctxNode->nodeType != ELEMENT_NODE) {
-            node = ctxNode->parentNode;
+            if (ctxNode->nodeType == ATTRIBUTE_NODE) {
+                node = ((domAttrNode*)ctxNode)->parentNode;
+            } else {
+                node = ctxNode->parentNode;
+            }
         } else {
             node = ctxNode;
         }
