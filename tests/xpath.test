@@ -1301,6 +1301,14 @@ test xpath-7.8 {Attribute node as context node of a lang() call} -setup {
     $doc delete
 } -result ""
 
+test xpath-7.9 {Attribute node as context node of an id() call} -setup {
+    set doc [dom parse {<doc foo="bar"/>}]
+} -body {
+    $doc selectNodes {doc/@foo[id(.)]}
+} -cleanup {
+    $doc delete
+} -result ""
+
 # cleanup
 ::tcltest::cleanupTests
 return
