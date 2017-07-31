@@ -2508,22 +2508,6 @@ void tcldom_AppendEscaped (
                                  "UTF-8 chars up to 4 bytes length");
 
                     }
-#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION == 6)
-#define SMALL_TCL_UNICHAR 4
-#else
-#define SMALL_TCL_UNICHAR 3
-#endif
-#if TCL_UTF_MAX > SMALL_TCL_UNICHAR
-                    if (escapeNonASCII) {
-                        Tcl_UtfToUniChar(pc, (Tcl_UniChar*)&unicode);
-                        AP('&') AP('#')
-                        sprintf(charRef, "%d", unicode);
-                        for (i = 0; i < (int)strlen(charRef); i++) {
-                            AP(charRef[i]);
-                        }
-                        AP(';')
-                        pc += (clen - 1);
-#else 
                     if (clen == 4 || escapeNonASCII) {
                         if (clen == 4) {
                             unicode = ((pc[0] & 0x07) << 18) 
@@ -2541,7 +2525,6 @@ void tcldom_AppendEscaped (
                         }
                         AP(';')
                         pc += (clen - 1);
-#endif 
                     } else {
                         for (i = 0; i < clen; i++) {
                             AP(*pc);

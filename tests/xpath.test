@@ -293,6 +293,10 @@ test xpath-3.37 {number conversion} {
     $doc selectNodes {count(/a/b[4<number])}
 } {2}
 
+test xpath-3.38 {mod by a float that casts to integer 0} {
+    $doc selectNodes { 2 mod 0.2}
+} {NaN}
+
 $doc delete
 
 set doc [dom parse {<root xmlns:myNS="myNS">Foo</root>}]
@@ -1259,7 +1263,7 @@ test xpath-7.6 {parent axis on /} {
     set result
 } {0 0 0}
 
-test xpath-7.7 {Document order in complexer // expresions} -setup {
+test xpath-7.7 {Document order in complexer // expressions} -setup {
     set doc [dom parse {
     <doc>
     <a>
@@ -1288,6 +1292,22 @@ test xpath-7.7 {Document order in complexer // expresions} -setup {
 } -cleanup {
     $doc delete
 } -result {1 - 11 - 2 - 22 - 3 - 4 - 33}
+
+test xpath-7.8 {Attribute node as context node of a lang() call} -setup {
+    set doc [dom parse <doc/>]
+} -body {
+    $doc selectNodes {/namespace::node()[lang('en')]}
+} -cleanup {
+    $doc delete
+} -result ""
+
+test xpath-7.9 {Attribute node as context node of an id() call} -setup {
+    set doc [dom parse {<doc foo="bar"/>}]
+} -body {
+    $doc selectNodes {doc/@foo[id(.)]}
+} -cleanup {
+    $doc delete
+} -result ""
 
 # cleanup
 ::tcltest::cleanupTests

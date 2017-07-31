@@ -2848,6 +2848,7 @@ xpathEvalFunction (
     int              argc, savedDocOrder, from;
     xpathResultSets *args;
     xpathResultSet  *arg;
+    Tcl_HashTable   *ids;
     Tcl_HashEntry   *entryPtr;
     int              left = 0;
     double           dRight = 0.0;
@@ -3051,7 +3052,12 @@ xpathEvalFunction (
 
     case f_id:
         XPATH_ARITYCHECK(step,1,errMsg);
-        if (!ctxNode->ownerDocument->ids) {
+        if (ctxNode->nodeType == ATTRIBUTE_NODE) {
+            ids = ((domAttrNode*)ctxNode)->parentNode->ownerDocument->ids;
+        } else {
+            ids = ctxNode->ownerDocument->ids;
+        }
+        if (!ids) {
             break;
         }
         xpathRSInit (&leftResult);
@@ -3071,8 +3077,7 @@ xpathEvalFunction (
         if (leftResult.type == xNodeSetResult) {
             for (i=0; i < leftResult.nr_nodes; i++) {
                 leftStr = xpathFuncStringForNode (leftResult.nodes[i]);
-                entryPtr = Tcl_FindHashEntry (ctxNode->ownerDocument->ids,
-                                              leftStr);
+                entryPtr = Tcl_FindHashEntry (ids, leftStr);
                 if (entryPtr) {
                     node = (domNode*) Tcl_GetHashValue (entryPtr);
                     /* Don't report nodes out of the fragment list */
@@ -3097,8 +3102,7 @@ xpathEvalFunction (
                         continue;
                     }
                     *pto = '\0';
-                    entryPtr = Tcl_FindHashEntry (ctxNode->ownerDocument->ids,
-                                                  pfrom);
+                    entryPtr = Tcl_FindHashEntry (ids, pfrom);
                     if (entryPtr) {
                         node = (domNode*) Tcl_GetHashValue (entryPtr);
                         /* Don't report nodes out of the fragment list */
@@ -3119,8 +3123,7 @@ xpathEvalFunction (
                 }
             }
             if (!pwhite) {
-                entryPtr = Tcl_FindHashEntry (ctxNode->ownerDocument->ids,
-                                              pfrom);
+                entryPtr = Tcl_FindHashEntry (ids, pfrom);
                 if (entryPtr) {
                     node = (domNode*) Tcl_GetHashValue (entryPtr);
                     /* Don't report nodes out of the fragment list */
@@ -3187,7 +3190,11 @@ xpathEvalFunction (
         }
         leftStr = xpathFuncString (&leftResult);
         if (ctxNode->nodeType != ELEMENT_NODE) {
-            node = ctxNode->parentNode;
+            if (ctxNode->nodeType == ATTRIBUTE_NODE) {
+                node = ((domAttrNode*)ctxNode)->parentNode;
+            } else {
+                node = ctxNode->parentNode;
+            }
         } else {
             node = ctxNode;
         }
@@ -4483,7 +4490,7 @@ static int xpathEvalStep (
             }
             break;
         case Mod:
-            if (dRight == 0.0) {
+            if ((int)dRight == 0) {
                 rsSetNaN (result);
             } else {
                 rsSetInt  (result, ((int)dLeft) % ((int)dRight));
