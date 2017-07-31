@@ -1,5 +1,5 @@
-C Fixed\sseg\sfault\sin\scase\sof\sattribute\snode\sas\scontext\snode\sof\san\sid()\sfunction\scall.
-D 2017-07-30T00:48:40.626
+C Some\sdoc\sproofreading.
+D 2017-07-31T08:42:52.151
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -17,7 +17,7 @@ F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html 60f5d127c5500cb90a997dd7744dba39589bb3dd
 F doc/dom.html 60b871c6f7d3e28078846bfbade37ee86cb74a78
 F doc/dom.n 14934ed33594b20de1663ba1f1cc2cfcc2aec9b7
-F doc/dom.xml c278a2ee6f2da38d8dffe5a7a7e71d15e447ecac
+F doc/dom.xml b1d38f2ed773c9cd13a08d0d940ff2b3bbbbb732
 F doc/domDoc.html 87fba2f97b90749be5ac8c9496f27a0344b39463
 F doc/domDoc.n 954b9968965115cf0d9b748e52a8db9eba9bbcca
 F doc/domDoc.xml c441c27c7ba922c84f0a17433e1b1a880407f1d4
@@ -245,8 +245,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P b8bbb8a60aa3af0418ddcec981d401912af5ce96
-R d7a8d801538a891076dce2eb45c48495
+P 8a41290899b3ee1a93c1cc615d2c7b646bf8f7ea
+R 2b05458aa9ae80e73f331bba81a42212
 U rolf
-Z 7ccbfdd361065d2d6922455305390a05
+Z a0803a8bd3a77f0760ef61becd0b8086
 # Remove this line to create a well-formed Fossil manifest.
