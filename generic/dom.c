@@ -1286,8 +1286,7 @@ startElement(
                 node->namespace = info->document->rootNode->firstAttr->namespace;
             } else {
                 /* Since where here, this means, the element has a
-                   up to now not declared namespace prefix. We probably
-                   should return this as an error, shouldn't we?*/
+                   up to now not declared namespace prefix. */
                 Tcl_SetResult (info->interp, "Namespace prefix is not "
                                "defined", NULL);
                 XML_StopParser(info->parser, 0);
@@ -3240,7 +3239,7 @@ domRemoveAttributeNS (
         domSplitQName (attr->nodeName, prefix, &str);
         if (strcmp(localName,str)==0) {
             ns = domGetNamespaceByIndex(node->ownerDocument, attr->namespace);
-            if (strcmp(ns->uri, uri)==0) {
+            if (ns && strcmp(ns->uri, uri)==0) {
                 if (previous) {
                     previous->nextSibling = attr->nextSibling;
                 } else {
@@ -4511,8 +4510,7 @@ domNewProcessingInstructionNode(
 domNode *
 domNewElementNode(
     domDocument *doc,
-    const char  *tagName,
-    domNodeType  nodeType		
+    const char  *tagName
 )
 {
     domNode       *node;
@@ -4522,7 +4520,7 @@ domNewElementNode(
     h = Tcl_CreateHashEntry(&HASHTAB(doc, tdom_tagNames), tagName, &hnew);
     node = (domNode*) domAlloc(sizeof(domNode));
     memset(node, 0, sizeof(domNode));
-    node->nodeType      = nodeType;
+    node->nodeType      = ELEMENT_NODE;
     node->nodeFlags     = 0;
     node->namespace     = 0;
     node->nodeNumber    = NODE_NO(doc);
@@ -4549,8 +4547,7 @@ domNode *
 domNewElementNodeNS (
     domDocument *doc,
     const char  *tagName,
-    const char  *uri,
-    domNodeType  nodeType		
+    const char  *uri
 )
 {
     domNode       *node;
@@ -4563,7 +4560,7 @@ domNewElementNodeNS (
     h = Tcl_CreateHashEntry(&HASHTAB(doc, tdom_tagNames), tagName, &hnew);
     node = (domNode*) domAlloc(sizeof(domNode));
     memset(node, 0, sizeof(domNode));
-    node->nodeType      = nodeType;
+    node->nodeType      = ELEMENT_NODE;
     node->nodeFlags     = 0;
     node->namespace     = 0;
     node->nodeNumber    = NODE_NO(doc);
@@ -4617,7 +4614,7 @@ domCloneNode (
 					 tnode->nodeType);
     }
 
-    n = domNewElementNode(node->ownerDocument, node->nodeName, node->nodeType);
+    n = domNewElementNode(node->ownerDocument, node->nodeName);
     n->namespace = node->namespace;
 
 

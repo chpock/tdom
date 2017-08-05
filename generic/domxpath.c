@@ -894,6 +894,30 @@ static XPathTokens xpathLexer (
                        }
                        break;
 
+            case '%':  if (!varParseCB) {
+                           *errMsg = tdomstrdup ("Unexpected char '%'");
+                           return tokens;
+                       }
+                       ps = (varParseCB->parseVarCB) (
+                                varParseCB->parseVarClientData, &xpath[i],
+                                &offset, errMsg
+                              );
+                       if (ps) {
+                           token = WCARDNAME;
+                           tokens[l].strvalue = tdomstrdup (ps);
+                           /* We kind of misuse the (in case of
+                            * WCARDNAME token otherwise not used)
+                            * intvalue to mark this WCARDNAME token
+                            * to be meant as literal - this is to
+                            * distinguish between '*' as wildcard and
+                            * as literal element name. */
+                           tokens[l].intvalue = 1;
+                           i += offset - 1;
+                       } else {
+                           return tokens;
+                       }
+                       break;
+                
             case '.':  if (xpath[i+1] == '.') {
                            token = DOTDOT;
                            i++;
@@ -1161,6 +1185,7 @@ Production(NodeTest)
     } else {
         Consume(WCARDNAME);
         a = NewStr (IsElement, STRVAL);
+        a->intvalue = INTVAL;
     }
 EndProduction
 
@@ -2162,7 +2187,9 @@ int xpathParsePostProcess (
     while (t) {
         DBG(printAst (4, t);)
         if (t->type == AxisNamespace) {
-            if (t->child->type == IsElement && t->child->strvalue[0] != '*') {
+            if (t->child->type == IsElement
+                && t->child->strvalue[0] != '*'
+                && t->child->intvalue == 0) {
                 uri = domLookupPrefixWithMappings (exprContext, 
                                                    t->child->strvalue, 
                                                    prefixMappings);
@@ -2347,7 +2374,8 @@ int xpathNodeTest (
         if (node->nodeType == ELEMENT_NODE) {
             if ((step->child->strvalue[0] == '*') &&
                 (step->child->strvalue[1] == '\0') &&
-                (node->ownerDocument->rootNode != node)) return 1;
+                (node->ownerDocument->rootNode != node) &&
+                (step->child->intvalue == 0)) return 1;
             if (node->namespace) return 0;
             return (strcmp(node->nodeName, step->child->strvalue)==0);
         }
@@ -2820,6 +2848,7 @@ xpathEvalFunction (
     int              argc, savedDocOrder, from;
     xpathResultSets *args;
     xpathResultSet  *arg;
+    Tcl_HashTable   *ids;
     Tcl_HashEntry   *entryPtr;
     int              left = 0;
     double           dRight = 0.0;
@@ -3023,7 +3052,12 @@ xpathEvalFunction (
 
     case f_id:
         XPATH_ARITYCHECK(step,1,errMsg);
-        if (!ctxNode->ownerDocument->ids) {
+        if (ctxNode->nodeType == ATTRIBUTE_NODE) {
+            ids = ((domAttrNode*)ctxNode)->parentNode->ownerDocument->ids;
+        } else {
+            ids = ctxNode->ownerDocument->ids;
+        }
+        if (!ids) {
             break;
         }
         xpathRSInit (&leftResult);
@@ -3043,8 +3077,7 @@ xpathEvalFunction (
         if (leftResult.type == xNodeSetResult) {
             for (i=0; i < leftResult.nr_nodes; i++) {
                 leftStr = xpathFuncStringForNode (leftResult.nodes[i]);
-                entryPtr = Tcl_FindHashEntry (ctxNode->ownerDocument->ids,
-                                              leftStr);
+                entryPtr = Tcl_FindHashEntry (ids, leftStr);
                 if (entryPtr) {
                     node = (domNode*) Tcl_GetHashValue (entryPtr);
                     /* Don't report nodes out of the fragment list */
@@ -3069,8 +3102,7 @@ xpathEvalFunction (
                         continue;
                     }
                     *pto = '\0';
-                    entryPtr = Tcl_FindHashEntry (ctxNode->ownerDocument->ids,
-                                                  pfrom);
+                    entryPtr = Tcl_FindHashEntry (ids, pfrom);
                     if (entryPtr) {
                         node = (domNode*) Tcl_GetHashValue (entryPtr);
                         /* Don't report nodes out of the fragment list */
@@ -3091,8 +3123,7 @@ xpathEvalFunction (
                 }
             }
             if (!pwhite) {
-                entryPtr = Tcl_FindHashEntry (ctxNode->ownerDocument->ids,
-                                              pfrom);
+                entryPtr = Tcl_FindHashEntry (ids, pfrom);
                 if (entryPtr) {
                     node = (domNode*) Tcl_GetHashValue (entryPtr);
                     /* Don't report nodes out of the fragment list */
@@ -3159,7 +3190,11 @@ xpathEvalFunction (
         }
         leftStr = xpathFuncString (&leftResult);
         if (ctxNode->nodeType != ELEMENT_NODE) {
-            node = ctxNode->parentNode;
+            if (ctxNode->nodeType == ATTRIBUTE_NODE) {
+                node = ((domAttrNode*)ctxNode)->parentNode;
+            } else {
+                node = ctxNode->parentNode;
+            }
         } else {
             node = ctxNode;
         }
@@ -4455,7 +4490,7 @@ static int xpathEvalStep (
             }
             break;
         case Mod:
-            if (dRight == 0.0) {
+            if ((int)dRight == 0) {
                 rsSetNaN (result);
             } else {
                 rsSetInt  (result, ((int)dLeft) % ((int)dRight));
@@ -5189,7 +5224,7 @@ int xpathEval (
     xpathResultSet nodeList;
     int            rc, hnew = 1, docOrder = 1;
     ast            t;
-    Tcl_HashEntry *h;
+    Tcl_HashEntry *h = NULL;
 
     *errMsg = NULL;
     if (cache) {
@@ -5198,7 +5233,12 @@ int xpathEval (
     if (hnew) {
         rc = xpathParse(xpath, exprContext, XPATH_EXPR, prefixMappings,
                         parseVarCB, &t, errMsg);
-        CHECK_RC;
+        if (rc) {
+            if (h != NULL) {
+                Tcl_DeleteHashEntry(h);
+            }
+            return rc;
+        }
         if (cache) {
             Tcl_SetHashValue(h, t);
         }
@@ -5279,7 +5319,8 @@ int xpathMatches (
                         xpathRSFree (&nodeList); return 0;
                     }
                     if ((step->child->strvalue[0] != '*') ||
-                        (step->child->strvalue[1] != '\0'))
+                        (step->child->strvalue[1] != '\0') ||
+                        (step->child->intvalue != 0))
                     {
                         if (nodeToMatch->namespace) return 0;
                         if (strcmp(nodeToMatch->nodeName, step->child->strvalue)!=0) {
@@ -5323,7 +5364,8 @@ int xpathMatches (
                     xpathRSFree (&nodeList); return 0;
                 }
                 if ((step->strvalue[0] != '*') ||
-                    (step->strvalue[1] != '\0'))
+                    (step->strvalue[1] != '\0') ||
+                    (step->intvalue != 0))
                 {
                     if (nodeToMatch->namespace) return 0;
                     if (strcmp(nodeToMatch->nodeName, step->strvalue)!=0) {
@@ -5679,7 +5721,7 @@ double xpathGetPrio (
 
     if (steps->next == NULL) {
         if (steps->type == IsElement) {
-            if (strcmp(steps->strvalue, "*")==0) {
+            if (strcmp(steps->strvalue, "*")==0 && steps->intvalue==0) {
                 return -0.5;
             } else {
                 return 0.0;

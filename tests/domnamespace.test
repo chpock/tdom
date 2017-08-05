@@ -5,6 +5,7 @@
 #
 #    domnamespace-1.*: misc tests
 #    domnamespace-2.*: moving namespaced nodes from one document to another
+#    domnamespace-3.*: moving namespaced nodes within a document
 #
 # Copyright (c) 2002 Rolf Ade.
 #
@@ -301,6 +302,17 @@ test domnamespace-2.17 {moving nodes with namespaced attributes between document
     $doc appendChild $child
     $doc asXML -indent none
 } {<test xmlns="foo"><item xmlns="foo"/></test>}
+
+test domnamespace-3.1 {moving namespaced nodes within a document} {
+    set doc [dom parse {<doc><e xmlns="foo"><ee/></e><e xmlns="bar"/></doc>}]
+    set root [$doc documentElement]
+    set nodeToMove [$doc selectNodes {/doc/node()[1]/node()[1]}]
+    set newParent [$doc selectNodes {/doc/node()[2]}]
+    $newParent appendChild $nodeToMove
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc><e xmlns="foo"/><e xmlns="bar"><ee xmlns="foo"/></e></doc>}
 
 # cleanup
 ::tcltest::cleanupTests

@@ -76,16 +76,7 @@ test i18n-1.8 {pcdata outside BMP} -constraints {
     set result [$doc asXML -indent none]
     $doc delete
     set result
-} -result "<doc>\U1F46E\U1F47E\U1F494</doc>"
-
-test i18n-1.9 {pcdata outside BMP} -constraints {
-    beyondBMP
-} -body {
-    set doc [dom parse "<doc>&#x1F46E;&#x1F47E;&#x1F494;</doc>"]
-    set result [$doc asXML -indent none]
-    $doc delete
-    set result
-} -result "<doc>\U1F46E\U1F47E\U1F494</doc>"
+} -result "<doc>&#128110;&#128126;&#128148;</doc>"
 
 test i18n-1.10 {pcdata outside unicode} -body {
     set doc [dom parse "<doc>&#x10FFFF;</doc>"]

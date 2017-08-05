@@ -4,19 +4,20 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x1374d00">NAME</a> · <a href="#SECTid0x12aa8f0">SYNOPSIS</a> · <a href="#SECTid0x137f290">DESCRIPTION </a> · <a href="#SECTid0x13bc860">KEYWORDS</a>
+<a href="#SECTid0xb56980">NAME</a> · <a href="#SECTid0xa76ae0">SYNOPSIS</a> · <a href="#SECTid0xb62b50">DESCRIPTION </a> · <a href="#SECTid0xb84020">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x1374d00">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0xb56980">NAME</a></h2><p class="namesection">
 <b class="names">dom - </b><br>Create an in-memory DOM tree from XML</p>
   
-  <h2><a name="SECTid0x12aa8f0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0xa76ae0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">dom</b> <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
 
-  <h2><a name="SECTid0x137f290">DESCRIPTION </a></h2><p>This command provides the creation of complete DOM trees in memory. In
+  <h2><a name="SECTid0xb62b50">DESCRIPTION </a></h2><p>This command provides the creation of DOM trees in memory. In
 the usual case a string containing a XML information is parsed and converted
-into a DOM tree. <i class="m">method</i> indicates a specific subcommand. </p><p>The valid methods are:</p><dl class="commandlist">
+into a DOM tree. Other possible parse input may be HTML or JSON.
+The <i class="m">method</i> indicates a specific subcommand. </p><p>The valid methods are:</p><dl class="commandlist">
         
           <dt>
 <b class="cmd">dom</b> <b class="method">parse</b> ?<i class="m">options</i>? ?<i class="m">data</i>?</dt>
@@ -70,7 +71,58 @@ character references.</dd>
                 <dd>If <i class="m">-html</i> is specified, a fast HTML parser is 
 used, which tries to even parse badly formed HTML into a DOM tree.</dd>
               
-       
+
+              
+                <dt><b>-html5</b></dt>
+                <dd>This option is only available, if tDOM was build
+                with --enable-html5. Try the <i class="m">featureinfo</i> method
+                if you need to know, if this feature is build in. If
+                <i class="m">-html5</i> is specified, the gumbo lib html5 parser
+                (https://github.com/google/gumbo-parser) is used, to
+                build the DOM tree. This is, as far as it goes, XML
+                namespace aware. Since this probably isn't wanted by a
+                lot of users and adds only burden for no good in a lot
+                of use cases <i class="m">-html5</i> can be combined with
+                <i class="m">-ignorexmlns</i>, in which case all nodes and
+                attributes in the DOM tree are not in an XML
+                namespace. All tag and attribute names in the DOM tree
+                will be lower case, even for foreign elements not in
+                the xhtml, svg or mathml namespace. The DOM tree may
+                include nodes, that the parser inserted, because they
+                are implied by the context (as &lt;head&gt;,
+                &lt;tbody&gt;, etc.).</dd>
+              
+
+              
+                <dt><b>-json</b></dt>
+                <dd>If <i class="m">-json</i> is specified, the <i class="m">data</i> is
+                expected to be a valid JSON string (according to RFC
+                7159). The command returns an ordinary DOM document
+                with nesting token inside the JSON data translated
+                into tree hierarchy. If a JSON array value is itself
+                an object or array then container element nodes named
+                (in a default build) arraycontainer or
+                objectcontainer, respectively, are inserted into the
+                tree. The JSON serialization of this document (with
+                the domDoc method <i class="m">asJSON</i>) is the same JSON
+                information as the <i class="m">data</i>, preserving JSON
+                datatypes, allowing non-unique member names of objects
+                while preserving their order and the full range of
+                JSON string values. JSON datatype handling is done
+                with an additional property "sticking" at the doc and
+                tree nodes. This property isn't contained in an XML
+                serialization of the document. If you need to store
+                the JSON data represented by a document, store the
+                JSON serialization and parse it back from there. Apart
+                from this JSON type information the returned doc
+                command or handle is an ordinary DOM doc, which may be
+                investigated or modified with the full range of the
+                doc and node methods. Please note that the element
+                node names and the text node values within the tree
+                may be outside of what the appropriate XML productions
+                allow.</dd>
+              
+              
               
                 <dt><b>-keepEmpties</b></dt> 
                 <dd>If <i class="m">-keepEmpties</i> is
@@ -198,18 +250,19 @@ their XML declaration.</dd>
 
               
                 <dt><b>-ignorexmlns</b></dt>
-                <dd>It is recommended, that you not use this
-                option. If this option is given, no node within the
-                created DOM tree will be internally marked as placed
-                into an XML Namespace, even if there is a default
-                namespace in scope for un-prefixed elements or even if
-                the element has a defined namespace prefix. One
-                consequence is of this is, that XPath node expressions
-                on such a DOM tree doesn't work as expected. Prefixed
-                element nodes can't be selected and element nodes
-                without prefix will be seen by XPath expressions as if
-                they haven't any namespace (no matter if they in fact
-                in a default namespace).
+                <dd>It is recommended, that you only use this option
+                together with the <i class="m">-html5</i> option, if ever. If
+                this option is given, no node within the created DOM
+                tree will be internally marked as placed into an XML
+                Namespace, even if there is a default namespace in
+                scope for un-prefixed elements or even if the element
+                has a defined namespace prefix. One consequence is of
+                this is, that XPath node expressions on such a DOM
+                tree doesn't work as expected. Prefixed element nodes
+                can't be selected and element nodes without prefix
+                will be seen by XPath expressions as if they haven't
+                any namespace (no matter if they in fact in a default
+                namespace).
                 </dd>
               
 
@@ -261,30 +314,40 @@ iso8859-4, iso8859-5, iso8859-6, iso8859-7, iso8859-8, iso8859-9, koi8-r.</dd>
         
           <dt>
 <b class="cmd">dom</b> <b class="method">createNodeCmd</b>
-<i class="m">?-returnNodeCmd?</i> <i class="m">(element|comment|text|cdata|pi)Node</i> <i class="m">commandName</i>
+<i class="m">?-returnNodeCmd?</i> <i class="m">?-tagName name?</i> <i class="m">?-jsonType jsonType</i> <i class="m">(element|comment|text|cdata|pi)Node</i> <i class="m">commandName</i>
 </dt>
-          <dd>This method creates Tcl commands, which in turn create tDOM nodes.
-Tcl commands created by this command are only avaliable inside a script given to the
-domNode method <i class="m">appendFromScript</i>. If a command created with
-<i class="m">createNodeCmd</i> is invoked in any other context, it will return error. The
-created command <i class="m">commandName</i> replaces any existing command or procedure
-with that name. If the <i class="m">commandName</i> includes any namespace qualifiers, 
-it is created in the specified namespace.
+          <dd>This method creates Tcl commands, which in turn create
+          tDOM nodes. Tcl commands created by this command are only
+          avaliable inside a script given to the domNode methods
+          <i class="m">appendFromScript</i> or <i class="m">insertBeforeFromScript</i>. If
+          a command created with <i class="m">createNodeCmd</i> is invoked in
+          any other context, it will return error. The created command
+          <i class="m">commandName</i> replaces any existing command or
+          procedure with that name. If the <i class="m">commandName</i> includes
+          any namespace qualifiers, it is created in the specified
+          namespace. The <i class="m">-tagName</i> option is only allowed for
+          the elementNode type. The <i class="m">-jsonType</i> option is only
+          allowed for elementNode and textNode types.
 
-<p>If such command is invoked inside a script given as argument to
-the domNode method <i class="m">appendFromScript</i>, it creates a new node and
-appends this node at the end of the child list of the invoking element
-node. If the option <i class="m">-returnNodeCmd</i> was given, the command returns the
-created node as Tcl command. If this option was omitted, the command returns
-nothing. Each command creates always the same type of node. Which type of 
-node is created by the command is determined by the first argument to the
-<i class="m">createNodeCmd</i>. The syntax of the created command depends on the 
-type of the node it creates.</p>
+<p>If such command is invoked inside a script given as argument to the
+domNode method <i class="m">appendFromScript</i> or
+<i class="m">insertBeforeFromScript</i> it creates a new node and appends this
+node at the end of the child list of the invoking element node. If the
+option <i class="m">-returnNodeCmd</i> was given, the command returns the
+created node as Tcl command. If this option was omitted, the command
+returns nothing. Each command creates always the same type of node.
+Which type of node is created by the command is determined by the
+first argument to the <i class="m">createNodeCmd</i>. The syntax of the created
+command depends on the type of the node it creates.</p>
 
-<p>If the first argument of the method is <i class="m">elementNode</i>, the created
-command will create an element node. The tag name of the created
-node is <i class="m">commandName</i> without namespace qualifiers. The syntax of the 
-created command is:</p>
+<p>If the first argument of the method is <i class="m">elementNode</i>, the
+created command will create an element node. Without the
+<i class="m">-tagName</i> option the tag name of the created node is
+<i class="m">commandName</i> without namespace qualifiers. If the
+<i class="m">-tagName</i> option was given then the created command the created
+elements will have this tag name. If the <i class="m">-jsonType</i> option was
+given then the created node elements will have the given JSON type.
+The syntax of the created command is:</p>
 
 <pre class="syntax">
 <b class="cmd">elementNodeCmd</b> <i class="m">?attributeName attributeValue ...? ?script?</i>
@@ -306,8 +369,10 @@ argument. This script is evaluated as recursive <i class="m">appendFromScript</i
 with the node created by the <i class="m">elementNodeCmd</i> as parent of all nodes
 created by the script.</p>
 
-<p>If the first argument of the method is <i class="m">textNode</i>, the command will create
-a text node. The syntax of the created command is:</p>
+<p>If the first argument of the method is <i class="m">textNode</i>, the command
+will create a text node. If the <i class="m">-jsonType</i> option was given then
+the created text node will have that JSON type. The syntax of the
+created command is:</p>
 
 <pre class="syntax">
 <b class="cmd">textNodeCmd</b> ?-disableOutputEscaping? <i class="m">data</i>
@@ -317,8 +382,8 @@ a text node. The syntax of the created command is:</p>
 escaping of the ampersand character (&amp;) and the left angle bracket (&lt;)
 inside the data is disabled. You should use this flag carefully.</p>
 
-<p>If the first argument of the method is <i class="m">commentNode</i>, or 
-<i class="m">cdataNode</i>, the command will create an comment node or CDATA section 
+<p>If the first argument of the method is <i class="m">commentNode</i> or 
+<i class="m">cdataNode</i> the command will create an comment node or CDATA section 
 node. The syntax of the created command is:</p>
 
 <pre class="syntax">
@@ -533,12 +598,17 @@ recommendation. Otherwise it returns 0.</dd>
                     <dd>Returns the TCL_UTF_MAX value of the tcl
                     core, tDOM was build with as integer</dd>
                 
+                
+                    <dt><b>html5</b></dt>
+                    <dd>Returns as boolean, if build with
+                    <i class="m">--enable-html5</i>.</dd>
+                
             </dl>
             </dd>   
         
     </dl>
 
-<h2><a name="SECTid0x13bc860">KEYWORDS</a></h2><p class="keywords">
+<h2><a name="SECTid0xb84020">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-XML">XML</a>, <a class="keyword" href="keyword-index.html#KW-DOM">DOM</a>, <a class="keyword" href="keyword-index.html#KW-document">document</a>, <a class="keyword" href="keyword-index.html#KW-node">node</a>, <a class="keyword" href="keyword-index.html#KW-parsing">parsing</a>
 </p>
 </div><hr class="navsep"><div class="navbar" align="center">

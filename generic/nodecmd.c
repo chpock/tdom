@@ -88,6 +88,8 @@ typedef struct CurrentStack {
 typedef struct NodeInfo {
     int   type;
     char *namespace;
+    int   jsonType;
+    char *tagName;
 } NodeInfo;
 
 #ifndef TCL_THREADS
@@ -264,6 +266,9 @@ NodeObjCmdDeleteProc (
     if (nodeInfo->namespace) {
         FREE (nodeInfo->namespace);
     }
+    if (nodeInfo->tagName) {
+        FREE (nodeInfo->tagName);
+    }
     FREE (nodeInfo);
 }
 
@@ -282,6 +287,7 @@ NodeObjCmd (arg, interp, objc, objv)
         index = 1;
     char *tag, *p, *tval, *aval;
     domNode *parent, *newNode = NULL;
+    domTextNode *textNode = NULL;
     domDocument *doc;
     Tcl_Obj *cmdObj, **opts;
     NodeInfo *nodeInfo = (NodeInfo*) arg;
@@ -351,11 +357,12 @@ NodeObjCmd (arg, interp, objc, objv)
             createType = nodeInfo->type;
             break;
         }
-        newNode = (domNode*)domNewTextNode(doc, tval, len, createType);
+        textNode = domNewTextNode(doc, tval, len, createType);
+        textNode->info = nodeInfo->jsonType;
         if (disableOutputEscaping) {
-            newNode->nodeFlags |= DISABLE_OUTPUT_ESCAPING;
+            textNode->nodeFlags |= DISABLE_OUTPUT_ESCAPING;
         }
-        domAppendChild(parent, newNode);
+        domAppendChild(parent, (domNode*) textNode);
         break;
 
     case PROCESSING_INSTRUCTION_NODE_NAME_CHK:
@@ -393,18 +400,23 @@ NodeObjCmd (arg, interp, objc, objv)
     case ELEMENT_NODE_AVALUE_CHK:
     case ELEMENT_NODE_CHK:
     case ELEMENT_NODE:
-        tag = Tcl_GetStringFromObj(objv[0], &len);
-        p = tag + len;
-        /* Isolate just the tag name, i.e. skip it's parent namespace */
-        while (--p > tag) {
-            if ((*p == ':') && (*(p-1) == ':')) {
-                p++; /* just after the last "::" */
-                tag = p;
-                break;
+        if (!nodeInfo->tagName) {
+            tag = Tcl_GetStringFromObj(objv[0], &len);
+            p = tag + len;
+            /* Isolate just the tag name, i.e. skip it's parent namespace */
+            while (--p > tag) {
+                if ((*p == ':') && (*(p-1) == ':')) {
+                    p++; /* just after the last "::" */
+                    tag = p;
+                    break;
+                }
             }
+        } else {
+            tag = nodeInfo->tagName;
         }
 
         newNode = domAppendNewElementNode (parent, tag, NULL);
+        newNode->info = nodeInfo->jsonType;
         
         /*
          * Allow for following syntax:
@@ -511,8 +523,10 @@ nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
     int             checkName;          /* Flag: Name checks? */
     int             checkCharData;      /* Flag: Data checks? */
 {
-    int ix, index, ret, type, nodecmd = 0;
+    int index, ret, type, nodecmd = 0, jsonType = 0, haveJsonType = 0;
+    int isElement = 0;
     char *nsName, buf[64];
+    Tcl_Obj *tagName = NULL;
     Tcl_DString cmdName;
     NodeInfo *nodeInfo;
 
@@ -531,20 +545,64 @@ nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
         "parserNode", NULL
     };
 
-    if (objc != 3 && objc != 4) {
+    static CONST84 char *options[] = {
+        "-returnNodeCmd", "-jsonType", "-tagName", NULL
+    };
+
+    enum option {
+        o_returnNodeCmd, o_jsonType, o_tagName
+    };
+
+    static const char *jsonTypes[] = {
+        "NONE",
+        "ARRAY",
+        "OBJECT",
+        "NULL",
+        "TRUE",
+        "FALSE",
+        "STRING",
+        "NUMBER"
+    };
+
+    if (objc < 3 ) {
         goto usage;
     }
-    if (objc == 4) {
-        if (strcmp(Tcl_GetString(objv[1]), "-returnNodeCmd")) {
-            goto usage;
+
+    while (objc > 3) {
+        if (Tcl_GetIndexFromObj (interp, objv[1], options, "option",
+                                 0, &index) != TCL_OK) {
+            return TCL_ERROR;
         }
-        nodecmd = 1;
-        ix = 2;
-    } else {
-        nodecmd = 0;
-        ix = 1;
+        switch ((enum option) index) {
+        case o_returnNodeCmd:
+            nodecmd = 1;
+            objc--;
+            objv++;
+            break;
+            
+        case o_jsonType:
+            if (Tcl_GetIndexFromObj (interp, objv[2], jsonTypes, "jsonType",
+                                     1, &jsonType) != TCL_OK) {
+                return TCL_ERROR;
+            }
+            haveJsonType = 1;
+            objc -= 2;
+            objv += 2;
+            break;
+            
+        case o_tagName:
+            tagName = objv[2];
+            objc -= 2;
+            objv += 2;
+            break;
+            
+        }
     }
-    ret = Tcl_GetIndexFromObj(interp, objv[ix], subcmds, "option", 0, &index);
+    if (objc != 3) {
+        goto usage;
+    }
+
+    ret = Tcl_GetIndexFromObj(interp, objv[1], subcmds, "nodeType", 0, &index);
     if (ret != TCL_OK) {
         return ret;
     }
@@ -564,24 +622,33 @@ nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
     if (strcmp(nsName, "::")) {
         Tcl_DStringAppend(&cmdName, "::", 2);
     }
-    Tcl_DStringAppend(&cmdName, Tcl_GetString(objv[ix+1]), -1);
+    Tcl_DStringAppend(&cmdName, Tcl_GetString(objv[2]), -1);
 
-    nodeInfo = (NodeInfo *) MALLOC (sizeof (NodeInfo));
-    nodeInfo->namespace = NULL;
     Tcl_ResetResult (interp);
     switch ((enum subCmd)index) {
     case ELM_NODE: 
-        if (!tcldom_nameCheck(interp, namespaceTail(objv[ix+1]), "tag", 0)) {
-            FREE (nodeInfo);
-            return TCL_ERROR;
-        }
-        if (checkName && checkCharData) {
-            type = ELEMENT_NODE_CHK;
-        } else if (checkName) {
-            type = ELEMENT_NODE_ANAME_CHK;
-        } else if (checkCharData) {
-            type = ELEMENT_NODE_AVALUE_CHK;
+        isElement = 1;
+        if (!haveJsonType) {
+            if (!tcldom_nameCheck(interp, namespaceTail(objv[2]),
+                                  "tag", 0)) {
+                return TCL_ERROR;
+            }
+            if (checkName && checkCharData) {
+                type = ELEMENT_NODE_CHK;
+            } else if (checkName) {
+                type = ELEMENT_NODE_ANAME_CHK;
+            } else if (checkCharData) {
+                type = ELEMENT_NODE_AVALUE_CHK;
+            } else {
+                type = ELEMENT_NODE;
+            }
         } else {
+            if (jsonType > 2) {
+                Tcl_SetResult(interp, "For an element node the jsonType"
+                              " argument must be one out of this list: ARRAY"
+                              " OBJECT NONE.", NULL);
+                return TCL_ERROR;
+            }
             type = ELEMENT_NODE;
         }
         break;
@@ -589,9 +656,19 @@ nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
         type = PARSER_NODE;
         break;
     case TXT_NODE: 
-        if (checkCharData) {
-            type = TEXT_NODE_CHK;
+        if (!haveJsonType) {
+            if (checkCharData) {
+                type = TEXT_NODE_CHK;
+            } else {
+                type = TEXT_NODE;
+            }
         } else {
+            if (jsonType < 3 && jsonType > 0) {
+                Tcl_SetResult(interp, "For a text node the jsonType "
+                              "argument must be one out of this list: "
+                              "TRUE FALSE NULL NUMBER STRING NONE",
+                              NULL);
+            }
             type = TEXT_NODE;
         }
         break;
@@ -624,10 +701,29 @@ nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
         Tcl_SetResult (interp, "Invalid/unexpected node type", NULL);
         return TCL_ERROR;
     }
+
+    if (tagName && !isElement) {
+        Tcl_SetResult(interp, "The -tagName option is allowed only for "
+                      "element node commands.", NULL);
+        return TCL_ERROR;        
+    }
     
+    if (haveJsonType && type != ELEMENT_NODE && type != TEXT_NODE) {
+        Tcl_SetResult(interp, "Only element and text nodes may have a "
+                      "JSON type.", NULL);
+        return TCL_ERROR;        
+    }
+    
+    nodeInfo = (NodeInfo *) MALLOC (sizeof (NodeInfo));
+    nodeInfo->namespace = NULL;
     nodeInfo->type = type;
     if (nodecmd) {
         nodeInfo->type *= -1; /* Signal this fact */
+    }
+    nodeInfo->jsonType = jsonType;
+    nodeInfo->tagName = NULL;
+    if (tagName) {
+        nodeInfo->tagName = tdomstrdup (Tcl_GetString(tagName));
     }
     Tcl_CreateObjCommand(interp, Tcl_DStringValue(&cmdName), NodeObjCmd,
                          (ClientData)nodeInfo, NodeObjCmdDeleteProc);
@@ -637,7 +733,10 @@ nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
     return TCL_OK;
 
  usage:
-    Tcl_AppendResult(interp, "dom createNodeCmd ?-returnNodeCmd?"
+    Tcl_AppendResult(interp, "dom createNodeCmd\n"
+                     "\t?-returnNodeCmd?\n"
+                     "\t?-jsonType <jsonType>?\n"
+                     "\t?-tagName <tagName>?\n"
                      " nodeType cmdName", NULL);
     return TCL_ERROR;
 }

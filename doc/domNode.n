@@ -418,16 +418,25 @@ of attribute name / value pairs. If \fItypeVar\fR is given
 the result type name is stored into that variable (empty,
 bool, number, string, nodes, attrnodes or mixed).
 .PP
-The argument \fIxpathQuery\fR has to be a valid XPath
-expression. However, there is one exception to that rule. Tcl variable
-names can appear in the XPath statement at any position where it is
-legal according to the rules of the XPath syntax to put an XPath
-variable. The value of the variable is substituted for the variable
-name. Ignoring the syntax rules of XPath the Tcl variable name may be
-any legal Tcl var name: local variables, global variables, array
-entries and so on. The value will always be seen as string literal by
-the xpath engine. Cast the value explicitly with the according xpath
-functions (number(), boolean()) to another data type, if needed.
+The argument \fIxpathQuery\fR has to be a valid XPath expression.
+However there are a few exceptions to that rule. Tcl variable
+references (in the usual tcl syntax: $varname) may appear in the XPath
+statement at any position where it is legal according to the rules of
+the XPath syntax to put an XPath variable. Ignoring the syntax rules of
+XPath the Tcl variable name may be any legal Tcl var name: local
+variables, global variables, array entries and so on. The value will
+always be seen as string literal by the xpath engine. Cast the value
+explicitly with the according xpath functions (number(), boolean()) to
+another data type, if needed.
+.PP
+Simmilar to the above descibed way to inject literals in a secure
+way into the XPath expression using tcl variable references there is a
+syntax to inject element names from tcl variables. At every place
+where the XPath syntax allows a node test there could be a tcl
+variable reference (in any form), just the leading $ replaced with %.
+This allows to select nodes with 'strange' (invalid, according to the
+appropriate XML production rule) node names which may be needed in
+case of working with JSON data.
 .PP
 The option \fI-namespaces\fR expects a tcl list with prefix /
 namespace pairs as argument. If this option is not given, then any
@@ -444,21 +453,23 @@ namespace definitions in scope of the context node will be used to
 resolve the prefix, as usual.
 .PP
 If the \fI-cache\fR option is used with a true value, then the
-\&\fIxpathQuery\fR will be looked up in a document specific cache. If the query
-is found, then the stored pre-compiled query will be used. If the
-query isn't found, it will be pre-compiled and stored in the cache,
-for use in further calls. Please notice, that the \fIxpathQuery\fR as given as
-string is used as key for the cache. This means, that equal XPath
-expressions, which differ only in white space are treated as
+\&\fIxpathQuery\fR will be looked up in a document specific cache. If
+the query is found, then the stored pre-compiled query will be used.
+If the query isn't found, it will be compiled and stored in the cache,
+for use in further calls. Please notice, that the \fIxpathQuery\fR as
+given as string is used as key for the cache. This means, that equal
+XPath expressions, which differ only in white space are treated as
 different cache entries. Special care is needed, if the XPath
-expression includes namespace prefixes. During pre-compilation, the
-prefixes will be resolved first to the prefix / namespace pairs of
-the \fI-namespaces\fR option, if given, and to the namespaces
-in scope of the context node at pre-compilation time. If the XPath
-is found in the cache, neither the \fI-namespaces\fR option nor
-the namespaces in scope of the context node will be taken in
-account but the already resolved (stored) namespaces will be used
-for the query.
+expression includes namespace prefixes or references to tcl variables.
+Both namespace prefixes and tcl variable references will be resolved
+according to the XML prefix namespace mappings and tcl variable values
+at expression compilation time. If the same XPath expression is used
+later on in a context with other XML prefix namespace mappings or
+values of the used tcl variables, make sure to first remove the
+compiled expression from the cache with the help of the
+\&\fBdeleteXPathCache\fP method, to force a recompilation.
+Without using the \fI-cache\fR option such consideration is never
+needed.
 .PP
 Examples:
 
@@ -648,6 +659,16 @@ if given, is set to the empty string.
 \&\fB\fI@attrName\fB
 \&\fRReturns the value of the attribute \fIattrName\fR.  Short cut
 for \fIgetAttribute\fR.
+.TP
+\&\fB\fBjsonType\fP \fI?OBJECT|ARRAY|NONE)|(STRING|NUMBER|TRUE|FALSE|NULL|NONE)?\fB
+\&\fROnly element and text nodes may have a JSON type and
+only this types of nodes support the \fIjsonType\fR method;
+the other node types return error if called with this method.
+Returns the jsonType of the node. If the optional argument is
+given, the JSON type of the node is set to the given type and
+returned. Valid type arguments for element nodes are OBJECT,
+ARRAY and NONE. Valid type arguments for text nodes are
+STRING, NUMBER, TRUE, FALSE, NULL and NONE.
 .PP
 Otherwise, if an unknown method name is given, the command with the same
 name as the given method within the namespace \fB::dom::domNode\fR is tried to

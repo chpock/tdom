@@ -1374,7 +1374,7 @@ static int xsltFormatNumber (
     Tcl_UniChar prefix1[800], prefix2[800], suffix1[800], suffix2[800];
     Tcl_UniChar save = '\0', save1, t, *prefix, *suffix, n[800], f[800];
     Tcl_UniChar uniCharNull = '\0';
-    char stmp[240], ftmp[80];
+    char stmp[240], ftmp[80], *tstr;
     char wrongFormat[] = "Unable to interpret format pattern.";
     int i, j, k, l, zl, g, nHash, nZero, fHash, fZero, gLen, isNeg;
     int prefixMinux, percentMul = 0, perMilleMul = 0;
@@ -1735,12 +1735,11 @@ static int xsltFormatNumber (
         Tcl_DStringFree (&dbStr);
     )
     Tcl_DStringSetLength (&dStr, 0);
-    *resultStr = tdomstrdup(
-        Tcl_UniCharToUtfDString(
-            (Tcl_UniChar*)Tcl_DStringValue (&s),
-            Tcl_UniCharLen((Tcl_UniChar*)Tcl_DStringValue(&s)), &dStr
-            )
+    tstr = Tcl_UniCharToUtfDString(
+        (Tcl_UniChar*)Tcl_DStringValue (&s),
+        Tcl_UniCharLen((Tcl_UniChar*)Tcl_DStringValue(&s)), &dStr
         );
+    *resultStr = tdomstrdup(tstr);
     Tcl_DStringFree (&dStr);
     Tcl_DStringFree (&s);
     *resultLen = strlen(*resultStr);
@@ -2767,8 +2766,7 @@ static int xsltSetVar (
             xpathRSInit (&rs);
             rsSetString (&rs, "");
         } else {
-            fragmentNode = domNewElementNode(xs->resultDoc, "",
-                                             ELEMENT_NODE);
+            fragmentNode = domNewElementNode(xs->resultDoc, "");
             savedLastNode = xs->lastNode;
             xs->lastNode = fragmentNode;
             /* process the children as well */
@@ -3242,7 +3240,7 @@ static int xsltAddTemplate (
                    is cleand up. */
                 tpl->match = NULL;
             } else {
-                free ((char*)tpl);
+                FREE ((char*)tpl);
             }
             return rc;
         }
@@ -4286,7 +4284,7 @@ static int ExecAction (
 
             savedLastNode = xs->lastNode;
             xs->lastNode  = domNewElementNode (xs->resultDoc,
-                                               "container", ELEMENT_NODE);
+                                               "container");
             xsltPushVarFrame (xs);
             rc = ExecActions(xs, context, currentNode, currentPos,
                              actionNode->firstChild, errMsg);
@@ -4455,7 +4453,7 @@ static int ExecAction (
             break;
 
         case comment:
-            fragmentNode = domNewElementNode(xs->resultDoc, "", ELEMENT_NODE);
+            fragmentNode = domNewElementNode(xs->resultDoc, "");
             savedLastNode = xs->lastNode;
             xs->lastNode = fragmentNode;
             xsltPushVarFrame (xs);
@@ -4475,7 +4473,7 @@ static int ExecAction (
             }
             str = xpathGetStringValue (fragmentNode, &len);
             if (!domIsComment (str)) {
-                reportError (actionNode, "Invalide comment value", errMsg);
+                reportError (actionNode, "Invalid comment value", errMsg);
                 domDeleteNode (fragmentNode, NULL, NULL);
                 FREE(str);
                 return -1;
@@ -4848,8 +4846,7 @@ static int ExecAction (
                              "attribute: 'yes' or 'no'", errMsg);
                 return -1;
             }
-            fragmentNode = domNewElementNode(xs->resultDoc, "",
-                                             ELEMENT_NODE);
+            fragmentNode = domNewElementNode(xs->resultDoc, "");
             savedLastNode = xs->lastNode;
             xs->lastNode = fragmentNode;
             xsltPushVarFrame (xs);
@@ -4947,7 +4944,7 @@ static int ExecAction (
                              " missing mandatory attribute \"name\".", errMsg);
                 return -1;
             }
-            fragmentNode = domNewElementNode(xs->resultDoc, "", ELEMENT_NODE);
+            fragmentNode = domNewElementNode(xs->resultDoc, "");
             savedLastNode = xs->lastNode;
             xs->lastNode = fragmentNode;
             xsltPushVarFrame (xs);
@@ -4969,7 +4966,7 @@ static int ExecAction (
             }
             str = xpathGetStringValue (fragmentNode, &len);
             if (!domIsPIValue (str)) {
-                reportError (actionNode, "Invalide processing instruction "
+                reportError (actionNode, "Invalid processing instruction "
                              "value", errMsg);
                 domDeleteNode (fragmentNode, NULL, NULL);
                 FREE(str);
@@ -6657,7 +6654,7 @@ static int processTopLevel (
                                  NULL, &(keyInfo->matchAst), errMsg);
                 if (rc < 0) {
                     reportError (node, *errMsg, errMsg);
-                    free ((char*)keyInfo);
+                    FREE ((char*)keyInfo);
                     return rc;
                 }
                 keyInfo->use       = use;
@@ -6666,7 +6663,7 @@ static int processTopLevel (
                 if (rc < 0) {
                     reportError (node, *errMsg, errMsg);
                     xpathFreeAst (keyInfo->matchAst);
-                    free ((char*)keyInfo);
+                    FREE ((char*)keyInfo);
                     return rc;
                 }
                 domSplitQName (name, prefix, &localName);

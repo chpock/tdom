@@ -4,15 +4,15 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x12a9cf0">NAME</a> · <a href="#SECTid0x12d0090">SYNOPSIS</a> · <a href="#SECTid0x132dd50">DESCRIPTION </a> · <a href="#SECTid0x13c1c80">SEE ALSO</a> · <a href="#SECTid0x13c2010">KEYWORDS</a>
+<a href="#SECTid0xa2ebe0">NAME</a> · <a href="#SECTid0xa4db80">SYNOPSIS</a> · <a href="#SECTid0xad8760">DESCRIPTION </a> · <a href="#SECTid0xb75940">SEE ALSO</a> · <a href="#SECTid0xb75cd0">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x12a9cf0">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0xa2ebe0">NAME</a></h2><p class="namesection">
 <b class="names">domDoc - </b><br>Manipulates an instance of a DOM document object</p>
   
-  <h2><a name="SECTid0x12d0090">SYNOPSIS</a></h2><pre class="syntax">domDocObjCmd <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
+  <h2><a name="SECTid0xa4db80">SYNOPSIS</a></h2><pre class="syntax">domDocObjCmd <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
 
-  <h2><a name="SECTid0x132dd50">DESCRIPTION </a></h2><p>This command manipulates one particular instance of a document
+  <h2><a name="SECTid0xad8760">DESCRIPTION </a></h2><p>This command manipulates one particular instance of a document
 object. <i class="m">method</i> indicates a specific method of the document class. These
 methods should closely conform to the W3C recommendation "Document Object Model
 (Core) Level 1" (<a href="http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html">http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html</a>). Look
@@ -186,6 +186,86 @@ order without any escaping. In effect, this is what the xslt output method
 "text" (XSLT 1.0 recommendation, section 16.3) does.</dd>
       
 
+      
+        <dt>
+<b class="method">asJSON</b> <b class="option">?-indent none/0..8?</b> <b class="option">?-channel channelId?</b>
+</dt>
+          <dd>
+<p>The asJSON method serializes the tree into a valid
+          JSON data string. In general this may be a lossy
+          serialization. For this serialization all comment, character
+          data sections and processing instruction nodes, all
+          attributes and all XML namespaces are ignored. Only element
+          and text nodes may be reflected in the generated JSON
+          serialization. Appropriate JSON data type information of a
+          node will be respected.</p>
+
+          <p>If an element node has the JSON type OBJECT then every
+          element node child of this element will be serializend as
+          member of that object, with the node name of the child as
+          the member name and the relevant childs of that child as the
+          value. Every other child nodes will be ignored.</p>
+
+          <p>If an element node has the JSON type ARRAY then the text
+          and element node childs of that element node are serialized
+          as the consecutive values of the array. Element node childs
+          of an ARRAY element will be container nodes for nested ARRAY
+          or OBJECT values.</p>
+
+          <p>Text nodes with the JSON types TRUE, FALSE or NULL will
+          be serialized to the corresponding JSON token without
+          looking at the value of the text node. A text node without
+          JSON type will always be serialized as a JSON string token.
+          A text node with JSON type NUMBER will be serialized as JSON
+          number token if the text node value is in fact a valid JSON
+          number and as a JSON string if not.</p>
+
+          <p>If an element node doesn't has a JSON type then the
+          serialization of its childs is determined by the following
+          rules:</p>
+
+          <p>Only text and element node child are relevant. If the
+          element node to serialize is the member of a JSON object and
+          there is no relevant child node the value of that member
+          will be an empty JSON string. If the only relevant child
+          node of this element node is a text node then the JSON
+          value of that text node will be the value of the object
+          member. If the element has more than one relevant child
+          nodes and the first one is a text node then the relevant
+          childs will be serialized as JSON array. If the only
+          relevant child node is an element node or the first relevant
+          child is an element node and the node name of that only or
+          first relevant child isn't equal to the array container node
+          name all element node childs will be serialized as the
+          members of a JSON object (while ignoring any intermixed text
+          nodes). If the only or first relevant child is an element
+          node and the node name of this child is equal to the array
+          container element name then all relevant childs will be
+          serialized as the values of a JSON array.</p>
+
+          <p>If the element to serialize is a value of a JSON array
+          and the node name of this element isn't equal to the array
+          container node name that element will be seen as a
+          container node for a JSON object and all element node childs
+          will be serialized as the members of that array while
+          ignoring any text node childs. If the element to serialize
+          is a value of a JSON array and the node name of this element
+          is equal to the array container node name, all relevant
+          childs will be serialized as JSON array.</p>
+
+          <p>If the <i class="m">-channel</i> option is given the serialization
+          isn't returned as string but send directly to the channel,
+          given as argument to the option.</p>
+
+          <p>If the <i class="m">-indent</i> option is given and the argument
+          given to this option isn't "none" then the returned JSON
+          string is "pretty-printed". The numeric argument to this
+          option defines the number of spaces for any indentation
+          level. The default is to not emit any additional
+          white space.</p>
+</dd>
+      
+      
       
         <dt>
 <b class="method">publicId</b> <i class="m">?publicId?</i>
@@ -378,11 +458,11 @@ then the command is processed in the same way as
         <dt>
 <b class="method">normalize</b> <i class="m">?-forXPath?</i>
 </dt>
-        <dd>Puts all Text nodes in the document
+        <dd>Puts all text nodes in the document
 into a "normal" form where only structure (e.g., elements,
 comments, processing instructions and CDATA
-sections) separates Text nodes, i.e., there
-are neither adjacent Text nodes nor empty Text nodes. If the option
+sections) separates text nodes, i.e., there
+are neither adjacent text nodes nor empty text nodes. If the option
 <i class="m">-forXPath</i> is given, all CDATA sections in the nodes are
 converted to text nodes, as a first step before the
 normalization. </dd>
@@ -523,21 +603,23 @@ namespace definitions in scope of the context node will be used to
 resolve the prefix, as usual.</p>
 
 <p>If the <i class="m">-cache</i> option is used with a true value, then the
-<i class="m">xpathQuery</i> will be looked up in a document specific cache. If the query
-is found, then the stored pre-compiled query will be used. If the
-query isn't found, it will be pre-compiled and stored in the cache,
-for use in further calls. Please notice, that the <i class="m">xpathQuery</i> as given as
-string is used as key for the cache. This means, that equal XPath
-expressions, which differ only in white space are treated as
+<i class="m">xpathQuery</i> will be looked up in a document specific cache. If
+the query is found, then the stored pre-compiled query will be used.
+If the query isn't found, it will be compiled and stored in the cache,
+for use in further calls. Please notice, that the <i class="m">xpathQuery</i> as
+given as string is used as key for the cache. This means, that equal
+XPath expressions, which differ only in white space are treated as
 different cache entries. Special care is needed, if the XPath
-expression includes namespace prefixes. During pre-compilation, the
-prefixes will be resolved first to the prefix / namespace pairs of
-the <i class="m">-namespaces</i> option, if given, and to the namespaces
-in scope of the context node at pre-compilation time. If the XPath
-is found in the cache, neither the <i class="m">-namespaces</i> option nor
-the namespaces in scope of the context node will be taken in
-account but the already resolved (stored) namespaces will be used
-for the query.</p>
+expression includes namespace prefixes or references to tcl variables.
+Both namespace prefixes and tcl variable references will be resolved
+according to the XML prefix namespace mappings and tcl variable values
+at expression compilation time. If the same XPath expression is used
+later on in a context with other XML prefix namespace mappings or
+values of the used tcl variables, make sure to first remove the
+compiled expression from the cache with the help of the
+<b class="method">deleteXPathCache</b> method, to force a recompilation.
+Without using the <i class="m">-cache</i> option such consideration is never
+needed.</p>
 
 <p>Examples:</p>
           <pre class="example">set paragraphNodes [$node selectNodes {chapter[3]//para[@type='warning' or @type='error'} ]
@@ -592,14 +674,14 @@ empty string.</dd>
       
 
   </dl><p>Otherwise, if an unknown method name is given, the command with the
-same name as the given metho within the namespace <tt class="samp">::dom::domDoc</tt> is
+same name as the given method within the namespace <tt class="samp">::dom::domDoc</tt> is
 tried to be executed. This allows quick method additions on Tcl level.</p><p>Newly created nodes are appended to a hidden fragment list. If they
 are not moved into the tree they are automaticaly deleted, when the whole
 document gets deleted.</p>
 
-    <h2><a name="SECTid0x13c1c80">SEE ALSO</a></h2><p class="seealso">dom, domNode</p>
+    <h2><a name="SECTid0xb75940">SEE ALSO</a></h2><p class="seealso">dom, domNode</p>
 
-    <h2><a name="SECTid0x13c2010">KEYWORDS</a></h2><p class="keywords">
+    <h2><a name="SECTid0xb75cd0">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-DOMnodecreation">DOM node creation</a>, <a class="keyword" href="keyword-index.html#KW-documentelement">document element</a>
 </p>
 
