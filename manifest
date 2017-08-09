@@ -1,5 +1,5 @@
-C Added\sa\srandom\stest.
-D 2017-08-05T12:52:12.112
+C More\sproof-reading.
+D 2017-08-09T10:23:03.886
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -20,7 +20,7 @@ F doc/dom.n 14934ed33594b20de1663ba1f1cc2cfcc2aec9b7
 F doc/dom.xml b1d38f2ed773c9cd13a08d0d940ff2b3bbbbb732
 F doc/domDoc.html 87fba2f97b90749be5ac8c9496f27a0344b39463
 F doc/domDoc.n 954b9968965115cf0d9b748e52a8db9eba9bbcca
-F doc/domDoc.xml c441c27c7ba922c84f0a17433e1b1a880407f1d4
+F doc/domDoc.xml c92e4942fe952b5e05ea4b1891aca93af6a7df85
 F doc/domNode.html 4b30a8ff2b510b4b7471fd7e582a736fb15926a1
 F doc/domNode.n c304932090fdc5ecdf05e28314a923ba7ac401bf
 F doc/domNode.xml f76514d54cc898ac97f4348ed0c4ccf04ea40eaa
@@ -245,8 +245,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 7bd9eda4308d915ce4568195a6fd9e5ee124e88b
-R 7406b247f4e4ef6e368ddd88441e0684
+P 19c24838e3a79569b75efe349cf57ed6fbfed3da
+R e530379b5542fe1c1e7c7509edb562b2
 U rolf
-Z 7b3e56bd2a3b92d288dcb004ed43abb2
+Z f72a770486f0084b96d64152d6db7174
 # Remove this line to create a well-formed Fossil manifest.
