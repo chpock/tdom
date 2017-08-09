@@ -199,7 +199,7 @@ channelId?</option> <option>?-escapeNonASCII?</option> <option>?-htmlEntities?</
           the member name and the relevant children of that child as
           the value. Every other child nodes will be ignored.</p>
 
-          <p>If an element node has the JSON type ARRAY then the text
+          <p>If an element node has the JSON type ARRAY, then the text
           and element node children of that element node are serialized
           as the consecutive values of the array. Element node children
           of an ARRAY element will be container nodes for nested ARRAY
@@ -296,11 +296,11 @@ text node child of every element node in the document with the same
 name as the first argument will be serialized as CDATA section. If the
 second argument is a boolean with value false, all text nodes of all
 elements with the same name as the first argument will be serialized
-as usual. Namespaced element names have to given in the form
+as usual. Namespaced element names have to be given in the form
 namespace_URI:localname, not in the otherwise usual prefix:localname
 form. With two arguments called, the method returns the used boolean
 value. If the method is called with only an element name, it will
-return a boolean value, indicating, if the text nodes children of all
+return a boolean value, indicating that the text node children of all
 elements with that name in the document will be serialized as CDATA
 section elements (return value 1) or not (return value 0). If the
 method is called with only one argument and that argument is an
