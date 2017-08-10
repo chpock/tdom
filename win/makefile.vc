@@ -174,6 +174,7 @@ DLLOBJS = \
 	$(TMP_DIR)\dom.obj         \
 	$(TMP_DIR)\domalloc.obj    \
 	$(TMP_DIR)\domhtml.obj     \
+	$(TMP_DIR)\domhtml5.obj     \
 	$(TMP_DIR)\domxslt.obj     \
 	$(TMP_DIR)\nodecmd.obj     \
 	$(TMP_DIR)\domxpath.obj    \
@@ -279,7 +280,11 @@ cflags = $(cflags) -DUSE_TK_STUBS
 
 DEFS            =-DHAVE_MEMMOVE -DXML_DTD -DXML_NS -DTDOM_NO_UNKNOWN_CMD
 DEFS_EXPAT	=-DXMLIMPORT=__declspec(dllexport)
-INCLUDES	= -I"$(WINDIR)" -I"$(GENERICDIR)" -I"$(EXPATDIR)" $(TCL_INCLUDES) 
+INCLUDES	= -I"$(WINDIR)" -I"$(GENERICDIR)" -I"$(EXPATDIR)" $(TCL_INCLUDES)
+!if "$(GUMBODIR)" != ""
+DEFS     = $(DEFS) -DTDOM_HAVE_GUMBO
+INCLUDES = $(INCLUDES) -I"$(GUMBODIR)\src"
+!endif
 BASE_CFLAGS	= $(cflags) $(cdebug) $(crt) $(INCLUDES)
 CON_CFLAGS	= $(cflags) $(cdebug) $(crt) -DCONSOLE
 TCL_CFLAGS      = -DPACKAGE_NAME="\"$(PROJECT)\"" \
@@ -330,6 +335,10 @@ baselibs  = $(TCLSTUBLIB)
 !if defined(TKSTUBLIB)
 baselibs  = $(baselibs) $(TKSTUBLIB)
 !endif
+!endif
+
+!if "$(GUMBODIR)" != ""
+baselibs = $(baselibs) "$(GUMBODIR)\.libs\libgumbo.a"
 !endif
 
 # Avoid 'unresolved external symbol __security_cookie' errors.
@@ -450,12 +459,6 @@ $<
 #
 #-------------------------------------------------------------------------
 
-$(OUT_DIR)\pkgIndex.tcl: $(ROOT)\pkgIndex.tcl.in
-	nmakehlp -s << $** > $@
-@PACKAGE_VERSION@    $(DOTVERSION)
-@PACKAGE_NAME@       $(PROJECT)
-@PKG_LIB_FILE@       $(PRJLIBNAME)
-<<
 
 #---------------------------------------------------------------------
 # Installation. (EDIT)
@@ -476,11 +479,7 @@ install-libraries:
         @if exist $(LIBDIR)\NUL $(CPY) $(LIBDIR)\*.tcl "$(SCRIPT_INSTALL_DIR)" >NUL
         @echo Installing package index in '$(SCRIPT_INSTALL_DIR)'
         @type << >"$(SCRIPT_INSTALL_DIR)\pkgIndex.tcl"
-if {[info exists ::tcl_platform(debug)]} {
-    package ifneeded $(PROJECT) $(DOTVERSION) "[list load [file join $$dir $(PROJECT)$(VERSION)g.$(EXT)] tdom]; [list source [file join $$dir tdom.tcl]]"
-} else {
-    package ifneeded $(PROJECT) $(DOTVERSION) "[list load [file join $$dir $(PROJECT)$(VERSION).$(EXT)] tdom]; [list source [file join $$dir tdom.tcl]]"
-}
+    package ifneeded $(PROJECT) $(DOTVERSION) "[list load [file join $$dir $(PROJECT)$(VERSION)$(SUFX).$(EXT)] tdom]; [list source [file join $$dir tdom.tcl]]"
 <<
 
 install-docs:
