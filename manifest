@@ -1,5 +1,5 @@
-C Added\sthe\snew\sobj\sfile\sto\sthe\svc\smakefiles.
-D 2017-08-10T09:36:45.342
+C Updated\sMSVC\sbuild\sfiles\sfor\snew\scompilers\sand\s64-bit\ssupport\s(no\sgumbo\syet)
+D 2017-08-10T15:57:54.657
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -234,19 +234,22 @@ F tests/xslt.test 5863a9a228ceb7e8cf03888068b3d1e0f7b883b7
 F unix/CONFIG 789192e463910e1b9dd7e65f6338390d2bf1f68a
 F unix/tclAppInit.c a1655c51127aed18d069010f234a378fceacb2a6
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F win/makefile.vc e2535acc1dd0de798cf5713604f49f926c14e412
+F win/makefile.vc d7c7c4b167b4e14422fea08447e4408f84778220
 F win/makefile805.vc da2003745caf522d88f27fcebadd916c1d5c042d
 F win/mkd.bat 85d3fe58ce051a778447fb2bfc7384867d21cef0
 F win/nmakehlp.c 604c15fe6ebf3bb5f1cf54dd43801b9ae89fd653
 F win/pkgIndex.tcl 95f43bef978a72e8ceda0c97edac4ed8333b2327
-F win/rules.vc 45b10bfc82b91ffa3c166e159d1f926a39c4e2ed
+F win/rules.vc 1038eef57578ab6eb5ea1e33289788b8875a369b
 F win/tdom.rc 46fe2071b1b93040adeb66d98da6b72d270055c7
 F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 9e9b4c52250814dccab2ed6dfec54bd31caba9f8
-R 684ab0787e98835be6ab8b4681123569
-U rolf
-Z 185dd8bd8b3fbd479b6790bbb17a262d
+P 8344151942eb5c583cc6e7a3959b6d21b418b0da
+R 69a7ba6c8fe9c2ccee04076d66483f86
+T *branch * msvc
+T *sym-msvc *
+T -sym-trunk *
+U apnadkarni
+Z c81010893ab05d4d4ecda7a7844bf7e2
 # Remove this line to create a well-formed Fossil manifest.

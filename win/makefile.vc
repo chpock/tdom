@@ -244,6 +244,11 @@ cdebug	= -Zi -WX $(DEBUGFLAGS)
 cwarn = -D _CRT_SECURE_NO_DEPRECATE -D _CRT_NONSTDC_NO_DEPRECATE
 cflags = -nologo -c $(COMPILERFLAGS) $(cwarn) -Fp$(TMP_DIR)^\
 
+# TBD - some of the code, like expat checks for Windows using the
+# WIN32 macro. This should really be changed to check _WIN32. For now,
+# define WIN32 ourselves
+cflags = $(cflags) -DWIN32
+
 # Warning level
 !if $(FULLWARNINGS)
 cflags = $(cflags) -W4
