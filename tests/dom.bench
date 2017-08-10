@@ -203,3 +203,17 @@ bench -desc "clone dom tree without clone method - token" -pre {
     $clone delete
     dom setObjectCommands automatic
 }
+
+foreach nrOf {1 10 100 1000} {
+
+    bench -desc "Create document node: $nrOf"  -pre {
+        set doclist [list]
+    } -body {
+        lappend doclist [dom createDocumentNode]
+    } -post {
+        foreach doc $doclist {
+            $doc delete
+        }
+    }
+
+}

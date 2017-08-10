@@ -1370,8 +1370,7 @@ Optional Features:
   --disable-option-checking  ignore unrecognized --enable/--with options
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
-  --enable-html5          build with HTML5 parsing support (default: if
-                          available)
+  --enable-html5          build with HTML5 parsing support (default: no)
   --enable-threads        build with threads
   --enable-shared         build and link with shared libraries (default: on)
   --enable-64bit          enable 64bit support (default: off)

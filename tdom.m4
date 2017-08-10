@@ -228,7 +228,7 @@ AC_DEFUN(TDOM_ENABLE_HTML5, [
     AC_MSG_CHECKING([whether to enable support for HTML5 parsing (using gumbo)])
     AC_ARG_ENABLE(html5,
         AC_HELP_STRING([--enable-html5],
-            [build with HTML5 parsing support (default: if available)]),
+            [build with HTML5 parsing support (default: no)]),
         [tcl_ok=$enableval], [tcl_ok=no])
 
     if test "${enable_html5+set}" = set; then
