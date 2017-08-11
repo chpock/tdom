@@ -9,20 +9,28 @@
  *
  * See the file "license.terms" for information on usage and redistribution of
  * this file, and for a DISCLAIMER OF ALL WARRANTIES.
- *
- * ----------------------------------------------------------------------------
- * RCS: @(#) $Id$
  * ----------------------------------------------------------------------------
  */
 
 #define _CRT_SECURE_NO_DEPRECATE
 #include <windows.h>
+#define NO_SHLWAPI_GDI
+#define NO_SHLWAPI_STREAM
+#define NO_SHLWAPI_REG
+#include <shlwapi.h>
 #pragma comment (lib, "user32.lib")
 #pragma comment (lib, "kernel32.lib")
+#pragma comment (lib, "shlwapi.lib")
 #include <stdio.h>
 #include <math.h>
+
+/*
+ * This library is required for x64 builds with _some_ versions of MSVC
+ */
 #if defined(_M_IA64) || defined(_M_AMD64)
+#if _MSC_VER >= 1400 && _MSC_VER < 1500
 #pragma comment(lib, "bufferoverflowU")
+#endif
 #endif
 
 /* ISO hack for dumb VC++ */
@@ -34,13 +42,13 @@
 
 /* protos */
 
-int		CheckForCompilerFeature(const char *option);
-int		CheckForLinkerFeature(const char *option);
-int		IsIn(const char *string, const char *substring);
-int		GrepForDefine(const char *file, const char *string);
-int		SubstituteFile(const char *substs, const char *filename);
-const char *    GetVersionFromFile(const char *filename, const char *match);
-DWORD WINAPI	ReadFromPipe(LPVOID args);
+static int CheckForCompilerFeature(const char *option);
+static int CheckForLinkerFeature(const char **options, int count);
+static int IsIn(const char *string, const char *substring);
+static int SubstituteFile(const char *substs, const char *filename);
+static int QualifyPath(const char *path);
+static const char *GetVersionFromFile(const char *filename, const char *match, int numdots);
+static DWORD WINAPI ReadFromPipe(LPVOID args);
 
 /* globals */
 
@@ -94,16 +102,16 @@ main(
 	    }
 	    return CheckForCompilerFeature(argv[2]);
 	case 'l':
-	    if (argc != 3) {
+	    if (argc < 3) {
 		chars = snprintf(msg, sizeof(msg) - 1,
-	       		"usage: %s -l <linker option>\n"
+	       		"usage: %s -l <linker option> ?<mandatory option> ...?\n"
 			"Tests for whether link.exe supports an option\n"
 			"exitcodes: 0 == no, 1 == yes, 2 == error\n", argv[0]);
 		WriteFile(GetStdHandle(STD_ERROR_HANDLE), msg, chars,
 			&dwWritten, NULL);
 		return 2;
 	    }
-	    return CheckForLinkerFeature(argv[2]);
+	    return CheckForLinkerFeature(&argv[2], argc-2);
 	case 'f':
 	    if (argc == 2) {
 		chars = snprintf(msg, sizeof(msg) - 1,
@@ -122,18 +130,6 @@ main(
 	    } else {
 		return IsIn(argv[2], argv[3]);
 	    }
-	case 'g':
-	    if (argc == 2) {
-		chars = snprintf(msg, sizeof(msg) - 1,
-			"usage: %s -g <file> <string>\n"
-			"grep for a #define\n"
-			"exitcodes: integer of the found string (no decimals)\n",
-			argv[0]);
-		WriteFile(GetStdHandle(STD_ERROR_HANDLE), msg, chars,
-			&dwWritten, NULL);
-		return 2;
-	    }
-	    return GrepForDefine(argv[2], argv[3]);
 	case 's':
 	    if (argc == 2) {
 		chars = snprintf(msg, sizeof(msg) - 1,
@@ -157,12 +153,23 @@ main(
 		    &dwWritten, NULL);
 		return 0;
 	    }
-	    printf("%s\n", GetVersionFromFile(argv[2], argv[3]));
+	    printf("%s\n", GetVersionFromFile(argv[2], argv[3], *(argv[1]+2) - '0'));
 	    return 0;
+	case 'Q':
+	    if (argc != 3) {
+		chars = snprintf(msg, sizeof(msg) - 1,
+		    "usage: %s -Q path\n"
+		    "Emit the fully qualified path\n"
+		    "exitcodes: 0 == no, 1 == yes, 2 == error\n", argv[0]);
+		WriteFile(GetStdHandle(STD_ERROR_HANDLE), msg, chars,
+		    &dwWritten, NULL);
+		return 2;
+	    }
+	    return QualifyPath(argv[2]);
 	}
     }
     chars = snprintf(msg, sizeof(msg) - 1,
-	    "usage: %s -c|-l|-f|-g|-V ...\n"
+	    "usage: %s -c|-f|-l|-Q|-s|-V ...\n"
 	    "This is a little helper app to equalize shell differences between WinNT and\n"
 	    "Win9x and get nmake.exe to accomplish its job.\n",
 	    argv[0]);
@@ -170,7 +177,7 @@ main(
     return 2;
 }
 
-int
+static int
 CheckForCompilerFeature(
     const char *option)
 {
@@ -255,7 +262,7 @@ CheckForCompilerFeature(
 	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM|FORMAT_MESSAGE_IGNORE_INSERTS|
 		FORMAT_MESSAGE_MAX_WIDTH_MASK, 0L, err, 0, (LPVOID)&msg[chars],
 		(300-chars), 0);
-	WriteFile(GetStdHandle(STD_ERROR_HANDLE), msg,lstrlen(msg), &err,NULL);
+	WriteFile(GetStdHandle(STD_ERROR_HANDLE), msg, lstrlen(msg), &err,NULL);
 	return 2;
     }
 
@@ -299,12 +306,15 @@ CheckForCompilerFeature(
     return !(strstr(Out.buffer, "D4002") != NULL
              || strstr(Err.buffer, "D4002") != NULL
              || strstr(Out.buffer, "D9002") != NULL
-             || strstr(Err.buffer, "D9002") != NULL);
+             || strstr(Err.buffer, "D9002") != NULL
+             || strstr(Out.buffer, "D2021") != NULL
+             || strstr(Err.buffer, "D2021") != NULL);
 }
 
-int
+static int
 CheckForLinkerFeature(
-    const char *option)
+    const char **options,
+    int count)
 {
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
@@ -313,7 +323,8 @@ CheckForLinkerFeature(
     char msg[300];
     BOOL ok;
     HANDLE hProcess, h, pipeThreads[2];
-    char cmdline[100];
+    int i;
+    char cmdline[255];
 
     hProcess = GetCurrentProcess();
 
@@ -359,7 +370,11 @@ CheckForLinkerFeature(
      * Append our option for testing.
      */
 
-    lstrcat(cmdline, option);
+    for (i = 0; i < count; i++) {
+	lstrcat(cmdline, " \"");
+	lstrcat(cmdline, options[i]);
+	lstrcat(cmdline, "\"");
+    }
 
     ok = CreateProcess(
 	    NULL,	    /* Module name. */
@@ -381,7 +396,7 @@ CheckForLinkerFeature(
 	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM|FORMAT_MESSAGE_IGNORE_INSERTS|
 		FORMAT_MESSAGE_MAX_WIDTH_MASK, 0L, err, 0, (LPVOID)&msg[chars],
 		(300-chars), 0);
-	WriteFile(GetStdHandle(STD_ERROR_HANDLE), msg,lstrlen(msg), &err,NULL);
+	WriteFile(GetStdHandle(STD_ERROR_HANDLE), msg, lstrlen(msg), &err,NULL);
 	return 2;
     }
 
@@ -424,10 +439,12 @@ CheckForLinkerFeature(
     return !(strstr(Out.buffer, "LNK1117") != NULL ||
 	    strstr(Err.buffer, "LNK1117") != NULL ||
 	    strstr(Out.buffer, "LNK4044") != NULL ||
-	    strstr(Err.buffer, "LNK4044") != NULL);
+	    strstr(Err.buffer, "LNK4044") != NULL ||
+	    strstr(Out.buffer, "LNK4224") != NULL ||
+	    strstr(Err.buffer, "LNK4224") != NULL);
 }
 
-DWORD WINAPI
+static DWORD WINAPI
 ReadFromPipe(
     LPVOID args)
 {
@@ -452,69 +469,12 @@ ReadFromPipe(
     return 0;  /* makes the compiler happy */
 }
 
-int
+static int
 IsIn(
     const char *string,
     const char *substring)
 {
     return (strstr(string, substring) != NULL);
-}
-
-/*
- * Find a specified #define by name.
- *
- * If the line is '#define TCL_VERSION "8.5"', it returns 85 as the result.
- */
-
-int
-GrepForDefine(
-    const char *file,
-    const char *string)
-{
-    char s1[51], s2[51], s3[51];
-    FILE *f = fopen(file, "rt");
-
-    if (f == NULL) {
-	return 0;
-    }
-
-    do {
-	int r = fscanf(f, "%50s", s1);
-
-	if (r == 1 && !strcmp(s1, "#define")) {
-	    /*
-	     * Get next two words.
-	     */
-
-	    r = fscanf(f, "%50s %50s", s2, s3);
-	    if (r != 2) {
-		continue;
-	    }
-
-	    /*
-	     * Is the first word what we're looking for?
-	     */
-
-	    if (!strcmp(s2, string)) {
-		double d1;
-
-		fclose(f);
-
-		/*
-		 * Add 1 past first double quote char. "8.5"
-		 */
-
-		d1 = atof(s3 + 1);		  /*    8.5  */
-		while (floor(d1) != d1) {
-		    d1 *= 10.0;
-		}
-		return ((int) d1);		  /*    85   */
-	    }
-	}
-    } while (!feof(f));
-
-    fclose(f);
-    return 0;
 }
 
 /*
@@ -524,10 +484,11 @@ GrepForDefine(
  * 	package provide or package ifneeded.
  */
 
-const char *
+static const char *
 GetVersionFromFile(
     const char *filename,
-    const char *match)
+    const char *match,
+    int numdots)
 {
     size_t cbBuffer = 100;
     static char szBuffer[100];
@@ -545,9 +506,10 @@ GetVersionFromFile(
 	    p = strstr(szBuffer, match);
 	    if (p != NULL) {
 		/*
-		 * Skip to first digit.
+		 * Skip to first digit after the match.
 		 */
 
+		p += strlen(match);
 		while (*p && !isdigit(*p)) {
 		    ++p;
 		}
@@ -557,7 +519,8 @@ GetVersionFromFile(
 		 */
 
 		q = p;
-		while (*q && (isalnum(*q) || *q == '.')) {
+		while (*q && (strchr("0123456789.ab", *q)) && ((!strchr(".ab", *q)
+			    && (!strchr("ab", q[-1])) || --numdots))) {
 		    ++q;
 		}
 
@@ -630,7 +593,7 @@ list_free(list_item_t **listPtrPtr)
  *        <<
  */
 
-int
+static int
 SubstituteFile(
     const char *substitutions,
     const char *filename)
@@ -651,8 +614,8 @@ SubstituteFile(
 	sp = fopen(substitutions, "rt");
 	if (sp != NULL) {
 	    while (fgets(szBuffer, cbBuffer, sp) != NULL) {
-		char *ks, *ke, *vs, *ve;
-		ks = szBuffer;
+		unsigned char *ks, *ke, *vs, *ve;
+		ks = (unsigned char*)szBuffer;
 		while (ks && *ks && isspace(*ks)) ++ks;
 		ke = ks;
 		while (ke && *ke && !isspace(*ke)) ++ke;
@@ -661,7 +624,7 @@ SubstituteFile(
 		ve = vs;
 		while (ve && *ve && !(*ve == '\r' || *ve == '\n')) ++ve;
 		*ke = 0, *ve = 0;
-		list_insert(&substPtr, ks, vs);
+		list_insert(&substPtr, (char*)ks, (char*)vs);
 	    }
 	    fclose(sp);
 	}
@@ -676,11 +639,11 @@ SubstituteFile(
 	    }
 	}
 #endif
-	
+
 	/*
 	 * Run the substitutions over each line of the input
 	 */
-	
+
 	while (fgets(szBuffer, cbBuffer, fp) != NULL) {
 	    list_item_t *p = NULL;
 	    for (p = substPtr; p != NULL; p = p->nextPtr) {
@@ -700,10 +663,34 @@ SubstituteFile(
 	    }
 	    printf(szBuffer);
 	}
-	
+
 	list_free(&substPtr);
     }
     fclose(fp);
+    return 0;
+}
+
+/*
+ * QualifyPath --
+ *
+ *	This composes the current working directory with a provided path
+ *	and returns the fully qualified and normalized path.
+ *	Mostly needed to setup paths for testing.
+ */
+
+static int
+QualifyPath(
+    const char *szPath)
+{
+    char szCwd[MAX_PATH + 1];
+    char szTmp[MAX_PATH + 1];
+    char *p;
+    GetCurrentDirectory(MAX_PATH, szCwd);
+    while ((p = strchr(szPath, '/')) && *p)
+	*p = '\\';
+    PathCombine(szTmp, szCwd, szPath);
+    PathCanonicalize(szCwd, szTmp);
+    printf("%s\n", szCwd);
     return 0;
 }
 

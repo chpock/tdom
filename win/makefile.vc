@@ -278,11 +278,11 @@ cflags = $(cflags) -DUSE_TK_STUBS
 !endif
 !endif
 
-DEFS            =-DHAVE_MEMMOVE -DXML_DTD -DXML_NS -DTDOM_NO_UNKNOWN_CMD
+DEFS            =-DHAVE_MEMMOVE=1 -DXML_DTD=1 -DXML_NS=1 -DTDOM_NO_UNKNOWN_CMD=1
 DEFS_EXPAT	=-DXMLIMPORT=__declspec(dllexport)
 INCLUDES	= -I"$(WINDIR)" -I"$(GENERICDIR)" -I"$(EXPATDIR)" $(TCL_INCLUDES)
 !if "$(GUMBODIR)" != ""
-DEFS     = $(DEFS) -DTDOM_HAVE_GUMBO
+DEFS     = $(DEFS) -DTDOM_HAVE_GUMBO=1
 INCLUDES = $(INCLUDES) -I"$(GUMBODIR)\src"
 !endif
 BASE_CFLAGS	= $(cflags) $(cdebug) $(crt) $(INCLUDES)
@@ -492,7 +492,7 @@ install-docs:
 
 clean:
 	@if exist $(TMP_DIR)\nul $(RMDIR) $(TMP_DIR)
-	@if exist $(WINDIR)\version.vc del $(WINDIR)\version.vc
+	@if exist $(WINDIR)\versions.vc del $(WINDIR)\versions.vc
 	@if exist $(WINDIR)\vercl.i del $(WINDIR)\vercl.i
 	@if exist $(WINDIR)\vercl.x del $(WINDIR)\vercl.x
 	@if exist $(WINDIR)\_junk.pch del $(WINDIR)\_junk.pch

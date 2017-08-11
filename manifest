@@ -1,5 +1,5 @@
-C Remove\sHAVE_MEMMOVE\sdef\sas\salready\spassed\son\scommand\sline
-D 2017-08-11T14:22:11.153
+C Updated\snmakehlp.c\sto\slatest\sversion\sfrom\sTcl\srepo.\nFix\sdefines\sin\smakefile.vc\sto\smatch\sthose\sin\sUnix\sconfigure.
+D 2017-08-11T14:24:11.897
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -234,10 +234,10 @@ F tests/xslt.test 5863a9a228ceb7e8cf03888068b3d1e0f7b883b7
 F unix/CONFIG 789192e463910e1b9dd7e65f6338390d2bf1f68a
 F unix/tclAppInit.c a1655c51127aed18d069010f234a378fceacb2a6
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F win/makefile.vc 69ab1aebbafbbf1b8c284b045413ce7bc2f784a2
+F win/makefile.vc 21e54e363291f33946ae0bd917712314ca4fcefc
 F win/makefile805.vc da2003745caf522d88f27fcebadd916c1d5c042d
 F win/mkd.bat 85d3fe58ce051a778447fb2bfc7384867d21cef0
-F win/nmakehlp.c 604c15fe6ebf3bb5f1cf54dd43801b9ae89fd653
+F win/nmakehlp.c de6445b4bc73d55651ceabfbbf46b96e00d0c6a9
 F win/pkgIndex.tcl 95f43bef978a72e8ceda0c97edac4ed8333b2327
 F win/rules.vc 1038eef57578ab6eb5ea1e33289788b8875a369b
 F win/tdom.rc 46fe2071b1b93040adeb66d98da6b72d270055c7
@@ -245,8 +245,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 326758aa508e822410fde3797f938f41b6db6e24
-R c2dae154ba9c40f6df7218ea739e457c
+P 56564f04e357947ae4323b248e34366c7ad2510c
+R f0fcdedc3ae083af5e78fa7009236e88
 U apnadkarni
-Z 738811cf394f024c552eba3a88ca1cc4
+Z a79aad46c274aabd1d6ec145e5c78e09
 # Remove this line to create a well-formed Fossil manifest.
