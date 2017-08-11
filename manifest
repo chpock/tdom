@@ -1,5 +1,5 @@
-C Updated\snmakehlp.c\sto\slatest\sversion\sfrom\sTcl\srepo.\nFix\sdefines\sin\smakefile.vc\sto\smatch\sthose\sin\sUnix\sconfigure.
-D 2017-08-11T14:24:11.897
+C Bring\sWindows\sbuild\sinto\sthe\smodern\sage.
+D 2017-08-11T14:25:37.675
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -113,14 +113,15 @@ F extensions/tnc/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
 F extensions/tnc/configure 1dde3eac56f5775e7251643f7e3c34caf32fafe5 x
 F extensions/tnc/configure.in dd21abf5e009277f508ffae78c8f656a302bb3d8
 F extensions/tnc/install-sh bdd5e293591621ae60d9824d86a4b1c5f22c3d00 x
-F extensions/tnc/makefile.vc c8d5523cb2a2ced5fd41831e122f32e40df98d76
 F extensions/tnc/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
 F extensions/tnc/pkgIndex.tcl.in 6c224c2cdbb494f621ec008f96fe4a552a79a7b7
 F extensions/tnc/test.tcl 545cdec17e6702cef9f79184fdf1ce0166b8c412
 F extensions/tnc/tests/all.tcl 845c9dab65c294c3570f69cc731d6fef62efbd03
 F extensions/tnc/tests/loadtnc.tcl 9472a546f30972f5ea6d16880ed57e709556ce88
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
-F extensions/tnc/tnc.c e30dc44a8be8b99c9772daf5cafb3714d8550c37
+F extensions/tnc/tnc.c 83eea8ff3a6d3423ffb3bc1598267a7e771ec931
+F extensions/tnc/win/makefile.vc 69e91d0df94f31ef30376555f9d38d5126a6c2e7
+F extensions/tnc/win/nmakehlp.c de6445b4bc73d55651ceabfbbf46b96e00d0c6a9
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
 F generic/dom.c 910ea5c7d1a3de5a71afd640d4e30d417ef218bf
 F generic/dom.h 6e967a3b38384b60e7dde1d856b2ee305e7ab6f2
@@ -245,8 +246,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 56564f04e357947ae4323b248e34366c7ad2510c
-R f0fcdedc3ae083af5e78fa7009236e88
+P 845339cedef78fe8da98128c1f5a35b8831addae
+R cde9cba448cda480ae6b36af7fcb0059
 U apnadkarni
-Z a79aad46c274aabd1d6ec145e5c78e09
+Z c0cf43873f6fa3468f22de41e3e464c4
 # Remove this line to create a well-formed Fossil manifest.
