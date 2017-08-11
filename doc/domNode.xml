@@ -150,9 +150,11 @@ attribute is not available <m>defaultValue</m> is returned.</desc>
         <command><method>setAttribute</method> <m>attributeName newValue 
 ?attributeName newValue ...?</m></command>
         <desc>Sets the value for one or more attributes. Every
-<m>attributeName</m> is set to the corresponding <m>newValue</m>. If there
-isn't an attribute for one or more of the <m>attributeName</m> this will
-create that attribute.</desc>
+        <m>attributeName</m> is set to the corresponding
+        <m>newValue</m>. If there isn't an attribute for one or more
+        of the <m>attributeName</m> this will create that attribute.
+        It is not recommended to set attributes that look like xml
+        namespace declarations.</desc>
 
       </commanddef>
 
@@ -195,18 +197,9 @@ method has the same effect as the method <b>setAttribute</b>.</p>
 
         <example>$node setAttributeNS "" attri "some Value"</example>
 
-<p>XML namespace nodes are not in any namespace. Set them this way:</p>
-
-        <example>$node setAttributeNS "" xmlns:myprefix "myNamespaceURI"
-$node setAttributeNS "" xmlns "newDefaultNamespace"</example>
-
-<p>If your <m>qualifiedName</m> has the prefix "xml" and you give the empty
-string as <m>uri</m>, the namespace of the attribute defaults to
-"http://www.w3.org/XML/1998/namespace", as the DOM 2 recommendation
-requests. With the exceptions of the special prefixes "xmlns" and "xml" you
+<p>With the exceptions of the special prefixes "xmlns" and "xml" you
 always must provide a non emtpy <m>uri</m>, if your <m>qualifiedName</m> has a
-prefix.</p>
-        </desc>
+prefix. It is not recommended to set xml namespace declarations. The effects are complicated and not always obvious up to resulting a not well-formed serializations after further processing.</p></desc>
       </commanddef>
 
       <commanddef>
