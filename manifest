@@ -1,5 +1,5 @@
-C Merge\strunk\sand\sfix\spkgIndex.tcl\sgeneration
-D 2017-08-10T17:34:13.220
+C Statically\slink\sgumbo\son\sWindows
+D 2017-08-11T10:41:48.305
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -9,7 +9,7 @@ F README 898b19870f39b3014ede29f6e5ea8db1f592e429
 F README.AOL a4faf5f85723467a8d8ca406f8aca855a18441b1
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/xslt.tcl ac4a75ba2f05e26d4ea6f92547983caa80fc6d55
-F configure 1ba852b24a07ab64c0680ac3cba8d1b54a20484f x
+F configure 9202fe1dff635c4b76f0db3af9015870a8c6c788 x
 F configure-tcl8.0.5 db1a666545d519c42e229d245224d456a84c798a x
 F configure.in 4fbc61995c0b135ef502906a58d63009c447e542
 F doc/INDEX.MAP c8e767983bcea4bbd53ecdbf3d78cb044996e9bc
@@ -180,7 +180,7 @@ F macosx/README 90fbbcf96747374a4c4a7b97766f0c6bafa7780e
 F tclconfig/README.txt 180f4215d59309ec5645aa5f4565557dac484945
 F tclconfig/install-sh bdd5e293591621ae60d9824d86a4b1c5f22c3d00 x
 F tclconfig/tcl.m4 77652577e7a7c2ca5656a93e6fbfd61614846893
-F tdom.m4 9a3e067dda9db0182e8b8ed11c0f1058718992c5
+F tdom.m4 81a564c068e2bb0a3b213bdf3d8096300b6ffd2d
 F tdomConfig.sh.in 5756c6b431179e49852a607cc2ca01e5381da905
 F tests/JSONTestSuite.tcl 907228f9bd31855951b9033df74c9c15778765af
 F tests/OASIS-suite.tcl 428c0f45f780f5f942c46babd9287277ad0caaed
@@ -245,8 +245,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ed206ab786bd29db14fdedf4a41e23bb5a23482a f02dd1b31994cc44c1a67edb9dd1892adb8e75de
-R 5f9de5c144f25cc210682b469837a615
+P 50a1e5725f1d2d1f28b3ca6b7718416567a79e92
+R 9175379e9fab519e40201823a546b753
 U apnadkarni
-Z 70d5c0fba63e9e6a998f00a901f600ec
+Z 1cfd18fc177f7cc7466ea8021322be2d
 # Remove this line to create a well-formed Fossil manifest.
