@@ -1,5 +1,5 @@
-C Statically\slink\sgumbo\son\sWindows
-D 2017-08-11T10:41:48.305
+C Remove\sHAVE_MEMMOVE\sdef\sas\salready\spassed\son\scommand\sline
+D 2017-08-11T14:22:11.153
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -79,7 +79,7 @@ F expat/latin1tab.h a0655f4fc2de3cc5993319b0fcad636a906ca885
 F expat/macconfig.h 87e972880ef8ef8271c5ce1eb79662e1638290db
 F expat/nametab.h 7ebf9a02f20fe58ad2e6d0488acd620b1f534e9e
 F expat/utf8tab.h 4dc893a1f5286443647d5b5674774e13c8e21a11
-F expat/winconfig.h edadcc3d4d825c6cd95dc9480200813d3a5ffc70
+F expat/winconfig.h 7758510f42e0a91bfafd127979da608f7a1874af
 F expat/xmlparse.c 89a41335b1fbf6836db6189055245771e09fd90f
 F expat/xmlrole.c ee105982a223c04b4c25836c915b495d4c23ef5a
 F expat/xmlrole.h dce455a07e6f1e8958e0b0c4ae403c205a9c78f5
@@ -245,8 +245,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 50a1e5725f1d2d1f28b3ca6b7718416567a79e92
-R 9175379e9fab519e40201823a546b753
+P 326758aa508e822410fde3797f938f41b6db6e24
+R c2dae154ba9c40f6df7218ea739e457c
 U apnadkarni
-Z 1cfd18fc177f7cc7466ea8021322be2d
+Z 738811cf394f024c552eba3a88ca1cc4
 # Remove this line to create a well-formed Fossil manifest.
