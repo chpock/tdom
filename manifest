@@ -1,5 +1,5 @@
-C Hide\simplemention\sdetails\sbehind\swarning\sin\sdocumentation.
-D 2017-08-11T22:41:41.393
+C Minor\scode\scleanup:\sremoved\scheck\sfor\sa\scondition\swhich\sis\salways\strue.
+D 2017-08-12T19:57:01.737
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -135,7 +135,7 @@ F generic/domjson.h b10c42af9ef7fc9d0ad4fac733ef6461df0cdd90
 F generic/domlock.c b9543b7f1066118a5bcd0d2fa30acda6d247f15a
 F generic/domxpath.c 7ca875b87f03c51f4952a6a640b55a62c1dfb181
 F generic/domxpath.h 5481cdcb9248c50fb99cfba6d602572453897938
-F generic/domxslt.c 4584b45fe757aeebc622558c151a9d2329466260
+F generic/domxslt.c 8d68ab5a71fcdc93b4c8ebfe2f017143a7c4acb6
 F generic/domxslt.h c068da9c518ad5e2a543874c18166065f0bf2bbc
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -245,8 +245,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f02dd1b31994cc44c1a67edb9dd1892adb8e75de
-R f70f763ed7411884171d928cca30f5fd
+P e6f379b2f560ed2a30ccbfa58a6e78df2136b153
+R 4365a0b27489880a55f31294f843c4a5
 U rolf
-Z 9f89098fd07fc9ee3c40059e54af6c5b
+Z a713cefdc673e0c9205ce2eb2668506b
 # Remove this line to create a well-formed Fossil manifest.
