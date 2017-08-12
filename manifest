@@ -1,5 +1,5 @@
-C Bring\sWindows\sbuild\sinto\sthe\smodern\sage.
-D 2017-08-11T14:25:37.675
+C Integrate\sGumbo\sinto\sVS\s2017\sbuilds.
+D 2017-08-12T09:35:33.901
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -235,7 +235,7 @@ F tests/xslt.test 5863a9a228ceb7e8cf03888068b3d1e0f7b883b7
 F unix/CONFIG 789192e463910e1b9dd7e65f6338390d2bf1f68a
 F unix/tclAppInit.c a1655c51127aed18d069010f234a378fceacb2a6
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F win/makefile.vc 21e54e363291f33946ae0bd917712314ca4fcefc
+F win/makefile.vc 456db08753d6b376204b207780c72eed0eb0dc46
 F win/makefile805.vc da2003745caf522d88f27fcebadd916c1d5c042d
 F win/mkd.bat 85d3fe58ce051a778447fb2bfc7384867d21cef0
 F win/nmakehlp.c de6445b4bc73d55651ceabfbbf46b96e00d0c6a9
@@ -246,8 +246,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 845339cedef78fe8da98128c1f5a35b8831addae
-R cde9cba448cda480ae6b36af7fcb0059
+P 31019684aa157ff6bd46ce91614b715b83fad31c
+R 1f1ed2d51b130fc091ff7f0cb2aac08b
 U apnadkarni
-Z c0cf43873f6fa3468f22de41e3e464c4
+Z 9d70e8765a8bf85c7bfcaae0fe214b89
 # Remove this line to create a well-formed Fossil manifest.
