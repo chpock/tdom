@@ -1,5 +1,5 @@
-C createNodeCmd:\sFixed\sarg\schecking\sof\s-jsonType\sfor\stext\snodes.
-D 2017-08-14T22:34:21.219
+C New\soption\s-namespace\sfor\screateNodeCmd\selementNode:\sthe\sby\sthis\scmd\screated\snodes\swill\sbe\sXML\snamespaced\s(and\sfor\sthe\snamespace\sdeclarations\sis\scared\sfor\syou).
+D 2017-08-14T23:57:06.775
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -139,7 +139,7 @@ F generic/domxslt.c 8d68ab5a71fcdc93b4c8ebfe2f017143a7c4acb6
 F generic/domxslt.h c068da9c518ad5e2a543874c18166065f0bf2bbc
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F generic/nodecmd.c a6be897f4495040f03c1f4f7666d68e21b3ef9c3
+F generic/nodecmd.c 248bb4d00e2e1a06ea06fd773145f99f52c29dd5
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
 F generic/tcldom.c 200ff0e388552f1c15ef0f5ec2f7a2d2f4bcef8c
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
@@ -212,13 +212,13 @@ F tests/dom.test f0edf516498f20826ae87c2344ab7127fba85891
 F tests/domDoc.test 19a23398be6a4639153ce6d91f94cc177363f9d3
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test ad13f0c2900def74f0f2f238f61ff8c693d57a42
-F tests/domnamespace.test 5acffd96d0315c77efb011dae06e1c000c5b7db6
+F tests/domjson.text d048529181a57378e273e0d4a028d5f3ab553b62 w tests/jsonreader.test
+F tests/domnamespace.test 3cff0cc27e2b9a82503c4c5bc8d8e767a38c94c4
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
 F tests/html5reader.test f839da02dd4b1227a2ee3bae9abfba983951d9ad
 F tests/htmlreader.test 0fffea0d73efb2ccf5e3a807e68b437f55a152d2
 F tests/i18n.test 085cc18a881d5d6952267c28cd319dcc72aadbd1
-F tests/jsonreader.test d048529181a57378e273e0d4a028d5f3ab553b62
 F tests/loadtdom.tcl bf298e4effa2a7de7380687911994f762c0f0c84
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
 F tests/parser.test 5bc2a09293d5dbb3d9c3af8fd4a7c57a3fb78212
@@ -245,8 +245,11 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P dcb4735ca9984383b8e9096dfec2f2743ae1b93e
-R 249611545547b4f29a2d4b8f494a507e
+P f77454e666df95eda3f32414f8ac4d3e91f8f692
+R e46f765b77668392b41681ce26978481
+T *branch * nodecmdns
+T *sym-nodecmdns *
+T -sym-trunk *
 U rolf
-Z 44518e68c44cfe37d696f3acfec818aa
+Z 70d33870f4155be9f4c2f0192bb55b78
 # Remove this line to create a well-formed Fossil manifest.

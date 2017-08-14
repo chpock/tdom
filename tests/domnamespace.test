@@ -6,6 +6,7 @@
 #    domnamespace-1.*: misc tests
 #    domnamespace-2.*: moving namespaced nodes from one document to another
 #    domnamespace-3.*: moving namespaced nodes within a document
+#    domnamespace-4.*: createNodeCmd and namespaces
 #
 # Copyright (c) 2002 Rolf Ade.
 #
@@ -314,6 +315,47 @@ test domnamespace-3.1 {moving namespaced nodes within a document} {
     set result
 } {<doc><e xmlns="foo"/><e xmlns="bar"><ee xmlns="foo"/></e></doc>}
 
+
+namespace eval nodeCmds {
+    dom createNodeCmd -namespace foo.bar elementNode ns1:e1
+    dom createNodeCmd -namespace foo.bar elementNode e1
+    dom createNodeCmd textNode t
+}
+
+test domnamespace-4.1 {createNodeCmd and namespace} {
+    dom createDocument doc doc
+    $doc documentElement root
+    $root appendFromScript {
+        nodeCmds::ns1:e1 {nodeCmds::t "this"}
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc><ns1:e1 xmlns:ns1="foo.bar">this</ns1:e1></doc>}
+
+test domnamespace-4.2 {createNodeCmd and namespace} {
+    dom createDocumentNS foo.bar ns1:doc doc
+    $doc documentElement root
+    $root appendFromScript {
+        nodeCmds::ns1:e1 {nodeCmds::t "this"}
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc xmlns:ns1="foo.bar"><ns1:e1>this</ns1:e1></doc>}
+
+test domnamespace-4.3 {createNodeCmd and namespace} {
+    dom createDocumentNS foo.bar doc doc
+    $doc documentElement root
+    $root appendFromScript {
+        nodeCmds::ns1:e1 {nodeCmds::t "this"}
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc xmlns="foo.bar"><ns1:e1 xmlns:ns1="foo.bar">this</ns1:e1></doc>}
+
+    
 # cleanup
 ::tcltest::cleanupTests
 return
