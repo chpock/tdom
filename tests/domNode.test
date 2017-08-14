@@ -3329,7 +3329,7 @@ test domNode-38.3 {toXPath - syntax} -setup {
     set errMsg
 } -cleanup {
     $doc delete
-} -match regexp -result {wrong # args: should be "domNode0x[[:xdigit:]]+ toXPath \?-legacy\?"}
+} -match regexp -result {wrong # args: should be "domNode(0x)?[[:xdigit:]]+ toXPath \?-legacy\?"}
 
 test domNode-38.4 {toXPath - default xml namespace} -setup {
     set doc [dom parse {<root><foo xmlns="foo"/><foo/></root>}]

@@ -178,6 +178,7 @@ DLLOBJS = \
 	$(TMP_DIR)\nodecmd.obj     \
 	$(TMP_DIR)\domxpath.obj    \
 	$(TMP_DIR)\domlock.obj     \
+	$(TMP_DIR)\domjson.obj     \
 	$(TMP_DIR)\tclexpat.obj    \
 	$(TMP_DIR)\tcldom.obj      \
 	$(TMP_DIR)\tdomStubInit.obj\

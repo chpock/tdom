@@ -7068,15 +7068,13 @@ xsltFreeState (
     }
     Tcl_DeleteHashTable(&xs->formats);
 
-    if (&xs->topLevelVars) {
-        for (entryPtr = Tcl_FirstHashEntry(&xs->topLevelVars, &search);
-             entryPtr != (Tcl_HashEntry*) NULL;
-             entryPtr = Tcl_NextHashEntry(&search)) {
-            tlv = (xsltTopLevelVar *) Tcl_GetHashValue (entryPtr);
-            FREE(tlv);
-        }
-        Tcl_DeleteHashTable (&xs->topLevelVars);
+    for (entryPtr = Tcl_FirstHashEntry(&xs->topLevelVars, &search);
+         entryPtr != (Tcl_HashEntry*) NULL;
+         entryPtr = Tcl_NextHashEntry(&search)) {
+        tlv = (xsltTopLevelVar *) Tcl_GetHashValue (entryPtr);
+        FREE(tlv);
     }
+    Tcl_DeleteHashTable (&xs->topLevelVars);
 
     /*--- free key definition information ---*/
     for (entryPtr = Tcl_FirstHashEntry (&xs->keyInfos, &search);
