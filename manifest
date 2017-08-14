@@ -1,5 +1,5 @@
-C Merged\strunk
-D 2017-08-12T10:07:07.289
+C FULLWARNINGS\snot\sneeded\sanymore
+D 2017-08-14T12:47:40.814
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -235,19 +235,19 @@ F tests/xslt.test 5863a9a228ceb7e8cf03888068b3d1e0f7b883b7
 F unix/CONFIG 789192e463910e1b9dd7e65f6338390d2bf1f68a
 F unix/tclAppInit.c a1655c51127aed18d069010f234a378fceacb2a6
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F win/makefile.vc 456db08753d6b376204b207780c72eed0eb0dc46
+F win/makefile.vc 380db1ec35dae93d5cfce241fce04ec2dd8c327b
 F win/makefile805.vc da2003745caf522d88f27fcebadd916c1d5c042d
 F win/mkd.bat 85d3fe58ce051a778447fb2bfc7384867d21cef0
 F win/nmakehlp.c de6445b4bc73d55651ceabfbbf46b96e00d0c6a9
 F win/pkgIndex.tcl 95f43bef978a72e8ceda0c97edac4ed8333b2327
-F win/rules.vc 1038eef57578ab6eb5ea1e33289788b8875a369b
+F win/rules.vc 67821c2e92e5b10237df2fe4d197b2bd09fda001
 F win/tdom.rc 46fe2071b1b93040adeb66d98da6b72d270055c7
 F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 646cc2b4d657a05d503462d9848128329de8d0b1 e6f379b2f560ed2a30ccbfa58a6e78df2136b153
-R 61579f5d566da0c96a7804ad1cb93914
+P 7161d9dfd7f71395cc5f77ad7a66d87d279733a0
+R ba686656f85f69c657b3e1ebcb602ce8
 U apnadkarni
-Z f3f3974f5b1060575a693f565698e41c
+Z f4ca35443b3c8c48339388c5ab434140
 # Remove this line to create a well-formed Fossil manifest.

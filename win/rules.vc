@@ -417,7 +417,7 @@ TCL_COMPILE_DEBUG   = 0
 
 !if "$(CHECKS)" == "" || [nmakehlp -f "$(CHECKS)" "none"]
 TCL_NO_DEPRECATED	    = 0
-FULLWARNINGS		    = 0
+WARNINGS		    = -W3
 !else
 !if [nmakehlp -f $(CHECKS) "nodep"]
 !message *** Doing nodep check
