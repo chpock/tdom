@@ -668,6 +668,7 @@ nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
                               "argument must be one out of this list: "
                               "TRUE FALSE NULL NUMBER STRING NONE",
                               NULL);
+                return TCL_ERROR;
             }
             type = TEXT_NODE;
         }

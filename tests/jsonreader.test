@@ -469,3 +469,7 @@ test json-8.4 {appendFromScript - text node with type NUMBER} {
     $doc delete
     set result
 } {["",0,123456789012345678901234567890.12345679e-0003,"42 "," 42","-"]}
+
+test json-8.5 {createNodeCmd - wrong jsonType} {
+    catch {dom createNodeCmd -jsonType OBJECT textNode textNodeWithJsonTypeObject}
+} 1
