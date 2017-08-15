@@ -1,5 +1,5 @@
-C createNodeCmd:\sFixed\sarg\schecking\sof\s-jsonType\sfor\stext\snodes.
-D 2017-08-14T22:34:21.219
+C Changed\sslightly\sthe\sformat\sof\sthe\soutput\sof\sthe\sparsed\stokens\swithin\sthe\serror\smsg\sin\ssyntactically\swrong\sxpath\sexpressions,\sbecause\sthe\sup\sto\snow\sformat\swasn't\sthe\ssame\son\sdifferent\splatforms.\sRenamed\sthe\sjson\stest\sfile;\sthe\stests\scover\smore\sthan\sjust\sparsing\sjson.
+D 2017-08-15T20:59:05.844
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -133,7 +133,7 @@ F generic/domhtml5.h 5cca562a556e7662f2dce222640c32abb2777146
 F generic/domjson.c a0fc3dfb64039df70fbebe3a97ecc9bac902f30c
 F generic/domjson.h b10c42af9ef7fc9d0ad4fac733ef6461df0cdd90
 F generic/domlock.c b9543b7f1066118a5bcd0d2fa30acda6d247f15a
-F generic/domxpath.c 7ca875b87f03c51f4952a6a640b55a62c1dfb181
+F generic/domxpath.c b15b79bd5ac09ba2a272890b030e1cf856972902
 F generic/domxpath.h 5481cdcb9248c50fb99cfba6d602572453897938
 F generic/domxslt.c 8d68ab5a71fcdc93b4c8ebfe2f017143a7c4acb6
 F generic/domxslt.h c068da9c518ad5e2a543874c18166065f0bf2bbc
@@ -212,13 +212,13 @@ F tests/dom.test f0edf516498f20826ae87c2344ab7127fba85891
 F tests/domDoc.test 19a23398be6a4639153ce6d91f94cc177363f9d3
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test ad13f0c2900def74f0f2f238f61ff8c693d57a42
+F tests/domjson.test d048529181a57378e273e0d4a028d5f3ab553b62 w tests/jsonreader.test
 F tests/domnamespace.test 5acffd96d0315c77efb011dae06e1c000c5b7db6
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
 F tests/html5reader.test f839da02dd4b1227a2ee3bae9abfba983951d9ad
 F tests/htmlreader.test 0fffea0d73efb2ccf5e3a807e68b437f55a152d2
 F tests/i18n.test 085cc18a881d5d6952267c28cd319dcc72aadbd1
-F tests/jsonreader.test d048529181a57378e273e0d4a028d5f3ab553b62
 F tests/loadtdom.tcl bf298e4effa2a7de7380687911994f762c0f0c84
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
 F tests/parser.test 5bc2a09293d5dbb3d9c3af8fd4a7c57a3fb78212
@@ -229,8 +229,8 @@ F tests/tdomcmd.test b3ec8a3f2c99305aae381989727ac707db2dea58
 F tests/xmlsimple.test b9ca923fb971af2b6170f35a887922e488db928d
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.bench 41d24b5b9b7b4593d002b3c6486cd36061f823bb
-F tests/xpath.test 1441124b0016eb0ff3d10d0c1d7ea127e47f09e5
-F tests/xslt.test 5863a9a228ceb7e8cf03888068b3d1e0f7b883b7
+F tests/xpath.test ce2970735550f97caddd94effbd3bb32ad76333f
+F tests/xslt.test d087ac314ffcd643169522a9424615135f4ecb57
 F unix/CONFIG 789192e463910e1b9dd7e65f6338390d2bf1f68a
 F unix/tclAppInit.c a1655c51127aed18d069010f234a378fceacb2a6
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -245,8 +245,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P dcb4735ca9984383b8e9096dfec2f2743ae1b93e
-R 249611545547b4f29a2d4b8f494a507e
+P f77454e666df95eda3f32414f8ac4d3e91f8f692
+R dbe9a2f753af8a86919d203d4ba0ba52
 U rolf
-Z 44518e68c44cfe37d696f3acfec818aa
+Z 17e330536fe20cd7d957c45bb7bd8b5b
 # Remove this line to create a well-formed Fossil manifest.
