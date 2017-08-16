@@ -1399,6 +1399,24 @@ test domDoc-25.7 {selectNodesNamespaces} {
     set result
 } {{} elem1 elem11 {}}
 
+test domDoc-25.7.1 {selectNodesNamespaces} {
+    set doc [dom parse {<root xmlns="rootdefaultNS">
+        <elem1 xmlns="elem1NS"/>
+        <elem2 xmlns="elem2NS"/>
+        </root>}]
+    $doc documentElement root
+    $root firstChild elem1
+    $doc createElement elem11 elem11
+    $elem1 appendChild $elem11
+    $doc selectNodesNamespaces {default2 elem1NS default1 rootdefaultNS}
+    set node [$doc selectNodes default1:root/default2:elem1]
+    set result [list [$node prefix] [$node localName]]
+    set node [$doc selectNodes default1:root/default2:elem1/elem11]
+    lappend result [$node nodeName] [$node namespaceURI]
+    $doc delete
+    set result
+} {{} elem1 elem11 {}}
+
 test domDoc-25.8 {selectNodesNamespaces} {
     set doc [dom parse {<root xmlns="rootdefaultNS">
         <elem1 xmlns="elem1NS"><elem11 xmlns=""/></elem1>

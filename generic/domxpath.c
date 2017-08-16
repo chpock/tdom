@@ -2376,7 +2376,10 @@ int xpathNodeTest (
                 (step->child->strvalue[1] == '\0') &&
                 (node->ownerDocument->rootNode != node) &&
                 (step->child->intvalue == 0)) return 1;
-            if (node->namespace) return 0;
+            if (node->namespace
+                && (node->ownerDocument->namespaces[node->namespace-1]->prefix[0] != '\0'
+                    || node->ownerDocument->namespaces[node->namespace-1]->uri[0] != '\0')
+                ) return 0;
             return (strcmp(node->nodeName, step->child->strvalue)==0);
         }
         return 0;

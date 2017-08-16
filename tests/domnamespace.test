@@ -320,6 +320,7 @@ namespace eval nodeCmds {
     dom createNodeCmd -namespace foo.bar elementNode ns1:e1
     dom createNodeCmd -namespace foo.bar elementNode e1
     dom createNodeCmd textNode t
+    dom createNodeCmd -tagName e1 elementNode e1NoNS
 }
 
 test domnamespace-4.1 {createNodeCmd and namespace} {
@@ -342,7 +343,7 @@ test domnamespace-4.2 {createNodeCmd and namespace} {
     set result [$doc asXML -indent none]
     $doc delete
     set result
-} {<doc xmlns:ns1="foo.bar"><ns1:e1>this</ns1:e1></doc>}
+} {<ns1:doc xmlns:ns1="foo.bar"><ns1:e1>this</ns1:e1></ns1:doc>}
 
 test domnamespace-4.3 {createNodeCmd and namespace} {
     dom createDocumentNS foo.bar doc doc
@@ -354,6 +355,32 @@ test domnamespace-4.3 {createNodeCmd and namespace} {
     $doc delete
     set result
 } {<doc xmlns="foo.bar"><ns1:e1 xmlns:ns1="foo.bar">this</ns1:e1></doc>}
+
+test domnamespace-4.4 {createNodeCmd and namespace} {
+    dom createDocumentNS foo.bar doc doc
+    $doc documentElement root
+    $root appendFromScript {
+        nodeCmds::e1 {
+            nodeCmds::e1NoNS att attValue {nodeCmds::t "this"}
+        }
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc xmlns="foo.bar"><e1><e1 xmlns="" att="attValue">this</e1></e1></doc>}
+
+test domnamespace-4.5 {createNodeCmd and namespace} {
+    dom createDocumentNS foo.bar doc doc
+    $doc documentElement root
+    $root appendFromScript {
+        nodeCmds::e1 {
+            nodeCmds::e1NoNS att attValue {nodeCmds::t "this"}
+        }
+    }
+    set result [$doc selectNodes -namespaces {fb foo.bar} string(/fb:doc/fb:e1/e1/@att)]
+    $doc delete
+    set result
+} {attValue}
 
     
 # cleanup
