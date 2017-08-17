@@ -1650,9 +1650,9 @@ int tcldom_selectNodes (
     char          *xpathQuery, *typeVar, *option;
     char          *errMsg = NULL, **mappings = NULL;
     int            rc, i, len, optionIndex, localmapping = 0, cache = 0;
-    int            mappingListObjLen;
+    int            mappingListObjLen = 0;
     xpathResultSet rs;
-    Tcl_Obj       *type, *objPtr, *objPtr1, *mappingListObj;
+    Tcl_Obj       *type, *objPtr, *objPtr1, *mappingListObj = NULL;
     xpathCBs       cbs;
     xpathParseVarCB parseVarCB;
 

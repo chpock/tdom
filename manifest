@@ -1,5 +1,5 @@
-C Changed\sslightly\sthe\sformat\sof\sthe\soutput\sof\sthe\sparsed\stokens\swithin\sthe\serror\smsg\sin\ssyntactically\swrong\sxpath\sexpressions,\sbecause\sthe\sup\sto\snow\sformat\swasn't\sthe\ssame\son\sdifferent\splatforms.\sRenamed\sthe\sjson\stest\sfile;\sthe\stests\scover\smore\sthan\sjust\sparsing\sjson.
-D 2017-08-15T20:59:05.844
+C Pacify\scompiler\swarnings.
+D 2017-08-17T00:15:51.356
 F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
 F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -141,7 +141,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c a6be897f4495040f03c1f4f7666d68e21b3ef9c3
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
-F generic/tcldom.c 200ff0e388552f1c15ef0f5ec2f7a2d2f4bcef8c
+F generic/tcldom.c e58dc5d4f044e731277252d06189149707ec2541
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
 F generic/tclexpat.c 069180212797fc14bdb0a08bcd1ad3461406975c
 F generic/tclexpat.h 3fb4df4c023d1f625ec9c5783c4fc1d1e4e0b8bb
@@ -212,7 +212,7 @@ F tests/dom.test f0edf516498f20826ae87c2344ab7127fba85891
 F tests/domDoc.test 19a23398be6a4639153ce6d91f94cc177363f9d3
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test ad13f0c2900def74f0f2f238f61ff8c693d57a42
-F tests/domjson.test d048529181a57378e273e0d4a028d5f3ab553b62 w tests/jsonreader.test
+F tests/domjson.test d048529181a57378e273e0d4a028d5f3ab553b62
 F tests/domnamespace.test 5acffd96d0315c77efb011dae06e1c000c5b7db6
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
@@ -245,8 +245,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f77454e666df95eda3f32414f8ac4d3e91f8f692
-R dbe9a2f753af8a86919d203d4ba0ba52
+P 7cce9c5133aa5a9036f068a209b40bedcf5887c1
+R 27a90185f8841eb476b86550b9cc3f5a
 U rolf
-Z 17e330536fe20cd7d957c45bb7bd8b5b
+Z 38c00f2f2b9c6f09144ae928d72368a9
 # Remove this line to create a well-formed Fossil manifest.
