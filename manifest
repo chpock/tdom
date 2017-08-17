@@ -1,7 +1,7 @@
-C Integrated\snew\sfeature\s"creating\sreal\sFQ\snodes\swith\s*fromScript\smethods".
-D 2017-08-17T14:33:59.070
-F CHANGES 0b9fb727d92b7a6cdc7b16883c87055c46164089
-F ChangeLog ed778ffb441da626c234c8ae491fe630ee198fd0
+C Updated\sCHANGES.\sNoted\snew\shome\spage\sin\sChangeLog.
+D 2017-08-17T15:03:41.418
+F CHANGES 1716f58c63b78e9c0f4142bc0b94d95b201a09db
+F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 3965f5b535b48290240151057611b376495aadec
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
@@ -245,9 +245,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 59d4d6b0601006acb0665109b24acf192e2b4e2e 9e7f64d9c55116c8caa7a8f691eec2bed0211e8a
-R 8a7eaf5a5d541efb267d89c4a99222e4
-T +closed 9e7f64d9c55116c8caa7a8f691eec2bed0211e8a
+P 32afe7f8439e7f49f2277cc158f3f61907c31cbf
+R f567b436c682c6e2a045ec6b3f0c63e7
 U rolf
-Z 91eb514b964bc91c3049d519bd39bdfe
+Z ef402df13437e82dac54e5c5809fd0d2
 # Remove this line to create a well-formed Fossil manifest.
