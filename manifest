@@ -1,5 +1,5 @@
-C Regenerated\suser\sdocs\sfrom\sxml\ssources.
-D 2017-08-17T17:23:02.972
+C Regenerated\sextension\sconfigure\sfiles\safter\sTEA\supdate.
+D 2017-08-17T18:40:17.261
 F CHANGES 1716f58c63b78e9c0f4142bc0b94d95b201a09db
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -90,7 +90,7 @@ F expat/xmltok_impl.h cb8cce4d3f128dc013901010b462d852b4d4d804
 F expat/xmltok_ns.c 8aec1b3ad754d262d3b1ba44b3abb5171c3e21f8
 F extensions/example/Makefile.in fff10db0bbe3655dbf6e54ed9032fecb7d94ee9d
 F extensions/example/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
-F extensions/example/configure e0b85a7c1484c298cf43aed91b4452a3347126e7 x
+F extensions/example/configure e5a85a3026f24a0de8120e0927670617c55dba6f x
 F extensions/example/configure.in 6064e7a99c4bb1296a4f1d00949ec603895cafd4
 F extensions/example/example.c a8d16832ce63ed38438e6d0ef12299c288bce3f4
 F extensions/example/exampletest.tcl c699cc2c17a2baa598e56b2e760ddfaeb5769e8e
@@ -110,7 +110,7 @@ F extensions/tdomhtml/pkgIndex.tcl.in 2612d2a8fd5a213a1379ad5570c229d82810dcb5
 F extensions/tdomhtml/tdomhtml.tcl 7d48c19d50f203ee71b3db15d0fc6077dc244798
 F extensions/tnc/Makefile.in fff10db0bbe3655dbf6e54ed9032fecb7d94ee9d
 F extensions/tnc/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
-F extensions/tnc/configure 1dde3eac56f5775e7251643f7e3c34caf32fafe5 x
+F extensions/tnc/configure a5c3423e75665d254f3c42d9e17bfd450701fb56 x
 F extensions/tnc/configure.in dd21abf5e009277f508ffae78c8f656a302bb3d8
 F extensions/tnc/install-sh bdd5e293591621ae60d9824d86a4b1c5f22c3d00 x
 F extensions/tnc/makefile.vc c8d5523cb2a2ced5fd41831e122f32e40df98d76
@@ -245,8 +245,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 13d2b92d8432c97d1ed5a07a3f8bc681f6ccd1d4
-R fcbe251c5a67902f5154979289ff18c4
+P 7223713d86a1b1352e4b933d1a6f0e1b7c07806f
+R 9df995b089303326ecadf40144e9c3f8
 U rolf
-Z 5772a565071e7e0a8c08cbc54feadcde
+Z 109765de330300a51d62d4fc0cd7c871
 # Remove this line to create a well-formed Fossil manifest.
