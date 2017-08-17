@@ -333,7 +333,7 @@ node. <m>objVar</m> controls the memory handling as explained above.</desc>
 
         <commanddef>
           <command><cmd>dom</cmd> <method>createNodeCmd</method>
-<m>?-returnNodeCmd?</m> <m>?-tagName name?</m> <m>?-jsonType jsonType</m> <m>(element|comment|text|cdata|pi)Node</m> <m>commandName</m></command>
+<m>?-returnNodeCmd?</m> <m>?-tagName name?</m> <m>?-jsonType jsonType?</m> <m>?-namespace URI?</m> <m>(element|comment|text|cdata|pi)Node</m> <m>commandName</m></command>
           <desc>This method creates Tcl commands, which in turn create
           tDOM nodes. Tcl commands created by this command are only
           avaliable inside a script given to the domNode methods
@@ -358,14 +358,23 @@ Which type of node is created by the command is determined by the
 first argument to the <m>createNodeCmd</m>. The syntax of the created
 command depends on the type of the node it creates.</p>
 
-<p>If the first argument of the method is <m>elementNode</m>, the
-created command will create an element node, if called. Without the
+<p>If the command type to create is <m>elementNode</m>, the created
+command will create an element node, if called. Without the
 <m>-tagName</m> option the tag name of the created node is
 <m>commandName</m> without namespace qualifiers. If the
 <m>-tagName</m> option was given then the created command the created
 elements will have this tag name. If the <m>-jsonType</m> option was
-given then the created node elements will have the given JSON type.
-The syntax of the created command is:</p>
+given then the created node elements will have the given JSON type. If
+the <m>-namespace</m> option is given the created element node will be
+XML namespaced and in the namespace given by the option. The element
+name will be literal as given either by the command name or the
+<m>-tagname</m> option, if that was given. An appropriate XML
+namespace declaration will be automatically added, to bind the prefix
+(if the element name has one) or the default namespace (if the element
+name hasn't a prefix) to the namespace if such a binding isn't in
+scope.</p>
+
+<p>The syntax of the created command is:</p>
 
 <syntax>
 <cmd>elementNodeCmd</cmd> <m>?attributeName attributeValue ...? ?script?</m>

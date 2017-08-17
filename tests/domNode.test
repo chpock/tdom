@@ -397,6 +397,14 @@ test domNode-4.17 {setAttributeNS - set multiple Attribute with NS atts undermix
 } {<p1:root xmlns:p1="uri1" xmlns:p2="uri2" xmlns="uri3" xmlns:p4="uri4" p1:a1="1" p1:a2="2" p4:a1="a1" p2:a3="3" a4="4"/>
 }
 
+test domNode-4.18 {setAttributeNS - prefixed attribute name with empty namespace} {
+    set doc [dom createDocument "root"]
+    set root [$doc documentElement]
+    catch {$root setAttributeNS "" ns:att attvalue} errMsg
+    $doc delete
+    set errMsg
+} {For all prefixed attributes with prefixes other than 'xml' or 'xmlns' you have to provide a namespace URI}
+
 test domNode-5.1 {removeChild} {
     dom parse {<root><child/></root>} doc
     $doc documentElement root

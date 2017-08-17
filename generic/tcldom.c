@@ -214,7 +214,7 @@ static char dom_usage[] =
     "    attachDocument domDoc ?objVar?                   \n"
     "    detachDocument domDoc                            \n"
     )
-    "    createNodeCmd ?-returnNodeCmd? (element|comment|text|cdata|pi)Node cmdName \n"
+    "    createNodeCmd ?-returnNodeCmd? ?-tagName name? ?-jsonType jsonType? ?-namespace URI? (element|comment|text|cdata|pi)Node cmdName \n"
     "    setResultEncoding ?encodingName?                 \n"
     "    setStoreLineColumn ?boolean?                     \n"
     "    setNameCheck ?boolean?                           \n"
@@ -5590,6 +5590,10 @@ int tcldom_DocObjCmd (
             tag = Tcl_GetString(objv[3]);
             CheckName (interp, tag, "full qualified tag", 1);
             n = domNewElementNodeNS(doc, tag, uri);
+            if (n == NULL) {
+                SetResult("Missing URI in Namespace declaration");
+                return TCL_ERROR;
+            }
             return tcldom_setInterpAndReturnVar(interp, n, (objc == 5),
                                         (objc == 5) ? objv[4] : NULL);
 
