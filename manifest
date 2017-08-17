@@ -1,12 +1,12 @@
-C Merged\strunk.
-D 2017-08-17T17:58:54.150
+C Updated\sversion\snr\sat\smore\splaces.
+D 2017-08-17T18:05:32.533
 F CHANGES 1716f58c63b78e9c0f4142bc0b94d95b201a09db
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 3965f5b535b48290240151057611b376495aadec
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
 F README e56f2a815184d3c9d11f295be9774555a91bc6a2
-F README.AOL a4faf5f85723467a8d8ca406f8aca855a18441b1
+F README.AOL 376fae7d29e49ce1d889cc5980b23ebf18be974e
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/xslt.tcl ac4a75ba2f05e26d4ea6f92547983caa80fc6d55
 F configure 533b5c35c333b339d0ca078bfec3e3c2d37774e1 x
@@ -193,14 +193,14 @@ F tests/dom.test e0febcbda4b7d4f10d76302574e7e64095f347e9
 F tests/domDoc.test b69b4c7a2f6df995f399bc33147ba5e635e6398f
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test 66a77f681b6e946b88c55a72efe62d8d7e430348
-F tests/domjson.test d048529181a57378e273e0d4a028d5f3ab553b62 w tests/jsonreader.test
+F tests/domjson.test d048529181a57378e273e0d4a028d5f3ab553b62
 F tests/domnamespace.test c67346e939dab82f1b6de8ddd04bd004cf24391b
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
 F tests/html5reader.test f839da02dd4b1227a2ee3bae9abfba983951d9ad
 F tests/htmlreader.test 0fffea0d73efb2ccf5e3a807e68b437f55a152d2
 F tests/i18n.test 085cc18a881d5d6952267c28cd319dcc72aadbd1
-F tests/loadtdom.tcl bf298e4effa2a7de7380687911994f762c0f0c84
+F tests/loadtdom.tcl 0c9e5f2416ddc86a49c4643fc61984d107ba686b
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
 F tests/parser.test 5bc2a09293d5dbb3d9c3af8fd4a7c57a3fb78212
 F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
@@ -226,8 +226,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ab191039017d009cdd21abf89ed53e00e4ded713 7223713d86a1b1352e4b933d1a6f0e1b7c07806f
-R ec65686d2ba975bd6497c1ee88623dd1
+P c75669c175b2bb9416a99c752009221a1dea2a1e
+R e2958e2a1fc483cb550870603d5595ab
 U rolf
-Z 8eb4e6b89c97cab74b3348654524357b
+Z af57943cf6113b3516f87e5ca7a948dd
 # Remove this line to create a well-formed Fossil manifest.
