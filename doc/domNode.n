@@ -259,9 +259,11 @@ attribute is not available \fIdefaultValue\fR is returned.
 .TP
 \&\fB\fBsetAttribute\fP \fIattributeName newValue  ?attributeName newValue ...?\fB
 \&\fRSets the value for one or more attributes. Every
-\&\fIattributeName\fR is set to the corresponding \fInewValue\fR. If there
-isn't an attribute for one or more of the \fIattributeName\fR this will
-create that attribute.
+\&\fIattributeName\fR is set to the corresponding
+\&\fInewValue\fR. If there isn't an attribute for one or more
+of the \fIattributeName\fR this will create that attribute.
+It is not recommended to set attributes that look like xml
+namespace declarations.
 .TP
 \&\fB\fBremoveAttribute\fP \fIattributeName\fB
 \&\fRRemoves the attribute \fIattributeName\fR.
@@ -304,21 +306,9 @@ method has the same effect as the method \fBsetAttribute\fR.
 $node setAttributeNS "" attri "some Value"
 .CE
 .PP
-XML namespace nodes are not in any namespace. Set them this way:
-
-
-        
-.CS
-$node setAttributeNS "" xmlns:myprefix "myNamespaceURI"
-$node setAttributeNS "" xmlns "newDefaultNamespace"
-.CE
-.PP
-If your \fIqualifiedName\fR has the prefix "xml" and you give the empty
-string as \fIuri\fR, the namespace of the attribute defaults to
-"http://www.w3.org/XML/1998/namespace", as the DOM 2 recommendation
-requests. With the exceptions of the special prefixes "xmlns" and "xml" you
+With the exceptions of the special prefixes "xmlns" and "xml" you
 always must provide a non emtpy \fIuri\fR, if your \fIqualifiedName\fR has a
-prefix.
+prefix. It is not recommended to set xml namespace declarations. The effects are complicated and not always obvious up to resulting a not well-formed serializations after further processing.
 .RE
 .TP
 \&\fB\fBremoveAttributeNS\fP \fIuri\fB \fIlocalName\fB
