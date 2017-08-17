@@ -118,6 +118,39 @@ test dom-1.15 {createDocument - rename the doc cmd} {
     expr {[llength [info commands]] == $nrOfCommands}
 } {1}
 
+test dom-1.16 {createDocumentNS - empty namespace, no prefix} {
+    dom createDocumentNS "" doc doc
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc/>}
+
+test dom-1.17 {createDocumentNS -  namespace, no prefix} {
+    dom createDocumentNS "uri" doc doc
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc xmlns="uri"/>}
+
+test dom-1.18 {createDocumentNS -  namespace, no prefix} {
+    dom createDocumentNS "uri" doc doc
+    set result [$doc selectNodes -namespaces {ns uri} count(/ns:doc)]
+    $doc delete
+    set result
+} 1
+
+test dom-1.19 {createDocumentNS - namespace, prefix} {
+    dom createDocumentNS "uri" n1:doc doc
+    set result [$doc selectNodes -namespaces {ns uri} count(/ns:doc)]
+    $doc delete
+    set result
+} 1
+
+test dom-1.20 {createDocumentNS - empty namespace, prefix} {
+    catch {dom createDocumentNS "" n1:doc doc} errMsg
+    set errMsg
+} {Missing URI in Namespace declaration}
+
 test dom-2.1 {Don't quash white space at start or end of non white space content} {
     set doc [dom parse {<root>
     some content
@@ -489,7 +522,7 @@ test dom-2.28 {parse document with undeclared xml prefix} {
 
 # This is an expat bug. If XML_StopParser is called in the
 # elementstarthandler function for the document element and there
-# isn't anything else in the document then this document element, then
+# isn't anything else in the document than this document element, then
 # the XML_Parse() return code doesn't reflects this. This is an edge
 # case, see the next test below.
 test dom-2.29 {parse not well-formed document with undeclared xml prefix} {knownBug} {
@@ -535,6 +568,11 @@ test dom-2.33 {end of options option} {
     $doc delete
     set result
 } -0.123
+
+test dom-2.34 {XML prefix declaration with empty namespace} {
+    catch {dom parse {<foo:doc xmlns:foo=""><e1/></foo:doc>}} errMsg
+    set errMsg
+} {Missing URI in Namespace declaration, referenced at line 1 character 22}
 
 test dom-3.1 {isName} {
     dom isName ":foo"
