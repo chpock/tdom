@@ -2317,7 +2317,7 @@ int xpathParse (
         memmove(*errMsg + len+6+newlen, "' ", 3);
 
         for (i=0; tokens[i].token != EOS; i++) {
-            sprintf(tmp, "%s\n%3s%3d %-12s %5ld %.3e %5d  ",
+            sprintf(tmp, "%s\n%3s%3d %-12s %5ld %09.3f %5d  ",
                          (i==0) ? "\n\nParsed symbols:" : "",
                          (i==l) ? "-->" : "   ",
                           i,
@@ -2376,7 +2376,10 @@ int xpathNodeTest (
                 (step->child->strvalue[1] == '\0') &&
                 (node->ownerDocument->rootNode != node) &&
                 (step->child->intvalue == 0)) return 1;
-            if (node->namespace) return 0;
+            if (node->namespace
+                && (node->ownerDocument->namespaces[node->namespace-1]->prefix[0] != '\0'
+                    || node->ownerDocument->namespaces[node->namespace-1]->uri[0] != '\0')
+                ) return 0;
             return (strcmp(node->nodeName, step->child->strvalue)==0);
         }
         return 0;

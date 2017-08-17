@@ -20,11 +20,11 @@ if {$tcl_version >= 8.1} {
             set ::tcltest::testConfig(need_uri) 1
             set ::tcltest::testConstraints(need_uri) 1
         }
-   } else {
+    } else {
         ::tcltest::testConstraint need_i18n 1
-       if {[info procs ::tDOM::extRefHandler] != ""} {
-           ::tcltest::testConstraint need_uri 1
-       }
+        if {[info procs ::tDOM::extRefHandler] != ""} {
+            ::tcltest::testConstraint need_uri 1
+        }
     }
 }
 
