@@ -1,5 +1,5 @@
-C Changed\smy\smind:\snext\sversion\swill\sbe\s0.9.0.
-D 2017-08-17T18:44:23.347
+C Merged\strunk.
+D 2017-08-17T18:44:51.950
 F CHANGES 1716f58c63b78e9c0f4142bc0b94d95b201a09db
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -90,7 +90,7 @@ F expat/xmltok_impl.h cb8cce4d3f128dc013901010b462d852b4d4d804
 F expat/xmltok_ns.c 8aec1b3ad754d262d3b1ba44b3abb5171c3e21f8
 F extensions/example/Makefile.in fff10db0bbe3655dbf6e54ed9032fecb7d94ee9d
 F extensions/example/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
-F extensions/example/configure e0b85a7c1484c298cf43aed91b4452a3347126e7 x
+F extensions/example/configure e5a85a3026f24a0de8120e0927670617c55dba6f x
 F extensions/example/configure.in 6064e7a99c4bb1296a4f1d00949ec603895cafd4
 F extensions/example/example.c a8d16832ce63ed38438e6d0ef12299c288bce3f4
 F extensions/example/exampletest.tcl c699cc2c17a2baa598e56b2e760ddfaeb5769e8e
@@ -226,8 +226,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 5d9e51455e78368e304ae0257dace4d74e1b6e60
-R 89b27cd9411fcf95b39b08da5b197d37
+P d9742bb60d7dbc8abff58de0fb765039b9f81ac7 4b6f04f245ed60e3412a4f0ded5095f142bbd93a
+R 1acd82d60d1eb10d1db894e9ed6f787a
 U rolf
-Z 45bf9837b3178d3705ded8022b3c379c
+Z c7a0bdf4cb28f2b3855b275db929456c
 # Remove this line to create a well-formed Fossil manifest.
