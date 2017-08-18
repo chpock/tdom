@@ -415,7 +415,7 @@ NodeObjCmd (arg, interp, objc, objv)
             tag = nodeInfo->tagName;
         }
 
-        newNode = domAppendNewElementNode (parent, tag, NULL);
+        newNode = domAppendNewElementNode (parent, tag, nodeInfo->namespace);
         newNode->info = nodeInfo->jsonType;
         
         /*
@@ -526,7 +526,7 @@ nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
     int index, ret, type, nodecmd = 0, jsonType = 0, haveJsonType = 0;
     int isElement = 0;
     char *nsName, buf[64];
-    Tcl_Obj *tagName = NULL;
+    Tcl_Obj *tagName = NULL, *namespace = NULL;
     Tcl_DString cmdName;
     NodeInfo *nodeInfo;
 
@@ -546,11 +546,11 @@ nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
     };
 
     static CONST84 char *options[] = {
-        "-returnNodeCmd", "-jsonType", "-tagName", NULL
+        "-returnNodeCmd", "-jsonType", "-tagName", "-namespace", NULL
     };
 
     enum option {
-        o_returnNodeCmd, o_jsonType, o_tagName
+        o_returnNodeCmd, o_jsonType, o_tagName, o_namespace
     };
 
     static const char *jsonTypes[] = {
@@ -592,6 +592,12 @@ nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
             
         case o_tagName:
             tagName = objv[2];
+            objc -= 2;
+            objv += 2;
+            break;
+
+        case o_namespace:
+            namespace = objv[2];
             objc -= 2;
             objv += 2;
             break;
@@ -668,6 +674,7 @@ nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
                               "argument must be one out of this list: "
                               "TRUE FALSE NULL NUMBER STRING NONE",
                               NULL);
+                return TCL_ERROR;
             }
             type = TEXT_NODE;
         }
@@ -707,6 +714,12 @@ nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
                       "element node commands.", NULL);
         return TCL_ERROR;        
     }
+
+    if (namespace && !isElement) {
+        Tcl_SetResult(interp, "The -namespace option is allowed only for "
+                      "element node commands.", NULL);
+        return TCL_ERROR;        
+    }
     
     if (haveJsonType && type != ELEMENT_NODE && type != TEXT_NODE) {
         Tcl_SetResult(interp, "Only element and text nodes may have a "
@@ -722,6 +735,9 @@ nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
     }
     nodeInfo->jsonType = jsonType;
     nodeInfo->tagName = NULL;
+    if (namespace) {
+        nodeInfo->namespace = tdomstrdup (Tcl_GetString(namespace));
+    }
     if (tagName) {
         nodeInfo->tagName = tdomstrdup (Tcl_GetString(tagName));
     }

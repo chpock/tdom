@@ -4,21 +4,21 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0xdf3700">NAME</a> · <a href="#SECTid0xe01e70">SYNOPSIS</a> · <a href="#SECTid0xdbf0d0">DESCRIPTION</a> · <a href="#SECTid0xdbfe10">COMMAND OPTIONS</a> · <a href="#SECTid0xdd20d0"> COMMAND METHODS </a> · <a href="#SECTid0xdd8530">Callback Command Return Codes</a> · <a href="#SECTid0xdd90c0">SEE ALSO</a> · <a href="#SECTid0xdd9480">KEYWORDS</a>
+<a href="#SECTid0xa31d40">NAME</a> Â· <a href="#SECTid0x943cd0">SYNOPSIS</a> Â· <a href="#SECTid0xa4aa80">DESCRIPTION</a> Â· <a href="#SECTid0xa4b7c0">COMMAND OPTIONS</a> Â· <a href="#SECTid0xa85360"> COMMAND METHODS </a> Â· <a href="#SECTid0xa8f7d0">Callback Command Return Codes</a> Â· <a href="#SECTid0xa90360">SEE ALSO</a> Â· <a href="#SECTid0xa90720">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-    <h2><a name="SECTid0xdf3700">NAME</a></h2><p class="namesection">
+    <h2><a name="SECTid0xa31d40">NAME</a></h2><p class="namesection">
 <b class="names">expat - </b><br>Creates an instance of an expat parser object</p>
 
 
 
-    <h2><a name="SECTid0xe01e70">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+    <h2><a name="SECTid0x943cd0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">expat</b> ?<i class="m">parsername</i>? ?<i class="m">-namespace</i>? ?<i class="m">arg arg ..</i>
 
 <b class="cmd">xml::parser</b> ?<i class="m">parsername</i>? ?<i class="m">-namespace</i>? ?<i class="m">arg arg ..</i>
 </pre>
-    <h2><a name="SECTid0xdbf0d0">DESCRIPTION</a></h2><p>The parser created with <i class="m">expat</i> or <i class="m">xml::parser</i>
+    <h2><a name="SECTid0xa4aa80">DESCRIPTION</a></h2><p>The parser created with <i class="m">expat</i> or <i class="m">xml::parser</i>
 (which is just another name for the same command in an own namespace) are able
 to parse any kind of well-formed XML. The parsers are stream oriented XML
 parser. This means that you register handler scripts with the parser prior to
@@ -35,7 +35,7 @@ in memory "tDOM" DOM tree, while the parser is parsing the input.</p><p>It is po
 and C level handlers for most of the events. If the event occurs, they are
 called in turn.</p>
 
-    <h2><a name="SECTid0xdbfe10">COMMAND OPTIONS</a></h2><dl class="optlist">
+    <h2><a name="SECTid0xa4b7c0">COMMAND OPTIONS</a></h2><dl class="optlist">
         
           <dt><b>-namespace</b></dt>
 
@@ -615,7 +615,7 @@ enddoctypedeclcommand scripts, if set, are not called.</dd>
         
 
       </dl>
-    <h2><a name="SECTid0xdd20d0"> COMMAND METHODS </a></h2><dl class="commandlist">
+    <h2><a name="SECTid0xa85360"> COMMAND METHODS </a></h2><dl class="commandlist">
         
           <dt>
 <b class="cmd">parser</b> <b class="method">configure</b> <i class="m">option value ?option value?</i>
@@ -766,7 +766,7 @@ cases.</p></dd>
         
       </dl>
 
-    <h2><a name="SECTid0xdd8530">Callback Command Return Codes</a></h2><p>A script invoked for any of the parser callback commands, such as
+    <h2><a name="SECTid0xa8f7d0">Callback Command Return Codes</a></h2><p>A script invoked for any of the parser callback commands, such as
 -elementstartcommand, -elementendcommand, etc, may return an error code other
 than "ok" or "error". All callbacks may in addition return
 "break" or "continue".</p><p>If a callback script returns an "error" error code then
@@ -780,13 +780,13 @@ script out of this Tcl handler set and processing continues with the next
 (sibling) element. This does not influence any other handler set.</p><p>If a callback script returns a "return" error
 code then parsing is canceled altogether, but no error is raised.</p>
 
-    <h2><a name="SECTid0xdd90c0">SEE ALSO</a></h2><p class="seealso">
+    <h2><a name="SECTid0xa90360">SEE ALSO</a></h2><p class="seealso">
 <a href="expatapi.html">expatapi</a>, <a href="tdomcmd.html">tdom</a>
 </p>
 
-    <h2><a name="SECTid0xdd9480">KEYWORDS</a></h2><p class="keywords"><a class="keyword" href="keyword-index.html#KW-SAX">SAX</a></p>
+    <h2><a name="SECTid0xa90720">KEYWORDS</a></h2><p class="keywords"><a class="keyword" href="keyword-index.html#KW-SAX">SAX</a></p>
   </div><hr class="navsep"><div class="navbar" align="center">
-<a class="navaid" href="index.html">Contents</a> · <a class="navaid" href="category-index.html">Index</a> · <a class="navaid" href="keyword-index.html">Keywords</a>
+<a class="navaid" href="index.html">Contents</a> Â· <a class="navaid" href="category-index.html">Index</a> Â· <a class="navaid" href="keyword-index.html">Keywords</a>
 </div>
 </body>
 </html>

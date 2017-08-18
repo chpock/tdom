@@ -1202,6 +1202,12 @@ startElement(
                 xmlns = atPtr[0];
                 newNS = 1;
                 if (xmlns[5] == ':') {
+                    if (atPtr[1][0] == '\0') {
+                        Tcl_SetResult (info->interp, "Missing URI in Namespace "
+                               "declaration", NULL);
+                        XML_StopParser(info->parser, 0);
+                        return;
+                    }
                     if (domIsNamespaceInScope (info->activeNS, info->activeNSpos,
                                                &(xmlns[6]), atPtr[1])) {
                         ns = domLookupPrefix (info->currentNode, &(xmlns[6]));
@@ -2495,6 +2501,12 @@ domCreateDocument (
                     Tcl_SetObjResult(interp, 
                                      Tcl_NewStringObj("invalid prefix name", -1));
                 }
+                return NULL;
+            }
+            if (uri[0] == '\0') {
+                Tcl_SetObjResult(interp,
+                                 Tcl_NewStringObj("Missing URI in "
+                                                  "Namespace declaration", -1));
                 return NULL;
             }
         }
@@ -4568,6 +4580,9 @@ domNewElementNodeNS (
     node->nodeName      = (char *)&(h->key);
 
     domSplitQName (tagName, prefix, &localname);
+    if (prefix[0] == '\0' && uri[0] == '\0') {
+        return NULL;
+    }
     ns = domNewNamespace(doc, prefix, uri);
     node->namespace = ns->index;
 

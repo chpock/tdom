@@ -1143,24 +1143,28 @@ set xslt {
 
 set xml {<dontMatter/>}
 
-test xslt-8.1 {current() not allowed in pattern} {
+test xslt-8.1 {current() not allowed in pattern} -body {
     dom parse $xml xmldoc
     dom parse $xslt xsltdoc
     catch {$xmldoc xslt $xsltdoc resultDoc} errMsg
     $xmldoc delete
     $xsltdoc delete
-    set errMsg
-} {The 'current' function is not allowed in Pattern. for '*[current() != 'notthis']' 
+    set expected {The 'current' function is not allowed in Pattern. for '*[current() != 'notthis']' 
 
 Parsed symbols:
-     0 WCARDNAME        0 0.000e+00     0  *
-     1 LBRACKET         0 0.000e+00     1  
-     2 FUNCTION         0 0.000e+00     8  current
-     3 LPAR             0 0.000e+00     9  
-     4 RPAR             0 0.000e+00    10  
-     5 NOTEQ            0 0.000e+00    13  
-     6 LITERAL          0 0.000e+00    23  notthis
-     7 RBRACKET         0 0.000e+00    24  }
+     0 WCARDNAME        0 00000.000     0  *
+     1 LBRACKET         0 00000.000     1  
+     2 FUNCTION         0 00000.000     8  current
+     3 LPAR             0 00000.000     9  
+     4 RPAR             0 00000.000    10  
+     5 NOTEQ            0 00000.000    13  
+     6 LITERAL          0 00000.000    23  notthis
+     7 RBRACKET         0 00000.000    24  }
+    puts [binary encode hex $expected]
+    puts ---
+    puts [binary encode hex $errMsg]
+    list [string length $errMsg] [string length $expected]
+} -result {}
 
 set xslt-8.2.xml {<?xml version="1.0"?>
 <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet" xmlns:html="http://www.w3.org/TR/REC-html40">

@@ -247,22 +247,21 @@ every non 7 bit ASCII character in attribute values or element
 PCDATA content will be escaped as character reference in
 decimal representation.
 .PP
-The flag \fI-doctypeDeclaration\fR
-determines, whether there will be a DOCTYPE declaration
-emitted before the first node of the document. The default is,
-to do not. The DOCTYPE name will always be the element name of
-the document element. An external entity declaration of the
-external subset is only emitted, if the document has a system
-identifier.
+The flag \fI-doctypeDeclaration\fR determines whether
+there will be a DOCTYPE declaration emitted before the first
+node of the document. The default is not to emit it. The
+DOCTYPE name will always be the element name of the document
+element. An external entity declaration of the external subset
+is only emitted if the document has a system identifier.
 .PP
-The flag \fI-xmlDeclaration\fR determines, whether there
+The flag \fI-xmlDeclaration\fR determines whether there
 will be an XML Declaration and a newline emitted before
-anything else. The default is, to do not. If this flag is
+anything else. The default is not to emit one. If this flag is
 given with a true argument then
 .PP
 \&\fI-encString\fR sets the encoding value in the XML
-Declaration. Otherwise, this option is ignored. Please note,
-that this option just enhance the string representation of the
+Declaration. Otherwise this option is ignored. Please note
+that this option just enhances the string representation of the
 generated XML Declaration with an encoding information string,
 nothing more. It's up to the user to handle encoding in case
 of writing to a channel or reparsing.
@@ -278,27 +277,30 @@ value given as argument to \fI-indentAttrs\fR (0..8).
 .RE
 .TP
 \&\fB\fBasHTML\fP \fB?-channel channelId?\fP \fB?-escapeNonASCII?\fP \fB?-htmlEntities?\fP \fB?-doctypeDeclaration <boolean>?\fP
-\&\fRReturns the DOM tree serialized acording to HTML rules (HTML
-elements are recognized regardless of case, without end tags for emtpy HTML
-elements etc.), as string or sends the output directly to the given
-channelId. If the option \fI-escapeNonASCII\fR is given, every non 7 bit ASCII
-character in attribute values or element PCDATA content will be escaped as
-character reference in decimal representation. If the option
-\&\fI-htmlEntities\fR is given, a character is outputed using a HTML 4.01
-character entity reference, if one is defined for it. The flag
-\&\fI-doctypeDeclaration\fR determines, whether there will be a DOCTYPE
-declaration emitted before the first node of the document. The default is, to
-do not. The DOCTYPE name will always be the element name of the document
-element without case normalization. An external entity declaration of the
-external subset is only emitted, if the document has a system identifier. The
-doctype declaration will be written from the avaliable informations, without
-check, if this is a known (w3c) HTML version information or if the document
-confirms to the given HTML version.
+\&\fRReturns the DOM tree serialized acording to HTML rules
+(HTML elements are recognized regardless of case, without end
+tags for emtpy HTML elements etc.) as string or sends the
+output directly to the given channelId. If the option
+\&\fI-escapeNonASCII\fR is given, every non 7 bit ASCII
+character in attribute values or element PCDATA content will
+be escaped as character reference in decimal representation.
+If the option \fI-htmlEntities\fR is given, a character is
+written using its HTML 4.01 character entity reference, if it
+has one. If the flag \fI-doctypeDeclaration\fR is given there
+will be a DOCTYPE declaration emitted before the first node of
+the document. The default is, to do not. The DOCTYPE name will
+always be the element name of the document element without
+case normalization. An external entity declaration of the
+external subset is only emitted, if the document has a system
+identifier. The doctype declaration will be written from the
+avaliable information, without check, if this is a known
+(w3c) HTML version information or if the document confirms to
+the given HTML version.
 .TP
 \&\fB\fBasText\fP
-\&\fRThe asText method outputs the result tree by outputting
-the string-value of every text node in the result tree in document
-order without any escaping. In effect, this is what the xslt output method
+\&\fRThe asText method returns the tree by serializing the
+string-value of every text node in document order without
+any escaping. In effect, this is what the xslt output method
 "text" (XSLT 1.0 recommendation, section 16.3) does.
 .TP
 \&\fB\fBasJSON\fP \fB?-indent none/0..8?\fP \fB?-channel channelId?\fP
@@ -306,7 +308,7 @@ order without any escaping. In effect, this is what the xslt output method
 .RS
 .PP
 The asJSON method serializes the tree into a valid
-JSON data string. In general this may be a lossy
+JSON data string. In general, this may be a lossy
 serialization. For this serialization all comment, character
 data sections and processing instruction nodes, all
 attributes and all XML namespaces are ignored. Only element
@@ -314,15 +316,15 @@ and text nodes may be reflected in the generated JSON
 serialization. Appropriate JSON data type information of a
 node will be respected.
 .PP
-If an element node has the JSON type OBJECT then every
-element node child of this element will be serializend as
+If an element node has the JSON type OBJECT, then every
+element node child of this element will be serialized as
 member of that object, with the node name of the child as
-the member name and the relevant childs of that child as the
-value. Every other child nodes will be ignored.
+the member name and the relevant children of that child as
+the value. Every other child nodes will be ignored.
 .PP
-If an element node has the JSON type ARRAY then the text
-and element node childs of that element node are serialized
-as the consecutive values of the array. Element node childs
+If an element node has the JSON type ARRAY, then the text
+and element node children of that element node are serialized
+as the consecutive values of the array. Element node children
 of an ARRAY element will be container nodes for nested ARRAY
 or OBJECT values.
 .PP
@@ -335,7 +337,7 @@ number token if the text node value is in fact a valid JSON
 number and as a JSON string if not.
 .PP
 If an element node doesn't has a JSON type then the
-serialization of its childs is determined by the following
+serialization of its children is determined by the following
 rules:
 .PP
 Only text and element node child are relevant. If the
@@ -346,26 +348,26 @@ node of this element node is a text node then the JSON
 value of that text node will be the value of the object
 member. If the element has more than one relevant child
 nodes and the first one is a text node then the relevant
-childs will be serialized as JSON array. If the only
+children will be serialized as JSON array. If the only
 relevant child node is an element node or the first relevant
 child is an element node and the node name of that only or
 first relevant child isn't equal to the array container node
-name all element node childs will be serialized as the
+name all element node children will be serialized as the
 members of a JSON object (while ignoring any intermixed text
 nodes). If the only or first relevant child is an element
 node and the node name of this child is equal to the array
-container element name then all relevant childs will be
+container element name then all relevant children will be
 serialized as the values of a JSON array.
 .PP
 If the element to serialize is a value of a JSON array
 and the node name of this element isn't equal to the array
-container node name that element will be seen as a
-container node for a JSON object and all element node childs
-will be serialized as the members of that array while
-ignoring any text node childs. If the element to serialize
-is a value of a JSON array and the node name of this element
-is equal to the array container node name, all relevant
-childs will be serialized as JSON array.
+container node name that element will be seen as a container
+node for a JSON object and all element node children will be
+serialized as the members of that array while ignoring any
+text node children. If the element to serialize is a value of
+a JSON array and the node name of this element is equal to
+the array container node name, all relevant children will be
+serialized as JSON array.
 .PP
 If the \fI-channel\fR option is given the serialization
 isn't returned as string but send directly to the channel,
@@ -395,14 +397,14 @@ value.
 \&\fRReturns the internal subset of the doctype declaration of the
 document, if there is one, otherwise the empty string. If there is a value
 given to the method, the internal subset of the document is set to this
-value. Note, that none of the parsing methods preserve the internal subset
+value. Note that none of the parsing methods preserve the internal subset
 of a document; a freshly parsed document will always have an empty internal
 subset. Also note, that the method doesen't do any syntactical check on a
 given internal subset.
 .TP
 \&\fB\fBcdataSectionElements\fP \fI(?URI:?localname|*) ?<boolean>?\fB
-\&\fRThis method allows to control, for which element nodes
-the text node childs will be serialized as CDATA sections (this affects only
+\&\fRThis method allows to control for which element nodes
+the text node children will be serialized as CDATA sections (this affects only
 serialization with the asXML method, no text node is altered in any
 way by this method). IF the method is called with an element name as
 first argument and a boolean with value true as second argument, every
@@ -410,33 +412,34 @@ text node child of every element node in the document with the same
 name as the first argument will be serialized as CDATA section. If the
 second argument is a boolean with value false, all text nodes of all
 elements with the same name as the first argument will be serialized
-as usual. Namespaced element names have to given in the form
+as usual. Namespaced element names have to be given in the form
 namespace_URI:localname, not in the otherwise usual prefix:localname
 form. With two arguments called, the method returns the used boolean
 value. If the method is called with only an element name, it will
-return a boolean value, indicating, if the text nodes childs of all
+return a boolean value, indicating that the text node children of all
 elements with that name in the document will be serialized as CDATA
 section elements (return value 1) or not (return value 0). If the
 method is called with only one argument and that argument is an
 asterisk ('*'), then the method returns an unordered list of all
-element names of the document, for which the text node childs will be
+element names of the document, for which the text node children will be
 serialized as CDATA section nodes.
 .TP
 \&\fB\fBselectNodesNamespaces\fP \fB?prefixUriList?\fP
 \&\fRThis method allows to control a document global prefix
-to namespace URI mapping, which will be used for selectNodes method
-calls (on document as well as on all nodes, which belongs to the
-document), if it is not overwritten by using the -namespaces option of
-the selectNodes method. Any namespace prefix within an xpath
-expression will be first resolved against this list. If the list bind
-the same prefix to different namespaces, then the first binding will
-win. If a prefix could not resolved against the document global prefix
-/ namespaces list, then the namespace definitions in scope of the
-context node will be used to resolve the prefix, as usual. If the
-optional argument \fIprefixUriList\fR is given, then the global prefix /
-namespace list is set to this list and returns it. Without
-the optional argument the method returns the current list. The
-default is the empty list.
+to namespace URI mapping, which will be used for selectNodes
+method calls (on document as well as on all nodes, which
+belongs to the document) if it is not overwritten by using
+the -namespaces option of the selectNodes method. Any
+namespace prefix within an xpath expression will be first
+resolved against this list. If the list binds the same prefix
+to different namespaces, then the first binding will win. If a
+prefix could not resolved against the document global prefix /
+namespaces list, then the namespace definitions in scope of
+the context node will be used to resolve the prefix, as usual.
+If the optional argument \fIprefixUriList\fR is given, then
+the global prefix / namespace list is set to this list and
+returns it. Without the optional argument the method returns
+the current list. The default is the empty list.
 .TP
 \&\fB\fBxslt\fP \fB?-parameters parameterList?\fP \fB?-ignoreUndeclaredParameters?\fP \fB?-maxApplyDepth int?\fP \fB?-xsltmessagecmd script?\fP \fIstylesheet\fB \fI?outputVar?\fB
 \&\fRApplies an XSLT transformation on the whole document of the node
@@ -452,8 +455,8 @@ list consisting of parameter name and value pairs.
 If the option \fI-ignoreUndeclaredParameters\fR is given, then parameter
 names in the \fIparameterList\fR given to the \fI-parameters\fR options that
 are not declared as top-level parameters in the stylesheet are silently
-ignored. Without this option, an error is raised, if the user tries to set a
-top-level parameter, which is not declared in the stylesheet.
+ignored. Without this option, an error is raised if the user tries to set a
+top-level parameter that is not declared in the stylesheet.
 .PP
 The option \fI-maxApplyDepth\fR expects a positiv integer as
 argument. By default, the xslt engine allows xslt templates to nest up
@@ -507,7 +510,7 @@ list consisting of parameter name and value pairs.
 If the option \fI-ignoreUndeclaredParameters\fR is given, then parameter
 names in the \fIparameterList\fR given to the \fI-parameters\fR options that
 are not declared as top-level parameters in the stylesheet are silently
-ignored. Without this option, an error is raised, if the user tries to set a
+ignored. Without this option, an error is raised if the user tries to set a
 top-level parameter, which is not declared in the stylesheet.
 .PP
 The option \fI-maxApplyDepth\fR expects a positiv integer as
@@ -575,11 +578,11 @@ after this operation. It is not physically deleted.
 .TP
 \&\fB\fBinsertBefore\fP \fInewChild\fB  \fIrefChild\fB
 \&\fRInsert \fInewChild\fR before the \fIrefChild\fR into the list of
-top level nodes of the document. If \fIrefChild\fR is the empty string, insert
+top level nodes of the document. If \fIrefChild\fR is the empty string, inserts
 \&\fInewChild\fR at the end of the top level nodes.
 .TP
 \&\fB\fBreplaceChild\fP \fInewChild\fB  \fIoldChild\fB
-\&\fRReplace \fIoldChild\fR with \fInewChild\fR in the list of
+\&\fRReplaces \fIoldChild\fR with \fInewChild\fR in the list of
 children of that node. The \fIoldChild\fR node will be part of the
 document fragment list after this operation.
 .TP
@@ -618,12 +621,12 @@ The option \fI-namespaces\fR expects a tcl list with prefix /
 namespace pairs as argument. If this option is not given, then any
 namespace prefix within the xpath expression will be first resolved
 against the list of prefix / namespace pairs set with the
-selectNodesNamespaces method for the document, the node belongs to. If
+selectNodesNamespaces method for the document the node belongs to. If
 this fails, then the namespace definitions in scope of the context
 node will be used to resolve the prefix. If this option is given, any
 namespace prefix within the xpath expression will be first resolved
 against that given list (and ignoring the document global prefix /
-namespace list). If the list bind the same prefix to different
+namespace list). If the list binds the same prefix to different
 namespaces, then the first binding will win.  If this fails, then the
 namespace definitions in scope of the context node will be used to
 resolve the prefix, as usual.
@@ -633,9 +636,9 @@ If the \fI-cache\fR option is used with a true value, then the
 the query is found, then the stored pre-compiled query will be used.
 If the query isn't found, it will be compiled and stored in the cache,
 for use in further calls. Please notice, that the \fIxpathQuery\fR as
-given as string is used as key for the cache. This means, that equal
-XPath expressions, which differ only in white space are treated as
-different cache entries. Special care is needed, if the XPath
+given as string is used as key for the cache. This means that equal
+XPath expressions, which differ only in white space, are treated as
+different cache entries. Special care is needed if the XPath
 expression includes namespace prefixes or references to tcl variables.
 Both namespace prefixes and tcl variable references will be resolved
 according to the XML prefix namespace mappings and tcl variable values
@@ -690,7 +693,7 @@ same name as the given method within the namespace \fB::dom::domDoc\fR is
 tried to be executed. This allows quick method additions on Tcl level.
 .PP
 Newly created nodes are appended to a hidden fragment list. If they
-are not moved into the tree they are automaticaly deleted, when the whole
+are not moved into the tree they are automaticaly deleted as soon as the whole
 document gets deleted.
 .SH "SEE ALSO"
 dom, domNode

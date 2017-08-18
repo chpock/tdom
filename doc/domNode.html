@@ -4,17 +4,17 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0xb275d0">NAME</a> · <a href="#SECTid0xb558b0">SYNOPSIS</a> · <a href="#SECTid0xad87e0"> DESCRIPTION </a> · <a href="#SECTid0xb81b10">SEE ALSO</a> · <a href="#SECTid0xb81ea0">KEYWORDS</a>
+<a href="#SECTid0x962a70">NAME</a> · <a href="#SECTid0x8ddff0">SYNOPSIS</a> · <a href="#SECTid0xa6c150"> DESCRIPTION </a> · <a href="#SECTid0xa96b80">SEE ALSO</a> · <a href="#SECTid0xa96f10">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0xb275d0">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x962a70">NAME</a></h2><p class="namesection">
 <b class="names">domNode - </b><br>Manipulates an instance of a DOM node object</p>
 
 
 
-  <h2><a name="SECTid0xb558b0">SYNOPSIS</a></h2><pre class="syntax"> $nodeObject <i class="m">method</i>  <i class="m">arg arg ...</i>
+  <h2><a name="SECTid0x8ddff0">SYNOPSIS</a></h2><pre class="syntax"> $nodeObject <i class="m">method</i>  <i class="m">arg arg ...</i>
 </pre>
-  <h2><a name="SECTid0xad87e0"> DESCRIPTION </a></h2><p>This command manipulates one particular instance of a DOM node object.
+  <h2><a name="SECTid0xa6c150"> DESCRIPTION </a></h2><p>This command manipulates one particular instance of a DOM node object.
 <i class="m">method</i> indicates a specific method of the node class. These methods
 should closely conform to the W3C recommendation "Document Object Model
 (Core) Level 1" (<a href="http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html">http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html</a>)
@@ -159,9 +159,11 @@ attribute is not available <i class="m">defaultValue</i> is returned.</dd>
 ?attributeName newValue ...?</i>
 </dt>
         <dd>Sets the value for one or more attributes. Every
-<i class="m">attributeName</i> is set to the corresponding <i class="m">newValue</i>. If there
-isn't an attribute for one or more of the <i class="m">attributeName</i> this will
-create that attribute.</dd>
+        <i class="m">attributeName</i> is set to the corresponding
+        <i class="m">newValue</i>. If there isn't an attribute for one or more
+        of the <i class="m">attributeName</i> this will create that attribute.
+        It is not recommended to set attributes that look like xml
+        namespace declarations.</dd>
 
       
 
@@ -212,18 +214,10 @@ method has the same effect as the method <b>setAttribute</b>.</p>
 
         <pre class="example">$node setAttributeNS "" attri "some Value"</pre>
 
-<p>XML namespace nodes are not in any namespace. Set them this way:</p>
-
-        <pre class="example">$node setAttributeNS "" xmlns:myprefix "myNamespaceURI"
-$node setAttributeNS "" xmlns "newDefaultNamespace"</pre>
-
-<p>If your <i class="m">qualifiedName</i> has the prefix "xml" and you give the empty
-string as <i class="m">uri</i>, the namespace of the attribute defaults to
-"http://www.w3.org/XML/1998/namespace", as the DOM 2 recommendation
-requests. With the exceptions of the special prefixes "xmlns" and "xml" you
+<p>With the exceptions of the special prefixes "xmlns" and "xml" you
 always must provide a non emtpy <i class="m">uri</i>, if your <i class="m">qualifiedName</i> has a
-prefix.</p>
-        </dd>
+prefix. It is not recommended to set xml namespace declarations. The effects are complicated and not always obvious up to resulting a not well-formed serializations after further processing.</p>
+</dd>
       
 
       
@@ -732,9 +726,9 @@ name as the given method within the namespace <tt class="l">::dom::domNode</tt> 
 be executed. This allows quick method additions on Tcl level.</p>
 
 
-  <h2><a name="SECTid0xb81b10">SEE ALSO</a></h2><p class="seealso">dom, domDoc</p>
+  <h2><a name="SECTid0xa96b80">SEE ALSO</a></h2><p class="seealso">dom, domDoc</p>
   
-  <h2><a name="SECTid0xb81ea0">KEYWORDS</a></h2><p class="keywords">
+  <h2><a name="SECTid0xa96f10">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-XML">XML</a>, <a class="keyword" href="keyword-index.html#KW-DOM">DOM</a>, <a class="keyword" href="keyword-index.html#KW-document">document</a>, <a class="keyword" href="keyword-index.html#KW-node">node</a>, <a class="keyword" href="keyword-index.html#KW-parsing">parsing</a>
 </p>
   
