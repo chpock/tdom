@@ -1,5 +1,5 @@
-C Remove\sduplicate\sBUILD_tdom\sdefinition
-D 2017-08-18T09:17:03.725
+C nmake\smakefile\sfor\stdomhtml
+D 2017-08-18T14:11:37.719
 F CHANGES 1716f58c63b78e9c0f4142bc0b94d95b201a09db
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -108,6 +108,7 @@ F extensions/tdomhtml/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F extensions/tdomhtml/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
 F extensions/tdomhtml/pkgIndex.tcl.in 2612d2a8fd5a213a1379ad5570c229d82810dcb5
 F extensions/tdomhtml/tdomhtml.tcl 7d48c19d50f203ee71b3db15d0fc6077dc244798
+F extensions/tdomhtml/win/makefile.vc a6ba491c8f63a88c607c443e7a80f1369cb3c40c
 F extensions/tnc/Makefile.in 3f8240f260a2008db34a0cc4548d898fd10bac28
 F extensions/tnc/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
 F extensions/tnc/configure c444ff5095732b3c3169fcd2eb431f7cd845e18b x
@@ -246,8 +247,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P b7f5203f105ba0970e012acec734d968c27b602e
-R 648172e7cd3d7c53475574e40c3f1b3c
+P 6ce051c4db58f2bd3e8dccfb37925109729b75fe
+R e3863182865130bbf259796967468870
 U apnadkarni
-Z c3df364a760c24918695b975d3d38400
+Z 1acff48bc4e5dba58f73cc09c8e7426b
 # Remove this line to create a well-formed Fossil manifest.
