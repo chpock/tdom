@@ -331,7 +331,7 @@ baselibs  = $(baselibs) $(TKSTUBLIB)
 !if "$(MACHINE)" == "AMD64"
 baselibs = $(baselibs) "$(GUMBODIR)\visualc\x64\Release\gumbo.lib"
 !else
-baselibs = $(baselibs) "$(GUMBODIR)\visualc\Release\gumbo.lib"
+baselibs = $(baselibs) "$(GUMBODIR)\visualc\Win32\Release\gumbo.lib"
 !endif
 !endif
 

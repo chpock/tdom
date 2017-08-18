@@ -1,5 +1,5 @@
-C nmake\smakefile\sfor\stdomhtml
-D 2017-08-18T14:11:37.719
+C Fix\s32-bit\sgumbo\spath
+D 2017-08-18T17:20:43.892
 F CHANGES 1716f58c63b78e9c0f4142bc0b94d95b201a09db
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -236,7 +236,7 @@ F tests/xslt.test d087ac314ffcd643169522a9424615135f4ecb57
 F unix/CONFIG 789192e463910e1b9dd7e65f6338390d2bf1f68a
 F unix/tclAppInit.c a1655c51127aed18d069010f234a378fceacb2a6
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F win/makefile.vc 380db1ec35dae93d5cfce241fce04ec2dd8c327b
+F win/makefile.vc 96807afd77da2ef35b523a724f1c8563a8ebdccf
 F win/makefile805.vc da2003745caf522d88f27fcebadd916c1d5c042d
 F win/mkd.bat 85d3fe58ce051a778447fb2bfc7384867d21cef0
 F win/nmakehlp.c de6445b4bc73d55651ceabfbbf46b96e00d0c6a9
@@ -247,8 +247,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 6ce051c4db58f2bd3e8dccfb37925109729b75fe
-R e3863182865130bbf259796967468870
+P 8a3788419604d6f0db893ad6f3ed45a4f6059595
+R 96d2e3023cb6f87929337fd5af48624f
 U apnadkarni
-Z 1acff48bc4e5dba58f73cc09c8e7426b
+Z 102ee1b6d0996696b3214c2da1fa88e6
 # Remove this line to create a well-formed Fossil manifest.
