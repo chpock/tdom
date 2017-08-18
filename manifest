@@ -1,5 +1,5 @@
-C Fixed\scounting\sof\snested\sdepth\sby\sthe\sJSON\sparser.
-D 2017-08-18T16:26:42.689
+C Updated\sthe\srequested\sTEA_INIT\sversion,\saccording\sto\sthe\snew\sTEA\sversion.
+D 2017-08-18T18:58:48.811
 F CHANGES 1716f58c63b78e9c0f4142bc0b94d95b201a09db
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -9,9 +9,9 @@ F README 898b19870f39b3014ede29f6e5ea8db1f592e429
 F README.AOL a4faf5f85723467a8d8ca406f8aca855a18441b1
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/xslt.tcl ac4a75ba2f05e26d4ea6f92547983caa80fc6d55
-F configure 12cbff612a65b6e48e1e81d342848f99a9c9adf6 x
+F configure 3b77a33be0ad28d0a425f87defb4447c22a3bf9e x
 F configure-tcl8.0.5 db1a666545d519c42e229d245224d456a84c798a x
-F configure.in 4fbc61995c0b135ef502906a58d63009c447e542
+F configure.in 5495cb8e8aeab64319a72da43347280dcb2f53b3
 F doc/INDEX.MAP c8e767983bcea4bbd53ecdbf3d78cb044996e9bc
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html b7ef39eb9462a9b368c9cc95a8e059d9d8e04023
@@ -90,8 +90,8 @@ F expat/xmltok_impl.h cb8cce4d3f128dc013901010b462d852b4d4d804
 F expat/xmltok_ns.c 8aec1b3ad754d262d3b1ba44b3abb5171c3e21f8
 F extensions/example/Makefile.in fff10db0bbe3655dbf6e54ed9032fecb7d94ee9d
 F extensions/example/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
-F extensions/example/configure e5a85a3026f24a0de8120e0927670617c55dba6f x
-F extensions/example/configure.in 6064e7a99c4bb1296a4f1d00949ec603895cafd4
+F extensions/example/configure 4236423d0319e1b25c0ab06ef1fc32dd2a81f915 x
+F extensions/example/configure.in 68a3a3201a8a8b6ba56b40ba5feee1072b03dede
 F extensions/example/example.c a8d16832ce63ed38438e6d0ef12299c288bce3f4
 F extensions/example/exampletest.tcl c699cc2c17a2baa598e56b2e760ddfaeb5769e8e
 F extensions/example/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
@@ -110,8 +110,8 @@ F extensions/tdomhtml/pkgIndex.tcl.in 2612d2a8fd5a213a1379ad5570c229d82810dcb5
 F extensions/tdomhtml/tdomhtml.tcl 7d48c19d50f203ee71b3db15d0fc6077dc244798
 F extensions/tnc/Makefile.in fff10db0bbe3655dbf6e54ed9032fecb7d94ee9d
 F extensions/tnc/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
-F extensions/tnc/configure a5c3423e75665d254f3c42d9e17bfd450701fb56 x
-F extensions/tnc/configure.in dd21abf5e009277f508ffae78c8f656a302bb3d8
+F extensions/tnc/configure ae9d4081a946e303a95dbe977aa9a0132b255ef2 x
+F extensions/tnc/configure.in 4d7b55298aa5c18380c43582828da9bd96e702d4
 F extensions/tnc/install-sh bdd5e293591621ae60d9824d86a4b1c5f22c3d00 x
 F extensions/tnc/makefile.vc c8d5523cb2a2ced5fd41831e122f32e40df98d76
 F extensions/tnc/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
@@ -245,8 +245,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 4b6f04f245ed60e3412a4f0ded5095f142bbd93a
-R 4451b2ae3f286738356f7917124aa9b2
+P 7e98c7c35665f033c8a9d1a9d16c4138f0678570
+R 6a68ae24e7e509faa9011d68d9fa6a7a
 U rolf
-Z c93d147754b56ddfa1241dd73f66c2e3
+Z d1e74cb5f17241f0ca11606451deceea
 # Remove this line to create a well-formed Fossil manifest.
