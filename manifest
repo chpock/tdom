@@ -1,5 +1,5 @@
-C Fix\sclean\starget\sfor\sversions.vc
-D 2017-08-18T09:16:13.170
+C Remove\sduplicate\sBUILD_tdom\sdefinition
+D 2017-08-18T09:17:03.725
 F CHANGES 1716f58c63b78e9c0f4142bc0b94d95b201a09db
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -9,9 +9,9 @@ F README 898b19870f39b3014ede29f6e5ea8db1f592e429
 F README.AOL a4faf5f85723467a8d8ca406f8aca855a18441b1
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/xslt.tcl ac4a75ba2f05e26d4ea6f92547983caa80fc6d55
-F configure e006e6d7c322a42708aa824b2eb1e963e81abcbc x
+F configure 0ce01cccd9deb93b3d187c874d3886bbc7170412 x
 F configure-tcl8.0.5 db1a666545d519c42e229d245224d456a84c798a x
-F configure.in 4fbc61995c0b135ef502906a58d63009c447e542
+F configure.in 06d1763a8a566ef420bb4dd87398346eef607e7e
 F doc/INDEX.MAP c8e767983bcea4bbd53ecdbf3d78cb044996e9bc
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html b7ef39eb9462a9b368c9cc95a8e059d9d8e04023
@@ -110,8 +110,8 @@ F extensions/tdomhtml/pkgIndex.tcl.in 2612d2a8fd5a213a1379ad5570c229d82810dcb5
 F extensions/tdomhtml/tdomhtml.tcl 7d48c19d50f203ee71b3db15d0fc6077dc244798
 F extensions/tnc/Makefile.in 3f8240f260a2008db34a0cc4548d898fd10bac28
 F extensions/tnc/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
-F extensions/tnc/configure a5c3423e75665d254f3c42d9e17bfd450701fb56 x
-F extensions/tnc/configure.in dd21abf5e009277f508ffae78c8f656a302bb3d8
+F extensions/tnc/configure c444ff5095732b3c3169fcd2eb431f7cd845e18b x
+F extensions/tnc/configure.in fca0deff574e5d04d8ecbed4815224ebe379edd2
 F extensions/tnc/install-sh bdd5e293591621ae60d9824d86a4b1c5f22c3d00 x
 F extensions/tnc/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
 F extensions/tnc/pkgIndex.tcl.in 6c224c2cdbb494f621ec008f96fe4a552a79a7b7
@@ -246,8 +246,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 8fa0b1767392aba8e42d3aa4ffafc0a83c5ea14b
-R 82d25ee59920a5c87f4fa7c23233074b
+P b7f5203f105ba0970e012acec734d968c27b602e
+R 648172e7cd3d7c53475574e40c3f1b3c
 U apnadkarni
-Z 49f00402f0ef072522cc78f5c96523fc
+Z c3df364a760c24918695b975d3d38400
 # Remove this line to create a well-formed Fossil manifest.
