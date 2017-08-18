@@ -1143,13 +1143,14 @@ set xslt {
 
 set xml {<dontMatter/>}
 
-test xslt-8.1 {current() not allowed in pattern} -body {
+test xslt-8.1 {current() not allowed in pattern} {
     dom parse $xml xmldoc
     dom parse $xslt xsltdoc
     catch {$xmldoc xslt $xsltdoc resultDoc} errMsg
     $xmldoc delete
     $xsltdoc delete
-    set expected {The 'current' function is not allowed in Pattern. for '*[current() != 'notthis']' 
+    set errMsg
+} {The 'current' function is not allowed in Pattern. for '*[current() != 'notthis']' 
 
 Parsed symbols:
      0 WCARDNAME        0 00000.000     0  *
@@ -1160,11 +1161,6 @@ Parsed symbols:
      5 NOTEQ            0 00000.000    13  
      6 LITERAL          0 00000.000    23  notthis
      7 RBRACKET         0 00000.000    24  }
-    puts [binary encode hex $expected]
-    puts ---
-    puts [binary encode hex $errMsg]
-    list [string length $errMsg] [string length $expected]
-} -result {}
 
 set xslt-8.2.xml {<?xml version="1.0"?>
 <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet" xmlns:html="http://www.w3.org/TR/REC-html40">

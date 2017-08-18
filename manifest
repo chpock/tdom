@@ -1,5 +1,5 @@
-C Merged\strunk
-D 2017-08-18T08:05:39.212
+C Reverted\sinadvertent\scheck-in\sof\sxslt-8.1\sdebug\scode
+D 2017-08-18T08:53:40.081
 F CHANGES 1716f58c63b78e9c0f4142bc0b94d95b201a09db
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -213,7 +213,7 @@ F tests/dom.test e0febcbda4b7d4f10d76302574e7e64095f347e9
 F tests/domDoc.test b69b4c7a2f6df995f399bc33147ba5e635e6398f
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test 66a77f681b6e946b88c55a72efe62d8d7e430348
-F tests/domjson.test d048529181a57378e273e0d4a028d5f3ab553b62 w tests/jsonreader.test
+F tests/domjson.test d048529181a57378e273e0d4a028d5f3ab553b62
 F tests/domnamespace.test c67346e939dab82f1b6de8ddd04bd004cf24391b
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
@@ -231,7 +231,7 @@ F tests/xmlsimple.test b9ca923fb971af2b6170f35a887922e488db928d
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.bench 41d24b5b9b7b4593d002b3c6486cd36061f823bb
 F tests/xpath.test ce2970735550f97caddd94effbd3bb32ad76333f
-F tests/xslt.test c6d533dfe3b101f8b26deb3d24ec82c06e9c4143
+F tests/xslt.test d087ac314ffcd643169522a9424615135f4ecb57
 F unix/CONFIG 789192e463910e1b9dd7e65f6338390d2bf1f68a
 F unix/tclAppInit.c a1655c51127aed18d069010f234a378fceacb2a6
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -246,8 +246,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 221a33e30b3ccd0e8b5f396c05f0c5f43aa1e5f2 f77454e666df95eda3f32414f8ac4d3e91f8f692 4b6f04f245ed60e3412a4f0ded5095f142bbd93a
-R 476b70de47b0e8fae05cc13e40be7489
+P 67820b67ca86024a53780cd17b067d3c3ebbb0b3
+R aca5d0a33288b601453af874e5a33b93
 U apnadkarni
-Z c29db2e516dc3e99194f8f33df0cb216
+Z 934fed0c51375dd7858a4822e125e6f3
 # Remove this line to create a well-formed Fossil manifest.
