@@ -208,13 +208,6 @@ cdebug	= -Zi -WX $(DEBUGFLAGS)
 cwarn = -D _CRT_SECURE_NO_DEPRECATE -D _CRT_NONSTDC_NO_DEPRECATE
 cflags = -nologo -c $(COMPILERFLAGS) $(cwarn) -Fp$(TMP_DIR)^\
 
-# Warning level
-!if $(FULLWARNINGS)
-cflags = $(cflags) -W4
-!else
-cflags = $(cflags) -W3
-!endif
-
 !if $(MSVCRT)
 !if $(DEBUG) && !$(UNCHECKED)
 crt = -MDd
@@ -269,10 +262,6 @@ ldebug	= -release -opt:ref -opt:icf,3
 
 ### Declarations common to all linker options
 lflags	= -nologo -machine:$(MACHINE) $(LINKERFLAGS) $(ldebug)
-
-!if $(FULLWARNINGS)
-lflags = $(lflags) -warn:3
-!endif
 
 !if $(PROFILE)
 lflags	= $(lflags) -profile
