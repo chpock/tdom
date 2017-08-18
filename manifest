@@ -1,5 +1,5 @@
-C Fix\spath\sto\sinstall\sscript
-D 2017-08-18T09:15:35.056
+C Fix\sclean\starget\sfor\sversions.vc
+D 2017-08-18T09:16:13.170
 F CHANGES 1716f58c63b78e9c0f4142bc0b94d95b201a09db
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -120,7 +120,7 @@ F extensions/tnc/tests/all.tcl 845c9dab65c294c3570f69cc731d6fef62efbd03
 F extensions/tnc/tests/loadtnc.tcl 9472a546f30972f5ea6d16880ed57e709556ce88
 F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
 F extensions/tnc/tnc.c 83eea8ff3a6d3423ffb3bc1598267a7e771ec931
-F extensions/tnc/win/makefile.vc 808581ce9d4a033f8265f9302521d20fe0dfed75
+F extensions/tnc/win/makefile.vc c2445c1ea773738cd898a3325d32223d99a5225f
 F extensions/tnc/win/nmakehlp.c de6445b4bc73d55651ceabfbbf46b96e00d0c6a9
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
 F generic/dom.c 5060ea06a037b18bc63a3b798e797d58783f3c7f
@@ -246,8 +246,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 43708f19a5c95e367f50ea7ac9a00f6aef3af4c6
-R c95cb5441cdc7af5cf03e77c1aa46970
+P 8fa0b1767392aba8e42d3aa4ffafc0a83c5ea14b
+R 82d25ee59920a5c87f4fa7c23233074b
 U apnadkarni
-Z 6d8d9fed75bd521df71d2a37cd292ab5
+Z 49f00402f0ef072522cc78f5c96523fc
 # Remove this line to create a well-formed Fossil manifest.
