@@ -2093,7 +2093,7 @@ TncElementEndCommand (userData, name)
     printContentStack (tncdata);
 #endif
     while (1) {
-        if (!TncProbeElementEnd (tncdata, 0)) {
+        if (!TncProbeElementEnd (tncdata)) {
             signalNotValid (userData, TNC_ERROR_ELEMENT_CAN_NOT_END_HERE);
             return;
         }

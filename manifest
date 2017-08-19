@@ -1,5 +1,5 @@
-C Updated\sthe\srequested\sTEA_INIT\sversion,\saccording\sto\sthe\snew\sTEA\sversion.
-D 2017-08-18T18:58:48.811
+C Cleanup.
+D 2017-08-19T19:23:07.184
 F CHANGES 1716f58c63b78e9c0f4142bc0b94d95b201a09db
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -119,8 +119,8 @@ F extensions/tnc/pkgIndex.tcl.in 6c224c2cdbb494f621ec008f96fe4a552a79a7b7
 F extensions/tnc/test.tcl 545cdec17e6702cef9f79184fdf1ce0166b8c412
 F extensions/tnc/tests/all.tcl 845c9dab65c294c3570f69cc731d6fef62efbd03
 F extensions/tnc/tests/loadtnc.tcl 9472a546f30972f5ea6d16880ed57e709556ce88
-F extensions/tnc/tests/tnc.test ba2fde4b20537ff0502ba069b353b7525b498e1e
-F extensions/tnc/tnc.c e30dc44a8be8b99c9772daf5cafb3714d8550c37
+F extensions/tnc/tests/tnc.test e204aa4e7c79071d6c941030cd3bfa2fcd540db0
+F extensions/tnc/tnc.c 3c01430fb06fb9ce26914ba0856db0b2cdeb6ce7
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
 F generic/dom.c 5060ea06a037b18bc63a3b798e797d58783f3c7f
 F generic/dom.h 6e967a3b38384b60e7dde1d856b2ee305e7ab6f2
@@ -245,8 +245,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 7e98c7c35665f033c8a9d1a9d16c4138f0678570
-R 6a68ae24e7e509faa9011d68d9fa6a7a
+P 67fc5860ca1c3304bd309c0835c70ab41d5fbb44
+R 62d33354f4c9d1ac45e1b15bc6f6cc12
 U rolf
-Z d1e74cb5f17241f0ca11606451deceea
+Z 331108008e7bc57ae6e0d7ba93a0a450
 # Remove this line to create a well-formed Fossil manifest.
