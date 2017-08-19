@@ -1,5 +1,5 @@
-C Updated\sREADME\sfor\sWindows\sbuilds
-D 2017-08-18T17:21:17.103
+C Merged\strunk
+D 2017-08-19T05:35:56.105
 F CHANGES 1716f58c63b78e9c0f4142bc0b94d95b201a09db
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -9,9 +9,9 @@ F README 172bc7f5d89c22710fa8f9611d0f693adb929f0a
 F README.AOL a4faf5f85723467a8d8ca406f8aca855a18441b1
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/xslt.tcl ac4a75ba2f05e26d4ea6f92547983caa80fc6d55
-F configure 0ce01cccd9deb93b3d187c874d3886bbc7170412 x
+F configure a048f1218791c45f04abf2ef739116a59139a862 x
 F configure-tcl8.0.5 db1a666545d519c42e229d245224d456a84c798a x
-F configure.in 06d1763a8a566ef420bb4dd87398346eef607e7e
+F configure.in 28054ab293618c420ef126345976e768bea2a827
 F doc/INDEX.MAP c8e767983bcea4bbd53ecdbf3d78cb044996e9bc
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html b7ef39eb9462a9b368c9cc95a8e059d9d8e04023
@@ -90,8 +90,8 @@ F expat/xmltok_impl.h cb8cce4d3f128dc013901010b462d852b4d4d804
 F expat/xmltok_ns.c 8aec1b3ad754d262d3b1ba44b3abb5171c3e21f8
 F extensions/example/Makefile.in fff10db0bbe3655dbf6e54ed9032fecb7d94ee9d
 F extensions/example/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
-F extensions/example/configure e5a85a3026f24a0de8120e0927670617c55dba6f x
-F extensions/example/configure.in 6064e7a99c4bb1296a4f1d00949ec603895cafd4
+F extensions/example/configure 4236423d0319e1b25c0ab06ef1fc32dd2a81f915 x
+F extensions/example/configure.in 68a3a3201a8a8b6ba56b40ba5feee1072b03dede
 F extensions/example/example.c a8d16832ce63ed38438e6d0ef12299c288bce3f4
 F extensions/example/exampletest.tcl c699cc2c17a2baa598e56b2e760ddfaeb5769e8e
 F extensions/example/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
@@ -111,8 +111,8 @@ F extensions/tdomhtml/tdomhtml.tcl 7d48c19d50f203ee71b3db15d0fc6077dc244798
 F extensions/tdomhtml/win/makefile.vc a6ba491c8f63a88c607c443e7a80f1369cb3c40c
 F extensions/tnc/Makefile.in 3f8240f260a2008db34a0cc4548d898fd10bac28
 F extensions/tnc/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
-F extensions/tnc/configure c444ff5095732b3c3169fcd2eb431f7cd845e18b x
-F extensions/tnc/configure.in fca0deff574e5d04d8ecbed4815224ebe379edd2
+F extensions/tnc/configure 9dd4089f8912fb1b2df266fc6ae2d8f81735c42e x
+F extensions/tnc/configure.in d15ed29caa0e95f17f9df4686553dd6636549c61
 F extensions/tnc/install-sh bdd5e293591621ae60d9824d86a4b1c5f22c3d00 x
 F extensions/tnc/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
 F extensions/tnc/pkgIndex.tcl.in 6c224c2cdbb494f621ec008f96fe4a552a79a7b7
@@ -132,7 +132,7 @@ F generic/domhtml.c c2893b476ea83dba3820f908b6bc2e29a26b5a97
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domhtml5.c 7ca86f4b6db03d94915f318d64a6dd74b57307ba
 F generic/domhtml5.h 5cca562a556e7662f2dce222640c32abb2777146
-F generic/domjson.c a0fc3dfb64039df70fbebe3a97ecc9bac902f30c
+F generic/domjson.c 26a4f6a4edeb73762c90c0284e322b9f56183577
 F generic/domjson.h b10c42af9ef7fc9d0ad4fac733ef6461df0cdd90
 F generic/domlock.c b9543b7f1066118a5bcd0d2fa30acda6d247f15a
 F generic/domxpath.c 50a45ca765bf862bed25df4272fb2a980c605aa4
@@ -248,8 +248,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 30a6caeae78afc58a14ee8cf734a420641ccd820
-R 634a465d3fdd8fb09dff45c3f16a863d
+P e6c39c8eb524ab2e89947242dd6a8061c497b4a6 67fc5860ca1c3304bd309c0835c70ab41d5fbb44
+R c2c1cf04eeb3af1e33d55dc9fa832c9b
 U apnadkarni
-Z bc1c09889c41558f5d60288f21e21079
+Z 790ad55d76ae68d273d948898c1a9690
 # Remove this line to create a well-formed Fossil manifest.
