@@ -5551,7 +5551,11 @@ fi
 $as_echo "yes" >&6; }
             $as_echo "#define TDOM_HAVE_GUMBO 1" >>confdefs.h
 
-            HTML5_LIBS="`pkg-config --cflags --libs gumbo`"
+            if test "${TEA_PLATFORM}" = "windows" ; then
+                HTML5_LIBS="-Wl,-Bstatic `pkg-config --static --cflags --libs gumbo` -Wl,-Bdynamic"
+            else
+                HTML5_LIBS="`pkg-config --cflags --libs gumbo`"
+            fi
         else
             as_fn_error $? "The required lib gumbo not found" "$LINENO" 5
         fi
@@ -5701,8 +5705,6 @@ $as_echo "no" >&6; }
 #--------------------------------------------------------------------
 
 if test "${TEA_PLATFORM}" = "windows" ; then
-    $as_echo "#define BUILD_tdom 1" >>confdefs.h
-
     CLEANFILES="pkgIndex.tcl *.lib *.dll *.exp *.ilk *.pdb vc*.pch"
     #TEA_ADD_SOURCES([win/winFile.c])
     #TEA_ADD_INCLUDES([-I\"$(${CYGPATH} ${srcdir}/win)\"])

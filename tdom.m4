@@ -243,7 +243,11 @@ AC_DEFUN(TDOM_ENABLE_HTML5, [
         if test "$HAVEGUMBO" = "1" ; then
             AC_MSG_RESULT([yes])
             AC_DEFINE(TDOM_HAVE_GUMBO)
-            HTML5_LIBS="`pkg-config --cflags --libs gumbo`"
+            if test "${TEA_PLATFORM}" = "windows" ; then
+                HTML5_LIBS="-Wl,-Bstatic `pkg-config --static --cflags --libs gumbo` -Wl,-Bdynamic"
+            else
+                HTML5_LIBS="`pkg-config --cflags --libs gumbo`"
+            fi
         else
             AC_MSG_ERROR([The required lib gumbo not found])
         fi
