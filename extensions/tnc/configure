@@ -2195,12 +2195,12 @@ $as_echo_n "checking for correct TEA configuration... " >&6; }
 	as_fn_error $? "
 The PACKAGE_NAME variable must be defined by your TEA configure.ac" "$LINENO" 5
     fi
-    if test x"3.9" = x ; then
+    if test x"3.10" = x ; then
 	as_fn_error $? "
 TEA version not specified." "$LINENO" 5
-    elif test "3.9" != "${TEA_VERSION}" ; then
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: warning: requested TEA version \"3.9\", have \"${TEA_VERSION}\"" >&5
-$as_echo "warning: requested TEA version \"3.9\", have \"${TEA_VERSION}\"" >&6; }
+    elif test "3.10" != "${TEA_VERSION}" ; then
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: warning: requested TEA version \"3.10\", have \"${TEA_VERSION}\"" >&5
+$as_echo "warning: requested TEA version \"3.10\", have \"${TEA_VERSION}\"" >&6; }
     else
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: ok (TEA ${TEA_VERSION})" >&5
 $as_echo "ok (TEA ${TEA_VERSION})" >&6; }
@@ -5564,9 +5564,7 @@ $as_echo "file not found" >&6; }
 #--------------------------------------------------------------------
 
 if test "${TEA_PLATFORM}" = "windows" ; then
-
-$as_echo "#define BUILD_tnc 1" >>confdefs.h
-
+    #AC_DEFINE(BUILD_tnc, 1, [Build windows export dll])
     CLEANFILES="pkgIndex.tcl *.lib *.dll *.exp *.ilk *.pdb vc*.pch"
     #TEA_ADD_SOURCES([win/winFile.c])
     #TEA_ADD_INCLUDES([-I\"$(${CYGPATH} ${srcdir}/win)\"])

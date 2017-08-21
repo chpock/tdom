@@ -74,6 +74,8 @@ COMPILING/USING tDOM
     Since tDOM is TEA-compatible you should be able to build it using
     the MinGW build environment for Windows. There is also the MSVC
     nmake file so you can compile the package with Microsoft tools.
+    Refer to the README in the win directory for more details about
+    building on Windows.
 
     The compile process will build the tDOM shared library suitable for
     loading into the Tcl shell using standard "package require" mechanism.

@@ -337,6 +337,7 @@ static int jsonParseValue(
             skipspace(i);
             if (json[i] == ']') {
                 jparse->within = savedWithin;
+                jparse->nestingDepth--;
                 return i+1;
             }
             if (json[i] == ',') {
