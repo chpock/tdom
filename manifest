@@ -1,5 +1,5 @@
-C Windows\sbuild\ssystem\s(VC\sand\smingw)\smodernised.
-D 2017-08-21T21:38:43.164
+C Some\smore\sproof\sreading.
+D 2017-08-21T23:46:41.602
 F CHANGES 32e2f76ec01a9205c8443fba54f50f13c05722f6
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -21,9 +21,9 @@ F doc/dom.xml b0a44a6858f88df8d2c7bc952a8ebae54369d4e8
 F doc/domDoc.html 39ab0b23074f5a847087d51359edc0e66b52d454
 F doc/domDoc.n fe35d96b23026428c62322348c5fecaf7ad56fc6
 F doc/domDoc.xml aa17a4b59db5164870c2bff76d8a143d94cafc4b
-F doc/domNode.html 6768c606823dd2a59d185dc8b130101db78b2522
-F doc/domNode.n 70cee2dd9f0175392459858aaeff39d716501cec
-F doc/domNode.xml eed367825d1b77b239485aea3c92456f0c72f4c7
+F doc/domNode.html 4d9bf0a780802d9758934c7b4de085aa49e400df
+F doc/domNode.n c0efc75096e64e4cd5567fb46520a2936b8ae63c
+F doc/domNode.xml d95c111f760d36535bd364e3e67d4a7b32231c9a
 F doc/expat.html d4159132458833d9e1503ee98fcc8705d86cd987
 F doc/expat.n 1532a92db725e1d28a357484fe9105ebe7fb778c
 F doc/expat.xml cc280131ede8000bcfe6d79ead52b0852076a55d
@@ -248,8 +248,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P fe8daed3e64cd9b20a46a0cfc2ab34adc17f12ed 3843ca8dc2aa5058b1815a74d55413d4e021cd4e
-R 5242b1e358f8972ec173ae77570dab8e
+P 640dd65ff9d5b55b1fec11526b5057cc4b5a8330
+R d90e49d8de4af7cfb6095a2088dc490f
 U rolf
-Z 257dd622ac5a20cd690325676dca6ed5
+Z 417557dc225fb45f0c7477d075cf1973
 # Remove this line to create a well-formed Fossil manifest.
