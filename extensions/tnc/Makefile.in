@@ -294,7 +294,7 @@ VPATH = $(srcdir):$(srcdir)/generic:$(srcdir)/unix:$(srcdir)/win:$(srcdir)/macos
 
 pkgIndex.tcl-hand:
 	@(echo 'package ifneeded $(PACKAGE_NAME) $(PACKAGE_VERSION) \
-	"package require todm;\
+	"package require tdom;\
 	 load [list [file join $$dir $(PKG_LIB_FILE)]];"'\
 	) > pkgIndex.tcl
 
