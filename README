@@ -7,7 +7,7 @@
 This directory contains a freely distributable thread-safe extension
 to Tcl/Tk called tDOM.
 
-tDOM was stated by Jochen Loewer (loewerj@hotmail.com) and developted
+tDOM was started by Jochen Loewer (loewerj@hotmail.com) and developed
 by Jochen and Rolf Ade (rolf@pointsman.de) with contributions by Zoran
 Vasiljevic (zv@archiware.com). Since more than a decade it is
 maintained and developed by Rolf Ade.
@@ -15,12 +15,12 @@ maintained and developed by Rolf Ade.
 
 tDOM contains:
 
-    *  for convencience expat 2.2.0, the XML parser originated from
-       James Clark although you're able to link tdom with another
-       expat version or the library provided by the system.
+    *  for convenience expat 2.2.0, the XML parser originated from
+       James Clark, although you're able to link tDOM with other
+       expat versions or the library provided by the system.
 
     *  building a DOM tree from XML in one go implemented in C for
-       maximum performance and minimum memory usage and DOM I and II
+       maximum performance and minimum memory usage, and DOM I and II
        methods to work on such a tree using either a OO-like or a
        handle syntax.
 
@@ -36,7 +36,7 @@ tDOM contains:
     *  optional DTD validation.
 
     *  a JSON parser which parses any possible JSON input into a DOM
-       tree without loose of information.
+       tree without losing information.
 
     *  an efficient and Tcl'ish way to create XML and HTML documents
        and JSON string.
@@ -54,7 +54,7 @@ tDOM contains:
 DOCUMENTATION
 
     The documentation is included into the source distribution in HTML
-    and man format. Alternatively read it online starting at
+    and man format. Alternatively, read it online starting at
     http://tdom.org/index.html/doc/tdom-0-9-0/doc/index.html
 
 
@@ -65,7 +65,7 @@ GETTING THE CODE
     trunk.
 
     If you insist on using an older tDOM with lesser features and
-    probably more bugs you should use the latest release 0.9.0. Get
+    probably more bugs, you should use the latest release 0.9.0. Get
     the source code release from
     http://tdom.org/downloads/tdom-0.9.0-src.tgz or
     http://tdom.org/downloads/tdom-0.9.0-src.zip
@@ -92,12 +92,12 @@ COMPILING tDOM
     Alternatively, you can build the tDOM package in just about any
     directory elsewhere on the fileystem (since TEA-compatible).
     
-    You might also want to do "../configure --help" to get list of all
-    supported options of the configure script. In the "unix" directory
-    there is a "CONFIG" file containing some examples on how to invoke
-    the "configure" script for some common cases. You can peek
-    there. This file also includes a short description of the tDOM
-    specific configure options.
+    You might also want to do "../configure --help" to get a list of
+    all supported options of the configure script. In the "unix"
+    directory there is a "CONFIG" file containing some examples on how
+    to invoke the "configure" script for some common cases. You can
+    peek there. This file also includes a short description of the
+    tDOM specific configure options.
 
     Since tDOM is TEA-compatible you should be able to build it using
     the MinGW build environment for Windows. There is also the MSVC
