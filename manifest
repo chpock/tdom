@@ -1,11 +1,11 @@
-C Added\sa\slink\sto\sthe\srepository\sand\sa\smeta\scontent\stag\sto\sthe\sHTML\sdocumentation.
-D 2017-08-23T14:10:06.360
+C Changed\sthe\slink\sto\s/\sfile\sname\sof\sthe\ssource\sdistribution.
+D 2017-08-23T14:45:17.260
 F CHANGES 32e2f76ec01a9205c8443fba54f50f13c05722f6
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 3965f5b535b48290240151057611b376495aadec
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
-F README 84d2c21fb67e6cbda3addddc02ef09b2cb20f762
+F README e7a07e1f9321b63186aeca07c759779152b14d42
 F README.AOL 7ed4520a6ceef92f2c564f2cdc7305c382847268
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/xslt.tcl ac4a75ba2f05e26d4ea6f92547983caa80fc6d55
@@ -229,8 +229,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 6cdde781d59f114701921ea651ca63b251a77958
-R d95ed9c8578a0697aee536f2d4a5b2a3
+P 44f479fa12552cfc45613208b07aa286eade568f
+R 2821b81901180139bf97236fbaa27140
 U rolf
-Z 087c5c58166957c8f4cef1a3036ff566
+Z 09a9f63f6dc6f33405180b4cbba3397f
 # Remove this line to create a well-formed Fossil manifest.

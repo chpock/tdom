@@ -67,8 +67,8 @@ GETTING THE CODE
     If you insist on using an older tDOM with lesser features and
     probably more bugs you should use the latest release 0.9.0. Get
     the source code release from
-    http://tdom.org/downloads/tdom-0.9.0.tgz or
-    http://tdom.org/downloads/tdom-0.9.0.zip
+    http://tdom.org/downloads/tdom-0.9.0-src.tgz or
+    http://tdom.org/downloads/tdom-0.9.0-src.zip
 
     Windows binaries (32 bit as well as 64 bit) of the 0.9.0 release
     are also available. Get it from
