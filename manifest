@@ -1,5 +1,5 @@
-C Updated\sREADME.
-D 2017-08-23T13:34:42.751
+C Added\sa\slink\sto\sthe\srepository\sand\sa\smeta\scontent\stag\sto\sthe\sHTML\sdocumentation.
+D 2017-08-23T14:10:06.360
 F CHANGES 32e2f76ec01a9205c8443fba54f50f13c05722f6
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -14,33 +14,33 @@ F configure-tcl8.0.5 db1a666545d519c42e229d245224d456a84c798a x
 F configure.in 8484b8a4101d22a1a294d8b0efc66d91fca90c49
 F doc/INDEX.MAP c8e767983bcea4bbd53ecdbf3d78cb044996e9bc
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
-F doc/category-index.html b7ef39eb9462a9b368c9cc95a8e059d9d8e04023
-F doc/dom.html bcd008175cf021e2bd6d916948fc46800fd8b41e
+F doc/category-index.html 98092b3a6d0fa7ade2cd5715b56ea0a6fef89be1
+F doc/dom.html 59d7e9f815e534bf6f510e6eade17945e0ed4d5a
 F doc/dom.n 1121676ae4b042a5648b66d9a6cf4a2e1a5cb863
 F doc/dom.xml b0a44a6858f88df8d2c7bc952a8ebae54369d4e8
-F doc/domDoc.html 39ab0b23074f5a847087d51359edc0e66b52d454
+F doc/domDoc.html 830d07be5860146dbab74129dac41545ffccda3d
 F doc/domDoc.n fe35d96b23026428c62322348c5fecaf7ad56fc6
 F doc/domDoc.xml aa17a4b59db5164870c2bff76d8a143d94cafc4b
-F doc/domNode.html 4d9bf0a780802d9758934c7b4de085aa49e400df
+F doc/domNode.html ab1981c00c998fe176ff14774ffc0da63d873a80
 F doc/domNode.n c0efc75096e64e4cd5567fb46520a2936b8ae63c
 F doc/domNode.xml d95c111f760d36535bd364e3e67d4a7b32231c9a
-F doc/expat.html d4159132458833d9e1503ee98fcc8705d86cd987
+F doc/expat.html 8418308697f649252ecdcd8b0e85671e7e88d141
 F doc/expat.n 1532a92db725e1d28a357484fe9105ebe7fb778c
 F doc/expat.xml cc280131ede8000bcfe6d79ead52b0852076a55d
-F doc/expatapi.html c1fd62c5795ba72b660958f6cb4089cf13c40f86
+F doc/expatapi.html 823625fbed8656c1e22dc19d113fb0cb85429e62
 F doc/expatapi.n 6b56b9d897f32d15a7cdac0e0c9b8c636c5b8d56
 F doc/expatapi.xml 82ad1cfa27e60658976cb03d8e7a11d42558651b
-F doc/index.html 638a833481f11b86e8e3f7393d6c6c190d0b96b7
-F doc/keyword-index.html e6540c020887723f92157011dbc71161a96cca97
+F doc/index.html 468688212024d55c7005365e86ac4160aae87c79
+F doc/keyword-index.html 5be2401954db258fd6efdee746ba97f02032224c
 F doc/manpage.css 3b4ec1d641048933a7e6bffc659de9519030a959
 F doc/tDOM.xml 35369df6a7d84d68cfb28692530ef9d1a8b8ca3e
-F doc/tdomcmd.html 29c548837d9ce0ef0df56ef2fd8afec5b73524a2
+F doc/tdomcmd.html b1406826c77b1079a2276adbf5104953a7b0f309
 F doc/tdomcmd.n 087bbf0cf783376e39ff903a48bc377ce507b8f3
 F doc/tdomcmd.xml fa7bb2424b54e7180148f53557f4059673103c9a
 F doc/tmml.dtd 63259dc9f69f9104f1515be445b85b195a1fb990
 F doc/tmml.options 8a76115c6e9725e8dae55b3005e8ba9878023bbd
 F doc/tmml.rnc 65a2a69ac3347b19aa57e70bb127a4923f5dfc95
-F doc/tnc.html d42c36f539049a37a097be79e83bb1c841ec634a
+F doc/tnc.html 3b5c14cff179a67313bb33698e9fed810cb623fd
 F doc/tnc.n 147129ce67de3ac8758752bf9747ebf193f60626
 F doc/tnc.xml 9a687664923259ff45bd0cf4b69d4c65dc3f59f3
 F encodings/GenCompactCodings 5996a4e04bf65b44226c90260f7a19c30c077a7a x
@@ -229,8 +229,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 792b1394bc4f049f0cd2b80102010251a6f5044f
-R 11fa3f7bb696651dcbd083fa21a7e8a8
+P 6cdde781d59f114701921ea651ca63b251a77958
+R d95ed9c8578a0697aee536f2d4a5b2a3
 U rolf
-Z 7f64cd276570f6048d30101318dcfbbf
+Z 087c5c58166957c8f4cef1a3036ff566
 # Remove this line to create a well-formed Fossil manifest.
