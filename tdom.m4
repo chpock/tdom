@@ -243,7 +243,11 @@ AC_DEFUN(TDOM_ENABLE_HTML5, [
         if test "$HAVEGUMBO" = "1" ; then
             AC_MSG_RESULT([yes])
             AC_DEFINE(TDOM_HAVE_GUMBO)
-            HTML5_LIBS="`pkg-config --cflags --libs gumbo`"
+            if test "${TEA_PLATFORM}" = "windows" ; then
+                HTML5_LIBS="-Wl,-Bstatic `pkg-config --static --cflags --libs gumbo` -Wl,-Bdynamic"
+            else
+                HTML5_LIBS="`pkg-config --cflags --libs gumbo`"
+            fi
         else
             AC_MSG_ERROR([The required lib gumbo not found])
         fi
@@ -356,6 +360,8 @@ AC_DEFUN(TDOM_PATH_EXPAT, [
                          expat/xmltok.c \
                          expat/xmlparse.c])
         TEA_ADD_INCLUDES([-I${srcdir}/expat])
+        AC_DEFINE([XML_POOR_ENTROPY], 1,
+          [Define to use poor entropy in lack of better source.])
     else
         AC_MSG_RESULT([Using shared expat found in ${ac_cv_c_expat}])
         TEA_ADD_INCLUDES(-I${ac_cv_c_expat}/include)

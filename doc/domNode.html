@@ -4,17 +4,17 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x962a70">NAME</a> · <a href="#SECTid0x8ddff0">SYNOPSIS</a> · <a href="#SECTid0xa6c150"> DESCRIPTION </a> · <a href="#SECTid0xa96b80">SEE ALSO</a> · <a href="#SECTid0xa96f10">KEYWORDS</a>
+<a href="#SECTid0xdf8210">NAME</a> · <a href="#SECTid0xee14e0">SYNOPSIS</a> · <a href="#SECTid0xee1960"> DESCRIPTION </a> · <a href="#SECTid0xf424b0">SEE ALSO</a> · <a href="#SECTid0xf42840">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x962a70">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0xdf8210">NAME</a></h2><p class="namesection">
 <b class="names">domNode - </b><br>Manipulates an instance of a DOM node object</p>
 
 
 
-  <h2><a name="SECTid0x8ddff0">SYNOPSIS</a></h2><pre class="syntax"> $nodeObject <i class="m">method</i>  <i class="m">arg arg ...</i>
+  <h2><a name="SECTid0xee14e0">SYNOPSIS</a></h2><pre class="syntax"> $nodeObject <i class="m">method</i>  <i class="m">arg arg ...</i>
 </pre>
-  <h2><a name="SECTid0xa6c150"> DESCRIPTION </a></h2><p>This command manipulates one particular instance of a DOM node object.
+  <h2><a name="SECTid0xee1960"> DESCRIPTION </a></h2><p>This command manipulates one particular instance of a DOM node object.
 <i class="m">method</i> indicates a specific method of the node class. These methods
 should closely conform to the W3C recommendation "Document Object Model
 (Core) Level 1" (<a href="http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html">http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html</a>)
@@ -55,7 +55,7 @@ value.</dd>
 
       
         <dt><b class="method">hasChildNodes</b></dt>
-        <dd>Returns 1 if the has children. Otherwise 0 is returned.</dd>
+        <dd>Returns 1 if the node has children. Otherwise 0 is returned.</dd>
       
 
       
@@ -77,7 +77,7 @@ the node in the sense of the DOM recommendation. This nodeList object is
 "live" in the sense that, for instance, changes to the children of
 the node object that it was created from are immediately reflected in the nodes
 returned by the NodeList accessors; it is not a static snapshot of the content
-of the node. The both accessors know by the nodeList object are "item
+of the node. The two accessors known by the nodeList object are "item
 &lt;index&gt;", which returns the indexth item in the collection, and
 "length", which returns the number of nodes in the list.</dd>
       
@@ -100,7 +100,7 @@ of the node. The both accessors know by the nodeList object are "item
         <dt>
 <b class="method">nextSibling</b>  <b class="variable">?objVar?</b>
 </dt>
-        <dd>Returns the next sibling relativ to the current node as a node
+        <dd>Returns the next sibling relative to the current node as a node
 object.</dd>
       
 
@@ -108,7 +108,7 @@ object.</dd>
         <dt>
 <b class="method">previousSibling</b> <b class="variable">?objVar?</b>
 </dt>
-        <dd>Returns the next sibling relativ to the current node as a node
+        <dd>Returns the next sibling relative to the current node as a node
 object.</dd>
       
 
@@ -133,8 +133,8 @@ matching (glob style) <i class="m">localname</i> and having the given namespace
         <dt>
 <b class="method">getElementById</b> <i class="m">id</i>
 </dt>
-        <dd>Returns the node having a id attribute with value
-<i class="m">id</i> or the emtpy string, if no node has an id attribute with that value.</dd>
+        <dd>Returns the node having an id attribute with value
+<i class="m">id</i> or the emtpy string if no node has an id attribute with that value.</dd>
       
 
       
@@ -149,7 +149,7 @@ matching (glob style) <i class="m">localname</i> and having the given namespace
         <dt>
 <b class="method">getAttribute</b> <i class="m">attributeName  ?defaultValue?</i>
 </dt>
-        <dd>Returns the value of the attribute <i class="m">attributeName</i>. If
+        <dd>Returns the value of the attribute <i class="m">attributeName</i>. If the
 attribute is not available <i class="m">defaultValue</i> is returned.</dd>
       
 
@@ -161,10 +161,9 @@ attribute is not available <i class="m">defaultValue</i> is returned.</dd>
         <dd>Sets the value for one or more attributes. Every
         <i class="m">attributeName</i> is set to the corresponding
         <i class="m">newValue</i>. If there isn't an attribute for one or more
-        of the <i class="m">attributeName</i> this will create that attribute.
+        of the <i class="m">attributeName</i>, this will create that attribute.
         It is not recommended to set attributes that look like xml
         namespace declarations.</dd>
-
       
 
       
@@ -233,7 +232,7 @@ prefix. It is not recommended to set xml namespace declarations. The effects are
 <b class="method">attributes</b> <b class="option">?attributeNamePattern?</b>
 </dt>
         <dd>Returns all attributes matching the <i class="m">attributeNamePattern</i>.
-If <i class="m">attributeNamePattern</i> isn't given all attributes are returned as a Tcl
+If <i class="m">attributeNamePattern</i> isn't given, all attributes are returned as a Tcl
 list.</dd>
       
 
@@ -241,7 +240,7 @@ list.</dd>
         <dt>
 <b class="method">appendChild</b> <i class="m">newChild</i>
 </dt>
-        <dd>Append <i class="m">newChild</i> to the end of the child list of the
+        <dd>Appends <i class="m">newChild</i> to the end of the child list of the
 node.</dd>
       
 
@@ -249,7 +248,7 @@ node.</dd>
         <dt>
 <b class="method">insertBefore</b> <i class="m">newChild</i>  <i class="m">refChild</i>
 </dt>
-        <dd>Insert <i class="m">newChild</i> before the <i class="m">refChild</i> into the list of
+        <dd>Inserts <i class="m">newChild</i> before the <i class="m">refChild</i> into the list of
 children of node. If <i class="m">refChild</i> is the empty string, insert
 <i class="m">newChild</i> at the end of the child nodes list of that node.</dd>
       
@@ -258,7 +257,7 @@ children of node. If <i class="m">refChild</i> is the empty string, insert
         <dt>
 <b class="method">replaceChild</b> <i class="m">newChild</i>  <i class="m">oldChild</i>
 </dt>
-        <dd>Replace <i class="m">oldChild</i> with <i class="m">newChild</i> in the list of
+        <dd>Replaces <i class="m">oldChild</i> with <i class="m">newChild</i> in the list of
 children of that node. The <i class="m">oldChild</i> node will be part of the
 document fragment list after this operation.</dd>
       
@@ -267,9 +266,9 @@ document fragment list after this operation.</dd>
         <dt>
 <b class="method">removeChild</b> <i class="m">child</i>
 </dt>
-        <dd>Removes <i class="m">child</i> from the list of children of that node
+        <dd>Removes <i class="m">child</i> from the list of children of that node.
 <i class="m">child</i> will be part of the document fragment list after this
-operation. It is not physically deleted.</dd>
+operation.</dd>
       
 
       
@@ -409,7 +408,7 @@ always be seen as string literal by the xpath engine. Cast the value
 explicitly with the according xpath functions (number(), boolean()) to
 another data type, if needed.</p>
 
-<p>Simmilar to the above descibed way to inject literals in a secure
+<p>Similar to the way described above to inject literals in a secure
 way into the XPath expression using tcl variable references there is a
 syntax to inject element names from tcl variables. At every place
 where the XPath syntax allows a node test there could be a tcl
@@ -427,7 +426,7 @@ this fails, then the namespace definitions in scope of the context
 node will be used to resolve the prefix. If this option is given, any
 namespace prefix within the xpath expression will be first resolved
 against that given list (and ignoring the document global prefix /
-namespace list). If the list bind the same prefix to different
+namespace list). If the list binds the same prefix to different
 namespaces, then the first binding will win.  If this fails, then the
 namespace definitions in scope of the context node will be used to
 resolve the prefix, as usual.</p>
@@ -436,7 +435,7 @@ resolve the prefix, as usual.</p>
 <i class="m">xpathQuery</i> will be looked up in a document specific cache. If
 the query is found, then the stored pre-compiled query will be used.
 If the query isn't found, it will be compiled and stored in the cache,
-for use in further calls. Please notice, that the <i class="m">xpathQuery</i> as
+for use in further calls. Please note that the <i class="m">xpathQuery</i> 
 given as string is used as key for the cache. This means, that equal
 XPath expressions, which differ only in white space are treated as
 different cache entries. Special care is needed, if the XPath
@@ -497,7 +496,7 @@ nested Tcl list.</dd>
         PCDATA content will be escaped as character reference in
         decimal representation.</p>
 
-        <p>The flag <i class="m">-xmlDeclaration</i> determines, whether there
+        <p>The flag <i class="m">-xmlDeclaration</i> determines whether there
         will be an XML Declaration and a newline emitted before
         anything else. The default is, to do not. If this flag is
         given with a true argument then</p>
@@ -534,7 +533,7 @@ as string or sends the output directly to the given channelId. If the option
 <i class="m">-escapeNonASCII</i> is given, every non 7 bit ASCII character in attribute
 values or element PCDATA content will be escaped as character reference in
 decimal representation. If the option <i class="m">-htmlEntities</i> is given, a
-character is outputed using a HTML 4.01 character entity reference, if one is
+character is written using its HTML 4.01 character entity reference, if one is
 defined for it.</dd>
       
 
@@ -569,7 +568,7 @@ given node.</dd>
 </dt>
         <dd>Inserts the nodes created in the <i class="m">tclScript</i> by
 Tcl functions, which have been built using <i class="m">dom createNodeCmd</i>, before the
-<i class="m">refChild</i> into to the list of children of node. If <i class="m">refChild</i> is
+<i class="m">refChild</i> into the list of children of node. If <i class="m">refChild</i> is
 the empty string, the new nodes will be appended.</dd>
       
 
@@ -586,7 +585,7 @@ appends this subtree to the current node.</dd>
 <b class="method">simpleTranslate</b> <i class="m">outputVar</i>
 <i class="m">specifications</i>
 </dt>
-        <dd>Translate the subtree starting at the object node according to
+        <dd>Translates the subtree starting at the object node according to
 the specifications in <i class="m">specifications</i> and outputs the result in the
 variable <i class="m">outputVar</i> . The translation is very similar to Cost Simple
 mode.</dd>
@@ -613,7 +612,7 @@ are returnd, which doesn't work in all cases.</dd>
 <b class="method">baseURI</b> <i class="m">?URI?</i>
 </dt>
         <dd>Returns the present baseURI of the node. If the optional 
-argument URI is given, sets the base URI of the node and of all of its child
+argument URI is given, it sets the base URI of the node and of all of its child
 nodes out of the same enitity as node to the given URI.</dd>
       
 
@@ -621,7 +620,7 @@ nodes out of the same enitity as node to the given URI.</dd>
         <dt>
 <b class="method">disableOutputEscaping</b> <i class="m">?boolean?</i>
 </dt>
-        <dd>This method works only for text nodes; for every other nodes it
+        <dd>This method works only for text nodes; for every other node it
 returns error. Without the optional argument it returns, if disabling output
 escaping is on. The return value 0 means, the characters of the text node will
 be escaped, to generate valid XML, if serialized. This is the default for
@@ -629,10 +628,10 @@ every parsed or created text node (with the exception of that text nodes in a
 result tree of an XSLT transformation, for which disabling output escaping was
 requested explicitely in the stylesheet). The return value 1 means, that output
 escaping is disabled for this text node. If such a text node is serialized
-(with asXML or asHTML), it is literarily written, without escaping of the
+(with asXML or asHTML), it is literally written, without escaping of the
 special XML characters. If the optional boolean value <i class="m">boolean</i> is given,
-the flag is set accordingly. You should not set this flag to 1, until you
-really know, what you do.</dd>
+the flag is set accordingly. You should not set this flag to 1 until you
+really know what you do.</dd>
       
 
       
@@ -641,8 +640,8 @@ really know, what you do.</dd>
 </dt>
         <dd>Compares the relative order of the node and <i class="m">refnode</i>. Both
 nodes must be part of the same documents and not out of the fragment list of
-the document. Returns true, if node is in document order (in the sense of the
-XPath 1.0 recommendation) before <i class="m">refnode</i> and false otherwise.</dd>
+the document. Returns true if node is in document order (in the sense of the
+XPath 1.0 recommendation) before <i class="m">refnode</i>, and false otherwise.</dd>
       
 
 
@@ -679,10 +678,10 @@ list consisting of parameter name and value pairs.</p>
 <p>If the option <i class="m">-ignoreUndeclaredParameters</i> is given, then parameter
 names in the <i class="m">parameterList</i> given to the <i class="m">-parameters</i> options that
 are not declared as top-level parameters in the stylesheet are silently
-ignored. Without this option, an error is raised, if the user tries to set a
-top-level parameter, which is not declared in the stylesheet.</p>
+ignored. Without this option, an error is raised if the user tries to set a
+top-level parameter which is not declared in the stylesheet.</p>
 
-<p>The option <i class="m">-maxApplyDepth</i> expects a positiv integer as
+<p>The option <i class="m">-maxApplyDepth</i> expects a positive integer as
 argument. By default, the xslt engine allows xslt templates to nest up
 to 3000 levels (and raises error if they nest deeper). This limit can
 be set by the <i class="m">-maxApplyDepth</i> option.</p>
@@ -691,12 +690,12 @@ be set by the <i class="m">-maxApplyDepth</i> option.</p>
 in the stylesheet. The actual command consists of the script, given as argument
 to the option, appended with the XML Fragment from instantiating the
 xsl:message element content as string (as if the XPath string() function would
-have been applied to the XML Fragment) and a flag, which indicates, if the
+have been applied to the XML Fragment) and a flag, which indicates wether the
 xsl:message has an attribute "terminate" with the value "yes". If the
 called script returns anything else then TCL_OK then the xslt
 transformation will be aborted, returning error. If the called script
-returns -code break, the error message is empty, otherwise the result
-code is reported. In case of terminated transformation, the outputVar,
+returns -code break the error message is empty, otherwise the result
+code is reported. In case of terminated transformation the outputVar,
 if given, is set to the empty string.</p>
 </dd>
       
@@ -726,9 +725,9 @@ name as the given method within the namespace <tt class="l">::dom::domNode</tt> 
 be executed. This allows quick method additions on Tcl level.</p>
 
 
-  <h2><a name="SECTid0xa96b80">SEE ALSO</a></h2><p class="seealso">dom, domDoc</p>
+  <h2><a name="SECTid0xf424b0">SEE ALSO</a></h2><p class="seealso">dom, domDoc</p>
   
-  <h2><a name="SECTid0xa96f10">KEYWORDS</a></h2><p class="keywords">
+  <h2><a name="SECTid0xf42840">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-XML">XML</a>, <a class="keyword" href="keyword-index.html#KW-DOM">DOM</a>, <a class="keyword" href="keyword-index.html#KW-document">document</a>, <a class="keyword" href="keyword-index.html#KW-node">node</a>, <a class="keyword" href="keyword-index.html#KW-parsing">parsing</a>
 </p>
   
