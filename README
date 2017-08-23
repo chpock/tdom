@@ -81,8 +81,8 @@ GETTING THE CODE
 
 COMPILING tDOM
 
-    Depending on your platform, (unix or win) go to the corresponding
-    directory and invoke the configure script:
+    Depending on your platform (unix/mac or win), go to the
+    corresponding directory and invoke the configure script:
 
         ../configure
         make 
