@@ -161,7 +161,7 @@ Please `cd` to its location first.
 PROJECT = tdom
 !include "rules.vc"
 
-DOTVERSION      = 0.8.3
+DOTVERSION      = 0.9.0
 VERSION         = $(DOTVERSION:.=)
 STUBPREFIX      = $(PROJECT)stub
 
@@ -174,7 +174,7 @@ DLLOBJS = \
 	$(TMP_DIR)\dom.obj         \
 	$(TMP_DIR)\domalloc.obj    \
 	$(TMP_DIR)\domhtml.obj     \
-	$(TMP_DIR)\domhtml5.obj     \
+	$(TMP_DIR)\domhtml5.obj    \
 	$(TMP_DIR)\domxslt.obj     \
 	$(TMP_DIR)\nodecmd.obj     \
 	$(TMP_DIR)\domxpath.obj    \
