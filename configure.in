@@ -133,7 +133,7 @@ if test "${TEA_PLATFORM}" = "windows" ; then
     #TEA_ADD_SOURCES([win/winFile.c])
     #TEA_ADD_INCLUDES([-I\"$(${CYGPATH} ${srcdir}/win)\"])
 else
-    CLEANFILES="pkgIndex.tcl tdomConfig.sh tdom.tcl tcldomsh"
+    CLEANFILES="pkgIndex.tcl tdom.tcl tcldomsh"
     #TEA_ADD_SOURCES([unix/unixFile.c])
     #TEA_ADD_LIBS([-lsuperfly])
 fi

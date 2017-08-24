@@ -1,17 +1,17 @@
-C Changed\sa\slast\scomma.
-D 2017-08-23T16:16:41.853
+C Install\salso\stdomConfig.sh.\sAnd\ssince\stdomConfig.sh\sis\sgenerated\sby\sconfigure,\sdon't\sremove\sit\swith\smake\sclean\sbut\sonly\swith\smake\sdistclean.
+D 2017-08-24T13:57:44.934
 F CHANGES 32e2f76ec01a9205c8443fba54f50f13c05722f6
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
-F Makefile.in 3965f5b535b48290240151057611b376495aadec
+F Makefile.in d75a5497674f790f32be0f83d9b101041233b00f
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
 F README 4a04853957b7d6d8b9198a83af406815294de53b
 F README.AOL 7ed4520a6ceef92f2c564f2cdc7305c382847268
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/xslt.tcl ac4a75ba2f05e26d4ea6f92547983caa80fc6d55
-F configure 3f4dd7acbf7d01816036658a560cb63e52255c49 x
+F configure 206d248578e2d42e472f4195636af950c9216051 x
 F configure-tcl8.0.5 db1a666545d519c42e229d245224d456a84c798a x
-F configure.in 8484b8a4101d22a1a294d8b0efc66d91fca90c49
+F configure.in 71902e55a61ba7cc62ddc0b3488411f14102a7c9
 F doc/INDEX.MAP c8e767983bcea4bbd53ecdbf3d78cb044996e9bc
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html 98092b3a6d0fa7ade2cd5715b56ea0a6fef89be1
@@ -229,8 +229,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 1aaa919d6e9db46150d9b8b7abedf4890ac7e158
-R c9e8f0afb15031161eaa62294936c968
+P fe91db4e276040d442df7e8881068b582873ee88
+R c46ab609f412388f4e95f42dae7a0af1
 U rolf
-Z 717a34f1212d60a59f104886251cc2f5
+Z cf8a8d2aaf63246f2ab4e5f2e565dc0e
 # Remove this line to create a well-formed Fossil manifest.

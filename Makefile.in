@@ -175,7 +175,7 @@ PKG_CFLAGS	= @PKG_CFLAGS@
 DEFS		= @DEFS@ $(PKG_CFLAGS)
 
 # Move pkgIndex.tcl to 'BINARIES' var if it is generated in the Makefile
-CONFIG_CLEAN_FILES = Makefile pkgIndex.tcl
+CONFIG_CLEAN_FILES = Makefile pkgIndex.tcl tdomConfig.sh
 CLEANFILES	= @CLEANFILES@
 
 CPPFLAGS	= @CPPFLAGS@
@@ -427,6 +427,8 @@ install-lib-binaries: binaries
 	    fi; \
 	  fi; \
 	done
+	@echo "Installing tdomConfig.sh to $(DESTDIR)$(libdir)/"
+	@$(INSTALL_DATA) tdomConfig.sh "$(DESTDIR)$(libdir)/tdomConfig.sh"
 	@list='$(PKG_TCL_SOURCES)'; for p in $$list; do \
 	  if test -f $(srcdir)/$$p; then \
 	    destp=`basename $$p`; \
