@@ -15,7 +15,7 @@ maintained and developed by Rolf Ade.
 
 tDOM contains:
 
-    *  for convenience expat 2.2.0, the XML parser originated from
+    *  for convenience expat 2.2.4, the XML parser originated from
        James Clark, although you're able to link tDOM with other
        expat versions or the library provided by the system.
 
