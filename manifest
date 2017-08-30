@@ -1,5 +1,5 @@
-C Plugged\smemory\sleak\sin\scase\s[dom\screateDocumentNS]\sis\serroneously\scalled\swith\sprefixed\sdocument\selement\sname\sand\sthe\sempty\sstring\sas\snamespace\sURI.
-D 2017-08-30T14:03:55.982
+C Now\sthe\sdomNode\smethod\scloneNode\sdoes\salso\scopy\sthe\sjson\stype\sannotation\sof\sthe\snode\sor\ssubtree\sto\sclone.
+D 2017-08-30T15:21:19.715
 F CHANGES 32e2f76ec01a9205c8443fba54f50f13c05722f6
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -124,7 +124,7 @@ F extensions/tnc/tnc.c 5882c44366dc07358ca1d9ea31ec43bcac2c098b
 F extensions/tnc/win/makefile.vc c2445c1ea773738cd898a3325d32223d99a5225f
 F extensions/tnc/win/nmakehlp.c de6445b4bc73d55651ceabfbbf46b96e00d0c6a9
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
-F generic/dom.c 747fa561baa206849ee294490565ec176a88c9bb
+F generic/dom.c 5ef1846e93a9bc597feb555805e92b762e789649
 F generic/dom.h 6e967a3b38384b60e7dde1d856b2ee305e7ab6f2
 F generic/domalloc.c 55e9eeff19cc54cf3956a7013883ead07efd3593
 F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
@@ -195,7 +195,7 @@ F tests/dom.test e0febcbda4b7d4f10d76302574e7e64095f347e9
 F tests/domDoc.test b69b4c7a2f6df995f399bc33147ba5e635e6398f
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test 66a77f681b6e946b88c55a72efe62d8d7e430348
-F tests/domjson.test d048529181a57378e273e0d4a028d5f3ab553b62
+F tests/domjson.test 0d4b12158194b43b9c1a0f7f4352a64130eb49cb
 F tests/domnamespace.test c67346e939dab82f1b6de8ddd04bd004cf24391b
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
@@ -229,8 +229,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P fa48078af4cbe6180a191c2be94dc4900d0403d2
-R 0aef059d417bda274dabaf834a794c60
+P 9352a1da4164003b65478ddf18a95b1fd4363d2b
+R 5367532f8d2e45a0a6b5ff17b5a71098
 U rolf
-Z 195b8ba78d9796ca4a8ec3e990ed8d8f
+Z ecefa24227ef00094d5bd3d61142cb09
 # Remove this line to create a well-formed Fossil manifest.

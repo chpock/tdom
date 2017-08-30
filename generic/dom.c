@@ -4624,15 +4624,23 @@ domCloneNode (
                                          pinode->dataLength);
     }
     if (node->nodeType != ELEMENT_NODE) {
-        domTextNode *tnode = (domTextNode*)node;
-        return (domNode*) domNewTextNode(tnode->ownerDocument,
-                                         tnode->nodeValue, tnode->valueLength,
-					 tnode->nodeType);
+        domTextNode *t1node, *tnode = (domTextNode*)node;
+        if (tnode->info) {
+            t1node = domNewTextNode(tnode->ownerDocument,
+                                    tnode->nodeValue, tnode->valueLength,
+                                    tnode->nodeType);
+            t1node->info = tnode->info;
+            return (domNode*) t1node;
+        } else {
+            return (domNode*) domNewTextNode(tnode->ownerDocument,
+                                             tnode->nodeValue, tnode->valueLength,
+                                             tnode->nodeType);
+        }
     }
 
     n = domNewElementNode(node->ownerDocument, node->nodeName);
     n->namespace = node->namespace;
-
+    n->info = node->info;
 
     /*------------------------------------------------------------------
     |   copy attributes (if any)
