@@ -1,5 +1,5 @@
-C Merged\sfrom\strunk.
-D 2017-08-29T21:05:59.566
+C Added\snew\sexpat\ssource\sfiles.
+D 2017-08-30T11:44:47.125
 F CHANGES 32e2f76ec01a9205c8443fba54f50f13c05722f6
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -75,8 +75,10 @@ F expat/expat_external.h d284dec03c1304f71d57802834e2bf4cfaf3d4d4
 F expat/iasciitab.h dc8c6384b722aac84587943dd25633c51ecacd72
 F expat/internal.h a1b121549e0b04b65888c8a2b7c5cb7f37ba4483
 F expat/latin1tab.h b8d684ac2f448af019fd1a220fdfb24f7f6edf2f
+F expat/loadlibrary.c 9f09e06fa7ccc75c8798b9daf8274cfc22da5891
 F expat/macconfig.h 87e972880ef8ef8271c5ce1eb79662e1638290db
 F expat/nametab.h b50bbc064f5b733d359237beb26ab9ad1176a120
+F expat/siphash.h 3864e00b3c0c52acaa55e6d5b156b3c349204471
 F expat/utf8tab.h 11120617d08d6c93670e0d95fa1e7d887afa6b16
 F expat/winconfig.h ec69be71e7901619ebdbf6cf483da34333b4af40
 F expat/xmlparse.c b7bb07d7d7aae0371df02353f1354ca1baab57bd
@@ -228,8 +230,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 631d353e34d0c7ba32e61fd6086184305e684cb3 fa48078af4cbe6180a191c2be94dc4900d0403d2
-R 1367b2a56dedceaac710d987e3a4f731
+P 367f9260b38b643ce0b228fcba19a92c976d372d
+R 9c1b34b3b824f14aea4e21ec8e619249
 U rolf
-Z 25a6039e0deb6ea61fa5b444386113ac
+Z e56872c1f4df76065d8a524cdf2ecabd
 # Remove this line to create a well-formed Fossil manifest.
