@@ -4569,6 +4569,11 @@ domNewElementNodeNS (
     const char    *localname;
     domNS         *ns;
 
+    domSplitQName (tagName, prefix, &localname);
+    if (prefix[0] == '\0' && uri[0] == '\0') {
+        return NULL;
+    }
+
     h = Tcl_CreateHashEntry(&HASHTAB(doc, tdom_tagNames), tagName, &hnew);
     node = (domNode*) domAlloc(sizeof(domNode));
     memset(node, 0, sizeof(domNode));
@@ -4579,10 +4584,6 @@ domNewElementNodeNS (
     node->ownerDocument = doc;
     node->nodeName      = (char *)&(h->key);
 
-    domSplitQName (tagName, prefix, &localname);
-    if (prefix[0] == '\0' && uri[0] == '\0') {
-        return NULL;
-    }
     ns = domNewNamespace(doc, prefix, uri);
     node->namespace = ns->index;
 
