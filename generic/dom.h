@@ -497,13 +497,13 @@ typedef struct domDocInfo {
 } domDocInfo;
 
 #ifndef EMEM_BLOCK_SIZE
-#  define EMEM_BLOCK_SIZE 50
+#  define EMEM_BLOCK_SIZE 200
 #endif
 #ifndef AMEM_BLOCK_SIZE
-#  define AMEM_BLOCK_SIZE 20
+#  define AMEM_BLOCK_SIZE 200
 #endif
 #ifndef TMEM_BLOCK_SIZE
-#  define TMEM_BLOCK_SIZE 50
+#  define TMEM_BLOCK_SIZE 200
 #endif
 #ifndef PMEM_BLOCK_SIZE
 #  define PMEM_BLOCK_SIZE 20

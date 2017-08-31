@@ -1180,6 +1180,7 @@ int tcldom_appendXML (
     int          xml_string_len;
     int          resultcode = 0;
     int          ignorexmlns = 0;
+    int          copy = 0;
     domDocument *doc;
     domNode     *nodeToAppend;
     XML_Parser   parser;
@@ -1258,8 +1259,16 @@ int tcldom_appendXML (
 
     
     nodeToAppend = doc->rootNode->firstChild;
+    if ((doc->nodeFlags & BULK_ALLOC)
+        || (node->ownerDocument->nodeFlags & BULK_ALLOC)) {
+        copy = 1;
+    }
     while (nodeToAppend) {
-        domAppendChild(node, nodeToAppend);
+        if (copy) {
+            domCopyTo (nodeToAppend, node, 1);
+        } else {
+            domAppendChild(node, nodeToAppend);
+        }
         nodeToAppend = nodeToAppend->nextSibling;
     }
     domFreeDocument(doc, NULL, NULL);
@@ -4901,7 +4910,16 @@ int tcldom_NodeObjCmd (
             if (child == NULL) {
                 return TCL_ERROR;
             }
-            exception = domAppendChild (node, child);
+            if (node->ownerDocument != child->ownerDocument &&
+                ((node->ownerDocument->nodeFlags & BULK_ALLOC)
+                 || (child->ownerDocument->nodeFlags & BULK_ALLOC))) {
+                domCopyTo (child, node, 1);
+                domDeleteNode(child, tcldom_deleteNode, interp);
+                exception = OK;
+                child = node->lastChild;
+            } else {
+                exception = domAppendChild (node, child);
+            }
             if (exception != OK) {
                 SetResult(domException2String(exception));
                 return TCL_ERROR;
@@ -5200,12 +5218,6 @@ int tcldom_NodeObjCmd (
 
         case m_delete:
             CheckArgs(2,2,2,"");
-#ifdef DOM_MALLOC            
-            if (node->ownerDocument->nodeFlags & BULK_ALLOC) {
-                SetResult("Error: use removeChild or change memory mode.");
-                return TCL_ERROR;
-            }
-#endif
             domDeleteNode(node, tcldom_deleteNode, interp);
             break;
 

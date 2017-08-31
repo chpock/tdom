@@ -2977,8 +2977,15 @@ domDeleteNode (
     )
     MutationEvent3(DOMNodeRemoved, childToRemove, node);
     MutationEvent2(DOMSubtreeModified, node);
+#ifdef DOM_MALLOC            
+    if (doc->nodeFlags & BULK_ALLOC) {
+        node->nodeFlags |= IS_DELETED;
+    } else {
+        domFreeNode(node, freeCB, clientData, 0);
+    }
+#else
     domFreeNode(node, freeCB, clientData, 0);
-
+#endif
     return OK;
 }
 
@@ -3147,11 +3154,13 @@ domFreeDocument (
             }
             Tcl_DeleteHashTable(&doc->tdom_attrNames);
             domLocksDetach(doc);
-            node = doc->deletedNodes;
-            while (node) {
-                next = node->nextSibling;
-                domFreeNode (node, freeCB, clientData, 0);
-                node = next;
+            if (!(doc->nodeFlags & BULK_ALLOC)) {
+                node = doc->deletedNodes;
+                while (node) {
+                    next = node->nextSibling;
+                    domFreeNode (node, freeCB, clientData, 0);
+                    node = next;
+                    }
             }
         }
     )
