@@ -740,7 +740,7 @@ HTML_SimpleParse (
                 /*--------------------------------------------------------
                 |   allocate new TEXT node
                 \-------------------------------------------------------*/
-                tnode = (domTextNode*) domAlloc(sizeof(domTextNode));
+                tnode = domInitTextNodeStruct(doc);
                 memset(tnode, 0, sizeof(domTextNode));
                 tnode->nodeType    = TEXT_NODE;
                 tnode->nodeFlags   = 0;
@@ -947,7 +947,7 @@ HTML_SimpleParse (
                         /*----------------------------------------------------
                         |   allocate new COMMENT node for comments
                         \---------------------------------------------------*/
-                        tnode = (domTextNode*) domAlloc(sizeof(domTextNode));
+                        tnode = domInitTextNodeStruct(doc);
                         memset(tnode, 0, sizeof(domTextNode));
                         tnode->nodeType      = COMMENT_NODE;
                         tnode->nodeFlags     = 0;
@@ -1026,7 +1026,7 @@ HTML_SimpleParse (
                             /*----------------------------------------------------
                             |   allocate new TEXT node for CDATA section data
                             \---------------------------------------------------*/
-                            tnode = (domTextNode*) domAlloc(sizeof(domTextNode));
+                            tnode = domInitTextNodeStruct(doc);
                             memset(tnode, 0, sizeof(domTextNode));
                             tnode->nodeType      = TEXT_NODE;
                             tnode->nodeFlags     = 0;
@@ -1178,7 +1178,7 @@ HTML_SimpleParse (
             \----------------------------------------------------------*/
             h = Tcl_CreateHashEntry(&HASHTAB(doc,tdom_tagNames), e, &hnew);
 
-            node = (domNode*) domAlloc(sizeof(domNode));
+            node = domInitElementNodeStruct(doc);
             memset(node, 0, sizeof(domNode));
             node->nodeType      = ELEMENT_NODE;
             node->nodeFlags     = 0;
@@ -1282,7 +1282,7 @@ HTML_SimpleParse (
                 \--------------------------------------------------*/
                 h = Tcl_CreateHashEntry(&HASHTAB(doc,tdom_attrNames),
                                         ArgName, &hnew);
-                attrnode = (domAttrNode*) domAlloc(sizeof(domAttrNode));
+                attrnode = domInitAttrNodeStruct(doc);
                 memset(attrnode, 0, sizeof(domAttrNode));
                 attrnode->parentNode  = node;
                 attrnode->nodeName    = (char *)&(h->key);
@@ -1393,7 +1393,7 @@ HTML_SimpleParse (
                     /*----------------------------------------------------
                     |   allocate new TEXT node for style/script data
                     \---------------------------------------------------*/
-                    tnode = (domTextNode*) domAlloc(sizeof(domTextNode));
+                    tnode = domInitTextNodeStruct(doc);
                     memset(tnode, 0, sizeof(domTextNode));
                     tnode->nodeType      = TEXT_NODE;
                     tnode->nodeFlags     = 0;

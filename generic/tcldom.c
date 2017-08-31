@@ -165,6 +165,7 @@
 |   Module Globals
 |
 \---------------------------------------------------------------------------*/
+int bulkMem = 0;
 #ifndef TCL_THREADS
     static TEncoding *Encoding_to_8bit      = NULL;
     static int        storeLineColumn       = 0;
@@ -5199,6 +5200,12 @@ int tcldom_NodeObjCmd (
 
         case m_delete:
             CheckArgs(2,2,2,"");
+#ifdef DOM_MALLOC            
+            if (node->ownerDocument->nodeFlags & BULK_ALLOC) {
+                SetResult("Error: use removeChild or change memory mode.");
+                return TCL_ERROR;
+            }
+#endif
             domDeleteNode(node, tcldom_deleteNode, interp);
             break;
 
@@ -6748,7 +6755,7 @@ int tcldom_DomObjCmd (
         "isQName",         "isComment",          "isCDATA",
         "isPIValue",       "isNCName",           "createDocumentNode",
         "setNameCheck",    "setTextCheck",       "setObjectCommands",
-        "featureinfo",     "isBMPCharData",
+        "featureinfo",     "isBMPCharData",      "setMemType",
 #ifdef TCL_THREADS
         "attachDocument",  "detachDocument",
 #endif
@@ -6761,7 +6768,7 @@ int tcldom_DomObjCmd (
         m_isQName,           m_isComment,          m_isCDATA,
         m_isPIValue,         m_isNCName,           m_createDocumentNode,
         m_setNameCheck,      m_setTextCheck,       m_setObjectCommands,
-        m_featureinfo,       m_isBMPCharData
+        m_featureinfo,       m_isBMPCharData,      m_setMemType
 #ifdef TCL_THREADS
         ,m_attachDocument,   m_detachDocument
 #endif
@@ -6946,6 +6953,14 @@ int tcldom_DomObjCmd (
             }
             return TCL_OK;
 
+        case m_setMemType:
+            CheckArgs(3,3,2,"boolean");
+            if (Tcl_GetBooleanFromObj (interp, objv[2], &bool) != TCL_OK) {
+                return TCL_ERROR;
+            }
+            bulkMem = bool;
+            return TCL_OK;
+            
         case m_isCharData:
             CheckArgs(3,3,2,"string");
             SetBooleanResult(domIsChar(Tcl_GetString(objv[2])));

@@ -250,6 +250,250 @@ domProcessingInstructionNode * coerceToProcessingInstructionNode( domNode *n ) {
     return (domProcessingInstructionNode *)n;
 }
 
+static domDocument *
+domInitDocStruct (storeLineColumn) {
+    domDocument *doc;
+    _domDocument *_doc;
+    domNode *eNode;
+    domAttrNode *aNode;
+    domTextNode *tNode;
+    domPINode *pNode;
+    
+    if (bulkMem && !storeLineColumn) {
+        _doc = (_domDocument *) malloc (sizeof (_domDocument));
+        memset (_doc, 0, sizeof (_domDocument));
+        _doc->eBlock = (domNode *) malloc (sizeof (domNode) * (EMEM_BLOCK_SIZE + 1));
+        eNode = &_doc->eBlock[EMEM_BLOCK_SIZE];
+        eNode->nextSibling = NULL;
+        _doc->aBlock = (domAttrNode *) malloc (sizeof (domAttrNode) * (AMEM_BLOCK_SIZE + 1));
+        aNode = &_doc->aBlock[AMEM_BLOCK_SIZE];
+        aNode->nextSibling = NULL;
+        _doc->tBlock = (domTextNode *) malloc (sizeof (domTextNode) * (TMEM_BLOCK_SIZE + 1));
+        tNode = &_doc->tBlock[TMEM_BLOCK_SIZE];
+        tNode->nextSibling = NULL;
+        _doc->pBlock = (domPINode *) malloc (sizeof (domPINode) * (PMEM_BLOCK_SIZE + 1));
+        pNode = &_doc->pBlock[PMEM_BLOCK_SIZE];
+        pNode->nextSibling = NULL;
+        _doc->nodeFlags |= BULK_ALLOC;
+        doc = (domDocument *) _doc;
+    } else {
+        doc = (domDocument *) MALLOC (sizeof (domDocument));
+        memset (doc, 0, sizeof (domDocument));
+    }
+    doc->nodeType       = DOCUMENT_NODE;
+    doc->documentNumber = DOC_NO(doc);
+    doc->nsptr          = -1;
+    doc->nslen          =  4;
+    doc->namespaces     = (domNS**) MALLOC (sizeof (domNS*) * doc->nslen);
+
+    TDomThreaded(
+        domLocksAttach(doc);
+        Tcl_InitHashTable(&doc->tdom_tagNames, TCL_STRING_KEYS);
+        Tcl_InitHashTable(&doc->tdom_attrNames, TCL_STRING_KEYS);
+        );
+
+    return doc;
+}
+
+#ifdef DOM_MALLOC
+static void domFreeMemPool (domDocument *doc) 
+{
+    _domDocument *_doc = (_domDocument*) doc;
+    domNode *eBlock, *eNext, *eToFree;
+    domAttrNode *aNode, *aBlock, *aNext, *aToFree;
+    domTextNode *tNode, *tBlock, *tNext, *tToFree;
+    domPINode *pNode, *pBlock, *pNext, *pToFree;
+    int i;
+    
+    if (_doc->eBlock) {
+        eNext = &_doc->eBlock[EMEM_BLOCK_SIZE];
+        eToFree = _doc->eBlock;
+        while (eNext->nextSibling) {
+            eBlock = eNext->nextSibling;
+            free (eToFree);
+            eNext = &eBlock[EMEM_BLOCK_SIZE];
+            eToFree = eBlock;
+        }
+        free(eToFree);
+    }
+    if (_doc->aBlock) {
+        i = 0;
+        while (i < _doc->aNext) {
+            aNode = &_doc->aBlock[i];
+            FREE(aNode->nodeValue);
+            i++;
+        }
+        aNext = &_doc->aBlock[AMEM_BLOCK_SIZE];
+        aToFree = _doc->aBlock;
+        while (aNext->nextSibling) {
+            aBlock = aNext->nextSibling;
+            free (aToFree);
+            i = 0;
+            while(i < AMEM_BLOCK_SIZE) {
+                aNode = &aBlock[i];
+                FREE(aNode->nodeValue);
+                i++;
+            }
+            aNext = &aBlock[AMEM_BLOCK_SIZE];
+            aToFree = aBlock;
+        }
+        free(aToFree);
+    }
+    if (_doc->tBlock) {
+        i = 0;
+        while (i < _doc->tNext) {
+            tNode = &(_doc->tBlock[i]);
+            FREE(tNode->nodeValue);
+            i++;
+        }
+        tNext = &_doc->tBlock[TMEM_BLOCK_SIZE];
+        tToFree = _doc->tBlock;
+        while (tNext->nextSibling) {
+            tBlock = (domTextNode *) tNext->nextSibling;
+            free (tToFree);
+            i = 0;
+            while(i < TMEM_BLOCK_SIZE) {
+                tNode = &tBlock[i];
+                FREE(tNode->nodeValue);
+                i++;
+            }
+            tNext = &tBlock[TMEM_BLOCK_SIZE];
+            tToFree = tBlock;
+        }
+        free(tToFree);
+    }
+    if (_doc->pBlock) {
+        i = 0;
+        while (i < _doc->pNext) {
+            pNode = &(_doc->pBlock[i]);
+            FREE(pNode->targetValue);
+            FREE(pNode->dataValue);
+            i++;
+        }
+        pNext = &_doc->pBlock[PMEM_BLOCK_SIZE];
+        pToFree = _doc->pBlock;
+        while (pNext->nextSibling) {
+            pBlock = (domPINode *)pNext->nextSibling;
+            free (pToFree);
+            i = 0;
+            while(i < PMEM_BLOCK_SIZE) {
+                pNode = &pBlock[i];
+                FREE(pNode->targetValue);
+                FREE(pNode->dataValue);
+                i++;
+            }
+            pNext = &pBlock[PMEM_BLOCK_SIZE];
+            pToFree = pBlock;
+        }
+        free(pToFree);
+    }
+}
+
+domNode *
+domInitElementNodeStruct (domDocument *doc) 
+{
+    domNode *node, *newBlock, *next;
+    _domDocument *_doc;
+    
+    if (doc->nodeFlags & BULK_ALLOC) {
+        _doc = (_domDocument *) doc;
+        if (_doc->eNext == EMEM_BLOCK_SIZE) {
+            /* Alloc new block */
+            newBlock = (domNode *) malloc (sizeof (domNode)
+                                           * (EMEM_BLOCK_SIZE + 1)); 
+            node = &newBlock[0];
+            _doc->eNext = 1;
+            next = &newBlock[EMEM_BLOCK_SIZE];
+            next->nextSibling = _doc->eBlock;
+            _doc->eBlock = newBlock;
+        } else {
+            node = &_doc->eBlock[_doc->eNext++];
+        }
+    } else {
+        node = (domNode*) domAlloc(sizeof(domNode));
+    }
+    return node;
+}
+
+domTextNode *
+domInitTextNodeStruct (domDocument *doc) 
+{
+    domTextNode *node, *newBlock, *next;
+    _domDocument *_doc;
+    
+    if (doc->nodeFlags & BULK_ALLOC) {
+        _doc = (_domDocument *) doc;
+        if (_doc->tNext == TMEM_BLOCK_SIZE) {
+            /* Alloc new block */
+            newBlock = (domTextNode *) malloc (sizeof (domTextNode)
+                                               * (TMEM_BLOCK_SIZE + 1)); 
+            node = &newBlock[0];
+            _doc->tNext = 1;
+            next = &newBlock[TMEM_BLOCK_SIZE];
+            next->nextSibling = (domNode *)_doc->tBlock;
+            _doc->tBlock = newBlock;
+        } else {
+            node = &_doc->tBlock[_doc->tNext++];
+        }
+    } else {
+        node = (domTextNode*) domAlloc(sizeof(domTextNode));
+    }
+    return node;
+}
+
+domAttrNode *
+domInitAttrNodeStruct (domDocument *doc) 
+{
+    domAttrNode *node, *newBlock, *next;
+    _domDocument *_doc;
+    
+    if (doc->nodeFlags & BULK_ALLOC) {
+        _doc = (_domDocument *) doc;
+        if (_doc->aNext == AMEM_BLOCK_SIZE) {
+            /* Alloc new block */
+            newBlock = (domAttrNode *) malloc (sizeof (domAttrNode)
+                                               * (AMEM_BLOCK_SIZE + 1)); 
+            node = &newBlock[0];
+            _doc->aNext = 1;
+            next = &newBlock[AMEM_BLOCK_SIZE];
+            next->nextSibling = _doc->aBlock;
+            _doc->aBlock = newBlock;
+        } else {
+            node = &_doc->aBlock[_doc->aNext++];
+        }
+    } else {
+        node = (domAttrNode*) domAlloc(sizeof(domAttrNode));
+    }
+    return node;
+}
+
+domPINode *
+domInitPINodeStruct (domDocument *doc) 
+{
+    domPINode *node, *newBlock, *next;
+    _domDocument *_doc;
+    
+    if (doc->nodeFlags & BULK_ALLOC) {
+        _doc = (_domDocument *) doc;
+        if (_doc->pNext == PMEM_BLOCK_SIZE) {
+            /* Alloc new block */
+            newBlock = (domPINode *) malloc (sizeof (domPINode)
+                                             * (PMEM_BLOCK_SIZE + 1)); 
+            node = &newBlock[0];
+            _doc->pNext = 1;
+            next = &newBlock[PMEM_BLOCK_SIZE];
+            next->nextSibling = (domNode *) _doc->pBlock;
+            _doc->pBlock = newBlock;
+        } else {
+            node = &_doc->pBlock[_doc->pNext++];
+        }
+    } else {
+        node = (domPINode*) domAlloc(sizeof(domPINode));
+    }
+    return node;
+}
+#endif /* #ifdef DOM_MALLOC */
+
 /*---------------------------------------------------------------------------
 |   domIsNAME
 |
@@ -1132,7 +1376,7 @@ startElement(
         node = (domNode*) domAlloc(sizeof(domNode)
                                     + sizeof(domLineColumn));
     } else {
-        node = (domNode*) domAlloc(sizeof(domNode));
+        node = domInitElementNodeStruct(info->document);
     }
     memset(node, 0, sizeof(domNode));
     node->nodeType      = ELEMENT_NODE;
@@ -1234,7 +1478,7 @@ startElement(
 
                 h = Tcl_CreateHashEntry(&HASHTAB(info->document, tdom_attrNames),
                                         atPtr[0], &hnew);
-                attrnode = (domAttrNode*) domAlloc(sizeof(domAttrNode));
+                attrnode = domInitAttrNodeStruct(info->document);
                 memset(attrnode, 0, sizeof(domAttrNode));
                 attrnode->nodeType    = ATTRIBUTE_NODE;
                 attrnode->nodeFlags   = IS_NS_NODE;
@@ -1338,7 +1582,7 @@ elemNSfound:
         }
         h = Tcl_CreateHashEntry(&HASHTAB(info->document, tdom_attrNames),
                                 atPtr[0], &hnew);
-        attrnode = (domAttrNode*) domAlloc(sizeof(domAttrNode));
+        attrnode = domInitAttrNodeStruct(info->document);
         memset(attrnode, 0, sizeof(domAttrNode));
         attrnode->nodeType = ATTRIBUTE_NODE;
         if (atPtr == idAttPtr) {
@@ -1518,7 +1762,7 @@ DispatchPCDATA (
             node = (domTextNode*) domAlloc(sizeof(domTextNode)
                                             + sizeof(domLineColumn));
         } else {
-            node = (domTextNode*) domAlloc(sizeof(domTextNode));
+            node = domInitTextNodeStruct(info->document);
         }
         memset(node, 0, sizeof(domTextNode));
         node->nodeType    = TEXT_NODE;
@@ -1594,7 +1838,7 @@ commentHandler (
         node = (domTextNode*) domAlloc(sizeof(domTextNode)
                                         + sizeof(domLineColumn));
     } else {
-        node = (domTextNode*) domAlloc(sizeof(domTextNode));
+        node = domInitTextNodeStruct(info->document);
     }
     memset(node, 0, sizeof(domTextNode));
     node->nodeType    = COMMENT_NODE;
@@ -1675,8 +1919,7 @@ processingInstructionHandler(
                domAlloc(sizeof(domProcessingInstructionNode)
                          + sizeof(domLineColumn));
     } else {
-        node = (domProcessingInstructionNode*)
-               domAlloc(sizeof(domProcessingInstructionNode));
+        node = domInitPINodeStruct(info->document);
     }
     memset(node, 0, sizeof(domProcessingInstructionNode));
     node->nodeType    = PROCESSING_INSTRUCTION_NODE;
@@ -2373,7 +2616,7 @@ domCreateXMLNamespaceNode (
     domAttrNode    *attr;
     domNS          *ns;
 
-    attr = (domAttrNode *) domAlloc (sizeof (domAttrNode));
+    attr = domInitAttrNodeStruct (parent->ownerDocument);
     memset (attr, 0, sizeof (domAttrNode));
     h = Tcl_CreateHashEntry(&HASHTAB(parent->ownerDocument,tdom_attrNames),
                             "xmlns:xml", &hnew);
@@ -2387,6 +2630,7 @@ domCreateXMLNamespaceNode (
     attr->nodeValue     = tdomstrdup (XML_NAMESPACE);
     return attr;
 }
+
 
 
 /*
@@ -2419,29 +2663,21 @@ domCreateDoc (
     domDocument   *doc;
     domLineColumn *lc;
 
-    doc = (domDocument *) MALLOC (sizeof (domDocument));
-    memset(doc, 0, sizeof(domDocument));
-    doc->nodeType       = DOCUMENT_NODE;
-    doc->documentNumber = DOC_NO(doc);
-    doc->nsptr          = -1;
-    doc->nslen          =  4;
-    doc->namespaces     = (domNS**) MALLOC (sizeof (domNS*) * doc->nslen);
+    doc = domInitDocStruct(storeLineColumn);
     
     /* We malloc and initialze the baseURIs hash table here to avoid
        cluttering of the code all over the place with checks. */
     doc->baseURIs = MALLOC (sizeof (Tcl_HashTable));
     Tcl_InitHashTable (doc->baseURIs, TCL_ONE_WORD_KEYS);
 
-    TDomThreaded(
-        domLocksAttach(doc);
-        Tcl_InitHashTable(&doc->tdom_tagNames, TCL_STRING_KEYS);
-        Tcl_InitHashTable(&doc->tdom_attrNames, TCL_STRING_KEYS);
-    )
-
     if (storeLineColumn) {
         rootNode = (domNode*) domAlloc(sizeof(domNode)+sizeof(domLineColumn));
+        lc = (domLineColumn*) ( ((char*)rootNode) + sizeof(domNode));
+        rootNode->nodeFlags |= HAS_LINE_COLUMN;
+        lc->line            = 0;
+        lc->column          = 0;
     } else {
-        rootNode = (domNode*) domAlloc(sizeof(domNode));
+        rootNode = (domNode*) domInitElementNodeStruct (doc);
     }
     memset(rootNode, 0, sizeof(domNode));
     rootNode->nodeType      = ELEMENT_NODE;
@@ -2449,23 +2685,13 @@ domCreateDoc (
         h = Tcl_CreateHashEntry (doc->baseURIs, (char*)rootNode, &hnew);
         Tcl_SetHashValue (h, tdomstrdup (baseURI));
         rootNode->nodeFlags |= HAS_BASEURI;
-    } else {
-        rootNode->nodeFlags = 0;
-    }
-    rootNode->namespace     = 0;
+    } 
     h = Tcl_CreateHashEntry(&HASHTAB(doc,tdom_tagNames), "", &hnew);
     rootNode->nodeName      = (char *)&(h->key);
     rootNode->nodeNumber    = NODE_NO(doc);
     rootNode->ownerDocument = doc;
-    rootNode->parentNode    = NULL;
     rootNode->firstChild    = rootNode->lastChild = NULL;
     rootNode->firstAttr     = domCreateXMLNamespaceNode (rootNode);
-    if (storeLineColumn) {
-        lc = (domLineColumn*) ( ((char*)rootNode) + sizeof(domNode));
-        rootNode->nodeFlags |= HAS_LINE_COLUMN;
-        lc->line            = 0;
-        lc->column          = 0;
-    }
     doc->rootNode = rootNode;
 
     return doc;
@@ -2530,7 +2756,7 @@ domCreateDocument (
 
     h = Tcl_CreateHashEntry(&HASHTAB(doc, tdom_tagNames),
                             documentElementTagName, &hnew);
-    node = (domNode*) domAlloc(sizeof(domNode));
+    node = domInitElementNodeStruct(doc);
     memset(node, 0, sizeof(domNode));
     node->nodeType        = ELEMENT_NODE;
     node->nodeFlags       = 0;
@@ -2595,6 +2821,9 @@ domFreeNode (
         DBG(fprintf (stderr, "null ptr in domFreeNode (dom.c) !\n");)
         return;
     }
+#ifdef DOM_MALLOC
+    if (node->ownerDocument->nodeFlags & BULK_ALLOC) return;
+#endif
     TDomThreaded (
         shared = node->ownerDocument && node->ownerDocument->refCount > 1;
     )
@@ -2783,22 +3012,28 @@ domFreeDocument (
         if (freeCB) {
             freeCB(node, clientData);
         }
-        domFreeNode (node, freeCB, clientData, dontfree);
+        if (!dontfree && (doc->nodeFlags & BULK_ALLOC)) {
+            domFreeMemPool(doc);
+        } else {
+            domFreeNode (node, freeCB, clientData, dontfree);
+        }
     }
 
     /*-----------------------------------------------------------
     | delete fragment trees
     \-----------------------------------------------------------*/
-    node = doc->fragments;
-    while (node) {
-        next = node->nextSibling;
-        if (freeCB) {
-            freeCB(node, clientData);
+    if (!(doc->nodeFlags & BULK_ALLOC)) {
+        node = doc->fragments;
+        while (node) {
+            next = node->nextSibling;
+            if (freeCB) {
+                freeCB(node, clientData);
+            }
+            domFreeNode (node, freeCB, clientData, dontfree);
+            node = next;
         }
-        domFreeNode (node, freeCB, clientData, dontfree);
-        node = next;
     }
-
+    
     if (dontfree) return;
     
     /*-----------------------------------------------------------
@@ -2969,7 +3204,7 @@ domSetAttribute (
         /*-----------------------------------------------
         |   add a complete new attribute node
         \----------------------------------------------*/
-        attr = (domAttrNode*) domAlloc(sizeof(domAttrNode));
+        attr = domInitAttrNodeStruct(node->ownerDocument);
         memset(attr, 0, sizeof(domAttrNode));
         h = Tcl_CreateHashEntry(&HASHTAB(node->ownerDocument,tdom_attrNames),
                                 attributeName, &hnew);
@@ -3101,7 +3336,7 @@ domSetAttributeNS (
         /*--------------------------------------------------------
         |   add a complete new attribute node
         \-------------------------------------------------------*/
-        attr = (domAttrNode*) domAlloc(sizeof(domAttrNode));
+        attr = domInitAttrNodeStruct(node->ownerDocument);
         memset(attr, 0, sizeof(domAttrNode));
         h = Tcl_CreateHashEntry(&HASHTAB(node->ownerDocument,tdom_attrNames),
                                 attributeName, &hnew);
@@ -3215,10 +3450,12 @@ domRemoveAttribute (
             h = Tcl_FindHashEntry (node->ownerDocument->ids, attr->nodeValue);
             if (h) Tcl_DeleteHashEntry (h);
         }
-        FREE (attr->nodeValue);
-        MutationEvent();
+        if (!(node->ownerDocument->nodeFlags & BULK_ALLOC)) {
+            FREE (attr->nodeValue);
+            domFree ((void*)attr);
+        }
 
-        domFree ((void*)attr);
+        MutationEvent();
         return 0;
     }
     return -1;
@@ -3263,9 +3500,11 @@ domRemoveAttributeNS (
                                            attr->nodeValue);
                     if (h) Tcl_DeleteHashEntry (h);
                 }
-                FREE (attr->nodeValue);
+                if (!(node->ownerDocument->nodeFlags & BULK_ALLOC)) {
+                    FREE (attr->nodeValue);
+                    domFree ((void*)attr);
+                }
                 MutationEvent();
-                domFree ((void*)attr);
                 return 0;
             }
         }
@@ -3542,6 +3781,14 @@ domAppendChild (
         }
     }
 
+#ifdef DOM_MALLOC
+    if (node->ownerDocument->nodeFlags & BULK_ALLOC) {
+        if (node->ownerDocument != childToAppend->ownerDocument) {
+            return NOT_SUPPORTED_ERR;
+        }
+    }
+#endif
+    
     /* unlink childToAppend */
     if (childToAppend->previousSibling) {
         childToAppend->previousSibling->nextSibling = 
@@ -3968,10 +4215,9 @@ domNewTextNode(
 {
     domTextNode   *node;
 
-    node = (domTextNode*) domAlloc(sizeof(domTextNode));
+    node = domInitTextNodeStruct (doc);
     memset(node, 0, sizeof(domTextNode));
     node->nodeType      = nodeType;
-    node->nodeFlags     = 0;
     node->nodeNumber    = NODE_NO(doc);
     node->ownerDocument = doc;
     node->valueLength   = length;
@@ -4058,7 +4304,7 @@ domAppendNewTextNode(
         MutationEvent();
         return (domTextNode*)parent->lastChild;
     }
-    node = (domTextNode*) domAlloc(sizeof(domTextNode));
+    node = domInitTextNodeStruct(parent->ownerDocument);
     memset(node, 0, sizeof(domTextNode));
     node->nodeType      = nodeType;
     node->nodeFlags     = 0;
@@ -4116,7 +4362,7 @@ domAppendNewElementNode(
 
     h = Tcl_CreateHashEntry(&HASHTAB(parent->ownerDocument,tdom_tagNames),
                             tagName, &hnew);
-    node = (domNode*) domAlloc(sizeof(domNode));
+    node = domInitElementNodeStruct(parent->ownerDocument);
     memset(node, 0, sizeof(domNode));
     node->nodeType      = ELEMENT_NODE;
     node->nodeNumber    = NODE_NO(parent->ownerDocument);
@@ -4394,7 +4640,7 @@ domAddNSToNode (
         Tcl_DStringAppend (&dStr, nsToAdd->prefix, -1);
     }
     /* Add new namespace attribute */
-    attr = (domAttrNode*) domAlloc(sizeof(domAttrNode));
+    attr = domInitAttrNodeStruct(node->ownerDocument);
     memset(attr, 0, sizeof(domAttrNode));
     h = Tcl_CreateHashEntry(&HASHTAB(node->ownerDocument,tdom_attrNames),
                             Tcl_DStringValue(&dStr), &hnew);
@@ -4447,7 +4693,7 @@ domAppendLiteralNode(
 
     h = Tcl_CreateHashEntry(&HASHTAB(parent->ownerDocument, tdom_tagNames),
                              literalNode->nodeName, &hnew);
-    node = (domNode*) domAlloc(sizeof(domNode));
+    node = domInitElementNodeStruct(parent->ownerDocument);
     memset(node, 0, sizeof(domNode));
     node->nodeType      = ELEMENT_NODE;
     node->nodeNumber    = NODE_NO(parent->ownerDocument);
@@ -4487,7 +4733,7 @@ domNewProcessingInstructionNode(
 {
     domProcessingInstructionNode   *node;
 
-    node = (domProcessingInstructionNode*) domAlloc(sizeof(domProcessingInstructionNode));
+    node = domInitPINodeStruct(doc);
     memset(node, 0, sizeof(domProcessingInstructionNode));
     node->nodeType      = PROCESSING_INSTRUCTION_NODE;
     node->nodeFlags     = 0;
@@ -4530,11 +4776,9 @@ domNewElementNode(
     int           hnew;
 
     h = Tcl_CreateHashEntry(&HASHTAB(doc, tdom_tagNames), tagName, &hnew);
-    node = (domNode*) domAlloc(sizeof(domNode));
+    node = domInitElementNodeStruct (doc);
     memset(node, 0, sizeof(domNode));
     node->nodeType      = ELEMENT_NODE;
-    node->nodeFlags     = 0;
-    node->namespace     = 0;
     node->nodeNumber    = NODE_NO(doc);
     node->ownerDocument = doc;
     node->nodeName      = (char *)&(h->key);
@@ -4570,7 +4814,7 @@ domNewElementNodeNS (
     domNS         *ns;
 
     h = Tcl_CreateHashEntry(&HASHTAB(doc, tdom_tagNames), tagName, &hnew);
-    node = (domNode*) domAlloc(sizeof(domNode));
+    node = domInitElementNodeStruct(doc);
     memset(node, 0, sizeof(domNode));
     node->nodeType      = ELEMENT_NODE;
     node->nodeFlags     = 0;

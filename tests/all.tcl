@@ -32,6 +32,8 @@ set timeCmd {clock format [clock seconds]}
 
 set ::tcltest::testSingleFile false
 
+dom setMemType 1
+
 puts stdout "Tcl $tcl_patchLevel tests running in interp:  [info nameofexecutable]"
 
 if {$tcl_version < 8.2} {

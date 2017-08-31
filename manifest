@@ -1,5 +1,5 @@
-C Release\s0.9.0
-D 2017-08-24T15:33:22.159
+C Exploring\soptimization\spossibilities.\sUsing\sdoc\sspecific\ssimple\smem\spools\sspeeds\sup\sa\s[dom\sparse\s$xml\sdoc;\s$doc\sdelete]\sby\sa\sfactor\sof\s1.25\s(though,\swhile\sDOM\stree\sbuilding\sis\salso\sslightly\sfaster\smost\sof\sthe\sgain\sis\sa\smuch\sfaster\sdoc\sfree).\sTest\ssuite\sruns\svalgrind\sclean.\sSome\stests.\sSome\stests\sfail\sbut\smost\sof\sthem\sdo\srightly.\sThis\shas\sa\sprice:\sno\ssubree\smove\sbetween\sdocumentes\s(the\sDOM\srecommendation\sdoesn't\sallow\sthis\sbut\stdom\sdid,\sso\sfar),\sno\s[domNode\sdelete]\s(but\sthis\sin\sfact\sfreed\sthe\smemory\salready\sonly\sin\snon-threaded\sbuilds),\sno\sline/column\sinformation.\sNeeds\screation\sof\snodeCmds\sin\sdoc\sspecific\snamespace\sfor\scleanup\sof\sthe\stcl\scommands\sin\sone\sgo\s(to\sbe\simplemented)\sand\sthread\ssafety\sconsideration.\sIf\sall\sgoes\swell\sand\sstill\slooks\sas\sa\sgain\scould\sbe\sintegrated\sin\sa\sswitch\son/of\sat\sruntime\sway.
+D 2017-08-31T02:47:32.909
 F CHANGES 32e2f76ec01a9205c8443fba54f50f13c05722f6
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -124,11 +124,11 @@ F extensions/tnc/tnc.c 5882c44366dc07358ca1d9ea31ec43bcac2c098b
 F extensions/tnc/win/makefile.vc c2445c1ea773738cd898a3325d32223d99a5225f
 F extensions/tnc/win/nmakehlp.c de6445b4bc73d55651ceabfbbf46b96e00d0c6a9
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
-F generic/dom.c 5060ea06a037b18bc63a3b798e797d58783f3c7f
-F generic/dom.h 6e967a3b38384b60e7dde1d856b2ee305e7ab6f2
+F generic/dom.c 20f0822a20fbcdc446a6aa235de9dff9f7897b6b
+F generic/dom.h 0fee28c291ba66da197087000958cde520444438
 F generic/domalloc.c 55e9eeff19cc54cf3956a7013883ead07efd3593
 F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
-F generic/domhtml.c c2893b476ea83dba3820f908b6bc2e29a26b5a97
+F generic/domhtml.c f6e7a729d1598ae61060838551b6de8977f9cb0a
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domhtml5.c 7ca86f4b6db03d94915f318d64a6dd74b57307ba
 F generic/domhtml5.h 5cca562a556e7662f2dce222640c32abb2777146
@@ -143,7 +143,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 248bb4d00e2e1a06ea06fd773145f99f52c29dd5
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
-F generic/tcldom.c 45af7a0367adc233b7ac1e0ff7a906689fbce392
+F generic/tcldom.c 8ef59fa44f2b6773309016554247cc765802c424
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
 F generic/tclexpat.c 069180212797fc14bdb0a08bcd1ad3461406975c
 F generic/tclexpat.h 3fb4df4c023d1f625ec9c5783c4fc1d1e4e0b8bb
@@ -156,7 +156,7 @@ F generic/tdominit.c fc4e5f13d29a419304451679b7f79fbe228a45f2
 F generic/utf8conv.c 8d58daa846a0b715df1736720cf9031e924988f2
 F generic/utf8conv.h 4132db4e05ac30dcb78dc3b4799ae0a9ae8a057f
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
-F generic/xmlsimple.c c12dfb6aea298976b4465cedda77ae87374e10d8
+F generic/xmlsimple.c 00bad168de47fa8ab9f8fe8052b815b0c2256e88
 F generic/xmlsimple.h f2861868b0fed932c79f9e595bb875d261d97bd5
 F lib/tdom.tcl 6622f60e568d6cf658746174e189197f857e59c5
 F macosx/README 90fbbcf96747374a4c4a7b97766f0c6bafa7780e
@@ -168,7 +168,7 @@ F tdomConfig.sh.in 5756c6b431179e49852a607cc2ca01e5381da905
 F tests/JSONTestSuite.tcl 907228f9bd31855951b9033df74c9c15778765af
 F tests/OASIS-suite.tcl 428c0f45f780f5f942c46babd9287277ad0caaed
 F tests/all-bench.tcl 38bc7b4c88f5d679b2fce6c9c2b2ea7d8ad18e90
-F tests/all.tcl 0a8b1e8320bab576c48f02995aa385a90502d4b6
+F tests/all.tcl 7f89c46f85660dc1217b24cbfbf322f76e585c98
 F tests/attribute.test 53ac8fb043e79b638c8c6f5e7da848f6103552d6
 F tests/cdata.test 5a1dc3bee6353700186d12f0d11b15914849c6be
 F tests/comment.test ff9d1abbbcde4d3532bf93b1eb7e819997fa8178
@@ -229,9 +229,11 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 9f9b4577ac4e270b46037ffe16275267697d51ed 9ca8c82d0a19850a3c73757b66d1f4459345fe03
-R c46ab609f412388f4e95f42dae7a0af1
-T +closed 9ca8c82d0a19850a3c73757b66d1f4459345fe03
+P 6c9e8589f1d28f882f9d7784647d579979a9073e
+R f4837022df8fb0a82db1d01d84ea2351
+T *branch * fastFree
+T *sym-fastFree *
+T -sym-trunk *
 U rolf
-Z ef2d8ea77fadf16ab3e27624a0e7cd92
+Z 3a302b531e88a635c3752ef3fd23e988
 # Remove this line to create a well-formed Fossil manifest.

@@ -113,11 +113,13 @@
 
 #define domPanic(msg) Tcl_Panic((msg));
 
+
 /*
  * If compiled against threaded Tcl core, we must take
  * some extra care about process-wide globals and the
  * way we name Tcl object accessor commands.
  */
+extern int           bulkMem;
 #ifndef TCL_THREADS
   extern unsigned long domUniqueNodeNr;
   extern unsigned long domUniqueDocNr;
@@ -440,6 +442,7 @@ typedef unsigned int domDocFlags;
 #define NEEDS_RENUMBERING         2
 #define DONT_FREE                 4
 #define IGNORE_XMLNS              8
+#define BULK_ALLOC               16
 
 /*--------------------------------------------------------------------------
 |   a index to the namespace records
@@ -493,10 +496,59 @@ typedef struct domDocInfo {
     
 } domDocInfo;
 
+#ifndef EMEM_BLOCK_SIZE
+#  define EMEM_BLOCK_SIZE 50
+#endif
+#ifndef AMEM_BLOCK_SIZE
+#  define AMEM_BLOCK_SIZE 20
+#endif
+#ifndef TMEM_BLOCK_SIZE
+#  define TMEM_BLOCK_SIZE 50
+#endif
+#ifndef PMEM_BLOCK_SIZE
+#  define PMEM_BLOCK_SIZE 20
+#endif
+
+typedef struct domEMem 
+{
+    int        size;
+    int        next;
+    struct domNode  *block;
+    struct domEMem   *nextBlock;
+} domEMem;
+
+typedef struct domAMem 
+{
+    int        size;
+    int        next;
+    struct domAttrNode *block;
+    struct domAMem *nextBlock;
+} domAMem;
+
+typedef struct domTMem 
+{
+    int        size;
+    int        next;
+    struct domTextNode *block;
+    struct domTMem *nextBlock;
+} domTMem;
+
+typedef struct domPMem 
+{
+    int        size;
+    int        next;
+    struct domProcessingInstructionNode *block;
+    struct domPMem *nextBlock;
+} domPMem;
+
+
+#define domPINode domProcessingInstructionNode
+
 /*--------------------------------------------------------------------------
 |   domDocument
 |
 \-------------------------------------------------------------------------*/
+/* This exists in two variants. */
 typedef struct domDocument {
 
     domNodeType       nodeType  : 8;
@@ -531,6 +583,49 @@ typedef struct domDocument {
         struct _domlock *lock;          /* Lock for this document */
     )
 } domDocument;
+
+typedef struct _domDocument {
+
+    domNodeType       nodeType  : 8;
+    domDocFlags       nodeFlags : 8;
+    domNameSpaceIndex dummy     : 16;
+    unsigned long     documentNumber;
+    struct domNode   *documentElement;
+    struct domNode   *fragments;
+#ifdef TCL_THREADS
+    struct domNode   *deletedNodes;
+#endif
+    struct domNS    **namespaces;
+    int               nsptr;
+    int               nslen;
+    char            **prefixNSMappings; /* Stores doc global prefix ns
+                                           mappings for resolving of
+                                           prefixes in seletNodes expr */
+#ifdef TCL_THREADS
+    unsigned int      nodeCounter;
+#endif
+    struct domNode   *rootNode;
+    Tcl_HashTable    *ids;
+    Tcl_HashTable    *unparsedEntities;
+    Tcl_HashTable    *baseURIs;
+    Tcl_HashTable    *xpathCache;
+    char             *extResolver;
+    domDocInfo       *doctype;
+    TDomThreaded (
+        Tcl_HashTable tdom_tagNames;   /* Names of tags found in doc */
+        Tcl_HashTable tdom_attrNames;  /* Names of tag attributes */
+        unsigned int  refCount;        /* # of object commands attached */
+        struct _domlock *lock;         /* Lock for this document */
+    )
+    int                 eNext;         /* This are the struct elements */
+    struct domNode     *eBlock;        /* for the doc internal node */
+    int                 aNext;         /* struct memory pool. Must stay */
+    struct domAttrNode *aBlock;        /* at the end of the doc struct */
+    int                 tNext;
+    struct domTextNode *tBlock;
+    int                 pNext;
+    struct domPINode   *pBlock;        /* End of doc memory pool */
+} _domDocument;
 
 /*--------------------------------------------------------------------------
 |  domLock
@@ -686,7 +781,6 @@ typedef struct domProcessingInstructionNode {
     int                 dataLength;
 
 } domProcessingInstructionNode;
-
 
 /*--------------------------------------------------------------------------
 |   domAttrNode
@@ -878,6 +972,26 @@ void           domLocksFinalize(ClientData dummy);
 domAttrNode                  * coerceToAttrNode( domNode *n );
 domTextNode                  * coerceToTextNode( domNode *n );
 domProcessingInstructionNode * coerceToProcessingInstructionNode( domNode *n );
+
+
+/* Fast free malloc stuff */
+#define DOM_MALLOC 1
+
+#ifndef DOM_MALLOC
+
+#define domInitElementNodeStruct(doc) (domNode*) domAlloc(sizeof(domNode))
+#define domInitAttrNodeStruct(doc) (domAttrNode*) domAlloc(sizeof(domAttrNode))
+#define domInitTextNodeStruct(doc) (domTextNode*) domAlloc(sizeof(domTextNode))
+#define domInitPINodeStruct(doc) (domProcessingInstructionNode*) domAlloc(sizeof(domProcessingInstructionNode))
+
+#else
+
+domNode * domInitElementNodeStruct( domDocument *doc);
+domTextNode * domInitTextNodeStruct (domDocument *doc);
+domAttrNode * domInitAttrNodeStruct (domDocument *doc);
+domPINode * domInitPINodeStruct (domDocument *doc);
+
+#endif
 
 
 #endif
