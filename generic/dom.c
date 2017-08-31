@@ -4813,6 +4813,11 @@ domNewElementNodeNS (
     const char    *localname;
     domNS         *ns;
 
+    domSplitQName (tagName, prefix, &localname);
+    if (prefix[0] == '\0' && uri[0] == '\0') {
+        return NULL;
+    }
+
     h = Tcl_CreateHashEntry(&HASHTAB(doc, tdom_tagNames), tagName, &hnew);
     node = domInitElementNodeStruct(doc);
     memset(node, 0, sizeof(domNode));
@@ -4823,10 +4828,6 @@ domNewElementNodeNS (
     node->ownerDocument = doc;
     node->nodeName      = (char *)&(h->key);
 
-    domSplitQName (tagName, prefix, &localname);
-    if (prefix[0] == '\0' && uri[0] == '\0') {
-        return NULL;
-    }
     ns = domNewNamespace(doc, prefix, uri);
     node->namespace = ns->index;
 
@@ -4867,15 +4868,23 @@ domCloneNode (
                                          pinode->dataLength);
     }
     if (node->nodeType != ELEMENT_NODE) {
-        domTextNode *tnode = (domTextNode*)node;
-        return (domNode*) domNewTextNode(tnode->ownerDocument,
-                                         tnode->nodeValue, tnode->valueLength,
-					 tnode->nodeType);
+        domTextNode *t1node, *tnode = (domTextNode*)node;
+        if (tnode->info) {
+            t1node = domNewTextNode(tnode->ownerDocument,
+                                    tnode->nodeValue, tnode->valueLength,
+                                    tnode->nodeType);
+            t1node->info = tnode->info;
+            return (domNode*) t1node;
+        } else {
+            return (domNode*) domNewTextNode(tnode->ownerDocument,
+                                             tnode->nodeValue, tnode->valueLength,
+                                             tnode->nodeType);
+        }
     }
 
     n = domNewElementNode(node->ownerDocument, node->nodeName);
     n->namespace = node->namespace;
-
+    n->info = node->info;
 
     /*------------------------------------------------------------------
     |   copy attributes (if any)
