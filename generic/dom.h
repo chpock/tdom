@@ -509,38 +509,6 @@ typedef struct domDocInfo {
 #  define PMEM_BLOCK_SIZE 20
 #endif
 
-typedef struct domEMem 
-{
-    int        size;
-    int        next;
-    struct domNode  *block;
-    struct domEMem   *nextBlock;
-} domEMem;
-
-typedef struct domAMem 
-{
-    int        size;
-    int        next;
-    struct domAttrNode *block;
-    struct domAMem *nextBlock;
-} domAMem;
-
-typedef struct domTMem 
-{
-    int        size;
-    int        next;
-    struct domTextNode *block;
-    struct domTMem *nextBlock;
-} domTMem;
-
-typedef struct domPMem 
-{
-    int        size;
-    int        next;
-    struct domProcessingInstructionNode *block;
-    struct domPMem *nextBlock;
-} domPMem;
-
 
 #define domPINode domProcessingInstructionNode
 
