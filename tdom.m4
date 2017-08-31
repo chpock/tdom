@@ -358,7 +358,8 @@ AC_DEFUN(TDOM_PATH_EXPAT, [
         AC_MSG_RESULT([Using bundled expat distribution])
         TEA_ADD_SOURCES([expat/xmlrole.c \
                          expat/xmltok.c \
-                         expat/xmlparse.c])
+                         expat/xmlparse.c \
+                         expat/loadlibrary.c])
         TEA_ADD_INCLUDES([-I${srcdir}/expat])
         AC_DEFINE([XML_POOR_ENTROPY], 1,
           [Define to use poor entropy in lack of better source.])

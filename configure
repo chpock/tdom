@@ -5457,7 +5457,8 @@ $as_echo "Using bundled expat distribution" >&6; }
 
     vars="expat/xmlrole.c \
                          expat/xmltok.c \
-                         expat/xmlparse.c"
+                         expat/xmlparse.c \
+                         expat/loadlibrary.c"
     for i in $vars; do
 	case $i in
 	    \$*)
