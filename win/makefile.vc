@@ -185,6 +185,7 @@ DLLOBJS = \
 	$(TMP_DIR)\tdomStubInit.obj\
 	$(TMP_DIR)\tdomStubLib.obj \
 	$(TMP_DIR)\tdominit.obj    \
+	$(TMP_DIR)\loadlibrary.obj    \
 !if !$(STATIC_BUILD)
 	$(TMP_DIR)\tdom.res
 !endif

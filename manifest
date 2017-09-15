@@ -1,5 +1,5 @@
-C Added\sthe\snew\sexpat\ssource\sfile\sloadlibrary.c\sto\sthe\sonce\sto\sbuild;\sits\sneeded\son\swindows.
-D 2017-08-31T12:34:01.382
+C Added\sloadlibrary.c\sto\sWindows\sbuild.\sMinor\supdate\sto\sREADME
+D 2017-09-15T15:29:09.768
 F CHANGES 32e2f76ec01a9205c8443fba54f50f13c05722f6
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -217,9 +217,9 @@ F tests/xpath.test ce2970735550f97caddd94effbd3bb32ad76333f
 F tests/xslt.test d087ac314ffcd643169522a9424615135f4ecb57
 F unix/CONFIG 789192e463910e1b9dd7e65f6338390d2bf1f68a
 F unix/tclAppInit.c a1655c51127aed18d069010f234a378fceacb2a6
-F win/README 73916fb24a4ac0cc509dd9e225f191943b061292
+F win/README 565751141aadfe155d7f95c202496b523f8dcc88
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F win/makefile.vc 67280588e5d8b2ab79f73b390c6d5629d4a58693
+F win/makefile.vc b89707670bf3d66b2a2e95cefeb4eb95f1e23020
 F win/makefile805.vc da2003745caf522d88f27fcebadd916c1d5c042d
 F win/mkd.bat 85d3fe58ce051a778447fb2bfc7384867d21cef0
 F win/nmakehlp.c de6445b4bc73d55651ceabfbbf46b96e00d0c6a9
@@ -230,8 +230,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f6b055a47b7f8b26e309067231d859f91247ec07
-R 1e123c845caa5f2f9b21c76c29fbf6a0
-U rolf
-Z 1f10df6f31d591358d7b005b42333672
+P 1caab6d4da440d9e53a3467191c9486f5fcd098c
+R c64c212f3296d761778f5e7034103309
+U apnadkarni
+Z 52003c9e8223365b48456dd69dd88e4b
 # Remove this line to create a well-formed Fossil manifest.
