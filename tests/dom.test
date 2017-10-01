@@ -574,6 +574,11 @@ test dom-2.34 {XML prefix declaration with empty namespace} {
     set errMsg
 } {Missing URI in Namespace declaration, referenced at line 1 character 22}
 
+test dom-2.34 {errorCode after XML parsing error} {
+    catch {dom parse "foo"} errMsg catchResult
+    set errorCode
+} {TDOM NOTWELLFORMED 1 0 2 {syntax error}}
+
 test dom-3.1 {isName} {
     dom isName ":foo"
 } {1}

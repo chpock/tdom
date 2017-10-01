@@ -6548,7 +6548,7 @@ int tcldom_parse (
                           interp,
                           &status);
     if (doc == NULL) {
-        char s[50];
+        char s[50], linenr[50], columnnr[50];
         long byteIndex, i;
         
         switch (status) {
@@ -6559,7 +6559,8 @@ int tcldom_parse (
             return TCL_OK;
         default:
             interpResult = Tcl_GetStringResult(interp);
-            sprintf(s, "%ld", XML_GetCurrentLineNumber(parser));
+            sprintf(linenr, "%ld", XML_GetCurrentLineNumber(parser));
+            sprintf(columnnr, "%ld", XML_GetCurrentColumnNumber(parser));
             if (interpResult[0] == '\0') {
                 /* If the interp result isn't empty, then there was an error
                    in an enternal entity and the interp result has already the
@@ -6568,9 +6569,8 @@ int tcldom_parse (
                    build the error msg as follows. */
                 Tcl_AppendResult(interp, "error \"", 
                                  XML_ErrorString(XML_GetErrorCode(parser)),
-                                 "\" at line ", s, " character ", NULL);
-                sprintf(s, "%ld", XML_GetCurrentColumnNumber(parser));
-                Tcl_AppendResult(interp, s, NULL);
+                                 "\" at line ", linenr, " character ",
+                                 columnnr, NULL);
                 byteIndex = XML_GetCurrentByteIndex(parser);
                 if ((byteIndex != -1) && (chan == NULL)) {
                     Tcl_AppendResult(interp, "\n\"", NULL);
@@ -6590,6 +6590,11 @@ int tcldom_parse (
                     }
                     Tcl_AppendResult(interp, "\"",NULL);
                 }
+                sprintf(s, "%d", XML_GetErrorCode(parser));
+                Tcl_SetErrorCode(interp, "TDOM", "NOTWELLFORMED", linenr,
+                                 columnnr, s,
+                                 XML_ErrorString(XML_GetErrorCode(parser)),
+                                 NULL);
             } else {
                 if (status == TCL_OK) {
                     /* For tcl errors (in -externalentitycommand or
@@ -6600,9 +6605,9 @@ int tcldom_parse (
                      * error was in an external entity. Therefore, we
                      * just add the place of the referencing entity in
                      * the mail document.*/
-                    Tcl_AppendResult(interp, ", referenced at line ", s, NULL);
-                    sprintf(s, "%ld", XML_GetCurrentColumnNumber(parser));
-                    Tcl_AppendResult(interp, " character ", s, NULL);
+                    Tcl_AppendResult(interp, ", referenced at line ",
+                                     linenr, " character ", columnnr,
+                                     NULL);
                 }
             }
             XML_ParserFree(parser);
