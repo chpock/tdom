@@ -336,7 +336,7 @@ node. <m>objVar</m> controls the memory handling as explained above.</desc>
 <m>?-returnNodeCmd?</m> <m>?-tagName name?</m> <m>?-jsonType jsonType?</m> <m>?-namespace URI?</m> <m>(element|comment|text|cdata|pi)Node</m> <m>commandName</m></command>
           <desc>This method creates Tcl commands, which in turn create
           tDOM nodes. Tcl commands created by this command are only
-          avaliable inside a script given to the domNode methods
+          available inside a script given to the domNode methods
           <m>appendFromScript</m> or <m>insertBeforeFromScript</m>. If
           a command created with <m>createNodeCmd</m> is invoked in
           any other context, it will return error. The created command

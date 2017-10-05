@@ -131,7 +131,7 @@ matching (glob style) <m>localname</m> and having the given namespace
       <commanddef>
         <command><method>getElementById</method> <m>id</m></command>
         <desc>Returns the node having an id attribute with value
-<m>id</m> or the emtpy string if no node has an id attribute with that value.</desc>
+<m>id</m> or the empty string if no node has an id attribute with that value.</desc>
       </commanddef>
 
       <commanddef>
@@ -197,7 +197,7 @@ method has the same effect as the method <b>setAttribute</b>.</p>
         <example>$node setAttributeNS "" attri "some Value"</example>
 
 <p>With the exceptions of the special prefixes "xmlns" and "xml" you
-always must provide a non emtpy <m>uri</m>, if your <m>qualifiedName</m> has a
+always must provide a non empty <m>uri</m>, if your <m>qualifiedName</m> has a
 prefix. It is not recommended to set xml namespace declarations. The effects are complicated and not always obvious up to resulting a not well-formed serializations after further processing.</p></desc>
       </commanddef>
 
@@ -362,7 +362,7 @@ way into the XPath expression using tcl variable references there is a
 syntax to inject element names from tcl variables. At every place
 where the XPath syntax allows a node test there could be a tcl
 variable reference (in any form), just the leading $ replaced with %.
-This allows to select nodes with 'strange' (invalid, according to the
+This allows one to select nodes with 'strange' (invalid, according to the
 appropriate XML production rule) node names which may be needed in
 case of working with JSON data.</p>
 
@@ -414,13 +414,13 @@ set childNodes [$root selectNodes -namespaces {default http://www.defaultnamespa
 
       <commanddef>
         <command><method>getLine</method></command>
-        <desc>Returns the line number of that node in the orignal parsed
+        <desc>Returns the line number of that node in the originally parsed
 XML.</desc>
       </commanddef>
       
       <commanddef>
         <command><method>getColumn</method></command>
-        <desc>Returns the column number of that node in the orignal parsed
+        <desc>Returns the column number of that node in the originally parsed
 XML.</desc>
       </commanddef>
 
@@ -469,8 +469,8 @@ nested Tcl list.</desc>
         <command><method>asHTML</method> <option>?-channel channelId?</option>
 <option>?-escapeNonASCII?</option>  <option>?-htmlEntities?</option></command>
         <desc>Returns the DOM substree starting from the current node as the
-root node of the result serialized acording to HTML rules (HTML elements are
-recognized regardless of case, without end tags for emtpy HTML elements etc.),
+root node of the result serialized according to HTML rules (HTML elements are
+recognized regardless of case, without end tags for empty HTML elements etc.),
 as string or sends the output directly to the given channelId. If the option
 <m>-escapeNonASCII</m> is given, every non 7 bit ASCII character in attribute
 values or element PCDATA content will be escaped as character reference in
@@ -528,7 +528,7 @@ mode.</desc>
         <desc>Returns an XPath, which exactly addresses the given
 node in its document. This XPath is only valid as there are no changes to DOM
 tree made later one. With the -legacy option, other XPath expressions
-are returnd, which doesn't work in all cases.</desc>
+are returned, which doesn't work in all cases.</desc>
       </commanddef>
 
       <commanddef>
@@ -541,7 +541,7 @@ are returnd, which doesn't work in all cases.</desc>
         <command><method>baseURI</method> <m>?URI?</m></command>
         <desc>Returns the present baseURI of the node. If the optional 
 argument URI is given, it sets the base URI of the node and of all of its child
-nodes out of the same enitity as node to the given URI.</desc>
+nodes out of the same entity as node to the given URI.</desc>
       </commanddef>
 
       <commanddef>
@@ -552,7 +552,7 @@ escaping is on. The return value 0 means, the characters of the text node will
 be escaped, to generate valid XML, if serialized. This is the default for
 every parsed or created text node (with the exception of that text nodes in a
 result tree of an XSLT transformation, for which disabling output escaping was
-requested explicitely in the stylesheet). The return value 1 means, that output
+requested explicitly in the stylesheet). The return value 1 means, that output
 escaping is disabled for this text node. If such a text node is serialized
 (with asXML or asHTML), it is literally written, without escaping of the
 special XML characters. If the optional boolean value <m>boolean</m> is given,
@@ -610,7 +610,7 @@ be set by the <m>-maxApplyDepth</m> option.</p>
 in the stylesheet. The actual command consists of the script, given as argument
 to the option, appended with the XML Fragment from instantiating the
 xsl:message element content as string (as if the XPath string() function would
-have been applied to the XML Fragment) and a flag, which indicates wether the
+have been applied to the XML Fragment) and a flag, which indicates whether the
 xsl:message has an attribute "terminate" with the value "yes". If the
 called script returns anything else then TCL_OK then the xslt
 transformation will be aborted, returning error. If the called script
