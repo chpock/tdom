@@ -195,7 +195,7 @@ static char *astType2str[] = {
     "Int", "Real", "Mult", "Div", "Mod", "UnaryMinus", "IsNSElement",
     "IsNode", "IsComment", "IsText", "IsPI", "IsSpecificPI", "IsElement",
     "IsFQElement", "GetVar", "GetFQVar", "Literal", "ExecFunction", "Pred",
-    "EvalSteps", "SelectRoot", "CombineSets", "Add", "Substract", "Less",
+    "EvalSteps", "SelectRoot", "CombineSets", "Add", "Subtract", "Less",
     "LessOrEq", "Greater", "GreaterOrEq", "Equal", "NotEqual", "And", "Or",
     "IsNSAttr", "IsAttr", "AxisAncestor", "AxisAncestorOrSelf",
     "AxisAttribute", "AxisChild",
@@ -1473,7 +1473,7 @@ Production(AdditiveExpr)
             a = New2( Add, a, Recurse(MultiplicativeExpr));
         } else {
             Consume(MINUS);
-            a = New2( Substract, a, Recurse(MultiplicativeExpr));
+            a = New2( Subtract, a, Recurse(MultiplicativeExpr));
         }
     }
 EndProduction
@@ -4381,7 +4381,7 @@ static int xpathEvalStep (
         break;
 
     case Add:
-    case Substract:
+    case Subtract:
     case Mult:
     case Div:
     case Mod:
@@ -4426,7 +4426,7 @@ static int xpathEvalStep (
                 rsSetNaN (result);
             } else {
                 switch (step->type) {
-                case Substract:
+                case Subtract:
                     NaN1 = -1 * NaN1;
                     /* fall throu */   
                 case Add:
@@ -4475,7 +4475,7 @@ static int xpathEvalStep (
         }
         switch (step->type) {
         case Add:       rsSetReal (result, dLeft + dRight); break;
-        case Substract: rsSetReal (result, dLeft - dRight); break;
+        case Subtract: rsSetReal (result, dLeft - dRight); break;
         case Mult:      rsSetReal (result, dLeft * dRight); break;
         case Div:
             if (dRight == 0.0) {

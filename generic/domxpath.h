@@ -75,7 +75,7 @@ typedef enum {
     Int, Real, Mult, Div, Mod, UnaryMinus, IsNSElement,
     IsNode, IsComment, IsText, IsPI, IsSpecificPI, IsElement,
     IsFQElement, GetVar, GetFQVar, Literal, ExecFunction, Pred,
-    EvalSteps, SelectRoot, CombineSets, Add, Substract, Less,
+    EvalSteps, SelectRoot, CombineSets, Add, Subtract, Less,
     LessOrEq, Greater, GreaterOrEq, Equal,  NotEqual, And, Or,
     IsNSAttr, IsAttr, AxisAncestor, AxisAncestorOrSelf, 
     AxisAttribute, AxisChild,

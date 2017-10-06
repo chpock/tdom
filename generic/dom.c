@@ -97,7 +97,7 @@ TDomThreaded(static Tcl_Mutex initMutex;)
 
 static char *domException2StringTable [] = {
 
-    "OK - no expection",
+    "OK - no exception",
     "INDEX_SIZE_ERR",
     "DOMSTRING_SIZE_ERR",
     "HIERARCHY_REQUEST_ERR",
@@ -5432,7 +5432,7 @@ TclTdomObjCmd (dummy, interp, objc, objv)
         }
         expat = GetExpatInfo (interp, objv[1]);
         if (info->tdomStatus != 2 || !expat->finished) {
-            Tcl_SetResult (interp, "No DOM tree avaliable.", NULL);
+            Tcl_SetResult (interp, "No DOM tree available.", NULL);
             return TCL_ERROR;
         }
         domSetDocumentElement (info->document);
