@@ -143,156 +143,35 @@ Please `cd` to its location first.
 !error $(MSG)
 !endif
 
-#-------------------------------------------------------------------------
-# Project specific information (EDIT)
-#
-# You should edit this with the name and version of your project. This
-# information is used to generate the name of the package library and
-# it's install location.
-#
-# For example, the sample extension is  going to build sample04.dll and
-# would install it into $(INSTALLDIR)\lib\sample04
-#
-# You need to specify the object files that need to be linked into your
-# binary here.
-#
-#-------------------------------------------------------------------------
-
 PROJECT = tnc
-!include "..\..\..\win\rules.vc"
+!include "rules-ext.vc"
 
-DOTVERSION      = 0.3.0
-VERSION         = $(DOTVERSION:.=)
-STUBPREFIX      = $(PROJECT)stub
+PRJ_OBJS = $(TMP_DIR)\tnc.obj
 
-DLLOBJS = $(TMP_DIR)\tnc.obj
-
-TDOM_DOTVERSION      = 0.8.3
+!if [echo TDOM_DOTVERSION = \> versions.vc] \
+   || [nmakehlp -V ..\..\..\configure.in ^[tdom^] >> versions.vc]
+!error *** Could not figure out tdom version.
+!endif
+!include versions.vc
 TDOMVER             = $(TDOM_DOTVERSION:.=)
 
-BINROOT		= .
 # tdom root
-ROOT            = ..\..\..
+TDOMROOT            = ..\..\..
 
-PRJIMPLIB	= $(OUT_DIR)\$(PROJECT)$(VERSION)$(SUFX).lib
-PRJLIBNAME	= $(PROJECT)$(VERSION)$(SUFX).$(EXT)
-PRJLIB		= $(OUT_DIR)\$(PRJLIBNAME)
-
-### Make sure we use backslash only.
-PRJ_INSTALL_DIR         = $(_INSTALLDIR)\$(PROJECT)$(DOTVERSION)
-LIB_INSTALL_DIR		= $(PRJ_INSTALL_DIR)
-BIN_INSTALL_DIR		= $(PRJ_INSTALL_DIR)
-DOC_INSTALL_DIR		= $(PRJ_INSTALL_DIR)
-SCRIPT_INSTALL_DIR	= $(PRJ_INSTALL_DIR)
-INCLUDE_INSTALL_DIR	= $(_TCLDIR)\include
-
-#---------------------------------------------------------------------
-# Compile flags
-#---------------------------------------------------------------------
-
-!if !$(DEBUG)
-!if $(OPTIMIZING)
-### This cranks the optimization level to maximize speed
-cdebug	= $(OPTIMIZATIONS)
-!else
-cdebug	=
-!endif
-!else if "$(MACHINE)" == "IA64" || "$(MACHINE)" == "AMD64"
-### Warnings are too many, can't support warnings into errors.
-cdebug	= -Zi -Od $(DEBUGFLAGS)
-!else
-cdebug	= -Zi -WX $(DEBUGFLAGS)
+PRJ_DEFINES = -D _CRT_SECURE_NO_DEPRECATE -D _CRT_NONSTDC_NO_DEPRECATE \
+	-DHAVE_MEMMOVE=1 -DXML_DTD=1 -DXML_NS=1 -DTDOM_NO_UNKNOWN_CMD=1 \
+!if !$(STATIC_BUILD)
+	-DUSE_TDOM_STUBS
 !endif
 
-### Declarations common to all compiler options
-cwarn = -D _CRT_SECURE_NO_DEPRECATE -D _CRT_NONSTDC_NO_DEPRECATE
-cflags = -nologo -c $(COMPILERFLAGS) $(cwarn) -Fp$(TMP_DIR)^\
+TDOMLIBPATH    = "$(TDOMROOT)\win\$(BUILDDIRTOP)"
 
-!if $(MSVCRT)
-!if $(DEBUG) && !$(UNCHECKED)
-crt = -MDd
-!else
-crt = -MD
-!endif
-!else
-!if $(DEBUG) && !$(UNCHECKED)
-crt = -MTd
-!else
-crt = -MT
-!endif
-!endif
+PRJ_INCLUDES = -I$(TDOMROOT)\generic -I$(TDOMROOT)\expat
+
+TNCDIR         = $(TDOMROOT)\extensions\tnc
 
 !if !$(STATIC_BUILD)
-cflags = $(cflags) -DUSE_TCL_STUBS -DUSE_TDOM_STUBS
-!if defined(TKSTUBLIB)
-cflags = $(cflags) -DUSE_TK_STUBS
-!endif
-!endif
-
-TDOMLIBPATH    = "$(ROOT)\win\$(BUILDDIRTOP)"
-
-TNCDIR         = $(ROOT)\extensions\tnc
-WINDIR		= $(TNCDIR)\win
-GENERICDIR     = $(ROOT)\generic
-EXPATDIR    = $(ROOT)\expat
-TCLINCDIR      = $(INSTALLDIR)\Include
-
-DEFS            = -DHAVE_MEMMOVE=1 -DXML_DTD=1 -DXML_NS=1 -DTDOM_NO_UNKNOWN_CMD=1
-INCLUDES	= -I"$(WINDIR)" -I"$(TNCDIR)" -I"$(GENERICDIR)" -I"$(EXPATDIR)" $(TCL_INCLUDES)
-BASE_CFLAGS	= $(cflags) $(cdebug) $(crt) $(INCLUDES)
-CON_CFLAGS	= $(cflags) $(cdebug) $(crt) -DCONSOLE
-TCL_CFLAGS      = -DPACKAGE_NAME="\"$(PROJECT)\"" \
-		  -DPACKAGE_VERSION="\"$(DOTVERSION)\"" \
-		  -DTDOM_PACKAGE_VERSION="\"$(TDOM_DOTVERSION)\"" \
-		  $(BASE_CFLAGS) $(OPTDEFINES) $(DEFS) $(DEFS_EXPAT)
-
-
-#---------------------------------------------------------------------
-# Link flags
-#---------------------------------------------------------------------
-
-!if $(DEBUG)
-ldebug	= -debug:full -debugtype:cv
-!if $(MSVCRT)
-ldebug = $(ldebug) -nodefaultlib:msvcrt
-!endif
-!else
-ldebug	= -release -opt:ref -opt:icf,3
-!endif
-
-### Declarations common to all linker options
-lflags	= -nologo -machine:$(MACHINE) $(LINKERFLAGS) $(ldebug)
-
-!if $(PROFILE)
-lflags	= $(lflags) -profile
-!endif
-
-!if $(ALIGN98_HACK) && !$(STATIC_BUILD)
-### Align sections for PE size savings.
-lflags	= $(lflags) -opt:nowin98
-!else if !$(ALIGN98_HACK) && $(STATIC_BUILD)
-### Align sections for speed in loading by choosing the virtual page size.
-lflags	= $(lflags) -align:4096
-!endif
-
-!if $(LOIMPACT)
-lflags	= $(lflags) -ws:aggressive
-!endif
-
-dlllflags = $(lflags) -dll
-conlflags = $(lflags) -subsystem:console
-guilflags = $(lflags) -subsystem:windows
-!if !$(STATIC_BUILD)
-baselibs  = $(TCLSTUBLIB) $(TDOMLIBPATH)\tdomstub$(TDOMVER).lib
-!if defined(TKSTUBLIB)
-baselibs  = $(baselibs) $(TKSTUBLIB)
-!endif
-!endif
-
-# Avoid 'unresolved external symbol __security_cookie' errors.
-# c.f. http://support.microsoft.com/?id=894573
-!if "$(MACHINE)" == "IA64" || "$(MACHINE)" == "AMD64"
-baselibs   = $(baselibs) bufferoverflowU.lib
+PRJ_LIBS  = $(TDOMLIBPATH)\tdomstub$(TDOMVER).lib
 !endif
 
 #---------------------------------------------------------------------
@@ -303,18 +182,10 @@ baselibs   = $(baselibs) bufferoverflowU.lib
 TESTFLAGS = $(TESTFLAGS) -file $(TESTPAT)
 !ENDIF
 
-#---------------------------------------------------------------------
-# Project specific targets (EDIT)
-#---------------------------------------------------------------------
+!include "$(_RULESDIR)\targets.vc"
 
-all:	    setup $(PROJECT)
-$(PROJECT): setup $(PRJLIB)
-install:    install-binaries install-libraries install-docs
+pkgindex: default-pkgindex
 
-# Tests need to ensure we load the right dll file we
-# have to handle the output differently on Win9x.
-#
-!if "$(OS)" == "Windows_NT"  || "$(MSVCDIR)" == "IDE"
 test: setup $(PROJECT)
         set TCL_LIBRARY=$(ROOT)/library
         $(TCLSH) <<
@@ -324,115 +195,4 @@ cd "$(ROOT)/tests"
 set argv "$(TESTFLAGS)"
 source all.tcl
 <<
-!else
-test: setup $(PROJECT)
-        echo Please wait while the test results are collected
-        set TCL_LIBRARY=$(ROOT)/library
-        $(TCLSH) << >tests.log
-load $(PRJLIB:\=/)
-source [file join $(LIBDIR:\=/) tdom.tcl]
-cd "$(ROOT)/tests"
-set argv "$(TESTFLAGS)"
-source all.tcl
-<<
-        type tests.log | more
-!endif
 
-setup:
-	@if not exist $(OUT_DIR)\nul mkdir $(OUT_DIR)
-	@if not exist $(TMP_DIR)\nul mkdir $(TMP_DIR)
-
-# See <tcl>/win/coffbase.txt for extension base addresses.
-$(PRJLIB): $(DLLOBJS)
-!if $(STATIC_BUILD)
-	$(lib32) -nologo -out:$@ @<<
-$**
-<<
-!else
-	$(link32) $(dlllflags)  -out:$@ $(baselibs) @<<
-$**
-<<
-	$(_VC_MANIFEST_EMBED_DLL)
-	-@del $*.exp
-!endif
-
-#---------------------------------------------------------------------
-# Implicit rules
-#---------------------------------------------------------------------
-
-{$(WINDIR)}.c{$(TMP_DIR)}.obj::
-    $(cc32) $(TCL_CFLAGS) -DBUILD_$(PROJECT) -Fo$(TMP_DIR)\ @<<
-$<
-<<
-
-{$(TNCDIR)}.c{$(TMP_DIR)}.obj::
-    $(cc32) $(TCL_CFLAGS) -DBUILD_$(PROJECT) -Fo$(TMP_DIR)\ @<<
-$<
-<<
-
-{$(WINDIR)}.rc{$(TMP_DIR)}.res:
-	$(rc32) -fo $@ -r -i "$(GENERICDIR)" -D__WIN32__ \
-                -DCOMMAVERSION=$(DOTVERSION:.=,),0 \
-                -DDOTVERSION=\"$(DOTVERSION)\" \
-                -DVERSION=\"$(VERSION)$(SUFX)\" \
-!if $(DEBUG)
-	-d DEBUG \
-!endif
-!if $(TCL_THREADS)
-	-d TCL_THREADS \
-!endif
-!if $(STATIC_BUILD)
-	-d STATIC_BUILD \
-!endif
-	$<
-
-.SUFFIXES:
-.SUFFIXES:.c .rc
-
-#-------------------------------------------------------------------------
-# Explicit dependency rules
-#
-#-------------------------------------------------------------------------
-
-
-#---------------------------------------------------------------------
-# Installation. (EDIT)
-#
-# You may need to modify this section to reflect the final distribution
-# of your files and possibly to generate documentation.
-#
-#---------------------------------------------------------------------
-
-install-binaries:
-	@echo Installing binaries to '$(SCRIPT_INSTALL_DIR)'
-	@if not exist "$(SCRIPT_INSTALL_DIR)" mkdir "$(SCRIPT_INSTALL_DIR)"
-	@$(CPY) $(PRJLIB) "$(SCRIPT_INSTALL_DIR)" >NUL
-	@$(CPY) $(PRJSTUBLIB) "$(SCRIPT_INSTALL_DIR)" >NUL
-
-install-libraries:
-        @echo Installing package index in '$(SCRIPT_INSTALL_DIR)'
-        @type << >"$(SCRIPT_INSTALL_DIR)\pkgIndex.tcl"
-    package ifneeded $(PROJECT) $(DOTVERSION) "[list load [file join $$dir $(PROJECT)$(VERSION)$(SUFX).$(EXT)] $(PROJECT)]"
-<<
-
-install-docs:
-#	@echo Installing documentation files to '$(DOC_INSTALL_DIR)'
-#	@if exist $(DOCDIR) $(CPY) $(DOCDIR)\*.n "$(DOC_INSTALL_DIR)"
-
-#---------------------------------------------------------------------
-# Clean up
-#---------------------------------------------------------------------
-
-clean:
-	@if exist $(TMP_DIR)\nul $(RMDIR) $(TMP_DIR)
-	@if exist $(WINDIR)\versions.vc del $(WINDIR)\versions.vc
-	@if exist $(WINDIR)\vercl.i del $(WINDIR)\vercl.i
-	@if exist $(WINDIR)\vercl.x del $(WINDIR)\vercl.x
-	@if exist $(WINDIR)\_junk.pch del $(WINDIR)\_junk.pch
-
-realclean: clean
-	@if exist $(OUT_DIR)\nul $(RMDIR) $(OUT_DIR)
-
-distclean: realclean
-	@if exist $(WINDIR)\nmakehlp.exe del $(WINDIR)\nmakehlp.exe
-	@if exist $(WINDIR)\nmakehlp.obj del $(WINDIR)\nmakehlp.obj
