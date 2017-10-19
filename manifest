@@ -1,5 +1,5 @@
-C Applyed\sspelling/\swording\sfixes\sin\ssource\scode\scomments,\serror\smessages\sand\seven\ssymbols\s(!)\s\s(documentation\spart)\sas\sreported\sby\sDebian\slintian\s[9629f6d4fb8c9].
-D 2017-10-06T00:03:05.582
+C Create\snew\sbranch\snamed\s"vc-reform"
+D 2017-10-19T04:17:06.816
 F CHANGES 32e2f76ec01a9205c8443fba54f50f13c05722f6
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -229,8 +229,11 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 764b3d1ea0b2e66ed8ef91289c6af912322a4514
+P f8ced39e14105698111c31ba1170302802cbb09b
 R 20463a62411b59c433b55c9a76cb97c3
-U rolf
-Z cb96b919631ceb629888ba6dccfa88f1
+T *branch * vc-reform
+T *sym-vc-reform *
+T -sym-trunk *
+U apnadkarni
+Z 2070319376c65b1247eb0ca93b5bc9e3
 # Remove this line to create a well-formed Fossil manifest.
