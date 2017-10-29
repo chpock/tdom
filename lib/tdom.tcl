@@ -740,6 +740,13 @@ proc tDOM::IANAEncoding2TclEncoding {IANAName} {
 #----------------------------------------------------------------------------
 proc tDOM::xmlOpenFile {filename {encodingString {}}} {
 
+    # This partly (mis-)use the encoding of a channel handed to [dom
+    # parse -channel ..] as a marker: if the channel encoding is utf-8
+    # then behind the scene Tcl_Read() is used, otherwise
+    # Tcl_ReadChars(). This is used for the encodings understood (and
+    # checked) by the used expat implementation: utf-8 and utf-16 (in
+    # either byte order.
+    
     set fd [open $filename]
 
     if {$encodingString != {}} {
@@ -765,7 +772,7 @@ proc tDOM::xmlOpenFile {filename {encodingString {}}} {
             # ffef: UTF-16, little-endian BOM
             seek $fd 0 start
             set encString UTF-16            
-            fconfigure $fd -encoding identity
+            fconfigure $fd -encoding utf-8
             return $fd
         }
     }
@@ -819,7 +826,7 @@ proc tDOM::xmlOpenFile {filename {encodingString {}}} {
             # UTF-16, big-endian, no BOM
             # UTF-16, little-endian, no BOM
             seek $fd 0 start
-            set encoding identity
+            set encoding utf-8
             set encString UTF-16
         }
         "4c6fa794" {
@@ -829,7 +836,7 @@ proc tDOM::xmlOpenFile {filename {encodingString {}}} {
         default {
             # UTF-8 without an encoding declaration
             seek $fd 0 start
-            set encoding identity
+            set encoding utf-8
             set encString "UTF-8"
         }
     }

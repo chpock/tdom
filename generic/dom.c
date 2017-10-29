@@ -2202,7 +2202,7 @@ domReadDocument (
             *resultcode = info.status;
             return NULL;
         }
-        if (strcmp (Tcl_DStringValue (&dStr), "identity")==0 ) useBinary = 1;
+        if (strcmp (Tcl_DStringValue (&dStr), "utf-8")==0 ) useBinary = 1;
         else useBinary = 0;
         Tcl_DStringFree (&dStr);
         if (useBinary) {
