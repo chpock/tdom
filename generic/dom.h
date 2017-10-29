@@ -723,7 +723,7 @@ typedef void (*domFreeCallback) (domNode * node, void * clientData);
 |   Function prototypes
 |
 \-------------------------------------------------------------------------*/
-const char *   domException2String (domException expection);
+const char *   domException2String (domException exception);
 
 
 void           domModuleInitialize (void);

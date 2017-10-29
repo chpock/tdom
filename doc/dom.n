@@ -429,7 +429,7 @@ iso8859-9, koi8-r.
 \&\fB\fBdom\fP \fBcreateNodeCmd\fP \fI?-returnNodeCmd?\fB \fI?-tagName name?\fB \fI?-jsonType jsonType?\fB \fI?-namespace URI?\fB \fI(element|comment|text|cdata|pi)Node\fB \fIcommandName\fB
 \&\fRThis method creates Tcl commands, which in turn create
 tDOM nodes. Tcl commands created by this command are only
-avaliable inside a script given to the domNode methods
+available inside a script given to the domNode methods
 \&\fIappendFromScript\fR or \fIinsertBeforeFromScript\fR. If
 a command created with \fIcreateNodeCmd\fR is invoked in
 any other context, it will return error. The created command

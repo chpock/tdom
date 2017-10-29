@@ -1795,7 +1795,7 @@ TncElementStartCommand (userData, name, atts)
        data out of the provided DTD isn't postprocessed by 
        TncElementStartCommand. We do this now.
        NOTE: Since there wasn't a doctype declaration, there is no
-       information avaliable which element is expected to be the
+       information available which element is expected to be the
        document element. Eventually it would be desirable, to set
        this somehow. For now, this means, that every valid subtree
        of the given DTD information is accepted.  */

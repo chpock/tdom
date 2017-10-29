@@ -147,7 +147,11 @@ GENERICDIR	= $(ROOT)\generic
 TOOLSDIR	= $(ROOT)\tools
 !endif
 !ifndef LIBDIR
+!if exist("$(ROOT)\library")
 LIBDIR          = $(ROOT)\library
+!else
+LIBDIR          = $(ROOT)\lib
+!endif
 !endif
 !ifndef DEMODIR
 !if exist("$(LIBDIR)\demos")
@@ -1265,7 +1269,9 @@ pkgcflags_nostubs = $(appcflags_nostubs) $(PKGNAMEFLAGS) -DBUILD_$(PROJECT)
 #
 # TBD - tclvfs has a comment that stubs libs should not be compiled with -GL
 # without stating why. Tcl itself compiled stubs libs with this flag.
-# so we do not remove it from cflags.
+# so we do not remove it from cflags. -GL may prevent extensions
+# compiled with one VC version to fail to link against stubs library
+# compiled with another VC version. Check for this and fix accordingly.
 stubscflags = $(cflags) $(PRJ_DEFINES) $(OPTDEFINES) -Zl -DSTATIC_BUILD $(INCLUDES)
 
 # Link flags 

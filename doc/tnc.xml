@@ -42,14 +42,14 @@ and frees all information, stored by it.</p></desc>
       <commanddef>
         <command><cmd>tnc</cmd> <m>parserObj</m> <method>getValidateCmd</method> <option>?validateCmdName?</option></command>
 
-        <desc><p>Returns a new created validation command, if one is avaliable
+        <desc><p>Returns a new created validation command, if one is available
 from the parser command, otherwise it signals error. The name of the validation
 command is the <m>validateCmdName</m>, if this optional argument was given, or
-a random choosen name. A validation command is avaliable in a parser command,
+a random chosen name. A validation command is available in a parser command,
 if the parser with tnc enabled was previously used, to parse an XML document
 with a valid doctype declaration, a valid external subset, if one was given by
 the doctype declaration, and a valid internal subset. The further document
-doesn't need to be valid, to make the validation command avaliable. The
+doesn't need to be valid, to make the validation command available. The
 validation command can only get received one time from the parser command. The
 created validation command has this syntax:</p>
 
@@ -71,8 +71,8 @@ the empty string in case of a valid document.</desc>
         <command><method>validateTree</method> <m>elementNode</m> <m>?varName?</m></command>
 
         <desc>Checks, if the given subtree with <m>domNode</m> as root element
-is a posible valid subtree of a document conforming to the DTD information
-represented by teh validation command. IDREF could not checked, while
+is a possible valid subtree of a document conforming to the DTD information
+represented by the validation command. IDREF could not checked, while
 validating only a subtree, but it is checked, that every known ID attribute in
 the subtree is unique. Returns 1, if the subtree is OK, 0 otherwise. If the
 <m>varName</m> argument is given, then the variable it names is set to the
