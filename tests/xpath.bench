@@ -83,3 +83,148 @@ foreach nrOf {1 10 20 30 40 50 60} {
 
 }
 
+dom createNodeCmd elementNode e2
+
+dom createDocument root doc
+$doc documentElement root
+$root appendFromScript {
+    e2
+    for {set x 1} {$x < 1000} {incr x} {
+        e1
+    }
+}
+
+bench -desc "Select unique element between 1000, at first, with pred" -body {
+    $root selectNodes -cache 1 {e2[1]}
+} -post {
+    $doc delete
+}
+
+bench -desc "Select unique element between 1000, at first, without pred" -pre {
+    dom createDocument root doc
+    $doc documentElement root
+    $root appendFromScript {
+        e2
+        for {set x 1} {$x < 1000} {incr x} {
+            e1
+        }
+    }
+} -body {
+    $root selectNodes -cache 1 {e2}
+} -post {
+    $doc delete
+}
+
+bench -desc "Select unique element between 1000, at first, with last() pred" -pre {
+    dom createDocument root doc
+    $doc documentElement root
+    $root appendFromScript {
+        e2
+        for {set x 1} {$x < 1000} {incr x} {
+            e1
+        }
+    }
+} -body {
+    $root selectNodes -cache 1 {e2[last()]}
+} -post {
+    $doc delete
+}
+
+bench -desc "Select unique element between 1000, at 500, with pred" -pre {
+    dom createDocument root doc
+    $doc documentElement root
+    $root appendFromScript {
+        for {set x 1} {$x < 500} {incr x} {
+            e1
+        }
+        e2
+        for {set x 501} {$x <= 1000} {incr x} {
+            e1
+        }
+    }
+} -body {
+    $root selectNodes -cache 1 {e2[1]}
+} -post {
+    $doc delete
+}
+
+bench -desc "Select unique element between 1000, at 500, without pred" -pre {
+    dom createDocument root doc
+    $doc documentElement root
+    $root appendFromScript {
+        for {set x 1} {$x < 500} {incr x} {
+            e1
+        }
+        e2
+        for {set x 501} {$x <= 1000} {incr x} {
+            e1
+        }
+    }
+} -body {
+    $root selectNodes -cache 1 {e2}
+} -post {
+    $doc delete
+}
+
+bench -desc "Select unique element between 1000, at 500, with last()" -pre {
+    dom createDocument root doc
+    $doc documentElement root
+    $root appendFromScript {
+        for {set x 1} {$x < 500} {incr x} {
+            e1
+        }
+        e2
+        for {set x 501} {$x <= 1000} {incr x} {
+            e1
+        }
+    }
+} -body {
+    $root selectNodes -cache 1 {e2[last()]}
+} -post {
+    $doc delete
+}
+
+bench -desc "Select unique element between 1000, at 1000, with pred" -pre {
+    dom createDocument root doc
+    $doc documentElement root
+    $root appendFromScript {
+        for {set x 1} {$x < 1000} {incr x} {
+            e1
+        }
+        e2
+    }
+} -body {
+    $root selectNodes -cache 1 {e2[1]}
+} -post {
+    $doc delete
+}
+
+bench -desc "Select unique element between 1000, at 1000, without pred" -pre {
+    dom createDocument root doc
+    $doc documentElement root
+    $root appendFromScript {
+        for {set x 1} {$x < 1000} {incr x} {
+            e1
+        }
+        e2
+    }
+} -body {
+    $root selectNodes -cache 1 {e2}
+} -post {
+    $doc delete
+}
+
+bench -desc "Select unique element between 1000, at 1000, with last()" -pre {
+    dom createDocument root doc
+    $doc documentElement root
+    $root appendFromScript {
+        for {set x 1} {$x < 1000} {incr x} {
+            e1
+        }
+        e2
+    }
+} -body {
+    $root selectNodes -cache 1 {e2[last()]}
+} -post {
+    $doc delete
+}
