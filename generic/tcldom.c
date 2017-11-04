@@ -1205,6 +1205,7 @@ int tcldom_appendXML (
                           xml_string,
                           xml_string_len,
                           1,
+                          0,
                           TSD(Encoding_to_8bit),
                           TSD(storeLineColumn),
                           ignorexmlns,
@@ -6135,6 +6136,7 @@ int tcldom_parse (
     int          feedbackAfter       = 0;
     int          useForeignDTD       = 0;
     int          paramEntityParsing  = (int)XML_PARAM_ENTITY_PARSING_ALWAYS;
+    int          keepCDATA           = 0;
     int          status              = 0;
     domDocument *doc;
     Tcl_Obj     *newObjName = NULL;
@@ -6151,7 +6153,7 @@ int tcldom_parse (
         "-html5",
 #endif
         "-jsonmaxnesting",        "-ignorexmlns",   "--",
-        NULL
+        "-keepCDATA",                NULL
     };
     enum parseOption {
         o_keepEmpties,            o_simple,         o_html,
@@ -6161,7 +6163,8 @@ int tcldom_parse (
 #ifdef TDOM_HAVE_GUMBO
         o_htmlfive,
 #endif
-        o_jsonmaxnesting,         o_ignorexmlns,    o_LAST
+        o_jsonmaxnesting,         o_ignorexmlns,    o_LAST,
+        o_keepCDATA
     };
 
     static CONST84 char *paramEntityParsingValues[] = {
@@ -6388,6 +6391,10 @@ int tcldom_parse (
         case o_LAST:
             objv++;  objc--; break;
             
+        case o_keepCDATA:
+            keepCDATA = 1;
+            objv++;  objc--; break;
+            
         }
         if ((enum parseOption) optionIndex == o_LAST) break;
     }
@@ -6535,6 +6542,7 @@ int tcldom_parse (
     doc = domReadDocument(parser, xml_string,
                           xml_string_len,
                           ignoreWhiteSpaces,
+                          keepCDATA,
                           TSD(Encoding_to_8bit),
                           TSD(storeLineColumn),
                           ignorexmlns,

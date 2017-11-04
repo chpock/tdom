@@ -152,7 +152,9 @@ typedef struct _domReadInfo {
     domNode          *currentNode;
     int               depth;
     int               ignoreWhiteSpaces;
+    int               strict;
     Tcl_DString      *cdata;
+    int               cdataSection;
     TEncoding        *encoding_8bit;
     int               storeLineColumn;
     int               ignorexmlns;
@@ -1458,6 +1460,36 @@ characterDataHandler (
 }
 
 /*---------------------------------------------------------------------------
+|   startCDATA
+|
+\--------------------------------------------------------------------------*/
+static void
+startCDATA (
+    void        *userData
+    )
+{
+    domReadInfo   *info = userData;
+
+    DispatchPCDATA (info);
+    info->cdataSection = 1;
+}
+
+/*---------------------------------------------------------------------------
+|   endCDATA
+|
+\--------------------------------------------------------------------------*/
+static void
+endCDATA (
+    void        *userData
+    )
+{
+    domReadInfo   *info = userData;
+    
+    DispatchPCDATA (info);
+    info->cdataSection = 0;
+}
+
+/*---------------------------------------------------------------------------
 |   DispatchPCDATA
 |
 \--------------------------------------------------------------------------*/
@@ -1473,18 +1505,19 @@ DispatchPCDATA (
     char          *s;
     int            len, hnew;
     
-    s = Tcl_DStringValue (info->cdata);
     len = Tcl_DStringLength (info->cdata);
     if (!len) return;
+    s = Tcl_DStringValue (info->cdata);
     
     if (TclOnly8Bits && info->encoding_8bit) {
         tdom_Utf8to8Bit( info->encoding_8bit, s, &len);
     }
     parentNode = info->currentNode;
     if (!parentNode) return;
-    
+
     if (   parentNode->lastChild 
-        && parentNode->lastChild->nodeType == TEXT_NODE) {
+        && parentNode->lastChild->nodeType == TEXT_NODE
+        && !info->cdataSection) {
 
         /* normalize text node, i.e. there are no adjacent text nodes */
         node = (domTextNode*)parentNode->lastChild;
@@ -1521,7 +1554,10 @@ DispatchPCDATA (
             node = (domTextNode*) domAlloc(sizeof(domTextNode));
         }
         memset(node, 0, sizeof(domTextNode));
-        node->nodeType    = TEXT_NODE;
+        if (info->cdataSection)
+            node->nodeType    = CDATA_SECTION_NODE;
+        else 
+            node->nodeType    = TEXT_NODE;
         node->nodeFlags   = 0;
         node->nodeNumber  = NODE_NO(info->document);
         node->valueLength = len;
@@ -2090,6 +2126,7 @@ domReadDocument (
     char       *xml,
     int         length,
     int         ignoreWhiteSpaces,
+    int         keepCDATA,
     TEncoding  *encoding_8bit,
     int         storeLineColumn,
     int         ignorexmlns,
@@ -2131,6 +2168,7 @@ domReadDocument (
     info.ignoreWhiteSpaces    = ignoreWhiteSpaces;
     info.cdata                = (Tcl_DString*) MALLOC (sizeof (Tcl_DString));
     Tcl_DStringInit (info.cdata);
+    info.cdataSection         = 0;
     info.encoding_8bit        = encoding_8bit;
     info.storeLineColumn      = storeLineColumn;
     info.ignorexmlns          = ignorexmlns;
@@ -2168,6 +2206,10 @@ domReadDocument (
                              (enum XML_ParamEntityParsing) paramEntityParsing);
     XML_SetDoctypeDeclHandler (parser, startDoctypeDeclHandler,
                                endDoctypeDeclHandler);
+    if (keepCDATA) {
+        XML_SetCdataSectionHandler(parser, startCDATA, endCDATA);
+    }
+    
 
     if (channel == NULL) {
         status = XML_Parse(parser, xml, length, 1);
@@ -5190,6 +5232,7 @@ typedef struct _tdomCmdReadInfo {
     domNode          *currentNode;
     int               depth;
     int               ignoreWhiteSpaces;
+    int               cdataSection;
     Tcl_DString      *cdata;
     TEncoding        *encoding_8bit;
     int               storeLineColumn;
@@ -5335,14 +5378,14 @@ TclTdomObjCmd (dummy, interp, objc, objv)
         "enable", "getdoc",
         "setResultEncoding", "setStoreLineColumn",
         "setExternalEntityResolver", "keepEmpties",
-        "remove", "ignorexmlns",
+        "remove", "ignorexmlns", "keepCDATA",
         NULL
     };
     enum tdomMethod {
         m_enable, m_getdoc,
         m_setResultEncoding, m_setStoreLineColumn,
         m_setExternalEntityResolver, m_keepEmpties,
-        m_remove, m_ignorexmlns
+        m_remove, m_ignorexmlns, m_keepCDATA
     };
 
     if (objc < 3 || objc > 4) {
@@ -5398,6 +5441,7 @@ TclTdomObjCmd (dummy, interp, objc, objv)
         info->currentNode       = NULL;
         info->depth             = 0;
         info->ignoreWhiteSpaces = 1;
+        info->cdataSection      = 0;
         info->cdata             = (Tcl_DString*) MALLOC (sizeof (Tcl_DString));
         Tcl_DStringInit (info->cdata);
         info->encoding_8bit     = 0;
@@ -5543,6 +5587,31 @@ TclTdomObjCmd (dummy, interp, objc, objv)
         info->tdomStatus = 1;
         break;
 
+    case m_keepCDATA:
+        if (objc != 4) {
+            Tcl_SetResult (interp, "wrong # of args for method keepCDATA.",
+                           NULL);
+            return TCL_ERROR;
+        }
+        handlerSet = CHandlerSetGet (interp, objv[1], "tdom");
+        info = handlerSet->userData;
+        if (!info) {
+            Tcl_SetResult (interp, "parser object isn't tdom enabled.", NULL);
+            return TCL_ERROR;
+        }
+        if (Tcl_GetBooleanFromObj (interp, objv[3], &bool) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        if (bool) {
+            handlerSet->startCdataSectionCommand = startCDATA;
+            handlerSet->endCdataSectionCommand = endCDATA;
+        } else {
+            handlerSet->startCdataSectionCommand = startCDATA;
+            handlerSet->endCdataSectionCommand = endCDATA;
+        }
+        info->tdomStatus = 1;
+        break;
+        
     case m_ignorexmlns:
         info = CHandlerSetGetUserData (interp, objv[1], "tdom");
         if (!info) {

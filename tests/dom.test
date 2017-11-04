@@ -574,6 +574,24 @@ test dom-2.34 {XML prefix declaration with empty namespace} {
     set errMsg
 } {Missing URI in Namespace declaration, referenced at line 1 character 22}
 
+test dom-2.35 {-keepCDATA} {
+    set doc [dom parse -keepCDATA {<doc>foo <![CDATA[test of & <bad> format]]> bar </doc>}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc>foo <![CDATA[test of & <bad> format]]> bar </doc>}
+
+test dom-2.36 {-keepCDATA} {
+    set doc [dom parse -keepCDATA {<doc>foo <![CDATA[test of & <bad> format]]> bar </doc>}]
+    set root [$doc documentElement]
+    set result [list]
+    foreach child [$root childNodes] {
+        lappend result [$child nodeType]
+    }
+    $doc delete
+    set result
+} {TEXT_NODE CDATA_SECTION_NODE TEXT_NODE}
+    
 test dom-3.1 {isName} {
     dom isName ":foo"
 } {1}
