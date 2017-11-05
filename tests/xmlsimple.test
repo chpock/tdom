@@ -89,6 +89,32 @@ test simple-1.11 {simple doesn't catch all not wellformed input} {
                     <http://www.w3.org/1999/XSL/Transform> "/>}}
 } 0
 
+test simple-1.12 {CDATA section} {
+    set doc [dom parse -simple {<doc>foo <![CDATA[test of & <bad> format]]> bar </doc>}]
+    set result [$doc selectNodes count(doc/node())]
+    $doc delete
+    set result
+} 1
+
+test simple-1.13 {CDATA section} {
+    set doc [dom parse -simple {<doc>foo <![CDATA[test of & <bad> format]]> bar </doc>}]
+    set root [$doc documentElement]
+    set result [list]
+    foreach child [$root childNodes] {
+        lappend result [$child nodeType]
+    }
+    $doc delete
+    set result
+} {TEXT_NODE}
+
+test simple-1.14 {CDATA section} {
+    set doc [dom parse -simple {<doc>&lt;foo &amp; &gt;<![CDATA[test of & <bad> format]]>&apos; bar &quot;</doc>}]
+    set result [$doc selectNodes string(doc)]
+    $doc delete
+    set result
+} {<foo & >test of & <bad> format' bar "}
+# emacs: "
+
 test simple-2.1 {XML build in entities} {
     set doc [dom parse -simple {<doc>&lt;&gt;&amp;&apos;&quot;</doc>}]
     set root [$doc documentElement]

@@ -441,33 +441,54 @@ XML_SimpleParse (
                 x++;
             }
             if (!(only_whites && ignoreWhiteSpaces) && parent_node) {
-                /*--------------------------------------------------------
-                |   allocate new TEXT node
-                 \-------------------------------------------------------*/
-                tnode = (domTextNode*) domAlloc(sizeof(domTextNode));
-                memset(tnode, 0, sizeof(domTextNode));
-                tnode->nodeType    = TEXT_NODE;
-                tnode->nodeFlags   = 0;
-                tnode->ownerDocument = doc;
-                tnode->nodeNumber  = NODE_NO(doc);
-                tnode->valueLength = (x - start);
-                tnode->nodeValue   = (char*)MALLOC((x - start)+1);
-                memmove(tnode->nodeValue, start, (x - start));
-                *(tnode->nodeValue + (x - start)) = 0;
-                if (ampersandSeen) {
-                    if (!TranslateEntityRefs(tnode->nodeValue, 
-                                             &(tnode->valueLength) )) {
-                        RetError("Entity parsing error", (x - xml));
+                if (parent_node->lastChild
+                    && parent_node->lastChild->nodeType == TEXT_NODE) {
+                    /* normalize text node, i.e. there are no adjacent
+                     * text nodes */
+                    tnode = (domTextNode*)parent_node->lastChild;
+                    tnode->nodeValue = REALLOC(tnode->nodeValue,
+                                               tnode->valueLength + x - start + 1);
+                    memmove(tnode->nodeValue + tnode->valueLength,
+                            start, x - start);
+                    saved = tnode->valueLength;
+                    tnode->valueLength += (x - start);
+                    *(tnode->nodeValue + tnode->valueLength) = 0;
+                    if (ampersandSeen) {
+                        if (!TranslateEntityRefs(tnode->nodeValue + saved, 
+                                                 &(tnode->valueLength) )) {
+                            RetError("Entity parsing error", (x - xml));
+                        }
+                        tnode->valueLength += saved;
                     }
-                }
-                tnode->parentNode = parent_node;
-                if (parent_node->firstChild)  {
-                    parent_node->lastChild->nextSibling = (domNode*)tnode;
-                    tnode->previousSibling = parent_node->lastChild;
-                    parent_node->lastChild = (domNode*)tnode;
                 } else {
-                    parent_node->firstChild = parent_node->lastChild = 
-                        (domNode*)tnode;
+                    /*--------------------------------------------------------
+                      |   allocate new TEXT node
+                      \-------------------------------------------------------*/
+                    tnode = (domTextNode*) domAlloc(sizeof(domTextNode));
+                    memset(tnode, 0, sizeof(domTextNode));
+                    tnode->nodeType    = TEXT_NODE;
+                    tnode->nodeFlags   = 0;
+                    tnode->ownerDocument = doc;
+                    tnode->nodeNumber  = NODE_NO(doc);
+                    tnode->valueLength = (x - start);
+                    tnode->nodeValue   = (char*)MALLOC((x - start)+1);
+                    memmove(tnode->nodeValue, start, (x - start));
+                    *(tnode->nodeValue + (x - start)) = 0;
+                    tnode->parentNode = parent_node;
+                    if (parent_node->firstChild)  {
+                        parent_node->lastChild->nextSibling = (domNode*)tnode;
+                        tnode->previousSibling = parent_node->lastChild;
+                        parent_node->lastChild = (domNode*)tnode;
+                    } else {
+                        parent_node->firstChild = parent_node->lastChild = 
+                            (domNode*)tnode;
+                    }
+                    if (ampersandSeen) {
+                        if (!TranslateEntityRefs(tnode->nodeValue, 
+                                                 &(tnode->valueLength) )) {
+                            RetError("Entity parsing error", (x - xml));
+                        }
+                    }
                 }
             }
 
@@ -606,26 +627,39 @@ XML_SimpleParse (
                     }
                     if (*x) {
                         if (parent_node && (x - start)) {
-                            /*----------------------------------------------------
-                            |   allocate new TEXT node for CDATA section data
-                            \---------------------------------------------------*/
-                            tnode = (domTextNode*) domAlloc(sizeof(domTextNode));
-                            memset(tnode, 0, sizeof(domTextNode));
-                            tnode->nodeType      = TEXT_NODE;
-                            tnode->nodeFlags     = 0;
-                            tnode->ownerDocument = doc;
-                            tnode->nodeNumber    = NODE_NO(doc);
-                            tnode->parentNode    = parent_node;
-                            tnode->valueLength   = (x - start);
-                            tnode->nodeValue     = (char*)MALLOC((x - start)+1);
-                            memmove(tnode->nodeValue, start, (x - start));
-                            *(tnode->nodeValue + (x - start)) = 0;
-                            if (parent_node->firstChild)  {
-                                parent_node->lastChild->nextSibling = (domNode*)tnode;
-                                tnode->previousSibling = parent_node->lastChild;
-                                parent_node->lastChild = (domNode*)tnode;
+                            if (parent_node->lastChild
+                                && parent_node->lastChild->nodeType == TEXT_NODE) {
+                                /* normalize text node, i.e. there are no adjacent
+                                 * text nodes */
+                                tnode = (domTextNode*)parent_node->lastChild;
+                                tnode->nodeValue = REALLOC(tnode->nodeValue,
+                                                           tnode->valueLength + x - start + 1);
+                                memmove(tnode->nodeValue + tnode->valueLength,
+                                        start, x - start);
+                                tnode->valueLength += (x - start);
+                                *(tnode->nodeValue + tnode->valueLength) = 0;
                             } else {
-                                parent_node->firstChild = parent_node->lastChild = (domNode*)tnode;
+                                /*----------------------------------------------------
+                                  |   allocate new TEXT node for CDATA section data
+                                  \---------------------------------------------------*/
+                                tnode = (domTextNode*) domAlloc(sizeof(domTextNode));
+                                memset(tnode, 0, sizeof(domTextNode));
+                                tnode->nodeType      = TEXT_NODE;
+                                tnode->nodeFlags     = 0;
+                                tnode->ownerDocument = doc;
+                                tnode->nodeNumber    = NODE_NO(doc);
+                                tnode->parentNode    = parent_node;
+                                tnode->valueLength   = (x - start);
+                                tnode->nodeValue     = (char*)MALLOC((x - start)+1);
+                                memmove(tnode->nodeValue, start, (x - start));
+                                *(tnode->nodeValue + (x - start)) = 0;
+                                if (parent_node->firstChild)  {
+                                    parent_node->lastChild->nextSibling = (domNode*)tnode;
+                                    tnode->previousSibling = parent_node->lastChild;
+                                    parent_node->lastChild = (domNode*)tnode;
+                                } else {
+                                    parent_node->firstChild = parent_node->lastChild = (domNode*)tnode;
+                                }
                             }
                         }
                         x += 3;

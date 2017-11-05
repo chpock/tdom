@@ -1,5 +1,5 @@
-C Added\ssome\swords\sof\sdocumentation\sabout\sthe\snew\s[dom\sparse\s...]\sflag\s-keepCDATA.
-D 2017-11-05T01:15:56.800
+C Fixed\ssimple\sparser:\sIt\snow\sgroups\sconsecutive\stext\sand\sCDATA\ssections\sinto\sone\sTEXT_NODE,\sas\sthe\sexpat\sbased\sDOM\sbuilding\s(without\s-keepCDATA)\sdoes.
+D 2017-11-05T18:27:00.203
 F CHANGES 32e2f76ec01a9205c8443fba54f50f13c05722f6
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -159,7 +159,7 @@ F generic/tdominit.c fc4e5f13d29a419304451679b7f79fbe228a45f2
 F generic/utf8conv.c 8d58daa846a0b715df1736720cf9031e924988f2
 F generic/utf8conv.h 4132db4e05ac30dcb78dc3b4799ae0a9ae8a057f
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
-F generic/xmlsimple.c c12dfb6aea298976b4465cedda77ae87374e10d8
+F generic/xmlsimple.c 7dd165b59df26b60d37198180cbff14090361e48
 F generic/xmlsimple.h f2861868b0fed932c79f9e595bb875d261d97bd5
 F lib/tdom.tcl b0a8f49b5c40400d9e0377e1a8d671d7fd9a17d1
 F macosx/README 90fbbcf96747374a4c4a7b97766f0c6bafa7780e
@@ -212,7 +212,7 @@ F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
 F tests/tdomcmd.test 8972e7b5670ce475603263ef92e7000fe36c5815
-F tests/xmlsimple.test b9ca923fb971af2b6170f35a887922e488db928d
+F tests/xmlsimple.test 9fc44b152eacc3d970a8dcb1b21aac1023050339
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.bench 41d24b5b9b7b4593d002b3c6486cd36061f823bb
 F tests/xpath.test ce2970735550f97caddd94effbd3bb32ad76333f
@@ -234,8 +234,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P e320c2065d2bddcb647b0c3d77ed5cfe7df25fe9
-R febec42194fcf9877ff64b4b16ff76a5
+P 43b6f8f8434977b1087b1e2cedf2ea122b45dbed
+R 47dd1ac744b6db57e55f9e6c0d1f64a5
 U rolf
-Z f2bdd95f2b940e1b94299e5dbc157707
+Z 178ffd6e52b46070a91d89deb1aace10
 # Remove this line to create a well-formed Fossil manifest.
