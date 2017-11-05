@@ -152,9 +152,8 @@ typedef struct _domReadInfo {
     domNode          *currentNode;
     int               depth;
     int               ignoreWhiteSpaces;
-    int               strict;
-    Tcl_DString      *cdata;
     int               cdataSection;
+    Tcl_DString      *cdata;
     TEncoding        *encoding_8bit;
     int               storeLineColumn;
     int               ignorexmlns;
