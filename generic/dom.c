@@ -1505,7 +1505,7 @@ DispatchPCDATA (
     int            len, hnew;
     
     len = Tcl_DStringLength (info->cdata);
-    if (!len) return;
+    if (!len && !info->cdataSection) return;
     s = Tcl_DStringValue (info->cdata);
     
     if (TclOnly8Bits && info->encoding_8bit) {

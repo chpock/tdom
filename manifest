@@ -1,5 +1,5 @@
-C Fixed\ssimple\sparser:\sIt\snow\sgroups\sconsecutive\stext\sand\sCDATA\ssections\sinto\sone\sTEXT_NODE,\sas\sthe\sexpat\sbased\sDOM\sbuilding\s(without\s-keepCDATA)\sdoes.
-D 2017-11-05T18:27:00.203
+C If\s-keepCDATA\sis\sused\stogether\swith\s-keepEmpties\seven\sempty\sCDATA\ssections\swill\sbe\sCDATA_SECTION_NODE\s(with\sempty\stext)\sin\sthe\sDOM\stree.
+D 2017-11-05T23:56:18.601
 F CHANGES 32e2f76ec01a9205c8443fba54f50f13c05722f6
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -127,7 +127,7 @@ F extensions/tnc/win/rules-ext.vc 5d4a9b4662d42bfeb1ba3d8215c67e1393120a13
 F extensions/tnc/win/rules.vc f2fff77551761f97a5aaea7f1ca4f2886a031330
 F extensions/tnc/win/targets.vc ba02bbc7b0956bbb17385ddf64d684c594e61074
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
-F generic/dom.c 80c8c26b03ce6587bef6ba6a2b4d8af66af4ad03
+F generic/dom.c 825140c60abfdd552b31e51dba9ae5502db69562
 F generic/dom.h ea32034888b1f4601951bbd458ab1d8b0e44695d
 F generic/domalloc.c 55e9eeff19cc54cf3956a7013883ead07efd3593
 F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
@@ -194,7 +194,7 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.bench 5446ce379127b8d5700f18a5a0848e580313d0d7
-F tests/dom.test af187fb172d6819380f07f1d3f701a35a10d94d9
+F tests/dom.test 5521c431e2e554569d9b6a5c2c2f0b03979cdabc
 F tests/domDoc.test b69b4c7a2f6df995f399bc33147ba5e635e6398f
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test 66a77f681b6e946b88c55a72efe62d8d7e430348
@@ -234,8 +234,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 43b6f8f8434977b1087b1e2cedf2ea122b45dbed
-R 47dd1ac744b6db57e55f9e6c0d1f64a5
+P cde6b24b70b6a3ab95d10bc6c658313fd64a1cff
+R 407b6043cfb48ed3d6c708cbe5d2d883
 U rolf
-Z 178ffd6e52b46070a91d89deb1aace10
+Z 50b8d3725c3e8ba7bed818971544f2c2
 # Remove this line to create a well-formed Fossil manifest.
