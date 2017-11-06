@@ -1,5 +1,5 @@
-C If\s-keepCDATA\sis\sused\stogether\swith\s-keepEmpties\seven\sempty\sCDATA\ssections\swill\sbe\sCDATA_SECTION_NODE\s(with\sempty\stext)\sin\sthe\sDOM\stree.
-D 2017-11-05T23:56:18.601
+C Made\ssimple\sXML\sparser\s([dom\sparse\s-simple\s...])\s-keepCDATA\saware,\swith\sthe\ssame\ssemantic\sas\sfor\sthe\sstandard\sexpat\sparser.
+D 2017-11-06T00:57:37.629
 F CHANGES 32e2f76ec01a9205c8443fba54f50f13c05722f6
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -146,7 +146,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 248bb4d00e2e1a06ea06fd773145f99f52c29dd5
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
-F generic/tcldom.c 9562b259aea0144de88551a076876a0a60c1da40
+F generic/tcldom.c b008dd4e63ec35a790e2a9f028c843988170bd08
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
 F generic/tclexpat.c 069180212797fc14bdb0a08bcd1ad3461406975c
 F generic/tclexpat.h 3fb4df4c023d1f625ec9c5783c4fc1d1e4e0b8bb
@@ -159,8 +159,8 @@ F generic/tdominit.c fc4e5f13d29a419304451679b7f79fbe228a45f2
 F generic/utf8conv.c 8d58daa846a0b715df1736720cf9031e924988f2
 F generic/utf8conv.h 4132db4e05ac30dcb78dc3b4799ae0a9ae8a057f
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
-F generic/xmlsimple.c 7dd165b59df26b60d37198180cbff14090361e48
-F generic/xmlsimple.h f2861868b0fed932c79f9e595bb875d261d97bd5
+F generic/xmlsimple.c 0590ba5bf169e61c34a8c6030cfec72241666b45
+F generic/xmlsimple.h 3cb9d055e60643afcdfe9ab407adf1e8bb5dbafb
 F lib/tdom.tcl b0a8f49b5c40400d9e0377e1a8d671d7fd9a17d1
 F macosx/README 90fbbcf96747374a4c4a7b97766f0c6bafa7780e
 F tclconfig/README.txt 180f4215d59309ec5645aa5f4565557dac484945
@@ -212,7 +212,7 @@ F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
 F tests/tdomcmd.test 8972e7b5670ce475603263ef92e7000fe36c5815
-F tests/xmlsimple.test 9fc44b152eacc3d970a8dcb1b21aac1023050339
+F tests/xmlsimple.test a5c577be330f0254d9d7c4bee2c030acd28e703b
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.bench 41d24b5b9b7b4593d002b3c6486cd36061f823bb
 F tests/xpath.test ce2970735550f97caddd94effbd3bb32ad76333f
@@ -234,8 +234,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P cde6b24b70b6a3ab95d10bc6c658313fd64a1cff
-R 407b6043cfb48ed3d6c708cbe5d2d883
+P d333be5a282f799f9696a2227261a424acc5eb90
+R 3444c8376d178503580399a19d7cb963
 U rolf
-Z 50b8d3725c3e8ba7bed818971544f2c2
+Z 5b60e99d9259ef6e00fb0ef0eb5800bf
 # Remove this line to create a well-formed Fossil manifest.

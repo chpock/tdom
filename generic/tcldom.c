@@ -6495,6 +6495,7 @@ int tcldom_parse (
                                            &byteIndex, &errStr);
         } else {
             doc = XML_SimpleParseDocument(xml_string, ignoreWhiteSpaces,
+                                          keepCDATA,
                                           baseURI, extResolver,
                                           &byteIndex, &errStr);
         }

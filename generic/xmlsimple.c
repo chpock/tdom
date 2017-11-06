@@ -387,6 +387,7 @@ XML_SimpleParse (
     domDocument *doc,
     domNode     *parent_nodeOld,
     int          ignoreWhiteSpaces,
+    int          keepCDATA,
     char       **errStr
 ) {
     register int   c;          /* Next character of the input file */
@@ -621,44 +622,62 @@ XML_SimpleParse (
                     \-------------------------------------------------------*/
                     x += 8;
                     start = x;
-                    while ( (*x!=0) &&
+                    only_whites = 1;
+                    while ( ((c=*x)!=0) &&
                             ((*x!=']') || (x[1]!=']') || (x[2]!='>'))) {
+                        if (only_whites &&
+                            (c != ' ')  &&
+                            (c != '\t') &&
+                            (c != '\n') &&
+                            (c != '\r') ) {
+                            only_whites = 0;
+                        }
                         x++;
                     }
                     if (*x) {
-                        if (parent_node && (x - start)) {
+                        if (parent_node && ((x - start) || keepCDATA)) {
                             if (parent_node->lastChild
-                                && parent_node->lastChild->nodeType == TEXT_NODE) {
-                                /* normalize text node, i.e. there are no adjacent
-                                 * text nodes */
-                                tnode = (domTextNode*)parent_node->lastChild;
-                                tnode->nodeValue = REALLOC(tnode->nodeValue,
-                                                           tnode->valueLength + x - start + 1);
-                                memmove(tnode->nodeValue + tnode->valueLength,
-                                        start, x - start);
-                                tnode->valueLength += (x - start);
-                                *(tnode->nodeValue + tnode->valueLength) = 0;
+                                && parent_node->lastChild->nodeType == TEXT_NODE
+                                && !keepCDATA) {
+                                if ((x - start) && !(only_whites && ignoreWhiteSpaces)) {
+                                    /* normalize text node, i.e. there
+                                     * are no adjacent text nodes */
+                                    tnode = (domTextNode*)parent_node->lastChild;
+                                    tnode->nodeValue =
+                                        REALLOC(tnode->nodeValue,
+                                                tnode->valueLength + x - start + 1);
+                                    memmove(tnode->nodeValue + tnode->valueLength,
+                                            start, x - start);
+                                    tnode->valueLength += (x - start);
+                                    *(tnode->nodeValue + tnode->valueLength) = 0;
+                                }
                             } else {
-                                /*----------------------------------------------------
-                                  |   allocate new TEXT node for CDATA section data
-                                  \---------------------------------------------------*/
-                                tnode = (domTextNode*) domAlloc(sizeof(domTextNode));
-                                memset(tnode, 0, sizeof(domTextNode));
-                                tnode->nodeType      = TEXT_NODE;
-                                tnode->nodeFlags     = 0;
-                                tnode->ownerDocument = doc;
-                                tnode->nodeNumber    = NODE_NO(doc);
-                                tnode->parentNode    = parent_node;
-                                tnode->valueLength   = (x - start);
-                                tnode->nodeValue     = (char*)MALLOC((x - start)+1);
-                                memmove(tnode->nodeValue, start, (x - start));
-                                *(tnode->nodeValue + (x - start)) = 0;
-                                if (parent_node->firstChild)  {
-                                    parent_node->lastChild->nextSibling = (domNode*)tnode;
-                                    tnode->previousSibling = parent_node->lastChild;
-                                    parent_node->lastChild = (domNode*)tnode;
-                                } else {
-                                    parent_node->firstChild = parent_node->lastChild = (domNode*)tnode;
+                                if (!(only_whites && ignoreWhiteSpaces)
+                                    && ((x - start) || keepCDATA)) {
+                                    /*----------------------------------------------------
+                                      |   allocate new node for CDATA section data
+                                      \---------------------------------------------------*/
+                                    tnode = (domTextNode*) domAlloc(sizeof(domTextNode));
+                                    memset(tnode, 0, sizeof(domTextNode));
+                                    if (keepCDATA)
+                                        tnode->nodeType      = CDATA_SECTION_NODE;
+                                    else 
+                                        tnode->nodeType      = TEXT_NODE;
+                                    tnode->nodeFlags     = 0;
+                                    tnode->ownerDocument = doc;
+                                    tnode->nodeNumber    = NODE_NO(doc);
+                                    tnode->parentNode    = parent_node;
+                                    tnode->valueLength   = (x - start);
+                                    tnode->nodeValue     = (char*)MALLOC((x - start)+1);
+                                    memmove(tnode->nodeValue, start, (x - start));
+                                    *(tnode->nodeValue + (x - start)) = 0;
+                                    if (parent_node->firstChild)  {
+                                        parent_node->lastChild->nextSibling = (domNode*)tnode;
+                                        tnode->previousSibling = parent_node->lastChild;
+                                        parent_node->lastChild = (domNode*)tnode;
+                                    } else {
+                                        parent_node->firstChild = parent_node->lastChild = (domNode*)tnode;
+                                    }
                                 }
                             }
                         }
@@ -1076,6 +1095,7 @@ domDocument *
 XML_SimpleParseDocument (
     char    *xml,              /* Complete text of the file being parsed  */
     int      ignoreWhiteSpaces,
+    int      keepCDATA,
     char    *baseURI,
     Tcl_Obj *extResolver,
     int     *pos,
@@ -1088,7 +1108,7 @@ XML_SimpleParseDocument (
     }
     
     *pos = 0;
-    XML_SimpleParse (xml, pos, doc, NULL, ignoreWhiteSpaces, errStr);
+    XML_SimpleParse (xml, pos, doc, NULL, ignoreWhiteSpaces, keepCDATA, errStr);
     domSetDocumentElement (doc);
 
     return doc;
