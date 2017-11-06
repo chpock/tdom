@@ -1,6 +1,6 @@
-C Added\sa\sfew\sbench\stests\sto\scheck\spositional\spredicate\soptimization.
-D 2017-11-04T19:12:49.284
-F CHANGES 32e2f76ec01a9205c8443fba54f50f13c05722f6
+C 0.9.0\srelease\smark\sin\sthe\sCHANGES\sfile.
+D 2017-11-06T01:00:26.646
+F CHANGES c4d3772348a5d09dfed01bad335422220fadf8d4
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in d75a5497674f790f32be0f83d9b101041233b00f
@@ -234,8 +234,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 33ee70bd11af67f46ff9eadafda27a8bb94adc5b
-R f9a7f8d9a122fef4f57d41c511b902d8
+P e01e9499479081814692519c6fe40cab8ba42f0b
+R e96017033d36cdf3fc7d448501afdbdf
 U rolf
-Z 87f169d0fbf79fcb597a0f0947365e8e
+Z 08f6296cfefb940e5b9fe801fdbb53df
 # Remove this line to create a well-formed Fossil manifest.
