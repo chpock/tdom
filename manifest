@@ -1,11 +1,11 @@
-C Added\sflag\s-keepCDATA\sto\s[dom\sparse\s...],\srespected\sby\sthe\sexpat\sand\ssimple\sxml\sparser.\sIf\snot\sused\stogether\swith\s-keepEmpties,\swhite\sspace\sonly\sCDATA\ssections\swill\snot\sbe\sincluded\sinto\sthe\sDOM\stree.\sUsed\stogether\swith\s-keepEmpties,\seven\sempty\sCDATA\ssections\swill\sresult\sinto\sa\snode.\sFixed\sthe\ssimple\sxml\sparser\sit\snow\sbulds\san\sXPath/XSLT\s"ready"\stree\sby\sdefault,\sas\sit\sthe\sstandard\sparser\sdoes.\sAdded\stDOM::xmlReadFileForSimple\shelper\sto\sread\sxml\sfiles\sfor\s[dom\sparse\s-simple].
-D 2017-11-07T23:25:37.494
-F CHANGES c4d3772348a5d09dfed01bad335422220fadf8d4
+C Tweaked\sdoc\sstuff.
+D 2017-11-07T23:36:35.636
+F CHANGES 890a8c86aac08751850f646d284f970cb424ca7c
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in d75a5497674f790f32be0f83d9b101041233b00f
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
-F README b459e84740343c5ad07973855f5cf16dc09f960a
+F README a097b51b559f421a68a12d2901766a0bf2520b19
 F README.AOL d076b065f6a3209b5374a63c9ddd7fbca167643e
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/xslt.tcl ac4a75ba2f05e26d4ea6f92547983caa80fc6d55
@@ -15,8 +15,8 @@ F configure.in d6788a4cb3fe918f78e06fc3b1333854b86c37a7
 F doc/INDEX.MAP c8e767983bcea4bbd53ecdbf3d78cb044996e9bc
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html 98092b3a6d0fa7ade2cd5715b56ea0a6fef89be1
-F doc/dom.html 256d3fcc5f4e330ef8d903aafe76facf6218ed77
-F doc/dom.n 0e2452f80bbca5a25dd051dbbbabce5818c5c5f5
+F doc/dom.html d5806eaeebb57e5cbf577d4b63e5421424473878
+F doc/dom.n 8d7897ad3037685c7364b2f7c2a4a09520ac8588
 F doc/dom.xml dbea78b109c6c1df69aafa76a2ed2dfca069205b
 F doc/domDoc.html a5e74983986419cedac0ab7872d3294b3e553f8d
 F doc/domDoc.n 8bb70588d0d32353951d742b4be0aa343890aa59
@@ -234,9 +234,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c630765b29e7aeb34c10bcf2d806a1e6fc02cee3 d07b1bbc1ca9ec69e8fdd1799cff648db03564e8
-R f2672470dfc97fa843c08eb8094589b2
-T +closed d07b1bbc1ca9ec69e8fdd1799cff648db03564e8
+P a0809eb3c14462df9b4234a41d6faf7ae45e8093
+R 9cad72f9a79ce2954b3968c87231f6ee
 U rolf
-Z c14f9094d16950b4e4b2ae41f0faffd5
+Z b7d3775f5f63127fc5931b1e4d6f24ba
 # Remove this line to create a well-formed Fossil manifest.
