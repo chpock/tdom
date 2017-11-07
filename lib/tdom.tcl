@@ -738,14 +738,14 @@ proc tDOM::IANAEncoding2TclEncoding {IANAName} {
 #   xmlOpenFile
 #
 #----------------------------------------------------------------------------
-proc tDOM::xmlOpenFile {filename {encodingString {}}} {
+proc tDOM::xmlOpenFile {filename {encodingString {}} {forSimple 0}} {
 
     # This partly (mis-)use the encoding of a channel handed to [dom
     # parse -channel ..] as a marker: if the channel encoding is utf-8
     # then behind the scene Tcl_Read() is used, otherwise
     # Tcl_ReadChars(). This is used for the encodings understood (and
     # checked) by the used expat implementation: utf-8 and utf-16 (in
-    # either byte order.
+    # either byte order).
     
     set fd [open $filename]
 
@@ -766,17 +766,30 @@ proc tDOM::xmlOpenFile {filename {encodingString {}}} {
     
     # First check for BOM
     switch [string range $firstBytes 0 3] {
-        "feff" -
-        "fffe" {
+        "feff" {
             # feff: UTF-16, big-endian BOM
-            # ffef: UTF-16, little-endian BOM
+            if {$forSimple} {
+                error "UTF-16be is not supported by the simple parser"
+            }
             seek $fd 0 start
-            set encString UTF-16            
+            set encString UTF-16be
             fconfigure $fd -encoding utf-8
             return $fd
         }
+        "fffe" {
+            # ffef: UTF-16, little-endian BOM
+            set encString UTF-16le          
+            if {$forSimple} {
+                seek $fd 2 start
+                fconfigure $fd -encoding unicode
+            } else {
+                seek $fd 0 start
+                fconfigure $fd -encoding utf-8
+            }
+            return $fd
+        }
     }
-
+    
     # If the entity has a XML Declaration, the first four characters
     # must be "<?xm".
     switch $firstBytes {
@@ -821,13 +834,25 @@ proc tDOM::xmlOpenFile {filename {encodingString {}}} {
             # UCS-4
             error "UCS-4 not supported"
         }
-        "003c003f" -
-        "3c003f00" {
+            "003c003f" {
             # UTF-16, big-endian, no BOM
-            # UTF-16, little-endian, no BOM
+            if {$forSimple} {
+                error "UTF-16be is not supported by the simple parser"
+            }
             seek $fd 0 start
             set encoding utf-8
-            set encString UTF-16
+            set encString UTF-16be
+        }
+        "3c003f00" {
+            # UTF-16, little-endian, no BOM
+            if {$forSimple} {
+                seek $fd 2 start
+                set encoding unicode
+            } else {
+                seek $fd 0 start
+                set encoding utf-8
+            }
+            set encString UTF-16le          
         }
         "4c6fa794" {
             # EBCDIC in some flavor
@@ -848,13 +873,13 @@ proc tDOM::xmlOpenFile {filename {encodingString {}}} {
 #   xmlReadFile
 #
 #----------------------------------------------------------------------------
-proc tDOM::xmlReadFile {filename {encodingString {}}} {
+proc tDOM::xmlReadFile {filename {encodingString {}} {forSimple 0}} {
 
     if {$encodingString != {}} {
         upvar $encodingString encString
     }
     
-    set fd [xmlOpenFile $filename encString]
+    set fd [xmlOpenFile $filename encString $forSimple]
     set data [read $fd [file size $filename]]
     close $fd 
     return $data
