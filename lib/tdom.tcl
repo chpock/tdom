@@ -738,7 +738,7 @@ proc tDOM::IANAEncoding2TclEncoding {IANAName} {
 #   xmlOpenFile
 #
 #----------------------------------------------------------------------------
-proc tDOM::xmlOpenFile {filename {encodingString {}} {forSimple 0}} {
+proc tDOM::xmlOpenFileWorker {filename {encodingString {}} {forSimple 0}} {
 
     # This partly (mis-)use the encoding of a channel handed to [dom
     # parse -channel ..] as a marker: if the channel encoding is utf-8
@@ -873,13 +873,45 @@ proc tDOM::xmlOpenFile {filename {encodingString {}} {forSimple 0}} {
 #   xmlReadFile
 #
 #----------------------------------------------------------------------------
-proc tDOM::xmlReadFile {filename {encodingString {}} {forSimple 0}} {
+proc tDOM::xmlOpenFile {filename {encodingString {}}} {
 
     if {$encodingString != {}} {
         upvar $encodingString encString
     }
     
-    set fd [xmlOpenFile $filename encString $forSimple]
+    set fd [xmlOpenFileWorker $filename encString]
+    set data [read $fd [file size $filename]]
+    close $fd 
+    return $data
+}
+
+#----------------------------------------------------------------------------
+#   xmlReadFile
+#
+#----------------------------------------------------------------------------
+proc tDOM::xmlReadFile {filename {encodingString {}}} {
+
+    if {$encodingString != {}} {
+        upvar $encodingString encString
+    }
+    
+    set fd [xmlOpenFileWorker $filename encString]
+    set data [read $fd [file size $filename]]
+    close $fd 
+    return $data
+}
+
+#----------------------------------------------------------------------------
+#   xmlReadFileForSimple
+#
+#----------------------------------------------------------------------------
+proc tDOM::xmlReadFileForSimple {filename {encodingString {}}} {
+
+    if {$encodingString != {}} {
+        upvar $encodingString encString
+    }
+    
+    set fd [xmlOpenFileWorker $filename encString 1]
     set data [read $fd [file size $filename]]
     close $fd 
     return $data
