@@ -5572,6 +5572,10 @@ TclTdomObjCmd (dummy, interp, objc, objv)
             return TCL_ERROR;
         }
         handlerSet = CHandlerSetGet (interp, objv[1], "tdom");
+        if (!handlerSet) {
+            Tcl_SetResult (interp, "parser object isn't tdom enabled.", NULL);
+            return TCL_ERROR;
+        }
         info = handlerSet->userData;
         if (!info) {
             Tcl_SetResult (interp, "parser object isn't tdom enabled.", NULL);
@@ -5593,6 +5597,10 @@ TclTdomObjCmd (dummy, interp, objc, objv)
             return TCL_ERROR;
         }
         handlerSet = CHandlerSetGet (interp, objv[1], "tdom");
+        if (!handlerSet) {
+            Tcl_SetResult (interp, "parser object isn't tdom enabled.", NULL);
+            return TCL_ERROR;
+        }
         info = handlerSet->userData;
         if (!info) {
             Tcl_SetResult (interp, "parser object isn't tdom enabled.", NULL);

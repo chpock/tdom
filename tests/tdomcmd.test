@@ -40,6 +40,9 @@ proc dom {args} {
                     "-keepEmpties" {
                         tdom $::_main_parser keepEmpties 1
                     }
+                    "-keepCDATA" {
+                        tdom $::_main_parser keepCDATA 1
+                    }
                     "-baseurl" {
                         incr x
                         $::_main_parser configure -baseurl [lindex $args $x]
@@ -140,6 +143,12 @@ test tdomcmd-1.3 {Try to tdom enable a parser from its parsing callback} {
     set result
 } {1}
     
+test tdomcmd-1.4 {keepCDATA} {
+    set parser [expat]
+    set result [catch {tdom $parser keepCDATA 1}]
+    $parser free
+    set result
+} 1
 
 # cleanup
 ::tcltest::cleanupTests

@@ -1,5 +1,5 @@
-C Tweaked\sdoc\sstuff.
-D 2017-11-07T23:36:35.636
+C Added\s-keepCDATA\sto\sthe\stdom\shandler\sset\sbased\simplementation\sof\sthe\s[dom\sparse\s...]\sAPI.\sBug\sfix\sin\sarg\scheck.
+D 2017-11-09T00:32:27.110
 F CHANGES 890a8c86aac08751850f646d284f970cb424ca7c
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -127,7 +127,7 @@ F extensions/tnc/win/rules-ext.vc 5d4a9b4662d42bfeb1ba3d8215c67e1393120a13
 F extensions/tnc/win/rules.vc f2fff77551761f97a5aaea7f1ca4f2886a031330
 F extensions/tnc/win/targets.vc ba02bbc7b0956bbb17385ddf64d684c594e61074
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
-F generic/dom.c 825140c60abfdd552b31e51dba9ae5502db69562
+F generic/dom.c 228c07726d89cbe6a8a491eea5a188de36140b93
 F generic/dom.h ea32034888b1f4601951bbd458ab1d8b0e44695d
 F generic/domalloc.c 55e9eeff19cc54cf3956a7013883ead07efd3593
 F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
@@ -211,7 +211,7 @@ F tests/parser.test 5bc2a09293d5dbb3d9c3af8fd4a7c57a3fb78212
 F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
-F tests/tdomcmd.test 8972e7b5670ce475603263ef92e7000fe36c5815
+F tests/tdomcmd.test 092401adf0609906d710f3ef8997cb4ca29bc208
 F tests/xmlsimple.test a5c577be330f0254d9d7c4bee2c030acd28e703b
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.bench 99e98467544b11bf625e6f72b2fb89c7516bfced
@@ -234,8 +234,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a0809eb3c14462df9b4234a41d6faf7ae45e8093
-R 9cad72f9a79ce2954b3968c87231f6ee
+P f4336d7b7097bb5ebfd24624c1a39a74edbd6eab
+R 0aac8923becd939c9c6075a182640331
 U rolf
-Z b7d3775f5f63127fc5931b1e4d6f24ba
+Z a653c0c3a67837364c5f1df5b368f8da
 # Remove this line to create a well-formed Fossil manifest.
