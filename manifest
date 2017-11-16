@@ -1,5 +1,5 @@
-C Updated\sto\sexpat\s2.2.5.
-D 2017-11-16T22:18:45.950
+C Hallelujah.\sCan\sremove\sthat\sknownBug\stest\stag,\safter\ssuccessfully\snagging\supstream.
+D 2017-11-16T22:47:38.518
 F CHANGES 890a8c86aac08751850f646d284f970cb424ca7c
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -195,7 +195,7 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.bench 5446ce379127b8d5700f18a5a0848e580313d0d7
-F tests/dom.test 5521c431e2e554569d9b6a5c2c2f0b03979cdabc
+F tests/dom.test 50901ec23fc754e3c01c443c4f7330bbc6dc8e6c
 F tests/domDoc.test b69b4c7a2f6df995f399bc33147ba5e635e6398f
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test 66a77f681b6e946b88c55a72efe62d8d7e430348
@@ -235,8 +235,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 2f825a10bb7315a957175e5435fb30a46e3c43c8
-R f8aa2bae3caaa62867a693d8a4d79892
+P 5034d18e1a00f35c39d7f1eb8ef8abcc419a1d26
+R d3b95e4d003c74562feccf3093a72903
 U rolf
-Z 5a911bf0abe8aecc9e483babdce87aa5
+Z 10687c25355a72f6ee5e97ba71f052e6
 # Remove this line to create a well-formed Fossil manifest.
