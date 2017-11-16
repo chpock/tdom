@@ -9,7 +9,8 @@
 #    json-5.*: Max nesting
 #    json-6.*: asJSON
 #    json-7.*: jsonType
-#    json-7.*: appendFromScript
+#    json-8.*: appendFromScript
+#    json-9.*: cloneNode
 # Copyright (c) 2017 Rolf Ade.
 
 source [file join [file dir [info script]] loadtdom.tcl]
@@ -473,3 +474,41 @@ test json-8.4 {appendFromScript - text node with type NUMBER} {
 test json-8.5 {createNodeCmd - wrong jsonType} {
     catch {dom createNodeCmd -jsonType OBJECT textNode textNodeWithJsonTypeObject}
 } 1
+
+test json-9.1 {cloneNode -deep} {
+    dom parse -json {[["a",1,"b",{"foo":"bar","baz":"boo"},null],"",null]} doc
+    dom createDocument some other
+    $other documentElement root
+    $root appendChild [[$doc firstChild] cloneNode -deep]
+    set result [[$root firstChild] asJSON]
+    $doc delete
+    $other delete
+    set result
+} {["a",1,"b",{"foo":"bar","baz":"boo"},null]}
+
+test json-9.2 {cloneNode} {
+    dom parse -json {[["a",1,"b",{"foo":"bar","baz":"boo"},null],"",null]} doc
+    dom createDocument some other
+    $other documentElement root
+    $root appendChild [[$doc firstChild] cloneNode]
+    set result [[$root firstChild] asJSON]
+    $doc delete
+    $other delete
+    set result
+} {[]}
+
+test json-9.3 {cloneNode} {
+    dom parse -json {{"string":"bar","number":1,"boolean":true,"array":[1,2,3],"object":{"foo":"bar","baz":"boo"}}} doc
+    dom createDocument some other
+    $other documentElement root
+    foreach child [$doc childNodes] {
+        $root appendChild [$child cloneNode -deep]
+    }
+    set result [list]
+    foreach child [$root childNodes] {
+        lappend result [$child asJSON]
+    }
+    $doc delete
+    $other delete
+    set result
+} {{"bar"} 1 true {[1,2,3]} {{"foo":"bar","baz":"boo"}}}

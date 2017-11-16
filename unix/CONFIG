@@ -47,7 +47,7 @@
 # for examples.
 # 
 # --with-tdom
-# Useful (and avaliable) only for building extensions to tDOM (as
+# Useful (and available) only for building extensions to tDOM (as
 # tnc). Use it to point to the tdomConfig.sh file.
 #
 # 

@@ -4,17 +4,17 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x1fa3230">NAME</a> · <a href="#SECTid0x1e4dba0">SYNOPSIS</a> · <a href="#SECTid0x1f5bfd0"> DESCRIPTION </a> · <a href="#SECTid0x1f86500">SEE ALSO</a> · <a href="#SECTid0x1f86890">KEYWORDS</a>
+<a href="#SECTid0x1dc0790">NAME</a> · <a href="#SECTid0x1e7bad0">SYNOPSIS</a> · <a href="#SECTid0x1e6ee30"> DESCRIPTION </a> · <a href="#SECTid0x1f0a420">SEE ALSO</a> · <a href="#SECTid0x1f0a7b0">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x1fa3230">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x1dc0790">NAME</a></h2><p class="namesection">
 <b class="names">domNode - </b><br>Manipulates an instance of a DOM node object</p>
 
 
 
-  <h2><a name="SECTid0x1e4dba0">SYNOPSIS</a></h2><pre class="syntax"> $nodeObject <i class="m">method</i>  <i class="m">arg arg ...</i>
+  <h2><a name="SECTid0x1e7bad0">SYNOPSIS</a></h2><pre class="syntax"> $nodeObject <i class="m">method</i>  <i class="m">arg arg ...</i>
 </pre>
-  <h2><a name="SECTid0x1f5bfd0"> DESCRIPTION </a></h2><p>This command manipulates one particular instance of a DOM node object.
+  <h2><a name="SECTid0x1e6ee30"> DESCRIPTION </a></h2><p>This command manipulates one particular instance of a DOM node object.
 <i class="m">method</i> indicates a specific method of the node class. These methods
 should closely conform to the W3C recommendation "Document Object Model
 (Core) Level 1" (<a href="http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html">http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html</a>)
@@ -134,7 +134,7 @@ matching (glob style) <i class="m">localname</i> and having the given namespace
 <b class="method">getElementById</b> <i class="m">id</i>
 </dt>
         <dd>Returns the node having an id attribute with value
-<i class="m">id</i> or the emtpy string if no node has an id attribute with that value.</dd>
+<i class="m">id</i> or the empty string if no node has an id attribute with that value.</dd>
       
 
       
@@ -214,7 +214,7 @@ method has the same effect as the method <b>setAttribute</b>.</p>
         <pre class="example">$node setAttributeNS "" attri "some Value"</pre>
 
 <p>With the exceptions of the special prefixes "xmlns" and "xml" you
-always must provide a non emtpy <i class="m">uri</i>, if your <i class="m">qualifiedName</i> has a
+always must provide a non empty <i class="m">uri</i>, if your <i class="m">qualifiedName</i> has a
 prefix. It is not recommended to set xml namespace declarations. The effects are complicated and not always obvious up to resulting a not well-formed serializations after further processing.</p>
 </dd>
       
@@ -413,7 +413,7 @@ way into the XPath expression using tcl variable references there is a
 syntax to inject element names from tcl variables. At every place
 where the XPath syntax allows a node test there could be a tcl
 variable reference (in any form), just the leading $ replaced with %.
-This allows to select nodes with 'strange' (invalid, according to the
+This allows one to select nodes with 'strange' (invalid, according to the
 appropriate XML production rule) node names which may be needed in
 case of working with JSON data.</p>
 
@@ -465,13 +465,13 @@ set childNodes [$root selectNodes -namespaces {default http://www.defaultnamespa
 
       
         <dt><b class="method">getLine</b></dt>
-        <dd>Returns the line number of that node in the orignal parsed
+        <dd>Returns the line number of that node in the originally parsed
 XML.</dd>
       
       
       
         <dt><b class="method">getColumn</b></dt>
-        <dd>Returns the column number of that node in the orignal parsed
+        <dd>Returns the column number of that node in the originally parsed
 XML.</dd>
       
 
@@ -527,8 +527,8 @@ nested Tcl list.</dd>
 <b class="option">?-escapeNonASCII?</b>  <b class="option">?-htmlEntities?</b>
 </dt>
         <dd>Returns the DOM substree starting from the current node as the
-root node of the result serialized acording to HTML rules (HTML elements are
-recognized regardless of case, without end tags for emtpy HTML elements etc.),
+root node of the result serialized according to HTML rules (HTML elements are
+recognized regardless of case, without end tags for empty HTML elements etc.),
 as string or sends the output directly to the given channelId. If the option
 <i class="m">-escapeNonASCII</i> is given, every non 7 bit ASCII character in attribute
 values or element PCDATA content will be escaped as character reference in
@@ -598,7 +598,7 @@ mode.</dd>
         <dd>Returns an XPath, which exactly addresses the given
 node in its document. This XPath is only valid as there are no changes to DOM
 tree made later one. With the -legacy option, other XPath expressions
-are returnd, which doesn't work in all cases.</dd>
+are returned, which doesn't work in all cases.</dd>
       
 
       
@@ -613,7 +613,7 @@ are returnd, which doesn't work in all cases.</dd>
 </dt>
         <dd>Returns the present baseURI of the node. If the optional 
 argument URI is given, it sets the base URI of the node and of all of its child
-nodes out of the same enitity as node to the given URI.</dd>
+nodes out of the same entity as node to the given URI.</dd>
       
 
       
@@ -626,7 +626,7 @@ escaping is on. The return value 0 means, the characters of the text node will
 be escaped, to generate valid XML, if serialized. This is the default for
 every parsed or created text node (with the exception of that text nodes in a
 result tree of an XSLT transformation, for which disabling output escaping was
-requested explicitely in the stylesheet). The return value 1 means, that output
+requested explicitly in the stylesheet). The return value 1 means, that output
 escaping is disabled for this text node. If such a text node is serialized
 (with asXML or asHTML), it is literally written, without escaping of the
 special XML characters. If the optional boolean value <i class="m">boolean</i> is given,
@@ -690,7 +690,7 @@ be set by the <i class="m">-maxApplyDepth</i> option.</p>
 in the stylesheet. The actual command consists of the script, given as argument
 to the option, appended with the XML Fragment from instantiating the
 xsl:message element content as string (as if the XPath string() function would
-have been applied to the XML Fragment) and a flag, which indicates wether the
+have been applied to the XML Fragment) and a flag, which indicates whether the
 xsl:message has an attribute "terminate" with the value "yes". If the
 called script returns anything else then TCL_OK then the xslt
 transformation will be aborted, returning error. If the called script
@@ -725,9 +725,9 @@ name as the given method within the namespace <tt class="l">::dom::domNode</tt> 
 be executed. This allows quick method additions on Tcl level.</p>
 
 
-  <h2><a name="SECTid0x1f86500">SEE ALSO</a></h2><p class="seealso">dom, domDoc</p>
+  <h2><a name="SECTid0x1f0a420">SEE ALSO</a></h2><p class="seealso">dom, domDoc</p>
   
-  <h2><a name="SECTid0x1f86890">KEYWORDS</a></h2><p class="keywords">
+  <h2><a name="SECTid0x1f0a7b0">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-XML">XML</a>, <a class="keyword" href="keyword-index.html#KW-DOM">DOM</a>, <a class="keyword" href="keyword-index.html#KW-document">document</a>, <a class="keyword" href="keyword-index.html#KW-node">node</a>, <a class="keyword" href="keyword-index.html#KW-parsing">parsing</a>
 </p>
   

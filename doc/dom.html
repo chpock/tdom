@@ -4,17 +4,17 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x1f2bd90">NAME</a> · <a href="#SECTid0x1e4db70">SYNOPSIS</a> · <a href="#SECTid0x1f36320">DESCRIPTION </a> · <a href="#SECTid0x1f86b10">KEYWORDS</a>
+<a href="#SECTid0x1a52950">NAME</a> · <a href="#SECTid0x19ffe90">SYNOPSIS</a> · <a href="#SECTid0x195dd50">DESCRIPTION </a> · <a href="#SECTid0x1a9e7c0">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x1f2bd90">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x1a52950">NAME</a></h2><p class="namesection">
 <b class="names">dom - </b><br>Create an in-memory DOM tree from XML</p>
   
-  <h2><a name="SECTid0x1e4db70">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x19ffe90">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">dom</b> <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
 
-  <h2><a name="SECTid0x1f36320">DESCRIPTION </a></h2><p>This command provides the creation of DOM trees in memory. In
+  <h2><a name="SECTid0x195dd50">DESCRIPTION </a></h2><p>This command provides the creation of DOM trees in memory. In
 the usual case a string containing a XML information is parsed and converted
 into a DOM tree. Other possible parse input may be HTML or JSON.
 The <i class="m">method</i> indicates a specific subcommand. </p><p>The valid methods are:</p><dl class="commandlist">
@@ -148,6 +148,19 @@ resulting DOM tree. In default case (<i class="m">-keepEmpties</i> not given) th
 text nodes are removed at parsing time.</dd>
               
 
+              
+                <dt><b>-keepCDATA</b></dt> 
+                <dd>If <i class="m">-keepCDATA</i> is
+specified then CDATA sections aren't added to the tree as text nodes
+(and, if necessary, combined with sibling text nodes into one text
+node) as without this option but are added as CDATA_SECTION_NODEs to
+the tree. Please note that the resulting tree isn't prepared for XPath
+selects or to be the source or the stylesheet of an XSLT
+transformation. If not combined with <i class="m">-keepEmpties</i> only not
+whitespace only CDATA sections will be added to the resulting DOM
+                tree.</dd>
+              
+              
               
                 <dt>
 <b>-channel</b> <i>&lt;channel-ID&gt;</i>
@@ -349,7 +362,7 @@ node. <i class="m">objVar</i> controls the memory handling as explained above.</
 </dt>
           <dd>This method creates Tcl commands, which in turn create
           tDOM nodes. Tcl commands created by this command are only
-          avaliable inside a script given to the domNode methods
+          available inside a script given to the domNode methods
           <i class="m">appendFromScript</i> or <i class="m">insertBeforeFromScript</i>. If
           a command created with <i class="m">createNodeCmd</i> is invoked in
           any other context, it will return error. The created command
@@ -648,7 +661,7 @@ recommendation. Otherwise it returns 0.</dd>
         
     </dl>
 
-<h2><a name="SECTid0x1f86b10">KEYWORDS</a></h2><p class="keywords">
+<h2><a name="SECTid0x1a9e7c0">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-XML">XML</a>, <a class="keyword" href="keyword-index.html#KW-DOM">DOM</a>, <a class="keyword" href="keyword-index.html#KW-document">document</a>, <a class="keyword" href="keyword-index.html#KW-node">node</a>, <a class="keyword" href="keyword-index.html#KW-parsing">parsing</a>
 </p>
 </div><hr class="navsep"><div class="navbar" align="center">

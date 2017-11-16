@@ -574,6 +574,66 @@ test dom-2.34 {XML prefix declaration with empty namespace} {
     set errMsg
 } {Missing URI in Namespace declaration, referenced at line 1 character 22}
 
+test dom-2.35 {-keepCDATA} {
+    set doc [dom parse -keepCDATA {<doc>foo <![CDATA[test of & <bad> format]]> bar </doc>}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc>foo <![CDATA[test of & <bad> format]]> bar </doc>}
+
+test dom-2.36 {-keepCDATA} {
+    set doc [dom parse -keepCDATA {<doc>foo <![CDATA[test of & <bad> format]]> bar </doc>}]
+    set root [$doc documentElement]
+    set result [list]
+    foreach child [$root childNodes] {
+        lappend result [$child nodeType]
+    }
+    $doc delete
+    set result
+} {TEXT_NODE CDATA_SECTION_NODE TEXT_NODE}
+
+test dom-2.37 {-keepCDATA} {
+    set doc [dom parse -keepCDATA {<doc><e><![CDATA[one]]></e></doc>}]
+    set result [list]
+    foreach child [$doc selectNodes doc/e/node()] {
+        lappend result [$child nodeType]
+    }
+    $doc delete
+    set result
+} {CDATA_SECTION_NODE}
+
+test dom-2.38 {-keepCDATA} {
+    set doc [dom parse -keepCDATA {<doc><e><![CDATA[one]]><![CDATA[two]]></e></doc>}]
+    set result [list]
+    foreach child [$doc selectNodes doc/e/node()] {
+        lappend result [$child nodeType]
+    }
+    $doc delete
+    set result
+} {CDATA_SECTION_NODE CDATA_SECTION_NODE}
+
+test dom-2.39 {-keepCDATA} {
+    set doc [dom parse -keepCDATA {<doc><e><![CDATA[]]></e></doc>}]
+    set result [$doc selectNodes count(doc/e/node())]
+    $doc delete
+    set result
+} 0
+
+test dom-2.40 {-keepCDATA white space only CDATA section} {
+    set doc [dom parse -keepCDATA {<doc><e><![CDATA[
+    ]]></e></doc>}]
+    set result [$doc selectNodes count(doc/e/node())]
+    $doc delete
+    set result
+} 0
+
+test dom-2.41 {-keepCDATA and -keepEmpties} {
+    set doc [dom parse -keepCDATA -keepEmpties {<doc><e><![CDATA[]]></e></doc>}]
+    set result [$doc selectNodes count(doc/e/node())]
+    $doc delete
+    set result
+} 1
+
 test dom-3.1 {isName} {
     dom isName ":foo"
 } {1}

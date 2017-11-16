@@ -204,7 +204,7 @@ A Tcl Object containing the name of a expat parser object
 .BE
 .SH DESCRIPTION
 .PP
-The functions described in this manual allows to add C level coded event
+The functions described in this manual allows one to add C level coded event
 handler to an tDOM Tcl expat parser objects. A tDOM Tcl expat parser object is
 able to have several Tcl scripts and C functions associated with an specific
 event. If the event occurs, first the Tcl scripts then the C functions
@@ -223,7 +223,7 @@ typedef struct CHandlerSet {
     int ignoreWhiteCDATAs;          /* ignore 'white' CDATA sections */
 
     void *userData;                 /* Handler set specific Data Structure;
-                                       the C handler set extention has to
+                                       the C handler set extension has to
                                        malloc the needed structure in his
                                        init func and has to provide a
                                        cleanup func (to free it). */
@@ -293,7 +293,7 @@ type
 void (Tcl_Interp *interp, void *userData)
 .CE
 .PP
-\&\fIresetProc\fR is called in case the parser is reseted with
+\&\fIresetProc\fR is called in case the parser is reset with
 \&\fB<parserObj> reset\fR and should do any necessary cleanup and
 reinitializing to prepare the C handler set for a new XML document. The
 \&\fIfreeProc\fR is called, if the parser is deleted and should do memory

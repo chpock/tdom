@@ -277,9 +277,9 @@ value given as argument to \fI-indentAttrs\fR (0..8).
 .RE
 .TP
 \&\fB\fBasHTML\fP \fB?-channel channelId?\fP \fB?-escapeNonASCII?\fP \fB?-htmlEntities?\fP \fB?-doctypeDeclaration <boolean>?\fP
-\&\fRReturns the DOM tree serialized acording to HTML rules
+\&\fRReturns the DOM tree serialized according to HTML rules
 (HTML elements are recognized regardless of case, without end
-tags for emtpy HTML elements etc.) as string or sends the
+tags for empty HTML elements etc.) as string or sends the
 output directly to the given channelId. If the option
 \&\fI-escapeNonASCII\fR is given, every non 7 bit ASCII
 character in attribute values or element PCDATA content will
@@ -293,7 +293,7 @@ always be the element name of the document element without
 case normalization. An external entity declaration of the
 external subset is only emitted, if the document has a system
 identifier. The doctype declaration will be written from the
-avaliable information, without check, if this is a known
+available information, without check, if this is a known
 (w3c) HTML version information or if the document confirms to
 the given HTML version.
 .TP
@@ -399,11 +399,11 @@ document, if there is one, otherwise the empty string. If there is a value
 given to the method, the internal subset of the document is set to this
 value. Note that none of the parsing methods preserve the internal subset
 of a document; a freshly parsed document will always have an empty internal
-subset. Also note, that the method doesen't do any syntactical check on a
+subset. Also note, that the method doesn't do any syntactical check on a
 given internal subset.
 .TP
 \&\fB\fBcdataSectionElements\fP \fI(?URI:?localname|*) ?<boolean>?\fB
-\&\fRThis method allows to control for which element nodes
+\&\fRThis method allows one to control for which element nodes
 the text node children will be serialized as CDATA sections (this affects only
 serialization with the asXML method, no text node is altered in any
 way by this method). IF the method is called with an element name as
@@ -425,7 +425,7 @@ element names of the document, for which the text node children will be
 serialized as CDATA section nodes.
 .TP
 \&\fB\fBselectNodesNamespaces\fP \fB?prefixUriList?\fP
-\&\fRThis method allows to control a document global prefix
+\&\fRThis method allows one to control a document global prefix
 to namespace URI mapping, which will be used for selectNodes
 method calls (on document as well as on all nodes, which
 belongs to the document) if it is not overwritten by using
@@ -479,7 +479,7 @@ if given, is set to the empty string.
 \&\fB\fBtoXSLTcmd\fP ?\fIobjVar\fB?
 \&\fRIf the DOM tree represents a valid XSLT stylesheet, this method
 transforms the DOM tree into an xslt command, otherwise it returns error. The
-created xsltCmd is returnd and stored in the \fIobjVar\fR, if a var name was
+created xsltCmd is returned and stored in the \fIobjVar\fR, if a var name was
 given. A successful transformation of the DOM tree to an xsltCmd removes the
 domDoc cmd and all nodeCmds of the document.
 .RS
@@ -550,7 +550,7 @@ DOCUMENT_NODE.
 .TP
 \&\fB\fBgetElementById\fP \fIid\fB
 \&\fRReturns the node having a id attribute with value
-\&\fIid\fR or the emtpy string, if no node has an id attribute with that value.
+\&\fIid\fR or the empty string, if no node has an id attribute with that value.
 .TP
 \&\fB\fBfirstChild\fP \fB?objVar?\fP
 \&\fRReturns the first top level node of the document.
@@ -693,7 +693,7 @@ same name as the given method within the namespace \fB::dom::domDoc\fR is
 tried to be executed. This allows quick method additions on Tcl level.
 .PP
 Newly created nodes are appended to a hidden fragment list. If they
-are not moved into the tree they are automaticaly deleted as soon as the whole
+are not moved into the tree they are automatically deleted as soon as the whole
 document gets deleted.
 .SH "SEE ALSO"
 dom, domNode

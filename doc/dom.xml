@@ -156,6 +156,19 @@ text nodes are removed at parsing time.</desc>
               </optdef>
 
               <optdef>
+                <optname>-keepCDATA</optname> 
+                <desc>If <m>-keepCDATA</m> is
+specified then CDATA sections aren't added to the tree as text nodes
+(and, if necessary, combined with sibling text nodes into one text
+node) as without this option but are added as CDATA_SECTION_NODEs to
+the tree. Please note that the resulting tree isn't prepared for XPath
+selects or to be the source or the stylesheet of an XSLT
+transformation. If not combined with <m>-keepEmpties</m> only not
+whitespace only CDATA sections will be added to the resulting DOM
+                tree.</desc>
+              </optdef>
+              
+              <optdef>
                 <optname>-channel</optname>
                 <optarg>&lt;channel-ID&gt;</optarg>
                 <desc>If <m>-channel &lt;channel-ID&gt;</m> is specified, the
@@ -336,7 +349,7 @@ node. <m>objVar</m> controls the memory handling as explained above.</desc>
 <m>?-returnNodeCmd?</m> <m>?-tagName name?</m> <m>?-jsonType jsonType?</m> <m>?-namespace URI?</m> <m>(element|comment|text|cdata|pi)Node</m> <m>commandName</m></command>
           <desc>This method creates Tcl commands, which in turn create
           tDOM nodes. Tcl commands created by this command are only
-          avaliable inside a script given to the domNode methods
+          available inside a script given to the domNode methods
           <m>appendFromScript</m> or <m>insertBeforeFromScript</m>. If
           a command created with <m>createNodeCmd</m> is invoked in
           any other context, it will return error. The created command

@@ -296,6 +296,16 @@ If \fI-keepEmpties\fR is
 specified then text nodes which contain only whitespaces will be part of the
 resulting DOM tree. In default case (\fI-keepEmpties\fR not given) those empty
 text nodes are removed at parsing time.
+.IP "\fB-keepCDATA\fR"
+If \fI-keepCDATA\fR is
+specified then CDATA sections aren't added to the tree as text nodes
+(and, if necessary, combined with sibling text nodes into one text
+node) as without this option but are added as CDATA_SECTION_NODEs to
+the tree. Please note that the resulting tree isn't prepared for XPath
+selects or to be the source or the stylesheet of an XSLT
+transformation. If not combined with \fI-keepEmpties\fR only not
+whitespace only CDATA sections will be added to the resulting DOM
+tree.
 .IP "\fB-channel  \fI<channel-ID>\fP\fR"
 If \fI-channel <channel-ID>\fR is specified, the
 input to be parsed is read from the specified channel. The encoding setting of
@@ -429,7 +439,7 @@ iso8859-9, koi8-r.
 \&\fB\fBdom\fP \fBcreateNodeCmd\fP \fI?-returnNodeCmd?\fB \fI?-tagName name?\fB \fI?-jsonType jsonType?\fB \fI?-namespace URI?\fB \fI(element|comment|text|cdata|pi)Node\fB \fIcommandName\fB
 \&\fRThis method creates Tcl commands, which in turn create
 tDOM nodes. Tcl commands created by this command are only
-avaliable inside a script given to the domNode methods
+available inside a script given to the domNode methods
 \&\fIappendFromScript\fR or \fIinsertBeforeFromScript\fR. If
 a command created with \fIcreateNodeCmd\fR is invoked in
 any other context, it will return error. The created command
