@@ -1,5 +1,5 @@
-C Hallelujah.\sCan\sremove\sthat\sknownBug\stest\stag,\safter\ssuccessfully\snagging\supstream.
-D 2017-11-16T22:47:38.518
+C Added\smore\ssensitive\sdetection\sof\ssource\sof\sentropy\sfor\sexpat\sto\sthe\sconfigure\ssystem.\sThe\sdefault\sis\sto\stry\sto\suse\sthe\sbest\savailable\ssource\sfor\sthe\sbuild\splattform.\sThe\snew\sconfigure\soption\s-with-entropy\sallows\sto\spick\sa\scertain\ssource\sof\sentropy\sincluding\sXML_POOR_ENTROPY,\swhich\smeans\suse\sthe\sold\sway\sof\sdoing\sthis.
+D 2017-11-18T01:59:42.286
 F CHANGES 890a8c86aac08751850f646d284f970cb424ca7c
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -9,9 +9,9 @@ F README e5a7cedfe1afbf8094797acdb38b434d7d22ade3
 F README.AOL d076b065f6a3209b5374a63c9ddd7fbca167643e
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/xslt.tcl ac4a75ba2f05e26d4ea6f92547983caa80fc6d55
-F configure 6d03034ccf587ce8c196e4b9b397aacfe2e24860 x
+F configure f2058e629b01f27b997fc9e65937085ab218846e x
 F configure-tcl8.0.5 db1a666545d519c42e229d245224d456a84c798a x
-F configure.in d6788a4cb3fe918f78e06fc3b1333854b86c37a7
+F configure.in 99ada7d3a4f5186f0cf2efc1ce729b7e99093e67
 F doc/INDEX.MAP c8e767983bcea4bbd53ecdbf3d78cb044996e9bc
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html 98092b3a6d0fa7ade2cd5715b56ea0a6fef89be1
@@ -167,7 +167,7 @@ F macosx/README 90fbbcf96747374a4c4a7b97766f0c6bafa7780e
 F tclconfig/README.txt 180f4215d59309ec5645aa5f4565557dac484945
 F tclconfig/install-sh bdd5e293591621ae60d9824d86a4b1c5f22c3d00 x
 F tclconfig/tcl.m4 5e4d22029628036a04c1851c4c94e62d669b0048
-F tdom.m4 df6f268ffa4a65d512ce8729eba09b56e1e70bc4
+F tdom.m4 ec701d89b1a01a46015e459c93b5c45c73e889d8
 F tdomConfig.sh.in 5756c6b431179e49852a607cc2ca01e5381da905
 F tests/JSONTestSuite.tcl 907228f9bd31855951b9033df74c9c15778765af
 F tests/OASIS-suite.tcl 428c0f45f780f5f942c46babd9287277ad0caaed
@@ -235,8 +235,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 5034d18e1a00f35c39d7f1eb8ef8abcc419a1d26
-R d3b95e4d003c74562feccf3093a72903
+P cbcf5049f70a05acd3481cfe6e52a7fd6f270da9
+R 567ea0842e2da322ba675e3563df892b
 U rolf
-Z 10687c25355a72f6ee5e97ba71f052e6
+Z 42ecd9fe2f7a0bedb73a724bba7b2cf7
 # Remove this line to create a well-formed Fossil manifest.
