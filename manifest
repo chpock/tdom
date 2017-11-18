@@ -1,11 +1,11 @@
-C Added\smore\ssensitive\sdetection\sof\ssource\sof\sentropy\sfor\sexpat\sto\sthe\sconfigure\ssystem.\sThe\sdefault\sis\sto\stry\sto\suse\sthe\sbest\savailable\ssource\sfor\sthe\sbuild\splattform.\sThe\snew\sconfigure\soption\s-with-entropy\sallows\sto\spick\sa\scertain\ssource\sof\sentropy\sincluding\sXML_POOR_ENTROPY,\swhich\smeans\suse\sthe\sold\sway\sof\sdoing\sthis.
-D 2017-11-18T01:59:42.286
+C Updated\sthe\sREADME\sabout\sthe\sincluded\sexpat\sversion.
+D 2017-11-18T15:33:58.376
 F CHANGES 890a8c86aac08751850f646d284f970cb424ca7c
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in d75a5497674f790f32be0f83d9b101041233b00f
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
-F README e5a7cedfe1afbf8094797acdb38b434d7d22ade3
+F README 352d5eb38ca0882084aaa7a69091e95e52924f20
 F README.AOL d076b065f6a3209b5374a63c9ddd7fbca167643e
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/xslt.tcl ac4a75ba2f05e26d4ea6f92547983caa80fc6d55
@@ -235,8 +235,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P cbcf5049f70a05acd3481cfe6e52a7fd6f270da9
-R 567ea0842e2da322ba675e3563df892b
+P 2de0b19f9399c75b1c7782f4d902137bb9144d40
+R 8edcb905ceaea4ecff276c239624fa0a
 U rolf
-Z 42ecd9fe2f7a0bedb73a724bba7b2cf7
+Z dd8817ccb7d84781b3628136562612ec
 # Remove this line to create a well-formed Fossil manifest.
