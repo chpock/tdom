@@ -7030,7 +7030,7 @@ int tcldom_EvalLocked (
     domLocksLock(dl, flag);
 
     Tcl_AllowExceptions(interp);
-    ret = Tcl_EvalObj(interp, objv[2]);
+    ret = Tcl_EvalObjEx(interp, objv[2], 0);
     if (ret == TCL_ERROR) {
         char msg[64 + TCL_INTEGER_SPACE];
         sprintf(msg, "\n    (\"%s %s\" body line %d)", Tcl_GetString(objv[0]),

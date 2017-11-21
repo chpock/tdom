@@ -793,7 +793,7 @@ nodecmd_appendFromScript (interp, node, cmdObj)
 
     StackPush((void *)node);
     Tcl_AllowExceptions(interp);
-    ret = Tcl_EvalObj(interp, cmdObj);
+    ret = Tcl_EvalObjEx(interp, cmdObj, 0);
     if (ret != TCL_ERROR) {
         Tcl_ResetResult(interp);
     }
