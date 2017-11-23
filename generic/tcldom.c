@@ -6644,14 +6644,14 @@ int tcldom_featureinfo (
         "expatversion",      "expatmajorversion",  "expatminorversion",
         "expatmicroversion", "dtd",                "ns",
         "unknown",           "tdomalloc",          "lessns",
-        "html5",             "jsonmaxnesting",
+        "html5",             "jsonmaxnesting",     "stacklessfs",
         "TCL_UTF_MAX",        NULL
     };
     enum feature {
         o_expatversion,      o_expatmajorversion,  o_expatminorversion,
         o_expatmicroversion, o_dtd,                o_ns,
         o_unknown,           o_tdomalloc,          o_lessns,
-        o_html5,             o_jsonmaxnesting,
+        o_html5,             o_jsonmaxnesting,     o_stacklessfs,
         o_TCL_UTF_MAX
     };
 
@@ -6724,7 +6724,14 @@ int tcldom_featureinfo (
     case o_jsonmaxnesting:
         SetIntResult(JSON_MAX_NESTING);
         break;
-        
+    case o_stacklessfs:
+#ifdef STACKLESS_FS
+        result = 1;
+#else
+        result = 0;
+#endif
+        SetBooleanResult(result);
+        break;
     case o_TCL_UTF_MAX:
         SetIntResult(TCL_UTF_MAX);
         break;

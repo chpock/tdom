@@ -109,6 +109,7 @@ static void * StackPop   _ANSI_ARGS_((void));
 static void * StackTop   _ANSI_ARGS_((void));
 static int    NodeObjCmd _ANSI_ARGS_((ClientData,Tcl_Interp*,int,Tcl_Obj *CONST o[]));
 static void   StackFinalize _ANSI_ARGS_((ClientData));
+static Tcl_NRPostProc	NodeObjCmdCallback;
 
 extern int tcldom_appendXML (Tcl_Interp*, domNode*, Tcl_Obj*);
 
@@ -480,6 +481,24 @@ NodeObjCmd (arg, interp, objc, objv)
     return ret;
 }
 
+#ifdef STACKLESS_FS
+/*----------------------------------------------------------------------------
+|   NodeObjProc
+|
+\---------------------------------------------------------------------------*/
+static int
+NodeObjProc (arg, interp, objc, objv)
+    ClientData      arg;                /* Type of node to create. */
+    Tcl_Interp    * interp;             /* Current interpreter. */
+    int             objc;               /* Number of arguments. */
+    Tcl_Obj *CONST  objv[];             /* Argument objects. */
+{
+    printf("NodeObjProc\n");
+    return Tcl_NRCallObjProc(interp, NodeObjCmd,
+            arg, objc, objv);
+}
+#endif
+
 /*----------------------------------------------------------------------------
 |   nodecmd_createNodeCmd  -  implements the "createNodeCmd" method of
 |                             "dom" Tcl command
@@ -741,8 +760,15 @@ nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
     if (tagName) {
         nodeInfo->tagName = tdomstrdup (Tcl_GetString(tagName));
     }
+#ifdef STACKLESS_FS
+    fprintf(stderr, "hier\n");
+    Tcl_NRCreateCommand(interp, Tcl_DStringValue(&cmdName),
+                        NodeObjProc, NodeObjCmd,
+                        (ClientData)nodeInfo, NodeObjCmdDeleteProc);
+#else
     Tcl_CreateObjCommand(interp, Tcl_DStringValue(&cmdName), NodeObjCmd,
                          (ClientData)nodeInfo, NodeObjCmdDeleteProc);
+#endif
     Tcl_DStringResult(interp, &cmdName);
     Tcl_DStringFree(&cmdName);
 
@@ -781,19 +807,36 @@ nodecmd_appendFromScript (interp, node, cmdObj)
     domNode    *node;                   /* Parent dom node */
     Tcl_Obj    *cmdObj;                 /* Argument objects. */
 {
+    domNode *oldLastChild = node->lastChild;
+#ifndef STACKLESS_FS
     int ret;
     domNode *oldLastChild, *child, *nextChild;
-
+#endif
+    
     if (node->nodeType != ELEMENT_NODE) {
         Tcl_SetResult (interp, "NOT_AN_ELEMENT : can't append nodes", NULL);
         return TCL_ERROR;
     }
     
-    oldLastChild = node->lastChild;
-
     StackPush((void *)node);
     Tcl_AllowExceptions(interp);
+#ifdef STACKLESS_FS
+    Tcl_NRAddCallback(interp, NodeObjCmdCallback, node, oldLastChild,
+                     NULL, NULL);
+    return Tcl_NREvalObj(interp, cmdObj, 0);
+}
+int
+NodeObjCmdCallback (
+    ClientData data[],
+    Tcl_Interp *interp,
+    int ret)
+{
+    domNode *node = data[0];
+    domNode *oldLastChild = data[1];
+    domNode *child, *nextChild;
+#else
     ret = Tcl_EvalObjEx(interp, cmdObj, 0);
+#endif
     if (ret != TCL_ERROR) {
         Tcl_ResetResult(interp);
     }

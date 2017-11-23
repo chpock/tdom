@@ -47,12 +47,7 @@ int nodecmd_insertBeforeFromScript (Tcl_Interp *interp,
                                     Tcl_Obj    *cmdObj,
                                     domNode    *refChild);
 
-/* EOF $RCSfile $ */
 
-/* Emacs Setup Variables */
-/* Local Variables:      */
-/* mode: C               */
-/* indent-tabs-mode: nil */
-/* c-basic-offset: 4     */
-/* End:                  */
-
+#if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION >= 0) && defined(TDOM_STACKLESS_FS)
+# define STACKLESS_FS 1
+#endif

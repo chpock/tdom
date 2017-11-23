@@ -204,6 +204,49 @@ AC_DEFUN(TDOM_ENABLE_LESS_NS, [
         AC_MSG_RESULT([no])
     fi
 ])
+
+
+#------------------------------------------------------------------------
+# TDOM_ENABLE_STACKLESS_FS --
+#
+#   Enables stackless *FromScript
+#
+# Arguments:
+#   
+#   
+# Results:
+#
+#   Adds the following arguments to configure:
+#       --enable-stacklessfs=yes|no
+#
+#   Defines the following vars:
+#
+#   Sets the following vars:
+#
+#------------------------------------------------------------------------
+
+AC_DEFUN(TDOM_ENABLE_STACKLESS_FS, [
+    AC_MSG_CHECKING([whether to enable stackless *FromScript evaluation])
+    AC_ARG_ENABLE(,
+        AC_HELP_STRING([--enable-stacklessfs],
+            [build with stackless *FromScript evaluation (default: off)]),
+        [tcl_ok=$enableval], [tcl_ok=no])
+
+    if test "${enable_stacklessfs+set}" = set; then
+        enableval="$enable_stacklessfs"
+        tcl_ok=$enableval
+    else
+        tcl_ok=no
+    fi
+
+    if test "$tcl_ok" = "yes" ; then
+        AC_MSG_RESULT([yes])
+        AC_DEFINE(TDOM_STACKLESS_FS)
+    else
+        AC_MSG_RESULT([no])
+    fi
+])
+
 
 #------------------------------------------------------------------------
 # TDOM_ENABLE_HTML5 --
