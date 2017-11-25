@@ -735,7 +735,7 @@ proc tDOM::IANAEncoding2TclEncoding {IANAName} {
 }
 
 #----------------------------------------------------------------------------
-#   xmlOpenFile
+#   xmlOpenFileWorker
 #
 #----------------------------------------------------------------------------
 proc tDOM::xmlOpenFileWorker {filename {encodingString {}} {forSimple 0}} {
@@ -789,6 +789,7 @@ proc tDOM::xmlOpenFileWorker {filename {encodingString {}} {forSimple 0}} {
             return $fd
         }
     }
+    
     
     # If the entity has a XML Declaration, the first four characters
     # must be "<?xm".
@@ -870,7 +871,7 @@ proc tDOM::xmlOpenFileWorker {filename {encodingString {}} {forSimple 0}} {
 }
 
 #----------------------------------------------------------------------------
-#   xmlReadFile
+#   xmlOpenFile
 #
 #----------------------------------------------------------------------------
 proc tDOM::xmlOpenFile {filename {encodingString {}}} {
@@ -880,9 +881,7 @@ proc tDOM::xmlOpenFile {filename {encodingString {}}} {
     }
     
     set fd [xmlOpenFileWorker $filename encString]
-    set data [read $fd [file size $filename]]
-    close $fd 
-    return $data
+    return $fd
 }
 
 #----------------------------------------------------------------------------

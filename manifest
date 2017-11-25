@@ -1,5 +1,5 @@
-C Replaced\sthe\sdeprecated\sTcl_EvalObj\swith\sits\ssuccessor.
-D 2017-11-21T22:13:45.177
+C Botched\stdom.tcl\son\strunk\sand\snobody\scomplained\s...
+D 2017-11-25T01:49:43.129
 F CHANGES 890a8c86aac08751850f646d284f970cb424ca7c
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -161,7 +161,7 @@ F generic/utf8conv.h 4132db4e05ac30dcb78dc3b4799ae0a9ae8a057f
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
 F generic/xmlsimple.c 0590ba5bf169e61c34a8c6030cfec72241666b45
 F generic/xmlsimple.h 3cb9d055e60643afcdfe9ab407adf1e8bb5dbafb
-F lib/tdom.tcl 80db97c0554780dd421173226cbd80bbf61246b0
+F lib/tdom.tcl d06a03bdcc90290a863cc33625893095da41f66c
 F macosx/README 90fbbcf96747374a4c4a7b97766f0c6bafa7780e
 F tclconfig/README.txt 180f4215d59309ec5645aa5f4565557dac484945
 F tclconfig/install-sh bdd5e293591621ae60d9824d86a4b1c5f22c3d00 x
@@ -234,8 +234,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 8cd193981c2b3aea998d2ca1b0e6a5d25eb0eaf7
-R c09be7d9cb3b918a975e9b1964e5ee18
+P c4d91cd3e94c13a702c01ec91ac08edd93f9be5b
+R 70a38b0b720cc9c25da00764cd859fc8
 U rolf
-Z 6dc55dc0acaff67fb6c377621ad5aeb1
+Z d2929e2e0f545ee52a50c550f3ff75fd
 # Remove this line to create a well-formed Fossil manifest.
