@@ -2756,6 +2756,277 @@ void tcldom_treeAsHTML (
 }
 
 
+#ifdef STACKLESS_FS
+
+/*----------------------------------------------------------------------------
+|   tcldom_treeAsXML
+|
+\---------------------------------------------------------------------------*/
+static
+void tcldom_treeAsXML (
+    Tcl_Obj    *xmlString,
+    domNode    *node,
+    int         indent,
+    int         level,
+    int         doIndent,
+    Tcl_Channel chan,
+    int         escapeNonASCII,
+    int         doctypeDeclaration,
+    int         xmlDeclaration,
+    Tcl_Obj    *encString,
+    int         cdataChild,
+    int         escapeAllQuot,
+    int         indentAttrs
+)
+{
+    domAttrNode   *attrs;
+    domNode       *child;
+    domDocument   *doc;
+    int            first, hasElements, i;
+    char           prefix[MAX_PREFIX_LEN], *start, *p;
+    const char    *localName;
+    Tcl_HashEntry *h;
+    Tcl_DString    dStr;
+
+    if (xmlDeclaration) {
+        writeChars(xmlString, chan, "<?xml version=\"1.0\"", 19);
+        if (encString) {
+            writeChars(xmlString, chan, " encoding=\"", 11);
+            writeChars(xmlString, chan,
+                       Tcl_GetString(encString), -1);
+            writeChars(xmlString, chan, "\"", 1);
+        } else if (node->nodeType == DOCUMENT_NODE &&
+                   ((domDocument*) node)->doctype &&
+                   ((domDocument*) node)->doctype->encoding) {
+            writeChars(xmlString, chan, " encoding=\"", 11);
+            writeChars(xmlString, chan,
+                       ((domDocument*) node)->doctype->encoding, -1);
+            writeChars(xmlString, chan, "\"", 1);
+        }
+        writeChars(xmlString, chan, "?>\n", 3);
+    }
+    if (node->nodeType == DOCUMENT_NODE) {
+        doc = (domDocument*) node;
+        if (doctypeDeclaration && doc->documentElement) {
+            writeChars(xmlString, chan, "<!DOCTYPE ", 10);
+            writeChars(xmlString, chan, doc->documentElement->nodeName, -1);
+            if (   doc->doctype 
+                && doc->doctype->systemId
+                && (doc->doctype->systemId[0] != '\0')) {
+                if (   doc->doctype->publicId 
+                    && doc->doctype->publicId[0] != '\0') {
+                    writeChars(xmlString, chan, " PUBLIC \"", 9);
+                    writeChars(xmlString, chan, doc->doctype->publicId, -1);
+                    writeChars(xmlString, chan, "\" \"", 3);
+                    writeChars(xmlString, chan, doc->doctype->systemId, -1);
+                    writeChars(xmlString, chan, "\"", 1);
+                } else {
+                    writeChars(xmlString, chan, " SYSTEM \"", 9);
+                    writeChars(xmlString, chan, doc->doctype->systemId, -1);
+                    writeChars(xmlString, chan, "\"", 1);
+                }
+                if (doc->doctype->internalSubset) {
+                    writeChars(xmlString, chan, " [", 2);
+                    writeChars(xmlString, chan, doc->doctype->internalSubset,
+                               -1);
+                    writeChars(xmlString, chan, "]", 1);
+                }
+            }
+            writeChars(xmlString, chan, ">\n", 2);
+        }
+        node = doc->rootNode->firstChild;
+    }
+
+    while (node) {
+        switch (node->nodeType) {
+        case TEXT_NODE:
+            if (cdataChild) {
+                writeChars(xmlString, chan, "<![CDATA[", 9);
+                i = 0;
+                start = p = ((domTextNode*)node)->nodeValue;
+                while (i < ((domTextNode*)node)->valueLength) {
+                    if (*p == ']') {
+                        p++; i++;;
+                        if (i >= ((domTextNode*)node)->valueLength) break;
+                        if (*p == ']') {
+                            p++; i++;;
+                            if (i >= ((domTextNode*)node)->valueLength) break;
+                            if (*p == '>') {
+                                writeChars(xmlString, chan, start, p-start);
+                                writeChars(xmlString, chan, "]]><![CDATA[>", 13);
+                                start = p+1;
+                            }
+                        }
+                    }
+                    p++; i++;;
+                }
+                writeChars(xmlString, chan, start, p-start);
+                writeChars(xmlString, chan, "]]>", 3);
+            } else {
+                if (node->nodeFlags & DISABLE_OUTPUT_ESCAPING) {
+                    writeChars(xmlString, chan, ((domTextNode*)node)->nodeValue,
+                               ((domTextNode*)node)->valueLength);
+                } else {
+                    tcldom_AppendEscaped(xmlString, chan,
+                                         ((domTextNode*)node)->nodeValue,
+                                         ((domTextNode*)node)->valueLength, 0,
+                                         escapeNonASCII, 0, escapeAllQuot);
+                }
+            }
+            break;
+
+        case CDATA_SECTION_NODE:
+            writeChars(xmlString, chan, "<![CDATA[", 9);
+            writeChars(xmlString, chan, ((domTextNode*)node)->nodeValue,
+                       ((domTextNode*)node)->valueLength);
+            writeChars(xmlString, chan, "]]>", 3);
+            break;
+
+        case COMMENT_NODE:
+            if ((indent != -1) && doIndent) {
+                for(i=0; i<level; i++) {
+                    writeChars(xmlString, chan, "        ", indent);
+                }
+            }
+            writeChars(xmlString, chan, "<!--", 4);
+            writeChars(xmlString, chan, ((domTextNode*)node)->nodeValue,
+                       ((domTextNode*)node)->valueLength);
+            writeChars(xmlString, chan, "-->", 3);
+            if (indent != -1) writeChars (xmlString, chan, "\n", 1);
+            break;
+        
+        case PROCESSING_INSTRUCTION_NODE:
+            if ((indent != -1) && doIndent) {
+                for(i=0; i<level; i++) {
+                    writeChars(xmlString, chan, "        ", indent);
+                }
+            }
+            writeChars(xmlString, chan, "<?", 2);
+            writeChars(xmlString, chan, 
+                       ((domProcessingInstructionNode*)node)->targetValue,
+                       ((domProcessingInstructionNode*)node)->targetLength);
+            writeChars(xmlString, chan, " ", 1);
+            writeChars(xmlString, chan, 
+                       ((domProcessingInstructionNode*)node)->dataValue,
+                       ((domProcessingInstructionNode*)node)->dataLength);
+            writeChars(xmlString, chan, "?>", 2);
+            if (indent != -1) writeChars (xmlString, chan, "\n", 1);
+            break;
+
+        case ELEMENT_NODE:
+            if ((indent != -1) && doIndent) {
+                for(i=0; i<level; i++) {
+                    writeChars(xmlString, chan, "        ", indent);
+                }
+            }
+            writeChars(xmlString, chan, "<", 1);
+            writeChars(xmlString, chan, node->nodeName, -1);
+            
+            attrs = node->firstAttr;
+            while (attrs) {
+                if (indentAttrs > -1) {
+                    writeChars(xmlString, chan, "\n", 1);
+                    if ((indent != -1) && doIndent) {
+                        for(i=0; i<level; i++) {
+                            writeChars(xmlString, chan, "        ", indent);
+                        }
+                        if (indentAttrs) {
+                            writeChars(xmlString, chan, "        ", indentAttrs);
+                        }
+                    }
+                } else {
+                    writeChars(xmlString, chan, " ", 1);
+                }
+                writeChars(xmlString, chan, attrs->nodeName, -1);
+                writeChars(xmlString, chan, "=\"", 2);
+                tcldom_AppendEscaped(xmlString, chan, attrs->nodeValue, 
+                                     attrs->valueLength, 1, escapeNonASCII, 0,
+                                     escapeAllQuot);
+                writeChars(xmlString, chan, "\"", 1);
+                attrs = attrs->nextSibling;
+            }
+
+            hasElements = 0;
+            first       = 1;
+            doIndent    = 1;
+
+            cdataChild = 0;
+            if (node->ownerDocument->doctype
+                && node->ownerDocument->doctype->cdataSectionElements) {
+                if (node->namespace) {
+                    Tcl_DStringInit (&dStr);
+                    Tcl_DStringAppend (&dStr, domNamespaceURI(node), -1);
+                    Tcl_DStringAppend (&dStr, ":", 1);
+                    domSplitQName (node->nodeName, prefix, &localName);
+                    Tcl_DStringAppend (&dStr, localName, -1);
+                    h = Tcl_FindHashEntry (
+                        node->ownerDocument->doctype->cdataSectionElements,
+                        Tcl_DStringValue (&dStr));
+                    Tcl_DStringFree (&dStr);
+                } else {
+                    h = Tcl_FindHashEntry (
+                        node->ownerDocument->doctype->cdataSectionElements,
+                        node->nodeName);
+                }
+                if (h) {
+                    cdataChild = 1;
+                }
+            }
+            child = node->firstChild;
+            while (child != NULL) {
+
+                if (  (child->nodeType == ELEMENT_NODE)
+                      ||(child->nodeType == PROCESSING_INSTRUCTION_NODE)
+                      ||(child->nodeType == COMMENT_NODE) )
+                {
+                    hasElements = 1;
+                }
+                if (first) {
+                    writeChars(xmlString, chan, ">", 1);
+                    if ((indent != -1) && hasElements) {
+                        writeChars(xmlString, chan, "\n", 1);
+                    }
+                }
+                first = 0;
+                tcldom_treeAsXML(xmlString, child, indent, level+1, doIndent,
+                                 chan, escapeNonASCII, doctypeDeclaration, 0,
+                                 NULL, cdataChild, escapeAllQuot, indentAttrs);
+                doIndent = 0;
+                if (  (child->nodeType == ELEMENT_NODE)
+                      ||(child->nodeType == PROCESSING_INSTRUCTION_NODE)
+                      ||(child->nodeType == COMMENT_NODE) )
+                {
+                    doIndent = 1;
+                }
+                child = child->nextSibling;
+            }
+        }
+
+        if (first) {
+            if (indent != -1) {
+                writeChars(xmlString, chan, "/>\n", 3);
+            } else {
+                writeChars(xmlString, chan, "/>",   2);
+            }
+        } else {
+            if ((indent != -1) && hasElements) {
+                for(i=0; i<level; i++) {
+                    writeChars(xmlString, chan, "        ", indent);
+                }
+            }
+            writeChars (xmlString, chan, "</", 2);
+            writeChars(xmlString, chan, node->nodeName, -1);
+            if (indent != -1) {
+                writeChars(xmlString, chan, ">\n", 2);
+            } else {
+                writeChars(xmlString, chan, ">",   1);
+            }
+        }
+    }
+}
+
+#else
+
 /*----------------------------------------------------------------------------
 |   tcldom_treeAsXML
 |
@@ -3021,6 +3292,7 @@ void tcldom_treeAsXML (
         }
     }
 }
+#endif /* #ifdef STACKLESS_FS */
 
 /*----------------------------------------------------------------------------
 |   tcldom_AppendEscapedJSON

@@ -1,5 +1,5 @@
-C Removed\snot\sused\scode.
-D 2017-11-25T14:20:56.243
+C Working\swith\sdeep\snested\sXML\sdata\sshould\salso\smean\sto\sbe\sable\sto\sserialize\sit.\sStarted\simplementation\sof\snon-recursive\sasXML.\sWip.
+D 2017-11-25T14:23:21.314
 F CHANGES 890a8c86aac08751850f646d284f970cb424ca7c
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -146,7 +146,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c e3d839202ad1041ff81dd4414704b4759c4716a2
 F generic/nodecmd.h e2cc508427ff8bea23ab4df0bed7e85b004e310c
-F generic/tcldom.c 9a281c32ba57f66466367ce53189f5509021b94f
+F generic/tcldom.c 3e0a299b4604d545e07d54cc3c7e197fc121e178
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
 F generic/tclexpat.c 069180212797fc14bdb0a08bcd1ad3461406975c
 F generic/tclexpat.h 3fb4df4c023d1f625ec9c5783c4fc1d1e4e0b8bb
@@ -234,8 +234,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 0a1f7977feac6f81a09f5888420be5c62a893919
-R 69a833a01d0f61aea72ba6d8cf33d23e
+P 1124913539a554164df85abcba138525db9fc57f
+R 2c2d3a75ef2925195859f128c7381652
 U rolf
-Z 1e603550d6e1e7187f954d66ea0a4b35
+Z 34cbdc3c57ffb01797422105e43d877f
 # Remove this line to create a well-formed Fossil manifest.
