@@ -1,5 +1,5 @@
-C Exploring\sstackless\sfromScript\sscript\scode\sevaluation.
-D 2017-11-23T00:59:47.088
+C Removed\snot\sused\scode.
+D 2017-11-25T14:20:56.243
 F CHANGES 890a8c86aac08751850f646d284f970cb424ca7c
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -144,7 +144,7 @@ F generic/domxslt.c 56aca62e8872bc4e81d1c26a1c15e2f7fd7f67d1
 F generic/domxslt.h c068da9c518ad5e2a543874c18166065f0bf2bbc
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F generic/nodecmd.c 4e9271c82b22597599338b73c95ba4e47618a82a
+F generic/nodecmd.c e3d839202ad1041ff81dd4414704b4759c4716a2
 F generic/nodecmd.h e2cc508427ff8bea23ab4df0bed7e85b004e310c
 F generic/tcldom.c 9a281c32ba57f66466367ce53189f5509021b94f
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
@@ -234,11 +234,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c4d91cd3e94c13a702c01ec91ac08edd93f9be5b
-R 0395517a4f32792ecd4700468fb8aee4
-T *branch * stacklessfs
-T *sym-stacklessfs *
-T -sym-trunk *
+P 0a1f7977feac6f81a09f5888420be5c62a893919
+R 69a833a01d0f61aea72ba6d8cf33d23e
 U rolf
-Z 416cacda080ff5515e24ab68119aa68f
+Z 1e603550d6e1e7187f954d66ea0a4b35
 # Remove this line to create a well-formed Fossil manifest.

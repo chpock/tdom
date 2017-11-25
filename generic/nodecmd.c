@@ -954,25 +954,3 @@ nodecmd_insertBeforeFromScript (interp, node, cmdObj, refChild)
     
     return ret;
 }
-
-
-/*----------------------------------------------------------------------------
-|   nodecmd_curentNode
-|
-\---------------------------------------------------------------------------*/
-
-void *
-nodecmd_currentNode(void)
-{
-    return StackTop();
-}
-
-/* EOF $RCSfile $ */
-
-/* Emacs Setup Variables */
-/* Local Variables:      */
-/* mode: C               */
-/* indent-tabs-mode: nil */
-/* c-basic-offset: 4     */
-/* End:                  */
-
