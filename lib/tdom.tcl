@@ -657,7 +657,7 @@ proc tDOM::IANAEncoding2TclEncoding {IANAName} {
     switch [string tolower $IANAName] {
         "us-ascii"    {return ascii}
         "utf-8"       {return utf-8}
-        "utf-16"      {return unicode; # not sure about this}
+        "utf-16"      {return unicode}
         "iso-8859-1"  {return iso8859-1}
         "iso-8859-2"  {return iso8859-2}
         "iso-8859-3"  {return iso8859-3}
@@ -738,7 +738,7 @@ proc tDOM::IANAEncoding2TclEncoding {IANAName} {
 #   xmlOpenFileWorker
 #
 #----------------------------------------------------------------------------
-proc tDOM::xmlOpenFileWorker {filename {encodingString {}} {forSimple 0}} {
+proc tDOM::xmlOpenFileWorker {filename {encodingString {}} {forSimple 0} {forRead 0}} {
 
     # This partly (mis-)use the encoding of a channel handed to [dom
     # parse -channel ..] as a marker: if the channel encoding is utf-8
@@ -768,8 +768,8 @@ proc tDOM::xmlOpenFileWorker {filename {encodingString {}} {forSimple 0}} {
     switch [string range $firstBytes 0 3] {
         "feff" {
             # feff: UTF-16, big-endian BOM
-            if {$forSimple} {
-                error "UTF-16be is not supported by the simple parser"
+            if {$forSimple || $forRead} {
+                error "UTF-16be is not supported"
             }
             seek $fd 0 start
             set encString UTF-16be
@@ -779,7 +779,7 @@ proc tDOM::xmlOpenFileWorker {filename {encodingString {}} {forSimple 0}} {
         "fffe" {
             # ffef: UTF-16, little-endian BOM
             set encString UTF-16le          
-            if {$forSimple} {
+            if {$forSimple || $forRead} {
                 seek $fd 2 start
                 fconfigure $fd -encoding unicode
             } else {
@@ -894,7 +894,7 @@ proc tDOM::xmlReadFile {filename {encodingString {}}} {
         upvar $encodingString encString
     }
     
-    set fd [xmlOpenFileWorker $filename encString]
+    set fd [xmlOpenFileWorker $filename encString 0 1]
     set data [read $fd [file size $filename]]
     close $fd 
     return $data

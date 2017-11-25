@@ -1,5 +1,5 @@
-C Botched\stdom.tcl\son\strunk\sand\snobody\scomplained\s...
-D 2017-11-25T01:49:43.129
+C Made\sxmlOpenFileWorker\sreporting\sthe\sright\sencoding\sin\scase\sit\sis\scalled\sby\sxmlReadFile.
+D 2017-11-25T02:27:31.741
 F CHANGES 890a8c86aac08751850f646d284f970cb424ca7c
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -161,7 +161,7 @@ F generic/utf8conv.h 4132db4e05ac30dcb78dc3b4799ae0a9ae8a057f
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
 F generic/xmlsimple.c 0590ba5bf169e61c34a8c6030cfec72241666b45
 F generic/xmlsimple.h 3cb9d055e60643afcdfe9ab407adf1e8bb5dbafb
-F lib/tdom.tcl d06a03bdcc90290a863cc33625893095da41f66c
+F lib/tdom.tcl 5b1737365071be8f202868c116b6afd51e4e6ea2
 F macosx/README 90fbbcf96747374a4c4a7b97766f0c6bafa7780e
 F tclconfig/README.txt 180f4215d59309ec5645aa5f4565557dac484945
 F tclconfig/install-sh bdd5e293591621ae60d9824d86a4b1c5f22c3d00 x
@@ -234,8 +234,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c4d91cd3e94c13a702c01ec91ac08edd93f9be5b
-R 70a38b0b720cc9c25da00764cd859fc8
+P e42dab602e340de00fdb2306f3a731f091696f21
+R 270af3c8838ff494c27c22ad705df86e
 U rolf
-Z d2929e2e0f545ee52a50c550f3ff75fd
+Z 5ce1be956141563322c76db6d3fb2f10
 # Remove this line to create a well-formed Fossil manifest.
