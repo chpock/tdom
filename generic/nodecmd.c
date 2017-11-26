@@ -109,7 +109,9 @@ static void * StackPop   _ANSI_ARGS_((void));
 static void * StackTop   _ANSI_ARGS_((void));
 static int    NodeObjCmd _ANSI_ARGS_((ClientData,Tcl_Interp*,int,Tcl_Obj *CONST o[]));
 static void   StackFinalize _ANSI_ARGS_((ClientData));
+#ifdef STACKLESS_FS
 static Tcl_NRPostProc	NodeObjCmdCallback;
+#endif
 
 extern int tcldom_appendXML (Tcl_Interp*, domNode*, Tcl_Obj*);
 
@@ -810,7 +812,7 @@ nodecmd_appendFromScript (interp, node, cmdObj)
     domNode *oldLastChild = node->lastChild;
 #ifndef STACKLESS_FS
     int ret;
-    domNode *oldLastChild, *child, *nextChild;
+    domNode *child, *nextChild;
 #endif
     
     if (node->nodeType != ELEMENT_NODE) {

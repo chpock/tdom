@@ -295,6 +295,7 @@ proc runTest {testcase} {
             return
         }
     }
+    set xslfile [file join $catalogDir $majorpath $filepath $xslfile]
     if {![file readable $xslfile]} {
         set xslfile [findFile $xslfile \
                          [file join $catalogDir $majorpath $filepath]]
@@ -305,7 +306,9 @@ proc runTest {testcase} {
             return
         }
     }
-    set xslfile [file join $catalogDir $majorpath $filepath $xslfile]
+    # if {$verbose} {
+    #     puts "$xmlfile $xslfile"
+    # }
     set xmlout [$scenario selectNodes \
                     {string(output-file[@role="principal" and @compare="XML"])}]
     set xmloutfile ""
@@ -351,6 +354,7 @@ proc runTest {testcase} {
         if {$operation eq "execution-error"} {
             incr notFailed
             log 0 "$xslfile - test should have failed, but didn't."
+            puts "$xmlfile $xslfile"
         }
     }
     if {$xmloutfile ne "" && [llength [info commands $resultDoc]]} {
