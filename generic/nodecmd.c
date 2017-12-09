@@ -763,7 +763,6 @@ nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
         nodeInfo->tagName = tdomstrdup (Tcl_GetString(tagName));
     }
 #ifdef STACKLESS_FS
-    fprintf(stderr, "hier\n");
     Tcl_NRCreateCommand(interp, Tcl_DStringValue(&cmdName),
                         NodeObjProc, NodeObjCmd,
                         (ClientData)nodeInfo, NodeObjCmdDeleteProc);

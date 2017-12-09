@@ -2758,6 +2758,10 @@ void tcldom_treeAsHTML (
 
 #ifdef STACKLESS_FS
 
+#ifndef MAX_STATIC_ASXML_STACK
+# define MAX_STATIC_ASXML_STACK 32
+#endif
+
 /*----------------------------------------------------------------------------
 |   tcldom_treeAsXML
 |
@@ -2781,8 +2785,12 @@ void tcldom_treeAsXML (
 {
     domAttrNode   *attrs;
     domNode       *child;
+    domNode       *staticStack[MAX_STATIC_ASXML_STACK];
+    domNode       *dynStack;
+    int            dynStackSize;
     domDocument   *doc;
-    int            first, hasElements, i;
+    int            isDoc = 0;
+    int            first, i;
     char           prefix[MAX_PREFIX_LEN], *start, *p;
     const char    *localName;
     Tcl_HashEntry *h;
@@ -2806,6 +2814,7 @@ void tcldom_treeAsXML (
         writeChars(xmlString, chan, "?>\n", 3);
     }
     if (node->nodeType == DOCUMENT_NODE) {
+        isDoc = 1;
         doc = (domDocument*) node;
         if (doctypeDeclaration && doc->documentElement) {
             writeChars(xmlString, chan, "<!DOCTYPE ", 10);
@@ -2836,7 +2845,7 @@ void tcldom_treeAsXML (
         }
         node = doc->rootNode->firstChild;
     }
-
+    level = 0;
     while (node) {
         switch (node->nodeType) {
         case TEXT_NODE:
@@ -2914,6 +2923,7 @@ void tcldom_treeAsXML (
             break;
 
         case ELEMENT_NODE:
+            first = 0;
             if ((indent != -1) && doIndent) {
                 for(i=0; i<level; i++) {
                     writeChars(xmlString, chan, "        ", indent);
@@ -2946,80 +2956,91 @@ void tcldom_treeAsXML (
                 attrs = attrs->nextSibling;
             }
 
-            hasElements = 0;
-            first       = 1;
-            doIndent    = 1;
-
-            cdataChild = 0;
-            if (node->ownerDocument->doctype
-                && node->ownerDocument->doctype->cdataSectionElements) {
-                if (node->namespace) {
-                    Tcl_DStringInit (&dStr);
-                    Tcl_DStringAppend (&dStr, domNamespaceURI(node), -1);
-                    Tcl_DStringAppend (&dStr, ":", 1);
-                    domSplitQName (node->nodeName, prefix, &localName);
-                    Tcl_DStringAppend (&dStr, localName, -1);
-                    h = Tcl_FindHashEntry (
-                        node->ownerDocument->doctype->cdataSectionElements,
-                        Tcl_DStringValue (&dStr));
-                    Tcl_DStringFree (&dStr);
-                } else {
-                    h = Tcl_FindHashEntry (
-                        node->ownerDocument->doctype->cdataSectionElements,
-                        node->nodeName);
+            if (node->firstChild) {
+                writeChars(xmlString, chan, ">", 1);
+                if (indent != -1) {
+                    writeChars(xmlString, chan, "\n", 1);
                 }
-                if (h) {
-                    cdataChild = 1;
-                }
-            }
-            child = node->firstChild;
-            while (child != NULL) {
-
-                if (  (child->nodeType == ELEMENT_NODE)
-                      ||(child->nodeType == PROCESSING_INSTRUCTION_NODE)
-                      ||(child->nodeType == COMMENT_NODE) )
-                {
-                    hasElements = 1;
-                }
-                if (first) {
-                    writeChars(xmlString, chan, ">", 1);
-                    if ((indent != -1) && hasElements) {
-                        writeChars(xmlString, chan, "\n", 1);
+                cdataChild = 0;
+                if (node->ownerDocument->doctype
+                    && node->ownerDocument->doctype->cdataSectionElements) {
+                    if (node->namespace) {
+                        Tcl_DStringInit (&dStr);
+                        Tcl_DStringAppend (&dStr, domNamespaceURI(node), -1);
+                        Tcl_DStringAppend (&dStr, ":", 1);
+                        domSplitQName (node->nodeName, prefix, &localName);
+                        Tcl_DStringAppend (&dStr, localName, -1);
+                        h = Tcl_FindHashEntry (
+                            node->ownerDocument->doctype->cdataSectionElements,
+                            Tcl_DStringValue (&dStr));
+                        Tcl_DStringFree (&dStr);
+                    } else {
+                        h = Tcl_FindHashEntry (
+                            node->ownerDocument->doctype->cdataSectionElements,
+                            node->nodeName);
+                    }
+                    if (h) {
+                        cdataChild = 1;
                     }
                 }
-                first = 0;
-                tcldom_treeAsXML(xmlString, child, indent, level+1, doIndent,
-                                 chan, escapeNonASCII, doctypeDeclaration, 0,
-                                 NULL, cdataChild, escapeAllQuot, indentAttrs);
-                doIndent = 0;
-                if (  (child->nodeType == ELEMENT_NODE)
-                      ||(child->nodeType == PROCESSING_INSTRUCTION_NODE)
-                      ||(child->nodeType == COMMENT_NODE) )
-                {
-                    doIndent = 1;
+                staticStack[level] = node;
+                level++;
+                first = 1;
+                node = node->firstChild;
+            } else {
+                if (indent != -1) {
+                    writeChars(xmlString, chan, "/>\n", 3);
+                } else {
+                    writeChars(xmlString, chan, "/>",   2);
                 }
-                child = child->nextSibling;
             }
         }
-
-        if (first) {
-            if (indent != -1) {
-                writeChars(xmlString, chan, "/>\n", 3);
+        if (level == 0) {
+            if (isDoc) {
+                node = node->nextSibling;
             } else {
-                writeChars(xmlString, chan, "/>",   2);
+                break;
             }
         } else {
-            if ((indent != -1) && hasElements) {
-                for(i=0; i<level; i++) {
-                    writeChars(xmlString, chan, "        ", indent);
-                }
-            }
-            writeChars (xmlString, chan, "</", 2);
-            writeChars(xmlString, chan, node->nodeName, -1);
-            if (indent != -1) {
-                writeChars(xmlString, chan, ">\n", 2);
+            if (first) {
+                first = 0;
             } else {
-                writeChars(xmlString, chan, ">",   1);
+                if (node->nextSibling) {
+                    node = node->nextSibling;
+                } else {
+                    while (1) {
+                        level--;
+                        node = staticStack[level];
+                        if (indent != -1) {
+                            for(i=0; i<level; i++) {
+                                writeChars(xmlString, chan, "        ",
+                                           indent);
+                            }
+                        }
+                        writeChars (xmlString, chan, "</", 2);
+                        writeChars(xmlString, chan, node->nodeName, -1);
+                        if (indent != -1) {
+                            writeChars(xmlString, chan, ">\n", 2);
+                        } else {
+                            writeChars(xmlString, chan, ">",   1);
+                        }
+                        if (level > 0) {
+                            if (node->nextSibling) {
+                                node = node->nextSibling;
+                                break;
+                            } else {
+                                continue;
+                            }
+                        } else {
+                            if (isDoc) {
+                                node = node->nextSibling;
+                            } else {
+                                node = NULL;
+                            }
+                            break;
+                        }
+                    }
+                }
             }
         }
     }
