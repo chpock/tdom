@@ -808,7 +808,7 @@ nodecmd_appendFromScript (interp, node, cmdObj)
     domNode    *node;                   /* Parent dom node */
     Tcl_Obj    *cmdObj;                 /* Argument objects. */
 {
-    domNode *oldLastChild = node->lastChild;
+    domNode *oldLastChild;
 #ifndef STACKLESS_FS
     int ret;
     domNode *child, *nextChild;
@@ -818,7 +818,8 @@ nodecmd_appendFromScript (interp, node, cmdObj)
         Tcl_SetResult (interp, "NOT_AN_ELEMENT : can't append nodes", NULL);
         return TCL_ERROR;
     }
-    
+    oldLastChild = node->lastChild;
+
     StackPush((void *)node);
     Tcl_AllowExceptions(interp);
 #ifdef STACKLESS_FS

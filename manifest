@@ -1,5 +1,5 @@
-C More\swork\son\sstackless\sxml\sserialization.\sStill\sdeep\swip.
-D 2017-12-09T02:16:48.393
+C Fixed\sinvalid\smemory\sread\sin\scase\snon-element\snode\sis\scalled\swith\sappendFromScript.
+D 2017-12-10T20:44:26.548
 F CHANGES 890a8c86aac08751850f646d284f970cb424ca7c
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -144,7 +144,7 @@ F generic/domxslt.c 56aca62e8872bc4e81d1c26a1c15e2f7fd7f67d1
 F generic/domxslt.h c068da9c518ad5e2a543874c18166065f0bf2bbc
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F generic/nodecmd.c f38c2fbc00da1bcbc4c35478099869d722cd7534
+F generic/nodecmd.c c1696a97e31108a2b0fc46d464ad4abdecbc8f82
 F generic/nodecmd.h e2cc508427ff8bea23ab4df0bed7e85b004e310c
 F generic/tcldom.c f414030056c3938c67f311d4c8ee925ef8330447
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
@@ -234,8 +234,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c92b24eb583db81411260aa5345633d7e17d3f4a
-R 9abc572913ec9567533cd0917d78f87f
+P 120e42774d2cb56be61e3fffc64a5acde2fea0f3
+R 128d9c0c72badcf2f9947a4446be9deb
 U rolf
-Z 3293369a55b5b299def87867c893102d
+Z 6d7da2dd0d8c86487741eca6b4bc13d6
 # Remove this line to create a well-formed Fossil manifest.
