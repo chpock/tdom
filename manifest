@@ -1,5 +1,5 @@
-C Test\sfor\sCDATA\ssection\selement\swith\smixed\scontent.
-D 2017-12-11T00:59:56.318
+C Ripped\sout\sstackless\sXML\sserialization\sfrom\sstacklessfs\sinto\sown\sbranch,\swhile\sfurther\sworking\son\sit.\sThis\smay\sbe\sa\sworth\sthing\sfor\sitself,\ssince\sexpat\sdigests\sreally\sdeeply\snested\sXML.\swip.
+D 2017-12-11T22:45:43.670
 F CHANGES 890a8c86aac08751850f646d284f970cb424ca7c
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -146,7 +146,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 4637664667d7d458eab2081dc694e0c0f4c55223
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
-F generic/tcldom.c 80709193f9751cc33c3101c9ce5a11f639694547
+F generic/tcldom.c 099fd764a05c27c6855ada28910f91aa0ac34799
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
 F generic/tclexpat.c 069180212797fc14bdb0a08bcd1ad3461406975c
 F generic/tclexpat.h 3fb4df4c023d1f625ec9c5783c4fc1d1e4e0b8bb
@@ -234,8 +234,11 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a29752b9143b80e3e5fb90b17492330ef951062d
-R be3d92d0a444692b64362e3908d65293
+P 5f26ebf2dda6f32d27c9e6d4476387f71b0228ac
+R dc5f8a3f4ec83a1561dcc3aa6eb7ed96
+T *branch * stackless_asXML
+T *sym-stackless_asXML *
+T -sym-trunk *
 U rolf
-Z 6b1a3aeee1a6c6ed9007a1f5ce9654dd
+Z fd0f15ac03881afef7ca60a587d53be9
 # Remove this line to create a well-formed Fossil manifest.
