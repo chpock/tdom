@@ -1,5 +1,5 @@
-C Made\sxmlOpenFileWorker\sreporting\sthe\sright\sencoding\sin\scase\sit\sis\scalled\sby\sxmlReadFile.
-D 2017-11-25T02:27:31.741
+C Test\sfor\sCDATA\ssection\selement\swith\smixed\scontent.
+D 2017-12-11T00:59:56.318
 F CHANGES 890a8c86aac08751850f646d284f970cb424ca7c
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -195,7 +195,7 @@ F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.bench 5446ce379127b8d5700f18a5a0848e580313d0d7
 F tests/dom.test 5521c431e2e554569d9b6a5c2c2f0b03979cdabc
-F tests/domDoc.test b69b4c7a2f6df995f399bc33147ba5e635e6398f
+F tests/domDoc.test 99a4e4e8b894e97f62d438f0cd6f1e470d8bf2b3
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test 66a77f681b6e946b88c55a72efe62d8d7e430348
 F tests/domjson.test 0d4b12158194b43b9c1a0f7f4352a64130eb49cb
@@ -234,8 +234,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P e42dab602e340de00fdb2306f3a731f091696f21
-R 270af3c8838ff494c27c22ad705df86e
+P a29752b9143b80e3e5fb90b17492330ef951062d
+R be3d92d0a444692b64362e3908d65293
 U rolf
-Z 5ce1be956141563322c76db6d3fb2f10
+Z 6b1a3aeee1a6c6ed9007a1f5ce9654dd
 # Remove this line to create a well-formed Fossil manifest.

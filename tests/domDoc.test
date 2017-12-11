@@ -1326,6 +1326,15 @@ test domDoc-24.16 {cdataSectionElements} {
     set result
 } {<child><![CDATA[some text]]></child>}
 
+test domDoc-24.17 {cdataSectionElements} {
+    set doc [dom parse {<doc><child>some text <b>more text</b> text again</child></doc>}]
+    $doc cdataSectionElements child 1
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc><child><![CDATA[some text ]]><b>more text</b><![CDATA[ text again]]></child></doc>}
+
+
 test domDoc-25.1 {selectNodesNamespaces} {
     set doc [dom createDocument foo]
     set result [$doc selectNodesNamespaces]
