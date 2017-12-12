@@ -2990,7 +2990,20 @@ void tcldom_treeAsXML (
                     staticStack[level].node = node;
                     staticStack[level].cdata = cdataChild;
                 } else {
-
+                    if (level >= MAX_STATIC_ASXML_STACK + dynStackSize) {
+                        if (dynStackSize) {
+                            dynStack = (asXMLStack *)
+                                REALLOC (dynStack,
+                                         sizeof(asXMLStack)*dynStackSize*2);
+                            dynStackSize *= 2;
+                        } else {
+                            dynStack = (asXMLStack *)
+                                MALLOC (sizeof(asXMLStack)*MAX_STATIC_ASXML_STACK);
+                            dynStackSize = MAX_STATIC_ASXML_STACK;
+                        }
+                    }
+                    dynStack[level-MAX_STATIC_ASXML_STACK].node = node;
+                    dynStack[level-MAX_STATIC_ASXML_STACK].cdata = cdataChild;
                 }
                 level++;
                 first = 1;
@@ -3018,8 +3031,13 @@ void tcldom_treeAsXML (
                 } else {
                     while (1) {
                         level--;
-                        node = staticStack[level].node;
-                        cdataChild = staticStack[level].cdata;
+                        if (level < MAX_STATIC_ASXML_STACK) {
+                            node = staticStack[level].node;
+                            cdataChild = staticStack[level].cdata;
+                        } else {
+                            node = dynStack[level-MAX_STATIC_ASXML_STACK].node;
+                            cdataChild = dynStack[level-MAX_STATIC_ASXML_STACK].cdata;
+                        }
                         if (indent != -1 
                             && (   node->firstChild->nodeType == ELEMENT_NODE
                                 || node->firstChild->nodeType == PROCESSING_INSTRUCTION_NODE
