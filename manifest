@@ -1,5 +1,5 @@
-C Save\swork\sfor\sdiscussion.
-D 2017-12-12T21:58:01.679
+C Still\snot\sexactly\sthe\ssame\soutput\sas\sthe\scurrent\sserializer\sbut\sclose.
+D 2017-12-13T23:47:02.148
 F CHANGES 890a8c86aac08751850f646d284f970cb424ca7c
 F ChangeLog 49452c595ba18d82761e9ac579537dc5f98aad48
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -128,7 +128,7 @@ F extensions/tnc/win/rules.vc f2fff77551761f97a5aaea7f1ca4f2886a031330
 F extensions/tnc/win/targets.vc ba02bbc7b0956bbb17385ddf64d684c594e61074
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
 F generic/dom.c 228c07726d89cbe6a8a491eea5a188de36140b93
-F generic/dom.h ea32034888b1f4601951bbd458ab1d8b0e44695d
+F generic/dom.h c2bb6f6dd70b962dc2ed99b76ccb0538677a1c2e
 F generic/domalloc.c 55e9eeff19cc54cf3956a7013883ead07efd3593
 F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
 F generic/domhtml.c c2893b476ea83dba3820f908b6bc2e29a26b5a97
@@ -146,7 +146,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 4637664667d7d458eab2081dc694e0c0f4c55223
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
-F generic/tcldom.c 23b2c45b94b3c8cd197fdd247af725188ae04181
+F generic/tcldom.c 37bdf1cf55c5ff46e6c44d15302ef032f93db5b2
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
 F generic/tclexpat.c 069180212797fc14bdb0a08bcd1ad3461406975c
 F generic/tclexpat.h 3fb4df4c023d1f625ec9c5783c4fc1d1e4e0b8bb
@@ -234,8 +234,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P fe454a1b53ba543986853a78b74399216a6435d4
-R 9e9ee16ffef25076a189b858e9dc151f
+P dbf205286deff40eed76a4a124855dd4f732a06a
+R bdd02ff9ec170d5a480a013ca8a7c1bf
 U rolf
-Z 344c573bf894f05f52a35cdac4665037
+Z 08c86f7dc76d0b549245bd18a2bf6677
 # Remove this line to create a well-formed Fossil manifest.

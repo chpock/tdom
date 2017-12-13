@@ -2760,10 +2760,6 @@ void tcldom_treeAsHTML (
     writeChars(htmlString, chan, ">",  1);
 }
 
-#ifndef MAX_STATIC_ASXML_STACK
-# define MAX_STATIC_ASXML_STACK 32
-#endif
-
 /*----------------------------------------------------------------------------
 |   tcldom_treeAsXML
 |
@@ -2773,7 +2769,6 @@ void tcldom_treeAsXML (
     Tcl_Obj    *xmlString,
     domNode    *node,
     int         indent,
-    int         doIndent,
     Tcl_Channel chan,
     int         escapeNonASCII,
     int         doctypeDeclaration,
@@ -2784,13 +2779,13 @@ void tcldom_treeAsXML (
 )
 {
     domAttrNode   *attrs;
-    asXMLStack     staticStack[MAX_STATIC_ASXML_STACK];
+    asXMLStack     staticStack[STATIC_STACK_SIZE];
     asXMLStack    *dynStack = NULL;
     int            dynStackSize = 0;
     domDocument   *doc;
     int            isDoc = 0;
     int            level = 0, cdataChild = 0;
-    int            first, i;
+    int            i;
     char           prefix[MAX_PREFIX_LEN], *start, *p;
     const char    *localName;
     Tcl_HashEntry *h;
@@ -2891,7 +2886,7 @@ void tcldom_treeAsXML (
             break;
 
         case COMMENT_NODE:
-            if ((indent != -1) && doIndent) {
+            if (indent != -1) {
                 for(i=0; i<level; i++) {
                     writeChars(xmlString, chan, "        ", indent);
                 }
@@ -2904,7 +2899,7 @@ void tcldom_treeAsXML (
             break;
         
         case PROCESSING_INSTRUCTION_NODE:
-            if ((indent != -1) && doIndent) {
+            if (indent != -1) {
                 for(i=0; i<level; i++) {
                     writeChars(xmlString, chan, "        ", indent);
                 }
@@ -2922,8 +2917,13 @@ void tcldom_treeAsXML (
             break;
 
         case ELEMENT_NODE:
-            first = 0;
-            if ((indent != -1) && doIndent) {
+            if (indent != -1 &&
+                (node->previousSibling == NULL ||
+                 ((node->previousSibling->nodeType == ELEMENT_NODE) ||
+                  (node->previousSibling->nodeType == PROCESSING_INSTRUCTION_NODE) ||
+                  (node->previousSibling->nodeType == COMMENT_NODE)))
+                )
+            {
                 for(i=0; i<level; i++) {
                     writeChars(xmlString, chan, "        ", indent);
                 }
@@ -2935,7 +2935,7 @@ void tcldom_treeAsXML (
             while (attrs) {
                 if (indentAttrs > -1) {
                     writeChars(xmlString, chan, "\n", 1);
-                    if ((indent != -1) && doIndent) {
+                    if (indent != -1) {
                         for(i=0; i<level; i++) {
                             writeChars(xmlString, chan, "        ", indent);
                         }
@@ -2986,11 +2986,11 @@ void tcldom_treeAsXML (
                         cdataChild = 1;
                     }
                 }
-                if (level < MAX_STATIC_ASXML_STACK) {
+                if (level < STATIC_STACK_SIZE) {
                     staticStack[level].node = node;
                     staticStack[level].cdata = cdataChild;
                 } else {
-                    if (level >= MAX_STATIC_ASXML_STACK + dynStackSize) {
+                    if (level >= STATIC_STACK_SIZE + dynStackSize) {
                         if (dynStackSize) {
                             dynStack = (asXMLStack *)
                                 REALLOC (dynStack,
@@ -2998,16 +2998,16 @@ void tcldom_treeAsXML (
                             dynStackSize *= 2;
                         } else {
                             dynStack = (asXMLStack *)
-                                MALLOC (sizeof(asXMLStack)*MAX_STATIC_ASXML_STACK);
-                            dynStackSize = MAX_STATIC_ASXML_STACK;
+                                MALLOC (sizeof(asXMLStack)*STATIC_STACK_SIZE);
+                            dynStackSize = STATIC_STACK_SIZE;
                         }
                     }
-                    dynStack[level-MAX_STATIC_ASXML_STACK].node = node;
-                    dynStack[level-MAX_STATIC_ASXML_STACK].cdata = cdataChild;
+                    dynStack[level-STATIC_STACK_SIZE].node = node;
+                    dynStack[level-STATIC_STACK_SIZE].cdata = cdataChild;
                 }
                 level++;
-                first = 1;
                 node = node->firstChild;
+                continue;
             } else {
                 if (indent != -1) {
                     writeChars(xmlString, chan, "/>\n", 3);
@@ -3023,54 +3023,50 @@ void tcldom_treeAsXML (
                 break;
             }
         } else {
-            if (first) {
-                first = 0;
+            if (node->nextSibling) {
+                node = node->nextSibling;
             } else {
-                if (node->nextSibling) {
-                    node = node->nextSibling;
-                } else {
-                    while (1) {
-                        level--;
-                        if (level < MAX_STATIC_ASXML_STACK) {
-                            node = staticStack[level].node;
-                            cdataChild = staticStack[level].cdata;
-                        } else {
-                            node = dynStack[level-MAX_STATIC_ASXML_STACK].node;
-                            cdataChild = dynStack[level-MAX_STATIC_ASXML_STACK].cdata;
+                while (1) {
+                    level--;
+                    if (level < STATIC_STACK_SIZE) {
+                        node = staticStack[level].node;
+                        cdataChild = staticStack[level].cdata;
+                    } else {
+                        node = dynStack[level-STATIC_STACK_SIZE].node;
+                        cdataChild = dynStack[level-STATIC_STACK_SIZE].cdata;
+                    }
+                    if (indent != -1 
+                        && (   node->firstChild->nodeType == ELEMENT_NODE
+                               || node->firstChild->nodeType == PROCESSING_INSTRUCTION_NODE
+                               || node->firstChild->nodeType == COMMENT_NODE )
+                        ) {
+                        for(i=0; i<level; i++) {
+                            writeChars(xmlString, chan, "        ",
+                                       indent);
                         }
-                        if (indent != -1 
-                            && (   node->firstChild->nodeType == ELEMENT_NODE
-                                || node->firstChild->nodeType == PROCESSING_INSTRUCTION_NODE
-                                || node->firstChild->nodeType == COMMENT_NODE )
-                            ) {
-                            for(i=0; i<level; i++) {
-                                writeChars(xmlString, chan, "        ",
-                                           indent);
-                            }
-                        }
-                        writeChars (xmlString, chan, "</", 2);
-                        writeChars(xmlString, chan, node->nodeName, -1);
-                        if (indent != -1) {
-                            writeChars(xmlString, chan, ">\n", 2);
-                        } else {
-                            writeChars(xmlString, chan, ">",   1);
-                        }
-                        if (level > 0) {
-                            if (node->nextSibling) {
-                                cdataChild = staticStack[level-1].cdata;
-                                node = node->nextSibling;
-                                break;
-                            } else {
-                                continue;
-                            }
-                        } else {
-                            if (isDoc) {
-                                node = node->nextSibling;
-                            } else {
-                                node = NULL;
-                            }
+                    }
+                    writeChars (xmlString, chan, "</", 2);
+                    writeChars(xmlString, chan, node->nodeName, -1);
+                    if (indent != -1) {
+                        writeChars(xmlString, chan, ">\n", 2);
+                    } else {
+                        writeChars(xmlString, chan, ">",   1);
+                    }
+                    if (level > 0) {
+                        if (node->nextSibling) {
+                            cdataChild = staticStack[level-1].cdata;
+                            node = node->nextSibling;
                             break;
+                        } else {
+                            continue;
                         }
+                    } else {
+                        if (isDoc) {
+                            node = node->nextSibling;
+                        } else {
+                            node = NULL;
+                        }
+                        break;
                     }
                 }
             }
@@ -3647,7 +3643,7 @@ static int serializeAsXML (
     if (indent < -1) indent = -1;
 
     resultPtr = Tcl_NewStringObj("", 0);
-    tcldom_treeAsXML(resultPtr, node, indent, 1, chan, escapeNonASCII,
+    tcldom_treeAsXML(resultPtr, node, indent, chan, escapeNonASCII,
                      doctypeDeclaration, xmlDeclaration, encString,
                      escapeAllQuot, indentAttrs);
     Tcl_SetObjResult(interp, resultPtr);

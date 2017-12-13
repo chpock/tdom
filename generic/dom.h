@@ -113,6 +113,10 @@
 
 #define domPanic(msg) Tcl_Panic((msg));
 
+#ifndef STATIC_STACK_SIZE
+# define STATIC_STACK_SIZE 32
+#endif
+
 /*
  * If compiled against threaded Tcl core, we must take
  * some extra care about process-wide globals and the
