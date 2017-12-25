@@ -68,7 +68,7 @@ baselibs = $(baselibs) "$(GUMBODIR)\visualc\Win32\Release\gumbo.lib"
 
 !include "$(_RULESDIR)\targets.vc"
 
-install:    default-install-docs-n default-install-stubs
+install:    default-install-docs-html default-install-stubs
 
 {$(EXPATDIR)}.c{$(TMP_DIR)}.obj::
     $(CCPKGCMD) @<<

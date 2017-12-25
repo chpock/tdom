@@ -1,5 +1,5 @@
-C Updated\snmake\sto\sv1.1\sfrom\sTcl\srepository
-D 2017-12-25T07:42:25.959
+C On\sWindows,\sinstall\shtml\sdocs,\snot\smanpages
+D 2017-12-25T10:11:03.591
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F CHANGES 890a8c86aac08751850f646d284f970cb424ca7c
@@ -223,7 +223,7 @@ F unix/CONFIG 3a713863dbdceb7ff897775e4820c85a624fb142
 F unix/tclAppInit.c a1655c51127aed18d069010f234a378fceacb2a6
 F win/README 73916fb24a4ac0cc509dd9e225f191943b061292
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F win/makefile.vc 40b6d856785961cb5b56abf5a47fbaa5be83fb13
+F win/makefile.vc b6b0dae0f749b54dff5b182c15556b1f11177368
 F win/makefile805.vc da2003745caf522d88f27fcebadd916c1d5c042d
 F win/mkd.bat 85d3fe58ce051a778447fb2bfc7384867d21cef0
 F win/nmakehlp.c 194ae7c24886245c679cb4c9ea7e6daaaebb5fcd
@@ -236,8 +236,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 7bfd42df889ade70c1d23ba118669925c7b7d8a5
-R fff0e7f75f8885ab1e8fcadf19512ce5
+P 367d3b204a6602c6a409cbfb07807f615b69fbbf
+R 8803a436ea40c8e3d06df69dfee15036
 U apnadkarni
-Z 7e321b0044df53ba0e8cfd7d3f480590
+Z a87b2cbbb3f37c4dea9c1684f1ee4b84
 # Remove this line to create a well-formed Fossil manifest.
