@@ -3009,7 +3009,13 @@ void tcldom_treeAsXML (
                 node = node->firstChild;
                 continue;
             } else {
-                if (indent != -1) {
+                if (indent != -1 &&
+                    (node->nextSibling == NULL ||
+                     ((node->nextSibling->nodeType == ELEMENT_NODE) ||
+                      (node->nextSibling->nodeType == PROCESSING_INSTRUCTION_NODE) ||
+                      (node->nextSibling->nodeType == COMMENT_NODE)))
+                    )
+                {
                     writeChars(xmlString, chan, "/>\n", 3);
                 } else {
                     writeChars(xmlString, chan, "/>",   2);
