@@ -821,7 +821,7 @@ HTML_SimpleParse (
                     pnode = pnode->parentNode;
                 }
                 if (pnode == NULL) {
-                    /* begining tag was not found the way up the tag hierarchy
+                    /* beginning tag was not found the way up the tag hierarchy
                        -> ignore the tag */
                     DBG(fprintf(stderr,"ignoring closing '%s' \n", start+2);)
                     ignore = 1;

@@ -1036,7 +1036,7 @@ domGetAttributeNodeNS (
  *      attributes. Since the domAttrNode struct doesn't has an
  *      element for the previous attribute, we need a function for the
  *      relatively rare cases, the 'previous attribute' is
- *      needed. Remeber, that the XML rec say, that there is no
+ *      needed. Remember, that the XML rec say, that there is no
  *      specific order of the attributes of a node.
  *
  * Results: 
@@ -4831,7 +4831,7 @@ domCopyTo (
             if (copyNS) {
                 /* If copyNS is true, then all namespaces in scope
                  * (including the one declared with the node to copy)
-                 * are allready copied over. */
+                 * are already copied over. */
                 attr = attr->nextSibling;
                 continue;
                 

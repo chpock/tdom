@@ -14,7 +14,7 @@ typedef struct CHandlerSet {
     int ignoreWhiteCDATAs;          /* ignore 'white' CDATA sections */
 
     void *userData;                 /* Handler set specific Data Structure;
-                                       the C handler set extention has to
+                                       the C handler set extension has to
                                        malloc the needed structure in his
                                        init func and has to provide a
                                        cleanup func (to free it). */

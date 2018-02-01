@@ -1103,7 +1103,7 @@ static void formatValue (
                 Tcl_DStringAppend (str, f->tokens[*useFormatToken-1].sepStart,
                                    f->tokens[*useFormatToken-1].sepLen);
             } else {
-                /* insert default seperator '.' */
+                /* insert default separator '.' */
                 Tcl_DStringAppend (str, ".", 1);
             }
         }
@@ -4346,7 +4346,7 @@ static int ExecAction (
             }
             if (!h) {
                 reportError (actionNode, "xsl:call-template calls a non"
-                             " existend template!", errMsg);
+                             " existing template!", errMsg);
                 return -1;
             } 
             tplChoosen = (xsltTemplate *) Tcl_GetHashValue (h);
@@ -4587,10 +4587,10 @@ static int ExecAction (
                     if (rs.nodes[i]->nodeType == ATTRIBUTE_NODE) {
                         attr = (domAttrNode*)rs.nodes[i];
                         if (attr ->nodeFlags & IS_NS_NODE) {
-                            /* If someone selects explicitely namespace nodes
+                            /* If someone selects explicitly namespace nodes
                                to copy-of with e.g namespace::* (remember: @*
                                doesn't select namespace nodes), we must this
-                               handle seperately.*/
+                               handle separately.*/
                             /* The xmlns:xml namespace node will always
                                be in scope, but never needed to be copied,
                                because the result tree will also always
@@ -7266,7 +7266,7 @@ xsltResetState (
     }
     xs->nsUniqeNr = 0;
     /* In theory, the varFramesStack and varStack pointers should
-       be always back to there inital state. But to be sure, we
+       be always back to there initial state. But to be sure, we
        re-initialize, just in case of a bizarre error or something. */
     xs->varFramesStackPtr = -1;
     xs->varStackPtr       = -1;

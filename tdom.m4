@@ -389,7 +389,7 @@ AC_DEFUN(TDOM_PATH_CONFIG, [
 	    AC_MSG_CHECKING([for tDOM configuration])
 	    AC_ARG_WITH(tdom, 
                 AC_HELP_STRING([--with-tdom],
-                    [directory containig tDOM configuration (tdomConfig.sh)]),
+                    [directory containing tDOM configuration (tdomConfig.sh)]),
                 with_tdomconfig=${withval})
 
 	    no_tdom=true

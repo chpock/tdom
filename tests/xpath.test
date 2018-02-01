@@ -203,7 +203,7 @@ test xpath-3.20 {Infinity divided by Infinity} {
     $root selectNodes {(2 div 0) div (3 div 0)}
 } {NaN}
 
-test xpath-3.21 {Infinity divided by postive number} {
+test xpath-3.21 {Infinity divided by positive number} {
     $root selectNodes {(2.7 div 0) div 23}
 } {Infinity}
 
@@ -211,7 +211,7 @@ test xpath-3.22 {Infinity divided by negative number} {
     $root selectNodes {(2.7 div 0) div -23}
 } {-Infinity}
 
-test xpath-3.23 {-Infinity divided by postive number} {
+test xpath-3.23 {-Infinity divided by positive number} {
     $root selectNodes {(-2.7 div 0) div 23}
 } {-Infinity}
 
@@ -860,7 +860,7 @@ test xpath-5.34 {tcl var resolution in expr} {
     # non empty string is always true
     set node [$doc selectNodes {/doc/e[$which]}]
     set result [llength $node]
-    # If another xpath data type is needed, cast explictly
+    # If another xpath data type is needed, cast explicitly
     set node [$doc selectNodes {/doc/e[number($which)]}]
     lappend result [llength $node]
     lappend result [$node @att]

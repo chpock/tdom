@@ -386,7 +386,7 @@ XML source. This is the default in case
 parsed and no external entity (including the external
 subset) will be resolved and parsed. The value
 "notstandalone" means, that all external entities will
-be resolved and parsed, with the execption of
+be resolved and parsed, with the exception of
 documents, which explicitly states standalone="yes" in
 their XML declaration.
 .IP "\fB-ignorexmlns\fR"

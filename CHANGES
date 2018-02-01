@@ -87,7 +87,7 @@
         then this proc is used as -feedbackcmd. If there isn't such a
         proc and -feedbackAfter is used, it is an error to not also
         use -feedbackcmd. A return -code break from the -feedbackcmd
-        causes the parser to almost immediatly abort parsing and let
+        causes the parser to almost immediately abort parsing and let
         the [dom parse] call return the empty string (instead of a
         document) without raising error. 
 

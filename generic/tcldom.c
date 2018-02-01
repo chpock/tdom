@@ -2030,7 +2030,7 @@ int tcldom_appendFromTclList (
     domAppendChild(node, newnode);
 
     /*------------------------------------------------------------------------
-    |   create atributes
+    |   create attributes
     \-----------------------------------------------------------------------*/
     if ((rc = Tcl_ListObjIndex(interp, lnode, 1, &attrListObj)) != TCL_OK) {
         return rc;
@@ -5045,7 +5045,7 @@ int tcldom_NodeObjCmd (
             }
             if (nsIndex == -1) {
                 /* There isn't such a namespace declared in this document.
-                   Since getElementsByTagNameNS doesn't raise an execption
+                   Since getElementsByTagNameNS doesn't raise an exception
                    short cut: return empty result */
                 Tcl_ResetResult(interp);
                 return TCL_OK;
@@ -5570,7 +5570,7 @@ int tcldom_DocObjCmd (
             }
             if (nsIndex == -1) {
                 /* There isn't such a namespace declared in this document.
-                   Since getElementsByTagNameNS doesn't raise an execption
+                   Since getElementsByTagNameNS doesn't raise an exception
                    short cut: return empty result */
                 return TCL_OK;
             }
@@ -6573,7 +6573,7 @@ int tcldom_parse (
                 /* If the interp result isn't empty, then there was an error
                    in an enternal entity and the interp result has already the
                    error msg. If we don't got a document, but interp result is
-                   empty, the error occured in the main document and we
+                   empty, the error occurred in the main document and we
                    build the error msg as follows. */
                 Tcl_AppendResult(interp, "error \"", 
                                  XML_ErrorString(XML_GetErrorCode(parser)),
