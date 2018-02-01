@@ -1,5 +1,5 @@
-C A\scouple\sof\sspell\sfixes\s/\styping\serror\scorrections.\sThanks\sgoes\sto\sGustav\sNeumann.
-D 2018-02-01T00:16:45.571
+C One\sof\sthe\spreviously\schanged\sspellings\swas\sin\sfact\scorrect.\sChanged\sback.
+D 2018-02-01T12:08:26.719
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F CHANGES 0a28f8f99b2d8e65476448113bad92f603dc97bf
@@ -126,7 +126,7 @@ F extensions/tnc/tnc.c 26dbaeae9f8c085e78a4eefdeae16f06bd450cd6
 F extensions/tnc/win/makefile.vc b512d0f3eb67d83ace6f626d20b6ed8c895e609d
 F extensions/tnc/win/nmakehlp.c 194ae7c24886245c679cb4c9ea7e6daaaebb5fcd
 F extensions/tnc/win/rules-ext.vc e788fcfc1e69b11946e18b8f67e0870b3bd38913
-F extensions/tnc/win/rules.vc d79112d6bc4764cd89480c49c5021cd684d1ed34
+F extensions/tnc/win/rules.vc a27af1782e5718a0526ef0424434e8074786f614
 F extensions/tnc/win/targets.vc 79dea1c6a94a94e6ed8bae9e0195149b25a69923
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
 F generic/dom.c 5228c21f94d7734bb30353bbeaa0d5b9ade9007e
@@ -229,15 +229,15 @@ F win/mkd.bat 85d3fe58ce051a778447fb2bfc7384867d21cef0
 F win/nmakehlp.c 194ae7c24886245c679cb4c9ea7e6daaaebb5fcd
 F win/pkgIndex.tcl 4631218a784aae412d2a6bcadc72619eb14b264a
 F win/rules-ext.vc e788fcfc1e69b11946e18b8f67e0870b3bd38913
-F win/rules.vc d79112d6bc4764cd89480c49c5021cd684d1ed34
+F win/rules.vc a27af1782e5718a0526ef0424434e8074786f614
 F win/targets.vc 79dea1c6a94a94e6ed8bae9e0195149b25a69923
 F win/tdom.rc 1463128845bffe1fdf24ab99f562727830855516
 F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P bf23a5e2b393ed01a92b201fab3f94e58a0b744d
-R e6feafa2113789bb280a749a5a5bc99d
+P 4897033c1bc237c925641df5a94d5eb72a3d24f8
+R a503f448c5b30f66e0de66c1afd7eb21
 U rolf
-Z 3159a6a2d9ef9947604991d36dcc74c0
+Z 20c240e95ff5cd351ad56b1b02f29dcd
 # Remove this line to create a well-formed Fossil manifest.
