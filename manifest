@@ -1,5 +1,5 @@
-C On\sWindows,\sinstall\shtml\sdocs,\snot\smanpages
-D 2017-12-25T10:11:03.591
+C Expose\sthe\sSAX\sparser\sbuffer\ssize\sa\sbit.
+D 2018-02-01T00:11:40.724
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F CHANGES 890a8c86aac08751850f646d284f970cb424ca7c
@@ -150,7 +150,7 @@ F generic/nodecmd.c 4637664667d7d458eab2081dc694e0c0f4c55223
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
 F generic/tcldom.c 80709193f9751cc33c3101c9ce5a11f639694547
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
-F generic/tclexpat.c 069180212797fc14bdb0a08bcd1ad3461406975c
+F generic/tclexpat.c 23f0eb96338b07a99ebe06d813b402b87ee0a05c
 F generic/tclexpat.h 3fb4df4c023d1f625ec9c5783c4fc1d1e4e0b8bb
 F generic/tdom.decls d825af72ec3fd2ae4ebb1d7f883bde6e3613c914
 F generic/tdom.h ce5839cdddbde35ac016a6033415c73082b2f87c
@@ -236,8 +236,8 @@ F xe/README 1b4c67a44ba2c29c643a3d646817d21c0ea064c5
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 367d3b204a6602c6a409cbfb07807f615b69fbbf
-R 8803a436ea40c8e3d06df69dfee15036
-U apnadkarni
-Z a87b2cbbb3f37c4dea9c1684f1ee4b84
+P 76ab45e19d99990dc09ec4d23c07bcfc1cbcec5b
+R 892804cee388d4fbc4c3dd693eeba0d8
+U rolf
+Z efd75d594324b5f53f5621d2e0dd14f4
 # Remove this line to create a well-formed Fossil manifest.

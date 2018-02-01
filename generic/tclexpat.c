@@ -51,7 +51,9 @@
    greater than 5 */
 #define ERROR_IN_EXTREFHANDLER 5
 
-#define READ_SIZE (1024*8)
+#ifndef TDOM_EXPAT_READ_SIZE
+# define TDOM_EXPAT_READ_SIZE (1024*8)
+#endif
 #ifndef O_BINARY
 #ifdef _O_BINARY
 #define O_BINARY _O_BINARY
@@ -1006,7 +1008,7 @@ TclExpatParse (interp, expat, data, len, type)
       expat->parsingState = 2;
       for (;;) {
           int nread;
-          char *fbuf = XML_GetBuffer (parser, READ_SIZE);
+          char *fbuf = XML_GetBuffer (parser, TDOM_EXPAT_READ_SIZE);
           if (!fbuf) {
               close (fd);
               Tcl_ResetResult (interp);
@@ -1014,7 +1016,7 @@ TclExpatParse (interp, expat, data, len, type)
               expat->parsingState = 1;
               return TCL_ERROR;
           }
-          nread = read(fd, fbuf, READ_SIZE);
+          nread = read(fd, fbuf, TDOM_EXPAT_READ_SIZE);
           if (nread < 0) {
               close (fd);
               Tcl_ResetResult (interp);
@@ -3460,7 +3462,7 @@ TclGenExpatExternalEntityRefHandler(parser, openEntityNames, base, systemId,
           result = 1;
           for (;;) {
               int nread;
-              char *fbuf = XML_GetBuffer (extparser, READ_SIZE);
+              char *fbuf = XML_GetBuffer (extparser, TDOM_EXPAT_READ_SIZE);
               if (!fbuf) {
                   close (fd);
                   Tcl_ResetResult (expat->interp);
@@ -3469,7 +3471,7 @@ TclGenExpatExternalEntityRefHandler(parser, openEntityNames, base, systemId,
                                          ERROR_IN_EXTREFHANDLER);
                   return 0;
               }
-              nread = read(fd, fbuf, READ_SIZE);
+              nread = read(fd, fbuf, TDOM_EXPAT_READ_SIZE);
               if (nread < 0) {
                   close (fd);
                   Tcl_ResetResult (expat->interp);
