@@ -1526,7 +1526,7 @@ int tcldom_xpathFuncCallBack (
                                          + strlen (functionName));
                 strcpy(*errMsg, "Unknown type of return value \"");
                 strcat(*errMsg, typeStr);
-                strcat(*errMsg, "\" from tcl coded XPath function \"");
+                strcat(*errMsg, "\" from Tcl coded XPath function \"");
                 strcat(*errMsg, functionName);
                 strcat(*errMsg, "\"!");
                 res = XPATH_EVAL_ERR;
@@ -1543,7 +1543,7 @@ int tcldom_xpathFuncCallBack (
     } else {
         errStr = Tcl_GetStringFromObj( Tcl_GetObjResult(interp), &errStrLen);
         *errMsg = (char*)MALLOC(120+strlen(functionName) + errStrLen);
-        strcpy(*errMsg, "Tcl error while executing XPATH extension function '");
+        strcpy(*errMsg, "Tcl error while executing XPath extension function '");
         strcat(*errMsg, functionName );
         strcat(*errMsg, "':\n" );
         strcat(*errMsg, errStr);
@@ -1622,7 +1622,7 @@ char * tcldom_xpathResolveVar (
     if (varValue) {
         *offset = termPtr - strToParse;
         /* If strToParse start with a single '$' without a following
-         * var name (according to tcl var name rules), Tcl_ParseVar()
+         * var name (according to Tcl var name rules), Tcl_ParseVar()
          * doesn't report a parsing error but returns just a pointer
          * to a static string "$". */ 
         if (*offset == 1) {
@@ -6272,7 +6272,7 @@ int tcldom_parse (
                 channelId = Tcl_GetString(objv[1]);
             } else {
                 SetResult("The \"dom parse\" option \"-channel\" "
-                          "requires a tcl channel as argument.");
+                          "requires a Tcl channel as argument.");
                 return TCL_ERROR;
             }
             chan = Tcl_GetChannel(interp, channelId, &mode);
@@ -6601,9 +6601,9 @@ int tcldom_parse (
                 }
             } else {
                 if (status == TCL_OK) {
-                    /* For tcl errors (in -externalentitycommand or
+                    /* For Tcl errors (in -externalentitycommand or
                      * feedback callback) we leave the error msg in
-                     * the interpreter alone. If there wasn't a tcl
+                     * the interpreter alone. If there wasn't a Tcl
                      * error, there was a parsing error. Because the
                      * interp has already an error msg, that parsing
                      * error was in an external entity. Therefore, we

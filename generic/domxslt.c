@@ -3222,7 +3222,7 @@ static int xsltAddTemplate (
     }
     tpl->sDoc = sDoc;
     
-    TRACE1("compiling XPATH '%s' ...\n", tpl->match);
+    TRACE1("compiling XPath '%s' ...\n", tpl->match);
     if (tpl->match) {
         rc = xpathParse(tpl->match, node, XPATH_TEMPMATCH_PATTERN, NULL, NULL,
                         &(tpl->freeAst), errMsg);
@@ -3708,7 +3708,7 @@ static int xsltNumber (
         vVals = 1;
         v[0] = xpathRound(xpathFuncNumber( &rs, &NaN ));
         /* MARK recoverable error */
-        /* This is one of the not so satisfying corners of the xslt
+        /* This is one of the not so satisfying corners of the XSLT
          * rec. The rec doesn't say, what to do, if the value isn't a
          * (finit) number. E24 from the erratas doesn't makes things
          * much better - a little bit dubious wording and a not very
@@ -5110,8 +5110,8 @@ static int ExecAction (
             while (n) {
                 attr = n->firstAttr;
                 while (attr && (attr->nodeFlags & IS_NS_NODE)) {
-                    /* xslt namespace isn't copied */
-                    /* Well, xslt implementors doesn't seem to agree
+                    /* XSLT namespace isn't copied */
+                    /* Well, XSLT implementors doesn't seem to agree
                        at which point this rule out of the second paragraph
                        of 7.1.1 must be applied: before or after applying
                        the namespace aliases (or, in other words: is this
@@ -5407,7 +5407,7 @@ static int ApplyTemplate (
             continue; /* doesn't match mode */
         }
         TRACE4("tpl has prio='%f' precedence='%f', currentPrio='%f', currentPrec='%f'\n", tpl->prio, tpl->precedence, currentPrio, currentPrec);
-        /* According to xslt rec 5.5: First test precedence */
+        /* According to XSLT rec 5.5: First test precedence */
         if (tpl->precedence < currentPrec) break;
         if (tpl->precedence == currentPrec) {
             if (tpl->prio < currentPrio) break;
@@ -7225,7 +7225,7 @@ xsltResetState (
        preserved, therefor we don't touch excludeNS and extensionNS
        information */
     /* This loop works only as coded, because, the first subdoc will
-     * always be the primary xslt doc, so xs->subDocs will not
+     * always be the primary XSLT doc, so xs->subDocs will not
      * change. Crusty stuff, this code. */
     sd = xs->subDocs;
     while (sd)  {
@@ -7363,7 +7363,7 @@ xsltCompileStylesheet (
     
     node = xsltDoc->documentElement;
 
-    /* add the xslt doc to the doc list */
+    /* add the XSLT doc to the doc list */
     sdoc = (xsltSubDoc*)MALLOC(sizeof (xsltSubDoc));
     sdoc->doc = xsltDoc;
     baseURI = findBaseURI (xsltDoc->documentElement);

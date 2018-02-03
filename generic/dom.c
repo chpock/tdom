@@ -1316,7 +1316,7 @@ elemNSfound:
                                  atts[idatt+1],
                                  &hnew);
         /* if hnew isn't 1 this is a validation error. Hm, no clear way
-           to report this. And more, xslt and xpath can process not
+           to report this. And more, XSLT and XPath can process not
            valid XML, the spec mentioned this even within the context
            of id(). If some elements share the same ID, the first in
            document order should be used. Doing it this way, this is
@@ -2468,7 +2468,7 @@ domCreateDoc (
     doc->nslen          =  4;
     doc->namespaces     = (domNS**) MALLOC (sizeof (domNS*) * doc->nslen);
     
-    /* We malloc and initialze the baseURIs hash table here to avoid
+    /* We malloc and initialize the baseURIs hash table here to avoid
        cluttering of the code all over the place with checks. */
     doc->baseURIs = MALLOC (sizeof (Tcl_HashTable));
     Tcl_InitHashTable (doc->baseURIs, TCL_ONE_WORD_KEYS);
@@ -2917,7 +2917,7 @@ domFreeDocument (
     FREE (doc->baseURIs);
     
     /*-----------------------------------------------------------
-    | delete xpath cache hash table
+    | delete XPath cache hash table
     \-----------------------------------------------------------*/
     if (doc->xpathCache) {
         entryPtr = Tcl_FirstHashEntry (doc->xpathCache, &search);
@@ -5545,7 +5545,7 @@ TclTdomObjCmd (dummy, interp, objc, objv)
 
     case m_setExternalEntityResolver:
         if (objc != 4) {
-            Tcl_SetResult (interp, "You must name a tcl command as external entity resolver for setExternalEntityResolver.", NULL);
+            Tcl_SetResult (interp, "You must name a Tcl command as external entity resolver for setExternalEntityResolver.", NULL);
             return TCL_ERROR;
         }
         info = CHandlerSetGetUserData (interp, objv[1], "tdom");

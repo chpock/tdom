@@ -1,3 +1,9 @@
+2018-02-03  Rolf Ade  <rolf@pointsman.de>
+
+        In a bunch of spell fixes a few changes (partly even marginal,
+        e.g. during configuration) in error messages for uniformly
+        usage of names.
+
 2017-11-07  Rolf Ade  <rolf@pointsman.de>
 
         New flag -keepCDATA for [dom parse ...].

@@ -247,7 +247,7 @@ static int xpathEvalPredicate (ast steps, domNode *exprContext,
                                xpathCBs *cbs, int *docOrder, char **errMsg);
 
 /*----------------------------------------------------------------------------
-|   xpath result set functions
+|   XPath result set functions
 |
 \---------------------------------------------------------------------------*/
 
@@ -2488,7 +2488,7 @@ static double xpathStringToNumber (
          XPath doesn't allow this characters. Since this two
          characters are not legal XML characters, they can not be part
          of a DOM tree and therefor there isn't a problem with XPath
-         expressions on DOM trees or in XSLT. But on tcl level it's
+         expressions on DOM trees or in XSLT. But on Tcl level it's
          possible, to feed that characters literal into the XPath
          engine.
     */

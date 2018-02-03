@@ -393,7 +393,7 @@ MSG = ^
 !endif
 
 
-# If INSTALLDIR set to tcl installation root dir then reset to the
+# If INSTALLDIR set to Tcl installation root dir then reset to the
 # lib dir for installing extensions 
 !if exist("$(_INSTALLDIR)\include\tcl.h")
 _INSTALLDIR=$(_INSTALLDIR)\lib
@@ -731,7 +731,7 @@ TCL_USE_STATIC_PACKAGES	= 0
 !endif
 
 !if [nmakehlp -f $(OPTS) "nothreads"]
-!message *** Compile explicitly for non-threaded tcl
+!message *** Compile explicitly for non-threaded Tcl
 TCL_THREADS	= 0
 USE_THREAD_ALLOC= 0
 !else
@@ -1209,7 +1209,7 @@ RESFILE = $(TMP_DIR)\$(PROJECT).res
 # SCRIPT_INSTALL_DIR - where scripts should be installed
 # INCLUDE_INSTALL_DIR - where C include files should be installed
 # DEMO_INSTALL_DIR - where demos should be installed
-# PRJ_INSTALL_DIR - where package will be installed (not set for tcl and tk)
+# PRJ_INSTALL_DIR - where package will be installed (not set for Tcl and Tk)
 
 !if $(DOING_TCL) || $(DOING_TK)
 LIB_INSTALL_DIR		= $(_INSTALLDIR)\lib
@@ -1278,8 +1278,8 @@ OPTDEFINES	= $(OPTDEFINES) -DTCL_NO_DEPRECATED
 !endif
 
 !if $(USE_STUBS)
-# Note we do not define USE_TCL_STUBS even when building tk since some
-# test targets in tk do not use stubs
+# Note we do not define USE_TCL_STUBS even when building Tk since some
+# test targets in Tk do not use stubs
 !if ! $(DOING_TCL)
 USE_STUBS_DEFS  = -DUSE_TCL_STUBS -DUSE_TCLOO_STUBS
 !if $(NEED_TK)

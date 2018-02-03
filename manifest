@@ -1,8 +1,8 @@
-C One\sof\sthe\spreviously\schanged\sspellings\swas\sin\sfact\scorrect.\sChanged\sback.
-D 2018-02-01T12:08:26.719
+C More\sspell\sfixes\sand\sunification\sb
+D 2018-02-03T00:22:59.853
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
-F CHANGES 0a28f8f99b2d8e65476448113bad92f603dc97bf
+F CHANGES d938cf966d4e79c09ddf6818bdbc55cc05b3b9b6
 F ChangeLog 9b60ec8bfbae84e4f1a97aaee24be00ccea212b7
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in d75a5497674f790f32be0f83d9b101041233b00f
@@ -126,10 +126,10 @@ F extensions/tnc/tnc.c 26dbaeae9f8c085e78a4eefdeae16f06bd450cd6
 F extensions/tnc/win/makefile.vc b512d0f3eb67d83ace6f626d20b6ed8c895e609d
 F extensions/tnc/win/nmakehlp.c 194ae7c24886245c679cb4c9ea7e6daaaebb5fcd
 F extensions/tnc/win/rules-ext.vc e788fcfc1e69b11946e18b8f67e0870b3bd38913
-F extensions/tnc/win/rules.vc a27af1782e5718a0526ef0424434e8074786f614
+F extensions/tnc/win/rules.vc 8157e2a811cf5e93683d6b0fbf5d91d153aa4535
 F extensions/tnc/win/targets.vc 79dea1c6a94a94e6ed8bae9e0195149b25a69923
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
-F generic/dom.c 5228c21f94d7734bb30353bbeaa0d5b9ade9007e
+F generic/dom.c 8940bfa290dd68186268e4b3b5adfe35a0edb0a2
 F generic/dom.h ea32034888b1f4601951bbd458ab1d8b0e44695d
 F generic/domalloc.c 55e9eeff19cc54cf3956a7013883ead07efd3593
 F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
@@ -140,22 +140,22 @@ F generic/domhtml5.h 5cca562a556e7662f2dce222640c32abb2777146
 F generic/domjson.c 26a4f6a4edeb73762c90c0284e322b9f56183577
 F generic/domjson.h b10c42af9ef7fc9d0ad4fac733ef6461df0cdd90
 F generic/domlock.c b9543b7f1066118a5bcd0d2fa30acda6d247f15a
-F generic/domxpath.c c78b0039f4f8f0ed0c1e301d1044fdae55e837da
+F generic/domxpath.c 5909056177499235be080b241de6919497a5c9a2
 F generic/domxpath.h 5ad44674855106484d4cac1380349787bc33ff50
-F generic/domxslt.c cb364e4409e354c39030e1406b819de80d98003e
+F generic/domxslt.c f96e388c4b5ede2be37d6612e6eba3bbb9b16084
 F generic/domxslt.h c068da9c518ad5e2a543874c18166065f0bf2bbc
 F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 4637664667d7d458eab2081dc694e0c0f4c55223
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
-F generic/tcldom.c 6c97ea1685d8e789fa8b3350836f7bda914f004f
+F generic/tcldom.c 513efff14e048c25e50a1919c70ffd484473cc79
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
 F generic/tclexpat.c 23f0eb96338b07a99ebe06d813b402b87ee0a05c
 F generic/tclexpat.h f70ed259e4c81333df48f6b13e995d1dacb27586
 F generic/tdom.decls d825af72ec3fd2ae4ebb1d7f883bde6e3613c914
 F generic/tdom.h d27e43748242d5fe7dd98b8c7aa4a5a891d015bf
 F generic/tdomDecls.h dd20e4afe55f21c8a845bc593806fa2d606b18eb
-F generic/tdomStubInit.c fa037218373f882436fe5b3779bac64ec84f1fba
+F generic/tdomStubInit.c d913ba0420b8614788043f63e5df9c3b9ae69dfc
 F generic/tdomStubLib.c 669854629a698ec7d3f15c10edae36569cf43fc3
 F generic/tdominit.c fc4e5f13d29a419304451679b7f79fbe228a45f2
 F generic/utf8conv.c 8d58daa846a0b715df1736720cf9031e924988f2
@@ -229,15 +229,15 @@ F win/mkd.bat 85d3fe58ce051a778447fb2bfc7384867d21cef0
 F win/nmakehlp.c 194ae7c24886245c679cb4c9ea7e6daaaebb5fcd
 F win/pkgIndex.tcl 4631218a784aae412d2a6bcadc72619eb14b264a
 F win/rules-ext.vc e788fcfc1e69b11946e18b8f67e0870b3bd38913
-F win/rules.vc a27af1782e5718a0526ef0424434e8074786f614
+F win/rules.vc 8157e2a811cf5e93683d6b0fbf5d91d153aa4535
 F win/targets.vc 79dea1c6a94a94e6ed8bae9e0195149b25a69923
 F win/tdom.rc 1463128845bffe1fdf24ab99f562727830855516
 F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 4897033c1bc237c925641df5a94d5eb72a3d24f8
-R a503f448c5b30f66e0de66c1afd7eb21
+P d869524b7002c3d5e4787d83b85f61e9ddd72369
+R bfb4050a32aaed53f61b0ddefd3d35c7
 U rolf
-Z 20c240e95ff5cd351ad56b1b02f29dcd
+Z f4ab1ee79eb0b30ba5bcd127938698f1
 # Remove this line to create a well-formed Fossil manifest.
