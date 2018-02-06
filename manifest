@@ -1,5 +1,5 @@
-C More\sspell\sfixes\sand\sunification\sb
-D 2018-02-03T00:22:59.853
+C Spell\sfix.
+D 2018-02-06T22:00:57.618
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F CHANGES d938cf966d4e79c09ddf6818bdbc55cc05b3b9b6
@@ -17,9 +17,9 @@ F configure.in d6788a4cb3fe918f78e06fc3b1333854b86c37a7
 F doc/INDEX.MAP c8e767983bcea4bbd53ecdbf3d78cb044996e9bc
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html 98092b3a6d0fa7ade2cd5715b56ea0a6fef89be1
-F doc/dom.html 215515736a2e71f82b7873dc503986b459acee6d
-F doc/dom.n 61e11c3e8c4b015e56c4977de1e2864b6a46420a
-F doc/dom.xml 2216af46431c1fac6dfa106c89ae41bec8ae26f3
+F doc/dom.html 146b30616d600ade9140cd179875db289f4da710
+F doc/dom.n b156819becfd00aa55e38f8bce945df7b9894198
+F doc/dom.xml df1f4ad1000eaff4c9c8dec8b1fdbe2f836401d5
 F doc/domDoc.html a5e74983986419cedac0ab7872d3294b3e553f8d
 F doc/domDoc.n 8bb70588d0d32353951d742b4be0aa343890aa59
 F doc/domDoc.xml 73d66d8a3879eb7aa7fca41a0195246e2f2ddb8c
@@ -236,8 +236,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P d869524b7002c3d5e4787d83b85f61e9ddd72369
-R bfb4050a32aaed53f61b0ddefd3d35c7
+P de204a84e63ffc3a36c8d05479bca141e8111dbf
+R 7f26cd532e1a7ebcfd9db82742d0211a
 U rolf
-Z f4ab1ee79eb0b30ba5bcd127938698f1
+Z 16ad9fb7797e37be02e6027176be46f6
 # Remove this line to create a well-formed Fossil manifest.

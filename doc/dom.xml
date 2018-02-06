@@ -135,7 +135,7 @@ used, which tries to even parse badly formed HTML into a DOM tree.</desc>
               <optdef>
                 <optname>-jsonmaxnesting</optname>
                 <optarg>integer</optarg>
-                <desc>This options only has effect if used together
+                <desc>This option only has effect if used together
                 with the <m>-json</m> option. The current implementation uses recursive descent JSON parser. In order to avoid using excess stack space, any JSON input that has more than a certain levels of nesting is considered invalid. The default maximum nesting is 2000. The option -jsonmaxnesting allows the user to adjust that.</desc>
               </optdef>
               

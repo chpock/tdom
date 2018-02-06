@@ -284,7 +284,7 @@ node names and the text node values within the tree
 may be outside of what the appropriate XML productions
 allow.
 .IP "\fB-jsonmaxnesting  \fIinteger\fP\fR"
-This options only has effect if used together
+This option only has effect if used together
 with the \fI-json\fR option. The current implementation uses recursive descent JSON parser. In order to avoid using excess stack space, any JSON input that has more than a certain levels of nesting is considered invalid. The default maximum nesting is 2000. The option -jsonmaxnesting allows the user to adjust that.
 .IP "\fB--\fR"
 The option \fI--\fR marks the end of options.
