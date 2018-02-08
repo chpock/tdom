@@ -1,5 +1,5 @@
-C Spell\sfix.
-D 2018-02-06T22:00:57.618
+C Adusted\stest\ssuite\saccording\sname\sunification.
+D 2018-02-08T00:35:47.946
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F CHANGES d938cf966d4e79c09ddf6818bdbc55cc05b3b9b6
@@ -217,7 +217,7 @@ F tests/tdomcmd.test 092401adf0609906d710f3ef8997cb4ca29bc208
 F tests/xmlsimple.test a5c577be330f0254d9d7c4bee2c030acd28e703b
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.bench 99e98467544b11bf625e6f72b2fb89c7516bfced
-F tests/xpath.test 89e6c4c9fd75378bb93e51a26d5de2b33ca54789
+F tests/xpath.test 73e21d99d99dd2180979941b89e60247d4e31af6
 F tests/xslt.test 298d472aa69b5159560b52a7a78460693c0e12dd
 F unix/CONFIG 63b556af9314ca6bd1abea70f3b3a34a433b342f
 F unix/tclAppInit.c a1655c51127aed18d069010f234a378fceacb2a6
@@ -236,8 +236,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P de204a84e63ffc3a36c8d05479bca141e8111dbf
-R 7f26cd532e1a7ebcfd9db82742d0211a
+P db949eaaba071a2f241c597658c1271b93fffb6f
+R 94b895e48e9c940888ebb305216743cd
 U rolf
-Z 16ad9fb7797e37be02e6027176be46f6
+Z 537cd8cb51074ee5083cea22b27067b5
 # Remove this line to create a well-formed Fossil manifest.

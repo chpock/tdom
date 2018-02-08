@@ -340,7 +340,7 @@ test xpath-4.5 {tcl coded additional XPath function} {
 test xpath-4.6 {tcl coded additional XPath function - error reported} {
     catch {$root selectNodes {mycontains(., 'bo', 'ba')}} errMsg
     set errMsg
-} {Tcl error while executing XPATH extension function 'mycontains':
+} {Tcl error while executing XPath extension function 'mycontains':
 mycontains(): wrong # of args!}
 
 proc ::dom::xpathFunc::wrongreturn {ctxNode pos nodeListNode nodeList args} {
@@ -350,7 +350,7 @@ proc ::dom::xpathFunc::wrongreturn {ctxNode pos nodeListNode nodeList args} {
 test xpath-4.7 {tcl coded additional XPath function - unknown return type} {
     catch {$root selectNodes {wrongreturn('foo')}} errMsg
     set errMsg
-} {Unknown type of return value "footype" from tcl coded XPath function "wrongreturn"!}
+} {Unknown type of return value "footype" from Tcl coded XPath function "wrongreturn"!}
 
 proc ::dom::xpathFunc::returnnumber {ctxNode pos nodeListNode nodeList args} {
     return [list number "42"]
@@ -482,7 +482,7 @@ proc ::dom::xpathFunc::errorStack {ctxNode pos nodeListNode nodeList args} {
 test xpath-4.18 {error stack in tcl coded additional XPath function} {
     set result [catch {$root selectNodes errorStack()} errMsg]
     lappend result $errMsg
-} {1 {Tcl error while executing XPATH extension function 'errorStack':
+} {1 {Tcl error while executing XPath extension function 'errorStack':
 Some error}}
 
 proc ::dom::xpathFunc::stringReturn {args} {return x}
