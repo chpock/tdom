@@ -1,7 +1,8 @@
-C Adusted\stest\ssuite\saccording\sname\sunification.
-D 2018-02-08T00:35:47.946
+C Enable\smanifest\son\scloned\srepositories.
+D 2018-02-08T12:40:06.986
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
+F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
 F CHANGES d938cf966d4e79c09ddf6818bdbc55cc05b3b9b6
 F ChangeLog 9b60ec8bfbae84e4f1a97aaee24be00ccea212b7
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
@@ -236,8 +237,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P db949eaaba071a2f241c597658c1271b93fffb6f
-R 94b895e48e9c940888ebb305216743cd
+P 1d140ee6a9df73e42c357043fec17ebdb83cb5ae
+R 45ac8feb6c30ac8f08db8c497b781e26
 U rolf
-Z 537cd8cb51074ee5083cea22b27067b5
+Z d71987e985c6be6e291f9dddb9a54b84
 # Remove this line to create a well-formed Fossil manifest.
