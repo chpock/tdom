@@ -1750,6 +1750,10 @@ test dom-11.5 {featureinfo - jsonmaxnesting} {
     dom featureinfo jsonmaxnesting
 } 2000
 
+test dom-11.6 {featureinfo - versionhash} {
+    regexp {^[0-9a-fA-F]{40}$} [dom featureinfo versionhash]
+} 1
+
 proc ::dom::domParseFeedback {} {
     return -code break
 }
