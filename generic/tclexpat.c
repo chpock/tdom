@@ -47,7 +47,7 @@
 #endif
 
 /* Used internal als status, like TCL_OK, TCL_ERROR etc.  As a
-   consequent, application specific error codes must be at least
+   consequence, application specific error codes must be at least
    greater than 5 */
 #define ERROR_IN_EXTREFHANDLER 5
 
