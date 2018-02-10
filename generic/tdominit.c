@@ -42,6 +42,7 @@
 #include <dom.h>
 #include <tdom.h>
 #include <tcldom.h>
+#include <tclpull.h>
 
 extern TdomStubs tdomStubs;
 
@@ -89,6 +90,10 @@ Tdom_Init (interp)
 #ifndef TDOM_NO_EXPAT    
     Tcl_CreateObjCommand(interp, "expat",       TclExpatObjCmd, NULL, NULL );
     Tcl_CreateObjCommand(interp, "xml::parser", TclExpatObjCmd, NULL, NULL );
+#endif
+
+#ifndef TDOM_NO_PULL
+    Tcl_CreateObjCommand(interp, "tDOM::pullparser", tDOM_PullParserCmd, NULL, NULL );    
 #endif
     
 #ifdef USE_TCL_STUBS

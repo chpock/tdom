@@ -1,5 +1,5 @@
-C Spell\sfix.
-D 2018-02-09T11:17:15.178
+C Started\sa\spull\sAPI\sexperiment\s/\sdigression.
+D 2018-02-10T02:37:13.407
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -12,9 +12,9 @@ F README a097b51b559f421a68a12d2901766a0bf2520b19
 F README.AOL d076b065f6a3209b5374a63c9ddd7fbca167643e
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/xslt.tcl ac4a75ba2f05e26d4ea6f92547983caa80fc6d55
-F configure c67c8f7586dd54719b8c3e943847277eeeb932d5 x
+F configure 84d4a7acedeb6eccc8569f9a6cedd870e778dfe3 x
 F configure-tcl8.0.5 db1a666545d519c42e229d245224d456a84c798a x
-F configure.in d6788a4cb3fe918f78e06fc3b1333854b86c37a7
+F configure.in a8e57ac7b420b7cff1eef7dc52f50eb127bee6c2
 F doc/INDEX.MAP c8e767983bcea4bbd53ecdbf3d78cb044996e9bc
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html 98092b3a6d0fa7ade2cd5715b56ea0a6fef89be1
@@ -153,12 +153,14 @@ F generic/tcldom.c 513efff14e048c25e50a1919c70ffd484473cc79
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
 F generic/tclexpat.c 6d91b063777fe13c175cb80c97ed6cdddb68e2ba
 F generic/tclexpat.h f70ed259e4c81333df48f6b13e995d1dacb27586
+F generic/tclpull.c 397a11b686c75de894ee6eb8a5e1d83736ab842d
+F generic/tclpull.h d0d2599fa133de4ab038a260b4cfbd04f01c1312
 F generic/tdom.decls d825af72ec3fd2ae4ebb1d7f883bde6e3613c914
 F generic/tdom.h d27e43748242d5fe7dd98b8c7aa4a5a891d015bf
 F generic/tdomDecls.h dd20e4afe55f21c8a845bc593806fa2d606b18eb
 F generic/tdomStubInit.c d913ba0420b8614788043f63e5df9c3b9ae69dfc
 F generic/tdomStubLib.c 669854629a698ec7d3f15c10edae36569cf43fc3
-F generic/tdominit.c fc4e5f13d29a419304451679b7f79fbe228a45f2
+F generic/tdominit.c 10f385c55e66abd1db972c638b062085d4659069
 F generic/utf8conv.c 8d58daa846a0b715df1736720cf9031e924988f2
 F generic/utf8conv.h 4132db4e05ac30dcb78dc3b4799ae0a9ae8a057f
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
@@ -237,8 +239,11 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ba1f8c48638d888dc720167e44b7825445cac416
-R 2ab659ab4202c64c120a1bc9dff99438
+P 661363f3183616fc215559c5443c68fe11420911
+R 64172cd3788cafd02bb83e5172136246
+T *branch * pullAPI
+T *sym-pullAPI *
+T -sym-trunk *
 U rolf
-Z 734d28233a167d42f6c6a0eb4e913c2f
+Z 078fe614ac93acf68f57b7123664b7a5
 # Remove this line to create a well-formed Fossil manifest.
