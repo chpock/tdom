@@ -21,6 +21,8 @@ typedef struct tDOM_PullParserInfo
     int             inputfd;
     PullParserState state;
     Tcl_DString    *cdata;
+    const char     *elmname;
+    const char    **atts;
 } tDOM_PullParserInfo;
 
 #define SetResult(str) Tcl_ResetResult(interp); \
@@ -35,6 +37,10 @@ startElement(
 {
     tDOM_PullParserInfo *pullInfo = userData;
 
+    pullInfo->elmname = name;
+    pullInfo->atts = atts;
+    pullInfo->state = PULLPARSERSTATE_START_TAG;
+    XML_StopParser(pullInfo->parser, 1);
 }
 
 static void
@@ -45,6 +51,7 @@ endElement (
 {
     tDOM_PullParserInfo *pullInfo = userData;
 
+    
 }
 
 static void
@@ -80,15 +87,18 @@ tDOM_PullParserInstanceCmd (
     tDOM_PullParserInfo *pullInfo = clientdata;
     int methodIndex, len, result, status;
     char *data, s[255];
+    const char **atts;
+    Tcl_Obj *resultPtr;
     
     static const char *const methods[] = {
         "input", "inputchannel", "inputfile",
-        "next", "state", NULL
+        "next", "state", "tag", "attributes",
+        NULL
     };
 
     enum method {
         m_input, m_inputchannel, m_inputfile,
-        m_next, m_state
+        m_next, m_state, m_tag, m_attributes
     };
 
     if (objc == 1) {
@@ -101,6 +111,7 @@ tDOM_PullParserInstanceCmd (
         return TCL_ERROR;
     }
     switch ((enum method) methodIndex) {
+
     case m_input:
         if (objc != 3) {
             Tcl_WrongNumArgs (interp, 2, objv, "<xml>");
@@ -110,10 +121,13 @@ tDOM_PullParserInstanceCmd (
         pullInfo->inputString = objv[2];
         pullInfo->state = PULLPARSERSTATE_START_DOKUMENT;
         break;
+
     case m_inputchannel:
         break;
+
     case m_inputfile:
         break;
+
     case m_next:
         switch (pullInfo->state) {
         case PULLPARSERSTATE_READY:
@@ -133,9 +147,15 @@ tDOM_PullParserInstanceCmd (
             }
             switch (result) {
             case XML_STATUS_OK:
+                if (pullInfo->inputString) {
+                    Tcl_DecrRefCount (pullInfo->inputString);
+                }
                 pullInfo->state = PULLPARSERSTATE_END_DOKUMENT;
                 break;
             case XML_STATUS_ERROR:
+                if (pullInfo->inputString) {
+                    Tcl_DecrRefCount (pullInfo->inputString);
+                }
                 sprintf(s, "%ld", XML_GetCurrentLineNumber(pullInfo->parser));
                 Tcl_AppendResult(interp, "error \"",
                                  XML_ErrorString(
@@ -152,6 +172,30 @@ tDOM_PullParserInstanceCmd (
             break;
         default:
             status = XML_ResumeParser (pullInfo->parser);
+            switch (status) {
+            case XML_STATUS_OK:
+                if (pullInfo->inputString) {
+                    Tcl_DecrRefCount (pullInfo->inputString);
+                }
+                pullInfo->state = PULLPARSERSTATE_END_DOKUMENT;
+                break;
+            case XML_STATUS_ERROR:
+                if (pullInfo->inputString) {
+                    Tcl_DecrRefCount (pullInfo->inputString);
+                }
+                sprintf(s, "%ld", XML_GetCurrentLineNumber(pullInfo->parser));
+                Tcl_AppendResult(interp, "error \"",
+                                 XML_ErrorString(
+                                     XML_GetErrorCode(pullInfo->parser)),
+                                 "\" at line ", s, " character ", NULL);
+                sprintf(s, "%ld", XML_GetCurrentColumnNumber(pullInfo->parser));
+                Tcl_AppendResult(interp, s, NULL);
+                return TCL_ERROR;
+            case XML_STATUS_SUSPENDED:
+                /* Nothing to do here, state was set in handler, just
+                 * take care to report */
+                break;
+            }
         }
         /* Fall throu to reporting state */
     case m_state:
@@ -175,6 +219,28 @@ tDOM_PullParserInstanceCmd (
             SetResult("TEXT");
             break;
         }
+        break;
+
+    case m_tag:
+        if (pullInfo->state != PULLPARSERSTATE_START_TAG) {
+            return TCL_ERROR;
+        }
+        SetResult(pullInfo->elmname);
+        break;
+
+    case m_attributes:
+        if (pullInfo->state != PULLPARSERSTATE_START_TAG) {
+            return TCL_ERROR;
+        }
+        Tcl_ResetResult(interp);
+        resultPtr = Tcl_GetObjResult(interp);
+        atts = pullInfo->atts;
+        while (atts != NULL) {
+            Tcl_ListObjAppendElement (interp, resultPtr,
+                                      Tcl_NewStringObj(atts[0], -1));
+            atts++;
+        }
+        break;
     }
 
     return TCL_OK;
@@ -200,6 +266,7 @@ tDOM_PullParserCmd (
     memset (pullInfo, 0, sizeof (tDOM_PullParserInfo));
 
     pullInfo->parser = XML_ParserCreate_MM(NULL, MEM_SUITE, NULL);
+    XML_SetUserData (pullInfo->parser, pullInfo);
     XML_SetElementHandler (pullInfo->parser, startElement, endElement);
     XML_SetCharacterDataHandler (pullInfo->parser, characterDataHandler);
     pullInfo->interp = interp;

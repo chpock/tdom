@@ -1,5 +1,5 @@
-C Save\swork,\sstill\swip
-D 2018-02-12T02:19:35.628
+C More\swork.
+D 2018-02-13T01:20:27.746
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -153,7 +153,7 @@ F generic/tcldom.c 513efff14e048c25e50a1919c70ffd484473cc79
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
 F generic/tclexpat.c 6d91b063777fe13c175cb80c97ed6cdddb68e2ba
 F generic/tclexpat.h f70ed259e4c81333df48f6b13e995d1dacb27586
-F generic/tclpull.c 0c5e0bf82d180d59c8bc044d2d0b945864d7f7ea
+F generic/tclpull.c 62a4ad494ba59a7b20f0bd46ec19aae5ed1a1989
 F generic/tclpull.h d0d2599fa133de4ab038a260b4cfbd04f01c1312
 F generic/tdom.decls d825af72ec3fd2ae4ebb1d7f883bde6e3613c914
 F generic/tdom.h d27e43748242d5fe7dd98b8c7aa4a5a891d015bf
@@ -239,8 +239,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 1cfd25c1cc151fd9551b55c0f1f5d880c02c5574
-R 58db611cdcb87e366addf7244fa7cbaf
+P efd441e644cedcd9a32633fdd0d3f37542037607
+R 57b3447602ff07176ffe4d482ce94e27
 U rolf
-Z da4fc533f08cf590aae0c580cc0276bd
+Z 881747081598e503268e39bc65e663e9
 # Remove this line to create a well-formed Fossil manifest.
