@@ -1,5 +1,5 @@
-C Added\sversionhash\sto\sdom\sfeatureinfo,\sreturning\sthe\sfossil\srepository\shash\sof\sthe\sversion\stDOM\swas\sbuild\sfrom.\sA\smechanism\sto\sbuild\sversionhash.h\son\swindows\sis\sto\sbe\sdone.
-D 2018-02-08T22:13:26.372
+C Add\sversionhash.h\smechanism\sto\sWindows\snmake\sbuilds
+D 2018-02-13T06:05:12.250
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -224,24 +224,21 @@ F unix/CONFIG 63b556af9314ca6bd1abea70f3b3a34a433b342f
 F unix/tclAppInit.c a1655c51127aed18d069010f234a378fceacb2a6
 F win/README 73916fb24a4ac0cc509dd9e225f191943b061292
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F win/makefile.vc b6b0dae0f749b54dff5b182c15556b1f11177368
+F win/makefile.vc bc5ce0104c7f1bade1d30bfe7b8f5fa4a2234b08
 F win/makefile805.vc da2003745caf522d88f27fcebadd916c1d5c042d
 F win/mkd.bat 85d3fe58ce051a778447fb2bfc7384867d21cef0
 F win/nmakehlp.c 194ae7c24886245c679cb4c9ea7e6daaaebb5fcd
 F win/pkgIndex.tcl 4631218a784aae412d2a6bcadc72619eb14b264a
 F win/rules-ext.vc e788fcfc1e69b11946e18b8f67e0870b3bd38913
-F win/rules.vc 8157e2a811cf5e93683d6b0fbf5d91d153aa4535
+F win/rules.vc 996a623bd2ea3dc2fac239a1b845ca51695c8012
 F win/targets.vc 79dea1c6a94a94e6ed8bae9e0195149b25a69923
 F win/tdom.rc 1463128845bffe1fdf24ab99f562727830855516
 F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ba1f8c48638d888dc720167e44b7825445cac416
-R 2911f03f11b07d54e272dbfe1d753111
-T *branch * versionhash
-T *sym-versionhash *
-T -sym-trunk *
-U rolf
-Z ede644d4431a50402ed372dc85bc053d
+P 593846006866f6a172df268305098fb0072d0da5
+R 68166033beacbd07821092b24e146431
+U apnadkarni
+Z b060b6487a55c32805b66e4c31b5462b
 # Remove this line to create a well-formed Fossil manifest.
