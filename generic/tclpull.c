@@ -15,11 +15,11 @@ typedef struct tDOM_PullParserInfo
 {
     XML_Parser      parser;
     Tcl_Interp     *interp;
-    Tcl_Obj        *name;
     Tcl_Obj        *inputString;
     Tcl_Channel    *inputChannel;
     int             inputfd;
     PullParserState state;
+    PullParserState nextState;
     Tcl_DString    *cdata;
     const char     *elmname;
     const char    **atts;
@@ -37,9 +37,15 @@ startElement(
 {
     tDOM_PullParserInfo *pullInfo = userData;
 
+    if (Tcl_DStringLength (pullInfo->cdata) > 0) {
+        pullInfo->state = PULLPARSERSTATE_TEXT;
+        pullInfo->nextState = PULLPARSERSTATE_START_TAG;
+    } else {
+        pullInfo->state = PULLPARSERSTATE_START_TAG;
+    }
     pullInfo->elmname = name;
     pullInfo->atts = atts;
-    pullInfo->state = PULLPARSERSTATE_START_TAG;
+
     XML_StopParser(pullInfo->parser, 1);
 }
 
@@ -51,7 +57,14 @@ endElement (
 {
     tDOM_PullParserInfo *pullInfo = userData;
 
-    
+    if (Tcl_DStringLength (pullInfo->cdata) > 0) {
+        pullInfo->state = PULLPARSERSTATE_TEXT;
+        pullInfo->nextState = PULLPARSERSTATE_END_TAG;
+    } else {
+        pullInfo->state = PULLPARSERSTATE_END_TAG;
+    }
+    pullInfo->elmname = name;
+    XML_StopParser(pullInfo->parser, 1);
 }
 
 static void
@@ -73,6 +86,12 @@ tDOM_PullParserDeleteCmd (
 {
     tDOM_PullParserInfo *pullInfo = clientdata;
 
+    XML_ParserFree (pullInfo->parser);
+    if (pullInfo->inputString) {
+        Tcl_DecrRefCount (pullInfo->inputString);
+    }
+    Tcl_DStringFree (pullInfo->cdata);
+    FREE (pullInfo->cdata);
     FREE (pullInfo);
 }
 
@@ -93,22 +112,23 @@ tDOM_PullParserInstanceCmd (
     static const char *const methods[] = {
         "input", "inputchannel", "inputfile",
         "next", "state", "tag", "attributes",
-        NULL
+        "text", "delete", NULL
     };
 
     enum method {
         m_input, m_inputchannel, m_inputfile,
-        m_next, m_state, m_tag, m_attributes
+        m_next, m_state, m_tag, m_attributes,
+        m_text, m_delete
     };
 
     if (objc == 1) {
         /* Default method call is next */
-
-    }
-
-    if (Tcl_GetIndexFromObj (interp, objv[1], methods, "method", 0,
-                             &methodIndex) != TCL_OK) {
-        return TCL_ERROR;
+        methodIndex = m_next;
+    } else {
+        if (Tcl_GetIndexFromObj (interp, objv[1], methods, "method", 0,
+                                 &methodIndex) != TCL_OK) {
+            return TCL_ERROR;
+        }
     }
     switch ((enum method) methodIndex) {
 
@@ -136,6 +156,15 @@ tDOM_PullParserInstanceCmd (
         case PULLPARSERSTATE_END_DOKUMENT:
             SetResult ("No next event after END_DOKUMENT");
             return TCL_ERROR;
+        case PULLPARSERSTATE_TEXT:
+            if (pullInfo->nextState == PULLPARSERSTATE_START_TAG) {
+                SetResult ("START_TAG");
+            } else {
+                SetResult ("END_TAG");
+            }
+            Tcl_DStringSetLength (pullInfo->cdata, 0);
+            pullInfo->state = pullInfo->nextState;
+            return TCL_OK;
         case PULLPARSERSTATE_START_DOKUMENT:
             if (pullInfo->inputfd) {
                 
@@ -149,13 +178,16 @@ tDOM_PullParserInstanceCmd (
             case XML_STATUS_OK:
                 if (pullInfo->inputString) {
                     Tcl_DecrRefCount (pullInfo->inputString);
+                    pullInfo->inputString = NULL;
                 }
                 pullInfo->state = PULLPARSERSTATE_END_DOKUMENT;
                 break;
             case XML_STATUS_ERROR:
                 if (pullInfo->inputString) {
                     Tcl_DecrRefCount (pullInfo->inputString);
+                    pullInfo->inputString = NULL;
                 }
+                Tcl_ResetResult (interp);
                 sprintf(s, "%ld", XML_GetCurrentLineNumber(pullInfo->parser));
                 Tcl_AppendResult(interp, "error \"",
                                  XML_ErrorString(
@@ -176,12 +208,14 @@ tDOM_PullParserInstanceCmd (
             case XML_STATUS_OK:
                 if (pullInfo->inputString) {
                     Tcl_DecrRefCount (pullInfo->inputString);
+                    pullInfo->inputString = NULL;
                 }
                 pullInfo->state = PULLPARSERSTATE_END_DOKUMENT;
                 break;
             case XML_STATUS_ERROR:
                 if (pullInfo->inputString) {
                     Tcl_DecrRefCount (pullInfo->inputString);
+                    pullInfo->inputString = NULL;
                 }
                 sprintf(s, "%ld", XML_GetCurrentLineNumber(pullInfo->parser));
                 Tcl_AppendResult(interp, "error \"",
@@ -222,7 +256,9 @@ tDOM_PullParserInstanceCmd (
         break;
 
     case m_tag:
-        if (pullInfo->state != PULLPARSERSTATE_START_TAG) {
+        if (pullInfo->state != PULLPARSERSTATE_START_TAG
+            && pullInfo->state != PULLPARSERSTATE_END_TAG) {
+            SetResult("Invalid state");
             return TCL_ERROR;
         }
         SetResult(pullInfo->elmname);
@@ -240,6 +276,19 @@ tDOM_PullParserInstanceCmd (
                                       Tcl_NewStringObj(atts[0], -1));
             atts++;
         }
+        break;
+
+    case m_text:
+        Tcl_ResetResult (interp);
+        Tcl_SetStringObj (
+            Tcl_GetObjResult (interp),
+            Tcl_DStringValue (pullInfo->cdata),
+            Tcl_DStringLength (pullInfo->cdata)
+            );
+        break;
+        
+    case m_delete:
+        Tcl_DeleteCommand (interp, Tcl_GetString (objv[0]));
         break;
     }
 
@@ -270,15 +319,14 @@ tDOM_PullParserCmd (
     XML_SetElementHandler (pullInfo->parser, startElement, endElement);
     XML_SetCharacterDataHandler (pullInfo->parser, characterDataHandler);
     pullInfo->interp = interp;
-    pullInfo->name = objv[1];
     pullInfo->cdata = (Tcl_DString*) MALLOC (sizeof (Tcl_DString));
     Tcl_DStringInit (pullInfo->cdata);
     pullInfo->state = PULLPARSERSTATE_READY;
 
-    Tcl_CreateObjCommand (interp, Tcl_GetString(pullInfo->name),
+    Tcl_CreateObjCommand (interp, Tcl_GetString(objv[1]),
                           tDOM_PullParserInstanceCmd, (ClientData) pullInfo,
                           tDOM_PullParserDeleteCmd);
-    Tcl_SetObjResult(interp, pullInfo->name);
+    Tcl_SetObjResult(interp, objv[1]);
     return TCL_OK;
 }
 
