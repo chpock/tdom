@@ -235,7 +235,7 @@ tDOM_PullParserInstanceCmd (
         Tcl_ResetResult(interp);
         resultPtr = Tcl_GetObjResult(interp);
         atts = pullInfo->atts;
-        while (atts != NULL) {
+        while (atts[0] != NULL) {
             Tcl_ListObjAppendElement (interp, resultPtr,
                                       Tcl_NewStringObj(atts[0], -1));
             atts++;
