@@ -1,3 +1,8 @@
+2018-02-14  Rolf Ade  <rolf@pointsman.de>
+
+        Added [dom featureinfo versionhash], which returns the fossil
+        repository version hash of the sources build from.
+        
 2018-02-03  Rolf Ade  <rolf@pointsman.de>
 
         In a bunch of spell fixes a few changes (partly even marginal,

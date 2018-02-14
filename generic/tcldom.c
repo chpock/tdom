@@ -54,6 +54,7 @@
 #include <domhtml5.h>
 #include <nodecmd.h>
 #include <tcldom.h>
+#include <versionhash.h>
 
 /* #define DEBUG */
 /*----------------------------------------------------------------------------
@@ -6644,14 +6645,14 @@ int tcldom_featureinfo (
         "expatversion",      "expatmajorversion",  "expatminorversion",
         "expatmicroversion", "dtd",                "ns",
         "unknown",           "tdomalloc",          "lessns",
-        "html5",             "jsonmaxnesting",
+        "html5",             "jsonmaxnesting",     "versionhash",
         "TCL_UTF_MAX",        NULL
     };
     enum feature {
         o_expatversion,      o_expatmajorversion,  o_expatminorversion,
         o_expatmicroversion, o_dtd,                o_ns,
         o_unknown,           o_tdomalloc,          o_lessns,
-        o_html5,             o_jsonmaxnesting,
+        o_html5,             o_jsonmaxnesting,     o_versionhash,
         o_TCL_UTF_MAX
     };
 
@@ -6723,6 +6724,10 @@ int tcldom_featureinfo (
         break;
     case o_jsonmaxnesting:
         SetIntResult(JSON_MAX_NESTING);
+        break;
+
+    case o_versionhash:
+        SetResult(FOSSIL_HASH);
         break;
         
     case o_TCL_UTF_MAX:

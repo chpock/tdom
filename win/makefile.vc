@@ -15,6 +15,12 @@
 
 PROJECT = tdom
 PRJ_RCFILE = tdom.rc
+!if [echo VERSIONHASH = \> nmakehlp.out] \
+   || [type ..\manifest.uuid >> nmakehlp.out]
+!error *** Could not retrieve VERSIONHASH.
+!endif
+!include nmakehlp.out
+
 !include "rules-ext.vc"
 
 EXPATDIR = ..\expat
@@ -51,7 +57,7 @@ PRJ_DEFINES = \
 # define WIN32 ourselves
 PRJ_DEFINES = $(PRJ_DEFINES) -DWIN32
 
-PRJ_INCLUDES	= -I"$(EXPATDIR)"
+PRJ_INCLUDES	= -I"$(EXPATDIR)" -I"$(TMP_DIR)"
 
 !if "$(GUMBODIR)" != ""
 
@@ -67,6 +73,10 @@ baselibs = $(baselibs) "$(GUMBODIR)\visualc\Win32\Release\gumbo.lib"
 !endif # GUMBODIR
 
 !include "$(_RULESDIR)\targets.vc"
+
+$(TMP_DIR)\tcldom.obj: $(TMP_DIR)\versionhash.h
+$(TMP_DIR)\versionhash.h: $(ROOT)\manifest.uuid
+	echo #define FOSSIL_HASH "$(VERSIONHASH)" > $(TMP_DIR)\versionhash.h
 
 install:    default-install-docs-html default-install-stubs
 
