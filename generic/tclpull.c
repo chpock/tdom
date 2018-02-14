@@ -3,8 +3,8 @@
 
 typedef enum {
     PULLPARSERSTATE_READY,
-    PULLPARSERSTATE_START_DOKUMENT,
-    PULLPARSERSTATE_END_DOKUMENT,
+    PULLPARSERSTATE_START_DOCUMENT,
+    PULLPARSERSTATE_END_DOCUMENT,
     PULLPARSERSTATE_START_TAG,
     PULLPARSERSTATE_END_TAG,
     PULLPARSERSTATE_TEXT
@@ -56,12 +56,19 @@ endElement (
 )
 {
     tDOM_PullParserInfo *pullInfo = userData;
-
+    XML_ParsingStatus status;
+    
     if (Tcl_DStringLength (pullInfo->cdata) > 0) {
         pullInfo->state = PULLPARSERSTATE_TEXT;
         pullInfo->nextState = PULLPARSERSTATE_END_TAG;
     } else {
-        pullInfo->state = PULLPARSERSTATE_END_TAG;
+        XML_GetParsingStatus (pullInfo->parser, &status);
+        if (status.parsing == XML_SUSPENDED) {
+            pullInfo->state = PULLPARSERSTATE_START_TAG;
+            pullInfo->nextState = PULLPARSERSTATE_END_TAG;
+        } else {
+            pullInfo->state = PULLPARSERSTATE_END_TAG;
+        }
     }
     pullInfo->elmname = name;
     XML_StopParser(pullInfo->parser, 1);
@@ -139,7 +146,7 @@ tDOM_PullParserInstanceCmd (
         }
         Tcl_IncrRefCount (objv[2]);
         pullInfo->inputString = objv[2];
-        pullInfo->state = PULLPARSERSTATE_START_DOKUMENT;
+        pullInfo->state = PULLPARSERSTATE_START_DOCUMENT;
         break;
 
     case m_inputchannel:
@@ -149,86 +156,91 @@ tDOM_PullParserInstanceCmd (
         break;
 
     case m_next:
-        switch (pullInfo->state) {
-        case PULLPARSERSTATE_READY:
-            SetResult ("No input");
-            return TCL_ERROR;
-        case PULLPARSERSTATE_END_DOKUMENT:
-            SetResult ("No next event after END_DOKUMENT");
-            return TCL_ERROR;
-        case PULLPARSERSTATE_TEXT:
-            if (pullInfo->nextState == PULLPARSERSTATE_START_TAG) {
-                SetResult ("START_TAG");
-            } else {
-                SetResult ("END_TAG");
-            }
+        if (pullInfo->state == PULLPARSERSTATE_TEXT) {
             Tcl_DStringSetLength (pullInfo->cdata, 0);
+        }
+        if (pullInfo->nextState) {
             pullInfo->state = pullInfo->nextState;
-            return TCL_OK;
-        case PULLPARSERSTATE_START_DOKUMENT:
-            if (pullInfo->inputfd) {
-                
-            } else if (pullInfo->inputChannel) {
+            pullInfo->nextState = 0;
+        } else {
+            switch (pullInfo->state) {
+            case PULLPARSERSTATE_READY:
+                SetResult ("No input");
+                return TCL_ERROR;
+            case PULLPARSERSTATE_END_DOCUMENT:
+                SetResult ("No next event after END_DOCUMENT");
+                return TCL_ERROR;
+            case PULLPARSERSTATE_TEXT:
+                /* Since PULLPARSERSTATE_TEXT always has nextState set
+                 * this case is handled in the if part of this if else
+                 * and this is never reached. It's just here to eat up
+                 * this case in the switch. */
+                break;
+            case PULLPARSERSTATE_START_DOCUMENT:
+                if (pullInfo->inputfd) {
+                    
+                } else if (pullInfo->inputChannel) {
 
-            } else if (pullInfo->inputString) {
-                data = Tcl_GetStringFromObj(pullInfo->inputString, &len);
-                result = XML_Parse (pullInfo->parser, data, len, 1);
-            }
-            switch (result) {
-            case XML_STATUS_OK:
-                if (pullInfo->inputString) {
-                    Tcl_DecrRefCount (pullInfo->inputString);
-                    pullInfo->inputString = NULL;
+                } else if (pullInfo->inputString) {
+                    data = Tcl_GetStringFromObj(pullInfo->inputString, &len);
+                    result = XML_Parse (pullInfo->parser, data, len, 1);
                 }
-                pullInfo->state = PULLPARSERSTATE_END_DOKUMENT;
-                break;
-            case XML_STATUS_ERROR:
-                if (pullInfo->inputString) {
-                    Tcl_DecrRefCount (pullInfo->inputString);
-                    pullInfo->inputString = NULL;
+                switch (result) {
+                case XML_STATUS_OK:
+                    if (pullInfo->inputString) {
+                        Tcl_DecrRefCount (pullInfo->inputString);
+                        pullInfo->inputString = NULL;
+                    }
+                    pullInfo->state = PULLPARSERSTATE_END_DOCUMENT;
+                    break;
+                case XML_STATUS_ERROR:
+                    if (pullInfo->inputString) {
+                        Tcl_DecrRefCount (pullInfo->inputString);
+                        pullInfo->inputString = NULL;
+                    }
+                    Tcl_ResetResult (interp);
+                    sprintf(s, "%ld", XML_GetCurrentLineNumber(pullInfo->parser));
+                    Tcl_AppendResult(interp, "error \"",
+                                     XML_ErrorString(
+                                         XML_GetErrorCode(pullInfo->parser)),
+                                     "\" at line ", s, " character ", NULL);
+                    sprintf(s, "%ld", XML_GetCurrentColumnNumber(pullInfo->parser));
+                    Tcl_AppendResult(interp, s, NULL);
+                    return TCL_ERROR;
+                case XML_STATUS_SUSPENDED:
+                    /* Nothing to do here, state was set in handler, just
+                     * take care to report */
+                    break;
                 }
-                Tcl_ResetResult (interp);
-                sprintf(s, "%ld", XML_GetCurrentLineNumber(pullInfo->parser));
-                Tcl_AppendResult(interp, "error \"",
-                                 XML_ErrorString(
-                                     XML_GetErrorCode(pullInfo->parser)),
-                                 "\" at line ", s, " character ", NULL);
-                sprintf(s, "%ld", XML_GetCurrentColumnNumber(pullInfo->parser));
-                Tcl_AppendResult(interp, s, NULL);
-                return TCL_ERROR;
-            case XML_STATUS_SUSPENDED:
-                /* Nothing to do here, state was set in handler, just
-                 * take care to report */
                 break;
-            }
-            break;
-        default:
-            status = XML_ResumeParser (pullInfo->parser);
-            switch (status) {
-            case XML_STATUS_OK:
-                if (pullInfo->inputString) {
-                    Tcl_DecrRefCount (pullInfo->inputString);
-                    pullInfo->inputString = NULL;
+            default:
+                status = XML_ResumeParser (pullInfo->parser);
+                switch (status) {
+                case XML_STATUS_OK:
+                    if (pullInfo->inputString) {
+                        Tcl_DecrRefCount (pullInfo->inputString);
+                        pullInfo->inputString = NULL;
+                    }
+                    pullInfo->state = PULLPARSERSTATE_END_DOCUMENT;
+                    break;
+                case XML_STATUS_ERROR:
+                    if (pullInfo->inputString) {
+                        Tcl_DecrRefCount (pullInfo->inputString);
+                        pullInfo->inputString = NULL;
+                    }
+                    sprintf(s, "%ld", XML_GetCurrentLineNumber(pullInfo->parser));
+                    Tcl_AppendResult(interp, "error \"",
+                                     XML_ErrorString(
+                                         XML_GetErrorCode(pullInfo->parser)),
+                                     "\" at line ", s, " character ", NULL);
+                    sprintf(s, "%ld", XML_GetCurrentColumnNumber(pullInfo->parser));
+                    Tcl_AppendResult(interp, s, NULL);
+                    return TCL_ERROR;
+                case XML_STATUS_SUSPENDED:
+                    /* Nothing to do here, state was set in handler, just
+                     * take care to report */
+                    break;
                 }
-                pullInfo->state = PULLPARSERSTATE_END_DOKUMENT;
-                break;
-            case XML_STATUS_ERROR:
-                if (pullInfo->inputString) {
-                    Tcl_DecrRefCount (pullInfo->inputString);
-                    pullInfo->inputString = NULL;
-                }
-                sprintf(s, "%ld", XML_GetCurrentLineNumber(pullInfo->parser));
-                Tcl_AppendResult(interp, "error \"",
-                                 XML_ErrorString(
-                                     XML_GetErrorCode(pullInfo->parser)),
-                                 "\" at line ", s, " character ", NULL);
-                sprintf(s, "%ld", XML_GetCurrentColumnNumber(pullInfo->parser));
-                Tcl_AppendResult(interp, s, NULL);
-                return TCL_ERROR;
-            case XML_STATUS_SUSPENDED:
-                /* Nothing to do here, state was set in handler, just
-                 * take care to report */
-                break;
             }
         }
         /* Fall throu to reporting state */
@@ -237,11 +249,11 @@ tDOM_PullParserInstanceCmd (
         case PULLPARSERSTATE_READY:
             SetResult("READY");
             break;
-        case PULLPARSERSTATE_START_DOKUMENT:
-            SetResult("START_DOKUMENT");
+        case PULLPARSERSTATE_START_DOCUMENT:
+            SetResult("START_DOCUMENT");
             break;
-        case PULLPARSERSTATE_END_DOKUMENT:
-            SetResult("END_DOKUMENT");
+        case PULLPARSERSTATE_END_DOCUMENT:
+            SetResult("END_DOCUMENT");
             break;
         case PULLPARSERSTATE_START_TAG:
             SetResult("START_TAG");
