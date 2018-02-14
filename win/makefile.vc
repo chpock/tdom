@@ -74,8 +74,8 @@ baselibs = $(baselibs) "$(GUMBODIR)\visualc\Win32\Release\gumbo.lib"
 
 !include "$(_RULESDIR)\targets.vc"
 
-$(PRJ_OBJS): $(TMP_DIR)\versionhash.h
-$(TMP_DIR)\versionhash.h:
+$(TMP_DIR)\tcldom.obj: $(TMP_DIR)\versionhash.h
+$(TMP_DIR)\versionhash.h: $(ROOT)\manifest.uuid
 	echo #define FOSSIL_HASH "$(VERSIONHASH)" > $(TMP_DIR)\versionhash.h
 
 install:    default-install-docs-html default-install-stubs

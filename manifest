@@ -1,5 +1,5 @@
-C Add\sversionhash.h\smechanism\sto\sWindows\snmake\sbuilds
-D 2018-02-13T06:05:12.250
+C Make\sversionhash.h\sdependent\son\smanifest.uuid\nMake\sonly\stcldom.c\sdependent\son\sversionhash.h\sand\snot\sall\sobject\sfiles\nas\swas\sthe\scase\sbefore.
+D 2018-02-14T03:05:06.454
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -224,7 +224,7 @@ F unix/CONFIG 63b556af9314ca6bd1abea70f3b3a34a433b342f
 F unix/tclAppInit.c a1655c51127aed18d069010f234a378fceacb2a6
 F win/README 73916fb24a4ac0cc509dd9e225f191943b061292
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F win/makefile.vc bc5ce0104c7f1bade1d30bfe7b8f5fa4a2234b08
+F win/makefile.vc e55872316a152bd472c3e12a68b81f7d30615870
 F win/makefile805.vc da2003745caf522d88f27fcebadd916c1d5c042d
 F win/mkd.bat 85d3fe58ce051a778447fb2bfc7384867d21cef0
 F win/nmakehlp.c 194ae7c24886245c679cb4c9ea7e6daaaebb5fcd
@@ -237,8 +237,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 593846006866f6a172df268305098fb0072d0da5
-R 68166033beacbd07821092b24e146431
+P b727b73d8fa2effbc733defe588d2d4544871a45
+R 12ead5400cee2867289c03f8bca5dca4
 U apnadkarni
-Z b060b6487a55c32805b66e4c31b5462b
+Z 60ba5d5cfa0c1c1bc62c21f27cf43f6c
 # Remove this line to create a well-formed Fossil manifest.
