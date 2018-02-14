@@ -217,6 +217,10 @@ tDOM_PullParserInstanceCmd (
         break;
 
     case m_next:
+        if (objc != 2) {
+            Tcl_WrongNumArgs (interp, 2, objv, "");
+            return TCL_ERROR;
+        }
         if (pullInfo->state == PULLPARSERSTATE_TEXT) {
             Tcl_DStringSetLength (pullInfo->cdata, 0);
         }
@@ -306,6 +310,10 @@ tDOM_PullParserInstanceCmd (
         }
         /* Fall throu to reporting state */
     case m_state:
+        if (objc != 2) {
+            Tcl_WrongNumArgs (interp, 2, objv, "");
+            return TCL_ERROR;
+        }
         switch (pullInfo->state) {
         case PULLPARSERSTATE_READY:
             SetResult("READY");
@@ -329,6 +337,10 @@ tDOM_PullParserInstanceCmd (
         break;
 
     case m_tag:
+        if (objc != 2) {
+            Tcl_WrongNumArgs (interp, 2, objv, "");
+            return TCL_ERROR;
+        }
         if (pullInfo->state != PULLPARSERSTATE_START_TAG
             && pullInfo->state != PULLPARSERSTATE_END_TAG) {
             SetResult("Invalid state");
@@ -338,6 +350,10 @@ tDOM_PullParserInstanceCmd (
         break;
 
     case m_attributes:
+        if (objc != 2) {
+            Tcl_WrongNumArgs (interp, 2, objv, "");
+            return TCL_ERROR;
+        }
         if (pullInfo->state != PULLPARSERSTATE_START_TAG) {
             return TCL_ERROR;
         }
@@ -352,6 +368,10 @@ tDOM_PullParserInstanceCmd (
         break;
 
     case m_text:
+        if (objc != 2) {
+            Tcl_WrongNumArgs (interp, 2, objv, "");
+            return TCL_ERROR;
+        }
         Tcl_ResetResult (interp);
         Tcl_SetStringObj (
             Tcl_GetObjResult (interp),
@@ -361,10 +381,18 @@ tDOM_PullParserInstanceCmd (
         break;
         
     case m_delete:
+        if (objc != 2) {
+            Tcl_WrongNumArgs (interp, 2, objv, "");
+            return TCL_ERROR;
+        }
         Tcl_DeleteCommand (interp, Tcl_GetString (objv[0]));
         break;
 
     case m_reset:
+        if (objc != 2) {
+            Tcl_WrongNumArgs (interp, 2, objv, "");
+            return TCL_ERROR;
+        }
         if (pullInfo->inputString) {
             Tcl_DecrRefCount (pullInfo->inputString);
             pullInfo->inputString = NULL;
@@ -401,7 +429,7 @@ tDOM_PullParserCmd (
 {
     tDOM_PullParserInfo *pullInfo;
 
-    if (objc < 2) {
+    if (objc != 2) {
         Tcl_WrongNumArgs (interp, 1, objv, "cmdName");
         return TCL_ERROR;
     }
