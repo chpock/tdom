@@ -1,5 +1,19 @@
 
 #include <tdom.h>
+#include <fcntl.h>
+#ifdef _MSC_VER
+#include <io.h>
+#else
+#include <unistd.h>
+#endif
+
+#ifndef O_BINARY
+#ifdef _O_BINARY
+#define O_BINARY _O_BINARY
+#else
+#define O_BINARY 0
+#endif
+#endif
 
 typedef enum {
     PULLPARSERSTATE_READY,
@@ -16,7 +30,7 @@ typedef struct tDOM_PullParserInfo
     XML_Parser      parser;
     Tcl_Interp     *interp;
     Tcl_Obj        *inputString;
-    Tcl_Channel    *inputChannel;
+    Tcl_Channel     inputChannel;
     int             inputfd;
     PullParserState state;
     PullParserState nextState;
@@ -97,6 +111,9 @@ tDOM_PullParserDeleteCmd (
     if (pullInfo->inputString) {
         Tcl_DecrRefCount (pullInfo->inputString);
     }
+    if (pullInfo->inputfd) {
+        close (pullInfo->inputfd);
+    }
     Tcl_DStringFree (pullInfo->cdata);
     FREE (pullInfo->cdata);
     FREE (pullInfo);
@@ -111,21 +128,22 @@ tDOM_PullParserInstanceCmd (
     )
 {
     tDOM_PullParserInfo *pullInfo = clientdata;
-    int methodIndex, len, result, status;
+    int methodIndex, len, result, status, mode, fd;
     char *data, s[255];
     const char **atts;
     Tcl_Obj *resultPtr;
+    Tcl_Channel channel;
     
     static const char *const methods[] = {
         "input", "inputchannel", "inputfile",
         "next", "state", "tag", "attributes",
-        "text", "delete", NULL
+        "text", "delete", "reset", NULL
     };
 
     enum method {
         m_input, m_inputchannel, m_inputfile,
         m_next, m_state, m_tag, m_attributes,
-        m_text, m_delete
+        m_text, m_delete, m_reset
     };
 
     if (objc == 1) {
@@ -144,15 +162,58 @@ tDOM_PullParserInstanceCmd (
             Tcl_WrongNumArgs (interp, 2, objv, "<xml>");
             return TCL_ERROR;
         }
+        if (pullInfo->state != PULLPARSERSTATE_READY) {
+            SetResult ("Can't change input while already parsing.");
+            return TCL_ERROR;
+        }
         Tcl_IncrRefCount (objv[2]);
         pullInfo->inputString = objv[2];
         pullInfo->state = PULLPARSERSTATE_START_DOCUMENT;
         break;
 
     case m_inputchannel:
+        if (objc != 3) {
+            Tcl_WrongNumArgs (interp, 2, objv, "<channel>");
+            return TCL_ERROR;
+        }
+        if (pullInfo->state != PULLPARSERSTATE_READY) {
+            SetResult ("Can't change input while already parsing.");
+            return TCL_ERROR;
+        }
+        channel = Tcl_GetChannel (interp, Tcl_GetString(objv[2]), &mode);
+        if (channel == NULL) {
+            Tcl_ResetResult (interp);
+            Tcl_AppendResult (interp, "\"", Tcl_GetString(objv[2]),
+                              "\" isn't a Tcl channel in this interpreter", 
+                              NULL);
+            return TCL_ERROR;
+        }
+        if (!(mode & TCL_READABLE)) {
+            Tcl_ResetResult (interp);
+            Tcl_AppendResult (interp, "channel \"", Tcl_GetString(objv[2]),
+                              "wasn't opened for reading", NULL);
+            return TCL_ERROR;
+        }
+        pullInfo->inputChannel = channel;
         break;
 
     case m_inputfile:
+        if (objc != 3) {
+            Tcl_WrongNumArgs (interp, 2, objv, "<filename>");
+            return TCL_ERROR;
+        }
+        if (pullInfo->state != PULLPARSERSTATE_READY) {
+            SetResult ("Can't change input while already parsing.");
+            return TCL_ERROR;
+        }
+        fd = open(Tcl_GetString(objv[2]), O_BINARY|O_RDONLY);
+        if (fd < 0) {
+            Tcl_ResetResult (interp);
+            Tcl_AppendResult (interp, "error opening file \"",
+                              Tcl_GetString(objv[2]), "\"", NULL);
+            return TCL_ERROR;
+        }
+        pullInfo->inputfd = fd;
         break;
 
     case m_next:
@@ -302,6 +363,28 @@ tDOM_PullParserInstanceCmd (
     case m_delete:
         Tcl_DeleteCommand (interp, Tcl_GetString (objv[0]));
         break;
+
+    case m_reset:
+        if (pullInfo->inputString) {
+            Tcl_DecrRefCount (pullInfo->inputString);
+            pullInfo->inputString = NULL;
+        }
+        pullInfo->inputChannel = NULL;
+        if (pullInfo->inputfd) {
+            close (pullInfo->inputfd);
+            pullInfo->inputfd = 0;
+        }
+        pullInfo->state = PULLPARSERSTATE_READY;
+        pullInfo->nextState = 0;
+        Tcl_DStringSetLength (pullInfo->cdata, 0);
+        if (XML_ParserReset (pullInfo->parser, NULL) != XML_TRUE) {
+            SetResult ("Parser reset failed!");
+            return TCL_ERROR;
+        }
+        XML_SetElementHandler (pullInfo->parser, startElement, endElement);
+        XML_SetUserData (pullInfo->parser, pullInfo);
+        break;
+        
     }
 
     return TCL_OK;
