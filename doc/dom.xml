@@ -620,6 +620,10 @@ recommendation. Otherwise it returns 0.</desc>
                     <desc>Returns as boolean, if build with
                     <m>--enable-html5</m>.</desc>
                 </optdef>
+                <optdef>
+                    <optname>versionhash</optname>
+                    <desc>Returns the fossil repository version hash.</desc>
+                </optdef>
             </optlist>
             </desc>   
         </commanddef>

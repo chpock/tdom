@@ -670,6 +670,8 @@ core, tDOM was build with as integer
 .IP "\fBhtml5\fR"
 Returns as boolean, if build with
 \&\fI--enable-html5\fR.
+.IP "\fBversionhash\fR"
+Returns the fossil repository version hash.
 .RE
 .SH KEYWORDS
 XML, DOM, document, node, parsing

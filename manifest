@@ -1,12 +1,12 @@
-C Spell\sfix.
-D 2018-02-09T11:17:15.178
+C Added\s[dom\sfeatureinfo\sversionhash].
+D 2018-02-14T14:31:30.513
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
 F CHANGES d938cf966d4e79c09ddf6818bdbc55cc05b3b9b6
 F ChangeLog 9b60ec8bfbae84e4f1a97aaee24be00ccea212b7
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
-F Makefile.in d75a5497674f790f32be0f83d9b101041233b00f
+F Makefile.in 5efeebe28417cb9c32ce01559351a7f306444754
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
 F README a097b51b559f421a68a12d2901766a0bf2520b19
 F README.AOL d076b065f6a3209b5374a63c9ddd7fbca167643e
@@ -18,9 +18,9 @@ F configure.in d6788a4cb3fe918f78e06fc3b1333854b86c37a7
 F doc/INDEX.MAP c8e767983bcea4bbd53ecdbf3d78cb044996e9bc
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html 98092b3a6d0fa7ade2cd5715b56ea0a6fef89be1
-F doc/dom.html 146b30616d600ade9140cd179875db289f4da710
-F doc/dom.n b156819becfd00aa55e38f8bce945df7b9894198
-F doc/dom.xml df1f4ad1000eaff4c9c8dec8b1fdbe2f836401d5
+F doc/dom.html 2a79d8cf33feacf9e1682c41f64622e97c5c559b
+F doc/dom.n e70f2943aab797b111dd81d31e47f443d07153bf
+F doc/dom.xml 93154903dc3a6574d226bf8f54fe8b49f6f6c846
 F doc/domDoc.html a5e74983986419cedac0ab7872d3294b3e553f8d
 F doc/domDoc.n 8bb70588d0d32353951d742b4be0aa343890aa59
 F doc/domDoc.xml 73d66d8a3879eb7aa7fca41a0195246e2f2ddb8c
@@ -149,7 +149,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 4637664667d7d458eab2081dc694e0c0f4c55223
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
-F generic/tcldom.c 513efff14e048c25e50a1919c70ffd484473cc79
+F generic/tcldom.c 0dd129c60f47bc570ae58c71134b2bd7dd35f066
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
 F generic/tclexpat.c 6d91b063777fe13c175cb80c97ed6cdddb68e2ba
 F generic/tclexpat.h f70ed259e4c81333df48f6b13e995d1dacb27586
@@ -197,7 +197,7 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.bench 5446ce379127b8d5700f18a5a0848e580313d0d7
-F tests/dom.test 5521c431e2e554569d9b6a5c2c2f0b03979cdabc
+F tests/dom.test dd4ee60d60b79b0bf26eda2590304501f411d2b3
 F tests/domDoc.test 99a4e4e8b894e97f62d438f0cd6f1e470d8bf2b3
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test 66a77f681b6e946b88c55a72efe62d8d7e430348
@@ -224,21 +224,22 @@ F unix/CONFIG 63b556af9314ca6bd1abea70f3b3a34a433b342f
 F unix/tclAppInit.c a1655c51127aed18d069010f234a378fceacb2a6
 F win/README 73916fb24a4ac0cc509dd9e225f191943b061292
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F win/makefile.vc b6b0dae0f749b54dff5b182c15556b1f11177368
+F win/makefile.vc e55872316a152bd472c3e12a68b81f7d30615870
 F win/makefile805.vc da2003745caf522d88f27fcebadd916c1d5c042d
 F win/mkd.bat 85d3fe58ce051a778447fb2bfc7384867d21cef0
 F win/nmakehlp.c 194ae7c24886245c679cb4c9ea7e6daaaebb5fcd
 F win/pkgIndex.tcl 4631218a784aae412d2a6bcadc72619eb14b264a
 F win/rules-ext.vc e788fcfc1e69b11946e18b8f67e0870b3bd38913
-F win/rules.vc 8157e2a811cf5e93683d6b0fbf5d91d153aa4535
+F win/rules.vc 996a623bd2ea3dc2fac239a1b845ca51695c8012
 F win/targets.vc 79dea1c6a94a94e6ed8bae9e0195149b25a69923
 F win/tdom.rc 1463128845bffe1fdf24ab99f562727830855516
 F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ba1f8c48638d888dc720167e44b7825445cac416
-R 2ab659ab4202c64c120a1bc9dff99438
+P 661363f3183616fc215559c5443c68fe11420911 b86521b6f4970abc37f7406e6badd1ad8e49eaa9
+R 874deaafbc0b5e4e6779a7db63d0cea2
+T +closed b86521b6f4970abc37f7406e6badd1ad8e49eaa9
 U rolf
-Z 734d28233a167d42f6c6a0eb4e913c2f
+Z 4b763114a9a039c749bd9ae6e58d7631
 # Remove this line to create a well-formed Fossil manifest.
