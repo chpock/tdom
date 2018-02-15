@@ -23,3 +23,11 @@ test pp-1.3 {Reset freshly created parser} {
     pp reset
     pp delete
 } {}
+
+test pp-1.4 {State after creation} {
+    tDOM::pullparser pp
+    set result [pp state]
+    lappend result [pp state]
+    pp delete
+    set result
+} {READY READY}

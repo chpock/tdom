@@ -37,6 +37,7 @@ typedef struct tDOM_PullParserInfo
     Tcl_DString    *cdata;
     const char     *elmname;
     const char    **atts;
+    Tcl_Obj        *channelReadBuf;
 } tDOM_PullParserInfo;
 
 #define SetResult(str) Tcl_ResetResult(interp); \
@@ -116,7 +117,28 @@ tDOM_PullParserDeleteCmd (
     }
     Tcl_DStringFree (pullInfo->cdata);
     FREE (pullInfo->cdata);
+    if (pullInfo->channelReadBuf) {
+        Tcl_DecrRefCount (pullInfo->channelReadBuf);
+    }
     FREE (pullInfo);
+}
+
+static void
+tDOM_ReportXMLError (
+    Tcl_Interp *interp,
+    tDOM_PullParserInfo *pullInfo
+    )
+{
+    char s[255];
+
+    Tcl_ResetResult (interp);
+    sprintf(s, "%ld", XML_GetCurrentLineNumber(pullInfo->parser));
+    Tcl_AppendResult(interp, "error \"",
+                     XML_ErrorString(
+                         XML_GetErrorCode(pullInfo->parser)),
+                     "\" at line ", s, " character ", NULL);
+    sprintf(s, "%ld", XML_GetCurrentColumnNumber(pullInfo->parser));
+    Tcl_AppendResult(interp, s, NULL);
 }
 
 static int
@@ -128,11 +150,12 @@ tDOM_PullParserInstanceCmd (
     )
 {
     tDOM_PullParserInfo *pullInfo = clientdata;
-    int methodIndex, len, result, status, mode, fd;
-    char *data, s[255];
+    int methodIndex, len, result, status, mode, fd, done;
+    char *data;
     const char **atts;
     Tcl_Obj *resultPtr;
     Tcl_Channel channel;
+    XML_ParsingStatus pstatus;
     
     static const char *const methods[] = {
         "input", "inputchannel", "inputfile",
@@ -195,6 +218,12 @@ tDOM_PullParserInstanceCmd (
             return TCL_ERROR;
         }
         pullInfo->inputChannel = channel;
+        if (pullInfo->channelReadBuf == NULL) {
+            pullInfo->channelReadBuf = Tcl_NewObj ();
+            Tcl_IncrRefCount (pullInfo->channelReadBuf);
+            Tcl_SetObjLength (pullInfo->channelReadBuf, 6144);
+        }
+        pullInfo->state = PULLPARSERSTATE_START_DOCUMENT;
         break;
 
     case m_inputfile:
@@ -245,7 +274,15 @@ tDOM_PullParserInstanceCmd (
                 if (pullInfo->inputfd) {
                     
                 } else if (pullInfo->inputChannel) {
-
+                    do {
+                        len = Tcl_ReadChars (pullInfo->inputChannel,
+                                             pullInfo->channelReadBuf,
+                                             1024, 0);
+                        done = (len < 1024);
+                        data = Tcl_GetStringFromObj (pullInfo->channelReadBuf,
+                                                     &len);
+                        result = XML_Parse (pullInfo->parser, data, len, done);
+                    } while (result == XML_STATUS_OK);
                 } else if (pullInfo->inputString) {
                     data = Tcl_GetStringFromObj(pullInfo->inputString, &len);
                     result = XML_Parse (pullInfo->parser, data, len, 1);
@@ -263,14 +300,7 @@ tDOM_PullParserInstanceCmd (
                         Tcl_DecrRefCount (pullInfo->inputString);
                         pullInfo->inputString = NULL;
                     }
-                    Tcl_ResetResult (interp);
-                    sprintf(s, "%ld", XML_GetCurrentLineNumber(pullInfo->parser));
-                    Tcl_AppendResult(interp, "error \"",
-                                     XML_ErrorString(
-                                         XML_GetErrorCode(pullInfo->parser)),
-                                     "\" at line ", s, " character ", NULL);
-                    sprintf(s, "%ld", XML_GetCurrentColumnNumber(pullInfo->parser));
-                    Tcl_AppendResult(interp, s, NULL);
+                    tDOM_ReportXMLError (interp, pullInfo);
                     return TCL_ERROR;
                 case XML_STATUS_SUSPENDED:
                     /* Nothing to do here, state was set in handler, just
@@ -285,21 +315,42 @@ tDOM_PullParserInstanceCmd (
                     if (pullInfo->inputString) {
                         Tcl_DecrRefCount (pullInfo->inputString);
                         pullInfo->inputString = NULL;
+                        pullInfo->state = PULLPARSERSTATE_END_DOCUMENT;
+                    } else if (pullInfo->inputChannel) {
+                        XML_GetParsingStatus (pullInfo->parser, &pstatus);
+                        if (pstatus.parsing == XML_FINISHED) {
+                            pullInfo->state = PULLPARSERSTATE_END_DOCUMENT;
+                            break;
+                        }
+                        do {
+                            len = Tcl_ReadChars (pullInfo->inputChannel,
+                                                 pullInfo->channelReadBuf,
+                                                 1024, 0);
+                            done = (len < 1024);
+                            data = Tcl_GetStringFromObj (
+                                pullInfo->channelReadBuf, &len
+                                );
+                            result = XML_Parse (pullInfo->parser, data,
+                                                len, done);
+                        } while (result == XML_STATUS_OK && !done);
+                        if (result == XML_STATUS_ERROR) {
+                            tDOM_ReportXMLError (interp, pullInfo);
+                            return TCL_ERROR;
+                        }
+                        if (done && result == XML_STATUS_OK) {
+                            pullInfo->state = PULLPARSERSTATE_END_DOCUMENT;
+                        }
+                        /* If here result == XML_STATUS_SUSPENDED,
+                         * state was set in handler, just take care to
+                         * report */
                     }
-                    pullInfo->state = PULLPARSERSTATE_END_DOCUMENT;
                     break;
                 case XML_STATUS_ERROR:
                     if (pullInfo->inputString) {
                         Tcl_DecrRefCount (pullInfo->inputString);
                         pullInfo->inputString = NULL;
                     }
-                    sprintf(s, "%ld", XML_GetCurrentLineNumber(pullInfo->parser));
-                    Tcl_AppendResult(interp, "error \"",
-                                     XML_ErrorString(
-                                         XML_GetErrorCode(pullInfo->parser)),
-                                     "\" at line ", s, " character ", NULL);
-                    sprintf(s, "%ld", XML_GetCurrentColumnNumber(pullInfo->parser));
-                    Tcl_AppendResult(interp, s, NULL);
+                    tDOM_ReportXMLError (interp, pullInfo);
                     return TCL_ERROR;
                 case XML_STATUS_SUSPENDED:
                     /* Nothing to do here, state was set in handler, just

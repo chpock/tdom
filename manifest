@@ -1,5 +1,5 @@
-C Added\ssome\smore\sargument\schecks.\sAdded\sa\stiny\stests\sfile.
-D 2018-02-14T17:16:56.633
+C Added\sstreaming\sfrom\sTcl_Channel.
+D 2018-02-15T00:56:22.929
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -153,7 +153,7 @@ F generic/tcldom.c 0dd129c60f47bc570ae58c71134b2bd7dd35f066
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
 F generic/tclexpat.c 6d91b063777fe13c175cb80c97ed6cdddb68e2ba
 F generic/tclexpat.h f70ed259e4c81333df48f6b13e995d1dacb27586
-F generic/tclpull.c 6b57a4616064b1aefa10dcf9fc268509f02a57af
+F generic/tclpull.c 8b5f455803c6caaa3d9a337bb712fb06eed07359
 F generic/tclpull.h d0d2599fa133de4ab038a260b4cfbd04f01c1312
 F generic/tdom.decls d825af72ec3fd2ae4ebb1d7f883bde6e3613c914
 F generic/tdom.h d27e43748242d5fe7dd98b8c7aa4a5a891d015bf
@@ -215,7 +215,7 @@ F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
 F tests/parser.test 5bc2a09293d5dbb3d9c3af8fd4a7c57a3fb78212
 F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
-F tests/pullparser.test ee09b82f60def44d1214f264da141c6d9daeb957
+F tests/pullparser.test 3b0237c9623e7a609f58fab5dbea0787175546bd
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
 F tests/tdomcmd.test 092401adf0609906d710f3ef8997cb4ca29bc208
 F tests/xmlsimple.test a5c577be330f0254d9d7c4bee2c030acd28e703b
@@ -240,8 +240,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 35ce23541d9f295d9f1a5f7659e6596669396ce8
-R a7b97b2201236858e858e276fc7b65a5
+P 07b0fa7da5676549d49eee5d90970eb91910e055
+R 223388a5ef76a6a27359d5306e52c5c1
 U rolf
-Z f85663738c66f92acb6a2775043526f3
+Z c84e00c59f99c906af562476ed9fe8a8
 # Remove this line to create a well-formed Fossil manifest.
