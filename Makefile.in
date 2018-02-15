@@ -335,7 +335,7 @@ pkgIndex.tcl-hand:
 # Create a include file that #define the current fossil hash
 #========================================================================
 versionhash.h: $(srcdir)/manifest.uuid
-	@echo -n "#define FOSSIL_HASH \"" > $(top_builddir)/versionhash.h
+	@echo "#define FOSSIL_HASH \"" | tr -d '\n\r' > $(top_builddir)/versionhash.h
 	@cat $(srcdir)/manifest.uuid | tr -d '\n\r' >> $(top_builddir)/versionhash.h
 	@echo "\"" >> $(top_builddir)/versionhash.h
 

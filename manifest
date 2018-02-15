@@ -1,12 +1,12 @@
-C Added\sthe\snew\suser\svisible\schange\sto\sCHANGES.
-D 2018-02-14T14:35:52.233
+C Fixed\sversionhash.h\sgeneration\son\sMac.
+D 2018-02-15T14:22:05.935
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
 F CHANGES e223084407328cb8c03776261e162fa77bba6029
 F ChangeLog 9b60ec8bfbae84e4f1a97aaee24be00ccea212b7
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
-F Makefile.in 5efeebe28417cb9c32ce01559351a7f306444754
+F Makefile.in fb12afbc1594343c206035cbd74de3a6d3b173e7
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
 F README a097b51b559f421a68a12d2901766a0bf2520b19
 F README.AOL d076b065f6a3209b5374a63c9ddd7fbca167643e
@@ -237,8 +237,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c303ca134c3e43ace67449d7a67dad640f76c198
-R abc13587fec65c0dbca5c02cbc7d0539
+P 9dd79ab3912be01a054e59de22ca6727a9535278
+R cda2a3fe956b566624e82acec2571914
 U rolf
-Z 58a38a1fdaa8007a81e5dd3293afe23c
+Z d0982c52d38fd1b96724d28221fa0db0
 # Remove this line to create a well-formed Fossil manifest.
