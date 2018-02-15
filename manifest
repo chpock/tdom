@@ -1,5 +1,5 @@
-C Added\sstreaming\sfrom\sfile.
-D 2018-02-15T02:15:38.886
+C Faster\spull\sstatus\sreporting.
+D 2018-02-15T12:40:24.350
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -153,7 +153,7 @@ F generic/tcldom.c 0dd129c60f47bc570ae58c71134b2bd7dd35f066
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
 F generic/tclexpat.c 6d91b063777fe13c175cb80c97ed6cdddb68e2ba
 F generic/tclexpat.h f70ed259e4c81333df48f6b13e995d1dacb27586
-F generic/tclpull.c 06f2a92c059307a334ed632c45a5aaa0c068b40a
+F generic/tclpull.c cbd765a8dbdf630ffcaffbfbdf682eac1f0464b2
 F generic/tclpull.h d0d2599fa133de4ab038a260b4cfbd04f01c1312
 F generic/tdom.decls d825af72ec3fd2ae4ebb1d7f883bde6e3613c914
 F generic/tdom.h d27e43748242d5fe7dd98b8c7aa4a5a891d015bf
@@ -240,8 +240,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a6c90f3b6c3462979c90f5d89ad040b8f43afea4
-R 0be7a00e611a846e5cdbf104323e5d08
+P 5b284aca8b82b08fae9fae60677f763398de0a4d
+R 6b18d3eaaf2d62af7c8b9ca98c00f145
 U rolf
-Z af6f8c5ae99d484ea1d72e80bdeef67e
+Z 1b44e67ea24fe3548660492667570370
 # Remove this line to create a well-formed Fossil manifest.

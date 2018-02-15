@@ -42,6 +42,9 @@ typedef struct tDOM_PullParserInfo
     const char     *elmname;
     const char    **atts;
     Tcl_Obj        *channelReadBuf;
+    Tcl_Obj        *start_tag;
+    Tcl_Obj        *end_tag;
+    Tcl_Obj        *text;
 } tDOM_PullParserInfo;
 
 #define SetResult(str) Tcl_ResetResult(interp); \
@@ -124,6 +127,9 @@ tDOM_PullParserDeleteCmd (
     if (pullInfo->channelReadBuf) {
         Tcl_DecrRefCount (pullInfo->channelReadBuf);
     }
+    Tcl_DecrRefCount(pullInfo->start_tag);
+    Tcl_DecrRefCount(pullInfo->end_tag);
+    Tcl_DecrRefCount(pullInfo->text);
     FREE (pullInfo);
 }
 
@@ -403,13 +409,13 @@ tDOM_PullParserInstanceCmd (
             SetResult("END_DOCUMENT");
             break;
         case PULLPARSERSTATE_START_TAG:
-            SetResult("START_TAG");
+            Tcl_SetObjResult (interp, pullInfo->start_tag);
             break;
         case PULLPARSERSTATE_END_TAG:
-            SetResult("END_TAG");
+            Tcl_SetObjResult (interp, pullInfo->end_tag);
             break;
         case PULLPARSERSTATE_TEXT:
-            SetResult("TEXT");
+            Tcl_SetObjResult (interp, pullInfo->text);
             break;
         }
         break;
@@ -523,7 +529,13 @@ tDOM_PullParserCmd (
     pullInfo->cdata = (Tcl_DString*) MALLOC (sizeof (Tcl_DString));
     Tcl_DStringInit (pullInfo->cdata);
     pullInfo->state = PULLPARSERSTATE_READY;
-
+    pullInfo->start_tag = Tcl_NewStringObj("START_TAG", 9);
+    Tcl_IncrRefCount (pullInfo->start_tag);
+    pullInfo->end_tag = Tcl_NewStringObj("END_TAG", 7);
+    Tcl_IncrRefCount (pullInfo->end_tag);
+    pullInfo->text = Tcl_NewStringObj("TEXT", 4);
+    Tcl_IncrRefCount (pullInfo->text);
+    
     Tcl_CreateObjCommand (interp, Tcl_GetString(objv[1]),
                           tDOM_PullParserInstanceCmd, (ClientData) pullInfo,
                           tDOM_PullParserDeleteCmd);
