@@ -46,6 +46,7 @@ typedef struct tDOM_PullParserInfo
     Tcl_Obj        *start_tag;
     Tcl_Obj        *end_tag;
     Tcl_Obj        *text;
+    int             ignoreWhiteSpaces;
 } tDOM_PullParserInfo;
 
 #define SetResult(str) Tcl_ResetResult(interp); \
@@ -61,8 +62,32 @@ startElement(
     tDOM_PullParserInfo *pullInfo = userData;
 
     if (Tcl_DStringLength (pullInfo->cdata) > 0) {
-        pullInfo->state = PULLPARSERSTATE_TEXT;
-        pullInfo->nextState = PULLPARSERSTATE_START_TAG;
+        if (pullInfo->ignoreWhiteSpaces) {
+            char *pc, len, wso = 1;
+            len = Tcl_DStringLength(pullInfo->cdata);
+            for (pc = Tcl_DStringValue (pullInfo->cdata);
+                 len > 0;
+                 len--, pc++) 
+            {
+                if ( (*pc != ' ')  &&
+                     (*pc != '\t') &&
+                     (*pc != '\n') &&
+                     (*pc != '\r') ) {
+                    wso = 0;
+                    break;
+                }
+            }
+            if (wso) {
+                Tcl_DStringSetLength (pullInfo->cdata, 0);
+                pullInfo->state = PULLPARSERSTATE_START_TAG;
+            } else {
+                pullInfo->state = PULLPARSERSTATE_TEXT;
+                pullInfo->nextState = PULLPARSERSTATE_START_TAG;
+            }
+        } else {
+            pullInfo->state = PULLPARSERSTATE_TEXT;
+            pullInfo->nextState = PULLPARSERSTATE_START_TAG;
+        }
     } else {
         pullInfo->state = PULLPARSERSTATE_START_TAG;
     }
@@ -82,8 +107,32 @@ endElement (
     XML_ParsingStatus status;
     
     if (Tcl_DStringLength (pullInfo->cdata) > 0) {
-        pullInfo->state = PULLPARSERSTATE_TEXT;
-        pullInfo->nextState = PULLPARSERSTATE_END_TAG;
+        if (pullInfo->ignoreWhiteSpaces) {
+            char *pc, len, wso = 1;
+            len = Tcl_DStringLength(pullInfo->cdata);
+            for (pc = Tcl_DStringValue (pullInfo->cdata);
+                 len > 0;
+                 len--, pc++) 
+            {
+                if ( (*pc != ' ')  &&
+                     (*pc != '\t') &&
+                     (*pc != '\n') &&
+                     (*pc != '\r') ) {
+                    wso = 0;
+                    break;
+                }
+            }
+            if (wso) {
+                Tcl_DStringSetLength (pullInfo->cdata, 0);
+                pullInfo->state = PULLPARSERSTATE_END_TAG;
+            } else {
+                pullInfo->state = PULLPARSERSTATE_TEXT;
+                pullInfo->nextState = PULLPARSERSTATE_END_TAG;
+            }
+        } else {
+            pullInfo->state = PULLPARSERSTATE_TEXT;
+            pullInfo->nextState = PULLPARSERSTATE_END_TAG;
+        }
     } else {
         XML_GetParsingStatus (pullInfo->parser, &status);
         if (status.parsing == XML_SUSPENDED) {
@@ -459,6 +508,7 @@ tDOM_PullParserInstanceCmd (
             return TCL_ERROR;
         }
         if (pullInfo->state != PULLPARSERSTATE_START_TAG) {
+            SetResult("Invalid state - attribute method is only valid in state START_TAG.");
             return TCL_ERROR;
         }
         Tcl_ResetResult(interp);
@@ -524,10 +574,31 @@ tDOM_PullParserCmd (
     )
 {
     tDOM_PullParserInfo *pullInfo;
+    int flagIndex, ignoreWhiteSpaces = 0;
 
-    if (objc != 2) {
-        Tcl_WrongNumArgs (interp, 1, objv, "cmdName");
+    static const char *const flags[] = {
+        "-ignorewhitecdata", NULL
+    };
+    
+    enum flag {
+        f_ignoreWhiteSpaces,
+    };    
+
+    if (objc < 2 || objc > 3) {
+        Tcl_WrongNumArgs (interp, 1, objv, "cmdName ?-ignorewhitecdata?");
         return TCL_ERROR;
+    }
+
+    if (objc == 3) {
+        if (Tcl_GetIndexFromObj (interp, objv[2], flags, "flag", 0,
+                                 &flagIndex) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        switch ((enum flag) flagIndex) {
+        case f_ignoreWhiteSpaces:
+            ignoreWhiteSpaces = 1;
+            break;
+        }
     }
     
     pullInfo = (tDOM_PullParserInfo *) MALLOC(sizeof(tDOM_PullParserInfo));
@@ -547,6 +618,7 @@ tDOM_PullParserCmd (
     Tcl_IncrRefCount (pullInfo->end_tag);
     pullInfo->text = Tcl_NewStringObj("TEXT", 4);
     Tcl_IncrRefCount (pullInfo->text);
+    pullInfo->ignoreWhiteSpaces = ignoreWhiteSpaces;
     
     Tcl_CreateObjCommand (interp, Tcl_GetString(objv[1]),
                           tDOM_PullParserInstanceCmd, (ClientData) pullInfo,
