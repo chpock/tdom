@@ -19,6 +19,17 @@
 # define TDOM_EXPAT_READ_SIZE (1024*8)
 #endif
 
+/* #define DEBUG */
+/*----------------------------------------------------------------------------
+|   Debug Macros
+|
+\---------------------------------------------------------------------------*/
+#ifdef DEBUG
+# define DBG(x) x
+#else
+# define DBG(x) 
+#endif
+
 typedef enum {
     PULLPARSERSTATE_READY,
     PULLPARSERSTATE_START_DOCUMENT,
@@ -60,7 +71,7 @@ startElement(
 )
 {
     tDOM_PullParserInfo *pullInfo = userData;
-
+    DBG(fprintf(stderr, "startElement tag %s\n", name));
     if (Tcl_DStringLength (pullInfo->cdata) > 0) {
         if (pullInfo->ignoreWhiteSpaces) {
             char *pc, len, wso = 1;
@@ -106,9 +117,10 @@ endElement (
     tDOM_PullParserInfo *pullInfo = userData;
     XML_ParsingStatus status;
     
+    DBG(fprintf(stderr, "endElement tag %s\n", name));
     if (Tcl_DStringLength (pullInfo->cdata) > 0) {
         if (pullInfo->ignoreWhiteSpaces) {
-            char *pc, len, wso = 1;
+            char *pc; int len, wso = 1;
             len = Tcl_DStringLength(pullInfo->cdata);
             for (pc = Tcl_DStringValue (pullInfo->cdata);
                  len > 0;
@@ -123,6 +135,7 @@ endElement (
                 }
             }
             if (wso) {
+                DBG(fprintf(stderr, "... skipping white space only text\n"));
                 Tcl_DStringSetLength (pullInfo->cdata, 0);
                 pullInfo->state = PULLPARSERSTATE_END_TAG;
             } else {
@@ -155,6 +168,7 @@ characterDataHandler (
 {
     tDOM_PullParserInfo *pullInfo = userData;
 
+    DBG(fprintf(stderr, "cdata handler called\n"));
     Tcl_DStringAppend (pullInfo->cdata, s, len);    
 }
 
