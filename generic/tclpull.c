@@ -15,6 +15,10 @@
 #endif
 #endif
 
+#ifndef TDOM_EXPAT_READ_SIZE
+# define TDOM_EXPAT_READ_SIZE (1024*8)
+#endif
+
 typedef enum {
     PULLPARSERSTATE_READY,
     PULLPARSERSTATE_START_DOCUMENT,
@@ -243,6 +247,7 @@ tDOM_PullParserInstanceCmd (
             return TCL_ERROR;
         }
         pullInfo->inputfd = fd;
+        pullInfo->state = PULLPARSERSTATE_START_DOCUMENT;
         break;
 
     case m_next:
@@ -272,16 +277,23 @@ tDOM_PullParserInstanceCmd (
                 break;
             case PULLPARSERSTATE_START_DOCUMENT:
                 if (pullInfo->inputfd) {
-                    
+                    do {
+                        char *fbuf =
+                            XML_GetBuffer (pullInfo->parser,
+                                           TDOM_EXPAT_READ_SIZE);
+                        len = read(pullInfo->inputfd, fbuf,
+                                   TDOM_EXPAT_READ_SIZE);
+                        result = XML_ParseBuffer (pullInfo->parser,
+                                                  len, len == 0);
+                    } while (result == XML_STATUS_OK);
                 } else if (pullInfo->inputChannel) {
                     do {
                         len = Tcl_ReadChars (pullInfo->inputChannel,
                                              pullInfo->channelReadBuf,
                                              1024, 0);
-                        done = (len < 1024);
-                        data = Tcl_GetStringFromObj (pullInfo->channelReadBuf,
-                                                     &len);
-                        result = XML_Parse (pullInfo->parser, data, len, done);
+                        data = Tcl_GetString (pullInfo->channelReadBuf);
+                        result = XML_Parse (pullInfo->parser, data, len,
+                                            len == 0);
                     } while (result == XML_STATUS_OK);
                 } else if (pullInfo->inputString) {
                     data = Tcl_GetStringFromObj(pullInfo->inputString, &len);
@@ -316,12 +328,14 @@ tDOM_PullParserInstanceCmd (
                         Tcl_DecrRefCount (pullInfo->inputString);
                         pullInfo->inputString = NULL;
                         pullInfo->state = PULLPARSERSTATE_END_DOCUMENT;
-                    } else if (pullInfo->inputChannel) {
-                        XML_GetParsingStatus (pullInfo->parser, &pstatus);
-                        if (pstatus.parsing == XML_FINISHED) {
-                            pullInfo->state = PULLPARSERSTATE_END_DOCUMENT;
-                            break;
-                        }
+                        break;
+                    }
+                    XML_GetParsingStatus (pullInfo->parser, &pstatus);
+                    if (pstatus.parsing == XML_FINISHED) {
+                        pullInfo->state = PULLPARSERSTATE_END_DOCUMENT;
+                        break;
+                    }
+                    if (pullInfo->inputChannel) {
                         do {
                             len = Tcl_ReadChars (pullInfo->inputChannel,
                                                  pullInfo->channelReadBuf,
@@ -333,17 +347,30 @@ tDOM_PullParserInstanceCmd (
                             result = XML_Parse (pullInfo->parser, data,
                                                 len, done);
                         } while (result == XML_STATUS_OK && !done);
-                        if (result == XML_STATUS_ERROR) {
-                            tDOM_ReportXMLError (interp, pullInfo);
-                            return TCL_ERROR;
-                        }
-                        if (done && result == XML_STATUS_OK) {
-                            pullInfo->state = PULLPARSERSTATE_END_DOCUMENT;
-                        }
-                        /* If here result == XML_STATUS_SUSPENDED,
-                         * state was set in handler, just take care to
-                         * report */
+                    } else {
+                        /* inputfile */
+                        do {
+                            char *fbuf = 
+                                XML_GetBuffer (pullInfo->parser,
+                                               TDOM_EXPAT_READ_SIZE);
+                            len = read (pullInfo->inputfd, fbuf,
+                                        TDOM_EXPAT_READ_SIZE);
+                            done = (len < TDOM_EXPAT_READ_SIZE);
+                            result = XML_ParseBuffer (pullInfo->parser,
+                                                      len, done);
+                        } while (result == XML_STATUS_OK && !done);
                     }
+                    if (result == XML_STATUS_ERROR) {
+                        tDOM_ReportXMLError (interp, pullInfo);
+                        return TCL_ERROR;
+                    }
+                    if (done && result == XML_STATUS_OK) {
+                        pullInfo->state = PULLPARSERSTATE_END_DOCUMENT;
+                    }
+                    /* If here result == XML_STATUS_SUSPENDED,
+                     * state was set in handler, just take care to
+                     * report */
+                            
                     break;
                 case XML_STATUS_ERROR:
                     if (pullInfo->inputString) {
