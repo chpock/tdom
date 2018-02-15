@@ -151,6 +151,22 @@ tDOM_ReportXMLError (
     Tcl_AppendResult(interp, s, NULL);
 }
 
+static void
+tDOM_CleanupInputSource (
+    tDOM_PullParserInfo *pullInfo
+    )
+{
+    if (pullInfo->inputString) {
+        Tcl_DecrRefCount (pullInfo->inputString);
+        pullInfo->inputString = NULL;
+    }
+    pullInfo->inputChannel = NULL;
+    if (pullInfo->inputfd) {
+        close (pullInfo->inputfd);
+        pullInfo->inputfd = 0;
+    }
+}
+
 static int
 tDOM_PullParserInstanceCmd (
     ClientData  clientdata,
@@ -307,17 +323,11 @@ tDOM_PullParserInstanceCmd (
                 }
                 switch (result) {
                 case XML_STATUS_OK:
-                    if (pullInfo->inputString) {
-                        Tcl_DecrRefCount (pullInfo->inputString);
-                        pullInfo->inputString = NULL;
-                    }
+                    tDOM_CleanupInputSource (pullInfo);
                     pullInfo->state = PULLPARSERSTATE_END_DOCUMENT;
                     break;
                 case XML_STATUS_ERROR:
-                    if (pullInfo->inputString) {
-                        Tcl_DecrRefCount (pullInfo->inputString);
-                        pullInfo->inputString = NULL;
-                    }
+                    tDOM_CleanupInputSource (pullInfo);
                     tDOM_ReportXMLError (interp, pullInfo);
                     return TCL_ERROR;
                 case XML_STATUS_SUSPENDED:
@@ -338,6 +348,7 @@ tDOM_PullParserInstanceCmd (
                     }
                     XML_GetParsingStatus (pullInfo->parser, &pstatus);
                     if (pstatus.parsing == XML_FINISHED) {
+                        tDOM_CleanupInputSource (pullInfo);
                         pullInfo->state = PULLPARSERSTATE_END_DOCUMENT;
                         break;
                     }
@@ -367,10 +378,12 @@ tDOM_PullParserInstanceCmd (
                         } while (result == XML_STATUS_OK && !done);
                     }
                     if (result == XML_STATUS_ERROR) {
+                        tDOM_CleanupInputSource (pullInfo);
                         tDOM_ReportXMLError (interp, pullInfo);
                         return TCL_ERROR;
                     }
                     if (done && result == XML_STATUS_OK) {
+                        tDOM_CleanupInputSource (pullInfo);
                         pullInfo->state = PULLPARSERSTATE_END_DOCUMENT;
                     }
                     /* If here result == XML_STATUS_SUSPENDED,
@@ -379,10 +392,7 @@ tDOM_PullParserInstanceCmd (
                             
                     break;
                 case XML_STATUS_ERROR:
-                    if (pullInfo->inputString) {
-                        Tcl_DecrRefCount (pullInfo->inputString);
-                        pullInfo->inputString = NULL;
-                    }
+                    tDOM_CleanupInputSource (pullInfo);
                     tDOM_ReportXMLError (interp, pullInfo);
                     return TCL_ERROR;
                 case XML_STATUS_SUSPENDED:
@@ -477,15 +487,7 @@ tDOM_PullParserInstanceCmd (
             Tcl_WrongNumArgs (interp, 2, objv, "");
             return TCL_ERROR;
         }
-        if (pullInfo->inputString) {
-            Tcl_DecrRefCount (pullInfo->inputString);
-            pullInfo->inputString = NULL;
-        }
-        pullInfo->inputChannel = NULL;
-        if (pullInfo->inputfd) {
-            close (pullInfo->inputfd);
-            pullInfo->inputfd = 0;
-        }
+        tDOM_CleanupInputSource (pullInfo);
         pullInfo->state = PULLPARSERSTATE_READY;
         pullInfo->nextState = 0;
         Tcl_DStringSetLength (pullInfo->cdata, 0);
