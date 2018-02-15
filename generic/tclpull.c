@@ -25,7 +25,8 @@ typedef enum {
     PULLPARSERSTATE_END_DOCUMENT,
     PULLPARSERSTATE_START_TAG,
     PULLPARSERSTATE_END_TAG,
-    PULLPARSERSTATE_TEXT
+    PULLPARSERSTATE_TEXT,
+    PULLPARSERSTATE_PARSE_ERROR
 } PullParserState;
     
 
@@ -288,6 +289,9 @@ tDOM_PullParserInstanceCmd (
             case PULLPARSERSTATE_READY:
                 SetResult ("No input");
                 return TCL_ERROR;
+            case PULLPARSERSTATE_PARSE_ERROR:
+                SetResult ("Parsing stoped with XML parsing error.");
+                return TCL_ERROR;
             case PULLPARSERSTATE_END_DOCUMENT:
                 SetResult ("No next event after END_DOCUMENT");
                 return TCL_ERROR;
@@ -329,6 +333,7 @@ tDOM_PullParserInstanceCmd (
                 case XML_STATUS_ERROR:
                     tDOM_CleanupInputSource (pullInfo);
                     tDOM_ReportXMLError (interp, pullInfo);
+                    pullInfo->state = PULLPARSERSTATE_PARSE_ERROR;
                     return TCL_ERROR;
                 case XML_STATUS_SUSPENDED:
                     /* Nothing to do here, state was set in handler, just
@@ -380,6 +385,7 @@ tDOM_PullParserInstanceCmd (
                     if (result == XML_STATUS_ERROR) {
                         tDOM_CleanupInputSource (pullInfo);
                         tDOM_ReportXMLError (interp, pullInfo);
+                        pullInfo->state = PULLPARSERSTATE_PARSE_ERROR;
                         return TCL_ERROR;
                     }
                     if (done && result == XML_STATUS_OK) {
@@ -394,6 +400,7 @@ tDOM_PullParserInstanceCmd (
                 case XML_STATUS_ERROR:
                     tDOM_CleanupInputSource (pullInfo);
                     tDOM_ReportXMLError (interp, pullInfo);
+                    pullInfo->state = PULLPARSERSTATE_PARSE_ERROR;
                     return TCL_ERROR;
                 case XML_STATUS_SUSPENDED:
                     /* Nothing to do here, state was set in handler, just
@@ -411,6 +418,9 @@ tDOM_PullParserInstanceCmd (
         switch (pullInfo->state) {
         case PULLPARSERSTATE_READY:
             SetResult("READY");
+            break;
+        case PULLPARSERSTATE_PARSE_ERROR:
+            SetResult("PARSE_ERROR");
             break;
         case PULLPARSERSTATE_START_DOCUMENT:
             SetResult("START_DOCUMENT");
