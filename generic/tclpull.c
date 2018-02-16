@@ -52,7 +52,8 @@ typedef struct tDOM_PullParserInfo
     PullParserState nextState;
     PullParserState next2State;
     Tcl_DString    *cdata;
-    const char     *elmname;
+    Tcl_HashTable  *elmCache;
+    Tcl_Obj        *currentElm;
     const char    **atts;
     Tcl_Obj        *channelReadBuf;
     Tcl_Obj        *start_tag;
@@ -72,7 +73,9 @@ startElement(
 )
 {
     tDOM_PullParserInfo *pullInfo = userData;
-
+    int hnew;
+    Tcl_HashEntry *h;
+    
     DBG(fprintf(stderr, "startElement tag %s\n", name));
 
     if (Tcl_DStringLength (pullInfo->cdata) > 0) {
@@ -107,7 +110,14 @@ startElement(
     } else {
         pullInfo->state = PULLPARSERSTATE_START_TAG;
     }
-    pullInfo->elmname = name;
+    h = Tcl_CreateHashEntry (pullInfo->elmCache, name, &hnew);
+    if (hnew) {
+        pullInfo->currentElm = Tcl_NewStringObj (name, -1);
+        Tcl_IncrRefCount (pullInfo->currentElm);
+        Tcl_SetHashValue (h, pullInfo->currentElm);
+    } else {
+        pullInfo->currentElm = (Tcl_Obj *) Tcl_GetHashValue (h);
+    }
     pullInfo->atts = atts;
 
     XML_StopParser(pullInfo->parser, 1);
@@ -169,7 +179,8 @@ endElement (
         pullInfo->state = PULLPARSERSTATE_END_TAG;
     }
 
-    pullInfo->elmname = name;
+    pullInfo->currentElm = (Tcl_Obj *)
+        Tcl_GetHashValue(Tcl_FindHashEntry (pullInfo->elmCache, name));
     XML_StopParser(pullInfo->parser, 1);
 }
 
@@ -192,6 +203,8 @@ tDOM_PullParserDeleteCmd (
     )
 {
     tDOM_PullParserInfo *pullInfo = clientdata;
+    Tcl_HashEntry *entryPtr;
+    Tcl_HashSearch search;
 
     XML_ParserFree (pullInfo->parser);
     if (pullInfo->inputString) {
@@ -205,6 +218,13 @@ tDOM_PullParserDeleteCmd (
     if (pullInfo->channelReadBuf) {
         Tcl_DecrRefCount (pullInfo->channelReadBuf);
     }
+    entryPtr = Tcl_FirstHashEntry(pullInfo->elmCache, &search);
+    while (entryPtr) {
+        Tcl_DecrRefCount ((Tcl_Obj*) Tcl_GetHashValue (entryPtr));
+        entryPtr = Tcl_NextHashEntry (&search);
+    }
+    Tcl_DeleteHashTable (pullInfo->elmCache);
+    FREE (pullInfo->elmCache);
     Tcl_DecrRefCount(pullInfo->start_tag);
     Tcl_DecrRefCount(pullInfo->end_tag);
     Tcl_DecrRefCount(pullInfo->text);
@@ -531,7 +551,7 @@ tDOM_PullParserInstanceCmd (
             SetResult("Invalid state");
             return TCL_ERROR;
         }
-        SetResult(pullInfo->elmname);
+        Tcl_SetObjResult (interp, pullInfo->currentElm);
         break;
 
     case m_attributes:
@@ -651,7 +671,9 @@ tDOM_PullParserCmd (
     pullInfo->text = Tcl_NewStringObj("TEXT", 4);
     Tcl_IncrRefCount (pullInfo->text);
     pullInfo->ignoreWhiteSpaces = ignoreWhiteSpaces;
-    
+    pullInfo->elmCache = (Tcl_HashTable *)MALLOC(sizeof (Tcl_HashTable));
+    Tcl_InitHashTable(pullInfo->elmCache, TCL_STRING_KEYS);
+        
     Tcl_CreateObjCommand (interp, Tcl_GetString(objv[1]),
                           tDOM_PullParserInstanceCmd, (ClientData) pullInfo,
                           tDOM_PullParserDeleteCmd);
