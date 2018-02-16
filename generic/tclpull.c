@@ -50,6 +50,7 @@ typedef struct tDOM_PullParserInfo
     int             inputfd;
     PullParserState state;
     PullParserState nextState;
+    PullParserState next2State;
     Tcl_DString    *cdata;
     const char     *elmname;
     const char    **atts;
@@ -116,11 +117,19 @@ endElement (
 {
     tDOM_PullParserInfo *pullInfo = userData;
     XML_ParsingStatus status;
+    int reportStartTag = 0, reportText = 0;
     
     DBG(fprintf(stderr, "endElement tag %s\n", name));
+
+    XML_GetParsingStatus (pullInfo->parser, &status);
+    if (status.parsing == XML_SUSPENDED) {
+        reportStartTag = 1;
+    }
+
+    
     if (Tcl_DStringLength (pullInfo->cdata) > 0) {
         if (pullInfo->ignoreWhiteSpaces) {
-            char *pc; int len, wso = 1;
+            char *pc; int len;
             len = Tcl_DStringLength(pullInfo->cdata);
             for (pc = Tcl_DStringValue (pullInfo->cdata);
                  len > 0;
@@ -130,31 +139,30 @@ endElement (
                      (*pc != '\t') &&
                      (*pc != '\n') &&
                      (*pc != '\r') ) {
-                    wso = 0;
+                    reportText = 1;
                     break;
                 }
             }
-            if (wso) {
-                DBG(fprintf(stderr, "... skipping white space only text\n"));
-                Tcl_DStringSetLength (pullInfo->cdata, 0);
-                pullInfo->state = PULLPARSERSTATE_END_TAG;
-            } else {
-                pullInfo->state = PULLPARSERSTATE_TEXT;
-                pullInfo->nextState = PULLPARSERSTATE_END_TAG;
-            }
         } else {
-            pullInfo->state = PULLPARSERSTATE_TEXT;
-            pullInfo->nextState = PULLPARSERSTATE_END_TAG;
-        }
-    } else {
-        XML_GetParsingStatus (pullInfo->parser, &status);
-        if (status.parsing == XML_SUSPENDED) {
-            pullInfo->state = PULLPARSERSTATE_START_TAG;
-            pullInfo->nextState = PULLPARSERSTATE_END_TAG;
-        } else {
-            pullInfo->state = PULLPARSERSTATE_END_TAG;
+            reportText = 1;
         }
     }
+
+
+    if (reportStartTag && reportText) {
+        pullInfo->state = PULLPARSERSTATE_TEXT;
+        pullInfo->nextState = PULLPARSERSTATE_START_TAG;
+        pullInfo->next2State = PULLPARSERSTATE_END_TAG;
+    } else if (reportStartTag) {
+        pullInfo->state = PULLPARSERSTATE_START_TAG;
+        pullInfo->nextState = PULLPARSERSTATE_END_TAG;
+    } else if (reportText) {
+        pullInfo->state = PULLPARSERSTATE_TEXT;
+        pullInfo->nextState = PULLPARSERSTATE_END_TAG;
+    } else {
+        pullInfo->state = PULLPARSERSTATE_END_TAG;
+    }
+
     pullInfo->elmname = name;
     XML_StopParser(pullInfo->parser, 1);
 }
@@ -344,7 +352,11 @@ tDOM_PullParserInstanceCmd (
         if (pullInfo->state == PULLPARSERSTATE_TEXT) {
             Tcl_DStringSetLength (pullInfo->cdata, 0);
         }
-        if (pullInfo->nextState) {
+        if (pullInfo->next2State) {
+            pullInfo->state = pullInfo->nextState;
+            pullInfo->nextState = pullInfo->next2State;
+            pullInfo->next2State = 0;
+        } else if (pullInfo->nextState) {
             pullInfo->state = pullInfo->nextState;
             pullInfo->nextState = 0;
         } else {
