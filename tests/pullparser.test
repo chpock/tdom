@@ -4,6 +4,8 @@
 # interface.
 # Tested functionalities:
 #    pp-1.*: Basics, interface
+#    pp-2.*: Compare dom / pull parsing
+#
 # Copyright (c) 2017 Rolf Ade.
 
 source [file join [file dir [info script]] loadtdom.tcl]
@@ -31,3 +33,133 @@ test pp-1.4 {State after creation} {
     pp delete
     set result
 } {READY READY}
+
+proc walkDOM {node} {
+    set str ""
+    switch [$node nodeType] {
+        "ELEMENT_NODE" {
+            append str [$node nodeName]
+            # Because the dom builder arranges attributes so that the
+            # xmlns attributes come first we need to ensure a unify
+            # attribute order for comparsion.
+            set attpairs [list]
+            foreach att [$node attributes] {
+                if {[llength $att] == 3} {
+                    if {[lindex $att 2] eq ""} {
+                        lappend attpairs [list \
+                            xmlns:[lindex $att 0] \
+                            [$node getAttribute xmlns:[lindex $att 0]]]
+                    } else {
+                        lappend attpairs [list \
+                            [lindex $att 1]:[lindex $att 0] \
+                            [$node getAttribute [lindex $att 1]:[lindex $att 0]]]
+                    }
+                } else {
+                    lappend attpairs [list $att [$node getAttribute $att]]
+                }
+            }
+            foreach {name value} [lsort -index 0 $attpairs] {
+                append str $name $value
+            }
+            foreach child [$node childNodes] {
+                append str [walkDOM $child]
+            }
+            append str /[$node nodeName]
+        }
+        "TEXT_NODE" {
+            append str [$node nodeValue]
+        }
+        default {
+            # Ignore anything else
+        }
+    }
+    return $str
+}
+
+proc loopPull {} {
+    while {[set state [pp next]] ne "END_DOCUMENT"} {
+        switch $state {
+            "START_TAG" {
+                append pullstr [pp tag]
+                set attpairs [list]
+                foreach {attname attvalue} [pp attributes] {
+                    lappend attpairs [list $attname $attvalue]
+                }
+                foreach {name value} [lsort -index 0 $attpairs] {
+                    append pullstr $name $value
+                }
+            }
+            "TEXT" {
+                append pullstr [pp text]
+            }
+            "END_TAG" {
+                append pullstr /[pp tag]
+            }
+        }
+    }
+    return $pullstr
+}
+
+proc compareWith {data {inputMethod input}} {
+    if {$inputMethod eq "input"} {
+        dom parse $data doc
+    } elseif {$inputMethod eq "inputchannel"} {
+        dom parse -channel $data doc
+    } else {
+        dom parse [::tDOM::xmlReadFile $data] doc
+    }
+    set domstr [walkDOM [$doc documentElement]]
+    $doc delete
+    tDOM::pullparser pp -ignorewhitecdata
+    pp $inputMethod $data
+    set pullstr [loopPull]
+    if {$domstr eq $pullstr} {
+        return 1
+    } else {
+        puts $domstr
+        puts $pullstr
+        return 0
+    }
+}
+
+test pp-2.1 {dom/pull comparsion: mondial-europe.xml} {
+    compareWith ../tests/data/mondial-europe.xml inputfile
+} 1
+
+test pp-2.2 {dom/pull comparsion: books.xml} {
+    compareWith ../tests/data/books.xml inputfile
+} 1
+
+test pp-2.3 {dom/pull comparsion: i18n_1.xml} {
+    compareWith ../tests/data/i18n_1.xml inputfile
+} 1
+
+test pp-2.4 {dom/pull comparsion: i18n_2.xml} {
+    compareWith ../tests/data/i18n_1.xml inputfile
+} 1
+
+test pp-2.5 {dom/pull comparsion: REC-xslt-19991116.xml} {
+    compareWith ../tests/data/REC-xslt-19991116.xml inputfile
+} 1
+
+test pp-2.6 {dom/pull comparsion: xslt_1.xsl} {
+    compareWith ../tests/data/xslt_1.xsl inputfile
+} 1
+
+test pp-2.7 {dom/pull comparsion} {
+    compareWith {<p>This specification defines the syntax and semantics of XSLT, which
+is a language for transforming XML documents into other XML
+        documents.</p>}
+} 1
+
+test pp-2.8 {dom/pull comparsion} {
+    compareWith {<p><termdef> (see <specref/>), which is
+referred to in </termdef></p>}
+} 1
+
+test pp-2.9 {dom/pull comparsion} {
+    compareWith {<p>This specification defines the syntax and semantics of the XSLT
+language.  A transformation in the XSLT language is expressed as a
+well-formed XML document <bibref/>conforming </p>}
+} 1
+
