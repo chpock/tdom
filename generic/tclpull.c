@@ -72,10 +72,12 @@ startElement(
 )
 {
     tDOM_PullParserInfo *pullInfo = userData;
+
     DBG(fprintf(stderr, "startElement tag %s\n", name));
+
     if (Tcl_DStringLength (pullInfo->cdata) > 0) {
         if (pullInfo->ignoreWhiteSpaces) {
-            char *pc, len, wso = 1;
+            char *pc; int len, wso = 1;
             len = Tcl_DStringLength(pullInfo->cdata);
             for (pc = Tcl_DStringValue (pullInfo->cdata);
                  len > 0;
@@ -93,10 +95,12 @@ startElement(
                 Tcl_DStringSetLength (pullInfo->cdata, 0);
                 pullInfo->state = PULLPARSERSTATE_START_TAG;
             } else {
+                DBG(fprintf(stderr, "schedule TEXT event\n"));
                 pullInfo->state = PULLPARSERSTATE_TEXT;
                 pullInfo->nextState = PULLPARSERSTATE_START_TAG;
             }
         } else {
+            DBG(fprintf(stderr, "schedule TEXT event\n"));
             pullInfo->state = PULLPARSERSTATE_TEXT;
             pullInfo->nextState = PULLPARSERSTATE_START_TAG;
         }
@@ -126,7 +130,6 @@ endElement (
         reportStartTag = 1;
     }
 
-    
     if (Tcl_DStringLength (pullInfo->cdata) > 0) {
         if (pullInfo->ignoreWhiteSpaces) {
             char *pc; int len;
@@ -150,13 +153,16 @@ endElement (
 
 
     if (reportStartTag && reportText) {
+        DBG(fprintf(stderr, "schedule 2 events\n"));
         pullInfo->state = PULLPARSERSTATE_TEXT;
         pullInfo->nextState = PULLPARSERSTATE_START_TAG;
         pullInfo->next2State = PULLPARSERSTATE_END_TAG;
     } else if (reportStartTag) {
+        DBG(fprintf(stderr, "schedule 1 event\n"));
         pullInfo->state = PULLPARSERSTATE_START_TAG;
         pullInfo->nextState = PULLPARSERSTATE_END_TAG;
     } else if (reportText) {
+        DBG(fprintf(stderr, "schedule 1 event\n"));
         pullInfo->state = PULLPARSERSTATE_TEXT;
         pullInfo->nextState = PULLPARSERSTATE_END_TAG;
     } else {
