@@ -151,6 +151,12 @@ test dom-1.20 {createDocumentNS - empty namespace, prefix} {
     set errMsg
 } {Missing URI in Namespace declaration}
 
+test dom-1.21 {Explicit delete of scoped doc} {
+    dom createDocument test doc
+    domDoc $doc delete
+    unset doc
+} {}    
+
 test dom-2.1 {Don't quash white space at start or end of non white space content} {
     set doc [dom parse {<root>
     some content
