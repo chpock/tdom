@@ -60,6 +60,8 @@ typedef struct tDOM_PullParserInfo
     Tcl_Obj        *end_tag;
     Tcl_Obj        *text;
     int             ignoreWhiteSpaces;
+    int             skipMode;
+    int             skipDepth;
 } tDOM_PullParserInfo;
 
 #define SetResult(str) Tcl_ResetResult(interp); \
@@ -78,6 +80,10 @@ startElement(
     
     DBG(fprintf(stderr, "startElement tag %s\n", name));
 
+    if (pullInfo->skipMode) {
+        pullInfo->skipDepth++;
+        return;
+    }
     if (Tcl_DStringLength (pullInfo->cdata) > 0) {
         if (pullInfo->ignoreWhiteSpaces) {
             char *pc; int len, wso = 1;
@@ -124,6 +130,19 @@ startElement(
 }
 
 static void
+characterDataHandler (
+    void        *userData,
+    const char  *s,
+    int          len
+)
+{
+    tDOM_PullParserInfo *pullInfo = userData;
+
+    DBG(fprintf(stderr, "cdata handler called\n"));
+    Tcl_DStringAppend (pullInfo->cdata, s, len);    
+}
+
+static void
 endElement (
     void        *userData,
     const char  *name
@@ -135,6 +154,15 @@ endElement (
     
     DBG(fprintf(stderr, "endElement tag %s\n", name));
 
+    if (pullInfo->skipMode) {
+        if (pullInfo->skipDepth > 0) {
+            pullInfo->skipDepth--;
+            return;
+        }
+        pullInfo->skipMode = 0;
+        XML_SetCharacterDataHandler (pullInfo->parser, characterDataHandler);
+    }
+            
     XML_GetParsingStatus (pullInfo->parser, &status);
     if (status.parsing == XML_SUSPENDED) {
         reportStartTag = 1;
@@ -161,7 +189,6 @@ endElement (
         }
     }
 
-
     if (reportStartTag && reportText) {
         DBG(fprintf(stderr, "schedule 2 events\n"));
         pullInfo->state = PULLPARSERSTATE_TEXT;
@@ -182,19 +209,6 @@ endElement (
     pullInfo->currentElm = (Tcl_Obj *)
         Tcl_GetHashValue(Tcl_FindHashEntry (pullInfo->elmCache, name));
     XML_StopParser(pullInfo->parser, 1);
-}
-
-static void
-characterDataHandler (
-    void        *userData,
-    const char  *s,
-    int          len
-)
-{
-    tDOM_PullParserInfo *pullInfo = userData;
-
-    DBG(fprintf(stderr, "cdata handler called\n"));
-    Tcl_DStringAppend (pullInfo->cdata, s, len);    
 }
 
 static void
@@ -266,6 +280,83 @@ tDOM_CleanupInputSource (
 }
 
 static int
+tDOM_resumeParseing (
+    Tcl_Interp *interp,
+    tDOM_PullParserInfo *pullInfo
+    ) 
+{
+    XML_ParsingStatus pstatus;
+    int len, done, result;
+    char *data;
+    
+    switch (XML_ResumeParser (pullInfo->parser)) {
+    case XML_STATUS_OK:
+        if (pullInfo->inputString) {
+            Tcl_DecrRefCount (pullInfo->inputString);
+            pullInfo->inputString = NULL;
+            pullInfo->state = PULLPARSERSTATE_END_DOCUMENT;
+            break;
+        }
+        XML_GetParsingStatus (pullInfo->parser, &pstatus);
+        if (pstatus.parsing == XML_FINISHED) {
+            tDOM_CleanupInputSource (pullInfo);
+            pullInfo->state = PULLPARSERSTATE_END_DOCUMENT;
+            break;
+        }
+        if (pullInfo->inputChannel) {
+            do {
+                len = Tcl_ReadChars (pullInfo->inputChannel,
+                                     pullInfo->channelReadBuf,
+                                     1024, 0);
+                done = (len < 1024);
+                data = Tcl_GetStringFromObj (
+                    pullInfo->channelReadBuf, &len
+                    );
+                result = XML_Parse (pullInfo->parser, data,
+                                    len, done);
+            } while (result == XML_STATUS_OK && !done);
+        } else {
+            /* inputfile */
+            do {
+                char *fbuf = 
+                    XML_GetBuffer (pullInfo->parser,
+                                   TDOM_EXPAT_READ_SIZE);
+                len = read (pullInfo->inputfd, fbuf,
+                            TDOM_EXPAT_READ_SIZE);
+                done = (len < TDOM_EXPAT_READ_SIZE);
+                result = XML_ParseBuffer (pullInfo->parser,
+                                          len, done);
+            } while (result == XML_STATUS_OK && !done);
+        }
+        if (result == XML_STATUS_ERROR) {
+            tDOM_CleanupInputSource (pullInfo);
+            tDOM_ReportXMLError (interp, pullInfo);
+            pullInfo->state = PULLPARSERSTATE_PARSE_ERROR;
+            return TCL_ERROR;
+        }
+        if (done && result == XML_STATUS_OK) {
+            tDOM_CleanupInputSource (pullInfo);
+            pullInfo->state = PULLPARSERSTATE_END_DOCUMENT;
+        }
+        /* If here result == XML_STATUS_SUSPENDED,
+         * state was set in handler, just take care to
+         * report */
+        break;
+    case XML_STATUS_ERROR:
+        tDOM_CleanupInputSource (pullInfo);
+        tDOM_ReportXMLError (interp, pullInfo);
+        pullInfo->state = PULLPARSERSTATE_PARSE_ERROR;
+        return TCL_ERROR;
+    case XML_STATUS_SUSPENDED:
+        /* Nothing to do here, state was set in handler, just
+         * take care to report */
+        break;
+    }
+    
+    return TCL_OK;
+}
+
+static int
 tDOM_PullParserInstanceCmd (
     ClientData  clientdata,
     Tcl_Interp *interp,
@@ -274,23 +365,22 @@ tDOM_PullParserInstanceCmd (
     )
 {
     tDOM_PullParserInfo *pullInfo = clientdata;
-    int methodIndex, len, result, status, mode, fd, done;
+    int methodIndex, len, result, mode, fd;
     char *data;
     const char **atts;
     Tcl_Obj *resultPtr;
     Tcl_Channel channel;
-    XML_ParsingStatus pstatus;
     
     static const char *const methods[] = {
         "input", "inputchannel", "inputfile",
         "next", "state", "tag", "attributes",
-        "text", "delete", "reset", NULL
+        "text", "delete", "reset", "skip", NULL
     };
 
     enum method {
         m_input, m_inputchannel, m_inputfile,
         m_next, m_state, m_tag, m_attributes,
-        m_text, m_delete, m_reset
+        m_text, m_delete, m_reset, m_skip
     };
 
     if (objc == 1) {
@@ -422,7 +512,7 @@ tDOM_PullParserInstanceCmd (
                         result = XML_Parse (pullInfo->parser, data, len,
                                             len == 0);
                     } while (result == XML_STATUS_OK);
-                } else if (pullInfo->inputString) {
+                } else {
                     data = Tcl_GetStringFromObj(pullInfo->inputString, &len);
                     result = XML_Parse (pullInfo->parser, data, len, 1);
                 }
@@ -443,71 +533,10 @@ tDOM_PullParserInstanceCmd (
                 }
                 break;
             default:
-                status = XML_ResumeParser (pullInfo->parser);
-                switch (status) {
-                case XML_STATUS_OK:
-                    if (pullInfo->inputString) {
-                        Tcl_DecrRefCount (pullInfo->inputString);
-                        pullInfo->inputString = NULL;
-                        pullInfo->state = PULLPARSERSTATE_END_DOCUMENT;
-                        break;
-                    }
-                    XML_GetParsingStatus (pullInfo->parser, &pstatus);
-                    if (pstatus.parsing == XML_FINISHED) {
-                        tDOM_CleanupInputSource (pullInfo);
-                        pullInfo->state = PULLPARSERSTATE_END_DOCUMENT;
-                        break;
-                    }
-                    if (pullInfo->inputChannel) {
-                        do {
-                            len = Tcl_ReadChars (pullInfo->inputChannel,
-                                                 pullInfo->channelReadBuf,
-                                                 1024, 0);
-                            done = (len < 1024);
-                            data = Tcl_GetStringFromObj (
-                                pullInfo->channelReadBuf, &len
-                                );
-                            result = XML_Parse (pullInfo->parser, data,
-                                                len, done);
-                        } while (result == XML_STATUS_OK && !done);
-                    } else {
-                        /* inputfile */
-                        do {
-                            char *fbuf = 
-                                XML_GetBuffer (pullInfo->parser,
-                                               TDOM_EXPAT_READ_SIZE);
-                            len = read (pullInfo->inputfd, fbuf,
-                                        TDOM_EXPAT_READ_SIZE);
-                            done = (len < TDOM_EXPAT_READ_SIZE);
-                            result = XML_ParseBuffer (pullInfo->parser,
-                                                      len, done);
-                        } while (result == XML_STATUS_OK && !done);
-                    }
-                    if (result == XML_STATUS_ERROR) {
-                        tDOM_CleanupInputSource (pullInfo);
-                        tDOM_ReportXMLError (interp, pullInfo);
-                        pullInfo->state = PULLPARSERSTATE_PARSE_ERROR;
-                        return TCL_ERROR;
-                    }
-                    if (done && result == XML_STATUS_OK) {
-                        tDOM_CleanupInputSource (pullInfo);
-                        pullInfo->state = PULLPARSERSTATE_END_DOCUMENT;
-                    }
-                    /* If here result == XML_STATUS_SUSPENDED,
-                     * state was set in handler, just take care to
-                     * report */
-                            
-                    break;
-                case XML_STATUS_ERROR:
-                    tDOM_CleanupInputSource (pullInfo);
-                    tDOM_ReportXMLError (interp, pullInfo);
-                    pullInfo->state = PULLPARSERSTATE_PARSE_ERROR;
+                if (tDOM_resumeParseing (interp, pullInfo) != TCL_OK) {
                     return TCL_ERROR;
-                case XML_STATUS_SUSPENDED:
-                    /* Nothing to do here, state was set in handler, just
-                     * take care to report */
-                    break;
                 }
+                break;
             }
         }
         /* Fall throu to reporting state */
@@ -585,6 +614,35 @@ tDOM_PullParserInstanceCmd (
             Tcl_DStringLength (pullInfo->cdata)
             );
         break;
+
+    case m_skip:
+        if (objc != 2) {
+            Tcl_WrongNumArgs (interp, 2, objv, "");
+            return TCL_ERROR;
+        }
+        if (pullInfo->state != PULLPARSERSTATE_START_TAG) {
+            SetResult("Invalid state - skip method is only valid in state START_TAG.");
+            return TCL_ERROR;
+        }
+        if (pullInfo->nextState == PULLPARSERSTATE_END_TAG
+            || pullInfo->next2State == PULLPARSERSTATE_END_TAG) {
+            pullInfo->state = PULLPARSERSTATE_END_TAG;
+            pullInfo->nextState = 0;
+            pullInfo->next2State = 0;
+            Tcl_DStringSetLength (pullInfo->cdata, 0);
+            Tcl_SetObjResult (interp, pullInfo->end_tag);
+            break;
+        }
+        pullInfo->skipMode = 1;
+        pullInfo->skipDepth = 0;
+        Tcl_DStringSetLength (pullInfo->cdata, 0);
+        XML_SetCharacterDataHandler (pullInfo->parser, NULL);
+        if (tDOM_resumeParseing (interp, pullInfo) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        Tcl_SetObjResult (interp, pullInfo->end_tag);
+        break;
+        
         
     case m_delete:
         if (objc != 2) {

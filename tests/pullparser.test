@@ -5,6 +5,7 @@
 # Tested functionalities:
 #    pp-1.*: Basics, interface
 #    pp-2.*: Compare dom / pull parsing
+#    pp-3.*: skip method
 #
 # Copyright (c) 2017 Rolf Ade.
 
@@ -163,3 +164,168 @@ language.  A transformation in the XSLT language is expressed as a
 well-formed XML document <bibref/>conforming </p>}
 } 1
 
+test pp-3.1 {skip} {
+    tDOM::pullparser pp
+    pp input <doc/>
+    set result [pp next]
+    lappend result [pp tag]
+    lappend result [pp skip]
+    lappend result [pp tag]
+    lappend result [pp next]
+    pp delete
+    set result
+} {START_TAG doc END_TAG doc END_DOCUMENT}
+
+test pp-3.1.1 {skip} {
+    tDOM::pullparser pp
+    pp input {<doc><e/></doc>}
+    set result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp skip]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    pp delete
+    set result
+} {START_TAG doc START_TAG e END_TAG e END_TAG doc END_DOCUMENT}
+
+test pp-3.1.2 {skip} {
+    tDOM::pullparser pp
+    pp input {<doc>text<e/>text</doc>}
+    set result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [pp text]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp skip]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [pp text]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    pp delete
+    set result
+} {START_TAG doc TEXT text START_TAG e END_TAG e TEXT text END_TAG doc END_DOCUMENT}
+
+test pp-3.1.3 {skip} {
+    tDOM::pullparser pp
+    pp input {<doc>text<e>bar<b><c/><c>baz</c></b><b>text</b></e>text</doc>}
+    set result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [pp text]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp skip]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [pp text]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    pp delete
+    set result
+} {START_TAG doc TEXT text START_TAG e END_TAG e TEXT text END_TAG doc END_DOCUMENT}
+
+test pp-3.2 {skip} {
+    tDOM::pullparser pp
+    pp input {<doc><e/></doc>}
+    set result [pp next]
+    lappend result [pp tag]
+    lappend result [pp skip]
+    lappend result [pp tag]
+    lappend result [pp next]
+    pp delete
+    set result
+} {START_TAG doc END_TAG doc END_DOCUMENT}
+
+test pp-3.3 {skip} {
+    tDOM::pullparser pp
+    pp input {<doc>foo bar<e/></doc>}
+    set result [pp next]
+    lappend result [pp tag]
+    lappend result [pp skip]
+    lappend result [pp tag]
+    lappend result [pp next]
+    pp delete
+    set result
+} {START_TAG doc END_TAG doc END_DOCUMENT}
+
+test pp-3.4 {skip} {
+    tDOM::pullparser pp
+    pp input {<doc>foo bar<e/><e>bar<e/></e><e></e></doc>}
+    set result [pp next]
+    lappend result [pp tag]
+    lappend result [pp skip]
+    lappend result [pp tag]
+    lappend result [pp next]
+    pp delete
+    set result
+} {START_TAG doc END_TAG doc END_DOCUMENT}
+
+test pp-3.5 {skip} {
+    tDOM::pullparser pp
+    pp input {<doc>foo bar<e/><e>bar<e/></e><e></e></doc>}
+    set result [list]
+    while {[set state [pp next]] ne "END_DOCUMENT"} {
+        lappend result $state
+        if {$state eq "START_TAG"} {
+            lappend result [pp tag]
+            if {[pp tag] eq "e"} {
+                pp skip
+                continue
+            }
+        }
+        if {[pp state] eq "END_TAG"} {
+            lappend result [pp tag]
+        }
+    }
+    pp delete
+    set result
+} {START_TAG doc TEXT START_TAG e START_TAG e START_TAG e END_TAG doc}
+
+test pp-3.6 {skip} {
+    tDOM::pullparser pp
+    pp input {<doc>foo bar<e/><e>bar<e/></e><e></e>baz</doc>}
+    set result [list]
+    while {[set state [pp next]] ne "END_DOCUMENT"} {
+        lappend result $state
+        if {$state eq "START_TAG"} {
+            lappend result [pp tag]
+            if {[pp tag] eq "e"} {
+                pp skip
+                continue
+            }
+        }
+        if {[pp state] eq "END_TAG"} {
+            lappend result [pp tag]
+        }
+        if {[pp state] eq "TEXT"} {
+            lappend result [pp text]
+        }
+    }
+    pp delete
+    set result
+} {START_TAG doc TEXT {foo bar} START_TAG e START_TAG e START_TAG e TEXT baz END_TAG doc}
+
+test pp-3.7 {skip} {
+    tDOM::pullparser pp
+    pp input {<doc>foo bar<e/><e>bar</wrong><e></e></doc>}
+    set result [pp next]
+    lappend result [pp next]; # TEXT "foo bar"
+    lappend result [pp next]; # START_TAG
+    lappend result [pp tag];  # e
+    lappend result [pp next]; # END_TAG
+    lappend result [pp tag];  # e
+    lappend result [pp next]; # START_TAG
+    lappend result [pp tag];  # e
+    lappend result [catch {pp skip} errMsg]
+    lappend result $errMsg
+    pp delete
+    set result
+} {START_TAG TEXT START_TAG e END_TAG e START_TAG e 1 {error "mismatched tag" at line 1 character 24}}
