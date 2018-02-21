@@ -22,11 +22,11 @@ source [file join [file dir [info script]] loadtdom.tcl]
 
 test dom-1.1 {createDocument with root node name not a XML Name} {
     list [catch {dom createDocument "root node"} msg] $msg
-} "1 {invalid root element name}"
+} "1 {Invalid root element name 'root node'}"
 
 test dom-1.2 {createDocument with root node name not a XML Name} {
     list [catch {dom createDocument "1root"} msg] $msg
-} "1 {invalid root element name}"
+} "1 {Invalid root element name '1root'}"
 
 test dom-1.3 {createDocument - root name us-ascii} {
     dom createDocument "root" doc 
@@ -74,19 +74,19 @@ test dom-1.8 {createDocumentNS - check the NS of the created root} {
 
 test dom-1.9 {createDocumentNS with root name not a NCName} {
     list [catch {dom createDocumentNS "http://foo.bar" "foo bar" doc} msg] $msg
-} "1 {invalid local name}"
+} "1 {Invalid root element name 'foo bar'}"
 
 test dom-1.10 {createDocumentNS with root name not a NCName} {
     list [catch {dom createDocumentNS "http://foo.bar" "a:b:c" doc} msg] $msg
-} "1 {invalid local name}"
+} "1 {Invalid root element name 'a:b:c'}"
 
 test dom-1.11 {createDocumentNS with root name not a NCName} {
     list [catch {dom createDocumentNS "http://foo.bar" "a b:b" doc} msg] $msg
-} "1 {invalid prefix name}"
+} "1 {Invalid root element name 'a b:b'}"
 
 test dom-1.12 {createDocumentNS with root name not a NCName} {
     list [catch {dom createDocumentNS "http://foo.bar" "a:a b" doc} msg] $msg
-} "1 {invalid local name}"
+} "1 {Invalid root element name 'a:a b'}"
 
 test dom-1.13 {createDocumentNS - check root name} {
     set doc [dom createDocumentNS "http://foo.bar" foo:root]
@@ -151,7 +151,7 @@ test dom-1.20 {createDocumentNS - empty namespace, prefix} {
     set errMsg
 } {Missing URI in Namespace declaration}
 
-test dom-1.21 {Explicit delete of scoped doc} {
+test dom-1.21 {Explicit delete of scoped doc with domDoc cmd} {knownBug} {
     dom createDocument test doc
     domDoc $doc delete
     unset doc
@@ -1506,6 +1506,16 @@ test dom-7.19 {setTextCheck and appendFromScript - setTextCheck state at create 
     lappend result $errMsg
 } [list 1 "Invalid text value 'foo\u0003bar'"]
 
+test dom-7.19 {setNameCheck / createDocument} {
+    dom setNameCheck 0
+    dom createDocument "foo bar" doc
+    set result [$doc asXML -indent none]
+    $doc delete
+    dom setNameCheck 1
+    set result
+} {<foo bar/>}
+    
+
 test dom-8.1 {createDocumentNode} {
     set result [catch {dom createDocumentNode foo bar}]
 } {1}
@@ -1757,7 +1767,7 @@ test dom-11.5 {featureinfo - jsonmaxnesting} {
 } 2000
 
 test dom-11.6 {featureinfo - versionhash} {
-    regexp {^[0-9a-fA-F]{40}$} [dom featureinfo versionhash]
+    regexp {^[0-9a-fA-F]+$} [dom featureinfo versionhash]
 } 1
 
 proc ::dom::domParseFeedback {} {

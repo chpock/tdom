@@ -1,5 +1,5 @@
-C Added\stest\sfor\s[e6ccc3c1fac1].
-D 2018-02-17T03:27:10.037
+C Respect\s[dom\ssetNameCheck]\seven\sfor\s[dom\screateDocument/createDocumentNS\s...]\sThanks\sto\spooryorick\sfor\sreporting.
+D 2018-02-21T00:09:42.505
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -130,7 +130,7 @@ F extensions/tnc/win/rules-ext.vc e788fcfc1e69b11946e18b8f67e0870b3bd38913
 F extensions/tnc/win/rules.vc 8157e2a811cf5e93683d6b0fbf5d91d153aa4535
 F extensions/tnc/win/targets.vc 79dea1c6a94a94e6ed8bae9e0195149b25a69923
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
-F generic/dom.c 8940bfa290dd68186268e4b3b5adfe35a0edb0a2
+F generic/dom.c 1134e5039f4e2ea01a28148604be60a1eaf5f377898018249ede80838a44bb4a
 F generic/dom.h ea32034888b1f4601951bbd458ab1d8b0e44695d
 F generic/domalloc.c 55e9eeff19cc54cf3956a7013883ead07efd3593
 F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
@@ -149,7 +149,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 4637664667d7d458eab2081dc694e0c0f4c55223
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
-F generic/tcldom.c 0dd129c60f47bc570ae58c71134b2bd7dd35f066
+F generic/tcldom.c 1c18a133534610a1ef84449a7883e3aba9d3af3e4c7563b7ba949a1821cb083e
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
 F generic/tclexpat.c 6d91b063777fe13c175cb80c97ed6cdddb68e2ba
 F generic/tclexpat.h f70ed259e4c81333df48f6b13e995d1dacb27586
@@ -197,7 +197,7 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.bench 5446ce379127b8d5700f18a5a0848e580313d0d7
-F tests/dom.test 2ca1216801b13ef50151344f0864343b355e6d0dd2ad3bfa51551118f737ba03
+F tests/dom.test 83518796aa5f5d7314f88943eb0a3367fe4f97db8b5b79a77a5da7627f09f624
 F tests/domDoc.test 99a4e4e8b894e97f62d438f0cd6f1e470d8bf2b3
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test 66a77f681b6e946b88c55a72efe62d8d7e430348
@@ -237,8 +237,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P b054a3bb6e03bdcd3f8b05974d11cfaa750e57cf
-R b7a1a9e938f7b530d3856f19c44f822e
+P ebebdc302788ba5d1f5190a1cd4915eee45ec23e2a2f9ca56afa9ac3560f129f
+R 5ed6a81bacd7dd22793cdb8355ffbd55
 U rolf
-Z c27c19ea25ed290b27ec46954edb0687
+Z 30ed340e777c3f14e474e73adc0deb2e
 # Remove this line to create a well-formed Fossil manifest.
