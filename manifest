@@ -1,5 +1,5 @@
-C Removed\sthe\snow\sunused\sinterp\sargument\sfrom\sdomCreateDocument.
-D 2018-02-21T12:30:27.448
+C HTML\sreader:\sDocument\smemory\saccess\sproblem\swith\sinvalid\snumeric\scharacter\sentity.
+D 2018-02-21T22:26:12.112
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -206,7 +206,7 @@ F tests/domnamespace.test c67346e939dab82f1b6de8ddd04bd004cf24391b
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
 F tests/html5reader.test f839da02dd4b1227a2ee3bae9abfba983951d9ad
-F tests/htmlreader.test 0fffea0d73efb2ccf5e3a807e68b437f55a152d2
+F tests/htmlreader.test e807b9b326fc615e27b19a3df564fe3efe78bbb45d6bd99023993cbe5c609b4d
 F tests/i18n.test 085cc18a881d5d6952267c28cd319dcc72aadbd1
 F tests/loadtdom.tcl 299708334c5e68ce50faf166d9538de0178ce7cd
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
@@ -237,8 +237,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 20ad68103637e99e14f5bfce229ee50239ffc1ffc746f65c37f92b1fc9f54e15
-R a3cac4142ea39c09fd997a27a896f467
+P d0fbb5904c583f612f22e690ef45a06873772f26e86e0e58e4b397a06b0d8106
+R 08064f30bd24165871bcf3512958b379
 U rolf
-Z c0741a876259fe452c5f63c571030fd1
+Z dfdf37452dad92dfc37fa21db9882e98
 # Remove this line to create a well-formed Fossil manifest.
