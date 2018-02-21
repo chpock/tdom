@@ -172,12 +172,13 @@ test dom-1.23 {Explicit delete of scoped doc} {
     unset doc
 } {}    
 
-test dom-1.24 {Explicit delete of scoped doc} {knownBug} {
+test dom-1.24 {Explicit delete of scoped doc} {
     dom createDocument test doc
     set result [catch {set doc foo} errMsg]
     lappend result $errMsg
     $doc delete
     unset doc
+    set result
 } {1 {can't set "doc": var is read-only}}
 
 test dom-2.1 {Don't quash white space at start or end of non white space content} {

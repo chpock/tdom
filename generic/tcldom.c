@@ -546,6 +546,8 @@ char * tcldom_docTrace (
         return NULL;
     }
     if (flags & TCL_TRACE_WRITES) {
+        DOC_CMD(objCmdName, doc);
+        Tcl_SetVar2 (interp, name1, name2, objCmdName, TCL_LEAVE_ERR_MSG);
         return "var is read-only";
     }
     if (flags & TCL_TRACE_UNSETS) {
