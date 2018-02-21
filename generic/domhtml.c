@@ -576,6 +576,7 @@ static void TranslateEntityRefs (
 
     while (z[from]) {
         if (z[from]=='&') {
+            int isInvalid = 0;
             int i = from+1;
             int c;
 
@@ -598,6 +599,13 @@ static void TranslateEntityRefs (
                             value += c-'a' + 10;
                         } else {
                             /* error */
+			    isInvalid = 1;
+			    break;
+                        }
+                        if (value > 2097152) {
+                            /* error */
+			    isInvalid = 1;
+			    break;
                         }
                         i++;
                     }
@@ -608,14 +616,33 @@ static void TranslateEntityRefs (
                             value += c-'0';
                         } else {
                             /* error */
+  			    isInvalid = 1;
+			    break;
+                        }
+                        if (value > 2097152) {
+                            /* error */
+			    isInvalid = 1;
+			    break;
                         }
                         i++;
                     }
                 }
                 if (z[i]!=';') {
                     /* error */
+		    isInvalid = 1;
                 }
-                from = i+1;
+		if (isInvalid) {
+		    /*
+		     * In case the character reference was invalid
+		     * it was a false alaram, no valid character
+		     * reference, just copy the source chars;
+		     */
+		    int j;
+		    for (j = from; j < i; j++) {
+		        z[to++] = z[j];
+		    }
+		    from = i;
+		} else {
 #if TclOnly8Bits
                 z[to++] = value;
 #else 
@@ -632,6 +659,8 @@ static void TranslateEntityRefs (
                     /* error */
                 }
 #endif
+		    from = i+1;
+		}
             } else {
                 while (z[i] && isalpha((unsigned char)z[i])) {
                    i++;
