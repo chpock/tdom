@@ -44,7 +44,6 @@ typedef enum {
 typedef struct tDOM_PullParserInfo 
 {
     XML_Parser      parser;
-    Tcl_Interp     *interp;
     Tcl_Obj        *inputString;
     Tcl_Channel     inputChannel;
     int             inputfd;
@@ -718,7 +717,6 @@ tDOM_PullParserCmd (
     XML_SetUserData (pullInfo->parser, pullInfo);
     XML_SetElementHandler (pullInfo->parser, startElement, endElement);
     XML_SetCharacterDataHandler (pullInfo->parser, characterDataHandler);
-    pullInfo->interp = interp;
     pullInfo->cdata = (Tcl_DString*) MALLOC (sizeof (Tcl_DString));
     Tcl_DStringInit (pullInfo->cdata);
     pullInfo->state = PULLPARSERSTATE_READY;

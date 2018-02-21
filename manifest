@@ -1,5 +1,5 @@
-C Merged\strunk.
-D 2018-02-21T19:12:36.610
+C Removed\sunused\sstruct\smember.
+D 2018-02-21T23:58:21.270
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -153,7 +153,7 @@ F generic/tcldom.c ce5730f1077fff3d9fe5b053b8763f89810c5f14aa04829f1572244cfdcc9
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
 F generic/tclexpat.c 6d91b063777fe13c175cb80c97ed6cdddb68e2ba
 F generic/tclexpat.h f70ed259e4c81333df48f6b13e995d1dacb27586
-F generic/tclpull.c 33d1bf8c494dcc543f26286c3e0e5b1858f93e08750ae7b7d26d753df7497228
+F generic/tclpull.c e228cd6e6fa7e139d800001d0704ac1c763be6409912eb4a6e171ca95cc4534b
 F generic/tclpull.h d0d2599fa133de4ab038a260b4cfbd04f01c1312
 F generic/tdom.decls d825af72ec3fd2ae4ebb1d7f883bde6e3613c914
 F generic/tdom.h d27e43748242d5fe7dd98b8c7aa4a5a891d015bf
@@ -240,8 +240,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 1f504129d4adf7a5b4758dddd59334eb5cb91eb0b5f677f079631bd5e4119871 d0fbb5904c583f612f22e690ef45a06873772f26e86e0e58e4b397a06b0d8106
-R 8433c72b18e495d636cebb5ff67f132d
+P 39e0da6177acf490e713e12ead9072a3e75d1d10186ae43cacb92d641c7b6c06
+R bd8ab89af9e74d655f6ad67958c83b6e
 U rolf
-Z 287ec26137f1a07699d38ef021cfc956
+Z 1993938a9a82e21a70efb68203171a86
 # Remove this line to create a well-formed Fossil manifest.
