@@ -728,7 +728,7 @@ const char *   domException2String (domException exception);
 
 void           domModuleInitialize (void);
 domDocument *  domCreateDoc (const char *baseURI, int storeLineColumn);
-domDocument *  domCreateDocument (Tcl_Interp *interp, const char *uri,
+domDocument *  domCreateDocument (const char *uri,
                                   char *documentElementTagName);
 void           domSetDocumentElement (domDocument *doc);
 

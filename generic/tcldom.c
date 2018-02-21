@@ -5973,7 +5973,7 @@ int tcldom_createDocument (
     }
 
     CheckName(interp, Tcl_GetString(objv[1]), "root element", 0);
-    doc = domCreateDocument(interp, NULL, Tcl_GetString(objv[1]));
+    doc = domCreateDocument(NULL, Tcl_GetString(objv[1]));
     return tcldom_returnDocumentObj(interp, doc, setVariable, newObjName, 1,
                                     0);
 }
@@ -6059,11 +6059,11 @@ int tcldom_createDocumentNS (
                 return TCL_ERROR;
             }
         }
-        doc = domCreateDocument(interp, NULL, Tcl_GetString(objv[2]));
+        doc = domCreateDocument (NULL, Tcl_GetString(objv[2]));
     } else {
-        doc = domCreateDocument(interp, uri, Tcl_GetString(objv[2]));
+        doc = domCreateDocument (uri, Tcl_GetString(objv[2]));
     }
-    return tcldom_returnDocumentObj(interp, doc, setVariable, newObjName, 1,
+    return tcldom_returnDocumentObj (interp, doc, setVariable, newObjName, 1,
                                     0);
 }
 

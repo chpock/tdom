@@ -2518,7 +2518,6 @@ domCreateDoc (
 \--------------------------------------------------------------------------*/
 domDocument *
 domCreateDocument (
-    Tcl_Interp *interp,
     const char *uri,
     char       *documentElementTagName
 )
