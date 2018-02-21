@@ -2535,37 +2535,7 @@ domCreateDocument (
         domSplitQName (documentElementTagName, prefix, &localName);
         DBG(fprintf(stderr, 
                     "rootName: -->%s<--, prefix: -->%s<--, localName: -->%s<--\n", 
-                    documentElementTagName, prefix, localName);)
-        if (prefix[0] != '\0') {
-            if (!domIsNCNAME (prefix)) {
-                if (interp) {
-                    Tcl_SetObjResult(interp, 
-                                     Tcl_NewStringObj("invalid prefix name", -1));
-                }
-                return NULL;
-            }
-            if (uri[0] == '\0') {
-                Tcl_SetObjResult(interp,
-                                 Tcl_NewStringObj("Missing URI in "
-                                                  "Namespace declaration", -1));
-                return NULL;
-            }
-        }
-        if (!domIsNCNAME (localName)) {
-            if (interp) {
-                Tcl_SetObjResult(interp, 
-                                 Tcl_NewStringObj("invalid local name", -1));
-            }
-            return NULL;
-        }
-    } else {
-        if (!domIsNAME (documentElementTagName)) {
-            if (interp) {
-                Tcl_SetObjResult(interp, 
-                                 Tcl_NewStringObj("invalid root element name", -1));
-            }
-            return NULL;
-        }
+                    documentElementTagName, prefix, localName););
     }
     doc = domCreateDoc (NULL, 0);
 

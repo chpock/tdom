@@ -546,6 +546,8 @@ char * tcldom_docTrace (
         return NULL;
     }
     if (flags & TCL_TRACE_WRITES) {
+        DOC_CMD(objCmdName, doc);
+        Tcl_SetVar2 (interp, name1, name2, objCmdName, TCL_LEAVE_ERR_MSG);
         return "var is read-only";
     }
     if (flags & TCL_TRACE_UNSETS) {
@@ -5970,11 +5972,8 @@ int tcldom_createDocument (
         setVariable = 1;
     }
 
+    CheckName(interp, Tcl_GetString(objv[1]), "root element", 0);
     doc = domCreateDocument(interp, NULL, Tcl_GetString(objv[1]));
-    if (doc == NULL) {
-        return TCL_ERROR;
-    }
-
     return tcldom_returnDocumentObj(interp, doc, setVariable, newObjName, 1,
                                     0);
 }
@@ -6038,7 +6037,8 @@ int tcldom_createDocumentNS (
     Tcl_Obj    * const objv[]
 )
 {
-    int          setVariable = 0;
+    int          setVariable = 0, len;
+    char        *uri;
     domDocument *doc;
     Tcl_Obj     *newObjName = NULL;
 
@@ -6050,12 +6050,19 @@ int tcldom_createDocumentNS (
         setVariable = 1;
     }
 
-    doc = domCreateDocument(interp, Tcl_GetString(objv[1]),
-                            Tcl_GetString(objv[2]));
-    if (doc == NULL) {
-        return TCL_ERROR;
+    CheckName(interp, Tcl_GetString(objv[2]), "root element", 1);
+    uri = Tcl_GetStringFromObj (objv[1], &len);
+    if (len == 0) {
+        if (!TSD(dontCheckName)) {
+            if (!domIsNCNAME (Tcl_GetString(objv[2]))) {
+                SetResult ("Missing URI in Namespace declaration");
+                return TCL_ERROR;
+            }
+        }
+        doc = domCreateDocument(interp, NULL, Tcl_GetString(objv[2]));
+    } else {
+        doc = domCreateDocument(interp, uri, Tcl_GetString(objv[2]));
     }
-
     return tcldom_returnDocumentObj(interp, doc, setVariable, newObjName, 1,
                                     0);
 }
