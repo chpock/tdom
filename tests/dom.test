@@ -157,6 +157,29 @@ test dom-1.21 {Explicit delete of scoped doc with domDoc cmd} {knownBug} {
     unset doc
 } {}    
 
+proc dom-1.22 {doc} {
+    $doc delete
+}
+test dom-1.22 {Explicit delete of scoped doc in proc call from scope} {knownBug} {
+    dom createDocument test doc
+    dom-1.22 $doc
+    unset doc
+} {}    
+
+test dom-1.23 {Explicit delete of scoped doc} {
+    dom createDocument test doc
+    $doc delete
+    unset doc
+} {}    
+
+test dom-1.24 {Explicit delete of scoped doc} {knownBug} {
+    dom createDocument test doc
+    set result [catch {set doc foo} errMsg]
+    lappend result $errMsg
+    $doc delete
+    unset doc
+} {1 {can't set "doc": var is read-only}}
+
 test dom-2.1 {Don't quash white space at start or end of non white space content} {
     set doc [dom parse {<root>
     some content

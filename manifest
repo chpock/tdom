@@ -1,5 +1,5 @@
-C Respect\s[dom\ssetNameCheck]\seven\sfor\s[dom\screateDocument/createDocumentNS\s...]\sThanks\sto\spooryorick\sfor\sreporting.
-D 2018-02-21T00:09:42.505
+C More\sdescription\sand\scontext\sof\se6ccc3c1fac1ebbfa.
+D 2018-02-21T00:14:07.205
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -197,7 +197,7 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.bench 5446ce379127b8d5700f18a5a0848e580313d0d7
-F tests/dom.test 83518796aa5f5d7314f88943eb0a3367fe4f97db8b5b79a77a5da7627f09f624
+F tests/dom.test 79600407e7eee4e06e5c51d0183868a1c383f38893b05ffdd5970f342078b863
 F tests/domDoc.test 99a4e4e8b894e97f62d438f0cd6f1e470d8bf2b3
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test 66a77f681b6e946b88c55a72efe62d8d7e430348
@@ -237,8 +237,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ebebdc302788ba5d1f5190a1cd4915eee45ec23e2a2f9ca56afa9ac3560f129f
-R 5ed6a81bacd7dd22793cdb8355ffbd55
+P 66acb1bd7d4a7e3ecbdbce5ea90a96a92e659cf3a9e1c50c98ba32cf0f0ed0a2
+R 24c28c0e79121ff1828b589c6a1b8db1
 U rolf
-Z 30ed340e777c3f14e474e73adc0deb2e
+Z d01c5922c36eb3beead7ad2e7b7556fe
 # Remove this line to create a well-formed Fossil manifest.
