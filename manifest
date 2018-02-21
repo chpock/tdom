@@ -1,5 +1,5 @@
-C Made\sbehaviour\sof\sthe\scode\smatch\sexpectation:\sif\sa\svar\sis\sread-only\syou\sshoudn't\sbe\sable\sto\sset\sit\sanyway.
-D 2018-02-21T00:24:30.011
+C Removed\sthe\snow\sunused\sinterp\sargument\sfrom\sdomCreateDocument.
+D 2018-02-21T12:30:27.448
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -130,8 +130,8 @@ F extensions/tnc/win/rules-ext.vc e788fcfc1e69b11946e18b8f67e0870b3bd38913
 F extensions/tnc/win/rules.vc 8157e2a811cf5e93683d6b0fbf5d91d153aa4535
 F extensions/tnc/win/targets.vc 79dea1c6a94a94e6ed8bae9e0195149b25a69923
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
-F generic/dom.c 1134e5039f4e2ea01a28148604be60a1eaf5f377898018249ede80838a44bb4a
-F generic/dom.h ea32034888b1f4601951bbd458ab1d8b0e44695d
+F generic/dom.c 9545062d62884da83412368399e74bcb9b4871e4b6c7fa22aeb808074f0928ac
+F generic/dom.h 5494be214bb46a3e578b41d4150481046c94d508c7797f4256f62730de943370
 F generic/domalloc.c 55e9eeff19cc54cf3956a7013883ead07efd3593
 F generic/domalloc.h c26d53952525e71fa4655625f790eabcbba3ec63
 F generic/domhtml.c 1b20f81001dd6845a14fbbcd90979195f90d96c0
@@ -149,7 +149,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 4637664667d7d458eab2081dc694e0c0f4c55223
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
-F generic/tcldom.c 253b2ece429a1d825d957f320c66ace80258cd09051da41c72ee0879652bcade
+F generic/tcldom.c ce5730f1077fff3d9fe5b053b8763f89810c5f14aa04829f1572244cfdcc91d4
 F generic/tcldom.h 000c3c26233c69dba58b303c508fc15a6030aefc
 F generic/tclexpat.c 6d91b063777fe13c175cb80c97ed6cdddb68e2ba
 F generic/tclexpat.h f70ed259e4c81333df48f6b13e995d1dacb27586
@@ -237,8 +237,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 8515af34334ce883e7cb734c6d2900c6d2ccfc657dae6316bd637d89fd279993
-R b00200ecc8e70504a2dbbbe38d697f9b
+P 20ad68103637e99e14f5bfce229ee50239ffc1ffc746f65c37f92b1fc9f54e15
+R a3cac4142ea39c09fd997a27a896f467
 U rolf
-Z 6fa39fc274a49729099cec42a3d262ce
+Z c0741a876259fe452c5f63c571030fd1
 # Remove this line to create a well-formed Fossil manifest.
