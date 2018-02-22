@@ -1755,7 +1755,7 @@ static int xsltFormatNumber (
 
 
 static xsltNodeSet *
-createXsltNodeSet () 
+createXsltNodeSet (void) 
 {
     xsltNodeSet * ns;
 

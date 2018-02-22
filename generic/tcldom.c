@@ -443,7 +443,7 @@ tcldom_Finalize(
 |   This is exported since we need it in tdominit.c.
 \---------------------------------------------------------------------------*/
 
-void tcldom_initialize()
+void tcldom_initialize(void)
 {
     if (!tcldomInitialized) {
         Tcl_MutexLock(&tableMutex);

@@ -62,9 +62,9 @@ extern TdomStubs tdomStubs;
  */
 
 int
-Tdom_Init (interp)
-     Tcl_Interp *interp; /* Interpreter to initialize. */
-{
+Tdom_Init (
+     Tcl_Interp *interp /* Interpreter to initialize. */
+) {
         
 #ifdef USE_TCL_STUBS
     Tcl_InitStubs(interp, "8", 0);
@@ -102,9 +102,9 @@ Tdom_Init (interp)
 }
 
 int
-Tdom_SafeInit (interp)
-     Tcl_Interp *interp;
-{
+Tdom_SafeInit (
+     Tcl_Interp *interp
+) {
     return Tdom_Init (interp);
 }
 
