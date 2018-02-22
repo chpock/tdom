@@ -1624,22 +1624,64 @@ int tcldom_xpathParseVar (
     
     idx = pvcd->used;
     *offset = 0;
-    varValue = Tcl_ParseVar(interp, strToParse, &termPtr);
-    if (varValue) {
-        *offset = termPtr - strToParse;
-        /* If strToParse start with a single '$' without a following
-         * var name (according to Tcl var name rules), Tcl_ParseVar()
-         * doesn't report a parsing error but returns just a pointer
-         * to a static string "$". */ 
-        if (*offset == 1) {
-            *errMsg = tdomstrdup ("Missing var name after '$'.");
-            varValue = NULL;
+    if (idx == pvcd->allocated) {
+        for (i = 0; i < pvcd->allocated; i++) {
+            if (getparse(pvcd, i).tokenPtr == getparse(pvcd, i).staticTokens) {
+                getparse(pvcd, i).tokenPtr = NULL;
+            }
         }
-    } else {
-        *errMsg = tdomstrdup (Tcl_GetStringResult(interp));
+        *pvcdPtr = REALLOC (pvcd,
+                               sizeof (tcldom_ParseVarData) + sizeof(tcldom_ParsedVar) * pvcd->allocated * 2);
+        pvcd = *pvcdPtr;
+
+        for (i = 0; i < pvcd->allocated; i++) {
+            if (getparse(pvcd, i).tokenPtr == NULL) {
+                getparse(pvcd, i).tokenPtr = getparse(pvcd, i).staticTokens;
+            }
+        }
+        pvcd->allocated = pvcd->allocated * 2;
     }
-    Tcl_ResetResult (interp);
-    return (char*)varValue;
+    rc = Tcl_ParseVarName(pvcd->interp, strToParse, -1,
+                          &(getparse(pvcd, idx)), 0);
+    if (rc != TCL_OK) {
+        *errMsg = tdomstrdup (Tcl_GetStringResult(pvcd->interp));
+        res = -1;
+        goto cleanup0;
+    }
+
+    if (getparse(pvcd, idx).numTokens > 1) {
+        for (size = 0; size < getparse(pvcd, idx).numTokens; size++) {
+            *offset += getparse(pvcd, idx).tokenPtr[size].size;
+            size += getparse(pvcd, idx).tokenPtr[size].numComponents;
+        }
+        res = idx++;
+        pvcd->used = idx;
+    } else if (getparse(pvcd, pvcd->used).numTokens == 1) {
+        /* If strToParse starts with a single '$' without a following var name
+         * (according to tcl var name rules), Tcl_ParseVarName() doesn't report
+         * a parsing error adds just one token to the parse structure .
+         */ 
+        *errMsg = tdomstrdup ("Missing var name after '$'.");
+        res = -1;
+    } else {
+        *errMsg = tdomstrdup (Tcl_GetStringResult(pvcd->interp));
+        res = -1;
+    }
+    Tcl_ResetResult (pvcd->interp);
+    cleanup0:
+        return res;
+}
+
+
+int tcldom_xpathGetVar (
+    tcldom_ParseVarData * pvcd,
+    int id,
+    xpathResultSet *result,
+    char  **errMsg
+    )
+{
+    rsSetString (result, Tcl_GetString(getobj(pvcd, id)));
+    return TCL_OK;
 }
 
 /*----------------------------------------------------------------------------
@@ -1657,10 +1699,14 @@ int tcldom_selectNodes (
     ast           t;
     char          *xpathQuery, *typeVar, *option;
     char          *errMsg = NULL, **mappings = NULL;
-    int            rc, i, len, optionIndex, localmapping = 0, cache = 0;
+    int            hnew = 0, rc = TCL_OK, i, j, len, optionIndex;
+    int            localmapping = 0, cache = 0;
+    Tcl_HashEntry *h = NULL;
+    tcldom_ParseVarData *pvcd = NULL;
     int            mappingListObjLen = 0;
     xpathResultSet rs;
-    Tcl_Obj       *type, *objPtr, *objPtr1, *mappingListObj = NULL;
+    Tcl_Obj       *type, *objPtr, *objPtr1, *scriptres;
+    Tcl_Obj       *mappingListObj = NULL;
     xpathCBs       cbs;
     xpathParseVarCB parseVarCB;
     Tcl_Parse      tokenData;
@@ -1818,18 +1864,8 @@ int tcldom_selectNodes (
     rc = xpathEval (node, node, pvcd->t, (void *)&cbs, &errMsg, &rs);
 
     if (rc != XPATH_OK) {
-        xpathRSFree(&rs);
-        SetResult(errMsg);
-        DBG(fprintf(stderr, "errMsg = %s \n", errMsg);)
-        if (errMsg) {
-            FREE(errMsg);
-        }
         rc = TCL_ERROR;
-        goto cleanup;
-    }
-    if (errMsg) {
-        fprintf (stderr, "Why this: '%s'\n", errMsg);
-        FREE(errMsg);
+        goto cleanup2;
     }
     typeVar = NULL;
     if (objc > 2) {
@@ -1869,8 +1905,27 @@ cleanup:
         Tcl_DecrRefCount (mappingListObj);
         FREE(mappings);
     }
+
+    if (errMsg) {
+        SetResult(errMsg);
+        DBG(fprintf(stderr, "errMsg = %s \n", errMsg);)
+        FREE(errMsg);
+    }
     return rc;
 }
+
+void tcldom_FreePvcd(tcldom_ParseVarData *pvcd) {
+    int i;
+    xpathFreeAst (pvcd->t);
+    for (i = 0; i < pvcd->used ; i++) {
+        if (getparse(pvcd, i).tokenPtr != getparse(pvcd, i).staticTokens) {
+            Tcl_FreeParse(&(getparse(pvcd, i)));
+        }
+    }
+    Tcl_DecrRefCount(pvcd->query);
+    FREE(pvcd);
+}
+
 
 /*----------------------------------------------------------------------------
 |   tcldom_nameCheck
@@ -6035,6 +6090,7 @@ int tcldom_createDocument (
     domDocument *doc;
     Tcl_Obj     *newObjName = NULL;
 
+    GetTcldomTSD()
 
     CheckArgs(2,3,1,"docElemName ?newObjVar?");
 
@@ -6113,6 +6169,7 @@ int tcldom_createDocumentNS (
     domDocument *doc;
     Tcl_Obj     *newObjName = NULL;
 
+    GetTcldomTSD()
 
     CheckArgs(3,4,1,"uri docElemName ?newObjVar?");
 

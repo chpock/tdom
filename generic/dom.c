@@ -2468,7 +2468,7 @@ domCreateDoc (
     doc->nslen          =  4;
     doc->namespaces     = (domNS**) MALLOC (sizeof (domNS*) * doc->nslen);
     
-    /* We malloc and initialze the baseURIs hash table here to avoid
+    /* We malloc and initialize the baseURIs hash table here to avoid
        cluttering of the code all over the place with checks. */
     doc->baseURIs = MALLOC (sizeof (Tcl_HashTable));
     Tcl_InitHashTable (doc->baseURIs, TCL_ONE_WORD_KEYS);

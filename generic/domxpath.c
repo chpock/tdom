@@ -146,8 +146,21 @@
                           return a;
 
 #define CHECK_RC          if (rc) return rc
+#define CHECK_RC_NEG      do { \
+                              if (rc < 0) return -rc; \
+                              rc = -rc; \
+                          } while (0)
 #define checkRsAddNode(rs,node)    if (useFastAdd) rsAddNodeFast( rs,node); \
                                    else rsAddNode (rs,node);
+
+/*----------------------------------------------------------------------------
+|   "symbolic" addresses
+|
+\---------------------------------------------------------------------------*/
+
+char *externalNodeName = "";
+
+/*----------------------------------------------------------------------------
 
 /*----------------------------------------------------------------------------
 |   Types for Lexer
@@ -160,7 +173,7 @@ typedef enum {
     PIPE, PLUS, MINUS, EQUAL, NOTEQ, LT, LTE, GT, GTE,
     AND, OR, MOD, DIV, MULTIPLY, FUNCTION, VARIABLE,
     FQVARIABLE, WCARDNAME, COMMENT, TEXT, PINSTR, NODE, AXISNAME, 
-    EXTERNALVAR,
+    EXTERNALVAR, EXTERNALNODENAME,
     EOS
 } Token;
 
@@ -171,7 +184,7 @@ static char *token2str[] = {
     "PIPE", "PLUS", "MINUS", "EQUAL", "NOTEQ", "LT", "LTE", "GT", "GTE",
     "AND", "OR", "MOD", "DIV", "MULTIPLY", "FUNCTION", "VARIABLE",
     "FQVARIABLE", "WCARDNAME", "COMMENT", "TEXT", "PI", "NODE", "AXISNAME",
-    "EXTERNALVAR",
+    "EXTERNALVAR", "EXTERNALNODENAME",
     "EOS"
 };
 
@@ -628,7 +641,7 @@ static void freeAst (ast t)
     ast tmp;
     while (t) {
         tmp = t->next;
-        if (t->strvalue) FREE(t->strvalue);
+        if (t->strvalue && t->strvalue != externalNodeName) FREE(t->strvalue);
         if (t->child) freeAst (t->child);
         FREE((char*)t);
         t = tmp;
@@ -891,7 +904,7 @@ static XPathTokens xpathLexer (
                                    ps = &(xpath[++i]);
                                    if (!isNCNameStart (&xpath[i])) {
                                        *errMsg = tdomstrdup ("Illegal variable"
-                                                             " name");
+                                       " name");
                                        return tokens;
                                    }
                                    i += UTF8_CHAR_LEN (xpath[i]);
@@ -914,21 +927,14 @@ static XPathTokens xpathLexer (
                            *errMsg = tdomstrdup ("Unexpected char '%'");
                            return tokens;
                        }
-                       ps = (varParseCB->parseVarCB) (
+                       cbres = (varParseCB->parseVarCB) (
                                 varParseCB->parseVarClientData, &xpath[i],
-                                &offset, errMsg
+                                &size, errMsg
                               );
-                       if (ps) {
-                           token = WCARDNAME;
-                           tokens[l].strvalue = tdomstrdup (ps);
-                           /* We kind of misuse the (in case of
-                            * WCARDNAME token otherwise not used)
-                            * intvalue to mark this WCARDNAME token
-                            * to be meant as literal - this is to
-                            * distinguish between '*' as wildcard and
-                            * as literal element name. */
-                           tokens[l].intvalue = 1;
-                           i += offset - 1;
+                       if (cbres >= 0) {
+                           token=EXTERNALNODENAME;
+                           tokens[l].intvalue = cbres;
+                           i += size - 1;
                        } else {
                            return tokens;
                        }
@@ -1198,6 +1204,12 @@ Production(NodeTest)
     if (LA==NSWC) {
         Consume (NSWC);
         a = NewStr (IsNSElement, STRVAL);
+    } else
+    if (LA==EXTERNALNODENAME) {
+        Consume(EXTERNALNODENAME);
+        a = NewInt (INTVAL);
+        a->type = IsElement;
+        a->strvalue = externalNodeName;
     } else {
         Consume(WCARDNAME);
         a = NewStr (IsElement, STRVAL);
@@ -1753,6 +1765,7 @@ Production(AbsoluteLocationPath)
         Consume(SLASH);
         a = New(SelectRoot);
         if ( (LA==AXISNAME)
+           ||(LA==EXTERNALNODENAME)
            ||(LA==WCARDNAME)
            ||(LA==NSPREFIX)
            ||(LA==NSWC)
@@ -2384,15 +2397,22 @@ int xpathParse (
 \---------------------------------------------------------------------------*/
 int xpathNodeTest (
     domNode        *node,
-    ast             step
+    ast             step,
+    xpathCBs       *cbs,
+    char          **errMsg
 )
 {
-    const char *localName, *nodeUri;
+    int rc;
+    const char *localName, *nodeUri, *strvalue;
+    xpathExternalVarCallback externalVarCB = cbs->varCB; 
+    xpathResultSet  result;
 
     if (!(step->child)) return 1;
     if (step->child->type == IsElement) {
         if (node->nodeType == ELEMENT_NODE) {
-            if ((step->child->strvalue[0] == '*') &&
+            if (
+                (step->child->strvalue != externalNodeName) &&
+                (step->child->strvalue[0] == '*') &&
                 (step->child->strvalue[1] == '\0') &&
                 (node->ownerDocument->rootNode != node) &&
                 (step->child->intvalue == 0)) return 1;
@@ -2400,7 +2420,19 @@ int xpathNodeTest (
                 && (node->ownerDocument->namespaces[node->namespace-1]->prefix[0] != '\0'
                     || node->ownerDocument->namespaces[node->namespace-1]->uri[0] != '\0')
                 ) return 0;
-            return (strcmp(node->nodeName, step->child->strvalue)==0);
+            if (step->child->strvalue == externalNodeName) {
+                rc = externalVarCB(
+                    cbs->varClientData, step->intvalue, &result, errMsg);
+                if (rc) {
+                    return -rc;
+                }
+                strvalue = result.string;
+            } else {
+                strvalue = step->child->strvalue;
+            }
+                
+
+            return (strcmp(node->nodeName, strvalue)==0);
         }
         return 0;
     } else
@@ -3888,7 +3920,9 @@ static int xpathEvalStep (
             while (child && (count < step->intvalue)) {
                 DBG(fprintf(stderr, "AxisChild: child '%s' domNode%p \n", 
                             child->nodeName, child);)
-                if (xpathNodeTest(child, step)) {
+                rc = xpathNodeTest(child, step, cbs, errMsg);
+                CHECK_RC_NEG;
+                if (rc) {
                     DBG(fprintf(stderr, 
                       "AxisChild: after node taking child '%s' domNode%p \n",
                                 child->nodeName, child);)
@@ -3901,7 +3935,9 @@ static int xpathEvalStep (
             while (child) {
                 DBG(fprintf(stderr, "AxisChild: child '%s' domNode%p \n",
                             child->nodeName, child);)
-                if (xpathNodeTest(child, step)) {
+                rc = xpathNodeTest(child, step, cbs, errMsg);
+                CHECK_RC_NEG;
+                if (rc) {
                     DBG(fprintf(stderr,
                       "AxisChild: after node taking child '%s' domNode%p \n",
                                 child->nodeName, child);)
@@ -3927,7 +3963,9 @@ static int xpathEvalStep (
                     return rc;
                 }
             }
-            if (xpathNodeTest(node, step)) {
+            rc = xpathNodeTest(node, step, cbs, errMsg);
+            CHECK_RC_NEG;
+            if (rc) {
                 rsAddNodeFast( &tResult, node);
             }
             node = node->nextSibling;
@@ -3944,14 +3982,18 @@ static int xpathEvalStep (
             *docOrder = 1;
             if (ctxNode->nodeType == ATTRIBUTE_NODE
                 && step->type == AxisDescendantOrSelf) {
-                if (xpathNodeTest(ctxNode, step)) {
+                rc = xpathNodeTest(ctxNode, step, cbs, errMsg);
+                CHECK_RC_NEG;
+                if (rc) {
                     checkRsAddNode( result, ctxNode);
                 }
                 break;
             }
             if (ctxNode->nodeType != ELEMENT_NODE) return XPATH_OK;
             if (step->type == AxisDescendantOrSelf) {
-                if (xpathNodeTest(ctxNode, step)) {
+                rc = xpathNodeTest(ctxNode, step, cbs, errMsg);
+                CHECK_RC_NEG;
+                if (rc) {
                     xpathRSInit (&tResult);
                     rsAddNodeFast( &tResult, ctxNode);
                     rc = xpathEvalPredicate (step->next, exprContext, result,
@@ -3981,7 +4023,9 @@ static int xpathEvalStep (
         if (ctxNode->nodeType == ATTRIBUTE_NODE
             && (step->type == AxisDescendantOrSelf
                 || step->type == AxisDescendantOrSelfLit)) {
-            if (xpathNodeTest(ctxNode, step)) {
+            rc = xpathNodeTest(ctxNode, step, cbs, errMsg);
+            CHECK_RC_NEG;
+            if (rc) {
                 checkRsAddNode( result, ctxNode);
             }
             break;
@@ -3989,7 +4033,9 @@ static int xpathEvalStep (
         if (ctxNode->nodeType != ELEMENT_NODE) return XPATH_OK;
         if (step->type == AxisDescendantOrSelf
             || step->type == AxisDescendantOrSelfLit) {
-            if (xpathNodeTest(ctxNode, step)) {
+            rc = xpathNodeTest(ctxNode, step, cbs, errMsg);
+            CHECK_RC_NEG;
+            if (rc) {
                 checkRsAddNode( result, ctxNode);
                 if (predLimit) {
                     count++;
@@ -4000,7 +4046,9 @@ static int xpathEvalStep (
         startingNode = ctxNode;
         node = ctxNode->firstChild;
         while (node && node != startingNode) {
-            if (xpathNodeTest(node, step)) {
+            rc = xpathNodeTest(node, step, cbs, errMsg);
+            CHECK_RC_NEG;
+            if (rc) {
                  checkRsAddNode( result, node);
                  if (predLimit) {
                      count++;
@@ -4035,7 +4083,9 @@ static int xpathEvalStep (
     case AxisSelf:
         *docOrder = 1;
         DBG(fprintf(stderr, "AxisSelf :: \n");)
-        if (xpathNodeTest(ctxNode, step)) {
+        rc = xpathNodeTest(ctxNode, step, cbs, errMsg);
+        CHECK_RC_NEG;
+        if (rc) {
             rsAddNode( result, ctxNode);
         }
         break;
@@ -4065,7 +4115,9 @@ static int xpathEvalStep (
                 while (attr && (attr->nodeFlags & IS_NS_NODE))
                     attr = attr->nextSibling;
                 while (attr) {
-                    if (xpathNodeTest( (domNode*)attr, step)) {
+                    rc = xpathNodeTest( (domNode*)attr, step, cbs, errMsg);
+                    CHECK_RC_NEG;
+                    if (rc) {
                         checkRsAddNode (result, (domNode *)attr);
                     }
                     attr = attr->nextSibling;
@@ -4077,7 +4129,9 @@ static int xpathEvalStep (
             while (attr && (attr->nodeFlags & IS_NS_NODE))
                 attr = attr->nextSibling;
             while (attr) {
-                if (xpathNodeTest ( (domNode*)attr, step)) {
+                rc = xpathNodeTest( (domNode*)attr, step, cbs, errMsg);
+                CHECK_RC_NEG;
+                if (rc) {
                     checkRsAddNode (result, (domNode *)attr);
                 }
                 attr = attr->nextSibling;
@@ -4088,19 +4142,25 @@ static int xpathEvalStep (
     case AxisParent:
         *docOrder = 1;
         if (ctxNode->nodeType == ATTRIBUTE_NODE) {
-            if (xpathNodeTest(((domAttrNode *)ctxNode)->parentNode, step)) {
+            rc = xpathNodeTest(((domAttrNode *)ctxNode)->parentNode, step, cbs, errMsg);
+            CHECK_RC_NEG;
+            if (rc) {
                 rsAddNode(result,((domAttrNode *)ctxNode)->parentNode);
             }
         } else {
             if (ctxNode->parentNode) {
-                if (xpathNodeTest(ctxNode->parentNode, step)) {
+                rc = xpathNodeTest(ctxNode->parentNode, step, cbs, errMsg);
+                CHECK_RC_NEG;
+                if (rc) {
                     rsAddNode(result,ctxNode->parentNode);
                 }
             } else {
-                if (ctxNode->ownerDocument->rootNode != ctxNode
-                    && xpathNodeTest (ctxNode->ownerDocument->rootNode, 
-                                      step)) {
-                    rsAddNode (result, ctxNode->ownerDocument->rootNode);
+                if (ctxNode->ownerDocument->rootNode != ctxNode) {
+                    rc = xpathNodeTest (ctxNode->ownerDocument->rootNode, step, cbs, errMsg);
+                    CHECK_RC_NEG;
+                    if (rc) {
+                        rsAddNode (result, ctxNode->ownerDocument->rootNode);
+                    }
                 }
             }
         }
@@ -4125,25 +4185,33 @@ static int xpathEvalStep (
         *docOrder = 0;
         xpathRSInit (&tResult);
         if (step->type == AxisAncestorOrSelf) {
-            if (xpathNodeTest(ctxNode, step)) {
+            rc = xpathNodeTest(ctxNode, step, cbs, errMsg);
+            CHECK_RC_NEG;
+            if (rc) {
                 rsAddNodeFast(&tResult, ctxNode);
             }
         }
         if (ctxNode->nodeType == ATTRIBUTE_NODE) {
             ctxNode = ((domAttrNode *)ctxNode)->parentNode;
-            if (xpathNodeTest(ctxNode, step)) {
+            rc = xpathNodeTest(ctxNode, step, cbs, errMsg);
+            CHECK_RC_NEG;
+            if (rc) {
                 rsAddNodeFast(&tResult, ctxNode);
             }
         }
         startingNode = ctxNode;
         while (ctxNode->parentNode) {
             ctxNode = ctxNode->parentNode;
-            if (xpathNodeTest(ctxNode, step)) {
+            rc = xpathNodeTest(ctxNode, step, cbs, errMsg);
+            CHECK_RC_NEG;
+            if (rc) {
                 rsAddNodeFast(&tResult, ctxNode);
             }
         }
         if (startingNode != ctxNode->ownerDocument->rootNode) {
-            if (xpathNodeTest (ctxNode->ownerDocument->rootNode, step)) {
+            rc = xpathNodeTest (ctxNode->ownerDocument->rootNode, step, cbs, errMsg);
+            CHECK_RC_NEG;
+            if (rc) {
                 rsAddNodeFast (&tResult, ctxNode->ownerDocument->rootNode);
             }
         }
@@ -4161,7 +4229,9 @@ static int xpathEvalStep (
         if (step->intvalue) {
             while (ctxNode->nextSibling && (count < step->intvalue)) {
                 ctxNode = ctxNode->nextSibling;
-                if (xpathNodeTest(ctxNode, step)) {
+                rc = xpathNodeTest(ctxNode, step, cbs, errMsg);
+                CHECK_RC_NEG;
+                if (rc) {
                     checkRsAddNode(result, ctxNode);
                     count++;
                 }
@@ -4169,7 +4239,9 @@ static int xpathEvalStep (
         } else {
             while (ctxNode->nextSibling) {
                 ctxNode = ctxNode->nextSibling;
-                if (xpathNodeTest(ctxNode, step)) {
+                rc = xpathNodeTest(ctxNode, step, cbs, errMsg);
+                CHECK_RC_NEG;
+                if (rc) {
                     checkRsAddNode(result, ctxNode);
                 }
             }
@@ -4185,7 +4257,9 @@ static int xpathEvalStep (
             node = ctxNode->previousSibling;
             xpathRSInit (&tResult);
             while (node && (count < step->intvalue)) {
-                if (xpathNodeTest (node, step)) {
+                rc = xpathNodeTest (node, step, cbs, errMsg);
+                CHECK_RC_NEG;
+                if (rc) {
                     rsAddNodeFast (&tResult, node);
                     count++;
                 }
@@ -4205,7 +4279,9 @@ static int xpathEvalStep (
                 node = startingNode->ownerDocument->rootNode->firstChild;
             }
             while (node && (node != startingNode)) {
-                if (xpathNodeTest(node, step)) {
+                rc = xpathNodeTest(node, step, cbs, errMsg);
+                CHECK_RC_NEG;
+                if (rc) {
                     checkRsAddNode(result, node);
                 } 
                 node = node->nextSibling;
@@ -4231,7 +4307,9 @@ static int xpathEvalStep (
             }
         }
         while (1) {
-            if (xpathNodeTest (node, step)) {
+            rc = xpathNodeTest (node, step, cbs, errMsg);
+            CHECK_RC_NEG;
+            if (rc) {
                 checkRsAddNode (result, node);
                 if (step->intvalue) {
                     count++;
@@ -4278,11 +4356,15 @@ static int xpathEvalStep (
                 node = NULL;
             }
             while (startingNode != ancestor) {
-                if (xpathNodeTest(startingNode, step)) {
+                rc = xpathNodeTest(startingNode, step, cbs, errMsg);
+                CHECK_RC_NEG;
+                if (rc) {
                     checkRsAddNode(result, startingNode);
                 }
                 while ((node) && (node != startingNode)) {
-                   if (xpathNodeTest(node, step)) {
+                   rc = xpathNodeTest(node, step, cbs, errMsg);
+                   CHECK_RC_NEG;
+                   if (rc) {
                        checkRsAddNode(result, node);
                    }
                    if ((node->nodeType == ELEMENT_NODE) &&

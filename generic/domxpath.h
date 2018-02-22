@@ -163,7 +163,7 @@ typedef int (*xpathExternalVarCallback)
                               
 typedef struct xpathCBs {               /* all xpath callbacks + clientData */
 
-    void              (*varCB)();
+    void              (*varCB)(void);
     void              * varClientData;
     xpathFuncCallback   funcCB;
     void              * funcClientData;
