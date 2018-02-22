@@ -5964,6 +5964,7 @@ int tcldom_createDocument (
     domDocument *doc;
     Tcl_Obj     *newObjName = NULL;
 
+    GetTcldomTSD()
 
     CheckArgs(2,3,1,"docElemName ?newObjVar?");
 
@@ -6042,6 +6043,7 @@ int tcldom_createDocumentNS (
     domDocument *doc;
     Tcl_Obj     *newObjName = NULL;
 
+    GetTcldomTSD()
 
     CheckArgs(3,4,1,"uri docElemName ?newObjVar?");
 
