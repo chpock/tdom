@@ -22,11 +22,11 @@ source [file join [file dir [info script]] loadtdom.tcl]
 
 test dom-1.1 {createDocument with root node name not a XML Name} {
     list [catch {dom createDocument "root node"} msg] $msg
-} "1 {invalid root element name}"
+} "1 {Invalid root element name 'root node'}"
 
 test dom-1.2 {createDocument with root node name not a XML Name} {
     list [catch {dom createDocument "1root"} msg] $msg
-} "1 {invalid root element name}"
+} "1 {Invalid root element name '1root'}"
 
 test dom-1.3 {createDocument - root name us-ascii} {
     dom createDocument "root" doc 
@@ -74,19 +74,19 @@ test dom-1.8 {createDocumentNS - check the NS of the created root} {
 
 test dom-1.9 {createDocumentNS with root name not a NCName} {
     list [catch {dom createDocumentNS "http://foo.bar" "foo bar" doc} msg] $msg
-} "1 {invalid local name}"
+} "1 {Invalid root element name 'foo bar'}"
 
 test dom-1.10 {createDocumentNS with root name not a NCName} {
     list [catch {dom createDocumentNS "http://foo.bar" "a:b:c" doc} msg] $msg
-} "1 {invalid local name}"
+} "1 {Invalid root element name 'a:b:c'}"
 
 test dom-1.11 {createDocumentNS with root name not a NCName} {
     list [catch {dom createDocumentNS "http://foo.bar" "a b:b" doc} msg] $msg
-} "1 {invalid prefix name}"
+} "1 {Invalid root element name 'a b:b'}"
 
 test dom-1.12 {createDocumentNS with root name not a NCName} {
     list [catch {dom createDocumentNS "http://foo.bar" "a:a b" doc} msg] $msg
-} "1 {invalid local name}"
+} "1 {Invalid root element name 'a:a b'}"
 
 test dom-1.13 {createDocumentNS - check root name} {
     set doc [dom createDocumentNS "http://foo.bar" foo:root]
@@ -117,6 +117,69 @@ test dom-1.15 {createDocument - rename the doc cmd} {
     fooCmd delete
     expr {[llength [info commands]] == $nrOfCommands}
 } {1}
+
+test dom-1.16 {createDocumentNS - empty namespace, no prefix} {
+    dom createDocumentNS "" doc doc
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc/>}
+
+test dom-1.17 {createDocumentNS -  namespace, no prefix} {
+    dom createDocumentNS "uri" doc doc
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc xmlns="uri"/>}
+
+test dom-1.18 {createDocumentNS -  namespace, no prefix} {
+    dom createDocumentNS "uri" doc doc
+    set result [$doc selectNodes -namespaces {ns uri} count(/ns:doc)]
+    $doc delete
+    set result
+} 1
+
+test dom-1.19 {createDocumentNS - namespace, prefix} {
+    dom createDocumentNS "uri" n1:doc doc
+    set result [$doc selectNodes -namespaces {ns uri} count(/ns:doc)]
+    $doc delete
+    set result
+} 1
+
+test dom-1.20 {createDocumentNS - empty namespace, prefix} {
+    catch {dom createDocumentNS "" n1:doc doc} errMsg
+    set errMsg
+} {Missing URI in Namespace declaration}
+
+test dom-1.21 {Explicit delete of scoped doc with domDoc cmd} {knownBug} {
+    dom createDocument test doc
+    domDoc $doc delete
+    unset doc
+} {}    
+
+proc dom-1.22 {doc} {
+    $doc delete
+}
+test dom-1.22 {Explicit delete of scoped doc in proc call from scope} {knownBug} {
+    dom createDocument test doc
+    dom-1.22 $doc
+    unset doc
+} {}    
+
+test dom-1.23 {Explicit delete of scoped doc} {
+    dom createDocument test doc
+    $doc delete
+    unset doc
+} {}    
+
+test dom-1.24 {Explicit delete of scoped doc} {
+    dom createDocument test doc
+    set result [catch {set doc foo} errMsg]
+    lappend result $errMsg
+    $doc delete
+    unset doc
+    set result
+} {1 {can't set "doc": var is read-only}}
 
 test dom-2.1 {Don't quash white space at start or end of non white space content} {
     set doc [dom parse {<root>
@@ -489,7 +552,7 @@ test dom-2.28 {parse document with undeclared xml prefix} {
 
 # This is an expat bug. If XML_StopParser is called in the
 # elementstarthandler function for the document element and there
-# isn't anything else in the document then this document element, then
+# isn't anything else in the document than this document element, then
 # the XML_Parse() return code doesn't reflects this. This is an edge
 # case, see the next test below.
 test dom-2.29 {parse not well-formed document with undeclared xml prefix} {knownBug} {
@@ -528,6 +591,78 @@ test dom-2.32 {parse document with undeclared xml prefix and -ignorexmlns} {
     $doc delete
     set result
 } {foo:e}
+
+test dom-2.33 {end of options option} {
+    set doc [dom parse -json -- -0.123]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} -0.123
+
+test dom-2.34 {XML prefix declaration with empty namespace} {
+    catch {dom parse {<foo:doc xmlns:foo=""><e1/></foo:doc>}} errMsg
+    set errMsg
+} {Missing URI in Namespace declaration, referenced at line 1 character 22}
+
+test dom-2.35 {-keepCDATA} {
+    set doc [dom parse -keepCDATA {<doc>foo <![CDATA[test of & <bad> format]]> bar </doc>}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc>foo <![CDATA[test of & <bad> format]]> bar </doc>}
+
+test dom-2.36 {-keepCDATA} {
+    set doc [dom parse -keepCDATA {<doc>foo <![CDATA[test of & <bad> format]]> bar </doc>}]
+    set root [$doc documentElement]
+    set result [list]
+    foreach child [$root childNodes] {
+        lappend result [$child nodeType]
+    }
+    $doc delete
+    set result
+} {TEXT_NODE CDATA_SECTION_NODE TEXT_NODE}
+
+test dom-2.37 {-keepCDATA} {
+    set doc [dom parse -keepCDATA {<doc><e><![CDATA[one]]></e></doc>}]
+    set result [list]
+    foreach child [$doc selectNodes doc/e/node()] {
+        lappend result [$child nodeType]
+    }
+    $doc delete
+    set result
+} {CDATA_SECTION_NODE}
+
+test dom-2.38 {-keepCDATA} {
+    set doc [dom parse -keepCDATA {<doc><e><![CDATA[one]]><![CDATA[two]]></e></doc>}]
+    set result [list]
+    foreach child [$doc selectNodes doc/e/node()] {
+        lappend result [$child nodeType]
+    }
+    $doc delete
+    set result
+} {CDATA_SECTION_NODE CDATA_SECTION_NODE}
+
+test dom-2.39 {-keepCDATA} {
+    set doc [dom parse -keepCDATA {<doc><e><![CDATA[]]></e></doc>}]
+    set result [$doc selectNodes count(doc/e/node())]
+    $doc delete
+    set result
+} 0
+
+test dom-2.40 {-keepCDATA white space only CDATA section} {
+    set doc [dom parse -keepCDATA {<doc><e><![CDATA[
+    ]]></e></doc>}]
+    set result [$doc selectNodes count(doc/e/node())]
+    $doc delete
+    set result
+} 0
+
+test dom-2.41 {-keepCDATA and -keepEmpties} {
+    set doc [dom parse -keepCDATA -keepEmpties {<doc><e><![CDATA[]]></e></doc>}]
+    set result [$doc selectNodes count(doc/e/node())]
+    $doc delete
+    set result
+} 1
 
 test dom-3.1 {isName} {
     dom isName ":foo"
@@ -1395,6 +1530,16 @@ test dom-7.19 {setTextCheck and appendFromScript - setTextCheck state at create 
     lappend result $errMsg
 } [list 1 "Invalid text value 'foo\u0003bar'"]
 
+test dom-7.19 {setNameCheck / createDocument} {
+    dom setNameCheck 0
+    dom createDocument "foo bar" doc
+    set result [$doc asXML -indent none]
+    $doc delete
+    dom setNameCheck 1
+    set result
+} {<foo bar/>}
+    
+
 test dom-8.1 {createDocumentNode} {
     set result [catch {dom createDocumentNode foo bar}]
 } {1}
@@ -1447,6 +1592,42 @@ test dom-8.6 {createDocumentNode} {
     $docNode delete
     set result
 } {<root><child1/><child2/>some text<child3/></root>}
+
+test dom-8.7 {createDocumentNode} {
+    dom createDocumentNode docNode
+    dom createDocumentNode docNode
+    $docNode delete
+    set result ""
+} ""
+
+test dom-8.8 {createDocumentNode} {
+    dom createDocumentNode -jsonType ARRAY docNode
+    set result [$docNode jsonType]
+    $docNode delete
+    set result
+} ARRAY
+
+test dom-8.9 {createDocumentNode} {
+    set docNode [dom createDocumentNode -jsonType NUMBER]
+    set result [$docNode jsonType]
+    $docNode delete
+    set result
+} NUMBER
+
+test dom-8.10 {createDocumentNode} {
+    catch {dom createDocumentNode -foo NULL docNode} errMsg
+    set errMsg
+} {bad option "-foo": must be -jsonType}
+
+test dom-8.10 {createDocumentNode} {
+    catch {dom createDocumentNode -foo NULL docNode} errMsg
+    set errMsg
+} {bad option "-foo": must be -jsonType}
+
+test dom-8.11 {createDocumentNode} {
+    catch {dom createDocumentNode -jsonType FOO docNode} errMsg
+    set errMsg
+} {bad jsonType "FOO": must be NONE, ARRAY, OBJECT, NULL, TRUE, FALSE, STRING, or NUMBER}
 
 test dom-9.1 {setObjectCommands} {
     dom setObjectCommands
@@ -1513,11 +1694,12 @@ namespace eval nodeCmds {
     dom createNodeCmd cdataNode   cdata
     dom createNodeCmd piNode      pi
     dom createNodeCmd parserNode  parser
+    dom createNodeCmd -tagName foo elementNode bar
 }
 
 test dom-10.1 {createNodeCmd} {
     llength [info commands nodeCmds::*]
-} {7}
+} {8}
 
 namespace eval nodeCmds {
     rename e1 {}
@@ -1527,6 +1709,7 @@ namespace eval nodeCmds {
     rename cdata {}
     rename pi {}
     rename parser {}
+    rename bar {}
 }
 
 test dom-10.2 {createNodeCmd} {
@@ -1572,6 +1755,19 @@ test dom-10.5 {node creating command called outside domNode context} {
     lappend result $errMsg
 } {{<docRoot><e1>Some text</e1></docRoot>} 1 {called outside domNode context}}
 
+namespace eval nodeCmds {
+    dom createNodeCmd -tagName foo elementNode bar
+}
+test dom-10.6 {createNodeCmd - option -tagName} {
+    set doc [dom createDocumentNode]
+    $doc appendFromScript {
+        nodeCmds::bar {}
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<foo/>}
+
 namespace delete nodeCmds
 
 test dom-11.1 {featureinfo - expatversion} -body {
@@ -1589,6 +1785,14 @@ test dom-11.3 {featureinfo - expatmajorversion} -body {
 test dom-11.4 {featureinfo - dtd} -body {
     dom featureinfo dtd
 } -match regexp -result {(0|1)}
+
+test dom-11.5 {featureinfo - jsonmaxnesting} {
+    dom featureinfo jsonmaxnesting
+} 2000
+
+test dom-11.6 {featureinfo - versionhash} {
+    regexp {^[0-9a-fA-F]+$} [dom featureinfo versionhash]
+} 1
 
 proc ::dom::domParseFeedback {} {
     return -code break

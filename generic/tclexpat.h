@@ -14,7 +14,7 @@ typedef struct CHandlerSet {
     int ignoreWhiteCDATAs;          /* ignore 'white' CDATA sections */
 
     void *userData;                 /* Handler set specific Data Structure;
-                                       the C handler set extention has to
+                                       the C handler set extension has to
                                        malloc the needed structure in his
                                        init func and has to provide a
                                        cleanup func (to free it). */
@@ -151,24 +151,23 @@ typedef struct TclGenExpatInfo {
 #  define TCL_STORAGE_CLASS DLLEXPORT
 #endif
 
-EXTERN int TclExpatObjCmd _ANSI_ARGS_((ClientData dummy,
-                                       Tcl_Interp *interp,
-                                       int objc, Tcl_Obj *CONST objv[]));
-EXTERN int CheckExpatParserObj _ANSI_ARGS_((Tcl_Interp *interp,
-                                            Tcl_Obj *CONST nameObj));
-EXTERN int CHandlerSetInstall _ANSI_ARGS_((Tcl_Interp *interp,
-                                           Tcl_Obj *CONST expatObj,
-                                           CHandlerSet *handlerSet));
-EXTERN int CHandlerSetRemove _ANSI_ARGS_((Tcl_Interp *interp,
-                                          Tcl_Obj *CONST expatObj,
-                                          char *handlerSetName));
-EXTERN CHandlerSet * CHandlerSetCreate _ANSI_ARGS_((char *name));
-EXTERN CHandlerSet * CHandlerSetGet _ANSI_ARGS_((Tcl_Interp *interp,
-                                               Tcl_Obj *CONST expatObj,
-                                               char *handlerSetName));
-EXTERN void * CHandlerSetGetUserData _ANSI_ARGS_((Tcl_Interp *interp,
-                                               Tcl_Obj *CONST expatObj,
-                                               char *handlerSetName));
+EXTERN Tcl_ObjCmdProc TclExpatObjCmd;
 
-EXTERN TclGenExpatInfo * GetExpatInfo _ANSI_ARGS_((Tcl_Interp *interp,
-                                                   Tcl_Obj *CONST expatObj));
+EXTERN int CheckExpatParserObj (Tcl_Interp *interp,
+				Tcl_Obj *CONST nameObj);
+EXTERN int CHandlerSetInstall (Tcl_Interp *interp,
+			       Tcl_Obj *CONST expatObj,
+			       CHandlerSet *handlerSet);
+EXTERN int CHandlerSetRemove (Tcl_Interp *interp,
+			      Tcl_Obj *CONST expatObj,
+			      char *handlerSetName);
+EXTERN CHandlerSet * CHandlerSetCreate (char *name);
+EXTERN CHandlerSet * CHandlerSetGet (Tcl_Interp *interp,
+                                     Tcl_Obj *CONST expatObj,
+				     char *handlerSetName);
+EXTERN void * CHandlerSetGetUserData (Tcl_Interp *interp,
+                                      Tcl_Obj *CONST expatObj,
+				      char *handlerSetName);
+
+EXTERN TclGenExpatInfo * GetExpatInfo (Tcl_Interp *interp,
+				       Tcl_Obj *CONST expatObj);

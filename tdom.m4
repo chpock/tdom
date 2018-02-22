@@ -228,7 +228,7 @@ AC_DEFUN(TDOM_ENABLE_HTML5, [
     AC_MSG_CHECKING([whether to enable support for HTML5 parsing (using gumbo)])
     AC_ARG_ENABLE(html5,
         AC_HELP_STRING([--enable-html5],
-            [build with HTML5 parsing support (default: if available)]),
+            [build with HTML5 parsing support (default: no)]),
         [tcl_ok=$enableval], [tcl_ok=no])
 
     if test "${enable_html5+set}" = set; then
@@ -243,7 +243,11 @@ AC_DEFUN(TDOM_ENABLE_HTML5, [
         if test "$HAVEGUMBO" = "1" ; then
             AC_MSG_RESULT([yes])
             AC_DEFINE(TDOM_HAVE_GUMBO)
-            HTML5_LIBS="`pkg-config --cflags --libs gumbo`"
+            if test "${TEA_PLATFORM}" = "windows" ; then
+                HTML5_LIBS="-Wl,-Bstatic `pkg-config --static --cflags --libs gumbo` -Wl,-Bdynamic"
+            else
+                HTML5_LIBS="`pkg-config --cflags --libs gumbo`"
+            fi
         else
             AC_MSG_ERROR([The required lib gumbo not found])
         fi
@@ -385,7 +389,7 @@ AC_DEFUN(TDOM_PATH_CONFIG, [
 	    AC_MSG_CHECKING([for tDOM configuration])
 	    AC_ARG_WITH(tdom, 
                 AC_HELP_STRING([--with-tdom],
-                    [directory containig tDOM configuration (tdomConfig.sh)]),
+                    [directory containing tDOM configuration (tdomConfig.sh)]),
                 with_tdomconfig=${withval})
 
 	    no_tdom=true

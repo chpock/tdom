@@ -31,6 +31,7 @@
 #    domDoc-25.*: selectNodesNamespaces
 #    domDoc-26.*: fragments list
 #    domDoc-27.*: deleteXPathCache
+#    domDoc-28.*: createElementNS
 #
 # Copyright (c) 2004 - 2007 Rolf Ade.
 
@@ -1075,6 +1076,35 @@ test domDoc-20.5 {selectNodes with -namespaces option} {
     set result
 } [list tdom:doc tdom:doc "" empty]
 
+test domDoc-20.6 {selectNodes with -namespaces option} {
+    set doc [dom createDocumentNS "http://tdom.org" tdom:doc]
+    set node [$doc selectNodes \
+                  -namespaces {foo bar} \
+                  -namespaces {a b c d} \
+                  -namespaces {tdom http://tdom.org} \
+                  tdom:doc]
+    set result [$node nodeName]
+    set node [$doc selectNodes \
+                  -namespaces {myPrefix http://tdom.org} \
+                  myPrefix:doc]
+    lappend result [$node nodeName]
+    lappend result [$doc selectNodes -namespaces {} doc typeVar]
+    lappend result $typeVar
+    $doc delete
+    set result
+} [list tdom:doc tdom:doc "" empty]
+
+test domDoc-20.7 {selectNodes with -namespaces option} {
+    set doc [dom createDocumentNS "http://tdom.org" tdom:doc]
+    catch {set node [$doc selectNodes \
+                         -namespaces {foo bar} \
+                         -namespaces {a b c d} \
+                         -namespaces {wrong_not_pair} \
+                         tdom:doc]} errMsg
+    $doc delete
+    set errMsg
+} {The "-namespaces" option requires a 'prefix namespace' pairs list as argument}
+
 test domDoc-21.1 {baseURI} {
     set doc [dom createDocumentNode]
     set result [$doc baseURI]
@@ -1296,6 +1326,15 @@ test domDoc-24.16 {cdataSectionElements} {
     set result
 } {<child><![CDATA[some text]]></child>}
 
+test domDoc-24.17 {cdataSectionElements} {
+    set doc [dom parse {<doc><child>some text <b>more text</b> text again</child></doc>}]
+    $doc cdataSectionElements child 1
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc><child><![CDATA[some text ]]><b>more text</b><![CDATA[ text again]]></child></doc>}
+
+
 test domDoc-25.1 {selectNodesNamespaces} {
     set doc [dom createDocument foo]
     set result [$doc selectNodesNamespaces]
@@ -1370,6 +1409,24 @@ test domDoc-25.7 {selectNodesNamespaces} {
     set result
 } {{} elem1 elem11 {}}
 
+test domDoc-25.7.1 {selectNodesNamespaces} {
+    set doc [dom parse {<root xmlns="rootdefaultNS">
+        <elem1 xmlns="elem1NS"/>
+        <elem2 xmlns="elem2NS"/>
+        </root>}]
+    $doc documentElement root
+    $root firstChild elem1
+    $doc createElement elem11 elem11
+    $elem1 appendChild $elem11
+    $doc selectNodesNamespaces {default2 elem1NS default1 rootdefaultNS}
+    set node [$doc selectNodes default1:root/default2:elem1]
+    set result [list [$node prefix] [$node localName]]
+    set node [$doc selectNodes default1:root/default2:elem1/elem11]
+    lappend result [$node nodeName] [$node namespaceURI]
+    $doc delete
+    set result
+} {{} elem1 elem11 {}}
+
 test domDoc-25.8 {selectNodesNamespaces} {
     set doc [dom parse {<root xmlns="rootdefaultNS">
         <elem1 xmlns="elem1NS"><elem11 xmlns=""/></elem1>
@@ -1432,6 +1489,35 @@ test domDoc-27.1 {deleteXPathCache} {
     $doc delete
     set result
 } {{} {} {} {}}
+
+test domDoc-28.1 {createElementNS} {
+    set doc [dom createDocument doc]
+    set newElem [$doc createElementNS uri ns:e]
+    $doc documentElement root
+    $root appendChild $newElem
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc><ns:e xmlns:ns="uri"/></doc>}
+
+test domDoc-28.2 {createElementNS} {
+    set doc [dom createDocument doc]
+    set newElem [$doc createElementNS uri ns:e]
+    $newElem setAttributeNS uri ns:att value
+    $doc documentElement root
+    $root appendChild $newElem
+    set result [$doc selectNodes -namespaces {ns uri} string(/doc/ns:e/@ns:att)]
+    $doc delete
+    set result
+} {value}
+
+test domDoc-28.3 {createElementNS} {
+    set doc [dom createDocument doc]
+    catch {$doc createElementNS "" e} errMsg
+    $doc delete
+    set errMsg
+} {Missing URI in Namespace declaration}
+
 
 # cleanup
 ::tcltest::cleanupTests

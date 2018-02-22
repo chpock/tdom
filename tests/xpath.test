@@ -203,7 +203,7 @@ test xpath-3.20 {Infinity divided by Infinity} {
     $root selectNodes {(2 div 0) div (3 div 0)}
 } {NaN}
 
-test xpath-3.21 {Infinity divided by postive number} {
+test xpath-3.21 {Infinity divided by positive number} {
     $root selectNodes {(2.7 div 0) div 23}
 } {Infinity}
 
@@ -211,7 +211,7 @@ test xpath-3.22 {Infinity divided by negative number} {
     $root selectNodes {(2.7 div 0) div -23}
 } {-Infinity}
 
-test xpath-3.23 {-Infinity divided by postive number} {
+test xpath-3.23 {-Infinity divided by positive number} {
     $root selectNodes {(-2.7 div 0) div 23}
 } {-Infinity}
 
@@ -293,6 +293,10 @@ test xpath-3.37 {number conversion} {
     $doc selectNodes {count(/a/b[4<number])}
 } {2}
 
+test xpath-3.38 {mod by a float that casts to integer 0} {
+    $doc selectNodes { 2 mod 0.2}
+} {NaN}
+
 $doc delete
 
 set doc [dom parse {<root xmlns:myNS="myNS">Foo</root>}]
@@ -336,7 +340,7 @@ test xpath-4.5 {tcl coded additional XPath function} {
 test xpath-4.6 {tcl coded additional XPath function - error reported} {
     catch {$root selectNodes {mycontains(., 'bo', 'ba')}} errMsg
     set errMsg
-} {Tcl error while executing XPATH extension function 'mycontains':
+} {Tcl error while executing XPath extension function 'mycontains':
 mycontains(): wrong # of args!}
 
 proc ::dom::xpathFunc::wrongreturn {ctxNode pos nodeListNode nodeList args} {
@@ -346,7 +350,7 @@ proc ::dom::xpathFunc::wrongreturn {ctxNode pos nodeListNode nodeList args} {
 test xpath-4.7 {tcl coded additional XPath function - unknown return type} {
     catch {$root selectNodes {wrongreturn('foo')}} errMsg
     set errMsg
-} {Unknown type of return value "footype" from tcl coded XPath function "wrongreturn"!}
+} {Unknown type of return value "footype" from Tcl coded XPath function "wrongreturn"!}
 
 proc ::dom::xpathFunc::returnnumber {ctxNode pos nodeListNode nodeList args} {
     return [list number "42"]
@@ -478,7 +482,7 @@ proc ::dom::xpathFunc::errorStack {ctxNode pos nodeListNode nodeList args} {
 test xpath-4.18 {error stack in tcl coded additional XPath function} {
     set result [catch {$root selectNodes errorStack()} errMsg]
     lappend result $errMsg
-} {1 {Tcl error while executing XPATH extension function 'errorStack':
+} {1 {Tcl error while executing XPath extension function 'errorStack':
 Some error}}
 
 proc ::dom::xpathFunc::stringReturn {args} {return x}
@@ -544,9 +548,9 @@ test xpath-5.1 {erroneous XPath expr: missing right brace in predicate} {
 } {1 {Predicate: Expected "RBRACKET" for '*[1' 
 
 Parsed symbols:
-     0 WCARDNAME        0 0.000e+00     0  *
-     1 LBRACKET         0 0.000e+00     1  
-     2 INTNUMBER        1 1.000e+00     2  }}
+     0 WCARDNAME        0 00000.000     0  *
+     1 LBRACKET         0 00000.000     1  
+     2 INTNUMBER        1 00001.000     2  }}
 
 test xpath-5.2 {erroneous XPath expr: missing right brace in predicate} {
     set result [catch {$root selectNodes {*[1][@attr}} errMsg]
@@ -554,12 +558,12 @@ test xpath-5.2 {erroneous XPath expr: missing right brace in predicate} {
 } {1 {Predicate: Expected "RBRACKET" for '*[1][@attr' 
 
 Parsed symbols:
-     0 WCARDNAME        0 0.000e+00     0  *
-     1 LBRACKET         0 0.000e+00     1  
-     2 INTNUMBER        1 1.000e+00     2  
-     3 RBRACKET         0 0.000e+00     3  
-     4 LBRACKET         0 0.000e+00     4  
-     5 ATTRIBUTE        0 0.000e+00     9  attr}}
+     0 WCARDNAME        0 00000.000     0  *
+     1 LBRACKET         0 00000.000     1  
+     2 INTNUMBER        1 00001.000     2  
+     3 RBRACKET         0 00000.000     3  
+     4 LBRACKET         0 00000.000     4  
+     5 ATTRIBUTE        0 00000.000     9  attr}}
 
 test xpath-5.3 {erroneous XPath expr: missing left brace in predicate} {
     catch {$root selectNodes {*1]}}
@@ -856,7 +860,7 @@ test xpath-5.34 {tcl var resolution in expr} {
     # non empty string is always true
     set node [$doc selectNodes {/doc/e[$which]}]
     set result [llength $node]
-    # If another xpath data type is needed, cast explictly
+    # If another xpath data type is needed, cast explicitly
     set node [$doc selectNodes {/doc/e[number($which)]}]
     lappend result [llength $node]
     lappend result [$node @att]
@@ -878,7 +882,7 @@ test xpath-5.35 {tcl var resolution in xpath expr} {
     lappend result [$node selectNodes -cache 1 {string(*[position()=$i])}]
     $doc delete
     set result
-} {2 3}
+} {2 2}
 
 test xpath-5.36 {tcl var resolution in xpath expr} {
     set doc [dom parse {<doc><e>1</e><e>2</e><e>3</e><e>4</e></doc>}]
@@ -906,24 +910,7 @@ test xpath-5.37 {tcl var resolution in xpath expr} {
     set i 3
     $doc delete
     set result
-} {2 4}
-
-proc xpath-5.37.1 {node} {
-    set xpathexpr string
-    append xpathexpr {(*[position()=$i])}
-    set i 2
-    return [$node selectNodes -cache 1 $xpathexpr]
-}
-test xpath-5.37.1 {tcl var resolution in xpath expr} {
-    set doc [dom parse {<doc><e>1</e><e>2</e><e>3</e><e>4</e></doc>}]
-    set node [$doc documentElement] 
-    set i 4
-    set result [list]
-    lappend result [xpath-5.37.1 $node]
-    lappend result [$node selectNodes -cache 1 {string(*[position()=$i])}]
-    $doc delete
-    set result
-} {2 4}
+} {2 2}
 
 test xpath-5.38 {tcl var resolution in xpath expr} {
     set doc [dom parse <doc/>]
@@ -974,6 +961,7 @@ test xpath-5.40 {tcl var resolution in xpath expr} {
     set result [$doc selectNodes $xpath]
     lappend result [$doc selectNodes -cache 1 $xpath]
     $doc delete
+    unset a
     set result
 } {2 2}
 
@@ -1002,6 +990,7 @@ test xpath-5.41 {tcl var resolution in xpath expr} {
     set result [$doc selectNodes $xpath]
     append result [$doc selectNodes -cache 1 $xpath]
     $doc delete
+    unset a
     set result
 } ""
 
@@ -1029,8 +1018,167 @@ test xpath-5.42 {tcl var resolution in xpath expr} {
     set result [$doc selectNodes $xpath]
     append result [$doc selectNodes -cache 1 $xpath]
     $doc delete
+    unset a
     set result
 } ""
+
+test xpath-5.43 {XPath is commutative} {
+    set xml {
+<doc>
+  <e>
+    <ee>eins</ee>
+  </e>
+  <e>
+    <ee>zwei</ee>
+  </e>
+</doc>}
+    set doc [dom parse $xml]
+    set result [expr {[$doc selectNodes {doc/e[ee='zwei']}]
+                      == [$doc selectNodes {doc/e['zwei'=ee]}]}]
+    lappend result [llength [$doc selectNodes {doc/e[ee='zwei']}]]
+    lappend result [$doc selectNodes {string(doc/e[ee='zwei'])}]
+    $doc delete
+    set result
+} {1 1 zwei}
+
+test xpath-5.44 {Element name injected with tcl variable} {
+    set doc [dom parse -json {{"member name with spaces":"the value"}}]
+    set nodeName "member name with spaces"
+    set node [$doc selectNodes %nodeName]
+    set result [list]
+    lappend result [$node nodeName]
+    lappend result [$doc selectNodes string(%nodeName)]
+    set node [$doc selectNodes /%nodeName]
+    lappend result [$node nodeName]
+    $doc delete
+    set result
+} {{member name with spaces} {the value} {member name with spaces}}
+
+test xpath-5.45 {Element name injected with tcl variable} {
+    set doc [dom parse -json {{"a":{"with spaces":"the value"},"a":{"with spaces":"another value"}}}]
+    set nodeName "with spaces"
+    set node [$doc selectNodes {a[%nodeName='another value']}]
+    set result [list]
+    lappend result [$node nodeName]
+    lappend result [$doc selectNodes {string(a[%nodeName='another value'])}]
+    $doc delete
+    set result
+} {a {another value}}
+
+test xpath-5.46 {Element name injected with tcl variable - wrong xpath syntax} {
+    set doc [dom parse -json {{"a":{"with spaces":"the value"},"a":{"with spaces":"another value"}}}]
+    set result [catch {$doc selectNodes {a[b %nodeName='another value']}} errMsg]
+    lappend result $errMsg
+    $doc delete
+    set result
+} {1 {Predicate: Expected "RBRACKET" for 'a[b %nodeName='another value']' 
+
+Parsed symbols:
+     0 WCARDNAME        0 00000.000     0  a
+     1 LBRACKET         0 00000.000     1  
+     2 WCARDNAME        0 00000.000     2  b
+-->  3 WCARDNAME        1 00000.000    12  with spaces
+     4 EQUAL            0 00000.000    13  
+     5 LITERAL          0 00000.000    28  another value
+     6 RBRACKET         0 00000.000    29  }}
+
+test xpath-5.47 {Element name injected with tcl variable} {
+    set doc [dom parse -json {{"a":{"":"the value"},"a":{"":"another value"}}}]
+    set nodeName ""
+    set node [$doc selectNodes {a[%nodeName='another value']}]
+    set result [list]
+    lappend result [$node nodeName]
+    lappend result [$doc selectNodes {string(a[%nodeName='another value'])}]
+    $doc delete
+    set result
+} {a {another value}}
+
+test xpath-5.48 {Element name injected with tcl variable} {
+    set doc [dom parse -json {{"a":{"a\u0001b":"the value"},"a":{"a\u0001b":"another value"}}}]
+    set nodeName "a\u0001b"
+    set node [$doc selectNodes {a[%nodeName='another value']}]
+    set result [list]
+    lappend result [$node nodeName]
+    lappend result [$doc selectNodes {string(a[%nodeName='another value'])}]
+    $doc delete
+    set result
+} {a {another value}}
+
+test xpath-5.49 {Element name injected with tcl variable} {
+    set doc [dom parse -json {{"a":{"a\u0000b":"the value"},"a":{"a\u0000b":"another value"}}}]
+    set nodeName "a\u0000b"
+    set node [$doc selectNodes {a[%nodeName='another value']}]
+    set result [list]
+    lappend result [$node nodeName]
+    lappend result [$doc selectNodes {string(a[%nodeName='another value'])}]
+    $doc delete
+    set result
+} {a {another value}}
+
+test xpath-5.50 {Element name injected with tcl variable} {
+    set doc [dom parse -json {{"a":"1","*":"2","c":"3"}}]
+    set nodeName "*"
+    set result [llength [$doc selectNodes %nodeName]]
+    $doc delete
+    set result
+} {1}
+
+test xpath-5.51 {Element name injected with tcl variable} {
+    set doc [dom parse -json {{"member name with spaces":"the value"}}]
+    set nodeName "member name with spaces"
+    set node [$doc selectNodes %nodeName]
+    set result [list]
+    lappend result [$node nodeName]
+    lappend result [$doc selectNodes string(%nodeName)]
+    set node [$doc selectNodes child::%nodeName]
+    lappend result [$node nodeName]
+    $doc delete
+    set result
+} {{member name with spaces} {the value} {member name with spaces}}
+
+test xpath-5.52 {Element name injected with tcl variable} {
+    set doc [dom parse -json {{"a:b":"value"}}]
+    set nodeName "a:b"
+    set result [$doc selectNodes string(%nodeName)]
+    $doc delete
+    set result
+} {value}
+
+test xpath-5.53 {Element name injected with tcl variable} {
+    set doc [dom parse -json {{"a:b":"value"}}]
+    set nodeName "a:b"
+    set result [$doc selectNodes string(child::%nodeName)]
+    $doc delete
+    set result
+} {value}
+
+test xpath-5.54 {Element name injected with tcl variable} {
+    set doc [dom parse -json {{"a:b":"value"}}]
+    set nodeName "a:b"
+    set result [$doc selectNodes string(descendant-or-self::%nodeName)]
+    $doc delete
+    set result
+} {value}
+
+test xpath-5.55 {Element name injected with tcl variable} {
+    set doc [dom parse <a><b/></a>]
+    set nodeName "a/b"
+    set result [llength [$doc selectNodes %nodeName]]
+    lappend result [llength [$doc selectNodes a/b]]
+    $doc delete
+    set result
+} {0 1}
+
+test xpath-5.56 {Element name injected with tcl variable} {
+    set doc [dom parse -json {{"a":{"a/b":"a/b"},"a":{"a":{"b":"b"}}}}]
+    set nodeName0 "a"
+    set nodeName1 "a/b"
+    set result [list]
+    lappend result [$doc selectNodes string(%nodeName0/%nodeName1)]
+    lappend result [$doc selectNodes string(a/a/b)]
+    $doc delete
+    set result
+} {a/b b}
 
 set doc [dom parse {
 <root>
@@ -1115,7 +1263,7 @@ test xpath-7.6 {parent axis on /} {
     set result
 } {0 0 0}
 
-test xpath-7.7 {Document order in complexer // expresions} -setup {
+test xpath-7.7 {Document order in complexer // expressions} -setup {
     set doc [dom parse {
     <doc>
     <a>
@@ -1144,6 +1292,22 @@ test xpath-7.7 {Document order in complexer // expresions} -setup {
 } -cleanup {
     $doc delete
 } -result {1 - 11 - 2 - 22 - 3 - 4 - 33}
+
+test xpath-7.8 {Attribute node as context node of a lang() call} -setup {
+    set doc [dom parse <doc/>]
+} -body {
+    $doc selectNodes {/namespace::node()[lang('en')]}
+} -cleanup {
+    $doc delete
+} -result ""
+
+test xpath-7.9 {Attribute node as context node of an id() call} -setup {
+    set doc [dom parse {<doc foo="bar"/>}]
+} -body {
+    $doc selectNodes {doc/@foo[id(.)]}
+} -cleanup {
+    $doc delete
+} -result ""
 
 # cleanup
 ::tcltest::cleanupTests

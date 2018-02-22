@@ -69,7 +69,7 @@ TclGenExpatInfo*
 
   <section>
     <title>DESCRIPTION</title>
-<p>The functions described in this manual allows to add C level coded event
+<p>The functions described in this manual allows one to add C level coded event
 handler to an tDOM Tcl expat parser objects. A tDOM Tcl expat parser object is
 able to have several Tcl scripts and C functions associated with an specific
 event. If the event occurs, first the Tcl scripts then the C functions
@@ -88,7 +88,7 @@ typedef struct CHandlerSet {
     int ignoreWhiteCDATAs;          /* ignore 'white' CDATA sections */
 
     void *userData;                 /* Handler set specific Data Structure;
-                                       the C handler set extention has to
+                                       the C handler set extension has to
                                        malloc the needed structure in his
                                        init func and has to provide a
                                        cleanup func (to free it). */
@@ -160,7 +160,7 @@ event handler functions are called with this pointer as userData argument.
 type</p>
     <syntax>void (Tcl_Interp *interp, void *userData)</syntax>
 
-    <p><m>resetProc</m> is called in case the parser is reseted with
+    <p><m>resetProc</m> is called in case the parser is reset with
 <samp>&lt;parserObj&gt; reset</samp> and should do any necessary cleanup and
 reinitializing to prepare the C handler set for a new XML document. The
 <m>freeProc</m> is called, if the parser is deleted and should do memory

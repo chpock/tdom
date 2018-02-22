@@ -88,6 +88,8 @@ typedef struct CurrentStack {
 typedef struct NodeInfo {
     int   type;
     char *namespace;
+    int   jsonType;
+    char *tagName;
 } NodeInfo;
 
 #ifndef TCL_THREADS
@@ -102,11 +104,11 @@ typedef struct NodeInfo {
 |   Forward declarations
 |
 \---------------------------------------------------------------------------*/
-static void * StackPush  _ANSI_ARGS_((void *));
-static void * StackPop   _ANSI_ARGS_((void));
-static void * StackTop   _ANSI_ARGS_((void));
-static int    NodeObjCmd _ANSI_ARGS_((ClientData,Tcl_Interp*,int,Tcl_Obj *CONST o[]));
-static void   StackFinalize _ANSI_ARGS_((ClientData));
+static void * StackPush  (void *);
+static void * StackPop   (void);
+static void * StackTop   (void);
+static int    NodeObjCmd (ClientData,Tcl_Interp*,int,Tcl_Obj *CONST o[]);
+static void   StackFinalize (ClientData);
 
 extern int tcldom_appendXML (Tcl_Interp*, domNode*, Tcl_Obj*);
 
@@ -116,9 +118,9 @@ extern int tcldom_appendXML (Tcl_Interp*, domNode*, Tcl_Obj*);
 |
 \---------------------------------------------------------------------------*/
 static void *
-StackPush (element)
-    void *element;
-{
+StackPush (
+    void *element
+) {
     StackSlot *newElement;
     CurrentStack *tsdPtr = TSDPTR(&dataKey);
 
@@ -162,7 +164,7 @@ StackPush (element)
 |
 \---------------------------------------------------------------------------*/
 static void *
-StackPop ()
+StackPop (void)
 {
     void *element;
     CurrentStack *tsdPtr = TSDPTR(&dataKey);
@@ -182,7 +184,7 @@ StackPop ()
 |
 \---------------------------------------------------------------------------*/
 static void *
-StackTop ()
+StackTop (void)
 {
     CurrentStack *tsdPtr = TSDPTR(&dataKey);
 
@@ -199,9 +201,9 @@ StackTop ()
 |
 \---------------------------------------------------------------------------*/
 static void
-StackFinalize (clientData)
-    ClientData clientData;
-{
+StackFinalize (
+    ClientData clientData
+) {
     StackSlot *tmp, *stack = (StackSlot *)clientData;
 
     while (stack) {
@@ -231,8 +233,9 @@ StackFinalize (clientData)
  *----------------------------------------------------------------------
  */
 static char*
-namespaceTail (nameObj) 
-    Tcl_Obj *nameObj;
+namespaceTail (
+    Tcl_Obj *nameObj
+)    
 {
     char *name,*p;
     int   len;
@@ -264,6 +267,9 @@ NodeObjCmdDeleteProc (
     if (nodeInfo->namespace) {
         FREE (nodeInfo->namespace);
     }
+    if (nodeInfo->tagName) {
+        FREE (nodeInfo->tagName);
+    }
     FREE (nodeInfo);
 }
 
@@ -272,16 +278,17 @@ NodeObjCmdDeleteProc (
 |
 \---------------------------------------------------------------------------*/
 static int
-NodeObjCmd (arg, interp, objc, objv)
-    ClientData      arg;                /* Type of node to create. */
-    Tcl_Interp    * interp;             /* Current interpreter. */
-    int             objc;               /* Number of arguments. */
-    Tcl_Obj *CONST  objv[];             /* Argument objects. */
-{
+NodeObjCmd (
+    ClientData      arg,                /* Type of node to create. */
+    Tcl_Interp    * interp,             /* Current interpreter. */
+    int             objc,               /* Number of arguments. */
+    Tcl_Obj *CONST  objv[]             /* Argument objects. */
+) {
     int type, createType, len, dlen, i, ret, disableOutputEscaping = 0, 
         index = 1;
     char *tag, *p, *tval, *aval;
     domNode *parent, *newNode = NULL;
+    domTextNode *textNode = NULL;
     domDocument *doc;
     Tcl_Obj *cmdObj, **opts;
     NodeInfo *nodeInfo = (NodeInfo*) arg;
@@ -351,11 +358,12 @@ NodeObjCmd (arg, interp, objc, objv)
             createType = nodeInfo->type;
             break;
         }
-        newNode = (domNode*)domNewTextNode(doc, tval, len, createType);
+        textNode = domNewTextNode(doc, tval, len, createType);
+        textNode->info = nodeInfo->jsonType;
         if (disableOutputEscaping) {
-            newNode->nodeFlags |= DISABLE_OUTPUT_ESCAPING;
+            textNode->nodeFlags |= DISABLE_OUTPUT_ESCAPING;
         }
-        domAppendChild(parent, newNode);
+        domAppendChild(parent, (domNode*) textNode);
         break;
 
     case PROCESSING_INSTRUCTION_NODE_NAME_CHK:
@@ -393,18 +401,23 @@ NodeObjCmd (arg, interp, objc, objv)
     case ELEMENT_NODE_AVALUE_CHK:
     case ELEMENT_NODE_CHK:
     case ELEMENT_NODE:
-        tag = Tcl_GetStringFromObj(objv[0], &len);
-        p = tag + len;
-        /* Isolate just the tag name, i.e. skip it's parent namespace */
-        while (--p > tag) {
-            if ((*p == ':') && (*(p-1) == ':')) {
-                p++; /* just after the last "::" */
-                tag = p;
-                break;
+        if (!nodeInfo->tagName) {
+            tag = Tcl_GetStringFromObj(objv[0], &len);
+            p = tag + len;
+            /* Isolate just the tag name, i.e. skip it's parent namespace */
+            while (--p > tag) {
+                if ((*p == ':') && (*(p-1) == ':')) {
+                    p++; /* just after the last "::" */
+                    tag = p;
+                    break;
+                }
             }
+        } else {
+            tag = nodeInfo->tagName;
         }
 
-        newNode = domAppendNewElementNode (parent, tag, NULL);
+        newNode = domAppendNewElementNode (parent, tag, nodeInfo->namespace);
+        newNode->info = nodeInfo->jsonType;
         
         /*
          * Allow for following syntax:
@@ -504,15 +517,17 @@ NodeObjCmd (arg, interp, objc, objv)
 |
 \---------------------------------------------------------------------------*/
 int
-nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
-    Tcl_Interp    * interp;             /* Current interpreter. */
-    int             objc;               /* Number of arguments. */
-    Tcl_Obj *CONST  objv[];             /* Argument objects. */
-    int             checkName;          /* Flag: Name checks? */
-    int             checkCharData;      /* Flag: Data checks? */
-{
-    int ix, index, ret, type, nodecmd = 0;
+nodecmd_createNodeCmd (
+    Tcl_Interp    * interp,             /* Current interpreter. */
+    int             objc,               /* Number of arguments. */
+    Tcl_Obj *CONST  objv[],             /* Argument objects. */
+    int             checkName,          /* Flag: Name checks? */
+    int             checkCharData       /* Flag: Data checks? */
+) {
+    int index, ret, type, nodecmd = 0, jsonType = 0, haveJsonType = 0;
+    int isElement = 0;
     char *nsName, buf[64];
+    Tcl_Obj *tagName = NULL, *namespace = NULL;
     Tcl_DString cmdName;
     NodeInfo *nodeInfo;
 
@@ -531,20 +546,70 @@ nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
         "parserNode", NULL
     };
 
-    if (objc != 3 && objc != 4) {
+    static CONST84 char *options[] = {
+        "-returnNodeCmd", "-jsonType", "-tagName", "-namespace", NULL
+    };
+
+    enum option {
+        o_returnNodeCmd, o_jsonType, o_tagName, o_namespace
+    };
+
+    static const char *jsonTypes[] = {
+        "NONE",
+        "ARRAY",
+        "OBJECT",
+        "NULL",
+        "TRUE",
+        "FALSE",
+        "STRING",
+        "NUMBER"
+    };
+
+    if (objc < 3 ) {
         goto usage;
     }
-    if (objc == 4) {
-        if (strcmp(Tcl_GetString(objv[1]), "-returnNodeCmd")) {
-            goto usage;
+
+    while (objc > 3) {
+        if (Tcl_GetIndexFromObj (interp, objv[1], options, "option",
+                                 0, &index) != TCL_OK) {
+            return TCL_ERROR;
         }
-        nodecmd = 1;
-        ix = 2;
-    } else {
-        nodecmd = 0;
-        ix = 1;
+        switch ((enum option) index) {
+        case o_returnNodeCmd:
+            nodecmd = 1;
+            objc--;
+            objv++;
+            break;
+            
+        case o_jsonType:
+            if (Tcl_GetIndexFromObj (interp, objv[2], jsonTypes, "jsonType",
+                                     1, &jsonType) != TCL_OK) {
+                return TCL_ERROR;
+            }
+            haveJsonType = 1;
+            objc -= 2;
+            objv += 2;
+            break;
+            
+        case o_tagName:
+            tagName = objv[2];
+            objc -= 2;
+            objv += 2;
+            break;
+
+        case o_namespace:
+            namespace = objv[2];
+            objc -= 2;
+            objv += 2;
+            break;
+            
+        }
     }
-    ret = Tcl_GetIndexFromObj(interp, objv[ix], subcmds, "option", 0, &index);
+    if (objc != 3) {
+        goto usage;
+    }
+
+    ret = Tcl_GetIndexFromObj(interp, objv[1], subcmds, "nodeType", 0, &index);
     if (ret != TCL_OK) {
         return ret;
     }
@@ -564,24 +629,33 @@ nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
     if (strcmp(nsName, "::")) {
         Tcl_DStringAppend(&cmdName, "::", 2);
     }
-    Tcl_DStringAppend(&cmdName, Tcl_GetString(objv[ix+1]), -1);
+    Tcl_DStringAppend(&cmdName, Tcl_GetString(objv[2]), -1);
 
-    nodeInfo = (NodeInfo *) MALLOC (sizeof (NodeInfo));
-    nodeInfo->namespace = NULL;
     Tcl_ResetResult (interp);
     switch ((enum subCmd)index) {
     case ELM_NODE: 
-        if (!tcldom_nameCheck(interp, namespaceTail(objv[ix+1]), "tag", 0)) {
-            FREE (nodeInfo);
-            return TCL_ERROR;
-        }
-        if (checkName && checkCharData) {
-            type = ELEMENT_NODE_CHK;
-        } else if (checkName) {
-            type = ELEMENT_NODE_ANAME_CHK;
-        } else if (checkCharData) {
-            type = ELEMENT_NODE_AVALUE_CHK;
+        isElement = 1;
+        if (!haveJsonType) {
+            if (!tcldom_nameCheck(interp, namespaceTail(objv[2]),
+                                  "tag", 0)) {
+                return TCL_ERROR;
+            }
+            if (checkName && checkCharData) {
+                type = ELEMENT_NODE_CHK;
+            } else if (checkName) {
+                type = ELEMENT_NODE_ANAME_CHK;
+            } else if (checkCharData) {
+                type = ELEMENT_NODE_AVALUE_CHK;
+            } else {
+                type = ELEMENT_NODE;
+            }
         } else {
+            if (jsonType > 2) {
+                Tcl_SetResult(interp, "For an element node the jsonType"
+                              " argument must be one out of this list: ARRAY"
+                              " OBJECT NONE.", NULL);
+                return TCL_ERROR;
+            }
             type = ELEMENT_NODE;
         }
         break;
@@ -589,9 +663,20 @@ nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
         type = PARSER_NODE;
         break;
     case TXT_NODE: 
-        if (checkCharData) {
-            type = TEXT_NODE_CHK;
+        if (!haveJsonType) {
+            if (checkCharData) {
+                type = TEXT_NODE_CHK;
+            } else {
+                type = TEXT_NODE;
+            }
         } else {
+            if (jsonType < 3 && jsonType > 0) {
+                Tcl_SetResult(interp, "For a text node the jsonType "
+                              "argument must be one out of this list: "
+                              "TRUE FALSE NULL NUMBER STRING NONE",
+                              NULL);
+                return TCL_ERROR;
+            }
             type = TEXT_NODE;
         }
         break;
@@ -624,10 +709,38 @@ nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
         Tcl_SetResult (interp, "Invalid/unexpected node type", NULL);
         return TCL_ERROR;
     }
+
+    if (tagName && !isElement) {
+        Tcl_SetResult(interp, "The -tagName option is allowed only for "
+                      "element node commands.", NULL);
+        return TCL_ERROR;        
+    }
+
+    if (namespace && !isElement) {
+        Tcl_SetResult(interp, "The -namespace option is allowed only for "
+                      "element node commands.", NULL);
+        return TCL_ERROR;        
+    }
     
+    if (haveJsonType && type != ELEMENT_NODE && type != TEXT_NODE) {
+        Tcl_SetResult(interp, "Only element and text nodes may have a "
+                      "JSON type.", NULL);
+        return TCL_ERROR;        
+    }
+    
+    nodeInfo = (NodeInfo *) MALLOC (sizeof (NodeInfo));
+    nodeInfo->namespace = NULL;
     nodeInfo->type = type;
     if (nodecmd) {
         nodeInfo->type *= -1; /* Signal this fact */
+    }
+    nodeInfo->jsonType = jsonType;
+    nodeInfo->tagName = NULL;
+    if (namespace) {
+        nodeInfo->namespace = tdomstrdup (Tcl_GetString(namespace));
+    }
+    if (tagName) {
+        nodeInfo->tagName = tdomstrdup (Tcl_GetString(tagName));
     }
     Tcl_CreateObjCommand(interp, Tcl_DStringValue(&cmdName), NodeObjCmd,
                          (ClientData)nodeInfo, NodeObjCmdDeleteProc);
@@ -637,7 +750,10 @@ nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
     return TCL_OK;
 
  usage:
-    Tcl_AppendResult(interp, "dom createNodeCmd ?-returnNodeCmd?"
+    Tcl_AppendResult(interp, "dom createNodeCmd\n"
+                     "\t?-returnNodeCmd?\n"
+                     "\t?-jsonType <jsonType>?\n"
+                     "\t?-tagName <tagName>?\n"
                      " nodeType cmdName", NULL);
     return TCL_ERROR;
 }
@@ -661,11 +777,11 @@ nodecmd_createNodeCmd (interp, objc, objv, checkName, checkCharData)
  */
 
 int
-nodecmd_appendFromScript (interp, node, cmdObj)
-    Tcl_Interp *interp;                 /* Current interpreter. */
-    domNode    *node;                   /* Parent dom node */
-    Tcl_Obj    *cmdObj;                 /* Argument objects. */
-{
+nodecmd_appendFromScript (
+    Tcl_Interp *interp,                /* Current interpreter. */
+    domNode    *node,                  /* Parent dom node */
+    Tcl_Obj    *cmdObj                 /* Argument objects. */
+) {
     int ret;
     domNode *oldLastChild, *child, *nextChild;
 
@@ -678,7 +794,7 @@ nodecmd_appendFromScript (interp, node, cmdObj)
 
     StackPush((void *)node);
     Tcl_AllowExceptions(interp);
-    ret = Tcl_EvalObj(interp, cmdObj);
+    ret = Tcl_EvalObjEx(interp, cmdObj, 0);
     if (ret != TCL_ERROR) {
         Tcl_ResetResult(interp);
     }
@@ -730,13 +846,13 @@ nodecmd_appendFromScript (interp, node, cmdObj)
  */
 
 int
-nodecmd_insertBeforeFromScript (interp, node, cmdObj, refChild)
-    Tcl_Interp *interp;                 /* Current interpreter. */
-    domNode    *node;                   /* Parent dom node */
-    Tcl_Obj    *cmdObj;                 /* Argument objects. */
-    domNode    *refChild;               /* Insert new childs before this
+nodecmd_insertBeforeFromScript (
+    Tcl_Interp *interp,                 /* Current interpreter. */
+    domNode    *node,                   /* Parent dom node */
+    Tcl_Obj    *cmdObj,                 /* Argument objects. */
+    domNode    *refChild                /* Insert new childs before this
                                          * node; may be NULL */
-{
+) {
     int      ret;
     domNode *storedLastChild, *n;
 

@@ -97,7 +97,7 @@ TDomThreaded(static Tcl_Mutex initMutex;)
 
 static char *domException2StringTable [] = {
 
-    "OK - no expection",
+    "OK - no exception",
     "INDEX_SIZE_ERR",
     "DOMSTRING_SIZE_ERR",
     "HIERARCHY_REQUEST_ERR",
@@ -152,6 +152,7 @@ typedef struct _domReadInfo {
     domNode          *currentNode;
     int               depth;
     int               ignoreWhiteSpaces;
+    int               cdataSection;
     Tcl_DString      *cdata;
     TEncoding        *encoding_8bit;
     int               storeLineColumn;
@@ -1035,7 +1036,7 @@ domGetAttributeNodeNS (
  *      attributes. Since the domAttrNode struct doesn't has an
  *      element for the previous attribute, we need a function for the
  *      relatively rare cases, the 'previous attribute' is
- *      needed. Remeber, that the XML rec say, that there is no
+ *      needed. Remember, that the XML rec say, that there is no
  *      specific order of the attributes of a node.
  *
  * Results: 
@@ -1202,6 +1203,12 @@ startElement(
                 xmlns = atPtr[0];
                 newNS = 1;
                 if (xmlns[5] == ':') {
+                    if (atPtr[1][0] == '\0') {
+                        Tcl_SetResult (info->interp, "Missing URI in Namespace "
+                               "declaration", NULL);
+                        XML_StopParser(info->parser, 0);
+                        return;
+                    }
                     if (domIsNamespaceInScope (info->activeNS, info->activeNSpos,
                                                &(xmlns[6]), atPtr[1])) {
                         ns = domLookupPrefix (info->currentNode, &(xmlns[6]));
@@ -1286,8 +1293,7 @@ startElement(
                 node->namespace = info->document->rootNode->firstAttr->namespace;
             } else {
                 /* Since where here, this means, the element has a
-                   up to now not declared namespace prefix. We probably
-                   should return this as an error, shouldn't we?*/
+                   up to now not declared namespace prefix. */
                 Tcl_SetResult (info->interp, "Namespace prefix is not "
                                "defined", NULL);
                 XML_StopParser(info->parser, 0);
@@ -1310,7 +1316,7 @@ elemNSfound:
                                  atts[idatt+1],
                                  &hnew);
         /* if hnew isn't 1 this is a validation error. Hm, no clear way
-           to report this. And more, xslt and xpath can process not
+           to report this. And more, XSLT and XPath can process not
            valid XML, the spec mentioned this even within the context
            of id(). If some elements share the same ID, the first in
            document order should be used. Doing it this way, this is
@@ -1453,6 +1459,36 @@ characterDataHandler (
 }
 
 /*---------------------------------------------------------------------------
+|   startCDATA
+|
+\--------------------------------------------------------------------------*/
+static void
+startCDATA (
+    void        *userData
+    )
+{
+    domReadInfo   *info = userData;
+
+    DispatchPCDATA (info);
+    info->cdataSection = 1;
+}
+
+/*---------------------------------------------------------------------------
+|   endCDATA
+|
+\--------------------------------------------------------------------------*/
+static void
+endCDATA (
+    void        *userData
+    )
+{
+    domReadInfo   *info = userData;
+    
+    DispatchPCDATA (info);
+    info->cdataSection = 0;
+}
+
+/*---------------------------------------------------------------------------
 |   DispatchPCDATA
 |
 \--------------------------------------------------------------------------*/
@@ -1468,18 +1504,19 @@ DispatchPCDATA (
     char          *s;
     int            len, hnew;
     
-    s = Tcl_DStringValue (info->cdata);
     len = Tcl_DStringLength (info->cdata);
-    if (!len) return;
+    if (!len && !info->cdataSection) return;
+    s = Tcl_DStringValue (info->cdata);
     
     if (TclOnly8Bits && info->encoding_8bit) {
         tdom_Utf8to8Bit( info->encoding_8bit, s, &len);
     }
     parentNode = info->currentNode;
     if (!parentNode) return;
-    
+
     if (   parentNode->lastChild 
-        && parentNode->lastChild->nodeType == TEXT_NODE) {
+        && parentNode->lastChild->nodeType == TEXT_NODE
+        && !info->cdataSection) {
 
         /* normalize text node, i.e. there are no adjacent text nodes */
         node = (domTextNode*)parentNode->lastChild;
@@ -1516,7 +1553,10 @@ DispatchPCDATA (
             node = (domTextNode*) domAlloc(sizeof(domTextNode));
         }
         memset(node, 0, sizeof(domTextNode));
-        node->nodeType    = TEXT_NODE;
+        if (info->cdataSection)
+            node->nodeType    = CDATA_SECTION_NODE;
+        else 
+            node->nodeType    = TEXT_NODE;
         node->nodeFlags   = 0;
         node->nodeNumber  = NODE_NO(info->document);
         node->valueLength = len;
@@ -2085,6 +2125,7 @@ domReadDocument (
     char       *xml,
     int         length,
     int         ignoreWhiteSpaces,
+    int         keepCDATA,
     TEncoding  *encoding_8bit,
     int         storeLineColumn,
     int         ignorexmlns,
@@ -2126,6 +2167,7 @@ domReadDocument (
     info.ignoreWhiteSpaces    = ignoreWhiteSpaces;
     info.cdata                = (Tcl_DString*) MALLOC (sizeof (Tcl_DString));
     Tcl_DStringInit (info.cdata);
+    info.cdataSection         = 0;
     info.encoding_8bit        = encoding_8bit;
     info.storeLineColumn      = storeLineColumn;
     info.ignorexmlns          = ignorexmlns;
@@ -2163,6 +2205,10 @@ domReadDocument (
                              (enum XML_ParamEntityParsing) paramEntityParsing);
     XML_SetDoctypeDeclHandler (parser, startDoctypeDeclHandler,
                                endDoctypeDeclHandler);
+    if (keepCDATA) {
+        XML_SetCdataSectionHandler(parser, startCDATA, endCDATA);
+    }
+    
 
     if (channel == NULL) {
         status = XML_Parse(parser, xml, length, 1);
@@ -2197,7 +2243,7 @@ domReadDocument (
             *resultcode = info.status;
             return NULL;
         }
-        if (strcmp (Tcl_DStringValue (&dStr), "identity")==0 ) useBinary = 1;
+        if (strcmp (Tcl_DStringValue (&dStr), "utf-8")==0 ) useBinary = 1;
         else useBinary = 0;
         Tcl_DStringFree (&dStr);
         if (useBinary) {
@@ -2472,7 +2518,6 @@ domCreateDoc (
 \--------------------------------------------------------------------------*/
 domDocument *
 domCreateDocument (
-    Tcl_Interp *interp,
     const char *uri,
     char       *documentElementTagName
 )
@@ -2489,31 +2534,7 @@ domCreateDocument (
         domSplitQName (documentElementTagName, prefix, &localName);
         DBG(fprintf(stderr, 
                     "rootName: -->%s<--, prefix: -->%s<--, localName: -->%s<--\n", 
-                    documentElementTagName, prefix, localName);)
-        if (prefix[0] != '\0') {
-            if (!domIsNCNAME (prefix)) {
-                if (interp) {
-                    Tcl_SetObjResult(interp, 
-                                     Tcl_NewStringObj("invalid prefix name", -1));
-                }
-                return NULL;
-            }
-        }
-        if (!domIsNCNAME (localName)) {
-            if (interp) {
-                Tcl_SetObjResult(interp, 
-                                 Tcl_NewStringObj("invalid local name", -1));
-            }
-            return NULL;
-        }
-    } else {
-        if (!domIsNAME (documentElementTagName)) {
-            if (interp) {
-                Tcl_SetObjResult(interp, 
-                                 Tcl_NewStringObj("invalid root element name", -1));
-            }
-            return NULL;
-        }
+                    documentElementTagName, prefix, localName););
     }
     doc = domCreateDoc (NULL, 0);
 
@@ -2866,7 +2887,7 @@ domFreeDocument (
     FREE (doc->baseURIs);
     
     /*-----------------------------------------------------------
-    | delete xpath cache hash table
+    | delete XPath cache hash table
     \-----------------------------------------------------------*/
     if (doc->xpathCache) {
         entryPtr = Tcl_FirstHashEntry (doc->xpathCache, &search);
@@ -4564,6 +4585,11 @@ domNewElementNodeNS (
     const char    *localname;
     domNS         *ns;
 
+    domSplitQName (tagName, prefix, &localname);
+    if (prefix[0] == '\0' && uri[0] == '\0') {
+        return NULL;
+    }
+
     h = Tcl_CreateHashEntry(&HASHTAB(doc, tdom_tagNames), tagName, &hnew);
     node = (domNode*) domAlloc(sizeof(domNode));
     memset(node, 0, sizeof(domNode));
@@ -4574,7 +4600,6 @@ domNewElementNodeNS (
     node->ownerDocument = doc;
     node->nodeName      = (char *)&(h->key);
 
-    domSplitQName (tagName, prefix, &localname);
     ns = domNewNamespace(doc, prefix, uri);
     node->namespace = ns->index;
 
@@ -4615,15 +4640,23 @@ domCloneNode (
                                          pinode->dataLength);
     }
     if (node->nodeType != ELEMENT_NODE) {
-        domTextNode *tnode = (domTextNode*)node;
-        return (domNode*) domNewTextNode(tnode->ownerDocument,
-                                         tnode->nodeValue, tnode->valueLength,
-					 tnode->nodeType);
+        domTextNode *t1node, *tnode = (domTextNode*)node;
+        if (tnode->info) {
+            t1node = domNewTextNode(tnode->ownerDocument,
+                                    tnode->nodeValue, tnode->valueLength,
+                                    tnode->nodeType);
+            t1node->info = tnode->info;
+            return (domNode*) t1node;
+        } else {
+            return (domNode*) domNewTextNode(tnode->ownerDocument,
+                                             tnode->nodeValue, tnode->valueLength,
+                                             tnode->nodeType);
+        }
     }
 
     n = domNewElementNode(node->ownerDocument, node->nodeName);
     n->namespace = node->namespace;
-
+    n->info = node->info;
 
     /*------------------------------------------------------------------
     |   copy attributes (if any)
@@ -4773,7 +4806,7 @@ domCopyTo (
             if (copyNS) {
                 /* If copyNS is true, then all namespaces in scope
                  * (including the one declared with the node to copy)
-                 * are allready copied over. */
+                 * are already copied over. */
                 attr = attr->nextSibling;
                 continue;
                 
@@ -5173,6 +5206,7 @@ typedef struct _tdomCmdReadInfo {
     domNode          *currentNode;
     int               depth;
     int               ignoreWhiteSpaces;
+    int               cdataSection;
     Tcl_DString      *cdata;
     TEncoding        *encoding_8bit;
     int               storeLineColumn;
@@ -5318,14 +5352,14 @@ TclTdomObjCmd (dummy, interp, objc, objv)
         "enable", "getdoc",
         "setResultEncoding", "setStoreLineColumn",
         "setExternalEntityResolver", "keepEmpties",
-        "remove", "ignorexmlns",
+        "remove", "ignorexmlns", "keepCDATA",
         NULL
     };
     enum tdomMethod {
         m_enable, m_getdoc,
         m_setResultEncoding, m_setStoreLineColumn,
         m_setExternalEntityResolver, m_keepEmpties,
-        m_remove, m_ignorexmlns
+        m_remove, m_ignorexmlns, m_keepCDATA
     };
 
     if (objc < 3 || objc > 4) {
@@ -5381,6 +5415,7 @@ TclTdomObjCmd (dummy, interp, objc, objv)
         info->currentNode       = NULL;
         info->depth             = 0;
         info->ignoreWhiteSpaces = 1;
+        info->cdataSection      = 0;
         info->cdata             = (Tcl_DString*) MALLOC (sizeof (Tcl_DString));
         Tcl_DStringInit (info->cdata);
         info->encoding_8bit     = 0;
@@ -5415,7 +5450,7 @@ TclTdomObjCmd (dummy, interp, objc, objv)
         }
         expat = GetExpatInfo (interp, objv[1]);
         if (info->tdomStatus != 2 || !expat->finished) {
-            Tcl_SetResult (interp, "No DOM tree avaliable.", NULL);
+            Tcl_SetResult (interp, "No DOM tree available.", NULL);
             return TCL_ERROR;
         }
         domSetDocumentElement (info->document);
@@ -5485,7 +5520,7 @@ TclTdomObjCmd (dummy, interp, objc, objv)
 
     case m_setExternalEntityResolver:
         if (objc != 4) {
-            Tcl_SetResult (interp, "You must name a tcl command as external entity resolver for setExternalEntityResolver.", NULL);
+            Tcl_SetResult (interp, "You must name a Tcl command as external entity resolver for setExternalEntityResolver.", NULL);
             return TCL_ERROR;
         }
         info = CHandlerSetGetUserData (interp, objv[1], "tdom");
@@ -5512,6 +5547,10 @@ TclTdomObjCmd (dummy, interp, objc, objv)
             return TCL_ERROR;
         }
         handlerSet = CHandlerSetGet (interp, objv[1], "tdom");
+        if (!handlerSet) {
+            Tcl_SetResult (interp, "parser object isn't tdom enabled.", NULL);
+            return TCL_ERROR;
+        }
         info = handlerSet->userData;
         if (!info) {
             Tcl_SetResult (interp, "parser object isn't tdom enabled.", NULL);
@@ -5526,6 +5565,35 @@ TclTdomObjCmd (dummy, interp, objc, objv)
         info->tdomStatus = 1;
         break;
 
+    case m_keepCDATA:
+        if (objc != 4) {
+            Tcl_SetResult (interp, "wrong # of args for method keepCDATA.",
+                           NULL);
+            return TCL_ERROR;
+        }
+        handlerSet = CHandlerSetGet (interp, objv[1], "tdom");
+        if (!handlerSet) {
+            Tcl_SetResult (interp, "parser object isn't tdom enabled.", NULL);
+            return TCL_ERROR;
+        }
+        info = handlerSet->userData;
+        if (!info) {
+            Tcl_SetResult (interp, "parser object isn't tdom enabled.", NULL);
+            return TCL_ERROR;
+        }
+        if (Tcl_GetBooleanFromObj (interp, objv[3], &bool) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        if (bool) {
+            handlerSet->startCdataSectionCommand = startCDATA;
+            handlerSet->endCdataSectionCommand = endCDATA;
+        } else {
+            handlerSet->startCdataSectionCommand = startCDATA;
+            handlerSet->endCdataSectionCommand = endCDATA;
+        }
+        info->tdomStatus = 1;
+        break;
+        
     case m_ignorexmlns:
         info = CHandlerSetGetUserData (interp, objv[1], "tdom");
         if (!info) {

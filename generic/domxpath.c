@@ -197,7 +197,7 @@ static char *astType2str[] = {
     "Int", "Real", "Mult", "Div", "Mod", "UnaryMinus", "IsNSElement",
     "IsNode", "IsComment", "IsText", "IsPI", "IsSpecificPI", "IsElement",
     "IsFQElement", "GetVar", "GetFQVar", "Literal", "ExecFunction", "Pred",
-    "EvalSteps", "SelectRoot", "CombineSets", "Add", "Substract", "Less",
+    "EvalSteps", "SelectRoot", "CombineSets", "Add", "Subtract", "Less",
     "LessOrEq", "Greater", "GreaterOrEq", "Equal", "NotEqual", "And", "Or",
     "IsNSAttr", "IsAttr", "AxisAncestor", "AxisAncestorOrSelf",
     "AxisAttribute", "AxisChild",
@@ -249,7 +249,7 @@ static int xpathEvalPredicate (ast steps, domNode *exprContext,
                                xpathCBs *cbs, int *docOrder, char **errMsg);
 
 /*----------------------------------------------------------------------------
-|   xpath result set functions
+|   XPath result set functions
 |
 \---------------------------------------------------------------------------*/
 
@@ -910,6 +910,30 @@ static XPathTokens xpathLexer (
                        }
                        break;
 
+            case '%':  if (!varParseCB) {
+                           *errMsg = tdomstrdup ("Unexpected char '%'");
+                           return tokens;
+                       }
+                       ps = (varParseCB->parseVarCB) (
+                                varParseCB->parseVarClientData, &xpath[i],
+                                &offset, errMsg
+                              );
+                       if (ps) {
+                           token = WCARDNAME;
+                           tokens[l].strvalue = tdomstrdup (ps);
+                           /* We kind of misuse the (in case of
+                            * WCARDNAME token otherwise not used)
+                            * intvalue to mark this WCARDNAME token
+                            * to be meant as literal - this is to
+                            * distinguish between '*' as wildcard and
+                            * as literal element name. */
+                           tokens[l].intvalue = 1;
+                           i += offset - 1;
+                       } else {
+                           return tokens;
+                       }
+                       break;
+                
             case '.':  if (xpath[i+1] == '.') {
                            token = DOTDOT;
                            i++;
@@ -1177,6 +1201,7 @@ Production(NodeTest)
     } else {
         Consume(WCARDNAME);
         a = NewStr (IsElement, STRVAL);
+        a->intvalue = INTVAL;
     }
 EndProduction
 
@@ -1469,7 +1494,7 @@ Production(AdditiveExpr)
             a = New2( Add, a, Recurse(MultiplicativeExpr));
         } else {
             Consume(MINUS);
-            a = New2( Substract, a, Recurse(MultiplicativeExpr));
+            a = New2( Subtract, a, Recurse(MultiplicativeExpr));
         }
     }
 EndProduction
@@ -2183,7 +2208,9 @@ int xpathParsePostProcess (
     while (t) {
         DBG(printAst (4, t);)
         if (t->type == AxisNamespace) {
-            if (t->child->type == IsElement && t->child->strvalue[0] != '*') {
+            if (t->child->type == IsElement
+                && t->child->strvalue[0] != '*'
+                && t->child->intvalue == 0) {
                 uri = domLookupPrefixWithMappings (exprContext, 
                                                    t->child->strvalue, 
                                                    prefixMappings);
@@ -2310,7 +2337,7 @@ int xpathParse (
         memmove(*errMsg + len+6+newlen, "' ", 3);
 
         for (i=0; tokens[i].token != EOS; i++) {
-            sprintf(tmp, "%s\n%3s%3d %-12s %5ld %.3e %5d  ",
+            sprintf(tmp, "%s\n%3s%3d %-12s %5ld %09.3f %5d  ",
                          (i==0) ? "\n\nParsed symbols:" : "",
                          (i==l) ? "-->" : "   ",
                           i,
@@ -2367,8 +2394,12 @@ int xpathNodeTest (
         if (node->nodeType == ELEMENT_NODE) {
             if ((step->child->strvalue[0] == '*') &&
                 (step->child->strvalue[1] == '\0') &&
-                (node->ownerDocument->rootNode != node)) return 1;
-            if (node->namespace) return 0;
+                (node->ownerDocument->rootNode != node) &&
+                (step->child->intvalue == 0)) return 1;
+            if (node->namespace
+                && (node->ownerDocument->namespaces[node->namespace-1]->prefix[0] != '\0'
+                    || node->ownerDocument->namespaces[node->namespace-1]->uri[0] != '\0')
+                ) return 0;
             return (strcmp(node->nodeName, step->child->strvalue)==0);
         }
         return 0;
@@ -2470,14 +2501,14 @@ static double xpathStringToNumber (
        Just to use strtod() isn't sufficient for a few reasons:
        - strtod() accepts a leading - or +, but XPath allows only a
          leading -
-       - strtod() accepts the string represention of a hexadecimal
+       - strtod() accepts the string representation of a hexadecimal
          number, but XPath does not
        - strtod() accepts an optional exponent but XPath does not
        - strtod() accepts leading whitespace including \f and \v, but
          XPath doesn't allow this characters. Since this two
          characters are not legal XML characters, they can not be part
          of a DOM tree and therefor there isn't a problem with XPath
-         expressions on DOM trees or in XSLT. But on tcl level it's
+         expressions on DOM trees or in XSLT. But on Tcl level it's
          possible, to feed that characters literal into the XPath
          engine.
     */
@@ -2840,6 +2871,7 @@ xpathEvalFunction (
     int              argc, savedDocOrder, from;
     xpathResultSets *args;
     xpathResultSet  *arg;
+    Tcl_HashTable   *ids;
     Tcl_HashEntry   *entryPtr;
     int              left = 0;
     double           dRight = 0.0;
@@ -3043,7 +3075,12 @@ xpathEvalFunction (
 
     case f_id:
         XPATH_ARITYCHECK(step,1,errMsg);
-        if (!ctxNode->ownerDocument->ids) {
+        if (ctxNode->nodeType == ATTRIBUTE_NODE) {
+            ids = ((domAttrNode*)ctxNode)->parentNode->ownerDocument->ids;
+        } else {
+            ids = ctxNode->ownerDocument->ids;
+        }
+        if (!ids) {
             break;
         }
         xpathRSInit (&leftResult);
@@ -3063,8 +3100,7 @@ xpathEvalFunction (
         if (leftResult.type == xNodeSetResult) {
             for (i=0; i < leftResult.nr_nodes; i++) {
                 leftStr = xpathFuncStringForNode (leftResult.nodes[i]);
-                entryPtr = Tcl_FindHashEntry (ctxNode->ownerDocument->ids,
-                                              leftStr);
+                entryPtr = Tcl_FindHashEntry (ids, leftStr);
                 if (entryPtr) {
                     node = (domNode*) Tcl_GetHashValue (entryPtr);
                     /* Don't report nodes out of the fragment list */
@@ -3089,8 +3125,7 @@ xpathEvalFunction (
                         continue;
                     }
                     *pto = '\0';
-                    entryPtr = Tcl_FindHashEntry (ctxNode->ownerDocument->ids,
-                                                  pfrom);
+                    entryPtr = Tcl_FindHashEntry (ids, pfrom);
                     if (entryPtr) {
                         node = (domNode*) Tcl_GetHashValue (entryPtr);
                         /* Don't report nodes out of the fragment list */
@@ -3111,8 +3146,7 @@ xpathEvalFunction (
                 }
             }
             if (!pwhite) {
-                entryPtr = Tcl_FindHashEntry (ctxNode->ownerDocument->ids,
-                                              pfrom);
+                entryPtr = Tcl_FindHashEntry (ids, pfrom);
                 if (entryPtr) {
                     node = (domNode*) Tcl_GetHashValue (entryPtr);
                     /* Don't report nodes out of the fragment list */
@@ -3179,7 +3213,11 @@ xpathEvalFunction (
         }
         leftStr = xpathFuncString (&leftResult);
         if (ctxNode->nodeType != ELEMENT_NODE) {
-            node = ctxNode->parentNode;
+            if (ctxNode->nodeType == ATTRIBUTE_NODE) {
+                node = ((domAttrNode*)ctxNode)->parentNode;
+            } else {
+                node = ctxNode->parentNode;
+            }
         } else {
             node = ctxNode;
         }
@@ -3930,7 +3968,7 @@ static int xpathEvalStep (
             CHECK_RC;
             break;
         }
-        /* whithout following Pred step, // is the same as 
+        /* without following Pred step, // is the same as 
            AxisDescendantOrSelf, fall throu */
 
     case AxisDescendantLit:
@@ -4369,7 +4407,7 @@ static int xpathEvalStep (
         break;
 
     case Add:
-    case Substract:
+    case Subtract:
     case Mult:
     case Div:
     case Mod:
@@ -4414,7 +4452,7 @@ static int xpathEvalStep (
                 rsSetNaN (result);
             } else {
                 switch (step->type) {
-                case Substract:
+                case Subtract:
                     NaN1 = -1 * NaN1;
                     /* fall throu */   
                 case Add:
@@ -4463,7 +4501,7 @@ static int xpathEvalStep (
         }
         switch (step->type) {
         case Add:       rsSetReal (result, dLeft + dRight); break;
-        case Substract: rsSetReal (result, dLeft - dRight); break;
+        case Subtract: rsSetReal (result, dLeft - dRight); break;
         case Mult:      rsSetReal (result, dLeft * dRight); break;
         case Div:
             if (dRight == 0.0) {
@@ -4481,7 +4519,7 @@ static int xpathEvalStep (
             }
             break;
         case Mod:
-            if (dRight == 0.0) {
+            if ((int)dRight == 0) {
                 rsSetNaN (result);
             } else {
                 rsSetInt  (result, ((int)dLeft) % ((int)dRight));
@@ -4834,7 +4872,7 @@ static int xpathEvalStep (
                 }
                 break;
             case BoolResult:
-                /* pleftResult is a non-emtpy nodeset, therefor: */
+                /* pleftResult is a non-empty nodeset, therefor: */
                 dLeft = 1.0;
                 dRight = xpathFuncNumber (prightResult, &NaN);
                 if (NaN) break;
@@ -5282,7 +5320,8 @@ int xpathMatches (
                         xpathRSFree (&nodeList); return 0;
                     }
                     if ((step->child->strvalue[0] != '*') ||
-                        (step->child->strvalue[1] != '\0'))
+                        (step->child->strvalue[1] != '\0') ||
+                        (step->child->intvalue != 0))
                     {
                         if (nodeToMatch->namespace) return 0;
                         if (strcmp(nodeToMatch->nodeName, step->child->strvalue)!=0) {
@@ -5326,7 +5365,8 @@ int xpathMatches (
                     xpathRSFree (&nodeList); return 0;
                 }
                 if ((step->strvalue[0] != '*') ||
-                    (step->strvalue[1] != '\0'))
+                    (step->strvalue[1] != '\0') ||
+                    (step->intvalue != 0))
                 {
                     if (nodeToMatch->namespace) return 0;
                     if (strcmp(nodeToMatch->nodeName, step->strvalue)!=0) {
@@ -5682,7 +5722,7 @@ double xpathGetPrio (
 
     if (steps->next == NULL) {
         if (steps->type == IsElement) {
-            if (strcmp(steps->strvalue, "*")==0) {
+            if (strcmp(steps->strvalue, "*")==0 && steps->intvalue==0) {
                 return -0.5;
             } else {
                 return 0.0;

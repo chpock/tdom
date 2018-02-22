@@ -97,7 +97,8 @@ TDOMOBJS = $(TMPDIR)\xmlrole.obj    \
 	   $(TMPDIR)\domxslt.obj    \
 	   $(TMPDIR)\nodecmd.obj    \
            $(TMPDIR)\domxpath.obj   \
-           $(TMPDIR)\domlock.obj   \
+           $(TMPDIR)\domlock.obj    \
+           $(TMPDIR)\domjson.obj    \
            $(TMPDIR)\tclexpat.obj   \
            $(TMPDIR)\tcldom.obj     \
            $(TMPDIR)\tdominit.obj

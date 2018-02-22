@@ -1,20 +1,20 @@
 <html>
 <head>
-<link rel="stylesheet" href="manpage.css"><title>tDOM manual: domNode</title><meta name="xsl-processor" content="Jochen Loewer (loewerj@hotmail.com), Rolf Ade (rolf@pointsman.de) et. al."><meta name="generator" content="$RCSfile: tmml-html.xsl,v $ $Revision: 1.11 $">
+<link rel="stylesheet" href="manpage.css"><title>tDOM manual: domNode</title><meta name="xsl-processor" content="Jochen Loewer (loewerj@hotmail.com), Rolf Ade (rolf@pointsman.de) et. al."><meta name="generator" content="$RCSfile: tmml-html.xsl,v $ $Revision: 1.11 $"><meta charset="utf-8">
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0xdccf70">NAME</a> · <a href="#SECTid0xcbd820">SYNOPSIS</a> · <a href="#SECTid0xe01af0"> DESCRIPTION </a> · <a href="#SECTid0xe2a560">SEE ALSO</a> · <a href="#SECTid0xe2a8f0">KEYWORDS</a>
+<a href="#SECTid0x1dc0790">NAME</a> Â· <a href="#SECTid0x1e7bad0">SYNOPSIS</a> Â· <a href="#SECTid0x1e6ee30"> DESCRIPTION </a> Â· <a href="#SECTid0x1f0a420">SEE ALSO</a> Â· <a href="#SECTid0x1f0a7b0">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0xdccf70">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x1dc0790">NAME</a></h2><p class="namesection">
 <b class="names">domNode - </b><br>Manipulates an instance of a DOM node object</p>
 
 
 
-  <h2><a name="SECTid0xcbd820">SYNOPSIS</a></h2><pre class="syntax"> $nodeObject <i class="m">method</i>  <i class="m">arg arg ...</i>
+  <h2><a name="SECTid0x1e7bad0">SYNOPSIS</a></h2><pre class="syntax"> $nodeObject <i class="m">method</i>  <i class="m">arg arg ...</i>
 </pre>
-  <h2><a name="SECTid0xe01af0"> DESCRIPTION </a></h2><p>This command manipulates one particular instance of a DOM node object.
+  <h2><a name="SECTid0x1e6ee30"> DESCRIPTION </a></h2><p>This command manipulates one particular instance of a DOM node object.
 <i class="m">method</i> indicates a specific method of the node class. These methods
 should closely conform to the W3C recommendation "Document Object Model
 (Core) Level 1" (<a href="http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html">http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html</a>)
@@ -55,7 +55,7 @@ value.</dd>
 
       
         <dt><b class="method">hasChildNodes</b></dt>
-        <dd>Returns 1 if the has children. Otherwise 0 is returned.</dd>
+        <dd>Returns 1 if the node has children. Otherwise 0 is returned.</dd>
       
 
       
@@ -77,7 +77,7 @@ the node in the sense of the DOM recommendation. This nodeList object is
 "live" in the sense that, for instance, changes to the children of
 the node object that it was created from are immediately reflected in the nodes
 returned by the NodeList accessors; it is not a static snapshot of the content
-of the node. The both accessors know by the nodeList object are "item
+of the node. The two accessors known by the nodeList object are "item
 &lt;index&gt;", which returns the indexth item in the collection, and
 "length", which returns the number of nodes in the list.</dd>
       
@@ -100,7 +100,7 @@ of the node. The both accessors know by the nodeList object are "item
         <dt>
 <b class="method">nextSibling</b>  <b class="variable">?objVar?</b>
 </dt>
-        <dd>Returns the next sibling relativ to the current node as a node
+        <dd>Returns the next sibling relative to the current node as a node
 object.</dd>
       
 
@@ -108,7 +108,7 @@ object.</dd>
         <dt>
 <b class="method">previousSibling</b> <b class="variable">?objVar?</b>
 </dt>
-        <dd>Returns the next sibling relativ to the current node as a node
+        <dd>Returns the next sibling relative to the current node as a node
 object.</dd>
       
 
@@ -133,8 +133,8 @@ matching (glob style) <i class="m">localname</i> and having the given namespace
         <dt>
 <b class="method">getElementById</b> <i class="m">id</i>
 </dt>
-        <dd>Returns the node having a id attribute with value
-<i class="m">id</i> or the emtpy string, if no node has an id attribute with that value.</dd>
+        <dd>Returns the node having an id attribute with value
+<i class="m">id</i> or the empty string if no node has an id attribute with that value.</dd>
       
 
       
@@ -149,7 +149,7 @@ matching (glob style) <i class="m">localname</i> and having the given namespace
         <dt>
 <b class="method">getAttribute</b> <i class="m">attributeName  ?defaultValue?</i>
 </dt>
-        <dd>Returns the value of the attribute <i class="m">attributeName</i>. If
+        <dd>Returns the value of the attribute <i class="m">attributeName</i>. If the
 attribute is not available <i class="m">defaultValue</i> is returned.</dd>
       
 
@@ -159,10 +159,11 @@ attribute is not available <i class="m">defaultValue</i> is returned.</dd>
 ?attributeName newValue ...?</i>
 </dt>
         <dd>Sets the value for one or more attributes. Every
-<i class="m">attributeName</i> is set to the corresponding <i class="m">newValue</i>. If there
-isn't an attribute for one or more of the <i class="m">attributeName</i> this will
-create that attribute.</dd>
-
+        <i class="m">attributeName</i> is set to the corresponding
+        <i class="m">newValue</i>. If there isn't an attribute for one or more
+        of the <i class="m">attributeName</i>, this will create that attribute.
+        It is not recommended to set attributes that look like xml
+        namespace declarations.</dd>
       
 
       
@@ -212,18 +213,10 @@ method has the same effect as the method <b>setAttribute</b>.</p>
 
         <pre class="example">$node setAttributeNS "" attri "some Value"</pre>
 
-<p>XML namespace nodes are not in any namespace. Set them this way:</p>
-
-        <pre class="example">$node setAttributeNS "" xmlns:myprefix "myNamespaceURI"
-$node setAttributeNS "" xmlns "newDefaultNamespace"</pre>
-
-<p>If your <i class="m">qualifiedName</i> has the prefix "xml" and you give the empty
-string as <i class="m">uri</i>, the namespace of the attribute defaults to
-"http://www.w3.org/XML/1998/namespace", as the DOM 2 recommendation
-requests. With the exceptions of the special prefixes "xmlns" and "xml" you
-always must provide a non emtpy <i class="m">uri</i>, if your <i class="m">qualifiedName</i> has a
-prefix.</p>
-        </dd>
+<p>With the exceptions of the special prefixes "xmlns" and "xml" you
+always must provide a non empty <i class="m">uri</i>, if your <i class="m">qualifiedName</i> has a
+prefix. It is not recommended to set xml namespace declarations. The effects are complicated and not always obvious up to resulting a not well-formed serializations after further processing.</p>
+</dd>
       
 
       
@@ -239,7 +232,7 @@ prefix.</p>
 <b class="method">attributes</b> <b class="option">?attributeNamePattern?</b>
 </dt>
         <dd>Returns all attributes matching the <i class="m">attributeNamePattern</i>.
-If <i class="m">attributeNamePattern</i> isn't given all attributes are returned as a Tcl
+If <i class="m">attributeNamePattern</i> isn't given, all attributes are returned as a Tcl
 list.</dd>
       
 
@@ -247,7 +240,7 @@ list.</dd>
         <dt>
 <b class="method">appendChild</b> <i class="m">newChild</i>
 </dt>
-        <dd>Append <i class="m">newChild</i> to the end of the child list of the
+        <dd>Appends <i class="m">newChild</i> to the end of the child list of the
 node.</dd>
       
 
@@ -255,7 +248,7 @@ node.</dd>
         <dt>
 <b class="method">insertBefore</b> <i class="m">newChild</i>  <i class="m">refChild</i>
 </dt>
-        <dd>Insert <i class="m">newChild</i> before the <i class="m">refChild</i> into the list of
+        <dd>Inserts <i class="m">newChild</i> before the <i class="m">refChild</i> into the list of
 children of node. If <i class="m">refChild</i> is the empty string, insert
 <i class="m">newChild</i> at the end of the child nodes list of that node.</dd>
       
@@ -264,7 +257,7 @@ children of node. If <i class="m">refChild</i> is the empty string, insert
         <dt>
 <b class="method">replaceChild</b> <i class="m">newChild</i>  <i class="m">oldChild</i>
 </dt>
-        <dd>Replace <i class="m">oldChild</i> with <i class="m">newChild</i> in the list of
+        <dd>Replaces <i class="m">oldChild</i> with <i class="m">newChild</i> in the list of
 children of that node. The <i class="m">oldChild</i> node will be part of the
 document fragment list after this operation.</dd>
       
@@ -273,9 +266,9 @@ document fragment list after this operation.</dd>
         <dt>
 <b class="method">removeChild</b> <i class="m">child</i>
 </dt>
-        <dd>Removes <i class="m">child</i> from the list of children of that node
+        <dd>Removes <i class="m">child</i> from the list of children of that node.
 <i class="m">child</i> will be part of the document fragment list after this
-operation. It is not physically deleted.</dd>
+operation.</dd>
       
 
       
@@ -404,17 +397,25 @@ of attribute name / value pairs. If <i class="m">typeVar</i> is given
 the result type name is stored into that variable (empty,
 bool, number, string, nodes, attrnodes or mixed).</p>
 
-<p>The argument <i class="m">xpathQuery</i> has to be a valid XPath
-expression. However, there is one exception to that rule. Tcl variable
-names can appear in the XPath statement at any position where it is
-legal according to the rules of the XPath syntax to put an XPath
-variable. The value of the variable is substituted for the variable
-name. Ignoring the syntax rules of XPath the Tcl variable name may be
-any legal Tcl var name: local variables, global variables, array
-entries and so on. The value will always be seen as string literal by
-the xpath engine. Cast the value explicitly with the according xpath
-functions (number(), boolean()) to another data type, if needed.
-</p>
+<p>The argument <i class="m">xpathQuery</i> has to be a valid XPath expression.
+However there are a few exceptions to that rule. Tcl variable
+references (in the usual tcl syntax: $varname) may appear in the XPath
+statement at any position where it is legal according to the rules of
+the XPath syntax to put an XPath variable. Ignoring the syntax rules of
+XPath the Tcl variable name may be any legal Tcl var name: local
+variables, global variables, array entries and so on. The value will
+always be seen as string literal by the xpath engine. Cast the value
+explicitly with the according xpath functions (number(), boolean()) to
+another data type, if needed.</p>
+
+<p>Similar to the way described above to inject literals in a secure
+way into the XPath expression using tcl variable references there is a
+syntax to inject element names from tcl variables. At every place
+where the XPath syntax allows a node test there could be a tcl
+variable reference (in any form), just the leading $ replaced with %.
+This allows one to select nodes with 'strange' (invalid, according to the
+appropriate XML production rule) node names which may be needed in
+case of working with JSON data.</p>
 
 <p>The option <i class="m">-namespaces</i> expects a tcl list with prefix /
 namespace pairs as argument. If this option is not given, then any
@@ -425,27 +426,29 @@ this fails, then the namespace definitions in scope of the context
 node will be used to resolve the prefix. If this option is given, any
 namespace prefix within the xpath expression will be first resolved
 against that given list (and ignoring the document global prefix /
-namespace list). If the list bind the same prefix to different
+namespace list). If the list binds the same prefix to different
 namespaces, then the first binding will win.  If this fails, then the
 namespace definitions in scope of the context node will be used to
 resolve the prefix, as usual.</p>
 
 <p>If the <i class="m">-cache</i> option is used with a true value, then the
-<i class="m">xpathQuery</i> will be looked up in a document specific cache. If the query
-is found, then the stored pre-compiled query will be used. If the
-query isn't found, it will be pre-compiled and stored in the cache,
-for use in further calls. Please notice, that the <i class="m">xpathQuery</i> as given as
-string is used as key for the cache. This means, that equal XPath
-expressions, which differ only in white space are treated as
+<i class="m">xpathQuery</i> will be looked up in a document specific cache. If
+the query is found, then the stored pre-compiled query will be used.
+If the query isn't found, it will be compiled and stored in the cache,
+for use in further calls. Please note that the <i class="m">xpathQuery</i> 
+given as string is used as key for the cache. This means, that equal
+XPath expressions, which differ only in white space are treated as
 different cache entries. Special care is needed, if the XPath
-expression includes namespace prefixes. During pre-compilation, the
-prefixes will be resolved first to the prefix / namespace pairs of
-the <i class="m">-namespaces</i> option, if given, and to the namespaces
-in scope of the context node at pre-compilation time. If the XPath
-is found in the cache, neither the <i class="m">-namespaces</i> option nor
-the namespaces in scope of the context node will be taken in
-account but the already resolved (stored) namespaces will be used
-for the query.</p>
+expression includes namespace prefixes or references to tcl variables.
+Both namespace prefixes and tcl variable references will be resolved
+according to the XML prefix namespace mappings and tcl variable values
+at expression compilation time. If the same XPath expression is used
+later on in a context with other XML prefix namespace mappings or
+values of the used tcl variables, make sure to first remove the
+compiled expression from the cache with the help of the
+<b class="method">deleteXPathCache</b> method, to force a recompilation.
+Without using the <i class="m">-cache</i> option such consideration is never
+needed.</p>
 
 <p>Examples:</p>
           <pre class="example">set paragraphNodes [$node selectNodes {chapter[3]//para[@type='warning' or @type='error'} ]
@@ -462,13 +465,13 @@ set childNodes [$root selectNodes -namespaces {default http://www.defaultnamespa
 
       
         <dt><b class="method">getLine</b></dt>
-        <dd>Returns the line number of that node in the orignal parsed
+        <dd>Returns the line number of that node in the originally parsed
 XML.</dd>
       
       
       
         <dt><b class="method">getColumn</b></dt>
-        <dd>Returns the column number of that node in the orignal parsed
+        <dd>Returns the column number of that node in the originally parsed
 XML.</dd>
       
 
@@ -480,21 +483,42 @@ nested Tcl list.</dd>
 
       
         <dt>
-<b class="method">asXML</b> <b class="option">?-indent none/1..8?</b>
-<b class="option">?-channel channelId?</b> <b class="option">?-escapeNonASCII?</b><b class="option">?-escapeAllQuot?</b> <b class="option">?-indentAttrs?</b>
+<b class="method">asXML</b> <b class="option">?-indent none/1..8?</b> <b class="option">?-channel channelId?</b> <b class="option">?-escapeNonASCII?</b> <b class="option">-xmlDeclaration &lt;boolean&gt;?</b> <b class="option">-encString &lt;string&gt;</b> <b class="option">?-escapeAllQuot?</b> <b class="option">?-indentAttrs?</b>
 </dt>
+        <dd>
+<p>Returns the DOM substree starting from the current
+        node as the root node of the result as an (optional indented)
+        XML string or sends the output directly to the given
+        channelId.</p>
 
-        <dd>Returns the DOM substree starting from the current node
-as the root node of the result as an (optional indented) XML string or
-sends the output directly to the given channelId. If the option
-<i class="m">-escapeNonASCII</i> is given, every non 7 bit ASCII character in
-attribute values or element PCDATA content will be escaped as
-character reference in decimal representation. If the option
-<i class="m">-escapeAllQuot</i> is given, quotation marks will be escaped with
-&amp;quot; even in text content of elements.  If the option
-<i class="m">-indentAttrs</i> is given, then attributes will each be separated 
-with newlines and indented to the same level as the parent node plus
-        the value given as argument to <i class="m">-indentAttrs</i> (0..8).</dd>
+        <p>If the option <i class="m">-escapeNonASCII</i> is given,
+        every non 7 bit ASCII character in attribute values or element
+        PCDATA content will be escaped as character reference in
+        decimal representation.</p>
+
+        <p>The flag <i class="m">-xmlDeclaration</i> determines whether there
+        will be an XML Declaration and a newline emitted before
+        anything else. The default is, to do not. If this flag is
+        given with a true argument then</p>
+
+        <p>
+<i class="m">-encString</i> sets the encoding value in the XML
+        Declaration. Otherwise, this option is ignored. Please note,
+        that this option just enhance the string representation of the
+        generated XML Declaration with an encoding information string,
+        nothing more. It's up to the user to handle encoding in case
+        of writing to a channel or reparsing.</p>
+            
+        <p>If the option <i class="m">-escapeAllQuot</i> is given,
+        quotation marks will be escaped with &amp;quot; even in text
+        content of elements.</p>
+
+        <p>If the option <i class="m">-indentAttrs</i> is
+        given, then attributes will each be separated with newlines
+        and indented to the same level as the parent node plus the
+        value given as argument to <i class="m">-indentAttrs</i> (0..8).</p>
+</dd>
+
       
 
       
@@ -503,13 +527,13 @@ with newlines and indented to the same level as the parent node plus
 <b class="option">?-escapeNonASCII?</b>  <b class="option">?-htmlEntities?</b>
 </dt>
         <dd>Returns the DOM substree starting from the current node as the
-root node of the result serialized acording to HTML rules (HTML elements are
-recognized regardless of case, without end tags for emtpy HTML elements etc.),
+root node of the result serialized according to HTML rules (HTML elements are
+recognized regardless of case, without end tags for empty HTML elements etc.),
 as string or sends the output directly to the given channelId. If the option
 <i class="m">-escapeNonASCII</i> is given, every non 7 bit ASCII character in attribute
 values or element PCDATA content will be escaped as character reference in
 decimal representation. If the option <i class="m">-htmlEntities</i> is given, a
-character is outputed using a HTML 4.01 character entity reference, if one is
+character is written using its HTML 4.01 character entity reference, if one is
 defined for it.</dd>
       
 
@@ -544,7 +568,7 @@ given node.</dd>
 </dt>
         <dd>Inserts the nodes created in the <i class="m">tclScript</i> by
 Tcl functions, which have been built using <i class="m">dom createNodeCmd</i>, before the
-<i class="m">refChild</i> into to the list of children of node. If <i class="m">refChild</i> is
+<i class="m">refChild</i> into the list of children of node. If <i class="m">refChild</i> is
 the empty string, the new nodes will be appended.</dd>
       
 
@@ -561,7 +585,7 @@ appends this subtree to the current node.</dd>
 <b class="method">simpleTranslate</b> <i class="m">outputVar</i>
 <i class="m">specifications</i>
 </dt>
-        <dd>Translate the subtree starting at the object node according to
+        <dd>Translates the subtree starting at the object node according to
 the specifications in <i class="m">specifications</i> and outputs the result in the
 variable <i class="m">outputVar</i> . The translation is very similar to Cost Simple
 mode.</dd>
@@ -574,7 +598,7 @@ mode.</dd>
         <dd>Returns an XPath, which exactly addresses the given
 node in its document. This XPath is only valid as there are no changes to DOM
 tree made later one. With the -legacy option, other XPath expressions
-are returnd, which doesn't work in all cases.</dd>
+are returned, which doesn't work in all cases.</dd>
       
 
       
@@ -588,26 +612,26 @@ are returnd, which doesn't work in all cases.</dd>
 <b class="method">baseURI</b> <i class="m">?URI?</i>
 </dt>
         <dd>Returns the present baseURI of the node. If the optional 
-argument URI is given, sets the base URI of the node and of all of its child
-nodes out of the same enitity as node to the given URI.</dd>
+argument URI is given, it sets the base URI of the node and of all of its child
+nodes out of the same entity as node to the given URI.</dd>
       
 
       
         <dt>
 <b class="method">disableOutputEscaping</b> <i class="m">?boolean?</i>
 </dt>
-        <dd>This method works only for text nodes; for every other nodes it
+        <dd>This method works only for text nodes; for every other node it
 returns error. Without the optional argument it returns, if disabling output
 escaping is on. The return value 0 means, the characters of the text node will
 be escaped, to generate valid XML, if serialized. This is the default for
 every parsed or created text node (with the exception of that text nodes in a
 result tree of an XSLT transformation, for which disabling output escaping was
-requested explicitely in the stylesheet). The return value 1 means, that output
+requested explicitly in the stylesheet). The return value 1 means, that output
 escaping is disabled for this text node. If such a text node is serialized
-(with asXML or asHTML), it is literarily written, without escaping of the
+(with asXML or asHTML), it is literally written, without escaping of the
 special XML characters. If the optional boolean value <i class="m">boolean</i> is given,
-the flag is set accordingly. You should not set this flag to 1, until you
-really know, what you do.</dd>
+the flag is set accordingly. You should not set this flag to 1 until you
+really know what you do.</dd>
       
 
       
@@ -616,8 +640,8 @@ really know, what you do.</dd>
 </dt>
         <dd>Compares the relative order of the node and <i class="m">refnode</i>. Both
 nodes must be part of the same documents and not out of the fragment list of
-the document. Returns true, if node is in document order (in the sense of the
-XPath 1.0 recommendation) before <i class="m">refnode</i> and false otherwise.</dd>
+the document. Returns true if node is in document order (in the sense of the
+XPath 1.0 recommendation) before <i class="m">refnode</i>, and false otherwise.</dd>
       
 
 
@@ -654,10 +678,10 @@ list consisting of parameter name and value pairs.</p>
 <p>If the option <i class="m">-ignoreUndeclaredParameters</i> is given, then parameter
 names in the <i class="m">parameterList</i> given to the <i class="m">-parameters</i> options that
 are not declared as top-level parameters in the stylesheet are silently
-ignored. Without this option, an error is raised, if the user tries to set a
-top-level parameter, which is not declared in the stylesheet.</p>
+ignored. Without this option, an error is raised if the user tries to set a
+top-level parameter which is not declared in the stylesheet.</p>
 
-<p>The option <i class="m">-maxApplyDepth</i> expects a positiv integer as
+<p>The option <i class="m">-maxApplyDepth</i> expects a positive integer as
 argument. By default, the xslt engine allows xslt templates to nest up
 to 3000 levels (and raises error if they nest deeper). This limit can
 be set by the <i class="m">-maxApplyDepth</i> option.</p>
@@ -666,12 +690,12 @@ be set by the <i class="m">-maxApplyDepth</i> option.</p>
 in the stylesheet. The actual command consists of the script, given as argument
 to the option, appended with the XML Fragment from instantiating the
 xsl:message element content as string (as if the XPath string() function would
-have been applied to the XML Fragment) and a flag, which indicates, if the
+have been applied to the XML Fragment) and a flag, which indicates whether the
 xsl:message has an attribute "terminate" with the value "yes". If the
 called script returns anything else then TCL_OK then the xslt
 transformation will be aborted, returning error. If the called script
-returns -code break, the error message is empty, otherwise the result
-code is reported. In case of terminated transformation, the outputVar,
+returns -code break the error message is empty, otherwise the result
+code is reported. In case of terminated transformation the outputVar,
 if given, is set to the empty string.</p>
 </dd>
       
@@ -681,19 +705,34 @@ if given, is set to the empty string.</p>
         <dd>Returns the value of the attribute <i class="m">attrName</i>.  Short cut
 for <i class="m">getAttribute</i>.</dd>
       
+
+      
+        <dt>
+<b class="method">jsonType</b> <i class="m">?OBJECT|ARRAY|NONE)|(STRING|NUMBER|TRUE|FALSE|NULL|NONE)?</i>
+</dt>
+        <dd>Only element and text nodes may have a JSON type and
+        only this types of nodes support the <i class="m">jsonType</i> method;
+        the other node types return error if called with this method.
+        Returns the jsonType of the node. If the optional argument is
+        given, the JSON type of the node is set to the given type and
+        returned. Valid type arguments for element nodes are OBJECT,
+        ARRAY and NONE. Valid type arguments for text nodes are
+        STRING, NUMBER, TRUE, FALSE, NULL and NONE.</dd>
+      
+
     </dl><p>Otherwise, if an unknown method name is given, the command with the same
 name as the given method within the namespace <tt class="l">::dom::domNode</tt> is tried to
 be executed. This allows quick method additions on Tcl level.</p>
 
 
-  <h2><a name="SECTid0xe2a560">SEE ALSO</a></h2><p class="seealso">dom, domDoc</p>
+  <h2><a name="SECTid0x1f0a420">SEE ALSO</a></h2><p class="seealso">dom, domDoc</p>
   
-  <h2><a name="SECTid0xe2a8f0">KEYWORDS</a></h2><p class="keywords">
+  <h2><a name="SECTid0x1f0a7b0">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-XML">XML</a>, <a class="keyword" href="keyword-index.html#KW-DOM">DOM</a>, <a class="keyword" href="keyword-index.html#KW-document">document</a>, <a class="keyword" href="keyword-index.html#KW-node">node</a>, <a class="keyword" href="keyword-index.html#KW-parsing">parsing</a>
 </p>
   
 </div><hr class="navsep"><div class="navbar" align="center">
-<a class="navaid" href="index.html">Contents</a> · <a class="navaid" href="category-index.html">Index</a> · <a class="navaid" href="keyword-index.html">Keywords</a>
+<a class="navaid" href="index.html">Contents</a> Â· <a class="navaid" href="category-index.html">Index</a> Â· <a class="navaid" href="keyword-index.html">Keywords</a> Â· <a class="navaid" href="http://tdom.org">Repository</a>
 </div>
 </body>
 </html>

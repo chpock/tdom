@@ -1,4 +1,52 @@
+2018-02-14  Rolf Ade  <rolf@pointsman.de>
 
+        Added [dom featureinfo versionhash], which returns the fossil
+        repository version hash of the sources build from.
+        
+2018-02-03  Rolf Ade  <rolf@pointsman.de>
+
+        In a bunch of spell fixes a few changes (partly even marginal,
+        e.g. during configuration) in error messages for uniformly
+        usage of names.
+
+2017-11-07  Rolf Ade  <rolf@pointsman.de>
+
+        New flag -keepCDATA for [dom parse ...].
+
+--- Release 0.9.0, 24. Aug. 2017 --- 
+
+2017-08-21 Ashok Nadkarni
+
+        Windows build system (VC and mingw) modernised.
+
+2017-08-17 Rolf Ade  <rolf@pointsman.de>
+
+        New feature "creating real FQ nodes with *fromScript methods",
+        by adding option -namespace to [dom createNodeCmd].
+
+2017-08-14 Rolf Ade  <rolf@pointsman.de>
+
+        Updated TEA.
+
+2017-07-29 Rolf Ade  <rolf@pointsman.de>
+
+        Removed hacky check on [load] time if the tclsh and tDOM are
+        build with incompatible TCL_UTF_MAX (because it did not work
+        anymore with recent tcl because of changes in core).
+
+2017-07-28 Rolf Ade  <rolf@pointsman.de>
+
+        Added JSON support. New -json option to [dom parse]. New doc
+        method asJSON. New node method jsonType. New option -jsonType
+        of [dom createNodeCmd]. New option -tagName of [dom
+        createNodeCmd]. New option -jsonType to dom method
+        createDocumentNode.
+
+2017-04-06 Rolf Ade  <rolf@pointsman.de>
+
+        Added HTM5 parser (new -html5 option to [dom parse]). Requires
+        gumbo lib and must be enabled at configure time.
+        
 2016-10-01 Rolf Ade  <rolf@pointsman.de>
 
         Updated to expat 2.2.0.
@@ -50,7 +98,7 @@
         then this proc is used as -feedbackcmd. If there isn't such a
         proc and -feedbackAfter is used, it is an error to not also
         use -feedbackcmd. A return -code break from the -feedbackcmd
-        causes the parser to almost immediatly abort parsing and let
+        causes the parser to almost immediately abort parsing and let
         the [dom parse] call return the empty string (instead of a
         document) without raising error. 
 

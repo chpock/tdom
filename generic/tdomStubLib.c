@@ -46,7 +46,7 @@
 #undef TCL_STORAGE_CLASS
 #define TCL_STORAGE_CLASS DLLEXPORT
 
-TdomStubs *tdomStubsPtr;
+const TdomStubs *tdomStubsPtr;
 
 /*----------------------------------------------------------------------------
 |   Tdom_InitStubs

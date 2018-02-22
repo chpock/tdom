@@ -204,7 +204,7 @@ optional argument \fInewValue\fR is given, the node is set to that
 value.
 .TP
 \&\fB\fBhasChildNodes\fP
-\&\fRReturns 1 if the has children. Otherwise 0 is returned.
+\&\fRReturns 1 if the node has children. Otherwise 0 is returned.
 .TP
 \&\fB\fBparentNode\fP \fB?objVar?\fP
 \&\fRReturns the parent node.
@@ -218,7 +218,7 @@ the node in the sense of the DOM recommendation. This nodeList object is
 "live" in the sense that, for instance, changes to the children of
 the node object that it was created from are immediately reflected in the nodes
 returned by the NodeList accessors; it is not a static snapshot of the content
-of the node. The both accessors know by the nodeList object are "item
+of the node. The two accessors known by the nodeList object are "item
 <index>", which returns the indexth item in the collection, and
 "length", which returns the number of nodes in the list.
 .TP
@@ -229,11 +229,11 @@ of the node. The both accessors know by the nodeList object are "item
 \&\fRReturns the last child as a node object.
 .TP
 \&\fB\fBnextSibling\fP  \fB?objVar?\fP
-\&\fRReturns the next sibling relativ to the current node as a node
+\&\fRReturns the next sibling relative to the current node as a node
 object.
 .TP
 \&\fB\fBpreviousSibling\fP \fB?objVar?\fP
-\&\fRReturns the next sibling relativ to the current node as a node
+\&\fRReturns the next sibling relative to the current node as a node
 object.
 .TP
 \&\fB\fBgetElementsByTagName\fP \fIname\fB
@@ -246,22 +246,24 @@ matching (glob style) \fIlocalname\fR and having the given namespace
 \&\fIuri\fR.
 .TP
 \&\fB\fBgetElementById\fP \fIid\fB
-\&\fRReturns the node having a id attribute with value
-\&\fIid\fR or the emtpy string, if no node has an id attribute with that value.
+\&\fRReturns the node having an id attribute with value
+\&\fIid\fR or the empty string if no node has an id attribute with that value.
 .TP
 \&\fB\fBhasAttribute\fP \fIattributeName\fB
 \&\fRReturns 1 if the object node contains an attribute with name
 \&\fIattributeName\fR . Otherwise 0 is returned.
 .TP
 \&\fB\fBgetAttribute\fP \fIattributeName  ?defaultValue?\fB
-\&\fRReturns the value of the attribute \fIattributeName\fR. If
+\&\fRReturns the value of the attribute \fIattributeName\fR. If the
 attribute is not available \fIdefaultValue\fR is returned.
 .TP
 \&\fB\fBsetAttribute\fP \fIattributeName newValue  ?attributeName newValue ...?\fB
 \&\fRSets the value for one or more attributes. Every
-\&\fIattributeName\fR is set to the corresponding \fInewValue\fR. If there
-isn't an attribute for one or more of the \fIattributeName\fR this will
-create that attribute.
+\&\fIattributeName\fR is set to the corresponding
+\&\fInewValue\fR. If there isn't an attribute for one or more
+of the \fIattributeName\fR, this will create that attribute.
+It is not recommended to set attributes that look like xml
+namespace declarations.
 .TP
 \&\fB\fBremoveAttribute\fP \fIattributeName\fB
 \&\fRRemoves the attribute \fIattributeName\fR.
@@ -304,21 +306,9 @@ method has the same effect as the method \fBsetAttribute\fR.
 $node setAttributeNS "" attri "some Value"
 .CE
 .PP
-XML namespace nodes are not in any namespace. Set them this way:
-
-
-        
-.CS
-$node setAttributeNS "" xmlns:myprefix "myNamespaceURI"
-$node setAttributeNS "" xmlns "newDefaultNamespace"
-.CE
-.PP
-If your \fIqualifiedName\fR has the prefix "xml" and you give the empty
-string as \fIuri\fR, the namespace of the attribute defaults to
-"http://www.w3.org/XML/1998/namespace", as the DOM 2 recommendation
-requests. With the exceptions of the special prefixes "xmlns" and "xml" you
-always must provide a non emtpy \fIuri\fR, if your \fIqualifiedName\fR has a
-prefix.
+With the exceptions of the special prefixes "xmlns" and "xml" you
+always must provide a non empty \fIuri\fR, if your \fIqualifiedName\fR has a
+prefix. It is not recommended to set xml namespace declarations. The effects are complicated and not always obvious up to resulting a not well-formed serializations after further processing.
 .RE
 .TP
 \&\fB\fBremoveAttributeNS\fP \fIuri\fB \fIlocalName\fB
@@ -327,27 +317,27 @@ the namespace \fIuri\fR.
 .TP
 \&\fB\fBattributes\fP \fB?attributeNamePattern?\fP
 \&\fRReturns all attributes matching the \fIattributeNamePattern\fR.
-If \fIattributeNamePattern\fR isn't given all attributes are returned as a Tcl
+If \fIattributeNamePattern\fR isn't given, all attributes are returned as a Tcl
 list.
 .TP
 \&\fB\fBappendChild\fP \fInewChild\fB
-\&\fRAppend \fInewChild\fR to the end of the child list of the
+\&\fRAppends \fInewChild\fR to the end of the child list of the
 node.
 .TP
 \&\fB\fBinsertBefore\fP \fInewChild\fB  \fIrefChild\fB
-\&\fRInsert \fInewChild\fR before the \fIrefChild\fR into the list of
+\&\fRInserts \fInewChild\fR before the \fIrefChild\fR into the list of
 children of node. If \fIrefChild\fR is the empty string, insert
 \&\fInewChild\fR at the end of the child nodes list of that node.
 .TP
 \&\fB\fBreplaceChild\fP \fInewChild\fB  \fIoldChild\fB
-\&\fRReplace \fIoldChild\fR with \fInewChild\fR in the list of
+\&\fRReplaces \fIoldChild\fR with \fInewChild\fR in the list of
 children of that node. The \fIoldChild\fR node will be part of the
 document fragment list after this operation.
 .TP
 \&\fB\fBremoveChild\fP \fIchild\fB
-\&\fRRemoves \fIchild\fR from the list of children of that node
+\&\fRRemoves \fIchild\fR from the list of children of that node.
 \&\fIchild\fR will be part of the document fragment list after this
-operation. It is not physically deleted.
+operation.
 .TP
 \&\fB\fBdelete\fP
 \&\fRDeletes the given node and its complete child tree
@@ -418,16 +408,25 @@ of attribute name / value pairs. If \fItypeVar\fR is given
 the result type name is stored into that variable (empty,
 bool, number, string, nodes, attrnodes or mixed).
 .PP
-The argument \fIxpathQuery\fR has to be a valid XPath
-expression. However, there is one exception to that rule. Tcl variable
-names can appear in the XPath statement at any position where it is
-legal according to the rules of the XPath syntax to put an XPath
-variable. The value of the variable is substituted for the variable
-name. Ignoring the syntax rules of XPath the Tcl variable name may be
-any legal Tcl var name: local variables, global variables, array
-entries and so on. The value will always be seen as string literal by
-the xpath engine. Cast the value explicitly with the according xpath
-functions (number(), boolean()) to another data type, if needed.
+The argument \fIxpathQuery\fR has to be a valid XPath expression.
+However there are a few exceptions to that rule. Tcl variable
+references (in the usual tcl syntax: $varname) may appear in the XPath
+statement at any position where it is legal according to the rules of
+the XPath syntax to put an XPath variable. Ignoring the syntax rules of
+XPath the Tcl variable name may be any legal Tcl var name: local
+variables, global variables, array entries and so on. The value will
+always be seen as string literal by the xpath engine. Cast the value
+explicitly with the according xpath functions (number(), boolean()) to
+another data type, if needed.
+.PP
+Similar to the way described above to inject literals in a secure
+way into the XPath expression using tcl variable references there is a
+syntax to inject element names from tcl variables. At every place
+where the XPath syntax allows a node test there could be a tcl
+variable reference (in any form), just the leading $ replaced with %.
+This allows one to select nodes with 'strange' (invalid, according to the
+appropriate XML production rule) node names which may be needed in
+case of working with JSON data.
 .PP
 The option \fI-namespaces\fR expects a tcl list with prefix /
 namespace pairs as argument. If this option is not given, then any
@@ -438,27 +437,29 @@ this fails, then the namespace definitions in scope of the context
 node will be used to resolve the prefix. If this option is given, any
 namespace prefix within the xpath expression will be first resolved
 against that given list (and ignoring the document global prefix /
-namespace list). If the list bind the same prefix to different
+namespace list). If the list binds the same prefix to different
 namespaces, then the first binding will win.  If this fails, then the
 namespace definitions in scope of the context node will be used to
 resolve the prefix, as usual.
 .PP
 If the \fI-cache\fR option is used with a true value, then the
-\&\fIxpathQuery\fR will be looked up in a document specific cache. If the query
-is found, then the stored pre-compiled query will be used. If the
-query isn't found, it will be pre-compiled and stored in the cache,
-for use in further calls. Please notice, that the \fIxpathQuery\fR as given as
-string is used as key for the cache. This means, that equal XPath
-expressions, which differ only in white space are treated as
+\&\fIxpathQuery\fR will be looked up in a document specific cache. If
+the query is found, then the stored pre-compiled query will be used.
+If the query isn't found, it will be compiled and stored in the cache,
+for use in further calls. Please note that the \fIxpathQuery\fR
+given as string is used as key for the cache. This means, that equal
+XPath expressions, which differ only in white space are treated as
 different cache entries. Special care is needed, if the XPath
-expression includes namespace prefixes. During pre-compilation, the
-prefixes will be resolved first to the prefix / namespace pairs of
-the \fI-namespaces\fR option, if given, and to the namespaces
-in scope of the context node at pre-compilation time. If the XPath
-is found in the cache, neither the \fI-namespaces\fR option nor
-the namespaces in scope of the context node will be taken in
-account but the already resolved (stored) namespaces will be used
-for the query.
+expression includes namespace prefixes or references to tcl variables.
+Both namespace prefixes and tcl variable references will be resolved
+according to the XML prefix namespace mappings and tcl variable values
+at expression compilation time. If the same XPath expression is used
+later on in a context with other XML prefix namespace mappings or
+values of the used tcl variables, make sure to first remove the
+compiled expression from the cache with the help of the
+\&\fBdeleteXPathCache\fP method, to force a recompilation.
+Without using the \fI-cache\fR option such consideration is never
+needed.
 .PP
 Examples:
 
@@ -476,39 +477,62 @@ set childNodes [$root selectNodes -namespaces {default http://www.defaultnamespa
 .RE
 .TP
 \&\fB\fBgetLine\fP
-\&\fRReturns the line number of that node in the orignal parsed
+\&\fRReturns the line number of that node in the originally parsed
 XML.
 .TP
 \&\fB\fBgetColumn\fP
-\&\fRReturns the column number of that node in the orignal parsed
+\&\fRReturns the column number of that node in the originally parsed
 XML.
 .TP
 \&\fB\fBasList\fP
 \&\fRReturns the DOM substree starting form the current node as a
 nested Tcl list.
 .TP
-\&\fB\fBasXML\fP \fB?-indent none/1..8?\fP \fB?-channel channelId?\fP \fB?-escapeNonASCII?\fP\fB?-escapeAllQuot?\fP \fB?-indentAttrs?\fP
-\&\fRReturns the DOM substree starting from the current node
-as the root node of the result as an (optional indented) XML string or
-sends the output directly to the given channelId. If the option
-\&\fI-escapeNonASCII\fR is given, every non 7 bit ASCII character in
-attribute values or element PCDATA content will be escaped as
-character reference in decimal representation. If the option
-\&\fI-escapeAllQuot\fR is given, quotation marks will be escaped with
-&quot; even in text content of elements.  If the option
-\&\fI-indentAttrs\fR is given, then attributes will each be separated
-with newlines and indented to the same level as the parent node plus
-the value given as argument to \fI-indentAttrs\fR (0..8).
+\&\fB\fBasXML\fP \fB?-indent none/1..8?\fP \fB?-channel channelId?\fP \fB?-escapeNonASCII?\fP \fB-xmlDeclaration <boolean>?\fP \fB-encString <string>\fP \fB?-escapeAllQuot?\fP \fB?-indentAttrs?\fP
+\&\fR
+.RS
+.PP
+Returns the DOM substree starting from the current
+node as the root node of the result as an (optional indented)
+XML string or sends the output directly to the given
+channelId.
+.PP
+If the option \fI-escapeNonASCII\fR is given,
+every non 7 bit ASCII character in attribute values or element
+PCDATA content will be escaped as character reference in
+decimal representation.
+.PP
+The flag \fI-xmlDeclaration\fR determines whether there
+will be an XML Declaration and a newline emitted before
+anything else. The default is, to do not. If this flag is
+given with a true argument then
+.PP
+\&\fI-encString\fR sets the encoding value in the XML
+Declaration. Otherwise, this option is ignored. Please note,
+that this option just enhance the string representation of the
+generated XML Declaration with an encoding information string,
+nothing more. It's up to the user to handle encoding in case
+of writing to a channel or reparsing.
+.PP
+If the option \fI-escapeAllQuot\fR is given,
+quotation marks will be escaped with &quot; even in text
+content of elements.
+.PP
+If the option \fI-indentAttrs\fR is
+given, then attributes will each be separated with newlines
+and indented to the same level as the parent node plus the
+value given as argument to \fI-indentAttrs\fR (0..8).
+.RE
 .TP
 \&\fB\fBasHTML\fP \fB?-channel channelId?\fP \fB?-escapeNonASCII?\fP  \fB?-htmlEntities?\fP
 \&\fRReturns the DOM substree starting from the current node as the
-root node of the result serialized acording to HTML rules (HTML elements are
-recognized regardless of case, without end tags for emtpy HTML elements etc.),
+root node of the result serialized according to HTML rules (HTML elements are
+recognized regardless of case, without end tags for empty HTML elements etc.),
 as string or sends the output directly to the given channelId. If the option
 \&\fI-escapeNonASCII\fR is given, every non 7 bit ASCII character in attribute
 values or element PCDATA content will be escaped as character reference in
 decimal representation. If the option \fI-htmlEntities\fR is given, a
-character is outputed using a HTML 4.01 character entity reference, if one is
+character is written using its HTML 4.01 character entity reference, if one is
 defined for it.
 .TP
 \&\fB\fBasText\fP
@@ -529,7 +553,7 @@ given node.
 \&\fB\fBinsertBeforeFromScript\fP \fItclScript\fB \fIrefChild\fB
 \&\fRInserts the nodes created in the \fItclScript\fR by
 Tcl functions, which have been built using \fIdom createNodeCmd\fR, before the
-\&\fIrefChild\fR into to the list of children of node. If \fIrefChild\fR is
+\&\fIrefChild\fR into the list of children of node. If \fIrefChild\fR is
 the empty string, the new nodes will be appended.
 .TP
 \&\fB\fBappendXML\fP \fIXMLstring\fB
@@ -537,7 +561,7 @@ the empty string, the new nodes will be appended.
 appends this subtree to the current node.
 .TP
 \&\fB\fBsimpleTranslate\fP \fIoutputVar\fB \fIspecifications\fB
-\&\fRTranslate the subtree starting at the object node according to
+\&\fRTranslates the subtree starting at the object node according to
 the specifications in \fIspecifications\fR and outputs the result in the
 variable \fIoutputVar\fR . The translation is very similar to Cost Simple
 mode.
@@ -546,7 +570,7 @@ mode.
 \&\fRReturns an XPath, which exactly addresses the given
 node in its document. This XPath is only valid as there are no changes to DOM
 tree made later one. With the -legacy option, other XPath expressions
-are returnd, which doesn't work in all cases.
+are returned, which doesn't work in all cases.
 .TP
 \&\fB\fBgetBaseURI\fP
 \&\fRReturns the baseURI of the node. This method is deprecated in
@@ -554,28 +578,28 @@ favor of the \fIbaseURI\fR method.
 .TP
 \&\fB\fBbaseURI\fP \fI?URI?\fB
 \&\fRReturns the present baseURI of the node. If the optional
-argument URI is given, sets the base URI of the node and of all of its child
-nodes out of the same enitity as node to the given URI.
+argument URI is given, it sets the base URI of the node and of all of its child
+nodes out of the same entity as node to the given URI.
 .TP
 \&\fB\fBdisableOutputEscaping\fP \fI?boolean?\fB
-\&\fRThis method works only for text nodes; for every other nodes it
+\&\fRThis method works only for text nodes; for every other node it
 returns error. Without the optional argument it returns, if disabling output
 escaping is on. The return value 0 means, the characters of the text node will
 be escaped, to generate valid XML, if serialized. This is the default for
 every parsed or created text node (with the exception of that text nodes in a
 result tree of an XSLT transformation, for which disabling output escaping was
-requested explicitely in the stylesheet). The return value 1 means, that output
+requested explicitly in the stylesheet). The return value 1 means, that output
 escaping is disabled for this text node. If such a text node is serialized
-(with asXML or asHTML), it is literarily written, without escaping of the
+(with asXML or asHTML), it is literally written, without escaping of the
 special XML characters. If the optional boolean value \fIboolean\fR is given,
-the flag is set accordingly. You should not set this flag to 1, until you
-really know, what you do.
+the flag is set accordingly. You should not set this flag to 1 until you
+really know what you do.
 .TP
 \&\fB\fBprecedes\fP \fIrefnode\fB
 \&\fRCompares the relative order of the node and \fIrefnode\fR. Both
 nodes must be part of the same documents and not out of the fragment list of
-the document. Returns true, if node is in document order (in the sense of the
-XPath 1.0 recommendation) before \fIrefnode\fR and false otherwise.
+the document. Returns true if node is in document order (in the sense of the
+XPath 1.0 recommendation) before \fIrefnode\fR, and false otherwise.
 .TP
 \&\fB\fBnormalize\fP \fI?-forXPath?\fB
 \&\fRPuts all Text nodes in the full depth of the sub-tree underneath
@@ -601,10 +625,10 @@ list consisting of parameter name and value pairs.
 If the option \fI-ignoreUndeclaredParameters\fR is given, then parameter
 names in the \fIparameterList\fR given to the \fI-parameters\fR options that
 are not declared as top-level parameters in the stylesheet are silently
-ignored. Without this option, an error is raised, if the user tries to set a
-top-level parameter, which is not declared in the stylesheet.
+ignored. Without this option, an error is raised if the user tries to set a
+top-level parameter which is not declared in the stylesheet.
 .PP
-The option \fI-maxApplyDepth\fR expects a positiv integer as
+The option \fI-maxApplyDepth\fR expects a positive integer as
 argument. By default, the xslt engine allows xslt templates to nest up
 to 3000 levels (and raises error if they nest deeper). This limit can
 be set by the \fI-maxApplyDepth\fR option.
@@ -613,18 +637,28 @@ The \fI-xsltmessagecmd\fR option sets a callback for xslt:message elements
 in the stylesheet. The actual command consists of the script, given as argument
 to the option, appended with the XML Fragment from instantiating the
 xsl:message element content as string (as if the XPath string() function would
-have been applied to the XML Fragment) and a flag, which indicates, if the
+have been applied to the XML Fragment) and a flag, which indicates whether the
 xsl:message has an attribute "terminate" with the value "yes". If the
 called script returns anything else then TCL_OK then the xslt
 transformation will be aborted, returning error. If the called script
-returns -code break, the error message is empty, otherwise the result
-code is reported. In case of terminated transformation, the outputVar,
+returns -code break the error message is empty, otherwise the result
+code is reported. In case of terminated transformation the outputVar,
 if given, is set to the empty string.
 .RE
 .TP
 \&\fB\fI@attrName\fB
 \&\fRReturns the value of the attribute \fIattrName\fR.  Short cut
 for \fIgetAttribute\fR.
+.TP
+\&\fB\fBjsonType\fP \fI?OBJECT|ARRAY|NONE)|(STRING|NUMBER|TRUE|FALSE|NULL|NONE)?\fB
+\&\fROnly element and text nodes may have a JSON type and
+only this types of nodes support the \fIjsonType\fR method;
+the other node types return error if called with this method.
+Returns the jsonType of the node. If the optional argument is
+given, the JSON type of the node is set to the given type and
+returned. Valid type arguments for element nodes are OBJECT,
+ARRAY and NONE. Valid type arguments for text nodes are
+STRING, NUMBER, TRUE, FALSE, NULL and NONE.
 .PP
 Otherwise, if an unknown method name is given, the command with the same
 name as the given method within the namespace \fB::dom::domNode\fR is tried to

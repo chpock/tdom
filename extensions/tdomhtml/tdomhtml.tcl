@@ -174,7 +174,7 @@ namespace eval ::dom::domHTML {
     }
 
     #
-    # Miscelaneous commands. Not part of HTML specs but needed 
+    # Miscellaneous commands. Not part of HTML specs but needed 
     # for generation of special DOM nodes.
     #
 

@@ -576,6 +576,7 @@ static void TranslateEntityRefs (
 
     while (z[from]) {
         if (z[from]=='&') {
+            int isInvalid = 0;
             int i = from+1;
             int c;
 
@@ -598,6 +599,13 @@ static void TranslateEntityRefs (
                             value += c-'a' + 10;
                         } else {
                             /* error */
+			    isInvalid = 1;
+			    break;
+                        }
+                        if (value > 2097152) {
+                            /* error */
+			    isInvalid = 1;
+			    break;
                         }
                         i++;
                     }
@@ -608,14 +616,33 @@ static void TranslateEntityRefs (
                             value += c-'0';
                         } else {
                             /* error */
+  			    isInvalid = 1;
+			    break;
+                        }
+                        if (value > 2097152) {
+                            /* error */
+			    isInvalid = 1;
+			    break;
                         }
                         i++;
                     }
                 }
                 if (z[i]!=';') {
                     /* error */
+		    isInvalid = 1;
                 }
-                from = i+1;
+		if (isInvalid) {
+		    /*
+		     * In case the character reference was invalid
+		     * it was a false alaram, no valid character
+		     * reference, just copy the source chars;
+		     */
+		    int j;
+		    for (j = from; j < i; j++) {
+		        z[to++] = z[j];
+		    }
+		    from = i;
+		} else {
 #if TclOnly8Bits
                 z[to++] = value;
 #else 
@@ -632,6 +659,8 @@ static void TranslateEntityRefs (
                     /* error */
                 }
 #endif
+		    from = i+1;
+		}
             } else {
                 while (z[i] && isalpha((unsigned char)z[i])) {
                    i++;
@@ -821,7 +850,7 @@ HTML_SimpleParse (
                     pnode = pnode->parentNode;
                 }
                 if (pnode == NULL) {
-                    /* begining tag was not found the way up the tag hierarchy
+                    /* beginning tag was not found the way up the tag hierarchy
                        -> ignore the tag */
                     DBG(fprintf(stderr,"ignoring closing '%s' \n", start+2);)
                     ignore = 1;
@@ -1344,7 +1373,8 @@ HTML_SimpleParse (
                 case 'l':  if (!strcmp(node->nodeName,"link"))     hasContent = 0; break;
                 case 'm':  if (!strcmp(node->nodeName,"meta"))     hasContent = 0; break;
                 case 'p':  if (!strcmp(node->nodeName,"param"))    hasContent = 0; break;
-                case 's':  if (!strcmp(node->nodeName,"spacer"))   hasContent = 0; break; /*ext*/
+                case 's':  if (!strcmp(node->nodeName,"spacer") ||                        /*ext*/
+                               !strcmp(node->nodeName,"source"))   hasContent = 0; break; /*html5*/
             }
 
             if (*x=='/') {

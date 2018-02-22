@@ -161,7 +161,7 @@ TCLSH		= $(PKG_ENV) $(TCLSH_ENV) $(TCLSH_PROG)
 
 SHARED_BUILD	= @SHARED_BUILD@
 
-INCLUDES	= @PKG_INCLUDES@ @TCL_INCLUDES@
+INCLUDES	= @PKG_INCLUDES@ @TCL_INCLUDES@ -I$(top_builddir)
 #INCLUDES	= @PKG_INCLUDES@ @TCL_INCLUDES@ @TK_INCLUDES@ @TK_XINCLUDES@
 
 PKG_CFLAGS	= @PKG_CFLAGS@
@@ -175,7 +175,7 @@ PKG_CFLAGS	= @PKG_CFLAGS@
 DEFS		= @DEFS@ $(PKG_CFLAGS)
 
 # Move pkgIndex.tcl to 'BINARIES' var if it is generated in the Makefile
-CONFIG_CLEAN_FILES = Makefile pkgIndex.tcl
+CONFIG_CLEAN_FILES = Makefile pkgIndex.tcl tdomConfig.sh versionhash.h
 CLEANFILES	= @CLEANFILES@
 
 CPPFLAGS	= @CPPFLAGS@
@@ -216,7 +216,7 @@ $(TDOMSHELL): $(PKG_OBJECTS) $(srcdir)/unix/tclAppInit.c
 # of the Makefile, in the "BINARIES" variable.
 #========================================================================
 
-binaries: $(BINARIES) pkgIndex.tcl-hand
+binaries: versionhash.h $(BINARIES) pkgIndex.tcl-hand
 
 libraries:
 
@@ -331,6 +331,24 @@ pkgIndex.tcl-hand:
 	) > pkgIndex.tcl
 
 #========================================================================
+# Create tdomDecls.h and tdomStubInit.c from tdom.decls
+#========================================================================
+
+genstubs: $(srcdir)/generic/tdom.decls
+	$(TCLSH_PROG) $(TCL_SRC_DIR)/tools/genStubs.tcl $(srcdir)/generic \
+               $(srcdir)/generic/tdom.decls
+
+#========================================================================
+# Create a include file that #define the current fossil hash
+#========================================================================
+versionhash.h: $(srcdir)/manifest.uuid
+	@echo "#define FOSSIL_HASH \"" | tr -d '\n\r' > $(top_builddir)/versionhash.h
+	@cat $(srcdir)/manifest.uuid | tr -d '\n\r' >> $(top_builddir)/versionhash.h
+	@echo "\"" >> $(top_builddir)/versionhash.h
+
+tcldom.o: $(srcdir)/generic/tcldom.c $(top_builddir)/versionhash.h
+
+#========================================================================
 # Distribution creation
 # You may need to tweak this target to make it work correctly.
 #========================================================================
@@ -427,6 +445,8 @@ install-lib-binaries: binaries
 	    fi; \
 	  fi; \
 	done
+	@echo "Installing tdomConfig.sh to $(DESTDIR)$(libdir)/"
+	@$(INSTALL_DATA) tdomConfig.sh "$(DESTDIR)$(libdir)/tdomConfig.sh"
 	@list='$(PKG_TCL_SOURCES)'; for p in $$list; do \
 	  if test -f $(srcdir)/$$p; then \
 	    destp=`basename $$p`; \

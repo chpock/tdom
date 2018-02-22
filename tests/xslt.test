@@ -1153,14 +1153,14 @@ test xslt-8.1 {current() not allowed in pattern} {
 } {The 'current' function is not allowed in Pattern. for '*[current() != 'notthis']' 
 
 Parsed symbols:
-     0 WCARDNAME        0 0.000e+00     0  *
-     1 LBRACKET         0 0.000e+00     1  
-     2 FUNCTION         0 0.000e+00     8  current
-     3 LPAR             0 0.000e+00     9  
-     4 RPAR             0 0.000e+00    10  
-     5 NOTEQ            0 0.000e+00    13  
-     6 LITERAL          0 0.000e+00    23  notthis
-     7 RBRACKET         0 0.000e+00    24  }
+     0 WCARDNAME        0 00000.000     0  *
+     1 LBRACKET         0 00000.000     1  
+     2 FUNCTION         0 00000.000     8  current
+     3 LPAR             0 00000.000     9  
+     4 RPAR             0 00000.000    10  
+     5 NOTEQ            0 00000.000    13  
+     6 LITERAL          0 00000.000    23  notthis
+     7 RBRACKET         0 00000.000    24  }
 
 set xslt-8.2.xml {<?xml version="1.0"?>
 <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet" xmlns:html="http://www.w3.org/TR/REC-html40">
@@ -1317,6 +1317,22 @@ test xslt-8.8 {Almost minimal xslt 1.0 stylesheet} {
     set result
 } {}
 
+test xslt-8.9 {format-number} {knownBug} {
+    set xmlDoc [dom parse <doc/>]
+    set xsltDoc [dom parse {<xsl:stylesheet
+        xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+        <xsl:template match="/">
+        <out><xsl:value-of select="format-number(1.0, '000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000')"/></out>
+        </xsl:template>
+        </xsl:stylesheet>}]
+    $xmlDoc xslt $xsltDoc resultDoc
+    set result [$resultDoc asXML -indent none]
+    $xmlDoc delete
+    $xsltDoc delete
+    $resultDoc delete
+    set result <out>001</out>
+} {<out>001</out>}
+
 proc ::dom::xpathFunc::xslt-9.1 {ctxNode pos nodeListType nodeList args} {
     if {[llength $ctxNode] != 2} {
         error "::dom::xpathFunc::xslt-9.1: expected parent node / attribute \
@@ -1356,7 +1372,7 @@ test xslt-9.1 {xslt using scripted xpath function} -setup {
 # xslt identity transformation and returns the result tree of that
 # transformation. This is used to test, that the result tree of an xslt
 # transformation could be used as any 'ordinary' tree created with
-# [dom parse]. It is here, because I didn't want to hold it seperated.
+# [dom parse]. It is here, because I didn't want to hold it separated.
 # It is commented out, because some of the tests in the sourced test files
 # need line/column or baseURI information, to work correctly, and this
 # information is not preserved by an xslt identity transformation and

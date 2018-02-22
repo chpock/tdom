@@ -134,6 +134,19 @@ test tnc-2.6 {invalid document} {
     set result
 } {1}
 
+test tnc-2.7 {not valid document} {
+    set parser [expat]
+    tnc $parser enable
+    set result [catch {$parser parse {<!DOCTYPE root [
+    <!ELEMENT root (a,b)>
+    <!ELEMENT a (#PCDATA)>
+    <!ELEMENT b EMPTY>
+]>
+<root><a>text</a></root>}} errMsg]
+    $parser free
+    set errMsg
+} {Validation error at line 6, character 17: Element can not end here (required element(s) missing).}
+
 test tnc-3.1 {validate cmd} {
     set parser [expat]
     tnc $parser enable

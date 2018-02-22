@@ -19,7 +19,7 @@ dnl	to configure the system for the local environment.
 # this case) so that we create the export library with the dll.
 #-----------------------------------------------------------------------
 
-AC_INIT([tdom], [0.8.3])
+AC_INIT([tdom], [0.9.1])
 
 #--------------------------------------------------------------------
 # Call TEA_INIT as the first TEA_ macro to set up initial vars.
@@ -27,7 +27,7 @@ AC_INIT([tdom], [0.8.3])
 # as well as PKG_LIB_FILE and PKG_STUB_LIB_FILE.
 #--------------------------------------------------------------------
 
-TEA_INIT([3.9])
+TEA_INIT([3.10])
 
 AC_CONFIG_AUX_DIR(tclconfig)
 
@@ -100,6 +100,7 @@ TEA_ADD_SOURCES([generic/xmlsimple.c \
                  generic/dom.c       \
                  generic/domhtml.c   \
                  generic/domhtml5.c  \
+                 generic/domjson.c   \
                  generic/domxpath.c  \
                  generic/domxslt.c   \
                  generic/domlock.c   \
@@ -128,12 +129,11 @@ TEA_ADD_TCL_SOURCES([lib/tdom.tcl])
 #--------------------------------------------------------------------
 
 if test "${TEA_PLATFORM}" = "windows" ; then
-    AC_DEFINE(BUILD_tdom)
     CLEANFILES="pkgIndex.tcl *.lib *.dll *.exp *.ilk *.pdb vc*.pch"
     #TEA_ADD_SOURCES([win/winFile.c])
     #TEA_ADD_INCLUDES([-I\"$(${CYGPATH} ${srcdir}/win)\"])
 else
-    CLEANFILES="pkgIndex.tcl tdomConfig.sh tdom.tcl tcldomsh"
+    CLEANFILES="pkgIndex.tcl tdom.tcl tcldomsh"
     #TEA_ADD_SOURCES([unix/unixFile.c])
     #TEA_ADD_LIBS([-lsuperfly])
 fi
