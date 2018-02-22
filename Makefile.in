@@ -330,6 +330,13 @@ pkgIndex.tcl-hand:
          source [list [file join $$dir tdom.tcl]]"'\
 	) > pkgIndex.tcl
 
+#========================================================================
+# Create tdomDecls.h and tdomStubInit.c from tdom.decls
+#========================================================================
+
+genstubs: $(srcdir)/generic/tdom.decls
+	$(TCLSH_PROG) $(TCL_SRC_DIR)/tools/genStubs.tcl $(srcdir)/generic \
+               $(srcdir)/generic/tdom.decls
 
 #========================================================================
 # Create a include file that #define the current fossil hash

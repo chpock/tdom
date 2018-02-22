@@ -69,8 +69,8 @@ Tcl_ObjCmdProc TclTdomObjCmd;
 
 #define STR_TDOM_VERSION(v) (VERSION)
 
-EXTERN int Tdom_Init     _ANSI_ARGS_((Tcl_Interp *interp));
-EXTERN int Tdom_SafeInit _ANSI_ARGS_((Tcl_Interp *interp));
+EXTERN int Tdom_Init     (Tcl_Interp *interp);
+EXTERN int Tdom_SafeInit (Tcl_Interp *interp);
 
 #endif
 

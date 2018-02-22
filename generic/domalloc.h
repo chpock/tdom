@@ -34,7 +34,7 @@
 |
 \--------------------------------------------------------------------------*/
 
-void   domAllocInit();
+void   domAllocInit(void);
 void * domAlloc(int size);
 void   domFree(void *mem);
 

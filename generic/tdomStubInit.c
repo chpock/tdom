@@ -9,9 +9,9 @@
 
 /* !BEGIN!: Do not edit below this line. */
 
-TdomStubs tdomStubs = {
+const TdomStubs tdomStubs = {
     TCL_STUB_MAGIC,
-    NULL,
+    0,
     TclExpatObjCmd, /* 0 */
     CheckExpatParserObj, /* 1 */
     CHandlerSetInstall, /* 2 */
