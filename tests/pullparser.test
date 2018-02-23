@@ -6,6 +6,7 @@
 #    pp-1.*: Basics, interface
 #    pp-2.*: Compare dom / pull parsing
 #    pp-3.*: skip method
+#    pp-4.*: find-element method
 #
 # Copyright (c) 2017 Rolf Ade.
 
@@ -329,3 +330,120 @@ test pp-3.7 {skip} {
     pp delete
     set result
 } {START_TAG TEXT START_TAG e END_TAG e START_TAG e 1 {error "mismatched tag" at line 1 character 24}}
+
+test pp-4.1 {find-element} {
+    tDOM::pullparser pp
+    pp input {<doc><a>foo bar</a><b>baz</b><c>grill</c><d>here</d></doc>}
+    set result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp find-element d]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [pp text]
+    lappend result [pp next]
+    lappend result [pp tag]    
+    while {[pp next] ne "END_DOCUMENT"} {}
+    pp delete
+    set result
+} {START_TAG doc START_TAG a START_TAG d TEXT here END_TAG d}
+
+test pp-4.2 {find-element} {
+    tDOM::pullparser pp
+    pp input {<doc><a>foo bar</a><b>baz</b><c>grill</c><d></d></doc>}
+    set result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp find-element d]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [pp tag]    
+    while {[pp next] ne "END_DOCUMENT"} {}
+    pp delete
+    set result
+} {START_TAG doc START_TAG a START_TAG d END_TAG d}
+
+test pp-4.3 {find-element} {
+    tDOM::pullparser pp
+    pp input {<doc><a>foo bar</a><b>baz</b><c>grill</c>some<d/></doc>}
+    set result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp find-element d]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [pp tag]    
+    while {[pp next] ne "END_DOCUMENT"} {}
+    pp delete
+    set result
+} {START_TAG doc START_TAG a START_TAG d END_TAG d}
+
+test pp-4.4 {find-element} {
+    tDOM::pullparser pp
+    pp input {<doc><a><b><c><d>grill</d></c></b></a></doc>}
+    set result [pp next]
+    lappend result [pp tag]
+    lappend result [pp find-element d]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [pp text]
+    lappend result [pp next]
+    lappend result [pp tag]    
+    lappend result [pp next]
+    lappend result [pp tag]    
+    while {[pp next] ne "END_DOCUMENT"} {}
+    pp delete
+    set result
+} {START_TAG doc START_TAG d TEXT grill END_TAG d END_TAG c}
+
+test pp-4.5 {find-element} {
+    tDOM::pullparser pp
+    pp input {<doc><a><b><c><d></d></c></b></a></doc>}
+    set result [pp next]
+    lappend result [pp tag]
+    lappend result [pp find-element d]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [pp tag]    
+    lappend result [pp next]
+    lappend result [pp tag]    
+    while {[pp next] ne "END_DOCUMENT"} {}
+    pp delete
+    set result
+} {START_TAG doc START_TAG d END_TAG d END_TAG c}
+
+test pp-4.6 {find-element} {
+    tDOM::pullparser pp
+    pp input {<doc><a><b><c><d/></c></b></a></doc>}
+    set result [pp next]
+    lappend result [pp tag]
+    lappend result [pp find-element d]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [pp tag]    
+    lappend result [pp next]
+    lappend result [pp tag]    
+    while {[pp next] ne "END_DOCUMENT"} {}
+    pp delete
+    set result
+} {START_TAG doc START_TAG d END_TAG d END_TAG c}
+
+
+test pp-4.7 {find-element} {
+    tDOM::pullparser pp
+    pp input {<doc><a><b/></a><a><b><c/></b></a><a><b/></a></doc>}
+    set result [pp next]
+    lappend result [pp tag]
+    lappend result [pp find-element b]
+    lappend result [pp tag]
+    lappend result [pp find-element c]
+    lappend result [pp tag]
+    lappend result [pp find-element a]
+    lappend result [pp tag]
+    while {[pp next] ne "END_DOCUMENT"} {}
+    pp delete
+    set result
+} {START_TAG doc START_TAG b START_TAG c START_TAG a}

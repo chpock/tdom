@@ -42,7 +42,8 @@ typedef enum {
 
 typedef enum {
     PULLPARSEMODE_NORMAL,
-    PULLPARSEMODE_SKIP
+    PULLPARSEMODE_SKIP,
+    PULLPARSEMODE_FIND
 } PullParseMode;
     
 typedef struct tDOM_PullParserInfo 
@@ -65,72 +66,11 @@ typedef struct tDOM_PullParserInfo
     int             ignoreWhiteSpaces;
     PullParseMode   mode;
     int             skipDepth;
+    char           *findElement;
 } tDOM_PullParserInfo;
 
 #define SetResult(str) Tcl_ResetResult(interp); \
                      Tcl_SetStringObj(Tcl_GetObjResult(interp), (str), -1)
-
-static void
-startElement(
-    void         *userData,
-    const char   *name,
-    const char  **atts
-)
-{
-    tDOM_PullParserInfo *pullInfo = userData;
-    int hnew;
-    Tcl_HashEntry *h;
-    
-    DBG(fprintf(stderr, "startElement tag %s\n", name));
-
-    if (pullInfo->mode == PULLPARSEMODE_SKIP) {
-        pullInfo->skipDepth++;
-        return;
-    }
-    if (Tcl_DStringLength (pullInfo->cdata) > 0) {
-        if (pullInfo->ignoreWhiteSpaces) {
-            char *pc; int len, wso = 1;
-            len = Tcl_DStringLength(pullInfo->cdata);
-            for (pc = Tcl_DStringValue (pullInfo->cdata);
-                 len > 0;
-                 len--, pc++) 
-            {
-                if ( (*pc != ' ')  &&
-                     (*pc != '\t') &&
-                     (*pc != '\n') &&
-                     (*pc != '\r') ) {
-                    wso = 0;
-                    break;
-                }
-            }
-            if (wso) {
-                Tcl_DStringSetLength (pullInfo->cdata, 0);
-                pullInfo->state = PULLPARSERSTATE_START_TAG;
-            } else {
-                DBG(fprintf(stderr, "schedule TEXT event\n"));
-                pullInfo->state = PULLPARSERSTATE_TEXT;
-                pullInfo->nextState = PULLPARSERSTATE_START_TAG;
-            }
-        } else {
-            DBG(fprintf(stderr, "schedule TEXT event\n"));
-            pullInfo->state = PULLPARSERSTATE_TEXT;
-            pullInfo->nextState = PULLPARSERSTATE_START_TAG;
-        }
-    } else {
-        pullInfo->state = PULLPARSERSTATE_START_TAG;
-    }
-    h = Tcl_CreateHashEntry (pullInfo->elmCache, name, &hnew);
-    if (hnew) {
-        pullInfo->currentElm = Tcl_NewStringObj (name, -1);
-        Tcl_IncrRefCount (pullInfo->currentElm);
-        Tcl_SetHashValue (h, pullInfo->currentElm);
-    } else {
-        pullInfo->currentElm = (Tcl_Obj *) Tcl_GetHashValue (h);
-    }
-    pullInfo->atts = atts;
-
-    XML_StopParser(pullInfo->parser, 1);
-}
 
 static void
 characterDataHandler (
@@ -153,8 +93,9 @@ endElement (
 {
     tDOM_PullParserInfo *pullInfo = userData;
     XML_ParsingStatus status;
-    int reportStartTag = 0, reportText = 0;
-    
+    int reportStartTag = 0, reportText = 0, hnew;
+    Tcl_HashEntry *h;
+
     DBG(fprintf(stderr, "endElement tag %s\n", name));
 
     if (pullInfo->mode == PULLPARSEMODE_SKIP) {
@@ -209,8 +150,93 @@ endElement (
         pullInfo->state = PULLPARSERSTATE_END_TAG;
     }
 
-    pullInfo->currentElm = (Tcl_Obj *)
-        Tcl_GetHashValue(Tcl_FindHashEntry (pullInfo->elmCache, name));
+    h = Tcl_FindHashEntry (pullInfo->elmCache, name);
+    if (h == NULL) {
+        /* The start tag entry creation was skipped during a
+         * find-element, create it now. */
+        h = Tcl_CreateHashEntry (pullInfo->elmCache, name, &hnew);
+        DBG(fprintf(stderr, "endElement: create tag hash table entry %s\n", name));
+        pullInfo->currentElm = Tcl_NewStringObj (name, -1);
+        Tcl_IncrRefCount (pullInfo->currentElm);
+        Tcl_SetHashValue (h, pullInfo->currentElm);
+    }
+    pullInfo->currentElm = (Tcl_Obj *) Tcl_GetHashValue(h);
+    XML_StopParser(pullInfo->parser, 1);
+}
+
+static void
+startElement(
+    void         *userData,
+    const char   *name,
+    const char  **atts
+)
+{
+    tDOM_PullParserInfo *pullInfo = userData;
+    int hnew;
+    Tcl_HashEntry *h;
+    
+    DBG(fprintf(stderr, "startElement tag %s\n", name));
+
+    switch (pullInfo->mode) {
+    case PULLPARSEMODE_SKIP:
+        pullInfo->skipDepth++;
+        return;
+    case PULLPARSEMODE_FIND:
+        DBG(fprintf (stderr, "PULLPARSEMODE_FIND this %s search for %s\n",
+                     name, pullInfo->findElement));
+        if (strcmp (name, pullInfo->findElement) != 0) {
+            return;
+        }
+        pullInfo->mode = PULLPARSEMODE_NORMAL;
+        XML_SetCharacterDataHandler (pullInfo->parser, characterDataHandler);
+        XML_SetEndElementHandler (pullInfo->parser, endElement);
+        break;
+    case PULLPARSEMODE_NORMAL:
+        break;
+    }
+    if (Tcl_DStringLength (pullInfo->cdata) > 0) {
+        if (pullInfo->ignoreWhiteSpaces) {
+            char *pc; int len, wso = 1;
+            len = Tcl_DStringLength(pullInfo->cdata);
+            for (pc = Tcl_DStringValue (pullInfo->cdata);
+                 len > 0;
+                 len--, pc++) 
+            {
+                if ( (*pc != ' ')  &&
+                     (*pc != '\t') &&
+                     (*pc != '\n') &&
+                     (*pc != '\r') ) {
+                    wso = 0;
+                    break;
+                }
+            }
+            if (wso) {
+                Tcl_DStringSetLength (pullInfo->cdata, 0);
+                pullInfo->state = PULLPARSERSTATE_START_TAG;
+            } else {
+                DBG(fprintf(stderr, "schedule TEXT event\n"));
+                pullInfo->state = PULLPARSERSTATE_TEXT;
+                pullInfo->nextState = PULLPARSERSTATE_START_TAG;
+            }
+        } else {
+            DBG(fprintf(stderr, "schedule TEXT event\n"));
+            pullInfo->state = PULLPARSERSTATE_TEXT;
+            pullInfo->nextState = PULLPARSERSTATE_START_TAG;
+        }
+    } else {
+        pullInfo->state = PULLPARSERSTATE_START_TAG;
+    }
+    h = Tcl_CreateHashEntry (pullInfo->elmCache, name, &hnew);
+    if (hnew) {
+        DBG(fprintf(stderr, "startElement: create tag hash table entry %s\n", name));
+        pullInfo->currentElm = Tcl_NewStringObj (name, -1);
+        Tcl_IncrRefCount (pullInfo->currentElm);
+        Tcl_SetHashValue (h, pullInfo->currentElm);
+    } else {
+        pullInfo->currentElm = (Tcl_Obj *) Tcl_GetHashValue (h);
+    }
+    pullInfo->atts = atts;
+
     XML_StopParser(pullInfo->parser, 1);
 }
 
@@ -377,13 +403,15 @@ tDOM_PullParserInstanceCmd (
     static const char *const methods[] = {
         "input", "inputchannel", "inputfile",
         "next", "state", "tag", "attributes",
-        "text", "delete", "reset", "skip", NULL
+        "text", "delete", "reset", "skip",
+        "find-element", NULL
     };
 
     enum method {
         m_input, m_inputchannel, m_inputfile,
         m_next, m_state, m_tag, m_attributes,
-        m_text, m_delete, m_reset, m_skip
+        m_text, m_delete, m_reset, m_skip,
+        m_find_element
     };
 
     if (objc == 1) {
@@ -646,6 +674,32 @@ tDOM_PullParserInstanceCmd (
         Tcl_SetObjResult (interp, pullInfo->end_tag);
         break;
         
+    case m_find_element:
+        if (objc != 3) {
+            Tcl_WrongNumArgs (interp, 2, objv, "elementName");
+            return TCL_ERROR;
+        }
+        if (pullInfo->state != PULLPARSERSTATE_START_TAG) {
+            SetResult("Invalid state - skip method is only valid in states "
+                      "START_DOCUMENT and START_TAG.");
+            return TCL_ERROR;
+        }
+        pullInfo->mode = PULLPARSEMODE_FIND;
+        /* As long as we don't evalute any tcl script code during a
+         * pull parser method call this should be secure. */
+        pullInfo->findElement = Tcl_GetString (objv[2]);
+        Tcl_DStringSetLength (pullInfo->cdata, 0);
+        XML_SetCharacterDataHandler (pullInfo->parser, NULL);
+        XML_SetEndElementHandler (pullInfo->parser, NULL);
+        if (tDOM_resumeParseing (interp, pullInfo) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        if (pullInfo->state == PULLPARSERSTATE_START_TAG) {
+            Tcl_SetObjResult (interp, pullInfo->start_tag);
+        } else {
+            SetResult ("END_DOCUMENT");
+        }
+        break;
         
     case m_delete:
         if (objc != 2) {
