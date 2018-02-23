@@ -1,5 +1,5 @@
-C More\spruning\sout\shistory:\sall\sthat\sCONST\sand\seven\sCONST84\sbusiness.
-D 2018-02-22T01:46:32.272
+C Added\sconstraint\sto\stest\sthat\suses\sa\s>=\s8.5\stcl\score\sfeature.
+D 2018-02-23T12:08:04.423
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -174,7 +174,7 @@ F tdomConfig.sh.in 5756c6b431179e49852a607cc2ca01e5381da905
 F tests/JSONTestSuite.tcl 907228f9bd31855951b9033df74c9c15778765af
 F tests/OASIS-suite.tcl 428c0f45f780f5f942c46babd9287277ad0caaed
 F tests/all-bench.tcl 38bc7b4c88f5d679b2fce6c9c2b2ea7d8ad18e90
-F tests/all.tcl 0a8b1e8320bab576c48f02995aa385a90502d4b6
+F tests/all.tcl e7c57aa5132d6c463a8e9f0bb77973da6a35859e30d018855d5f76ac8ef9d683
 F tests/attribute.test 53ac8fb043e79b638c8c6f5e7da848f6103552d6
 F tests/cdata.test 5a1dc3bee6353700186d12f0d11b15914849c6be
 F tests/comment.test ff9d1abbbcde4d3532bf93b1eb7e819997fa8178
@@ -201,7 +201,7 @@ F tests/dom.test 4633d24b0a5740aa697d4e1b7d68752e8f70ee47881fb3147110636bb398fa3
 F tests/domDoc.test 99a4e4e8b894e97f62d438f0cd6f1e470d8bf2b3
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test 66a77f681b6e946b88c55a72efe62d8d7e430348
-F tests/domjson.test 0d4b12158194b43b9c1a0f7f4352a64130eb49cb
+F tests/domjson.test 4d59a364b082b9009e7edddd4133941e4b463896db28939accdfeed3ca210df1
 F tests/domnamespace.test c67346e939dab82f1b6de8ddd04bd004cf24391b
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
@@ -237,11 +237,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P da20a637cfcda316dac548597d927fbbf2523214b1e8f3ffc5c1ed5884e4f5cc
-R a13c797fa4f618e597397edf1a6accdd
-T *branch * deCONST
-T *sym-deCONST *
-T -sym-trunk *
+P 659134bc9a7910c623b6b1e02772808fa7d1f4c9085c31e3a3cf9422418ad8e0
+R 83a6128c9b530e04156432bd0067d6a0
 U rolf
-Z 62841e8cc6de81f17b95316aeef1f0c4
+Z ce09be6baad5f217ea4d517bbf30df31
 # Remove this line to create a well-formed Fossil manifest.
