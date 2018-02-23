@@ -680,8 +680,8 @@ tDOM_PullParserInstanceCmd (
             return TCL_ERROR;
         }
         if (pullInfo->state != PULLPARSERSTATE_START_TAG) {
-            SetResult("Invalid state - skip method is only valid in states "
-                      "START_DOCUMENT and START_TAG.");
+            SetResult("Invalid state - find-element method is only valid in state "
+                      "START_TAG.");
             return TCL_ERROR;
         }
         pullInfo->mode = PULLPARSEMODE_FIND;
