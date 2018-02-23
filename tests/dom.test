@@ -151,7 +151,7 @@ test dom-1.20 {createDocumentNS - empty namespace, prefix} {
     set errMsg
 } {Missing URI in Namespace declaration}
 
-test dom-1.21 {Explicit delete of scoped doc with domDoc cmd} {knownBug} {
+test dom-1.21 {Explicit delete of scoped doc with domDoc cmd} {} {
     dom createDocument test doc
     domDoc $doc delete
     unset doc
@@ -160,7 +160,7 @@ test dom-1.21 {Explicit delete of scoped doc with domDoc cmd} {knownBug} {
 proc dom-1.22 {doc} {
     $doc delete
 }
-test dom-1.22 {Explicit delete of scoped doc in proc call from scope} {knownBug} {
+test dom-1.22 {Explicit delete of scoped doc in proc call from scope} {} {
     dom createDocument test doc
     dom-1.22 $doc
     unset doc

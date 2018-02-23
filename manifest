@@ -1,5 +1,5 @@
-C Fixed\sthe\srecently\sbroken\sbuild\sw/\s--enable-threads.
-D 2018-02-22T12:49:15.848
+C Fixed\s[e6ccc3c1fac1eb].
+D 2018-02-23T01:47:01.764
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -131,7 +131,7 @@ F extensions/tnc/win/rules.vc 8157e2a811cf5e93683d6b0fbf5d91d153aa4535
 F extensions/tnc/win/targets.vc 79dea1c6a94a94e6ed8bae9e0195149b25a69923
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
 F generic/dom.c 377c4659bf1914c413dc0698f0933f27e7d40994b2699f4e563dbcd01be9022b
-F generic/dom.h 5494be214bb46a3e578b41d4150481046c94d508c7797f4256f62730de943370
+F generic/dom.h 559f338ea9d063c97d784b859b007b3c849f3c5aa1049df83b54a97dc54aaf60
 F generic/domalloc.c 55e9eeff19cc54cf3956a7013883ead07efd3593
 F generic/domalloc.h 4830a81539dc0323fbdc98f613df33fd38736da60e1ff5891b5c328eb1a6881d
 F generic/domhtml.c 9e09ee68cd91f040f5d5afaf81e377f4d23a1ff87b92756c34668b5621d1932f
@@ -149,7 +149,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 93450ac7574ca1b45c754de9d4b01197c83bc3da1450d21a590206b837c970e6
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
-F generic/tcldom.c e584dc78e1d162a9a2973a61c0127557580886cd28cfc14051181d22a71bcfbe
+F generic/tcldom.c 5ef91f13339bff3b909931c13580a3fe011618c54e51d51f83f8f295f7d1a2eb
 F generic/tcldom.h 2e8edc2bf095200c419a740fed626f4fdcba274125e0234366e84a25bb0c2b25
 F generic/tclexpat.c ddcae4c997dcbc75b64e844ad4045dcad64a9db54d66d01452baf34a12485d80
 F generic/tclexpat.h 816f43b0a00c9b0ce5e9d17aea8cab1c57b6aa30873164ba24467fbd4b87059b
@@ -197,7 +197,7 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.bench 5446ce379127b8d5700f18a5a0848e580313d0d7
-F tests/dom.test 4633d24b0a5740aa697d4e1b7d68752e8f70ee47881fb3147110636bb398fa3e
+F tests/dom.test ae2f26439eb0995703e5a6aaaa8040066fcd3858b5138d66e0a23b6f86d1307e
 F tests/domDoc.test 99a4e4e8b894e97f62d438f0cd6f1e470d8bf2b3
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test 66a77f681b6e946b88c55a72efe62d8d7e430348
@@ -237,8 +237,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P da20a637cfcda316dac548597d927fbbf2523214b1e8f3ffc5c1ed5884e4f5cc
-R 89bef5aff5943c3f9775b8193a538501
+P c05bde946911295ef95a1d1123e7e8391ff91f9bf9fb110976eb11a3d6916585
+R 487751328cf7623c5f33e0f8b854b294
 U rolf
-Z f9c4d6dee11aa47f19a93039b5d39e65
+Z 2d2200550368528998d5562245add435
 # Remove this line to create a well-formed Fossil manifest.
