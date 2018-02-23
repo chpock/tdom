@@ -39,8 +39,12 @@ typedef enum {
     PULLPARSERSTATE_TEXT,
     PULLPARSERSTATE_PARSE_ERROR
 } PullParserState;
-    
 
+typedef enum {
+    PULLPARSEMODE_NORMAL,
+    PULLPARSEMODE_SKIP
+} PullParseMode;
+    
 typedef struct tDOM_PullParserInfo 
 {
     XML_Parser      parser;
@@ -59,7 +63,7 @@ typedef struct tDOM_PullParserInfo
     Tcl_Obj        *end_tag;
     Tcl_Obj        *text;
     int             ignoreWhiteSpaces;
-    int             skipMode;
+    PullParseMode   mode;
     int             skipDepth;
 } tDOM_PullParserInfo;
 
@@ -79,7 +83,7 @@ startElement(
     
     DBG(fprintf(stderr, "startElement tag %s\n", name));
 
-    if (pullInfo->skipMode) {
+    if (pullInfo->mode == PULLPARSEMODE_SKIP) {
         pullInfo->skipDepth++;
         return;
     }
@@ -153,12 +157,12 @@ endElement (
     
     DBG(fprintf(stderr, "endElement tag %s\n", name));
 
-    if (pullInfo->skipMode) {
+    if (pullInfo->mode == PULLPARSEMODE_SKIP) {
         if (pullInfo->skipDepth > 0) {
             pullInfo->skipDepth--;
             return;
         }
-        pullInfo->skipMode = 0;
+        pullInfo->mode = PULLPARSEMODE_NORMAL;
         XML_SetCharacterDataHandler (pullInfo->parser, characterDataHandler);
     }
             
@@ -632,7 +636,7 @@ tDOM_PullParserInstanceCmd (
             Tcl_SetObjResult (interp, pullInfo->end_tag);
             break;
         }
-        pullInfo->skipMode = 1;
+        pullInfo->mode = PULLPARSEMODE_SKIP;
         pullInfo->skipDepth = 0;
         Tcl_DStringSetLength (pullInfo->cdata, 0);
         XML_SetCharacterDataHandler (pullInfo->parser, NULL);
@@ -729,6 +733,7 @@ tDOM_PullParserCmd (
     pullInfo->ignoreWhiteSpaces = ignoreWhiteSpaces;
     pullInfo->elmCache = (Tcl_HashTable *)MALLOC(sizeof (Tcl_HashTable));
     Tcl_InitHashTable(pullInfo->elmCache, TCL_STRING_KEYS);
+    pullInfo->mode = PULLPARSEMODE_NORMAL;
         
     Tcl_CreateObjCommand (interp, Tcl_GetString(objv[1]),
                           tDOM_PullParserInstanceCmd, (ClientData) pullInfo,

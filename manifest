@@ -1,5 +1,5 @@
-C Merged\strunk.
-D 2018-02-22T12:50:59.917
+C Prepare\scode\sfor\sintegration\sof\sfind-element\smethod.
+D 2018-02-23T12:27:49.030
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -153,7 +153,7 @@ F generic/tcldom.c e584dc78e1d162a9a2973a61c0127557580886cd28cfc14051181d22a71bc
 F generic/tcldom.h 2e8edc2bf095200c419a740fed626f4fdcba274125e0234366e84a25bb0c2b25
 F generic/tclexpat.c ddcae4c997dcbc75b64e844ad4045dcad64a9db54d66d01452baf34a12485d80
 F generic/tclexpat.h 816f43b0a00c9b0ce5e9d17aea8cab1c57b6aa30873164ba24467fbd4b87059b
-F generic/tclpull.c e228cd6e6fa7e139d800001d0704ac1c763be6409912eb4a6e171ca95cc4534b
+F generic/tclpull.c 79385d764768504c89efcd9befef6ecebeb88166ee3847e761438bc41c642dad
 F generic/tclpull.h d0d2599fa133de4ab038a260b4cfbd04f01c1312
 F generic/tdom.decls d825af72ec3fd2ae4ebb1d7f883bde6e3613c914
 F generic/tdom.h d27e43748242d5fe7dd98b8c7aa4a5a891d015bf
@@ -240,8 +240,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P d43d04b9768ab8229a1d057be94fab2817aa760a9f5f17effe2c2a7508942750 c05bde946911295ef95a1d1123e7e8391ff91f9bf9fb110976eb11a3d6916585
-R fb816b80a2966d4357d253f6e047ee41
+P a49f7e938f0e68c17bd4b1b5012974b0dffdc3fa872154aa66626199346c7181
+R 90335019c4329d39dbce39638b3758be
 U rolf
-Z dc8d760a14e841aa0acf8ef79b84927d
+Z ea897c79aa7351b581b7e77098886e33
 # Remove this line to create a well-formed Fossil manifest.
