@@ -2422,7 +2422,7 @@ int xpathNodeTest (
                 ) return 0;
             if (step->child->strvalue == externalNodeName) {
                 rc = externalVarCB(
-                    cbs->varClientData, step->intvalue, &result, errMsg);
+                    cbs->varClientData, step->child->intvalue, &result, errMsg);
                 if (rc) {
                     return -rc;
                 }
