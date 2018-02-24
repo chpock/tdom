@@ -506,21 +506,16 @@ void tcldom_docCmdDeleteProc(
 {
     domDeleteInfo *dinfo = (domDeleteInfo *)clientData;
     domDocument   *doc   = dinfo->document;
-    char          *var   = dinfo->traceVarName;
+    int            hasTrace  = dinfo->document->nodeFlags & VAR_TRACE;
     
     DBG(fprintf(stderr, "--> tcldom_docCmdDeleteProc doc %p\n", doc));
-    if (var) {
-        DBG(fprintf(stderr, "--> tcldom_docCmdDeleteProc calls "
-                    "Tcl_UntraceVar for \"%s\"\n", var));
-        Tcl_UntraceVar(dinfo->interp, var, TCL_TRACE_WRITES|TCL_TRACE_UNSETS,
-                       tcldom_docTrace, clientData);
-        FREE(var);
-        dinfo->traceVarName = NULL;
-    }
-
     tcldom_deleteDoc(dinfo->interp, doc);
 
-    FREE((void*)dinfo);
+    if (hasTrace) {
+        dinfo->document = NULL;
+    } else {
+        FREE((void*)dinfo);
+    }
 }
 
 /*----------------------------------------------------------------------------
@@ -542,7 +537,14 @@ char * tcldom_docTrace (
 
     DBG(fprintf(stderr, "--> tcldom_docTrace %x %p\n", flags, doc));
 
-    if (flags & TCL_INTERP_DESTROYED) {
+    if (doc == NULL) {
+        if (!(flags & TCL_INTERP_DESTROYED)) {
+            Tcl_UntraceVar(dinfo->interp, dinfo->traceVarName,
+                           TCL_TRACE_WRITES|TCL_TRACE_UNSETS,
+                           tcldom_docTrace, clientData);
+        }
+        FREE (dinfo->traceVarName);
+        FREE (dinfo);
         return NULL;
     }
     if (flags & TCL_TRACE_WRITES) {
@@ -554,6 +556,8 @@ char * tcldom_docTrace (
         DOC_CMD(objCmdName, doc);
         DBG(fprintf(stderr, "--> tcldom_docTrace delete doc %p\n", doc));
         Tcl_DeleteCommand(interp, objCmdName);
+        FREE (dinfo->traceVarName);
+        FREE (dinfo);
     }
 
     return NULL;
@@ -769,6 +773,7 @@ int tcldom_returnDocumentObj (
             dinfo = (domDeleteInfo*)MALLOC(sizeof(domDeleteInfo));
             dinfo->interp       = interp;
             dinfo->document     = document;
+            document->nodeFlags |= DOCUMENT_CMD;
             dinfo->traceVarName = NULL;
             Tcl_CreateObjCommand(interp, objCmdName,
                                  (Tcl_ObjCmdProc *)  tcldom_DocObjCmd,
@@ -782,6 +787,7 @@ int tcldom_returnDocumentObj (
             Tcl_UnsetVar(interp, objVar, 0);
             Tcl_SetVar  (interp, objVar, objCmdName, 0);
             if (trace) {
+                document->nodeFlags |= VAR_TRACE;
                 dinfo->traceVarName = tdomstrdup(objVar);
                 Tcl_TraceVar(interp,objVar,TCL_TRACE_WRITES|TCL_TRACE_UNSETS,
                              (Tcl_VarTraceProc*)tcldom_docTrace,
@@ -5640,7 +5646,7 @@ int tcldom_DocObjCmd (
 
         case m_delete:
             CheckArgs(2,2,2,"");
-            if (clientData != NULL) {
+            if (clientData != NULL || doc->nodeFlags & DOCUMENT_CMD) {
                 Tcl_DeleteCommand(interp, Tcl_GetString (objv[0]));
             } else {
                 tcldom_deleteDoc(interp, doc);

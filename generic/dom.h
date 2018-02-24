@@ -440,6 +440,8 @@ typedef unsigned int domDocFlags;
 #define NEEDS_RENUMBERING         2
 #define DONT_FREE                 4
 #define IGNORE_XMLNS              8
+#define DOCUMENT_CMD             16
+#define VAR_TRACE                32
 
 /*--------------------------------------------------------------------------
 |   a index to the namespace records
