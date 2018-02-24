@@ -679,9 +679,10 @@ tDOM_PullParserInstanceCmd (
             Tcl_WrongNumArgs (interp, 2, objv, "elementName");
             return TCL_ERROR;
         }
-        if (pullInfo->state != PULLPARSERSTATE_START_TAG) {
-            SetResult("Invalid state - find-element method is only valid in state "
-                      "START_TAG.");
+        if (pullInfo->state != PULLPARSERSTATE_START_TAG
+            && pullInfo->state != PULLPARSERSTATE_END_TAG) {
+            SetResult("Invalid state - find-element method is only valid in states "
+                      "START_TAG and END_TAG.");
             return TCL_ERROR;
         }
         pullInfo->mode = PULLPARSEMODE_FIND;
