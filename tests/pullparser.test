@@ -501,3 +501,51 @@ test pp-4.10 {find-element} {
     pp delete
     set result
 } {START_TAG doc START_TAG a END_TAG a START_TAG a END_TAG a TEXT baz END_TAG b}
+
+test pp-4.11 {find-element} {
+    tDOM::pullparser pp
+    pp input {<doc>foo<a/>bar<b>grill<a/>baz</b></doc>}
+    set result [pp state]
+    lappend result [pp find-element a]; # START_TAG
+    lappend result [pp tag]; # a
+    lappend result [pp next]; # END_TAG
+    lappend result [pp tag]; # a
+    lappend result [pp find-element a]; # START_TAG
+    lappend result [pp tag]; #a 
+    lappend result [pp next]; # END_TAG
+    lappend result [pp tag]; # a 
+    lappend result [pp next]; # TEXT 
+    lappend result [pp text]; # baz 
+    lappend result [pp next]; # END_TAG 
+    lappend result [pp tag]; # b
+    while {[pp next] ne "END_DOCUMENT"} {}
+    pp delete
+    set result
+} {START_DOCUMENT START_TAG a END_TAG a START_TAG a END_TAG a TEXT baz END_TAG b}
+
+test pp-4.12 {find-element} {
+    tDOM::pullparser pp
+    pp input {<doc>foo<a/>bar<b>grill<a/>baz</b></doc>}
+    set result [pp state]
+    pp find-element a
+    lappend result [pp find-element a]; # START_TAG
+    lappend result [pp tag]; #a 
+    lappend result [pp next]; # END_TAG
+    lappend result [pp tag]; # a 
+    lappend result [pp next]; # TEXT 
+    lappend result [pp text]; # baz 
+    lappend result [pp next]; # END_TAG 
+    lappend result [pp tag]; # b
+    while {[pp next] ne "END_DOCUMENT"} {}
+    pp delete
+    set result
+} {START_DOCUMENT START_TAG a END_TAG a TEXT baz END_TAG b}
+
+test pp-4.13 {find-element} {
+    tDOM::pullparser pp
+    pp input {<doc/>}
+    set result [pp state]
+    lappend result [pp find-element a]
+    pp delete
+    set result
+} {START_DOCUMENT END_DOCUMENT}    

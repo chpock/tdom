@@ -390,7 +390,7 @@ tDOM_PullParserInstanceCmd (
     ClientData  clientdata,
     Tcl_Interp *interp,
     int         objc,
-    Tcl_Obj    *CONST objv[]
+    Tcl_Obj    *const objv[]
     )
 {
     tDOM_PullParserInfo *pullInfo = clientdata;
@@ -680,9 +680,10 @@ tDOM_PullParserInstanceCmd (
             return TCL_ERROR;
         }
         if (pullInfo->state != PULLPARSERSTATE_START_TAG
-            && pullInfo->state != PULLPARSERSTATE_END_TAG) {
+            && pullInfo->state != PULLPARSERSTATE_END_TAG
+            && pullInfo->state != PULLPARSERSTATE_START_DOCUMENT) {
             SetResult("Invalid state - find-element method is only valid in states "
-                      "START_TAG and END_TAG.");
+                      "START_DOCUMENT, START_TAG and END_TAG.");
             return TCL_ERROR;
         }
         pullInfo->mode = PULLPARSEMODE_FIND;
@@ -692,8 +693,20 @@ tDOM_PullParserInstanceCmd (
         Tcl_DStringSetLength (pullInfo->cdata, 0);
         XML_SetCharacterDataHandler (pullInfo->parser, NULL);
         XML_SetEndElementHandler (pullInfo->parser, NULL);
-        if (tDOM_resumeParseing (interp, pullInfo) != TCL_OK) {
-            return TCL_ERROR;
+        if (pullInfo->state == PULLPARSERSTATE_START_DOCUMENT) {
+            Tcl_Obj * thisObjv[2];
+            Tcl_Obj * thisMethod = Tcl_NewStringObj ("next", 4);
+            Tcl_IncrRefCount (thisMethod);
+            thisObjv[0] = objv[0];
+            thisObjv[1] = thisMethod;
+            if (tDOM_PullParserInstanceCmd (pullInfo, interp, 2, thisObjv)
+                != TCL_OK) {
+                return TCL_ERROR;
+            }
+        } else {
+            if (tDOM_resumeParseing (interp, pullInfo) != TCL_OK) {
+                return TCL_ERROR;
+            }
         }
         if (pullInfo->state == PULLPARSERSTATE_START_TAG) {
             Tcl_SetObjResult (interp, pullInfo->start_tag);
@@ -738,7 +751,7 @@ tDOM_PullParserCmd (
     ClientData  dummy,
     Tcl_Interp *interp,
     int         objc,
-    Tcl_Obj    *CONST objv[]
+    Tcl_Obj    *const objv[]
     )
 {
     tDOM_PullParserInfo *pullInfo;
