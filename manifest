@@ -1,5 +1,5 @@
-C Enabled\smethod\sfind-element\salso\sfor\sSTART_DOCUMENT\sstate.
-D 2018-02-24T02:09:31.138
+C Started\sdocumentation.
+D 2018-02-24T03:12:04.563
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -36,6 +36,7 @@ F doc/expatapi.xml 8b9d1dcb7f5995ad60a99a56a11abb1d29316ec6
 F doc/index.html 468688212024d55c7005365e86ac4160aae87c79
 F doc/keyword-index.html 5be2401954db258fd6efdee746ba97f02032224c
 F doc/manpage.css 3b4ec1d641048933a7e6bffc659de9519030a959
+F doc/pullparser.xml 1cbe0ef936bb58d38dd240f706a0de89424af7c37a6c02834d5ccd5f6cbcf032
 F doc/tDOM.xml 35369df6a7d84d68cfb28692530ef9d1a8b8ca3e
 F doc/tdomcmd.html b1406826c77b1079a2276adbf5104953a7b0f309
 F doc/tdomcmd.n 087bbf0cf783376e39ff903a48bc377ce507b8f3
@@ -240,8 +241,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 99c809552e739f93e8fb20cb8796669d53cfbcfe488ce4154d137f374d75be78
-R e702562bba5e139a0ec3b5268f1cde5e
+P 9055eaa40429d200447a305e7dc45e3110e672013ddbd0db261cb49cefa9fd4a
+R 0ab9d6ffe58eb3270305a42f16048f21
 U rolf
-Z e36bec628638ee8de448c9340239c9d3
+Z 8bea30cb33e3ae4785aaeeff3663349c
 # Remove this line to create a well-formed Fossil manifest.

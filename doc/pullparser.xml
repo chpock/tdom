@@ -1,0 +1,118 @@
+<manpage id="pullparser" cat="pullparser" title="pullparser">
+  <namesection>
+    <name>tDOM::pullparser</name>
+    <desc>Create an XML pull parser command</desc>
+  </namesection>
+
+  <synopsis>
+    <syntax>package require tdom
+
+    <cmd>tDOM::pullparser</cmd> <m>cmdName</m> <o>?-ignorewhitecdata</o>
+    </syntax>
+  </synopsis>
+
+  <section>
+    <title>DESCRIPTION </title>    
+    
+    <p>This command creates XML pull parser commands with a simple
+    API, along the lines of a simple StAX parser. After creation,
+    you've to set an input source, to do anything useful with the pull
+    parser. For this see the methods <m>input</m>, <m>inputchannel</m>
+    and <m>inputfile</m>.</p>
+
+    <p>The parser has always a <m>state</m>. You start parsing the XML
+    data until some next state, do what has to be done and skip again
+    to the next state. XML well-formedness errors along the way will
+    be reported as TCL_ERROR with additional info in the error
+    message.</p>
+
+    <p>The pull parsers doesn't follow externial entites and are XML
+    1.0 only, they know nothing about XML Namespaces. You get the tags
+    and attribute names as in the source. You aren't noticed about
+    CDATA Sections, comments, processing instructions and entities;
+    they are silently ignored for you.
+    </p>
+
+    <p>On the brighter side is that character entity and attribute
+    default declarations in the internal subset are respected (because
+    of using expat as underlying parser). It is probably somewhat
+    faster than a comperable implementation with the SAX interface.
+    It's a nice programming model. It's a slim interface.
+    </p>
+
+    <p>If the option <o>-ignorewhitecdata</o> is given, the created
+    XML pull parser command will ignore any white space only (' ', \t,
+    \n and \r) text content between START_TAG and START_TAG / END_TAG.
+    The parser won't stop at such input and will create TEXT state
+    events only for not white space only text. </p>
+
+    <p>The valid methods of the created commands are:</p>
+    <commandlist>
+      <commanddef>
+        <command><method>state</method></command>
+        <desc></desc>
+      </commanddef>
+
+      <commanddef>
+        <command><method>input</method> <m>data</m></command>
+        <desc></desc>
+      </commanddef>
+
+      <commanddef>
+        <command><method>inputchannel</method> <m>channel</m></command>
+        <desc></desc>
+      </commanddef>
+
+      <commanddef>
+        <command><method>inputfile</method> <m>filename</m></command>
+        <desc></desc>
+      </commanddef>
+
+      <commanddef>
+        <command><method>next</method></command>
+        <desc></desc>
+      </commanddef>
+
+      <commanddef>
+        <command><method>tag</method></command>
+        <desc></desc>
+      </commanddef>
+
+      <commanddef>
+        <command><method>attributes</method></command>
+        <desc></desc>
+      </commanddef>
+
+      <commanddef>
+        <command><method>text</method></command>
+        <desc></desc>
+      </commanddef>
+
+      <commanddef>
+        <command><method>skip</method></command>
+        <desc></desc>
+      </commanddef>
+
+      <commanddef>
+        <command><method>find-element</method> <m>tagname</m></command>
+        <desc></desc>
+      </commanddef>
+
+      <commanddef>
+        <command><method>reset</method></command>
+        <desc></desc>
+      </commanddef>
+
+      <commanddef>
+        <command><method>delete</method></command>
+        <desc></desc>
+      </commanddef>
+    </commandlist>
+  </section>
+
+  <keywords>
+    <keyword>XML</keyword>
+    <keyword>pull</keyword>
+    <keyword>parsing</keyword>
+  </keywords>
+</manpage>
