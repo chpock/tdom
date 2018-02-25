@@ -1,5 +1,5 @@
-C Added\slegal\sboilerplate\sto\stclpull.c
-D 2018-02-24T16:11:25.320
+C More\swork\son\sthe\spullparser\sdocumentation.
+D 2018-02-25T02:39:00.238
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -36,7 +36,9 @@ F doc/expatapi.xml 8b9d1dcb7f5995ad60a99a56a11abb1d29316ec6
 F doc/index.html 468688212024d55c7005365e86ac4160aae87c79
 F doc/keyword-index.html 5be2401954db258fd6efdee746ba97f02032224c
 F doc/manpage.css 3b4ec1d641048933a7e6bffc659de9519030a959
-F doc/pullparser.xml 1cbe0ef936bb58d38dd240f706a0de89424af7c37a6c02834d5ccd5f6cbcf032
+F doc/pullparser.html efc571a0f486447e9389148447cca82a0bb9dbdceee48c309a46f0c25214d292
+F doc/pullparser.n 4c203bed303896f19c055540709d8c446d941bccd367494e89146f83cddaf7d3
+F doc/pullparser.xml be21dfe8281f19af9c1c5005719defd9c296f99a5fab78bfab809c143624da07
 F doc/tDOM.xml 35369df6a7d84d68cfb28692530ef9d1a8b8ca3e
 F doc/tdomcmd.html b1406826c77b1079a2276adbf5104953a7b0f309
 F doc/tdomcmd.n 087bbf0cf783376e39ff903a48bc377ce507b8f3
@@ -241,8 +243,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 98dddd2848577d0826be9f5da20aba8180867dcb32aca65795e44ee28d03eb79
-R 75e7e9cba7dd6c4b71e42e17a8962bf4
+P ff44e93eb63c5762e818a9c372ee2fae78f1c846bb66ac5eff0b42cd738a4bd6
+R ca9f4bde20d04fb0a664d6eb7c89575a
 U rolf
-Z 82be89506bb5a79964961df8100a6d51
+Z f337bad0e256d3a5c07810d166d73243
 # Remove this line to create a well-formed Fossil manifest.
