@@ -721,8 +721,10 @@ tDOM_PullParserInstanceCmd (
             Tcl_IncrRefCount (thisMethod);
             thisObjv[0] = objv[0];
             thisObjv[1] = thisMethod;
-            if (tDOM_PullParserInstanceCmd (pullInfo, interp, 2, thisObjv)
-                != TCL_OK) {
+            result = tDOM_PullParserInstanceCmd (pullInfo, interp, 2,
+                                                 thisObjv);
+            Tcl_DecrRefCount (thisMethod);
+            if (result != TCL_OK) {
                 return TCL_ERROR;
             }
         } else {
