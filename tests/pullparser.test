@@ -102,7 +102,7 @@ proc loopPull {} {
     return $pullstr
 }
 
-proc compareWith {data {inputMethod input}} {
+proc comparewithDOM {data {inputMethod input}} {
     if {$inputMethod eq "input"} {
         dom parse $data doc
     } elseif {$inputMethod eq "inputchannel"} {
@@ -122,45 +122,153 @@ proc compareWith {data {inputMethod input}} {
         puts $pullstr
         return 0
     }
+    pp delete
 }
 
 test pp-2.1 {dom/pull comparsion: mondial-europe.xml} {
-    compareWith ../tests/data/mondial-europe.xml inputfile
+    comparewithDOM ../tests/data/mondial-europe.xml inputfile
 } 1
 
 test pp-2.2 {dom/pull comparsion: books.xml} {
-    compareWith ../tests/data/books.xml inputfile
+    comparewithDOM ../tests/data/books.xml inputfile
 } 1
 
 test pp-2.3 {dom/pull comparsion: i18n_1.xml} {
-    compareWith ../tests/data/i18n_1.xml inputfile
+    comparewithDOM ../tests/data/i18n_1.xml inputfile
 } 1
 
 test pp-2.4 {dom/pull comparsion: i18n_2.xml} {
-    compareWith ../tests/data/i18n_1.xml inputfile
+    comparewithDOM ../tests/data/i18n_1.xml inputfile
 } 1
 
 test pp-2.5 {dom/pull comparsion: REC-xslt-19991116.xml} {
-    compareWith ../tests/data/REC-xslt-19991116.xml inputfile
+    comparewithDOM ../tests/data/REC-xslt-19991116.xml inputfile
 } 1
 
 test pp-2.6 {dom/pull comparsion: xslt_1.xsl} {
-    compareWith ../tests/data/xslt_1.xsl inputfile
+    comparewithDOM ../tests/data/xslt_1.xsl inputfile
 } 1
 
 test pp-2.7 {dom/pull comparsion} {
-    compareWith {<p>This specification defines the syntax and semantics of XSLT, which
+    comparewithDOM {<p>This specification defines the syntax and semantics of XSLT, which
 is a language for transforming XML documents into other XML
         documents.</p>}
 } 1
 
 test pp-2.8 {dom/pull comparsion} {
-    compareWith {<p><termdef> (see <specref/>), which is
+    comparewithDOM {<p><termdef> (see <specref/>), which is
 referred to in </termdef></p>}
 } 1
 
 test pp-2.9 {dom/pull comparsion} {
-    compareWith {<p>This specification defines the syntax and semantics of the XSLT
+    comparewithDOM {<p>This specification defines the syntax and semantics of the XSLT
+language.  A transformation in the XSLT language is expressed as a
+well-formed XML document <bibref/>conforming </p>}
+} 1
+
+
+proc loopPullE {} {
+    while {[set state [pullparser next]] ne "END_DOCUMENT"} {
+        switch $state {
+            "START_TAG" {
+                append pullstr [pullparser tag]
+                foreach {attname attvalue} [pullparser attributes] {
+                    append pullstr $attname $attvalue
+                }
+            }
+            "TEXT" {
+                append pullstr [pullparser text]
+            }
+            "END_TAG" {
+                append pullstr /[pullparser tag]
+            }
+        }
+    }
+    return $pullstr
+}
+
+proc elementstart {name atts} {
+    global expatstr
+
+    append expatstr $name
+    foreach {attname attvalue} $atts {
+        append expatstr $attname $attvalue
+    }
+}
+
+proc elementend {name} {
+    global expatstr
+
+    append expatstr /$name
+}
+
+proc cdata {cdata} {
+    global expatstr
+
+    append expatstr $cdata
+}
+
+proc comparewithExpat {data {inputMethod ""}} {
+    global expatstr
+
+    set expatstr ""
+    expat pushparser \
+        -elementstartcommand elementstart \
+        -elementendcommand elementend \
+        -characterdatacommand cdata
+    pushparser parse$inputMethod $data
+    tDOM::pullparser pullparser
+    pullparser input$inputMethod $data
+    set pullstr [loopPullE]
+    if {$expatstr eq $pullstr} {
+        return 1
+    } else {
+        puts $expatstr
+        puts $pullstr
+        return 0
+    }
+    pushparser free
+    pullparser delete
+}
+
+
+test pp-2.10 {expat/pull comparsion: mondial-europe.xml} {
+    comparewithExpat ../tests/data/mondial-europe.xml file
+} 1
+
+test pp-2.11 {expat/pull comparsion: books.xml} {
+    comparewithExpat ../tests/data/books.xml file
+} 1
+
+test pp-2.12 {expat/pull comparsion: i18n_1.xml} {
+    comparewithExpat ../tests/data/i18n_1.xml file
+} 1
+
+test pp-2.13 {expat/pull comparsion: i18n_2.xml} {
+    comparewithExpat ../tests/data/i18n_1.xml file
+} 1
+
+test pp-2.14 {expat/pull comparsion: REC-xslt-19991116.xml} {
+    comparewithExpat ../tests/data/REC-xslt-19991116.xml file
+} 1
+
+test pp-2.15 {expat/pull comparsion: xslt_1.xsl} {
+    comparewithExpat ../tests/data/xslt_1.xsl file
+} 1
+
+test pp-2.16 {expat/pull comparsion} {
+    comparewithExpat {<p>This specification defines the syntax and semantics of XSLT, which
+is a language for transforming XML documents into other XML
+        documents.</p>}
+} 1
+
+test pp-2.17 {expat/pull comparsion} {
+    comparewithExpat {<p><termdef> (see <specref/>), which is
+referred to in </termdef></p>}
+} 1
+
+test pp-2.18 {expat/pull comparsion} {
+    comparewithExpat {<p>This specification defines the syntax and semantics of the XSLT
 language.  A transformation in the XSLT language is expressed as a
 well-formed XML document <bibref/>conforming </p>}
 } 1
