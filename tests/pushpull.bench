@@ -1,0 +1,96 @@
+# -*- tcl -*-
+#
+# This file contains a number of benchmarks for push (expat) and pull
+# (tDOM::pullparser) parser.
+#
+# (c) 2018 Rolf Ade <rolf@pointsman.de>
+#
+
+
+# ### ### ### ######### ######### ######### ###########################
+## Setting up the environment ...
+
+package require tdom 
+
+# ### ### ### ######### ######### ######### ###########################
+## Benchmarks.
+
+
+proc loopPullE {} {
+    while {[set state [pullparser next]] ne "END_DOCUMENT"} {
+        switch $state {
+            "START_TAG" {
+                append pullstr [pullparser tag]
+                foreach {attname attvalue} [pullparser attributes] {
+                    append pullstr $attname $attvalue
+                }
+            }
+            "TEXT" {
+                append pullstr [pullparser text]
+            }
+            "END_TAG" {
+                append pullstr /[pullparser tag]
+            }
+        }
+    }
+    return $pullstr
+}
+
+proc elementstart {name atts} {
+    global expatstr
+
+    append expatstr $name
+    foreach {attname attvalue} $atts {
+        append expatstr $attname $attvalue
+    }
+}
+
+proc elementend {name} {
+    global expatstr
+
+    append expatstr /$name
+}
+
+proc cdata {cdata} {
+    global expatstr
+
+    append expatstr $cdata
+}
+
+bench -desc "push/allstring mondial-europe.xml" -pre {
+    set expatstr ""
+    expat pushparser \
+        -elementstartcommand elementstart \
+        -elementendcommand elementend \
+        -characterdatacommand cdata
+} -iters 1 -body {
+    pushparser parsefile ../tests/data/mondial-europe.xml
+} -post {
+    expat free
+}
+
+bench -desc "pull/allstring mondial-europe.xml" -pre {
+    tDOM::pullparser pullparser
+    set pullstr ""
+} -iters 1 -body {
+    pullparser inputfile ../tests/data/mondial-europe.xml
+    while {[set state [pullparser next]] ne "END_DOCUMENT"} {
+        switch $state {
+            "START_TAG" {
+                append pullstr [pullparser tag]
+                foreach {attname attvalue} [pullparser attributes] {
+                    append pullstr $attname $attvalue
+                }
+            }
+            "TEXT" {
+                append pullstr [pullparser text]
+            }
+            "END_TAG" {
+                append pullstr /[pullparser tag]
+            }
+        }
+    }
+    pullparser reset
+} -post {
+    pullparser delete
+}
