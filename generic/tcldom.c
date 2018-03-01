@@ -186,6 +186,7 @@
     } ThreadSpecificData;
     static Tcl_ThreadDataKey dataKey;
     static Tcl_HashTable     sharedDocs;
+    static Tcl_HashTable     *sharedDocsPtr = &sharedDocs;
     static Tcl_Mutex         tableMutex;
     static int               tcldomInitialized;
 #   define TSD(x)            tsdPtr->x
@@ -433,7 +434,8 @@ tcldom_Finalize(
 )
 {
     Tcl_MutexLock(&tableMutex);
-    Tcl_DeleteHashTable(&sharedDocs);
+    Tcl_DeleteHashTable(sharedDocsPtr);
+	sharedDocsPtr = NULL;
     Tcl_MutexUnlock(&tableMutex);
 }
 
@@ -447,7 +449,7 @@ void tcldom_initialize(void)
 {
     if (!tcldomInitialized) {
         Tcl_MutexLock(&tableMutex);
-        Tcl_InitHashTable(&sharedDocs, TCL_ONE_WORD_KEYS);
+        Tcl_InitHashTable(sharedDocsPtr, TCL_ONE_WORD_KEYS);
         Tcl_CreateExitHandler(tcldom_Finalize, NULL);
         tcldomInitialized = 1;
         Tcl_MutexUnlock(&tableMutex);
@@ -797,7 +799,10 @@ int tcldom_returnDocumentObj (
     }
     
     if (!forOwnerDocument) {
-        TDomThreaded(tcldom_RegisterDocShared(document));
+        TDomThreaded(if (tcldom_RegisterDocShared(document)) {
+			SetResult("Could not register document");
+			return TCL_ERROR;
+		};)
     }
     SetResult(objCmdName);
 
@@ -7085,16 +7090,20 @@ int tcldom_RegisterDocShared (
 #else
     ++doc->refCount;
 #endif
-    entryPtr = Tcl_CreateHashEntry(&sharedDocs, (char*)doc, &newEntry);
-    if (newEntry) {
-        Tcl_SetHashValue(entryPtr, (ClientData)doc);
-    }
-    Tcl_MutexUnlock(&tableMutex);
+	if (sharedDocsPtr == NULL) {
+		return 1;
+	} else {
+		entryPtr = Tcl_CreateHashEntry(sharedDocsPtr, (char*)doc, &newEntry);
+		if (newEntry) {
+			Tcl_SetHashValue(entryPtr, (ClientData)doc);
+		}
+		Tcl_MutexUnlock(&tableMutex);
 
-    DBG(fprintf(stderr, "--> tcldom_RegisterDocShared: doc %p %s "
-                "shared table now with refcount of %d\n", doc,
-                newEntry ? "entered into" : "already in", refCount));
-    return 0;
+		DBG(fprintf(stderr, "--> tcldom_RegisterDocShared: doc %p %s "
+					"shared table now with refcount of %d\n", doc,
+					newEntry ? "entered into" : "already in", refCount));
+		return 0;
+	}
 }
 
 /*----------------------------------------------------------------------------
@@ -7117,13 +7126,17 @@ int tcldom_UnregisterDocShared (
         doc->refCount--;
         deleted = 0;
     } else {
-        Tcl_HashEntry *entryPtr = Tcl_FindHashEntry(&sharedDocs, (char*)doc);
-        if (entryPtr) {
-            Tcl_DeleteHashEntry(entryPtr);
-            deleted = 1;
-        } else {
-            deleted = 0;
-        }
+		if (sharedDocsPtr == NULL) {
+			deleted = 0;
+		} else {
+			Tcl_HashEntry *entryPtr = Tcl_FindHashEntry(sharedDocsPtr, (char*)doc);
+			if (entryPtr) {
+				Tcl_DeleteHashEntry(entryPtr);
+				deleted = 1;
+			} else {
+				deleted = 0;
+			}
+		}
     }
     Tcl_MutexUnlock(&tableMutex);
 
@@ -7147,15 +7160,19 @@ int tcldom_CheckDocShared (
     domDocument *tabDoc = NULL;
     int found = 0;
 
-    Tcl_MutexLock(&tableMutex);
-    entryPtr = Tcl_FindHashEntry(&sharedDocs, (char*)doc);
-    if (entryPtr == NULL) {
-        found = 0;
-    } else {
-        tabDoc = (domDocument*)Tcl_GetHashValue(entryPtr);
-        found  = tabDoc ? 1 : 0;
-    }
-    Tcl_MutexUnlock(&tableMutex);
+	if (sharedDocsPtr == NULL) {
+		found = 0;
+	} else {
+		Tcl_MutexLock(&tableMutex);
+		entryPtr = Tcl_FindHashEntry(sharedDocsPtr, (char*)doc);
+		if (entryPtr == NULL) {
+			found = 0;
+		} else {
+			tabDoc = (domDocument*)Tcl_GetHashValue(entryPtr);
+			found  = tabDoc ? 1 : 0;
+		}
+		Tcl_MutexUnlock(&tableMutex);
+	}
 
     if (found && doc != tabDoc) {
         Tcl_Panic("document mismatch; doc=%p, in table=%p\n", doc, tabDoc);
