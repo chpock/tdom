@@ -1,5 +1,5 @@
-C Made\sthe\s'load\stDOM\sfor\stest\ssuite\srun'\shelper\sscript\sa\sbit\smore\sflexible.
-D 2018-03-02T15:39:40.009
+C Done\ssomething\swith\s[e831cf931a07d].
+D 2018-03-06T22:48:35.678
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -149,7 +149,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 93450ac7574ca1b45c754de9d4b01197c83bc3da1450d21a590206b837c970e6
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
-F generic/tcldom.c 228e8353a1e8f3c774f1abb3bd57ed68ae523eb33bde41e0d66e101a8eb9540b
+F generic/tcldom.c 5ec78e1acb36f517e021fd19a8326944da320d4f619c95dc64768c414c841182
 F generic/tcldom.h 2e8edc2bf095200c419a740fed626f4fdcba274125e0234366e84a25bb0c2b25
 F generic/tclexpat.c ddcae4c997dcbc75b64e844ad4045dcad64a9db54d66d01452baf34a12485d80
 F generic/tclexpat.h 816f43b0a00c9b0ce5e9d17aea8cab1c57b6aa30873164ba24467fbd4b87059b
@@ -237,8 +237,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P d5ec6fc8889ed021cc727bf11deff862bf0cbdd7652d3e03f4c3cd2d40d84ed6
-R ccb5b69f8d1e81a81af15573682a6e47
+P 35c762d5858b6ac145e7c906fb71abb7cdf96e90f6ef6bdee0a568ff6702d0cb
+R 5885f703ab24e71851096ec47acde803
 U rolf
-Z 12bfd3cc8a3177f08745d72c31581dcb
+Z 5ffd7ac1989309df0f83f0e9dbf93d94
 # Remove this line to create a well-formed Fossil manifest.
