@@ -709,11 +709,13 @@ TclExpatInstanceCmd (
 
   static CONST84 char *options[] = {
       "configure", "cget", "currentmarkup", "free", "get",
-      "parse", "parsechannel", "parsefile", "reset", NULL
+      "parse", "parsechannel", "parsefile", "reset", "delete",
+      NULL
   };
   enum options {
       EXPAT_CONFIGURE, EXPAT_CGET, EXPAT_CURRENTMARKUP, EXPAT_FREE, EXPAT_GET,
-      EXPAT_PARSE, EXPAT_PARSECHANNEL, EXPAT_PARSEFILE, EXPAT_RESET
+      EXPAT_PARSE, EXPAT_PARSECHANNEL, EXPAT_PARSEFILE, EXPAT_RESET,
+      EXPAT_DELETE
   };
 
 
@@ -776,12 +778,13 @@ TclExpatInstanceCmd (
         result = TCL_OK;
         break;
 
+    case EXPAT_DELETE:
     case EXPAT_FREE:
 
         CheckArgs (2,2,1,"");
 
         if (expat->parsingState > 1) {
-            Tcl_SetResult (interp, "parser freeing not allowed from within "
+            Tcl_SetResult (interp, "parser delete not allowed from within "
                            "callback", TCL_STATIC);
             result = TCL_ERROR;
         } else {
