@@ -2361,11 +2361,6 @@ TclGenExpatElementEndHandler(
 
               Tcl_ListObjAppendElement(expat->interp, cmdPtr,
                                        Tcl_NewStringObj((char *)name, -1));
-
-              /*
-               * It would be desirable to be able to terminate parsing
-               * if the return result is TCL_ERROR or TCL_BREAK.
-               */
 #if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
               result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
 #else

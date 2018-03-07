@@ -1,5 +1,5 @@
-C This\sis\san\simportant\sbut\shard\sto\sexplain\sbug\sfix.\sThe\ssymptom\swas:\susing\sexpat\sin\sa\scertain\sway\s(triggering\sthe\s"Welch\sdispatch"\smethod\sof\scalling\shandler\sscripts\sbehind\sthe\sscene)\ssuffered\sfrom\sa\sdramatic\sslowdown\swith\s8.6,\swhile\sit\swas\sthe\sfastest\smethod\sof\susing\sexpat\swith\sall\sother\sversions\s<\s8.6.\sThis\schanges\sadapts\stDOM\sto\sthe\srelevant\score\schanges.
-D 2018-03-07T00:03:48.400
+C Removed\sobsolete\scomment.\sIt\sis\salready\spossible\sto\sterminate\sparsing\swith\scertain\sresult\scodes.\sThis\sis\shandled\sin\sTclExpatHandlerResult().
+D 2018-03-07T00:06:16.243
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -151,7 +151,7 @@ F generic/nodecmd.c 93450ac7574ca1b45c754de9d4b01197c83bc3da1450d21a590206b837c9
 F generic/nodecmd.h 42a9b529fbf79ee58d93fc5a07e2d2ac118f6e34
 F generic/tcldom.c 5ec78e1acb36f517e021fd19a8326944da320d4f619c95dc64768c414c841182
 F generic/tcldom.h 2e8edc2bf095200c419a740fed626f4fdcba274125e0234366e84a25bb0c2b25
-F generic/tclexpat.c 5335807bf7b05023504a6f137de2a4d854c476906e597a8487186a3c69dd00d7
+F generic/tclexpat.c 7846697bc6ea455fca15d02a83e741c22ff4c11abc3b875b8800e04867e80e3f
 F generic/tclexpat.h 816f43b0a00c9b0ce5e9d17aea8cab1c57b6aa30873164ba24467fbd4b87059b
 F generic/tdom.decls d825af72ec3fd2ae4ebb1d7f883bde6e3613c914
 F generic/tdom.h d27e43748242d5fe7dd98b8c7aa4a5a891d015bf
@@ -237,8 +237,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a99a29a3aa1fc22b68fd735a84e4f67341e8985dcb2c2ce66511bbc71208df86
-R e8f7cfec8311174e7a1abb7b01dfb17f
+P 32df86b4d483f768560e25acab029574cd83633ad5b6d2f2d261089ba96ef9a3
+R fe14928376ba1481921bf13ed9a83bbe
 U rolf
-Z c0cb0e024a11686370e7a0b107d4cc07
+Z 1bce4414555c67739888a1b7c0294772
 # Remove this line to create a well-formed Fossil manifest.
