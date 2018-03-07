@@ -432,8 +432,10 @@ tcldom_Finalize(
     ClientData unused
 )
 {
+    DBG(fprintf(stderr, "--> tcldom_Finalize\n"));
     Tcl_MutexLock(&tableMutex);
     Tcl_DeleteHashTable(&sharedDocs);
+    tcldomInitialized = 0;
     Tcl_MutexUnlock(&tableMutex);
 }
 
@@ -446,6 +448,7 @@ tcldom_Finalize(
 void tcldom_initialize(void)
 {
     if (!tcldomInitialized) {
+        DBG(fprintf(stderr, "--> tcldom_initialize\n"));
         Tcl_MutexLock(&tableMutex);
         Tcl_InitHashTable(&sharedDocs, TCL_ONE_WORD_KEYS);
         Tcl_CreateExitHandler(tcldom_Finalize, NULL);
@@ -7074,7 +7077,7 @@ int tcldom_RegisterDocShared (
 )
 {
     Tcl_HashEntry *entryPtr;
-    int newEntry;
+    int newEntry = 0;
 #ifdef DEBUG    
     int refCount;
 #endif
@@ -7117,10 +7120,14 @@ int tcldom_UnregisterDocShared (
         doc->refCount--;
         deleted = 0;
     } else {
-        Tcl_HashEntry *entryPtr = Tcl_FindHashEntry(&sharedDocs, (char*)doc);
-        if (entryPtr) {
-            Tcl_DeleteHashEntry(entryPtr);
-            deleted = 1;
+        if (tcldomInitialized) {
+            Tcl_HashEntry *entryPtr = Tcl_FindHashEntry(&sharedDocs, (char*)doc);
+            if (entryPtr) {
+                Tcl_DeleteHashEntry(entryPtr);
+                deleted = 1;
+            } else {
+                deleted = 0;
+            }
         } else {
             deleted = 0;
         }
@@ -7148,12 +7155,14 @@ int tcldom_CheckDocShared (
     int found = 0;
 
     Tcl_MutexLock(&tableMutex);
-    entryPtr = Tcl_FindHashEntry(&sharedDocs, (char*)doc);
-    if (entryPtr == NULL) {
-        found = 0;
-    } else {
-        tabDoc = (domDocument*)Tcl_GetHashValue(entryPtr);
-        found  = tabDoc ? 1 : 0;
+    if (tcldomInitialized) {
+        entryPtr = Tcl_FindHashEntry(&sharedDocs, (char*)doc);
+        if (entryPtr == NULL) {
+            found = 0;
+        } else {
+            tabDoc = (domDocument*)Tcl_GetHashValue(entryPtr);
+            found  = tabDoc ? 1 : 0;
+        }
     }
     Tcl_MutexUnlock(&tableMutex);
 

@@ -2079,6 +2079,7 @@ TclExpatHandlerResult(
   switch (result) {
     case TCL_OK:
       handlerSet->status = TCL_OK;
+      Tcl_ResetResult (expat->interp);
       break;
 
     case TCL_CONTINUE:
@@ -2090,6 +2091,7 @@ TclExpatHandlerResult(
        */
       handlerSet->status = TCL_CONTINUE;
       handlerSet->continueCount = 1;
+      Tcl_ResetResult (expat->interp);
       break;
 
     case TCL_BREAK:
@@ -2097,6 +2099,7 @@ TclExpatHandlerResult(
        * Skip all further callbacks of this handlerSet, but return OK.
        */
       handlerSet->status = TCL_BREAK;
+      Tcl_ResetResult (expat->interp);
       break;
 
     case TCL_ERROR:
@@ -2233,11 +2236,6 @@ TclGenExpatElementStartHandler(
               Tcl_ListObjAppendElement(expat->interp, cmdPtr,
                                        Tcl_NewStringObj((char *)name, -1));
               Tcl_ListObjAppendElement(expat->interp, cmdPtr, atList);
-
-              /*
-               * It would be desirable to be able to terminate parsing
-               * if the return result is TCL_ERROR or TCL_BREAK.
-               */
 #if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
               result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
 #else
@@ -2358,11 +2356,6 @@ TclGenExpatElementEndHandler(
 
               Tcl_ListObjAppendElement(expat->interp, cmdPtr,
                                        Tcl_NewStringObj((char *)name, -1));
-
-              /*
-               * It would be desirable to be able to terminate parsing
-               * if the return result is TCL_ERROR or TCL_BREAK.
-               */
 #if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
               result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
 #else
@@ -2464,11 +2457,6 @@ TclGenExpatStartNamespaceDeclHandler(
                                Tcl_NewStringObj((char *)prefix, -1));
       Tcl_ListObjAppendElement(expat->interp, cmdPtr,
                                Tcl_NewStringObj((char *)uri,    -1));
-
-      /*
-       * It would be desirable to be able to terminate parsing
-       * if the return result is TCL_ERROR or TCL_BREAK.
-       */
 #if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
       result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
 #else
@@ -2562,11 +2550,6 @@ TclGenExpatEndNamespaceDeclHandler(
       Tcl_Preserve((ClientData) expat->interp);
 
       Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)prefix, -1));
-
-      /*
-       * It would be desirable to be able to terminate parsing
-       * if the return result is TCL_ERROR or TCL_BREAK.
-       */
 #if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
       result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
 #else
@@ -2744,11 +2727,6 @@ TclExpatDispatchPCDATA(
 
           Tcl_ListObjAppendElement(expat->interp, cmdPtr,
                                    Tcl_NewStringObj((char *)s, len));
-
-          /*
-           * It would be desirable to be able to terminate parsing
-           * if the return result is TCL_ERROR or TCL_BREAK.
-           */
 #if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
           result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
 #else
@@ -2844,11 +2822,6 @@ TclGenExpatProcessingInstructionHandler(
 
       Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)target, strlen(target)));
       Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)data, strlen(data)));
-
-      /*
-       * It would be desirable to be able to terminate parsing
-       * if the return result is TCL_ERROR or TCL_BREAK.
-       */
 #if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
       result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
 #else
@@ -2934,11 +2907,6 @@ TclGenExpatDefaultHandler(
       Tcl_Preserve((ClientData) expat->interp);
 
       Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)s, len));
-
-      /*
-       * It would be desirable to be able to terminate parsing
-       * if the return result is TCL_ERROR or TCL_BREAK.
-       */
 #if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
       result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
 #else
@@ -3059,11 +3027,6 @@ TclGenExpatEntityDeclHandler(
       } else {
           Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)notationName, strlen(notationName)));
       }
-
-      /*
-       * It would be desirable to be able to terminate parsing
-       * if the return result is TCL_ERROR or TCL_BREAK.
-       */
 #if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
       result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
 #else
@@ -3163,11 +3126,6 @@ TclGenExpatNotationDeclHandler(
       } else {
           Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)publicId, strlen(publicId)));
       }
-
-      /*
-       * It would be desirable to be able to terminate parsing
-       * if the return result is TCL_ERROR or TCL_BREAK.
-       */
 #if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
       result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
 #else
