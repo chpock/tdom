@@ -2079,6 +2079,7 @@ TclExpatHandlerResult(
   switch (result) {
     case TCL_OK:
       handlerSet->status = TCL_OK;
+      Tcl_ResetResult (expat->interp);
       break;
 
     case TCL_CONTINUE:
@@ -2090,6 +2091,7 @@ TclExpatHandlerResult(
        */
       handlerSet->status = TCL_CONTINUE;
       handlerSet->continueCount = 1;
+      Tcl_ResetResult (expat->interp);
       break;
 
     case TCL_BREAK:
@@ -2097,6 +2099,7 @@ TclExpatHandlerResult(
        * Skip all further callbacks of this handlerSet, but return OK.
        */
       handlerSet->status = TCL_BREAK;
+      Tcl_ResetResult (expat->interp);
       break;
 
     case TCL_ERROR:
