@@ -1,3 +1,18 @@
+2018-03-09  Rolf Ade  <rolf@pointsman.de>
+
+       Added command tDOM::pullparser, with creates simple XKL "pull"
+       parser commands. This commands parse XML input and stop at
+       certain points ("events"). You continue parsing at your will.
+
+2018-03-06  Rolf Ade  <rolf@pointsman.de>
+
+        Fixed a potentially dramatic speed problem, if the expat
+        parser is used w/ "Welch dispatch" with any 8.6 version. The
+        core changed behaviour, we had to adapt.
+
+        Added method "delete" to the [expat] push parser (as an alias
+        to the still there "free").
+
 2018-02-14  Rolf Ade  <rolf@pointsman.de>
 
         Added [dom featureinfo versionhash], which returns the fossil
