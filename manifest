@@ -1,5 +1,5 @@
-C Added\smethod\sdelete\sto\s[expat]\spush\sparsers,\smade\sthe\sup\sto\snow\smethod\sfree\san\salias\sof\sthat.\sTo\shave\sat\sleast\sfor\sdeletion\ssome\sconsistence\sabout\sthe\sobj\scmds\sthat\stDOM\screates.
-D 2018-03-07T00:45:06.014
+C Make\spull\sparser\sa\sreal\sthing.
+D 2018-03-09T00:16:28.663
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -12,9 +12,9 @@ F README a097b51b559f421a68a12d2901766a0bf2520b19
 F README.AOL d076b065f6a3209b5374a63c9ddd7fbca167643e
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/xslt.tcl ac4a75ba2f05e26d4ea6f92547983caa80fc6d55
-F configure c67c8f7586dd54719b8c3e943847277eeeb932d5 x
+F configure 84d4a7acedeb6eccc8569f9a6cedd870e778dfe3 x
 F configure-tcl8.0.5 db1a666545d519c42e229d245224d456a84c798a x
-F configure.in d6788a4cb3fe918f78e06fc3b1333854b86c37a7
+F configure.in a8e57ac7b420b7cff1eef7dc52f50eb127bee6c2
 F doc/INDEX.MAP c8e767983bcea4bbd53ecdbf3d78cb044996e9bc
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html 98092b3a6d0fa7ade2cd5715b56ea0a6fef89be1
@@ -36,6 +36,9 @@ F doc/expatapi.xml 8b9d1dcb7f5995ad60a99a56a11abb1d29316ec6
 F doc/index.html 468688212024d55c7005365e86ac4160aae87c79
 F doc/keyword-index.html 5be2401954db258fd6efdee746ba97f02032224c
 F doc/manpage.css 3b4ec1d641048933a7e6bffc659de9519030a959
+F doc/pullparser.html efc571a0f486447e9389148447cca82a0bb9dbdceee48c309a46f0c25214d292
+F doc/pullparser.n 4c203bed303896f19c055540709d8c446d941bccd367494e89146f83cddaf7d3
+F doc/pullparser.xml be21dfe8281f19af9c1c5005719defd9c296f99a5fab78bfab809c143624da07
 F doc/tDOM.xml 35369df6a7d84d68cfb28692530ef9d1a8b8ca3e
 F doc/tdomcmd.html b1406826c77b1079a2276adbf5104953a7b0f309
 F doc/tdomcmd.n 087bbf0cf783376e39ff903a48bc377ce507b8f3
@@ -153,12 +156,14 @@ F generic/tcldom.c 5ec78e1acb36f517e021fd19a8326944da320d4f619c95dc64768c414c841
 F generic/tcldom.h 2e8edc2bf095200c419a740fed626f4fdcba274125e0234366e84a25bb0c2b25
 F generic/tclexpat.c 8bc2f0cb7066635cc8b52aab92bbad780ba7e7e5dbd7700e9ea16dbf052a789e
 F generic/tclexpat.h 816f43b0a00c9b0ce5e9d17aea8cab1c57b6aa30873164ba24467fbd4b87059b
+F generic/tclpull.c 15b334556d6579b70cac191a719ea8f25a97ee5d3606814f63596766ca09bfe4
+F generic/tclpull.h d0d2599fa133de4ab038a260b4cfbd04f01c1312
 F generic/tdom.decls d825af72ec3fd2ae4ebb1d7f883bde6e3613c914
 F generic/tdom.h d27e43748242d5fe7dd98b8c7aa4a5a891d015bf
 F generic/tdomDecls.h 16048318d44a4dc302f849e0e6010e30c5b405980675d7fdfb66e1564ba9edfb
 F generic/tdomStubInit.c 375ebd144c8e09dbe2fe4864e799da2bd0fbe3bce2855346487634c3be49daf0
 F generic/tdomStubLib.c 2387d2887cc357b649e064286c153176627acd7fb024a355fee15844d2cf416d
-F generic/tdominit.c 59882b12cb05be4f2a47efcfe8e011e06cc3fc3267f4ae30a773c947dc8d0d9f
+F generic/tdominit.c 0d9d4ee2adcf379692358de57342f9103d3ab150172ffbef0eca8d1432c156f2
 F generic/utf8conv.c 8d58daa846a0b715df1736720cf9031e924988f2
 F generic/utf8conv.h 4132db4e05ac30dcb78dc3b4799ae0a9ae8a057f
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
@@ -173,7 +178,7 @@ F tdom.m4 a9389c4b82a46f7f3a7250529418ac5764c936af
 F tdomConfig.sh.in 5756c6b431179e49852a607cc2ca01e5381da905
 F tests/JSONTestSuite.tcl 907228f9bd31855951b9033df74c9c15778765af
 F tests/OASIS-suite.tcl 428c0f45f780f5f942c46babd9287277ad0caaed
-F tests/all-bench.tcl 38bc7b4c88f5d679b2fce6c9c2b2ea7d8ad18e90
+F tests/all-bench.tcl 1444cd15eb49d934cb08f75f59b244363372dd23cff13470f5b14580cc33ca47
 F tests/all.tcl 0a8b1e8320bab576c48f02995aa385a90502d4b6
 F tests/attribute.test 53ac8fb043e79b638c8c6f5e7da848f6103552d6
 F tests/cdata.test 5a1dc3bee6353700186d12f0d11b15914849c6be
@@ -208,11 +213,13 @@ F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
 F tests/html5reader.test f839da02dd4b1227a2ee3bae9abfba983951d9ad
 F tests/htmlreader.test 67a0d90dd599e72c1cbf7a5c6f91364c4a83ceaa7ce5cc4ab556302538bbb77a
 F tests/i18n.test 085cc18a881d5d6952267c28cd319dcc72aadbd1
-F tests/loadtdom.tcl db57d45fd21f6949bff843644130bc6d0c17d40af76d4fa82cb981b796b66133
+F tests/loadtdom.tcl 8cdd451c9e11518103e2a4b1ed48476a1b78f378ce2ea145c40cb675d8f58899
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
 F tests/parser.test 7957ceae1fb271cddf7dd8dcc6ed2f903bfdf0adf3662f686a6953919a5a2715
 F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
+F tests/pullparser.test 459adf73853afcea8e2fa7f97d17b5efa4caa590d1b3f0f79f3257ece8f4d070
+F tests/pushpull.bench 4b84a4c5c306e006c8236d1f8b047490d79a538af3f527052db7a1215e5a38c7
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
 F tests/tdomcmd.test 092401adf0609906d710f3ef8997cb4ca29bc208
 F tests/xmlsimple.test a5c577be330f0254d9d7c4bee2c030acd28e703b
@@ -237,8 +244,9 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 71598843fdf9308dbd112b8822bf7e742318778504493601103a47e4865a09cc
-R 18d7457fa166352e37741e989154addb
+P c5d89835b8a41f849aa3c5b0b9341d58f17b5375b73754dfae33ba2550848139 4c3629f439a3a6e91722a0efca46d8f16753847caba88f63fd540520a02c545c
+R b992651d8b5c181bc5d00c4f9934a458
+T +closed 4c3629f439a3a6e91722a0efca46d8f16753847caba88f63fd540520a02c545c
 U rolf
-Z 6d893bba1bfef5cfb81980775e013ec5
+Z b33ce940c9e82c295da654b37d697702
 # Remove this line to create a well-formed Fossil manifest.
