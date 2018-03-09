@@ -1,9 +1,9 @@
-C Noted\suser\svisible\schanges.
-D 2018-03-09T00:38:59.549
+C Indentation.
+D 2018-03-09T00:58:23.119
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
-F CHANGES b556cc440cd24b117843452eed15c7b85c798ca0a60ecb0e67bdb3622d77b26b
+F CHANGES 4b7d4d712d7958c21a898f224d9d8a80b762d7cc915a32ba326fce5e79f8c221
 F ChangeLog 9b60ec8bfbae84e4f1a97aaee24be00ccea212b7
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 31c74d9719d90506d0015986e688ebf84cb01d2138c80a442ce0ea8f6de59935
@@ -244,8 +244,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P e96d74234da5b0fb51bf40400fd446c283288fe04c9a9a187663193c4cf4b46a
-R 948a6ba71fbb4fcded7ca058f3531bda
+P 4cb486509a6e99b7824b3b8ff61653ef09f6a944496c7399b989d0cf380efc62
+R df013be7b6cc74d0acce61a9ac817105
 U rolf
-Z 0b7f2812529f09155678f7771e39b4db
+Z a21eb6717d6ca3126ab737eacef5806c
 # Remove this line to create a well-formed Fossil manifest.
