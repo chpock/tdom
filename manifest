@@ -1,5 +1,5 @@
-C Added\sthe\sexternal\sDTD\sfor\sREC-xslt-19991116.xml\sto\sthe\stest\sdata.\sUsed\sthat\sfor\sa\smore\scomplex\sDTD\svalidation\stest.
-D 2018-03-21T20:14:35.277
+C Refined\sthe\sbenchmark\stests\sto\sexpose\sthe\sDOM\sbuilding\stime\smore.
+D 2018-03-21T20:46:51.270
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -222,7 +222,7 @@ F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
 F tests/pullparser.test 459adf73853afcea8e2fa7f97d17b5efa4caa590d1b3f0f79f3257ece8f4d070
 F tests/pushpull.bench 4b84a4c5c306e006c8236d1f8b047490d79a538af3f527052db7a1215e5a38c7
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
-F tests/tdomcmd.bench c501c06f219b20482405ec115072c12d105cddb58d1d46841fe07a2daade2622
+F tests/tdomcmd.bench 0f97cdc9f9b0e733dcd7e67847ba5d33f109b2277560d514c8f1700d9f3e2b88
 F tests/tdomcmd.test 092401adf0609906d710f3ef8997cb4ca29bc208
 F tests/xmlsimple.test a5c577be330f0254d9d7c4bee2c030acd28e703b
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
@@ -246,8 +246,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 334c4fa6cf40fa74c4ac476f722d861eaae9010c0d575de6c87e5f9473dc7da7
-R fe11d412cd967026e9a6658480ccb744
+P 2f34951b427368616ac435629a396c3576917523753c7ab16d66a8b44e872530
+R 4fb0366cb34ef2347ad347007bcb29c7
 U rolf
-Z f22375db197e77b90435b726c185fb09
+Z 64d1490e22dc273da2ac2e1f16395e84
 # Remove this line to create a well-formed Fossil manifest.

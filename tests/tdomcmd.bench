@@ -15,32 +15,68 @@ package require tdom
 ## Benchmarks.
 
 
-bench -desc "dom mondial-europe.xml" -iters 5 -body {
+bench -desc "dom mondial-europe.xml" -iters 20 -ipre {
     set fd [open ../tests/data/mondial-europe.xml]
+} -body {
     set doc [dom parse -channel $fd]
+} -ipost {
     close $fd
     $doc delete
 }
 
-bench -desc "tdom mondial-europe.xml" -iters 5 -body {
+bench -desc "tdom mondial-europe.xml" -iters 20 -ipre {
     set p [expat]
     tdom $p enable
+} -body {
     $p parsefile ../tests/data/mondial-europe.xml
     set doc [tdom $p getdoc]
+} -ipost {
     $doc delete
+    $p free
 }
 
-bench -desc "dom REC-xslt-19991116.xml" -iters 5 -body {
+bench -desc "tdom mondial-europe.xml / resuse parser" -iters 20 -pre {
+    set p [expat]
+    tdom $p enable
+} -body {
+    $p parsefile ../tests/data/mondial-europe.xml
+    set doc [tdom $p getdoc]
+} -ipost {
+    $doc delete
+    $p reset
+} -post {
+    $p free
+}
+
+bench -desc "dom REC-xslt-19991116.xml" -iters 20 -ipre {
     set fd [open ../tests/data/REC-xslt-19991116.xml]
+} -body {
     set doc [dom parse -channel $fd]
+} -ipost {
     close $fd
     $doc delete
 }
 
-bench -desc "tdom REC-xslt-19991116.xmlmondial-europe.xml" -iters 5 -body {
+bench -desc "tdom REC-xslt-19991116.xml" -iters 20 -ipre {
     set p [expat]
     tdom $p enable
+} -body {
     $p parsefile ../tests/data/REC-xslt-19991116.xml
     set doc [tdom $p getdoc]
+} -ipost {
     $doc delete
+    $p free
+}
+
+bench -desc "tdom REC-xslt-19991116.xml / resuse parser" -iters 20 -pre {
+    set p [expat]
+    tdom $p enable
+} -body {
+    $p parsefile ../tests/data/REC-xslt-19991116.xml
+    set doc [tdom $p getdoc]
+} -ipost {
+    $doc delete
+    $p reset
+} -post {
+    $p free
 }
