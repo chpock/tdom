@@ -1,5 +1,5 @@
-C Started\stest\ssuite\sto\smeasure\soverhead\sof\susing\sstacked\shandler\scompared\swith\s[dom].
-D 2018-03-21T01:54:09.225
+C Added\sthe\sexternal\sDTD\sfor\sREC-xslt-19991116.xml\sto\sthe\stest\sdata.\sUsed\sthat\sfor\sa\smore\scomplex\sDTD\svalidation\stest.
+D 2018-03-21T20:14:35.277
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -125,7 +125,7 @@ F extensions/tnc/pkgIndex.tcl.in 6c224c2cdbb494f621ec008f96fe4a552a79a7b7
 F extensions/tnc/test.tcl 545cdec17e6702cef9f79184fdf1ce0166b8c412
 F extensions/tnc/tests/all.tcl 845c9dab65c294c3570f69cc731d6fef62efbd03
 F extensions/tnc/tests/loadtnc.tcl 2228e517a49106038388055d7e0b959198ab54ce
-F extensions/tnc/tests/tnc.test e204aa4e7c79071d6c941030cd3bfa2fcd540db0
+F extensions/tnc/tests/tnc.test 7f248ada7239ca41ccdb56515b93947bafee1f06d10118adcedfc2885479d540
 F extensions/tnc/tnc.c 26dbaeae9f8c085e78a4eefdeae16f06bd450cd6
 F extensions/tnc/win/makefile.vc b512d0f3eb67d83ace6f626d20b6ed8c895e609d
 F extensions/tnc/win/nmakehlp.c 194ae7c24886245c679cb4c9ea7e6daaaebb5fcd
@@ -198,6 +198,7 @@ F tests/data/dtd-6.6.dtd a1036539ff132635da3e368604b59651a47909e4
 F tests/data/i18n_1.xml 7b4282addd307b17940fffd818de016ca64311fa
 F tests/data/i18n_2.xml 4dc16d8ee2337fbd30061dd1159f6c49b2d0a52c
 F tests/data/mondial-europe.xml 61790f95c676755667358b6ddfc46eb8cc3f470b
+F tests/data/xmlspec-v20.dtd dcb796f8ff379dad58487ed43d12775eed7d6d0ead4658e461f7a731d86a5293
 F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
@@ -245,8 +246,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 7c46ddb63f1ef5f3497813651123fae0196de7b017311a9f28701b9acd7e06f8
-R ecfefb75b2ea2999fcaeedce6d9ded5a
+P 334c4fa6cf40fa74c4ac476f722d861eaae9010c0d575de6c87e5f9473dc7da7
+R fe11d412cd967026e9a6658480ccb744
 U rolf
-Z bba533191850c35e349871c953c2d43b
+Z f22375db197e77b90435b726c185fb09
 # Remove this line to create a well-formed Fossil manifest.
