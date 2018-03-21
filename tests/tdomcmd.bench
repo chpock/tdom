@@ -35,7 +35,7 @@ bench -desc "tdom mondial-europe.xml" -iters 20 -ipre {
     $p free
 }
 
-bench -desc "tdom mondial-europe.xml / resuse parser" -iters 20 -pre {
+bench -desc "tdom mondial-europe.xml / reuse parser" -iters 20 -pre {
     set p [expat]
     tdom $p enable
 } -body {
@@ -68,7 +68,7 @@ bench -desc "tdom REC-xslt-19991116.xml" -iters 20 -ipre {
     $p free
 }
 
-bench -desc "tdom REC-xslt-19991116.xml / resuse parser" -iters 20 -pre {
+bench -desc "tdom REC-xslt-19991116.xml / reuse parser" -iters 20 -pre {
     set p [expat]
     tdom $p enable
 } -body {
@@ -79,4 +79,53 @@ bench -desc "tdom REC-xslt-19991116.xml / resuse parser" -iters 20 -pre {
     $p reset
 } -post {
     $p free
+}
+
+if {![catch {package require tnc}]} {
+
+    proc extresolver {base systemId publicId} {
+        switch $publicId {
+            "-//W3C//DTD Specification V2.0//EN" {
+                set fd [open [file join [file dir [info script]] \
+                                  data/xmlspec-v20.dtd]]
+                set xmlspec [read $fd]
+                close $fd
+                return [list "string" "" $xmlspec]
+            }
+            default {
+                puts stderr "Unexpected systemId '$systemId'"
+                return ""
+            }
+        }
+    }
+    
+    bench -desc "tdom REC-xslt-19991116.xml / tnc " -iters 20 -ipre {
+        set p [expat -externalentitycommand extresolver \
+                   -paramentityparsing always]
+        tdom $p enable
+        tnc $p enable
+    } -body {
+        $p parsefile ../tests/data/REC-xslt-19991116.xml
+        set doc [tdom $p getdoc]
+    } -ipost {
+        $doc delete
+        $p free
+    }
+
+
+    bench -desc "tdom REC-xslt-19991116.xml / tnc / reuse parse" -iters 20 -pre {
+        set p [expat -externalentitycommand extresolver \
+                   -paramentityparsing always]
+        tdom $p enable
+        tnc $p enable
+    } -body {
+        $p parsefile ../tests/data/REC-xslt-19991116.xml
+        set doc [tdom $p getdoc]
+    } -ipost {
+        $doc delete
+        $p reset
+        $p configure -paramentityparsing always
+    } -post {
+        $p free
+    }
 }
