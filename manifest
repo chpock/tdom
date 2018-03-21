@@ -1,5 +1,5 @@
-C Indentation.
-D 2018-03-09T00:58:23.119
+C Started\stest\ssuite\sto\smeasure\soverhead\sof\susing\sstacked\shandler\scompared\swith\s[dom].
+D 2018-03-21T01:54:09.225
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -221,6 +221,7 @@ F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
 F tests/pullparser.test 459adf73853afcea8e2fa7f97d17b5efa4caa590d1b3f0f79f3257ece8f4d070
 F tests/pushpull.bench 4b84a4c5c306e006c8236d1f8b047490d79a538af3f527052db7a1215e5a38c7
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
+F tests/tdomcmd.bench c501c06f219b20482405ec115072c12d105cddb58d1d46841fe07a2daade2622
 F tests/tdomcmd.test 092401adf0609906d710f3ef8997cb4ca29bc208
 F tests/xmlsimple.test a5c577be330f0254d9d7c4bee2c030acd28e703b
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
@@ -244,8 +245,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 4cb486509a6e99b7824b3b8ff61653ef09f6a944496c7399b989d0cf380efc62
-R df013be7b6cc74d0acce61a9ac817105
+P 7c46ddb63f1ef5f3497813651123fae0196de7b017311a9f28701b9acd7e06f8
+R ecfefb75b2ea2999fcaeedce6d9ded5a
 U rolf
-Z a21eb6717d6ca3126ab737eacef5806c
+Z bba533191850c35e349871c953c2d43b
 # Remove this line to create a well-formed Fossil manifest.
