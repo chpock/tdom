@@ -1228,6 +1228,7 @@ int tcldom_appendXML (
                           extResolver,
                           0,
                           (int) XML_PARAM_ENTITY_PARSING_ALWAYS,
+                          0,
                           interp,
                           &resultcode);
     if (extResolver) {
@@ -6156,6 +6157,7 @@ int tcldom_parse (
     int          useForeignDTD       = 0;
     int          paramEntityParsing  = (int)XML_PARAM_ENTITY_PARSING_ALWAYS;
     int          keepCDATA           = 0;
+    int          dtdvalidation       = 0;
     int          status              = 0;
     domDocument *doc;
     Tcl_Obj     *newObjName = NULL;
@@ -6172,7 +6174,7 @@ int tcldom_parse (
         "-html5",
 #endif
         "-jsonmaxnesting",        "-ignorexmlns",   "--",
-        "-keepCDATA",                NULL
+        "-keepCDATA",             "-dtdvalidation", NULL
     };
     enum parseOption {
         o_keepEmpties,            o_simple,         o_html,
@@ -6183,7 +6185,7 @@ int tcldom_parse (
         o_htmlfive,
 #endif
         o_jsonmaxnesting,         o_ignorexmlns,    o_LAST,
-        o_keepCDATA
+        o_keepCDATA,              o_dtdvalidation
     };
 
     static CONST84 char *paramEntityParsingValues[] = {
@@ -6414,6 +6416,10 @@ int tcldom_parse (
             keepCDATA = 1;
             objv++;  objc--; break;
             
+        case o_dtdvalidation:
+            dtdvalidation = 0;
+            objv++;  objc--; break;
+            
         }
         if ((enum parseOption) optionIndex == o_LAST) break;
     }
@@ -6573,6 +6579,7 @@ int tcldom_parse (
                           extResolver,
                           useForeignDTD,
                           paramEntityParsing,
+                          dtdvalidation,
                           interp,
                           &status);
     if (doc == NULL) {

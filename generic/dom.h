@@ -749,6 +749,7 @@ domDocument *  domReadDocument   (XML_Parser parser,
                                   Tcl_Obj *extResolver,
                                   int   useForeignDTD,
                                   int   paramEntityParsing,
+                                  int   dtdvalidation,
                                   Tcl_Interp *interp,
                                   int  *status);
 
