@@ -1437,7 +1437,7 @@ TncEndDoctypeDeclHandler (userData)
         }
         entryPtr = Tcl_NextHashEntry (&search);
     }
-    tncdata->status = 1;
+    tncdata->dtdstatus = 1;
 }
 
 /*
@@ -2064,6 +2064,149 @@ TncProbeAttribute (userData, elemAtts, attrName, attrValue, nrOfreq)
     return 1;
 }
 
+/*
+ *----------------------------------------------------------------------------
+ *
+ * TncProbeElementEnd --
+ *
+ *	This procedure checks, if the current content allows the
+ *      the element to end here.
+ *
+ * Results:
+ *	1 if element end is OK,
+ *      0 if not.
+ *
+ * Side effects:
+ *	Let the contentStackPtr point to the last current content
+ *      model before the element had started.
+ *
+ *----------------------------------------------------------------------------
+ */
+
+static int
+TncProbeElementEnd (tncdata)
+    domReadInfo *tncdata;
+{
+    TNC_ContentStack stackelm;
+    unsigned int i;
+    int zeroMatchPossible, seqstartindex;
+
+    stackelm = tncdata->contentStack[tncdata->contentStackPtr - 1];
+    switch (stackelm.model->type) {
+    case XML_CTYPE_MIXED:
+    case XML_CTYPE_ANY:
+    case XML_CTYPE_EMPTY:
+        return 1;
+    case XML_CTYPE_CHOICE:
+        if (stackelm.alreadymatched) {
+            return 1;
+        }
+
+        if (stackelm.model->quant == XML_CQUANT_REP ||
+            stackelm.model->quant == XML_CQUANT_OPT) {
+            return 1;
+        }
+        zeroMatchPossible = 0;
+        for (i = 0; i < stackelm.model->numchildren; i++) {
+            if ((&stackelm.model->children[i])->type == XML_CTYPE_NAME) {
+                if ((&stackelm.model->children[i])->quant == XML_CQUANT_OPT ||
+                    (&stackelm.model->children[i])->quant == XML_CQUANT_REP) {
+                    zeroMatchPossible = 1;
+                    break;
+                }
+            }
+            else {
+                if (tncdata->contentStackPtr == tncdata->contentStackSize) {
+                    tncdata->contentStack = (TNC_ContentStack *)
+                        Tcl_Realloc ((char *)tncdata->contentStack,
+                                     sizeof (TNC_Content *) * 2 *
+                                     tncdata->contentStackSize);
+                    tncdata->contentStackSize *= 2;
+                }
+                (&tncdata->contentStack[tncdata->contentStackPtr])->model
+                    = &stackelm.model->children[i];
+                tncdata->contentStack[tncdata->contentStackPtr].activeChild
+                    = 0;
+                tncdata->contentStack[tncdata->contentStackPtr].deep
+                    = stackelm.deep + 1;
+                tncdata->contentStack[tncdata->contentStackPtr].alreadymatched
+                    = 0;
+                tncdata->contentStackPtr++;
+                if (TncProbeElementEnd (tncdata)) {
+                    zeroMatchPossible = 1;
+                    tncdata->contentStackPtr--;
+                    break;
+                }
+                tncdata->contentStackPtr--;
+            }
+        }
+        if (zeroMatchPossible) {
+            return 1;
+        } else {
+            return 0;
+        }
+    case XML_CTYPE_SEQ:
+        if (!stackelm.alreadymatched) {
+            if (stackelm.model->quant == XML_CQUANT_REP ||
+                stackelm.model->quant == XML_CQUANT_OPT) {
+                return 1;
+            }
+        }
+        if (!stackelm.alreadymatched) {
+            seqstartindex = 0;
+        }
+        else {
+            seqstartindex = stackelm.activeChild + 1;
+        }
+        for (i = seqstartindex; i < stackelm.model->numchildren; i++) {
+            if ((&stackelm.model->children[i])->type == XML_CTYPE_NAME) {
+                if ((&stackelm.model->children[i])->quant == XML_CQUANT_OPT ||
+                    (&stackelm.model->children[i])->quant == XML_CQUANT_REP) {
+                    continue;
+                } else {
+                    return 0;
+                }
+            } else {
+                if (tncdata->contentStackPtr == tncdata->contentStackSize) {
+                    tncdata->contentStack = (TNC_ContentStack *)
+                        Tcl_Realloc ((char *)tncdata->contentStack,
+                                     sizeof (TNC_Content *) * 2 *
+                                     tncdata->contentStackSize);
+                    tncdata->contentStackSize *= 2;
+                }
+                (&tncdata->contentStack[tncdata->contentStackPtr])->model
+                    = &stackelm.model->children[i];
+                tncdata->contentStack[tncdata->contentStackPtr].activeChild
+                    = 0;
+                tncdata->contentStack[tncdata->contentStackPtr].deep
+                    = stackelm.deep + 1;
+                tncdata->contentStack[tncdata->contentStackPtr].alreadymatched
+                    = 0;
+                tncdata->contentStackPtr++;
+                if (TncProbeElementEnd (tncdata)) {
+                    tncdata->contentStackPtr--;
+                    continue;
+                }
+                else {
+                    tncdata->contentStackPtr--;
+                    return 0;
+                }
+            }
+        }
+        return 1;
+    case XML_CTYPE_NAME:
+        /* NAME type dosen't occur at top level of a content model and is
+           handled in some "shotcut" way directly in the CHOICE and SEQ cases.
+           It's only here to pacify gcc -Wall. */
+        fprintf (stderr, "error!!! - in TncProbeElementEnd: XML_CTYPE_NAME "
+                 "shouldn't be reached in any case.\n");
+    default:
+        fprintf (stderr, "error!!! - in TncProbeElementEnd: unknown content "
+                 "type: %d\n", stackelm.model->type);
+        return 1;
+    }
+}
+
 /*---------------------------------------------------------------------------
 |   startElement
 |
@@ -2539,6 +2682,71 @@ endElement (
     domReadInfo  *info = userData;
 
     DispatchPCDATA (info);
+
+    if (info->dtdvalidation) {
+        domReadInfo *tncdata = info;
+        Tcl_HashEntry *entryPtr;
+        Tcl_HashSearch search;
+
+#ifdef TNC_DEBUG
+        printf ("TncElementEndCommand start\n");
+        printContentStack (tncdata);
+#endif
+        while (1) {
+            if (!TncProbeElementEnd (tncdata)) {
+                signalNotValid (userData, TNC_ERROR_ELEMENT_CAN_NOT_END_HERE);
+                return;
+            }
+            if (tncdata->contentStack[tncdata->contentStackPtr - 1].deep == 0) {
+                break;
+            }
+            tncdata->contentStackPtr--;
+        }
+        /* Remove the content model of the closed element from the stack */
+        tncdata->contentStackPtr--;
+#ifdef TNC_DEBUG
+        printf ("after removing ended element from the stack\n");
+        printContentStack (tncdata);
+#endif
+        if (tncdata->contentStackPtr) {
+            switch ((&tncdata->contentStack[tncdata->contentStackPtr - 1])->model->type) {
+            case XML_CTYPE_MIXED:
+            case XML_CTYPE_ANY:
+                tncdata->skipWhiteCDATAs = 1;
+                tncdata->ignorePCDATA = 1;
+                break;
+            case XML_CTYPE_EMPTY:
+                tncdata->skipWhiteCDATAs = 0;
+                break;
+            case XML_CTYPE_CHOICE:
+            case XML_CTYPE_SEQ:
+            case XML_CTYPE_NAME:
+                tncdata->skipWhiteCDATAs = 1;
+                tncdata->ignorePCDATA = 0;
+                break;
+            }
+        } else {
+            /* This means, the root element is closed,
+               therefor the place to check, if every IDREF points
+               to a ID. */
+            if (tncdata->idCheck) {
+                for (entryPtr = Tcl_FirstHashEntry (tncdata->ids, &search);
+                     entryPtr != NULL;
+                     entryPtr = Tcl_NextHashEntry (&search)) {
+#ifdef TNC_DEBUG
+                    printf ("check id value %s\n",
+                            Tcl_GetHashKey (tncdata->ids, entryPtr));
+                    printf ("value %p\n", Tcl_GetHashValue (entryPtr));
+#endif
+                    if (!Tcl_GetHashValue (entryPtr)) {
+                        signalNotValid (userData, TNC_ERROR_UNKNOWN_ID_REFERRED);
+                        return;
+                    }
+                }
+            }
+        }
+    }
+    
     
     info->depth--;
     if (!info->ignorexmlns) {
@@ -2570,13 +2778,36 @@ endElement (
 static void
 characterDataHandler (
     void        *userData,
-    const char  *s,
+    const char  *data,
     int          len
 )
 {
     domReadInfo   *info = userData;
 
-    Tcl_DStringAppend (info->cdata, s, len);
+    Tcl_DStringAppend (info->cdata, data, len);
+    if (info->dtdvalidation) {
+        domReadInfo *tncdata = info;
+        int i;
+        char *pc;
+
+        if (!tncdata->skipWhiteCDATAs && len > 0) {
+            signalNotValid (userData, TNC_ERROR_EMPTY_ELEMENT);
+            return;
+        }
+        if (!tncdata->ignorePCDATA) {
+            for (i = 0, pc = (char*)data; i < len; i++, pc++) {
+                if ( (*pc == ' ')  ||
+                     (*pc == '\n') ||
+                     (*pc == '\r') ||
+                     (*pc == '\t') ) {
+                    continue;
+                }
+                signalNotValid (userData, TNC_ERROR_DISALLOWED_PCDATA);
+                return;
+            }
+        }
+    }
+    
     return;
     
 }

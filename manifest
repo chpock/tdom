@@ -1,5 +1,5 @@
-C Started\smusing\sabout\swhat\sit\smeans\sto\sintegrate\sXML\sDTD\svalidation\sinto\sthe\sdom\scommand\s(on\svarious\sscales).
-D 2018-03-24T02:04:48.482
+C Added\scode\sto\sthe\slast\smissing\shandlers.\sSome\ssmaller\sthings\s(reporting,\sforeign\sDTD)\sbut\sotherwise\sshould\sbe\salmost\sthere.
+D 2018-03-24T16:09:39.416
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -126,14 +126,14 @@ F extensions/tnc/test.tcl 545cdec17e6702cef9f79184fdf1ce0166b8c412
 F extensions/tnc/tests/all.tcl 845c9dab65c294c3570f69cc731d6fef62efbd03
 F extensions/tnc/tests/loadtnc.tcl 2228e517a49106038388055d7e0b959198ab54ce
 F extensions/tnc/tests/tnc.test 7f248ada7239ca41ccdb56515b93947bafee1f06d10118adcedfc2885479d540
-F extensions/tnc/tnc.c 26dbaeae9f8c085e78a4eefdeae16f06bd450cd6
+F extensions/tnc/tnc.c da85614c92b0f50c8186ea8a4fe8a06bb26e84061a095773be889607646b537d
 F extensions/tnc/win/makefile.vc b512d0f3eb67d83ace6f626d20b6ed8c895e609d
 F extensions/tnc/win/nmakehlp.c 194ae7c24886245c679cb4c9ea7e6daaaebb5fcd
 F extensions/tnc/win/rules-ext.vc e788fcfc1e69b11946e18b8f67e0870b3bd38913
 F extensions/tnc/win/rules.vc 8157e2a811cf5e93683d6b0fbf5d91d153aa4535
 F extensions/tnc/win/targets.vc 79dea1c6a94a94e6ed8bae9e0195149b25a69923
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
-F generic/dom.c fe79040674c692fd04076dbe7198ad5e86c74dd7175febed1501161af51ddadd
+F generic/dom.c ef1ac71e0ce5ef83e47ff254d685b30db6e7601f99dd4a19407a9bb024fd659c
 F generic/dom.h 0c6f8d20c97a1b45f3045527b1b767c6aecc1b99fe917cc38095e2e4b92c38cf
 F generic/domalloc.c 55e9eeff19cc54cf3956a7013883ead07efd3593
 F generic/domalloc.h 4830a81539dc0323fbdc98f613df33fd38736da60e1ff5891b5c328eb1a6881d
@@ -246,8 +246,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 6ade23ef3eae74dba2c0021e07e02cfed3e398572411b112fa61a378d9a51ef7
-R dbae491036423e4d0b80892fc0acd397
+P 5bd1293e5326f5c2c35560a2a8eb0a96b2b68959508589f4637a0c118eb7ad42
+R c97e8ad27cf434121b3cb5c9ea245cec
 U rolf
-Z 57763e5efb9cb008b1bfc7eb5956ccef
+Z 58e223c105d4a4409e60726670659f9a
 # Remove this line to create a well-formed Fossil manifest.
