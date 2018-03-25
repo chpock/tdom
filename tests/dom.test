@@ -664,6 +664,32 @@ test dom-2.41 {-keepCDATA and -keepEmpties} {
     set result
 } 1
 
+proc dom-2.42-resolver {base systemId publicId} {
+    switch $publicId {
+        "-//W3C//DTD Specification V2.0//EN" {
+            set fd [open [file join [file dir [info script]] \
+                              data/xmlspec-v20.dtd]]
+            set xmlspec [read $fd]
+            close $fd
+            return [list "string" "" $xmlspec]
+        }
+        default {
+            puts stderr "Unexpected systemId '$systemId'"
+            return ""
+        }
+    }
+}
+
+test dom-2.42 {-validate} {
+    set file [file join [file dir [info script]] data/REC-xslt-19991116.xml]
+    set fd [open $file]
+    set doc [dom parse -dtdvalidation \
+                 -channel $fd \
+                 -baseurl file://$file \
+                 -externalentitycommand dom-2.42-resolver]
+    $doc delete
+} {}
+
 test dom-3.1 {isName} {
     dom isName ":foo"
 } {1}

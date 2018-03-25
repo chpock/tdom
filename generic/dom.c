@@ -457,10 +457,17 @@ signalNotValid (userData, code)
     int          code;
 {
     domReadInfo *tncdata = (domReadInfo *) userData;
-
-    tncdata->dtdstatus = 1;
-    Tcl_SetResult (tncdata->interp, (char *)TNC_ErrorString (code),
-                   TCL_VOLATILE);
+    char linenr[50], colnr[50];
+    
+    
+    tncdata->status = TCL_ERROR;
+    sprintf(linenr, "%ld", XML_GetCurrentLineNumber(tncdata->parser));
+    sprintf(colnr, "%ld", XML_GetCurrentColumnNumber(tncdata->parser));
+    Tcl_ResetResult (tncdata->interp);
+    Tcl_AppendResult (tncdata->interp, "At line ", linenr, ", column ",
+                      colnr, ": ", (char *)TNC_ErrorString (code),
+                      NULL);
+    XML_StopParser(tncdata->parser, 1);
 }
 
 /*---------------------------------------------------------------------------
@@ -4158,7 +4165,7 @@ domReadDocument (
         status = XML_Parse(parser, xml, length, 1);
         switch (status) {
         case XML_STATUS_SUSPENDED:
-            DBG(fprintf(stderr, "XML_STATUS_SUSPENDED\n");)
+            DBG(fprintf(stderr, "XML_STATUS_SUSPENDED\n"));
             if (info.status == TCL_BREAK) {
                 Tcl_ResetResult(interp);
             }

@@ -6417,7 +6417,7 @@ int tcldom_parse (
             objv++;  objc--; break;
             
         case o_dtdvalidation:
-            dtdvalidation = 0;
+            dtdvalidation = 1;
             objv++;  objc--; break;
             
         }
