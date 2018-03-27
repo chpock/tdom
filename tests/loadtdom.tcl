@@ -8,8 +8,12 @@
 
 package require tcltest
 namespace import ::tcltest::*
-package require -exact tdom 0.9.1
-if {[lsearch [namespace children] ::tDOM] == -1} {
+if {[catch {package require -exact tdom 0.9.1}]} {
+    if {[catch {load [file join [file dir [info script]] ../unix/libtdom0.9.1.so]}]} {
+        error "Unable to load the appropriate tDOM version!"
+    }
+}
+if {[info commands ::tDOM::xmlReadFile] eq ""} {
     # tcldomsh without the script library. Source the lib.
     source [file join [file dir [info script]] ../lib tdom.tcl]
 }
