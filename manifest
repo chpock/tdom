@@ -1,5 +1,5 @@
-C Merged\sfrom\strunk.
-D 2018-04-06T15:57:07.439
+C Removed\sa\sCONST\scomming\sfrom\strunk\sand\sa\sfew\sothers\sthat\sdangled\saround.
+D 2018-04-06T16:06:50.768
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -157,12 +157,12 @@ F generic/tcldom.h 2e8edc2bf095200c419a740fed626f4fdcba274125e0234366e84a25bb0c2
 F generic/tclexpat.c 02a14d770a1394705dd319299d3e88613ee7c8c08f85fdfff097cb05bd3bd232
 F generic/tclexpat.h 82c3d9efe50617f2e0883c520240e6ab17b830e56d6786cd88d2fa31294c02c5
 F generic/tclpull.c 15b334556d6579b70cac191a719ea8f25a97ee5d3606814f63596766ca09bfe4
-F generic/tclpull.h d0d2599fa133de4ab038a260b4cfbd04f01c1312
+F generic/tclpull.h 8e1aac98bdad497c669c901494939eecd6c2f57ea51c4f5d4dac502db48527d4
 F generic/tdom.decls 26593c07732dca37caa7a4b56226f2b2700590a30a61af4cb7757cfa3e28c89e
 F generic/tdom.h d27e43748242d5fe7dd98b8c7aa4a5a891d015bf
 F generic/tdomDecls.h 07996e561ca42574739182f3d479cd0b28302405f8c8f16b8448b720a305faa4
 F generic/tdomStubInit.c 375ebd144c8e09dbe2fe4864e799da2bd0fbe3bce2855346487634c3be49daf0
-F generic/tdomStubLib.c 2387d2887cc357b649e064286c153176627acd7fb024a355fee15844d2cf416d
+F generic/tdomStubLib.c b56629bb86788e7062fe3e68f5a832304fe6dc937a1597f7c7420d028eeca1f6
 F generic/tdominit.c 0d9d4ee2adcf379692358de57342f9103d3ab150172ffbef0eca8d1432c156f2
 F generic/utf8conv.c 8d58daa846a0b715df1736720cf9031e924988f2
 F generic/utf8conv.h 4132db4e05ac30dcb78dc3b4799ae0a9ae8a057f
@@ -246,8 +246,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 7064f3a9eb0c92b769234233364f919bb5d2d8e35fc34410eccf4ab1cc1f90c3 d573bb0b47365521bd05eeeb520a7fd02cff3230cd189667b4e58560fb04e06a
-R 8918e4e4bc90a3991709e7b248c16e89
+P 7b9d2c1ea61656d431accf77a36362a8127c58788489a1700c3967533e285ab5
+R 82bb60482ec07073e41818ff031747b2
 U rolf
-Z 0b0a693d49a6e42072bda0ebf610a985
+Z 420b1e272d3e715ac645eafe35731c7e
 # Remove this line to create a well-formed Fossil manifest.
