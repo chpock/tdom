@@ -204,6 +204,11 @@ test parser-1.16 {parser get} {
     set result
 } {0}
 
+test parser-1.17 {parser delete} {
+    expat parser-1.17
+    parser-1.17 delete
+} {}
+
 # Test break return code from callback
 
 test parser-2.1 {break in callback} {
@@ -512,7 +517,7 @@ test parser-8.1 {parser free called from within callback proc} {
     lappend result $errMsg
     $parser free
     set result
-} {1 {parser freeing not allowed from within callback}}
+} {1 {parser delete not allowed from within callback}}
 
 proc elementstart {args} {
     global parser

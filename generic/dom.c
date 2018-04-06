@@ -1122,6 +1122,7 @@ startElement(
             }
             info->nextFeedbackPosition = 
                 XML_GetCurrentByteIndex (info->parser) + info->feedbackAfter;
+            Tcl_ResetResult (info->interp);
         }
     }
 

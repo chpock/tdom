@@ -151,7 +151,7 @@ test dom-1.20 {createDocumentNS - empty namespace, prefix} {
     set errMsg
 } {Missing URI in Namespace declaration}
 
-test dom-1.21 {Explicit delete of scoped doc with domDoc cmd} {knownBug} {
+test dom-1.21 {Explicit delete of scoped doc with domDoc cmd} {} {
     dom createDocument test doc
     domDoc $doc delete
     unset doc
@@ -160,7 +160,7 @@ test dom-1.21 {Explicit delete of scoped doc with domDoc cmd} {knownBug} {
 proc dom-1.22 {doc} {
     $doc delete
 }
-test dom-1.22 {Explicit delete of scoped doc in proc call from scope} {knownBug} {
+test dom-1.22 {Explicit delete of scoped doc in proc call from scope} {} {
     dom createDocument test doc
     dom-1.22 $doc
     unset doc
@@ -1996,7 +1996,15 @@ test dom-12.15 {-feedbackAfter with -feedbackcmd and external entities, with err
                                <doc>&a;&b;</doc>}} msg]
     list $result $msg
 } -result [list 1 "Error in feedback cmd."]
-
+proc feedbackcmd-12.16 {} {
+    incr ::feedbackcmd-12.16
+}
+test dom-12.16 {-feedbackcmd setting interp result w/ invalid XML} -body {
+    set result [catch {dom parse -feedbackcmd feedbackcmd-12.16 \
+                           -feedbackAfter 1 {<doc><e1/><e1/><e1></doc}} msg]
+    list $result $msg
+} -result [list 1 {error "unclosed token" at line 1 character 19
+"<doc><e1/><e1/><e1>< <--Error-- /doc"}]
 
 # cleanup
 ::tcltest::cleanupTests

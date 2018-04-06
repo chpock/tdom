@@ -147,6 +147,32 @@ test tnc-2.7 {not valid document} {
     set errMsg
 } {Validation error at line 6, character 17: Element can not end here (required element(s) missing).}
 
+proc 2.8-resolver {base systemId publicId} {
+    switch $publicId {
+        "-//W3C//DTD Specification V2.0//EN" {
+            set fd [open [file join [file dir [info script]] \
+                              ../../../tests/data/xmlspec-v20.dtd]]
+            set xmlspec [read $fd]
+            close $fd
+            return [list "string" "" $xmlspec]
+        }
+        default {
+            puts stderr "Unexpected systemId '$systemId'"
+            return ""
+        }
+    }
+}
+
+test tnc-2.8 {Validate REC-xslt-19991116.xml} {
+    set ::tDOM::extRefHandlerDebug 1
+    set parser [expat -externalentitycommand 2.8-resolver  \
+                    -paramentityparsing always]
+    tnc $parser enable
+    $parser parsefile [file join [file dir [info script]] \
+                           ../../../tests/data/REC-xslt-19991116.xml] 
+    $parser free
+} {}
+
 test tnc-3.1 {validate cmd} {
     set parser [expat]
     tnc $parser enable
