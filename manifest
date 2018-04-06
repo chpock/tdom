@@ -1,5 +1,5 @@
-C Test\sto\sdocument\sproblem\sfixed\swith\s[0fb34974584ae2].
-D 2018-04-06T09:44:34.230
+C Pruned\sout\smore\sold\sANSI_ARGS\susage.
+D 2018-04-06T16:18:06.285
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -230,7 +230,7 @@ F tests/xpath.bench 99e98467544b11bf625e6f72b2fb89c7516bfced
 F tests/xpath.test 73e21d99d99dd2180979941b89e60247d4e31af6
 F tests/xslt.test 298d472aa69b5159560b52a7a78460693c0e12dd
 F unix/CONFIG 63b556af9314ca6bd1abea70f3b3a34a433b342f
-F unix/tclAppInit.c a1655c51127aed18d069010f234a378fceacb2a6
+F unix/tclAppInit.c a9d819ee595ace5199f48051aeb9ae8e6e52b5f0435bb3adc230de3f4c3f2ccd
 F win/README 73916fb24a4ac0cc509dd9e225f191943b061292
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F win/makefile.vc e55872316a152bd472c3e12a68b81f7d30615870
@@ -246,8 +246,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 0fb34974584ae2f36411ce8f4d7ff657b8bc12afeeb99665e2f88ff59ef0a266
-R e40ec7be0427b75d10b75360649c5c5d
+P d573bb0b47365521bd05eeeb520a7fd02cff3230cd189667b4e58560fb04e06a
+R 3847f0f48216b3835f1e4d6ec4d8ff6f
 U rolf
-Z 210bc0d3ea7e104c90900433eec6f8c9
+Z 9cc33b57bcd4fb8157937b0af712e796
 # Remove this line to create a well-formed Fossil manifest.
