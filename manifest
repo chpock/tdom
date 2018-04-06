@@ -1,5 +1,5 @@
-C Removed\sa\sCONST\scomming\sfrom\strunk\sand\sa\sfew\sothers\sthat\sdangled\saround.
-D 2018-04-06T16:06:50.768
+C Merged\sfrom\strunk.
+D 2018-04-06T16:18:30.831
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -230,7 +230,7 @@ F tests/xpath.bench 99e98467544b11bf625e6f72b2fb89c7516bfced
 F tests/xpath.test 73e21d99d99dd2180979941b89e60247d4e31af6
 F tests/xslt.test 298d472aa69b5159560b52a7a78460693c0e12dd
 F unix/CONFIG 63b556af9314ca6bd1abea70f3b3a34a433b342f
-F unix/tclAppInit.c a1655c51127aed18d069010f234a378fceacb2a6
+F unix/tclAppInit.c a9d819ee595ace5199f48051aeb9ae8e6e52b5f0435bb3adc230de3f4c3f2ccd
 F win/README 73916fb24a4ac0cc509dd9e225f191943b061292
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F win/makefile.vc e55872316a152bd472c3e12a68b81f7d30615870
@@ -246,8 +246,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 7b9d2c1ea61656d431accf77a36362a8127c58788489a1700c3967533e285ab5
-R 82bb60482ec07073e41818ff031747b2
+P 640861fcf57de85c2cc198bbe16c5a02d9df98704e0823d72e0eb544d6165994 a54f9b058de8e7a5d6b20ce4deffb0a387dbd0f0ef60db020d7c64aa0c397d72
+R 516ed0e20a6440d6f2955f158429aee8
 U rolf
-Z 420b1e272d3e715ac645eafe35731c7e
+Z d46aa251cef906ce3fc7b5197243bd9b
 # Remove this line to create a well-formed Fossil manifest.

@@ -39,8 +39,8 @@
 MODULE_SCOPE int Tcl_AppInit(Tcl_Interp *);
 MODULE_SCOPE int main(int, char **);
  
-extern int Tdom_Init _ANSI_ARGS_((Tcl_Interp *interp));
-extern int Tdom_SafeInit _ANSI_ARGS_((Tcl_Interp *interp));
+extern int Tdom_Init (Tcl_Interp *interp);
+extern int Tdom_SafeInit (Tcl_Interp *interp);
 
 /*----------------------------------------------------------------------------
 |   main
