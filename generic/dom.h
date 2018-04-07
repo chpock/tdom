@@ -87,13 +87,6 @@
 #endif
 
 /*
- * Beginning with 8.4, Tcl API is CONST'ified
- */
-#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION <= 3)
-# define CONST84
-#endif
-
-/*
  * Beginning with 8.6, interp->errorLine isn't public visible anymore
  * (TIP 330)
  */

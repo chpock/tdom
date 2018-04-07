@@ -15,31 +15,31 @@ extern "C" {
 
 /* 0 */
 EXTERN int		TclExpatObjCmd(ClientData dummy, Tcl_Interp *interp,
-				int objc, Tcl_Obj *CONST objv[]);
+				int objc, Tcl_Obj *const objv[]);
 /* 1 */
 EXTERN int		CheckExpatParserObj(Tcl_Interp *interp,
-				Tcl_Obj *CONST nameObj);
+				Tcl_Obj *const nameObj);
 /* 2 */
 EXTERN int		CHandlerSetInstall(Tcl_Interp *interp,
-				Tcl_Obj *CONST expatObj, 
+				Tcl_Obj *const expatObj, 
 				CHandlerSet *handlerSet);
 /* 3 */
 EXTERN int		CHandlerSetRemove(Tcl_Interp *interp,
-				Tcl_Obj *CONST expatObj, 
+				Tcl_Obj *const expatObj, 
 				char *handlerSetName);
 /* 4 */
 EXTERN CHandlerSet *	CHandlerSetCreate(char *name);
 /* 5 */
 EXTERN CHandlerSet *	CHandlerSetGet(Tcl_Interp *interp,
-				Tcl_Obj *CONST expatObj, 
+				Tcl_Obj *const expatObj, 
 				char *handlerSetName);
 /* 6 */
 EXTERN void *		CHandlerSetGetUserData(Tcl_Interp *interp,
-				Tcl_Obj *CONST expatObj,
+				Tcl_Obj *const expatObj,
 				char *handlerSetName);
 /* 7 */
 EXTERN TclGenExpatInfo * GetExpatInfo(Tcl_Interp *interp,
-				Tcl_Obj *CONST expatObj);
+				Tcl_Obj *const expatObj);
 /* 8 */
 EXTERN XML_Size		XML_GetCurrentLineNumber(XML_Parser parser);
 /* 9 */
@@ -67,14 +67,14 @@ typedef struct TdomStubs {
     int magic;
     void *hooks;
 
-    int (*tclExpatObjCmd) (ClientData dummy, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]); /* 0 */
-    int (*checkExpatParserObj) (Tcl_Interp *interp, Tcl_Obj *CONST nameObj); /* 1 */
-    int (*cHandlerSetInstall) (Tcl_Interp *interp, Tcl_Obj *CONST expatObj, CHandlerSet *handlerSet); /* 2 */
-    int (*cHandlerSetRemove) (Tcl_Interp *interp, Tcl_Obj *CONST expatObj, char *handlerSetName); /* 3 */
+    int (*tclExpatObjCmd) (ClientData dummy, Tcl_Interp *interp, int objc, Tcl_Obj *const objv[]); /* 0 */
+    int (*checkExpatParserObj) (Tcl_Interp *interp, Tcl_Obj *const nameObj); /* 1 */
+    int (*cHandlerSetInstall) (Tcl_Interp *interp, Tcl_Obj *const expatObj, CHandlerSet *handlerSet); /* 2 */
+    int (*cHandlerSetRemove) (Tcl_Interp *interp, Tcl_Obj *const expatObj, char *handlerSetName); /* 3 */
     CHandlerSet * (*cHandlerSetCreate) (char *name); /* 4 */
-    CHandlerSet * (*cHandlerSetGet) (Tcl_Interp *interp, Tcl_Obj *CONST expatObj, char *handlerSetName); /* 5 */
-    void * (*cHandlerSetGetUserData) (Tcl_Interp *interp, Tcl_Obj *CONST expatObj, char *handlerSetName); /* 6 */
-    TclGenExpatInfo * (*getExpatInfo) (Tcl_Interp *interp, Tcl_Obj *CONST expatObj); /* 7 */
+    CHandlerSet * (*cHandlerSetGet) (Tcl_Interp *interp, Tcl_Obj *const expatObj, char *handlerSetName); /* 5 */
+    void * (*cHandlerSetGetUserData) (Tcl_Interp *interp, Tcl_Obj *const expatObj, char *handlerSetName); /* 6 */
+    TclGenExpatInfo * (*getExpatInfo) (Tcl_Interp *interp, Tcl_Obj *const expatObj); /* 7 */
     XML_Size (*xML_GetCurrentLineNumber) (XML_Parser parser); /* 8 */
     XML_Size (*xML_GetCurrentColumnNumber) (XML_Parser parser); /* 9 */
     XML_Index (*xML_GetCurrentByteIndex) (XML_Parser parser); /* 10 */

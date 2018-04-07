@@ -134,7 +134,7 @@ typedef struct TclGenExpatInfo {
     int paramentityparsing;     
     int noexpand;
     int useForeignDTD;
-    CONST char *currentmarkup;  /* Used to transfer data for method */
+    const char *currentmarkup;  /* Used to transfer data for method */
     int currentmarkuplen;       /* currentmarkup */
  
     TclHandlerSet *firstTclHandlerSet;
@@ -154,20 +154,20 @@ typedef struct TclGenExpatInfo {
 EXTERN Tcl_ObjCmdProc TclExpatObjCmd;
 
 EXTERN int CheckExpatParserObj (Tcl_Interp *interp,
-				Tcl_Obj *CONST nameObj);
+				Tcl_Obj *const nameObj);
 EXTERN int CHandlerSetInstall (Tcl_Interp *interp,
-			       Tcl_Obj *CONST expatObj,
+			       Tcl_Obj *const expatObj,
 			       CHandlerSet *handlerSet);
 EXTERN int CHandlerSetRemove (Tcl_Interp *interp,
-			      Tcl_Obj *CONST expatObj,
+			      Tcl_Obj *const expatObj,
 			      char *handlerSetName);
 EXTERN CHandlerSet * CHandlerSetCreate (char *name);
 EXTERN CHandlerSet * CHandlerSetGet (Tcl_Interp *interp,
-                                     Tcl_Obj *CONST expatObj,
+                                     Tcl_Obj *const expatObj,
 				     char *handlerSetName);
 EXTERN void * CHandlerSetGetUserData (Tcl_Interp *interp,
-                                      Tcl_Obj *CONST expatObj,
+                                      Tcl_Obj *const expatObj,
 				      char *handlerSetName);
 
 EXTERN TclGenExpatInfo * GetExpatInfo (Tcl_Interp *interp,
-				       Tcl_Obj *CONST expatObj);
+				       Tcl_Obj *const expatObj);

@@ -2258,6 +2258,7 @@ startElement(
             }
             info->nextFeedbackPosition = 
                 XML_GetCurrentByteIndex (info->parser) + info->feedbackAfter;
+            Tcl_ResetResult (info->interp);
         }
     }
 
@@ -3174,10 +3175,10 @@ entityDeclHandler (
 static int
 externalEntityRefHandler (
     XML_Parser  parser,
-    CONST char *openEntityNames,
-    CONST char *base,
-    CONST char *systemId,
-    CONST char *publicId
+    const char *openEntityNames,
+    const char *base,
+    const char *systemId,
+    const char *publicId
 )
 {
     domReadInfo   *info = (domReadInfo *) XML_GetUserData (parser);
@@ -3193,7 +3194,7 @@ externalEntityRefHandler (
     Tcl_Channel chan = (Tcl_Channel) NULL;
     enum XML_Status status;
     XML_Index storedNextFeedbackPosition;
-    CONST84 char *interpResult;
+    const char *interpResult;
 
     if (info->document->extResolver == NULL) {
         Tcl_AppendResult (info->interp, "Can't read external entity \"",
@@ -7291,7 +7292,7 @@ TclTdomObjCmd (dummy, interp, objc, objv)
      ClientData dummy;
      Tcl_Interp *interp;
      int objc;
-     Tcl_Obj *CONST objv[];
+     Tcl_Obj *const objv[];
 {
     char            *encodingName;
     CHandlerSet     *handlerSet;
@@ -7301,7 +7302,7 @@ TclTdomObjCmd (dummy, interp, objc, objv)
     Tcl_Obj         *newObjName = NULL;
     TEncoding       *encoding;
 
-    static CONST84 char *tdomMethods[] = {
+    static const char *tdomMethods[] = {
         "enable", "getdoc",
         "setResultEncoding", "setStoreLineColumn",
         "setExternalEntityResolver", "keepEmpties",
