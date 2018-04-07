@@ -28,6 +28,11 @@ if {$tcl_version >= 8.1} {
     }
 }
 
+::tcltest::testConstraint needExpand 1
+if {$tcl_version < 8.5} {
+    ::tcltest::testConstraint needExpand 0
+}
+    
 set timeCmd {clock format [clock seconds]}
 
 set ::tcltest::testSingleFile false

@@ -53,14 +53,14 @@ const TdomStubs *tdomStubsPtr;
 |
 \---------------------------------------------------------------------------*/
 
-CONST char *
+const char *
 Tdom_InitStubs (
     Tcl_Interp *interp, 
     char *version, 
     int exact
     )
 {
-    CONST char *actualVersion;
+    const char *actualVersion;
     ClientData clientData = NULL;
 
 #if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION == 0)
