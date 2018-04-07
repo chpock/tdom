@@ -1141,12 +1141,16 @@ test domDoc-22.1 {appendFromScript} {
 
 test domDoc-22.2 {appendFromScript} {
     set doc [dom parse <root/>]
-    namespace eval nodeCmds {
-        $doc appendFromScript {
-            e1
-            e2
-        }
+    $doc appendFromScript {
+        nodeCmds::e1
+        nodeCmds::e2
     }
+    # namespace eval nodeCmds {
+    #     $doc appendFromScript {
+    #         e1
+    #         e2
+    #     }
+    # }
     set result [$doc asXML -indent none]
     foreach node [$doc selectNodes *] {
         lappend result [$node parentNode]

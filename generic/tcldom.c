@@ -398,10 +398,22 @@ const Tcl_ObjType tdomNodeType = {
 |   Prototypes for procedures defined later in this file:
 |
 \---------------------------------------------------------------------------*/
-
+#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION <= 3)
+/*
+ * Before Tcl 8.4, Tcl_VarTraceProc and Tcl_CmdDeleteProc were not
+ * CONST84'ified. When compiling with -DTCL_NO_DEPRECATED, CONST84 is
+ * gone, therefore we can't use the function type definitions of
+ * Tcl_VarTraceProc and Tcl_CmdDeleteProc for these old version.
+ * 
+ */
+static char * tcldom_docTrace(
+    ClientData clientData, Tcl_Interp *interp,
+    const char *part1, const char *part2, int flags);
+static void tcldom_docCmdDeleteProc(ClientData clientData);
+#else 
 static Tcl_VarTraceProc  tcldom_docTrace;
-
 static Tcl_CmdDeleteProc tcldom_docCmdDeleteProc;
+#endif
 
 static void tcldom_treeAsJSON(Tcl_Obj *jstring, domNode *node,
                               Tcl_Channel channel, int indent,
