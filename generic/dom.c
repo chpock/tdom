@@ -3972,66 +3972,72 @@ TncFreeValidationData (
     TNC_EntityInfo *entityInfo;
     TNC_AttDecl *attDecl;
     
-    if (info->dtdvalidation) {
-        if (info->elemContentsRewriten) {
-            entryPtr = Tcl_FirstHashEntry (info->tagNames, &search);
-            while (entryPtr) {
-                model = Tcl_GetHashValue (entryPtr);
-                if (model) {
-                    TncFreeTncModel (model);
-                    FREE ((char *) model);
-                }
-                entryPtr = Tcl_NextHashEntry (&search);
-            }
-        }
-        Tcl_DeleteHashTable (info->tagNames);
-        entryPtr = Tcl_FirstHashEntry (info->attDefsTables, &search);
+    if (!info->dtdvalidation) return;
+    
+    if (info->elemContentsRewriten) {
+        entryPtr = Tcl_FirstHashEntry (info->tagNames, &search);
         while (entryPtr) {
-            elemAttInfo = Tcl_GetHashValue (entryPtr);
-            if (!elemAttInfo) {
-                entryPtr = Tcl_NextHashEntry (&search);
-                continue;
-            }
-            attentryPtr = Tcl_FirstHashEntry (elemAttInfo->attributes, &attsearch);
-            while (attentryPtr) {
-                attDecl = Tcl_GetHashValue (attentryPtr);
-                if (attDecl) {
-                    if (attDecl->att_type == TNC_ATTTYPE_NOTATION ||
-                        attDecl->att_type == TNC_ATTTYPE_ENUMERATION) {
-                        Tcl_DeleteHashTable (attDecl->lookupTable);
-                        FREE ((char *) attDecl->lookupTable);
-                    }
-                    if (attDecl->dflt) {
-                        FREE (attDecl->dflt);
-                    }
-                    FREE ((char *) attDecl);
-                }
-                attentryPtr = Tcl_NextHashEntry (&attsearch);
-            }
-            Tcl_DeleteHashTable (elemAttInfo->attributes);
-            FREE ((char *) elemAttInfo->attributes);
-            FREE ((char *) elemAttInfo);
-            entryPtr = Tcl_NextHashEntry (&search);
-        }
-        Tcl_DeleteHashTable (info->attDefsTables);
-        entryPtr = Tcl_FirstHashEntry (info->entityDecls, &search);
-        while (entryPtr) {
-            entityInfo = Tcl_GetHashValue (entryPtr);
-            if (entityInfo) {
-                if (entityInfo->is_notation) {
-                    FREE (entityInfo->notationName);
-                }
-                FREE ((char *) entityInfo);
+            model = Tcl_GetHashValue (entryPtr);
+            if (model) {
+                TncFreeTncModel (model);
+                FREE ((char *) model);
             }
             entryPtr = Tcl_NextHashEntry (&search);
-        }
-        Tcl_DeleteHashTable (info->entityDecls);
-        Tcl_DeleteHashTable (info->notationDecls);
-        Tcl_DeleteHashTable (info->ids);
-        if (info->doctypeName) {
-            FREE (info->doctypeName);
         }
     }
+    Tcl_DeleteHashTable (info->tagNames);
+    entryPtr = Tcl_FirstHashEntry (info->attDefsTables, &search);
+    while (entryPtr) {
+        elemAttInfo = Tcl_GetHashValue (entryPtr);
+        if (!elemAttInfo) {
+            entryPtr = Tcl_NextHashEntry (&search);
+            continue;
+        }
+        attentryPtr = Tcl_FirstHashEntry (elemAttInfo->attributes, &attsearch);
+        while (attentryPtr) {
+            attDecl = Tcl_GetHashValue (attentryPtr);
+            if (attDecl) {
+                if (attDecl->att_type == TNC_ATTTYPE_NOTATION ||
+                    attDecl->att_type == TNC_ATTTYPE_ENUMERATION) {
+                    Tcl_DeleteHashTable (attDecl->lookupTable);
+                    FREE ((char *) attDecl->lookupTable);
+                }
+                if (attDecl->dflt) {
+                    FREE (attDecl->dflt);
+                }
+                FREE ((char *) attDecl);
+            }
+            attentryPtr = Tcl_NextHashEntry (&attsearch);
+        }
+        Tcl_DeleteHashTable (elemAttInfo->attributes);
+        FREE ((char *) elemAttInfo->attributes);
+        FREE ((char *) elemAttInfo);
+        entryPtr = Tcl_NextHashEntry (&search);
+    }
+    Tcl_DeleteHashTable (info->attDefsTables);
+    entryPtr = Tcl_FirstHashEntry (info->entityDecls, &search);
+    while (entryPtr) {
+        entityInfo = Tcl_GetHashValue (entryPtr);
+        if (entityInfo) {
+            if (entityInfo->is_notation) {
+                FREE (entityInfo->notationName);
+            }
+            FREE ((char *) entityInfo);
+        }
+        entryPtr = Tcl_NextHashEntry (&search);
+    }
+    Tcl_DeleteHashTable (info->entityDecls);
+    Tcl_DeleteHashTable (info->notationDecls);
+    Tcl_DeleteHashTable (info->ids);
+    if (info->doctypeName) {
+        FREE (info->doctypeName);
+    }
+    FREE ((char *) info->tagNames);
+    FREE ((char *) info->attDefsTables);
+    FREE ((char *) info->entityDecls);
+    FREE ((char *) info->notationDecls);
+    FREE ((char *) info->ids);
+    FREE ((char *) info->contentStack);
 }
 
 
