@@ -1388,7 +1388,7 @@ TncRewriteModel (emodel, tmodel, tagNames)
  *----------------------------------------------------------------------------
  */
 
-void
+static void
 TncEndDoctypeDeclHandler (userData)
     void *userData;
 {
@@ -3549,7 +3549,7 @@ TncElementDeclCommand (userData, name, model)
  *----------------------------------------------------------------------------
  */
 
-void
+static void
 TncAttDeclCommand (userData, elname, attname, att_type, dflt, isrequired)
     void       *userData;
     const char *elname;
@@ -3909,7 +3909,7 @@ TncAttDeclCommand (userData, elname, attname, att_type, dflt, isrequired)
  *----------------------------------------------------------------------------
  */
 
-void
+static void
 TncNotationDeclHandler (userData, notationName, base, systemId, publicId)
     void       *userData;
     const char *notationName;
@@ -3960,7 +3960,7 @@ TncFreeTncModel (tmodel)
     }
 }
 
-void
+static void
 TncFreeValidationData (
     domReadInfo *info
     )
