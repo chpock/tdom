@@ -1,5 +1,5 @@
-C Still\sbuilds\s(and\sworks)\sback\sto\s8.4\s(and\smaybe\seven\sto\s8.3)\sand\snow\snew\salso\swith\s(current)\s9.0.\sTest\ssuite\sneeds\ssome\smore\supdates\sto\swork\sw/\s9.0\swithout\serrors.
-D 2018-04-07T00:59:44.288
+C Made\stest\ssuite\s9.0\scompatible.\sBuilds\sfrom\s8.4\s-\s9.0\sand\sruns\stest\ssuite\swithout\serror\s(one\stest\serror\swith\s8.4\sbecause\sof\sint\swide).
+D 2018-04-19T23:52:05.116
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -203,10 +203,10 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.bench 5446ce379127b8d5700f18a5a0848e580313d0d7
-F tests/dom.test 68945750f5e9279ecf8f5a0048a0d3fff8007018f0ecaae43c9adc8ce1d32a1c
+F tests/dom.test 1a4ce76c241cf1a5f97b5b334df6d76e2a5b031447a45f141dd1e5b402ae28ee
 F tests/domDoc.test 461f12ed515c56774433316e24932fb4259775c3eefe4d6081d093ed4b1e446b
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
-F tests/domNode.test 66a77f681b6e946b88c55a72efe62d8d7e430348
+F tests/domNode.test 2e48daafc8c41ffb2399a2491832bbce96fec3b7b4fdb5218984b5effa6c84c9
 F tests/domjson.test 4d59a364b082b9009e7edddd4133941e4b463896db28939accdfeed3ca210df1
 F tests/domnamespace.test c67346e939dab82f1b6de8ddd04bd004cf24391b
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
@@ -246,9 +246,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a54f9b058de8e7a5d6b20ce4deffb0a387dbd0f0ef60db020d7c64aa0c397d72 9eb5979f332260d474e8677d362fb6fcb3ff96168b813a2ab4b4b1dd8b8895bb
-R ce5c407b86210661e616cda221983d6f
-T +closed 9eb5979f332260d474e8677d362fb6fcb3ff96168b813a2ab4b4b1dd8b8895bb
+P c20f5260c75e73488dc44f4f60d83e24dfd94dce0dfabacb4b0000de68b96b83
+R c5b876cc6583be9a45f705181118e31b
 U rolf
-Z 03d2552129a4eaf8eec7216dbfd933b7
+Z 3dcd5a9cc16f29e47f726935f1f6d63e
 # Remove this line to create a well-formed Fossil manifest.

@@ -2000,6 +2000,7 @@ proc feedbackcmd-12.16 {} {
     incr ::feedbackcmd-12.16
 }
 test dom-12.16 {-feedbackcmd setting interp result w/ invalid XML} -body {
+    set ::feedbackcmd-12.16 0
     set result [catch {dom parse -feedbackcmd feedbackcmd-12.16 \
                            -feedbackAfter 1 {<doc><e1/><e1/><e1></doc}} msg]
     list $result $msg
