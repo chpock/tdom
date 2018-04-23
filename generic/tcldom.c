@@ -4365,7 +4365,7 @@ int tcldom_NodeObjCmd (
                  *str, *attr_name, *attr_val, *filter;
     const char  *localName, *uri, *nsStr;
     int          result, length, methodIndex, i, line, column;
-    int          nsIndex, bool, hnew, legacy, jsonType;
+    int          nsIndex, bool, hnew, legacy, jsonType, fromToken = 0;
     Tcl_Obj     *namePtr, *resultPtr;
     Tcl_Obj     *mobjv[MAX_REWRITE_ARGS];
     Tcl_CmdInfo  cmdInfo;
@@ -4433,6 +4433,7 @@ int tcldom_NodeObjCmd (
         if (node == NULL) {
             return TCL_ERROR;
         }
+        fromToken = 1;
         objc--;
         objv++;
     }
@@ -5225,6 +5226,13 @@ int tcldom_NodeObjCmd (
         case m_delete:
             CheckArgs(2,2,2,"");
             domDeleteNode(node, tcldom_deleteNode, interp);
+            if (fromToken && (objv[0]->typePtr == &tdomNodeType)) {
+                if (objv[0]->bytes) ckfree (objv[0]->bytes);
+                objv[0]->typePtr = NULL;
+                objv[0]->bytes = ckalloc((unsigned char) 1);
+                objv[0]->bytes[0] = '\0';
+                objv[0]->length = 0;
+            }
             break;
 
         case m_data:
