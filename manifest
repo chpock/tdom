@@ -1,5 +1,5 @@
-C Pacify\s[696962e4dd42505].
-D 2018-04-23T21:40:29.696
+C Added\stest\srelated\sto\s[696962e4d].
+D 2018-04-23T23:59:16.176
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -203,7 +203,7 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.bench 5446ce379127b8d5700f18a5a0848e580313d0d7
-F tests/dom.test 1a4ce76c241cf1a5f97b5b334df6d76e2a5b031447a45f141dd1e5b402ae28ee
+F tests/dom.test 335f747797c1f87c9ec454a2bd86e18c9f98c8975085cf52fd49d152957e051a
 F tests/domDoc.test 461f12ed515c56774433316e24932fb4259775c3eefe4d6081d093ed4b1e446b
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test 2e48daafc8c41ffb2399a2491832bbce96fec3b7b4fdb5218984b5effa6c84c9
@@ -246,11 +246,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 3c5422fea45b45b29b1c1eab22ac2e47762bf662c32f28a869e6b03f467f1087
-R c4599ca044e1d9e89a29ea7344ec1d80
-T *branch * tokenMode
-T *sym-tokenMode *
-T -sym-trunk *
+P f1a400460231b8957a932cee1f4be30957d039815a85cd24d8df2190002640b8
+R 5d3966c8df15dbd8e11f5be73a471f76
 U rolf
-Z 4314a9ffb98e0e35f8ab05c8b7fd3051
+Z 0cbd21b7ceace7f131454f5212063564
 # Remove this line to create a well-formed Fossil manifest.
