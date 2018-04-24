@@ -572,6 +572,11 @@ domPrecedes (
     }
     return (node->nodeNumber < other->nodeNumber);
 # else 
+    if (node->ownerDocument->nodeFlags & NEEDS_RENUMBERING
+        && node->ownerDocument->refCount <= 1) {
+        domRenumberTree (node->ownerDocument->rootNode);
+        node->ownerDocument->nodeFlags &= ~NEEDS_RENUMBERING;
+    }
     if (!(node->ownerDocument->nodeFlags & NEEDS_RENUMBERING)) {
         return (node->nodeNumber < other->nodeNumber);
     }
