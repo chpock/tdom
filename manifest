@@ -1,5 +1,5 @@
-C Add\sdocumentation\sfor\s"renameNode".
-D 2018-04-25T05:21:14.507
+C Back\sout\sthe\sdocumentation\sfor\srenameNode.\sThis\smethod\sisn't\s"public"\satm\sand\smay\schange\sits\sinterface\sbefore\sit\swill\sbe.
+D 2018-04-25T10:23:19.669
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -23,7 +23,7 @@ F doc/dom.n e70f2943aab797b111dd81d31e47f443d07153bf
 F doc/dom.xml 93154903dc3a6574d226bf8f54fe8b49f6f6c846
 F doc/domDoc.html a5e74983986419cedac0ab7872d3294b3e553f8d
 F doc/domDoc.n 8bb70588d0d32353951d742b4be0aa343890aa59
-F doc/domDoc.xml cb2fefb71413ea6178d59d8ee7341413d3f3fa017d13f209220b78dd1e3849dd
+F doc/domDoc.xml 73d66d8a3879eb7aa7fca41a0195246e2f2ddb8c
 F doc/domNode.html b2f79d8f1479cff6b1a75c169047c7521a842bb0
 F doc/domNode.n 9e246587cd722176eb73e8719b7c48a7bb8c1295
 F doc/domNode.xml b840d44efba864bb9c215fb118b2d548543afc53
@@ -246,8 +246,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 1069b49d243e0b4644a56ccafa61abfd85fefcbb382f8e8413108c7b5c1cb657
-R 57cb27969f58e35ca61369e83b714276
-U yorick
-Z fab0c35755660cd1899552e01f0b12ff
+P bb27c56d41f7ba16db44eec95b37b4e6e45796bc308f0b42e8a2d45db5e723a0
+R 723c6d9e702ff705cf5171020f3785c4
+U rolf
+Z 16f45d190c3a5529f2dcdfe4b9b03344
 # Remove this line to create a well-formed Fossil manifest.
