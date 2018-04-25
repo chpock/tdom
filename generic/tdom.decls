@@ -11,34 +11,34 @@ interface tdom
 
 declare 0 generic {
     int TclExpatObjCmd (ClientData dummy, Tcl_Interp *interp, 
-                        int objc, Tcl_Obj *CONST objv[])
+                        int objc, Tcl_Obj *const objv[])
 }
 declare 1 generic {
-    int CheckExpatParserObj (Tcl_Interp *interp, Tcl_Obj *CONST nameObj)
+    int CheckExpatParserObj (Tcl_Interp *interp, Tcl_Obj *const nameObj)
 }
 declare 2 generic {
-     int CHandlerSetInstall (Tcl_Interp *interp, Tcl_Obj *CONST expatObj,
+     int CHandlerSetInstall (Tcl_Interp *interp, Tcl_Obj *const expatObj,
                              CHandlerSet *handlerSet)
 }
 declare 3 generic {
-     int CHandlerSetRemove (Tcl_Interp *interp, Tcl_Obj *CONST expatObj,
+     int CHandlerSetRemove (Tcl_Interp *interp, Tcl_Obj *const expatObj,
                             char *handlerSetName)
 }
 declare 4 generic {
      CHandlerSet * CHandlerSetCreate (char *name)
 }
 declare 5 generic {
-     CHandlerSet * CHandlerSetGet (Tcl_Interp *interp, Tcl_Obj *CONST expatObj,
+     CHandlerSet * CHandlerSetGet (Tcl_Interp *interp, Tcl_Obj *const expatObj,
                                    char *handlerSetName)
 }
 declare 6 generic {
      void * CHandlerSetGetUserData (Tcl_Interp *interp, 
-                                    Tcl_Obj *CONST expatObj,
+                                    Tcl_Obj *const expatObj,
                                     char *handlerSetName)
 }
 declare 7 generic {
      TclGenExpatInfo * GetExpatInfo (Tcl_Interp *interp,
-                                     Tcl_Obj *CONST expatObj)
+                                     Tcl_Obj *const expatObj)
 }
 declare 8 generic {
      XML_Size XML_GetCurrentLineNumber(XML_Parser parser)

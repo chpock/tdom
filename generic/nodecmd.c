@@ -107,7 +107,7 @@ typedef struct NodeInfo {
 static void * StackPush  (void *);
 static void * StackPop   (void);
 static void * StackTop   (void);
-static int    NodeObjCmd (ClientData,Tcl_Interp*,int,Tcl_Obj *CONST o[]);
+static int    NodeObjCmd (ClientData,Tcl_Interp*,int,Tcl_Obj *const o[]);
 static void   StackFinalize (ClientData);
 
 extern int tcldom_appendXML (Tcl_Interp*, domNode*, Tcl_Obj*);
@@ -282,7 +282,7 @@ NodeObjCmd (
     ClientData      arg,                /* Type of node to create. */
     Tcl_Interp    * interp,             /* Current interpreter. */
     int             objc,               /* Number of arguments. */
-    Tcl_Obj *CONST  objv[]             /* Argument objects. */
+    Tcl_Obj *const  objv[]             /* Argument objects. */
 ) {
     int type, createType, len, dlen, i, ret, disableOutputEscaping = 0, 
         index = 1;
@@ -520,7 +520,7 @@ int
 nodecmd_createNodeCmd (
     Tcl_Interp    * interp,             /* Current interpreter. */
     int             objc,               /* Number of arguments. */
-    Tcl_Obj *CONST  objv[],             /* Argument objects. */
+    Tcl_Obj *const  objv[],             /* Argument objects. */
     int             checkName,          /* Flag: Name checks? */
     int             checkCharData       /* Flag: Data checks? */
 ) {
@@ -541,12 +541,12 @@ nodecmd_createNodeCmd (
         ELM_NODE, TXT_NODE, CDS_NODE, CMT_NODE, PIC_NODE, PRS_NODE
     };
 
-    static CONST84 char *subcmds[] = {
+    static const char *subcmds[] = {
         "elementNode", "textNode", "cdataNode", "commentNode", "piNode",
         "parserNode", NULL
     };
 
-    static CONST84 char *options[] = {
+    static const char *options[] = {
         "-returnNodeCmd", "-jsonType", "-tagName", "-namespace", NULL
     };
 
