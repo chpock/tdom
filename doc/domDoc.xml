@@ -14,6 +14,7 @@
   -->
   <synopsis>
     <syntax>domDocObjCmd <m>method</m> ?<m>arg arg ...</m>?</syntax>
+    <syntax>domDoc <m>docToken</m> <m>method</m> ?<m>arg arg ...</m>?</syntax>
   </synopsis>
 
   <section>

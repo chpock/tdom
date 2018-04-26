@@ -1,5 +1,5 @@
-C Back\sout\sthe\sdocumentation\sfor\srenameNode.\sThis\smethod\sisn't\s"public"\satm\sand\smay\schange\sits\sinterface\sbefore\sit\swill\sbe.
-D 2018-04-25T10:23:19.669
+C Hardened\stoken\smode\sa\slittle\sbit.
+D 2018-04-26T21:57:47.399
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -21,12 +21,12 @@ F doc/category-index.html 98092b3a6d0fa7ade2cd5715b56ea0a6fef89be1
 F doc/dom.html 2a79d8cf33feacf9e1682c41f64622e97c5c559b
 F doc/dom.n e70f2943aab797b111dd81d31e47f443d07153bf
 F doc/dom.xml 93154903dc3a6574d226bf8f54fe8b49f6f6c846
-F doc/domDoc.html a5e74983986419cedac0ab7872d3294b3e553f8d
-F doc/domDoc.n 8bb70588d0d32353951d742b4be0aa343890aa59
-F doc/domDoc.xml 73d66d8a3879eb7aa7fca41a0195246e2f2ddb8c
-F doc/domNode.html b2f79d8f1479cff6b1a75c169047c7521a842bb0
-F doc/domNode.n 9e246587cd722176eb73e8719b7c48a7bb8c1295
-F doc/domNode.xml b840d44efba864bb9c215fb118b2d548543afc53
+F doc/domDoc.html 231ce0667118628da0c6e2863a0bece75cfe0e843ce56146a8de3f33d2f5635b
+F doc/domDoc.n e166dcdcfcfac0f16fa971d7d44af43d813f0cc27feb757f35ccef0891c9ab60
+F doc/domDoc.xml ef98ca5040d2a09631d2fab76f916a1c1556cb69cf7ac0d78dce428074154eb2
+F doc/domNode.html fe72fd81b42aadf1cd34564348b6b61f1c8a30b7a88bc5b503ef7175b1fcce1c
+F doc/domNode.n cb4ab571dcfa821ee3c916e2abf1d0d5a2e00f17bc076d22fc08ec115e78e9d6
+F doc/domNode.xml caca5d3d482259a357bb67149d507b1f0bf3464f9c4ecca8279837ac7d0255a7
 F doc/expat.html e7b5071878f8e3d9f818054e00dac627b82c40ec60a9aa362b8a3b1be763598e
 F doc/expat.n a0464f49b085e48feef6e1ed3ecdee2ece407d724b4b63401ca7a058188ef8e8
 F doc/expat.xml deb732519f3ad503241e9fefe303cd582bd33b62c349e9a3fe3b2134dd23931e
@@ -152,7 +152,7 @@ F generic/encodings.inc 9fc9705ffe9a8642f0aaba39fcc70119c34128d4
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 1ffb1f01bfe601de3c886993a08ae7df2e949d08ad727ef59438e3174fdbe378
 F generic/nodecmd.h 7c8e609b3652dcc29a1fb9d15735fc5ad1e0e00adb4450bd914186efbebee01d
-F generic/tcldom.c 16abb502fc6df15f6cc2b9f58444a78ae0c737a3d4359a5530f9f637863baf5a
+F generic/tcldom.c 275db4b83eb083e9d3ffc9a33fcb5b95095f24dd4a065544874e5f3b236de78d
 F generic/tcldom.h 2e8edc2bf095200c419a740fed626f4fdcba274125e0234366e84a25bb0c2b25
 F generic/tclexpat.c 02a14d770a1394705dd319299d3e88613ee7c8c08f85fdfff097cb05bd3bd232
 F generic/tclexpat.h 82c3d9efe50617f2e0883c520240e6ab17b830e56d6786cd88d2fa31294c02c5
@@ -203,7 +203,7 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.bench 5446ce379127b8d5700f18a5a0848e580313d0d7
-F tests/dom.test 1a4ce76c241cf1a5f97b5b334df6d76e2a5b031447a45f141dd1e5b402ae28ee
+F tests/dom.test 335f747797c1f87c9ec454a2bd86e18c9f98c8975085cf52fd49d152957e051a
 F tests/domDoc.test 461f12ed515c56774433316e24932fb4259775c3eefe4d6081d093ed4b1e446b
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test 2e48daafc8c41ffb2399a2491832bbce96fec3b7b4fdb5218984b5effa6c84c9
@@ -246,8 +246,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P bb27c56d41f7ba16db44eec95b37b4e6e45796bc308f0b42e8a2d45db5e723a0
-R 723c6d9e702ff705cf5171020f3785c4
+P 8cad55ff91b5fe5136f834513947300c442c46de11f67ba0393540e09b798116 51b58f0a65c406b44986ec49fdf960d8965c5fc88282ca53795a2e62594de130
+R d13de12574ebfb8501ee20e9b4352f7b
 U rolf
-Z 16f45d190c3a5529f2dcdfe4b9b03344
+Z 0c57bc6232573fcf50356a082b0f13cd
 # Remove this line to create a well-formed Fossil manifest.
