@@ -1,5 +1,5 @@
-C Hardened\stoken\smode\sa\slittle\sbit.
-D 2018-04-26T21:57:47.399
+C Added\sthe\sdocumentation\sfor\spull\sparsers\sto\sthe\sdocumentation\sindexes.
+D 2018-04-26T23:12:23.005
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -15,9 +15,9 @@ F apps/xslt.tcl ac4a75ba2f05e26d4ea6f92547983caa80fc6d55
 F configure 84d4a7acedeb6eccc8569f9a6cedd870e778dfe3 x
 F configure-tcl8.0.5 db1a666545d519c42e229d245224d456a84c798a x
 F configure.in a8e57ac7b420b7cff1eef7dc52f50eb127bee6c2
-F doc/INDEX.MAP c8e767983bcea4bbd53ecdbf3d78cb044996e9bc
+F doc/INDEX.MAP 55cb7aedd008e5bb07d026e056778a04b7d562398ef29e83e024cfc1ef2b9968
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
-F doc/category-index.html 98092b3a6d0fa7ade2cd5715b56ea0a6fef89be1
+F doc/category-index.html a3c7817482616cbfc8d2fc770ba177ffd622df9d4a94d761812c6ce2bb12bfb5
 F doc/dom.html 2a79d8cf33feacf9e1682c41f64622e97c5c559b
 F doc/dom.n e70f2943aab797b111dd81d31e47f443d07153bf
 F doc/dom.xml 93154903dc3a6574d226bf8f54fe8b49f6f6c846
@@ -29,17 +29,17 @@ F doc/domNode.n cb4ab571dcfa821ee3c916e2abf1d0d5a2e00f17bc076d22fc08ec115e78e9d6
 F doc/domNode.xml caca5d3d482259a357bb67149d507b1f0bf3464f9c4ecca8279837ac7d0255a7
 F doc/expat.html e7b5071878f8e3d9f818054e00dac627b82c40ec60a9aa362b8a3b1be763598e
 F doc/expat.n a0464f49b085e48feef6e1ed3ecdee2ece407d724b4b63401ca7a058188ef8e8
-F doc/expat.xml deb732519f3ad503241e9fefe303cd582bd33b62c349e9a3fe3b2134dd23931e
+F doc/expat.xml a404af989ee943eafbd470b6de0778d442b5686f7d80bc42ca9c607dd9d4677e
 F doc/expatapi.html fd32353769fa6dad1ce2dc59caafb02af8e21f3da5cf72147347638078121f72
 F doc/expatapi.n c46bf0503057037c929f4dbd465e3aa0372e701f3211bee6fc19379557f42122
 F doc/expatapi.xml f978d9a0b6df6878e1f94e427c018240efaf33f6d8dfa456051cfe551b15d4c3
-F doc/index.html 468688212024d55c7005365e86ac4160aae87c79
-F doc/keyword-index.html 5be2401954db258fd6efdee746ba97f02032224c
+F doc/index.html 22d7d146b761598f0358a4fb9cb2c9b907602431e5950ca8c40394b411de24d7
+F doc/keyword-index.html e316c5df54ab8329e573542c5a348fe370cc317a15d0244fbefc596cc5489dda
 F doc/manpage.css 3b4ec1d641048933a7e6bffc659de9519030a959
 F doc/pullparser.html efc571a0f486447e9389148447cca82a0bb9dbdceee48c309a46f0c25214d292
 F doc/pullparser.n 4c203bed303896f19c055540709d8c446d941bccd367494e89146f83cddaf7d3
 F doc/pullparser.xml be21dfe8281f19af9c1c5005719defd9c296f99a5fab78bfab809c143624da07
-F doc/tDOM.xml 35369df6a7d84d68cfb28692530ef9d1a8b8ca3e
+F doc/tDOM.xml c2c23ef23bc7ed266b10e833a196833dab73cca8e6e63eeaba0da29bff2bbaf6
 F doc/tdomcmd.html b1406826c77b1079a2276adbf5104953a7b0f309
 F doc/tdomcmd.n 087bbf0cf783376e39ff903a48bc377ce507b8f3
 F doc/tdomcmd.xml fa7bb2424b54e7180148f53557f4059673103c9a
@@ -246,8 +246,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 8cad55ff91b5fe5136f834513947300c442c46de11f67ba0393540e09b798116 51b58f0a65c406b44986ec49fdf960d8965c5fc88282ca53795a2e62594de130
-R d13de12574ebfb8501ee20e9b4352f7b
+P 36e470e5a63b3aa219c36adea8c0b5d9612fce79e315ce3c1ee4ccc657f7de0e
+R 563125d743af0af8220118bfe3116942
 U rolf
-Z 0c57bc6232573fcf50356a082b0f13cd
+Z 2d6fe77ed761a04a5eef3208c381f53c
 # Remove this line to create a well-formed Fossil manifest.

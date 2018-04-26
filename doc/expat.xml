@@ -743,6 +743,8 @@ code then parsing is canceled altogether, but no error is raised.</p>
 
     <keywords>
       <keyword>SAX</keyword>
+      <keyword>push</keyword>
+      <keyword>pushparser</keyword>
     </keywords>
   </manpage>
 
