@@ -1,5 +1,5 @@
-C Added\sthe\sdocumentation\sfor\spull\sparsers\sto\sthe\sdocumentation\sindexes.
-D 2018-04-26T23:12:23.005
+C Described\sbetter\swhat\spull\sparsers\sdo\swith\sCDATA\ssections.
+D 2018-04-27T15:56:05.181
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -36,9 +36,9 @@ F doc/expatapi.xml f978d9a0b6df6878e1f94e427c018240efaf33f6d8dfa456051cfe551b15d
 F doc/index.html 22d7d146b761598f0358a4fb9cb2c9b907602431e5950ca8c40394b411de24d7
 F doc/keyword-index.html e316c5df54ab8329e573542c5a348fe370cc317a15d0244fbefc596cc5489dda
 F doc/manpage.css 3b4ec1d641048933a7e6bffc659de9519030a959
-F doc/pullparser.html efc571a0f486447e9389148447cca82a0bb9dbdceee48c309a46f0c25214d292
-F doc/pullparser.n 4c203bed303896f19c055540709d8c446d941bccd367494e89146f83cddaf7d3
-F doc/pullparser.xml be21dfe8281f19af9c1c5005719defd9c296f99a5fab78bfab809c143624da07
+F doc/pullparser.html 6197964c4f3218d4d604b0008a4f8759ada36dc2e1d78ac960fa0ca311ff341f
+F doc/pullparser.n fba6792f0f4f029558c86e5becd9aad29e77ec932f71ecc6f805a88a3973f158
+F doc/pullparser.xml a3fa26e42b708f127072d2c140aeaa9b05c246abf957ea1d1865628a22800679
 F doc/tDOM.xml c2c23ef23bc7ed266b10e833a196833dab73cca8e6e63eeaba0da29bff2bbaf6
 F doc/tdomcmd.html b1406826c77b1079a2276adbf5104953a7b0f309
 F doc/tdomcmd.n 087bbf0cf783376e39ff903a48bc377ce507b8f3
@@ -219,7 +219,7 @@ F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
 F tests/parser.test 7957ceae1fb271cddf7dd8dcc6ed2f903bfdf0adf3662f686a6953919a5a2715
 F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
-F tests/pullparser.test 459adf73853afcea8e2fa7f97d17b5efa4caa590d1b3f0f79f3257ece8f4d070
+F tests/pullparser.test 3a3a25c1d37bffb616c00e36e1d33f530d9a91c37c41a680fdaafa79498be825
 F tests/pushpull.bench 4b84a4c5c306e006c8236d1f8b047490d79a538af3f527052db7a1215e5a38c7
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
 F tests/tdomcmd.bench b07448ed4de08ccaa9734cf3fe15c695fd7066c993da58ff48d465747940e417
@@ -246,8 +246,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 36e470e5a63b3aa219c36adea8c0b5d9612fce79e315ce3c1ee4ccc657f7de0e
-R 563125d743af0af8220118bfe3116942
+P 2174b4b773a111d3174398b1c6d56c0a36120a562ae1322941ed1be3fd074f98
+R 019aa2e1d0e4e19fbb754c3a39dd47bc
 U rolf
-Z 2d6fe77ed761a04a5eef3208c381f53c
+Z 40dc2737714fabf3f122e624e97be96b
 # Remove this line to create a well-formed Fossil manifest.

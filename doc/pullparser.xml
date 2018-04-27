@@ -7,7 +7,7 @@
   <synopsis>
     <syntax>package require tdom
 
-    <cmd>tDOM::pullparser</cmd> <m>cmdName</m> <o>?-ignorewhitecdata</o>
+    <cmd>tDOM::pullparser</cmd> <m>cmdName</m> <o>-ignorewhitecdata</o>
     </syntax>
   </synopsis>
 
@@ -29,8 +29,9 @@
     <p>The pull parsers doesn't follow externial entites and are XML
     1.0 only, they know nothing about XML Namespaces. You get the tags
     and attribute names as in the source. You aren't noticed about
-    CDATA Sections, comments, processing instructions and entities;
-    they are silently ignored for you.
+    comments, processing instructions and external entities; they are
+    silently ignored for you. CDATA Sections are handled as if their
+    content would have been provided without using a CDATA Section.
     </p>
 
     <p>On the brighter side is that character entity and attribute
@@ -40,7 +41,7 @@
     It's a nice programming model. It's a slim interface.
     </p>
 
-    <p>If the option <o>-ignorewhitecdata</o> is given, the created
+    <p>If the option <m>-ignorewhitecdata</m> is given, the created
     XML pull parser command will ignore any white space only (' ', \t,
     \n and \r) text content between START_TAG and START_TAG / END_TAG.
     The parser won't stop at such input and will create TEXT state
