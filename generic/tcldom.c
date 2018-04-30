@@ -162,6 +162,11 @@
 #define DOM_CREATECMDMODE_CMDS 1
 #define DOM_CREATECMDMODE_TOKENS 2
 
+#define XML_SERIALIZE_FOR_ATTR 1
+#define XML_SERIALIZE_ESCAPE_NON_ASCII 2
+#define XML_SERIALIZE_HTML_ENTITIES 4
+#define XML_SERIALIZE_ESCAPE_ALL_QUOT 8
+
 /*----------------------------------------------------------------------------
 |   Module Globals
 |
@@ -2202,10 +2207,7 @@ void tcldom_AppendEscaped (
     Tcl_Channel chan,
     char       *value,
     int         value_length,
-    int         forAttr,
-    int         escapeNonASCII,
-    int         htmlEntities,
-    int         escapeAllQuot
+    int         outputFlags
 )
 {
 #define APESC_BUF_SIZE 512
@@ -2228,7 +2230,7 @@ void tcldom_AppendEscaped (
     while (   (value_length == -1 && *pc)
            || (value_length != -1 && pc != pEnd)
     ) {
-        if ((forAttr || escapeAllQuot) && (*pc == '"')) { 
+        if ((outputFlags & XML_SERIALIZE_FOR_ATTR || outputFlags & XML_SERIALIZE_ESCAPE_ALL_QUOT) && (*pc == '"')) { 
             AP('&') AP('q') AP('u') AP('o') AP('t') AP(';')
         } else
         if (*pc == '&') { AP('&') AP('a') AP('m') AP('p') AP(';')
@@ -2237,11 +2239,11 @@ void tcldom_AppendEscaped (
         } else
         if (*pc == '>') { AP('&') AP('g') AP('t') AP(';')
         } else
-        if (forAttr && (*pc == '\n')) { AP('&') AP('#') AP('x') AP('A') AP(';')
+        if (outputFlags & XML_SERIALIZE_FOR_ATTR && (*pc == '\n')) { AP('&') AP('#') AP('x') AP('A') AP(';')
         } else
         {
             charDone = 0;
-            if (htmlEntities) {
+            if (outputFlags & XML_SERIALIZE_HTML_ENTITIES) {
                 charDone = 1;
 #if TclOnly8Bits
                 switch ((unsigned int)*pc)
@@ -2513,7 +2515,7 @@ void tcldom_AppendEscaped (
             }
 #if TclOnly8Bits
             if (!charDone) {
-                if (escapeNonASCII && ((unsigned char)*pc > 127)) {
+                if (outputFlags & XML_SERIALIZE_ESCAPE_NON_ASCII && ((unsigned char)*pc > 127)) {
                     AP('&') AP('#')
                     sprintf(charRef, "%d", (unsigned char)*pc);
                     for (i = 0; i < 3; i++) {
@@ -2533,7 +2535,7 @@ void tcldom_AppendEscaped (
                                  "UTF-8 chars up to 4 bytes length");
 
                     }
-                    if (clen == 4 || escapeNonASCII) {
+                    if (clen == 4 || outputFlags & XML_SERIALIZE_ESCAPE_NON_ASCII) {
                         if (clen == 4) {
                             unicode = ((pc[0] & 0x07) << 18) 
                                 + ((pc[1] & 0x3F) << 12)
@@ -2611,12 +2613,14 @@ void tcldom_treeAsHTML (
     int          noEscaping
 )
 {
-    int          empty, scriptTag;
+    int          empty, scriptTag, outputFlags = 0;
     domNode     *child;
     domAttrNode *attrs;
     domDocument *doc;
     char         tag[80], attrName[80];
 
+    if (escapeNonASCII) outputFlags = XML_SERIALIZE_ESCAPE_NON_ASCII;
+    if (htmlEntities) outputFlags |= XML_SERIALIZE_HTML_ENTITIES;
     if (node->nodeType == DOCUMENT_NODE) {
         doc = (domDocument*) node;
         if (doctypeDeclaration && doc->documentElement) {
@@ -2673,8 +2677,8 @@ void tcldom_treeAsHTML (
         } else {
             tcldom_AppendEscaped(htmlString, chan,
                                  ((domTextNode*)node)->nodeValue,
-                                 ((domTextNode*)node)->valueLength, 0,
-                                 escapeNonASCII, htmlEntities, 0);
+                                 ((domTextNode*)node)->valueLength,
+                                 outputFlags);
         }
         return;
     }
@@ -2686,8 +2690,8 @@ void tcldom_treeAsHTML (
         } else {
             tcldom_AppendEscaped(htmlString, chan,
                                  ((domTextNode*)node)->nodeValue,
-                                 ((domTextNode*)node)->valueLength, 0,
-                                 escapeNonASCII, htmlEntities, 0);
+                                 ((domTextNode*)node)->valueLength,
+                                 outputFlags);
         }
         return;
     }
@@ -2739,8 +2743,8 @@ void tcldom_treeAsHTML (
         writeChars(htmlString, chan, " ", 1);
         writeChars (htmlString, chan, attrName, -1);
         writeChars(htmlString, chan, "=\"", 2);
-        tcldom_AppendEscaped(htmlString, chan, attrs->nodeValue, -1, 1,
-                             escapeNonASCII, htmlEntities, 0);
+        tcldom_AppendEscaped(htmlString, chan, attrs->nodeValue, -1,
+                             outputFlags | XML_SERIALIZE_FOR_ATTR);
         writeChars(htmlString, chan, "\"", 1);
         attrs = attrs->nextSibling;
     }
@@ -2804,12 +2808,15 @@ void tcldom_treeAsXML (
     domAttrNode   *attrs;
     domNode       *child;
     domDocument   *doc;
-    int            first, hasElements, i;
+    int            first, hasElements, i, outputFlags = 0;
     char           prefix[MAX_PREFIX_LEN], *start, *p;
     const char    *localName;
     Tcl_HashEntry *h;
     Tcl_DString    dStr;
 
+    if (escapeAllQuot) outputFlags = XML_SERIALIZE_ESCAPE_ALL_QUOT;
+    if (escapeNonASCII) outputFlags |= XML_SERIALIZE_ESCAPE_NON_ASCII;
+    
     if (xmlDeclaration) {
         writeChars(xmlString, chan, "<?xml version=\"1.0\"", 19);
         if (encString) {
@@ -2896,8 +2903,8 @@ void tcldom_treeAsXML (
             } else {
                 tcldom_AppendEscaped(xmlString, chan,
                                      ((domTextNode*)node)->nodeValue,
-                                     ((domTextNode*)node)->valueLength, 0,
-                                     escapeNonASCII, 0, escapeAllQuot);
+                                     ((domTextNode*)node)->valueLength,
+                                     outputFlags);
             }
         }
         return;
@@ -2961,8 +2968,8 @@ void tcldom_treeAsXML (
         writeChars(xmlString, chan, attrs->nodeName, -1);
         writeChars(xmlString, chan, "=\"", 2);
         tcldom_AppendEscaped(xmlString, chan, attrs->nodeValue, 
-                             attrs->valueLength, 1, escapeNonASCII, 0,
-                             escapeAllQuot);
+                             attrs->valueLength,
+                             outputFlags | XML_SERIALIZE_FOR_ATTR);
         writeChars(xmlString, chan, "\"", 1);
         attrs = attrs->nextSibling;
     }
