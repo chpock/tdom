@@ -2220,7 +2220,7 @@ void tcldom_AppendEscaped (
     int   unicode;
     Tcl_UniChar uniChar;
 #endif
-
+    
     b = buf;
     bLimit = b + APESC_BUF_SIZE;
     pc = pEnd = value;
@@ -2230,7 +2230,8 @@ void tcldom_AppendEscaped (
     while (   (value_length == -1 && *pc)
            || (value_length != -1 && pc != pEnd)
     ) {
-        if ((outputFlags & XML_SERIALIZE_FOR_ATTR || outputFlags & XML_SERIALIZE_ESCAPE_ALL_QUOT) && (*pc == '"')) { 
+        if ((*pc == '"') && (outputFlags & XML_SERIALIZE_FOR_ATTR
+                             || outputFlags & XML_SERIALIZE_ESCAPE_ALL_QUOT)) { 
             AP('&') AP('q') AP('u') AP('o') AP('t') AP(';')
         } else
         if (*pc == '&') { AP('&') AP('a') AP('m') AP('p') AP(';')
@@ -2239,7 +2240,8 @@ void tcldom_AppendEscaped (
         } else
         if (*pc == '>') { AP('&') AP('g') AP('t') AP(';')
         } else
-        if (outputFlags & XML_SERIALIZE_FOR_ATTR && (*pc == '\n')) { AP('&') AP('#') AP('x') AP('A') AP(';')
+        if ((*pc == '\n') && outputFlags & XML_SERIALIZE_FOR_ATTR) {
+            AP('&') AP('#') AP('x') AP('A') AP(';')
         } else
         {
             charDone = 0;
