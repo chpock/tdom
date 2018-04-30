@@ -4,17 +4,17 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x1a52950">NAME</a> · <a href="#SECTid0x19ffe90">SYNOPSIS</a> · <a href="#SECTid0x195dd50">DESCRIPTION </a> · <a href="#SECTid0x1a9e7c0">KEYWORDS</a>
+<a href="#SECTid0x182d960">NAME</a> · <a href="#SECTid0x17deeb0">SYNOPSIS</a> · <a href="#SECTid0x1730d40">DESCRIPTION </a> · <a href="#SECTid0x1879b50">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x1a52950">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x182d960">NAME</a></h2><p class="namesection">
 <b class="names">dom - </b><br>Create an in-memory DOM tree from XML</p>
   
-  <h2><a name="SECTid0x19ffe90">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x17deeb0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">dom</b> <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
 
-  <h2><a name="SECTid0x195dd50">DESCRIPTION </a></h2><p>This command provides the creation of DOM trees in memory. In
+  <h2><a name="SECTid0x1730d40">DESCRIPTION </a></h2><p>This command provides the creation of DOM trees in memory. In
 the usual case a string containing a XML information is parsed and converted
 into a DOM tree. Other possible parse input may be HTML or JSON.
 The <i class="m">method</i> indicates a specific subcommand. </p><p>The valid methods are:</p><dl class="commandlist">
@@ -128,7 +128,7 @@ used, which tries to even parse badly formed HTML into a DOM tree.</dd>
 <b>-jsonmaxnesting</b> <i>integer</i>
 </dt>
                 
-                <dd>This options only has effect if used together
+                <dd>This option only has effect if used together
                 with the <i class="m">-json</i> option. The current implementation uses recursive descent JSON parser. In order to avoid using excess stack space, any JSON input that has more than a certain levels of nesting is considered invalid. The default maximum nesting is 2000. The option -jsonmaxnesting allows the user to adjust that.</dd>
               
               
@@ -281,7 +281,7 @@ called. The <i class="m">-useForeignDTD</i> respects </dd>
                 parsed and no external entity (including the external
                 subset) will be resolved and parsed. The value
                 "notstandalone" means, that all external entities will
-                be resolved and parsed, with the execption of
+                be resolved and parsed, with the exception of
                 documents, which explicitly states standalone="yes" in
                 their XML declaration.</dd>
               
@@ -656,12 +656,16 @@ recommendation. Otherwise it returns 0.</dd>
                     <dd>Returns as boolean, if build with
                     <i class="m">--enable-html5</i>.</dd>
                 
+                
+                    <dt><b>versionhash</b></dt>
+                    <dd>Returns the fossil repository version hash.</dd>
+                
             </dl>
             </dd>   
         
     </dl>
 
-<h2><a name="SECTid0x1a9e7c0">KEYWORDS</a></h2><p class="keywords">
+<h2><a name="SECTid0x1879b50">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-XML">XML</a>, <a class="keyword" href="keyword-index.html#KW-DOM">DOM</a>, <a class="keyword" href="keyword-index.html#KW-document">document</a>, <a class="keyword" href="keyword-index.html#KW-node">node</a>, <a class="keyword" href="keyword-index.html#KW-parsing">parsing</a>
 </p>
 </div><hr class="navsep"><div class="navbar" align="center">

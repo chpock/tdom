@@ -1103,7 +1103,7 @@ static void formatValue (
                 Tcl_DStringAppend (str, f->tokens[*useFormatToken-1].sepStart,
                                    f->tokens[*useFormatToken-1].sepLen);
             } else {
-                /* insert default seperator '.' */
+                /* insert default separator '.' */
                 Tcl_DStringAppend (str, ".", 1);
             }
         }
@@ -1755,7 +1755,7 @@ static int xsltFormatNumber (
 
 
 static xsltNodeSet *
-createXsltNodeSet () 
+createXsltNodeSet (void) 
 {
     xsltNodeSet * ns;
 
@@ -3222,7 +3222,7 @@ static int xsltAddTemplate (
     }
     tpl->sDoc = sDoc;
     
-    TRACE1("compiling XPATH '%s' ...\n", tpl->match);
+    TRACE1("compiling XPath '%s' ...\n", tpl->match);
     if (tpl->match) {
         rc = xpathParse(tpl->match, node, XPATH_TEMPMATCH_PATTERN, NULL, NULL,
                         &(tpl->freeAst), errMsg);
@@ -3708,7 +3708,7 @@ static int xsltNumber (
         vVals = 1;
         v[0] = xpathRound(xpathFuncNumber( &rs, &NaN ));
         /* MARK recoverable error */
-        /* This is one of the not so satisfying corners of the xslt
+        /* This is one of the not so satisfying corners of the XSLT
          * rec. The rec doesn't say, what to do, if the value isn't a
          * (finit) number. E24 from the erratas doesn't makes things
          * much better - a little bit dubious wording and a not very
@@ -4346,7 +4346,7 @@ static int ExecAction (
             }
             if (!h) {
                 reportError (actionNode, "xsl:call-template calls a non"
-                             " existend template!", errMsg);
+                             " existing template!", errMsg);
                 return -1;
             } 
             tplChoosen = (xsltTemplate *) Tcl_GetHashValue (h);
@@ -4587,10 +4587,10 @@ static int ExecAction (
                     if (rs.nodes[i]->nodeType == ATTRIBUTE_NODE) {
                         attr = (domAttrNode*)rs.nodes[i];
                         if (attr ->nodeFlags & IS_NS_NODE) {
-                            /* If someone selects explicitely namespace nodes
+                            /* If someone selects explicitly namespace nodes
                                to copy-of with e.g namespace::* (remember: @*
                                doesn't select namespace nodes), we must this
-                               handle seperately.*/
+                               handle separately.*/
                             /* The xmlns:xml namespace node will always
                                be in scope, but never needed to be copied,
                                because the result tree will also always
@@ -5110,8 +5110,8 @@ static int ExecAction (
             while (n) {
                 attr = n->firstAttr;
                 while (attr && (attr->nodeFlags & IS_NS_NODE)) {
-                    /* xslt namespace isn't copied */
-                    /* Well, xslt implementors doesn't seem to agree
+                    /* XSLT namespace isn't copied */
+                    /* Well, XSLT implementors doesn't seem to agree
                        at which point this rule out of the second paragraph
                        of 7.1.1 must be applied: before or after applying
                        the namespace aliases (or, in other words: is this
@@ -5407,7 +5407,7 @@ static int ApplyTemplate (
             continue; /* doesn't match mode */
         }
         TRACE4("tpl has prio='%f' precedence='%f', currentPrio='%f', currentPrec='%f'\n", tpl->prio, tpl->precedence, currentPrio, currentPrec);
-        /* According to xslt rec 5.5: First test precedence */
+        /* According to XSLT rec 5.5: First test precedence */
         if (tpl->precedence < currentPrec) break;
         if (tpl->precedence == currentPrec) {
             if (tpl->prio < currentPrio) break;
@@ -5908,7 +5908,7 @@ getExternalDocument (
     int           resultcode = 0;
     char         *resultType, *extbase, *xmlstring, *channelId, s[20];
     Tcl_Obj      *extResolver = NULL;
-    CONST84 char *str;
+    const char   *str;
     domDocument  *doc;
     xsltSubDoc   *sdoc;
     XML_Parser    parser;
@@ -7225,7 +7225,7 @@ xsltResetState (
        preserved, therefor we don't touch excludeNS and extensionNS
        information */
     /* This loop works only as coded, because, the first subdoc will
-     * always be the primary xslt doc, so xs->subDocs will not
+     * always be the primary XSLT doc, so xs->subDocs will not
      * change. Crusty stuff, this code. */
     sd = xs->subDocs;
     while (sd)  {
@@ -7266,7 +7266,7 @@ xsltResetState (
     }
     xs->nsUniqeNr = 0;
     /* In theory, the varFramesStack and varStack pointers should
-       be always back to there inital state. But to be sure, we
+       be always back to there initial state. But to be sure, we
        re-initialize, just in case of a bizarre error or something. */
     xs->varFramesStackPtr = -1;
     xs->varStackPtr       = -1;
@@ -7363,7 +7363,7 @@ xsltCompileStylesheet (
     
     node = xsltDoc->documentElement;
 
-    /* add the xslt doc to the doc list */
+    /* add the XSLT doc to the doc list */
     sdoc = (xsltSubDoc*)MALLOC(sizeof (xsltSubDoc));
     sdoc->doc = xsltDoc;
     baseURI = findBaseURI (xsltDoc->documentElement);

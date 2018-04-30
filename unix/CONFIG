@@ -5,7 +5,7 @@
 # you need and run this script with "sh CONFIG".
 #
 # With the exception of the --enable-tdomalloc option it's best, to
-# leave the tDOM specfic configuration options alone (that is: use the
+# leave the tDOM specific configuration options alone (that is: use the
 # defaults, do nothing).
 # 
 # --enable-tdomalloc

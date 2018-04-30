@@ -46,21 +46,21 @@
 #undef TCL_STORAGE_CLASS
 #define TCL_STORAGE_CLASS DLLEXPORT
 
-TdomStubs *tdomStubsPtr;
+const TdomStubs *tdomStubsPtr;
 
 /*----------------------------------------------------------------------------
 |   Tdom_InitStubs
 |
 \---------------------------------------------------------------------------*/
 
-CONST char *
+const char *
 Tdom_InitStubs (
     Tcl_Interp *interp, 
     char *version, 
     int exact
     )
 {
-    CONST char *actualVersion;
+    const char *actualVersion;
     ClientData clientData = NULL;
 
 #if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION == 0)

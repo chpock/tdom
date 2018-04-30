@@ -736,13 +736,21 @@ and -processinginstructioncommand). Otherwise it return the
 empty string.
 .RE
 .TP
-\&\fB\fBparser\fP \fBfree\fP
+\&\fB\fBparser\fP \fBdelete\fP
 \&\fR
 .RS
 .PP
 Deletes the parser and the parser command. A parser cannot
-be freed from within one of its handler callbacks (neither directly nor
+be deleted from within one of its handler callbacks (neither directly nor
 indirectly) and will raise a tcl error in this case.
+.RE
+.TP
+\&\fB\fBparser\fP \fBfree\fP
+\&\fR
+.RS
+.PP
+Another name to call the method \fIdelete\fR, see
+there.
 .RE
 .TP
 \&\fB\fBparser\fP \fBget\fP \fI-specifiedattributecount|-idattributeindex|-currentbytecount|-currentlinenumber|-currentcolumnnumber|-currentbyteindex\fB

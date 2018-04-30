@@ -247,7 +247,7 @@ static int xpathEvalPredicate (ast steps, domNode *exprContext,
                                xpathCBs *cbs, int *docOrder, char **errMsg);
 
 /*----------------------------------------------------------------------------
-|   xpath result set functions
+|   XPath result set functions
 |
 \---------------------------------------------------------------------------*/
 
@@ -2481,14 +2481,14 @@ static double xpathStringToNumber (
        Just to use strtod() isn't sufficient for a few reasons:
        - strtod() accepts a leading - or +, but XPath allows only a
          leading -
-       - strtod() accepts the string represention of a hexadecimal
+       - strtod() accepts the string representation of a hexadecimal
          number, but XPath does not
        - strtod() accepts an optional exponent but XPath does not
        - strtod() accepts leading whitespace including \f and \v, but
          XPath doesn't allow this characters. Since this two
          characters are not legal XML characters, they can not be part
          of a DOM tree and therefor there isn't a problem with XPath
-         expressions on DOM trees or in XSLT. But on tcl level it's
+         expressions on DOM trees or in XSLT. But on Tcl level it's
          possible, to feed that characters literal into the XPath
          engine.
     */
@@ -3946,7 +3946,7 @@ static int xpathEvalStep (
             CHECK_RC;
             break;
         }
-        /* whithout following Pred step, // is the same as 
+        /* without following Pred step, // is the same as 
            AxisDescendantOrSelf, fall throu */
 
     case AxisDescendantLit:
@@ -4846,7 +4846,7 @@ static int xpathEvalStep (
                 }
                 break;
             case BoolResult:
-                /* pleftResult is a non-emtpy nodeset, therefor: */
+                /* pleftResult is a non-empty nodeset, therefor: */
                 dLeft = 1.0;
                 dRight = xpathFuncNumber (prightResult, &NaN);
                 if (NaN) break;

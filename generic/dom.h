@@ -87,13 +87,6 @@
 #endif
 
 /*
- * Beginning with 8.4, Tcl API is CONST'ified
- */
-#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION <= 3)
-# define CONST84
-#endif
-
-/*
  * Beginning with 8.6, interp->errorLine isn't public visible anymore
  * (TIP 330)
  */
@@ -444,6 +437,8 @@ typedef unsigned int domDocFlags;
 #define NEEDS_RENUMBERING         2
 #define DONT_FREE                 4
 #define IGNORE_XMLNS              8
+#define DOCUMENT_CMD             16
+#define VAR_TRACE                32
 
 /*--------------------------------------------------------------------------
 |   a index to the namespace records
@@ -732,7 +727,7 @@ const char *   domException2String (domException exception);
 
 void           domModuleInitialize (void);
 domDocument *  domCreateDoc (const char *baseURI, int storeLineColumn);
-domDocument *  domCreateDocument (Tcl_Interp *interp, const char *uri,
+domDocument *  domCreateDocument (const char *uri,
                                   char *documentElementTagName);
 void           domSetDocumentElement (domDocument *doc);
 

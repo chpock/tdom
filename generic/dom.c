@@ -572,6 +572,11 @@ domPrecedes (
     }
     return (node->nodeNumber < other->nodeNumber);
 # else 
+    if (node->ownerDocument->nodeFlags & NEEDS_RENUMBERING
+        && node->ownerDocument->refCount <= 1) {
+        domRenumberTree (node->ownerDocument->rootNode);
+        node->ownerDocument->nodeFlags &= ~NEEDS_RENUMBERING;
+    }
     if (!(node->ownerDocument->nodeFlags & NEEDS_RENUMBERING)) {
         return (node->nodeNumber < other->nodeNumber);
     }
@@ -1036,7 +1041,7 @@ domGetAttributeNodeNS (
  *      attributes. Since the domAttrNode struct doesn't has an
  *      element for the previous attribute, we need a function for the
  *      relatively rare cases, the 'previous attribute' is
- *      needed. Remeber, that the XML rec say, that there is no
+ *      needed. Remember, that the XML rec say, that there is no
  *      specific order of the attributes of a node.
  *
  * Results: 
@@ -1122,6 +1127,7 @@ startElement(
             }
             info->nextFeedbackPosition = 
                 XML_GetCurrentByteIndex (info->parser) + info->feedbackAfter;
+            Tcl_ResetResult (info->interp);
         }
     }
 
@@ -1316,7 +1322,7 @@ elemNSfound:
                                  atts[idatt+1],
                                  &hnew);
         /* if hnew isn't 1 this is a validation error. Hm, no clear way
-           to report this. And more, xslt and xpath can process not
+           to report this. And more, XSLT and XPath can process not
            valid XML, the spec mentioned this even within the context
            of id(). If some elements share the same ID, the first in
            document order should be used. Doing it this way, this is
@@ -1813,10 +1819,10 @@ entityDeclHandler (
 static int
 externalEntityRefHandler (
     XML_Parser  parser,
-    CONST char *openEntityNames,
-    CONST char *base,
-    CONST char *systemId,
-    CONST char *publicId
+    const char *openEntityNames,
+    const char *base,
+    const char *systemId,
+    const char *publicId
 )
 {
     domReadInfo   *info = (domReadInfo *) XML_GetUserData (parser);
@@ -1832,7 +1838,7 @@ externalEntityRefHandler (
     Tcl_Channel chan = (Tcl_Channel) NULL;
     enum XML_Status status;
     XML_Index storedNextFeedbackPosition;
-    CONST84 char *interpResult;
+    const char *interpResult;
 
     if (info->document->extResolver == NULL) {
         Tcl_AppendResult (info->interp, "Can't read external entity \"",
@@ -2518,7 +2524,6 @@ domCreateDoc (
 \--------------------------------------------------------------------------*/
 domDocument *
 domCreateDocument (
-    Tcl_Interp *interp,
     const char *uri,
     char       *documentElementTagName
 )
@@ -2535,37 +2540,7 @@ domCreateDocument (
         domSplitQName (documentElementTagName, prefix, &localName);
         DBG(fprintf(stderr, 
                     "rootName: -->%s<--, prefix: -->%s<--, localName: -->%s<--\n", 
-                    documentElementTagName, prefix, localName);)
-        if (prefix[0] != '\0') {
-            if (!domIsNCNAME (prefix)) {
-                if (interp) {
-                    Tcl_SetObjResult(interp, 
-                                     Tcl_NewStringObj("invalid prefix name", -1));
-                }
-                return NULL;
-            }
-            if (uri[0] == '\0') {
-                Tcl_SetObjResult(interp,
-                                 Tcl_NewStringObj("Missing URI in "
-                                                  "Namespace declaration", -1));
-                return NULL;
-            }
-        }
-        if (!domIsNCNAME (localName)) {
-            if (interp) {
-                Tcl_SetObjResult(interp, 
-                                 Tcl_NewStringObj("invalid local name", -1));
-            }
-            return NULL;
-        }
-    } else {
-        if (!domIsNAME (documentElementTagName)) {
-            if (interp) {
-                Tcl_SetObjResult(interp, 
-                                 Tcl_NewStringObj("invalid root element name", -1));
-            }
-            return NULL;
-        }
+                    documentElementTagName, prefix, localName););
     }
     doc = domCreateDoc (NULL, 0);
 
@@ -2917,7 +2892,7 @@ domFreeDocument (
     FREE (doc->baseURIs);
     
     /*-----------------------------------------------------------
-    | delete xpath cache hash table
+    | delete XPath cache hash table
     \-----------------------------------------------------------*/
     if (doc->xpathCache) {
         entryPtr = Tcl_FirstHashEntry (doc->xpathCache, &search);
@@ -4831,7 +4806,7 @@ domCopyTo (
             if (copyNS) {
                 /* If copyNS is true, then all namespaces in scope
                  * (including the one declared with the node to copy)
-                 * are allready copied over. */
+                 * are already copied over. */
                 attr = attr->nextSibling;
                 continue;
                 
@@ -5363,7 +5338,7 @@ TclTdomObjCmd (dummy, interp, objc, objv)
      ClientData dummy;
      Tcl_Interp *interp;
      int objc;
-     Tcl_Obj *CONST objv[];
+     Tcl_Obj *const objv[];
 {
     char            *encodingName;
     CHandlerSet     *handlerSet;
@@ -5373,7 +5348,7 @@ TclTdomObjCmd (dummy, interp, objc, objv)
     Tcl_Obj         *newObjName = NULL;
     TEncoding       *encoding;
 
-    static CONST84 char *tdomMethods[] = {
+    static const char *tdomMethods[] = {
         "enable", "getdoc",
         "setResultEncoding", "setStoreLineColumn",
         "setExternalEntityResolver", "keepEmpties",
@@ -5545,7 +5520,7 @@ TclTdomObjCmd (dummy, interp, objc, objv)
 
     case m_setExternalEntityResolver:
         if (objc != 4) {
-            Tcl_SetResult (interp, "You must name a tcl command as external entity resolver for setExternalEntityResolver.", NULL);
+            Tcl_SetResult (interp, "You must name a Tcl command as external entity resolver for setExternalEntityResolver.", NULL);
             return TCL_ERROR;
         }
         info = CHandlerSetGetUserData (interp, objv[1], "tdom");

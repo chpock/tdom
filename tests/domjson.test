@@ -161,7 +161,7 @@ test json-1.19 {Invalid input - uncompled \u escape} {
     catch {dom parse -json {"ab\u00"}}
 } 1
 
-test json-1.20 {Escaped binary 0} {
+test json-1.20 {Escaped binary 0} {needExpand} {
     dom parse -json "\"a\\u0000\"" doc
     set textvalue [$doc selectNodes string(node())]
     set result [string length $textvalue]
