@@ -5577,7 +5577,6 @@ $as_echo "no" >&6; }
 
 
     vars="generic/xmlsimple.c \
-                 generic/utf8conv.c  \
                  generic/dom.c       \
                  generic/domhtml.c   \
                  generic/domhtml5.c  \

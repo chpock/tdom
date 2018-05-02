@@ -196,14 +196,6 @@ DOM tree.
 Returns the DOM tree as domDoc (see there) object.
 .RE
 .TP
-\&\fB\fBtdom\fP \fIparserObj\fB \fBsetResultEncoding\fP
-\&\fR
-.RS
-.PP
-See the method \fBsetResultEncoding\fR of the
-\&\fBdom\fP command.
-.RE
-.TP
 \&\fB\fBtdom\fP \fIparserObj\fB \fBsetStoreLineColumn\fP ?\fIboolean\fB?
 \&\fR
 .RS

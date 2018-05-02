@@ -328,23 +328,6 @@ node. <m>objVar</m> controls the memory handling as explained above.</desc>
         </commanddef>
 
         <commanddef>
-          <command><cmd>dom</cmd> <method>setResultEncoding</method> ?<m>encodingName</m>?</command>
-          <desc>This option is for backward compatibility with Tcl
-          8.0. If tDOM is build with any newer Tcl version this option
-          does not has any effect. If <m>encodingName</m> is not given
-          the current global result encoding is returned. Otherwise
-          the global result encoding is set to <m>encodingName</m>.
-          All character data, attribute values etc. will then be
-          converted from UTF-8, which is delivered from the Expat XML
-          parser, to the given 8 bit encoding at XML/DOM parse time.
-          Valid values for <m>encodingName</m> are: utf-8, ascii,
-          cp1250, cp1251, cp1252, cp1253, cp1254, cp1255, cp1256,
-          cp437, cp850, en, iso8859-1, iso8859-2, iso8859-3,
-          iso8859-4, iso8859-5, iso8859-6, iso8859-7, iso8859-8,
-          iso8859-9, koi8-r.</desc>
-        </commanddef>
-
-        <commanddef>
           <command><cmd>dom</cmd> <method>createNodeCmd</method>
 <m>?-returnNodeCmd?</m> <m>?-tagName name?</m> <m>?-jsonType jsonType?</m> <m>?-namespace URI?</m> <m>(element|comment|text|cdata|pi)Node</m> <m>commandName</m></command>
           <desc>This method creates Tcl commands, which in turn create

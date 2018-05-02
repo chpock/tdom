@@ -47,11 +47,8 @@
 |
 \--------------------------------------------------------------------------*/
 #include <tcl.h>
-#include <stdlib.h>
-#include <string.h>
 #include <dom.h>
 #include <domxpath.h>
-#include <utf8conv.h>
 #include <tclexpat.h>
 
 
@@ -114,7 +111,6 @@ static char tdom_usage[] =
                 "Usage tdom <expat parser obj> <subCommand>, where subCommand can be:\n"
                 "           enable             \n"
                 "           getdoc             \n"
-                "           setResultEncoding  \n"
                 "           setStoreLineColumn \n"
                 ;
 
@@ -154,7 +150,6 @@ typedef struct _domReadInfo {
     int               ignoreWhiteSpaces;
     int               cdataSection;
     Tcl_DString      *cdata;
-    TEncoding        *encoding_8bit;
     int               storeLineColumn;
     int               ignorexmlns;
     int               feedbackAfter;
@@ -1249,9 +1244,6 @@ startElement(
                 attrnode->nodeName    = (char *)&(h->key);
                 attrnode->parentNode  = node;
                 len = strlen(atPtr[1]);
-                if (TclOnly8Bits && info->encoding_8bit) {
-                    tdom_Utf8to8Bit(info->encoding_8bit, atPtr[1], &len);
-                }
                 attrnode->valueLength = len;
                 attrnode->nodeValue   = (char*)MALLOC(len+1);
                 strcpy(attrnode->nodeValue, atPtr[1]);
@@ -1357,9 +1349,6 @@ elemNSfound:
         attrnode->nodeName    = (char *)&(h->key);
         attrnode->parentNode  = node;
         len = strlen(atPtr[1]);
-        if (TclOnly8Bits && info->encoding_8bit) {
-            tdom_Utf8to8Bit(info->encoding_8bit, atPtr[1], &len);
-        }
         attrnode->valueLength = len;
         attrnode->nodeValue   = (char*)MALLOC(len+1);
         strcpy(attrnode->nodeValue, (char *)atPtr[1]);
@@ -1514,9 +1503,6 @@ DispatchPCDATA (
     if (!len && !info->cdataSection) return;
     s = Tcl_DStringValue (info->cdata);
     
-    if (TclOnly8Bits && info->encoding_8bit) {
-        tdom_Utf8to8Bit( info->encoding_8bit, s, &len);
-    }
     parentNode = info->currentNode;
     if (!parentNode) return;
 
@@ -1626,9 +1612,6 @@ commentHandler (
     DispatchPCDATA (info);
 
     len = strlen(s);
-    if (TclOnly8Bits && info->encoding_8bit) {
-        tdom_Utf8to8Bit(info->encoding_8bit, s, &len);
-    }
     parentNode = info->currentNode;
 
     if (info->storeLineColumn) {
@@ -1735,17 +1718,11 @@ processingInstructionHandler(
     }
 
     len = strlen(target);
-    if (TclOnly8Bits && info->encoding_8bit) {
-        tdom_Utf8to8Bit(info->encoding_8bit, target, &len);
-    }
     node->targetLength = len;
     node->targetValue  = (char*)MALLOC(len);
     memmove(node->targetValue, target, len);
 
     len = strlen(data);
-    if (TclOnly8Bits && info->encoding_8bit) {
-        tdom_Utf8to8Bit(info->encoding_8bit, data, &len);
-    }
     node->dataLength = len;
     node->dataValue  = (char*)MALLOC(len);
     memmove(node->dataValue, data, len);
@@ -1885,12 +1862,8 @@ externalEntityRefHandler (
     }
 
  
-#if TclOnly8Bits
-    result = Tcl_GlobalEvalObj(info->interp, cmdPtr);
-#else
     result = Tcl_EvalObjEx (info->interp, cmdPtr, 
                             TCL_EVAL_DIRECT | TCL_EVAL_GLOBAL);
-#endif
 
     Tcl_DecrRefCount(cmdPtr);
 
@@ -2132,7 +2105,6 @@ domReadDocument (
     int         length,
     int         ignoreWhiteSpaces,
     int         keepCDATA,
-    TEncoding  *encoding_8bit,
     int         storeLineColumn,
     int         ignorexmlns,
     int         feedbackAfter,
@@ -2151,12 +2123,10 @@ domReadDocument (
     size_t          len;
     domReadInfo     info;
     char            buf[8192];
-#if !TclOnly8Bits
     Tcl_Obj        *bufObj;
     Tcl_DString     dStr;
     int             useBinary;
     char           *str;
-#endif
     domDocument    *doc = domCreateDoc(baseurl, storeLineColumn);
 
     if (extResolver) {
@@ -2174,7 +2144,6 @@ domReadDocument (
     info.cdata                = (Tcl_DString*) MALLOC (sizeof (Tcl_DString));
     Tcl_DStringInit (info.cdata);
     info.cdataSection         = 0;
-    info.encoding_8bit        = encoding_8bit;
     info.storeLineColumn      = storeLineColumn;
     info.ignorexmlns          = ignorexmlns;
     info.feedbackAfter        = feedbackAfter;
@@ -2238,7 +2207,6 @@ domReadDocument (
             break;
         }
     } else {
-#if !TclOnly8Bits
         Tcl_DStringInit (&dStr);
         if (Tcl_GetChannelOption (interp, channel, "-encoding", &dStr) != TCL_OK) {
             FREE ( (char*) info.activeNS );
@@ -2308,33 +2276,6 @@ domReadDocument (
             } while (!done);
             Tcl_DecrRefCount (bufObj);
         }
-#else
-        do {
-            len = Tcl_Read (channel, buf, sizeof(buf));
-            done = len < sizeof(buf);
-            str = Tcl_GetStringFromObj(bufObj, &tclLen);
-            switch (status) {
-            case XML_STATUS_SUSPENDED:
-                DBG(fprintf(stderr, "XML_STATUS_SUSPENDED\n"););
-                if (info.status == TCL_BREAK) {
-                    Tcl_ResetResult(interp);
-                }
-                /* fall throu */
-            case XML_STATUS_ERROR:
-                DBG(fprintf(stderr, "XML_STATUS_ERROR\n");)
-                FREE ( info.activeNS );
-                FREE ( info.baseURIstack );
-                Tcl_DStringFree (info.cdata);
-                FREE ( info.cdata);
-                domFreeDocument (doc, NULL, NULL);
-                Tcl_DecrRefCount (bufObj);
-                *resultcode = info.status;
-                return NULL;
-            case XML_STATUS_OK:
-                break;
-            }
-        } while (!done);
-#endif
     }
     FREE ( info.activeNS );
     FREE ( info.baseURIstack );
@@ -5208,7 +5149,6 @@ typedef struct _tdomCmdReadInfo {
     int               ignoreWhiteSpaces;
     int               cdataSection;
     Tcl_DString      *cdata;
-    TEncoding        *encoding_8bit;
     int               storeLineColumn;
     int               ignorexmlns;
     int               feedbackAfter;
@@ -5340,24 +5280,22 @@ TclTdomObjCmd (dummy, interp, objc, objv)
      int objc;
      Tcl_Obj *const objv[];
 {
-    char            *encodingName;
     CHandlerSet     *handlerSet;
     int              methodIndex, result, bool;
     tdomCmdReadInfo *info;
     TclGenExpatInfo *expat;
     Tcl_Obj         *newObjName = NULL;
-    TEncoding       *encoding;
 
     static const char *tdomMethods[] = {
         "enable", "getdoc",
-        "setResultEncoding", "setStoreLineColumn",
+        "setStoreLineColumn",
         "setExternalEntityResolver", "keepEmpties",
         "remove", "ignorexmlns", "keepCDATA",
         NULL
     };
     enum tdomMethod {
         m_enable, m_getdoc,
-        m_setResultEncoding, m_setStoreLineColumn,
+        m_setStoreLineColumn,
         m_setExternalEntityResolver, m_keepEmpties,
         m_remove, m_ignorexmlns, m_keepCDATA
     };
@@ -5418,7 +5356,6 @@ TclTdomObjCmd (dummy, interp, objc, objv)
         info->cdataSection      = 0;
         info->cdata             = (Tcl_DString*) MALLOC (sizeof (Tcl_DString));
         Tcl_DStringInit (info->cdata);
-        info->encoding_8bit     = 0;
         info->storeLineColumn   = 0;
         info->ignorexmlns       = 0;
         info->feedbackAfter     = 0;
@@ -5459,41 +5396,6 @@ TclTdomObjCmd (dummy, interp, objc, objv)
         info->document = NULL;
         return result;
 
-    case m_setResultEncoding:
-        info = CHandlerSetGetUserData (interp, objv[1], "tdom");
-        if (!info) {
-            Tcl_SetResult (interp, "parser object isn't tdom enabled.", NULL);
-            return TCL_ERROR;
-        }
-        if (info->encoding_8bit == NULL) {
-            Tcl_AppendResult (interp, "UTF-8", NULL);
-        }
-        else {
-            Tcl_AppendResult (interp,
-                              tdom_GetEncodingName (info->encoding_8bit),
-                              NULL);
-        }
-        if (objc == 4) {
-            encodingName = Tcl_GetString(objv[3]);
-
-            if (   (strcmp(encodingName, "UTF-8") == 0)
-                 ||(strcmp(encodingName, "UTF8" ) == 0)
-                 ||(strcmp(encodingName, "utf-8") == 0)
-                 ||(strcmp(encodingName, "utf8" ) == 0)) {
-
-                info->encoding_8bit = NULL;
-            } else {
-                encoding = tdom_GetEncoding ( encodingName );
-                if (encoding == NULL) {
-                    Tcl_AppendResult(interp, "encoding not found", NULL);
-                    return TCL_ERROR;
-                }
-                info->encoding_8bit = encoding;
-            }
-        }
-        info->tdomStatus = 1;
-        break;
-        
     case m_setStoreLineColumn:
         info = CHandlerSetGetUserData (interp, objv[1], "tdom");
         if (!info) {

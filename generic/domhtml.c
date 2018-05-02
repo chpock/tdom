@@ -100,11 +100,7 @@ struct Er {
 |   character entity references known to the system.
 |
 \---------------------------------------------------------------------------*/
-#if TclOnly8Bits
-#define ER_HASH_SIZE 107
-#else
 #define ER_HASH_SIZE 257
-#endif
 
 /*----------------------------------------------------------------------------
 |   The following flag is TRUE if entity reference hash table needs
@@ -165,104 +161,6 @@ static Er er_sequences[] = {
     { "gt",        ">",        0 },
     { "apos",      "'",        0 },
     { "quot",      "\"",       0 },
-#if TclOnly8Bits
-    { "nbsp",      "\240",     0 },
-    { "iexcl",     "\241",     0 }, /* inverted exclamation mark  */
-    { "cent",      "\242",     0 }, /* cent sign  */
-    { "pound",     "\243",     0 }, /* pound sterling sign  */
-    { "curren",    "\244",     0 }, /* general currency sign  */
-    { "yen",       "\245",     0 }, /* yen sign  */
-    { "brvbar",    "\246",     0 }, /* broken (vertical) bar  */
-    { "sect",      "\247",     0 }, /* section sign  */
-    { "uml",       "\250",     0 }, /* umlaut (dieresis)  */
-    { "copy",      "\251",     0 }, /* copyright sign  */
-    { "ordf",      "\252",     0 }, /* ordinal indicator, feminine  */
-    { "laquo",     "\253",     0 }, /* angle quotation mark, left  */
-    { "not",       "\254",     0 }, /* not sign  */
-    { "shy",       "\255",     0 }, /* soft hyphen  */
-    { "reg",       "\256",     0 }, /* registered sign  */
-    { "macr",      "\257",     0 }, /* macron  */
-    { "deg",       "\260",     0 }, /* degree sign  */
-    { "plusmn",    "\261",     0 }, /* plus-or-minus sign  */
-    { "sup2",      "\262",     0 }, /* superscript two  */
-    { "sup3",      "\263",     0 }, /* superscript three  */
-    { "acute",     "\264",     0 }, /* acute accent  */
-    { "micro",     "\265",     0 }, /* micro sign  */
-    { "para",      "\266",     0 }, /* pilcrow (paragraph sign)  */
-    { "middot",    "\267",     0 }, /* middle dot  */
-    { "cedil",     "\270",     0 }, /* cedilla  */
-    { "sup1",      "\271",     0 }, /* superscript one  */
-    { "ordm",      "\272",     0 }, /* ordinal indicator, masculine  */
-    { "raquo",     "\273",     0 }, /* angle quotation mark, right  */
-    { "frac14",    "\274",     0 }, /* fraction one-quarter  */
-    { "frac12",    "\275",     0 }, /* fraction one-half  */
-    { "frac34",    "\276",     0 }, /* fraction three-quarters  */
-    { "iquest",    "\277",     0 }, /* inverted question mark  */
-    { "Agrave",    "\300",     0 }, /* capital A, grave accent  */
-    { "Aacute",    "\301",     0 }, /* capital A, acute accent  */
-    { "Acirc",     "\302",     0 }, /* capital A, circumflex accent  */
-    { "Atilde",    "\303",     0 }, /* capital A, tilde  */
-    { "Auml",      "\304",     0 }, /* capital A, dieresis or umlaut mark  */
-    { "Aring",     "\305",     0 }, /* capital A, ring  */
-    { "AElig",     "\306",     0 }, /* capital AE diphthong (ligature)  */
-    { "Ccedil",    "\307",     0 }, /* capital C, cedilla  */
-    { "Egrave",    "\310",     0 }, /* capital E, grave accent  */
-    { "Eacute",    "\311",     0 }, /* capital E, acute accent  */
-    { "Ecirc",     "\312",     0 }, /* capital E, circumflex accent  */
-    { "Euml",      "\313",     0 }, /* capital E, dieresis or umlaut mark  */
-    { "Igrave",    "\314",     0 }, /* capital I, grave accent  */
-    { "Iacute",    "\315",     0 }, /* capital I, acute accent  */
-    { "Icirc",     "\316",     0 }, /* capital I, circumflex accent  */
-    { "Iuml",      "\317",     0 }, /* capital I, dieresis or umlaut mark  */
-    { "ETH",       "\320",     0 }, /* capital Eth, Icelandic  */
-    { "Ntilde",    "\321",     0 }, /* capital N, tilde  */
-    { "Ograve",    "\322",     0 }, /* capital O, grave accent  */
-    { "Oacute",    "\323",     0 }, /* capital O, acute accent  */
-    { "Ocirc",     "\324",     0 }, /* capital O, circumflex accent  */
-    { "Otilde",    "\325",     0 }, /* capital O, tilde  */
-    { "Ouml",      "\326",     0 }, /* capital O, dieresis or umlaut mark  */
-    { "times",     "\327",     0 }, /* multiply sign  */
-    { "Oslash",    "\330",     0 }, /* capital O, slash  */
-    { "Ugrave",    "\331",     0 }, /* capital U, grave accent  */
-    { "Uacute",    "\332",     0 }, /* capital U, acute accent  */
-    { "Ucirc",     "\333",     0 }, /* capital U, circumflex accent  */
-    { "Uuml",      "\334",     0 }, /* capital U, dieresis or umlaut mark  */
-    { "Yacute",    "\335",     0 }, /* capital Y, acute accent  */
-    { "THORN",     "\336",     0 }, /* capital THORN, Icelandic  */
-    { "szlig",     "\337",     0 }, /* small sharp s, German (sz ligature)  */
-    { "agrave",    "\340",     0 }, /* small a, grave accent  */
-    { "aacute",    "\341",     0 }, /* small a, acute accent  */
-    { "acirc",     "\342",     0 }, /* small a, circumflex accent  */
-    { "atilde",    "\343",     0 }, /* small a, tilde  */
-    { "auml",      "\344",     0 }, /* small a, dieresis or umlaut mark  */
-    { "aring",     "\345",     0 }, /* small a, ring  */
-    { "aelig",     "\346",     0 }, /* small ae diphthong (ligature)  */
-    { "ccedil",    "\347",     0 }, /* small c, cedilla  */
-    { "egrave",    "\350",     0 }, /* small e, grave accent  */
-    { "eacute",    "\351",     0 }, /* small e, acute accent  */
-    { "ecirc",     "\352",     0 }, /* small e, circumflex accent  */
-    { "euml",      "\353",     0 }, /* small e, dieresis or umlaut mark  */
-    { "igrave",    "\354",     0 }, /* small i, grave accent  */
-    { "iacute",    "\355",     0 }, /* small i, acute accent  */
-    { "icirc",     "\356",     0 }, /* small i, circumflex accent  */
-    { "iuml",      "\357",     0 }, /* small i, dieresis or umlaut mark  */
-    { "eth",       "\360",     0 }, /* small eth, Icelandic  */
-    { "ntilde",    "\361",     0 }, /* small n, tilde  */
-    { "ograve",    "\362",     0 }, /* small o, grave accent  */
-    { "oacute",    "\363",     0 }, /* small o, acute accent  */
-    { "ocirc",     "\364",     0 }, /* small o, circumflex accent  */
-    { "otilde",    "\365",     0 }, /* small o, tilde  */
-    { "ouml",      "\366",     0 }, /* small o, dieresis or umlaut mark  */
-    { "divide",    "\367",     0 }, /* divide sign  */
-    { "oslash",    "\370",     0 }, /* small o, slash  */
-    { "ugrave",    "\371",     0 }, /* small u, grave accent  */
-    { "uacute",    "\372",     0 }, /* small u, acute accent  */
-    { "ucirc",     "\373",     0 }, /* small u, circumflex accent  */
-    { "uuml",      "\374",     0 }, /* small u, dieresis or umlaut mark  */
-    { "yacute",    "\375",     0 }, /* small y, acute accent  */
-    { "thorn",     "\376",     0 }, /* small thorn, Icelandic  */
-    { "yuml",      "\377",     0 }, /* small y, dieresis or umlaut mark  */
-#else
     { "nbsp",      "\xC2\xA0",    0 },
     { "iexcl",     "\xC2\xA1",    0 },
     { "cent",      "\xC2\xA2",    0 },
@@ -513,7 +411,6 @@ static Er er_sequences[] = {
     { "clubs",     "\xE2\x99\xA3",    0 },
     { "hearts",    "\xE2\x99\xA5",    0 },
     { "diams",     "\xE2\x99\xA6",    0 },
-#endif
 };
 
 
@@ -643,9 +540,6 @@ static void TranslateEntityRefs (
 		    }
 		    from = i;
 		} else {
-#if TclOnly8Bits
-                z[to++] = value;
-#else 
                 if (value < 0x80) {
                     z[to++] = value;
                 } else if (value <= 0x7FF) {
@@ -658,7 +552,6 @@ static void TranslateEntityRefs (
                 } else {
                     /* error */
                 }
-#endif
 		    from = i+1;
 		}
             } else {
