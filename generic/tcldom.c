@@ -688,7 +688,8 @@ int tcldom_setInterpAndReturnVar (
         tcldom_createNodeObj(interp, node, objCmdName);
         if (setVariable) {
             objVar = Tcl_GetString(var_name);
-            Tcl_SetVar  (interp, objVar, objCmdName, 0);
+            if (!Tcl_SetVar (interp, objVar, objCmdName, TCL_LEAVE_ERR_MSG))
+                return TCL_ERROR;
         }
         SetResult(objCmdName);
     } else {
@@ -701,7 +702,8 @@ int tcldom_setInterpAndReturnVar (
         if (setVariable) {
             NODE_CMD(objCmdName, node);
             objVar = Tcl_GetString(var_name);
-            Tcl_SetVar  (interp, objVar, objCmdName, 0);
+            if (!Tcl_SetVar (interp, objVar, objCmdName, TCL_LEAVE_ERR_MSG))
+                return TCL_ERROR;
         }
     }
     return TCL_OK;
