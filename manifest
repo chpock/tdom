@@ -1,5 +1,5 @@
-C Added\sscript,\sthat\shelps\smeasuring\s(micro-)optimizations.
-D 2018-04-30T14:50:33.209
+C Fixed\sediting\serror.
+D 2018-05-02T10:03:35.580
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -230,7 +230,7 @@ F tests/xpath.bench 99e98467544b11bf625e6f72b2fb89c7516bfced
 F tests/xpath.test 73e21d99d99dd2180979941b89e60247d4e31af6
 F tests/xslt.test 298d472aa69b5159560b52a7a78460693c0e12dd
 F unix/CONFIG 63b556af9314ca6bd1abea70f3b3a34a433b342f
-F unix/speed-check.sh efa911be39abfb60a6a5d530a363b62ea37d05ee0ce1a05f82fa47f114e9fca3
+F unix/speed-check.sh 7a8d91e7edf1cdc9bcfad5f28e1a068cb2843d05e49d8bd89d9b30a46511497d
 F unix/tclAppInit.c a9d819ee595ace5199f48051aeb9ae8e6e52b5f0435bb3adc230de3f4c3f2ccd
 F win/README 73916fb24a4ac0cc509dd9e225f191943b061292
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -247,8 +247,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 82da650bd70b23bc4660920ce009b1a9c0613c2d5a8cd1c8ca014928b76dfece
-R 42e404cfe257ba0f2ccbb8735b813e82
+P 834c959f810f7c4ec8f410ebaafc09106115a12d20ad41c0ee7abc2c2e1cd683
+R 625236272738df4f002e0539c93ca037
 U rolf
-Z 5a210a7fdfe7440df70287a08a8b3f3a
+Z 77a8d1b4c2570ce7505315050015410e
 # Remove this line to create a well-formed Fossil manifest.
