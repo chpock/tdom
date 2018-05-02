@@ -29,7 +29,6 @@ PRJ_OBJS = \
 	$(TMP_DIR)\xmltok.obj      \
 	$(TMP_DIR)\xmlparse.obj    \
 	$(TMP_DIR)\xmlsimple.obj   \
-	$(TMP_DIR)\utf8conv.obj    \
 	$(TMP_DIR)\dom.obj         \
 	$(TMP_DIR)\domalloc.obj    \
 	$(TMP_DIR)\domhtml.obj     \
