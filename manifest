@@ -1,5 +1,5 @@
-C More\spruning.
-D 2018-05-02T15:27:04.006
+C Again,\smore\spruning.
+D 2018-05-02T19:11:28.861
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -204,7 +204,7 @@ F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.bench 99e98467544b11bf625e6f72b2fb89c7516bfced
 F tests/xpath.test 73e21d99d99dd2180979941b89e60247d4e31af6
 F tests/xslt.test 298d472aa69b5159560b52a7a78460693c0e12dd
-F unix/CONFIG 63b556af9314ca6bd1abea70f3b3a34a433b342f
+F unix/CONFIG 431b82a51451df40e38261b91e1a37060797ef655e8f981fab761de59f1e01e9
 F unix/speed-check.sh 7a8d91e7edf1cdc9bcfad5f28e1a068cb2843d05e49d8bd89d9b30a46511497d
 F unix/tclAppInit.c a9d819ee595ace5199f48051aeb9ae8e6e52b5f0435bb3adc230de3f4c3f2ccd
 F win/README 73916fb24a4ac0cc509dd9e225f191943b061292
@@ -221,8 +221,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P d729de4c396d71ffa68dcf0b1d4958a163914375fe02b8b19a9d833ca2fa74d3
-R e057de34d5f1d2dbe11ae515b67a83c4
+P 731b463a74ce23c9502405bb6c9ca34a891c7185953280b48e205b84f74af4ce
+R 903d81718b2c7f25fbcbfca7132337f6
 U rolf
-Z 81fbadf5ce60ce7f2f581424a01f1634
+Z 72fa3174df40d1c1cd38ff7688dc4ab5
 # Remove this line to create a well-formed Fossil manifest.
