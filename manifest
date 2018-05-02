@@ -1,5 +1,5 @@
-C More\swork\son\sserialization\sflags.
-D 2018-04-30T23:32:17.211
+C Merged\sfrom\strunk.
+D 2018-05-02T10:07:44.833
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -230,7 +230,7 @@ F tests/xpath.bench 99e98467544b11bf625e6f72b2fb89c7516bfced
 F tests/xpath.test 73e21d99d99dd2180979941b89e60247d4e31af6
 F tests/xslt.test 298d472aa69b5159560b52a7a78460693c0e12dd
 F unix/CONFIG 63b556af9314ca6bd1abea70f3b3a34a433b342f
-F unix/speed-check.sh efa911be39abfb60a6a5d530a363b62ea37d05ee0ce1a05f82fa47f114e9fca3
+F unix/speed-check.sh 7a8d91e7edf1cdc9bcfad5f28e1a068cb2843d05e49d8bd89d9b30a46511497d
 F unix/tclAppInit.c a9d819ee595ace5199f48051aeb9ae8e6e52b5f0435bb3adc230de3f4c3f2ccd
 F win/README 73916fb24a4ac0cc509dd9e225f191943b061292
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -247,8 +247,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 0774fa689807339ea9b26d67c2e4dfe6caa2792681ee29085773c56151b9746e
-R ea5e85b69879624603f267bb7eb6e865
+P 617801ee8e8531a2057b8e593587819bc8810d45b90794d32ee98758274acd00 cb72ce2fdfe5d098235e9aebe94e74f6d24b1b0300bc1d55ef402e767fcb18eb
+R 75be24470c27afd2fb586eec49426e90
 U rolf
-Z 2b3280d2ada59329245231f4a31597dd
+Z eee874f177a26320f22cbabc3c0677d1
 # Remove this line to create a well-formed Fossil manifest.
