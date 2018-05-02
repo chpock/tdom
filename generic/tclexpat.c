@@ -899,12 +899,10 @@ TclExpatParse (
   XML_Parser  parser;
   Tcl_Channel channel = NULL;
   CHandlerSet *activeCHandlerSet;
-#if !TclOnly8Bits
   Tcl_Obj       *bufObj = NULL;
   Tcl_DString    dStr;
   int            useBinary;
   char          *str;
-#endif
 
   if (expat->finished) {
       if ((result = TclExpatInitializeParser (interp, expat, 0)) != TCL_OK) 
@@ -953,7 +951,6 @@ TclExpatParse (
                             "wasn't opened for reading", (char *) NULL);
           return TCL_ERROR;
       }
-#if !TclOnly8Bits
       Tcl_DStringInit (&dStr);
       if (Tcl_GetChannelOption (interp, channel, "-encoding", &dStr) 
           != TCL_OK) {
@@ -989,15 +986,6 @@ TclExpatParse (
               Tcl_DecrRefCount (bufObj);
           }
       }
-#else
-      expat->parsingState = 2;
-      do {
-          bytesread = Tcl_Read (channel, buf, sizeof (buf));
-          done = bytesread < sizeof (buf);
-          result = XML_Parse (expat->parser, buf, bytesread, done);
-          if (result != XML_STATUS_OK) break;
-      } while (!done);
-#endif /* !TclOnly8Bits */
       expat->parsingState = 1;
       break;
 
@@ -1053,11 +1041,9 @@ TclExpatParse (
           sprintf(s, "%ld", XML_GetCurrentColumnNumber(expat->parser));
           Tcl_AppendResult(interp, s, NULL);
       }
-#if !TclOnly8Bits
       if (bufObj) {
           Tcl_DecrRefCount (bufObj);
       }
-#endif
       return TCL_ERROR;
   }
   switch (expat->status) {
