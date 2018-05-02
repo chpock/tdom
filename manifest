@@ -1,5 +1,5 @@
-C Eventually\sremoved\s"support"\sfor\stcl\s8.0.5\s-\sit\swas\sa\sfalse\sassertion\ssince\sa\swhile.
-D 2018-05-02T19:25:31.104
+C Added\sthe\spull\sparser\ssource\sfile\sto\sthe\swindows\sbuild\ssystem\sfor\sVC.
+D 2018-05-02T19:29:59.460
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -209,7 +209,7 @@ F unix/speed-check.sh 7a8d91e7edf1cdc9bcfad5f28e1a068cb2843d05e49d8bd89d9b30a465
 F unix/tclAppInit.c a9d819ee595ace5199f48051aeb9ae8e6e52b5f0435bb3adc230de3f4c3f2ccd
 F win/README 73916fb24a4ac0cc509dd9e225f191943b061292
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F win/makefile.vc 6d526070a264ac0831beea0c46782ab788ff0f785f9ea2928f57b1bfcfb19b54
+F win/makefile.vc f0b59504f6ef2025be3eed8f3455aeb5e4f86d7afe01a140d7a36a0d87bb34cc
 F win/mkd.bat 85d3fe58ce051a778447fb2bfc7384867d21cef0
 F win/nmakehlp.c 194ae7c24886245c679cb4c9ea7e6daaaebb5fcd
 F win/pkgIndex.tcl 4631218a784aae412d2a6bcadc72619eb14b264a
@@ -221,9 +221,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P cb72ce2fdfe5d098235e9aebe94e74f6d24b1b0300bc1d55ef402e767fcb18eb f14a12cfdc3b9ccca15be10f2b3fa3ed2410f9f71730b01a520177c5f58ee74a
-R 903d81718b2c7f25fbcbfca7132337f6
-T +closed f14a12cfdc3b9ccca15be10f2b3fa3ed2410f9f71730b01a520177c5f58ee74a
+P 064a48e5721639f1e09c62c3eb5052a27551253d4b69a3eb5f56e169b3db2158
+R 3816ed02e8f66e3aaccbba0858fb06c2
 U rolf
-Z f93b0ac3ac62be670aabd9d74019b84d
+Z 3c4aceaf4877b43cd122f65647865990
 # Remove this line to create a well-formed Fossil manifest.
