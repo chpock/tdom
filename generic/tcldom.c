@@ -671,39 +671,35 @@ int tcldom_setInterpAndReturnVar (
     Tcl_Obj    *var_name
 )
 {
-    char     objCmdName[80], *objVar;
+    char     objCmdName[80];
     Tcl_Obj *resultObj;
     
     GetTcldomTSD()
 
     if (node == NULL) {
         if (setVariable) {
-            objVar = Tcl_GetString(var_name);
-            Tcl_SetVar(interp, objVar, "", 0);
+            if (!Tcl_ObjSetVar2 (interp, var_name, NULL,
+                                 Tcl_NewStringObj("",0),
+                                 TCL_LEAVE_ERR_MSG)) {
+                return TCL_ERROR;
+            }
         }
         SetResult("");
         return TCL_OK;
     }
+    resultObj = Tcl_NewObj();
+    resultObj->bytes = NULL;
+    resultObj->length = 0;
+    resultObj->internalRep.otherValuePtr = node;
+    resultObj->typePtr = &tdomNodeType;
+    Tcl_SetObjResult (interp, resultObj);
     if (TSD(dontCreateObjCommands) == 0) {
         tcldom_createNodeObj(interp, node, objCmdName);
-        if (setVariable) {
-            objVar = Tcl_GetString(var_name);
-            if (!Tcl_SetVar (interp, objVar, objCmdName, TCL_LEAVE_ERR_MSG))
-                return TCL_ERROR;
-        }
-        SetResult(objCmdName);
-    } else {
-        resultObj = Tcl_NewObj();
-        resultObj->bytes = NULL;
-        resultObj->length = 0;
-        resultObj->internalRep.otherValuePtr = node;
-        resultObj->typePtr = &tdomNodeType;
-        Tcl_SetObjResult (interp, resultObj);
-        if (setVariable) {
-            NODE_CMD(objCmdName, node);
-            objVar = Tcl_GetString(var_name);
-            if (!Tcl_SetVar (interp, objVar, objCmdName, TCL_LEAVE_ERR_MSG))
-                return TCL_ERROR;
+    }
+    if (setVariable) {
+        if (!Tcl_ObjSetVar2 (interp, var_name, NULL, resultObj,
+                             TCL_LEAVE_ERR_MSG)) {
+            return TCL_ERROR;
         }
     }
     return TCL_OK;
