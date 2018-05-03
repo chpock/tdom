@@ -1,3 +1,11 @@
+2018-04-24  Rolf Ade  <rolf@pointsman.de>
+
+        Fixed a potentially dramatic speed problem in case of certain
+        classes of XPath expressions, if a threads enabled tDOM is
+        used, the result set is large and the DOM tree to query was
+        altered somewhere before the query by an operation, which
+        appended, inserted or replaced a node.
+
 2018-03-09  Rolf Ade  <rolf@pointsman.de>
 
         Added command tDOM::pullparser, with creates simple XKL "pull"

@@ -42,9 +42,6 @@
 |
 \---------------------------------------------------------------------------*/
 #include <tcl.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
 #include <dom.h>
 #include <domxpath.h>
 #include <domxslt.h>
@@ -148,15 +145,9 @@
                          } \
                      }
 
-#if TclOnly8Bits
-#define writeChars(var,chan,buf,len)  (chan) ? \
-                     ((void)Tcl_Write ((chan), (buf), (len) )) : \
-                     (Tcl_AppendToObj ((var), (buf), (len) ));
-#else
 #define writeChars(var,chan,buf,len)  (chan) ? \
                      ((void)Tcl_WriteChars ((chan), (buf), (len) )) : \
                      (Tcl_AppendToObj ((var), (buf), (len) ));
-#endif
 
 #define DOM_CREATECMDMODE_AUTO 0
 #define DOM_CREATECMDMODE_CMDS 1
@@ -174,7 +165,6 @@
 |
 \---------------------------------------------------------------------------*/
 #ifndef TCL_THREADS
-    static TEncoding *Encoding_to_8bit      = NULL;
     static int        storeLineColumn       = 0;
     static int        dontCreateObjCommands = 0;
     static int        dontCheckCharData     = 0;
@@ -184,7 +174,6 @@
 #   define GetTcldomTSD()
 #else
     typedef struct ThreadSpecificData {
-        TEncoding *Encoding_to_8bit;
         int        storeLineColumn;
         int        dontCreateObjCommands;
         int        dontCheckCharData;
@@ -223,7 +212,6 @@ static char dom_usage[] =
     "    detachDocument domDoc                            \n"
     )
     "    createNodeCmd ?-returnNodeCmd? ?-tagName name? ?-jsonType jsonType? ?-namespace URI? (element|comment|text|cdata|pi)Node cmdName \n"
-    "    setResultEncoding ?encodingName?                 \n"
     "    setStoreLineColumn ?boolean?                     \n"
     "    setNameCheck ?boolean?                           \n"
     "    setTextCheck ?boolean?                           \n"
@@ -690,37 +678,35 @@ int tcldom_setInterpAndReturnVar (
     Tcl_Obj    *var_name
 )
 {
-    char     objCmdName[80], *objVar;
+    char     objCmdName[80];
     Tcl_Obj *resultObj;
     
     GetTcldomTSD()
 
     if (node == NULL) {
         if (setVariable) {
-            objVar = Tcl_GetString(var_name);
-            Tcl_SetVar(interp, objVar, "", 0);
+            if (!Tcl_ObjSetVar2 (interp, var_name, NULL,
+                                 Tcl_NewStringObj("",0),
+                                 TCL_LEAVE_ERR_MSG)) {
+                return TCL_ERROR;
+            }
         }
         SetResult("");
         return TCL_OK;
     }
+    resultObj = Tcl_NewObj();
+    resultObj->bytes = NULL;
+    resultObj->length = 0;
+    resultObj->internalRep.otherValuePtr = node;
+    resultObj->typePtr = &tdomNodeType;
+    Tcl_SetObjResult (interp, resultObj);
     if (TSD(dontCreateObjCommands) == 0) {
         tcldom_createNodeObj(interp, node, objCmdName);
-        if (setVariable) {
-            objVar = Tcl_GetString(var_name);
-            Tcl_SetVar  (interp, objVar, objCmdName, 0);
-        }
-        SetResult(objCmdName);
-    } else {
-        resultObj = Tcl_NewObj();
-        resultObj->bytes = NULL;
-        resultObj->length = 0;
-        resultObj->internalRep.otherValuePtr = node;
-        resultObj->typePtr = &tdomNodeType;
-        Tcl_SetObjResult (interp, resultObj);
-        if (setVariable) {
-            NODE_CMD(objCmdName, node);
-            objVar = Tcl_GetString(var_name);
-            Tcl_SetVar  (interp, objVar, objCmdName, 0);
+    }
+    if (setVariable) {
+        if (!Tcl_ObjSetVar2 (interp, var_name, NULL, resultObj,
+                             TCL_LEAVE_ERR_MSG)) {
+            return TCL_ERROR;
         }
     }
     return TCL_OK;
@@ -1237,7 +1223,6 @@ int tcldom_appendXML (
                           xml_string_len,
                           1,
                           0,
-                          TSD(Encoding_to_8bit),
                           TSD(storeLineColumn),
                           ignorexmlns,
                           0,
@@ -2217,11 +2202,9 @@ void tcldom_AppendEscaped (
 #define AE(s)  pc1 = s; while(*pc1) *b++ = *pc1++;
     char  buf[APESC_BUF_SIZE+80], *b, *bLimit,  *pc, *pc1, *pEnd, charRef[10];
     int   charDone, i;
-#if !TclOnly8Bits
     int   clen = 0;
     int   unicode;
     Tcl_UniChar uniChar;
-#endif
     
     b = buf;
     bLimit = b + APESC_BUF_SIZE;
@@ -2249,12 +2232,8 @@ void tcldom_AppendEscaped (
             charDone = 0;
             if (outputFlags & SERIALIZE_HTML_ENTITIES) {
                 charDone = 1;
-#if TclOnly8Bits
-                switch ((unsigned int)*pc)
-#else           
                 Tcl_UtfToUniChar(pc, &uniChar);
                 switch (uniChar) 
-#endif
                 {
                 case 0240: AE("&nbsp;");    break;     
                 case 0241: AE("&iexcl;");   break;    
@@ -2352,7 +2331,6 @@ void tcldom_AppendEscaped (
                 case 0375: AE("&yacute;");  break;   
                 case 0376: AE("&thorn;");   break;    
                 case 0377: AE("&yuml;");    break;     
-#if !TclOnly8Bits
                 /* "Special" chars, according to XHTML xhtml-special.ent */
                 case 338:  AE("&OElig;");   break;
                 case 339:  AE("&oelig;");   break;
@@ -2507,30 +2485,13 @@ void tcldom_AppendEscaped (
                 case 9827: AE("&clubs;");   break;    
                 case 9829: AE("&hearts;");  break;   
                 case 9830: AE("&diams;");   break;    
-#endif                    
                 default: charDone = 0; 
                 }
-#if !TclOnly8Bits
                 if (charDone) {
                     clen = UTF8_CHAR_LEN(*pc);
                     pc += (clen - 1);
                 }
-#endif
             }
-#if TclOnly8Bits
-            if (!charDone) {
-                if (outputFlags & SERIALIZE_ESCAPE_NON_ASCII && ((unsigned char)*pc > 127)) {
-                    AP('&') AP('#')
-                    sprintf(charRef, "%d", (unsigned char)*pc);
-                    for (i = 0; i < 3; i++) {
-                        AP(charRef[i]);
-                    }
-                    AP(';')
-                } else {
-                    AP(*pc);
-                }
-            }
-#else
             if (!charDone) {
                 if ((unsigned char)*pc > 127) {
                     clen = UTF8_CHAR_LEN(*pc);
@@ -2567,7 +2528,6 @@ void tcldom_AppendEscaped (
                     AP(*pc);
                 }
             }
-#endif
         }
         if (b >= bLimit) {
             writeChars(xmlString, chan, buf, b - buf);
@@ -6104,52 +6064,6 @@ int tcldom_createDocumentNS (
                                     0);
 }
 
-
-/*----------------------------------------------------------------------------
-|   tcldom_setResultEncoding
-|
-\---------------------------------------------------------------------------*/
-static
-int tcldom_setResultEncoding (
-    ClientData  clientData,
-    Tcl_Interp *interp,
-    int         objc,
-    Tcl_Obj    * const objv[]
-)
-{
-    GetTcldomTSD()
-
-    TEncoding *encoding;
-    char      *encodingName;
-
-    CheckArgs(1,2,1,"?encodingName?");
-    if (objc == 1) {
-        if (TSD(Encoding_to_8bit) == NULL) {
-            Tcl_AppendResult(interp, "UTF-8", NULL);
-        } else {
-            Tcl_AppendResult(interp, TSD(Encoding_to_8bit->name), NULL);
-        }
-        return TCL_OK;
-    }
-    encodingName = Tcl_GetString(objv[1]);
-    if ( (strcmp(encodingName, "UTF-8")==0)
-       ||(strcmp(encodingName, "UTF8")==0)
-       ||(strcmp(encodingName, "utf-8")==0)
-       ||(strcmp(encodingName, "utf8")==0)) {
-
-        TSD(Encoding_to_8bit) = NULL;
-    } else {
-        encoding = tdom_GetEncoding ( encodingName );
-        if (encoding == NULL) {
-             Tcl_AppendResult(interp, "encoding not found", NULL);
-             return TCL_ERROR;
-        }
-        TSD(Encoding_to_8bit) = encoding;
-    }
-    return TCL_OK;
-}
-
-
 /*----------------------------------------------------------------------------
 |   tcldom_parse
 |
@@ -6589,7 +6503,6 @@ int tcldom_parse (
                           xml_string_len,
                           ignoreWhiteSpaces,
                           keepCDATA,
-                          TSD(Encoding_to_8bit),
                           TSD(storeLineColumn),
                           ignorexmlns,
                           feedbackAfter,
@@ -6801,7 +6714,7 @@ int tcldom_DomObjCmd (
 
     static const char *domMethods[] = {
         "createDocument",  "createDocumentNS",   "createNodeCmd",
-        "parse",           "setResultEncoding",  "setStoreLineColumn",
+        "parse",                                 "setStoreLineColumn",
         "isCharData",      "isName",             "isPIName",
         "isQName",         "isComment",          "isCDATA",
         "isPIValue",       "isNCName",           "createDocumentNode",
@@ -6814,7 +6727,7 @@ int tcldom_DomObjCmd (
     };
     enum domMethod {
         m_createDocument,    m_createDocumentNS,   m_createNodeCmd,
-        m_parse,             m_setResultEncoding,  m_setStoreLineColumn,
+        m_parse,                                   m_setStoreLineColumn,
         m_isCharData,        m_isName,             m_isPIName,
         m_isQName,           m_isComment,          m_isCDATA,
         m_isPIValue,         m_isNCName,           m_createDocumentNode,
@@ -6934,9 +6847,6 @@ int tcldom_DomObjCmd (
             }
             break;
 #endif
-
-        case m_setResultEncoding:
-            return tcldom_setResultEncoding(clientData, interp, --objc, objv+1);
 
         case m_setStoreLineColumn:
             if (objc == 3) {

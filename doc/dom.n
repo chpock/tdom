@@ -421,21 +421,6 @@ memory handling as explained above.
 \&\fRCreates a new 'empty' DOM document object without any element
 node. \fIobjVar\fR controls the memory handling as explained above.
 .TP
-\&\fB\fBdom\fP \fBsetResultEncoding\fP ?\fIencodingName\fB?
-\&\fRThis option is for backward compatibility with Tcl
-8.0. If tDOM is build with any newer Tcl version this option
-does not has any effect. If \fIencodingName\fR is not given
-the current global result encoding is returned. Otherwise
-the global result encoding is set to \fIencodingName\fR.
-All character data, attribute values etc. will then be
-converted from UTF-8, which is delivered from the Expat XML
-parser, to the given 8 bit encoding at XML/DOM parse time.
-Valid values for \fIencodingName\fR are: utf-8, ascii,
-cp1250, cp1251, cp1252, cp1253, cp1254, cp1255, cp1256,
-cp437, cp850, en, iso8859-1, iso8859-2, iso8859-3,
-iso8859-4, iso8859-5, iso8859-6, iso8859-7, iso8859-8,
-iso8859-9, koi8-r.
-.TP
 \&\fB\fBdom\fP \fBcreateNodeCmd\fP \fI?-returnNodeCmd?\fB \fI?-tagName name?\fB \fI?-jsonType jsonType?\fB \fI?-namespace URI?\fB \fI(element|comment|text|cdata|pi)Node\fB \fIcommandName\fB
 \&\fRThis method creates Tcl commands, which in turn create
 tDOM nodes. Tcl commands created by this command are only
