@@ -5583,7 +5583,6 @@ $as_echo "no" >&6; }
 
 
     vars="generic/xmlsimple.c \
-                 generic/utf8conv.c  \
                  generic/dom.c       \
                  generic/domhtml.c   \
                  generic/domhtml5.c  \
@@ -5595,6 +5594,7 @@ $as_echo "no" >&6; }
                  generic/nodecmd.c   \
                  generic/tdominit.c  \
                  generic/tclexpat.c  \
+                 generic/tclpull.c   \
                  generic/tdomStubInit.c"
     for i in $vars; do
 	case $i in

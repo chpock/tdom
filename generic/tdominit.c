@@ -42,6 +42,7 @@
 #include <dom.h>
 #include <tdom.h>
 #include <tcldom.h>
+#include <tclpull.h>
 
 extern TdomStubs tdomStubs;
 
@@ -62,9 +63,9 @@ extern TdomStubs tdomStubs;
  */
 
 int
-Tdom_Init (interp)
-     Tcl_Interp *interp; /* Interpreter to initialize. */
-{
+Tdom_Init (
+     Tcl_Interp *interp /* Interpreter to initialize. */
+) {
         
 #ifdef USE_TCL_STUBS
     Tcl_InitStubs(interp, "8", 0);
@@ -90,6 +91,10 @@ Tdom_Init (interp)
     Tcl_CreateObjCommand(interp, "expat",       TclExpatObjCmd, NULL, NULL );
     Tcl_CreateObjCommand(interp, "xml::parser", TclExpatObjCmd, NULL, NULL );
 #endif
+
+#ifndef TDOM_NO_PULL
+    Tcl_CreateObjCommand(interp, "tDOM::pullparser", tDOM_PullParserCmd, NULL, NULL );    
+#endif
     
 #ifdef USE_TCL_STUBS
     Tcl_PkgProvideEx(interp, PACKAGE_NAME, PACKAGE_VERSION, 
@@ -102,9 +107,9 @@ Tdom_Init (interp)
 }
 
 int
-Tdom_SafeInit (interp)
-     Tcl_Interp *interp;
-{
+Tdom_SafeInit (
+     Tcl_Interp *interp
+) {
     return Tdom_Init (interp);
 }
 

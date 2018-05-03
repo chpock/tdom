@@ -37,9 +37,10 @@
 #define __DOM_H__
 
 #include <tcl.h>
+#include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
 #include <expat.h>
-#include <utf8conv.h>
 #include <domalloc.h>
 
 /*
@@ -84,13 +85,6 @@
 #  define MEM_SUITE &memsuite
 #else
 #  define MEM_SUITE NULL
-#endif
-
-/*
- * Beginning with 8.4, Tcl API is CONST'ified
- */
-#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION <= 3)
-# define CONST84
 #endif
 
 /*
@@ -143,26 +137,16 @@
 #define XML_NAMESPACE "http://www.w3.org/XML/1998/namespace"
 #define XMLNS_NAMESPACE "http://www.w3.org/2000/xmlns"
 
-#if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0) || TCL_MAJOR_VERSION < 8
-#define TclOnly8Bits 1
-#else
-#define TclOnly8Bits 0
-#endif
-
 #define UTF8_1BYTE_CHAR(c) ( 0    == ((c) & 0x80))
 #define UTF8_2BYTE_CHAR(c) ( 0xC0 == ((c) & 0xE0))
 #define UTF8_3BYTE_CHAR(c) ( 0xE0 == ((c) & 0xF0))
 #define UTF8_4BYTE_CHAR(c) ( 0xF0 == ((c) & 0xF8))
 
-#if TclOnly8Bits
-#define UTF8_CHAR_LEN(c) 1
-#else
 #define UTF8_CHAR_LEN(c) \
   UTF8_1BYTE_CHAR((c)) ? 1 : \
    (UTF8_2BYTE_CHAR((c)) ? 2 : \
      (UTF8_3BYTE_CHAR((c)) ? 3 : \
        (UTF8_4BYTE_CHAR((c)) ? 4 : 0)))
-#endif
 
 /* The following 2 defines are out of the expat code */
 
@@ -224,11 +208,7 @@ We need 8 bits to index into pages, 3 bits to add to that index and
       ? UTF8_GET_NAMING3(nmstrtPages, (const unsigned char *)(p)) \
       : 0)))
 
-#if TclOnly8Bits 
-#  define UTF8_XMLCHAR(p,n) \
- (*(p) < 0x80 ? CharBit[(int)(*(p))] : 1)
-#else  
-#  define UTF8_XMLCHAR3(p) \
+#define UTF8_XMLCHAR3(p) \
   (*(p) == 0xED  \
    ? ((p)[1] < 0xA0 ? 1 : 0) \
    : (*(p) == 0xEF \
@@ -243,7 +223,7 @@ We need 8 bits to index into pages, 3 bits to add to that index and
  * this define does not care about the discouraged characters beyond
  * #xFFFF (but after all, they are only discouraged, not
  * forbidden). */
-#  define UTF8_XMLCHAR(p, n) \
+#define UTF8_XMLCHAR(p, n) \
   ((n) == 1 \
   ? CharBit[(int)(*(p))] \
   : ((n) == 2 \
@@ -252,7 +232,6 @@ We need 8 bits to index into pages, 3 bits to add to that index and
       ? (UTF8_XMLCHAR3(p)) \
       : ((n) == 4 \
         ? 1 : 0))))
-#endif
 
 #include "../expat/nametab.h"
 
@@ -354,17 +333,10 @@ static const unsigned char CharBit[] = {
 };
 
 
-#if TclOnly8Bits == 1
-#  define isNameStart(x)   (isalpha(*x) || ((*x)=='_') || ((*x)==':'))
-#  define isNameChar(x)    (isalnum(*x)  || ((*x)=='_') || ((*x)=='-') || ((*x)=='.') || ((*x)==':'))
-#  define isNCNameStart(x) (isalpha(*x) || ((*x)=='_'))
-#  define isNCNameChar(x)  (isalnum(*x)  || ((*x)=='_') || ((*x)=='-') || ((*x)=='.'))
-#else
-#  define isNameStart(x)   UTF8_GET_NAME_START((x),UTF8_CHAR_LEN(*(x)))
-#  define isNCNameStart(x) UTF8_GET_NCNAME_START((x),UTF8_CHAR_LEN(*(x)))
-#  define isNameChar(x)    UTF8_GET_NAMING_NMTOKEN((x),UTF8_CHAR_LEN(*(x)))
-#  define isNCNameChar(x)  UTF8_GET_NAMING_NCNMTOKEN((x),UTF8_CHAR_LEN(*(x)))
-#endif
+#define isNameStart(x)   UTF8_GET_NAME_START((x),UTF8_CHAR_LEN(*(x)))
+#define isNCNameStart(x) UTF8_GET_NCNAME_START((x),UTF8_CHAR_LEN(*(x)))
+#define isNameChar(x)    UTF8_GET_NAMING_NMTOKEN((x),UTF8_CHAR_LEN(*(x)))
+#define isNCNameChar(x)  UTF8_GET_NAMING_NCNMTOKEN((x),UTF8_CHAR_LEN(*(x)))
 
 #define IS_XML_WHITESPACE(c)  ((c)==' ' || (c)=='\n' || (c)=='\r' || (c)=='\t')
 
@@ -440,6 +412,8 @@ typedef unsigned int domDocFlags;
 #define NEEDS_RENUMBERING         2
 #define DONT_FREE                 4
 #define IGNORE_XMLNS              8
+#define DOCUMENT_CMD             16
+#define VAR_TRACE                32
 
 /*--------------------------------------------------------------------------
 |   a index to the namespace records
@@ -728,7 +702,7 @@ const char *   domException2String (domException exception);
 
 void           domModuleInitialize (void);
 domDocument *  domCreateDoc (const char *baseURI, int storeLineColumn);
-domDocument *  domCreateDocument (Tcl_Interp *interp, const char *uri,
+domDocument *  domCreateDocument (const char *uri,
                                   char *documentElementTagName);
 void           domSetDocumentElement (domDocument *doc);
 
@@ -737,7 +711,6 @@ domDocument *  domReadDocument   (XML_Parser parser,
                                   int   length,
                                   int   ignoreWhiteSpaces,
                                   int   keepCDATA,
-                                  TEncoding *encoding_8bit,
                                   int   storeLineColumn,
                                   int   ignoreXMLNS,
                                   int   feedbackAfter,

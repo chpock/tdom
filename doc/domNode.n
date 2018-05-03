@@ -163,7 +163,10 @@ Database Class:	\\fB\\$3\\fR
 domNode \- Manipulates an instance of a DOM node object
 .SH SYNOPSIS
 .nf
- $nodeObject \fImethod\fR  \fIarg arg ...\fR
+$nodeObject \fImethod\fR \fIarg arg ...\fR
+.fi
+.nf
+domNode \fInodeToken\fR \fImethod\fR \fIarg arg ...\fR
 .fi
 .BE
 .SH " DESCRIPTION "

@@ -22,7 +22,7 @@
 # define TDomThreaded(x) x
 #endif
 
-/* The inital stack sizes must be at least 1 */
+/* The initial stack sizes must be at least 1 */
 #define TNC_INITCONTENTSTACKSIZE 512
 
 /*----------------------------------------------------------------------------
@@ -181,13 +181,13 @@ enum TNC_Error {
     TNC_ERROR_NO_DOCTYPE_DECL,
     TNC_ERROR_WRONG_ROOT_ELEMENT,
     TNC_ERROR_NO_ATTRIBUTES,
-    TNC_ERROR_UNKOWN_ATTRIBUTE,
+    TNC_ERROR_UNKNOWN_ATTRIBUTE,
     TNC_ERROR_WRONG_FIXED_ATTVALUE,
     TNC_ERROR_MISSING_REQUIRED_ATTRIBUTE,
     TNC_ERROR_MORE_THAN_ONE_ID_ATT,
     TNC_ERROR_ID_ATT_DEFAULT,
     TNC_ERROR_DUPLICATE_ID_VALUE,
-    TNC_ERROR_UNKOWN_ID_REFERRED,
+    TNC_ERROR_UNKNOWN_ID_REFERRED,
     TNC_ERROR_ENTITY_ATTRIBUTE,
     TNC_ERROR_ENTITIES_ATTRIBUTE,
     TNC_ERROR_ATT_ENTITY_DEFAULT_MUST_BE_DECLARED,
@@ -582,7 +582,7 @@ TncEntityDeclHandler (userData, entityName, is_parameter_entity, value,
 
     /* expat collects entity definitions internaly by itself. So this is
        maybe superfluous, if it possible to access the expat internal
-       represention. To study this is left to the reader. */
+       representation. To study this is left to the reader. */
 
     if (is_parameter_entity) return;
     entryPtr = Tcl_CreateHashEntry (tncdata->entityDecls, entityName, &newPtr);
@@ -1217,7 +1217,7 @@ TncProbeElement (nameId, tncdata)
                   here, they don't.  Since the current cp has already
                   matched and isn't multiple, the current cp as a whole
                   is done.  But no contradiction detected, so return
-                  "search futher" */
+                  "search further" */
                 return -1;
             }
         }
@@ -1293,7 +1293,7 @@ TncProbeElement (nameId, tncdata)
                 tncdata->contentStackPtr--;
             }
         }
-        /* OK, nobody has claimed a match. Question is: try futher or is
+        /* OK, nobody has claimed a match. Question is: try further or is
            this a document structure error. */
         if (zeroMatchPossible ||
             stackelm->alreadymatched ||
@@ -1392,7 +1392,7 @@ TncProbeElement (nameId, tncdata)
         if (!stackelm->alreadymatched) {
             if (zeroMatchPossible) {
                 /* The stackelm hasn't matched, but don't have to
-                   after all.  Return try futher */
+                   after all.  Return try further */
                 return -1;
             } else {
                 /* No previous match, but at least one child is
@@ -1420,7 +1420,7 @@ TncProbeElement (nameId, tncdata)
                    where no required (quant NONE or PLUS) childs. */
                 if (stackelm->model->quant == XML_CQUANT_NONE ||
                     stackelm->model->quant == XML_CQUANT_OPT) {
-                    /* The entire seq isn't multiple. Just look futher. */
+                    /* The entire seq isn't multiple. Just look further. */
                     return -1;
                 }
             }
@@ -1430,8 +1430,8 @@ TncProbeElement (nameId, tncdata)
            last match) true and the entire seq may be
            multiple. Therefore start again with activeChild = 0, to
            see, if the current nameId starts a repeated match of the
-           seq.  By the way: zeroMatchPossible still has inital value
-           1, therefor no second initaliation is needed */
+           seq.  By the way: zeroMatchPossible still has initial value
+           1, therefor no second initialiation is needed */
         for (i = 0; i < seqstartindex; i++) {
             if ((&stackelm->model->children[i])->type == XML_CTYPE_NAME) {
                 if ((&stackelm->model->children[i])->nameId == nameId) {
@@ -1533,7 +1533,7 @@ TncProbeAttribute (userData, elemAtts, attrName, attrValue, nrOfreq)
 
     entryPtr = Tcl_FindHashEntry (elemAtts, attrName);
     if (!entryPtr) {
-        signalNotValid (userData, TNC_ERROR_UNKOWN_ATTRIBUTE);
+        signalNotValid (userData, TNC_ERROR_UNKNOWN_ATTRIBUTE);
         return 0;
     }
     /* NOTE: attribute uniqueness per element is a wellformed
@@ -2139,7 +2139,7 @@ TncElementEndCommand (userData, name)
                 printf ("value %p\n", Tcl_GetHashValue (entryPtr));
 #endif
                 if (!Tcl_GetHashValue (entryPtr)) {
-                    signalNotValid (userData, TNC_ERROR_UNKOWN_ID_REFERRED);
+                    signalNotValid (userData, TNC_ERROR_UNKNOWN_ID_REFERRED);
                 return;
                 }
             }

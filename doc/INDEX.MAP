@@ -2,6 +2,7 @@
     <MAN id="dom" title="dom"/>
     <DEF cat="manpage" name="dom" manpage="dom"/>
     <DEF cat="cmd" name="dom" manpage="dom"/>
+    <DEF cat="cmd" name="dom" manpage="dom"/>
     <KWD name="XML" manpage="dom"/>
     <KWD name="DOM" manpage="dom"/>
     <KWD name="document" manpage="dom"/>
@@ -23,12 +24,22 @@
     <MAN id="expat" title="expat"/>
     <DEF cat="manpage" name="expat" manpage="expat"/>
     <DEF cat="cmd" name="expat" manpage="expat"/>
+    <DEF cat="cmd" name="expat" manpage="expat"/>
     <DEF cat="cmd" name="xml::parser" manpage="expat"/>
     <KWD name="SAX" manpage="expat"/>
+    <KWD name="push" manpage="expat"/>
+    <KWD name="pushparser" manpage="expat"/>
     <MAN id="expatapi" title="expatapi"/>
     <DEF cat="manpage" name="expatapi" manpage="expatapi"/>
     <DEF cat="fun" name="CheckExpatParserObj, CHandlerSetInstall, CHandlerSetRemove,&#xA;         CHandlerSetCreate, CHandlerSetGetUserData, GetExpatInfo" manpage="expatapi"/>
     <KWD name="C handler set" manpage="expatapi"/>
+    <MAN id="pullparser" title="pullparser"/>
+    <DEF cat="manpage" name="pullparser" manpage="pullparser"/>
+    <DEF cat="pullparser" name="tDOM::pullparser" manpage="pullparser"/>
+    <DEF cat="cmd" name="tDOM::pullparser" manpage="pullparser"/>
+    <KWD name="XML" manpage="pullparser"/>
+    <KWD name="pull" manpage="pullparser"/>
+    <KWD name="parsing" manpage="pullparser"/>
     <MAN id="tdomcmd" title="tdom"/>
     <DEF cat="manpage" name="tdomcmd" manpage="tdomcmd"/>
     <DEF cat="cmd" name="tdom" manpage="tdomcmd"/>

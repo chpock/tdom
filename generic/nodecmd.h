@@ -34,7 +34,7 @@
 
 int nodecmd_createNodeCmd (Tcl_Interp    * interp,
                            int             objc,
-                           Tcl_Obj *CONST  objv[],
+                           Tcl_Obj *const  objv[],
                            int             checkName,
                            int             checkCharData);
 

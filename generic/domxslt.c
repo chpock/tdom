@@ -49,11 +49,8 @@
 |
 \---------------------------------------------------------------------------*/
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <math.h>
 #include <limits.h>
-#include <ctype.h>
 #include <locale.h>
 #include <dom.h>
 #include <domxpath.h>
@@ -304,19 +301,6 @@ typedef struct xsltVarInProcess
 \-------------------------------------------------------------------------*/
 typedef struct xsltDecimalFormat
 {
-#if TclOnly8Bits
-    char   * name;
-    char   * uri;
-    char     decimalSeparator;
-    char     groupingSeparator;
-    char   * infinity;
-    char     minusSign;
-    char   * NaN;
-    char     percent;
-    char     zeroDigit;
-    char     digit;
-    char     patternSeparator;
-#else 
     char        * name;
     char        * uri;
     Tcl_UniChar   decimalSeparator;
@@ -329,7 +313,6 @@ typedef struct xsltDecimalFormat
     Tcl_UniChar   zeroDigit;
     Tcl_UniChar   digit;
     Tcl_UniChar   patternSeparator;
-#endif /* TclOnly8Bits */
 
     struct xsltDecimalFormat * next;
 
@@ -1103,7 +1086,7 @@ static void formatValue (
                 Tcl_DStringAppend (str, f->tokens[*useFormatToken-1].sepStart,
                                    f->tokens[*useFormatToken-1].sepLen);
             } else {
-                /* insert default seperator '.' */
+                /* insert default separator '.' */
                 Tcl_DStringAppend (str, ".", 1);
             }
         }
@@ -1116,213 +1099,6 @@ static void formatValue (
 |   xsltFormatNumber
 |
 \---------------------------------------------------------------------------*/
-#if TclOnly8Bits
-static int xsltFormatNumber (
-    double              number,
-    char              * formatStr,
-    xsltDecimalFormat * df,
-    char             ** resultStr,
-    int               * resultLen,
-    char             ** errMsg
-)
-{
-    char *p, prefix[800], suffix[800], s[2400], n[800], f[800];
-    char *negformat = NULL, save = '\0', save1;
-    int i, l, zl, g, nHash, nZero, fHash, fZero, gLen, isNeg;
-/*      struct lconv *lc = NULL;  */
-    char wrongFormat[] = "Unable to interpret format pattern.";
-
-    DBG(fprintf(stderr, "\nformatStr='%s' \n", formatStr);)
-    if (number < 0.0) {
-        isNeg = 1;
-        number *= -1.0;
-    } else {
-        isNeg = 0;
-    }
-    p = formatStr;
-    while (*p) {
-        if (*p == df->patternSeparator) {
-            *p = '\0';
-            negformat = ++p;
-            break;
-        }
-        p++;
-    }
-    /* Check for more than one patternSeparator in the formatStr */
-    while (*p) {
-        if (*p == df->patternSeparator) {
-            *errMsg = tdomstrdup(wrongFormat);
-            return -1;
-        }
-        p++;
-    }
-    p = formatStr;
-
-    i = 0;
-    while (*p 
-           && (*p!=df->zeroDigit) 
-           && (*p!=df->digit) 
-           && (*p!=df->groupingSeparator) 
-           && (*p!=df->decimalSeparator)) {
-        if (i<79) { prefix[i++] = *p; }
-        p++;
-    }
-    prefix[i] = '\0';
-    nHash = nZero = fHash = fZero = 0;
-    gLen = -2222;
-    while (*p) {
-             if (*p==df->digit) {
-                 if (nZero) {*errMsg = tdomstrdup(wrongFormat); return -1;}
-                 nHash++;}
-        else if (*p==df->zeroDigit) { nZero++; }
-        else if (*p==df->groupingSeparator) { gLen=-1; }
-        else break;
-        p++; gLen++;
-    }
-    if (*p && (*p==df->decimalSeparator)) {
-        p++;
-        while (*p && (*p==df->zeroDigit)) { p++; fZero++; }
-        while (*p && (*p==df->digit)) { p++; fHash++; }
-    }
-    i = 0;
-    while (*p) {
-        if (i<79) { suffix[i++] = *p; }
-        p++;
-    }
-    suffix[i] = '\0';
-    if (save) *p = save;
-
-    if (isNeg && negformat) {
-        /* Only prefix and suffix are taken from the second format string */
-        p++;
-        i = 0;
-        while (*p 
-               && *p!=df->zeroDigit
-               && *p!=df->digit 
-               && *p!=df->groupingSeparator 
-               && *p!=df->decimalSeparator) {
-            if (i<79) { prefix[i++] = *p; }
-            p++;
-        }
-        prefix[i] = '\0';
-        while (*p 
-               && ((*p==df->zeroDigit) 
-                   || (*p==df->digit) 
-                   || (*p==df->groupingSeparator) 
-                   || (*p==df->decimalSeparator))) p++;
-        i = 0;
-        while (*p) {
-            if (i<79) { suffix[i++] = *p; }
-            p++;
-        }
-        suffix[i] = '\0';
-    }
-
-    if (isNeg) {
-        if (negformat) {
-            if (prefix[0]=='\0' && suffix[0]=='\0') {
-                prefix[0] = df->minusSign;
-                prefix[1] = '\0';
-            }
-        } else {
-            i = 0;
-            save = prefix[0];
-            prefix[0] = df->minusSign;
-            while (i < 79) {
-                i++;
-                if (save == '\0') {
-                    prefix[i] = save;
-                    break;
-                }
-                save1 = prefix[i];
-                prefix[i] = save;
-                save = save1;
-            }
-            if (i == 79) prefix[79] = '\0';
-        }
-    }
-    if (prefix[0]=='\xc2' && prefix[1]=='\xa4') {
-/*          lc = localeconv(); */
-/*          if (strlen (lc->currency_symbol) > 79 */
-/*              || lc->currency_symbol[0] == '\0') { */
-            prefix[0] = '$';
-            prefix[1] = '\0';
-/*          } else { */
-/*              strcpy (prefix, lc->currency_symbol); */
-/*          } */
-    }
-
-    if (suffix[0] == df->percent) {
-        number *= 100.0;
-    } else 
-    if (suffix[0]=='\xe2' && suffix[1]=='\x80' && suffix[2]=='\xb0') {
-        number *= 1000.0;
-    }
-    
-    if (fHash + fZero == 0) {
-        i = (int) (number+0.5);
-    } else {
-        i = (int) number;
-    }
-    DBG(fprintf(stderr,"normal part nZero=%d i=%d glen=%d\n", nZero, i, gLen);)
-    /* fill in grouping char */
-    if (gLen > 0) {
-        if (i < 0.0) {isNeg = 1; i *= -1;}
-        else isNeg = 0;
-        sprintf(s,"%0*d", nZero, i);
-        l = strlen(s);
-        /* if (l > (nHash+nZero)) { l = nHash+nZero; } */
-        DBG(fprintf(stderr,"s='%s isNeg=%d'\n", s, isNeg);)
-        zl = l + ((l-1) / gLen);
-        DBG(fprintf(stderr, "l=%d zl=%d \n", l, zl);)
-        n[zl--] = '\0';
-        p = s + strlen(s) -1;
-        g = 0;
-        while (zl>=0) {
-            g++;
-            n[zl--] = *p--;
-            if ((g == gLen) && (zl>=1)) {
-                n[zl--] = df->groupingSeparator;
-                g = 0;
-            }
-        }
-        DBG(fprintf(stderr,"s='%s' --> n='%s'\n", s, n);)
-
-    } else {
-        sprintf(n,"%0*d", nZero, i);
-        DBG(fprintf(stderr,"n='%s'\n", n);)
-    }
-
-    DBG(fprintf(stderr, "number=%f Hash=%d fZero=%d \n", number, fHash, fZero);)
-    if ((fHash+fZero) > 0) {
-        i = (int) number;
-        /* format fraction part */
-        if (number >= 0.0) {
-            sprintf(f,"%0.*f", fZero+fHash, number -i);
-        } else {
-            sprintf(f,"%0.*f", fZero+fHash, -1.0 * (number -i) );
-        }
-        l = strlen(f);
-        while (l>0 && fHash>0) {   /* strip not need 0's */
-            if (f[l-1] == '0') {
-                f[l-1]='\0'; l--; fHash--;
-            } else {
-                break;
-            }
-        }
-        DBG(fprintf(stderr, "f='%s'\n", f);)
-        sprintf(s,"%s%s%c%s%s", prefix, n, df->decimalSeparator, &(f[2]), suffix);
-    } else {
-        sprintf(s,"%s%s%s", prefix, n, suffix);
-    }
-    DBG(fprintf(stderr, "returning s='%s' \n\n", s);)
-    *resultStr = tdomstrdup(s);
-    *resultLen = strlen(s);
-    return 0;
-}
-
-#else
-
 static int addCurrencySymbol (
     Tcl_UniChar  *p,
     Tcl_UniChar  *result,
@@ -1751,11 +1527,8 @@ static int xsltFormatNumber (
     return -1;
 }
 
-#endif /* TclOnly8Bits */
-
-
 static xsltNodeSet *
-createXsltNodeSet () 
+createXsltNodeSet (void) 
 {
     xsltNodeSet * ns;
 
@@ -2523,27 +2296,13 @@ static int nodeGreater (
 )
 {
     int             rc;
-#if TclOnly8Bits == 0
     char           *strAptr, *strBptr;
     int             lenA, lenB, len;
     Tcl_UniChar     unicharA, unicharB;
-#endif
 
     *greater = 0;
 
     if (typeText) {
-
-#if TclOnly8Bits
-        /* TODO: this only works for 7 bit ASCII */
-        rc = STRCASECMP(strA, strB);
-        if (rc == 0) {
-            rc = strcmp (strA, strB);
-            if (!upperFirst) {
-                rc *= -1;
-            }
-        }
-DBG(   fprintf(stderr, "nodeGreater %d <-- strA='%s' strB='%s'\n", rc, strA, strB);)
-#else
         lenA = Tcl_NumUtfChars (strA, -1);
         lenB = Tcl_NumUtfChars (strB, -1);
         len = (lenA < lenB ? lenA : lenB);
@@ -2570,7 +2329,6 @@ DBG(   fprintf(stderr, "nodeGreater %d <-- strA='%s' strB='%s'\n", rc, strA, str
                 rc *= -1;
             }
         }
-#endif
         if (asc) *greater = (rc > 0);
             else *greater = (rc < 0);
 
@@ -3222,7 +2980,7 @@ static int xsltAddTemplate (
     }
     tpl->sDoc = sDoc;
     
-    TRACE1("compiling XPATH '%s' ...\n", tpl->match);
+    TRACE1("compiling XPath '%s' ...\n", tpl->match);
     if (tpl->match) {
         rc = xpathParse(tpl->match, node, XPATH_TEMPMATCH_PATTERN, NULL, NULL,
                         &(tpl->freeAst), errMsg);
@@ -3708,7 +3466,7 @@ static int xsltNumber (
         vVals = 1;
         v[0] = xpathRound(xpathFuncNumber( &rs, &NaN ));
         /* MARK recoverable error */
-        /* This is one of the not so satisfying corners of the xslt
+        /* This is one of the not so satisfying corners of the XSLT
          * rec. The rec doesn't say, what to do, if the value isn't a
          * (finit) number. E24 from the erratas doesn't makes things
          * much better - a little bit dubious wording and a not very
@@ -4346,7 +4104,7 @@ static int ExecAction (
             }
             if (!h) {
                 reportError (actionNode, "xsl:call-template calls a non"
-                             " existend template!", errMsg);
+                             " existing template!", errMsg);
                 return -1;
             } 
             tplChoosen = (xsltTemplate *) Tcl_GetHashValue (h);
@@ -4587,10 +4345,10 @@ static int ExecAction (
                     if (rs.nodes[i]->nodeType == ATTRIBUTE_NODE) {
                         attr = (domAttrNode*)rs.nodes[i];
                         if (attr ->nodeFlags & IS_NS_NODE) {
-                            /* If someone selects explicitely namespace nodes
+                            /* If someone selects explicitly namespace nodes
                                to copy-of with e.g namespace::* (remember: @*
                                doesn't select namespace nodes), we must this
-                               handle seperately.*/
+                               handle separately.*/
                             /* The xmlns:xml namespace node will always
                                be in scope, but never needed to be copied,
                                because the result tree will also always
@@ -5110,8 +4868,8 @@ static int ExecAction (
             while (n) {
                 attr = n->firstAttr;
                 while (attr && (attr->nodeFlags & IS_NS_NODE)) {
-                    /* xslt namespace isn't copied */
-                    /* Well, xslt implementors doesn't seem to agree
+                    /* XSLT namespace isn't copied */
+                    /* Well, XSLT implementors doesn't seem to agree
                        at which point this rule out of the second paragraph
                        of 7.1.1 must be applied: before or after applying
                        the namespace aliases (or, in other words: is this
@@ -5407,7 +5165,7 @@ static int ApplyTemplate (
             continue; /* doesn't match mode */
         }
         TRACE4("tpl has prio='%f' precedence='%f', currentPrio='%f', currentPrec='%f'\n", tpl->prio, tpl->precedence, currentPrio, currentPrec);
-        /* According to xslt rec 5.5: First test precedence */
+        /* According to XSLT rec 5.5: First test precedence */
         if (tpl->precedence < currentPrec) break;
         if (tpl->precedence == currentPrec) {
             if (tpl->prio < currentPrio) break;
@@ -5908,7 +5666,7 @@ getExternalDocument (
     int           resultcode = 0;
     char         *resultType, *extbase, *xmlstring, *channelId, s[20];
     Tcl_Obj      *extResolver = NULL;
-    CONST84 char *str;
+    const char   *str;
     domDocument  *doc;
     xsltSubDoc   *sdoc;
     XML_Parser    parser;
@@ -5941,11 +5699,7 @@ getExternalDocument (
     Tcl_ListObjAppendElement (interp, cmdPtr,
                               Tcl_NewStringObj ("", 0));
 
-#if TclOnly8Bits
-    result = Tcl_GlobalEvalObj(interp, cmdPtr);
-#else 
     result = Tcl_EvalObjEx (interp, cmdPtr, TCL_EVAL_DIRECT | TCL_EVAL_GLOBAL);
-#endif    
 
     Tcl_DecrRefCount (cmdPtr);
     resultObj = Tcl_GetObjResult (interp);
@@ -6020,7 +5774,7 @@ getExternalDocument (
     }
     /* keep white space, no fiddling with the encoding (is this
        a good idea?) */
-    doc = domReadDocument (parser, xmlstring, len, 0, 0, 0, storeLineColumn,
+    doc = domReadDocument (parser, xmlstring, len, 0, 0, storeLineColumn,
                            0, 0, NULL, chan, extbase, extResolver, 0, 
                            (int) XML_PARAM_ENTITY_PARSING_ALWAYS, interp,
                            &resultcode);
@@ -6351,17 +6105,6 @@ static int processTopLevel (
                         memset (df, 0, sizeof (xsltDecimalFormat));
                         newdf = 1;
                         /* initialize to defaults */
-#if TclOnly8Bits
-                        df->decimalSeparator  = '.';
-                        df->groupingSeparator = ',';
-                        df->infinity          = "Infinity";
-                        df->minusSign         = '-';
-                        df->NaN               = "NaN";
-                        df->percent           = '%';
-                        df->zeroDigit         = '0';
-                        df->digit             = '#';
-                        df->patternSeparator  = ';';
-#else 
                         df->decimalSeparator  = 46;          
                         df->groupingSeparator = 44;          
                         df->infinity          = "Infinity";  
@@ -6372,7 +6115,6 @@ static int processTopLevel (
                         df->zeroDigit         = 48;          
                         df->digit             = 35;          
                         df->patternSeparator  = 59;
-#endif /* TclOnly8Bits */
                         df->name = tdomstrdup(str);
                         if (ns) df->uri = tdomstrdup(ns->uri);
                         else df->uri = NULL;
@@ -6387,15 +6129,6 @@ static int processTopLevel (
                 }
                 str = getAttr(node, "decimal-separator",  a_decimalSeparator);
                 if (str) {
-#if TclOnly8Bits
-                    if (str[1] != '\0') {
-                        reportError (node, "decimal-separator has to be a"
-                                     " single char", errMsg);
-                        if (newdf) FREE((char*)df);
-                        return -1;
-                    }
-                    df->decimalSeparator = str[0];
-#else
                     clen = UTF8_CHAR_LEN (str[0]);
                     if (str[clen] != '\0') {
                         reportError (node, "decimal-separator has to be a"
@@ -6404,19 +6137,9 @@ static int processTopLevel (
                         return -1;
                     }
                     Tcl_UtfToUniChar (str, &df->decimalSeparator);
-#endif /* TclOnly8Bits */
                 }
                 str = getAttr(node, "grouping-separator", a_groupingSeparator);
                 if (str) {
-#if TclOnly8Bits
-                    if (str[1] != '\0') {
-                        reportError (node, "grouping-separator has to be a"
-                                     " single char", errMsg);
-                        if (newdf) FREE((char*)df);
-                        return -1;
-                    }
-                    df->groupingSeparator = str[0];
-#else 
                     clen = UTF8_CHAR_LEN (str[0]);
                     if (str[clen] != '\0') {
                         reportError (node, "groupingSeparator has to be a"
@@ -6425,20 +6148,11 @@ static int processTopLevel (
                         return -1;
                     }
                     Tcl_UtfToUniChar (str, &df->groupingSeparator);
-#endif /* TclOnly8Bits */                    
                 }
                 str = getAttr(node, "infinity",           a_infinity);
                 if (str) df->infinity = str;
                 str = getAttr(node, "minus-sign",         a_minusSign);
                 if (str) {
-#if TclOnly8Bits
-                    if (str[1] != '\0') {
-                        reportError (node, "minus-sign has to be a single"
-                                     " char", errMsg);
-                        return -1;
-                    }
-                    df->minusSign = str[0];
-#else                     
                     clen = UTF8_CHAR_LEN (str[0]);
                     if (str[clen] != '\0') {
                         reportError (node, "minus-sign has to be a single"
@@ -6447,20 +6161,17 @@ static int processTopLevel (
                         return -1;
                     }
                     Tcl_UtfToUniChar (str, &df->minusSign);
-#endif /* TclOnly8Bits */         
                 }
                 str = getAttr(node, "NaN",                a_nan);
                 if (str) df->NaN = str;
                 str = getAttr(node, "percent",            a_percent);
                 if (str) {
-#if TclOnly8Bits
                     if (str[1] != '\0') {
                         reportError (node, "percent has to be a single"
                                      " char", errMsg);
                         return -1;
                     }
                     df->percent = str[0];
-#else
                     clen = UTF8_CHAR_LEN (str[0]);
                     if (str[clen] != '\0') {
                         reportError (node, "percent has to be a single"
@@ -6469,15 +6180,9 @@ static int processTopLevel (
                         return -1;
                     }
                     Tcl_UtfToUniChar (str, &df->percent);                    
-#endif /* TclOnly8Bits */
                 }
                 str = getAttr(node, "per-mille",          a_perMille);
                 if (str) {
-#if TclOnly8Bits
-                    reportError (node, "User defined per-mille sign not"
-                                 " supported, sorry.", errMsg);
-                    return -1;
-#else
                     clen = UTF8_CHAR_LEN (str[0]);
                     if (str[clen] != '\0') {
                         reportError (node, "per-mille has to be a single"
@@ -6486,18 +6191,9 @@ static int processTopLevel (
                         return -1;
                     }
                     Tcl_UtfToUniChar (str, &df->perMille);                    
-#endif /* TclOnly8Bits */
                 }
                 str = getAttr(node, "zero-digit",         a_zeroDigit);
                 if (str) {
-#if TclOnly8Bits                    
-                    if (str[1] != '\0') {
-                        reportError (node, "zero-digit has to be a single"
-                                     " char", errMsg);
-                        return -1;
-                    }
-                    df->zeroDigit = str[0];
-#else
                     clen = UTF8_CHAR_LEN (str[0]);
                     if (str[clen] != '\0') {
                         reportError (node, "zero-digit has to be a single"
@@ -6506,18 +6202,9 @@ static int processTopLevel (
                         return -1;
                     }
                     Tcl_UtfToUniChar (str, &df->zeroDigit);                    
-#endif /* TclOnly8Bits */
                 }
                 str = getAttr(node, "digit",              a_digit);
                 if (str) {
-#if TclOnly8Bits
-                    if (str[1] != '\0') {
-                        reportError (node, "digit has to be a single char",
-                                     errMsg);
-                        return -1;
-                    }
-                    df->digit = str[0];
-#else 
                     clen = UTF8_CHAR_LEN (str[0]);
                     if (str[clen] != '\0') {
                         reportError (node, "digit has to be a single char",
@@ -6526,18 +6213,9 @@ static int processTopLevel (
                         return -1;
                     }
                     Tcl_UtfToUniChar (str, &df->digit);
-#endif /* TclOnly8Bits */
                 }
                 str = getAttr(node, "pattern-separator",  a_patternSeparator);
                 if (str) {
-#if TclOnly8Bits
-                    if (str[1] != '\0') {
-                        reportError (node, "pattern-separator has to be a"
-                                     " single char", errMsg);
-                        return -1;
-                    }
-                    df->patternSeparator = str[0];
-#else
                     clen = UTF8_CHAR_LEN (str[0]);
                     if (str[clen] != '\0') {
                         reportError (node, "pattern-separator has to be a"
@@ -6545,7 +6223,6 @@ static int processTopLevel (
                         return -1;
                     }
                     Tcl_UtfToUniChar (str, &df->patternSeparator);
-#endif /* TclOnly8Bits */
                 }
                 break;
 
@@ -7225,7 +6902,7 @@ xsltResetState (
        preserved, therefor we don't touch excludeNS and extensionNS
        information */
     /* This loop works only as coded, because, the first subdoc will
-     * always be the primary xslt doc, so xs->subDocs will not
+     * always be the primary XSLT doc, so xs->subDocs will not
      * change. Crusty stuff, this code. */
     sd = xs->subDocs;
     while (sd)  {
@@ -7266,7 +6943,7 @@ xsltResetState (
     }
     xs->nsUniqeNr = 0;
     /* In theory, the varFramesStack and varStack pointers should
-       be always back to there inital state. But to be sure, we
+       be always back to there initial state. But to be sure, we
        re-initialize, just in case of a bizarre error or something. */
     xs->varFramesStackPtr = -1;
     xs->varStackPtr       = -1;
@@ -7337,15 +7014,6 @@ xsltCompileStylesheet (
     Tcl_InitHashTable ( &(xs->keyInfos), TCL_STRING_KEYS);
     xs->decimalFormats->name              = NULL;
     xs->decimalFormats->uri               = NULL;
-#if TclOnly8Bits
-    xs->decimalFormats->decimalSeparator  = '.';
-    xs->decimalFormats->groupingSeparator = ',';
-    xs->decimalFormats->minusSign         = '-';
-    xs->decimalFormats->percent           = '%';
-    xs->decimalFormats->zeroDigit         = '0';
-    xs->decimalFormats->digit             = '#';
-    xs->decimalFormats->patternSeparator  = ';';
-#else 
     xs->decimalFormats->decimalSeparator  = 46;          
     xs->decimalFormats->groupingSeparator = 44;          
     xs->decimalFormats->minusSign         = 45;          
@@ -7354,7 +7022,6 @@ xsltCompileStylesheet (
     xs->decimalFormats->zeroDigit         = 48;          
     xs->decimalFormats->digit             = 35;          
     xs->decimalFormats->patternSeparator  = 59;          
-#endif /* TclOnly8Bits */
     xs->decimalFormats->infinity          = "Infinity";
     xs->decimalFormats->NaN               = "NaN";
     xs->decimalFormats->next              = NULL;
@@ -7363,7 +7030,7 @@ xsltCompileStylesheet (
     
     node = xsltDoc->documentElement;
 
-    /* add the xslt doc to the doc list */
+    /* add the XSLT doc to the doc list */
     sdoc = (xsltSubDoc*)MALLOC(sizeof (xsltSubDoc));
     sdoc->doc = xsltDoc;
     baseURI = findBaseURI (xsltDoc->documentElement);

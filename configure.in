@@ -96,7 +96,6 @@ TDOM_ENABLE_HTML5
 #-----------------------------------------------------------------------
 
 TEA_ADD_SOURCES([generic/xmlsimple.c \
-                 generic/utf8conv.c  \
                  generic/dom.c       \
                  generic/domhtml.c   \
                  generic/domhtml5.c  \
@@ -108,6 +107,7 @@ TEA_ADD_SOURCES([generic/xmlsimple.c \
                  generic/nodecmd.c   \
                  generic/tdominit.c  \
                  generic/tclexpat.c  \
+                 generic/tclpull.c   \
                  generic/tdomStubInit.c])
 TEA_ADD_HEADERS([generic/tdom.h])
 TEA_ADD_INCLUDES([-I${srcdir}/generic ${AOL_INCLUDES}])

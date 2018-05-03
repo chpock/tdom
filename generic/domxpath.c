@@ -247,7 +247,7 @@ static int xpathEvalPredicate (ast steps, domNode *exprContext,
                                xpathCBs *cbs, int *docOrder, char **errMsg);
 
 /*----------------------------------------------------------------------------
-|   xpath result set functions
+|   XPath result set functions
 |
 \---------------------------------------------------------------------------*/
 
@@ -2481,14 +2481,14 @@ static double xpathStringToNumber (
        Just to use strtod() isn't sufficient for a few reasons:
        - strtod() accepts a leading - or +, but XPath allows only a
          leading -
-       - strtod() accepts the string represention of a hexadecimal
+       - strtod() accepts the string representation of a hexadecimal
          number, but XPath does not
        - strtod() accepts an optional exponent but XPath does not
        - strtod() accepts leading whitespace including \f and \v, but
          XPath doesn't allow this characters. Since this two
          characters are not legal XML characters, they can not be part
          of a DOM tree and therefor there isn't a problem with XPath
-         expressions on DOM trees or in XSLT. But on tcl level it's
+         expressions on DOM trees or in XSLT. But on Tcl level it's
          possible, to feed that characters literal into the XPath
          engine.
     */
@@ -2858,15 +2858,11 @@ xpathEvalFunction (
     char            *leftStr = NULL, *rightStr = NULL;
     const char      *str;
     Tcl_DString      dStr;
-#if TclOnly8Bits
-    char            *fStr;
-#else
     int              found, j;
     int              lenstr, fromlen, utfCharLen;
     char             utfBuf[TCL_UTF_MAX];
     Tcl_DString      tstr, tfrom, tto, tresult;
     Tcl_UniChar     *ufStr, *upfrom, unichar;
-#endif
 
     switch (step->intvalue) {
 
@@ -2983,9 +2979,6 @@ xpathEvalFunction (
         if      (step->intvalue == f_string)
             rsSetString (result, leftStr);
         else if (step->intvalue == f_stringLength) {
-#if TclOnly8Bits            
-            rsSetInt (result, strlen(leftStr));
-#else
             pto = leftStr;
             len = 0;
             while (*pto) {
@@ -3000,7 +2993,6 @@ xpathEvalFunction (
                 pto += i;
             }
             rsSetInt (result, len);
-#endif
         }
         else {
             pwhite = 1;
@@ -3408,30 +3400,9 @@ xpathEvalFunction (
             }
         } else {
             if (from < 0) from = 0;
-#if TclOnly8Bits
-            len = strlen(leftStr) - from;
-#else
             len = INT_MAX;
-#endif
         }
 
-#if TclOnly8Bits
-        if (from >= (int) strlen(leftStr)) {
-            rsSetString (result, "");
-            FREE(leftStr);
-            return XPATH_OK;
-        } else {
-            if ( (len == INT_MAX) || ((from + len) > (int) strlen(leftStr)) ) {
-                len =  strlen(leftStr) - from;
-            }
-        }
-        DBG(fprintf(stderr, "substring leftStr='%s' from=%d len=%d \n",
-                    leftStr, from, len);
-            )
-
-            *(leftStr+from+len) = '\0';
-        rsSetString (result, (leftStr+from));
-#else 
         pfrom = leftStr;
         while (*pfrom && (from > 0)) {
             i = UTF8_CHAR_LEN (*pfrom);
@@ -3460,7 +3431,6 @@ xpathEvalFunction (
             *pto = '\0';
         }
         rsSetString (result, pfrom);
-#endif
         FREE(leftStr);
         break;
 
@@ -3488,24 +3458,6 @@ xpathEvalFunction (
         replaceStr = xpathFuncString( &replaceResult );
 
 
-#if TclOnly8Bits
-        len = strlen(replaceStr);
-        pfrom = pto = leftStr;
-        while (*pfrom) {
-            fStr = strchr(rightStr, *pfrom);
-            if (fStr == NULL) {
-                *pto++ = *pfrom;
-            } else {
-                i = (fStr - rightStr);
-                if (i < len) {
-                    *pto++ = *(replaceStr+i);
-                }
-            }
-            pfrom++;
-        }
-        *pto = '\0';
-        rsSetString (result, leftStr);
-#else
         Tcl_DStringInit (&tstr);
         Tcl_DStringInit (&tfrom);
         Tcl_DStringInit (&tto);
@@ -3547,7 +3499,6 @@ xpathEvalFunction (
         Tcl_DStringFree (&tfrom);
         Tcl_DStringFree (&tto);
         Tcl_DStringFree (&tresult);
-#endif
 
         xpathRSFree( &replaceResult );
         xpathRSFree( &rightResult   );
@@ -3946,7 +3897,7 @@ static int xpathEvalStep (
             CHECK_RC;
             break;
         }
-        /* whithout following Pred step, // is the same as 
+        /* without following Pred step, // is the same as 
            AxisDescendantOrSelf, fall throu */
 
     case AxisDescendantLit:
@@ -4846,7 +4797,7 @@ static int xpathEvalStep (
                 }
                 break;
             case BoolResult:
-                /* pleftResult is a non-emtpy nodeset, therefor: */
+                /* pleftResult is a non-empty nodeset, therefor: */
                 dLeft = 1.0;
                 dRight = xpathFuncNumber (prightResult, &NaN);
                 if (NaN) break;

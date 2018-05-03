@@ -165,6 +165,9 @@ domDoc \- Manipulates an instance of a DOM document object
 .nf
 domDocObjCmd \fImethod\fR ?\fIarg arg ...\fR?
 .fi
+.nf
+domDoc \fIdocToken\fR \fImethod\fR ?\fIarg arg ...\fR?
+.fi
 .BE
 .SH "DESCRIPTION "
 .PP

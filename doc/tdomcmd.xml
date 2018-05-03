@@ -41,13 +41,6 @@ DOM tree.</p></desc>
       </commanddef>
 
       <commanddef>
-        <command><cmd>tdom</cmd> <m>parserObj</m> <method>setResultEncoding</method></command>
-
-        <desc><p>See the method <samp>setResultEncoding</samp> of the
-<cmd>dom</cmd> command.</p></desc>
-      </commanddef>
-
-      <commanddef>
         <command><cmd>tdom</cmd> <m>parserObj</m> <method>setStoreLineColumn</method> ?<m>boolean</m>?</command>
 
         <desc><p>See the method <samp>setStoreLineColumn</samp> of the

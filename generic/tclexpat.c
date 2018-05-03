@@ -47,11 +47,13 @@
 #endif
 
 /* Used internal als status, like TCL_OK, TCL_ERROR etc.  As a
-   consequent, application specific error codes must be at least
+   consequence, application specific error codes must be at least
    greater than 5 */
 #define ERROR_IN_EXTREFHANDLER 5
 
-#define READ_SIZE (1024*8)
+#ifndef TDOM_EXPAT_READ_SIZE
+# define TDOM_EXPAT_READ_SIZE (1024*8)
+#endif
 #ifndef O_BINARY
 #ifdef _O_BINARY
 #define O_BINARY _O_BINARY
@@ -111,99 +113,101 @@ TDomThreaded(static Tcl_Mutex counterMutex;) /* Protect the counter (zv) */
 |   Prototypes for procedures defined later in this file:
 |
 \---------------------------------------------------------------------------*/
-int             TclExpatObjCmd _ANSI_ARGS_((ClientData dummy,
-                    Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]));
-static int      TclExpatInstanceCmd _ANSI_ARGS_((ClientData dummy,
-                    Tcl_Interp *interp, int objc, struct Tcl_Obj *CONST objv[]));
-static void     TclExpatDeleteCmd _ANSI_ARGS_((ClientData clientData));
+int             TclExpatObjCmd (ClientData dummy,
+                    Tcl_Interp *interp, int objc, Tcl_Obj *const objv[]);
+static int      TclExpatInstanceCmd (ClientData dummy,
+                    Tcl_Interp *interp, int objc, struct Tcl_Obj *const objv[]);
+static void     TclExpatDeleteCmd (ClientData clientData);
 
-static Tcl_Obj* FindUniqueCmdName _ANSI_ARGS_((Tcl_Interp *interp));
-static int      TclExpatCheckWhiteData _ANSI_ARGS_((char *pc, int len));
+static Tcl_Obj* FindUniqueCmdName (Tcl_Interp *interp);
+static int      TclExpatCheckWhiteData (char *pc, int len);
 
-static int      TclExpatInitializeParser _ANSI_ARGS_((Tcl_Interp *interp,
-                    TclGenExpatInfo *expat, int resetOptions ));
-static void     TclExpatFreeParser  _ANSI_ARGS_((TclGenExpatInfo *expat));
-static int      TclExpatParse _ANSI_ARGS_((Tcl_Interp *interp,
+static int      TclExpatInitializeParser (Tcl_Interp *interp,
+                    TclGenExpatInfo *expat, int resetOptions );
+static void     TclExpatFreeParser  (TclGenExpatInfo *expat);
+static int      TclExpatParse (Tcl_Interp *interp,
                     TclGenExpatInfo *expat, char *data, int len,
-                                     TclExpat_InputType type));
-static int      TclExpatConfigure _ANSI_ARGS_((Tcl_Interp *interp,
-                    TclGenExpatInfo *expat, int objc, Tcl_Obj *CONST objv[]));
-static int      TclExpatCget _ANSI_ARGS_((Tcl_Interp *interp,
-                    TclGenExpatInfo *expat, int objc, Tcl_Obj *CONST objv[]));
+                               TclExpat_InputType type);
+static int      TclExpatConfigure (Tcl_Interp *interp,
+                    TclGenExpatInfo *expat, int objc, Tcl_Obj *const objv[]);
+static int      TclExpatCget (Tcl_Interp *interp,
+                    TclGenExpatInfo *expat, int objc, Tcl_Obj *const objv[]);
 
-static int	TclExpatGet _ANSI_ARGS_((Tcl_Interp *interp,
-		    TclGenExpatInfo *expat, int objc, Tcl_Obj *CONST objv[]));
-static void	TclExpatDispatchPCDATA _ANSI_ARGS_((TclGenExpatInfo *expat));
-static void TclGenExpatElementStartHandler _ANSI_ARGS_((void *userdata,
-                                                        const XML_Char *name,
-                                                        const XML_Char **atts));
-static void TclGenExpatElementEndHandler _ANSI_ARGS_((void *userData,
-                                                      const XML_Char *name));
-static void TclGenExpatCharacterDataHandler _ANSI_ARGS_((void *userData,
-                                                         const XML_Char *s,
-                                                         int len));
+static int	TclExpatGet (Tcl_Interp *interp,
+		    TclGenExpatInfo *expat, int objc, Tcl_Obj *const objv[]);
+static void	TclExpatDispatchPCDATA (TclGenExpatInfo *expat);
+static void TclGenExpatElementStartHandler (void *userdata,
+                                            const XML_Char *name,
+                                            const XML_Char **atts);
+static void TclGenExpatElementEndHandler (void *userData,
+                                          const XML_Char *name);
+static void TclGenExpatCharacterDataHandler (void *userData,
+                                             const XML_Char *s,
+                                             int len);
 
-static void 	TclGenExpatProcessingInstructionHandler _ANSI_ARGS_((
+static void 	TclGenExpatProcessingInstructionHandler (
 	    	    void *userData, const XML_Char *target,
-	    	    const XML_Char *data));
-static int 	TclGenExpatExternalEntityRefHandler _ANSI_ARGS_((
+	    	    const XML_Char *data);
+static int 	TclGenExpatExternalEntityRefHandler (
 	    	    XML_Parser parser, const XML_Char *openEntityNames,
 	    	    const XML_Char *base, const XML_Char *systemId,
-	    	    const XML_Char *publicId));
-static void 	TclGenExpatDefaultHandler _ANSI_ARGS_ ((void *userData,
-	    	    const XML_Char *s, int len));
-static void 	TclGenExpatNotationDeclHandler _ANSI_ARGS_ ((void *userData,
+	    	    const XML_Char *publicId);
+static void 	TclGenExpatDefaultHandler (void *userData,
+	    	    const XML_Char *s, int len);
+static void 	TclGenExpatNotationDeclHandler (void *userData,
 		    const XML_Char *notationName, const XML_Char *base,
-		    const XML_Char *systemId, const XML_Char *publicId));
-static int	TclGenExpatUnknownEncodingHandler _ANSI_ARGS_ ((
+		    const XML_Char *systemId, const XML_Char *publicId);
+static int	TclGenExpatUnknownEncodingHandler (
 		    void *encodingHandlerData, const XML_Char *name,
-		    XML_Encoding *info));
+		    XML_Encoding *info);
 
-static void  TclGenExpatStartNamespaceDeclHandler _ANSI_ARGS_((void *userdata,
-                                                               const XML_Char *prefix,
-                                                               const XML_Char *uri));
-static void  TclGenExpatEndNamespaceDeclHandler _ANSI_ARGS_((void *userData,
-                                                          const XML_Char *prefix));
+static void  TclGenExpatStartNamespaceDeclHandler (void *userdata,
+                                                   const XML_Char *prefix,
+						   const XML_Char *uri);
+static void  TclGenExpatEndNamespaceDeclHandler (void *userData,
+						 const XML_Char *prefix);
 
 
 /* Following added by ericm@scriptics, 1999.6.25 */
 /* Prototype definition for the TclExpat comment handler */
-static void 	TclGenExpatCommentHandler _ANSI_ARGS_ ((void *userData,
-						     const XML_Char *data));
+static void 	TclGenExpatCommentHandler (void *userData,
+					   const XML_Char *data);
 /* Prototype for TclExpat Not Standalone Handler */
-static int 	TclGenExpatNotStandaloneHandler _ANSI_ARGS_ ((void *userData));
+static int 	TclGenExpatNotStandaloneHandler (void *userData);
 
 /* Prototype for TclExpat {Start|End}CdataSectionHandler */
-static void 	TclGenExpatStartCdataSectionHandler _ANSI_ARGS_((void *userData));
-static void 	TclGenExpatEndCdataSectionHandler _ANSI_ARGS_((void *userData));
+static void 	TclGenExpatStartCdataSectionHandler (void *userData);
+static void 	TclGenExpatEndCdataSectionHandler (void *userData);
 
 /* Added by ericm@scriptics.com, 1999.09.13 */
 /* Prototype for TclExpat (Element|Attlist) Declaration Handlers */
-static void     TclGenExpatElementDeclHandler _ANSI_ARGS_((void *userData,
-                    const XML_Char *name, XML_Content *model));
-static void     TclGenExpatAttlistDeclHandler _ANSI_ARGS_((void *userData,
+static void     TclGenExpatElementDeclHandler (void *userData,
+                    const XML_Char *name, XML_Content *model);
+static void     TclGenExpatAttlistDeclHandler (void *userData,
                     const XML_Char *elname, const XML_Char *name,
                     const XML_Char *type, const XML_Char *dflt,
-                    int isrequired));
+                    int isrequired);
 /* Prototypes for the TclExpat Doctype Decl handlers */
-static void     TclGenExpatStartDoctypeDeclHandler _ANSI_ARGS_((void *userData,
-                    const XML_Char *doctypeName, const XML_Char *sysid,
-                    const XML_Char *pubid, int has_internal_subset));
-static void     TclGenExpatEndDoctypeDeclHandler _ANSI_ARGS_((void *userData));
-static void     TclGenExpatXmlDeclHandler _ANSI_ARGS_((void *userData,
-                                                       const XML_Char *version,
-                                                       const XML_Char *encoding,
-                                                       int standalone));
-static void     TclGenExpatEntityDeclHandler _ANSI_ARGS_((void *userData,
-                                                          const XML_Char *entityname,
-                                                          int is_param,
-                                                          const XML_Char *value,
-                                                          int length,
-                                                          CONST XML_Char *base,
-                                                          CONST XML_Char *systemId,
-                                                          CONST XML_Char *publicId,
-                                                          CONST XML_Char *notationName));
-
+static void     TclGenExpatStartDoctypeDeclHandler (
+    void *userData,
+    const XML_Char *doctypeName,
+    const XML_Char *sysid,
+    const XML_Char *pubid,
+    int has_internal_subset);
+static void     TclGenExpatEndDoctypeDeclHandler (void *userData);
+static void     TclGenExpatXmlDeclHandler (void *userData,
+                                           const XML_Char *version,
+                                           const XML_Char *encoding,
+					   int standalone);
+static void     TclGenExpatEntityDeclHandler (void *userData,
+                                              const XML_Char *entityname,
+                                              int is_param,
+                                              const XML_Char *value,
+                                              int length,
+                                              const XML_Char *base,
+                                              const XML_Char *systemId,
+                                              const XML_Char *publicId,
+					      const XML_Char *notationName);
 
 /*
  *----------------------------------------------------------------------------
@@ -223,9 +227,9 @@ static void     TclGenExpatEntityDeclHandler _ANSI_ARGS_((void *userData,
  */
 
 static TclHandlerSet*
-CreateTclHandlerSet (name)
-    char *name;
-{
+CreateTclHandlerSet (
+    char *name
+) {
     TclHandlerSet *handlerSet;
 
     handlerSet = (TclHandlerSet*) MALLOC (sizeof (TclHandlerSet)); \
@@ -276,9 +280,9 @@ CreateTclHandlerSet (name)
  */
 
 CHandlerSet*
-CHandlerSetCreate (name)
-    char *name;
-{
+CHandlerSetCreate (
+    char *name
+) {
     CHandlerSet *handlerSet;
 
     handlerSet = (CHandlerSet *) MALLOC (sizeof (CHandlerSet));
@@ -333,12 +337,12 @@ CHandlerSetCreate (name)
  */
 
 int
-TclExpatObjCmd(dummy, interp, objc, objv)
-     ClientData dummy;
-     Tcl_Interp *interp;
-     int objc;
-     Tcl_Obj *CONST objv[];
-{
+TclExpatObjCmd(
+    ClientData dummy,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+) {
   TclGenExpatInfo *genexpat;
   int ns_mode = 0;
   char *nsoption;
@@ -431,9 +435,9 @@ TclExpatObjCmd(dummy, interp, objc, objv)
  */
 
 static Tcl_Obj *
-FindUniqueCmdName(interp)
-     Tcl_Interp *interp;
-{
+FindUniqueCmdName(
+    Tcl_Interp *interp
+) {
   Tcl_Obj *name;
   Tcl_CmdInfo info;
   char s[20];
@@ -474,11 +478,11 @@ FindUniqueCmdName(interp)
  */
 
 static int
-TclExpatInitializeParser(interp, expat, resetOptions)
-     Tcl_Interp      *interp;
-     TclGenExpatInfo *expat;
-     int              resetOptions;
-{
+TclExpatInitializeParser(
+    Tcl_Interp      *interp,
+    TclGenExpatInfo *expat,
+    int              resetOptions
+) {
     CHandlerSet *activeCHandlerSet;
     ExpatElemContent *eContent, *eContentSave;
 
@@ -614,9 +618,9 @@ TclExpatInitializeParser(interp, expat, resetOptions)
  */
 
 static void
-TclExpatFreeParser(expat)
-     TclGenExpatInfo *expat;
-{
+TclExpatFreeParser(
+    TclGenExpatInfo *expat
+) {
   ExpatElemContent *eContent, *eContentSave;
 
   eContent = expat->eContents;
@@ -648,11 +652,11 @@ TclExpatFreeParser(expat)
  *----------------------------------------------------------------------------
  */
 static void
-CurrentmarkupCommand(userData, s, len)
-     void *userData;
-     CONST char *s;
-     int len;
-{
+CurrentmarkupCommand (
+    void *userData,
+    const char *s,
+    int len
+) {
     TclGenExpatInfo *expat = (TclGenExpatInfo *) userData;
 
     if (expat->status != TCL_OK) {
@@ -693,23 +697,25 @@ CurrentmarkupCommand(userData, s, len)
  */
 
 static int
-TclExpatInstanceCmd (clientData, interp, objc, objv)
-     ClientData clientData;
-     Tcl_Interp *interp;
-     int objc;
-     Tcl_Obj *CONST objv[];
-{
+TclExpatInstanceCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+) {
   TclGenExpatInfo *expat = (TclGenExpatInfo *) clientData;
   char *data;
   int len = 0, optionIndex, result = TCL_OK;
 
-  static CONST84 char *options[] = {
+  static const char *options[] = {
       "configure", "cget", "currentmarkup", "free", "get",
-      "parse", "parsechannel", "parsefile", "reset", NULL
+      "parse", "parsechannel", "parsefile", "reset", "delete",
+      NULL
   };
   enum options {
       EXPAT_CONFIGURE, EXPAT_CGET, EXPAT_CURRENTMARKUP, EXPAT_FREE, EXPAT_GET,
-      EXPAT_PARSE, EXPAT_PARSECHANNEL, EXPAT_PARSEFILE, EXPAT_RESET
+      EXPAT_PARSE, EXPAT_PARSECHANNEL, EXPAT_PARSEFILE, EXPAT_RESET,
+      EXPAT_DELETE
   };
 
 
@@ -772,12 +778,13 @@ TclExpatInstanceCmd (clientData, interp, objc, objv)
         result = TCL_OK;
         break;
 
+    case EXPAT_DELETE:
     case EXPAT_FREE:
 
         CheckArgs (2,2,1,"");
 
         if (expat->parsingState > 1) {
-            Tcl_SetResult (interp, "parser freeing not allowed from within "
+            Tcl_SetResult (interp, "parser delete not allowed from within "
                            "callback", TCL_STATIC);
             result = TCL_ERROR;
         } else {
@@ -878,13 +885,13 @@ TclExpatInstanceCmd (clientData, interp, objc, objv)
  */
 
 static int
-TclExpatParse (interp, expat, data, len, type)
-     Tcl_Interp *interp;
-     TclGenExpatInfo *expat;
-     char *data;
-     int len;
-     TclExpat_InputType type;
-{
+TclExpatParse (
+    Tcl_Interp *interp,
+    TclGenExpatInfo *expat,
+    char *data,
+    int len,
+    TclExpat_InputType type
+) {
   int result, mode, done;
   size_t bytesread;
   char s[255], buf[8*1024];
@@ -892,12 +899,10 @@ TclExpatParse (interp, expat, data, len, type)
   XML_Parser  parser;
   Tcl_Channel channel = NULL;
   CHandlerSet *activeCHandlerSet;
-#if !TclOnly8Bits
   Tcl_Obj       *bufObj = NULL;
   Tcl_DString    dStr;
   int            useBinary;
   char          *str;
-#endif
 
   if (expat->finished) {
       if ((result = TclExpatInitializeParser (interp, expat, 0)) != TCL_OK) 
@@ -946,7 +951,6 @@ TclExpatParse (interp, expat, data, len, type)
                             "wasn't opened for reading", (char *) NULL);
           return TCL_ERROR;
       }
-#if !TclOnly8Bits
       Tcl_DStringInit (&dStr);
       if (Tcl_GetChannelOption (interp, channel, "-encoding", &dStr) 
           != TCL_OK) {
@@ -982,15 +986,6 @@ TclExpatParse (interp, expat, data, len, type)
               Tcl_DecrRefCount (bufObj);
           }
       }
-#else
-      expat->parsingState = 2;
-      do {
-          bytesread = Tcl_Read (channel, buf, sizeof (buf));
-          done = bytesread < sizeof (buf);
-          result = XML_Parse (expat->parser, buf, bytesread, done);
-          if (result != XML_STATUS_OK) break;
-      } while (!done);
-#endif /* !TclOnly8Bits */
       expat->parsingState = 1;
       break;
 
@@ -1006,7 +1001,7 @@ TclExpatParse (interp, expat, data, len, type)
       expat->parsingState = 2;
       for (;;) {
           int nread;
-          char *fbuf = XML_GetBuffer (parser, READ_SIZE);
+          char *fbuf = XML_GetBuffer (parser, TDOM_EXPAT_READ_SIZE);
           if (!fbuf) {
               close (fd);
               Tcl_ResetResult (interp);
@@ -1014,7 +1009,7 @@ TclExpatParse (interp, expat, data, len, type)
               expat->parsingState = 1;
               return TCL_ERROR;
           }
-          nread = read(fd, fbuf, READ_SIZE);
+          nread = read(fd, fbuf, TDOM_EXPAT_READ_SIZE);
           if (nread < 0) {
               close (fd);
               Tcl_ResetResult (interp);
@@ -1046,11 +1041,9 @@ TclExpatParse (interp, expat, data, len, type)
           sprintf(s, "%ld", XML_GetCurrentColumnNumber(expat->parser));
           Tcl_AppendResult(interp, s, NULL);
       }
-#if !TclOnly8Bits
       if (bufObj) {
           Tcl_DecrRefCount (bufObj);
       }
-#endif
       return TCL_ERROR;
   }
   switch (expat->status) {
@@ -1092,13 +1085,13 @@ TclExpatParse (interp, expat, data, len, type)
  */
 
 static int
-TclExpatConfigure (interp, expat, objc, objv)
-     Tcl_Interp *interp;
-     TclGenExpatInfo *expat;
-     int objc;
-     Tcl_Obj *CONST objv[];
-{
-  static CONST84 char *switches[] = {
+TclExpatConfigure (
+    Tcl_Interp *interp,
+    TclGenExpatInfo *expat,
+    int objc,
+    Tcl_Obj *const objv[]
+) {
+  static const char *switches[] = {
     "-final",
     "-baseurl",
     "-elementstartcommand",
@@ -1153,7 +1146,7 @@ TclExpatConfigure (interp, expat, objc, objv)
     EXPAT_HANDLERSET,
     EXPAT_NOEXPAND
   };
-  static CONST84 char *paramEntityParsingValues[] = {
+  static const char *paramEntityParsingValues[] = {
       "always",
       "never",
       "notstandalone",
@@ -1165,7 +1158,7 @@ TclExpatConfigure (interp, expat, objc, objv)
       EXPAT_PARAMENTITYPARSINGNOTSTANDALONE
   };
   int optionIndex, value, bool;
-  Tcl_Obj *CONST *objPtr = objv;
+  Tcl_Obj *const *objPtr = objv;
   Tcl_CmdInfo cmdInfo;
   int rc;
   char *handlerSetName = NULL;
@@ -1584,13 +1577,13 @@ TclExpatConfigure (interp, expat, objc, objv)
  */
 
 static int
-TclExpatCget (interp, expat, objc, objv)
-     Tcl_Interp *interp;
-     TclGenExpatInfo *expat;
-     int objc;
-     Tcl_Obj *CONST objv[];
-{
-    static CONST84 char *switches[] = {
+TclExpatCget (
+    Tcl_Interp *interp,
+    TclGenExpatInfo *expat,
+    int objc,
+    Tcl_Obj *const objv[]
+) {
+    static const char *switches[] = {
         "-final",
         "-baseurl",
         "-elementstartcommand",
@@ -1986,13 +1979,14 @@ TclExpatCget (interp, expat, objc, objv)
  *----------------------------------------------------------------------------
  */
 static int
-TclExpatGet (interp, expat, objc, objv)
-     Tcl_Interp *interp;
-     TclGenExpatInfo *expat;
-     int objc;
-     Tcl_Obj *CONST objv[];
+TclExpatGet (
+    Tcl_Interp *interp,
+    TclGenExpatInfo *expat,
+    int objc,
+    Tcl_Obj *const objv[]
+)
 {
-  static CONST84 char *getSwitches[] = {
+  static const char *getSwitches[] = {
     "-specifiedattributecount",
     "-currentbytecount",
     "-currentlinenumber",
@@ -2066,14 +2060,15 @@ TclExpatGet (interp, expat, objc, objv)
  */
 
 static void
-TclExpatHandlerResult(expat, handlerSet, result)
-     TclGenExpatInfo *expat;
-     TclHandlerSet *handlerSet;
-     int result;
-{
+TclExpatHandlerResult(
+    TclGenExpatInfo *expat,
+    TclHandlerSet *handlerSet,
+    int result
+) {
   switch (result) {
     case TCL_OK:
       handlerSet->status = TCL_OK;
+      Tcl_ResetResult (expat->interp);
       break;
 
     case TCL_CONTINUE:
@@ -2085,6 +2080,7 @@ TclExpatHandlerResult(expat, handlerSet, result)
        */
       handlerSet->status = TCL_CONTINUE;
       handlerSet->continueCount = 1;
+      Tcl_ResetResult (expat->interp);
       break;
 
     case TCL_BREAK:
@@ -2092,6 +2088,7 @@ TclExpatHandlerResult(expat, handlerSet, result)
        * Skip all further callbacks of this handlerSet, but return OK.
        */
       handlerSet->status = TCL_BREAK;
+      Tcl_ResetResult (expat->interp);
       break;
 
     case TCL_ERROR:
@@ -2143,11 +2140,11 @@ TclExpatHandlerResult(expat, handlerSet, result)
  */
 
 static void
-TclGenExpatElementStartHandler(userData, name, atts)
-     void *userData;
-     const char *name;
-     const char **atts;
-{
+TclGenExpatElementStartHandler(
+    void *userData,
+    const char *name,
+    const char **atts
+) {
   TclGenExpatInfo *expat = (TclGenExpatInfo *) userData;
   Tcl_Obj *atList = NULL;
   const char **atPtr;
@@ -2228,11 +2225,6 @@ TclGenExpatElementStartHandler(userData, name, atts)
               Tcl_ListObjAppendElement(expat->interp, cmdPtr,
                                        Tcl_NewStringObj((char *)name, -1));
               Tcl_ListObjAppendElement(expat->interp, cmdPtr, atList);
-
-              /*
-               * It would be desirable to be able to terminate parsing
-               * if the return result is TCL_ERROR or TCL_BREAK.
-               */
 #if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
               result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
 #else
@@ -2283,10 +2275,10 @@ TclGenExpatElementStartHandler(userData, name, atts)
  */
 
 static void
-TclGenExpatElementEndHandler(userData, name)
-     void *userData;
-     CONST char *name;
-{
+TclGenExpatElementEndHandler(
+    void *userData,
+    const char *name
+) {
   TclGenExpatInfo *expat = (TclGenExpatInfo *) userData;
   int result;
   Tcl_Obj *vector[2], *ename = NULL;
@@ -2353,11 +2345,6 @@ TclGenExpatElementEndHandler(userData, name)
 
               Tcl_ListObjAppendElement(expat->interp, cmdPtr,
                                        Tcl_NewStringObj((char *)name, -1));
-
-              /*
-               * It would be desirable to be able to terminate parsing
-               * if the return result is TCL_ERROR or TCL_BREAK.
-               */
 #if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
               result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
 #else
@@ -2408,11 +2395,11 @@ TclGenExpatElementEndHandler(userData, name)
  */
 
 static void
-TclGenExpatStartNamespaceDeclHandler(userData, prefix, uri)
-     void       *userData;
-     const char *prefix;
-     const char *uri;
-{
+TclGenExpatStartNamespaceDeclHandler(
+    void       *userData,
+    const char *prefix,
+    const char *uri
+) {
   TclGenExpatInfo *expat = (TclGenExpatInfo *) userData;
   Tcl_Obj      *cmdPtr;
   int           result;
@@ -2459,11 +2446,6 @@ TclGenExpatStartNamespaceDeclHandler(userData, prefix, uri)
                                Tcl_NewStringObj((char *)prefix, -1));
       Tcl_ListObjAppendElement(expat->interp, cmdPtr,
                                Tcl_NewStringObj((char *)uri,    -1));
-
-      /*
-       * It would be desirable to be able to terminate parsing
-       * if the return result is TCL_ERROR or TCL_BREAK.
-       */
 #if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
       result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
 #else
@@ -2508,10 +2490,10 @@ TclGenExpatStartNamespaceDeclHandler(userData, prefix, uri)
  */
 
 static void
-TclGenExpatEndNamespaceDeclHandler(userData, prefix)
-     void       *userData;
-     CONST char *prefix;
-{
+TclGenExpatEndNamespaceDeclHandler(
+    void       *userData,
+    const char *prefix
+) {
   TclGenExpatInfo *expat = (TclGenExpatInfo *) userData;
   Tcl_Obj *cmdPtr;
   int result;
@@ -2557,11 +2539,6 @@ TclGenExpatEndNamespaceDeclHandler(userData, prefix)
       Tcl_Preserve((ClientData) expat->interp);
 
       Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)prefix, -1));
-
-      /*
-       * It would be desirable to be able to terminate parsing
-       * if the return result is TCL_ERROR or TCL_BREAK.
-       */
 #if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
       result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
 #else
@@ -2603,10 +2580,10 @@ TclGenExpatEndNamespaceDeclHandler(userData, prefix)
  */
 
 static int
-TclExpatCheckWhiteData (pc, len)
-     char         *pc;
-     int           len;
-{
+TclExpatCheckWhiteData (
+    char         *pc,
+    int           len
+) {
     for (; len > 0; len--, pc++) {
         if ( (*pc != ' ')  &&
              (*pc != '\t') &&
@@ -2636,11 +2613,11 @@ TclExpatCheckWhiteData (pc, len)
  */
 
 static void
-TclGenExpatCharacterDataHandler(userData, s, len)
-     void *userData;
-     CONST char *s;
-     int len;
-{
+TclGenExpatCharacterDataHandler(
+    void *userData,
+    const char *s,
+    int len
+) {
   TclGenExpatInfo *expat = (TclGenExpatInfo *) userData;
 
   if (expat->status != TCL_OK) {
@@ -2673,9 +2650,9 @@ TclGenExpatCharacterDataHandler(userData, s, len)
  */
 
 static void
-TclExpatDispatchPCDATA(expat)
-     TclGenExpatInfo *expat;
-{
+TclExpatDispatchPCDATA(
+    TclGenExpatInfo *expat
+) {
   int len, result, onlyWhiteSpace = 0;
   Tcl_Obj *vector[2];
   TclHandlerSet *activeTclHandlerSet;
@@ -2739,11 +2716,6 @@ TclExpatDispatchPCDATA(expat)
 
           Tcl_ListObjAppendElement(expat->interp, cmdPtr,
                                    Tcl_NewStringObj((char *)s, len));
-
-          /*
-           * It would be desirable to be able to terminate parsing
-           * if the return result is TCL_ERROR or TCL_BREAK.
-           */
 #if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
           result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
 #else
@@ -2796,11 +2768,11 @@ TclExpatDispatchPCDATA(expat)
  */
 
 static void
-TclGenExpatProcessingInstructionHandler(userData, target, data)
-     void *userData;
-     CONST char *target;
-     CONST char *data;
-{
+TclGenExpatProcessingInstructionHandler(
+    void *userData,
+    const char *target,
+    const char *data
+) {
   TclGenExpatInfo *expat = (TclGenExpatInfo *) userData;
   Tcl_Obj *cmdPtr;
   int result;
@@ -2839,11 +2811,6 @@ TclGenExpatProcessingInstructionHandler(userData, target, data)
 
       Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)target, strlen(target)));
       Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)data, strlen(data)));
-
-      /*
-       * It would be desirable to be able to terminate parsing
-       * if the return result is TCL_ERROR or TCL_BREAK.
-       */
 #if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
       result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
 #else
@@ -2887,11 +2854,11 @@ TclGenExpatProcessingInstructionHandler(userData, target, data)
  */
 
 static void
-TclGenExpatDefaultHandler(userData, s, len)
-     void *userData;
-     CONST char *s;
-     int len;
-{
+TclGenExpatDefaultHandler(
+    void *userData,
+    const char *s,
+    int len
+) {
   TclGenExpatInfo *expat = (TclGenExpatInfo *) userData;
   Tcl_Obj *cmdPtr;
   int result;
@@ -2929,11 +2896,6 @@ TclGenExpatDefaultHandler(userData, s, len)
       Tcl_Preserve((ClientData) expat->interp);
 
       Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)s, len));
-
-      /*
-       * It would be desirable to be able to terminate parsing
-       * if the return result is TCL_ERROR or TCL_BREAK.
-       */
 #if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
       result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
 #else
@@ -2978,17 +2940,17 @@ TclGenExpatDefaultHandler(userData, s, len)
  */
 
 static void
-TclGenExpatEntityDeclHandler(userData, entityname, is_param, value, length, base, systemId, publicId, notationName)
-     void *userData;
-     CONST char *entityname;
-     int         is_param;
-     CONST char *value;
-     int         length;
-     CONST char *base;
-     CONST char *systemId;
-     CONST char *publicId;
-     CONST char *notationName;
-{
+TclGenExpatEntityDeclHandler(
+    void *userData,
+    const char *entityname,
+    int         is_param,
+    const char *value,
+    int         length,
+    const char *base,
+    const char *systemId,
+    const char *publicId,
+    const char *notationName
+) {
   TclGenExpatInfo *expat = (TclGenExpatInfo *) userData;
   Tcl_Obj *cmdPtr;
   int result;
@@ -3054,11 +3016,6 @@ TclGenExpatEntityDeclHandler(userData, entityname, is_param, value, length, base
       } else {
           Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)notationName, strlen(notationName)));
       }
-
-      /*
-       * It would be desirable to be able to terminate parsing
-       * if the return result is TCL_ERROR or TCL_BREAK.
-       */
 #if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
       result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
 #else
@@ -3104,13 +3061,13 @@ TclGenExpatEntityDeclHandler(userData, entityname, is_param, value, length, base
  */
 
 static void
-TclGenExpatNotationDeclHandler(userData, notationName, base, systemId, publicId)
-     void *userData;
-     CONST char *notationName;
-     CONST char *base;
-     CONST char *systemId;
-     CONST char *publicId;
-{
+TclGenExpatNotationDeclHandler(
+    void *userData,
+    const char *notationName,
+    const char *base,
+    const char *systemId,
+    const char *publicId
+) {
   TclGenExpatInfo *expat = (TclGenExpatInfo *) userData;
   Tcl_Obj *cmdPtr;
   int result;
@@ -3158,11 +3115,6 @@ TclGenExpatNotationDeclHandler(userData, notationName, base, systemId, publicId)
       } else {
           Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)publicId, strlen(publicId)));
       }
-
-      /*
-       * It would be desirable to be able to terminate parsing
-       * if the return result is TCL_ERROR or TCL_BREAK.
-       */
 #if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
       result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
 #else
@@ -3208,11 +3160,11 @@ TclGenExpatNotationDeclHandler(userData, notationName, base, systemId, publicId)
  */
 
 static int
-TclGenExpatUnknownEncodingHandler(encodingHandlerData, name, info)
-     void *encodingHandlerData;
-     CONST char *name;
-     XML_Encoding *info;
-{
+TclGenExpatUnknownEncodingHandler(
+    void *encodingHandlerData,
+    const char *name,
+    XML_Encoding *info
+) {
   TclGenExpatInfo *expat = (TclGenExpatInfo *) encodingHandlerData;
   CHandlerSet *activeCHandlerSet;
 
@@ -3254,14 +3206,13 @@ TclGenExpatUnknownEncodingHandler(encodingHandlerData, name, info)
  *----------------------------------------------------------------------------
  */
 static int
-TclGenExpatExternalEntityRefHandler(parser, openEntityNames, base, systemId,
-                                    publicId)
-     XML_Parser parser;
-     CONST char *openEntityNames;
-     CONST char *base;
-     CONST char *systemId;
-     CONST char *publicId;
-{
+TclGenExpatExternalEntityRefHandler(
+    XML_Parser parser,
+    const char *openEntityNames,
+    const char *base,
+    const char *systemId,
+    const char *publicId
+) {
   TclGenExpatInfo *expat = (TclGenExpatInfo *) XML_GetUserData(parser);
   Tcl_Obj *cmdPtr, *resultObj, *resultTypeObj, *extbaseObj, *dataObj;
   int result, mode, done, fd, tclLen;
@@ -3460,7 +3411,7 @@ TclGenExpatExternalEntityRefHandler(parser, openEntityNames, base, systemId,
           result = 1;
           for (;;) {
               int nread;
-              char *fbuf = XML_GetBuffer (extparser, READ_SIZE);
+              char *fbuf = XML_GetBuffer (extparser, TDOM_EXPAT_READ_SIZE);
               if (!fbuf) {
                   close (fd);
                   Tcl_ResetResult (expat->interp);
@@ -3469,7 +3420,7 @@ TclGenExpatExternalEntityRefHandler(parser, openEntityNames, base, systemId,
                                          ERROR_IN_EXTREFHANDLER);
                   return 0;
               }
-              nread = read(fd, fbuf, READ_SIZE);
+              nread = read(fd, fbuf, TDOM_EXPAT_READ_SIZE);
               if (nread < 0) {
                   close (fd);
                   Tcl_ResetResult (expat->interp);
@@ -3577,10 +3528,10 @@ TclGenExpatExternalEntityRefHandler(parser, openEntityNames, base, systemId,
  *----------------------------------------------------------------------------
  */
 static void
-TclGenExpatCommentHandler(userData, data)
-    void *userData;
-    const char *data;
-{
+TclGenExpatCommentHandler(
+    void *userData,
+    const char *data
+) {
   TclGenExpatInfo *expat = (TclGenExpatInfo *) userData;
   Tcl_Obj *cmdPtr;
   int result;
@@ -3661,9 +3612,9 @@ TclGenExpatCommentHandler(userData, data)
  *----------------------------------------------------------------------------
  */
 static int
-TclGenExpatNotStandaloneHandler(userData)
-    void *userData;
-{
+TclGenExpatNotStandaloneHandler(
+    void *userData
+) {
   TclGenExpatInfo *expat = (TclGenExpatInfo *) userData;
   Tcl_Obj *cmdPtr;
   int result;
@@ -3738,9 +3689,9 @@ TclGenExpatNotStandaloneHandler(userData)
  *----------------------------------------------------------------------------
  */
 static void
-TclGenExpatStartCdataSectionHandler(userData)
-    void *userData;
-{
+TclGenExpatStartCdataSectionHandler(
+    void *userData
+) {
   TclGenExpatInfo *expat = (TclGenExpatInfo *) userData;
   Tcl_Obj *cmdPtr;
   int result;
@@ -3818,9 +3769,9 @@ TclGenExpatStartCdataSectionHandler(userData)
  *----------------------------------------------------------------------------
  */
 static void
-TclGenExpatEndCdataSectionHandler(userData)
-    void *userData;
-{
+TclGenExpatEndCdataSectionHandler(
+    void *userData
+) {
   TclGenExpatInfo *expat = (TclGenExpatInfo *) userData;
   Tcl_Obj *cmdPtr;
   int result;
@@ -3880,11 +3831,11 @@ TclGenExpatEndCdataSectionHandler(userData)
 
 
 static void
-generateModel (interp, rep, model)
-    Tcl_Interp  *interp;
-    Tcl_Obj     *rep;
-    XML_Content *model;
-{
+generateModel (
+	       Tcl_Interp  *interp,
+	       Tcl_Obj     *rep,
+	       XML_Content *model
+) {
     Tcl_Obj *cp, *detail;
     unsigned int      i;
 
@@ -3962,11 +3913,11 @@ generateModel (interp, rep, model)
  */
 
 static void
-TclGenExpatElementDeclHandler(userData, name, model)
-    void *userData;
-    const XML_Char *name;
-    XML_Content *model;
-{
+TclGenExpatElementDeclHandler(
+    void *userData,
+    const XML_Char *name,
+    XML_Content *model
+) {
   TclGenExpatInfo *expat = (TclGenExpatInfo *) userData;
   Tcl_Obj *cmdPtr;
   Tcl_Obj *content;
@@ -4057,14 +4008,14 @@ TclGenExpatElementDeclHandler(userData, name, model)
  */
 
 static void
-TclGenExpatAttlistDeclHandler(userData, elname, name, type, dflt, isrequired)
-    void           *userData;
-    const XML_Char *elname;
-    const XML_Char *name;
-    const XML_Char *type;
-    const XML_Char *dflt;
-    int             isrequired;
-{
+TclGenExpatAttlistDeclHandler(
+    void           *userData,
+    const XML_Char *elname,
+    const XML_Char *name,
+    const XML_Char *type,
+    const XML_Char *dflt,
+    int             isrequired
+) {
   TclGenExpatInfo *expat = (TclGenExpatInfo *) userData;
   Tcl_Obj *cmdPtr;
   int result;
@@ -4159,13 +4110,13 @@ TclGenExpatAttlistDeclHandler(userData, elname, name, type, dflt, isrequired)
  */
 
 static void
-TclGenExpatStartDoctypeDeclHandler(userData, doctypeName, sysid, pubid, has_internal_subset)
-    void *userData;
-    const XML_Char *doctypeName;
-    const XML_Char *sysid;
-    const XML_Char *pubid;
-    int   has_internal_subset;
-{
+TclGenExpatStartDoctypeDeclHandler(
+    void *userData,
+    const XML_Char *doctypeName,
+    const XML_Char *sysid,
+    const XML_Char *pubid,
+    int   has_internal_subset
+) {
   TclGenExpatInfo *expat = (TclGenExpatInfo *) userData;
   Tcl_Obj *cmdPtr;
   int result;
@@ -4263,9 +4214,9 @@ TclGenExpatStartDoctypeDeclHandler(userData, doctypeName, sysid, pubid, has_inte
  */
 
 static void
-TclGenExpatEndDoctypeDeclHandler(userData)
-    void *userData;
-{
+TclGenExpatEndDoctypeDeclHandler(
+    void *userData
+) {
   TclGenExpatInfo *expat = (TclGenExpatInfo *) userData;
   Tcl_Obj *cmdPtr;
   int result;
@@ -4352,12 +4303,12 @@ TclGenExpatEndDoctypeDeclHandler(userData)
  */
 
 static void
-TclGenExpatXmlDeclHandler (userData, version, encoding, standalone)
-    void *userData;
-    const char *version;
-    const char *encoding;
-    int   standalone;
-{
+TclGenExpatXmlDeclHandler (
+    void *userData,
+    const char *version,
+    const char *encoding,
+    int   standalone
+) {
     TclGenExpatInfo *expat = (TclGenExpatInfo *) userData;
     Tcl_Obj *cmdPtr;
     int result;
@@ -4445,9 +4396,9 @@ TclGenExpatXmlDeclHandler (userData, version, encoding, standalone)
  */
 
 static void
-TclExpatDeleteCmd(clientData)
-     ClientData clientData;
-{
+TclExpatDeleteCmd(
+    ClientData clientData
+) {
   TclGenExpatInfo *expat = (TclGenExpatInfo *) clientData;
   TclHandlerSet *activeTclHandlerSet, *tmpTclHandlerSet;
   CHandlerSet *activeCHandlerSet, *tmpCHandlerSet;
@@ -4554,12 +4505,11 @@ TclExpatDeleteCmd(clientData)
 
 
 int
-CheckExpatParserObj (interp, nameObj)
-    Tcl_Interp *interp;
-    Tcl_Obj *CONST nameObj;
-{
+CheckExpatParserObj (
+    Tcl_Interp *interp,
+    Tcl_Obj *const nameObj
+) {
     Tcl_CmdInfo info;
-
 
     if (!Tcl_GetCommandInfo (interp, Tcl_GetString(nameObj), &info)) {
         return 0;
@@ -4571,11 +4521,11 @@ CheckExpatParserObj (interp, nameObj)
 }
 
 int
-CHandlerSetInstall (interp, expatObj, handlerSet)
-    Tcl_Interp *interp;
-    Tcl_Obj *CONST expatObj;
-    CHandlerSet *handlerSet;
-{
+CHandlerSetInstall (
+    Tcl_Interp *interp,
+    Tcl_Obj *const expatObj,
+    CHandlerSet *handlerSet
+) {
     Tcl_CmdInfo info;
     TclGenExpatInfo *expat;
     CHandlerSet *activeCHandlerSet;
@@ -4608,11 +4558,11 @@ CHandlerSetInstall (interp, expatObj, handlerSet)
 }
 
 int
-CHandlerSetRemove (interp, expatObj, handlerSetName)
-    Tcl_Interp *interp;
-    Tcl_Obj *CONST expatObj;
-    char *handlerSetName;
-{
+CHandlerSetRemove (
+    Tcl_Interp *interp,
+    Tcl_Obj *const expatObj,
+    char *handlerSetName
+) {
     Tcl_CmdInfo info;
     TclGenExpatInfo *expat;
     CHandlerSet *activeCHandlerSet, *parentHandlerSet = NULL;
@@ -4648,11 +4598,11 @@ CHandlerSetRemove (interp, expatObj, handlerSetName)
 }
 
 CHandlerSet *
-CHandlerSetGet (interp, expatObj, handlerSetName)
-    Tcl_Interp *interp;
-    Tcl_Obj *CONST expatObj;
-    char *handlerSetName;
-{
+CHandlerSetGet (
+    Tcl_Interp *interp,
+    Tcl_Obj *const expatObj,
+    char *handlerSetName
+) {
     Tcl_CmdInfo info;
     TclGenExpatInfo *expat;
     CHandlerSet *activeCHandlerSet;
@@ -4675,11 +4625,11 @@ CHandlerSetGet (interp, expatObj, handlerSetName)
 }
 
 void *
-CHandlerSetGetUserData (interp, expatObj, handlerSetName)
-    Tcl_Interp *interp;
-    Tcl_Obj *CONST expatObj;
-    char *handlerSetName;
-{
+CHandlerSetGetUserData (
+    Tcl_Interp *interp,
+    Tcl_Obj *const expatObj,
+    char *handlerSetName
+) {
     Tcl_CmdInfo info;
     TclGenExpatInfo *expat;
     CHandlerSet *activeCHandlerSet;
@@ -4702,10 +4652,10 @@ CHandlerSetGetUserData (interp, expatObj, handlerSetName)
 }
 
 TclGenExpatInfo *
-GetExpatInfo (interp, expatObj)
-    Tcl_Interp *interp;
-    Tcl_Obj *CONST expatObj;
-{
+GetExpatInfo (
+    Tcl_Interp *interp,
+    Tcl_Obj *const expatObj
+) {
     Tcl_CmdInfo info;
     if (!Tcl_GetCommandInfo (interp, Tcl_GetString(expatObj), &info)) {
         return NULL;

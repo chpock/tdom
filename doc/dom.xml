@@ -135,7 +135,7 @@ used, which tries to even parse badly formed HTML into a DOM tree.</desc>
               <optdef>
                 <optname>-jsonmaxnesting</optname>
                 <optarg>integer</optarg>
-                <desc>This options only has effect if used together
+                <desc>This option only has effect if used together
                 with the <m>-json</m> option. The current implementation uses recursive descent JSON parser. In order to avoid using excess stack space, any JSON input that has more than a certain levels of nesting is considered invalid. The default maximum nesting is 2000. The option -jsonmaxnesting allows the user to adjust that.</desc>
               </optdef>
               
@@ -274,7 +274,7 @@ called. The <m>-useForeignDTD</m> respects </desc>
                 parsed and no external entity (including the external
                 subset) will be resolved and parsed. The value
                 "notstandalone" means, that all external entities will
-                be resolved and parsed, with the execption of
+                be resolved and parsed, with the exception of
                 documents, which explicitly states standalone="yes" in
                 their XML declaration.</desc>
               </optdef>
@@ -325,23 +325,6 @@ memory handling as explained above.</desc>
 ?<m>objVar</m>?</command>
           <desc>Creates a new 'empty' DOM document object without any element
 node. <m>objVar</m> controls the memory handling as explained above.</desc>
-        </commanddef>
-
-        <commanddef>
-          <command><cmd>dom</cmd> <method>setResultEncoding</method> ?<m>encodingName</m>?</command>
-          <desc>This option is for backward compatibility with Tcl
-          8.0. If tDOM is build with any newer Tcl version this option
-          does not has any effect. If <m>encodingName</m> is not given
-          the current global result encoding is returned. Otherwise
-          the global result encoding is set to <m>encodingName</m>.
-          All character data, attribute values etc. will then be
-          converted from UTF-8, which is delivered from the Expat XML
-          parser, to the given 8 bit encoding at XML/DOM parse time.
-          Valid values for <m>encodingName</m> are: utf-8, ascii,
-          cp1250, cp1251, cp1252, cp1253, cp1254, cp1255, cp1256,
-          cp437, cp850, en, iso8859-1, iso8859-2, iso8859-3,
-          iso8859-4, iso8859-5, iso8859-6, iso8859-7, iso8859-8,
-          iso8859-9, koi8-r.</desc>
         </commanddef>
 
         <commanddef>
@@ -619,6 +602,10 @@ recommendation. Otherwise it returns 0.</desc>
                     <optname>html5</optname>
                     <desc>Returns as boolean, if build with
                     <m>--enable-html5</m>.</desc>
+                </optdef>
+                <optdef>
+                    <optname>versionhash</optname>
+                    <desc>Returns the fossil repository version hash.</desc>
                 </optdef>
             </optlist>
             </desc>   
