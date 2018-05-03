@@ -159,6 +159,8 @@
 #define SERIALIZE_ESCAPE_NON_ASCII 8
 #define SERIALIZE_HTML_ENTITIES 16
 #define SERIALIZE_ESCAPE_ALL_QUOT 32
+#define SERIALIZE_NO_GT_ESCAPE 64
+#define SERIALIZE_NO_EMPTY_ELEMENT_TAG 128
 
 /*----------------------------------------------------------------------------
 |   Module Globals
@@ -2223,7 +2225,8 @@ void tcldom_AppendEscaped (
         } else
         if (*pc == '<') { AP('&') AP('l') AP('t') AP(';')
         } else
-        if (*pc == '>') { AP('&') AP('g') AP('t') AP(';')
+        if (*pc == '>' && !(outputFlags & SERIALIZE_NO_GT_ESCAPE)) {
+            AP('&') AP('g') AP('t') AP(';')
         } else
         if ((*pc == '\n') && outputFlags & SERIALIZE_FOR_ATTR) {
             AP('&') AP('#') AP('x') AP('A') AP(';')
@@ -2991,9 +2994,21 @@ void tcldom_treeAsXML (
 
     if (first) {
         if (indent != -1) {
-            writeChars(xmlString, chan, "/>\n", 3);
+            if (outputFlags & SERIALIZE_NO_EMPTY_ELEMENT_TAG) {
+                writeChars (xmlString, chan, "></", 3);
+                writeChars(xmlString, chan, node->nodeName, -1);
+                writeChars(xmlString, chan, ">\n", 2);
+            } else {
+                writeChars(xmlString, chan, "/>\n", 3);
+            }
         } else {
-            writeChars(xmlString, chan, "/>",   2);
+            if (outputFlags & SERIALIZE_NO_EMPTY_ELEMENT_TAG) {
+                writeChars (xmlString, chan, "></", 3);
+                writeChars(xmlString, chan, node->nodeName, -1);
+                writeChars(xmlString, chan, ">", 1);
+            } else {
+                writeChars(xmlString, chan, "/>",   2);
+            }
         }
     } else {
         if ((indent != -1) && hasElements) {
@@ -3438,11 +3453,13 @@ static int serializeAsXML (
     static const char *asXMLOptions[] = {
         "-indent", "-channel", "-escapeNonASCII", "-doctypeDeclaration",
         "-xmlDeclaration", "-encString", "-escapeAllQuot", "-indentAttrs",
+        "-nogtescape", "-noEmptyElementTag",
         NULL
     };
     enum asXMLOption {
         m_indent, m_channel, m_escapeNonASCII, m_doctypeDeclaration,
-        m_xmlDeclaration, m_encString, m_escapeAllQuot, m_indentAttrs
+        m_xmlDeclaration, m_encString, m_escapeAllQuot, m_indentAttrs,
+        m_nogtescape, m_noEmptyElementTag
     };
     
     indent = 4;
@@ -3573,6 +3590,18 @@ static int serializeAsXML (
             
         case m_escapeAllQuot:
             outputFlags |= SERIALIZE_ESCAPE_ALL_QUOT;
+            objc -= 1;
+            objv += 1;
+            break;
+
+        case m_nogtescape:
+            outputFlags |= SERIALIZE_NO_GT_ESCAPE;
+            objc -= 1;
+            objv += 1;
+            break;
+
+        case m_noEmptyElementTag:
+            outputFlags |= SERIALIZE_NO_EMPTY_ELEMENT_TAG;
             objc -= 1;
             objv += 1;
             break;
