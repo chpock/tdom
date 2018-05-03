@@ -87,6 +87,9 @@ Tdom_Init (
     Tcl_CreateObjCommand(interp, "domNode", tcldom_NodeObjCmd,  NULL, NULL );
     Tcl_CreateObjCommand(interp, "tdom",    TclTdomObjCmd,      NULL, NULL );
 
+    Tcl_CreateObjCommand(interp, "tcl::mathfunc::isNodeToken",
+                         tcldom_IsNodeTokenFunc, NULL, NULL );
+
 #ifndef TDOM_NO_EXPAT    
     Tcl_CreateObjCommand(interp, "expat",       TclExpatObjCmd, NULL, NULL );
     Tcl_CreateObjCommand(interp, "xml::parser", TclExpatObjCmd, NULL, NULL );

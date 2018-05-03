@@ -61,6 +61,7 @@ Tcl_ObjCmdProc tcldom_NodeObjCmd;
 Tcl_ObjCmdProc TclExpatObjCmd;
 Tcl_ObjCmdProc tcldom_unknownCmd;
 Tcl_ObjCmdProc TclTdomObjCmd;
+Tcl_ObjCmdProc tcldom_IsNodeTokenFunc;
 
 #if defined(_MSC_VER) || defined(__MINGW32__)
 #  undef TCL_STORAGE_CLASS

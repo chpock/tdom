@@ -4305,6 +4305,29 @@ static int convertToXSLTCmd (
 }
 
 /*----------------------------------------------------------------------------
+|   tcldom_IsNodeTokenFunc
+|
+\---------------------------------------------------------------------------*/
+int tcldom_IsNodeTokenFunc (
+    ClientData  clientData,
+    Tcl_Interp *interp,
+    int         objc,
+    Tcl_Obj    *const objv[]
+)
+{
+    if (objc != 2) {
+        SetResult ("Expect one argument, the value to check");
+        return TCL_ERROR;
+    }
+    if (objv[1]->typePtr == &tdomNodeType) {
+        Tcl_SetObjResult(interp, Tcl_NewBooleanObj(1));
+    } else {
+        Tcl_SetObjResult(interp, Tcl_NewBooleanObj(0));
+    }
+    return TCL_OK;
+}
+
+/*----------------------------------------------------------------------------
 |   tcldom_NodeObjCmd
 |
 \---------------------------------------------------------------------------*/
@@ -6699,7 +6722,7 @@ int tcldom_DomObjCmd (
     Tcl_Obj    * const objv[]
 )
 {
-    GetTcldomTSD()
+    GetTcldomTSD();
 
     char        * method, tmp[300];
     int           methodIndex, result, i, bool;
@@ -6713,7 +6736,7 @@ int tcldom_DomObjCmd (
         "isQName",         "isComment",          "isCDATA",
         "isPIValue",       "isNCName",           "createDocumentNode",
         "setNameCheck",    "setTextCheck",       "setObjectCommands",
-        "featureinfo",     "isBMPCharData",
+        "featureinfo",     "isBMPCharData",      "isNodeToken",
 #ifdef TCL_THREADS
         "attachDocument",  "detachDocument",
 #endif
@@ -6726,7 +6749,7 @@ int tcldom_DomObjCmd (
         m_isQName,           m_isComment,          m_isCDATA,
         m_isPIValue,         m_isNCName,           m_createDocumentNode,
         m_setNameCheck,      m_setTextCheck,       m_setObjectCommands,
-        m_featureinfo,       m_isBMPCharData
+        m_featureinfo,       m_isBMPCharData,      m_isNodeToken
 #ifdef TCL_THREADS
         ,m_attachDocument,   m_detachDocument
 #endif
@@ -6956,7 +6979,16 @@ int tcldom_DomObjCmd (
             CheckArgs(3,3,2,"string");
             SetBooleanResult(domIsBMPChar(Tcl_GetString(objv[2])));
             return TCL_OK;
-                
+
+        case m_isNodeToken:
+            CheckArgs(3,3,2,"varname");
+            if (objv[2]->typePtr == &tdomNodeType) {
+                Tcl_SetObjResult(interp, Tcl_NewBooleanObj(1));
+            } else {
+                Tcl_SetObjResult(interp, Tcl_NewBooleanObj(0));
+            }
+            return TCL_OK;
+
     }
     SetResult( dom_usage);
     return TCL_ERROR;
