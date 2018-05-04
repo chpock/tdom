@@ -1,9 +1,9 @@
-C Integrated\sthe\snew\sasXML\soptions.
-D 2018-05-04T11:57:22.621
+C Added\snote\sabout\sthe\snew\sasXML\soptions\sto\sCHANGES.
+D 2018-05-04T12:02:08.370
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
-F CHANGES 721a845f921ba0567aaf6e1eb8ba2c6d67dd7193d6117b8bda7d7fab86a2d174
+F CHANGES e523c87200842378b03095d3718b7e17aeae319419eb00919b51ed99ed9d8f9b
 F ChangeLog 9b60ec8bfbae84e4f1a97aaee24be00ccea212b7
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 31c74d9719d90506d0015986e688ebf84cb01d2138c80a442ce0ea8f6de59935
@@ -221,9 +221,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 0bf32f09fe33974c3326d5b3560bb7df2b37f7e1a4dcdb941b4fab1bc51e9a84 190601fb923c0bf4edc9bf0ef465387b5fae3c258118d7f17ab7442aad123b3e
-R 3c5b62f7564526891ea515cabed665bf
-T +closed 190601fb923c0bf4edc9bf0ef465387b5fae3c258118d7f17ab7442aad123b3e
+P 0906a7a6f520cca041bfa0634cf74e63b236860d5c8c30c5d8c667bc9782a447
+R 5d6d6f706c57b5b5fb6e60c50aad20fd
 U rolf
-Z ab91036205abc56b2a0e4ab73a685b4c
+Z f44e23e26257d1241d299b9bc47f5323
 # Remove this line to create a well-formed Fossil manifest.
