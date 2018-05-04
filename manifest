@@ -1,5 +1,5 @@
-C Merged\sfrom\strunk.
-D 2018-05-04T17:40:51.074
+C Fixed\sattribute\sserialization\s(an\somit\sof\sthe\slast\smerge\sconflict\sresolve).
+D 2018-05-04T17:51:50.523
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -129,7 +129,7 @@ F generic/domxslt.h c068da9c518ad5e2a543874c18166065f0bf2bbc
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 1ffb1f01bfe601de3c886993a08ae7df2e949d08ad727ef59438e3174fdbe378
 F generic/nodecmd.h 7c8e609b3652dcc29a1fb9d15735fc5ad1e0e00adb4450bd914186efbebee01d
-F generic/tcldom.c bb427c85ed48a504581df6193c23a67a3af6ea4cb9ee0d78ef12ab8ca9ae7571
+F generic/tcldom.c 6835f149ced905e65c4a9d6da86c2eeeaeb04f2ca8d2bd0c69202bc8def262b6
 F generic/tcldom.h 2e8edc2bf095200c419a740fed626f4fdcba274125e0234366e84a25bb0c2b25
 F generic/tclexpat.c ddbb28dde01951a5d41726cc655fc1f002338086e8af13b83873443da008894a
 F generic/tclexpat.h 82c3d9efe50617f2e0883c520240e6ab17b830e56d6786cd88d2fa31294c02c5
@@ -221,8 +221,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 2233d2d25add42f3bd900b26d3699a0d188f697c2ea2d93da961e42a020d6d65 3fd564bb2e77f6be895a8aac7db823a510f80158ca8705e949d29f9eb50548d2
-R efba274015ff64a8d8fbdf7e9bad6f94
+P 218dbbf795ca848c9902a2466e156399a60c6fec272d4fba67bae4b4168cad44
+R 6b2cb03a1932b3712eebece7ffb1c32f
 U rolf
-Z 55f6b1c332a39aa480d620c30db06f79
+Z d19d68e027a1846fb0e4c541ec17b860
 # Remove this line to create a well-formed Fossil manifest.

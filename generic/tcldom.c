@@ -2943,7 +2943,8 @@ void tcldom_treeAsXML (
                 writeChars(xmlString, chan, attrs->nodeName, -1);
                 writeChars(xmlString, chan, "=\"", 2);
                 tcldom_AppendEscaped(xmlString, chan, attrs->nodeValue, 
-                                     attrs->valueLength, outputFlags);
+                                     attrs->valueLength,
+                                     outputFlags | SERIALIZE_FOR_ATTR);
                 writeChars(xmlString, chan, "\"", 1);
                 attrs = attrs->nextSibling;
             }
