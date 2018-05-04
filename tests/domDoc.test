@@ -309,6 +309,16 @@ test domDoc-1.30 {asXML -noEmptyElementTag} {
     set result
 } {<doc><elm></elm></doc>}
 
+test domDoc-1.31 {asXML '"' in attribute value} {
+    # emacs: "
+    set doc [dom createDocument doc]
+    set root [$doc documentElement]
+    $root setAttribute attr "foo\"bar"
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc attr="foo&quot;bar"/>}
+
 set doc [dom parse <root/>]
 
 test domDoc-2.1 {publicId - no publicId there} {

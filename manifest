@@ -1,5 +1,5 @@
-C Added\snote\sabout\sthe\snew\sasXML\soptions\sto\sCHANGES.
-D 2018-05-04T12:02:08.370
+C Added\sserialization\stest.
+D 2018-05-04T17:39:39.769
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -179,7 +179,7 @@ F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.bench 5446ce379127b8d5700f18a5a0848e580313d0d7
 F tests/dom.test 335f747797c1f87c9ec454a2bd86e18c9f98c8975085cf52fd49d152957e051a
-F tests/domDoc.test 8b4826f6c5ec9b417517a5152f9be334ddc713119e02a347585e32d2add1698b
+F tests/domDoc.test 2b9087538d6cfc438328686c383152772fb5a8e75c756aa9587e99d8780ed4c5
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test 8dc65c0c6bba9dfbf436fce15fec4f742de8e1048db9784bdeff3cee39a83b5e
 F tests/domjson.test 4d59a364b082b9009e7edddd4133941e4b463896db28939accdfeed3ca210df1
@@ -221,8 +221,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 0906a7a6f520cca041bfa0634cf74e63b236860d5c8c30c5d8c667bc9782a447
-R 5d6d6f706c57b5b5fb6e60c50aad20fd
+P 67f94983f5fba665e9c2b85e40560fcfed6e6f6f2fb084b5601aec0bccd695af
+R e8c34b5b2f643c59ddba779222e54dd1
 U rolf
-Z f44e23e26257d1241d299b9bc47f5323
+Z 7933b6e4c9bda5c4d800a9dfabc4a81d
 # Remove this line to create a well-formed Fossil manifest.
