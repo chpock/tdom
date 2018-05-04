@@ -173,11 +173,7 @@ static Er er_sequences[] = {
     { "gt",        ">",        0 },
     { "apos",      "'",        0 },
     { "quot",      "\"",       0 },
-#if TclOnly8Bits
-    { "nbsp",      "\240",     0 },
-#else
     { "nbsp",      "\xC2\xA0",    0 },
-#endif
 };
 
 
@@ -287,9 +283,6 @@ static int TranslateEntityRefs (
                     /* error */
                 }
                 from = i+1;
-#if TclOnly8Bits
-                z[to++] = value;
-#else 
                 if (value < 0x80) {
                     z[to++] = value;
                 } else if (value <= 0x7FF) {
@@ -303,7 +296,6 @@ static int TranslateEntityRefs (
                     /* error */
                     return 0;
                 }
-#endif
             } else {
                 while (z[i] && isalpha((unsigned char)z[i])) {
                    i++;

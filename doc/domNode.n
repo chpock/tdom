@@ -163,7 +163,10 @@ Database Class:	\\fB\\$3\\fR
 domNode \- Manipulates an instance of a DOM node object
 .SH SYNOPSIS
 .nf
- $nodeObject \fImethod\fR  \fIarg arg ...\fR
+$nodeObject \fImethod\fR \fIarg arg ...\fR
+.fi
+.nf
+domNode \fInodeToken\fR \fImethod\fR \fIarg arg ...\fR
 .fi
 .BE
 .SH " DESCRIPTION "
@@ -488,7 +491,7 @@ XML.
 \&\fRReturns the DOM substree starting form the current node as a
 nested Tcl list.
 .TP
-\&\fB\fBasXML\fP \fB?-indent none/1..8?\fP \fB?-channel channelId?\fP \fB?-escapeNonASCII?\fP \fB-xmlDeclaration <boolean>?\fP \fB-encString <string>\fP \fB?-escapeAllQuot?\fP \fB?-indentAttrs?\fP
+\&\fB\fBasXML\fP \fB?-indent none/1..8?\fP \fB?-channel channelId?\fP \fB?-escapeNonASCII?\fP \fB-xmlDeclaration <boolean>?\fP \fB-encString <string>\fP \fB?-escapeAllQuot?\fP \fB?-indentAttrs?\fP \fB?-nogtescape?\fP \fB?-noEmptyElementTag?\fP
 \&\fR
 .RS
 .PP
@@ -522,6 +525,16 @@ If the option \fI-indentAttrs\fR is
 given, then attributes will each be separated with newlines
 and indented to the same level as the parent node plus the
 value given as argument to \fI-indentAttrs\fR (0..8).
+.PP
+If the option \fI-nogtescape\fR is given then the
+character '>' won't get escaped in attribute values and text
+content of elements. The default is to escape this
+character.
+.PP
+If the option \fI-noEmptyElementTag\fR is given then no
+empty tag syntax will be used. Instead, if an element has
+empty content it will be serialized with an element start tag
+and an immediately following element end tag.
 .RE
 .TP
 \&\fB\fBasHTML\fP \fB?-channel channelId?\fP \fB?-escapeNonASCII?\fP  \fB?-htmlEntities?\fP

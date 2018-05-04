@@ -108,6 +108,23 @@ test domNode-1.6 {domNode command: invalid token} {
     set result
 } {1}
 
+proc domNode-1.7-traceproc {args} {
+    error "error in nodeObjVar trace"
+}
+
+test domNode-1.7 {error in trace on nodeObjVar} {
+    set xml {<doc><e>1</e><e>2</e></doc>}
+
+    set doc [dom parse $xml]
+    set root [$doc documentElement]
+    trace add variable resultVar write domNode-1.7-traceproc
+    set result [catch {$root firstChild resultVar} errMsg]
+    lappend result $errMsg
+    trace remove variable resultVar write domNode-1.7-traceproc
+    $doc delete
+    set result
+} {1 {can't set "resultVar": error in nodeObjVar trace}}
+
 set doc [dom parse {<root xmlns="rootdefaultNS">
     <elem1 xmlns="elem1NS"><elem11/></elem1>
     <elem2 xmlns="elem2NS"/>
@@ -1234,7 +1251,7 @@ test domNode-13.2 {appendFromScript - elementNode} {
     set doc [dom createDocument root]
     set root [$doc documentElement]
     namespace eval nodeCmds {
-        $root appendFromScript {
+        $::root appendFromScript {
             e1
             e2
         }
@@ -1248,7 +1265,7 @@ test domNode-13.3 {appendFromScript - elementNode} {
     set doc [dom createDocument root]
     set root [$doc documentElement]
     namespace eval nodeCmds {
-        $root appendFromScript {
+        $::root appendFromScript {
             e1 {
                 e2 {
                     e1
@@ -1266,7 +1283,7 @@ test domNode-13.4 {appendFromScript - elementNode with attributes as options} {
     set doc [dom createDocument root]
     set root [$doc documentElement]
     namespace eval nodeCmds {
-        $root appendFromScript {
+        $::root appendFromScript {
             e1 -attr1 attr1Value -attr2 "attr 2 Value"
         }
     }
@@ -1280,8 +1297,8 @@ test domNode-13.5 {appendFromScript - elementNode with attributes as list} {
     set root [$doc documentElement]
     set attlist [list -a1 "some & value" -a2 "another attvalue"]
     namespace eval nodeCmds {
-        $root appendFromScript {
-            e1 $attlist {}
+        $::root appendFromScript {
+            e1 $::attlist {}
         }
     }
     set result [$root asXML -indent none]
@@ -1293,7 +1310,7 @@ test domNode-13.6 {appendFromScript - textnode, commentnode, cdatanode, pinode} 
     set doc [dom createDocument root]
     set root [$doc documentElement]
     namespace eval nodeCmds {
-        $root appendFromScript {
+        $::root appendFromScript {
             t foo
             c "my comment"
             cdata {&"<>;} ;# emacs: "
@@ -1311,7 +1328,7 @@ test domNode-13.7 {appendFromScript - textnode} {
     set doc [dom createDocument root]
     set root [$doc documentElement]
     namespace eval nodeCmds {
-        $root appendFromScript {
+        $::root appendFromScript {
             t "<p>Some <b>important</b> stuff</p>"
         }
     }
@@ -1324,7 +1341,7 @@ test domNode-13.8 {appendFromScript - textnode with -disableOutputEscaping} {
     set doc [dom createDocument root]
     set root [$doc documentElement]
     namespace eval nodeCmds {
-        $root appendFromScript {
+        $::root appendFromScript {
             t -disableOutputEscaping "<p>Some <b>important</b> stuff</p>"
         }
     }
@@ -1414,7 +1431,7 @@ test domNode-13.14 {qualified nodeCmd name} {
     set doc [dom createDocument root]
     set root [$doc documentElement]
     namespace eval nodeCmds {
-        $root appendFromScript {
+        $::root appendFromScript {
             thisCmds::thisE
         }
     }
@@ -1428,15 +1445,15 @@ namespace eval nodeCmds::$nsname { }
 
 test domNode-13.15 {qualified nodeCmds name} {
     namespace eval nodeCmds {
-        dom createNodeCmd elementNode ${nsname}::thisE
+        dom createNodeCmd elementNode ${::nsname}::thisE
     }
     set result [llength [info commands nodeCmds::thisE]]
     lappend result [llength [info commands nodeCmds::${nsname}::thisE]]
     set doc [dom createDocument root]
     set root [$doc documentElement]
     namespace eval nodeCmds {
-        $root appendFromScript {
-            ${nsname}::thisE
+        $::root appendFromScript {
+            ${::nsname}::thisE
         }
     }
     lappend result [$doc asXML -indent none]
@@ -1449,7 +1466,7 @@ test domNode-13.16 {Invalid attribute name} {
     set root [$doc documentElement]
     set result [catch {
         namespace eval nodeCmds {
-            $root appendFromScript {
+            $::root appendFromScript {
                 e1 att1 att1Value "invalid attname" value {}
             }
         }
@@ -1464,7 +1481,7 @@ test domNode-13.17 {Invalid attribute value} {
     set root [$doc documentElement]
     set result [catch {
         namespace eval nodeCmds {
-            $root appendFromScript {
+            $::root appendFromScript {
                 e1 att1 att1Value att2 "invalid \u0003 value" {}
             }
         }
@@ -1485,7 +1502,7 @@ test domNode-13.18 {Invalid attribute name - check disabled} {
     set root [$doc documentElement]
     set result [catch {
         namespace eval nodeCmds {
-            $root appendFromScript {
+            $::root appendFromScript {
                 e1 att1 att1Value "invalid attname" value {}
             }
         }
@@ -1505,7 +1522,7 @@ test domNode-13.19 {Invalid attribute value - check disabled} {
     set root [$doc documentElement]
     set result [catch {
         namespace eval nodeCmds {
-            $root appendFromScript {
+            $::root appendFromScript {
                 e1 att1 att1Value att2 "invalid \u0003 value" {}
             }
         }
@@ -1527,7 +1544,7 @@ test domNode-13.20 {Invalid att name, invalid att value, checks disabled} {
     set root [$doc documentElement]
     set result [catch {
         namespace eval nodeCmds {
-            $root appendFromScript {
+            $::root appendFromScript {
                 e1 att1 att1Value "invalid attName" "invalid \u0003 value" {}
             }
         }
@@ -1545,7 +1562,7 @@ test domNode-13.21 {Invalid comment value} {
     set root [$doc documentElement]
     set result [catch {
         namespace eval nodeCmds {
-            $root appendFromScript {
+            $::root appendFromScript {
                 c "invalid -- comment"
             }
         }
@@ -1560,7 +1577,7 @@ test domNode-13.22 {Invalid CDATA section value} {
     set root [$doc documentElement]
     set result [catch {
         namespace eval nodeCmds {
-            $root appendFromScript {
+            $::root appendFromScript {
                 cdata "invalid comment ]]>"
             }
         }
@@ -1575,7 +1592,7 @@ test domNode-13.23 {Invalid text node} {
     set root [$doc documentElement]
     set result [catch {
         namespace eval nodeCmds {
-            $root appendFromScript {
+            $::root appendFromScript {
                 t "invalid text \u0004"
             }
         }
@@ -1590,7 +1607,7 @@ test domNode-13.24 {Invalid processing instruction} {
     set root [$doc documentElement]
     set result [catch {
         namespace eval nodeCmds {
-            $root appendFromScript {
+            $::root appendFromScript {
                 pi  Xml "data"
             }
         }
@@ -1605,7 +1622,7 @@ test domNode-13.25 {Invalid processing instruction} {
     set root [$doc documentElement]
     set result [catch {
         namespace eval nodeCmds {
-            $root appendFromScript {
+            $::root appendFromScript {
                 pi  Xmll "data ?>"
             }
         }
@@ -1619,7 +1636,7 @@ test domNode-13.26 {appendFromScript with default namespace in scope} {
     set doc [dom parse {<doc xmlns="http://www.stock.org/stock"/>}]
     set root [$doc documentElement]
     namespace eval nodeCmds {
-        $root appendFromScript {
+        $::root appendFromScript {
             e1
         }
     }
@@ -2887,13 +2904,13 @@ test domNode-33.4 {insertBeforeFromScript - insert more then one node} {
     set doc [dom parse {<doc><foo/><bar/><grill/></doc>}]
     $doc documentElement root
     namespace eval nodeCmds {
-        $root insertBeforeFromScript {
+        $::root insertBeforeFromScript {
             e1
             e2 {
                 t new
             }
             e1
-        } [lindex [$root childNodes] 1]
+        } [lindex [$::root childNodes] 1]
     }
     set result [$doc asXML -indent none]
     $doc delete
@@ -2904,13 +2921,13 @@ test domNode-33.5 {insertBeforeFromScript - insert more then one node} {
     set doc [dom parse {<doc><foo/><bar/><grill/></doc>}]
     $doc documentElement root
     namespace eval nodeCmds {
-        $root insertBeforeFromScript {
+        $::root insertBeforeFromScript {
             e1
             e2 {
                 t new
             }
             e1
-        } [lindex [$root childNodes] 1]
+        } [lindex [$::root childNodes] 1]
     }
     set result ""
     foreach node [$root childNodes] {
@@ -2924,13 +2941,13 @@ test domNode-33.6 {insertBeforeFromScript - insert more then one node} {
     set doc [dom parse {<doc><foo/><bar/><grill/></doc>}]
     $doc documentElement root
     namespace eval nodeCmds {
-        $root insertBeforeFromScript {
+        $::root insertBeforeFromScript {
             e1
             e2 {
                 t new
             }
             e1
-        } [lindex [$root childNodes] 1]
+        } [lindex [$::root childNodes] 1]
     }
     set result ""
     set node [$root lastChild]
@@ -2946,14 +2963,14 @@ test domNode-33.7 {insertBeforeFromScript - error in script} {
     set doc [dom parse {<doc><foo/><bar/><grill/></doc>}]
     $doc documentElement root
     catch {namespace eval nodeCmds {
-        $root insertBeforeFromScript {
+        $::root insertBeforeFromScript {
             e1
             e2 {
                 t new
             }
             e1
             this is wrong
-        } [lindex [$root childNodes] 2]
+        } [lindex [$::root childNodes] 2]
     }}
     set result [$doc asXML -indent none]
     $doc delete

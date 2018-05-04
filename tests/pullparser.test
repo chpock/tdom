@@ -7,8 +7,9 @@
 #    pp-2.*: Compare dom / pull parsing
 #    pp-3.*: skip method
 #    pp-4.*: find-element method
+#    pp-5.*: CDATA section handling
 #
-# Copyright (c) 2017 Rolf Ade.
+# Copyright (c) 2017-2018 Rolf Ade.
 
 source [file join [file dir [info script]] loadtdom.tcl]
 
@@ -657,3 +658,162 @@ test pp-4.13 {find-element} {
     pp delete
     set result
 } {START_DOCUMENT END_DOCUMENT}    
+
+test pp-5.1 {CDATA section} {
+    tDOM::pullparser pp
+    pp input {<doc><![CDATA[ some text  ]]></doc>}
+    set result [pp state]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [pp text]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    
+    pp delete
+    set result
+} {START_DOCUMENT START_TAG doc TEXT { some text  } END_TAG doc END_DOCUMENT}
+
+test pp-5.2 {CDATA section inside of text} {
+    tDOM::pullparser pp
+    pp input {<doc>before<![CDATA[ some text  ]]>after</doc>}
+    set result [pp state]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [pp text]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    
+    pp delete
+    set result
+} {START_DOCUMENT START_TAG doc TEXT {before some text  after} END_TAG doc END_DOCUMENT}
+
+test pp-5.3 {CDATA section after text} {
+    tDOM::pullparser pp
+    pp input {<doc>before<![CDATA[ some text  ]]></doc>}
+    set result [pp state]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [pp text]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    
+    pp delete
+    set result
+} {START_DOCUMENT START_TAG doc TEXT {before some text  } END_TAG doc END_DOCUMENT}
+
+test pp-5.4 {CDATA section before text} {
+    tDOM::pullparser pp
+    pp input {<doc><![CDATA[ some text  ]]>after</doc>}
+    set result [pp state]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [pp text]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    
+    pp delete
+    set result
+} {START_DOCUMENT START_TAG doc TEXT { some text  after} END_TAG doc END_DOCUMENT}
+
+test pp-5.5 {White space only CDATA section inside text} {
+    tDOM::pullparser pp
+    pp input {<doc>before <![CDATA[  ]]> after</doc>}
+    set result [pp state]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [pp text]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    
+    pp delete
+    set result
+} {START_DOCUMENT START_TAG doc TEXT {before    after} END_TAG doc END_DOCUMENT}
+
+test pp-5.6 {White space only CDATA section inside text with -ignorewhitecdata} {
+    tDOM::pullparser pp -ignorewhitecdata
+    pp input {<doc>before <![CDATA[  ]]> after</doc>}
+    set result [pp state]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [pp text]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    
+    pp delete
+    set result
+} {START_DOCUMENT START_TAG doc TEXT {before    after} END_TAG doc END_DOCUMENT}
+
+test pp-5.6 {White space only CDATA section inside text with -ignorewhitecdata} {
+    tDOM::pullparser pp -ignorewhitecdata
+    pp input {<doc>before <![CDATA[  ]]> after</doc>}
+    set result [pp state]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [pp text]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    
+    pp delete
+    set result
+} {START_DOCUMENT START_TAG doc TEXT {before    after} END_TAG doc END_DOCUMENT}
+
+test pp-5.7 {White space only CDATA section inside white space only text w/ -ignorewhitecdata} {
+    tDOM::pullparser pp -ignorewhitecdata
+    pp input {<doc> <![CDATA[  ]]>
+        </doc>}
+    set result [pp state]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    
+    pp delete
+    set result
+} {START_DOCUMENT START_TAG doc END_TAG doc END_DOCUMENT}
+
+test pp-5.8 {White space only CDATA section before text w/ -ignorewhitecdata} {
+    tDOM::pullparser pp -ignorewhitecdata
+    pp input {<doc> <![CDATA[  ]]> after</doc>}
+    set result [pp state]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [pp text]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    
+    pp delete
+    set result
+} {START_DOCUMENT START_TAG doc TEXT {    after} END_TAG doc END_DOCUMENT}
+
+test pp-5.9 {Successive CDATA sections} {
+    tDOM::pullparser pp
+    pp input {<doc> <![CDATA[one]]><![CDATA[two]]><![CDATA[  ]]> after</doc>}
+    set result [pp state]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [pp text]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    
+    pp delete
+    set result
+} {START_DOCUMENT START_TAG doc TEXT { onetwo   after} END_TAG doc END_DOCUMENT}

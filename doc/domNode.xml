@@ -15,7 +15,8 @@
 -->
 
   <synopsis>
-    <syntax> $nodeObject <m>method</m>  <m>arg arg ...</m></syntax>
+    <syntax>$nodeObject <m>method</m> <m>arg arg ...</m></syntax>
+    <syntax>domNode <m>nodeToken</m> <m>method</m> <m>arg arg ...</m></syntax>
   </synopsis>
   <section>
     <title> DESCRIPTION </title>
@@ -431,7 +432,7 @@ nested Tcl list.</desc>
       </commanddef>
 
       <commanddef>
-        <command><method>asXML</method> <option>?-indent none/1..8?</option> <option>?-channel channelId?</option> <option>?-escapeNonASCII?</option> <option>-xmlDeclaration &lt;boolean&gt;?</option> <option>-encString &lt;string&gt;</option> <option>?-escapeAllQuot?</option> <option>?-indentAttrs?</option></command>
+        <command><method>asXML</method> <option>?-indent none/1..8?</option> <option>?-channel channelId?</option> <option>?-escapeNonASCII?</option> <option>-xmlDeclaration &lt;boolean&gt;?</option> <option>-encString &lt;string&gt;</option> <option>?-escapeAllQuot?</option> <option>?-indentAttrs?</option> <option>?-nogtescape?</option> <option>?-noEmptyElementTag?</option></command>
         <desc><p>Returns the DOM substree starting from the current
         node as the root node of the result as an (optional indented)
         XML string or sends the output directly to the given
@@ -461,7 +462,17 @@ nested Tcl list.</desc>
         <p>If the option <m>-indentAttrs</m> is
         given, then attributes will each be separated with newlines
         and indented to the same level as the parent node plus the
-        value given as argument to <m>-indentAttrs</m> (0..8).</p></desc>
+        value given as argument to <m>-indentAttrs</m> (0..8).</p>
+
+        <p>If the option <m>-nogtescape</m> is given then the
+        character '>' won't get escaped in attribute values and text
+        content of elements. The default is to escape this
+        character.</p>
+
+        <p>If the option <m>-noEmptyElementTag</m> is given then no
+        empty tag syntax will be used. Instead, if an element has
+        empty content it will be serialized with an element start tag
+        and an immediately following element end tag.</p></desc>
 
       </commanddef>
 
