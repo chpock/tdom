@@ -108,6 +108,23 @@ test domNode-1.6 {domNode command: invalid token} {
     set result
 } {1}
 
+proc domNode-1.7-traceproc {args} {
+    error "error in nodeObjVar trace"
+}
+
+test domNode-1.7 {error in trace on nodeObjVar} {
+    set xml {<doc><e>1</e><e>2</e></doc>}
+
+    set doc [dom parse $xml]
+    set root [$doc documentElement]
+    trace add variable resultVar write domNode-1.7-traceproc
+    set result [catch {$root firstChild resultVar} errMsg]
+    lappend result $errMsg
+    trace remove variable resultVar write domNode-1.7-traceproc
+    $doc delete
+    set result
+} {1 {can't set "resultVar": error in nodeObjVar trace}}
+
 set doc [dom parse {<root xmlns="rootdefaultNS">
     <elem1 xmlns="elem1NS"><elem11/></elem1>
     <elem2 xmlns="elem2NS"/>

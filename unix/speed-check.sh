@@ -11,7 +11,7 @@ then
 fi
 NAME=$1
 CACHEGRIND_OPTS=""
-TESTSCRIPT="../tests/all"
+TESTSCRIPT="../tests/all.tcl"
 TESTRUN_OPTS=""
 shift
 while test "$1" != ""; do

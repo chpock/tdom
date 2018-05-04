@@ -96,7 +96,6 @@ TDOM_ENABLE_HTML5
 #-----------------------------------------------------------------------
 
 TEA_ADD_SOURCES([generic/xmlsimple.c \
-                 generic/utf8conv.c  \
                  generic/dom.c       \
                  generic/domhtml.c   \
                  generic/domhtml5.c  \
