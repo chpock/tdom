@@ -67,6 +67,7 @@ typedef struct TNC_contentStack
 
 typedef struct TNC_data
 {
+    XML_Parser        parser;                  /* NULL after DOCTYPE decl. */
     char             *doctypeName;            /* From DOCTYPE declaration */
     int               ignoreWhiteCDATAs;      /* Flag: white space allowed in 
                                                  current content model? */
@@ -276,10 +277,23 @@ signalNotValid (userData, code)
 {
     TNC_Data *tncdata = (TNC_Data *) userData;
     TclGenExpatInfo *expat;
+    Tcl_HashEntry *entryPtr;
+    Tcl_HashSearch search;
+    XML_Content *model;
     char s[1000];
 
     if (tncdata->expatObj) {
         expat = GetExpatInfo (tncdata->interp, tncdata->expatObj);
+        if (!tncdata->elemContentsRewriten) {
+            entryPtr = Tcl_FirstHashEntry (tncdata->tagNames, &search);
+            while (entryPtr) {
+                model = Tcl_GetHashValue (entryPtr);
+                if (model) {
+                    XML_MemFree (expat->parser, model);
+                }
+                entryPtr = Tcl_NextHashEntry (&search);
+            }
+        }            
         sprintf (s, "Validation error at line %ld, character %ld: %s",
                  XML_GetCurrentLineNumber (expat->parser),
                  XML_GetCurrentColumnNumber (expat->parser),
@@ -513,6 +527,7 @@ TncEndDoctypeDeclHandler (userData)
             tmodel->attInfo = NULL;
         }
         Tcl_SetHashValue (entryPtr, tmodel);
+        XML_MemFree (tncdata->parser, emodel);
         entryPtr = Tcl_NextHashEntry (&search);
     }
     tncdata->elemContentsRewriten = 1;
@@ -2704,6 +2719,7 @@ createTncData (
     TNC_Data *tncdata;
     
     tncdata = (TNC_Data *) MALLOC (sizeof (TNC_Data));
+    tncdata->parser = NULL;
     tncdata->tagNames = (Tcl_HashTable *) MALLOC (sizeof (Tcl_HashTable));
     Tcl_InitHashTable (tncdata->tagNames, TCL_STRING_KEYS);
     tncdata->elemContentsRewriten = 0;
