@@ -1417,6 +1417,7 @@ TncEndDoctypeDeclHandler (userData)
             tmodel->attInfo = NULL;
         }
         Tcl_SetHashValue (entryPtr, tmodel);
+        XML_MemFree (tncdata->parser, emodel);
         entryPtr = Tcl_NextHashEntry (&search);
     }
     tncdata->elemContentsRewriten = 1;

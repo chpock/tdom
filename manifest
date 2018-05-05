@@ -1,5 +1,5 @@
-C Merged\sfrom\strunk.
-D 2018-05-04T22:24:05.539
+C Plugged\smemory\sleak:\sNot\sall\scollected\sDTD\sdata\sgot\sfreed.
+D 2018-05-05T00:06:07.481
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -111,7 +111,7 @@ F extensions/tnc/win/rules-ext.vc e788fcfc1e69b11946e18b8f67e0870b3bd38913
 F extensions/tnc/win/rules.vc 8157e2a811cf5e93683d6b0fbf5d91d153aa4535
 F extensions/tnc/win/targets.vc 79dea1c6a94a94e6ed8bae9e0195149b25a69923
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
-F generic/dom.c 9ce49c9115d4a76ac950daf3b0da611574dc76fa411edd99eb189a85fdde8194
+F generic/dom.c 8bc1290c354c28f83156810974ddfba1dac617b72fd629762c475e585415c22f
 F generic/dom.h 8917f4b9caa11b8897651e9ce2e0970be9b6c2366077cd5b89e5e5cfc0e237a8
 F generic/domalloc.c 55e9eeff19cc54cf3956a7013883ead07efd3593
 F generic/domalloc.h 4830a81539dc0323fbdc98f613df33fd38736da60e1ff5891b5c328eb1a6881d
@@ -221,8 +221,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 46dd7587a528808da20278cdc53d89c1ab2b9aefaf0739817956fa580590409e 3fd564bb2e77f6be895a8aac7db823a510f80158ca8705e949d29f9eb50548d2
-R 0b7c04d6d248e67e5f8b8feedf5c1084
+P b8bdad56dbe006295dfda056af6df321e431f225fbc79791b39cff17af53d1ff
+R e6f577f49d958d408befb575c7d3c1e8
 U rolf
-Z b68fe0b9c86323cff6da6bd2e75b925b
+Z faec87cec541e22c8234dfe09d793070
 # Remove this line to create a well-formed Fossil manifest.
