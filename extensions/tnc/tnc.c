@@ -68,7 +68,7 @@ typedef struct TNC_contentStack
 typedef struct TNC_data
 {
     char             *doctypeName;            /* From DOCTYPE declaration */
-    int               ignoreWhiteCDATAs;      /* Flag: white space allowed in 
+    int               skipWhiteCDATAs;        /* Flag: white space allowed in 
                                                  current content model? */
     int               ignorePCDATA;           /* Flag: currently mixed content
                                                  model? */
@@ -89,7 +89,7 @@ typedef struct TNC_data
     int               elemContentsRewriten;   /* Signals, if the tagNames
                                                  entries point to
                                                  TNC_Contents */
-    int               status;                 /* While used with expat obj:
+    int               dtdstatus;                 /* While used with expat obj:
                                                  1 after successful parsed
                                                  DTD, 0 otherwise.
                                                  For validateCmd used for
@@ -288,7 +288,7 @@ signalNotValid (userData, code)
         expat->result = Tcl_NewStringObj (s, -1);
         Tcl_IncrRefCount (expat->result);
     } else {
-        tncdata->status = 1;
+        tncdata->dtdstatus = 1;
         Tcl_SetResult (tncdata->interp, (char *)TNC_ErrorString (code),
                        TCL_VOLATILE);
     }
@@ -540,7 +540,7 @@ TncEndDoctypeDeclHandler (userData)
         }
         entryPtr = Tcl_NextHashEntry (&search);
     }
-    tncdata->status = 1;
+    tncdata->dtdstatus = 1;
 }
 
 
@@ -1814,15 +1814,15 @@ TncElementStartCommand (userData, name, atts)
     switch (model->type) {
     case XML_CTYPE_MIXED:
     case XML_CTYPE_ANY:
-        tncdata->ignoreWhiteCDATAs = 1;
+        tncdata->skipWhiteCDATAs = 1;
         tncdata->ignorePCDATA = 1;
         break;
     case XML_CTYPE_EMPTY:
-        tncdata->ignoreWhiteCDATAs = 0;
+        tncdata->skipWhiteCDATAs = 0;
         break;
     case XML_CTYPE_CHOICE:
     case XML_CTYPE_SEQ:
-        tncdata->ignoreWhiteCDATAs = 1;
+        tncdata->skipWhiteCDATAs = 1;
         tncdata->ignorePCDATA = 0;
         break;
     case XML_CTYPE_NAME:
@@ -2111,16 +2111,16 @@ TncElementEndCommand (userData, name)
         switch ((&tncdata->contentStack[tncdata->contentStackPtr - 1])->model->type) {
         case XML_CTYPE_MIXED:
         case XML_CTYPE_ANY:
-            tncdata->ignoreWhiteCDATAs = 1;
+            tncdata->skipWhiteCDATAs = 1;
             tncdata->ignorePCDATA = 1;
             break;
         case XML_CTYPE_EMPTY:
-            tncdata->ignoreWhiteCDATAs = 0;
+            tncdata->skipWhiteCDATAs = 0;
             break;
         case XML_CTYPE_CHOICE:
         case XML_CTYPE_SEQ:
         case XML_CTYPE_NAME:
-            tncdata->ignoreWhiteCDATAs = 1;
+            tncdata->skipWhiteCDATAs = 1;
             tncdata->ignorePCDATA = 0;
             break;
         }
@@ -2173,7 +2173,7 @@ TncCharacterdataCommand (userData, data, len)
     int i;
     char *pc;
 
-    if (!tncdata->ignoreWhiteCDATAs && len > 0) {
+    if (!tncdata->skipWhiteCDATAs && len > 0) {
         signalNotValid (userData, TNC_ERROR_EMPTY_ELEMENT);
         return;
     }
@@ -2300,7 +2300,7 @@ static int validateTree (
     switch (node->nodeType) {
     case ELEMENT_NODE:
         TncElementStartCommand (tncdata, node->nodeName, NULL);
-        if (tncdata->status) return 0;
+        if (tncdata->dtdstatus) return 0;
         if (!validateNodeAttributes (tncdata, tncdata->elemAttInfo, node)) 
             return 0;
         if (node->firstChild) {
@@ -2311,13 +2311,13 @@ static int validateTree (
             }
         }
         TncElementEndCommand (tncdata, node->nodeName);
-        if (tncdata->status) return 0;
+        if (tncdata->dtdstatus) return 0;
         break;
     case TEXT_NODE:
     case CDATA_SECTION_NODE:
         TncCharacterdataCommand (tncdata, ((domTextNode*)node)->nodeValue, 
                                  ((domTextNode*)node)->valueLength);
-        if (tncdata->status) return 0;
+        if (tncdata->dtdstatus) return 0;
         break;
     case COMMENT_NODE:
     case PROCESSING_INSTRUCTION_NODE:
@@ -2397,7 +2397,7 @@ tnc_ValidateObjCmd (
             SetResult ("The validateTree method needs a domNode as argument.");
             return TCL_ERROR;
         }
-        tncdata->status = 0;
+        tncdata->dtdstatus = 0;
         tncdata->idCheck = 0;
         if (tncdata->ids->numEntries) {
             Tcl_DeleteHashTable (tncdata->ids);
@@ -2463,7 +2463,7 @@ tnc_ValidateObjCmd (
             SetBooleanResult (0);
             return TCL_OK;
         }
-        tncdata->status = 0;
+        tncdata->dtdstatus = 0;
         tncdata->idCheck = 1;
         if (tncdata->ids->numEntries) {
             Tcl_DeleteHashTable (tncdata->ids);
@@ -2516,7 +2516,7 @@ tnc_ValidateObjCmd (
             return TCL_OK;
         }
         model = (TNC_Content *) Tcl_GetHashValue (entryPtr);
-        tncdata->status = 0;
+        tncdata->dtdstatus = 0;
         tncdata->idCheck = 0;
         if (tncdata->ids->numEntries) {
             Tcl_DeleteHashTable (tncdata->ids);
@@ -2666,14 +2666,14 @@ TncResetProc (interp, userData)
     FreeTncData (tncdata);
     Tcl_InitHashTable (tncdata->tagNames, TCL_STRING_KEYS);
     tncdata->elemContentsRewriten = 0;
-    tncdata->status = 0;
+    tncdata->dtdstatus = 0;
     tncdata->idCheck = 1;
     Tcl_InitHashTable (tncdata->attDefsTables, TCL_STRING_KEYS);
     Tcl_InitHashTable (tncdata->entityDecls, TCL_STRING_KEYS);
     Tcl_InitHashTable (tncdata->notationDecls, TCL_STRING_KEYS);
     Tcl_InitHashTable (tncdata->ids, TCL_STRING_KEYS);
     tncdata->doctypeName = NULL;
-    tncdata->ignoreWhiteCDATAs = 1;
+    tncdata->skipWhiteCDATAs = 1;
     tncdata->ignorePCDATA = 0;
     tncdata->contentStackPtr = 0;
 }
@@ -2706,7 +2706,7 @@ createTncData (
     tncdata->tagNames = (Tcl_HashTable *) MALLOC (sizeof (Tcl_HashTable));
     Tcl_InitHashTable (tncdata->tagNames, TCL_STRING_KEYS);
     tncdata->elemContentsRewriten = 0;
-    tncdata->status = 0;
+    tncdata->dtdstatus = 0;
     tncdata->idCheck = 1;
     tncdata->attDefsTables = 
         (Tcl_HashTable *) MALLOC (sizeof (Tcl_HashTable));
@@ -2722,7 +2722,7 @@ createTncData (
     tncdata->doctypeName = NULL;
     tncdata->interp = interp;
     tncdata->expatObj = expatObj;
-    tncdata->ignoreWhiteCDATAs = 1;
+    tncdata->skipWhiteCDATAs = 1;
     tncdata->ignorePCDATA = 0;
     tncdata->contentStack = (TNC_ContentStack *)
         MALLOC (sizeof (TNC_ContentStack) * TNC_INITCONTENTSTACKSIZE);
@@ -2903,14 +2903,14 @@ TclTncObjCmd(dummy, interp, objc, objv)
             return TCL_ERROR;
         }
         tncdata = (TNC_Data *) handlerSet->userData;
-        if (!tncdata->status) {
+        if (!tncdata->dtdstatus) {
             SetResult ("No complete and error free DTD data available.");
             return TCL_ERROR;
         }
         /* After we finished, the validator structure is its own command,
            there isn't a parser cmd anymore. */
         tncdata->expatObj = NULL;
-        tncdata->status = 0;
+        tncdata->dtdstatus = 0;
         handlerSet->userData = createTncData (interp, objv[1]);
         if (objc == 4) {
             cmdName = Tcl_GetStringFromObj (objv[3], NULL);
