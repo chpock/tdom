@@ -9,13 +9,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-/*
- * Beginning with 8.4, Tcl API is CONST'ified
- */
-#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION <= 3)
-# define CONST84
-#endif
-
 #ifndef TCL_THREADS
 # define TDomThreaded(x)
 #else
@@ -270,9 +263,10 @@ TNC_ErrorString (int code)
 extern char *Tdom_InitStubs (Tcl_Interp *interp, char *version, int exact);
 
 static void
-signalNotValid (userData, code)
-    void        *userData;
-    int          code;
+signalNotValid (
+    void        *userData,
+    int          code
+)
 {
     TNC_Data *tncdata = (TNC_Data *) userData;
     TclGenExpatInfo *expat;
@@ -344,12 +338,13 @@ FindUniqueCmdName(
  */
 
 void
-TncStartDoctypeDeclHandler (userData, doctypeName, sysid, pubid, has_internal_subset)
-    void       *userData;
-    const char *doctypeName;
-    const char *sysid;
-    const char *pubid;
-    int         has_internal_subset;
+TncStartDoctypeDeclHandler (
+    void       *userData,
+    const char *doctypeName,
+    const char *sysid,
+    const char *pubid,
+    int         has_internal_subset
+)
 {
     TNC_Data *tncdata = (TNC_Data *) userData;
 
@@ -377,8 +372,9 @@ TncStartDoctypeDeclHandler (userData, doctypeName, sysid, pubid, has_internal_su
  */
 
 static void
-TncFreeTncModel (tmodel)
-    TNC_Content *tmodel;
+TncFreeTncModel (
+    TNC_Content *tmodel
+)
 {
     unsigned int i;
 
@@ -409,10 +405,11 @@ TncFreeTncModel (tmodel)
  */
 
 static void
-TncRewriteModel (emodel, tmodel, tagNames)
-    XML_Content   *emodel;
-    TNC_Content   *tmodel;
-    Tcl_HashTable *tagNames;
+TncRewriteModel (
+    XML_Content   *emodel,
+    TNC_Content   *tmodel,
+    Tcl_HashTable *tagNames
+)
 {
     Tcl_HashEntry *entryPtr;
     unsigned int i;
@@ -485,8 +482,9 @@ TncRewriteModel (emodel, tmodel, tagNames)
  */
 
 void
-TncEndDoctypeDeclHandler (userData)
-    void *userData;
+TncEndDoctypeDeclHandler (
+    void *userData
+)
 {
     TNC_Data *tncdata = (TNC_Data *) userData;
     Tcl_HashEntry *entryPtr, *ePtr1;
@@ -562,17 +560,17 @@ TncEndDoctypeDeclHandler (userData)
  */
 
 void
-TncEntityDeclHandler (userData, entityName, is_parameter_entity, value,
-                       value_length, base, systemId, publicId, notationName)
-    void *userData;
-    const char *entityName;
-    int is_parameter_entity;
-    const char *value;
-    int value_length;
-    const char *base;
-    const char *systemId;
-    const char *publicId;
-    const char *notationName;
+TncEntityDeclHandler (
+    void *userData,
+    const char *entityName,
+    int is_parameter_entity,
+    const char *value,
+    int value_length,
+    const char *base,
+    const char *systemId,
+    const char *publicId,
+    const char *notationName
+)
 {
     TNC_Data *tncdata = (TNC_Data *) userData;
     Tcl_HashEntry *entryPtr;
@@ -635,12 +633,13 @@ TncEntityDeclHandler (userData, entityName, is_parameter_entity, value,
  */
 
 void
-TncNotationDeclHandler (userData, notationName, base, systemId, publicId)
-    void       *userData;
-    const char *notationName;
-    const char *base;
-    const char *systemId;
-    const char *publicId;
+TncNotationDeclHandler (
+    void       *userData,
+    const char *notationName,
+    const char *base,
+    const char *systemId,
+    const char *publicId
+)
 {
     TNC_Data *tncdata = (TNC_Data *) userData;
     Tcl_HashEntry *entryPtr;
@@ -674,10 +673,11 @@ TncNotationDeclHandler (userData, notationName, base, systemId, publicId)
  */
 
 void
-TncElementDeclCommand (userData, name, model)
-    void *userData;
-    const char *name;
-    XML_Content *model;
+TncElementDeclCommand (
+    void *userData,
+    const char *name,
+    XML_Content *model
+)
 {
     TNC_Data *tncdata = (TNC_Data *) userData;
     Tcl_HashEntry *entryPtr;
@@ -731,13 +731,14 @@ TncElementDeclCommand (userData, name, model)
  */
 
 void
-TncAttDeclCommand (userData, elname, attname, att_type, dflt, isrequired)
-    void       *userData;
-    const char *elname;
-    const char *attname;
-    const char *att_type;
-    const char *dflt;
-    int         isrequired;
+TncAttDeclCommand (
+    void       *userData,
+    const char *elname,
+    const char *attname,
+    const char *att_type,
+    const char *dflt,
+    int         isrequired
+)
 {
     TNC_Data *tncdata = (TNC_Data *) userData;
     Tcl_HashEntry *entryPtr, *entryPtr1;
@@ -1150,9 +1151,10 @@ printContentStack (TNC_Data *tncdata)
  */
 
 static int
-TncProbeElement (nameId, tncdata)
-    TNC_NameId *nameId;
-    TNC_Data   *tncdata;
+TncProbeElement (
+    TNC_NameId *nameId,
+    TNC_Data   *tncdata
+)
 {
     TNC_ContentStack *stackelm;
     TNC_Content *activeModel;
@@ -1517,12 +1519,13 @@ TncProbeElement (nameId, tncdata)
  */
 
 static int
-TncProbeAttribute (userData, elemAtts, attrName, attrValue, nrOfreq)
-    void *userData;
-    Tcl_HashTable *elemAtts;
-    char *attrName;
-    char *attrValue;
-    int *nrOfreq;
+TncProbeAttribute (
+    void *userData,
+    Tcl_HashTable *elemAtts,
+    char *attrName,
+    char *attrValue,
+    int *nrOfreq
+)
 {
     TNC_Data *tncdata = (TNC_Data *) userData;
     Tcl_HashEntry *entryPtr;
@@ -1773,10 +1776,11 @@ TncProbeAttribute (userData, elemAtts, attrName, attrValue, nrOfreq)
  */
 
 void
-TncElementStartCommand (userData, name, atts)
-    void *userData;
-    const char *name;
-    const char **atts;
+TncElementStartCommand (
+    void *userData,
+    const char *name,
+    const char **atts
+)
 {
     TNC_Data *tncdata = (TNC_Data *) userData;
     Tcl_HashEntry *entryPtr;
@@ -1936,8 +1940,9 @@ TncElementStartCommand (userData, name, atts)
  */
 
 static int
-TncProbeElementEnd (tncdata)
-    TNC_Data *tncdata;
+TncProbeElementEnd (
+    TNC_Data *tncdata
+)
 {
     TNC_ContentStack stackelm;
     unsigned int i;
@@ -2080,9 +2085,10 @@ TncProbeElementEnd (tncdata)
  */
 
 void
-TncElementEndCommand (userData, name)
-    void       *userData;
-    const char *name;
+TncElementEndCommand (
+    void       *userData,
+    const char *name
+)
 {
     TNC_Data *tncdata = (TNC_Data *) userData;
     Tcl_HashEntry *entryPtr;
@@ -2165,10 +2171,11 @@ TncElementEndCommand (userData, name)
  */
 
 void
-TncCharacterdataCommand (userData, data, len)
-    void       *userData;
-    const char *data;
-    int         len;
+TncCharacterdataCommand (
+    void       *userData,
+    const char *data,
+    int         len
+)
 {
     TNC_Data *tncdata = (TNC_Data *) userData;
     int i;
@@ -2210,8 +2217,9 @@ TncCharacterdataCommand (userData, data, len)
  */
 
 void
-TncStartCdataSectionHandler (userData)
-    void *userData;
+TncStartCdataSectionHandler (
+    void *userData
+)
 {
     TNC_Data *tncdata = (TNC_Data *) userData;
 
@@ -2353,7 +2361,7 @@ tnc_ValidateObjCmd (
     ClientData  clientData,
     Tcl_Interp *interp,
     int         objc,
-    Tcl_Obj    *CONST objv[]
+    Tcl_Obj    *const objv[]
     )
 {
     TNC_Data        *tncdata = (TNC_Data*) clientData;
@@ -2363,7 +2371,7 @@ tnc_ValidateObjCmd (
     Tcl_HashEntry   *entryPtr;
     TNC_Content     *model;
     
-    static CONST84 char *validateMethods[] = {
+    static const char *validateMethods[] = {
         "validateTree",   "validateDocument", "validateAttributes",
         "delete",
         NULL
@@ -2570,8 +2578,9 @@ tnc_ValidateObjCmd (
  *
  *---------------------------------------------------------------------------- */
 static void
-FreeTncData (tncdata)
-    TNC_Data *tncdata;
+FreeTncData (
+    TNC_Data *tncdata
+)
 {
     Tcl_HashEntry *entryPtr, *attentryPtr;
     Tcl_HashSearch search, attsearch;
@@ -2658,9 +2667,10 @@ FreeTncData (tncdata)
  */
 
 void
-TncResetProc (interp, userData)
-    Tcl_Interp *interp;
-    void *userData;
+TncResetProc (
+    Tcl_Interp *interp,
+    void *userData
+)
 {
     TNC_Data *tncdata = (TNC_Data *) userData;
 
@@ -2751,9 +2761,10 @@ createTncData (
  */
 
 void
-TncFreeProc (interp, userData)
-    Tcl_Interp *interp;
-    void *userData;
+TncFreeProc (
+    Tcl_Interp *interp,
+    void *userData
+)
 {
     TNC_Data *tncdata = (TNC_Data *) userData;
 
@@ -2817,14 +2828,14 @@ TclTncObjCmd(dummy, interp, objc, objv)
      ClientData dummy;
      Tcl_Interp *interp;
      int objc;
-     Tcl_Obj *CONST objv[];
+     Tcl_Obj *const objv[];
 {
     char          *cmdName, s[20];
     CHandlerSet   *handlerSet;
     int            methodIndex, result;
     TNC_Data      *tncdata;
 
-    static CONST84 char *tncMethods[] = {
+    static const char *tncMethods[] = {
         "enable",  "remove", "getValidateCmd",
         NULL
     };
