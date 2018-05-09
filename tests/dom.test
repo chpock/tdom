@@ -680,7 +680,7 @@ proc dom-2.42-resolver {base systemId publicId} {
     }
 }
 
-test dom-2.42 {-validate} {
+test dom-2.42 {-dtdvalidation} {
     set file [file join [file dir [info script]] data/REC-xslt-19991116.xml]
     set fd [open $file]
     set doc [dom parse -dtdvalidation \
@@ -689,6 +689,14 @@ test dom-2.42 {-validate} {
                  -externalentitycommand dom-2.42-resolver]
     $doc delete
 } {}
+
+test dom-2.43 {-dtdvalidation / invalid dtd} {
+    set result [catch {
+        dom parse -dtdvalidation {<!DOCTYPE root [
+            <!ELEMENT root (#PCDATA|a|b|a)*>]>
+            <root/>}} errMsg]
+    set result
+} 1
 
 test dom-3.1 {isName} {
     dom isName ":foo"

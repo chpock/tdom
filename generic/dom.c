@@ -3486,6 +3486,7 @@ TncElementDeclCommand (userData, name, model)
     entryPtr = Tcl_CreateHashEntry (tncdata->tagNames, name, &newPtr);
     /* "No element type may be declared more than once." (rec. 3.2) */
     if (!newPtr) {
+        XML_FreeContentModel (tncdata->parser, model);
         signalNotValid (userData, TNC_ERROR_DUPLICATE_ELEMENT_DECL);
         return;
     }
@@ -3499,6 +3500,7 @@ TncElementDeclCommand (userData, name, model)
             for (j = i + 1; j < model->numchildren; j++) {
                 if (strcmp ((&model->children[i])->name,
                             (&model->children[j])->name) == 0) {
+                    XML_FreeContentModel (tncdata->parser, model);
                     signalNotValid (userData,
                                     TNC_ERROR_DUPLICATE_MIXED_ELEMENT);
                     return;
@@ -3953,16 +3955,18 @@ TncFreeValidationData (
     
     if (!info->dtdvalidation) return;
     
-    if (info->elemContentsRewriten) {
-        entryPtr = Tcl_FirstHashEntry (info->tagNames, &search);
-        while (entryPtr) {
-            model = Tcl_GetHashValue (entryPtr);
+    entryPtr = Tcl_FirstHashEntry (info->tagNames, &search);
+    while (entryPtr) {
+        model = Tcl_GetHashValue (entryPtr);
+        if (info->elemContentsRewriten) {
             if (model) {
                 TncFreeTncModel (model);
                 FREE ((char *) model);
             }
-            entryPtr = Tcl_NextHashEntry (&search);
+        } else {
+            XML_FreeContentModel(info->parser, (XML_Content *)model);
         }
+        entryPtr = Tcl_NextHashEntry (&search);
     }
     Tcl_DeleteHashTable (info->tagNames);
     entryPtr = Tcl_FirstHashEntry (info->attDefsTables, &search);
