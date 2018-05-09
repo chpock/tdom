@@ -1,5 +1,5 @@
-C Finer\sdetails\sof\sthe\smemory\smanagement:\sWhile\sthe\stdom\sexpat\sapi\scares\sfor\stnc\sabout\scleaning\sup\sthe\scontent\smodels\sthat\sexpat\shands\sout\sto\sthe\suser,\san\sintegration\sinto\sdom\shas\sto\scare\sby\sitself.
-D 2018-05-09T23:14:59.150
+C Merged\sfrom\strunk.
+D 2018-05-09T23:59:17.092
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -104,7 +104,7 @@ F extensions/tnc/test.tcl 545cdec17e6702cef9f79184fdf1ce0166b8c412
 F extensions/tnc/tests/all.tcl 845c9dab65c294c3570f69cc731d6fef62efbd03
 F extensions/tnc/tests/loadtnc.tcl 2228e517a49106038388055d7e0b959198ab54ce
 F extensions/tnc/tests/tnc.test 7f248ada7239ca41ccdb56515b93947bafee1f06d10118adcedfc2885479d540
-F extensions/tnc/tnc.c 21b8df6d13769a2395edcef4f30576f34352de1ac844f1e160372707bc01d004
+F extensions/tnc/tnc.c 7323d9b09ad364d8d785fc3f7bb673aab43c44d2f58031632119dc0ecdacfecf
 F extensions/tnc/win/makefile.vc b512d0f3eb67d83ace6f626d20b6ed8c895e609d
 F extensions/tnc/win/nmakehlp.c 194ae7c24886245c679cb4c9ea7e6daaaebb5fcd
 F extensions/tnc/win/rules-ext.vc e788fcfc1e69b11946e18b8f67e0870b3bd38913
@@ -221,8 +221,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 05b7cbc62ac5288a21444f90944ebf6622b8689eac38d1362ae2b14ebf72b95f
-R 9f3c46c2c6162a399d4d40ab83ba24a7
+P c0393aab8d1d074fbe455708bb5b1d561419a20cd6d7dfc415b8cd0f7f4618e0 c1bddcddb3b700e444321317f9eb2e8cdc51b185463883f1e783c1a746eb218a
+R a95ba57cdcaab1cc8facd5c792609a75
 U rolf
-Z 7b262d719345820d74d90129c70b92d7
+Z 2dd1888d6692fd30b9b128fe691f74f2
 # Remove this line to create a well-formed Fossil manifest.
