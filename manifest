@@ -1,5 +1,5 @@
-C Modernizing\sthe\sC\sstyle,\sdeCONSTifing.
-D 2018-05-09T23:58:19.837
+C Improved\sdocumentation.
+D 2018-05-10T00:27:42.459
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -35,9 +35,9 @@ F doc/expatapi.xml f978d9a0b6df6878e1f94e427c018240efaf33f6d8dfa456051cfe551b15d
 F doc/index.html 22d7d146b761598f0358a4fb9cb2c9b907602431e5950ca8c40394b411de24d7
 F doc/keyword-index.html e316c5df54ab8329e573542c5a348fe370cc317a15d0244fbefc596cc5489dda
 F doc/manpage.css 3b4ec1d641048933a7e6bffc659de9519030a959
-F doc/pullparser.html 6197964c4f3218d4d604b0008a4f8759ada36dc2e1d78ac960fa0ca311ff341f
-F doc/pullparser.n fba6792f0f4f029558c86e5becd9aad29e77ec932f71ecc6f805a88a3973f158
-F doc/pullparser.xml a3fa26e42b708f127072d2c140aeaa9b05c246abf957ea1d1865628a22800679
+F doc/pullparser.html ff210d802a278d0e23902d9e57ffafcb48165209b9133684359b32438a923a80
+F doc/pullparser.n f83f41ad60266831d221f92fcb1c38e8410fc58ad0cf297cf09c70657e99ba25
+F doc/pullparser.xml c731c3dc9e7315608ff483d5d2aabfa04cd2f321c61b9002e053b5697ce43d95
 F doc/tDOM.xml c2c23ef23bc7ed266b10e833a196833dab73cca8e6e63eeaba0da29bff2bbaf6
 F doc/tdomcmd.html 9b4d9ff443499554adf2346ff0efc0317a98bd6e1fc3fc79a6e476b71fe85fed
 F doc/tdomcmd.n c06a5ff035f16a2a52636b69d9ebe6ba84ff5101922ed27b551146c4d61d6cda
@@ -221,8 +221,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 0546eec94fbeb8b00bad95fba507d2c1b1ea4d1fd085f74e1b7a1939a8c3d9d1
-R 862430b28531f808f220ffb21b5473a7
+P c1bddcddb3b700e444321317f9eb2e8cdc51b185463883f1e783c1a746eb218a
+R 28b2c6845750651ae06dbb7c66c8317e
 U rolf
-Z cb666e5c1c8da1d72f7451e776f8ea44
+Z a8790ec2246a86998ad070b520852b69
 # Remove this line to create a well-formed Fossil manifest.

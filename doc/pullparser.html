@@ -4,18 +4,18 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x241d970">NAME</a> · <a href="#SECTid0x2307540">SYNOPSIS</a> · <a href="#SECTid0x231cbc0">DESCRIPTION </a> · <a href="#SECTid0x2441170">KEYWORDS</a>
+<a href="#SECTid0x1202970">NAME</a> · <a href="#SECTid0x10ec540">SYNOPSIS</a> · <a href="#SECTid0x1101bc0">DESCRIPTION </a> · <a href="#SECTid0x12261f0">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x241d970">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x1202970">NAME</a></h2><p class="namesection">
 <b class="names">tDOM::pullparser - </b><br>Create an XML pull parser command</p>
 
-  <h2><a name="SECTid0x2307540">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x10ec540">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
     <b class="cmd">tDOM::pullparser</b> <i class="m">cmdName</i>  ? -ignorewhitecdata ? 
     </pre>
 
-  <h2><a name="SECTid0x231cbc0">DESCRIPTION </a></h2><p>This command creates XML pull parser commands with a simple
+  <h2><a name="SECTid0x1101bc0">DESCRIPTION </a></h2><p>This command creates XML pull parser commands with a simple
     API, along the lines of a simple StAX parser. After creation,
     you've to set an input source, to do anything useful with the pull
     parser. For this see the methods <i class="m">input</i>, <i class="m">inputchannel</i>
@@ -102,7 +102,9 @@
       
         <dt><b class="method">next</b></dt>
         <dd>This method valid in state <i class="m">START_DOCUMENT</i>,
-        <i class="m">START_TAG</i>, <i class="m">END_TAG</i> and <i class="m">TEXT</i>.</dd>
+        <i class="m">START_TAG</i>, <i class="m">END_TAG</i> and <i class="m">TEXT</i>. It continues
+        parsing of the XML input until the next event, which it will
+        return.</dd>
       
 
       
@@ -129,8 +131,9 @@
       
         <dt><b class="method">skip</b></dt>
         <dd>This method is only valid in state <i class="m">START_TAG</i>. It
-        skips to the corresponding end tag while, ignores all events
-        on the way and returns the new state END_TAG.</dd>
+        skips to the corresponding end tag and ignores all events (but
+        not XML parsing errors) on the way and returns the new state
+        END_TAG.</dd>
       
 
       
@@ -158,7 +161,7 @@
       
     </dl>
 
-  <h2><a name="SECTid0x2441170">KEYWORDS</a></h2><p class="keywords">
+  <h2><a name="SECTid0x12261f0">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-XML">XML</a>, <a class="keyword" href="keyword-index.html#KW-pull">pull</a>, <a class="keyword" href="keyword-index.html#KW-parsing">parsing</a>
 </p>
 </div><hr class="navsep"><div class="navbar" align="center">

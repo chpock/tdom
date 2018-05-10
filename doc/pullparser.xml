@@ -99,7 +99,9 @@
       <commanddef>
         <command><method>next</method></command>
         <desc>This method valid in state <m>START_DOCUMENT</m>,
-        <m>START_TAG</m>, <m>END_TAG</m> and <m>TEXT</m>.</desc>
+        <m>START_TAG</m>, <m>END_TAG</m> and <m>TEXT</m>. It continues
+        parsing of the XML input until the next event, which it will
+        return.</desc>
       </commanddef>
 
       <commanddef>
@@ -126,8 +128,9 @@
       <commanddef>
         <command><method>skip</method></command>
         <desc>This method is only valid in state <m>START_TAG</m>. It
-        skips to the corresponding end tag while, ignores all events
-        on the way and returns the new state END_TAG.</desc>
+        skips to the corresponding end tag and ignores all events (but
+        not XML parsing errors) on the way and returns the new state
+        END_TAG.</desc>
       </commanddef>
 
       <commanddef>
