@@ -8,6 +8,7 @@
 #    pp-3.*: skip method
 #    pp-4.*: find-element method
 #    pp-5.*: CDATA section handling
+#    pp-6.*: line/column methods
 #
 # Copyright (c) 2017-2018 Rolf Ade.
 
@@ -817,3 +818,43 @@ test pp-5.9 {Successive CDATA sections} {
     pp delete
     set result
 } {START_DOCUMENT START_TAG doc TEXT { onetwo   after} END_TAG doc END_DOCUMENT}
+
+test pp-6.1 {line} {
+    tDOM::pullparser pp
+    set result [catch {pp line}]
+    pp input {<doc> <![CDATA[one]]><![CDATA[two]]><![CDATA[  ]]> after</doc>}
+    lappend result [pp line]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp line]
+    lappend result [pp next]
+    lappend result [pp text]
+    lappend result [pp line]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp line]
+    lappend result [pp next]
+    lappend result [pp line]
+    pp delete
+    set result
+} {1 0 START_TAG doc 1 TEXT { onetwo   after} 1 END_TAG doc 1 END_DOCUMENT 1}
+
+test pp-6.2 {column} {
+    tDOM::pullparser pp
+    set result [catch {pp column}]
+    pp input {<doc> <![CDATA[one]]><![CDATA[two]]><![CDATA[  ]]> after</doc>}
+    lappend result [pp column]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp column]
+    lappend result [pp next]
+    lappend result [pp text]
+    lappend result [pp column]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp column]
+    lappend result [pp next]
+    lappend result [pp column]
+    pp delete
+    set result
+} {1 0 START_TAG doc 5 TEXT { onetwo   after} 56 END_TAG doc 62 END_DOCUMENT 62}

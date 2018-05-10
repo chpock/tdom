@@ -417,6 +417,7 @@ tDOM_PullParserInstanceCmd (
 {
     tDOM_PullParserInfo *pullInfo = clientdata;
     int methodIndex, len, result, mode, fd;
+    long column;
     char *data;
     const char **atts;
     Tcl_Obj *resultPtr;
@@ -426,14 +427,14 @@ tDOM_PullParserInstanceCmd (
         "input", "inputchannel", "inputfile",
         "next", "state", "tag", "attributes",
         "text", "delete", "reset", "skip",
-        "find-element", NULL
+        "find-element", "line", "column", NULL
     };
 
     enum method {
         m_input, m_inputchannel, m_inputfile,
         m_next, m_state, m_tag, m_attributes,
         m_text, m_delete, m_reset, m_skip,
-        m_find_element
+        m_find_element, m_line, m_column
     };
 
     if (objc == 1) {
@@ -736,6 +737,47 @@ tDOM_PullParserInstanceCmd (
             Tcl_SetObjResult (interp, pullInfo->start_tag);
         } else {
             SetResult ("END_DOCUMENT");
+        }
+        break;
+
+    case m_line:
+    case m_column:
+        if (objc != 2) {
+            Tcl_WrongNumArgs (interp, 2, objv, "");
+            return TCL_ERROR;
+        }
+        switch (pullInfo->state) {
+        case PULLPARSERSTATE_READY:
+            SetResult("No input");
+            return TCL_ERROR;
+        case PULLPARSERSTATE_END_TAG:
+        case PULLPARSERSTATE_START_TAG:
+        case PULLPARSERSTATE_END_DOCUMENT:
+        case PULLPARSERSTATE_PARSE_ERROR:
+            if ((enum method) methodIndex == m_line) {
+                Tcl_SetObjResult(interp,
+                    Tcl_NewIntObj (XML_GetCurrentLineNumber(pullInfo->parser)));
+            } else {
+                Tcl_SetObjResult(interp,
+                    Tcl_NewIntObj (XML_GetCurrentColumnNumber(pullInfo->parser)));
+            }
+            break;
+        case PULLPARSERSTATE_TEXT:
+            /* TEXT states are propagated from END_TAG, we have to
+             * adjust the return value of the parser. */
+            if ((enum method) methodIndex == m_line) {
+                Tcl_SetObjResult(interp,
+                    Tcl_NewIntObj (XML_GetCurrentLineNumber(pullInfo->parser)));
+            } else {
+                column = XML_GetCurrentColumnNumber (pullInfo->parser);
+                column -= strlen (Tcl_GetString(pullInfo->currentElm));
+                column -= 3;
+                Tcl_SetObjResult(interp, Tcl_NewLongObj (column));
+            }
+            break;            
+        case PULLPARSERSTATE_START_DOCUMENT:
+            Tcl_SetObjResult(interp, Tcl_NewIntObj (0));
+            break;
         }
         break;
         
