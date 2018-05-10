@@ -158,7 +158,7 @@ endElement (
     if (reportStartTag && reportText) {
         DBG(fprintf(stderr, "schedule 2 events\n"));
         pullInfo->state = PULLPARSERSTATE_TEXT;
-        pullInfo->nextState = PULLPARSERSTATE_START_TAG;
+        pullInfo->nextState= PULLPARSERSTATE_START_TAG;
         pullInfo->next2State = PULLPARSERSTATE_END_TAG;
     } else if (reportStartTag) {
         DBG(fprintf(stderr, "schedule 1 event\n"));
@@ -750,6 +750,9 @@ tDOM_PullParserInstanceCmd (
         case PULLPARSERSTATE_READY:
             SetResult("No input");
             return TCL_ERROR;
+        case PULLPARSERSTATE_TEXT:
+            SetResult("Invalid state");
+            return TCL_ERROR;
         case PULLPARSERSTATE_END_TAG:
         case PULLPARSERSTATE_START_TAG:
         case PULLPARSERSTATE_END_DOCUMENT:
@@ -762,19 +765,6 @@ tDOM_PullParserInstanceCmd (
                     Tcl_NewIntObj (XML_GetCurrentColumnNumber(pullInfo->parser)));
             }
             break;
-        case PULLPARSERSTATE_TEXT:
-            /* TEXT states are propagated from END_TAG, we have to
-             * adjust the return value of the parser. */
-            if ((enum method) methodIndex == m_line) {
-                Tcl_SetObjResult(interp,
-                    Tcl_NewIntObj (XML_GetCurrentLineNumber(pullInfo->parser)));
-            } else {
-                column = XML_GetCurrentColumnNumber (pullInfo->parser);
-                column -= strlen (Tcl_GetString(pullInfo->currentElm));
-                column -= 3;
-                Tcl_SetObjResult(interp, Tcl_NewLongObj (column));
-            }
-            break;            
         case PULLPARSERSTATE_START_DOCUMENT:
             Tcl_SetObjResult(interp, Tcl_NewIntObj (0));
             break;

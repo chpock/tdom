@@ -829,7 +829,6 @@ test pp-6.1 {line} {
     lappend result [pp line]
     lappend result [pp next]
     lappend result [pp text]
-    lappend result [pp line]
     lappend result [pp next]
     lappend result [pp tag]
     lappend result [pp line]
@@ -837,7 +836,7 @@ test pp-6.1 {line} {
     lappend result [pp line]
     pp delete
     set result
-} {1 0 START_TAG doc 1 TEXT { onetwo   after} 1 END_TAG doc 1 END_DOCUMENT 1}
+} {1 0 START_TAG doc 1 TEXT { onetwo   after} END_TAG doc 1 END_DOCUMENT 1}
 
 test pp-6.2 {column} {
     tDOM::pullparser pp
@@ -849,7 +848,6 @@ test pp-6.2 {column} {
     lappend result [pp column]
     lappend result [pp next]
     lappend result [pp text]
-    lappend result [pp column]
     lappend result [pp next]
     lappend result [pp tag]
     lappend result [pp column]
@@ -857,4 +855,68 @@ test pp-6.2 {column} {
     lappend result [pp column]
     pp delete
     set result
-} {1 0 START_TAG doc 5 TEXT { onetwo   after} 56 END_TAG doc 62 END_DOCUMENT 62}
+} {1 0 START_TAG doc 5 TEXT { onetwo   after} END_TAG doc 62 END_DOCUMENT 62}
+
+test pp-6.3 {column} {
+    tDOM::pullparser pp
+    pp input {<doc>foo<b>bar</b>grill</doc>}
+    set result [list]
+    while {[pp next] ne "END_DOCUMENT"} {
+        if {[pp state] eq "TEXT"} {
+            lappend result [pp text]
+        } else {
+            lappend result [pp tag]
+            lappend result [pp column]
+        }
+    }
+    pp delete
+    set result
+} {doc 5 foo b 11 bar b 18 grill doc 29}
+
+test pp-6.4 {line/column} {
+    tDOM::pullparser pp
+    pp input {<doc>foo
+<b>bar
+</b>grill</doc>}
+    set result [list]
+    while {[pp next] ne "END_DOCUMENT"} {
+        if {[pp state] eq "TEXT"} {
+            lappend result [pp text]
+        } else {
+            lappend result [pp tag]
+            lappend result [pp line]/[pp column]
+        }
+    }
+    pp delete
+    set result
+} {doc 1/5 {foo
+} b 2/3 {bar
+} b 3/4 grill doc 3/15}
+
+test pp-6.5 {column} {
+    tDOM::pullparser pp
+    pp input {<doc att="attvalue">foo<b att="boo">bar</b>grill</doc>}
+    set result [list]
+    while {[pp next] ne "END_DOCUMENT"} {
+        if {[pp state] eq "TEXT"} {
+            lappend result [pp text]
+        } else {
+            lappend result [pp tag]
+            lappend result [pp column]
+        }
+    }
+    lappend result [pp column]
+    pp delete
+    set result
+} {doc 20 foo b 36 bar b 43 grill doc 54 54}
+
+test pp-6.6 {line/column after parsing error} {
+    tDOM::pullparser pp
+    pp input {<doc>an
+        < xml error </doc>}
+    pp next
+    set result [catch {pp skip}]
+    lappend result [pp line]/[pp column]
+    pp delete
+    set result
+} {1 2/9}
