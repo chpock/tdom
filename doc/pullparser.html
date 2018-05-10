@@ -4,18 +4,18 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x1202970">NAME</a> · <a href="#SECTid0x10ec540">SYNOPSIS</a> · <a href="#SECTid0x1101bc0">DESCRIPTION </a> · <a href="#SECTid0x12261f0">KEYWORDS</a>
+<a href="#SECTid0x11bc970">NAME</a> · <a href="#SECTid0x10a6540">SYNOPSIS</a> · <a href="#SECTid0x10bbbc0">DESCRIPTION </a> · <a href="#SECTid0x11e0cb0">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x1202970">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x11bc970">NAME</a></h2><p class="namesection">
 <b class="names">tDOM::pullparser - </b><br>Create an XML pull parser command</p>
 
-  <h2><a name="SECTid0x10ec540">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x10a6540">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
     <b class="cmd">tDOM::pullparser</b> <i class="m">cmdName</i>  ? -ignorewhitecdata ? 
     </pre>
 
-  <h2><a name="SECTid0x1101bc0">DESCRIPTION </a></h2><p>This command creates XML pull parser commands with a simple
+  <h2><a name="SECTid0x10bbbc0">DESCRIPTION </a></h2><p>This command creates XML pull parser commands with a simple
     API, along the lines of a simple StAX parser. After creation,
     you've to set an input source, to do anything useful with the pull
     parser. For this see the methods <i class="m">input</i>, <i class="m">inputchannel</i>
@@ -159,9 +159,23 @@
         <dd>This method is valid in all parser states. It deletes
         the parser command.</dd>
       
+    </dl><p>Miscellaneous methods:</p><dl class="commandlist">
+      
+        <dt><b class="method">line</b></dt>
+        <dd>This method is valid in all parser states except READY
+        and TEXT. It returns the line number of the parsing
+        position.</dd>
+      
+
+      
+        <dt><b class="method">line</b></dt>
+        <dd>This method is valid in all parser states except READY
+        and TEXT. It returns the offset, from the beginning of the
+        current line, of the parsing position.</dd>
+      
     </dl>
 
-  <h2><a name="SECTid0x12261f0">KEYWORDS</a></h2><p class="keywords">
+  <h2><a name="SECTid0x11e0cb0">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-XML">XML</a>, <a class="keyword" href="keyword-index.html#KW-pull">pull</a>, <a class="keyword" href="keyword-index.html#KW-parsing">parsing</a>
 </p>
 </div><hr class="navsep"><div class="navbar" align="center">

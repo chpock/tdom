@@ -291,5 +291,17 @@ parser into READY state and returns that.
 \&\fB\fBdelete\fP
 \&\fRThis method is valid in all parser states. It deletes
 the parser command.
+.PP
+Miscellaneous methods:
+.TP
+\&\fB\fBline\fP
+\&\fRThis method is valid in all parser states except READY
+and TEXT. It returns the line number of the parsing
+position.
+.TP
+\&\fB\fBline\fP
+\&\fRThis method is valid in all parser states except READY
+and TEXT. It returns the offset, from the beginning of the
+current line, of the parsing position.
 .SH KEYWORDS
 XML, pull, parsing
