@@ -1,3 +1,7 @@
+2018-05-10  Rolf Ade  <rolf@pointsman.de>
+
+        Added new methods line and column to most pull parser states.
+
 2018-05-04  Rolf Ade  <rolf@pointsman.de>
 
         More fine grain control about serialization details: new asXML
