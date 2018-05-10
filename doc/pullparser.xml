@@ -155,6 +155,23 @@
         the parser command.</desc>
       </commanddef>
     </commandlist>
+
+    <p>Miscellaneous methods:</p>
+    <commandlist>
+      <commanddef>
+        <command><method>line</method></command>
+        <desc>This method is valid in all parser states except READY
+        and TEXT. It returns the line number of the parsing
+        position.</desc>
+      </commanddef>
+
+      <commanddef>
+        <command><method>line</method></command>
+        <desc>This method is valid in all parser states except READY
+        and TEXT. It returns the offset, from the beginning of the
+        current line, of the parsing position.</desc>
+      </commanddef>
+    </commandlist>
   </section>
 
   <keywords>

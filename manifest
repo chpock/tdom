@@ -1,5 +1,5 @@
-C Done\swhat\scould\sbe\sdone\swithout\sruntime\scosts.
-D 2018-05-10T23:06:00.792
+C Added\sa\sfew\swords\sdocumentation\sabout\sthe\snew\smethods\sline/column.
+D 2018-05-10T23:27:59.627
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -35,9 +35,9 @@ F doc/expatapi.xml f978d9a0b6df6878e1f94e427c018240efaf33f6d8dfa456051cfe551b15d
 F doc/index.html 22d7d146b761598f0358a4fb9cb2c9b907602431e5950ca8c40394b411de24d7
 F doc/keyword-index.html e316c5df54ab8329e573542c5a348fe370cc317a15d0244fbefc596cc5489dda
 F doc/manpage.css 3b4ec1d641048933a7e6bffc659de9519030a959
-F doc/pullparser.html ff210d802a278d0e23902d9e57ffafcb48165209b9133684359b32438a923a80
-F doc/pullparser.n f83f41ad60266831d221f92fcb1c38e8410fc58ad0cf297cf09c70657e99ba25
-F doc/pullparser.xml c731c3dc9e7315608ff483d5d2aabfa04cd2f321c61b9002e053b5697ce43d95
+F doc/pullparser.html 733f2199a24710471cdb8ebea9850957b69f4314d29775fb7ce05749f47cb71a
+F doc/pullparser.n a592b5ca5f9c5aca69ff24a690561b1c7e2e590dac3a75db4db53c5726c734f9
+F doc/pullparser.xml a25f7aa32029a095f4c2e482422436fb88ea8c91a06989819c7c7880d2277132
 F doc/tDOM.xml c2c23ef23bc7ed266b10e833a196833dab73cca8e6e63eeaba0da29bff2bbaf6
 F doc/tdomcmd.html 9b4d9ff443499554adf2346ff0efc0317a98bd6e1fc3fc79a6e476b71fe85fed
 F doc/tdomcmd.n c06a5ff035f16a2a52636b69d9ebe6ba84ff5101922ed27b551146c4d61d6cda
@@ -221,8 +221,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P da47d218b2969400d393bd7ebf7a7a3d16b2fbe411abca0fe9b1e3a3af4448ed
-R 4134addcaf22a4a61bc7268516216e5a
+P 12b2139d1e14bb070ab2f4077fe5fc820ff08aa85fda284870bed6d90307d15d
+R da8be570aaef633ddc9d11fce2d772ca
 U rolf
-Z b113e78519dc4f11de69ad34fe50dbda
+Z ed7cd485cfa040b9ef9296c236f6fc25
 # Remove this line to create a well-formed Fossil manifest.
