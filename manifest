@@ -1,5 +1,5 @@
-C Merged\sfrom\strunk.
-D 2018-05-09T23:59:17.092
+C C\sstyle\smodernization\sof\sthe\sintegrated\sdtd\svalidation.
+D 2018-05-10T00:08:31.156
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -111,7 +111,7 @@ F extensions/tnc/win/rules-ext.vc e788fcfc1e69b11946e18b8f67e0870b3bd38913
 F extensions/tnc/win/rules.vc 8157e2a811cf5e93683d6b0fbf5d91d153aa4535
 F extensions/tnc/win/targets.vc 79dea1c6a94a94e6ed8bae9e0195149b25a69923
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
-F generic/dom.c c2e290a80fd5445b6f93f5930861c4bcf9bc3fb8c8fabd322dd744f6d4e6add0
+F generic/dom.c c3ea2d3e4b409830a9fd9d14aed95650ea0cea1b0ebd65bdfcb71935e715c9a3
 F generic/dom.h 8917f4b9caa11b8897651e9ce2e0970be9b6c2366077cd5b89e5e5cfc0e237a8
 F generic/domalloc.c 55e9eeff19cc54cf3956a7013883ead07efd3593
 F generic/domalloc.h 4830a81539dc0323fbdc98f613df33fd38736da60e1ff5891b5c328eb1a6881d
@@ -221,8 +221,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c0393aab8d1d074fbe455708bb5b1d561419a20cd6d7dfc415b8cd0f7f4618e0 c1bddcddb3b700e444321317f9eb2e8cdc51b185463883f1e783c1a746eb218a
-R a95ba57cdcaab1cc8facd5c792609a75
+P dc7f7734d0c28457e07b1f20d4494fe3ae363f406dd86e799a21829693f97165
+R a966ceaf7e91eeae994e5f83da6bc252
 U rolf
-Z 2dd1888d6692fd30b9b128fe691f74f2
+Z c732dd660ac5a1c635825393f507ac51
 # Remove this line to create a well-formed Fossil manifest.

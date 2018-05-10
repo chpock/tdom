@@ -1314,10 +1314,11 @@ domPreviousSibling (
  */
 
 static void
-TncRewriteModel (emodel, tmodel, tagNames)
-    XML_Content   *emodel;
-    TNC_Content   *tmodel;
-    Tcl_HashTable *tagNames;
+TncRewriteModel (
+    XML_Content   *emodel,
+    TNC_Content   *tmodel,
+    Tcl_HashTable *tagNames
+)
 {
     Tcl_HashEntry *entryPtr;
     unsigned int i;
@@ -1389,8 +1390,9 @@ TncRewriteModel (emodel, tmodel, tagNames)
  */
 
 static void
-TncEndDoctypeDeclHandler (userData)
-    void *userData;
+TncEndDoctypeDeclHandler (
+    void *userData
+)
 {
     domReadInfo *tncdata = (domReadInfo *) userData;
     Tcl_HashEntry *entryPtr, *ePtr1;
@@ -1469,9 +1471,10 @@ TncEndDoctypeDeclHandler (userData)
  */
 
 static int
-TncProbeElement (nameId, tncdata)
-    TNC_NameId *nameId;
-    domReadInfo   *tncdata;
+TncProbeElement (
+    TNC_NameId *nameId,
+    domReadInfo   *tncdata
+)
 {
     TNC_ContentStack *stackelm;
     TNC_Content *activeModel;
@@ -1836,12 +1839,13 @@ TncProbeElement (nameId, tncdata)
  */
 
 static int
-TncProbeAttribute (userData, elemAtts, attrName, attrValue, nrOfreq)
-    void *userData;
-    Tcl_HashTable *elemAtts;
-    char *attrName;
-    char *attrValue;
-    int *nrOfreq;
+TncProbeAttribute (
+    void *userData,
+    Tcl_HashTable *elemAtts,
+    char *attrName,
+    char *attrValue,
+    int *nrOfreq
+)
 {
     domReadInfo *tncdata = (domReadInfo *) userData;
     Tcl_HashEntry *entryPtr;
@@ -2092,8 +2096,9 @@ TncProbeAttribute (userData, elemAtts, attrName, attrValue, nrOfreq)
  */
 
 static int
-TncProbeElementEnd (tncdata)
-    domReadInfo *tncdata;
+TncProbeElementEnd (
+    domReadInfo *tncdata
+)
 {
     TNC_ContentStack stackelm;
     unsigned int i;
@@ -3473,10 +3478,11 @@ endDoctypeDeclHandler (
  */
 
 static void
-TncElementDeclCommand (userData, name, model)
-    void *userData;
-    const char *name;
-    XML_Content *model;
+TncElementDeclCommand (
+    void *userData,
+    const char *name,
+    XML_Content *model
+)
 {
     domReadInfo *tncdata = (domReadInfo *) userData;
     Tcl_HashEntry *entryPtr;
@@ -3531,13 +3537,14 @@ TncElementDeclCommand (userData, name, model)
  */
 
 static void
-TncAttDeclCommand (userData, elname, attname, att_type, dflt, isrequired)
-    void       *userData;
-    const char *elname;
-    const char *attname;
-    const char *att_type;
-    const char *dflt;
-    int         isrequired;
+TncAttDeclCommand (
+    void       *userData,
+    const char *elname,
+    const char *attname,
+    const char *att_type,
+    const char *dflt,
+    int         isrequired
+)
 {
     domReadInfo *tncdata = (domReadInfo *) userData;
     Tcl_HashEntry *entryPtr, *entryPtr1;
@@ -3891,12 +3898,13 @@ TncAttDeclCommand (userData, elname, attname, att_type, dflt, isrequired)
  */
 
 static void
-TncNotationDeclHandler (userData, notationName, base, systemId, publicId)
-    void       *userData;
-    const char *notationName;
-    const char *base;
-    const char *systemId;
-    const char *publicId;
+TncNotationDeclHandler (
+    void       *userData,
+    const char *notationName,
+    const char *base,
+    const char *systemId,
+    const char *publicId
+)
 {
     domReadInfo *tncdata = (domReadInfo *) userData;
     Tcl_HashEntry *entryPtr;
@@ -3928,8 +3936,9 @@ TncNotationDeclHandler (userData, notationName, base, systemId, publicId)
  */
 
 static void
-TncFreeTncModel (tmodel)
-    TNC_Content *tmodel;
+TncFreeTncModel (
+    TNC_Content *tmodel
+)
 {
     unsigned int i;
 
