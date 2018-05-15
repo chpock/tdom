@@ -4383,7 +4383,7 @@ int tcldom_NodeObjCmd (
         "getElementsByTagName",              "getElementsByTagNameNS",
         "disableOutputEscaping",             "precedes",         "asText",
         "insertBeforeFromScript",            "normalize",        "baseURI",
-        "asJSON",          "jsonType", 
+        "asJSON",          "jsonType",       "attributeNames",
 #ifdef TCL_THREADS
         "readlock",        "writelock",
 #endif
@@ -4406,7 +4406,7 @@ int tcldom_NodeObjCmd (
         m_getElementsByTagName,              m_getElementsByTagNameNS,
         m_disableOutputEscaping,             m_precedes,        m_asText,
         m_insertBeforeFromScript,            m_normalize,       m_baseURI,
-        m_asJSON,          m_jsonType
+        m_asJSON,          m_jsonType,       m_attributeNames
 #ifdef TCL_THREADS
         ,m_readlock,       m_writelock
 #endif
@@ -4645,6 +4645,33 @@ int tcldom_NodeObjCmd (
                             );
                         namePtr  = Tcl_NewListObj(3, mobjv);
                     }
+                    result = Tcl_ListObjAppendElement(interp, resultPtr, 
+                                                      namePtr);
+                    if (result != TCL_OK) {
+                        Tcl_DecrRefCount(namePtr);
+                        return result;
+                    }
+                }
+                attrs = attrs->nextSibling;
+            }
+            break;
+
+        case m_attributeNames:
+            CheckArgs(2,3,2,"?nameFilter?");
+            if (node->nodeType != ELEMENT_NODE) {
+                SetResult("");
+                return TCL_OK;
+            }
+            filter = NULL;
+            if (objc == 3) {
+                filter = Tcl_GetString(objv[2]);
+            }
+            resultPtr = Tcl_GetObjResult(interp);
+
+            attrs = node->firstAttr;
+            while (attrs != NULL) {
+                if (!filter || Tcl_StringMatch((char*)attrs->nodeName, filter)) {
+                    namePtr = Tcl_NewStringObj((char*)attrs->nodeName, -1);
                     result = Tcl_ListObjAppendElement(interp, resultPtr, 
                                                       namePtr);
                     if (result != TCL_OK) {
