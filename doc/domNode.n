@@ -319,9 +319,22 @@ prefix. It is not recommended to set xml namespace declarations. The effects are
 the namespace \fIuri\fR.
 .TP
 \&\fB\fBattributes\fP \fB?attributeNamePattern?\fP
-\&\fRReturns all attributes matching the \fIattributeNamePattern\fR.
-If \fIattributeNamePattern\fR isn't given, all attributes are returned as a Tcl
-list.
+\&\fRReturns information about the attriubtes matching the
+\&\fIattributeNamePattern\fR. If \fIattributeNamePattern\fR
+isn't given, information about all attributes are returned.
+The return value is a Tcl list, the elements just the
+attriubute name in case of non namespaced attriubtes and three
+element sublists for namespaced attributes. n case of an
+"ordinary" namespaced attribute, the sublist elements are
+{<localname> <prefix> <namespace_uri>}. In the special case of
+an xml namespace declaration it is {<the prefix defined>
+<localname> ""}.
+.TP
+\&\fB\fBattributeNames\fP \fB?attributeNamePattern?\fP
+\&\fRReturns a flat list of all attributes names (as found in
+the XML source) matching the \fIattributeNamePattern\fR. If
+\&\fIattributeNamePattern\fR isn't given, all attribute names
+are returned as a Tcl list.
 .TP
 \&\fB\fBappendChild\fP \fInewChild\fB
 \&\fRAppends \fInewChild\fR to the end of the child list of the

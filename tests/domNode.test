@@ -21,7 +21,7 @@
 #    domNode-15.*: delete
 #    domNode-16.*: getAttribute
 #    domNode-17.*: nodeType
-#    domNode-18.*: attributes
+#    domNode-18.*: attributes, attributeNames
 #    domNode-19.*: removeAttribute, removeAttributeNS
 #    domNode-20.*: parentNode
 #    domNode-21.*: hasChildNodes
@@ -2001,6 +2001,34 @@ test domNode-18.7 {attributes} {
     [$root firstChild] attributes
 } {}
 
+test domNode-18.1.1 {attributeNames} {
+    $root attributeNames
+} {xmlns:foo attr1 attr2 attr3 foo:attr1 worble2}
+
+test domNode-18.2.1 {attributeNames} {
+    $root attributeNames *
+} {xmlns:foo attr1 attr2 attr3 foo:attr1 worble2}
+
+test domNode-18.3.1 {attributeNames} {
+    $root attributeNames attr*
+} {attr1 attr2 attr3}
+
+test domNode-18.4.1 {attributeNames} {
+    $root attributeNames *2*
+} {attr2 worble2}
+
+test domNode-18.5.1 {attributeNames} {
+    $root attributeNames worble2
+} {worble2}
+
+test domNode-18.6.1 {attributeNames} {
+    $root attributeNames *brab*
+} {}
+
+test domNode-18.7.1 {attributeNames} {
+    [$root firstChild] attributeNames
+} {}
+
 # Hmmm. This two following tests are mostly there to document the
 # behavior of the method, as it is.  It may debatable if they should
 # behave this way. The optional attribute name pattern is a tDOM
@@ -2014,6 +2042,10 @@ test domNode-18.8 {attributes} {
 test domNode-18.9 {attributes} {
     $root attributes foo*
 } {{attr1 foo http://tdom.org/ns}}
+
+test domNode-18.9.1 {attributeNames} {
+    $root attributeNames foo:*
+} {foo:attr1}
 
 $doc delete
 set doc [dom parse {<root attr1="bingbaz"
