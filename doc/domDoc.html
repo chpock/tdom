@@ -4,15 +4,15 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x13bfc60">NAME</a> · <a href="#SECTid0x12d3db0">SYNOPSIS</a> · <a href="#SECTid0x13b9e50">DESCRIPTION </a> · <a href="#SECTid0x141c6d0">SEE ALSO</a> · <a href="#SECTid0x141ca60">KEYWORDS</a>
+<a href="#SECTid0x1eae960">NAME</a> · <a href="#SECTid0x1e5ff20">SYNOPSIS</a> · <a href="#SECTid0x1e97f70">DESCRIPTION </a> · <a href="#SECTid0x1efaea0">SEE ALSO</a> · <a href="#SECTid0x1efb230">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x13bfc60">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x1eae960">NAME</a></h2><p class="namesection">
 <b class="names">domDoc - </b><br>Manipulates an instance of a DOM document object</p>
   
-  <h2><a name="SECTid0x12d3db0">SYNOPSIS</a></h2><pre class="syntax">domDocObjCmd <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre><pre class="syntax">domDoc <i class="m">docToken</i> <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
+  <h2><a name="SECTid0x1e5ff20">SYNOPSIS</a></h2><pre class="syntax">domDocObjCmd <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre><pre class="syntax">domDoc <i class="m">docToken</i> <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
 
-  <h2><a name="SECTid0x13b9e50">DESCRIPTION </a></h2><p>This command manipulates one particular instance of a document
+  <h2><a name="SECTid0x1e97f70">DESCRIPTION </a></h2><p>This command manipulates one particular instance of a document
 object. <i class="m">method</i> indicates a specific method of the document class. These
 methods should closely conform to the W3C recommendation "Document Object Model
 (Core) Level 1" (<a href="http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html">http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html</a>). Look
@@ -110,7 +110,7 @@ usually a result of a XSLT transformation.</dd>
 
       
         <dt>
-<b class="method">asXML</b> <b class="option">?-indent none/1..8?</b> <b class="option">?-channel channelId?</b> <b class="option">?-escapeNonASCII?</b> <b class="option">?-doctypeDeclaration &lt;boolean&gt;?</b> <b class="option">-xmlDeclaration &lt;boolean&gt;?</b> <b class="option">-encString &lt;string&gt;</b> <b class="option">?-escapeAllQuot?</b> <b class="option">?-indentAttrs?</b>
+<b class="method">asXML</b> <b class="option">?-indent none/1..8?</b> <b class="option">?-channel channelId?</b> <b class="option">?-escapeNonASCII?</b> <b class="option">?-doctypeDeclaration &lt;boolean&gt;?</b> <b class="option">-xmlDeclaration &lt;boolean&gt;?</b> <b class="option">-encString &lt;string&gt;</b> <b class="option">?-escapeAllQuot?</b> <b class="option">?-indentAttrs?</b> <b class="option">?-nogtescape?</b> <b class="option">?-noEmptyElementTag?</b>
 </dt>
         <dd>
 <p>Returns the DOM tree as an (optional indented) XML
@@ -150,6 +150,16 @@ usually a result of a XSLT transformation.</dd>
         given, then attributes will each be separated with newlines
         and indented to the same level as the parent node plus the
         value given as argument to <i class="m">-indentAttrs</i> (0..8).</p>
+
+        <p>If the option <i class="m">-nogtescape</i> is given then the
+        character '&gt;' won't get escaped in attribute values and text
+        content of elements. The default is to escape this
+        character.</p>
+
+        <p>If the option <i class="m">-noEmptyElementTag</i> is given then no
+        empty tag syntax will be used. Instead, if an element has
+        empty content it will be serialized with an element start tag
+        and an immediately following element end tag.</p>
 </dd>
 
       
@@ -682,9 +692,9 @@ tried to be executed. This allows quick method additions on Tcl level.</p><p>New
 are not moved into the tree they are automatically deleted as soon as the whole
 document gets deleted.</p>
 
-    <h2><a name="SECTid0x141c6d0">SEE ALSO</a></h2><p class="seealso">dom, domNode</p>
+    <h2><a name="SECTid0x1efaea0">SEE ALSO</a></h2><p class="seealso">dom, domNode</p>
 
-    <h2><a name="SECTid0x141ca60">KEYWORDS</a></h2><p class="keywords">
+    <h2><a name="SECTid0x1efb230">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-DOMnodecreation">DOM node creation</a>, <a class="keyword" href="keyword-index.html#KW-documentelement">document element</a>
 </p>
 

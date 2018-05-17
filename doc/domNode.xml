@@ -210,11 +210,27 @@ prefix. It is not recommended to set xml namespace declarations. The effects are
 
       <commanddef>
         <command><method>attributes</method> <option>?attributeNamePattern?</option></command>
-        <desc>Returns all attributes matching the <m>attributeNamePattern</m>.
-If <m>attributeNamePattern</m> isn't given, all attributes are returned as a Tcl
-list.</desc>
+        <desc>Returns information about the attriubtes matching the
+        <m>attributeNamePattern</m>. If <m>attributeNamePattern</m>
+        isn't given, information about all attributes are returned.
+        The return value is a Tcl list, the elements just the
+        attriubute name in case of non namespaced attriubtes and three
+        element sublists for namespaced attributes. n case of an
+        "ordinary" namespaced attribute, the sublist elements are
+        {&lt;localname&gt; &lt;prefix&gt; &lt;namespace_uri&gt;}. In the special case of
+        an xml namespace declaration it is {&lt;the prefix defined&gt;
+        &lt;localname&gt; ""}.
+        </desc>
       </commanddef>
 
+      <commanddef>
+        <command><method>attributeNames</method> <option>?attributeNamePattern?</option></command>
+        <desc>Returns a flat list of all attributes names (as found in
+        the XML source) matching the <m>attributeNamePattern</m>. If
+        <m>attributeNamePattern</m> isn't given, all attribute names
+        are returned as a Tcl list.</desc>
+      </commanddef>
+      
       <commanddef>
         <command><method>appendChild</method> <m>newChild</m></command>
         <desc>Appends <m>newChild</m> to the end of the child list of the
@@ -432,7 +448,7 @@ nested Tcl list.</desc>
       </commanddef>
 
       <commanddef>
-        <command><method>asXML</method> <option>?-indent none/1..8?</option> <option>?-channel channelId?</option> <option>?-escapeNonASCII?</option> <option>-xmlDeclaration &lt;boolean&gt;?</option> <option>-encString &lt;string&gt;</option> <option>?-escapeAllQuot?</option> <option>?-indentAttrs?</option></command>
+        <command><method>asXML</method> <option>?-indent none/1..8?</option> <option>?-channel channelId?</option> <option>?-escapeNonASCII?</option> <option>-xmlDeclaration &lt;boolean&gt;?</option> <option>-encString &lt;string&gt;</option> <option>?-escapeAllQuot?</option> <option>?-indentAttrs?</option> <option>?-nogtescape?</option> <option>?-noEmptyElementTag?</option></command>
         <desc><p>Returns the DOM substree starting from the current
         node as the root node of the result as an (optional indented)
         XML string or sends the output directly to the given
@@ -462,7 +478,17 @@ nested Tcl list.</desc>
         <p>If the option <m>-indentAttrs</m> is
         given, then attributes will each be separated with newlines
         and indented to the same level as the parent node plus the
-        value given as argument to <m>-indentAttrs</m> (0..8).</p></desc>
+        value given as argument to <m>-indentAttrs</m> (0..8).</p>
+
+        <p>If the option <m>-nogtescape</m> is given then the
+        character '>' won't get escaped in attribute values and text
+        content of elements. The default is to escape this
+        character.</p>
+
+        <p>If the option <m>-noEmptyElementTag</m> is given then no
+        empty tag syntax will be used. Instead, if an element has
+        empty content it will be serialized with an element start tag
+        and an immediately following element end tag.</p></desc>
 
       </commanddef>
 

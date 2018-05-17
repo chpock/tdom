@@ -119,7 +119,7 @@ test domDoc-1.10 {asXML - unknown option} {
     catch {$doc asXML -fooOption 1} errMsg
     $doc delete
     set errMsg
-} {bad option "-fooOption": must be -indent, -channel, -escapeNonASCII, -doctypeDeclaration, -xmlDeclaration, -encString, -escapeAllQuot, or -indentAttrs}
+} {bad option "-fooOption": must be -indent, -channel, -escapeNonASCII, -doctypeDeclaration, -xmlDeclaration, -encString, -escapeAllQuot, -indentAttrs, -nogtescape, or -noEmptyElementTag}
 
 test domDoc-1.11 {asXML - non boolean value to -doctypeDeclaration} {
     set doc [dom parse {<!DOCTYPE root SYSTEM "file:///boo.baz"><root/>}]
@@ -294,6 +294,30 @@ test domDoc-1.28 {asXML -xmlDeclaration not xml compliant -encString} {
 } [subst -nocommands -novariables {<?xml version="1.0" encoding="1\u2345"?>
 <doc/>
 }]
+
+test domDoc-1.29 {asXML -nogtescape} {
+    set doc [dom parse {<doc attr="foo>bar">></doc>}]
+    set result [$doc asXML -nogtescape -indent none]
+    $doc delete
+    set result
+} {<doc attr="foo>bar">></doc>}
+
+test domDoc-1.30 {asXML -noEmptyElementTag} {
+    set doc [dom parse {<doc><elm/></doc>}]
+    set result [$doc asXML -noEmptyElementTag -indent none]
+    $doc delete
+    set result
+} {<doc><elm></elm></doc>}
+
+test domDoc-1.31 {asXML '"' in attribute value} {
+    # emacs: "
+    set doc [dom createDocument doc]
+    set root [$doc documentElement]
+    $root setAttribute attr "foo\"bar"
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc attr="foo&quot;bar"/>}
 
 set doc [dom parse <root/>]
 

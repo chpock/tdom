@@ -4,18 +4,18 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x1d04960">NAME</a> · <a href="#SECTid0x1cb5f40">SYNOPSIS</a> · <a href="#SECTid0x1ceddf0"> DESCRIPTION </a> · <a href="#SECTid0x1d540e0">SEE ALSO</a> · <a href="#SECTid0x1d54470">KEYWORDS</a>
+<a href="#SECTid0xd75c60">NAME</a> · <a href="#SECTid0xc89db0">SYNOPSIS</a> · <a href="#SECTid0xd6fd90"> DESCRIPTION </a> · <a href="#SECTid0xdd72b0">SEE ALSO</a> · <a href="#SECTid0xdd7640">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x1d04960">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0xd75c60">NAME</a></h2><p class="namesection">
 <b class="names">domNode - </b><br>Manipulates an instance of a DOM node object</p>
 
 
 
-  <h2><a name="SECTid0x1cb5f40">SYNOPSIS</a></h2><pre class="syntax">$nodeObject <i class="m">method</i> <i class="m">arg arg ...</i>
+  <h2><a name="SECTid0xc89db0">SYNOPSIS</a></h2><pre class="syntax">$nodeObject <i class="m">method</i> <i class="m">arg arg ...</i>
 </pre><pre class="syntax">domNode <i class="m">nodeToken</i> <i class="m">method</i> <i class="m">arg arg ...</i>
 </pre>
-  <h2><a name="SECTid0x1ceddf0"> DESCRIPTION </a></h2><p>This command manipulates one particular instance of a DOM node object.
+  <h2><a name="SECTid0xd6fd90"> DESCRIPTION </a></h2><p>This command manipulates one particular instance of a DOM node object.
 <i class="m">method</i> indicates a specific method of the node class. These methods
 should closely conform to the W3C recommendation "Document Object Model
 (Core) Level 1" (<a href="http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html">http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html</a>)
@@ -232,11 +232,29 @@ prefix. It is not recommended to set xml namespace declarations. The effects are
         <dt>
 <b class="method">attributes</b> <b class="option">?attributeNamePattern?</b>
 </dt>
-        <dd>Returns all attributes matching the <i class="m">attributeNamePattern</i>.
-If <i class="m">attributeNamePattern</i> isn't given, all attributes are returned as a Tcl
-list.</dd>
+        <dd>Returns information about the attriubtes matching the
+        <i class="m">attributeNamePattern</i>. If <i class="m">attributeNamePattern</i>
+        isn't given, information about all attributes are returned.
+        The return value is a Tcl list, the elements just the
+        attriubute name in case of non namespaced attriubtes and three
+        element sublists for namespaced attributes. n case of an
+        "ordinary" namespaced attribute, the sublist elements are
+        {&lt;localname&gt; &lt;prefix&gt; &lt;namespace_uri&gt;}. In the special case of
+        an xml namespace declaration it is {&lt;the prefix defined&gt;
+        &lt;localname&gt; ""}.
+        </dd>
       
 
+      
+        <dt>
+<b class="method">attributeNames</b> <b class="option">?attributeNamePattern?</b>
+</dt>
+        <dd>Returns a flat list of all attributes names (as found in
+        the XML source) matching the <i class="m">attributeNamePattern</i>. If
+        <i class="m">attributeNamePattern</i> isn't given, all attribute names
+        are returned as a Tcl list.</dd>
+      
+      
       
         <dt>
 <b class="method">appendChild</b> <i class="m">newChild</i>
@@ -484,7 +502,7 @@ nested Tcl list.</dd>
 
       
         <dt>
-<b class="method">asXML</b> <b class="option">?-indent none/1..8?</b> <b class="option">?-channel channelId?</b> <b class="option">?-escapeNonASCII?</b> <b class="option">-xmlDeclaration &lt;boolean&gt;?</b> <b class="option">-encString &lt;string&gt;</b> <b class="option">?-escapeAllQuot?</b> <b class="option">?-indentAttrs?</b>
+<b class="method">asXML</b> <b class="option">?-indent none/1..8?</b> <b class="option">?-channel channelId?</b> <b class="option">?-escapeNonASCII?</b> <b class="option">-xmlDeclaration &lt;boolean&gt;?</b> <b class="option">-encString &lt;string&gt;</b> <b class="option">?-escapeAllQuot?</b> <b class="option">?-indentAttrs?</b> <b class="option">?-nogtescape?</b> <b class="option">?-noEmptyElementTag?</b>
 </dt>
         <dd>
 <p>Returns the DOM substree starting from the current
@@ -518,6 +536,16 @@ nested Tcl list.</dd>
         given, then attributes will each be separated with newlines
         and indented to the same level as the parent node plus the
         value given as argument to <i class="m">-indentAttrs</i> (0..8).</p>
+
+        <p>If the option <i class="m">-nogtescape</i> is given then the
+        character '&gt;' won't get escaped in attribute values and text
+        content of elements. The default is to escape this
+        character.</p>
+
+        <p>If the option <i class="m">-noEmptyElementTag</i> is given then no
+        empty tag syntax will be used. Instead, if an element has
+        empty content it will be serialized with an element start tag
+        and an immediately following element end tag.</p>
 </dd>
 
       
@@ -726,9 +754,9 @@ name as the given method within the namespace <tt class="l">::dom::domNode</tt> 
 be executed. This allows quick method additions on Tcl level.</p>
 
 
-  <h2><a name="SECTid0x1d540e0">SEE ALSO</a></h2><p class="seealso">dom, domDoc</p>
+  <h2><a name="SECTid0xdd72b0">SEE ALSO</a></h2><p class="seealso">dom, domDoc</p>
   
-  <h2><a name="SECTid0x1d54470">KEYWORDS</a></h2><p class="keywords">
+  <h2><a name="SECTid0xdd7640">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-XML">XML</a>, <a class="keyword" href="keyword-index.html#KW-DOM">DOM</a>, <a class="keyword" href="keyword-index.html#KW-document">document</a>, <a class="keyword" href="keyword-index.html#KW-node">node</a>, <a class="keyword" href="keyword-index.html#KW-parsing">parsing</a>
 </p>
   
