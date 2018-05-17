@@ -4620,18 +4620,16 @@ int tcldom_NodeObjCmd (
                 SetResult("");
                 return TCL_OK;
             }
+            filter = NULL;
             if (objc == 3) {
                 filter = Tcl_GetString(objv[2]);
-            } else {
-                filter = "*";
             }
             Tcl_ResetResult(interp);
             resultPtr = Tcl_GetObjResult(interp);
 
             attrs = node->firstAttr;
             while (attrs != NULL) {
-                if (Tcl_StringMatch((char*)attrs->nodeName, filter)) {
-
+                if (!filter || Tcl_StringMatch((char*)attrs->nodeName, filter)) {
                     if (attrs->namespace == 0) {
                         namePtr = Tcl_NewStringObj((char*)attrs->nodeName, -1);
                     } else {
