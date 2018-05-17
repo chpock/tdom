@@ -307,6 +307,7 @@ static char node_usage[] =
     "    setAttributeNS uri attrName value ?attrName value ...? \n"
     "    removeAttributeNS uri attrName \n"
     "    attributes ?attrNamePattern?   \n"
+    "    attributeNames ?attrNamePattern?   \n"
     "    appendChild new              \n"
     "    insertBefore new ref         \n"
     "    replaceChild new old         \n"
