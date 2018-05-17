@@ -1,3 +1,7 @@
+2018-05-17  Rolf Ade  <rolf@pointsman.de>
+
+        Added new method attributeNames to domNode (cmds).
+
 2018-05-10  Rolf Ade  <rolf@pointsman.de>
 
         Added new methods line and column to most pull parser states.
