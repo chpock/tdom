@@ -251,7 +251,9 @@ switches the parser into state START_DOCUMENT.
 .TP
 \&\fB\fBnext\fP
 \&\fRThis method valid in state \fISTART_DOCUMENT\fR,
-\&\fISTART_TAG\fR, \fIEND_TAG\fR and \fITEXT\fR.
+\&\fISTART_TAG\fR, \fIEND_TAG\fR and \fITEXT\fR. It continues
+parsing of the XML input until the next event, which it will
+return.
 .TP
 \&\fB\fBtag\fP
 \&\fRThis method is only valid in states \fISTART_TAG\fR and
@@ -270,8 +272,9 @@ START_TAG or END_TAG event.
 .TP
 \&\fB\fBskip\fP
 \&\fRThis method is only valid in state \fISTART_TAG\fR. It
-skips to the corresponding end tag while, ignores all events
-on the way and returns the new state END_TAG.
+skips to the corresponding end tag and ignores all events (but
+not XML parsing errors) on the way and returns the new state
+END_TAG.
 .TP
 \&\fB\fBfind-element\fP \fItagname\fB
 \&\fRThis method is only valid in states
@@ -288,5 +291,17 @@ parser into READY state and returns that.
 \&\fB\fBdelete\fP
 \&\fRThis method is valid in all parser states. It deletes
 the parser command.
+.PP
+Miscellaneous methods:
+.TP
+\&\fB\fBline\fP
+\&\fRThis method is valid in all parser states except READY
+and TEXT. It returns the line number of the parsing
+position.
+.TP
+\&\fB\fBline\fP
+\&\fRThis method is valid in all parser states except READY
+and TEXT. It returns the offset, from the beginning of the
+current line, of the parsing position.
 .SH KEYWORDS
 XML, pull, parsing
