@@ -1,5 +1,5 @@
-C Small\simprovement\s(and\soptimization)\sof\sattributes.
-D 2018-05-17T23:46:49.637
+C Added\sa\stnc\stest.
+D 2018-05-24T13:47:50.957
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -103,7 +103,7 @@ F extensions/tnc/pkgIndex.tcl.in 6c224c2cdbb494f621ec008f96fe4a552a79a7b7
 F extensions/tnc/test.tcl 545cdec17e6702cef9f79184fdf1ce0166b8c412
 F extensions/tnc/tests/all.tcl 845c9dab65c294c3570f69cc731d6fef62efbd03
 F extensions/tnc/tests/loadtnc.tcl 2228e517a49106038388055d7e0b959198ab54ce
-F extensions/tnc/tests/tnc.test 7f248ada7239ca41ccdb56515b93947bafee1f06d10118adcedfc2885479d540
+F extensions/tnc/tests/tnc.test 5176eb3e9fb9fd6956f85580c8667127e23bf1b5ec905e68f623f3f2af5365bc
 F extensions/tnc/tnc.c 898c17f5e85694a324ee0741dd5825d648069027a0921469202226a0b09793bf
 F extensions/tnc/win/makefile.vc b512d0f3eb67d83ace6f626d20b6ed8c895e609d
 F extensions/tnc/win/nmakehlp.c 194ae7c24886245c679cb4c9ea7e6daaaebb5fcd
@@ -221,8 +221,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 2f5cf2b7106282cf6521225e0992a4d15bfb68b619b9c7b74cf35658f6deefe3
-R e82b50cb5eae62d5cacde4316486fd0c
+P 054337d785b18e6d9eb1cf0bcc2297c587dc89cabeacd8eb0710d0b81e6f26b4
+R 7445906a1dcd06920915edf1826729a3
 U rolf
-Z 0bc937aca2ebe345a85666d80da14f62
+Z 88b104bc39273ccc81c1ed3a7cc21b7d
 # Remove this line to create a well-formed Fossil manifest.
