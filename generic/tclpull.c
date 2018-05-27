@@ -417,7 +417,6 @@ tDOM_PullParserInstanceCmd (
 {
     tDOM_PullParserInfo *pullInfo = clientdata;
     int methodIndex, len, result, mode, fd;
-    long column;
     char *data;
     const char **atts;
     Tcl_Obj *resultPtr;
