@@ -1,12 +1,12 @@
-C Removed\sunused\svariable.
-D 2018-05-27T00:22:28.732
+C Reorder\sRANLIB\sclause\sto\savoid\s"permission\sdenied"\serror.
+D 2018-05-28T03:41:54.791
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
 F CHANGES 5334b2b894ae536d07b82c7383969ae2203116c7a5d52d7db4c7f5c800f392be
 F ChangeLog 9b60ec8bfbae84e4f1a97aaee24be00ccea212b7
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
-F Makefile.in 31c74d9719d90506d0015986e688ebf84cb01d2138c80a442ce0ea8f6de59935
+F Makefile.in 7f69670cc19f7c87bebb3e49b10cc5463fff7a7d8f9c9e03c79d039ae67fa496
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
 F README a097b51b559f421a68a12d2901766a0bf2520b19
 F README.AOL d076b065f6a3209b5374a63c9ddd7fbca167643e
@@ -221,8 +221,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 6cc90fd8ef7825c87233ccb4aeba3542e6121a0a3b2924e1cf1023cc92f6f407
-R e6808c12f95b38125189ae8e70cc154f
-U rolf
-Z f80f0819a6f4a5f8c3c6eff74e16e1d0
+P 0e29ef329c3466753662be3ce3f0e61255e33abd144d061b0a9fd5b059309564
+R 7b6629f89c09ecae0b8a06ffb7cfdbc7
+U yorick
+Z a9613bb06bcdd0c46ee378a2687f8e67
 # Remove this line to create a well-formed Fossil manifest.
