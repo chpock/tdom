@@ -82,7 +82,10 @@
 #define SetResult(str) Tcl_ResetResult(interp); \
                      Tcl_SetStringObj(Tcl_GetObjResult(interp), (str), -1)
 
-#define SetIntResult(i) Tcl_ResetResult(interp); \
+#define SetResult3(str1,str2,str3) Tcl_ResetResult(interp);     \
+                     Tcl_AppendResult(interp, (str1), (str2), (str3), NULL)
+
+#define SetIntResult(i) Tcl_ResetResult(interp);                        \
                      Tcl_SetIntObj(Tcl_GetObjResult(interp), (i))
                      
 #define SetDoubleResult(d) Tcl_ResetResult(interp); \
@@ -615,21 +618,22 @@ SetTdomNodeFromAny(
     nodeName = Tcl_GetString(objPtr);
     if (strncmp(nodeName, "domNode", 7)) {
         if (interp) {
-            SetResult("parameter not a domNode!");
+            SetResult3("Parameter \"", nodeName, "\" is not a domNode.");
             return TCL_ERROR;
         }
     }
     if (sscanf(&nodeName[7], "%p%1c", &node, &eolcheck) != 1) {
         if (!Tcl_GetCommandInfo(interp, nodeName, &cmdInfo)) {
             if (interp) {
-                SetResult("parameter not a domNode!");
+                SetResult3("Parameter \"", nodeName, "\" is not a domNode.");
                 return TCL_ERROR;
             }
         }
         if (   (cmdInfo.isNativeObjectProc == 0)
             || (cmdInfo.objProc != (Tcl_ObjCmdProc*)tcldom_NodeObjCmd)) {
             if (interp) {
-                SetResult("parameter not a domNode object command");
+                SetResult3("Parameter \"", nodeName, "\" is not a domNode"
+                    " object command");
                 return TCL_ERROR;
             }
         }
@@ -1088,17 +1092,18 @@ domNode * tcldom_getNodeFromObj (
     
     nodeName = Tcl_GetString(nodeObj);
     if (strncmp(nodeName, "domNode", 7)) {
-        SetResult("parameter not a domNode!");
+        SetResult3("Parameter \"", nodeName, "\" is not a domNode.");
         return NULL;
     }
     if (sscanf(&nodeName[7], "%p%1c", &node, &eolcheck) != 1) {
         if (!Tcl_GetCommandInfo(interp, nodeName, &cmdInfo)) {
-            SetResult("parameter not a domNode!");
+            SetResult3("Parameter \"", nodeName, "\" is not a domNode.");
             return NULL;
         }
         if (   (cmdInfo.isNativeObjectProc == 0)
             || (cmdInfo.objProc != (Tcl_ObjCmdProc*)tcldom_NodeObjCmd)) {
-            SetResult("parameter not a domNode object command!");
+            SetResult3("Parameter \"", nodeName, "\" is not a domNode"
+                       " object command.");
             return NULL;
         }
         node = (domNode*)cmdInfo.objClientData;

@@ -2418,7 +2418,7 @@ test domNode-30.2 {precedes} {
 test domNode-30.3 {precedes} {
     set result [catch {$root precedes notaNode} errMsg]
     lappend result $errMsg
-} {1 {parameter not a domNode!}}
+} {1 {Parameter "notaNode" is not a domNode.}}
 
 test domNode-30.4 {precedes} {
     set firstChild [$root firstChild]
