@@ -43,6 +43,7 @@
 #include <tdom.h>
 #include <tcldom.h>
 #include <tclpull.h>
+#include <structure.h>
 
 extern TdomStubs tdomStubs;
 
@@ -94,6 +95,11 @@ Tdom_Init (
 
 #ifndef TDOM_NO_PULL
     Tcl_CreateObjCommand(interp, "tDOM::pullparser", tDOM_PullParserCmd, NULL, NULL );    
+#endif
+
+#ifndef TDOM_NO_STRUCTURE
+    Tcl_CreateObjCommand (interp, "tDOM::structure", tDOM_StructureObjCmd,
+                          NULL, NULL);
 #endif
     
 #ifdef USE_TCL_STUBS

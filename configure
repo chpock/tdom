@@ -5589,6 +5589,7 @@ $as_echo "no" >&6; }
                  generic/tdominit.c  \
                  generic/tclexpat.c  \
                  generic/tclpull.c   \
+                 generic/structure.c \
                  generic/tdomStubInit.c"
     for i in $vars; do
 	case $i in

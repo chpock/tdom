@@ -1,5 +1,5 @@
-C Refer\sthe\snode\scmd/token\sthat\sisn't\sa\sdomNode\sin\serror\smsg.
-D 2018-06-04T18:08:30.431
+C Musing\sabout\sgeneric\sstructure\svalidation.
+D 2018-06-06T00:16:28.844
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -12,8 +12,8 @@ F README a097b51b559f421a68a12d2901766a0bf2520b19
 F README.AOL d076b065f6a3209b5374a63c9ddd7fbca167643e
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/xslt.tcl ac4a75ba2f05e26d4ea6f92547983caa80fc6d55
-F configure 4e98133222f4e7bfc3c590b12cfe72d7e10484d2a5d8caeb3769b649c75f56df x
-F configure.in 6273c703634e3c57ee70d2bfef308894c5f3892a644fc89fcb15bc19bcb9a73c
+F configure faf930cfe69631e7294d2b37691154f7f60f7c57802837ec8868b9a93811cc11 x
+F configure.in 4588b82d1df7856ea6af0e30badab965db1496c7d8fbdbd33e77beefe6b9889f
 F doc/INDEX.MAP 55cb7aedd008e5bb07d026e056778a04b7d562398ef29e83e024cfc1ef2b9968
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html a3c7817482616cbfc8d2fc770ba177ffd622df9d4a94d761812c6ce2bb12bfb5
@@ -129,6 +129,8 @@ F generic/domxslt.h c068da9c518ad5e2a543874c18166065f0bf2bbc
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 1ffb1f01bfe601de3c886993a08ae7df2e949d08ad727ef59438e3174fdbe378
 F generic/nodecmd.h 7c8e609b3652dcc29a1fb9d15735fc5ad1e0e00adb4450bd914186efbebee01d
+F generic/structure.c 9f8e32bd65e79fa88701b0777ea7db814b5e344f2744ceb03a2fc3507e6f8fbb
+F generic/structure.h ba16eb4a8c28d21b0258b085c6f908f0bb77c7a27546549fbb848a8615b0018a
 F generic/tcldom.c b96e32d57bbef00b15933e5afbf8fe7241a21b9b973754bb2508065156f0c400
 F generic/tcldom.h 2e8edc2bf095200c419a740fed626f4fdcba274125e0234366e84a25bb0c2b25
 F generic/tclexpat.c ddbb28dde01951a5d41726cc655fc1f002338086e8af13b83873443da008894a
@@ -140,7 +142,7 @@ F generic/tdom.h d27e43748242d5fe7dd98b8c7aa4a5a891d015bf
 F generic/tdomDecls.h 07996e561ca42574739182f3d479cd0b28302405f8c8f16b8448b720a305faa4
 F generic/tdomStubInit.c 375ebd144c8e09dbe2fe4864e799da2bd0fbe3bce2855346487634c3be49daf0
 F generic/tdomStubLib.c b56629bb86788e7062fe3e68f5a832304fe6dc937a1597f7c7420d028eeca1f6
-F generic/tdominit.c 0d9d4ee2adcf379692358de57342f9103d3ab150172ffbef0eca8d1432c156f2
+F generic/tdominit.c 53d91518f41f700a22caf3921808620bdce75ea06e86e593c8dcb99045dd98b8
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
 F generic/xmlsimple.c 1f5913508685b83476cecd80157f4b72358ac22bc4d21ecb1ec3a129b72665f4
 F generic/xmlsimple.h 3cb9d055e60643afcdfe9ab407adf1e8bb5dbafb
@@ -221,9 +223,11 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c54834be20b8464410bc53b9358ca630b35683703820de47809b4ded752cc75a cde666b194807285e4dccd0a5d5e103d579b0c180ef1f35d52e3b892cec5ca31
-R 36aa4729094ffafce05deac524af6a08
-T +closed cde666b194807285e4dccd0a5d5e103d579b0c180ef1f35d52e3b892cec5ca31
+P d404fd67a8c66113ffa3ab0c852e2b8f6be1e52b268798d428187b4ee7b683f8
+R 081fe8cbc76189f84c7373128fa32cdc
+T *branch * structure
+T *sym-structure *
+T -sym-trunk *
 U rolf
-Z 36063178f46d7bfc9ffa1b6b56820bf5
+Z 885096c255ccf46eda27eff4d482f109
 # Remove this line to create a well-formed Fossil manifest.
