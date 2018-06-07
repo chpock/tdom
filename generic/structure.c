@@ -4,6 +4,9 @@
 
 #define TMALLOC(t) (t*)MALLOC(sizeof(t))
 
+#define SetResult(str) Tcl_ResetResult(interp); \
+                     Tcl_SetStringObj(Tcl_GetObjResult(interp), (str), -1)
+
 typedef Tcl_HashEntry* Namespace;
 
 typedef struct 
@@ -11,6 +14,7 @@ typedef struct
     char *start;
     char *startNamespace;
     Tcl_HashTable element;
+    Tcl_HashTable namespace;
     Tcl_HashTable pattern;
 } StructurInfo;
 
@@ -45,57 +49,184 @@ typedef struct StructurePattern
 typedef struct StructureElement 
 {
     char *name;
-    char *namespace;
+    void *namespace;
     StructurePattern *pattern;
     struct StructureElement *next;
 } StructureElement;
+
+static StructureElement*
+initStructureElement () 
+{
+    StructureElement *element;
+
+    element = TMALLOC (StructureElement);
+    memset(element, 0, sizeof(StructureElement));
+    return element;
+}
+    
+static StructurInfo*
+initStructure () 
+{
+    StructurInfo *structureInfo;
+    
+    structureInfo = TMALLOC (StructurInfo);
+    structureInfo->start = NULL;
+    structureInfo->startNamespace = NULL;
+    Tcl_InitHashTable (&structureInfo->element, TCL_STRING_KEYS);
+    Tcl_InitHashTable (&structureInfo->pattern, TCL_STRING_KEYS);
+    Tcl_InitHashTable (&structureInfo->namespace, TCL_STRING_KEYS);
+    return structureInfo;
+}
+
+static void
+structureCleanupElement (
+    StructureElement *element,
+    int freeStruct
+    ) 
+{
+    if (element->name) FREE (element->name);
+}
 
 static int 
 structureInstanceCmd (
     ClientData clientData,
     Tcl_Interp *interp,
     int objc,
-    Tcl_Obj *CONST objv[]
+    Tcl_Obj *const objv[]
     )
 {
-    int            methodIndex, result = TCL_OK;
+    int            methodIndex, length, index, keywordIndex,
+                   hnew, result = TCL_OK;
     StructurInfo  *structureInfo = (StructurInfo *) clientData;
-
-    static CONST84 char *structureMethods[] = {
+    Tcl_Obj *listelm, *namespace, *patternName;
+    Tcl_HashEntry *entryPtr;
+    StructureElement *element, *current;
+    void          *namespacePtr;
+    
+    static const char *structureInstanceMethods[] = {
         "element", "pattern", "start", NULL
     };
-    enum datatypeMethod {
+    enum structureInstanceMethod {
         m_element, m_pattern, m_start
     };
 
+    static const char *elementDescriptionKeywords[] = {
+        "namespace", "pattern", NULL
+    };
+
+    enum elementDescriptionKeyword
+    {
+        k_namespace, k_pattern
+    };
+    
     if (objc < 2) {
         Tcl_WrongNumArgs (interp, 1, objv, "subcommand ?arguments?");
         return TCL_ERROR;
     }
 
-    if (Tcl_GetIndexFromObj (interp, objv[1], structureMethods,
+    if (Tcl_GetIndexFromObj (interp, objv[1], structureInstanceMethods,
                              "method", 0, &methodIndex)
         != TCL_OK) {
         return TCL_ERROR;
     }
         
     Tcl_ResetResult (interp);
-    switch ((enum datatypeMethod) methodIndex) {
+    switch ((enum structureInstanceMethod) methodIndex) {
     case m_element:
+        if (objc != 4) {
+            Tcl_WrongNumArgs (interp, 2, objv, "<name> <definition>");
+            return TCL_ERROR;
+        }
+        if (!Tcl_ListObjLength (interp, objv[3], &length)
+            || (length != 2 && length != 4)) {
+            SetResult ("Expected argument: {?namespace <namespace>?"
+                       " pattern <patternName>}");
+            return TCL_ERROR;
+        }
+        index = 0;
+        namespace = NULL;
+        patternName = NULL;
+        while (index < length) {
+            Tcl_ListObjIndex (interp, objv[3], index, &listelm);
+            if (Tcl_GetIndexFromObj (interp, listelm,
+                                     elementDescriptionKeywords,
+                                     "keyword", 0, &keywordIndex)
+                != TCL_OK) {
+                return TCL_ERROR;
+            }
+            switch ((enum elementDescriptionKeyword) keywordIndex) {
+            case k_namespace:
+                Tcl_ListObjIndex (interp, objv[3], index + 1,
+                                  &namespace);
+                break;
+                
+            case k_pattern:
+                Tcl_ListObjIndex (interp, objv[3], index + 1,
+                                  &patternName);
+                break;
+            }
+            index += 2;
+        }
+        if (!patternName) {
+            SetResult ("Expected argument: {?namespace <namespace>?"
+                       " pattern <patternName>}");
+            return TCL_ERROR;
+        }
+        namespacePtr = NULL;
+        if (namespace) {
+            entryPtr = Tcl_CreateHashEntry (&structureInfo->namespace,
+                                            namespace, &hnew);
+            namespacePtr = Tcl_GetHashKey (&structureInfo->namespace,
+                                           entryPtr);
+        }
+        entryPtr = Tcl_CreateHashEntry (&structureInfo->element,
+                                        objv[2], &hnew);
+        if (hnew) {
+            element = initStructureElement ();
+            Tcl_SetHashValue (entryPtr, element);
+        } else {
+            element = (StructureElement *) Tcl_GetHashValue (entryPtr);
+            while (element) {
+                if (element->namespace == namespacePtr) {
+                    structureCleanupElement (element, 0);
+                    break;
+                }
+                element = element->next;
+            }
+            if (!element) {
+                element = initStructureElement ();
+                current = (StructureElement *) Tcl_GetHashValue (entryPtr);
+                element->next = current;
+                Tcl_SetHashValue (entryPtr, element);
+            }
+        }
+        element->name = tdomstrdup (Tcl_GetString (objv[2]));
+        element->namespace = namespacePtr;
+        element->pattern = (StructurePattern *)
+            Tcl_CreateHashEntry (&structureInfo->pattern,
+                                 Tcl_GetString (patternName), &hnew);
         break;
 
     case m_pattern:
         break;
 
     case m_start:
-        if (objc != 3) {
-            Tcl_WrongNumArgs (interp, 2, objv, "<documentElement>");
+        if (objc < 3 || objc > 3) {
+            Tcl_WrongNumArgs (interp, 2, objv, "<documentElement>"
+                              " ?<namespace>?");
             return TCL_ERROR;
         }
         if (structureInfo->start) {
             FREE (structureInfo->start);
         }
         structureInfo->start = tdomstrdup (Tcl_GetString (objv[2]));
+        if (objc == 4) {
+            if (structureInfo->startNamespace) {
+                FREE (structureInfo->startNamespace);
+            }
+            structureInfo->startNamespace =
+                tdomstrdup (Tcl_GetString (objv[3]));
+        }
         break;
         
     default:
@@ -141,17 +272,6 @@ static void structureInstanceDelete (
     
 }
 
-static StructurInfo*
-initStructure () 
-{
-    StructurInfo *structureInfo;
-    
-    structureInfo = TMALLOC (StructurInfo);
-    Tcl_InitHashTable (&structureInfo->element, TCL_STRING_KEYS);
-    Tcl_InitHashTable (&structureInfo->pattern, TCL_STRING_KEYS);
-    return structureInfo;
-}
-
 
 /*
  *----------------------------------------------------------------------------
@@ -175,16 +295,16 @@ tDOM_StructureObjCmd (
     ClientData clientData,
     Tcl_Interp *interp,
     int objc,
-    Tcl_Obj *CONST objv[]
+    Tcl_Obj *const objv[]
     )
 {
     int            methodIndex, result = TCL_OK;
     StructurInfo  *structureInfo;
 
-    static CONST84 char *structureMethods[] = {
+    static const char *structureMethods[] = {
         "create", NULL
     };
-    enum datatypeMethod {
+    enum structureMethod {
         m_create
     };
 
@@ -204,7 +324,7 @@ tDOM_StructureObjCmd (
     }
         
     Tcl_ResetResult (interp);
-    switch ((enum datatypeMethod) methodIndex) {
+    switch ((enum structureMethod) methodIndex) {
     case m_create:
         structureInfo = initStructure();
         Tcl_CreateObjCommand (interp, Tcl_GetString(objv[2]),

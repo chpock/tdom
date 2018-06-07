@@ -1,5 +1,5 @@
-C Musing\sabout\sgeneric\sstructure\svalidation.
-D 2018-06-06T00:16:28.844
+C Continued\swork.
+D 2018-06-07T01:59:48.499
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -129,7 +129,7 @@ F generic/domxslt.h c068da9c518ad5e2a543874c18166065f0bf2bbc
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 1ffb1f01bfe601de3c886993a08ae7df2e949d08ad727ef59438e3174fdbe378
 F generic/nodecmd.h 7c8e609b3652dcc29a1fb9d15735fc5ad1e0e00adb4450bd914186efbebee01d
-F generic/structure.c 9f8e32bd65e79fa88701b0777ea7db814b5e344f2744ceb03a2fc3507e6f8fbb
+F generic/structure.c 6212c06ad52a0ca35a181825136b03b5c457d4019546f17f9baca353eb937d20
 F generic/structure.h ba16eb4a8c28d21b0258b085c6f908f0bb77c7a27546549fbb848a8615b0018a
 F generic/tcldom.c b96e32d57bbef00b15933e5afbf8fe7241a21b9b973754bb2508065156f0c400
 F generic/tcldom.h 2e8edc2bf095200c419a740fed626f4fdcba274125e0234366e84a25bb0c2b25
@@ -223,11 +223,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P d404fd67a8c66113ffa3ab0c852e2b8f6be1e52b268798d428187b4ee7b683f8
-R 081fe8cbc76189f84c7373128fa32cdc
-T *branch * structure
-T *sym-structure *
-T -sym-trunk *
+P a71edddc7e3d07bf118214ef46b0480140c8fa8ea4bcf16773f9c1653ba90166
+R 7e40be4f482adc27ec42b1a860651d5f
 U rolf
-Z 885096c255ccf46eda27eff4d482f109
+Z a6ced90130728babefe9aa42f297fde2
 # Remove this line to create a well-formed Fossil manifest.
