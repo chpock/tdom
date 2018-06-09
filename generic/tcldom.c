@@ -2692,21 +2692,21 @@ void tcldom_treeAsHTML (
     empty = 0;
     scriptTag = 0;
     switch (tag[0]) {
-        case 'a':  if (!strcmp(tag,"area"))       empty = 1; break;
-        case 'b':  if (!strcmp(tag,"br")     ||
-                       !strcmp(tag,"base")   ||
-                       !strcmp(tag,"basefont"))   empty = 1;
-        case 'c':  if (!strcmp(tag,"col"))        empty = 1; break;
-        case 'f':  if (!strcmp(tag,"frame"))      empty = 1; break;
-        case 'h':  if (!strcmp(tag,"hr"))         empty = 1; break;
-        case 'i':  if (!strcmp(tag,"img")    ||
-                       !strcmp(tag,"input")  ||
-                       !strcmp(tag,"isindex"))    empty = 1; break;
-        case 'l':  if (!strcmp(tag,"link"))       empty = 1; break;
-        case 'm':  if (!strcmp(tag,"meta"))       empty = 1; break;
-        case 'p':  if (!strcmp(tag,"param"))      empty = 1; break;
-        case 's':  if (!strcmp(tag,"script") ||     
-                       !strcmp(tag,"style"))  scriptTag = 1; break;
+    case 'a':  if (!strcmp(tag,"area"))       {empty = 1;} break;
+    case 'b':  if (!strcmp(tag,"br")     ||
+                   !strcmp(tag,"base")   ||
+                   !strcmp(tag,"basefont"))   {empty = 1;} break;
+    case 'c':  if (!strcmp(tag,"col"))        {empty = 1;} break;
+    case 'f':  if (!strcmp(tag,"frame"))      {empty = 1;} break;
+    case 'h':  if (!strcmp(tag,"hr"))         {empty = 1;} break;
+    case 'i':  if (!strcmp(tag,"img")    ||
+                   !strcmp(tag,"input")  ||
+                   !strcmp(tag,"isindex"))    {empty = 1;} break;
+    case 'l':  if (!strcmp(tag,"link"))       {empty = 1;} break;
+    case 'm':  if (!strcmp(tag,"meta"))       {empty = 1;} break;
+    case 'p':  if (!strcmp(tag,"param"))      {empty = 1;} break;
+    case 's':  if (!strcmp(tag,"script") ||     
+                   !strcmp(tag,"style"))  {scriptTag = 1;} break;
     }
 
 
