@@ -1,22 +1,10 @@
 
 #include <tdom.h>
 
-
 #define TMALLOC(t) (t*)MALLOC(sizeof(t))
 
 #define SetResult(str) Tcl_ResetResult(interp); \
                      Tcl_SetStringObj(Tcl_GetObjResult(interp), (str), -1)
-
-typedef Tcl_HashEntry* Namespace;
-
-typedef struct 
-{
-    char *start;
-    char *startNamespace;
-    Tcl_HashTable element;
-    Tcl_HashTable namespace;
-    Tcl_HashTable pattern;
-} StructurInfo;
 
 typedef enum structure_content_type {
   STRUCTURE_CTYPE_EMPTY,
@@ -54,6 +42,24 @@ typedef struct StructureElement
     struct StructureElement *next;
 } StructureElement;
 
+typedef struct 
+{
+    StructurePattern *currentModel;
+    int               deep;
+} StructureValidationStack;
+
+typedef struct 
+{
+    char *start;
+    char *startNamespace;
+    StructureValidationStack **validationStack;
+    int                        validationStackSize;
+    Tcl_HashTable element;
+    Tcl_HashTable namespace;
+    Tcl_HashTable pattern;
+} StructurInfo;
+
+
 static StructureElement*
 initStructureElement () 
 {
@@ -72,6 +78,8 @@ initStructure ()
     structureInfo = TMALLOC (StructurInfo);
     structureInfo->start = NULL;
     structureInfo->startNamespace = NULL;
+    structureInfo->validationStack = NULL;
+    structureInfo->validationStackSize = 0;
     Tcl_InitHashTable (&structureInfo->element, TCL_STRING_KEYS);
     Tcl_InitHashTable (&structureInfo->pattern, TCL_STRING_KEYS);
     Tcl_InitHashTable (&structureInfo->namespace, TCL_STRING_KEYS);
@@ -104,10 +112,10 @@ structureInstanceCmd (
     void          *namespacePtr;
     
     static const char *structureInstanceMethods[] = {
-        "element", "pattern", "start", NULL
+        "element", "pattern", "start", "event", NULL
     };
     enum structureInstanceMethod {
-        m_element, m_pattern, m_start
+        m_element, m_pattern, m_start, m_event
     };
 
     static const char *elementDescriptionKeywords[] = {
@@ -118,6 +126,16 @@ structureInstanceCmd (
     {
         k_namespace, k_pattern
     };
+
+    static const char *eventKeywords[] = {
+        "elementstart", "elementend", "text", NULL
+    };
+
+    enum eventKeyword 
+    {
+        k_elementstart, k_elementend, k_text
+    };
+    
     
     if (objc < 2) {
         Tcl_WrongNumArgs (interp, 1, objv, "subcommand ?arguments?");
@@ -208,6 +226,18 @@ structureInstanceCmd (
         break;
 
     case m_pattern:
+        if (objc != 4) {
+            Tcl_WrongNumArgs (interp, 2, objv, "<patternname> <definition>");
+            return TCL_ERROR;
+        }
+        if (!Tcl_ListObjLength (interp, objv[3], &length)
+            || (length != 2 && length != 4)) {
+            SetResult ("Expected argument: <tdf>}");
+            return TCL_ERROR;
+        }
+        index = 0;
+        namespace = NULL;
+        patternName = NULL;
         break;
 
     case m_start:
@@ -226,6 +256,42 @@ structureInstanceCmd (
             }
             structureInfo->startNamespace =
                 tdomstrdup (Tcl_GetString (objv[3]));
+        }
+        break;
+
+    case m_event:
+        if (objc < 3) {
+            Tcl_WrongNumArgs (interp, 2, objv, "<eventType>"
+                              " ?<type specific data>?");
+            return TCL_ERROR;
+        }
+        if (Tcl_GetIndexFromObj (interp, objv[2], eventKeywords,
+                                 "keyword", 0, &keywordIndex)
+            != TCL_OK) {
+            return TCL_ERROR;
+        }
+        switch ((enum eventKeyword) keywordIndex) {
+        case k_elementstart:
+            if (objc < 4 && objc > 6) {
+                Tcl_WrongNumArgs (interp, 3, objv, "<elementname>"
+                    "?<namespace>? ?<attInfo>?");
+                return TCL_ERROR;
+            }
+            break;
+        case k_elementend:
+            if (objc < 4 && objc > 5) {
+                Tcl_WrongNumArgs (interp, 3, objv, "<elementname>"
+                    "?<namespace>?");
+                return TCL_ERROR;
+            }
+            break;
+            
+        case k_text:
+            if (objc != 4) {
+                Tcl_WrongNumArgs (interp, 3, objv, "<text>");
+                return TCL_ERROR;
+            }
+            break;
         }
         break;
         
