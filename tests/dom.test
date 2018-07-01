@@ -1691,7 +1691,7 @@ test dom-9.7 {Attempt to use the token to an already freed node} {
     domDoc $doc delete
     dom setObjectCommands automatic
     set result
-} {1 {parameter not a domNode!}}
+} {1 {Parameter "" is not a domNode.}}
     
 catch {namespace delete nodeCmds}
 
