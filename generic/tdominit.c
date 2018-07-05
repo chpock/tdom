@@ -100,6 +100,7 @@ Tdom_Init (
 #ifndef TDOM_NO_STRUCTURE
     Tcl_CreateObjCommand (interp, "tDOM::structure", tDOM_StructureObjCmd,
                           NULL, NULL);
+    tDOM_StructureInit (interp);
 #endif
     
 #ifdef USE_TCL_STUBS

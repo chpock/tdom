@@ -6,6 +6,10 @@
 #define SetResult(str) Tcl_ResetResult(interp); \
                      Tcl_SetStringObj(Tcl_GetObjResult(interp), (str), -1)
 
+#define checkNrArgs(l,h,err) if (objc < l && objc > h) {      \
+        SetResult (err);                                      \
+    }
+
 typedef enum structure_content_type {
   STRUCTURE_CTYPE_EMPTY,
   STRUCTURE_CTYPE_ANY,
@@ -13,12 +17,13 @@ typedef enum structure_content_type {
   STRUCTURE_CTYPE_NAME,
   STRUCTURE_CTYPE_CHOICE,
   STRUCTURE_CTYPE_SEQ,
+  STRUCTURE_CTYPE_INTERLEAVE,
   STRUCTURE_CTYPE_GROUP
 } Structure_Content_Type;
 
 typedef enum structure_content_quant  {
   STRUCTURE_CQUANT_NONE,
-  STRUCTURE_CQUANTURE_OPT,
+  STRUCTURE_CQUANT_OPT,
   STRUCTURE_CQUANT_REP,
   STRUCTURE_CQUANT_PLUS,
   STRUCTURE_CQUANT_N,
@@ -57,6 +62,7 @@ typedef struct
     Tcl_HashTable element;
     Tcl_HashTable namespace;
     Tcl_HashTable pattern;
+    StructurePattern *currentPattern;
 } StructurInfo;
 
 
@@ -66,10 +72,20 @@ initStructureElement ()
     StructureElement *element;
 
     element = TMALLOC (StructureElement);
-    memset(element, 0, sizeof(StructureElement));
+    memset (element, 0, sizeof(StructureElement));
     return element;
 }
-    
+
+static StructurePattern*
+initStructurePattern ()
+{
+    StructurePattern *pattern;
+
+    pattern = TMALLOC (StructurePattern);
+    memset (pattern, 0, sizeof(StructurePattern));
+    return pattern;
+}
+
 static StructurInfo*
 initStructure () 
 {
@@ -87,7 +103,7 @@ initStructure ()
 }
 
 static void
-structureCleanupElement (
+cleanupElement (
     StructureElement *element,
     int freeStruct
     ) 
@@ -95,6 +111,14 @@ structureCleanupElement (
     if (element->name) FREE (element->name);
 }
 
+static void
+cleanupPattern (
+    StructurePattern *pattern
+    )
+{
+    FREE (pattern);
+}
+    
 static int 
 structureInstanceCmd (
     ClientData clientData,
@@ -109,13 +133,14 @@ structureInstanceCmd (
     Tcl_Obj *listelm, *namespace, *patternName;
     Tcl_HashEntry *entryPtr;
     StructureElement *element, *current;
+    StructurePattern *pattern;
     void          *namespacePtr;
     
     static const char *structureInstanceMethods[] = {
-        "element", "pattern", "start", "event", NULL
+        "element", "pattern", "start", "event", "delete", NULL
     };
     enum structureInstanceMethod {
-        m_element, m_pattern, m_start, m_event
+        m_element, m_pattern, m_start, m_event, m_delete
     };
 
     static const char *elementDescriptionKeywords[] = {
@@ -206,7 +231,7 @@ structureInstanceCmd (
             element = (StructureElement *) Tcl_GetHashValue (entryPtr);
             while (element) {
                 if (element->namespace == namespacePtr) {
-                    structureCleanupElement (element, 0);
+                    cleanupElement (element, 0);
                     break;
                 }
                 element = element->next;
@@ -226,18 +251,20 @@ structureInstanceCmd (
         break;
 
     case m_pattern:
-        if (objc != 4) {
+        if (objc != 3) {
             Tcl_WrongNumArgs (interp, 2, objv, "<patternname> <definition>");
             return TCL_ERROR;
         }
-        if (!Tcl_ListObjLength (interp, objv[3], &length)
-            || (length != 2 && length != 4)) {
-            SetResult ("Expected argument: <tdf>}");
-            return TCL_ERROR;
+        entryPtr = Tcl_CreateHashEntry (&structureInfo->pattern,
+                                        Tcl_GetString(objv[1]), &hnew);
+        if (hnew) {
+            cleanupPattern ((StructurePattern *) entryPtr);
         }
-        index = 0;
-        namespace = NULL;
-        patternName = NULL;
+        pattern = initStructurePattern ();
+        Tcl_SetHashValue (entryPtr, pattern);
+        structureInfo->currentPattern = pattern;
+        result = Tcl_VarEval (interp, "eval ::tDOM::structure {",
+                              Tcl_GetString (objv[2]), "}", NULL);
         break;
 
     case m_start:
@@ -293,6 +320,14 @@ structureInstanceCmd (
             }
             break;
         }
+        break;
+        
+    case m_delete:
+        if (objc != 2) {
+            Tcl_WrongNumArgs(interp, 2, objv, "");
+            return TCL_ERROR;
+        }
+        Tcl_DeleteCommand(interp, Tcl_GetString(objv[0]));
         break;
         
     default:
@@ -408,3 +443,167 @@ tDOM_StructureObjCmd (
     }
     return result;
 }
+
+int
+EmptyPatternObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+
+    return TCL_OK;
+}
+
+int
+AnyPatternObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+
+    return TCL_OK;
+}
+
+int
+MixedPatternObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+
+    return TCL_OK;
+}
+
+int
+ElementPatternObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    checkNrArgs (2,3,"Expected: elementName ?pattern?");
+
+    
+    return TCL_OK;
+}
+
+int
+ChoicePatternObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+
+    return TCL_OK;
+}
+
+int
+SeqPatternObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+
+    return TCL_OK;
+}
+
+int
+InterleavePatternObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+
+    return TCL_OK;
+}
+
+int
+GroupPatternObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+
+    return TCL_OK;
+}
+
+int
+AttributePatternObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+
+    return TCL_OK;
+}
+
+int
+NamespacePatternObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+
+    return TCL_OK;
+}
+
+int
+RefPatternObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+
+    return TCL_OK;
+}
+
+void
+tDOM_StructureInit (
+    Tcl_Interp *interp
+    )
+{
+    Tcl_CreateObjCommand (interp, "tDOM::structure::empty",
+                          EmptyPatternObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp, "tDOM::structure::any",
+                          AnyPatternObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp, "tDOM::structure::mixed",
+                          MixedPatternObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp, "tDOM::structure::element",
+                          ElementPatternObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp, "tDOM::structure::choice",
+                          ChoicePatternObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp, "tDOM::structure::seq",
+                          SeqPatternObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp, "tDOM::structure::interleave",
+                          InterleavePatternObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp, "tDOM::structure::group",
+                          GroupPatternObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp, "tDOM::structure::attribute",
+                          AttributePatternObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp, "tDOM::structure::namespace",
+                          NamespacePatternObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp, "tDOM::structure::ref",
+                          RefPatternObjCmd, NULL, NULL);
+}
+

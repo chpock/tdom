@@ -1,0 +1,16 @@
+# Features covered: Structure validation
+#
+# Tested functionalities:
+#    structure-1.*: Basics, interface
+#
+# Copyright (c) 2018 Rolf Ade.
+
+source [file join [file dir [info script]] loadtdom.tcl]
+
+test structure-1.1 {create} {
+    tDOM::structure create grammer
+    grammer start doc
+    grammer delete
+} {}
+
+    

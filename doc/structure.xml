@@ -1,0 +1,21 @@
+<manpage id="structure" cat="structure" title="structure">
+  <namesection>
+    <name>tDOM::structure</name>
+    <desc>Create an XML pull parser command</desc>
+  </namesection>
+
+  <synopsis>
+    <syntax>package require tdom
+
+    <cmd>tDOM::structure</cmd> <m>cmdName</m>
+    </syntax>
+  </synopsis>
+
+  <section>
+    <title>DESCRIPTION </title>    
+    
+    <p>This command creates validation commands with a simple API. The
+    validation commands have methods to define an XML grammer and are 
+    able to validate XML or DOM trees against this grammer.</p>
+  </section>
+</manpage>
