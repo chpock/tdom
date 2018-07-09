@@ -40,6 +40,8 @@ typedef struct StructurePattern
     struct StructurePattern **content;
 } StructurePattern;
 
+
+
 typedef struct StructureElement 
 {
     char *name;
@@ -63,6 +65,9 @@ typedef struct
     Tcl_HashTable element;
     Tcl_HashTable namespace;
     Tcl_HashTable pattern;
+    char *currentNamespace;
+    char *currentAttributeNamespace;
+    int   isAttribute;
     StructurePattern *currentPattern;
     StructurePattern **currentChilds;
     unsigned int childCount;
@@ -85,6 +90,18 @@ static void SetActiveStructureInfo (StructurInfo *v)
 }
 # define SETASI(v) SetActiveStructureInfo (v)
 #endif
+
+
+#define CHECK_SI \
+    if (!structureInfo) {                                          \
+        SetResult ("Command called outside of grammer context.");  \
+        return TCL_ERROR;                                          \
+    }
+#define CHECK_SI_CONTEXT \
+    if (structureInfo->isAttribute) {                             \
+        SetResult ("Command called in invalid grammer context."); \
+        return TCL_ERROR;                                         \
+    }
 
 static StructureElement*
 initStructureElement () 
@@ -509,10 +526,7 @@ ElementPatternObjCmd (
 {
     StructurInfo *structureInfo = GETASI;
 
-    if (!structureInfo) {
-        SetResult ("element command called outside of grammer context.");
-        return TCL_ERROR;
-    }
+    CHECK_SI
     checkNrArgs (3,4,"Expected: elementName quant ?pattern?");
     
     return TCL_OK;
@@ -586,7 +600,23 @@ NamespacePatternObjCmd (
     Tcl_Obj *const objv[]
     )
 {
+    StructurInfo *structureInfo = GETASI;
+    char *currentNamespace;
+    Tcl_HashEntry *entryPtr;
+    int hnew;
+    
+    CHECK_SI
+    checkNrArgs (3,3,"Expected: namespace pattern");
 
+    currentNamespace = structureInfo->currentNamespace;
+    entryPtr = Tcl_CreateHashEntry (&structureInfo->namespace,
+                                    objv[1], &hnew);
+    structureInfo->currentNamespace = (char *)
+        Tcl_GetHashKey (&structureInfo->namespace, entryPtr);
+    if (Tcl_EvalObjEx (interp, objv[2], 0) != TCL_OK) {
+        return TCL_ERROR;
+    }
+    structureInfo->currentNamespace = currentNamespace;
     return TCL_OK;
 }
 
