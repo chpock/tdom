@@ -6,8 +6,9 @@
 #define SetResult(str) Tcl_ResetResult(interp); \
                      Tcl_SetStringObj(Tcl_GetObjResult(interp), (str), -1)
 
-#define checkNrArgs(l,h,err) if (objc < l && objc > h) {      \
+#define checkNrArgs(l,h,err) if (objc < l || objc > h) {      \
         SetResult (err);                                      \
+        return TCL_ERROR;                                     \
     }
 
 typedef enum structure_content_type {
@@ -63,8 +64,27 @@ typedef struct
     Tcl_HashTable namespace;
     Tcl_HashTable pattern;
     StructurePattern *currentPattern;
+    StructurePattern **currentChilds;
+    unsigned int childCount;
+    unsigned int childSize;
 } StructurInfo;
 
+#ifndef TCL_THREADS
+  static StructurInfo *activeStructureInfo = 0;
+# define GETASI activeStructureInfo
+# define SETASI(v) activeStructureInfo = v
+#else
+  static Tcl_ThreadDataKey activeStructureInfo;
+# define GETASI  *(StructurInfo**) Tcl_GetThreadData(&activeStructureInfo, \
+                                                     sizeof(StructurInfo*))
+static void SetActiveStructureInfo (StructurInfo *v) 
+{
+    StructurInfo **structureInfoPtr = Tcl_GetThreadData(&activeStructureInfo,
+                                                        sizeof (StructurInfo*));
+    *structureInfoPtr = v;
+}
+# define SETASI(v) SetActiveStructureInfo (v)
+#endif
 
 static StructureElement*
 initStructureElement () 
@@ -92,10 +112,7 @@ initStructure ()
     StructurInfo *structureInfo;
     
     structureInfo = TMALLOC (StructurInfo);
-    structureInfo->start = NULL;
-    structureInfo->startNamespace = NULL;
-    structureInfo->validationStack = NULL;
-    structureInfo->validationStackSize = 0;
+    memset (structureInfo, 0, sizeof(StructurInfo));
     Tcl_InitHashTable (&structureInfo->element, TCL_STRING_KEYS);
     Tcl_InitHashTable (&structureInfo->pattern, TCL_STRING_KEYS);
     Tcl_InitHashTable (&structureInfo->namespace, TCL_STRING_KEYS);
@@ -251,20 +268,22 @@ structureInstanceCmd (
         break;
 
     case m_pattern:
-        if (objc != 3) {
+        if (objc != 4) {
             Tcl_WrongNumArgs (interp, 2, objv, "<patternname> <definition>");
             return TCL_ERROR;
         }
         entryPtr = Tcl_CreateHashEntry (&structureInfo->pattern,
-                                        Tcl_GetString(objv[1]), &hnew);
-        if (hnew) {
+                                        Tcl_GetString(objv[2]), &hnew);
+        if (!hnew) {
             cleanupPattern ((StructurePattern *) entryPtr);
         }
+        SETASI(structureInfo);
         pattern = initStructurePattern ();
         Tcl_SetHashValue (entryPtr, pattern);
         structureInfo->currentPattern = pattern;
-        result = Tcl_VarEval (interp, "eval ::tDOM::structure {",
-                              Tcl_GetString (objv[2]), "}", NULL);
+        result = Tcl_VarEval (interp, "namespace eval ::tDOM::structure {",
+                              Tcl_GetString (objv[3]), "}", NULL);
+        SETASI(0);
         break;
 
     case m_start:
@@ -488,8 +507,13 @@ ElementPatternObjCmd (
     Tcl_Obj *const objv[]
     )
 {
-    checkNrArgs (2,3,"Expected: elementName ?pattern?");
+    StructurInfo *structureInfo = GETASI;
 
+    if (!structureInfo) {
+        SetResult ("element command called outside of grammer context.");
+        return TCL_ERROR;
+    }
+    checkNrArgs (3,4,"Expected: elementName quant ?pattern?");
     
     return TCL_OK;
 }

@@ -13,4 +13,15 @@ test structure-1.1 {create} {
     grammer delete
 } {}
 
-    
+test structure-1.2 {grammer cmd outside context} {
+    catch {tDOM::structure::element}
+} {1}
+
+test structure-1.3 {grammer cmd} {
+    tDOM::structure create grammer
+    grammer pattern somePattern {
+        element foo !
+        element bar !
+    }
+    grammer delete
+} {}
