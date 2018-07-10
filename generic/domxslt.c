@@ -928,7 +928,7 @@ static void formatValue (
     Tcl_DString      *str,
     char             *groupingSeparator,
     long              groupingSize,
-    int               addSeperater
+    int               addSeparater
 )
 {
     int         len, fulllen, gslen, upper = 0, e, m, b, i, z, v;
@@ -1076,7 +1076,7 @@ static void formatValue (
     len = strlen (tmp);
     Tcl_DStringAppend (str, tmp, len);
  appendSeperator:
-    if (addSeperater) {
+    if (addSeparater) {
         if (f->tokens[*useFormatToken].sepStart) {
             Tcl_DStringAppend (str, f->tokens[*useFormatToken].sepStart,
                                f->tokens[*useFormatToken].sepLen);
@@ -1379,10 +1379,10 @@ static int xsltFormatNumber (
     } else {
         i = (int) number;
         /* format fraction part */
-        DBG(fprintf(stderr, "formating fraction part: '%f', fZero+fHash: '%d'\n",
+        DBG(fprintf(stderr, "formatting fraction part: '%f', fZero+fHash: '%d'\n",
                     number - i, fZero+fHash);)
         sprintf(ftmp,"%.*f", fZero+fHash, number -i);
-        DBG(fprintf(stderr, "raw formated fraction part: '%s'\n", ftmp);)
+        DBG(fprintf(stderr, "raw formatted fraction part: '%s'\n", ftmp);)
         if (ftmp[0] == '1') {
             i++;
         }
