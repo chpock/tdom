@@ -1,5 +1,5 @@
-C Document\sseg\sfault\swith\ssimple\sxml\sparser.
-D 2018-07-10T00:12:52.109
+C Fixed\sbug\s(demonstrated\sby\s[590b76f97d4])\sin\snamespace\shandling\sif\sthe\ssimple\sparser\sis\sused\sand\sthe\sXML\sdata\shas\san\sempty\selement\snode\swith\san\sXML\snamespace\sdeclaration\sthat\swas\sgiven\swith\ssame\sprefix/URI\salso\son\sa\sprevious\ssibling\sof\sthat\selement\sand\swhich\suses\sthe\sempty\selement\ssyntax.
+D 2018-07-10T21:18:54.975
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -142,7 +142,7 @@ F generic/tdomStubInit.c 375ebd144c8e09dbe2fe4864e799da2bd0fbe3bce2855346487634c
 F generic/tdomStubLib.c b56629bb86788e7062fe3e68f5a832304fe6dc937a1597f7c7420d028eeca1f6
 F generic/tdominit.c 0d9d4ee2adcf379692358de57342f9103d3ab150172ffbef0eca8d1432c156f2
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
-F generic/xmlsimple.c 1f5913508685b83476cecd80157f4b72358ac22bc4d21ecb1ec3a129b72665f4
+F generic/xmlsimple.c 35123ab232feee4db073c609d8502b5bdcc0b469c687c06b553167aecaa286c9
 F generic/xmlsimple.h 3cb9d055e60643afcdfe9ab407adf1e8bb5dbafb
 F lib/tdom.tcl 5b1737365071be8f202868c116b6afd51e4e6ea2
 F macosx/README 90fbbcf96747374a4c4a7b97766f0c6bafa7780e
@@ -178,7 +178,7 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.bench 5446ce379127b8d5700f18a5a0848e580313d0d7
-F tests/dom.test 5ca77d0ddef582cbd12c212334017f9e5358caa4e1669c57ffa0b0ff194c1f9f
+F tests/dom.test 68c438b9b1ccdcea778e28d0b212d2c822ce0989a81e6bba58a323dc4afe427c
 F tests/domDoc.test 2b9087538d6cfc438328686c383152772fb5a8e75c756aa9587e99d8780ed4c5
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test d792fc806fe1f5e29c220449cd420ffab8fbda776c0685953120ecd80ce23781
@@ -221,8 +221,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f56cc2fc4659cc9377601d2e05a9a025e314363c2d84b3e9ab5c23ced82111c8
-R ac76593053a426ad9250b2b06cb09e90
+P 590b76f97d45cbceda3568f93b8ddf3a0019b0600a1564f655e61fbc0f372a63
+R 11b2ce4f30018efa5daf7a84f84dd973
 U rolf
-Z 58210574b039631ae6d9a9e56c8ae897
+Z 8fb83b063bdfdc9a8c5ee387ccbcca24
 # Remove this line to create a well-formed Fossil manifest.

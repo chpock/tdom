@@ -1049,6 +1049,14 @@ XML_SimpleParse (
                 if (*x!='>') {
                     RetError("Syntax Error",(x - xml - 1) );
                 }
+#ifdef TDOM_NS 
+                /* pop active namespaces */
+                while ( (activeNSpos >= 0) &&
+                        (activeNS[activeNSpos].depth == depth) )
+                {
+                    activeNSpos--;
+                } 
+#endif                                   
             }
             if (x[1] == 0) {
 #ifdef TDOM_NS
