@@ -1,5 +1,5 @@
-C Fixed\sbug\s(demonstrated\sby\s[590b76f97d4])\sin\snamespace\shandling\sif\sthe\ssimple\sparser\sis\sused\sand\sthe\sXML\sdata\shas\san\sempty\selement\snode\swith\san\sXML\snamespace\sdeclaration\sthat\swas\sgiven\swith\ssame\sprefix/URI\salso\son\sa\sprevious\ssibling\sof\sthat\selement\sand\swhich\suses\sthe\sempty\selement\ssyntax.
-D 2018-07-10T21:18:54.975
+C Removed\scode\sduplication.
+D 2018-07-10T21:45:17.250
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -111,8 +111,8 @@ F extensions/tnc/win/rules-ext.vc e788fcfc1e69b11946e18b8f67e0870b3bd38913
 F extensions/tnc/win/rules.vc 8157e2a811cf5e93683d6b0fbf5d91d153aa4535
 F extensions/tnc/win/targets.vc 79dea1c6a94a94e6ed8bae9e0195149b25a69923
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
-F generic/dom.c 6bfb80a29d41efd7d77f4e809fa66998aa54589df367fe22ea321859e32cad37
-F generic/dom.h 3d740ba3d647c465be8936c4126ebdafe16734946f0a4b64a0eccf8c46ffb740
+F generic/dom.c 4bfa88c87462d5ac435bdf561f5bad6722e4dd7df179d2326da9fc3b1566a82a
+F generic/dom.h 36ad6216fbe31a26eb6238c02ebe0a96bd59e094b79e0ea7dd94fac02356b9e8
 F generic/domalloc.c 55e9eeff19cc54cf3956a7013883ead07efd3593
 F generic/domalloc.h 4830a81539dc0323fbdc98f613df33fd38736da60e1ff5891b5c328eb1a6881d
 F generic/domhtml.c 6e8c333df54d0caf70897f50f042c59ad55314081378769453a4ededf82069da
@@ -142,7 +142,7 @@ F generic/tdomStubInit.c 375ebd144c8e09dbe2fe4864e799da2bd0fbe3bce2855346487634c
 F generic/tdomStubLib.c b56629bb86788e7062fe3e68f5a832304fe6dc937a1597f7c7420d028eeca1f6
 F generic/tdominit.c 0d9d4ee2adcf379692358de57342f9103d3ab150172ffbef0eca8d1432c156f2
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
-F generic/xmlsimple.c 35123ab232feee4db073c609d8502b5bdcc0b469c687c06b553167aecaa286c9
+F generic/xmlsimple.c d6602c4d509ccfaa807bafa526ea0afb6b1ba3a879f6930d2ab2059b00267a24
 F generic/xmlsimple.h 3cb9d055e60643afcdfe9ab407adf1e8bb5dbafb
 F lib/tdom.tcl 5b1737365071be8f202868c116b6afd51e4e6ea2
 F macosx/README 90fbbcf96747374a4c4a7b97766f0c6bafa7780e
@@ -221,8 +221,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 590b76f97d45cbceda3568f93b8ddf3a0019b0600a1564f655e61fbc0f372a63
-R 11b2ce4f30018efa5daf7a84f84dd973
+P f6de2da35d0526c21e6e149c926582ac36ed4d7eeb804675827aa976566e928a
+R 807efeb10c9fbec64e91350d1b6c69c6
 U rolf
-Z 8fb83b063bdfdc9a8c5ee387ccbcca24
+Z ce0b6ec3b198279f1421075bb583d303
 # Remove this line to create a well-formed Fossil manifest.

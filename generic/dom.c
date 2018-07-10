@@ -114,18 +114,6 @@ static char tdom_usage[] =
                 "           setStoreLineColumn \n"
                 ;
 
-
-/*---------------------------------------------------------------------------
-|   type domActiveNS
-|
-\--------------------------------------------------------------------------*/
-typedef struct _domActiveNS {
-
-    int    depth;
-    domNS *namespace;
-
-} domActiveNS;
-
 /*---------------------------------------------------------------------------
 |   type domBaseURIstackElem
 |
@@ -719,7 +707,7 @@ domLookupPrefix (
 |   domIsNamespaceInScope
 |
 \--------------------------------------------------------------------------*/
-static int
+int
 domIsNamespaceInScope (
     domActiveNS *NSstack,
     int          NSstackPos,
