@@ -4102,7 +4102,7 @@ static int applyXSLT (
     };
 
     enum xsltOption {
-        m_parmeters, m_ignoreUndeclaredParameters, m_maxApplyDepth,
+        m_parameters, m_ignoreUndeclaredParameters, m_maxApplyDepth,
         m_xsltmessagecmd
     };
 
@@ -4124,7 +4124,7 @@ static int applyXSLT (
     
         switch ((enum xsltOption) optionIndex) {
 
-        case m_parmeters:
+        case m_parameters:
             if (objc < 3) {SetResult(usage); goto applyXSLTCleanUP;}
             if (Tcl_ListObjLength(interp, objv[1], &length) != TCL_OK) {
                 SetResult("ill-formed parameters list: the -parameters "
@@ -6819,7 +6819,7 @@ int tcldom_DomObjCmd (
         |   try to find method implemented as normal Tcl proc
         \-------------------------------------------------------*/
         if ((strlen(method)-1) >= 270) {
-            SetResult("method name to long!");
+            SetResult("method name too long!");
             return TCL_ERROR;
         }
         sprintf(tmp, "::dom::DOMImplementation::%s", method);

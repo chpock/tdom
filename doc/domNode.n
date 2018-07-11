@@ -199,7 +199,7 @@ target for processing-instructions, "#text" for text node,
 nodes.
 .TP
 \&\fB\fBnodeValue\fP \fI?newValue?\fB
-\&\fRReturns the value of that node object. This is the the text or
+\&\fRReturns the value of that node object. This is the text or
 the data for element nodes of type TEXT_NODE, COMMENT_NODE,
 PROCESSING_INSTRUCTION_NODE or CDATA_SECTION_NODE). Otherwise it is empty. If
 the node is a TEXT_NODE, COMMENT_NODE or PROCESSING_INSTRUCTION_NODE and the
@@ -564,8 +564,7 @@ defined for it.
 \&\fB\fBasText\fP
 \&\fRFor ELEMENT_NODEs, the asText method outputs
 the string-value of every text node descendant of node in document
-order without any escaping. For every other node type, this method outputs the
-the XPath string value of that node.
+order without any escaping. For every other node type, this method outputs the XPath string value of that node.
 .TP
 \&\fB\fBappendFromList\fP \fIlist\fB
 \&\fRParses \fIlist\fR , creates an according DOM subtree and
