@@ -94,12 +94,12 @@ static void SetActiveStructureInfo (StructurInfo *v)
 
 #define CHECK_SI \
     if (!structureInfo) {                                          \
-        SetResult ("Command called outside of grammer context.");  \
+        SetResult ("Command called outside of grammar context.");  \
         return TCL_ERROR;                                          \
     }
 #define CHECK_SI_CONTEXT \
     if (structureInfo->isAttribute) {                             \
-        SetResult ("Command called in invalid grammer context."); \
+        SetResult ("Command called in invalid grammar context."); \
         return TCL_ERROR;                                         \
     }
 
