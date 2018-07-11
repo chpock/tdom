@@ -392,6 +392,7 @@ static void structureInstanceDelete (
     Tcl_HashEntry *entryPtr;
     Tcl_HashSearch search;
 
+    if (structureInfo->start) FREE (structureInfo->start);
     entryPtr = Tcl_FirstHashEntry (&structureInfo->element, &search);
     while (entryPtr) {
         pattern = Tcl_GetHashValue (entryPtr);
@@ -406,7 +407,7 @@ static void structureInstanceDelete (
         entryPtr = Tcl_NextHashEntry (&search);
     }
     Tcl_DeleteHashTable (&structureInfo->pattern);
-    
+    FREE (structureInfo);
 }
 
 
