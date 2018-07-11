@@ -664,6 +664,13 @@ test dom-2.41 {-keepCDATA and -keepEmpties} {
     set result
 } 1
 
+test dom-2.42 {namespaces} {
+    set doc [dom parse {
+        <help><br xmlns:xsi="a"/><em xmlns:xsi="a">notes</em></help>
+    }]
+    $doc delete
+} {}
+
 test dom-3.1 {isName} {
     dom isName ":foo"
 } {1}

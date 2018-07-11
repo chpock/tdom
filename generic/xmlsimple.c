@@ -62,17 +62,6 @@
 #endif
 #define SPACE(c)       ((c)==' ' || (c)=='\n' || (c)=='\t' || (c)=='\r')
 
-/*---------------------------------------------------------------------------
-|   type domActiveNS
-|
-\--------------------------------------------------------------------------*/
-typedef struct _domActiveNS {
-
-    int    depth;
-    domNS *namespace;
-
-} domActiveNS;
-
 /*----------------------------------------------------------------------------
 |   Begin Character Entity Translator
 |
@@ -333,37 +322,6 @@ static int TranslateEntityRefs (
 /*----------------------------------------------------------------------------
 |   End Of Character Entity Translator
 \---------------------------------------------------------------------------*/
-
-
-/*---------------------------------------------------------------------------
-|   domIsNamespaceInScope
-|
-\--------------------------------------------------------------------------*/
-static int
-domIsNamespaceInScope (
-    domActiveNS *NSstack,
-    int          NSstackPos,
-    const char  *prefix,
-    const char  *namespaceURI
-)
-{
-    int    i;
-
-    for (i = NSstackPos; i >= 0; i--) {
-        if (NSstack[i].namespace->prefix[0] &&
-            (strcmp(NSstack[i].namespace->prefix, prefix)==0)) {
-            if (strcmp(NSstack[i].namespace->uri, namespaceURI)==0) {
-                /* OK, exactly the same namespace declaration is in scope */
-                return 1;
-            } else {
-                /* This prefix is currently assigned to another uri,
-                   we need a new NS declaration, to override this one */
-                return 0;
-            }
-        }
-    }
-    return 0;
-}
 
 /*----------------------------------------------------------------------------
 |   XML_SimpleParse (non recursive)
@@ -1049,6 +1007,14 @@ XML_SimpleParse (
                 if (*x!='>') {
                     RetError("Syntax Error",(x - xml - 1) );
                 }
+#ifdef TDOM_NS 
+                /* pop active namespaces */
+                while ( (activeNSpos >= 0) &&
+                        (activeNS[activeNSpos].depth == depth) )
+                {
+                    activeNSpos--;
+                } 
+#endif                                   
             }
             if (x[1] == 0) {
 #ifdef TDOM_NS

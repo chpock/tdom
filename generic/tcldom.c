@@ -2692,21 +2692,21 @@ void tcldom_treeAsHTML (
     empty = 0;
     scriptTag = 0;
     switch (tag[0]) {
-        case 'a':  if (!strcmp(tag,"area"))       empty = 1; break;
-        case 'b':  if (!strcmp(tag,"br")     ||
-                       !strcmp(tag,"base")   ||
-                       !strcmp(tag,"basefont"))   empty = 1;
-        case 'c':  if (!strcmp(tag,"col"))        empty = 1; break;
-        case 'f':  if (!strcmp(tag,"frame"))      empty = 1; break;
-        case 'h':  if (!strcmp(tag,"hr"))         empty = 1; break;
-        case 'i':  if (!strcmp(tag,"img")    ||
-                       !strcmp(tag,"input")  ||
-                       !strcmp(tag,"isindex"))    empty = 1; break;
-        case 'l':  if (!strcmp(tag,"link"))       empty = 1; break;
-        case 'm':  if (!strcmp(tag,"meta"))       empty = 1; break;
-        case 'p':  if (!strcmp(tag,"param"))      empty = 1; break;
-        case 's':  if (!strcmp(tag,"script") ||     
-                       !strcmp(tag,"style"))  scriptTag = 1; break;
+    case 'a':  if (!strcmp(tag,"area"))       {empty = 1;} break;
+    case 'b':  if (!strcmp(tag,"br")     ||
+                   !strcmp(tag,"base")   ||
+                   !strcmp(tag,"basefont"))   {empty = 1;} break;
+    case 'c':  if (!strcmp(tag,"col"))        {empty = 1;} break;
+    case 'f':  if (!strcmp(tag,"frame"))      {empty = 1;} break;
+    case 'h':  if (!strcmp(tag,"hr"))         {empty = 1;} break;
+    case 'i':  if (!strcmp(tag,"img")    ||
+                   !strcmp(tag,"input")  ||
+                   !strcmp(tag,"isindex"))    {empty = 1;} break;
+    case 'l':  if (!strcmp(tag,"link"))       {empty = 1;} break;
+    case 'm':  if (!strcmp(tag,"meta"))       {empty = 1;} break;
+    case 'p':  if (!strcmp(tag,"param"))      {empty = 1;} break;
+    case 's':  if (!strcmp(tag,"script") ||     
+                   !strcmp(tag,"style"))  {scriptTag = 1;} break;
     }
 
 
@@ -4102,7 +4102,7 @@ static int applyXSLT (
     };
 
     enum xsltOption {
-        m_parmeters, m_ignoreUndeclaredParameters, m_maxApplyDepth,
+        m_parameters, m_ignoreUndeclaredParameters, m_maxApplyDepth,
         m_xsltmessagecmd
     };
 
@@ -4124,7 +4124,7 @@ static int applyXSLT (
     
         switch ((enum xsltOption) optionIndex) {
 
-        case m_parmeters:
+        case m_parameters:
             if (objc < 3) {SetResult(usage); goto applyXSLTCleanUP;}
             if (Tcl_ListObjLength(interp, objv[1], &length) != TCL_OK) {
                 SetResult("ill-formed parameters list: the -parameters "
@@ -6819,7 +6819,7 @@ int tcldom_DomObjCmd (
         |   try to find method implemented as normal Tcl proc
         \-------------------------------------------------------*/
         if ((strlen(method)-1) >= 270) {
-            SetResult("method name to long!");
+            SetResult("method name too long!");
             return TCL_ERROR;
         }
         sprintf(tmp, "::dom::DOMImplementation::%s", method);
