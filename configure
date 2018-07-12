@@ -1378,7 +1378,7 @@ Optional Features:
   --disable-option-checking  ignore unrecognized --enable/--with options
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
-  --enable-html5          build with HTML5 parsing support (default: no)
+  --enable-html5          build with HTML5 parsing support (default: off)
   --enable-threads        build with threads
   --enable-shared         build and link with shared libraries (default: on)
   --enable-stubs          build and link with stub libraries. Always true for
@@ -5544,6 +5544,17 @@ fi
         tcl_ok=no
     fi
     HTML5_LIBS=""
+    HTML5_INCLUDES=""
+    if test "$tcl_ok" = "yes" ; then
+        # Check if pkg-config is available
+        PKGCONFIG=no
+        pkg-config --version > /dev/null 2>&1 && PKGCONFIG=yes
+        if test "$PKGCONFIG" = no; then
+            tcl_ok=no
+	    as_fn_error $? "**** Cannot find pkg-config needed for --enable-html5." "$LINENO" 5
+	    as_fn_error $? "**** Despite configure request HTML5 parser _NOT_ enabled." "$LINENO" 5
+        fi
+    fi
     if test "$tcl_ok" = "yes" ; then
         HAVEGUMBO=`pkg-config --exists gumbo && echo "1"`
         if test "$HAVEGUMBO" = "1" ; then
@@ -5552,10 +5563,11 @@ $as_echo "yes" >&6; }
             $as_echo "#define TDOM_HAVE_GUMBO 1" >>confdefs.h
 
             if test "${TEA_PLATFORM}" = "windows" ; then
-                HTML5_LIBS="-Wl,-Bstatic `pkg-config --static --cflags --libs gumbo` -Wl,-Bdynamic"
+                HTML5_LIBS="-Wl,-Bstatic `pkg-config --static --libs gumbo` -Wl,-Bdynamic"
             else
-                HTML5_LIBS="`pkg-config --cflags --libs gumbo`"
+                HTML5_LIBS="`pkg-config --libs gumbo`"
             fi
+            HTML5_INCLUDES="`pkg-config --cflags gumbo`"
         else
             as_fn_error $? "The required lib gumbo not found" "$LINENO" 5
         fi
@@ -5635,7 +5647,7 @@ $as_echo "no" >&6; }
 
 
 
-    vars="-I${srcdir}/generic ${AOL_INCLUDES}"
+    vars="-I${srcdir}/generic ${AOL_INCLUDES} ${HTML5_INCLUDES}"
     for i in $vars; do
 	PKG_INCLUDES="$PKG_INCLUDES $i"
     done
