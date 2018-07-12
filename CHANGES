@@ -21,7 +21,7 @@
 
 2018-03-09  Rolf Ade  <rolf@pointsman.de>
 
-        Added command tDOM::pullparser, with creates simple XKL "pull"
+        Added command tDOM::pullparser, with creates simple XML "pull"
         parser commands. This commands parse XML input and stop at
         certain points ("events"). You continue parsing at your will.
 

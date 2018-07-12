@@ -1,9 +1,9 @@
-C Fix\sconfigure\sin\scase\sof\s--enable-html5\sand\sgumbo\sinstalled\sin\snon-standard\splaces.\sPlus\sother\ssmall\scorrections\sand\simprovements\srelated\sto\sconfigure\s--enable-html5.
-D 2018-07-12T21:04:15.848
+C Fixed\stypo.
+D 2018-07-12T21:13:46.819
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
-F CHANGES 5334b2b894ae536d07b82c7383969ae2203116c7a5d52d7db4c7f5c800f392be
+F CHANGES 68b2326e34cff998e54708ad27f7d9a2cc5a0980a6b50aa6c42e47db826a8972
 F ChangeLog 9b60ec8bfbae84e4f1a97aaee24be00ccea212b7
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 7f69670cc19f7c87bebb3e49b10cc5463fff7a7d8f9c9e03c79d039ae67fa496
@@ -221,9 +221,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 26cf441c85ab2856191bc4d23daa546c6021076f36ccf44f103632cac36a2802 952341c0d9ee352118d3c2049f1a70f54e2d3a21041ff6a8701f70f2a93d59d3
-R 34e9dd696a4e37425183a0512f7e1ef9
-T +closed 952341c0d9ee352118d3c2049f1a70f54e2d3a21041ff6a8701f70f2a93d59d3
+P 2b885994358c23903d729dc90ef29191ee561364134e7c192f6843b19ab9e3a2
+R dc3ece08ec43a12afbb3ead0c015c314
 U rolf
-Z 0d6804df3ad153c72919dc2f15f2368e
+Z 9400b06ddf4b3d306876a562a8e1bf80
 # Remove this line to create a well-formed Fossil manifest.
