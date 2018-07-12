@@ -1,9 +1,9 @@
-C The\spullparser\scommand\s(and\simplementation)\scan\sbe\sdisabled\swith\sa\sdefine.
-D 2018-07-12T22:05:39.968
+C Updated\sTEA.
+D 2018-07-12T22:27:51.514
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
-F CHANGES 68b2326e34cff998e54708ad27f7d9a2cc5a0980a6b50aa6c42e47db826a8972
+F CHANGES 054058f91c0c8946bc1716b62345f9f0aac6227b1c8e43aa9c470abc5dd8d907
 F ChangeLog 9b60ec8bfbae84e4f1a97aaee24be00ccea212b7
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 7f69670cc19f7c87bebb3e49b10cc5463fff7a7d8f9c9e03c79d039ae67fa496
@@ -12,8 +12,8 @@ F README a097b51b559f421a68a12d2901766a0bf2520b19
 F README.AOL d076b065f6a3209b5374a63c9ddd7fbca167643e
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/xslt.tcl ac4a75ba2f05e26d4ea6f92547983caa80fc6d55
-F configure f2e0b64cf6a0bf9d82406759f8ab9ca34a7bfcda9c3265a1bec6f107317e7b6d x
-F configure.in 0509ea0868edb6841cb24a5f864df144c82e4b3b846a2a0a0b2f34709913f1d5
+F configure 1545c9226b12f4e7eb23eaabcd27751ffd2ca6c13b3fb9de44f4e7350329ffbf x
+F configure.in bc4cf6cc5a5bd81f5bfa61f3af3cb674fc9616def6d14cceefa88c2ebdfbc146
 F doc/INDEX.MAP 55cb7aedd008e5bb07d026e056778a04b7d562398ef29e83e024cfc1ef2b9968
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html a3c7817482616cbfc8d2fc770ba177ffd622df9d4a94d761812c6ce2bb12bfb5
@@ -148,7 +148,7 @@ F lib/tdom.tcl 5b1737365071be8f202868c116b6afd51e4e6ea2
 F macosx/README 75fe1f6617f6cb7e4480cff5367b5c26fcd8dd207e2321f35dceebafccf4c99c
 F tclconfig/README.txt 180f4215d59309ec5645aa5f4565557dac484945
 F tclconfig/install-sh bdd5e293591621ae60d9824d86a4b1c5f22c3d00 x
-F tclconfig/tcl.m4 5e4d22029628036a04c1851c4c94e62d669b0048
+F tclconfig/tcl.m4 2e84c88428573888ec9b12552b7ca6d732ef0bd4fabbb43547b038f4de6dece0
 F tdom.m4 da6f4b0dffc318bde16a17276104350087429fd84a93da1a42d573ec6faa8495
 F tdomConfig.sh.in 5756c6b431179e49852a607cc2ca01e5381da905
 F tests/JSONTestSuite.tcl 907228f9bd31855951b9033df74c9c15778765af
@@ -221,8 +221,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c6ed107738794290d0123353fc09d91d46c6a393016628a6fcf173b00faabd3d
-R f57d8567de2b36ed77bb35cfbf84e679
+P 66f5a1c0cd629a98ac3b6da1a97e3ccf6da9120e98100c0f9fb058bedff1fa25
+R 96f2beb19667d38de5312ac16147b12d
 U rolf
-Z 21fa6d57f65ab8564485c5958fbc68a8
+Z b0e541b93853a47d57e4c871a161a36a
 # Remove this line to create a well-formed Fossil manifest.
