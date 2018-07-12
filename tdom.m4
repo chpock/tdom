@@ -412,6 +412,10 @@ AC_DEFUN(TDOM_EXPAT_ENTROPY, [
             [source of entropy to use]), , [with_entropy=auto])
 
         case $with_entropy in
+            no) 
+                AC_DEFINE([XML_POOR_ENTROPY], 1,
+                          [Define to use poor entropy.])
+            ;;
             auto)
                 AC_MSG_CHECKING([for arc4random_buf (BSD or libbsd)])
                 AC_LINK_IFELSE([AC_LANG_SOURCE([

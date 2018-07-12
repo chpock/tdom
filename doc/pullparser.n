@@ -250,7 +250,7 @@ if the file could not be open in read mode. Otherwise it
 switches the parser into state START_DOCUMENT.
 .TP
 \&\fB\fBnext\fP
-\&\fRThis method valid in state \fISTART_DOCUMENT\fR,
+\&\fRThis method is valid in state \fISTART_DOCUMENT\fR,
 \&\fISTART_TAG\fR, \fIEND_TAG\fR and \fITEXT\fR. It continues
 parsing of the XML input until the next event, which it will
 return.

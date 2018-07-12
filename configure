@@ -2912,6 +2912,11 @@ fi
 
 
         case $with_entropy in
+            no)
+
+$as_echo "#define XML_POOR_ENTROPY 1" >>confdefs.h
+
+            ;;
             auto)
                 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for arc4random_buf (BSD or libbsd)" >&5
 $as_echo_n "checking for arc4random_buf (BSD or libbsd)... " >&6; }

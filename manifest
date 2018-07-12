@@ -1,5 +1,5 @@
-C Merged\sfrom\strunk.
-D 2018-07-12T22:48:18.366
+C Made\sit\sa\sbit\seasier\sto\sdisable\sall\sthe\snew\sexpat\sentropy\ssource\slimbo\sdance\sby\sjust\s--without-entropy.
+D 2018-07-12T23:14:00.747
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -12,7 +12,7 @@ F README 352d5eb38ca0882084aaa7a69091e95e52924f20
 F README.AOL d076b065f6a3209b5374a63c9ddd7fbca167643e
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/xslt.tcl ac4a75ba2f05e26d4ea6f92547983caa80fc6d55
-F configure c6480ef4d7e5ad209561519b72349ec7da4546554179a61c6410dd79f258484c x
+F configure f7a632930065f8d9199e3e269916653f0554487fa8784959ec10f2112523ae47 x
 F configure.in 2cb0ae105d0e6ab027a9868fc6f09f3feae27461d68c9171f1abe15062ac3199
 F doc/INDEX.MAP 55cb7aedd008e5bb07d026e056778a04b7d562398ef29e83e024cfc1ef2b9968
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
@@ -35,9 +35,9 @@ F doc/expatapi.xml f978d9a0b6df6878e1f94e427c018240efaf33f6d8dfa456051cfe551b15d
 F doc/index.html 22d7d146b761598f0358a4fb9cb2c9b907602431e5950ca8c40394b411de24d7
 F doc/keyword-index.html e316c5df54ab8329e573542c5a348fe370cc317a15d0244fbefc596cc5489dda
 F doc/manpage.css 3b4ec1d641048933a7e6bffc659de9519030a959
-F doc/pullparser.html 733f2199a24710471cdb8ebea9850957b69f4314d29775fb7ce05749f47cb71a
-F doc/pullparser.n a592b5ca5f9c5aca69ff24a690561b1c7e2e590dac3a75db4db53c5726c734f9
-F doc/pullparser.xml a25f7aa32029a095f4c2e482422436fb88ea8c91a06989819c7c7880d2277132
+F doc/pullparser.html 7d8c1bcc3152a533eeb98af30b177bf085fe97b99c922804ebd72d56d2607c8f
+F doc/pullparser.n c35fcd949fc3c33ddcb9365d5277141e63805e4eed726f09163ebb6a0351a1a7
+F doc/pullparser.xml ef4c49ae1e978c7c2e36c024bd834a710f80d211d582d4a4633c35ddc6d628b5
 F doc/tDOM.xml c2c23ef23bc7ed266b10e833a196833dab73cca8e6e63eeaba0da29bff2bbaf6
 F doc/tdomcmd.html 9b4d9ff443499554adf2346ff0efc0317a98bd6e1fc3fc79a6e476b71fe85fed
 F doc/tdomcmd.n c06a5ff035f16a2a52636b69d9ebe6ba84ff5101922ed27b551146c4d61d6cda
@@ -150,7 +150,7 @@ F macosx/README 75fe1f6617f6cb7e4480cff5367b5c26fcd8dd207e2321f35dceebafccf4c99c
 F tclconfig/README.txt 180f4215d59309ec5645aa5f4565557dac484945
 F tclconfig/install-sh bdd5e293591621ae60d9824d86a4b1c5f22c3d00 x
 F tclconfig/tcl.m4 2e84c88428573888ec9b12552b7ca6d732ef0bd4fabbb43547b038f4de6dece0
-F tdom.m4 af25443f46351ca3cbc2a4c382dd1e8c97efc098ad250599cd3a3afb1be7760c
+F tdom.m4 c2df3f3444af017f80548b21f439f365bfa85d6593c67d9a7fef24c2f01b0c6a
 F tdomConfig.sh.in 5756c6b431179e49852a607cc2ca01e5381da905
 F tests/JSONTestSuite.tcl 907228f9bd31855951b9033df74c9c15778765af
 F tests/OASIS-suite.tcl b71b0f8ccd9f1cfd7b3cd4d74459b4456e8253809c409ff25f72281654ec5e1e
@@ -222,8 +222,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 132adf28aa999187f9bf564fbda889829ce7e68166236bb05c85af809b858b2e 740e401adc02ee33cea5ab80b69dc21872523c812610049ec1eb4632e924238e
-R 968d2c9c914256ba0caa193de1ff7021
+P 24bc5ef530825a2e4c720f73840a17b9bc33184d04eb86802cb69079b58d88d7
+R 933189f5e01e4d8b759ab52cc3361c2a
 U rolf
-Z d4324554c2cfd52ee4f9fc627caeb194
+Z e67897697e2dbadb81cb49c219da47f2
 # Remove this line to create a well-formed Fossil manifest.
