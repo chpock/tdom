@@ -657,6 +657,9 @@ Returns as boolean, if build with
 \&\fI--enable-html5\fR.
 .IP "\fBversionhash\fR"
 Returns the fossil repository version hash.
+.IP "\fBpullparser\fR"
+Returns as boolean if the pullparser command
+is build in.
 .RE
 .SH KEYWORDS
 XML, DOM, document, node, parsing

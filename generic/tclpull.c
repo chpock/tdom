@@ -21,6 +21,8 @@
 |
 \---------------------------------------------------------------------------*/
 
+#ifndef TDOM_NO_PULL
+
 #include <tdom.h>
 #include <fcntl.h>
 #ifdef _MSC_VER
@@ -865,3 +867,4 @@ tDOM_PullParserCmd (
     return TCL_OK;
 }
 
+#endif /* ifndef TDOM_NO_PULL */
