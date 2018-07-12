@@ -30,7 +30,7 @@ TDOM_EXPAT_ENTROPY
 # as well as PKG_LIB_FILE and PKG_STUB_LIB_FILE.
 #--------------------------------------------------------------------
 
-TEA_INIT([3.10])
+TEA_INIT([3.13])
 
 AC_CONFIG_AUX_DIR(tclconfig)
 
@@ -113,7 +113,7 @@ TEA_ADD_SOURCES([generic/xmlsimple.c \
                  generic/tclpull.c   \
                  generic/tdomStubInit.c])
 TEA_ADD_HEADERS([generic/tdom.h])
-TEA_ADD_INCLUDES([-I${srcdir}/generic ${AOL_INCLUDES}])
+TEA_ADD_INCLUDES([-I${srcdir}/generic ${AOL_INCLUDES} ${HTML5_INCLUDES}])
 TEA_ADD_LIBS([${AOL_LIBS} ${HTML5_LIBS}])
 TEA_ADD_CFLAGS([])
 TEA_ADD_STUB_SOURCES([generic/tdomStubLib.c])

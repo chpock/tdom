@@ -1,3 +1,7 @@
+2018-07-12  Rolf Ade  <rolf@pointsman.de>
+
+        Updated TEA.
+
 2018-05-17  Rolf Ade  <rolf@pointsman.de>
 
         Added new method attributeNames to domNode (cmds).
@@ -21,7 +25,7 @@
 
 2018-03-09  Rolf Ade  <rolf@pointsman.de>
 
-        Added command tDOM::pullparser, with creates simple XKL "pull"
+        Added command tDOM::pullparser, with creates simple XML "pull"
         parser commands. This commands parse XML input and stop at
         certain points ("events"). You continue parsing at your will.
 
