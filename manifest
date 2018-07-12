@@ -1,5 +1,5 @@
-C Fix\sconfigure\sin\scase\sgumbo\sis\sinstalled\sin\snon-standard\splaces.\sPlus\sother\ssmall\scorrections\sand\simprovents\srelated\sto\s--enable-html5.
-D 2018-07-12T19:57:02.145
+C Only\sone\sAC_MSG_ERROR\sline\smakes\ssense\sfor\sobvious\sreason.
+D 2018-07-12T21:01:01.137
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -149,7 +149,7 @@ F macosx/README 75fe1f6617f6cb7e4480cff5367b5c26fcd8dd207e2321f35dceebafccf4c99c
 F tclconfig/README.txt 180f4215d59309ec5645aa5f4565557dac484945
 F tclconfig/install-sh bdd5e293591621ae60d9824d86a4b1c5f22c3d00 x
 F tclconfig/tcl.m4 5e4d22029628036a04c1851c4c94e62d669b0048
-F tdom.m4 c1bdc897969c33d6909e915b349cc3b34d3d8f728066b48b09e76184e206c18a
+F tdom.m4 da6f4b0dffc318bde16a17276104350087429fd84a93da1a42d573ec6faa8495
 F tdomConfig.sh.in 5756c6b431179e49852a607cc2ca01e5381da905
 F tests/JSONTestSuite.tcl 907228f9bd31855951b9033df74c9c15778765af
 F tests/OASIS-suite.tcl b71b0f8ccd9f1cfd7b3cd4d74459b4456e8253809c409ff25f72281654ec5e1e
@@ -221,11 +221,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 26cf441c85ab2856191bc4d23daa546c6021076f36ccf44f103632cac36a2802
-R 972375370bf311d42a2beb155e76a045
-T *branch * configurefix
-T *sym-configurefix *
-T -sym-trunk *
+P a230fd334bf255b057326715c52a19d2e93ee2460a841d85a3d6c5ec3456993f
+R 34e9dd696a4e37425183a0512f7e1ef9
 U rolf
-Z 999803d7d16730024922ee0a6ef978f2
+Z 14a37df9e0aff2209f5882eb6e3dd73c
 # Remove this line to create a well-formed Fossil manifest.

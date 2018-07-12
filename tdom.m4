@@ -245,8 +245,7 @@ AC_DEFUN(TDOM_ENABLE_HTML5, [
         pkg-config --version > /dev/null 2>&1 && PKGCONFIG=yes
         if test "$PKGCONFIG" = no; then
             tcl_ok=no
-	    AC_MSG_ERROR([**** Cannot find pkg-config needed for --enable-html5.])
-	    AC_MSG_ERROR([**** Despite configure request HTML5 parser _NOT_ enabled.])
+	    AC_MSG_ERROR([cannot find pkg-config needed for --enable-html5.])
         fi
     fi
     if test "$tcl_ok" = "yes" ; then
