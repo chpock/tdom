@@ -784,7 +784,7 @@ HTML_SimpleParse (
                         case 'd': if (!strcmp(pn,"dd") ||
                                       !strcmp(pn,"dt") ||
                                       (!strcmp(start+2,"form") && !strcmp(pn,"div"))
-                            )                        autoclose = 1; break;
+                            )                        {autoclose = 1;}          break;
                         case 'h': if (!strcmp(pn,"head") ||
                                       !strcmp(pn,"html"))     {autoclose = 1;} break;
                         case 'f': if (!strcmp(pn,"font")||
