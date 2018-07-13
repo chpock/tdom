@@ -441,6 +441,19 @@ test pp-3.7 {skip} {
     set result
 } {START_TAG TEXT START_TAG e END_TAG e START_TAG e 1 {error "mismatched tag" at line 1 character 24}}
 
+test pp-3.8 {skip} {
+    tDOM::pullparser pp
+    pp input {<doc>foo bar<e/><e>bar</e></doc>}
+    set result [pp next]
+    lappend result [pp skip]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [catch {pp next} errMsg]
+    lappend result $errMsg
+    pp delete
+    set result
+} {START_TAG END_TAG doc END_DOCUMENT 1 {No next event after END_DOCUMENT}}
+
 test pp-4.1 {find-element} {
     tDOM::pullparser pp
     pp input {<doc><a>foo bar</a><b>baz</b><c>grill</c><d>here</d></doc>}
@@ -660,6 +673,19 @@ test pp-4.13 {find-element} {
     set result
 } {START_DOCUMENT END_DOCUMENT}    
 
+test pp-4.14 {find-element} {
+    tDOM::pullparser pp
+    pp input {<doc>foo bar<e/><e>bar</e></doc>}
+    set result [pp next]
+    lappend result [pp skip]
+    lappend result [pp tag]
+    lappend result [pp find-element b]
+    lappend result [catch {pp next} errMsg]
+    lappend result $errMsg
+    pp delete
+    set result
+} {START_TAG END_TAG doc END_DOCUMENT 1 {No next event after END_DOCUMENT}}
+    
 test pp-5.1 {CDATA section} {
     tDOM::pullparser pp
     pp input {<doc><![CDATA[ some text  ]]></doc>}
