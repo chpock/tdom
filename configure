@@ -665,12 +665,6 @@ TCL_EXTRA_CFLAGS
 TCL_DEFS
 TCL_LIBS
 CLEANFILES
-OBJEXT
-ac_ct_CC
-CPPFLAGS
-LDFLAGS
-CFLAGS
-CC
 TCL_STUB_LIB_SPEC
 TCL_STUB_LIB_FLAG
 TCL_STUB_LIB_FILE
@@ -696,8 +690,14 @@ PKG_STUB_OBJECTS
 PKG_STUB_SOURCES
 PKG_STUB_LIB_FILE
 PKG_LIB_FILE
-EXEEXT
 CYGPATH
+OBJEXT
+EXEEXT
+ac_ct_CC
+CPPFLAGS
+LDFLAGS
+CFLAGS
+CC
 target_alias
 host_alias
 build_alias
@@ -739,6 +739,7 @@ SHELL'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
+with_entropy
 with_tcl
 with_aol
 with_expat
@@ -1397,6 +1398,7 @@ Optional Features:
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --with-entropy          source of entropy to use
   --with-tcl              directory containing tcl configuration
                           (tclConfig.sh)
   --with-aolserver        directory with AOLserver distribution
@@ -1532,6 +1534,52 @@ fi
 
 } # ac_fn_c_try_compile
 
+# ac_fn_c_try_link LINENO
+# -----------------------
+# Try to link conftest.$ac_ext, and return whether this succeeded.
+ac_fn_c_try_link ()
+{
+  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
+  rm -f conftest.$ac_objext conftest$ac_exeext
+  if { { ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
+$as_echo "$ac_try_echo"; } >&5
+  (eval "$ac_link") 2>conftest.err
+  ac_status=$?
+  if test -s conftest.err; then
+    grep -v '^ *+' conftest.err >conftest.er1
+    cat conftest.er1 >&5
+    mv -f conftest.er1 conftest.err
+  fi
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext && {
+	 test "$cross_compiling" = yes ||
+	 test -x conftest$ac_exeext
+       }; then :
+  ac_retval=0
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_retval=1
+fi
+  # Delete the IPA/IPO (Inter Procedural Analysis/Optimization) information
+  # created by the PGI compiler (conftest_ipa8_conftest.oo), as it would
+  # interfere with the next link command; also delete a directory that is
+  # left behind by Apple's compiler.  We do this before executing the actions.
+  rm -rf conftest.dSYM conftest_ipa8_conftest.oo
+  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
+  as_fn_set_status $ac_retval
+
+} # ac_fn_c_try_link
+
 # ac_fn_c_try_cpp LINENO
 # ----------------------
 # Try to preprocess conftest.$ac_ext, and return whether this succeeded.
@@ -1641,52 +1689,6 @@ $as_echo "$ac_res" >&6; }
   eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
 
 } # ac_fn_c_check_header_compile
-
-# ac_fn_c_try_link LINENO
-# -----------------------
-# Try to link conftest.$ac_ext, and return whether this succeeded.
-ac_fn_c_try_link ()
-{
-  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
-  rm -f conftest.$ac_objext conftest$ac_exeext
-  if { { ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
-$as_echo "$ac_try_echo"; } >&5
-  (eval "$ac_link") 2>conftest.err
-  ac_status=$?
-  if test -s conftest.err; then
-    grep -v '^ *+' conftest.err >conftest.er1
-    cat conftest.er1 >&5
-    mv -f conftest.er1 conftest.err
-  fi
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; } && {
-	 test -z "$ac_c_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest$ac_exeext && {
-	 test "$cross_compiling" = yes ||
-	 test -x conftest$ac_exeext
-       }; then :
-  ac_retval=0
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	ac_retval=1
-fi
-  # Delete the IPA/IPO (Inter Procedural Analysis/Optimization) information
-  # created by the PGI compiler (conftest_ipa8_conftest.oo), as it would
-  # interfere with the next link command; also delete a directory that is
-  # left behind by Apple's compiler.  We do this before executing the actions.
-  rm -rf conftest.dSYM conftest_ipa8_conftest.oo
-  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
-  as_fn_set_status $ac_retval
-
-} # ac_fn_c_try_link
 
 # ac_fn_c_check_func LINENO FUNC VAR
 # ----------------------------------
@@ -2106,362 +2108,6 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
-
-#--------------------------------------------------------------------
-# Call TEA_INIT as the first TEA_ macro to set up initial vars.
-# This will define a ${TEA_PLATFORM} variable == "unix" or "windows"
-# as well as PKG_LIB_FILE and PKG_STUB_LIB_FILE.
-#--------------------------------------------------------------------
-
-
-    TEA_VERSION="3.13"
-
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking TEA configuration" >&5
-$as_echo_n "checking TEA configuration... " >&6; }
-    if test x"${PACKAGE_NAME}" = x ; then
-	as_fn_error $? "
-The PACKAGE_NAME variable must be defined by your TEA configure.ac" "$LINENO" 5
-    fi
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: ok (TEA ${TEA_VERSION})" >&5
-$as_echo "ok (TEA ${TEA_VERSION})" >&6; }
-
-    # If the user did not set CFLAGS, set it now to keep macros
-    # like AC_PROG_CC and AC_TRY_COMPILE from adding "-g -O2".
-    if test "${CFLAGS+set}" != "set" ; then
-	CFLAGS=""
-    fi
-
-    case "`uname -s`" in
-	*win32*|*WIN32*|*MINGW32_*|*MINGW64_*)
-	    # Extract the first word of "cygpath", so it can be a program name with args.
-set dummy cygpath; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_prog_CYGPATH+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  if test -n "$CYGPATH"; then
-  ac_cv_prog_CYGPATH="$CYGPATH" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_CYGPATH="cygpath -m"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-  test -z "$ac_cv_prog_CYGPATH" && ac_cv_prog_CYGPATH="echo"
-fi
-fi
-CYGPATH=$ac_cv_prog_CYGPATH
-if test -n "$CYGPATH"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CYGPATH" >&5
-$as_echo "$CYGPATH" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-	    EXEEXT=".exe"
-	    TEA_PLATFORM="windows"
-	    ;;
-	*CYGWIN_*)
-	    EXEEXT=".exe"
-	    # CYGPATH and TEA_PLATFORM are determined later in LOAD_TCLCONFIG
-	    ;;
-	*)
-	    CYGPATH=echo
-	    # Maybe we are cross-compiling....
-	    case ${host_alias} in
-		*mingw32*)
-		EXEEXT=".exe"
-		TEA_PLATFORM="windows"
-		;;
-	    *)
-		EXEEXT=""
-		TEA_PLATFORM="unix"
-		;;
-	    esac
-	    ;;
-    esac
-
-    # Check if exec_prefix is set. If not use fall back to prefix.
-    # Note when adjusted, so that TEA_PREFIX can correct for this.
-    # This is needed for recursive configures, since autoconf propagates
-    # $prefix, but not $exec_prefix (doh!).
-    if test x$exec_prefix = xNONE ; then
-	exec_prefix_default=yes
-	exec_prefix=$prefix
-    fi
-
-    { $as_echo "$as_me:${as_lineno-$LINENO}: configuring ${PACKAGE_NAME} ${PACKAGE_VERSION}" >&5
-$as_echo "$as_me: configuring ${PACKAGE_NAME} ${PACKAGE_VERSION}" >&6;}
-
-
-
-
-    # This package name must be replaced statically for AC_SUBST to work
-
-    # Substitute STUB_LIB_FILE in case package creates a stub library too.
-
-
-    # We AC_SUBST these here to ensure they are subst'ed,
-    # in case the user doesn't call TEA_ADD_...
-
-
-
-
-
-
-
-
-    # Configure the installer.
-
-    INSTALL='$(SHELL) $(srcdir)/tclconfig/install-sh -c'
-    INSTALL_DATA_DIR='${INSTALL} -d -m 755'
-    INSTALL_DATA='${INSTALL} -m 644'
-    INSTALL_PROGRAM='${INSTALL} -m 755'
-    INSTALL_SCRIPT='${INSTALL} -m 755'
-
-
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking system version" >&5
-$as_echo_n "checking system version... " >&6; }
-if ${tcl_cv_sys_version+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-
-	# TEA specific:
-	if test "${TEA_PLATFORM}" = "windows" ; then
-	    tcl_cv_sys_version=windows
-	else
-	    tcl_cv_sys_version=`uname -s`-`uname -r`
-	    if test "$?" -ne 0 ; then
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: can't find uname command" >&5
-$as_echo "$as_me: WARNING: can't find uname command" >&2;}
-		tcl_cv_sys_version=unknown
-	    else
-		if test "`uname -s`" = "AIX" ; then
-		    tcl_cv_sys_version=AIX-`uname -v`.`uname -r`
-		fi
-	    fi
-	fi
-
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $tcl_cv_sys_version" >&5
-$as_echo "$tcl_cv_sys_version" >&6; }
-    system=$tcl_cv_sys_version
-
-    case $system in
-	HP-UX-*) INSTALL_LIBRARY='${INSTALL} -m 755' ;;
-	      *) INSTALL_LIBRARY='${INSTALL} -m 644' ;;
-    esac
-
-
-
-
-
-
-
-
-
-
-ac_aux_dir=
-for ac_dir in tclconfig "$srcdir"/tclconfig; do
-  if test -f "$ac_dir/install-sh"; then
-    ac_aux_dir=$ac_dir
-    ac_install_sh="$ac_aux_dir/install-sh -c"
-    break
-  elif test -f "$ac_dir/install.sh"; then
-    ac_aux_dir=$ac_dir
-    ac_install_sh="$ac_aux_dir/install.sh -c"
-    break
-  elif test -f "$ac_dir/shtool"; then
-    ac_aux_dir=$ac_dir
-    ac_install_sh="$ac_aux_dir/shtool install -c"
-    break
-  fi
-done
-if test -z "$ac_aux_dir"; then
-  as_fn_error $? "cannot find install-sh, install.sh, or shtool in tclconfig \"$srcdir\"/tclconfig" "$LINENO" 5
-fi
-
-# These three variables are undocumented and unsupported,
-# and are intended to be withdrawn in a future Autoconf release.
-# They can cause serious problems if a builder's source tree is in a directory
-# whose full name contains unusual characters.
-ac_config_guess="$SHELL $ac_aux_dir/config.guess"  # Please don't use this var.
-ac_config_sub="$SHELL $ac_aux_dir/config.sub"  # Please don't use this var.
-ac_configure="$SHELL $ac_aux_dir/configure"  # Please don't use this var.
-
-
-
-#--------------------------------------------------------------------
-# Load the tclConfig.sh file
-#--------------------------------------------------------------------
-
-
-
-    #
-    # Ok, lets find the tcl configuration
-    # First, look for one uninstalled.
-    # the alternative search directory is invoked by --with-tcl
-    #
-
-    if test x"${no_tcl}" = x ; then
-	# we reset no_tcl in case something fails here
-	no_tcl=true
-
-# Check whether --with-tcl was given.
-if test "${with_tcl+set}" = set; then :
-  withval=$with_tcl; with_tclconfig="${withval}"
-fi
-
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for Tcl configuration" >&5
-$as_echo_n "checking for Tcl configuration... " >&6; }
-	if ${ac_cv_c_tclconfig+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-
-
-	    # First check to see if --with-tcl was specified.
-	    if test x"${with_tclconfig}" != x ; then
-		case "${with_tclconfig}" in
-		    */tclConfig.sh )
-			if test -f "${with_tclconfig}"; then
-			    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: --with-tcl argument should refer to directory containing tclConfig.sh, not to tclConfig.sh itself" >&5
-$as_echo "$as_me: WARNING: --with-tcl argument should refer to directory containing tclConfig.sh, not to tclConfig.sh itself" >&2;}
-			    with_tclconfig="`echo "${with_tclconfig}" | sed 's!/tclConfig\.sh$!!'`"
-			fi ;;
-		esac
-		if test -f "${with_tclconfig}/tclConfig.sh" ; then
-		    ac_cv_c_tclconfig="`(cd "${with_tclconfig}"; pwd)`"
-		else
-		    as_fn_error $? "${with_tclconfig} directory doesn't contain tclConfig.sh" "$LINENO" 5
-		fi
-	    fi
-
-	    # then check for a private Tcl installation
-	    if test x"${ac_cv_c_tclconfig}" = x ; then
-		for i in \
-			../tcl \
-			`ls -dr ../tcl[8-9].[0-9].[0-9]* 2>/dev/null` \
-			`ls -dr ../tcl[8-9].[0-9] 2>/dev/null` \
-			`ls -dr ../tcl[8-9].[0-9]* 2>/dev/null` \
-			../../tcl \
-			`ls -dr ../../tcl[8-9].[0-9].[0-9]* 2>/dev/null` \
-			`ls -dr ../../tcl[8-9].[0-9] 2>/dev/null` \
-			`ls -dr ../../tcl[8-9].[0-9]* 2>/dev/null` \
-			../../../tcl \
-			`ls -dr ../../../tcl[8-9].[0-9].[0-9]* 2>/dev/null` \
-			`ls -dr ../../../tcl[8-9].[0-9] 2>/dev/null` \
-			`ls -dr ../../../tcl[8-9].[0-9]* 2>/dev/null` ; do
-		    if test "${TEA_PLATFORM}" = "windows" \
-			    -a -f "$i/win/tclConfig.sh" ; then
-			ac_cv_c_tclconfig="`(cd $i/win; pwd)`"
-			break
-		    fi
-		    if test -f "$i/unix/tclConfig.sh" ; then
-			ac_cv_c_tclconfig="`(cd $i/unix; pwd)`"
-			break
-		    fi
-		done
-	    fi
-
-	    # on Darwin, check in Framework installation locations
-	    if test "`uname -s`" = "Darwin" -a x"${ac_cv_c_tclconfig}" = x ; then
-		for i in `ls -d ~/Library/Frameworks 2>/dev/null` \
-			`ls -d /Library/Frameworks 2>/dev/null` \
-			`ls -d /Network/Library/Frameworks 2>/dev/null` \
-			`ls -d /System/Library/Frameworks 2>/dev/null` \
-			`ls -d /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Library/Frameworks/Tcl.framework 2>/dev/null` \
-			`ls -d /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Network/Library/Frameworks/Tcl.framework 2>/dev/null` \
-			`ls -d /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Tcl.framework 2>/dev/null` \
-			; do
-		    if test -f "$i/Tcl.framework/tclConfig.sh" ; then
-			ac_cv_c_tclconfig="`(cd $i/Tcl.framework; pwd)`"
-			break
-		    fi
-		done
-	    fi
-
-	    # TEA specific: on Windows, check in common installation locations
-	    if test "${TEA_PLATFORM}" = "windows" \
-		-a x"${ac_cv_c_tclconfig}" = x ; then
-		for i in `ls -d C:/Tcl/lib 2>/dev/null` \
-			`ls -d C:/Progra~1/Tcl/lib 2>/dev/null` \
-			; do
-		    if test -f "$i/tclConfig.sh" ; then
-			ac_cv_c_tclconfig="`(cd $i; pwd)`"
-			break
-		    fi
-		done
-	    fi
-
-	    # check in a few common install locations
-	    if test x"${ac_cv_c_tclconfig}" = x ; then
-		for i in `ls -d ${libdir} 2>/dev/null` \
-			`ls -d ${exec_prefix}/lib 2>/dev/null` \
-			`ls -d ${prefix}/lib 2>/dev/null` \
-			`ls -d /usr/local/lib 2>/dev/null` \
-			`ls -d /usr/contrib/lib 2>/dev/null` \
-			`ls -d /usr/pkg/lib 2>/dev/null` \
-			`ls -d /usr/lib 2>/dev/null` \
-			`ls -d /usr/lib64 2>/dev/null` \
-			`ls -d /usr/lib/tcl8.6 2>/dev/null` \
-			`ls -d /usr/lib/tcl8.5 2>/dev/null` \
-			`ls -d /usr/local/lib/tcl8.6 2>/dev/null` \
-			`ls -d /usr/local/lib/tcl8.5 2>/dev/null` \
-			`ls -d /usr/local/lib/tcl/tcl8.6 2>/dev/null` \
-			`ls -d /usr/local/lib/tcl/tcl8.5 2>/dev/null` \
-			; do
-		    if test -f "$i/tclConfig.sh" ; then
-			ac_cv_c_tclconfig="`(cd $i; pwd)`"
-			break
-		    fi
-		done
-	    fi
-
-	    # check in a few other private locations
-	    if test x"${ac_cv_c_tclconfig}" = x ; then
-		for i in \
-			${srcdir}/../tcl \
-			`ls -dr ${srcdir}/../tcl[8-9].[0-9].[0-9]* 2>/dev/null` \
-			`ls -dr ${srcdir}/../tcl[8-9].[0-9] 2>/dev/null` \
-			`ls -dr ${srcdir}/../tcl[8-9].[0-9]* 2>/dev/null` ; do
-		    if test "${TEA_PLATFORM}" = "windows" \
-			    -a -f "$i/win/tclConfig.sh" ; then
-			ac_cv_c_tclconfig="`(cd $i/win; pwd)`"
-			break
-		    fi
-		    if test -f "$i/unix/tclConfig.sh" ; then
-			ac_cv_c_tclconfig="`(cd $i/unix; pwd)`"
-			break
-		    fi
-		done
-	    fi
-
-fi
-
-
-	if test x"${ac_cv_c_tclconfig}" = x ; then
-	    TCL_BIN_DIR="# no Tcl configs found"
-	    as_fn_error $? "Can't find Tcl configuration definitions. Use --with-tcl to specify a directory containing tclConfig.sh" "$LINENO" 5
-	else
-	    no_tcl=
-	    TCL_BIN_DIR="${ac_cv_c_tclconfig}"
-	    { $as_echo "$as_me:${as_lineno-$LINENO}: result: found ${TCL_BIN_DIR}/tclConfig.sh" >&5
-$as_echo "found ${TCL_BIN_DIR}/tclConfig.sh" >&6; }
-	fi
-    fi
 
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -3252,6 +2898,548 @@ ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
+
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking which source of entropy to use" >&5
+$as_echo "$as_me: checking which source of entropy to use" >&6;}
+
+# Check whether --with-entropy was given.
+if test "${with_entropy+set}" = set; then :
+  withval=$with_entropy;
+else
+  with_entropy=auto
+fi
+
+
+        case $with_entropy in
+            no)
+
+$as_echo "#define XML_POOR_ENTROPY 1" >>confdefs.h
+
+            ;;
+            auto)
+                { $as_echo "$as_me:${as_lineno-$LINENO}: checking for arc4random_buf (BSD or libbsd)" >&5
+$as_echo_n "checking for arc4random_buf (BSD or libbsd)... " >&6; }
+                cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+                  #include <stdlib.h>  /* for arc4random_buf on BSD, for NULL */
+                  #if defined(HAVE_LIBBSD)
+                  # include <bsd/stdlib.h>
+                  #endif
+                  int main() {
+                    arc4random_buf(NULL, 0U);
+                    return 0;
+                  }
+
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+
+
+$as_echo "#define HAVE_ARC4RANDOM_BUF 1" >>confdefs.h
+
+                    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+else
+
+                    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+                    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for arc4random (BSD, macOS or libbsd)" >&5
+$as_echo_n "checking for arc4random (BSD, macOS or libbsd)... " >&6; }
+                    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+                      #if defined(HAVE_LIBBSD)
+                      # include <bsd/stdlib.h>
+                      #else
+                      # include <stdlib.h>
+                      #endif
+                      int main() {
+                          arc4random();
+                          return 0;
+                      }
+
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+
+
+$as_echo "#define HAVE_ARC4RANDOM 1" >>confdefs.h
+
+                        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+else
+
+                        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+
+                { $as_echo "$as_me:${as_lineno-$LINENO}: checking for getrandom (Linux 3.17+, glibc 2.25+)" >&5
+$as_echo_n "checking for getrandom (Linux 3.17+, glibc 2.25+)... " >&6; }
+                cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+                  #include <stdlib.h>  /* for NULL */
+                  #include <sys/random.h>
+                  int main() {
+                    return getrandom(NULL, 0U, 0U);
+                  }
+
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+
+
+$as_echo "#define HAVE_GETRANDOM 1" >>confdefs.h
+
+                    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+else
+
+                    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+                    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for syscall SYS_getrandom (Linux 3.17+)" >&5
+$as_echo_n "checking for syscall SYS_getrandom (Linux 3.17+)... " >&6; }
+                    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+                      #include <stdlib.h>  /* for NULL */
+                      #include <unistd.h>  /* for syscall */
+                      #include <sys/syscall.h>  /* for SYS_getrandom */
+                      int main() {
+                        syscall(SYS_getrandom, NULL, 0, 0);
+                        return 0;
+                      }
+
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+
+
+$as_echo "#define HAVE_SYSCALL_GETRANDOM 1" >>confdefs.h
+
+                        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+else
+
+                        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+$as_echo "#define XML_DEV_URANDOM 1" >>confdefs.h
+
+
+$as_echo "#define XML_POOR_ENTROPY 1" >>confdefs.h
+
+            ;;
+            HAVE_GETRANDOM)
+
+$as_echo "#define HAVE_GETRANDOM 1" >>confdefs.h
+
+            ;;
+            HAVE_SYSCALL_GETRANDOM)
+
+$as_echo "#define HAVE_SYSCALL_GETRANDOM 1" >>confdefs.h
+
+            ;;
+            HAVE_ARC4RANDOM_BUF)
+
+$as_echo "#define HAVE_ARC4RANDOM_BUF 1" >>confdefs.h
+
+            ;;
+            HAVE_ARC4RANDOM)
+
+$as_echo "#define HAVE_ARC4RANDOM 1" >>confdefs.h
+
+            ;;
+            XML_DEV_URANDOM)
+
+$as_echo "#define XML_DEV_URANDOM 1" >>confdefs.h
+
+            ;;
+            XML_POOR_ENTROPY)
+
+$as_echo "#define XML_POOR_ENTROPY 1" >>confdefs.h
+
+            ;;
+            *)
+                as_fn_error $? "${with_entropy} not known." "$LINENO" 5
+        esac
+
+
+#--------------------------------------------------------------------
+# Call TEA_INIT as the first TEA_ macro to set up initial vars.
+# This will define a ${TEA_PLATFORM} variable == "unix" or "windows"
+# as well as PKG_LIB_FILE and PKG_STUB_LIB_FILE.
+#--------------------------------------------------------------------
+
+
+    TEA_VERSION="3.13"
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking TEA configuration" >&5
+$as_echo_n "checking TEA configuration... " >&6; }
+    if test x"${PACKAGE_NAME}" = x ; then
+	as_fn_error $? "
+The PACKAGE_NAME variable must be defined by your TEA configure.ac" "$LINENO" 5
+    fi
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: ok (TEA ${TEA_VERSION})" >&5
+$as_echo "ok (TEA ${TEA_VERSION})" >&6; }
+
+    # If the user did not set CFLAGS, set it now to keep macros
+    # like AC_PROG_CC and AC_TRY_COMPILE from adding "-g -O2".
+    if test "${CFLAGS+set}" != "set" ; then
+	CFLAGS=""
+    fi
+
+    case "`uname -s`" in
+	*win32*|*WIN32*|*MINGW32_*|*MINGW64_*)
+	    # Extract the first word of "cygpath", so it can be a program name with args.
+set dummy cygpath; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_prog_CYGPATH+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$CYGPATH"; then
+  ac_cv_prog_CYGPATH="$CYGPATH" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_CYGPATH="cygpath -m"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  test -z "$ac_cv_prog_CYGPATH" && ac_cv_prog_CYGPATH="echo"
+fi
+fi
+CYGPATH=$ac_cv_prog_CYGPATH
+if test -n "$CYGPATH"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CYGPATH" >&5
+$as_echo "$CYGPATH" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+	    EXEEXT=".exe"
+	    TEA_PLATFORM="windows"
+	    ;;
+	*CYGWIN_*)
+	    EXEEXT=".exe"
+	    # CYGPATH and TEA_PLATFORM are determined later in LOAD_TCLCONFIG
+	    ;;
+	*)
+	    CYGPATH=echo
+	    # Maybe we are cross-compiling....
+	    case ${host_alias} in
+		*mingw32*)
+		EXEEXT=".exe"
+		TEA_PLATFORM="windows"
+		;;
+	    *)
+		EXEEXT=""
+		TEA_PLATFORM="unix"
+		;;
+	    esac
+	    ;;
+    esac
+
+    # Check if exec_prefix is set. If not use fall back to prefix.
+    # Note when adjusted, so that TEA_PREFIX can correct for this.
+    # This is needed for recursive configures, since autoconf propagates
+    # $prefix, but not $exec_prefix (doh!).
+    if test x$exec_prefix = xNONE ; then
+	exec_prefix_default=yes
+	exec_prefix=$prefix
+    fi
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: configuring ${PACKAGE_NAME} ${PACKAGE_VERSION}" >&5
+$as_echo "$as_me: configuring ${PACKAGE_NAME} ${PACKAGE_VERSION}" >&6;}
+
+
+
+
+    # This package name must be replaced statically for AC_SUBST to work
+
+    # Substitute STUB_LIB_FILE in case package creates a stub library too.
+
+
+    # We AC_SUBST these here to ensure they are subst'ed,
+    # in case the user doesn't call TEA_ADD_...
+
+
+
+
+
+
+
+
+    # Configure the installer.
+
+    INSTALL='$(SHELL) $(srcdir)/tclconfig/install-sh -c'
+    INSTALL_DATA_DIR='${INSTALL} -d -m 755'
+    INSTALL_DATA='${INSTALL} -m 644'
+    INSTALL_PROGRAM='${INSTALL} -m 755'
+    INSTALL_SCRIPT='${INSTALL} -m 755'
+
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking system version" >&5
+$as_echo_n "checking system version... " >&6; }
+if ${tcl_cv_sys_version+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+	# TEA specific:
+	if test "${TEA_PLATFORM}" = "windows" ; then
+	    tcl_cv_sys_version=windows
+	else
+	    tcl_cv_sys_version=`uname -s`-`uname -r`
+	    if test "$?" -ne 0 ; then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: can't find uname command" >&5
+$as_echo "$as_me: WARNING: can't find uname command" >&2;}
+		tcl_cv_sys_version=unknown
+	    else
+		if test "`uname -s`" = "AIX" ; then
+		    tcl_cv_sys_version=AIX-`uname -v`.`uname -r`
+		fi
+	    fi
+	fi
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $tcl_cv_sys_version" >&5
+$as_echo "$tcl_cv_sys_version" >&6; }
+    system=$tcl_cv_sys_version
+
+    case $system in
+	HP-UX-*) INSTALL_LIBRARY='${INSTALL} -m 755' ;;
+	      *) INSTALL_LIBRARY='${INSTALL} -m 644' ;;
+    esac
+
+
+
+
+
+
+
+
+
+
+ac_aux_dir=
+for ac_dir in tclconfig "$srcdir"/tclconfig; do
+  if test -f "$ac_dir/install-sh"; then
+    ac_aux_dir=$ac_dir
+    ac_install_sh="$ac_aux_dir/install-sh -c"
+    break
+  elif test -f "$ac_dir/install.sh"; then
+    ac_aux_dir=$ac_dir
+    ac_install_sh="$ac_aux_dir/install.sh -c"
+    break
+  elif test -f "$ac_dir/shtool"; then
+    ac_aux_dir=$ac_dir
+    ac_install_sh="$ac_aux_dir/shtool install -c"
+    break
+  fi
+done
+if test -z "$ac_aux_dir"; then
+  as_fn_error $? "cannot find install-sh, install.sh, or shtool in tclconfig \"$srcdir\"/tclconfig" "$LINENO" 5
+fi
+
+# These three variables are undocumented and unsupported,
+# and are intended to be withdrawn in a future Autoconf release.
+# They can cause serious problems if a builder's source tree is in a directory
+# whose full name contains unusual characters.
+ac_config_guess="$SHELL $ac_aux_dir/config.guess"  # Please don't use this var.
+ac_config_sub="$SHELL $ac_aux_dir/config.sub"  # Please don't use this var.
+ac_configure="$SHELL $ac_aux_dir/configure"  # Please don't use this var.
+
+
+
+#--------------------------------------------------------------------
+# Load the tclConfig.sh file
+#--------------------------------------------------------------------
+
+
+
+    #
+    # Ok, lets find the tcl configuration
+    # First, look for one uninstalled.
+    # the alternative search directory is invoked by --with-tcl
+    #
+
+    if test x"${no_tcl}" = x ; then
+	# we reset no_tcl in case something fails here
+	no_tcl=true
+
+# Check whether --with-tcl was given.
+if test "${with_tcl+set}" = set; then :
+  withval=$with_tcl; with_tclconfig="${withval}"
+fi
+
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for Tcl configuration" >&5
+$as_echo_n "checking for Tcl configuration... " >&6; }
+	if ${ac_cv_c_tclconfig+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+
+	    # First check to see if --with-tcl was specified.
+	    if test x"${with_tclconfig}" != x ; then
+		case "${with_tclconfig}" in
+		    */tclConfig.sh )
+			if test -f "${with_tclconfig}"; then
+			    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: --with-tcl argument should refer to directory containing tclConfig.sh, not to tclConfig.sh itself" >&5
+$as_echo "$as_me: WARNING: --with-tcl argument should refer to directory containing tclConfig.sh, not to tclConfig.sh itself" >&2;}
+			    with_tclconfig="`echo "${with_tclconfig}" | sed 's!/tclConfig\.sh$!!'`"
+			fi ;;
+		esac
+		if test -f "${with_tclconfig}/tclConfig.sh" ; then
+		    ac_cv_c_tclconfig="`(cd "${with_tclconfig}"; pwd)`"
+		else
+		    as_fn_error $? "${with_tclconfig} directory doesn't contain tclConfig.sh" "$LINENO" 5
+		fi
+	    fi
+
+	    # then check for a private Tcl installation
+	    if test x"${ac_cv_c_tclconfig}" = x ; then
+		for i in \
+			../tcl \
+			`ls -dr ../tcl[8-9].[0-9].[0-9]* 2>/dev/null` \
+			`ls -dr ../tcl[8-9].[0-9] 2>/dev/null` \
+			`ls -dr ../tcl[8-9].[0-9]* 2>/dev/null` \
+			../../tcl \
+			`ls -dr ../../tcl[8-9].[0-9].[0-9]* 2>/dev/null` \
+			`ls -dr ../../tcl[8-9].[0-9] 2>/dev/null` \
+			`ls -dr ../../tcl[8-9].[0-9]* 2>/dev/null` \
+			../../../tcl \
+			`ls -dr ../../../tcl[8-9].[0-9].[0-9]* 2>/dev/null` \
+			`ls -dr ../../../tcl[8-9].[0-9] 2>/dev/null` \
+			`ls -dr ../../../tcl[8-9].[0-9]* 2>/dev/null` ; do
+		    if test "${TEA_PLATFORM}" = "windows" \
+			    -a -f "$i/win/tclConfig.sh" ; then
+			ac_cv_c_tclconfig="`(cd $i/win; pwd)`"
+			break
+		    fi
+		    if test -f "$i/unix/tclConfig.sh" ; then
+			ac_cv_c_tclconfig="`(cd $i/unix; pwd)`"
+			break
+		    fi
+		done
+	    fi
+
+	    # on Darwin, check in Framework installation locations
+	    if test "`uname -s`" = "Darwin" -a x"${ac_cv_c_tclconfig}" = x ; then
+		for i in `ls -d ~/Library/Frameworks 2>/dev/null` \
+			`ls -d /Library/Frameworks 2>/dev/null` \
+			`ls -d /Network/Library/Frameworks 2>/dev/null` \
+			`ls -d /System/Library/Frameworks 2>/dev/null` \
+			`ls -d /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Library/Frameworks/Tcl.framework 2>/dev/null` \
+			`ls -d /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Network/Library/Frameworks/Tcl.framework 2>/dev/null` \
+			`ls -d /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Tcl.framework 2>/dev/null` \
+			; do
+		    if test -f "$i/Tcl.framework/tclConfig.sh" ; then
+			ac_cv_c_tclconfig="`(cd $i/Tcl.framework; pwd)`"
+			break
+		    fi
+		done
+	    fi
+
+	    # TEA specific: on Windows, check in common installation locations
+	    if test "${TEA_PLATFORM}" = "windows" \
+		-a x"${ac_cv_c_tclconfig}" = x ; then
+		for i in `ls -d C:/Tcl/lib 2>/dev/null` \
+			`ls -d C:/Progra~1/Tcl/lib 2>/dev/null` \
+			; do
+		    if test -f "$i/tclConfig.sh" ; then
+			ac_cv_c_tclconfig="`(cd $i; pwd)`"
+			break
+		    fi
+		done
+	    fi
+
+	    # check in a few common install locations
+	    if test x"${ac_cv_c_tclconfig}" = x ; then
+		for i in `ls -d ${libdir} 2>/dev/null` \
+			`ls -d ${exec_prefix}/lib 2>/dev/null` \
+			`ls -d ${prefix}/lib 2>/dev/null` \
+			`ls -d /usr/local/lib 2>/dev/null` \
+			`ls -d /usr/contrib/lib 2>/dev/null` \
+			`ls -d /usr/pkg/lib 2>/dev/null` \
+			`ls -d /usr/lib 2>/dev/null` \
+			`ls -d /usr/lib64 2>/dev/null` \
+			`ls -d /usr/lib/tcl8.6 2>/dev/null` \
+			`ls -d /usr/lib/tcl8.5 2>/dev/null` \
+			`ls -d /usr/local/lib/tcl8.6 2>/dev/null` \
+			`ls -d /usr/local/lib/tcl8.5 2>/dev/null` \
+			`ls -d /usr/local/lib/tcl/tcl8.6 2>/dev/null` \
+			`ls -d /usr/local/lib/tcl/tcl8.5 2>/dev/null` \
+			; do
+		    if test -f "$i/tclConfig.sh" ; then
+			ac_cv_c_tclconfig="`(cd $i; pwd)`"
+			break
+		    fi
+		done
+	    fi
+
+	    # check in a few other private locations
+	    if test x"${ac_cv_c_tclconfig}" = x ; then
+		for i in \
+			${srcdir}/../tcl \
+			`ls -dr ${srcdir}/../tcl[8-9].[0-9].[0-9]* 2>/dev/null` \
+			`ls -dr ${srcdir}/../tcl[8-9].[0-9] 2>/dev/null` \
+			`ls -dr ${srcdir}/../tcl[8-9].[0-9]* 2>/dev/null` ; do
+		    if test "${TEA_PLATFORM}" = "windows" \
+			    -a -f "$i/win/tclConfig.sh" ; then
+			ac_cv_c_tclconfig="`(cd $i/win; pwd)`"
+			break
+		    fi
+		    if test -f "$i/unix/tclConfig.sh" ; then
+			ac_cv_c_tclconfig="`(cd $i/unix; pwd)`"
+			break
+		    fi
+		done
+	    fi
+
+fi
+
+
+	if test x"${ac_cv_c_tclconfig}" = x ; then
+	    TCL_BIN_DIR="# no Tcl configs found"
+	    as_fn_error $? "Can't find Tcl configuration definitions. Use --with-tcl to specify a directory containing tclConfig.sh" "$LINENO" 5
+	else
+	    no_tcl=
+	    TCL_BIN_DIR="${ac_cv_c_tclconfig}"
+	    { $as_echo "$as_me:${as_lineno-$LINENO}: result: found ${TCL_BIN_DIR}/tclConfig.sh" >&5
+$as_echo "found ${TCL_BIN_DIR}/tclConfig.sh" >&6; }
+	fi
+    fi
 
 
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for existence of ${TCL_BIN_DIR}/tclConfig.sh" >&5
@@ -4927,7 +5115,8 @@ $as_echo "Using bundled expat distribution" >&6; }
 
     vars="expat/xmlrole.c \
                          expat/xmltok.c \
-                         expat/xmlparse.c"
+                         expat/xmlparse.c \
+                         expat/loadlibrary.c"
     for i in $vars; do
 	case $i in
 	    \$*)
@@ -4967,6 +5156,9 @@ $as_echo "Using bundled expat distribution" >&6; }
 	PKG_INCLUDES="$PKG_INCLUDES $i"
     done
 
+
+
+$as_echo "#define XML_POOR_ENTROPY 1" >>confdefs.h
 
     else
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: Using shared expat found in ${ac_cv_c_expat}" >&5

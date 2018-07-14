@@ -369,13 +369,155 @@ AC_DEFUN(TDOM_PATH_EXPAT, [
         AC_MSG_RESULT([Using bundled expat distribution])
         TEA_ADD_SOURCES([expat/xmlrole.c \
                          expat/xmltok.c \
-                         expat/xmlparse.c])
+                         expat/xmlparse.c \
+                         expat/loadlibrary.c])
         TEA_ADD_INCLUDES([-I${srcdir}/expat])
+        AC_DEFINE([XML_POOR_ENTROPY], 1,
+          [Define to use poor entropy in lack of better source.])
     else
         AC_MSG_RESULT([Using shared expat found in ${ac_cv_c_expat}])
         TEA_ADD_INCLUDES(-I${ac_cv_c_expat}/include)
         TEA_ADD_LIBS([-lexpat])
     fi
+])
+
+#------------------------------------------------------------------------
+# TDOM_EXPAT_ENTROPY
+#
+#   Only useful if building with the included expat. Allows to
+#   determine the source of entropy used by the lib. If the argument
+#   is something else then the default "auto", this argument value
+#   will be a #define. Use XML_POOR_ENTROPY to fall back to the old
+#   expat hash table salting. The default is to determine the best
+#   available source and to use this.
+#
+# Arguments:
+#   none
+#
+# Results:
+#
+#   Adds the following arguments to configure:
+#       --with-entropy=...
+#
+#   Defines the following vars:
+#
+#   Sets the following vars:
+#
+#------------------------------------------------------------------------
+
+AC_DEFUN(TDOM_EXPAT_ENTROPY, [
+    AC_MSG_NOTICE([checking which source of entropy to use])
+    AC_ARG_WITH(entropy,
+        AC_HELP_STRING([--with-entropy],
+            [source of entropy to use]), , [with_entropy=auto])
+
+        case $with_entropy in
+            no) 
+                AC_DEFINE([XML_POOR_ENTROPY], 1,
+                          [Define to use poor entropy.])
+            ;;
+            auto)
+                AC_MSG_CHECKING([for arc4random_buf (BSD or libbsd)])
+                AC_LINK_IFELSE([AC_LANG_SOURCE([
+                  #include <stdlib.h>  /* for arc4random_buf on BSD, for NULL */
+                  #if defined(HAVE_LIBBSD)
+                  # include <bsd/stdlib.h>
+                  #endif
+                  int main() {
+                    arc4random_buf(NULL, 0U);
+                    return 0;
+                  }
+                ])], [
+                    AC_DEFINE([HAVE_ARC4RANDOM_BUF], [1],
+                        [`arc4random_buf' function.])
+                    AC_MSG_RESULT([yes])
+                ], [
+                    AC_MSG_RESULT([no])
+
+                    AC_MSG_CHECKING([for arc4random (BSD, macOS or libbsd)])
+                    AC_LINK_IFELSE([AC_LANG_SOURCE([
+                      #if defined(HAVE_LIBBSD)
+                      # include <bsd/stdlib.h>
+                      #else
+                      # include <stdlib.h>
+                      #endif
+                      int main() {
+                          arc4random();
+                          return 0;
+                      }
+                    ])], [
+                        AC_DEFINE([HAVE_ARC4RANDOM], [1],
+                            [`arc4random' function.])
+                        AC_MSG_RESULT([yes])
+                    ], [
+                        AC_MSG_RESULT([no])
+                    ])
+                ])
+
+
+                AC_MSG_CHECKING([for getrandom (Linux 3.17+, glibc 2.25+)])
+                AC_LINK_IFELSE([AC_LANG_SOURCE([
+                  #include <stdlib.h>  /* for NULL */
+                  #include <sys/random.h>
+                  int main() {
+                    return getrandom(NULL, 0U, 0U);
+                  }
+                ])], [
+                    AC_DEFINE([HAVE_GETRANDOM], [1],
+                        [`getrandom' function.])
+                    AC_MSG_RESULT([yes])
+                ], [
+                    AC_MSG_RESULT([no])
+
+                    AC_MSG_CHECKING([for syscall SYS_getrandom (Linux 3.17+)])
+                    AC_LINK_IFELSE([AC_LANG_SOURCE([
+                      #include <stdlib.h>  /* for NULL */
+                      #include <unistd.h>  /* for syscall */
+                      #include <sys/syscall.h>  /* for SYS_getrandom */
+                      int main() {
+                        syscall(SYS_getrandom, NULL, 0, 0);
+                        return 0;
+                      }
+                    ])], [
+                        AC_DEFINE([HAVE_SYSCALL_GETRANDOM], [1],
+                            [`syscall' and `SYS_getrandom'.])
+                        AC_MSG_RESULT([yes])
+                    ], [
+                        AC_MSG_RESULT([no])
+                    ])
+                ])
+                AC_DEFINE([XML_DEV_URANDOM], 1,
+                          [include code reading entropy from `/dev/urandom'.])
+                AC_DEFINE([XML_POOR_ENTROPY], 1,
+                          [Define to use poor entropy in lack of better source.])
+            ;;
+            HAVE_GETRANDOM)
+                AC_DEFINE([HAVE_GETRANDOM], 1,
+                          [Linux + glibc >=2.25])
+            ;;
+            HAVE_SYSCALL_GETRANDOM)
+                AC_DEFINE([HAVE_SYSCALL_GETRANDOM], 1,
+                          [Linux + glibc <2.25])
+            ;;
+            HAVE_ARC4RANDOM_BUF)
+                AC_DEFINE([HAVE_ARC4RANDOM_BUF], 1,
+                          [BSD / macOS >=10.7])
+            ;;
+            HAVE_ARC4RANDOM)
+                AC_DEFINE([HAVE_ARC4RANDOM], 1,
+                          [BSD / macOS <10.7])
+            ;;
+            XML_DEV_URANDOM)
+                AC_DEFINE([XML_DEV_URANDOM], 1,
+                          [Linux / BSD / macOS (/dev/urandom).])
+            ;;
+            XML_POOR_ENTROPY)
+                AC_DEFINE([XML_POOR_ENTROPY], 1,
+                          [Define to use poor entropy in lack of better source.])
+            ;;
+            *)
+                AC_MSG_ERROR([${with_entropy} not known.])
+        esac             
 ])
 
 #------------------------------------------------------------------------

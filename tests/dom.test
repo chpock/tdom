@@ -550,12 +550,7 @@ test dom-2.28 {parse document with undeclared xml prefix} {
     string range $errMsg 0 30
 } {Namespace prefix is not defined}
 
-# This is an expat bug. If XML_StopParser is called in the
-# elementstarthandler function for the document element and there
-# isn't anything else in the document than this document element, then
-# the XML_Parse() return code doesn't reflects this. This is an edge
-# case, see the next test below.
-test dom-2.29 {parse not well-formed document with undeclared xml prefix} {knownBug} {
+test dom-2.29 {parse not well-formed document with undeclared xml prefix} {
     catch {dom parse {<foo:e/>}} errMsg
     string range $errMsg 0 30
 } {Namespace prefix is not defined}
