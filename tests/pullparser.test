@@ -343,6 +343,42 @@ test pp-3.1.3 {skip} {
     set result
 } {START_TAG doc TEXT text START_TAG e END_TAG e TEXT text END_TAG doc END_DOCUMENT}
 
+test pp-3.1.4 {skip} {
+    tDOM::pullparser pp
+    pp input <doc></doc>
+    set result [pp next]
+    lappend result [pp tag]
+    lappend result [pp skip]
+    lappend result [pp tag]
+    lappend result [pp next]
+    pp delete
+    set result
+} {START_TAG doc END_TAG doc END_DOCUMENT}
+
+test pp-3.1.5 {skip} {
+    tDOM::pullparser pp
+    pp input {<doc> </doc>}
+    set result [pp next]
+    lappend result [pp tag]
+    lappend result [pp skip]
+    lappend result [pp tag]
+    lappend result [pp next]
+    pp delete
+    set result
+} {START_TAG doc END_TAG doc END_DOCUMENT}
+
+test pp-3.1.5 {skip} {
+    tDOM::pullparser pp -ignorewhitecdata
+    pp input {<doc> </doc>}
+    set result [pp next]
+    lappend result [pp tag]
+    lappend result [pp skip]
+    lappend result [pp tag]
+    lappend result [pp next]
+    pp delete
+    set result
+} {START_TAG doc END_TAG doc END_DOCUMENT}
+
 test pp-3.2 {skip} {
     tDOM::pullparser pp
     pp input {<doc><e/></doc>}
@@ -574,6 +610,43 @@ test pp-4.7 {find-element} {
 test pp-4.8 {find-element} {
     tDOM::pullparser pp
     pp input {<doc/>}
+    set result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp find-element b]
+    pp delete
+    set result
+} {START_TAG doc END_TAG doc END_DOCUMENT}
+
+test pp-4.8.1 {find-element} {
+    tDOM::pullparser pp
+    pp input {<doc></doc>}
+    set result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp find-element b]
+    pp delete
+    set result
+} {START_TAG doc END_TAG doc END_DOCUMENT}
+
+test pp-4.8.2 {find-element} {
+    tDOM::pullparser pp
+    pp input {<doc> </doc>}
+    set result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp find-element b]
+    pp delete
+    set result
+} {START_TAG doc TEXT END_TAG doc END_DOCUMENT}
+
+test pp-4.8.3 {find-element} {
+    tDOM::pullparser pp -ignorewhitecdata
+    pp input {<doc> </doc>}
     set result [pp next]
     lappend result [pp tag]
     lappend result [pp next]
