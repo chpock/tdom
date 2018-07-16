@@ -43,7 +43,8 @@ PRJ_OBJS = \
 	$(TMP_DIR)\tclpull.obj     \
 	$(TMP_DIR)\tdomStubInit.obj\
 	$(TMP_DIR)\tdomStubLib.obj \
-	$(TMP_DIR)\tdominit.obj
+	$(TMP_DIR)\tdominit.obj    \
+	$(TMP_DIR)\loadlibrary.obj
 
 PRJ_STUBOBJS = $(TMP_DIR)\tdomStubLib.obj
 

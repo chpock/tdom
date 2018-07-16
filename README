@@ -9,7 +9,7 @@ to Tcl/Tk called tDOM.
 
 tDOM contains:
 
-    *  for convenience expat 2.2.0, the XML parser originated from
+    *  for convenience expat 2.2.5, the XML parser originated from
        James Clark, although you're able to link tDOM with other
        expat versions or the library provided by the system.
 
@@ -108,6 +108,7 @@ REPORTING BUGS
     Please head to http://tdom.org/index.html/ticket and click on "New
     Ticket". Log in as anonymous and report your findings. If you
     prefer to have an individual login write Rolf a mail.
+
 
 HISTORY
 

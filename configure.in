@@ -8,6 +8,7 @@ dnl	to configure the system for the local environment.
 # need to modify this file are marked by the string __CHANGE__
 #-----------------------------------------------------------------------
 
+
 #-----------------------------------------------------------------------
 # __CHANGE__
 # Set your package name and version numbers here.
@@ -21,13 +22,15 @@ dnl	to configure the system for the local environment.
 
 AC_INIT([tdom], [0.9.1])
 
+TDOM_EXPAT_ENTROPY
+
 #--------------------------------------------------------------------
 # Call TEA_INIT as the first TEA_ macro to set up initial vars.
 # This will define a ${TEA_PLATFORM} variable == "unix" or "windows"
 # as well as PKG_LIB_FILE and PKG_STUB_LIB_FILE.
 #--------------------------------------------------------------------
 
-TEA_INIT([3.10])
+TEA_INIT([3.13])
 
 AC_CONFIG_AUX_DIR(tclconfig)
 
@@ -111,7 +114,7 @@ TEA_ADD_SOURCES([generic/xmlsimple.c \
                  generic/structure.c \
                  generic/tdomStubInit.c])
 TEA_ADD_HEADERS([generic/tdom.h])
-TEA_ADD_INCLUDES([-I${srcdir}/generic ${AOL_INCLUDES}])
+TEA_ADD_INCLUDES([-I${srcdir}/generic ${AOL_INCLUDES} ${HTML5_INCLUDES}])
 TEA_ADD_LIBS([${AOL_LIBS} ${HTML5_LIBS}])
 TEA_ADD_CFLAGS([])
 TEA_ADD_STUB_SOURCES([generic/tdomStubLib.c])

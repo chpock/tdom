@@ -9,13 +9,13 @@ package require tdom
 # installed. This code only ensures, that the tDOM script library gets
 # sourced, if the script is called with a tcldomsh out of the build
 # dir of a complete tDOM source installation.
-if {[info commands ::tDOM::xmlReadFile] == ""} {
+if {[info commands ::tdom::xmlReadFile] == ""} {
     # tcldomsh without the script library. Source the lib.
     source [file join [file dir [info script]] ../lib tdom.tcl]
 }
 
 # Import the tDOM helper procs
-namespace import tDOM::*
+namespace import tdom::*
 
 set catalogfile ""
 set loglevel 0

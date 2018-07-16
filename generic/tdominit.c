@@ -94,7 +94,7 @@ Tdom_Init (
 #endif
 
 #ifndef TDOM_NO_PULL
-    Tcl_CreateObjCommand(interp, "tDOM::pullparser", tDOM_PullParserCmd, NULL, NULL );    
+    Tcl_CreateObjCommand(interp, "tdom::pullparser", tDOM_PullParserCmd, NULL, NULL );    
 #endif
 
 #ifndef TDOM_NO_STRUCTURE

@@ -8,11 +8,11 @@
 </div><hr class="navsep">
 </div><div class="body">
   <h2><a name="SECTid0x11bc970">NAME</a></h2><p class="namesection">
-<b class="names">tDOM::pullparser - </b><br>Create an XML pull parser command</p>
+<b class="names">tdom::pullparser - </b><br>Create an XML pull parser command</p>
 
   <h2><a name="SECTid0x10a6540">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
-    <b class="cmd">tDOM::pullparser</b> <i class="m">cmdName</i>  ? -ignorewhitecdata ? 
+    <b class="cmd">tdom::pullparser</b> <i class="m">cmdName</i>  ? -ignorewhitecdata ? 
     </pre>
 
   <h2><a name="SECTid0x10bbbc0">DESCRIPTION </a></h2><p>This command creates XML pull parser commands with a simple
@@ -101,7 +101,7 @@
 
       
         <dt><b class="method">next</b></dt>
-        <dd>This method valid in state <i class="m">START_DOCUMENT</i>,
+        <dd>This method is valid in state <i class="m">START_DOCUMENT</i>,
         <i class="m">START_TAG</i>, <i class="m">END_TAG</i> and <i class="m">TEXT</i>. It continues
         parsing of the XML input until the next event, which it will
         return.</dd>

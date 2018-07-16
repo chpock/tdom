@@ -21,6 +21,8 @@
 |
 \---------------------------------------------------------------------------*/
 
+#ifndef TDOM_NO_PULL
+
 #include <tdom.h>
 #include <fcntl.h>
 #ifdef _MSC_VER
@@ -39,6 +41,13 @@
 
 #ifndef TDOM_EXPAT_READ_SIZE
 # define TDOM_EXPAT_READ_SIZE (1024*8)
+#endif
+
+/* For information about why this work-around for a certain expat
+ * version is necessary see
+ * https://github.com/libexpat/libexpat/issues/204 */
+#if (XML_MAJOR_VERSION == 2) && (XML_MINOR_VERSION == 2) && (XML_MICRO_VERSION == 5)
+# define EXPAT_RESUME_BUG
 #endif
 
 /* #define DEBUG */
@@ -89,10 +98,43 @@ typedef struct tDOM_PullParserInfo
     PullParseMode   mode;
     int             skipDepth;
     char           *findElement;
+#ifdef EXPAT_RESUME_BUG
+    long            elmStartCounter;
+#endif
 } tDOM_PullParserInfo;
 
 #define SetResult(str) Tcl_ResetResult(interp); \
                      Tcl_SetStringObj(Tcl_GetObjResult(interp), (str), -1)
+
+DBG(
+static void
+printParserState (
+    XML_Parser parser
+    )
+{
+    XML_ParsingStatus pstatus;
+    
+    XML_GetParsingStatus (parser, &pstatus);
+    switch (pstatus.parsing) {
+    case XML_INITIALIZED:
+        fprintf (stderr, "parser status: XML_INITIALIZED\n");
+        break;
+    case XML_PARSING:
+        fprintf (stderr, "parser status: XML_PARSING\n");
+        break;
+    case XML_FINISHED:
+        fprintf (stderr, "parser status: XML_FINISHED\n");
+        break;
+    case XML_SUSPENDED:
+        fprintf (stderr, "parser status: XML_SUSPENDED\n");
+        break;
+    default:
+        fprintf (stderr, "unexpected parser status: %d\n",
+                 pstatus.parsing);
+        break;
+    }
+}
+)
 
 static void
 characterDataHandler (
@@ -156,16 +198,26 @@ endElement (
     }
 
     if (reportStartTag && reportText) {
+        /* This happens if in mixed content an empty element written
+         * with the empty element syntax (<foo/>) follows text. */
         DBG(fprintf(stderr, "schedule 2 events\n"));
         pullInfo->state = PULLPARSERSTATE_TEXT;
         pullInfo->nextState= PULLPARSERSTATE_START_TAG;
         pullInfo->next2State = PULLPARSERSTATE_END_TAG;
     } else if (reportStartTag) {
-        DBG(fprintf(stderr, "schedule 1 event\n"));
+        /* This happens if not in mixed content and the parser saw an
+         * empty element written with the empty element syntax. */
+        DBG(fprintf(stderr, "schedule 1 event (reportStartTag)\n"));
         pullInfo->state = PULLPARSERSTATE_START_TAG;
         pullInfo->nextState = PULLPARSERSTATE_END_TAG;
+#ifdef EXPAT_RESUME_BUG
+        DBG(fprintf(stderr, "EXPAT_RESUME_BUG\n"));
+        if (pullInfo->elmStartCounter == 1) {
+            pullInfo->next2State = PULLPARSERSTATE_END_DOCUMENT;
+        }
+#endif        
     } else if (reportText) {
-        DBG(fprintf(stderr, "schedule 1 event\n"));
+        DBG(fprintf(stderr, "schedule 1 event (reportText)\n"));
         pullInfo->state = PULLPARSERSTATE_TEXT;
         pullInfo->nextState = PULLPARSERSTATE_END_TAG;
     } else {
@@ -199,8 +251,13 @@ startElement(
     
     DBG(fprintf(stderr, "startElement tag %s\n", name));
 
+#ifdef EXPAT_RESUME_BUG
+    pullInfo->elmStartCounter++;
+#endif
+
     switch (pullInfo->mode) {
     case PULLPARSEMODE_SKIP:
+        DBG(fprintf (stderr, "PULLPARSEMODE_SKIP\n"));
         pullInfo->skipDepth++;
         return;
     case PULLPARSEMODE_FIND:
@@ -340,6 +397,7 @@ tDOM_resumeParseing (
     int len, done, result;
     char *data;
     
+
     switch (XML_ResumeParser (pullInfo->parser)) {
     case XML_STATUS_OK:
         if (pullInfo->inputString) {
@@ -586,9 +644,11 @@ tDOM_PullParserInstanceCmd (
                 }
                 break;
             default:
+                DBG (printParserState(pullInfo->parser));
                 if (tDOM_resumeParseing (interp, pullInfo) != TCL_OK) {
                     return TCL_ERROR;
                 }
+                DBG (printParserState(pullInfo->parser));
                 break;
             }
         }
@@ -680,7 +740,15 @@ tDOM_PullParserInstanceCmd (
         if (pullInfo->nextState == PULLPARSERSTATE_END_TAG
             || pullInfo->next2State == PULLPARSERSTATE_END_TAG) {
             pullInfo->state = PULLPARSERSTATE_END_TAG;
+#ifdef EXPAT_RESUME_BUG
+            if (pullInfo->next2State == PULLPARSERSTATE_END_DOCUMENT) {
+                pullInfo->nextState = PULLPARSERSTATE_END_DOCUMENT;
+            } else {
+                pullInfo->nextState = 0;
+            }
+#else            
             pullInfo->nextState = 0;
+#endif            
             pullInfo->next2State = 0;
             Tcl_DStringSetLength (pullInfo->cdata, 0);
             Tcl_SetObjResult (interp, pullInfo->end_tag);
@@ -708,6 +776,14 @@ tDOM_PullParserInstanceCmd (
                       "START_DOCUMENT, START_TAG and END_TAG.");
             return TCL_ERROR;
         }
+#ifdef EXPAT_RESUME_BUG
+        if (pullInfo->state == PULLPARSERSTATE_END_TAG
+            && pullInfo->nextState == PULLPARSERSTATE_END_DOCUMENT) {
+            pullInfo->state = PULLPARSERSTATE_END_DOCUMENT;
+            SetResult ("END_DOCUMENT");
+            break;
+        }
+#endif
         pullInfo->mode = PULLPARSEMODE_FIND;
         /* As long as we don't evalute any tcl script code during a
          * pull parser method call this should be secure. */
@@ -857,7 +933,10 @@ tDOM_PullParserCmd (
     pullInfo->elmCache = (Tcl_HashTable *)MALLOC(sizeof (Tcl_HashTable));
     Tcl_InitHashTable(pullInfo->elmCache, TCL_STRING_KEYS);
     pullInfo->mode = PULLPARSEMODE_NORMAL;
-        
+#ifdef EXPAT_RESUME_BUG
+    pullInfo->elmStartCounter = 0;
+#endif
+    
     Tcl_CreateObjCommand (interp, Tcl_GetString(objv[1]),
                           tDOM_PullParserInstanceCmd, (ClientData) pullInfo,
                           tDOM_PullParserDeleteCmd);
@@ -865,3 +944,4 @@ tDOM_PullParserCmd (
     return TCL_OK;
 }
 
+#endif /* ifndef TDOM_NO_PULL */
