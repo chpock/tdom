@@ -1,3 +1,14 @@
+2018-07-16  Rolf Ade  <rolf@pointsman.de>
+
+        The package name is tDOM, but it always has been requested by
+        [package require tdom] and now the scripted helper commands in
+        tdom.tcl are also in the namespace tdom (not anymore in tDOM).
+        The new pullparser command is now also in this namespace.
+        There are aliases from the old command names to the new one,
+        so there must be nothing done; old scripts will run as they
+        did. It's just, that you in new code don't have to write
+        serveral upcase letters in a row because of tDOM.
+
 2018-07-14  Rolf Ade  <rolf@pointsman.de>
 
         Updated to expat 2.2.5. Expat now want to use a "good" entropy

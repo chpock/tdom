@@ -160,12 +160,12 @@ Database Class:	\\fB\\$3\\fR
 .TH pullparser n "" Tcl ""
 .BS
 .SH NAME
-tDOM::pullparser \- Create an XML pull parser command
+tdom::pullparser \- Create an XML pull parser command
 .SH SYNOPSIS
 .nf
 package require tdom
 
-    \fBtDOM::pullparser\fP \fIcmdName\fR  \fR?\fP -ignorewhitecdata \fR?\fP 
+    \fBtdom::pullparser\fP \fIcmdName\fR  \fR?\fP -ignorewhitecdata \fR?\fP 
     
 .fi
 .BE

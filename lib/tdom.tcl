@@ -51,11 +51,12 @@ namespace eval ::dom {
     }
 }
 
-namespace eval ::tDOM { 
+namespace eval ::tdom { 
     variable extRefHandlerDebug 0
     variable useForeignDTD ""
 
-    namespace export xmlOpenFile xmlReadFile extRefHandler baseURL
+    namespace export xmlOpenFile xmlReadFile xmlReadFileForSimple \
+        extRefHandler baseURL
 }
 
 #----------------------------------------------------------------------------
@@ -640,7 +641,7 @@ proc ::dom::xpathFunc::system-property { ctxNode pos
 # 
 # Just add more mappings (and mail them to the tDOM mailing list, please).
 
-proc tDOM::IANAEncoding2TclEncoding {IANAName} {
+proc tdom::IANAEncoding2TclEncoding {IANAName} {
     
     # First the most widespread encodings with there
     # preferred MIME name, to speed lookup in this
@@ -738,7 +739,7 @@ proc tDOM::IANAEncoding2TclEncoding {IANAName} {
 #   xmlOpenFileWorker
 #
 #----------------------------------------------------------------------------
-proc tDOM::xmlOpenFileWorker {filename {encodingString {}} {forSimple 0} {forRead 0}} {
+proc tdom::xmlOpenFileWorker {filename {encodingString {}} {forSimple 0} {forRead 0}} {
 
     # This partly (mis-)use the encoding of a channel handed to [dom
     # parse -channel ..] as a marker: if the channel encoding is utf-8
@@ -874,7 +875,7 @@ proc tDOM::xmlOpenFileWorker {filename {encodingString {}} {forSimple 0} {forRea
 #   xmlOpenFile
 #
 #----------------------------------------------------------------------------
-proc tDOM::xmlOpenFile {filename {encodingString {}}} {
+proc tdom::xmlOpenFile {filename {encodingString {}}} {
 
     if {$encodingString != {}} {
         upvar $encodingString encString
@@ -888,7 +889,7 @@ proc tDOM::xmlOpenFile {filename {encodingString {}}} {
 #   xmlReadFile
 #
 #----------------------------------------------------------------------------
-proc tDOM::xmlReadFile {filename {encodingString {}}} {
+proc tdom::xmlReadFile {filename {encodingString {}}} {
 
     if {$encodingString != {}} {
         upvar $encodingString encString
@@ -904,7 +905,7 @@ proc tDOM::xmlReadFile {filename {encodingString {}}} {
 #   xmlReadFileForSimple
 #
 #----------------------------------------------------------------------------
-proc tDOM::xmlReadFileForSimple {filename {encodingString {}}} {
+proc tdom::xmlReadFileForSimple {filename {encodingString {}}} {
 
     if {$encodingString != {}} {
         upvar $encodingString encString
@@ -925,12 +926,12 @@ proc tDOM::xmlReadFileForSimple {filename {encodingString {}}} {
 #----------------------------------------------------------------------------
 
 if {![catch {package require uri}]} {
-    proc tDOM::extRefHandler {base systemId publicId} {
+    proc tdom::extRefHandler {base systemId publicId} {
         variable extRefHandlerDebug
         variable useForeignDTD
 
         if {$extRefHandlerDebug} {
-            puts stderr "tDOM::extRefHandler called with:"
+            puts stderr "tdom::extRefHandler called with:"
             puts stderr "\tbase:     '$base'"
             puts stderr "\tsystemId: '$systemId'"
             puts stderr "\tpublicId: '$publicId'"
@@ -939,7 +940,7 @@ if {![catch {package require uri}]} {
             if {$useForeignDTD != ""} {
                 set systemId $useForeignDTD
             } else {
-                error "::tDOM::useForeignDTD does\
+                error "::tdom::useForeignDTD does\
                         not point to the foreign DTD"
             }
         }
@@ -964,7 +965,7 @@ if {![catch {package require uri}]} {
 #
 #----------------------------------------------------------------------------
 
-proc tDOM::baseURL {path} {
+proc tdom::baseURL {path} {
     switch [file pathtype $path] {
         "relative" {
             return "file://[pwd]/$path"
@@ -973,6 +974,24 @@ proc tDOM::baseURL {path} {
             return "file://$path"
         }
     }
+}
+
+namespace eval ::tDOM { 
+    variable extRefHandlerDebug 0
+    variable useForeignDTD ""
+
+    namespace export xmlOpenFile xmlReadFile xmlReadFileForSimple \
+        extRefHandler baseURL
+}
+
+foreach cmd {
+    xmlOpenFile
+    xmlReadFile
+    xmlReadFileForSimple
+    extRefHandler
+    baseURL
+} {
+    interp alias {} tDOM::$cmd {} tdom::$cmd
 }
 
 # EOF

@@ -38,7 +38,7 @@
 source [file join [file dir [info script]] loadtdom.tcl]
 
 test domDoc-1.1 {asXML -escapeNonASCII} {need_i18n} {
-    set doc [dom parse [tDOM::xmlReadFile \
+    set doc [dom parse [tdom::xmlReadFile \
             [file join [file dir [info script]] data/i18n_1.xml]]]
     set result [$doc asXML -escapeNonASCII]
     $doc delete
@@ -47,7 +47,7 @@ test domDoc-1.1 {asXML -escapeNonASCII} {need_i18n} {
 }
 
 test domDoc-1.2 {asXML -escapeNonASCII; comments and PI's are not altered} {need_i18n} {
-    set doc [dom parse [tDOM::xmlReadFile \
+    set doc [dom parse [tdom::xmlReadFile \
             [file join [file dir [info script]] data/i18n_2.xml]]]
     set result [$doc asXML -indent none -escapeNonASCII]
     $doc delete

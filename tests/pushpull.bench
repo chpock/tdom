@@ -1,7 +1,7 @@
 # -*- tcl -*-
 #
 # This file contains a number of benchmarks for push (expat) and pull
-# (tDOM::pullparser) parser.
+# (tdom::pullparser) parser.
 #
 # (c) 2018 Rolf Ade <rolf@pointsman.de>
 #
@@ -104,7 +104,7 @@ bench -desc "push/tricky mondial-europe.xml" -iters 5 -body {
     pushparserTricky free
 }
 
-tDOM::pullparser pullparser
+tdom::pullparser pullparser
 
 bench -desc "pull mondial-europe.xml" -iters 5 -body {
     pullparser inputfile ../tests/data/mondial-europe.xml

@@ -1,13 +1,13 @@
 <manpage id="pullparser" cat="pullparser" title="pullparser">
   <namesection>
-    <name>tDOM::pullparser</name>
+    <name>tdom::pullparser</name>
     <desc>Create an XML pull parser command</desc>
   </namesection>
 
   <synopsis>
     <syntax>package require tdom
 
-    <cmd>tDOM::pullparser</cmd> <m>cmdName</m> <o>-ignorewhitecdata</o>
+    <cmd>tdom::pullparser</cmd> <m>cmdName</m> <o>-ignorewhitecdata</o>
     </syntax>
   </synopsis>
 
