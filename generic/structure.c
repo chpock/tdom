@@ -298,7 +298,7 @@ structureInstanceCmd (
         pattern = initStructurePattern ();
         Tcl_SetHashValue (entryPtr, pattern);
         structureInfo->currentPattern = pattern;
-        result = Tcl_VarEval (interp, "namespace eval ::tDOM::structure {",
+        result = Tcl_VarEval (interp, "namespace eval ::tdom::structure {",
                               Tcl_GetString (objv[3]), "}", NULL);
         SETASI(0);
         break;
@@ -638,27 +638,27 @@ tDOM_StructureInit (
     Tcl_Interp *interp
     )
 {
-    Tcl_CreateObjCommand (interp, "tDOM::structure::empty",
+    Tcl_CreateObjCommand (interp, "tdom::structure::empty",
                           EmptyPatternObjCmd, NULL, NULL);
-    Tcl_CreateObjCommand (interp, "tDOM::structure::any",
+    Tcl_CreateObjCommand (interp, "tdom::structure::any",
                           AnyPatternObjCmd, NULL, NULL);
-    Tcl_CreateObjCommand (interp, "tDOM::structure::mixed",
+    Tcl_CreateObjCommand (interp, "tdom::structure::mixed",
                           MixedPatternObjCmd, NULL, NULL);
-    Tcl_CreateObjCommand (interp, "tDOM::structure::element",
+    Tcl_CreateObjCommand (interp, "tdom::structure::element",
                           ElementPatternObjCmd, NULL, NULL);
-    Tcl_CreateObjCommand (interp, "tDOM::structure::choice",
+    Tcl_CreateObjCommand (interp, "tdom::structure::choice",
                           ChoicePatternObjCmd, NULL, NULL);
-    Tcl_CreateObjCommand (interp, "tDOM::structure::seq",
+    Tcl_CreateObjCommand (interp, "tdom::structure::seq",
                           SeqPatternObjCmd, NULL, NULL);
-    Tcl_CreateObjCommand (interp, "tDOM::structure::interleave",
+    Tcl_CreateObjCommand (interp, "tdom::structure::interleave",
                           InterleavePatternObjCmd, NULL, NULL);
-    Tcl_CreateObjCommand (interp, "tDOM::structure::group",
+    Tcl_CreateObjCommand (interp, "tdom::structure::group",
                           GroupPatternObjCmd, NULL, NULL);
-    Tcl_CreateObjCommand (interp, "tDOM::structure::attribute",
+    Tcl_CreateObjCommand (interp, "tdom::structure::attribute",
                           AttributePatternObjCmd, NULL, NULL);
-    Tcl_CreateObjCommand (interp, "tDOM::structure::namespace",
+    Tcl_CreateObjCommand (interp, "tdom::structure::namespace",
                           NamespacePatternObjCmd, NULL, NULL);
-    Tcl_CreateObjCommand (interp, "tDOM::structure::ref",
+    Tcl_CreateObjCommand (interp, "tdom::structure::ref",
                           RefPatternObjCmd, NULL, NULL);
 }
 
