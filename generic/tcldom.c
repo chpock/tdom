@@ -622,7 +622,7 @@ SetTdomNodeFromAny(
             return TCL_ERROR;
         }
     }
-    if (sscanf(&nodeName[7], "%p%1c", &node, &eolcheck) != 1) {
+    if (sscanf(&nodeName[7], "%p%1c", (void **)&node, &eolcheck) != 1) {
         if (!Tcl_GetCommandInfo(interp, nodeName, &cmdInfo)) {
             if (interp) {
                 SetResult3("Parameter \"", nodeName, "\" is not a domNode.");
@@ -1095,7 +1095,7 @@ domNode * tcldom_getNodeFromObj (
         SetResult3("Parameter \"", nodeName, "\" is not a domNode.");
         return NULL;
     }
-    if (sscanf(&nodeName[7], "%p%1c", &node, &eolcheck) != 1) {
+    if (sscanf(&nodeName[7], "%p%1c", (void **)&node, &eolcheck) != 1) {
         if (!Tcl_GetCommandInfo(interp, nodeName, &cmdInfo)) {
             SetResult3("Parameter \"", nodeName, "\" is not a domNode.");
             return NULL;
@@ -1130,7 +1130,7 @@ domNode * tcldom_getNodeFromName (
         *errMsg = "parameter not a domNode!";
         return NULL;
     }
-    if (sscanf(&nodeName[7], "%p%1c", &node, &eolcheck) != 1) {
+    if (sscanf(&nodeName[7], "%p%1c", (void **)&node, &eolcheck) != 1) {
         if (!Tcl_GetCommandInfo(interp, nodeName, &cmdInfo)) {
            *errMsg = "parameter not a domNode!";
            return NULL;
@@ -1165,7 +1165,7 @@ domDocument * tcldom_getDocumentFromName (
         *errMsg = "parameter not a domDoc!";
         return NULL;
     }
-    if (sscanf(&docName[6], "%p%1c", &doc, &eolcheck) != 1) {
+    if (sscanf(&docName[6], "%p%1c", (void **)&doc, &eolcheck) != 1) {
         if (!Tcl_GetCommandInfo(interp, docName, &cmdInfo)) {
             *errMsg = "parameter not a domDoc!";
             return NULL;
@@ -7170,7 +7170,8 @@ int tcldom_CheckDocShared (
     Tcl_MutexUnlock(&tableMutex);
 
     if (found && doc != tabDoc) {
-        Tcl_Panic("document mismatch; doc=%p, in table=%p\n", doc, tabDoc);
+        Tcl_Panic("document mismatch; doc=%p, in table=%p\n", (void *)doc,
+                  (void *)tabDoc);
     }
 
     return found;

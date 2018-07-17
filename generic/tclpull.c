@@ -893,8 +893,8 @@ tDOM_PullParserCmd (
     };
     
     enum flag {
-        f_ignoreWhiteSpaces,
-    };    
+        f_ignoreWhiteSpaces
+    };
 
     if (objc < 2 || objc > 3) {
         Tcl_WrongNumArgs (interp, 1, objv, "cmdName ?-ignorewhitecdata?");
