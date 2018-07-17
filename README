@@ -40,6 +40,8 @@ tDOM contains:
 
     *  an even faster simple XML parser for trusted XML input.
 
+    *  A slim Tcl interface to use expat as pull-parser.
+
     *  additional convenience methods.
  
     *  and more.

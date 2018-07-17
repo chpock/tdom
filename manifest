@@ -1,5 +1,5 @@
-C The\spackage\sname\sis\stDOM,\sbut\sit\salways\shas\sbeen\srequested\sby\s[package\srequire\stdom]\sand\snow\sthe\sscripted\shelper\scommands\sin\stdom.tcl\sare\salso\sin\sthe\snamespace\stdom\s(not\sanymore\sin\stDOM).\sThe\snew\spullparser\scommand\sis\snow\salso\sin\sthis\snamespace.\sThere\sare\saliases\sfrom\sthe\sold\scommand\snames\sto\sthe\snew\sone,\sso\sthere\smust\sbe\snothing\sdone;\sold\sscripts\swill\srun\sas\sthey\sdid.\sIt's\sjust,\sthat\syou\sin\snew\scode\sdon't\shave\sto\swrite\sserveral\supcase\sletters\sin\sa\srow\sbecause\sof\stDOM.
-D 2018-07-16T21:36:27.560
+C Trumpet\sthe\spull\sinterface\sa\sbit\sin\sthe\soverview.
+D 2018-07-17T00:09:12.141
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -8,7 +8,7 @@ F ChangeLog 9b60ec8bfbae84e4f1a97aaee24be00ccea212b7
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 7f69670cc19f7c87bebb3e49b10cc5463fff7a7d8f9c9e03c79d039ae67fa496
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
-F README 352d5eb38ca0882084aaa7a69091e95e52924f20
+F README ec86edd4e1a53772e1fffd49120c1b6875bf09279ff49d8333a55051a78883aa
 F README.AOL d076b065f6a3209b5374a63c9ddd7fbca167643e
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/xslt.tcl ac4a75ba2f05e26d4ea6f92547983caa80fc6d55
@@ -222,8 +222,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 19cf312be676b79f9d57d29055783fdee85c76a78753e33175452b3f1e6c8f40
-R a7de87d1144ca0d92c9747806d285442
+P afde497780c5321d5b7f7d43b9bfa59c34393e82a1e1ed70f384531815ce23c0
+R 53fc18092aa8abeb85783ec90fed3442
 U rolf
-Z e4e5091fa41f58a494eefc534290f77d
+Z 314f90ada0f40b2b14b617896192970d
 # Remove this line to create a well-formed Fossil manifest.
