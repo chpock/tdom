@@ -1,5 +1,5 @@
-C Some\s--pedantic\scompiler\spacifying.
-D 2018-07-17T00:23:18.060
+C Fix\sHAVE_MEMMOVE\sconflict\swith\sexpat
+D 2018-07-18T05:20:30.620
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -210,7 +210,7 @@ F unix/speed-check.sh 7a8d91e7edf1cdc9bcfad5f28e1a068cb2843d05e49d8bd89d9b30a465
 F unix/tclAppInit.c a9d819ee595ace5199f48051aeb9ae8e6e52b5f0435bb3adc230de3f4c3f2ccd
 F win/README 565751141aadfe155d7f95c202496b523f8dcc88
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F win/makefile.vc 71dadeba1047ca47e54e21b6c61daf3ebcac5cefff43953b3882ca3feae9b3b8
+F win/makefile.vc dd338d632aa254eba6c8634eab4585666bf6c998971467c28ce942c3a3ac2fe5
 F win/mkd.bat 85d3fe58ce051a778447fb2bfc7384867d21cef0
 F win/nmakehlp.c 194ae7c24886245c679cb4c9ea7e6daaaebb5fcd
 F win/pkgIndex.tcl 4631218a784aae412d2a6bcadc72619eb14b264a
@@ -222,8 +222,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a08a033618ec1f47d74515e12cae68853137601cc4c4231236ad20383baeffe5
-R 3f20c6aad7cd6622f224063ed6fd7f4d
-U rolf
-Z cd2dbb9f643c0e96d2b8f6287fef30f3
+P 491081c44c93b97a98e5527556bdf00e8cfe71f9b76bfc655aa2dbb3e8691b34
+R db7dedccf4cbe4a737f5867b76f94b1c
+U apnadkarni
+Z fc3e81c44f6f0056f09874accf0fec15
 # Remove this line to create a well-formed Fossil manifest.
