@@ -971,7 +971,11 @@ proc tdom::baseURL {path} {
             return "file://[pwd]/$path"
         }
         default {
-            return "file://$path"
+            if {[string index $path 0] ne "/"} {
+                return "file:///$path"
+            } else {
+                return "file://$path"
+            }
         }
     }
 }

@@ -1,5 +1,5 @@
-C Fix\sHAVE_MEMMOVE\sconflict\swith\sexpat
-D 2018-07-18T05:20:30.620
+C Attempt\sto\smake\stdom::baseURI\sreturn\s"the\sright\sthing"\sfor\sabsolute\spaths\son\swindows.
+D 2018-07-18T14:41:27.365
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -145,7 +145,7 @@ F generic/tdominit.c 378f4bc3607f73031beb0993d6af949a4277c0747e24e275ab90990f8f2
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
 F generic/xmlsimple.c d6602c4d509ccfaa807bafa526ea0afb6b1ba3a879f6930d2ab2059b00267a24
 F generic/xmlsimple.h 3cb9d055e60643afcdfe9ab407adf1e8bb5dbafb
-F lib/tdom.tcl b22f69c943a20f4a05de87d7015185d767c4dbd70bf0bdbd667b7b53536a96eb
+F lib/tdom.tcl ebd872747647d73bd116f12dddca6001fde938289862bddc066bb5c44c8fe37f
 F macosx/README 75fe1f6617f6cb7e4480cff5367b5c26fcd8dd207e2321f35dceebafccf4c99c
 F tclconfig/README.txt 180f4215d59309ec5645aa5f4565557dac484945
 F tclconfig/install-sh bdd5e293591621ae60d9824d86a4b1c5f22c3d00 x
@@ -222,8 +222,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 491081c44c93b97a98e5527556bdf00e8cfe71f9b76bfc655aa2dbb3e8691b34
-R db7dedccf4cbe4a737f5867b76f94b1c
-U apnadkarni
-Z fc3e81c44f6f0056f09874accf0fec15
+P 0ef0ce1813debdbdfb4e722dee597ad1d41e10f65bd515ad3e9699bed40c3a90
+R d3a7106f5ccbd8ca43fbb7f84e8d4c06
+U rolf
+Z 3158544f105b161c143cadbac24ea091
 # Remove this line to create a well-formed Fossil manifest.
