@@ -110,45 +110,51 @@ proc comparewithDOM {data {inputMethod input}} {
     } elseif {$inputMethod eq "inputchannel"} {
         dom parse -channel $data doc
     } else {
-        dom parse [::tdom::xmlReadFile $data] doc
+        dom parse -keepEmpties [::tdom::xmlReadFile $data] doc
     }
     set domstr [walkDOM [$doc documentElement]]
     $doc delete
-    tdom::pullparser pp -ignorewhitecdata
+    tdom::pullparser pp
     pp $inputMethod $data
     set pullstr [loopPull]
     if {$domstr eq $pullstr} {
         return 1
     } else {
+        puts "*** DOM str:"
         puts $domstr
+        puts "*** Pull str:"
         puts $pullstr
         return 0
     }
     pp delete
 }
 
+proc fdata {file} {
+    file join [file dir [info script]] data/$file
+}
+
 test pp-2.1 {dom/pull comparsion: mondial-europe.xml} {
-    comparewithDOM ../tests/data/mondial-europe.xml inputfile
+    comparewithDOM [fdata mondial-europe.xml] inputfile
 } 1
 
 test pp-2.2 {dom/pull comparsion: books.xml} {
-    comparewithDOM ../tests/data/books.xml inputfile
+    comparewithDOM [fdata books.xml] inputfile
 } 1
 
 test pp-2.3 {dom/pull comparsion: i18n_1.xml} {
-    comparewithDOM ../tests/data/i18n_1.xml inputfile
+    comparewithDOM [fdata i18n_1.xml] inputfile
 } 1
 
 test pp-2.4 {dom/pull comparsion: i18n_2.xml} {
-    comparewithDOM ../tests/data/i18n_1.xml inputfile
+    comparewithDOM [fdata i18n_2.xml] inputfile
 } 1
 
 test pp-2.5 {dom/pull comparsion: REC-xslt-19991116.xml} {
-    comparewithDOM ../tests/data/REC-xslt-19991116.xml inputfile
+    comparewithDOM [fdata REC-xslt-19991116.xml] inputfile
 } 1
 
 test pp-2.6 {dom/pull comparsion: xslt_1.xsl} {
-    comparewithDOM ../tests/data/xslt_1.xsl inputfile
+    comparewithDOM [fdata xslt_1.xsl] inputfile
 } 1
 
 test pp-2.7 {dom/pull comparsion} {
@@ -235,27 +241,27 @@ proc comparewithExpat {data {inputMethod ""}} {
 
 
 test pp-2.10 {expat/pull comparsion: mondial-europe.xml} {
-    comparewithExpat ../tests/data/mondial-europe.xml file
+    comparewithExpat [fdata mondial-europe.xml] file
 } 1
 
 test pp-2.11 {expat/pull comparsion: books.xml} {
-    comparewithExpat ../tests/data/books.xml file
+    comparewithExpat [fdata books.xml] file
 } 1
 
 test pp-2.12 {expat/pull comparsion: i18n_1.xml} {
-    comparewithExpat ../tests/data/i18n_1.xml file
+    comparewithExpat [fdata i18n_1.xml] file
 } 1
 
 test pp-2.13 {expat/pull comparsion: i18n_2.xml} {
-    comparewithExpat ../tests/data/i18n_1.xml file
+    comparewithExpat [fdata i18n_2.xml] file
 } 1
 
 test pp-2.14 {expat/pull comparsion: REC-xslt-19991116.xml} {
-    comparewithExpat ../tests/data/REC-xslt-19991116.xml file
+    comparewithExpat [fdata REC-xslt-19991116.xml] file
 } 1
 
 test pp-2.15 {expat/pull comparsion: xslt_1.xsl} {
-    comparewithExpat ../tests/data/xslt_1.xsl file
+    comparewithExpat [fdata xslt_1.xsl] file
 } 1
 
 test pp-2.16 {expat/pull comparsion} {
