@@ -1,5 +1,5 @@
-C Fixed\sthe\stest\ssuite\sso\sthat\sit\sshould\srun\swithout\sfailure\seven\sif\sthe\sbuild\sdir\sis\soutside\sthe\ssource\stree.
-D 2018-07-19T00:42:15.953
+C Create\snew\sbranch\snamed\s"win-uri-fix"
+D 2018-07-19T12:53:10.905
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -222,8 +222,12 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P b4d45b840967f23c388d28aede24b9c89b310cfba8084f5586049e9e6c822dae
+P 96b8d81fe9394bd68dedcf1c0fecfddb41f1697ae1278d4a2d43718e27f69fcc
 R 40ed6b884b4e1756ce4835346953f48f
-U rolf
-Z 04a3d81e529cc1830ec0e1a4bea9f2f2
+T *branch * win-uri-fix
+T *sym-win-uri-fix *
+T -sym-tdom-0-9-1-rc *
+T -sym-trunk *
+U apnadkarni
+Z 6d409e2ee6edcf6a1a43c6bc4d48cd13
 # Remove this line to create a well-formed Fossil manifest.
