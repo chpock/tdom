@@ -1,5 +1,5 @@
-C Makefile.in\scould\sbe\smore\sin\ssync\swith\sTEA.
-D 2018-07-18T23:59:31.506
+C Merged\sfrom\strunk.
+D 2018-07-20T09:58:25.137
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -195,7 +195,7 @@ F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
 F tests/parser.test 7957ceae1fb271cddf7dd8dcc6ed2f903bfdf0adf3662f686a6953919a5a2715
 F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
-F tests/pullparser.test 84a681b95c63ed328eadbcbf0ef60e53f729a1b557ffcce03bde66716c68d783
+F tests/pullparser.test b151992a653db5e65d506cdc279dc086ae00158836685803d8d0ffdaea101df5
 F tests/pushpull.bench 664e8f512917537d96c4b71933d4d9a6da65fc6fe85bd7c459483830dc7d2faf
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
 F tests/tdomcmd.bench b07448ed4de08ccaa9734cf3fe15c695fd7066c993da58ff48d465747940e417
@@ -222,11 +222,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P b4d45b840967f23c388d28aede24b9c89b310cfba8084f5586049e9e6c822dae
-R 2ccd5af766edd9fa61f6d3be941968c0
-T *branch * nearerTEAtoThee
-T *sym-nearerTEAtoThee *
-T -sym-trunk *
+P 15fc3242db6ed13b7c2fc136a4978ee1eca332e35a831d50b7f5e870751b5dc5 96b8d81fe9394bd68dedcf1c0fecfddb41f1697ae1278d4a2d43718e27f69fcc
+R 5494895b03db47f36e36e04441d8d228
 U rolf
-Z 6cfd33267db574673987ccd7309a536c
+Z a946bef57306df0656c72fa23b27ce20
 # Remove this line to create a well-formed Fossil manifest.
