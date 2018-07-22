@@ -3024,7 +3024,7 @@ test domNode-34.1 {getBaseURI} {need_uri} {
     makeFile <y/> domNode-34.1-e1.xml [file join [file dir [info script]] data]
     makeFile <y/> domNode-34.1-e2.xml [file join [file dir [info script]] data]
 
-    set baseURI file://[file join [pwd] [file dir [info script]] dom.test]
+    set baseURI [tdom::baseURL [file join [pwd] [file dir [info script]] dom.test]]
     set doc [dom parse \
                  -baseurl $baseURI \
                  -externalentitycommand ::tdom::extRefHandler {
@@ -3056,7 +3056,7 @@ test domNode-34.2 {getBaseURI} {need_uri} {
     makeFile <y/> domNode-34.1-e1.xml [file join [file dir [info script]] data]
     makeFile <y/> domNode-34.1-e2.xml [file join [file dir [info script]] data]
 
-    set baseURI file://[file join [pwd] [file dir [info script]] dom.test]
+    set baseURI [tdom::baseURL [file join [pwd] [file dir [info script]] dom.test]]
     set doc [dom parse \
                  -baseurl $baseURI \
                  -externalentitycommand ::tdom::extRefHandler {

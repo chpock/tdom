@@ -1,5 +1,5 @@
-C Create\snew\sbranch\snamed\s"win-uri-fix"
-D 2018-07-19T12:53:10.905
+C Fix\sbaseURL\sand\sextRefHandler\sfor\sWindows\spaths\scontaining\sdrive\sletters.\nNote\sthat\sthe\stcllib\suri\spackage\sused\sby\sextRefHandler\swas\sbroken\suntil\nV1.2.7.\sThis\sversion\sonly\stested\swith\sthat\sversion.\n\nThere\sis\sstill\san\sunrelated\sbug\spending\sin\sthat\sURI's\sare\ssupposed\sto\nbe\surl-encoded\sbut\sthe\scode\sdoes\snot\scurrently\shandle\sthat\sand\swill\nfail\sfor\sspecial\scharacters\sin\sthe\spath.
+D 2018-07-22T08:50:43.346
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -145,7 +145,7 @@ F generic/tdominit.c 378f4bc3607f73031beb0993d6af949a4277c0747e24e275ab90990f8f2
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
 F generic/xmlsimple.c d6602c4d509ccfaa807bafa526ea0afb6b1ba3a879f6930d2ab2059b00267a24
 F generic/xmlsimple.h 3cb9d055e60643afcdfe9ab407adf1e8bb5dbafb
-F lib/tdom.tcl ebd872747647d73bd116f12dddca6001fde938289862bddc066bb5c44c8fe37f
+F lib/tdom.tcl 784b1d8b83f2d4fc623e1a729ad400a4647e39c99efc4acbaf5a3736ebb242cc
 F macosx/README 75fe1f6617f6cb7e4480cff5367b5c26fcd8dd207e2321f35dceebafccf4c99c
 F tclconfig/README.txt 180f4215d59309ec5645aa5f4565557dac484945
 F tclconfig/install-sh bdd5e293591621ae60d9824d86a4b1c5f22c3d00 x
@@ -179,10 +179,10 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.bench 5446ce379127b8d5700f18a5a0848e580313d0d7
-F tests/dom.test 3c043907890916ed7a369ae7b7dd610b5a267a49f6bcea5495aedead01d75abd
+F tests/dom.test d5e3434beab143c880304c3f09134fedf955069126b3afb441b7483fb11e7d9b
 F tests/domDoc.test be9b9e7cd82108f75fb264869a6626d6f41458f7dda7b312ec9fbcff5e24f3c7
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
-F tests/domNode.test 18dab40b8dbb76e76a45f3d9017204fa2d6fba27f59dcfaff49af59358af1d65
+F tests/domNode.test 45a91d71a2747f4155e4546159b768359531ce81229c5dc9c1fb818f9ab2be13
 F tests/domjson.test 4d59a364b082b9009e7edddd4133941e4b463896db28939accdfeed3ca210df1
 F tests/domnamespace.test c67346e939dab82f1b6de8ddd04bd004cf24391b
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
@@ -222,12 +222,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 96b8d81fe9394bd68dedcf1c0fecfddb41f1697ae1278d4a2d43718e27f69fcc
-R 40ed6b884b4e1756ce4835346953f48f
-T *branch * win-uri-fix
-T *sym-win-uri-fix *
-T -sym-tdom-0-9-1-rc *
-T -sym-trunk *
+P 7e818a10f825712b840b35752732b6eeb7b0226b30cb603d7ea6cfc2635b02bb
+R 902eb1d6f39c1776e347dd53cccfa54c
 U apnadkarni
-Z 6d409e2ee6edcf6a1a43c6bc4d48cd13
+Z 8ce482cc55830470a2c17b7d3b1c5009
 # Remove this line to create a well-formed Fossil manifest.
