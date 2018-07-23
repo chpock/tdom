@@ -592,7 +592,7 @@ tDOM_PullParserInstanceCmd (
                 SetResult ("No input");
                 return TCL_ERROR;
             case PULLPARSERSTATE_PARSE_ERROR:
-                SetResult ("Parsing stoped with XML parsing error.");
+                SetResult ("Parsing stopped with XML parsing error.");
                 return TCL_ERROR;
             case PULLPARSERSTATE_END_DOCUMENT:
                 SetResult ("No next event after END_DOCUMENT");

@@ -6,7 +6,7 @@
 #    entity-1.*:  parameter entities, character entities
 #    entity-2.*:  predefined entities
 #    entity-3.*:  -useForeignDTD
-#    entity-4.*:  external parsed entites
+#    entity-4.*:  external parsed entities
 #
 # Copyright (c) 1999-2000 Zveno Pty Ltd.
 # Copyright (c) 2000-2004 Rolf Ade

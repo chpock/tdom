@@ -1,5 +1,5 @@
-C Merged\sthe\sfixes\sfor\sthe\sscripted\shelper\sprocs\sbaseURL\sand\sextRefHandler\sfor\sWindows\spaths\scontaining\sdrive\sletters\sprovided\sby\sAshok\sP.\sNadkarni.
-D 2018-07-23T10:28:20.498
+C Applied\sa\slast\sround\sof\sspell\sfixes\sprovided\sby\sthe\sdebian\stDOM\smaintainers.
+D 2018-07-23T10:42:42.798
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -35,9 +35,9 @@ F doc/expatapi.xml f978d9a0b6df6878e1f94e427c018240efaf33f6d8dfa456051cfe551b15d
 F doc/index.html 22d7d146b761598f0358a4fb9cb2c9b907602431e5950ca8c40394b411de24d7
 F doc/keyword-index.html e316c5df54ab8329e573542c5a348fe370cc317a15d0244fbefc596cc5489dda
 F doc/manpage.css 3b4ec1d641048933a7e6bffc659de9519030a959
-F doc/pullparser.html 2a37e130d92a88a94ddb3c0aa97276a2ad2d53ee9ee7efdff6f58471a7bb6792
-F doc/pullparser.n d98fe01a8e283938b89308f6d666ebfe6d23460c4771bdbaedd28f392f29b105
-F doc/pullparser.xml a948a2857b4440510d1421b658b3cb81e3a33b5e8fb9e1619ac0586c4ca8509f
+F doc/pullparser.html 8cda7c3bd1d0b505994e364085d2c998039e6f12a1e6968651c495f6cfce6086
+F doc/pullparser.n 6b2cfda2d91325778e0b22afb540d2b1c7684e18c45e348a060a7290e54cf5bd
+F doc/pullparser.xml 96c94fcb5f4af239bad43680fc8cde2f549f1c51fb9bb2bd2c86556c4f73ae88
 F doc/tDOM.xml c2c23ef23bc7ed266b10e833a196833dab73cca8e6e63eeaba0da29bff2bbaf6
 F doc/tdomcmd.html 9b4d9ff443499554adf2346ff0efc0317a98bd6e1fc3fc79a6e476b71fe85fed
 F doc/tdomcmd.n c06a5ff035f16a2a52636b69d9ebe6ba84ff5101922ed27b551146c4d61d6cda
@@ -134,7 +134,7 @@ F generic/tcldom.c 4e7e8c3dcd47e36306b9ea2d2892b3efc41a8bc971cc5cf409e697c7dcfe2
 F generic/tcldom.h 2e8edc2bf095200c419a740fed626f4fdcba274125e0234366e84a25bb0c2b25
 F generic/tclexpat.c d0878eac72096430d4c43c67601ce2c8d9d9e1a1f5ab148c9a5a64e635a7024f
 F generic/tclexpat.h 82c3d9efe50617f2e0883c520240e6ab17b830e56d6786cd88d2fa31294c02c5
-F generic/tclpull.c 3a8d3f8c284d8f59c44ba891135c72d9ff647d568a6d9646543a188012c50bb5
+F generic/tclpull.c 39db0f14d88fb69d76a86cd86610a2885df97c3202e7a3eae2e04b9d0bb3e20f
 F generic/tclpull.h 8e1aac98bdad497c669c901494939eecd6c2f57ea51c4f5d4dac502db48527d4
 F generic/tdom.decls 26593c07732dca37caa7a4b56226f2b2700590a30a61af4cb7757cfa3e28c89e
 F generic/tdom.h d27e43748242d5fe7dd98b8c7aa4a5a891d015bf
@@ -186,7 +186,7 @@ F tests/domNode.test 45a91d71a2747f4155e4546159b768359531ce81229c5dc9c1fb818f9ab
 F tests/domjson.test 4d59a364b082b9009e7edddd4133941e4b463896db28939accdfeed3ca210df1
 F tests/domnamespace.test c67346e939dab82f1b6de8ddd04bd004cf24391b
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
-F tests/entity.test 132b82b1f908a14302ed5a0a0dc7747d0f800554
+F tests/entity.test 36170db2ac7d72660640b2a33966803233a4a9f19e2c5611c38692e3b6c8cd35
 F tests/html5reader.test f839da02dd4b1227a2ee3bae9abfba983951d9ad
 F tests/htmlreader.test 67a0d90dd599e72c1cbf7a5c6f91364c4a83ceaa7ce5cc4ab556302538bbb77a
 F tests/i18n.test a204756237570196620d3ca384ee72be34fd12ec38cddea6919b6b878d8ed4f4
@@ -222,8 +222,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 96b8d81fe9394bd68dedcf1c0fecfddb41f1697ae1278d4a2d43718e27f69fcc fadeed78022088eb497698ab74c3d8feaff43707668cf9c323fbdc7fd4ae2d68
-R 902eb1d6f39c1776e347dd53cccfa54c
+P 905eec2720d1944d5a6a32ae371dae442acd43ebeace6cbd6437516dc0eb22a5
+R 26c57c6df50baec21e447c2bfdaa644a
 U rolf
-Z e8ca0ee12653d3149112699711d17456
+Z ff41d0037aa615747ead85ec3a724ada
 # Remove this line to create a well-formed Fossil manifest.
