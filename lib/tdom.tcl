@@ -948,6 +948,13 @@ if {![catch {package require uri}]} {
         array set uriData [uri::split $absolutURI]
         switch $uriData(scheme) {
             file {
+                if {$::tcl_platform(platform) eq "windows"} {
+                    # Strip leading / for drive based paths
+                    if {[string match /?:* $uriData(path)]} {
+                        set uriData(path) [string range $uriData(path) 1 end]
+                    }
+                }
+                # FIXME - path should be URL-decoded
                 return [list string $absolutURI [xmlReadFile $uriData(path)]]
             }
             default {
@@ -964,18 +971,23 @@ if {![catch {package require uri}]} {
 #   filename.
 #
 #----------------------------------------------------------------------------
-
 proc tdom::baseURL {path} {
-    switch [file pathtype $path] {
-        "relative" {
-            return "file://[pwd]/$path"
-        }
-        default {
-            if {[string index $path 0] ne "/"} {
-                return "file:///$path"
-            } else {
-                return "file://$path"
-            }
+    # FIXME - path components need to be URL-encoded
+
+    # Note [file join] will return path as is if it is already absolute.
+    # Also on Windows, it will change \ -> /. This is necessary because
+    # file URIs must always use /, never \.
+    set path [file join [pwd] $path]
+
+    if {$::tcl_platform(platform) ne "windows"} {
+        return "file://$path"
+    } else {
+        if {[string match //* $path]} {
+            # UNC path
+            return "file:$path"
+        } else {
+            # Drive based path
+            return "file:///$path"
         }
     }
 }
