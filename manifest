@@ -1,5 +1,5 @@
-C Applied\sa\slast\sround\sof\sspell\sfixes\sprovided\sby\sthe\sdebian\stDOM\smaintainers.
-D 2018-07-23T10:42:42.798
+C Ready\sto\scut\sarchives.
+D 2018-07-24T21:30:56.364
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -8,7 +8,7 @@ F ChangeLog 9b60ec8bfbae84e4f1a97aaee24be00ccea212b7
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
 F Makefile.in 7f69670cc19f7c87bebb3e49b10cc5463fff7a7d8f9c9e03c79d039ae67fa496
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
-F README ec86edd4e1a53772e1fffd49120c1b6875bf09279ff49d8333a55051a78883aa
+F README e5ea8b111d7e9b9f6812cdb0c54d287a6affbbf54abff060987c86a04abc6194
 F README.AOL d076b065f6a3209b5374a63c9ddd7fbca167643e
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/xslt.tcl ac4a75ba2f05e26d4ea6f92547983caa80fc6d55
@@ -222,8 +222,9 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 905eec2720d1944d5a6a32ae371dae442acd43ebeace6cbd6437516dc0eb22a5
-R 26c57c6df50baec21e447c2bfdaa644a
+P 02bf3a9823bcb02bf4763398ad2a807ac8023486360d83152d56f6ff060ef30e b82decbc009f5a7432969f590cea667be5d69d4a65e0c829e81696b52b1499e3
+R 0fd58221b7bfb323e773eb7e5bbab219
+T +closed b82decbc009f5a7432969f590cea667be5d69d4a65e0c829e81696b52b1499e3
 U rolf
-Z ff41d0037aa615747ead85ec3a724ada
+Z 1a7afdf65efdf446d98a1510118b4197
 # Remove this line to create a well-formed Fossil manifest.
