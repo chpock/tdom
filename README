@@ -86,7 +86,7 @@ COMPILING tDOM
         make install
 
     Alternatively, you can build the tDOM package in just about any
-    directory elsewhere on the fileystem (since TEA-compatible).
+    directory elsewhere on the filesystem (since TEA-compatible).
     
     You might also want to do "../configure --help" to get a list of
     all supported options of the configure script. In the "unix"
