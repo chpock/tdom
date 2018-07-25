@@ -130,9 +130,9 @@
 # define DOC_NO(doc)        (unsigned long)(doc)
 #endif /* TCL_THREADS */
 
-#define DOC_CMD(s,doc)      sprintf((s), "domDoc%p", (doc))
-#define NODE_CMD(s,node)    sprintf((s), "domNode%p", (node))
-#define XSLT_CMD(s,doc)     sprintf((s), "XSLTcmd%p", (doc))
+#define DOC_CMD(s,doc)      sprintf((s), "domDoc%p", (void *)(doc))
+#define NODE_CMD(s,node)    sprintf((s), "domNode%p", (void *)(node))
+#define XSLT_CMD(s,doc)     sprintf((s), "XSLTcmd%p", (void *)(doc))
 
 #define XML_NAMESPACE "http://www.w3.org/XML/1998/namespace"
 #define XMLNS_NAMESPACE "http://www.w3.org/2000/xmlns"
@@ -545,6 +545,16 @@ typedef struct domNS {
 
 #define MAX_PREFIX_LEN   80
 
+/*---------------------------------------------------------------------------
+|   type domActiveNS
+|
+\--------------------------------------------------------------------------*/
+typedef struct _domActiveNS {
+
+    int    depth;
+    domNS *namespace;
+
+} domActiveNS;
 
 
 /*--------------------------------------------------------------------------
@@ -788,6 +798,8 @@ int            domSplitQName (const char *name, char *prefix,
 domNS *        domLookupNamespace (domDocument *doc, const char *prefix, 
                                    const char *namespaceURI);
 domNS *        domLookupPrefix  (domNode *node, const char *prefix);
+int            domIsNamespaceInScope (domActiveNS *NSstack, int NSstackPos,
+                                      const char *prefix, const char *namespaceURI);
 const char *   domLookupPrefixWithMappings (domNode *node, const char *prefix,
                                             char **prefixMappings);
 domNS *        domLookupURI     (domNode *node, char *uri);

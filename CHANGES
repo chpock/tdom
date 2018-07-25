@@ -1,3 +1,29 @@
+2018-07-16  Rolf Ade  <rolf@pointsman.de>
+
+        The package name is tDOM, but it always has been requested by
+        [package require tdom] and now the scripted helper commands in
+        tdom.tcl are also in the namespace tdom (not anymore in tDOM).
+        The new pullparser command is now also in this namespace.
+        There are aliases from the old command names to the new one,
+        so there must be nothing done; old scripts will run as they
+        did. It's just, that you in new code don't have to write
+        serveral upcase letters in a row because of tDOM.
+
+2018-07-14  Rolf Ade  <rolf@pointsman.de>
+
+        Updated to expat 2.2.5. Expat now want to use a "good" entropy
+        source to salt internal hash table (to reduce the possibility
+        of DoS attacts with malicious XML input). Configure tries to
+        figure out automatically the most appropriate entropy source
+        on your platform. The new configure switch --with-entropy
+        gives control over that. The configure switch
+        --without-entropy disables all this; expat (and in turn tDOM)
+        will use what was used in earlier expat versions.
+
+2018-07-12  Rolf Ade  <rolf@pointsman.de>
+
+        Updated TEA.
+
 2018-05-17  Rolf Ade  <rolf@pointsman.de>
 
         Added new method attributeNames to domNode (cmds).
@@ -14,14 +40,14 @@
 2018-04-24  Rolf Ade  <rolf@pointsman.de>
 
         Fixed a potentially dramatic speed problem in case of certain
-        classes of XPath expressions, if a threads enabled tDOM is
+        classes of XPath expressions if a threads enabled tDOM is
         used, the result set is large and the DOM tree to query was
         altered somewhere before the query by an operation, which
         appended, inserted or replaced a node.
 
 2018-03-09  Rolf Ade  <rolf@pointsman.de>
 
-        Added command tDOM::pullparser, with creates simple XKL "pull"
+        Added command tDOM::pullparser, with creates simple XML "pull"
         parser commands. This commands parse XML input and stop at
         certain points ("events"). You continue parsing at your will.
 

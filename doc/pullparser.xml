@@ -1,13 +1,13 @@
 <manpage id="pullparser" cat="pullparser" title="pullparser">
   <namesection>
-    <name>tDOM::pullparser</name>
+    <name>tdom::pullparser</name>
     <desc>Create an XML pull parser command</desc>
   </namesection>
 
   <synopsis>
     <syntax>package require tdom
 
-    <cmd>tDOM::pullparser</cmd> <m>cmdName</m> <o>-ignorewhitecdata</o>
+    <cmd>tdom::pullparser</cmd> <m>cmdName</m> <o>-ignorewhitecdata</o>
     </syntax>
   </synopsis>
 
@@ -26,7 +26,7 @@
     be reported as TCL_ERROR with additional info in the error
     message.</p>
 
-    <p>The pull parsers doesn't follow externial entites and are XML
+    <p>The pull parsers don't follow external entities and are XML
     1.0 only, they know nothing about XML Namespaces. You get the tags
     and attribute names as in the source. You aren't noticed about
     comments, processing instructions and external entities; they are
@@ -98,7 +98,7 @@
 
       <commanddef>
         <command><method>next</method></command>
-        <desc>This method valid in state <m>START_DOCUMENT</m>,
+        <desc>This method is valid in state <m>START_DOCUMENT</m>,
         <m>START_TAG</m>, <m>END_TAG</m> and <m>TEXT</m>. It continues
         parsing of the XML input until the next event, which it will
         return.</desc>

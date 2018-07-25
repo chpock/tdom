@@ -305,5 +305,6 @@ HTML_GumboParseDocument (
     gumbo_destroy_output(&kGumboDefaultOptions, output);    
     return doc;
 }
-
+#else
+typedef int make_pedantic_compiler_happy;
 #endif

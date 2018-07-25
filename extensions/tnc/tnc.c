@@ -1487,7 +1487,7 @@ TncProbeElement (
            matched already ... */
         return -1;
     case XML_CTYPE_NAME:
-        /* NAME type dosen't occur at top level of a content model and is
+        /* NAME type doesn't occur at top level of a content model and is
            handled in some "shotcut" way directly in the CHOICE and SEQ cases.
            It's only here to pacify gcc -Wall. */
         printf ("error!!! - in TncProbeElement: XML_CTYPE_NAME shouldn't reached in any case.\n");
@@ -2052,7 +2052,7 @@ TncProbeElementEnd (
         }
         return 1;
     case XML_CTYPE_NAME:
-        /* NAME type dosen't occur at top level of a content model and is
+        /* NAME type doesn't occur at top level of a content model and is
            handled in some "shotcut" way directly in the CHOICE and SEQ cases.
            It's only here to pacify gcc -Wall. */
         fprintf (stderr, "error!!! - in TncProbeElementEnd: XML_CTYPE_NAME "

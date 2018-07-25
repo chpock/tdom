@@ -174,7 +174,14 @@ test simple-1.21 {-keepCDATA and -keepEmpties} {
     $doc delete
     set result
 } 1
-    
+
+test simple-1.22 {namespaces} {
+    set doc [dom parse -simple {
+        <help><br xmlns:xsi="a"/><em xmlns:xsi="a">notes</em></help>
+    }]
+    $doc delete
+} {}
+
 test simple-2.1 {XML build in entities} {
     set doc [dom parse -simple {<doc>&lt;&gt;&amp;&apos;&quot;</doc>}]
     set root [$doc documentElement]

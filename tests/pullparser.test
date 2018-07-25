@@ -15,23 +15,23 @@
 source [file join [file dir [info script]] loadtdom.tcl]
 
 test pp-1.1 {Create} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp delete
 } {}
 
 test pp-1.2 {Invalid create} {
-    catch {tDOM::pullparser pp foo}
+    catch {tdom::pullparser pp foo}
 } 1
 
 test pp-1.3 {Reset freshly created parser} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp reset
     pp reset
     pp delete
 } {}
 
 test pp-1.4 {State after creation} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     set result [pp state]
     lappend result [pp state]
     pp delete
@@ -110,45 +110,51 @@ proc comparewithDOM {data {inputMethod input}} {
     } elseif {$inputMethod eq "inputchannel"} {
         dom parse -channel $data doc
     } else {
-        dom parse [::tDOM::xmlReadFile $data] doc
+        dom parse -keepEmpties [::tdom::xmlReadFile $data] doc
     }
     set domstr [walkDOM [$doc documentElement]]
     $doc delete
-    tDOM::pullparser pp -ignorewhitecdata
+    tdom::pullparser pp
     pp $inputMethod $data
     set pullstr [loopPull]
     if {$domstr eq $pullstr} {
         return 1
     } else {
+        puts "*** DOM str:"
         puts $domstr
+        puts "*** Pull str:"
         puts $pullstr
         return 0
     }
     pp delete
 }
 
+proc fdata {file} {
+    file join [file dir [info script]] data/$file
+}
+
 test pp-2.1 {dom/pull comparsion: mondial-europe.xml} {
-    comparewithDOM ../tests/data/mondial-europe.xml inputfile
+    comparewithDOM [fdata mondial-europe.xml] inputfile
 } 1
 
 test pp-2.2 {dom/pull comparsion: books.xml} {
-    comparewithDOM ../tests/data/books.xml inputfile
+    comparewithDOM [fdata books.xml] inputfile
 } 1
 
 test pp-2.3 {dom/pull comparsion: i18n_1.xml} {
-    comparewithDOM ../tests/data/i18n_1.xml inputfile
+    comparewithDOM [fdata i18n_1.xml] inputfile
 } 1
 
 test pp-2.4 {dom/pull comparsion: i18n_2.xml} {
-    comparewithDOM ../tests/data/i18n_1.xml inputfile
+    comparewithDOM [fdata i18n_2.xml] inputfile
 } 1
 
 test pp-2.5 {dom/pull comparsion: REC-xslt-19991116.xml} {
-    comparewithDOM ../tests/data/REC-xslt-19991116.xml inputfile
+    comparewithDOM [fdata REC-xslt-19991116.xml] inputfile
 } 1
 
 test pp-2.6 {dom/pull comparsion: xslt_1.xsl} {
-    comparewithDOM ../tests/data/xslt_1.xsl inputfile
+    comparewithDOM [fdata xslt_1.xsl] inputfile
 } 1
 
 test pp-2.7 {dom/pull comparsion} {
@@ -219,7 +225,7 @@ proc comparewithExpat {data {inputMethod ""}} {
         -elementendcommand elementend \
         -characterdatacommand cdata
     pushparser parse$inputMethod $data
-    tDOM::pullparser pullparser
+    tdom::pullparser pullparser
     pullparser input$inputMethod $data
     set pullstr [loopPullE]
     if {$expatstr eq $pullstr} {
@@ -235,27 +241,27 @@ proc comparewithExpat {data {inputMethod ""}} {
 
 
 test pp-2.10 {expat/pull comparsion: mondial-europe.xml} {
-    comparewithExpat ../tests/data/mondial-europe.xml file
+    comparewithExpat [fdata mondial-europe.xml] file
 } 1
 
 test pp-2.11 {expat/pull comparsion: books.xml} {
-    comparewithExpat ../tests/data/books.xml file
+    comparewithExpat [fdata books.xml] file
 } 1
 
 test pp-2.12 {expat/pull comparsion: i18n_1.xml} {
-    comparewithExpat ../tests/data/i18n_1.xml file
+    comparewithExpat [fdata i18n_1.xml] file
 } 1
 
 test pp-2.13 {expat/pull comparsion: i18n_2.xml} {
-    comparewithExpat ../tests/data/i18n_1.xml file
+    comparewithExpat [fdata i18n_2.xml] file
 } 1
 
 test pp-2.14 {expat/pull comparsion: REC-xslt-19991116.xml} {
-    comparewithExpat ../tests/data/REC-xslt-19991116.xml file
+    comparewithExpat [fdata REC-xslt-19991116.xml] file
 } 1
 
 test pp-2.15 {expat/pull comparsion: xslt_1.xsl} {
-    comparewithExpat ../tests/data/xslt_1.xsl file
+    comparewithExpat [fdata xslt_1.xsl] file
 } 1
 
 test pp-2.16 {expat/pull comparsion} {
@@ -276,7 +282,7 @@ well-formed XML document <bibref/>conforming </p>}
 } 1
 
 test pp-3.1 {skip} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp input <doc/>
     set result [pp next]
     lappend result [pp tag]
@@ -288,7 +294,7 @@ test pp-3.1 {skip} {
 } {START_TAG doc END_TAG doc END_DOCUMENT}
 
 test pp-3.1.1 {skip} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp input {<doc><e/></doc>}
     set result [pp next]
     lappend result [pp tag]
@@ -304,7 +310,7 @@ test pp-3.1.1 {skip} {
 } {START_TAG doc START_TAG e END_TAG e END_TAG doc END_DOCUMENT}
 
 test pp-3.1.2 {skip} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp input {<doc>text<e/>text</doc>}
     set result [pp next]
     lappend result [pp tag]
@@ -324,7 +330,7 @@ test pp-3.1.2 {skip} {
 } {START_TAG doc TEXT text START_TAG e END_TAG e TEXT text END_TAG doc END_DOCUMENT}
 
 test pp-3.1.3 {skip} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp input {<doc>text<e>bar<b><c/><c>baz</c></b><b>text</b></e>text</doc>}
     set result [pp next]
     lappend result [pp tag]
@@ -343,8 +349,44 @@ test pp-3.1.3 {skip} {
     set result
 } {START_TAG doc TEXT text START_TAG e END_TAG e TEXT text END_TAG doc END_DOCUMENT}
 
+test pp-3.1.4 {skip} {
+    tdom::pullparser pp
+    pp input <doc></doc>
+    set result [pp next]
+    lappend result [pp tag]
+    lappend result [pp skip]
+    lappend result [pp tag]
+    lappend result [pp next]
+    pp delete
+    set result
+} {START_TAG doc END_TAG doc END_DOCUMENT}
+
+test pp-3.1.5 {skip} {
+    tdom::pullparser pp
+    pp input {<doc> </doc>}
+    set result [pp next]
+    lappend result [pp tag]
+    lappend result [pp skip]
+    lappend result [pp tag]
+    lappend result [pp next]
+    pp delete
+    set result
+} {START_TAG doc END_TAG doc END_DOCUMENT}
+
+test pp-3.1.5 {skip} {
+    tdom::pullparser pp -ignorewhitecdata
+    pp input {<doc> </doc>}
+    set result [pp next]
+    lappend result [pp tag]
+    lappend result [pp skip]
+    lappend result [pp tag]
+    lappend result [pp next]
+    pp delete
+    set result
+} {START_TAG doc END_TAG doc END_DOCUMENT}
+
 test pp-3.2 {skip} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp input {<doc><e/></doc>}
     set result [pp next]
     lappend result [pp tag]
@@ -356,7 +398,7 @@ test pp-3.2 {skip} {
 } {START_TAG doc END_TAG doc END_DOCUMENT}
 
 test pp-3.3 {skip} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp input {<doc>foo bar<e/></doc>}
     set result [pp next]
     lappend result [pp tag]
@@ -368,7 +410,7 @@ test pp-3.3 {skip} {
 } {START_TAG doc END_TAG doc END_DOCUMENT}
 
 test pp-3.4 {skip} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp input {<doc>foo bar<e/><e>bar<e/></e><e></e></doc>}
     set result [pp next]
     lappend result [pp tag]
@@ -380,7 +422,7 @@ test pp-3.4 {skip} {
 } {START_TAG doc END_TAG doc END_DOCUMENT}
 
 test pp-3.5 {skip} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp input {<doc>foo bar<e/><e>bar<e/></e><e></e></doc>}
     set result [list]
     while {[set state [pp next]] ne "END_DOCUMENT"} {
@@ -401,7 +443,7 @@ test pp-3.5 {skip} {
 } {START_TAG doc TEXT START_TAG e START_TAG e START_TAG e END_TAG doc}
 
 test pp-3.6 {skip} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp input {<doc>foo bar<e/><e>bar<e/></e><e></e>baz</doc>}
     set result [list]
     while {[set state [pp next]] ne "END_DOCUMENT"} {
@@ -425,7 +467,7 @@ test pp-3.6 {skip} {
 } {START_TAG doc TEXT {foo bar} START_TAG e START_TAG e START_TAG e TEXT baz END_TAG doc}
 
 test pp-3.7 {skip} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp input {<doc>foo bar<e/><e>bar</wrong><e></e></doc>}
     set result [pp next]
     lappend result [pp next]; # TEXT "foo bar"
@@ -441,8 +483,21 @@ test pp-3.7 {skip} {
     set result
 } {START_TAG TEXT START_TAG e END_TAG e START_TAG e 1 {error "mismatched tag" at line 1 character 24}}
 
+test pp-3.8 {skip} {
+    tdom::pullparser pp
+    pp input {<doc>foo bar<e/><e>bar</e></doc>}
+    set result [pp next]
+    lappend result [pp skip]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [catch {pp next} errMsg]
+    lappend result $errMsg
+    pp delete
+    set result
+} {START_TAG END_TAG doc END_DOCUMENT 1 {No next event after END_DOCUMENT}}
+
 test pp-4.1 {find-element} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp input {<doc><a>foo bar</a><b>baz</b><c>grill</c><d>here</d></doc>}
     set result [pp next]
     lappend result [pp tag]
@@ -460,7 +515,7 @@ test pp-4.1 {find-element} {
 } {START_TAG doc START_TAG a START_TAG d TEXT here END_TAG d}
 
 test pp-4.2 {find-element} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp input {<doc><a>foo bar</a><b>baz</b><c>grill</c><d></d></doc>}
     set result [pp next]
     lappend result [pp tag]
@@ -476,7 +531,7 @@ test pp-4.2 {find-element} {
 } {START_TAG doc START_TAG a START_TAG d END_TAG d}
 
 test pp-4.3 {find-element} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp input {<doc><a>foo bar</a><b>baz</b><c>grill</c>some<d/></doc>}
     set result [pp next]
     lappend result [pp tag]
@@ -492,7 +547,7 @@ test pp-4.3 {find-element} {
 } {START_TAG doc START_TAG a START_TAG d END_TAG d}
 
 test pp-4.4 {find-element} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp input {<doc><a><b><c><d>grill</d></c></b></a></doc>}
     set result [pp next]
     lappend result [pp tag]
@@ -510,7 +565,7 @@ test pp-4.4 {find-element} {
 } {START_TAG doc START_TAG d TEXT grill END_TAG d END_TAG c}
 
 test pp-4.5 {find-element} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp input {<doc><a><b><c><d></d></c></b></a></doc>}
     set result [pp next]
     lappend result [pp tag]
@@ -526,7 +581,7 @@ test pp-4.5 {find-element} {
 } {START_TAG doc START_TAG d END_TAG d END_TAG c}
 
 test pp-4.6 {find-element} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp input {<doc><a><b><c><d/></c></b></a></doc>}
     set result [pp next]
     lappend result [pp tag]
@@ -543,7 +598,7 @@ test pp-4.6 {find-element} {
 
 
 test pp-4.7 {find-element} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp input {<doc><a><b/></a><a><b><c/></b></a><a><b/></a></doc>}
     set result [pp next]
     lappend result [pp tag]
@@ -559,7 +614,7 @@ test pp-4.7 {find-element} {
 } {START_TAG doc START_TAG b START_TAG c START_TAG a}
 
 test pp-4.8 {find-element} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp input {<doc/>}
     set result [pp next]
     lappend result [pp tag]
@@ -570,8 +625,45 @@ test pp-4.8 {find-element} {
     set result
 } {START_TAG doc END_TAG doc END_DOCUMENT}
 
+test pp-4.8.1 {find-element} {
+    tdom::pullparser pp
+    pp input {<doc></doc>}
+    set result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp find-element b]
+    pp delete
+    set result
+} {START_TAG doc END_TAG doc END_DOCUMENT}
+
+test pp-4.8.2 {find-element} {
+    tdom::pullparser pp
+    pp input {<doc> </doc>}
+    set result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp find-element b]
+    pp delete
+    set result
+} {START_TAG doc TEXT END_TAG doc END_DOCUMENT}
+
+test pp-4.8.3 {find-element} {
+    tdom::pullparser pp -ignorewhitecdata
+    pp input {<doc> </doc>}
+    set result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp find-element b]
+    pp delete
+    set result
+} {START_TAG doc END_TAG doc END_DOCUMENT}
+
 test pp-4.9 {find-element} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp input {<doc><a><b/></a><a><b><c/></b></a><a><b/></a></doc>}
     set result [pp next]; # START_TAG
     lappend result [pp tag]; # doc
@@ -591,7 +683,7 @@ test pp-4.9 {find-element} {
 } {START_TAG doc START_TAG a START_TAG b START_TAG c END_TAG c START_TAG a}
 
 test pp-4.10 {find-element} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp input {<doc>foo<a/>bar<b>grill<a/>baz</b></doc>}
     set result [pp next]; # START_TAG
     lappend result [pp tag]; # doc
@@ -613,7 +705,7 @@ test pp-4.10 {find-element} {
 } {START_TAG doc START_TAG a END_TAG a START_TAG a END_TAG a TEXT baz END_TAG b}
 
 test pp-4.11 {find-element} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp input {<doc>foo<a/>bar<b>grill<a/>baz</b></doc>}
     set result [pp state]
     lappend result [pp find-element a]; # START_TAG
@@ -634,7 +726,7 @@ test pp-4.11 {find-element} {
 } {START_DOCUMENT START_TAG a END_TAG a START_TAG a END_TAG a TEXT baz END_TAG b}
 
 test pp-4.12 {find-element} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp input {<doc>foo<a/>bar<b>grill<a/>baz</b></doc>}
     set result [pp state]
     pp find-element a
@@ -652,7 +744,7 @@ test pp-4.12 {find-element} {
 } {START_DOCUMENT START_TAG a END_TAG a TEXT baz END_TAG b}
 
 test pp-4.13 {find-element} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp input {<doc/>}
     set result [pp state]
     lappend result [pp find-element a]
@@ -660,8 +752,21 @@ test pp-4.13 {find-element} {
     set result
 } {START_DOCUMENT END_DOCUMENT}    
 
+test pp-4.14 {find-element} {
+    tdom::pullparser pp
+    pp input {<doc>foo bar<e/><e>bar</e></doc>}
+    set result [pp next]
+    lappend result [pp skip]
+    lappend result [pp tag]
+    lappend result [pp find-element b]
+    lappend result [catch {pp next} errMsg]
+    lappend result $errMsg
+    pp delete
+    set result
+} {START_TAG END_TAG doc END_DOCUMENT 1 {No next event after END_DOCUMENT}}
+    
 test pp-5.1 {CDATA section} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp input {<doc><![CDATA[ some text  ]]></doc>}
     set result [pp state]
     lappend result [pp next]
@@ -677,7 +782,7 @@ test pp-5.1 {CDATA section} {
 } {START_DOCUMENT START_TAG doc TEXT { some text  } END_TAG doc END_DOCUMENT}
 
 test pp-5.2 {CDATA section inside of text} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp input {<doc>before<![CDATA[ some text  ]]>after</doc>}
     set result [pp state]
     lappend result [pp next]
@@ -693,7 +798,7 @@ test pp-5.2 {CDATA section inside of text} {
 } {START_DOCUMENT START_TAG doc TEXT {before some text  after} END_TAG doc END_DOCUMENT}
 
 test pp-5.3 {CDATA section after text} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp input {<doc>before<![CDATA[ some text  ]]></doc>}
     set result [pp state]
     lappend result [pp next]
@@ -709,7 +814,7 @@ test pp-5.3 {CDATA section after text} {
 } {START_DOCUMENT START_TAG doc TEXT {before some text  } END_TAG doc END_DOCUMENT}
 
 test pp-5.4 {CDATA section before text} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp input {<doc><![CDATA[ some text  ]]>after</doc>}
     set result [pp state]
     lappend result [pp next]
@@ -725,7 +830,7 @@ test pp-5.4 {CDATA section before text} {
 } {START_DOCUMENT START_TAG doc TEXT { some text  after} END_TAG doc END_DOCUMENT}
 
 test pp-5.5 {White space only CDATA section inside text} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp input {<doc>before <![CDATA[  ]]> after</doc>}
     set result [pp state]
     lappend result [pp next]
@@ -741,7 +846,7 @@ test pp-5.5 {White space only CDATA section inside text} {
 } {START_DOCUMENT START_TAG doc TEXT {before    after} END_TAG doc END_DOCUMENT}
 
 test pp-5.6 {White space only CDATA section inside text with -ignorewhitecdata} {
-    tDOM::pullparser pp -ignorewhitecdata
+    tdom::pullparser pp -ignorewhitecdata
     pp input {<doc>before <![CDATA[  ]]> after</doc>}
     set result [pp state]
     lappend result [pp next]
@@ -757,7 +862,7 @@ test pp-5.6 {White space only CDATA section inside text with -ignorewhitecdata} 
 } {START_DOCUMENT START_TAG doc TEXT {before    after} END_TAG doc END_DOCUMENT}
 
 test pp-5.6 {White space only CDATA section inside text with -ignorewhitecdata} {
-    tDOM::pullparser pp -ignorewhitecdata
+    tdom::pullparser pp -ignorewhitecdata
     pp input {<doc>before <![CDATA[  ]]> after</doc>}
     set result [pp state]
     lappend result [pp next]
@@ -773,7 +878,7 @@ test pp-5.6 {White space only CDATA section inside text with -ignorewhitecdata} 
 } {START_DOCUMENT START_TAG doc TEXT {before    after} END_TAG doc END_DOCUMENT}
 
 test pp-5.7 {White space only CDATA section inside white space only text w/ -ignorewhitecdata} {
-    tDOM::pullparser pp -ignorewhitecdata
+    tdom::pullparser pp -ignorewhitecdata
     pp input {<doc> <![CDATA[  ]]>
         </doc>}
     set result [pp state]
@@ -788,7 +893,7 @@ test pp-5.7 {White space only CDATA section inside white space only text w/ -ign
 } {START_DOCUMENT START_TAG doc END_TAG doc END_DOCUMENT}
 
 test pp-5.8 {White space only CDATA section before text w/ -ignorewhitecdata} {
-    tDOM::pullparser pp -ignorewhitecdata
+    tdom::pullparser pp -ignorewhitecdata
     pp input {<doc> <![CDATA[  ]]> after</doc>}
     set result [pp state]
     lappend result [pp next]
@@ -804,7 +909,7 @@ test pp-5.8 {White space only CDATA section before text w/ -ignorewhitecdata} {
 } {START_DOCUMENT START_TAG doc TEXT {    after} END_TAG doc END_DOCUMENT}
 
 test pp-5.9 {Successive CDATA sections} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp input {<doc> <![CDATA[one]]><![CDATA[two]]><![CDATA[  ]]> after</doc>}
     set result [pp state]
     lappend result [pp next]
@@ -820,7 +925,7 @@ test pp-5.9 {Successive CDATA sections} {
 } {START_DOCUMENT START_TAG doc TEXT { onetwo   after} END_TAG doc END_DOCUMENT}
 
 test pp-6.1 {line} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     set result [catch {pp line}]
     pp input {<doc> <![CDATA[one]]><![CDATA[two]]><![CDATA[  ]]> after</doc>}
     lappend result [pp line]
@@ -839,7 +944,7 @@ test pp-6.1 {line} {
 } {1 0 START_TAG doc 1 TEXT { onetwo   after} END_TAG doc 1 END_DOCUMENT 1}
 
 test pp-6.2 {column} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     set result [catch {pp column}]
     pp input {<doc> <![CDATA[one]]><![CDATA[two]]><![CDATA[  ]]> after</doc>}
     lappend result [pp column]
@@ -858,7 +963,7 @@ test pp-6.2 {column} {
 } {1 0 START_TAG doc 5 TEXT { onetwo   after} END_TAG doc 62 END_DOCUMENT 62}
 
 test pp-6.3 {column} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp input {<doc>foo<b>bar</b>grill</doc>}
     set result [list]
     while {[pp next] ne "END_DOCUMENT"} {
@@ -874,7 +979,7 @@ test pp-6.3 {column} {
 } {doc 5 foo b 11 bar b 18 grill doc 29}
 
 test pp-6.4 {line/column} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp input {<doc>foo
 <b>bar
 </b>grill</doc>}
@@ -894,7 +999,7 @@ test pp-6.4 {line/column} {
 } b 3/4 grill doc 3/15}
 
 test pp-6.5 {column} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp input {<doc att="attvalue">foo<b att="boo">bar</b>grill</doc>}
     set result [list]
     while {[pp next] ne "END_DOCUMENT"} {
@@ -911,7 +1016,7 @@ test pp-6.5 {column} {
 } {doc 20 foo b 36 bar b 43 grill doc 54 54}
 
 test pp-6.6 {line/column after parsing error} {
-    tDOM::pullparser pp
+    tdom::pullparser pp
     pp input {<doc>an
         < xml error </doc>}
     pp next

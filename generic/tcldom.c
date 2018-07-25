@@ -82,7 +82,10 @@
 #define SetResult(str) Tcl_ResetResult(interp); \
                      Tcl_SetStringObj(Tcl_GetObjResult(interp), (str), -1)
 
-#define SetIntResult(i) Tcl_ResetResult(interp); \
+#define SetResult3(str1,str2,str3) Tcl_ResetResult(interp);     \
+                     Tcl_AppendResult(interp, (str1), (str2), (str3), NULL)
+
+#define SetIntResult(i) Tcl_ResetResult(interp);                        \
                      Tcl_SetIntObj(Tcl_GetObjResult(interp), (i))
                      
 #define SetDoubleResult(d) Tcl_ResetResult(interp); \
@@ -615,21 +618,22 @@ SetTdomNodeFromAny(
     nodeName = Tcl_GetString(objPtr);
     if (strncmp(nodeName, "domNode", 7)) {
         if (interp) {
-            SetResult("parameter not a domNode!");
+            SetResult3("Parameter \"", nodeName, "\" is not a domNode.");
             return TCL_ERROR;
         }
     }
-    if (sscanf(&nodeName[7], "%p%1c", &node, &eolcheck) != 1) {
+    if (sscanf(&nodeName[7], "%p%1c", (void **)&node, &eolcheck) != 1) {
         if (!Tcl_GetCommandInfo(interp, nodeName, &cmdInfo)) {
             if (interp) {
-                SetResult("parameter not a domNode!");
+                SetResult3("Parameter \"", nodeName, "\" is not a domNode.");
                 return TCL_ERROR;
             }
         }
         if (   (cmdInfo.isNativeObjectProc == 0)
             || (cmdInfo.objProc != (Tcl_ObjCmdProc*)tcldom_NodeObjCmd)) {
             if (interp) {
-                SetResult("parameter not a domNode object command");
+                SetResult3("Parameter \"", nodeName, "\" is not a domNode"
+                    " object command");
                 return TCL_ERROR;
             }
         }
@@ -1088,17 +1092,18 @@ domNode * tcldom_getNodeFromObj (
     
     nodeName = Tcl_GetString(nodeObj);
     if (strncmp(nodeName, "domNode", 7)) {
-        SetResult("parameter not a domNode!");
+        SetResult3("Parameter \"", nodeName, "\" is not a domNode.");
         return NULL;
     }
-    if (sscanf(&nodeName[7], "%p%1c", &node, &eolcheck) != 1) {
+    if (sscanf(&nodeName[7], "%p%1c", (void **)&node, &eolcheck) != 1) {
         if (!Tcl_GetCommandInfo(interp, nodeName, &cmdInfo)) {
-            SetResult("parameter not a domNode!");
+            SetResult3("Parameter \"", nodeName, "\" is not a domNode.");
             return NULL;
         }
         if (   (cmdInfo.isNativeObjectProc == 0)
             || (cmdInfo.objProc != (Tcl_ObjCmdProc*)tcldom_NodeObjCmd)) {
-            SetResult("parameter not a domNode object command!");
+            SetResult3("Parameter \"", nodeName, "\" is not a domNode"
+                       " object command.");
             return NULL;
         }
         node = (domNode*)cmdInfo.objClientData;
@@ -1125,7 +1130,7 @@ domNode * tcldom_getNodeFromName (
         *errMsg = "parameter not a domNode!";
         return NULL;
     }
-    if (sscanf(&nodeName[7], "%p%1c", &node, &eolcheck) != 1) {
+    if (sscanf(&nodeName[7], "%p%1c", (void **)&node, &eolcheck) != 1) {
         if (!Tcl_GetCommandInfo(interp, nodeName, &cmdInfo)) {
            *errMsg = "parameter not a domNode!";
            return NULL;
@@ -1160,7 +1165,7 @@ domDocument * tcldom_getDocumentFromName (
         *errMsg = "parameter not a domDoc!";
         return NULL;
     }
-    if (sscanf(&docName[6], "%p%1c", &doc, &eolcheck) != 1) {
+    if (sscanf(&docName[6], "%p%1c", (void **)&doc, &eolcheck) != 1) {
         if (!Tcl_GetCommandInfo(interp, docName, &cmdInfo)) {
             *errMsg = "parameter not a domDoc!";
             return NULL;
@@ -2688,21 +2693,21 @@ void tcldom_treeAsHTML (
     empty = 0;
     scriptTag = 0;
     switch (tag[0]) {
-        case 'a':  if (!strcmp(tag,"area"))       empty = 1; break;
-        case 'b':  if (!strcmp(tag,"br")     ||
-                       !strcmp(tag,"base")   ||
-                       !strcmp(tag,"basefont"))   empty = 1;
-        case 'c':  if (!strcmp(tag,"col"))        empty = 1; break;
-        case 'f':  if (!strcmp(tag,"frame"))      empty = 1; break;
-        case 'h':  if (!strcmp(tag,"hr"))         empty = 1; break;
-        case 'i':  if (!strcmp(tag,"img")    ||
-                       !strcmp(tag,"input")  ||
-                       !strcmp(tag,"isindex"))    empty = 1; break;
-        case 'l':  if (!strcmp(tag,"link"))       empty = 1; break;
-        case 'm':  if (!strcmp(tag,"meta"))       empty = 1; break;
-        case 'p':  if (!strcmp(tag,"param"))      empty = 1; break;
-        case 's':  if (!strcmp(tag,"script") ||     
-                       !strcmp(tag,"style"))  scriptTag = 1; break;
+    case 'a':  if (!strcmp(tag,"area"))       {empty = 1;} break;
+    case 'b':  if (!strcmp(tag,"br")     ||
+                   !strcmp(tag,"base")   ||
+                   !strcmp(tag,"basefont"))   {empty = 1;} break;
+    case 'c':  if (!strcmp(tag,"col"))        {empty = 1;} break;
+    case 'f':  if (!strcmp(tag,"frame"))      {empty = 1;} break;
+    case 'h':  if (!strcmp(tag,"hr"))         {empty = 1;} break;
+    case 'i':  if (!strcmp(tag,"img")    ||
+                   !strcmp(tag,"input")  ||
+                   !strcmp(tag,"isindex"))    {empty = 1;} break;
+    case 'l':  if (!strcmp(tag,"link"))       {empty = 1;} break;
+    case 'm':  if (!strcmp(tag,"meta"))       {empty = 1;} break;
+    case 'p':  if (!strcmp(tag,"param"))      {empty = 1;} break;
+    case 's':  if (!strcmp(tag,"script") ||     
+                   !strcmp(tag,"style"))  {scriptTag = 1;} break;
     }
 
 
@@ -4098,7 +4103,7 @@ static int applyXSLT (
     };
 
     enum xsltOption {
-        m_parmeters, m_ignoreUndeclaredParameters, m_maxApplyDepth,
+        m_parameters, m_ignoreUndeclaredParameters, m_maxApplyDepth,
         m_xsltmessagecmd
     };
 
@@ -4120,7 +4125,7 @@ static int applyXSLT (
     
         switch ((enum xsltOption) optionIndex) {
 
-        case m_parmeters:
+        case m_parameters:
             if (objc < 3) {SetResult(usage); goto applyXSLTCleanUP;}
             if (Tcl_ListObjLength(interp, objv[1], &length) != TCL_OK) {
                 SetResult("ill-formed parameters list: the -parameters "
@@ -6665,14 +6670,14 @@ int tcldom_featureinfo (
         "expatmicroversion", "dtd",                "ns",
         "unknown",           "tdomalloc",          "lessns",
         "html5",             "jsonmaxnesting",     "versionhash",
-        "TCL_UTF_MAX",        NULL
+        "pullparser",        "TCL_UTF_MAX",        NULL
     };
     enum feature {
         o_expatversion,      o_expatmajorversion,  o_expatminorversion,
         o_expatmicroversion, o_dtd,                o_ns,
         o_unknown,           o_tdomalloc,          o_lessns,
         o_html5,             o_jsonmaxnesting,     o_versionhash,
-        o_TCL_UTF_MAX
+        o_pullparser,        o_TCL_UTF_MAX,
     };
 
     if (Tcl_GetIndexFromObj(interp, objv[1], features, "feature", 0,
@@ -6748,7 +6753,14 @@ int tcldom_featureinfo (
     case o_versionhash:
         SetResult(FOSSIL_HASH);
         break;
-        
+    case o_pullparser:
+#ifndef TDOM_NO_PULL
+        result = 1;
+#else
+        result = 0;
+#endif
+        SetBooleanResult(result);
+        break;
     case o_TCL_UTF_MAX:
         SetIntResult(TCL_UTF_MAX);
         break;
@@ -6821,7 +6833,7 @@ int tcldom_DomObjCmd (
         |   try to find method implemented as normal Tcl proc
         \-------------------------------------------------------*/
         if ((strlen(method)-1) >= 270) {
-            SetResult("method name to long!");
+            SetResult("method name too long!");
             return TCL_ERROR;
         }
         sprintf(tmp, "::dom::DOMImplementation::%s", method);
@@ -7165,7 +7177,8 @@ int tcldom_CheckDocShared (
     Tcl_MutexUnlock(&tableMutex);
 
     if (found && doc != tabDoc) {
-        Tcl_Panic("document mismatch; doc=%p, in table=%p\n", doc, tabDoc);
+        Tcl_Panic("document mismatch; doc=%p, in table=%p\n", (void *)doc,
+                  (void *)tabDoc);
     }
 
     return found;

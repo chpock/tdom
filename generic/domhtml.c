@@ -778,31 +778,31 @@ HTML_SimpleParse (
                         \--------------------------------------------------------------*/
                         autoclose = 0;
                         switch (pn[0]) {
-                            case 'a': if (!strcmp(pn,"a"))        autoclose = 1; break;
-                            case 'b': if (!strcmp(pn,"b"))        autoclose = 1; break;
-                            case 'c': if (!strcmp(pn,"colgroup")) autoclose = 1; break;
-                            case 'd': if (!strcmp(pn,"dd") ||
-                                          !strcmp(pn,"dt") ||
-                                          (!strcmp(start+2,"form") && !strcmp(pn,"div"))
-                                         )                        autoclose = 1; break;
-                            case 'h': if (!strcmp(pn,"head") ||
-                                          !strcmp(pn,"html"))     autoclose = 1; break;
-                            case 'f': if (!strcmp(pn,"font")||
-                                          !strcmp(pn,"form"))     autoclose = 1; break;
-                            case 'i': if (!strcmp(pn,"i"))        autoclose = 1; break;
-                            case 'l': if (!strcmp(pn,"li"))       autoclose = 1; break;
-                            case 'n': if (!strcmp(pn,"noscript")) autoclose = 1; break;
-                            case 'o': if (!strcmp(pn,"option"))   autoclose = 1; break;
-                            case 'p': if (!strcmp(pn,"p"))        autoclose = 1; break;
-                            case 's': if (!strcmp(pn,"span"))     autoclose = 1; break;
-                            case 't': if (!strcmp(pn,"tbody") ||
-                                          !strcmp(pn,"td")    ||
-                                          !strcmp(pn,"tfoot") ||
-                                          !strcmp(pn,"thead") ||
-                                          !strcmp(pn,"th")    ||
-                                          !strcmp(pn,"tr")    ||
-                                          !strcmp(pn,"tt"))       autoclose = 1; break;
-                            case 'u': if (!strcmp(pn,"ul"))       autoclose = 1; break; /* ext */
+                        case 'a': if (!strcmp(pn,"a"))        {autoclose = 1;} break;
+                        case 'b': if (!strcmp(pn,"b"))        {autoclose = 1;} break;
+                        case 'c': if (!strcmp(pn,"colgroup")) {autoclose = 1;} break;
+                        case 'd': if (!strcmp(pn,"dd") ||
+                                      !strcmp(pn,"dt") ||
+                                      (!strcmp(start+2,"form") && !strcmp(pn,"div"))
+                            )                        {autoclose = 1;}          break;
+                        case 'h': if (!strcmp(pn,"head") ||
+                                      !strcmp(pn,"html"))     {autoclose = 1;} break;
+                        case 'f': if (!strcmp(pn,"font")||
+                                      !strcmp(pn,"form"))     {autoclose = 1;} break;
+                        case 'i': if (!strcmp(pn,"i"))        {autoclose = 1;} break;
+                        case 'l': if (!strcmp(pn,"li"))       {autoclose = 1;} break;
+                        case 'n': if (!strcmp(pn,"noscript")) {autoclose = 1;} break;
+                        case 'o': if (!strcmp(pn,"option"))   {autoclose = 1;} break;
+                        case 'p': if (!strcmp(pn,"p"))        {autoclose = 1;} break;
+                        case 's': if (!strcmp(pn,"span"))     {autoclose = 1;} break;
+                        case 't': if (!strcmp(pn,"tbody") ||
+                                      !strcmp(pn,"td")    ||
+                                      !strcmp(pn,"tfoot") ||
+                                      !strcmp(pn,"thead") ||
+                                      !strcmp(pn,"th")    ||
+                                      !strcmp(pn,"tr")    ||
+                                      !strcmp(pn,"tt"))       {autoclose = 1;} break;
+                        case 'u': if (!strcmp(pn,"ul"))       {autoclose = 1;} break; /* ext */
                         }
                         /*---------------------------------------------------------------
                         |   check for tags for close inner tags
@@ -1252,22 +1252,22 @@ HTML_SimpleParse (
             |   check for empty HTML tags
             \----------------------------------------------------------*/
             switch (node->nodeName[0]) {
-                case 'a':  if (!strcmp(node->nodeName,"area"))     hasContent = 0; break;
-                case 'b':  if (!strcmp(node->nodeName,"br")     ||
-                               !strcmp(node->nodeName,"base")   ||
-                               !strcmp(node->nodeName,"basefont")) hasContent = 0; break;
-                case 'c':  if (!strcmp(node->nodeName,"col"))      hasContent = 0; break;
-                case 'e':  if (!strcmp(node->nodeName,"embed"))    hasContent = 0; break; /*ext*/
-                case 'f':  if (!strcmp(node->nodeName,"frame"))    hasContent = 0; break;
-                case 'h':  if (!strcmp(node->nodeName,"hr"))       hasContent = 0; break;
-                case 'i':  if (!strcmp(node->nodeName,"img")   ||
-                               !strcmp(node->nodeName,"input") ||
-                               !strcmp(node->nodeName,"isindex"))  hasContent = 0; break;
-                case 'l':  if (!strcmp(node->nodeName,"link"))     hasContent = 0; break;
-                case 'm':  if (!strcmp(node->nodeName,"meta"))     hasContent = 0; break;
-                case 'p':  if (!strcmp(node->nodeName,"param"))    hasContent = 0; break;
-                case 's':  if (!strcmp(node->nodeName,"spacer") ||                        /*ext*/
-                               !strcmp(node->nodeName,"source"))   hasContent = 0; break; /*html5*/
+            case 'a':  if (!strcmp(node->nodeName,"area"))     {hasContent = 0;} break;
+            case 'b':  if (!strcmp(node->nodeName,"br")     ||
+                           !strcmp(node->nodeName,"base")   ||
+                           !strcmp(node->nodeName,"basefont")) {hasContent = 0;} break;
+            case 'c':  if (!strcmp(node->nodeName,"col"))      {hasContent = 0;} break;
+            case 'e':  if (!strcmp(node->nodeName,"embed"))    {hasContent = 0;} break;
+            case 'f':  if (!strcmp(node->nodeName,"frame"))    {hasContent = 0;} break;
+            case 'h':  if (!strcmp(node->nodeName,"hr"))       {hasContent = 0;} break;
+            case 'i':  if (!strcmp(node->nodeName,"img")   ||
+                           !strcmp(node->nodeName,"input") ||
+                           !strcmp(node->nodeName,"isindex"))  {hasContent = 0;} break;
+            case 'l':  if (!strcmp(node->nodeName,"link"))     {hasContent = 0;} break;
+            case 'm':  if (!strcmp(node->nodeName,"meta"))     {hasContent = 0;} break;
+            case 'p':  if (!strcmp(node->nodeName,"param"))    {hasContent = 0;} break;
+            case 's':  if (!strcmp(node->nodeName,"spacer") || 
+                           !strcmp(node->nodeName,"source"))   {hasContent = 0;} break; /*html5*/
             }
 
             if (*x=='/') {
@@ -1353,22 +1353,22 @@ HTML_SimpleParse (
         \--------------------------------------------------------------*/
         autoclose = 0;
         switch (pn[0]) {
-            case 'b': if (!strcmp(pn,"body"))     autoclose = 1; break;
-            case 'c': if (!strcmp(pn,"colgroup")) autoclose = 1; break;
-            case 'd': if (!strcmp(pn,"dd") ||
-                          !strcmp(pn,"dt"))       autoclose = 1; break;
-            case 'h': if (!strcmp(pn,"head") ||
-                          !strcmp(pn,"html"))     autoclose = 1; break;
-            case 'l': if (!strcmp(pn,"li"))       autoclose = 1; break;
-            case 'o': if (!strcmp(pn,"option"))   autoclose = 1; break;
-            case 'p': if (!strcmp(pn,"p"))        autoclose = 1; break;
-            case 't': if (!strcmp(pn,"tbody") ||
-                          !strcmp(pn,"td")    ||
-                          !strcmp(pn,"tfoot") ||
-                          !strcmp(pn,"thead") ||
-                          !strcmp(pn,"th")    ||
-                          !strcmp(pn,"tr"))       autoclose = 1; break;
-            case 'u': if (!strcmp(pn,"ul"))       autoclose = 1; break; /* ext */
+        case 'b': if (!strcmp(pn,"body"))     {autoclose = 1;} break;
+        case 'c': if (!strcmp(pn,"colgroup")) {autoclose = 1;} break;
+        case 'd': if (!strcmp(pn,"dd") ||
+                      !strcmp(pn,"dt"))       {autoclose = 1;} break;
+        case 'h': if (!strcmp(pn,"head") ||
+                      !strcmp(pn,"html"))     {autoclose = 1;} break;
+        case 'l': if (!strcmp(pn,"li"))       {autoclose = 1;} break;
+        case 'o': if (!strcmp(pn,"option"))   {autoclose = 1;} break;
+        case 'p': if (!strcmp(pn,"p"))        {autoclose = 1;} break;
+        case 't': if (!strcmp(pn,"tbody") ||
+                      !strcmp(pn,"td")    ||
+                      !strcmp(pn,"tfoot") ||
+                      !strcmp(pn,"thead") ||
+                      !strcmp(pn,"th")    ||
+                      !strcmp(pn,"tr"))       {autoclose = 1;} break;
+        case 'u': if (!strcmp(pn,"ul"))       {autoclose = 1;} break; /* ext */
         }
         if (!autoclose) break;
         DBG(fprintf(stderr, "final autoclosed '%s'! \n", pn);)

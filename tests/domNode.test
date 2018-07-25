@@ -639,10 +639,10 @@ test domNode-6.15 {appendChild} -setup {
 } -body {
     set docs {}
     foreach rf $fileList {
-        set doc [dom parse -baseurl [tDOM::baseURL $rf] \
-                     -externalentitycommand ::tDOM::extRefHandler \
+        set doc [dom parse -baseurl [tdom::baseURL $rf] \
+                     -externalentitycommand ::tdom::extRefHandler \
                      -keepEmpties \
-                     [tDOM::xmlReadFile $rf] ]
+                     [tdom::xmlReadFile $rf] ]
         lappend docs $doc
     }
     set resultDoc [dom createDocument new_report]
@@ -2418,7 +2418,7 @@ test domNode-30.2 {precedes} {
 test domNode-30.3 {precedes} {
     set result [catch {$root precedes notaNode} errMsg]
     lappend result $errMsg
-} {1 {parameter not a domNode!}}
+} {1 {Parameter "notaNode" is not a domNode.}}
 
 test domNode-30.4 {precedes} {
     set firstChild [$root firstChild]
@@ -3024,10 +3024,10 @@ test domNode-34.1 {getBaseURI} {need_uri} {
     makeFile <y/> domNode-34.1-e1.xml [file join [file dir [info script]] data]
     makeFile <y/> domNode-34.1-e2.xml [file join [file dir [info script]] data]
 
-    set baseURI file://[file join [pwd] [file dir [info script]] dom.test]
+    set baseURI [tdom::baseURL [file join [pwd] [file dir [info script]] dom.test]]
     set doc [dom parse \
                  -baseurl $baseURI \
-                 -externalentitycommand ::tDOM::extRefHandler {
+                 -externalentitycommand ::tdom::extRefHandler {
                      <!DOCTYPE x [
                                   <!ENTITY a SYSTEM "data/domNode-34.1-e1.xml">
                                   <!ENTITY b SYSTEM "data/domNode-34.1-e2.xml">
@@ -3056,10 +3056,10 @@ test domNode-34.2 {getBaseURI} {need_uri} {
     makeFile <y/> domNode-34.1-e1.xml [file join [file dir [info script]] data]
     makeFile <y/> domNode-34.1-e2.xml [file join [file dir [info script]] data]
 
-    set baseURI file://[file join [pwd] [file dir [info script]] dom.test]
+    set baseURI [tdom::baseURL [file join [pwd] [file dir [info script]] dom.test]]
     set doc [dom parse \
                  -baseurl $baseURI \
-                 -externalentitycommand ::tDOM::extRefHandler {
+                 -externalentitycommand ::tdom::extRefHandler {
                      <!DOCTYPE x [
                                   <!ENTITY a SYSTEM "data/domNode-34.1-e1.xml">
                                   <!ENTITY b SYSTEM "data/domNode-34.1-e2.xml">
@@ -3072,7 +3072,7 @@ test domNode-34.2 {getBaseURI} {need_uri} {
     $doc delete
     set doc [dom parse \
                  -baseurl $baseURI \
-                 -externalentitycommand ::tDOM::extRefHandler {
+                 -externalentitycommand ::tdom::extRefHandler {
                      <!DOCTYPE x [
                                   <!ENTITY a SYSTEM "data/domNode-34.1-e1.xml">
                                   <!ENTITY b SYSTEM "data/domNode-34.1-e2.xml">

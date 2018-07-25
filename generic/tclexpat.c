@@ -3459,7 +3459,7 @@ TclGenExpatExternalEntityRefHandler(
       
       /* The last node in the external entity may be a text node. To call 
          TclExpatDispatchPCDATA, before switching back to the old parser
-         ensures, that that last text node has the right base URI. */
+         ensures, that last text node has the right base URI. */
       TclExpatDispatchPCDATA(expat);
 
       XML_ParserFree (extparser);
