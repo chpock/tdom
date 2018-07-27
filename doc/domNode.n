@@ -199,7 +199,7 @@ target for processing-instructions, "#text" for text node,
 nodes.
 .TP
 \&\fB\fBnodeValue\fP \fI?newValue?\fB
-\&\fRReturns the value of that node object. This is the the text or
+\&\fRReturns the value of that node object. This is the text or
 the data for element nodes of type TEXT_NODE, COMMENT_NODE,
 PROCESSING_INSTRUCTION_NODE or CDATA_SECTION_NODE). Otherwise it is empty. If
 the node is a TEXT_NODE, COMMENT_NODE or PROCESSING_INSTRUCTION_NODE and the
@@ -319,9 +319,22 @@ prefix. It is not recommended to set xml namespace declarations. The effects are
 the namespace \fIuri\fR.
 .TP
 \&\fB\fBattributes\fP \fB?attributeNamePattern?\fP
-\&\fRReturns all attributes matching the \fIattributeNamePattern\fR.
-If \fIattributeNamePattern\fR isn't given, all attributes are returned as a Tcl
-list.
+\&\fRReturns information about the attriubtes matching the
+\&\fIattributeNamePattern\fR. If \fIattributeNamePattern\fR
+isn't given, information about all attributes are returned.
+The return value is a Tcl list, the elements just the
+attriubute name in case of non namespaced attriubtes and three
+element sublists for namespaced attributes. n case of an
+"ordinary" namespaced attribute, the sublist elements are
+{<localname> <prefix> <namespace_uri>}. In the special case of
+an xml namespace declaration it is {<the prefix defined>
+<localname> ""}.
+.TP
+\&\fB\fBattributeNames\fP \fB?attributeNamePattern?\fP
+\&\fRReturns a flat list of all attributes names (as found in
+the XML source) matching the \fIattributeNamePattern\fR. If
+\&\fIattributeNamePattern\fR isn't given, all attribute names
+are returned as a Tcl list.
 .TP
 \&\fB\fBappendChild\fP \fInewChild\fB
 \&\fRAppends \fInewChild\fR to the end of the child list of the
@@ -551,8 +564,7 @@ defined for it.
 \&\fB\fBasText\fP
 \&\fRFor ELEMENT_NODEs, the asText method outputs
 the string-value of every text node descendant of node in document
-order without any escaping. For every other node type, this method outputs the
-the XPath string value of that node.
+order without any escaping. For every other node type, this method outputs the XPath string value of that node.
 .TP
 \&\fB\fBappendFromList\fP \fIlist\fB
 \&\fRParses \fIlist\fR , creates an according DOM subtree and

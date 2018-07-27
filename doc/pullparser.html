@@ -4,18 +4,18 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x241d970">NAME</a> · <a href="#SECTid0x2307540">SYNOPSIS</a> · <a href="#SECTid0x231cbc0">DESCRIPTION </a> · <a href="#SECTid0x2441170">KEYWORDS</a>
+<a href="#SECTid0x11bc970">NAME</a> · <a href="#SECTid0x10a6540">SYNOPSIS</a> · <a href="#SECTid0x10bbbc0">DESCRIPTION </a> · <a href="#SECTid0x11e0cb0">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x241d970">NAME</a></h2><p class="namesection">
-<b class="names">tDOM::pullparser - </b><br>Create an XML pull parser command</p>
+  <h2><a name="SECTid0x11bc970">NAME</a></h2><p class="namesection">
+<b class="names">tdom::pullparser - </b><br>Create an XML pull parser command</p>
 
-  <h2><a name="SECTid0x2307540">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x10a6540">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
-    <b class="cmd">tDOM::pullparser</b> <i class="m">cmdName</i>  ? -ignorewhitecdata ? 
+    <b class="cmd">tdom::pullparser</b> <i class="m">cmdName</i>  ? -ignorewhitecdata ? 
     </pre>
 
-  <h2><a name="SECTid0x231cbc0">DESCRIPTION </a></h2><p>This command creates XML pull parser commands with a simple
+  <h2><a name="SECTid0x10bbbc0">DESCRIPTION </a></h2><p>This command creates XML pull parser commands with a simple
     API, along the lines of a simple StAX parser. After creation,
     you've to set an input source, to do anything useful with the pull
     parser. For this see the methods <i class="m">input</i>, <i class="m">inputchannel</i>
@@ -23,7 +23,7 @@
     data until some next state, do what has to be done and skip again
     to the next state. XML well-formedness errors along the way will
     be reported as TCL_ERROR with additional info in the error
-    message.</p><p>The pull parsers doesn't follow externial entites and are XML
+    message.</p><p>The pull parsers don't follow external entities and are XML
     1.0 only, they know nothing about XML Namespaces. You get the tags
     and attribute names as in the source. You aren't noticed about
     comments, processing instructions and external entities; they are
@@ -101,8 +101,10 @@
 
       
         <dt><b class="method">next</b></dt>
-        <dd>This method valid in state <i class="m">START_DOCUMENT</i>,
-        <i class="m">START_TAG</i>, <i class="m">END_TAG</i> and <i class="m">TEXT</i>.</dd>
+        <dd>This method is valid in state <i class="m">START_DOCUMENT</i>,
+        <i class="m">START_TAG</i>, <i class="m">END_TAG</i> and <i class="m">TEXT</i>. It continues
+        parsing of the XML input until the next event, which it will
+        return.</dd>
       
 
       
@@ -129,8 +131,9 @@
       
         <dt><b class="method">skip</b></dt>
         <dd>This method is only valid in state <i class="m">START_TAG</i>. It
-        skips to the corresponding end tag while, ignores all events
-        on the way and returns the new state END_TAG.</dd>
+        skips to the corresponding end tag and ignores all events (but
+        not XML parsing errors) on the way and returns the new state
+        END_TAG.</dd>
       
 
       
@@ -156,9 +159,23 @@
         <dd>This method is valid in all parser states. It deletes
         the parser command.</dd>
       
+    </dl><p>Miscellaneous methods:</p><dl class="commandlist">
+      
+        <dt><b class="method">line</b></dt>
+        <dd>This method is valid in all parser states except READY
+        and TEXT. It returns the line number of the parsing
+        position.</dd>
+      
+
+      
+        <dt><b class="method">line</b></dt>
+        <dd>This method is valid in all parser states except READY
+        and TEXT. It returns the offset, from the beginning of the
+        current line, of the parsing position.</dd>
+      
     </dl>
 
-  <h2><a name="SECTid0x2441170">KEYWORDS</a></h2><p class="keywords">
+  <h2><a name="SECTid0x11e0cb0">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-XML">XML</a>, <a class="keyword" href="keyword-index.html#KW-pull">pull</a>, <a class="keyword" href="keyword-index.html#KW-parsing">parsing</a>
 </p>
 </div><hr class="navsep"><div class="navbar" align="center">

@@ -21,7 +21,7 @@
 #    domNode-15.*: delete
 #    domNode-16.*: getAttribute
 #    domNode-17.*: nodeType
-#    domNode-18.*: attributes
+#    domNode-18.*: attributes, attributeNames
 #    domNode-19.*: removeAttribute, removeAttributeNS
 #    domNode-20.*: parentNode
 #    domNode-21.*: hasChildNodes
@@ -639,10 +639,10 @@ test domNode-6.15 {appendChild} -setup {
 } -body {
     set docs {}
     foreach rf $fileList {
-        set doc [dom parse -baseurl [tDOM::baseURL $rf] \
-                     -externalentitycommand ::tDOM::extRefHandler \
+        set doc [dom parse -baseurl [tdom::baseURL $rf] \
+                     -externalentitycommand ::tdom::extRefHandler \
                      -keepEmpties \
-                     [tDOM::xmlReadFile $rf] ]
+                     [tdom::xmlReadFile $rf] ]
         lappend docs $doc
     }
     set resultDoc [dom createDocument new_report]
@@ -2001,6 +2001,34 @@ test domNode-18.7 {attributes} {
     [$root firstChild] attributes
 } {}
 
+test domNode-18.1.1 {attributeNames} {
+    $root attributeNames
+} {xmlns:foo attr1 attr2 attr3 foo:attr1 worble2}
+
+test domNode-18.2.1 {attributeNames} {
+    $root attributeNames *
+} {xmlns:foo attr1 attr2 attr3 foo:attr1 worble2}
+
+test domNode-18.3.1 {attributeNames} {
+    $root attributeNames attr*
+} {attr1 attr2 attr3}
+
+test domNode-18.4.1 {attributeNames} {
+    $root attributeNames *2*
+} {attr2 worble2}
+
+test domNode-18.5.1 {attributeNames} {
+    $root attributeNames worble2
+} {worble2}
+
+test domNode-18.6.1 {attributeNames} {
+    $root attributeNames *brab*
+} {}
+
+test domNode-18.7.1 {attributeNames} {
+    [$root firstChild] attributeNames
+} {}
+
 # Hmmm. This two following tests are mostly there to document the
 # behavior of the method, as it is.  It may debatable if they should
 # behave this way. The optional attribute name pattern is a tDOM
@@ -2014,6 +2042,10 @@ test domNode-18.8 {attributes} {
 test domNode-18.9 {attributes} {
     $root attributes foo*
 } {{attr1 foo http://tdom.org/ns}}
+
+test domNode-18.9.1 {attributeNames} {
+    $root attributeNames foo:*
+} {foo:attr1}
 
 $doc delete
 set doc [dom parse {<root attr1="bingbaz"
@@ -2386,7 +2418,7 @@ test domNode-30.2 {precedes} {
 test domNode-30.3 {precedes} {
     set result [catch {$root precedes notaNode} errMsg]
     lappend result $errMsg
-} {1 {parameter not a domNode!}}
+} {1 {Parameter "notaNode" is not a domNode.}}
 
 test domNode-30.4 {precedes} {
     set firstChild [$root firstChild]
@@ -2992,10 +3024,10 @@ test domNode-34.1 {getBaseURI} {need_uri} {
     makeFile <y/> domNode-34.1-e1.xml [file join [file dir [info script]] data]
     makeFile <y/> domNode-34.1-e2.xml [file join [file dir [info script]] data]
 
-    set baseURI file://[file join [pwd] [file dir [info script]] dom.test]
+    set baseURI [tdom::baseURL [file join [pwd] [file dir [info script]] dom.test]]
     set doc [dom parse \
                  -baseurl $baseURI \
-                 -externalentitycommand ::tDOM::extRefHandler {
+                 -externalentitycommand ::tdom::extRefHandler {
                      <!DOCTYPE x [
                                   <!ENTITY a SYSTEM "data/domNode-34.1-e1.xml">
                                   <!ENTITY b SYSTEM "data/domNode-34.1-e2.xml">
@@ -3024,10 +3056,10 @@ test domNode-34.2 {getBaseURI} {need_uri} {
     makeFile <y/> domNode-34.1-e1.xml [file join [file dir [info script]] data]
     makeFile <y/> domNode-34.1-e2.xml [file join [file dir [info script]] data]
 
-    set baseURI file://[file join [pwd] [file dir [info script]] dom.test]
+    set baseURI [tdom::baseURL [file join [pwd] [file dir [info script]] dom.test]]
     set doc [dom parse \
                  -baseurl $baseURI \
-                 -externalentitycommand ::tDOM::extRefHandler {
+                 -externalentitycommand ::tdom::extRefHandler {
                      <!DOCTYPE x [
                                   <!ENTITY a SYSTEM "data/domNode-34.1-e1.xml">
                                   <!ENTITY b SYSTEM "data/domNode-34.1-e2.xml">
@@ -3040,7 +3072,7 @@ test domNode-34.2 {getBaseURI} {need_uri} {
     $doc delete
     set doc [dom parse \
                  -baseurl $baseURI \
-                 -externalentitycommand ::tDOM::extRefHandler {
+                 -externalentitycommand ::tdom::extRefHandler {
                      <!DOCTYPE x [
                                   <!ENTITY a SYSTEM "data/domNode-34.1-e1.xml">
                                   <!ENTITY b SYSTEM "data/domNode-34.1-e2.xml">

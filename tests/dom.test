@@ -299,7 +299,7 @@ proc extRefResolver {base systemId publicId} {
     if {$publicId == "DOMCMDTEST"} {
         return [list string $base $dom_dtd]
     } else {
-        return [::tDOM::extRefHandler $base $systemId $publicId]
+        return [::tdom::extRefHandler $base $systemId $publicId]
     }
 }
 
@@ -550,12 +550,7 @@ test dom-2.28 {parse document with undeclared xml prefix} {
     string range $errMsg 0 30
 } {Namespace prefix is not defined}
 
-# This is an expat bug. If XML_StopParser is called in the
-# elementstarthandler function for the document element and there
-# isn't anything else in the document than this document element, then
-# the XML_Parse() return code doesn't reflects this. This is an edge
-# case, see the next test below.
-test dom-2.29 {parse not well-formed document with undeclared xml prefix} {knownBug} {
+test dom-2.29 {parse not well-formed document with undeclared xml prefix} {
     catch {dom parse {<foo:e/>}} errMsg
     string range $errMsg 0 30
 } {Namespace prefix is not defined}
@@ -663,6 +658,13 @@ test dom-2.41 {-keepCDATA and -keepEmpties} {
     $doc delete
     set result
 } 1
+
+test dom-2.42 {namespaces} {
+    set doc [dom parse {
+        <help><br xmlns:xsi="a"/><em xmlns:xsi="a">notes</em></help>
+    }]
+    $doc delete
+} {}
 
 test dom-3.1 {isName} {
     dom isName ":foo"
@@ -1052,12 +1054,12 @@ test dom-4.1 {-useForeignDTD 0} {
 } {}
 
 test dom-4.2 {-useForeignDTD 1 with document with internal subset} {need_uri} {
-    set baseURI file://[file join [pwd] [file dir [info script]] dom.test]
-    set ::tDOM::useForeignDTD "data/domCmd1.dtd"
+    set baseURI [tdom::baseURL [file join [pwd] [file dir [info script]] dom.test]]
+    set ::tdom::useForeignDTD "data/domCmd1.dtd"
     set doc [dom parse \
             -useForeignDTD 1 \
             -baseurl $baseURI \
-            -externalentitycommand ::tDOM::extRefHandler {
+            -externalentitycommand ::tdom::extRefHandler {
 <!DOCTYPE root [
     <!ATTLIST root fixed CDATA #FIXED "toThat">
 ]>
@@ -1069,12 +1071,12 @@ test dom-4.2 {-useForeignDTD 1 with document with internal subset} {need_uri} {
 } {toThat}
 
 test dom-4.3 {-useForeignDTD 1 with document with internal subset} {need_uri} {
-    set baseURI file://[file join [pwd] [file dir [info script]] dom.test]
-    set ::tDOM::useForeignDTD "data/domCmd1.dtd"
+    set baseURI [tdom::baseURL [file join [pwd] [file dir [info script]] dom.test]]
+    set ::tdom::useForeignDTD "data/domCmd1.dtd"
     set doc [dom parse \
             -useForeignDTD 1 \
             -baseurl $baseURI \
-            -externalentitycommand ::tDOM::extRefHandler {
+            -externalentitycommand ::tdom::extRefHandler {
 <!DOCTYPE root [
     <!ATTLIST root fixed2 CDATA #FIXED "toThat">
 ]>
@@ -1087,12 +1089,12 @@ test dom-4.3 {-useForeignDTD 1 with document with internal subset} {need_uri} {
 } {toThis toThat}
 
 test dom-4.4 {-useForeignDTD 1 with document without document declaration} {need_uri} {
-    set baseURI file://[file join [pwd] [file dir [info script]] dom.test]
-    set ::tDOM::useForeignDTD "data/domCmd1.dtd"
+    set baseURI [tdom::baseURL [file join [pwd] [file dir [info script]] dom.test]]
+    set ::tdom::useForeignDTD "data/domCmd1.dtd"
     set doc [dom parse \
             -useForeignDTD 1 \
             -baseurl $baseURI \
-            -externalentitycommand ::tDOM::extRefHandler <root/>]
+            -externalentitycommand ::tdom::extRefHandler <root/>]
     set root [$doc documentElement]
     set result [$root @fixed]
     $doc delete
@@ -1100,12 +1102,12 @@ test dom-4.4 {-useForeignDTD 1 with document without document declaration} {need
 } {toThis}
 
 test dom-4.5 {-useForeignDTD 1 does not overwrite a given external subset} {need_uri} {
-    set baseURI file://[file join [pwd] [file dir [info script]] dom.test]
-    set ::tDOM::useForeignDTD "data/domCmd1.dtd"
+    set baseURI [tdom::baseURL [file join [pwd] [file dir [info script]] dom.test]]
+    set ::tdom::useForeignDTD "data/domCmd1.dtd"
     set doc [dom parse \
             -useForeignDTD 1 \
             -baseurl $baseURI \
-            -externalentitycommand ::tDOM::extRefHandler {
+            -externalentitycommand ::tdom::extRefHandler {
 <!DOCTYPE root SYSTEM "data/domCmd2.dtd">
 <root/>}]
     set root [$doc documentElement]
@@ -1120,10 +1122,10 @@ test dom-4.6 {-useForeignDTD with nonboolean arg} {need_uri} {
 } {1 {expected boolean value but got "foo"}}
 
 test dom-5.1 {document with external subset} {need_uri} {
-    set baseURI file://[file join [pwd] [file dir [info script]] dom.test]
+    set baseURI [tdom::baseURL [file join [pwd] [file dir [info script]] dom.test]]
     set doc [dom parse \
             -baseurl $baseURI \
-            -externalentitycommand ::tDOM::extRefHandler {
+            -externalentitycommand ::tdom::extRefHandler {
 <!DOCTYPE root SYSTEM "data/domCmd2.dtd">
 <root/>}]
     set root [$doc documentElement]
@@ -1337,7 +1339,7 @@ test dom-5.8 {-externalentitycommand - nested external entities} -setup {
 } -result [list 1 {error "not well-formed (invalid token)" in entity "e3.xml" at line 1 character 2, referenced in entity "e2.xml" at line 1 character 4, referenced in entity "e1.xml" at line 1 character 4, referenced at line 6 character 21}]
 
 test dom-5.9 {Wrong option after -externalentitycommand} -body {
-    set result [catch {dom parse -externalentitycommand ::tDOM::extRefHandler \
+    set result [catch {dom parse -externalentitycommand ::tdom::extRefHandler \
                            -useForeignDTD foo}]
 } -result 1
 
@@ -1696,7 +1698,7 @@ test dom-9.7 {Attempt to use the token to an already freed node} {
     domDoc $doc delete
     dom setObjectCommands automatic
     set result
-} {1 {parameter not a domNode!}}
+} {1 {Parameter "" is not a domNode.}}
     
 catch {namespace delete nodeCmds}
 

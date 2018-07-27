@@ -43,13 +43,14 @@ PRJ_OBJS = \
 	$(TMP_DIR)\tclpull.obj     \
 	$(TMP_DIR)\tdomStubInit.obj\
 	$(TMP_DIR)\tdomStubLib.obj \
-	$(TMP_DIR)\tdominit.obj
+	$(TMP_DIR)\tdominit.obj    \
+	$(TMP_DIR)\loadlibrary.obj
 
 PRJ_STUBOBJS = $(TMP_DIR)\tdomStubLib.obj
 
 PRJ_DEFINES = \
 	-D _CRT_SECURE_NO_DEPRECATE -D _CRT_NONSTDC_NO_DEPRECATE \
-	-DHAVE_MEMMOVE=1 -DXML_DTD=1 -DXML_NS=1 -DTDOM_NO_UNKNOWN_CMD=1 \
+	-DHAVE_MEMMOVE -DXML_DTD=1 -DXML_NS=1 -DTDOM_NO_UNKNOWN_CMD=1 \
 	-DXMLIMPORT=__declspec(dllexport)
 
 # TBD - some of the code, like expat checks for Windows using the

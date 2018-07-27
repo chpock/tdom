@@ -58,7 +58,7 @@ nodes.</desc>
 
       <commanddef>
         <command><method>nodeValue</method> <m>?newValue?</m></command>
-        <desc>Returns the value of that node object. This is the the text or
+        <desc>Returns the value of that node object. This is the text or
 the data for element nodes of type TEXT_NODE, COMMENT_NODE,
 PROCESSING_INSTRUCTION_NODE or CDATA_SECTION_NODE). Otherwise it is empty. If
 the node is a TEXT_NODE, COMMENT_NODE or PROCESSING_INSTRUCTION_NODE and the
@@ -210,11 +210,27 @@ prefix. It is not recommended to set xml namespace declarations. The effects are
 
       <commanddef>
         <command><method>attributes</method> <option>?attributeNamePattern?</option></command>
-        <desc>Returns all attributes matching the <m>attributeNamePattern</m>.
-If <m>attributeNamePattern</m> isn't given, all attributes are returned as a Tcl
-list.</desc>
+        <desc>Returns information about the attriubtes matching the
+        <m>attributeNamePattern</m>. If <m>attributeNamePattern</m>
+        isn't given, information about all attributes are returned.
+        The return value is a Tcl list, the elements just the
+        attriubute name in case of non namespaced attriubtes and three
+        element sublists for namespaced attributes. n case of an
+        "ordinary" namespaced attribute, the sublist elements are
+        {&lt;localname&gt; &lt;prefix&gt; &lt;namespace_uri&gt;}. In the special case of
+        an xml namespace declaration it is {&lt;the prefix defined&gt;
+        &lt;localname&gt; ""}.
+        </desc>
       </commanddef>
 
+      <commanddef>
+        <command><method>attributeNames</method> <option>?attributeNamePattern?</option></command>
+        <desc>Returns a flat list of all attributes names (as found in
+        the XML source) matching the <m>attributeNamePattern</m>. If
+        <m>attributeNamePattern</m> isn't given, all attribute names
+        are returned as a Tcl list.</desc>
+      </commanddef>
+      
       <commanddef>
         <command><method>appendChild</method> <m>newChild</m></command>
         <desc>Appends <m>newChild</m> to the end of the child list of the
@@ -494,8 +510,7 @@ defined for it.</desc>
         <command><method>asText</method></command>
           <desc>For ELEMENT_NODEs, the asText method outputs 
 the string-value of every text node descendant of node in document
-order without any escaping. For every other node type, this method outputs the
-the XPath string value of that node.</desc>
+order without any escaping. For every other node type, this method outputs the XPath string value of that node.</desc>
       </commanddef>
 
       <commanddef>

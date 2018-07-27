@@ -13,7 +13,7 @@ if {[catch {package require -exact tdom 0.9.1}]} {
         error "Unable to load the appropriate tDOM version!"
     }
 }
-if {[info commands ::tDOM::xmlReadFile] == ""} {
+if {[info commands ::tdom::xmlReadFile] == ""} {
     # tcldomsh without the script library. Source the lib.
     source [file join [file dir [info script]] ../lib tdom.tcl]
 }
