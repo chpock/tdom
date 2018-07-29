@@ -207,7 +207,7 @@ all: binaries libraries doc
 # TDOM enabled shell is build as an extra directive, since non TEA. 
 #========================================================================
 
-$(TDOMSHELL): $(PKG_OBJECTS) $(srcdir)/unix/tclAppInit.c
+$(TDOMSHELL): binaries $(srcdir)/unix/tclAppInit.c
 	$(COMPILE) -c `@CYGPATH@ $(srcdir)/unix/tclAppInit.c`
 	$(CC) @LDFLAGS@ -o $@ tclAppInit.$(OBJEXT) $(PKG_OBJECTS) \
 	  $(TCL_LIB_SPEC) $(TDOMSHELL_LIBS) $(TDOM_LD_SEARCH_FLAGS)

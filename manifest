@@ -1,12 +1,12 @@
-C Fixed\sa\stypo.
-D 2018-07-25T23:07:35.705
+C Made\sthe\smake\starget\stcldomsh\swork\swithout\sa\sprior\smake\sall.
+D 2018-07-29T23:00:09.754
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
 F CHANGES 014245dd36bb67aa1d98ad75bdfaf4a6904bceaa9db84a0627fabff967bd3800
 F ChangeLog 9b60ec8bfbae84e4f1a97aaee24be00ccea212b7
 F LICENSE c9ba7733dcfadb0ce00b4f2b0dd29dfef28a708a
-F Makefile.in 5d75050d79d2e70a4f2cebe33bab918cf0a9e1db99d632854ad71c78fb51eeeb
+F Makefile.in fefa4f5e0ad04c6dc0c93a37064bae3b430056dc2a56a53ee85d06f29c06994b
 F NPL-1_1Final.html 844d247f8cb7b5b3d08c7d3cd1acb91f983e5e3e
 F README a8ada2bb9b20e9ff066f68f54bd84c36e5559c5c4e6fa846c8ab4715b4758a5a
 F README.AOL d076b065f6a3209b5374a63c9ddd7fbca167643e
@@ -223,8 +223,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 3f83c3f5659176907d2d2d4a68e14f82f3defd78 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 59c3d27071827d91dc865b69bee438f55ed063b13caf2dc7c2b9b62c6636fe40
-R 45462a8a5348448ee600bf6a9df5b3b6
+P 7476c3ea9d4e362f79991250130afb50a0e85e668268e66eae035ad82917b7a7
+R 6325fe6bdb84e5715c6c002413c31e3e
 U rolf
-Z e92f6f00e10ff720b32b0d87bd021d7c
+Z 1f7a335a86e205fdd2d5732cb6de6f89
 # Remove this line to create a well-formed Fossil manifest.
