@@ -391,7 +391,7 @@ dist: dist-clean
 	    $(srcdir)/CHANGES \
 	    $(srcdir)/ChangeLog \
 	    $(srcdir)/LICENSE \
-	    $(srcdir)/NPL-1_1Final.html \
+	    $(srcdir)/MPL_2.0.html \
 	    $(srcdir)/README \
 	    $(srcdir)/README.AOL \
 	    $(srcdir)/manifest \

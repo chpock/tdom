@@ -1,3 +1,9 @@
+2018-08-08  Rolf Ade  <rolf@pointsman.de>
+
+        Changed the license to MPL 2.0.
+
+--- Release 0.9.1, 24. Jul. 2018 --- 
+
 2018-07-16  Rolf Ade  <rolf@pointsman.de>
 
         The package name is tDOM, but it always has been requested by
