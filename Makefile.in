@@ -1,4 +1,4 @@
-#  Makefile.in --
+# Makefile.in --
 #
 #	This file is a Makefile for the tdom TEA Extension. If it has the name
 #	"Makefile.in" then it is a template for a Makefile;  to generate the
@@ -96,15 +96,15 @@ pkgdatadir	= $(datadir)/$(PKG_DIR)
 pkglibdir	= $(libdir)/$(PKG_DIR)
 pkgincludedir	= $(includedir)/$(PKG_DIR)
 
-top_builddir	= .
+top_builddir	= @abs_top_builddir@
 
-INSTALL_OPTIONS =
-INSTALL		= $(SHELL) $(srcdir)/tclconfig/install-sh -c ${INSTALL_OPTIONS}
-INSTALL_DATA_DIR = ${INSTALL} -d -m 755
-INSTALL_PROGRAM	= ${INSTALL} -m 555
-INSTALL_DATA	= ${INSTALL} -m 444
-INSTALL_SCRIPT	= ${INSTALL_PROGRAM}
-INSTALL_LIBRARY	= ${INSTALL_DATA}
+INSTALL_OPTIONS	=
+INSTALL		= @INSTALL@ $(INSTALL_OPTIONS)
+INSTALL_DATA_DIR = @INSTALL_DATA_DIR@
+INSTALL_DATA	= @INSTALL_DATA@
+INSTALL_PROGRAM	= @INSTALL_PROGRAM@
+INSTALL_SCRIPT	= @INSTALL_SCRIPT@
+INSTALL_LIBRARY	= @INSTALL_LIBRARY@
 
 PACKAGE_NAME	= @PACKAGE_NAME@
 PACKAGE_VERSION	= @PACKAGE_VERSION@
@@ -130,8 +130,6 @@ TCL_SRC_DIR	= @TCL_SRC_DIR@
 #TK_BIN_DIR	= @TK_BIN_DIR@
 #TK_SRC_DIR	= @TK_SRC_DIR@
 
-MATH_LIBS	= @MATH_LIBS@
-
 # Not used, but retained for reference of what libs Tcl required
 #TCL_LIBS	= @TCL_LIBS@
 
@@ -153,11 +151,11 @@ PKG_ENV		= @LD_LIBRARY_PATH_VAR@="$(EXTRA_PATH):$(@LD_LIBRARY_PATH_VAR@)" \
 		  TCLLIBPATH="$(TCLLIBPATH)"
 
 TCLSH_PROG	= @TCLSH_PROG@
-TCLSH		= $(PKG_ENV) $(TCLSH_ENV) $(TCLSH_PROG)
+TCLSH		= $(TCLSH_ENV) $(PKG_ENV) $(TCLSH_PROG)
 
 #WISH_ENV	= TK_LIBRARY=`@CYGPATH@ $(TK_SRC_DIR)/library`
 #WISH_PROG	= @WISH_PROG@
-#WISH		= $(PKG_ENV) $(TCLSH_ENV) $(WISH_ENV) $(WISH_PROG)
+#WISH		= $(TCLSH_ENV) $(WISH_ENV) $(PKG_ENV) $(WISH_PROG)
 
 SHARED_BUILD	= @SHARED_BUILD@
 
@@ -167,7 +165,7 @@ INCLUDES	= @PKG_INCLUDES@ @TCL_INCLUDES@ -I$(top_builddir)
 PKG_CFLAGS	= @PKG_CFLAGS@
 
 # TCL_DEFS is not strictly need here, but if you remove it, then you
-# must make sure that configure.in checks for the necessary components
+# must make sure that configure.ac checks for the necessary components
 # that your library may use.  TCL_DEFS can actually be a problem if
 # you do not compile with a similar machine setup as the Tcl core was
 # compiled with.
@@ -183,6 +181,11 @@ LIBS		= @PKG_LIBS@ @LIBS@
 AR		= @AR@
 CFLAGS		= @CFLAGS@
 COMPILE		= $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+
+GDB		= gdb
+VALGRIND	= valgrind
+VALGRINDARGS	= --tool=memcheck --num-callers=20 --leak-resolution=high \
+		  --leak-check=yes --show-reachable=yes -v
 
 .SUFFIXES: .c .$(OBJEXT)
 
@@ -204,7 +207,7 @@ all: binaries libraries doc
 # TDOM enabled shell is build as an extra directive, since non TEA. 
 #========================================================================
 
-$(TDOMSHELL): $(PKG_OBJECTS) $(srcdir)/unix/tclAppInit.c
+$(TDOMSHELL): binaries $(srcdir)/unix/tclAppInit.c
 	$(COMPILE) -c `@CYGPATH@ $(srcdir)/unix/tclAppInit.c`
 	$(CC) @LDFLAGS@ -o $@ tclAppInit.$(OBJEXT) $(PKG_OBJECTS) \
 	  $(TCL_LIB_SPEC) $(TDOMSHELL_LIBS) $(TDOM_LD_SEARCH_FLAGS)
@@ -216,7 +219,7 @@ $(TDOMSHELL): $(PKG_OBJECTS) $(srcdir)/unix/tclAppInit.c
 # of the Makefile, in the "BINARIES" variable.
 #========================================================================
 
-binaries: versionhash.h $(BINARIES) pkgIndex.tcl-hand
+binaries: versionhash.h $(BINARIES)
 
 libraries:
 
@@ -266,17 +269,21 @@ shell: binaries libraries
 	@$(TCLSH) $(SCRIPT)
 
 gdb:
-	$(TCLSH_ENV) gdb $(TCLSH_PROG) $(SCRIPT)
+	$(TCLSH_ENV) $(PKG_ENV) $(GDB) $(TCLSH_PROG) $(SCRIPT)
 
-VALGRINDARGS =	--tool=memcheck --num-callers=20 --leak-resolution=high \
-		--leak-check=yes --show-reachable=yes -v
+gdb-test: binaries libraries 
+	$(TCLSH_ENV) $(PKG_ENV) $(GDB) \
+	    --args $(TCLSH_PROG) `@CYGPATH@ $(srcdir)/tests/all.tcl` \
+	    $(TESTFLAGS) -singleproc 1 \
+	    -load "package ifneeded $(PACKAGE_NAME) $(PACKAGE_VERSION) \
+		[list load `@CYGPATH@ $(PKG_LIB_FILE)` $(PACKAGE_NAME)]"
 
 valgrind: binaries libraries
-	$(TCLSH_ENV) valgrind $(VALGRINDARGS) $(TCLSH_PROG) \
-		`@CYGPATH@ $(srcdir)/tests/all.tcl` $(TESTFLAGS)
+	$(TCLSH_ENV) $(PKG_ENV) $(VALGRIND) $(VALGRINDARGS) $(TCLSH_PROG) \
+	    `@CYGPATH@ $(srcdir)/tests/all.tcl` $(TESTFLAGS)
 
 valgrindshell: binaries libraries
-	$(TCLSH_ENV) valgrind $(VALGRINDARGS) $(TCLSH_PROG) $(SCRIPT)
+	$(TCLSH_ENV) $(PKG_ENV) $(VALGRIND) $(VALGRINDARGS) $(TCLSH_PROG) $(SCRIPT)
 
 depend:
 
@@ -354,40 +361,58 @@ tcldom.o: $(srcdir)/generic/tcldom.c $(top_builddir)/versionhash.h
 #========================================================================
 
 #COMPRESS	= tar cvf $(PKG_DIR).tar $(PKG_DIR); compress $(PKG_DIR).tar
-COMPRESS	= tar zcvf $(PKG_DIR).tar.gz $(PKG_DIR)
+COMPRESS	= tar zcvf $(DIST_PKG_DIR)-src.tgz $(DIST_PKG_DIR)
 DIST_ROOT	= /tmp/dist
-DIST_DIR	= $(DIST_ROOT)/$(PKG_DIR)
+DIST_DIR	= $(DIST_ROOT)/$(DIST_PKG_DIR)
+DIST_PKG_DIR	= $(PACKAGE_NAME)-$(PACKAGE_VERSION)
+
+DIST_INSTALL_DATA	= CPPROG='cp -p' $(INSTALL) -m 644
+DIST_INSTALL_SCRIPT	= CPPROG='cp -p' $(INSTALL) -m 755
 
 dist-clean:
-	rm -rf $(DIST_DIR) $(DIST_ROOT)/$(PKG_DIR).tar.*
+	rm -rf $(DIST_DIR) $(DIST_ROOT)/$(DIST_PKG_DIR)-src.tgz
 
 dist: dist-clean
-	mkdir -p $(DIST_DIR)
-	cp -p $(srcdir)/ChangeLog $(srcdir)/README* $(srcdir)/license* \
-		$(srcdir)/aclocal.m4 $(srcdir)/configure $(srcdir)/*.in \
-		$(DIST_DIR)/
-	chmod 664 $(DIST_DIR)/Makefile.in $(DIST_DIR)/aclocal.m4
-	chmod 775 $(DIST_DIR)/configure $(DIST_DIR)/configure.in
+	$(INSTALL_DATA_DIR) $(DIST_DIR)
 
-	for i in $(srcdir)/*.[ch]; do \
-	    if [ -f $$i ]; then \
-		cp -p $$i $(DIST_DIR)/ ; \
-	    fi; \
-	done;
+	# TEA files
+	$(DIST_INSTALL_DATA) $(srcdir)/Makefile.in \
+	    $(srcdir)/aclocal.m4 $(srcdir)/configure.ac \
+	    $(DIST_DIR)/
+	$(DIST_INSTALL_SCRIPT) $(srcdir)/configure $(DIST_DIR)/
 
-	mkdir $(DIST_DIR)/tclconfig
-	cp $(srcdir)/tclconfig/install-sh $(srcdir)/tclconfig/tcl.m4 \
-		$(DIST_DIR)/tclconfig/
-	chmod 664 $(DIST_DIR)/tclconfig/tcl.m4
-	chmod +x $(DIST_DIR)/tclconfig/install-sh
+	$(INSTALL_DATA_DIR) $(DIST_DIR)/tclconfig
+	$(DIST_INSTALL_DATA) $(srcdir)/tclconfig/README.txt \
+	    $(srcdir)/tclconfig/tcl.m4 $(srcdir)/tclconfig/install-sh \
+	    $(DIST_DIR)/tclconfig/
 
-	list='demos doc generic library mac tests unix win'; \
+	# Extension files
+	$(DIST_INSTALL_DATA) \
+	    $(srcdir)/CHANGES \
+	    $(srcdir)/ChangeLog \
+	    $(srcdir)/LICENSE \
+	    $(srcdir)/MPL_2.0.html \
+	    $(srcdir)/README \
+	    $(srcdir)/README.AOL \
+	    $(srcdir)/manifest \
+	    $(srcdir)/manifest.uuid \
+	    $(srcdir)/tdomConfig.sh.in \
+	    $(srcdir)/tdom.m4 \
+	    $(srcdir)/pkgIndex.tcl.in \
+	    $(DIST_DIR)/
+
+	list='apps doc expat generic lib macosx unix win xe'; \
 	for p in $$list; do \
-	    if test -d $(srcdir)/$$p ; then \
-		mkdir $(DIST_DIR)/$$p; \
-		cp -p $(srcdir)/$$p/*.* $(DIST_DIR)/$$p/; \
-	    fi; \
+	    $(INSTALL_DATA_DIR) $(DIST_DIR)/$$p; \
+	    $(DIST_INSTALL_DATA) $(srcdir)/$$p/* $(DIST_DIR)/$$p/; \
 	done
+
+	$(INSTALL_DATA_DIR) $(DIST_DIR)/tests/data
+	$(DIST_INSTALL_DATA) $(srcdir)/tests/*.* $(DIST_DIR)/tests/
+	$(DIST_INSTALL_DATA) $(srcdir)/tests/data/*.* $(DIST_DIR)/tests/data/
+
+	$(INSTALL_DATA_DIR) $(DIST_DIR)/extensions
+	cp -rp $(srcdir)/extensions/* $(DIST_DIR)/extensions/
 
 	(cd $(DIST_ROOT); $(COMPRESS);)
 
@@ -397,7 +422,7 @@ dist: dist-clean
 
 #========================================================================
 # Don't modify the file to clean here.  Instead, set the "CLEANFILES"
-# variable in configure.in
+# variable in configure.ac
 #========================================================================
 
 clean:
@@ -425,16 +450,8 @@ install-lib-binaries: binaries
 	@$(INSTALL_DATA_DIR) $(DESTDIR)$(pkglibdir)
 	@list='$(lib_BINARIES)'; for p in $$list; do \
 	  if test -f $$p; then \
-	    if test "x$$stub" = "xstub"; then \
-		echo " $(RANLIB_STUB) $$p"; \
-		$(RANLIB_STUB) $$p; \
-	    else \
-		echo " $(RANLIB) $$p"; \
-		$(RANLIB) $$p; \
-	    fi; \
 	    echo " $(INSTALL_LIBRARY) $$p $(DESTDIR)$(pkglibdir)/$$p"; \
 	    $(INSTALL_LIBRARY) $$p $(DESTDIR)$(pkglibdir)/$$p; \
-	    stub=`echo $$p|sed -e "s/.*\(stub\).*/\1/"`; \
 	    ext=`echo $$p|sed -e "s/.*\.//"`; \
 	    if test "x$$ext" = "xdll"; then \
 		lib=`basename $$p|sed -e 's/.[^.]*$$//'`.lib; \
@@ -494,6 +511,7 @@ uninstall-binaries:
 	done
 
 .PHONY: all binaries clean depend distclean doc install libraries test
+.PHONY: gdb gdb-test valgrind valgrindshell
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

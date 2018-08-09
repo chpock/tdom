@@ -183,7 +183,7 @@ to the next state. XML well-formedness errors along the way will
 be reported as TCL_ERROR with additional info in the error
 message.
 .PP
-The pull parsers doesn't follow externial entites and are XML
+The pull parsers don't follow external entities and are XML
 1.0 only, they know nothing about XML Namespaces. You get the tags
 and attribute names as in the source. You aren't noticed about
 comments, processing instructions and external entities; they are

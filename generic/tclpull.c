@@ -4,7 +4,7 @@
 |
 |
 |   The contents of this file are subject to the Mozilla Public License
-|   Version 1.1 (the "License"); you may not use this file except in
+|   Version 2.0 (the "License"); you may not use this file except in
 |   compliance with the License. You may obtain a copy of the License at
 |   http://www.mozilla.org/MPL/
 |
@@ -592,7 +592,7 @@ tDOM_PullParserInstanceCmd (
                 SetResult ("No input");
                 return TCL_ERROR;
             case PULLPARSERSTATE_PARSE_ERROR:
-                SetResult ("Parsing stoped with XML parsing error.");
+                SetResult ("Parsing stopped with XML parsing error.");
                 return TCL_ERROR;
             case PULLPARSERSTATE_END_DOCUMENT:
                 SetResult ("No next event after END_DOCUMENT");
@@ -893,8 +893,8 @@ tDOM_PullParserCmd (
     };
     
     enum flag {
-        f_ignoreWhiteSpaces,
-    };    
+        f_ignoreWhiteSpaces
+    };
 
     if (objc < 2 || objc > 3) {
         Tcl_WrongNumArgs (interp, 1, objv, "cmdName ?-ignorewhitecdata?");

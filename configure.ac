@@ -4,10 +4,9 @@ dnl	generate the file "configure", which is run during Tcl installation
 dnl	to configure the system for the local environment.
 
 #-----------------------------------------------------------------------
-# Sample configure.in for Tcl Extensions.  The only places you should
+# Sample configure.ac for Tcl Extensions.  The only places you should
 # need to modify this file are marked by the string __CHANGE__
 #-----------------------------------------------------------------------
-
 
 #-----------------------------------------------------------------------
 # __CHANGE__
@@ -16,13 +15,11 @@ dnl	to configure the system for the local environment.
 # This initializes the environment with PACKAGE_NAME and PACKAGE_VERSION
 # set as provided.  These will also be added as -D defs in your Makefile
 # so you can encode the package version directly into the source files.
-# This will also define a special symbol for Windows (BUILD_sample in
-# this case) so that we create the export library with the dll.
+# This will also define a special symbol for Windows (BUILD_<PACKAGE_NAME>
+# so that we create the export library with the dll.
 #-----------------------------------------------------------------------
 
 AC_INIT([tdom], [0.9.1])
-
-TDOM_EXPAT_ENTROPY
 
 #--------------------------------------------------------------------
 # Call TEA_INIT as the first TEA_ macro to set up initial vars.
@@ -30,7 +27,7 @@ TDOM_EXPAT_ENTROPY
 # as well as PKG_LIB_FILE and PKG_STUB_LIB_FILE.
 #--------------------------------------------------------------------
 
-TEA_INIT([3.13])
+TEA_INIT()
 
 AC_CONFIG_AUX_DIR(tclconfig)
 
@@ -77,10 +74,11 @@ AC_CHECK_FUNCS(memmove bcopy)
 TDOM_PATH_AOLSERVER
 
 #--------------------------------------------------------------------
-# Add shared expat includes
+# Add shared expat includes and expat entropy
 #--------------------------------------------------------------------
 
 TDOM_PATH_EXPAT
+TDOM_EXPAT_ENTROPY
 
 #--------------------------------------------------------------------
 # Add HTML5 parsing support.
@@ -132,16 +130,20 @@ TEA_ADD_TCL_SOURCES([lib/tdom.tcl])
 # TEA_ADD_* any platform specific compiler/build info here.
 #--------------------------------------------------------------------
 
+#CLEANFILES="$CLEANFILES pkgIndex.tcl"
 if test "${TEA_PLATFORM}" = "windows" ; then
-    CLEANFILES="pkgIndex.tcl *.lib *.dll *.exp *.ilk *.pdb vc*.pch"
+    # Ensure no empty if clauses
+    :
     #TEA_ADD_SOURCES([win/winFile.c])
     #TEA_ADD_INCLUDES([-I\"$(${CYGPATH} ${srcdir}/win)\"])
+    CLEANFILES="$CLEANFILES *.ilk vc*.pch"
 else
-    CLEANFILES="pkgIndex.tcl tdom.tcl tcldomsh"
+    # Ensure no empty else clauses
+    :
     #TEA_ADD_SOURCES([unix/unixFile.c])
     #TEA_ADD_LIBS([-lsuperfly])
+    CLEANFILES="$CLEANFILES tdom.tcl tcldomsh"
 fi
-AC_SUBST(CLEANFILES)
 
 #--------------------------------------------------------------------
 # __CHANGE__
@@ -191,16 +193,6 @@ AC_SUBST(TDOM_LD_SEARCH_FLAGS)
 TEA_ENABLE_SYMBOLS
 
 #--------------------------------------------------------------------
-# Everyone should be linking against the Tcl stub library.  If you
-# can't for some reason, remove this definition.  If you aren't using
-# stubs, you also need to modify the SHLIB_LD_LIBS setting below to
-# link against the non-stubbed Tcl library.  Add Tk too if necessary.
-#--------------------------------------------------------------------
-
-AC_DEFINE(USE_TCL_STUBS, 1, [Use Tcl stubs])
-#AC_DEFINE(USE_TK_STUBS, 1, [Use Tk stubs])
-
-#--------------------------------------------------------------------
 # This macro generates a line to use when building a library.  It
 # depends on values set by the TEA_ENABLE_SHARED, TEA_ENABLE_SYMBOLS,
 # and TEA_LOAD_TCLCONFIG macros above.
@@ -237,7 +229,7 @@ TDOM_EXPORT_CONFIG
 #--------------------------------------------------------------------
 # Finally, substitute all of the various values into the Makefile.
 # You may alternatively have a special pkgIndex.tcl.in or other files
-# which require substituting th AC variables in.  Include these here.
+# which require substituting the AC variables in. Include these here.
 #--------------------------------------------------------------------
 
-AC_OUTPUT([Makefile tdomConfig.sh])
+AC_OUTPUT([Makefile pkgIndex.tcl tdomConfig.sh])

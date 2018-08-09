@@ -40,6 +40,8 @@ tDOM contains:
 
     *  an even faster simple XML parser for trusted XML input.
 
+    *  A slim Tcl interface to use expat as pull-parser.
+
     *  additional convenience methods.
  
     *  and more.
@@ -59,15 +61,15 @@ GETTING THE CODE
     trunk.
 
     If you insist on using an older tDOM with lesser features and
-    probably more bugs, you should use the latest release 0.9.0. Get
+    probably more bugs, you should use the latest release 0.9.1. Get
     the source code release from
-    http://tdom.org/downloads/tdom-0.9.0-src.tgz or
-    http://tdom.org/downloads/tdom-0.9.0-src.zip
+    http://tdom.org/downloads/tdom-0.9.1-src.tgz or
+    http://tdom.org/downloads/tdom-0.9.1-src.zip
 
-    Windows binaries (32 bit as well as 64 bit) of the 0.9.0 release
+    Windows binaries (32 bit as well as 64 bit) of the 0.9.1 release
     are also available. Get it from
-    http://tdom.org/downloads/tdom-0.9-windows-x64.zip and 
-    http://tdom.org/downloads/tdom-0.9-windows-x86.zip
+    http://tdom.org/downloads/tdom-0.9.1-windows-x64.zip and 
+    http://tdom.org/downloads/tdom-0.9.1-windows-x86.zip
     
     The provided windows binaries include (statically linked) the
     HTML5 parser.
@@ -84,7 +86,7 @@ COMPILING tDOM
         make install
 
     Alternatively, you can build the tDOM package in just about any
-    directory elsewhere on the fileystem (since TEA-compatible).
+    directory elsewhere on the filesystem (since TEA-compatible).
     
     You might also want to do "../configure --help" to get a list of
     all supported options of the configure script. In the "unix"
@@ -115,4 +117,4 @@ HISTORY
     tDOM was started by Jochen Loewer (loewerj@hotmail.com) and
     developed by Jochen and Rolf Ade (rolf@pointsman.de) with
     contributions by Zoran Vasiljevic (zv@archiware.com). Since more
-    than a decade it is maintained and developed by Rolf Ade.
+    than a dozen years it is maintained and developed by Rolf Ade.
