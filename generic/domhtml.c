@@ -658,6 +658,7 @@ HTML_SimpleParse (
                 if ( !SPACE(c) ) only_whites = 0;
                 x++;
             }
+                
             if (!(only_whites && ignoreWhiteSpaces) && parent_node) {
                 /*--------------------------------------------------------
                 |   allocate new TEXT node
@@ -665,7 +666,6 @@ HTML_SimpleParse (
                 tnode = (domTextNode*) domAlloc(sizeof(domTextNode));
                 memset(tnode, 0, sizeof(domTextNode));
                 tnode->nodeType    = TEXT_NODE;
-                tnode->nodeFlags   = 0;
                 tnode->ownerDocument = doc;
                 tnode->nodeNumber  = NODE_NO(doc);
                 tnode->valueLength = (x - start);
@@ -872,7 +872,6 @@ HTML_SimpleParse (
                         tnode = (domTextNode*) domAlloc(sizeof(domTextNode));
                         memset(tnode, 0, sizeof(domTextNode));
                         tnode->nodeType      = COMMENT_NODE;
-                        tnode->nodeFlags     = 0;
                         tnode->ownerDocument = doc;
                         tnode->nodeNumber    = NODE_NO(doc);
                         tnode->parentNode    = parent_node;
@@ -951,7 +950,6 @@ HTML_SimpleParse (
                             tnode = (domTextNode*) domAlloc(sizeof(domTextNode));
                             memset(tnode, 0, sizeof(domTextNode));
                             tnode->nodeType      = TEXT_NODE;
-                            tnode->nodeFlags     = 0;
                             tnode->ownerDocument = doc;
                             tnode->nodeNumber    = NODE_NO(doc);
                             tnode->parentNode    = parent_node;
@@ -994,8 +992,6 @@ HTML_SimpleParse (
                             MALLOC(sizeof(domProcessingInstructionNode));
                     memset(pinode, 0, sizeof(domProcessingInstructionNode));
                     pinode->nodeType      = PROCESSING_INSTRUCTION_NODE;
-                    pinode->nodeFlags     = 0;
-                    pinode->namespace     = 0;
                     pinode->ownerDocument = doc;
                     pinode->nodeNumber    = NODE_NO(doc);
                     pinode->parentNode    = parent_node;
@@ -1098,13 +1094,29 @@ HTML_SimpleParse (
             /*-----------------------------------------------------------
             |   create new DOM element node
             \----------------------------------------------------------*/
+            if (!parent_node && (strcmp(e,"html")!=0)) {
+                // Insert missing html tag
+                h = Tcl_CreateHashEntry(&HASHTAB(doc,tdom_tagNames), "html", &hnew);
+                node = (domNode*) domAlloc(sizeof(domNode));
+                memset(node, 0, sizeof(domNode));
+                node->nodeType      = ELEMENT_NODE;
+                node->nodeName      = (char *)&(h->key);
+                node->ownerDocument = doc;
+                node->nodeNumber    = NODE_NO(doc);
+                if (doc->rootNode->lastChild) {
+                    node->previousSibling = doc->rootNode->lastChild;
+                    doc->rootNode->lastChild->nextSibling = node;
+                } else {
+                    doc->rootNode->firstChild = node;
+                }
+                doc->rootNode->lastChild = node;
+                parent_node = node;
+                DBG(fprintf(stderr, "%d: Inserted missing tag '%s' hasContent=%d nodeNumber=%d\n", getDeep(node), node->nodeName, hasContent, node->nodeNumber);)
+            }
             h = Tcl_CreateHashEntry(&HASHTAB(doc,tdom_tagNames), e, &hnew);
-
             node = (domNode*) domAlloc(sizeof(domNode));
             memset(node, 0, sizeof(domNode));
             node->nodeType      = ELEMENT_NODE;
-            node->nodeFlags     = 0;
-            node->namespace     = 0;
             node->nodeName      = (char *)&(h->key);
             node->ownerDocument = doc;
             node->nodeNumber    = NODE_NO(doc);
@@ -1209,7 +1221,6 @@ HTML_SimpleParse (
                 attrnode->parentNode  = node;
                 attrnode->nodeName    = (char *)&(h->key);
                 attrnode->nodeType    = ATTRIBUTE_NODE;
-                attrnode->nodeFlags   = 0;
                 attrnode->nodeValue   = (char*)MALLOC(nArgVal+1);
                 attrnode->valueLength = nArgVal;
                 memmove(attrnode->nodeValue, ArgVal, nArgVal);
@@ -1318,7 +1329,6 @@ HTML_SimpleParse (
                     tnode = (domTextNode*) domAlloc(sizeof(domTextNode));
                     memset(tnode, 0, sizeof(domTextNode));
                     tnode->nodeType      = TEXT_NODE;
-                    tnode->nodeFlags     = 0;
                     tnode->ownerDocument = doc;
                     tnode->nodeNumber    = NODE_NO(doc);
                     tnode->parentNode    = node;

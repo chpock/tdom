@@ -203,12 +203,18 @@ test html-3.1 {Bad data} {
     set data {line 6 column 17 - Warning: <script> lacks "type" attribute
 line 10 column 17 - Warning: <script> lacks "type" attribute
         line 11 column 17 - Warning: <table> lacks "summary" attribute}
-    catch {set doc [dom parse -html $data]}
-} 1
+    set doc [dom parse -html $data]
+    set result [$doc asHTML]
+    $doc delete
+    set result
+} {<html><script></script></html>}
 
 test html-3.2 {Bad data} {
-     catch {set doc [dom parse -html {<a>}]}
-} 1
+    set doc [dom parse -html {<a>}]
+    set result [$doc asHTML]
+    $doc delete
+    set result
+} {<html><a></a></html>}
         
 test html-4.1 {Tag name case normalization} {
     set doc [dom parse -html {<HtmL><boDY></BODy></HTml>}]

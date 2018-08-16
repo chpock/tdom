@@ -1,5 +1,5 @@
-C Removed\scruft.
-D 2018-08-09T23:16:03.569
+C Applied\smodified\spatch\sfrom\s[3807a4ac722c]\s(and\sremoved\sunnecessary\sinitializations\sseen\swhile\sworking\son\sthe\scode).
+D 2018-08-16T23:34:55.554
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -112,11 +112,11 @@ F extensions/tnc/win/rules-ext.vc e788fcfc1e69b11946e18b8f67e0870b3bd38913
 F extensions/tnc/win/rules.vc 8157e2a811cf5e93683d6b0fbf5d91d153aa4535
 F extensions/tnc/win/targets.vc 79dea1c6a94a94e6ed8bae9e0195149b25a69923
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
-F generic/dom.c 7744a0cfb02a82178fec8a45fa16681746b027bd5a03181eb2477a8c26b6e2c2
+F generic/dom.c 862a70f7da5a898fb9d9eab1041f0b41b0e8f83e7d00014a8e311d697cb7af0a
 F generic/dom.h ee92ca833f8d7773ff845442a0497ffa3aa0c63fe63b5dfff629946a8eb470d1
 F generic/domalloc.c 5b85531fd059f893ad6fedc348426f9db6a20b5acfc0209b4592a77374c548fc
 F generic/domalloc.h 512845d4b423ca0e2dc1ff002372da9a163f8ed4f184e12069002a40d66fa0da
-F generic/domhtml.c e556a615265b1da238025cccdfba01cc600bae7ab37b0c2ad60ae7dc2593c67d
+F generic/domhtml.c 17c2ae18c3edb2e83b46b7e53d1a04fdfb280ade5fd6499f7b9fe99bcf607cca
 F generic/domhtml.h c4a149bf7ea2b1432b69971c150ada5e6a1018b8
 F generic/domhtml5.c 90519cc20803f769f3feac23dc825e5c330d54175e976ee537bcf986d2ea4512
 F generic/domhtml5.h 5cca562a556e7662f2dce222640c32abb2777146
@@ -143,7 +143,7 @@ F generic/tdomStubInit.c 375ebd144c8e09dbe2fe4864e799da2bd0fbe3bce2855346487634c
 F generic/tdomStubLib.c 155ce3ac6825ad0b54d5e12fe9d816dd2a73b68798030d8162f9351df743736b
 F generic/tdominit.c b3d1f2f7cd5c0336b864fca1bc2a2fee926d46bdd78f81e5a81bfc5cd8811064
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
-F generic/xmlsimple.c d9a4423218688421cc97edeb0f82a5dc55429e8a91ac1448bd74c3f2148a1f51
+F generic/xmlsimple.c be39c8ff62d31e70ddcac4e5afa05797ee1971d2ada0a670648e74b47b3074d2
 F generic/xmlsimple.h 3cb9d055e60643afcdfe9ab407adf1e8bb5dbafb
 F lib/tdom.tcl 69a0424565ec40099b4785e76cb35c455d4623da0c862b4a20307a19b5baad16
 F macosx/README 75fe1f6617f6cb7e4480cff5367b5c26fcd8dd207e2321f35dceebafccf4c99c
@@ -189,7 +189,7 @@ F tests/domnamespace.test c67346e939dab82f1b6de8ddd04bd004cf24391b
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 36170db2ac7d72660640b2a33966803233a4a9f19e2c5611c38692e3b6c8cd35
 F tests/html5reader.test f839da02dd4b1227a2ee3bae9abfba983951d9ad
-F tests/htmlreader.test 67a0d90dd599e72c1cbf7a5c6f91364c4a83ceaa7ce5cc4ab556302538bbb77a
+F tests/htmlreader.test 5ee43450a25c90b7dc79fd5803b0105714948f480335576c22f5a6ea61d08ae9
 F tests/i18n.test a204756237570196620d3ca384ee72be34fd12ec38cddea6919b6b878d8ed4f4
 F tests/loadtdom.tcl f77299cfe7eb0b3d4b36dff4afd680c292b479f50b5d4e224f17ce410ca37b59
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
@@ -223,8 +223,11 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 39f9d6bbbfd1c50fe6ab19e2a4a8bad45003b07441a02f9f215cbe536a01d987
-R 80d53581e9763578dbfd502f5fe36a74
+P f48a402792286db12f3753be4f76d2ac58942d9aaac572db8eef8c9685621764
+R 0ba8ebb48ca95516800a02426aaa033d
+T *branch * htmlreader
+T *sym-htmlreader *
+T -sym-trunk *
 U rolf
-Z 373ccb9c1b6a9e974f483a6186447f64
+Z e9e75397b657e28c3562e731085bbd5b
 # Remove this line to create a well-formed Fossil manifest.
