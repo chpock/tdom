@@ -555,7 +555,7 @@ static void TranslateEntityRefs (
 		    from = i+1;
 		}
             } else {
-                while (z[i] && isalpha((unsigned char)z[i])) {
+                while (z[i] && isalnum((unsigned char)z[i])) {
                    i++;
                 }
                 c = z[i];
