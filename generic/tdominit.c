@@ -68,7 +68,7 @@ Tdom_Init (
 ) {
         
 #ifdef USE_TCL_STUBS
-    Tcl_InitStubs(interp, "8", 0);
+    Tcl_InitStubs(interp, "8.4", 0);
 #endif
         
     domModuleInitialize();

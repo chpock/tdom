@@ -1,5 +1,5 @@
-C Integrated\sbug\sfixes\s/\simprovements\sof\sthe\sincluded\ssimple\sHTML\sreader\sinto\strunk.
-D 2018-08-27T11:57:32.018
+C Require\sthe\scurrent\sneeded\sminimal\sversion\sin\sTcl_InitStubs.\n
+D 2018-10-05T23:36:49.758
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -141,7 +141,7 @@ F generic/tdom.h d27e43748242d5fe7dd98b8c7aa4a5a891d015bf
 F generic/tdomDecls.h 07996e561ca42574739182f3d479cd0b28302405f8c8f16b8448b720a305faa4
 F generic/tdomStubInit.c 375ebd144c8e09dbe2fe4864e799da2bd0fbe3bce2855346487634c3be49daf0
 F generic/tdomStubLib.c 155ce3ac6825ad0b54d5e12fe9d816dd2a73b68798030d8162f9351df743736b
-F generic/tdominit.c b3d1f2f7cd5c0336b864fca1bc2a2fee926d46bdd78f81e5a81bfc5cd8811064
+F generic/tdominit.c f7fc5a95861b5f6c938001923fae846c931cd05f6c13a1808224dc50763002a5
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
 F generic/xmlsimple.c be39c8ff62d31e70ddcac4e5afa05797ee1971d2ada0a670648e74b47b3074d2
 F generic/xmlsimple.h 3cb9d055e60643afcdfe9ab407adf1e8bb5dbafb
@@ -223,9 +223,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f48a402792286db12f3753be4f76d2ac58942d9aaac572db8eef8c9685621764 8dfd0cb03dccde9ed8aaff55550fa7c2ae9b6debb9b9e9a5698d9c7028fb5926
-R 9d864842989a98ffb22841ef218e9457
-T +closed 8dfd0cb03dccde9ed8aaff55550fa7c2ae9b6debb9b9e9a5698d9c7028fb5926
+P 0c53fb967a8082a2111d10da2c4173510c6cfa3b34e4d289f281cae1862b364b
+R 5de258906294d90221f2afa1dd30c246
 U rolf
-Z ed2679442206faf7f298bd1cfc40b12f
+Z cf016bab3068ba076bd7c5bbd00351e7
 # Remove this line to create a well-formed Fossil manifest.
