@@ -626,14 +626,14 @@ version as string, something like
 "exapt_2.1.0". This is what the expat API
 function XML_ExpatVersion() returns.
 .IP "\fBexpatmajorversion\fR"
-Returns the major version of the underlyling
-expat version as integer.
+Returns the major version of the at build
+time used version as integer.
 .IP "\fBexpatminorversion\fR"
-Returns the minor version of the underlyling
-expat version as integer.
+Returns the minor version of the at build
+time used expat version as integer.
 .IP "\fBexpatmicroversion\fR"
-Returns the micro version of the underlyling
-expat version as integer.
+Returns the micro version of the at build
+time used expat version as integer.
 .IP "\fBdtd\fR"
 Returns as boolean if build with
 \&\fI--enable-dtd\fR.
