@@ -1,5 +1,5 @@
-C Defined\sthe\sreturn\svalue\sof\ssome\sfeatureinfo\smethods\smore\sprecisely.\sFor\sbackground\ssee\s[38409e31938f].
-D 2018-10-06T00:38:06.294
+C Changed\sversion\sto\s0.9.2.
+D 2018-10-12T10:56:38.800
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -8,12 +8,12 @@ F ChangeLog 9b60ec8bfbae84e4f1a97aaee24be00ccea212b7
 F LICENSE 7c00b00fe8e88c48498a54c103dd7df03faeeb039c783279d5fb54dfca307b77
 F MPL_2.0.html 326b847674d6f5846c5b260fb437372e21232c23e3911f3a94f766a62459126c
 F Makefile.in 7b7e8ed4a39444a84e95d50af02f1ce0437c14f376103c73b9e2795357b6da0a
-F README a8ada2bb9b20e9ff066f68f54bd84c36e5559c5c4e6fa846c8ab4715b4758a5a
-F README.AOL d076b065f6a3209b5374a63c9ddd7fbca167643e
+F README 1b74b899ce95656b6a63039d0796b164e51a7317263cba9d67959b402dc2009e
+F README.AOL 34b4178830536f5183328420bc28b8063fbf6b598010ecf105c2ecfdbfc3ffa1
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/xslt.tcl 64103132fbe0a1fbf61cf3506608cb7ea5cbfddd247d207d95d8e96a071e1846
-F configure c09b9e60c3d758e374786019a01c980306c13b13e84d2bbc3b9f5b4261b2e404 x
-F configure.ac 739c272a28eef868d23de271b6d7520d695d12a7b68e857c06ee72eadd1992e8
+F configure 6accefb5f34f534a0fed8b69dd3320369f5361fbc92417eaa07920908d1a80ca x
+F configure.ac 7cfadfeb8518a343f6b35dab6f328c4f49beec45ed90804f019e1a7a769ed690
 F doc/INDEX.MAP 55cb7aedd008e5bb07d026e056778a04b7d562398ef29e83e024cfc1ef2b9968
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html a3c7817482616cbfc8d2fc770ba177ffd622df9d4a94d761812c6ce2bb12bfb5
@@ -103,7 +103,7 @@ F extensions/tnc/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
 F extensions/tnc/pkgIndex.tcl.in 6c224c2cdbb494f621ec008f96fe4a552a79a7b7
 F extensions/tnc/test.tcl 545cdec17e6702cef9f79184fdf1ce0166b8c412
 F extensions/tnc/tests/all.tcl 845c9dab65c294c3570f69cc731d6fef62efbd03
-F extensions/tnc/tests/loadtnc.tcl 2228e517a49106038388055d7e0b959198ab54ce
+F extensions/tnc/tests/loadtnc.tcl c9b49c87af627263d40dcfbdd005bfddbc2a6ab5c8636d25618034c724e91c71
 F extensions/tnc/tests/tnc.test 5176eb3e9fb9fd6956f85580c8667127e23bf1b5ec905e68f623f3f2af5365bc
 F extensions/tnc/tnc.c 283471debf5af0be6d37cb06032d0e8b4c448497a94210631ab0288bf1239fff
 F extensions/tnc/win/makefile.vc b512d0f3eb67d83ace6f626d20b6ed8c895e609d
@@ -191,7 +191,7 @@ F tests/entity.test 36170db2ac7d72660640b2a33966803233a4a9f19e2c5611c38692e3b6c8
 F tests/html5reader.test f839da02dd4b1227a2ee3bae9abfba983951d9ad
 F tests/htmlreader.test 1bf1d46a724dfaad56965b292129c83bee0010371fc56438b29a0df96f82a1b3
 F tests/i18n.test a204756237570196620d3ca384ee72be34fd12ec38cddea6919b6b878d8ed4f4
-F tests/loadtdom.tcl f77299cfe7eb0b3d4b36dff4afd680c292b479f50b5d4e224f17ce410ca37b59
+F tests/loadtdom.tcl 6e05da1fa24c3aaf4e684b68cbe61eb5e760650ae8481abcee6bb3f94c903601
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
 F tests/parser.test 7957ceae1fb271cddf7dd8dcc6ed2f903bfdf0adf3662f686a6953919a5a2715
 F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
@@ -214,7 +214,7 @@ F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F win/makefile.vc dd338d632aa254eba6c8634eab4585666bf6c998971467c28ce942c3a3ac2fe5
 F win/mkd.bat 85d3fe58ce051a778447fb2bfc7384867d21cef0
 F win/nmakehlp.c 194ae7c24886245c679cb4c9ea7e6daaaebb5fcd
-F win/pkgIndex.tcl 4631218a784aae412d2a6bcadc72619eb14b264a
+F win/pkgIndex.tcl 915cf5788165a425755dd5b959fbbc4f13428d3191ac36e3e5e1ef733dc25f4b
 F win/rules-ext.vc e788fcfc1e69b11946e18b8f67e0870b3bd38913
 F win/rules.vc 996a623bd2ea3dc2fac239a1b845ca51695c8012
 F win/targets.vc 79dea1c6a94a94e6ed8bae9e0195149b25a69923
@@ -223,8 +223,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a5c8f9b468870cd6c75de790aa6e2809f5733cac43c4730fff490a0a6adf9426
-R 092258a3421799fb376fa600dab916b9
+P 18be91e27b2883a5480698123fc41353200da7bfbb65a681cc8ff34ff245422b
+R 5ae1ab4a57d89891cb6fa1ea2b31892a
 U rolf
-Z a0606be3848320b1b040c590f5ce8bd7
+Z 8cbd96d856c45f9291c1de6047ea40cc
 # Remove this line to create a well-formed Fossil manifest.

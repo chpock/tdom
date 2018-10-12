@@ -8,8 +8,8 @@
 
 package require tcltest
 namespace import ::tcltest::*
-if {[catch {package require -exact tdom 0.9.1}]} {
-    if {[catch {load [file join [file dir [info script]] ../unix/libtdom0.9.1.so]}]} {
+if {[catch {package require -exact tdom 0.9.2}]} {
+    if {[catch {load [file join [file dir [info script]] ../unix/libtdom0.9.2.so]}]} {
         error "Unable to load the appropriate tDOM version!"
     }
 }
