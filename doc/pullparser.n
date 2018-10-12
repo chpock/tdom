@@ -299,7 +299,7 @@ Miscellaneous methods:
 and TEXT. It returns the line number of the parsing
 position.
 .TP
-\&\fB\fBline\fP
+\&\fB\fBcolumn\fP
 \&\fRThis method is valid in all parser states except READY
 and TEXT. It returns the offset, from the beginning of the
 current line, of the parsing position.

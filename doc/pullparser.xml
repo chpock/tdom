@@ -166,7 +166,7 @@
       </commanddef>
 
       <commanddef>
-        <command><method>line</method></command>
+        <command><method>column</method></command>
         <desc>This method is valid in all parser states except READY
         and TEXT. It returns the offset, from the beginning of the
         current line, of the parsing position.</desc>
