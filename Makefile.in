@@ -219,7 +219,7 @@ $(TDOMSHELL): binaries $(srcdir)/unix/tclAppInit.c
 # of the Makefile, in the "BINARIES" variable.
 #========================================================================
 
-binaries: versionhash.h $(BINARIES)
+binaries: $(top_builddir)/versionhash.h $(BINARIES)
 
 libraries:
 
@@ -348,7 +348,7 @@ genstubs: $(srcdir)/generic/tdom.decls
 #========================================================================
 # Create a include file that #define the current fossil hash
 #========================================================================
-versionhash.h: $(srcdir)/manifest.uuid
+$(top_builddir)/versionhash.h: $(srcdir)/manifest.uuid
 	@echo "#define FOSSIL_HASH \"" | tr -d '\n\r' > $(top_builddir)/versionhash.h
 	@cat $(srcdir)/manifest.uuid | tr -d '\n\r' >> $(top_builddir)/versionhash.h
 	@echo "\"" >> $(top_builddir)/versionhash.h
