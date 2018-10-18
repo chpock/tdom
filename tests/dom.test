@@ -814,7 +814,7 @@ set nameStartChars [lsort -command sortCmd \
 # Append stop char needed by the test code to work properly.
 lappend nameStartChars 0x10000
 
-test dom-3.8 {isName} {longRunning && need_i18n} {
+test dom-3.8 {isName} {longRunning} {
     set ind 0
     set nr 0
     while {$nr < 65536} {
@@ -850,7 +850,7 @@ set nameChars [lsort -command sortCmd \
 # Append stop char needed by the test code to work properly.
 lappend nameChars 0x10000
 
-test dom-3.9 {isName} {longRunning && need_i18n} {
+test dom-3.9 {isName} {
     set ind 0
     set nr 0
     while {$nr < 65536} {
@@ -961,7 +961,7 @@ set XMLChars {
     0x9 0xA 0xD {0x20 0xD7FF} {0xE000 0xFFFD} {0x10000 0x10FFFF}
 }
 
-test dom-3.27 {isCharData} {longRunning && need_i18n} {
+test dom-3.27 {isCharData} {longRunning} {
     set ind 0
     set nr 1
     while {$nr < 65536} {
@@ -1031,7 +1031,7 @@ test dom-3.37 {isCDATA} {
     dom isCDATA "valid: ]]> "
 } {0}
 
-test dom-3.38 {isCDATA} {need_i18n} {
+test dom-3.38 {isCDATA} {
     dom isCDATA "\ud7fa\ud7fb\ud7fc\ud7fd\ud7fe\ud7ff]]>"
 } {0}
 

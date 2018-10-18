@@ -37,7 +37,7 @@
 
 source [file join [file dir [info script]] loadtdom.tcl]
 
-test domDoc-1.1 {asXML -escapeNonASCII} {need_i18n} {
+test domDoc-1.1 {asXML -escapeNonASCII} {
     set doc [dom parse [tdom::xmlReadFile \
             [file join [file dir [info script]] data/i18n_1.xml]]]
     set result [$doc asXML -escapeNonASCII]
@@ -46,7 +46,7 @@ test domDoc-1.1 {asXML -escapeNonASCII} {need_i18n} {
 } {<test>&#1072;&#1073;&#1074;&#1075;&#1076;&#1077;&#1078;&#1079;&#1080;&#1081;</test>
 }
 
-test domDoc-1.2 {asXML -escapeNonASCII; comments and PI's are not altered} {need_i18n} {
+test domDoc-1.2 {asXML -escapeNonASCII; comments and PI's are not altered} {
     set doc [dom parse [tdom::xmlReadFile \
             [file join [file dir [info script]] data/i18n_2.xml]]]
     set result [$doc asXML -indent none -escapeNonASCII]
@@ -56,7 +56,7 @@ test domDoc-1.2 {asXML -escapeNonASCII; comments and PI's are not altered} {need
 german umlauts: &#228;&#246;&#252;&#223;
 </root>"
 
-test domDoc-1.3 {asHTML -escapeNonASCII -htmlEntities} {need_i18n} {
+test domDoc-1.3 {asHTML -escapeNonASCII -htmlEntities} {
     set doc [dom parse {<html><body>&#228;&#xfc;&#8222;&#8223;&#8224;</body></html>}]
     set result [$doc asHTML -escapeNonASCII -htmlEntities]
     $doc delete
