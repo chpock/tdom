@@ -1333,6 +1333,42 @@ test xpath-7.11 {processing-instruction with literal argument} -setup {
     $doc delete
 } -result {<?mypi whatever?>}
 
+test xpath-7.12 {string value of processing-instruction} -setup {
+    set doc [dom parse {<h>
+        <?mypi whatever?>
+        <stuff>does not matter</stuff>
+        </h>
+    }]
+} -body {
+    $doc selectNodes string(//processing-instruction('mypi'))
+} -cleanup {
+    $doc delete
+} -result {whatever}
+
+test xpath-7.13 {string value of processing-instruction} -setup {
+    set doc [dom parse {<h>
+        <?mypi whatever  ?>
+        <stuff>does not matter</stuff>
+        </h>
+    }]
+} -body {
+    $doc selectNodes string(//processing-instruction('mypi'))
+} -cleanup {
+    $doc delete
+} -result "whatever  "
+
+test xpath-7.14 {local-name value of processing-instruction} -setup {
+    set doc [dom parse {<h>
+        <?mypi whatever  ?>
+        <stuff>does not matter</stuff>
+        </h>
+    }]
+} -body {
+    $doc selectNodes local-name(//processing-instruction('mypi'))
+} -cleanup {
+    $doc delete
+} -result {mypi}
+
 # cleanup
 ::tcltest::cleanupTests
 return
