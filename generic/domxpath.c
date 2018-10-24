@@ -2435,10 +2435,11 @@ int xpathNodeTest (
         return (node->nodeType == PROCESSING_INSTRUCTION_NODE);
     } else
     if (step->child->type == IsSpecificPI) {
-        return (strncmp (((domProcessingInstructionNode*)node)->targetValue,
-                         step->child->strvalue,
-                         ((domProcessingInstructionNode*)node)->targetLength)
-            == 0);
+        return (node->nodeType == PROCESSING_INSTRUCTION_NODE
+                && strncmp (((domProcessingInstructionNode*)node)->targetValue,
+                            step->child->strvalue,
+                            ((domProcessingInstructionNode*)node)->targetLength)
+                    == 0);
     } else
     if (step->child->type == IsComment) {
         return (node->nodeType == COMMENT_NODE);

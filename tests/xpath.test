@@ -1309,6 +1309,30 @@ test xpath-7.9 {Attribute node as context node of an id() call} -setup {
     $doc delete
 } -result ""
 
+test xpath-7.10 {processing-instruction with literal argument} -setup {
+    set doc [dom parse {<h>
+        <?mypi whatever?>
+        <stuff>does not matter</stuff>
+        </h>
+    }]
+} -body {
+    $doc selectNodes //processing-instruction('dontexist')
+} -cleanup {
+    $doc delete
+} -result {}
+
+test xpath-7.11 {processing-instruction with literal argument} -setup {
+    set doc [dom parse {<h>
+        <?mypi whatever?>
+        <stuff>does not matter</stuff>
+        </h>
+    }]
+} -body {
+    [$doc selectNodes //processing-instruction('mypi')] asXML -indent none
+} -cleanup {
+    $doc delete
+} -result {<?mypi whatever?>}
+
 # cleanup
 ::tcltest::cleanupTests
 return
