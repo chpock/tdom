@@ -364,9 +364,9 @@ proc runTest {testcase} {
                 incr compareDIFF
                 log 1 "Result and ref differ."
                 log 2 "Ref:"
-                log 2 [$refinfosetdoc asXML]
+                log 2 [$refinfosetdoc asXML -indent none]
                 log 2 "Result:"
-                log 2 [$resultinfosetdoc asXML]
+                log 2 [$resultinfosetdoc asXML -indent none]
             } else {
                 incr compareOK
             }

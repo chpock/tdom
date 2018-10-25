@@ -5702,11 +5702,13 @@ double xpathGetPrio (
                 return 0.0;
             }
         } else
+        if (steps->type == IsSpecificPI) {
+            return 0.0;
+        } else 
         if ( steps->type == IsNode
              || steps->type == IsText
              || steps->type == IsPI
              || steps->type == IsComment
-             || steps->type == IsSpecificPI
             ) {
             return -0.5;
         } else 
