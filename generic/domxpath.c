@@ -2826,6 +2826,65 @@ int xpathRound (double r) {
 }
 
 /*----------------------------------------------------------------------------
+|   idSplitAndAdd
+|
+\---------------------------------------------------------------------------*/
+static void
+idSplitAndAdd (
+    char           *idStr,
+    Tcl_HashTable  *ids,
+    xpathResultSet *result
+    ) 
+{
+    int            pwhite;
+    char          *pfrom, *pto;
+    Tcl_HashEntry *entryPtr;
+    domNode       *node;
+    
+    pwhite = 0;
+    pfrom = pto = idStr;
+    while (*pto) {
+        switch (*pto) {
+        case ' ' : case '\n': case '\r': case '\t':
+            if (pwhite) {
+                pto++;
+                continue;
+            }
+            *pto = '\0';
+            entryPtr = Tcl_FindHashEntry (ids, pfrom);
+            if (entryPtr) {
+                node = (domNode*) Tcl_GetHashValue (entryPtr);
+                /* Don't report nodes out of the fragment list */
+                if (node->parentNode != NULL ||
+                    (node == node->ownerDocument->documentElement)) {
+                    rsAddNode (result, node);
+                }
+            }
+            pwhite = 1;
+            pto++;
+            continue;
+        default:
+            if (pwhite) {
+                pfrom = pto;
+                pwhite = 0;
+            }
+            pto++;
+        }
+    }
+    if (!pwhite) {
+        entryPtr = Tcl_FindHashEntry (ids, pfrom);
+        if (entryPtr) {
+            node = (domNode*) Tcl_GetHashValue (entryPtr);
+            /* Don't report nodes out of the fragment list */
+            if (node->parentNode != NULL ||
+                (node == node->ownerDocument->documentElement)) {
+                rsAddNode (result, node);
+            }
+        }
+    }
+}
+
+/*----------------------------------------------------------------------------
 |   xpathEvalFunction
 |
 \---------------------------------------------------------------------------*/
@@ -3073,62 +3132,12 @@ xpathEvalFunction (
         if (leftResult.type == xNodeSetResult) {
             for (i=0; i < leftResult.nr_nodes; i++) {
                 leftStr = xpathFuncStringForNode (leftResult.nodes[i]);
-                entryPtr = Tcl_FindHashEntry (ids, leftStr);
-                if (entryPtr) {
-                    node = (domNode*) Tcl_GetHashValue (entryPtr);
-                    /* Don't report nodes out of the fragment list */
-                    if (node->parentNode != NULL ||
-                        (node == node->ownerDocument->documentElement)) {
-                        rsAddNode (result, node);
-                    }
-                }
+                idSplitAndAdd (leftStr, ids, result);
                 FREE(leftStr);
-                /*xpathRSFree (&newNodeList);*/
             }
         } else {
             leftStr = xpathFuncString (&leftResult);
-            from = 0;
-            pwhite = 0;
-            pfrom = pto = leftStr;
-            while (*pto) {
-                switch (*pto) {
-                case ' ' : case '\n': case '\r': case '\t':
-                    if (pwhite) {
-                        pto++;
-                        continue;
-                    }
-                    *pto = '\0';
-                    entryPtr = Tcl_FindHashEntry (ids, pfrom);
-                    if (entryPtr) {
-                        node = (domNode*) Tcl_GetHashValue (entryPtr);
-                        /* Don't report nodes out of the fragment list */
-                        if (node->parentNode != NULL ||
-                            (node == node->ownerDocument->documentElement)) {
-                            rsAddNode (result, node);
-                        }
-                    }
-                    pwhite = 1;
-                    pto++;
-                    continue;
-                default:
-                    if (pwhite) {
-                        pfrom = pto;
-                        pwhite = 0;
-                    }
-                    pto++;
-                }
-            }
-            if (!pwhite) {
-                entryPtr = Tcl_FindHashEntry (ids, pfrom);
-                if (entryPtr) {
-                    node = (domNode*) Tcl_GetHashValue (entryPtr);
-                    /* Don't report nodes out of the fragment list */
-                    if (node->parentNode != NULL ||
-                        (node == node->ownerDocument->documentElement)) {
-                        rsAddNode (result, node);
-                    }
-                }
-            }
+            idSplitAndAdd (leftStr, ids, result);
             FREE(leftStr);
         }
         sortByDocOrder (result);
