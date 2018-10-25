@@ -4343,6 +4343,12 @@ static int ExecAction (
             if (rs.type == xNodeSetResult) {
                 for (i=0; i<rs.nr_nodes; i++) {
                     if (rs.nodes[i]->nodeType == ATTRIBUTE_NODE) {
+                        if (xs->lastNode->firstChild) {
+                            /* Adding an Attribute to an element after
+                               children have been added to it is an error.
+                               Ignore the attribute. */
+                            continue;
+                        }
                         attr = (domAttrNode*)rs.nodes[i];
                         if (attr ->nodeFlags & IS_NS_NODE) {
                             /* If someone selects explicitly namespace nodes

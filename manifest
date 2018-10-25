@@ -1,5 +1,5 @@
-C Bug\sfix:\sCorrected\sthe\sdefault\svalue\sof\sa\stemplates\spriority\sin\scase\sthe\smatch\spattern\shas\sthe\sform\sof\sprocessing-instruction(Literal);\sthe\sdefault\svalue\s(in\scase\sof\sno\spriority\sattribute\son\sthe\stemplate)\swas\s-0.5\sand\sis\snow\s0.0.
-D 2018-10-25T01:06:00.867
+C Ignore\sattempt\sto\swrite\san\sattribute\swith\sxsl:copy-of\sto\sthe\sresult\stree\sif\sthe\starget\snode\salready\shas\schild\snodes\s(as\sxsl:attribute).
+D 2018-10-25T11:11:16.191
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -124,7 +124,7 @@ F generic/domjson.h b10c42af9ef7fc9d0ad4fac733ef6461df0cdd90
 F generic/domlock.c 54944f25f27ae220fc46cc2ac33d57b04500724c24c04eb59806126f13520fab
 F generic/domxpath.c 36e11064a3c1b49eb6c4b7b445a549c11b14394b00e2540cc6c18f6ecef90dfa
 F generic/domxpath.h fe6f664710ce79ebcf81e1aed74e763e7113047119f1e8302f93f2a1103d43ac
-F generic/domxslt.c 4c9b23cbf43130392963571dcd3372848729058fdff3dd4d4080518680150ddd
+F generic/domxslt.c 794467d3591956bc7caf075bcf217e15375cfe41fe2fb14978c8b3632a68ae55
 F generic/domxslt.h 140fa73765d699bfced9554c2c6439c0d2e6695eec3a8e69e1d25c0bbdf28fc6
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c abf69665ad49ed053885f7e7459d47be5abb057ba4ed919e96e83d636b016a30
@@ -222,8 +222,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 9b7ef1556bcad166aa79cbfd28fc67d8243d6db6ddf26c48de6efd5d416982ca
-R 9bbbf196a25ec69ca15b0cbc16af7470
+P f5cb4572d8ae62f9726bc90515a85d1736b191e2cb1bdf11cd76c9be3901681f
+R 1f7b6eb8ef0e873853193bb0c1af1107
 U rolf
-Z 1a78768ee0298dce9a309dd338900ac7
+Z 6dcb465607decf428f83c5deda0a59f0
 # Remove this line to create a well-formed Fossil manifest.
