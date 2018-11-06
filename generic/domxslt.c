@@ -3493,9 +3493,14 @@ static int xsltNumber (
         } else {
             Tcl_DStringInit (&dStr);
             if (currentNode->nodeType == ELEMENT_NODE) {
-                /* TODO: This is wrong. Instead this should use the
-                   "expanded-name" of the current node. */
-                Tcl_DStringAppend (&dStr, currentNode->nodeName, -1);
+                if (!currentNode->parentNode &&
+                    currentNode == currentNode->ownerDocument->rootNode) {
+                    Tcl_DStringAppend (&dStr, "/", 1);
+                } else {
+                    /* TODO: This is wrong. Instead this should use the
+                       "expanded-name" of the current node. */
+                    Tcl_DStringAppend (&dStr, currentNode->nodeName, -1);
+                }
             } else 
             if (currentNode->nodeType == ATTRIBUTE_NODE) {
                 Tcl_DStringAppend (&dStr, "@", 1);
