@@ -113,8 +113,8 @@ proc extRefHandler {base systemId publicId} {
 
     set absolutURI [uri::resolve $base $systemId]
     incr usageCounter($absolutURI)
-    if {$usageCounter($absolutURI) > 10} {
-        error "Cirular import/include?"
+    if {$usageCounter($absolutURI) > 50} {
+        error "Circular import/include?"
     }
     switch $systemId {
         "notfound.xml" {

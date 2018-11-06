@@ -1,5 +1,5 @@
-C Minor:\sNow\severy\sxsl:comment\scall\sin\san\sXSLT\sstylesheet\swill\screate\sa\scomment\snode\sin\sthe\sresult\stree,\seven\sif\sit\sis\sempty.\sUp\sto\snow\sthis\shappend\sonly\sfor\snot\sempty\scomment\snodes.
-D 2018-11-06T12:17:52.248
+C Minor\stweak
+D 2018-11-06T22:45:48.308
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -153,7 +153,7 @@ F tclconfig/tcl.m4 2e84c88428573888ec9b12552b7ca6d732ef0bd4fabbb43547b038f4de6de
 F tdom.m4 c2df3f3444af017f80548b21f439f365bfa85d6593c67d9a7fef24c2f01b0c6a
 F tdomConfig.sh.in 5756c6b431179e49852a607cc2ca01e5381da905
 F tests/JSONTestSuite.tcl 907228f9bd31855951b9033df74c9c15778765af
-F tests/OASIS-suite.tcl 6839f61412683cb3af52276779802937d463c82d7113c67b6e4c8b856c6ca439
+F tests/OASIS-suite.tcl 1da66ffffee97dd7c39d3f14482f5a9382000d4233668c7f2ed1c5825752904e
 F tests/all-bench.tcl 1444cd15eb49d934cb08f75f59b244363372dd23cff13470f5b14580cc33ca47
 F tests/all.tcl e2e7e7fc73b1e04a6074b8d8e2f6d2f523c45baa1e0dbe1988354d59a9180884
 F tests/attribute.test 53ac8fb043e79b638c8c6f5e7da848f6103552d6
@@ -222,8 +222,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a4b0959de15f2b6c3fa503e2273fd30f59293539ad3dc9ea37ed9859668361f9
-R 107f8903e1729a07faf4a38d348caa3e
+P 66794b03cdbfa10e6b0a6f9db96fb05e7f56bc31db824f3d6053a18ad44fa99f
+R 5d98f423c601e368ee9758cf11ce450e
 U rolf
-Z 018d3a97a43949f8307651f6dc628bb6
+Z db01ef7d8908f2ea019c37c856d33d3c
 # Remove this line to create a well-formed Fossil manifest.
