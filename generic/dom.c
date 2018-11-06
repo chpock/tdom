@@ -3958,7 +3958,6 @@ domEscapeCData (
     }
 }
 
-
 /*---------------------------------------------------------------------------
 |   domAppendNewTextNode
 |
@@ -3974,7 +3973,7 @@ domAppendNewTextNode(
 {
     domTextNode   *node;
 
-    if (!length) {
+    if (!length && (nodeType == TEXT_NODE)) {
         return NULL;
     }
 
