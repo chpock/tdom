@@ -1,5 +1,5 @@
-C Made\sxsl:number\swork\sif\sthe\scontext\snode\sis\sthe\sdocument\snode\sof\sthe\ssource\sdocument\sand\sno\svalue\sattriubte\sis\sgiven.
-D 2018-11-06T22:55:18.853
+C The\svalue\sof\sthe\sname\sattribute\sof\sthe\sxsl:element\safter\sattribute\svalue\stemplate\sevaluation\shas\sto\sbe\sa\sQName\s(and\swas\sup\sto\snow\sonly\schecked\sif\sit\sis\san\sXML\sName).
+D 2018-11-07T10:03:33.533
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -124,7 +124,7 @@ F generic/domjson.h b10c42af9ef7fc9d0ad4fac733ef6461df0cdd90
 F generic/domlock.c 54944f25f27ae220fc46cc2ac33d57b04500724c24c04eb59806126f13520fab
 F generic/domxpath.c a71e0f1107d2b1ce864e06d29a7116a8d227753c319625c366d2eee77cdbbdb3
 F generic/domxpath.h fe6f664710ce79ebcf81e1aed74e763e7113047119f1e8302f93f2a1103d43ac
-F generic/domxslt.c 1598ce608d3d5cf8c20f12dab67b61d8263dd0148966b353a25c20c23a88eaba
+F generic/domxslt.c 41dfe1e31474547cd4f6953cc2bfc29ad7817d0ddc75be32d87596196c9a9199
 F generic/domxslt.h 140fa73765d699bfced9554c2c6439c0d2e6695eec3a8e69e1d25c0bbdf28fc6
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c abf69665ad49ed053885f7e7459d47be5abb057ba4ed919e96e83d636b016a30
@@ -222,8 +222,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P bce9b847ddd34eb59d6fcb7903439d8f4ca6bbf822b4fa6725cedadfada890f6
-R 5dfa3f0e8be8905a4d229aaf5df3f401
+P f1af439dfe09c81ddf703fe7fefb84edbcd15a8e611ed8d469dc93955de35f42
+R 2bb545039fe361bbf2d967de33beab12
 U rolf
-Z ffef1a794888d8acc5e214c6594e26cb
+Z 77008f4e2e76895332454d5d5efc7113
 # Remove this line to create a well-formed Fossil manifest.

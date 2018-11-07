@@ -4430,7 +4430,7 @@ static int ExecAction (
             rc = evalAttrTemplates( xs, context, currentNode, currentPos,
                                     str, &str2, errMsg);
             CHECK_RC;
-            if (!domIsNAME (str2)) {
+            if (!domIsQNAME (str2)) {
                 reportError (actionNode, "xsl:element: Element name is not a"
                              " valid QName.", errMsg);
                 FREE(str2);
