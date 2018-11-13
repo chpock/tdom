@@ -555,18 +555,18 @@ recommendation. Otherwise it returns 0.</desc>
                 </optdef>
                 <optdef>
                     <optname>expatmajorversion</optname>
-                    <desc>Returns the major version of the underlyling
-                    expat version as integer.</desc>
+                    <desc>Returns the major version of the at build
+                    time used expat version as integer.</desc>
                 </optdef>
                 <optdef>
                     <optname>expatminorversion</optname>
-                    <desc>Returns the minor version of the underlyling
-                    expat version as integer.</desc>
+                    <desc>Returns the minor version of the at build
+                    time used expat version as integer.</desc>
                 </optdef>
                 <optdef>
                     <optname>expatmicroversion</optname>
-                    <desc>Returns the micro version of the underlyling
-                    expat version as integer.</desc>
+                    <desc>Returns the micro version of the at build
+                    time used expat version as integer.</desc>
                 </optdef>
                 <optdef>
                     <optname>dtd</optname>

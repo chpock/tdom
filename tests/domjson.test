@@ -15,6 +15,10 @@
 
 source [file join [file dir [info script]] loadtdom.tcl]
 
+testConstraint needExpand 1
+if {$tcl_version < 8.5} {
+    testConstraint needExpand 0
+}
 
 namespace eval nodeCmds {
     dom createNodeCmd elementNode e1

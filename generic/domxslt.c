@@ -3493,9 +3493,14 @@ static int xsltNumber (
         } else {
             Tcl_DStringInit (&dStr);
             if (currentNode->nodeType == ELEMENT_NODE) {
-                /* TODO: This is wrong. Instead this should use the
-                   "expanded-name" of the current node. */
-                Tcl_DStringAppend (&dStr, currentNode->nodeName, -1);
+                if (!currentNode->parentNode &&
+                    currentNode == currentNode->ownerDocument->rootNode) {
+                    Tcl_DStringAppend (&dStr, "/", 1);
+                } else {
+                    /* TODO: This is wrong. Instead this should use the
+                       "expanded-name" of the current node. */
+                    Tcl_DStringAppend (&dStr, currentNode->nodeName, -1);
+                }
             } else 
             if (currentNode->nodeType == ATTRIBUTE_NODE) {
                 Tcl_DStringAppend (&dStr, "@", 1);
@@ -4343,6 +4348,12 @@ static int ExecAction (
             if (rs.type == xNodeSetResult) {
                 for (i=0; i<rs.nr_nodes; i++) {
                     if (rs.nodes[i]->nodeType == ATTRIBUTE_NODE) {
+                        if (xs->lastNode->firstChild) {
+                            /* Adding an Attribute to an element after
+                               children have been added to it is an error.
+                               Ignore the attribute. */
+                            continue;
+                        }
                         attr = (domAttrNode*)rs.nodes[i];
                         if (attr ->nodeFlags & IS_NS_NODE) {
                             /* If someone selects explicitly namespace nodes
@@ -4419,7 +4430,7 @@ static int ExecAction (
             rc = evalAttrTemplates( xs, context, currentNode, currentPos,
                                     str, &str2, errMsg);
             CHECK_RC;
-            if (!domIsNAME (str2)) {
+            if (!domIsQNAME (str2)) {
                 reportError (actionNode, "xsl:element: Element name is not a"
                              " valid QName.", errMsg);
                 FREE(str2);
