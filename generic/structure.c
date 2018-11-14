@@ -1,6 +1,17 @@
 
 #include <tdom.h>
 
+/* #define DEBUG */
+/*----------------------------------------------------------------------------
+|   Debug Macros
+|
+\---------------------------------------------------------------------------*/
+#ifdef DEBUG
+# define DBG(x) x
+#else
+# define DBG(x) 
+#endif
+
 #define TMALLOC(t) (t*)MALLOC(sizeof(t))
 
 #define SetResult(str) Tcl_ResetResult(interp); \
@@ -21,6 +32,17 @@ typedef enum structure_content_type {
   STRUCTURE_CTYPE_INTERLEAVE,
   STRUCTURE_CTYPE_GROUP
 } Structure_Content_Type;
+
+static char *Structure_Content_Type2str[] = {
+    "EMPTY",
+    "ANY",
+    "MIXED",
+    "NAME",
+    "CHOICE",
+    "SEQ",
+    "INTERLEAVE",
+    "GROUP",
+};
 
 typedef enum structure_content_quant  {
   STRUCTURE_CQUANT_NONE,
@@ -62,8 +84,8 @@ typedef struct StructureCP
     struct StructureCP      *next;
     StructureFlags           flags;
     Structure_Content_Type   type;
-    struct StructureCP      *content;
-    StructureQuant          *quants;
+    struct StructureCP     **content;
+    StructureQuant         **quants;
     unsigned int             numChildren;
 } StructureCP;
 
@@ -88,8 +110,8 @@ typedef struct
     char *currentNamespace;
     char *currentAttributeNamespace;
     int   isAttribute;
-    StructureCP *currentChilds;
-    StructureQuant *childQuants;
+    StructureCP **currentChilds;
+    StructureQuant **childQuants;
     unsigned int childCount;
     unsigned int childSize;
 } StructurInfo;
@@ -138,17 +160,18 @@ initStructureCP (
     switch (type) {
     case STRUCTURE_CTYPE_NAME:
         pattern->namespace = (char *)namespace;
-        pattern->name = name;
         /* Fall thru. */
     case STRUCTURE_CTYPE_GROUP:
+        pattern->name = name;
+        /* Fall thru. */
     case STRUCTURE_CTYPE_MIXED:
     case STRUCTURE_CTYPE_CHOICE:
     case STRUCTURE_CTYPE_SEQ:
     case STRUCTURE_CTYPE_INTERLEAVE:
-        pattern->content = (StructureCP*) MALLOC (
+        pattern->content = (StructureCP**) MALLOC (
             sizeof(StructureCP*) * START_CONTENT_ARRAY_LEN
             );
-        pattern->quants = (StructureQuant*) MALLOC (
+        pattern->quants = (StructureQuant**) MALLOC (
             sizeof (StructureQuant*) * START_CONTENT_ARRAY_LEN
             );
         break;
@@ -158,6 +181,53 @@ initStructureCP (
         break;
     }
     return pattern;
+}
+
+DBG(
+static void serializeCP (
+    StructureCP *pattern
+    )
+{
+    fprintf (stderr, "CP type: %s\n",
+             Structure_Content_Type2str[pattern->type]);
+    switch (pattern->type) {
+    case STRUCTURE_CTYPE_NAME:
+    case STRUCTURE_CTYPE_GROUP:
+        fprintf (stderr, "\tName: '%s' Namespace: '%s'\n",
+                 pattern->name,pattern->namespace);
+        if (pattern->flags & ANON_ELEMENT_DEF) {
+            fprintf (stderr, "\tAnonymously defined NAME\n");
+        }
+        /* Fall thru. */
+    case STRUCTURE_CTYPE_MIXED:
+    case STRUCTURE_CTYPE_CHOICE:
+    case STRUCTURE_CTYPE_SEQ:
+    case STRUCTURE_CTYPE_INTERLEAVE:
+        fprintf (stderr, "\t%d childs\n", pattern->numChildren);
+        break;
+    case STRUCTURE_CTYPE_EMPTY:
+    case STRUCTURE_CTYPE_ANY:
+        /* Do nothing */
+        break;
+    }
+}
+)
+
+static void freeStructureCP (
+    StructureCP *pattern
+    )
+{
+    switch (pattern->type) {
+    case STRUCTURE_CTYPE_EMPTY:
+    case STRUCTURE_CTYPE_ANY:
+        /* do nothing */
+        break;
+    default:
+        FREE (pattern->content);
+        FREE (pattern->quants);
+        break;
+    }
+    FREE (pattern);
 }
 
 static StructurInfo*
@@ -171,6 +241,36 @@ initStructureInfo ()
     Tcl_InitHashTable (&structureInfo->pattern, TCL_STRING_KEYS);
     Tcl_InitHashTable (&structureInfo->namespace, TCL_STRING_KEYS);
     return structureInfo;
+}
+
+static void structureInstanceDelete (
+    ClientData clientData
+    )
+{
+    StructurInfo *structureInfo = (StructurInfo *) clientData;
+    StructureCP *pattern;
+    
+    Tcl_HashEntry *entryPtr;
+    Tcl_HashSearch search;
+
+    if (structureInfo->start) FREE (structureInfo->start);
+    entryPtr = Tcl_FirstHashEntry (&structureInfo->element, &search);
+    while (entryPtr) {
+        pattern = Tcl_GetHashValue (entryPtr);
+        DBG(serializeCP (pattern));
+        freeStructureCP (pattern);
+        entryPtr = Tcl_NextHashEntry (&search);
+    }
+    Tcl_DeleteHashTable (&structureInfo->element);
+    entryPtr = Tcl_FirstHashEntry (&structureInfo->pattern, &search);
+    while (entryPtr) {
+        pattern = Tcl_GetHashValue (entryPtr);
+        DBG(serializeCP (pattern));
+        freeStructureCP (pattern);
+        entryPtr = Tcl_NextHashEntry (&search);
+    }
+    Tcl_DeleteHashTable (&structureInfo->pattern);
+    FREE (structureInfo);
 }
 
 static int 
@@ -203,7 +303,6 @@ structureInstanceCmd (
     {
         k_elementstart, k_elementend, k_text
     };
-    
     
     if (objc < 2) {
         Tcl_WrongNumArgs (interp, 1, objv, "subcommand ?arguments?");
@@ -271,6 +370,9 @@ structureInstanceCmd (
         structureInfo->childSize = START_CONTENT_ARRAY_LEN;
         result = Tcl_VarEval (interp, "namespace eval ::tdom::structure {",
                               Tcl_GetString (objv[patternIndex]), "}", NULL);
+        element->content = structureInfo->currentChilds;
+        element->quants = structureInfo->childQuants;
+        element->numChildren = structureInfo->childCount;
         SETASI(0);
         break;
 
@@ -286,7 +388,11 @@ structureInstanceCmd (
             return TCL_ERROR;
         }
         SETASI(structureInfo);
-        pattern = initStructureCP (STRUCTURE_CTYPE_GROUP, NULL, NULL);
+        pattern = initStructureCP (
+            STRUCTURE_CTYPE_GROUP,
+            NULL,
+            Tcl_GetHashKey (&structureInfo->pattern, entryPtr)
+            );
         Tcl_SetHashValue (entryPtr, pattern);
         structureInfo->currentChilds = pattern->content;
         structureInfo->childQuants = pattern->quants;
@@ -294,6 +400,10 @@ structureInstanceCmd (
         structureInfo->childSize = START_CONTENT_ARRAY_LEN;
         result = Tcl_VarEval (interp, "namespace eval ::tdom::structure {",
                               Tcl_GetString (objv[3]), "}", NULL);
+        pattern->content = structureInfo->currentChilds;
+        pattern->quants = structureInfo->childQuants;
+        pattern->numChildren = structureInfo->childCount;
+        
         SETASI(0);
         break;
 
@@ -367,51 +477,6 @@ structureInstanceCmd (
         
     }
     return result;
-}
-
-static void freeStructureCP (
-    StructureCP *pattern
-    )
-{
-    switch (pattern->type) {
-    case STRUCTURE_CTYPE_EMPTY:
-    case STRUCTURE_CTYPE_ANY:
-        /* do nothing */
-        break;
-    default:
-        FREE (pattern->content);
-        FREE (pattern->quants);
-        break;
-    }
-    FREE (pattern);
-}
-
-static void structureInstanceDelete (
-    ClientData clientData
-    )
-{
-    StructurInfo *structureInfo = (StructurInfo *) clientData;
-    StructureCP *pattern;
-    
-    Tcl_HashEntry *entryPtr;
-    Tcl_HashSearch search;
-
-    if (structureInfo->start) FREE (structureInfo->start);
-    entryPtr = Tcl_FirstHashEntry (&structureInfo->element, &search);
-    while (entryPtr) {
-        pattern = Tcl_GetHashValue (entryPtr);
-        freeStructureCP (pattern);
-        entryPtr = Tcl_NextHashEntry (&search);
-    }
-    Tcl_DeleteHashTable (&structureInfo->element);
-    entryPtr = Tcl_FirstHashEntry (&structureInfo->pattern, &search);
-    while (entryPtr) {
-        pattern = Tcl_GetHashValue (entryPtr);
-        freeStructureCP (pattern);
-        entryPtr = Tcl_NextHashEntry (&search);
-    }
-    Tcl_DeleteHashTable (&structureInfo->pattern);
-    FREE (structureInfo);
 }
 
 
@@ -537,11 +602,11 @@ ElementPatternObjCmd (
     CHECK_SI
     checkNrArgs (2,4,"Expected: elementName ?quant? ?pattern?");
 
-
     if (objc < 4) {
         /* Reference to an element type */
         entryPtr = Tcl_CreateHashEntry (&structureInfo->element,
-                                        objv[1], &hnew);
+                                        Tcl_GetString(objv[1]), &hnew);
+        
         if (!hnew) {
             element = (StructureCP *) Tcl_GetHashValue (entryPtr);
             while (element) {
@@ -555,7 +620,7 @@ ElementPatternObjCmd (
             element = initStructureCP(
                 STRUCTURE_CTYPE_NAME,
                 structureInfo->currentNamespace,
-                Tcl_GetString (objv[1])
+                Tcl_GetHashKey (&structureInfo->element, entryPtr)
                 );
             element->flags &= ANON_ELEMENT_DEF;
             if (!hnew) {
@@ -564,6 +629,15 @@ ElementPatternObjCmd (
             }
             Tcl_SetHashValue (entryPtr, element);
         }
+        if (structureInfo->childCount == structureInfo->childSize) {
+            structureInfo->currentChilds =
+                REALLOC (structureInfo->currentChilds,
+                         2 * structureInfo->childSize
+                         * sizeof (StructureCP*));
+            structureInfo->childSize *= 2;
+        }
+        structureInfo->currentChilds[structureInfo->childCount] = element;
+        structureInfo->childCount++;
     } else {
         /* Local definition of this element */
         
