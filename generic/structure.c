@@ -53,6 +53,7 @@ typedef enum structure_cp_type {
   STRUCTURE_CTYPE_NAME,
   STRUCTURE_CTYPE_CHOICE,
   STRUCTURE_CTYPE_INTERLEAVE,
+  STRUCTURE_CTYPE_PATTERN,
   STRUCTURE_CTYPE_GROUP
 } Structure_CP_Type;
 
@@ -63,6 +64,7 @@ static char *Structure_CP_Type2str[] = {
     "NAME",
     "CHOICE",
     "INTERLEAVE",
+    "PATTERN",
     "GROUP",
 };
 
@@ -101,14 +103,14 @@ static StructureQuant *quantPlus = &QuantPlus;
 
 typedef struct StructureCP
 {
-    Structure_CP_Type   type;
-    char                    *namespace;
-    char                    *name;
-    struct StructureCP      *next;
-    StructureFlags           flags;
-    struct StructureCP     **content;
-    StructureQuant         **quants;
-    unsigned int             numChildren;
+    Structure_CP_Type    type;
+    char                *namespace;
+    char                *name;
+    struct StructureCP  *next;
+    StructureFlags       flags;
+    struct StructureCP **content;
+    StructureQuant     **quants;
+    unsigned int         numChildren;
 } StructureCP;
 
 #define CONTENT_ARRAY_SIZE_INIT 20
@@ -129,10 +131,10 @@ typedef struct
     Tcl_HashTable element;
     Tcl_HashTable namespace;
     Tcl_HashTable pattern;
-    StructureCP **anonPattern;
-    unsigned int numAnonPattern;
-    unsigned int anonPatternSize;
-    unsigned int forwardPatternDef;
+    StructureCP **patternList;
+    unsigned int numPatternList;
+    unsigned int patternListSize;
+    unsigned int forwardPatternDefs;
     StructureQuant **quants;
     unsigned int numQuants;
     unsigned int quantsSize;
@@ -193,26 +195,26 @@ static void SetActiveStructureData (StructureData *v)
     sdata->currentQuants[sdata->numChildren] = quant;                   \
     sdata->numChildren++;                                               \
 
-#define REMEMBER_ANON_PATTERN(pattern)                                  \
-    if (sdata->numAnonPattern == sdata->anonPatternSize) {              \
-        sdata->anonPattern = (StructureCP **) MALLOC (                  \
-            sizeof (StructureCP*) * sdata->anonPatternSize * 2);        \
-        sdata->anonPatternSize *= 2;                                    \
+#define REMEMBER_PATTERN(pattern)                                       \
+    if (sdata->numPatternList == sdata->patternListSize) {              \
+        sdata->patternList = (StructureCP **) MALLOC (                  \
+            sizeof (StructureCP*) * sdata->patternListSize * 2);        \
+        sdata->patternListSize *= 2;                                    \
     }                                                                   \
-    sdata->anonPattern[sdata->numAnonPattern] = pattern;                \
-    sdata->numAnonPattern++;
+    sdata->patternList[sdata->numPatternList] = pattern;                \
+    sdata->numPatternList++;
 
 #define SAVE_FOR_EVAL_VARS                                              \
     StructureCP **savedCurrentContent;                                  \
     StructureQuant **savedCurrentQuant;                                 \
-    unsigned int savedNumChildren, savedContenSize, savedNumAnonPattern; 
+    unsigned int savedNumChildren, savedContenSize, savedNumPatternList; 
 
 #define SAVE_FOR_EVAL                                   \
     savedCurrentContent = sdata->currentContent;        \
     savedCurrentQuant = sdata->currentQuants;           \
     savedNumChildren = sdata->numChildren;              \
     savedContenSize = sdata->contentSize;               \
-    savedNumAnonPattern = sdata->numAnonPattern;        \
+    savedNumPatternList = sdata->numPatternList;        \
     sdata->currentContent = pattern->content;           \
     sdata->currentQuants = pattern->quants;             \
     sdata->numChildren = 0;                             \
@@ -241,11 +243,11 @@ initStructureCP (
     pattern->type = type;
     switch (type) {
     case STRUCTURE_CTYPE_NAME:
+    case STRUCTURE_CTYPE_PATTERN:
         pattern->namespace = (char *)namespace;
-        /* Fall thru. */
-    case STRUCTURE_CTYPE_GROUP:
         pattern->name = name;
         /* Fall thru. */
+    case STRUCTURE_CTYPE_GROUP:
     case STRUCTURE_CTYPE_MIXED:
     case STRUCTURE_CTYPE_CHOICE:
     case STRUCTURE_CTYPE_INTERLEAVE:
@@ -320,9 +322,9 @@ initStructureData ()
     Tcl_InitHashTable (&sdata->element, TCL_STRING_KEYS);
     Tcl_InitHashTable (&sdata->pattern, TCL_STRING_KEYS);
     Tcl_InitHashTable (&sdata->namespace, TCL_STRING_KEYS);
-    sdata->anonPattern = (StructureCP **) MALLOC (
+    sdata->patternList = (StructureCP **) MALLOC (
         sizeof (StructureCP*) * ANON_PATTERN_ARRAY_SIZE_INIT);
-    sdata->anonPatternSize = ANON_PATTERN_ARRAY_SIZE_INIT;
+    sdata->patternListSize = ANON_PATTERN_ARRAY_SIZE_INIT;
     sdata->quants = (StructureQuant **) MALLOC (
         sizeof (StructureQuant*) * QUANTS_ARRAY_SIZE_INIT);
     sdata->quantsSize = QUANTS_ARRAY_SIZE_INIT;
@@ -334,38 +336,73 @@ static void structureInstanceDelete (
     )
 {
     StructureData *sdata = (StructureData *) clientData;
-    StructureCP *pattern;
     unsigned int i;
     
-    Tcl_HashEntry *entryPtr;
-    Tcl_HashSearch search;
-
     if (sdata->start) FREE (sdata->start);
-    entryPtr = Tcl_FirstHashEntry (&sdata->element, &search);
-    while (entryPtr) {
-        pattern = Tcl_GetHashValue (entryPtr);
-        DBG(serializeCP (pattern));
-        freeStructureCP (pattern);
-        entryPtr = Tcl_NextHashEntry (&search);
-    }
+    if (sdata->startNamespace) FREE (sdata->startNamespace);
+    Tcl_DeleteHashTable (&sdata->namespace);
     Tcl_DeleteHashTable (&sdata->element);
-    entryPtr = Tcl_FirstHashEntry (&sdata->pattern, &search);
-    while (entryPtr) {
-        pattern = Tcl_GetHashValue (entryPtr);
-        DBG(serializeCP (pattern));
-        freeStructureCP (pattern);
-        entryPtr = Tcl_NextHashEntry (&search);
-    }
     Tcl_DeleteHashTable (&sdata->pattern);
-    for (i = 0; i < sdata->numAnonPattern; i++) {
-        freeStructureCP (sdata->anonPattern[i]);
+    for (i = 0; i < sdata->numPatternList; i++) {
+        DBG(serializeCP (pattern));
+        freeStructureCP (sdata->patternList[i]);
     }
-    FREE (sdata->anonPattern);
+    FREE (sdata->patternList);
     for (i = 0; i < sdata->numQuants; i++) {
         FREE (sdata->quants[i]);
     }
     FREE (sdata->quants);
     FREE (sdata);
+}
+
+static void
+cleanupLastPattern (
+    StructureData *sdata,
+    unsigned int from
+    )
+{
+    unsigned int i;
+    Tcl_HashTable *hashTable;
+    Tcl_HashEntry *entryPtr;
+    StructureCP *this, *previous, *current;
+    
+    for (i = from; i < sdata->numPatternList; i++) {
+        this = sdata->patternList[i];
+        hashTable = NULL;
+        if (this->type == STRUCTURE_CTYPE_NAME) {
+            hashTable = &sdata->element;
+        }
+        if (this->type == STRUCTURE_CTYPE_PATTERN) {
+            hashTable = &sdata->pattern;
+        }
+        if (hashTable) {
+            if (this->flags & FORWARD_PATTERN_DEF) {
+                sdata->forwardPatternDefs--;
+            }
+            entryPtr = Tcl_FindHashEntry (hashTable, this->name);
+            previous = NULL;
+            current = Tcl_GetHashValue (entryPtr);
+            while (current != NULL && current != this) {
+                previous = current;
+                current = current->next;
+            }
+            if (previous) {
+                if (current->next) {
+                    previous->next = current->next;
+                } else {
+                    previous->next = NULL;
+                }
+            } else {
+                if (current->next) {
+                    Tcl_SetHashValue (entryPtr, current->next);
+                } else {
+                    Tcl_DeleteHashEntry (entryPtr);
+                }
+            }
+        }
+        freeStructureCP (sdata->patternList[i]);
+    }
+    sdata->numPatternList = from;
 }
 
 static int 
@@ -377,10 +414,12 @@ structureInstanceCmd (
     )
 {
     int            methodIndex, keywordIndex, hnew, patternIndex;
-    int            result = TCL_OK, isAnonPattern = 0, newPattern = 0;
+    int            result = TCL_OK, forwardDef = 0;
+    unsigned int   savedNumPatternList;
     StructureData  *sdata = (StructureData *) clientData;
+    Tcl_HashTable *hashTable;
     Tcl_HashEntry *entryPtr;
-    StructureCP   *element, *pattern, *current = NULL;
+    StructureCP   *pattern, *current = NULL;
     void          *namespacePtr;
     
     static const char *structureInstanceMethods[] = {
@@ -415,11 +454,18 @@ structureInstanceCmd (
     Tcl_ResetResult (interp);
     switch ((enum structureInstanceMethod) methodIndex) {
     case m_element:
+    case m_pattern:
         if (objc != 4 && objc != 5) {
             Tcl_WrongNumArgs (interp, 1, objv, "<name>"
                  " ?<namespace>? pattern");
             return TCL_ERROR;
         }
+        if ((enum structureInstanceMethod) methodIndex == m_element) {
+            hashTable = &sdata->element;
+        } else {
+            hashTable = &sdata->pattern;
+        }
+        savedNumPatternList = sdata->numPatternList;
         namespacePtr = NULL;
         patternIndex = 3;
         if (objc == 5) {
@@ -429,104 +475,63 @@ structureInstanceCmd (
             namespacePtr = Tcl_GetHashKey (&sdata->namespace,
                                            entryPtr);
         }
-        entryPtr = Tcl_CreateHashEntry (&sdata->element,
+        entryPtr = Tcl_CreateHashEntry (hashTable,
                                         Tcl_GetString (objv[2]), &hnew);
-        element = NULL;
+        pattern = NULL;
         if (!hnew) {
-            element = (StructureCP *) Tcl_GetHashValue (entryPtr);
-            while (element) {
-                if (element->namespace == namespacePtr) {
-                    if (element->flags & FORWARD_PATTERN_DEF) {
-                        isAnonPattern = 1;
+            pattern = (StructureCP *) Tcl_GetHashValue (entryPtr);
+            while (pattern) {
+                if (pattern->namespace == namespacePtr) {
+                    if (pattern->flags & FORWARD_PATTERN_DEF) {
+                        forwardDef = 1;
                         break;
                     }
-                    SetResult ("Element already defined in this namespace.");
+                    if ((enum structureInstanceMethod) methodIndex
+                        == m_element) {
+                        SetResult ("Element already defined "
+                                   "in this namespace.");
+                    } else {
+                        SetResult ("Pattern already defined "
+                                   "in this namespace.");
+                    }
                     return TCL_ERROR;
                 }
-                element = element->next;
+                pattern = pattern->next;
             }
         }
-        if (element == NULL) {
-            element = initStructureCP (
+        if (pattern == NULL) {
+            pattern = initStructureCP (
                 STRUCTURE_CTYPE_NAME,
                 namespacePtr,
-                Tcl_GetHashKey (&sdata->element, entryPtr)
+                Tcl_GetHashKey (hashTable, entryPtr)
                 );
-            newPattern = 1;
             if (!hnew) {
                 current = (StructureCP *) Tcl_GetHashValue (entryPtr);
-                element->next = current;
+                pattern->next = current;
             }
-            Tcl_SetHashValue (entryPtr, element);
+            REMEMBER_PATTERN (pattern);
+            Tcl_SetHashValue (entryPtr, pattern);
         }
 
         SETASI(sdata);
         sdata->currentNamespace = namespacePtr;
-        sdata->currentContent = element->content;
-        sdata->currentQuants = element->quants;
-        sdata->numChildren = 0;
-        sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
-        result = Tcl_VarEval (interp, "namespace eval ::tdom::structure {",
-                              Tcl_GetString (objv[patternIndex]), "}", NULL);
-        sdata->currentNamespace = NULL;
-        element->content = sdata->currentContent;
-        element->quants = sdata->currentQuants;
-        element->numChildren = sdata->numChildren;
-        if (result == TCL_OK) {
-            if (isAnonPattern) {
-                element->flags &= ~FORWARD_PATTERN_DEF;
-                sdata->forwardPatternDef--;
-            }
-        } else {
-            if (hnew) Tcl_DeleteHashEntry (entryPtr);
-            if (newPattern) freeStructureCP (element);
-        }
-        SETASI(0);
-        break;
-
-    case m_pattern:
-        if (objc != 4) {
-            Tcl_WrongNumArgs (interp, 2, objv, "<patternname> <definition>");
-            return TCL_ERROR;
-        }
-        entryPtr = Tcl_CreateHashEntry (&sdata->pattern,
-                                        Tcl_GetString(objv[2]), &hnew);
-        if (hnew) {
-            pattern = initStructureCP (
-                STRUCTURE_CTYPE_GROUP,
-                NULL,
-                Tcl_GetHashKey (&sdata->pattern, entryPtr)
-                );
-            Tcl_SetHashValue (entryPtr, pattern);
-        } else {
-            pattern = (StructureCP *) Tcl_GetHashValue (entryPtr);
-            if (pattern->flags & FORWARD_PATTERN_DEF) {
-                isAnonPattern = 1;
-            } else {
-                SetResult ("Pattern already defined.");
-                return TCL_ERROR;
-            }
-        }
-        SETASI(sdata);
         sdata->currentContent = pattern->content;
         sdata->currentQuants = pattern->quants;
         sdata->numChildren = 0;
         sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
         result = Tcl_VarEval (interp, "namespace eval ::tdom::structure {",
-                              Tcl_GetString (objv[3]), "}", NULL);
+                              Tcl_GetString (objv[patternIndex]), "}", NULL);
+        sdata->currentNamespace = NULL;
         pattern->content = sdata->currentContent;
         pattern->quants = sdata->currentQuants;
         pattern->numChildren = sdata->numChildren;
         if (result == TCL_OK) {
-            if (isAnonPattern) {
+            if (forwardDef) {
                 pattern->flags &= ~FORWARD_PATTERN_DEF;
-                sdata->forwardPatternDef--;
+                sdata->forwardPatternDefs--;
             }
         } else {
-            if (hnew) {
-                Tcl_DeleteHashEntry (entryPtr);
-                freeStructureCP (pattern);
-            }
+            cleanupLastPattern (sdata, savedNumPatternList);
         }
         SETASI(0);
         break;
@@ -599,7 +604,7 @@ structureInstanceCmd (
             Tcl_WrongNumArgs(interp, 2, objv, "");
             return TCL_ERROR;
         }
-        SetIntResult(sdata->forwardPatternDef);
+        SetIntResult(sdata->forwardPatternDefs);
         break;
         
     default:
@@ -794,7 +799,7 @@ EmptyAnyPatternObjCmd (
     checkNrArgs (1,1,"No arguments expected.");
     pattern = initStructureCP ((Structure_CP_Type) clientData,
                                NULL, NULL);
-    REMEMBER_ANON_PATTERN (pattern)
+    REMEMBER_PATTERN (pattern)
     ADD_TO_CONTENT (pattern, quantNone)
     return TCL_OK;
 }
@@ -811,8 +816,9 @@ MixedPatternObjCmd (
     return TCL_OK;
 }
 
+/* Implements the grammer definition commands "element" and "ref" */
 int
-ElementPatternObjCmd (
+NamedPatternObjCmd (
     ClientData clientData,
     Tcl_Interp *interp,
     int objc,
@@ -820,46 +826,55 @@ ElementPatternObjCmd (
     )
 {
     StructureData *sdata = GETASI;
+    Structure_CP_Type patternType = (Structure_CP_Type) clientData;
+    Tcl_HashTable *hashTable;
     Tcl_HashEntry *entryPtr;
-    StructureCP *element = NULL, *current;
+    StructureCP *pattern = NULL, *current;
     StructureQuant *quant;
     int hnew;
     
     CHECK_SI
-    checkNrArgs (2,4,"Expected: elementName ?quant? ?pattern?");
-
+    if (patternType == STRUCTURE_CTYPE_NAME) {
+        checkNrArgs (2,4,"Expected: elementName ?quant? ?pattern?");
+        hashTable = &sdata->element;
+    } else {
+        checkNrArgs (2,3,"Expected: patternName ?quant?");
+        hashTable = &sdata->pattern;
+    }
+        
     quant = getQuant (interp, sdata, objc == 2 ? NULL : objv[2]);
     if (!quant) {
         return TCL_ERROR;
     }
     if (objc < 4) {
-        /* Reference to an element type */
-        entryPtr = Tcl_CreateHashEntry (&sdata->element,
+        /* Reference to an element or pattern */
+        entryPtr = Tcl_CreateHashEntry (hashTable,
                                         Tcl_GetString(objv[1]), &hnew);
         if (!hnew) {
-            element = (StructureCP *) Tcl_GetHashValue (entryPtr);
-            while (element) {
-                if (element->namespace == sdata->currentNamespace) {
+            pattern = (StructureCP *) Tcl_GetHashValue (entryPtr);
+            while (pattern) {
+                if (pattern->namespace == sdata->currentNamespace) {
                     break;
                 }
-                element = element->next;
+                pattern = pattern->next;
             }
         }
-        if (!element) {
-            element = initStructureCP (
-                STRUCTURE_CTYPE_NAME,
+        if (!pattern) {
+            pattern = initStructureCP (
+                patternType,
                 sdata->currentNamespace,
-                Tcl_GetHashKey (&sdata->element, entryPtr)
+                Tcl_GetHashKey (hashTable, entryPtr)
                 );
-            element->flags |= FORWARD_PATTERN_DEF;
-            sdata->forwardPatternDef++;
+            pattern->flags |= FORWARD_PATTERN_DEF;
+            sdata->forwardPatternDefs++;
             if (!hnew) {
                 current = (StructureCP *) Tcl_GetHashValue (entryPtr);
-                element->next = current;
+                pattern->next = current;
             }
-            Tcl_SetHashValue (entryPtr, element);
+            REMEMBER_PATTERN (pattern);
+            Tcl_SetHashValue (entryPtr, pattern);
         }
-        ADD_TO_CONTENT(element, quant);
+        ADD_TO_CONTENT (pattern, quant);
     } else {
         /* Local definition of this element */
         
@@ -880,7 +895,7 @@ ChoicePatternObjCmd (
     StructureQuant *quant;
     StructureCP *pattern;
     SAVE_FOR_EVAL_VARS
-    int result, i;
+    int result;
 
     CHECK_SI
     checkNrArgs (2,3,"Expected: ?quant? definition");
@@ -893,13 +908,10 @@ ChoicePatternObjCmd (
     result = Tcl_EvalObjEx (interp, objc == 2 ? objv[1] : objv[2], 0);
     RESTORE_AFTER_EVAL
     if (result == TCL_OK) {
-        REMEMBER_ANON_PATTERN (pattern);
+        REMEMBER_PATTERN (pattern);
         ADD_TO_CONTENT (pattern, quant);
     } else {
-        for (i = savedNumAnonPattern; i < sdata->numAnonPattern; i++) {
-            freeStructureCP (sdata->anonPattern[i]);
-        }
-        sdata->numAnonPattern = savedNumAnonPattern;
+        cleanupLastPattern (sdata, savedNumPatternList);
         freeStructureCP (pattern);
     }
     return TCL_OK;
@@ -954,17 +966,15 @@ GroupPatternObjCmd (
     result = Tcl_EvalObjEx (interp, objc == 2 ? objv[1] : objv[2], 0);
     RESTORE_AFTER_EVAL
     if (result == TCL_OK) {
-        REMEMBER_ANON_PATTERN (pattern);
+        REMEMBER_PATTERN (pattern);
         ADD_TO_CONTENT (pattern, quant);
     } else {
-        for (i = savedNumAnonPattern; i < sdata->numAnonPattern; i++) {
-            freeStructureCP (sdata->anonPattern[i]);
+        for (i = savedNumPatternList; i < sdata->numPatternList; i++) {
+            freeStructureCP (sdata->patternList[i]);
         }
-        sdata->numAnonPattern = savedNumAnonPattern;
+        sdata->numPatternList = savedNumPatternList;
         freeStructureCP (pattern);
     }
-    return TCL_OK;
-
     return TCL_OK;
 }
 
@@ -1007,45 +1017,6 @@ NamespacePatternObjCmd (
     return result;
 }
 
-int
-RefPatternObjCmd (
-    ClientData clientData,
-    Tcl_Interp *interp,
-    int objc,
-    Tcl_Obj *const objv[]
-    )
-{
-    StructureData *sdata = GETASI;
-    StructureQuant *quant;
-    Tcl_HashEntry *entryPtr;
-    int hnew;
-    StructureCP *pattern;
-    
-    CHECK_SI
-    checkNrArgs (2,3,"Expected argument: patternName ?quant?");
-
-    quant = getQuant (interp, sdata, objc == 2 ? NULL : objv[2]);
-    if (!quant) {
-        return TCL_ERROR;
-    }
-    entryPtr = Tcl_CreateHashEntry (&sdata->pattern,
-                                    Tcl_GetString (objv[1]), &hnew);
-    if (hnew) {
-        pattern = initStructureCP (
-            STRUCTURE_CTYPE_GROUP,
-            NULL,
-            Tcl_GetString (objv[1])
-            );
-        pattern->flags |= FORWARD_PATTERN_DEF;
-        Tcl_SetHashValue (entryPtr, pattern);
-        sdata->forwardPatternDef++;
-    } else {
-        pattern = Tcl_GetHashValue (entryPtr);
-    }
-    ADD_TO_CONTENT(pattern, quant);
-    return TCL_OK;
-}
-
 void
 tDOM_StructureInit (
     Tcl_Interp *interp
@@ -1062,10 +1033,14 @@ tDOM_StructureInit (
     Tcl_CreateObjCommand (interp, "tdom::structure::any",
                           EmptyAnyPatternObjCmd,
                           (ClientData) STRUCTURE_CTYPE_ANY, NULL);
+    Tcl_CreateObjCommand (interp, "tdom::structure::element",
+                          NamedPatternObjCmd,
+                          (ClientData) STRUCTURE_CTYPE_NAME, NULL);
+    Tcl_CreateObjCommand (interp, "tdom::structure::ref",
+                          NamedPatternObjCmd,
+                          (ClientData) STRUCTURE_CTYPE_PATTERN, NULL);
     Tcl_CreateObjCommand (interp, "tdom::structure::mixed",
                           MixedPatternObjCmd, NULL, NULL);
-    Tcl_CreateObjCommand (interp, "tdom::structure::element",
-                          ElementPatternObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::structure::choice",
                           ChoicePatternObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::structure::interleave",
@@ -1076,6 +1051,4 @@ tDOM_StructureInit (
                           AttributePatternObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::structure::namespace",
                           NamespacePatternObjCmd, NULL, NULL);
-    Tcl_CreateObjCommand (interp, "tdom::structure::ref",
-                          RefPatternObjCmd, NULL, NULL);
 }

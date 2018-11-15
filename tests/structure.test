@@ -74,6 +74,70 @@ test structure-1.7 {quants} {
     grammer delete
 } {}
 
+test structure-1.8 {Same element name in different Namespaces} {
+    tdom::structure create grammer
+    grammer element doc {
+        element elm1
+        element elm2
+    }
+    grammer element doc ns1 {
+        # Forward defined element inherits child namespace
+        element elm1
+        element elm2
+    }
+    grammer element doc ns2 {
+        # Forward defined element inherits child namespace
+        element elm1
+        element elm2
+    }
+    grammer element elm1 ns2 empty
+    grammer element elm2 ns2 any
+    set result [catch {
+        grammer element elm1 ns1 {
+            choice {
+                element fooElem
+                element barElem +
+            }
+            error
+        }
+    }]
+    grammer element elm1 ns1 any
+    grammer element elm2 ns1 empty
+    grammer delete
+    set result
+} 1
+
+test structure-1.9 {Same element name in different Namespaces} {
+    tdom::structure create grammer
+    set result [catch {
+        grammer element doc {
+            element elm1
+            element elm2
+        }
+        grammer element doc ns1 {
+            # Forward defined element inherits child namespace
+            element elm1
+            element elm2
+        }
+        grammer element doc ns2 {
+            # Forward defined element inherits child namespace
+            element elm1
+            element elm2
+        }
+        grammer element elm1 ns2 empty
+        grammer element elm2 ns2 any
+        grammer element elm1 ns1 {
+            choice {
+                element fooElem
+                element barElem +
+            }
+            error
+        }
+    }]
+    grammer delete
+    set result
+} 1
+
 test structure-2.1 {grammer definition: ref} {
     tdom::structure create grammer
     grammer pattern thisPattern {
