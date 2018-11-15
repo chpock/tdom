@@ -34,3 +34,14 @@ test structure-1.4 {grammer cmd} {
     }
     grammer delete
 } {}
+
+test structure-1.5 {grammer cmd} {
+    tdom::structure create grammer
+    grammer element doc {
+        element elm1
+        element elm2 *
+    }
+    grammer element elm1 empty
+    grammer element elm2 empty
+    grammer delete
+} {}

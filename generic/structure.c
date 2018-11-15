@@ -89,7 +89,8 @@ typedef struct StructureCP
     unsigned int             numChildren;
 } StructureCP;
 
-#define START_CONTENT_ARRAY_LEN 20
+#define CONTENT_ARRAY_SIZE_INIT 20
+#define ANNO_PATTERN_ARRAY_SIZE_INIT 128
 
 typedef struct 
 {
@@ -102,18 +103,21 @@ typedef struct
 {
     char *start;
     char *startNamespace;
-    StructureValidationStack **validationStack;
-    int                        validationStackSize;
     Tcl_HashTable element;
     Tcl_HashTable namespace;
     Tcl_HashTable pattern;
+    StructureCP **annoPattern;
+    unsigned int numAnnoPattern;
+    unsigned int annoPatternSize;
     char *currentNamespace;
     char *currentAttributeNamespace;
     int   isAttribute;
     StructureCP **currentContent;
     StructureQuant **currentQuants;
     unsigned int numChildren;
-    unsigned int childSize;
+    unsigned int contentSize;
+    StructureValidationStack **validationStack;
+    int                        validationStackSize;
 } StructureData;
 
 #ifndef TCL_THREADS
@@ -134,16 +138,37 @@ static void SetActiveStructureData (StructureData *v)
 #endif
 
 
-#define CHECK_SI \
-    if (!sdata) {                                          \
-        SetResult ("Command called outside of grammar context.");  \
-        return TCL_ERROR;                                          \
+#define CHECK_SI                                                        \
+    if (!sdata) {                                                       \
+        SetResult ("Command called outside of grammar context.");       \
+        return TCL_ERROR;                                               \
     }
-#define CHECK_SI_CONTEXT \
-    if (sdata->isAttribute) {                             \
-        SetResult ("Command called in invalid grammar context."); \
-        return TCL_ERROR;                                         \
+#define CHECK_SI_CONTEXT                                                \
+    if (sdata->isAttribute) {                                           \
+        SetResult ("Command called in invalid grammar context.");       \
+        return TCL_ERROR;                                               \
     }
+
+#define ADD_TO_CONTENT(pattern)                                         \
+    if (sdata->numChildren == sdata->contentSize) {                     \
+        sdata->currentContent =                                         \
+            REALLOC (sdata->currentContent,                             \
+                     2 * sdata->contentSize                             \
+                     * sizeof (StructureCP*));                          \
+        sdata->contentSize *= 2;                                        \
+    }                                                                   \
+    sdata->currentContent[sdata->numChildren] = (pattern);              \
+    sdata->numChildren++;
+
+
+#define REMEMBER_ANNO_PATTERN(pattern)                                  \
+    if (sdata->numAnnoPattern == sdata->annoPatternSize) {              \
+        sdata->annoPattern = (StructureCP **) MALLOC (                  \
+            sizeof (StructureCP*) * sdata->annoPatternSize * 2);        \
+        sdata->annoPatternSize *= 2;                                    \
+    }                                                                   \
+    sdata->annoPattern[sdata->numAnnoPattern] = pattern;                \
+    sdata->numAnnoPattern++;
 
 static StructureCP*
 initStructureCP (
@@ -169,10 +194,10 @@ initStructureCP (
     case STRUCTURE_CTYPE_SEQ:
     case STRUCTURE_CTYPE_INTERLEAVE:
         pattern->content = (StructureCP**) MALLOC (
-            sizeof(StructureCP*) * START_CONTENT_ARRAY_LEN
+            sizeof(StructureCP*) * CONTENT_ARRAY_SIZE_INIT
             );
         pattern->quants = (StructureQuant**) MALLOC (
-            sizeof (StructureQuant*) * START_CONTENT_ARRAY_LEN
+            sizeof (StructureQuant*) * CONTENT_ARRAY_SIZE_INIT
             );
         break;
     case STRUCTURE_CTYPE_EMPTY:
@@ -240,6 +265,10 @@ initStructureData ()
     Tcl_InitHashTable (&sdata->element, TCL_STRING_KEYS);
     Tcl_InitHashTable (&sdata->pattern, TCL_STRING_KEYS);
     Tcl_InitHashTable (&sdata->namespace, TCL_STRING_KEYS);
+    sdata->annoPattern = (StructureCP **) MALLOC (
+        sizeof (StructureCP*) * ANNO_PATTERN_ARRAY_SIZE_INIT);
+    sdata->numAnnoPattern = 0;
+    sdata->annoPatternSize = ANNO_PATTERN_ARRAY_SIZE_INIT;
     return sdata;
 }
 
@@ -249,6 +278,7 @@ static void structureInstanceDelete (
 {
     StructureData *sdata = (StructureData *) clientData;
     StructureCP *pattern;
+    unsigned int i;
     
     Tcl_HashEntry *entryPtr;
     Tcl_HashSearch search;
@@ -270,6 +300,10 @@ static void structureInstanceDelete (
         entryPtr = Tcl_NextHashEntry (&search);
     }
     Tcl_DeleteHashTable (&sdata->pattern);
+    for (i = 0; i < sdata->numAnnoPattern; i++) {
+        freeStructureCP (sdata->annoPattern[i]);
+    }
+    FREE(sdata->annoPattern);
     FREE (sdata);
 }
 
@@ -318,23 +352,22 @@ structureInstanceCmd (
     Tcl_ResetResult (interp);
     switch ((enum structureInstanceMethod) methodIndex) {
     case m_element:
-        if (objc != 3 && objc != 5) {
+        if (objc != 4 && objc != 5) {
             Tcl_WrongNumArgs (interp, 1, objv, "<name>"
-                 " ?namespace <namespace>? pattern");
+                 " ?<namespace>? pattern");
             return TCL_ERROR;
         }
         namespacePtr = NULL;
+        patternIndex = 3;
         if (objc == 5) {
             patternIndex = 4;
             entryPtr = Tcl_CreateHashEntry (&sdata->namespace,
                                             Tcl_GetString (objv[3]), &hnew);
             namespacePtr = Tcl_GetHashKey (&sdata->namespace,
                                            entryPtr);
-        } else {
-            patternIndex = 2;
-        }            
+        }
         entryPtr = Tcl_CreateHashEntry (&sdata->element,
-                                        objv[2], &hnew);
+                                        Tcl_GetString (objv[2]), &hnew);
         element = NULL;
         if (!hnew) {
             element = (StructureCP *) Tcl_GetHashValue (entryPtr);
@@ -367,7 +400,7 @@ structureInstanceCmd (
         sdata->currentContent = element->content;
         sdata->currentQuants = element->quants;
         sdata->numChildren = 0;
-        sdata->childSize = START_CONTENT_ARRAY_LEN;
+        sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
         result = Tcl_VarEval (interp, "namespace eval ::tdom::structure {",
                               Tcl_GetString (objv[patternIndex]), "}", NULL);
         element->content = sdata->currentContent;
@@ -397,7 +430,7 @@ structureInstanceCmd (
         sdata->currentContent = pattern->content;
         sdata->currentQuants = pattern->quants;
         sdata->numChildren = 0;
-        sdata->childSize = START_CONTENT_ARRAY_LEN;
+        sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
         result = Tcl_VarEval (interp, "namespace eval ::tdom::structure {",
                               Tcl_GetString (objv[3]), "}", NULL);
         pattern->content = sdata->currentContent;
@@ -551,26 +584,22 @@ tDOM_StructureObjCmd (
 }
 
 int
-EmptyPatternObjCmd (
+EmptyAnyPatternObjCmd (
     ClientData clientData,
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
     )
 {
-
-    return TCL_OK;
-}
-
-int
-AnyPatternObjCmd (
-    ClientData clientData,
-    Tcl_Interp *interp,
-    int objc,
-    Tcl_Obj *const objv[]
-    )
-{
-
+    StructureData *sdata = GETASI;
+    StructureCP *pattern;
+    
+    CHECK_SI
+    checkNrArgs (1,1,"No arguments expected.");
+    pattern = initStructureCP ((Structure_Content_Type) clientData,
+                               NULL, NULL);
+    REMEMBER_ANNO_PATTERN (pattern)
+    ADD_TO_CONTENT (pattern)
     return TCL_OK;
 }
 
@@ -622,22 +651,14 @@ ElementPatternObjCmd (
                 sdata->currentNamespace,
                 Tcl_GetHashKey (&sdata->element, entryPtr)
                 );
-            element->flags &= ANON_ELEMENT_DEF;
+            element->flags |= ANON_ELEMENT_DEF;
             if (!hnew) {
                 current = (StructureCP *) Tcl_GetHashValue (entryPtr);
                 element->next = current;
             }
             Tcl_SetHashValue (entryPtr, element);
         }
-        if (sdata->numChildren == sdata->childSize) {
-            sdata->currentContent =
-                REALLOC (sdata->currentContent,
-                         2 * sdata->childSize
-                         * sizeof (StructureCP*));
-            sdata->childSize *= 2;
-        }
-        sdata->currentContent[sdata->numChildren] = element;
-        sdata->numChildren++;
+        ADD_TO_CONTENT(element)
     } else {
         /* Local definition of this element */
         
@@ -757,9 +778,11 @@ tDOM_StructureInit (
     quantPlus->quant = STRUCTURE_CQUANT_PLUS;
                                       
     Tcl_CreateObjCommand (interp, "tdom::structure::empty",
-                          EmptyPatternObjCmd, NULL, NULL);
+                          EmptyAnyPatternObjCmd,
+                          (ClientData) STRUCTURE_CTYPE_EMPTY, NULL);
     Tcl_CreateObjCommand (interp, "tdom::structure::any",
-                          AnyPatternObjCmd, NULL, NULL);
+                          EmptyAnyPatternObjCmd,
+                          (ClientData) STRUCTURE_CTYPE_ANY, NULL);
     Tcl_CreateObjCommand (interp, "tdom::structure::mixed",
                           MixedPatternObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::structure::element",
