@@ -1,5 +1,5 @@
-C Added\sgrammer\sdefinition\scommand\schoice.\sBetter\shandling\sin\scase\sof\serror\sin\sdefinition\sscripts.
-D 2018-11-15T14:41:03.293
+C wip
+D 2018-11-15T16:16:35.292
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -130,7 +130,7 @@ F generic/domxslt.h 140fa73765d699bfced9554c2c6439c0d2e6695eec3a8e69e1d25c0bbdf2
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c abf69665ad49ed053885f7e7459d47be5abb057ba4ed919e96e83d636b016a30
 F generic/nodecmd.h e4a6d836834554a2a590cbd916cdee937945965ee55709e48b62976a66861ef8
-F generic/structure.c 982c29946f86eaa9db1b45e93274086cb82fbf702b20183791695f0a4030f32d
+F generic/structure.c 4f270f41fc76a0eed1363929e02fcb1784f07486b1b0fa5d1c97dbfb17d9d1a0
 F generic/structure.h 53923a9cf25d0b260562cff96d910ba4bd863aa37674c4add6d136613c4291bf
 F generic/tcldom.c 1e42c901104f9c86e06a8583bb65b5bbea559d3e90a2f54c1251ef7b27ac1e59
 F generic/tcldom.h 11934aae8b0c2194eac7a6bf7b62611abded4dcd290375a23463f25afc34484c
@@ -226,8 +226,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 9dd15ff7bbe6f31b96ba795c3650eabe5c8ee88cdbfca309030f626c191cfebd
-R 9b7886f55e6748501f5b3015aca91264
+P 97cfddf47e58f24871a2d3d2d48cce9b84769337089c5e970da79e60bf650bd9
+R 6b56043ae8b0f7949b92195aef1989ae
 U rolf
-Z e510524c316689baa1231c8282d9a21d
+Z 7abcf11e6f2da06266f2280969325516
 # Remove this line to create a well-formed Fossil manifest.

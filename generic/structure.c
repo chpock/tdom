@@ -46,24 +46,22 @@
         return TCL_ERROR;                                     \
     }
 
-typedef enum structure_content_type {
+typedef enum structure_cp_type {
   STRUCTURE_CTYPE_EMPTY,
   STRUCTURE_CTYPE_ANY,
   STRUCTURE_CTYPE_MIXED,
   STRUCTURE_CTYPE_NAME,
   STRUCTURE_CTYPE_CHOICE,
-  STRUCTURE_CTYPE_SEQ,
   STRUCTURE_CTYPE_INTERLEAVE,
   STRUCTURE_CTYPE_GROUP
-} Structure_Content_Type;
+} Structure_CP_Type;
 
-static char *Structure_Content_Type2str[] = {
+static char *Structure_CP_Type2str[] = {
     "EMPTY",
     "ANY",
     "MIXED",
     "NAME",
     "CHOICE",
-    "SEQ",
     "INTERLEAVE",
     "GROUP",
 };
@@ -78,7 +76,7 @@ typedef enum structure_content_quant  {
 } Structure_Content_Quant;
 
 typedef unsigned int StructureFlags;
-#define ANON_PATTERN_DEF 1
+#define FORWARD_PATTERN_DEF 1
 
 typedef struct
 {
@@ -103,11 +101,11 @@ static StructureQuant *quantPlus = &QuantPlus;
 
 typedef struct StructureCP
 {
+    Structure_CP_Type   type;
     char                    *namespace;
     char                    *name;
     struct StructureCP      *next;
     StructureFlags           flags;
-    Structure_Content_Type   type;
     struct StructureCP     **content;
     StructureQuant         **quants;
     unsigned int             numChildren;
@@ -134,7 +132,7 @@ typedef struct
     StructureCP **anonPattern;
     unsigned int numAnonPattern;
     unsigned int anonPatternSize;
-    unsigned int undefinedAnonPattern;
+    unsigned int forwardPatternDef;
     StructureQuant **quants;
     unsigned int numQuants;
     unsigned int quantsSize;
@@ -172,6 +170,7 @@ static void SetActiveStructureData (StructureData *v)
         SetResult ("Command called outside of grammar context.");       \
         return TCL_ERROR;                                               \
     }
+
 #define CHECK_SI_CONTEXT                                                \
     if (sdata->isAttribute) {                                           \
         SetResult ("Command called in invalid grammar context.");       \
@@ -193,7 +192,6 @@ static void SetActiveStructureData (StructureData *v)
     sdata->currentContent[sdata->numChildren] = (pattern);              \
     sdata->currentQuants[sdata->numChildren] = quant;                   \
     sdata->numChildren++;                                               \
-    
 
 #define REMEMBER_ANON_PATTERN(pattern)                                  \
     if (sdata->numAnonPattern == sdata->anonPatternSize) {              \
@@ -204,9 +202,34 @@ static void SetActiveStructureData (StructureData *v)
     sdata->anonPattern[sdata->numAnonPattern] = pattern;                \
     sdata->numAnonPattern++;
 
+#define SAVE_FOR_EVAL_VARS                                              \
+    StructureCP **savedCurrentContent;                                  \
+    StructureQuant **savedCurrentQuant;                                 \
+    unsigned int savedNumChildren, savedContenSize, savedNumAnonPattern; 
+
+#define SAVE_FOR_EVAL                                   \
+    savedCurrentContent = sdata->currentContent;        \
+    savedCurrentQuant = sdata->currentQuants;           \
+    savedNumChildren = sdata->numChildren;              \
+    savedContenSize = sdata->contentSize;               \
+    savedNumAnonPattern = sdata->numAnonPattern;        \
+    sdata->currentContent = pattern->content;           \
+    sdata->currentQuants = pattern->quants;             \
+    sdata->numChildren = 0;                             \
+    sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
+
+#define RESTORE_AFTER_EVAL                              \
+    pattern->content = sdata->currentContent;           \
+    pattern->quants = sdata->currentQuants;             \
+    pattern->numChildren = sdata->numChildren;          \
+    sdata->currentContent = savedCurrentContent;        \
+    sdata->currentQuants = savedCurrentQuant;           \
+    sdata->numChildren = savedNumChildren;              \
+    sdata->contentSize = savedContenSize;               \
+
 static StructureCP*
 initStructureCP (
-    Structure_Content_Type type,
+    Structure_CP_Type type,
     void *namespace,
     char *name
     )
@@ -225,7 +248,6 @@ initStructureCP (
         /* Fall thru. */
     case STRUCTURE_CTYPE_MIXED:
     case STRUCTURE_CTYPE_CHOICE:
-    case STRUCTURE_CTYPE_SEQ:
     case STRUCTURE_CTYPE_INTERLEAVE:
         pattern->content = (StructureCP**) MALLOC (
             sizeof(StructureCP*) * CONTENT_ARRAY_SIZE_INIT
@@ -248,19 +270,18 @@ static void serializeCP (
     )
 {
     fprintf (stderr, "CP type: %s\n",
-             Structure_Content_Type2str[pattern->type]);
+             Structure_CP_Type2str[pattern->type]);
     switch (pattern->type) {
     case STRUCTURE_CTYPE_NAME:
     case STRUCTURE_CTYPE_GROUP:
         fprintf (stderr, "\tName: '%s' Namespace: '%s'\n",
                  pattern->name,pattern->namespace);
-        if (pattern->flags & ANON_PATTERN_DEF) {
+        if (pattern->flags & FORWARD_PATTERN_DEF) {
             fprintf (stderr, "\tAnonymously defined NAME\n");
         }
         /* Fall thru. */
     case STRUCTURE_CTYPE_MIXED:
     case STRUCTURE_CTYPE_CHOICE:
-    case STRUCTURE_CTYPE_SEQ:
     case STRUCTURE_CTYPE_INTERLEAVE:
         fprintf (stderr, "\t%d childs\n", pattern->numChildren);
         break;
@@ -415,7 +436,7 @@ structureInstanceCmd (
             element = (StructureCP *) Tcl_GetHashValue (entryPtr);
             while (element) {
                 if (element->namespace == namespacePtr) {
-                    if (element->flags & ANON_PATTERN_DEF) {
+                    if (element->flags & FORWARD_PATTERN_DEF) {
                         isAnonPattern = 1;
                         break;
                     }
@@ -453,8 +474,8 @@ structureInstanceCmd (
         element->numChildren = sdata->numChildren;
         if (result == TCL_OK) {
             if (isAnonPattern) {
-                element->flags &= ~ANON_PATTERN_DEF;
-                sdata->undefinedAnonPattern--;
+                element->flags &= ~FORWARD_PATTERN_DEF;
+                sdata->forwardPatternDef--;
             }
         } else {
             if (hnew) Tcl_DeleteHashEntry (entryPtr);
@@ -479,7 +500,7 @@ structureInstanceCmd (
             Tcl_SetHashValue (entryPtr, pattern);
         } else {
             pattern = (StructureCP *) Tcl_GetHashValue (entryPtr);
-            if (pattern->flags & ANON_PATTERN_DEF) {
+            if (pattern->flags & FORWARD_PATTERN_DEF) {
                 isAnonPattern = 1;
             } else {
                 SetResult ("Pattern already defined.");
@@ -498,8 +519,8 @@ structureInstanceCmd (
         pattern->numChildren = sdata->numChildren;
         if (result == TCL_OK) {
             if (isAnonPattern) {
-                pattern->flags &= ~ANON_PATTERN_DEF;
-                sdata->undefinedAnonPattern--;
+                pattern->flags &= ~FORWARD_PATTERN_DEF;
+                sdata->forwardPatternDef--;
             }
         } else {
             if (hnew) {
@@ -578,7 +599,7 @@ structureInstanceCmd (
             Tcl_WrongNumArgs(interp, 2, objv, "");
             return TCL_ERROR;
         }
-        SetIntResult(sdata->undefinedAnonPattern);
+        SetIntResult(sdata->forwardPatternDef);
         break;
         
     default:
@@ -771,7 +792,7 @@ EmptyAnyPatternObjCmd (
     
     CHECK_SI
     checkNrArgs (1,1,"No arguments expected.");
-    pattern = initStructureCP ((Structure_Content_Type) clientData,
+    pattern = initStructureCP ((Structure_CP_Type) clientData,
                                NULL, NULL);
     REMEMBER_ANON_PATTERN (pattern)
     ADD_TO_CONTENT (pattern, quantNone)
@@ -830,8 +851,8 @@ ElementPatternObjCmd (
                 sdata->currentNamespace,
                 Tcl_GetHashKey (&sdata->element, entryPtr)
                 );
-            element->flags |= ANON_PATTERN_DEF;
-            sdata->undefinedAnonPattern++;
+            element->flags |= FORWARD_PATTERN_DEF;
+            sdata->forwardPatternDef++;
             if (!hnew) {
                 current = (StructureCP *) Tcl_GetHashValue (entryPtr);
                 element->next = current;
@@ -858,10 +879,8 @@ ChoicePatternObjCmd (
     StructureData *sdata = GETASI;
     StructureQuant *quant;
     StructureCP *pattern;
-    StructureCP **savedCurrentContent;
-    StructureQuant **savedCurrentQuant;
-    unsigned int savedNumChildren, savedContenSize;
-    int result;
+    SAVE_FOR_EVAL_VARS
+    int result, i;
 
     CHECK_SI
     checkNrArgs (2,3,"Expected: ?quant? definition");
@@ -870,26 +889,17 @@ ChoicePatternObjCmd (
         return TCL_ERROR;
     }
     pattern = initStructureCP (STRUCTURE_CTYPE_CHOICE, NULL, NULL);
-    savedCurrentContent = sdata->currentContent;
-    savedCurrentQuant = sdata->currentQuants;
-    savedNumChildren = sdata->numChildren;
-    savedContenSize = sdata->contentSize;
-    sdata->currentContent = pattern->content;
-    sdata->currentQuants = pattern->quants;
-    sdata->numChildren = 0;
-    sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
+    SAVE_FOR_EVAL
     result = Tcl_EvalObjEx (interp, objc == 2 ? objv[1] : objv[2], 0);
-    pattern->content = sdata->currentContent;
-    pattern->quants = sdata->currentQuants;
-    pattern->numChildren = sdata->numChildren;
-    sdata->currentContent = savedCurrentContent;
-    sdata->currentQuants = savedCurrentQuant;
-    sdata->numChildren = savedNumChildren;
-    sdata->contentSize = savedContenSize;
+    RESTORE_AFTER_EVAL
     if (result == TCL_OK) {
         REMEMBER_ANON_PATTERN (pattern);
         ADD_TO_CONTENT (pattern, quant);
     } else {
+        for (i = savedNumAnonPattern; i < sdata->numAnonPattern; i++) {
+            freeStructureCP (sdata->anonPattern[i]);
+        }
+        sdata->numAnonPattern = savedNumAnonPattern;
         freeStructureCP (pattern);
     }
     return TCL_OK;
@@ -927,6 +937,33 @@ GroupPatternObjCmd (
     Tcl_Obj *const objv[]
     )
 {
+    StructureData *sdata = GETASI;
+    StructureQuant *quant;
+    StructureCP *pattern;
+    SAVE_FOR_EVAL_VARS
+    int result, i;
+
+    CHECK_SI
+    checkNrArgs (2,3,"Expected: ?quant? definition");
+    quant = getQuant (interp, sdata, objc == 2 ? NULL : objv[1]);
+    if (!quant) {
+        return TCL_ERROR;
+    }
+    pattern = initStructureCP (STRUCTURE_CTYPE_CHOICE, NULL, NULL);
+    SAVE_FOR_EVAL
+    result = Tcl_EvalObjEx (interp, objc == 2 ? objv[1] : objv[2], 0);
+    RESTORE_AFTER_EVAL
+    if (result == TCL_OK) {
+        REMEMBER_ANON_PATTERN (pattern);
+        ADD_TO_CONTENT (pattern, quant);
+    } else {
+        for (i = savedNumAnonPattern; i < sdata->numAnonPattern; i++) {
+            freeStructureCP (sdata->anonPattern[i]);
+        }
+        sdata->numAnonPattern = savedNumAnonPattern;
+        freeStructureCP (pattern);
+    }
+    return TCL_OK;
 
     return TCL_OK;
 }
@@ -999,9 +1036,9 @@ RefPatternObjCmd (
             NULL,
             Tcl_GetString (objv[1])
             );
-        pattern->flags |= ANON_PATTERN_DEF;
+        pattern->flags |= FORWARD_PATTERN_DEF;
         Tcl_SetHashValue (entryPtr, pattern);
-        sdata->undefinedAnonPattern++;
+        sdata->forwardPatternDef++;
     } else {
         pattern = Tcl_GetHashValue (entryPtr);
     }
@@ -1031,8 +1068,6 @@ tDOM_StructureInit (
                           ElementPatternObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::structure::choice",
                           ChoicePatternObjCmd, NULL, NULL);
-    Tcl_CreateObjCommand (interp, "tdom::structure::seq",
-                          SeqPatternObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::structure::interleave",
                           InterleavePatternObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::structure::group",
