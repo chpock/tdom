@@ -54,7 +54,8 @@ typedef enum structure_cp_type {
   STRUCTURE_CTYPE_CHOICE,
   STRUCTURE_CTYPE_INTERLEAVE,
   STRUCTURE_CTYPE_PATTERN,
-  STRUCTURE_CTYPE_GROUP
+  STRUCTURE_CTYPE_GROUP,
+  STRUCTURE_CTYPE_TEXT
 } Structure_CP_Type;
 
 static char *Structure_CP_Type2str[] = {
@@ -66,6 +67,7 @@ static char *Structure_CP_Type2str[] = {
     "INTERLEAVE",
     "PATTERN",
     "GROUP",
+    "TEXT"
 };
 
 typedef enum structure_content_quant  {
@@ -79,6 +81,7 @@ typedef enum structure_content_quant  {
 
 typedef unsigned int StructureFlags;
 #define FORWARD_PATTERN_DEF 1
+#define AMBIGUOUS_PATTERN   2
 
 typedef struct
 {
@@ -114,7 +117,7 @@ typedef struct StructureCP
 } StructureCP;
 
 #define CONTENT_ARRAY_SIZE_INIT 20
-#define ANON_PATTERN_ARRAY_SIZE_INIT 128
+#define ANON_PATTERN_ARRAY_SIZE_INIT 256
 #define QUANTS_ARRAY_SIZE_INIT 8
 
 typedef struct 
@@ -180,6 +183,7 @@ static void SetActiveStructureData (StructureData *v)
     }
 
 #define ADD_TO_CONTENT(pattern,quant)                                   \
+    checkForAmbiguousness (pattern);                                    \
     if (sdata->numChildren == sdata->contentSize) {                     \
         sdata->currentContent =                                         \
             REALLOC (sdata->currentContent,                             \
@@ -203,31 +207,6 @@ static void SetActiveStructureData (StructureData *v)
     }                                                                   \
     sdata->patternList[sdata->numPatternList] = pattern;                \
     sdata->numPatternList++;
-
-#define SAVE_FOR_EVAL_VARS                                              \
-    StructureCP **savedCurrentContent;                                  \
-    StructureQuant **savedCurrentQuant;                                 \
-    unsigned int savedNumChildren, savedContenSize, savedNumPatternList; 
-
-#define SAVE_FOR_EVAL                                   \
-    savedCurrentContent = sdata->currentContent;        \
-    savedCurrentQuant = sdata->currentQuants;           \
-    savedNumChildren = sdata->numChildren;              \
-    savedContenSize = sdata->contentSize;               \
-    savedNumPatternList = sdata->numPatternList;        \
-    sdata->currentContent = pattern->content;           \
-    sdata->currentQuants = pattern->quants;             \
-    sdata->numChildren = 0;                             \
-    sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
-
-#define RESTORE_AFTER_EVAL                              \
-    pattern->content = sdata->currentContent;           \
-    pattern->quants = sdata->currentQuants;             \
-    pattern->numChildren = sdata->numChildren;          \
-    sdata->currentContent = savedCurrentContent;        \
-    sdata->currentQuants = savedCurrentQuant;           \
-    sdata->numChildren = savedNumChildren;              \
-    sdata->contentSize = savedContenSize;               \
 
 static StructureCP*
 initStructureCP (
@@ -260,6 +239,7 @@ initStructureCP (
         break;
     case STRUCTURE_CTYPE_EMPTY:
     case STRUCTURE_CTYPE_ANY:
+    case STRUCTURE_CTYPE_TEXT:
         /* Do nothing */
         break;
     }
@@ -403,6 +383,16 @@ cleanupLastPattern (
         freeStructureCP (sdata->patternList[i]);
     }
     sdata->numPatternList = from;
+}
+
+static void
+checkForAmbiguousness (
+    StructureCP *pattern
+    )
+{
+    /* As long as we don't know otherwise we assume any pattern to be
+     * ambiguous. */
+    pattern->flags |= AMBIGUOUS_PATTERN;
 }
 
 static int 
@@ -784,6 +774,7 @@ getQuant (
     return initStructureQuant (sdata, STRUCTURE_CQUANT_NM, n, m);
 }
 
+/* Implements the grammer definition commands "empty" and "any" */
 int
 EmptyAnyPatternObjCmd (
     ClientData clientData,
@@ -801,18 +792,6 @@ EmptyAnyPatternObjCmd (
                                NULL, NULL);
     REMEMBER_PATTERN (pattern)
     ADD_TO_CONTENT (pattern, quantNone)
-    return TCL_OK;
-}
-
-int
-MixedPatternObjCmd (
-    ClientData clientData,
-    Tcl_Interp *interp,
-    int objc,
-    Tcl_Obj *const objv[]
-    )
-{
-
     return TCL_OK;
 }
 
@@ -883,8 +862,10 @@ NamedPatternObjCmd (
     return TCL_OK;
 }
 
+/* Implements the grammer definition commands "choice", "group",
+ * "interleave" and "mixed" */
 int
-ChoicePatternObjCmd (
+AnonPatternObjCmd (
     ClientData clientData,
     Tcl_Interp *interp,
     int objc,
@@ -892,9 +873,12 @@ ChoicePatternObjCmd (
     )
 {
     StructureData *sdata = GETASI;
+    Structure_CP_Type patternType = (Structure_CP_Type) clientData;
     StructureQuant *quant;
     StructureCP *pattern;
-    SAVE_FOR_EVAL_VARS
+    StructureCP **savedCurrentContent;
+    StructureQuant **savedCurrentQuant;
+    unsigned int savedNumChildren, savedContenSize, savedNumPatternList; 
     int result;
 
     CHECK_SI
@@ -903,77 +887,38 @@ ChoicePatternObjCmd (
     if (!quant) {
         return TCL_ERROR;
     }
-    pattern = initStructureCP (STRUCTURE_CTYPE_CHOICE, NULL, NULL);
-    SAVE_FOR_EVAL
+
+    pattern = initStructureCP (patternType, NULL, NULL);
+    REMEMBER_PATTERN (pattern);
+
+    /* Save some state of sdata .. */
+    savedCurrentContent = sdata->currentContent;
+    savedCurrentQuant = sdata->currentQuants;
+    savedNumChildren = sdata->numChildren;
+    savedContenSize = sdata->contentSize;
+    /* ... and prepare sdata for definition evaluation. */
+    savedNumPatternList = sdata->numPatternList;
+    sdata->currentContent = pattern->content;
+    sdata->currentQuants = pattern->quants;
+    sdata->numChildren = 0;
+    sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
+
     result = Tcl_EvalObjEx (interp, objc == 2 ? objv[1] : objv[2], 0);
-    RESTORE_AFTER_EVAL
+
+    /* Save the definition evaluation results to the pattern ... */
+    pattern->content = sdata->currentContent;
+    pattern->quants = sdata->currentQuants;
+    pattern->numChildren = sdata->numChildren;
+    /* ... and restore the previously saved sdata  */
+    sdata->currentContent = savedCurrentContent;
+    sdata->currentQuants = savedCurrentQuant;
+    sdata->numChildren = savedNumChildren;
+    sdata->contentSize = savedContenSize;
+
     if (result == TCL_OK) {
-        REMEMBER_PATTERN (pattern);
         ADD_TO_CONTENT (pattern, quant);
     } else {
         cleanupLastPattern (sdata, savedNumPatternList);
-        freeStructureCP (pattern);
-    }
-    return TCL_OK;
-}
-
-int
-SeqPatternObjCmd (
-    ClientData clientData,
-    Tcl_Interp *interp,
-    int objc,
-    Tcl_Obj *const objv[]
-    )
-{
-
-    return TCL_OK;
-}
-
-int
-InterleavePatternObjCmd (
-    ClientData clientData,
-    Tcl_Interp *interp,
-    int objc,
-    Tcl_Obj *const objv[]
-    )
-{
-
-    return TCL_OK;
-}
-
-int
-GroupPatternObjCmd (
-    ClientData clientData,
-    Tcl_Interp *interp,
-    int objc,
-    Tcl_Obj *const objv[]
-    )
-{
-    StructureData *sdata = GETASI;
-    StructureQuant *quant;
-    StructureCP *pattern;
-    SAVE_FOR_EVAL_VARS
-    int result, i;
-
-    CHECK_SI
-    checkNrArgs (2,3,"Expected: ?quant? definition");
-    quant = getQuant (interp, sdata, objc == 2 ? NULL : objv[1]);
-    if (!quant) {
-        return TCL_ERROR;
-    }
-    pattern = initStructureCP (STRUCTURE_CTYPE_CHOICE, NULL, NULL);
-    SAVE_FOR_EVAL
-    result = Tcl_EvalObjEx (interp, objc == 2 ? objv[1] : objv[2], 0);
-    RESTORE_AFTER_EVAL
-    if (result == TCL_OK) {
-        REMEMBER_PATTERN (pattern);
-        ADD_TO_CONTENT (pattern, quant);
-    } else {
-        for (i = savedNumPatternList; i < sdata->numPatternList; i++) {
-            freeStructureCP (sdata->patternList[i]);
-        }
-        sdata->numPatternList = savedNumPatternList;
-        freeStructureCP (pattern);
     }
     return TCL_OK;
 }
@@ -1017,6 +962,26 @@ NamespacePatternObjCmd (
     return result;
 }
 
+int
+TextPatternObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    StructureData *sdata = GETASI;
+    StructureCP *pattern;
+    
+    CHECK_SI
+    checkNrArgs (1,1,"No arguments expected.");
+    pattern = initStructureCP ((Structure_CP_Type) clientData,
+                               NULL, NULL);
+    REMEMBER_PATTERN (pattern)
+    ADD_TO_CONTENT (pattern, quantNone)
+    return TCL_OK;
+}
+
 void
 tDOM_StructureInit (
     Tcl_Interp *interp
@@ -1033,22 +998,31 @@ tDOM_StructureInit (
     Tcl_CreateObjCommand (interp, "tdom::structure::any",
                           EmptyAnyPatternObjCmd,
                           (ClientData) STRUCTURE_CTYPE_ANY, NULL);
+
     Tcl_CreateObjCommand (interp, "tdom::structure::element",
                           NamedPatternObjCmd,
                           (ClientData) STRUCTURE_CTYPE_NAME, NULL);
     Tcl_CreateObjCommand (interp, "tdom::structure::ref",
                           NamedPatternObjCmd,
                           (ClientData) STRUCTURE_CTYPE_PATTERN, NULL);
-    Tcl_CreateObjCommand (interp, "tdom::structure::mixed",
-                          MixedPatternObjCmd, NULL, NULL);
+
     Tcl_CreateObjCommand (interp, "tdom::structure::choice",
-                          ChoicePatternObjCmd, NULL, NULL);
+                          AnonPatternObjCmd,
+                          (ClientData) STRUCTURE_CTYPE_CHOICE, NULL);
+    Tcl_CreateObjCommand (interp, "tdom::structure::mixed",
+                          MixedPatternObjCmd,
+                          (ClientData) STRUCTURE_CTYPE_MIXED, NULL);
     Tcl_CreateObjCommand (interp, "tdom::structure::interleave",
-                          InterleavePatternObjCmd, NULL, NULL);
+                          InterleavePatternObjCmd,
+                          (ClientData) STRUCTURE_CTYPE_INTERLEAVE, NULL);
     Tcl_CreateObjCommand (interp, "tdom::structure::group",
-                          GroupPatternObjCmd, NULL, NULL);
+                          GroupPatternObjCmd,
+                          (ClientData) STRUCTURE_CTYPE_GROUP, NULL);
+    
     Tcl_CreateObjCommand (interp, "tdom::structure::attribute",
                           AttributePatternObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::structure::namespace",
                           NamespacePatternObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp, "tdom::structure::text",
+                          TextPatternObjCmd, NULL, NULL);
 }
