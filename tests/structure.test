@@ -63,3 +63,42 @@ test structure-1.6 {quants} {
     }
     grammer delete
 } {}
+
+test structure-1.7 {quants} {
+    tdom::structure create grammer
+    grammer element doc {
+        for {set i 0} {$i < 100} {incr i} {
+            element elm$i [list $i [expr {$i + 1}]]
+        }
+    }
+    grammer delete
+} {}
+
+test structure-2.1 {grammer definition: ref} {
+    tdom::structure create grammer
+    grammer pattern thisPattern {
+        element a
+        element b
+    }
+    grammer pattern thatPattern {
+        element c
+        element d
+    }
+    grammer element doc {
+        ref thisPattern
+        ref thatPattern ?
+    }
+    grammer delete
+} {}
+
+test structure-2.2 {grammer definition: ref} {
+    tdom::structure create grammer
+    set result [grammer nrForwardDefinitions]
+    grammer element doc {
+        ref thisPattern
+        ref thatPattern ?
+    }
+    lappend result [grammer nrForwardDefinitions]
+    grammer delete
+    set result
+} {0 2}
