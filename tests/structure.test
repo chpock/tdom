@@ -45,3 +45,21 @@ test structure-1.5 {grammer cmd} {
     grammer element elm2 empty
     grammer delete
 } {}
+
+test structure-1.6 {quants} {
+    tdom::structure create grammer
+    grammer element doc {
+        element elm1
+        element elm2 *
+        element elm3 !
+        element elm4 +
+        element elm5 ?
+        element elm6 1
+        element elm7 5
+        element elm8 12
+        element elm9 {0 3}
+        element elm9 {1 12}
+        element elm10 "8 "
+    }
+    grammer delete
+} {}

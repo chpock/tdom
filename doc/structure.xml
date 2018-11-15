@@ -17,5 +17,35 @@
     <p>This command creates validation commands with a simple API. The
     validation commands have methods to define an XML grammer and are 
     able to validate XML or DOM trees against this grammer.</p>
+
+    <p>The valid methods of the created commands are:</p>
+
+    <commandlist>
+      <commanddef>
+        <command><method>element</method> <m>name</m> <m>?namespace?</m> <m>definition script</m></command>
+        <desc></desc>
+      </commanddef>
+
+      <commanddef>
+        <command><method>pattern</method> <m>name</m> <m>definition script</m></command>
+        <desc></desc>
+      </commanddef>
+      
+      <commanddef>
+        <command><method>start</method> <m>documentElement</m> <m>?namespace?</m></command>
+        <desc></desc>
+      </commanddef>
+
+      <commanddef>
+        <command><method>event</method> <m>(start|end|text)</m> <m>?event specific data</m></command>
+        <desc></desc>
+      </commanddef>
+
+      <commanddef>
+        <command><method>delete</method> <m></m></command>
+        <desc></desc>
+      </commanddef>
+
+    </commandlist>
   </section>
 </manpage>

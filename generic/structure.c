@@ -167,11 +167,10 @@ static void SetActiveStructureData (StructureData *v)
     }                                                                   \
     sdata->currentContent[sdata->numChildren] = (pattern);              \
     if (!(quantObj)) {                                                  \
-        fprintf (stderr, "No quant obj\n");                             \
         sdata->currentQuants[sdata->numChildren] = quantNone;           \
     } else {                                                            \
         StructureQuant *quant;                                          \
-        quant = getQuant (interp, (quantObj));                          \
+        quant = getQuant (interp, sdata, (quantObj));                   \
         if (!quant) {                                                   \
             return TCL_ERROR;                                           \
         }                                                               \
@@ -355,7 +354,7 @@ structureInstanceCmd (
     };
 
     static const char *eventKeywords[] = {
-        "elementstart", "elementend", "text", NULL
+        "start", "end", "text", NULL
     };
 
     enum eventKeyword 
@@ -519,7 +518,7 @@ structureInstanceCmd (
             break;
         }
         break;
-        
+
     case m_delete:
         if (objc != 2) {
             Tcl_WrongNumArgs(interp, 2, objv, "");
@@ -608,14 +607,44 @@ tDOM_StructureObjCmd (
     return result;
 }
 
+
+static StructureQuant *
+initStructureQuant  (
+    StructureData * sdata,
+    Structure_Content_Quant quantType,
+    int n,
+    int m
+    )
+{
+    StructureQuant * quant;
+
+    quant = TMALLOC (StructureQuant);
+    quant->quant = quantType;
+    quant->minOccur = n;
+    quant->maxOccur = m;
+    if (sdata->numQuants == sdata->quantsSize) {
+        sdata->quants = REALLOC (
+            sdata->quants,
+            sizeof (StructureQuant*) * 2 * sdata->quantsSize
+            );
+        sdata->quantsSize *= 2;
+    }
+    sdata->quants[sdata->numQuants] = quant;
+    sdata->numQuants++;
+    return quant;
+}
+
+
 static StructureQuant *
 getQuant (
     Tcl_Interp *interp,
+    StructureData *sdata,
     Tcl_Obj *quantObj
     ) 
 {
     char *quantStr;
-    int len ;
+    int len, n, m;
+    Tcl_Obj *thisObj;
     
     if (!quantObj) {
         return quantNone;
@@ -631,13 +660,48 @@ getQuant (
             return quantOpt;
         case '+':
             return quantPlus;
-        default:
+        }
+    }
+    if (Tcl_ListObjLength (interp, quantObj, &len) != TCL_OK) {
+        SetResult ("Invalid quant specifier.");
+        return NULL;
+    }
+    if (len != 1 && len != 2) {
+        SetResult ("Invalid quant specifier.");
+        return NULL;
+    }
+    if (len == 1) {
+        if (Tcl_GetIntFromObj (interp, quantObj, &n) != TCL_OK) {
             SetResult ("Invalid quant specifier.");
             return NULL;
         }
+        if (n < 1) {
+            SetResult ("Invalid quant specifier.");
+            return NULL;
+        }
+        return initStructureQuant (sdata, STRUCTURE_CQUANT_N, n, 0);
     }
-    SetResult ("Numeric or range quants to be implemented.");
-    return NULL;
+    /* The "list-ness" of the quantObj is already checked by the
+     * Tcl_ListObjLength() call above, no need to check result. */
+    Tcl_ListObjIndex (interp, quantObj, 0, &thisObj);
+    if (Tcl_GetIntFromObj (interp, thisObj, &n) != TCL_OK) {
+        SetResult ("Invalid quant specifier.");
+        return NULL;
+    }
+    if (n < 0) {
+        SetResult ("Invalid quant specifier.");
+        return NULL;
+    }
+    Tcl_ListObjIndex (interp, quantObj, 1, &thisObj);
+    if (Tcl_GetIntFromObj (interp, thisObj, &m) != TCL_OK) {
+        SetResult ("Invalid quant specifier.");
+        return NULL;
+    }
+    if (n >= m) {
+        SetResult ("Invalid quant specifier.");
+        return NULL;
+    }
+    return initStructureQuant (sdata, STRUCTURE_CQUANT_NM, n, m);
 }
 
 int
