@@ -91,6 +91,7 @@ typedef struct StructureCP
 
 #define CONTENT_ARRAY_SIZE_INIT 20
 #define ANNO_PATTERN_ARRAY_SIZE_INIT 128
+#define QUANTS_ARRAY_SIZE_INIT 8
 
 typedef struct 
 {
@@ -109,6 +110,9 @@ typedef struct
     StructureCP **annoPattern;
     unsigned int numAnnoPattern;
     unsigned int annoPatternSize;
+    StructureQuant **quants;
+    unsigned int numQuants;
+    unsigned int quantsSize;
     char *currentNamespace;
     char *currentAttributeNamespace;
     int   isAttribute;
@@ -149,17 +153,32 @@ static void SetActiveStructureData (StructureData *v)
         return TCL_ERROR;                                               \
     }
 
-#define ADD_TO_CONTENT(pattern)                                         \
+#define ADD_TO_CONTENT(pattern,quantObj)                                \
     if (sdata->numChildren == sdata->contentSize) {                     \
         sdata->currentContent =                                         \
             REALLOC (sdata->currentContent,                             \
                      2 * sdata->contentSize                             \
                      * sizeof (StructureCP*));                          \
+        sdata->currentQuants =                                          \
+            REALLOC (sdata->currentQuants,                              \
+                     2 * sdata->contentSize                             \
+                     * sizeof (StructureQuant*));                       \
         sdata->contentSize *= 2;                                        \
     }                                                                   \
     sdata->currentContent[sdata->numChildren] = (pattern);              \
-    sdata->numChildren++;
-
+    if (!(quantObj)) {                                                  \
+        fprintf (stderr, "No quant obj\n");                             \
+        sdata->currentQuants[sdata->numChildren] = quantNone;           \
+    } else {                                                            \
+        StructureQuant *quant;                                          \
+        quant = getQuant (interp, (quantObj));                          \
+        if (!quant) {                                                   \
+            return TCL_ERROR;                                           \
+        }                                                               \
+        sdata->currentQuants[sdata->numChildren] = quant;               \
+    }                                                                   \
+    sdata->numChildren++;                                               \
+    
 
 #define REMEMBER_ANNO_PATTERN(pattern)                                  \
     if (sdata->numAnnoPattern == sdata->annoPatternSize) {              \
@@ -267,8 +286,10 @@ initStructureData ()
     Tcl_InitHashTable (&sdata->namespace, TCL_STRING_KEYS);
     sdata->annoPattern = (StructureCP **) MALLOC (
         sizeof (StructureCP*) * ANNO_PATTERN_ARRAY_SIZE_INIT);
-    sdata->numAnnoPattern = 0;
     sdata->annoPatternSize = ANNO_PATTERN_ARRAY_SIZE_INIT;
+    sdata->quants = (StructureQuant **) MALLOC (
+        sizeof (StructureQuant*) * QUANTS_ARRAY_SIZE_INIT);
+    sdata->quantsSize = QUANTS_ARRAY_SIZE_INIT;
     return sdata;
 }
 
@@ -303,7 +324,11 @@ static void structureInstanceDelete (
     for (i = 0; i < sdata->numAnnoPattern; i++) {
         freeStructureCP (sdata->annoPattern[i]);
     }
-    FREE(sdata->annoPattern);
+    FREE (sdata->annoPattern);
+    for (i = 0; i < sdata->numQuants; i++) {
+        FREE (sdata->quants[i]);
+    }
+    FREE (sdata->quants);
     FREE (sdata);
 }
 
@@ -583,6 +608,38 @@ tDOM_StructureObjCmd (
     return result;
 }
 
+static StructureQuant *
+getQuant (
+    Tcl_Interp *interp,
+    Tcl_Obj *quantObj
+    ) 
+{
+    char *quantStr;
+    int len ;
+    
+    if (!quantObj) {
+        return quantNone;
+    }
+    quantStr = Tcl_GetStringFromObj (quantObj, &len);
+    if (len == 1) {
+        switch (quantStr[0]) {
+        case '!':
+            return quantNone;
+        case '*':
+            return quantRep;
+        case '?':
+            return quantOpt;
+        case '+':
+            return quantPlus;
+        default:
+            SetResult ("Invalid quant specifier.");
+            return NULL;
+        }
+    }
+    SetResult ("Numeric or range quants to be implemented.");
+    return NULL;
+}
+
 int
 EmptyAnyPatternObjCmd (
     ClientData clientData,
@@ -599,7 +656,7 @@ EmptyAnyPatternObjCmd (
     pattern = initStructureCP ((Structure_Content_Type) clientData,
                                NULL, NULL);
     REMEMBER_ANNO_PATTERN (pattern)
-    ADD_TO_CONTENT (pattern)
+    ADD_TO_CONTENT (pattern, NULL)
     return TCL_OK;
 }
 
@@ -658,7 +715,7 @@ ElementPatternObjCmd (
             }
             Tcl_SetHashValue (entryPtr, element);
         }
-        ADD_TO_CONTENT(element)
+        ADD_TO_CONTENT(element, objc == 2 ? NULL : objv[2]);
     } else {
         /* Local definition of this element */
         
