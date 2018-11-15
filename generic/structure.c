@@ -1,3 +1,25 @@
+/*----------------------------------------------------------------------------
+|   Copyright (c) 2018  Rolf Ade (rolf@pointsman.de)
+|-----------------------------------------------------------------------------
+|
+|
+|   The contents of this file are subject to the Mozilla Public License
+|   Version 2.0 (the "License"); you may not use this file except in
+|   compliance with the License. You may obtain a copy of the License at
+|   http://www.mozilla.org/MPL/
+|
+|   Software distributed under the License is distributed on an "AS IS"
+|   basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+|   License for the specific language governing rights and limitations
+|   under the License.
+|
+|   Contributor(s):
+|
+|
+|   written by Rolf Ade
+|   November 2018
+|
+\---------------------------------------------------------------------------*/
 
 #include <tdom.h>
 
@@ -156,7 +178,7 @@ static void SetActiveStructureData (StructureData *v)
         return TCL_ERROR;                                               \
     }
 
-#define ADD_TO_CONTENT(pattern,quantObj)                                \
+#define ADD_TO_CONTENT(pattern,quant)                                   \
     if (sdata->numChildren == sdata->contentSize) {                     \
         sdata->currentContent =                                         \
             REALLOC (sdata->currentContent,                             \
@@ -169,16 +191,7 @@ static void SetActiveStructureData (StructureData *v)
         sdata->contentSize *= 2;                                        \
     }                                                                   \
     sdata->currentContent[sdata->numChildren] = (pattern);              \
-    if (!(quantObj)) {                                                  \
-        sdata->currentQuants[sdata->numChildren] = quantNone;           \
-    } else {                                                            \
-        StructureQuant *quant;                                          \
-        quant = getQuant (interp, sdata, (quantObj));                   \
-        if (!quant) {                                                   \
-            return TCL_ERROR;                                           \
-        }                                                               \
-        sdata->currentQuants[sdata->numChildren] = quant;               \
-    }                                                                   \
+    sdata->currentQuants[sdata->numChildren] = quant;                   \
     sdata->numChildren++;                                               \
     
 
@@ -343,10 +356,10 @@ structureInstanceCmd (
     )
 {
     int            methodIndex, keywordIndex, hnew, patternIndex;
-    int            result = TCL_OK, isAnonPattern = 0;
+    int            result = TCL_OK, isAnonPattern = 0, newPattern = 0;
     StructureData  *sdata = (StructureData *) clientData;
     Tcl_HashEntry *entryPtr;
-    StructureCP *element, *current, *pattern;
+    StructureCP   *element, *pattern, *current = NULL;
     void          *namespacePtr;
     
     static const char *structureInstanceMethods[] = {
@@ -418,12 +431,13 @@ structureInstanceCmd (
                 namespacePtr,
                 Tcl_GetHashKey (&sdata->element, entryPtr)
                 );
+            newPattern = 1;
             if (!hnew) {
                 current = (StructureCP *) Tcl_GetHashValue (entryPtr);
                 element->next = current;
             }
+            Tcl_SetHashValue (entryPtr, element);
         }
-        Tcl_SetHashValue (entryPtr, element);
 
         SETASI(sdata);
         sdata->currentNamespace = namespacePtr;
@@ -433,14 +447,19 @@ structureInstanceCmd (
         sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
         result = Tcl_VarEval (interp, "namespace eval ::tdom::structure {",
                               Tcl_GetString (objv[patternIndex]), "}", NULL);
-        if (isAnonPattern && (result == TCL_OK)) {
-            element->flags &= ~ANON_PATTERN_DEF;
-            sdata->undefinedAnonPattern--;
-        }
         sdata->currentNamespace = NULL;
         element->content = sdata->currentContent;
         element->quants = sdata->currentQuants;
         element->numChildren = sdata->numChildren;
+        if (result == TCL_OK) {
+            if (isAnonPattern) {
+                element->flags &= ~ANON_PATTERN_DEF;
+                sdata->undefinedAnonPattern--;
+            }
+        } else {
+            if (hnew) Tcl_DeleteHashEntry (entryPtr);
+            if (newPattern) freeStructureCP (element);
+        }
         SETASI(0);
         break;
 
@@ -474,14 +493,20 @@ structureInstanceCmd (
         sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
         result = Tcl_VarEval (interp, "namespace eval ::tdom::structure {",
                               Tcl_GetString (objv[3]), "}", NULL);
-        if (isAnonPattern && (result == TCL_OK)) {
-            pattern->flags &= ~ANON_PATTERN_DEF;
-            sdata->undefinedAnonPattern--;
-        }
         pattern->content = sdata->currentContent;
         pattern->quants = sdata->currentQuants;
         pattern->numChildren = sdata->numChildren;
-        
+        if (result == TCL_OK) {
+            if (isAnonPattern) {
+                pattern->flags &= ~ANON_PATTERN_DEF;
+                sdata->undefinedAnonPattern--;
+            }
+        } else {
+            if (hnew) {
+                Tcl_DeleteHashEntry (entryPtr);
+                freeStructureCP (pattern);
+            }
+        }
         SETASI(0);
         break;
 
@@ -749,7 +774,7 @@ EmptyAnyPatternObjCmd (
     pattern = initStructureCP ((Structure_Content_Type) clientData,
                                NULL, NULL);
     REMEMBER_ANON_PATTERN (pattern)
-    ADD_TO_CONTENT (pattern, NULL)
+    ADD_TO_CONTENT (pattern, quantNone)
     return TCL_OK;
 }
 
@@ -776,16 +801,20 @@ ElementPatternObjCmd (
     StructureData *sdata = GETASI;
     Tcl_HashEntry *entryPtr;
     StructureCP *element = NULL, *current;
+    StructureQuant *quant;
     int hnew;
     
     CHECK_SI
     checkNrArgs (2,4,"Expected: elementName ?quant? ?pattern?");
 
+    quant = getQuant (interp, sdata, objc == 2 ? NULL : objv[2]);
+    if (!quant) {
+        return TCL_ERROR;
+    }
     if (objc < 4) {
         /* Reference to an element type */
         entryPtr = Tcl_CreateHashEntry (&sdata->element,
                                         Tcl_GetString(objv[1]), &hnew);
-        
         if (!hnew) {
             element = (StructureCP *) Tcl_GetHashValue (entryPtr);
             while (element) {
@@ -796,7 +825,7 @@ ElementPatternObjCmd (
             }
         }
         if (!element) {
-            element = initStructureCP(
+            element = initStructureCP (
                 STRUCTURE_CTYPE_NAME,
                 sdata->currentNamespace,
                 Tcl_GetHashKey (&sdata->element, entryPtr)
@@ -809,7 +838,7 @@ ElementPatternObjCmd (
             }
             Tcl_SetHashValue (entryPtr, element);
         }
-        ADD_TO_CONTENT(element, objc == 2 ? NULL : objv[2]);
+        ADD_TO_CONTENT(element, quant);
     } else {
         /* Local definition of this element */
         
@@ -826,7 +855,43 @@ ChoicePatternObjCmd (
     Tcl_Obj *const objv[]
     )
 {
+    StructureData *sdata = GETASI;
+    StructureQuant *quant;
+    StructureCP *pattern;
+    StructureCP **savedCurrentContent;
+    StructureQuant **savedCurrentQuant;
+    unsigned int savedNumChildren, savedContenSize;
+    int result;
 
+    CHECK_SI
+    checkNrArgs (2,3,"Expected: ?quant? definition");
+    quant = getQuant (interp, sdata, objc == 2 ? NULL : objv[1]);
+    if (!quant) {
+        return TCL_ERROR;
+    }
+    pattern = initStructureCP (STRUCTURE_CTYPE_CHOICE, NULL, NULL);
+    savedCurrentContent = sdata->currentContent;
+    savedCurrentQuant = sdata->currentQuants;
+    savedNumChildren = sdata->numChildren;
+    savedContenSize = sdata->contentSize;
+    sdata->currentContent = pattern->content;
+    sdata->currentQuants = pattern->quants;
+    sdata->numChildren = 0;
+    sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
+    result = Tcl_EvalObjEx (interp, objc == 2 ? objv[1] : objv[2], 0);
+    pattern->content = sdata->currentContent;
+    pattern->quants = sdata->currentQuants;
+    pattern->numChildren = sdata->numChildren;
+    sdata->currentContent = savedCurrentContent;
+    sdata->currentQuants = savedCurrentQuant;
+    sdata->numChildren = savedNumChildren;
+    sdata->contentSize = savedContenSize;
+    if (result == TCL_OK) {
+        REMEMBER_ANON_PATTERN (pattern);
+        ADD_TO_CONTENT (pattern, quant);
+    } else {
+        freeStructureCP (pattern);
+    }
     return TCL_OK;
 }
 
@@ -889,7 +954,7 @@ NamespacePatternObjCmd (
     StructureData *sdata = GETASI;
     char *currentNamespace;
     Tcl_HashEntry *entryPtr;
-    int hnew;
+    int hnew, result;
     
     CHECK_SI
     checkNrArgs (3,3,"Expected: namespace pattern");
@@ -899,12 +964,10 @@ NamespacePatternObjCmd (
                                     objv[1], &hnew);
     sdata->currentNamespace = (char *)
         Tcl_GetHashKey (&sdata->namespace, entryPtr);
-    if (Tcl_EvalObjEx (interp, objv[2], 0) != TCL_OK) {
-        sdata->currentNamespace = currentNamespace;
-        return TCL_ERROR;
-    }
+    
+    result = Tcl_EvalObjEx (interp, objv[2], 0);
     sdata->currentNamespace = currentNamespace;
-    return TCL_OK;
+    return result;
 }
 
 int
@@ -916,6 +979,7 @@ RefPatternObjCmd (
     )
 {
     StructureData *sdata = GETASI;
+    StructureQuant *quant;
     Tcl_HashEntry *entryPtr;
     int hnew;
     StructureCP *pattern;
@@ -923,6 +987,10 @@ RefPatternObjCmd (
     CHECK_SI
     checkNrArgs (2,3,"Expected argument: patternName ?quant?");
 
+    quant = getQuant (interp, sdata, objc == 2 ? NULL : objv[2]);
+    if (!quant) {
+        return TCL_ERROR;
+    }
     entryPtr = Tcl_CreateHashEntry (&sdata->pattern,
                                     Tcl_GetString (objv[1]), &hnew);
     if (hnew) {
@@ -937,7 +1005,7 @@ RefPatternObjCmd (
     } else {
         pattern = Tcl_GetHashValue (entryPtr);
     }
-    ADD_TO_CONTENT(pattern, objc == 2 ? NULL : objv[2]);
+    ADD_TO_CONTENT(pattern, quant);
     return TCL_OK;
 }
 
@@ -976,4 +1044,3 @@ tDOM_StructureInit (
     Tcl_CreateObjCommand (interp, "tdom::structure::ref",
                           RefPatternObjCmd, NULL, NULL);
 }
-
