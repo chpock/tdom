@@ -121,13 +121,21 @@ typedef struct StructureCP
 #define CONTENT_ARRAY_SIZE_INIT 20
 #define ANON_PATTERN_ARRAY_SIZE_INIT 256
 #define QUANTS_ARRAY_SIZE_INIT 8
+#define STACK_SIZE_INIT 16
+#define STACK_LIST_SIZE_INIT 64
 
-typedef struct 
+typedef struct StructureValidationStack
 {
-    StructureCP *currentModel;
-    StructureCP *nextPossible;
+    StructureCP *pattern;
+    struct StructureValidationStack *next;
+    int               activeChild;
     int               deep;
+    int               nrMatched;
 } StructureValidationStack;
+
+#define VALIDATION_NOT_STARTED 0
+#define VALIDATION_STARTED     1
+#define VALIDATION_FINISHED    2
 
 typedef struct 
 {
@@ -151,8 +159,14 @@ typedef struct
     StructureQuant **currentQuants;
     unsigned int numChildren;
     unsigned int contentSize;
-    StructureValidationStack **validationStack;
-    int                        validationStackSize;
+    StructureValidationStack **stack;
+    int                        stackSize;
+    int                        stackPtr;
+    int                        validationState;
+    StructureValidationStack **stackList;
+    unsigned int numStackList;
+    unsigned int stackListSize;
+    unsigned int numStackAllocated;
 } StructureData;
 
 #ifndef TCL_THREADS
@@ -317,6 +331,12 @@ initStructureData ()
     sdata->quants = (StructureQuant **) MALLOC (
         sizeof (StructureQuant*) * QUANTS_ARRAY_SIZE_INIT);
     sdata->quantsSize = QUANTS_ARRAY_SIZE_INIT;
+    sdata->stack = (StructureValidationStack **) MALLOC (
+        sizeof (StructureValidationStack *) * STACK_SIZE_INIT);
+    sdata->stackSize = STACK_SIZE_INIT;
+    sdata->stackList = (StructureValidationStack **) MALLOC (
+        sizeof (StructureValidationStack *) * STACK_LIST_SIZE_INIT);
+    sdata->stackListSize = STACK_LIST_SIZE_INIT;
     return sdata;
 }
 
@@ -341,6 +361,11 @@ static void structureInstanceDelete (
         FREE (sdata->quants[i]);
     }
     FREE (sdata->quants);
+    FREE (sdata->stack);
+    for (i = 0; i < sdata->numStackAllocated; i++) {
+        FREE (sdata->stackList[i]);
+    }
+    FREE (sdata->stackList);
     FREE (sdata);
 }
 
@@ -404,6 +429,42 @@ checkForAmbiguousness (
     pattern->flags |= AMBIGUOUS_PATTERN;
 }
 
+static void
+pushToStack (
+    StructureData *sdata,
+    StructureCP *pattern,
+    int deep
+    )
+{
+    StructureValidationStack *stackElm;
+
+    if (sdata->numStackList < sdata->numStackAllocated) {
+        stackElm = sdata->stackList[sdata->numStackList];
+    } else {
+        if (sdata->stackPtr == sdata->stackSize) {
+            sdata->stack = REALLOC (
+                sdata->stack,
+                sizeof (StructureValidationStack *) * 2 * sdata->stackSize);
+            sdata->stackSize *= 2;
+        }
+        if (sdata->stackListSize == sdata->numStackList) {
+            sdata->stackList = REALLOC (
+                sdata->stackList,
+                sizeof (StructureValidationStack *) * 2 * sdata->stackListSize);
+            sdata->stackListSize *= 2;
+        }
+        stackElm = TMALLOC (StructureValidationStack);
+        sdata->numStackAllocated++;
+        sdata->stackList[sdata->numStackList] = stackElm;
+        sdata->numStackList++;
+        sdata->stack[sdata->stackPtr] = stackElm;
+        sdata->stackPtr++;
+    }
+    memset (stackElm, 0, sizeof (StructureValidationStack));
+    stackElm->pattern = pattern;
+    stackElm->deep = deep;
+}
+
 static int
 probeElement (
     Tcl_Interp *interp,
@@ -412,7 +473,64 @@ probeElement (
     void *namespace
     ) 
 {
-    return TCL_ERROR;
+    Tcl_HashEntry *entryPtr;
+    void *namespacePtr;
+    StructureCP *pattern, *apattern;
+    StructureValidationStack *astackElm;
+
+    if (sdata->validationState == VALIDATION_FINISHED) {
+        SetResult ("Validation finished.");
+        return TCL_ERROR;
+    }
+            
+    if (namespace) {
+        entryPtr = Tcl_FindHashEntry (&sdata->namespace, (char *)namespace);
+        if (!entryPtr) {
+            SetResult ("No elements defined in this namespace.");
+            return TCL_ERROR;
+        }
+        if (entryPtr == sdata->emptyNamespace) {
+            namespacePtr = NULL;
+        } else {
+            namespacePtr = Tcl_GetHashKey (&sdata->namespace, entryPtr);
+        }
+    } else {
+        namespacePtr = NULL;
+    }
+
+    entryPtr = Tcl_FindHashEntry (&sdata->element, name);
+    if (!entryPtr) {
+        SetResult ("No such element name in grammer.");
+        return TCL_ERROR;
+    }
+    pattern = (StructureCP *) Tcl_GetHashValue (entryPtr);
+    while (pattern) {
+        if (pattern->namespace == namespacePtr) {
+            break;
+        }
+        pattern = pattern->next;
+    }
+    if (!pattern) {
+        SetResult ("No such element definition.");
+        return TCL_ERROR;
+    }
+
+    if (sdata->validationState == VALIDATION_STARTED) {
+        /* The normal case: we're inside the tree */
+        astackElm = sdata->stack[sdata->stackPtr-1];
+        apattern = astackElm->pattern;
+        while (astackElm) {
+            while (1) {
+                break;
+            }
+            astackElm = astackElm->next;
+        }
+    } else {
+        /* The root of the tree to check. */
+        pushToStack (sdata, pattern, 1);
+        sdata->stack[0]->nrMatched = 1;
+    }
+    return TCL_OK;
 }
 
 static int 
