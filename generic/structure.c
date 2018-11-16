@@ -58,6 +58,7 @@ typedef enum structure_cp_type {
   STRUCTURE_CTYPE_TEXT
 } Structure_CP_Type;
 
+#ifdef DEBUG
 static char *Structure_CP_Type2str[] = {
     "EMPTY",
     "ANY",
@@ -69,6 +70,7 @@ static char *Structure_CP_Type2str[] = {
     "GROUP",
     "TEXT"
 };
+#endif
 
 typedef enum structure_content_quant  {
   STRUCTURE_CQUANT_NONE,
@@ -80,8 +82,9 @@ typedef enum structure_content_quant  {
 } Structure_Content_Quant;
 
 typedef unsigned int StructureFlags;
-#define FORWARD_PATTERN_DEF 1
-#define AMBIGUOUS_PATTERN   2
+#define FORWARD_PATTERN_DEF     1
+#define PLACEHOLDER_PATTERN_DEF 2
+#define AMBIGUOUS_PATTERN       4
 
 typedef struct
 {
@@ -90,8 +93,7 @@ typedef struct
     int                      maxOccur;
 }  StructureQuant;
 
-/* Pointers to heap-allocated shared quants. */
-
+/* Pointer to heap-allocated shared quants. */
 static StructureQuant QuantNone;
 static StructureQuant *quantNone = &QuantNone;
 
@@ -260,6 +262,9 @@ static void serializeCP (
                  pattern->name,pattern->namespace);
         if (pattern->flags & FORWARD_PATTERN_DEF) {
             fprintf (stderr, "\tAnonymously defined NAME\n");
+        }
+        if (pattern->flags & PLACEHOLDER_PATTERN_DEF) {
+            fprintf (stderr, "\tAs placeholder defined NAME\n");
         }
         /* Fall thru. */
     case STRUCTURE_CTYPE_MIXED:
@@ -472,7 +477,8 @@ structureInstanceCmd (
             pattern = (StructureCP *) Tcl_GetHashValue (entryPtr);
             while (pattern) {
                 if (pattern->namespace == namespacePtr) {
-                    if (pattern->flags & FORWARD_PATTERN_DEF) {
+                    if (pattern->flags & FORWARD_PATTERN_DEF
+                        || pattern->flags & PLACEHOLDER_PATTERN_DEF) {
                         forwardDef = 1;
                         break;
                     }
@@ -517,8 +523,11 @@ structureInstanceCmd (
         pattern->numChildren = sdata->numChildren;
         if (result == TCL_OK) {
             if (forwardDef) {
-                pattern->flags &= ~FORWARD_PATTERN_DEF;
-                sdata->forwardPatternDefs--;
+                if (pattern->flags & FORWARD_PATTERN_DEF) {
+                    sdata->forwardPatternDefs--;
+                    pattern->flags &= ~FORWARD_PATTERN_DEF;
+                }
+                pattern->flags &= ~PLACEHOLDER_PATTERN_DEF;
             }
         } else {
             cleanupLastPattern (sdata, savedNumPatternList);
@@ -795,6 +804,54 @@ EmptyAnyPatternObjCmd (
     return TCL_OK;
 }
 
+static int
+evalDefinition (
+    Tcl_Interp *interp,
+    StructureData *sdata,
+    Tcl_Obj *definition,
+    StructureCP *pattern,
+    StructureQuant *quant
+    )
+{
+    StructureCP **savedCurrentContent;
+    StructureQuant **savedCurrentQuant;
+    unsigned int savedNumChildren, savedContenSize, savedNumPatternList;
+    int result;
+
+    /* Save some state of sdata .. */
+    savedCurrentContent = sdata->currentContent;
+    savedCurrentQuant = sdata->currentQuants;
+    savedNumChildren = sdata->numChildren;
+    savedContenSize = sdata->contentSize;
+    /* ... and prepare sdata for definition evaluation. */
+    savedNumPatternList = sdata->numPatternList;
+    sdata->currentContent = pattern->content;
+    sdata->currentQuants = pattern->quants;
+    sdata->numChildren = 0;
+    sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
+
+    result = Tcl_EvalObjEx (interp, definition, 0);
+
+    /* Save the definition evaluation results to the pattern ... */
+    pattern->content = sdata->currentContent;
+    pattern->quants = sdata->currentQuants;
+    pattern->numChildren = sdata->numChildren;
+    /* ... and restore the previously saved sdata states  */
+    sdata->currentContent = savedCurrentContent;
+    sdata->currentQuants = savedCurrentQuant;
+    sdata->numChildren = savedNumChildren;
+    sdata->contentSize = savedContenSize;
+
+    if (result == TCL_OK) {
+        REMEMBER_PATTERN (pattern);
+        ADD_TO_CONTENT (pattern, quant);
+    } else {
+        cleanupLastPattern (sdata, savedNumPatternList);
+        freeStructureCP (pattern);
+    }
+    return result;
+}
+
 /* Implements the grammer definition commands "element" and "ref" */
 int
 NamedPatternObjCmd (
@@ -825,10 +882,10 @@ NamedPatternObjCmd (
     if (!quant) {
         return TCL_ERROR;
     }
+    entryPtr = Tcl_CreateHashEntry (hashTable,
+                                    Tcl_GetString(objv[1]), &hnew);
     if (objc < 4) {
         /* Reference to an element or pattern */
-        entryPtr = Tcl_CreateHashEntry (hashTable,
-                                        Tcl_GetString(objv[1]), &hnew);
         if (!hnew) {
             pattern = (StructureCP *) Tcl_GetHashValue (entryPtr);
             while (pattern) {
@@ -856,9 +913,23 @@ NamedPatternObjCmd (
         ADD_TO_CONTENT (pattern, quant);
     } else {
         /* Local definition of this element */
-        
+        if (hnew) {
+            pattern = initStructureCP (
+                STRUCTURE_CTYPE_NAME,
+                sdata->currentNamespace,
+                Tcl_GetHashKey (hashTable, entryPtr)
+                );
+            pattern->flags |= PLACEHOLDER_PATTERN_DEF;
+            REMEMBER_PATTERN (pattern);
+            Tcl_SetHashValue (entryPtr, pattern);
+        }
+        pattern = initStructureCP (
+            STRUCTURE_CTYPE_NAME,
+            sdata->currentNamespace,
+            Tcl_GetHashKey (hashTable, entryPtr)
+            );
+        return evalDefinition (interp, sdata, objv[3], pattern, quant);
     }
-    
     return TCL_OK;
 }
 
@@ -876,10 +947,6 @@ AnonPatternObjCmd (
     Structure_CP_Type patternType = (Structure_CP_Type) clientData;
     StructureQuant *quant;
     StructureCP *pattern;
-    StructureCP **savedCurrentContent;
-    StructureQuant **savedCurrentQuant;
-    unsigned int savedNumChildren, savedContenSize, savedNumPatternList; 
-    int result;
 
     CHECK_SI
     checkNrArgs (2,3,"Expected: ?quant? definition");
@@ -889,38 +956,9 @@ AnonPatternObjCmd (
     }
 
     pattern = initStructureCP (patternType, NULL, NULL);
-    REMEMBER_PATTERN (pattern);
 
-    /* Save some state of sdata .. */
-    savedCurrentContent = sdata->currentContent;
-    savedCurrentQuant = sdata->currentQuants;
-    savedNumChildren = sdata->numChildren;
-    savedContenSize = sdata->contentSize;
-    /* ... and prepare sdata for definition evaluation. */
-    savedNumPatternList = sdata->numPatternList;
-    sdata->currentContent = pattern->content;
-    sdata->currentQuants = pattern->quants;
-    sdata->numChildren = 0;
-    sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
-
-    result = Tcl_EvalObjEx (interp, objc == 2 ? objv[1] : objv[2], 0);
-
-    /* Save the definition evaluation results to the pattern ... */
-    pattern->content = sdata->currentContent;
-    pattern->quants = sdata->currentQuants;
-    pattern->numChildren = sdata->numChildren;
-    /* ... and restore the previously saved sdata  */
-    sdata->currentContent = savedCurrentContent;
-    sdata->currentQuants = savedCurrentQuant;
-    sdata->numChildren = savedNumChildren;
-    sdata->contentSize = savedContenSize;
-
-    if (result == TCL_OK) {
-        ADD_TO_CONTENT (pattern, quant);
-    } else {
-        cleanupLastPattern (sdata, savedNumPatternList);
-    }
-    return TCL_OK;
+    return evalDefinition (interp, sdata, objc == 2 ? objv[1] : objv[2],
+                           pattern, quant);
 }
 
 int
@@ -1010,13 +1048,13 @@ tDOM_StructureInit (
                           AnonPatternObjCmd,
                           (ClientData) STRUCTURE_CTYPE_CHOICE, NULL);
     Tcl_CreateObjCommand (interp, "tdom::structure::mixed",
-                          MixedPatternObjCmd,
+                          AnonPatternObjCmd,
                           (ClientData) STRUCTURE_CTYPE_MIXED, NULL);
     Tcl_CreateObjCommand (interp, "tdom::structure::interleave",
-                          InterleavePatternObjCmd,
+                          AnonPatternObjCmd,
                           (ClientData) STRUCTURE_CTYPE_INTERLEAVE, NULL);
     Tcl_CreateObjCommand (interp, "tdom::structure::group",
-                          GroupPatternObjCmd,
+                          AnonPatternObjCmd,
                           (ClientData) STRUCTURE_CTYPE_GROUP, NULL);
     
     Tcl_CreateObjCommand (interp, "tdom::structure::attribute",

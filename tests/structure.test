@@ -138,6 +138,24 @@ test structure-1.9 {Same element name in different Namespaces} {
     set result
 } 1
 
+test structure-1.10 {Local element definition} {
+    tdom::structure create grammer
+    grammer element doc {
+        element elm1
+        element elm1 1 {
+            element a
+            element b
+        }
+    }
+    grammer element c text
+    grammer element d text
+    grammer element elm1 {
+        element c
+        element d
+    }
+    grammer delete
+} {}
+
 test structure-2.1 {grammer definition: ref} {
     tdom::structure create grammer
     grammer pattern thisPattern {
