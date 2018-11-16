@@ -135,6 +135,7 @@ typedef struct
     char *startNamespace;
     Tcl_HashTable element;
     Tcl_HashTable namespace;
+    Tcl_HashEntry *emptyNamespace;
     Tcl_HashTable pattern;
     StructureCP **patternList;
     unsigned int numPatternList;
@@ -301,12 +302,15 @@ static StructureData*
 initStructureData () 
 {
     StructureData *sdata;
+    int hnew;
     
     sdata = TMALLOC (StructureData);
     memset (sdata, 0, sizeof(StructureData));
     Tcl_InitHashTable (&sdata->element, TCL_STRING_KEYS);
     Tcl_InitHashTable (&sdata->pattern, TCL_STRING_KEYS);
     Tcl_InitHashTable (&sdata->namespace, TCL_STRING_KEYS);
+    sdata->emptyNamespace = Tcl_CreateHashEntry (
+        &sdata->namespace, "", &hnew);
     sdata->patternList = (StructureCP **) MALLOC (
         sizeof (StructureCP*) * ANON_PATTERN_ARRAY_SIZE_INIT);
     sdata->patternListSize = ANON_PATTERN_ARRAY_SIZE_INIT;
@@ -400,6 +404,17 @@ checkForAmbiguousness (
     pattern->flags |= AMBIGUOUS_PATTERN;
 }
 
+static int
+probeElement (
+    Tcl_Interp *interp,
+    StructureData *sdata,
+    char *name,
+    void *namespace
+    ) 
+{
+    return TCL_ERROR;
+}
+
 static int 
 structureInstanceCmd (
     ClientData clientData,
@@ -467,8 +482,10 @@ structureInstanceCmd (
             patternIndex = 4;
             entryPtr = Tcl_CreateHashEntry (&sdata->namespace,
                                             Tcl_GetString (objv[3]), &hnew);
-            namespacePtr = Tcl_GetHashKey (&sdata->namespace,
-                                           entryPtr);
+            if (entryPtr != sdata->emptyNamespace) {
+                namespacePtr = Tcl_GetHashKey (&sdata->namespace,
+                                               entryPtr);
+            }
         }
         entryPtr = Tcl_CreateHashEntry (hashTable,
                                         Tcl_GetString (objv[2]), &hnew);
@@ -569,9 +586,23 @@ structureInstanceCmd (
         case k_elementstart:
             if (objc < 4 && objc > 6) {
                 Tcl_WrongNumArgs (interp, 3, objv, "<elementname>"
-                    "?<namespace>? ?<attInfo>?");
+                    "?<attInfo>? ?<namespace>?");
                 return TCL_ERROR;
             }
+            if (objc == 6) {
+                entryPtr = Tcl_FindHashEntry (&sdata->namespace,
+                                              Tcl_GetString (objv[6]));
+                if (entryPtr && entryPtr != sdata->emptyNamespace) {
+                    namespacePtr = Tcl_GetHashKey (&sdata->namespace,
+                                                   entryPtr);
+                } else {
+                    namespacePtr = NULL;
+                }
+            } else {
+                namespacePtr = NULL;
+            }
+            result = probeElement (interp, sdata, Tcl_GetString (objv[4]),
+                                   namespacePtr);
             break;
         case k_elementend:
             if (objc < 4 && objc > 5) {
@@ -783,7 +814,7 @@ getQuant (
     return initStructureQuant (sdata, STRUCTURE_CQUANT_NM, n, m);
 }
 
-/* Implements the grammer definition commands "empty" and "any" */
+/* Implements the grammar definition commands "empty" and "any" */
 int
 EmptyAnyPatternObjCmd (
     ClientData clientData,
@@ -852,7 +883,7 @@ evalDefinition (
     return result;
 }
 
-/* Implements the grammer definition commands "element" and "ref" */
+/* Implements the grammar definition commands "element" and "ref" */
 int
 NamedPatternObjCmd (
     ClientData clientData,
@@ -933,7 +964,7 @@ NamedPatternObjCmd (
     return TCL_OK;
 }
 
-/* Implements the grammer definition commands "choice", "group",
+/* Implements the grammar definition commands "choice", "group",
  * "interleave" and "mixed" */
 int
 AnonPatternObjCmd (
@@ -992,9 +1023,12 @@ NamespacePatternObjCmd (
     currentNamespace = sdata->currentNamespace;
     entryPtr = Tcl_CreateHashEntry (&sdata->namespace,
                                     objv[1], &hnew);
-    sdata->currentNamespace = (char *)
-        Tcl_GetHashKey (&sdata->namespace, entryPtr);
-    
+    if (entryPtr == sdata->emptyNamespace) {
+        sdata->currentNamespace = NULL;
+    } else {
+        sdata->currentNamespace = (char *)
+            Tcl_GetHashKey (&sdata->namespace, entryPtr);
+    }
     result = Tcl_EvalObjEx (interp, objv[2], 0);
     sdata->currentNamespace = currentNamespace;
     return result;
