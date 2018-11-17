@@ -241,7 +241,7 @@ test structure-4.1 {validation} {
     tdom::structure create grammar
     grammar element doc {
         element e1
-        element e2 ?
+        element e2 *
     }
     foreach e {e1 e2} {
         grammar element $e {}
@@ -249,6 +249,12 @@ test structure-4.1 {validation} {
     pullValidate grammar {
         <doc><e1/></doc>
     }
+    # pullValidate grammar {
+    #     <doc><e1/><e2/></doc>
+    # }
+    # pullValidate grammar {
+    #     <doc><e1/><e2/><e2/><e2/></doc>
+    # }
 } {}
 
     

@@ -617,6 +617,12 @@ probeElementEnd (
         }
         astackElm = astackElm->next;
     }
+    if (sdata->stackPtr == 1) {
+        /* End of the first pattern (the tree root) without error.
+           We have successfully ended validation */
+        sdata->validationState = VALIDATION_FINISHED;
+        return TCL_OK;
+    }
     thisStackPtr = sdata->stackPtr - 2;
     while (sdata->stack[thisStackPtr]->deep ==
            sdata->stack[sdata->stackPtr-1]->deep) {
