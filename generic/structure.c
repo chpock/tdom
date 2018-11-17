@@ -133,9 +133,11 @@ typedef struct StructureValidationStack
     int               nrMatched;
 } StructureValidationStack;
 
-#define VALIDATION_NOT_STARTED 0
-#define VALIDATION_STARTED     1
-#define VALIDATION_FINISHED    2
+typedef enum {
+    VALIDATION_READY,
+    VALIDATION_STARTED,
+    VALIDATION_FINISHED
+} ValidationState;
 
 typedef struct 
 {
@@ -162,7 +164,7 @@ typedef struct
     StructureValidationStack **stack;
     int                        stackSize;
     int                        stackPtr;
-    int                        validationState;
+    ValidationState            validationState;
     StructureValidationStack **stackList;
     unsigned int numStackList;
     unsigned int stackListSize;
@@ -515,7 +517,7 @@ probeElement (
         return TCL_ERROR;
     }
 
-    if (sdata->validationState == VALIDATION_NOT_STARTED) {
+    if (sdata->validationState == VALIDATION_READY) {
         /* The root of the tree to check. */
         if (sdata->start) {
             if (strcmp (name, sdata->start) != 0) {
@@ -578,7 +580,7 @@ probeElementEnd (
         SetResult ("Validation finished.");
         return TCL_ERROR;
     }
-    if (sdata->validationState == VALIDATION_NOT_STARTED) {
+    if (sdata->validationState == VALIDATION_READY) {
         SetResult ("No validation started");
         return TCL_ERROR;
     }
@@ -654,11 +656,11 @@ structureInstanceCmd (
     
     static const char *structureInstanceMethods[] = {
         "element", "pattern", "start", "event", "delete",
-        "nrForwardDefinitions", NULL
+        "nrForwardDefinitions", "state", "reset", NULL
     };
     enum structureInstanceMethod {
         m_element, m_pattern, m_start, m_event, m_delete,
-        m_nrForwardDefinitions
+        m_nrForwardDefinitions, m_state, m_reset
     };
 
     static const char *eventKeywords[] = {
@@ -856,7 +858,29 @@ structureInstanceCmd (
         }
         SetIntResult(sdata->forwardPatternDefs);
         break;
-        
+
+    case m_state:
+        switch (sdata->validationState) {
+        case VALIDATION_READY:
+            SetResult ("READY");
+            break;
+        case VALIDATION_STARTED:
+            SetResult ("VALIDATING");
+            break;
+        case VALIDATION_FINISHED:
+            SetResult ("FINISHED");
+            break;
+        default:
+            SetResult ("Internal error: Invalid validation state.");
+            return TCL_ERROR;
+        }
+        break;
+
+    case m_reset:
+        sdata->stackPtr = 0;
+        sdata->validationState = VALIDATION_READY;
+        break;
+            
     default:
         Tcl_SetResult (interp, "unknown method", NULL);
         result = TCL_ERROR;

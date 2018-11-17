@@ -249,12 +249,23 @@ test structure-4.1 {validation} {
     pullValidate grammar {
         <doc><e1/></doc>
     }
-    # pullValidate grammar {
-    #     <doc><e1/><e2/></doc>
-    # }
-    # pullValidate grammar {
-    #     <doc><e1/><e2/><e2/><e2/></doc>
-    # }
+    if {[grammar state] ne "FINISHED"} {
+        error "Wrong state."
+    }
+    grammar reset
+    pullValidate grammar {
+        <doc><e1/><e2/></doc>
+    }
+    if {[grammar state] ne "FINISHED"} {
+        error "Wrong state."
+    }
+    grammar reset
+    pullValidate grammar {
+        <doc><e1/><e2/><e2/><e2/></doc>
+    }
+    if {[grammar state] ne "FINISHED"} {
+        error "Wrong state."
+    }
 } {}
 
     
