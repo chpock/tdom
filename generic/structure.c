@@ -500,7 +500,7 @@ probeElement (
 
     entryPtr = Tcl_FindHashEntry (&sdata->element, name);
     if (!entryPtr) {
-        SetResult ("No such element name in grammer.");
+        SetResult ("No such element name in grammar.");
         return TCL_ERROR;
     }
     pattern = (StructureCP *) Tcl_GetHashValue (entryPtr);
@@ -515,21 +515,117 @@ probeElement (
         return TCL_ERROR;
     }
 
-    if (sdata->validationState == VALIDATION_STARTED) {
-        /* The normal case: we're inside the tree */
-        astackElm = sdata->stack[sdata->stackPtr-1];
+    if (sdata->validationState == VALIDATION_NOT_STARTED) {
+        /* The root of the tree to check. */
+        if (sdata->start) {
+            if (strcmp (name, sdata->start) != 0) {
+                SetResult ("Root element doesn't match.");
+                return TCL_ERROR;
+            }
+            if (namespace) {
+                if (!sdata->startNamespace ||
+                    strcmp (namespace, sdata->startNamespace) != 0) {
+                    SetResult ("Root element namespace doesn't match");
+                    return TCL_ERROR;
+                }
+            } else {
+                if (sdata->startNamespace &&
+                    strcmp((char*)namespace, sdata->startNamespace) != 0) {
+                    SetResult ("Root element namespace doesn't match");
+                    return TCL_ERROR;
+                }
+            }
+        }
+        pushToStack (sdata, pattern, 0);
+        sdata->validationState = VALIDATION_STARTED;
+        return TCL_OK;
+    }
+    
+    /* The normal case: we're inside the tree */
+    astackElm = sdata->stack[sdata->stackPtr-1];
+    while (astackElm) {
         apattern = astackElm->pattern;
-        while (astackElm) {
-            while (1) {
+        while (1) {
+            if (astackElm->activeChild < apattern->numChildren) {
+                if (pattern == apattern->content[astackElm->activeChild]) {
+                    if (apattern->quants[astackElm->activeChild] == quantNone ||
+                        apattern->quants[astackElm->activeChild] == quantOpt) {
+                        astackElm->activeChild++;
+                    }
+                }
+                pushToStack (sdata, pattern, astackElm->deep + 1);
+                return TCL_OK;
+            }
+            break;
+        }
+        astackElm = astackElm->next;
+    }
+
+    return TCL_ERROR;
+}
+
+static int
+probeElementEnd (
+    Tcl_Interp * interp,
+    StructureData *sdata
+    )
+{
+    StructureCP *apattern;
+    StructureValidationStack *astackElm, *thisstackElm;
+    int ac, thisStackPtr, i;
+    
+    if (sdata->validationState == VALIDATION_FINISHED) {
+        SetResult ("Validation finished.");
+        return TCL_ERROR;
+    }
+    if (sdata->validationState == VALIDATION_NOT_STARTED) {
+        SetResult ("No validation started");
+        return TCL_ERROR;
+    }
+    if (sdata->stackPtr < 1) {
+        SetResult ("Spurious element end event after tree validation "
+                   "has finished.");
+        return TCL_ERROR;
+    }
+
+    astackElm = sdata->stack[sdata->stackPtr-1];
+    while (astackElm) {
+        thisstackElm = astackElm;
+        thisStackPtr = sdata->stackPtr-1;
+        while (thisstackElm->deep == astackElm->deep) {
+            ac = thisstackElm->activeChild;
+            apattern = thisstackElm->pattern;
+            for (i = ac; i < apattern->numChildren; i++) {
+                if (apattern->quants[i] == quantOpt ||
+                    apattern->quants[i] == quantRep) {
+                    continue;
+                }
+                if (apattern->quants[i] == quantNone ||
+                    apattern->quants[i] == quantPlus) {
+                    SetResult ("Element can not end here (required "
+                               "element(s) missing)");
+                    return TCL_ERROR;
+                }
+                SetResult ("N and NM quantifier not implemented.");
+                return TCL_ERROR;
+            }
+            thisStackPtr--;
+            if (thisStackPtr < 1) {
                 break;
             }
-            astackElm = astackElm->next;
+            thisstackElm = sdata->stack[thisStackPtr];
         }
-    } else {
-        /* The root of the tree to check. */
-        pushToStack (sdata, pattern, 1);
-        sdata->stack[0]->nrMatched = 1;
+        astackElm = astackElm->next;
     }
+    thisStackPtr = sdata->stackPtr - 2;
+    while (sdata->stack[thisStackPtr]->deep ==
+           sdata->stack[sdata->stackPtr-1]->deep) {
+        thisStackPtr--;
+        if (thisStackPtr < 1) {
+            break;
+        }
+    }
+    sdata->stackPtr = thisStackPtr + 1;
     return TCL_OK;
 }
 
@@ -709,7 +805,7 @@ structureInstanceCmd (
             }
             if (objc == 6) {
                 entryPtr = Tcl_FindHashEntry (&sdata->namespace,
-                                              Tcl_GetString (objv[6]));
+                                              Tcl_GetString (objv[5]));
                 if (entryPtr && entryPtr != sdata->emptyNamespace) {
                     namespacePtr = Tcl_GetHashKey (&sdata->namespace,
                                                    entryPtr);
@@ -719,15 +815,15 @@ structureInstanceCmd (
             } else {
                 namespacePtr = NULL;
             }
-            result = probeElement (interp, sdata, Tcl_GetString (objv[4]),
+            result = probeElement (interp, sdata, Tcl_GetString (objv[3]),
                                    namespacePtr);
             break;
         case k_elementend:
-            if (objc < 4 && objc > 5) {
-                Tcl_WrongNumArgs (interp, 3, objv, "<elementname>"
-                    "?<namespace>?");
+            if (objc != 3) {
+                Tcl_WrongNumArgs (interp, 3, objv, "No arguments expected.");
                 return TCL_ERROR;
             }
+            result = probeElementEnd (interp, sdata);
             break;
             
         case k_text:
@@ -949,7 +1045,7 @@ EmptyAnyPatternObjCmd (
     pattern = initStructureCP ((Structure_CP_Type) clientData,
                                NULL, NULL);
     REMEMBER_PATTERN (pattern)
-    ADD_TO_CONTENT (pattern, quantNone)
+    ADD_TO_CONTENT (pattern, quantRep)
     return TCL_OK;
 }
 
@@ -979,7 +1075,7 @@ evalDefinition (
     sdata->numChildren = 0;
     sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
 
-    result = Tcl_EvalObjEx (interp, definition, 0);
+    result = Tcl_EvalObjEx (interp, definition, TCL_EVAL_DIRECT);
 
     /* Save the definition evaluation results to the pattern ... */
     pattern->content = sdata->currentContent;
@@ -1147,7 +1243,7 @@ NamespacePatternObjCmd (
         sdata->currentNamespace = (char *)
             Tcl_GetHashKey (&sdata->namespace, entryPtr);
     }
-    result = Tcl_EvalObjEx (interp, objv[2], 0);
+    result = Tcl_EvalObjEx (interp, objv[2], TCL_EVAL_DIRECT);
     sdata->currentNamespace = currentNamespace;
     return result;
 }
