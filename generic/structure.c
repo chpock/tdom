@@ -22,6 +22,7 @@
 \---------------------------------------------------------------------------*/
 
 #include <tdom.h>
+#include <structure.h>
 
 /* #define DEBUG */
 /*----------------------------------------------------------------------------
@@ -32,6 +33,22 @@
 # define DBG(x) x
 #else
 # define DBG(x) 
+#endif
+
+#ifndef CONTENT_ARRAY_SIZE_INIT
+#  define CONTENT_ARRAY_SIZE_INIT 20
+#endif
+#ifndef ANON_PATTERN_ARRAY_SIZE_INIT
+#  define ANON_PATTERN_ARRAY_SIZE_INIT 256
+#endif
+#ifndef QUANTS_ARRAY_SIZE_INIT
+#  define QUANTS_ARRAY_SIZE_INIT 8
+#endif
+#ifndef STACK_SIZE_INIT
+#  define STACK_SIZE_INIT 16
+#endif
+#ifndef STACK_LIST_SIZE_INIT
+#  define STACK_LIST_SIZE_INIT 64
 #endif
 
 #define TMALLOC(t) (t*)MALLOC(sizeof(t))
@@ -45,18 +62,6 @@
         SetResult (err);                                      \
         return TCL_ERROR;                                     \
     }
-
-typedef enum structure_cp_type {
-  STRUCTURE_CTYPE_EMPTY,
-  STRUCTURE_CTYPE_ANY,
-  STRUCTURE_CTYPE_MIXED,
-  STRUCTURE_CTYPE_NAME,
-  STRUCTURE_CTYPE_CHOICE,
-  STRUCTURE_CTYPE_INTERLEAVE,
-  STRUCTURE_CTYPE_PATTERN,
-  STRUCTURE_CTYPE_GROUP,
-  STRUCTURE_CTYPE_TEXT
-} Structure_CP_Type;
 
 #ifdef DEBUG
 static char *Structure_CP_Type2str[] = {
@@ -72,26 +77,10 @@ static char *Structure_CP_Type2str[] = {
 };
 #endif
 
-typedef enum structure_content_quant  {
-  STRUCTURE_CQUANT_NONE,
-  STRUCTURE_CQUANT_OPT,
-  STRUCTURE_CQUANT_REP,
-  STRUCTURE_CQUANT_PLUS,
-  STRUCTURE_CQUANT_N,
-  STRUCTURE_CQUANT_NM
-} Structure_Content_Quant;
-
-typedef unsigned int StructureFlags;
+/* The StructureFlags flags */
 #define FORWARD_PATTERN_DEF     1
 #define PLACEHOLDER_PATTERN_DEF 2
 #define AMBIGUOUS_PATTERN       4
-
-typedef struct
-{
-    Structure_Content_Quant  quant;
-    int                      minOccur;
-    int                      maxOccur;
-}  StructureQuant;
 
 /* Pointer to heap-allocated shared quants. */
 static StructureQuant QuantNone;
@@ -105,71 +94,6 @@ static StructureQuant *quantRep = &QuantRep;
 
 static StructureQuant QuantPlus;
 static StructureQuant *quantPlus = &QuantPlus;
-
-typedef struct StructureCP
-{
-    Structure_CP_Type    type;
-    char                *namespace;
-    char                *name;
-    struct StructureCP  *next;
-    StructureFlags       flags;
-    struct StructureCP **content;
-    StructureQuant     **quants;
-    unsigned int         numChildren;
-} StructureCP;
-
-#define CONTENT_ARRAY_SIZE_INIT 20
-#define ANON_PATTERN_ARRAY_SIZE_INIT 256
-#define QUANTS_ARRAY_SIZE_INIT 8
-#define STACK_SIZE_INIT 16
-#define STACK_LIST_SIZE_INIT 64
-
-typedef struct StructureValidationStack
-{
-    StructureCP *pattern;
-    struct StructureValidationStack *next;
-    int               activeChild;
-    int               deep;
-    int               nrMatched;
-} StructureValidationStack;
-
-typedef enum {
-    VALIDATION_READY,
-    VALIDATION_STARTED,
-    VALIDATION_FINISHED
-} ValidationState;
-
-typedef struct 
-{
-    char *start;
-    char *startNamespace;
-    Tcl_HashTable element;
-    Tcl_HashTable namespace;
-    Tcl_HashEntry *emptyNamespace;
-    Tcl_HashTable pattern;
-    StructureCP **patternList;
-    unsigned int numPatternList;
-    unsigned int patternListSize;
-    unsigned int forwardPatternDefs;
-    StructureQuant **quants;
-    unsigned int numQuants;
-    unsigned int quantsSize;
-    char *currentNamespace;
-    char *currentAttributeNamespace;
-    int   isAttribute;
-    StructureCP **currentContent;
-    StructureQuant **currentQuants;
-    unsigned int numChildren;
-    unsigned int contentSize;
-    StructureValidationStack **stack;
-    int                        stackSize;
-    int                        stackPtr;
-    ValidationState            validationState;
-    StructureValidationStack **stackList;
-    unsigned int numStackList;
-    unsigned int stackListSize;
-    unsigned int numStackAllocated;
-} StructureData;
 
 #ifndef TCL_THREADS
   static StructureData *activeStructureData = 0;
@@ -467,7 +391,7 @@ pushToStack (
     stackElm->deep = deep;
 }
 
-static int
+int
 probeElement (
     Tcl_Interp *interp,
     StructureData *sdata,
@@ -566,7 +490,7 @@ probeElement (
     return TCL_ERROR;
 }
 
-static int
+int
 probeElementEnd (
     Tcl_Interp * interp,
     StructureData *sdata
@@ -637,7 +561,7 @@ probeElementEnd (
     return TCL_OK;
 }
 
-static int 
+int 
 structureInstanceCmd (
     ClientData clientData,
     Tcl_Interp *interp,

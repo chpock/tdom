@@ -151,6 +151,7 @@ typedef struct _domReadInfo {
     int               baseURIstackPos;
     domActiveBaseURI *baseURIstack;
     int               insideDTD;
+    StructureData    *sdata;
     int               status;
 
 } domReadInfo;
@@ -1378,6 +1379,15 @@ elemNSfound:
         }
     }
 
+    if (info->sdata) {
+        if (probeElement (info->interp, info->sdata, node->nodeName,
+                          node->namespace ?
+                          info->document->namespaces[node->namespace-1] : NULL)
+            != TCL_OK) {
+            XML_StopParser(info->parser, 0);
+        }
+    }
+
     info->depth++;
 }
 
@@ -1414,6 +1424,12 @@ endElement (
     if (info->depth) {
         if (info->baseURIstack[info->baseURIstackPos].depth == info->depth) {
             info->baseURIstackPos--;
+        }
+    }
+
+    if (info->sdata) {
+        if (probeElementEnd (info->interp, info->sdata) != TCL_OK) {
+            XML_StopParser(info->parser, 0);
         }
     }
 }
@@ -2093,6 +2109,7 @@ domReadDocument (
     Tcl_Obj    *extResolver,
     int         useForeignDTD,
     int         paramEntityParsing,
+    StructureData *sdata,
     Tcl_Interp *interp,
     int        *resultcode
 )
@@ -2139,7 +2156,8 @@ domReadDocument (
         MALLOC (sizeof(domActiveBaseURI) * info.baseURIstackSize);
     info.insideDTD            = 0;
     info.status               = 0;
-
+    info.sdata                = sdata;
+    
     XML_SetUserData(parser, &info);
     XML_SetBase (parser, baseurl);
     /* We must use XML_GetBase(), because XML_SetBase copies the baseURI,
@@ -5129,6 +5147,7 @@ typedef struct _tdomCmdReadInfo {
     int               baseURIstackPos;
     domActiveBaseURI *baseURIstack;
     int               insideDTD;
+    StructureData    *sdata;
     /* Now the tdom cmd specific elements */
     int               tdomStatus;
     Tcl_Obj          *extResolver;
@@ -5340,6 +5359,7 @@ TclTdomObjCmd (dummy, interp, objc, objv)
         info->insideDTD         = 0;
         info->tdomStatus        = 0;
         info->extResolver       = NULL;
+        info->sdata             = NULL;
 
         handlerSet->userData    = info;
 

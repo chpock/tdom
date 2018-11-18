@@ -266,6 +266,47 @@ test structure-4.1 {validation} {
     if {[grammar state] ne "FINISHED"} {
         error "Wrong state."
     }
+    grammar delete
 } {}
 
-    
+test structure-5.1 {dom parse -validateCmd} {
+    set result [catch {
+        [dom parse -validateCmd tdom::structure <doc/>]
+    }]
+} 1
+
+test structure-5.2 {dom parse -validateCmd} {
+    tdom::structure create grammar
+    grammar element doc {
+        element e1
+        element e2 *
+    }
+    foreach e {e1 e2} {
+        grammar element $e {}
+    }
+    dom parse -validateCmd grammar {
+        <doc><e1/></doc>
+    } doc
+    if {[grammar state] ne "FINISHED"} {
+        error "Wrong state."
+    }
+    $doc delete
+    grammar reset
+    dom parse -validateCmd grammar {
+        <doc><e1/><e2/></doc>
+    } doc
+    if {[grammar state] ne "FINISHED"} {
+        error "Wrong state."
+    }
+    $doc delete
+    grammar reset
+    dom parse -validateCmd grammar {
+        <doc><e1/><e2/><e2/><e2/></doc>
+    } doc
+    if {[grammar state] ne "FINISHED"} {
+        error "Wrong state."
+    }
+    $doc delete
+    grammar delete
+} {}
+

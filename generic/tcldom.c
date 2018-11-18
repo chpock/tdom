@@ -51,6 +51,7 @@
 #include <domhtml5.h>
 #include <nodecmd.h>
 #include <tcldom.h>
+#include <structure.h>
 #include <versionhash.h>
 
 /* #define DEBUG */
@@ -1240,6 +1241,7 @@ int tcldom_appendXML (
                           extResolver,
                           0,
                           (int) XML_PARAM_ENTITY_PARSING_ALWAYS,
+                          NULL,
                           interp,
                           &resultcode);
     if (extResolver) {
@@ -6162,6 +6164,7 @@ int tcldom_parse (
     XML_Parser   parser;
     Tcl_Channel  chan = (Tcl_Channel) NULL;
     Tcl_CmdInfo  cmdInfo;
+    StructureData *sdata = NULL;
 
     static const char *parseOptions[] = {
         "-keepEmpties",           "-simple",        "-html",
@@ -6172,7 +6175,7 @@ int tcldom_parse (
         "-html5",
 #endif
         "-jsonmaxnesting",        "-ignorexmlns",   "--",
-        "-keepCDATA",                NULL
+        "-keepCDATA",             "-validateCmd",   NULL
     };
     enum parseOption {
         o_keepEmpties,            o_simple,         o_html,
@@ -6183,7 +6186,7 @@ int tcldom_parse (
         o_htmlfive,
 #endif
         o_jsonmaxnesting,         o_ignorexmlns,    o_LAST,
-        o_keepCDATA
+        o_keepCDATA,              o_validateCmd
     };
 
     static const char *paramEntityParsingValues[] = {
@@ -6412,8 +6415,30 @@ int tcldom_parse (
             
         case o_keepCDATA:
             keepCDATA = 1;
-            objv++;  objc--; break;
+            objv++;  objc--; continue;
             
+        case o_validateCmd:
+            objv++; objc--;
+            if (objc < 2) {
+                SetResult("The \"dom parse\" option \"-validateCmd\" "
+                          "requires a tDOM validation command as argument.");
+                return TCL_ERROR;
+            }
+            if (!Tcl_GetCommandInfo(interp, Tcl_GetString(objv[1]),
+                                    &cmdInfo)) {
+                SetResult3("The \"-validateCmd\" argument \"",
+                           Tcl_GetString(objv[1]),
+                           "\" is not a tDOM validation command.");
+                return TCL_ERROR;
+            }
+            if (cmdInfo.objProc != structureInstanceCmd) {
+                SetResult3("The \"-validateCmd\" argument \"",
+                           Tcl_GetString(objv[1]),
+                           "\" is not a tDOM validation command.");
+                return TCL_ERROR;
+            }
+            sdata = (StructureData *) cmdInfo.objClientData;
+            objv++;  objc--; continue;
         }
         if ((enum parseOption) optionIndex == o_LAST) break;
     }
@@ -6572,6 +6597,7 @@ int tcldom_parse (
                           extResolver,
                           useForeignDTD,
                           paramEntityParsing,
+                          sdata,
                           interp,
                           &status);
     if (doc == NULL) {
