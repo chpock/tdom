@@ -21,6 +21,8 @@
 |
 \---------------------------------------------------------------------------*/
 
+#ifndef TDOM_NO_STRUCTURE
+
 #include <tdom.h>
 #include <structure.h>
 
@@ -492,7 +494,7 @@ probeElement (
 
 int
 probeElementEnd (
-    Tcl_Interp * interp,
+    Tcl_Interp *interp,
     StructureData *sdata
     )
 {
@@ -560,6 +562,26 @@ probeElementEnd (
     sdata->stackPtr = thisStackPtr + 1;
     return TCL_OK;
 }
+
+int
+probeText (
+    Tcl_Interp *interp,
+    StructureData *sdata,
+    char *text
+    )
+{
+    if (sdata->validationState == VALIDATION_FINISHED) {
+        SetResult ("Validation finished.");
+        return TCL_ERROR;
+    }
+    if (sdata->validationState == VALIDATION_READY) {
+        SetResult ("No validation started");
+        return TCL_ERROR;
+    }
+
+    return TCL_OK;
+}
+
 
 int 
 structureInstanceCmd (
@@ -763,6 +785,7 @@ structureInstanceCmd (
                 Tcl_WrongNumArgs (interp, 3, objv, "<text>");
                 return TCL_ERROR;
             }
+            result = probeText (interp, sdata, Tcl_GetString (objv[3]));
             break;
         }
         break;
@@ -1266,3 +1289,5 @@ tDOM_StructureInit (
     Tcl_CreateObjCommand (interp, "tdom::structure::text",
                           TextPatternObjCmd, NULL, NULL);
 }
+
+#endif

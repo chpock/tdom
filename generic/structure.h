@@ -146,4 +146,12 @@ probeElementEnd (
     StructureData *sdata
     );
 
+int
+probeText (
+    Tcl_Interp *interp,
+    StructureData *sdata,
+    char *text
+    );
+
+
 #endif 

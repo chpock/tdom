@@ -51,7 +51,9 @@
 #include <domhtml5.h>
 #include <nodecmd.h>
 #include <tcldom.h>
-#include <structure.h>
+#ifndef TDOM_NO_STRUCTURE
+# include <structure.h>
+#endif
 #include <versionhash.h>
 
 /* #define DEBUG */
@@ -1241,7 +1243,9 @@ int tcldom_appendXML (
                           extResolver,
                           0,
                           (int) XML_PARAM_ENTITY_PARSING_ALWAYS,
+#ifndef TDOM_NO_STRUCTURE
                           NULL,
+#endif
                           interp,
                           &resultcode);
     if (extResolver) {
@@ -6164,8 +6168,9 @@ int tcldom_parse (
     XML_Parser   parser;
     Tcl_Channel  chan = (Tcl_Channel) NULL;
     Tcl_CmdInfo  cmdInfo;
+#ifndef TDOM_NO_STRUCTURE
     StructureData *sdata = NULL;
-
+#endif
     static const char *parseOptions[] = {
         "-keepEmpties",           "-simple",        "-html",
         "-feedbackAfter",         "-channel",       "-baseurl",
@@ -6174,8 +6179,11 @@ int tcldom_parse (
 #ifdef TDOM_HAVE_GUMBO
         "-html5",
 #endif
+#ifndef TDOM_NO_STRUCTURE
+        "-validateCmd",
+#endif
         "-jsonmaxnesting",        "-ignorexmlns",   "--",
-        "-keepCDATA",             "-validateCmd",   NULL
+        "-keepCDATA",             NULL
     };
     enum parseOption {
         o_keepEmpties,            o_simple,         o_html,
@@ -6185,8 +6193,11 @@ int tcldom_parse (
 #ifdef TDOM_HAVE_GUMBO
         o_htmlfive,
 #endif
+#ifndef TDOM_NO_STRUCTURE
+        o_validateCmd,
+#endif
         o_jsonmaxnesting,         o_ignorexmlns,    o_LAST,
-        o_keepCDATA,              o_validateCmd
+        o_keepCDATA
     };
 
     static const char *paramEntityParsingValues[] = {
@@ -6417,6 +6428,7 @@ int tcldom_parse (
             keepCDATA = 1;
             objv++;  objc--; continue;
             
+#ifndef TDOM_NO_STRUCTURE
         case o_validateCmd:
             objv++; objc--;
             if (objc < 2) {
@@ -6439,6 +6451,7 @@ int tcldom_parse (
             }
             sdata = (StructureData *) cmdInfo.objClientData;
             objv++;  objc--; continue;
+#endif
         }
         if ((enum parseOption) optionIndex == o_LAST) break;
     }
@@ -6597,7 +6610,9 @@ int tcldom_parse (
                           extResolver,
                           useForeignDTD,
                           paramEntityParsing,
+#ifndef TDOM_NO_STRUCTURE
                           sdata,
+#endif
                           interp,
                           &status);
     if (doc == NULL) {

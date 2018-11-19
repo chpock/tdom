@@ -285,7 +285,7 @@ test structure-5.2 {dom parse -validateCmd} {
         grammar element $e {}
     }
     dom parse -validateCmd grammar {
-        <doc><e1/></doc>
+        <doc><e2/></doc>
     } doc
     if {[grammar state] ne "FINISHED"} {
         error "Wrong state."
