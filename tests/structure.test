@@ -285,7 +285,7 @@ test structure-5.2 {dom parse -validateCmd} {
         grammar element $e {}
     }
     dom parse -validateCmd grammar {
-        <doc><e2/></doc>
+        <doc><e1/></doc>
     } doc
     if {[grammar state] ne "FINISHED"} {
         error "Wrong state."
@@ -310,3 +310,25 @@ test structure-5.2 {dom parse -validateCmd} {
     grammar delete
 } {}
 
+proc structure-5.3 {base systemId publicId} {
+    return [list "string" "" "<foo/>"]
+}
+
+test structure-5.3 {dom parse -validateCmd} {
+    tdom::structure create grammar
+    grammar element doc {
+        element e1
+        element e2 *
+    }
+    foreach e {e1 e2} {
+        grammar element $e {}
+    }
+    set result [catch {dom parse -validateCmd grammar \
+                           -externalentitycommand structure-5.3 {
+                               <!DOCTYPE doc [
+                                              <!ENTITY e1 PUBLIC "e1" "e1.xml">
+                                             ]>
+                                   <doc>&e1;</doc>} doc} errMsg]
+    grammar delete
+    set result
+} 1
