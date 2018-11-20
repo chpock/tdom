@@ -24,6 +24,9 @@
 #ifndef TDOM_NO_PULL
 
 #include <tdom.h>
+#ifndef TDOM_NO_STRUCTURE
+# include <structure.h>
+#endif
 #include <fcntl.h>
 #ifdef _MSC_VER
 #include <io.h>
@@ -101,10 +104,15 @@ typedef struct tDOM_PullParserInfo
 #ifdef EXPAT_RESUME_BUG
     long            elmStartCounter;
 #endif
+#ifndef TDOM_NO_STRUCTURE
+    StructureData    *sdata;
+#endif
 } tDOM_PullParserInfo;
 
 #define SetResult(str) Tcl_ResetResult(interp); \
                      Tcl_SetStringObj(Tcl_GetObjResult(interp), (str), -1)
+#define SetResult3(str1,str2,str3) Tcl_ResetResult(interp);     \
+                     Tcl_AppendResult(interp, (str1), (str2), (str3), NULL)
 
 DBG(
 static void
@@ -148,6 +156,33 @@ characterDataHandler (
     DBG(fprintf(stderr, "cdata handler called\n"));
     Tcl_DStringAppend (pullInfo->cdata, s, len);    
 }
+
+#ifndef TDOM_NO_STRUCTURE
+static int
+isValid (
+    Tcl_Interp *interp,
+    tDOM_PullParserInfo pullInfo
+    )
+{
+    int result 1
+    if (pullInfo->sdata) {
+        if (pullInfo->state == PULLPARSERSTATE_START_TAG) {
+            result = probeElement (interp, pullInfo->sdata,
+                                    Tcl_GetString(pullInfo->currentElm),
+                                    NULL);
+        } else if (pullInfo->state == PULLPARSERSTATE_TEXT) {
+            result = probeText (interp, pullInfo->sdata,
+                                Tcl_DStringValue (pullInfo->cdata));
+        } else if (pullInfo->state == PULLPARSERSTATE_END_TAG) {
+            result = probeElement (interp, pullInfo->sdata);
+        }
+        if (result != TCL_OK) {
+            XML_StopParser(pullInfo->parser, 0);
+            return 0;
+        }
+    }
+}
+#endif
 
 static void
 endElement (
@@ -235,6 +270,8 @@ endElement (
         Tcl_SetHashValue (h, pullInfo->currentElm);
     }
     pullInfo->currentElm = (Tcl_Obj *) Tcl_GetHashValue(h);
+#ifndef TDOM_NO_STRUCTURE
+#endif    
     XML_StopParser(pullInfo->parser, 1);
 }
 
@@ -887,21 +924,33 @@ tDOM_PullParserCmd (
 {
     tDOM_PullParserInfo *pullInfo;
     int flagIndex, ignoreWhiteSpaces = 0;
+    Tcl_Obj *cmdNameObj;
+#ifndef TDOM_NO_STRUCTURE
+    Tcl_CmdInfo  cmdInfo;
+    StructureData *sdata = NULL;
+#endif
 
     static const char *const flags[] = {
+#ifndef TDOM_NO_STRUCTURE
+        "-validateCmd",
+#endif
         "-ignorewhitecdata", NULL
     };
     
     enum flag {
+#ifndef TDOM_NO_STRUCTURE
+        f_validateCmd,
+#endif
         f_ignoreWhiteSpaces
     };
 
-    if (objc < 2 || objc > 3) {
-        Tcl_WrongNumArgs (interp, 1, objv, "cmdName ?-ignorewhitecdata?");
+    if (objc < 2 || objc > 5) {
+        Tcl_WrongNumArgs (interp, 1, objv, "cmdName ?-ignorewhitecdata? "
+                          "?-validateCmd cmdName?");
         return TCL_ERROR;
     }
-
-    if (objc == 3) {
+    cmdNameObj = objv[1];
+    while (objc > 2) {
         if (Tcl_GetIndexFromObj (interp, objv[2], flags, "flag", 0,
                                  &flagIndex) != TCL_OK) {
             return TCL_ERROR;
@@ -909,7 +958,31 @@ tDOM_PullParserCmd (
         switch ((enum flag) flagIndex) {
         case f_ignoreWhiteSpaces:
             ignoreWhiteSpaces = 1;
-            break;
+            objv++;  objc--; continue;
+#ifndef TDOM_NO_STRUCTURE
+        case f_validateCmd:
+            objv++; objc--;
+            if (objc < 3) {
+                SetResult("The \"dom parse\" option \"-validateCmd\" "
+                          "requires a tDOM validation command as argument.");
+                return TCL_ERROR;
+            }
+            if (!Tcl_GetCommandInfo(interp, Tcl_GetString(objv[2]),
+                                    &cmdInfo)) {
+                SetResult3("The \"-validateCmd\" argument \"",
+                           Tcl_GetString(objv[2]),
+                           "\" is not a tDOM validation command.");
+                return TCL_ERROR;
+            }
+            if (cmdInfo.objProc != structureInstanceCmd) {
+                SetResult3("The \"-validateCmd\" argument \"",
+                           Tcl_GetString(objv[2]),
+                           "\" is not a tDOM validation command.");
+                return TCL_ERROR;
+            }
+            sdata = (StructureData *) cmdInfo.objClientData;
+            objv++;  objc--; continue;
+#endif
         }
     }
     
@@ -936,8 +1009,11 @@ tDOM_PullParserCmd (
 #ifdef EXPAT_RESUME_BUG
     pullInfo->elmStartCounter = 0;
 #endif
+#ifndef TDOM_NO_STRUCTURE
+    pullInfo->sdata = sdata;
+#endif
     
-    Tcl_CreateObjCommand (interp, Tcl_GetString(objv[1]),
+    Tcl_CreateObjCommand (interp, Tcl_GetString(cmdNameObj),
                           tDOM_PullParserInstanceCmd, (ClientData) pullInfo,
                           tDOM_PullParserDeleteCmd);
     Tcl_SetObjResult(interp, objv[1]);
