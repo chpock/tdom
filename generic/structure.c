@@ -1290,4 +1290,46 @@ tDOM_StructureInit (
                           TextPatternObjCmd, NULL, NULL);
 }
 
-#endif
+# else  /* #ifndef TDOM_NO_STRUCTURE */
+int 
+structureInstanceCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    return TCL_OK;
+}
+
+int
+probeElement (
+    Tcl_Interp *interp,
+    StructureData *sdata,
+    char *name,
+    void *namespace
+    )
+{
+    return TCL_OK;
+}
+
+int
+probeElementEnd (
+    Tcl_Interp * interp,
+    StructureData *sdata
+    )
+{
+    return TCL_OK;
+}
+
+int
+probeText (
+    Tcl_Interp *interp,
+    StructureData *sdata,
+    char *text
+    )
+{
+    return TCL_OK;
+}
+
+#endif  /* #ifndef TDOM_NO_STRUCTURE */

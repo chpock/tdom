@@ -51,9 +51,7 @@
 #include <domhtml5.h>
 #include <nodecmd.h>
 #include <tcldom.h>
-#ifndef TDOM_NO_STRUCTURE
-# include <structure.h>
-#endif
+#include <structure.h>
 #include <versionhash.h>
 
 /* #define DEBUG */
@@ -1243,9 +1241,7 @@ int tcldom_appendXML (
                           extResolver,
                           0,
                           (int) XML_PARAM_ENTITY_PARSING_ALWAYS,
-#ifndef TDOM_NO_STRUCTURE
                           NULL,
-#endif
                           interp,
                           &resultcode);
     if (extResolver) {
@@ -6168,9 +6164,7 @@ int tcldom_parse (
     XML_Parser   parser;
     Tcl_Channel  chan = (Tcl_Channel) NULL;
     Tcl_CmdInfo  cmdInfo;
-#ifndef TDOM_NO_STRUCTURE
     StructureData *sdata = NULL;
-#endif
     static const char *parseOptions[] = {
         "-keepEmpties",           "-simple",        "-html",
         "-feedbackAfter",         "-channel",       "-baseurl",
@@ -6610,9 +6604,7 @@ int tcldom_parse (
                           extResolver,
                           useForeignDTD,
                           paramEntityParsing,
-#ifndef TDOM_NO_STRUCTURE
                           sdata,
-#endif
                           interp,
                           &status);
     if (doc == NULL) {

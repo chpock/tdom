@@ -39,6 +39,7 @@
 #include <dom.h>
 #include <tclexpat.h>
 #include <fcntl.h>
+#include <structure.h>
 
 #ifdef _MSC_VER
 #include <io.h>
@@ -86,6 +87,8 @@
                          expat->firstTclHandlerSet = activeTclHandlerSet; \
                          activeTclHandlerSet->nextHandlerSet = tmpTclHandlerSet; \
                       }
+#define SetResult3(str1,str2,str3) Tcl_ResetResult(interp);     \
+                     Tcl_AppendResult(interp, (str1), (str2), (str3), NULL)
 
 /*----------------------------------------------------------------------------
 |   typedefs
@@ -1121,6 +1124,9 @@ TclExpatConfigure (
     "-ignorewhitespace",
     "-handlerset",
     "-noexpand",
+#ifndef TDOM_NO_STRUCTURE
+    "-validateCmd",
+#endif
     (char *) NULL
   };
   enum switches {
@@ -1145,6 +1151,9 @@ TclExpatConfigure (
     EXPAT_NOWHITESPACE,
     EXPAT_HANDLERSET,
     EXPAT_NOEXPAND
+#ifndef TDOM_NO_STRUCTURE
+    ,EXPAT_VALIDATECMD
+#endif
   };
   static const char *paramEntityParsingValues[] = {
       "always",
@@ -1550,6 +1559,22 @@ TclExpatConfigure (
         expat->noexpand = bool;
         break;
 
+#ifndef TDOM_NO_STRUCTURE
+    case EXPAT_VALIDATECMD:
+        if (!Tcl_GetCommandInfo(interp, Tcl_GetString(objv[1]), &cmdInfo)) {
+            SetResult3("The \"-validateCmd\" argument \"",
+                       Tcl_GetString(objv[1]),
+                       "\" is not a tDOM validation command.");
+            return TCL_ERROR;
+        }
+        if (cmdInfo.objProc != structureInstanceCmd) {
+            SetResult3("The \"-validateCmd\" argument \"",
+                       Tcl_GetString(objv[1]),
+                       "\" is not a tDOM validation command.");
+            return TCL_ERROR;
+        }
+        expat->sdata = (StructureData *) cmdInfo.objClientData;
+#endif
     }
 
     objPtr += 2;

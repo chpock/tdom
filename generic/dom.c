@@ -151,9 +151,7 @@ typedef struct _domReadInfo {
     int               baseURIstackPos;
     domActiveBaseURI *baseURIstack;
     int               insideDTD;
-#ifndef TDOM_NO_STRUCTURE
     StructureData    *sdata;
-#endif
     int               status;
 
 } domReadInfo;
@@ -1380,7 +1378,6 @@ elemNSfound:
             }
         }
     }
-#ifndef TDOM_NO_STRUCTURE
     if (info->sdata) {
         if (probeElement (info->interp, info->sdata, node->nodeName,
                           node->namespace ?
@@ -1389,7 +1386,6 @@ elemNSfound:
             XML_StopParser(info->parser, 0);
         }
     }
-#endif
     info->depth++;
 }
 
@@ -1428,13 +1424,11 @@ endElement (
             info->baseURIstackPos--;
         }
     }
-#ifndef TDOM_NO_STRUCTURE
     if (info->sdata) {
         if (probeElementEnd (info->interp, info->sdata) != TCL_OK) {
             XML_StopParser(info->parser, 0);
         }
     }
-#endif
 }
 
 /*---------------------------------------------------------------------------
@@ -2112,9 +2106,7 @@ domReadDocument (
     Tcl_Obj    *extResolver,
     int         useForeignDTD,
     int         paramEntityParsing,
-#ifndef TDOM_NO_STRUCTURE
     StructureData *sdata,
-#endif
     Tcl_Interp *interp,
     int        *resultcode
 )
@@ -2161,9 +2153,7 @@ domReadDocument (
         MALLOC (sizeof(domActiveBaseURI) * info.baseURIstackSize);
     info.insideDTD            = 0;
     info.status               = 0;
-#ifndef TDOM_NO_STRUCTURE
     info.sdata                = sdata;
-#endif
     
     XML_SetUserData(parser, &info);
     XML_SetBase (parser, baseurl);
@@ -5154,9 +5144,7 @@ typedef struct _tdomCmdReadInfo {
     int               baseURIstackPos;
     domActiveBaseURI *baseURIstack;
     int               insideDTD;
-#ifndef TDOM_NO_STRUCTURE
     StructureData    *sdata;
-#endif
     /* Now the tdom cmd specific elements */
     int               tdomStatus;
     Tcl_Obj          *extResolver;
@@ -5368,9 +5356,7 @@ TclTdomObjCmd (dummy, interp, objc, objv)
         info->insideDTD         = 0;
         info->tdomStatus        = 0;
         info->extResolver       = NULL;
-#ifndef TDOM_NO_STRUCTURE
         info->sdata             = NULL;
-#endif
         handlerSet->userData    = info;
 
         CHandlerSetInstall (interp, objv[1], handlerSet);
