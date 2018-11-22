@@ -332,3 +332,20 @@ test structure-5.3 {dom parse -validateCmd} {
     grammar delete
     set result
 } 1
+
+test structure-6.1 {expat parser with -validateCmd} {
+    tdom::structure create grammar
+    grammar element doc {
+        element e1
+        element e2 *
+    }
+    foreach e {e1 e2} {
+        grammar element $e {}
+    }
+    ::xml::parser p -validateCmd grammar
+    set result [catch {p parse {<doc><e2/></doc>}} errMsg]
+    p delete
+    grammar delete
+    set result
+} 1
+

@@ -397,7 +397,7 @@ int
 probeElement (
     Tcl_Interp *interp,
     StructureData *sdata,
-    char *name,
+    const char *name,
     void *namespace
     ) 
 {
@@ -1006,7 +1006,7 @@ getQuant (
 }
 
 /* Implements the grammar definition commands "empty" and "any" */
-int
+static int
 EmptyAnyPatternObjCmd (
     ClientData clientData,
     Tcl_Interp *interp,
@@ -1075,7 +1075,7 @@ evalDefinition (
 }
 
 /* Implements the grammar definition commands "element" and "ref" */
-int
+static int
 NamedPatternObjCmd (
     ClientData clientData,
     Tcl_Interp *interp,
@@ -1157,7 +1157,7 @@ NamedPatternObjCmd (
 
 /* Implements the grammar definition commands "choice", "group",
  * "interleave" and "mixed" */
-int
+static int
 AnonPatternObjCmd (
     ClientData clientData,
     Tcl_Interp *interp,
@@ -1183,7 +1183,7 @@ AnonPatternObjCmd (
                            pattern, quant);
 }
 
-int
+static int
 AttributePatternObjCmd (
     ClientData clientData,
     Tcl_Interp *interp,
@@ -1195,7 +1195,7 @@ AttributePatternObjCmd (
     return TCL_OK;
 }
 
-int
+static int
 NamespacePatternObjCmd (
     ClientData clientData,
     Tcl_Interp *interp,
@@ -1225,7 +1225,7 @@ NamespacePatternObjCmd (
     return result;
 }
 
-int
+static int
 TextPatternObjCmd (
     ClientData clientData,
     Tcl_Interp *interp,

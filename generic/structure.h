@@ -136,7 +136,7 @@ int
 probeElement (
     Tcl_Interp *interp,
     StructureData *sdata,
-    char *name,
+    const char *name,
     void *namespace
     );
 

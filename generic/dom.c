@@ -1578,6 +1578,11 @@ DispatchPCDATA (
             lc->column       = XML_GetCurrentColumnNumber(info->parser);
         }
     }
+    if (info->sdata) {
+        if (probeText (info->interp, info->sdata, s) != TCL_OK) {
+            XML_StopParser(info->parser, 0);
+        }
+    }
     Tcl_DStringSetLength (info->cdata, 0);
 }
 

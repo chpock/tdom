@@ -2279,6 +2279,11 @@ TclGenExpatElementStartHandler(
       activeCHandlerSet = activeCHandlerSet->nextHandlerSet;
   }
 
+  if (expat->sdata) {
+      if (probeElement (expat->interp, expat->sdata, name, NULL) != TCL_OK) {
+          TclExpatHandlerResult (expat, NULL, TCL_ERROR);
+      }
+  }
   return;
 }
 
@@ -2399,6 +2404,11 @@ TclGenExpatElementEndHandler(
       activeCHandlerSet = activeCHandlerSet->nextHandlerSet;
   }
 
+  if (expat->sdata) {
+      if (probeElementEnd (expat->interp, expat->sdata) != TCL_OK) {
+          TclExpatHandlerResult (expat, NULL, TCL_ERROR);
+      }
+  }
   return;
 }
 
@@ -2754,6 +2764,12 @@ TclExpatDispatchPCDATA(
           }
       }
       activeCHandlerSet = activeCHandlerSet->nextHandlerSet;
+  }
+  
+  if (expat->sdata) {
+      if (probeText (expat->interp, expat->sdata, s) != TCL_OK) {
+          TclExpatHandlerResult (expat, NULL, TCL_ERROR);
+      }
   }
   Tcl_DecrRefCount (expat->cdata);
   expat->cdata = NULL;
