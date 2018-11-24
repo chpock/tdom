@@ -37,7 +37,7 @@ typedef enum {
 } Structure_CP_Type;
 
 typedef enum {
-  STRUCTURE_CQUANT_NONE,
+  STRUCTURE_CQUANT_ONE,
   STRUCTURE_CQUANT_OPT,
   STRUCTURE_CQUANT_REP,
   STRUCTURE_CQUANT_PLUS,
@@ -45,14 +45,16 @@ typedef enum {
   STRUCTURE_CQUANT_NM
 } Structure_Content_Quant;
 
-typedef unsigned int StructureFlags;
+typedef unsigned int QuantFlags;
 
 typedef struct
 {
-    Structure_Content_Quant  quant;
+    Structure_Content_Quant  type;
     int                      minOccur;
     int                      maxOccur;
 }  StructureQuant;
+
+typedef unsigned int StructureFlags;
 
 typedef struct StructureCP
 {
@@ -70,9 +72,11 @@ typedef struct StructureValidationStack
 {
     StructureCP *pattern;
     struct StructureValidationStack *next;
+    struct StructureValidationStack *down;
     int               activeChild;
     int               deep;
     int               nrMatched;
+    unsigned int      stacklistWatermark;
 } StructureValidationStack;
 
 typedef enum {

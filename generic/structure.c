@@ -77,7 +77,16 @@ static char *Structure_CP_Type2str[] = {
     "GROUP",
     "TEXT"
 };
+static char *Structure_Quant_Type2str[] = {
+    "ONE",
+    "OPT",
+    "REP",
+    "PLUS",
+    "N",
+    "NM"
+};
 #endif
+
 
 /* The StructureFlags flags */
 #define FORWARD_PATTERN_DEF     1
@@ -85,8 +94,8 @@ static char *Structure_CP_Type2str[] = {
 #define AMBIGUOUS_PATTERN       4
 
 /* Pointer to heap-allocated shared quants. */
-static StructureQuant QuantNone;
-static StructureQuant *quantNone = &QuantNone;
+static StructureQuant QuantOne;
+static StructureQuant *quantOne = &QuantOne;
 
 static StructureQuant QuantOpt;
 static StructureQuant *quantOpt = &QuantOpt;
@@ -200,6 +209,7 @@ static void serializeCP (
              Structure_CP_Type2str[pattern->type]);
     switch (pattern->type) {
     case STRUCTURE_CTYPE_NAME:
+    case STRUCTURE_CTYPE_PATTERN:
     case STRUCTURE_CTYPE_GROUP:
         fprintf (stderr, "\tName: '%s' Namespace: '%s'\n",
                  pattern->name,pattern->namespace);
@@ -217,11 +227,37 @@ static void serializeCP (
         break;
     case STRUCTURE_CTYPE_EMPTY:
     case STRUCTURE_CTYPE_ANY:
+    case STRUCTURE_CTYPE_TEXT:
         /* Do nothing */
         break;
     }
 }
+
+static void serializeQuant (
+    StructureQuant *quant
+    )
+{
+    fprintf (stderr, "Quant type: %s n: %d m: %d\n",
+             Structure_Quant_Type2str[quant->type], quant->minOccur, quant->maxOccur);
+}
+
+static void serializeStack (
+    StructureData *sdata
+    ) 
+{
+    int i = sdata->stackPtr-1;
+
+    fprintf (stderr, "++++ Current validation stack (size %d):\n", i+1);
+    while (i >= 0) {
+        serializeCP (sdata->stack[i]->pattern);
+        fprintf (stderr, "ac: %d nm: %d\n",
+                 sdata->stack[1]->activeChild, sdata->stack[i]->nrMatched);
+        i--;
+    }
+    fprintf (stderr, "++++ Stack bottom\n");
+}
 )
+/* DBG end */
 
 static void freeStructureCP (
     StructureCP *pattern
@@ -274,14 +310,13 @@ static void structureInstanceDelete (
 {
     StructureData *sdata = (StructureData *) clientData;
     unsigned int i;
-    
+
     if (sdata->start) FREE (sdata->start);
     if (sdata->startNamespace) FREE (sdata->startNamespace);
     Tcl_DeleteHashTable (&sdata->namespace);
     Tcl_DeleteHashTable (&sdata->element);
     Tcl_DeleteHashTable (&sdata->pattern);
     for (i = 0; i < sdata->numPatternList; i++) {
-        DBG(serializeCP (pattern));
         freeStructureCP (sdata->patternList[i]);
     }
     FREE (sdata->patternList);
@@ -384,13 +419,236 @@ pushToStack (
         stackElm = TMALLOC (StructureValidationStack);
         sdata->numStackAllocated++;
         sdata->stackList[sdata->numStackList] = stackElm;
-        sdata->numStackList++;
-        sdata->stack[sdata->stackPtr] = stackElm;
-        sdata->stackPtr++;
     }
+    sdata->numStackList++;
     memset (stackElm, 0, sizeof (StructureValidationStack));
     stackElm->pattern = pattern;
     stackElm->deep = deep;
+    sdata->stack[sdata->stackPtr] = stackElm;
+    sdata->stackPtr++;
+}
+
+#define maxOne(quant) \
+    ((quant) == quantOne || (quant) == quantOpt) ? 1 : 0
+
+#define minOne(quant) \
+    ((quant) == quantOne || (quant) == quantPlus) || ((quant->type == STRUCTURE_CQUANT_N || quant->type == STRUCTURE_CQUANT_NM) && (quant)->minOccur > 0)  ? 1 : 0
+
+#define mayMiss(quant) \
+    ((quant) == quantOpt || (quant) == quantRep) || (quant->type == STRUCTURE_CQUANT_NM && (quant)->minOccur == 0) ? 1 : 0
+
+#define mayRepead(quant) \
+    ((quant) == quantRep || (quant) == quantPlus) ? 1 : 0
+
+#define mustMatch(quant,nr) \
+    (nr) == 0 ? minOne(quant)                                              \
+        : (quant->type == STRUCTURE_CQUANT_N || quant->type == STRUCTURE_CQUANT_NM) && (quant->minOccur < (nr)) ? 1 : 0
+
+#define getContext(parent, ac, nm) \
+    parent = sdata->stack[sdata->stackPtr-1]->pattern;   \
+    ac = sdata->stack[sdata->stackPtr-1]->activeChild;   \
+    nm = sdata->stack[sdata->stackPtr-1]->nrMatched;
+
+
+static void
+updateStack (
+    StructureData *sdata,
+    int stackPtr,
+    int newac,
+    int newnm
+    )
+{
+    StructureCP *parent = sdata->stack[stackPtr-1]->pattern;
+    StructureQuant *quant =  parent->quants[newac];
+
+    switch (parent->type) {
+    case STRUCTURE_CTYPE_NAME:
+    case STRUCTURE_CTYPE_GROUP:
+    case STRUCTURE_CTYPE_PATTERN:
+        if (mayRepead(quant)) break;
+        if (maxOne(quant)) {
+            newac++;
+            newnm = 0;
+            break;
+        } else {
+            if (quant->type == STRUCTURE_CQUANT_N) {
+                if (quant->minOccur == newnm) {
+                    newac++;
+                    newnm = 0;
+                }
+            } else {
+                if (quant->maxOccur == newnm) {
+                    newac++;
+                    newnm = 0;
+                }
+            }
+        }
+        break;
+        
+    case STRUCTURE_CTYPE_TEXT:
+    case STRUCTURE_CTYPE_ANY:
+    case STRUCTURE_CTYPE_EMPTY:
+        /* Never pushed onto stack */
+        Tcl_Panic ("Invalid CTYPE onto the validation stack!");
+        return;
+
+    case STRUCTURE_CTYPE_INTERLEAVE:
+        fprintf (stderr, "matchNamePattern: STRUCTURE_CTYPE_INTERLEAVE to be implemented\n");
+        return;
+
+    case STRUCTURE_CTYPE_MIXED:
+    case STRUCTURE_CTYPE_CHOICE:
+        break;
+    }
+    sdata->stack[sdata->stackPtr-1]->activeChild = newac;
+    sdata->stack[sdata->stackPtr-1]->nrMatched = newnm;
+}
+
+#define popStack(sdata) sdata->stackPtr--
+
+#define waterMark(sdata) sdata->stack[sdata->stackPtr-1]->stacklistWatermark = sdata->numStackList - 1
+#define restoreWaterMark(sdata) sdata->numStackList = sdata->stack[sdata->stackPtr-1]->stacklistWatermark
+
+static int
+matchNamePattern (
+    StructureData *sdata,
+    StructureCP *pattern,
+    int currentDeep
+    )
+{
+    StructureCP *parent, *candidate;
+    int nm, ac, savedStackPtr, rc, i;
+    int isName = 0;
+    
+    /* The caller must ensure pattern->type = STRUCTURE_CTYPE_NAME */
+
+    getContext (parent, ac, nm);
+
+    switch (parent->type) {
+    case STRUCTURE_CTYPE_NAME:
+        isName = 1;
+        /* fall through */
+    case STRUCTURE_CTYPE_GROUP:
+    case STRUCTURE_CTYPE_PATTERN:
+        while (ac < parent->numChildren) {
+            candidate = parent->content[ac];
+
+            switch (candidate->type) {
+            case STRUCTURE_CTYPE_EMPTY:
+                /* The empty pattern never match an element */
+                ac++;
+                nm = 0;
+                break;
+
+            case STRUCTURE_CTYPE_ANY:
+                updateStack (sdata, sdata->stackPtr, ac, nm+1);
+                return 1;
+                
+            case STRUCTURE_CTYPE_NAME:
+                if (candidate == pattern) {
+                    updateStack (sdata, sdata->stackPtr, ac, nm+1);
+                    pushToStack (sdata, candidate, currentDeep + 1);
+                    waterMark (sdata);
+                    return 1;
+                }
+                if (mustMatch (parent->quants[ac], nm)) return 0;
+                ac++;
+                nm = 0;
+                break;
+                
+            case STRUCTURE_CTYPE_TEXT:
+                if (mustMatch (parent->quants[ac], nm)) return 0;
+                ac++;
+                nm = 0;
+                break;
+                
+            case STRUCTURE_CTYPE_GROUP:
+            case STRUCTURE_CTYPE_PATTERN:
+            case STRUCTURE_CTYPE_MIXED:
+            case STRUCTURE_CTYPE_INTERLEAVE:
+            case STRUCTURE_CTYPE_CHOICE:
+                savedStackPtr = sdata->stackPtr;
+                pushToStack (sdata, candidate, currentDeep);
+                rc = matchNamePattern (sdata, pattern, currentDeep);
+                if (rc == 1) {
+                    /* Matched */
+                    updateStack (sdata, savedStackPtr, ac, nm+1);
+                    return 1;
+                }
+                popStack (sdata);
+                if (mustMatch (parent->quants[ac], nm)) return 0;
+                ac++;
+                nm = 0;
+                break;
+            }
+        }
+        if (isName) {
+            /* No match, but any remaining possible childs tested */
+            return 0;
+        } else {
+            /* No match, but also no explicit error */
+            return -1;
+        }
+        
+    case STRUCTURE_CTYPE_TEXT:
+    case STRUCTURE_CTYPE_ANY:
+    case STRUCTURE_CTYPE_EMPTY:
+        /* Never pushed onto stack */
+        Tcl_Panic ("Invalid CTYPE onto the validation stack!");
+        return 0;
+
+    case STRUCTURE_CTYPE_INTERLEAVE:
+        fprintf (stderr, "matchNamePattern: STRUCTURE_CTYPE_INTERLEAVE to be implemented\n");
+        return 0;
+
+    case STRUCTURE_CTYPE_MIXED:
+    case STRUCTURE_CTYPE_CHOICE:
+        for (i = 0; i < pattern->numChildren; i++) {
+            candidate = parent->content[ac];
+
+            switch (candidate->type) {
+            case STRUCTURE_CTYPE_EMPTY:
+                /* The empty pattern never match an element */
+                break;
+
+            case STRUCTURE_CTYPE_ANY:
+                return 1;
+                
+            case STRUCTURE_CTYPE_TEXT:
+                /* An elememt never match text. */
+                break;
+                
+            case STRUCTURE_CTYPE_NAME:
+                if (candidate == pattern) {
+                    updateStack (sdata, sdata->stackPtr, 0, nm+1);
+                    pushToStack (sdata, candidate, currentDeep + 1);
+                    return 1;
+                }
+                break;
+                
+            case STRUCTURE_CTYPE_GROUP:
+            case STRUCTURE_CTYPE_PATTERN:
+            case STRUCTURE_CTYPE_MIXED:
+            case STRUCTURE_CTYPE_INTERLEAVE:
+            case STRUCTURE_CTYPE_CHOICE:
+                savedStackPtr = sdata->stackPtr;
+                pushToStack (sdata, candidate, currentDeep);
+                rc = matchNamePattern (sdata, pattern, currentDeep);
+                if (rc == 1) {
+                    /* Matched */
+                    updateStack (sdata, savedStackPtr, 0, nm+1);
+                    return 1;
+                }
+                popStack (sdata);
+                break;
+            }
+            
+        }
+        /* No match, but the pattern may be optional or has already
+         * matched often enough. Check this on caller level. */
+        return -1;
+    }
+    return 0;
 }
 
 int
@@ -403,8 +661,8 @@ probeElement (
 {
     Tcl_HashEntry *entryPtr;
     void *namespacePtr;
-    StructureCP *pattern, *apattern;
-    StructureValidationStack *astackElm;
+    StructureCP *pattern;
+    int savedStackPtr, activeStack, currentDeep, rc;
 
     if (sdata->validationState == VALIDATION_FINISHED) {
         SetResult ("Validation finished.");
@@ -457,8 +715,7 @@ probeElement (
                     return TCL_ERROR;
                 }
             } else {
-                if (sdata->startNamespace &&
-                    strcmp((char*)namespace, sdata->startNamespace) != 0) {
+                if (sdata->startNamespace) {
                     SetResult ("Root element namespace doesn't match");
                     return TCL_ERROR;
                 }
@@ -470,26 +727,67 @@ probeElement (
     }
     
     /* The normal case: we're inside the tree */
-    astackElm = sdata->stack[sdata->stackPtr-1];
-    while (astackElm) {
-        apattern = astackElm->pattern;
-        while (1) {
-            if (astackElm->activeChild < apattern->numChildren) {
-                if (pattern == apattern->content[astackElm->activeChild]) {
-                    if (apattern->quants[astackElm->activeChild] == quantNone ||
-                        apattern->quants[astackElm->activeChild] == quantOpt) {
-                        astackElm->activeChild++;
-                    }
-                }
-                pushToStack (sdata, pattern, astackElm->deep + 1);
-                return TCL_OK;
-            }
+    savedStackPtr = sdata->stackPtr;
+    activeStack = savedStackPtr - 1;
+    currentDeep = sdata->stack[activeStack]->deep;
+    
+    while ((rc = matchNamePattern (sdata, pattern, currentDeep)) == -1) {
+        activeStack--;
+        if (activeStack < 0 || !sdata->stack[activeStack]->deep < currentDeep) {
             break;
         }
-        astackElm = astackElm->next;
+        sdata->stackPtr = activeStack + 1;
     }
-
+    if (rc == 1) {
+        return TCL_OK;
+    }
+    sdata->stackPtr = savedStackPtr;
+    SetResult ("Element doesn't match.");
     return TCL_ERROR;
+}
+
+static int checkElementEnd (
+    StructureData *sdata
+    )
+{
+    StructureCP *parent;
+    int nm, ac;
+    int isName = 0;
+    
+    getContext (parent, ac, nm);
+    
+    switch (parent->type) {
+    case STRUCTURE_CTYPE_NAME:
+        isName = 1;
+        /* fall through */
+    case STRUCTURE_CTYPE_GROUP:
+    case STRUCTURE_CTYPE_PATTERN:
+        while (ac < parent->numChildren) {
+            if (mustMatch (parent->quants[ac], nm)) {
+                return 0;
+            }
+            ac ++;
+            nm = 0;
+        }
+        if (isName) return 1;
+        else return -1;
+
+    case STRUCTURE_CTYPE_TEXT:
+    case STRUCTURE_CTYPE_ANY:
+    case STRUCTURE_CTYPE_EMPTY:
+        /* Never pushed onto stack */
+        Tcl_Panic ("Invalid CTYPE onto the validation stack!");
+        return 0;
+
+    case STRUCTURE_CTYPE_INTERLEAVE:
+        fprintf (stderr, "checkElementEnd: STRUCTURE_CTYPE_INTERLEAVE to be implemented\n");
+        return 0;
+        
+    case STRUCTURE_CTYPE_MIXED:
+    case STRUCTURE_CTYPE_CHOICE:
+        return -1;
+    }
+    return 0;
 }
 
 int
@@ -498,9 +796,7 @@ probeElementEnd (
     StructureData *sdata
     )
 {
-    StructureCP *apattern;
-    StructureValidationStack *astackElm, *thisstackElm;
-    int ac, thisStackPtr, i;
+    int activeStack, savedStackPtr, rc, currentDeep;
     
     if (sdata->validationState == VALIDATION_FINISHED) {
         SetResult ("Validation finished.");
@@ -510,56 +806,32 @@ probeElementEnd (
         SetResult ("No validation started");
         return TCL_ERROR;
     }
-    if (sdata->stackPtr < 1) {
-        SetResult ("Spurious element end event after tree validation "
-                   "has finished.");
+
+    savedStackPtr = sdata->stackPtr;
+    activeStack = savedStackPtr;
+    currentDeep = sdata->stack[activeStack-1]->deep;
+    while ((rc = checkElementEnd (sdata)) == -1) {
+        activeStack--;
+        if (activeStack < 1 || !sdata->stack[activeStack]->deep < currentDeep) {
+            break;
+        }
+        popStack(sdata);
+    }
+
+    if (rc != 1) {
+        sdata->stackPtr = savedStackPtr;
+        SetResult ("Missing mandatory elements\n");
         return TCL_ERROR;
     }
 
-    astackElm = sdata->stack[sdata->stackPtr-1];
-    while (astackElm) {
-        thisstackElm = astackElm;
-        thisStackPtr = sdata->stackPtr-1;
-        while (thisstackElm->deep == astackElm->deep) {
-            ac = thisstackElm->activeChild;
-            apattern = thisstackElm->pattern;
-            for (i = ac; i < apattern->numChildren; i++) {
-                if (apattern->quants[i] == quantOpt ||
-                    apattern->quants[i] == quantRep) {
-                    continue;
-                }
-                if (apattern->quants[i] == quantNone ||
-                    apattern->quants[i] == quantPlus) {
-                    SetResult ("Element can not end here (required "
-                               "element(s) missing)");
-                    return TCL_ERROR;
-                }
-                SetResult ("N and NM quantifier not implemented.");
-                return TCL_ERROR;
-            }
-            thisStackPtr--;
-            if (thisStackPtr < 1) {
-                break;
-            }
-            thisstackElm = sdata->stack[thisStackPtr];
-        }
-        astackElm = astackElm->next;
-    }
-    if (sdata->stackPtr == 1) {
+    restoreWaterMark(sdata);
+    popStack(sdata);
+    if (sdata->stackPtr == 0) {
         /* End of the first pattern (the tree root) without error.
            We have successfully ended validation */
         sdata->validationState = VALIDATION_FINISHED;
-        return TCL_OK;
     }
-    thisStackPtr = sdata->stackPtr - 2;
-    while (sdata->stack[thisStackPtr]->deep ==
-           sdata->stack[sdata->stackPtr-1]->deep) {
-        thisStackPtr--;
-        if (thisStackPtr < 1) {
-            break;
-        }
-    }
-    sdata->stackPtr = thisStackPtr + 1;
+
     return TCL_OK;
 }
 
@@ -920,7 +1192,7 @@ initStructureQuant  (
     StructureQuant * quant;
 
     quant = TMALLOC (StructureQuant);
-    quant->quant = quantType;
+    quant->type = quantType;
     quant->minOccur = n;
     quant->maxOccur = m;
     if (sdata->numQuants == sdata->quantsSize) {
@@ -948,13 +1220,13 @@ getQuant (
     Tcl_Obj *thisObj;
     
     if (!quantObj) {
-        return quantNone;
+        return quantOne;
     }
     quantStr = Tcl_GetStringFromObj (quantObj, &len);
     if (len == 1) {
         switch (quantStr[0]) {
         case '!':
-            return quantNone;
+            return quantOne;
         case '*':
             return quantRep;
         case '?':
@@ -980,6 +1252,9 @@ getQuant (
             SetResult ("Invalid quant specifier.");
             return NULL;
         }
+        if (n == 1) {
+            return quantOne;
+        }
         return initStructureQuant (sdata, STRUCTURE_CQUANT_N, n, 0);
     }
     /* The "list-ness" of the quantObj is already checked by the
@@ -1001,6 +1276,9 @@ getQuant (
     if (n >= m) {
         SetResult ("Invalid quant specifier.");
         return NULL;
+    }
+    if (n == 0 && m == 1) {
+        return quantOpt;
     }
     return initStructureQuant (sdata, STRUCTURE_CQUANT_NM, n, m);
 }
@@ -1241,7 +1519,7 @@ TextPatternObjCmd (
     pattern = initStructureCP ((Structure_CP_Type) clientData,
                                NULL, NULL);
     REMEMBER_PATTERN (pattern)
-    ADD_TO_CONTENT (pattern, quantNone)
+    ADD_TO_CONTENT (pattern, quantOne)
     return TCL_OK;
 }
 
@@ -1250,10 +1528,10 @@ tDOM_StructureInit (
     Tcl_Interp *interp
     )
 {
-    quantNone->quant = STRUCTURE_CQUANT_NONE;
-    quantOpt->quant = STRUCTURE_CQUANT_OPT;
-    quantRep->quant = STRUCTURE_CQUANT_REP;
-    quantPlus->quant = STRUCTURE_CQUANT_PLUS;
+    quantOne->type = STRUCTURE_CQUANT_ONE;
+    quantOpt->type = STRUCTURE_CQUANT_OPT;
+    quantRep->type = STRUCTURE_CQUANT_REP;
+    quantPlus->type = STRUCTURE_CQUANT_PLUS;
                                       
     Tcl_CreateObjCommand (interp, "tdom::structure::empty",
                           EmptyAnyPatternObjCmd,
