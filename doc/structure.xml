@@ -22,12 +22,17 @@
 
     <commandlist>
       <commanddef>
-        <command><method>element</method> <m>name</m> <m>?namespace?</m> <m>definition script</m></command>
+        <command><method>defelement</method> <m>name</m> <m>?namespace?</m> <m>definition script</m></command>
         <desc></desc>
       </commanddef>
 
       <commanddef>
-        <command><method>pattern</method> <m>name</m> <m>definition script</m></command>
+        <command><method>defpattern</method> <m>name</m> <m>definition script</m></command>
+        <desc></desc>
+      </commanddef>
+
+      <commanddef>
+        <command><method>define</method> <m>definition script</m></command>
         <desc></desc>
       </commanddef>
       

@@ -19,7 +19,7 @@ test structure-1.2 {grammar cmd outside context} {
 
 test structure-1.3 {grammar cmd} {
     tdom::structure create grammar
-    grammar pattern somePattern {
+    grammar defpattern somePattern {
         element foo !
     }
     grammar delete
@@ -27,7 +27,7 @@ test structure-1.3 {grammar cmd} {
 
 test structure-1.4 {grammar cmd} {
     tdom::structure create grammar
-    grammar pattern somePattern {
+    grammar defpattern somePattern {
         for {set i 0} {$i < 100} {incr i} {
             element foo$i !
         }
@@ -37,18 +37,18 @@ test structure-1.4 {grammar cmd} {
 
 test structure-1.5 {grammar cmd} {
     tdom::structure create grammar
-    grammar element doc {
+    grammar defelement doc {
         element elm1
         element elm2 *
     }
-    grammar element elm1 empty
-    grammar element elm2 empty
+    grammar defelement elm1 empty
+    grammar defelement elm2 empty
     grammar delete
 } {}
 
 test structure-1.6 {quants} {
     tdom::structure create grammar
-    grammar element doc {
+    grammar defelement doc {
         element elm1
         element elm2 *
         element elm3 !
@@ -66,7 +66,7 @@ test structure-1.6 {quants} {
 
 test structure-1.7 {quants} {
     tdom::structure create grammar
-    grammar element doc {
+    grammar defelement doc {
         for {set i 0} {$i < 100} {incr i} {
             element elm$i [list $i [expr {$i + 1}]]
         }
@@ -76,24 +76,24 @@ test structure-1.7 {quants} {
 
 test structure-1.8 {Same element name in different Namespaces} {
     tdom::structure create grammar
-    grammar element doc {
+    grammar defelement doc {
         element elm1
         element elm2
     }
-    grammar element doc ns1 {
+    grammar defelement doc ns1 {
         # Forward defined element inherits child namespace
         element elm1
         element elm2
     }
-    grammar element doc ns2 {
+    grammar defelement doc ns2 {
         # Forward defined element inherits child namespace
         element elm1
         element elm2
     }
-    grammar element elm1 ns2 empty
-    grammar element elm2 ns2 any
+    grammar defelement elm1 ns2 empty
+    grammar defelement elm2 ns2 any
     set result [catch {
-        grammar element elm1 ns1 {
+        grammar defelement elm1 ns1 {
             choice {
                 element fooElem
                 element barElem +
@@ -101,8 +101,8 @@ test structure-1.8 {Same element name in different Namespaces} {
             error
         }
     }]
-    grammar element elm1 ns1 any
-    grammar element elm2 ns1 empty
+    grammar defelement elm1 ns1 any
+    grammar defelement elm2 ns1 empty
     grammar delete
     set result
 } 1
@@ -110,23 +110,23 @@ test structure-1.8 {Same element name in different Namespaces} {
 test structure-1.9 {Same element name in different Namespaces} {
     tdom::structure create grammar
     set result [catch {
-        grammar element doc {
+        grammar defelement doc {
             element elm1
             element elm2
         }
-        grammar element doc ns1 {
+        grammar defelement doc ns1 {
             # Forward defined element inherits child namespace
             element elm1
             element elm2
         }
-        grammar element doc ns2 {
+        grammar defelement doc ns2 {
             # Forward defined element inherits child namespace
             element elm1
             element elm2
         }
-        grammar element elm1 ns2 empty
-        grammar element elm2 ns2 any
-        grammar element elm1 ns1 {
+        grammar defelement elm1 ns2 empty
+        grammar defelement elm2 ns2 any
+        grammar defelement elm1 ns1 {
             choice {
                 element fooElem
                 element barElem +
@@ -140,33 +140,55 @@ test structure-1.9 {Same element name in different Namespaces} {
 
 test structure-1.10 {Local element definition} {
     tdom::structure create grammar
-    grammar element doc {
+    grammar defelement doc {
         element elm1
         element elm1 1 {
             element a
             element b
         }
     }
-    grammar element c text
-    grammar element d text
-    grammar element elm1 {
+    grammar defelement c text
+    grammar defelement d text
+    grammar defelement elm1 {
         element c
         element d
     }
     grammar delete
 } {}
 
+test structure-1.11 {define} {
+    tdom::structure create grammar
+    set result [catch {grammar define {
+        element elm1
+    }} errMsg]
+    grammar delete
+    lappend result $errMsg
+} {1 {Command not allowed at top level in grammar define evaluation}}
+
+test structure-1.12 {define} {
+    tdom::structure create grammar
+    set result [catch {grammar define {
+        defelement elm1 {
+            element a
+            element b
+        }
+        element elm1
+    }} errMsg]
+    grammar delete
+    lappend result $errMsg
+} {1 {Command not allowed at top level in grammar define evaluation}}
+
 test structure-2.1 {grammar definition: ref} {
     tdom::structure create grammar
-    grammar pattern thisPattern {
+    grammar defpattern thisPattern {
         element a
         element b
     }
-    grammar pattern thatPattern {
+    grammar defpattern thatPattern {
         element c
         element d
     }
-    grammar element doc {
+    grammar defelement doc {
         ref thisPattern
         ref thatPattern ?
     }
@@ -176,7 +198,7 @@ test structure-2.1 {grammar definition: ref} {
 test structure-2.2 {grammar definition: ref} {
     tdom::structure create grammar
     set result [grammar nrForwardDefinitions]
-    grammar element doc {
+    grammar defelement doc {
         ref thisPattern
         ref thatPattern ?
     }
@@ -187,7 +209,7 @@ test structure-2.2 {grammar definition: ref} {
 
 test structure-3.1 {grammar definition: choice} {
     tdom::structure create grammar
-    grammar element doc {
+    grammar defelement doc {
         element elm
         choice {
             element fooElem
@@ -204,7 +226,7 @@ test structure-3.1 {grammar definition: choice} {
 
 test structure-3.2 {grammar definition: choice} {
     tdom::structure create grammar
-    grammar pattern thisPattern {
+    grammar defpattern thisPattern {
         element elm
         choice {
             element fooElem
@@ -239,12 +261,12 @@ proc pullValidate {g xml} {
 
 test structure-4.1 {validation} {
     tdom::structure create grammar
-    grammar element doc {
+    grammar defelement doc {
         element e1
         element e2 *
     }
     foreach e {e1 e2} {
-        grammar element $e {}
+        grammar defelement $e {}
     }
     pullValidate grammar {
         <doc><e1/></doc>
@@ -277,12 +299,12 @@ test structure-5.1 {dom parse -validateCmd} {
 
 test structure-5.2 {dom parse -validateCmd} {
     tdom::structure create grammar
-    grammar element doc {
+    grammar defelement doc {
         element e1
         element e2 *
     }
     foreach e {e1 e2} {
-        grammar element $e {}
+        grammar defelement $e {}
     }
     dom parse -validateCmd grammar {
         <doc><e1/></doc>
@@ -316,12 +338,12 @@ proc structure-5.3 {base systemId publicId} {
 
 test structure-5.3 {dom parse -validateCmd} {
     tdom::structure create grammar
-    grammar element doc {
+    grammar defelement doc {
         element e1
         element e2 *
     }
     foreach e {e1 e2} {
-        grammar element $e {}
+        grammar defelement $e {}
     }
     set result [catch {dom parse -validateCmd grammar \
                            -externalentitycommand structure-5.3 {
@@ -333,14 +355,35 @@ test structure-5.3 {dom parse -validateCmd} {
     set result
 } 1
 
+test structure-5.4 {define} {
+    tdom::structure create grammar
+    grammar define {
+        defelement elm1 {
+            element a
+            element b
+        }
+        defelement a {
+            element c
+        }
+        defelement b {}
+        defelement c {empty}
+    }
+    set doc [dom parse -validateCmd grammar {
+        <elm1><a><c/></a><b/></elm1>
+    }]
+    $doc delete
+    grammar delete
+} {}
+
+
 test structure-6.1 {expat parser with -validateCmd} {
     tdom::structure create grammar
-    grammar element doc {
+    grammar defelement doc {
         element e1
         element e2 *
     }
     foreach e {e1 e2} {
-        grammar element $e {}
+        grammar defelement $e {}
     }
     ::xml::parser p -validateCmd grammar
     set result [catch {p parse {<doc><e2/></doc>}} errMsg]
@@ -351,7 +394,7 @@ test structure-6.1 {expat parser with -validateCmd} {
 
 test structure-7.1 {group} {
     tdom::structure create grammar
-    grammar element doc {
+    grammar defelement doc {
         element e1
         group ! {
             element e1
@@ -364,7 +407,36 @@ test structure-7.1 {group} {
         element e2 *
     }
     foreach e {e1 e2} {
-        grammar element $e {}
+        grammar defelement $e {}
+    }
+    dom parse -validateCmd grammar {
+        <doc><e1/><e1/><e2/><e1/><e2/><e2/><e2/><e2/></doc>
+    } doc
+    $doc delete
+    if {[grammar state] ne "FINISHED"} {
+        error "Wrong state."
+    }
+    grammar delete
+} {}
+
+test structure-7.1.1 {group} {
+    tdom::structure create grammar
+    grammar define {
+        defelement doc {
+            element e1
+            group ! {
+                element e1
+                element e2
+            }
+            group ! {
+                element e1
+                element e2
+            }
+            element e2 *
+        }
+        foreach e {e1 e2} {
+            defelement $e {}
+        }
     }
     dom parse -validateCmd grammar {
         <doc><e1/><e1/><e2/><e1/><e2/><e2/><e2/><e2/></doc>
@@ -378,7 +450,7 @@ test structure-7.1 {group} {
 
 test structure-7.2 {group} {
     tdom::structure create grammar
-    grammar element doc {
+    grammar defelement doc {
         element e1
         group 2 {
             element e1
@@ -387,7 +459,7 @@ test structure-7.2 {group} {
         element e2 *
     }
     foreach e {e1 e2} {
-        grammar element $e {}
+        grammar defelement $e {}
     }
     dom parse -validateCmd grammar {
         <doc><e1/><e1/><e2/><e1/><e2/><e2/><e2/><e2/></doc>

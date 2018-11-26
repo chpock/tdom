@@ -130,6 +130,13 @@ static void SetActiveStructureData (StructureData *v)
         return TCL_ERROR;                                               \
     }
 
+#define CHECK_TOPLEVEL                                                  \
+    if (sdata->defineToplevel) {                                        \
+        SetResult("Command not allowed at top level "                   \
+                  "in grammar define evaluation");                      \
+        return TCL_ERROR;                                               \
+    }
+
 #define CHECK_SI_CONTEXT                                                \
     if (sdata->isAttribute) {                                           \
         SetResult ("Command called in invalid grammar context.");       \
@@ -924,7 +931,8 @@ structureInstanceCmd (
     )
 {
     int            methodIndex, keywordIndex, hnew, patternIndex;
-    int            result = TCL_OK, forwardDef = 0;
+    int            result = TCL_OK, forwardDef = 0, i = 0;
+    int            savedDefineToplevel;
     unsigned int   savedNumPatternList;
     StructureData  *sdata = (StructureData *) clientData;
     Tcl_HashTable *hashTable;
@@ -933,12 +941,12 @@ structureInstanceCmd (
     void          *namespacePtr;
     
     static const char *structureInstanceMethods[] = {
-        "element", "pattern", "start", "event", "delete",
-        "nrForwardDefinitions", "state", "reset", NULL
+        "defelement", "defpattern", "start", "event", "delete",
+        "nrForwardDefinitions", "state", "reset", "define", NULL
     };
     enum structureInstanceMethod {
-        m_element, m_pattern, m_start, m_event, m_delete,
-        m_nrForwardDefinitions, m_state, m_reset
+        m_defelement, m_defpattern, m_start, m_event, m_delete,
+        m_nrForwardDefinitions, m_state, m_reset, m_define
     };
 
     static const char *eventKeywords[] = {
@@ -955,40 +963,47 @@ structureInstanceCmd (
         return TCL_ERROR;
     }
 
-    if (Tcl_GetIndexFromObj (interp, objv[1], structureInstanceMethods,
+    if (sdata == NULL) {
+        /* Inline defined defelement, defpattern or start */
+        sdata = GETASI;
+        CHECK_SI;
+        i = 1;
+    }
+
+    if (Tcl_GetIndexFromObj (interp, objv[1-i], structureInstanceMethods,
                              "method", 0, &methodIndex)
         != TCL_OK) {
         return TCL_ERROR;
     }
-        
+    
     Tcl_ResetResult (interp);
     switch ((enum structureInstanceMethod) methodIndex) {
-    case m_element:
-    case m_pattern:
-        if (objc != 4 && objc != 5) {
-            Tcl_WrongNumArgs (interp, 1, objv, "<name>"
+    case m_defelement:
+    case m_defpattern:
+        if (objc != 4-i && objc != 5-i) {
+            Tcl_WrongNumArgs (interp, 1-i, objv, "<name>"
                  " ?<namespace>? pattern");
             return TCL_ERROR;
         }
-        if ((enum structureInstanceMethod) methodIndex == m_element) {
+        if ((enum structureInstanceMethod) methodIndex == m_defelement) {
             hashTable = &sdata->element;
         } else {
             hashTable = &sdata->pattern;
         }
         savedNumPatternList = sdata->numPatternList;
         namespacePtr = NULL;
-        patternIndex = 3;
-        if (objc == 5) {
-            patternIndex = 4;
+        patternIndex = 3-i;
+        if (objc == 5-i) {
+            patternIndex = 4-i;
             entryPtr = Tcl_CreateHashEntry (&sdata->namespace,
-                                            Tcl_GetString (objv[3]), &hnew);
+                                            Tcl_GetString (objv[3-i]), &hnew);
             if (entryPtr != sdata->emptyNamespace) {
                 namespacePtr = Tcl_GetHashKey (&sdata->namespace,
                                                entryPtr);
             }
         }
         entryPtr = Tcl_CreateHashEntry (hashTable,
-                                        Tcl_GetString (objv[2]), &hnew);
+                                        Tcl_GetString (objv[2-i]), &hnew);
         pattern = NULL;
         if (!hnew) {
             pattern = (StructureCP *) Tcl_GetHashValue (entryPtr);
@@ -1000,7 +1015,7 @@ structureInstanceCmd (
                         break;
                     }
                     if ((enum structureInstanceMethod) methodIndex
-                        == m_element) {
+                        == m_defelement) {
                         SetResult ("Element already defined "
                                    "in this namespace.");
                     } else {
@@ -1026,13 +1041,17 @@ structureInstanceCmd (
             Tcl_SetHashValue (entryPtr, pattern);
         }
 
-        SETASI(sdata);
+        if (!sdata->defineToplevel) {
+            SETASI(sdata);
+        }
+        savedDefineToplevel = sdata->defineToplevel;
+        sdata->defineToplevel = 0;
         sdata->currentNamespace = namespacePtr;
         sdata->currentContent = pattern->content;
         sdata->currentQuants = pattern->quants;
         sdata->numChildren = 0;
         sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
-        result = Tcl_VarEval (interp, "namespace eval ::tdom::structure {",
+        result = Tcl_VarEval (interp, "::namespace eval ::tdom::structure {",
                               Tcl_GetString (objv[patternIndex]), "}", NULL);
         sdata->currentNamespace = NULL;
         pattern->content = sdata->currentContent;
@@ -1049,12 +1068,37 @@ structureInstanceCmd (
         } else {
             cleanupLastPattern (sdata, savedNumPatternList);
         }
+        sdata->defineToplevel = savedDefineToplevel;
+        if (!savedDefineToplevel) {
+            SETASI(0);
+        }
+        break;
+
+    case m_define:
+        if (objc != 3) {
+            Tcl_WrongNumArgs (interp, 2, objv, "<definition commands>");
+            return TCL_ERROR;
+        }
+        SETASI(sdata);
+        savedNumPatternList = sdata->numPatternList;
+        sdata->currentNamespace = 0;
+        sdata->currentContent = NULL;
+        sdata->currentQuants = NULL;
+        sdata->numChildren = 0;
+        sdata->contentSize = 0;
+        sdata->defineToplevel = 1;
+        result = Tcl_VarEval (interp, "::namespace eval ::tdom::structure {",
+                              Tcl_GetString (objv[2]), "}", NULL);
+        if (result != TCL_OK) {
+            cleanupLastPattern (sdata, savedNumPatternList);
+        }
+        sdata->defineToplevel = 0;
         SETASI(0);
         break;
 
     case m_start:
-        if (objc < 3 || objc > 3) {
-            Tcl_WrongNumArgs (interp, 2, objv, "<documentElement>"
+        if (objc < 3-i || objc > 3-i) {
+            Tcl_WrongNumArgs (interp, 2-1, objv, "<documentElement>"
                               " ?<namespace>?");
             return TCL_ERROR;
         }
@@ -1062,7 +1106,7 @@ structureInstanceCmd (
             FREE (sdata->start);
         }
         sdata->start = tdomstrdup (Tcl_GetString (objv[2]));
-        if (objc == 4) {
+        if (objc == 4-i) {
             if (sdata->startNamespace) {
                 FREE (sdata->startNamespace);
             }
@@ -1356,6 +1400,7 @@ EmptyAnyPatternObjCmd (
     StructureCP *pattern;
     
     CHECK_SI
+    CHECK_TOPLEVEL
     checkNrArgs (1,1,"No arguments expected.");
     pattern = initStructureCP ((Structure_CP_Type) clientData,
                                NULL, NULL);
@@ -1430,6 +1475,7 @@ NamedPatternObjCmd (
     int hnew;
     
     CHECK_SI
+    CHECK_TOPLEVEL
     if (patternType == STRUCTURE_CTYPE_NAME) {
         checkNrArgs (2,4,"Expected: elementName ?quant? ?pattern?");
         hashTable = &sdata->element;
@@ -1509,6 +1555,7 @@ AnonPatternObjCmd (
     StructureCP *pattern;
 
     CHECK_SI
+    CHECK_TOPLEVEL
     checkNrArgs (2,3,"Expected: ?quant? definition");
     quant = getQuant (interp, sdata, objc == 2 ? NULL : objv[1]);
     if (!quant) {
@@ -1545,8 +1592,10 @@ NamespacePatternObjCmd (
     char *currentNamespace;
     Tcl_HashEntry *entryPtr;
     int hnew, result;
-    
+
+    fprintf (stderr, "+++HIER 0: '%s'\n", Tcl_GetString(objv[0]));
     CHECK_SI
+    CHECK_TOPLEVEL
     checkNrArgs (3,3,"Expected: namespace pattern");
 
     currentNamespace = sdata->currentNamespace;
@@ -1575,6 +1624,7 @@ TextPatternObjCmd (
     StructureCP *pattern;
     
     CHECK_SI
+    CHECK_TOPLEVEL
     checkNrArgs (1,1,"No arguments expected.");
     pattern = initStructureCP ((Structure_CP_Type) clientData,
                                NULL, NULL);
@@ -1592,7 +1642,15 @@ tDOM_StructureInit (
     quantOpt->type = STRUCTURE_CQUANT_OPT;
     quantRep->type = STRUCTURE_CQUANT_REP;
     quantPlus->type = STRUCTURE_CQUANT_PLUS;
-                                      
+
+    /* Inline definition commands. */
+    Tcl_CreateObjCommand (interp, "tdom::structure::defelement",
+                          structureInstanceCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp, "tdom::structure::defelement",
+                          structureInstanceCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp, "tdom::structure::start",
+                          structureInstanceCmd, NULL, NULL);
+    
     Tcl_CreateObjCommand (interp, "tdom::structure::empty",
                           EmptyAnyPatternObjCmd,
                           (ClientData) STRUCTURE_CTYPE_EMPTY, NULL);

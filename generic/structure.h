@@ -102,6 +102,7 @@ typedef struct
     unsigned int quantsSize;
     char *currentNamespace;
     char *currentAttributeNamespace;
+    int   defineToplevel;
     int   isAttribute;
     StructureCP **currentContent;
     StructureQuant **currentQuants;
