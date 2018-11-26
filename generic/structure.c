@@ -26,7 +26,7 @@
 #include <tdom.h>
 #include <structure.h>
 
-#define DEBUG
+/* #define DEBUG */
 /*----------------------------------------------------------------------------
 |   Debug Macros
 |
@@ -240,9 +240,6 @@ static void serializeQuant (
     fprintf (stderr, "Quant type: %s n: %d m: %d\n",
              Structure_Quant_Type2str[quant->type], quant->minOccur, quant->maxOccur);
 }
-)
-
-/* DBG end */
 
 static void serializeStack (
     StructureData *sdata
@@ -259,6 +256,9 @@ static void serializeStack (
     }
     fprintf (stderr, "++++ Stack bottom\n");
 }
+)
+
+/* DBG end */
 
 static void freeStructureCP (
     StructureCP *pattern
@@ -506,6 +506,8 @@ updateStack (
     case STRUCTURE_CTYPE_CHOICE:
         break;
     }
+    DBG(fprintf (stderr, "updateStack: updating %d, ac: %d, nm: %d\n",
+                 sdata->stackPtr-1, newac, newnm));
     sdata->stack[sdata->stackPtr-1]->activeChild = newac;
     sdata->stack[sdata->stackPtr-1]->nrMatched = newnm;
 }
@@ -528,8 +530,6 @@ matchNamePattern (
     
     /* The caller must ensure pattern->type = STRUCTURE_CTYPE_NAME */
 
-    fprintf (stderr, "matchNamePattern: look if '%s' match\n", pattern->name);
-    serializeStack (sdata);
     getContext (parent, ac, nm);
 
     switch (parent->type) {
@@ -557,6 +557,10 @@ matchNamePattern (
             case STRUCTURE_CTYPE_NAME:
                 if (candidate == pattern) {
                     updateStack (sdata, sdata->stackPtr, ac, nm+1);
+                    /* We need to push the element only onto the stack
+                     * if it has non-empty content. But how many real
+                     * life XML vocabularies does have EMPTY
+                     * elements? Should we check for this? */
                     pushToStack (sdata, candidate, currentDeep + 1);
                     waterMark (sdata);
                     return 1;
@@ -596,18 +600,21 @@ matchNamePattern (
             /* No match, but also no explicit error. */
             /* We finished a non atomic pattern (GROUP or PATTERN) and
              * increment the nrMatched of that inside its parent. */
-            sdata->stack[sdata->stackPtr-2]->nrMatched++;
+            sdata->stack[sdata->stackPtr-2]->nrMatched += 1;
+            
             /* Check, if we have to restart the parent pattern (look
                for match right from the start) because of quant. */
             if (startac) {
                 /* It only make sense to look for a match from the
                  * start if the start active child wasn't already 0*/
                 StructureQuant *parentQuant;
-                parentQuant = sdata->stack[sdata->stackPtr-2]->pattern->quants[sdata->stack[sdata->stackPtr-2]->activeChild];
+                parentQuant = sdata->stack[sdata->stackPtr-2]->
+                    pattern->quants[sdata->stack[sdata->stackPtr-2]->activeChild];
                 if (mayRepeat (parentQuant)) {
                     ac = 0;
                     nm = 0;
                     startac = 0;
+                    DBG(fprintf (stderr, "... loopOverContent\n"));
                     goto loopOverContent;
                 }
                 if (!maxOne (parentQuant)) {
@@ -619,6 +626,8 @@ matchNamePattern (
                     }
                 }
             }
+            sdata->stack[sdata->stackPtr-2]->activeChild += 1;
+            sdata->stack[sdata->stackPtr-2]->nrMatched = 0;
             return -1;
         }
         
@@ -761,7 +770,12 @@ probeElement (
     savedStackPtr = sdata->stackPtr;
     activeStack = savedStackPtr - 1;
     currentDeep = sdata->stack[activeStack]->deep;
-    
+
+    DBG(
+        fprintf (stderr, "probeElement: look if '%s' match\n", pattern->name);
+        serializeStack (sdata);
+        );
+
     while ((rc = matchNamePattern (sdata, pattern, currentDeep)) == -1) {
         activeStack--;
         if (activeStack < 0 || sdata->stack[activeStack]->deep < currentDeep) {
@@ -770,9 +784,19 @@ probeElement (
         sdata->stackPtr = activeStack + 1;
     }
     if (rc == 1) {
+        DBG(
+            fprintf (stderr, "probeElement: element '%s' match\n", name);
+            serializeStack (sdata);
+            fprintf (stderr, "\n");
+            );
         return TCL_OK;
     }
     sdata->stackPtr = savedStackPtr;
+    DBG(
+        fprintf (stderr, "element '%s' DOESN'T match\n", name);
+        serializeStack (sdata);
+        fprintf (stderr, "\n");
+        );
     SetResult ("Element doesn't match.");
     return TCL_ERROR;
 }
@@ -838,6 +862,11 @@ probeElementEnd (
         return TCL_ERROR;
     }
 
+    DBG(
+        fprintf (stderr, "probeElementEnd: look if current stack top can end\n");
+        serializeStack (sdata);
+        );
+    
     savedStackPtr = sdata->stackPtr;
     activeStack = savedStackPtr;
     currentDeep = sdata->stack[activeStack-1]->deep;

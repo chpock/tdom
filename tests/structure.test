@@ -370,8 +370,31 @@ test structure-7.1 {group} {
         <doc><e1/><e1/><e2/><e1/><e2/><e2/><e2/><e2/></doc>
     } doc
     $doc delete
-    grammar delete
     if {[grammar state] ne "FINISHED"} {
         error "Wrong state."
     }
+    grammar delete
+} {}
+
+test structure-7.2 {group} {
+    tdom::structure create grammar
+    grammar element doc {
+        element e1
+        group 2 {
+            element e1
+            element e2
+        }
+        element e2 *
+    }
+    foreach e {e1 e2} {
+        grammar element $e {}
+    }
+    dom parse -validateCmd grammar {
+        <doc><e1/><e1/><e2/><e1/><e2/><e2/><e2/><e2/></doc>
+    } doc
+    $doc delete
+    if {[grammar state] ne "FINISHED"} {
+        error "Wrong state."
+    }
+    grammar delete
 } {}

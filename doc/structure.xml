@@ -42,8 +42,28 @@
       </commanddef>
 
       <commanddef>
-        <command><method>delete</method> <m></m></command>
-        <desc></desc>
+        <command><method>delete</method></command>
+        <desc>This method deletes the validation command.</desc>
+      </commanddef>
+
+      <commanddef>
+        <command><method>state</method></command>
+        <desc>This method returns the state of the validation command with respect to validation state. The possible return values and their meanings are:
+        <dl>
+          <dt>READY</dt><dd>The validation command is ready to start
+          validation</dd>
+          <dt>VALIDATING</dt><dd>The validation command is in the
+          process of validating input.</dd>
+          <dt>FINISHED</dt><dd>The validation has finished, no futher
+          events are expected.</dd>
+        </dl>
+        </desc>
+      </commanddef>
+      
+      <commanddef>
+        <command><method>reset</method></command>
+        <desc>This method resets the validation command into state
+        READY (while preserving the defined grammer).</desc>
       </commanddef>
 
     </commandlist>
