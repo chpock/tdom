@@ -26,7 +26,7 @@
 #include <tdom.h>
 #include <structure.h>
 
-/* #define DEBUG */
+#define DEBUG
 /*----------------------------------------------------------------------------
 |   Debug Macros
 |
@@ -240,6 +240,9 @@ static void serializeQuant (
     fprintf (stderr, "Quant type: %s n: %d m: %d\n",
              Structure_Quant_Type2str[quant->type], quant->minOccur, quant->maxOccur);
 }
+)
+
+/* DBG end */
 
 static void serializeStack (
     StructureData *sdata
@@ -251,13 +254,11 @@ static void serializeStack (
     while (i >= 0) {
         serializeCP (sdata->stack[i]->pattern);
         fprintf (stderr, "ac: %d nm: %d\n",
-                 sdata->stack[1]->activeChild, sdata->stack[i]->nrMatched);
+                 sdata->stack[i]->activeChild, sdata->stack[i]->nrMatched);
         i--;
     }
     fprintf (stderr, "++++ Stack bottom\n");
 }
-)
-/* DBG end */
 
 static void freeStructureCP (
     StructureCP *pattern
@@ -437,7 +438,7 @@ pushToStack (
 #define mayMiss(quant) \
     ((quant) == quantOpt || (quant) == quantRep) || (quant->type == STRUCTURE_CQUANT_NM && (quant)->minOccur == 0) ? 1 : 0
 
-#define mayRepead(quant) \
+#define mayRepeat(quant) \
     ((quant) == quantRep || (quant) == quantPlus) ? 1 : 0
 
 #define mustMatch(quant,nr) \
@@ -448,6 +449,11 @@ pushToStack (
     parent = sdata->stack[sdata->stackPtr-1]->pattern;   \
     ac = sdata->stack[sdata->stackPtr-1]->activeChild;   \
     nm = sdata->stack[sdata->stackPtr-1]->nrMatched;
+
+#define getContext2(parent2, ac2, nm2)                       \
+    parent = sdata->stack[sdata->stackPtr-2]->pattern;   \
+    ac = sdata->stack[sdata->stackPtr-2]->activeChild;   \
+    nm = sdata->stack[sdata->stackPtr-2]->nrMatched;
 
 
 static void
@@ -465,7 +471,7 @@ updateStack (
     case STRUCTURE_CTYPE_NAME:
     case STRUCTURE_CTYPE_GROUP:
     case STRUCTURE_CTYPE_PATTERN:
-        if (mayRepead(quant)) break;
+        if (mayRepeat(quant)) break;
         if (maxOne(quant)) {
             newac++;
             newnm = 0;
@@ -493,7 +499,7 @@ updateStack (
         return;
 
     case STRUCTURE_CTYPE_INTERLEAVE:
-        fprintf (stderr, "matchNamePattern: STRUCTURE_CTYPE_INTERLEAVE to be implemented\n");
+        fprintf (stderr, "updateStack: STRUCTURE_CTYPE_INTERLEAVE to be implemented\n");
         return;
 
     case STRUCTURE_CTYPE_MIXED:
@@ -517,11 +523,13 @@ matchNamePattern (
     )
 {
     StructureCP *parent, *candidate;
-    int nm, ac, savedStackPtr, rc, i;
+    int nm, ac, startac, savedStackPtr, rc, i;
     int isName = 0;
     
     /* The caller must ensure pattern->type = STRUCTURE_CTYPE_NAME */
 
+    fprintf (stderr, "matchNamePattern: look if '%s' match\n", pattern->name);
+    serializeStack (sdata);
     getContext (parent, ac, nm);
 
     switch (parent->type) {
@@ -530,6 +538,8 @@ matchNamePattern (
         /* fall through */
     case STRUCTURE_CTYPE_GROUP:
     case STRUCTURE_CTYPE_PATTERN:
+        startac = ac;
+    loopOverContent:
         while (ac < parent->numChildren) {
             candidate = parent->content[ac];
 
@@ -570,12 +580,9 @@ matchNamePattern (
                 savedStackPtr = sdata->stackPtr;
                 pushToStack (sdata, candidate, currentDeep);
                 rc = matchNamePattern (sdata, pattern, currentDeep);
-                if (rc == 1) {
-                    /* Matched */
-                    updateStack (sdata, savedStackPtr, ac, nm+1);
-                    return 1;
-                }
+                if (rc == 1) return 1;
                 popStack (sdata);
+                if (rc == 0) return 0;
                 if (mustMatch (parent->quants[ac], nm)) return 0;
                 ac++;
                 nm = 0;
@@ -586,7 +593,32 @@ matchNamePattern (
             /* No match, but any remaining possible childs tested */
             return 0;
         } else {
-            /* No match, but also no explicit error */
+            /* No match, but also no explicit error. */
+            /* We finished a non atomic pattern (GROUP or PATTERN) and
+             * increment the nrMatched of that inside its parent. */
+            sdata->stack[sdata->stackPtr-2]->nrMatched++;
+            /* Check, if we have to restart the parent pattern (look
+               for match right from the start) because of quant. */
+            if (startac) {
+                /* It only make sense to look for a match from the
+                 * start if the start active child wasn't already 0*/
+                StructureQuant *parentQuant;
+                parentQuant = sdata->stack[sdata->stackPtr-2]->pattern->quants[sdata->stack[sdata->stackPtr-2]->activeChild];
+                if (mayRepeat (parentQuant)) {
+                    ac = 0;
+                    nm = 0;
+                    startac = 0;
+                    goto loopOverContent;
+                }
+                if (!maxOne (parentQuant)) {
+                    if (sdata->stack[sdata->stackPtr-2]->nrMatched < parentQuant->maxOccur) {
+                        ac = 0;
+                        nm = 0;
+                        startac = 0;
+                        goto loopOverContent;
+                    }
+                }
+            }
             return -1;
         }
         
@@ -595,7 +627,6 @@ matchNamePattern (
     case STRUCTURE_CTYPE_EMPTY:
         /* Never pushed onto stack */
         Tcl_Panic ("Invalid CTYPE onto the validation stack!");
-        return 0;
 
     case STRUCTURE_CTYPE_INTERLEAVE:
         fprintf (stderr, "matchNamePattern: STRUCTURE_CTYPE_INTERLEAVE to be implemented\n");
@@ -733,7 +764,7 @@ probeElement (
     
     while ((rc = matchNamePattern (sdata, pattern, currentDeep)) == -1) {
         activeStack--;
-        if (activeStack < 0 || !sdata->stack[activeStack]->deep < currentDeep) {
+        if (activeStack < 0 || sdata->stack[activeStack]->deep < currentDeep) {
             break;
         }
         sdata->stackPtr = activeStack + 1;
@@ -812,7 +843,7 @@ probeElementEnd (
     currentDeep = sdata->stack[activeStack-1]->deep;
     while ((rc = checkElementEnd (sdata)) == -1) {
         activeStack--;
-        if (activeStack < 1 || !sdata->stack[activeStack]->deep < currentDeep) {
+        if (activeStack < 1 || sdata->stack[activeStack]->deep < currentDeep) {
             break;
         }
         popStack(sdata);
@@ -1255,7 +1286,7 @@ getQuant (
         if (n == 1) {
             return quantOne;
         }
-        return initStructureQuant (sdata, STRUCTURE_CQUANT_N, n, 0);
+        return initStructureQuant (sdata, STRUCTURE_CQUANT_N, n, n);
     }
     /* The "list-ness" of the quantObj is already checked by the
      * Tcl_ListObjLength() call above, no need to check result. */

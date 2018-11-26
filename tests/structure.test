@@ -353,7 +353,11 @@ test structure-7.1 {group} {
     tdom::structure create grammar
     grammar element doc {
         element e1
-        group 2 {
+        group ! {
+            element e1
+            element e2
+        }
+        group ! {
             element e1
             element e2
         }
