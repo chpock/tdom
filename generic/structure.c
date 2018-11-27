@@ -92,6 +92,7 @@ static char *Structure_Quant_Type2str[] = {
 #define FORWARD_PATTERN_DEF     1
 #define PLACEHOLDER_PATTERN_DEF 2
 #define AMBIGUOUS_PATTERN       4
+#define LOCAL_DEFINED_ELEMENT  8
 
 /* Pointer to heap-allocated shared quants. */
 static StructureQuant QuantOne;
@@ -226,6 +227,9 @@ static void serializeCP (
         if (pattern->flags & PLACEHOLDER_PATTERN_DEF) {
             fprintf (stderr, "\tAs placeholder defined NAME\n");
         }
+        if (pattern->flags & LOCAL_DEFINED_ELEMENT) {
+            fprintf (stderr, "\tAs placeholder defined NAME\n");
+        }
         /* Fall thru. */
     case STRUCTURE_CTYPE_MIXED:
     case STRUCTURE_CTYPE_CHOICE:
@@ -257,7 +261,7 @@ static void serializeStack (
     fprintf (stderr, "++++ Current validation stack (size %d):\n", i+1);
     while (i >= 0) {
         serializeCP (sdata->stack[i]->pattern);
-        fprintf (stderr, "ac: %d nm: %d\n",
+        fprintf (stderr, "deep: %d ac: %d nm: %d\n", sdata->stack[i]->deep,
                  sdata->stack[i]->activeChild, sdata->stack[i]->nrMatched);
         i--;
     }
@@ -562,7 +566,8 @@ matchNamePattern (
                 return 1;
                 
             case STRUCTURE_CTYPE_NAME:
-                if (candidate == pattern) {
+                if (candidate == pattern
+                    || strcmp (candidate->name, pattern->name) == 0) {
                     updateStack (sdata, sdata->stackPtr, ac, nm+1);
                     /* We need to push the element only onto the stack
                      * if it has non-empty content. But how many real
@@ -804,7 +809,7 @@ probeElement (
         serializeStack (sdata);
         fprintf (stderr, "\n");
         );
-    SetResult ("Element doesn't match.");
+    SetResult ("Element doesn't match");
     return TCL_ERROR;
 }
 
@@ -820,6 +825,7 @@ static int checkElementEnd (
     
     switch (parent->type) {
     case STRUCTURE_CTYPE_NAME:
+        if (sdata->stackPtr == 1) return 1;
         isName = 1;
         /* fall through */
     case STRUCTURE_CTYPE_GROUP:
@@ -869,14 +875,17 @@ probeElementEnd (
         return TCL_ERROR;
     }
 
-    DBG(
-        fprintf (stderr, "probeElementEnd: look if current stack top can end\n");
-        serializeStack (sdata);
-        );
-    
     savedStackPtr = sdata->stackPtr;
     activeStack = savedStackPtr;
     currentDeep = sdata->stack[activeStack-1]->deep;
+
+    DBG(
+        fprintf (stderr, "probeElementEnd: look if current stack top can end "
+                 " name: '%s' currentDeep: %d\n",
+                 sdata->stack[sdata->stackPtr-1]->pattern->name, currentDeep);
+        serializeStack (sdata);
+        );
+    
     while ((rc = checkElementEnd (sdata)) == -1) {
         activeStack--;
         if (activeStack < 1 || sdata->stack[activeStack]->deep < currentDeep) {
@@ -1534,6 +1543,7 @@ NamedPatternObjCmd (
             sdata->currentNamespace,
             Tcl_GetHashKey (hashTable, entryPtr)
             );
+        pattern->flags |= LOCAL_DEFINED_ELEMENT;
         return evalDefinition (interp, sdata, objv[3], pattern, quant);
     }
     return TCL_OK;
