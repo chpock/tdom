@@ -1381,7 +1381,7 @@ elemNSfound:
     if (info->sdata) {
         if (probeElement (info->interp, info->sdata, node->nodeName,
                           node->namespace ?
-                          info->document->namespaces[node->namespace-1] : NULL)
+                          info->document->namespaces[node->namespace-1]->uri : NULL)
             != TCL_OK) {
             XML_StopParser(info->parser, 0);
         }

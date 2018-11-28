@@ -354,7 +354,8 @@ cleanupLastPattern (
     Tcl_HashTable *hashTable;
     Tcl_HashEntry *entryPtr;
     StructureCP *this, *previous, *current;
-    
+
+    return;
     for (i = from; i < sdata->numPatternList; i++) {
         this = sdata->patternList[i];
         hashTable = NULL;
@@ -724,7 +725,7 @@ probeElement (
     if (namespace) {
         entryPtr = Tcl_FindHashEntry (&sdata->namespace, (char *)namespace);
         if (!entryPtr) {
-            SetResult ("No elements defined in this namespace.");
+            SetResult ("No elements defined in this namespace");
             return TCL_ERROR;
         }
         if (entryPtr == sdata->emptyNamespace) {
@@ -896,7 +897,8 @@ probeElementEnd (
 
     if (rc != 1) {
         sdata->stackPtr = savedStackPtr;
-        SetResult ("Missing mandatory elements\n");
+        SetResult ("Missing mandatory element\n");
+        DBG(fprintf(stderr, "probeElementEnd: CAN'T end here.\n"));
         return TCL_ERROR;
     }
 
@@ -941,13 +943,13 @@ structureInstanceCmd (
 {
     int            methodIndex, keywordIndex, hnew, patternIndex;
     int            result = TCL_OK, forwardDef = 0, i = 0;
-    int            savedDefineToplevel;
+    int            savedDefineToplevel, type;
     unsigned int   savedNumPatternList;
     StructureData  *sdata = (StructureData *) clientData;
     Tcl_HashTable *hashTable;
     Tcl_HashEntry *entryPtr;
     StructureCP   *pattern, *current = NULL;
-    void          *namespacePtr;
+    void          *namespacePtr, *savedNamespacePtr;
     
     static const char *structureInstanceMethods[] = {
         "defelement", "defpattern", "start", "event", "delete",
@@ -996,8 +998,10 @@ structureInstanceCmd (
         }
         if ((enum structureInstanceMethod) methodIndex == m_defelement) {
             hashTable = &sdata->element;
+            type = STRUCTURE_CTYPE_NAME;
         } else {
             hashTable = &sdata->pattern;
+            type = STRUCTURE_CTYPE_PATTERN;
         }
         savedNumPatternList = sdata->numPatternList;
         namespacePtr = NULL;
@@ -1037,11 +1041,8 @@ structureInstanceCmd (
             }
         }
         if (pattern == NULL) {
-            pattern = initStructureCP (
-                STRUCTURE_CTYPE_NAME,
-                namespacePtr,
-                Tcl_GetHashKey (hashTable, entryPtr)
-                );
+            pattern = initStructureCP (type, namespacePtr,
+                                       Tcl_GetHashKey (hashTable, entryPtr));
             if (!hnew) {
                 current = (StructureCP *) Tcl_GetHashValue (entryPtr);
                 pattern->next = current;
@@ -1054,6 +1055,7 @@ structureInstanceCmd (
             SETASI(sdata);
         }
         savedDefineToplevel = sdata->defineToplevel;
+        savedNamespacePtr = sdata->currentNamespace;
         sdata->defineToplevel = 0;
         sdata->currentNamespace = namespacePtr;
         sdata->currentContent = pattern->content;
@@ -1078,6 +1080,7 @@ structureInstanceCmd (
             cleanupLastPattern (sdata, savedNumPatternList);
         }
         sdata->defineToplevel = savedDefineToplevel;
+        sdata->currentNamespace = savedNamespacePtr;
         if (!savedDefineToplevel) {
             SETASI(0);
         }
@@ -1481,8 +1484,8 @@ NamedPatternObjCmd (
     Tcl_HashEntry *entryPtr;
     StructureCP *pattern = NULL, *current;
     StructureQuant *quant;
-    int hnew;
-    
+    int hnew, i;
+
     CHECK_SI
     CHECK_TOPLEVEL
     if (patternType == STRUCTURE_CTYPE_NAME) {
@@ -1656,11 +1659,12 @@ tDOM_StructureInit (
     /* Inline definition commands. */
     Tcl_CreateObjCommand (interp, "tdom::structure::defelement",
                           structureInstanceCmd, NULL, NULL);
-    Tcl_CreateObjCommand (interp, "tdom::structure::defelement",
+    Tcl_CreateObjCommand (interp, "tdom::structure::defpattern",
                           structureInstanceCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::structure::start",
                           structureInstanceCmd, NULL, NULL);
     
+    /* The "empty" and "any" definition commands. */
     Tcl_CreateObjCommand (interp, "tdom::structure::empty",
                           EmptyAnyPatternObjCmd,
                           (ClientData) STRUCTURE_CTYPE_EMPTY, NULL);
@@ -1668,13 +1672,15 @@ tDOM_StructureInit (
                           EmptyAnyPatternObjCmd,
                           (ClientData) STRUCTURE_CTYPE_ANY, NULL);
 
+    /* The named pattern commands "element" and "ref". */
     Tcl_CreateObjCommand (interp, "tdom::structure::element",
                           NamedPatternObjCmd,
                           (ClientData) STRUCTURE_CTYPE_NAME, NULL);
     Tcl_CreateObjCommand (interp, "tdom::structure::ref",
                           NamedPatternObjCmd,
                           (ClientData) STRUCTURE_CTYPE_PATTERN, NULL);
-
+    /* The anonymous pattern commands "choise", "mixed", "interleave"
+     * and "group". */
     Tcl_CreateObjCommand (interp, "tdom::structure::choice",
                           AnonPatternObjCmd,
                           (ClientData) STRUCTURE_CTYPE_CHOICE, NULL);
@@ -1688,6 +1694,7 @@ tDOM_StructureInit (
                           AnonPatternObjCmd,
                           (ClientData) STRUCTURE_CTYPE_GROUP, NULL);
     
+    /* The "attribute", "namespace" and "text" definition commands. */
     Tcl_CreateObjCommand (interp, "tdom::structure::attribute",
                           AttributePatternObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::structure::namespace",

@@ -73,4 +73,73 @@
 
     </commandlist>
   </section>
+
+  <section>
+    <title>Structure definition scripts</title>
+    <p>Structure definition scripts are ordinary Tcl scripts that are
+    evaluatend in the namespace tdom::structure. Several commands in
+    this tcl namespace allows to define a wide variety of document
+    structures.</p>
+
+    <p>The valid methods of the created commands are:</p>
+
+    <commandlist>
+      <commanddef>
+        <command><method>element</method> <m>name</m> <m>?quant?</m> <m>?definition script?</m></command>
+        <desc></desc>
+      </commanddef>
+
+      <commanddef>
+        <command><method>ref</method> <m>name</m></command>
+        <desc></desc>
+      </commanddef>
+
+      <commanddef>
+        <command><method>group</method> <m>definition script</m></command>
+        <desc></desc>
+      </commanddef>
+      
+      <commanddef>
+        <command><method>choice</method> <m>definition script?</m></command>
+        <desc></desc>
+      </commanddef>
+
+      <commanddef>
+        <command><method>interleave</method> <m>definition script</m></command>
+        <desc></desc>
+      </commanddef>
+
+      <commanddef>
+        <command><method>mixed</method> <m>definition script</m></command>
+        <desc></desc>
+      </commanddef>
+
+      <commanddef>
+        <command><method>text</method> <m>definition script</m></command>
+        <desc></desc>
+      </commanddef>
+
+      <commanddef>
+        <command><method>any</method></command>
+        <desc></desc>
+      </commanddef>
+
+      <commanddef>
+        <command><method>attribute</method> <m>definition script</m></command>
+        <desc></desc>
+      </commanddef>
+
+      <commanddef>
+        <command><method>namespace</method> <m>definition script</m></command>
+        <desc></desc>
+      </commanddef>
+      
+      <commanddef>
+        <command><method>empty</method></command>
+        <desc></desc>
+      </commanddef>
+    </commandlist>
+    
+  </section>
+  
 </manpage>

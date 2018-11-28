@@ -582,3 +582,114 @@ test structure-7.5 {group with inline defined element} {
     grammar delete
 } {}
 
+# test structure-7.6 {nested groups via refs} {
+#     tdom::structure create grammar
+#     grammar define {
+#         defpattern a foouri {
+#             group {
+#                 element e1
+#                 element e1 1 {
+#                     element e2
+#                 }
+#                 element e2
+#             }
+#             element e3 ?
+#         }
+#         defpattern b foouri {
+#             b1 *
+#             group 2 {
+#                 element b2
+#                 ref a
+#             }
+#         }
+#         foreach e {e1 e2 e3 b1 b2} {
+#             defelement $e foouri {}
+#         }
+#         defelement doc foouri {
+#             group {
+#                 ref a
+#                 ref b 2
+#             }
+#         }
+#     }
+#     set doc [dom parse -validateCmd grammar {
+#          <doc xmlns="foouri">
+#            <!-- ref a start -->
+#            <e1/>
+#            <e1>
+#              <e2/>
+#            </e1>
+#            <e2/>
+#            <e3/>
+#            <!-- ref a end -->
+#            <!-- ref b start -->
+#            <b1/>
+#            <b1/>
+#            <b1/>
+#            <!-- inside ref a: ref b start -->
+#            <a/>
+#            <e1/>
+#            <e1>
+#              <e2/>
+#            </e1>
+#            <e2/>
+#            <!-- inside ref a: ref b end -->
+#            <!-- inside ref a: ref b start -->
+#            <e1/>
+#            <e1>
+#              <e2/>
+#            </e1>
+#            <e2/>
+#            <e3/>
+#            <!-- inside ref a: ref b end -->
+#            <!-- ref b end -->
+#          </doc>
+#     }]
+#     $doc delete
+#     if {[grammar state] ne "FINISHED"} {
+#         error "Wrong state."
+#     }
+#     grammar delete
+# } {}
+
+# test structure-7.7 {nested groups via refs} {
+#     tdom::structure create grammar
+#     grammar define {
+#         defpattern a foouri {
+#             group {
+#                 element e1
+#                 element e1 1 {
+#                     element e2
+#                 }
+#                 element e2
+#             }
+#             element e3 ?
+#         }
+#         foreach e {e1 e2 e3 b1 b2} {
+#             defelement $e foouri {}
+#         }
+#         defelement doc foouri {
+#             group {
+#                 ref a
+#             }
+#         }
+#     }
+#     set doc [dom parse -validateCmd grammar {
+#          <doc xmlns="foouri">
+#            <!-- ref a start -->
+#            <e1/>
+#            <e1>
+#              <e2/>
+#            </e1>
+#            <e2/>
+#            <e3/>
+#            <!-- ref a end -->
+#          </doc>
+#     }]
+#     $doc delete
+#     if {[grammar state] ne "FINISHED"} {
+#         error "Wrong state."
+#     }
+#     grammar delete
+# } {}
+
