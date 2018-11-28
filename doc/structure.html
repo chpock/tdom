@@ -4,37 +4,37 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x8011d0">NAME</a> · <a href="#SECTid0x7401b0">SYNOPSIS</a> · <a href="#SECTid0x86ad00">DESCRIPTION </a> · <a href="#SECTid0x8ad590">Structure definition scripts</a> · <a href="#SECTid0x8b0d80">Exampels</a>
+<a href="#SECTid0x1d571d0">NAME</a> · <a href="#SECTid0x1c972c0">SYNOPSIS</a> · <a href="#SECTid0x1dc0cb0">DESCRIPTION </a> · <a href="#SECTid0x1e035f0">Structure definition scripts</a> · <a href="#SECTid0x1e06de0">Exampels</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x8011d0">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x1d571d0">NAME</a></h2><p class="namesection">
 <b class="names">tdom::structure - </b><br>Create an XML structure validation command</p>
 
-  <h2><a name="SECTid0x7401b0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x1c972c0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
     <b class="cmd">tdom::structure</b> <i class="m">cmdName</i>
     </pre>
 
-  <h2><a name="SECTid0x86ad00">DESCRIPTION </a></h2><p>This command creates validation commands with a simple API. The
+  <h2><a name="SECTid0x1dc0cb0">DESCRIPTION </a></h2><p>This command creates validation commands with a simple API. The
     validation commands have methods to define an XML grammer and are 
     able to validate XML or DOM trees against this grammer.</p><p>The valid methods of the created commands are:</p><dl class="commandlist">
       
         <dt>
-<b class="method">defelement</b> <i class="m">name</i> <i class="m">?namespace?</i> <i class="m">definition script</i>
+<b class="method">defelement</b> <i class="m">name</i> <i class="m">?namespace?</i> <i class="m">&lt;definition script&gt;</i>
 </dt>
         <dd></dd>
       
 
       
         <dt>
-<b class="method">defpattern</b> <i class="m">name</i> <i class="m">definition script</i>
+<b class="method">defpattern</b> <i class="m">name</i> <i class="m">&lt;definition script&gt;</i>
 </dt>
         <dd></dd>
       
 
       
         <dt>
-<b class="method">define</b> <i class="m">definition script</i>
+<b class="method">define</b> <i class="m">&lt;definition script&gt;</i>
 </dt>
         <dd></dd>
       
@@ -48,7 +48,7 @@
 
       
         <dt>
-<b class="method">event</b> <i class="m">(start|end|text)</i> <i class="m">?event specific data</i>
+<b class="method">event</b> <i class="m">(start|end|text)</i> <i class="m">?event specific data?</i>
 </dt>
         <dd></dd>
       
@@ -80,13 +80,13 @@
 
     </dl>
 
-  <h2><a name="SECTid0x8ad590">Structure definition scripts</a></h2><p>Structure definition scripts are ordinary Tcl scripts that are
+  <h2><a name="SECTid0x1e035f0">Structure definition scripts</a></h2><p>Structure definition scripts are ordinary Tcl scripts that are
     evaluatend in the namespace tdom::structure. Several commands in
     this tcl namespace allows to define a wide variety of document
     structures.</p><p>This commands are:</p><dl class="commandlist">
       
         <dt>
-<b class="method">element</b> <i class="m">name</i> <i class="m">?quant?</i> <i class="m">?definition script?</i>
+<b class="method">element</b> <i class="m">name</i> <i class="m">?quant?</i> <i class="m">?&lt;definition script&gt;?</i>
 </dt>
         <dd></dd>
       
@@ -100,35 +100,35 @@
 
       
         <dt>
-<b class="method">group</b> <i class="m">definition script</i>
+<b class="method">group</b> <i class="m">&lt;definition script&gt;</i>
 </dt>
         <dd></dd>
       
       
       
         <dt>
-<b class="method">choice</b> <i class="m">definition script?</i>
-</dt>
-        <dd></dd>
-      
-
-      
-        <dt>
-<b class="method">interleave</b> <i class="m">definition script</i>
+<b class="method">choice</b> <i class="m">&lt;definition script&gt;</i>
 </dt>
         <dd></dd>
       
 
       
         <dt>
-<b class="method">mixed</b> <i class="m">definition script</i>
+<b class="method">interleave</b> <i class="m">&lt;definition script&gt;</i>
 </dt>
         <dd></dd>
       
 
       
         <dt>
-<b class="method">text</b> <i class="m">definition script</i>
+<b class="method">mixed</b> <i class="m">&lt;definition script&gt;</i>
+</dt>
+        <dd></dd>
+      
+
+      
+        <dt>
+<b class="method">text</b> <i class="m">&lt;definition script&gt;</i>
 </dt>
         <dd></dd>
       
@@ -140,14 +140,14 @@
 
       
         <dt>
-<b class="method">attribute</b> <i class="m">definition script</i>
+<b class="method">attribute</b> <i class="m">&lt;definition script&gt;</i>
 </dt>
         <dd></dd>
       
 
       
         <dt>
-<b class="method">namespace</b> <i class="m">definition script</i>
+<b class="method">namespace</b> <i class="m">&lt;definition script&gt;</i>
 </dt>
         <dd></dd>
       
@@ -158,7 +158,7 @@
       
     </dl>
   
-  <h2><a name="SECTid0x8b0d80">Exampels</a></h2><p>The XML Schema Part 0: Primer Second Edition
+  <h2><a name="SECTid0x1e06de0">Exampels</a></h2><p>The XML Schema Part 0: Primer Second Edition
     https://www.w3.org/TR/xmlschema-0/ starts with this example schema
     or grammar or Structure definition:</p><pre class="example">
 &lt;xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;

@@ -1,5 +1,5 @@
-C Fixed\seditorial\serrors.
-D 2018-11-28T13:42:36.916
+C More\seditorial\scorrections.
+D 2018-11-28T13:56:21.578
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -38,9 +38,9 @@ F doc/manpage.css 3b4ec1d641048933a7e6bffc659de9519030a959
 F doc/pullparser.html 3afeaa6c3960776a6dfc09df4395aace9c73c05389861bf8de1ce5943f7cc73b
 F doc/pullparser.n 5f5672e8bb2dd221602040cd212234da6b6ed8c99c5daa60be9fa0c476529c09
 F doc/pullparser.xml 6032c1e8c8d001068c227601dba9860824f8acc709c87fd8e36ac4a596b6a2f2
-F doc/structure.html 2e6511b18dfada76ebad5a6570b76eec5aac4cbaf60c24734c9d46496e428129
-F doc/structure.n d133ac8727286c38d262ed4b0136e0564deb01480019198d9c89a52fb2c28080
-F doc/structure.xml f1d6d69c00e3b8437e62737ae153563d9898dff20c89fb1e12c2fb25be46d808
+F doc/structure.html b751aed2a56cb4eda6ca96743305dc43c42d6842873f86f84f522ece94fdf3b2
+F doc/structure.n dd596f8980a29eff97e009883ef377c2983cf762a2911c44e8300585f83d582b
+F doc/structure.xml bc9cab8363c02219dc1a610cf98f4d7505c2d5e6bb553e1a0952ee677a2c5dd8
 F doc/tDOM.xml da77576ab62262463b7806357baf04a01affd5dfda77511a0e469597f43f93b7
 F doc/tdomcmd.html 9b4d9ff443499554adf2346ff0efc0317a98bd6e1fc3fc79a6e476b71fe85fed
 F doc/tdomcmd.n c06a5ff035f16a2a52636b69d9ebe6ba84ff5101922ed27b551146c4d61d6cda
@@ -228,8 +228,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P bd982e01d4ffd13dab3d5329f7ab4b22591abb84e7b7b26f98a32ee2989293ff
-R 19e680f964a53a3f0d44f994bf5c6924
+P 9c0ae974dd3556c55fe11c5a14b1aa12417cdc91fe20ab3e0df595ad2e919f6c
+R 9098a49079f24aee464078578bbafdd7
 U rolf
-Z 3464f2f98d520653cffefcaa7c2efd8c
+Z 5d8ce4f44c9b60aed55d28334410b931
 # Remove this line to create a well-formed Fossil manifest.

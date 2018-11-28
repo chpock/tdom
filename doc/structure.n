@@ -177,19 +177,19 @@ able to validate XML or DOM trees against this grammer.
 .PP
 The valid methods of the created commands are:
 .TP
-\&\fB\fBdefelement\fP \fIname\fB \fI?namespace?\fB \fIdefinition script\fB
+\&\fB\fBdefelement\fP \fIname\fB \fI?namespace?\fB \fI<definition script>\fB
 \&\fR
 .TP
-\&\fB\fBdefpattern\fP \fIname\fB \fIdefinition script\fB
+\&\fB\fBdefpattern\fP \fIname\fB \fI<definition script>\fB
 \&\fR
 .TP
-\&\fB\fBdefine\fP \fIdefinition script\fB
+\&\fB\fBdefine\fP \fI<definition script>\fB
 \&\fR
 .TP
 \&\fB\fBstart\fP \fIdocumentElement\fB \fI?namespace?\fB
 \&\fR
 .TP
-\&\fB\fBevent\fP \fI(start|end|text)\fB \fI?event specific data\fB
+\&\fB\fBevent\fP \fI(start|end|text)\fB \fI?event specific data?\fB
 \&\fR
 .TP
 \&\fB\fBdelete\fP
@@ -224,34 +224,34 @@ structures.
 .PP
 This commands are:
 .TP
-\&\fB\fBelement\fP \fIname\fB \fI?quant?\fB \fI?definition script?\fB
+\&\fB\fBelement\fP \fIname\fB \fI?quant?\fB \fI?<definition script>?\fB
 \&\fR
 .TP
 \&\fB\fBref\fP \fIname\fB
 \&\fR
 .TP
-\&\fB\fBgroup\fP \fIdefinition script\fB
+\&\fB\fBgroup\fP \fI<definition script>\fB
 \&\fR
 .TP
-\&\fB\fBchoice\fP \fIdefinition script?\fB
+\&\fB\fBchoice\fP \fI<definition script>\fB
 \&\fR
 .TP
-\&\fB\fBinterleave\fP \fIdefinition script\fB
+\&\fB\fBinterleave\fP \fI<definition script>\fB
 \&\fR
 .TP
-\&\fB\fBmixed\fP \fIdefinition script\fB
+\&\fB\fBmixed\fP \fI<definition script>\fB
 \&\fR
 .TP
-\&\fB\fBtext\fP \fIdefinition script\fB
+\&\fB\fBtext\fP \fI<definition script>\fB
 \&\fR
 .TP
 \&\fB\fBany\fP
 \&\fR
 .TP
-\&\fB\fBattribute\fP \fIdefinition script\fB
+\&\fB\fBattribute\fP \fI<definition script>\fB
 \&\fR
 .TP
-\&\fB\fBnamespace\fP \fIdefinition script\fB
+\&\fB\fBnamespace\fP \fI<definition script>\fB
 \&\fR
 .TP
 \&\fB\fBempty\fP

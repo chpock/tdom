@@ -22,17 +22,17 @@
 
     <commandlist>
       <commanddef>
-        <command><method>defelement</method> <m>name</m> <m>?namespace?</m> <m>definition script</m></command>
+        <command><method>defelement</method> <m>name</m> <m>?namespace?</m> <m>&lt;definition script></m></command>
         <desc></desc>
       </commanddef>
 
       <commanddef>
-        <command><method>defpattern</method> <m>name</m> <m>definition script</m></command>
+        <command><method>defpattern</method> <m>name</m> <m>&lt;definition script></m></command>
         <desc></desc>
       </commanddef>
 
       <commanddef>
-        <command><method>define</method> <m>definition script</m></command>
+        <command><method>define</method> <m>&lt;definition script></m></command>
         <desc></desc>
       </commanddef>
       
@@ -42,7 +42,7 @@
       </commanddef>
 
       <commanddef>
-        <command><method>event</method> <m>(start|end|text)</m> <m>?event specific data</m></command>
+        <command><method>event</method> <m>(start|end|text)</m> <m>?event specific data?</m></command>
         <desc></desc>
       </commanddef>
 
@@ -86,7 +86,7 @@
 
     <commandlist>
       <commanddef>
-        <command><method>element</method> <m>name</m> <m>?quant?</m> <m>?definition script?</m></command>
+        <command><method>element</method> <m>name</m> <m>?quant?</m> <m>?&lt;definition script>?</m></command>
         <desc></desc>
       </commanddef>
 
@@ -96,27 +96,27 @@
       </commanddef>
 
       <commanddef>
-        <command><method>group</method> <m>definition script</m></command>
+        <command><method>group</method> <m>&lt;definition script></m></command>
         <desc></desc>
       </commanddef>
       
       <commanddef>
-        <command><method>choice</method> <m>definition script?</m></command>
+        <command><method>choice</method> <m>&lt;definition script></m></command>
         <desc></desc>
       </commanddef>
 
       <commanddef>
-        <command><method>interleave</method> <m>definition script</m></command>
+        <command><method>interleave</method> <m>&lt;definition script></m></command>
         <desc></desc>
       </commanddef>
 
       <commanddef>
-        <command><method>mixed</method> <m>definition script</m></command>
+        <command><method>mixed</method> <m>&lt;definition script></m></command>
         <desc></desc>
       </commanddef>
 
       <commanddef>
-        <command><method>text</method> <m>definition script</m></command>
+        <command><method>text</method> <m>&lt;definition script></m></command>
         <desc></desc>
       </commanddef>
 
@@ -126,12 +126,12 @@
       </commanddef>
 
       <commanddef>
-        <command><method>attribute</method> <m>definition script</m></command>
+        <command><method>attribute</method> <m>&lt;definition script></m></command>
         <desc></desc>
       </commanddef>
 
       <commanddef>
-        <command><method>namespace</method> <m>definition script</m></command>
+        <command><method>namespace</method> <m>&lt;definition script></m></command>
         <desc></desc>
       </commanddef>
       
