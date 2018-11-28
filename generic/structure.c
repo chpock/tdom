@@ -379,7 +379,6 @@ cleanupLastPattern (
     Tcl_HashEntry *entryPtr;
     StructureCP *this, *previous, *current;
 
-    return;
     for (i = from; i < sdata->numPatternList; i++) {
         this = sdata->patternList[i];
         hashTable = NULL;
@@ -407,7 +406,7 @@ cleanupLastPattern (
                     previous->next = NULL;
                 }
             } else {
-                if (current->next) {
+                if (current) {
                     Tcl_SetHashValue (entryPtr, current->next);
                 } else {
                     Tcl_DeleteHashEntry (entryPtr);
@@ -1563,7 +1562,7 @@ evalDefinition (
 {
     StructureCP **savedCurrentContent;
     StructureQuant **savedCurrentQuant;
-    unsigned int savedNumChildren, savedContenSize, savedNumPatternList;
+    unsigned int savedNumChildren, savedContenSize;
     int result;
 
     /* Save some state of sdata .. */
@@ -1572,7 +1571,6 @@ evalDefinition (
     savedNumChildren = sdata->numChildren;
     savedContenSize = sdata->contentSize;
     /* ... and prepare sdata for definition evaluation. */
-    savedNumPatternList = sdata->numPatternList;
     sdata->currentContent = pattern->content;
     sdata->currentQuants = pattern->quants;
     sdata->numChildren = 0;
@@ -1594,7 +1592,6 @@ evalDefinition (
         REMEMBER_PATTERN (pattern);
         ADD_TO_CONTENT (pattern, quant);
     } else {
-        cleanupLastPattern (sdata, savedNumPatternList);
         freeStructureCP (pattern);
     }
     return result;
