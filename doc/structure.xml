@@ -234,8 +234,8 @@ grammar define {
     element comment {text}
 
     defpattern PurchaseOrderType {
-        element shipTo {text USAddress}
-        element billTo {text USAddress}
+        element shipTo {ref USAddress}
+        element billTo {ref USAddress}
         element comment ?
         element items
         attribute orderDate
