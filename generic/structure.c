@@ -37,6 +37,10 @@
 # define DBG(x) 
 #endif
 
+/*----------------------------------------------------------------------------
+|   Initial buffer sizes
+|
+\---------------------------------------------------------------------------*/
 #ifndef CONTENT_ARRAY_SIZE_INIT
 #  define CONTENT_ARRAY_SIZE_INIT 20
 #endif
@@ -53,6 +57,22 @@
 #  define STACK_LIST_SIZE_INIT 64
 #endif
 
+/*----------------------------------------------------------------------------
+|   Local typedefs
+|
+\---------------------------------------------------------------------------*/
+
+typedef struct
+{
+    StructureData *sdata;
+    Tcl_Interp    *interp;
+    XML_Parser     parser;
+} ValidateMethodData;
+
+/*----------------------------------------------------------------------------
+|   Macros
+|
+\---------------------------------------------------------------------------*/
 #define TMALLOC(t) (t*)MALLOC(sizeof(t))
 
 #define SetResult(str) Tcl_ResetResult(interp); \
@@ -92,7 +112,7 @@ static char *Structure_Quant_Type2str[] = {
 #define FORWARD_PATTERN_DEF     1
 #define PLACEHOLDER_PATTERN_DEF 2
 #define AMBIGUOUS_PATTERN       4
-#define LOCAL_DEFINED_ELEMENT  8
+#define LOCAL_DEFINED_ELEMENT   8
 
 /* Pointer to heap-allocated shared quants. */
 static StructureQuant QuantOne;
@@ -313,6 +333,8 @@ initStructureData ()
     sdata->stackList = (StructureValidationStack **) MALLOC (
         sizeof (StructureValidationStack *) * STACK_LIST_SIZE_INIT);
     sdata->stackListSize = STACK_LIST_SIZE_INIT;
+    sdata->cdata = (Tcl_DString*) MALLOC (sizeof (Tcl_DString));
+    Tcl_DStringInit (sdata->cdata);
     return sdata;
 }
 
@@ -341,6 +363,8 @@ static void structureInstanceDelete (
         FREE (sdata->stackList[i]);
     }
     FREE (sdata->stackList);
+    Tcl_DStringFree (sdata->cdata);
+    FREE (sdata->cdata);
     FREE (sdata);
 }
 
@@ -932,6 +956,101 @@ probeText (
     return TCL_OK;
 }
 
+static void
+startElement(
+    void         *userData,
+    const char   *name,
+    const char  **atts
+)
+{
+    ValidateMethodData *vdata = (ValidateMethodData *) userData;
+
+    DBG(fprintf (stderr, "startElement: '%s'\n", name);)
+    if (Tcl_DStringLength (vdata->sdata->cdata)) {
+        if (probeText (vdata->interp, vdata->sdata,
+                       Tcl_DStringValue (vdata->sdata->cdata)) != TCL_OK) {
+            XML_StopParser (vdata->parser, 0);
+        }
+    }
+    if (probeElement (vdata->interp, vdata->sdata, name, NULL)
+        != TCL_OK) {
+        XML_StopParser (vdata->parser, 0);
+    }
+}
+
+static void
+endElement (
+    void        *userData,
+    const char  *name
+)
+{
+    ValidateMethodData *vdata = (ValidateMethodData *) userData;
+
+    DBG(fprintf (stderr, "endElement: '%s'\n", name);)
+    if (Tcl_DStringLength (vdata->sdata->cdata)) {
+        if (probeText (vdata->interp, vdata->sdata,
+                       Tcl_DStringValue (vdata->sdata->cdata)) != TCL_OK) {
+            XML_StopParser (vdata->parser, 0);
+        }
+    }
+    if (probeElementEnd (vdata->interp, vdata->sdata)
+        != TCL_OK) {
+        XML_StopParser (vdata->parser, 0);
+    }
+}
+
+static void
+characterDataHandler (
+    void        *userData,
+    const char  *s,
+    int          len
+)
+{
+    ValidateMethodData *vdata = (ValidateMethodData *) userData;
+
+    Tcl_DStringAppend (vdata->sdata->cdata, s, len);    
+}
+
+static int
+validateString (
+    Tcl_Interp *interp,
+    StructureData *sdata,
+    char *xmlstr,
+    int len
+    )
+{
+    XML_Parser parser;
+    char sep = '\xFF';
+    ValidateMethodData vdata;
+    Tcl_Obj *resultObj;
+    char sl[50], sc[50];
+    int result;
+    
+        
+    Tcl_DStringSetLength (sdata->cdata, 0);
+    parser = XML_ParserCreate_MM (NULL, MEM_SUITE, &sep);
+    vdata.interp = interp;
+    vdata.sdata = sdata;
+    vdata.parser = parser;
+    XML_SetUserData (parser, &vdata);
+    XML_SetElementHandler (parser, startElement, endElement);
+    XML_SetCharacterDataHandler (parser, characterDataHandler);
+    
+    if (XML_Parse (parser, xmlstr, len, 1) != XML_STATUS_OK) {
+        resultObj = Tcl_NewObj ();
+        sprintf(sl, "%ld", XML_GetCurrentLineNumber(parser));
+        sprintf(sc, "%ld", XML_GetCurrentColumnNumber(parser));
+        Tcl_AppendStringsToObj (resultObj, "error \"",
+                                Tcl_GetStringResult (interp),"\" at line ",
+                                sl, " character ", sc, NULL);
+        Tcl_SetObjResult (interp, resultObj);
+        result = TCL_ERROR;
+    } else {
+        result = TCL_OK;
+    }
+    XML_ParserFree (parser);
+    return result;
+}
 
 int 
 structureInstanceCmd (
@@ -943,21 +1062,24 @@ structureInstanceCmd (
 {
     int            methodIndex, keywordIndex, hnew, patternIndex;
     int            result = TCL_OK, forwardDef = 0, i = 0;
-    int            savedDefineToplevel, type;
+    int            savedDefineToplevel, type, len;
     unsigned int   savedNumPatternList;
     StructureData  *sdata = (StructureData *) clientData;
     Tcl_HashTable *hashTable;
     Tcl_HashEntry *entryPtr;
     StructureCP   *pattern, *current = NULL;
     void          *namespacePtr, *savedNamespacePtr;
+    char          *xmlstr;
     
     static const char *structureInstanceMethods[] = {
         "defelement", "defpattern", "start", "event", "delete",
-        "nrForwardDefinitions", "state", "reset", "define", NULL
+        "nrForwardDefinitions", "state", "reset", "define",
+        "validate", NULL
     };
     enum structureInstanceMethod {
         m_defelement, m_defpattern, m_start, m_event, m_delete,
-        m_nrForwardDefinitions, m_state, m_reset, m_define
+        m_nrForwardDefinitions, m_state, m_reset, m_define,
+        m_validate
     };
 
     static const char *eventKeywords[] = {
@@ -1214,8 +1336,17 @@ structureInstanceCmd (
     case m_reset:
         sdata->stackPtr = 0;
         sdata->validationState = VALIDATION_READY;
+        Tcl_DStringSetLength (sdata->cdata, 0);
         break;
-            
+
+    case m_validate:
+        if (objc != 3) {
+            Tcl_WrongNumArgs (interp, 2, objv, "<xml>");
+            return TCL_ERROR;
+        }
+        xmlstr = Tcl_GetStringFromObj (objv[2], &len);
+        return validateString (interp, sdata, xmlstr, len);
+        
     default:
         Tcl_SetResult (interp, "unknown method", NULL);
         result = TCL_ERROR;
@@ -1484,7 +1615,7 @@ NamedPatternObjCmd (
     Tcl_HashEntry *entryPtr;
     StructureCP *pattern = NULL, *current;
     StructureQuant *quant;
-    int hnew, i;
+    int hnew;
 
     CHECK_SI
     CHECK_TOPLEVEL

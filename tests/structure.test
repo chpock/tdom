@@ -2,12 +2,13 @@
 #
 # Tested functionalities:
 #    structure-1.*: Basics, interface
-#    structure-2.*: Grammar definition
-#    structure-3.*: Grammar definition
+#    structure-2.*: Grammar definition ref
+#    structure-3.*: Grammar definition choice
 #    structure-4.*: Script level validation with event
 #    structure-5.*: dom parse -validateCmd
 #    structure-6.*: expat parser -validateCmd
 #    structure-7.*: Validation checks.
+#    structure-8.*: tdom::structure validate method
 #
 # Copyright (c) 2018 Rolf Ade.
 
@@ -664,7 +665,7 @@ test structure-7.5 {group with inline defined element} {
 #                 element e2
 #             }
 #             element e3 ?
-{#         }
+#         }
 #         foreach e {e1 e2 e3 b1 b2} {
 #             defelement $e foouri {}
 #         }
@@ -692,3 +693,19 @@ test structure-7.5 {group with inline defined element} {
 #     }
 #     grammar delete
 # } {}
+
+test structure-8.1 {validate method} {
+    tdom::structure create grammar
+    grammar defelement doc {
+        element e1
+        element e2 *
+    }
+    foreach e {e1 e2} {
+        grammar defelement $e {}
+    }
+    set result [catch {grammar validate <doc><e1/></doc>}]
+    grammar reset
+    lappend result [catch {grammar validate <doc><e1/><e1/></doc>} errMsg]
+    grammar delete
+    set result
+} {0 1}
