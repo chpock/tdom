@@ -76,12 +76,13 @@
 
   <section>
     <title>Structure definition scripts</title>
+
     <p>Structure definition scripts are ordinary Tcl scripts that are
     evaluatend in the namespace tdom::structure. Several commands in
     this tcl namespace allows to define a wide variety of document
     structures.</p>
 
-    <p>The valid methods of the created commands are:</p>
+    <p>This commands are:</p>
 
     <commandlist>
       <commanddef>
@@ -142,4 +143,125 @@
     
   </section>
   
+  <section>
+    <title>Exampels</title>
+
+    <p>The XML Schema Part 0: Primer Second Edition
+    https://www.w3.org/TR/xmlschema-0/ starts with this example schema
+    or grammar or Structure definition:</p>
+
+    <example>
+&lt;xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+  &lt;xsd:annotation>
+    &lt;xsd:documentation xml:lang="en">
+     Purchase order schema for Example.com.
+     Copyright 2000 Example.com. All rights reserved.
+    &lt;/xsd:documentation>
+  &lt;/xsd:annotation>
+
+  &lt;xsd:element name="purchaseOrder" type="PurchaseOrderType"/>
+
+  &lt;xsd:element name="comment" type="xsd:string"/>
+
+  &lt;xsd:complexType name="PurchaseOrderType">
+    &lt;xsd:sequence>
+      &lt;xsd:element name="shipTo" type="USAddress"/>
+      &lt;xsd:element name="billTo" type="USAddress"/>
+      &lt;xsd:element ref="comment" minOccurs="0"/>
+      &lt;xsd:element name="items"  type="Items"/>
+    &lt;/xsd:sequence>
+    &lt;xsd:attribute name="orderDate" type="xsd:date"/>
+  &lt;/xsd:complexType>
+
+  &lt;xsd:complexType name="USAddress">
+    &lt;xsd:sequence>
+      &lt;xsd:element name="name"   type="xsd:string"/>
+      &lt;xsd:element name="street" type="xsd:string"/>
+      &lt;xsd:element name="city"   type="xsd:string"/>
+      &lt;xsd:element name="state"  type="xsd:string"/>
+      &lt;xsd:element name="zip"    type="xsd:decimal"/>
+    &lt;/xsd:sequence>
+    &lt;xsd:attribute name="country" type="xsd:NMTOKEN"
+                   fixed="US"/>
+  &lt;/xsd:complexType>
+
+  &lt;xsd:complexType name="Items">
+    &lt;xsd:sequence>
+      &lt;xsd:element name="item" minOccurs="0" maxOccurs="unbounded">
+        &lt;xsd:complexType>
+          &lt;xsd:sequence>
+            &lt;xsd:element name="productName" type="xsd:string"/>
+            &lt;xsd:element name="quantity">
+              &lt;xsd:simpleType>
+                &lt;xsd:restriction base="xsd:positiveInteger">
+                  &lt;xsd:maxExclusive value="100"/>
+                &lt;/xsd:restriction>
+              &lt;/xsd:simpleType>
+            &lt;/xsd:element>
+            &lt;xsd:element name="USPrice"  type="xsd:decimal"/>
+            &lt;xsd:element ref="comment"   minOccurs="0"/>
+            &lt;xsd:element name="shipDate" type="xsd:date" minOccurs="0"/>
+          &lt;/xsd:sequence>
+          &lt;xsd:attribute name="partNum" type="SKU" use="required"/>
+        &lt;/xsd:complexType>
+      &lt;/xsd:element>
+    &lt;/xsd:sequence>
+  &lt;/xsd:complexType>
+
+  &lt;!-- Stock Keeping Unit, a code for identifying products -->
+  &lt;xsd:simpleType name="SKU">
+    &lt;xsd:restriction base="xsd:string">
+      &lt;xsd:pattern value="\d{3}-[A-Z]{2}"/>
+    &lt;/xsd:restriction>
+  &lt;/xsd:simpleType>
+
+&lt;/xsd:schema>
+    </example>
+
+    <p>A somewhat one-to-one translation of that into a tDOM structure
+    defintion script would be:</p>
+
+    <example>
+tdom::structure grammar      
+grammar define {
+
+    # Purchase order schema for Example.com.
+    # Copyright 2000 Example.com. All rights reserved.
+
+    element purchaseOrder {ref PurchaseOrderType}
+
+    element comment {text}
+
+    defpattern PurchaseOrderType {
+        element shipTo {text USAddress}
+        element billTo {text USAddress}
+        element comment ?
+        element items
+        attribute orderDate
+    }
+
+    defpattern USAddress {
+        element name {text}
+        element street {text}
+        element city {text}
+        element state {text}
+        element zip {text}
+        attribute country ! {text fixed "US"}
+    }
+
+    defelement items {
+        element item * {
+            element product ! {text}
+            element quntity ! {text {maxExcluse 100}}
+            element USPrice ! {text isNumber}
+            element comment
+            element shipDate ? {text isDate}
+            attribute partNum ! {text {pattern "\d{3}-[A-Z]{2}"}}
+        }
+    }
+}
+      
+    </example>
+  </section>
 </manpage>

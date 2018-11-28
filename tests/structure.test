@@ -664,7 +664,7 @@ test structure-7.5 {group with inline defined element} {
 #                 element e2
 #             }
 #             element e3 ?
-#         }
+{#         }
 #         foreach e {e1 e2 e3 b1 b2} {
 #             defelement $e foouri {}
 #         }
@@ -692,4 +692,3 @@ test structure-7.5 {group with inline defined element} {
 #     }
 #     grammar delete
 # } {}
-
