@@ -56,6 +56,9 @@
 #ifndef STACK_LIST_SIZE_INIT
 #  define STACK_LIST_SIZE_INIT 64
 #endif
+#ifndef URI_BUFFER_LEN_INIT
+#  define URI_BUFFER_LEN_INIT 128
+#endif
 
 /*----------------------------------------------------------------------------
 |   Local typedefs
@@ -67,6 +70,9 @@ typedef struct
     StructureData *sdata;
     Tcl_Interp    *interp;
     XML_Parser     parser;
+    Tcl_DString   *cdata;
+    char          *uri;
+    int            maxUriLen;
 } ValidateMethodData;
 
 /*----------------------------------------------------------------------------
@@ -333,8 +339,6 @@ initStructureData ()
     sdata->stackList = (StructureValidationStack **) MALLOC (
         sizeof (StructureValidationStack *) * STACK_LIST_SIZE_INIT);
     sdata->stackListSize = STACK_LIST_SIZE_INIT;
-    sdata->cdata = (Tcl_DString*) MALLOC (sizeof (Tcl_DString));
-    Tcl_DStringInit (sdata->cdata);
     return sdata;
 }
 
@@ -363,8 +367,6 @@ static void structureInstanceDelete (
         FREE (sdata->stackList[i]);
     }
     FREE (sdata->stackList);
-    Tcl_DStringFree (sdata->cdata);
-    FREE (sdata->cdata);
     FREE (sdata);
 }
 
@@ -963,15 +965,38 @@ startElement(
 )
 {
     ValidateMethodData *vdata = (ValidateMethodData *) userData;
-
+    char *namespace;
+    const char *s;
+    int i = 0;
+    
     DBG(fprintf (stderr, "startElement: '%s'\n", name);)
-    if (Tcl_DStringLength (vdata->sdata->cdata)) {
+    if (Tcl_DStringLength (vdata->cdata)) {
         if (probeText (vdata->interp, vdata->sdata,
-                       Tcl_DStringValue (vdata->sdata->cdata)) != TCL_OK) {
+                       Tcl_DStringValue (vdata->cdata)) != TCL_OK) {
             XML_StopParser (vdata->parser, 0);
         }
     }
-    if (probeElement (vdata->interp, vdata->sdata, name, NULL)
+    s = name;
+    while (*s && *s != '\xFF') {
+        i++; s++;
+    }
+    namespace = NULL;
+    if (*s == '\xFF') {
+        s++;
+        if (i) {
+            if (i >= vdata->maxUriLen - 1) {
+                vdata->uri = (char *) REALLOC (vdata->uri, vdata->maxUriLen * 2);
+                vdata->maxUriLen *= 2;
+            }
+            memcpy (vdata->uri, name, i);
+            vdata->uri[i] = '\0';
+            namespace = vdata->uri;
+        }
+    } else {
+        s = name;
+    }
+
+    if (probeElement (vdata->interp, vdata->sdata, s, namespace)
         != TCL_OK) {
         XML_StopParser (vdata->parser, 0);
     }
@@ -986,9 +1011,9 @@ endElement (
     ValidateMethodData *vdata = (ValidateMethodData *) userData;
 
     DBG(fprintf (stderr, "endElement: '%s'\n", name);)
-    if (Tcl_DStringLength (vdata->sdata->cdata)) {
+    if (Tcl_DStringLength (vdata->cdata)) {
         if (probeText (vdata->interp, vdata->sdata,
-                       Tcl_DStringValue (vdata->sdata->cdata)) != TCL_OK) {
+                       Tcl_DStringValue (vdata->cdata)) != TCL_OK) {
             XML_StopParser (vdata->parser, 0);
         }
     }
@@ -1007,7 +1032,7 @@ characterDataHandler (
 {
     ValidateMethodData *vdata = (ValidateMethodData *) userData;
 
-    Tcl_DStringAppend (vdata->sdata->cdata, s, len);    
+    Tcl_DStringAppend (vdata->cdata, s, len);    
 }
 
 static int
@@ -1021,16 +1046,19 @@ validateString (
     XML_Parser parser;
     char sep = '\xFF';
     ValidateMethodData vdata;
+    Tcl_DString cdata;
     Tcl_Obj *resultObj;
     char sl[50], sc[50];
     int result;
     
-        
-    Tcl_DStringSetLength (sdata->cdata, 0);
     parser = XML_ParserCreate_MM (NULL, MEM_SUITE, &sep);
     vdata.interp = interp;
     vdata.sdata = sdata;
     vdata.parser = parser;
+    Tcl_DStringInit (&cdata);
+    vdata.cdata = &cdata;
+    vdata.uri = (char *) MALLOC (URI_BUFFER_LEN_INIT);
+    vdata.maxUriLen = URI_BUFFER_LEN_INIT;
     XML_SetUserData (parser, &vdata);
     XML_SetElementHandler (parser, startElement, endElement);
     XML_SetCharacterDataHandler (parser, characterDataHandler);
@@ -1048,6 +1076,8 @@ validateString (
         result = TCL_OK;
     }
     XML_ParserFree (parser);
+    Tcl_DStringFree (&cdata);
+    FREE (vdata.uri);
     return result;
 }
 
@@ -1335,7 +1365,6 @@ structureInstanceCmd (
     case m_reset:
         sdata->stackPtr = 0;
         sdata->validationState = VALIDATION_READY;
-        Tcl_DStringSetLength (sdata->cdata, 0);
         break;
 
     case m_validate:

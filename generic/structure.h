@@ -112,7 +112,6 @@ typedef struct
     int                        stackSize;
     int                        stackPtr;
     ValidationState            validationState;
-    Tcl_DString               *cdata;
     StructureValidationStack **stackList;
     unsigned int numStackList;
     unsigned int stackListSize;

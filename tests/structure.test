@@ -709,3 +709,19 @@ test structure-8.1 {validate method} {
     grammar delete
     set result
 } {0 1}
+
+test structure-8.2 {validate method} {
+    tdom::structure create grammar
+    grammar defelement doc foouri {
+        element e1
+        element e2 *
+    }
+    foreach e {e1 e2} {
+        grammar defelement $e foouri {}
+    }
+    set result [catch {grammar validate {<doc xmlns="foouri"><e1/></doc>}}]
+    grammar reset
+    lappend result [catch {grammar validate {<doc xmlns="foouri"><e1/><e1/></doc>}} errMsg]
+    grammar delete
+    set result
+} {0 1}
