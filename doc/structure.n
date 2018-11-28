@@ -160,12 +160,12 @@ Database Class:	\\fB\\$3\\fR
 .TH structure n "" Tcl ""
 .BS
 .SH NAME
-tDOM::structure \- Create an XML pull parser command
+tdom::structure \- Create an XML structure validation command
 .SH SYNOPSIS
 .nf
 package require tdom
 
-    \fBtDOM::structure\fP \fIcmdName\fR
+    \fBtdom::structure\fP \fIcmdName\fR
     
 .fi
 .BE

@@ -1,13 +1,13 @@
 <manpage id="structure" cat="structure" title="structure">
   <namesection>
-    <name>tDOM::structure</name>
-    <desc>Create an XML pull parser command</desc>
+    <name>tdom::structure</name>
+    <desc>Create an XML structure validation command</desc>
   </namesection>
 
   <synopsis>
     <syntax>package require tdom
 
-    <cmd>tDOM::structure</cmd> <m>cmdName</m>
+    <cmd>tdom::structure</cmd> <m>cmdName</m>
     </syntax>
   </synopsis>
 
