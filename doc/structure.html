@@ -1,0 +1,330 @@
+<html>
+<head>
+<link rel="stylesheet" href="manpage.css"><title>tDOM manual: structure</title><meta name="xsl-processor" content="Jochen Loewer (loewerj@hotmail.com), Rolf Ade (rolf@pointsman.de) et. al."><meta name="generator" content="$RCSfile: tmml-html.xsl,v $ $Revision: 1.11 $"><meta charset="utf-8">
+</head><body>
+<div class="header">
+<div class="navbar" align="center">
+<a href="#SECTid0xd581d0">NAME</a> · <a href="#SECTid0xc98260">SYNOPSIS</a> · <a href="#SECTid0xdc1bd0">DESCRIPTION </a> · <a href="#SECTid0xe04570">Structure definition scripts</a> · <a href="#SECTid0xe07d60">Exampels</a>
+</div><hr class="navsep">
+</div><div class="body">
+  <h2><a name="SECTid0xd581d0">NAME</a></h2><p class="namesection">
+<b class="names">tDOM::structure - </b><br>Create an XML pull parser command</p>
+
+  <h2><a name="SECTid0xc98260">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+
+    <b class="cmd">tDOM::structure</b> <i class="m">cmdName</i>
+    </pre>
+
+  <h2><a name="SECTid0xdc1bd0">DESCRIPTION </a></h2><p>This command creates validation commands with a simple API. The
+    validation commands have methods to define an XML grammer and are 
+    able to validate XML or DOM trees against this grammer.</p><p>The valid methods of the created commands are:</p><dl class="commandlist">
+      
+        <dt>
+<b class="method">defelement</b> <i class="m">name</i> <i class="m">?namespace?</i> <i class="m">definition script</i>
+</dt>
+        <dd></dd>
+      
+
+      
+        <dt>
+<b class="method">defpattern</b> <i class="m">name</i> <i class="m">definition script</i>
+</dt>
+        <dd></dd>
+      
+
+      
+        <dt>
+<b class="method">define</b> <i class="m">definition script</i>
+</dt>
+        <dd></dd>
+      
+      
+      
+        <dt>
+<b class="method">start</b> <i class="m">documentElement</i> <i class="m">?namespace?</i>
+</dt>
+        <dd></dd>
+      
+
+      
+        <dt>
+<b class="method">event</b> <i class="m">(start|end|text)</i> <i class="m">?event specific data</i>
+</dt>
+        <dd></dd>
+      
+
+      
+        <dt><b class="method">delete</b></dt>
+        <dd>This method deletes the validation command.</dd>
+      
+
+      
+        <dt><b class="method">state</b></dt>
+        <dd>This method returns the state of the validation command with respect to validation state. The possible return values and their meanings are:
+        <dl>
+          <dt>READY</dt><dd>The validation command is ready to start
+          validation</dd>
+          <dt>VALIDATING</dt><dd>The validation command is in the
+          process of validating input.</dd>
+          <dt>FINISHED</dt><dd>The validation has finished, no futher
+          events are expected.</dd>
+        </dl>
+        </dd>
+      
+      
+      
+        <dt><b class="method">reset</b></dt>
+        <dd>This method resets the validation command into state
+        READY (while preserving the defined grammer).</dd>
+      
+
+    </dl>
+
+  <h2><a name="SECTid0xe04570">Structure definition scripts</a></h2><p>Structure definition scripts are ordinary Tcl scripts that are
+    evaluatend in the namespace tdom::structure. Several commands in
+    this tcl namespace allows to define a wide variety of document
+    structures.</p><p>This commands are:</p><dl class="commandlist">
+      
+        <dt>
+<b class="method">element</b> <i class="m">name</i> <i class="m">?quant?</i> <i class="m">?definition script?</i>
+</dt>
+        <dd></dd>
+      
+
+      
+        <dt>
+<b class="method">ref</b> <i class="m">name</i>
+</dt>
+        <dd></dd>
+      
+
+      
+        <dt>
+<b class="method">group</b> <i class="m">definition script</i>
+</dt>
+        <dd></dd>
+      
+      
+      
+        <dt>
+<b class="method">choice</b> <i class="m">definition script?</i>
+</dt>
+        <dd></dd>
+      
+
+      
+        <dt>
+<b class="method">interleave</b> <i class="m">definition script</i>
+</dt>
+        <dd></dd>
+      
+
+      
+        <dt>
+<b class="method">mixed</b> <i class="m">definition script</i>
+</dt>
+        <dd></dd>
+      
+
+      
+        <dt>
+<b class="method">text</b> <i class="m">definition script</i>
+</dt>
+        <dd></dd>
+      
+
+      
+        <dt><b class="method">any</b></dt>
+        <dd></dd>
+      
+
+      
+        <dt>
+<b class="method">attribute</b> <i class="m">definition script</i>
+</dt>
+        <dd></dd>
+      
+
+      
+        <dt>
+<b class="method">namespace</b> <i class="m">definition script</i>
+</dt>
+        <dd></dd>
+      
+      
+      
+        <dt><b class="method">empty</b></dt>
+        <dd></dd>
+      
+    </dl>
+  
+  <h2><a name="SECTid0xe07d60">Exampels</a></h2><p>The XML Schema Part 0: Primer Second Edition
+    https://www.w3.org/TR/xmlschema-0/ starts with this example schema
+    or grammar or Structure definition:</p><pre class="example">
+&lt;xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+
+  &lt;xsd:annotation&gt;
+    &lt;xsd:documentation xml:lang="en"&gt;
+     Purchase order schema for Example.com.
+     Copyright 2000 Example.com. All rights reserved.
+    &lt;/xsd:documentation&gt;
+  &lt;/xsd:annotation&gt;
+
+  &lt;xsd:element name="purchaseOrder" type="PurchaseOrderType"/&gt;
+
+  &lt;xsd:element name="comment" type="xsd:string"/&gt;
+
+  &lt;xsd:complexType name="PurchaseOrderType"&gt;
+    &lt;xsd:sequence&gt;
+      &lt;xsd:element name="shipTo" type="USAddress"/&gt;
+      &lt;xsd:element name="billTo" type="USAddress"/&gt;
+      &lt;xsd:element ref="comment" minOccurs="0"/&gt;
+      &lt;xsd:element name="items"  type="Items"/&gt;
+    &lt;/xsd:sequence&gt;
+    &lt;xsd:attribute name="orderDate" type="xsd:date"/&gt;
+  &lt;/xsd:complexType&gt;
+
+  &lt;xsd:complexType name="USAddress"&gt;
+    &lt;xsd:sequence&gt;
+      &lt;xsd:element name="name"   type="xsd:string"/&gt;
+      &lt;xsd:element name="street" type="xsd:string"/&gt;
+      &lt;xsd:element name="city"   type="xsd:string"/&gt;
+      &lt;xsd:element name="state"  type="xsd:string"/&gt;
+      &lt;xsd:element name="zip"    type="xsd:decimal"/&gt;
+    &lt;/xsd:sequence&gt;
+    &lt;xsd:attribute name="country" type="xsd:NMTOKEN"
+                   fixed="US"/&gt;
+  &lt;/xsd:complexType&gt;
+
+  &lt;xsd:complexType name="Items"&gt;
+    &lt;xsd:sequence&gt;
+      &lt;xsd:element name="item" minOccurs="0" maxOccurs="unbounded"&gt;
+        &lt;xsd:complexType&gt;
+          &lt;xsd:sequence&gt;
+            &lt;xsd:element name="productName" type="xsd:string"/&gt;
+            &lt;xsd:element name="quantity"&gt;
+              &lt;xsd:simpleType&gt;
+                &lt;xsd:restriction base="xsd:positiveInteger"&gt;
+                  &lt;xsd:maxExclusive value="100"/&gt;
+                &lt;/xsd:restriction&gt;
+              &lt;/xsd:simpleType&gt;
+            &lt;/xsd:element&gt;
+            &lt;xsd:element name="USPrice"  type="xsd:decimal"/&gt;
+            &lt;xsd:element ref="comment"   minOccurs="0"/&gt;
+            &lt;xsd:element name="shipDate" type="xsd:date" minOccurs="0"/&gt;
+          &lt;/xsd:sequence&gt;
+          &lt;xsd:attribute name="partNum" type="SKU" use="required"/&gt;
+        &lt;/xsd:complexType&gt;
+      &lt;/xsd:element&gt;
+    &lt;/xsd:sequence&gt;
+  &lt;/xsd:complexType&gt;
+
+  &lt;!-- Stock Keeping Unit, a code for identifying products --&gt;
+  &lt;xsd:simpleType name="SKU"&gt;
+    &lt;xsd:restriction base="xsd:string"&gt;
+      &lt;xsd:pattern value="\d{3}-[A-Z]{2}"/&gt;
+    &lt;/xsd:restriction&gt;
+  &lt;/xsd:simpleType&gt;
+
+&lt;/xsd:schema&gt;
+    </pre><p>A somewhat one-to-one translation of that into a tDOM structure
+    defintion script would be:</p><pre class="example">
+tdom::structure grammar      
+grammar define {
+
+    # Purchase order schema for Example.com.
+    # Copyright 2000 Example.com. All rights reserved.
+
+    element purchaseOrder {ref PurchaseOrderType}
+
+    element comment {text}
+
+    defpattern PurchaseOrderType {
+        element shipTo {ref USAddress}
+        element billTo {ref USAddress}
+        element comment ?
+        element items
+        attribute orderDate
+    }
+
+    defpattern USAddress {
+        element name {text}
+        element street {text}
+        element city {text}
+        element state {text}
+        element zip {text}
+        attribute country ! {text fixed "US"}
+    }
+
+    defelement items {
+        element item * {
+            element product ! {text}
+            element quntity ! {text {maxExcluse 100}}
+            element USPrice ! {text isNumber}
+            element comment
+            element shipDate ? {text isDate}
+            attribute partNum ! {text {pattern "\d{3}-[A-Z]{2}"}}
+        }
+    }
+}
+      
+    </pre><p>The RELAX NG Tutorial http://relaxng.org/tutorial-20011203.html
+    starts with this example:</p><pre class="example">
+Consider a simple XML representation of an email address book:
+
+&lt;addressBook&gt;
+  &lt;card&gt;
+    &lt;name&gt;John Smith&lt;/name&gt;
+    &lt;email&gt;js@example.com&lt;/email&gt;
+  &lt;/card&gt;
+  &lt;card&gt;
+    &lt;name&gt;Fred Bloggs&lt;/name&gt;
+    &lt;email&gt;fb@example.net&lt;/email&gt;
+  &lt;/card&gt;
+&lt;/addressBook&gt;
+
+The DTD would be as follows:
+
+&lt;!DOCTYPE addressBook [
+&lt;!ELEMENT addressBook (card*)&gt;
+&lt;!ELEMENT card (name, email)&gt;
+&lt;!ELEMENT name (#PCDATA)&gt;
+&lt;!ELEMENT email (#PCDATA)&gt;
+]&gt;
+
+A RELAX NG pattern for this could be written as follows:
+
+&lt;element name="addressBook" xmlns="http://relaxng.org/ns/structure/1.0"&gt;
+  &lt;zeroOrMore&gt;
+    &lt;element name="card"&gt;
+      &lt;element name="name"&gt;
+        &lt;text/&gt;
+      &lt;/element&gt;
+      &lt;element name="email"&gt;
+        &lt;text/&gt;
+      &lt;/element&gt;
+    &lt;/element&gt;
+  &lt;/zeroOrMore&gt;
+&lt;/element&gt;
+      
+    </pre><p>This structure definition script will do the same:</p><pre class="example">
+tdom::structure grammar      
+grammar define {
+    defelement addressBook {
+        element card *
+    }
+    defelement card {
+        element name
+        element email
+    }
+    foreach e {name email} {
+        defelement $e {text}
+    }
+}
+      
+    </pre>
+</div><hr class="navsep"><div class="navbar" align="center">
+<a class="navaid" href="index.html">Contents</a> · <a class="navaid" href="category-index.html">Index</a> · <a class="navaid" href="keyword-index.html">Keywords</a> · <a class="navaid" href="http://tdom.org">Repository</a>
+</div>
+</body>
+</html>

@@ -35,11 +35,15 @@
     <KWD name="C handler set" manpage="expatapi"/>
     <MAN id="pullparser" title="pullparser"/>
     <DEF cat="manpage" name="pullparser" manpage="pullparser"/>
-    <DEF cat="pullparser" name="tDOM::pullparser" manpage="pullparser"/>
-    <DEF cat="cmd" name="tDOM::pullparser" manpage="pullparser"/>
+    <DEF cat="pullparser" name="tdom::pullparser" manpage="pullparser"/>
+    <DEF cat="cmd" name="tdom::pullparser" manpage="pullparser"/>
     <KWD name="XML" manpage="pullparser"/>
     <KWD name="pull" manpage="pullparser"/>
     <KWD name="parsing" manpage="pullparser"/>
+    <MAN id="structure" title="structure"/>
+    <DEF cat="manpage" name="structure" manpage="structure"/>
+    <DEF cat="structure" name="tDOM::structure" manpage="structure"/>
+    <DEF cat="cmd" name="tDOM::structure" manpage="structure"/>
     <MAN id="tdomcmd" title="tdom"/>
     <DEF cat="manpage" name="tdomcmd" manpage="tdomcmd"/>
     <DEF cat="cmd" name="tdom" manpage="tdomcmd"/>

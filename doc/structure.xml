@@ -263,5 +263,67 @@ grammar define {
 }
       
     </example>
+
+    <p>The RELAX NG Tutorial http://relaxng.org/tutorial-20011203.html
+    starts with this example:</p>
+
+    <example>
+Consider a simple XML representation of an email address book:
+
+&lt;addressBook>
+  &lt;card>
+    &lt;name>John Smith&lt;/name>
+    &lt;email>js@example.com&lt;/email>
+  &lt;/card>
+  &lt;card>
+    &lt;name>Fred Bloggs&lt;/name>
+    &lt;email>fb@example.net&lt;/email>
+  &lt;/card>
+&lt;/addressBook>
+
+The DTD would be as follows:
+
+&lt;!DOCTYPE addressBook [
+&lt;!ELEMENT addressBook (card*)>
+&lt;!ELEMENT card (name, email)>
+&lt;!ELEMENT name (#PCDATA)>
+&lt;!ELEMENT email (#PCDATA)>
+]>
+
+A RELAX NG pattern for this could be written as follows:
+
+&lt;element name="addressBook" xmlns="http://relaxng.org/ns/structure/1.0">
+  &lt;zeroOrMore>
+    &lt;element name="card">
+      &lt;element name="name">
+        &lt;text/>
+      &lt;/element>
+      &lt;element name="email">
+        &lt;text/>
+      &lt;/element>
+    &lt;/element>
+  &lt;/zeroOrMore>
+&lt;/element>
+      
+    </example>
+
+    <p>This structure definition script will do the same:</p>
+
+    <example>
+tdom::structure grammar      
+grammar define {
+    defelement addressBook {
+        element card *
+    }
+    defelement card {
+        element name
+        element email
+    }
+    foreach e {name email} {
+        defelement $e {text}
+    }
+}
+      
+    </example>
   </section>
 </manpage>

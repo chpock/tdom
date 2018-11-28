@@ -5,6 +5,7 @@
 <!ENTITY expat SYSTEM "expat.xml">
 <!ENTITY expatapi SYSTEM "expatapi.xml">
 <!ENTITY pullparser SYSTEM "pullparser.xml">
+<!ENTITY structure SYSTEM "structure.xml">
 <!ENTITY tdomcmd SYSTEM "tdomcmd.xml">
 <!ENTITY tnc SYSTEM "tnc.xml">
 ]>
@@ -22,6 +23,8 @@
 &expatapi;
 
 &pullparser;
+
+&structure;
 
 &tdomcmd;
 

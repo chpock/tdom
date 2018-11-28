@@ -1,0 +1,444 @@
+'\"
+'\" Generated from structure.xml
+'\"
+'\" BEGIN man.macros
+.if t .wh -1.3i ^B
+.nr ^l \n(.l
+.ad b
+.de AP
+.ie !"\\$4"" .TP \\$4
+.el \{\
+.   ie !"\\$2"" .TP \\n()Cu
+.   el          .TP 15
+.\}
+.ta \\n()Au \\n()Bu
+.ie !"\\$3"" \{\
+\&\\$1	\\fI\\$2\\fP	(\\$3)
+.\".b
+.\}
+.el \{\
+.br
+.ie !"\\$2"" \{\
+\&\\$1	\\fI\\$2\\fP
+.\}
+.el \{\
+\&\\fI\\$1\\fP
+.\}
+.\}
+..
+.de AS
+.nr )A 10n
+.if !"\\$1"" .nr )A \\w'\\$1'u+3n
+.nr )B \\n()Au+15n
+.\"
+.if !"\\$2"" .nr )B \\w'\\$2'u+\\n()Au+3n
+.nr )C \\n()Bu+\\w'(in/out)'u+2n
+..
+.AS Tcl_Interp Tcl_CreateInterp in/out
+.de BS
+.br
+.mk ^y
+.nr ^b 1u
+.if n .nf
+.if n .ti 0
+.if n \l'\\n(.lu\(ul'
+.if n .fi
+..
+.de BE
+.nf
+.ti 0
+.mk ^t
+.ie n \l'\\n(^lu\(ul'
+.el \{\
+.\"	Draw four-sided box normally, but don't draw top of
+.\"	box if the box started on an earlier page.
+.ie !\\n(^b-1 \{\
+\h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.el \}\
+\h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.\}
+.fi
+.br
+.nr ^b 0
+..
+.de VS
+.if !"\\$2"" .br
+.mk ^Y
+.ie n 'mc \s12\(br\s0
+.el .nr ^v 1u
+..
+.de VE
+.ie n 'mc
+.el \{\
+.ev 2
+.nf
+.ti 0
+.mk ^t
+\h'|\\n(^lu+3n'\L'|\\n(^Yu-1v\(bv'\v'\\n(^tu+1v-\\n(^Yu'\h'-|\\n(^lu+3n'
+.sp -1
+.fi
+.ev
+.\}
+.nr ^v 0
+..
+.de ^B
+.ev 2
+'ti 0
+'nf
+.mk ^t
+.if \\n(^b \{\
+.\"	Draw three-sided box if this is the box's first page,
+.\"	draw two sides but no top otherwise.
+.ie !\\n(^b-1 \h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.el \h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.\}
+.if \\n(^v \{\
+.nr ^x \\n(^tu+1v-\\n(^Yu
+\kx\h'-\\nxu'\h'|\\n(^lu+3n'\ky\L'-\\n(^xu'\v'\\n(^xu'\h'|0u'\c
+.\}
+.bp
+'fi
+.ev
+.if \\n(^b \{\
+.mk ^y
+.nr ^b 2
+.\}
+.if \\n(^v \{\
+.mk ^Y
+.\}
+..
+.de DS
+.RS
+.nf
+.sp
+..
+.de DE
+.fi
+.RE
+.sp
+..
+.de SO
+.SH "STANDARD OPTIONS"
+.LP
+.nf
+.ta 5.5c 11c
+.ft B
+..
+.de SE
+.fi
+.ft R
+.LP
+See the \\fBoptions\\fR manual entry for details on the standard options.
+..
+.de OP
+.LP
+.nf
+.ta 4c
+Command-Line Name:	\\fB\\$1\\fR
+Database Name:	\\fB\\$2\\fR
+Database Class:	\\fB\\$3\\fR
+.fi
+.IP
+..
+.de CS
+.RS
+.nf
+.ta .25i .5i .75i 1i
+.if t .ft C
+..
+.de CE
+.fi
+.if t .ft R
+.RE
+..
+.de UL
+\\$1\l'|0\(ul'\\$2
+..
+'\" END man.macros
+.TH structure n "" Tcl ""
+.BS
+.SH NAME
+tDOM::structure \- Create an XML pull parser command
+.SH SYNOPSIS
+.nf
+package require tdom
+
+    \fBtDOM::structure\fP \fIcmdName\fR
+    
+.fi
+.BE
+.SH "DESCRIPTION "
+.PP
+This command creates validation commands with a simple API. The
+validation commands have methods to define an XML grammer and are
+able to validate XML or DOM trees against this grammer.
+.PP
+The valid methods of the created commands are:
+.TP
+\&\fB\fBdefelement\fP \fIname\fB \fI?namespace?\fB \fIdefinition script\fB
+\&\fR
+.TP
+\&\fB\fBdefpattern\fP \fIname\fB \fIdefinition script\fB
+\&\fR
+.TP
+\&\fB\fBdefine\fP \fIdefinition script\fB
+\&\fR
+.TP
+\&\fB\fBstart\fP \fIdocumentElement\fB \fI?namespace?\fB
+\&\fR
+.TP
+\&\fB\fBevent\fP \fI(start|end|text)\fB \fI?event specific data\fB
+\&\fR
+.TP
+\&\fB\fBdelete\fP
+\&\fRThis method deletes the validation command.
+.TP
+\&\fB\fBstate\fP
+\&\fRThis method returns the state of the validation command with respect to validation state. The possible return values and their meanings are:
+.RS
+.TP
+READY
+The validation command is ready to start
+validation
+.TP
+VALIDATING
+The validation command is in the
+process of validating input.
+.TP
+FINISHED
+The validation has finished, no futher
+events are expected.
+.RE
+.TP
+\&\fB\fBreset\fP
+\&\fRThis method resets the validation command into state
+READY (while preserving the defined grammer).
+.SH "Structure definition scripts"
+.PP
+Structure definition scripts are ordinary Tcl scripts that are
+evaluatend in the namespace tdom::structure. Several commands in
+this tcl namespace allows to define a wide variety of document
+structures.
+.PP
+This commands are:
+.TP
+\&\fB\fBelement\fP \fIname\fB \fI?quant?\fB \fI?definition script?\fB
+\&\fR
+.TP
+\&\fB\fBref\fP \fIname\fB
+\&\fR
+.TP
+\&\fB\fBgroup\fP \fIdefinition script\fB
+\&\fR
+.TP
+\&\fB\fBchoice\fP \fIdefinition script?\fB
+\&\fR
+.TP
+\&\fB\fBinterleave\fP \fIdefinition script\fB
+\&\fR
+.TP
+\&\fB\fBmixed\fP \fIdefinition script\fB
+\&\fR
+.TP
+\&\fB\fBtext\fP \fIdefinition script\fB
+\&\fR
+.TP
+\&\fB\fBany\fP
+\&\fR
+.TP
+\&\fB\fBattribute\fP \fIdefinition script\fB
+\&\fR
+.TP
+\&\fB\fBnamespace\fP \fIdefinition script\fB
+\&\fR
+.TP
+\&\fB\fBempty\fP
+\&\fR
+.SH Exampels
+.PP
+The XML Schema Part 0: Primer Second Edition
+https://www.w3.org/TR/xmlschema-0/ starts with this example schema
+or grammar or Structure definition:
+.CS
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+     Purchase order schema for Example.com.
+     Copyright 2000 Example.com. All rights reserved.
+    </xsd:documentation>
+  </xsd:annotation>
+
+  <xsd:element name="purchaseOrder" type="PurchaseOrderType"/>
+
+  <xsd:element name="comment" type="xsd:string"/>
+
+  <xsd:complexType name="PurchaseOrderType">
+    <xsd:sequence>
+      <xsd:element name="shipTo" type="USAddress"/>
+      <xsd:element name="billTo" type="USAddress"/>
+      <xsd:element ref="comment" minOccurs="0"/>
+      <xsd:element name="items"  type="Items"/>
+    </xsd:sequence>
+    <xsd:attribute name="orderDate" type="xsd:date"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="USAddress">
+    <xsd:sequence>
+      <xsd:element name="name"   type="xsd:string"/>
+      <xsd:element name="street" type="xsd:string"/>
+      <xsd:element name="city"   type="xsd:string"/>
+      <xsd:element name="state"  type="xsd:string"/>
+      <xsd:element name="zip"    type="xsd:decimal"/>
+    </xsd:sequence>
+    <xsd:attribute name="country" type="xsd:NMTOKEN"
+                   fixed="US"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="Items">
+    <xsd:sequence>
+      <xsd:element name="item" minOccurs="0" maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="productName" type="xsd:string"/>
+            <xsd:element name="quantity">
+              <xsd:simpleType>
+                <xsd:restriction base="xsd:positiveInteger">
+                  <xsd:maxExclusive value="100"/>
+                </xsd:restriction>
+              </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="USPrice"  type="xsd:decimal"/>
+            <xsd:element ref="comment"   minOccurs="0"/>
+            <xsd:element name="shipDate" type="xsd:date" minOccurs="0"/>
+          </xsd:sequence>
+          <xsd:attribute name="partNum" type="SKU" use="required"/>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <!-- Stock Keeping Unit, a code for identifying products -->
+  <xsd:simpleType name="SKU">
+    <xsd:restriction base="xsd:string">
+      <xsd:pattern value="\ed{3}-[A-Z]{2}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+</xsd:schema>
+    
+.CE
+.PP
+A somewhat one-to-one translation of that into a tDOM structure
+defintion script would be:
+.CS
+
+tdom::structure grammar      
+grammar define {
+
+    # Purchase order schema for Example.com.
+    # Copyright 2000 Example.com. All rights reserved.
+
+    element purchaseOrder {ref PurchaseOrderType}
+
+    element comment {text}
+
+    defpattern PurchaseOrderType {
+        element shipTo {ref USAddress}
+        element billTo {ref USAddress}
+        element comment ?
+        element items
+        attribute orderDate
+    }
+
+    defpattern USAddress {
+        element name {text}
+        element street {text}
+        element city {text}
+        element state {text}
+        element zip {text}
+        attribute country ! {text fixed "US"}
+    }
+
+    defelement items {
+        element item * {
+            element product ! {text}
+            element quntity ! {text {maxExcluse 100}}
+            element USPrice ! {text isNumber}
+            element comment
+            element shipDate ? {text isDate}
+            attribute partNum ! {text {pattern "\ed{3}-[A-Z]{2}"}}
+        }
+    }
+}
+      
+    
+.CE
+.PP
+The RELAX NG Tutorial http://relaxng.org/tutorial-20011203.html
+starts with this example:
+.CS
+
+Consider a simple XML representation of an email address book:
+
+<addressBook>
+  <card>
+    <name>John Smith</name>
+    <email>js@example.com</email>
+  </card>
+  <card>
+    <name>Fred Bloggs</name>
+    <email>fb@example.net</email>
+  </card>
+</addressBook>
+
+The DTD would be as follows:
+
+<!DOCTYPE addressBook [
+<!ELEMENT addressBook (card*)>
+<!ELEMENT card (name, email)>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT email (#PCDATA)>
+]>
+
+A RELAX NG pattern for this could be written as follows:
+
+<element name="addressBook" xmlns="http://relaxng.org/ns/structure/1.0">
+  <zeroOrMore>
+    <element name="card">
+      <element name="name">
+        <text/>
+      </element>
+      <element name="email">
+        <text/>
+      </element>
+    </element>
+  </zeroOrMore>
+</element>
+      
+    
+.CE
+.PP
+This structure definition script will do the same:
+.CS
+
+tdom::structure grammar      
+grammar define {
+    defelement addressBook {
+        element card *
+    }
+    defelement card {
+        element name
+        element email
+    }
+    foreach e {name email} {
+        defelement $e {text}
+    }
+}
+      
+    
+.CE
+
