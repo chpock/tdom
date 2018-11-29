@@ -47,6 +47,11 @@
       </commanddef>
 
       <commanddef>
+        <command><method>validate</method> <m>&lt;XML string></m></command>
+        <desc></desc>
+      </commanddef>
+
+      <commanddef>
         <command><method>delete</method></command>
         <desc>This method deletes the validation command.</desc>
       </commanddef>

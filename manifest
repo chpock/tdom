@@ -1,5 +1,5 @@
-C Made\sthe\snew\sstructure\svalidation\scommand\smethod\s"validate"\sXML\snamespace\saware.\s(The\scurrent\sexpat\spush\sparser\scommand\sswitch\s-validateCmd\sisn't\sXML\snamespace\saware,\sso\sfar.)
-D 2018-11-28T23:49:57.185
+C Added\sdocumentation\sstub\sfor\sthe\snew\smethod\svalidate.
+D 2018-11-29T00:40:55.419
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -40,7 +40,7 @@ F doc/pullparser.n 5f5672e8bb2dd221602040cd212234da6b6ed8c99c5daa60be9fa0c476529
 F doc/pullparser.xml 6032c1e8c8d001068c227601dba9860824f8acc709c87fd8e36ac4a596b6a2f2
 F doc/structure.html b751aed2a56cb4eda6ca96743305dc43c42d6842873f86f84f522ece94fdf3b2
 F doc/structure.n dd596f8980a29eff97e009883ef377c2983cf762a2911c44e8300585f83d582b
-F doc/structure.xml bc9cab8363c02219dc1a610cf98f4d7505c2d5e6bb553e1a0952ee677a2c5dd8
+F doc/structure.xml a0f57df8f006b64b3529e83d2e7a1f58a7fbf3af04dcfbb8502efb9d9b044ad6
 F doc/tDOM.xml da77576ab62262463b7806357baf04a01affd5dfda77511a0e469597f43f93b7
 F doc/tdomcmd.html 9b4d9ff443499554adf2346ff0efc0317a98bd6e1fc3fc79a6e476b71fe85fed
 F doc/tdomcmd.n c06a5ff035f16a2a52636b69d9ebe6ba84ff5101922ed27b551146c4d61d6cda
@@ -228,8 +228,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P b5f168a794072cf13262c91f3e3d896245d15ab31967dc18130c644ab26bc014
-R dbe8789bf26dcabe23dbc5b71da27234
+P e9f59e858a04fde0e5829d3eb2d49e4b2e2322c71d2de7e0260e9d75d3668de9
+R 84c98d13382abb56f7aad37efcbc9082
 U rolf
-Z 8223882bce813436980551cd426fbb8e
+Z 71ad928b3565434c01d6e88244abc7c7
 # Remove this line to create a well-formed Fossil manifest.
