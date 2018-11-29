@@ -83,6 +83,8 @@ typedef struct
 
 #define SetResult(str) Tcl_ResetResult(interp); \
                      Tcl_SetStringObj(Tcl_GetObjResult(interp), (str), -1)
+#define SetResult3(str1,str2,str3) Tcl_ResetResult(interp);     \
+                     Tcl_AppendResult(interp, (str1), (str2), (str3), NULL)
 #define SetIntResult(i) Tcl_ResetResult(interp);                        \
                      Tcl_SetIntObj(Tcl_GetObjResult(interp), (i))
 
@@ -482,72 +484,23 @@ pushToStack (
     (nr) == 0 ? minOne(quant)                                              \
         : (quant->type == STRUCTURE_CQUANT_N || quant->type == STRUCTURE_CQUANT_NM) && (quant->minOccur < (nr)) ? 1 : 0
 
+#define hasMatched(quant,nr) \
+    (nr) == 0 ? 0 : ((nr) == 1 && (quant == quantOne || quant == quantOpt) ? 1 : quant->maxOccur == (nr))
+
 #define getContext(parent, ac, nm) \
     parent = sdata->stack[sdata->stackPtr-1]->pattern;   \
     ac = sdata->stack[sdata->stackPtr-1]->activeChild;   \
     nm = sdata->stack[sdata->stackPtr-1]->nrMatched;
 
-#define getContext2(parent2, ac2, nm2)                       \
+#define getContext2(parent2, ac2, nm2)                   \
     parent = sdata->stack[sdata->stackPtr-2]->pattern;   \
     ac = sdata->stack[sdata->stackPtr-2]->activeChild;   \
     nm = sdata->stack[sdata->stackPtr-2]->nrMatched;
 
 
-static void
-updateStack (
-    StructureData *sdata,
-    int stackPtr,
-    int newac,
-    int newnm
-    )
-{
-    StructureCP *parent = sdata->stack[stackPtr-1]->pattern;
-    StructureQuant *quant =  parent->quants[newac];
-
-    switch (parent->type) {
-    case STRUCTURE_CTYPE_NAME:
-    case STRUCTURE_CTYPE_GROUP:
-    case STRUCTURE_CTYPE_PATTERN:
-        if (mayRepeat(quant)) break;
-        if (maxOne(quant)) {
-            newac++;
-            newnm = 0;
-            break;
-        } else {
-            if (quant->type == STRUCTURE_CQUANT_N) {
-                if (quant->minOccur == newnm) {
-                    newac++;
-                    newnm = 0;
-                }
-            } else {
-                if (quant->maxOccur == newnm) {
-                    newac++;
-                    newnm = 0;
-                }
-            }
-        }
-        break;
-        
-    case STRUCTURE_CTYPE_TEXT:
-    case STRUCTURE_CTYPE_ANY:
-    case STRUCTURE_CTYPE_EMPTY:
-        /* Never pushed onto stack */
-        Tcl_Panic ("Invalid CTYPE onto the validation stack!");
-        return;
-
-    case STRUCTURE_CTYPE_INTERLEAVE:
-        fprintf (stderr, "updateStack: STRUCTURE_CTYPE_INTERLEAVE to be implemented\n");
-        return;
-
-    case STRUCTURE_CTYPE_MIXED:
-    case STRUCTURE_CTYPE_CHOICE:
-        break;
-    }
-    DBG(fprintf (stderr, "updateStack: updating %d, ac: %d, nm: %d\n",
-                 sdata->stackPtr-1, newac, newnm));
-    sdata->stack[sdata->stackPtr-1]->activeChild = newac;
-    sdata->stack[sdata->stackPtr-1]->nrMatched = newnm;
-}
+#define updateStack(sdata,stackPtr,newac,newnm)         \
+    sdata->stack[stackPtr-1]->activeChild = newac;      \
+    sdata->stack[stackPtr-1]->nrMatched = newnm;
 
 #define popStack(sdata) sdata->stackPtr--
 
@@ -563,12 +516,19 @@ matchNamePattern (
 {
     StructureCP *parent, *candidate;
     int nm, ac, startac, savedStackPtr, rc, i;
-    int isName = 0;
+    int isName = 0, loopOver = 0;
     
     /* The caller must ensure pattern->type = STRUCTURE_CTYPE_NAME */
 
     getContext (parent, ac, nm);
 
+    if (hasMatched (parent->quants[ac], nm)) {ac++; nm = 0;}
+
+    DBG(
+        fprintf (stderr, "matchNamePattern: ac: %d nm: %d stack:\n", ac, nm);
+        serializeStack (sdata);
+        )
+    
     switch (parent->type) {
     case STRUCTURE_CTYPE_NAME:
         isName = 1;
@@ -579,10 +539,9 @@ matchNamePattern (
     loopOverContent:
         while (ac < parent->numChildren) {
             candidate = parent->content[ac];
-
             switch (candidate->type) {
             case STRUCTURE_CTYPE_EMPTY:
-                /* The empty pattern never match an element */
+                /* The empty pattern never match an element, successfully */
                 ac++;
                 nm = 0;
                 break;
@@ -595,6 +554,9 @@ matchNamePattern (
                 if (candidate == pattern
                     || strcmp (candidate->name, pattern->name) == 0) {
                     updateStack (sdata, sdata->stackPtr, ac, nm+1);
+                    if (loopOver) {
+                        sdata->stack[sdata->stackPtr-2]->nrMatched++;
+                    }
                     /* We need to push the element only onto the stack
                      * if it has non-empty content. But how many real
                      * life XML vocabularies does have EMPTY
@@ -622,7 +584,10 @@ matchNamePattern (
                 savedStackPtr = sdata->stackPtr;
                 pushToStack (sdata, candidate, currentDeep);
                 rc = matchNamePattern (sdata, pattern, currentDeep);
-                if (rc == 1) return 1;
+                if (rc == 1) {
+                    updateStack (sdata, savedStackPtr, ac, nm+1);
+                    return 1;
+                }
                 popStack (sdata);
                 if (rc == 0) return 0;
                 if (mustMatch (parent->quants[ac], nm)) return 0;
@@ -638,7 +603,6 @@ matchNamePattern (
             /* No match, but also no explicit error. */
             /* We finished a non atomic pattern (GROUP or PATTERN) and
              * increment the nrMatched of that inside its parent. */
-            sdata->stack[sdata->stackPtr-2]->nrMatched += 1;
             
             /* Check, if we have to restart the parent pattern (look
                for match right from the start) because of quant. */
@@ -652,20 +616,24 @@ matchNamePattern (
                     ac = 0;
                     nm = 0;
                     startac = 0;
+                    loopOver = 1;
                     DBG(fprintf (stderr, "... loopOverContent\n"));
                     goto loopOverContent;
-                }
-                if (!maxOne (parentQuant)) {
-                    if (sdata->stack[sdata->stackPtr-2]->nrMatched < parentQuant->maxOccur) {
-                        ac = 0;
-                        nm = 0;
-                        startac = 0;
-                        goto loopOverContent;
+                } else {
+                    if (!maxOne (parentQuant)) {
+                        if (sdata->stack[sdata->stackPtr-2]->nrMatched
+                            < parentQuant->maxOccur) {
+                            ac = 0;
+                            nm = 0;
+                            startac = 0;
+                            loopOver = 1;
+                            DBG(fprintf (stderr, "... loopOverContent\n"));
+                            goto loopOverContent;
+                        }
                     }
+                    
                 }
             }
-            sdata->stack[sdata->stackPtr-2]->activeChild += 1;
-            sdata->stack[sdata->stackPtr-2]->nrMatched = 0;
             return -1;
         }
         
@@ -764,7 +732,7 @@ probeElement (
 
     entryPtr = Tcl_FindHashEntry (&sdata->element, name);
     if (!entryPtr) {
-        SetResult ("No such element name in grammar.");
+        SetResult3 ("\"", name, "\" isn't a defined element name in grammar.");
         return TCL_ERROR;
     }
     pattern = (StructureCP *) Tcl_GetHashValue (entryPtr);
@@ -806,12 +774,11 @@ probeElement (
     
     /* The normal case: we're inside the tree */
     savedStackPtr = sdata->stackPtr;
-    activeStack = savedStackPtr - 1;
-    currentDeep = sdata->stack[activeStack]->deep;
+    activeStack = savedStackPtr;
+    currentDeep = sdata->stack[activeStack-1]->deep;
 
     DBG(
         fprintf (stderr, "probeElement: look if '%s' match\n", pattern->name);
-        serializeStack (sdata);
         );
 
     while ((rc = matchNamePattern (sdata, pattern, currentDeep)) == -1) {
@@ -835,7 +802,7 @@ probeElement (
         serializeStack (sdata);
         fprintf (stderr, "\n");
         );
-    SetResult ("Element doesn't match");
+    SetResult3 ("Element \"", name, "\" doesn't match");
     return TCL_ERROR;
 }
 
@@ -923,12 +890,19 @@ probeElementEnd (
     if (rc != 1) {
         sdata->stackPtr = savedStackPtr;
         SetResult ("Missing mandatory element\n");
-        DBG(fprintf(stderr, "probeElementEnd: CAN'T end here.\n"));
+        DBG(
+            fprintf(stderr, "probeElementEnd: CAN'T end here.\n");
+            serializeStack (sdata);
+            );
         return TCL_ERROR;
     }
 
     restoreWaterMark(sdata);
     popStack(sdata);
+    DBG(
+        fprintf(stderr, "probeElementEnd: ended here.\n");
+        serializeStack (sdata);
+        );
     if (sdata->stackPtr == 0) {
         /* End of the first pattern (the tree root) without error.
            We have successfully ended validation */
@@ -1763,7 +1737,6 @@ NamespacePatternObjCmd (
     Tcl_HashEntry *entryPtr;
     int hnew, result;
 
-    fprintf (stderr, "+++HIER 0: '%s'\n", Tcl_GetString(objv[0]));
     CHECK_SI
     CHECK_TOPLEVEL
     checkNrArgs (3,3,"Expected: namespace pattern");
@@ -1808,9 +1781,13 @@ tDOM_StructureInit (
     Tcl_Interp *interp
     )
 {
+    memset (quantOne, 0, sizeof (StructureQuant));
     quantOne->type = STRUCTURE_CQUANT_ONE;
+    memset (quantOpt, 0, sizeof (StructureQuant));
     quantOpt->type = STRUCTURE_CQUANT_OPT;
+    memset (quantRep, 0, sizeof (StructureQuant));
     quantRep->type = STRUCTURE_CQUANT_REP;
+    memset (quantPlus, 0, sizeof (StructureQuant));
     quantPlus->type = STRUCTURE_CQUANT_PLUS;
 
     /* Inline definition commands. */
