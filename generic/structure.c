@@ -494,12 +494,6 @@ pushToStack (
     ac = sdata->stack[sdata->stackPtr-1]->activeChild;   \
     nm = sdata->stack[sdata->stackPtr-1]->nrMatched;
 
-#define getContext2(parent2, ac2, nm2)                   \
-    parent = sdata->stack[sdata->stackPtr-2]->pattern;   \
-    ac = sdata->stack[sdata->stackPtr-2]->activeChild;   \
-    nm = sdata->stack[sdata->stackPtr-2]->nrMatched;
-
-
 #define updateStack(sdata,stackPtr,newac,newnm)         \
     sdata->stack[stackPtr-1]->activeChild = newac;      \
     sdata->stack[stackPtr-1]->nrMatched = newnm;
