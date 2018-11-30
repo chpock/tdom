@@ -207,13 +207,38 @@ pattern definition for the name/namespace combination the
 command raises error.
 .TP
 \&\fB\fBdefine\fP \fI<definition script>\fB
-\&\fR
+\&\fRThis method allows to define several elements or pattern
+or a whole grammar with one call.
 .TP
 \&\fB\fBstart\fP \fIdocumentElement\fB \fI?namespace?\fB
-\&\fR
+\&\fRThis method defines the name and namespace of the root
+element of a tree to validate. If this method is used then the
+root element must match for validity. If \fIstart\fR isn't
+used, any with \fIdefelement\fR defined element may be the
+root of a valid document. The \fIstart\fR method may be used
+serveral times with varying arguments during the lifetime of a
+validation command. If the command is called with just the
+empty string (and no namespace argument), the validation
+constrain for the root element is removed and any defined
+element will be valid as root of a tree to validate.
 .TP
 \&\fB\fBevent\fP \fI(start|end|text)\fB \fI?event specific data?\fB
-\&\fR
+\&\fRThis method allows to validate hierarchical data against
+the so far defined content constrains of the validation
+command.
+.RS
+.IP "\fBstart  \fIname ?attributes? ?namespace? \fP\fR"
+Checks if the current validation state allows the
+element \fIname\fR in the \fInamespace\fR is allowed to
+start here. It raises error, if not.
+.IP "\fBend\fR"
+Checks if the current innermost open element may be
+end here in the current state without violate validation
+constrains. It raises error, if not.
+.IP "\fBtext  \fItext\fP\fR"
+Checks if the current validation state allows the
+given text content. It raises error, if not.
+.RE
 .TP
 \&\fB\fBvalidate\fP \fI<XML string>\fB \fI?objVar?\fB
 \&\fRReturns true if the \fI<XML string>\fR is valid or
@@ -257,10 +282,16 @@ valid.
 The structure definition commands are:
 .TP
 \&\fB\fBelement\fP \fIname\fB \fI?quant?\fB \fI?<definition script>?\fB
-\&\fR
+\&\fRThis command refers to the element defined with
+\&\fIdefelement\fR with the name \fIname\fR in the current context
+namespace. Forward references to a so far not defined element
+or recursive references are allowed.
 .TP
 \&\fB\fBref\fP \fIname\fB \fI?quant?\fB
-\&\fR
+\&\fRThis command refers to the content particle defined with
+\&\fIdefpattern\fR with the name \fIname\fR in the current context
+namespace. Forward references to a so far not defined pattern
+or recursive references are allowed.
 .TP
 \&\fB\fBgroup\fP \fI?quant?\fB \fI<definition script>\fB
 \&\fR
@@ -294,6 +325,9 @@ The structure definition commands are:
 .TP
 \&\fB\fBdefpattern\fP \fIname\fB \fI?namespace?\fB \fI<definition script>\fB
 \&\fR
+.TP
+\&\fB\fBstart\fP \fIname\fB \fI?namespace?\fB
+\&\fR
 .SH "Quantity specifier"
 .PP
 Serveral structure definition commands expects a quantifier as
@@ -317,7 +351,7 @@ The content particle must occur n times in a row in
 valid documents. The quantifier must be an integer greater
 zero.
 .IP "\fB{n m}\fR"
-The content particle may occur
+The content particle must occur
 n to m times (both inclusive) in a row in valid documents. The
 quantifier must be a tcl list with two elements. Both elements
 must be integers, with n >= 0 and n < m.

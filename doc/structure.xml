@@ -56,17 +56,55 @@
 
       <commanddef>
         <command><method>define</method> <m>&lt;definition script></m></command>
-        <desc></desc>
+        <desc>This method allows to define several elements or pattern
+        or a whole grammar with one call.</desc>
       </commanddef>
       
       <commanddef>
         <command><method>start</method> <m>documentElement</m> <m>?namespace?</m></command>
-        <desc></desc>
+        <desc>This method defines the name and namespace of the root
+        element of a tree to validate. If this method is used then the
+        root element must match for validity. If <m>start</m> isn't
+        used, any with <m>defelement</m> defined element may be the
+        root of a valid document. The <m>start</m> method may be used
+        serveral times with varying arguments during the lifetime of a
+        validation command. If the command is called with just the
+        empty string (and no namespace argument), the validation
+        constrain for the root element is removed and any defined
+        element will be valid as root of a tree to validate.</desc>
       </commanddef>
 
       <commanddef>
         <command><method>event</method> <m>(start|end|text)</m> <m>?event specific data?</m></command>
-        <desc></desc>
+        <desc>This method allows to validate hierarchical data against
+        the so far defined content constrains of the validation
+        command.
+
+        <optlist>
+          <optdef>
+            <optname>start</optname>
+            <optarg>name ?attributes? ?namespace? </optarg>
+            <desc>Checks if the current validation state allows the
+            element <m>name</m> in the <m>namespace</m> is allowed to
+            start here. It raises error, if not.</desc>
+          </optdef>
+
+          <optdef>
+            <optname>end</optname>
+            <desc>Checks if the current innermost open element may be
+            end here in the current state without violate validation
+            constrains. It raises error, if not.</desc>
+          </optdef>
+          
+          <optdef>
+            <optname>text</optname>
+            <optarg>text</optarg>
+            <desc>Checks if the current validation state allows the
+            given text content. It raises error, if not.</desc>
+          </optdef>
+
+        </optlist>
+        </desc>
       </commanddef>
 
       <commanddef>
@@ -121,12 +159,18 @@
     <commandlist>
       <commanddef>
         <command><method>element</method> <m>name</m> <m>?quant?</m> <m>?&lt;definition script>?</m></command>
-        <desc></desc>
+        <desc>This command refers to the element defined with
+        <m>defelement</m> with the name <m>name</m> in the current context
+        namespace. Forward references to a so far not defined element
+        or recursive references are allowed.</desc>
       </commanddef>
 
       <commanddef>
         <command><method>ref</method> <m>name</m> <m>?quant?</m></command>
-        <desc></desc>
+        <desc>This command refers to the content particle defined with
+        <m>defpattern</m> with the name <m>name</m> in the current context
+        namespace. Forward references to a so far not defined pattern
+        or recursive references are allowed.</desc>
       </commanddef>
 
       <commanddef>
@@ -183,6 +227,11 @@
         <command><method>defpattern</method> <m>name</m> <m>?namespace?</m> <m>&lt;definition script></m></command>
         <desc></desc>
       </commanddef>
+
+      <commanddef>
+        <command><method>start</method> <m>name</m> <m>?namespace?</m></command>
+        <desc></desc>
+      </commanddef>
     </commandlist>
     
   </section>
@@ -228,7 +277,7 @@
       </optdef>
     
       <optdef>
-        <optname>{n m}</optname> <desc>The content particle may occur
+        <optname>{n m}</optname> <desc>The content particle must occur
         n to m times (both inclusive) in a row in valid documents. The
         quantifier must be a tcl list with two elements. Both elements
         must be integers, with n >= 0 and n &lt; m.</desc>

@@ -4,18 +4,18 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x12d31d0">NAME</a> · <a href="#SECTid0x12132c0">SYNOPSIS</a> · <a href="#SECTid0x137d2a0">DESCRIPTION </a> · <a href="#SECTid0x1382d90">Structure definition scripts</a> · <a href="#SECTid0x1387980">Quantity specifier</a> · <a href="#SECTid0x1389860">Exampels</a>
+<a href="#SECTid0x24391d0">NAME</a> · <a href="#SECTid0x23792c0">SYNOPSIS</a> · <a href="#SECTid0x24e32a0">DESCRIPTION </a> · <a href="#SECTid0x24ea820">Structure definition scripts</a> · <a href="#SECTid0x24f0040">Quantity specifier</a> · <a href="#SECTid0x24f1e90">Exampels</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x12d31d0">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x24391d0">NAME</a></h2><p class="namesection">
 <b class="names">tdom::structure - </b><br>Create an XML structure validation command</p>
 
-  <h2><a name="SECTid0x12132c0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x23792c0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
     <b class="cmd">tdom::structure</b> <i class="m">cmdName</i>
     </pre>
 
-  <h2><a name="SECTid0x137d2a0">DESCRIPTION </a></h2><p>This command creates validation commands with a simple API. The
+  <h2><a name="SECTid0x24e32a0">DESCRIPTION </a></h2><p>This command creates validation commands with a simple API. The
     validation commands have methods to define an XML grammer and are 
     able to validate XML or DOM trees against this grammer.</p><p>Additionaly, a validation command may be used as argument to
     the <i class="m">-validateCmd</i> option of the <i class="m">dom parse</i> and the
@@ -57,21 +57,63 @@
         <dt>
 <b class="method">define</b> <i class="m">&lt;definition script&gt;</i>
 </dt>
-        <dd></dd>
+        <dd>This method allows to define several elements or pattern
+        or a whole grammar with one call.</dd>
       
       
       
         <dt>
 <b class="method">start</b> <i class="m">documentElement</i> <i class="m">?namespace?</i>
 </dt>
-        <dd></dd>
+        <dd>This method defines the name and namespace of the root
+        element of a tree to validate. If this method is used then the
+        root element must match for validity. If <i class="m">start</i> isn't
+        used, any with <i class="m">defelement</i> defined element may be the
+        root of a valid document. The <i class="m">start</i> method may be used
+        serveral times with varying arguments during the lifetime of a
+        validation command. If the command is called with just the
+        empty string (and no namespace argument), the validation
+        constrain for the root element is removed and any defined
+        element will be valid as root of a tree to validate.</dd>
       
 
       
         <dt>
 <b class="method">event</b> <i class="m">(start|end|text)</i> <i class="m">?event specific data?</i>
 </dt>
-        <dd></dd>
+        <dd>This method allows to validate hierarchical data against
+        the so far defined content constrains of the validation
+        command.
+
+        <dl class="optlist">
+          
+            <dt>
+<b>start</b> <i>name ?attributes? ?namespace? </i>
+</dt>
+            
+            <dd>Checks if the current validation state allows the
+            element <i class="m">name</i> in the <i class="m">namespace</i> is allowed to
+            start here. It raises error, if not.</dd>
+          
+
+          
+            <dt><b>end</b></dt>
+            <dd>Checks if the current innermost open element may be
+            end here in the current state without violate validation
+            constrains. It raises error, if not.</dd>
+          
+          
+          
+            <dt>
+<b>text</b> <i>text</i>
+</dt>
+            
+            <dd>Checks if the current validation state allows the
+            given text content. It raises error, if not.</dd>
+          
+
+        </dl>
+        </dd>
       
 
       
@@ -111,7 +153,7 @@
 
     </dl>
 
-  <h2><a name="SECTid0x1382d90">Structure definition scripts</a></h2><p>Structure definition scripts are ordinary Tcl scripts that are
+  <h2><a name="SECTid0x24ea820">Structure definition scripts</a></h2><p>Structure definition scripts are ordinary Tcl scripts that are
     evaluatend in the namespace tdom::structure. Several structure
     definition commands in this tcl namespace allow to define a wide
     variety of document structures. Every structure definition command
@@ -122,14 +164,20 @@
         <dt>
 <b class="method">element</b> <i class="m">name</i> <i class="m">?quant?</i> <i class="m">?&lt;definition script&gt;?</i>
 </dt>
-        <dd></dd>
+        <dd>This command refers to the element defined with
+        <i class="m">defelement</i> with the name <i class="m">name</i> in the current context
+        namespace. Forward references to a so far not defined element
+        or recursive references are allowed.</dd>
       
 
       
         <dt>
 <b class="method">ref</b> <i class="m">name</i> <i class="m">?quant?</i>
 </dt>
-        <dd></dd>
+        <dd>This command refers to the content particle defined with
+        <i class="m">defpattern</i> with the name <i class="m">name</i> in the current context
+        namespace. Forward references to a so far not defined pattern
+        or recursive references are allowed.</dd>
       
 
       
@@ -204,9 +252,16 @@
 </dt>
         <dd></dd>
       
+
+      
+        <dt>
+<b class="method">start</b> <i class="m">name</i> <i class="m">?namespace?</i>
+</dt>
+        <dd></dd>
+      
     </dl>
 
-  <h2><a name="SECTid0x1387980">Quantity specifier</a></h2><p>Serveral structure definition commands expects a quantifier as
+  <h2><a name="SECTid0x24f0040">Quantity specifier</a></h2><p>Serveral structure definition commands expects a quantifier as
     one of their arguments, which specifies how often the content
     particle specified by the command is expected. The valid values
     for a <i class="m">quant</i> argument are:</p><dl class="optlist">
@@ -242,7 +297,7 @@
       
     
       
-        <dt><b>{n m}</b></dt> <dd>The content particle may occur
+        <dt><b>{n m}</b></dt> <dd>The content particle must occur
         n to m times (both inclusive) in a row in valid documents. The
         quantifier must be a tcl list with two elements. Both elements
         must be integers, with n &gt;= 0 and n &lt; m.</dd>
@@ -251,7 +306,7 @@
     the content particle must occur exactly once in valid
     documents.</p>
   
-  <h2><a name="SECTid0x1389860">Exampels</a></h2><p>The XML Schema Part 0: Primer Second Edition
+  <h2><a name="SECTid0x24f1e90">Exampels</a></h2><p>The XML Schema Part 0: Primer Second Edition
     https://www.w3.org/TR/xmlschema-0/ starts with this example schema
     or grammar or Structure definition:</p><pre class="example">
 &lt;xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;

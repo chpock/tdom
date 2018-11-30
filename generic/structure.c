@@ -1232,20 +1232,27 @@ structureInstanceCmd (
 
     case m_start:
         if (objc < 3-i || objc > 3-i) {
-            Tcl_WrongNumArgs (interp, 2-1, objv, "<documentElement>"
+            Tcl_WrongNumArgs (interp, 2-i, objv, "<documentElement>"
                               " ?<namespace>?");
             return TCL_ERROR;
         }
         if (sdata->start) {
             FREE (sdata->start);
         }
-        sdata->start = tdomstrdup (Tcl_GetString (objv[2]));
+        if (objc == 3-i && strcmp (Tcl_GetString (objv[2-i]), "") == 0) {
+            if (sdata->startNamespace) {
+                FREE (sdata->startNamespace);
+            }
+            sdata->start = NULL;
+            break;
+        }
+        sdata->start = tdomstrdup (Tcl_GetString (objv[2-i]));
         if (objc == 4-i) {
             if (sdata->startNamespace) {
                 FREE (sdata->startNamespace);
             }
             sdata->startNamespace =
-                tdomstrdup (Tcl_GetString (objv[3]));
+                tdomstrdup (Tcl_GetString (objv[3-i]));
         }
         break;
 
