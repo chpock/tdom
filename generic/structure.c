@@ -528,7 +528,7 @@ matchNamePattern (
         fprintf (stderr, "matchNamePattern: ac: %d nm: %d stack:\n", ac, nm);
         serializeStack (sdata);
         )
-    
+        
     switch (parent->type) {
     case STRUCTURE_CTYPE_NAME:
         isName = 1;
@@ -649,8 +649,8 @@ matchNamePattern (
 
     case STRUCTURE_CTYPE_MIXED:
     case STRUCTURE_CTYPE_CHOICE:
-        for (i = 0; i < pattern->numChildren; i++) {
-            candidate = parent->content[ac];
+        for (i = 0; i < parent->numChildren; i++) {
+            candidate = parent->content[i];
 
             switch (candidate->type) {
             case STRUCTURE_CTYPE_EMPTY:
@@ -665,7 +665,8 @@ matchNamePattern (
                 break;
                 
             case STRUCTURE_CTYPE_NAME:
-                if (candidate == pattern) {
+                if (candidate == pattern
+                    || strcmp (candidate->name, pattern->name) == 0) {
                     updateStack (sdata, sdata->stackPtr, 0, nm+1);
                     pushToStack (sdata, candidate, currentDeep + 1);
                     return 1;

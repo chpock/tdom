@@ -247,12 +247,12 @@ grammar define {
     }
 
     defpattern USAddress {
-        element name {text}
-        element street {text}
-        element city {text}
-        element state {text}
-        element zip {text}
-        attribute country ! {text fixed "US"}
+        element name ! {text}
+        element street ! {text}
+        element city ! {text}
+        element state ! {text}
+        element zip ! {text isNumber}
+        attribute country ! {text {fixed "US"}}
     }
 
     defelement items {

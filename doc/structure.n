@@ -192,6 +192,9 @@ The valid methods of the created commands are:
 \&\fB\fBevent\fP \fI(start|end|text)\fB \fI?event specific data?\fB
 \&\fR
 .TP
+\&\fB\fBvalidate\fP \fI<XML string>\fB
+\&\fR
+.TP
 \&\fB\fBdelete\fP
 \&\fRThis method deletes the validation command.
 .TP
@@ -355,12 +358,12 @@ grammar define {
     }
 
     defpattern USAddress {
-        element name {text}
-        element street {text}
-        element city {text}
-        element state {text}
-        element zip {text}
-        attribute country ! {text fixed "US"}
+        element name ! {text}
+        element street ! {text}
+        element city ! {text}
+        element state ! {text}
+        element zip ! {text isNumber}
+        attribute country ! {text {fixed "US"}}
     }
 
     defelement items {

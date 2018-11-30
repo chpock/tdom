@@ -793,3 +793,27 @@ test structure-8.2 {validate method} {
     grammar delete
     set result
 } {0 1}
+
+test structure-9.1 {choice} {
+    tdom::structure create grammar
+    grammar define {
+        defelement doc foouri {
+            choice * {
+                element e1
+                element e2 *
+            }
+        }
+        foreach e {e1 e2} {
+            defelement $e foouri {}
+        }
+    }
+    grammar validate {<doc xmlns="foouri"/>}
+    grammar reset
+    grammar validate {<doc xmlns="foouri"><e1/></doc>}
+    grammar reset
+    grammar validate {<doc xmlns="foouri"><e1/><e1/></doc>}
+    grammar reset
+    grammar validate {<doc xmlns="foouri"><e1/><e2/><e1/></doc>}
+    grammar delete
+} {}
+    
