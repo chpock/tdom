@@ -4,32 +4,53 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0xcf61d0">NAME</a> · <a href="#SECTid0xc362c0">SYNOPSIS</a> · <a href="#SECTid0xd5ffd0">DESCRIPTION </a> · <a href="#SECTid0xda30e0">Structure definition scripts</a> · <a href="#SECTid0xda68d0">Exampels</a>
+<a href="#SECTid0x12d31d0">NAME</a> · <a href="#SECTid0x12132c0">SYNOPSIS</a> · <a href="#SECTid0x137d2a0">DESCRIPTION </a> · <a href="#SECTid0x1382d90">Structure definition scripts</a> · <a href="#SECTid0x1387980">Quantity specifier</a> · <a href="#SECTid0x1389860">Exampels</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0xcf61d0">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x12d31d0">NAME</a></h2><p class="namesection">
 <b class="names">tdom::structure - </b><br>Create an XML structure validation command</p>
 
-  <h2><a name="SECTid0xc362c0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x12132c0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
     <b class="cmd">tdom::structure</b> <i class="m">cmdName</i>
     </pre>
 
-  <h2><a name="SECTid0xd5ffd0">DESCRIPTION </a></h2><p>This command creates validation commands with a simple API. The
+  <h2><a name="SECTid0x137d2a0">DESCRIPTION </a></h2><p>This command creates validation commands with a simple API. The
     validation commands have methods to define an XML grammer and are 
-    able to validate XML or DOM trees against this grammer.</p><p>The valid methods of the created commands are:</p><dl class="commandlist">
+    able to validate XML or DOM trees against this grammer.</p><p>Additionaly, a validation command may be used as argument to
+    the <i class="m">-validateCmd</i> option of the <i class="m">dom parse</i> and the
+    <i class="m">expat</i> commands to enable validation additional to what they
+    otherwise do.</p><p>The valid methods of the created commands are:</p><dl class="commandlist">
       
         <dt>
 <b class="method">defelement</b> <i class="m">name</i> <i class="m">?namespace?</i> <i class="m">&lt;definition script&gt;</i>
 </dt>
-        <dd></dd>
+        <dd>This method defines the element <i class="m">name</i> (optional in
+        the namespace <i class="m">namespace</i>) in the grammar. The
+        <i class="m">definition script</i> is evaluated and defines the content
+        model of the element. If the <i class="m">namespace</i> argument is
+        given, any <i class="m">element</i> or <i class="m">ref</i> references in the
+        definition script not wrapped inside a <i class="m">namespace</i>
+        command are resolved in that namespace. If there is already a
+        element definition for the name/namespace combination the
+        command raises error.</dd>
       
 
       
         <dt>
 <b class="method">defpattern</b> <i class="m">name</i> <i class="m">&lt;definition script&gt;</i>
 </dt>
-        <dd></dd>
+        <dd>This method defines a (maybe complex) content particle
+        with the <i class="m">name</i> (optional in the namespace
+        <i class="m">namespace</i>) in the grammar, to be referenced in other
+        definition scripts with the definition command <i class="m">ref</i>. The
+        <i class="m">definition script</i> is evaluated and defines the content
+        model of the content particle. If the <i class="m">namespace</i>
+        argument is given, any <i class="m">element</i> or <i class="m">ref</i> references
+        in the definition script not wrapped inside a <i class="m">namespace</i>
+        command are resolved in that namespace. If there is already a
+        pattern definition for the name/namespace combination the
+        command raises error.</dd>
       
 
       
@@ -58,9 +79,9 @@
 <b class="method">validate</b> <i class="m">&lt;XML string&gt;</i> <i class="m">?objVar?</i>
 </dt>
         <dd>Returns true if the <i class="m">&lt;XML string&gt;</i> is valid or
-        false otherwise. If validation failed and the optional fourth
-        argument is given, then the variable with that name is set to
-        a validation error message.</dd>
+        false otherwise. If validation failed and the optional
+        <i class="m">objVar</i> argument is given, then the variable with that
+        name is set to a validation error message.</dd>
       
 
       
@@ -90,10 +111,13 @@
 
     </dl>
 
-  <h2><a name="SECTid0xda30e0">Structure definition scripts</a></h2><p>Structure definition scripts are ordinary Tcl scripts that are
-    evaluatend in the namespace tdom::structure. Several commands in
-    this tcl namespace allows to define a wide variety of document
-    structures.</p><p>This commands are:</p><dl class="commandlist">
+  <h2><a name="SECTid0x1382d90">Structure definition scripts</a></h2><p>Structure definition scripts are ordinary Tcl scripts that are
+    evaluatend in the namespace tdom::structure. Several structure
+    definition commands in this tcl namespace allow to define a wide
+    variety of document structures. Every structure definition command
+    establish a validation constrain on the content which all has to
+    match, leaving no unmatched content to render the content as
+    valid.</p><p>The structure definition commands are:</p><dl class="commandlist">
       
         <dt>
 <b class="method">element</b> <i class="m">name</i> <i class="m">?quant?</i> <i class="m">?&lt;definition script&gt;?</i>
@@ -103,35 +127,35 @@
 
       
         <dt>
-<b class="method">ref</b> <i class="m">name</i>
+<b class="method">ref</b> <i class="m">name</i> <i class="m">?quant?</i>
 </dt>
         <dd></dd>
       
 
       
         <dt>
-<b class="method">group</b> <i class="m">&lt;definition script&gt;</i>
+<b class="method">group</b> <i class="m">?quant?</i> <i class="m">&lt;definition script&gt;</i>
 </dt>
         <dd></dd>
       
       
       
         <dt>
-<b class="method">choice</b> <i class="m">&lt;definition script&gt;</i>
-</dt>
-        <dd></dd>
-      
-
-      
-        <dt>
-<b class="method">interleave</b> <i class="m">&lt;definition script&gt;</i>
+<b class="method">choice</b> <i class="m">?quant?</i> <i class="m">&lt;definition script&gt;</i>
 </dt>
         <dd></dd>
       
 
       
         <dt>
-<b class="method">mixed</b> <i class="m">&lt;definition script&gt;</i>
+<b class="method">interleave</b> <i class="m">?quant?</i> <i class="m">&lt;definition script&gt;</i>
+</dt>
+        <dd></dd>
+      
+
+      
+        <dt>
+<b class="method">mixed</b> <i class="m">?quant?</i> <i class="m">&lt;definition script&gt;</i>
 </dt>
         <dd></dd>
       
@@ -166,9 +190,68 @@
         <dt><b class="method">empty</b></dt>
         <dd></dd>
       
+
+      
+        <dt>
+<b class="method">defelement</b> <i class="m">name</i> <i class="m">?namespace?</i> <i class="m">&lt;definition script&gt;</i>
+</dt>
+        <dd></dd>
+      
+
+      
+        <dt>
+<b class="method">defpattern</b> <i class="m">name</i> <i class="m">?namespace?</i> <i class="m">&lt;definition script&gt;</i>
+</dt>
+        <dd></dd>
+      
     </dl>
+
+  <h2><a name="SECTid0x1387980">Quantity specifier</a></h2><p>Serveral structure definition commands expects a quantifier as
+    one of their arguments, which specifies how often the content
+    particle specified by the command is expected. The valid values
+    for a <i class="m">quant</i> argument are:</p><dl class="optlist">
+      
+        <dt><b>!</b></dt>
+        <dd>The content particle must occur exactly once in valid
+        documents.</dd>
+      
+    
+      
+        <dt><b>?</b></dt>
+        <dd>The content particle must occur at most once in valid
+        documents.</dd>
+      
+    
+      
+        <dt><b>*</b></dt>
+        <dd>The content particle may occur zero or more times in a
+        row in valid documents.</dd>
+      
+    
+      
+        <dt><b>+</b></dt>
+        <dd>The content particle may occur one or more times in a
+        row in valid documents.</dd>
+      
+    
+      
+        <dt><b>n</b></dt>
+        <dd>The content particle must occur n times in a row in
+        valid documents. The quantifier must be an integer greater
+        zero.</dd>
+      
+    
+      
+        <dt><b>{n m}</b></dt> <dd>The content particle may occur
+        n to m times (both inclusive) in a row in valid documents. The
+        quantifier must be a tcl list with two elements. Both elements
+        must be integers, with n &gt;= 0 and n &lt; m.</dd>
+      
+    </dl><p>If an optional quantifier is missing then it defaults to ! -
+    the content particle must occur exactly once in valid
+    documents.</p>
   
-  <h2><a name="SECTid0xda68d0">Exampels</a></h2><p>The XML Schema Part 0: Primer Second Edition
+  <h2><a name="SECTid0x1389860">Exampels</a></h2><p>The XML Schema Part 0: Primer Second Edition
     https://www.w3.org/TR/xmlschema-0/ starts with this example schema
     or grammar or Structure definition:</p><pre class="example">
 &lt;xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;

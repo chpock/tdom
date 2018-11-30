@@ -175,13 +175,36 @@ This command creates validation commands with a simple API. The
 validation commands have methods to define an XML grammer and are
 able to validate XML or DOM trees against this grammer.
 .PP
+Additionaly, a validation command may be used as argument to
+the \fI-validateCmd\fR option of the \fIdom parse\fR and the
+\&\fIexpat\fR commands to enable validation additional to what they
+otherwise do.
+.PP
 The valid methods of the created commands are:
 .TP
 \&\fB\fBdefelement\fP \fIname\fB \fI?namespace?\fB \fI<definition script>\fB
-\&\fR
+\&\fRThis method defines the element \fIname\fR (optional in
+the namespace \fInamespace\fR) in the grammar. The
+\&\fIdefinition script\fR is evaluated and defines the content
+model of the element. If the \fInamespace\fR argument is
+given, any \fIelement\fR or \fIref\fR references in the
+definition script not wrapped inside a \fInamespace\fR
+command are resolved in that namespace. If there is already a
+element definition for the name/namespace combination the
+command raises error.
 .TP
 \&\fB\fBdefpattern\fP \fIname\fB \fI<definition script>\fB
-\&\fR
+\&\fRThis method defines a (maybe complex) content particle
+with the \fIname\fR (optional in the namespace
+\&\fInamespace\fR) in the grammar, to be referenced in other
+definition scripts with the definition command \fIref\fR. The
+\&\fIdefinition script\fR is evaluated and defines the content
+model of the content particle. If the \fInamespace\fR
+argument is given, any \fIelement\fR or \fIref\fR references
+in the definition script not wrapped inside a \fInamespace\fR
+command are resolved in that namespace. If there is already a
+pattern definition for the name/namespace combination the
+command raises error.
 .TP
 \&\fB\fBdefine\fP \fI<definition script>\fB
 \&\fR
@@ -194,9 +217,9 @@ The valid methods of the created commands are:
 .TP
 \&\fB\fBvalidate\fP \fI<XML string>\fB \fI?objVar?\fB
 \&\fRReturns true if the \fI<XML string>\fR is valid or
-false otherwise. If validation failed and the optional fourth
-argument is given, then the variable with that name is set to
-a validation error message.
+false otherwise. If validation failed and the optional
+\&\fIobjVar\fR argument is given, then the variable with that
+name is set to a validation error message.
 .TP
 \&\fB\fBdelete\fP
 \&\fRThis method deletes the validation command.
@@ -224,28 +247,31 @@ READY (while preserving the defined grammer).
 .SH "Structure definition scripts"
 .PP
 Structure definition scripts are ordinary Tcl scripts that are
-evaluatend in the namespace tdom::structure. Several commands in
-this tcl namespace allows to define a wide variety of document
-structures.
+evaluatend in the namespace tdom::structure. Several structure
+definition commands in this tcl namespace allow to define a wide
+variety of document structures. Every structure definition command
+establish a validation constrain on the content which all has to
+match, leaving no unmatched content to render the content as
+valid.
 .PP
-This commands are:
+The structure definition commands are:
 .TP
 \&\fB\fBelement\fP \fIname\fB \fI?quant?\fB \fI?<definition script>?\fB
 \&\fR
 .TP
-\&\fB\fBref\fP \fIname\fB
+\&\fB\fBref\fP \fIname\fB \fI?quant?\fB
 \&\fR
 .TP
-\&\fB\fBgroup\fP \fI<definition script>\fB
+\&\fB\fBgroup\fP \fI?quant?\fB \fI<definition script>\fB
 \&\fR
 .TP
-\&\fB\fBchoice\fP \fI<definition script>\fB
+\&\fB\fBchoice\fP \fI?quant?\fB \fI<definition script>\fB
 \&\fR
 .TP
-\&\fB\fBinterleave\fP \fI<definition script>\fB
+\&\fB\fBinterleave\fP \fI?quant?\fB \fI<definition script>\fB
 \&\fR
 .TP
-\&\fB\fBmixed\fP \fI<definition script>\fB
+\&\fB\fBmixed\fP \fI?quant?\fB \fI<definition script>\fB
 \&\fR
 .TP
 \&\fB\fBtext\fP \fI<definition script>\fB
@@ -262,6 +288,43 @@ This commands are:
 .TP
 \&\fB\fBempty\fP
 \&\fR
+.TP
+\&\fB\fBdefelement\fP \fIname\fB \fI?namespace?\fB \fI<definition script>\fB
+\&\fR
+.TP
+\&\fB\fBdefpattern\fP \fIname\fB \fI?namespace?\fB \fI<definition script>\fB
+\&\fR
+.SH "Quantity specifier"
+.PP
+Serveral structure definition commands expects a quantifier as
+one of their arguments, which specifies how often the content
+particle specified by the command is expected. The valid values
+for a \fIquant\fR argument are:
+.IP "\fB!\fR"
+The content particle must occur exactly once in valid
+documents.
+.IP "\fB?\fR"
+The content particle must occur at most once in valid
+documents.
+.IP "\fB*\fR"
+The content particle may occur zero or more times in a
+row in valid documents.
+.IP "\fB+\fR"
+The content particle may occur one or more times in a
+row in valid documents.
+.IP "\fBn\fR"
+The content particle must occur n times in a row in
+valid documents. The quantifier must be an integer greater
+zero.
+.IP "\fB{n m}\fR"
+The content particle may occur
+n to m times (both inclusive) in a row in valid documents. The
+quantifier must be a tcl list with two elements. Both elements
+must be integers, with n >= 0 and n < m.
+.PP
+If an optional quantifier is missing then it defaults to ! -
+the content particle must occur exactly once in valid
+documents.
 .SH Exampels
 .PP
 The XML Schema Part 0: Primer Second Edition

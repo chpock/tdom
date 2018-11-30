@@ -18,17 +18,40 @@
     validation commands have methods to define an XML grammer and are 
     able to validate XML or DOM trees against this grammer.</p>
 
+    <p>Additionaly, a validation command may be used as argument to
+    the <m>-validateCmd</m> option of the <m>dom parse</m> and the
+    <m>expat</m> commands to enable validation additional to what they
+    otherwise do.</p>
+
     <p>The valid methods of the created commands are:</p>
 
     <commandlist>
       <commanddef>
         <command><method>defelement</method> <m>name</m> <m>?namespace?</m> <m>&lt;definition script></m></command>
-        <desc></desc>
+        <desc>This method defines the element <m>name</m> (optional in
+        the namespace <m>namespace</m>) in the grammar. The
+        <m>definition script</m> is evaluated and defines the content
+        model of the element. If the <m>namespace</m> argument is
+        given, any <m>element</m> or <m>ref</m> references in the
+        definition script not wrapped inside a <m>namespace</m>
+        command are resolved in that namespace. If there is already a
+        element definition for the name/namespace combination the
+        command raises error.</desc>
       </commanddef>
 
       <commanddef>
         <command><method>defpattern</method> <m>name</m> <m>&lt;definition script></m></command>
-        <desc></desc>
+        <desc>This method defines a (maybe complex) content particle
+        with the <m>name</m> (optional in the namespace
+        <m>namespace</m>) in the grammar, to be referenced in other
+        definition scripts with the definition command <m>ref</m>. The
+        <m>definition script</m> is evaluated and defines the content
+        model of the content particle. If the <m>namespace</m>
+        argument is given, any <m>element</m> or <m>ref</m> references
+        in the definition script not wrapped inside a <m>namespace</m>
+        command are resolved in that namespace. If there is already a
+        pattern definition for the name/namespace combination the
+        command raises error.</desc>
       </commanddef>
 
       <commanddef>
@@ -49,9 +72,9 @@
       <commanddef>
         <command><method>validate</method> <m>&lt;XML string></m> <m>?objVar?</m></command>
         <desc>Returns true if the <m>&lt;XML string></m> is valid or
-        false otherwise. If validation failed and the optional fourth
-        argument is given, then the variable with that name is set to
-        a validation error message.</desc>
+        false otherwise. If validation failed and the optional
+        <m>objVar</m> argument is given, then the variable with that
+        name is set to a validation error message.</desc>
       </commanddef>
 
       <commanddef>
@@ -86,11 +109,14 @@
     <title>Structure definition scripts</title>
 
     <p>Structure definition scripts are ordinary Tcl scripts that are
-    evaluatend in the namespace tdom::structure. Several commands in
-    this tcl namespace allows to define a wide variety of document
-    structures.</p>
+    evaluatend in the namespace tdom::structure. Several structure
+    definition commands in this tcl namespace allow to define a wide
+    variety of document structures. Every structure definition command
+    establish a validation constrain on the content which all has to
+    match, leaving no unmatched content to render the content as
+    valid.</p>
 
-    <p>This commands are:</p>
+    <p>The structure definition commands are:</p>
 
     <commandlist>
       <commanddef>
@@ -99,27 +125,27 @@
       </commanddef>
 
       <commanddef>
-        <command><method>ref</method> <m>name</m></command>
+        <command><method>ref</method> <m>name</m> <m>?quant?</m></command>
         <desc></desc>
       </commanddef>
 
       <commanddef>
-        <command><method>group</method> <m>&lt;definition script></m></command>
+        <command><method>group</method> <m>?quant?</m> <m>&lt;definition script></m></command>
         <desc></desc>
       </commanddef>
       
       <commanddef>
-        <command><method>choice</method> <m>&lt;definition script></m></command>
+        <command><method>choice</method> <m>?quant?</m> <m>&lt;definition script></m></command>
         <desc></desc>
       </commanddef>
 
       <commanddef>
-        <command><method>interleave</method> <m>&lt;definition script></m></command>
+        <command><method>interleave</method> <m>?quant?</m> <m>&lt;definition script></m></command>
         <desc></desc>
       </commanddef>
 
       <commanddef>
-        <command><method>mixed</method> <m>&lt;definition script></m></command>
+        <command><method>mixed</method> <m>?quant?</m> <m>&lt;definition script></m></command>
         <desc></desc>
       </commanddef>
 
@@ -147,7 +173,71 @@
         <command><method>empty</method></command>
         <desc></desc>
       </commanddef>
+
+      <commanddef>
+        <command><method>defelement</method> <m>name</m> <m>?namespace?</m> <m>&lt;definition script></m></command>
+        <desc></desc>
+      </commanddef>
+
+      <commanddef>
+        <command><method>defpattern</method> <m>name</m> <m>?namespace?</m> <m>&lt;definition script></m></command>
+        <desc></desc>
+      </commanddef>
     </commandlist>
+    
+  </section>
+
+  <section>
+    <title>Quantity specifier</title>
+
+    <p>Serveral structure definition commands expects a quantifier as
+    one of their arguments, which specifies how often the content
+    particle specified by the command is expected. The valid values
+    for a <m>quant</m> argument are:</p>
+
+    <optlist>
+      <optdef>
+        <optname>!</optname>
+        <desc>The content particle must occur exactly once in valid
+        documents.</desc>
+      </optdef>
+    
+      <optdef>
+        <optname>?</optname>
+        <desc>The content particle must occur at most once in valid
+        documents.</desc>
+      </optdef>
+    
+      <optdef>
+        <optname>*</optname>
+        <desc>The content particle may occur zero or more times in a
+        row in valid documents.</desc>
+      </optdef>
+    
+      <optdef>
+        <optname>+</optname>
+        <desc>The content particle may occur one or more times in a
+        row in valid documents.</desc>
+      </optdef>
+    
+      <optdef>
+        <optname>n</optname>
+        <desc>The content particle must occur n times in a row in
+        valid documents. The quantifier must be an integer greater
+        zero.</desc>
+      </optdef>
+    
+      <optdef>
+        <optname>{n m}</optname> <desc>The content particle may occur
+        n to m times (both inclusive) in a row in valid documents. The
+        quantifier must be a tcl list with two elements. Both elements
+        must be integers, with n >= 0 and n &lt; m.</desc>
+      </optdef>
+    </optlist>
+
+    <p>If an optional quantifier is missing then it defaults to ! -
+    the content particle must occur exactly once in valid
+    documents.</p>
     
   </section>
   

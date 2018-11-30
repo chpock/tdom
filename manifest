@@ -1,5 +1,5 @@
-C Removed\squant\stype\sSTRUCTURE_CQUANT_N\sbecause\sit\scan\sbe\shandled\seasily\sas\sa\sspecial\scase\sof\sSTRUCTURE_CQUANT_NM.
-D 2018-11-30T11:50:31.895
+C More\sexplanation\show\sa\sgrammar\sor\sstructure\sdefinition\sis\sto\sbe\sdefined.
+D 2018-11-30T13:13:21.101
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -38,9 +38,9 @@ F doc/manpage.css 3b4ec1d641048933a7e6bffc659de9519030a959
 F doc/pullparser.html 3afeaa6c3960776a6dfc09df4395aace9c73c05389861bf8de1ce5943f7cc73b
 F doc/pullparser.n 5f5672e8bb2dd221602040cd212234da6b6ed8c99c5daa60be9fa0c476529c09
 F doc/pullparser.xml 6032c1e8c8d001068c227601dba9860824f8acc709c87fd8e36ac4a596b6a2f2
-F doc/structure.html be73d9427ccb25b7bca2cfde981dd5eeb6a38044f9f2d14e1a0a6940bb7da602
-F doc/structure.n b270bcf91103623b5526be40a18ec71f63b72da655cae4e09e0112648928cf4f
-F doc/structure.xml 424bb3879bd8cd802eec5da7e8568ff850d848b66c206b670497e353631eef5b
+F doc/structure.html bdc322c78944d0eddb0c0f0fc5f97acaf4a2e3185200a9577a217eafa55ccdb7
+F doc/structure.n 7a2e733f4d27df0683644b340ddd0efb72fb57c17fef6ec5523adace802dca8b
+F doc/structure.xml 08ecc4264b6aa9e7c841646fc6de360f8f7fcca3a76a429307545195f8ac0650
 F doc/tDOM.xml da77576ab62262463b7806357baf04a01affd5dfda77511a0e469597f43f93b7
 F doc/tdomcmd.html 9b4d9ff443499554adf2346ff0efc0317a98bd6e1fc3fc79a6e476b71fe85fed
 F doc/tdomcmd.n c06a5ff035f16a2a52636b69d9ebe6ba84ff5101922ed27b551146c4d61d6cda
@@ -228,8 +228,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P bb1c6e19967e4bed17d6df24ba1398b7924e57bcf378972d30d72c142b9c6845
-R d3adaaa0d5b7f519f5f5d81651705e6b
+P 46fc4186e4d65396adbaea5f8d3376d663527d54e570a20cb1eaaaa80c683af4
+R 6306055e9660be2798e2a4f561d2c65f
 U rolf
-Z 83dcffb072b1b0645c74d053df4b85d4
+Z 1b0d3f54de1bd4e1b6264f9ab0fbfb9b
 # Remove this line to create a well-formed Fossil manifest.
