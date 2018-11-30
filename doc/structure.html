@@ -4,18 +4,18 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x17e41d0">NAME</a> · <a href="#SECTid0x17242c0">SYNOPSIS</a> · <a href="#SECTid0x184dde0">DESCRIPTION </a> · <a href="#SECTid0x1890bb0">Structure definition scripts</a> · <a href="#SECTid0x18943a0">Exampels</a>
+<a href="#SECTid0xcf61d0">NAME</a> · <a href="#SECTid0xc362c0">SYNOPSIS</a> · <a href="#SECTid0xd5ffd0">DESCRIPTION </a> · <a href="#SECTid0xda30e0">Structure definition scripts</a> · <a href="#SECTid0xda68d0">Exampels</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x17e41d0">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0xcf61d0">NAME</a></h2><p class="namesection">
 <b class="names">tdom::structure - </b><br>Create an XML structure validation command</p>
 
-  <h2><a name="SECTid0x17242c0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0xc362c0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
     <b class="cmd">tdom::structure</b> <i class="m">cmdName</i>
     </pre>
 
-  <h2><a name="SECTid0x184dde0">DESCRIPTION </a></h2><p>This command creates validation commands with a simple API. The
+  <h2><a name="SECTid0xd5ffd0">DESCRIPTION </a></h2><p>This command creates validation commands with a simple API. The
     validation commands have methods to define an XML grammer and are 
     able to validate XML or DOM trees against this grammer.</p><p>The valid methods of the created commands are:</p><dl class="commandlist">
       
@@ -55,9 +55,12 @@
 
       
         <dt>
-<b class="method">validate</b> <i class="m">&lt;XML string&gt;</i>
+<b class="method">validate</b> <i class="m">&lt;XML string&gt;</i> <i class="m">?objVar?</i>
 </dt>
-        <dd></dd>
+        <dd>Returns true if the <i class="m">&lt;XML string&gt;</i> is valid or
+        false otherwise. If validation failed and the optional fourth
+        argument is given, then the variable with that name is set to
+        a validation error message.</dd>
       
 
       
@@ -87,7 +90,7 @@
 
     </dl>
 
-  <h2><a name="SECTid0x1890bb0">Structure definition scripts</a></h2><p>Structure definition scripts are ordinary Tcl scripts that are
+  <h2><a name="SECTid0xda30e0">Structure definition scripts</a></h2><p>Structure definition scripts are ordinary Tcl scripts that are
     evaluatend in the namespace tdom::structure. Several commands in
     this tcl namespace allows to define a wide variety of document
     structures.</p><p>This commands are:</p><dl class="commandlist">
@@ -165,7 +168,7 @@
       
     </dl>
   
-  <h2><a name="SECTid0x18943a0">Exampels</a></h2><p>The XML Schema Part 0: Primer Second Edition
+  <h2><a name="SECTid0xda68d0">Exampels</a></h2><p>The XML Schema Part 0: Primer Second Edition
     https://www.w3.org/TR/xmlschema-0/ starts with this example schema
     or grammar or Structure definition:</p><pre class="example">
 &lt;xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;

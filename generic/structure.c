@@ -87,7 +87,9 @@ typedef struct
                      Tcl_AppendResult(interp, (str1), (str2), (str3), NULL)
 #define SetIntResult(i) Tcl_ResetResult(interp);                        \
                      Tcl_SetIntObj(Tcl_GetObjResult(interp), (i))
-
+#define SetBooleanResult(i) Tcl_ResetResult(interp); \
+                     Tcl_SetBooleanObj(Tcl_GetObjResult(interp), (i))
+ 
 #define checkNrArgs(l,h,err) if (objc < l || objc > h) {      \
         SetResult (err);                                      \
         return TCL_ERROR;                                     \
@@ -1343,12 +1345,21 @@ structureInstanceCmd (
         break;
 
     case m_validate:
-        if (objc != 3) {
-            Tcl_WrongNumArgs (interp, 2, objv, "<xml>");
+        if (objc < 3 || objc > 4) {
+            Tcl_WrongNumArgs (interp, 2, objv, "<xml> ?resultVarName?");
             return TCL_ERROR;
         }
         xmlstr = Tcl_GetStringFromObj (objv[2], &len);
-        return validateString (interp, sdata, xmlstr, len);
+        if (validateString (interp, sdata, xmlstr, len) == TCL_OK) {
+            SetBooleanResult (1);
+        } else {
+            if (objc == 4) {
+                Tcl_SetVar (interp, Tcl_GetString (objv[3]),
+                            Tcl_GetStringResult (interp), 0);
+            }
+            SetBooleanResult (0);
+        }
+        break;
         
     default:
         Tcl_SetResult (interp, "unknown method", NULL);

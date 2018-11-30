@@ -47,8 +47,11 @@
       </commanddef>
 
       <commanddef>
-        <command><method>validate</method> <m>&lt;XML string></m></command>
-        <desc></desc>
+        <command><method>validate</method> <m>&lt;XML string></m> <m>?objVar?</m></command>
+        <desc>Returns true if the <m>&lt;XML string></m> is valid or
+        false otherwise. If validation failed and the optional fourth
+        argument is given, then the variable with that name is set to
+        a validation error message.</desc>
       </commanddef>
 
       <commanddef>

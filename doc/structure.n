@@ -192,8 +192,11 @@ The valid methods of the created commands are:
 \&\fB\fBevent\fP \fI(start|end|text)\fB \fI?event specific data?\fB
 \&\fR
 .TP
-\&\fB\fBvalidate\fP \fI<XML string>\fB
-\&\fR
+\&\fB\fBvalidate\fP \fI<XML string>\fB \fI?objVar?\fB
+\&\fRReturns true if the \fI<XML string>\fR is valid or
+false otherwise. If validation failed and the optional fourth
+argument is given, then the variable with that name is set to
+a validation error message.
 .TP
 \&\fB\fBdelete\fP
 \&\fRThis method deletes the validation command.

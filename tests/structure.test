@@ -765,15 +765,15 @@ test structure-8.1 {validate method} {
     foreach e {e1 e2} {
         grammar defelement $e {}
     }
-    set result [catch {grammar validate <doc><e1/></doc>}]
+    set result [grammar validate <doc><e1/></doc>]
     if {[grammar state] ne "FINISHED"} {
         error "Wrong state."
     }
     grammar reset
-    lappend result [catch {grammar validate <doc><e1/><e1/></doc>} errMsg]
+    lappend result [grammar validate <doc><e1/><e1/></doc> errMsg]
     grammar delete
     set result
-} {0 1}
+} {1 0}
 
 test structure-8.2 {validate method} {
     tdom::structure create grammar
@@ -784,15 +784,15 @@ test structure-8.2 {validate method} {
     foreach e {e1 e2} {
         grammar defelement $e foouri {}
     }
-    set result [catch {grammar validate {<doc xmlns="foouri"><e1/></doc>}}]
+    set result [grammar validate {<doc xmlns="foouri"><e1/></doc>}]
     if {[grammar state] ne "FINISHED"} {
         error "Wrong state."
     }
     grammar reset
-    lappend result [catch {grammar validate {<doc xmlns="foouri"><e1/><e1/></doc>}} errMsg]
+    lappend result [grammar validate {<doc xmlns="foouri"><e1/><e1/></doc>} errMsg]
     grammar delete
     set result
-} {0 1}
+} {1 0}
 
 test structure-9.1 {choice} {
     tdom::structure create grammar
