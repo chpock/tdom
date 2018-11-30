@@ -474,7 +474,7 @@ pushToStack (
     ((quant) == quantOne || (quant) == quantOpt) ? 1 : 0
 
 #define minOne(quant) \
-    ((quant) == quantOne || (quant) == quantPlus) || ((quant->type == STRUCTURE_CQUANT_N || quant->type == STRUCTURE_CQUANT_NM) && (quant)->minOccur > 0)  ? 1 : 0
+    ((quant) == quantOne || (quant) == quantPlus) || (quant->type == STRUCTURE_CQUANT_NM && (quant)->minOccur > 0)  ? 1 : 0
 
 #define mayMiss(quant) \
     ((quant) == quantOpt || (quant) == quantRep) || (quant->type == STRUCTURE_CQUANT_NM && (quant)->minOccur == 0) ? 1 : 0
@@ -484,7 +484,7 @@ pushToStack (
 
 #define mustMatch(quant,nr) \
     (nr) == 0 ? minOne(quant)                                              \
-        : (quant->type == STRUCTURE_CQUANT_N || quant->type == STRUCTURE_CQUANT_NM) && (quant->minOccur < (nr)) ? 1 : 0
+        : (quant->type == STRUCTURE_CQUANT_NM && quant->minOccur < (nr)) ? 1 : 0
 
 #define hasMatched(quant,nr) \
     (nr) == 0 ? 0 : ((nr) == 1 && (quant == quantOne || quant == quantOpt) ? 1 : quant->maxOccur == (nr))
@@ -1510,7 +1510,7 @@ getQuant (
         if (n == 1) {
             return quantOne;
         }
-        return initStructureQuant (sdata, STRUCTURE_CQUANT_N, n, n);
+        return initStructureQuant (sdata, STRUCTURE_CQUANT_NM, n, n);
     }
     /* The "list-ness" of the quantObj is already checked by the
      * Tcl_ListObjLength() call above, no need to check result. */
