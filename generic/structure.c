@@ -343,6 +343,13 @@ initStructureData ()
     sdata->stackList = (StructureValidationStack **) MALLOC (
         sizeof (StructureValidationStack *) * STACK_LIST_SIZE_INIT);
     sdata->stackListSize = STACK_LIST_SIZE_INIT;
+    sdata->evalStub = (Tcl_Obj **) (MALLOC (sizeof (Tcl_Obj*) * 4));
+    sdata->evalStub[0] = Tcl_NewStringObj("::namespace", 11);
+    Tcl_IncrRefCount (sdata->evalStub[0]);
+    sdata->evalStub[1] = Tcl_NewStringObj("eval", 4);
+    Tcl_IncrRefCount (sdata->evalStub[1]);
+    sdata->evalStub[2] = Tcl_NewStringObj("::tdom::structure", 17);
+    Tcl_IncrRefCount (sdata->evalStub[2]);
     return sdata;
 }
 
@@ -371,6 +378,10 @@ static void structureInstanceDelete (
         FREE (sdata->stackList[i]);
     }
     FREE (sdata->stackList);
+    Tcl_DecrRefCount (sdata->evalStub[0]);
+    Tcl_DecrRefCount (sdata->evalStub[1]);
+    Tcl_DecrRefCount (sdata->evalStub[2]);
+    FREE (sdata->evalStub);
     FREE (sdata);
 }
 
@@ -1184,8 +1195,9 @@ structureInstanceCmd (
         sdata->currentQuants = pattern->quants;
         sdata->numChildren = 0;
         sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
-        result = Tcl_VarEval (interp, "::namespace eval ::tdom::structure {",
-                              Tcl_GetString (objv[patternIndex]), "}", NULL);
+        sdata->evalStub[3] = objv[patternIndex];
+        result = Tcl_EvalObjv (interp, 4, sdata->evalStub,
+                               TCL_EVAL_DIRECT | TCL_EVAL_GLOBAL);
         sdata->currentNamespace = NULL;
         pattern->content = sdata->currentContent;
         pattern->quants = sdata->currentQuants;
@@ -1221,8 +1233,9 @@ structureInstanceCmd (
         sdata->numChildren = 0;
         sdata->contentSize = 0;
         sdata->defineToplevel = 1;
-        result = Tcl_VarEval (interp, "::namespace eval ::tdom::structure {",
-                              Tcl_GetString (objv[2]), "}", NULL);
+        sdata->evalStub[3] = objv[2];
+        result = Tcl_EvalObjv (interp, 4, sdata->evalStub,
+                               TCL_EVAL_DIRECT | TCL_EVAL_GLOBAL);
         if (result != TCL_OK) {
             cleanupLastPattern (sdata, savedNumPatternList);
         }

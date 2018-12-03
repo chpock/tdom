@@ -99,6 +99,7 @@ typedef struct
     StructureQuant **quants;
     unsigned int numQuants;
     unsigned int quantsSize;
+    Tcl_Obj **evalStub;
     char *currentNamespace;
     char *currentAttributeNamespace;
     int   defineToplevel;

@@ -1,7 +1,7 @@
 <manpage id="structure" cat="structure" title="structure">
   <namesection>
     <name>tdom::structure</name>
-    <desc>Create an XML structure validation command</desc>
+    <desc>Create a structure validation command</desc>
   </namesection>
 
   <synopsis>
@@ -15,10 +15,11 @@
     <title>DESCRIPTION </title>    
     
     <p>This command creates validation commands with a simple API. The
-    validation commands have methods to define an XML grammer and are 
-    able to validate XML or DOM trees against this grammer.</p>
+    validation commands have methods to define a grammer and are able
+    to validate XML or DOM trees (and to some degree other kind of
+    hierarchical data) against this grammer.</p>
 
-    <p>Additionaly, a validation command may be used as argument to
+    <p>Additionally, a validation command may be used as argument to
     the <m>-validateCmd</m> option of the <m>dom parse</m> and the
     <m>expat</m> commands to enable validation additional to what they
     otherwise do.</p>
@@ -91,8 +92,8 @@
 
           <optdef>
             <optname>end</optname>
-            <desc>Checks if the current innermost open element may be
-            end here in the current state without violate validation
+            <desc>Checks if the current innermost open element may end
+            here in the current state without violate validation
             constrains. It raises error, if not.</desc>
           </optdef>
           
@@ -294,8 +295,8 @@
     <title>Exampels</title>
 
     <p>The XML Schema Part 0: Primer Second Edition
-    https://www.w3.org/TR/xmlschema-0/ starts with this example schema
-    or grammar or Structure definition:</p>
+    (<url>https://www.w3.org/TR/xmlschema-0/</url>) starts with this
+    example schema:</p>
 
     <example>
 &lt;xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -411,8 +412,9 @@ grammar define {
       
     </example>
 
-    <p>The RELAX NG Tutorial http://relaxng.org/tutorial-20011203.html
-    starts with this example:</p>
+    <p>The RELAX NG Tutorial
+    (<url>http://relaxng.org/tutorial-20011203.html</url>) starts with
+    this example:</p>
 
     <example>
 Consider a simple XML representation of an email address book:
