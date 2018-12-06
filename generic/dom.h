@@ -42,7 +42,7 @@
 #include <ctype.h>
 #include <expat.h>
 #include <domalloc.h>
-#include <structure.h>
+#include <schema.h>
 
 /*
  * tDOM provides it's own memory allocator which is optimized for
@@ -731,7 +731,7 @@ domDocument *  domReadDocument   (XML_Parser parser,
                                   Tcl_Obj *extResolver,
                                   int   useForeignDTD,
                                   int   paramEntityParsing,
-                                  StructureData *sdata,
+                                  SchemaData *sdata,
                                   Tcl_Interp *interp,
                                   int  *status);
 

@@ -1,5 +1,5 @@
 '\"
-'\" Generated from structure.xml
+'\" Generated from schema.xml
 '\"
 '\" BEGIN man.macros
 .if t .wh -1.3i ^B
@@ -157,25 +157,26 @@ Database Class:	\\fB\\$3\\fR
 \\$1\l'|0\(ul'\\$2
 ..
 '\" END man.macros
-.TH structure n "" Tcl ""
+.TH schema n "" Tcl ""
 .BS
 .SH NAME
-tdom::structure \- Create an XML structure validation command
+tdom::schema \- Create a schema validation command
 .SH SYNOPSIS
 .nf
 package require tdom
 
-    \fBtdom::structure\fP \fIcmdName\fR
+    \fBtdom::schema\fP \fIcmdName\fR
     
 .fi
 .BE
 .SH "DESCRIPTION "
 .PP
 This command creates validation commands with a simple API. The
-validation commands have methods to define an XML grammer and are
-able to validate XML or DOM trees against this grammer.
+validation commands have methods to define a grammer and are able
+to validate XML or DOM trees (and to some degree other kind of
+hierarchical data) against this grammer.
 .PP
-Additionaly, a validation command may be used as argument to
+Additionally, a validation command may be used as argument to
 the \fI-validateCmd\fR option of the \fIdom parse\fR and the
 \&\fIexpat\fR commands to enable validation additional to what they
 otherwise do.
@@ -232,8 +233,8 @@ Checks if the current validation state allows the
 element \fIname\fR in the \fInamespace\fR is allowed to
 start here. It raises error, if not.
 .IP "\fBend\fR"
-Checks if the current innermost open element may be
-end here in the current state without violate validation
+Checks if the current innermost open element may end
+here in the current state without violate validation
 constrains. It raises error, if not.
 .IP "\fBtext  \fItext\fP\fR"
 Checks if the current validation state allows the
@@ -269,17 +270,17 @@ events are expected.
 \&\fB\fBreset\fP
 \&\fRThis method resets the validation command into state
 READY (while preserving the defined grammer).
-.SH "Structure definition scripts"
+.SH "Schema definition scripts"
 .PP
-Structure definition scripts are ordinary Tcl scripts that are
-evaluatend in the namespace tdom::structure. Several structure
+Schema definition scripts are ordinary Tcl scripts that are
+evaluatend in the namespace tdom::schema. Several schema
 definition commands in this tcl namespace allow to define a wide
-variety of document structures. Every structure definition command
+variety of document structures. Every schema definition command
 establish a validation constrain on the content which all has to
 match, leaving no unmatched content to render the content as
 valid.
 .PP
-The structure definition commands are:
+The schema definition commands are:
 .TP
 \&\fB\fBelement\fP \fIname\fB \fI?quant?\fB \fI?<definition script>?\fB
 \&\fRThis command refers to the element defined with
@@ -330,7 +331,7 @@ or recursive references are allowed.
 \&\fR
 .SH "Quantity specifier"
 .PP
-Serveral structure definition commands expects a quantifier as
+Serveral schema definition commands expects a quantifier as
 one of their arguments, which specifies how often the content
 particle specified by the command is expected. The valid values
 for a \fIquant\fR argument are:
@@ -361,9 +362,12 @@ the content particle must occur exactly once in valid
 documents.
 .SH Exampels
 .PP
+.UR "https://www.w3.org/TR/xmlschema-0/"
+<URL: https://www.w3.org/TR/xmlschema-0/>
+.UE
 The XML Schema Part 0: Primer Second Edition
-https://www.w3.org/TR/xmlschema-0/ starts with this example schema
-or grammar or Structure definition:
+() starts with this
+example schema:
 .CS
 
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -435,11 +439,11 @@ or grammar or Structure definition:
     
 .CE
 .PP
-A somewhat one-to-one translation of that into a tDOM structure
+A somewhat one-to-one translation of that into a tDOM schema
 defintion script would be:
 .CS
 
-tdom::structure grammar      
+tdom::schema grammar      
 grammar define {
 
     # Purchase order schema for Example.com.
@@ -481,8 +485,12 @@ grammar define {
     
 .CE
 .PP
-The RELAX NG Tutorial http://relaxng.org/tutorial-20011203.html
-starts with this example:
+.UR "http://relaxng.org/tutorial-20011203.html"
+<URL: http://relaxng.org/tutorial-20011203.html>
+.UE
+The RELAX NG Tutorial
+() starts with
+this example:
 .CS
 
 Consider a simple XML representation of an email address book:
@@ -525,10 +533,10 @@ A RELAX NG pattern for this could be written as follows:
     
 .CE
 .PP
-This structure definition script will do the same:
+This schema definition script will do the same:
 .CS
 
-tdom::structure grammar      
+tdom::schema grammar      
 grammar define {
     defelement addressBook {
         element card *

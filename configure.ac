@@ -109,7 +109,7 @@ TEA_ADD_SOURCES([generic/xmlsimple.c \
                  generic/tdominit.c  \
                  generic/tclexpat.c  \
                  generic/tclpull.c   \
-                 generic/structure.c \
+                 generic/schema.c \
                  generic/tdomStubInit.c])
 TEA_ADD_HEADERS([generic/tdom.h])
 TEA_ADD_INCLUDES([-I${srcdir}/generic ${AOL_INCLUDES} ${HTML5_INCLUDES}])

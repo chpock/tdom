@@ -136,7 +136,7 @@ typedef struct TclGenExpatInfo {
     int useForeignDTD;
     const char *currentmarkup;  /* Used to transfer data for method */
     int currentmarkuplen;       /* currentmarkup */
-    StructureData *sdata;       /* Validation / Structure data */
+    SchemaData *sdata;          /* Validation / Schema data */
  
     TclHandlerSet *firstTclHandlerSet;
     CHandlerSet *firstCHandlerSet;

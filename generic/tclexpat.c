@@ -39,7 +39,7 @@
 #include <dom.h>
 #include <tclexpat.h>
 #include <fcntl.h>
-#include <structure.h>
+#include <schema.h>
 
 #ifdef _MSC_VER
 #include <io.h>
@@ -1124,7 +1124,7 @@ TclExpatConfigure (
     "-ignorewhitespace",
     "-handlerset",
     "-noexpand",
-#ifndef TDOM_NO_STRUCTURE
+#ifndef TDOM_NO_SCHEMA
     "-validateCmd",
 #endif
     (char *) NULL
@@ -1151,7 +1151,7 @@ TclExpatConfigure (
     EXPAT_NOWHITESPACE,
     EXPAT_HANDLERSET,
     EXPAT_NOEXPAND
-#ifndef TDOM_NO_STRUCTURE
+#ifndef TDOM_NO_SCHEMA
     ,EXPAT_VALIDATECMD
 #endif
   };
@@ -1559,7 +1559,7 @@ TclExpatConfigure (
         expat->noexpand = bool;
         break;
 
-#ifndef TDOM_NO_STRUCTURE
+#ifndef TDOM_NO_SCHEMA
     case EXPAT_VALIDATECMD:
         if (!Tcl_GetCommandInfo(interp, Tcl_GetString(objv[1]), &cmdInfo)) {
             SetResult3("The \"-validateCmd\" argument \"",
@@ -1567,13 +1567,13 @@ TclExpatConfigure (
                        "\" is not a tDOM validation command.");
             return TCL_ERROR;
         }
-        if (cmdInfo.objProc != structureInstanceCmd) {
+        if (cmdInfo.objProc != schemaInstanceCmd) {
             SetResult3("The \"-validateCmd\" argument \"",
                        Tcl_GetString(objv[1]),
                        "\" is not a tDOM validation command.");
             return TCL_ERROR;
         }
-        expat->sdata = (StructureData *) cmdInfo.objClientData;
+        expat->sdata = (SchemaData *) cmdInfo.objClientData;
 #endif
     }
 

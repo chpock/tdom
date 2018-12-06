@@ -51,7 +51,7 @@
 #include <domhtml5.h>
 #include <nodecmd.h>
 #include <tcldom.h>
-#include <structure.h>
+#include <schema.h>
 #include <versionhash.h>
 
 /* #define DEBUG */
@@ -6164,7 +6164,7 @@ int tcldom_parse (
     XML_Parser   parser;
     Tcl_Channel  chan = (Tcl_Channel) NULL;
     Tcl_CmdInfo  cmdInfo;
-    StructureData *sdata = NULL;
+    SchemaData *sdata = NULL;
     static const char *parseOptions[] = {
         "-keepEmpties",           "-simple",        "-html",
         "-feedbackAfter",         "-channel",       "-baseurl",
@@ -6173,7 +6173,7 @@ int tcldom_parse (
 #ifdef TDOM_HAVE_GUMBO
         "-html5",
 #endif
-#ifndef TDOM_NO_STRUCTURE
+#ifndef TDOM_NO_SCHEMA
         "-validateCmd",
 #endif
         "-jsonmaxnesting",        "-ignorexmlns",   "--",
@@ -6187,7 +6187,7 @@ int tcldom_parse (
 #ifdef TDOM_HAVE_GUMBO
         o_htmlfive,
 #endif
-#ifndef TDOM_NO_STRUCTURE
+#ifndef TDOM_NO_SCHEMA
         o_validateCmd,
 #endif
         o_jsonmaxnesting,         o_ignorexmlns,    o_LAST,
@@ -6422,7 +6422,7 @@ int tcldom_parse (
             keepCDATA = 1;
             objv++;  objc--; continue;
             
-#ifndef TDOM_NO_STRUCTURE
+#ifndef TDOM_NO_SCHEMA
         case o_validateCmd:
             objv++; objc--;
             if (objc < 2) {
@@ -6437,13 +6437,13 @@ int tcldom_parse (
                            "\" is not a tDOM validation command.");
                 return TCL_ERROR;
             }
-            if (cmdInfo.objProc != structureInstanceCmd) {
+            if (cmdInfo.objProc != schemaInstanceCmd) {
                 SetResult3("The \"-validateCmd\" argument \"",
                            Tcl_GetString(objv[1]),
                            "\" is not a tDOM validation command.");
                 return TCL_ERROR;
             }
-            sdata = (StructureData *) cmdInfo.objClientData;
+            sdata = (SchemaData *) cmdInfo.objClientData;
             objv++;  objc--; continue;
 #endif
         }

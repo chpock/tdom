@@ -21,10 +21,10 @@
 |
 \---------------------------------------------------------------------------*/
 
-#ifndef TDOM_NO_STRUCTURE
+#ifndef TDOM_NO_SCHEMA
 
 #include <tdom.h>
-#include <structure.h>
+#include <schema.h>
 
 /* #define DEBUG */
 /*----------------------------------------------------------------------------
@@ -67,7 +67,7 @@
 
 typedef struct
 {
-    StructureData *sdata;
+    SchemaData *sdata;
     Tcl_Interp    *interp;
     XML_Parser     parser;
     Tcl_DString   *cdata;
@@ -96,7 +96,7 @@ typedef struct
     }
 
 #ifdef DEBUG
-static char *Structure_CP_Type2str[] = {
+static char *Schema_CP_Type2str[] = {
     "EMPTY",
     "ANY",
     "MIXED",
@@ -107,7 +107,7 @@ static char *Structure_CP_Type2str[] = {
     "GROUP",
     "TEXT"
 };
-static char *Structure_Quant_Type2str[] = {
+static char *Schema_Quant_Type2str[] = {
     "ONE",
     "OPT",
     "REP",
@@ -118,40 +118,40 @@ static char *Structure_Quant_Type2str[] = {
 #endif
 
 
-/* The StructureFlags flags */
+/* The SchemaFlags flags */
 #define FORWARD_PATTERN_DEF     1
 #define PLACEHOLDER_PATTERN_DEF 2
 #define AMBIGUOUS_PATTERN       4
 #define LOCAL_DEFINED_ELEMENT   8
 
 /* Pointer to heap-allocated shared quants. */
-static StructureQuant QuantOne;
-static StructureQuant *quantOne = &QuantOne;
+static SchemaQuant QuantOne;
+static SchemaQuant *quantOne = &QuantOne;
 
-static StructureQuant QuantOpt;
-static StructureQuant *quantOpt = &QuantOpt;
+static SchemaQuant QuantOpt;
+static SchemaQuant *quantOpt = &QuantOpt;
 
-static StructureQuant QuantRep;
-static StructureQuant *quantRep = &QuantRep;
+static SchemaQuant QuantRep;
+static SchemaQuant *quantRep = &QuantRep;
 
-static StructureQuant QuantPlus;
-static StructureQuant *quantPlus = &QuantPlus;
+static SchemaQuant QuantPlus;
+static SchemaQuant *quantPlus = &QuantPlus;
 
 #ifndef TCL_THREADS
-  static StructureData *activeStructureData = 0;
-# define GETASI activeStructureData
-# define SETASI(v) activeStructureData = v
+  static SchemaData *activeSchemaData = 0;
+# define GETASI activeSchemaData
+# define SETASI(v) activeSchemaData = v
 #else
-  static Tcl_ThreadDataKey activeStructureData;
-# define GETASI  *(StructureData**) Tcl_GetThreadData(&activeStructureData, \
-                                                     sizeof(StructureData*))
-static void SetActiveStructureData (StructureData *v) 
+  static Tcl_ThreadDataKey activeSchemaData;
+# define GETASI  *(SchemaData**) Tcl_GetThreadData(&activeSchemaData, \
+                                                     sizeof(SchemaData*))
+static void SetActiveSchemaData (SchemaData *v) 
 {
-    StructureData **structureInfoPtr = Tcl_GetThreadData(&activeStructureData,
-                                                        sizeof (StructureData*));
-    *structureInfoPtr = v;
+    SchemaData **schemaInfoPtr = Tcl_GetThreadData(&activeSchemaData,
+                                                        sizeof (SchemaData*));
+    *schemaInfoPtr = v;
 }
-# define SETASI(v) SetActiveStructureData (v)
+# define SETASI(v) SetActiveSchemaData (v)
 #endif
 
 
@@ -180,11 +180,11 @@ static void SetActiveStructureData (StructureData *v)
         sdata->currentContent =                                         \
             REALLOC (sdata->currentContent,                             \
                      2 * sdata->contentSize                             \
-                     * sizeof (StructureCP*));                          \
+                     * sizeof (SchemaCP*));                             \
         sdata->currentQuants =                                          \
             REALLOC (sdata->currentQuants,                              \
                      2 * sdata->contentSize                             \
-                     * sizeof (StructureQuant*));                       \
+                     * sizeof (SchemaQuant*));                          \
         sdata->contentSize *= 2;                                        \
     }                                                                   \
     sdata->currentContent[sdata->numChildren] = (pattern);              \
@@ -193,45 +193,45 @@ static void SetActiveStructureData (StructureData *v)
 
 #define REMEMBER_PATTERN(pattern)                                       \
     if (sdata->numPatternList == sdata->patternListSize) {              \
-        sdata->patternList = (StructureCP **) MALLOC (                  \
-            sizeof (StructureCP*) * sdata->patternListSize * 2);        \
+        sdata->patternList = (SchemaCP **) MALLOC (                     \
+            sizeof (SchemaCP*) * sdata->patternListSize * 2);           \
         sdata->patternListSize *= 2;                                    \
     }                                                                   \
     sdata->patternList[sdata->numPatternList] = pattern;                \
     sdata->numPatternList++;
 
-static StructureCP*
-initStructureCP (
-    Structure_CP_Type type,
+static SchemaCP*
+initSchemaCP (
+    Schema_CP_Type type,
     void *namespace,
     char *name
     )
 {
-    StructureCP *pattern;
+    SchemaCP *pattern;
 
-    pattern = TMALLOC (StructureCP);
-    memset (pattern, 0, sizeof(StructureCP));
+    pattern = TMALLOC (SchemaCP);
+    memset (pattern, 0, sizeof(SchemaCP));
     pattern->type = type;
     switch (type) {
-    case STRUCTURE_CTYPE_NAME:
-    case STRUCTURE_CTYPE_PATTERN:
+    case SCHEMA_CTYPE_NAME:
+    case SCHEMA_CTYPE_PATTERN:
         pattern->namespace = (char *)namespace;
         pattern->name = name;
         /* Fall thru. */
-    case STRUCTURE_CTYPE_GROUP:
-    case STRUCTURE_CTYPE_MIXED:
-    case STRUCTURE_CTYPE_CHOICE:
-    case STRUCTURE_CTYPE_INTERLEAVE:
-        pattern->content = (StructureCP**) MALLOC (
-            sizeof(StructureCP*) * CONTENT_ARRAY_SIZE_INIT
+    case SCHEMA_CTYPE_GROUP:
+    case SCHEMA_CTYPE_MIXED:
+    case SCHEMA_CTYPE_CHOICE:
+    case SCHEMA_CTYPE_INTERLEAVE:
+        pattern->content = (SchemaCP**) MALLOC (
+            sizeof(SchemaCP*) * CONTENT_ARRAY_SIZE_INIT
             );
-        pattern->quants = (StructureQuant**) MALLOC (
-            sizeof (StructureQuant*) * CONTENT_ARRAY_SIZE_INIT
+        pattern->quants = (SchemaQuant**) MALLOC (
+            sizeof (SchemaQuant*) * CONTENT_ARRAY_SIZE_INIT
             );
         break;
-    case STRUCTURE_CTYPE_EMPTY:
-    case STRUCTURE_CTYPE_ANY:
-    case STRUCTURE_CTYPE_TEXT:
+    case SCHEMA_CTYPE_EMPTY:
+    case SCHEMA_CTYPE_ANY:
+    case SCHEMA_CTYPE_TEXT:
         /* Do nothing */
         break;
     }
@@ -240,15 +240,15 @@ initStructureCP (
 
 DBG(
 static void serializeCP (
-    StructureCP *pattern
+    SchemaCP *pattern
     )
 {
     fprintf (stderr, "CP type: %s\n",
-             Structure_CP_Type2str[pattern->type]);
+             Schema_CP_Type2str[pattern->type]);
     switch (pattern->type) {
-    case STRUCTURE_CTYPE_NAME:
-    case STRUCTURE_CTYPE_PATTERN:
-    case STRUCTURE_CTYPE_GROUP:
+    case SCHEMA_CTYPE_NAME:
+    case SCHEMA_CTYPE_PATTERN:
+    case SCHEMA_CTYPE_GROUP:
         fprintf (stderr, "\tName: '%s' Namespace: '%s'\n",
                  pattern->name,pattern->namespace);
         if (pattern->flags & FORWARD_PATTERN_DEF) {
@@ -261,29 +261,29 @@ static void serializeCP (
             fprintf (stderr, "\tAs placeholder defined NAME\n");
         }
         /* Fall thru. */
-    case STRUCTURE_CTYPE_MIXED:
-    case STRUCTURE_CTYPE_CHOICE:
-    case STRUCTURE_CTYPE_INTERLEAVE:
+    case SCHEMA_CTYPE_MIXED:
+    case SCHEMA_CTYPE_CHOICE:
+    case SCHEMA_CTYPE_INTERLEAVE:
         fprintf (stderr, "\t%d childs\n", pattern->numChildren);
         break;
-    case STRUCTURE_CTYPE_EMPTY:
-    case STRUCTURE_CTYPE_ANY:
-    case STRUCTURE_CTYPE_TEXT:
+    case SCHEMA_CTYPE_EMPTY:
+    case SCHEMA_CTYPE_ANY:
+    case SCHEMA_CTYPE_TEXT:
         /* Do nothing */
         break;
     }
 }
 
 static void serializeQuant (
-    StructureQuant *quant
+    SchemaQuant *quant
     )
 {
     fprintf (stderr, "Quant type: %s n: %d m: %d\n",
-             Structure_Quant_Type2str[quant->type], quant->minOccur, quant->maxOccur);
+             Schema_Quant_Type2str[quant->type], quant->minOccur, quant->maxOccur);
 }
 
 static void serializeStack (
-    StructureData *sdata
+    SchemaData *sdata
     ) 
 {
     int i = sdata->stackPtr-1;
@@ -302,13 +302,13 @@ static void serializeStack (
 
 /* DBG end */
 
-static void freeStructureCP (
-    StructureCP *pattern
+static void freeSchemaCP (
+    SchemaCP *pattern
     )
 {
     switch (pattern->type) {
-    case STRUCTURE_CTYPE_EMPTY:
-    case STRUCTURE_CTYPE_ANY:
+    case SCHEMA_CTYPE_EMPTY:
+    case SCHEMA_CTYPE_ANY:
         /* do nothing */
         break;
     default:
@@ -319,46 +319,46 @@ static void freeStructureCP (
     FREE (pattern);
 }
 
-static StructureData*
-initStructureData () 
+static SchemaData*
+initSchemaData () 
 {
-    StructureData *sdata;
+    SchemaData *sdata;
     int hnew;
     
-    sdata = TMALLOC (StructureData);
-    memset (sdata, 0, sizeof(StructureData));
+    sdata = TMALLOC (SchemaData);
+    memset (sdata, 0, sizeof(SchemaData));
     Tcl_InitHashTable (&sdata->element, TCL_STRING_KEYS);
     Tcl_InitHashTable (&sdata->pattern, TCL_STRING_KEYS);
     Tcl_InitHashTable (&sdata->namespace, TCL_STRING_KEYS);
     sdata->emptyNamespace = Tcl_CreateHashEntry (
         &sdata->namespace, "", &hnew);
-    sdata->patternList = (StructureCP **) MALLOC (
-        sizeof (StructureCP*) * ANON_PATTERN_ARRAY_SIZE_INIT);
+    sdata->patternList = (SchemaCP **) MALLOC (
+        sizeof (SchemaCP*) * ANON_PATTERN_ARRAY_SIZE_INIT);
     sdata->patternListSize = ANON_PATTERN_ARRAY_SIZE_INIT;
-    sdata->quants = (StructureQuant **) MALLOC (
-        sizeof (StructureQuant*) * QUANTS_ARRAY_SIZE_INIT);
+    sdata->quants = (SchemaQuant **) MALLOC (
+        sizeof (SchemaQuant*) * QUANTS_ARRAY_SIZE_INIT);
     sdata->quantsSize = QUANTS_ARRAY_SIZE_INIT;
-    sdata->stack = (StructureValidationStack **) MALLOC (
-        sizeof (StructureValidationStack *) * STACK_SIZE_INIT);
+    sdata->stack = (SchemaValidationStack **) MALLOC (
+        sizeof (SchemaValidationStack *) * STACK_SIZE_INIT);
     sdata->stackSize = STACK_SIZE_INIT;
-    sdata->stackList = (StructureValidationStack **) MALLOC (
-        sizeof (StructureValidationStack *) * STACK_LIST_SIZE_INIT);
+    sdata->stackList = (SchemaValidationStack **) MALLOC (
+        sizeof (SchemaValidationStack *) * STACK_LIST_SIZE_INIT);
     sdata->stackListSize = STACK_LIST_SIZE_INIT;
     sdata->evalStub = (Tcl_Obj **) (MALLOC (sizeof (Tcl_Obj*) * 4));
     sdata->evalStub[0] = Tcl_NewStringObj("::namespace", 11);
     Tcl_IncrRefCount (sdata->evalStub[0]);
     sdata->evalStub[1] = Tcl_NewStringObj("eval", 4);
     Tcl_IncrRefCount (sdata->evalStub[1]);
-    sdata->evalStub[2] = Tcl_NewStringObj("::tdom::structure", 17);
+    sdata->evalStub[2] = Tcl_NewStringObj("::tdom::schema", 17);
     Tcl_IncrRefCount (sdata->evalStub[2]);
     return sdata;
 }
 
-static void structureInstanceDelete (
+static void schemaInstanceDelete (
     ClientData clientData
     )
 {
-    StructureData *sdata = (StructureData *) clientData;
+    SchemaData *sdata = (SchemaData *) clientData;
     unsigned int i;
 
     if (sdata->start) FREE (sdata->start);
@@ -367,7 +367,7 @@ static void structureInstanceDelete (
     Tcl_DeleteHashTable (&sdata->element);
     Tcl_DeleteHashTable (&sdata->pattern);
     for (i = 0; i < sdata->numPatternList; i++) {
-        freeStructureCP (sdata->patternList[i]);
+        freeSchemaCP (sdata->patternList[i]);
     }
     FREE (sdata->patternList);
     for (i = 0; i < sdata->numQuants; i++) {
@@ -388,22 +388,22 @@ static void structureInstanceDelete (
 
 static void
 cleanupLastPattern (
-    StructureData *sdata,
+    SchemaData *sdata,
     unsigned int from
     )
 {
     unsigned int i;
     Tcl_HashTable *hashTable;
     Tcl_HashEntry *entryPtr;
-    StructureCP *this, *previous, *current;
+    SchemaCP *this, *previous, *current;
 
     for (i = from; i < sdata->numPatternList; i++) {
         this = sdata->patternList[i];
         hashTable = NULL;
-        if (this->type == STRUCTURE_CTYPE_NAME) {
+        if (this->type == SCHEMA_CTYPE_NAME) {
             hashTable = &sdata->element;
         }
-        if (this->type == STRUCTURE_CTYPE_PATTERN) {
+        if (this->type == SCHEMA_CTYPE_PATTERN) {
             hashTable = &sdata->pattern;
         }
         if (hashTable) {
@@ -431,14 +431,14 @@ cleanupLastPattern (
                 }
             }
         }
-        freeStructureCP (sdata->patternList[i]);
+        freeSchemaCP (sdata->patternList[i]);
     }
     sdata->numPatternList = from;
 }
 
 static void
 checkForAmbiguousness (
-    StructureCP *pattern
+    SchemaCP *pattern
     )
 {
     /* As long as we don't know otherwise we assume any pattern to be
@@ -448,12 +448,12 @@ checkForAmbiguousness (
 
 static void
 pushToStack (
-    StructureData *sdata,
-    StructureCP *pattern,
+    SchemaData *sdata,
+    SchemaCP *pattern,
     int deep
     )
 {
-    StructureValidationStack *stackElm;
+    SchemaValidationStack *stackElm;
 
     if (sdata->numStackList < sdata->numStackAllocated) {
         stackElm = sdata->stackList[sdata->numStackList];
@@ -461,21 +461,21 @@ pushToStack (
         if (sdata->stackPtr == sdata->stackSize) {
             sdata->stack = REALLOC (
                 sdata->stack,
-                sizeof (StructureValidationStack *) * 2 * sdata->stackSize);
+                sizeof (SchemaValidationStack *) * 2 * sdata->stackSize);
             sdata->stackSize *= 2;
         }
         if (sdata->stackListSize == sdata->numStackList) {
             sdata->stackList = REALLOC (
                 sdata->stackList,
-                sizeof (StructureValidationStack *) * 2 * sdata->stackListSize);
+                sizeof (SchemaValidationStack *) * 2 * sdata->stackListSize);
             sdata->stackListSize *= 2;
         }
-        stackElm = TMALLOC (StructureValidationStack);
+        stackElm = TMALLOC (SchemaValidationStack);
         sdata->numStackAllocated++;
         sdata->stackList[sdata->numStackList] = stackElm;
     }
     sdata->numStackList++;
-    memset (stackElm, 0, sizeof (StructureValidationStack));
+    memset (stackElm, 0, sizeof (SchemaValidationStack));
     stackElm->pattern = pattern;
     stackElm->deep = deep;
     sdata->stack[sdata->stackPtr] = stackElm;
@@ -486,17 +486,17 @@ pushToStack (
     ((quant) == quantOne || (quant) == quantOpt) ? 1 : 0
 
 #define minOne(quant) \
-    ((quant) == quantOne || (quant) == quantPlus) || (quant->type == STRUCTURE_CQUANT_NM && (quant)->minOccur > 0)  ? 1 : 0
+    ((quant) == quantOne || (quant) == quantPlus) || (quant->type == SCHEMA_CQUANT_NM && (quant)->minOccur > 0)  ? 1 : 0
 
 #define mayMiss(quant) \
-    ((quant) == quantOpt || (quant) == quantRep) || (quant->type == STRUCTURE_CQUANT_NM && (quant)->minOccur == 0) ? 1 : 0
+    ((quant) == quantOpt || (quant) == quantRep) || (quant->type == SCHEMA_CQUANT_NM && (quant)->minOccur == 0) ? 1 : 0
 
 #define mayRepeat(quant) \
     ((quant) == quantRep || (quant) == quantPlus) ? 1 : 0
 
 #define mustMatch(quant,nr) \
     (nr) == 0 ? minOne(quant)                                              \
-        : (quant->type == STRUCTURE_CQUANT_NM && quant->minOccur < (nr)) ? 1 : 0
+        : (quant->type == SCHEMA_CQUANT_NM && quant->minOccur < (nr)) ? 1 : 0
 
 #define hasMatched(quant,nr) \
     (nr) == 0 ? 0 : ((nr) == 1 && (quant == quantOne || quant == quantOpt) ? 1 : quant->maxOccur == (nr))
@@ -517,16 +517,16 @@ pushToStack (
 
 static int
 matchNamePattern (
-    StructureData *sdata,
-    StructureCP *pattern,
+    SchemaData *sdata,
+    SchemaCP *pattern,
     int currentDeep
     )
 {
-    StructureCP *parent, *candidate;
+    SchemaCP *parent, *candidate;
     int nm, ac, startac, savedStackPtr, rc, i;
     int isName = 0, loopOver = 0;
     
-    /* The caller must ensure pattern->type = STRUCTURE_CTYPE_NAME */
+    /* The caller must ensure pattern->type = SCHEMA_CTYPE_NAME */
 
     getContext (parent, ac, nm);
 
@@ -538,27 +538,27 @@ matchNamePattern (
         )
         
     switch (parent->type) {
-    case STRUCTURE_CTYPE_NAME:
+    case SCHEMA_CTYPE_NAME:
         isName = 1;
         /* fall through */
-    case STRUCTURE_CTYPE_GROUP:
-    case STRUCTURE_CTYPE_PATTERN:
+    case SCHEMA_CTYPE_GROUP:
+    case SCHEMA_CTYPE_PATTERN:
         startac = ac;
     loopOverContent:
         while (ac < parent->numChildren) {
             candidate = parent->content[ac];
             switch (candidate->type) {
-            case STRUCTURE_CTYPE_EMPTY:
+            case SCHEMA_CTYPE_EMPTY:
                 /* The empty pattern never match an element, successfully */
                 ac++;
                 nm = 0;
                 break;
 
-            case STRUCTURE_CTYPE_ANY:
+            case SCHEMA_CTYPE_ANY:
                 updateStack (sdata, sdata->stackPtr, ac, nm+1);
                 return 1;
                 
-            case STRUCTURE_CTYPE_NAME:
+            case SCHEMA_CTYPE_NAME:
                 if (candidate == pattern
                     || strcmp (candidate->name, pattern->name) == 0) {
                     updateStack (sdata, sdata->stackPtr, ac, nm+1);
@@ -578,17 +578,17 @@ matchNamePattern (
                 nm = 0;
                 break;
                 
-            case STRUCTURE_CTYPE_TEXT:
+            case SCHEMA_CTYPE_TEXT:
                 if (mustMatch (parent->quants[ac], nm)) return 0;
                 ac++;
                 nm = 0;
                 break;
                 
-            case STRUCTURE_CTYPE_GROUP:
-            case STRUCTURE_CTYPE_PATTERN:
-            case STRUCTURE_CTYPE_MIXED:
-            case STRUCTURE_CTYPE_INTERLEAVE:
-            case STRUCTURE_CTYPE_CHOICE:
+            case SCHEMA_CTYPE_GROUP:
+            case SCHEMA_CTYPE_PATTERN:
+            case SCHEMA_CTYPE_MIXED:
+            case SCHEMA_CTYPE_INTERLEAVE:
+            case SCHEMA_CTYPE_CHOICE:
                 savedStackPtr = sdata->stackPtr;
                 pushToStack (sdata, candidate, currentDeep);
                 rc = matchNamePattern (sdata, pattern, currentDeep);
@@ -617,7 +617,7 @@ matchNamePattern (
             if (startac) {
                 /* It only make sense to look for a match from the
                  * start if the start active child wasn't already 0*/
-                StructureQuant *parentQuant;
+                SchemaQuant *parentQuant;
                 parentQuant = sdata->stack[sdata->stackPtr-2]->
                     pattern->quants[sdata->stack[sdata->stackPtr-2]->activeChild];
                 if (mayRepeat (parentQuant)) {
@@ -645,37 +645,37 @@ matchNamePattern (
             return -1;
         }
         
-    case STRUCTURE_CTYPE_TEXT:
+    case SCHEMA_CTYPE_TEXT:
         if (mustMatch (parent->quants[ac], nm)) return 0;
         break;
         
-    case STRUCTURE_CTYPE_ANY:
-    case STRUCTURE_CTYPE_EMPTY:
+    case SCHEMA_CTYPE_ANY:
+    case SCHEMA_CTYPE_EMPTY:
         /* Never pushed onto stack */
         Tcl_Panic ("Invalid CTYPE onto the validation stack!");
 
-    case STRUCTURE_CTYPE_INTERLEAVE:
-        fprintf (stderr, "matchNamePattern: STRUCTURE_CTYPE_INTERLEAVE to be implemented\n");
+    case SCHEMA_CTYPE_INTERLEAVE:
+        fprintf (stderr, "matchNamePattern: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
         return 0;
 
-    case STRUCTURE_CTYPE_MIXED:
-    case STRUCTURE_CTYPE_CHOICE:
+    case SCHEMA_CTYPE_MIXED:
+    case SCHEMA_CTYPE_CHOICE:
         for (i = 0; i < parent->numChildren; i++) {
             candidate = parent->content[i];
 
             switch (candidate->type) {
-            case STRUCTURE_CTYPE_EMPTY:
+            case SCHEMA_CTYPE_EMPTY:
                 /* The empty pattern never match an element */
                 break;
 
-            case STRUCTURE_CTYPE_ANY:
+            case SCHEMA_CTYPE_ANY:
                 return 1;
                 
-            case STRUCTURE_CTYPE_TEXT:
+            case SCHEMA_CTYPE_TEXT:
                 /* An elememt never match text. */
                 break;
                 
-            case STRUCTURE_CTYPE_NAME:
+            case SCHEMA_CTYPE_NAME:
                 if (candidate == pattern
                     || strcmp (candidate->name, pattern->name) == 0) {
                     updateStack (sdata, sdata->stackPtr, 0, nm+1);
@@ -684,11 +684,11 @@ matchNamePattern (
                 }
                 break;
                 
-            case STRUCTURE_CTYPE_GROUP:
-            case STRUCTURE_CTYPE_PATTERN:
-            case STRUCTURE_CTYPE_MIXED:
-            case STRUCTURE_CTYPE_INTERLEAVE:
-            case STRUCTURE_CTYPE_CHOICE:
+            case SCHEMA_CTYPE_GROUP:
+            case SCHEMA_CTYPE_PATTERN:
+            case SCHEMA_CTYPE_MIXED:
+            case SCHEMA_CTYPE_INTERLEAVE:
+            case SCHEMA_CTYPE_CHOICE:
                 savedStackPtr = sdata->stackPtr;
                 pushToStack (sdata, candidate, currentDeep);
                 rc = matchNamePattern (sdata, pattern, currentDeep);
@@ -712,14 +712,14 @@ matchNamePattern (
 int
 probeElement (
     Tcl_Interp *interp,
-    StructureData *sdata,
+    SchemaData *sdata,
     const char *name,
     void *namespace
     ) 
 {
     Tcl_HashEntry *entryPtr;
     void *namespacePtr;
-    StructureCP *pattern;
+    SchemaCP *pattern;
     int savedStackPtr, activeStack, currentDeep, rc;
 
     if (sdata->validationState == VALIDATION_FINISHED) {
@@ -747,7 +747,7 @@ probeElement (
         SetResult3 ("\"", name, "\" isn't a defined element name in grammar.");
         return TCL_ERROR;
     }
-    pattern = (StructureCP *) Tcl_GetHashValue (entryPtr);
+    pattern = (SchemaCP *) Tcl_GetHashValue (entryPtr);
     while (pattern) {
         if (pattern->namespace == namespacePtr) {
             break;
@@ -819,22 +819,22 @@ probeElement (
 }
 
 static int checkElementEnd (
-    StructureData *sdata
+    SchemaData *sdata
     )
 {
-    StructureCP *parent;
+    SchemaCP *parent;
     int nm, ac;
     int isName = 0;
     
     getContext (parent, ac, nm);
     
     switch (parent->type) {
-    case STRUCTURE_CTYPE_NAME:
+    case SCHEMA_CTYPE_NAME:
         if (sdata->stackPtr == 1) return 1;
         isName = 1;
         /* fall through */
-    case STRUCTURE_CTYPE_GROUP:
-    case STRUCTURE_CTYPE_PATTERN:
+    case SCHEMA_CTYPE_GROUP:
+    case SCHEMA_CTYPE_PATTERN:
         while (ac < parent->numChildren) {
             if (mustMatch (parent->quants[ac], nm)) {
                 return 0;
@@ -845,19 +845,19 @@ static int checkElementEnd (
         if (isName) return 1;
         else return -1;
 
-    case STRUCTURE_CTYPE_TEXT:
-    case STRUCTURE_CTYPE_ANY:
-    case STRUCTURE_CTYPE_EMPTY:
+    case SCHEMA_CTYPE_TEXT:
+    case SCHEMA_CTYPE_ANY:
+    case SCHEMA_CTYPE_EMPTY:
         /* Never pushed onto stack */
         Tcl_Panic ("Invalid CTYPE onto the validation stack!");
         return 0;
 
-    case STRUCTURE_CTYPE_INTERLEAVE:
-        fprintf (stderr, "checkElementEnd: STRUCTURE_CTYPE_INTERLEAVE to be implemented\n");
+    case SCHEMA_CTYPE_INTERLEAVE:
+        fprintf (stderr, "checkElementEnd: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
         return 0;
         
-    case STRUCTURE_CTYPE_MIXED:
-    case STRUCTURE_CTYPE_CHOICE:
+    case SCHEMA_CTYPE_MIXED:
+    case SCHEMA_CTYPE_CHOICE:
         return -1;
     }
     return 0;
@@ -866,7 +866,7 @@ static int checkElementEnd (
 int
 probeElementEnd (
     Tcl_Interp *interp,
-    StructureData *sdata
+    SchemaData *sdata
     )
 {
     int activeStack, savedStackPtr, rc, currentDeep;
@@ -927,7 +927,7 @@ probeElementEnd (
 static int
 checkText (
     Tcl_Interp *interp,
-    StructureCP *cp,
+    SchemaCP *cp,
     char *text
     )
 {
@@ -938,11 +938,11 @@ checkText (
 int
 probeText (
     Tcl_Interp *interp,
-    StructureData *sdata,
+    SchemaData *sdata,
     char *text
     )
 {
-    StructureCP *parent;
+    SchemaCP *parent;
     int ac, nm, only_whites;
     char *pc;
 
@@ -959,13 +959,13 @@ probeText (
     getContext (parent, ac, nm);
 
     while (ac < parent->numChildren) {
-        if (parent->content[ac]->type == STRUCTURE_CTYPE_TEXT
+        if (parent->content[ac]->type == SCHEMA_CTYPE_TEXT
             || mustMatch (parent->quants[ac], nm)) break;
         ac++;
         nm = 0;
     }
     if (ac < parent->numChildren) {
-        if (parent->content[ac]->type == STRUCTURE_CTYPE_TEXT) {
+        if (parent->content[ac]->type == SCHEMA_CTYPE_TEXT) {
             return checkText (interp, parent->content[ac], text);
         }
     }
@@ -1069,7 +1069,7 @@ characterDataHandler (
 static int
 validateString (
     Tcl_Interp *interp,
-    StructureData *sdata,
+    SchemaData *sdata,
     char *xmlstr,
     int len
     )
@@ -1113,7 +1113,7 @@ validateString (
 }
 
 int 
-structureInstanceCmd (
+schemaInstanceCmd (
     ClientData clientData,
     Tcl_Interp *interp,
     int objc,
@@ -1124,19 +1124,19 @@ structureInstanceCmd (
     int            result = TCL_OK, forwardDef = 0, i = 0;
     int            savedDefineToplevel, type, len;
     unsigned int   savedNumPatternList;
-    StructureData  *sdata = (StructureData *) clientData;
+    SchemaData  *sdata = (SchemaData *) clientData;
     Tcl_HashTable *hashTable;
     Tcl_HashEntry *entryPtr;
-    StructureCP   *pattern, *current = NULL;
+    SchemaCP   *pattern, *current = NULL;
     void          *namespacePtr, *savedNamespacePtr;
     char          *xmlstr;
     
-    static const char *structureInstanceMethods[] = {
+    static const char *schemaInstanceMethods[] = {
         "defelement", "defpattern", "start", "event", "delete",
         "nrForwardDefinitions", "state", "reset", "define",
         "validate", NULL
     };
-    enum structureInstanceMethod {
+    enum schemaInstanceMethod {
         m_defelement, m_defpattern, m_start, m_event, m_delete,
         m_nrForwardDefinitions, m_state, m_reset, m_define,
         m_validate
@@ -1163,14 +1163,14 @@ structureInstanceCmd (
         i = 1;
     }
 
-    if (Tcl_GetIndexFromObj (interp, objv[1-i], structureInstanceMethods,
+    if (Tcl_GetIndexFromObj (interp, objv[1-i], schemaInstanceMethods,
                              "method", 0, &methodIndex)
         != TCL_OK) {
         return TCL_ERROR;
     }
     
     Tcl_ResetResult (interp);
-    switch ((enum structureInstanceMethod) methodIndex) {
+    switch ((enum schemaInstanceMethod) methodIndex) {
     case m_defelement:
     case m_defpattern:
         if (objc != 4-i && objc != 5-i) {
@@ -1178,12 +1178,12 @@ structureInstanceCmd (
                  " ?<namespace>? pattern");
             return TCL_ERROR;
         }
-        if ((enum structureInstanceMethod) methodIndex == m_defelement) {
+        if ((enum schemaInstanceMethod) methodIndex == m_defelement) {
             hashTable = &sdata->element;
-            type = STRUCTURE_CTYPE_NAME;
+            type = SCHEMA_CTYPE_NAME;
         } else {
             hashTable = &sdata->pattern;
-            type = STRUCTURE_CTYPE_PATTERN;
+            type = SCHEMA_CTYPE_PATTERN;
         }
         savedNumPatternList = sdata->numPatternList;
         namespacePtr = NULL;
@@ -1201,7 +1201,7 @@ structureInstanceCmd (
                                         Tcl_GetString (objv[2-i]), &hnew);
         pattern = NULL;
         if (!hnew) {
-            pattern = (StructureCP *) Tcl_GetHashValue (entryPtr);
+            pattern = (SchemaCP *) Tcl_GetHashValue (entryPtr);
             while (pattern) {
                 if (pattern->namespace == namespacePtr) {
                     if (pattern->flags & FORWARD_PATTERN_DEF
@@ -1209,7 +1209,7 @@ structureInstanceCmd (
                         forwardDef = 1;
                         break;
                     }
-                    if ((enum structureInstanceMethod) methodIndex
+                    if ((enum schemaInstanceMethod) methodIndex
                         == m_defelement) {
                         SetResult ("Element already defined "
                                    "in this namespace.");
@@ -1223,10 +1223,10 @@ structureInstanceCmd (
             }
         }
         if (pattern == NULL) {
-            pattern = initStructureCP (type, namespacePtr,
+            pattern = initSchemaCP (type, namespacePtr,
                                        Tcl_GetHashKey (hashTable, entryPtr));
             if (!hnew) {
-                current = (StructureCP *) Tcl_GetHashValue (entryPtr);
+                current = (SchemaCP *) Tcl_GetHashValue (entryPtr);
                 pattern->next = current;
             }
             REMEMBER_PATTERN (pattern);
@@ -1437,9 +1437,9 @@ structureInstanceCmd (
 /*
  *----------------------------------------------------------------------------
  *
- * tDOM_StructureObjCmd --
+ * tDOM_SchemaObjCmd --
  *
- *	This procedure is invoked to process the "structure" command.
+ *	This procedure is invoked to process the "schema" command.
  *      See the user documentation for what it does.
  *
  * Results:
@@ -1452,7 +1452,7 @@ structureInstanceCmd (
  */
 
 int 
-tDOM_StructureObjCmd (
+tDOM_SchemaObjCmd (
     ClientData clientData,
     Tcl_Interp *interp,
     int objc,
@@ -1460,12 +1460,12 @@ tDOM_StructureObjCmd (
     )
 {
     int            methodIndex, result = TCL_OK;
-    StructureData  *sdata;
+    SchemaData  *sdata;
 
-    static const char *structureMethods[] = {
+    static const char *schemaMethods[] = {
         "create", NULL
     };
-    enum structureMethod {
+    enum schemaMethod {
         m_create
     };
 
@@ -1477,7 +1477,7 @@ tDOM_StructureObjCmd (
     if (objc == 2) {
         methodIndex = m_create;
     } else {
-        if (Tcl_GetIndexFromObj (interp, objv[1], structureMethods,
+        if (Tcl_GetIndexFromObj (interp, objv[1], schemaMethods,
                                  "method", 0, &methodIndex)
             != TCL_OK) {
             return TCL_ERROR;
@@ -1485,13 +1485,13 @@ tDOM_StructureObjCmd (
     }
         
     Tcl_ResetResult (interp);
-    switch ((enum structureMethod) methodIndex) {
+    switch ((enum schemaMethod) methodIndex) {
     case m_create:
-        sdata = initStructureData ();
+        sdata = initSchemaData ();
         Tcl_CreateObjCommand (interp, Tcl_GetString(objv[2]),
-                              structureInstanceCmd, 
+                              schemaInstanceCmd, 
                               (ClientData) sdata,
-                              structureInstanceDelete);
+                              schemaInstanceDelete);
         Tcl_SetObjResult (interp, objv[2]);
         break;
         
@@ -1505,24 +1505,24 @@ tDOM_StructureObjCmd (
 }
 
 
-static StructureQuant *
-initStructureQuant  (
-    StructureData * sdata,
-    Structure_Content_Quant quantType,
+static SchemaQuant *
+initSchemaQuant  (
+    SchemaData * sdata,
+    Schema_Content_Quant quantType,
     int n,
     int m
     )
 {
-    StructureQuant * quant;
+    SchemaQuant * quant;
 
-    quant = TMALLOC (StructureQuant);
+    quant = TMALLOC (SchemaQuant);
     quant->type = quantType;
     quant->minOccur = n;
     quant->maxOccur = m;
     if (sdata->numQuants == sdata->quantsSize) {
         sdata->quants = REALLOC (
             sdata->quants,
-            sizeof (StructureQuant*) * 2 * sdata->quantsSize
+            sizeof (SchemaQuant*) * 2 * sdata->quantsSize
             );
         sdata->quantsSize *= 2;
     }
@@ -1532,10 +1532,10 @@ initStructureQuant  (
 }
 
 
-static StructureQuant *
+static SchemaQuant *
 getQuant (
     Tcl_Interp *interp,
-    StructureData *sdata,
+    SchemaData *sdata,
     Tcl_Obj *quantObj
     ) 
 {
@@ -1579,7 +1579,7 @@ getQuant (
         if (n == 1) {
             return quantOne;
         }
-        return initStructureQuant (sdata, STRUCTURE_CQUANT_NM, n, n);
+        return initSchemaQuant (sdata, SCHEMA_CQUANT_NM, n, n);
     }
     /* The "list-ness" of the quantObj is already checked by the
      * Tcl_ListObjLength() call above, no need to check result. */
@@ -1604,7 +1604,7 @@ getQuant (
     if (n == 0 && m == 1) {
         return quantOpt;
     }
-    return initStructureQuant (sdata, STRUCTURE_CQUANT_NM, n, m);
+    return initSchemaQuant (sdata, SCHEMA_CQUANT_NM, n, m);
 }
 
 /* Implements the grammar definition commands "empty" and "any" */
@@ -1616,13 +1616,13 @@ EmptyAnyPatternObjCmd (
     Tcl_Obj *const objv[]
     )
 {
-    StructureData *sdata = GETASI;
-    StructureCP *pattern;
+    SchemaData *sdata = GETASI;
+    SchemaCP *pattern;
     
     CHECK_SI
     CHECK_TOPLEVEL
     checkNrArgs (1,1,"No arguments expected.");
-    pattern = initStructureCP ((Structure_CP_Type) clientData,
+    pattern = initSchemaCP ((Schema_CP_Type) clientData,
                                NULL, NULL);
     REMEMBER_PATTERN (pattern)
     ADD_TO_CONTENT (pattern, quantRep)
@@ -1632,14 +1632,14 @@ EmptyAnyPatternObjCmd (
 static int
 evalDefinition (
     Tcl_Interp *interp,
-    StructureData *sdata,
+    SchemaData *sdata,
     Tcl_Obj *definition,
-    StructureCP *pattern,
-    StructureQuant *quant
+    SchemaCP *pattern,
+    SchemaQuant *quant
     )
 {
-    StructureCP **savedCurrentContent;
-    StructureQuant **savedCurrentQuant;
+    SchemaCP **savedCurrentContent;
+    SchemaQuant **savedCurrentQuant;
     unsigned int savedNumChildren, savedContenSize;
     int result;
 
@@ -1670,7 +1670,7 @@ evalDefinition (
         REMEMBER_PATTERN (pattern);
         ADD_TO_CONTENT (pattern, quant);
     } else {
-        freeStructureCP (pattern);
+        freeSchemaCP (pattern);
     }
     return result;
 }
@@ -1684,17 +1684,17 @@ NamedPatternObjCmd (
     Tcl_Obj *const objv[]
     )
 {
-    StructureData *sdata = GETASI;
-    Structure_CP_Type patternType = (Structure_CP_Type) clientData;
+    SchemaData *sdata = GETASI;
+    Schema_CP_Type patternType = (Schema_CP_Type) clientData;
     Tcl_HashTable *hashTable;
     Tcl_HashEntry *entryPtr;
-    StructureCP *pattern = NULL, *current;
-    StructureQuant *quant;
+    SchemaCP *pattern = NULL, *current;
+    SchemaQuant *quant;
     int hnew;
 
     CHECK_SI
     CHECK_TOPLEVEL
-    if (patternType == STRUCTURE_CTYPE_NAME) {
+    if (patternType == SCHEMA_CTYPE_NAME) {
         checkNrArgs (2,4,"Expected: elementName ?quant? ?pattern?");
         hashTable = &sdata->element;
     } else {
@@ -1711,7 +1711,7 @@ NamedPatternObjCmd (
     if (objc < 4) {
         /* Reference to an element or pattern */
         if (!hnew) {
-            pattern = (StructureCP *) Tcl_GetHashValue (entryPtr);
+            pattern = (SchemaCP *) Tcl_GetHashValue (entryPtr);
             while (pattern) {
                 if (pattern->namespace == sdata->currentNamespace) {
                     break;
@@ -1720,7 +1720,7 @@ NamedPatternObjCmd (
             }
         }
         if (!pattern) {
-            pattern = initStructureCP (
+            pattern = initSchemaCP (
                 patternType,
                 sdata->currentNamespace,
                 Tcl_GetHashKey (hashTable, entryPtr)
@@ -1728,7 +1728,7 @@ NamedPatternObjCmd (
             pattern->flags |= FORWARD_PATTERN_DEF;
             sdata->forwardPatternDefs++;
             if (!hnew) {
-                current = (StructureCP *) Tcl_GetHashValue (entryPtr);
+                current = (SchemaCP *) Tcl_GetHashValue (entryPtr);
                 pattern->next = current;
             }
             REMEMBER_PATTERN (pattern);
@@ -1738,8 +1738,8 @@ NamedPatternObjCmd (
     } else {
         /* Local definition of this element */
         if (hnew) {
-            pattern = initStructureCP (
-                STRUCTURE_CTYPE_NAME,
+            pattern = initSchemaCP (
+                SCHEMA_CTYPE_NAME,
                 sdata->currentNamespace,
                 Tcl_GetHashKey (hashTable, entryPtr)
                 );
@@ -1747,8 +1747,8 @@ NamedPatternObjCmd (
             REMEMBER_PATTERN (pattern);
             Tcl_SetHashValue (entryPtr, pattern);
         }
-        pattern = initStructureCP (
-            STRUCTURE_CTYPE_NAME,
+        pattern = initSchemaCP (
+            SCHEMA_CTYPE_NAME,
             sdata->currentNamespace,
             Tcl_GetHashKey (hashTable, entryPtr)
             );
@@ -1768,10 +1768,10 @@ AnonPatternObjCmd (
     Tcl_Obj *const objv[]
     )
 {
-    StructureData *sdata = GETASI;
-    Structure_CP_Type patternType = (Structure_CP_Type) clientData;
-    StructureQuant *quant;
-    StructureCP *pattern;
+    SchemaData *sdata = GETASI;
+    Schema_CP_Type patternType = (Schema_CP_Type) clientData;
+    SchemaQuant *quant;
+    SchemaCP *pattern;
 
     CHECK_SI
     CHECK_TOPLEVEL
@@ -1781,7 +1781,7 @@ AnonPatternObjCmd (
         return TCL_ERROR;
     }
 
-    pattern = initStructureCP (patternType, NULL, NULL);
+    pattern = initSchemaCP (patternType, NULL, NULL);
 
     return evalDefinition (interp, sdata, objc == 2 ? objv[1] : objv[2],
                            pattern, quant);
@@ -1807,7 +1807,7 @@ NamespacePatternObjCmd (
     Tcl_Obj *const objv[]
     )
 {
-    StructureData *sdata = GETASI;
+    SchemaData *sdata = GETASI;
     char *currentNamespace;
     Tcl_HashEntry *entryPtr;
     int hnew, result;
@@ -1838,13 +1838,13 @@ TextPatternObjCmd (
     Tcl_Obj *const objv[]
     )
 {
-    StructureData *sdata = GETASI;
-    StructureCP *pattern;
+    SchemaData *sdata = GETASI;
+    SchemaCP *pattern;
     
     CHECK_SI
     CHECK_TOPLEVEL
     checkNrArgs (1,1,"No arguments expected.");
-    pattern = initStructureCP ((Structure_CP_Type) clientData,
+    pattern = initSchemaCP ((Schema_CP_Type) clientData,
                                NULL, NULL);
     REMEMBER_PATTERN (pattern)
     ADD_TO_CONTENT (pattern, quantOne)
@@ -1852,69 +1852,69 @@ TextPatternObjCmd (
 }
 
 void
-tDOM_StructureInit (
+tDOM_SchemaInit (
     Tcl_Interp *interp
     )
 {
-    memset (quantOne, 0, sizeof (StructureQuant));
-    quantOne->type = STRUCTURE_CQUANT_ONE;
-    memset (quantOpt, 0, sizeof (StructureQuant));
-    quantOpt->type = STRUCTURE_CQUANT_OPT;
-    memset (quantRep, 0, sizeof (StructureQuant));
-    quantRep->type = STRUCTURE_CQUANT_REP;
-    memset (quantPlus, 0, sizeof (StructureQuant));
-    quantPlus->type = STRUCTURE_CQUANT_PLUS;
+    memset (quantOne, 0, sizeof (SchemaQuant));
+    quantOne->type = SCHEMA_CQUANT_ONE;
+    memset (quantOpt, 0, sizeof (SchemaQuant));
+    quantOpt->type = SCHEMA_CQUANT_OPT;
+    memset (quantRep, 0, sizeof (SchemaQuant));
+    quantRep->type = SCHEMA_CQUANT_REP;
+    memset (quantPlus, 0, sizeof (SchemaQuant));
+    quantPlus->type = SCHEMA_CQUANT_PLUS;
 
     /* Inline definition commands. */
-    Tcl_CreateObjCommand (interp, "tdom::structure::defelement",
-                          structureInstanceCmd, NULL, NULL);
-    Tcl_CreateObjCommand (interp, "tdom::structure::defpattern",
-                          structureInstanceCmd, NULL, NULL);
-    Tcl_CreateObjCommand (interp, "tdom::structure::start",
-                          structureInstanceCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp, "tdom::schema::defelement",
+                          schemaInstanceCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp, "tdom::schema::defpattern",
+                          schemaInstanceCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp, "tdom::schema::start",
+                          schemaInstanceCmd, NULL, NULL);
     
     /* The "empty" and "any" definition commands. */
-    Tcl_CreateObjCommand (interp, "tdom::structure::empty",
+    Tcl_CreateObjCommand (interp, "tdom::schema::empty",
                           EmptyAnyPatternObjCmd,
-                          (ClientData) STRUCTURE_CTYPE_EMPTY, NULL);
-    Tcl_CreateObjCommand (interp, "tdom::structure::any",
+                          (ClientData) SCHEMA_CTYPE_EMPTY, NULL);
+    Tcl_CreateObjCommand (interp, "tdom::schema::any",
                           EmptyAnyPatternObjCmd,
-                          (ClientData) STRUCTURE_CTYPE_ANY, NULL);
+                          (ClientData) SCHEMA_CTYPE_ANY, NULL);
 
     /* The named pattern commands "element" and "ref". */
-    Tcl_CreateObjCommand (interp, "tdom::structure::element",
+    Tcl_CreateObjCommand (interp, "tdom::schema::element",
                           NamedPatternObjCmd,
-                          (ClientData) STRUCTURE_CTYPE_NAME, NULL);
-    Tcl_CreateObjCommand (interp, "tdom::structure::ref",
+                          (ClientData) SCHEMA_CTYPE_NAME, NULL);
+    Tcl_CreateObjCommand (interp, "tdom::schema::ref",
                           NamedPatternObjCmd,
-                          (ClientData) STRUCTURE_CTYPE_PATTERN, NULL);
+                          (ClientData) SCHEMA_CTYPE_PATTERN, NULL);
     /* The anonymous pattern commands "choise", "mixed", "interleave"
      * and "group". */
-    Tcl_CreateObjCommand (interp, "tdom::structure::choice",
+    Tcl_CreateObjCommand (interp, "tdom::schema::choice",
                           AnonPatternObjCmd,
-                          (ClientData) STRUCTURE_CTYPE_CHOICE, NULL);
-    Tcl_CreateObjCommand (interp, "tdom::structure::mixed",
+                          (ClientData) SCHEMA_CTYPE_CHOICE, NULL);
+    Tcl_CreateObjCommand (interp, "tdom::schema::mixed",
                           AnonPatternObjCmd,
-                          (ClientData) STRUCTURE_CTYPE_MIXED, NULL);
-    Tcl_CreateObjCommand (interp, "tdom::structure::interleave",
+                          (ClientData) SCHEMA_CTYPE_MIXED, NULL);
+    Tcl_CreateObjCommand (interp, "tdom::schema::interleave",
                           AnonPatternObjCmd,
-                          (ClientData) STRUCTURE_CTYPE_INTERLEAVE, NULL);
-    Tcl_CreateObjCommand (interp, "tdom::structure::group",
+                          (ClientData) SCHEMA_CTYPE_INTERLEAVE, NULL);
+    Tcl_CreateObjCommand (interp, "tdom::schema::group",
                           AnonPatternObjCmd,
-                          (ClientData) STRUCTURE_CTYPE_GROUP, NULL);
+                          (ClientData) SCHEMA_CTYPE_GROUP, NULL);
     
     /* The "attribute", "namespace" and "text" definition commands. */
-    Tcl_CreateObjCommand (interp, "tdom::structure::attribute",
+    Tcl_CreateObjCommand (interp, "tdom::schema::attribute",
                           AttributePatternObjCmd, NULL, NULL);
-    Tcl_CreateObjCommand (interp, "tdom::structure::namespace",
+    Tcl_CreateObjCommand (interp, "tdom::schema::namespace",
                           NamespacePatternObjCmd, NULL, NULL);
-    Tcl_CreateObjCommand (interp, "tdom::structure::text",
+    Tcl_CreateObjCommand (interp, "tdom::schema::text",
                           TextPatternObjCmd, NULL, NULL);
 }
 
-# else  /* #ifndef TDOM_NO_STRUCTURE */
+# else  /* #ifndef TDOM_NO_SCHEMA */
 int 
-structureInstanceCmd (
+schemaInstanceCmd (
     ClientData clientData,
     Tcl_Interp *interp,
     int objc,
@@ -1927,7 +1927,7 @@ structureInstanceCmd (
 int
 probeElement (
     Tcl_Interp *interp,
-    StructureData *sdata,
+    SchemaData *sdata,
     char *name,
     void *namespace
     )
@@ -1938,7 +1938,7 @@ probeElement (
 int
 probeElementEnd (
     Tcl_Interp * interp,
-    StructureData *sdata
+    SchemaData *sdata
     )
 {
     return TCL_OK;
@@ -1947,11 +1947,11 @@ probeElementEnd (
 int
 probeText (
     Tcl_Interp *interp,
-    StructureData *sdata,
+    SchemaData *sdata,
     char *text
     )
 {
     return TCL_OK;
 }
 
-#endif  /* #ifndef TDOM_NO_STRUCTURE */
+#endif  /* #ifndef TDOM_NO_SCHEMA */

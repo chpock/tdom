@@ -151,7 +151,7 @@ typedef struct _domReadInfo {
     int               baseURIstackPos;
     domActiveBaseURI *baseURIstack;
     int               insideDTD;
-    StructureData    *sdata;
+    SchemaData       *sdata;
     int               status;
 
 } domReadInfo;
@@ -2111,7 +2111,7 @@ domReadDocument (
     Tcl_Obj    *extResolver,
     int         useForeignDTD,
     int         paramEntityParsing,
-    StructureData *sdata,
+    SchemaData *sdata,
     Tcl_Interp *interp,
     int        *resultcode
 )
@@ -5149,7 +5149,7 @@ typedef struct _tdomCmdReadInfo {
     int               baseURIstackPos;
     domActiveBaseURI *baseURIstack;
     int               insideDTD;
-    StructureData    *sdata;
+    SchemaData       *sdata;
     /* Now the tdom cmd specific elements */
     int               tdomStatus;
     Tcl_Obj          *extResolver;

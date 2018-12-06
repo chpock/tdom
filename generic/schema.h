@@ -21,62 +21,62 @@
 |
 \---------------------------------------------------------------------------*/
 
-#ifndef __STRUCTURE_H__
-#define __STRUCTURE_H__
+#ifndef __SCHEMA_H__
+#define __SCHEMA_H__
 
 typedef enum {
-  STRUCTURE_CTYPE_EMPTY,
-  STRUCTURE_CTYPE_ANY,
-  STRUCTURE_CTYPE_MIXED,
-  STRUCTURE_CTYPE_NAME,
-  STRUCTURE_CTYPE_CHOICE,
-  STRUCTURE_CTYPE_INTERLEAVE,
-  STRUCTURE_CTYPE_PATTERN,
-  STRUCTURE_CTYPE_GROUP,
-  STRUCTURE_CTYPE_TEXT
-} Structure_CP_Type;
+  SCHEMA_CTYPE_EMPTY,
+  SCHEMA_CTYPE_ANY,
+  SCHEMA_CTYPE_MIXED,
+  SCHEMA_CTYPE_NAME,
+  SCHEMA_CTYPE_CHOICE,
+  SCHEMA_CTYPE_INTERLEAVE,
+  SCHEMA_CTYPE_PATTERN,
+  SCHEMA_CTYPE_GROUP,
+  SCHEMA_CTYPE_TEXT
+} Schema_CP_Type;
 
 typedef enum {
-  STRUCTURE_CQUANT_ONE,
-  STRUCTURE_CQUANT_OPT,
-  STRUCTURE_CQUANT_REP,
-  STRUCTURE_CQUANT_PLUS,
-  STRUCTURE_CQUANT_NM
-} Structure_Content_Quant;
+  SCHEMA_CQUANT_ONE,
+  SCHEMA_CQUANT_OPT,
+  SCHEMA_CQUANT_REP,
+  SCHEMA_CQUANT_PLUS,
+  SCHEMA_CQUANT_NM
+} Schema_Content_Quant;
 
 typedef unsigned int QuantFlags;
 
 typedef struct
 {
-    Structure_Content_Quant  type;
+    Schema_Content_Quant  type;
     int                      minOccur;
     int                      maxOccur;
-}  StructureQuant;
+}  SchemaQuant;
 
-typedef unsigned int StructureFlags;
+typedef unsigned int SchemaFlags;
 
-typedef struct StructureCP
+typedef struct SchemaCP
 {
-    Structure_CP_Type    type;
+    Schema_CP_Type    type;
     char                *namespace;
     char                *name;
-    struct StructureCP  *next;
-    StructureFlags       flags;
-    struct StructureCP **content;
-    StructureQuant     **quants;
+    struct SchemaCP  *next;
+    SchemaFlags       flags;
+    struct SchemaCP **content;
+    SchemaQuant     **quants;
     unsigned int         numChildren;
-} StructureCP;
+} SchemaCP;
 
-typedef struct StructureValidationStack
+typedef struct SchemaValidationStack
 {
-    StructureCP *pattern;
-    struct StructureValidationStack *next;
-    struct StructureValidationStack *down;
+    SchemaCP *pattern;
+    struct SchemaValidationStack *next;
+    struct SchemaValidationStack *down;
     int               activeChild;
     int               deep;
     int               nrMatched;
     unsigned int      stacklistWatermark;
-} StructureValidationStack;
+} SchemaValidationStack;
 
 typedef enum {
     VALIDATION_READY,
@@ -92,11 +92,11 @@ typedef struct
     Tcl_HashTable namespace;
     Tcl_HashEntry *emptyNamespace;
     Tcl_HashTable pattern;
-    StructureCP **patternList;
+    SchemaCP **patternList;
     unsigned int numPatternList;
     unsigned int patternListSize;
     unsigned int forwardPatternDefs;
-    StructureQuant **quants;
+    SchemaQuant **quants;
     unsigned int numQuants;
     unsigned int quantsSize;
     Tcl_Obj **evalStub;
@@ -104,43 +104,43 @@ typedef struct
     char *currentAttributeNamespace;
     int   defineToplevel;
     int   isAttribute;
-    StructureCP **currentContent;
-    StructureQuant **currentQuants;
+    SchemaCP **currentContent;
+    SchemaQuant **currentQuants;
     unsigned int numChildren;
     unsigned int contentSize;
-    StructureValidationStack **stack;
+    SchemaValidationStack **stack;
     int                        stackSize;
     int                        stackPtr;
     ValidationState            validationState;
-    StructureValidationStack **stackList;
+    SchemaValidationStack **stackList;
     unsigned int numStackList;
     unsigned int stackListSize;
     unsigned int numStackAllocated;
-} StructureData;
+} SchemaData;
 
 int 
-structureInstanceCmd (
+schemaInstanceCmd (
     ClientData clientData,
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
     );
 
-int tDOM_StructureObjCmd (
+int tDOM_SchemaObjCmd (
     ClientData clientData,
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *CONST objv[]
     );
 
-void tDOM_StructureInit (
+void tDOM_SchemaInit (
     Tcl_Interp *interp
     );
 
 int
 probeElement (
     Tcl_Interp *interp,
-    StructureData *sdata,
+    SchemaData *sdata,
     const char *name,
     void *namespace
     );
@@ -148,13 +148,13 @@ probeElement (
 int
 probeElementEnd (
     Tcl_Interp * interp,
-    StructureData *sdata
+    SchemaData *sdata
     );
 
 int
 probeText (
     Tcl_Interp *interp,
-    StructureData *sdata,
+    SchemaData *sdata,
     char *text
     );
 

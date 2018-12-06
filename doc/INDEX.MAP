@@ -40,10 +40,10 @@
     <KWD name="XML" manpage="pullparser"/>
     <KWD name="pull" manpage="pullparser"/>
     <KWD name="parsing" manpage="pullparser"/>
-    <MAN id="structure" title="structure"/>
-    <DEF cat="manpage" name="structure" manpage="structure"/>
-    <DEF cat="structure" name="tdom::structure" manpage="structure"/>
-    <DEF cat="cmd" name="tdom::structure" manpage="structure"/>
+    <MAN id="schema" title="schema"/>
+    <DEF cat="manpage" name="schema" manpage="schema"/>
+    <DEF cat="schema" name="tdom::schema" manpage="schema"/>
+    <DEF cat="cmd" name="tdom::schema" manpage="schema"/>
     <MAN id="tdomcmd" title="tdom"/>
     <DEF cat="manpage" name="tdomcmd" manpage="tdomcmd"/>
     <DEF cat="cmd" name="tdom" manpage="tdomcmd"/>

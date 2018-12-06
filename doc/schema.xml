@@ -1,13 +1,13 @@
-<manpage id="structure" cat="structure" title="structure">
+<manpage id="schema" cat="schema" title="schema">
   <namesection>
-    <name>tdom::structure</name>
-    <desc>Create a structure validation command</desc>
+    <name>tdom::schema</name>
+    <desc>Create a schema validation command</desc>
   </namesection>
 
   <synopsis>
     <syntax>package require tdom
 
-    <cmd>tdom::structure</cmd> <m>cmdName</m>
+    <cmd>tdom::schema</cmd> <m>cmdName</m>
     </syntax>
   </synopsis>
 
@@ -145,17 +145,17 @@
   </section>
 
   <section>
-    <title>Structure definition scripts</title>
+    <title>Schema definition scripts</title>
 
-    <p>Structure definition scripts are ordinary Tcl scripts that are
-    evaluatend in the namespace tdom::structure. Several structure
+    <p>Schema definition scripts are ordinary Tcl scripts that are
+    evaluatend in the namespace tdom::schema. Several schema
     definition commands in this tcl namespace allow to define a wide
-    variety of document structures. Every structure definition command
+    variety of document structures. Every schema definition command
     establish a validation constrain on the content which all has to
     match, leaving no unmatched content to render the content as
     valid.</p>
 
-    <p>The structure definition commands are:</p>
+    <p>The schema definition commands are:</p>
 
     <commandlist>
       <commanddef>
@@ -240,7 +240,7 @@
   <section>
     <title>Quantity specifier</title>
 
-    <p>Serveral structure definition commands expects a quantifier as
+    <p>Serveral schema definition commands expects a quantifier as
     one of their arguments, which specifies how often the content
     particle specified by the command is expected. The valid values
     for a <m>quant</m> argument are:</p>
@@ -367,11 +367,11 @@
 &lt;/xsd:schema>
     </example>
 
-    <p>A somewhat one-to-one translation of that into a tDOM structure
+    <p>A somewhat one-to-one translation of that into a tDOM schema
     defintion script would be:</p>
 
     <example>
-tdom::structure grammar      
+tdom::schema grammar      
 grammar define {
 
     # Purchase order schema for Example.com.
@@ -456,10 +456,10 @@ A RELAX NG pattern for this could be written as follows:
       
     </example>
 
-    <p>This structure definition script will do the same:</p>
+    <p>This schema definition script will do the same:</p>
 
     <example>
-tdom::structure grammar      
+tdom::schema grammar      
 grammar define {
     defelement addressBook {
         element card *

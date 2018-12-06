@@ -1,39 +1,39 @@
-# Features covered: Structure validation
+# Features covered: Schema validation
 #
 # Tested functionalities:
-#    structure-1.*: Basics, interface
-#    structure-2.*: Grammar definition ref
-#    structure-3.*: Grammar definition choice
-#    structure-4.*: Script level validation with event
-#    structure-5.*: dom parse -validateCmd
-#    structure-6.*: expat parser -validateCmd
-#    structure-7.*: Validation checks.
-#    structure-8.*: tdom::structure validate method
+#    schema-1.*: Basics, interface
+#    schema-2.*: Grammar definition ref
+#    schema-3.*: Grammar definition choice
+#    schema-4.*: Script level validation with event
+#    schema-5.*: dom parse -validateCmd
+#    schema-6.*: expat parser -validateCmd
+#    schema-7.*: Validation checks.
+#    schema-8.*: tdom::schema validate method
 #
 # Copyright (c) 2018 Rolf Ade.
 
 source [file join [file dir [info script]] loadtdom.tcl]
 
-test structure-1.1 {create} {
-    tdom::structure create grammar
+test schema-1.1 {create} {
+    tdom::schema create grammar
     grammar start doc
     grammar delete
 } {}
 
-test structure-1.2 {grammar cmd outside context} {
-    catch {tdom::structure::element}
+test schema-1.2 {grammar cmd outside context} {
+    catch {tdom::schema::element}
 } {1}
 
-test structure-1.3 {grammar cmd} {
-    tdom::structure create grammar
+test schema-1.3 {grammar cmd} {
+    tdom::schema create grammar
     grammar defpattern somePattern {
         element foo !
     }
     grammar delete
 } {}
 
-test structure-1.4 {grammar cmd} {
-    tdom::structure create grammar
+test schema-1.4 {grammar cmd} {
+    tdom::schema create grammar
     grammar defpattern somePattern {
         for {set i 0} {$i < 100} {incr i} {
             element foo$i !
@@ -42,8 +42,8 @@ test structure-1.4 {grammar cmd} {
     grammar delete
 } {}
 
-test structure-1.5 {grammar cmd} {
-    tdom::structure create grammar
+test schema-1.5 {grammar cmd} {
+    tdom::schema create grammar
     grammar defelement doc {
         element elm1
         element elm2 *
@@ -53,8 +53,8 @@ test structure-1.5 {grammar cmd} {
     grammar delete
 } {}
 
-test structure-1.6 {quants} {
-    tdom::structure create grammar
+test schema-1.6 {quants} {
+    tdom::schema create grammar
     grammar defelement doc {
         element elm1
         element elm2 *
@@ -71,8 +71,8 @@ test structure-1.6 {quants} {
     grammar delete
 } {}
 
-test structure-1.7 {quants} {
-    tdom::structure create grammar
+test schema-1.7 {quants} {
+    tdom::schema create grammar
     grammar defelement doc {
         for {set i 0} {$i < 100} {incr i} {
             element elm$i [list $i [expr {$i + 1}]]
@@ -81,8 +81,8 @@ test structure-1.7 {quants} {
     grammar delete
 } {}
 
-test structure-1.8 {Same element name in different Namespaces} {
-    tdom::structure create grammar
+test schema-1.8 {Same element name in different Namespaces} {
+    tdom::schema create grammar
     grammar defelement doc {
         element elm1
         element elm2
@@ -114,8 +114,8 @@ test structure-1.8 {Same element name in different Namespaces} {
     set result
 } 1
 
-test structure-1.9 {Same element name in different Namespaces} {
-    tdom::structure create grammar
+test schema-1.9 {Same element name in different Namespaces} {
+    tdom::schema create grammar
     set result [catch {
         grammar defelement doc {
             element elm1
@@ -145,8 +145,8 @@ test structure-1.9 {Same element name in different Namespaces} {
     set result
 } 1
 
-test structure-1.10 {Local element definition} {
-    tdom::structure create grammar
+test schema-1.10 {Local element definition} {
+    tdom::schema create grammar
     grammar defelement doc {
         element elm1
         element elm1 1 {
@@ -163,8 +163,8 @@ test structure-1.10 {Local element definition} {
     grammar delete
 } {}
 
-test structure-1.11 {define} {
-    tdom::structure create grammar
+test schema-1.11 {define} {
+    tdom::schema create grammar
     set result [catch {grammar define {
         element elm1
     }} errMsg]
@@ -172,8 +172,8 @@ test structure-1.11 {define} {
     lappend result $errMsg
 } {1 {Command not allowed at top level in grammar define evaluation}}
 
-test structure-1.12 {define} {
-    tdom::structure create grammar
+test schema-1.12 {define} {
+    tdom::schema create grammar
     set result [catch {grammar define {
         defelement elm1 {
             element a
@@ -185,8 +185,8 @@ test structure-1.12 {define} {
     lappend result $errMsg
 } {1 {Command not allowed at top level in grammar define evaluation}}
 
-test structure-2.1 {grammar definition: ref} {
-    tdom::structure create grammar
+test schema-2.1 {grammar definition: ref} {
+    tdom::schema create grammar
     grammar defpattern thisPattern {
         element a
         element b
@@ -202,8 +202,8 @@ test structure-2.1 {grammar definition: ref} {
     grammar delete
 } {}
 
-test structure-2.2 {grammar definition: ref} {
-    tdom::structure create grammar
+test schema-2.2 {grammar definition: ref} {
+    tdom::schema create grammar
     set result [grammar nrForwardDefinitions]
     grammar defelement doc {
         ref thisPattern
@@ -214,8 +214,8 @@ test structure-2.2 {grammar definition: ref} {
     set result
 } {0 2}
 
-test structure-3.1 {grammar definition: choice} {
-    tdom::structure create grammar
+test schema-3.1 {grammar definition: choice} {
+    tdom::schema create grammar
     grammar defelement doc {
         element elm
         choice {
@@ -231,8 +231,8 @@ test structure-3.1 {grammar definition: choice} {
     grammar delete
 } {}
 
-test structure-3.2 {grammar definition: choice} {
-    tdom::structure create grammar
+test schema-3.2 {grammar definition: choice} {
+    tdom::schema create grammar
     grammar defpattern thisPattern {
         element elm
         choice {
@@ -266,8 +266,8 @@ proc pullValidate {g xml} {
     }
 }
 
-test structure-4.1 {validation} {
-    tdom::structure create grammar
+test schema-4.1 {validation} {
+    tdom::schema create grammar
     grammar defelement doc {
         element e1
         element e2 *
@@ -298,14 +298,14 @@ test structure-4.1 {validation} {
     grammar delete
 } {}
 
-test structure-5.1 {dom parse -validateCmd} {
+test schema-5.1 {dom parse -validateCmd} {
     set result [catch {
-        [dom parse -validateCmd tdom::structure <doc/>]
+        [dom parse -validateCmd tdom::schema <doc/>]
     }]
 } 1
 
-test structure-5.2 {dom parse -validateCmd} {
-    tdom::structure create grammar
+test schema-5.2 {dom parse -validateCmd} {
+    tdom::schema create grammar
     grammar defelement doc {
         element e1
         element e2 *
@@ -339,12 +339,12 @@ test structure-5.2 {dom parse -validateCmd} {
     grammar delete
 } {}
 
-proc structure-5.3 {base systemId publicId} {
+proc schema-5.3 {base systemId publicId} {
     return [list "string" "" "<foo/>"]
 }
 
-test structure-5.3 {dom parse -validateCmd} {
-    tdom::structure create grammar
+test schema-5.3 {dom parse -validateCmd} {
+    tdom::schema create grammar
     grammar defelement doc {
         element e1
         element e2 *
@@ -353,7 +353,7 @@ test structure-5.3 {dom parse -validateCmd} {
         grammar defelement $e {}
     }
     set result [catch {dom parse -validateCmd grammar \
-                           -externalentitycommand structure-5.3 {
+                           -externalentitycommand schema-5.3 {
                                <!DOCTYPE doc [
                                               <!ENTITY e1 PUBLIC "e1" "e1.xml">
                                              ]>
@@ -362,8 +362,8 @@ test structure-5.3 {dom parse -validateCmd} {
     set result
 } 1
 
-test structure-5.4 {define} {
-    tdom::structure create grammar
+test schema-5.4 {define} {
+    tdom::schema create grammar
     grammar define {
         defelement elm1 {
             element a
@@ -383,8 +383,8 @@ test structure-5.4 {define} {
 } {}
 
 
-test structure-6.1 {expat parser with -validateCmd} {
-    tdom::structure create grammar
+test schema-6.1 {expat parser with -validateCmd} {
+    tdom::schema create grammar
     grammar defelement doc {
         element e1
         element e2 *
@@ -399,8 +399,8 @@ test structure-6.1 {expat parser with -validateCmd} {
     set result
 } 1
 
-test structure-7.1 {group} {
-    tdom::structure create grammar
+test schema-7.1 {group} {
+    tdom::schema create grammar
     grammar defelement doc {
         element e1
         group ! {
@@ -426,8 +426,8 @@ test structure-7.1 {group} {
     grammar delete
 } {}
 
-test structure-7.1.1 {group} {
-    tdom::structure create grammar
+test schema-7.1.1 {group} {
+    tdom::schema create grammar
     grammar define {
         defelement doc {
             element e1
@@ -455,8 +455,8 @@ test structure-7.1.1 {group} {
     grammar delete
 } {}
 
-test structure-7.2 {group} {
-    tdom::structure create grammar
+test schema-7.2 {group} {
+    tdom::schema create grammar
     grammar defelement doc {
         element e1
         group 2 {
@@ -478,8 +478,8 @@ test structure-7.2 {group} {
     grammar delete
 } {}
 
-test structure-7.2.1 {group} {
-    tdom::structure create grammar
+test schema-7.2.1 {group} {
+    tdom::schema create grammar
     grammar define {
         defelement doc {
             element e1
@@ -503,8 +503,8 @@ test structure-7.2.1 {group} {
     grammar delete
 } {}
 
-test structure-7.3 {group with inline defined element} {
-    tdom::structure create grammar
+test schema-7.3 {group with inline defined element} {
+    tdom::schema create grammar
     grammar define {
         defelement doc {
             element e1
@@ -530,8 +530,8 @@ test structure-7.3 {group with inline defined element} {
     grammar delete
 } {}
 
-test structure-7.4 {group with inline defined element} {
-    tdom::structure create grammar
+test schema-7.4 {group with inline defined element} {
+    tdom::schema create grammar
     grammar define {
         defelement doc {
             group {
@@ -556,8 +556,8 @@ test structure-7.4 {group with inline defined element} {
     grammar delete
 } {}
 
-test structure-7.5 {group with inline defined element} {
-    tdom::structure create grammar
+test schema-7.5 {group with inline defined element} {
+    tdom::schema create grammar
     grammar define {
         defelement doc {
             group {
@@ -583,8 +583,8 @@ test structure-7.5 {group with inline defined element} {
     grammar delete
 } {}
 
-test structure-7.6 {nested groups via refs} {
-    tdom::structure create grammar
+test schema-7.6 {nested groups via refs} {
+    tdom::schema create grammar
     grammar define {
         defpattern a foouri {
             group {
@@ -655,8 +655,8 @@ test structure-7.6 {nested groups via refs} {
     grammar delete
 } {}
 
-test structure-7.7 {nested groups via refs} {
-    tdom::structure create grammar
+test schema-7.7 {nested groups via refs} {
+    tdom::schema create grammar
     grammar define {
         defpattern a  {
             group {
@@ -715,8 +715,8 @@ test structure-7.7 {nested groups via refs} {
     grammar delete
 } {}
 
-test structure-7.8 {nested groups via refs} {
-    tdom::structure create grammar
+test schema-7.8 {nested groups via refs} {
+    tdom::schema create grammar
     grammar define {
         defpattern a foouri {
             group {
@@ -756,8 +756,8 @@ test structure-7.8 {nested groups via refs} {
     grammar delete
 } {}
 
-test structure-7.9 {loop over seq} {
-    tdom::structure create grammar
+test schema-7.9 {loop over seq} {
+    tdom::schema create grammar
     grammar define {
         defelement doc {
             group ? {
@@ -775,8 +775,8 @@ test structure-7.9 {loop over seq} {
     set result
 } 1
 
-test structure-7.10 {loop over seq} {knownBug} {
-    tdom::structure create grammar
+test schema-7.10 {loop over seq} {knownBug} {
+    tdom::schema create grammar
     grammar define {
         defelement doc {
             group 2 {
@@ -794,8 +794,8 @@ test structure-7.10 {loop over seq} {knownBug} {
     set result
 } 1
 
-test structure-8.1 {validate method} {
-    tdom::structure create grammar
+test schema-8.1 {validate method} {
+    tdom::schema create grammar
     grammar defelement doc {
         element e1
         element e2 *
@@ -813,8 +813,8 @@ test structure-8.1 {validate method} {
     set result
 } {1 0}
 
-test structure-8.2 {validate method} {
-    tdom::structure create grammar
+test schema-8.2 {validate method} {
+    tdom::schema create grammar
     grammar defelement doc foouri {
         element e1
         element e2 *
@@ -832,8 +832,8 @@ test structure-8.2 {validate method} {
     set result
 } {1 0}
 
-test structure-9.1 {choice} {
-    tdom::structure create grammar
+test schema-9.1 {choice} {
+    tdom::schema create grammar
     grammar define {
         defelement doc foouri {
             choice * {
