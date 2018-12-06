@@ -291,7 +291,8 @@ static void serializeStack (
     fprintf (stderr, "++++ Current validation stack (size %d):\n", i+1);
     while (i >= 0) {
         serializeCP (sdata->stack[i]->pattern);
-        fprintf (stderr, "deep: %d ac: %d nm: %d\n", sdata->stack[i]->deep,
+        fprintf (stderr, "deep: %d matched: %d ac: %d nm: %d\n",
+                 sdata->stack[i]->deep, sdata->stack[i]->acNrMatched,
                  sdata->stack[i]->activeChild, sdata->stack[i]->nrMatched);
         i--;
     }
@@ -645,6 +646,9 @@ matchNamePattern (
         }
         
     case STRUCTURE_CTYPE_TEXT:
+        if (mustMatch (parent->quants[ac], nm)) return 0;
+        break;
+        
     case STRUCTURE_CTYPE_ANY:
     case STRUCTURE_CTYPE_EMPTY:
         /* Never pushed onto stack */
@@ -920,6 +924,17 @@ probeElementEnd (
     return TCL_OK;
 }
 
+static int
+checkText (
+    Tcl_Interp *interp,
+    StructureCP *cp,
+    char *text
+    )
+{
+    
+    return TCL_OK;
+}
+
 int
 probeText (
     Tcl_Interp *interp,
@@ -927,6 +942,11 @@ probeText (
     char *text
     )
 {
+    StructureCP *parent;
+    int ac, nm, only_whites;
+    char *pc;
+
+    DBG(fprintf (stderr, "probeText started, text: '%s'\n", text);)
     if (sdata->validationState == VALIDATION_FINISHED) {
         SetResult ("Validation finished.");
         return TCL_ERROR;
@@ -936,7 +956,36 @@ probeText (
         return TCL_ERROR;
     }
 
-    return TCL_OK;
+    getContext (parent, ac, nm);
+
+    while (ac < parent->numChildren) {
+        if (parent->content[ac]->type == STRUCTURE_CTYPE_TEXT
+            || mustMatch (parent->quants[ac], nm)) break;
+        ac++;
+        nm = 0;
+    }
+    if (ac < parent->numChildren) {
+        if (parent->content[ac]->type == STRUCTURE_CTYPE_TEXT) {
+            return checkText (interp, parent->content[ac], text);
+        }
+    }
+    /* If we are here then there isn't a matching TEXT cp. Check, if
+     * this is white space only between tags. */
+    only_whites = 1;
+    pc = text;
+    while (*pc) {
+        if ( (*pc == ' ')  ||
+             (*pc == '\n') ||
+             (*pc == '\r') ||
+             (*pc == '\t') ) {
+            pc++;
+            continue;
+        }
+        only_whites = 0;
+        break;
+    }
+    if (only_whites)  return TCL_OK;
+    return TCL_ERROR;
 }
 
 static void
