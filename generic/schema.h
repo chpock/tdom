@@ -116,6 +116,7 @@ typedef struct
     unsigned int numStackList;
     unsigned int stackListSize;
     unsigned int numStackAllocated;
+    unsigned int skipDeep;
 } SchemaData;
 
 int 

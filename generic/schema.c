@@ -291,9 +291,9 @@ static void serializeStack (
     fprintf (stderr, "++++ Current validation stack (size %d):\n", i+1);
     while (i >= 0) {
         serializeCP (sdata->stack[i]->pattern);
-        fprintf (stderr, "deep: %d matched: %d ac: %d nm: %d\n",
-                 sdata->stack[i]->deep, sdata->stack[i]->acNrMatched,
-                 sdata->stack[i]->activeChild, sdata->stack[i]->nrMatched);
+        fprintf (stderr, "deep: %d ac: %d nm: %d\n",
+                 sdata->stack[i]->deep, sdata->stack[i]->activeChild,
+                 sdata->stack[i]->nrMatched);
         i--;
     }
     fprintf (stderr, "++++ Stack bottom\n");
@@ -556,6 +556,7 @@ matchNamePattern (
 
             case SCHEMA_CTYPE_ANY:
                 updateStack (sdata, sdata->stackPtr, ac, nm+1);
+                sdata->skipDeep = 1;
                 return 1;
                 
             case SCHEMA_CTYPE_NAME:
@@ -565,15 +566,17 @@ matchNamePattern (
                     if (loopOver) {
                         sdata->stack[sdata->stackPtr-2]->nrMatched++;
                     }
-                    /* We need to push the element only onto the stack
-                     * if it has non-empty content. But how many real
-                     * life XML vocabularies does have EMPTY
-                     * elements? Should we check for this? */
                     pushToStack (sdata, candidate, currentDeep + 1);
                     waterMark (sdata);
                     return 1;
                 }
-                if (mustMatch (parent->quants[ac], nm)) return 0;
+                if (mustMatch (parent->quants[ac], nm)) {
+                    if (loopOver) {
+                        return -1;
+                    } else {
+                        return 0;
+                    }
+                }
                 ac++;
                 nm = 0;
                 break;
@@ -597,7 +600,7 @@ matchNamePattern (
                     return 1;
                 }
                 popStack (sdata);
-                if (rc == 0) return 0;
+                /* if (rc == 0) return 0; */
                 if (mustMatch (parent->quants[ac], nm)) return 0;
                 ac++;
                 nm = 0;
@@ -722,11 +725,15 @@ probeElement (
     SchemaCP *pattern;
     int savedStackPtr, activeStack, currentDeep, rc;
 
+    if (sdata->skipDeep) {
+        sdata->skipDeep++;
+        return TCL_OK;
+    }
     if (sdata->validationState == VALIDATION_FINISHED) {
         SetResult ("Validation finished.");
         return TCL_ERROR;
     }
-            
+
     if (namespace) {
         entryPtr = Tcl_FindHashEntry (&sdata->namespace, (char *)namespace);
         if (!entryPtr) {
@@ -871,6 +878,10 @@ probeElementEnd (
 {
     int activeStack, savedStackPtr, rc, currentDeep;
     
+    if (sdata->skipDeep) {
+        sdata->skipDeep--;
+        return TCL_OK;
+    }
     if (sdata->validationState == VALIDATION_FINISHED) {
         SetResult ("Validation finished.");
         return TCL_ERROR;
@@ -947,6 +958,9 @@ probeText (
     char *pc;
 
     DBG(fprintf (stderr, "probeText started, text: '%s'\n", text);)
+    if (sdata->skipDeep) {
+        return TCL_OK;
+    }
     if (sdata->validationState == VALIDATION_FINISHED) {
         SetResult ("Validation finished.");
         return TCL_ERROR;
@@ -1006,6 +1020,7 @@ startElement(
                        Tcl_DStringValue (vdata->cdata)) != TCL_OK) {
             XML_StopParser (vdata->parser, 0);
         }
+        Tcl_DStringSetLength (vdata->cdata, 0);
     }
     s = name;
     while (*s && *s != '\xFF') {
@@ -1047,6 +1062,7 @@ endElement (
                        Tcl_DStringValue (vdata->cdata)) != TCL_OK) {
             XML_StopParser (vdata->parser, 0);
         }
+        Tcl_DStringSetLength (vdata->cdata, 0);
     }
     if (probeElementEnd (vdata->interp, vdata->sdata)
         != TCL_OK) {
@@ -1110,6 +1126,16 @@ validateString (
     Tcl_DStringFree (&cdata);
     FREE (vdata.uri);
     return result;
+}
+
+static void
+schemaReset (
+    SchemaData *sdata
+    )
+{
+    sdata->stackPtr = 0;
+    sdata->validationState = VALIDATION_READY;
+    sdata->skipDeep = 0;
 }
 
 int 
@@ -1403,8 +1429,7 @@ schemaInstanceCmd (
         break;
 
     case m_reset:
-        sdata->stackPtr = 0;
-        sdata->validationState = VALIDATION_READY;
+        schemaReset (sdata);
         break;
 
     case m_validate:
@@ -1422,6 +1447,7 @@ schemaInstanceCmd (
             }
             SetBooleanResult (0);
         }
+        schemaReset (sdata);
         break;
         
     default:

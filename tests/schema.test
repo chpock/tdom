@@ -9,6 +9,8 @@
 #    schema-6.*: expat parser -validateCmd
 #    schema-7.*: Validation checks.
 #    schema-8.*: tdom::schema validate method
+#    schema-9.*: Choice
+#    scheam-10.*: Any
 #
 # Copyright (c) 2018 Rolf Ade.
 
@@ -760,7 +762,7 @@ test schema-7.9 {loop over seq} {
     tdom::schema create grammar
     grammar define {
         defelement doc {
-            group ? {
+            group * {
                 element a
                 element b
             }
@@ -770,10 +772,80 @@ test schema-7.9 {loop over seq} {
             defelement $e {}
         }
     }
-    set result [grammar validate <doc><a/><b/><a/><b/><c/></doc>]
+    set result [grammar validate <doc><c/></doc> errMsg]
     grammar delete
     set result
 } 1
+
+test schema-7.10 {loop over seq} {
+    tdom::schema create grammar
+    grammar define {
+        defelement doc {
+            group {
+                element a
+                element b
+            }
+            element c
+        }
+        foreach e {a b c} {
+            defelement $e {}
+        }
+    }
+    set result [grammar validate <doc><c/></doc> errMsg]
+    grammar delete
+    set result
+} 0
+
+test schema-7.11 {loop over seq} {knownBug} {
+    tdom::schema create grammar
+    grammar define {
+        defelement doc {
+            group * {
+                element a
+                element b
+            }
+            element c
+        }
+        foreach e {a b c} {
+            defelement $e {}
+        }
+    }
+    set result [grammar validate <doc><c/></doc> errMsg]
+    grammar reset
+    lappend result [grammar validate <doc><a/><b/><c/></doc>]
+    grammar reset
+    lappend result [grammar validate <doc><a/><b/><a/><b/><c/></doc>]
+    grammar reset
+    lappend result [grammar validate <doc><a/><b/><a/><b/></doc>]
+    grammar delete
+    set result
+} {1 1 1 0}
+
+test schema-7.12 {loop over seq} {knownBug} {
+    tdom::schema create grammar
+    grammar define {
+        defelement doc {
+            group {
+                element a
+                element b
+            }
+            element c
+        }
+        foreach e {a b c} {
+            defelement $e {}
+        }
+    }
+    set result [grammar validate <doc><c/></doc> errMsg]
+    grammar reset
+    lappend result [grammar validate <doc><a/><b/><c/></doc>]
+    grammar reset
+    lappend result [grammar validate <doc><a/><b/><a/><b/><c/></doc>]
+    grammar reset
+    lappend result [grammar validate <doc><a/><b/></doc>]
+    grammar delete
+    set result
+} {0 1 0 0}
+
 
 test schema-7.10 {loop over seq} {knownBug} {
     tdom::schema create grammar
@@ -845,13 +917,31 @@ test schema-9.1 {choice} {
             defelement $e foouri {}
         }
     }
-    grammar validate {<doc xmlns="foouri"/>}
+    set result [grammar validate {<doc xmlns="foouri"/>}]
     grammar reset
-    grammar validate {<doc xmlns="foouri"><e1/></doc>}
+    lappend result [grammar validate {<doc xmlns="foouri"><e1/></doc>}]
     grammar reset
-    grammar validate {<doc xmlns="foouri"><e1/><e1/></doc>}
+    lappend result [grammar validate {<doc xmlns="foouri"><e1/><e1/></doc>}]
     grammar reset
-    grammar validate {<doc xmlns="foouri"><e1/><e2/><e1/></doc>}
+    lappend result [grammar validate {<doc xmlns="foouri"><e1/><e2/><e1/></doc>}]
     grammar delete
-} {}
+    set result
+} {1 1 1 1}
     
+
+test schema-10.1 {any} {
+    tdom::schema create s
+    s define {
+        defelement doc {
+            element a
+            any
+            element b
+        }
+        defelement a {}
+        defelement b {}
+    }
+    set result [s validate {<doc><a/><something/><b/></doc>}]
+    lappend result [s validate {<doc><a/><a><b>text</b><c><c><c/></c></c></a><b/></doc>}]
+    s delete
+    set result
+} {1 1}            
