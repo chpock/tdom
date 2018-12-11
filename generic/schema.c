@@ -612,8 +612,7 @@ matchNamePattern (
             return 0;
         } else {
             /* No match, but also no explicit error. */
-            /* We finished a non atomic pattern (GROUP or PATTERN) and
-             * increment the nrMatched of that inside its parent. */
+            /* We finished a non atomic pattern (GROUP or PATTERN). */
             
             /* Check, if we have to restart the parent pattern (look
                for match right from the start) because of quant. */
@@ -1115,8 +1114,8 @@ validateString (
         sprintf(sl, "%ld", XML_GetCurrentLineNumber(parser));
         sprintf(sc, "%ld", XML_GetCurrentColumnNumber(parser));
         Tcl_AppendStringsToObj (resultObj, "error \"",
-                                Tcl_GetStringResult (interp),"\" at line ",
-                                sl, " character ", sc, NULL);
+                                XML_ErrorString(XML_GetErrorCode(parser)),
+                                "\" at line ", sl, " character ", sc, NULL);
         Tcl_SetObjResult (interp, resultObj);
         result = TCL_ERROR;
     } else {
@@ -1186,6 +1185,10 @@ schemaInstanceCmd (
         /* Inline defined defelement, defpattern or start */
         sdata = GETASI;
         CHECK_SI;
+        if (!sdata->defineToplevel) {
+            SetResult ("Command not allowed in nested schema define script");
+            return TCL_ERROR;
+        }
         i = 1;
     }
 

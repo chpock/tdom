@@ -772,7 +772,7 @@ test schema-7.9 {loop over seq} {
             defelement $e {}
         }
     }
-    set result [grammar validate <doc><c/></doc> errMsg]
+    set result [grammar validate <doc><c/></doc>]
     grammar delete
     set result
 } 1
@@ -791,7 +791,44 @@ test schema-7.10 {loop over seq} {
             defelement $e {}
         }
     }
-    set result [grammar validate <doc><c/></doc> errMsg]
+    set result [grammar validate <doc><c/></doc>]
+    grammar delete
+    set result
+} 0
+
+test schema-7.10a {loop over seq} {
+    tdom::schema create grammar
+    set result [catch {grammar define {
+        defelement doc {
+            group 2 {
+                element a
+                element b
+            }
+            element c
+            foreach e {a b c} {
+                defelement $e {}
+            }
+        }
+    }}]
+    grammar delete
+    set result
+} 1
+
+test schema-7.10b {loop over seq} {
+    tdom::schema create grammar
+    grammar define {
+        defelement doc {
+            group {
+                element a
+                element b
+            }
+            element c
+        }
+        foreach e {a b c} {
+            defelement $e {}
+        }
+    }
+    set result [grammar validate <doc><a/></b><c/></doc> errMsg]
     grammar delete
     set result
 } 0
@@ -845,26 +882,6 @@ test schema-7.12 {loop over seq} {knownBug} {
     grammar delete
     set result
 } {0 1 0 0}
-
-
-test schema-7.10 {loop over seq} {knownBug} {
-    tdom::schema create grammar
-    grammar define {
-        defelement doc {
-            group 2 {
-                element a
-                element b
-            }
-            element c
-            foreach e {a b c} {
-                defelement $e {}
-            }
-        }
-    }
-    set result [grammar validate <doc><a/><b/><c/></doc>]
-    grammar delete
-    set result
-} 1
 
 test schema-8.1 {validate method} {
     tdom::schema create grammar
