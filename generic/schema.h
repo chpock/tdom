@@ -49,8 +49,8 @@ typedef unsigned int QuantFlags;
 typedef struct
 {
     Schema_Content_Quant  type;
-    int                      minOccur;
-    int                      maxOccur;
+    int                   minOccur;
+    int                   maxOccur;
 }  SchemaQuant;
 
 typedef unsigned int SchemaFlags;
@@ -58,13 +58,13 @@ typedef unsigned int SchemaFlags;
 typedef struct SchemaCP
 {
     Schema_CP_Type    type;
-    char                *namespace;
-    char                *name;
+    char             *namespace;
+    char             *name;
     struct SchemaCP  *next;
     SchemaFlags       flags;
     struct SchemaCP **content;
     SchemaQuant     **quants;
-    unsigned int         numChildren;
+    unsigned int      numChildren;
 } SchemaCP;
 
 typedef struct SchemaValidationStack
@@ -75,7 +75,6 @@ typedef struct SchemaValidationStack
     int               activeChild;
     int               deep;
     int               nrMatched;
-    unsigned int      stacklistWatermark;
 } SchemaValidationStack;
 
 typedef enum {
@@ -108,14 +107,9 @@ typedef struct
     SchemaQuant **currentQuants;
     unsigned int numChildren;
     unsigned int contentSize;
-    SchemaValidationStack **stack;
-    int                        stackSize;
-    int                        stackPtr;
-    ValidationState            validationState;
-    SchemaValidationStack **stackList;
-    unsigned int numStackList;
-    unsigned int stackListSize;
-    unsigned int numStackAllocated;
+    SchemaValidationStack *stack;
+    ValidationState validationState;
+    SchemaValidationStack *stackPool;
     unsigned int skipDeep;
 } SchemaData;
 

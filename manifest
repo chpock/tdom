@@ -1,5 +1,5 @@
-C Better\serror\schecking\sto\savoid\sseg\sfault.\sCorrected\swell-formedness\serror\sreporting\sof\sthe\svalidate\smethod.
-D 2018-12-11T22:00:58.198
+C wip
+D 2018-12-12T01:28:40.343
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -132,8 +132,8 @@ F generic/domxslt.h 140fa73765d699bfced9554c2c6439c0d2e6695eec3a8e69e1d25c0bbdf2
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c abf69665ad49ed053885f7e7459d47be5abb057ba4ed919e96e83d636b016a30
 F generic/nodecmd.h e4a6d836834554a2a590cbd916cdee937945965ee55709e48b62976a66861ef8
-F generic/schema.c 27733522333995fbf547c1df297c360e6fa89e429c8559eb1d70b1d74f138408
-F generic/schema.h f6e796ef5264be19cf07c865eac58a9250fc33e7c38f576c0a39253fdf821d49
+F generic/schema.c 2eb9c9b429f116f220a861022a4b3d07bc68827f88d615032c82ee46f6c600c5
+F generic/schema.h db561c14652d23726810a28478b035ab02355a352849546030397e84ccf90c90
 F generic/tcldom.c 4aabd7c352214b0bfaf65e3ecc028b92d06a1dc4867b4bb3305811969320faef
 F generic/tcldom.h 11934aae8b0c2194eac7a6bf7b62611abded4dcd290375a23463f25afc34484c
 F generic/tclexpat.c c3160ec4ed7dfd16a182a4d4318131ee4cf7ec7cce58375a37bfae6ee7429435
@@ -228,8 +228,11 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 0fe2d35d5c89874fd04171f3e5f8fffc9898021d15e6399305baaefbf4333caf
-R 5a6e12382179583d32b94ac25e1c815e
+P a74eacae4d688fde328683c70d3d0f0fb87e55db4dcfafacebf93bba0f176b53
+R ca5b32f6e8a8284ef418748b591eb86f
+T *branch * wip
+T *sym-wip *
+T -sym-schema *
 U rolf
-Z 182ad3956b911f8eb415f72f4324c187
+Z da8ac5a69cebc48b404540debfe73b37
 # Remove this line to create a well-formed Fossil manifest.

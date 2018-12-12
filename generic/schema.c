@@ -26,7 +26,7 @@
 #include <tdom.h>
 #include <schema.h>
 
-/* #define DEBUG */
+#define DEBUG
 /*----------------------------------------------------------------------------
 |   Debug Macros
 |
@@ -286,15 +286,15 @@ static void serializeStack (
     SchemaData *sdata
     ) 
 {
-    int i = sdata->stackPtr-1;
+    SchemaValidationStack *sp;
 
-    fprintf (stderr, "++++ Current validation stack (size %d):\n", i+1);
-    while (i >= 0) {
-        serializeCP (sdata->stack[i]->pattern);
+    fprintf (stderr, "++++ Current validation stack:\n");
+    sp = sdata->stack;
+    while (sp) {
+        serializeCP (sp->pattern);
         fprintf (stderr, "deep: %d ac: %d nm: %d\n",
-                 sdata->stack[i]->deep, sdata->stack[i]->activeChild,
-                 sdata->stack[i]->nrMatched);
-        i--;
+                 sp->deep, sp->activeChild, sp->nrMatched);
+        sp = sp->down;
     }
     fprintf (stderr, "++++ Stack bottom\n");
 }
@@ -338,12 +338,6 @@ initSchemaData ()
     sdata->quants = (SchemaQuant **) MALLOC (
         sizeof (SchemaQuant*) * QUANTS_ARRAY_SIZE_INIT);
     sdata->quantsSize = QUANTS_ARRAY_SIZE_INIT;
-    sdata->stack = (SchemaValidationStack **) MALLOC (
-        sizeof (SchemaValidationStack *) * STACK_SIZE_INIT);
-    sdata->stackSize = STACK_SIZE_INIT;
-    sdata->stackList = (SchemaValidationStack **) MALLOC (
-        sizeof (SchemaValidationStack *) * STACK_LIST_SIZE_INIT);
-    sdata->stackListSize = STACK_LIST_SIZE_INIT;
     sdata->evalStub = (Tcl_Obj **) (MALLOC (sizeof (Tcl_Obj*) * 4));
     sdata->evalStub[0] = Tcl_NewStringObj("::namespace", 11);
     Tcl_IncrRefCount (sdata->evalStub[0]);
@@ -360,6 +354,7 @@ static void schemaInstanceDelete (
 {
     SchemaData *sdata = (SchemaData *) clientData;
     unsigned int i;
+    SchemaValidationStack *down;
 
     if (sdata->start) FREE (sdata->start);
     if (sdata->startNamespace) FREE (sdata->startNamespace);
@@ -374,11 +369,16 @@ static void schemaInstanceDelete (
         FREE (sdata->quants[i]);
     }
     FREE (sdata->quants);
-    FREE (sdata->stack);
-    for (i = 0; i < sdata->numStackAllocated; i++) {
-        FREE (sdata->stackList[i]);
+    while (sdata->stack) {
+        down = sdata->stack->down;
+        FREE (sdata->stack);
+        sdata->stack = down;
     }
-    FREE (sdata->stackList);
+    while (sdata->stackPool) {
+        down = sdata->stackPool->down;
+        FREE (sdata->stackPool);
+        sdata->stackPool = down;
+    }
     Tcl_DecrRefCount (sdata->evalStub[0]);
     Tcl_DecrRefCount (sdata->evalStub[1]);
     Tcl_DecrRefCount (sdata->evalStub[2]);
@@ -453,33 +453,21 @@ pushToStack (
     int deep
     )
 {
-    SchemaValidationStack *stackElm;
+    SchemaValidationStack *stackElm, *se;
 
-    if (sdata->numStackList < sdata->numStackAllocated) {
-        stackElm = sdata->stackList[sdata->numStackList];
+    if (sdata->stackPool) {
+        stackElm = sdata->stackPool;
+        se = stackElm->down;
+        sdata->stackPool = se;
     } else {
-        if (sdata->stackPtr == sdata->stackSize) {
-            sdata->stack = REALLOC (
-                sdata->stack,
-                sizeof (SchemaValidationStack *) * 2 * sdata->stackSize);
-            sdata->stackSize *= 2;
-        }
-        if (sdata->stackListSize == sdata->numStackList) {
-            sdata->stackList = REALLOC (
-                sdata->stackList,
-                sizeof (SchemaValidationStack *) * 2 * sdata->stackListSize);
-            sdata->stackListSize *= 2;
-        }
         stackElm = TMALLOC (SchemaValidationStack);
-        sdata->numStackAllocated++;
-        sdata->stackList[sdata->numStackList] = stackElm;
     }
-    sdata->numStackList++;
     memset (stackElm, 0, sizeof (SchemaValidationStack));
+    se = sdata->stack;
+    stackElm->down = se;
     stackElm->pattern = pattern;
     stackElm->deep = deep;
-    sdata->stack[sdata->stackPtr] = stackElm;
-    sdata->stackPtr++;
+    sdata->stack = stackElm;
 }
 
 #define maxOne(quant) \
@@ -501,19 +489,31 @@ pushToStack (
 #define hasMatched(quant,nr) \
     (nr) == 0 ? 0 : ((nr) == 1 && (quant == quantOne || quant == quantOpt) ? 1 : quant->maxOccur == (nr))
 
-#define getContext(parent, ac, nm) \
-    parent = sdata->stack[sdata->stackPtr-1]->pattern;   \
-    ac = sdata->stack[sdata->stackPtr-1]->activeChild;   \
-    nm = sdata->stack[sdata->stackPtr-1]->nrMatched;
+#define getContext(parent, ac, nm)    \
+    parent = sdata->stack->pattern;   \
+    ac = sdata->stack->activeChild;   \
+    nm = sdata->stack->nrMatched;
 
-#define updateStack(sdata,stackPtr,newac,newnm)         \
-    sdata->stack[stackPtr-1]->activeChild = newac;      \
-    sdata->stack[stackPtr-1]->nrMatched = newnm;
+static void
+updateStack (
+    SchemaData *sdata,
+    int deep
+    )
+{
+    sdata->stack->nrMatched++;
+}
 
-#define popStack(sdata) sdata->stackPtr--
-
-#define waterMark(sdata) sdata->stack[sdata->stackPtr-1]->stacklistWatermark = sdata->numStackList - 1
-#define restoreWaterMark(sdata) sdata->numStackList = sdata->stack[sdata->stackPtr-1]->stacklistWatermark
+static void
+popStack (
+    SchemaData *sdata
+    )
+{
+    SchemaValidationStack *se;
+    se = sdata->stack->down;
+    sdata->stack->down = sdata->stackPool;
+    sdata->stackPool = sdata->stack;
+    sdata->stack = se;
+}
 
 static int
 matchNamePattern (
@@ -523,17 +523,21 @@ matchNamePattern (
     )
 {
     SchemaCP *parent, *candidate;
-    int nm, ac, startac, savedStackPtr, rc, i;
+    int nm, ac, startac, rc, i;
     int isName = 0, loopOver = 0;
     
     /* The caller must ensure pattern->type = SCHEMA_CTYPE_NAME */
 
     getContext (parent, ac, nm);
 
-    if (hasMatched (parent->quants[ac], nm)) {ac++; nm = 0;}
+    if (hasMatched (parent->quants[ac], nm)) {
+        sdata->stack->activeChild++;
+        sdata->stack->nrMatched = 0;
+        ac++; nm = 0;
+    }
 
     DBG(
-        fprintf (stderr, "matchNamePattern: ac: %d nm: %d stack:\n", ac, nm);
+        fprintf (stderr, "matchNamePattern: ac: %d nm: %d\n", ac, nm);
         serializeStack (sdata);
         )
         
@@ -555,19 +559,18 @@ matchNamePattern (
                 break;
 
             case SCHEMA_CTYPE_ANY:
-                updateStack (sdata, sdata->stackPtr, ac, nm+1);
+                updateStack (sdata, sdata->stack->deep);
                 sdata->skipDeep = 1;
                 return 1;
                 
             case SCHEMA_CTYPE_NAME:
                 if (candidate == pattern
                     || strcmp (candidate->name, pattern->name) == 0) {
-                    updateStack (sdata, sdata->stackPtr, ac, nm+1);
+                    updateStack (sdata, sdata->stack->deep);
                     if (loopOver) {
-                        sdata->stack[sdata->stackPtr-2]->nrMatched++;
+                        sdata->stack->down->nrMatched++;
                     }
                     pushToStack (sdata, candidate, currentDeep + 1);
-                    waterMark (sdata);
                     return 1;
                 }
                 if (mustMatch (parent->quants[ac], nm)) {
@@ -592,11 +595,10 @@ matchNamePattern (
             case SCHEMA_CTYPE_MIXED:
             case SCHEMA_CTYPE_INTERLEAVE:
             case SCHEMA_CTYPE_CHOICE:
-                savedStackPtr = sdata->stackPtr;
                 pushToStack (sdata, candidate, currentDeep);
                 rc = matchNamePattern (sdata, pattern, currentDeep);
                 if (rc == 1) {
-                    updateStack (sdata, savedStackPtr, ac, nm+1);
+                    updateStack (sdata, sdata->stack->deep);
                     return 1;
                 }
                 popStack (sdata);
@@ -620,8 +622,7 @@ matchNamePattern (
                 /* It only make sense to look for a match from the
                  * start if the start active child wasn't already 0*/
                 SchemaQuant *parentQuant;
-                parentQuant = sdata->stack[sdata->stackPtr-2]->
-                    pattern->quants[sdata->stack[sdata->stackPtr-2]->activeChild];
+                parentQuant = sdata->stack->down->pattern->quants[sdata->stack->down->activeChild];
                 if (mayRepeat (parentQuant)) {
                     ac = 0;
                     nm = 0;
@@ -631,7 +632,7 @@ matchNamePattern (
                     goto loopOverContent;
                 } else {
                     if (!maxOne (parentQuant)) {
-                        if (sdata->stack[sdata->stackPtr-2]->nrMatched
+                        if (sdata->stack->nrMatched
                             < parentQuant->maxOccur) {
                             ac = 0;
                             nm = 0;
@@ -680,7 +681,7 @@ matchNamePattern (
             case SCHEMA_CTYPE_NAME:
                 if (candidate == pattern
                     || strcmp (candidate->name, pattern->name) == 0) {
-                    updateStack (sdata, sdata->stackPtr, 0, nm+1);
+                    updateStack (sdata, sdata->stack->deep);
                     pushToStack (sdata, candidate, currentDeep + 1);
                     return 1;
                 }
@@ -691,12 +692,10 @@ matchNamePattern (
             case SCHEMA_CTYPE_MIXED:
             case SCHEMA_CTYPE_INTERLEAVE:
             case SCHEMA_CTYPE_CHOICE:
-                savedStackPtr = sdata->stackPtr;
                 pushToStack (sdata, candidate, currentDeep);
                 rc = matchNamePattern (sdata, pattern, currentDeep);
                 if (rc == 1) {
                     /* Matched */
-                    updateStack (sdata, savedStackPtr, 0, nm+1);
                     return 1;
                 }
                 popStack (sdata);
@@ -722,7 +721,7 @@ probeElement (
     Tcl_HashEntry *entryPtr;
     void *namespacePtr;
     SchemaCP *pattern;
-    int savedStackPtr, activeStack, currentDeep, rc;
+    int currentDeep, rc;
 
     if (sdata->skipDeep) {
         sdata->skipDeep++;
@@ -791,20 +790,14 @@ probeElement (
     }
     
     /* The normal case: we're inside the tree */
-    savedStackPtr = sdata->stackPtr;
-    activeStack = savedStackPtr;
-    currentDeep = sdata->stack[activeStack-1]->deep;
-
     DBG(
         fprintf (stderr, "probeElement: look if '%s' match\n", pattern->name);
         );
 
+    currentDeep = sdata->stack->deep;
     while ((rc = matchNamePattern (sdata, pattern, currentDeep)) == -1) {
-        activeStack--;
-        if (activeStack < 0 || sdata->stack[activeStack]->deep < currentDeep) {
-            break;
-        }
-        sdata->stackPtr = activeStack + 1;
+        popStack (sdata);
+        if (!sdata->stack) break;
     }
     if (rc == 1) {
         DBG(
@@ -814,7 +807,6 @@ probeElement (
             );
         return TCL_OK;
     }
-    sdata->stackPtr = savedStackPtr;
     DBG(
         fprintf (stderr, "element '%s' DOESN'T match\n", name);
         serializeStack (sdata);
@@ -836,7 +828,7 @@ static int checkElementEnd (
     
     switch (parent->type) {
     case SCHEMA_CTYPE_NAME:
-        if (sdata->stackPtr == 1) return 1;
+        if (!sdata->stack->down) return 1;
         isName = 1;
         /* fall through */
     case SCHEMA_CTYPE_GROUP:
@@ -875,7 +867,7 @@ probeElementEnd (
     SchemaData *sdata
     )
 {
-    int activeStack, savedStackPtr, rc, currentDeep;
+    int rc;
     
     if (sdata->skipDeep) {
         sdata->skipDeep--;
@@ -890,27 +882,22 @@ probeElementEnd (
         return TCL_ERROR;
     }
 
-    savedStackPtr = sdata->stackPtr;
-    activeStack = savedStackPtr;
-    currentDeep = sdata->stack[activeStack-1]->deep;
-
     DBG(
         fprintf (stderr, "probeElementEnd: look if current stack top can end "
                  " name: '%s' currentDeep: %d\n",
-                 sdata->stack[sdata->stackPtr-1]->pattern->name, currentDeep);
+                 sdata->stack->pattern->name, sdata->stack->deep);
         serializeStack (sdata);
         );
     
     while ((rc = checkElementEnd (sdata)) == -1) {
-        activeStack--;
-        if (activeStack < 1 || sdata->stack[activeStack]->deep < currentDeep) {
+        if (!sdata->stack->down
+            || sdata->stack->deep > sdata->stack->down->deep) {
             break;
         }
         popStack(sdata);
     }
 
     if (rc != 1) {
-        sdata->stackPtr = savedStackPtr;
         SetResult ("Missing mandatory element\n");
         DBG(
             fprintf(stderr, "probeElementEnd: CAN'T end here.\n");
@@ -919,13 +906,12 @@ probeElementEnd (
         return TCL_ERROR;
     }
 
-    restoreWaterMark(sdata);
     popStack(sdata);
     DBG(
         fprintf(stderr, "probeElementEnd: ended here.\n");
         serializeStack (sdata);
         );
-    if (sdata->stackPtr == 0) {
+    if (sdata->stack == NULL) {
         /* End of the first pattern (the tree root) without error.
            We have successfully ended validation */
         sdata->validationState = VALIDATION_FINISHED;
@@ -1132,7 +1118,7 @@ schemaReset (
     SchemaData *sdata
     )
 {
-    sdata->stackPtr = 0;
+    sdata->stack = NULL;
     sdata->validationState = VALIDATION_READY;
     sdata->skipDeep = 0;
 }
