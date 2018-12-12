@@ -26,7 +26,7 @@
 #include <tdom.h>
 #include <schema.h>
 
-#define DEBUG
+/* #define DEBUG */
 /*----------------------------------------------------------------------------
 |   Debug Macros
 |
@@ -292,7 +292,7 @@ static void serializeStack (
     sp = sdata->stack;
     while (sp) {
         serializeCP (sp->pattern);
-        fprintf (stderr, "deep: %d ac: %d nm: %d\n",
+        fprintf (stderr, "\tdeep: %d ac: %d nm: %d\n",
                  sp->deep, sp->activeChild, sp->nrMatched);
         sp = sp->down;
     }
@@ -525,11 +525,16 @@ matchNamePattern (
     SchemaCP *parent, *candidate;
     int nm, ac, startac, rc, i;
     int isName = 0, loopOver = 0;
+    SchemaValidationStack *se;
     
     /* The caller must ensure pattern->type = SCHEMA_CTYPE_NAME */
 
     getContext (parent, ac, nm);
 
+    if (ac >= parent->numChildren) {
+        if (parent->type == SCHEMA_CTYPE_NAME) return 0;
+        else return -1;
+    }
     if (hasMatched (parent->quants[ac], nm)) {
         sdata->stack->activeChild++;
         sdata->stack->nrMatched = 0;
@@ -595,10 +600,11 @@ matchNamePattern (
             case SCHEMA_CTYPE_MIXED:
             case SCHEMA_CTYPE_INTERLEAVE:
             case SCHEMA_CTYPE_CHOICE:
+                se = sdata->stack;
                 pushToStack (sdata, candidate, currentDeep);
                 rc = matchNamePattern (sdata, pattern, currentDeep);
                 if (rc == 1) {
-                    updateStack (sdata, sdata->stack->deep);
+                    se->nrMatched++;
                     return 1;
                 }
                 popStack (sdata);
@@ -1110,6 +1116,7 @@ validateString (
     XML_ParserFree (parser);
     Tcl_DStringFree (&cdata);
     FREE (vdata.uri);
+    while (sdata->stack) popStack (sdata);
     return result;
 }
 

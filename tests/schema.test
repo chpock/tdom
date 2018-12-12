@@ -409,17 +409,13 @@ test schema-7.1 {group} {
             element e1
             element e2
         }
-        group ! {
-            element e1
-            element e2
-        }
         element e2 *
     }
     foreach e {e1 e2} {
         grammar defelement $e {}
     }
     dom parse -validateCmd grammar {
-        <doc><e1/><e1/><e2/><e1/><e2/><e2/><e2/><e2/></doc>
+        <doc><e1/><e1/><e2/><e2/><e2/><e2/></doc>
     } doc
     $doc delete
     if {[grammar state] ne "FINISHED"} {
@@ -832,6 +828,27 @@ test schema-7.10b {loop over seq} {
     grammar delete
     set result
 } 0
+
+test schema-7.10c {loop over seq} {
+    tdom::schema create grammar
+    grammar define {
+        defelement doc {
+            group {
+                element a
+                element b
+            }
+            element c
+        }
+        foreach e {a b c} {
+            defelement $e {}
+        }
+    }
+    set result [catch {
+        set doc [dom parse -validateCmd grammar <doc><a/></b><c/></doc>]
+    }]
+    grammar delete
+    set result
+} 1
 
 test schema-7.11 {loop over seq} {knownBug} {
     tdom::schema create grammar
