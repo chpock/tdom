@@ -133,7 +133,7 @@ proc fdata {file} {
     file join [file dir [info script]] data/$file
 }
 
-test pp-2.1 {dom/pull comparsion: mondial-europe.xml} {
+test pp-2.1 {dom/pull comparsion: mondial-europe.xml} {longRunning} {
     comparewithDOM [fdata mondial-europe.xml] inputfile
 } 1
 
@@ -149,7 +149,7 @@ test pp-2.4 {dom/pull comparsion: i18n_2.xml} {
     comparewithDOM [fdata i18n_2.xml] inputfile
 } 1
 
-test pp-2.5 {dom/pull comparsion: REC-xslt-19991116.xml} {
+test pp-2.5 {dom/pull comparsion: REC-xslt-19991116.xml} {longRunning} {
     comparewithDOM [fdata REC-xslt-19991116.xml] inputfile
 } 1
 
@@ -240,7 +240,7 @@ proc comparewithExpat {data {inputMethod ""}} {
 }
 
 
-test pp-2.10 {expat/pull comparsion: mondial-europe.xml} {
+test pp-2.10 {expat/pull comparsion: mondial-europe.xml} {longRunning} {
     comparewithExpat [fdata mondial-europe.xml] file
 } 1
 
@@ -256,7 +256,7 @@ test pp-2.13 {expat/pull comparsion: i18n_2.xml} {
     comparewithExpat [fdata i18n_2.xml] file
 } 1
 
-test pp-2.14 {expat/pull comparsion: REC-xslt-19991116.xml} {
+test pp-2.14 {expat/pull comparsion: REC-xslt-19991116.xml} {longRunning} {
     comparewithExpat [fdata REC-xslt-19991116.xml] file
 } 1
 

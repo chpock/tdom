@@ -8,7 +8,7 @@
 |
 |
 |   The contents of this file are subject to the Mozilla Public License
-|   Version 1.1 (the "License"); you may not use this file except in
+|   Version 2.0 (the "License"); you may not use this file except in
 |   compliance with the License. You may obtain a copy of the License at
 |   http://www.mozilla.org/MPL/
 |
@@ -418,7 +418,6 @@ XML_SimpleParse (
                     tnode = (domTextNode*) domAlloc(sizeof(domTextNode));
                     memset(tnode, 0, sizeof(domTextNode));
                     tnode->nodeType    = TEXT_NODE;
-                    tnode->nodeFlags   = 0;
                     tnode->ownerDocument = doc;
                     tnode->nodeNumber  = NODE_NO(doc);
                     tnode->valueLength = (x - start);
@@ -505,7 +504,6 @@ XML_SimpleParse (
                         tnode = (domTextNode*) domAlloc(sizeof(domTextNode));
                         memset(tnode, 0, sizeof(domTextNode));
                         tnode->nodeType      = COMMENT_NODE;
-                        tnode->nodeFlags     = 0;
                         tnode->ownerDocument = doc;
                         tnode->nodeNumber    = NODE_NO(doc);
                         tnode->parentNode    = parent_node;
@@ -613,7 +611,6 @@ XML_SimpleParse (
                                         tnode->nodeType      = CDATA_SECTION_NODE;
                                     else 
                                         tnode->nodeType      = TEXT_NODE;
-                                    tnode->nodeFlags     = 0;
                                     tnode->ownerDocument = doc;
                                     tnode->nodeNumber    = NODE_NO(doc);
                                     tnode->parentNode    = parent_node;
@@ -658,8 +655,6 @@ XML_SimpleParse (
                             domAlloc(sizeof(domProcessingInstructionNode));
                     memset(pinode, 0, sizeof(domProcessingInstructionNode));
                     pinode->nodeType      = PROCESSING_INSTRUCTION_NODE;
-                    pinode->nodeFlags     = 0;
-                    pinode->namespace     = 0;
                     pinode->ownerDocument = doc;
                     pinode->nodeNumber    = NODE_NO(doc);
                     pinode->parentNode    = parent_node;
@@ -739,8 +734,6 @@ XML_SimpleParse (
             node = (domNode*) domAlloc(sizeof(domNode));
             memset(node, 0, sizeof(domNode));
             node->nodeType      = ELEMENT_NODE;
-            node->nodeFlags     = 0;
-            node->namespace     = 0;
             node->nodeName      = (char *)&(h->key);
             node->ownerDocument = doc;
             node->nodeNumber    = NODE_NO(doc);
@@ -913,7 +906,6 @@ XML_SimpleParse (
                     attrnode->parentNode  = node;
                     attrnode->nodeName    = (char *)&(h->key);
                     attrnode->nodeType    = ATTRIBUTE_NODE;
-                    attrnode->nodeFlags   = 0;
                     attrnode->nodeValue   = (char*)MALLOC(nArgVal+1);
                     attrnode->valueLength = nArgVal;
                     memmove(attrnode->nodeValue, ArgVal, nArgVal);

@@ -207,7 +207,7 @@ all: binaries libraries doc
 # TDOM enabled shell is build as an extra directive, since non TEA. 
 #========================================================================
 
-$(TDOMSHELL): $(PKG_OBJECTS) $(srcdir)/unix/tclAppInit.c
+$(TDOMSHELL): binaries $(srcdir)/unix/tclAppInit.c
 	$(COMPILE) -c `@CYGPATH@ $(srcdir)/unix/tclAppInit.c`
 	$(CC) @LDFLAGS@ -o $@ tclAppInit.$(OBJEXT) $(PKG_OBJECTS) \
 	  $(TCL_LIB_SPEC) $(TDOMSHELL_LIBS) $(TDOM_LD_SEARCH_FLAGS)
@@ -219,7 +219,7 @@ $(TDOMSHELL): $(PKG_OBJECTS) $(srcdir)/unix/tclAppInit.c
 # of the Makefile, in the "BINARIES" variable.
 #========================================================================
 
-binaries: versionhash.h $(BINARIES)
+binaries: $(top_builddir)/versionhash.h $(BINARIES)
 
 libraries:
 
@@ -348,7 +348,7 @@ genstubs: $(srcdir)/generic/tdom.decls
 #========================================================================
 # Create a include file that #define the current fossil hash
 #========================================================================
-versionhash.h: $(srcdir)/manifest.uuid
+$(top_builddir)/versionhash.h: $(srcdir)/manifest.uuid
 	@echo "#define FOSSIL_HASH \"" | tr -d '\n\r' > $(top_builddir)/versionhash.h
 	@cat $(srcdir)/manifest.uuid | tr -d '\n\r' >> $(top_builddir)/versionhash.h
 	@echo "\"" >> $(top_builddir)/versionhash.h
@@ -391,7 +391,7 @@ dist: dist-clean
 	    $(srcdir)/CHANGES \
 	    $(srcdir)/ChangeLog \
 	    $(srcdir)/LICENSE \
-	    $(srcdir)/NPL-1_1Final.html \
+	    $(srcdir)/MPL_2.0.html \
 	    $(srcdir)/README \
 	    $(srcdir)/README.AOL \
 	    $(srcdir)/manifest \

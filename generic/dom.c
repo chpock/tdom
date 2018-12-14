@@ -10,7 +10,7 @@
 |
 |
 |   The contents of this file are subject to the Mozilla Public License
-|   Version 1.1 (the "License"); you may not use this file except in
+|   Version 2.0 (the "License"); you may not use this file except in
 |   compliance with the License. You may obtain a copy of the License at
 |   http://www.mozilla.org/MPL/
 |
@@ -2405,8 +2405,6 @@ startElement(
     }
     memset(node, 0, sizeof(domNode));
     node->nodeType      = ELEMENT_NODE;
-    node->nodeFlags     = 0;
-    node->namespace     = 0;
     node->nodeName      = (char *)&(h->key);
     node->nodeNumber    = NODE_NO(info->document);
     node->ownerDocument = info->document;
@@ -2609,10 +2607,7 @@ elemNSfound:
         attrnode->nodeType = ATTRIBUTE_NODE;
         if (atPtr == idAttPtr) {
             attrnode->nodeFlags |= IS_ID_ATTRIBUTE;
-        } else {
-            attrnode->nodeFlags = 0;
         }
-        attrnode->namespace   = 0;
         attrnode->nodeName    = (char *)&(h->key);
         attrnode->parentNode  = node;
         len = strlen(atPtr[1]);
@@ -2904,7 +2899,6 @@ DispatchPCDATA (
             node->nodeType    = CDATA_SECTION_NODE;
         else 
             node->nodeType    = TEXT_NODE;
-        node->nodeFlags   = 0;
         node->nodeNumber  = NODE_NO(info->document);
         node->valueLength = len;
         node->nodeValue   = (char*)MALLOC(len);
@@ -2977,7 +2971,6 @@ commentHandler (
     }
     memset(node, 0, sizeof(domTextNode));
     node->nodeType    = COMMENT_NODE;
-    node->nodeFlags   = 0;
     node->nodeNumber  = NODE_NO(info->document);
     node->valueLength = len;
     node->nodeValue   = (char*)MALLOC(len);
@@ -3059,8 +3052,6 @@ processingInstructionHandler(
     }
     memset(node, 0, sizeof(domProcessingInstructionNode));
     node->nodeType    = PROCESSING_INSTRUCTION_NODE;
-    node->nodeFlags   = 0;
-    node->namespace   = 0;
     node->nodeNumber  = NODE_NO(info->document);
 
     if (info->baseURIstack[info->baseURIstackPos].baseURI 
@@ -4401,8 +4392,6 @@ domCreateDoc (
         h = Tcl_CreateHashEntry (doc->baseURIs, (char*)rootNode, &hnew);
         Tcl_SetHashValue (h, tdomstrdup (baseURI));
         rootNode->nodeFlags |= HAS_BASEURI;
-    } else {
-        rootNode->nodeFlags = 0;
     }
     rootNode->namespace     = 0;
     h = Tcl_CreateHashEntry(&HASHTAB(doc,tdom_tagNames), "", &hnew);
@@ -4454,7 +4443,6 @@ domCreateDocument (
     node = (domNode*) domAlloc(sizeof(domNode));
     memset(node, 0, sizeof(domNode));
     node->nodeType        = ELEMENT_NODE;
-    node->nodeFlags       = 0;
     node->nodeNumber      = NODE_NO(doc);
     node->ownerDocument   = doc;
     node->nodeName        = (char *)&(h->key);
@@ -5892,7 +5880,6 @@ domNewTextNode(
     node = (domTextNode*) domAlloc(sizeof(domTextNode));
     memset(node, 0, sizeof(domTextNode));
     node->nodeType      = nodeType;
-    node->nodeFlags     = 0;
     node->nodeNumber    = NODE_NO(doc);
     node->ownerDocument = doc;
     node->valueLength   = length;
@@ -5947,7 +5934,6 @@ domEscapeCData (
     }
 }
 
-
 /*---------------------------------------------------------------------------
 |   domAppendNewTextNode
 |
@@ -5963,7 +5949,7 @@ domAppendNewTextNode(
 {
     domTextNode   *node;
 
-    if (!length) {
+    if (!length && (nodeType == TEXT_NODE)) {
         return NULL;
     }
 
@@ -5982,7 +5968,6 @@ domAppendNewTextNode(
     node = (domTextNode*) domAlloc(sizeof(domTextNode));
     memset(node, 0, sizeof(domTextNode));
     node->nodeType      = nodeType;
-    node->nodeFlags     = 0;
     if (disableOutputEscaping) {
         node->nodeFlags |= DISABLE_OUTPUT_ESCAPING;
     }
@@ -6411,8 +6396,6 @@ domNewProcessingInstructionNode(
     node = (domProcessingInstructionNode*) domAlloc(sizeof(domProcessingInstructionNode));
     memset(node, 0, sizeof(domProcessingInstructionNode));
     node->nodeType      = PROCESSING_INSTRUCTION_NODE;
-    node->nodeFlags     = 0;
-    node->namespace     = 0;
     node->nodeNumber    = NODE_NO(doc);
     node->ownerDocument = doc;
     node->targetLength  = targetLength;
@@ -6454,8 +6437,6 @@ domNewElementNode(
     node = (domNode*) domAlloc(sizeof(domNode));
     memset(node, 0, sizeof(domNode));
     node->nodeType      = ELEMENT_NODE;
-    node->nodeFlags     = 0;
-    node->namespace     = 0;
     node->nodeNumber    = NODE_NO(doc);
     node->ownerDocument = doc;
     node->nodeName      = (char *)&(h->key);
@@ -6499,8 +6480,6 @@ domNewElementNodeNS (
     node = (domNode*) domAlloc(sizeof(domNode));
     memset(node, 0, sizeof(domNode));
     node->nodeType      = ELEMENT_NODE;
-    node->nodeFlags     = 0;
-    node->namespace     = 0;
     node->nodeNumber    = NODE_NO(doc);
     node->ownerDocument = doc;
     node->nodeName      = (char *)&(h->key);

@@ -2383,7 +2383,9 @@ TclGenExpatElementEndHandler(
  *
  * TclGenExpatStartNamespaceDeclHandler --
  *
- *	Called by expat for each start tag.
+ *	Called by expat for each namespace declaration command (and is
+ *	called before the start tag handler on which the namespace is
+ *	declared).
  *
  * Results:
  *	None.
@@ -2415,14 +2417,6 @@ TclGenExpatStartNamespaceDeclHandler(
 
       switch (activeTclHandlerSet->status) {
       case TCL_CONTINUE:
-          /*
-           * We're currently skipping elements looking for the
-           * close of the continued element.
-           */
-
-          activeTclHandlerSet->continueCount++;
-          goto nextTcl;
-          break;
       case TCL_BREAK:
           goto nextTcl;
           break;
@@ -2478,7 +2472,8 @@ TclGenExpatStartNamespaceDeclHandler(
  *
  * TclGenExpatEndNamespaceDeclHandler --
  *
- *	Called by expat for each end tag.
+ *	Called by expat for the end of scope for any namespace (and
+ *	after the handler for the according element tag.
  *
  * Results:
  *	None.
@@ -2509,16 +2504,6 @@ TclGenExpatEndNamespaceDeclHandler(
 
       switch (activeTclHandlerSet->status) {
       case TCL_CONTINUE:
-          /*
-           * We're currently skipping elements looking for the
-           * end of the currently open element.
-           */
-
-          if (!--(activeTclHandlerSet->continueCount)) {
-              activeTclHandlerSet->status = TCL_OK;
-          }
-          goto nextTcl;
-          break;
       case TCL_BREAK:
           goto nextTcl;
           break;

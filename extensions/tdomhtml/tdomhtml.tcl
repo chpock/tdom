@@ -8,7 +8,7 @@
 #   as implemented in tDOM package.
 #
 #   The contents of this file are subject to the Mozilla Public License
-#   Version 1.1 (the "License"); you may not use this file except in
+#   Version 2.0 (the "License"); you may not use this file except in
 #   compliance with the License. You may obtain a copy of the License at
 #   http://www.mozilla.org/MPL/
 #
@@ -51,18 +51,7 @@
 #
 
 package require tdom
-
-#
-# Caller (usually our pkgIndex.tcl loader) will supply the package
-# version by defining the _V_ variable before sourcing this file.
-# For all other cases, we just provide the no-version package.
-#
-
-if {[info exists _V_] == 0} {
-    package provide tdomhtml
-} else {
-    package provide tdomhtml $_V_
-}
+package provide tdomhtml 0.1.0
 
 #
 # Declare HTML generating commands
