@@ -497,10 +497,12 @@ pushToStack (
 static void
 updateStack (
     SchemaData *sdata,
-    int deep
+    int ac,
+    int nm
     )
 {
-    sdata->stack->nrMatched++;
+    sdata->stack->activeChild = ac;
+    sdata->stack->nrMatched = nm;
 }
 
 static void
@@ -516,46 +518,56 @@ popStack (
 }
 
 static int
-matchNamePattern (
+matchElementStart (
     SchemaData *sdata,
-    SchemaCP *pattern,
-    int currentDeep
+    char *name,
+    char *namespace
     )
 {
-    SchemaCP *parent, *candidate;
-    int nm, ac, startac, rc, i;
-    int isName = 0, loopOver = 0;
-    SchemaValidationStack *se;
+
     
-    /* The caller must ensure pattern->type = SCHEMA_CTYPE_NAME */
+    return 0;
+}
 
-    getContext (parent, ac, nm);
-
-    if (ac >= parent->numChildren) {
-        if (parent->type == SCHEMA_CTYPE_NAME) return 0;
-        else return -1;
-    }
-    if (hasMatched (parent->quants[ac], nm)) {
-        sdata->stack->activeChild++;
-        sdata->stack->nrMatched = 0;
-        ac++; nm = 0;
-    }
+static int
+matchName (
+    SchemaData *sdata,
+    char *name,
+    char *namespace,
+    int deep
+    )
+{
+    SchemaCP *cp, *candidate;
+    int nm, ac, startac, rc, i, result;
+    int isName = 0, loopOver = 0;
+    SchemaValidationStack *se, *pse;
+    
+    getContext (cp, ac, nm);
 
     DBG(
-        fprintf (stderr, "matchNamePattern: ac: %d nm: %d\n", ac, nm);
+        fprintf (stderr, "matchName: ac: %d nm: %d\n", ac, nm);
         serializeStack (sdata);
         )
         
-    switch (parent->type) {
+    switch (cp->type) {
     case SCHEMA_CTYPE_NAME:
         isName = 1;
         /* fall through */
     case SCHEMA_CTYPE_GROUP:
     case SCHEMA_CTYPE_PATTERN:
+        if (ac >= cp->numChildren) {
+            if (cp->type == SCHEMA_CTYPE_NAME) return 0;
+            else return -1;
+        }
+        if (hasMatched (cp->quants[ac], nm)) {
+            sdata->stack->activeChild++;
+            sdata->stack->nrMatched = 0;
+            ac++; nm = 0;
+        }
         startac = ac;
     loopOverContent:
-        while (ac < parent->numChildren) {
-            candidate = parent->content[ac];
+        while (ac < cp->numChildren) {
+            candidate = cp->content[ac];
             switch (candidate->type) {
             case SCHEMA_CTYPE_EMPTY:
                 /* The empty pattern never match an element, successfully */
@@ -564,21 +576,21 @@ matchNamePattern (
                 break;
 
             case SCHEMA_CTYPE_ANY:
-                updateStack (sdata, sdata->stack->deep);
+                updateStack (sdata, ac, nm+1);
                 sdata->skipDeep = 1;
                 return 1;
                 
             case SCHEMA_CTYPE_NAME:
-                if (candidate == pattern
-                    || strcmp (candidate->name, pattern->name) == 0) {
-                    updateStack (sdata, sdata->stack->deep);
+                if (candidate->name == name
+                    && candidate->namespace == namespace) {
+                    updateStack (sdata, ac, nm+1);
                     if (loopOver) {
                         sdata->stack->down->nrMatched++;
                     }
-                    pushToStack (sdata, candidate, currentDeep + 1);
+                    pushToStack (sdata, candidate, deep + 1);
                     return 1;
                 }
-                if (mustMatch (parent->quants[ac], nm)) {
+                if (mustMatch (cp->quants[ac], nm)) {
                     if (loopOver) {
                         return -1;
                     } else {
@@ -590,7 +602,7 @@ matchNamePattern (
                 break;
                 
             case SCHEMA_CTYPE_TEXT:
-                if (mustMatch (parent->quants[ac], nm)) return 0;
+                if (mustMatch (cp->quants[ac], nm)) return 0;
                 ac++;
                 nm = 0;
                 break;
@@ -601,15 +613,16 @@ matchNamePattern (
             case SCHEMA_CTYPE_INTERLEAVE:
             case SCHEMA_CTYPE_CHOICE:
                 se = sdata->stack;
-                pushToStack (sdata, candidate, currentDeep);
-                rc = matchNamePattern (sdata, pattern, currentDeep);
+                pushToStack (sdata, candidate, deep);
+                rc = matchName (sdata, name, namespace, deep);
                 if (rc == 1) {
-                    se->nrMatched++;
+                    se->activeChild = ac;
+                    se->nrMatched = nm+1;
                     return 1;
                 }
                 popStack (sdata);
                 /* if (rc == 0) return 0; */
-                if (mustMatch (parent->quants[ac], nm)) return 0;
+                if (mustMatch (cp->quants[ac], nm)) return 0;
                 ac++;
                 nm = 0;
                 break;
@@ -622,40 +635,34 @@ matchNamePattern (
             /* No match, but also no explicit error. */
             /* We finished a non atomic pattern (GROUP or PATTERN). */
             
-            /* Check, if we have to restart the parent pattern (look
+            /* Check, if we have to restart the cp pattern (look
                for match right from the start) because of quant. */
             if (startac) {
                 /* It only make sense to look for a match from the
                  * start if the start active child wasn't already 0*/
                 SchemaQuant *parentQuant;
                 parentQuant = sdata->stack->down->pattern->quants[sdata->stack->down->activeChild];
-                if (mayRepeat (parentQuant)) {
+                if (mayRepeat (parentQuant)
+                    || (!maxOne (parentQuant) && (
+                            sdata->stack->nrMatched < parentQuant->maxOccur
+                            )
+                        )
+                    ) {
+                    sdata->stack->activeChild = 0;
+                    sdata->stack->nrMatched = 0;
                     ac = 0;
                     nm = 0;
                     startac = 0;
                     loopOver = 1;
                     DBG(fprintf (stderr, "... loopOverContent\n"));
                     goto loopOverContent;
-                } else {
-                    if (!maxOne (parentQuant)) {
-                        if (sdata->stack->nrMatched
-                            < parentQuant->maxOccur) {
-                            ac = 0;
-                            nm = 0;
-                            startac = 0;
-                            loopOver = 1;
-                            DBG(fprintf (stderr, "... loopOverContent\n"));
-                            goto loopOverContent;
-                        }
-                    }
-                    
                 }
             }
             return -1;
         }
         
     case SCHEMA_CTYPE_TEXT:
-        if (mustMatch (parent->quants[ac], nm)) return 0;
+        if (mustMatch (cp->quants[ac], nm)) return 0;
         break;
         
     case SCHEMA_CTYPE_ANY:
@@ -664,13 +671,19 @@ matchNamePattern (
         Tcl_Panic ("Invalid CTYPE onto the validation stack!");
 
     case SCHEMA_CTYPE_INTERLEAVE:
-        fprintf (stderr, "matchNamePattern: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
+        fprintf (stderr, "matchName: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
         return 0;
 
     case SCHEMA_CTYPE_MIXED:
     case SCHEMA_CTYPE_CHOICE:
-        for (i = 0; i < parent->numChildren; i++) {
-            candidate = parent->content[i];
+        pse = sdata->stack->down;
+        if (hasMatched (pse->pattern->quants[pse->activeChild],
+                        pse->nrMatched)) {
+            return -1;
+        }
+        result = 0;
+        for (i = 0; i < cp->numChildren; i++) {
+            candidate = cp->content[i];
 
             switch (candidate->type) {
             case SCHEMA_CTYPE_EMPTY:
@@ -678,18 +691,18 @@ matchNamePattern (
                 break;
 
             case SCHEMA_CTYPE_ANY:
-                return 1;
+                result = 1;
+                break;
                 
             case SCHEMA_CTYPE_TEXT:
                 /* An elememt never match text. */
                 break;
                 
             case SCHEMA_CTYPE_NAME:
-                if (candidate == pattern
-                    || strcmp (candidate->name, pattern->name) == 0) {
-                    updateStack (sdata, sdata->stack->deep);
-                    pushToStack (sdata, candidate, currentDeep + 1);
-                    return 1;
+                if (candidate->name == name
+                    && candidate->namespace == namespace) {
+                    pushToStack (sdata, candidate, deep + 1);
+                    result = 1;
                 }
                 break;
                 
@@ -698,16 +711,20 @@ matchNamePattern (
             case SCHEMA_CTYPE_MIXED:
             case SCHEMA_CTYPE_INTERLEAVE:
             case SCHEMA_CTYPE_CHOICE:
-                pushToStack (sdata, candidate, currentDeep);
-                rc = matchNamePattern (sdata, pattern, currentDeep);
+                pushToStack (sdata, candidate, deep);
+                rc = matchName (sdata, name, namespace, deep);
                 if (rc == 1) {
                     /* Matched */
-                    return 1;
+                    result = 1;
+                    break;
                 }
                 popStack (sdata);
                 break;
             }
-            
+            if (result == 1) {
+                if (pse->nrMatched) pse->nrMatched++;
+                return 1;
+            }
         }
         /* No match, but the pattern may be optional or has already
          * matched often enough. Check this on caller level. */
@@ -725,9 +742,9 @@ probeElement (
     ) 
 {
     Tcl_HashEntry *entryPtr;
-    void *namespacePtr;
+    void *namespacePtr, *namePtr;
     SchemaCP *pattern;
-    int currentDeep, rc;
+    int deep, rc;
 
     if (sdata->skipDeep) {
         sdata->skipDeep++;
@@ -737,6 +754,11 @@ probeElement (
         SetResult ("Validation finished.");
         return TCL_ERROR;
     }
+
+    DBG(
+        fprintf (stderr, "probeElement: look if '%s' in ns '%s' match\n",
+                 name, (char *)namespace);
+        );
 
     if (namespace) {
         entryPtr = Tcl_FindHashEntry (&sdata->namespace, (char *)namespace);
@@ -754,22 +776,11 @@ probeElement (
     }
 
     entryPtr = Tcl_FindHashEntry (&sdata->element, name);
-    if (!entryPtr) {
-        SetResult3 ("\"", name, "\" isn't a defined element name in grammar.");
-        return TCL_ERROR;
+    if (entryPtr) {
+        namePtr = Tcl_GetHashKey (&sdata->element, entryPtr);
+    } else {
+        namePtr = NULL;
     }
-    pattern = (SchemaCP *) Tcl_GetHashValue (entryPtr);
-    while (pattern) {
-        if (pattern->namespace == namespacePtr) {
-            break;
-        }
-        pattern = pattern->next;
-    }
-    if (!pattern) {
-        SetResult ("No such element definition.");
-        return TCL_ERROR;
-    }
-
     if (sdata->validationState == VALIDATION_READY) {
         /* The root of the tree to check. */
         if (sdata->start) {
@@ -790,20 +801,31 @@ probeElement (
                 }
             }
         }
+        pattern = (SchemaCP *) Tcl_GetHashValue (entryPtr);
+        while (pattern) {
+            if (pattern->namespace == namespacePtr) {
+                break;
+            }
+            pattern = pattern->next;
+        }
+        if (!pattern) {
+            SetResult ("Root element doesn't match.");
+            return TCL_ERROR;
+        }
         pushToStack (sdata, pattern, 0);
         sdata->validationState = VALIDATION_STARTED;
         return TCL_OK;
     }
     
     /* The normal case: we're inside the tree */
-    DBG(
-        fprintf (stderr, "probeElement: look if '%s' match\n", pattern->name);
-        );
-
-    currentDeep = sdata->stack->deep;
-    while ((rc = matchNamePattern (sdata, pattern, currentDeep)) == -1) {
+    deep = sdata->stack->deep;
+    rc = matchName (sdata, (char *) namePtr, (char *) namespacePtr,
+                    deep);
+    while (rc == -1) {
         popStack (sdata);
         if (!sdata->stack) break;
+        rc = matchName (sdata, (char *) namePtr, (char *) namespacePtr,
+                        deep);
     }
     if (rc == 1) {
         DBG(
@@ -832,9 +854,14 @@ static int checkElementEnd (
     
     getContext (parent, ac, nm);
     
+    if (ac >= parent->numChildren) {
+        if (parent->type == SCHEMA_CTYPE_NAME) return 1;
+        else return -1;
+    }
+    if (hasMatched (parent->quants[ac], nm)) {ac++; nm++;}
     switch (parent->type) {
     case SCHEMA_CTYPE_NAME:
-        if (!sdata->stack->down) return 1;
+        /* if (!sdata->stack->down) return 1; */
         isName = 1;
         /* fall through */
     case SCHEMA_CTYPE_GROUP:
@@ -875,6 +902,13 @@ probeElementEnd (
 {
     int rc;
     
+    DBG(
+        fprintf (stderr, "probeElementEnd: look if current stack top can end "
+                 " name: '%s' deep: %d\n",
+                 sdata->stack->pattern->name, sdata->stack->deep);
+        serializeStack (sdata);
+        );
+    
     if (sdata->skipDeep) {
         sdata->skipDeep--;
         return TCL_OK;
@@ -888,23 +922,19 @@ probeElementEnd (
         return TCL_ERROR;
     }
 
-    DBG(
-        fprintf (stderr, "probeElementEnd: look if current stack top can end "
-                 " name: '%s' currentDeep: %d\n",
-                 sdata->stack->pattern->name, sdata->stack->deep);
-        serializeStack (sdata);
-        );
-    
-    while ((rc = checkElementEnd (sdata)) == -1) {
+    rc = checkElementEnd (sdata);
+    while (rc == -1) {
         if (!sdata->stack->down
             || sdata->stack->deep > sdata->stack->down->deep) {
             break;
         }
         popStack(sdata);
+        rc = checkElementEnd (sdata);
     }
 
     if (rc != 1) {
         SetResult ("Missing mandatory element\n");
+        sdata->validationState = VALIDATION_ERROR;
         DBG(
             fprintf(stderr, "probeElementEnd: CAN'T end here.\n");
             serializeStack (sdata);
@@ -1101,7 +1131,8 @@ validateString (
     XML_SetElementHandler (parser, startElement, endElement);
     XML_SetCharacterDataHandler (parser, characterDataHandler);
     
-    if (XML_Parse (parser, xmlstr, len, 1) != XML_STATUS_OK) {
+    if (XML_Parse (parser, xmlstr, len, 1) != XML_STATUS_OK
+        || sdata->validationState == VALIDATION_ERROR) {
         resultObj = Tcl_NewObj ();
         sprintf(sl, "%ld", XML_GetCurrentLineNumber(parser));
         sprintf(sc, "%ld", XML_GetCurrentColumnNumber(parser));

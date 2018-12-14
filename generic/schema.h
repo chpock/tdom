@@ -80,6 +80,7 @@ typedef struct SchemaValidationStack
 typedef enum {
     VALIDATION_READY,
     VALIDATION_STARTED,
+    VALIDATION_ERROR,
     VALIDATION_FINISHED
 } ValidationState;
 

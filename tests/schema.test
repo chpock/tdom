@@ -850,7 +850,7 @@ test schema-7.10c {loop over seq} {
     set result
 } 1
 
-test schema-7.11 {loop over seq} {knownBug} {
+test schema-7.11 {loop over seq} {
     tdom::schema create grammar
     grammar define {
         defelement doc {
@@ -873,9 +873,9 @@ test schema-7.11 {loop over seq} {knownBug} {
     lappend result [grammar validate <doc><a/><b/><a/><b/></doc>]
     grammar delete
     set result
-} {1 1 1 0}
+} {0 1 1 0}
 
-test schema-7.12 {loop over seq} {knownBug} {
+test schema-7.12 {loop over seq} {
     tdom::schema create grammar
     grammar define {
         defelement doc {
