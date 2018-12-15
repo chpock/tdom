@@ -496,13 +496,13 @@ pushToStack (
 
 static void
 updateStack (
-    SchemaData *sdata,
+    SchemaValidationStack *se,
     int ac,
     int nm
     )
 {
-    sdata->stack->activeChild = ac;
-    sdata->stack->nrMatched = nm;
+    se->activeChild = ac;
+    se->nrMatched = nm;
 }
 
 static void
@@ -524,212 +524,125 @@ matchElementStart (
     char *namespace
     )
 {
-
-    
-    return 0;
-}
-
-static int
-matchName (
-    SchemaData *sdata,
-    char *name,
-    char *namespace,
-    int deep
-    )
-{
     SchemaCP *cp, *candidate;
-    int nm, ac, startac, rc, i, result;
-    int isName = 0, loopOver = 0;
-    SchemaValidationStack *se, *pse;
-    
+    int nm, ac, i;
+    int isName = 0, deep;
+    SchemaValidationStack *se;
+
     getContext (cp, ac, nm);
-
-    DBG(
-        fprintf (stderr, "matchName: ac: %d nm: %d\n", ac, nm);
-        serializeStack (sdata);
-        )
-        
-    switch (cp->type) {
-    case SCHEMA_CTYPE_NAME:
-        isName = 1;
-        /* fall through */
-    case SCHEMA_CTYPE_GROUP:
-    case SCHEMA_CTYPE_PATTERN:
-        if (ac >= cp->numChildren) {
-            if (cp->type == SCHEMA_CTYPE_NAME) return 0;
-            else return -1;
-        }
-        if (hasMatched (cp->quants[ac], nm)) {
-            sdata->stack->activeChild++;
-            sdata->stack->nrMatched = 0;
-            ac++; nm = 0;
-        }
-        startac = ac;
-    loopOverContent:
-        while (ac < cp->numChildren) {
-            candidate = cp->content[ac];
-            switch (candidate->type) {
-            case SCHEMA_CTYPE_EMPTY:
-                /* The empty pattern never match an element, successfully */
-                ac++;
-                nm = 0;
-                break;
-
-            case SCHEMA_CTYPE_ANY:
-                updateStack (sdata, ac, nm+1);
-                sdata->skipDeep = 1;
-                return 1;
-                
-            case SCHEMA_CTYPE_NAME:
-                if (candidate->name == name
-                    && candidate->namespace == namespace) {
-                    updateStack (sdata, ac, nm+1);
-                    if (loopOver) {
-                        sdata->stack->down->nrMatched++;
-                    }
-                    pushToStack (sdata, candidate, deep + 1);
-                    return 1;
-                }
-                if (mustMatch (cp->quants[ac], nm)) {
-                    if (loopOver) {
-                        return -1;
-                    } else {
-                        return 0;
-                    }
-                }
-                ac++;
-                nm = 0;
-                break;
-                
-            case SCHEMA_CTYPE_TEXT:
-                if (mustMatch (cp->quants[ac], nm)) return 0;
-                ac++;
-                nm = 0;
-                break;
-                
-            case SCHEMA_CTYPE_GROUP:
-            case SCHEMA_CTYPE_PATTERN:
-            case SCHEMA_CTYPE_MIXED:
-            case SCHEMA_CTYPE_INTERLEAVE:
-            case SCHEMA_CTYPE_CHOICE:
-                se = sdata->stack;
-                pushToStack (sdata, candidate, deep);
-                rc = matchName (sdata, name, namespace, deep);
-                if (rc == 1) {
-                    se->activeChild = ac;
-                    se->nrMatched = nm+1;
-                    return 1;
-                }
-                popStack (sdata);
-                /* if (rc == 0) return 0; */
-                if (mustMatch (cp->quants[ac], nm)) return 0;
-                ac++;
-                nm = 0;
-                break;
+    se = sdata->stack;
+    deep = se->deep;
+    
+    while (1) {
+        switch (cp->type) {
+        case SCHEMA_CTYPE_NAME:
+            isName = 1;
+            /* fall through */
+        case SCHEMA_CTYPE_GROUP:
+        case SCHEMA_CTYPE_PATTERN:
+            if (hasMatched (cp->quants[ac], nm)) {
+                ac++; nm = 0;
+                updateStack (se, ac, nm);
             }
-        }
-        if (isName) {
-            /* No match, but any remaining possible childs tested */
-            return 0;
-        } else {
-            /* No match, but also no explicit error. */
-            /* We finished a non atomic pattern (GROUP or PATTERN). */
-            
-            /* Check, if we have to restart the cp pattern (look
-               for match right from the start) because of quant. */
-            if (startac) {
-                /* It only make sense to look for a match from the
-                 * start if the start active child wasn't already 0*/
-                SchemaQuant *parentQuant;
-                parentQuant = sdata->stack->down->pattern->quants[sdata->stack->down->activeChild];
-                if (mayRepeat (parentQuant)
-                    || (!maxOne (parentQuant) && (
-                            sdata->stack->nrMatched < parentQuant->maxOccur
-                            )
-                        )
-                    ) {
-                    sdata->stack->activeChild = 0;
-                    sdata->stack->nrMatched = 0;
-                    ac = 0;
-                    nm = 0;
-                    startac = 0;
-                    loopOver = 1;
-                    DBG(fprintf (stderr, "... loopOverContent\n"));
-                    goto loopOverContent;
-                }
-            }
-            return -1;
-        }
-        
-    case SCHEMA_CTYPE_TEXT:
-        if (mustMatch (cp->quants[ac], nm)) return 0;
-        break;
-        
-    case SCHEMA_CTYPE_ANY:
-    case SCHEMA_CTYPE_EMPTY:
-        /* Never pushed onto stack */
-        Tcl_Panic ("Invalid CTYPE onto the validation stack!");
+            while (ac < cp->numChildren) {
+                candidate = cp->content[ac];
+                switch (candidate->type) {
+                case SCHEMA_CTYPE_TEXT:
+                case SCHEMA_CTYPE_EMPTY:
+                    break;
 
-    case SCHEMA_CTYPE_INTERLEAVE:
-        fprintf (stderr, "matchName: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
-        return 0;
-
-    case SCHEMA_CTYPE_MIXED:
-    case SCHEMA_CTYPE_CHOICE:
-        pse = sdata->stack->down;
-        if (hasMatched (pse->pattern->quants[pse->activeChild],
-                        pse->nrMatched)) {
-            return -1;
-        }
-        result = 0;
-        for (i = 0; i < cp->numChildren; i++) {
-            candidate = cp->content[i];
-
-            switch (candidate->type) {
-            case SCHEMA_CTYPE_EMPTY:
-                /* The empty pattern never match an element */
-                break;
-
-            case SCHEMA_CTYPE_ANY:
-                result = 1;
-                break;
+                case SCHEMA_CTYPE_ANY:
+                    updateStack (se, ac, nm+1);
+                    sdata->skipDeep = 1;
+                    return 1;
                 
-            case SCHEMA_CTYPE_TEXT:
-                /* An elememt never match text. */
-                break;
-                
-            case SCHEMA_CTYPE_NAME:
-                if (candidate->name == name
-                    && candidate->namespace == namespace) {
-                    pushToStack (sdata, candidate, deep + 1);
-                    result = 1;
-                }
-                break;
-                
-            case SCHEMA_CTYPE_GROUP:
-            case SCHEMA_CTYPE_PATTERN:
-            case SCHEMA_CTYPE_MIXED:
-            case SCHEMA_CTYPE_INTERLEAVE:
-            case SCHEMA_CTYPE_CHOICE:
-                pushToStack (sdata, candidate, deep);
-                rc = matchName (sdata, name, namespace, deep);
-                if (rc == 1) {
-                    /* Matched */
-                    result = 1;
+                case SCHEMA_CTYPE_NAME:
+                    if (candidate->name == name
+                        && candidate->namespace == namespace) {
+                        updateStack (se, ac, nm+1);
+                        pushToStack (sdata, candidate, deep + 1);
+                        return 1;
+                    }
+                    break;
+                case SCHEMA_CTYPE_GROUP:
+                case SCHEMA_CTYPE_PATTERN:
+                case SCHEMA_CTYPE_MIXED:
+                case SCHEMA_CTYPE_INTERLEAVE:
+                case SCHEMA_CTYPE_CHOICE:
+                    pushToStack (sdata, candidate, deep);
+                    if (matchElementStart (sdata, name, namespace)) {
+                        updateStack (se, ac, nm+1);
+                        return 1;
+                    }
                     break;
                 }
-                popStack (sdata);
-                break;
+                if (mustMatch (cp->quants[ac], nm)) {
+                    return 0;
+                }
+                ac++;
+                nm = 0;
             }
-            if (result == 1) {
-                if (pse->nrMatched) pse->nrMatched++;
-                return 1;
+            if (isName) return 0;
+            popStack (sdata);
+            getContext (cp, ac, nm);
+            se = sdata->stack;
+            continue;
+            
+        case SCHEMA_CTYPE_TEXT:
+            return 0;
+        
+        case SCHEMA_CTYPE_ANY:
+        case SCHEMA_CTYPE_EMPTY:
+            /* Never pushed onto stack */
+            Tcl_Panic ("Invalid CTYPE onto the validation stack!");
+
+        case SCHEMA_CTYPE_INTERLEAVE:
+            fprintf (stderr, "matchElementStart: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
+            return 0;
+
+        case SCHEMA_CTYPE_MIXED:
+        case SCHEMA_CTYPE_CHOICE:
+            for (i = 0; i < cp->numChildren; i++) {
+                candidate = cp->content[i];
+                switch (candidate->type) {
+                case SCHEMA_CTYPE_TEXT:
+                case SCHEMA_CTYPE_EMPTY:
+                    break;
+
+                case SCHEMA_CTYPE_ANY:
+                    se->activeChild = ac;
+                    se->nrMatched = nm + 1;
+                    sdata->skipDeep = 1;
+                    return 1;
+                    
+                case SCHEMA_CTYPE_NAME:
+                    if (candidate->name == name
+                        && candidate->namespace == namespace) {
+                        se->activeChild = i;
+                        se->nrMatched = 1;
+                        pushToStack (sdata, candidate, deep + 1);
+                        return 1;
+                    }
+                case SCHEMA_CTYPE_GROUP:
+                case SCHEMA_CTYPE_PATTERN:
+                case SCHEMA_CTYPE_MIXED:
+                case SCHEMA_CTYPE_INTERLEAVE:
+                case SCHEMA_CTYPE_CHOICE:
+                    pushToStack (sdata, candidate, deep);
+                    if (matchElementStart (sdata, name, namespace)) {
+                        /* Matched */
+                        se->activeChild = i;
+                        se->nrMatched = 1;
+                        return 1;
+                    }
+                    popStack (sdata);
+                    break;
+                }
             }
+            return 0;
         }
-        /* No match, but the pattern may be optional or has already
-         * matched often enough. Check this on caller level. */
-        return -1;
     }
+    
     return 0;
 }
 
@@ -744,7 +657,6 @@ probeElement (
     Tcl_HashEntry *entryPtr;
     void *namespacePtr, *namePtr;
     SchemaCP *pattern;
-    int deep, rc;
 
     if (sdata->skipDeep) {
         sdata->skipDeep++;
@@ -818,16 +730,7 @@ probeElement (
     }
     
     /* The normal case: we're inside the tree */
-    deep = sdata->stack->deep;
-    rc = matchName (sdata, (char *) namePtr, (char *) namespacePtr,
-                    deep);
-    while (rc == -1) {
-        popStack (sdata);
-        if (!sdata->stack) break;
-        rc = matchName (sdata, (char *) namePtr, (char *) namespacePtr,
-                        deep);
-    }
-    if (rc == 1) {
+    if (matchElementStart (sdata, (char *) namePtr, (char *) namespacePtr)) {
         DBG(
             fprintf (stderr, "probeElement: element '%s' match\n", name);
             serializeStack (sdata);
