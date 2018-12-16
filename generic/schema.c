@@ -574,6 +574,7 @@ matchElementStart (
                         updateStack (se, ac, nm+1);
                         return 1;
                     }
+                    popStack (sdata);
                     break;
                 }
                 if (mustMatch (cp->quants[ac], nm)) {
@@ -751,26 +752,31 @@ static int checkElementEnd (
     SchemaData *sdata
     )
 {
-    SchemaCP *parent;
+    SchemaCP *cp;
     int nm, ac;
     int isName = 0;
     
-    getContext (parent, ac, nm);
+    getContext (cp, ac, nm);
     
-    if (ac >= parent->numChildren) {
-        if (parent->type == SCHEMA_CTYPE_NAME) return 1;
+    if (ac >= cp->numChildren) {
+        if (cp->type == SCHEMA_CTYPE_NAME) return 1;
         else return -1;
     }
-    if (hasMatched (parent->quants[ac], nm)) {ac++; nm++;}
-    switch (parent->type) {
+    if (hasMatched (cp->quants[ac], nm)) {
+        DBG(fprintf (stderr, "ac has matched, skiping to next ac\n"));
+        ac++; nm = 0;
+    }
+    switch (cp->type) {
     case SCHEMA_CTYPE_NAME:
         /* if (!sdata->stack->down) return 1; */
         isName = 1;
         /* fall through */
     case SCHEMA_CTYPE_GROUP:
     case SCHEMA_CTYPE_PATTERN:
-        while (ac < parent->numChildren) {
-            if (mustMatch (parent->quants[ac], nm)) {
+        while (ac < cp->numChildren) {
+            DBG(fprintf (stderr, "ac %d mustMatch: %d\n",
+                         ac, mustMatch (cp->quants[ac], nm)));
+            if (mustMatch (cp->quants[ac], nm)) {
                 return 0;
             }
             ac ++;
@@ -832,9 +838,10 @@ probeElementEnd (
             break;
         }
         popStack(sdata);
+        DBG(fprintf (stderr, "probe element end again after popping from stack\n");
+            serializeStack (sdata));
         rc = checkElementEnd (sdata);
     }
-
     if (rc != 1) {
         SetResult ("Missing mandatory element\n");
         sdata->validationState = VALIDATION_ERROR;
@@ -1574,14 +1581,19 @@ EmptyAnyPatternObjCmd (
 {
     SchemaData *sdata = GETASI;
     SchemaCP *pattern;
-    
+    SchemaQuant *quant;
+
     CHECK_SI
     CHECK_TOPLEVEL
-    checkNrArgs (1,1,"No arguments expected.");
+    checkNrArgs (1,2,"?quant?");
+    quant = getQuant (interp, sdata, objc == 1 ? NULL : objv[1]);
+    if (!quant) {
+        return TCL_ERROR;
+    }
     pattern = initSchemaCP ((Schema_CP_Type) clientData,
                                NULL, NULL);
     REMEMBER_PATTERN (pattern)
-    ADD_TO_CONTENT (pattern, quantRep)
+    ADD_TO_CONTENT (pattern, quant)
     return TCL_OK;
 }
 
