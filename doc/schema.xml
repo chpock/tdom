@@ -215,11 +215,6 @@
       </commanddef>
       
       <commanddef>
-        <command><method>empty</method></command>
-        <desc></desc>
-      </commanddef>
-
-      <commanddef>
         <command><method>defelement</method> <m>name</m> <m>?namespace?</m> <m>&lt;definition script></m></command>
         <desc></desc>
       </commanddef>

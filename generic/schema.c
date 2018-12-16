@@ -97,7 +97,6 @@ typedef struct
 
 #ifdef DEBUG
 static char *Schema_CP_Type2str[] = {
-    "EMPTY",
     "ANY",
     "MIXED",
     "NAME",
@@ -112,7 +111,6 @@ static char *Schema_Quant_Type2str[] = {
     "OPT",
     "REP",
     "PLUS",
-    "N",
     "NM"
 };
 #endif
@@ -229,7 +227,6 @@ initSchemaCP (
             sizeof (SchemaQuant*) * CONTENT_ARRAY_SIZE_INIT
             );
         break;
-    case SCHEMA_CTYPE_EMPTY:
     case SCHEMA_CTYPE_ANY:
     case SCHEMA_CTYPE_TEXT:
         /* Do nothing */
@@ -266,7 +263,6 @@ static void serializeCP (
     case SCHEMA_CTYPE_INTERLEAVE:
         fprintf (stderr, "\t%d childs\n", pattern->numChildren);
         break;
-    case SCHEMA_CTYPE_EMPTY:
     case SCHEMA_CTYPE_ANY:
     case SCHEMA_CTYPE_TEXT:
         /* Do nothing */
@@ -307,7 +303,6 @@ static void freeSchemaCP (
     )
 {
     switch (pattern->type) {
-    case SCHEMA_CTYPE_EMPTY:
     case SCHEMA_CTYPE_ANY:
         /* do nothing */
         break;
@@ -548,7 +543,6 @@ matchElementStart (
                 candidate = cp->content[ac];
                 switch (candidate->type) {
                 case SCHEMA_CTYPE_TEXT:
-                case SCHEMA_CTYPE_EMPTY:
                     break;
 
                 case SCHEMA_CTYPE_ANY:
@@ -593,7 +587,6 @@ matchElementStart (
             return 0;
         
         case SCHEMA_CTYPE_ANY:
-        case SCHEMA_CTYPE_EMPTY:
             /* Never pushed onto stack */
             Tcl_Panic ("Invalid CTYPE onto the validation stack!");
 
@@ -607,7 +600,6 @@ matchElementStart (
                 candidate = cp->content[i];
                 switch (candidate->type) {
                 case SCHEMA_CTYPE_TEXT:
-                case SCHEMA_CTYPE_EMPTY:
                     break;
 
                 case SCHEMA_CTYPE_ANY:
@@ -787,7 +779,6 @@ static int checkElementEnd (
 
     case SCHEMA_CTYPE_TEXT:
     case SCHEMA_CTYPE_ANY:
-    case SCHEMA_CTYPE_EMPTY:
         /* Never pushed onto stack */
         Tcl_Panic ("Invalid CTYPE onto the validation stack!");
         return 0;
@@ -1570,9 +1561,9 @@ getQuant (
     return initSchemaQuant (sdata, SCHEMA_CQUANT_NM, n, m);
 }
 
-/* Implements the grammar definition commands "empty" and "any" */
+/* Implements the grammar definition command "any" */
 static int
-EmptyAnyPatternObjCmd (
+AnyPatternObjCmd (
     ClientData clientData,
     Tcl_Interp *interp,
     int objc,
@@ -1590,8 +1581,7 @@ EmptyAnyPatternObjCmd (
     if (!quant) {
         return TCL_ERROR;
     }
-    pattern = initSchemaCP ((Schema_CP_Type) clientData,
-                               NULL, NULL);
+    pattern = initSchemaCP (SCHEMA_CTYPE_ANY, NULL, NULL);
     REMEMBER_PATTERN (pattern)
     ADD_TO_CONTENT (pattern, quant)
     return TCL_OK;
@@ -1811,7 +1801,7 @@ TextPatternObjCmd (
     
     CHECK_SI
     CHECK_TOPLEVEL
-    checkNrArgs (1,1,"No arguments expected.");
+    checkNrArgs (1,2,"?<definition script>?");
     pattern = initSchemaCP ((Schema_CP_Type) clientData,
                                NULL, NULL);
     REMEMBER_PATTERN (pattern)
@@ -1841,13 +1831,9 @@ tDOM_SchemaInit (
     Tcl_CreateObjCommand (interp, "tdom::schema::start",
                           schemaInstanceCmd, NULL, NULL);
     
-    /* The "empty" and "any" definition commands. */
-    Tcl_CreateObjCommand (interp, "tdom::schema::empty",
-                          EmptyAnyPatternObjCmd,
-                          (ClientData) SCHEMA_CTYPE_EMPTY, NULL);
+    /* The "any" definition command. */
     Tcl_CreateObjCommand (interp, "tdom::schema::any",
-                          EmptyAnyPatternObjCmd,
-                          (ClientData) SCHEMA_CTYPE_ANY, NULL);
+                          AnyPatternObjCmd, NULL, NULL);
 
     /* The named pattern commands "element" and "ref". */
     Tcl_CreateObjCommand (interp, "tdom::schema::element",

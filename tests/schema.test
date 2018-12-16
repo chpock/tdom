@@ -50,8 +50,8 @@ test schema-1.5 {grammar cmd} {
         element elm1
         element elm2 *
     }
-    grammar defelement elm1 empty
-    grammar defelement elm2 empty
+    grammar defelement elm1 {}
+    grammar defelement elm2 {}
     grammar delete
 } {}
 
@@ -99,7 +99,7 @@ test schema-1.8 {Same element name in different Namespaces} {
         element elm1
         element elm2
     }
-    grammar defelement elm1 ns2 empty
+    grammar defelement elm1 ns2 {}
     grammar defelement elm2 ns2 any
     set result [catch {
         grammar defelement elm1 ns1 {
@@ -111,7 +111,7 @@ test schema-1.8 {Same element name in different Namespaces} {
         }
     }]
     grammar defelement elm1 ns1 any
-    grammar defelement elm2 ns1 empty
+    grammar defelement elm2 ns1 {}
     grammar delete
     set result
 } 1
@@ -133,7 +133,7 @@ test schema-1.9 {Same element name in different Namespaces} {
             element elm1
             element elm2
         }
-        grammar defelement elm1 ns2 empty
+        grammar defelement elm1 ns2 {}
         grammar defelement elm2 ns2 any
         grammar defelement elm1 ns1 {
             choice {
