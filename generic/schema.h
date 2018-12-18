@@ -17,7 +17,7 @@
 |
 |
 |   written by Rolf Ade
-|   November 2018
+|   Nov, Dec 2018
 |
 \---------------------------------------------------------------------------*/
 
@@ -103,6 +103,7 @@ typedef struct
     char *currentAttributeNamespace;
     int   defineToplevel;
     int   isAttribute;
+    SchemaCP *currentCP;
     SchemaCP **currentContent;
     SchemaQuant **currentQuants;
     unsigned int numChildren;

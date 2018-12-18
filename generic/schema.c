@@ -17,7 +17,7 @@
 |
 |
 |   written by Rolf Ade
-|   November 2018
+|   Nov, Dec 2018
 |
 \---------------------------------------------------------------------------*/
 
@@ -155,20 +155,20 @@ static void SetActiveSchemaData (SchemaData *v)
 
 #define CHECK_SI                                                        \
     if (!sdata) {                                                       \
-        SetResult ("Command called outside of grammar context.");       \
+        SetResult ("Command called outside of schema context.");       \
         return TCL_ERROR;                                               \
     }
 
 #define CHECK_TOPLEVEL                                                  \
     if (sdata->defineToplevel) {                                        \
         SetResult("Command not allowed at top level "                   \
-                  "in grammar define evaluation");                      \
+                  "in schema define evaluation");                      \
         return TCL_ERROR;                                               \
     }
 
 #define CHECK_SI_CONTEXT                                                \
     if (sdata->isAttribute) {                                           \
-        SetResult ("Command called in invalid grammar context.");       \
+        SetResult ("Command called in invalid schema context.");       \
         return TCL_ERROR;                                               \
     }
 
@@ -875,7 +875,7 @@ probeText (
     char *text
     )
 {
-    SchemaCP *parent;
+    SchemaCP *cp;
     int ac, nm, only_whites;
     char *pc;
 
@@ -892,17 +892,20 @@ probeText (
         return TCL_ERROR;
     }
 
-    getContext (parent, ac, nm);
+    getContext (cp, ac, nm);
 
-    while (ac < parent->numChildren) {
-        if (parent->content[ac]->type == SCHEMA_CTYPE_TEXT
-            || mustMatch (parent->quants[ac], nm)) break;
+    if (cp->type == SCHEMA_CTYPE_MIXED) {
+        return TCL_OK;
+    }
+    while (ac < cp->numChildren) {
+        if (cp->content[ac]->type == SCHEMA_CTYPE_TEXT
+            || mustMatch (cp->quants[ac], nm)) break;
         ac++;
         nm = 0;
     }
-    if (ac < parent->numChildren) {
-        if (parent->content[ac]->type == SCHEMA_CTYPE_TEXT) {
-            return checkText (interp, parent->content[ac], text);
+    if (ac < cp->numChildren) {
+        if (cp->content[ac]->type == SCHEMA_CTYPE_TEXT) {
+            return checkText (interp, cp->content[ac], text);
         }
     }
     /* If we are here then there isn't a matching TEXT cp. Check, if
@@ -1194,6 +1197,7 @@ schemaInstanceCmd (
         savedNamespacePtr = sdata->currentNamespace;
         sdata->defineToplevel = 0;
         sdata->currentNamespace = namespacePtr;
+        sdata->currentCP = pattern;
         sdata->currentContent = pattern->content;
         sdata->currentQuants = pattern->quants;
         sdata->numChildren = 0;
@@ -1231,6 +1235,7 @@ schemaInstanceCmd (
         SETASI(sdata);
         savedNumPatternList = sdata->numPatternList;
         sdata->currentNamespace = 0;
+        sdata->currentCP = NULL;
         sdata->currentContent = NULL;
         sdata->currentQuants = NULL;
         sdata->numChildren = 0;
@@ -1561,7 +1566,7 @@ getQuant (
     return initSchemaQuant (sdata, SCHEMA_CQUANT_NM, n, m);
 }
 
-/* Implements the grammar definition command "any" */
+/* Implements the schema definition command "any" */
 static int
 AnyPatternObjCmd (
     ClientData clientData,
@@ -1596,17 +1601,19 @@ evalDefinition (
     SchemaQuant *quant
     )
 {
-    SchemaCP **savedCurrentContent;
+    SchemaCP **savedCurrentContent, *savedCurrentCP;
     SchemaQuant **savedCurrentQuant;
     unsigned int savedNumChildren, savedContenSize;
     int result;
 
     /* Save some state of sdata .. */
+    savedCurrentCP = sdata->currentCP;
     savedCurrentContent = sdata->currentContent;
     savedCurrentQuant = sdata->currentQuants;
     savedNumChildren = sdata->numChildren;
     savedContenSize = sdata->contentSize;
     /* ... and prepare sdata for definition evaluation. */
+    sdata->currentCP = pattern;
     sdata->currentContent = pattern->content;
     sdata->currentQuants = pattern->quants;
     sdata->numChildren = 0;
@@ -1619,6 +1626,7 @@ evalDefinition (
     pattern->quants = sdata->currentQuants;
     pattern->numChildren = sdata->numChildren;
     /* ... and restore the previously saved sdata states  */
+    sdata->currentCP = savedCurrentCP;
     sdata->currentContent = savedCurrentContent;
     sdata->currentQuants = savedCurrentQuant;
     sdata->numChildren = savedNumChildren;
@@ -1633,7 +1641,7 @@ evalDefinition (
     return result;
 }
 
-/* Implements the grammar definition commands "element" and "ref" */
+/* Implements the schema definition commands "element" and "ref" */
 static int
 NamedPatternObjCmd (
     ClientData clientData,
@@ -1716,7 +1724,7 @@ NamedPatternObjCmd (
     return TCL_OK;
 }
 
-/* Implements the grammar definition commands "choice", "group",
+/* Implements the schema definition commands "choice", "group",
  * "interleave" and "mixed" */
 static int
 AnonPatternObjCmd (
