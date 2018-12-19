@@ -155,20 +155,20 @@ static void SetActiveSchemaData (SchemaData *v)
 
 #define CHECK_SI                                                        \
     if (!sdata) {                                                       \
-        SetResult ("Command called outside of schema context.");       \
+        SetResult ("Command called outside of schema context.");        \
         return TCL_ERROR;                                               \
     }
 
 #define CHECK_TOPLEVEL                                                  \
     if (sdata->defineToplevel) {                                        \
         SetResult("Command not allowed at top level "                   \
-                  "in schema define evaluation");                      \
+                  "in schema define evaluation");                       \
         return TCL_ERROR;                                               \
     }
 
 #define CHECK_SI_CONTEXT                                                \
     if (sdata->isAttribute) {                                           \
-        SetResult ("Command called in invalid schema context.");       \
+        SetResult ("Command called in invalid schema context.");        \
         return TCL_ERROR;                                               \
     }
 
@@ -520,7 +520,7 @@ matchElementStart (
     )
 {
     SchemaCP *cp, *candidate;
-    int nm, ac, i;
+    int nm, ac, i, start, end;
     int isName = 0, deep;
     SchemaValidationStack *se;
 
@@ -596,7 +596,20 @@ matchElementStart (
 
         case SCHEMA_CTYPE_MIXED:
         case SCHEMA_CTYPE_CHOICE:
-            for (i = 0; i < cp->numChildren; i++) {
+            if (hasMatched (cp->quants[ac], nm)) {
+                popStack (sdata);
+                getContext (cp, ac, nm);
+                se = sdata->stack;
+                continue;
+            }
+            if (nm) {
+                start = ac;
+                end = ac + 1;
+            } else {
+                start = 0;
+                end = cp->numChildren;
+            }
+            for (i = start; i < end; i++) {
                 candidate = cp->content[i];
                 switch (candidate->type) {
                 case SCHEMA_CTYPE_TEXT:
@@ -612,7 +625,7 @@ matchElementStart (
                     if (candidate->name == name
                         && candidate->namespace == namespace) {
                         se->activeChild = i;
-                        se->nrMatched = 1;
+                        se->nrMatched = nm + 1;
                         pushToStack (sdata, candidate, deep + 1);
                         return 1;
                     }
@@ -625,7 +638,7 @@ matchElementStart (
                     if (matchElementStart (sdata, name, namespace)) {
                         /* Matched */
                         se->activeChild = i;
-                        se->nrMatched = 1;
+                        se->nrMatched = nm + 1;
                         return 1;
                     }
                     popStack (sdata);
@@ -750,14 +763,6 @@ static int checkElementEnd (
     
     getContext (cp, ac, nm);
     
-    if (ac >= cp->numChildren) {
-        if (cp->type == SCHEMA_CTYPE_NAME) return 1;
-        else return -1;
-    }
-    if (hasMatched (cp->quants[ac], nm)) {
-        DBG(fprintf (stderr, "ac has matched, skiping to next ac\n"));
-        ac++; nm = 0;
-    }
     switch (cp->type) {
     case SCHEMA_CTYPE_NAME:
         /* if (!sdata->stack->down) return 1; */
@@ -765,6 +770,10 @@ static int checkElementEnd (
         /* fall through */
     case SCHEMA_CTYPE_GROUP:
     case SCHEMA_CTYPE_PATTERN:
+        if (ac < cp->numChildren && (hasMatched (cp->quants[ac], nm))) {
+            DBG(fprintf (stderr, "ac has matched, skiping to next ac\n"));
+            ac++; nm = 0;
+        }
         while (ac < cp->numChildren) {
             DBG(fprintf (stderr, "ac %d mustMatch: %d\n",
                          ac, mustMatch (cp->quants[ac], nm)));
@@ -789,7 +798,10 @@ static int checkElementEnd (
         
     case SCHEMA_CTYPE_MIXED:
     case SCHEMA_CTYPE_CHOICE:
-        return -1;
+        if (hasMatched (cp->quants[ac], nm)) {
+            return -1;
+        }
+        return 0;
     }
     return 0;
 }

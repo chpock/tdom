@@ -1065,10 +1065,63 @@ test schema-9.1 {choice} {
     lappend result [grammar validate {<doc xmlns="foouri"><e1/></doc>}]
     lappend result [grammar validate {<doc xmlns="foouri"><e1/><e1/></doc>}]
     lappend result [grammar validate {<doc xmlns="foouri"><e1/><e2/><e1/></doc>}]
+    lappend result [grammar validate {<doc xmlns="foouri"><e1/><e1/><e2/><e1/></doc>}]
+    lappend result [grammar validate {<doc xmlns="foouri"><e1/><e1/><e2/><e1/><e2/><e2/></doc>}]
     grammar delete
     set result
-} {1 1 1 1}
-    
+} {1 1 1 1 1 1}
+
+test schema-9.2 {group} {
+    tdom::schema create grammar
+    grammar define {
+        defelement doc foouri {
+            group {
+                element e1
+                element e2 *
+            }
+        }
+        foreach e {e1 e2} {
+            defelement $e foouri {}
+        }
+    }
+    set result [grammar validate {<doc xmlns="foouri"/>}]
+    lappend result [grammar validate {<doc xmlns="foouri"><e1/></doc>}]
+    lappend result [grammar validate {<doc xmlns="foouri"><e1/><e1/></doc>}]
+    lappend result [grammar validate {<doc xmlns="foouri"><e1/><e2/><e1/></doc>}]
+    lappend result [grammar validate {<doc xmlns="foouri"><e1/><e1/><e2/><e1/></doc>}]
+    lappend result [grammar validate {<doc xmlns="foouri"><e1/><e1/><e2/><e1/><e2/><e2/></doc>}]
+    lappend result [grammar validate {<doc xmlns="foouri"><e1/><e2/><e2/></doc>}]
+    grammar delete
+    set result
+} {0 1 0 0 0 0 1}
+
+test schema-9.3 {choice} {
+    tdom::schema create grammar
+    grammar define {
+        defelement doc foouri {
+            choice * {
+                element e1
+                group {
+                    element e2
+                    element e3
+                }
+            }
+        }
+        foreach e {e1 e2} {
+            defelement $e foouri {}
+        }
+    }
+    set result [grammar validate {<doc xmlns="foouri"/>}]
+    lappend result [grammar validate {<doc xmlns="foouri"><e1/></doc>}]
+    lappend result [grammar validate {<doc xmlns="foouri"><e2/><e3/></doc>}]
+    lappend result [grammar validate {<doc xmlns="foouri"><e1/><e2/><e3/></doc>}]
+    lappend result [grammar validate {<doc xmlns="foouri"><e1/><e1/></doc>}]
+    lappend result [grammar validate {<doc xmlns="foouri"><e1/><e2/><e3/><e2/><e3/><e1/></doc>}]
+    lappend result [grammar validate {<doc xmlns="foouri"><e1/><e2/><e2/></doc>}]
+    grammar delete
+    set result
+} {0 1 1 1 1 1 1 0}
+
 test schema-10.1 {any} {
     tdom::schema create s
     s define {
