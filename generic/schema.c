@@ -944,6 +944,8 @@ startElement(
         if (probeText (vdata->interp, vdata->sdata,
                        Tcl_DStringValue (vdata->cdata)) != TCL_OK) {
             XML_StopParser (vdata->parser, 0);
+            Tcl_DStringSetLength (vdata->cdata, 0);
+            return;
         }
         Tcl_DStringSetLength (vdata->cdata, 0);
     }
@@ -986,6 +988,8 @@ endElement (
         if (probeText (vdata->interp, vdata->sdata,
                        Tcl_DStringValue (vdata->cdata)) != TCL_OK) {
             XML_StopParser (vdata->parser, 0);
+            Tcl_DStringSetLength (vdata->cdata, 0);
+            return;
         }
         Tcl_DStringSetLength (vdata->cdata, 0);
     }
@@ -1586,10 +1590,16 @@ AnyPatternObjCmd (
     if (!quant) {
         return TCL_ERROR;
     }
-    pattern = initSchemaCP (SCHEMA_CTYPE_ANY, NULL, NULL);
-    REMEMBER_PATTERN (pattern)
-    ADD_TO_CONTENT (pattern, quant)
-    return TCL_OK;
+    if (quant == quantOne
+        || quant == quantOpt
+        || (quant->type == SCHEMA_CQUANT_NM && (quant->minOccur == quant->maxOccur))) {
+        pattern = initSchemaCP (SCHEMA_CTYPE_ANY, NULL, NULL);
+        REMEMBER_PATTERN (pattern)
+        ADD_TO_CONTENT (pattern, quant)
+        return TCL_OK;
+    }
+    SetResult("The any command allows only the quantifier !, ? and <integer>");
+    return TCL_ERROR;
 }
 
 static int

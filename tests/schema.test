@@ -172,7 +172,7 @@ test schema-1.11 {define} {
     }} errMsg]
     grammar delete
     lappend result $errMsg
-} {1 {Command not allowed at top level in grammar define evaluation}}
+} {1 {Command not allowed at top level in schema define evaluation}}
 
 test schema-1.12 {define} {
     tdom::schema create grammar
@@ -185,7 +185,7 @@ test schema-1.12 {define} {
     }} errMsg]
     grammar delete
     lappend result $errMsg
-} {1 {Command not allowed at top level in grammar define evaluation}}
+} {1 {Command not allowed at top level in schema define evaluation}}
 
 test schema-2.1 {grammar definition: ref} {
     tdom::schema create grammar
@@ -710,8 +710,34 @@ test schema-7.7 {nested groups via refs} {
     if {[grammar state] ne "FINISHED"} {
         error "Wrong state."
     }
+    grammar reset
+    set result [grammar validate {
+         <doc>
+           <!-- ref b start -->
+           <b2/>
+           <!-- inside ref b: ref a start -->
+           <e1/>
+           <e1>
+             <e2/>
+           </e1>
+           <e2/>
+           <e3/>
+           <!-- inside ref b: ref a end -->
+           <!-- inside ref b: ref a start -->
+        <b2/>
+        <e1/>
+           <e1>
+             <e2/>
+           </e1>
+           <e2/>
+           <e3/>
+           <!-- inside ref b: ref a end -->
+           <!-- ref b end -->
+         </doc>
+    } msg]
     grammar delete
-} {}
+    set result
+} 1
 
 test schema-7.8 {nested groups via refs} {
     tdom::schema create grammar
@@ -927,6 +953,101 @@ test schema-8.2 {validate method} {
     set result
 } {1 0}
 
+test schema-8.3 {validate method: white space between elements} {
+    tdom::schema create grammar
+    grammar define {
+        defpattern a  {
+            group {
+                element e1
+                element e1 1 {
+                    element e2
+                }
+                element e2
+            }
+            element e3 ?
+        }
+        defpattern b  {
+            element b1 *
+            group 2 {
+                element b2
+                ref a
+            }
+        }
+        foreach e {e1 e2 e3 b1 b2} {
+            defelement $e  {}
+        }
+        defelement doc  {
+            group {
+                ref b
+            }
+        }
+    }
+    set result [grammar validate {
+         <doc>
+           <!-- ref b start -->
+           <b2/>
+           <!-- inside ref b: ref a start -->
+           <e1/>
+           <e1>
+             <e2/>
+           </e1>
+           <e2/>
+           <e3/>
+           <!-- inside ref b: ref a end -->
+           <!-- inside ref b: ref a start -->
+        <b2/>
+        <e1/>
+           <e1>
+             <e2/>
+           </e1>
+           <e2/>
+           <e3/>
+           <!-- inside ref b: ref a end -->
+           <!-- ref b end -->
+         </doc>
+    } msg]
+    grammar delete
+    set result
+} 1
+
+test schema-8.4 {illegal text} {
+    tdom::schema create grammar
+    grammar define {
+        defelement doc {
+            group * {
+                element a
+                element b
+            }
+            element c
+        }
+        foreach e {a b c} {
+            defelement $e {}
+        }
+    }
+    set result [grammar validate <doc><a/><b/>wrong<c/></doc> errMsg]
+    grammar delete
+    set result
+} 0
+
+test schema-8.5 {illegal text - expat not signaling XML_STATUS_SUSPENDED although XML_StopParser() was called in handler, again.} {knownBug} {
+    tdom::schema create grammar
+    grammar define {
+        defelement doc {
+            group * {
+                element a
+                element b
+            }
+            element c
+        }
+        foreach e {a b c} {
+            defelement $e {}
+        }
+    }
+    set result [grammar validate <doc><a/><b/>wrong<c/></doc> errMsg]
+    grammar delete
+    set result
+} 0
+
 test schema-9.1 {choice} {
     tdom::schema create grammar
     grammar define {
@@ -941,17 +1062,13 @@ test schema-9.1 {choice} {
         }
     }
     set result [grammar validate {<doc xmlns="foouri"/>}]
-    grammar reset
     lappend result [grammar validate {<doc xmlns="foouri"><e1/></doc>}]
-    grammar reset
     lappend result [grammar validate {<doc xmlns="foouri"><e1/><e1/></doc>}]
-    grammar reset
     lappend result [grammar validate {<doc xmlns="foouri"><e1/><e2/><e1/></doc>}]
     grammar delete
     set result
 } {1 1 1 1}
     
-
 test schema-10.1 {any} {
     tdom::schema create s
     s define {
@@ -964,7 +1081,64 @@ test schema-10.1 {any} {
         defelement b {}
     }
     set result [s validate {<doc><a/><something/><b/></doc>}]
-    #lappend result [s validate {<doc><a/><a><b>text</b><c><c><c/></c></c></a><b/></doc>}]
+    lappend result [s validate {<doc><a/><a><b>text</b><c><c><c/></c></c></a><b/></doc>}]
     s delete
     set result
-} 1            
+} {1 1}            
+
+test schema-10.2 {any} {
+    tdom::schema create s
+    s define {
+        defelement doc {
+            element a
+            any 1
+            element b
+        }
+        defelement a {}
+        defelement b {}
+    }
+    set result [s validate {<doc><a/><something/><b/></doc>}]
+    lappend result [s validate {<doc><a/><something/><something/><b/></doc>}]
+    lappend result [s validate {<doc><a/><b/></doc>}]
+    lappend result [s validate {<doc><a/><a><b>text</b><c><c><c/></c></c></a><b/></doc>}]
+    s delete
+    set result
+} {1 0 0 1}
+
+test schema-10.3 {any} {
+    tdom::schema create s
+    s define {
+        defelement doc {
+            element a
+            any ?
+            element b
+        }
+        defelement a {}
+        defelement b {}
+    }
+    set result [s validate {<doc><a/><something/><b/></doc>}]
+    lappend result [s validate {<doc><a/><something/><something/><b/></doc>}]
+    lappend result [s validate {<doc><a/><b/></doc>}]
+    lappend result [s validate {<doc><a/><a><b>text</b><c><c><c/></c></c></a><b/></doc>}]
+    s delete
+    set result
+} {1 0 0 1}
+
+test schema-10.4 {any} {
+    tdom::schema create s
+    s define {
+        defelement doc {
+            element a
+            any 2
+            element b
+        }
+        defelement a {}
+        defelement b {}
+    }
+    set result [s validate {<doc><a/><something/><b/></doc>}]
+    lappend result [s validate {<doc><a/><something/><something/><b/></doc>}]
+    lappend result [s validate {<doc><a/><b/></doc>}]
+    lappend result [s validate {<doc><a/><a><b>text</b><c><c><c/></c></c></a><b/></doc>}]
+    s delete
+    set result
+} {0 1 0 0}
