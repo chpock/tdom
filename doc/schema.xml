@@ -113,7 +113,9 @@
         <desc>Returns true if the <m>&lt;XML string></m> is valid or
         false otherwise. If validation failed and the optional
         <m>objVar</m> argument is given, then the variable with that
-        name is set to a validation error message.</desc>
+        name is set to a validation error message. If the XML string
+        is valid and the optional <m>objVar</m> argument is given,
+        then the variable with that name is set to the empty string.</desc>
       </commanddef>
 
       <commanddef>

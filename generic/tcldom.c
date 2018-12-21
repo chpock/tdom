@@ -6696,14 +6696,15 @@ int tcldom_featureinfo (
         "expatmicroversion", "dtd",                "ns",
         "unknown",           "tdomalloc",          "lessns",
         "html5",             "jsonmaxnesting",     "versionhash",
-        "pullparser",        "TCL_UTF_MAX",        NULL
+        "pullparser",        "TCL_UTF_MAX",        "schema",
+        NULL
     };
     enum feature {
         o_expatversion,      o_expatmajorversion,  o_expatminorversion,
         o_expatmicroversion, o_dtd,                o_ns,
         o_unknown,           o_tdomalloc,          o_lessns,
         o_html5,             o_jsonmaxnesting,     o_versionhash,
-        o_pullparser,        o_TCL_UTF_MAX,
+        o_pullparser,        o_TCL_UTF_MAX,        o_schema
     };
 
     if (Tcl_GetIndexFromObj(interp, objv[1], features, "feature", 0,
@@ -6781,6 +6782,14 @@ int tcldom_featureinfo (
         break;
     case o_pullparser:
 #ifndef TDOM_NO_PULL
+        result = 1;
+#else
+        result = 0;
+#endif
+        SetBooleanResult(result);
+        break;
+    case o_schema:
+#ifndef TDOM_NO_SCHEMA
         result = 1;
 #else
         result = 0;

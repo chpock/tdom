@@ -163,18 +163,16 @@ static void SetActiveSchemaData (SchemaData *v)
     if (!sdata) {                                                       \
         SetResult ("Command called outside of schema context.");        \
         return TCL_ERROR;                                               \
+    }                                                                   \
+    if (sdata->isAttribute) {                                           \
+        SetResult ("Command called in invalid schema context.");        \
+        return TCL_ERROR;                                               \
     }
 
 #define CHECK_TOPLEVEL                                                  \
     if (sdata->defineToplevel) {                                        \
         SetResult("Command not allowed at top level "                   \
                   "in schema define evaluation");                       \
-        return TCL_ERROR;                                               \
-    }
-
-#define CHECK_SI_CONTEXT                                                \
-    if (sdata->isAttribute) {                                           \
-        SetResult ("Command called in invalid schema context.");        \
         return TCL_ERROR;                                               \
     }
 
@@ -1798,7 +1796,14 @@ AttributePatternObjCmd (
     Tcl_Obj *const objv[]
     )
 {
+    SchemaData *sdata = GETASI;
 
+    CHECK_SI
+    CHECK_TOPLEVEL
+
+    sdata->isAttribute = 1;
+    
+    sdata->isAttribute = 0;
     return TCL_OK;
 }
 
