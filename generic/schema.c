@@ -27,6 +27,7 @@
 #include <schema.h>
 
 /* #define DEBUG */
+/* #define DDEBUG */
 /*----------------------------------------------------------------------------
 |   Debug Macros
 |
@@ -35,6 +36,11 @@
 # define DBG(x) x
 #else
 # define DBG(x) 
+#endif
+#if defined(DEBUG) || defined(DDEBUG)
+# define DDBG(x) x
+#else
+# define DDBG(x) 
 #endif
 
 /*----------------------------------------------------------------------------
@@ -95,7 +101,7 @@ typedef struct
         return TCL_ERROR;                                     \
     }
 
-#ifdef DEBUG
+#if defined(DEBUG) || defined(DDEBUG)
 static char *Schema_CP_Type2str[] = {
     "ANY",
     "MIXED",
@@ -235,7 +241,7 @@ initSchemaCP (
     return pattern;
 }
 
-DBG(
+DDBG(
 static void serializeCP (
     SchemaCP *pattern
     )
@@ -479,7 +485,7 @@ pushToStack (
 
 #define mustMatch(quant,nr) \
     (nr) == 0 ? minOne(quant)                                              \
-        : (quant->type == SCHEMA_CQUANT_NM && quant->minOccur < (nr)) ? 1 : 0
+        : (quant->type == SCHEMA_CQUANT_NM && quant->minOccur > (nr)) ? 1 : 0
 
 #define hasMatched(quant,nr) \
     (nr) == 0 ? 0 : ((nr) == 1 && (quant == quantOne || quant == quantOpt) ? 1 : quant->maxOccur == (nr))
@@ -703,7 +709,7 @@ probeElement (
         /* The root of the tree to check. */
         if (sdata->start) {
             if (strcmp (name, sdata->start) != 0) {
-                SetResult ("Root element doesn't match.");
+                SetResult ("Root element doesn't match");
                 return TCL_ERROR;
             }
             if (namespace) {
@@ -727,7 +733,7 @@ probeElement (
             pattern = pattern->next;
         }
         if (!pattern) {
-            SetResult ("Root element doesn't match.");
+            SetResult ("Root element doesn't match");
             return TCL_ERROR;
         }
         pushToStack (sdata, pattern, 0);
@@ -775,8 +781,8 @@ static int checkElementEnd (
             ac++; nm = 0;
         }
         while (ac < cp->numChildren) {
-            DBG(fprintf (stderr, "ac %d mustMatch: %d\n",
-                         ac, mustMatch (cp->quants[ac], nm)));
+            DBG(fprintf (stderr, "ac %d nm %d mustMatch: %d\n",
+                         ac, nm, mustMatch (cp->quants[ac], nm)));
             if (mustMatch (cp->quants[ac], nm)) {
                 return 0;
             }
@@ -818,7 +824,6 @@ probeElementEnd (
         fprintf (stderr, "probeElementEnd: look if current stack top can end "
                  " name: '%s' deep: %d\n",
                  sdata->stack->pattern->name, sdata->stack->deep);
-        serializeStack (sdata);
         );
     
     if (sdata->skipDeep) {
@@ -826,7 +831,7 @@ probeElementEnd (
         return TCL_OK;
     }
     if (sdata->validationState == VALIDATION_FINISHED) {
-        SetResult ("Validation finished.");
+        SetResult ("Validation finished");
         return TCL_ERROR;
     }
     if (sdata->validationState == VALIDATION_READY) {
@@ -834,19 +839,18 @@ probeElementEnd (
         return TCL_ERROR;
     }
 
-    rc = checkElementEnd (sdata);
-    while (rc == -1) {
-        if (!sdata->stack->down
-            || sdata->stack->deep > sdata->stack->down->deep) {
-            break;
-        }
+    while (1) {
+        rc = checkElementEnd (sdata);
+        if (rc != -1
+            || (!sdata->stack->down
+                || sdata->stack->deep > sdata->stack->down->deep)) break;
         popStack(sdata);
         DBG(fprintf (stderr, "probe element end again after popping from stack\n");
             serializeStack (sdata));
-        rc = checkElementEnd (sdata);
     }
+    
     if (rc != 1) {
-        SetResult ("Missing mandatory element\n");
+        SetResult ("Missing mandatory element");
         sdata->validationState = VALIDATION_ERROR;
         DBG(
             fprintf(stderr, "probeElementEnd: CAN'T end here.\n");
@@ -896,7 +900,7 @@ probeText (
         return TCL_OK;
     }
     if (sdata->validationState == VALIDATION_FINISHED) {
-        SetResult ("Validation finished.");
+        SetResult ("Validation finished");
         return TCL_ERROR;
     }
     if (sdata->validationState == VALIDATION_READY) {
@@ -955,6 +959,7 @@ startElement(
     if (Tcl_DStringLength (vdata->cdata)) {
         if (probeText (vdata->interp, vdata->sdata,
                        Tcl_DStringValue (vdata->cdata)) != TCL_OK) {
+            vdata->sdata->validationState = VALIDATION_ERROR;
             XML_StopParser (vdata->parser, 0);
             Tcl_DStringSetLength (vdata->cdata, 0);
             return;
@@ -983,6 +988,7 @@ startElement(
 
     if (probeElement (vdata->interp, vdata->sdata, s, namespace)
         != TCL_OK) {
+        vdata->sdata->validationState = VALIDATION_ERROR;
         XML_StopParser (vdata->parser, 0);
     }
 }
@@ -1056,9 +1062,15 @@ validateString (
         resultObj = Tcl_NewObj ();
         sprintf(sl, "%ld", XML_GetCurrentLineNumber(parser));
         sprintf(sc, "%ld", XML_GetCurrentColumnNumber(parser));
-        Tcl_AppendStringsToObj (resultObj, "error \"",
-                                XML_ErrorString(XML_GetErrorCode(parser)),
-                                "\" at line ", sl, " character ", sc, NULL);
+        if (sdata->validationState == VALIDATION_ERROR) {
+            Tcl_AppendStringsToObj (resultObj, "error \"",
+                                    Tcl_GetStringResult (interp),
+                                    "\" at line ", sl, " character ", sc, NULL);
+        } else {
+            Tcl_AppendStringsToObj (resultObj, "error \"",
+                                    XML_ErrorString(XML_GetErrorCode(parser)),
+                                    "\" at line ", sl, " character ", sc, NULL);
+        }
         Tcl_SetObjResult (interp, resultObj);
         result = TCL_ERROR;
     } else {
@@ -1185,10 +1197,10 @@ schemaInstanceCmd (
                     if ((enum schemaInstanceMethod) methodIndex
                         == m_defelement) {
                         SetResult ("Element already defined "
-                                   "in this namespace.");
+                                   "in this namespace");
                     } else {
                         SetResult ("Pattern already defined "
-                                   "in this namespace.");
+                                   "in this namespace");
                     }
                     return TCL_ERROR;
                 }
@@ -1372,7 +1384,7 @@ schemaInstanceCmd (
             SetResult ("FINISHED");
             break;
         default:
-            SetResult ("Internal error: Invalid validation state.");
+            SetResult ("Internal error: Invalid validation state");
             return TCL_ERROR;
         }
         break;
@@ -1389,6 +1401,9 @@ schemaInstanceCmd (
         xmlstr = Tcl_GetStringFromObj (objv[2], &len);
         if (validateString (interp, sdata, xmlstr, len) == TCL_OK) {
             SetBooleanResult (1);
+            if (objc == 4) {
+                Tcl_SetVar (interp, Tcl_GetString (objv[3]), "", 0);
+            }
         } else {
             if (objc == 4) {
                 Tcl_SetVar (interp, Tcl_GetString (objv[3]),
@@ -1535,20 +1550,20 @@ getQuant (
         }
     }
     if (Tcl_ListObjLength (interp, quantObj, &len) != TCL_OK) {
-        SetResult ("Invalid quant specifier.");
+        SetResult ("Invalid quant specifier");
         return NULL;
     }
     if (len != 1 && len != 2) {
-        SetResult ("Invalid quant specifier.");
+        SetResult ("Invalid quant specifier");
         return NULL;
     }
     if (len == 1) {
         if (Tcl_GetIntFromObj (interp, quantObj, &n) != TCL_OK) {
-            SetResult ("Invalid quant specifier.");
+            SetResult ("Invalid quant specifier");
             return NULL;
         }
         if (n < 1) {
-            SetResult ("Invalid quant specifier.");
+            SetResult ("Invalid quant specifier");
             return NULL;
         }
         if (n == 1) {
@@ -1560,20 +1575,20 @@ getQuant (
      * Tcl_ListObjLength() call above, no need to check result. */
     Tcl_ListObjIndex (interp, quantObj, 0, &thisObj);
     if (Tcl_GetIntFromObj (interp, thisObj, &n) != TCL_OK) {
-        SetResult ("Invalid quant specifier.");
+        SetResult ("Invalid quant specifier");
         return NULL;
     }
     if (n < 0) {
-        SetResult ("Invalid quant specifier.");
+        SetResult ("Invalid quant specifier");
         return NULL;
     }
     Tcl_ListObjIndex (interp, quantObj, 1, &thisObj);
     if (Tcl_GetIntFromObj (interp, thisObj, &m) != TCL_OK) {
-        SetResult ("Invalid quant specifier.");
+        SetResult ("Invalid quant specifier");
         return NULL;
     }
     if (n >= m) {
-        SetResult ("Invalid quant specifier.");
+        SetResult ("Invalid quant specifier");
         return NULL;
     }
     if (n == 0 && m == 1) {

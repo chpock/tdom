@@ -595,8 +595,8 @@ test schema-7.6 {nested groups via refs} {
             element e3 ?
         }
         defpattern b foouri {
-            element b1 *
-            group 2 {
+            element b1 3
+            group 3 {
                 element b2
                 ref a
             }
@@ -607,11 +607,11 @@ test schema-7.6 {nested groups via refs} {
         defelement doc foouri {
             group {
                 ref a
-                ref b 2
+                ref b 
             }
         }
     }
-    set doc [dom parse -validateCmd grammar {
+    set result [grammar validate {
          <doc xmlns="foouri">
            <!-- ref a start -->
            <e1/>
@@ -624,6 +624,23 @@ test schema-7.6 {nested groups via refs} {
            <!-- ref b start -->
            <b1/>
            <b1/>
+           <b1/>
+           <b2/>
+           <!-- inside ref b: ref a start -->
+           <e1/>
+           <e1>
+             <e2/>
+           </e1>
+           <e2/>
+           <!-- inside ref b: ref a end -->
+           <b2/>
+           <!-- inside ref b: ref a start -->
+           <e1/>
+           <e1>
+             <e2/>
+           </e1>
+           <e2/>
+           <!-- inside ref b: ref a end -->
            <b2/>
            <!-- inside ref b: ref a start -->
            <e1/>
@@ -633,25 +650,11 @@ test schema-7.6 {nested groups via refs} {
            <e2/>
            <!-- inside ref b: ref a end -->
            <!-- ref b end -->
-           <!-- ref b start -->
-           <b2/>
-           <!-- inside ref b: ref a start -->
-           <e1/>
-           <e1>
-             <e2/>
-           </e1>
-           <e2/>
-           <e3/>
-           <!-- inside ref a: ref b end -->
-           <!-- ref b end -->
          </doc>
     }]
-    $doc delete
-    if {[grammar state] ne "FINISHED"} {
-        error "Wrong state."
-    }
     grammar delete
-} {}
+    set result
+} 1
 
 test schema-7.7 {nested groups via refs} {
     tdom::schema create grammar
@@ -1029,7 +1032,7 @@ test schema-8.4 {illegal text} {
     set result
 } 0
 
-test schema-8.5 {illegal text - expat not signaling XML_STATUS_SUSPENDED although XML_StopParser() was called in handler, again.} {knownBug} {
+test schema-8.5 {illegal text - expat not signaling XML_STATUS_SUSPENDED although XML_StopParser() was called in handler, again.} {
     tdom::schema create grammar
     grammar define {
         defelement doc {
@@ -1054,7 +1057,7 @@ test schema-9.1 {choice} {
         defelement doc foouri {
             choice * {
                 element e1
-                element e2 *
+                element e2
             }
         }
         foreach e {e1 e2} {
@@ -1120,7 +1123,35 @@ test schema-9.3 {choice} {
     lappend result [grammar validate {<doc xmlns="foouri"><e1/><e2/><e2/></doc>}]
     grammar delete
     set result
-} {0 1 1 1 1 1 1 0}
+} {1 1 1 1 1 1 0}
+
+test schema-9.4 {choice} {
+    tdom::schema create grammar
+    grammar define {
+        defelement doc foouri {
+            choice 2 {
+                element e1
+                group {
+                    element e2
+                    element e3
+                }
+            }
+        }
+        foreach e {e1 e2} {
+            defelement $e foouri {}
+        }
+    }
+    set result [grammar validate {<doc xmlns="foouri"/>}]
+    lappend result [grammar validate {<doc xmlns="foouri"><e1/></doc>}]
+    lappend result [grammar validate {<doc xmlns="foouri"><e2/><e3/></doc>}]
+    lappend result [grammar validate {<doc xmlns="foouri"><e1/><e2/><e3/></doc>}]
+    lappend result [grammar validate {<doc xmlns="foouri"><e2/><e3/><e1/></doc>}]
+    lappend result [grammar validate {<doc xmlns="foouri"><e1/><e1/></doc>}]
+    lappend result [grammar validate {<doc xmlns="foouri"><e2/><e3/><e2/><e3/></doc>}]
+    lappend result [grammar validate {<doc xmlns="foouri"><e1/><e2/><e2/></doc>}]
+    grammar delete
+    set result
+} {0 0 0 1 1 1 1 0}
 
 test schema-10.1 {any} {
     tdom::schema create s
