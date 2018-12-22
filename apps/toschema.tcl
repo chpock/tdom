@@ -18,10 +18,6 @@ proc fromDTD_attlistDecl {args} {
     puts "fromDTD_attlistDecl: $args"
 }
 
-proc myextRefHandler {args} {
-    puts "myextRefHandler $args"
-}
-
 proc fromDTD {file} {
 
     ::xml::parser p \

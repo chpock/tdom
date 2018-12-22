@@ -923,6 +923,29 @@ test schema-7.12 {loop over seq} {
     set result
 } {0 1 0 0}
 
+test schema-7.13 {long sequence} {
+    tdom::schema create s
+    s define {
+        defelement doc {
+            for {set i 1} {$i < 200} {incr i} {
+                element e$i
+            }
+        }
+        for {set i 1} {$i < 200} {incr i} {
+            defelement e$i {element a}
+        }
+        defelement a {}
+    }
+    set xml "<doc>"
+    for {set i 1} {$i < 200} {incr i} {
+        append xml "<e$i><a/></e$i>"
+    }
+    append xml "</doc>"
+    set result [s validate $xml]
+    s delete
+    set result
+} 1
+
 test schema-8.1 {validate method} {
     tdom::schema create grammar
     grammar defelement doc {
