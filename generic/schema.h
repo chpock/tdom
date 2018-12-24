@@ -54,6 +54,23 @@ typedef struct
 
 typedef unsigned int SchemaFlags;
 
+typedef int (*SchemaConstraintFunc) (void *constraintData, char *text);
+
+typedef struct 
+{
+    void * constraintData;
+    SchemaConstraintFunc *constraint;
+} SchemaConstraint;
+
+typedef struct
+{
+    char              *namespace;
+    char              *name;
+    int                required;
+    SchemaConstraint **constrains;
+    unsigned int       numConstrains;
+} SchemaAttr;
+
 typedef struct SchemaCP
 {
     Schema_CP_Type    type;
@@ -64,6 +81,8 @@ typedef struct SchemaCP
     struct SchemaCP **content;
     SchemaQuant     **quants;
     unsigned int      numChildren;
+    SchemaAttr      **attrs;
+    unsigned int      numAttr;
 } SchemaCP;
 
 typedef struct SchemaValidationStack
@@ -108,9 +127,12 @@ typedef struct
     SchemaQuant **currentQuants;
     unsigned int numChildren;
     unsigned int contentSize;
+    SchemaAttr **currentAtts;
+    unsigned int numAttr;
+    unsigned int attrSize;
     SchemaValidationStack *stack;
-    ValidationState validationState;
     SchemaValidationStack *stackPool;
+    ValidationState validationState;
     unsigned int skipDeep;
 } SchemaData;
 

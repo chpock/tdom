@@ -65,6 +65,9 @@
 #ifndef URI_BUFFER_LEN_INIT
 #  define URI_BUFFER_LEN_INIT 128
 #endif
+#ifndef ATTR_ARRAY_INIT
+#  define ATTR_ARRAY_INIT 8
+#endif
 
 /*----------------------------------------------------------------------------
 |   Local typedefs
@@ -344,6 +347,9 @@ initSchemaData ()
     Tcl_IncrRefCount (sdata->evalStub[1]);
     sdata->evalStub[2] = Tcl_NewStringObj("::tdom::schema", 17);
     Tcl_IncrRefCount (sdata->evalStub[2]);
+    sdata->currentAtts = (SchemaAttr **) MALLOC (
+        sizeof (SchemaAttr*) * ATTR_ARRAY_INIT);
+    sdata->attrSize = ATTR_ARRAY_INIT;
     return sdata;
 }
 
@@ -382,6 +388,7 @@ static void schemaInstanceDelete (
     Tcl_DecrRefCount (sdata->evalStub[1]);
     Tcl_DecrRefCount (sdata->evalStub[2]);
     FREE (sdata->evalStub);
+    FREE (sdata->currentAtts);
     FREE (sdata);
 }
 
@@ -757,6 +764,21 @@ probeElement (
     return TCL_ERROR;
 }
 
+int probeAttributes (
+    Tcl_Interp *interp,
+    SchemaData *sdata,
+    const char **attr
+    )
+{
+    const char   **atPtr;
+    
+    for (atPtr = attr; atPtr[0] && atPtr[1]; atPtr += 2) {
+
+    }
+    
+    return TCL_OK;
+}
+
 static int checkElementEnd (
     SchemaData *sdata
     )
@@ -988,6 +1010,13 @@ startElement(
         != TCL_OK) {
         vdata->sdata->validationState = VALIDATION_ERROR;
         XML_StopParser (vdata->parser, 0);
+    }
+    if (atts) {
+        if (probeAttributes (vdata->interp, vdata->sdata, atts)
+            != TCL_OK) {
+            vdata->sdata->validationState = VALIDATION_ERROR;
+            XML_StopParser (vdata->parser, 0);
+        }
     }
 }
 
