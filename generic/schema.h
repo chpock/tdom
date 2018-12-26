@@ -67,8 +67,8 @@ typedef struct
     char              *namespace;
     char              *name;
     int                required;
-    SchemaConstraint **constrains;
-    unsigned int       numConstrains;
+    SchemaConstraint **constraints;
+    unsigned int       numConstraints;
 } SchemaAttr;
 
 typedef struct SchemaCP
@@ -110,6 +110,7 @@ typedef struct
     Tcl_HashTable namespace;
     Tcl_HashEntry *emptyNamespace;
     Tcl_HashTable pattern;
+    Tcl_HashTable attrNames;
     SchemaCP **patternList;
     unsigned int numPatternList;
     unsigned int patternListSize;
@@ -119,7 +120,6 @@ typedef struct
     unsigned int quantsSize;
     Tcl_Obj **evalStub;
     char *currentNamespace;
-    char *currentAttributeNamespace;
     int   defineToplevel;
     int   isAttribute;
     SchemaCP *currentCP;
@@ -127,7 +127,7 @@ typedef struct
     SchemaQuant **currentQuants;
     unsigned int numChildren;
     unsigned int contentSize;
-    SchemaAttr **currentAtts;
+    SchemaAttr **currentAttrs;
     unsigned int numAttr;
     unsigned int attrSize;
     SchemaValidationStack *stack;

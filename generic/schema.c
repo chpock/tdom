@@ -66,7 +66,7 @@
 #  define URI_BUFFER_LEN_INIT 128
 #endif
 #ifndef ATTR_ARRAY_INIT
-#  define ATTR_ARRAY_INIT 8
+#  define ATTR_ARRAY_INIT 4
 #endif
 
 /*----------------------------------------------------------------------------
@@ -309,6 +309,8 @@ static void freeSchemaCP (
     SchemaCP *pattern
     )
 {
+    int i;
+    
     switch (pattern->type) {
     case SCHEMA_CTYPE_ANY:
         /* do nothing */
@@ -316,6 +318,11 @@ static void freeSchemaCP (
     default:
         FREE (pattern->content);
         FREE (pattern->quants);
+        if (pattern->attrs) {
+            for (i = 0; i < pattern->numAttr; i++) {
+                FREE (pattern->attrs[i]);
+            }
+        }
         break;
     }
     FREE (pattern);
@@ -331,6 +338,7 @@ initSchemaData ()
     memset (sdata, 0, sizeof(SchemaData));
     Tcl_InitHashTable (&sdata->element, TCL_STRING_KEYS);
     Tcl_InitHashTable (&sdata->pattern, TCL_STRING_KEYS);
+    Tcl_InitHashTable (&sdata->attrNames, TCL_STRING_KEYS);
     Tcl_InitHashTable (&sdata->namespace, TCL_STRING_KEYS);
     sdata->emptyNamespace = Tcl_CreateHashEntry (
         &sdata->namespace, "", &hnew);
@@ -347,9 +355,6 @@ initSchemaData ()
     Tcl_IncrRefCount (sdata->evalStub[1]);
     sdata->evalStub[2] = Tcl_NewStringObj("::tdom::schema", 17);
     Tcl_IncrRefCount (sdata->evalStub[2]);
-    sdata->currentAtts = (SchemaAttr **) MALLOC (
-        sizeof (SchemaAttr*) * ATTR_ARRAY_INIT);
-    sdata->attrSize = ATTR_ARRAY_INIT;
     return sdata;
 }
 
@@ -366,6 +371,7 @@ static void schemaInstanceDelete (
     Tcl_DeleteHashTable (&sdata->namespace);
     Tcl_DeleteHashTable (&sdata->element);
     Tcl_DeleteHashTable (&sdata->pattern);
+    Tcl_DeleteHashTable (&sdata->attrNames);
     for (i = 0; i < sdata->numPatternList; i++) {
         freeSchemaCP (sdata->patternList[i]);
     }
@@ -388,7 +394,6 @@ static void schemaInstanceDelete (
     Tcl_DecrRefCount (sdata->evalStub[1]);
     Tcl_DecrRefCount (sdata->evalStub[2]);
     FREE (sdata->evalStub);
-    FREE (sdata->currentAtts);
     FREE (sdata);
 }
 
@@ -1256,6 +1261,8 @@ schemaInstanceCmd (
         sdata->currentContent = pattern->content;
         sdata->currentQuants = pattern->quants;
         sdata->numChildren = 0;
+        sdata->numAttr = 0;
+        sdata->currentAttrs = NULL;
         sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
         sdata->evalStub[3] = objv[patternIndex];
         result = Tcl_EvalObjv (interp, 4, sdata->evalStub,
@@ -1264,6 +1271,8 @@ schemaInstanceCmd (
         pattern->content = sdata->currentContent;
         pattern->quants = sdata->currentQuants;
         pattern->numChildren = sdata->numChildren;
+        pattern->attrs = sdata->currentAttrs;
+        pattern->numAttr = sdata->numAttr;
         if (result == TCL_OK) {
             if (forwardDef) {
                 if (pattern->flags & FORWARD_PATTERN_DEF) {
@@ -1667,7 +1676,9 @@ evalDefinition (
 {
     SchemaCP **savedCurrentContent, *savedCurrentCP;
     SchemaQuant **savedCurrentQuant;
-    unsigned int savedNumChildren, savedContenSize;
+    SchemaAttr **savedCurrentAttrs;
+    unsigned int savedNumChildren, savedContenSize, savedNumAttr;
+    unsigned int savedAttrSize;
     int result;
 
     /* Save some state of sdata .. */
@@ -1676,12 +1687,18 @@ evalDefinition (
     savedCurrentQuant = sdata->currentQuants;
     savedNumChildren = sdata->numChildren;
     savedContenSize = sdata->contentSize;
+    savedNumAttr = sdata->numAttr;
+    savedAttrSize = sdata->attrSize;
+    savedCurrentAttrs = sdata->currentAttrs;
     /* ... and prepare sdata for definition evaluation. */
     sdata->currentCP = pattern;
     sdata->currentContent = pattern->content;
     sdata->currentQuants = pattern->quants;
     sdata->numChildren = 0;
     sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
+    sdata->numAttr = 0;
+    sdata->currentAttrs = NULL;
+    sdata->attrSize = 0;
 
     result = Tcl_EvalObjEx (interp, definition, TCL_EVAL_DIRECT);
 
@@ -1689,12 +1706,17 @@ evalDefinition (
     pattern->content = sdata->currentContent;
     pattern->quants = sdata->currentQuants;
     pattern->numChildren = sdata->numChildren;
+    pattern->attrs = sdata->currentAttrs;
+    pattern->numAttr = sdata->numAttr;
     /* ... and restore the previously saved sdata states  */
     sdata->currentCP = savedCurrentCP;
     sdata->currentContent = savedCurrentContent;
     sdata->currentQuants = savedCurrentQuant;
     sdata->numChildren = savedNumChildren;
     sdata->contentSize = savedContenSize;
+    sdata->numAttr = savedNumAttr;
+    sdata->currentAttrs = savedCurrentAttrs;
+    sdata->attrSize = savedAttrSize;
 
     if (result == TCL_OK) {
         REMEMBER_PATTERN (pattern);
@@ -1818,6 +1840,72 @@ AnonPatternObjCmd (
 }
 
 static int
+evalConstraints (
+    Tcl_Interp *interp,
+    SchemaData *sdata,
+    Tcl_Obj *script,
+    SchemaAttr *attr
+    )
+{
+    return TCL_OK;
+}
+
+static int maybeAddAttr (
+    SchemaData *sdata,
+    Tcl_Obj *nameObj,
+    Tcl_Obj *scriptObj,
+    int required
+    )
+{
+    Tcl_HashEntry *h;
+    int hnew, i;
+    char *name;
+    SchemaAttr *attr;
+        
+    h = Tcl_CreateHashEntry (&sdata->attrNames,
+                             Tcl_GetString (nameObj), &hnew);
+    if (!hnew) {
+        /* Check, if there is already an attribute with this name
+         * / namespace */
+        name = Tcl_GetHashKey (&sdata->attrNames, h);
+        for (i = 0; i < sdata->numAttr; i++) {
+            if (sdata->currentAttrs[i]->name == name
+                && (sdata->currentAttrs[i]->namespace
+                    == sdata->currentNamespace)) {
+                /* Ignore the later attribute declaration */
+                return TCL_OK;
+            }
+        }
+    }
+    attr = TMALLOC (SchemaAttr);
+    attr->namespace = sdata->currentNamespace;
+    attr->name = name;
+    attr->required = required;
+    if (scriptObj) {
+        /* TODO */
+        attr->constraints = NULL;
+        attr->numConstraints = 0;
+    } else {
+        attr->constraints = NULL;
+        attr->numConstraints = 0;
+    }
+    if (!sdata->currentAttrs) {
+        sdata->currentAttrs = MALLOC (sizeof(SchemaAttr*)
+                                      * ATTR_ARRAY_INIT);
+        sdata->attrSize = ATTR_ARRAY_INIT;
+    } else if (sdata->numAttr == sdata->attrSize) {
+        sdata->currentAttrs =
+            REALLOC (sdata->currentAttrs, 2 * sdata->attrSize
+                     * sizeof (SchemaAttr));
+        sdata->attrSize *= 2;
+    }
+    sdata->currentAttrs[sdata->numAttr] = attr;
+    sdata->numChildren++;
+
+    return TCL_OK;
+}
+
+static int
 AttributePatternObjCmd (
     ClientData clientData,
     Tcl_Interp *interp,
@@ -1826,14 +1914,39 @@ AttributePatternObjCmd (
     )
 {
     SchemaData *sdata = GETASI;
+    char *quantStr;
+    int len, required = 1, scriptIndex;
 
     CHECK_SI
     CHECK_TOPLEVEL
+    checkNrArgs (2,4,"Expected: name"
+                 " | name attquant"
+                 " | name <constraint script>"
+                 " | name attquant <constraint script>");
 
-    sdata->isAttribute = 1;
-    
-    sdata->isAttribute = 0;
-    return TCL_OK;
+    if (objc == 2) {
+        return maybeAddAttr (sdata, objv[1], NULL, 1);
+    }
+    quantStr = Tcl_GetStringFromObj (objv[2], &len);
+    if (len == 1) {
+        if (quantStr[0] == '?') {
+            required = 0;
+        } else if (quantStr[0] != '!') {
+            SetResult ("Invalid attribute quant");
+            return TCL_ERROR;
+        }
+        if (objc == 3) {
+            return maybeAddAttr (sdata, objv[1], NULL, required);
+        }
+        scriptIndex = 3;
+    } else {
+        if (objc == 4) {
+            SetResult ("Invalid attribute quant");
+            return TCL_ERROR;
+        }
+        scriptIndex = 2;
+    }
+    return maybeAddAttr (sdata, objv[1], objv[scriptIndex], required);
 }
 
 static int

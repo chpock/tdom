@@ -1249,3 +1249,14 @@ test schema-10.4 {any} {
     s delete
     set result
 } {0 1 0 0}
+
+test schema-11.1 {attribute} {
+    tdom::schema create s
+    s define {
+        defelement doc {
+            attribute attr1
+            attribute attr2 ?
+        }
+    }
+    s delete
+} {}
