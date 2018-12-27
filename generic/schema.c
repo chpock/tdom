@@ -322,6 +322,7 @@ static void freeSchemaCP (
             for (i = 0; i < pattern->numAttr; i++) {
                 FREE (pattern->attrs[i]);
             }
+            FREE (pattern->attrs);
         }
         break;
     }
@@ -1900,7 +1901,7 @@ static int maybeAddAttr (
         sdata->attrSize *= 2;
     }
     sdata->currentAttrs[sdata->numAttr] = attr;
-    sdata->numChildren++;
+    sdata->numAttr++;
 
     return TCL_OK;
 }

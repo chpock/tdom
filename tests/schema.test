@@ -1260,3 +1260,18 @@ test schema-11.1 {attribute} {
     }
     s delete
 } {}
+
+test schema-11.2 {attribute} {
+    tdom::schema create s
+    s define {
+        defelement e {
+            attribute attr1
+            attribute attr2 ?
+            element e 1 {
+                attribute attr3
+                attribute attr4 ?
+            }
+        }
+    }
+    s delete
+} {}
