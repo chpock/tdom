@@ -1854,15 +1854,22 @@ evalConstraints (
 static int maybeAddAttr (
     SchemaData *sdata,
     Tcl_Obj *nameObj,
+    Tcl_Obj *namespaceObj,
     Tcl_Obj *scriptObj,
     int required
     )
 {
     Tcl_HashEntry *h;
-    int hnew, i;
-    char *name;
+    int hnew, hnew1, i;
+    char *name, *namespace = NULL;
     SchemaAttr *attr;
         
+    if (namespaceObj) {
+        h = Tcl_CreateHashEntry (&sdata->namespace, namespaceObj, &hnew1);
+        if (h != sdata->emptyNamespace) {
+            namespace = Tcl_GetHashKey (&sdata->namespace, h);
+        }
+    }
     h = Tcl_CreateHashEntry (&sdata->attrNames,
                              Tcl_GetString (nameObj), &hnew);
     if (!hnew) {
@@ -1871,15 +1878,14 @@ static int maybeAddAttr (
         name = Tcl_GetHashKey (&sdata->attrNames, h);
         for (i = 0; i < sdata->numAttr; i++) {
             if (sdata->currentAttrs[i]->name == name
-                && (sdata->currentAttrs[i]->namespace
-                    == sdata->currentNamespace)) {
+                && sdata->currentAttrs[i]->namespace == namespace) {
                 /* Ignore the later attribute declaration */
                 return TCL_OK;
             }
         }
     }
     attr = TMALLOC (SchemaAttr);
-    attr->namespace = sdata->currentNamespace;
+    attr->namespace = namespace;
     attr->name = name;
     attr->required = required;
     if (scriptObj) {
@@ -1916,19 +1922,32 @@ AttributePatternObjCmd (
 {
     SchemaData *sdata = GETASI;
     char *quantStr;
-    int len, required = 1, scriptIndex;
+    int len, required = 1, scriptIndex, isns = (int) clientData, i;
+    Tcl_Obj *nsobj;
 
     CHECK_SI
-    CHECK_TOPLEVEL
-    checkNrArgs (2,4,"Expected: name"
-                 " | name attquant"
-                 " | name <constraint script>"
-                 " | name attquant <constraint script>");
+        CHECK_TOPLEVEL;
 
-    if (objc == 2) {
-        return maybeAddAttr (sdata, objv[1], NULL, 1);
+    if (isns) {
+        checkNrArgs (3,5,"Expected: name namespace"
+                     " | name namespace attquant"
+                     " | name namespace <constraint script>"
+                     " | name namespace attquant <constraint script>");
+        i = 1;
+        nsobj = objv[2];
+    } else {
+        checkNrArgs (2,4,"Expected: name"
+                     " | name attquant"
+                     " | name <constraint script>"
+                     " | name attquant <constraint script>");
+        i = 0;
+        nsobj = NULL;
     }
-    quantStr = Tcl_GetStringFromObj (objv[2], &len);
+
+    if (objc == 2+i) {
+        return maybeAddAttr (sdata, objv[1], nsobj, NULL, 1);
+    }
+    quantStr = Tcl_GetStringFromObj (objv[2+i], &len);
     if (len == 1) {
         if (quantStr[0] == '?') {
             required = 0;
@@ -1936,18 +1955,18 @@ AttributePatternObjCmd (
             SetResult ("Invalid attribute quant");
             return TCL_ERROR;
         }
-        if (objc == 3) {
-            return maybeAddAttr (sdata, objv[1], NULL, required);
+        if (objc == 3+i) {
+            return maybeAddAttr (sdata, objv[1], nsobj, NULL, required);
         }
-        scriptIndex = 3;
+        scriptIndex = 3+i;
     } else {
-        if (objc == 4) {
+        if (objc == 4+i) {
             SetResult ("Invalid attribute quant");
             return TCL_ERROR;
         }
-        scriptIndex = 2;
+        scriptIndex = 2+i;
     }
-    return maybeAddAttr (sdata, objv[1], objv[scriptIndex], required);
+    return maybeAddAttr (sdata, objv[1], nsobj, objv[scriptIndex], required);
 }
 
 static int
@@ -2050,9 +2069,11 @@ tDOM_SchemaInit (
                           AnonPatternObjCmd,
                           (ClientData) SCHEMA_CTYPE_GROUP, NULL);
     
-    /* The "attribute", "namespace" and "text" definition commands. */
+    /* The "attribute", "nsattribute", "namespace" and "text" definition commands. */
     Tcl_CreateObjCommand (interp, "tdom::schema::attribute",
-                          AttributePatternObjCmd, NULL, NULL);
+                          AttributePatternObjCmd, (ClientData) 0, NULL);
+    Tcl_CreateObjCommand (interp, "tdom::schema::nsattribute",
+                          AttributePatternObjCmd, (ClientData) 1, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::namespace",
                           NamespacePatternObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::text",

@@ -209,7 +209,12 @@
       </commanddef>
 
       <commanddef>
-        <command><method>attribute</method> <m>&lt;definition script></m></command>
+        <command><method>attribute</method> <m>name</m> <m>?quant?</m> <m>?&lt;constraint script>?</m></command>
+        <desc></desc>
+      </commanddef>
+
+      <commanddef>
+        <command><method>nsattribute</method> <m>name</m> <m>namespace</m> <m>?quant?</m> <m>?&lt;constraint script>?</m></command>
         <desc></desc>
       </commanddef>
 
