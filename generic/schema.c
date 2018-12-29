@@ -777,11 +777,30 @@ int probeAttributes (
     )
 {
     const char   **atPtr;
-    
-    for (atPtr = attr; atPtr[0] && atPtr[1]; atPtr += 2) {
+    int i, found, reqAttr = 0;
+    SchemaCP *cp;
 
+    cp = sdata->stack->pattern;
+    for (atPtr = attr; atPtr[0] && atPtr[1]; atPtr += 2) {
+        found = 0;
+        for (i = 0; i < cp->numAttr; i++) {
+            if (strcmp (atPtr[0], cp->attrs[i]->name) == 0) {
+                found = 1;
+                if (cp->attrs[i]->required) reqAttr++;
+                break;
+            }
+        }
+        if (!found) {
+            SetResult3 ("Unknown attribute \"", atPtr[0], "\"");
+            return TCL_ERROR;
+        }
     }
-    
+    if (reqAttr != cp->numReqAttr) {
+        /* TODO: We surely should tell, which required attributes are
+         * missing. */
+        SetResult ("Missing mandatory attribute");
+        return TCL_ERROR;
+    }
     return TCL_OK;
 }
 
@@ -1017,7 +1036,7 @@ startElement(
         vdata->sdata->validationState = VALIDATION_ERROR;
         XML_StopParser (vdata->parser, 0);
     }
-    if (atts) {
+    if (atts[0]) {
         if (probeAttributes (vdata->interp, vdata->sdata, atts)
             != TCL_OK) {
             vdata->sdata->validationState = VALIDATION_ERROR;
@@ -1263,6 +1282,7 @@ schemaInstanceCmd (
         sdata->currentQuants = pattern->quants;
         sdata->numChildren = 0;
         sdata->numAttr = 0;
+        sdata->numReqAttr = 0;
         sdata->currentAttrs = NULL;
         sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
         sdata->evalStub[3] = objv[patternIndex];
@@ -1274,6 +1294,7 @@ schemaInstanceCmd (
         pattern->numChildren = sdata->numChildren;
         pattern->attrs = sdata->currentAttrs;
         pattern->numAttr = sdata->numAttr;
+        pattern->numReqAttr = sdata->numReqAttr;
         if (result == TCL_OK) {
             if (forwardDef) {
                 if (pattern->flags & FORWARD_PATTERN_DEF) {
@@ -1679,7 +1700,7 @@ evalDefinition (
     SchemaQuant **savedCurrentQuant;
     SchemaAttr **savedCurrentAttrs;
     unsigned int savedNumChildren, savedContenSize, savedNumAttr;
-    unsigned int savedAttrSize;
+    unsigned int savedAttrSize, savedNumReqAttr;
     int result;
 
     /* Save some state of sdata .. */
@@ -1689,6 +1710,7 @@ evalDefinition (
     savedNumChildren = sdata->numChildren;
     savedContenSize = sdata->contentSize;
     savedNumAttr = sdata->numAttr;
+    savedNumReqAttr = sdata->numReqAttr;
     savedAttrSize = sdata->attrSize;
     savedCurrentAttrs = sdata->currentAttrs;
     /* ... and prepare sdata for definition evaluation. */
@@ -1698,6 +1720,7 @@ evalDefinition (
     sdata->numChildren = 0;
     sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
     sdata->numAttr = 0;
+    sdata->numReqAttr = 0;
     sdata->currentAttrs = NULL;
     sdata->attrSize = 0;
 
@@ -1709,6 +1732,7 @@ evalDefinition (
     pattern->numChildren = sdata->numChildren;
     pattern->attrs = sdata->currentAttrs;
     pattern->numAttr = sdata->numAttr;
+    pattern->numReqAttr = sdata->numReqAttr;
     /* ... and restore the previously saved sdata states  */
     sdata->currentCP = savedCurrentCP;
     sdata->currentContent = savedCurrentContent;
@@ -1716,6 +1740,7 @@ evalDefinition (
     sdata->numChildren = savedNumChildren;
     sdata->contentSize = savedContenSize;
     sdata->numAttr = savedNumAttr;
+    sdata->numReqAttr = savedNumReqAttr;
     sdata->currentAttrs = savedCurrentAttrs;
     sdata->attrSize = savedAttrSize;
 
@@ -1872,10 +1897,10 @@ static int maybeAddAttr (
     }
     h = Tcl_CreateHashEntry (&sdata->attrNames,
                              Tcl_GetString (nameObj), &hnew);
+    name = Tcl_GetHashKey (&sdata->attrNames, h);
     if (!hnew) {
         /* Check, if there is already an attribute with this name
          * / namespace */
-        name = Tcl_GetHashKey (&sdata->attrNames, h);
         for (i = 0; i < sdata->numAttr; i++) {
             if (sdata->currentAttrs[i]->name == name
                 && sdata->currentAttrs[i]->namespace == namespace) {
@@ -1908,7 +1933,9 @@ static int maybeAddAttr (
     }
     sdata->currentAttrs[sdata->numAttr] = attr;
     sdata->numAttr++;
-
+    if (required) {
+        sdata->numReqAttr++;
+    }
     return TCL_OK;
 }
 

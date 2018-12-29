@@ -1258,20 +1258,31 @@ test schema-11.1 {attribute} {
             attribute attr2 ?
         }
     }
+    set result [s validate {<doc attr1="foo" attr2="bar"/>}]
+    lappend result [s validate {<doc attr1="foo"/>}]
+    lappend result [s validate {<doc attr2="bar"/>}]
+    lappend result [s validate {<doc attr1="foo" attr2="bar" unknownAtt="grill"/>}]
     s delete
-} {}
+    set result
+} {1 1 0 0}
 
 test schema-11.2 {attribute} {
     tdom::schema create s
     s define {
         defelement e {
             attribute attr1
-            attribute attr2 ?
             element e 1 {
-                attribute attr3
-                attribute attr4 ?
+                attribute attr3 ?
+                attribute attr4 !
             }
+            attribute attr2 ?
         }
     }
+    set result [s validate {<e attr1="attr1" attr2="attr2"><e attr3="attr3" attr4="attr4"/></e>}]
+    lappend result [s validate {<e attr1="attr1"><e attr3="attr3" attr4="attr4"/></e>}]
+    lappend result [s validate {<e attr2="attr2"><e attr3="attr3" attr4="attr4"/></e>}]
+    lappend result [s validate {<e attr1="attr1"><e attr4="attr4"/></e>}]
+    lappend result [s validate {<e attr1="attr1"><e attr3="attr3"/></e>}]
     s delete
-} {}
+    set result
+} {1 1 0 1 0}

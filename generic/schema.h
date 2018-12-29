@@ -83,6 +83,7 @@ typedef struct SchemaCP
     unsigned int      numChildren;
     SchemaAttr      **attrs;
     unsigned int      numAttr;
+    unsigned int      numReqAttr;
 } SchemaCP;
 
 typedef struct SchemaValidationStack
@@ -129,6 +130,7 @@ typedef struct
     unsigned int contentSize;
     SchemaAttr **currentAttrs;
     unsigned int numAttr;
+    unsigned int numReqAttr;
     unsigned int attrSize;
     SchemaValidationStack *stack;
     SchemaValidationStack *stackPool;
