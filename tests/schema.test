@@ -1286,3 +1286,19 @@ test schema-11.2 {attribute} {
     s delete
     set result
 } {1 1 0 1 0}
+
+test schema-11.3 {attribute} {
+    tdom::schema create s
+    s define {
+        defelement e {
+            attribute attr1
+            attribute attr3 ?
+            attribute attr4 !
+            attribute attr2 ?
+        }
+    }
+    set result [s validate <e/> errMsg]
+    lappend result $errMsg
+    s delete
+    set result
+} {0 {error "Missing mandatory attribute(s): attr1 attr4" at line 1 character 4}}

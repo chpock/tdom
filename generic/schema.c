@@ -796,9 +796,22 @@ int probeAttributes (
         }
     }
     if (reqAttr != cp->numReqAttr) {
-        /* TODO: We surely should tell, which required attributes are
-         * missing. */
-        SetResult ("Missing mandatory attribute");
+        /* Lookup the missing attribute(s) */
+        SetResult ("Missing mandatory attribute(s):");
+        for (i = 0; i < cp->numAttr; i++) {
+            if (!cp->attrs[i]->required) continue;
+            found = 0;
+            for (atPtr = attr; atPtr[0] && atPtr[1]; atPtr += 2) {
+                if (strcmp (atPtr[0], cp->attrs[i]->name) == 0) {
+                    found = 1;
+                    if (cp->attrs[i]->required) reqAttr++;
+                    break;
+                }
+            }
+            if (!found) {
+                Tcl_AppendResult (interp, " ", cp->attrs[i]->name, NULL);
+            }
+        }
         return TCL_ERROR;
     }
     return TCL_OK;
@@ -881,6 +894,9 @@ probeElementEnd (
     }
     if (sdata->validationState == VALIDATION_READY) {
         SetResult ("No validation started");
+        return TCL_ERROR;
+    }
+    if (sdata->validationState == VALIDATION_ERROR) {
         return TCL_ERROR;
     }
 
@@ -1036,7 +1052,7 @@ startElement(
         vdata->sdata->validationState = VALIDATION_ERROR;
         XML_StopParser (vdata->parser, 0);
     }
-    if (atts[0]) {
+    if (atts[0] || vdata->sdata->stack->pattern->attrs) {
         if (probeAttributes (vdata->interp, vdata->sdata, atts)
             != TCL_OK) {
             vdata->sdata->validationState = VALIDATION_ERROR;
@@ -1052,11 +1068,12 @@ endElement (
 )
 {
     ValidateMethodData *vdata = (ValidateMethodData *) userData;
-
+    
     DBG(fprintf (stderr, "endElement: '%s'\n", name);)
     if (Tcl_DStringLength (vdata->cdata)) {
         if (probeText (vdata->interp, vdata->sdata,
                        Tcl_DStringValue (vdata->cdata)) != TCL_OK) {
+            vdata->sdata->validationState = VALIDATION_ERROR;
             XML_StopParser (vdata->parser, 0);
             Tcl_DStringSetLength (vdata->cdata, 0);
             return;
@@ -1065,6 +1082,7 @@ endElement (
     }
     if (probeElementEnd (vdata->interp, vdata->sdata)
         != TCL_OK) {
+        vdata->sdata->validationState = VALIDATION_ERROR;
         XML_StopParser (vdata->parser, 0);
     }
 }
@@ -1949,13 +1967,14 @@ AttributePatternObjCmd (
 {
     SchemaData *sdata = GETASI;
     char *quantStr;
-    int len, required = 1, scriptIndex, isns = (int) clientData, i;
+    int len, required = 1, scriptIndex, i;
     Tcl_Obj *nsobj;
 
     CHECK_SI
-        CHECK_TOPLEVEL;
+    CHECK_TOPLEVEL
 
-    if (isns) {
+        
+    if (clientData) {
         checkNrArgs (3,5,"Expected: name namespace"
                      " | name namespace attquant"
                      " | name namespace <constraint script>"
@@ -2098,7 +2117,7 @@ tDOM_SchemaInit (
     
     /* The "attribute", "nsattribute", "namespace" and "text" definition commands. */
     Tcl_CreateObjCommand (interp, "tdom::schema::attribute",
-                          AttributePatternObjCmd, (ClientData) 0, NULL);
+                          AttributePatternObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::nsattribute",
                           AttributePatternObjCmd, (ClientData) 1, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::namespace",
