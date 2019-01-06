@@ -1266,6 +1266,30 @@ test schema-11.1 {attribute} {
     set result
 } {1 1 0 0}
 
+test schema-11.1a {attribute} {
+    tdom::schema create s
+    s define {
+        defelement doc {
+            attribute attr1
+            attribute attr2 ?
+        }
+    }
+    set result [list]
+    foreach xml {
+        {<doc attr1="foo" attr2="bar"/>}
+        {<doc attr1="foo"/>}
+        {<doc attr2="bar"/>}
+        {<doc attr1="foo" attr2="bar" unknownAtt="grill"/>}
+    } {
+        lappend result [catch {set doc [dom parse -validateCmd s $xml]} errMsg]
+        puts $errMsg
+        catch {$doc delete}
+        s reset
+    }
+    s delete
+    set result
+} {0 0 1 1}
+
 test schema-11.2 {attribute} {
     tdom::schema create s
     s define {
@@ -1302,3 +1326,18 @@ test schema-11.3 {attribute} {
     s delete
     set result
 } {0 {error "Missing mandatory attribute(s): attr1 attr4" at line 1 character 4}}
+
+test schema-11.4 {attribute} {
+    tdom::schema create s
+    s define {
+        defelement doc {
+            element e 1 {
+                attribute foo
+                nsattribute lang http://www.w3.org/XML/1998/namespace ?
+            }
+        }
+    }
+    set result [s validate {<doc><e foo="bar"/></doc>} errMsg]
+    s delete
+    lappend result $errMsg
+} {1 {}}

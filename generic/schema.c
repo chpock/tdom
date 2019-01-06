@@ -804,7 +804,6 @@ int probeAttributes (
             for (atPtr = attr; atPtr[0] && atPtr[1]; atPtr += 2) {
                 if (strcmp (atPtr[0], cp->attrs[i]->name) == 0) {
                     found = 1;
-                    if (cp->attrs[i]->required) reqAttr++;
                     break;
                 }
             }
@@ -812,6 +811,89 @@ int probeAttributes (
                 Tcl_AppendResult (interp, " ", cp->attrs[i]->name, NULL);
             }
         }
+        return TCL_ERROR;
+    }
+    return TCL_OK;
+}
+ 
+int probeDomAttributes (
+    Tcl_Interp *interp,
+    SchemaData *sdata,
+    domAttrNode *attr
+    )
+{
+    domAttrNode *atPtr;
+    int i, found, reqAttr = 0;
+    const char *ns;
+    SchemaCP *cp;
+
+    cp = sdata->stack->pattern;
+    atPtr = attr;
+    while (atPtr) {
+        if (atPtr->nodeFlags & IS_NS_NODE) goto nextAttr;
+        found = 0;
+        if (atPtr->namespace) ns = domNamespaceURI ((domNode *)atPtr);
+        else ns = NULL;
+        for (i = 0; i < cp->numAttr; i++) {
+            if (ns) {
+                if (!cp->attrs[i]->namespace) goto nextAttr;
+                if (strcmp (ns, cp->attrs[i]->namespace) != 0) goto nextAttr;
+            } else {
+                if (cp->attrs[i]->namespace) goto nextAttr;
+            }
+            if (strcmp (atPtr->nodeName, cp->attrs[i]->name) == 0) {
+                found = 1;
+                if (cp->attrs[i]->required) reqAttr++;
+                break;
+            }
+        }
+        if (!found) {
+            if (ns) {
+                SetResult ("Unknown attribute \"");
+                Tcl_AppendResult (interp, ns, ":", atPtr->nodeName,
+                                  "\"");
+            } else {
+                SetResult3 ("Unknown attribute \"", atPtr->nodeName, "\"");
+            }
+            sdata->validationState = VALIDATION_ERROR;
+            return TCL_ERROR;
+        }
+    nextAttr:
+        atPtr = atPtr->nextSibling;
+    }
+    if (reqAttr != cp->numReqAttr) {
+        /* Lookup the missing attribute(s) */
+        SetResult ("Missing mandatory attribute(s):");
+        for (i = 0; i < cp->numAttr; i++) {
+            if (!cp->attrs[i]->required) continue;
+            found = 0;
+            atPtr = attr;
+            while (atPtr) {
+                if (cp->attrs[i]->namespace) {
+                    if (!attr->namespace) goto nextAttr2;
+                    ns = domNamespaceURI ((domNode *)atPtr);
+                    if (strcmp (ns, cp->attrs[i]->namespace) != 0)
+                        goto nextAttr2;
+                } else {
+                    if (atPtr->namespace) goto nextAttr2;
+                }
+                if (strcmp (atPtr->nodeName, cp->attrs[i]->name) == 0) {
+                    found = 1;
+                    break;
+                }
+            nextAttr2:
+                atPtr = atPtr->nextSibling;
+            }
+            if (!found) {
+                if (cp->attrs[i]->namespace) {
+                    Tcl_AppendResult (interp, " ", cp->attrs[i]->namespace,
+                                      ":", cp->attrs[i]->name, NULL);
+                } else {
+                    Tcl_AppendResult (interp, " ", cp->attrs[i]->name, NULL);
+                }
+            }
+        }
+        sdata->validationState = VALIDATION_ERROR;
         return TCL_ERROR;
     }
     return TCL_OK;
@@ -1973,7 +2055,6 @@ AttributePatternObjCmd (
     CHECK_SI
     CHECK_TOPLEVEL
 
-        
     if (clientData) {
         checkNrArgs (3,5,"Expected: name namespace"
                      " | name namespace attquant"

@@ -165,6 +165,20 @@ probeElement (
     void *namespace
     );
 
+int probeAttributes (
+    Tcl_Interp *interp,
+    SchemaData *sdata,
+    const char **attr
+    );
+
+typedef struct domAttrNode domAttrNode;
+
+int probeDomAttributes (
+    Tcl_Interp *interp,
+    SchemaData *sdata,
+    domAttrNode *attr
+    );
+    
 int
 probeElementEnd (
     Tcl_Interp * interp,
