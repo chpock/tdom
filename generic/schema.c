@@ -824,7 +824,7 @@ int probeDomAttributes (
 {
     domAttrNode *atPtr;
     int i, found, reqAttr = 0;
-    const char *ns;
+    const char *ns, *ln;
     SchemaCP *cp;
 
     cp = sdata->stack->pattern;
@@ -832,16 +832,29 @@ int probeDomAttributes (
     while (atPtr) {
         if (atPtr->nodeFlags & IS_NS_NODE) goto nextAttr;
         found = 0;
-        if (atPtr->namespace) ns = domNamespaceURI ((domNode *)atPtr);
-        else ns = NULL;
+        if (atPtr->namespace) {
+            ns = domNamespaceURI ((domNode *)atPtr);
+            /* A namespaced attribute must always have a prefix */
+            ln = atPtr->nodeName;
+            while (*ln) {
+                if (*ln == ':') {
+                    ln++;
+                    break;
+                }
+                ln++;
+            }
+        } else {
+            ns = NULL;
+            ln = atPtr->nodeName;
+        }
         for (i = 0; i < cp->numAttr; i++) {
             if (ns) {
-                if (!cp->attrs[i]->namespace) goto nextAttr;
-                if (strcmp (ns, cp->attrs[i]->namespace) != 0) goto nextAttr;
+                if (!cp->attrs[i]->namespace) continue;
+                if (strcmp (ns, cp->attrs[i]->namespace) != 0) continue;
             } else {
-                if (cp->attrs[i]->namespace) goto nextAttr;
+                if (cp->attrs[i]->namespace) continue;
             }
-            if (strcmp (atPtr->nodeName, cp->attrs[i]->name) == 0) {
+            if (strcmp (ln, cp->attrs[i]->name) == 0) {
                 found = 1;
                 if (cp->attrs[i]->required) reqAttr++;
                 break;
@@ -875,13 +888,19 @@ int probeDomAttributes (
                     if (strcmp (ns, cp->attrs[i]->namespace) != 0) {
                         goto nextAttr2;
                     }
-                    fprintf (stderr, "namespace %s match\n", ns);
+                    ln = atPtr->nodeName;
+                    while (*ln) {
+                        if (*ln == ':') {
+                            ln++;
+                            break;
+                        }
+                        ln++;
+                    }
                 } else {
                     if (atPtr->namespace) goto nextAttr2;
+                    ln = atPtr->nodeName;
                 }
-                fprintf (stderr, "comparing names  %s %s\n", atPtr->nodeName,
-                    cp->attrs[i]->name);
-                if (strcmp (atPtr->nodeName, cp->attrs[i]->name) == 0) {
+                if (strcmp (ln, cp->attrs[i]->name) == 0) {
                     found = 1;
                     break;
                 }

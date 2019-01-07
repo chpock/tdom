@@ -1289,6 +1289,31 @@ test schema-11.1a {attribute} {
     set result
 } {0 0 1 1}
 
+test schema-11.1b {attribute} {
+    tdom::schema create s
+    s define {
+        defelement doc {
+            attribute attr1
+            attribute attr2 ?
+        }
+    }
+    ::xml::parser p -validateCmd s    
+    set result [list]
+    foreach xml {
+        {<doc attr1="foo" attr2="bar"/>}
+        {<doc attr1="foo"/>}
+        {<doc attr2="bar"/>}
+        {<doc attr1="foo" attr2="bar" unknownAtt="grill"/>}
+    } {
+        lappend result [catch {p parse $xml} errMsg]
+        p reset
+        s reset
+    }
+    s delete
+    p delete
+    set result
+} {0 0 1 1}
+
 test schema-11.2 {attribute} {
     tdom::schema create s
     s define {
@@ -1338,6 +1363,36 @@ test schema-11.2a {attribute} {
     set result
 } {0 0 1 0 1}
 
+test schema-11.2b {attribute} {
+    tdom::schema create s
+    s define {
+        defelement e {
+            attribute attr1
+            element e 1 {
+                attribute attr3 ?
+                attribute attr4 !
+            }
+            attribute attr2 ?
+        }
+    }
+    ::xml::parser p -validateCmd s    
+    set result [list]
+    foreach xml {
+        {<e attr1="attr1" attr2="attr2"><e attr3="attr3" attr4="attr4"/></e>}
+        {<e attr1="attr1"><e attr3="attr3" attr4="attr4"/></e>}
+        {<e attr2="attr2"><e attr3="attr3" attr4="attr4"/></e>}
+        {<e attr1="attr1"><e attr4="attr4"/></e>}
+        {<e attr1="attr1"><e attr3="attr3"/></e>}
+    } {
+        lappend result [catch {p parse $xml} errMsg]
+        p reset
+        s reset
+    }
+    p delete
+    s delete
+    set result
+} {0 0 1 0 1}
+
 test schema-11.3 {attribute} {
     tdom::schema create s
     s define {
@@ -1364,11 +1419,29 @@ test schema-11.3a {attribute} {
             attribute attr2 ?
         }
     }
-    set result [catch {dom parse -validateCmd s <e/> errMsg} errMsg]
+    set result [catch {dom parse -validateCmd s <e/>} errMsg]
     lappend result $errMsg
     s delete
     set result
 } {1 {Missing mandatory attribute(s): attr1 attr4, referenced at line 1 character 4}}
+
+test schema-11.3b {attribute} {
+    tdom::schema create s
+    s define {
+        defelement e {
+            attribute attr1
+            attribute attr3 ?
+            attribute attr4 !
+            attribute attr2 ?
+        }
+    }
+    ::xml::parser p -validateCmd s    
+    set result [catch {p parse <e/>} errMsg]
+    lappend result $errMsg
+    p delete
+    s delete
+    set result
+} {1 {Missing mandatory attribute(s): attr1 attr4}}
 
 test schema-11.4 {attribute} {
     tdom::schema create s
@@ -1431,6 +1504,8 @@ test schema-11.6 {nsattribute} {
     foreach xml {
         {<doc><e foo="bar"/></doc>}
         {<doc><e xml:lang="en"/></doc>}
+        {<doc><e unknown="some"/></doc>}
+        {<doc><e/></doc>}
     } {
         lappend result [catch {set doc [dom parse -validateCmd s $xml]} errMsg]
         lappend result $errMsg
@@ -1438,4 +1513,4 @@ test schema-11.6 {nsattribute} {
     }
     s delete
     set result
-} 0
+} {1 {Missing mandatory attribute(s): http://www.w3.org/XML/1998/namespace:lang, referenced at line 1 character 19} 1 {Missing mandatory attribute(s): foo, referenced at line 1 character 23} 1 {Unknown attribute "unknown", referenced at line 1 character 24} 1 {Missing mandatory attribute(s): foo http://www.w3.org/XML/1998/namespace:lang, referenced at line 1 character 9}}
