@@ -870,13 +870,17 @@ int probeDomAttributes (
             atPtr = attr;
             while (atPtr) {
                 if (cp->attrs[i]->namespace) {
-                    if (!attr->namespace) goto nextAttr2;
+                    if (!atPtr->namespace) goto nextAttr2;
                     ns = domNamespaceURI ((domNode *)atPtr);
-                    if (strcmp (ns, cp->attrs[i]->namespace) != 0)
+                    if (strcmp (ns, cp->attrs[i]->namespace) != 0) {
                         goto nextAttr2;
+                    }
+                    fprintf (stderr, "namespace %s match\n", ns);
                 } else {
                     if (atPtr->namespace) goto nextAttr2;
                 }
+                fprintf (stderr, "comparing names  %s %s\n", atPtr->nodeName,
+                    cp->attrs[i]->name);
                 if (strcmp (atPtr->nodeName, cp->attrs[i]->name) == 0) {
                     found = 1;
                     break;
@@ -1240,7 +1244,7 @@ schemaReset (
     SchemaData *sdata
     )
 {
-    sdata->stack = NULL;
+    while (sdata->stack) popStack (sdata);
     sdata->validationState = VALIDATION_READY;
     sdata->skipDeep = 0;
 }
@@ -1990,7 +1994,8 @@ static int maybeAddAttr (
     SchemaAttr *attr;
         
     if (namespaceObj) {
-        h = Tcl_CreateHashEntry (&sdata->namespace, namespaceObj, &hnew1);
+        h = Tcl_CreateHashEntry (&sdata->namespace,
+                                 Tcl_GetString (namespaceObj), &hnew1);
         if (h != sdata->emptyNamespace) {
             namespace = Tcl_GetHashKey (&sdata->namespace, h);
         }
