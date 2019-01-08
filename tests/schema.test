@@ -1531,7 +1531,7 @@ test schema-11.6 {nsattribute} {
 } {1 {Missing mandatory attribute(s): http://www.w3.org/XML/1998/namespace:lang, referenced at line 1 character 19} 1 {Missing mandatory attribute(s): foo, referenced at line 1 character 23} 1 {Unknown attribute "unknown", referenced at line 1 character 24} 1 {Missing mandatory attribute(s): foo http://www.w3.org/XML/1998/namespace:lang, referenced at line 1 character 9}}
 
 test schema-12.1 {domvalidate} {
-    tdom::schema s
+    tdom::schema s 
     s define {
         defelement addressBook {
             element card *
@@ -1558,6 +1558,6 @@ test schema-12.1 {domvalidate} {
     }]
     set result [s domvalidate $doc]
     $doc delete
-    $s delete
+    s delete
     set result
 } 1

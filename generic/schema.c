@@ -1720,7 +1720,7 @@ tDOM_SchemaObjCmd (
     Tcl_Obj *const objv[]
     )
 {
-    int            methodIndex, result = TCL_OK;
+    int            methodIndex, ind, result = TCL_OK;
     SchemaData  *sdata;
 
     static const char *schemaMethods[] = {
@@ -1737,23 +1737,25 @@ tDOM_SchemaObjCmd (
 
     if (objc == 2) {
         methodIndex = m_create;
+        ind = 1;
     } else {
         if (Tcl_GetIndexFromObj (interp, objv[1], schemaMethods,
                                  "method", 0, &methodIndex)
             != TCL_OK) {
             return TCL_ERROR;
         }
+        ind = 2;
     }
         
     Tcl_ResetResult (interp);
     switch ((enum schemaMethod) methodIndex) {
     case m_create:
         sdata = initSchemaData ();
-        Tcl_CreateObjCommand (interp, Tcl_GetString(objv[2]),
+        Tcl_CreateObjCommand (interp, Tcl_GetString(objv[ind]),
                               schemaInstanceCmd, 
                               (ClientData) sdata,
                               schemaInstanceDelete);
-        Tcl_SetObjResult (interp, objv[2]);
+        Tcl_SetObjResult (interp, objv[ind]);
         break;
         
     default:
