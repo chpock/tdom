@@ -1268,6 +1268,50 @@ validateString (
     return result;
 }
 
+static int
+validateDOM (
+    Tcl_Interp *interp,
+    SchemaData *sdata,
+    domNode    *node
+    )
+{
+    if (probeElement (interp, sdata, node->nodeName,
+                      node->namespace ?
+                      node->ownerDocument->namespaces[node->namespace-1]->uri
+                      : NULL)
+        != TCL_OK) {
+        return TCL_ERROR;
+    } else {
+        if (probeDomAttributes (interp, sdata, node->firstAttr) != TCL_OK) {
+            return TCL_ERROR;
+        }
+    }
+
+    node = node->firstChild;
+    while (node) {
+        switch (node->nodeType) {
+        case ELEMENT_NODE:
+            return validateDOM (interp, sdata, node);
+
+        case TEXT_NODE:
+        case CDATA_SECTION_NODE:
+            /* To be done */
+            break;
+            
+        case COMMENT_NODE:
+            break;
+
+        case PROCESSING_INSTRUCTION_NODE:
+            break;
+
+        default:
+            return TCL_ERROR;
+        }
+        node = node->nextSibling;
+    }
+    return TCL_OK;
+}
+
 static void
 schemaReset (
     SchemaData *sdata
@@ -1615,7 +1659,7 @@ schemaInstanceCmd (
         doc = tcldom_getDocumentFromName (interp, Tcl_GetString (objv[2]),
                                           &errMsg);
         if (doc) {
-
+            node = doc->documentElement;
         } else {
             node = tcldom_getNodeFromObj (interp, objv[2]);
             if (!node) {
@@ -1623,7 +1667,22 @@ schemaInstanceCmd (
                            "document or a element node");
                 return TCL_ERROR;
             }
+            sdata->validationState = VALIDATION_STARTED;
         }
+        if (validateDOM (interp, sdata, node) == TCL_OK) {
+            SetBooleanResult (1);
+            if (objc == 4) {
+                Tcl_SetVar (interp, Tcl_GetString (objv[3]), "", 0);
+            }
+        } else {
+            if (objc == 4) {
+                Tcl_SetVar (interp, Tcl_GetString (objv[3]),
+                            Tcl_GetStringResult (interp), 0);
+            }
+            SetBooleanResult (0);
+        }
+        schemaReset (sdata);
+            
         break;
         
     default:

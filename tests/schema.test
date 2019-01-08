@@ -11,6 +11,8 @@
 #    schema-8.*: tdom::schema validate method
 #    schema-9.*: Choice
 #    scheam-10.*: Any
+#    schema-11.*: attribute, nsattribute
+#    schema-12.*: schemaCmd domvalidate
 #
 # Copyright (c) 2018 Rolf Ade.
 
@@ -1527,3 +1529,35 @@ test schema-11.6 {nsattribute} {
     s delete
     set result
 } {1 {Missing mandatory attribute(s): http://www.w3.org/XML/1998/namespace:lang, referenced at line 1 character 19} 1 {Missing mandatory attribute(s): foo, referenced at line 1 character 23} 1 {Unknown attribute "unknown", referenced at line 1 character 24} 1 {Missing mandatory attribute(s): foo http://www.w3.org/XML/1998/namespace:lang, referenced at line 1 character 9}}
+
+test schema-12.1 {domvalidate} {
+    tdom::schema s
+    s define {
+        defelement addressBook {
+            element card *
+        }
+        defelement card {
+            element name
+            element email
+        }
+        foreach e {name email} {
+            defelement $e {text}
+        }
+    }
+    set doc [dom parse {
+<addressBook>
+  <card>
+    <name>John Smith</name>
+    <email>js@example.com</email>
+  </card>
+  <card>
+    <name>Fred Bloggs</name>
+    <email>fb@example.net</email>
+  </card>
+</addressBook>        
+    }]
+    set result [s domvalidate $doc]
+    $doc delete
+    $s delete
+    set result
+} 1
