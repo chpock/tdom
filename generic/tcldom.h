@@ -52,6 +52,9 @@ int  tcldom_nameCheck(Tcl_Interp *interp, char *name, char *nameType,
 void tcldom_createNodeObj(Tcl_Interp * interp, domNode *node,
                           char *objCmdName);
 
+domNode * tcldom_getNodeFromObj(Tcl_Interp  *interp, Tcl_Obj *nodeObj);
+domDocument * tcldom_getDocumentFromName(Tcl_Interp  *interp, char *docName,
+                                         char **errMsg);
 
 void tcldom_initialize(void);
 

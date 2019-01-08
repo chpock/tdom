@@ -1074,6 +1074,19 @@ test schema-8.5 {illegal text - expat not signaling XML_STATUS_SUSPENDED althoug
     set result
 } 0
 
+test schema-8.6 {} {
+    tdom::schema create s
+    s define {
+        defelement doc {}
+    }
+    set result [s validate <doc/>]
+    lappend result [s validate <wrong/>]
+    s start mydoc
+    lappend result [s validate <doc/>]
+    s delete
+    set result
+} {1 0 0}
+
 test schema-9.1 {choice} {
     tdom::schema create grammar
     grammar define {

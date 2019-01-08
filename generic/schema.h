@@ -171,6 +171,8 @@ int probeAttributes (
     const char **attr
     );
 
+typedef struct domDocument domDocument;
+typedef struct domNode domNode;
 typedef struct domAttrNode domAttrNode;
 
 int probeDomAttributes (

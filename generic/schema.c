@@ -24,6 +24,7 @@
 #ifndef TDOM_NO_SCHEMA
 
 #include <tdom.h>
+#include <tcldom.h>
 #include <schema.h>
 
 /* #define DEBUG */
@@ -716,6 +717,7 @@ probeElement (
     } else {
         namePtr = NULL;
     }
+
     if (sdata->validationState == VALIDATION_READY) {
         /* The root of the tree to check. */
         if (sdata->start) {
@@ -736,6 +738,8 @@ probeElement (
                 }
             }
         }
+    }
+    if (entryPtr) {
         pattern = (SchemaCP *) Tcl_GetHashValue (entryPtr);
         while (pattern) {
             if (pattern->namespace == namespacePtr) {
@@ -743,15 +747,20 @@ probeElement (
             }
             pattern = pattern->next;
         }
+    } else {
+        pattern = NULL;
+    }
+    
+    if (!sdata->stack) {
         if (!pattern) {
-            SetResult ("Root element doesn't match");
+            SetResult ("Unknown element");
             return TCL_ERROR;
         }
         pushToStack (sdata, pattern, 0);
         sdata->validationState = VALIDATION_STARTED;
         return TCL_OK;
     }
-    
+
     /* The normal case: we're inside the tree */
     if (matchElementStart (sdata, (char *) namePtr, (char *) namespacePtr)) {
         DBG(
@@ -1156,6 +1165,7 @@ startElement(
         != TCL_OK) {
         vdata->sdata->validationState = VALIDATION_ERROR;
         XML_StopParser (vdata->parser, 0);
+        return;
     }
     if (atts[0] || vdata->sdata->stack->pattern->attrs) {
         if (probeAttributes (vdata->interp, vdata->sdata, atts)
@@ -1285,17 +1295,19 @@ schemaInstanceCmd (
     Tcl_HashEntry *entryPtr;
     SchemaCP   *pattern, *current = NULL;
     void          *namespacePtr, *savedNamespacePtr;
-    char          *xmlstr;
+    char          *xmlstr, *errMsg;
+    domDocument   *doc;
+    domNode       *node;
     
     static const char *schemaInstanceMethods[] = {
         "defelement", "defpattern", "start", "event", "delete",
         "nrForwardDefinitions", "state", "reset", "define",
-        "validate", NULL
+        "validate", "domvalidate", NULL
     };
     enum schemaInstanceMethod {
         m_defelement, m_defpattern, m_start, m_event, m_delete,
         m_nrForwardDefinitions, m_state, m_reset, m_define,
-        m_validate
+        m_validate, m_domvalidate
     };
 
     static const char *eventKeywords[] = {
@@ -1593,6 +1605,25 @@ schemaInstanceCmd (
             SetBooleanResult (0);
         }
         schemaReset (sdata);
+        break;
+
+    case m_domvalidate:
+        if (objc < 3 || objc > 4) {
+            Tcl_WrongNumArgs (interp, 2, objv, "<xml> ?resultVarName?");
+            return TCL_ERROR;
+        }
+        doc = tcldom_getDocumentFromName (interp, Tcl_GetString (objv[2]),
+                                          &errMsg);
+        if (doc) {
+
+        } else {
+            node = tcldom_getNodeFromObj (interp, objv[2]);
+            if (!node) {
+                SetResult ("The second argument must be either a "
+                           "document or a element node");
+                return TCL_ERROR;
+            }
+        }
         break;
         
     default:
