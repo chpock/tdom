@@ -1096,6 +1096,7 @@ probeText (
     }
     if (ac < cp->numChildren) {
         if (cp->content[ac]->type == SCHEMA_CTYPE_TEXT) {
+            updateStack (sdata->stack, ac, nm+1);
             return checkText (interp, cp->content[ac], text);
         }
     }
@@ -1275,6 +1276,8 @@ validateDOM (
     domNode    *node
     )
 {
+    /* fprintf (stderr, "validateDOM, node '%s'\n", node->nodeName); */
+    /* serializeStack (sdata); */
     if (probeElement (interp, sdata, node->nodeName,
                       node->namespace ?
                       node->ownerDocument->namespaces[node->namespace-1]->uri
@@ -1291,24 +1294,27 @@ validateDOM (
     while (node) {
         switch (node->nodeType) {
         case ELEMENT_NODE:
-            return validateDOM (interp, sdata, node);
-
+            if (validateDOM (interp, sdata, node) != TCL_OK) return TCL_ERROR;
+            break;
+            
         case TEXT_NODE:
         case CDATA_SECTION_NODE:
-            /* To be done */
+            /* To be done seriously */
+            probeText (interp, sdata, ((domTextNode *) node)->nodeValue);
             break;
             
         case COMMENT_NODE:
-            break;
-
         case PROCESSING_INSTRUCTION_NODE:
+            /* They are just ignored, for validation. */
             break;
 
         default:
+            SetResult ("Unexpected node type in validateDOM!");
             return TCL_ERROR;
         }
         node = node->nextSibling;
     }
+    if (probeElementEnd (interp, sdata) != TCL_OK) return TCL_ERROR;
     return TCL_OK;
 }
 
@@ -2257,8 +2263,7 @@ TextPatternObjCmd (
     CHECK_SI
     CHECK_TOPLEVEL
     checkNrArgs (1,2,"?<definition script>?");
-    pattern = initSchemaCP ((Schema_CP_Type) clientData,
-                               NULL, NULL);
+    pattern = initSchemaCP (SCHEMA_CTYPE_TEXT, NULL, NULL);
     REMEMBER_PATTERN (pattern)
     ADD_TO_CONTENT (pattern, quantOne)
     return TCL_OK;

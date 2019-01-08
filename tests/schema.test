@@ -302,6 +302,83 @@ test schema-4.1 {validation} {
     grammar delete
 } {}
 
+test schema-4.1a {validation} {
+    tdom::schema create s
+    s defelement doc {
+        element e1
+        element e2 *
+    }
+    foreach e {e1 e2} {
+        s defelement $e {}
+    }
+    set result [list]
+    foreach xml {
+        <doc><e1/></doc>
+        <doc><e1/><e2/></doc>
+        <doc><e1/><e2/><e2/><e2/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 1 1}
+
+test schema-4.2 {validation} {
+    tdom::schema create s
+    s defelement doc {
+        element e1 *
+    }
+    s defelement e1 {
+        element ee1
+        element ee2
+    }
+    foreach e {ee1 ee2} {
+        s defelement $e {}
+    }
+    set result [list]
+    foreach xml {
+        <doc></doc>
+        <doc><e1/></doc>
+        <doc><e1><ee1/><ee2/></e1></doc>
+        <doc><e1><ee1/><ee2/></e1><e1><ee1/><ee2/></e1><e1><ee1/><ee2/></e1></doc>
+        <doc><e1><ee1/><ee2/></e1><e1><ee1/><ee2/><unknown/></e1></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 0 1 1 0}
+
+test schema-4.3 {domvalidate} {
+    tdom::schema s 
+    s define {
+        defelement addressBook {
+            element card *
+        }
+        defelement card {
+            element name
+            element email
+        }
+        foreach e {name email} {
+            defelement $e {text}
+        }
+    }
+    set result [s validate {
+<addressBook>
+  <card>
+    <name>John Smith</name>
+    <email>js@example.com</email>
+  </card>
+  <card>
+    <name>Fred Bloggs</name>
+    <email>fb@example.net</email>
+  </card>
+</addressBook>        
+    }]
+    s delete
+    set result
+} 1
+
 test schema-5.1 {dom parse -validateCmd} {
     set result [catch {
         [dom parse -validateCmd tdom::schema <doc/>]
@@ -918,12 +995,13 @@ test schema-7.12 {loop over seq} {
         }
     }
     set result [grammar validate <doc><c/></doc> errMsg]
+    lappend result [grammar validate <doc><a/><b/><c/><d/></doc>]
     lappend result [grammar validate <doc><a/><b/><c/></doc>]
     lappend result [grammar validate <doc><a/><b/><a/><b/><c/></doc>]
     lappend result [grammar validate <doc><a/><b/></doc>]
     grammar delete
     set result
-} {0 1 0 0}
+} {0 0 1 0 0}
 
 test schema-7.13 {long sequence} {
     tdom::schema create s
@@ -1557,7 +1635,11 @@ test schema-12.1 {domvalidate} {
 </addressBook>        
     }]
     set result [s domvalidate $doc]
+    lappend result [s domvalidate [$doc documentElement]]
+    lappend result [s domvalidate [[$doc documentElement] firstChild]]
+    lappend result [s domvalidate [[[$doc documentElement] firstChild] firstChild]]
     $doc delete
     s delete
     set result
-} 1
+} {1 1 1 1}
+

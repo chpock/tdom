@@ -174,6 +174,7 @@ int probeAttributes (
 typedef struct domDocument domDocument;
 typedef struct domNode domNode;
 typedef struct domAttrNode domAttrNode;
+typedef struct domTextNode domTextNode;
 
 int probeDomAttributes (
     Tcl_Interp *interp,

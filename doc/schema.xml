@@ -119,6 +119,16 @@
       </commanddef>
 
       <commanddef>
+        <command><method>domvalidate</method> <m>domNode</m> <m>?objVar?</m></command>
+        <desc>Returns true if the first argument is a valid tree or
+        false otherwise. If validation failed and the optional
+        <m>objVar</m> argument is given, then the variable with that
+        name is set to a validation error message. If the dom tree is
+        valid and the optional <m>objVar</m> argument is given, then
+        the variable with that name is set to the empty string. </desc>
+      </commanddef>
+      
+      <commanddef>
         <command><method>delete</method></command>
         <desc>This method deletes the validation command.</desc>
       </commanddef>
