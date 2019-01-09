@@ -13,6 +13,7 @@
 #    scheam-10.*: Any
 #    schema-11.*: attribute, nsattribute
 #    schema-12.*: schemaCmd domvalidate
+#    schema-13.*: XML namespaces
 #
 # Copyright (c) 2018 Rolf Ade.
 
@@ -1678,5 +1679,6 @@ test schema-12.2 {domvalidate} {
     s delete
     set result
 } {0 {Element "some" doesn't match}}
+
 
 }

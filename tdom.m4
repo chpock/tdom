@@ -235,7 +235,7 @@ AC_DEFUN(TDOM_ENABLE_SCHEMA, [
         enableval="$enable_schema"
         tcl_ok=$enableval
     else
-        tcl_ok=no
+        tcl_ok=yes
     fi
 
     if test "$tcl_ok" = "no" ; then

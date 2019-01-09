@@ -15,9 +15,9 @@
     <title>DESCRIPTION </title>    
     
     <p>This command creates validation commands with a simple API. The
-    validation commands have methods to define a grammer and are able
+    validation commands have methods to define a schema and are able
     to validate XML or DOM trees (and to some degree other kind of
-    hierarchical data) against this grammer.</p>
+    hierarchical data) against this schema.</p>
 
     <p>Additionally, a validation command may be used as argument to
     the <m>-validateCmd</m> option of the <m>dom parse</m> and the
@@ -30,7 +30,7 @@
       <commanddef>
         <command><method>defelement</method> <m>name</m> <m>?namespace?</m> <m>&lt;definition script></m></command>
         <desc>This method defines the element <m>name</m> (optional in
-        the namespace <m>namespace</m>) in the grammar. The
+        the namespace <m>namespace</m>) in the schema. The
         <m>definition script</m> is evaluated and defines the content
         model of the element. If the <m>namespace</m> argument is
         given, any <m>element</m> or <m>ref</m> references in the
@@ -44,7 +44,7 @@
         <command><method>defpattern</method> <m>name</m> <m>&lt;definition script></m></command>
         <desc>This method defines a (maybe complex) content particle
         with the <m>name</m> (optional in the namespace
-        <m>namespace</m>) in the grammar, to be referenced in other
+        <m>namespace</m>) in the schema, to be referenced in other
         definition scripts with the definition command <m>ref</m>. The
         <m>definition script</m> is evaluated and defines the content
         model of the content particle. If the <m>namespace</m>
@@ -58,7 +58,7 @@
       <commanddef>
         <command><method>define</method> <m>&lt;definition script></m></command>
         <desc>This method allows to define several elements or pattern
-        or a whole grammar with one call.</desc>
+        or a whole schema with one call.</desc>
       </commanddef>
       
       <commanddef>
@@ -78,8 +78,7 @@
       <commanddef>
         <command><method>event</method> <m>(start|end|text)</m> <m>?event specific data?</m></command>
         <desc>This method allows to validate hierarchical data against
-        the so far defined content constrains of the validation
-        command.
+        the content constrains of the validation command.
 
         <optlist>
           <optdef>
@@ -386,8 +385,8 @@
     defintion script would be:</p>
 
     <example>
-tdom::schema grammar      
-grammar define {
+tdom::schema schema      
+schema define {
 
     # Purchase order schema for Example.com.
     # Copyright 2000 Example.com. All rights reserved.
@@ -474,8 +473,8 @@ A RELAX NG pattern for this could be written as follows:
     <p>This schema definition script will do the same:</p>
 
     <example>
-tdom::schema grammar      
-grammar define {
+tdom::schema schema      
+schema define {
     defelement addressBook {
         element card *
     }
