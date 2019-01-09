@@ -569,6 +569,9 @@ matchElementStart (
                     return 1;
                 
                 case SCHEMA_CTYPE_NAME:
+                    DBG(fprintf (stderr, "name: %s ns: %s candidate name: %s "
+                                 "candidate ns: %s\n", name, namespace,
+                                 candidate->name, candidate->namespace));
                     if (candidate->name == name
                         && candidate->namespace == namespace) {
                         updateStack (se, ac, nm+1);
@@ -775,7 +778,11 @@ probeElement (
         serializeStack (sdata);
         fprintf (stderr, "\n");
         );
-    SetResult3 ("Element \"", name, "\" doesn't match");
+    SetResult ("Element \"");
+    if (namespacePtr) {
+        Tcl_AppendResult (interp, namespacePtr, ":", NULL);
+    }
+    Tcl_AppendResult (interp, name, "\" doesn't match", NULL);
     return TCL_ERROR;
 }
 
@@ -2237,7 +2244,7 @@ NamespacePatternObjCmd (
 
     currentNamespace = sdata->currentNamespace;
     entryPtr = Tcl_CreateHashEntry (&sdata->namespace,
-                                    objv[1], &hnew);
+                                    Tcl_GetString(objv[1]), &hnew);
     if (entryPtr == sdata->emptyNamespace) {
         sdata->currentNamespace = NULL;
     } else {

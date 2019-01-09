@@ -1680,5 +1680,69 @@ test schema-12.2 {domvalidate} {
     set result
 } {0 {Element "some" doesn't match}}
 
+test schema-13.1 {XML namespaces} {
+    tdom::schema create s
+    s defelement doc ns1 {
+        # Forward defined element inherits child namespace
+        element elm1
+        element elm2
+    }
+    s defelement elm1 ns2 {}
+    s defelement elm1 ns1 {
+        choice {
+            element fooElem
+            element barElem +
+        }
+    }
+    s defelement elm2 ns1 {}
+    s defelement fooElem ns1 {}
+    s defelement barElem ns1 {}
+    set result [list]
+    foreach xml {
+        {<doc xmlns="ns1"><elm1><fooElem/></elm1></doc>}
+        {<doc xmlns="ns1"><elm1><fooElem/></elm1><elm2/></doc>}
+        {<n:doc xmlns:n="ns1"><n:elm1><n:fooElem/></n:elm1><n:elm2/></n:doc>}
+        {<n:doc xmlns:n="ns1"><elm1 xmlns="ns1"><n:fooElem/></elm1><n:elm2/></n:doc>}
+        {<n:doc xmlns:n="ns1"><elm1 xmlns="ns2"><n:fooElem/></elm1><n:elm2/></n:doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 1 1 0}
+
+test schema-13.2 {XML namespaces} {
+    tdom::schema create s
+    s defelement doc ns1 {
+        namespace ns2 {
+            element elm1
+        }
+        # Forward defined element inherits child namespace
+        element elm2
+    }
+    s defelement elm1 ns2 {}
+    s defelement elm1 ns1 {
+        choice {
+            element fooElem
+            element barElem +
+        }
+    }
+    s defelement elm2 ns1 {}
+    s defelement fooElem ns1 {}
+    s defelement barElem ns1 {}
+    set result [list]
+    foreach xml {
+        {<doc xmlns="ns1"><elm1><fooElem/></elm1></doc>}
+        {<doc xmlns="ns1"><elm1><fooElem/></elm1><elm2/></doc>}
+        {<n:doc xmlns:n="ns1"><n:elm1><n:fooElem/></n:elm1><n:elm2/></n:doc>}
+        {<n:doc xmlns:n="ns1"><elm1 xmlns="ns1"><n:fooElem/></elm1><n:elm2/></n:doc>}
+        {<n:doc xmlns:n="ns1"><elm1 xmlns="ns2"/><n:elm2/></n:doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 0 0 1}
+
 
 }
