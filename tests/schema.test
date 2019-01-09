@@ -18,6 +18,8 @@
 
 source [file join [file dir [info script]] loadtdom.tcl]
 
+if {[dom featureinfo schema]} {
+
 test schema-1.1 {create} {
     tdom::schema create grammar
     grammar start doc
@@ -1643,3 +1645,38 @@ test schema-12.1 {domvalidate} {
     set result
 } {1 1 1 1}
 
+test schema-12.2 {domvalidate} {
+    tdom::schema s 
+    s define {
+        defelement addressBook {
+            element card *
+        }
+        defelement card {
+            element name
+            element email
+        }
+        foreach e {name email} {
+            defelement $e {text}
+        }
+    }
+    set doc [dom parse {
+<addressBook>
+  <card>
+    <name>John Smith</name>
+    <email>js@example.com</email>
+  </card>
+  <card>
+    <name>Fred Bloggs</name>
+    <email>fb@example.net</email>
+    <some>John Smith</some>
+  </card>
+</addressBook>        
+    }]
+    set result [s domvalidate $doc errMsg]
+    lappend result $errMsg
+    $doc delete
+    s delete
+    set result
+} {0 {Element "some" doesn't match}}
+
+}

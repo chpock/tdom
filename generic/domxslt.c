@@ -5787,7 +5787,10 @@ getExternalDocument (
        a good idea?) */
     doc = domReadDocument (parser, xmlstring, len, 0, 0, storeLineColumn,
                            0, 0, NULL, chan, extbase, extResolver, 0, 
-                           (int) XML_PARAM_ENTITY_PARSING_ALWAYS, NULL,
+                           (int) XML_PARAM_ENTITY_PARSING_ALWAYS,
+#ifndef TDOM_NO_SCHEMA
+                           NULL,
+#endif
                            interp, &resultcode);
     if (xsltDoc->extResolver) {
         Tcl_DecrRefCount (extResolver);

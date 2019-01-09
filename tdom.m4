@@ -206,6 +206,47 @@ AC_DEFUN(TDOM_ENABLE_LESS_NS, [
 ])
 
 #------------------------------------------------------------------------
+# TDOM_ENABLE_SCHEMA --
+#
+#   Building with validation features.
+#
+# Arguments:
+#   None
+#   
+# Results:
+#
+#   Adds the following arguments to configure:
+#       --enable-validation=yes|no
+#
+#   Defines the following vars:
+#
+#   Sets the following vars:
+#
+#------------------------------------------------------------------------
+
+AC_DEFUN(TDOM_ENABLE_SCHEMA, [
+    AC_MSG_CHECKING([whether to enable valiation features])
+    AC_ARG_ENABLE(schema,
+        AC_HELP_STRING([--enable-schema],
+            [build with valiation features (default: on)]),
+        [tcl_ok=$enableval], [tcl_ok=yes])
+
+    if test "${enable_schema+set}" = set; then
+        enableval="$enable_schema"
+        tcl_ok=$enableval
+    else
+        tcl_ok=no
+    fi
+
+    if test "$tcl_ok" = "no" ; then
+        AC_MSG_RESULT([no])
+        AC_DEFINE(TDOM_NO_SCHEMA)
+    else
+        AC_MSG_RESULT([yes])
+    fi
+])
+
+#------------------------------------------------------------------------
 # TDOM_ENABLE_HTML5 --
 #
 #   Building with gumbo support for HTML5 parsing (dom parse -html5)

@@ -1305,7 +1305,7 @@ validateDOM (
             
         case COMMENT_NODE:
         case PROCESSING_INSTRUCTION_NODE:
-            /* They are just ignored, for validation. */
+            /* They are just ignored by validation. */
             break;
 
         default:
@@ -2326,48 +2326,6 @@ tDOM_SchemaInit (
                           NamespacePatternObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::text",
                           TextPatternObjCmd, NULL, NULL);
-}
-
-# else  /* #ifndef TDOM_NO_SCHEMA */
-int 
-schemaInstanceCmd (
-    ClientData clientData,
-    Tcl_Interp *interp,
-    int objc,
-    Tcl_Obj *const objv[]
-    )
-{
-    return TCL_OK;
-}
-
-int
-probeElement (
-    Tcl_Interp *interp,
-    SchemaData *sdata,
-    char *name,
-    void *namespace
-    )
-{
-    return TCL_OK;
-}
-
-int
-probeElementEnd (
-    Tcl_Interp * interp,
-    SchemaData *sdata
-    )
-{
-    return TCL_OK;
-}
-
-int
-probeText (
-    Tcl_Interp *interp,
-    SchemaData *sdata,
-    char *text
-    )
-{
-    return TCL_OK;
 }
 
 #endif  /* #ifndef TDOM_NO_SCHEMA */

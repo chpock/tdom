@@ -2279,6 +2279,7 @@ TclGenExpatElementStartHandler(
       activeCHandlerSet = activeCHandlerSet->nextHandlerSet;
   }
 
+#ifndef TDOM_NO_SCHEMA
   if (expat->sdata) {
       if (probeElement (expat->interp, expat->sdata, name, NULL) != TCL_OK) {
           TclExpatHandlerResult (expat, NULL, TCL_ERROR);
@@ -2291,6 +2292,7 @@ TclGenExpatElementStartHandler(
           }
       }
   }
+#endif
   return;
 }
 
@@ -2411,11 +2413,13 @@ TclGenExpatElementEndHandler(
       activeCHandlerSet = activeCHandlerSet->nextHandlerSet;
   }
 
+#ifndef TDOM_NO_SCHEMA
   if (expat->sdata) {
       if (probeElementEnd (expat->interp, expat->sdata) != TCL_OK) {
           TclExpatHandlerResult (expat, NULL, TCL_ERROR);
       }
   }
+#endif
   return;
 }
 
@@ -2773,11 +2777,13 @@ TclExpatDispatchPCDATA(
       activeCHandlerSet = activeCHandlerSet->nextHandlerSet;
   }
   
+#ifndef TDOM_NO_SCHEMA
   if (expat->sdata) {
       if (probeText (expat->interp, expat->sdata, s) != TCL_OK) {
           TclExpatHandlerResult (expat, NULL, TCL_ERROR);
       }
   }
+#endif
   Tcl_DecrRefCount (expat->cdata);
   expat->cdata = NULL;
   return;

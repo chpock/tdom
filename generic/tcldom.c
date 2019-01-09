@@ -1241,7 +1241,9 @@ int tcldom_appendXML (
                           extResolver,
                           0,
                           (int) XML_PARAM_ENTITY_PARSING_ALWAYS,
+#ifndef TDOM_NO_SCHEMA
                           NULL,
+#endif
                           interp,
                           &resultcode);
     if (extResolver) {
@@ -6164,7 +6166,9 @@ int tcldom_parse (
     XML_Parser   parser;
     Tcl_Channel  chan = (Tcl_Channel) NULL;
     Tcl_CmdInfo  cmdInfo;
-    SchemaData *sdata = NULL;
+#ifndef TDOM_NO_SCHEMA
+    SchemaData  *sdata = NULL;
+#endif
     static const char *parseOptions[] = {
         "-keepEmpties",           "-simple",        "-html",
         "-feedbackAfter",         "-channel",       "-baseurl",
@@ -6604,7 +6608,9 @@ int tcldom_parse (
                           extResolver,
                           useForeignDTD,
                           paramEntityParsing,
+#ifndef TDOM_NO_SCHEMA
                           sdata,
+#endif
                           interp,
                           &status);
     if (doc == NULL) {
