@@ -168,7 +168,17 @@ static void SetActiveSchemaData (SchemaData *v)
         SetResult ("Command called outside of schema context.");        \
         return TCL_ERROR;                                               \
     }                                                                   \
-    if (sdata->isAttribute) {                                           \
+    if (sdata->isTextConstraint) {                                      \
+        SetResult ("Command called in invalid schema context.");        \
+        return TCL_ERROR;                                               \
+    }
+
+#define CHECK_TI                                                        \
+    if (!sdata) {                                                       \
+        SetResult ("Command called outside of schema context.");        \
+        return TCL_ERROR;                                               \
+    }                                                                   \
+    if (!sdata->isTextConstraint) {                                      \
         SetResult ("Command called in invalid schema context.");        \
         return TCL_ERROR;                                               \
     }
@@ -196,6 +206,24 @@ static void SetActiveSchemaData (SchemaData *v)
     sdata->currentContent[sdata->numChildren] = (pattern);              \
     sdata->currentQuants[sdata->numChildren] = quant;                   \
     sdata->numChildren++;                                               \
+
+#define ADD_CONSTRAINT(sdata, sc)                                       \
+    sc = TMALLOC (SchemaConstraint);                                    \
+    if (sdata->numChildren == sdata->contentSize) {                     \
+        sdata->currentContent =                                         \
+            REALLOC (sdata->currentContent,                             \
+                     2 * sdata->contentSize                             \
+                     * sizeof (SchemaCP*));                             \
+        sdata->currentQuants =                                          \
+            REALLOC (sdata->currentQuants,                              \
+                     2 * sdata->contentSize                             \
+                     * sizeof (SchemaQuant*));                          \
+        sdata->contentSize *= 2;                                        \
+    }                                                                   \
+    sdata->currentContent[sdata->numChildren] = (SchemaCP *) sc;        \
+    sdata->currentQuants[sdata->numChildren] = quantOne;                \
+    sdata->numChildren++;                                               \
+    
 
 #define REMEMBER_PATTERN(pattern)                                       \
     if (sdata->numPatternList == sdata->patternListSize) {              \
@@ -235,8 +263,11 @@ initSchemaCP (
             sizeof (SchemaQuant*) * CONTENT_ARRAY_SIZE_INIT
             );
         break;
-    case SCHEMA_CTYPE_ANY:
     case SCHEMA_CTYPE_TEXT:
+        /* content/quant will be allocated, if the cp in fact has
+         * constraints */
+        break;
+    case SCHEMA_CTYPE_ANY:
         /* Do nothing */
         break;
     }
@@ -316,6 +347,11 @@ static void freeSchemaCP (
     case SCHEMA_CTYPE_ANY:
         /* do nothing */
         break;
+    case SCHEMA_CTYPE_TEXT:
+        for (i = 0; i < pattern->numChildren; i++) {
+            FREE (pattern->content[i]);
+        }
+        /* Fall throu */
     default:
         FREE (pattern->content);
         FREE (pattern->quants);
@@ -350,13 +386,25 @@ initSchemaData ()
     sdata->quants = (SchemaQuant **) MALLOC (
         sizeof (SchemaQuant*) * QUANTS_ARRAY_SIZE_INIT);
     sdata->quantsSize = QUANTS_ARRAY_SIZE_INIT;
+    /* evalStub initialization */
     sdata->evalStub = (Tcl_Obj **) (MALLOC (sizeof (Tcl_Obj*) * 4));
     sdata->evalStub[0] = Tcl_NewStringObj("::namespace", 11);
     Tcl_IncrRefCount (sdata->evalStub[0]);
     sdata->evalStub[1] = Tcl_NewStringObj("eval", 4);
     Tcl_IncrRefCount (sdata->evalStub[1]);
-    sdata->evalStub[2] = Tcl_NewStringObj("::tdom::schema", 17);
+    sdata->evalStub[2] = Tcl_NewStringObj("::tdom::schema", 14);
     Tcl_IncrRefCount (sdata->evalStub[2]);
+    /* textStub initialization */
+    sdata->textStub = (Tcl_Obj **) (MALLOC (sizeof (Tcl_Obj*) * 4));
+    sdata->textStub[0] = Tcl_NewStringObj("::namespace", 11);
+    Tcl_IncrRefCount (sdata->textStub[0]);
+    sdata->textStub[1] = Tcl_NewStringObj("eval", 4);
+    Tcl_IncrRefCount (sdata->textStub[1]);
+    sdata->textStub[2] = Tcl_NewStringObj("::tdom::schema::text", 20);
+    Tcl_IncrRefCount (sdata->textStub[2]);
+
+    sdata->cdata = TMALLOC (Tcl_DString);
+    Tcl_DStringInit (sdata->cdata);
     return sdata;
 }
 
@@ -396,6 +444,12 @@ static void schemaInstanceDelete (
     Tcl_DecrRefCount (sdata->evalStub[1]);
     Tcl_DecrRefCount (sdata->evalStub[2]);
     FREE (sdata->evalStub);
+    Tcl_DecrRefCount (sdata->textStub[0]);
+    Tcl_DecrRefCount (sdata->textStub[1]);
+    Tcl_DecrRefCount (sdata->textStub[2]);
+    FREE (sdata->textStub);
+    Tcl_DStringFree (sdata->cdata);
+    FREE (sdata->cdata);
     FREE (sdata);
 }
 
@@ -669,7 +723,6 @@ matchElementStart (
             return 0;
         }
     }
-    
     return 0;
 }
 
@@ -1055,6 +1108,7 @@ probeElementEnd (
     return TCL_OK;
 }
 
+/* The cp argument is expected to be a SCHEMA_CTYPE_TEXT cp */
 static int
 checkText (
     Tcl_Interp *interp,
@@ -1062,7 +1116,15 @@ checkText (
     char *text
     )
 {
+    int i;
+    SchemaConstraint *sc;
     
+    for (i = 0; i < cp->numChildren; i++) {
+        sc = (SchemaConstraint *) cp->content[i];
+        if ((sc->constraint) (interp, sc->constraintData, text) != TCL_OK) {
+            return TCL_ERROR;
+        }
+    }
     return TCL_OK;
 }
 
@@ -1104,7 +1166,11 @@ probeText (
     if (ac < cp->numChildren) {
         if (cp->content[ac]->type == SCHEMA_CTYPE_TEXT) {
             updateStack (sdata->stack, ac, nm+1);
-            return checkText (interp, cp->content[ac], text);
+            if (cp->content[ac]->numChildren) {
+                return checkText (interp, cp->content[ac], text);
+            } else {
+                return TCL_OK;
+            }
         }
     }
     /* If we are here then there isn't a matching TEXT cp. Check, if
@@ -1283,8 +1349,6 @@ validateDOM (
     domNode    *node
     )
 {
-    /* fprintf (stderr, "validateDOM, node '%s'\n", node->nodeName); */
-    /* serializeStack (sdata); */
     if (probeElement (interp, sdata, node->nodeName,
                       node->namespace ?
                       node->ownerDocument->namespaces[node->namespace-1]->uri
@@ -1301,13 +1365,27 @@ validateDOM (
     while (node) {
         switch (node->nodeType) {
         case ELEMENT_NODE:
+            if (Tcl_DStringLength (sdata->cdata)) {
+                if (probeText (interp, sdata,
+                               Tcl_DStringValue (sdata->cdata)) != TCL_OK)
+                    return TCL_ERROR;
+                Tcl_DStringSetLength (sdata->cdata, 0);
+            }
             if (validateDOM (interp, sdata, node) != TCL_OK) return TCL_ERROR;
             break;
             
         case TEXT_NODE:
         case CDATA_SECTION_NODE:
-            /* To be done seriously */
-            probeText (interp, sdata, ((domTextNode *) node)->nodeValue);
+            if (node == node->parentNode->firstChild
+                && node == node->parentNode->lastChild) {
+                if (probeText (interp, sdata,
+                               ((domTextNode *) node)->nodeValue) != TCL_OK)
+                    return TCL_ERROR;
+                break;
+            }
+            Tcl_DStringAppend (sdata->cdata,
+                               ((domTextNode *) node)->nodeValue,
+                               ((domTextNode *) node)->valueLength);
             break;
             
         case COMMENT_NODE:
@@ -1320,6 +1398,11 @@ validateDOM (
             return TCL_ERROR;
         }
         node = node->nextSibling;
+    }
+    if (Tcl_DStringLength (sdata->cdata)) {
+        if (probeText (interp, sdata, Tcl_DStringValue (sdata->cdata))
+            != TCL_OK) return TCL_ERROR;
+        Tcl_DStringSetLength (sdata->cdata, 0);
     }
     if (probeElementEnd (interp, sdata) != TCL_OK) return TCL_ERROR;
     return TCL_OK;
@@ -2097,11 +2180,43 @@ static int
 evalConstraints (
     Tcl_Interp *interp,
     SchemaData *sdata,
-    Tcl_Obj *script,
-    SchemaAttr *attr
+    SchemaCP *cp,
+    Tcl_Obj *script
     )
 {
-    return TCL_OK;
+    int result;
+    SchemaCP **savedCurrentContent, *savedCurrentCP;
+    SchemaQuant **savedCurrentQuant;
+    unsigned int savedNumChildren, savedContenSize;
+
+    /* Save some state of sdata .. */
+    savedCurrentCP = sdata->currentCP;
+    savedCurrentContent = sdata->currentContent;
+    savedCurrentQuant = sdata->currentQuants;
+    savedNumChildren = sdata->numChildren;
+    savedContenSize = sdata->contentSize;
+    /* ... and prepare sdata for definition evaluation. */
+    sdata->currentCP = cp;
+    sdata->currentContent = cp->content;
+    sdata->currentQuants = cp->quants;
+    sdata->numChildren = 0;
+    sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
+    sdata->isTextConstraint = 1;
+    sdata->textStub[3] = script;
+    result = Tcl_EvalObjv (interp, 4, sdata->textStub,
+                           TCL_EVAL_DIRECT | TCL_EVAL_GLOBAL);
+    sdata->isTextConstraint = 0;
+    /* Save the definition evaluation results to the pattern ... */
+    cp->content = sdata->currentContent;
+    cp->quants = sdata->currentQuants;
+    cp->numChildren = sdata->numChildren;
+    /* ... and restore the previously saved sdata states  */
+    sdata->currentCP = savedCurrentCP;
+    sdata->currentContent = savedCurrentContent;
+    sdata->currentQuants = savedCurrentQuant;
+    sdata->numChildren = savedNumChildren;
+    sdata->contentSize = savedContenSize;
+    return result;
 }
 
 static int maybeAddAttr (
@@ -2273,6 +2388,49 @@ TextPatternObjCmd (
     pattern = initSchemaCP (SCHEMA_CTYPE_TEXT, NULL, NULL);
     REMEMBER_PATTERN (pattern)
     ADD_TO_CONTENT (pattern, quantOne)
+    if (objc == 2) {
+        pattern->content = (SchemaCP**) MALLOC (
+            sizeof(SchemaCP*) * CONTENT_ARRAY_SIZE_INIT
+            );
+        pattern->quants = (SchemaQuant**) MALLOC (
+            sizeof (SchemaQuant*) * CONTENT_ARRAY_SIZE_INIT
+            );        
+        return evalConstraints (interp, sdata, pattern, objv[1]);
+    }
+    return TCL_OK;
+}
+
+static int 
+isintImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    int n;
+    
+    if (Tcl_GetInt (interp, text, &n) != TCL_OK) {
+        return TCL_ERROR;
+    }
+    return TCL_OK;
+}
+
+static int
+isintTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+    
+    CHECK_TI
+    CHECK_TOPLEVEL
+    checkNrArgs (1,1,"no argument expected");
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = isintImpl;
     return TCL_OK;
 }
 
@@ -2333,6 +2491,11 @@ tDOM_SchemaInit (
                           NamespacePatternObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::text",
                           TextPatternObjCmd, NULL, NULL);
+
+    /* The text constraint commands */
+    Tcl_CreateObjCommand (interp, "tdom::schema::text::isint",
+                          isintTCObjCmd, NULL, NULL);
+
 }
 
 #endif  /* #ifndef TDOM_NO_SCHEMA */

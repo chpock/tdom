@@ -14,6 +14,7 @@
 #    schema-11.*: attribute, nsattribute
 #    schema-12.*: schemaCmd domvalidate
 #    schema-13.*: XML namespaces
+#    schema-14.*: text
 #
 # Copyright (c) 2018 Rolf Ade.
 
@@ -1744,5 +1745,24 @@ test schema-13.2 {XML namespaces} {
     set result
 } {0 0 0 0 1}
 
+test schema-14.1 {text} {
+    tdom::schema s
+    s defelement doc {
+        text isint
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc></doc>
+        <doc>5</doc>
+        <doc>eeee</doc>
+        <doc>56666</doc>
+        {<doc>   </doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 1 0 1 0}
 
 }

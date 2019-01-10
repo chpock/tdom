@@ -54,12 +54,13 @@ typedef struct
 
 typedef unsigned int SchemaFlags;
 
-typedef int (*SchemaConstraintFunc) (void *constraintData, char *text);
+typedef int (*SchemaConstraintFunc) (Tcl_Interp *interp,
+                                     void *constraintData, char *text);
 
 typedef struct 
 {
-    void * constraintData;
-    SchemaConstraintFunc *constraint;
+    void *constraintData;
+    SchemaConstraintFunc constraint;
 } SchemaConstraint;
 
 typedef struct
@@ -120,9 +121,10 @@ typedef struct
     unsigned int numQuants;
     unsigned int quantsSize;
     Tcl_Obj **evalStub;
+    Tcl_Obj **textStub;
     char *currentNamespace;
     int   defineToplevel;
-    int   isAttribute;
+    int   isTextConstraint;
     SchemaCP *currentCP;
     SchemaCP **currentContent;
     SchemaQuant **currentQuants;
@@ -136,6 +138,7 @@ typedef struct
     SchemaValidationStack *stackPool;
     ValidationState validationState;
     unsigned int skipDeep;
+    Tcl_DString *cdata;
 } SchemaData;
 
 int 
