@@ -1745,10 +1745,12 @@ test schema-13.2 {XML namespaces} {
     set result
 } {0 0 0 0 1}
 
-test schema-14.1 {text} {
+test schema-14.1 {text: isint} {
     tdom::schema s
     s defelement doc {
-        text isint
+        text {
+            isint
+        }
     }
     set result [list]
     foreach xml {
@@ -1764,5 +1766,40 @@ test schema-14.1 {text} {
     s delete
     set result
 } {0 0 1 0 1 0}
+
+proc proc-14.2 {param text} {
+    if {$text in {one two tree}} {
+        return true
+    }
+    return false
+}
+
+test schema-14.2 {text: tcl} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element a
+            element b
+        }
+        defelement a {
+            text {tcl string is lower -strict}
+        }
+        defelement b {
+            text {tcl proc-14.2 foo}
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/><b/></doc>
+        <doc><a>abc</a><b>two</b></doc>
+        <doc><a>aBc</a><b>two</b></doc>
+        <doc><a>abc</a><b>four</b></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 1 0 0}
 
 }

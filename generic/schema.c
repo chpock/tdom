@@ -178,7 +178,7 @@ static void SetActiveSchemaData (SchemaData *v)
         SetResult ("Command called outside of schema context.");        \
         return TCL_ERROR;                                               \
     }                                                                   \
-    if (!sdata->isTextConstraint) {                                      \
+    if (!sdata->isTextConstraint) {                                     \
         SetResult ("Command called in invalid schema context.");        \
         return TCL_ERROR;                                               \
     }
@@ -209,6 +209,7 @@ static void SetActiveSchemaData (SchemaData *v)
 
 #define ADD_CONSTRAINT(sdata, sc)                                       \
     sc = TMALLOC (SchemaConstraint);                                    \
+    memset (sc, 0, sizeof (SchemaConstraint));                          \
     if (sdata->numChildren == sdata->contentSize) {                     \
         sdata->currentContent =                                         \
             REALLOC (sdata->currentContent,                             \
@@ -223,7 +224,6 @@ static void SetActiveSchemaData (SchemaData *v)
     sdata->currentContent[sdata->numChildren] = (SchemaCP *) sc;        \
     sdata->currentQuants[sdata->numChildren] = quantOne;                \
     sdata->numChildren++;                                               \
-    
 
 #define REMEMBER_PATTERN(pattern)                                       \
     if (sdata->numPatternList == sdata->patternListSize) {              \
@@ -342,6 +342,7 @@ static void freeSchemaCP (
     )
 {
     int i;
+    SchemaConstraint *sc;
     
     switch (pattern->type) {
     case SCHEMA_CTYPE_ANY:
@@ -349,6 +350,10 @@ static void freeSchemaCP (
         break;
     case SCHEMA_CTYPE_TEXT:
         for (i = 0; i < pattern->numChildren; i++) {
+            sc = (SchemaConstraint *) pattern->content[i];
+            if (sc->freeData) {
+                (sc->freeData) (sc->constraintData);
+            }
             FREE (pattern->content[i]);
         }
         /* Fall throu */
@@ -2434,6 +2439,89 @@ isintTCObjCmd (
     return TCL_OK;
 }
 
+typedef struct 
+{
+    int nrArg;
+    Tcl_Obj **evalStub;
+} tclTCData;
+
+static void
+tclImplFree (
+    void *constraintData
+    )
+{
+    tclTCData *tcdata = constraintData;
+    int i;
+    
+    for (i = 0; i < tcdata->nrArg-1; i++) {
+        Tcl_DecrRefCount (tcdata->evalStub[i]);
+    }
+    FREE (tcdata->evalStub);
+    FREE (tcdata);
+}
+
+static int 
+tclImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    tclTCData *tcdata = constraintData;
+    int result, bool;
+    
+    tcdata->evalStub[tcdata->nrArg-1] = Tcl_NewStringObj(text, -1);
+    Tcl_IncrRefCount (tcdata->evalStub[tcdata->nrArg-1]);
+    result = Tcl_EvalObjv (interp, tcdata->nrArg, tcdata->evalStub,
+                           TCL_EVAL_DIRECT | TCL_EVAL_GLOBAL);
+    Tcl_DecrRefCount (tcdata->evalStub[tcdata->nrArg-1]);
+    if (result != TCL_OK) {
+        return TCL_ERROR;
+    }
+    result = Tcl_GetBooleanFromObj (interp, Tcl_GetObjResult (interp), &bool);
+    if (result != TCL_OK) {
+        return TCL_ERROR;
+    }
+    if (bool) {
+        return TCL_OK;
+    } else {
+        return TCL_ERROR;
+    }
+}
+
+static int
+tclTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+    tclTCData *tcdata;
+    int i;
+    
+    CHECK_TI
+    CHECK_TOPLEVEL
+    if (objc < 2) {
+        SetResult ("Expected: tclcmd ?arg arg ...?");
+        return TCL_ERROR;
+    }
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = tclImpl;
+    sc->freeData = tclImplFree;
+    tcdata = TMALLOC (tclTCData);
+    tcdata->nrArg = objc;
+    tcdata->evalStub = MALLOC (sizeof (Tcl_Obj*) * objc);
+    for (i = 1; i < objc; i++) {
+        tcdata->evalStub[i-1] = objv[i];
+        Tcl_IncrRefCount (tcdata->evalStub[i-1]);
+    }
+    sc->constraintData = tcdata;
+    return TCL_OK;
+}
+
 void
 tDOM_SchemaInit (
     Tcl_Interp *interp
@@ -2495,6 +2583,8 @@ tDOM_SchemaInit (
     /* The text constraint commands */
     Tcl_CreateObjCommand (interp, "tdom::schema::text::isint",
                           isintTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp, "tdom::schema::text::tcl",
+                          tclTCObjCmd, NULL, NULL);
 
 }
 

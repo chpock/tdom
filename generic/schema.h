@@ -56,11 +56,13 @@ typedef unsigned int SchemaFlags;
 
 typedef int (*SchemaConstraintFunc) (Tcl_Interp *interp,
                                      void *constraintData, char *text);
+typedef void (*SchemaConstraintFreeFunc) (void *constraintData);
 
 typedef struct 
 {
     void *constraintData;
     SchemaConstraintFunc constraint;
+    SchemaConstraintFreeFunc freeData;
 } SchemaConstraint;
 
 typedef struct
@@ -113,7 +115,7 @@ typedef struct
     Tcl_HashEntry *emptyNamespace;
     Tcl_HashTable pattern;
     Tcl_HashTable attrNames;
-    SchemaCP **patternList;
+    SchemaCP **patternList; 
     unsigned int numPatternList;
     unsigned int patternListSize;
     unsigned int forwardPatternDefs;
