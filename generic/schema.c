@@ -2592,7 +2592,65 @@ fixedTCObjCmd (
     sc->constraintData = tdomstrdup (Tcl_GetString (objv[1]));
     return TCL_OK;
 }
+
+static void
+enumerationImplFree (
+    void *constraintData
+    )
+{
+    Tcl_HashTable *values = (Tcl_HashTable *) constraintData;
+
+    Tcl_DeleteHashTable (values);
+    FREE (values);
+}
+
+static int 
+enumerationImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    Tcl_HashTable *values = (Tcl_HashTable *) constraintData;
+
+    if (Tcl_FindHashEntry(values, text)) return TCL_OK;
+    return TCL_ERROR;
+}
+
+static int
+enumerationTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+    Tcl_HashTable *values;
+    int len, i, hnew;
+    Tcl_Obj *value;
     
+    CHECK_TI
+    CHECK_TOPLEVEL
+    checkNrArgs (2,2,"Expected: <value list>");
+    if (Tcl_ListObjLength (interp, objv[1], &len) != TCL_OK) {
+        SetResult ("The argument must be a valid tcl list");
+        return TCL_ERROR;
+    }
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = enumerationImpl;
+    sc->freeData = enumerationImplFree;
+    values = TMALLOC (Tcl_HashTable);
+    Tcl_InitHashTable (values, TCL_STRING_KEYS);
+    for (i = 0; i < len; i++) {
+        Tcl_ListObjIndex (interp, objv[1], i, &value);
+        Tcl_CreateHashEntry (values, Tcl_GetString (value), &hnew);
+    }
+    sc->constraintData = values;
+    return TCL_OK;
+}
+
 void
 tDOM_SchemaInit (
     Tcl_Interp *interp
@@ -2659,6 +2717,8 @@ tDOM_SchemaInit (
                           tclTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::text::fixed",
                           fixedTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp, "tdom::schema::text::enumeration",
+                          enumerationTCObjCmd, NULL, NULL);
 
 }
 

@@ -1851,5 +1851,31 @@ test schema-14.4 {text: fixed} {
     set result
 } {1 1 0 0 0 0}
 
+test schema-14.5 {text: fixed} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element e *
+        }
+        defelement e {
+            attribute a {enumeration {enabled disabled}}
+            text {enumeration {enabled disabled "a third"}}
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        {<doc><e a="enabled">disabled</e></doc>}
+        {<doc><e a="enabled">disabled</e><e a="disabled">a third</e></doc>}
+        {<doc><e a="disabled">something</e></doc>}
+        {<doc><e a="enabled">something else</e></doc>}
+        {<doc><e a="enabled">enabled disabled</e></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 1 1 0 0 0}
+
 
 }
