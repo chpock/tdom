@@ -227,7 +227,8 @@ static void SetActiveSchemaData (SchemaData *v)
 
 #define REMEMBER_PATTERN(pattern)                                       \
     if (sdata->numPatternList == sdata->patternListSize) {              \
-        sdata->patternList = (SchemaCP **) MALLOC (                     \
+        sdata->patternList = (SchemaCP **) REALLOC (                    \
+            sdata->patternList,                                         \
             sizeof (SchemaCP*) * sdata->patternListSize * 2);           \
         sdata->patternListSize *= 2;                                    \
     }                                                                   \

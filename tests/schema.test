@@ -193,6 +193,21 @@ test schema-1.12 {define} {
     lappend result $errMsg
 } {1 {Command not allowed at top level in schema define evaluation}}
 
+test schema-1.13 {define lots of elements} {
+    tdom::schema create s
+    s define {
+        defelement elm1 {
+            for {set i 1} {$i <= 1000} {incr i} {
+                element a$i ?
+            }
+        }
+        for {set i 1} {$i <= 1000} {incr i} {
+            defelement a$i {}
+        }
+    }
+    s delete
+} {}
+
 test schema-2.1 {grammar definition: ref} {
     tdom::schema create grammar
     grammar defpattern thisPattern {
@@ -1851,7 +1866,7 @@ test schema-14.4 {text: fixed} {
     set result
 } {1 1 0 0 0 0}
 
-test schema-14.5 {text: fixed} {
+test schema-14.5 {text: enumeration} {
     tdom::schema s
     s define {
         defelement doc {
