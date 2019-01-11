@@ -2551,6 +2551,48 @@ tclTCObjCmd (
     return TCL_OK;
 }
 
+static void
+fixedImplFree (
+    void *constraintData
+    )
+{
+    FREE (constraintData);
+}
+
+static int 
+fixedImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    if (strcmp (text, (char *) constraintData) == 0) {
+        return TCL_OK;
+    }
+    return TCL_ERROR;
+}
+
+static int
+fixedTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+    
+    CHECK_TI
+    CHECK_TOPLEVEL
+    checkNrArgs (2,2,"Expected: <fixed value>");
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = fixedImpl;
+    sc->freeData = fixedImplFree;
+    sc->constraintData = tdomstrdup (Tcl_GetString (objv[1]));
+    return TCL_OK;
+}
+    
 void
 tDOM_SchemaInit (
     Tcl_Interp *interp
@@ -2584,6 +2626,7 @@ tDOM_SchemaInit (
     Tcl_CreateObjCommand (interp, "tdom::schema::ref",
                           NamedPatternObjCmd,
                           (ClientData) SCHEMA_CTYPE_PATTERN, NULL);
+
     /* The anonymous pattern commands "choise", "mixed", "interleave"
      * and "group". */
     Tcl_CreateObjCommand (interp, "tdom::schema::choice",
@@ -2614,6 +2657,8 @@ tDOM_SchemaInit (
                           isintTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::text::tcl",
                           tclTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp, "tdom::schema::text::fixed",
+                          fixedTCObjCmd, NULL, NULL);
 
 }
 

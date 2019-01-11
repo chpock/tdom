@@ -1825,5 +1825,31 @@ test schema-14.3 {attribute text: tcl} {
     set result
 } {1 0 0 1}
 
+test schema-14.4 {text: fixed} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element e *
+        }
+        defelement e {
+            attribute a ! {fixed enabled}
+            text {fixed something}
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        {<doc><e a="enabled">something</e></doc>}
+        {<doc><e a="somehing">something</e></doc>}
+        {<doc><e a="enabled">something else</e></doc>}
+        {<doc><e a="enabled">something</e><e a="foo">something</e></doc>}
+        {<doc><e a="enabled">something</e><e a="enabled">not</e></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 1 0 0 0 0}
+
 
 }
