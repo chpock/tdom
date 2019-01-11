@@ -62,7 +62,29 @@ proc fromDTD_generate {} {
         puts "defelement $name \{"
         foreach {attkey attDef} [array get dtdAttributes $name,*] {
             lassign $attDef attname type default isRequired
-            puts "[indent]attribute $attname [expr {$isRequired ? "" : "?"}]"
+            switch $type {
+                "ID" -
+                "IDREF" -
+                "IDREFS" -
+                "ENTITY" -
+                "ENTITIES" -
+                "NMTOKEN" -
+                "NMTOKENS" -
+                "NOTATION" {
+                    # All above to be done
+                    puts "[indent]attribute $attname [expr {$isRequired ? "" : "?"}]"
+                }
+                "CDATA" {
+                    puts "[indent]attribute $attname [expr {$isRequired ? "" : "?"}]"
+                }
+                default {
+                    if {[string index $type 0] ne "("} {
+                        # Ups. Should not happen.
+                        error "Unexpeced (invalid) attribute type '$type'"
+                    } 
+                    puts "[indent]attribute $attname [expr {$isRequired ? "" : "?"}] {enumeration {[split [string trim $type "()"] "|"]}}"
+                }
+            }
         }
         fromDTD_serialize 1 {*}$dtdElements($name)
         puts "\}"
@@ -107,3 +129,6 @@ proc fromDTD {file} {
 }
 
 fromDTD $argv
+if {[info exists dtdAttTypes]} {
+    puts [array names dtdAttTypes]
+}

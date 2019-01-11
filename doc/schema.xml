@@ -159,7 +159,7 @@
     <title>Schema definition scripts</title>
 
     <p>Schema definition scripts are ordinary Tcl scripts that are
-    evaluatend in the namespace tdom::schema. Several schema
+    evaluatend in the namespace tdom::schema. The below listed schema
     definition commands in this tcl namespace allow to define a wide
     variety of document structures. Every schema definition command
     establish a validation constrain on the content which all has to
@@ -206,7 +206,7 @@
       </commanddef>
 
       <commanddef>
-        <command><method>text</method> <m>&lt;definition script></m></command>
+        <command><method>text</method> <m>?&lt;definition script>?</m></command>
         <desc></desc>
       </commanddef>
 
@@ -234,17 +234,17 @@
       
       <commanddef>
         <command><method>defelement</method> <m>name</m> <m>?namespace?</m> <m>&lt;definition script></m></command>
-        <desc></desc>
+        <desc>This command is not allowed nested in an other definition script command.</desc>
       </commanddef>
 
       <commanddef>
         <command><method>defpattern</method> <m>name</m> <m>?namespace?</m> <m>&lt;definition script></m></command>
-        <desc></desc>
+        <desc>This command is not allowed nested in an other definition script command.</desc>
       </commanddef>
 
       <commanddef>
         <command><method>start</method> <m>name</m> <m>?namespace?</m></command>
-        <desc></desc>
+        <desc>This command is not allowed nested in an other definition script command.</desc>
       </commanddef>
     </commandlist>
     
