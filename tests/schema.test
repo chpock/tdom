@@ -1802,4 +1802,28 @@ test schema-14.2 {text: tcl} {
     set result
 } {0 0 1 0 0}
 
+test schema-14.3 {attribute text: tcl} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element e 1 {
+                attribute a ! {tcl string is lower -strict}
+                attribute b ? {tcl proc-14.2 foo}
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        {<doc><e a="abc" b="tree"/></doc>}
+        {<doc><e a="aAc" b="tree"/></doc>}
+        {<doc><e a="aa2c" b="tree"/></doc>}
+        {<doc><e a="aaoiu"/></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 0 0 1}
+
+
 }

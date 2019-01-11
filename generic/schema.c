@@ -589,6 +589,26 @@ popStack (
     sdata->stack = se;
 }
 
+/* The cp argument must be type SCHEMA_CTYPE_TEXT */
+static int
+checkText (
+    Tcl_Interp *interp,
+    SchemaCP *cp,
+    char *text
+    )
+{
+    int i;
+    SchemaConstraint *sc;
+    
+    for (i = 0; i < cp->numChildren; i++) {
+        sc = (SchemaConstraint *) cp->content[i];
+        if ((sc->constraint) (interp, sc->constraintData, text) != TCL_OK) {
+            return TCL_ERROR;
+        }
+    }
+    return TCL_OK;
+}
+
 static int
 matchElementStart (
     SchemaData *sdata,
@@ -860,6 +880,14 @@ int probeAttributes (
         for (i = 0; i < cp->numAttr; i++) {
             if (strcmp (atPtr[0], cp->attrs[i]->name) == 0) {
                 found = 1;
+                if (cp->attrs[i]->cp) {
+                    if (checkText (interp, cp->attrs[i]->cp, (char *) atPtr[1])
+                        != TCL_OK) {
+                        SetResult3 ("Attribute value doesn't match for "
+                                    "attribute '", atPtr[0], "'");
+                        return TCL_ERROR;
+                    }
+                }
                 if (cp->attrs[i]->required) reqAttr++;
                 break;
             }
@@ -929,6 +957,14 @@ int probeDomAttributes (
                 if (cp->attrs[i]->namespace) continue;
             }
             if (strcmp (ln, cp->attrs[i]->name) == 0) {
+                if (cp->attrs[i]->cp) {
+                    if (checkText (interp, cp->attrs[i]->cp, (char *) ln)
+                        != TCL_OK) {
+                        SetResult3 ("Attribute value doesn't match for "
+                                    "attribute '", ln, "'");
+                        return TCL_ERROR;
+                    }
+                }
                 found = 1;
                 if (cp->attrs[i]->required) reqAttr++;
                 break;
@@ -1113,26 +1149,6 @@ probeElementEnd (
     return TCL_OK;
 }
 
-/* The cp argument is expected to be a SCHEMA_CTYPE_TEXT cp */
-static int
-checkText (
-    Tcl_Interp *interp,
-    SchemaCP *cp,
-    char *text
-    )
-{
-    int i;
-    SchemaConstraint *sc;
-    
-    for (i = 0; i < cp->numChildren; i++) {
-        sc = (SchemaConstraint *) cp->content[i];
-        if ((sc->constraint) (interp, sc->constraintData, text) != TCL_OK) {
-            return TCL_ERROR;
-        }
-    }
-    return TCL_OK;
-}
-
 int
 probeText (
     Tcl_Interp *interp,
@@ -1172,10 +1188,12 @@ probeText (
         if (cp->content[ac]->type == SCHEMA_CTYPE_TEXT) {
             updateStack (sdata->stack, ac, nm+1);
             if (cp->content[ac]->numChildren) {
-                return checkText (interp, cp->content[ac], text);
-            } else {
-                return TCL_OK;
+                if (checkText (interp, cp->content[ac], text) != TCL_OK) {
+                    SetResult ("Invalid text content");
+                    return TCL_ERROR;
+                }
             }
+            return TCL_OK;
         }
     }
     /* If we are here then there isn't a matching TEXT cp. Check, if
@@ -2225,6 +2243,7 @@ evalConstraints (
 }
 
 static int maybeAddAttr (
+    Tcl_Interp *interp,
     SchemaData *sdata,
     Tcl_Obj *nameObj,
     Tcl_Obj *namespaceObj,
@@ -2233,9 +2252,10 @@ static int maybeAddAttr (
     )
 {
     Tcl_HashEntry *h;
-    int hnew, hnew1, i;
+    int hnew, hnew1, i, result = TCL_OK;
     char *name, *namespace = NULL;
     SchemaAttr *attr;
+    SchemaCP *cp;
         
     if (namespaceObj) {
         h = Tcl_CreateHashEntry (&sdata->namespace,
@@ -2264,11 +2284,18 @@ static int maybeAddAttr (
     attr->required = required;
     if (scriptObj) {
         /* TODO */
-        attr->constraints = NULL;
-        attr->numConstraints = 0;
+        cp = initSchemaCP (SCHEMA_CTYPE_TEXT, NULL, NULL);
+        REMEMBER_PATTERN (cp)
+        cp->content = (SchemaCP**) MALLOC (
+            sizeof(SchemaCP*) * CONTENT_ARRAY_SIZE_INIT
+            );
+        cp->quants = (SchemaQuant**) MALLOC (
+            sizeof (SchemaQuant*) * CONTENT_ARRAY_SIZE_INIT
+            );        
+        result = evalConstraints (interp, sdata, cp, scriptObj);
+        attr->cp = cp;
     } else {
-        attr->constraints = NULL;
-        attr->numConstraints = 0;
+        attr->cp = NULL;
     }
     if (!sdata->currentAttrs) {
         sdata->currentAttrs = MALLOC (sizeof(SchemaAttr*)
@@ -2285,7 +2312,7 @@ static int maybeAddAttr (
     if (required) {
         sdata->numReqAttr++;
     }
-    return TCL_OK;
+    return result;
 }
 
 static int
@@ -2321,7 +2348,7 @@ AttributePatternObjCmd (
     }
 
     if (objc == 2+i) {
-        return maybeAddAttr (sdata, objv[1], nsobj, NULL, 1);
+        return maybeAddAttr (interp, sdata, objv[1], nsobj, NULL, 1);
     }
     quantStr = Tcl_GetStringFromObj (objv[2+i], &len);
     if (len == 1) {
@@ -2332,7 +2359,8 @@ AttributePatternObjCmd (
             return TCL_ERROR;
         }
         if (objc == 3+i) {
-            return maybeAddAttr (sdata, objv[1], nsobj, NULL, required);
+            return maybeAddAttr (interp, sdata, objv[1], nsobj, NULL,
+                                 required);
         }
         scriptIndex = 3+i;
     } else {
@@ -2342,7 +2370,8 @@ AttributePatternObjCmd (
         }
         scriptIndex = 2+i;
     }
-    return maybeAddAttr (sdata, objv[1], nsobj, objv[scriptIndex], required);
+    return maybeAddAttr (interp, sdata, objv[1], nsobj,
+                         objv[scriptIndex], required);
 }
 
 static int

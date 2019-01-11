@@ -70,8 +70,7 @@ typedef struct
     char              *namespace;
     char              *name;
     int                required;
-    SchemaConstraint **constraints;
-    unsigned int       numConstraints;
+    struct SchemaCP   *cp;
 } SchemaAttr;
 
 typedef struct SchemaCP
