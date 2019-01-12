@@ -1045,6 +1045,63 @@ test schema-7.13 {long sequence} {
     set result
 } 1
 
+
+test schema-7.14 {mixed} {
+    tdom::schema create s
+    s define {
+        defelement doc {
+            mixed {
+                element a
+                element b
+            }
+        }
+        foreach e {a b} {
+            defelement $e {}
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc>text</doc>
+        <doc>text<a/></doc>
+        <doc><a/></doc>
+        <doc>some<a/><b/></doc>
+        <doc>some<a/><unknown/><b/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 1 1 1 0}
+
+test schema-7.14 {mixed} {knownBug} {
+    tdom::schema create s
+    s define {
+        defelement doc {
+            mixed ! {
+                element a
+                element b
+            }
+        }
+        foreach e {a b} {
+            defelement $e {}
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc>text</doc>
+        <doc>text<a/></doc>
+        <doc><a/></doc>
+        {<doc><b/>to much</doc>}
+        <doc>some<a/><b/></doc>
+        <doc><unknown/><b/></doc>
+    } {
+        lappend result [s validate $xml errMsg]
+        puts $errMsg
+    }
+    s delete
+    set result
+} {1 0 1 0 0}
+
 test schema-8.1 {validate method} {
     tdom::schema create grammar
     grammar defelement doc {
@@ -1585,6 +1642,21 @@ test schema-11.4a {attribute} {
     $doc delete
     set result
 } 0
+
+test schema-11.4b {attribute} {
+    tdom::schema create s
+    s define {
+        defelement doc {
+            element e 1 {
+                attribute foo
+                nsattribute lang http://www.w3.org/XML/1998/namespace
+            }
+        }
+    }
+    set result [s validate {<doc><e xml:lang="en" foo="bar"/></doc>} errMsg]
+    s delete
+    lappend result $errMsg
+} {1 {}}
 
 test schema-11.5 {nsattribute} {
     tdom::schema create s

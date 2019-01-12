@@ -730,6 +730,7 @@ matchElementStart (
                         pushToStack (sdata, candidate, deep + 1);
                         return 1;
                     }
+                    break;
                 case SCHEMA_CTYPE_GROUP:
                 case SCHEMA_CTYPE_PATTERN:
                 case SCHEMA_CTYPE_MIXED:
@@ -792,7 +793,6 @@ probeElement (
     } else {
         namespacePtr = NULL;
     }
-
     entryPtr = Tcl_FindHashEntry (&sdata->element, name);
     if (entryPtr) {
         namePtr = Tcl_GetHashKey (&sdata->element, entryPtr);
@@ -871,19 +871,40 @@ int probeAttributes (
     const char **attr
     )
 {
-    const char   **atPtr;
-    int i, found, reqAttr = 0;
+    char   **atPtr, *ln, *namespace;
+    int i, j, found, nsatt, reqAttr = 0;
     SchemaCP *cp;
 
     cp = sdata->stack->pattern;
-    for (atPtr = attr; atPtr[0] && atPtr[1]; atPtr += 2) {
+    for (atPtr = (char **) attr; atPtr[0] && atPtr[1]; atPtr += 2) {
         found = 0;
+        ln = atPtr[0];
+        j = 0;
+        while (*ln && *ln != '\xFF') {
+            j++, ln++;
+        }
+        if (*ln == '\xFF') {
+            namespace = atPtr[0];
+            namespace[j] = '\0';
+            ln++;
+            nsatt = 1;
+        } else {
+            namespace = NULL;
+            ln = atPtr[0];
+            nsatt = 0;
+        }
         for (i = 0; i < cp->numAttr; i++) {
-            if (strcmp (atPtr[0], cp->attrs[i]->name) == 0) {
+            if (nsatt) {
+                if (!cp->attrs[i]->namespace
+                    || (strcmp (cp->attrs[i]->namespace, namespace) != 0))
+                    continue;
+            }
+            if (strcmp (ln, cp->attrs[i]->name) == 0) {
                 found = 1;
                 if (cp->attrs[i]->cp) {
                     if (checkText (interp, cp->attrs[i]->cp, (char *) atPtr[1])
                         != TCL_OK) {
+                        if (nsatt) namespace[j] = '\xFF';
                         SetResult3 ("Attribute value doesn't match for "
                                     "attribute '", atPtr[0], "'");
                         return TCL_ERROR;
@@ -893,6 +914,7 @@ int probeAttributes (
                 break;
             }
         }
+        if (nsatt) namespace[j] = '\xFF';
         if (!found) {
             SetResult3 ("Unknown attribute \"", atPtr[0], "\"");
             return TCL_ERROR;
@@ -904,14 +926,37 @@ int probeAttributes (
         for (i = 0; i < cp->numAttr; i++) {
             if (!cp->attrs[i]->required) continue;
             found = 0;
-            for (atPtr = attr; atPtr[0] && atPtr[1]; atPtr += 2) {
+            for (atPtr = (char **) attr; atPtr[0] && atPtr[1]; atPtr += 2) {
+                if (cp->attrs[i]->namespace) {
+                    ln = atPtr[0];
+                    j = 0;
+                    while (*ln && *ln != '\xFF') {
+                        j++, ln++;
+                    }
+                    if (*ln == '\xFF') {
+                        namespace = atPtr[0];
+                        namespace[j] = '\0';
+                        ln++;
+                        nsatt = 1;
+                    } else {
+                        continue;
+                    }
+                    if (strcmp (cp->attrs[i]->namespace, namespace) != 0) {
+                        continue;
+                    }
+                }
                 if (strcmp (atPtr[0], cp->attrs[i]->name) == 0) {
                     found = 1;
                     break;
                 }
             }
             if (!found) {
-                Tcl_AppendResult (interp, " ", cp->attrs[i]->name, NULL);
+                if (cp->attrs[i]->namespace) {
+                    Tcl_AppendResult (interp, " ", cp->attrs[i]->namespace,
+                                      ":", cp->attrs[i]->name, NULL);
+                } else {
+                    Tcl_AppendResult (interp, " ", cp->attrs[i]->name, NULL);
+                }
             }
         }
         return TCL_ERROR;
@@ -1158,6 +1203,7 @@ probeText (
     )
 {
     SchemaCP *cp;
+    SchemaValidationStack *se;
     int ac, nm, only_whites;
     char *pc;
 
@@ -1177,15 +1223,30 @@ probeText (
     getContext (cp, ac, nm);
 
     if (cp->type == SCHEMA_CTYPE_MIXED) {
+        se = sdata->stack->down;
+        if (hasMatched (se->pattern->quants[se->activeChild], se->nrMatched)) {
+            popStack (sdata);
+            return probeText (interp, sdata, text);
+        }
+        se->nrMatched++;
         return TCL_OK;
     }
     while (ac < cp->numChildren) {
-        if (cp->content[ac]->type == SCHEMA_CTYPE_TEXT
-            || mustMatch (cp->quants[ac], nm)) break;
+        switch (cp->content[ac]->type) {
+        case SCHEMA_CTYPE_TEXT:
+        case SCHEMA_CTYPE_MIXED: goto foundCP;
+        default:
+            if (mustMatch (cp->quants[ac], nm)) break;
+        }
         ac++;
         nm = 0;
     }
+foundCP:
     if (ac < cp->numChildren) {
+        if (cp->content[ac]->type == SCHEMA_CTYPE_MIXED) {
+            updateStack (sdata->stack, ac, nm+1);
+            return TCL_OK;
+        }
         if (cp->content[ac]->type == SCHEMA_CTYPE_TEXT) {
             updateStack (sdata->stack, ac, nm+1);
             if (cp->content[ac]->numChildren) {
@@ -1213,6 +1274,7 @@ probeText (
         break;
     }
     if (only_whites)  return TCL_OK;
+    SetResult ("Unexpected text content");
     return TCL_ERROR;
 }
 
@@ -2188,8 +2250,19 @@ AnonPatternObjCmd (
 
     CHECK_SI
     CHECK_TOPLEVEL
-    checkNrArgs (2,3,"Expected: ?quant? definition");
-    quant = getQuant (interp, sdata, objc == 2 ? NULL : objv[1]);
+    if (patternType == SCHEMA_CTYPE_TEXT) {
+        checkNrArgs (1,2,"Expected: ?definition?");
+        quant = quantOpt;
+    } else if (patternType == SCHEMA_CTYPE_MIXED) {
+        checkNrArgs (2,3,"Expected: ?quant? definition");
+        quant = quantRep;
+        if (objc == 3) {
+            quant = getQuant (interp, sdata, objv[1]);
+        }
+    } else {
+        checkNrArgs (2,3,"Expected: ?quant? definition");
+        quant = getQuant (interp, sdata, objc == 2 ? NULL : objv[1]);
+    }
     if (!quant) {
         return TCL_ERROR;
     }

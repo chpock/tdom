@@ -62,6 +62,14 @@ proc fromDTD_generate {} {
         puts "defelement $name \{"
         foreach {attkey attDef} [array get dtdAttributes $name,*] {
             lassign $attDef attname type default isRequired
+            set cmd "attribute $attname"
+            if {[string range $attname 0 3] eq "xml:"} {
+                set cmd "nsattribute [string range $attname 4 end] http://www.w3.org/XML/1998/namespace"
+            }
+            if {$isRequired && $default != ""} {
+                puts "[indent]$cmd ? {[list "fixed" $default]}"
+                continue
+            }
             switch $type {
                 "ID" -
                 "IDREF" -
@@ -72,17 +80,17 @@ proc fromDTD_generate {} {
                 "NMTOKENS" -
                 "NOTATION" {
                     # All above to be done
-                    puts "[indent]attribute $attname [expr {$isRequired ? "" : "?"}]"
+                    puts "[indent]$cmd [expr {$isRequired ? "" : "?"}]"
                 }
                 "CDATA" {
-                    puts "[indent]attribute $attname [expr {$isRequired ? "" : "?"}]"
+                    puts "[indent]$cmd [expr {$isRequired ? "" : "?"}]"
                 }
                 default {
                     if {[string index $type 0] ne "("} {
                         # Ups. Should not happen.
                         error "Unexpeced (invalid) attribute type '$type'"
                     } 
-                    puts "[indent]attribute $attname [expr {$isRequired ? "" : "?"}] {enumeration {[split [string trim $type "()"] "|"]}}"
+                    puts "[indent]$cmd [expr {$isRequired ? "" : "?"}] {enumeration {[split [string trim $type "()"] "|"]}}"
                 }
             }
         }
