@@ -1964,5 +1964,30 @@ test schema-14.5 {text: enumeration} {
     set result
 } {1 1 1 0 0 0}
 
+test schema-14.6 {text: pattern (glob style)} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element e *
+        }
+        defelement e {
+            text {pattern {[a-zA-Z]*1[_!]}}
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        {<doc><e>disabled1_</e></doc>}
+        {<doc><e>dis able1_</e></doc>}
+        {<doc><e>something</e></doc>}
+        {<doc><e>a1!</e></doc>}
+        {<doc><e>a1!/</e></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 1 1 0 1 0}
+
 
 }

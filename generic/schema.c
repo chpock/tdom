@@ -2725,6 +2725,50 @@ enumerationTCObjCmd (
     return TCL_OK;
 }
 
+static void
+patternImplFree (
+    void *constraintData
+    )
+{
+
+    Tcl_DecrRefCount ((Tcl_Obj *) constraintData);
+}
+
+static int 
+patternImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    if (Tcl_StringMatch (text, Tcl_GetString ((Tcl_Obj *) constraintData)))
+        return TCL_OK;
+    return TCL_ERROR;
+}
+
+static int
+patternTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+    
+    CHECK_TI
+    CHECK_TOPLEVEL
+    checkNrArgs (2,2,"Expected: <glob pattern>");
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = patternImpl;
+    sc->freeData = patternImplFree;
+    Tcl_IncrRefCount (objv[1]);
+    sc->constraintData = objv[1];
+    return TCL_OK;
+}
+
+
 void
 tDOM_SchemaInit (
     Tcl_Interp *interp
@@ -2793,6 +2837,8 @@ tDOM_SchemaInit (
                           fixedTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::text::enumeration",
                           enumerationTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp, "tdom::schema::text::pattern",
+                          patternTCObjCmd, NULL, NULL);
 
 }
 
