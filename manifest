@@ -1,5 +1,5 @@
-C Implementend\sthe\stext\sconstraint\sscript\scommand\s"pattern"\s(a\sglob\sstyle\smatcher).
-D 2019-01-12T03:28:47.531
+C Better\snamespace\shandling\sin\scase\sof\sdtd\sto\stdom\sschema\sconversion.
+D 2019-01-12T16:14:48.063
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -11,7 +11,7 @@ F Makefile.in f9a929edb51a25c57b13d98d6ee6c3ef324893108ecfb55ced8e3127617c7914
 F README 1b74b899ce95656b6a63039d0796b164e51a7317263cba9d67959b402dc2009e
 F README.AOL 34b4178830536f5183328420bc28b8063fbf6b598010ecf105c2ecfdbfc3ffa1
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
-F apps/toschema.tcl 58a4b2418eef7df8cb4608d8bd795002a701df214b676bac5390ff58f38c0cc4
+F apps/toschema.tcl d51480aca21dab81b68df6ebaf6e240459ef12b654fe5974fde7490f719ac330
 F apps/xslt.tcl 64103132fbe0a1fbf61cf3506608cb7ea5cbfddd247d207d95d8e96a071e1846
 F configure d961574d71c710bca736a6e694d2b33f181854f75baeece469ad2d871e67501e x
 F configure.ac 8c2b9ba6172d837b6388bcab5ae0101e755435628b17f8db2c11ffc1f10258a0
@@ -229,8 +229,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P dc78a9ca7ddec2811c82ba91ad8c376abe43b5dc774b27b3451025e5ebd6e694
-R c5eeb7613402485978a4fe9420122264
+P d7ce604f85835a379e90577d251a8f332a9cda8f919850d91dcd6af7d262ac36
+R 5b3aaa0ba50df54252cc90191f6b3f34
 U rolf
-Z 4104c4ad620e6d92da643e59fcebf1af
+Z 6481bd968be6c42ba19bb14602eace4d
 # Remove this line to create a well-formed Fossil manifest.

@@ -33,10 +33,10 @@ proc fromDTD_serialize {level type quant name content} {
             return
         }
         "SEQ" {
-            puts "[indent]group \{"
+            puts "[indent]group $quant \{"
         }
         "CHOICE" {
-            puts "[indent]choice \{"
+            puts "[indent]choice $quant \{"
         }
     }
     foreach cp $content {
@@ -60,11 +60,45 @@ proc fromDTD_generate {} {
     set level 1
     foreach name [lsort [array names dtdElements]] {
         puts "defelement $name \{"
+        # First round to get possible namespace declarations
+        array unset nslookup
         foreach {attkey attDef} [array get dtdAttributes $name,*] {
             lassign $attDef attname type default isRequired
-            set cmd "attribute $attname"
-            if {[string range $attname 0 3] eq "xml:"} {
-                set cmd "nsattribute [string range $attname 4 end] http://www.w3.org/XML/1998/namespace"
+            if {$attname eq "xmlns"} {
+                if {$default ne ""} {
+                    set nslookup(:default) $default
+                }
+            } else {
+                set parts [split $attname ":"]
+                if {[llength $parts] == 2} {
+                    switch [lindex $parts 0] {
+                        "xml" {
+                            set nslookup(xml) "http://www.w3.org/XML/1998/namespace"
+                        }
+                        "xmlns" {
+                            if {$default ne ""} {
+                                set nslookup([lindex $parts 1]) $default
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        foreach {attkey attDef} [array get dtdAttributes $name,*] {
+            lassign $attDef attname type default isRequired
+            set parts [split $attname ":"]
+            if {[llength $parts] == 2} {
+                set prefix [lindex $parts 0]
+                if {![info exists nslookup($prefix)]} {
+                    # Hmmm. Either dtd error or the namespace is
+                    # defined somewhere on the ancestors. To be
+                    # handled. TODO
+                    set cmd "attribute $attname"
+                } else {
+                    set cmd "nsattribute [lindex $parts 1] $nslookup($prefix)"
+                }
+            } else {
+                set cmd "attribute $attname"
             }
             if {$isRequired && $default != ""} {
                 puts "[indent]$cmd ? {[list "fixed" $default]}"
