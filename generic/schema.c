@@ -2726,16 +2726,15 @@ enumerationTCObjCmd (
 }
 
 static void
-patternImplFree (
+matchImplFree (
     void *constraintData
     )
 {
-
     Tcl_DecrRefCount ((Tcl_Obj *) constraintData);
 }
 
 static int 
-patternImpl (
+matchImpl (
     Tcl_Interp *interp,
     void *constraintData,
     char *text
@@ -2747,7 +2746,7 @@ patternImpl (
 }
 
 static int
-patternTCObjCmd (
+matchTCObjCmd (
     ClientData clientData,
     Tcl_Interp *interp,
     int objc,
@@ -2759,15 +2758,70 @@ patternTCObjCmd (
     
     CHECK_TI
     CHECK_TOPLEVEL
-    checkNrArgs (2,2,"Expected: <glob pattern>");
+    checkNrArgs (2,2,"Expected: <match pattern>");
     ADD_CONSTRAINT (sdata, sc)
-    sc->constraint = patternImpl;
-    sc->freeData = patternImplFree;
+    sc->constraint = matchImpl;
+    sc->freeData = matchImplFree;
     Tcl_IncrRefCount (objv[1]);
     sc->constraintData = objv[1];
     return TCL_OK;
 }
 
+static void
+regexpImplFree (
+    void *constraintData
+    )
+{
+    Tcl_DecrRefCount ((Tcl_Obj *) constraintData);
+}
+
+static int 
+regexpImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    Tcl_Obj *textObj;
+    int rc;
+    
+
+    textObj = Tcl_NewStringObj(text, -1);
+    rc = Tcl_RegExpMatchObj (interp, textObj,  (Tcl_Obj *) constraintData);
+    Tcl_DecrRefCount (textObj);
+    /* rc may be 1, 0, -1 */ 
+    if (rc == 1) {
+        return TCL_OK;
+    }
+    return TCL_ERROR;
+}
+
+static int
+regexpTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+    
+    CHECK_TI
+    CHECK_TOPLEVEL
+    checkNrArgs (2,2,"Expected: <regexp>");
+    /* Compile it as syntax test (plus caches the complied regexp in
+     * the internal value) */
+    if (!Tcl_GetRegExpFromObj (interp, objv[1], 0)) {
+        return TCL_ERROR;
+    }
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = regexpImpl;
+    sc->freeData = regexpImplFree;
+    Tcl_IncrRefCount (objv[1]);
+    sc->constraintData = objv[1];
+    return TCL_OK;
+}
 
 void
 tDOM_SchemaInit (
@@ -2837,8 +2891,10 @@ tDOM_SchemaInit (
                           fixedTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::text::enumeration",
                           enumerationTCObjCmd, NULL, NULL);
-    Tcl_CreateObjCommand (interp, "tdom::schema::text::pattern",
-                          patternTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp, "tdom::schema::text::match",
+                          matchTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp, "tdom::schema::text::regexp",
+                          regexpTCObjCmd, NULL, NULL);
 
 }
 
