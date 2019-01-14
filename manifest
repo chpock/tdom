@@ -1,5 +1,5 @@
-C Renamed\sthe\slately\sintroduced\stext\sconstraint\scommand\spattern\sto\smatch.\sThe\smatch\scommand\sdoes\sshell\sstyle\smatching\sand\sthe\sxsd\sfacet\spattern\sdoes\sregular\sexpression\smatching\sand\sthat\scould\sbe\sconfusing.\sAdded\snew\stext\sconstraint\scommand\sregexp,\sfor\sregular\sexpression\smatching.\sAlso\snot\snamed\spattern\sbecause\sthe\sxsd\spattern\sregexp\srules\sdiffers\sin\smajor\spoints\sfrom\sthe\sfor\sthe\simplementation\sused\sTcl\sregexp\s(most\simportant\sdifference\sis\smaybe\sthat\sxsd\spattern\sautomatically\sanchors\sat\sstring\sstart/end\s(without\sexplict\s^$)).
-D 2019-01-13T02:39:00.817
+C Editorial\sfix.
+D 2019-01-14T23:19:12.137
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -203,7 +203,7 @@ F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
 F tests/pullparser.test e4b14ea0bdc9f9fd931f3bc559e78c309582a67a238170d58e0f20331f99890c
 F tests/pushpull.bench 664e8f512917537d96c4b71933d4d9a6da65fc6fe85bd7c459483830dc7d2faf
-F tests/schema.test 892a5c1884e9ced792486004c1555dfef0e2c7ee21bb84a700a88780521a6674
+F tests/schema.test 0b0f6e73e2c61caf293720ac4740904289d8b09e1fb90064f2a69d9a22baf541
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
 F tests/tdomcmd.bench b07448ed4de08ccaa9734cf3fe15c695fd7066c993da58ff48d465747940e417
 F tests/tdomcmd.test 092401adf0609906d710f3ef8997cb4ca29bc208
@@ -229,8 +229,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 24a354a13feb93631db0a856411324ab26496d668196e5597873adf1b620ae79
-R 149a4f0c737174c86a808332769575bf
+P 786dd360280f51c259f3ccaeb67facc474177e5727dcb900b22475ecd2238be5
+R 7bf84133f3a41ad35dc3a94a3c8164a4
 U rolf
-Z c380b2ea073c7329329aa2b16f0103c8
+Z 64f539bcdd6546a79efe738fa2579869
 # Remove this line to create a well-formed Fossil manifest.

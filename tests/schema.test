@@ -1989,7 +1989,7 @@ test schema-14.6 {text: match (glob style)} {
     set result
 } {1 1 1 0 1 0}
 
-test schema-14.7 {text: regexp (glob style)} {
+test schema-14.7 {text: regexp} {
     tdom::schema s
     s define {
         defelement doc {
