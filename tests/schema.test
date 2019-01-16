@@ -1061,6 +1061,7 @@ test schema-7.14 {mixed} {
     }
     set result [list]
     foreach xml {
+        <doc></doc>
         <doc>text</doc>
         <doc>text<a/></doc>
         <doc><a/></doc>
@@ -1071,9 +1072,9 @@ test schema-7.14 {mixed} {
     }
     s delete
     set result
-} {1 1 1 1 0}
+} {1 1 1 1 1 0}
 
-test schema-7.14 {mixed} {knownBug} {
+test schema-7.14a {mixed} {
     tdom::schema create s
     s define {
         defelement doc {
@@ -1096,7 +1097,7 @@ test schema-7.14 {mixed} {knownBug} {
         <doc><unknown/><b/></doc>
     } {
         lappend result [s validate $xml errMsg]
-        puts $errMsg
+        #puts $errMsg
     }
     s delete
     set result
@@ -1329,18 +1330,19 @@ test schema-9.4 {choice} {
                 }
             }
         }
-        foreach e {e1 e2} {
+        foreach e {e1 e2 e3} {
             defelement $e foouri {}
         }
     }
-    set result [grammar validate {<doc xmlns="foouri"/>}]
-    lappend result [grammar validate {<doc xmlns="foouri"><e1/></doc>}]
-    lappend result [grammar validate {<doc xmlns="foouri"><e2/><e3/></doc>}]
-    lappend result [grammar validate {<doc xmlns="foouri"><e1/><e2/><e3/></doc>}]
-    lappend result [grammar validate {<doc xmlns="foouri"><e2/><e3/><e1/></doc>}]
-    lappend result [grammar validate {<doc xmlns="foouri"><e1/><e1/></doc>}]
-    lappend result [grammar validate {<doc xmlns="foouri"><e2/><e3/><e2/><e3/></doc>}]
-    lappend result [grammar validate {<doc xmlns="foouri"><e1/><e2/><e2/></doc>}]
+    # set result [grammar validate {<doc xmlns="foouri"/>}]
+    # lappend result [grammar validate {<doc xmlns="foouri"><e1/></doc>}]
+    # lappend result [grammar validate {<doc xmlns="foouri"><e2/><e3/></doc>}]
+    set result [grammar validate {<doc xmlns="foouri"><e1/><e2/><e3/></doc>}]
+    # lappend result [grammar validate {<doc xmlns="foouri"><e1/><e2/><e3/></doc>}]
+    # lappend result [grammar validate {<doc xmlns="foouri"><e2/><e3/><e1/></doc>}]
+    # lappend result [grammar validate {<doc xmlns="foouri"><e1/><e1/></doc>}]
+    # lappend result [grammar validate {<doc xmlns="foouri"><e2/><e3/><e2/><e3/></doc>}]
+    # lappend result [grammar validate {<doc xmlns="foouri"><e1/><e2/><e2/></doc>}]
     grammar delete
     set result
 } {0 0 0 1 1 1 1 0}

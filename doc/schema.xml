@@ -41,7 +41,7 @@
       </commanddef>
 
       <commanddef>
-        <command><method>defpattern</method> <m>name</m> <m>&lt;definition script></m></command>
+        <command><method>defpattern</method> <m>name</m> <m>?namespace?</m> <m>&lt;definition script></m></command>
         <desc>This method defines a (maybe complex) content particle
         with the <m>name</m> (optional in the namespace
         <m>namespace</m>) in the schema, to be referenced in other
@@ -213,8 +213,10 @@
       <commanddef>
         <command><method>any</method> <m>?quant?</m></command>
         <desc>The any command matches every element (with whatever
-        attributes) including any descendants. The any command accepts
-        only the !, ? and n quantifiers.</desc>
+        attributes) or subtree, no matter if known within the schema
+        or not. Please notice, that this mean the quantifier * and +
+        will eat up any elements until the enclosing element
+        ends.</desc>
       </commanddef>
 
       <commanddef>
