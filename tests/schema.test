@@ -769,7 +769,7 @@ test schema-7.7 {nested groups via refs} {
         }
         defpattern b  {
             element b1 *
-            group 2 {
+            group 1 {
                 element b2
                 ref a
             }
@@ -778,7 +778,7 @@ test schema-7.7 {nested groups via refs} {
             defelement $e  {}
         }
         defelement doc  {
-            group {
+            group 2 {
                 ref b
             }
         }
@@ -786,9 +786,8 @@ test schema-7.7 {nested groups via refs} {
     set doc [dom parse -validateCmd grammar {
          <doc>
            <!-- ref b start -->
-           <b2/>
-           <!-- inside ref b: ref a start -->
-           <e1/>
+        <b2/>
+        <e1/>
            <e1>
              <e2/>
            </e1>
@@ -1061,6 +1060,7 @@ test schema-7.14 {mixed} {
     }
     set result [list]
     foreach xml {
+        <doc></doc>
         <doc>text</doc>
         <doc>text<a/></doc>
         <doc><a/></doc>
@@ -1071,9 +1071,9 @@ test schema-7.14 {mixed} {
     }
     s delete
     set result
-} {1 1 1 1 0}
+} {1 1 1 1 1 0}
 
-test schema-7.14 {mixed} {knownBug} {
+test schema-7.14a {mixed} {
     tdom::schema create s
     s define {
         defelement doc {
@@ -1096,11 +1096,11 @@ test schema-7.14 {mixed} {knownBug} {
         <doc><unknown/><b/></doc>
     } {
         lappend result [s validate $xml errMsg]
-        puts $errMsg
+        #puts $errMsg
     }
     s delete
     set result
-} {1 0 1 0 0}
+} {1 0 1 0 0 0}
 
 test schema-8.1 {validate method} {
     tdom::schema create grammar
@@ -1329,7 +1329,7 @@ test schema-9.4 {choice} {
                 }
             }
         }
-        foreach e {e1 e2} {
+        foreach e {e1 e2 e3} {
             defelement $e foouri {}
         }
     }
@@ -1766,7 +1766,7 @@ test schema-12.2 {domvalidate} {
     $doc delete
     s delete
     set result
-} {0 {Element "some" doesn't match}}
+} {0 {Unexpected child element "some" for element "some"}}
 
 test schema-13.1 {XML namespaces} {
     tdom::schema create s

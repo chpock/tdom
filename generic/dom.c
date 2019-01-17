@@ -1506,7 +1506,7 @@ DispatchPCDATA (
     domLineColumn *lc;
     Tcl_HashEntry *h;
     char          *s;
-    int            len, hnew;
+    int            len, hnew, only_whites;
     
     len = Tcl_DStringLength (info->cdata);
     if (!len && !info->cdataSection) return;
@@ -1529,7 +1529,7 @@ DispatchPCDATA (
 
         if (info->ignoreWhiteSpaces) {
             char *pc;
-            int   i, only_whites;
+            int   i;
 
             only_whites = 1;
             for (i=0, pc = s; i < len; i++, pc++) {
@@ -1542,8 +1542,7 @@ DispatchPCDATA (
                 }
             }
             if (only_whites) {
-                Tcl_DStringSetLength (info->cdata, 0);
-                return;
+                goto checkTextConstraints;
             }
         }
 
@@ -1591,10 +1590,14 @@ DispatchPCDATA (
             lc->column       = XML_GetCurrentColumnNumber(info->parser);
         }
     }
+checkTextConstraints:
 #ifndef TDOM_NO_SCHEMA
     if (info->sdata) {
-        if (probeText (info->interp, info->sdata, s) != TCL_OK) {
-            XML_StopParser(info->parser, 0);
+        if (!only_whites
+            || info->sdata->stack->pattern->flags & CONSTRAINT_TEXT_CHILD) {
+            if (probeText (info->interp, info->sdata, s) != TCL_OK) {
+                XML_StopParser(info->parser, 0);
+            }
         }
     }
 #endif

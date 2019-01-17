@@ -40,19 +40,9 @@ typedef enum {
   SCHEMA_CQUANT_OPT,
   SCHEMA_CQUANT_REP,
   SCHEMA_CQUANT_PLUS,
-  SCHEMA_CQUANT_NM
-} Schema_Content_Quant;
-
-typedef unsigned int QuantFlags;
-
-typedef struct
-{
-    Schema_Content_Quant  type;
-    int                   minOccur;
-    int                   maxOccur;
-}  SchemaQuant;
-
-typedef unsigned int SchemaFlags;
+  SCHEMA_CQUANT_NM,
+  SCHEMA_CQUANT_ERROR,
+} SchemaQuant;
 
 typedef int (*SchemaConstraintFunc) (Tcl_Interp *interp,
                                      void *constraintData, char *text);
@@ -73,6 +63,15 @@ typedef struct
     struct SchemaCP   *cp;
 } SchemaAttr;
 
+typedef unsigned int SchemaFlags;
+
+/* The SchemaFlags flags */
+#define FORWARD_PATTERN_DEF     1
+#define PLACEHOLDER_PATTERN_DEF 2
+#define AMBIGUOUS_PATTERN       4
+#define LOCAL_DEFINED_ELEMENT   8
+#define CONSTRAINT_TEXT_CHILD  16
+
 typedef struct SchemaCP
 {
     Schema_CP_Type    type;
@@ -81,7 +80,7 @@ typedef struct SchemaCP
     struct SchemaCP  *next;
     SchemaFlags       flags;
     struct SchemaCP **content;
-    SchemaQuant     **quants;
+    SchemaQuant      *quants;
     unsigned int      numChildren;
     SchemaAttr      **attrs;
     unsigned int      numAttr;
@@ -95,7 +94,7 @@ typedef struct SchemaValidationStack
     struct SchemaValidationStack *down;
     int               activeChild;
     int               deep;
-    int               nrMatched;
+    int               hasMatched;
 } SchemaValidationStack;
 
 typedef enum {
@@ -118,7 +117,7 @@ typedef struct
     unsigned int numPatternList;
     unsigned int patternListSize;
     unsigned int forwardPatternDefs;
-    SchemaQuant **quants;
+    SchemaQuant *quants;
     unsigned int numQuants;
     unsigned int quantsSize;
     Tcl_Obj **evalStub;
@@ -126,9 +125,10 @@ typedef struct
     char *currentNamespace;
     int   defineToplevel;
     int   isTextConstraint;
+    int   isAttributeConstaint;
     SchemaCP *currentCP;
     SchemaCP **currentContent;
-    SchemaQuant **currentQuants;
+    SchemaQuant *currentQuants;
     unsigned int numChildren;
     unsigned int contentSize;
     SchemaAttr **currentAttrs;
