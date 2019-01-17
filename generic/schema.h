@@ -65,6 +65,13 @@ typedef struct
 
 typedef unsigned int SchemaFlags;
 
+/* The SchemaFlags flags */
+#define FORWARD_PATTERN_DEF     1
+#define PLACEHOLDER_PATTERN_DEF 2
+#define AMBIGUOUS_PATTERN       4
+#define LOCAL_DEFINED_ELEMENT   8
+#define CONSTRAINT_TEXT_CHILD  16
+
 typedef struct SchemaCP
 {
     Schema_CP_Type    type;
@@ -118,6 +125,7 @@ typedef struct
     char *currentNamespace;
     int   defineToplevel;
     int   isTextConstraint;
+    int   isAttributeConstaint;
     SchemaCP *currentCP;
     SchemaCP **currentContent;
     SchemaQuant *currentQuants;

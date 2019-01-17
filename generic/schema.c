@@ -126,12 +126,6 @@ static char *Schema_Quant_Type2str[] = {
 #endif
 
 
-/* The SchemaFlags flags */
-#define FORWARD_PATTERN_DEF     1
-#define PLACEHOLDER_PATTERN_DEF 2
-#define AMBIGUOUS_PATTERN       4
-#define LOCAL_DEFINED_ELEMENT   8
-
 #ifndef TCL_THREADS
   static SchemaData *activeSchemaData = 0;
 # define GETASI activeSchemaData
@@ -586,6 +580,7 @@ checkText (
 
 static int
 matchElementStart (
+    Tcl_Interp *interp,
     SchemaData *sdata,
     char *name,
     char *namespace
@@ -612,8 +607,10 @@ matchElementStart (
                 candidate = cp->content[ac];
                 switch (candidate->type) {
                 case SCHEMA_CTYPE_TEXT:
-                    if (mustMatch (cp->quants[ac], hm)) {
-                        return 0;
+                    if (candidate->numChildren) {
+                        if (!checkText (interp, candidate, "")) {
+                            return 0;
+                        }
                     }
                     break;
 
@@ -667,7 +664,7 @@ matchElementStart (
                         case SCHEMA_CTYPE_GROUP:
                         case SCHEMA_CTYPE_PATTERN:
                             pushToStack (sdata, jc, deep);
-                            if (matchElementStart (sdata, name, namespace)) {
+                            if (matchElementStart (interp, sdata, name, namespace)) {
                                 updateStack (se, cp, ac);
                                 return 1;
                             }
@@ -684,7 +681,7 @@ matchElementStart (
                 case SCHEMA_CTYPE_GROUP:
                 case SCHEMA_CTYPE_PATTERN:
                     pushToStack (sdata, candidate, deep);
-                    if (matchElementStart (sdata, name, namespace)) {
+                    if (matchElementStart (interp, sdata, name, namespace)) {
                         updateStack (se, cp, ac);
                         return 1;
                     }
@@ -823,7 +820,7 @@ probeElement (
     }
 
     /* The normal case: we're inside the tree */
-    if (matchElementStart (sdata, (char *) namePtr, (char *) namespacePtr)) {
+    if (matchElementStart (interp, sdata, (char *) namePtr, namespacePtr)) {
         DBG(
             fprintf (stderr, "probeElement: element '%s' match\n", name);
             serializeStack (sdata);
@@ -1058,6 +1055,7 @@ int probeDomAttributes (
 }
 
 static int checkElementEnd (
+    Tcl_Interp *interp,
     SchemaData *sdata
     )
 {
@@ -1084,11 +1082,15 @@ static int checkElementEnd (
             while (ac < cp->numChildren) {
                 DBG(fprintf (stderr, "ac %d hm %d mustMatch: %d\n",
                              ac, hm, mustMatch (cp->quants[ac], hm)));
-                /* TODO: TEXT cp: If not opt call checkText() with
-                 * empty string and complain only if that returns
-                 * false. */
-                if (mustMatch (cp->quants[ac], hm)) {
-                    return 0;
+                if (cp->content[ac]->type == SCHEMA_CTYPE_TEXT
+                    && cp->content[ac]->numChildren) {
+                    if (!checkText (interp, cp->content[ac], "")) {
+                        return 0;
+                    }
+                } else {
+                    if (mustMatch (cp->quants[ac], hm)) {
+                        return 0;
+                    }
                 }
                 ac ++;
                 hm = 0;
@@ -1141,7 +1143,7 @@ probeElementEnd (
         return TCL_ERROR;
     }
 
-    if (checkElementEnd (sdata)) {
+    if (checkElementEnd (interp, sdata)) {
         if (sdata->stack == NULL) {
             /* End of the first pattern (the tree root) without error.
                We have successfully ended validation */
@@ -1171,7 +1173,7 @@ matchText (
 {
     SchemaCP *cp, *candidate, *ic;
     SchemaValidationStack *se;
-    int ac, hm, isName, i;
+    int ac, hm, isName = 0, i;
 
     while (1) {
         se = sdata->stack;
@@ -1311,26 +1313,32 @@ probeText (
         return TCL_ERROR;
     }
 
-    if (matchText (interp, sdata, text)) {
-        return TCL_OK;
-    }
-
     /* If we are here then there isn't a matching TEXT cp. Check, if
      * this is white space only between tags. */
-    only_whites = 1;
-    pc = text;
-    while (*pc) {
-        if ( (*pc == ' ')  ||
-             (*pc == '\n') ||
-             (*pc == '\r') ||
-             (*pc == '\t') ) {
-            pc++;
-            continue;
+    if (sdata->stack->pattern->flags & CONSTRAINT_TEXT_CHILD) {
+        if (matchText (interp, sdata, text)) {
+            return TCL_OK;
         }
-        only_whites = 0;
-        break;
+    } else {
+        only_whites = 1;
+        pc = text;
+        while (*pc) {
+            if ( (*pc == ' ')  ||
+                 (*pc == '\n') ||
+                 (*pc == '\r') ||
+                 (*pc == '\t') ) {
+                pc++;
+                continue;
+            }
+            only_whites = 0;
+            break;
+        }
+        if (only_whites)  return TCL_OK;
+        if (matchText (interp, sdata, text)) {
+            return TCL_OK;
+        }
     }
-    if (only_whites)  return TCL_OK;
+
     SetResult ("Unexpected text content");
     return TCL_ERROR;
 }
@@ -1348,7 +1356,9 @@ startElement(
     int i = 0;
     
     DBG(fprintf (stderr, "startElement: '%s'\n", name);)
-    if (Tcl_DStringLength (vdata->cdata)) {
+    if (Tcl_DStringLength (vdata->cdata)
+        || (vdata->sdata->stack
+            && (vdata->sdata->stack->pattern->flags & CONSTRAINT_TEXT_CHILD))) {
         if (probeText (vdata->interp, vdata->sdata,
                        Tcl_DStringValue (vdata->cdata)) != TCL_OK) {
             vdata->sdata->validationState = VALIDATION_ERROR;
@@ -1405,7 +1415,8 @@ endElement (
     if (vdata->sdata->validationState == VALIDATION_ERROR) {
         return;
     }
-    if (Tcl_DStringLength (vdata->cdata)) {
+    if (Tcl_DStringLength (vdata->cdata)
+        || vdata->sdata->stack->pattern->flags & CONSTRAINT_TEXT_CHILD) {
         if (probeText (vdata->interp, vdata->sdata,
                        Tcl_DStringValue (vdata->cdata)) != TCL_OK) {
             vdata->sdata->validationState = VALIDATION_ERROR;
@@ -2139,7 +2150,7 @@ evalDefinition (
     SchemaAttr **savedCurrentAttrs;
     unsigned int savedNumChildren, savedContenSize, savedNumAttr;
     unsigned int savedAttrSize, savedNumReqAttr;
-    int result;
+    int result, i;
 
     /* Save some state of sdata .. */
     savedCurrentCP = sdata->currentCP;
@@ -2185,6 +2196,15 @@ evalDefinition (
     if (result == TCL_OK) {
         REMEMBER_PATTERN (pattern);
         ADD_TO_CONTENT (pattern, quant);
+        for (i = 0; i < pattern->numChildren; i++) {
+            if (pattern->content[i]->type == SCHEMA_CTYPE_GROUP
+                && pattern->content[i]->type == SCHEMA_CTYPE_PATTERN) {
+                if (pattern->content[i]->flags & CONSTRAINT_TEXT_CHILD) {
+                    pattern->flags |= CONSTRAINT_TEXT_CHILD;
+                    break;
+                }
+            }
+        }
     } else {
         freeSchemaCP (pattern);
     }
@@ -2392,6 +2412,9 @@ evalConstraints (
     sdata->currentQuants = savedCurrentQuant;
     sdata->numChildren = savedNumChildren;
     sdata->contentSize = savedContenSize;
+    if (!sdata->isAttributeConstaint && cp->numChildren) {
+        sdata->currentCP->flags |= CONSTRAINT_TEXT_CHILD;
+    }
     return result;
 }
 
@@ -2443,8 +2466,10 @@ static int maybeAddAttr (
             );
         cp->quants = (SchemaQuant*) MALLOC (
             sizeof (SchemaQuant) * CONTENT_ARRAY_SIZE_INIT
-            );        
+            );
+        sdata->isAttributeConstaint = 1;
         result = evalConstraints (interp, sdata, cp, scriptObj);
+        sdata->isAttributeConstaint = 0;
         attr->cp = cp;
     } else {
         attr->cp = NULL;
