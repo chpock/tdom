@@ -27,7 +27,7 @@
 #include <tcldom.h>
 #include <schema.h>
 
-#define DEBUG
+/* #define DEBUG */
 /* #define DDEBUG */
 /*----------------------------------------------------------------------------
 |   Debug Macros
@@ -506,8 +506,7 @@ pushToStack (
 
     if (sdata->stackPool) {
         stackElm = sdata->stackPool;
-        se = stackElm->down;
-        sdata->stackPool = se;
+        sdata->stackPool = stackElm->down;
     } else {
         stackElm = TMALLOC (SchemaValidationStack);
     }
@@ -538,21 +537,20 @@ pushToStack (
     (hm) == 0 ? minOne(quant) : 0
 
 
-#define getContext(parent, ac, hm)    \
-    parent = sdata->stack->pattern;   \
-    ac = sdata->stack->activeChild;   \
-    hm = sdata->stack->hasMatched;
+#define getContext(cp, ac, hm)        \
+    cp = se->pattern;                 \
+    ac = se->activeChild;             \
+    hm = se->hasMatched;
 
-static void
-updateStack (
-    SchemaValidationStack *se,
-    int ac,
-    int hm
-    )
-{
-    se->activeChild = ac;
-    se->hasMatched = hm;
-}
+
+#define updateStack(se,cp,ac)                     \
+    if (maxOne (cp->quants[ac])) {                \
+        se->activeChild = ac + 1;                 \
+        se->hasMatched = 0;                       \
+    } else {                                      \
+        se->activeChild = ac;                     \
+        se->hasMatched = 1;                       \
+    }
 
 static void
 popStack (
@@ -580,10 +578,10 @@ checkText (
     for (i = 0; i < cp->numChildren; i++) {
         sc = (SchemaConstraint *) cp->content[i];
         if ((sc->constraint) (interp, sc->constraintData, text) != TCL_OK) {
-            return TCL_ERROR;
+            return 0;
         }
     }
-    return TCL_OK;
+    return 1;
 }
 
 static int
@@ -593,16 +591,17 @@ matchElementStart (
     char *namespace
     )
 {
-    SchemaCP *cp, *candidate;
-    int hm, ac, i;
+    SchemaCP *cp, *candidate, *jc;
+    int hm, ac, j;
     int isName = 0, deep;
     SchemaValidationStack *se;
 
-    getContext (cp, ac, hm);
-    se = sdata->stack;
-    deep = se->deep;
-    
     while (1) {
+        if (!sdata->stack) return 0;
+        se = sdata->stack;
+        getContext (cp, ac, hm);
+        deep = se->deep;
+    
         switch (cp->type) {
         case SCHEMA_CTYPE_NAME:
             isName = 1;
@@ -619,11 +618,7 @@ matchElementStart (
                     break;
 
                 case SCHEMA_CTYPE_ANY:
-                    if (maxOne (cp->quants[ac])) {
-                        updateStack (se, ac+1, 0);
-                    } else {
-                        updateStack (se, ac, 1);
-                    }
+                    updateStack (se, cp, ac);
                     sdata->skipDeep = 1;
                     return 1;
                 
@@ -633,28 +628,64 @@ matchElementStart (
                                  candidate->name, candidate->namespace));
                     if (candidate->name == name
                         && candidate->namespace == namespace) {
-                        if (maxOne (cp->quants[ac])) {
-                            updateStack (se, ac+1, 0);
-                        } else {
-                            updateStack (se, ac, 1);
-                        }
+                        updateStack (se, cp, ac);
                         pushToStack (sdata, candidate, deep + 1);
                         return 1;
                     }
                     break;
                     
+                case SCHEMA_CTYPE_MIXED:
+                case SCHEMA_CTYPE_CHOICE:
+                    for (j = 0; j < candidate->numChildren; j++) {
+                        jc = candidate->content[j];
+                        switch (jc->type) {
+                        case SCHEMA_CTYPE_TEXT:
+                            break;
+
+                        case SCHEMA_CTYPE_ANY:
+                            sdata->skipDeep = 1;
+                            updateStack (se, cp, ac);
+                            return 1;
+                    
+                        case SCHEMA_CTYPE_NAME:
+                            if (jc->name == name
+                                && jc->namespace == namespace) {
+                                pushToStack (sdata, jc, deep + 1);
+                                updateStack (se, cp, ac);
+                                return 1;
+                            }
+                            break;
+
+                        case SCHEMA_CTYPE_MIXED:
+                        case SCHEMA_CTYPE_CHOICE:
+                            Tcl_Panic ("MIXED or CHOICE child of MIXED or CHOICE");
+                            
+                        case SCHEMA_CTYPE_INTERLEAVE:
+                            fprintf (stderr, "matchElementStart: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
+                            return 0;
+
+                        case SCHEMA_CTYPE_GROUP:
+                        case SCHEMA_CTYPE_PATTERN:
+                            pushToStack (sdata, jc, deep);
+                            if (matchElementStart (sdata, name, namespace)) {
+                                updateStack (se, cp, ac);
+                                return 1;
+                            }
+                            popStack (sdata);
+                            break;
+                        }
+                    }
+                    break;
+                            
+                case SCHEMA_CTYPE_INTERLEAVE:
+                    fprintf (stderr, "matchElementStart: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
+                    return 0;
+                    
                 case SCHEMA_CTYPE_GROUP:
                 case SCHEMA_CTYPE_PATTERN:
-                case SCHEMA_CTYPE_MIXED:
-                case SCHEMA_CTYPE_INTERLEAVE:
-                case SCHEMA_CTYPE_CHOICE:
                     pushToStack (sdata, candidate, deep);
                     if (matchElementStart (sdata, name, namespace)) {
-                        if (maxOne (cp->quants[ac])) {
-                            updateStack (se, ac+1, 0);
-                        } else {
-                            updateStack (se, ac, 1);
-                        }
+                        updateStack (se, cp, ac);
                         return 1;
                     }
                     popStack (sdata);
@@ -668,54 +699,17 @@ matchElementStart (
             }
             if (isName) return 0;
             popStack (sdata);
-            getContext (cp, ac, hm);
-            se = sdata->stack;
             continue;
             
+        case SCHEMA_CTYPE_MIXED:
+        case SCHEMA_CTYPE_CHOICE:
         case SCHEMA_CTYPE_TEXT:
-            return 0;
-        
         case SCHEMA_CTYPE_ANY:
             /* Never pushed onto stack */
             Tcl_Panic ("Invalid CTYPE onto the validation stack!");
 
         case SCHEMA_CTYPE_INTERLEAVE:
             fprintf (stderr, "matchElementStart: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
-            return 0;
-
-        case SCHEMA_CTYPE_MIXED:
-        case SCHEMA_CTYPE_CHOICE:
-            for (i = 0; i < cp->numChildren; i++) {
-                candidate = cp->content[i];
-                switch (candidate->type) {
-                case SCHEMA_CTYPE_TEXT:
-                    break;
-
-                case SCHEMA_CTYPE_ANY:
-                    popStack (sdata);
-                    sdata->skipDeep = 1;
-                    return 1;
-                    
-                case SCHEMA_CTYPE_NAME:
-                    if (candidate->name == name
-                        && candidate->namespace == namespace) {
-                        pushToStack (sdata, candidate, deep + 1);
-                        return 1;
-                    }
-                    break;
-                case SCHEMA_CTYPE_GROUP:
-                case SCHEMA_CTYPE_PATTERN:
-                case SCHEMA_CTYPE_MIXED:
-                case SCHEMA_CTYPE_INTERLEAVE:
-                case SCHEMA_CTYPE_CHOICE:
-                    pushToStack (sdata, candidate, deep);
-                    if (matchElementStart (sdata, name, namespace)) {
-                        return 1;
-                    }
-                    popStack (sdata);
-                    break;
-                }
-            }
             return 0;
         }
     }
@@ -802,7 +796,23 @@ probeElement (
         pattern = NULL;
     }
     
-    if (!sdata->stack) {
+    if (sdata->stack) {
+        SchemaValidationStack *se;
+        se = sdata->stack;
+        if (se->pattern->type == SCHEMA_CTYPE_NAME
+            && se->activeChild >= se->pattern->numChildren) {
+            SetResult ("Unexpected child element \"");
+            if (namespacePtr) {
+                Tcl_AppendResult (interp, namespacePtr, ":", NULL);
+            }
+            Tcl_AppendResult (interp, name, "\" for element \"", NULL);
+            if (se->pattern->namespace) {
+                Tcl_AppendResult (interp, namespace, ":", NULL);
+            }
+            Tcl_AppendResult (interp, name, "\"", NULL);
+            return TCL_ERROR;
+        }
+    } else {
         if (!pattern) {
             SetResult ("Unknown element");
             return TCL_ERROR;
@@ -872,7 +882,7 @@ int probeAttributes (
                 found = 1;
                 if (cp->attrs[i]->cp) {
                     if (checkText (interp, cp->attrs[i]->cp, (char *) atPtr[1])
-                        != TCL_OK) {
+                        == 0) {
                         if (nsatt) namespace[j] = '\xFF';
                         SetResult3 ("Attribute value doesn't match for "
                                     "attribute '", atPtr[0], "'");
@@ -974,7 +984,7 @@ int probeDomAttributes (
             if (strcmp (ln, cp->attrs[i]->name) == 0) {
                 if (cp->attrs[i]->cp) {
                     if (checkText (interp, cp->attrs[i]->cp, (char *) ln)
-                        != TCL_OK) {
+                        == 0) {
                         SetResult3 ("Attribute value doesn't match for "
                                     "attribute '", ln, "'");
                         return TCL_ERROR;
@@ -1051,18 +1061,20 @@ static int checkElementEnd (
     SchemaData *sdata
     )
 {
+    SchemaValidationStack *se;
     SchemaCP *cp;
     int hm, ac;
     int isName = 0;
-    
-    getContext (cp, ac, hm);
-    
+
     while (1) {
+        DBG(fprintf (stderr, "checkElementEnd:\n");
+            serializeStack(sdata););
+        se = sdata->stack;
+        getContext (cp, ac, hm);
         switch (cp->type) {
         case SCHEMA_CTYPE_NAME:
-            /* if (!sdata->stack->down) return 1; */
             isName = 1;
-            /* fall through */
+            /* Fall through */
         case SCHEMA_CTYPE_GROUP:
         case SCHEMA_CTYPE_PATTERN:
             if (ac < cp->numChildren && (hasMatched (cp->quants[ac], hm))) {
@@ -1072,15 +1084,21 @@ static int checkElementEnd (
             while (ac < cp->numChildren) {
                 DBG(fprintf (stderr, "ac %d hm %d mustMatch: %d\n",
                              ac, hm, mustMatch (cp->quants[ac], hm)));
+                /* TODO: TEXT cp: If not opt call checkText() with
+                 * empty string and complain only if that returns
+                 * false. */
                 if (mustMatch (cp->quants[ac], hm)) {
                     return 0;
                 }
                 ac ++;
                 hm = 0;
             }
+            popStack (sdata);
             if (isName) return 1;
-            else return -1;
-
+            continue;
+            
+        case SCHEMA_CTYPE_MIXED:
+        case SCHEMA_CTYPE_CHOICE:
         case SCHEMA_CTYPE_TEXT:
         case SCHEMA_CTYPE_ANY:
             /* Never pushed onto stack */
@@ -1090,12 +1108,6 @@ static int checkElementEnd (
         case SCHEMA_CTYPE_INTERLEAVE:
             fprintf (stderr, "checkElementEnd: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
             return 0;
-        
-        case SCHEMA_CTYPE_MIXED:
-        case SCHEMA_CTYPE_CHOICE:
-            popStack (sdata);
-            getContext (cp, ac, hm);
-            continue;
         }
     }
     return 0;
@@ -1107,8 +1119,6 @@ probeElementEnd (
     SchemaData *sdata
     )
 {
-    int rc;
-    
     DBG(
         fprintf (stderr, "probeElementEnd: look if current stack top can end "
                  " name: '%s' deep: %d\n",
@@ -1131,38 +1141,151 @@ probeElementEnd (
         return TCL_ERROR;
     }
 
-    while (1) {
-        rc = checkElementEnd (sdata);
-        if (rc != -1
-            || (!sdata->stack->down
-                || sdata->stack->deep > sdata->stack->down->deep)) break;
-        popStack(sdata);
-        DBG(fprintf (stderr, "probe element end again after popping from stack\n");
-            serializeStack (sdata));
-    }
-    
-    if (rc != 1) {
-        SetResult ("Missing mandatory element");
-        sdata->validationState = VALIDATION_ERROR;
+    if (checkElementEnd (sdata)) {
+        if (sdata->stack == NULL) {
+            /* End of the first pattern (the tree root) without error.
+               We have successfully ended validation */
+            sdata->validationState = VALIDATION_FINISHED;
+        }
         DBG(
-            fprintf(stderr, "probeElementEnd: CAN'T end here.\n");
+            fprintf(stderr, "probeElementEnd: _CAN_ end here.\n");
             serializeStack (sdata);
             );
-        return TCL_ERROR;
+        return TCL_OK;
     }
-
-    popStack(sdata);
+    SetResult ("Missing mandatory content");
+    sdata->validationState = VALIDATION_ERROR;
     DBG(
-        fprintf(stderr, "probeElementEnd: ended here.\n");
+        fprintf(stderr, "probeElementEnd: CAN'T end here.\n");
         serializeStack (sdata);
         );
-    if (sdata->stack == NULL) {
-        /* End of the first pattern (the tree root) without error.
-           We have successfully ended validation */
-        sdata->validationState = VALIDATION_FINISHED;
-    }
+    return TCL_ERROR;
+}
 
-    return TCL_OK;
+static int
+matchText (
+    Tcl_Interp *interp,
+    SchemaData *sdata,
+    char *text
+    )
+{
+    SchemaCP *cp, *candidate, *ic;
+    SchemaValidationStack *se;
+    int ac, hm, isName, i;
+
+    while (1) {
+        se = sdata->stack;
+        getContext (cp, ac, hm);
+        switch (cp->type) {
+        case SCHEMA_CTYPE_NAME:
+            isName = 1;
+            /* Fall through */
+        case SCHEMA_CTYPE_GROUP:
+        case SCHEMA_CTYPE_PATTERN:
+            while (ac < cp->numChildren) {
+                candidate = cp->content[ac];
+                switch (candidate->type) {
+                case SCHEMA_CTYPE_MIXED:
+                    updateStack (se, cp, ac);
+                    return 1;
+                    
+                case SCHEMA_CTYPE_TEXT:
+                    if (checkText (interp, candidate, text)) {
+                        updateStack (se, cp, ac);
+                        return 1;
+                    }
+                    SetResult ("Invalid text content");
+                    return 0;
+
+                case SCHEMA_CTYPE_CHOICE:
+                    for (i = 0; i < candidate->numChildren; i++) {
+                        ic = candidate->content[i];
+                        switch (ic->type) {
+                        case SCHEMA_CTYPE_TEXT:
+                            if (checkText (interp, ic, text)) {
+                                updateStack (se, cp, ac);
+                                return 1;
+                            }
+                            break;
+                            
+                        case SCHEMA_CTYPE_NAME:
+                        case SCHEMA_CTYPE_ANY:
+                            break;
+
+                        case SCHEMA_CTYPE_GROUP:
+                        case SCHEMA_CTYPE_PATTERN:
+                            pushToStack (sdata, candidate, se->deep);
+                            if (matchText (interp, sdata, text)) {
+                                updateStack (se, cp, ac);
+                                return 1;
+                            }
+                            break;
+                            
+                        case SCHEMA_CTYPE_MIXED:
+                        case SCHEMA_CTYPE_CHOICE:
+                            Tcl_Panic ("MIXED or CHOICE child of MIXED or CHOICE");
+
+                        case SCHEMA_CTYPE_INTERLEAVE:
+                            fprintf (stderr, "matchText: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
+                            return 0;
+                        }
+                    }
+                    if (mustMatch (cp->quants[ac], hm)) {
+                        SetResult ("Unexpected text content");
+                        return 0;
+                    }
+                    break;
+                    
+                case SCHEMA_CTYPE_GROUP:
+                case SCHEMA_CTYPE_PATTERN:
+                    pushToStack (sdata, candidate, se->deep);
+                    if (matchText (interp, sdata, text)) {
+                        updateStack (se, cp, ac);
+                        return 1;
+                    }
+                    popStack (sdata);
+                    if (mustMatch (cp->quants[ac], hm)) {
+                        SetResult ("Unexpected text content");
+                        return 0;
+                    }
+                    break;
+
+                case SCHEMA_CTYPE_NAME:
+                case SCHEMA_CTYPE_ANY:
+                    if (mustMatch (cp->quants[ac], hm)) {
+                        SetResult ("Unexpected text content");
+                        return 0;
+                    }
+                    break;
+
+                case SCHEMA_CTYPE_INTERLEAVE:
+                    fprintf (stderr, "matchText: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
+                    return 0;
+                }
+                ac++;
+            }
+            if (isName) {
+                SetResult ("Unexpected text content");
+                return 0;
+            }
+            popStack (sdata);
+            continue;
+
+        case SCHEMA_CTYPE_MIXED:
+        case SCHEMA_CTYPE_CHOICE:
+        case SCHEMA_CTYPE_TEXT:
+        case SCHEMA_CTYPE_ANY:
+            /* Never pushed onto stack */
+            Tcl_Panic ("Invalid CTYPE onto the validation stack!");
+            break;
+            
+        case SCHEMA_CTYPE_INTERLEAVE:
+            fprintf (stderr, "probeText: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
+            return 0;
+        }
+        break;
+    }
+    return 0;
 }
 
 int
@@ -1172,9 +1295,7 @@ probeText (
     char *text
     )
 {
-    SchemaCP *cp;
-    SchemaValidationStack *se;
-    int ac, hm, only_whites;
+    int only_whites;
     char *pc;
 
     DBG(fprintf (stderr, "probeText started, text: '%s'\n", text);)
@@ -1190,44 +1311,10 @@ probeText (
         return TCL_ERROR;
     }
 
-    getContext (cp, ac, hm);
-
-    if (cp->type == SCHEMA_CTYPE_MIXED) {
-        se = sdata->stack->down;
-        if (hasMatched (se->pattern->quants[se->activeChild], se->hasMatched)) {
-            popStack (sdata);
-            return probeText (interp, sdata, text);
-        }
-        se->hasMatched++;
+    if (matchText (interp, sdata, text)) {
         return TCL_OK;
     }
-    while (ac < cp->numChildren) {
-        switch (cp->content[ac]->type) {
-        case SCHEMA_CTYPE_TEXT:
-        case SCHEMA_CTYPE_MIXED: goto foundCP;
-        default:
-            if (mustMatch (cp->quants[ac], hm)) break;
-        }
-        ac++;
-        hm = 0;
-    }
-foundCP:
-    if (ac < cp->numChildren) {
-        if (cp->content[ac]->type == SCHEMA_CTYPE_MIXED) {
-            updateStack (sdata->stack, ac, hm+1);
-            return TCL_OK;
-        }
-        if (cp->content[ac]->type == SCHEMA_CTYPE_TEXT) {
-            updateStack (sdata->stack, ac, hm+1);
-            if (cp->content[ac]->numChildren) {
-                if (checkText (interp, cp->content[ac], text) != TCL_OK) {
-                    SetResult ("Invalid text content");
-                    return TCL_ERROR;
-                }
-            }
-            return TCL_OK;
-        }
-    }
+
     /* If we are here then there isn't a matching TEXT cp. Check, if
      * this is white space only between tags. */
     only_whites = 1;
@@ -2349,7 +2436,6 @@ static int maybeAddAttr (
     attr->name = name;
     attr->required = required;
     if (scriptObj) {
-        /* TODO */
         cp = initSchemaCP (SCHEMA_CTYPE_TEXT, NULL, NULL);
         REMEMBER_PATTERN (cp)
         cp->content = (SchemaCP**) MALLOC (
@@ -2487,7 +2573,7 @@ TextPatternObjCmd (
     checkNrArgs (1,2,"?<definition script>?");
     pattern = initSchemaCP (SCHEMA_CTYPE_TEXT, NULL, NULL);
     REMEMBER_PATTERN (pattern)
-    ADD_TO_CONTENT (pattern, SCHEMA_CQUANT_ONE)
+    ADD_TO_CONTENT (pattern, SCHEMA_CQUANT_OPT)
     if (objc == 2) {
         pattern->content = (SchemaCP**) MALLOC (
             sizeof(SchemaCP*) * CONTENT_ARRAY_SIZE_INIT

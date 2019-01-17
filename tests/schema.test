@@ -769,7 +769,7 @@ test schema-7.7 {nested groups via refs} {
         }
         defpattern b  {
             element b1 *
-            group 2 {
+            group 1 {
                 element b2
                 ref a
             }
@@ -778,7 +778,7 @@ test schema-7.7 {nested groups via refs} {
             defelement $e  {}
         }
         defelement doc  {
-            group {
+            group 2 {
                 ref b
             }
         }
@@ -786,14 +786,15 @@ test schema-7.7 {nested groups via refs} {
     set doc [dom parse -validateCmd grammar {
          <doc>
            <!-- ref b start -->
-           <b2/>
-           <!-- inside ref b: ref a start -->
-           <e1/>
+        <b2/>
+        <e1/>
            <e1>
              <e2/>
            </e1>
            <e2/>
            <e3/>
+           <!-- inside ref b: ref a end -->
+           <!-- ref b end -->
            <!-- inside ref b: ref a end -->
            <!-- inside ref b: ref a start -->
         <b2/>
@@ -1101,7 +1102,7 @@ test schema-7.14a {mixed} {
     }
     s delete
     set result
-} {1 0 1 0 0}
+} {1 0 1 0 0 0}
 
 test schema-8.1 {validate method} {
     tdom::schema create grammar
@@ -1334,15 +1335,14 @@ test schema-9.4 {choice} {
             defelement $e foouri {}
         }
     }
-    # set result [grammar validate {<doc xmlns="foouri"/>}]
-    # lappend result [grammar validate {<doc xmlns="foouri"><e1/></doc>}]
-    # lappend result [grammar validate {<doc xmlns="foouri"><e2/><e3/></doc>}]
-    set result [grammar validate {<doc xmlns="foouri"><e1/><e2/><e3/></doc>}]
-    # lappend result [grammar validate {<doc xmlns="foouri"><e1/><e2/><e3/></doc>}]
-    # lappend result [grammar validate {<doc xmlns="foouri"><e2/><e3/><e1/></doc>}]
-    # lappend result [grammar validate {<doc xmlns="foouri"><e1/><e1/></doc>}]
-    # lappend result [grammar validate {<doc xmlns="foouri"><e2/><e3/><e2/><e3/></doc>}]
-    # lappend result [grammar validate {<doc xmlns="foouri"><e1/><e2/><e2/></doc>}]
+    set result [grammar validate {<doc xmlns="foouri"/>}]
+    lappend result [grammar validate {<doc xmlns="foouri"><e1/></doc>}]
+    lappend result [grammar validate {<doc xmlns="foouri"><e2/><e3/></doc>}]
+    lappend result [grammar validate {<doc xmlns="foouri"><e1/><e2/><e3/></doc>}]
+    lappend result [grammar validate {<doc xmlns="foouri"><e2/><e3/><e1/></doc>}]
+    lappend result [grammar validate {<doc xmlns="foouri"><e1/><e1/></doc>}]
+    lappend result [grammar validate {<doc xmlns="foouri"><e2/><e3/><e2/><e3/></doc>}]
+    lappend result [grammar validate {<doc xmlns="foouri"><e1/><e2/><e2/></doc>}]
     grammar delete
     set result
 } {0 0 0 1 1 1 1 0}
@@ -1768,7 +1768,7 @@ test schema-12.2 {domvalidate} {
     $doc delete
     s delete
     set result
-} {0 {Element "some" doesn't match}}
+} {0 {Unexpected child element "some" for element "some"}}
 
 test schema-13.1 {XML namespaces} {
     tdom::schema create s

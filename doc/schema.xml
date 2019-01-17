@@ -7,7 +7,7 @@
   <synopsis>
     <syntax>package require tdom
 
-    <cmd>tdom::schema</cmd> <m>cmdName</m>
+<cmd>tdom::schema</cmd> <m>?create?</m> <m>cmdName</m>
     </syntax>
   </synopsis>
 
