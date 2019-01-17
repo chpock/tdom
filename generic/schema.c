@@ -233,7 +233,6 @@ initSchemaCP (
         pattern->namespace = (char *)namespace;
         pattern->name = name;
         /* Fall thru. */
-    case SCHEMA_CTYPE_GROUP:
     case SCHEMA_CTYPE_MIXED:
     case SCHEMA_CTYPE_CHOICE:
     case SCHEMA_CTYPE_INTERLEAVE:
@@ -265,7 +264,6 @@ static void serializeCP (
     switch (pattern->type) {
     case SCHEMA_CTYPE_NAME:
     case SCHEMA_CTYPE_PATTERN:
-    case SCHEMA_CTYPE_GROUP:
         fprintf (stderr, "\tName: '%s' Namespace: '%s'\n",
                  pattern->name,pattern->namespace);
         if (pattern->flags & FORWARD_PATTERN_DEF) {
@@ -459,7 +457,7 @@ cleanupLastPattern (
         if (this->type == SCHEMA_CTYPE_PATTERN) {
             hashTable = &sdata->pattern;
         }
-        if (hashTable) {
+        if (this->name && hashTable) {
             if (this->flags & FORWARD_PATTERN_DEF) {
                 sdata->forwardPatternDefs--;
             }
@@ -601,7 +599,6 @@ matchElementStart (
         case SCHEMA_CTYPE_NAME:
             isName = 1;
             /* fall through */
-        case SCHEMA_CTYPE_GROUP:
         case SCHEMA_CTYPE_PATTERN:
             while (ac < cp->numChildren) {
                 candidate = cp->content[ac];
@@ -661,7 +658,6 @@ matchElementStart (
                             fprintf (stderr, "matchElementStart: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
                             return 0;
 
-                        case SCHEMA_CTYPE_GROUP:
                         case SCHEMA_CTYPE_PATTERN:
                             pushToStack (sdata, jc, deep);
                             if (matchElementStart (interp, sdata, name, namespace)) {
@@ -678,7 +674,6 @@ matchElementStart (
                     fprintf (stderr, "matchElementStart: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
                     return 0;
                     
-                case SCHEMA_CTYPE_GROUP:
                 case SCHEMA_CTYPE_PATTERN:
                     pushToStack (sdata, candidate, deep);
                     if (matchElementStart (interp, sdata, name, namespace)) {
@@ -1073,7 +1068,6 @@ static int checkElementEnd (
         case SCHEMA_CTYPE_NAME:
             isName = 1;
             /* Fall through */
-        case SCHEMA_CTYPE_GROUP:
         case SCHEMA_CTYPE_PATTERN:
             if (ac < cp->numChildren && (hasMatched (cp->quants[ac], hm))) {
                 DBG(fprintf (stderr, "ac has matched, skiping to next ac\n"));
@@ -1182,7 +1176,6 @@ matchText (
         case SCHEMA_CTYPE_NAME:
             isName = 1;
             /* Fall through */
-        case SCHEMA_CTYPE_GROUP:
         case SCHEMA_CTYPE_PATTERN:
             while (ac < cp->numChildren) {
                 candidate = cp->content[ac];
@@ -1214,7 +1207,6 @@ matchText (
                         case SCHEMA_CTYPE_ANY:
                             break;
 
-                        case SCHEMA_CTYPE_GROUP:
                         case SCHEMA_CTYPE_PATTERN:
                             pushToStack (sdata, candidate, se->deep);
                             if (matchText (interp, sdata, text)) {
@@ -1238,7 +1230,6 @@ matchText (
                     }
                     break;
                     
-                case SCHEMA_CTYPE_GROUP:
                 case SCHEMA_CTYPE_PATTERN:
                     pushToStack (sdata, candidate, se->deep);
                     if (matchText (interp, sdata, text)) {
@@ -2197,8 +2188,7 @@ evalDefinition (
         REMEMBER_PATTERN (pattern);
         ADD_TO_CONTENT (pattern, quant);
         for (i = 0; i < pattern->numChildren; i++) {
-            if (pattern->content[i]->type == SCHEMA_CTYPE_GROUP
-                && pattern->content[i]->type == SCHEMA_CTYPE_PATTERN) {
+            if (pattern->content[i]->type == SCHEMA_CTYPE_PATTERN) {
                 if (pattern->content[i]->flags & CONSTRAINT_TEXT_CHILD) {
                     pattern->flags |= CONSTRAINT_TEXT_CHILD;
                     break;
@@ -2964,7 +2954,7 @@ tDOM_SchemaInit (
                           (ClientData) SCHEMA_CTYPE_INTERLEAVE, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::group",
                           AnonPatternObjCmd,
-                          (ClientData) SCHEMA_CTYPE_GROUP, NULL);
+                          (ClientData) SCHEMA_CTYPE_PATTERN, NULL);
     
     /* The "attribute", "nsattribute", "namespace" and "text" definition commands. */
     Tcl_CreateObjCommand (interp, "tdom::schema::attribute",
