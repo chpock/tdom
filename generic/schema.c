@@ -585,7 +585,7 @@ matchElementStart (
     )
 {
     SchemaCP *cp, *candidate, *jc;
-    int hm, ac, j;
+    int hm, ac, j, mayskip;
     int isName = 0, deep;
     SchemaValidationStack *se;
 
@@ -602,6 +602,7 @@ matchElementStart (
         case SCHEMA_CTYPE_PATTERN:
             while (ac < cp->numChildren) {
                 candidate = cp->content[ac];
+                mayskip = 0;
                 switch (candidate->type) {
                 case SCHEMA_CTYPE_TEXT:
                     if (candidate->numChildren) {
@@ -667,6 +668,8 @@ matchElementStart (
                             popStack (sdata);
                             break;
                         }
+                        if (!mayskip && mayMiss(candidate->quants[j])) mayskip = 1;
+                        
                     }
                     break;
                             
@@ -683,7 +686,7 @@ matchElementStart (
                     popStack (sdata);
                     break;
                 }
-                if (mustMatch (cp->quants[ac], hm)) {
+                if (!mayskip && mustMatch (cp->quants[ac], hm)) {
                     return 0;
                 }
                 ac++;
