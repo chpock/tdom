@@ -171,21 +171,68 @@ static void SetActiveSchemaData (SchemaData *v)
         return TCL_ERROR;                                               \
     }
 
-#define ADD_TO_CONTENT(pattern,quant)                                   \
-    if (sdata->numChildren == sdata->contentSize) {                     \
-        sdata->currentContent =                                         \
-            REALLOC (sdata->currentContent,                             \
-                     2 * sdata->contentSize                             \
-                     * sizeof (SchemaCP*));                             \
-        sdata->currentQuants =                                          \
-            REALLOC (sdata->currentQuants,                              \
-                     2 * sdata->contentSize                             \
-                     * sizeof (SchemaQuant));                           \
-        sdata->contentSize *= 2;                                        \
+#define REMEMBER_PATTERN(pattern)                                       \
+    if (sdata->numPatternList == sdata->patternListSize) {              \
+        sdata->patternList = (SchemaCP **) REALLOC (                    \
+            sdata->patternList,                                         \
+            sizeof (SchemaCP*) * sdata->patternListSize * 2);           \
+        sdata->patternListSize *= 2;                                    \
     }                                                                   \
-    sdata->currentContent[sdata->numChildren] = (pattern);              \
-    sdata->currentQuants[sdata->numChildren] = quant;                   \
-    sdata->numChildren++;                                               \
+    sdata->patternList[sdata->numPatternList] = pattern;                \
+    sdata->numPatternList++;
+
+#define ADD_TO_CONTENT(pattern,quant,n,m)                               \
+    if (sdata->currentCP->type == SCHEMA_CTYPE_CHOICE                   \
+        && (quant != SCHEMA_CQUANT_OPT                                  \
+            && quant != SCHEMA_CQUANT_ONE)) {                           \
+        SchemaCP *wrapperCP;                                            \
+        wrapperCP = initSchemaCP (SCHEMA_CTYPE_PATTERN,NULL, NULL);     \
+        REMEMBER_PATTERN (wrapperCP);                                   \
+        wrapperCP->content[0] = pattern;                                \
+        wrapperCP->quants[0] = (quant = SCHEMA_CQUANT_NM) ? (n = 0 ? SCHEMA_CQUANT_OPT = SCHEMA_CQUANT_ONE : SCHEMA_CQUANT_ ; \
+        wrapperCP->numChildren = 1;                                     \
+        pattern = wrapperCP;                                            \
+    }                                                                   \
+    if (quant == SCHEMA_CQUANT_NM                                       \
+        && sdata->currentCP->type == SCHEMA_CTYPE_CHOICE) {             \
+        int i;                                                          \
+        int newChilds = (n >= m) ? n : m;                               \
+        while (sdata->numChildren + newChilds - 1 >= sdata->contentSize) { \
+            sdata->currentContent =                                     \
+                REALLOC (sdata->currentContent,                         \
+                         2 * sdata->contentSize                         \
+                         * sizeof (SchemaCP*));                         \
+            sdata->currentQuants =                                      \
+                REALLOC (sdata->currentQuants,                          \
+                         2 * sdata->contentSize                         \
+                         * sizeof (SchemaQuant));                       \
+            sdata->contentSize *= 2;                                    \
+        }                                                               \
+        for (i = 0; i < n; i++) {                                       \
+            sdata->currentContent[sdata->numChildren+i] = pattern;      \
+            sdata->currentQuants[sdata->numChildren+1] = SCHEMA_CQUANT_ONE; \
+        }                                                               \
+        for (i = n; i < m; i++) {                                       \
+            sdata->currentContent[sdata->numChildren+i] = pattern;      \
+            sdata->currentQuants[sdata->numChildren+1] = SCHEMA_CQUANT_OPT; \
+        }                                                               \
+        sdata->numChildren = sdata->numChildren + newChilds;            \
+    } else {                                                            \
+        if (sdata->numChildren == sdata->contentSize) {                 \
+            sdata->currentContent =                                     \
+                REALLOC (sdata->currentContent,                         \
+                         2 * sdata->contentSize                         \
+                         * sizeof (SchemaCP*));                         \
+            sdata->currentQuants =                                      \
+                REALLOC (sdata->currentQuants,                          \
+                         2 * sdata->contentSize                         \
+                         * sizeof (SchemaQuant));                       \
+            sdata->contentSize *= 2;                                    \
+        }                                                               \
+        sdata->currentContent[sdata->numChildren] = (pattern);          \
+        sdata->currentQuants[sdata->numChildren] = quant;               \
+        sdata->numChildren++;                                           \
+    }
 
 #define ADD_CONSTRAINT(sdata, sc)                                       \
     sc = TMALLOC (SchemaConstraint);                                    \
@@ -204,16 +251,6 @@ static void SetActiveSchemaData (SchemaData *v)
     sdata->currentContent[sdata->numChildren] = (SchemaCP *) sc;        \
     sdata->currentQuants[sdata->numChildren] = SCHEMA_CQUANT_ONE;       \
     sdata->numChildren++;                                               \
-
-#define REMEMBER_PATTERN(pattern)                                       \
-    if (sdata->numPatternList == sdata->patternListSize) {              \
-        sdata->patternList = (SchemaCP **) REALLOC (                    \
-            sdata->patternList,                                         \
-            sizeof (SchemaCP*) * sdata->patternListSize * 2);           \
-        sdata->patternListSize *= 2;                                    \
-    }                                                                   \
-    sdata->patternList[sdata->numPatternList] = pattern;                \
-    sdata->numPatternList++;
 
 static SchemaCP*
 initSchemaCP (
@@ -2084,14 +2121,17 @@ getQuant (
         SetResult ("Invalid quant specifier");
         return SCHEMA_CQUANT_ERROR;
     }
-    if (*n >= *m) {
+    if (*n > *m) {
         SetResult ("Invalid quant specifier");
         return SCHEMA_CQUANT_ERROR;
     }
     if (*n == 0 && *m == 1) {
         return SCHEMA_CQUANT_OPT;
     }
-    return SCHEMA_CQUANT_ONE;
+    if (*n == 1 && *m == 1) {
+        return SCHEMA_CQUANT_ONE;
+    }
+    return SCHEMA_CQUANT_NM;
 }
 
 /* Implements the schema definition command "any" */
@@ -2106,7 +2146,7 @@ AnyPatternObjCmd (
     SchemaData *sdata = GETASI;
     SchemaCP *pattern;
     SchemaQuant quant;
-    int n, m, i;
+    int n, m;
 
     CHECK_SI
     CHECK_TOPLEVEL
@@ -2117,16 +2157,7 @@ AnyPatternObjCmd (
     }
     pattern = initSchemaCP (SCHEMA_CTYPE_ANY, NULL, NULL);
     REMEMBER_PATTERN (pattern)
-    if (quant == SCHEMA_CQUANT_NM) {
-        for (i = 0; i < n; i++) {
-            ADD_TO_CONTENT (pattern, SCHEMA_CQUANT_ONE);
-        }
-        for (i = n; i < m; i++) {
-            ADD_TO_CONTENT (pattern, SCHEMA_CQUANT_OPT);
-        }
-    } else {
-        ADD_TO_CONTENT (pattern, quant);
-    }
+    ADD_TO_CONTENT(pattern, quant, n, m);
     return TCL_OK;
 }
 
@@ -2136,7 +2167,9 @@ evalDefinition (
     SchemaData *sdata,
     Tcl_Obj *definition,
     SchemaCP *pattern,
-    SchemaQuant quant
+    SchemaQuant quant,
+    int n,
+    int m
     )
 {
     SchemaCP **savedCurrentContent, *savedCurrentCP;
@@ -2189,7 +2222,6 @@ evalDefinition (
 
     if (result == TCL_OK) {
         REMEMBER_PATTERN (pattern);
-        ADD_TO_CONTENT (pattern, quant);
         for (i = 0; i < pattern->numChildren; i++) {
             if (pattern->content[i]->type == SCHEMA_CTYPE_PATTERN) {
                 if (pattern->content[i]->flags & CONSTRAINT_TEXT_CHILD) {
@@ -2198,6 +2230,7 @@ evalDefinition (
                 }
             }
         }
+        ADD_TO_CONTENT (pattern, quant, n, m);        
     } else {
         freeSchemaCP (pattern);
     }
@@ -2219,7 +2252,7 @@ NamedPatternObjCmd (
     Tcl_HashEntry *entryPtr;
     SchemaCP *pattern = NULL, *current;
     SchemaQuant quant;
-    int hnew, n, m, i, result;
+    int hnew, n, m;
 
     CHECK_SI
     CHECK_TOPLEVEL
@@ -2263,16 +2296,7 @@ NamedPatternObjCmd (
             REMEMBER_PATTERN (pattern);
             Tcl_SetHashValue (entryPtr, pattern);
         }
-        if (quant == SCHEMA_CQUANT_NM) {
-            for (i = 0; i < n; i++) {
-                ADD_TO_CONTENT (pattern, SCHEMA_CQUANT_ONE);
-            }
-            for (i = n; i < m; i++) {
-                ADD_TO_CONTENT (pattern, SCHEMA_CQUANT_OPT);
-            }
-        } else {
-            ADD_TO_CONTENT (pattern, quant);
-        }
+        ADD_TO_CONTENT (pattern, quant, n, m);
     } else {
         /* Local definition of this element */
         if (hnew) {
@@ -2291,20 +2315,7 @@ NamedPatternObjCmd (
             Tcl_GetHashKey (hashTable, entryPtr)
             );
         pattern->flags |= LOCAL_DEFINED_ELEMENT;
-        if (quant != SCHEMA_CQUANT_NM) {
-            return evalDefinition (interp, sdata, objv[3], pattern, quant);
-        } else {
-            if (n) quant = SCHEMA_CQUANT_ONE;
-            else quant = SCHEMA_CQUANT_OPT;
-            result =  evalDefinition (interp, sdata, objv[3], pattern, quant);
-            if (result != TCL_OK) return result;
-            for (i = 1; i < n; i++) {
-                ADD_TO_CONTENT (pattern, SCHEMA_CQUANT_ONE);
-            }
-            for (i = n; i < m; i++) {
-                ADD_TO_CONTENT (pattern, SCHEMA_CQUANT_OPT);
-            }            
-        }
+        evalDefinition (interp, sdata, objv[3], pattern, quant, n, m);
     }
     return TCL_OK;
 }
@@ -2323,7 +2334,7 @@ AnonPatternObjCmd (
     Schema_CP_Type patternType = (Schema_CP_Type) clientData;
     SchemaQuant quant;
     SchemaCP *pattern;
-    int n, m, i, result;
+    int n, m;
 
     CHECK_SI
     CHECK_TOPLEVEL
@@ -2346,23 +2357,8 @@ AnonPatternObjCmd (
 
     pattern = initSchemaCP (patternType, NULL, NULL);
 
-    if (quant != SCHEMA_CQUANT_NM) {
-        return evalDefinition (interp, sdata, objc == 2 ? objv[1] : objv[2],
-                               pattern, quant);
-    } else {
-        if (n) quant = SCHEMA_CQUANT_ONE;
-        else quant = SCHEMA_CQUANT_OPT;
-        result = evalDefinition (interp, sdata, objc == 2 ? objv[1] : objv[2],
-                                 pattern, quant);
-        if (result != TCL_OK) return result;
-        for (i = 1; i < n; i++) {
-            ADD_TO_CONTENT (pattern, SCHEMA_CQUANT_ONE);
-        }
-        for (i = n; i < m; i++) {
-            ADD_TO_CONTENT (pattern, SCHEMA_CQUANT_OPT);
-        }
-        return result;
-    }
+    return evalDefinition (interp, sdata, objc == 2 ? objv[1] : objv[2],
+                           pattern, quant, n, m);
 }
 
 static int
@@ -2591,7 +2587,7 @@ TextPatternObjCmd (
     checkNrArgs (1,2,"?<definition script>?");
     pattern = initSchemaCP (SCHEMA_CTYPE_TEXT, NULL, NULL);
     REMEMBER_PATTERN (pattern)
-    ADD_TO_CONTENT (pattern, SCHEMA_CQUANT_OPT)
+    ADD_TO_CONTENT (pattern, SCHEMA_CQUANT_OPT, 0, 0)
     if (objc == 2) {
         pattern->content = (SchemaCP**) MALLOC (
             sizeof(SchemaCP*) * CONTENT_ARRAY_SIZE_INIT
