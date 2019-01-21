@@ -186,7 +186,6 @@ static void SetActiveSchemaData (SchemaData *v)
         && quant != SCHEMA_CQUANT_ONE) {                                \
         SchemaCP *wrapperCP;                                            \
         wrapperCP = initSchemaCP (SCHEMA_CTYPE_PATTERN,NULL, NULL);     \
-        wrapperCP->flags |= CHOICE_PATTERN;                             \
         REMEMBER_PATTERN (wrapperCP);                                   \
         wrapperCP->content[0] = pattern;                                \
         wrapperCP->quants[0] = (quant == SCHEMA_CQUANT_NM) ? (n == 0 ? SCHEMA_CQUANT_OPT : SCHEMA_CQUANT_ONE) : quant; \
@@ -620,8 +619,8 @@ matchElementStart (
     char *namespace
     )
 {
-    SchemaCP *cp, *candidate, *jc;
-    int hm, ac, j, mayskip;
+    SchemaCP *cp, *candidate, *ic;
+    int hm, ac, i, mayskip;
     int isName = 0, deep;
     SchemaValidationStack *se;
 
@@ -638,7 +637,6 @@ matchElementStart (
         case SCHEMA_CTYPE_PATTERN:
             while (ac < cp->numChildren) {
                 candidate = cp->content[ac];
-                mayskip = 0;
                 switch (candidate->type) {
                 case SCHEMA_CTYPE_TEXT:
                     if (candidate->numChildren) {
@@ -665,53 +663,12 @@ matchElementStart (
                     }
                     break;
                     
-                case SCHEMA_CTYPE_MIXED:
-                case SCHEMA_CTYPE_CHOICE:
-                    for (j = 0; j < candidate->numChildren; j++) {
-                        jc = candidate->content[j];
-                        switch (jc->type) {
-                        case SCHEMA_CTYPE_TEXT:
-                            break;
-
-                        case SCHEMA_CTYPE_ANY:
-                            sdata->skipDeep = 1;
-                            updateStack (se, cp, ac);
-                            return 1;
-                    
-                        case SCHEMA_CTYPE_NAME:
-                            if (jc->name == name
-                                && jc->namespace == namespace) {
-                                pushToStack (sdata, jc, deep + 1);
-                                updateStack (se, cp, ac);
-                                return 1;
-                            }
-                            break;
-
-                        case SCHEMA_CTYPE_MIXED:
-                        case SCHEMA_CTYPE_CHOICE:
-                            Tcl_Panic ("MIXED or CHOICE child of MIXED or CHOICE");
-                            
-                        case SCHEMA_CTYPE_INTERLEAVE:
-                            fprintf (stderr, "matchElementStart: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
-                            return 0;
-
-                        case SCHEMA_CTYPE_PATTERN:
-                            pushToStack (sdata, jc, deep);
-                            if (matchElementStart (interp, sdata, name, namespace)) {
-                                updateStack (se, cp, ac);
-                                return 1;
-                            }
-                            popStack (sdata);
-                            break;
-                        }
-                        if (!mayskip && mayMiss(candidate->quants[j])) mayskip = 1;
-                    }
-                    break;
-                            
                 case SCHEMA_CTYPE_INTERLEAVE:
                     fprintf (stderr, "matchElementStart: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
                     return 0;
                     
+                case SCHEMA_CTYPE_MIXED:
+                case SCHEMA_CTYPE_CHOICE:
                 case SCHEMA_CTYPE_PATTERN:
                     pushToStack (sdata, candidate, deep);
                     if (matchElementStart (interp, sdata, name, namespace)) {
@@ -721,22 +678,63 @@ matchElementStart (
                     popStack (sdata);
                     break;
                 }
-                if (!mayskip && mustMatch (cp->quants[ac], hm)) {
+                if (mustMatch (cp->quants[ac], hm)) {
                     return 0;
                 }
                 ac++;
                 hm = 0;
             }
             if (isName) return 0;
-            if (cp->flags & CHOICE_PATTERN && !se->hasMatched) {
-                fprintf (stderr, "==== skip popStack of not maching PATTERN because of CHOICE_PATTERN\n");
-                return 0;
-            }
             popStack (sdata);
             continue;
             
         case SCHEMA_CTYPE_MIXED:
         case SCHEMA_CTYPE_CHOICE:
+            mayskip = 0;
+            for (i = 0; i < cp->numChildren; i++) {
+                ic = cp->content[i];
+                switch (ic->type) {
+                case SCHEMA_CTYPE_TEXT:
+                    break;
+
+                case SCHEMA_CTYPE_ANY:
+                    sdata->skipDeep = 1;
+                    /* updateStack (se, cp, ac); */
+                    return 1;
+                    
+                case SCHEMA_CTYPE_NAME:
+                    if (ic->name == name
+                        && ic->namespace == namespace) {
+                        pushToStack (sdata, ic, deep + 1);
+                        /* updateStack (se, cp, ac); */
+                        return 1;
+                    }
+                    break;
+
+                case SCHEMA_CTYPE_MIXED:
+                case SCHEMA_CTYPE_CHOICE:
+                    Tcl_Panic ("MIXED or CHOICE child of MIXED or CHOICE");
+                            
+                case SCHEMA_CTYPE_INTERLEAVE:
+                    fprintf (stderr, "matchElementStart: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
+                    return 0;
+
+                case SCHEMA_CTYPE_PATTERN:
+                    pushToStack (sdata, ic, deep);
+                    if (matchElementStart (interp, sdata, name, namespace)) {
+                        /* updateStack (se, cp, ac); */
+                        return 1;
+                    }
+                    popStack (sdata);
+                    break;
+                }
+                if (!mayskip && mayMiss(cp->quants[i])) mayskip = 1;
+            }
+            if (mayskip) {
+                se->down->hasMatched = 1;
+            }
+            return 0;
+            
         case SCHEMA_CTYPE_TEXT:
         case SCHEMA_CTYPE_ANY:
             /* Never pushed onto stack */
@@ -1137,6 +1135,9 @@ static int checkElementEnd (
             
         case SCHEMA_CTYPE_MIXED:
         case SCHEMA_CTYPE_CHOICE:
+            popStack (sdata);
+            continue;
+            
         case SCHEMA_CTYPE_TEXT:
         case SCHEMA_CTYPE_ANY:
             /* Never pushed onto stack */
@@ -1235,41 +1236,6 @@ matchText (
                     return 0;
 
                 case SCHEMA_CTYPE_CHOICE:
-                    for (i = 0; i < candidate->numChildren; i++) {
-                        ic = candidate->content[i];
-                        switch (ic->type) {
-                        case SCHEMA_CTYPE_TEXT:
-                            if (checkText (interp, ic, text)) {
-                                updateStack (se, cp, ac);
-                                return 1;
-                            }
-                            break;
-                            
-                        case SCHEMA_CTYPE_NAME:
-                        case SCHEMA_CTYPE_ANY:
-                            break;
-
-                        case SCHEMA_CTYPE_PATTERN:
-                            pushToStack (sdata, candidate, se->deep);
-                            if (matchText (interp, sdata, text)) {
-                                updateStack (se, cp, ac);
-                                return 1;
-                            }
-                            break;
-                            
-                        case SCHEMA_CTYPE_MIXED:
-                        case SCHEMA_CTYPE_CHOICE:
-                            Tcl_Panic ("MIXED or CHOICE child of MIXED or CHOICE");
-
-                        case SCHEMA_CTYPE_INTERLEAVE:
-                            fprintf (stderr, "matchText: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
-                            return 0;
-                        }
-                    }
-                    if (mustMatch (cp->quants[ac], hm)) {
-                        SetResult ("Unexpected text content");
-                        return 0;
-                    }
                     break;
                     
                 case SCHEMA_CTYPE_PATTERN:
@@ -1308,6 +1274,44 @@ matchText (
 
         case SCHEMA_CTYPE_MIXED:
         case SCHEMA_CTYPE_CHOICE:
+            for (i = 0; i < cp->numChildren; i++) {
+                ic = cp->content[i];
+                switch (ic->type) {
+                case SCHEMA_CTYPE_TEXT:
+                    if (checkText (interp, ic, text)) {
+                        updateStack (se, cp, ac);
+                        return 1;
+                    }
+                    break;
+                            
+                case SCHEMA_CTYPE_NAME:
+                case SCHEMA_CTYPE_ANY:
+                    break;
+
+                case SCHEMA_CTYPE_PATTERN:
+                    pushToStack (sdata, cp, se->deep);
+                    if (matchText (interp, sdata, text)) {
+                        updateStack (se, cp, ac);
+                        return 1;
+                    }
+                    break;
+                            
+                case SCHEMA_CTYPE_MIXED:
+                case SCHEMA_CTYPE_CHOICE:
+                    Tcl_Panic ("MIXED or CHOICE child of MIXED or CHOICE");
+
+                case SCHEMA_CTYPE_INTERLEAVE:
+                    fprintf (stderr, "matchText: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
+                    return 0;
+                }
+            }
+            if (mustMatch (cp->quants[ac], hm)) {
+                SetResult ("Unexpected text content");
+                return 0;
+            }
+            popStack (sdata);
+            continue;
+            
         case SCHEMA_CTYPE_TEXT:
         case SCHEMA_CTYPE_ANY:
             /* Never pushed onto stack */
@@ -1346,8 +1350,6 @@ probeText (
         return TCL_ERROR;
     }
 
-    /* If we are here then there isn't a matching TEXT cp. Check, if
-     * this is white space only between tags. */
     if (sdata->stack->pattern->flags & CONSTRAINT_TEXT_CHILD) {
         if (matchText (interp, sdata, text)) {
             return TCL_OK;

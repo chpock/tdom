@@ -1,5 +1,5 @@
-C wip
-D 2019-01-21T15:57:43.296
+C Digression
+D 2019-01-21T23:53:04.415
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -133,8 +133,8 @@ F generic/domxslt.h 140fa73765d699bfced9554c2c6439c0d2e6695eec3a8e69e1d25c0bbdf2
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c abf69665ad49ed053885f7e7459d47be5abb057ba4ed919e96e83d636b016a30
 F generic/nodecmd.h e4a6d836834554a2a590cbd916cdee937945965ee55709e48b62976a66861ef8
-F generic/schema.c 1832208fbabcc69318d1fcc4403312dacea139691d4431b38e19ecc77f425fe0
-F generic/schema.h b3eddd5a6404ccbdc158ae955d9ac2e17d6f520488f1a3f3d10df4f154efe77a
+F generic/schema.c a29ee13c4647f1624e3a3e034b750f0f26e520c6bf3518c22029159a3c578e41
+F generic/schema.h e428802dbf07e22e8474a0b23c91e4125f5184ab82b5d10296dca172b6e18b24
 F generic/tcldom.c 3393b9b15ec35ba21a2ad053c0406c44bde01b0a2c3db59f56f842fc2e46fcae
 F generic/tcldom.h ce701b04020e64b11d9f16a8dbea21133267f0aaa267d25881612ddcbba1b9b2
 F generic/tclexpat.c d34a9d251d2a4f56fab890b55e193acdba4c99abff46623d5e582a1e281fb783
@@ -229,8 +229,11 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 3851efb4aca14ccebeacf7865913828520f5a9b8b85fc51f4269b602c2569bc1
-R 547404395f4e318a7c9537102bf2a4c7
+P d85da14d6e3d41b2eca37f57802970e4083805dc7a57afeb72759e8eb82fe89e
+R 28838b6d2d1be0db124266b8a601d805
+T *branch * digression
+T *sym-digression *
+T -sym-wip *
 U rolf
-Z 999d70e917578765897e1e1dfc0bec3c
+Z d8bb6273f33f20ad730794f81e80e46b
 # Remove this line to create a well-formed Fossil manifest.
