@@ -27,7 +27,7 @@
 #include <tcldom.h>
 #include <schema.h>
 
-#define DEBUG
+/* #define DEBUG */
 /* #define DDEBUG */
 /*----------------------------------------------------------------------------
 |   Debug Macros
@@ -183,7 +183,7 @@ static void SetActiveSchemaData (SchemaData *v)
 
 #define ADD_TO_CONTENT(pattern,quant,n,m)                               \
     if (sdata->currentCP->type == SCHEMA_CTYPE_CHOICE                   \
-        && quant != SCHEMA_CQUANT_ONE) {                           \
+        && quant != SCHEMA_CQUANT_ONE) {                                \
         SchemaCP *wrapperCP;                                            \
         wrapperCP = initSchemaCP (SCHEMA_CTYPE_PATTERN,NULL, NULL);     \
         wrapperCP->flags |= CHOICE_PATTERN;                             \
@@ -697,7 +697,6 @@ matchElementStart (
 
                         case SCHEMA_CTYPE_PATTERN:
                             pushToStack (sdata, jc, deep);
-                    fprintf (stderr, "Warum hier nicht.. \n");
                             if (matchElementStart (interp, sdata, name, namespace)) {
                                 updateStack (se, cp, ac);
                                 return 1;
@@ -706,7 +705,6 @@ matchElementStart (
                             break;
                         }
                         if (!mayskip && mayMiss(candidate->quants[j])) mayskip = 1;
-                        
                     }
                     break;
                             
@@ -729,10 +727,12 @@ matchElementStart (
                 ac++;
                 hm = 0;
             }
-            if (isName || cp->flags & CHOICE_PATTERN) return 0;
-            serializeStack (sdata);
+            if (isName) return 0;
+            if (cp->flags & CHOICE_PATTERN && !se->hasMatched) {
+                fprintf (stderr, "==== skip popStack of not maching PATTERN because of CHOICE_PATTERN\n");
+                return 0;
+            }
             popStack (sdata);
-            serializeStack (sdata);            
             continue;
             
         case SCHEMA_CTYPE_MIXED:
