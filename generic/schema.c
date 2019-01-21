@@ -27,7 +27,7 @@
 #include <tcldom.h>
 #include <schema.h>
 
-/* #define DEBUG */
+#define DEBUG
 /* #define DDEBUG */
 /*----------------------------------------------------------------------------
 |   Debug Macros
@@ -183,18 +183,17 @@ static void SetActiveSchemaData (SchemaData *v)
 
 #define ADD_TO_CONTENT(pattern,quant,n,m)                               \
     if (sdata->currentCP->type == SCHEMA_CTYPE_CHOICE                   \
-        && (quant != SCHEMA_CQUANT_OPT                                  \
-            && quant != SCHEMA_CQUANT_ONE)) {                           \
+        && quant != SCHEMA_CQUANT_ONE) {                           \
         SchemaCP *wrapperCP;                                            \
         wrapperCP = initSchemaCP (SCHEMA_CTYPE_PATTERN,NULL, NULL);     \
+        wrapperCP->flags |= CHOICE_PATTERN;                             \
         REMEMBER_PATTERN (wrapperCP);                                   \
         wrapperCP->content[0] = pattern;                                \
-        wrapperCP->quants[0] = (quant = SCHEMA_CQUANT_NM) ? (n = 0 ? SCHEMA_CQUANT_OPT = SCHEMA_CQUANT_ONE : SCHEMA_CQUANT_ ; \
+        wrapperCP->quants[0] = (quant == SCHEMA_CQUANT_NM) ? (n == 0 ? SCHEMA_CQUANT_OPT : SCHEMA_CQUANT_ONE) : quant; \
         wrapperCP->numChildren = 1;                                     \
         pattern = wrapperCP;                                            \
     }                                                                   \
-    if (quant == SCHEMA_CQUANT_NM                                       \
-        && sdata->currentCP->type == SCHEMA_CTYPE_CHOICE) {             \
+    if (quant == SCHEMA_CQUANT_NM) {             \
         int i;                                                          \
         int newChilds = (n >= m) ? n : m;                               \
         while (sdata->numChildren + newChilds - 1 >= sdata->contentSize) { \
@@ -210,11 +209,11 @@ static void SetActiveSchemaData (SchemaData *v)
         }                                                               \
         for (i = 0; i < n; i++) {                                       \
             sdata->currentContent[sdata->numChildren+i] = pattern;      \
-            sdata->currentQuants[sdata->numChildren+1] = SCHEMA_CQUANT_ONE; \
+            sdata->currentQuants[sdata->numChildren+i] = SCHEMA_CQUANT_ONE; \
         }                                                               \
         for (i = n; i < m; i++) {                                       \
             sdata->currentContent[sdata->numChildren+i] = pattern;      \
-            sdata->currentQuants[sdata->numChildren+1] = SCHEMA_CQUANT_OPT; \
+            sdata->currentQuants[sdata->numChildren+i] = SCHEMA_CQUANT_OPT; \
         }                                                               \
         sdata->numChildren = sdata->numChildren + newChilds;            \
     } else {                                                            \
@@ -698,6 +697,7 @@ matchElementStart (
 
                         case SCHEMA_CTYPE_PATTERN:
                             pushToStack (sdata, jc, deep);
+                    fprintf (stderr, "Warum hier nicht.. \n");
                             if (matchElementStart (interp, sdata, name, namespace)) {
                                 updateStack (se, cp, ac);
                                 return 1;
@@ -729,8 +729,10 @@ matchElementStart (
                 ac++;
                 hm = 0;
             }
-            if (isName) return 0;
+            if (isName || cp->flags & CHOICE_PATTERN) return 0;
+            serializeStack (sdata);
             popStack (sdata);
+            serializeStack (sdata);            
             continue;
             
         case SCHEMA_CTYPE_MIXED:
