@@ -225,6 +225,7 @@ AC_DEFUN(TDOM_ENABLE_LESS_NS, [
 #------------------------------------------------------------------------
 
 AC_DEFUN(TDOM_ENABLE_HTML5, [
+    AC_PATH_TOOL([PKG_CONFIG],[pkg-config])
     AC_MSG_CHECKING([whether to enable support for HTML5 parsing (using gumbo)])
     AC_ARG_ENABLE(html5,
         AC_HELP_STRING([--enable-html5],
@@ -241,24 +242,22 @@ AC_DEFUN(TDOM_ENABLE_HTML5, [
     HTML5_INCLUDES=""
     if test "$tcl_ok" = "yes" ; then
         # Check if pkg-config is available
-        PKGCONFIG=no
-        pkg-config --version > /dev/null 2>&1 && PKGCONFIG=yes
-        if test "$PKGCONFIG" = no; then
+        if test "x$PKG_CONFIG" = x; then
             tcl_ok=no
 	    AC_MSG_ERROR([cannot find pkg-config needed for --enable-html5.])
         fi
     fi
     if test "$tcl_ok" = "yes" ; then
-        HAVEGUMBO=`pkg-config --exists gumbo && echo "1"`
+        HAVEGUMBO=`$PKG_CONFIG --exists gumbo && echo "1"`
         if test "$HAVEGUMBO" = "1" ; then
             AC_MSG_RESULT([yes])
             AC_DEFINE(TDOM_HAVE_GUMBO)
             if test "${TEA_PLATFORM}" = "windows" ; then
-                HTML5_LIBS="-Wl,-Bstatic `pkg-config --static --libs gumbo` -Wl,-Bdynamic"
+                HTML5_LIBS="-Wl,-Bstatic `$PKG_CONFIG --static --libs gumbo` -Wl,-Bdynamic"
             else
-                HTML5_LIBS="`pkg-config --libs gumbo`"
+                HTML5_LIBS="`$PKG_CONFIG --libs gumbo`"
             fi
-            HTML5_INCLUDES="`pkg-config --cflags gumbo`"
+            HTML5_INCLUDES="`$PKG_CONFIG --cflags gumbo`"
         else
             AC_MSG_ERROR([The required lib gumbo not found])
         fi
