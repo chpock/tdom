@@ -1,5 +1,5 @@
-C Removed\sunnecessary\scode.\sThe\shandler\spair\sfor\sstart\sand\send\stag\sis\senough\sfor\sbookkeeping\sabout\snesting.
-D 2018-11-22T00:13:45.668
+C While\scross\sbuild\s--enable-html5\sdoesn't\swork\s(at\sleast\snot\seasily)\sbut\sshould.
+D 2019-01-22T22:23:28.413
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -12,7 +12,7 @@ F README 1b74b899ce95656b6a63039d0796b164e51a7317263cba9d67959b402dc2009e
 F README.AOL 34b4178830536f5183328420bc28b8063fbf6b598010ecf105c2ecfdbfc3ffa1
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/xslt.tcl 64103132fbe0a1fbf61cf3506608cb7ea5cbfddd247d207d95d8e96a071e1846
-F configure 6accefb5f34f534a0fed8b69dd3320369f5361fbc92417eaa07920908d1a80ca x
+F configure 154f520228892266a7beb2db7c3bada8c4a7997102683b7b5aa0587b073cf12d x
 F configure.ac 7cfadfeb8518a343f6b35dab6f328c4f49beec45ed90804f019e1a7a769ed690
 F doc/INDEX.MAP 55cb7aedd008e5bb07d026e056778a04b7d562398ef29e83e024cfc1ef2b9968
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
@@ -150,7 +150,7 @@ F pkgIndex.tcl.in d6950e16450800b84d1c3161e30090bb8838346e1f6cb8d16bee910900c223
 F tclconfig/README.txt 180f4215d59309ec5645aa5f4565557dac484945
 F tclconfig/install-sh bdd5e293591621ae60d9824d86a4b1c5f22c3d00 x
 F tclconfig/tcl.m4 2e84c88428573888ec9b12552b7ca6d732ef0bd4fabbb43547b038f4de6dece0
-F tdom.m4 c2df3f3444af017f80548b21f439f365bfa85d6593c67d9a7fef24c2f01b0c6a
+F tdom.m4 358c717bd9a2e50e235dff20b9a08aa8a4c1fc3636403ded80105c1638ffea23
 F tdomConfig.sh.in 5756c6b431179e49852a607cc2ca01e5381da905
 F tests/JSONTestSuite.tcl 907228f9bd31855951b9033df74c9c15778765af
 F tests/OASIS-suite.tcl 1da66ffffee97dd7c39d3f14482f5a9382000d4233668c7f2ed1c5825752904e
@@ -222,8 +222,11 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c86a3ff6bb4c36f0e86f950e5d5d799396939cd3638765792b23c06759bab573
-R 25f522eae0e2f33c497191ac27162f30
+P 22bb3a056ff2bb44aa349c21994783212a79684dff64a8c53ea1e16818d6f0d8
+R 0948f006f50bef44c397929fdda56b34
+T *branch * crosscompile
+T *sym-crosscompile *
+T -sym-trunk *
 U rolf
-Z 310b343875c6ca5ba29f7ebf2a5e3760
+Z 407f109ad3a82b5a76dfec6e288f1a8d
 # Remove this line to create a well-formed Fossil manifest.
