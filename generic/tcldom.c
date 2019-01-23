@@ -2515,9 +2515,13 @@ void tcldom_AppendEscaped (
                                 + ((pc[1] & 0x3F) << 12)
                                 + ((pc[2] & 0x3F) <<  6) 
                                 + (pc[3] & 0x3F);
+                        } else if (clen == 3) {
+                            unicode = ((pc[0] & 0x0F) << 12) 
+                                + ((pc[1] & 0x3F) << 6)
+                                + (pc[2] & 0x3F);
                         } else {
-                            unicode = 0;
-                            Tcl_UtfToUniChar(pc, (Tcl_UniChar*)&unicode);
+                            unicode = ((pc[0] & 0x1F) << 6) 
+                                + (pc[1] & 0x3F);
                         }
                         AP('&') AP('#')
                         sprintf(charRef, "%d", unicode);
