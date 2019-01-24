@@ -108,12 +108,10 @@ typedef struct
 #if defined(DEBUG) || defined(DDEBUG)
 static char *Schema_CP_Type2str[] = {
     "ANY",
-    "MIXED",
     "NAME",
     "CHOICE",
     "INTERLEAVE",
     "PATTERN",
-    "GROUP",
     "TEXT"
 };
 static char *Schema_Quant_Type2str[] = {
@@ -484,32 +482,44 @@ addToContent (
     SchemaQuant *savedCurrentQuants;
     unsigned int savedNumChildren, savedContenSize;
 
-    if (sdata->currentCP->type == SCHEMA_CTYPE_CHOICE
-        && quant != SCHEMA_CQUANT_ONE) {
-        wrapperCP = initSchemaCP (SCHEMA_CTYPE_PATTERN,NULL, NULL);
-        REMEMBER_PATTERN (wrapperCP);
-        if (sdata->numChildren == sdata->contentSize) {
-            sdata->currentContent =
-                REALLOC (sdata->currentContent,
-                         2 * sdata->contentSize
-                         * sizeof (SchemaCP*));
-            sdata->currentQuants =
-                REALLOC (sdata->currentQuants,
-                         2 * sdata->contentSize
-                         * sizeof (SchemaQuant));
-            sdata->contentSize *= 2;
+    if (sdata->currentCP->type == SCHEMA_CTYPE_CHOICE) {
+        if (pattern->type == SCHEMA_CTYPE_CHOICE) {
+            if (pattern->flags & MIXED_CONTENT) {
+                sdata->currentCP->flags |= MIXED_CONTENT;
+            }
+            wrapperCP = initSchemaCP (SCHEMA_CTYPE_PATTERN,NULL, NULL);
+            REMEMBER_PATTERN (wrapperCP);
+            wrapperCP->content[0] = pattern;
+            wrapperCP->quants[0] = SCHEMA_CQUANT_ONE;
+            wrapperCP->numChildren = 1;
+            pattern = wrapperCP;
         }
-        sdata->currentContent[sdata->numChildren] = wrapperCP;
-        sdata->currentQuants[sdata->numChildren] = SCHEMA_CQUANT_ONE;
-        sdata->numChildren++;
-        savedCurrentContent = sdata->currentContent;
-        savedCurrentQuants = sdata->currentQuants;
-        savedNumChildren = sdata->numChildren;
-        savedContenSize = sdata->contentSize;
-        sdata->currentContent = wrapperCP->content;
-        sdata->currentQuants = wrapperCP->quants;
-        sdata->numChildren = 0;
-        sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
+        if (quant != SCHEMA_CQUANT_ONE) {
+            wrapperCP = initSchemaCP (SCHEMA_CTYPE_PATTERN,NULL, NULL);
+            REMEMBER_PATTERN (wrapperCP);
+            if (sdata->numChildren == sdata->contentSize) {
+                sdata->currentContent =
+                    REALLOC (sdata->currentContent,
+                             2 * sdata->contentSize
+                             * sizeof (SchemaCP*));
+                sdata->currentQuants =
+                    REALLOC (sdata->currentQuants,
+                             2 * sdata->contentSize
+                             * sizeof (SchemaQuant));
+                sdata->contentSize *= 2;
+            }
+            sdata->currentContent[sdata->numChildren] = wrapperCP;
+            sdata->currentQuants[sdata->numChildren] = SCHEMA_CQUANT_ONE;
+            sdata->numChildren++;
+            savedCurrentContent = sdata->currentContent;
+            savedCurrentQuants = sdata->currentQuants;
+            savedNumChildren = sdata->numChildren;
+            savedContenSize = sdata->contentSize;
+            sdata->currentContent = wrapperCP->content;
+            sdata->currentQuants = wrapperCP->quants;
+            sdata->numChildren = 0;
+            sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
+        }
     }
     if (quant == SCHEMA_CQUANT_NM) {
         int i;
@@ -1165,7 +1175,10 @@ static int checkElementEnd (
                     if (!checkText (interp, cp->content[ac], "")) {
                         return 0;
                     }
-                } else {
+                } else if (cp->content[ac]->type != SCHEMA_CTYPE_CHOICE
+                           || !(cp->content[ac]->flags & MIXED_CONTENT)) {
+                    /* The text of MIXED_CONTENT is without constraint
+                     * and the empty string matches this. */
                     if (mustMatch (cp->quants[ac], hm)) {
                         return 0;
                     }

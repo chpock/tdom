@@ -1610,6 +1610,135 @@ test schema-9.4 {choice} {
     set result
 } {0 0 0 1 1 1 1 0}
 
+test schema-9.5 {choice as choice child} {
+    tdom::schema create grammar
+    grammar define {
+        defelement doc {
+            choice {
+                element e1
+                element e2
+                choice {
+                    element e2
+                    element e3
+                }
+            }
+        }
+        foreach e {e1 e2 e3} {
+            defelement $e foouri {}
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        {<doc><e1/></doc>}
+        {<doc><e2/><e3/></doc>}
+        {<doc><e2/></doc>}
+        {<doc><e3/></doc>}
+        {<doc><e4></doc>}
+    } {
+        lappend result [grammar validate $xml]
+    }
+    grammar delete
+    set result
+} {0 1 0 1 1 0}
+
+test schema-9.6 {mixed as choice child} {
+    tdom::schema create grammar
+    grammar define {
+        defelement doc {
+            choice {
+                element e1
+                element e2
+                mixed {
+                    element e2
+                    element e3
+                }
+            }
+        }
+        foreach e {e1 e2 e3} {
+            defelement $e foouri {}
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        {<doc><e1/></doc>}
+        {<doc><e2/><e3/></doc>}
+        {<doc><e2/></doc>}
+        {<doc><e3/></doc>}
+        {<doc><e4></doc>}
+    } {
+        lappend result [grammar validate $xml]
+    }
+    grammar delete
+    set result
+} {1 1 0 1 1 0}
+
+test schema-9.7 {choice as mixed child} {
+    tdom::schema create grammar
+    grammar define {
+        defelement doc {
+            mixed {
+                element e1
+                element e2
+                choice {
+                    element e2
+                    element e3
+                }
+            }
+        }
+        foreach e {e1 e2 e3} {
+            defelement $e foouri {}
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        {<doc><e1/></doc>}
+        {<doc><e2/><e3/></doc>}
+        {<doc><e2/></doc>}
+        {<doc><e3/></doc>}
+        {<doc><e4></doc>}
+    } {
+        lappend result [grammar validate $xml]
+    }
+    grammar delete
+    set result
+} {1 1 1 1 1 0}
+
+test schema-9.8 {choice as choice child} {
+    tdom::schema create grammar
+    grammar define {
+        defelement doc {
+            choice {
+                element e1
+                element e2
+                choice 2 {
+                    element e3
+                    element e4
+                }
+            }
+        }
+        foreach e {e1 e2 e3 e4} {
+            defelement $e foouri {}
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        {<doc><e1/></doc>}
+        {<doc><e2/><e3/></doc>}
+        {<doc><e2/></doc>}
+        {<doc><e3/><e3/></doc>}
+        {<doc><e4/><e3/></doc>}
+        {<doc><e4></doc>}
+    } {
+        lappend result [grammar validate $xml]
+    }
+    grammar delete
+    set result
+} {0 1 0 1 1 1 0}
+
 test schema-10.1 {any} {
     tdom::schema create s
     s define {
