@@ -1,5 +1,5 @@
-C The\sconfigure\sflag\s--enable-html5\snow\sshould\salso\swork,\sif\scross\sbuilding\s(given,\spkg-config\sand\sgumbo\sare\savailable,\sof\scourse).
-D 2019-01-22T22:52:58.940
+C Fixed\sserialization\soption\s-escapeNonASCII\son\sbig\sendian\ssystems.
+D 2019-01-24T12:24:58.718
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -129,7 +129,7 @@ F generic/domxslt.h 140fa73765d699bfced9554c2c6439c0d2e6695eec3a8e69e1d25c0bbdf2
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c abf69665ad49ed053885f7e7459d47be5abb057ba4ed919e96e83d636b016a30
 F generic/nodecmd.h e4a6d836834554a2a590cbd916cdee937945965ee55709e48b62976a66861ef8
-F generic/tcldom.c 1e42c901104f9c86e06a8583bb65b5bbea559d3e90a2f54c1251ef7b27ac1e59
+F generic/tcldom.c f857bf5758d8331015ab8bff3b11e6d5ebca6d9896e0a84c77b13c2ecc7230d3
 F generic/tcldom.h 11934aae8b0c2194eac7a6bf7b62611abded4dcd290375a23463f25afc34484c
 F generic/tclexpat.c f2538fa6d0f1ac04d3ca76453773790d8db2e10db784ce86a867048992026b7e
 F generic/tclexpat.h 82c3d9efe50617f2e0883c520240e6ab17b830e56d6786cd88d2fa31294c02c5
@@ -222,9 +222,9 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 22bb3a056ff2bb44aa349c21994783212a79684dff64a8c53ea1e16818d6f0d8 11ea1cfb7eab052bbad4a2711d4abc5b01c57f7ca43a6e353c7aca44091f69f5
-R 0948f006f50bef44c397929fdda56b34
-T +closed 11ea1cfb7eab052bbad4a2711d4abc5b01c57f7ca43a6e353c7aca44091f69f5
+P 4fca08944c65199476bc5185e18280e5bfe743a22a0d5c4472b49287b077edad 6722cfb2c4fc26f33c2002212182e8c7fcb07eb60a39377c8a69d6f3f7f351e9
+R a90d9d8daa71b6c9e0c424f689b605a7
+T +closed 6722cfb2c4fc26f33c2002212182e8c7fcb07eb60a39377c8a69d6f3f7f351e9
 U rolf
-Z c1894da90fc7ec7f4dd05c9eda11ef68
+Z 1d111dca2873db7fbb62567bf1fea6b3
 # Remove this line to create a well-formed Fossil manifest.
