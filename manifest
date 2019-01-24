@@ -1,5 +1,5 @@
-C Merged\sfrom\strunk.
-D 2019-01-24T12:26:58.121
+C Added\sa\sfew\stests\smore.
+D 2019-01-24T13:28:03.792
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -203,7 +203,7 @@ F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
 F tests/pullparser.test e4b14ea0bdc9f9fd931f3bc559e78c309582a67a238170d58e0f20331f99890c
 F tests/pushpull.bench 664e8f512917537d96c4b71933d4d9a6da65fc6fe85bd7c459483830dc7d2faf
-F tests/schema.test caf50f542bbc1b24b241b9e2c2ff4ea2f63c1a83958d312d894c87066fa4dc63
+F tests/schema.test c6c311d3fd2ff464dc7b18abe4171bcb5c4ff152ab4b5688e311a9e341a7a43d
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
 F tests/tdomcmd.bench b07448ed4de08ccaa9734cf3fe15c695fd7066c993da58ff48d465747940e417
 F tests/tdomcmd.test 092401adf0609906d710f3ef8997cb4ca29bc208
@@ -229,8 +229,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 144b99b4760216cd5189e980e8c3bf104df801e4324964edc0eb9d731f4880c9 d2b2e909087a03fd074207726130e139b308c57be3cfed22a996c1fbf4d074a2
-R e5a132dc7902e9a1da222044da78a48d
+P 876f8ceb08b5680ee8c151071d8da5015fb5dc74b23a5cdad58a2e0faa95ba1d
+R 06e2674d893c99f9b04411e772ae397c
 U rolf
-Z 38792e2b4b07dbc58cfdb6e6046099c1
+Z b7b363bdcdac1299f5a99980631c19f3
 # Remove this line to create a well-formed Fossil manifest.

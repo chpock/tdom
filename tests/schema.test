@@ -1101,6 +1101,37 @@ test schema-7.14a {mixed} {
     set result
 } {1 0 1 0 0 0}
 
+test schema-7.14b {mixed} {
+    tdom::schema create s
+    s define {
+        defelement doc {
+            mixed ! {
+                element a *
+                element b
+            }
+        }
+        foreach e {a b} {
+            defelement $e {}
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc>text</doc>
+        <doc>text<a/></doc>
+        <doc><a/></doc>
+        <doc><a/><a/><a/></doc>
+        <doc><b/></doc>
+        {<doc><b/>to much</doc>}
+        <doc><b/><b/></doc>
+        <doc>some<a/><b/></doc>
+        <doc><unknown/><b/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 0 1 1 1 0 0 0 0}
+
 test schema-7.15 {choice with optional choices} {
     tdom::schema create s
     s define {
@@ -1129,6 +1160,62 @@ test schema-7.15 {choice with optional choices} {
     }
     set result
 } {0 0 1 0 1 1 1}
+
+test schema-7.15a {choice with optional choices} {
+    tdom::schema create s
+    s define {
+        defelement doc {
+            choice {
+                element a *
+                element b *
+            }
+        }
+        foreach e {a b} {
+            defelement $e {}
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/></doc>
+        <doc><a/><c/></doc>
+        <doc><a/><a/><a/></doc>
+        <doc><a/><a/><a/><c/></doc>
+        <doc><b/><b/><b/><c/></doc>
+        <doc><b/><b/><b/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    set result
+} {0 1 0 1 0 0 1}
+
+test schema-7.15b {choice with optional choices} {
+    tdom::schema create s
+    s define {
+        defelement doc {
+            choice {
+                element a *
+                element b
+            }
+        }
+        foreach e {a b} {
+            defelement $e {}
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/></doc>
+        <doc><a/><c/></doc>
+        <doc><a/><a/><a/></doc>
+        <doc><a/><a/><a/><c/></doc>
+        <doc><b/><b/><b/><c/></doc>
+        <doc><b/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    set result
+} {0 1 0 1 0 0 1}
 
 test schema-7.16 {choice with optional choices} {
     tdom::schema create s
