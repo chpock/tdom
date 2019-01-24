@@ -218,7 +218,6 @@ initSchemaCP (
         pattern->namespace = (char *)namespace;
         pattern->name = name;
         /* Fall thru. */
-    case SCHEMA_CTYPE_MIXED:
     case SCHEMA_CTYPE_CHOICE:
     case SCHEMA_CTYPE_INTERLEAVE:
         pattern->content = (SchemaCP**) MALLOC (
@@ -261,7 +260,6 @@ static void serializeCP (
             fprintf (stderr, "\tAs placeholder defined NAME\n");
         }
         /* Fall thru. */
-    case SCHEMA_CTYPE_MIXED:
     case SCHEMA_CTYPE_CHOICE:
     case SCHEMA_CTYPE_INTERLEAVE:
         fprintf (stderr, "\t%d childs\n", pattern->numChildren);
@@ -707,7 +705,6 @@ matchElementStart (
                 }
                 break;
 
-            case SCHEMA_CTYPE_MIXED:
             case SCHEMA_CTYPE_CHOICE:
                 for (j = 0; j < candidate->numChildren; j++) {
                     jc = candidate->content[j];
@@ -729,7 +726,6 @@ matchElementStart (
                         }
                         break;
 
-                    case SCHEMA_CTYPE_MIXED:
                     case SCHEMA_CTYPE_CHOICE:
                         Tcl_Panic ("MIXED or CHOICE child of MIXED or CHOICE");
 
@@ -777,7 +773,6 @@ matchElementStart (
         if (isName) return 0;
         return -1;
 
-    case SCHEMA_CTYPE_MIXED:
     case SCHEMA_CTYPE_CHOICE:
     case SCHEMA_CTYPE_TEXT:
     case SCHEMA_CTYPE_ANY:
@@ -1182,7 +1177,6 @@ static int checkElementEnd (
             if (isName) return 1;
             continue;
 
-        case SCHEMA_CTYPE_MIXED:
         case SCHEMA_CTYPE_CHOICE:
         case SCHEMA_CTYPE_TEXT:
         case SCHEMA_CTYPE_ANY:
@@ -1269,10 +1263,6 @@ matchText (
             while (ac < cp->numChildren) {
                 candidate = cp->content[ac];
                 switch (candidate->type) {
-                case SCHEMA_CTYPE_MIXED:
-                    updateStack (se, cp, ac);
-                    return 1;
-
                 case SCHEMA_CTYPE_TEXT:
                     if (checkText (interp, candidate, text)) {
                         updateStack (se, cp, ac);
@@ -1282,6 +1272,10 @@ matchText (
                     return 0;
 
                 case SCHEMA_CTYPE_CHOICE:
+                    if (candidate->flags & MIXED_CONTENT) {
+                        updateStack (se, cp, ac);
+                        return 1;
+                    }
                     for (i = 0; i < candidate->numChildren; i++) {
                         ic = candidate->content[i];
                         switch (ic->type) {
@@ -1304,7 +1298,6 @@ matchText (
                             }
                             break;
 
-                        case SCHEMA_CTYPE_MIXED:
                         case SCHEMA_CTYPE_CHOICE:
                             Tcl_Panic ("MIXED or CHOICE child of MIXED or CHOICE");
 
@@ -1353,7 +1346,6 @@ matchText (
             popStack (sdata);
             continue;
 
-        case SCHEMA_CTYPE_MIXED:
         case SCHEMA_CTYPE_CHOICE:
         case SCHEMA_CTYPE_TEXT:
         case SCHEMA_CTYPE_ANY:
@@ -2380,32 +2372,37 @@ AnonPatternObjCmd (
     )
 {
     SchemaData *sdata = GETASI;
-    Schema_CP_Type patternType = (Schema_CP_Type) clientData;
+    Schema_CP_Type patternType;
     SchemaQuant quant;
     SchemaCP *pattern;
     int n, m;
 
     CHECK_SI
     CHECK_TOPLEVEL
-    if (patternType == SCHEMA_CTYPE_TEXT) {
-        checkNrArgs (1,2,"Expected: ?definition?");
-        quant = SCHEMA_CQUANT_OPT;
-    } else if (patternType == SCHEMA_CTYPE_MIXED) {
-        checkNrArgs (2,3,"Expected: ?quant? definition");
-        quant = SCHEMA_CQUANT_REP;
-        if (objc == 3) {
-            quant = getQuant (interp, sdata, objv[1], &n, &m);
-        }
-    } else {
-        checkNrArgs (2,3,"Expected: ?quant? definition");
-        quant = getQuant (interp, sdata, objc == 2 ? NULL : objv[1], &n, &m);
-    }
+    checkNrArgs (2,3,"Expected: ?quant? definition");
+    
+    quant = getQuant (interp, sdata, objc == 2 ? NULL : objv[1], &n, &m);
     if (quant == SCHEMA_CQUANT_ERROR) {
         return TCL_ERROR;
     }
+    if (clientData == 0) {
+        patternType = SCHEMA_CTYPE_CHOICE;
+    } else if (clientData == (ClientData) 1) {
+        patternType = SCHEMA_CTYPE_CHOICE;
+        /* Default quant for mixed is * */
+        if (objc == 2) {
+            quant = SCHEMA_CQUANT_REP;
+        }
+    } else if (clientData == (ClientData) 2) {
+        patternType = SCHEMA_CTYPE_INTERLEAVE;
+    } else {
+        patternType = SCHEMA_CTYPE_PATTERN;
+    }
 
     pattern = initSchemaCP (patternType, NULL, NULL);
-
+    if (clientData == (ClientData) 1) {
+        pattern->flags |= MIXED_CONTENT;
+    }
     return evalDefinition (interp, sdata, objc == 2 ? objv[1] : objv[2],
                            pattern, quant, n, m);
 }
@@ -2993,17 +2990,13 @@ tDOM_SchemaInit (
     /* The anonymous pattern commands "choise", "mixed", "interleave"
      * and "group". */
     Tcl_CreateObjCommand (interp, "tdom::schema::choice",
-                          AnonPatternObjCmd,
-                          (ClientData) SCHEMA_CTYPE_CHOICE, NULL);
+                          AnonPatternObjCmd, (ClientData) 0, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::mixed",
-                          AnonPatternObjCmd,
-                          (ClientData) SCHEMA_CTYPE_MIXED, NULL);
+                          AnonPatternObjCmd, (ClientData) 1, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::interleave",
-                          AnonPatternObjCmd,
-                          (ClientData) SCHEMA_CTYPE_INTERLEAVE, NULL);
+                          AnonPatternObjCmd, (ClientData) 2, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::group",
-                          AnonPatternObjCmd,
-                          (ClientData) SCHEMA_CTYPE_PATTERN, NULL);
+                          AnonPatternObjCmd, (ClientData) 3, NULL);
 
     /* The "attribute", "nsattribute", "namespace" and "text" definition commands. */
     Tcl_CreateObjCommand (interp, "tdom::schema::attribute",

@@ -26,7 +26,6 @@
 
 typedef enum {
   SCHEMA_CTYPE_ANY,
-  SCHEMA_CTYPE_MIXED,
   SCHEMA_CTYPE_NAME,
   SCHEMA_CTYPE_CHOICE,
   SCHEMA_CTYPE_INTERLEAVE,
@@ -70,6 +69,7 @@ typedef unsigned int SchemaFlags;
 #define AMBIGUOUS_PATTERN       4
 #define LOCAL_DEFINED_ELEMENT   8
 #define CONSTRAINT_TEXT_CHILD  16
+#define MIXED_CONTENT          32 
 
 typedef struct SchemaCP
 {
