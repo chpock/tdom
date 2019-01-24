@@ -1095,12 +1095,190 @@ test schema-7.14a {mixed} {
         <doc>some<a/><b/></doc>
         <doc><unknown/><b/></doc>
     } {
-        lappend result [s validate $xml errMsg]
-        #puts $errMsg
+        lappend result [s validate $xml]
     }
     s delete
     set result
 } {1 0 1 0 0 0}
+
+test schema-7.15 {choice with optional choices} {
+    tdom::schema create s
+    s define {
+        defelement doc {
+            choice {
+                element a *
+                element b *
+            }
+            element c
+        }
+        foreach e {a b c} {
+            defelement $e {}
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/></doc>
+        <doc><a/><c/></doc>
+        <doc><a/><a/><a/></doc>
+        <doc><a/><a/><a/><c/></doc>
+        <doc><b/><b/><b/><c/></doc>
+        <doc><c/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    set result
+} {0 0 1 0 1 1 1}
+
+test schema-7.16 {choice with optional choices} {
+    tdom::schema create s
+    s define {
+        defelement doc {
+            choice {
+                element a *
+                group * {
+                    element aa
+                    element ab ?
+                }
+            }
+            element c
+        }
+        foreach e {a aa ab c} {
+            defelement $e {}
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/></doc>
+        <doc><a/><c/></doc>
+        <doc><a/><a/><a/></doc>
+        <doc><a/><a/><a/><c/></doc>
+        <doc><aa/><c/></doc>
+        <doc><aa/><ab/><aa/><c/></doc>
+        <doc><aa/><ab/><aa/><aa/><ab/><c/></doc>
+        <doc><c/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    set result
+} {0 0 1 0 1 1 1 1 1}
+
+test schema-7.17 {choice with optional choices} {
+    tdom::schema create s
+    s define {
+        defelement doc {
+            choice {
+                element a *
+                group {
+                    element aa
+                    element ab ?
+                }
+            }
+            element c
+        }
+        foreach e {a aa ab c} {
+            defelement $e {}
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/></doc>
+        <doc><a/><c/></doc>
+        <doc><a/><a/><a/></doc>
+        <doc><a/><a/><a/><c/></doc>
+        <doc><aa/><c/></doc>
+        <doc><aa/><ab/><aa/><c/></doc>
+        <doc><aa/><ab/><aa/><aa/><ab/><c/></doc>
+        <doc><c/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    set result
+} {0 0 1 0 1 1 0 0 1}
+
+test schema-7.18 {choice} {
+    tdom::schema create s
+    s define {
+        defelement doc {
+            choice {
+                element a
+                group {
+                    element aa
+                    element ab ?
+                }
+            }
+            element c
+        }
+        foreach e {a aa ab c} {
+            defelement $e {}
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/></doc>
+        <doc><a/><c/></doc>
+        <doc><a/><a/><a/></doc>
+        <doc><a/><a/><a/><c/></doc>
+        <doc><aa/><c/></doc>
+        <doc><aa/><ab/><aa/><c/></doc>
+        <doc><aa/><ab/><aa/><aa/><ab/><c/></doc>
+        <doc><c/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    set result
+} {0 0 1 0 0 1 0 0 0}
+
+        # <doc/>
+        # <doc><a/></doc>
+        # <doc><a/><c/></doc>
+        # <doc><a/><a/><c/></doc>
+        # <doc><a/><a/></doc>
+        # <doc><a/><a/><a/></doc>
+        # <doc><a/><a/><a/><c/></doc>
+        # <doc><aa/><c/></doc>
+        # <doc><aa/><ab/><aa/><c/></doc>
+        # <doc><aa/><ab/><aa/><aa/><ab/><c/></doc>
+        # <doc><c/></doc>
+
+test schema-7.19 {choice with quantified choice} {
+    tdom::schema create s
+    s define {
+        defelement doc {
+            choice {
+                element a {0 2}
+                group {
+                    element aa
+                    element ab ?
+                }
+            }
+            element c
+        }
+        foreach e {a aa ab c} {
+            defelement $e {}
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/></doc>
+        <doc><a/><c/></doc>
+        <doc><a/><a/><c/></doc>
+        <doc><a/><a/></doc>
+        <doc><a/><a/><a/></doc>
+        <doc><a/><a/><a/><c/></doc>
+        <doc><aa/><c/></doc>
+        <doc><aa/><ab/><aa/><c/></doc>
+        <doc><aa/><ab/><aa/><aa/><ab/><c/></doc>
+        <doc><c/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    set result
+} {0 0 1 1 0 0 0 1 0 0 1}
 
 test schema-8.1 {validate method} {
     tdom::schema create grammar
@@ -1411,10 +1589,15 @@ test schema-10.4 {any} {
         defelement a {}
         defelement b {}
     }
-    set result [s validate {<doc><a/><something/><b/></doc>}]
-    lappend result [s validate {<doc><a/><something/><something/><b/></doc>}]
-    lappend result [s validate {<doc><a/><b/></doc>}]
-    lappend result [s validate {<doc><a/><a><b>text</b><c><c><c/></c></c></a><b/></doc>}]
+    set result [list]
+    foreach xml {
+        {<doc><a/><something/><b/></doc>}
+        {<doc><a/><something/><something/><b/></doc>}
+        {<doc><a/><b/></doc>}
+        {<doc><a/><a><b>text</b><c><c><c/></c></c></a><b/></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
     s delete
     set result
 } {0 1 0 0}
