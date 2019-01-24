@@ -36,12 +36,12 @@
 #ifdef DEBUG
 # define DBG(x) x
 #else
-# define DBG(x) 
+# define DBG(x)
 #endif
 #if defined(DEBUG) || defined(DDEBUG)
 # define DDBG(x) x
 #else
-# define DDBG(x) 
+# define DDBG(x)
 #endif
 
 /*----------------------------------------------------------------------------
@@ -99,7 +99,7 @@ typedef struct
                      Tcl_SetIntObj(Tcl_GetObjResult(interp), (i))
 #define SetBooleanResult(i) Tcl_ResetResult(interp); \
                      Tcl_SetBooleanObj(Tcl_GetObjResult(interp), (i))
- 
+
 #define checkNrArgs(l,h,err) if (objc < l || objc > h) {      \
         SetResult (err);                                      \
         return TCL_ERROR;                                     \
@@ -134,7 +134,7 @@ static char *Schema_Quant_Type2str[] = {
   static Tcl_ThreadDataKey activeSchemaData;
 # define GETASI  *(SchemaData**) Tcl_GetThreadData(&activeSchemaData, \
                                                      sizeof(SchemaData*))
-static void SetActiveSchemaData (SchemaData *v) 
+static void SetActiveSchemaData (SchemaData *v)
 {
     SchemaData **schemaInfoPtr = Tcl_GetThreadData(&activeSchemaData,
                                                         sizeof (SchemaData*));
@@ -181,57 +181,6 @@ static void SetActiveSchemaData (SchemaData *v)
     sdata->patternList[sdata->numPatternList] = pattern;                \
     sdata->numPatternList++;
 
-#define ADD_TO_CONTENT(pattern,quant,n,m)                               \
-    if (sdata->currentCP->type == SCHEMA_CTYPE_CHOICE                   \
-        && quant != SCHEMA_CQUANT_ONE) {                                \
-        SchemaCP *wrapperCP;                                            \
-        wrapperCP = initSchemaCP (SCHEMA_CTYPE_PATTERN,NULL, NULL);     \
-        wrapperCP->flags |= CHOICE_PATTERN;                             \
-        REMEMBER_PATTERN (wrapperCP);                                   \
-        wrapperCP->content[0] = pattern;                                \
-        wrapperCP->quants[0] = (quant == SCHEMA_CQUANT_NM) ? (n == 0 ? SCHEMA_CQUANT_OPT : SCHEMA_CQUANT_ONE) : quant; \
-        wrapperCP->numChildren = 1;                                     \
-        pattern = wrapperCP;                                            \
-    }                                                                   \
-    if (quant == SCHEMA_CQUANT_NM) {             \
-        int i;                                                          \
-        int newChilds = (n >= m) ? n : m;                               \
-        while (sdata->numChildren + newChilds - 1 >= sdata->contentSize) { \
-            sdata->currentContent =                                     \
-                REALLOC (sdata->currentContent,                         \
-                         2 * sdata->contentSize                         \
-                         * sizeof (SchemaCP*));                         \
-            sdata->currentQuants =                                      \
-                REALLOC (sdata->currentQuants,                          \
-                         2 * sdata->contentSize                         \
-                         * sizeof (SchemaQuant));                       \
-            sdata->contentSize *= 2;                                    \
-        }                                                               \
-        for (i = 0; i < n; i++) {                                       \
-            sdata->currentContent[sdata->numChildren+i] = pattern;      \
-            sdata->currentQuants[sdata->numChildren+i] = SCHEMA_CQUANT_ONE; \
-        }                                                               \
-        for (i = n; i < m; i++) {                                       \
-            sdata->currentContent[sdata->numChildren+i] = pattern;      \
-            sdata->currentQuants[sdata->numChildren+i] = SCHEMA_CQUANT_OPT; \
-        }                                                               \
-        sdata->numChildren = sdata->numChildren + newChilds;            \
-    } else {                                                            \
-        if (sdata->numChildren == sdata->contentSize) {                 \
-            sdata->currentContent =                                     \
-                REALLOC (sdata->currentContent,                         \
-                         2 * sdata->contentSize                         \
-                         * sizeof (SchemaCP*));                         \
-            sdata->currentQuants =                                      \
-                REALLOC (sdata->currentQuants,                          \
-                         2 * sdata->contentSize                         \
-                         * sizeof (SchemaQuant));                       \
-            sdata->contentSize *= 2;                                    \
-        }                                                               \
-        sdata->currentContent[sdata->numChildren] = (pattern);          \
-        sdata->currentQuants[sdata->numChildren] = quant;               \
-        sdata->numChildren++;                                           \
-    }
 
 #define ADD_CONSTRAINT(sdata, sc)                                       \
     sc = TMALLOC (SchemaConstraint);                                    \
@@ -334,7 +283,7 @@ static void serializeQuant (
 
 static void serializeStack (
     SchemaData *sdata
-    ) 
+    )
 {
     SchemaValidationStack *sp;
 
@@ -358,7 +307,7 @@ static void freeSchemaCP (
 {
     int i;
     SchemaConstraint *sc;
-    
+
     switch (pattern->type) {
     case SCHEMA_CTYPE_ANY:
         /* do nothing */
@@ -387,11 +336,11 @@ static void freeSchemaCP (
 }
 
 static SchemaData*
-initSchemaData () 
+initSchemaData ()
 {
     SchemaData *sdata;
     int hnew;
-    
+
     sdata = TMALLOC (SchemaData);
     memset (sdata, 0, sizeof(SchemaData));
     Tcl_InitHashTable (&sdata->element, TCL_STRING_KEYS);
@@ -524,6 +473,98 @@ cleanupLastPattern (
 }
 
 static void
+addToContent (
+    SchemaData *sdata,
+    SchemaCP *pattern,
+    SchemaQuant quant,
+    int n,
+    int m
+    )
+{
+    SchemaCP *wrapperCP;
+    SchemaCP **savedCurrentContent;
+    SchemaQuant *savedCurrentQuants;
+    unsigned int savedNumChildren, savedContenSize;
+
+    if (sdata->currentCP->type == SCHEMA_CTYPE_CHOICE
+        && quant != SCHEMA_CQUANT_ONE) {
+        wrapperCP = initSchemaCP (SCHEMA_CTYPE_PATTERN,NULL, NULL);
+        REMEMBER_PATTERN (wrapperCP);
+        if (sdata->numChildren == sdata->contentSize) {
+            sdata->currentContent =
+                REALLOC (sdata->currentContent,
+                         2 * sdata->contentSize
+                         * sizeof (SchemaCP*));
+            sdata->currentQuants =
+                REALLOC (sdata->currentQuants,
+                         2 * sdata->contentSize
+                         * sizeof (SchemaQuant));
+            sdata->contentSize *= 2;
+        }
+        sdata->currentContent[sdata->numChildren] = wrapperCP;
+        sdata->currentQuants[sdata->numChildren] = SCHEMA_CQUANT_ONE;
+        sdata->numChildren++;
+        savedCurrentContent = sdata->currentContent;
+        savedCurrentQuants = sdata->currentQuants;
+        savedNumChildren = sdata->numChildren;
+        savedContenSize = sdata->contentSize;
+        sdata->currentContent = wrapperCP->content;
+        sdata->currentQuants = wrapperCP->quants;
+        sdata->numChildren = 0;
+        sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
+    }
+    if (quant == SCHEMA_CQUANT_NM) {
+        int i;
+        int newChilds = (n >= m) ? n : m;
+        while (sdata->numChildren + newChilds >= sdata->contentSize) {
+            sdata->currentContent =
+                REALLOC (sdata->currentContent,
+                         2 * sdata->contentSize
+                         * sizeof (SchemaCP*));
+            sdata->currentQuants =
+                REALLOC (sdata->currentQuants,
+                         2 * sdata->contentSize
+                         * sizeof (SchemaQuant));
+            sdata->contentSize *= 2;
+        }
+        for (i = 0; i < n; i++) {
+            sdata->currentContent[sdata->numChildren+i] = pattern;
+            sdata->currentQuants[sdata->numChildren+i] = SCHEMA_CQUANT_ONE;
+        }
+        for (i = n; i < m; i++) {
+            sdata->currentContent[sdata->numChildren+i] = pattern;
+            sdata->currentQuants[sdata->numChildren+i] = SCHEMA_CQUANT_OPT;
+        }
+        sdata->numChildren = sdata->numChildren + newChilds;
+    } else {
+        if (sdata->numChildren == sdata->contentSize) {
+            sdata->currentContent =
+                REALLOC (sdata->currentContent,
+                         2 * sdata->contentSize
+                         * sizeof (SchemaCP*));
+            sdata->currentQuants =
+                REALLOC (sdata->currentQuants,
+                         2 * sdata->contentSize
+                         * sizeof (SchemaQuant));
+            sdata->contentSize *= 2;
+        }
+        sdata->currentContent[sdata->numChildren] = (pattern);
+        sdata->currentQuants[sdata->numChildren] = quant;
+        sdata->numChildren++;
+    }
+    if (sdata->currentCP->type == SCHEMA_CTYPE_CHOICE
+        && quant != SCHEMA_CQUANT_ONE) {
+        wrapperCP->content = sdata->currentContent;
+        wrapperCP->quants = sdata->currentQuants;
+        wrapperCP->numChildren = sdata->numChildren;
+        sdata->currentContent = savedCurrentContent;
+        sdata->currentQuants = savedCurrentQuants;
+        sdata->numChildren = savedNumChildren;
+        sdata->contentSize = savedContenSize;
+    }
+}
+
+static void
 pushToStack (
     SchemaData *sdata,
     SchemaCP *pattern,
@@ -532,6 +573,7 @@ pushToStack (
 {
     SchemaValidationStack *stackElm, *se;
 
+    DBG(fprintf(stderr, "push to Stack:\n");serializeCP(pattern));
     if (sdata->stackPool) {
         stackElm = sdata->stackPool;
         sdata->stackPool = stackElm->down;
@@ -586,6 +628,7 @@ popStack (
     )
 {
     SchemaValidationStack *se;
+    DBG(fprintf(stderr, "pop from Stack:\n");serializeCP(sdata->stack->pattern));
     se = sdata->stack->down;
     sdata->stack->down = sdata->stackPool;
     sdata->stackPool = sdata->stack;
@@ -602,7 +645,7 @@ checkText (
 {
     int i;
     SchemaConstraint *sc;
-    
+
     for (i = 0; i < cp->numChildren; i++) {
         sc = (SchemaConstraint *) cp->content[i];
         if ((sc->constraint) (interp, sc->constraintData, text) != TCL_OK) {
@@ -621,131 +664,129 @@ matchElementStart (
     )
 {
     SchemaCP *cp, *candidate, *jc;
-    int hm, ac, j, mayskip;
+    int hm, ac, j, mayskip, rc;
     int isName = 0, deep;
     SchemaValidationStack *se;
 
-    while (1) {
-        if (!sdata->stack) return 0;
-        se = sdata->stack;
-        getContext (cp, ac, hm);
-        deep = se->deep;
-    
-        switch (cp->type) {
-        case SCHEMA_CTYPE_NAME:
-            isName = 1;
-            /* fall through */
-        case SCHEMA_CTYPE_PATTERN:
-            while (ac < cp->numChildren) {
-                candidate = cp->content[ac];
-                mayskip = 0;
-                switch (candidate->type) {
-                case SCHEMA_CTYPE_TEXT:
-                    if (candidate->numChildren) {
-                        if (!checkText (interp, candidate, "")) {
-                            return 0;
-                        }
-                    }
-                    break;
+    if (!sdata->stack) return 0;
+    se = sdata->stack;
+    getContext (cp, ac, hm);
+    deep = se->deep;
 
-                case SCHEMA_CTYPE_ANY:
+    switch (cp->type) {
+    case SCHEMA_CTYPE_NAME:
+        isName = 1;
+        /* fall through */
+    case SCHEMA_CTYPE_PATTERN:
+        while (ac < cp->numChildren) {
+            candidate = cp->content[ac];
+            mayskip = 0;
+            switch (candidate->type) {
+            case SCHEMA_CTYPE_TEXT:
+                if (candidate->numChildren) {
+                    if (!checkText (interp, candidate, "")) {
+                        return 0;
+                    }
+                }
+                break;
+
+            case SCHEMA_CTYPE_ANY:
+                updateStack (se, cp, ac);
+                sdata->skipDeep = 1;
+                return 1;
+
+            case SCHEMA_CTYPE_NAME:
+                DBG(fprintf (stderr, "name: %s ns: %s candidate name: %s "
+                             "candidate ns: %s\n", name, namespace,
+                             candidate->name, candidate->namespace));
+                if (candidate->name == name
+                    && candidate->namespace == namespace) {
                     updateStack (se, cp, ac);
-                    sdata->skipDeep = 1;
+                    pushToStack (sdata, candidate, deep + 1);
                     return 1;
-                
-                case SCHEMA_CTYPE_NAME:
-                    DBG(fprintf (stderr, "name: %s ns: %s candidate name: %s "
-                                 "candidate ns: %s\n", name, namespace,
-                                 candidate->name, candidate->namespace));
-                    if (candidate->name == name
-                        && candidate->namespace == namespace) {
-                        updateStack (se, cp, ac);
-                        pushToStack (sdata, candidate, deep + 1);
-                        return 1;
-                    }
-                    break;
-                    
-                case SCHEMA_CTYPE_MIXED:
-                case SCHEMA_CTYPE_CHOICE:
-                    for (j = 0; j < candidate->numChildren; j++) {
-                        jc = candidate->content[j];
-                        switch (jc->type) {
-                        case SCHEMA_CTYPE_TEXT:
-                            break;
+                }
+                break;
 
-                        case SCHEMA_CTYPE_ANY:
-                            sdata->skipDeep = 1;
+            case SCHEMA_CTYPE_MIXED:
+            case SCHEMA_CTYPE_CHOICE:
+                for (j = 0; j < candidate->numChildren; j++) {
+                    jc = candidate->content[j];
+                    switch (jc->type) {
+                    case SCHEMA_CTYPE_TEXT:
+                        break;
+
+                    case SCHEMA_CTYPE_ANY:
+                        sdata->skipDeep = 1;
+                        updateStack (se, cp, ac);
+                        return 1;
+
+                    case SCHEMA_CTYPE_NAME:
+                        if (jc->name == name
+                            && jc->namespace == namespace) {
+                            pushToStack (sdata, jc, deep + 1);
                             updateStack (se, cp, ac);
                             return 1;
-                    
-                        case SCHEMA_CTYPE_NAME:
-                            if (jc->name == name
-                                && jc->namespace == namespace) {
-                                pushToStack (sdata, jc, deep + 1);
-                                updateStack (se, cp, ac);
-                                return 1;
-                            }
-                            break;
-
-                        case SCHEMA_CTYPE_MIXED:
-                        case SCHEMA_CTYPE_CHOICE:
-                            Tcl_Panic ("MIXED or CHOICE child of MIXED or CHOICE");
-                            
-                        case SCHEMA_CTYPE_INTERLEAVE:
-                            fprintf (stderr, "matchElementStart: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
-                            return 0;
-
-                        case SCHEMA_CTYPE_PATTERN:
-                            pushToStack (sdata, jc, deep);
-                            if (matchElementStart (interp, sdata, name, namespace)) {
-                                updateStack (se, cp, ac);
-                                return 1;
-                            }
-                            popStack (sdata);
-                            break;
                         }
-                        if (!mayskip && mayMiss(candidate->quants[j])) mayskip = 1;
+                        break;
+
+                    case SCHEMA_CTYPE_MIXED:
+                    case SCHEMA_CTYPE_CHOICE:
+                        Tcl_Panic ("MIXED or CHOICE child of MIXED or CHOICE");
+
+                    case SCHEMA_CTYPE_INTERLEAVE:
+                        fprintf (stderr, "matchElementStart: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
+                        return 0;
+
+                    case SCHEMA_CTYPE_PATTERN:
+                        pushToStack (sdata, jc, deep);
+                        rc = matchElementStart (interp, sdata, name, namespace);
+                        if (rc == 1) {
+                            updateStack (se, cp, ac);
+                            return 1;
+                        }
+                        popStack (sdata);
+                        if (!mayskip && rc == -1) mayskip = 1;
+                        break;
                     }
-                    break;
-                            
-                case SCHEMA_CTYPE_INTERLEAVE:
-                    fprintf (stderr, "matchElementStart: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
-                    return 0;
-                    
-                case SCHEMA_CTYPE_PATTERN:
-                    pushToStack (sdata, candidate, deep);
-                    if (matchElementStart (interp, sdata, name, namespace)) {
-                        updateStack (se, cp, ac);
-                        return 1;
-                    }
-                    popStack (sdata);
-                    break;
+                    if (!mayskip && mayMiss (candidate->quants[j]))
+                        mayskip = 1;
                 }
-                if (!mayskip && mustMatch (cp->quants[ac], hm)) {
-                    return 0;
+                break;
+
+            case SCHEMA_CTYPE_INTERLEAVE:
+                fprintf (stderr, "matchElementStart: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
+                return 0;
+
+            case SCHEMA_CTYPE_PATTERN:
+                pushToStack (sdata, candidate, deep);
+                rc = matchElementStart (interp, sdata, name, namespace);
+                if (rc == 1) {
+                    updateStack (se, cp, ac);
+                    return 1;
                 }
-                ac++;
-                hm = 0;
+                popStack (sdata);
+
+                break;
             }
-            if (isName) return 0;
-            if (cp->flags & CHOICE_PATTERN && !se->hasMatched) {
-                fprintf (stderr, "==== skip popStack of not maching PATTERN because of CHOICE_PATTERN\n");
+            if (!mayskip && mustMatch (cp->quants[ac], hm)) {
                 return 0;
             }
-            popStack (sdata);
-            continue;
-            
-        case SCHEMA_CTYPE_MIXED:
-        case SCHEMA_CTYPE_CHOICE:
-        case SCHEMA_CTYPE_TEXT:
-        case SCHEMA_CTYPE_ANY:
-            /* Never pushed onto stack */
-            Tcl_Panic ("Invalid CTYPE onto the validation stack!");
-
-        case SCHEMA_CTYPE_INTERLEAVE:
-            fprintf (stderr, "matchElementStart: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
-            return 0;
+            ac++;
+            hm = 0;
         }
+        if (isName) return 0;
+        return -1;
+
+    case SCHEMA_CTYPE_MIXED:
+    case SCHEMA_CTYPE_CHOICE:
+    case SCHEMA_CTYPE_TEXT:
+    case SCHEMA_CTYPE_ANY:
+        /* Never pushed onto stack */
+        Tcl_Panic ("Invalid CTYPE onto the validation stack!");
+
+    case SCHEMA_CTYPE_INTERLEAVE:
+        fprintf (stderr, "matchElementStart: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
+        return 0;
     }
     return 0;
 }
@@ -756,11 +797,12 @@ probeElement (
     SchemaData *sdata,
     const char *name,
     void *namespace
-    ) 
+    )
 {
     Tcl_HashEntry *entryPtr;
     void *namespacePtr, *namePtr;
     SchemaCP *pattern;
+    int rc;
 
     if (sdata->skipDeep) {
         sdata->skipDeep++;
@@ -829,7 +871,7 @@ probeElement (
     } else {
         pattern = NULL;
     }
-    
+
     if (sdata->stack) {
         SchemaValidationStack *se;
         se = sdata->stack;
@@ -857,7 +899,12 @@ probeElement (
     }
 
     /* The normal case: we're inside the tree */
-    if (matchElementStart (interp, sdata, (char *) namePtr, namespacePtr)) {
+    rc = matchElementStart (interp, sdata, (char *) namePtr, namespacePtr);
+    while (rc == -1) {
+        popStack (sdata);
+        rc = matchElementStart (interp, sdata, (char *) namePtr, namespacePtr);
+    };
+    if (rc) {
         DBG(
             fprintf (stderr, "probeElement: element '%s' match\n", name);
             serializeStack (sdata);
@@ -976,7 +1023,7 @@ int probeAttributes (
     }
     return TCL_OK;
 }
- 
+
 int probeDomAttributes (
     Tcl_Interp *interp,
     SchemaData *sdata,
@@ -1112,7 +1159,7 @@ static int checkElementEnd (
             /* Fall through */
         case SCHEMA_CTYPE_PATTERN:
             if (ac < cp->numChildren && (hasMatched (cp->quants[ac], hm))) {
-                DBG(fprintf (stderr, "ac has matched, skiping to next ac\n"));
+                DBG(fprintf (stderr, "ac %d has matched, skiping to next ac\n", ac));
                 ac++; hm = 0;
             }
             while (ac < cp->numChildren) {
@@ -1134,7 +1181,7 @@ static int checkElementEnd (
             popStack (sdata);
             if (isName) return 1;
             continue;
-            
+
         case SCHEMA_CTYPE_MIXED:
         case SCHEMA_CTYPE_CHOICE:
         case SCHEMA_CTYPE_TEXT:
@@ -1162,7 +1209,7 @@ probeElementEnd (
                  " name: '%s' deep: %d\n",
                  sdata->stack->pattern->name, sdata->stack->deep);
         );
-    
+
     if (sdata->skipDeep) {
         sdata->skipDeep--;
         return TCL_OK;
@@ -1225,7 +1272,7 @@ matchText (
                 case SCHEMA_CTYPE_MIXED:
                     updateStack (se, cp, ac);
                     return 1;
-                    
+
                 case SCHEMA_CTYPE_TEXT:
                     if (checkText (interp, candidate, text)) {
                         updateStack (se, cp, ac);
@@ -1244,7 +1291,7 @@ matchText (
                                 return 1;
                             }
                             break;
-                            
+
                         case SCHEMA_CTYPE_NAME:
                         case SCHEMA_CTYPE_ANY:
                             break;
@@ -1256,7 +1303,7 @@ matchText (
                                 return 1;
                             }
                             break;
-                            
+
                         case SCHEMA_CTYPE_MIXED:
                         case SCHEMA_CTYPE_CHOICE:
                             Tcl_Panic ("MIXED or CHOICE child of MIXED or CHOICE");
@@ -1271,7 +1318,7 @@ matchText (
                         return 0;
                     }
                     break;
-                    
+
                 case SCHEMA_CTYPE_PATTERN:
                     pushToStack (sdata, candidate, se->deep);
                     if (matchText (interp, sdata, text)) {
@@ -1313,7 +1360,7 @@ matchText (
             /* Never pushed onto stack */
             Tcl_Panic ("Invalid CTYPE onto the validation stack!");
             break;
-            
+
         case SCHEMA_CTYPE_INTERLEAVE:
             fprintf (stderr, "probeText: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
             return 0;
@@ -1387,7 +1434,7 @@ startElement(
     char *namespace;
     const char *s;
     int i = 0;
-    
+
     DBG(fprintf (stderr, "startElement: '%s'\n", name);)
     if (Tcl_DStringLength (vdata->cdata)
         || (vdata->sdata->stack
@@ -1443,7 +1490,7 @@ endElement (
 )
 {
     ValidateMethodData *vdata = (ValidateMethodData *) userData;
-    
+
     DBG(fprintf (stderr, "endElement: '%s'\n", name);)
     if (vdata->sdata->validationState == VALIDATION_ERROR) {
         return;
@@ -1475,7 +1522,7 @@ characterDataHandler (
 {
     ValidateMethodData *vdata = (ValidateMethodData *) userData;
 
-    Tcl_DStringAppend (vdata->cdata, s, len);    
+    Tcl_DStringAppend (vdata->cdata, s, len);
 }
 
 static int
@@ -1493,7 +1540,7 @@ validateString (
     Tcl_Obj *resultObj;
     char sl[50], sc[50];
     int result;
-    
+
     parser = XML_ParserCreate_MM (NULL, MEM_SUITE, &sep);
     vdata.interp = interp;
     vdata.sdata = sdata;
@@ -1505,7 +1552,7 @@ validateString (
     XML_SetUserData (parser, &vdata);
     XML_SetElementHandler (parser, startElement, endElement);
     XML_SetCharacterDataHandler (parser, characterDataHandler);
-    
+
     if (XML_Parse (parser, xmlstr, len, 1) != XML_STATUS_OK
         || sdata->validationState == VALIDATION_ERROR) {
         resultObj = Tcl_NewObj ();
@@ -1563,7 +1610,7 @@ validateDOM (
             }
             if (validateDOM (interp, sdata, node) != TCL_OK) return TCL_ERROR;
             break;
-            
+
         case TEXT_NODE:
         case CDATA_SECTION_NODE:
             if (node == node->parentNode->firstChild
@@ -1577,7 +1624,7 @@ validateDOM (
                                ((domTextNode *) node)->nodeValue,
                                ((domTextNode *) node)->valueLength);
             break;
-            
+
         case COMMENT_NODE:
         case PROCESSING_INSTRUCTION_NODE:
             /* They are just ignored by validation. */
@@ -1608,7 +1655,7 @@ schemaReset (
     sdata->skipDeep = 0;
 }
 
-int 
+int
 schemaInstanceCmd (
     ClientData clientData,
     Tcl_Interp *interp,
@@ -1628,7 +1675,7 @@ schemaInstanceCmd (
     char          *xmlstr, *errMsg;
     domDocument   *doc;
     domNode       *node;
-    
+
     static const char *schemaInstanceMethods[] = {
         "defelement", "defpattern", "start", "event", "delete",
         "nrForwardDefinitions", "state", "reset", "define",
@@ -1644,11 +1691,11 @@ schemaInstanceCmd (
         "start", "end", "text", NULL
     };
 
-    enum eventKeyword 
+    enum eventKeyword
     {
         k_elementstart, k_elementend, k_text
     };
-    
+
     if (objc < 2) {
         Tcl_WrongNumArgs (interp, 1, objv, "subcommand ?arguments?");
         return TCL_ERROR;
@@ -1670,7 +1717,7 @@ schemaInstanceCmd (
         != TCL_OK) {
         return TCL_ERROR;
     }
-    
+
     Tcl_ResetResult (interp);
     switch ((enum schemaInstanceMethod) methodIndex) {
     case m_defelement:
@@ -1868,7 +1915,7 @@ schemaInstanceCmd (
             }
             result = probeElementEnd (interp, sdata);
             break;
-            
+
         case k_text:
             if (objc != 4) {
                 Tcl_WrongNumArgs (interp, 3, objv, "<text>");
@@ -1968,14 +2015,14 @@ schemaInstanceCmd (
             SetBooleanResult (0);
         }
         schemaReset (sdata);
-            
+
         break;
-        
+
     default:
         Tcl_SetResult (interp, "unknown method", NULL);
         result = TCL_ERROR;
         break;
-        
+
     }
     return result;
 }
@@ -1993,12 +2040,12 @@ schemaInstanceCmd (
  *	A standard Tcl result.
  *
  * Side effects:
- *      
+ *
  *
  *----------------------------------------------------------------------------
  */
 
-int 
+int
 tDOM_SchemaObjCmd (
     ClientData clientData,
     Tcl_Interp *interp,
@@ -2032,23 +2079,23 @@ tDOM_SchemaObjCmd (
         }
         ind = 2;
     }
-        
+
     Tcl_ResetResult (interp);
     switch ((enum schemaMethod) methodIndex) {
     case m_create:
         sdata = initSchemaData ();
         Tcl_CreateObjCommand (interp, Tcl_GetString(objv[ind]),
-                              schemaInstanceCmd, 
+                              schemaInstanceCmd,
                               (ClientData) sdata,
                               schemaInstanceDelete);
         Tcl_SetObjResult (interp, objv[ind]);
         break;
-        
+
     default:
         Tcl_SetResult (interp, "unknown method", NULL);
         result = TCL_ERROR;
         break;
-        
+
     }
     return result;
 }
@@ -2060,7 +2107,7 @@ getQuant (
     Tcl_Obj *quantObj,
     int *n,
     int *m
-    ) 
+    )
 {
     char *quantStr;
     int len;
@@ -2159,7 +2206,7 @@ AnyPatternObjCmd (
     }
     pattern = initSchemaCP (SCHEMA_CTYPE_ANY, NULL, NULL);
     REMEMBER_PATTERN (pattern)
-    ADD_TO_CONTENT(pattern, quant, n, m);
+    addToContent(sdata, pattern, quant, n, m);
     return TCL_OK;
 }
 
@@ -2175,7 +2222,7 @@ evalDefinition (
     )
 {
     SchemaCP **savedCurrentContent, *savedCurrentCP;
-    SchemaQuant *savedCurrentQuant;
+    SchemaQuant *savedCurrentQuants;
     SchemaAttr **savedCurrentAttrs;
     unsigned int savedNumChildren, savedContenSize, savedNumAttr;
     unsigned int savedAttrSize, savedNumReqAttr;
@@ -2184,7 +2231,7 @@ evalDefinition (
     /* Save some state of sdata .. */
     savedCurrentCP = sdata->currentCP;
     savedCurrentContent = sdata->currentContent;
-    savedCurrentQuant = sdata->currentQuants;
+    savedCurrentQuants = sdata->currentQuants;
     savedNumChildren = sdata->numChildren;
     savedContenSize = sdata->contentSize;
     savedNumAttr = sdata->numAttr;
@@ -2214,7 +2261,7 @@ evalDefinition (
     /* ... and restore the previously saved sdata states  */
     sdata->currentCP = savedCurrentCP;
     sdata->currentContent = savedCurrentContent;
-    sdata->currentQuants = savedCurrentQuant;
+    sdata->currentQuants = savedCurrentQuants;
     sdata->numChildren = savedNumChildren;
     sdata->contentSize = savedContenSize;
     sdata->numAttr = savedNumAttr;
@@ -2232,7 +2279,7 @@ evalDefinition (
                 }
             }
         }
-        ADD_TO_CONTENT (pattern, quant, n, m);        
+        addToContent (sdata, pattern, quant, n, m);
     } else {
         freeSchemaCP (pattern);
     }
@@ -2265,7 +2312,7 @@ NamedPatternObjCmd (
         checkNrArgs (2,3,"Expected: patternName ?quant?");
         hashTable = &sdata->pattern;
     }
-        
+
     quant = getQuant (interp, sdata, objc == 2 ? NULL : objv[2], &n, &m);
     if (quant == SCHEMA_CQUANT_ERROR) {
         return TCL_ERROR;
@@ -2298,7 +2345,7 @@ NamedPatternObjCmd (
             REMEMBER_PATTERN (pattern);
             Tcl_SetHashValue (entryPtr, pattern);
         }
-        ADD_TO_CONTENT (pattern, quant, n, m);
+        addToContent (sdata, pattern, quant, n, m);
     } else {
         /* Local definition of this element */
         if (hnew) {
@@ -2373,13 +2420,13 @@ evalConstraints (
 {
     int result;
     SchemaCP **savedCurrentContent, *savedCurrentCP;
-    SchemaQuant *savedCurrentQuant;
+    SchemaQuant *savedCurrentQuants;
     unsigned int savedNumChildren, savedContenSize;
 
     /* Save some state of sdata .. */
     savedCurrentCP = sdata->currentCP;
     savedCurrentContent = sdata->currentContent;
-    savedCurrentQuant = sdata->currentQuants;
+    savedCurrentQuants = sdata->currentQuants;
     savedNumChildren = sdata->numChildren;
     savedContenSize = sdata->contentSize;
     /* ... and prepare sdata for definition evaluation. */
@@ -2400,7 +2447,7 @@ evalConstraints (
     /* ... and restore the previously saved sdata states  */
     sdata->currentCP = savedCurrentCP;
     sdata->currentContent = savedCurrentContent;
-    sdata->currentQuants = savedCurrentQuant;
+    sdata->currentQuants = savedCurrentQuants;
     sdata->numChildren = savedNumChildren;
     sdata->contentSize = savedContenSize;
     if (!sdata->isAttributeConstaint && cp->numChildren) {
@@ -2423,7 +2470,7 @@ static int maybeAddAttr (
     char *name, *namespace = NULL;
     SchemaAttr *attr;
     SchemaCP *cp;
-        
+
     if (namespaceObj) {
         h = Tcl_CreateHashEntry (&sdata->namespace,
                                  Tcl_GetString (namespaceObj), &hnew1);
@@ -2583,26 +2630,27 @@ TextPatternObjCmd (
 {
     SchemaData *sdata = GETASI;
     SchemaCP *pattern;
-    
+
     CHECK_SI
     CHECK_TOPLEVEL
     checkNrArgs (1,2,"?<definition script>?");
     pattern = initSchemaCP (SCHEMA_CTYPE_TEXT, NULL, NULL);
     REMEMBER_PATTERN (pattern)
-    ADD_TO_CONTENT (pattern, SCHEMA_CQUANT_OPT, 0, 0)
+    addToContent (sdata, pattern, SCHEMA_CQUANT_OPT, 0, 0);
+    
     if (objc == 2) {
         pattern->content = (SchemaCP**) MALLOC (
             sizeof(SchemaCP*) * CONTENT_ARRAY_SIZE_INIT
             );
         pattern->quants = (SchemaQuant*) MALLOC (
             sizeof (SchemaQuant) * CONTENT_ARRAY_SIZE_INIT
-            );        
+            );
         return evalConstraints (interp, sdata, pattern, objv[1]);
     }
     return TCL_OK;
 }
 
-static int 
+static int
 isintImpl (
     Tcl_Interp *interp,
     void *constraintData,
@@ -2610,7 +2658,7 @@ isintImpl (
     )
 {
     int n;
-    
+
     if (Tcl_GetInt (interp, text, &n) != TCL_OK) {
         return TCL_ERROR;
     }
@@ -2627,7 +2675,7 @@ isintTCObjCmd (
 {
     SchemaData *sdata = GETASI;
     SchemaConstraint *sc;
-    
+
     CHECK_TI
     CHECK_TOPLEVEL
     checkNrArgs (1,1,"no argument expected");
@@ -2636,7 +2684,7 @@ isintTCObjCmd (
     return TCL_OK;
 }
 
-typedef struct 
+typedef struct
 {
     int nrArg;
     Tcl_Obj **evalStub;
@@ -2649,7 +2697,7 @@ tclImplFree (
 {
     tclTCData *tcdata = constraintData;
     int i;
-    
+
     for (i = 0; i < tcdata->nrArg-1; i++) {
         Tcl_DecrRefCount (tcdata->evalStub[i]);
     }
@@ -2657,7 +2705,7 @@ tclImplFree (
     FREE (tcdata);
 }
 
-static int 
+static int
 tclImpl (
     Tcl_Interp *interp,
     void *constraintData,
@@ -2666,7 +2714,7 @@ tclImpl (
 {
     tclTCData *tcdata = constraintData;
     int result, bool;
-    
+
     tcdata->evalStub[tcdata->nrArg-1] = Tcl_NewStringObj(text, -1);
     Tcl_IncrRefCount (tcdata->evalStub[tcdata->nrArg-1]);
     result = Tcl_EvalObjv (interp, tcdata->nrArg, tcdata->evalStub,
@@ -2698,7 +2746,7 @@ tclTCObjCmd (
     SchemaConstraint *sc;
     tclTCData *tcdata;
     int i;
-    
+
     CHECK_TI
     CHECK_TOPLEVEL
     if (objc < 2) {
@@ -2727,7 +2775,7 @@ fixedImplFree (
     FREE (constraintData);
 }
 
-static int 
+static int
 fixedImpl (
     Tcl_Interp *interp,
     void *constraintData,
@@ -2750,7 +2798,7 @@ fixedTCObjCmd (
 {
     SchemaData *sdata = GETASI;
     SchemaConstraint *sc;
-    
+
     CHECK_TI
     CHECK_TOPLEVEL
     checkNrArgs (2,2,"Expected: <fixed value>");
@@ -2772,7 +2820,7 @@ enumerationImplFree (
     FREE (values);
 }
 
-static int 
+static int
 enumerationImpl (
     Tcl_Interp *interp,
     void *constraintData,
@@ -2798,7 +2846,7 @@ enumerationTCObjCmd (
     Tcl_HashTable *values;
     int len, i, hnew;
     Tcl_Obj *value;
-    
+
     CHECK_TI
     CHECK_TOPLEVEL
     checkNrArgs (2,2,"Expected: <value list>");
@@ -2827,7 +2875,7 @@ matchImplFree (
     Tcl_DecrRefCount ((Tcl_Obj *) constraintData);
 }
 
-static int 
+static int
 matchImpl (
     Tcl_Interp *interp,
     void *constraintData,
@@ -2849,7 +2897,7 @@ matchTCObjCmd (
 {
     SchemaData *sdata = GETASI;
     SchemaConstraint *sc;
-    
+
     CHECK_TI
     CHECK_TOPLEVEL
     checkNrArgs (2,2,"Expected: <match pattern>");
@@ -2869,7 +2917,7 @@ regexpImplFree (
     Tcl_DecrRefCount ((Tcl_Obj *) constraintData);
 }
 
-static int 
+static int
 regexpImpl (
     Tcl_Interp *interp,
     void *constraintData,
@@ -2878,12 +2926,12 @@ regexpImpl (
 {
     Tcl_Obj *textObj;
     int rc;
-    
+
 
     textObj = Tcl_NewStringObj(text, -1);
     rc = Tcl_RegExpMatchObj (interp, textObj,  (Tcl_Obj *) constraintData);
     Tcl_DecrRefCount (textObj);
-    /* rc may be 1, 0, -1 */ 
+    /* rc may be 1, 0, -1 */
     if (rc == 1) {
         return TCL_OK;
     }
@@ -2900,7 +2948,7 @@ regexpTCObjCmd (
 {
     SchemaData *sdata = GETASI;
     SchemaConstraint *sc;
-    
+
     CHECK_TI
     CHECK_TOPLEVEL
     checkNrArgs (2,2,"Expected: <regexp>");
@@ -2929,7 +2977,7 @@ tDOM_SchemaInit (
                           schemaInstanceCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::start",
                           schemaInstanceCmd, NULL, NULL);
-    
+
     /* The "any" definition command. */
     Tcl_CreateObjCommand (interp, "tdom::schema::any",
                           AnyPatternObjCmd, NULL, NULL);
@@ -2956,7 +3004,7 @@ tDOM_SchemaInit (
     Tcl_CreateObjCommand (interp, "tdom::schema::group",
                           AnonPatternObjCmd,
                           (ClientData) SCHEMA_CTYPE_PATTERN, NULL);
-    
+
     /* The "attribute", "nsattribute", "namespace" and "text" definition commands. */
     Tcl_CreateObjCommand (interp, "tdom::schema::attribute",
                           AttributePatternObjCmd, NULL, NULL);

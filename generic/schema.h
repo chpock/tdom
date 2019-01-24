@@ -70,7 +70,6 @@ typedef unsigned int SchemaFlags;
 #define AMBIGUOUS_PATTERN       4
 #define LOCAL_DEFINED_ELEMENT   8
 #define CONSTRAINT_TEXT_CHILD  16
-#define CHOICE_PATTERN         32
 
 typedef struct SchemaCP
 {

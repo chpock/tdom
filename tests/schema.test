@@ -1263,12 +1263,22 @@ test schema-7.19 {choice with quantified choice} {
     }
     set result [list]
     foreach xml {
+        <doc/>
+        <doc><a/></doc>
         <doc><a/><c/></doc>
+        <doc><a/><a/><c/></doc>
+        <doc><a/><a/></doc>
+        <doc><a/><a/><a/></doc>
+        <doc><a/><a/><a/><c/></doc>
+        <doc><aa/><c/></doc>
+        <doc><aa/><ab/><aa/><c/></doc>
+        <doc><aa/><ab/><aa/><aa/><ab/><c/></doc>
+        <doc><c/></doc>
     } {
         lappend result [s validate $xml]
     }
     set result
-} {0 0 1 1 0 0 1 0 0 1}
+} {0 0 1 1 0 0 0 1 0 0 1}
 
 test schema-8.1 {validate method} {
     tdom::schema create grammar
