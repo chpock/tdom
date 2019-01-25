@@ -990,10 +990,15 @@ test schema-7.11 {loop over seq} {
             defelement $e {}
         }
     }
-    set result [grammar validate <doc><c/></doc> errMsg]
-    lappend result [grammar validate <doc><a/><b/><c/></doc>]
-    lappend result [grammar validate <doc><a/><b/><a/><b/><c/></doc>]
-    lappend result [grammar validate <doc><a/><b/><a/><b/></doc>]
+    set result [list]
+    foreach xml {
+        <doc><c/></doc>
+        <doc><a/><b/><c/></doc>
+        <doc><a/><b/><a/><b/><c/></doc>
+        <doc><a/><b/><a/><b/></doc>
+    } {
+        lappend result [grammar validate $xml]
+    }
     grammar delete
     set result
 } {1 1 1 0}
@@ -1187,7 +1192,7 @@ test schema-7.15a {choice with optional choices} {
         lappend result [s validate $xml]
     }
     set result
-} {0 1 0 1 0 0 1}
+} {1 1 0 1 0 0 1}
 
 test schema-7.15b {choice with optional choices} {
     tdom::schema create s
@@ -1215,7 +1220,7 @@ test schema-7.15b {choice with optional choices} {
         lappend result [s validate $xml]
     }
     set result
-} {0 1 0 1 0 0 1}
+} {1 1 0 1 0 0 1}
 
 test schema-7.16 {choice with optional choices} {
     tdom::schema create s
@@ -1366,6 +1371,34 @@ test schema-7.19 {choice with quantified choice} {
     }
     set result
 } {0 0 1 1 0 0 0 1 0 0 1}
+
+test schema-7.20 {group with only optional content} {
+    tdom::schema create s
+    s define {
+        defelement doc {
+            element a
+            group {
+                element b ?
+                element c ?
+            }
+        }
+        foreach e {a b c} {
+            defelement $e {}
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/></doc>
+        <doc><a/><c/></doc>
+        <doc><a/><a/><c/></doc>
+        <doc><a/><b/></doc>
+        <doc><a/><b/><c/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    set result
+} {0 1 1 0 1 1}
 
 test schema-8.1 {validate method} {
     tdom::schema create grammar

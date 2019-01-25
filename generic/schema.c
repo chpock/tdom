@@ -1149,58 +1149,113 @@ static int checkElementEnd (
     )
 {
     SchemaValidationStack *se;
-    SchemaCP *cp;
-    int hm, ac;
+    SchemaCP *cp, *ic;
+    int hm, ac, i, deep, mayMiss, rc;
     int isName = 0;
 
-    while (1) {
-        DBG(fprintf (stderr, "checkElementEnd:\n");
-            serializeStack(sdata););
-        se = sdata->stack;
-        getContext (cp, ac, hm);
-        switch (cp->type) {
-        case SCHEMA_CTYPE_NAME:
-            isName = 1;
-            /* Fall through */
-        case SCHEMA_CTYPE_PATTERN:
-            if (ac < cp->numChildren && (hasMatched (cp->quants[ac], hm))) {
-                DBG(fprintf (stderr, "ac %d has matched, skiping to next ac\n", ac));
-                ac++; hm = 0;
+    DBG(fprintf (stderr, "checkElementEnd:\n");
+        serializeStack(sdata););
+    se = sdata->stack;
+    getContext (cp, ac, hm);
+    deep = se->deep;
+    switch (cp->type) {
+    case SCHEMA_CTYPE_NAME:
+        isName = 1;
+        /* Fall through */
+    case SCHEMA_CTYPE_PATTERN:
+        if (ac < cp->numChildren && (hasMatched (cp->quants[ac], hm))) {
+            DBG(fprintf (stderr, "ac %d has matched, skiping to next ac\n", ac));
+            ac++; hm = 0;
+        }
+        while (ac < cp->numChildren) {
+            DBG(fprintf (stderr, "ac %d hm %d mayMiss: %d\n",
+                         ac, hm, mayMiss (cp->quants[ac])));
+            if (mayMiss (cp->quants[ac])) {
+                ac++; continue;
             }
-            while (ac < cp->numChildren) {
-                DBG(fprintf (stderr, "ac %d hm %d mustMatch: %d\n",
-                             ac, hm, mustMatch (cp->quants[ac], hm)));
-                if (cp->content[ac]->type == SCHEMA_CTYPE_TEXT
-                    && cp->content[ac]->numChildren) {
+            
+            switch (cp->content[ac]->type) {
+            case SCHEMA_CTYPE_TEXT:
+                if (cp->content[ac]->numChildren) {
                     if (!checkText (interp, cp->content[ac], "")) {
                         return 0;
                     }
-                } else if (cp->content[ac]->type != SCHEMA_CTYPE_CHOICE
-                           || !(cp->content[ac]->flags & MIXED_CONTENT)) {
-                    /* The text of MIXED_CONTENT is without constraint
-                     * and the empty string matches this. */
-                    if (mustMatch (cp->quants[ac], hm)) {
-                        return 0;
-                    }
                 }
-                ac ++;
-                hm = 0;
+                break;
+
+            case SCHEMA_CTYPE_CHOICE:
+                mayMiss = 0;
+                for (i = 0; i < cp->content[ac]->numChildren; i++) {
+                    if (mayMiss (cp->content[ac]->quants[i])) {
+                        mayMiss = 1;
+                        break;
+                    }
+                    ic = cp->content[ac]->content[i];
+                    switch (ic->type) {
+                    case SCHEMA_CTYPE_TEXT:
+                        if (ic->numChildren) {
+                            if (!checkText (interp, ic, "")) {
+                                continue;
+                            }
+                        }
+                        mayMiss = 1;
+                        break;
+
+                    case SCHEMA_CTYPE_CHOICE:
+                        /* Can't happen */
+                    case SCHEMA_CTYPE_INTERLEAVE:
+                        /* To do */
+                    case SCHEMA_CTYPE_NAME:
+                    case SCHEMA_CTYPE_ANY:
+                        continue;
+                        
+                    case SCHEMA_CTYPE_PATTERN:
+                        pushToStack (sdata, ic, deep);
+                        if (checkElementEnd (interp, sdata)) {
+                            mayMiss = 1;
+                        }
+                        popStack (sdata);
+                        break;
+                    }
+                    if (mayMiss) break;
+                }
+                if (mayMiss) {
+                    ac++; continue;
+                }
+                return 0;
+
+            case SCHEMA_CTYPE_PATTERN:
+                pushToStack (sdata, cp->content[ac], deep);
+                rc = checkElementEnd (interp, sdata);
+                popStack (sdata);
+                if (rc) {
+                    ac++; continue;
+                }
+                return 0;
+                
+            case SCHEMA_CTYPE_ANY:
+            case SCHEMA_CTYPE_NAME:
+                return 0;
+                
+            case SCHEMA_CTYPE_INTERLEAVE:
+                /* To do */
+                return 0;
             }
-            popStack (sdata);
-            if (isName) return 1;
-            continue;
-
-        case SCHEMA_CTYPE_CHOICE:
-        case SCHEMA_CTYPE_TEXT:
-        case SCHEMA_CTYPE_ANY:
-            /* Never pushed onto stack */
-            Tcl_Panic ("Invalid CTYPE onto the validation stack!");
-            return 0;
-
-        case SCHEMA_CTYPE_INTERLEAVE:
-            fprintf (stderr, "checkElementEnd: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
-            return 0;
+            ac++;
         }
+        if (isName) return 1;
+        return -1;
+
+    case SCHEMA_CTYPE_CHOICE:
+    case SCHEMA_CTYPE_TEXT:
+    case SCHEMA_CTYPE_ANY:
+        /* Never pushed onto stack */
+        Tcl_Panic ("Invalid CTYPE onto the validation stack!");
+        return 0;
+
+    case SCHEMA_CTYPE_INTERLEAVE:
+        fprintf (stderr, "checkElementEnd: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
+        return 0;
     }
     return 0;
 }
@@ -1211,6 +1266,8 @@ probeElementEnd (
     SchemaData *sdata
     )
 {
+    int rc;
+    
     DBG(
         fprintf (stderr, "probeElementEnd: look if current stack top can end "
                  " name: '%s' deep: %d\n",
@@ -1233,7 +1290,14 @@ probeElementEnd (
         return TCL_ERROR;
     }
 
-    if (checkElementEnd (interp, sdata)) {
+    rc = checkElementEnd (interp, sdata);
+    while (rc == -1) {
+        popStack (sdata);
+        rc = checkElementEnd (interp, sdata);
+    }
+
+    if (rc) {
+        popStack (sdata);
         if (sdata->stack == NULL) {
             /* End of the first pattern (the tree root) without error.
                We have successfully ended validation */
