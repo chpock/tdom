@@ -3039,6 +3039,126 @@ regexpTCObjCmd (
     return TCL_OK;
 }
 
+static int
+nmtokenImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    char *p;
+    int clen, tokenSeen = 0;
+
+    p = text;
+    /* Skip leading space */
+    while (*p && *p == ' ') {
+        p++;
+    }
+    while (*p && *p != ' ') {
+        clen = UTF8_CHAR_LEN (*p);
+        if (!clen) {
+            SetResult ("Invalid UTF-8 character");
+            return TCL_ERROR;
+        }
+        if (!UTF8_GET_NAMING_NMTOKEN (p, clen)) {
+            SetResult ("Attribute value isn't a NMTOKEN");
+            return TCL_ERROR;
+        }
+        tokenSeen = 1;
+        p += clen;
+    }
+    /* Skip following space */
+    while (*p && *p == ' ') {
+        p++;
+    }
+    if (*p) {
+        SetResult ("Attribute value isn't a NMTOKEN");
+        return TCL_ERROR;
+    }
+    if (!*p && !tokenSeen) {
+        SetResult ("Missing NMTOKEN value");
+        return TCL_ERROR;
+    }
+    return TCL_OK;
+}
+
+static int
+nmtokenTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+
+    CHECK_TI
+    CHECK_TOPLEVEL
+    checkNrArgs (1,1,"No arguments expected");
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = nmtokenImpl;
+    return TCL_OK;
+}
+
+static int
+nmtokensImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    char *p;
+    int clen, tokenSeen = 0;
+
+    p = text;
+    /* Skip leading space */
+    while (*p && *p == ' ') {
+        p++;
+    }
+    while (*p) {
+        if (*p == ' ') {
+            p++; continue;
+        }
+        clen = UTF8_CHAR_LEN (*p);
+        if (!clen) {
+            SetResult ("Invalid UTF-8 character");
+            return TCL_ERROR;
+        }
+        if (!UTF8_GET_NAMING_NMTOKEN (p, clen)) {
+            SetResult ("Invalid charcter: attribute value isn't a NMTOKENS");
+            return TCL_ERROR;
+        }
+        tokenSeen = 1;
+        p += clen;
+    }
+    /* Any following space is already skipped above */
+    if (!tokenSeen) {
+        SetResult ("Missing NMTOKENS value");
+        return TCL_ERROR;
+    }
+    return TCL_OK;
+}
+
+static int
+nmtokensTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+
+    CHECK_TI
+    CHECK_TOPLEVEL
+    checkNrArgs (1,1,"No arguments expected");
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = nmtokensImpl;
+    return TCL_OK;
+}
+
 void
 tDOM_SchemaInit (
     Tcl_Interp *interp
@@ -3098,6 +3218,10 @@ tDOM_SchemaInit (
                           matchTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::text::regexp",
                           regexpTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp, "tdom::schema::text::nmtoken",
+                          nmtokenTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp, "tdom::schema::text::nmtokens",
+                          nmtokensTCObjCmd, NULL, NULL);
 
 }
 

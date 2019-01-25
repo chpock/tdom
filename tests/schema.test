@@ -2445,5 +2445,38 @@ test schema-14.7 {text: regexp} {
     set result
 } {1 0 0 1 0}
 
+test schema-14.8 {text: nmtoken, nmtokens} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            attribute a {nmtoken}
+            attribute b {nmtokens}
+            attribute c ?
+        }
+    }
+    set result [list]
+    foreach xml {
+        {<doc a="foo" b="foo" c="something"/>}
+        {<doc a="foo" b="foo bar"/>}
+        {<doc a=".foo" b="f2o" c="something"/>}
+        {<doc a=":foo" b="fo:o b2/ar"/>}
+        {<doc b="foo bar"/>}
+        {<doc a="foo" b="  foo    bar  "/>}
+        {<doc a="  foo  " b="foo bar"/>}
+        {<doc a="foo " b="foo bar"/>}
+        {<doc a=" foo" b="foo bar"/>}
+        {<doc a="foo" b=" foo bar"/>}
+        {<doc a="foo" b="foo  bar"/>}
+        {<doc a="foo" b="foo bar "/>}
+        {<doc a="foo bar" b="foo bar"/>}
+        {<doc a="f&#xd7;o" b="foo bar"/>}
+        {<doc a="foo" b="foo b&#xf7;r"/>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 1 1 0 0 1 1 1 1 1 1 1 0 0 0}
+
 
 }
