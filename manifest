@@ -1,5 +1,5 @@
-C Got\srid\swith\sthe\svalidation\sstack\selement\sstruct\smember\sdeep\s-\sit\sisn't\sreally\sneeded\sfor\ssomething,\sso\sfar.
-D 2019-01-26T02:13:13.393
+C Use\sthe\snew\stext\sconstraint\scommands\snmtoken\sand\snmtokens\sin\sthe\sDTD\sto\stDOM\sschema\stranslation.
+D 2019-01-26T02:28:27.029
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -11,7 +11,7 @@ F Makefile.in f9a929edb51a25c57b13d98d6ee6c3ef324893108ecfb55ced8e3127617c7914
 F README 1b74b899ce95656b6a63039d0796b164e51a7317263cba9d67959b402dc2009e
 F README.AOL 34b4178830536f5183328420bc28b8063fbf6b598010ecf105c2ecfdbfc3ffa1
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
-F apps/toschema.tcl d51480aca21dab81b68df6ebaf6e240459ef12b654fe5974fde7490f719ac330
+F apps/toschema.tcl 26fbd344c2097f408ebd4242d6d699c92e8d99a6057e8ed8f558e1e94ee8a7d2
 F apps/xslt.tcl 64103132fbe0a1fbf61cf3506608cb7ea5cbfddd247d207d95d8e96a071e1846
 F configure 49f210e1e3c2bec44a47a2f0f48bc7b43ff9616d66ebad201c4778a26b621db7 x
 F configure.ac 8c2b9ba6172d837b6388bcab5ae0101e755435628b17f8db2c11ffc1f10258a0
@@ -229,8 +229,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 1b28fd0c1ead78227d09cba97cb4203185daee66193d9617f1e9e74cdc4dc655
-R 1d6197cf85bc8eb1d4197d956e0a0e4f
+P e99a1cbf9777bbe81d62d834c382601d43af5da341c26ac2b60237229bea5b62
+R 7c435f058be7961ab68d6cf0d3bd83c5
 U rolf
-Z 24ae54c2902a4ccfceddd2a059cf7d46
+Z 616b5d989a82087a19fc12ba1f1b3be8
 # Remove this line to create a well-formed Fossil manifest.

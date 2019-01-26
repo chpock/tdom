@@ -110,11 +110,15 @@ proc fromDTD_generate {} {
                 "IDREFS" -
                 "ENTITY" -
                 "ENTITIES" -
-                "NMTOKEN" -
-                "NMTOKENS" -
                 "NOTATION" {
                     # All above to be done
                     puts "[indent]$cmd [expr {$isRequired ? "" : "?"}]"
+                }
+                "NMTOKEN" {
+                    puts "[indent]$cmd [expr {$isRequired ? "" : "?"}] \{nmtoken\}"
+                }
+                "NMTOKENS" {
+                    puts "[indent]$cmd [expr {$isRequired ? "" : "?"}] \{nmtokens\}"
                 }
                 "CDATA" {
                     puts "[indent]$cmd [expr {$isRequired ? "" : "?"}]"
