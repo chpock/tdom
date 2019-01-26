@@ -337,7 +337,9 @@
       
       <commanddef>
         <command><cmd>tcl</cmd> <m>tclcmd</m> <m>?arg arg ...?</m></command>
-        <desc></desc>
+        <desc>Evaluates the tcl script <m>tclcmd arg arg ... /m> and
+        the text to validate appended to the argument list. The return
+        value of the tcl command is interpreted as a boolean.</desc>
       </commanddef>
       <commanddef>
         <command><cmd>enumeration</cmd> <m>list</m></command>

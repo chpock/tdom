@@ -92,7 +92,6 @@ typedef struct SchemaValidationStack
     struct SchemaValidationStack *next;
     struct SchemaValidationStack *down;
     int               activeChild;
-    int               deep;
     int               hasMatched;
 } SchemaValidationStack;
 

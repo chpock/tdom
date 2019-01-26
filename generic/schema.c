@@ -277,19 +277,31 @@ static void serializeQuant (
              Schema_Quant_Type2str[quant]);
 }
 
+static int getDeep (
+    SchemaValidationStack *se
+    )
+{
+    int i = 0;
+    while (se) {
+        if (se->pattern->type == SCHEMA_CTYPE_NAME) i++;
+        se = se->down;
+    }
+    return i;
+}
+    
 static void serializeStack (
     SchemaData *sdata
     )
 {
-    SchemaValidationStack *sp;
+    SchemaValidationStack *se;
 
     fprintf (stderr, "++++ Current validation stack:\n");
-    sp = sdata->stack;
-    while (sp) {
-        serializeCP (sp->pattern);
+    se = sdata->stack;
+    while (se) {
+        serializeCP (se->pattern);
         fprintf (stderr, "\tdeep: %d ac: %d hm: %d\n",
-                 sp->deep, sp->activeChild, sp->hasMatched);
-        sp = sp->down;
+                 getDeep (se), se->activeChild, se->hasMatched);
+        se = se->down;
     }
     fprintf (stderr, "++++ Stack bottom\n");
 }
@@ -575,8 +587,7 @@ addToContent (
 static void
 pushToStack (
     SchemaData *sdata,
-    SchemaCP *pattern,
-    int deep
+    SchemaCP *pattern
     )
 {
     SchemaValidationStack *stackElm, *se;
@@ -592,7 +603,6 @@ pushToStack (
     se = sdata->stack;
     stackElm->down = se;
     stackElm->pattern = pattern;
-    stackElm->deep = deep;
     sdata->stack = stackElm;
 }
 
@@ -673,13 +683,12 @@ matchElementStart (
 {
     SchemaCP *cp, *candidate, *jc;
     int hm, ac, j, mayskip, rc;
-    int isName = 0, deep;
+    int isName = 0;
     SchemaValidationStack *se;
 
     if (!sdata->stack) return 0;
     se = sdata->stack;
     getContext (cp, ac, hm);
-    deep = se->deep;
 
     switch (cp->type) {
     case SCHEMA_CTYPE_NAME:
@@ -710,7 +719,7 @@ matchElementStart (
                 if (candidate->name == name
                     && candidate->namespace == namespace) {
                     updateStack (se, cp, ac);
-                    pushToStack (sdata, candidate, deep + 1);
+                    pushToStack (sdata, candidate);
                     return 1;
                 }
                 break;
@@ -730,7 +739,7 @@ matchElementStart (
                     case SCHEMA_CTYPE_NAME:
                         if (jc->name == name
                             && jc->namespace == namespace) {
-                            pushToStack (sdata, jc, deep + 1);
+                            pushToStack (sdata, jc);
                             updateStack (se, cp, ac);
                             return 1;
                         }
@@ -744,7 +753,7 @@ matchElementStart (
                         return 0;
 
                     case SCHEMA_CTYPE_PATTERN:
-                        pushToStack (sdata, jc, deep);
+                        pushToStack (sdata, jc);
                         rc = matchElementStart (interp, sdata, name, namespace);
                         if (rc == 1) {
                             updateStack (se, cp, ac);
@@ -764,7 +773,7 @@ matchElementStart (
                 return 0;
 
             case SCHEMA_CTYPE_PATTERN:
-                pushToStack (sdata, candidate, deep);
+                pushToStack (sdata, candidate);
                 rc = matchElementStart (interp, sdata, name, namespace);
                 if (rc == 1) {
                     updateStack (se, cp, ac);
@@ -898,7 +907,7 @@ probeElement (
             SetResult ("Unknown element");
             return TCL_ERROR;
         }
-        pushToStack (sdata, pattern, 0);
+        pushToStack (sdata, pattern);
         sdata->validationState = VALIDATION_STARTED;
         return TCL_OK;
     }
@@ -1150,14 +1159,14 @@ static int checkElementEnd (
 {
     SchemaValidationStack *se;
     SchemaCP *cp, *ic;
-    int hm, ac, i, deep, mayMiss, rc;
+    int hm, ac, i, mayMiss, rc;
     int isName = 0;
 
     DBG(fprintf (stderr, "checkElementEnd:\n");
         serializeStack(sdata););
     se = sdata->stack;
     getContext (cp, ac, hm);
-    deep = se->deep;
+
     switch (cp->type) {
     case SCHEMA_CTYPE_NAME:
         isName = 1;
@@ -1210,7 +1219,7 @@ static int checkElementEnd (
                         continue;
                         
                     case SCHEMA_CTYPE_PATTERN:
-                        pushToStack (sdata, ic, deep);
+                        pushToStack (sdata, ic);
                         if (checkElementEnd (interp, sdata)) {
                             mayMiss = 1;
                         }
@@ -1225,7 +1234,7 @@ static int checkElementEnd (
                 return 0;
 
             case SCHEMA_CTYPE_PATTERN:
-                pushToStack (sdata, cp->content[ac], deep);
+                pushToStack (sdata, cp->content[ac]);
                 rc = checkElementEnd (interp, sdata);
                 popStack (sdata);
                 if (rc) {
@@ -1271,7 +1280,7 @@ probeElementEnd (
     DBG(
         fprintf (stderr, "probeElementEnd: look if current stack top can end "
                  " name: '%s' deep: %d\n",
-                 sdata->stack->pattern->name, sdata->stack->deep);
+                 sdata->stack->pattern->name, getDeep (sdata->stack));
         );
 
     if (sdata->skipDeep) {
@@ -1368,7 +1377,7 @@ matchText (
                             break;
 
                         case SCHEMA_CTYPE_PATTERN:
-                            pushToStack (sdata, candidate, se->deep);
+                            pushToStack (sdata, candidate);
                             if (matchText (interp, sdata, text)) {
                                 updateStack (se, cp, ac);
                                 return 1;
@@ -1390,7 +1399,7 @@ matchText (
                     break;
 
                 case SCHEMA_CTYPE_PATTERN:
-                    pushToStack (sdata, candidate, se->deep);
+                    pushToStack (sdata, candidate);
                     if (matchText (interp, sdata, text)) {
                         updateStack (se, cp, ac);
                         return 1;
