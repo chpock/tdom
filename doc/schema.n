@@ -165,16 +165,16 @@ tdom::schema \- Create a schema validation command
 .nf
 package require tdom
 
-    \fBtdom::schema\fP \fIcmdName\fR
+\&\fBtdom::schema\fP \fI?create?\fR \fIcmdName\fR
     
 .fi
 .BE
 .SH "DESCRIPTION "
 .PP
 This command creates validation commands with a simple API. The
-validation commands have methods to define a grammer and are able
+validation commands have methods to define a schema and are able
 to validate XML or DOM trees (and to some degree other kind of
-hierarchical data) against this grammer.
+hierarchical data) against this schema.
 .PP
 Additionally, a validation command may be used as argument to
 the \fI-validateCmd\fR option of the \fIdom parse\fR and the
@@ -185,7 +185,7 @@ The valid methods of the created commands are:
 .TP
 \&\fB\fBdefelement\fP \fIname\fB \fI?namespace?\fB \fI<definition script>\fB
 \&\fRThis method defines the element \fIname\fR (optional in
-the namespace \fInamespace\fR) in the grammar. The
+the namespace \fInamespace\fR) in the schema. The
 \&\fIdefinition script\fR is evaluated and defines the content
 model of the element. If the \fInamespace\fR argument is
 given, any \fIelement\fR or \fIref\fR references in the
@@ -194,10 +194,10 @@ command are resolved in that namespace. If there is already a
 element definition for the name/namespace combination the
 command raises error.
 .TP
-\&\fB\fBdefpattern\fP \fIname\fB \fI<definition script>\fB
+\&\fB\fBdefpattern\fP \fIname\fB \fI?namespace?\fB \fI<definition script>\fB
 \&\fRThis method defines a (maybe complex) content particle
 with the \fIname\fR (optional in the namespace
-\&\fInamespace\fR) in the grammar, to be referenced in other
+\&\fInamespace\fR) in the schema, to be referenced in other
 definition scripts with the definition command \fIref\fR. The
 \&\fIdefinition script\fR is evaluated and defines the content
 model of the content particle. If the \fInamespace\fR
@@ -209,7 +209,7 @@ command raises error.
 .TP
 \&\fB\fBdefine\fP \fI<definition script>\fB
 \&\fRThis method allows to define several elements or pattern
-or a whole grammar with one call.
+or a whole schema with one call.
 .TP
 \&\fB\fBstart\fP \fIdocumentElement\fB \fI?namespace?\fB
 \&\fRThis method defines the name and namespace of the root
@@ -225,8 +225,7 @@ element will be valid as root of a tree to validate.
 .TP
 \&\fB\fBevent\fP \fI(start|end|text)\fB \fI?event specific data?\fB
 \&\fRThis method allows to validate hierarchical data against
-the so far defined content constrains of the validation
-command.
+the content constrains of the validation command.
 .RS
 .IP "\fBstart  \fIname ?attributes? ?namespace? \fP\fR"
 Checks if the current validation state allows the
@@ -245,13 +244,25 @@ given text content. It raises error, if not.
 \&\fRReturns true if the \fI<XML string>\fR is valid or
 false otherwise. If validation failed and the optional
 \&\fIobjVar\fR argument is given, then the variable with that
-name is set to a validation error message.
+name is set to a validation error message. If the XML string
+is valid and the optional \fIobjVar\fR argument is given,
+then the variable with that name is set to the empty string.
+.TP
+\&\fB\fBdomvalidate\fP \fIdomNode\fB \fI?objVar?\fB
+\&\fRReturns true if the first argument is a valid tree or
+false otherwise. If validation failed and the optional
+\&\fIobjVar\fR argument is given, then the variable with that
+name is set to a validation error message. If the dom tree is
+valid and the optional \fIobjVar\fR argument is given, then
+the variable with that name is set to the empty string.
 .TP
 \&\fB\fBdelete\fP
 \&\fRThis method deletes the validation command.
 .TP
 \&\fB\fBstate\fP
-\&\fRThis method returns the state of the validation command with respect to validation state. The possible return values and their meanings are:
+\&\fRThis method returns the state of the validation command
+with respect to validation state. The possible return values
+and their meanings are:
 .RS
 .TP
 READY
@@ -273,20 +284,27 @@ READY (while preserving the defined grammer).
 .SH "Schema definition scripts"
 .PP
 Schema definition scripts are ordinary Tcl scripts that are
-evaluatend in the namespace tdom::schema. Several schema
+evaluatend in the namespace tdom::schema. The below listed schema
 definition commands in this tcl namespace allow to define a wide
 variety of document structures. Every schema definition command
-establish a validation constrain on the content which all has to
-match, leaving no unmatched content to render the content as
-valid.
+establish a validation constraint on the content which has to
+match or must be optional to render the content as valid. It is a
+validation error if the element in the XML source has additional
+(not matched) content.
 .PP
 The schema definition commands are:
 .TP
 \&\fB\fBelement\fP \fIname\fB \fI?quant?\fB \fI?<definition script>?\fB
-\&\fRThis command refers to the element defined with
-\&\fIdefelement\fR with the name \fIname\fR in the current context
-namespace. Forward references to a so far not defined element
-or recursive references are allowed.
+\&\fRIf the optional argument \fIdefinition script\fR isn't
+given this command refers to the element defined with
+\&\fIdefelement\fR with the name \fIname\fR in the current
+context namespace. If the \fIdefelement script\fR argument is
+given, then the validation constraint expects an element with
+the name \fIname\fR in the current namespace with content
+"locally" defined by the \fIdefinition script\fR. Forward
+references to so far not defined elements or pattern or other
+local definitions of the same name inside the \fIdefinition
+script\fR are allowed.
 .TP
 \&\fB\fBref\fP \fIname\fB \fI?quant?\fB
 \&\fRThis command refers to the content particle defined with
@@ -306,29 +324,36 @@ or recursive references are allowed.
 \&\fB\fBmixed\fP \fI?quant?\fB \fI<definition script>\fB
 \&\fR
 .TP
-\&\fB\fBtext\fP \fI<definition script>\fB
+\&\fB\fBtext\fP \fI?<constraint script>?\fB
+\&\fRWithout the optional constraint script this validation
+constraint matches every string (including the empty one).
+With \fIconstraint script\fR argument a text matching this
+script is expected.
+.TP
+\&\fB\fBany\fP \fI?quant?\fB
+\&\fRThe any command matches every element (with whatever
+attributes) or subtree, no matter if known within the schema
+or not. Please notice, that this mean the quantifier * and +
+will eat up any elements until the enclosing element
+ends.
+.TP
+\&\fB\fBattribute\fP \fIname\fB \fI?quant?\fB \fI?<constraint script>?\fB
 \&\fR
 .TP
-\&\fB\fBany\fP
+\&\fB\fBnsattribute\fP \fIname\fB \fInamespace\fB \fI?quant?\fB \fI?<constraint script>?\fB
 \&\fR
 .TP
-\&\fB\fBattribute\fP \fI<definition script>\fB
-\&\fR
-.TP
-\&\fB\fBnamespace\fP \fI<definition script>\fB
-\&\fR
-.TP
-\&\fB\fBempty\fP
-\&\fR
+\&\fB\fBnamespace\fP \fIuri\fB \fI<definition script>\fB
+\&\fREvaluates the \fIdefinition script\fR with context namespace \fIuri\fR.
 .TP
 \&\fB\fBdefelement\fP \fIname\fB \fI?namespace?\fB \fI<definition script>\fB
-\&\fR
+\&\fRThis command is not allowed nested in an other definition script command.
 .TP
 \&\fB\fBdefpattern\fP \fIname\fB \fI?namespace?\fB \fI<definition script>\fB
-\&\fR
+\&\fRThis command is not allowed nested in an other definition script command.
 .TP
 \&\fB\fBstart\fP \fIname\fB \fI?namespace?\fB
-\&\fR
+\&\fRThis command is not allowed nested in an other definition script command.
 .SH "Quantity specifier"
 .PP
 Serveral schema definition commands expects a quantifier as
@@ -337,7 +362,8 @@ particle specified by the command is expected. The valid values
 for a \fIquant\fR argument are:
 .IP "\fB!\fR"
 The content particle must occur exactly once in valid
-documents.
+documents. This is the default, if a quantifier is
+omitted.
 .IP "\fB?\fR"
 The content particle must occur at most once in valid
 documents.
@@ -357,9 +383,33 @@ n to m times (both inclusive) in a row in valid documents. The
 quantifier must be a tcl list with two elements. Both elements
 must be integers, with n >= 0 and n < m.
 .PP
-If an optional quantifier is missing then it defaults to ! -
-the content particle must occur exactly once in valid
-documents.
+If an optional quantifier is not given then it defaults to * in
+case of the mixed command and to ! for all other commands.
+.SH "Text constraint scripts"
+.PP
+.PP
+The text constraint commands are:
+.TP
+\&\fB\fBisint\fP
+\&\fR
+.TP
+\&\fB\fBfixed\fP \fIvalue\fB
+\&\fR
+.TP
+\&\fB\fBtcl\fP \fItclcmd\fB \fI?arg arg ...?\fB
+\&\fR
+.TP
+\&\fB\fBenumeration\fP \fIlist\fB
+\&\fR
+.TP
+\&\fB\fBmatch\fP \fIglob style match pattern\fB
+\&\fR
+.TP
+\&\fB\fBnmtoken\fP
+\&\fR
+.TP
+\&\fB\fBnmtokens\fP
+\&\fR
 .SH Exampels
 .PP
 .UR "https://www.w3.org/TR/xmlschema-0/"
@@ -443,8 +493,8 @@ A somewhat one-to-one translation of that into a tDOM schema
 defintion script would be:
 .CS
 
-tdom::schema grammar      
-grammar define {
+tdom::schema schema      
+schema define {
 
     # Purchase order schema for Example.com.
     # Copyright 2000 Example.com. All rights reserved.
@@ -536,8 +586,8 @@ A RELAX NG pattern for this could be written as follows:
 This schema definition script will do the same:
 .CS
 
-tdom::schema grammar      
-grammar define {
+tdom::schema schema      
+schema define {
     defelement addressBook {
         element card *
     }

@@ -1,5 +1,5 @@
-C Implemented\stext\sconstraint\scommands\snmtoken\sand\snmtokens.\sUseful\smostly\sfor\sDTD\sto\stDOM\sschema\stranslation.\sThe\scommands\sskip\sleading\sand\sfollowing\sspace\scharacters\sand\ssee\ssequences\sof\sspace\scharacters\sas\sone\sspace.\sIn\sother\swords:\sthey\sapply\sthe\srules\sof\swhat\sthe\sXML\srec\scalls\sattribute\svalue\snormalization\s(which\sthe\sXML\sparser\swould\sdo,\sif\she\swould\sknew\sthe\stype\sof\sthe\svalue)\son\sthe\svalue\sto\scheck\s(although\sthis\snormalization\sis\sdone\sno\smatter\sif\sthe\stext\sconstraint\scommand\sis\sused\sfor\san\sattribute\svalue\sor\spcdata\sbetween\stags).
-D 2019-01-25T16:50:53.837
+C A\sfew\sdocumentation\supdates\sand\sadditions.\sStartet\sa\slist\sof\stext\sconstraint\scommands.
+D 2019-01-26T01:33:30.977
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -39,9 +39,9 @@ F doc/manpage.css 3b4ec1d641048933a7e6bffc659de9519030a959
 F doc/pullparser.html 3afeaa6c3960776a6dfc09df4395aace9c73c05389861bf8de1ce5943f7cc73b
 F doc/pullparser.n 5f5672e8bb2dd221602040cd212234da6b6ed8c99c5daa60be9fa0c476529c09
 F doc/pullparser.xml 6032c1e8c8d001068c227601dba9860824f8acc709c87fd8e36ac4a596b6a2f2
-F doc/schema.html 80ef83796754291c711766737611654e4d00572bf2008296032768560c7e8ae8
-F doc/schema.n f4d53d233d1f86580e16b97f26b8f748892b56adcf76b0293f16e7d4070b70c4
-F doc/schema.xml a31e182e75f6430911bfc95ddb3ba084ee2b9f1968640d7f01feecb163e337ce
+F doc/schema.html 83227891b56308c7ed1f698bb1e931a35d407a8542840a3f9964ccd7e8679d1b
+F doc/schema.n 8679d22ba71ada70556a899e9377a736ca38bf441933b1d8d563e071fbcc1365
+F doc/schema.xml 9973c13e9847ec2000c7ecc3ba26a1ab68fc0be491da821623d87e20037d711d
 F doc/tDOM.xml 04db7d0ccfea39aae21f4fe07b8f05d5bff8a84193cfce2aa5faa2f42c076377
 F doc/tdomcmd.html 9b4d9ff443499554adf2346ff0efc0317a98bd6e1fc3fc79a6e476b71fe85fed
 F doc/tdomcmd.n c06a5ff035f16a2a52636b69d9ebe6ba84ff5101922ed27b551146c4d61d6cda
@@ -229,8 +229,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c30fa32733d890e65d3f3b932f243d4c07e71fa7e2bc721ad573d39b3712630d
-R 98a31013d38c334eac64bcbb35348ee5
+P a79cc50455c723400b6a45fdbda6c3937e29d8f506843ac589399418026d4973
+R 72651e8f999dab91deaaf061eb690b70
 U rolf
-Z 6b2eb75d8662a8d58e4e048a01ef0730
+Z ebfe4c1d02b40f75850fd79769806e4b
 # Remove this line to create a well-formed Fossil manifest.
