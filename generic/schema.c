@@ -682,6 +682,37 @@ checkText (
 }
 
 static int
+evalVirtual (
+    Tcl_Interp *interp,
+    SchemaCP *cp,
+    char *name,
+    char *namespace
+    )
+{
+    Tcl_Obj *nsObj, *nameObj;
+    int rc, bool;
+
+    nsObj = Tcl_NewStringObj(namespace, -1);
+    Tcl_IncrRefCount (nsObj);
+    nameObj = Tcl_NewStringObj(name, -1);
+    Tcl_IncrRefCount (nameObj);
+    cp->content[cp->numChildren-2] = (SchemaCP *) nsObj;
+    cp->content[cp->numChildren-1] = (SchemaCP *) nameObj;
+    rc = Tcl_EvalObjv (interp, cp->numChildren, (Tcl_Obj **) cp->content,
+                       TCL_EVAL_DIRECT | TCL_EVAL_GLOBAL);
+    Tcl_DecrRefCount (nameObj);
+    Tcl_DecrRefCount (nsObj);
+    if (rc != TCL_OK) {
+        return 0;
+    }
+    rc = Tcl_GetBooleanFromObj (interp, Tcl_GetObjResult (interp), &bool);
+    if (rc != TCL_OK) {
+        return 0;
+    }
+    return bool;
+}
+
+static int
 matchElementStart (
     Tcl_Interp *interp,
     SchemaData *sdata,
@@ -770,6 +801,11 @@ matchElementStart (
                         popStack (sdata);
                         if (!mayskip && rc == -1) mayskip = 1;
                         break;
+
+                    case SCHEMA_CTYPE_VIRTUAL:
+                        if (evalVirtual (interp, jc, namespace, name)) break;
+                        else return 0;
+                        
                     }
                     if (!mayskip && mayMiss (candidate->quants[j]))
                         mayskip = 1;
@@ -777,26 +813,9 @@ matchElementStart (
                 break;
 
             case SCHEMA_CTYPE_VIRTUAL:
-                nsObj = Tcl_NewStringObj(namespace, -1);
-                Tcl_IncrRefCount (nsObj);
-                nameObj = Tcl_NewStringObj(name, -1);
-                Tcl_IncrRefCount (nameObj);
-                cp->pattern[cp->numChildren-2] = nsObj;
-                cp->pattern[cp->numChildren-1] = nameObj;
-                rc = Tcl_EvalObjv (interp, cp->numChildren, (Tcl_Obj **) cp->content,
-                                   TCL_EVAL_DIRECT | TCL_EVAL_GLOBAL);
-                Tcl_DecrRefCount (nameObj);
-                Tcl_DecrRefCount (nsObj);
-                if (rc != TCL_OK) {
-                    return 0;
-                }
-                rc = Tcl_GetBooleanFromObj (interp, Tcl_GetObjResult (interp), &bool);
-                if (rc != TCL_OK) {
-                    return 0;
-                }
-                if (bool) break;
-                return 0;
-                
+                if (evalVirtual (interp, jc, namespace, name)) break;
+                else return 0;
+
             case SCHEMA_CTYPE_INTERLEAVE:
                 fprintf (stderr, "matchElementStart: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
                 return 0;
@@ -831,7 +850,8 @@ matchElementStart (
     case SCHEMA_CTYPE_INTERLEAVE:
         fprintf (stderr, "matchElementStart: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
         return 0;
-
+    }
+    
     return 0;
 }
 
@@ -1187,7 +1207,7 @@ static int checkElementEnd (
     SchemaData *sdata
     )
 {
-    SchemaValidationStack *se;
+    SchemaValidationStack *se, *tse;
     SchemaCP *cp, *ic;
     int hm, ac, i, mayMiss, rc;
     int isName = 0;
@@ -1255,21 +1275,35 @@ static int checkElementEnd (
                         }
                         popStack (sdata);
                         break;
+                        
+                    case SCHEMA_CTYPE_VIRTUAL:
+                        tse = se;
+                        while (tse->pattern->type != SCHEMA_CTYPE_NAME) {
+                            tse = tse->down;
+                        }
+                        if (evalVirtual (interp, ic, tse->pattern->namespace,
+                                         tse->pattern->name)) break;
+                        else return 0;
                     }
                     if (mayMiss) break;
                 }
-                if (mayMiss) {
-                    ac++; continue;
-                }
+                if (mayMiss) break;
                 return 0;
 
+            case SCHEMA_CTYPE_VIRTUAL:
+                tse = se;
+                while (tse->pattern->type != SCHEMA_CTYPE_NAME) {
+                    tse = tse->down;
+                }
+                if (evalVirtual (interp, cp, tse->pattern->namespace,
+                                 tse->pattern->name)) break;
+                else return 0;
+                
             case SCHEMA_CTYPE_PATTERN:
                 pushToStack (sdata, cp->content[ac]);
                 rc = checkElementEnd (interp, sdata);
                 popStack (sdata);
-                if (rc) {
-                    ac++; continue;
-                }
+                if (rc) break;
                 return 0;
                 
             case SCHEMA_CTYPE_ANY:
@@ -1285,6 +1319,7 @@ static int checkElementEnd (
         if (isName) return 1;
         return -1;
 
+    case SCHEMA_CTYPE_VIRTUAL:
     case SCHEMA_CTYPE_CHOICE:
     case SCHEMA_CTYPE_TEXT:
     case SCHEMA_CTYPE_ANY:
@@ -2777,7 +2812,10 @@ VirtualPatternObjCmd (
 
     CHECK_SI
     CHECK_TOPLEVEL
-    checkNrArgs (2,MAX_INT,"Expected: <tclcmd> ?arg? ?arg? ...");
+    if (objc < 2) {
+        SetResult ("Expected: <tclcmd> ?arg? ?arg? ...");
+        return TCL_ERROR;
+    }
 
     pattern = initSchemaCP (SCHEMA_CTYPE_VIRTUAL, NULL, NULL);
     REMEMBER_PATTERN (pattern)
@@ -3273,7 +3311,7 @@ tDOM_SchemaInit (
                           TextPatternObjCmd, NULL, NULL);
 
     /* The 'virtual' "tcl" definition command */
-    Tcl_CreateObjCommand (interp, "tdom::schema::text",
+    Tcl_CreateObjCommand (interp, "tdom::schema::tcl",
                           VirtualPatternObjCmd, NULL, NULL);
     
     /* The text constraint commands */
