@@ -229,6 +229,7 @@ initSchemaCP (
         /* content/quant will be allocated, if the cp in fact has
          * constraints */
         break;
+    case SCHEMA_CTYPE_VIRTUAL:
     case SCHEMA_CTYPE_ANY:
         /* Do nothing */
         break;
@@ -264,6 +265,7 @@ static void serializeCP (
         break;
     case SCHEMA_CTYPE_ANY:
     case SCHEMA_CTYPE_TEXT:
+    case SCHEMA_CTYPE_VIRTUAL:
         /* Do nothing */
         break;
     }
@@ -319,6 +321,12 @@ static void freeSchemaCP (
     switch (pattern->type) {
     case SCHEMA_CTYPE_ANY:
         /* do nothing */
+        break;
+    case SCHEMA_CTYPE_VIRTUAL:
+        for (i = 0; i < pattern->numChildren; i++) {
+            Tcl_DecrRefCount ((Tcl_Obj *)pattern->content[i]);
+        }
+        FREE (pattern->content);
         break;
     case SCHEMA_CTYPE_TEXT:
         for (i = 0; i < pattern->numChildren; i++) {
@@ -768,6 +776,27 @@ matchElementStart (
                 }
                 break;
 
+            case SCHEMA_CTYPE_VIRTUAL:
+                nsObj = Tcl_NewStringObj(namespace, -1);
+                Tcl_IncrRefCount (nsObj);
+                nameObj = Tcl_NewStringObj(name, -1);
+                Tcl_IncrRefCount (nameObj);
+                cp->pattern[cp->numChildren-2] = nsObj;
+                cp->pattern[cp->numChildren-1] = nameObj;
+                rc = Tcl_EvalObjv (interp, cp->numChildren, (Tcl_Obj **) cp->content,
+                                   TCL_EVAL_DIRECT | TCL_EVAL_GLOBAL);
+                Tcl_DecrRefCount (nameObj);
+                Tcl_DecrRefCount (nsObj);
+                if (rc != TCL_OK) {
+                    return 0;
+                }
+                rc = Tcl_GetBooleanFromObj (interp, Tcl_GetObjResult (interp), &bool);
+                if (rc != TCL_OK) {
+                    return 0;
+                }
+                if (bool) break;
+                return 0;
+                
             case SCHEMA_CTYPE_INTERLEAVE:
                 fprintf (stderr, "matchElementStart: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
                 return 0;
@@ -792,6 +821,7 @@ matchElementStart (
         if (isName) return 0;
         return -1;
 
+    case SCHEMA_CTYPE_VIRTUAL:
     case SCHEMA_CTYPE_CHOICE:
     case SCHEMA_CTYPE_TEXT:
     case SCHEMA_CTYPE_ANY:
@@ -801,7 +831,7 @@ matchElementStart (
     case SCHEMA_CTYPE_INTERLEAVE:
         fprintf (stderr, "matchElementStart: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
         return 0;
-    }
+
     return 0;
 }
 
@@ -2734,6 +2764,34 @@ TextPatternObjCmd (
 }
 
 static int
+VirtualPatternObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaCP *pattern;
+    int i;
+
+    CHECK_SI
+    CHECK_TOPLEVEL
+    checkNrArgs (2,MAX_INT,"Expected: <tclcmd> ?arg? ?arg? ...");
+
+    pattern = initSchemaCP (SCHEMA_CTYPE_VIRTUAL, NULL, NULL);
+    REMEMBER_PATTERN (pattern)
+        pattern->content = MALLOC (sizeof (Tcl_Obj*) * (objc +1));
+    for (i = 1; i < objc; i++) {
+        pattern->content[i-1] = (SchemaCP *) objv[i];
+        Tcl_IncrRefCount (objv[i]);
+    }
+    pattern->numChildren = objc + 1;
+    addToContent (sdata, pattern, SCHEMA_CQUANT_ONE, 0, 0);
+    return TCL_OK;
+}
+
+static int
 isintImpl (
     Tcl_Interp *interp,
     void *constraintData,
@@ -3214,6 +3272,10 @@ tDOM_SchemaInit (
     Tcl_CreateObjCommand (interp, "tdom::schema::text",
                           TextPatternObjCmd, NULL, NULL);
 
+    /* The 'virtual' "tcl" definition command */
+    Tcl_CreateObjCommand (interp, "tdom::schema::text",
+                          VirtualPatternObjCmd, NULL, NULL);
+    
     /* The text constraint commands */
     Tcl_CreateObjCommand (interp, "tdom::schema::text::isint",
                           isintTCObjCmd, NULL, NULL);
