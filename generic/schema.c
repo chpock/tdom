@@ -813,7 +813,7 @@ matchElementStart (
                 break;
 
             case SCHEMA_CTYPE_VIRTUAL:
-                if (evalVirtual (interp, jc, namespace, name)) break;
+                if (evalVirtual (interp, candidate, namespace, name)) break;
                 else return 0;
 
             case SCHEMA_CTYPE_INTERLEAVE:
@@ -1295,7 +1295,8 @@ static int checkElementEnd (
                 while (tse->pattern->type != SCHEMA_CTYPE_NAME) {
                     tse = tse->down;
                 }
-                if (evalVirtual (interp, cp, tse->pattern->namespace,
+                if (evalVirtual (interp, cp->content[ac],
+                                 tse->pattern->namespace,
                                  tse->pattern->name)) break;
                 else return 0;
                 

@@ -15,6 +15,7 @@
 #    schema-12.*: schemaCmd domvalidate
 #    schema-13.*: XML namespaces
 #    schema-14.*: text
+#    schema-15.*: Constraint cmd tcl
 #
 # Copyright (c) 2018 Rolf Ade.
 
@@ -2478,5 +2479,44 @@ test schema-14.8 {text: nmtoken, nmtokens} {
     set result
 } {1 1 1 0 0 1 1 1 1 1 1 1 0 0 0}
 
+test schema-15.1 {constraint cmd tcl} {
+    tdom::schema s
+    s define {
+        defelement a {
+            tcl append ::schema-15.1
+            element b
+            tcl append ::schema-15.1
+        }
+    }
+    set ::schema-15.1 ""
+    s validate {<a><b/></a>}
+    s delete
+    puts schema-15.1
+} {ba}
+
+proc schema-15.2-astart {args} {
+    append ::schema-15.2 astart
+}
+
+proc schema-15.2-aend {args} {
+    append ::schema-15.2 aend
+}
+
+test schema-15.2 {constraint cmd tcl} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element a *
+        }
+        defelement a {
+            element b text
+            element c text
+        }
+    }
+    set schema-15.2 ""
+    s validate {<doc><a><b>foo</b><c/></a>a><b></b><c>bar</c></a></doc>}
+    s delete
+    puts schema-15.2
+} {astartaendastartaend}
 
 }
