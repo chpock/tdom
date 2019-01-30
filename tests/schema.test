@@ -2489,10 +2489,11 @@ test schema-15.1 {constraint cmd tcl} {
         }
     }
     set ::schema-15.1 ""
-    s validate {<a><b/></a>}
+    set result [s validate {<a><b/></a>} msg]
     s delete
-    puts schema-15.1
-} {ba}
+    lappend result $msg ${::schema-15.1}
+    set result
+} {1 {} ba}
 
 proc schema-15.2-astart {args} {
     append ::schema-15.2 astart
@@ -2509,14 +2510,17 @@ test schema-15.2 {constraint cmd tcl} {
             element a *
         }
         defelement a {
-            element b text
-            element c text
+            tcl schema-15.2-astart
+            element b ! text
+            element c ! text
+            tcl schema-15.2-aend
         }
     }
     set schema-15.2 ""
-    s validate {<doc><a><b>foo</b><c/></a>a><b></b><c>bar</c></a></doc>}
+    set result [s validate {<doc><a><b>foo</b><c/></a><a><b></b><c>bar</c></a></doc>} msg]
     s delete
-    puts schema-15.2
-} {astartaendastartaend}
+    lappend result $msg ${schema-15.2}
+    set result
+} {1 {} astartaendastartaend}
 
 }

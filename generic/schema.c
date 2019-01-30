@@ -323,7 +323,7 @@ static void freeSchemaCP (
         /* do nothing */
         break;
     case SCHEMA_CTYPE_VIRTUAL:
-        for (i = 0; i < pattern->numChildren; i++) {
+        for (i = 0; i < pattern->numChildren - 2; i++) {
             Tcl_DecrRefCount ((Tcl_Obj *)pattern->content[i]);
         }
         FREE (pattern->content);
@@ -690,7 +690,7 @@ evalVirtual (
     )
 {
     Tcl_Obj *nsObj, *nameObj;
-    int rc, bool;
+    int rc;
 
     nsObj = Tcl_NewStringObj(namespace, -1);
     Tcl_IncrRefCount (nsObj);
@@ -705,11 +705,7 @@ evalVirtual (
     if (rc != TCL_OK) {
         return 0;
     }
-    rc = Tcl_GetBooleanFromObj (interp, Tcl_GetObjResult (interp), &bool);
-    if (rc != TCL_OK) {
-        return 0;
-    }
-    return bool;
+    return 1;
 }
 
 static int
@@ -813,7 +809,10 @@ matchElementStart (
                 break;
 
             case SCHEMA_CTYPE_VIRTUAL:
-                if (evalVirtual (interp, candidate, namespace, name)) break;
+                if (evalVirtual (interp, candidate, namespace, name)) {
+                    mayskip = 1;
+                    break;
+                }
                 else return 0;
 
             case SCHEMA_CTYPE_INTERLEAVE:
