@@ -1400,7 +1400,7 @@ matchText (
     )
 {
     SchemaCP *cp, *candidate, *ic;
-    SchemaValidationStack *se;
+    SchemaValidationStack *se, *tse;
     int ac, hm, isName = 0, i;
 
     while (1) {
@@ -1449,6 +1449,16 @@ matchText (
                             }
                             break;
 
+                        case SCHEMA_CTYPE_VIRTUAL:
+                            tse = se;
+                            while (tse->pattern->type != SCHEMA_CTYPE_NAME) {
+                                tse = tse->down;
+                            }
+                            if (!evalVirtual (interp, ic,
+                                              tse->pattern->namespace,
+                                              tse->pattern->name)) return 0;
+                            break;
+                            
                         case SCHEMA_CTYPE_CHOICE:
                             Tcl_Panic ("MIXED or CHOICE child of MIXED or CHOICE");
 
@@ -1476,6 +1486,15 @@ matchText (
                     }
                     break;
 
+                case SCHEMA_CTYPE_VIRTUAL:
+                    tse = se;
+                    while (tse->pattern->type != SCHEMA_CTYPE_NAME) {
+                        tse = tse->down;
+                    }
+                    if (!evalVirtual (interp, ic, tse->pattern->namespace,
+                                      tse->pattern->name)) return 0;
+                    break;
+                    
                 case SCHEMA_CTYPE_NAME:
                 case SCHEMA_CTYPE_ANY:
                     if (mustMatch (cp->quants[ac], hm)) {
@@ -1497,6 +1516,7 @@ matchText (
             popStack (sdata);
             continue;
 
+        case SCHEMA_CTYPE_VIRTUAL:
         case SCHEMA_CTYPE_CHOICE:
         case SCHEMA_CTYPE_TEXT:
         case SCHEMA_CTYPE_ANY:
