@@ -3320,6 +3320,108 @@ isodateTCObjCmd (
     return TCL_OK;
 }
 
+static int
+maxLengthImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    int maxlen = (int) constraintData;
+    int len = 0, clen;
+
+    while (*text != '\0') {
+        clen = UTF8_CHAR_LEN (*text);
+        if (!clen) {
+            SetResult ("Invalid UTF-8 character");
+            return TCL_ERROR;
+        }
+        len++;
+        if (len > maxlen) return TCL_ERROR;
+        text += clen;
+    }
+    return TCL_OK;
+}
+
+static int
+maxLengthTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+    int len;
+
+    CHECK_TI
+    CHECK_TOPLEVEL
+    checkNrArgs (2,2,"Expected: <maximal length as integer>");
+    if (Tcl_GetIntFromObj (interp, objv[1], &len) != TCL_OK) {
+        SetResult ("Expected: <maximal length as integer>");
+        return TCL_ERROR;
+    }
+    if (len < 1) {
+        SetResult ("The maximum length must be at least 1");
+    }
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = maxLengthImpl;
+    sc->constraintData = (void *)len;
+    return TCL_OK;
+}
+
+static int
+minLengthImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    int minlen = (int) constraintData;
+    int len = 0, clen;
+
+    while (*text != '\0') {
+        clen = UTF8_CHAR_LEN (*text);
+        if (!clen) {
+            SetResult ("Invalid UTF-8 character");
+            return TCL_ERROR;
+        }
+        len++;
+        if (len >= minlen) return TCL_OK;
+        text += clen;
+    }
+    return TCL_ERROR;
+}
+
+static int
+minLengthTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+    int len;
+
+    CHECK_TI
+    CHECK_TOPLEVEL
+    checkNrArgs (2,2,"Expected: <minimum length as integer>");
+    if (Tcl_GetIntFromObj (interp, objv[1], &len) != TCL_OK) {
+        SetResult ("Expected: <minimum length as integer>");
+        return TCL_ERROR;
+    }
+    if (len < 1) {
+        SetResult ("The minimum length must be at least 1");
+    }
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = minLengthImpl;
+    sc->constraintData = (void *)len;
+    return TCL_OK;
+}
+
 void
 tDOM_SchemaInit (
     Tcl_Interp *interp
@@ -3389,6 +3491,11 @@ tDOM_SchemaInit (
                           booleanTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::isodate",
                           isodateTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::maxLength",
+                          maxLengthTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::minLength",
+                          minLengthTCObjCmd, NULL, NULL);
 }
+
 
 #endif  /* #ifndef TDOM_NO_SCHEMA */

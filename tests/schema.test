@@ -2501,33 +2501,6 @@ test schema-14.8 {text: nmtoken, nmtokens} {
     set result
 } {1 1 1 0 0 1 1 1 1 1 1 1 0 0 0}
 
-test schema-14.10 {text: number} {
-    tdom::schema s
-    s define {
-        defelement doc {
-            text number
-        }
-    }
-    set result [list]
-    foreach xml {
-        <doc/>
-        <doc></doc>
-        <doc>foo</doc>
-        <doc>1</doc>
-        <doc>12</doc>
-        <doc>1234-12-31</doc>
-        <doc>-14.23</doc>
-        <doc>.777</doc>
-        <doc>-1.2e5</doc>
-        {<doc> -1.2e5 </doc>}
-        {<doc> -1.2e5 e</doc>}
-    } {
-        lappend result [s validate $xml]
-    }
-    s delete
-    set result
-} {0 0 0 1 1 0 1 1 1 1 0}
-
 test schema-14.9 {text: isodate} {
     tdom::schema s
     s define {
@@ -2557,5 +2530,85 @@ test schema-14.9 {text: isodate} {
     s delete
     set result
 } {0 0 0 0 0 1 0 0 1 1 1 0 0 0}
+
+test schema-14.10 {text: number} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            text number
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc></doc>
+        <doc>foo</doc>
+        <doc>1</doc>
+        <doc>12</doc>
+        <doc>1234-12-31</doc>
+        <doc>-14.23</doc>
+        <doc>.777</doc>
+        <doc>-1.2e5</doc>
+        {<doc> -1.2e5 </doc>}
+        {<doc> -1.2e5 e</doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 0 1 1 0 1 1 1 1 0}
+
+test schema-14.11 {text: maxLength} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            text {
+                maxLength 6
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc></doc>
+        <doc>foo</doc>
+        <doc>1</doc>
+        <doc>12</doc>
+        <doc>1234-12-31</doc>
+        <doc>-14.23</doc>
+        <doc>&#x1F46E;&#x1234;&#x1234;&#x1234;&#x1234;&#x1234;</doc>
+        <doc>&#x1F46E;&#x1234;&#x1234;&#x1234;&#x1234;&#x1234;&#x1F46E;</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 1 1 1 1 0 1 1 0}
+
+test schema-14.12 {text: maxLength} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            text {minLength 6}
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc></doc>
+        <doc>foo</doc>
+        <doc>1</doc>
+        <doc>12</doc>
+        <doc>1234-12-31</doc>
+        <doc>-14.23</doc>
+        <doc>&#x1F46E;&#x1234;&#x1234;&#x1234;&#x1234;</doc>
+        <doc>&#x1F46E;&#x1234;&#x1234;&#x1234;&#x1234;&#x1234;</doc>
+        <doc>&#x1F46E;&#x1234;&#x1234;&#x1234;&#x1234;&#x1234;&#x1F46E;</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 0 0 0 1 1 0 1 1}
 
 }
