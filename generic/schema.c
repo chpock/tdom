@@ -2013,7 +2013,7 @@ schemaInstanceCmd (
         break;
 
     case m_start:
-        if (objc < 3-i || objc > 3-i) {
+        if (objc < 3-i || objc > 4-i) {
             Tcl_WrongNumArgs (interp, 2-i, objv, "<documentElement>"
                               " ?<namespace>?");
             return TCL_ERROR;
@@ -2850,7 +2850,7 @@ VirtualPatternObjCmd (
 }
 
 static int
-isintImpl (
+integerImpl (
     Tcl_Interp *interp,
     void *constraintData,
     char *text
@@ -2865,7 +2865,7 @@ isintImpl (
 }
 
 static int
-isintTCObjCmd (
+integerTCObjCmd (
     ClientData clientData,
     Tcl_Interp *interp,
     int objc,
@@ -2879,7 +2879,7 @@ isintTCObjCmd (
     CHECK_TOPLEVEL
     checkNrArgs (1,1,"no argument expected");
     ADD_CONSTRAINT (sdata, sc)
-    sc->constraint = isintImpl;
+    sc->constraint = integerImpl;
     return TCL_OK;
 }
 
@@ -3284,6 +3284,158 @@ nmtokensTCObjCmd (
     return TCL_OK;
 }
 
+static int
+numberImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    double d;
+
+    if (Tcl_GetDouble (interp, text, &d) != TCL_OK) {
+        return TCL_ERROR;
+    }
+    return TCL_OK;
+}
+
+static int
+numberTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+
+    CHECK_TI
+    CHECK_TOPLEVEL
+    checkNrArgs (1,1,"No arguments expected");
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = numberImpl;
+    return TCL_OK;
+}
+
+static int
+booleanImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    int b;
+
+    if (Tcl_GetBoolean (interp, text, &b) != TCL_OK) {
+        return TCL_ERROR;
+    }
+    return TCL_OK;
+}
+
+static int
+booleanTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+
+    CHECK_TI
+    CHECK_TOPLEVEL
+    checkNrArgs (1,1,"No arguments expected");
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = booleanImpl;
+    return TCL_OK;
+}
+
+static int
+isodateImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    int i;
+
+    /* I know, it isn't that simple.  Provisional. */
+    if (*text < '1' || *text > '9') {
+        return TCL_ERROR;
+    }
+    text++;
+    for (i = 0; i < 3; i++) {
+        if (*text < '0' || *text > '9') {
+            return TCL_ERROR;
+        }
+        text++;
+    }
+    if (*text != '-') {
+        return TCL_ERROR;
+    }
+    text++;
+    if (*text == '0') {
+        text++;
+        if (*text < '1' || *text > '9') {
+            return TCL_ERROR;
+        }
+    } else if (*text == '1') {
+        text++;
+        if (*text < '0' || *text > '2') {
+            return TCL_ERROR;
+        }
+    }
+    text++;
+    if (*text != '-') {
+        return TCL_ERROR;
+    }
+    text++;
+    if (*text == '0') {
+        text++;
+        if (*text < '1' || *text > '9') {
+            return TCL_ERROR;
+        }
+    } else if (*text == '1' || *text == '2') {
+        text ++;
+        if (*text < '0' || *text > '9') {
+            return TCL_ERROR;
+        }
+    } else if (*text == '3') {
+        text ++;
+        if (*text != '0' && *text != '1') {
+            return TCL_ERROR;
+        }
+    } else {
+        return TCL_ERROR;
+    }
+    text++;
+    if (*text != '\0') {
+        return TCL_ERROR;
+    }
+    return TCL_OK;
+}
+
+static int
+isodateTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+
+    CHECK_TI
+    CHECK_TOPLEVEL
+    checkNrArgs (1,1,"No arguments expected");
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = isodateImpl;
+    return TCL_OK;
+}
+
 void
 tDOM_SchemaInit (
     Tcl_Interp *interp
@@ -3335,8 +3487,8 @@ tDOM_SchemaInit (
                           VirtualPatternObjCmd, NULL, NULL);
     
     /* The text constraint commands */
-    Tcl_CreateObjCommand (interp, "tdom::schema::text::isint",
-                          isintTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::integer",
+                          integerTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::text::tcl",
                           tclTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::text::fixed",
@@ -3351,7 +3503,12 @@ tDOM_SchemaInit (
                           nmtokenTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::text::nmtokens",
                           nmtokensTCObjCmd, NULL, NULL);
-
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::number",
+                          numberTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::boolean",
+                          booleanTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::isodate",
+                          isodateTCObjCmd, NULL, NULL);
 }
 
 #endif  /* #ifndef TDOM_NO_SCHEMA */

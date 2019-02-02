@@ -13,9 +13,20 @@ proc indent {} {
 }
 
 proc fromDTD_serialize {level type quant name content} {
+    variable nslookup
+    
     switch $type {
         "NAME" {
-            puts "[indent]element $name $quant"
+            set parts [split $name :]
+            if {[llength $parts] == 2 && [info exists nslookup([lindex $parts 0])]} {
+                puts "[indent]namespace $nslookup([lindex $parts 0]) {"
+                incr level
+                puts "[indent]element [lindex $parts 1] $quant"
+                incr level -1
+                puts "[indent]}"
+            } else {
+                puts "[indent]element $name $quant"
+            }
             return
         }
         "MIXED" {
@@ -49,6 +60,7 @@ proc fromDTD_generate {} {
     variable dtdStart
     variable dtdElements
     variable dtdAttributes
+    variable nslookup
     
     if {$dtdStart ne ""} {
         if {![info exists dtdElements($dtdStart)]} {
@@ -57,11 +69,14 @@ proc fromDTD_generate {} {
         }
         puts "start $dtdStart"
     }
+    set elements [lsort [array names dtdElements]]
+    set startInd [lsearch -exact $elements $dtdStart]
+    set elements [lreplace $elements $startInd $startInd]
+    set elements [linsert $elements 0 $dtdStart]
     set level 1
-    foreach name [lsort [array names dtdElements]] {
-        puts "defelement $name \{"
-        # First round to get possible namespace declarations
-        array unset nslookup
+    foreach name $elements {
+        # First round over attributes to get possible namespace
+        # declarations
         foreach {attkey attDef} [array get dtdAttributes $name,*] {
             lassign $attDef attname type default isRequired
             if {$attname eq "xmlns"} {
@@ -84,6 +99,31 @@ proc fromDTD_generate {} {
                 }
             }
         }
+        # Heuristic to get namespace right
+        set namespace ""
+        if {[info exists nslookup(:default)] && $nslookup(:default) ne ""} {
+            set namespace $nslookup(:default)
+        }
+        set parts [split $name ":"]
+        set schemaName $name
+        if {[llength $parts] == 2} {
+            set prefix [lindex $parts 0]
+            if {[info exists nslookup($prefix)]} {
+                set namespace $nslookup($prefix)
+                set schemaName [lindex $parts 1]
+            } else {
+                # Hmmm. Either dtd error or the namespace is
+                # defined somewhere on the ancestors. To be
+                # handled. TODO
+            }
+        }
+        if {$namespace ne ""} {
+            puts "defelement $schemaName $namespace \{"
+        } else {
+            puts "defelement $schemaName \{"
+        }
+        # Second round over attributes for the actualy attribute
+        # declarations.
         foreach {attkey attDef} [array get dtdAttributes $name,*] {
             lassign $attDef attname type default isRequired
             set parts [split $attname ":"]
@@ -175,6 +215,3 @@ proc fromDTD {file} {
 }
 
 fromDTD $argv
-if {[info exists dtdAttTypes]} {
-    puts [array names dtdAttTypes]
-}

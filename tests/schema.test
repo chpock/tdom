@@ -209,6 +209,29 @@ test schema-1.13 {define lots of elements} {
     s delete
 } {}
 
+test schema-1.14 {define start w/ namespace} {
+    tdom::schema create s
+    s start doc http://foo.bar
+    s defelement doc http://foo.bar {
+        element a
+        element b
+    }
+    foreach elm {a b} {
+        s defelement $elm http://foo.bar {}
+    }
+    set result [list]
+    foreach xml {
+        {<doc xmlns="http://foo.bar"><a/><b/></doc>}
+        {<a:doc xmlns:a="http://foo.bar"><a:a/><a:b/></a:doc>}
+        {<a:doc xmlns:a="http://foo.bar"><a xmlns="http://foo.bar"/><a:b/></a:doc>}
+        {<doc><a/><b/></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 1 1 0}
+        
 test schema-2.1 {grammar definition: ref} {
     tdom::schema create grammar
     grammar defpattern thisPattern {
@@ -2265,11 +2288,11 @@ test schema-13.2 {XML namespaces} {
     set result
 } {0 0 0 0 1}
 
-test schema-14.1 {text: isint} {
+test schema-14.1 {text: integer} {
     tdom::schema s
     s defelement doc {
         text {
-            isint
+            integer
         }
     }
     set result [list]
@@ -2478,6 +2501,63 @@ test schema-14.8 {text: nmtoken, nmtokens} {
     s delete
     set result
 } {1 1 1 0 0 1 1 1 1 1 1 1 0 0 0}
+
+test schema-14.9 {text: isodate} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            text isodate
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc></doc>
+        <doc>foo</doc>
+        <doc>1</doc>
+        <doc>12</doc>
+        <doc>1234-12-31</doc>
+        <doc>1234-14-31</doc>
+        <doc>1234-12-00</doc>
+        <doc>1234-02-31</doc>
+        <doc>1234-02-01</doc>
+        <doc>1234-08-10</doc>
+        <doc>1234-08-222</doc>
+        {<doc> 1234-08-22</doc>}
+        {<doc>1234-08-22 </doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 0 0 0 1 0 0 1 1 1 0 0 0}
+
+test schema-14.10 {text: number} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            text number
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc></doc>
+        <doc>foo</doc>
+        <doc>1</doc>
+        <doc>12</doc>
+        <doc>1234-12-31</doc>
+        <doc>-14.23</doc>
+        <doc>.777</doc>
+        <doc>-1.2e5</doc>
+        {<doc> -1.2e5 </doc>}
+        {<doc> -1.2e5 e</doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 0 1 1 0 1 1 1 1 0}
 
 test schema-15.1 {constraint cmd tcl} {
     tdom::schema s
