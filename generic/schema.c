@@ -1928,7 +1928,7 @@ schemaInstanceCmd (
         break;
 
     case m_start:
-        if (objc < 3-i || objc > 3-i) {
+        if (objc < 3-i || objc > 4-i) {
             Tcl_WrongNumArgs (interp, 2-i, objv, "<documentElement>"
                               " ?<namespace>?");
             return TCL_ERROR;

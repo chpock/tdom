@@ -208,6 +208,29 @@ test schema-1.13 {define lots of elements} {
     s delete
 } {}
 
+test schema-1.14 {define start w/ namespace} {
+    tdom::schema create s
+    s start doc http://foo.bar
+    s defelement doc http://foo.bar {
+        element a
+        element b
+    }
+    foreach elm {a b} {
+        s defelement $elm http://foo.bar {}
+    }
+    set result [list]
+    foreach xml {
+        {<doc xmlns="http://foo.bar"><a/><b/></doc>}
+        {<a:doc xmlns:a="http://foo.bar"><a:a/><a:b/></a:doc>}
+        {<a:doc xmlns:a="http://foo.bar"><a xmlns="http://foo.bar"/><a:b/></a:doc>}
+        {<doc><a/><b/></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 1 1 0}
+        
 test schema-2.1 {grammar definition: ref} {
     tdom::schema create grammar
     grammar defpattern thisPattern {
