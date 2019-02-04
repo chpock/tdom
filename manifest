@@ -1,5 +1,5 @@
-C Fixed\sserialization\soption\s-escapeNonASCII\son\sbig\sendian\ssystems.
-D 2019-01-24T12:24:58.718
+C Fix\sfor\s[13133c46dc75ed].\sWhile\sat\sit\smade\sall\sproc\snames\sin\stdom.lib\sabsolute.
+D 2019-02-04T22:11:50.761
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -144,7 +144,7 @@ F generic/tdominit.c f7fc5a95861b5f6c938001923fae846c931cd05f6c13a1808224dc50763
 F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
 F generic/xmlsimple.c be39c8ff62d31e70ddcac4e5afa05797ee1971d2ada0a670648e74b47b3074d2
 F generic/xmlsimple.h 3cb9d055e60643afcdfe9ab407adf1e8bb5dbafb
-F lib/tdom.tcl 69a0424565ec40099b4785e76cb35c455d4623da0c862b4a20307a19b5baad16
+F lib/tdom.tcl 09d732922620415020cdb362b92b05c97e008191e6a12ddc88269f5f5a5c698e
 F macosx/README 75fe1f6617f6cb7e4480cff5367b5c26fcd8dd207e2321f35dceebafccf4c99c
 F pkgIndex.tcl.in d6950e16450800b84d1c3161e30090bb8838346e1f6cb8d16bee910900c223f0
 F tclconfig/README.txt 180f4215d59309ec5645aa5f4565557dac484945
@@ -222,9 +222,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 4fca08944c65199476bc5185e18280e5bfe743a22a0d5c4472b49287b077edad 6722cfb2c4fc26f33c2002212182e8c7fcb07eb60a39377c8a69d6f3f7f351e9
-R a90d9d8daa71b6c9e0c424f689b605a7
-T +closed 6722cfb2c4fc26f33c2002212182e8c7fcb07eb60a39377c8a69d6f3f7f351e9
+P d2b2e909087a03fd074207726130e139b308c57be3cfed22a996c1fbf4d074a2
+R 007d9439f2484373fbb6f8fbb6c86a14
 U rolf
-Z 1d111dca2873db7fbb62567bf1fea6b3
+Z 00cdaed7e0eb1ca8e9428eec0e13e1c8
 # Remove this line to create a well-formed Fossil manifest.
