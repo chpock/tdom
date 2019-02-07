@@ -3200,60 +3200,59 @@ isodateImpl (
     char *text
     )
 {
-    int i;
+    int i, y, m, d;
 
-    /* I know, it isn't that simple.  Provisional. */
-    if (*text < '1' || *text > '9') {
-        return TCL_ERROR;
-    }
-    text++;
-    for (i = 0; i < 3; i++) {
-        if (*text < '0' || *text > '9') {
-            return TCL_ERROR;
-        }
+    if (*text == '-') {
+        /* A bce date */
         text++;
     }
-    if (*text != '-') {
-        return TCL_ERROR;
-    }
-    text++;
-    if (*text == '0') {
+    for (i = 0; i < 4; i++) {
+        if (*text < '0' || *text > '9') return TCL_ERROR;
         text++;
-        if (*text < '1' || *text > '9') {
-            return TCL_ERROR;
-        }
-    } else if (*text == '1') {
+    }
+    if (*text != '-') return TCL_ERROR;
+    y = atoi(text-4);
+    /* There isn't a year 0. it's either 0001 or -0001 */
+    if (y == 0) return TCL_ERROR;
+    text++;
+    for (i = 0; i < 2; i++) {
+        if (*text < '0' || *text > '9') return TCL_ERROR;
         text++;
-        if (*text < '0' || *text > '2') {
-            return TCL_ERROR;
-        }
     }
+    if (*text != '-') return TCL_ERROR;
+    m = atoi(text-2);
+    if (m < 1 || m > 12) return TCL_ERROR;
     text++;
-    if (*text != '-') {
-        return TCL_ERROR;
-    }
-    text++;
-    if (*text == '0') {
+    for (i = 0; i < 2; i++) {
+        if (*text < '0' || *text > '9') return TCL_ERROR;
         text++;
-        if (*text < '1' || *text > '9') {
-            return TCL_ERROR;
-        }
-    } else if (*text == '1' || *text == '2') {
-        text ++;
-        if (*text < '0' || *text > '9') {
-            return TCL_ERROR;
-        }
-    } else if (*text == '3') {
-        text ++;
-        if (*text != '0' && *text != '1') {
-            return TCL_ERROR;
-        }
-    } else {
-        return TCL_ERROR;
     }
-    text++;
-    if (*text != '\0') {
-        return TCL_ERROR;
+    if (*text != '\0') return TCL_ERROR;
+    d = atoi(text-2);
+    if (d < 1) return TCL_ERROR;
+    switch (m) {
+    case 1:
+    case 3:
+    case 5:
+    case 7:
+    case 8:
+    case 10:
+    case 12:
+        if (d > 31) return TCL_ERROR;
+        break;
+    case 4:
+    case 6:
+    case 9:
+    case 11:
+        if (d > 30) return TCL_ERROR;
+        break;
+    case 2:
+        if (y % 4 == 0 && (y % 100 != 0 || y % 400 == 0)) {
+            if (d > 29) return TCL_ERROR;
+        } else {
+            if (d > 28) return TCL_ERROR;
+        }
+        break;
     }
     return TCL_OK;
 }
