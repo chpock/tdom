@@ -1686,11 +1686,11 @@ test schema-9.5 {choice as choice child} {
     set result [list]
     foreach xml {
         <doc/>
-        {<doc><e1/></doc>}
-        {<doc><e2/><e3/></doc>}
-        {<doc><e2/></doc>}
-        {<doc><e3/></doc>}
-        {<doc><e4></doc>}
+        <doc><e1/></doc>
+        <doc><e2/><e3/></doc>
+        <doc><e2/></doc>
+        <doc><e3/></doc>
+        <doc><e4></doc>
     } {
         lappend result [grammar validate $xml]
     }
@@ -2610,5 +2610,66 @@ test schema-14.12 {text: maxLength} {
     s delete
     set result
 } {0 0 0 0 0 1 1 0 1 1}
+
+test schema-14.13 {text: two constraints} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            text {
+                minLength 6
+                maxLength 8
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc>foo</doc>
+        <doc>1</doc>
+        <doc>12</doc>
+        <doc>1234-12-31</doc>
+        <doc>-14.23</doc>
+        <doc>&#x1F46E;&#x1234;&#x1234;&#x1234;&#x1234;</doc>
+        <doc>&#x1F46E;&#x1234;&#x1234;&#x1234;&#x1234;&#x1234;</doc>
+        <doc>&#x1F46E;&#x1234;&#x1234;&#x1234;&#x1234;&#x1234;&#x1F46E;</doc>
+        <doc>1234567890</doc>
+        <doc>12345678901234567890</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 0 0 1 0 1 1 0 0}
+
+test schema-14.14 {text: one of two types} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            choice {
+                text {
+                    minLength 1
+                    maxLength 3
+                }
+                text {isodate}
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc></doc>
+        <doc>foo</doc>
+        <doc>1</doc>
+        <doc>12</doc>
+        <doc>1234-12-31</doc>
+        <doc>-14.23</doc>
+        <doc>&#x1F46E;&#x1234;&#x1234;&#x1234;&#x1234;</doc>
+        <doc>1234-12</doc>
+        <doc>12345678901234567890</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 1 1 1 1 0 0 0 0}
 
 }

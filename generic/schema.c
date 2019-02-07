@@ -241,8 +241,8 @@ static void serializeCP (
     SchemaCP *pattern
     )
 {
-    fprintf (stderr, "CP type: %s\n",
-             Schema_CP_Type2str[pattern->type]);
+    fprintf (stderr, "CP %p type: %s\n",
+             pattern, Schema_CP_Type2str[pattern->type]);
     switch (pattern->type) {
     case SCHEMA_CTYPE_NAME:
     case SCHEMA_CTYPE_PATTERN:
@@ -499,7 +499,7 @@ addToContent (
             if (pattern->flags & MIXED_CONTENT) {
                 sdata->currentCP->flags |= MIXED_CONTENT;
             }
-            wrapperCP = initSchemaCP (SCHEMA_CTYPE_PATTERN,NULL, NULL);
+            wrapperCP = initSchemaCP (SCHEMA_CTYPE_PATTERN, NULL, NULL);
             REMEMBER_PATTERN (wrapperCP);
             wrapperCP->content[0] = pattern;
             wrapperCP->quants[0] = SCHEMA_CQUANT_ONE;
@@ -507,7 +507,7 @@ addToContent (
             pattern = wrapperCP;
         }
         if (quant != SCHEMA_CQUANT_ONE) {
-            wrapperCP = initSchemaCP (SCHEMA_CTYPE_PATTERN,NULL, NULL);
+            wrapperCP = initSchemaCP (SCHEMA_CTYPE_PATTERN, NULL, NULL);
             REMEMBER_PATTERN (wrapperCP);
             if (sdata->numChildren == sdata->contentSize) {
                 sdata->currentContent =
@@ -568,7 +568,7 @@ addToContent (
                          * sizeof (SchemaQuant));
             sdata->contentSize *= 2;
         }
-        sdata->currentContent[sdata->numChildren] = (pattern);
+        sdata->currentContent[sdata->numChildren] = pattern;
         sdata->currentQuants[sdata->numChildren] = quant;
         sdata->numChildren++;
     }
@@ -1338,6 +1338,8 @@ matchText (
     SchemaValidationStack *se;
     int ac, hm, isName = 0, i;
 
+    DBG(fprintf (stderr, "matchText called with text '%s'\n", text));
+    
     while (1) {
         se = sdata->stack;
         getContext (cp, ac, hm);
@@ -1377,11 +1379,12 @@ matchText (
                             break;
 
                         case SCHEMA_CTYPE_PATTERN:
-                            pushToStack (sdata, candidate);
+                            pushToStack (sdata, ic);
                             if (matchText (interp, sdata, text)) {
                                 updateStack (se, cp, ac);
                                 return 1;
                             }
+                            popStack (sdata);
                             break;
 
                         case SCHEMA_CTYPE_CHOICE:
@@ -2712,6 +2715,7 @@ TextPatternObjCmd (
     )
 {
     SchemaData *sdata = GETASI;
+    SchemaQuant quant = SCHEMA_CQUANT_OPT;
     SchemaCP *pattern;
 
     CHECK_SI
@@ -2719,7 +2723,8 @@ TextPatternObjCmd (
     checkNrArgs (1,2,"?<definition script>?");
     pattern = initSchemaCP (SCHEMA_CTYPE_TEXT, NULL, NULL);
     REMEMBER_PATTERN (pattern)
-    addToContent (sdata, pattern, SCHEMA_CQUANT_OPT, 0, 0);
+    if (objc == 2) quant = SCHEMA_CQUANT_ONE;
+    addToContent (sdata, pattern, quant, 0, 0);
     
     if (objc == 2) {
         pattern->content = (SchemaCP**) MALLOC (
@@ -3327,7 +3332,7 @@ maxLengthImpl (
     char *text
     )
 {
-    int maxlen = (int) constraintData;
+    long maxlen = (long) constraintData;
     int len = 0, clen;
 
     while (*text != '\0') {
@@ -3353,12 +3358,12 @@ maxLengthTCObjCmd (
 {
     SchemaData *sdata = GETASI;
     SchemaConstraint *sc;
-    int len;
+    long len;
 
     CHECK_TI
     CHECK_TOPLEVEL
     checkNrArgs (2,2,"Expected: <maximal length as integer>");
-    if (Tcl_GetIntFromObj (interp, objv[1], &len) != TCL_OK) {
+    if (Tcl_GetLongFromObj (interp, objv[1], &len) != TCL_OK) {
         SetResult ("Expected: <maximal length as integer>");
         return TCL_ERROR;
     }
@@ -3378,7 +3383,7 @@ minLengthImpl (
     char *text
     )
 {
-    int minlen = (int) constraintData;
+    long minlen = (long) constraintData;
     int len = 0, clen;
 
     while (*text != '\0') {
@@ -3404,12 +3409,12 @@ minLengthTCObjCmd (
 {
     SchemaData *sdata = GETASI;
     SchemaConstraint *sc;
-    int len;
+    long len;
 
     CHECK_TI
     CHECK_TOPLEVEL
     checkNrArgs (2,2,"Expected: <minimum length as integer>");
-    if (Tcl_GetIntFromObj (interp, objv[1], &len) != TCL_OK) {
+    if (Tcl_GetLongFromObj (interp, objv[1], &len) != TCL_OK) {
         SetResult ("Expected: <minimum length as integer>");
         return TCL_ERROR;
     }
