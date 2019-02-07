@@ -81,7 +81,7 @@ typedef struct SchemaCP
     SchemaFlags       flags;
     struct SchemaCP **content;
     SchemaQuant      *quants;
-    unsigned int      numChildren;
+    unsigned int      nc;
     SchemaAttr      **attrs;
     unsigned int      numAttr;
     unsigned int      numReqAttr;
@@ -125,10 +125,7 @@ typedef struct
     int   defineToplevel;
     int   isTextConstraint;
     int   isAttributeConstaint;
-    SchemaCP *currentCP;
-    SchemaCP **currentContent;
-    SchemaQuant *currentQuants;
-    unsigned int numChildren;
+    SchemaCP *cp;
     unsigned int contentSize;
     SchemaAttr **currentAttrs;
     unsigned int numAttr;

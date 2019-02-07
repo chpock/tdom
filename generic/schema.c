@@ -183,20 +183,20 @@ static void SetActiveSchemaData (SchemaData *v)
 #define ADD_CONSTRAINT(sdata, sc)                                       \
     sc = TMALLOC (SchemaConstraint);                                    \
     memset (sc, 0, sizeof (SchemaConstraint));                          \
-    if (sdata->numChildren == sdata->contentSize) {                     \
-        sdata->currentContent =                                         \
-            REALLOC (sdata->currentContent,                             \
+    if (sdata->cp->nc == sdata->contentSize) {                          \
+        sdata->cp->content =                                            \
+            REALLOC (sdata->cp->content,                                \
                      2 * sdata->contentSize                             \
                      * sizeof (SchemaCP*));                             \
-        sdata->currentQuants =                                          \
-            REALLOC (sdata->currentQuants,                              \
+        sdata->cp->quants =                                             \
+            REALLOC (sdata->cp->quants,                                 \
                      2 * sdata->contentSize                             \
                      * sizeof (SchemaQuant));                           \
         sdata->contentSize *= 2;                                        \
     }                                                                   \
-    sdata->currentContent[sdata->numChildren] = (SchemaCP *) sc;        \
-    sdata->currentQuants[sdata->numChildren] = SCHEMA_CQUANT_ONE;       \
-    sdata->numChildren++;                                               \
+    sdata->cp->content[sdata->cp->nc] = (SchemaCP *) sc;                \
+    sdata->cp->quants[sdata->cp->nc] = SCHEMA_CQUANT_ONE;               \
+    sdata->cp->nc++;                                                    \
 
 static SchemaCP*
 initSchemaCP (
@@ -242,8 +242,8 @@ static void serializeCP (
     SchemaCP *pattern
     )
 {
-    fprintf (stderr, "CP type: %s\n",
-             Schema_CP_Type2str[pattern->type]);
+    fprintf (stderr, "CP %p type: %s\n",
+             pattern, Schema_CP_Type2str[pattern->type]);
     switch (pattern->type) {
     case SCHEMA_CTYPE_NAME:
     case SCHEMA_CTYPE_PATTERN:
@@ -323,13 +323,13 @@ static void freeSchemaCP (
         /* do nothing */
         break;
     case SCHEMA_CTYPE_VIRTUAL:
-        for (i = 0; i < pattern->numChildren - 2; i++) {
+        for (i = 0; i < pattern->nc - 2; i++) {
             Tcl_DecrRefCount ((Tcl_Obj *)pattern->content[i]);
         }
         FREE (pattern->content);
         break;
     case SCHEMA_CTYPE_TEXT:
-        for (i = 0; i < pattern->numChildren; i++) {
+        for (i = 0; i < pattern->nc; i++) {
             sc = (SchemaConstraint *) pattern->content[i];
             if (sc->freeData) {
                 (sc->freeData) (sc->constraintData);
@@ -498,96 +498,85 @@ addToContent (
     )
 {
     SchemaCP *wrapperCP;
-    SchemaCP **savedCurrentContent;
-    SchemaQuant *savedCurrentQuants;
-    unsigned int savedNumChildren, savedContenSize;
+    SchemaCP *savedCP = NULL;
+    unsigned int savedContenSize;
 
-    if (sdata->currentCP->type == SCHEMA_CTYPE_CHOICE) {
+    if (sdata->cp->type == SCHEMA_CTYPE_CHOICE) {
         if (pattern->type == SCHEMA_CTYPE_CHOICE) {
             if (pattern->flags & MIXED_CONTENT) {
-                sdata->currentCP->flags |= MIXED_CONTENT;
+                sdata->cp->flags |= MIXED_CONTENT;
             }
-            wrapperCP = initSchemaCP (SCHEMA_CTYPE_PATTERN,NULL, NULL);
+            wrapperCP = initSchemaCP (SCHEMA_CTYPE_PATTERN, NULL, NULL);
             REMEMBER_PATTERN (wrapperCP);
             wrapperCP->content[0] = pattern;
             wrapperCP->quants[0] = SCHEMA_CQUANT_ONE;
-            wrapperCP->numChildren = 1;
+            wrapperCP->nc = 1;
             pattern = wrapperCP;
         }
         if (quant != SCHEMA_CQUANT_ONE) {
-            wrapperCP = initSchemaCP (SCHEMA_CTYPE_PATTERN,NULL, NULL);
+            wrapperCP = initSchemaCP (SCHEMA_CTYPE_PATTERN, NULL, NULL);
             REMEMBER_PATTERN (wrapperCP);
-            if (sdata->numChildren == sdata->contentSize) {
-                sdata->currentContent =
-                    REALLOC (sdata->currentContent,
+            if (sdata->cp->nc == sdata->contentSize) {
+                sdata->cp->content =
+                    REALLOC (sdata->cp->content,
                              2 * sdata->contentSize
                              * sizeof (SchemaCP*));
-                sdata->currentQuants =
-                    REALLOC (sdata->currentQuants,
+                sdata->cp->quants =
+                    REALLOC (sdata->cp->quants,
                              2 * sdata->contentSize
                              * sizeof (SchemaQuant));
                 sdata->contentSize *= 2;
             }
-            sdata->currentContent[sdata->numChildren] = wrapperCP;
-            sdata->currentQuants[sdata->numChildren] = SCHEMA_CQUANT_ONE;
-            sdata->numChildren++;
-            savedCurrentContent = sdata->currentContent;
-            savedCurrentQuants = sdata->currentQuants;
-            savedNumChildren = sdata->numChildren;
+            sdata->cp->content[sdata->cp->nc] = wrapperCP;
+            sdata->cp->quants[sdata->cp->nc] = SCHEMA_CQUANT_ONE;
+            sdata->cp->nc++;
+            savedCP = sdata->cp;
             savedContenSize = sdata->contentSize;
-            sdata->currentContent = wrapperCP->content;
-            sdata->currentQuants = wrapperCP->quants;
-            sdata->numChildren = 0;
+            sdata->cp = wrapperCP;
             sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
         }
     }
     if (quant == SCHEMA_CQUANT_NM) {
         int i;
         int newChilds = (n >= m) ? n : m;
-        while (sdata->numChildren + newChilds >= sdata->contentSize) {
-            sdata->currentContent =
-                REALLOC (sdata->currentContent,
+        while (sdata->cp->nc + newChilds >= sdata->contentSize) {
+            sdata->cp->content =
+                REALLOC (sdata->cp->content,
                          2 * sdata->contentSize
                          * sizeof (SchemaCP*));
-            sdata->currentQuants =
-                REALLOC (sdata->currentQuants,
+            sdata->cp->quants =
+                REALLOC (sdata->cp->quants,
                          2 * sdata->contentSize
                          * sizeof (SchemaQuant));
             sdata->contentSize *= 2;
         }
         for (i = 0; i < n; i++) {
-            sdata->currentContent[sdata->numChildren+i] = pattern;
-            sdata->currentQuants[sdata->numChildren+i] = SCHEMA_CQUANT_ONE;
+            sdata->cp->content[sdata->cp->nc+i] = pattern;
+            sdata->cp->quants[sdata->cp->nc+i] = SCHEMA_CQUANT_ONE;
         }
         for (i = n; i < m; i++) {
-            sdata->currentContent[sdata->numChildren+i] = pattern;
-            sdata->currentQuants[sdata->numChildren+i] = SCHEMA_CQUANT_OPT;
+            sdata->cp->content[sdata->cp->nc+i] = pattern;
+            sdata->cp->quants[sdata->cp->nc+i] = SCHEMA_CQUANT_OPT;
         }
-        sdata->numChildren = sdata->numChildren + newChilds;
+        sdata->cp->nc = sdata->cp->nc + newChilds;
     } else {
-        if (sdata->numChildren == sdata->contentSize) {
-            sdata->currentContent =
-                REALLOC (sdata->currentContent,
+        if (sdata->cp->nc == sdata->contentSize) {
+            sdata->cp->content =
+                REALLOC (sdata->cp->content,
                          2 * sdata->contentSize
                          * sizeof (SchemaCP*));
-            sdata->currentQuants =
-                REALLOC (sdata->currentQuants,
+            sdata->cp->quants =
+                REALLOC (sdata->cp->quants,
                          2 * sdata->contentSize
                          * sizeof (SchemaQuant));
             sdata->contentSize *= 2;
         }
-        sdata->currentContent[sdata->numChildren] = (pattern);
-        sdata->currentQuants[sdata->numChildren] = quant;
-        sdata->numChildren++;
+        sdata->cp->content[sdata->cp->nc] = pattern;
+        sdata->cp->quants[sdata->cp->nc] = quant;
+        sdata->cp->nc++;
     }
-    if (sdata->currentCP->type == SCHEMA_CTYPE_CHOICE
-        && quant != SCHEMA_CQUANT_ONE) {
-        wrapperCP->content = sdata->currentContent;
-        wrapperCP->quants = sdata->currentQuants;
-        wrapperCP->numChildren = sdata->numChildren;
-        sdata->currentContent = savedCurrentContent;
-        sdata->currentQuants = savedCurrentQuants;
-        sdata->numChildren = savedNumChildren;
+    if (savedCP) {
+        sdata->cp = savedCP;
         sdata->contentSize = savedContenSize;
     }
 }
@@ -672,7 +661,7 @@ checkText (
     int i;
     SchemaConstraint *sc;
 
-    for (i = 0; i < cp->numChildren; i++) {
+    for (i = 0; i < cp->nc; i++) {
         sc = (SchemaConstraint *) cp->content[i];
         if ((sc->constraint) (interp, sc->constraintData, text) != TCL_OK) {
             return 0;
@@ -696,9 +685,9 @@ evalVirtual (
     Tcl_IncrRefCount (nsObj);
     nameObj = Tcl_NewStringObj(name, -1);
     Tcl_IncrRefCount (nameObj);
-    cp->content[cp->numChildren-2] = (SchemaCP *) nsObj;
-    cp->content[cp->numChildren-1] = (SchemaCP *) nameObj;
-    rc = Tcl_EvalObjv (interp, cp->numChildren, (Tcl_Obj **) cp->content,
+    cp->content[cp->nc-2] = (SchemaCP *) nsObj;
+    cp->content[cp->nc-1] = (SchemaCP *) nameObj;
+    rc = Tcl_EvalObjv (interp, cp->nc, (Tcl_Obj **) cp->content,
                        TCL_EVAL_DIRECT | TCL_EVAL_GLOBAL);
     Tcl_DecrRefCount (nameObj);
     Tcl_DecrRefCount (nsObj);
@@ -730,12 +719,12 @@ matchElementStart (
         isName = 1;
         /* fall through */
     case SCHEMA_CTYPE_PATTERN:
-        while (ac < cp->numChildren) {
+        while (ac < cp->nc) {
             candidate = cp->content[ac];
             mayskip = 0;
             switch (candidate->type) {
             case SCHEMA_CTYPE_TEXT:
-                if (candidate->numChildren) {
+                if (candidate->nc) {
                     if (!checkText (interp, candidate, "")) {
                         return 0;
                     }
@@ -760,7 +749,7 @@ matchElementStart (
                 break;
 
             case SCHEMA_CTYPE_CHOICE:
-                for (j = 0; j < candidate->numChildren; j++) {
+                for (j = 0; j < candidate->nc; j++) {
                     jc = candidate->content[j];
                     switch (jc->type) {
                     case SCHEMA_CTYPE_TEXT:
@@ -939,7 +928,7 @@ probeElement (
         SchemaValidationStack *se;
         se = sdata->stack;
         if (se->pattern->type == SCHEMA_CTYPE_NAME
-            && se->activeChild >= se->pattern->numChildren) {
+            && se->activeChild >= se->pattern->nc) {
             SetResult ("Unexpected child element \"");
             if (namespacePtr) {
                 Tcl_AppendResult (interp, namespacePtr, ":", NULL);
@@ -1221,11 +1210,11 @@ static int checkElementEnd (
         isName = 1;
         /* Fall through */
     case SCHEMA_CTYPE_PATTERN:
-        if (ac < cp->numChildren && (hasMatched (cp->quants[ac], hm))) {
+        if (ac < cp->nc && (hasMatched (cp->quants[ac], hm))) {
             DBG(fprintf (stderr, "ac %d has matched, skiping to next ac\n", ac));
             ac++; hm = 0;
         }
-        while (ac < cp->numChildren) {
+        while (ac < cp->nc) {
             DBG(fprintf (stderr, "ac %d hm %d mayMiss: %d\n",
                          ac, hm, mayMiss (cp->quants[ac])));
             if (mayMiss (cp->quants[ac])) {
@@ -1234,7 +1223,7 @@ static int checkElementEnd (
             
             switch (cp->content[ac]->type) {
             case SCHEMA_CTYPE_TEXT:
-                if (cp->content[ac]->numChildren) {
+                if (cp->content[ac]->nc) {
                     if (!checkText (interp, cp->content[ac], "")) {
                         return 0;
                     }
@@ -1243,7 +1232,7 @@ static int checkElementEnd (
 
             case SCHEMA_CTYPE_CHOICE:
                 mayMiss = 0;
-                for (i = 0; i < cp->content[ac]->numChildren; i++) {
+                for (i = 0; i < cp->content[ac]->nc; i++) {
                     if (mayMiss (cp->content[ac]->quants[i])) {
                         mayMiss = 1;
                         break;
@@ -1251,7 +1240,7 @@ static int checkElementEnd (
                     ic = cp->content[ac]->content[i];
                     switch (ic->type) {
                     case SCHEMA_CTYPE_TEXT:
-                        if (ic->numChildren) {
+                        if (ic->nc) {
                             if (!checkText (interp, ic, "")) {
                                 continue;
                             }
@@ -1403,6 +1392,8 @@ matchText (
     SchemaValidationStack *se, *tse;
     int ac, hm, isName = 0, i;
 
+    DBG(fprintf (stderr, "matchText called with text '%s'\n", text));
+    
     while (1) {
         se = sdata->stack;
         getContext (cp, ac, hm);
@@ -1411,7 +1402,7 @@ matchText (
             isName = 1;
             /* Fall through */
         case SCHEMA_CTYPE_PATTERN:
-            while (ac < cp->numChildren) {
+            while (ac < cp->nc) {
                 candidate = cp->content[ac];
                 switch (candidate->type) {
                 case SCHEMA_CTYPE_TEXT:
@@ -1427,7 +1418,7 @@ matchText (
                         updateStack (se, cp, ac);
                         return 1;
                     }
-                    for (i = 0; i < candidate->numChildren; i++) {
+                    for (i = 0; i < candidate->nc; i++) {
                         ic = candidate->content[i];
                         switch (ic->type) {
                         case SCHEMA_CTYPE_TEXT:
@@ -1442,11 +1433,12 @@ matchText (
                             break;
 
                         case SCHEMA_CTYPE_PATTERN:
-                            pushToStack (sdata, candidate);
+                            pushToStack (sdata, ic);
                             if (matchText (interp, sdata, text)) {
                                 updateStack (se, cp, ac);
                                 return 1;
                             }
+                            popStack (sdata);
                             break;
 
                         case SCHEMA_CTYPE_VIRTUAL:
@@ -1952,10 +1944,7 @@ schemaInstanceCmd (
         savedNamespacePtr = sdata->currentNamespace;
         sdata->defineToplevel = 0;
         sdata->currentNamespace = namespacePtr;
-        sdata->currentCP = pattern;
-        sdata->currentContent = pattern->content;
-        sdata->currentQuants = pattern->quants;
-        sdata->numChildren = 0;
+        sdata->cp = pattern;
         sdata->numAttr = 0;
         sdata->numReqAttr = 0;
         sdata->currentAttrs = NULL;
@@ -1964,9 +1953,6 @@ schemaInstanceCmd (
         result = Tcl_EvalObjv (interp, 4, sdata->evalStub,
                                TCL_EVAL_DIRECT | TCL_EVAL_GLOBAL);
         sdata->currentNamespace = NULL;
-        pattern->content = sdata->currentContent;
-        pattern->quants = sdata->currentQuants;
-        pattern->numChildren = sdata->numChildren;
         pattern->attrs = sdata->currentAttrs;
         pattern->numAttr = sdata->numAttr;
         pattern->numReqAttr = sdata->numReqAttr;
@@ -1996,10 +1982,7 @@ schemaInstanceCmd (
         SETASI(sdata);
         savedNumPatternList = sdata->numPatternList;
         sdata->currentNamespace = 0;
-        sdata->currentCP = NULL;
-        sdata->currentContent = NULL;
-        sdata->currentQuants = NULL;
-        sdata->numChildren = 0;
+        sdata->cp = NULL;
         sdata->contentSize = 0;
         sdata->defineToplevel = 1;
         sdata->evalStub[3] = objv[2];
@@ -2384,28 +2367,21 @@ evalDefinition (
     int m
     )
 {
-    SchemaCP **savedCurrentContent, *savedCurrentCP;
-    SchemaQuant *savedCurrentQuants;
+    SchemaCP *savedCP;
     SchemaAttr **savedCurrentAttrs;
-    unsigned int savedNumChildren, savedContenSize, savedNumAttr;
-    unsigned int savedAttrSize, savedNumReqAttr;
+    unsigned int savedContenSize;
+    unsigned int savedAttrSize, savedNumAttr, savedNumReqAttr;
     int result, i;
 
     /* Save some state of sdata .. */
-    savedCurrentCP = sdata->currentCP;
-    savedCurrentContent = sdata->currentContent;
-    savedCurrentQuants = sdata->currentQuants;
-    savedNumChildren = sdata->numChildren;
+    savedCP = sdata->cp;
     savedContenSize = sdata->contentSize;
     savedNumAttr = sdata->numAttr;
     savedNumReqAttr = sdata->numReqAttr;
     savedAttrSize = sdata->attrSize;
     savedCurrentAttrs = sdata->currentAttrs;
     /* ... and prepare sdata for definition evaluation. */
-    sdata->currentCP = pattern;
-    sdata->currentContent = pattern->content;
-    sdata->currentQuants = pattern->quants;
-    sdata->numChildren = 0;
+    sdata->cp = pattern;
     sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
     sdata->numAttr = 0;
     sdata->numReqAttr = 0;
@@ -2414,18 +2390,11 @@ evalDefinition (
 
     result = Tcl_EvalObjEx (interp, definition, TCL_EVAL_DIRECT);
 
-    /* Save the definition evaluation results to the pattern ... */
-    pattern->content = sdata->currentContent;
-    pattern->quants = sdata->currentQuants;
-    pattern->numChildren = sdata->numChildren;
     pattern->attrs = sdata->currentAttrs;
     pattern->numAttr = sdata->numAttr;
     pattern->numReqAttr = sdata->numReqAttr;
     /* ... and restore the previously saved sdata states  */
-    sdata->currentCP = savedCurrentCP;
-    sdata->currentContent = savedCurrentContent;
-    sdata->currentQuants = savedCurrentQuants;
-    sdata->numChildren = savedNumChildren;
+    sdata->cp = savedCP;
     sdata->contentSize = savedContenSize;
     sdata->numAttr = savedNumAttr;
     sdata->numReqAttr = savedNumReqAttr;
@@ -2434,7 +2403,7 @@ evalDefinition (
 
     if (result == TCL_OK) {
         REMEMBER_PATTERN (pattern);
-        for (i = 0; i < pattern->numChildren; i++) {
+        for (i = 0; i < pattern->nc; i++) {
             if (pattern->content[i]->type == SCHEMA_CTYPE_PATTERN) {
                 if (pattern->content[i]->flags & CONSTRAINT_TEXT_CHILD) {
                     pattern->flags |= CONSTRAINT_TEXT_CHILD;
@@ -2587,39 +2556,25 @@ evalConstraints (
     )
 {
     int result;
-    SchemaCP **savedCurrentContent, *savedCurrentCP;
-    SchemaQuant *savedCurrentQuants;
-    unsigned int savedNumChildren, savedContenSize;
+    SchemaCP *savedCP;
+    unsigned int savedContenSize;
 
     /* Save some state of sdata .. */
-    savedCurrentCP = sdata->currentCP;
-    savedCurrentContent = sdata->currentContent;
-    savedCurrentQuants = sdata->currentQuants;
-    savedNumChildren = sdata->numChildren;
+    savedCP = sdata->cp;
     savedContenSize = sdata->contentSize;
     /* ... and prepare sdata for definition evaluation. */
-    sdata->currentCP = cp;
-    sdata->currentContent = cp->content;
-    sdata->currentQuants = cp->quants;
-    sdata->numChildren = 0;
+    sdata->cp = cp;
     sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
     sdata->isTextConstraint = 1;
     sdata->textStub[3] = script;
     result = Tcl_EvalObjv (interp, 4, sdata->textStub,
                            TCL_EVAL_DIRECT | TCL_EVAL_GLOBAL);
     sdata->isTextConstraint = 0;
-    /* Save the definition evaluation results to the pattern ... */
-    cp->content = sdata->currentContent;
-    cp->quants = sdata->currentQuants;
-    cp->numChildren = sdata->numChildren;
     /* ... and restore the previously saved sdata states  */
-    sdata->currentCP = savedCurrentCP;
-    sdata->currentContent = savedCurrentContent;
-    sdata->currentQuants = savedCurrentQuants;
-    sdata->numChildren = savedNumChildren;
+    sdata->cp = savedCP;
     sdata->contentSize = savedContenSize;
-    if (!sdata->isAttributeConstaint && cp->numChildren) {
-        sdata->currentCP->flags |= CONSTRAINT_TEXT_CHILD;
+    if (!sdata->isAttributeConstaint && cp->nc) {
+        sdata->cp->flags |= CONSTRAINT_TEXT_CHILD;
     }
     return result;
 }
@@ -2797,6 +2752,7 @@ TextPatternObjCmd (
     )
 {
     SchemaData *sdata = GETASI;
+    SchemaQuant quant = SCHEMA_CQUANT_OPT;
     SchemaCP *pattern;
 
     CHECK_SI
@@ -2804,7 +2760,8 @@ TextPatternObjCmd (
     checkNrArgs (1,2,"?<definition script>?");
     pattern = initSchemaCP (SCHEMA_CTYPE_TEXT, NULL, NULL);
     REMEMBER_PATTERN (pattern)
-    addToContent (sdata, pattern, SCHEMA_CQUANT_OPT, 0, 0);
+    if (objc == 2) quant = SCHEMA_CQUANT_ONE;
+    addToContent (sdata, pattern, quant, 0, 0);
     
     if (objc == 2) {
         pattern->content = (SchemaCP**) MALLOC (
@@ -2844,7 +2801,7 @@ VirtualPatternObjCmd (
         pattern->content[i-1] = (SchemaCP *) objv[i];
         Tcl_IncrRefCount (objv[i]);
     }
-    pattern->numChildren = objc + 1;
+    pattern->nc = objc + 1;
     addToContent (sdata, pattern, SCHEMA_CQUANT_ONE, 0, 0);
     return TCL_OK;
 }
@@ -3436,6 +3393,108 @@ isodateTCObjCmd (
     return TCL_OK;
 }
 
+static int
+maxLengthImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    long maxlen = (long) constraintData;
+    int len = 0, clen;
+
+    while (*text != '\0') {
+        clen = UTF8_CHAR_LEN (*text);
+        if (!clen) {
+            SetResult ("Invalid UTF-8 character");
+            return TCL_ERROR;
+        }
+        len++;
+        if (len > maxlen) return TCL_ERROR;
+        text += clen;
+    }
+    return TCL_OK;
+}
+
+static int
+maxLengthTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+    long len;
+
+    CHECK_TI
+    CHECK_TOPLEVEL
+    checkNrArgs (2,2,"Expected: <maximal length as integer>");
+    if (Tcl_GetLongFromObj (interp, objv[1], &len) != TCL_OK) {
+        SetResult ("Expected: <maximal length as integer>");
+        return TCL_ERROR;
+    }
+    if (len < 1) {
+        SetResult ("The maximum length must be at least 1");
+    }
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = maxLengthImpl;
+    sc->constraintData = (void *)len;
+    return TCL_OK;
+}
+
+static int
+minLengthImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    long minlen = (long) constraintData;
+    int len = 0, clen;
+
+    while (*text != '\0') {
+        clen = UTF8_CHAR_LEN (*text);
+        if (!clen) {
+            SetResult ("Invalid UTF-8 character");
+            return TCL_ERROR;
+        }
+        len++;
+        if (len >= minlen) return TCL_OK;
+        text += clen;
+    }
+    return TCL_ERROR;
+}
+
+static int
+minLengthTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+    long len;
+
+    CHECK_TI
+    CHECK_TOPLEVEL
+    checkNrArgs (2,2,"Expected: <minimum length as integer>");
+    if (Tcl_GetLongFromObj (interp, objv[1], &len) != TCL_OK) {
+        SetResult ("Expected: <minimum length as integer>");
+        return TCL_ERROR;
+    }
+    if (len < 1) {
+        SetResult ("The minimum length must be at least 1");
+    }
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = minLengthImpl;
+    sc->constraintData = (void *)len;
+    return TCL_OK;
+}
+
 void
 tDOM_SchemaInit (
     Tcl_Interp *interp
@@ -3509,6 +3568,11 @@ tDOM_SchemaInit (
                           booleanTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::isodate",
                           isodateTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::maxLength",
+                          maxLengthTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::minLength",
+                          minLengthTCObjCmd, NULL, NULL);
 }
+
 
 #endif  /* #ifndef TDOM_NO_SCHEMA */
