@@ -2239,14 +2239,48 @@ test schema-12.3 {domvalidate w/ attribute} {
     set result [list]
     foreach xml {
         {<doc type="1.2"><a/><b/></doc>}
+        {<doc type="foo"><a/><b/></doc>}
+        {<doc><a/><b/></doc>}
+        {<doc type="1.2" another=""><a/><b/></doc>}
+        {<doc type="1.2"><a something="else"/><b/></doc>}
     } {
         set doc [dom parse $xml]
         lappend result [s domvalidate [$doc documentElement]]
+        lappend result [s validate $xml]
         $doc delete
     }
     s delete
     set result
-} {1}
+} {1 1 0 0 0 0 0 0 0 0}
+
+test schema-12.4 {domvalidate w/ text} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            attribute type {fixed "1.2"}
+            element a
+            element b
+        }
+        foreach e {a b} {
+            defelement $e text
+        }
+    }
+    set result [list]
+    foreach xml {
+        {<doc type="1.2"><a/><b/></doc>}
+        {<doc type="1.2"><a>content</a><b/></doc>}
+        {<doc type="1.2"><a>content</a><b>some text</b></doc>}
+        {<doc type="1.2">text<a>content</a><b>some text</b></doc>}
+        {<doc type="1.2"><a><b/></a><b>some text</b></doc>}
+    } {
+        set doc [dom parse $xml]
+        lappend result [s domvalidate [$doc documentElement]]
+        lappend result [s validate $xml]
+        $doc delete
+    }
+    s delete
+    set result
+} {1 1 1 1 1 1 0 0 0 0}
 
 test schema-13.1 {XML namespaces} {
     tdom::schema create s

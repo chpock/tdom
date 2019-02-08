@@ -1735,9 +1735,17 @@ validateDOM (
         != TCL_OK) {
         return TCL_ERROR;
     }
-    if (node->firstAttr
-        && probeDomAttributes (interp, sdata, node->firstAttr) != TCL_OK) {
-        return TCL_ERROR;
+    if (node->firstAttr) {
+        if (probeDomAttributes (interp, sdata, node->firstAttr) != TCL_OK) {
+            return TCL_ERROR;
+        }
+    } else {
+        if (sdata->stack->pattern->numReqAttr) {
+            /* probeDomAttributes fills interp result with a msg which
+             * required attributes are missing. */
+            probeDomAttributes (interp, sdata, NULL);
+            return TCL_ERROR;
+        }
     }
 
     node = node->firstChild;
