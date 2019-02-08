@@ -1757,9 +1757,15 @@ validateDOM (
         case CDATA_SECTION_NODE:
             if (node == node->parentNode->firstChild
                 && node == node->parentNode->lastChild) {
+                Tcl_DStringAppend (sdata->cdata,
+                                   ((domTextNode *) node)->nodeValue,
+                                   ((domTextNode *) node)->valueLength);
                 if (probeText (interp, sdata,
-                               ((domTextNode *) node)->nodeValue) != TCL_OK)
+                               Tcl_DStringValue (sdata->cdata)) != TCL_OK) {
+                    Tcl_DStringSetLength (sdata->cdata, 0);
                     return TCL_ERROR;
+                }
+                Tcl_DStringSetLength (sdata->cdata, 0);
                 break;
             }
             Tcl_DStringAppend (sdata->cdata,
