@@ -2224,6 +2224,30 @@ test schema-12.2 {domvalidate} {
     set result
 } {0 {Unexpected child element "some" for element "some"}}
 
+test schema-12.3 {domvalidate w/ attribute} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            attribute type {fixed "1.2"}
+            element a
+            element b
+        }
+        foreach e {a b} {
+            defelement $e {}
+        }
+    }
+    set result [list]
+    foreach xml {
+        {<doc type="1.2"><a/><b/></doc>}
+    } {
+        set doc [dom parse $xml]
+        lappend result [s domvalidate [$doc documentElement]]
+        $doc delete
+    }
+    s delete
+    set result
+} {1}
+
 test schema-13.1 {XML namespaces} {
     tdom::schema create s
     s defelement doc ns1 {

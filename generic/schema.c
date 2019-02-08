@@ -1116,7 +1116,7 @@ int probeDomAttributes (
             }
             if (strcmp (ln, cp->attrs[i]->name) == 0) {
                 if (cp->attrs[i]->cp) {
-                    if (checkText (interp, cp->attrs[i]->cp, (char *) ln)
+                    if (checkText (interp, cp->attrs[i]->cp, (char *) atPtr->nodeValue)
                         == 0) {
                         SetResult3 ("Attribute value doesn't match for "
                                     "attribute '", ln, "'");
@@ -1537,8 +1537,6 @@ probeText (
         return TCL_ERROR;
     }
 
-    /* If we are here then there isn't a matching TEXT cp. Check, if
-     * this is white space only between tags. */
     if (sdata->stack->pattern->flags & CONSTRAINT_TEXT_CHILD) {
         if (matchText (interp, sdata, text)) {
             return TCL_OK;
@@ -1736,10 +1734,10 @@ validateDOM (
                       : NULL)
         != TCL_OK) {
         return TCL_ERROR;
-    } else {
-        if (probeDomAttributes (interp, sdata, node->firstAttr) != TCL_OK) {
-            return TCL_ERROR;
-        }
+    }
+    if (node->firstAttr
+        && probeDomAttributes (interp, sdata, node->firstAttr) != TCL_OK) {
+        return TCL_ERROR;
     }
 
     node = node->firstChild;
