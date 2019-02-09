@@ -3072,5 +3072,140 @@ test schema-16.10 {interleave} {
     set result
 } {0 1 1 1 0 0 1 0}
 
+test schema-16.11 {interleave} {
+    tdom::schema s
+    s define {
+        foreach e {a b1 b2 c} {
+            defelement $e {}
+        }
+        defelement doc {
+            interleave {
+                element a
+                choice {
+                    element b1
+                    element b2
+                }
+                element c
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/><b1/><c/></doc>
+        <doc><b2/><a/><c/></doc>
+        <doc><c/><b1/><a/></doc>
+        <doc><c/><b1/><a/><b2/></doc>
+        <doc><b1/><b2/><a/><b1/><b2/><c/><b1/><b2/></doc>
+        <doc><a/><c/></doc>
+        <doc>12</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 1 1 0 0 0 0}
+
+test schema-16.12 {interleave} {
+    tdom::schema s
+    s define {
+        foreach e {a b1 b2 c} {
+            defelement $e {}
+        }
+        defelement doc {
+            interleave {
+                element a
+                choice ? {
+                    element b1
+                    element b2
+                }
+                element c
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/><b1/><c/></doc>
+        <doc><b2/><a/><c/></doc>
+        <doc><c/><b1/><a/></doc>
+        <doc><c/><b1/><a/><b2/></doc>
+        <doc><b1/><b2/><a/><b1/><b2/><c/><b1/><b2/></doc>
+        <doc><a/><c/></doc>
+        <doc>12</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 1 1 0 0 1 0}
+
+test schema-16.13 {interleave} {
+    tdom::schema s
+    s define {
+        foreach e {a b1 b2 c} {
+            defelement $e {}
+        }
+        defelement doc {
+            interleave {
+                element a
+                choice + {
+                    element b1
+                    element b2
+                }
+                element c
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/><b1/><c/></doc>
+        <doc><b2/><a/><c/></doc>
+        <doc><c/><b1/><a/></doc>
+        <doc><c/><b1/><a/><b2/></doc>
+        <doc><b1/><b2/><a/><b1/><b2/><c/><b1/><b2/></doc>
+        <doc><a/><c/></doc>
+        <doc>12</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 1 1 1 1 0 0}
+
+test schema-16.14 {interleave} {
+    tdom::schema s
+    s define {
+        foreach e {a b1 b2 c} {
+            defelement $e {}
+        }
+        defelement doc {
+            interleave {
+                element a
+                choice * {
+                    element b1
+                    element b2
+                }
+                element c
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/><b1/><c/></doc>
+        <doc><b2/><a/><c/></doc>
+        <doc><c/><b1/><a/></doc>
+        <doc><c/><b1/><a/><b2/></doc>
+        <doc><b1/><b2/><a/><b1/><b2/><c/><b1/><b2/></doc>
+        <doc><a/><c/></doc>
+        <doc>12</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 1 1 1 1 1 0}
 
 }

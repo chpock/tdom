@@ -493,7 +493,8 @@ addToContent (
     SchemaCP *savedCP = NULL;
     unsigned int savedContenSize;
 
-    if (sdata->cp->type == SCHEMA_CTYPE_CHOICE) {
+    if (sdata->cp->type == SCHEMA_CTYPE_CHOICE
+         || sdata->cp->type == SCHEMA_CTYPE_INTERLEAVE) {
         if (pattern->type == SCHEMA_CTYPE_CHOICE) {
             if (pattern->flags & MIXED_CONTENT) {
                 sdata->cp->flags |= MIXED_CONTENT;
@@ -505,7 +506,8 @@ addToContent (
             wrapperCP->nc = 1;
             pattern = wrapperCP;
         }
-        if (quant != SCHEMA_CQUANT_ONE) {
+        if (sdata->cp->type == SCHEMA_CTYPE_CHOICE
+            && quant != SCHEMA_CQUANT_ONE) {
             wrapperCP = initSchemaCP (SCHEMA_CTYPE_PATTERN, NULL, NULL);
             REMEMBER_PATTERN (wrapperCP);
             if (sdata->cp->nc == sdata->contentSize) {
