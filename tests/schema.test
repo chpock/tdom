@@ -3208,4 +3208,41 @@ test schema-16.14 {interleave} {
     set result
 } {0 1 1 1 1 1 1 0}
 
+test schema-16.15 {interleave} {
+    tdom::schema s
+    s define {
+        foreach e {a b1 b11 b2 c} {
+            defelement $e {}
+        }
+        defelement doc {
+            interleave {
+                element a
+                choice * {
+                    element b1
+                    group {
+                        element b11
+                        element b2
+                    }
+                }
+                element c
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/><b1/><c/></doc>
+        <doc><b2/><a/><c/></doc>
+        <doc><c/><b1/><a/></doc>
+        <doc><c/><b1/><a/><b2/></doc>
+        <doc><b11/><b2/><a/><b11/><b2/><c/><b11/><b2/></doc>
+        <doc><a/><c/></doc>
+        <doc>12</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 0 1 0 1 1 0}
+
 }
