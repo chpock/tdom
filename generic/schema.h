@@ -94,6 +94,7 @@ typedef struct SchemaValidationStack
     struct SchemaValidationStack *down;
     int               activeChild;
     int               hasMatched;
+    int              *interleaveState;
 } SchemaValidationStack;
 
 typedef enum {

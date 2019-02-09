@@ -261,7 +261,7 @@ static void serializeCP (
         /* Fall thru. */
     case SCHEMA_CTYPE_CHOICE:
     case SCHEMA_CTYPE_INTERLEAVE:
-        fprintf (stderr, "\t%d childs\n", pattern->numChildren);
+        fprintf (stderr, "\t%d childs\n", pattern->nc);
         break;
     case SCHEMA_CTYPE_ANY:
     case SCHEMA_CTYPE_TEXT:
@@ -600,6 +600,10 @@ pushToStack (
     se = sdata->stack;
     stackElm->down = se;
     stackElm->pattern = pattern;
+    if (pattern->type == SCHEMA_CTYPE_INTERLEAVE) {
+        stackElm->interleaveState = MALLOC (sizeof (int) * pattern->nc);
+        memset (stackElm->interleaveState, 0, sizeof (int) * pattern->nc);
+    }
     sdata->stack = stackElm;
 }
 
@@ -644,6 +648,10 @@ popStack (
 {
     SchemaValidationStack *se;
     DBG(fprintf(stderr, "pop from Stack:\n");serializeCP(sdata->stack->pattern));
+    if (sdata->stack->interleaveState) {
+        FREE (sdata->stack->interleaveState);
+        sdata->stack->interleaveState = NULL;
+    }
     se = sdata->stack->down;
     sdata->stack->down = sdata->stackPool;
     sdata->stackPool = sdata->stack;
@@ -705,8 +713,8 @@ matchElementStart (
     char *namespace
     )
 {
-    SchemaCP *cp, *candidate, *jc;
-    int hm, ac, j, mayskip, rc;
+    SchemaCP *cp, *candidate, *icp;
+    int hm, ac, i, mayskip, rc;
     int isName = 0;
     SchemaValidationStack *se;
 
@@ -749,9 +757,9 @@ matchElementStart (
                 break;
 
             case SCHEMA_CTYPE_CHOICE:
-                for (j = 0; j < candidate->nc; j++) {
-                    jc = candidate->content[j];
-                    switch (jc->type) {
+                for (i = 0; i < candidate->nc; i++) {
+                    icp = candidate->content[i];
+                    switch (icp->type) {
                     case SCHEMA_CTYPE_TEXT:
                         break;
 
@@ -761,9 +769,9 @@ matchElementStart (
                         return 1;
 
                     case SCHEMA_CTYPE_NAME:
-                        if (jc->name == name
-                            && jc->namespace == namespace) {
-                            pushToStack (sdata, jc);
+                        if (icp->name == name
+                            && icp->namespace == namespace) {
+                            pushToStack (sdata, icp);
                             updateStack (se, cp, ac);
                             return 1;
                         }
@@ -773,26 +781,23 @@ matchElementStart (
                         Tcl_Panic ("MIXED or CHOICE child of MIXED or CHOICE");
 
                     case SCHEMA_CTYPE_INTERLEAVE:
-                        fprintf (stderr, "matchElementStart: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
-                        return 0;
-
                     case SCHEMA_CTYPE_PATTERN:
-                        pushToStack (sdata, jc);
+                        pushToStack (sdata, icp);
                         rc = matchElementStart (interp, sdata, name, namespace);
                         if (rc == 1) {
                             updateStack (se, cp, ac);
                             return 1;
                         }
                         popStack (sdata);
-                        if (!mayskip && rc == -1) mayskip = 1;
+                        if (rc == -1) mayskip = 1;
                         break;
 
                     case SCHEMA_CTYPE_VIRTUAL:
-                        if (evalVirtual (interp, jc, namespace, name)) break;
+                        if (evalVirtual (interp, icp, namespace, name)) break;
                         else return 0;
                         
                     }
-                    if (!mayskip && mayMiss (candidate->quants[j]))
+                    if (!mayskip && mayMiss (candidate->quants[i]))
                         mayskip = 1;
                 }
                 break;
@@ -805,9 +810,6 @@ matchElementStart (
                 else return 0;
 
             case SCHEMA_CTYPE_INTERLEAVE:
-                fprintf (stderr, "matchElementStart: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
-                return 0;
-
             case SCHEMA_CTYPE_PATTERN:
                 pushToStack (sdata, candidate);
                 rc = matchElementStart (interp, sdata, name, namespace);
@@ -836,6 +838,54 @@ matchElementStart (
         Tcl_Panic ("Invalid CTYPE onto the validation stack!");
 
     case SCHEMA_CTYPE_INTERLEAVE:
+        mayskip = 1;
+        for (i = 0; i < cp->nc; i++) {
+            icp = cp->content[i];
+            if (se->interleaveState[i]) {
+                if (maxOne (cp->quants[i])) continue;
+            }
+            switch (icp->type) {
+            case SCHEMA_CTYPE_TEXT:
+                break;
+
+            case SCHEMA_CTYPE_ANY:
+                sdata->skipDeep = 1;
+                se->hasMatched = 1;
+                se->interleaveState[i] = 1;
+                return 1;
+
+            case SCHEMA_CTYPE_NAME:
+                if (icp->name == name
+                    && icp->namespace == namespace) {
+                    pushToStack (sdata, icp);
+                    se->hasMatched = 1;
+                    se->interleaveState[i] = 1;
+                    return 1;
+                }
+                break;
+
+            case SCHEMA_CTYPE_CHOICE:
+                Tcl_Panic ("MIXED or CHOICE child of INTERLEAVE");
+
+            case SCHEMA_CTYPE_INTERLEAVE:
+            case SCHEMA_CTYPE_PATTERN:
+                pushToStack (sdata, icp);
+                rc = matchElementStart (interp, sdata, name, namespace);
+                if (rc == 1) {
+                    se->hasMatched = 1;
+                    se->interleaveState[i] = 1;
+                    return 1;
+                }
+                popStack (sdata);
+                if (!mayskip && rc == -1) mayskip = 1;
+                break;
+            }
+
+        }
+                
+        break;
+
+
         fprintf (stderr, "matchElementStart: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
         return 0;
     }
@@ -1116,7 +1166,7 @@ int probeDomAttributes (
             }
             if (strcmp (ln, cp->attrs[i]->name) == 0) {
                 if (cp->attrs[i]->cp) {
-                    if (checkText (interp, cp->attrs[i]->cp, (char *) ln)
+                    if (checkText (interp, cp->attrs[i]->cp, (char *) atPtr->nodeValue)
                         == 0) {
                         SetResult3 ("Attribute value doesn't match for "
                                     "attribute '", ln, "'");
@@ -1250,12 +1300,11 @@ static int checkElementEnd (
 
                     case SCHEMA_CTYPE_CHOICE:
                         /* Can't happen */
-                    case SCHEMA_CTYPE_INTERLEAVE:
-                        /* To do */
                     case SCHEMA_CTYPE_NAME:
                     case SCHEMA_CTYPE_ANY:
                         continue;
                         
+                    case SCHEMA_CTYPE_INTERLEAVE:
                     case SCHEMA_CTYPE_PATTERN:
                         pushToStack (sdata, ic);
                         if (checkElementEnd (interp, sdata)) {
@@ -1288,6 +1337,7 @@ static int checkElementEnd (
                                  tse->pattern->name)) break;
                 else return 0;
                 
+            case SCHEMA_CTYPE_INTERLEAVE:
             case SCHEMA_CTYPE_PATTERN:
                 pushToStack (sdata, cp->content[ac]);
                 rc = checkElementEnd (interp, sdata);
@@ -1297,10 +1347,6 @@ static int checkElementEnd (
                 
             case SCHEMA_CTYPE_ANY:
             case SCHEMA_CTYPE_NAME:
-                return 0;
-                
-            case SCHEMA_CTYPE_INTERLEAVE:
-                /* To do */
                 return 0;
             }
             ac++;
@@ -1317,8 +1363,12 @@ static int checkElementEnd (
         return 0;
 
     case SCHEMA_CTYPE_INTERLEAVE:
-        fprintf (stderr, "checkElementEnd: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
-        return 0;
+        for (i = 0; i < cp->nc; i++) {
+            if (mustMatch (cp->quants[i], se->interleaveState[i])) {
+                return 0;
+            }
+        }
+        return -1;
     }
     return 0;
 }
@@ -1432,6 +1482,7 @@ matchText (
                         case SCHEMA_CTYPE_ANY:
                             break;
 
+                        case SCHEMA_CTYPE_INTERLEAVE:
                         case SCHEMA_CTYPE_PATTERN:
                             pushToStack (sdata, ic);
                             if (matchText (interp, sdata, text)) {
@@ -1454,9 +1505,6 @@ matchText (
                         case SCHEMA_CTYPE_CHOICE:
                             Tcl_Panic ("MIXED or CHOICE child of MIXED or CHOICE");
 
-                        case SCHEMA_CTYPE_INTERLEAVE:
-                            fprintf (stderr, "matchText: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
-                            return 0;
                         }
                     }
                     if (mustMatch (cp->quants[ac], hm)) {
@@ -1465,6 +1513,7 @@ matchText (
                     }
                     break;
 
+                case SCHEMA_CTYPE_INTERLEAVE:
                 case SCHEMA_CTYPE_PATTERN:
                     pushToStack (sdata, candidate);
                     if (matchText (interp, sdata, text)) {
@@ -1495,9 +1544,6 @@ matchText (
                     }
                     break;
 
-                case SCHEMA_CTYPE_INTERLEAVE:
-                    fprintf (stderr, "matchText: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
-                    return 0;
                 }
                 ac++;
             }
@@ -1517,8 +1563,36 @@ matchText (
             break;
 
         case SCHEMA_CTYPE_INTERLEAVE:
-            fprintf (stderr, "probeText: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
-            return 0;
+            for (i = 0; i < cp->nc; i++) {
+                ic = cp->content[i];
+                switch (ic->type) {
+                case SCHEMA_CTYPE_TEXT:
+                    if (checkText (interp, ic, text)) {
+                        se->hasMatched = 1;
+                        se->interleaveState[i] = 1;
+                        return 1;
+                    }
+                    break;
+
+                case SCHEMA_CTYPE_NAME:
+                case SCHEMA_CTYPE_ANY:
+                    break;
+
+                case SCHEMA_CTYPE_INTERLEAVE:
+                case SCHEMA_CTYPE_PATTERN:
+                    pushToStack (sdata, ic);
+                    if (matchText (interp, sdata, text)) {
+                        updateStack (se, cp, ac);
+                        return 1;
+                    }
+                    popStack (sdata);
+                    break;
+
+                case SCHEMA_CTYPE_CHOICE:
+                    Tcl_Panic ("MIXED or CHOICE child of MIXED or CHOICE");
+
+                }
+            }
         }
         break;
     }
@@ -1548,8 +1622,6 @@ probeText (
         return TCL_ERROR;
     }
 
-    /* If we are here then there isn't a matching TEXT cp. Check, if
-     * this is white space only between tags. */
     if (sdata->stack->pattern->flags & CONSTRAINT_TEXT_CHILD) {
         if (matchText (interp, sdata, text)) {
             return TCL_OK;
@@ -1747,8 +1819,16 @@ validateDOM (
                       : NULL)
         != TCL_OK) {
         return TCL_ERROR;
-    } else {
+    }
+    if (node->firstAttr) {
         if (probeDomAttributes (interp, sdata, node->firstAttr) != TCL_OK) {
+            return TCL_ERROR;
+        }
+    } else {
+        if (sdata->stack->pattern->numReqAttr) {
+            /* probeDomAttributes fills interp result with a msg which
+             * required attributes are missing. */
+            probeDomAttributes (interp, sdata, NULL);
             return TCL_ERROR;
         }
     }
@@ -1770,9 +1850,15 @@ validateDOM (
         case CDATA_SECTION_NODE:
             if (node == node->parentNode->firstChild
                 && node == node->parentNode->lastChild) {
+                Tcl_DStringAppend (sdata->cdata,
+                                   ((domTextNode *) node)->nodeValue,
+                                   ((domTextNode *) node)->valueLength);
                 if (probeText (interp, sdata,
-                               ((domTextNode *) node)->nodeValue) != TCL_OK)
+                               Tcl_DStringValue (sdata->cdata)) != TCL_OK) {
+                    Tcl_DStringSetLength (sdata->cdata, 0);
                     return TCL_ERROR;
+                }
+                Tcl_DStringSetLength (sdata->cdata, 0);
                 break;
             }
             Tcl_DStringAppend (sdata->cdata,
@@ -3316,60 +3402,59 @@ isodateImpl (
     char *text
     )
 {
-    int i;
+    int i, y, m, d;
 
-    /* I know, it isn't that simple.  Provisional. */
-    if (*text < '1' || *text > '9') {
-        return TCL_ERROR;
-    }
-    text++;
-    for (i = 0; i < 3; i++) {
-        if (*text < '0' || *text > '9') {
-            return TCL_ERROR;
-        }
+    if (*text == '-') {
+        /* A bce date */
         text++;
     }
-    if (*text != '-') {
-        return TCL_ERROR;
-    }
-    text++;
-    if (*text == '0') {
+    for (i = 0; i < 4; i++) {
+        if (*text < '0' || *text > '9') return TCL_ERROR;
         text++;
-        if (*text < '1' || *text > '9') {
-            return TCL_ERROR;
-        }
-    } else if (*text == '1') {
+    }
+    if (*text != '-') return TCL_ERROR;
+    y = atoi(text-4);
+    /* There isn't a year 0. it's either 0001 or -0001 */
+    if (y == 0) return TCL_ERROR;
+    text++;
+    for (i = 0; i < 2; i++) {
+        if (*text < '0' || *text > '9') return TCL_ERROR;
         text++;
-        if (*text < '0' || *text > '2') {
-            return TCL_ERROR;
-        }
     }
+    if (*text != '-') return TCL_ERROR;
+    m = atoi(text-2);
+    if (m < 1 || m > 12) return TCL_ERROR;
     text++;
-    if (*text != '-') {
-        return TCL_ERROR;
-    }
-    text++;
-    if (*text == '0') {
+    for (i = 0; i < 2; i++) {
+        if (*text < '0' || *text > '9') return TCL_ERROR;
         text++;
-        if (*text < '1' || *text > '9') {
-            return TCL_ERROR;
-        }
-    } else if (*text == '1' || *text == '2') {
-        text ++;
-        if (*text < '0' || *text > '9') {
-            return TCL_ERROR;
-        }
-    } else if (*text == '3') {
-        text ++;
-        if (*text != '0' && *text != '1') {
-            return TCL_ERROR;
-        }
-    } else {
-        return TCL_ERROR;
     }
-    text++;
-    if (*text != '\0') {
-        return TCL_ERROR;
+    if (*text != '\0') return TCL_ERROR;
+    d = atoi(text-2);
+    if (d < 1) return TCL_ERROR;
+    switch (m) {
+    case 1:
+    case 3:
+    case 5:
+    case 7:
+    case 8:
+    case 10:
+    case 12:
+        if (d > 31) return TCL_ERROR;
+        break;
+    case 4:
+    case 6:
+    case 9:
+    case 11:
+        if (d > 30) return TCL_ERROR;
+        break;
+    case 2:
+        if (y % 4 == 0 && (y % 100 != 0 || y % 400 == 0)) {
+            if (d > 29) return TCL_ERROR;
+        } else {
+            if (d > 28) return TCL_ERROR;
+        }
+        break;
     }
     return TCL_OK;
 }
