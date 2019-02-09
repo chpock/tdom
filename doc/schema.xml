@@ -337,7 +337,7 @@
       
       <commanddef>
         <command><cmd>tcl</cmd> <m>tclcmd</m> <m>?arg arg ...?</m></command>
-        <desc>Evaluates the tcl script <m>tclcmd arg arg ... /m> and
+        <desc>Evaluates the tcl script <m>tclcmd arg arg ... </m> and
         the text to validate appended to the argument list. The return
         value of the tcl command is interpreted as a boolean.</desc>
       </commanddef>
@@ -355,6 +355,26 @@
       </commanddef>
       <commanddef>
         <command><cmd>nmtokens</cmd></command>
+        <desc></desc>
+      </commanddef>
+      <commanddef>
+        <command><cmd>number</cmd></command>
+        <desc></desc>
+      </commanddef>
+      <commanddef>
+        <command><cmd>boolean</cmd></command>
+        <desc></desc>
+      </commanddef>
+      <commanddef>
+        <command><cmd>isodate</cmd></command>
+        <desc></desc>
+      </commanddef>
+      <commanddef>
+        <command><cmd>maxLength</cmd></command>
+        <desc></desc>
+      </commanddef>
+      <commanddef>
+        <command><cmd>minLength</cmd></command>
         <desc></desc>
       </commanddef>
     </commandlist>
