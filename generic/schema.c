@@ -260,7 +260,7 @@ static void serializeCP (
         /* Fall thru. */
     case SCHEMA_CTYPE_CHOICE:
     case SCHEMA_CTYPE_INTERLEAVE:
-        fprintf (stderr, "\t%d childs\n", pattern->numChildren);
+        fprintf (stderr, "\t%d childs\n", pattern->nc);
         break;
     case SCHEMA_CTYPE_ANY:
     case SCHEMA_CTYPE_TEXT:
@@ -824,7 +824,8 @@ matchElementStart (
                 pushToStack (sdata, icp);
                 rc = matchElementStart (interp, sdata, name, namespace);
                 if (rc == 1) {
-                    updateStack (se, cp, ac);
+                    se->hasMatched = 1;
+                    se->interleaveState[i] = 1;
                     return 1;
                 }
                 popStack (sdata);
