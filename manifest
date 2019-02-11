@@ -1,5 +1,5 @@
-C More\sinterleave\stests.
-D 2019-02-09T17:02:21.462
+C Fixed\sdomvalidate\sin\scase\sof\snamespaced\snodes\swith\sprefixes\sin\sthe\stree.\sImproved\sDTD\sto\sschema\stranslater:\sthere\sisn't\sa\sneed\sto\swrap\sa\sSEQ\swith\sdefault\squant\sinto\sa\sschema\sgroup.
+D 2019-02-11T20:17:19.849
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -11,7 +11,7 @@ F Makefile.in f9a929edb51a25c57b13d98d6ee6c3ef324893108ecfb55ced8e3127617c7914
 F README 1b74b899ce95656b6a63039d0796b164e51a7317263cba9d67959b402dc2009e
 F README.AOL 34b4178830536f5183328420bc28b8063fbf6b598010ecf105c2ecfdbfc3ffa1
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
-F apps/toschema.tcl c4aeace0d8c0caa1972008b2d0b99e6239fccf97ebaa852007db817628df2122
+F apps/toschema.tcl 5c1a33ca4e57a5acd81a848bdf87cf0affdf3d2aaf1e71626a7a24c64bd3783b
 F apps/xslt.tcl 64103132fbe0a1fbf61cf3506608cb7ea5cbfddd247d207d95d8e96a071e1846
 F configure 49f210e1e3c2bec44a47a2f0f48bc7b43ff9616d66ebad201c4778a26b621db7 x
 F configure.ac 8c2b9ba6172d837b6388bcab5ae0101e755435628b17f8db2c11ffc1f10258a0
@@ -133,7 +133,7 @@ F generic/domxslt.h 140fa73765d699bfced9554c2c6439c0d2e6695eec3a8e69e1d25c0bbdf2
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c abf69665ad49ed053885f7e7459d47be5abb057ba4ed919e96e83d636b016a30
 F generic/nodecmd.h e4a6d836834554a2a590cbd916cdee937945965ee55709e48b62976a66861ef8
-F generic/schema.c cec7ce5f03f74e647c022d4e779b309063d03cc94bd5c976c333f9d6b04c09dc
+F generic/schema.c 9bce99e160e7cc2fd39e07018e7be224a1e30b67099425d085f69d5ed968148f
 F generic/schema.h 74e50c58ba9a38d2e811319768ef22b9084e13b2bc861d5f3cf05745105aa592
 F generic/tcldom.c 0368e80337fe3e2f9dbda1639a29d048ed15dcab4a7817b03aa399b45599b033
 F generic/tcldom.h ce701b04020e64b11d9f16a8dbea21133267f0aaa267d25881612ddcbba1b9b2
@@ -165,7 +165,7 @@ F tests/all.tcl e2e7e7fc73b1e04a6074b8d8e2f6d2f523c45baa1e0dbe1988354d59a9180884
 F tests/attribute.test 53ac8fb043e79b638c8c6f5e7da848f6103552d6
 F tests/cdata.test 5a1dc3bee6353700186d12f0d11b15914849c6be
 F tests/comment.test ff9d1abbbcde4d3532bf93b1eb7e819997fa8178
-F tests/data/REC-xslt-19991116.xml d86bd1efbc1f810b2a6f74c0c182bd37ae5ee09d
+F tests/data/REC-xslt-19991116.xml 037d39caac3e4cc8964848a7b0eb9a4b385520606a635e1f54f2aff9802b5fd4
 F tests/data/books.xml 0b1ae696b2bbc1035303f5637a6ef67f041d0b9e
 F tests/data/domCmd1.dtd 2031a36d155dfac8f0a5ef3be69958d250f5459e
 F tests/data/domCmd2.dtd 42200fe458c04d2072e71d8fa00ade2cb1c59878
@@ -203,7 +203,7 @@ F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
 F tests/pullparser.test e4b14ea0bdc9f9fd931f3bc559e78c309582a67a238170d58e0f20331f99890c
 F tests/pushpull.bench 664e8f512917537d96c4b71933d4d9a6da65fc6fe85bd7c459483830dc7d2faf
-F tests/schema.test 84f3f56baa339ae4ac331560f7457a633821e4b6f00a53c890d5cd933c04d18c
+F tests/schema.test ac8f8f07fdce975f65e464be723365c03da379e2fb0da3856f14056c651911e3
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
 F tests/tdomcmd.bench b07448ed4de08ccaa9734cf3fe15c695fd7066c993da58ff48d465747940e417
 F tests/tdomcmd.test 092401adf0609906d710f3ef8997cb4ca29bc208
@@ -229,8 +229,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 39299146969fcb6997d419fb21614acea2f7b80993e9e791cc4ebc8f70e8ca2c
-R cfce9028ca72207aa73202c08630a7c2
+P ac9a46bd21d6d7b1d3163db754a56e50f2cb5153b7a44991a76b4ba327f889c8
+R 28db43f96161dc4bc950585081fd64ef
 U rolf
-Z 00dfb16b9038197262643c0da681fd2b
+Z 7d42c0d437372703ffff7f913697cf91
 # Remove this line to create a well-formed Fossil manifest.

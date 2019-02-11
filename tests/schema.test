@@ -2282,6 +2282,58 @@ test schema-12.4 {domvalidate w/ text} {
     set result
 } {1 1 1 1 1 1 0 0 0 0}
 
+test schema-12.5 {domvalidate doch w/ xml namespace} {
+    tdom::schema s 
+    s define {
+        defelement addressBook http://foo.bar {
+            element card *
+        }
+        defelement card http://foo.bar {
+            element name
+            element email
+        }
+        foreach e {name email} {
+            defelement $e http://foo.bar {text}
+        }
+    }
+    set doc [dom parse {
+<addressBook xmlns="http://foo.bar">
+  <card>
+    <name>John Smith</name>
+    <email>js@example.com</email>
+  </card>
+  <card>
+    <name>Fred Bloggs</name>
+    <email>fb@example.net</email>
+  </card>
+</addressBook>        
+    }]
+    set result [s domvalidate $doc]
+    lappend result [s domvalidate [$doc documentElement]]
+    lappend result [s domvalidate [[$doc documentElement] firstChild]]
+    lappend result [s domvalidate [[[$doc documentElement] firstChild] firstChild]]
+    $doc delete
+    set doc [dom parse {
+<ns1:addressBook xmlns:ns1="http://foo.bar">
+  <ns1:card>
+    <ns1:name>John Smith</ns1:name>
+    <ns1:email>js@example.com</ns1:email>
+  </ns1:card>
+  <ns1:card>
+    <ns1:name>Fred Bloggs</ns1:name>
+    <ns1:email>fb@example.net</ns1:email>
+  </ns1:card>
+</ns1:addressBook>        
+}]
+    lappend result [s domvalidate $doc]
+    lappend result [s domvalidate [$doc documentElement]]
+    lappend result [s domvalidate [[$doc documentElement] firstChild]]
+    lappend result [s domvalidate [[[$doc documentElement] firstChild] firstChild]]
+    $doc delete
+    s delete
+    set result
+} {1 1 1 1 1 1 1 1}
+
 test schema-13.1 {XML namespaces} {
     tdom::schema create s
     s defelement doc ns1 {

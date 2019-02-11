@@ -1731,7 +1731,28 @@ validateDOM (
     domNode    *node
     )
 {
-    if (probeElement (interp, sdata, node->nodeName,
+    char *ln;
+
+    if (node->namespace) {
+        if (node->ownerDocument->namespaces[node->namespace-1]->prefix[0] == '\0') {
+            ln = node->nodeName;
+        } else {
+            ln = node->nodeName;
+            while (*ln && (*ln != ':')) {
+                ln++;
+            }
+            if (*ln == ':') {
+                ln++;
+            } else {
+                /* Ups? */
+                ln = node->nodeName;
+            }
+        }
+    } else {
+        ln = node->nodeName;
+    }
+    
+    if (probeElement (interp, sdata, ln,
                       node->namespace ?
                       node->ownerDocument->namespaces[node->namespace-1]->uri
                       : NULL)
