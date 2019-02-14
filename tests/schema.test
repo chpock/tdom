@@ -1776,9 +1776,6 @@ test schema-9.8 {choice as choice child} {
                 }
             }
         }
-        foreach e {e1 e2 e3 e4} {
-            defelement $e foouri {}
-        }
     }
     set result [list]
     foreach xml {
@@ -2788,6 +2785,104 @@ test schema-14.14 {text: one of two types} {
     set result
 } {0 0 1 1 1 1 0 0 0 0}
 
+test schema-14.15 {text: oneOf} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            text {
+                oneOf {
+                    maxLength 3
+                    isodate
+                }
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc></doc>
+        <doc>foo</doc>
+        <doc>1</doc>
+        <doc>12</doc>
+        <doc>1234-12-31</doc>
+        <doc>-14.23</doc>
+        <doc>&#x1F46E;&#x1234;&#x1234;&#x1234;&#x1234;</doc>
+        <doc>1234-12</doc>
+        <doc>12345678901234567890</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 1 1 1 1 1 0 0 0 0}
+
+test schema-14.16 {text: oneOf} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            text {
+                minLength 1
+                oneOf {
+                    maxLength 3
+                    isodate
+                }
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc></doc>
+        <doc>foo</doc>
+        <doc>1</doc>
+        <doc>12</doc>
+        <doc>1234-12-31</doc>
+        <doc>-14.23</doc>
+        <doc>&#x1F46E;&#x1234;&#x1234;&#x1234;&#x1234;</doc>
+        <doc>1234-12</doc>
+        <doc>12345678901234567890</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 1 1 1 1 0 0 0 0}
+
+test schema-14.17 {text: oneOf w/ anyOf} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            text {
+                minLength 1
+                oneOf {
+                    allOf {
+                        maxLength 3
+                        minLength 1
+                    }
+                    isodate                    
+                }
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc></doc>
+        <doc>foo</doc>
+        <doc>1</doc>
+        <doc>12</doc>
+        <doc>1234-12-31</doc>
+        <doc>-14.23</doc>
+        <doc>&#x1F46E;&#x1234;&#x1234;&#x1234;&#x1234;</doc>
+        <doc>1234-12</doc>
+        <doc>12345678901234567890</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 1 1 1 1 0 0 0 0}
+
 test schema-16.1 {interleave} {
     tdom::schema s
     s define {
@@ -2978,15 +3073,6 @@ test schema-16.6 {interleave} {
     s delete
     set result
 } {0 1 1 1 0 1 1 0}
-
-        # <doc/>
-        # <doc><a/><b1/><b2/><c/></doc>
-        # <doc><b1/><b2/><a/><c/></doc>
-        # <doc><c/><b1/><b2/><a/></doc>
-        # <doc><c/><b1/><a/><b2/></doc>
-        # <doc><b1/><b2/><a/><b1/><b2/><c/><b1/><b2/></doc>
-        # <doc><a/><c/></doc>
-        # <doc>12</doc>
 
 test schema-16.7 {interleave} {
     tdom::schema s

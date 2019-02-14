@@ -378,6 +378,24 @@
         <command><cmd>minLength</cmd></command>
         <desc></desc>
       </commanddef>
+      <commanddef>
+        <command><cmd>oneOf</cmd> <m>&lt;constraint script></m></command>
+        <desc>This text constraint match if one of the text
+        constraints defined in the argument <m>constraint script</m>
+        match the text. It stops after the first match and probes the
+        text constraints in the order of definition.</desc>
+      </commanddef>
+      <commanddef>
+        <command><cmd>allOf</cmd> <m>&lt;constraint script></m></command>
+        <desc>This text constraint match if all of the text
+        constraints defined in the argument <m>constraint script</m>
+        match the text. It stops after the first match failues and
+        probes the text constraints in the order of definition. Since
+        the schema definition commmand <m>text</m> also expects all
+        text constraints to match the text constraint <m>allOf</m> is
+        useful mostly together with the <m>oneOf</m> text constraint
+        commmand.</desc>
+      </commanddef>
     </commandlist>
   </section>
   
