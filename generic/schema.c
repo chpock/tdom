@@ -144,21 +144,21 @@ static void SetActiveSchemaData (SchemaData *v)
 
 #define CHECK_SI                                                        \
     if (!sdata) {                                                       \
-        SetResult ("Command called outside of schema context.");        \
+        SetResult ("Command called outside of schema context");         \
         return TCL_ERROR;                                               \
     }                                                                   \
     if (sdata->isTextConstraint) {                                      \
-        SetResult ("Command called in invalid schema context.");        \
+        SetResult ("Command called in invalid schema context");         \
         return TCL_ERROR;                                               \
     }
 
 #define CHECK_TI                                                        \
     if (!sdata) {                                                       \
-        SetResult ("Command called outside of schema context.");        \
+        SetResult ("Command called outside of schema context");         \
         return TCL_ERROR;                                               \
     }                                                                   \
     if (!sdata->isTextConstraint) {                                     \
-        SetResult ("Command called in invalid schema context.");        \
+        SetResult ("Command called in invalid schema context");         \
         return TCL_ERROR;                                               \
     }
 
@@ -1849,10 +1849,10 @@ schemaInstanceCmd (
     int            result = TCL_OK, forwardDef = 0, i = 0;
     int            savedDefineToplevel, type, len;
     unsigned int   savedNumPatternList;
-    SchemaData  *sdata = (SchemaData *) clientData;
+    SchemaData    *savedsdata, *sdata = (SchemaData *) clientData;
     Tcl_HashTable *hashTable;
     Tcl_HashEntry *entryPtr;
-    SchemaCP   *pattern, *current = NULL;
+    SchemaCP      *pattern, *current = NULL;
     void          *namespacePtr, *savedNamespacePtr;
     char          *xmlstr, *errMsg;
     domDocument   *doc;
@@ -1965,6 +1965,11 @@ schemaInstanceCmd (
         }
 
         if (!sdata->defineToplevel) {
+            savedsdata = GETASI;
+            if (savedsdata == sdata) {
+                SetResult ("Recursive call of schema command is not allowed");
+                return TCL_ERROR;
+            }
             SETASI(sdata);
         }
         savedDefineToplevel = sdata->defineToplevel;
@@ -1997,13 +2002,18 @@ schemaInstanceCmd (
         sdata->defineToplevel = savedDefineToplevel;
         sdata->currentNamespace = savedNamespacePtr;
         if (!savedDefineToplevel) {
-            SETASI(0);
+            SETASI(savedsdata);
         }
         break;
 
     case m_define:
         if (objc != 3) {
             Tcl_WrongNumArgs (interp, 2, objv, "<definition commands>");
+            return TCL_ERROR;
+        }
+        savedsdata = GETASI;
+        if (savedsdata == sdata) {
+            SetResult ("Recursive call of schema command is not allowed");
             return TCL_ERROR;
         }
         SETASI(sdata);
@@ -2019,7 +2029,7 @@ schemaInstanceCmd (
             cleanupLastPattern (sdata, savedNumPatternList);
         }
         sdata->defineToplevel = 0;
-        SETASI(0);
+        SETASI(savedsdata);
         break;
 
     case m_start:

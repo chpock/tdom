@@ -231,7 +231,69 @@ test schema-1.14 {define start w/ namespace} {
     s delete
     set result
 } {1 1 1 0}
-        
+
+test schema-1.15 {call structure constraint outside define/defelement} {
+    set result [catch {tdom::schema::element foo} errMsg]
+    lappend result $errMsg
+    tdom::schema create grammar
+    lappend result [catch {tdom::schema::element foo} errMsg]
+    lappend result $errMsg
+    lappend result [catch {grammar define {::tdom::schema::element foo}} errMsg]
+    lappend result $errMsg
+    lappend result [catch {grammar defelement bar {::tdom::schema::element foo}} errMsg]
+    lappend result $errMsg
+    grammar delete
+    set result
+} {1 {Command called outside of schema context} 1 {Command called outside of schema context} 1 {Command not allowed at top level in schema define evaluation} 0 {}}
+
+test schema-1.16 {call another schema cmd in a schema definition script} {
+    tdom::schema create s1
+    s1 define {
+        defelement s1a {
+            element s1b *
+            element s1c
+        }
+        ::tdom::schema ::s2
+        s2 define {
+            defelement s1a {
+                element s1b *
+                element s1c
+            }
+        }
+        defelement s1b {
+            element s1b1
+        }
+    }
+    set result [list]
+    foreach xml {
+        <s1a/>
+        <s1a><s1b/><s1c/></s1a>
+        <s1a><s1c/></s1a>
+        <s1a><s1b><s1b1/></s1b><s1c/></s1a>
+    } {
+        lappend result [s1 validate $xml]
+        lappend result [s2 validate $xml]
+    }
+    s1 delete
+    s2 delete
+    set result
+} {0 0 0 1 1 1 1 0}
+
+test schema-1.17 {call schema cmd evaluation in his own schema definition script} {
+    tdom::schema create s1
+    set result [catch {s1 define {
+        defelement s1a {
+            s1 defelement s1b {
+                element s1b1
+            }
+            element s1b *
+            element s1c
+        }
+    }} errMsg]
+    s1 delete
+    set result
+} 1
+
 test schema-2.1 {grammar definition: ref} {
     tdom::schema create grammar
     grammar defpattern thisPattern {
