@@ -112,6 +112,7 @@ typedef struct
     Tcl_HashEntry *emptyNamespace;
     Tcl_HashTable pattern;
     Tcl_HashTable attrNames;
+    Tcl_HashTable textDef;
     SchemaCP **patternList; 
     unsigned int numPatternList;
     unsigned int patternListSize;
