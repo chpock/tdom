@@ -709,7 +709,10 @@ TclExpatInstanceCmd (
   TclGenExpatInfo *expat = (TclGenExpatInfo *) clientData;
   char *data;
   int len = 0, optionIndex, result = TCL_OK;
-
+#ifndef TDOM_NO_SCHEMA
+  int resetsdata = 0;
+#endif
+  
   static const char *options[] = {
       "configure", "cget", "currentmarkup", "free", "get",
       "parse", "parsechannel", "parsefile", "reset", "delete",
@@ -814,6 +817,9 @@ TclExpatInstanceCmd (
         data = Tcl_GetStringFromObj(objv[2], &len);
         result = TclExpatParse(interp, expat, data, len, EXPAT_INPUT_STRING);
         if (expat->final || result != TCL_OK) {
+#ifndef TDOM_NO_SCHEMA
+            resetsdata = 1;
+#endif
             expat->final = 1;
             expat->finished = 1;
         }
@@ -827,6 +833,9 @@ TclExpatInstanceCmd (
             result = TCL_ERROR;
             break;
         }
+#ifndef TDOM_NO_SCHEMA
+        resetsdata = 1;
+#endif
         data = Tcl_GetString(objv[2]);
         result = TclExpatParse(interp, expat, data, len, EXPAT_INPUT_CHANNEL);
         if (expat->final || result != TCL_OK) {
@@ -843,6 +852,9 @@ TclExpatInstanceCmd (
             result = TCL_ERROR;
             break;
         }
+#ifndef TDOM_NO_SCHEMA
+        resetsdata = 1;
+#endif
         data = Tcl_GetString(objv[2]);
         result = TclExpatParse (interp, expat, data, len, 
                                 EXPAT_INPUT_FILENAME);
@@ -867,6 +879,11 @@ TclExpatInstanceCmd (
 
   }
 
+#ifndef TDOM_NO_SCHEMA
+  if (resetsdata && expat->sdata) {
+      schemaReset (expat->sdata);
+  }
+#endif
   return result;
 }
 

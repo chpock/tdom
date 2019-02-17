@@ -502,27 +502,15 @@ test schema-5.2 {dom parse -validateCmd} {
     dom parse -validateCmd grammar {
         <doc><e1/></doc>
     } doc
-    if {[grammar state] ne "FINISHED"} {
-        error "Wrong state."
-    }
     $doc delete
-    grammar reset
     dom parse -validateCmd grammar {
         <doc><e1/><e2/></doc>
     } doc
-    if {[grammar state] ne "FINISHED"} {
-        error "Wrong state."
-    }
     $doc delete
-    grammar reset
     dom parse -validateCmd grammar {
         <doc><e1/><e2/><e2/><e2/></doc>
     } doc
-    if {[grammar state] ne "FINISHED"} {
-        error "Wrong state."
-    }
     $doc delete
-    grammar delete
 } {}
 
 proc schema-5.3 {base systemId publicId} {
@@ -602,9 +590,6 @@ test schema-7.1 {group} {
         <doc><e1/><e1/><e2/><e2/><e2/><e2/></doc>
     } doc
     $doc delete
-    if {[grammar state] ne "FINISHED"} {
-        error "Wrong state."
-    }
     grammar delete
 } {}
 
@@ -631,9 +616,6 @@ test schema-7.1.1 {group} {
         <doc><e1/><e1/><e2/><e1/><e2/><e2/><e2/><e2/></doc>
     } doc
     $doc delete
-    if {[grammar state] ne "FINISHED"} {
-        error "Wrong state."
-    }
     grammar delete
 } {}
 
@@ -654,9 +636,6 @@ test schema-7.2 {group} {
         <doc><e1/><e1/><e2/><e1/><e2/><e2/><e2/><e2/></doc>
     } doc
     $doc delete
-    if {[grammar state] ne "FINISHED"} {
-        error "Wrong state."
-    }
     grammar delete
 } {}
 
@@ -679,9 +658,6 @@ test schema-7.2.1 {group} {
         <doc><e1/><e1/><e2/><e1/><e2/><e2/><e2/><e2/></doc>
     } doc
     $doc delete
-    if {[grammar state] ne "FINISHED"} {
-        error "Wrong state."
-    }
     grammar delete
 } {}
 
@@ -706,9 +682,6 @@ test schema-7.3 {group with inline defined element} {
         <doc><e1/><e1><e2/></e1><e2/><e1><e2/></e1><e2/><e2/><e2/><e2/></doc>
     } doc
     $doc delete
-    if {[grammar state] ne "FINISHED"} {
-        error "Wrong state."
-    }
     grammar delete
 } {}
 
@@ -732,9 +705,6 @@ test schema-7.4 {group with inline defined element} {
         <doc><e1/><e1><e2/></e1><e2/></doc>
     } doc
     $doc delete
-    if {[grammar state] ne "FINISHED"} {
-        error "Wrong state."
-    }
     grammar delete
 } {}
 
@@ -759,9 +729,6 @@ test schema-7.5 {group with inline defined element} {
         <doc><e1/><e1><e2/></e1><e2/></doc>
     }
     p delete
-    if {[grammar state] ne "FINISHED"} {
-        error "Wrong state."
-    }
     grammar delete
 } {}
 
@@ -893,10 +860,6 @@ test schema-7.7 {nested groups via refs} {
          </doc>
     }]
     $doc delete
-    if {[grammar state] ne "FINISHED"} {
-        error "Wrong state."
-    }
-    grammar reset
     set result [grammar validate {
          <doc>
            <!-- ref b start -->
@@ -960,9 +923,6 @@ test schema-7.8 {nested groups via refs} {
          </doc>
     }]
     $doc delete
-    if {[grammar state] ne "FINISHED"} {
-        error "Wrong state."
-    }
     grammar delete
 } {}
 
@@ -2910,7 +2870,7 @@ test schema-14.16 {text: oneOf} {
     set result
 } {0 0 1 1 1 1 0 0 0 0}
 
-test schema-14.17 {text: oneOf w/ anyOf} {
+test schema-14.17 {text: oneOf w/ allOf} {
     tdom::schema s
     s define {
         defelement doc {
@@ -2944,6 +2904,41 @@ test schema-14.17 {text: oneOf w/ anyOf} {
     s delete
     set result
 } {0 0 1 1 1 1 0 0 0 0}
+
+test schema-14.18 {deftext} {
+    tdom::schema s
+    s deftext len2-4 {
+        minLength 2
+        maxLength 4
+    }
+    s defelement doc {
+         element e ! {text type len2-4}
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><e/></doc>
+        <doc><e></e></doc>
+        {<doc><e> </e></doc>}
+        {<doc><e>1</e></doc>}
+        {<doc><e>12</e></doc>}
+        {<doc><e>  </e></doc>}
+        {<doc><e>123</e></doc>}
+        {<doc><e>1234</e></doc>}
+        {<doc><e>1234 </e></doc>}
+        {<doc><e>12345</e></doc>}
+        {<doc><e>123&#x1234;</e></doc>}
+    } {
+        lappend result [s validate $xml]
+        set rc [catch {dom parse -validateCmd s $xml doc}]
+        if {$rc == 0} {
+            $doc delete
+        }
+        lappend result $rc
+    }
+    s delete
+    set result
+} {0 1 0 1 0 1 0 1 0 1 1 0 1 0 1 0 1 0 0 1 0 1 1 0}
 
 test schema-16.1 {interleave} {
     tdom::schema s

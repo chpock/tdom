@@ -196,5 +196,9 @@ probeText (
     char *text
     );
 
+void
+schemaReset (
+    SchemaData *sdata
+    );
 
 #endif 

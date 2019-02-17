@@ -1567,8 +1567,7 @@ probeText (
             return TCL_OK;
         }
     }
-
-    SetResult ("Unexpected text content");
+    SetResult ("Text content doesn't match");
     return TCL_ERROR;
 }
 
@@ -1829,7 +1828,7 @@ validateDOM (
     return TCL_OK;
 }
 
-static void
+void
 schemaReset (
     SchemaData *sdata
     )
@@ -1866,7 +1865,7 @@ evalConstraints (
     /* ... and restore the previously saved sdata states  */
     sdata->cp = savedCP;
     sdata->contentSize = savedContenSize;
-    if (!sdata->isAttributeConstaint && cp->nc) {
+    if (sdata->cp && !sdata->isAttributeConstaint && cp->nc) {
         sdata->cp->flags |= CONSTRAINT_TEXT_CHILD;
     }
     return result;
@@ -2834,6 +2833,7 @@ TextPatternObjCmd (
             return TCL_ERROR;
         }
         pattern = (SchemaCP *) Tcl_GetHashValue (h);
+        sdata->cp->flags |= CONSTRAINT_TEXT_CHILD;
     }
     if (objc < 3) {
         REMEMBER_PATTERN (pattern)
