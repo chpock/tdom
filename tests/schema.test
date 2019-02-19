@@ -232,7 +232,69 @@ test schema-1.14 {define start w/ namespace} {
     s delete
     set result
 } {1 1 1 0}
-        
+
+test schema-1.15 {call structure constraint outside define/defelement} {
+    set result [catch {tdom::schema::element foo} errMsg]
+    lappend result $errMsg
+    tdom::schema create grammar
+    lappend result [catch {tdom::schema::element foo} errMsg]
+    lappend result $errMsg
+    lappend result [catch {grammar define {::tdom::schema::element foo}} errMsg]
+    lappend result $errMsg
+    lappend result [catch {grammar defelement bar {::tdom::schema::element foo}} errMsg]
+    lappend result $errMsg
+    grammar delete
+    set result
+} {1 {Command called outside of schema context} 1 {Command called outside of schema context} 1 {Command not allowed at top level in schema define evaluation} 0 {}}
+
+test schema-1.16 {call another schema cmd in a schema definition script} {
+    tdom::schema create s1
+    s1 define {
+        defelement s1a {
+            element s1b *
+            element s1c
+        }
+        ::tdom::schema ::s2
+        s2 define {
+            defelement s1a {
+                element s1b *
+                element s1c
+            }
+        }
+        defelement s1b {
+            element s1b1
+        }
+    }
+    set result [list]
+    foreach xml {
+        <s1a/>
+        <s1a><s1b/><s1c/></s1a>
+        <s1a><s1c/></s1a>
+        <s1a><s1b><s1b1/></s1b><s1c/></s1a>
+    } {
+        lappend result [s1 validate $xml]
+        lappend result [s2 validate $xml]
+    }
+    s1 delete
+    s2 delete
+    set result
+} {0 0 0 1 1 1 1 0}
+
+test schema-1.17 {call schema cmd evaluation in his own schema definition script} {
+    tdom::schema create s1
+    set result [catch {s1 define {
+        defelement s1a {
+            s1 defelement s1b {
+                element s1b1
+            }
+            element s1b *
+            element s1c
+        }
+    }} errMsg]
+    s1 delete
+    set result
+} 1
+
 test schema-2.1 {grammar definition: ref} {
     tdom::schema create grammar
     grammar defpattern thisPattern {
@@ -441,27 +503,15 @@ test schema-5.2 {dom parse -validateCmd} {
     dom parse -validateCmd grammar {
         <doc><e1/></doc>
     } doc
-    if {[grammar state] ne "FINISHED"} {
-        error "Wrong state."
-    }
     $doc delete
-    grammar reset
     dom parse -validateCmd grammar {
         <doc><e1/><e2/></doc>
     } doc
-    if {[grammar state] ne "FINISHED"} {
-        error "Wrong state."
-    }
     $doc delete
-    grammar reset
     dom parse -validateCmd grammar {
         <doc><e1/><e2/><e2/><e2/></doc>
     } doc
-    if {[grammar state] ne "FINISHED"} {
-        error "Wrong state."
-    }
     $doc delete
-    grammar delete
 } {}
 
 proc schema-5.3 {base systemId publicId} {
@@ -541,9 +591,6 @@ test schema-7.1 {group} {
         <doc><e1/><e1/><e2/><e2/><e2/><e2/></doc>
     } doc
     $doc delete
-    if {[grammar state] ne "FINISHED"} {
-        error "Wrong state."
-    }
     grammar delete
 } {}
 
@@ -570,9 +617,6 @@ test schema-7.1.1 {group} {
         <doc><e1/><e1/><e2/><e1/><e2/><e2/><e2/><e2/></doc>
     } doc
     $doc delete
-    if {[grammar state] ne "FINISHED"} {
-        error "Wrong state."
-    }
     grammar delete
 } {}
 
@@ -593,9 +637,6 @@ test schema-7.2 {group} {
         <doc><e1/><e1/><e2/><e1/><e2/><e2/><e2/><e2/></doc>
     } doc
     $doc delete
-    if {[grammar state] ne "FINISHED"} {
-        error "Wrong state."
-    }
     grammar delete
 } {}
 
@@ -618,9 +659,6 @@ test schema-7.2.1 {group} {
         <doc><e1/><e1/><e2/><e1/><e2/><e2/><e2/><e2/></doc>
     } doc
     $doc delete
-    if {[grammar state] ne "FINISHED"} {
-        error "Wrong state."
-    }
     grammar delete
 } {}
 
@@ -645,9 +683,6 @@ test schema-7.3 {group with inline defined element} {
         <doc><e1/><e1><e2/></e1><e2/><e1><e2/></e1><e2/><e2/><e2/><e2/></doc>
     } doc
     $doc delete
-    if {[grammar state] ne "FINISHED"} {
-        error "Wrong state."
-    }
     grammar delete
 } {}
 
@@ -671,9 +706,6 @@ test schema-7.4 {group with inline defined element} {
         <doc><e1/><e1><e2/></e1><e2/></doc>
     } doc
     $doc delete
-    if {[grammar state] ne "FINISHED"} {
-        error "Wrong state."
-    }
     grammar delete
 } {}
 
@@ -698,9 +730,6 @@ test schema-7.5 {group with inline defined element} {
         <doc><e1/><e1><e2/></e1><e2/></doc>
     }
     p delete
-    if {[grammar state] ne "FINISHED"} {
-        error "Wrong state."
-    }
     grammar delete
 } {}
 
@@ -832,10 +861,6 @@ test schema-7.7 {nested groups via refs} {
          </doc>
     }]
     $doc delete
-    if {[grammar state] ne "FINISHED"} {
-        error "Wrong state."
-    }
-    grammar reset
     set result [grammar validate {
          <doc>
            <!-- ref b start -->
@@ -899,9 +924,6 @@ test schema-7.8 {nested groups via refs} {
          </doc>
     }]
     $doc delete
-    if {[grammar state] ne "FINISHED"} {
-        error "Wrong state."
-    }
     grammar delete
 } {}
 
@@ -1777,9 +1799,6 @@ test schema-9.8 {choice as choice child} {
                 }
             }
         }
-        foreach e {e1 e2 e3 e4} {
-            defelement $e foouri {}
-        }
     }
     set result [list]
     foreach xml {
@@ -2283,6 +2302,58 @@ test schema-12.4 {domvalidate w/ text} {
     set result
 } {1 1 1 1 1 1 0 0 0 0}
 
+test schema-12.5 {domvalidate doch w/ xml namespace} {
+    tdom::schema s 
+    s define {
+        defelement addressBook http://foo.bar {
+            element card *
+        }
+        defelement card http://foo.bar {
+            element name
+            element email
+        }
+        foreach e {name email} {
+            defelement $e http://foo.bar {text}
+        }
+    }
+    set doc [dom parse {
+<addressBook xmlns="http://foo.bar">
+  <card>
+    <name>John Smith</name>
+    <email>js@example.com</email>
+  </card>
+  <card>
+    <name>Fred Bloggs</name>
+    <email>fb@example.net</email>
+  </card>
+</addressBook>        
+    }]
+    set result [s domvalidate $doc]
+    lappend result [s domvalidate [$doc documentElement]]
+    lappend result [s domvalidate [[$doc documentElement] firstChild]]
+    lappend result [s domvalidate [[[$doc documentElement] firstChild] firstChild]]
+    $doc delete
+    set doc [dom parse {
+<ns1:addressBook xmlns:ns1="http://foo.bar">
+  <ns1:card>
+    <ns1:name>John Smith</ns1:name>
+    <ns1:email>js@example.com</ns1:email>
+  </ns1:card>
+  <ns1:card>
+    <ns1:name>Fred Bloggs</ns1:name>
+    <ns1:email>fb@example.net</ns1:email>
+  </ns1:card>
+</ns1:addressBook>        
+}]
+    lappend result [s domvalidate $doc]
+    lappend result [s domvalidate [$doc documentElement]]
+    lappend result [s domvalidate [[$doc documentElement] firstChild]]
+    lappend result [s domvalidate [[[$doc documentElement] firstChild] firstChild]]
+    $doc delete
+    s delete
+    set result
+} {1 1 1 1 1 1 1 1}
+
 test schema-13.1 {XML namespaces} {
     tdom::schema create s
     s defelement doc ns1 {
@@ -2781,6 +2852,139 @@ test schema-15.2 {constraint cmd tcl} {
     set result
 } {1 {} astartaendastartaend}
 
+test schema-14.15 {text: oneOf} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            text {
+                oneOf {
+                    maxLength 3
+                    isodate
+                }
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc></doc>
+        <doc>foo</doc>
+        <doc>1</doc>
+        <doc>12</doc>
+        <doc>1234-12-31</doc>
+        <doc>-14.23</doc>
+        <doc>&#x1F46E;&#x1234;&#x1234;&#x1234;&#x1234;</doc>
+        <doc>1234-12</doc>
+        <doc>12345678901234567890</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 1 1 1 1 1 0 0 0 0}
+
+test schema-14.16 {text: oneOf} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            text {
+                minLength 1
+                oneOf {
+                    maxLength 3
+                    isodate
+                }
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc></doc>
+        <doc>foo</doc>
+        <doc>1</doc>
+        <doc>12</doc>
+        <doc>1234-12-31</doc>
+        <doc>-14.23</doc>
+        <doc>&#x1F46E;&#x1234;&#x1234;&#x1234;&#x1234;</doc>
+        <doc>1234-12</doc>
+        <doc>12345678901234567890</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 1 1 1 1 0 0 0 0}
+
+test schema-14.17 {text: oneOf w/ allOf} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            text {
+                minLength 1
+                oneOf {
+                    allOf {
+                        maxLength 3
+                        minLength 1
+                    }
+                    isodate                    
+                }
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc></doc>
+        <doc>foo</doc>
+        <doc>1</doc>
+        <doc>12</doc>
+        <doc>1234-12-31</doc>
+        <doc>-14.23</doc>
+        <doc>&#x1F46E;&#x1234;&#x1234;&#x1234;&#x1234;</doc>
+        <doc>1234-12</doc>
+        <doc>12345678901234567890</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 1 1 1 1 0 0 0 0}
+
+test schema-14.18 {deftext} {
+    tdom::schema s
+    s deftext len2-4 {
+        minLength 2
+        maxLength 4
+    }
+    s defelement doc {
+         element e ! {text type len2-4}
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><e/></doc>
+        <doc><e></e></doc>
+        {<doc><e> </e></doc>}
+        {<doc><e>1</e></doc>}
+        {<doc><e>12</e></doc>}
+        {<doc><e>  </e></doc>}
+        {<doc><e>123</e></doc>}
+        {<doc><e>1234</e></doc>}
+        {<doc><e>1234 </e></doc>}
+        {<doc><e>12345</e></doc>}
+        {<doc><e>123&#x1234;</e></doc>}
+    } {
+        lappend result [s validate $xml]
+        set rc [catch {dom parse -validateCmd s $xml doc}]
+        if {$rc == 0} {
+            $doc delete
+        }
+        lappend result $rc
+    }
+    s delete
+    set result
+} {0 1 0 1 0 1 0 1 0 1 1 0 1 0 1 0 1 0 0 1 0 1 1 0}
+
 test schema-16.1 {interleave} {
     tdom::schema s
     s define {
@@ -2972,15 +3176,6 @@ test schema-16.6 {interleave} {
     set result
 } {0 1 1 1 0 1 1 0}
 
-        # <doc/>
-        # <doc><a/><b1/><b2/><c/></doc>
-        # <doc><b1/><b2/><a/><c/></doc>
-        # <doc><c/><b1/><b2/><a/></doc>
-        # <doc><c/><b1/><a/><b2/></doc>
-        # <doc><b1/><b2/><a/><b1/><b2/><c/><b1/><b2/></doc>
-        # <doc><a/><c/></doc>
-        # <doc>12</doc>
-
 test schema-16.7 {interleave} {
     tdom::schema s
     s define {
@@ -3117,5 +3312,177 @@ test schema-16.10 {interleave} {
     set result
 } {0 1 1 1 0 0 1 0}
 
+test schema-16.11 {interleave} {
+    tdom::schema s
+    s define {
+        foreach e {a b1 b2 c} {
+            defelement $e {}
+        }
+        defelement doc {
+            interleave {
+                element a
+                choice {
+                    element b1
+                    element b2
+                }
+                element c
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/><b1/><c/></doc>
+        <doc><b2/><a/><c/></doc>
+        <doc><c/><b1/><a/></doc>
+        <doc><c/><b1/><a/><b2/></doc>
+        <doc><b1/><b2/><a/><b1/><b2/><c/><b1/><b2/></doc>
+        <doc><a/><c/></doc>
+        <doc>12</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 1 1 0 0 0 0}
+
+test schema-16.12 {interleave} {
+    tdom::schema s
+    s define {
+        foreach e {a b1 b2 c} {
+            defelement $e {}
+        }
+        defelement doc {
+            interleave {
+                element a
+                choice ? {
+                    element b1
+                    element b2
+                }
+                element c
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/><b1/><c/></doc>
+        <doc><b2/><a/><c/></doc>
+        <doc><c/><b1/><a/></doc>
+        <doc><c/><b1/><a/><b2/></doc>
+        <doc><b1/><b2/><a/><b1/><b2/><c/><b1/><b2/></doc>
+        <doc><a/><c/></doc>
+        <doc>12</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 1 1 0 0 1 0}
+
+test schema-16.13 {interleave} {
+    tdom::schema s
+    s define {
+        foreach e {a b1 b2 c} {
+            defelement $e {}
+        }
+        defelement doc {
+            interleave {
+                element a
+                choice + {
+                    element b1
+                    element b2
+                }
+                element c
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/><b1/><c/></doc>
+        <doc><b2/><a/><c/></doc>
+        <doc><c/><b1/><a/></doc>
+        <doc><c/><b1/><a/><b2/></doc>
+        <doc><b1/><b2/><a/><b1/><b2/><c/><b1/><b2/></doc>
+        <doc><a/><c/></doc>
+        <doc>12</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 1 1 1 1 0 0}
+
+test schema-16.14 {interleave} {
+    tdom::schema s
+    s define {
+        foreach e {a b1 b2 c} {
+            defelement $e {}
+        }
+        defelement doc {
+            interleave {
+                element a
+                choice * {
+                    element b1
+                    element b2
+                }
+                element c
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/><b1/><c/></doc>
+        <doc><b2/><a/><c/></doc>
+        <doc><c/><b1/><a/></doc>
+        <doc><c/><b1/><a/><b2/></doc>
+        <doc><b1/><b2/><a/><b1/><b2/><c/><b1/><b2/></doc>
+        <doc><a/><c/></doc>
+        <doc>12</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 1 1 1 1 1 0}
+
+test schema-16.15 {interleave} {
+    tdom::schema s
+    s define {
+        foreach e {a b1 b11 b2 c} {
+            defelement $e {}
+        }
+        defelement doc {
+            interleave {
+                element a
+                choice * {
+                    element b1
+                    group {
+                        element b11
+                        element b2
+                    }
+                }
+                element c
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/><b1/><c/></doc>
+        <doc><b2/><a/><c/></doc>
+        <doc><c/><b1/><a/></doc>
+        <doc><c/><b1/><a/><b2/></doc>
+        <doc><b11/><b2/><a/><b11/><b2/><c/><b11/><b2/></doc>
+        <doc><a/><c/></doc>
+        <doc>12</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 0 1 0 1 1 0}
 
 }

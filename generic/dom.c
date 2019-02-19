@@ -1509,7 +1509,15 @@ DispatchPCDATA (
     int            len, hnew, only_whites;
     
     len = Tcl_DStringLength (info->cdata);
+#ifndef TDOM_NO_SCHEMA
+    if (!len && !info->cdataSection
+        && !(info->sdata
+             && info->sdata->stack
+             && info->sdata->stack->pattern->flags & CONSTRAINT_TEXT_CHILD))
+        return;
+#else
     if (!len && !info->cdataSection) return;
+#endif
     s = Tcl_DStringValue (info->cdata);
     
     parentNode = info->currentNode;
@@ -1525,6 +1533,7 @@ DispatchPCDATA (
         memmove(node->nodeValue + node->valueLength, s, len);
         node->valueLength += len;
 
+        only_whites = 0;
     } else {
 
         if (info->ignoreWhiteSpaces) {

@@ -1,3 +1,4 @@
+<!DOCTYPE  manpage  PUBLIC "-//jenglish//DTD TMML 0.6//EN" "tmml.dtd">
 <manpage id="schema" cat="schema" title="schema">
   <namesection>
     <name>tdom::schema</name>
@@ -337,7 +338,7 @@
       
       <commanddef>
         <command><cmd>tcl</cmd> <m>tclcmd</m> <m>?arg arg ...?</m></command>
-        <desc>Evaluates the tcl script <m>tclcmd arg arg ... /m> and
+        <desc>Evaluates the tcl script <m>tclcmd arg arg ... </m> and
         the text to validate appended to the argument list. The return
         value of the tcl command is interpreted as a boolean.</desc>
       </commanddef>
@@ -356,6 +357,44 @@
       <commanddef>
         <command><cmd>nmtokens</cmd></command>
         <desc></desc>
+      </commanddef>
+      <commanddef>
+        <command><cmd>number</cmd></command>
+        <desc></desc>
+      </commanddef>
+      <commanddef>
+        <command><cmd>boolean</cmd></command>
+        <desc></desc>
+      </commanddef>
+      <commanddef>
+        <command><cmd>isodate</cmd></command>
+        <desc></desc>
+      </commanddef>
+      <commanddef>
+        <command><cmd>maxLength</cmd></command>
+        <desc></desc>
+      </commanddef>
+      <commanddef>
+        <command><cmd>minLength</cmd></command>
+        <desc></desc>
+      </commanddef>
+      <commanddef>
+        <command><cmd>oneOf</cmd> <m>&lt;constraint script></m></command>
+        <desc>This text constraint match if one of the text
+        constraints defined in the argument <m>constraint script</m>
+        match the text. It stops after the first match and probes the
+        text constraints in the order of definition.</desc>
+      </commanddef>
+      <commanddef>
+        <command><cmd>allOf</cmd> <m>&lt;constraint script></m></command>
+        <desc>This text constraint match if all of the text
+        constraints defined in the argument <m>constraint script</m>
+        match the text. It stops after the first match failues and
+        probes the text constraints in the order of definition. Since
+        the schema definition commmand <m>text</m> also expects all
+        text constraints to match the text constraint <m>allOf</m> is
+        useful mostly together with the <m>oneOf</m> text constraint
+        commmand.</desc>
       </commanddef>
     </commandlist>
   </section>

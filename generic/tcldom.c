@@ -6617,6 +6617,9 @@ int tcldom_parse (
 #endif
                           interp,
                           &status);
+#ifndef TDOM_NO_SCHEMA
+    if (sdata) schemaReset (sdata);
+#endif
     if (doc == NULL) {
         char s[50];
         long byteIndex, i;

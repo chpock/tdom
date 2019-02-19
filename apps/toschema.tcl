@@ -44,7 +44,18 @@ proc fromDTD_serialize {level type quant name content} {
             return
         }
         "SEQ" {
-            puts "[indent]group $quant \{"
+            if {$level == 1 && $quant eq ""} {
+                # At least directly below defelement there isn't any
+                # need to wrap a ! SEQ into a group container -
+                # defelement childs are already processed as sequence
+                # while validating.
+                foreach cp $content {
+                    fromDTD_serialize $level {*}$cp
+                }
+                return
+            } else {
+                puts "[indent]group $quant \{"
+            }
         }
         "CHOICE" {
             puts "[indent]choice $quant \{"
