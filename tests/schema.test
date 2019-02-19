@@ -2808,50 +2808,6 @@ test schema-14.14 {text: one of two types} {
     set result
 } {0 0 1 1 1 1 0 0 0 0}
 
-test schema-15.1 {constraint cmd tcl} {
-    tdom::schema s
-    s define {
-        defelement a {
-            tcl append ::schema-15.1
-            element b
-            tcl append ::schema-15.1
-        }
-    }
-    set ::schema-15.1 ""
-    set result [s validate {<a><b/></a>} msg]
-    s delete
-    lappend result $msg ${::schema-15.1}
-    set result
-} {1 {} ba}
-
-proc schema-15.2-astart {args} {
-    append ::schema-15.2 astart
-}
-
-proc schema-15.2-aend {args} {
-    append ::schema-15.2 aend
-}
-
-test schema-15.2 {constraint cmd tcl} {
-    tdom::schema s
-    s define {
-        defelement doc {
-            element a *
-        }
-        defelement a {
-            tcl schema-15.2-astart
-            element b ! text
-            element c ! text
-            tcl schema-15.2-aend
-        }
-    }
-    set schema-15.2 ""
-    set result [s validate {<doc><a><b>foo</b><c/></a><a><b></b><c>bar</c></a></doc>} msg]
-    s delete
-    lappend result $msg ${schema-15.2}
-    set result
-} {1 {} astartaendastartaend}
-
 test schema-14.15 {text: oneOf} {
     tdom::schema s
     s define {
@@ -2984,6 +2940,50 @@ test schema-14.18 {deftext} {
     s delete
     set result
 } {0 1 0 1 0 1 0 1 0 1 1 0 1 0 1 0 1 0 0 1 0 1 1 0}
+
+test schema-15.1 {constraint cmd tcl} {
+    tdom::schema s
+    s define {
+        defelement a {
+            tcl append ::schema-15.1
+            element b
+            tcl append ::schema-15.1
+        }
+    }
+    set ::schema-15.1 ""
+    set result [s validate {<a><b/></a>} msg]
+    s delete
+    lappend result $msg ${::schema-15.1}
+    set result
+} {1 {} ba}
+
+proc schema-15.2-astart {args} {
+    append ::schema-15.2 astart
+}
+
+proc schema-15.2-aend {args} {
+    append ::schema-15.2 aend
+}
+
+test schema-15.2 {constraint cmd tcl} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element a *
+        }
+        defelement a {
+            tcl schema-15.2-astart
+            element b ! text
+            element c ! text
+            tcl schema-15.2-aend
+        }
+    }
+    set schema-15.2 ""
+    set result [s validate {<doc><a><b>foo</b><c/></a><a><b></b><c>bar</c></a></doc>} msg]
+    s delete
+    lappend result $msg ${schema-15.2}
+    set result
+} {1 {} astartaendastartaend}
 
 test schema-16.1 {interleave} {
     tdom::schema s

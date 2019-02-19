@@ -218,9 +218,10 @@
       <commanddef>
         <command><method>text</method> <m>?&lt;constraint script>?</m></command>
         <desc>Without the optional constraint script this validation
-        constraint matches every string (including the empty one).
-        With <m>constraint script</m> argument a text matching this
-        script is expected.</desc>
+        constraint matches every string (including the empty one). If
+        the <m>constraint script</m> argument is given then a text
+        machtes if it passes all text constraints in the
+        script.</desc>
       </commanddef>
 
       <commanddef>

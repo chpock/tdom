@@ -885,15 +885,14 @@ matchElementStart (
                 popStack (sdata);
                 if (!mayskip && rc == -1) mayskip = 1;
                 break;
+
+            case SCHEMA_CTYPE_VIRTUAL:
+                break;
             }
 
         }
                 
         break;
-
-
-        fprintf (stderr, "matchElementStart: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
-        return 0;
     }
     
     return 0;
@@ -1595,8 +1594,11 @@ matchText (
                     break;
 
                 case SCHEMA_CTYPE_CHOICE:
-                    Tcl_Panic ("MIXED or CHOICE child of MIXED or CHOICE");
+                    Tcl_Panic ("MIXED or CHOICE child of INTERLEAVE");
 
+                case SCHEMA_CTYPE_VIRTUAL:
+                    break;
+                    
                 }
             }
         }
@@ -2945,6 +2947,17 @@ VirtualPatternObjCmd (
     CHECK_TOPLEVEL
     if (objc < 2) {
         SetResult ("Expected: <tclcmd> ?arg? ?arg? ...");
+        return TCL_ERROR;
+    }
+
+    switch (sdata->cp->type) {
+    case SCHEMA_CTYPE_NAME:
+    case SCHEMA_CTYPE_PATTERN:
+        break;
+    default:
+        SetResult ("The \"tcl\" schema definition command is only "
+                   "allowed in sequential context (defelement, "
+                   "element or defpattern)");
         return TCL_ERROR;
     }
 
