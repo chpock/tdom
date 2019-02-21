@@ -842,10 +842,6 @@ matchElementStart (
         }
                 
         break;
-
-
-        fprintf (stderr, "matchElementStart: SCHEMA_CTYPE_INTERLEAVE to be implemented\n");
-        return 0;
     }
     return 0;
 }
@@ -1871,6 +1867,43 @@ evalConstraints (
     return result;
 }
 
+static int
+schemaInstanceQueryCmd (
+    SchemaData *sdata,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    int methodIndex;
+    
+    static const char *schemaInstanceQueryMethods[] = {
+        "defelements", NULL
+    };
+    enum schemaInstanceQueryMethod {
+        m_defelements
+    };
+
+    if (objc < 2) {
+        Tcl_WrongNumArgs (interp, 1, objv, "subcommand ?arguments?");
+        return TCL_ERROR;
+    }
+
+    if (Tcl_GetIndexFromObj (interp, objv[1], schemaInstanceQueryMethods,
+                             "method", 0, &methodIndex)
+        != TCL_OK) {
+        return TCL_ERROR;
+    }
+    
+    Tcl_ResetResult (interp);
+    switch ((enum schemaInstanceQueryMethod) methodIndex) {
+    case m_defelements:
+        break;
+    }
+    
+    return TCL_OK;
+}
+
 int
 schemaInstanceCmd (
     ClientData clientData,
@@ -1893,14 +1926,15 @@ schemaInstanceCmd (
     domNode       *node;
 
     static const char *schemaInstanceMethods[] = {
-        "defelement", "defpattern",  "start", "event", "delete",
-        "nrForwardDefinitions",      "state", "reset", "define",
-        "validate",   "domvalidate", "deftext", NULL
+        "defelement", "defpattern",  "start",   "event", "delete",
+        "nrForwardDefinitions",      "state",   "reset", "define",
+        "validate",   "domvalidate", "deftext", "query", "reportcmd",
+        NULL
     };
     enum schemaInstanceMethod {
-        m_defelement,  m_defpattern,  m_start, m_event, m_delete,
-        m_nrForwardDefinitions,       m_state, m_reset, m_define,
-        m_validate,    m_domvalidate, m_deftext
+        m_defelement,  m_defpattern,  m_start,   m_event, m_delete,
+        m_nrForwardDefinitions,       m_state,   m_reset, m_define,
+        m_validate,    m_domvalidate, m_deftext, m_query, m_reportcmd
     };
 
     static const char *eventKeywords[] = {
@@ -2260,6 +2294,24 @@ schemaInstanceCmd (
             SetBooleanResult (0);
         }
         schemaReset (sdata);
+        break;
+
+    case m_query:
+        objv++;
+        objc++;
+        result = schemaInstanceQueryCmd (sdata, interp, objc, objv);
+        break;
+
+    case m_reportcmd:
+        if (objc != 3) {
+            Tcl_WrongNumArgs (interp, 2, objv, "<tcl-cmd>");
+            return TCL_ERROR;
+        }
+        if (sdata->reportCmd) {
+            Tcl_DecrRefCount (sdata->reportCmd);
+        }
+        sdata->reportCmd = objv[2];
+        Tcl_IncrRefCount (sdata->reportCmd);
         break;
 
     default:
