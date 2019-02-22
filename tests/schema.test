@@ -3440,4 +3440,33 @@ test schema-16.15 {interleave} {
     set result
 } {0 1 0 1 0 1 1 0}
 
+test schema-17.1 {info} {
+    tdom::schema s
+    s define {
+        foreach e {a b1 b11 b2 c} {
+            defelement $e {}
+        }
+    }
+    set result [lsort [s info defelements]]
+    s delete
+    set result
+} {a b1 b11 b2 c}
+
+test schema-17.2 {info} {
+    tdom::schema s
+    s define {
+        defelement b {
+            element b1
+            element b2
+        }
+        defelement a {
+            element a1
+            element a2
+        }
+    }
+    set result [lsort [s info defelements]]
+    s delete
+    set result
+} {a b}
+
 }

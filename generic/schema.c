@@ -17,7 +17,7 @@
 |
 |
 |   written by Rolf Ade
-|   Nov, Dec, Jan 2018-2019
+|   2018-2019
 |
 \---------------------------------------------------------------------------*/
 
@@ -141,7 +141,6 @@ static void SetActiveSchemaData (SchemaData *v)
 # define SETASI(v) SetActiveSchemaData (v)
 #endif
 
-
 #define CHECK_SI                                                        \
     if (!sdata) {                                                       \
         SetResult ("Command called outside of schema context");         \
@@ -197,6 +196,48 @@ static void SetActiveSchemaData (SchemaData *v)
     sdata->cp->content[sdata->cp->nc] = (SchemaCP *) sc;                \
     sdata->cp->quants[sdata->cp->nc] = SCHEMA_CQUANT_ONE;               \
     sdata->cp->nc++;                                                    \
+
+#define maxOne(quant) \
+    ((quant) == SCHEMA_CQUANT_ONE || (quant) == SCHEMA_CQUANT_OPT) ? 1 : 0
+
+#define minOne(quant) \
+    ((quant) == SCHEMA_CQUANT_ONE || (quant) == SCHEMA_CQUANT_PLUS) ? 1 : 0
+
+#define mayRepeat(quant) \
+    ((quant) == SCHEMA_CQUANT_REP || (quant) == SCHEMA_CQUANT_PLUS) ? 1 : 0
+
+#define mayMiss(quant) \
+    ((quant) == SCHEMA_CQUANT_REP || (quant) == SCHEMA_CQUANT_OPT) ? 1 : 0
+
+#define hasMatched(quant,hm) \
+    (hm) == 0 ?  mayMiss(quant) :  1
+
+#define mustMatch(quant,hm) \
+    (hm) == 0 ? minOne(quant) : 0
+
+
+#define getContext(cp, ac, hm)        \
+    cp = se->pattern;                 \
+    ac = se->activeChild;             \
+    hm = se->hasMatched;
+
+
+#define updateStack(se,cp,ac)                     \
+    if (maxOne (cp->quants[ac])) {                \
+        se->activeChild = ac + 1;                 \
+        se->hasMatched = 0;                       \
+    } else {                                      \
+        se->activeChild = ac;                     \
+        se->hasMatched = 1;                       \
+    }
+
+#define serializeElementName(rObj, cp)                  \
+    rObj = Tcl_NewObj();                                \
+    if (cp->namespace) {                                \
+        Tcl_SetStringObj (rObj, cp->namespace, -1);     \
+        Tcl_AppendToObj (rObj, ":", 1);                 \
+    }                                                   \
+    Tcl_AppendToObj (rObj, cp->name, -1);
 
 static SchemaCP*
 initSchemaCP (
@@ -602,40 +643,6 @@ pushToStack (
     }
     sdata->stack = stackElm;
 }
-
-#define maxOne(quant) \
-    ((quant) == SCHEMA_CQUANT_ONE || (quant) == SCHEMA_CQUANT_OPT) ? 1 : 0
-
-#define minOne(quant) \
-    ((quant) == SCHEMA_CQUANT_ONE || (quant) == SCHEMA_CQUANT_PLUS) ? 1 : 0
-
-#define mayRepeat(quant) \
-    ((quant) == SCHEMA_CQUANT_REP || (quant) == SCHEMA_CQUANT_PLUS) ? 1 : 0
-
-#define mayMiss(quant) \
-    ((quant) == SCHEMA_CQUANT_REP || (quant) == SCHEMA_CQUANT_OPT) ? 1 : 0
-
-#define hasMatched(quant,hm) \
-    (hm) == 0 ?  mayMiss(quant) :  1
-
-#define mustMatch(quant,hm) \
-    (hm) == 0 ? minOne(quant) : 0
-
-
-#define getContext(cp, ac, hm)        \
-    cp = se->pattern;                 \
-    ac = se->activeChild;             \
-    hm = se->hasMatched;
-
-
-#define updateStack(se,cp,ac)                     \
-    if (maxOne (cp->quants[ac])) {                \
-        se->activeChild = ac + 1;                 \
-        se->hasMatched = 0;                       \
-    } else {                                      \
-        se->activeChild = ac;                     \
-        se->hasMatched = 1;                       \
-    }
 
 static void
 popStack (
@@ -1868,7 +1875,7 @@ evalConstraints (
 }
 
 static int
-schemaInstanceQueryCmd (
+schemaInstanceInfoCmd (
     SchemaData *sdata,
     Tcl_Interp *interp,
     int objc,
@@ -1876,29 +1883,71 @@ schemaInstanceQueryCmd (
     )
 {
     int methodIndex;
+    Tcl_HashEntry *h;
+    Tcl_HashSearch search;
+    SchemaCP *cp;
+    Tcl_Obj *resultObj, *elmObj;
     
-    static const char *schemaInstanceQueryMethods[] = {
-        "defelements", NULL
+    static const char *schemaInstanceInfoMethods[] = {
+        "defelements", "stack", NULL
     };
-    enum schemaInstanceQueryMethod {
-        m_defelements
+    enum schemaInstanceInfoMethod {
+        m_defelements, m_stack
     };
 
+    static const char *schemaInstanceInfoStackMethods[] = {
+        "top", "inside", NULL
+    };
+    enum schemaInstanceInfoStackMethod {
+        m_top, m_inside
+    };
+    
     if (objc < 2) {
         Tcl_WrongNumArgs (interp, 1, objv, "subcommand ?arguments?");
         return TCL_ERROR;
     }
 
-    if (Tcl_GetIndexFromObj (interp, objv[1], schemaInstanceQueryMethods,
+    if (Tcl_GetIndexFromObj (interp, objv[1], schemaInstanceInfoMethods,
                              "method", 0, &methodIndex)
         != TCL_OK) {
         return TCL_ERROR;
     }
     
     Tcl_ResetResult (interp);
-    switch ((enum schemaInstanceQueryMethod) methodIndex) {
+    switch ((enum schemaInstanceInfoMethod) methodIndex) {
     case m_defelements:
+        if (objc != 2) {
+            Tcl_WrongNumArgs (interp, 1, objv, "defelements");
+            return TCL_ERROR;
+        }
+        resultObj = Tcl_GetObjResult (interp);
+        for (h = Tcl_FirstHashEntry (&sdata->element, &search);
+             h != NULL;
+             h = Tcl_NextHashEntry (&search)) {
+            cp = (SchemaCP *) Tcl_GetHashValue (h);
+            if (!cp) continue;
+            if (cp->flags & FORWARD_PATTERN_DEF
+                || cp->flags & PLACEHOLDER_PATTERN_DEF) continue;
+            serializeElementName (elmObj, cp);
+            if (Tcl_ListObjAppendElement (interp, resultObj, elmObj) != TCL_OK)
+                return TCL_ERROR;
+        }
         break;
+
+    case m_stack:
+        if (Tcl_GetIndexFromObj (interp, objv[1],
+                                 schemaInstanceInfoStackMethods,
+                                 "method", 0, &methodIndex)
+            != TCL_OK) {
+            return TCL_ERROR;
+        }
+        switch ((enum schemaInstanceInfoStackMethod) methodIndex) {
+        case m_top:
+            break;
+        case m_inside:
+            break;
+        }
+        
     }
     
     return TCL_OK;
@@ -1928,13 +1977,13 @@ schemaInstanceCmd (
     static const char *schemaInstanceMethods[] = {
         "defelement", "defpattern",  "start",   "event", "delete",
         "nrForwardDefinitions",      "state",   "reset", "define",
-        "validate",   "domvalidate", "deftext", "query", "reportcmd",
+        "validate",   "domvalidate", "deftext", "info",  "reportcmd",
         NULL
     };
     enum schemaInstanceMethod {
         m_defelement,  m_defpattern,  m_start,   m_event, m_delete,
         m_nrForwardDefinitions,       m_state,   m_reset, m_define,
-        m_validate,    m_domvalidate, m_deftext, m_query, m_reportcmd
+        m_validate,    m_domvalidate, m_deftext, m_info, m_reportcmd
     };
 
     static const char *eventKeywords[] = {
@@ -2296,10 +2345,10 @@ schemaInstanceCmd (
         schemaReset (sdata);
         break;
 
-    case m_query:
+    case m_info:
         objv++;
-        objc++;
-        result = schemaInstanceQueryCmd (sdata, interp, objc, objv);
+        objc--;
+        result = schemaInstanceInfoCmd (sdata, interp, objc, objv);
         break;
 
     case m_reportcmd:
