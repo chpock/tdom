@@ -2940,6 +2940,113 @@ test schema-14.18 {deftext} {
     set result
 } {0 1 0 1 0 1 0 1 0 1 1 0 1 0 1 0 1 0 0 1 0 1 1 0}
 
+test schema-14.19 {deftext} {
+    tdom::schema s
+    s deftext len2-4 {
+        minLength 2
+        maxLength 4
+    }
+    s defelement doc {
+        element e
+    }
+    s defelement e {
+        attribute this type len2-4
+        attribute foo ? type len2-4
+    }
+    set result [list]
+    foreach xml {
+        <doc><e/></doc>
+        {<doc><e foo="bar"/></doc>}
+        {<doc><e this="bar"/></doc>}
+        {<doc><e this=""/></doc>}
+        {<doc><e this="12" foo="bar"/></doc>}
+        {<doc><e this="12" foo="b"/></doc>}
+        {<doc><e this="1234"/></doc>}
+        {<doc><e this="12345"/></doc>}
+        {<doc><e this="12345alkajsdlfjkals" and="this"/></doc>}
+        {<doc><e and="this" this="12345alkajsdlfjkals"/></doc>}
+    } {
+        lappend result [s validate $xml errMsg]
+        set rc [catch {dom parse -validateCmd s $xml doc}]
+        if {$rc == 0} {
+            $doc delete
+        }
+        lappend result $rc
+    }
+    s delete
+    set result
+} {0 1 0 1 1 0 0 1 1 0 0 1 1 0 0 1 0 1 0 1}
+
+test schema-14.19a {deftext} {
+    tdom::schema s
+    s deftext len2-4 {
+        minLength 2
+        maxLength 4
+    }
+    s defelement doc {
+        element e ! {
+            attribute this type len2-4
+            attribute foo ? type len2-4
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc><e/></doc>
+        {<doc><e foo="bar"/></doc>}
+        {<doc><e this="bar"/></doc>}
+        {<doc><e this=""/></doc>}
+        {<doc><e this="12" foo="bar"/></doc>}
+        {<doc><e this="12" foo="b"/></doc>}
+        {<doc><e this="1234"/></doc>}
+        {<doc><e this="12345"/></doc>}
+        {<doc><e this="12345alkajsdlfjkals" and="this"/></doc>}
+        {<doc><e and="this" this="12345alkajsdlfjkals"/></doc>}
+    } {
+        lappend result [s validate $xml]
+        set rc [catch {dom parse -validateCmd s $xml doc}]
+        if {$rc == 0} {
+            $doc delete
+        }
+        lappend result $rc
+    }
+    s delete
+    set result
+} {0 1 0 1 1 0 0 1 1 0 0 1 1 0 0 1 0 1 0 1}
+
+test schema-14.20 {deftext} {
+    tdom::schema s
+    s deftext len2-4 {
+        minLength 2
+        maxLength 4
+    }
+    s defelement doc {
+        element e ! {
+            nsattribute this http://tdom.org/test {
+                minLength 2
+                maxLength 4
+            }
+            nsattribute foo http://tdom.org/test ? type len2-4
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc><e/></doc>
+        {<doc xmlns:ns1="http://tdom.org/test"><e ns1:foo="bar"/></doc>}
+        {<doc xmlns:ns1="http://tdom.org/test"><e ns1:this="bar"/></doc>}
+        {<doc xmlns:ns1="http://tdom.org/test"><e ns1:this=""/></doc>}
+        {<doc xmlns:ns1="http://tdom.org/test"><e ns1:this="12" ns1:foo="bar"/></doc>}
+        {<doc xmlns:ns1="http://tdom.org/test"><e ns1:this="12" ns1:foo="b"/></doc>}
+        {<doc xmlns:ns1="http://tdom.org/test"><e ns1:this="1234"/></doc>}
+        {<doc xmlns:ns1="http://tdom.org/test"><e ns1:this="12345"/></doc>}
+        {<doc xmlns:ns1="http://tdom.org/test"><e ns1:this="12345alkajsdlfjkals" ns1:and="this"/></doc>}
+        {<doc xmlns:ns1="http://tdom.org/test"><e ns1:and="this" ns1:this="12345alkajsdlfjkals"/></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 1 0 1 0 1 0 0 0}
+
 test schema-16.1 {interleave} {
     tdom::schema s
     s define {

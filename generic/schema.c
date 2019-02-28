@@ -2752,7 +2752,8 @@ static int maybeAddAttr (
     Tcl_Obj *nameObj,
     Tcl_Obj *namespaceObj,
     Tcl_Obj *scriptObj,
-    int required
+    int required,
+    SchemaCP *type
     )
 {
     Tcl_HashEntry *h;
@@ -2794,6 +2795,8 @@ static int maybeAddAttr (
         result = evalConstraints (interp, sdata, cp, scriptObj);
         sdata->isAttributeConstaint = 0;
         attr->cp = cp;
+    } else if (type) {
+        attr->cp = type;
     } else {
         attr->cp = NULL;
     }
@@ -2824,54 +2827,84 @@ AttributePatternObjCmd (
     )
 {
     SchemaData *sdata = GETASI;
-    char *quantStr;
-    int len, required = 1, scriptIndex, i;
-    Tcl_Obj *nsobj;
+    char *str;
+    int len, required = 1;
+    Tcl_Obj *nsObj, *nameObj;
+    Tcl_HashEntry *h;
+    SchemaCP *type;
 
     CHECK_SI
     CHECK_TOPLEVEL
 
     if (clientData) {
-        checkNrArgs (3,5,"Expected: name namespace"
+        checkNrArgs (3,6,"Expected:"
+                     "  name namespace"
                      " | name namespace attquant"
-                     " | name namespace <constraint script>"
-                     " | name namespace attquant <constraint script>");
-        i = 1;
-        nsobj = objv[2];
+                     " | name namespace ?attquant? <constraint script>"
+                     " | name namespace ?attquant? \"type\" typename");
+        nsObj = objv[2];
     } else {
-        checkNrArgs (2,4,"Expected: name"
+        checkNrArgs (2,5,"Expected:"
+                     "  name"
                      " | name attquant"
-                     " | name <constraint script>"
-                     " | name attquant <constraint script>");
-        i = 0;
-        nsobj = NULL;
+                     " | name ?attquant? <constraint script>"
+                     " | name ?attquant? \"type\" typename");
+        nsObj = NULL;
     }
-
-    if (objc == 2+i) {
-        return maybeAddAttr (interp, sdata, objv[1], nsobj, NULL, 1);
+    nameObj = objv[1];
+    if (clientData) {
+        objv++;
+        objc--;
     }
-    quantStr = Tcl_GetStringFromObj (objv[2+i], &len);
+    if (objc == 2) {
+        return maybeAddAttr (interp, sdata, nameObj, nsObj, NULL, 1, NULL);
+    }
+    str = Tcl_GetStringFromObj (objv[2], &len);
     if (len == 1) {
-        if (quantStr[0] == '?') {
+        if (str[0] == '?') {
             required = 0;
-        } else if (quantStr[0] != '!') {
+        } else if (str[0] != '!') {
             SetResult ("Invalid attribute quant");
             return TCL_ERROR;
         }
-        if (objc == 3+i) {
-            return maybeAddAttr (interp, sdata, objv[1], nsobj, NULL,
-                                 required);
+        if (objc == 3) {
+            return maybeAddAttr (interp, sdata, nameObj, nsObj, NULL,
+                                 required, NULL);
         }
-        scriptIndex = 3+i;
-    } else {
-        if (objc == 4+i) {
-            SetResult ("Invalid attribute quant");
-            return TCL_ERROR;
-        }
-        scriptIndex = 2+i;
+        objv++;
+        objc--;
+        str = Tcl_GetStringFromObj (objv[2], &len);
     }
-    return maybeAddAttr (interp, sdata, objv[1], nsobj,
-                         objv[scriptIndex], required);
+    if (objc == 4) {
+        if (len != 4
+            || strcmp("type", str) != 0) {
+            if (clientData) {
+                SetResult ("Expected:"
+                           "  name namespace"
+                           " | name namespace attquant"
+                           " | name namespace ?attquant? <constraint script>"
+                           " | name namespace ?attquant? \"type\" typename");
+            } else {
+                SetResult ("Expected:"
+                           "  name"
+                           " | name attquant"
+                           " | name ?attquant? <constraint script>"
+                           " | name ?attquant? \"type\" typename");
+            }
+            return TCL_ERROR;
+        }
+        h = Tcl_FindHashEntry (&sdata->textDef, Tcl_GetString (objv[3]));
+        if (!h) {
+            SetResult3 ("Unknown text type \"", Tcl_GetString (objv[3]), "\"");
+            return TCL_ERROR;
+        }
+        type = (SchemaCP *) Tcl_GetHashValue (h);
+        return maybeAddAttr (interp, sdata, nameObj, nsObj, NULL,
+                             required, type);        
+    } else {
+        return maybeAddAttr (interp, sdata, nameObj, nsObj, objv[2],
+                             required, NULL);
+    }
 }
 
 static int
@@ -2930,7 +2963,7 @@ TextPatternObjCmd (
     } else {
         h = Tcl_FindHashEntry (&sdata->textDef, Tcl_GetString (objv[2]));
         if (!h) {
-            SetResult ("Unknown text type");
+            SetResult3 ("Unknown text type \"", Tcl_GetString (objv[2]), "\"");
             return TCL_ERROR;
         }
         pattern = (SchemaCP *) Tcl_GetHashValue (h);
