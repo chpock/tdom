@@ -4,18 +4,18 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x15681d0">NAME</a> · <a href="#SECTid0x14a8260">SYNOPSIS</a> · <a href="#SECTid0x1612380">DESCRIPTION </a> · <a href="#SECTid0x161a570">Schema definition scripts</a> · <a href="#SECTid0x1621550">Quantity specifier</a> · <a href="#SECTid0x16233e0">Text constraint scripts</a> · <a href="#SECTid0x1625670">Exampels</a>
+<a href="#SECTid0x256b2d0">NAME</a> · <a href="#SECTid0x256b930">SYNOPSIS</a> · <a href="#SECTid0x256d440">DESCRIPTION </a> · <a href="#SECTid0x2576900">Schema definition scripts</a> · <a href="#SECTid0x257ec30">Quantity specifier</a> · <a href="#SECTid0x2580ac0">Text constraint scripts</a> · <a href="#SECTid0x2586740">Exampels</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x15681d0">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x256b2d0">NAME</a></h2><p class="namesection">
 <b class="names">tdom::schema - </b><br>Create a schema validation command</p>
 
-  <h2><a name="SECTid0x14a8260">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x256b930">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">tdom::schema</b> <i class="m">?create?</i> <i class="m">cmdName</i>
     </pre>
 
-  <h2><a name="SECTid0x1612380">DESCRIPTION </a></h2><p>This command creates validation commands with a simple API. The
+  <h2><a name="SECTid0x256d440">DESCRIPTION </a></h2><p>This command creates validation commands with a simple API. The
     validation commands have methods to define a schema and are able
     to validate XML or DOM trees (and to some degree other kind of
     hierarchical data) against this schema.</p><p>Additionally, a validation command may be used as argument to
@@ -169,7 +169,7 @@
 
     </dl>
 
-  <h2><a name="SECTid0x161a570">Schema definition scripts</a></h2><p>Schema definition scripts are ordinary Tcl scripts that are
+  <h2><a name="SECTid0x2576900">Schema definition scripts</a></h2><p>Schema definition scripts are ordinary Tcl scripts that are
     evaluatend in the namespace tdom::schema. The below listed schema
     definition commands in this tcl namespace allow to define a wide
     variety of document structures. Every schema definition command
@@ -233,12 +233,13 @@
 
       
         <dt>
-<b class="method">text</b> <i class="m">?&lt;constraint script&gt;?</i>
+<b class="method">text</b> <i class="m">?&lt;constraint script&gt;|"type" typename?</i>
 </dt>
         <dd>Without the optional constraint script this validation
         constraint matches every string (including the empty one).
-        With <i class="m">constraint script</i> argument a text matching this
-        script is expected.</dd>
+        With <i class="m">constraint script</i> or with a given text type
+        argument a text matching this script or the text type is
+        expected. </dd>
       
 
       
@@ -254,48 +255,71 @@
 
       
         <dt>
-<b class="method">attribute</b> <i class="m">name</i> <i class="m">?quant?</i> <i class="m">?&lt;constraint script&gt;?</i>
+<b class="method">attribute</b> <i class="m">name</i> <i class="m">?quant?</i> <i class="m">(?&lt;constraint script&gt;|"type" typename?)</i>
 </dt>
-        <dd></dd>
+        <dd>The attribute command defines a attribute (in no
+        namespace) to the enclosing element. The first definition of
+        <i class="m">name</i> inside an element definition wins; later
+        definitions of the same name are silently ignored. After the
+        <i class="m">name</i> argument there may be one of the qunatifieres ? or
+        !. If there is, this will be used. Otherwise the attribute
+        will be required (must be present in the xml source). If there
+        is one argument more this argument is evaluated as constraint
+        script, defining the value constrains of the attribute.
+        Otherwise, if there are two more arguments and the first of
+        them is the bareword "type" then the following is used as a
+        text type name.</dd>
       
 
       
         <dt>
-<b class="method">nsattribute</b> <i class="m">name</i> <i class="m">namespace</i> <i class="m">?quant?</i> <i class="m">?&lt;constraint script&gt;?</i>
+<b class="method">nsattribute</b> <i class="m">name</i> <i class="m">namespace</i> <i class="m">?quant?</i> <i class="m">(?&lt;constraint script&gt;|"type" typename?)</i>
 </dt>
-        <dd></dd>
+        <dd>This command does the same as the command <i class="m">attribute</i>, just for the attribute <i class="m">name</i> in the namespace <i class="m">namespace</i>.</dd>
       
 
       
         <dt>
 <b class="method">namespace</b> <i class="m">uri</i> <i class="m">&lt;definition script&gt;</i>
 </dt>
-        <dd>Evaluates the <i class="m">definition script</i> with context namespace <i class="m">uri</i>.</dd>
+        <dd>Evaluates the <i class="m">definition script</i> with context namespace <i class="m">uri</i>. Every element or ref command name will be looked up in the namespace <i class="m">uri</i> and local defined element will be in that namespace.</dd>
       
       
       
         <dt>
 <b class="method">defelement</b> <i class="m">name</i> <i class="m">?namespace?</i> <i class="m">&lt;definition script&gt;</i>
 </dt>
-        <dd>This command is not allowed nested in an other definition script command.</dd>
+        <dd>This defines an element type exactly as a <i>schemacmd
+        defelement</i> call. This is meant as toplevel command of a
+        <i>schemacmd define</i> script. This command is not allowed
+        nested in an other definition script command and will raise
+        error, if you call it there.</dd>
       
 
       
         <dt>
 <b class="method">defpattern</b> <i class="m">name</i> <i class="m">?namespace?</i> <i class="m">&lt;definition script&gt;</i>
 </dt>
-        <dd>This command is not allowed nested in an other definition script command.</dd>
+        <dd>This defines a named pattern exactly as a <i>schemacmd
+        defpattern</i> call. This is meant as toplevel command of a
+        <i>schemacmd define</i> script. This command is not allowed
+        nested in an other definition script command and will raise
+        error, if you call it there.</dd>
       
 
       
         <dt>
 <b class="method">start</b> <i class="m">name</i> <i class="m">?namespace?</i>
 </dt>
-        <dd>This command is not allowed nested in an other definition script command.</dd>
+        <dd>This command works exactly as a <i>schemacmd start</i>
+        call. This is meant as toplevel command of a <i>schemacmd
+        define</i> script. This command is not allowed nested in an
+        other definition script command and will raise error, if you
+        call it there.</dd>
       
     </dl>
 
-  <h2><a name="SECTid0x1621550">Quantity specifier</a></h2><p>Serveral schema definition commands expects a quantifier as
+  <h2><a name="SECTid0x257ec30">Quantity specifier</a></h2><p>Serveral schema definition commands expects a quantifier as
     one of their arguments, which specifies how often the content
     particle specified by the command is expected. The valid values
     for a <i class="m">quant</i> argument are:</p><dl class="optlist">
@@ -340,7 +364,7 @@
     </dl><p>If an optional quantifier is not given then it defaults to * in
     case of the mixed command and to ! for all other commands.</p>
 
-  <h2><a name="SECTid0x16233e0">Text constraint scripts</a></h2><p></p><p>The text constraint commands are:</p><dl class="commandlist">
+  <h2><a name="SECTid0x2580ac0">Text constraint scripts</a></h2><p></p><p>The text constraint commands are:</p><dl class="commandlist">
       
         <dt><b class="cmd">isint</b></dt>
         <dd></dd>
@@ -357,31 +381,102 @@
         <dt>
 <b class="cmd">tcl</b> <i class="m">tclcmd</i> <i class="m">?arg arg ...?</i>
 </dt>
-        <dd></dd>
+        <dd>Evaluates the tcl script <i class="m">tclcmd arg arg ... </i> and
+        the text to validate appended to the argument list. The return
+        value of the tcl command is interpreted as a boolean.</dd>
       
       
         <dt>
 <b class="cmd">enumeration</b> <i class="m">list</i>
 </dt>
+        <dd>This text constraint match if the text value is equal to
+        one element (respecting case and any whitespace) of the
+        argument <i class="m">list</i>, which has to be a valid Tcl list.
+        </dd>
+      
+      
+        <dt>
+<b class="cmd">match</b> <i class="m">?-nocase?</i> <i class="m">glob style match pattern</i>
+</dt>
+        <dd>This text constraint match if the text value match the
+        glob style pattern given as argument. It follows the rules of
+        the Tcl [string match] command, see
+        <a href="https://www.tcl.tk/man/tcl8.6/TclCmd/string.htm#M35">https://www.tcl.tk/man/tcl8.6/TclCmd/string.htm#M35</a>.</dd>
+      
+      
+        <dt>
+<b class="cmd">regexp</b> <i class="m">expression</i>
+</dt>
+        <dd>This text constraint match if the text value match the
+        regular expression given as argument. <a href="https://www.tcl.tk/man/tcl8.6/TclCmd/re_syntax.htm">https://www.tcl.tk/man/tcl8.6/TclCmd/re_syntax.htm</a> describes the regular expression syntax</dd>
+      
+      
+        <dt><b class="cmd">nmtoken</b></dt>
+        <dd>This text constraint match if the text value match the
+        XML nmtoken production
+        <a href="https://www.w3.org/TR/xml/#NT-Nmtoken">https://www.w3.org/TR/xml/#NT-Nmtoken</a>
+</dd>
+      
+      
+        <dt><b class="cmd">nmtokens</b></dt>
+        <dd>This text constraint match if the text value match the
+        XML nmtokens production
+        <a href="https://www.w3.org/TR/xml/#NT-Nmtokens">https://www.w3.org/TR/xml/#NT-Nmtokens</a>
+</dd>
+      
+      
+        <dt><b class="cmd">number</b></dt>
+        <dd></dd>
+      
+      
+        <dt><b class="cmd">boolean</b></dt>
+        <dd></dd>
+      
+      
+        <dt><b class="cmd">isodate</b></dt>
         <dd></dd>
       
       
         <dt>
-<b class="cmd">match</b> <i class="m">glob style match pattern</i>
+<b class="cmd">maxLength</b> <i class="m">length</i>
 </dt>
-        <dd></dd>
+        <dd>This text constraint match if the length of the text
+        value (in characters, not bytes) is at most <i class="m">length</i>. The
+        length argument must be an integer greater zero.</dd>
       
       
-        <dt><b class="cmd">nmtoken</b></dt>
-        <dd></dd>
+        <dt>
+<b class="cmd">minLength</b> <i class="m">length</i>
+</dt>
+        <dd>This text constraint match if the length of the text
+        value (in characters, not bytes) is at least <i class="m">length</i>.
+        The length argument must be an integer greater zero.</dd>
       
       
-        <dt><b class="cmd">nmtokens</b></dt>
-        <dd></dd>
+        <dt>
+<b class="cmd">oneOf</b> <i class="m">&lt;constraint script&gt;</i>
+</dt>
+        <dd>This text constraint match if one of the text
+        constraints defined in the argument <i class="m">constraint script</i>
+        match the text. It stops after the first match and probes the
+        text constraints in the order of definition.</dd>
+      
+      
+        <dt>
+<b class="cmd">allOf</b> <i class="m">&lt;constraint script&gt;</i>
+</dt>
+        <dd>This text constraint match if all of the text
+        constraints defined in the argument <i class="m">constraint script</i>
+        match the text. It stops after the first match failues and
+        probes the text constraints in the order of definition. Since
+        the schema definition commmand <i class="m">text</i> also expects all
+        text constraints to match the text constraint <i class="m">allOf</i> is
+        useful mostly together with the <i class="m">oneOf</i> text constraint
+        commmand.</dd>
       
     </dl>
   
-  <h2><a name="SECTid0x1625670">Exampels</a></h2><p>The XML Schema Part 0: Primer Second Edition
+  <h2><a name="SECTid0x2586740">Exampels</a></h2><p>The XML Schema Part 0: Primer Second Edition
     (<a href="https://www.w3.org/TR/xmlschema-0/">https://www.w3.org/TR/xmlschema-0/</a>) starts with this
     example schema:</p><pre class="example">
 &lt;xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
@@ -493,7 +588,7 @@ schema define {
       
     </pre><p>The RELAX NG Tutorial
     (<a href="http://relaxng.org/tutorial-20011203.html">http://relaxng.org/tutorial-20011203.html</a>) starts with
-    this example:</p><pre class="example">
+described at     this example:</p><pre class="example">
 Consider a simple XML representation of an email address book:
 
 &lt;addressBook&gt;

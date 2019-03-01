@@ -3210,7 +3210,20 @@ matchImpl (
     char *text
     )
 {
-    if (Tcl_StringMatch (text, Tcl_GetString ((Tcl_Obj *) constraintData)))
+    if (Tcl_StringCaseMatch (text, Tcl_GetString ((Tcl_Obj *) constraintData), 0))
+        return 1;
+    return 0;
+}
+
+static int
+matchNocaseImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    if (Tcl_StringCaseMatch (text, Tcl_GetString ((Tcl_Obj *) constraintData),
+            TCL_MATCH_NOCASE))
         return 1;
     return 0;
 }
@@ -3228,9 +3241,20 @@ matchTCObjCmd (
 
     CHECK_TI
     CHECK_TOPLEVEL
-    checkNrArgs (2,2,"Expected: <match pattern>");
+    checkNrArgs (2,3,"Expected: ?-nocase? <match pattern>");
+    if (objc == 3) {
+        if (strcmp ("-nocase", Tcl_GetString (objv[1])) != 0) {
+            SetResult ("Expected: ?-nocase? <match pattern>");
+            return TCL_ERROR;
+        }
+        objv++;
+    }
     ADD_CONSTRAINT (sdata, sc)
-    sc->constraint = matchImpl;
+    if (objc == 2) {
+        sc->constraint = matchImpl;
+    } else {
+        sc->constraint = matchNocaseImpl;
+    }
     sc->freeData = matchImplFree;
     Tcl_IncrRefCount (objv[1]);
     sc->constraintData = objv[1];
@@ -3498,6 +3522,7 @@ isodateImpl (
         if (*text < '0' || *text > '9') return 0;
         text++;
     }
+    while (*text >= '0' && *text <= '9') text++;
     if (*text != '-') return 0;
     y = atoi(text-4);
     /* There isn't a year 0. it's either 0001 or -0001 */

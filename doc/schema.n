@@ -324,11 +324,12 @@ or recursive references are allowed.
 \&\fB\fBmixed\fP \fI?quant?\fB \fI<definition script>\fB
 \&\fR
 .TP
-\&\fB\fBtext\fP \fI?<constraint script>?\fB
+\&\fB\fBtext\fP \fI?<constraint script>|\*(lqtype\*(lq typename?\fB
 \&\fRWithout the optional constraint script this validation
 constraint matches every string (including the empty one).
-With \fIconstraint script\fR argument a text matching this
-script is expected.
+With \fIconstraint script\fR or with a given text type
+argument a text matching this script or the text type is
+expected.
 .TP
 \&\fB\fBany\fP \fI?quant?\fB
 \&\fRThe any command matches every element (with whatever
@@ -337,23 +338,46 @@ or not. Please notice, that this mean the quantifier * and +
 will eat up any elements until the enclosing element
 ends.
 .TP
-\&\fB\fBattribute\fP \fIname\fB \fI?quant?\fB \fI?<constraint script>?\fB
-\&\fR
+\&\fB\fBattribute\fP \fIname\fB \fI?quant?\fB \fI(?<constraint script>|\*(lqtype\*(lq typename?)\fB
+\&\fRThe attribute command defines a attribute (in no
+namespace) to the enclosing element. The first definition of
+\&\fIname\fR inside an element definition wins; later
+definitions of the same name are silently ignored. After the
+\&\fIname\fR argument there may be one of the qunatifieres ? or
+!. If there is, this will be used. Otherwise the attribute
+will be required (must be present in the xml source). If there
+is one argument more this argument is evaluated as constraint
+script, defining the value constrains of the attribute.
+Otherwise, if there are two more arguments and the first of
+them is the bareword "type" then the following is used as a
+text type name.
 .TP
-\&\fB\fBnsattribute\fP \fIname\fB \fInamespace\fB \fI?quant?\fB \fI?<constraint script>?\fB
-\&\fR
+\&\fB\fBnsattribute\fP \fIname\fB \fInamespace\fB \fI?quant?\fB \fI(?<constraint script>|\*(lqtype\*(lq typename?)\fB
+\&\fRThis command does the same as the command \fIattribute\fR, just for the attribute \fIname\fR in the namespace \fInamespace\fR.
 .TP
 \&\fB\fBnamespace\fP \fIuri\fB \fI<definition script>\fB
-\&\fREvaluates the \fIdefinition script\fR with context namespace \fIuri\fR.
+\&\fREvaluates the \fIdefinition script\fR with context namespace \fIuri\fR. Every element or ref command name will be looked up in the namespace \fIuri\fR and local defined element will be in that namespace.
 .TP
 \&\fB\fBdefelement\fP \fIname\fB \fI?namespace?\fB \fI<definition script>\fB
-\&\fRThis command is not allowed nested in an other definition script command.
+\&\fRThis defines an element type exactly as a \fIschemacmd
+defelement\fR call. This is meant as toplevel command of a
+\&\fIschemacmd define\fR script. This command is not allowed
+nested in an other definition script command and will raise
+error, if you call it there.
 .TP
 \&\fB\fBdefpattern\fP \fIname\fB \fI?namespace?\fB \fI<definition script>\fB
-\&\fRThis command is not allowed nested in an other definition script command.
+\&\fRThis defines a named pattern exactly as a \fIschemacmd
+defpattern\fR call. This is meant as toplevel command of a
+\&\fIschemacmd define\fR script. This command is not allowed
+nested in an other definition script command and will raise
+error, if you call it there.
 .TP
 \&\fB\fBstart\fP \fIname\fB \fI?namespace?\fB
-\&\fRThis command is not allowed nested in an other definition script command.
+\&\fRThis command works exactly as a \fIschemacmd start\fR
+call. This is meant as toplevel command of a \fIschemacmd
+define\fR script. This command is not allowed nested in an
+other definition script command and will raise error, if you
+call it there.
 .SH "Quantity specifier"
 .PP
 Serveral schema definition commands expects a quantifier as
@@ -397,19 +421,79 @@ The text constraint commands are:
 \&\fR
 .TP
 \&\fB\fBtcl\fP \fItclcmd\fB \fI?arg arg ...?\fB
-\&\fR
+\&\fREvaluates the tcl script \fItclcmd arg arg ... \fR and
+the text to validate appended to the argument list. The return
+value of the tcl command is interpreted as a boolean.
 .TP
 \&\fB\fBenumeration\fP \fIlist\fB
-\&\fR
+\&\fRThis text constraint match if the text value is equal to
+one element (respecting case and any whitespace) of the
+argument \fIlist\fR, which has to be a valid Tcl list.
 .TP
-\&\fB\fBmatch\fP \fIglob style match pattern\fB
-\&\fR
+\&\fB\fBmatch\fP \fI?-nocase?\fB \fIglob style match pattern\fB
+.UR "https://www.tcl.tk/man/tcl8.6/TclCmd/string.htm#M35"
+<URL: https://www.tcl.tk/man/tcl8.6/TclCmd/string.htm#M35>
+.UE
+\&\fRThis text constraint match if the text value match the
+glob style pattern given as argument. It follows the rules of
+the Tcl [string match] command, see
+\&.
+.TP
+\&\fB\fBregexp\fP \fIexpression\fB
+.UR "https://www.tcl.tk/man/tcl8.6/TclCmd/re_syntax.htm"
+<URL: https://www.tcl.tk/man/tcl8.6/TclCmd/re_syntax.htm>
+.UE
+\&\fRThis text constraint match if the text value match the
+regular expression given as argument.  describes the regular expression syntax
 .TP
 \&\fB\fBnmtoken\fP
-\&\fR
+.UR "https://www.w3.org/TR/xml/#NT-Nmtoken"
+<URL: https://www.w3.org/TR/xml/#NT-Nmtoken>
+.UE
+\&\fRThis text constraint match if the text value match the
+XML nmtoken production
 .TP
 \&\fB\fBnmtokens\fP
+.UR "https://www.w3.org/TR/xml/#NT-Nmtokens"
+<URL: https://www.w3.org/TR/xml/#NT-Nmtokens>
+.UE
+\&\fRThis text constraint match if the text value match the
+XML nmtokens production
+.TP
+\&\fB\fBnumber\fP
 \&\fR
+.TP
+\&\fB\fBboolean\fP
+\&\fR
+.TP
+\&\fB\fBisodate\fP
+\&\fR
+.TP
+\&\fB\fBmaxLength\fP \fIlength\fB
+\&\fRThis text constraint match if the length of the text
+value (in characters, not bytes) is at most \fIlength\fR. The
+length argument must be an integer greater zero.
+.TP
+\&\fB\fBminLength\fP \fIlength\fB
+\&\fRThis text constraint match if the length of the text
+value (in characters, not bytes) is at least \fIlength\fR.
+The length argument must be an integer greater zero.
+.TP
+\&\fB\fBoneOf\fP \fI<constraint script>\fB
+\&\fRThis text constraint match if one of the text
+constraints defined in the argument \fIconstraint script\fR
+match the text. It stops after the first match and probes the
+text constraints in the order of definition.
+.TP
+\&\fB\fBallOf\fP \fI<constraint script>\fB
+\&\fRThis text constraint match if all of the text
+constraints defined in the argument \fIconstraint script\fR
+match the text. It stops after the first match failues and
+probes the text constraints in the order of definition. Since
+the schema definition commmand \fItext\fR also expects all
+text constraints to match the text constraint \fIallOf\fR is
+useful mostly together with the \fIoneOf\fR text constraint
+commmand.
 .SH Exampels
 .PP
 .UR "https://www.w3.org/TR/xmlschema-0/"
@@ -540,7 +624,7 @@ schema define {
 .UE
 The RELAX NG Tutorial
 () starts with
-this example:
+described at     this example:
 .CS
 
 Consider a simple XML representation of an email address book:

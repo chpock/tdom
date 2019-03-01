@@ -2574,6 +2574,31 @@ test schema-14.6 {text: match (glob style)} {
     set result
 } {1 1 1 0 1 0}
 
+test schema-14.6a {text: match (glob style) -nocase} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element e *
+        }
+        defelement e {
+            text {match -nocase {[A-Z]*1[_!]}}
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        {<doc><e>disabled1_</e></doc>}
+        {<doc><e>dis able1_</e></doc>}
+        {<doc><e>something</e></doc>}
+        {<doc><e>a1!</e></doc>}
+        {<doc><e>a1!/</e></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 1 1 0 1 0}
+
 test schema-14.7 {text: regexp} {
     tdom::schema s
     s define {
