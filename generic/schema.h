@@ -105,6 +105,7 @@ typedef enum {
 
 typedef struct 
 {
+    Tcl_Obj *self;
     char *start;
     char *startNamespace;
     Tcl_HashTable element;

@@ -385,13 +385,18 @@ static void freeSchemaCP (
 }
 
 static SchemaData*
-initSchemaData ()
+initSchemaData (
+    Tcl_Obj *cmdNameObj)
 {
     SchemaData *sdata;
-    int hnew;
+    int hnew, len;
+    char *name;
 
     sdata = TMALLOC (SchemaData);
     memset (sdata, 0, sizeof(SchemaData));
+    name = Tcl_GetStringFromObj (cmdNameObj, &len);
+    sdata->self = Tcl_NewStringObj (name, len);
+    Tcl_IncrRefCount (sdata->self);
     Tcl_InitHashTable (&sdata->element, TCL_STRING_KEYS);
     Tcl_InitHashTable (&sdata->pattern, TCL_STRING_KEYS);
     Tcl_InitHashTable (&sdata->attrNames, TCL_STRING_KEYS);
@@ -435,6 +440,7 @@ static void schemaInstanceDelete (
     unsigned int i;
     SchemaValidationStack *down;
 
+    Tcl_DecrRefCount (sdata->self);
     if (sdata->start) FREE (sdata->start);
     if (sdata->startNamespace) FREE (sdata->startNamespace);
     Tcl_DeleteHashTable (&sdata->namespace);
@@ -695,6 +701,7 @@ matchElementStart (
     int hm, ac, i, mayskip, rc;
     int isName = 0;
     SchemaValidationStack *se;
+    Tcl_Obj *cmdPtr;
 
     if (!sdata->stack) return 0;
     se = sdata->stack;
@@ -712,6 +719,24 @@ matchElementStart (
             case SCHEMA_CTYPE_TEXT:
                 if (candidate->nc) {
                     if (!checkText (interp, candidate, "")) {
+                        if (sdata->reportCmd) {
+                            cmdPtr = Tcl_DuplicateObj (sdata->reportCmd);
+                            Tcl_ListObjAppendElement (interp, cmdPtr,
+                                                      sdata->self);
+                            Tcl_ListObjAppendElement (
+                                interp, cmdPtr,
+                                Tcl_NewStringObj ("MISSING_MANDATORY_TEXT", 22)
+                                );
+                            rc = Tcl_EvalObjEx (interp, cmdPtr,
+                                                TCL_EVAL_GLOBAL
+                                                | TCL_EVAL_DIRECT);
+                            Tcl_DecrRefCount (cmdPtr);
+                            if (rc != TCL_OK) {
+                                return 0;
+                            }
+                            break;
+                        }
+                        
                         return 0;
                     }
                 }
@@ -1886,6 +1911,7 @@ schemaInstanceInfoCmd (
     Tcl_HashEntry *h;
     Tcl_HashSearch search;
     SchemaCP *cp;
+    SchemaValidationStack *se;
     Tcl_Obj *resultObj, *elmObj;
     
     static const char *schemaInstanceInfoMethods[] = {
@@ -1945,6 +1971,17 @@ schemaInstanceInfoCmd (
         case m_top:
             break;
         case m_inside:
+            if (!sdata->stack) {
+                Tcl_ResetResult (interp);
+                return TCL_OK;
+            }
+            se = sdata->stack;
+            while (se->pattern->type != SCHEMA_CTYPE_NAME) {
+                se = se->down;
+            }
+            serializeElementName (elmObj, se->pattern);
+            Tcl_SetObjResult (interp, elmObj);
+            return TCL_OK;
             break;
         }
         
@@ -2428,7 +2465,7 @@ tDOM_SchemaObjCmd (
     Tcl_ResetResult (interp);
     switch ((enum schemaMethod) methodIndex) {
     case m_create:
-        sdata = initSchemaData ();
+        sdata = initSchemaData (objv[ind]);
         Tcl_CreateObjCommand (interp, Tcl_GetString(objv[ind]),
                               schemaInstanceCmd,
                               (ClientData) sdata,
