@@ -1,5 +1,5 @@
-C Added\sa\s-nocase\sflag\sto\sthe\stext\sconstraint\scommand\smatch\s(because\sit\swas\seasy).\sSmall\smodification\sto\sthe\stext\sconstraint\scommand\sisodate.\sIt\snow\saccept\syears\slonger\sthat\sfour\sdigits\s(as\sthe\sxsd\sdate\stypes\sdo).\sAdded\ssome\smore\sdocumentation.
-D 2019-03-01T11:58:59.363
+C Removed\s#define\sand\scode\sfor\sa\stcl\sversion\s(8.0)\sthat\sisn't\ssupport\sfor\sa\slong\stime.
+D 2019-03-02T02:28:04.946
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -138,7 +138,7 @@ F generic/schema.c fc14697ec60d605bb7aad10fecaaf262af00822a137a2ef638ec557fc868a
 F generic/schema.h 842af19d85ff11a181ffcd11a1f8c91ab0ef941f4bbe57fc01b8202fcc819413
 F generic/tcldom.c 7418bcb785c735baec156ba9de2ec64d4aff4619cf3b58cb089339688c1f7e5d
 F generic/tcldom.h ce701b04020e64b11d9f16a8dbea21133267f0aaa267d25881612ddcbba1b9b2
-F generic/tclexpat.c 748a644e119c67a1e566f78e22ec5a0255687a87949060ef8f91dc0450fa5898
+F generic/tclexpat.c 57f37c0029b7ae78d1a4dc22a068b5682f6b8867b69113dffca2e460529d0b4b
 F generic/tclexpat.h 3214445d1de6b11a13be4083d6e0fdf58e68e14bd62656b8f91b85311b47f4d6
 F generic/tclpull.c 85a5b5f089f34355cc456969f14d6a1fc782908071435269378fbbf26bb70627
 F generic/tclpull.h 8e1aac98bdad497c669c901494939eecd6c2f57ea51c4f5d4dac502db48527d4
@@ -230,8 +230,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 44ebaf2b3fb2f5cd56922dc2639613c05ae2f884d780c214801ce8ba34cf694f
-R 43f82e4a11d6c7633724ee0ae217292f
+P fa18fb363f1194d7b5daf9170e5e015969e868bc5c22df5e0cc19383f9352c2a
+R 20d2977442b8a174f930d56dfb30fc33
 U rolf
-Z 6c534b0f3e78e79469d6d08d3ad9443a
+Z 0c14a5bee1c947e984899188ed85ada7
 # Remove this line to create a well-formed Fossil manifest.
