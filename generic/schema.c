@@ -733,7 +733,7 @@ matchElementStart (
                                                       sdata->self);
                             Tcl_ListObjAppendElement (
                                 interp, cmdPtr,
-                                Tcl_NewStringObj ("MISSING_MANDATORY_TEXT", 22)
+                                Tcl_NewStringObj ("MISSING_TEXT", 22)
                                 );
                             sdata->currentEvals++;
                             rc = Tcl_EvalObjEx (interp, cmdPtr,
@@ -1898,8 +1898,7 @@ evalConstraints (
     sdata->isTextConstraint = 1;
     sdata->textStub[3] = script;
     sdata->currentEvals++;
-    result = Tcl_EvalObjv (interp, 4, sdata->textStub,
-                           TCL_EVAL_DIRECT | TCL_EVAL_GLOBAL);
+    result = Tcl_EvalObjv (interp, 4, sdata->textStub, TCL_EVAL_GLOBAL);
     sdata->currentEvals--;
     sdata->isTextConstraint = savedIsTextConstraint;
     /* ... and restore the previously saved sdata states  */
@@ -2147,8 +2146,7 @@ schemaInstanceCmd (
         sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
         sdata->evalStub[3] = objv[patternIndex];
         sdata->currentEvals++;
-        result = Tcl_EvalObjv (interp, 4, sdata->evalStub,
-                               TCL_EVAL_DIRECT | TCL_EVAL_GLOBAL);
+        result = Tcl_EvalObjv (interp, 4, sdata->evalStub, TCL_EVAL_GLOBAL);
         sdata->currentEvals--;
         sdata->currentNamespace = NULL;
         pattern->attrs = sdata->currentAttrs;
@@ -2190,8 +2188,7 @@ schemaInstanceCmd (
         sdata->defineToplevel = 1;
         sdata->evalStub[3] = objv[2];
         sdata->currentEvals++;
-        result = Tcl_EvalObjv (interp, 4, sdata->evalStub,
-                               TCL_EVAL_DIRECT | TCL_EVAL_GLOBAL);
+        result = Tcl_EvalObjv (interp, 4, sdata->evalStub, TCL_EVAL_GLOBAL);
         sdata->currentEvals--;
         if (result != TCL_OK) {
             cleanupLastPattern (sdata, savedNumPatternList);
@@ -3111,7 +3108,7 @@ tclImpl (
     Tcl_IncrRefCount (tcdata->evalStub[tcdata->nrArg-1]);
     tcdata->sdata->currentEvals++;
     result = Tcl_EvalObjv (interp, tcdata->nrArg, tcdata->evalStub,
-                           TCL_EVAL_DIRECT | TCL_EVAL_GLOBAL);
+                           TCL_EVAL_GLOBAL);
     tcdata->sdata->currentEvals--;
     Tcl_DecrRefCount (tcdata->evalStub[tcdata->nrArg-1]);
     if (result != TCL_OK) {
