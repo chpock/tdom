@@ -121,7 +121,9 @@ typedef struct
     SchemaQuant *quants;
     unsigned int numQuants;
     unsigned int quantsSize;
-    Tcl_Obj *reportCmd;
+    int       currentEvals;
+    int       cleanupAfterEval;
+    Tcl_Obj  *reportCmd;
     Tcl_Obj **evalStub;
     Tcl_Obj **textStub;
     char *currentNamespace;

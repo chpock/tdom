@@ -294,6 +294,19 @@ test schema-1.17 {call schema cmd evaluation in his own schema definition script
     set result
 } 1
 
+test schema-1.18 {delete schema cmd in definition script} {
+    tdom::schema create s
+    s define {
+        defelement e {
+            s delete
+            element e1 1 {
+                s delete
+            }
+        }
+    }
+    info commands s
+} {}
+
 test schema-2.1 {grammar definition: ref} {
     tdom::schema create grammar
     grammar defpattern thisPattern {

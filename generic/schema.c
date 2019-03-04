@@ -440,6 +440,14 @@ static void schemaInstanceDelete (
     unsigned int i;
     SchemaValidationStack *down;
 
+    /* Protect the clientData to be freed inside (even nested)
+     * Tcl_Eval*() calls to avoid invalid mem access and postpone the
+     * cleanup until the Tcl_Eval*() calls are finished (done in
+     * schemaInstanceCmd(). */
+    if (sdata->currentEvals) {
+        sdata->cleanupAfterEval = 1;
+        return;
+    }
     Tcl_DecrRefCount (sdata->self);
     if (sdata->start) FREE (sdata->start);
     if (sdata->startNamespace) FREE (sdata->startNamespace);
@@ -727,9 +735,11 @@ matchElementStart (
                                 interp, cmdPtr,
                                 Tcl_NewStringObj ("MISSING_MANDATORY_TEXT", 22)
                                 );
+                            sdata->currentEvals++;
                             rc = Tcl_EvalObjEx (interp, cmdPtr,
                                                 TCL_EVAL_GLOBAL
                                                 | TCL_EVAL_DIRECT);
+                            sdata->currentEvals--;
                             Tcl_DecrRefCount (cmdPtr);
                             if (rc != TCL_OK) {
                                 return 0;
@@ -1887,8 +1897,10 @@ evalConstraints (
     sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
     sdata->isTextConstraint = 1;
     sdata->textStub[3] = script;
+    sdata->currentEvals++;
     result = Tcl_EvalObjv (interp, 4, sdata->textStub,
                            TCL_EVAL_DIRECT | TCL_EVAL_GLOBAL);
+    sdata->currentEvals--;
     sdata->isTextConstraint = savedIsTextConstraint;
     /* ... and restore the previously saved sdata states  */
     sdata->cp = savedCP;
@@ -2134,8 +2146,10 @@ schemaInstanceCmd (
         sdata->currentAttrs = NULL;
         sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
         sdata->evalStub[3] = objv[patternIndex];
+        sdata->currentEvals++;
         result = Tcl_EvalObjv (interp, 4, sdata->evalStub,
                                TCL_EVAL_DIRECT | TCL_EVAL_GLOBAL);
+        sdata->currentEvals--;
         sdata->currentNamespace = NULL;
         pattern->attrs = sdata->currentAttrs;
         pattern->numAttr = sdata->numAttr;
@@ -2175,8 +2189,10 @@ schemaInstanceCmd (
         sdata->contentSize = 0;
         sdata->defineToplevel = 1;
         sdata->evalStub[3] = objv[2];
+        sdata->currentEvals++;
         result = Tcl_EvalObjv (interp, 4, sdata->evalStub,
                                TCL_EVAL_DIRECT | TCL_EVAL_GLOBAL);
+        sdata->currentEvals--;
         if (result != TCL_OK) {
             cleanupLastPattern (sdata, savedNumPatternList);
         }
@@ -2297,7 +2313,9 @@ schemaInstanceCmd (
             return TCL_ERROR;
         }
         Tcl_DeleteCommand(interp, Tcl_GetString(objv[0]));
-        break;
+        /* We return immediately here to avoid clashes with postponed
+           sdata cleanup at the end of the function. */
+        return TCL_OK;
 
     case m_nrForwardDefinitions:
         if (objc != 2) {
@@ -2405,6 +2423,9 @@ schemaInstanceCmd (
         result = TCL_ERROR;
         break;
 
+    }
+    if (sdata->cleanupAfterEval && sdata->currentEvals == 0) {
+        schemaInstanceDelete (sdata);
     }
     return result;
 }
@@ -2624,7 +2645,9 @@ evalDefinition (
     sdata->currentAttrs = NULL;
     sdata->attrSize = 0;
 
+    sdata->currentEvals++;
     result = Tcl_EvalObjEx (interp, definition, TCL_EVAL_DIRECT);
+    sdata->currentEvals--;
 
     pattern->attrs = sdata->currentAttrs;
     pattern->numAttr = sdata->numAttr;
@@ -2970,7 +2993,9 @@ NamespacePatternObjCmd (
         sdata->currentNamespace = (char *)
             Tcl_GetHashKey (&sdata->namespace, entryPtr);
     }
+    sdata->currentEvals++;
     result = Tcl_EvalObjEx (interp, objv[2], TCL_EVAL_DIRECT);
+    sdata->currentEvals--;
     sdata->currentNamespace = currentNamespace;
     return result;
 }
@@ -3054,6 +3079,7 @@ typedef struct
 {
     int nrArg;
     Tcl_Obj **evalStub;
+    SchemaData *sdata;
 } tclTCData;
 
 static void
@@ -3083,8 +3109,10 @@ tclImpl (
 
     tcdata->evalStub[tcdata->nrArg-1] = Tcl_NewStringObj(text, -1);
     Tcl_IncrRefCount (tcdata->evalStub[tcdata->nrArg-1]);
+    tcdata->sdata->currentEvals++;
     result = Tcl_EvalObjv (interp, tcdata->nrArg, tcdata->evalStub,
                            TCL_EVAL_DIRECT | TCL_EVAL_GLOBAL);
+    tcdata->sdata->currentEvals--;
     Tcl_DecrRefCount (tcdata->evalStub[tcdata->nrArg-1]);
     if (result != TCL_OK) {
         return 0;
@@ -3128,6 +3156,7 @@ tclTCObjCmd (
         tcdata->evalStub[i-1] = objv[i];
         Tcl_IncrRefCount (tcdata->evalStub[i-1]);
     }
+    tcdata->sdata = sdata;
     sc->constraintData = tcdata;
     return TCL_OK;
 }
