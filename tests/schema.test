@@ -300,12 +300,96 @@ test schema-1.18 {delete schema cmd in definition script} {
         defelement e {
             s delete
             element e1 1 {
-                s delete
+                set ::result [catch {s delete}]
             }
         }
     }
-    info commands s
-} {}
+    lappend result [info commands s]
+} {1 {}}
+
+test schema-1.19 {call top level schema cmd in definition script} {
+    tdom::schema create s
+    set result [catch {s define {
+        defelement e {
+            element e1 1 {
+                deftext foo {minLength 1}
+                defelement bar {}
+            }
+            element bar
+        }
+    }}]
+    lappend result [info commands s]
+    s delete
+    set result
+} {1 s}
+
+test schema-1.20 {call top level schema cmd in definition script} {
+    tdom::schema create s
+    set result [catch {s defelement e {
+            element e1 1 {
+                deftext foo {minLength 1}
+                defelement bar {}
+            }
+            element bar
+        }
+    }]
+    lappend result [info commands s]
+    s delete
+    set result
+} {1 s}
+
+test schema-1.21 {Create other schema cmd in definition script} {
+    tdom::schema create s1
+    s1 defelement e {
+        element e1 1 {}
+        element e1 1 {
+            ::tdom::schema create ::s2
+            ::s2 define {
+                defelement s2 {
+                    element s2e
+                    element s2ee
+                }
+                foreach e {s2e s2ee} {
+                    defelement $e {text}
+                }
+            }
+        }
+    }
+    set result [info commands s1]
+    lappend result [info commands s2]
+    foreach xml {
+        <e><e1/><e1/></e>
+        <s2><s2e>foo</s2e><s2ee/></s2>
+    } {
+        lappend result [s1 validate $xml]
+        lappend result [s2 validate $xml]
+    }
+    s2 delete
+    s1 delete
+    set result
+} {s1 s2 1 0 0 1}
+
+test schema-1.22 {Call not toplevel cmd methods in definition script} {
+    tdom::schema create s
+    set result [list]
+    s define {
+        defelement e {
+            lappend ::result [s nrForwardDefinitions]
+            element e1
+            lappend ::result [s nrForwardDefinitions]
+            element e1
+            lappend ::result [s nrForwardDefinitions]
+            element e2
+            lappend ::result [s nrForwardDefinitions]
+        }
+        foreach e {e1 e2} {
+            defelement $e {text}
+            lappend ::result [s nrForwardDefinitions]
+        }
+    }
+    s delete
+    set result
+} {0 1 1 2 1 0}
 
 test schema-2.1 {grammar definition: ref} {
     tdom::schema create grammar
@@ -664,7 +748,7 @@ test schema-7.2.1 {group} {
             element e2 *
         }
         foreach e {e1 e2} {
-            grammar defelement $e {}
+            defelement $e {}
         }
     }
     dom parse -validateCmd grammar {
@@ -688,7 +772,7 @@ test schema-7.3 {group with inline defined element} {
             element e2 *
         }
         foreach e {e1 e2} {
-            grammar defelement $e {}
+            defelement $e {}
         }
     }
     dom parse -validateCmd grammar {
@@ -711,7 +795,7 @@ test schema-7.4 {group with inline defined element} {
             }
         }
         foreach e {e1 e2} {
-            grammar defelement $e {}
+            defelement $e {}
         }
     }
     dom parse -validateCmd grammar {
@@ -734,7 +818,7 @@ test schema-7.5 {group with inline defined element} {
             }
         }
         foreach e {e1 e2} {
-            grammar defelement $e {}
+            defelement $e {}
         }
     }
     ::xml::parser p -validateCmd grammar

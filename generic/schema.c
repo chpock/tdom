@@ -168,6 +168,25 @@ static void SetActiveSchemaData (SchemaData *v)
         return TCL_ERROR;                                               \
     }
 
+#define CHECK_TOPLEVEL_CMD                                              \
+    if (!sdata->defineToplevel && sdata->currentEvals > 1) {            \
+        SetResult ("Command not allowed in nested schema define script"); \
+        return TCL_ERROR;                                               \
+    }                                                                   \
+    if (clientData != NULL) {                                           \
+        savedsdata = GETASI;                                            \
+        if (savedsdata == sdata) {                                      \
+            SetResult ("This recursive call is not allowed"); \
+            return TCL_ERROR;                                           \
+        }                                                               \
+    }
+      
+#define CHECK_EVAL                                                      \
+    if (sdata->currentEvals) {                                          \
+        SetResult ("Method not allowed in nested schema define script"); \
+        return TCL_ERROR;                                               \
+    }
+    
 #define REMEMBER_PATTERN(pattern)                                       \
     if (sdata->numPatternList == sdata->patternListSize) {              \
         sdata->patternList = (SchemaCP **) REALLOC (                    \
@@ -1900,8 +1919,8 @@ evalConstraints (
     sdata->currentEvals++;
     result = Tcl_EvalObjv (interp, 4, sdata->textStub, TCL_EVAL_GLOBAL);
     sdata->currentEvals--;
-    sdata->isTextConstraint = savedIsTextConstraint;
     /* ... and restore the previously saved sdata states  */
+    sdata->isTextConstraint = savedIsTextConstraint;
     sdata->cp = savedCP;
     sdata->contentSize = savedContenSize;
     if (sdata->cp && !sdata->isAttributeConstaint && cp->nc) {
@@ -2031,7 +2050,7 @@ schemaInstanceCmd (
     enum schemaInstanceMethod {
         m_defelement,  m_defpattern,  m_start,   m_event, m_delete,
         m_nrForwardDefinitions,       m_state,   m_reset, m_define,
-        m_validate,    m_domvalidate, m_deftext, m_info, m_reportcmd
+        m_validate,    m_domvalidate, m_deftext, m_info,  m_reportcmd
     };
 
     static const char *eventKeywords[] = {
@@ -2049,13 +2068,10 @@ schemaInstanceCmd (
     }
 
     if (sdata == NULL) {
-        /* Inline defined defelement, defpattern or start */
+        /* Inline defined defelement, defpattern, deftext or start */
         sdata = GETASI;
         CHECK_SI;
-        if (!sdata->defineToplevel) {
-            SetResult ("Command not allowed in nested schema define script");
-            return TCL_ERROR;
-        }
+        CHECK_TOPLEVEL_CMD
         i = 1;
     }
 
@@ -2127,14 +2143,7 @@ schemaInstanceCmd (
             Tcl_SetHashValue (h, pattern);
         }
 
-        if (!sdata->defineToplevel) {
-            savedsdata = GETASI;
-            if (savedsdata == sdata) {
-                SetResult ("Recursive call of schema command is not allowed");
-                return TCL_ERROR;
-            }
-            SETASI(sdata);
-        }
+        SETASI(sdata);
         savedDefineToplevel = sdata->defineToplevel;
         savedNamespacePtr = sdata->currentNamespace;
         sdata->defineToplevel = 0;
@@ -2171,14 +2180,17 @@ schemaInstanceCmd (
         break;
 
     case m_define:
+        CHECK_EVAL
         if (objc != 3) {
             Tcl_WrongNumArgs (interp, 2, objv, "<definition commands>");
             return TCL_ERROR;
         }
-        savedsdata = GETASI;
-        if (savedsdata == sdata) {
-            SetResult ("Recursive call of schema command is not allowed");
-            return TCL_ERROR;
+        if (clientData) {
+            savedsdata = GETASI;
+            if (savedsdata == sdata) {
+                SetResult ("Recursive call of schema command is not allowed");
+                return TCL_ERROR;
+            }
         }
         SETASI(sdata);
         savedNumPatternList = sdata->numPatternList;
@@ -2255,6 +2267,7 @@ schemaInstanceCmd (
         break;
 
     case m_event:
+        CHECK_EVAL
         if (objc < 3) {
             Tcl_WrongNumArgs (interp, 2, objv, "<eventType>"
                               " ?<type specific data>?");
@@ -2340,10 +2353,12 @@ schemaInstanceCmd (
         break;
 
     case m_reset:
+        CHECK_EVAL
         schemaReset (sdata);
         break;
 
     case m_validate:
+        CHECK_EVAL
         if (objc < 3 || objc > 4) {
             Tcl_WrongNumArgs (interp, 2, objv, "<xml> ?resultVarName?");
             return TCL_ERROR;
@@ -2365,6 +2380,7 @@ schemaInstanceCmd (
         break;
 
     case m_domvalidate:
+        CHECK_EVAL
         if (objc < 3 || objc > 4) {
             Tcl_WrongNumArgs (interp, 2, objv, "<xml> ?resultVarName?");
             return TCL_ERROR;
@@ -2752,7 +2768,7 @@ NamedPatternObjCmd (
             Tcl_GetHashKey (hashTable, entryPtr)
             );
         pattern->flags |= LOCAL_DEFINED_ELEMENT;
-        evalDefinition (interp, sdata, objv[3], pattern, quant, n, m);
+        return evalDefinition (interp, sdata, objv[3], pattern, quant, n, m);
     }
     return TCL_OK;
 }
@@ -3844,6 +3860,8 @@ tDOM_SchemaInit (
     Tcl_CreateObjCommand (interp, "tdom::schema::defelement",
                           schemaInstanceCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::defpattern",
+                          schemaInstanceCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp, "tdom::schema::deftext",
                           schemaInstanceCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::start",
                           schemaInstanceCmd, NULL, NULL);
