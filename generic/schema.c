@@ -168,11 +168,7 @@ static void SetActiveSchemaData (SchemaData *v)
         return TCL_ERROR;                                               \
     }
 
-#define CHECK_TOPLEVEL_CMD                                              \
-    if (!sdata->defineToplevel && sdata->currentEvals > 1) {            \
-        SetResult ("Command not allowed in nested schema define script"); \
-        return TCL_ERROR;                                               \
-    }                                                                   \
+#define CHECK_RECURSIVE_CALL                                            \
     if (clientData != NULL) {                                           \
         savedsdata = GETASI;                                            \
         if (savedsdata == sdata) {                                      \
@@ -2071,7 +2067,10 @@ schemaInstanceCmd (
         /* Inline defined defelement, defpattern, deftext or start */
         sdata = GETASI;
         CHECK_SI;
-        CHECK_TOPLEVEL_CMD
+        if (!sdata->defineToplevel && sdata->currentEvals > 1) {
+            SetResult ("Method not allowed in nested schema define script");
+            return TCL_ERROR;
+        }
         i = 1;
     }
 
@@ -2085,6 +2084,7 @@ schemaInstanceCmd (
     switch ((enum schemaInstanceMethod) methodIndex) {
     case m_defelement:
     case m_defpattern:
+        CHECK_RECURSIVE_CALL
         if (objc != 4-i && objc != 5-i) {
             Tcl_WrongNumArgs (interp, 1-i, objv, "<name>"
                  " ?<namespace>? pattern");
@@ -2210,6 +2210,7 @@ schemaInstanceCmd (
         break;
 
     case m_deftext:
+        CHECK_RECURSIVE_CALL
         if (objc !=  4-i) {
             Tcl_WrongNumArgs (interp, 2-i, objv, "<name>"
                               " <constraints script>");
@@ -2241,6 +2242,7 @@ schemaInstanceCmd (
         break;
         
     case m_start:
+        CHECK_RECURSIVE_CALL
         if (objc < 3-i || objc > 4-i) {
             Tcl_WrongNumArgs (interp, 2-i, objv, "<documentElement>"
                               " ?<namespace>?");
