@@ -30,7 +30,8 @@ typedef enum {
   SCHEMA_CTYPE_CHOICE,
   SCHEMA_CTYPE_INTERLEAVE,
   SCHEMA_CTYPE_PATTERN,
-  SCHEMA_CTYPE_TEXT
+  SCHEMA_CTYPE_TEXT,
+  SCHEMA_CTYPE_VIRTUAL
 } Schema_CP_Type;
 
 typedef enum {
@@ -123,6 +124,7 @@ typedef struct
     unsigned int quantsSize;
     int       currentEvals;
     int       cleanupAfterEval;
+    int       evalError;
     Tcl_Obj  *reportCmd;
     Tcl_Obj **evalStub;
     Tcl_Obj **textStub;
