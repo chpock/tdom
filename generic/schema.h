@@ -157,7 +157,7 @@ int tDOM_SchemaObjCmd (
     ClientData clientData,
     Tcl_Interp *interp,
     int objc,
-    Tcl_Obj *CONST objv[]
+    Tcl_Obj *const objv[]
     );
 
 void tDOM_SchemaInit (
