@@ -723,24 +723,15 @@ checkText (
 static int
 evalVirtual (
     Tcl_Interp *interp,
-    SchemaCP *cp,
-    char *name,
-    char *namespace
+    SchemaData *sdata,
+    SchemaCP *cp
     )
 {
-    Tcl_Obj *nsObj, *nameObj;
     int rc;
 
-    nsObj = Tcl_NewStringObj(namespace, -1);
-    Tcl_IncrRefCount (nsObj);
-    nameObj = Tcl_NewStringObj(name, -1);
-    Tcl_IncrRefCount (nameObj);
-    cp->content[cp->nc-2] = (SchemaCP *) nsObj;
-    cp->content[cp->nc-1] = (SchemaCP *) nameObj;
+    cp->content[cp->nc-1] = (SchemaCP *) sdata->self;
     rc = Tcl_EvalObjv (interp, cp->nc, (Tcl_Obj **) cp->content,
-                       TCL_EVAL_DIRECT | TCL_EVAL_GLOBAL);
-    Tcl_DecrRefCount (nameObj);
-    Tcl_DecrRefCount (nsObj);
+                       TCL_EVAL_GLOBAL);
     if (rc != TCL_OK) {
         return 0;
     }
@@ -856,7 +847,7 @@ matchElementStart (
                         break;
 
                     case SCHEMA_CTYPE_VIRTUAL:
-                        if (evalVirtual (interp, icp, namespace, name)) break;
+                        if (evalVirtual (interp, sdata, icp)) break;
                         else return 0;
                         
                     }
@@ -866,7 +857,7 @@ matchElementStart (
                 break;
 
             case SCHEMA_CTYPE_VIRTUAL:
-                if (evalVirtual (interp, candidate, namespace, name)) {
+                if (evalVirtual (interp, sdata, candidate)) {
                     mayskip = 1;
                     break;
                 }
@@ -1380,8 +1371,7 @@ static int checkElementEnd (
                         while (tse->pattern->type != SCHEMA_CTYPE_NAME) {
                             tse = tse->down;
                         }
-                        if (evalVirtual (interp, ic, tse->pattern->namespace,
-                                         tse->pattern->name)) break;
+                        if (evalVirtual (interp, sdata, ic)) break;
                         else return 0;
                     }
                     if (mayMiss) break;
@@ -1394,9 +1384,7 @@ static int checkElementEnd (
                 while (tse->pattern->type != SCHEMA_CTYPE_NAME) {
                     tse = tse->down;
                 }
-                if (evalVirtual (interp, cp->content[ac],
-                                 tse->pattern->namespace,
-                                 tse->pattern->name)) break;
+                if (evalVirtual (interp, sdata, cp->content[ac])) break;
                 else return 0;
                 
             case SCHEMA_CTYPE_INTERLEAVE:
@@ -1559,9 +1547,7 @@ matchText (
                             while (tse->pattern->type != SCHEMA_CTYPE_NAME) {
                                 tse = tse->down;
                             }
-                            if (!evalVirtual (interp, ic,
-                                              tse->pattern->namespace,
-                                              tse->pattern->name)) return 0;
+                            if (!evalVirtual (interp, sdata, ic)) return 0;
                             break;
                             
                         case SCHEMA_CTYPE_CHOICE:
@@ -1594,8 +1580,7 @@ matchText (
                     while (tse->pattern->type != SCHEMA_CTYPE_NAME) {
                         tse = tse->down;
                     }
-                    if (!evalVirtual (interp, ic, tse->pattern->namespace,
-                                      tse->pattern->name)) return 0;
+                    if (!evalVirtual (interp, sdata, ic)) return 0;
                     break;
                     
                 case SCHEMA_CTYPE_NAME:
@@ -3178,12 +3163,14 @@ VirtualPatternObjCmd (
 
     pattern = initSchemaCP (SCHEMA_CTYPE_VIRTUAL, NULL, NULL);
     REMEMBER_PATTERN (pattern)
-        pattern->content = MALLOC (sizeof (Tcl_Obj*) * (objc +1));
+    /* We alloc for one arugment more: the always appended schema
+     * cmd, */
+    pattern->content = MALLOC (sizeof (Tcl_Obj*) * (objc));
     for (i = 1; i < objc; i++) {
         pattern->content[i-1] = (SchemaCP *) objv[i];
         Tcl_IncrRefCount (objv[i]);
     }
-    pattern->nc = objc + 1;
+    pattern->nc = objc;
     addToContent (sdata, pattern, SCHEMA_CQUANT_ONE, 0, 0);
     return TCL_OK;
 }
