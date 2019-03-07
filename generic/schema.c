@@ -379,7 +379,7 @@ static void freeSchemaCP (
         /* do nothing */
         break;
     case SCHEMA_CTYPE_VIRTUAL:
-        for (i = 0; i < pattern->nc - 2; i++) {
+        for (i = 0; i < pattern->nc - 1; i++) {
             Tcl_DecrRefCount ((Tcl_Obj *)pattern->content[i]);
         }
         FREE (pattern->content);
@@ -733,6 +733,7 @@ evalVirtual (
     rc = Tcl_EvalObjv (interp, cp->nc, (Tcl_Obj **) cp->content,
                        TCL_EVAL_GLOBAL);
     if (rc != TCL_OK) {
+        sdata->evalError = 1;
         return 0;
     }
     return 1;
@@ -1072,11 +1073,13 @@ probeElement (
         serializeStack (sdata);
         fprintf (stderr, "\n");
         );
-    SetResult ("Element \"");
-    if (namespacePtr) {
-        Tcl_AppendResult (interp, namespacePtr, ":", NULL);
+    if (!sdata->evalError) {
+        SetResult ("Element \"");
+        if (namespacePtr) {
+            Tcl_AppendResult (interp, namespacePtr, ":", NULL);
+        }
+        Tcl_AppendResult (interp, name, "\" doesn't match", NULL);
     }
-    Tcl_AppendResult (interp, name, "\" doesn't match", NULL);
     return TCL_ERROR;
 }
 
@@ -1964,6 +1967,7 @@ schemaReset (
     while (sdata->stack) popStack (sdata);
     sdata->validationState = VALIDATION_READY;
     sdata->skipDeep = 0;
+    sdata->evalError = 0;
 }
 
 static int
@@ -2062,7 +2066,7 @@ schemaInstanceInfoCmd (
         break;
 
     case m_stack:
-        if (Tcl_GetIndexFromObj (interp, objv[1],
+        if (Tcl_GetIndexFromObj (interp, objv[2],
                                  schemaInstanceInfoStackMethods,
                                  "method", 0, &methodIndex)
             != TCL_OK) {

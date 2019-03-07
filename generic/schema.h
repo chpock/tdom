@@ -124,6 +124,7 @@ typedef struct
     unsigned int quantsSize;
     int       currentEvals;
     int       cleanupAfterEval;
+    int       evalError;
     Tcl_Obj  *reportCmd;
     Tcl_Obj **evalStub;
     Tcl_Obj **textStub;

@@ -3184,7 +3184,7 @@ test schema-15.1 {constraint cmd tcl} {
     s delete
     lappend result $msg ${::schema-15.1}
     set result
-} {1 {} ba}
+} {1 {} ss}
 
 proc schema-15.2-astart {args} {
     append ::schema-15.2 astart
@@ -3213,6 +3213,30 @@ test schema-15.2 {constraint cmd tcl} {
     lappend result $msg ${schema-15.2}
     set result
 } {1 {} astartaendastartaend}
+
+proc schema-15.3 {type cmd} {
+    lappend ::schema-15.3 $type [$cmd info stack inside]
+}
+
+test schema-15.3 {constraint cmd tcl} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element a *
+        }
+        defelement a {
+            tcl schema-15.3 astart
+            element b ! text
+            element c ! text
+            tcl schema-15.3 aend
+        }
+    }
+    set schema-15.3 ""
+    set result [s validate {<doc><a><b>foo</b><c/></a><a><b></b><c>bar</c></a></doc>} msg]
+    s delete
+    lappend result $msg {*}${schema-15.3}
+    set result
+} {1 {} astart a aend a astart a aend a}
 
 test schema-16.1 {interleave} {
     tdom::schema s
