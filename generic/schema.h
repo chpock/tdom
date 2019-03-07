@@ -106,6 +106,7 @@ typedef enum {
 
 typedef struct 
 {
+    Tcl_Obj *self;
     char *start;
     char *startNamespace;
     Tcl_HashTable element;
@@ -121,6 +122,9 @@ typedef struct
     SchemaQuant *quants;
     unsigned int numQuants;
     unsigned int quantsSize;
+    int       currentEvals;
+    int       cleanupAfterEval;
+    Tcl_Obj  *reportCmd;
     Tcl_Obj **evalStub;
     Tcl_Obj **textStub;
     char *currentNamespace;

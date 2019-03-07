@@ -216,12 +216,12 @@
       </commanddef>
 
       <commanddef>
-        <command><method>text</method> <m>?&lt;constraint script>?</m></command>
+        <command><method>text</method> <m>?&lt;constraint script>|"type" typename?</m></command>
         <desc>Without the optional constraint script this validation
-        constraint matches every string (including the empty one). If
-        the <m>constraint script</m> argument is given then a text
-        machtes if it passes all text constraints in the
-        script.</desc>
+        constraint matches every string (including the empty one).
+        With <m>constraint script</m> or with a given text type
+        argument a text matching this script or the text type is
+        expected. </desc>
       </commanddef>
 
       <commanddef>
@@ -234,33 +234,56 @@
       </commanddef>
 
       <commanddef>
-        <command><method>attribute</method> <m>name</m> <m>?quant?</m> <m>?&lt;constraint script>?</m></command>
-        <desc></desc>
+        <command><method>attribute</method> <m>name</m> <m>?quant?</m> <m>(?&lt;constraint script>|"type" typename?)</m></command>
+        <desc>The attribute command defines a attribute (in no
+        namespace) to the enclosing element. The first definition of
+        <m>name</m> inside an element definition wins; later
+        definitions of the same name are silently ignored. After the
+        <m>name</m> argument there may be one of the qunatifieres ? or
+        !. If there is, this will be used. Otherwise the attribute
+        will be required (must be present in the xml source). If there
+        is one argument more this argument is evaluated as constraint
+        script, defining the value constrains of the attribute.
+        Otherwise, if there are two more arguments and the first of
+        them is the bareword "type" then the following is used as a
+        text type name.</desc>
       </commanddef>
 
       <commanddef>
-        <command><method>nsattribute</method> <m>name</m> <m>namespace</m> <m>?quant?</m> <m>?&lt;constraint script>?</m></command>
-        <desc></desc>
+        <command><method>nsattribute</method> <m>name</m> <m>namespace</m> <m>?quant?</m> <m>(?&lt;constraint script>|"type" typename?)</m></command>
+        <desc>This command does the same as the command <m>attribute</m>, just for the attribute <m>name</m> in the namespace <m>namespace</m>.</desc>
       </commanddef>
 
       <commanddef>
         <command><method>namespace</method> <m>uri</m> <m>&lt;definition script></m></command>
-        <desc>Evaluates the <m>definition script</m> with context namespace <m>uri</m>.</desc>
+        <desc>Evaluates the <m>definition script</m> with context namespace <m>uri</m>. Every element or ref command name will be looked up in the namespace <m>uri</m> and local defined element will be in that namespace.</desc>
       </commanddef>
       
       <commanddef>
         <command><method>defelement</method> <m>name</m> <m>?namespace?</m> <m>&lt;definition script></m></command>
-        <desc>This command is not allowed nested in an other definition script command.</desc>
+        <desc>This defines an element type exactly as a <i>schemacmd
+        defelement</i> call. This is meant as toplevel command of a
+        <i>schemacmd define</i> script. This command is not allowed
+        nested in an other definition script command and will raise
+        error, if you call it there.</desc>
       </commanddef>
 
       <commanddef>
         <command><method>defpattern</method> <m>name</m> <m>?namespace?</m> <m>&lt;definition script></m></command>
-        <desc>This command is not allowed nested in an other definition script command.</desc>
+        <desc>This defines a named pattern exactly as a <i>schemacmd
+        defpattern</i> call. This is meant as toplevel command of a
+        <i>schemacmd define</i> script. This command is not allowed
+        nested in an other definition script command and will raise
+        error, if you call it there.</desc>
       </commanddef>
 
       <commanddef>
         <command><method>start</method> <m>name</m> <m>?namespace?</m></command>
-        <desc>This command is not allowed nested in an other definition script command.</desc>
+        <desc>This command works exactly as a <i>schemacmd start</i>
+        call. This is meant as toplevel command of a <i>schemacmd
+        define</i> script. This command is not allowed nested in an
+        other definition script command and will raise error, if you
+        call it there.</desc>
       </commanddef>
     </commandlist>
     
@@ -345,19 +368,34 @@
       </commanddef>
       <commanddef>
         <command><cmd>enumeration</cmd> <m>list</m></command>
-        <desc></desc>
+        <desc>This text constraint match if the text value is equal to
+        one element (respecting case and any whitespace) of the
+        argument <m>list</m>, which has to be a valid Tcl list.
+        </desc>
       </commanddef>
       <commanddef>
-        <command><cmd>match</cmd> <m>glob style match pattern</m></command>
-        <desc></desc>
+        <command><cmd>match</cmd> <m>?-nocase?</m> <m>glob style match pattern</m></command>
+        <desc>This text constraint match if the text value match the
+        glob style pattern given as argument. It follows the rules of
+        the Tcl [string match] command, see
+        <url>https://www.tcl.tk/man/tcl8.6/TclCmd/string.htm#M35</url>.</desc>
+      </commanddef>
+      <commanddef>
+        <command><cmd>regexp</cmd> <m>expression</m></command>
+        <desc>This text constraint match if the text value match the
+        regular expression given as argument. <url>https://www.tcl.tk/man/tcl8.6/TclCmd/re_syntax.htm</url> describes the regular expression syntax</desc>
       </commanddef>
       <commanddef>
         <command><cmd>nmtoken</cmd></command>
-        <desc></desc>
+        <desc>This text constraint match if the text value match the
+        XML nmtoken production
+        <url>https://www.w3.org/TR/xml/#NT-Nmtoken</url></desc>
       </commanddef>
       <commanddef>
         <command><cmd>nmtokens</cmd></command>
-        <desc></desc>
+        <desc>This text constraint match if the text value match the
+        XML nmtokens production
+        <url>https://www.w3.org/TR/xml/#NT-Nmtokens</url></desc>
       </commanddef>
       <commanddef>
         <command><cmd>number</cmd></command>
@@ -372,12 +410,16 @@
         <desc></desc>
       </commanddef>
       <commanddef>
-        <command><cmd>maxLength</cmd></command>
-        <desc></desc>
+        <command><cmd>maxLength</cmd> <m>length</m></command>
+        <desc>This text constraint match if the length of the text
+        value (in characters, not bytes) is at most <m>length</m>. The
+        length argument must be an integer greater zero.</desc>
       </commanddef>
       <commanddef>
-        <command><cmd>minLength</cmd></command>
-        <desc></desc>
+        <command><cmd>minLength</cmd> <m>length</m></command>
+        <desc>This text constraint match if the length of the text
+        value (in characters, not bytes) is at least <m>length</m>.
+        The length argument must be an integer greater zero.</desc>
       </commanddef>
       <commanddef>
         <command><cmd>oneOf</cmd> <m>&lt;constraint script></m></command>
@@ -523,7 +565,7 @@ schema define {
 
     <p>The RELAX NG Tutorial
     (<url>http://relaxng.org/tutorial-20011203.html</url>) starts with
-    this example:</p>
+described at     this example:</p>
 
     <example>
 Consider a simple XML representation of an email address book:

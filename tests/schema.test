@@ -295,6 +295,103 @@ test schema-1.17 {call schema cmd evaluation in his own schema definition script
     set result
 } 1
 
+test schema-1.18 {delete schema cmd in definition script} {
+    tdom::schema create s
+    s define {
+        defelement e {
+            s delete
+            element e1 1 {
+                set ::result [catch {s delete}]
+            }
+        }
+    }
+    lappend result [info commands s]
+} {1 {}}
+
+test schema-1.19 {call top level schema cmd in definition script} {
+    tdom::schema create s
+    set result [catch {s define {
+        defelement e {
+            element e1 1 {
+                deftext foo {minLength 1}
+                defelement bar {}
+            }
+            element bar
+        }
+    }}]
+    lappend result [info commands s]
+    s delete
+    set result
+} {1 s}
+
+test schema-1.20 {call top level schema cmd in definition script} {
+    tdom::schema create s
+    set result [catch {s defelement e {
+            element e1 1 {
+                deftext foo {minLength 1}
+                defelement bar {}
+            }
+            element bar
+        }
+    }]
+    lappend result [info commands s]
+    s delete
+    set result
+} {1 s}
+
+test schema-1.21 {Create other schema cmd in definition script} {
+    tdom::schema create s1
+    s1 defelement e {
+        element e1 1 {}
+        element e1 1 {
+            ::tdom::schema create ::s2
+            ::s2 define {
+                defelement s2 {
+                    element s2e
+                    element s2ee
+                }
+                foreach e {s2e s2ee} {
+                    defelement $e {text}
+                }
+            }
+        }
+    }
+    set result [info commands s1]
+    lappend result [info commands s2]
+    foreach xml {
+        <e><e1/><e1/></e>
+        <s2><s2e>foo</s2e><s2ee/></s2>
+    } {
+        lappend result [s1 validate $xml]
+        lappend result [s2 validate $xml]
+    }
+    s2 delete
+    s1 delete
+    set result
+} {s1 s2 1 0 0 1}
+
+test schema-1.22 {Call not toplevel cmd methods in definition script} {
+    tdom::schema create s
+    set result [list]
+    s define {
+        defelement e {
+            lappend ::result [s nrForwardDefinitions]
+            element e1
+            lappend ::result [s nrForwardDefinitions]
+            element e1
+            lappend ::result [s nrForwardDefinitions]
+            element e2
+            lappend ::result [s nrForwardDefinitions]
+        }
+        foreach e {e1 e2} {
+            defelement $e {text}
+            lappend ::result [s nrForwardDefinitions]
+        }
+    }
+    s delete
+    set result
+} {0 1 1 2 1 0}
+
 test schema-2.1 {grammar definition: ref} {
     tdom::schema create grammar
     grammar defpattern thisPattern {
@@ -652,7 +749,7 @@ test schema-7.2.1 {group} {
             element e2 *
         }
         foreach e {e1 e2} {
-            grammar defelement $e {}
+            defelement $e {}
         }
     }
     dom parse -validateCmd grammar {
@@ -676,7 +773,7 @@ test schema-7.3 {group with inline defined element} {
             element e2 *
         }
         foreach e {e1 e2} {
-            grammar defelement $e {}
+            defelement $e {}
         }
     }
     dom parse -validateCmd grammar {
@@ -699,7 +796,7 @@ test schema-7.4 {group with inline defined element} {
             }
         }
         foreach e {e1 e2} {
-            grammar defelement $e {}
+            defelement $e {}
         }
     }
     dom parse -validateCmd grammar {
@@ -722,7 +819,7 @@ test schema-7.5 {group with inline defined element} {
             }
         }
         foreach e {e1 e2} {
-            grammar defelement $e {}
+            defelement $e {}
         }
     }
     ::xml::parser p -validateCmd grammar
@@ -2575,6 +2672,31 @@ test schema-14.6 {text: match (glob style)} {
     set result
 } {1 1 1 0 1 0}
 
+test schema-14.6a {text: match (glob style) -nocase} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element e *
+        }
+        defelement e {
+            text {match -nocase {[A-Z]*1[_!]}}
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        {<doc><e>disabled1_</e></doc>}
+        {<doc><e>dis able1_</e></doc>}
+        {<doc><e>something</e></doc>}
+        {<doc><e>a1!</e></doc>}
+        {<doc><e>a1!/</e></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 1 1 0 1 0}
+
 test schema-14.7 {text: regexp} {
     tdom::schema s
     s define {
@@ -2940,6 +3062,113 @@ test schema-14.18 {deftext} {
     s delete
     set result
 } {0 1 0 1 0 1 0 1 0 1 1 0 1 0 1 0 1 0 0 1 0 1 1 0}
+
+test schema-14.19 {deftext} {
+    tdom::schema s
+    s deftext len2-4 {
+        minLength 2
+        maxLength 4
+    }
+    s defelement doc {
+        element e
+    }
+    s defelement e {
+        attribute this type len2-4
+        attribute foo ? type len2-4
+    }
+    set result [list]
+    foreach xml {
+        <doc><e/></doc>
+        {<doc><e foo="bar"/></doc>}
+        {<doc><e this="bar"/></doc>}
+        {<doc><e this=""/></doc>}
+        {<doc><e this="12" foo="bar"/></doc>}
+        {<doc><e this="12" foo="b"/></doc>}
+        {<doc><e this="1234"/></doc>}
+        {<doc><e this="12345"/></doc>}
+        {<doc><e this="12345alkajsdlfjkals" and="this"/></doc>}
+        {<doc><e and="this" this="12345alkajsdlfjkals"/></doc>}
+    } {
+        lappend result [s validate $xml errMsg]
+        set rc [catch {dom parse -validateCmd s $xml doc}]
+        if {$rc == 0} {
+            $doc delete
+        }
+        lappend result $rc
+    }
+    s delete
+    set result
+} {0 1 0 1 1 0 0 1 1 0 0 1 1 0 0 1 0 1 0 1}
+
+test schema-14.19a {deftext} {
+    tdom::schema s
+    s deftext len2-4 {
+        minLength 2
+        maxLength 4
+    }
+    s defelement doc {
+        element e ! {
+            attribute this type len2-4
+            attribute foo ? type len2-4
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc><e/></doc>
+        {<doc><e foo="bar"/></doc>}
+        {<doc><e this="bar"/></doc>}
+        {<doc><e this=""/></doc>}
+        {<doc><e this="12" foo="bar"/></doc>}
+        {<doc><e this="12" foo="b"/></doc>}
+        {<doc><e this="1234"/></doc>}
+        {<doc><e this="12345"/></doc>}
+        {<doc><e this="12345alkajsdlfjkals" and="this"/></doc>}
+        {<doc><e and="this" this="12345alkajsdlfjkals"/></doc>}
+    } {
+        lappend result [s validate $xml]
+        set rc [catch {dom parse -validateCmd s $xml doc}]
+        if {$rc == 0} {
+            $doc delete
+        }
+        lappend result $rc
+    }
+    s delete
+    set result
+} {0 1 0 1 1 0 0 1 1 0 0 1 1 0 0 1 0 1 0 1}
+
+test schema-14.20 {deftext} {
+    tdom::schema s
+    s deftext len2-4 {
+        minLength 2
+        maxLength 4
+    }
+    s defelement doc {
+        element e ! {
+            nsattribute this http://tdom.org/test {
+                minLength 2
+                maxLength 4
+            }
+            nsattribute foo http://tdom.org/test ? type len2-4
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc><e/></doc>
+        {<doc xmlns:ns1="http://tdom.org/test"><e ns1:foo="bar"/></doc>}
+        {<doc xmlns:ns1="http://tdom.org/test"><e ns1:this="bar"/></doc>}
+        {<doc xmlns:ns1="http://tdom.org/test"><e ns1:this=""/></doc>}
+        {<doc xmlns:ns1="http://tdom.org/test"><e ns1:this="12" ns1:foo="bar"/></doc>}
+        {<doc xmlns:ns1="http://tdom.org/test"><e ns1:this="12" ns1:foo="b"/></doc>}
+        {<doc xmlns:ns1="http://tdom.org/test"><e ns1:this="1234"/></doc>}
+        {<doc xmlns:ns1="http://tdom.org/test"><e ns1:this="12345"/></doc>}
+        {<doc xmlns:ns1="http://tdom.org/test"><e ns1:this="12345alkajsdlfjkals" ns1:and="this"/></doc>}
+        {<doc xmlns:ns1="http://tdom.org/test"><e ns1:and="this" ns1:this="12345alkajsdlfjkals"/></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 1 0 1 0 1 0 0 0}
 
 test schema-15.1 {constraint cmd tcl} {
     tdom::schema s
@@ -3484,5 +3713,34 @@ test schema-16.15 {interleave} {
     s delete
     set result
 } {0 1 0 1 0 1 1 0}
+
+test schema-17.1 {info} {
+    tdom::schema s
+    s define {
+        foreach e {a b1 b11 b2 c} {
+            defelement $e {}
+        }
+    }
+    set result [lsort [s info defelements]]
+    s delete
+    set result
+} {a b1 b11 b2 c}
+
+test schema-17.2 {info} {
+    tdom::schema s
+    s define {
+        defelement b {
+            element b1
+            element b2
+        }
+        defelement a {
+            element a1
+            element a2
+        }
+    }
+    set result [lsort [s info defelements]]
+    s delete
+    set result
+} {a b}
 
 }

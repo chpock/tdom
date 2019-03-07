@@ -17,7 +17,7 @@
 |
 |
 |   written by Rolf Ade
-|   Nov, Dec, Jan 2018-2019
+|   2018-2019
 |
 \---------------------------------------------------------------------------*/
 
@@ -141,7 +141,6 @@ static void SetActiveSchemaData (SchemaData *v)
 # define SETASI(v) SetActiveSchemaData (v)
 #endif
 
-
 #define CHECK_SI                                                        \
     if (!sdata) {                                                       \
         SetResult ("Command called outside of schema context");         \
@@ -169,6 +168,21 @@ static void SetActiveSchemaData (SchemaData *v)
         return TCL_ERROR;                                               \
     }
 
+#define CHECK_RECURSIVE_CALL                                            \
+    if (clientData != NULL) {                                           \
+        savedsdata = GETASI;                                            \
+        if (savedsdata == sdata) {                                      \
+            SetResult ("This recursive call is not allowed"); \
+            return TCL_ERROR;                                           \
+        }                                                               \
+    }
+      
+#define CHECK_EVAL                                                      \
+    if (sdata->currentEvals) {                                          \
+        SetResult ("Method not allowed in nested schema define script"); \
+        return TCL_ERROR;                                               \
+    }
+    
 #define REMEMBER_PATTERN(pattern)                                       \
     if (sdata->numPatternList == sdata->patternListSize) {              \
         sdata->patternList = (SchemaCP **) REALLOC (                    \
@@ -197,6 +211,48 @@ static void SetActiveSchemaData (SchemaData *v)
     sdata->cp->content[sdata->cp->nc] = (SchemaCP *) sc;                \
     sdata->cp->quants[sdata->cp->nc] = SCHEMA_CQUANT_ONE;               \
     sdata->cp->nc++;                                                    \
+
+#define maxOne(quant) \
+    ((quant) == SCHEMA_CQUANT_ONE || (quant) == SCHEMA_CQUANT_OPT) ? 1 : 0
+
+#define minOne(quant) \
+    ((quant) == SCHEMA_CQUANT_ONE || (quant) == SCHEMA_CQUANT_PLUS) ? 1 : 0
+
+#define mayRepeat(quant) \
+    ((quant) == SCHEMA_CQUANT_REP || (quant) == SCHEMA_CQUANT_PLUS) ? 1 : 0
+
+#define mayMiss(quant) \
+    ((quant) == SCHEMA_CQUANT_REP || (quant) == SCHEMA_CQUANT_OPT) ? 1 : 0
+
+#define hasMatched(quant,hm) \
+    (hm) == 0 ?  mayMiss(quant) :  1
+
+#define mustMatch(quant,hm) \
+    (hm) == 0 ? minOne(quant) : 0
+
+
+#define getContext(cp, ac, hm)        \
+    cp = se->pattern;                 \
+    ac = se->activeChild;             \
+    hm = se->hasMatched;
+
+
+#define updateStack(se,cp,ac)                     \
+    if (maxOne (cp->quants[ac])) {                \
+        se->activeChild = ac + 1;                 \
+        se->hasMatched = 0;                       \
+    } else {                                      \
+        se->activeChild = ac;                     \
+        se->hasMatched = 1;                       \
+    }
+
+#define serializeElementName(rObj, cp)                  \
+    rObj = Tcl_NewObj();                                \
+    if (cp->namespace) {                                \
+        Tcl_SetStringObj (rObj, cp->namespace, -1);     \
+        Tcl_AppendToObj (rObj, ":", 1);                 \
+    }                                                   \
+    Tcl_AppendToObj (rObj, cp->name, -1);
 
 static SchemaCP*
 initSchemaCP (
@@ -352,13 +408,18 @@ static void freeSchemaCP (
 }
 
 static SchemaData*
-initSchemaData ()
+initSchemaData (
+    Tcl_Obj *cmdNameObj)
 {
     SchemaData *sdata;
-    int hnew;
+    int hnew, len;
+    char *name;
 
     sdata = TMALLOC (SchemaData);
     memset (sdata, 0, sizeof(SchemaData));
+    name = Tcl_GetStringFromObj (cmdNameObj, &len);
+    sdata->self = Tcl_NewStringObj (name, len);
+    Tcl_IncrRefCount (sdata->self);
     Tcl_InitHashTable (&sdata->element, TCL_STRING_KEYS);
     Tcl_InitHashTable (&sdata->pattern, TCL_STRING_KEYS);
     Tcl_InitHashTable (&sdata->attrNames, TCL_STRING_KEYS);
@@ -402,6 +463,15 @@ static void schemaInstanceDelete (
     unsigned int i;
     SchemaValidationStack *down;
 
+    /* Protect the clientData to be freed inside (even nested)
+     * Tcl_Eval*() calls to avoid invalid mem access and postpone the
+     * cleanup until the Tcl_Eval*() calls are finished (done in
+     * schemaInstanceCmd(). */
+    if (sdata->currentEvals) {
+        sdata->cleanupAfterEval = 1;
+        return;
+    }
+    Tcl_DecrRefCount (sdata->self);
     if (sdata->start) FREE (sdata->start);
     if (sdata->startNamespace) FREE (sdata->startNamespace);
     Tcl_DeleteHashTable (&sdata->namespace);
@@ -611,40 +681,6 @@ pushToStack (
     sdata->stack = stackElm;
 }
 
-#define maxOne(quant) \
-    ((quant) == SCHEMA_CQUANT_ONE || (quant) == SCHEMA_CQUANT_OPT) ? 1 : 0
-
-#define minOne(quant) \
-    ((quant) == SCHEMA_CQUANT_ONE || (quant) == SCHEMA_CQUANT_PLUS) ? 1 : 0
-
-#define mayRepeat(quant) \
-    ((quant) == SCHEMA_CQUANT_REP || (quant) == SCHEMA_CQUANT_PLUS) ? 1 : 0
-
-#define mayMiss(quant) \
-    ((quant) == SCHEMA_CQUANT_REP || (quant) == SCHEMA_CQUANT_OPT) ? 1 : 0
-
-#define hasMatched(quant,hm) \
-    (hm) == 0 ?  mayMiss(quant) :  1
-
-#define mustMatch(quant,hm) \
-    (hm) == 0 ? minOne(quant) : 0
-
-
-#define getContext(cp, ac, hm)        \
-    cp = se->pattern;                 \
-    ac = se->activeChild;             \
-    hm = se->hasMatched;
-
-
-#define updateStack(se,cp,ac)                     \
-    if (maxOne (cp->quants[ac])) {                \
-        se->activeChild = ac + 1;                 \
-        se->hasMatched = 0;                       \
-    } else {                                      \
-        se->activeChild = ac;                     \
-        se->hasMatched = 1;                       \
-    }
-
 static void
 popStack (
     SchemaData *sdata
@@ -723,6 +759,7 @@ matchElementStart (
     int hm, ac, i, mayskip, rc;
     int isName = 0;
     SchemaValidationStack *se;
+    Tcl_Obj *cmdPtr;
 
     if (!sdata->stack) return 0;
     se = sdata->stack;
@@ -740,6 +777,26 @@ matchElementStart (
             case SCHEMA_CTYPE_TEXT:
                 if (candidate->nc) {
                     if (!checkText (interp, candidate, "")) {
+                        if (sdata->reportCmd) {
+                            cmdPtr = Tcl_DuplicateObj (sdata->reportCmd);
+                            Tcl_ListObjAppendElement (interp, cmdPtr,
+                                                      sdata->self);
+                            Tcl_ListObjAppendElement (
+                                interp, cmdPtr,
+                                Tcl_NewStringObj ("MISSING_TEXT", 22)
+                                );
+                            sdata->currentEvals++;
+                            rc = Tcl_EvalObjEx (interp, cmdPtr,
+                                                TCL_EVAL_GLOBAL
+                                                | TCL_EVAL_DIRECT);
+                            sdata->currentEvals--;
+                            Tcl_DecrRefCount (cmdPtr);
+                            if (rc != TCL_OK) {
+                                return 0;
+                            }
+                            break;
+                        }
+                        
                         return 0;
                     }
                 }
@@ -1945,16 +2002,108 @@ evalConstraints (
     sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
     sdata->isTextConstraint = 1;
     sdata->textStub[3] = script;
-    result = Tcl_EvalObjv (interp, 4, sdata->textStub,
-                           TCL_EVAL_DIRECT | TCL_EVAL_GLOBAL);
-    sdata->isTextConstraint = savedIsTextConstraint;
+    sdata->currentEvals++;
+    result = Tcl_EvalObjv (interp, 4, sdata->textStub, TCL_EVAL_GLOBAL);
+    sdata->currentEvals--;
     /* ... and restore the previously saved sdata states  */
+    sdata->isTextConstraint = savedIsTextConstraint;
     sdata->cp = savedCP;
     sdata->contentSize = savedContenSize;
     if (sdata->cp && !sdata->isAttributeConstaint && cp->nc) {
         sdata->cp->flags |= CONSTRAINT_TEXT_CHILD;
     }
     return result;
+}
+
+static int
+schemaInstanceInfoCmd (
+    SchemaData *sdata,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    int methodIndex;
+    Tcl_HashEntry *h;
+    Tcl_HashSearch search;
+    SchemaCP *cp;
+    SchemaValidationStack *se;
+    Tcl_Obj *resultObj, *elmObj;
+    
+    static const char *schemaInstanceInfoMethods[] = {
+        "defelements", "stack", NULL
+    };
+    enum schemaInstanceInfoMethod {
+        m_defelements, m_stack
+    };
+
+    static const char *schemaInstanceInfoStackMethods[] = {
+        "top", "inside", NULL
+    };
+    enum schemaInstanceInfoStackMethod {
+        m_top, m_inside
+    };
+    
+    if (objc < 2) {
+        Tcl_WrongNumArgs (interp, 1, objv, "subcommand ?arguments?");
+        return TCL_ERROR;
+    }
+
+    if (Tcl_GetIndexFromObj (interp, objv[1], schemaInstanceInfoMethods,
+                             "method", 0, &methodIndex)
+        != TCL_OK) {
+        return TCL_ERROR;
+    }
+    
+    Tcl_ResetResult (interp);
+    switch ((enum schemaInstanceInfoMethod) methodIndex) {
+    case m_defelements:
+        if (objc != 2) {
+            Tcl_WrongNumArgs (interp, 1, objv, "defelements");
+            return TCL_ERROR;
+        }
+        resultObj = Tcl_GetObjResult (interp);
+        for (h = Tcl_FirstHashEntry (&sdata->element, &search);
+             h != NULL;
+             h = Tcl_NextHashEntry (&search)) {
+            cp = (SchemaCP *) Tcl_GetHashValue (h);
+            if (!cp) continue;
+            if (cp->flags & FORWARD_PATTERN_DEF
+                || cp->flags & PLACEHOLDER_PATTERN_DEF) continue;
+            serializeElementName (elmObj, cp);
+            if (Tcl_ListObjAppendElement (interp, resultObj, elmObj) != TCL_OK)
+                return TCL_ERROR;
+        }
+        break;
+
+    case m_stack:
+        if (Tcl_GetIndexFromObj (interp, objv[1],
+                                 schemaInstanceInfoStackMethods,
+                                 "method", 0, &methodIndex)
+            != TCL_OK) {
+            return TCL_ERROR;
+        }
+        switch ((enum schemaInstanceInfoStackMethod) methodIndex) {
+        case m_top:
+            break;
+        case m_inside:
+            if (!sdata->stack) {
+                Tcl_ResetResult (interp);
+                return TCL_OK;
+            }
+            se = sdata->stack;
+            while (se->pattern->type != SCHEMA_CTYPE_NAME) {
+                se = se->down;
+            }
+            serializeElementName (elmObj, se->pattern);
+            Tcl_SetObjResult (interp, elmObj);
+            return TCL_OK;
+            break;
+        }
+        
+    }
+    
+    return TCL_OK;
 }
 
 int
@@ -1979,14 +2128,15 @@ schemaInstanceCmd (
     domNode       *node;
 
     static const char *schemaInstanceMethods[] = {
-        "defelement", "defpattern",  "start", "event", "delete",
-        "nrForwardDefinitions",      "state", "reset", "define",
-        "validate",   "domvalidate", "deftext", NULL
+        "defelement", "defpattern",  "start",   "event", "delete",
+        "nrForwardDefinitions",      "state",   "reset", "define",
+        "validate",   "domvalidate", "deftext", "info",  "reportcmd",
+        NULL
     };
     enum schemaInstanceMethod {
-        m_defelement,  m_defpattern,  m_start, m_event, m_delete,
-        m_nrForwardDefinitions,       m_state, m_reset, m_define,
-        m_validate,    m_domvalidate, m_deftext
+        m_defelement,  m_defpattern,  m_start,   m_event, m_delete,
+        m_nrForwardDefinitions,       m_state,   m_reset, m_define,
+        m_validate,    m_domvalidate, m_deftext, m_info,  m_reportcmd
     };
 
     static const char *eventKeywords[] = {
@@ -2004,11 +2154,11 @@ schemaInstanceCmd (
     }
 
     if (sdata == NULL) {
-        /* Inline defined defelement, defpattern or start */
+        /* Inline defined defelement, defpattern, deftext or start */
         sdata = GETASI;
         CHECK_SI;
-        if (!sdata->defineToplevel) {
-            SetResult ("Command not allowed in nested schema define script");
+        if (!sdata->defineToplevel && sdata->currentEvals > 1) {
+            SetResult ("Method not allowed in nested schema define script");
             return TCL_ERROR;
         }
         i = 1;
@@ -2024,6 +2174,7 @@ schemaInstanceCmd (
     switch ((enum schemaInstanceMethod) methodIndex) {
     case m_defelement:
     case m_defpattern:
+        CHECK_RECURSIVE_CALL
         if (objc != 4-i && objc != 5-i) {
             Tcl_WrongNumArgs (interp, 1-i, objv, "<name>"
                  " ?<namespace>? pattern");
@@ -2082,14 +2233,7 @@ schemaInstanceCmd (
             Tcl_SetHashValue (h, pattern);
         }
 
-        if (!sdata->defineToplevel) {
-            savedsdata = GETASI;
-            if (savedsdata == sdata) {
-                SetResult ("Recursive call of schema command is not allowed");
-                return TCL_ERROR;
-            }
-            SETASI(sdata);
-        }
+        SETASI(sdata);
         savedDefineToplevel = sdata->defineToplevel;
         savedNamespacePtr = sdata->currentNamespace;
         sdata->defineToplevel = 0;
@@ -2100,8 +2244,9 @@ schemaInstanceCmd (
         sdata->currentAttrs = NULL;
         sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
         sdata->evalStub[3] = objv[patternIndex];
-        result = Tcl_EvalObjv (interp, 4, sdata->evalStub,
-                               TCL_EVAL_DIRECT | TCL_EVAL_GLOBAL);
+        sdata->currentEvals++;
+        result = Tcl_EvalObjv (interp, 4, sdata->evalStub, TCL_EVAL_GLOBAL);
+        sdata->currentEvals--;
         sdata->currentNamespace = NULL;
         pattern->attrs = sdata->currentAttrs;
         pattern->numAttr = sdata->numAttr;
@@ -2125,14 +2270,17 @@ schemaInstanceCmd (
         break;
 
     case m_define:
+        CHECK_EVAL
         if (objc != 3) {
             Tcl_WrongNumArgs (interp, 2, objv, "<definition commands>");
             return TCL_ERROR;
         }
-        savedsdata = GETASI;
-        if (savedsdata == sdata) {
-            SetResult ("Recursive call of schema command is not allowed");
-            return TCL_ERROR;
+        if (clientData) {
+            savedsdata = GETASI;
+            if (savedsdata == sdata) {
+                SetResult ("Recursive call of schema command is not allowed");
+                return TCL_ERROR;
+            }
         }
         SETASI(sdata);
         savedNumPatternList = sdata->numPatternList;
@@ -2141,8 +2289,9 @@ schemaInstanceCmd (
         sdata->contentSize = 0;
         sdata->defineToplevel = 1;
         sdata->evalStub[3] = objv[2];
-        result = Tcl_EvalObjv (interp, 4, sdata->evalStub,
-                               TCL_EVAL_DIRECT | TCL_EVAL_GLOBAL);
+        sdata->currentEvals++;
+        result = Tcl_EvalObjv (interp, 4, sdata->evalStub, TCL_EVAL_GLOBAL);
+        sdata->currentEvals--;
         if (result != TCL_OK) {
             cleanupLastPattern (sdata, savedNumPatternList);
         }
@@ -2151,6 +2300,7 @@ schemaInstanceCmd (
         break;
 
     case m_deftext:
+        CHECK_RECURSIVE_CALL
         if (objc !=  4-i) {
             Tcl_WrongNumArgs (interp, 2-i, objv, "<name>"
                               " <constraints script>");
@@ -2182,6 +2332,7 @@ schemaInstanceCmd (
         break;
         
     case m_start:
+        CHECK_RECURSIVE_CALL
         if (objc < 3-i || objc > 4-i) {
             Tcl_WrongNumArgs (interp, 2-i, objv, "<documentElement>"
                               " ?<namespace>?");
@@ -2208,6 +2359,7 @@ schemaInstanceCmd (
         break;
 
     case m_event:
+        CHECK_EVAL
         if (objc < 3) {
             Tcl_WrongNumArgs (interp, 2, objv, "<eventType>"
                               " ?<type specific data>?");
@@ -2263,7 +2415,9 @@ schemaInstanceCmd (
             return TCL_ERROR;
         }
         Tcl_DeleteCommand(interp, Tcl_GetString(objv[0]));
-        break;
+        /* We return immediately here to avoid clashes with postponed
+           sdata cleanup at the end of the function. */
+        return TCL_OK;
 
     case m_nrForwardDefinitions:
         if (objc != 2) {
@@ -2291,10 +2445,12 @@ schemaInstanceCmd (
         break;
 
     case m_reset:
+        CHECK_EVAL
         schemaReset (sdata);
         break;
 
     case m_validate:
+        CHECK_EVAL
         if (objc < 3 || objc > 4) {
             Tcl_WrongNumArgs (interp, 2, objv, "<xml> ?resultVarName?");
             return TCL_ERROR;
@@ -2316,6 +2472,7 @@ schemaInstanceCmd (
         break;
 
     case m_domvalidate:
+        CHECK_EVAL
         if (objc < 3 || objc > 4) {
             Tcl_WrongNumArgs (interp, 2, objv, "<xml> ?resultVarName?");
             return TCL_ERROR;
@@ -2348,11 +2505,32 @@ schemaInstanceCmd (
         schemaReset (sdata);
         break;
 
+    case m_info:
+        objv++;
+        objc--;
+        result = schemaInstanceInfoCmd (sdata, interp, objc, objv);
+        break;
+
+    case m_reportcmd:
+        if (objc != 3) {
+            Tcl_WrongNumArgs (interp, 2, objv, "<tcl-cmd>");
+            return TCL_ERROR;
+        }
+        if (sdata->reportCmd) {
+            Tcl_DecrRefCount (sdata->reportCmd);
+        }
+        sdata->reportCmd = objv[2];
+        Tcl_IncrRefCount (sdata->reportCmd);
+        break;
+
     default:
         Tcl_SetResult (interp, "unknown method", NULL);
         result = TCL_ERROR;
         break;
 
+    }
+    if (sdata->cleanupAfterEval && sdata->currentEvals == 0) {
+        schemaInstanceDelete (sdata);
     }
     return result;
 }
@@ -2413,7 +2591,7 @@ tDOM_SchemaObjCmd (
     Tcl_ResetResult (interp);
     switch ((enum schemaMethod) methodIndex) {
     case m_create:
-        sdata = initSchemaData ();
+        sdata = initSchemaData (objv[ind]);
         Tcl_CreateObjCommand (interp, Tcl_GetString(objv[ind]),
                               schemaInstanceCmd,
                               (ClientData) sdata,
@@ -2572,7 +2750,9 @@ evalDefinition (
     sdata->currentAttrs = NULL;
     sdata->attrSize = 0;
 
+    sdata->currentEvals++;
     result = Tcl_EvalObjEx (interp, definition, TCL_EVAL_DIRECT);
+    sdata->currentEvals--;
 
     pattern->attrs = sdata->currentAttrs;
     pattern->numAttr = sdata->numAttr;
@@ -2680,7 +2860,7 @@ NamedPatternObjCmd (
             Tcl_GetHashKey (hashTable, entryPtr)
             );
         pattern->flags |= LOCAL_DEFINED_ELEMENT;
-        evalDefinition (interp, sdata, objv[3], pattern, quant, n, m);
+        return evalDefinition (interp, sdata, objv[3], pattern, quant, n, m);
     }
     return TCL_OK;
 }
@@ -2737,7 +2917,8 @@ static int maybeAddAttr (
     Tcl_Obj *nameObj,
     Tcl_Obj *namespaceObj,
     Tcl_Obj *scriptObj,
-    int required
+    int required,
+    SchemaCP *type
     )
 {
     Tcl_HashEntry *h;
@@ -2779,6 +2960,8 @@ static int maybeAddAttr (
         result = evalConstraints (interp, sdata, cp, scriptObj);
         sdata->isAttributeConstaint = 0;
         attr->cp = cp;
+    } else if (type) {
+        attr->cp = type;
     } else {
         attr->cp = NULL;
     }
@@ -2809,54 +2992,84 @@ AttributePatternObjCmd (
     )
 {
     SchemaData *sdata = GETASI;
-    char *quantStr;
-    int len, required = 1, scriptIndex, i;
-    Tcl_Obj *nsobj;
+    char *str;
+    int len, required = 1;
+    Tcl_Obj *nsObj, *nameObj;
+    Tcl_HashEntry *h;
+    SchemaCP *type;
 
     CHECK_SI
     CHECK_TOPLEVEL
 
     if (clientData) {
-        checkNrArgs (3,5,"Expected: name namespace"
+        checkNrArgs (3,6,"Expected:"
+                     "  name namespace"
                      " | name namespace attquant"
-                     " | name namespace <constraint script>"
-                     " | name namespace attquant <constraint script>");
-        i = 1;
-        nsobj = objv[2];
+                     " | name namespace ?attquant? <constraint script>"
+                     " | name namespace ?attquant? \"type\" typename");
+        nsObj = objv[2];
     } else {
-        checkNrArgs (2,4,"Expected: name"
+        checkNrArgs (2,5,"Expected:"
+                     "  name"
                      " | name attquant"
-                     " | name <constraint script>"
-                     " | name attquant <constraint script>");
-        i = 0;
-        nsobj = NULL;
+                     " | name ?attquant? <constraint script>"
+                     " | name ?attquant? \"type\" typename");
+        nsObj = NULL;
     }
-
-    if (objc == 2+i) {
-        return maybeAddAttr (interp, sdata, objv[1], nsobj, NULL, 1);
+    nameObj = objv[1];
+    if (clientData) {
+        objv++;
+        objc--;
     }
-    quantStr = Tcl_GetStringFromObj (objv[2+i], &len);
+    if (objc == 2) {
+        return maybeAddAttr (interp, sdata, nameObj, nsObj, NULL, 1, NULL);
+    }
+    str = Tcl_GetStringFromObj (objv[2], &len);
     if (len == 1) {
-        if (quantStr[0] == '?') {
+        if (str[0] == '?') {
             required = 0;
-        } else if (quantStr[0] != '!') {
+        } else if (str[0] != '!') {
             SetResult ("Invalid attribute quant");
             return TCL_ERROR;
         }
-        if (objc == 3+i) {
-            return maybeAddAttr (interp, sdata, objv[1], nsobj, NULL,
-                                 required);
+        if (objc == 3) {
+            return maybeAddAttr (interp, sdata, nameObj, nsObj, NULL,
+                                 required, NULL);
         }
-        scriptIndex = 3+i;
-    } else {
-        if (objc == 4+i) {
-            SetResult ("Invalid attribute quant");
-            return TCL_ERROR;
-        }
-        scriptIndex = 2+i;
+        objv++;
+        objc--;
+        str = Tcl_GetStringFromObj (objv[2], &len);
     }
-    return maybeAddAttr (interp, sdata, objv[1], nsobj,
-                         objv[scriptIndex], required);
+    if (objc == 4) {
+        if (len != 4
+            || strcmp("type", str) != 0) {
+            if (clientData) {
+                SetResult ("Expected:"
+                           "  name namespace"
+                           " | name namespace attquant"
+                           " | name namespace ?attquant? <constraint script>"
+                           " | name namespace ?attquant? \"type\" typename");
+            } else {
+                SetResult ("Expected:"
+                           "  name"
+                           " | name attquant"
+                           " | name ?attquant? <constraint script>"
+                           " | name ?attquant? \"type\" typename");
+            }
+            return TCL_ERROR;
+        }
+        h = Tcl_FindHashEntry (&sdata->textDef, Tcl_GetString (objv[3]));
+        if (!h) {
+            SetResult3 ("Unknown text type \"", Tcl_GetString (objv[3]), "\"");
+            return TCL_ERROR;
+        }
+        type = (SchemaCP *) Tcl_GetHashValue (h);
+        return maybeAddAttr (interp, sdata, nameObj, nsObj, NULL,
+                             required, type);        
+    } else {
+        return maybeAddAttr (interp, sdata, nameObj, nsObj, objv[2],
+                             required, NULL);
+    }
 }
 
 static int
@@ -2885,7 +3098,9 @@ NamespacePatternObjCmd (
         sdata->currentNamespace = (char *)
             Tcl_GetHashKey (&sdata->namespace, entryPtr);
     }
+    sdata->currentEvals++;
     result = Tcl_EvalObjEx (interp, objv[2], TCL_EVAL_DIRECT);
+    sdata->currentEvals--;
     sdata->currentNamespace = currentNamespace;
     return result;
 }
@@ -2915,7 +3130,7 @@ TextPatternObjCmd (
     } else {
         h = Tcl_FindHashEntry (&sdata->textDef, Tcl_GetString (objv[2]));
         if (!h) {
-            SetResult ("Unknown text type");
+            SetResult3 ("Unknown text type \"", Tcl_GetString (objv[2]), "\"");
             return TCL_ERROR;
         }
         pattern = (SchemaCP *) Tcl_GetHashValue (h);
@@ -3011,6 +3226,7 @@ typedef struct
 {
     int nrArg;
     Tcl_Obj **evalStub;
+    SchemaData *sdata;
 } tclTCData;
 
 static void
@@ -3040,8 +3256,10 @@ tclImpl (
 
     tcdata->evalStub[tcdata->nrArg-1] = Tcl_NewStringObj(text, -1);
     Tcl_IncrRefCount (tcdata->evalStub[tcdata->nrArg-1]);
+    tcdata->sdata->currentEvals++;
     result = Tcl_EvalObjv (interp, tcdata->nrArg, tcdata->evalStub,
-                           TCL_EVAL_DIRECT | TCL_EVAL_GLOBAL);
+                           TCL_EVAL_GLOBAL);
+    tcdata->sdata->currentEvals--;
     Tcl_DecrRefCount (tcdata->evalStub[tcdata->nrArg-1]);
     if (result != TCL_OK) {
         return 0;
@@ -3085,6 +3303,7 @@ tclTCObjCmd (
         tcdata->evalStub[i-1] = objv[i];
         Tcl_IncrRefCount (tcdata->evalStub[i-1]);
     }
+    tcdata->sdata = sdata;
     sc->constraintData = tcdata;
     return TCL_OK;
 }
@@ -3204,7 +3423,20 @@ matchImpl (
     char *text
     )
 {
-    if (Tcl_StringMatch (text, Tcl_GetString ((Tcl_Obj *) constraintData)))
+    if (Tcl_StringCaseMatch (text, Tcl_GetString ((Tcl_Obj *) constraintData), 0))
+        return 1;
+    return 0;
+}
+
+static int
+matchNocaseImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    if (Tcl_StringCaseMatch (text, Tcl_GetString ((Tcl_Obj *) constraintData),
+            TCL_MATCH_NOCASE))
         return 1;
     return 0;
 }
@@ -3222,9 +3454,20 @@ matchTCObjCmd (
 
     CHECK_TI
     CHECK_TOPLEVEL
-    checkNrArgs (2,2,"Expected: <match pattern>");
+    checkNrArgs (2,3,"Expected: ?-nocase? <match pattern>");
+    if (objc == 3) {
+        if (strcmp ("-nocase", Tcl_GetString (objv[1])) != 0) {
+            SetResult ("Expected: ?-nocase? <match pattern>");
+            return TCL_ERROR;
+        }
+        objv++;
+    }
     ADD_CONSTRAINT (sdata, sc)
-    sc->constraint = matchImpl;
+    if (objc == 2) {
+        sc->constraint = matchImpl;
+    } else {
+        sc->constraint = matchNocaseImpl;
+    }
     sc->freeData = matchImplFree;
     Tcl_IncrRefCount (objv[1]);
     sc->constraintData = objv[1];
@@ -3492,6 +3735,7 @@ isodateImpl (
         if (*text < '0' || *text > '9') return 0;
         text++;
     }
+    while (*text >= '0' && *text <= '9') text++;
     if (*text != '-') return 0;
     y = atoi(text-4);
     /* There isn't a year 0. it's either 0001 or -0001 */
@@ -3750,6 +3994,8 @@ tDOM_SchemaInit (
     Tcl_CreateObjCommand (interp, "tdom::schema::defelement",
                           schemaInstanceCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::defpattern",
+                          schemaInstanceCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp, "tdom::schema::deftext",
                           schemaInstanceCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::start",
                           schemaInstanceCmd, NULL, NULL);
