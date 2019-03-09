@@ -81,6 +81,7 @@ typedef struct
     Tcl_Interp    *interp;
     XML_Parser     parser;
     Tcl_DString   *cdata;
+    int            onlyWhiteSpace;
     char          *uri;
     int            maxUriLen;
 } ValidateMethodData;
@@ -698,6 +699,34 @@ popStack (
     sdata->stack = se;
 }
 
+static int 
+recover (
+    SchemaData *sdata,
+    const char *errType
+    )
+{
+    Tcl_Obj *cmdPtr;
+    int rc;
+    
+    cmdPtr = Tcl_DuplicateObj (sdata->reportCmd);
+    Tcl_ListObjAppendElement (interp, cmdPtr,
+                              sdata->self);
+    Tcl_ListObjAppendElement (
+        interp, cmdPtr,
+        Tcl_NewStringObj (errType, len)
+        );
+    sdata->currentEvals++;
+    rc = Tcl_EvalObjEx (interp, cmdPtr,
+                        TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT);
+    sdata->currentEvals--;
+    Tcl_DecrRefCount (cmdPtr);
+    if (rc != TCL_OK) {
+        sdata->evalError = 1;
+        return 0;
+    }
+    return 1;
+}
+
 /* The cp argument must be type SCHEMA_CTYPE_TEXT */
 static int
 checkText (
@@ -751,7 +780,6 @@ matchElementStart (
     int hm, ac, i, mayskip, rc;
     int isName = 0;
     SchemaValidationStack *se;
-    Tcl_Obj *cmdPtr;
 
     if (!sdata->stack) return 0;
     se = sdata->stack;
@@ -770,12 +798,15 @@ matchElementStart (
                 if (candidate->nc) {
                     if (!checkText (interp, candidate, "")) {
                         if (sdata->reportCmd) {
+                            Tcl_Obj *cmdPtr;
                             cmdPtr = Tcl_DuplicateObj (sdata->reportCmd);
                             Tcl_ListObjAppendElement (interp, cmdPtr,
                                                       sdata->self);
+                            fprintf (stderr, "HIER: %s\n",
+                                     Tcl_GetString (sdata->self));
                             Tcl_ListObjAppendElement (
                                 interp, cmdPtr,
-                                Tcl_NewStringObj ("MISSING_TEXT", 22)
+                                Tcl_NewStringObj ("MISSING_TEXT", 12)
                                 );
                             sdata->currentEvals++;
                             rc = Tcl_EvalObjEx (interp, cmdPtr,
@@ -787,8 +818,7 @@ matchElementStart (
                                 return 0;
                             }
                             break;
-                        }
-                        
+                        }                        
                         return 0;
                     }
                 }
@@ -882,7 +912,15 @@ matchElementStart (
             ac++;
             hm = 0;
         }
-        if (isName) return 0;
+        if (isName) {
+            if (recover (sdata, "MISSING_ELEMENT")) {
+                /* Skip the just opened element tag and the following
+                 * content of it. */
+                sdata->skipDeep = 2;
+                return 1;
+            }
+            return 0;
+        }
         return -1;
 
     case SCHEMA_CTYPE_VIRTUAL:
@@ -1723,9 +1761,11 @@ startElement(
             vdata->sdata->validationState = VALIDATION_ERROR;
             XML_StopParser (vdata->parser, 0);
             Tcl_DStringSetLength (vdata->cdata, 0);
+            vdata->onlyWhiteSpace = 1;
             return;
         }
         Tcl_DStringSetLength (vdata->cdata, 0);
+        vdata->onlyWhiteSpace = 1;
     }
     s = name;
     while (*s && *s != '\xFF') {
@@ -1781,9 +1821,11 @@ endElement (
             vdata->sdata->validationState = VALIDATION_ERROR;
             XML_StopParser (vdata->parser, 0);
             Tcl_DStringSetLength (vdata->cdata, 0);
+            vdata->onlyWhiteSpace = 1;
             return;
         }
         Tcl_DStringSetLength (vdata->cdata, 0);
+        vdata->onlyWhiteSpace = 1;
     }
     if (probeElementEnd (vdata->interp, vdata->sdata)
         != TCL_OK) {
@@ -1800,7 +1842,24 @@ characterDataHandler (
 )
 {
     ValidateMethodData *vdata = (ValidateMethodData *) userData;
-
+    const char *pc;
+    
+    if (vdata->onlyWhiteSpace) {
+        int i = 0;
+        pc = s;
+        while (i < len) {
+            if ( (*pc == ' ')  ||
+                 (*pc == '\n') ||
+                 (*pc == '\r') ||
+                 (*pc == '\t') ) {
+                pc++;
+                i++;
+                continue;
+            }
+            vdata->onlyWhiteSpace = 0;
+            break;
+        }
+    }
     Tcl_DStringAppend (vdata->cdata, s, len);
 }
 
@@ -1826,6 +1885,7 @@ validateString (
     vdata.parser = parser;
     Tcl_DStringInit (&cdata);
     vdata.cdata = &cdata;
+    vdata.onlyWhiteSpace = 1;
     vdata.uri = (char *) MALLOC (URI_BUFFER_LEN_INIT);
     vdata.maxUriLen = URI_BUFFER_LEN_INIT;
     XML_SetUserData (parser, &vdata);

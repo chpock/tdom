@@ -3767,4 +3767,24 @@ test schema-17.2 {info} {
     set result
 } {a b}
 
+proc schema-18 {args} {
+    lappend ::result {*}$args
+}
+test schema-18.1 {reportcmd} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element e
+            text {minLength 1}
+            element e
+        }
+    }
+    s reportcmd schema-18
+    set rc [s validate {<doc><e/></doc>} errMsg]
+    puts $errMsg
+    lappend result $rc
+    s delete
+    set result
+} {MISSING_TEXT s 1}
+
 }
