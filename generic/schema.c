@@ -701,13 +701,16 @@ popStack (
 
 static int 
 recover (
+    Tcl_Interp *interp,
     SchemaData *sdata,
-    const char *errType
+    const char *errType,
+    int len
     )
 {
     Tcl_Obj *cmdPtr;
     int rc;
-    
+
+    if (!sdata->reportCmd) return 0;
     cmdPtr = Tcl_DuplicateObj (sdata->reportCmd);
     Tcl_ListObjAppendElement (interp, cmdPtr,
                               sdata->self);
@@ -889,7 +892,6 @@ matchElementStart (
 
             case SCHEMA_CTYPE_VIRTUAL:
                 if (evalVirtual (interp, sdata, candidate)) {
-                    mayskip = 1;
                     break;
                 }
                 else return 0;
@@ -913,7 +915,7 @@ matchElementStart (
             hm = 0;
         }
         if (isName) {
-            if (recover (sdata, "MISSING_ELEMENT")) {
+            if (recover (interp, sdata, "MISSING_ELEMENT", 15)) {
                 /* Skip the just opened element tag and the following
                  * content of it. */
                 sdata->skipDeep = 2;
@@ -1339,7 +1341,7 @@ static int checkElementEnd (
     SchemaData *sdata
     )
 {
-    SchemaValidationStack *se, *tse;
+    SchemaValidationStack *se;
     SchemaCP *cp, *ic;
     int hm, ac, i, mayMiss, rc;
     int isName = 0;
@@ -1408,10 +1410,6 @@ static int checkElementEnd (
                         break;
                         
                     case SCHEMA_CTYPE_VIRTUAL:
-                        tse = se;
-                        while (tse->pattern->type != SCHEMA_CTYPE_NAME) {
-                            tse = tse->down;
-                        }
                         if (evalVirtual (interp, sdata, ic)) break;
                         else return 0;
                     }
@@ -1421,10 +1419,6 @@ static int checkElementEnd (
                 return 0;
 
             case SCHEMA_CTYPE_VIRTUAL:
-                tse = se;
-                while (tse->pattern->type != SCHEMA_CTYPE_NAME) {
-                    tse = tse->down;
-                }
                 if (evalVirtual (interp, sdata, cp->content[ac])) break;
                 else return 0;
                 
@@ -1530,7 +1524,7 @@ matchText (
     )
 {
     SchemaCP *cp, *candidate, *ic;
-    SchemaValidationStack *se, *tse;
+    SchemaValidationStack *se;
     int ac, hm, isName = 0, i;
 
     DBG(fprintf (stderr, "matchText called with text '%s'\n", text));
@@ -1584,10 +1578,6 @@ matchText (
                             break;
 
                         case SCHEMA_CTYPE_VIRTUAL:
-                            tse = se;
-                            while (tse->pattern->type != SCHEMA_CTYPE_NAME) {
-                                tse = tse->down;
-                            }
                             if (!evalVirtual (interp, sdata, ic)) return 0;
                             break;
                             
@@ -1617,10 +1607,6 @@ matchText (
                     break;
 
                 case SCHEMA_CTYPE_VIRTUAL:
-                    tse = se;
-                    while (tse->pattern->type != SCHEMA_CTYPE_NAME) {
-                        tse = tse->down;
-                    }
                     if (!evalVirtual (interp, sdata, ic)) return 0;
                     break;
                     
