@@ -892,6 +892,12 @@ matchElementStart (
 
             case SCHEMA_CTYPE_VIRTUAL:
                 if (evalVirtual (interp, sdata, candidate)) {
+                    /* Virtual contraints are always quant ONE, so
+                     * that the virtual constraints are called while
+                     * looking if an element can end. Therefor we use
+                     * here the already present mayskip mechanism to
+                     * try further, after calling the tcl script. */
+                    mayskip = 1;
                     break;
                 }
                 else return 0;
