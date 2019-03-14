@@ -166,20 +166,50 @@ test dom-1.22 {Explicit delete of scoped doc in proc call from scope} {} {
     unset doc
 } {}    
 
-test dom-1.23 {Explicit delete of scoped doc} {
+test dom-1.23a {Explicit delete of scoped doc} {
     dom createDocument test doc
     $doc delete
     unset doc
 } {}    
 
-test dom-1.24 {Explicit delete of scoped doc} {
+test dom-1.23b {Explicit delete of scoped doc} {
+    proc _test {} {
+        dom createDocument test doc
+        info command $doc
+    }
+    set result [_test]
+    expr { $result ne "" && [info command $result] eq "" }
+} 1    
+
+test dom-1.24a {Indirect delete of scoped doc} {
     dom createDocument test doc
-    set result [catch {set doc foo} errMsg]
-    lappend result $errMsg
-    $doc delete
+    set result [info command $doc]
     unset doc
-    set result
-} {1 {can't set "doc": var is read-only}}
+    expr { $result ne "" && [info command $result] eq "" }
+} 1
+
+test dom-1.24b {Indirect delete of scoped doc} {
+    set result {}
+    proc _test {} {
+        upvar result result
+        dom createDocument test doc
+        set result [info command $doc]
+        set doc foo
+        expr { $result ne "" && [info command $result] ne "" }
+    }
+    list [_test] [expr { $result ne "" && [info command $result] eq "" }]
+} {1 1}
+
+test dom-1.24c {Regression of GC using two different objects} -setup {
+    unset -nocomplain doc root
+} -body {
+    dom parse {<prev-doc/>} doc
+    dom parse {<doc><test/></doc>} root
+    $root documentElement doc
+    set result [$doc hasChildNodes]
+} -cleanup {
+    unset -nocomplain doc root
+} -result 1
 
 test dom-1.25 {Doc var} {
     dom parse <test/> doc
@@ -187,12 +217,17 @@ test dom-1.25 {Doc var} {
     unset doc
 } {}
 
-test dom-1.26 {Doc var} {
+test dom-1.26a {Doc var} {
     dom parse <test/> doc
     set result [catch {$doc documentElement doc}]
     unset doc
     set result
-} {1}
+} 0
+test dom-1.26b {Doc var (check is still useable)} {
+    dom parse <test/> doc
+    $doc documentElement doc
+    $doc hasChildNodes
+} 0
 
 test dom-2.1 {Don't quash white space at start or end of non white space content} {
     set doc [dom parse {<root>

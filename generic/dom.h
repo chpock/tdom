@@ -609,7 +609,6 @@ typedef struct domDeleteInfo {
     domDocument * document;
     domNode     * node;
     Tcl_Interp  * interp;
-    char        * traceVarName;
 } domDeleteInfo;
 
 

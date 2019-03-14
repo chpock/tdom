@@ -554,27 +554,26 @@ char * tcldom_docTrace (
     DBG(fprintf(stderr, "--> tcldom_docTrace %x %p\n", flags, doc));
 
     if (doc == NULL) {
-        if (!(flags & TCL_INTERP_DESTROYED)) {
-            Tcl_UntraceVar(dinfo->interp, dinfo->traceVarName,
+        if (!(flags & (TCL_TRACE_UNSETS|TCL_INTERP_DESTROYED))) {
+            Tcl_UntraceVar2(dinfo->interp, name1, name2,
                            TCL_TRACE_WRITES|TCL_TRACE_UNSETS,
                            tcldom_docTrace, clientData);
         }
-        FREE (dinfo->traceVarName);
         FREE (dinfo);
         return NULL;
     }
+
+    DOC_CMD(objCmdName, doc);
     if (flags & TCL_TRACE_WRITES) {
-        DOC_CMD(objCmdName, doc);
-        Tcl_SetVar2 (interp, name1, name2, objCmdName, TCL_LEAVE_ERR_MSG);
-        return "var is read-only";
+        Tcl_TraceVar2(interp,"__tdomGC", objCmdName, TCL_TRACE_UNSETS,
+                     (Tcl_VarTraceProc*)tcldom_docTrace,
+                     clientData);
+        return NULL;
     }
-    if (flags & TCL_TRACE_UNSETS) {
-        DOC_CMD(objCmdName, doc);
-        DBG(fprintf(stderr, "--> tcldom_docTrace delete doc %p\n", doc));
-        Tcl_DeleteCommand(interp, objCmdName);
-        FREE (dinfo->traceVarName);
-        FREE (dinfo);
-    }
+
+    DBG(fprintf(stderr, "--> tcldom_docTrace delete doc %p\n", doc));
+    Tcl_DeleteCommand(interp, objCmdName);
+    FREE (dinfo);
 
     return NULL;
 }
@@ -789,7 +788,6 @@ int tcldom_returnDocumentObj (
             dinfo->interp       = interp;
             dinfo->document     = document;
             document->nodeFlags |= DOCUMENT_CMD;
-            dinfo->traceVarName = NULL;
             Tcl_CreateObjCommand(interp, objCmdName,
                                  (Tcl_ObjCmdProc *)  tcldom_DocObjCmd,
                                  (ClientData)        dinfo,
@@ -803,7 +801,6 @@ int tcldom_returnDocumentObj (
             Tcl_SetVar  (interp, objVar, objCmdName, 0);
             if (trace) {
                 document->nodeFlags |= VAR_TRACE;
-                dinfo->traceVarName = tdomstrdup(objVar);
                 Tcl_TraceVar(interp,objVar,TCL_TRACE_WRITES|TCL_TRACE_UNSETS,
                              (Tcl_VarTraceProc*)tcldom_docTrace,
                              (ClientData)dinfo);
