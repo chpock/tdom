@@ -1,5 +1,5 @@
-C small\samend,\sremoving\sthe\sprevious\strace\sin\scase\sto\swrap\sto\s__tdomGC
-D 2019-03-14T15:38:15.889
+C accept\stcl-test\soptions\slike\s-load\s"load\slibtdom...;\ssource\s../lib/tdom.tcl"\s(allow\sto\srun\stest-suite\sfrom\sdevelopment\senvironment,\sother\stdom-version\sor\suninstalled)
+D 2019-03-14T16:16:05.970
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -190,7 +190,7 @@ F tests/entity.test 36170db2ac7d72660640b2a33966803233a4a9f19e2c5611c38692e3b6c8
 F tests/html5reader.test 9e17b12e5bc027d40b65cbab3937643d22dcbbd93620f416473d71934376b981
 F tests/htmlreader.test 6e08308d4aa9aafa8661aa0b9f4d17de4c1a40b0abc4db4379f744c428162859
 F tests/i18n.test 3e754eb159b720ea82e137046a7722c720d6918ccfe7479fc9aea32bc3075a12
-F tests/loadtdom.tcl 1ef622911c2e0bc646a711f3ea5952ff32100b2fac58a752e2b6a8284884da3a
+F tests/loadtdom.tcl 3b38fc099fad11ee2db6629dca2f85045c0fa5fc6929700c99b512afe134eba5
 F tests/namespace.test 35c6d0caef912114f40d35e8ed15ae2a646dfd68
 F tests/parser.test 7957ceae1fb271cddf7dd8dcc6ed2f903bfdf0adf3662f686a6953919a5a2715
 F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
@@ -222,8 +222,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c466f479887b217f56e3ff176a5de222f6b30e5951ca4b286b7691c5e21285ed
-R ae602498b521f973d633f29f49ea299b
+P ff7642f303084f9b05e686c3fe13dd85b71d9a34e0e94d5b49444f316e84572d
+R 1597cadf70aadb8e59623753dcc154a4
 U sebres
-Z c8b9a5e0cc0fa3c0ab3726de2bc1156a
+Z 5c7a45d597f6e4628920fd2652288f4c
 # Remove this line to create a well-formed Fossil manifest.
