@@ -1,5 +1,5 @@
-C Made\snovem\scompatible.
-D 2019-03-07T22:45:23.213
+C More\stests\sto\scheck/document\sbehaviour\sin\scase\sof\susing\straced\sdoc\svars\s(pattern\s[dom\sparse\s$xml\sdocvar]).
+D 2019-03-14T11:38:03.641
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -179,7 +179,7 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.bench 5446ce379127b8d5700f18a5a0848e580313d0d7
-F tests/dom.test 53af95098f2029312bf8441a0048bf5b841c374b396f69ddfbd6ceae8f4a4b22
+F tests/dom.test 4cbc01ba1185bf2afc632e1d49e18b75b03d16d912dfdd8d54ac9e2c00b99594
 F tests/domDoc.test b8aee0923b9a4bb4da28fc626791d28713a89b2fb6e562d16c89b7f989693934
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test 45a91d71a2747f4155e4546159b768359531ce81229c5dc9c1fb818f9ab2be13
@@ -222,8 +222,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P d4bb0eb147b1671ac73c8268f7d0595821f6d3b0e1594b299ff6d97a82b4495b
-R 9e2d8da79ad73eb4c71e113ae2d0cb51
+P d41caf001d9d4d2a6fbbe4da3736f666e5f6cd86abc66a69d68fa334dc0c3641
+R 4ab8fce5b38f80bf9b665af8f5dcac7b
 U rolf
-Z 47f9b80e9c0fe666c13545413bcc3a66
+Z 9b006b3cc008bc6ca0645491027c1c5c
 # Remove this line to create a well-formed Fossil manifest.
