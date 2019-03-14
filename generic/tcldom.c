@@ -553,14 +553,16 @@ char * tcldom_docTrace (
 
     DBG(fprintf(stderr, "--> tcldom_docTrace %x %p\n", flags, doc));
 
-    if (doc == NULL) {
+    if (doc == NULL || (flags & TCL_TRACE_WRITES)) {
         if (!(flags & (TCL_TRACE_UNSETS|TCL_INTERP_DESTROYED))) {
             Tcl_UntraceVar2(dinfo->interp, name1, name2,
                            TCL_TRACE_WRITES|TCL_TRACE_UNSETS,
                            tcldom_docTrace, clientData);
         }
-        FREE (dinfo);
-        return NULL;
+        if (!(flags & TCL_TRACE_WRITES)) {
+            FREE (dinfo);
+            return NULL;
+        }
     }
 
     DOC_CMD(objCmdName, doc);
