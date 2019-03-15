@@ -534,6 +534,28 @@ void tcldom_docCmdDeleteProc(
     }
 }
 
+/*----------------------------------------------------------------------------*/
+
+static
+int isProcCallFrame(
+    Tcl_Interp *interp
+) {
+    int isproc = 1;
+    /* retrieve frame info and check we're at proc-level */
+    if (Tcl_Eval(interp, "info frame 0") == TCL_OK) {
+        /* check proc is in info-dictionary */
+        Tcl_Obj *value, *key = Tcl_NewStringObj("proc", 4);
+        if ( Tcl_DictObjGet(NULL, Tcl_GetObjResult(interp), key, &value) != TCL_OK
+          || (value == NULL)
+        ) {
+            /* global or namespace level: */
+            isproc = 0;
+        };
+        Tcl_DecrRefCount(key);
+    }
+    return isproc;
+}
+
 /*----------------------------------------------------------------------------
 |   tcldom_docTrace
 |
@@ -559,7 +581,7 @@ char * tcldom_docTrace (
                            TCL_TRACE_WRITES|TCL_TRACE_UNSETS,
                            tcldom_docTrace, clientData);
         }
-        if (!(flags & TCL_TRACE_WRITES)) {
+        if (doc == NULL) {
             FREE (dinfo);
             return NULL;
         }
@@ -567,6 +589,13 @@ char * tcldom_docTrace (
 
     DOC_CMD(objCmdName, doc);
     if (flags & TCL_TRACE_WRITES) {
+        /* avoid usage of fallback to __tdomGC at global/NS level */
+        if (!isProcCallFrame(interp)) {
+            /* prohibit change (and restore variable) */
+            Tcl_SetVar2 (interp, name1, name2, objCmdName, TCL_LEAVE_ERR_MSG);
+            return "var is read-only";
+        }
+        /* save reference in temp GC-array (deleted at end of frame-scope) */
         Tcl_TraceVar2(interp,"__tdomGC", objCmdName, TCL_TRACE_UNSETS,
                      (Tcl_VarTraceProc*)tcldom_docTrace,
                      clientData);
