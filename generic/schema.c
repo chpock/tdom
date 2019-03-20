@@ -255,6 +255,8 @@ static void SetActiveSchemaData (SchemaData *v)
     }                                                   \
     Tcl_AppendToObj (rObj, cp->name, -1);
 
+#define S(str)  str, sizeof (str) -1
+
 static SchemaCP*
 initSchemaCP (
     Schema_CP_Type type,
@@ -508,6 +510,9 @@ static void schemaInstanceDelete (
     FREE (sdata->textStub);
     Tcl_DStringFree (sdata->cdata);
     FREE (sdata->cdata);
+    if (sdata->reportCmd) {
+        Tcl_DecrRefCount (sdata->reportCmd);
+    }
     FREE (sdata);
 }
 
@@ -712,6 +717,7 @@ recover (
 
     if (!sdata->reportCmd) return 0;
     cmdPtr = Tcl_DuplicateObj (sdata->reportCmd);
+    Tcl_IncrRefCount(cmdPtr);
     Tcl_ListObjAppendElement (interp, cmdPtr,
                               sdata->self);
     Tcl_ListObjAppendElement (
@@ -800,26 +806,7 @@ matchElementStart (
             case SCHEMA_CTYPE_TEXT:
                 if (candidate->nc) {
                     if (!checkText (interp, candidate, "")) {
-                        if (sdata->reportCmd) {
-                            Tcl_Obj *cmdPtr;
-                            cmdPtr = Tcl_DuplicateObj (sdata->reportCmd);
-                            Tcl_ListObjAppendElement (interp, cmdPtr,
-                                                      sdata->self);
-                            fprintf (stderr, "HIER: %s\n",
-                                     Tcl_GetString (sdata->self));
-                            Tcl_ListObjAppendElement (
-                                interp, cmdPtr,
-                                Tcl_NewStringObj ("MISSING_TEXT", 12)
-                                );
-                            sdata->currentEvals++;
-                            rc = Tcl_EvalObjEx (interp, cmdPtr,
-                                                TCL_EVAL_GLOBAL
-                                                | TCL_EVAL_DIRECT);
-                            sdata->currentEvals--;
-                            Tcl_DecrRefCount (cmdPtr);
-                            if (rc != TCL_OK) {
-                                return 0;
-                            }
+                        if (recover (interp, sdata, S("MISSING_TEXT"))) {
                             break;
                         }                        
                         return 0;
@@ -915,16 +902,22 @@ matchElementStart (
                 break;
             }
             if (!mayskip && mustMatch (cp->quants[ac], hm)) {
+                if (recover (interp, sdata, S("MISSING_CP"))) {
+                    /* Skip the just opened element tag and the following
+                     * content of the current. */
+                    sdata->skipDeep = 2;
+                    return 1;
+                }
                 return 0;
             }
             ac++;
             hm = 0;
         }
         if (isName) {
-            if (recover (interp, sdata, "MISSING_ELEMENT", 15)) {
+            if (recover (interp, sdata, "UNEXPECTED_ELEMENT", 15)) {
                 /* Skip the just opened element tag and the following
                  * content of it. */
-                sdata->skipDeep = 2;
+                sdata->skipDeep = 1;
                 return 1;
             }
             return 0;

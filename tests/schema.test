@@ -3780,11 +3780,30 @@ test schema-18.1 {reportcmd} {
         }
     }
     s reportcmd schema-18
+    set result ""
     set rc [s validate {<doc><e/></doc>} errMsg]
     puts $errMsg
     lappend result $rc
     s delete
     set result
 } {MISSING_TEXT s 1}
+
+test schema-18.2 {reportcmd} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element a
+            element b
+            element c
+        }
+    }
+    s reportcmd schema-18
+    set result ""
+    set rc [s validate {<doc><a/><c/></doc>} errMsg]
+    puts $errMsg
+    lappend result $rc
+    s delete
+    set result
+} {s MISSING_CP 1}
 
 }

@@ -1,5 +1,5 @@
-C Fix\sovereager\scleanup\sof\svirtual\sconstraints.
-D 2019-03-13T01:47:48.478
+C Still\swip.
+D 2019-03-20T16:00:12.627
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -134,7 +134,7 @@ F generic/domxslt.h 140fa73765d699bfced9554c2c6439c0d2e6695eec3a8e69e1d25c0bbdf2
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c abf69665ad49ed053885f7e7459d47be5abb057ba4ed919e96e83d636b016a30
 F generic/nodecmd.h e4a6d836834554a2a590cbd916cdee937945965ee55709e48b62976a66861ef8
-F generic/schema.c a9553b4cc64b8c3e6a8f3e20484d700fa03e7723e9cbe8a92a1a0c361a13e16c
+F generic/schema.c 308216a680e8f91509eb8f002a9bbf910058036e86cbb1e8422a1f67b9022815
 F generic/schema.h c41461cf0d4ee4d105c2da075a46504ca8757b13f997c24d2d15003aeb3fa563
 F generic/tcldom.c 7418bcb785c735baec156ba9de2ec64d4aff4619cf3b58cb089339688c1f7e5d
 F generic/tcldom.h d47791eb86380778d483d277e7dc3590179f2ad280d2297f416c40b654f3a92d
@@ -204,7 +204,7 @@ F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
 F tests/pullparser.test e4b14ea0bdc9f9fd931f3bc559e78c309582a67a238170d58e0f20331f99890c
 F tests/pushpull.bench 664e8f512917537d96c4b71933d4d9a6da65fc6fe85bd7c459483830dc7d2faf
-F tests/schema.test e1bab88320b906ed6a48be2fc5bbd9480254db1be0a5fcdb6b7024ffee6fc8fb
+F tests/schema.test db3ed88fb7d0e1b8d14df0e15de7b6f99522d1440f39b31e92dae2e83a34b979
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
 F tests/tdomcmd.bench b07448ed4de08ccaa9734cf3fe15c695fd7066c993da58ff48d465747940e417
 F tests/tdomcmd.test 092401adf0609906d710f3ef8997cb4ca29bc208
@@ -230,8 +230,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P e2187f03633cd956e26afb78a4e1765fc80569ba7cca9b5ea72a693f686ea7be
-R 9fb405aa3c46e0bc3a6378fd06cd8d25
+P abd9fe81b1dc4a3d778e700174e0994ff6905caa73812226f9150f8d57872789
+R a03d54b1ef93eeab8352f77512632d74
 U rolf
-Z 93aeed0e8311fbb1e7d28f73c9929e12
+Z 9cecf83fa30c992c3b961c43daf1efeb
 # Remove this line to create a well-formed Fossil manifest.
