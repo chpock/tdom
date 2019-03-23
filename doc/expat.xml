@@ -32,10 +32,12 @@ the associated structures in the document being parsed.  A start tag is an
 example of the kind of structures for which you may register a handler
 script.</p>
 
-<p>The parsers do not validate the XML document. They do parse the internal DTD
-and, at request, external DTD and external entities, if you resolve the
-identifier of the external entities with the -externalentitycommand script (see
-there).</p>
+<p>The parsers always check for XML well-formedness of the input (and
+report error, if the input isn't well-formed). They parse the internal
+DTD and, at request, external DTD and external entities, if you
+resolve the identifier of the external entities with the
+-externalentitycommand script (see there). If you use the -validateCmd
+option (see there), the input is additionally validated.</p>
 
 <p>Additionly, the Tcl extension code that implements this command provides an
 API for adding C level coded handlers. Up to now, there exists the parser
@@ -79,6 +81,17 @@ the data.</p>
 
 <p>If this option is set to "1" then documents which are not well-formed upon
 end of input will generate an error.</p></desc>
+        </optdef>
+
+        <optdef>
+          <optname>-validateCmd</optname>
+          <optarg>&lt;tdom schema cmd&gt;</optarg>
+
+          <desc><p>This option expects the name of a tDOM schema
+          command. If this option is given, then the input is also
+          validated. If the schema command hasn't set a reportcmd then
+          the first validation error will stop further parsing (as a
+          well-formedness error).</p></desc>
         </optdef>
 
         <optdef>

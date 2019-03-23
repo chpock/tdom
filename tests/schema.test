@@ -3799,9 +3799,83 @@ test schema-18.2 {reportcmd} {
     }
     s reportcmd schema-18
     set result ""
-    set rc [s validate {<doc><a/><c/></doc>} errMsg]
-    puts $errMsg
+    set rc [s validate {<doc><a/><c/></doc>}]
     lappend result $rc
+    s delete
+    set result
+} {s MISSING_CP 1}
+
+test schema-18.3 {reportcmd} {knownBug} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element a
+        }
+    }
+    s reportcmd schema-18
+    set result ""
+    foreach xml {
+        <foo/>
+        <bar>baz</bar>
+        <bar><a><b/></a></bar>
+    } {
+        set rc [s validate $xml]
+        lappend result $rc
+    }
+    s delete
+    set result
+} {s MISSING_CP 1}
+
+proc validatedSAX {g xml {keepEmpties 1}} {
+    set args [list -validateCmd $g]
+    if {!$keepEmpties} {
+        lappend args -ignorewhitespace 1
+    }
+    xml::parser p {*}$args
+    set rc [catch {p parse $xml} errMsg]
+    p delete
+    return $rc
+}
+
+proc validatedDOM {g xml {keepEmpties 0}} {
+    set args [list -validateCmd $g]
+    if {$keepEmpties} {
+        lappend args -keepEmpties
+    }
+    set rc [catch {
+        set doc [dom parse {*}$args $xml]
+    } errMsg]
+    if {$doc ne ""} {
+        $doc delete
+    }
+    return $rc
+}
+
+proc postValidation {g xml} {
+    set doc [dom parse $xml]
+    set rc [$g domvalidate $doc errMsg]
+    $doc delete
+    return $rc
+}
+
+
+test schema-18.4 {reportcmd} {knownBug} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element a
+        }
+    }
+    s reportcmd schema-18
+    set result ""
+    foreach xml {
+        <foo/>
+        <bar>baz</bar>
+        <bar><a><b/></a></bar>
+    } {
+        set rc [s validate $xml]
+        lappend result $rc
+    }
     s delete
     set result
 } {s MISSING_CP 1}
