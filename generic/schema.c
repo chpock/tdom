@@ -1759,8 +1759,9 @@ startElement(
 
     DBG(fprintf (stderr, "startElement: '%s'\n", name);)
     sdata = vdata->sdata;
-    if (Tcl_DStringLength (vdata->cdata)
-        || (sdata->stack->pattern->flags & CONSTRAINT_TEXT_CHILD)) {
+    if (!sdata->skipDeep && sdata->stack &&
+        (Tcl_DStringLength (vdata->cdata)
+         || sdata->stack->pattern->flags & CONSTRAINT_TEXT_CHILD)) {
         if (probeText (vdata->interp, sdata,
                        Tcl_DStringValue (vdata->cdata)) != TCL_OK) {
             sdata->validationState = VALIDATION_ERROR;
@@ -1822,7 +1823,7 @@ endElement (
     if (sdata->validationState == VALIDATION_ERROR) {
         return;
     }
-    if (!sdata->skipDeep &&
+    if (!sdata->skipDeep && sdata->stack &&
         (Tcl_DStringLength (vdata->cdata)
          || sdata->stack->pattern->flags & CONSTRAINT_TEXT_CHILD)) {
         if (probeText (vdata->interp, sdata,
