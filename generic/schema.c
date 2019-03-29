@@ -1834,6 +1834,8 @@ endElement (
             vdata->onlyWhiteSpace = 1;
             return;
         }
+    }
+    if (Tcl_DStringLength (vdata->cdata)) {
         Tcl_DStringSetLength (vdata->cdata, 0);
         vdata->onlyWhiteSpace = 1;
     }

@@ -1924,8 +1924,13 @@ test schema-10.1 {any} {
         defelement a {}
         defelement b {}
     }
-    set result [s validate {<doc><a/><something/><b/></doc>}]
-    lappend result [s validate {<doc><a/><a><b>text</b><c><c><c/></c></c></a><b/></doc>}]
+    set result [list]
+    foreach xml {
+        <doc><a/><something/><b/></doc>
+        <doc><a/><a><b>text</b><c><c><c/></c></c></a><b/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
     s delete
     set result
 } {1 1}            
