@@ -3775,7 +3775,7 @@ test schema-17.2 {info} {
 proc schema-18 {args} {
     lappend ::result {*}$args
 }
-test schema-18.1 {reportcmd} {
+test schema-18.1 {reportcmd} {knownBug} {
     tdom::schema s
     s define {
         defelement doc {
@@ -3810,7 +3810,7 @@ test schema-18.2 {reportcmd} {
     set result
 } {s MISSING_CP 1}
 
-test schema-18.3 {reportcmd} {knownBug} {
+test schema-18.3 {reportcmd} {
     tdom::schema s
     s define {
         defelement doc {
@@ -3822,6 +3822,7 @@ test schema-18.3 {reportcmd} {knownBug} {
     foreach xml {
         <foo/>
         <bar>baz</bar>
+        <bar>baz<a/>grill</bar>
         <bar><a><b/></a></bar>
     } {
         set rc [s validate $xml]
@@ -3829,7 +3830,7 @@ test schema-18.3 {reportcmd} {knownBug} {
     }
     s delete
     set result
-} {s MISSING_CP 1}
+} {s UNKNOWN_DOKUMENT_ELEMENT 1 s UNKNOWN_DOKUMENT_ELEMENT 1 s UNKNOWN_DOKUMENT_ELEMENT 1 s UNKNOWN_DOKUMENT_ELEMENT 1}
 
 proc validatedSAX {g xml {keepEmpties 1}} {
     set args [list -validateCmd $g]
@@ -3863,26 +3864,5 @@ proc postValidation {g xml} {
     return $rc
 }
 
-
-test schema-18.4 {reportcmd} {knownBug} {
-    tdom::schema s
-    s define {
-        defelement doc {
-            element a
-        }
-    }
-    s reportcmd schema-18
-    set result ""
-    foreach xml {
-        <foo/>
-        <bar>baz</bar>
-        <bar><a><b/></a></bar>
-    } {
-        set rc [s validate $xml]
-        lappend result $rc
-    }
-    s delete
-    set result
-} {s MISSING_CP 1}
 
 }

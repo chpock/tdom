@@ -1099,12 +1099,11 @@ probeElement (
         }
     } else {
         if (!pattern) {
-            SetResult ("Unknown element");
             if (recover (interp, sdata, S("UNKNOWN_DOKUMENT_ELEMENT"))) {
                 sdata->skipDeep = 1;
                 return TCL_OK;
             }
-            
+            SetResult ("Unknown element");
             return TCL_ERROR;
         }
         pushToStack (sdata, pattern);
@@ -1759,9 +1758,7 @@ startElement(
 
     DBG(fprintf (stderr, "startElement: '%s'\n", name);)
     sdata = vdata->sdata;
-    if (!sdata->skipDeep && sdata->stack &&
-        (Tcl_DStringLength (vdata->cdata)
-         || sdata->stack->pattern->flags & CONSTRAINT_TEXT_CHILD)) {
+    if (!sdata->skipDeep && sdata->stack && Tcl_DStringLength (vdata->cdata)) {
         if (probeText (vdata->interp, sdata,
                        Tcl_DStringValue (vdata->cdata)) != TCL_OK) {
             sdata->validationState = VALIDATION_ERROR;
@@ -1823,9 +1820,7 @@ endElement (
     if (sdata->validationState == VALIDATION_ERROR) {
         return;
     }
-    if (!sdata->skipDeep && sdata->stack &&
-        (Tcl_DStringLength (vdata->cdata)
-         || sdata->stack->pattern->flags & CONSTRAINT_TEXT_CHILD)) {
+    if (!sdata->skipDeep && sdata->stack && Tcl_DStringLength (vdata->cdata)) {
         if (probeText (vdata->interp, sdata,
                        Tcl_DStringValue (vdata->cdata)) != TCL_OK) {
             sdata->validationState = VALIDATION_ERROR;
@@ -3194,6 +3189,7 @@ TextPatternObjCmd (
             SetResult3 ("Unknown text type \"", Tcl_GetString (objv[2]), "\"");
             return TCL_ERROR;
         }
+        quant = SCHEMA_CQUANT_ONE;
         pattern = (SchemaCP *) Tcl_GetHashValue (h);
         sdata->cp->flags |= CONSTRAINT_TEXT_CHILD;
     }
