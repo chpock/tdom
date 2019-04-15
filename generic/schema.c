@@ -1099,7 +1099,7 @@ probeElement (
         }
     } else {
         if (!pattern) {
-            if (recover (interp, sdata, S("UNKNOWN_DOKUMENT_ELEMENT"))) {
+            if (recover (interp, sdata, S("UNKNOWN_ROOT_ELEMENT"))) {
                 sdata->skipDeep = 1;
                 return TCL_OK;
             }
@@ -1177,12 +1177,15 @@ int probeAttributes (
             if (strcmp (ln, cp->attrs[i]->name) == 0) {
                 found = 1;
                 if (cp->attrs[i]->cp) {
-                    if (checkText (interp, cp->attrs[i]->cp, (char *) atPtr[1])
-                        == 0) {
-                        if (nsatt) namespace[j] = '\xFF';
-                        SetResult3 ("Attribute value doesn't match for "
-                                    "attribute '", atPtr[0], "'");
-                        return TCL_ERROR;
+                    if (!checkText (interp, cp->attrs[i]->cp,
+                                    (char *) atPtr[1])) {
+                        if (!recover (interp, sdata,
+                                      S("WRONG_ATTRIBUTE_VALUE"))) {
+                            if (nsatt) namespace[j] = '\xFF';
+                            SetResult3 ("Attribute value doesn't match for "
+                                        "attribute '", atPtr[0], "'");
+                            return TCL_ERROR;
+                        }
                     }
                 }
                 if (cp->attrs[i]->required) reqAttr++;
@@ -1191,8 +1194,10 @@ int probeAttributes (
         }
         if (nsatt) namespace[j] = '\xFF';
         if (!found) {
-            SetResult3 ("Unknown attribute \"", atPtr[0], "\"");
-            return TCL_ERROR;
+            if (!recover (interp, sdata, S("UNKNOWN_ATTRIBUTE"))) {
+                SetResult3 ("Unknown attribute \"", atPtr[0], "\"");
+                return TCL_ERROR;
+            }
         }
     }
     if (reqAttr != cp->numReqAttr) {
@@ -1226,15 +1231,19 @@ int probeAttributes (
                 }
             }
             if (!found) {
-                if (cp->attrs[i]->namespace) {
-                    Tcl_AppendResult (interp, " ", cp->attrs[i]->namespace,
-                                      ":", cp->attrs[i]->name, NULL);
-                } else {
-                    Tcl_AppendResult (interp, " ", cp->attrs[i]->name, NULL);
+                if (!recover (interp, sdata, S("MISSING_ATTRIBUTE"))) {
+                    if (cp->attrs[i]->namespace) {
+                        Tcl_AppendResult (interp, " ", cp->attrs[i]->namespace,
+                                          ":", cp->attrs[i]->name, NULL);
+                    } else {
+                        Tcl_AppendResult (interp, " ", cp->attrs[i]->name, NULL);
+                    }
                 }
             }
         }
-        return TCL_ERROR;
+        if (!sdata->reportCmd) {
+            return TCL_ERROR;
+        }
     }
     return TCL_OK;
 }
@@ -1279,11 +1288,14 @@ int probeDomAttributes (
             }
             if (strcmp (ln, cp->attrs[i]->name) == 0) {
                 if (cp->attrs[i]->cp) {
-                    if (checkText (interp, cp->attrs[i]->cp, (char *) atPtr->nodeValue)
-                        == 0) {
-                        SetResult3 ("Attribute value doesn't match for "
-                                    "attribute '", ln, "'");
-                        return TCL_ERROR;
+                    if (!checkText (interp, cp->attrs[i]->cp,
+                                    (char *) atPtr->nodeValue)) {
+                        if (!recover (interp, sdata,
+                                      S("WRONG_ATTRIBUTE_VALUE"))) {
+                            SetResult3 ("Attribute value doesn't match for "
+                                        "attribute '", ln, "'");
+                            return TCL_ERROR;
+                        }
                     }
                 }
                 found = 1;
@@ -1292,15 +1304,17 @@ int probeDomAttributes (
             }
         }
         if (!found) {
-            if (ns) {
-                SetResult ("Unknown attribute \"");
-                Tcl_AppendResult (interp, ns, ":", atPtr->nodeName,
-                                  "\"");
-            } else {
-                SetResult3 ("Unknown attribute \"", atPtr->nodeName, "\"");
+            if (!recover (interp, sdata, S("UNKNOWN_ATTRIBUTE"))) {
+                if (ns) {
+                    SetResult ("Unknown attribute \"");
+                    Tcl_AppendResult (interp, ns, ":", atPtr->nodeName,
+                                      "\"");
+                } else {
+                    SetResult3 ("Unknown attribute \"", atPtr->nodeName, "\"");
+                }
+                sdata->validationState = VALIDATION_ERROR;
+                return TCL_ERROR;
             }
-            sdata->validationState = VALIDATION_ERROR;
-            return TCL_ERROR;
         }
     nextAttr:
         atPtr = atPtr->nextSibling;
@@ -1339,16 +1353,21 @@ int probeDomAttributes (
                 atPtr = atPtr->nextSibling;
             }
             if (!found) {
-                if (cp->attrs[i]->namespace) {
-                    Tcl_AppendResult (interp, " ", cp->attrs[i]->namespace,
-                                      ":", cp->attrs[i]->name, NULL);
-                } else {
-                    Tcl_AppendResult (interp, " ", cp->attrs[i]->name, NULL);
+                if (!recover (interp, sdata, S("MISSING_ATTRIBUTE"))) {
+                    if (cp->attrs[i]->namespace) {
+                        Tcl_AppendResult (interp, " ", cp->attrs[i]->namespace,
+                                          ":", cp->attrs[i]->name, NULL);
+                    } else {
+                        Tcl_AppendResult (interp, " ", cp->attrs[i]->name,
+                                          NULL);
+                    }
                 }
             }
         }
-        sdata->validationState = VALIDATION_ERROR;
-        return TCL_ERROR;
+        if (!sdata->reportCmd) {
+            sdata->validationState = VALIDATION_ERROR;
+            return TCL_ERROR;
+        }
     }
     return TCL_OK;
 }
@@ -1388,6 +1407,9 @@ static int checkElementEnd (
             case SCHEMA_CTYPE_TEXT:
                 if (cp->content[ac]->nc) {
                     if (!checkText (interp, cp->content[ac], "")) {
+                        if (recover (interp, sdata, S("MISSING_TEXT"))) {
+                            break;
+                        }
                         return 0;
                     }
                 }
@@ -1433,8 +1455,11 @@ static int checkElementEnd (
                     if (mayMiss) break;
                 }
                 if (mayMiss) break;
-                return 0;
-
+                if (!recover (interp, sdata, S("MISSING_ONE_OF_CHOICE"))) {
+                    return 0;
+                }
+                break;
+                
             case SCHEMA_CTYPE_VIRTUAL:
                 if (evalVirtual (interp, sdata, cp->content[ac])) break;
                 else return 0;

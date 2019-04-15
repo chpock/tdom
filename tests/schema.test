@@ -3775,7 +3775,7 @@ test schema-17.2 {info} {
 proc schema-18 {args} {
     lappend ::result {*}$args
 }
-test schema-18.1 {reportcmd} {knownBug} {
+test schema-18.1 {reportcmd} knownBug {
     tdom::schema s
     s define {
         defelement doc {
