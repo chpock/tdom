@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------
-|   Copyright (c) 2018  Rolf Ade (rolf@pointsman.de)
+|   Copyright (c) 2018, 2019  Rolf Ade (rolf@pointsman.de)
 |-----------------------------------------------------------------------------
 |
 |
@@ -807,6 +807,7 @@ matchElementStart (
                 if (candidate->nc) {
                     if (!checkText (interp, candidate, "")) {
                         if (recover (interp, sdata, S("MISSING_TEXT"))) {
+                            mayskip = 1;
                             break;
                         }                        
                         return 0;
@@ -1474,6 +1475,9 @@ static int checkElementEnd (
                 
             case SCHEMA_CTYPE_ANY:
             case SCHEMA_CTYPE_NAME:
+                if (recover (interp, sdata, S("MISSING_ELEMENT"))) {
+                    break;
+                }
                 return 0;
             }
             ac++;
@@ -1492,6 +1496,9 @@ static int checkElementEnd (
     case SCHEMA_CTYPE_INTERLEAVE:
         for (i = 0; i < cp->nc; i++) {
             if (mustMatch (cp->quants[i], se->interleaveState[i])) {
+                if (recover (interp, sdata, S("MISSING_ONE_OF_INTERLEAVE"))) {
+                    break;
+                }
                 return 0;
             }
         }

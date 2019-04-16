@@ -3775,7 +3775,7 @@ test schema-17.2 {info} {
 proc schema-18 {args} {
     lappend ::result {*}$args
 }
-test schema-18.1 {reportcmd} knownBug {
+test schema-18.1 {reportcmd} {
     tdom::schema s
     s define {
         defelement doc {
@@ -3791,7 +3791,24 @@ test schema-18.1 {reportcmd} knownBug {
     lappend result $rc
     s delete
     set result
-} {MISSING_TEXT s 1}
+} {s MISSING_TEXT s MISSING_ELEMENT 1}
+
+test schema-18.1a {reportcmd} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element e
+            text {minLength 1}
+            element e
+        }
+    }
+    s reportcmd schema-18
+    set result ""
+    set rc [s validate {<doc><e/><e/></doc>}]
+    lappend result $rc
+    s delete
+    set result
+} {s MISSING_TEXT 1}
 
 test schema-18.2 {reportcmd} {
     tdom::schema s
@@ -3830,7 +3847,7 @@ test schema-18.3 {reportcmd} {
     }
     s delete
     set result
-} {s UNKNOWN_DOKUMENT_ELEMENT 1 s UNKNOWN_DOKUMENT_ELEMENT 1 s UNKNOWN_DOKUMENT_ELEMENT 1 s UNKNOWN_DOKUMENT_ELEMENT 1}
+} {s UNKNOWN_ROOT_ELEMENT 1 s UNKNOWN_ROOT_ELEMENT 1 s UNKNOWN_ROOT_ELEMENT 1 s UNKNOWN_ROOT_ELEMENT 1}
 
 proc validatedSAX {g xml {keepEmpties 1}} {
     set args [list -validateCmd $g]
