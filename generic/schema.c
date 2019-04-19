@@ -1771,6 +1771,9 @@ probeText (
             return TCL_OK;
         }
     }
+    if (recover (interp, sdata, S("WRONG_VALUE"))) {
+        return TCL_OK;
+    }            
     SetResult ("Text content doesn't match");
     return TCL_ERROR;
 }

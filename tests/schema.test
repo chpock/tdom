@@ -3786,8 +3786,7 @@ test schema-18.1 {reportcmd} {
     }
     s reportcmd schema-18
     set result ""
-    set rc [s validate {<doc><e/></doc>} errMsg]
-    puts $errMsg
+    set rc [s validate {<doc><e/></doc>}]
     lappend result $rc
     s delete
     set result
