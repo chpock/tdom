@@ -1924,8 +1924,13 @@ test schema-10.1 {any} {
         defelement a {}
         defelement b {}
     }
-    set result [s validate {<doc><a/><something/><b/></doc>}]
-    lappend result [s validate {<doc><a/><a><b>text</b><c><c><c/></c></c></a><b/></doc>}]
+    set result [list]
+    foreach xml {
+        <doc><a/><something/><b/></doc>
+        <doc><a/><a><b>text</b><c><c><c/></c></c></a><b/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
     s delete
     set result
 } {1 1}            
@@ -3766,5 +3771,114 @@ test schema-17.2 {info} {
     s delete
     set result
 } {a b}
+
+proc schema-18 {args} {
+    lappend ::result {*}$args
+}
+test schema-18.1 {reportcmd} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element e
+            text {minLength 1}
+            element e
+        }
+    }
+    s reportcmd schema-18
+    set result ""
+    set rc [s validate {<doc><e/></doc>}]
+    lappend result $rc
+    s delete
+    set result
+} {s MISSING_TEXT s MISSING_ELEMENT 1}
+
+test schema-18.1a {reportcmd} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element e
+            text {minLength 1}
+            element e
+        }
+    }
+    s reportcmd schema-18
+    set result ""
+    set rc [s validate {<doc><e/><e/></doc>}]
+    lappend result $rc
+    s delete
+    set result
+} {s MISSING_TEXT 1}
+
+test schema-18.2 {reportcmd} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element a
+            element b
+            element c
+        }
+    }
+    s reportcmd schema-18
+    set result ""
+    set rc [s validate {<doc><a/><c/></doc>}]
+    lappend result $rc
+    s delete
+    set result
+} {s MISSING_CP 1}
+
+test schema-18.3 {reportcmd} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element a
+        }
+    }
+    s reportcmd schema-18
+    set result ""
+    foreach xml {
+        <foo/>
+        <bar>baz</bar>
+        <bar>baz<a/>grill</bar>
+        <bar><a><b/></a></bar>
+    } {
+        set rc [s validate $xml]
+        lappend result $rc
+    }
+    s delete
+    set result
+} {s UNKNOWN_ROOT_ELEMENT 1 s UNKNOWN_ROOT_ELEMENT 1 s UNKNOWN_ROOT_ELEMENT 1 s UNKNOWN_ROOT_ELEMENT 1}
+
+proc validatedSAX {g xml {keepEmpties 1}} {
+    set args [list -validateCmd $g]
+    if {!$keepEmpties} {
+        lappend args -ignorewhitespace 1
+    }
+    xml::parser p {*}$args
+    set rc [catch {p parse $xml} errMsg]
+    p delete
+    return $rc
+}
+
+proc validatedDOM {g xml {keepEmpties 0}} {
+    set args [list -validateCmd $g]
+    if {$keepEmpties} {
+        lappend args -keepEmpties
+    }
+    set rc [catch {
+        set doc [dom parse {*}$args $xml]
+    } errMsg]
+    if {$doc ne ""} {
+        $doc delete
+    }
+    return $rc
+}
+
+proc postValidation {g xml} {
+    set doc [dom parse $xml]
+    set rc [$g domvalidate $doc errMsg]
+    $doc delete
+    return $rc
+}
+
 
 }

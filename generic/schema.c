@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------
-|   Copyright (c) 2018  Rolf Ade (rolf@pointsman.de)
+|   Copyright (c) 2018, 2019  Rolf Ade (rolf@pointsman.de)
 |-----------------------------------------------------------------------------
 |
 |
@@ -81,6 +81,7 @@ typedef struct
     Tcl_Interp    *interp;
     XML_Parser     parser;
     Tcl_DString   *cdata;
+    int            onlyWhiteSpace;
     char          *uri;
     int            maxUriLen;
 } ValidateMethodData;
@@ -253,6 +254,8 @@ static void SetActiveSchemaData (SchemaData *v)
         Tcl_AppendToObj (rObj, ":", 1);                 \
     }                                                   \
     Tcl_AppendToObj (rObj, cp->name, -1);
+
+#define S(str)  str, sizeof (str) -1
 
 static SchemaCP*
 initSchemaCP (
@@ -507,6 +510,9 @@ static void schemaInstanceDelete (
     FREE (sdata->textStub);
     Tcl_DStringFree (sdata->cdata);
     FREE (sdata->cdata);
+    if (sdata->reportCmd) {
+        Tcl_DecrRefCount (sdata->reportCmd);
+    }
     FREE (sdata);
 }
 
@@ -698,6 +704,38 @@ popStack (
     sdata->stack = se;
 }
 
+static int 
+recover (
+    Tcl_Interp *interp,
+    SchemaData *sdata,
+    const char *errType,
+    int len
+    )
+{
+    Tcl_Obj *cmdPtr;
+    int rc;
+
+    if (!sdata->reportCmd) return 0;
+    cmdPtr = Tcl_DuplicateObj (sdata->reportCmd);
+    Tcl_IncrRefCount(cmdPtr);
+    Tcl_ListObjAppendElement (interp, cmdPtr,
+                              sdata->self);
+    Tcl_ListObjAppendElement (
+        interp, cmdPtr,
+        Tcl_NewStringObj (errType, len)
+        );
+    sdata->currentEvals++;
+    rc = Tcl_EvalObjEx (interp, cmdPtr,
+                        TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT);
+    sdata->currentEvals--;
+    Tcl_DecrRefCount (cmdPtr);
+    if (rc != TCL_OK) {
+        sdata->evalError = 1;
+        return 0;
+    }
+    return 1;
+}
+
 /* The cp argument must be type SCHEMA_CTYPE_TEXT */
 static int
 checkText (
@@ -751,7 +789,6 @@ matchElementStart (
     int hm, ac, i, mayskip, rc;
     int isName = 0;
     SchemaValidationStack *se;
-    Tcl_Obj *cmdPtr;
 
     if (!sdata->stack) return 0;
     se = sdata->stack;
@@ -769,26 +806,10 @@ matchElementStart (
             case SCHEMA_CTYPE_TEXT:
                 if (candidate->nc) {
                     if (!checkText (interp, candidate, "")) {
-                        if (sdata->reportCmd) {
-                            cmdPtr = Tcl_DuplicateObj (sdata->reportCmd);
-                            Tcl_ListObjAppendElement (interp, cmdPtr,
-                                                      sdata->self);
-                            Tcl_ListObjAppendElement (
-                                interp, cmdPtr,
-                                Tcl_NewStringObj ("MISSING_TEXT", 22)
-                                );
-                            sdata->currentEvals++;
-                            rc = Tcl_EvalObjEx (interp, cmdPtr,
-                                                TCL_EVAL_GLOBAL
-                                                | TCL_EVAL_DIRECT);
-                            sdata->currentEvals--;
-                            Tcl_DecrRefCount (cmdPtr);
-                            if (rc != TCL_OK) {
-                                return 0;
-                            }
+                        if (recover (interp, sdata, S("MISSING_TEXT"))) {
+                            mayskip = 1;
                             break;
-                        }
-                        
+                        }                        
                         return 0;
                     }
                 }
@@ -848,8 +869,7 @@ matchElementStart (
                         break;
 
                     case SCHEMA_CTYPE_VIRTUAL:
-                        if (evalVirtual (interp, sdata, icp)) break;
-                        else return 0;
+                        Tcl_Panic ("Virtual constrain in MIXED or CHOICE");
                         
                     }
                     if (!mayskip && mayMiss (candidate->quants[i]))
@@ -859,6 +879,11 @@ matchElementStart (
 
             case SCHEMA_CTYPE_VIRTUAL:
                 if (evalVirtual (interp, sdata, candidate)) {
+                    /* Virtual contraints are always quant ONE, so
+                     * that the virtual constraints are called while
+                     * looking if an element can end. Therefor we use
+                     * here the already present mayskip mechanism to
+                     * try further, after calling the tcl script. */
                     mayskip = 1;
                     break;
                 }
@@ -877,12 +902,26 @@ matchElementStart (
                 break;
             }
             if (!mayskip && mustMatch (cp->quants[ac], hm)) {
+                if (recover (interp, sdata, S("MISSING_CP"))) {
+                    /* Skip the just opened element tag and the following
+                     * content of the current. */
+                    sdata->skipDeep = 2;
+                    return 1;
+                }
                 return 0;
             }
             ac++;
             hm = 0;
         }
-        if (isName) return 0;
+        if (isName) {
+            if (recover (interp, sdata, "UNEXPECTED_ELEMENT", 15)) {
+                /* Skip the just opened element tag and the following
+                 * content of the current. */
+                sdata->skipDeep = 2;
+                return 1;
+            }
+            return 0;
+        }
         return -1;
 
     case SCHEMA_CTYPE_VIRTUAL:
@@ -895,16 +934,22 @@ matchElementStart (
     case SCHEMA_CTYPE_INTERLEAVE:
         mayskip = 1;
         for (i = 0; i < cp->nc; i++) {
-            icp = cp->content[i];
             if (se->interleaveState[i]) {
                 if (maxOne (cp->quants[i])) continue;
             }
+            icp = cp->content[i];
             switch (icp->type) {
             case SCHEMA_CTYPE_TEXT:
+                if (icp->nc) {
+                    if (!checkText (interp, icp, "")) {
+                        mayskip = 0;
+                    }
+                }
                 break;
 
             case SCHEMA_CTYPE_ANY:
                 sdata->skipDeep = 1;
+                if (mayskip && minOne (cp->quants[i])) mayskip = 0;
                 se->hasMatched = 1;
                 se->interleaveState[i] = 1;
                 return 1;
@@ -932,19 +977,24 @@ matchElementStart (
                     return 1;
                 }
                 popStack (sdata);
-                if (!mayskip && rc == -1) mayskip = 1;
+                if (mayskip && rc != -1) mayskip = 0;
                 break;
 
             case SCHEMA_CTYPE_VIRTUAL:
+                Tcl_Panic ("Virtual constraint child of INTERLEAVE");
                 break;
             }
 
         }
                 
-        break;
+        if (mayskip) break;
+        if (recover (interp, sdata, S("UNCOMPLET_CP"))) {
+            sdata->skipDeep = 2;
+            return 1;
+        }
     }
     
-    return 0;
+    return -1;
 }
 
 int
@@ -1033,6 +1083,10 @@ probeElement (
         se = sdata->stack;
         if (se->pattern->type == SCHEMA_CTYPE_NAME
             && se->activeChild >= se->pattern->nc) {
+            if (recover (interp, sdata, S("UNEXPECTED_ELEMENT"))) {
+                sdata->skipDeep = 1;
+                return TCL_OK;
+            }
             SetResult ("Unexpected child element \"");
             if (namespacePtr) {
                 Tcl_AppendResult (interp, namespacePtr, ":", NULL);
@@ -1046,6 +1100,10 @@ probeElement (
         }
     } else {
         if (!pattern) {
+            if (recover (interp, sdata, S("UNKNOWN_ROOT_ELEMENT"))) {
+                sdata->skipDeep = 1;
+                return TCL_OK;
+            }
             SetResult ("Unknown element");
             return TCL_ERROR;
         }
@@ -1120,12 +1178,15 @@ int probeAttributes (
             if (strcmp (ln, cp->attrs[i]->name) == 0) {
                 found = 1;
                 if (cp->attrs[i]->cp) {
-                    if (checkText (interp, cp->attrs[i]->cp, (char *) atPtr[1])
-                        == 0) {
-                        if (nsatt) namespace[j] = '\xFF';
-                        SetResult3 ("Attribute value doesn't match for "
-                                    "attribute '", atPtr[0], "'");
-                        return TCL_ERROR;
+                    if (!checkText (interp, cp->attrs[i]->cp,
+                                    (char *) atPtr[1])) {
+                        if (!recover (interp, sdata,
+                                      S("WRONG_ATTRIBUTE_VALUE"))) {
+                            if (nsatt) namespace[j] = '\xFF';
+                            SetResult3 ("Attribute value doesn't match for "
+                                        "attribute '", atPtr[0], "'");
+                            return TCL_ERROR;
+                        }
                     }
                 }
                 if (cp->attrs[i]->required) reqAttr++;
@@ -1134,8 +1195,10 @@ int probeAttributes (
         }
         if (nsatt) namespace[j] = '\xFF';
         if (!found) {
-            SetResult3 ("Unknown attribute \"", atPtr[0], "\"");
-            return TCL_ERROR;
+            if (!recover (interp, sdata, S("UNKNOWN_ATTRIBUTE"))) {
+                SetResult3 ("Unknown attribute \"", atPtr[0], "\"");
+                return TCL_ERROR;
+            }
         }
     }
     if (reqAttr != cp->numReqAttr) {
@@ -1169,15 +1232,19 @@ int probeAttributes (
                 }
             }
             if (!found) {
-                if (cp->attrs[i]->namespace) {
-                    Tcl_AppendResult (interp, " ", cp->attrs[i]->namespace,
-                                      ":", cp->attrs[i]->name, NULL);
-                } else {
-                    Tcl_AppendResult (interp, " ", cp->attrs[i]->name, NULL);
+                if (!recover (interp, sdata, S("MISSING_ATTRIBUTE"))) {
+                    if (cp->attrs[i]->namespace) {
+                        Tcl_AppendResult (interp, " ", cp->attrs[i]->namespace,
+                                          ":", cp->attrs[i]->name, NULL);
+                    } else {
+                        Tcl_AppendResult (interp, " ", cp->attrs[i]->name, NULL);
+                    }
                 }
             }
         }
-        return TCL_ERROR;
+        if (!sdata->reportCmd) {
+            return TCL_ERROR;
+        }
     }
     return TCL_OK;
 }
@@ -1222,11 +1289,14 @@ int probeDomAttributes (
             }
             if (strcmp (ln, cp->attrs[i]->name) == 0) {
                 if (cp->attrs[i]->cp) {
-                    if (checkText (interp, cp->attrs[i]->cp, (char *) atPtr->nodeValue)
-                        == 0) {
-                        SetResult3 ("Attribute value doesn't match for "
-                                    "attribute '", ln, "'");
-                        return TCL_ERROR;
+                    if (!checkText (interp, cp->attrs[i]->cp,
+                                    (char *) atPtr->nodeValue)) {
+                        if (!recover (interp, sdata,
+                                      S("WRONG_ATTRIBUTE_VALUE"))) {
+                            SetResult3 ("Attribute value doesn't match for "
+                                        "attribute '", ln, "'");
+                            return TCL_ERROR;
+                        }
                     }
                 }
                 found = 1;
@@ -1235,15 +1305,17 @@ int probeDomAttributes (
             }
         }
         if (!found) {
-            if (ns) {
-                SetResult ("Unknown attribute \"");
-                Tcl_AppendResult (interp, ns, ":", atPtr->nodeName,
-                                  "\"");
-            } else {
-                SetResult3 ("Unknown attribute \"", atPtr->nodeName, "\"");
+            if (!recover (interp, sdata, S("UNKNOWN_ATTRIBUTE"))) {
+                if (ns) {
+                    SetResult ("Unknown attribute \"");
+                    Tcl_AppendResult (interp, ns, ":", atPtr->nodeName,
+                                      "\"");
+                } else {
+                    SetResult3 ("Unknown attribute \"", atPtr->nodeName, "\"");
+                }
+                sdata->validationState = VALIDATION_ERROR;
+                return TCL_ERROR;
             }
-            sdata->validationState = VALIDATION_ERROR;
-            return TCL_ERROR;
         }
     nextAttr:
         atPtr = atPtr->nextSibling;
@@ -1282,16 +1354,21 @@ int probeDomAttributes (
                 atPtr = atPtr->nextSibling;
             }
             if (!found) {
-                if (cp->attrs[i]->namespace) {
-                    Tcl_AppendResult (interp, " ", cp->attrs[i]->namespace,
-                                      ":", cp->attrs[i]->name, NULL);
-                } else {
-                    Tcl_AppendResult (interp, " ", cp->attrs[i]->name, NULL);
+                if (!recover (interp, sdata, S("MISSING_ATTRIBUTE"))) {
+                    if (cp->attrs[i]->namespace) {
+                        Tcl_AppendResult (interp, " ", cp->attrs[i]->namespace,
+                                          ":", cp->attrs[i]->name, NULL);
+                    } else {
+                        Tcl_AppendResult (interp, " ", cp->attrs[i]->name,
+                                          NULL);
+                    }
                 }
             }
         }
-        sdata->validationState = VALIDATION_ERROR;
-        return TCL_ERROR;
+        if (!sdata->reportCmd) {
+            sdata->validationState = VALIDATION_ERROR;
+            return TCL_ERROR;
+        }
     }
     return TCL_OK;
 }
@@ -1301,7 +1378,7 @@ static int checkElementEnd (
     SchemaData *sdata
     )
 {
-    SchemaValidationStack *se, *tse;
+    SchemaValidationStack *se;
     SchemaCP *cp, *ic;
     int hm, ac, i, mayMiss, rc;
     int isName = 0;
@@ -1331,6 +1408,9 @@ static int checkElementEnd (
             case SCHEMA_CTYPE_TEXT:
                 if (cp->content[ac]->nc) {
                     if (!checkText (interp, cp->content[ac], "")) {
+                        if (recover (interp, sdata, S("MISSING_TEXT"))) {
+                            break;
+                        }
                         return 0;
                     }
                 }
@@ -1370,23 +1450,18 @@ static int checkElementEnd (
                         break;
                         
                     case SCHEMA_CTYPE_VIRTUAL:
-                        tse = se;
-                        while (tse->pattern->type != SCHEMA_CTYPE_NAME) {
-                            tse = tse->down;
-                        }
-                        if (evalVirtual (interp, sdata, ic)) break;
-                        else return 0;
+                        Tcl_Panic ("Virtual constrain in MIXED or CHOICE");
+                        
                     }
                     if (mayMiss) break;
                 }
                 if (mayMiss) break;
-                return 0;
-
-            case SCHEMA_CTYPE_VIRTUAL:
-                tse = se;
-                while (tse->pattern->type != SCHEMA_CTYPE_NAME) {
-                    tse = tse->down;
+                if (!recover (interp, sdata, S("MISSING_ONE_OF_CHOICE"))) {
+                    return 0;
                 }
+                break;
+                
+            case SCHEMA_CTYPE_VIRTUAL:
                 if (evalVirtual (interp, sdata, cp->content[ac])) break;
                 else return 0;
                 
@@ -1400,6 +1475,9 @@ static int checkElementEnd (
                 
             case SCHEMA_CTYPE_ANY:
             case SCHEMA_CTYPE_NAME:
+                if (recover (interp, sdata, S("MISSING_ELEMENT"))) {
+                    break;
+                }
                 return 0;
             }
             ac++;
@@ -1418,6 +1496,9 @@ static int checkElementEnd (
     case SCHEMA_CTYPE_INTERLEAVE:
         for (i = 0; i < cp->nc; i++) {
             if (mustMatch (cp->quants[i], se->interleaveState[i])) {
+                if (recover (interp, sdata, S("MISSING_ONE_OF_INTERLEAVE"))) {
+                    break;
+                }
                 return 0;
             }
         }
@@ -1492,7 +1573,7 @@ matchText (
     )
 {
     SchemaCP *cp, *candidate, *ic;
-    SchemaValidationStack *se, *tse;
+    SchemaValidationStack *se;
     int ac, hm, isName = 0, i;
 
     DBG(fprintf (stderr, "matchText called with text '%s'\n", text));
@@ -1546,10 +1627,6 @@ matchText (
                             break;
 
                         case SCHEMA_CTYPE_VIRTUAL:
-                            tse = se;
-                            while (tse->pattern->type != SCHEMA_CTYPE_NAME) {
-                                tse = tse->down;
-                            }
                             if (!evalVirtual (interp, sdata, ic)) return 0;
                             break;
                             
@@ -1579,10 +1656,6 @@ matchText (
                     break;
 
                 case SCHEMA_CTYPE_VIRTUAL:
-                    tse = se;
-                    while (tse->pattern->type != SCHEMA_CTYPE_NAME) {
-                        tse = tse->down;
-                    }
                     if (!evalVirtual (interp, sdata, ic)) return 0;
                     break;
                     
@@ -1698,6 +1771,9 @@ probeText (
             return TCL_OK;
         }
     }
+    if (recover (interp, sdata, S("WRONG_VALUE"))) {
+        return TCL_OK;
+    }            
     SetResult ("Text content doesn't match");
     return TCL_ERROR;
 }
@@ -1710,22 +1786,24 @@ startElement(
 )
 {
     ValidateMethodData *vdata = (ValidateMethodData *) userData;
+    SchemaData *sdata;
     char *namespace;
     const char *s;
     int i = 0;
 
     DBG(fprintf (stderr, "startElement: '%s'\n", name);)
-    if (Tcl_DStringLength (vdata->cdata)
-        || (vdata->sdata->stack
-            && (vdata->sdata->stack->pattern->flags & CONSTRAINT_TEXT_CHILD))) {
-        if (probeText (vdata->interp, vdata->sdata,
+    sdata = vdata->sdata;
+    if (!sdata->skipDeep && sdata->stack && Tcl_DStringLength (vdata->cdata)) {
+        if (probeText (vdata->interp, sdata,
                        Tcl_DStringValue (vdata->cdata)) != TCL_OK) {
-            vdata->sdata->validationState = VALIDATION_ERROR;
+            sdata->validationState = VALIDATION_ERROR;
             XML_StopParser (vdata->parser, 0);
             Tcl_DStringSetLength (vdata->cdata, 0);
+            vdata->onlyWhiteSpace = 1;
             return;
         }
         Tcl_DStringSetLength (vdata->cdata, 0);
+        vdata->onlyWhiteSpace = 1;
     }
     s = name;
     while (*s && *s != '\xFF') {
@@ -1747,16 +1825,17 @@ startElement(
         s = name;
     }
 
-    if (probeElement (vdata->interp, vdata->sdata, s, namespace)
+    if (probeElement (vdata->interp, sdata, s, namespace)
         != TCL_OK) {
-        vdata->sdata->validationState = VALIDATION_ERROR;
+        sdata->validationState = VALIDATION_ERROR;
         XML_StopParser (vdata->parser, 0);
         return;
     }
-    if (atts[0] || vdata->sdata->stack->pattern->attrs) {
-        if (probeAttributes (vdata->interp, vdata->sdata, atts)
+    if (atts[0] || (sdata->stack
+                    && sdata->stack->pattern->attrs)) {
+        if (probeAttributes (vdata->interp, sdata, atts)
             != TCL_OK) {
-            vdata->sdata->validationState = VALIDATION_ERROR;
+            sdata->validationState = VALIDATION_ERROR;
             XML_StopParser (vdata->parser, 0);
         }
     }
@@ -1769,25 +1848,30 @@ endElement (
 )
 {
     ValidateMethodData *vdata = (ValidateMethodData *) userData;
-
+    SchemaData *sdata;
+    
     DBG(fprintf (stderr, "endElement: '%s'\n", name);)
-    if (vdata->sdata->validationState == VALIDATION_ERROR) {
+    sdata = vdata->sdata;
+    if (sdata->validationState == VALIDATION_ERROR) {
         return;
     }
-    if (Tcl_DStringLength (vdata->cdata)
-        || vdata->sdata->stack->pattern->flags & CONSTRAINT_TEXT_CHILD) {
-        if (probeText (vdata->interp, vdata->sdata,
+    if (!sdata->skipDeep && sdata->stack && Tcl_DStringLength (vdata->cdata)) {
+        if (probeText (vdata->interp, sdata,
                        Tcl_DStringValue (vdata->cdata)) != TCL_OK) {
-            vdata->sdata->validationState = VALIDATION_ERROR;
+            sdata->validationState = VALIDATION_ERROR;
             XML_StopParser (vdata->parser, 0);
             Tcl_DStringSetLength (vdata->cdata, 0);
+            vdata->onlyWhiteSpace = 1;
             return;
         }
-        Tcl_DStringSetLength (vdata->cdata, 0);
     }
-    if (probeElementEnd (vdata->interp, vdata->sdata)
+    if (Tcl_DStringLength (vdata->cdata)) {
+        Tcl_DStringSetLength (vdata->cdata, 0);
+        vdata->onlyWhiteSpace = 1;
+    }
+    if (probeElementEnd (vdata->interp, sdata)
         != TCL_OK) {
-        vdata->sdata->validationState = VALIDATION_ERROR;
+        sdata->validationState = VALIDATION_ERROR;
         XML_StopParser (vdata->parser, 0);
     }
 }
@@ -1800,7 +1884,24 @@ characterDataHandler (
 )
 {
     ValidateMethodData *vdata = (ValidateMethodData *) userData;
-
+    const char *pc;
+    
+    if (vdata->onlyWhiteSpace) {
+        int i = 0;
+        pc = s;
+        while (i < len) {
+            if ( (*pc == ' ')  ||
+                 (*pc == '\n') ||
+                 (*pc == '\r') ||
+                 (*pc == '\t') ) {
+                pc++;
+                i++;
+                continue;
+            }
+            vdata->onlyWhiteSpace = 0;
+            break;
+        }
+    }
     Tcl_DStringAppend (vdata->cdata, s, len);
 }
 
@@ -1826,6 +1927,7 @@ validateString (
     vdata.parser = parser;
     Tcl_DStringInit (&cdata);
     vdata.cdata = &cdata;
+    vdata.onlyWhiteSpace = 1;
     vdata.uri = (char *) MALLOC (URI_BUFFER_LEN_INIT);
     vdata.maxUriLen = URI_BUFFER_LEN_INIT;
     XML_SetUserData (parser, &vdata);
@@ -3122,6 +3224,7 @@ TextPatternObjCmd (
             SetResult3 ("Unknown text type \"", Tcl_GetString (objv[2]), "\"");
             return TCL_ERROR;
         }
+        quant = SCHEMA_CQUANT_ONE;
         pattern = (SchemaCP *) Tcl_GetHashValue (h);
         sdata->cp->flags |= CONSTRAINT_TEXT_CHILD;
     }
