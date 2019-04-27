@@ -439,6 +439,12 @@
         useful mostly together with the <m>oneOf</m> text constraint
         commmand.</desc>
       </commanddef>
+      <commanddef>
+        <command><cmd>strip</cmd> <m>&lt;constraint script></m></command>
+        <desc>This text constraint command tests all text constraints
+        in the evaluated <m>constraint script></m> with the text to
+        test striped of all white space at start and end.</desc>
+      </commanddef>
     </commandlist>
   </section>
   

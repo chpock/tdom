@@ -494,6 +494,11 @@ the schema definition commmand \fItext\fR also expects all
 text constraints to match the text constraint \fIallOf\fR is
 useful mostly together with the \fIoneOf\fR text constraint
 commmand.
+.TP
+\&\fB\fBstrip\fP \fI<constraint script>\fB
+\&\fRThis text constraint command tests all text constraints
+in the evaluated \fIconstraint script>\fR with the text to
+test striped of all white space at start and end.
 .SH Exampels
 .PP
 .UR "https://www.w3.org/TR/xmlschema-0/"
