@@ -225,4 +225,40 @@ proc fromDTD {file} {
     p parse [tdom::xmlReadFile $file]
 }
 
-fromDTD $argv
+proc usage {} {
+    puts "$argv0 ?options? file"
+}
+
+proc run {args} {
+    if {[llength $args] == 1} {
+        set file [lindex $args 0]
+        if {![file readable $file] || ![file isfile $file]} {
+            puts stderr "Can't open '$file'"
+            exit 1
+        }
+        set needToGuess 0
+        switch [file extension $file] {
+            ".xml" {
+                fromDTD $file
+            }
+            default {
+                set needToGuess 1
+            }
+        }
+        if {$needToGuess} {
+            # Just probe everything we have in no specific order
+            foreach reader {
+                fromDTD
+            } {
+                if {![catch {$reader $file}]} {
+                    return
+                }
+            }
+        }
+        return
+    }
+    usage
+}
+
+run {*}$argv
+
