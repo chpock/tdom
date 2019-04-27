@@ -3175,6 +3175,38 @@ test schema-14.20 {deftext} {
     set result
 } {0 0 1 0 1 0 1 0 0 0}
 
+test schema-14.21 {strip} {
+    tdom::schema s
+    s define {
+        defelement a {
+            text {
+                strip {
+                    minLength 3
+                    maxLength 5
+                }
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        <a/>
+        <a></a>
+        {<a> </a>}
+        {<a>  3  </a>}
+        {<a>123</a>}
+        {<a> 123    </a>}
+        {<a>  123   </a>}
+        {<a>1234</a>}
+        {<a>12345</a>}
+        {<a>123456</a>}
+        {<a> 12 34 </a>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 0 0 1 1 1 1 1 0 1}
+
 test schema-15.1 {constraint cmd tcl} {
     tdom::schema s
     s define {

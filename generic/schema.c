@@ -4079,6 +4079,62 @@ allOfTCObjCmd (
     return TCL_ERROR;
 }
 
+static int
+stripImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    SchemaCP *cp = (SchemaCP *) constraintData;
+    int rc, restore = 0;
+    char *end, saved;
+
+    while(isspace((unsigned char)*text)) text++;
+    if(*text != 0) {
+        /* Not white space only */
+        /* Trim trailing space */
+        end = text + strlen(text) - 1;
+        while(end > text && isspace((unsigned char)*end)) end--;
+        saved = end[1];
+        restore = 1;
+        end[1] = '\0';
+    }
+    rc = checkText (interp, cp, text);
+    if (restore) end[1] = saved;
+    return rc;
+}
+
+static int
+stripTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaCP *cp;
+    SchemaConstraint *sc;
+    int rc;
+
+    CHECK_TI
+    CHECK_TOPLEVEL
+    checkNrArgs (2,2,"Expected: <text constraint script>");
+    
+    cp = initSchemaCP (SCHEMA_CTYPE_CHOICE, NULL, NULL);
+    cp->type = SCHEMA_CTYPE_TEXT;
+    REMEMBER_PATTERN (cp)
+    rc = evalConstraints (interp, sdata, cp, objv[1]);
+    if (rc == TCL_OK) {
+        ADD_CONSTRAINT (sdata, sc)
+        sc->constraint = stripImpl;
+        sc->constraintData = (void *)cp;
+        return TCL_OK;
+    }
+    return TCL_ERROR;
+}
+
 void
 tDOM_SchemaInit (
     Tcl_Interp *interp
@@ -4162,6 +4218,8 @@ tDOM_SchemaInit (
                           oneOfTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::allOf",
                           allOfTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::strip",
+                          stripTCObjCmd, NULL, NULL);
 }
 
 
