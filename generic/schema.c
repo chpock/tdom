@@ -101,6 +101,8 @@ typedef struct
 #define SetBooleanResult(i) Tcl_ResetResult(interp); \
                      Tcl_SetBooleanObj(Tcl_GetObjResult(interp), (i))
 
+#define SPACE(c) ((c) == ' ' || (c) == '\n' || (c )== '\t' || (c) == '\r')
+    
 #define checkNrArgs(l,h,err) if (objc < l || objc > h) {      \
         SetResult (err);                                      \
         return TCL_ERROR;                                     \
@@ -3356,6 +3358,7 @@ tclImpl (
     tcdata->sdata->currentEvals--;
     Tcl_DecrRefCount (tcdata->evalStub[tcdata->nrArg-1]);
     if (result != TCL_OK) {
+        tcdata->sdata->evalError = 1;
         return 0;
     }
     result = Tcl_GetBooleanFromObj (interp, Tcl_GetObjResult (interp), &bool);
@@ -4090,12 +4093,12 @@ stripImpl (
     int rc, restore = 0;
     char *end, saved;
 
-    while(isspace((unsigned char)*text)) text++;
+    while(SPACE((unsigned char)*text)) text++;
     if(*text != 0) {
         /* Not white space only */
         /* Trim trailing space */
         end = text + strlen(text) - 1;
-        while(end > text && isspace((unsigned char)*end)) end--;
+        while(end > text && SPACE((unsigned char)*end)) end--;
         saved = end[1];
         restore = 1;
         end[1] = '\0';
@@ -4133,6 +4136,183 @@ stripTCObjCmd (
         return TCL_OK;
     }
     return TCL_ERROR;
+}
+
+static int
+splitWhitespaceImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    SchemaCP *cp = (SchemaCP *) constraintData;
+    int rc = 0;
+    char *p, *end, saved = 0;
+    
+    fprintf (stderr, "hier: '%s' -->", text);
+    p = text;
+    while (*p != 0) {
+        while(SPACE (*p)) p++;
+        if (*p == 0) break;
+        end = p; end++;
+        while (*end != 0 && !SPACE(*end)) end++;
+        saved = *end;
+        *end = 0;
+        fprintf (stderr, " '%s'", p);
+        rc = checkText (interp, cp, p);
+        *end = saved;
+        p = end;
+        if (!rc) break;
+    }
+    fprintf (stderr, "\n");
+    return rc;
+}
+
+typedef struct
+{
+    int        nrArg;
+    Tcl_Obj  **evalStub;
+    SchemaData *sdata;
+    SchemaCP   *cp;
+} splitTclTCData;
+
+
+static int
+splitTclImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    splitTclTCData *tcdata = (splitTclTCData *) constraintData;
+    int rc, listlen, i;
+    Tcl_Obj *list, *listelm;
+
+    fprintf (stderr, "HIIIER nrArg: %d\n", tcdata->nrArg);
+    tcdata->evalStub[tcdata->nrArg-1] = Tcl_NewStringObj(text, -1);
+    Tcl_IncrRefCount (tcdata->evalStub[tcdata->nrArg-1]);
+    tcdata->sdata->currentEvals++;
+    rc = Tcl_EvalObjv (interp, tcdata->nrArg, tcdata->evalStub,
+                       TCL_EVAL_GLOBAL);
+    tcdata->sdata->currentEvals--;
+    Tcl_DecrRefCount (tcdata->evalStub[tcdata->nrArg-1]);
+    if (rc != TCL_OK) {
+        fprintf (stderr, "EvalError: %s\n", Tcl_GetStringResult (interp));
+        tcdata->sdata->evalError = 1;
+        return 0;
+    }
+    list = Tcl_GetObjResult (interp);
+    Tcl_IncrRefCount (list);
+    Tcl_ResetResult (interp);
+    if (Tcl_ListObjLength (interp, list, &listlen) != TCL_OK) {
+        Tcl_DecrRefCount (list);
+        tcdata->sdata->evalError = 1;
+        return 0;
+    }
+    rc = 1;
+    for (i = 0; i < listlen; i++) {
+        Tcl_ListObjIndex (interp, list, i, &listelm);
+        rc = checkText (interp, tcdata->cp, Tcl_GetString (listelm));
+        if (!rc) break;
+    }
+    Tcl_DecrRefCount (list);
+    return rc;
+}
+
+static void
+splitTclImplFree (
+    void *constraintData
+    )
+{
+    splitTclTCData *tcdata = constraintData;
+    int i;
+
+    for (i = 0; i < tcdata->nrArg-1; i++) {
+        Tcl_DecrRefCount (tcdata->evalStub[i]);
+    }
+    FREE (tcdata->evalStub);
+    FREE (tcdata);
+}
+
+static int
+splitTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaCP *cp;
+    SchemaConstraint *sc;
+    int methodIndex, rc, i;
+    splitTclTCData *tcdata;
+    
+    static const char *methods[] = {
+        "whitespace", "tcl", NULL
+    };
+    enum method {
+        m_whitespace, m_tcl
+    };
+
+    CHECK_TI
+    CHECK_TOPLEVEL
+    if (objc < 2) {
+        SetResult("Expected: ?type ?args?? <text constraint script>");
+        return TCL_ERROR;
+    }
+    
+    if (objc == 2) {
+        methodIndex = m_whitespace;
+    } else {
+        if (Tcl_GetIndexFromObj (interp, objv[1], methods, "type", 0,
+                                 &methodIndex) != TCL_OK) {
+            fprintf (stderr, "HIIIER %d\n", objc);
+            return TCL_ERROR;
+        }
+    }
+    switch ((enum method) methodIndex) {
+    case m_whitespace:
+        if (objc > 2) {
+            SetResult ("Type whitespace expects no argument.");
+            return TCL_ERROR;
+        }
+        break;
+    case m_tcl:
+        if (objc < 3) {
+            SetResult ("Expected: tclcmd ?arg ...?.");
+            return TCL_ERROR;
+        }
+    }
+    
+    cp = initSchemaCP (SCHEMA_CTYPE_CHOICE, NULL, NULL);
+    cp->type = SCHEMA_CTYPE_TEXT;
+    REMEMBER_PATTERN (cp)
+    rc = evalConstraints (interp, sdata, cp, objv[objc-1]);
+    if (rc != TCL_OK) {
+        return TCL_ERROR;
+    }
+    ADD_CONSTRAINT (sdata, sc)
+    switch ((enum method) methodIndex) {
+    case m_whitespace:
+        sc->constraint = splitWhitespaceImpl;
+        sc->constraintData = cp;
+        break;
+    case m_tcl:
+        sc->constraint = splitTclImpl;
+        sc->freeData = splitTclImplFree;
+        tcdata = TMALLOC (splitTclTCData);
+        tcdata->nrArg = objc - 2;
+        tcdata->evalStub = MALLOC (sizeof (Tcl_Obj*) * (objc-1));
+        for (i = 2; i < objc; i++) {
+            tcdata->evalStub[i-2] = objv[i];
+            Tcl_IncrRefCount (tcdata->evalStub[i-2]);
+        }
+        tcdata->sdata = sdata;
+        tcdata->cp = cp;
+        sc->constraintData = tcdata;
+    }
+    return TCL_OK;
 }
 
 void
@@ -4220,6 +4400,8 @@ tDOM_SchemaInit (
                           allOfTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::strip",
                           stripTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::split",
+                          splitTCObjCmd, NULL, NULL);
 }
 
 

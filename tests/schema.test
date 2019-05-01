@@ -3207,6 +3207,81 @@ test schema-14.21 {strip} {
     set result
 } {0 0 0 0 1 1 1 1 1 0 1}
 
+test schema-14.22 {split} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element a 1 {
+                text {
+                    split {
+                        number
+                    }
+                }
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc><a/></doc>
+        <doc><a></a></doc>
+        {<doc><a>  </a></doc>}
+        {<doc><a>1</a></doc>}
+        {<doc><a>-2.1</a></doc>}
+        {<doc><a> -2.1
+            </a></doc>}
+        {<doc><a>-a</a></doc>}
+        {<doc><a>-a b c</a></doc>}
+        {<doc><a> 1   2 3.5</a></doc>}
+        {<doc><a>  1   a 3.5</a></doc>}
+        {<doc><a>1 2 fooo</a></doc>}
+        {<doc><a>1 2 fooo   </a></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 0 1 1 1 0 0 1 0 0 0}
+
+proc schema-14.23 {text} {
+    return [split $text]
+}
+
+test schema-14.23 {split} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element a 1 {
+                text {
+                    split tcl schema-14.23 {
+                        number
+                    }
+                }
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc><a/></doc>
+        <doc><a></a></doc>
+        {<doc><a>  </a></doc>}
+        {<doc><a>1</a></doc>}
+        {<doc><a>-2.1</a></doc>}
+        {<doc><a> -2.1
+            </a></doc>}
+        {<doc><a>-a</a></doc>}
+        {<doc><a>-a b c</a></doc>}
+        {<doc><a>- 1   2 3.5</a></doc>}
+        {<doc><a>- 1   a 3.5</a></doc>}
+        {<doc><a>-1 2 fooo</a></doc>}
+        {<doc><a>-1 2 fooo   </a></doc>}
+    } {
+        lappend result [s validate $xml errMsg]
+        puts $errMsg
+    }
+    s delete
+    set result
+} {0 0 1 1 1 1 0 0 1 0 0 0}
+
 test schema-15.1 {constraint cmd tcl} {
     tdom::schema s
     s define {
