@@ -4149,7 +4149,6 @@ splitWhitespaceImpl (
     int rc = 0;
     char *p, *end, saved = 0;
     
-    fprintf (stderr, "hier: '%s' -->", text);
     p = text;
     while (*p != 0) {
         while(SPACE (*p)) p++;
@@ -4158,13 +4157,11 @@ splitWhitespaceImpl (
         while (*end != 0 && !SPACE(*end)) end++;
         saved = *end;
         *end = 0;
-        fprintf (stderr, " '%s'", p);
         rc = checkText (interp, cp, p);
         *end = saved;
         p = end;
         if (!rc) break;
     }
-    fprintf (stderr, "\n");
     return rc;
 }
 
@@ -4188,7 +4185,6 @@ splitTclImpl (
     int rc, listlen, i;
     Tcl_Obj *list, *listelm;
 
-    fprintf (stderr, "HIIIER nrArg: %d\n", tcdata->nrArg);
     tcdata->evalStub[tcdata->nrArg-1] = Tcl_NewStringObj(text, -1);
     Tcl_IncrRefCount (tcdata->evalStub[tcdata->nrArg-1]);
     tcdata->sdata->currentEvals++;
@@ -4197,7 +4193,6 @@ splitTclImpl (
     tcdata->sdata->currentEvals--;
     Tcl_DecrRefCount (tcdata->evalStub[tcdata->nrArg-1]);
     if (rc != TCL_OK) {
-        fprintf (stderr, "EvalError: %s\n", Tcl_GetStringResult (interp));
         tcdata->sdata->evalError = 1;
         return 0;
     }
@@ -4209,7 +4204,7 @@ splitTclImpl (
         tcdata->sdata->evalError = 1;
         return 0;
     }
-    rc = 1;
+    rc = 0;
     for (i = 0; i < listlen; i++) {
         Tcl_ListObjIndex (interp, list, i, &listelm);
         rc = checkText (interp, tcdata->cp, Tcl_GetString (listelm));
@@ -4267,7 +4262,6 @@ splitTCObjCmd (
     } else {
         if (Tcl_GetIndexFromObj (interp, objv[1], methods, "type", 0,
                                  &methodIndex) != TCL_OK) {
-            fprintf (stderr, "HIIIER %d\n", objc);
             return TCL_ERROR;
         }
     }

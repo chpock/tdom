@@ -3270,17 +3270,53 @@ test schema-14.23 {split} {
             </a></doc>}
         {<doc><a>-a</a></doc>}
         {<doc><a>-a b c</a></doc>}
-        {<doc><a>- 1   2 3.5</a></doc>}
-        {<doc><a>- 1   a 3.5</a></doc>}
-        {<doc><a>-1 2 fooo</a></doc>}
-        {<doc><a>-1 2 fooo   </a></doc>}
+        {<doc><a>1   2 3.5</a></doc>}
+        {<doc><a> 1   a 3.5</a></doc>}
+        {<doc><a>1 2 fooo</a></doc>}
+        {<doc><a>1 2 3 -4.5</a></doc>}
     } {
         lappend result [s validate $xml errMsg]
-        puts $errMsg
     }
     s delete
     set result
-} {0 0 1 1 1 1 0 0 1 0 0 0}
+} {0 0 0 1 1 0 0 0 0 0 0 1}
+
+proc schema-14.24 {text} {
+    global schema-14.24
+    switch ${schema-14.24} {
+        1 {return {1 2 3}}
+        2 {return {-23.4 .5}}
+        3 {return {0 a 5}}
+        default {error "Unexpected value of the global var schema-14.24."}
+    }
+}
+
+test schema-14.24 {split} {
+    set schema-14.24 0
+    tdom::schema s
+    s define {
+        defelement doc {
+            element a 1 {
+                text {
+                    split tcl schema-14.24 {
+                        number
+                    }
+                }
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        {<doc><a>  </a></doc>}
+        {<doc><a>-a</a></doc>}
+        {<doc><a>1 2 3 -4.5</a></doc>}
+    } {
+        incr schema-14.24
+        lappend result [s validate $xml errMsg]
+    }
+    s delete
+    set result
+} {1 1 0}
 
 test schema-15.1 {constraint cmd tcl} {
     tdom::schema s
