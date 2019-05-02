@@ -445,6 +445,26 @@
         in the evaluated <m>constraint script></m> with the text to
         test striped of all white space at start and end.</desc>
       </commanddef>
+      <commanddef>
+        <command><cmd>split</cmd> <m>?type ?args??</m><m>&lt;constraint script></m></command>
+        <desc><p>This text constraint command splits the text to test
+        into a list of values and tests all elements of that list for
+        the text constraints in the evaluated <m>constraint
+        script></m>.</p>
+        <p>The available types are:</p>
+        <dl>
+            <dt>whitespace</dt><dd>The text to split is striped of all
+            white space at start and end splited into a list at any
+            successive white space.</dd>
+            <dt>tcl tclcmd ?arg ...?</dt><dd>The text to split is
+            handed to the <m>tclcmd</m>, which is evaluated on global
+            level, appended with every given arg and the text to split
+            as last argument. This call must return a valid tcl list,
+            which elements are tested..</dd>
+        </dl>
+        <p>The default in case no split type argument is given is
+        <m>whitespace</m>.</p></desc>
+      </commanddef>
     </commandlist>
   </section>
   

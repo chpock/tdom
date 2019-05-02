@@ -1596,7 +1596,9 @@ matchText (
                         updateStack (se, cp, ac);
                         return 1;
                     }
-                    SetResult ("Invalid text content");
+                    if (!sdata->evalError) {
+                        SetResult ("Invalid text content");
+                    }
                     return 0;
 
                 case SCHEMA_CTYPE_CHOICE:
@@ -1775,8 +1777,10 @@ probeText (
     }
     if (recover (interp, sdata, S("WRONG_VALUE"))) {
         return TCL_OK;
-    }            
-    SetResult ("Text content doesn't match");
+    }
+    if (!sdata->evalError) {
+        SetResult ("Text content doesn't match");
+    }
     return TCL_ERROR;
 }
 
@@ -4167,8 +4171,8 @@ splitWhitespaceImpl (
 
 typedef struct
 {
-    int        nrArg;
-    Tcl_Obj  **evalStub;
+    int         nrArg;
+    Tcl_Obj   **evalStub;
     SchemaData *sdata;
     SchemaCP   *cp;
 } splitTclTCData;
@@ -4297,8 +4301,8 @@ splitTCObjCmd (
         sc->freeData = splitTclImplFree;
         tcdata = TMALLOC (splitTclTCData);
         tcdata->nrArg = objc - 2;
-        tcdata->evalStub = MALLOC (sizeof (Tcl_Obj*) * (objc-1));
-        for (i = 2; i < objc; i++) {
+        tcdata->evalStub = MALLOC (sizeof (Tcl_Obj*) * (objc-2));
+        for (i = 2; i < objc -1; i++) {
             tcdata->evalStub[i-2] = objv[i];
             Tcl_IncrRefCount (tcdata->evalStub[i-2]);
         }

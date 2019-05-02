@@ -3318,6 +3318,46 @@ test schema-14.24 {split} {
     set result
 } {1 1 0}
 
+proc schema-14.24a {arg1 arg2 text} {
+    global schema-14.24a
+    if {$arg1 ne "foo" || $arg2 ne "bar"} {
+        error "Unexpected args"
+    }
+    switch ${schema-14.24a} {
+        1 {return {1 2 3}}
+        2 {return {-23.4 .5}}
+        3 {return {0 a 5}}
+        default {error "Unexpected value of the global var schema-14.24."}
+    }
+}
+
+test schema-14.24a {split} {
+    set schema-14.24a 0
+    tdom::schema s
+    s define {
+        defelement doc {
+            element a 1 {
+                text {
+                    split tcl schema-14.24a foo bar {
+                        number
+                    }
+                }
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        {<doc><a>  </a></doc>}
+        {<doc><a>-a</a></doc>}
+        {<doc><a>1 2 3 -4.5</a></doc>}
+    } {
+        incr schema-14.24a
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 1 0}
+
 test schema-15.1 {constraint cmd tcl} {
     tdom::schema s
     s define {

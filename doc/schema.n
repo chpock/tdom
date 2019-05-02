@@ -499,6 +499,33 @@ commmand.
 \&\fRThis text constraint command tests all text constraints
 in the evaluated \fIconstraint script>\fR with the text to
 test striped of all white space at start and end.
+.TP
+\&\fB\fBsplit\fP \fI?type ?args??\fB\fI<constraint script>\fB
+\&\fR
+.RS
+.PP
+This text constraint command splits the text to test
+into a list of values and tests all elements of that list for
+the text constraints in the evaluated \fIconstraint
+script>\fR.
+.PP
+The available types are:
+.TP
+whitespace
+The text to split is striped of all
+white space at start and end splited into a list at any
+successive white space.
+.TP
+tcl tclcmd ?arg ...?
+The text to split is
+handed to the \fItclcmd\fR, which is evaluated on global
+level, appended with every given arg and the text to split
+as last argument. This call must return a valid tcl list,
+which elements are tested..
+.PP
+The default in case no split type argument is given is
+\&\fIwhitespace\fR.
+.RE
 .SH Exampels
 .PP
 .UR "https://www.w3.org/TR/xmlschema-0/"
