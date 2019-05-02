@@ -4,18 +4,18 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x564bf296cb30">NAME</a> · <a href="#SECTid0x564bf296d160">SYNOPSIS</a> · <a href="#SECTid0x564bf29675d0">DESCRIPTION </a> · <a href="#SECTid0x564bf29c0fc0">Schema definition scripts</a> · <a href="#SECTid0x564bf29c92f0">Quantity specifier</a> · <a href="#SECTid0x564bf29cb180">Text constraint scripts</a> · <a href="#SECTid0x564bf29d1480">Exampels</a>
+<a href="#SECTid0x55d81f852b30">NAME</a> · <a href="#SECTid0x55d81f853160">SYNOPSIS</a> · <a href="#SECTid0x55d81f84d5d0">DESCRIPTION </a> · <a href="#SECTid0x55d81f8ab7e0">Schema definition scripts</a> · <a href="#SECTid0x55d81f8b3b10">Quantity specifier</a> · <a href="#SECTid0x55d81f8b59a0">Text constraint scripts</a> · <a href="#SECTid0x55d81f8bcfc0">Exampels</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x564bf296cb30">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x55d81f852b30">NAME</a></h2><p class="namesection">
 <b class="names">tdom::schema - </b><br>Create a schema validation command</p>
 
-  <h2><a name="SECTid0x564bf296d160">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x55d81f853160">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">tdom::schema</b> <i class="m">?create?</i> <i class="m">cmdName</i>
     </pre>
 
-  <h2><a name="SECTid0x564bf29675d0">DESCRIPTION </a></h2><p>This command creates validation commands with a simple API. The
+  <h2><a name="SECTid0x55d81f84d5d0">DESCRIPTION </a></h2><p>This command creates validation commands with a simple API. The
     validation commands have methods to define a schema and are able
     to validate XML or DOM trees (and to some degree other kind of
     hierarchical data) against this schema.</p><p>Additionally, a validation command may be used as argument to
@@ -169,7 +169,7 @@
 
     </dl>
 
-  <h2><a name="SECTid0x564bf29c0fc0">Schema definition scripts</a></h2><p>Schema definition scripts are ordinary Tcl scripts that are
+  <h2><a name="SECTid0x55d81f8ab7e0">Schema definition scripts</a></h2><p>Schema definition scripts are ordinary Tcl scripts that are
     evaluatend in the namespace tdom::schema. The below listed schema
     definition commands in this tcl namespace allow to define a wide
     variety of document structures. Every schema definition command
@@ -319,7 +319,7 @@
       
     </dl>
 
-  <h2><a name="SECTid0x564bf29c92f0">Quantity specifier</a></h2><p>Serveral schema definition commands expects a quantifier as
+  <h2><a name="SECTid0x55d81f8b3b10">Quantity specifier</a></h2><p>Serveral schema definition commands expects a quantifier as
     one of their arguments, which specifies how often the content
     particle specified by the command is expected. The valid values
     for a <i class="m">quant</i> argument are:</p><dl class="optlist">
@@ -364,7 +364,7 @@
     </dl><p>If an optional quantifier is not given then it defaults to * in
     case of the mixed command and to ! for all other commands.</p>
 
-  <h2><a name="SECTid0x564bf29cb180">Text constraint scripts</a></h2><p></p><p>The text constraint commands are:</p><dl class="commandlist">
+  <h2><a name="SECTid0x55d81f8b59a0">Text constraint scripts</a></h2><p></p><p>The text constraint commands are:</p><dl class="commandlist">
       
         <dt><b class="cmd">isint</b></dt>
         <dd></dd>
@@ -482,9 +482,33 @@
         in the evaluated <i class="m">constraint script&gt;</i> with the text to
         test striped of all white space at start and end.</dd>
       
+      
+        <dt>
+<b class="cmd">split</b> <i class="m">?type ?args??</i><i class="m">&lt;constraint script&gt;</i>
+</dt>
+        <dd>
+<p>This text constraint command splits the text to test
+        into a list of values and tests all elements of that list for
+        the text constraints in the evaluated <i class="m">constraint
+        script&gt;</i>.</p>
+        <p>The available types are:</p>
+        <dl>
+            <dt>whitespace</dt><dd>The text to split is striped of all
+            white space at start and end splited into a list at any
+            successive white space.</dd>
+            <dt>tcl tclcmd ?arg ...?</dt><dd>The text to split is
+            handed to the <i class="m">tclcmd</i>, which is evaluated on global
+            level, appended with every given arg and the text to split
+            as last argument. This call must return a valid tcl list,
+            which elements are tested..</dd>
+        </dl>
+        <p>The default in case no split type argument is given is
+        <i class="m">whitespace</i>.</p>
+</dd>
+      
     </dl>
   
-  <h2><a name="SECTid0x564bf29d1480">Exampels</a></h2><p>The XML Schema Part 0: Primer Second Edition
+  <h2><a name="SECTid0x55d81f8bcfc0">Exampels</a></h2><p>The XML Schema Part 0: Primer Second Edition
     (<a href="https://www.w3.org/TR/xmlschema-0/">https://www.w3.org/TR/xmlschema-0/</a>) starts with this
     example schema:</p><pre class="example">
 &lt;xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
