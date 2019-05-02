@@ -457,6 +457,8 @@ initSchemaData (
 
     sdata->cdata = TMALLOC (Tcl_DString);
     Tcl_DStringInit (sdata->cdata);
+    Tcl_InitHashTable (&sdata->ids, TCL_STRING_KEYS);
+    sdata->unknownIDrefs = 0;
     return sdata;
 }
 
@@ -515,6 +517,7 @@ static void schemaInstanceDelete (
     if (sdata->reportCmd) {
         Tcl_DecrRefCount (sdata->reportCmd);
     }
+    Tcl_DeleteHashTable (&sdata->ids);
     FREE (sdata);
 }
 
@@ -1548,8 +1551,25 @@ probeElementEnd (
     if (rc) {
         popStack (sdata);
         if (sdata->stack == NULL) {
-            /* End of the first pattern (the tree root) without error.
-               We have successfully ended validation */
+            /* End of the first pattern (the tree root) without error. */
+            /* Check for unknown ID references */
+            if (sdata->unknownIDrefs) {
+                Tcl_HashEntry *h;
+                Tcl_HashSearch search;
+                SetResult ("References to unknown IDs:");
+                for (h = Tcl_FirstHashEntry (&sdata->ids, &search);
+                     h != NULL;
+                     h = Tcl_NextHashEntry (&search)) {
+                    if (Tcl_GetHashValue (h) == 0) {
+                        Tcl_AppendResult (interp, " '",
+                                          Tcl_GetHashKey (&sdata->ids, h),
+                                          "'", NULL);
+                    }
+                }
+                sdata->validationState = VALIDATION_ERROR;
+                return TCL_ERROR;
+            }
+            /*  We have successfully ended validation */
             sdata->validationState = VALIDATION_FINISHED;
         }
         DBG(
@@ -2076,6 +2096,12 @@ schemaReset (
     sdata->validationState = VALIDATION_READY;
     sdata->skipDeep = 0;
     sdata->evalError = 0;
+    Tcl_DStringSetLength (sdata->cdata, 0);
+    if (sdata->ids.numEntries) {
+        Tcl_DeleteHashTable (&sdata->ids);
+        Tcl_InitHashTable (&sdata->ids, TCL_STRING_KEYS);
+        sdata->unknownIDrefs = 0;
+    }
 }
 
 static int
@@ -4313,6 +4339,91 @@ splitTCObjCmd (
     return TCL_OK;
 }
 
+static int
+idImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    SchemaData *sdata = (SchemaData *) constraintData;
+    int hnew;
+    Tcl_HashEntry *h;
+
+    h = Tcl_CreateHashEntry (&sdata->ids, text, &hnew);
+    if (hnew) {
+        Tcl_SetHashValue (h, 1);
+        return 1;
+    }
+    if (Tcl_GetHashValue (h) == 0) {
+        Tcl_SetHashValue (h, 1);
+        sdata->unknownIDrefs--;
+        return 1;
+    } else {
+        /* Duplicate ID value */
+        return 0;
+    }
+}
+
+static int
+idTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+
+    CHECK_TI
+    CHECK_TOPLEVEL
+    checkNrArgs (1,1,"no argument expected");
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = idImpl;
+    sc->constraintData = (void *)sdata;
+    return TCL_OK;
+}
+
+static int
+idrefImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    SchemaData *sdata = (SchemaData *) constraintData;
+    int hnew;
+    Tcl_HashEntry *h;
+
+    h = Tcl_CreateHashEntry (&sdata->ids, text, &hnew);
+    if (hnew) {
+        Tcl_SetHashValue (h, 0);
+        sdata->unknownIDrefs++;
+    }
+    return 1;
+}
+
+static int
+idrefTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+
+    CHECK_TI
+    CHECK_TOPLEVEL
+    checkNrArgs (1,1,"no argument expected");
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = idrefImpl;
+    sc->constraintData = (void *)sdata;
+    return TCL_OK;
+}
+
 void
 tDOM_SchemaInit (
     Tcl_Interp *interp
@@ -4400,6 +4511,10 @@ tDOM_SchemaInit (
                           stripTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::split",
                           splitTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::id",
+                          idTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::idref",
+                          idrefTCObjCmd, NULL, NULL);
 }
 
 

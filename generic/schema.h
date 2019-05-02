@@ -143,6 +143,8 @@ typedef struct
     ValidationState validationState;
     unsigned int skipDeep;
     Tcl_DString *cdata;
+    Tcl_HashTable ids;
+    int unknownIDrefs;
 } SchemaData;
 
 int 

@@ -418,7 +418,8 @@ The text constraint commands are:
 \&\fR
 .TP
 \&\fB\fBfixed\fP \fIvalue\fB
-\&\fR
+\&\fRThe text constraint only matches if the text value is
+string equal to the given value.
 .TP
 \&\fB\fBtcl\fP \fItclcmd\fB \fI?arg arg ...?\fB
 \&\fREvaluates the tcl script \fItclcmd arg arg ... \fR and
@@ -526,6 +527,18 @@ which elements are tested..
 The default in case no split type argument is given is
 \&\fIwhitespace\fR.
 .RE
+.TP
+\&\fB\fBid\fP
+\&\fRThis text constraint command marks the text as a
+document wide ID (to be referenced by an idref). Every ID
+value within a document must be unique. It isn't an error if
+the ID isn't actually referenced within the document.
+.TP
+\&\fB\fBidref\fP
+\&\fRThis text constraint command expects the text to be a
+reference to an ID within the document. The referenced ID may
+be later in the document, that the reference. Several
+references within the document to one ID are possible.
 .SH Exampels
 .PP
 .UR "https://www.w3.org/TR/xmlschema-0/"

@@ -3358,6 +3358,68 @@ test schema-14.24a {split} {
     set result
 } {1 1 0}
 
+test schema-14.25 {element content id/idref} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            interleave {
+                element id *
+                element idref *
+            }
+        }
+        defelement id {text id}
+        defelement idref {text idref}
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><id>abc</id></doc>
+        <doc><idref>abc</idref></doc>
+        <doc><id>abc</id><idref>abc</idref></doc>
+        <doc><idref>abc</idref><id>abc</id></doc>
+        <doc><idref>abc</idref><idref>abc</idref><id>abc</id></doc>
+        <doc><id>abc</id><idref>abc</idref><idref>abc</idref></doc>
+        {<doc><id>abc</id><idref>abc</idref><idref>ab c</idref></doc>}
+        <doc><id>abc</id><idref>abc</idref><id>abc</id></doc>
+        <doc><idref>abc</idref><idref>123</idref></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 1 0 1 1 1 1 0 0 0}
+
+test schema-14.26 {attribute id/idref} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            interleave {
+                element id *
+                element idref *
+            }
+        }
+        defelement id {attribute id id}
+        defelement idref {attribute idref idref}
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        {<doc><id id="abc"/></doc>}
+        {<doc><idref idref="abc"/></doc>}
+        {<doc><id id="abc"/><idref idref="abc"/></doc>}
+        {<doc><idref idref="abc"/><id id="abc"/></doc>}
+        {<doc><idref idref="abc"/><idref idref="abc"/><id id="abc"/></doc>}
+        {<doc><id id="abc"/><idref idref="abc"/><idref idref="abc"/></doc>}
+        {<doc><id id="abc"/><idref idref="abc"/><idref idref="ab c"/></doc>}
+        {<doc><id id="abc"/><idref idref="abc"/><id id="abc"/></doc>}
+        {<doc><idref idref="abc"/><idref idref="123"/></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 1 0 1 1 1 1 0 0 0}
+
 test schema-15.1 {constraint cmd tcl} {
     tdom::schema s
     s define {

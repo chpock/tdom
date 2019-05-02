@@ -4,18 +4,18 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x55d81f852b30">NAME</a> · <a href="#SECTid0x55d81f853160">SYNOPSIS</a> · <a href="#SECTid0x55d81f84d5d0">DESCRIPTION </a> · <a href="#SECTid0x55d81f8ab7e0">Schema definition scripts</a> · <a href="#SECTid0x55d81f8b3b10">Quantity specifier</a> · <a href="#SECTid0x55d81f8b59a0">Text constraint scripts</a> · <a href="#SECTid0x55d81f8bcfc0">Exampels</a>
+<a href="#SECTid0x5588b7db8b30">NAME</a> · <a href="#SECTid0x5588b7db9160">SYNOPSIS</a> · <a href="#SECTid0x5588b7db35d0">DESCRIPTION </a> · <a href="#SECTid0x5588b7e11e10">Schema definition scripts</a> · <a href="#SECTid0x5588b7e1a140">Quantity specifier</a> · <a href="#SECTid0x5588b7e1bfd0">Text constraint scripts</a> · <a href="#SECTid0x5588b7e23fe0">Exampels</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x55d81f852b30">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x5588b7db8b30">NAME</a></h2><p class="namesection">
 <b class="names">tdom::schema - </b><br>Create a schema validation command</p>
 
-  <h2><a name="SECTid0x55d81f853160">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x5588b7db9160">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">tdom::schema</b> <i class="m">?create?</i> <i class="m">cmdName</i>
     </pre>
 
-  <h2><a name="SECTid0x55d81f84d5d0">DESCRIPTION </a></h2><p>This command creates validation commands with a simple API. The
+  <h2><a name="SECTid0x5588b7db35d0">DESCRIPTION </a></h2><p>This command creates validation commands with a simple API. The
     validation commands have methods to define a schema and are able
     to validate XML or DOM trees (and to some degree other kind of
     hierarchical data) against this schema.</p><p>Additionally, a validation command may be used as argument to
@@ -169,7 +169,7 @@
 
     </dl>
 
-  <h2><a name="SECTid0x55d81f8ab7e0">Schema definition scripts</a></h2><p>Schema definition scripts are ordinary Tcl scripts that are
+  <h2><a name="SECTid0x5588b7e11e10">Schema definition scripts</a></h2><p>Schema definition scripts are ordinary Tcl scripts that are
     evaluatend in the namespace tdom::schema. The below listed schema
     definition commands in this tcl namespace allow to define a wide
     variety of document structures. Every schema definition command
@@ -319,7 +319,7 @@
       
     </dl>
 
-  <h2><a name="SECTid0x55d81f8b3b10">Quantity specifier</a></h2><p>Serveral schema definition commands expects a quantifier as
+  <h2><a name="SECTid0x5588b7e1a140">Quantity specifier</a></h2><p>Serveral schema definition commands expects a quantifier as
     one of their arguments, which specifies how often the content
     particle specified by the command is expected. The valid values
     for a <i class="m">quant</i> argument are:</p><dl class="optlist">
@@ -364,7 +364,7 @@
     </dl><p>If an optional quantifier is not given then it defaults to * in
     case of the mixed command and to ! for all other commands.</p>
 
-  <h2><a name="SECTid0x55d81f8b59a0">Text constraint scripts</a></h2><p></p><p>The text constraint commands are:</p><dl class="commandlist">
+  <h2><a name="SECTid0x5588b7e1bfd0">Text constraint scripts</a></h2><p></p><p>The text constraint commands are:</p><dl class="commandlist">
       
         <dt><b class="cmd">isint</b></dt>
         <dd></dd>
@@ -374,7 +374,8 @@
         <dt>
 <b class="cmd">fixed</b> <i class="m">value</i>
 </dt>
-        <dd></dd>
+        <dd>The text constraint only matches if the text value is
+        string equal to the given value.</dd>
       
       
       
@@ -506,9 +507,23 @@
         <i class="m">whitespace</i>.</p>
 </dd>
       
+      
+        <dt><b class="cmd">id</b></dt>
+        <dd>This text constraint command marks the text as a
+        document wide ID (to be referenced by an idref). Every ID
+        value within a document must be unique. It isn't an error if
+        the ID isn't actually referenced within the document.</dd>
+      
+      
+        <dt><b class="cmd">idref</b></dt>
+        <dd>This text constraint command expects the text to be a
+        reference to an ID within the document. The referenced ID may
+        be later in the document, that the reference. Several
+        references within the document to one ID are possible.</dd>
+      
     </dl>
   
-  <h2><a name="SECTid0x55d81f8bcfc0">Exampels</a></h2><p>The XML Schema Part 0: Primer Second Edition
+  <h2><a name="SECTid0x5588b7e23fe0">Exampels</a></h2><p>The XML Schema Part 0: Primer Second Edition
     (<a href="https://www.w3.org/TR/xmlschema-0/">https://www.w3.org/TR/xmlschema-0/</a>) starts with this
     example schema:</p><pre class="example">
 &lt;xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;

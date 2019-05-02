@@ -357,7 +357,8 @@
 
       <commanddef>
         <command><cmd>fixed</cmd> <m>value</m></command>
-        <desc></desc>
+        <desc>The text constraint only matches if the text value is
+        string equal to the given value.</desc>
       </commanddef>
       
       <commanddef>
@@ -464,6 +465,20 @@
         </dl>
         <p>The default in case no split type argument is given is
         <m>whitespace</m>.</p></desc>
+      </commanddef>
+      <commanddef>
+        <command><cmd>id</cmd></command>
+        <desc>This text constraint command marks the text as a
+        document wide ID (to be referenced by an idref). Every ID
+        value within a document must be unique. It isn't an error if
+        the ID isn't actually referenced within the document.</desc>
+      </commanddef>
+      <commanddef>
+        <command><cmd>idref</cmd></command>
+        <desc>This text constraint command expects the text to be a
+        reference to an ID within the document. The referenced ID may
+        be later in the document, that the reference. Several
+        references within the document to one ID are possible.</desc>
       </commanddef>
     </commandlist>
   </section>

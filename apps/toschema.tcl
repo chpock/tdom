@@ -156,9 +156,6 @@ proc fromDTD_generate {} {
                 continue
             }
             switch $type {
-                "ID" -
-                "IDREF" -
-                "IDREFS" -
                 "ENTITY" -
                 "ENTITIES" -
                 "NOTATION" {
@@ -167,6 +164,15 @@ proc fromDTD_generate {} {
                 }
                 "NMTOKEN" {
                     puts "[indent]$cmd [expr {$isRequired ? "" : "?"}] \{nmtoken\}"
+                }
+                "ID" {
+                    puts "[indent]$cmd [expr {$isRequired ? "" : "?"}] \{nmtoken;id\}"
+                }
+                "IDREF" {
+                    puts "[indent]$cmd [expr {$isRequired ? "" : "?"}] \{idref\}"
+                }
+                "IDREFS" {
+                    puts "[indent]$cmd [expr {$isRequired ? "" : "?"}] \{split \{idref\}\}"
                 }
                 "NMTOKENS" {
                     puts "[indent]$cmd [expr {$isRequired ? "" : "?"}] \{nmtokens\}"
