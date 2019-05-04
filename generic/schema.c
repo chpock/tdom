@@ -25,6 +25,7 @@
 
 #include <tdom.h>
 #include <tcldom.h>
+#include <domxpath.h>
 #include <schema.h>
 
 /* #define DEBUG */
@@ -3314,6 +3315,82 @@ VirtualPatternObjCmd (
     return TCL_OK;
 }
 
+extern void printAst (int depth, ast t);
+static int
+processSchemaXPath (
+    Tcl_Interp *interp,
+    ast t,
+    int field
+    )
+{
+    while (t) {
+        switch (t->type) {
+        case IsElement:
+        case IsFQElement:
+        case IsNSElement:
+        case EvalSteps:
+        case CombineSets:
+            /* Only on top level? */
+        case AxisAttribute:
+        case AxisChild:
+        case AxisDescendant:
+        case GetContextNode:
+        case AxisSelf:
+        case IsNSAttr:
+        case IsAttr:
+            break;
+        default:
+            SetResult ("Not a reduced XPath expression.");
+            printAst (0, t);
+            return TCL_ERROR;
+        }
+        if (!field && (t->type == IsAttr || t->type == IsNSAttr)) {
+            SetResult ("Attribute selection is only possible in reduced "
+                       "XPath expression for field selectors.");
+            return TCL_ERROR;
+        }
+        if (t->child) {
+            if (processSchemaXPath (interp, t->child, field) != TCL_OK) {
+                return TCL_ERROR;
+            }
+        }
+        t = t->next;
+    }
+    return TCL_OK;
+    
+}
+
+static int
+uniquePatternCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    ast s, f;
+    char *errMsg = NULL;
+
+    CHECK_SI
+    CHECK_TOPLEVEL
+    checkNrArgs (3,3,"Expected: <selector> <fieldlist>");
+
+    if (xpathParse (Tcl_GetString (objv[1]), NULL, XPATH_EXPR,
+                    NULL, NULL, &s, &errMsg) < 0) {
+        SetResult3 ("Error in selector xpath: '", errMsg, "");
+        FREE (errMsg);
+        return TCL_ERROR;
+    }
+    if (processSchemaXPath (interp, s, 0) != TCL_OK) {
+        xpathFreeAst (s);
+        return TCL_ERROR;
+    }
+    printAst (0, s);
+    
+    return TCL_OK;
+}
+
 static int
 integerImpl (
     Tcl_Interp *interp,
@@ -4475,7 +4552,11 @@ tDOM_SchemaInit (
     /* The 'virtual' "tcl" definition command */
     Tcl_CreateObjCommand (interp, "tdom::schema::tcl",
                           VirtualPatternObjCmd, NULL, NULL);
-    
+
+    /* Identity definition commands */
+    Tcl_CreateObjCommand (interp,"tdom::schema::unique",
+                          uniquePatternCmd, NULL, NULL);
+
     /* The text constraint commands */
     Tcl_CreateObjCommand (interp,"tdom::schema::text::integer",
                           integerTCObjCmd, NULL, NULL);

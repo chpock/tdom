@@ -651,9 +651,11 @@ domLookupPrefixWithMappings (
             i += 2;
         }
     }
-    ns = domLookupPrefix (node, prefix);
-    if (ns) return ns->uri;
-    else    return NULL;
+    if (node) {
+        ns = domLookupPrefix (node, prefix);
+        if (ns) return ns->uri;
+    }
+    return NULL;
 }
 
 /*---------------------------------------------------------------------------

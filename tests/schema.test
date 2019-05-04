@@ -4125,5 +4125,59 @@ proc postValidation {g xml} {
     return $rc
 }
 
+test schema-19.1 {unique} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element a *
+            element b *
+            unique a @ref
+        }
+        defelement a {
+            attribute ref
+        }
+        defelement b {
+            attribute ref ?
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><b/></doc>
+        <doc><a/></doc>
+        {<doc><a ref="1"/><a ref="foo"/></doc>}
+    } {
+        lappend result [s validate $xml errMsg]
+        puts $errMsg
+    }
+    s delete
+    set result
+} {1 1 0 1}
+
+
+test schema-19.2 {unique} {
+    set schema {
+        defelement doc {
+            unique {${::schema-19.2}} @ref
+        }
+    }
+    set result [list]
+    foreach selector {
+        a
+        ./../a
+        /foo
+        a/b
+        {a | b}
+        a|b
+        .//a
+    } {
+        set ::schema-19.2 $selector
+        tdom::schema s
+        lappend result [catch {s define [subst $schema]} errMsg]
+        puts $errMsg
+        s delete
+    }
+    set result
+} {0 1 1 0 0 0}
 
 }
