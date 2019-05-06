@@ -480,6 +480,11 @@
         be later in the document, that the reference. Several
         references within the document to one ID are possible.</desc>
       </commanddef>
+      <commanddef>
+        <command><cmd>base64</cmd></command>
+        <desc>This text constraint match if text is valid according to
+        RFC 4648RFC 4648.</desc>
+      </commanddef>
     </commandlist>
   </section>
   

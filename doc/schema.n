@@ -539,6 +539,10 @@ the ID isn't actually referenced within the document.
 reference to an ID within the document. The referenced ID may
 be later in the document, that the reference. Several
 references within the document to one ID are possible.
+.TP
+\&\fB\fBbase64\fP
+\&\fRThis text constraint match if text is valid according to
+RFC 4648RFC 4648.
 .SH Exampels
 .PP
 .UR "https://www.w3.org/TR/xmlschema-0/"

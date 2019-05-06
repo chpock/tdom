@@ -4424,6 +4424,64 @@ idrefTCObjCmd (
     return TCL_OK;
 }
 
+static int
+base64Impl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    int chars = 0, equals = 0;
+    
+    while (*text != '\0') {
+        if (SPACE(*text)) {
+            text++;
+            continue;
+        }
+        if (   (*text >= 'A' && *text <= 'Z')
+            || (*text >= 'a' && *text <= 'z')
+            || (*text >= '0' && *text <= '9')
+            || (*text = '+')
+            || (*text = '/')) {
+            chars++;
+            text++;
+            continue;
+        }
+        if (equals < 2 && *text == '=') {
+            equals++;
+            text++;
+            continue;
+        }
+        break;
+    }
+    if (*text) {
+        return 0;
+    }
+    if ((chars + equals) % 4 != 0) {
+        return 0;
+    }
+    return 1;
+}
+
+static int
+base64TCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+
+    CHECK_TI
+    CHECK_TOPLEVEL
+    checkNrArgs (1,1,"No arguments expected");
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = base64Impl;
+    return TCL_OK;
+}
+
 void
 tDOM_SchemaInit (
     Tcl_Interp *interp
@@ -4515,6 +4573,8 @@ tDOM_SchemaInit (
                           idTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::idref",
                           idrefTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::base64",
+                          base64TCObjCmd, NULL, NULL);
 }
 
 

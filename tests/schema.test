@@ -3420,6 +3420,30 @@ test schema-14.26 {attribute id/idref} {
     set result
 } {1 1 0 1 1 1 1 0 0 0}
 
+test schema-14.27 {base64} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            text base64
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        {<doc>ZVL1</doc>}        
+        {<doc>zvL1</doc>}        
+        {<doc>zvü1</doc>}        
+        {<doc>0a BED   E+9</doc>}        
+        {<doc>ub1sU3==</doc>}        
+        {<doc>abc</doc>}        
+        {<doc>===</doc>}        
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 1 1 0 1 1 0 0}
+
 test schema-15.1 {constraint cmd tcl} {
     tdom::schema s
     s define {
