@@ -4170,14 +4170,19 @@ test schema-19.2 {unique} {
         {a | b}
         a|b
         .//a
+        //a
+        a/@ref
+        a/b/c
+        a//b/c
+        (.//b|a)/c
     } {
         set ::schema-19.2 $selector
         tdom::schema s
         lappend result [catch {s define [subst $schema]} errMsg]
-        puts $errMsg
+        #puts $errMsg
         s delete
     }
     set result
-} {0 1 1 0 0 0}
+} {0 1 1 0 0 0 0 1 1 0 1 1}
 
 }

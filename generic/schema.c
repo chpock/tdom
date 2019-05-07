@@ -3320,44 +3320,70 @@ static int
 processSchemaXPath (
     Tcl_Interp *interp,
     ast t,
-    int field
+    int field,
+    int toplevel
     )
 {
+    ast child;
+    
     while (t) {
         switch (t->type) {
+        case GetContextNode:
+            if (!toplevel) {
+                SetResult ("Not a reduced XPath expression.");
+                return TCL_ERROR;
+            }
+            t = t->next;
+            continue;
+        case CombineSets:
+            /* Only on top level? */
+            if (!toplevel) {
+                SetResult ("Not a reduced XPath expression.");
+                return TCL_ERROR;
+            }
+            for (child = t->child; child != NULL; child = child->next) {
+                if (processSchemaXPath (interp, child, field, 0) != TCL_OK) {
+                    return TCL_ERROR;
+                }
+            }
+            break;
+        case AxisDescendant:
+            if (!toplevel) {
+                SetResult ("Not a reduced XPath expression.");
+                return TCL_ERROR;
+            }
+            break;
         case IsElement:
         case IsFQElement:
         case IsNSElement:
-        case EvalSteps:
-        case CombineSets:
-            /* Only on top level? */
-        case AxisAttribute:
         case AxisChild:
-        case AxisDescendant:
-        case GetContextNode:
-        case AxisSelf:
+            break;
+        case AxisAttribute:
         case IsNSAttr:
         case IsAttr:
+            if (!field) {
+                SetResult ("Attribute selection is only possible in reduced "
+                           "XPath expression for field selectors.");
+                return TCL_ERROR;
+            }
+            if (t->type == AxisAttribute) {
+                break;
+            }
             break;
         default:
             SetResult ("Not a reduced XPath expression.");
-            printAst (0, t);
-            return TCL_ERROR;
-        }
-        if (!field && (t->type == IsAttr || t->type == IsNSAttr)) {
-            SetResult ("Attribute selection is only possible in reduced "
-                       "XPath expression for field selectors.");
             return TCL_ERROR;
         }
         if (t->child) {
-            if (processSchemaXPath (interp, t->child, field) != TCL_OK) {
+            if (processSchemaXPath (interp, t->child, field, 0) != TCL_OK) {
                 return TCL_ERROR;
             }
         }
+        toplevel = 0;
         t = t->next;
     }
+    /* printAst (0, t); */
     return TCL_OK;
-    
 }
 
 static int
@@ -3382,12 +3408,12 @@ uniquePatternCmd (
         FREE (errMsg);
         return TCL_ERROR;
     }
-    if (processSchemaXPath (interp, s, 0) != TCL_OK) {
+    if (processSchemaXPath (interp, s, 0, 1) != TCL_OK) {
         xpathFreeAst (s);
         return TCL_ERROR;
     }
-    printAst (0, s);
     
+    xpathFreeAst (s);
     return TCL_OK;
 }
 

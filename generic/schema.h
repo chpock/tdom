@@ -72,6 +72,13 @@ typedef unsigned int SchemaFlags;
 #define CONSTRAINT_TEXT_CHILD  16
 #define MIXED_CONTENT          32 
 
+typedef struct keyConstraint {
+    char           *name;
+    char           *ns;
+    struct keyConstraint *child;
+    struct keyConstraint *next;
+} keyConstraint;
+
 typedef struct SchemaCP
 {
     Schema_CP_Type    type;
@@ -85,6 +92,7 @@ typedef struct SchemaCP
     SchemaAttr      **attrs;
     unsigned int      numAttr;
     unsigned int      numReqAttr;
+    keyConstraint    *localkeys;
 } SchemaCP;
 
 typedef struct SchemaValidationStack
@@ -96,6 +104,8 @@ typedef struct SchemaValidationStack
     int               hasMatched;
     int              *interleaveState;
 } SchemaValidationStack;
+
+typedef keyConstraint *key;
 
 typedef enum {
     VALIDATION_READY,
