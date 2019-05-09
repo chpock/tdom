@@ -3326,6 +3326,7 @@ processSchemaXPath (
 {
     ast child;
     
+    printAst (0, t);
     while (t) {
         switch (t->type) {
         case GetContextNode:
@@ -3336,7 +3337,6 @@ processSchemaXPath (
             t = t->next;
             continue;
         case CombineSets:
-            /* Only on top level? */
             if (!toplevel) {
                 SetResult ("Not a reduced XPath expression.");
                 return TCL_ERROR;
@@ -3382,7 +3382,6 @@ processSchemaXPath (
         toplevel = 0;
         t = t->next;
     }
-    /* printAst (0, t); */
     return TCL_OK;
 }
 

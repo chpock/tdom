@@ -4169,6 +4169,7 @@ test schema-19.2 {unique} {
         a/b
         {a | b}
         a|b
+        (a|b)
         .//a
         //a
         a/@ref
@@ -4183,6 +4184,6 @@ test schema-19.2 {unique} {
         s delete
     }
     set result
-} {0 1 1 0 0 0 0 1 1 0 1 1}
+} {0 1 1 0 0 0 1 0 1 1 0 1 1}
 
 }
