@@ -181,6 +181,19 @@ test dom-1.24 {Explicit delete of scoped doc} {
     set result
 } {1 {can't set "doc": var is read-only}}
 
+test dom-1.25 {Doc var} {
+    dom parse <test/> doc
+    dom parse <test/> doc
+    unset doc
+} {}
+
+test dom-1.26 {Doc var} {
+    dom parse <test/> doc
+    set result [catch {$doc documentElement doc}]
+    unset doc
+    set result
+} {1}
+
 test dom-2.1 {Don't quash white space at start or end of non white space content} {
     set doc [dom parse {<root>
     some content

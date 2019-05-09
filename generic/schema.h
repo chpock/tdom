@@ -105,8 +105,6 @@ typedef struct SchemaValidationStack
     int              *interleaveState;
 } SchemaValidationStack;
 
-typedef keyConstraint *key;
-
 typedef enum {
     VALIDATION_READY,
     VALIDATION_STARTED,
