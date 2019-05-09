@@ -52,6 +52,8 @@ int  tcldom_nameCheck(Tcl_Interp *interp, char *name, char *nameType,
 void tcldom_createNodeObj(Tcl_Interp * interp, domNode *node,
                           char *objCmdName);
 
+int tcldom_prefixNSlist (char ***prefixnsPtr, Tcl_Interp *interp, int objc,
+                         Tcl_Obj *const objv[], const char *methodName);
 
 void tcldom_initialize(void);
 
