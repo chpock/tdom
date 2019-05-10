@@ -183,6 +183,20 @@ otherwise do.
 .PP
 The valid methods of the created commands are:
 .TP
+\&\fB\fBprefixns\fP \fI?prefixUriList?\fB
+\&\fRThis method gives control to a prefix (or
+abbreviation) to namespace URI mapping. Everywhere a
+namespace argument is expected in the schema command methods
+you may use the "prefix" pointing to the namespace
+URI in the current prefixUriList, set by this method. If the
+list map the same prefix to different namespace URIs the
+last won win. If there isn't such a prefix the namespace
+argument is used literally as namespace URI. If the method
+is called without argument it returns the current
+prefixUriList. If the method is called with the empty list
+any namespace URI arguments are used literally. This is the
+default.
+.TP
 \&\fB\fBdefelement\fP \fIname\fB \fI?namespace?\fB \fI<definition script>\fB
 \&\fRThis method defines the element \fIname\fR (optional in
 the namespace \fInamespace\fR) in the schema. The
@@ -542,7 +556,7 @@ references within the document to one ID are possible.
 .TP
 \&\fB\fBbase64\fP
 \&\fRThis text constraint match if text is valid according to
-RFC 4648RFC 4648.
+RFC 4648.
 .SH Exampels
 .PP
 .UR "https://www.w3.org/TR/xmlschema-0/"

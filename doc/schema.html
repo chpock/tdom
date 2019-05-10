@@ -4,24 +4,44 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x5563b3e4fb10">NAME</a> · <a href="#SECTid0x5563b3e50170">SYNOPSIS</a> · <a href="#SECTid0x5563b3e4a5f0">DESCRIPTION </a> · <a href="#SECTid0x5563b3ea8fc0">Schema definition scripts</a> · <a href="#SECTid0x5563b3eb12f0">Quantity specifier</a> · <a href="#SECTid0x5563b3eb3180">Text constraint scripts</a> · <a href="#SECTid0x5563b3ebb590">Exampels</a>
+<a href="#SECTid0x55dce5c8db10">NAME</a> · <a href="#SECTid0x55dce5c8e170">SYNOPSIS</a> · <a href="#SECTid0x55dce5c885f0">DESCRIPTION </a> · <a href="#SECTid0x55dce5ce7e60">Schema definition scripts</a> · <a href="#SECTid0x55dce5cf0190">Quantity specifier</a> · <a href="#SECTid0x55dce5cf2020">Text constraint scripts</a> · <a href="#SECTid0x55dce5cfa430">Exampels</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x5563b3e4fb10">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x55dce5c8db10">NAME</a></h2><p class="namesection">
 <b class="names">tdom::schema - </b><br>Create a schema validation command</p>
 
-  <h2><a name="SECTid0x5563b3e50170">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x55dce5c8e170">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">tdom::schema</b> <i class="m">?create?</i> <i class="m">cmdName</i>
     </pre>
 
-  <h2><a name="SECTid0x5563b3e4a5f0">DESCRIPTION </a></h2><p>This command creates validation commands with a simple API. The
+  <h2><a name="SECTid0x55dce5c885f0">DESCRIPTION </a></h2><p>This command creates validation commands with a simple API. The
     validation commands have methods to define a schema and are able
     to validate XML or DOM trees (and to some degree other kind of
     hierarchical data) against this schema.</p><p>Additionally, a validation command may be used as argument to
     the <i class="m">-validateCmd</i> option of the <i class="m">dom parse</i> and the
     <i class="m">expat</i> commands to enable validation additional to what they
     otherwise do.</p><p>The valid methods of the created commands are:</p><dl class="commandlist">
+      
+          <dt>
+<b class="method">prefixns</b> <i class="m">?prefixUriList?</i>
+</dt>
+
+          <dd>This method gives control to a prefix (or
+          abbreviation) to namespace URI mapping. Everywhere a
+          namespace argument is expected in the schema command methods
+          you may use the "prefix" pointing to the namespace
+          URI in the current prefixUriList, set by this method. If the
+          list map the same prefix to different namespace URIs the
+          last won win. If there isn't such a prefix the namespace
+          argument is used literally as namespace URI. If the method
+          is called without argument it returns the current
+          prefixUriList. If the method is called with the empty list
+          any namespace URI arguments are used literally. This is the
+          default.
+          </dd>
+      
+
       
         <dt>
 <b class="method">defelement</b> <i class="m">name</i> <i class="m">?namespace?</i> <i class="m">&lt;definition script&gt;</i>
@@ -169,7 +189,7 @@
 
     </dl>
 
-  <h2><a name="SECTid0x5563b3ea8fc0">Schema definition scripts</a></h2><p>Schema definition scripts are ordinary Tcl scripts that are
+  <h2><a name="SECTid0x55dce5ce7e60">Schema definition scripts</a></h2><p>Schema definition scripts are ordinary Tcl scripts that are
     evaluatend in the namespace tdom::schema. The below listed schema
     definition commands in this tcl namespace allow to define a wide
     variety of document structures. Every schema definition command
@@ -319,7 +339,7 @@
       
     </dl>
 
-  <h2><a name="SECTid0x5563b3eb12f0">Quantity specifier</a></h2><p>Serveral schema definition commands expects a quantifier as
+  <h2><a name="SECTid0x55dce5cf0190">Quantity specifier</a></h2><p>Serveral schema definition commands expects a quantifier as
     one of their arguments, which specifies how often the content
     particle specified by the command is expected. The valid values
     for a <i class="m">quant</i> argument are:</p><dl class="optlist">
@@ -364,7 +384,7 @@
     </dl><p>If an optional quantifier is not given then it defaults to * in
     case of the mixed command and to ! for all other commands.</p>
 
-  <h2><a name="SECTid0x5563b3eb3180">Text constraint scripts</a></h2><p></p><p>The text constraint commands are:</p><dl class="commandlist">
+  <h2><a name="SECTid0x55dce5cf2020">Text constraint scripts</a></h2><p></p><p>The text constraint commands are:</p><dl class="commandlist">
       
         <dt><b class="cmd">isint</b></dt>
         <dd></dd>
@@ -524,11 +544,11 @@
       
         <dt><b class="cmd">base64</b></dt>
         <dd>This text constraint match if text is valid according to
-        RFC 4648RFC 4648.</dd>
+        RFC 4648.</dd>
       
     </dl>
   
-  <h2><a name="SECTid0x5563b3ebb590">Exampels</a></h2><p>The XML Schema Part 0: Primer Second Edition
+  <h2><a name="SECTid0x55dce5cfa430">Exampels</a></h2><p>The XML Schema Part 0: Primer Second Edition
     (<a href="https://www.w3.org/TR/xmlschema-0/">https://www.w3.org/TR/xmlschema-0/</a>) starts with this
     example schema:</p><pre class="example">
 &lt;xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
