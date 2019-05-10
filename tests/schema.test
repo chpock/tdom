@@ -394,7 +394,7 @@ test schema-1.21 {Create other schema cmd in definition script} {
     set result
 } {s1 s2 1 0 0 1}
 
-test schema-1.22 {Call not toplevel cmd methods in definition script} {
+test schema-1.22 {nrForwardDefinitions} {
     tdom::schema create s
     set result [list]
     s define {
@@ -415,6 +415,186 @@ test schema-1.22 {Call not toplevel cmd methods in definition script} {
     s delete
     set result
 } {0 1 1 2 1 0}
+
+test schema-1.23 {prefixns} {
+    tdom::schema create s
+    set result [list]
+    lappend result [s prefixns]
+    lappend result [s prefixns {a b}]
+    lappend result [s prefixns]
+    lappend result [s prefixns {a b a b c d}]
+    lappend result [s prefixns {}]
+    lappend result [s prefixns ""]
+    lappend result [catch {s prefixns a b c} errMsg]
+    lappend result $errMsg
+    lappend result [catch {s prefixns {a b c}} errMsg]
+    lappend result $errMsg
+    lappend result [catch {s prefixns "a \{"} errMsg]
+    lappend result $errMsg
+    s delete
+    set result
+} {{} {a b} {a b} {a b a b c d} {} {} 1 {wrong # args: should be "s prefixns ?prefixUriList?"} 1 {The optional argument to prefixns must be a 'prefix namespace' pairs list} 1 {The optional argument to prefixns must be a 'prefix namespace' pairs list}}
+
+test schema-1.24 {prefixns} {
+    tdom::schema create s
+    set result [list]
+    lappend result [s define prefixns]
+    lappend result [s define {prefixns {a b}}]
+    lappend result [s define {prefixns}]
+    lappend result [s define {prefixns {a b a b c d}}]
+    lappend result [s define {prefixns {}}]
+    lappend result [s define {prefixns ""}]
+    lappend result [catch {s define {prefixns a b c}} errMsg]
+    lappend result $errMsg
+    lappend result [catch {s define {prefixns {a b c}}} errMsg]
+    lappend result $errMsg
+    lappend result [catch {s define {prefixns "a \{"}} errMsg]
+    lappend result $errMsg
+    s delete
+    set result
+} {{} {a b} {a b} {a b a b c d} {} {} 1 {wrong # args: should be "prefixns ?prefixUriList?"} 1 {The optional argument to prefixns must be a 'prefix namespace' pairs list} 1 {The optional argument to prefixns must be a 'prefix namespace' pairs list}}
+
+test schema-1.25 {prefixns} {
+    set result [list]
+    set schema {
+        defelement doc ns1 {
+            element e
+        }
+    }
+    set xml {<doc xmlns="http://tdom.org/test"><e/></doc>}
+    # 1
+    tdom::schema create s
+    s define $schema
+    lappend result [s validate $xml]
+    s delete
+    # 2
+    tdom::schema create s
+    s prefixns {ns1 http://tdom.org/test}
+    s define $schema
+    lappend result [s validate $xml]
+    s delete
+    # 3
+    tdom::schema create s
+    s prefixns {ns1 http://foo.bar}
+    s define $schema
+    lappend result [s validate $xml]
+    s delete
+    # 4
+    tdom::schema create s
+    s prefixns {ns1 http://tdom.org/test ns1 http://foo.bar}
+    s define $schema
+    lappend result [s validate $xml]
+    s delete
+    # 5
+    tdom::schema create s
+    s prefixns {ns1 http://foo.bar ns1 http://tdom.org/test}
+    s define $schema
+    lappend result [s validate $xml]
+    s delete
+    # 6
+    tdom::schema create s
+    s prefixns {ns1 http://foo.bar}
+    s prefixns {ns1 http://tdom.org/test ns1 http://foo.bar}
+    s define $schema
+    lappend result [s validate $xml]
+    s delete
+    # 7
+    tdom::schema create s
+    s define {
+        prefixns {ns1 http://tdom.org/test}
+        defelement doc ns1 {
+            element e
+        }
+        prefixns {ns2 http://foo.bar}
+        defelement e ns2 {text {minLength 1}}
+    }
+    lappend result [s validate $xml]
+    s delete
+    # 8
+    tdom::schema create s
+    s define {
+        prefixns {ns1 http://tdom.org/test}
+        defelement doc ns1 {
+            namespace http://foo.bar {
+                element e 
+            }
+        }
+        prefixns {ns2 http://foo.bar}
+        defelement e ns2 {text {minLength 1}}
+    }
+    lappend result [s validate $xml]
+    # 9
+    lappend result [s validate {<doc xmlns="http://tdom.org/test"><e xmlns="http://foo.bar"/></doc>}]
+    # 10
+    lappend result [s validate {<doc xmlns="http://tdom.org/test"><e xmlns="http://foo.bar">foo</e></doc>}]
+    s delete
+    # 11 
+    tdom::schema create s
+    s define {
+        prefixns {ns1 http://tdom.org/test ns2 http://foo.bar}
+        defelement doc ns1 {
+            namespace ns2 {
+                element e 
+            }
+        }
+        prefixns {ns2 http://foo.bar}
+        defelement e ns2 {text {minLength 1}}
+    }
+    lappend result [s validate $xml]
+    # 12
+    lappend result [s validate {<doc xmlns="http://tdom.org/test"><e xmlns="http://foo.bar"/></doc>}]
+    # 13
+    lappend result [s validate {<doc xmlns="http://tdom.org/test"><e xmlns="http://foo.bar">foo</e></doc>}]
+    s delete
+    set result
+} {0 1 0 1 0 1 1 0 0 1 0 0 1}
+
+test schema-1.26 {prefixns} {
+    tdom::schema create s
+    set result [list]
+    lappend result [catch {
+        s defelement doc {
+            prefixns {a http://foo.bar}
+            namespace a {
+                element e
+            }
+        }
+    } errMsg]
+    lappend result $errMsg
+    lappend result [catch {
+        s defelement doc {
+            namespace a {
+                element e
+            }
+            prefixns {a http://foo.bar}
+        }
+    } errMsg]
+    lappend result $errMsg
+    lappend result [catch {
+        s define {
+            defelement doc {
+                prefixns {a http://foo.bar}
+                namespace a {
+                    element e
+                }
+            }
+        }
+    } errMsg]
+    lappend result $errMsg
+    lappend result [catch {
+        s define {
+            defelement doc {
+                s prefixns {a http://foo.bar}
+                namespace a {
+                    element e
+                }
+            }
+        }
+    } errMsg]
+    lappend result $errMsg
+    s delete
+    set result
+} {1 {Command only allowed at lop level} 1 {Command only allowed at lop level} 1 {Method not allowed in nested schema define script} 1 {This recursive call is not allowed}}
 
 test schema-2.1 {grammar definition: ref} {
     tdom::schema create grammar
@@ -3290,6 +3470,47 @@ test schema-14.20 {deftext} {
                 maxLength 4
             }
             nsattribute foo http://tdom.org/test ? type len2-4
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc><e/></doc>
+        {<doc xmlns:ns1="http://tdom.org/test"><e ns1:foo="bar"/></doc>}
+        {<doc xmlns:ns1="http://tdom.org/test"><e ns1:this="bar"/></doc>}
+        {<doc xmlns:ns1="http://tdom.org/test"><e ns1:this=""/></doc>}
+        {<doc xmlns:ns1="http://tdom.org/test"><e ns1:this="12" ns1:foo="bar"/></doc>}
+        {<doc xmlns:ns1="http://tdom.org/test"><e ns1:this="12" ns1:foo="b"/></doc>}
+        {<doc xmlns:ns1="http://tdom.org/test"><e ns1:this="1234"/></doc>}
+        {<doc xmlns:ns1="http://tdom.org/test"><e ns1:this="12345"/></doc>}
+        {<doc xmlns:ns1="http://tdom.org/test"><e ns1:this="12345alkajsdlfjkals" ns1:and="this"/></doc>}
+        {<doc xmlns:ns1="http://tdom.org/test"><e ns1:and="this" ns1:this="12345alkajsdlfjkals"/></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 1 0 1 0 1 0 0 0}
+
+test schema-14.20a {deftext} {
+    tdom::schema s
+    s deftext len2-4 {
+        minLength 2
+        maxLength 4
+    }
+    s define {
+        prefixns {
+            ns2 http://tdom.org/test
+            nsfoo http://foo.bar
+            ns2 http://baz.boo
+        }
+        defelement doc {
+            element e ! {
+                nsattribute this ns2 {
+                    minLength 2
+                    maxLength 4
+                }
+                nsattribute foo ns2 ? type len2-4
+            }
         }
     }
     set result [list]

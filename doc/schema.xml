@@ -30,17 +30,16 @@
     <commandlist>
       <commanddef>
           <command><method>prefixns</method> <m>?prefixUriList?</m></command>
-
           <desc>This method gives control to a prefix (or
           abbreviation) to namespace URI mapping. Everywhere a
           namespace argument is expected in the schema command methods
           you may use the &quot;prefix&quot; pointing to the namespace
           URI in the current prefixUriList, set by this method. If the
           list map the same prefix to different namespace URIs the
-          last won win. If there isn't such a prefix the namespace
+          frist one win. If there isn't such a prefix the namespace
           argument is used literally as namespace URI. If the method
           is called without argument it returns the current
-          prefixUriList. If the method is called with the empty list
+          prefixUriList. If the method is called with the empty string
           any namespace URI arguments are used literally. This is the
           default.
           </desc>
@@ -277,6 +276,15 @@
         <desc>Evaluates the <m>definition script</m> with context namespace <m>uri</m>. Every element or ref command name will be looked up in the namespace <m>uri</m> and local defined element will be in that namespace.</desc>
       </commanddef>
       
+      <commanddef>
+        <command><method>prefixns</method> <m>?prefixUriList?</m></command>
+        <desc>This defines a prefix to namespace URI mapping exactly
+        as a <i>schemacmd prefixns</i> call. This is meant as toplevel
+        command of a <i>schemacmd define</i> script. This command is
+        not allowed nested in an other definition script command and
+        will raise error, if you call it there.</desc>
+      </commanddef>
+
       <commanddef>
         <command><method>defelement</method> <m>name</m> <m>?namespace?</m> <m>&lt;definition script></m></command>
         <desc>This defines an element type exactly as a <i>schemacmd

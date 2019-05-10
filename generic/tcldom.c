@@ -3960,9 +3960,8 @@ int tcldom_prefixNSlist (
     int      len, i, result;
     Tcl_Obj *objPtr, *listPtr;
 
-    CheckArgs (2,3,2, "?prefixUriList?");
     i = 0;
-    if (objc == 2) {
+    if (objc == 1) {
         if (!prefixns) return TCL_OK;
         listPtr = Tcl_NewListObj (0, NULL);
         i = 0;
@@ -3975,10 +3974,10 @@ int tcldom_prefixNSlist (
         Tcl_SetObjResult (interp, listPtr);
         return TCL_OK;
     }
-    result = Tcl_ListObjLength (interp, objv[2], &len);
+    result = Tcl_ListObjLength (interp, objv[1], &len);
     if (result != TCL_OK || (len % 2) != 0) {
-        SetResult3 ("The optional argument to the ", methodName, 
-                   " method must be a 'prefix namespace' pairs list");
+        SetResult3 ("The optional argument to ", methodName, 
+                   " must be a 'prefix namespace' pairs list");
         return TCL_ERROR;
     }
     if (prefixns) {
@@ -3998,11 +3997,11 @@ int tcldom_prefixNSlist (
         *prefixnsPtr = prefixns;
     }
     for (i = 0; i < len; i++) {
-        Tcl_ListObjIndex (interp, objv[2], i, &objPtr);
+        Tcl_ListObjIndex (interp, objv[1], i, &objPtr);
         prefixns[i] = tdomstrdup (Tcl_GetString (objPtr));
     }
     prefixns[len] = NULL;
-    Tcl_SetObjResult (interp, objv[2]);
+    Tcl_SetObjResult (interp, objv[1]);
     return TCL_OK;
 }
 
@@ -5935,8 +5934,10 @@ int tcldom_DocObjCmd (
             return cdataSectionElements (doc, interp, objc, objv);
 
         case m_selectNodesNamespaces:
-            return tcldom_prefixNSlist (&(doc->prefixNSMappings), interp, objc,
-                                        objv, "selectNodesNamespaces");
+            CheckArgs (2,3,2, "?prefixUriList?");
+            return tcldom_prefixNSlist (&(doc->prefixNSMappings), interp,
+                                        --objc, ++objv,
+                                        "selectNodesNamespaces");
             
         case m_renameNode:
             return renameNodes (doc, interp, objc, objv);

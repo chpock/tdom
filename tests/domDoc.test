@@ -1395,7 +1395,7 @@ test domDoc-25.4 {selectNodesNamespaces} {
     lappend result $errMsg
     $doc delete
     set result
-} {1 {The optional argument to the selectNodesNamespaces method must be a 'prefix namespace' pairs list}}
+} {1 {The optional argument to selectNodesNamespaces must be a 'prefix namespace' pairs list}}
 
 test domDoc-25.5 {selectNodesNamespaces} {
     set doc [dom parse {<root xmlns="rootdefaultNS">
