@@ -2255,7 +2255,7 @@ schemaInstanceCmd (
     )
 {
     int            methodIndex, keywordIndex, hnew, patternIndex;
-    int            result = TCL_OK, forwardDef = 0, i = 0;
+    int            result = TCL_OK, forwardDef = 0, i = 0, j;
     int            savedDefineToplevel, type, len;
     unsigned int   savedNumPatternList;
     SchemaData    *savedsdata = NULL, *sdata = (SchemaData *) clientData;
@@ -2289,13 +2289,9 @@ schemaInstanceCmd (
         k_elementstart, k_elementend, k_text
     };
 
-    if (objc < 2) {
-        Tcl_WrongNumArgs (interp, 1, objv, "subcommand ?arguments?");
-        return TCL_ERROR;
-    }
-
     if (sdata == NULL) {
-        /* Inline defined defelement, defpattern, deftext or start */
+        /* Inline defined defelement, defpattern, deftext, start or
+         * prefixns */
         sdata = GETASI;
         CHECK_SI;
         if (!sdata->defineToplevel && sdata->currentEvals > 1) {
@@ -2304,6 +2300,11 @@ schemaInstanceCmd (
         }
         i = 1;
     }
+    if (objc + i < 2) {
+        Tcl_WrongNumArgs (interp, 1, objv, "subcommand ?arguments?");
+        return TCL_ERROR;
+    }
+
 
     if (Tcl_GetIndexFromObj (interp, objv[1-i], schemaInstanceMethods,
                              "method", 0, &methodIndex)
@@ -2650,6 +2651,16 @@ schemaInstanceCmd (
         break;
 
     case m_prefixns:
+        CHECK_RECURSIVE_CALL
+        if (clientData == NULL && !sdata->defineToplevel) {
+            SetResult ("Command only allowed at lop level");
+            return TCL_ERROR;
+        }
+        if (objc != 2-i && objc != 3-i) {
+            Tcl_WrongNumArgs (interp, 2-i, objv, "?prefixUriList?");
+            return TCL_ERROR;
+        }
+        if (!i) {objc--; objv++;}
         result = tcldom_prefixNSlist (&sdata->prefixns, interp, objc, objv,
                                       "prefixns");
         if (sdata->prefix.numBuckets) {
@@ -2657,14 +2668,18 @@ schemaInstanceCmd (
             Tcl_InitHashTable (&sdata->prefix, TCL_STRING_KEYS);
         }
         if (result == TCL_OK && sdata->prefixns) {
-            i = 0;
-            while (sdata->prefixns[i]) {
-                h = Tcl_CreateHashEntry (&sdata->namespace,
-                                         sdata->prefixns[i+1], &hnew);
+            j = 0;
+            while (sdata->prefixns[j]) {
                 h1 = Tcl_CreateHashEntry (&sdata->prefix,
-                                          sdata->prefixns[i], &hnew);
-                Tcl_SetHashValue (h1, Tcl_GetHashKey (&sdata->namespace, h));
-                i += 2;
+                                          sdata->prefixns[j], &hnew);
+                /* This means: First prefix mapping wins */
+                if (hnew) {
+                    h = Tcl_CreateHashEntry (&sdata->namespace,
+                                             sdata->prefixns[j+1], &hnew);
+                    Tcl_SetHashValue (h1, Tcl_GetHashKey (&sdata->namespace,
+                                                          h));
+                }
+                j += 2;
             }
         }
         break;
@@ -4508,6 +4523,8 @@ tDOM_SchemaInit (
     Tcl_CreateObjCommand (interp, "tdom::schema::deftext",
                           schemaInstanceCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::start",
+                          schemaInstanceCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp, "tdom::schema::prefixns",
                           schemaInstanceCmd, NULL, NULL);
 
     /* The "any" definition command. */
