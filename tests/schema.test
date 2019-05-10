@@ -3869,6 +3869,30 @@ test schema-15.3 {constraint cmd tcl} {
     set result
 } {1 {} astart a aend a astart a aend a}
 
+proc schema-15.4 {text cmd} {
+    if {$text ne "in docContent"} {error "unexpected text argument"}
+    set ::schema-15.4 [$cmd info stack inside]
+}
+test schema-15.4 {constraint cmd tcl} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            ref docContent
+        }
+        defpattern docContent {
+            element a
+            tcl schema-15.4 "in docContent"
+            text
+            element b
+        }
+    }
+    set schema-15.4 ""
+    set result [s validate {<doc><a/>foo<b/></doc>}]
+    s delete
+    lappend result [set schema-15.4]
+    set result
+} {1 doc}
+
 test schema-16.1 {interleave} {
     tdom::schema s
     s define {
