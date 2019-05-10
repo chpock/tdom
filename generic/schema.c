@@ -1697,7 +1697,7 @@ matchText (
                     break;
 
                 case SCHEMA_CTYPE_VIRTUAL:
-                    if (!evalVirtual (interp, sdata, ic)) return 0;
+                    if (!evalVirtual (interp, sdata, candidate)) return 0;
                     break;
                     
                 case SCHEMA_CTYPE_NAME:
