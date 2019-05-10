@@ -3415,7 +3415,7 @@ uniquePatternCmd (
     checkNrArgs (3,3,"Expected: <selector> <fieldlist>");
 
     if (xpathParse (Tcl_GetString (objv[1]), NULL, XPATH_EXPR,
-                    NULL, NULL, &s, &errMsg) < 0) {
+                    sdata->prefixns, NULL, &s, &errMsg) < 0) {
         SetResult3 ("Error in selector xpath: '", errMsg, "");
         FREE (errMsg);
         return TCL_ERROR;

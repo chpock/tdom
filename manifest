@@ -1,5 +1,5 @@
-C Merge\sfrom\sschema.
-D 2019-05-10T00:40:52.647
+C Use\sthe\snew\sschema\sfeature\sprefixns\sfor\snamespace\sprefix\sresolution\sin\slocal\skey\sconstraint\sXPath\sexpressions.
+D 2019-05-10T00:49:22.950
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -134,7 +134,7 @@ F generic/domxslt.h 140fa73765d699bfced9554c2c6439c0d2e6695eec3a8e69e1d25c0bbdf2
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c abf69665ad49ed053885f7e7459d47be5abb057ba4ed919e96e83d636b016a30
 F generic/nodecmd.h e4a6d836834554a2a590cbd916cdee937945965ee55709e48b62976a66861ef8
-F generic/schema.c 1a701ac6d428262832efe28603f76043df8863b3e52e94db96fcfaefc2a154ac
+F generic/schema.c bc07e45d41974c3fa07ea37ad7fe8c56b45c557f7972315b57f02c8053e03153
 F generic/schema.h bbfb985ef08fb9de123d777b1844fd6f0b270a56afc20044bf0b9171677df5d7
 F generic/tcldom.c 543a2ec1665e787ad0dd9b0148e610530ebbb117520dae91cd0ea9e41a2f87a1
 F generic/tcldom.h 04ce531dd54fe3fcb82ba77194e3634cd95fb5bb2f3f0b7197abfdde9af2f2fd
@@ -230,8 +230,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 4879bb492bf44eb5005083e321b65e4a21462a9b73ce1ee966f26354e2cf957d 74a399d84f2fa99e070a1f8fd4460990c7d092bf535d50d30c8c9737db787695
-R e24b911d789344c19cf79964979406e7
+P 508a776b444fb4fbea66e688ae8ea16f2480a0b42602d2547976fa816548a0dc
+R ead4cdc9a8e962203427c564e680b8ee
 U rolf
-Z 13c95af139f4220ead149256c0237f8b
+Z ea70b16a3d2057c6746f8a0e1f240680
 # Remove this line to create a well-formed Fossil manifest.
