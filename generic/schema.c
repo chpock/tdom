@@ -427,6 +427,7 @@ initSchemaData (
     sdata->self = Tcl_NewStringObj (name, len);
     Tcl_IncrRefCount (sdata->self);
     Tcl_InitHashTable (&sdata->element, TCL_STRING_KEYS);
+    Tcl_InitHashTable (&sdata->prefix, TCL_STRING_KEYS);
     Tcl_InitHashTable (&sdata->pattern, TCL_STRING_KEYS);
     Tcl_InitHashTable (&sdata->attrNames, TCL_STRING_KEYS);
     Tcl_InitHashTable (&sdata->namespace, TCL_STRING_KEYS);
@@ -481,9 +482,17 @@ static void schemaInstanceDelete (
     }
     Tcl_DecrRefCount (sdata->self);
     if (sdata->start) FREE (sdata->start);
-    if (sdata->startNamespace) FREE (sdata->startNamespace);
+    if (sdata->prefixns) {
+        i = 0;
+        while (sdata->prefixns[i]) {
+            FREE (sdata->prefixns[i]);
+            i++;
+        }
+        FREE (sdata->prefixns);
+    }
     Tcl_DeleteHashTable (&sdata->namespace);
     Tcl_DeleteHashTable (&sdata->element);
+    Tcl_DeleteHashTable (&sdata->prefix);
     Tcl_DeleteHashTable (&sdata->pattern);
     Tcl_DeleteHashTable (&sdata->attrNames);
     Tcl_DeleteHashTable (&sdata->textDef);
@@ -1003,6 +1012,27 @@ matchElementStart (
     return -1;
 }
 
+static void *
+getNamespacePtr (
+    SchemaData *sdata,
+    char *ns
+    )
+{
+    Tcl_HashEntry *h;
+    int hnew;
+
+    if (!ns) return NULL;
+    h = Tcl_FindHashEntry (&sdata->prefix, ns);
+    if (h) {
+        return Tcl_GetHashValue (h);
+    }
+    h = Tcl_CreateHashEntry (&sdata->namespace, ns, &hnew);
+    if (h != sdata->emptyNamespace) {
+        return Tcl_GetHashKey (&sdata->namespace, h);
+    }
+    return NULL;
+}
+
 int
 probeElement (
     Tcl_Interp *interp,
@@ -1030,20 +1060,7 @@ probeElement (
                  name, (char *)namespace);
         );
 
-    if (namespace) {
-        entryPtr = Tcl_FindHashEntry (&sdata->namespace, (char *)namespace);
-        if (!entryPtr) {
-            SetResult ("No elements defined in this namespace");
-            return TCL_ERROR;
-        }
-        if (entryPtr == sdata->emptyNamespace) {
-            namespacePtr = NULL;
-        } else {
-            namespacePtr = Tcl_GetHashKey (&sdata->namespace, entryPtr);
-        }
-    } else {
-        namespacePtr = NULL;
-    }
+    namespacePtr = getNamespacePtr (sdata, namespace);
     entryPtr = Tcl_FindHashEntry (&sdata->element, name);
     if (entryPtr) {
         namePtr = Tcl_GetHashKey (&sdata->element, entryPtr);
@@ -1059,7 +1076,7 @@ probeElement (
                 return TCL_ERROR;
             }
             if (namespace) {
-                if (!sdata->startNamespace ||
+                if (!sdata->startNamespace||
                     strcmp (namespace, sdata->startNamespace) != 0) {
                     SetResult ("Root element namespace doesn't match");
                     return TCL_ERROR;
@@ -2244,7 +2261,7 @@ schemaInstanceCmd (
     unsigned int   savedNumPatternList;
     SchemaData    *savedsdata = NULL, *sdata = (SchemaData *) clientData;
     Tcl_HashTable *hashTable;
-    Tcl_HashEntry *h;
+    Tcl_HashEntry *h, *h1;
     SchemaCP      *pattern, *current = NULL;
     void          *namespacePtr, *savedNamespacePtr;
     char          *xmlstr, *errMsg;
@@ -2255,12 +2272,13 @@ schemaInstanceCmd (
         "defelement", "defpattern",  "start",   "event", "delete",
         "nrForwardDefinitions",      "state",   "reset", "define",
         "validate",   "domvalidate", "deftext", "info",  "reportcmd",
-        NULL
+        "prefixns",   NULL
     };
     enum schemaInstanceMethod {
         m_defelement,  m_defpattern,  m_start,   m_event, m_delete,
         m_nrForwardDefinitions,       m_state,   m_reset, m_define,
-        m_validate,    m_domvalidate, m_deftext, m_info,  m_reportcmd
+        m_validate,    m_domvalidate, m_deftext, m_info,  m_reportcmd,
+        m_prefixns
     };
 
     static const char *eventKeywords[] = {
@@ -2316,11 +2334,7 @@ schemaInstanceCmd (
         patternIndex = 3-i;
         if (objc == 5-i) {
             patternIndex = 4-i;
-            h = Tcl_CreateHashEntry (&sdata->namespace,
-                                            Tcl_GetString (objv[3-i]), &hnew);
-            if (h != sdata->emptyNamespace) {
-                namespacePtr = Tcl_GetHashKey (&sdata->namespace, h);
-            }
+            namespacePtr = getNamespacePtr (sdata, Tcl_GetString (objv[3-i]));
         }
         h = Tcl_CreateHashEntry (hashTable, Tcl_GetString (objv[2-i]), &hnew);
         pattern = NULL;
@@ -2466,19 +2480,14 @@ schemaInstanceCmd (
             FREE (sdata->start);
         }
         if (objc == 3-i && strcmp (Tcl_GetString (objv[2-i]), "") == 0) {
-            if (sdata->startNamespace) {
-                FREE (sdata->startNamespace);
-            }
+            sdata->startNamespace = NULL;
             sdata->start = NULL;
             break;
         }
         sdata->start = tdomstrdup (Tcl_GetString (objv[2-i]));
         if (objc == 4-i) {
-            if (sdata->startNamespace) {
-                FREE (sdata->startNamespace);
-            }
             sdata->startNamespace =
-                tdomstrdup (Tcl_GetString (objv[3-i]));
+                getNamespacePtr (sdata, Tcl_GetString (objv[3-i]));
         }
         break;
 
@@ -2501,16 +2510,10 @@ schemaInstanceCmd (
                     "?<attInfo>? ?<namespace>?");
                 return TCL_ERROR;
             }
+            namespacePtr = NULL;
             if (objc == 6) {
-                h = Tcl_FindHashEntry (&sdata->namespace,
-                                              Tcl_GetString (objv[5]));
-                if (h && h != sdata->emptyNamespace) {
-                     namespacePtr = Tcl_GetHashKey (&sdata->namespace, h);
-                } else {
-                    namespacePtr = NULL;
-                }
-            } else {
-                namespacePtr = NULL;
+                namespacePtr = getNamespacePtr (sdata,
+                                                Tcl_GetString (objv[5]));
             }
             result = probeElement (interp, sdata, Tcl_GetString (objv[3]),
                                    namespacePtr);
@@ -2647,6 +2650,26 @@ schemaInstanceCmd (
         Tcl_IncrRefCount (sdata->reportCmd);
         break;
 
+    case m_prefixns:
+        result = tcldom_prefixNSlist (&sdata->prefixns, interp, objc, objv,
+                                      "prefixns");
+        if (sdata->prefix.numBuckets) {
+            Tcl_DeleteHashTable (&sdata->prefix);
+            Tcl_InitHashTable (&sdata->prefix, TCL_STRING_KEYS);
+        }
+        if (result == TCL_OK && sdata->prefixns) {
+            i = 0;
+            while (sdata->prefixns[i]) {
+                h = Tcl_CreateHashEntry (&sdata->namespace,
+                                         sdata->prefixns[i+1], &hnew);
+                h1 = Tcl_CreateHashEntry (&sdata->prefix,
+                                          sdata->prefixns[i], &hnew);
+                Tcl_SetHashValue (h1, Tcl_GetHashKey (&sdata->namespace, h));
+                i += 2;
+            }
+        }
+        break;
+        
     default:
         Tcl_SetResult (interp, "unknown method", NULL);
         result = TCL_ERROR;
@@ -3046,17 +3069,14 @@ static int maybeAddAttr (
     )
 {
     Tcl_HashEntry *h;
-    int hnew, hnew1, i, result = TCL_OK;
+    int hnew, i, result = TCL_OK;
     char *name, *namespace = NULL;
     SchemaAttr *attr;
     SchemaCP *cp;
 
     if (namespaceObj) {
-        h = Tcl_CreateHashEntry (&sdata->namespace,
-                                 Tcl_GetString (namespaceObj), &hnew1);
-        if (h != sdata->emptyNamespace) {
-            namespace = Tcl_GetHashKey (&sdata->namespace, h);
-        }
+        namespace = getNamespacePtr (sdata,
+                                     Tcl_GetString (namespaceObj));
     }
     h = Tcl_CreateHashEntry (&sdata->attrNames,
                              Tcl_GetString (nameObj), &hnew);
@@ -3206,22 +3226,15 @@ NamespacePatternObjCmd (
 {
     SchemaData *sdata = GETASI;
     char *currentNamespace;
-    Tcl_HashEntry *entryPtr;
-    int hnew, result;
+    int result;
 
     CHECK_SI
     CHECK_TOPLEVEL
     checkNrArgs (3,3,"Expected: namespace pattern");
 
     currentNamespace = sdata->currentNamespace;
-    entryPtr = Tcl_CreateHashEntry (&sdata->namespace,
-                                    Tcl_GetString(objv[1]), &hnew);
-    if (entryPtr == sdata->emptyNamespace) {
-        sdata->currentNamespace = NULL;
-    } else {
-        sdata->currentNamespace = (char *)
-            Tcl_GetHashKey (&sdata->namespace, entryPtr);
-    }
+    sdata->currentNamespace =
+        getNamespacePtr (sdata, Tcl_GetString(objv[1]));
     sdata->currentEvals++;
     result = Tcl_EvalObjEx (interp, objv[2], TCL_EVAL_DIRECT);
     sdata->currentEvals--;

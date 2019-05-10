@@ -120,6 +120,8 @@ typedef struct
     Tcl_HashTable element;
     Tcl_HashTable namespace;
     Tcl_HashEntry *emptyNamespace;
+    char **prefixns;
+    Tcl_HashTable prefix;
     Tcl_HashTable pattern;
     Tcl_HashTable attrNames;
     Tcl_HashTable textDef;
