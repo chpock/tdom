@@ -373,6 +373,33 @@ static void serializeStack (
 
 /* DBG end */
 
+static void freeKeyConstraints (
+    KeyConstraint *kc
+    )
+{
+    KeyConstraint *knext;
+    KeyStep *step, *snext;
+
+    while (kc) {
+        knext = kc->next;
+        if (kc->name) FREE (kc->name);
+        step = kc->selectSteps;
+        while (step) {
+            snext = step->next;
+            FREE (step);
+            step = snext;
+        }
+        step = kc->fieldSteps;
+        while (step) {
+            snext = step->next;
+            FREE (step);
+            step = snext;
+        }
+        FREE (kc);
+        kc = knext;
+    }
+}
+
 static void freeSchemaCP (
     SchemaCP *pattern
     )
@@ -408,6 +435,7 @@ static void freeSchemaCP (
             }
             FREE (pattern->attrs);
         }
+        freeKeyConstraints (pattern->localkeys);
         break;
     }
     FREE (pattern);
@@ -3344,15 +3372,20 @@ VirtualPatternObjCmd (
 }
 
 extern void printAst (int depth, ast t);
+
 static int
 processSchemaXPath (
     Tcl_Interp *interp,
+    KeyConstraint *kc,
+    KeyStep *lastStep,
+    StepType nextType,
     ast t,
     int field,
     int toplevel
     )
 {
     ast child;
+    KeyStep *step;
     
     printAst (0, t);
     while (t) {
@@ -3370,7 +3403,9 @@ processSchemaXPath (
                 return TCL_ERROR;
             }
             for (child = t->child; child != NULL; child = child->next) {
-                if (processSchemaXPath (interp, child, field, 0) != TCL_OK) {
+                if (processSchemaXPath (interp, kc, NULL, SCHEMA_STEP_NONE,
+                                        child, field, 0)
+                    != TCL_OK) {
                     return TCL_ERROR;
                 }
             }
@@ -3380,13 +3415,9 @@ processSchemaXPath (
                 SetResult ("Not a reduced XPath expression.");
                 return TCL_ERROR;
             }
+            nextType = SCHEMA_STEP_DESCENDANT_ELEMENT;
+            
             break;
-        case IsElement:
-        case IsFQElement:
-        case IsNSElement:
-        case AxisChild:
-            break;
-        case AxisAttribute:
         case IsNSAttr:
         case IsAttr:
             if (!field) {
@@ -3394,16 +3425,35 @@ processSchemaXPath (
                            "XPath expression for field selectors.");
                 return TCL_ERROR;
             }
-            if (t->type == AxisAttribute) {
-                break;
+            /* Fall through */
+        case IsElement:
+        case IsFQElement:
+        case IsNSElement:
+            step = TMALLOC (KeyStep);
+            memset (step, 0, sizeof (KeyStep));
+            step->type = nextType;
+            if (lastStep) {
+                lastStep->next = step;
+            } else {
+                if (field) kc->fieldSteps = step;
+                else kc->selectSteps = step;
             }
+            lastStep = step;
+            break;
+        case AxisChild:
+            nextType = SCHEMA_STEP_ELEMENT;
+            break;
+        case AxisAttribute:
+            nextType = SCHEMA_STEP_ATTRIBUTE;
             break;
         default:
             SetResult ("Not a reduced XPath expression.");
             return TCL_ERROR;
         }
         if (t->child) {
-            if (processSchemaXPath (interp, t->child, field, 0) != TCL_OK) {
+            if (processSchemaXPath (interp, kc, lastStep, nextType,
+                                    t->child, field, 0)
+                != TCL_OK) {
                 return TCL_ERROR;
             }
         }
@@ -3424,6 +3474,7 @@ uniquePatternCmd (
     SchemaData *sdata = GETASI;
     ast s, f;
     char *errMsg = NULL;
+    KeyConstraint *kc, *kc1;
 
     CHECK_SI
     CHECK_TOPLEVEL
@@ -3435,12 +3486,37 @@ uniquePatternCmd (
         FREE (errMsg);
         return TCL_ERROR;
     }
-    if (processSchemaXPath (interp, s, 0, 1) != TCL_OK) {
-        xpathFreeAst (s);
+    if (xpathParse (Tcl_GetString (objv[2]), NULL, XPATH_EXPR,
+                    sdata->prefixns, NULL, &f, &errMsg) < 0) {
+        SetResult3 ("Error in field xpath: '", errMsg, "");
+        FREE (errMsg);
         return TCL_ERROR;
     }
-    
+    kc = TMALLOC (KeyConstraint);
+    memset (kc, 0, sizeof (KeyConstraint));
+    if (processSchemaXPath (interp, kc, NULL, SCHEMA_STEP_NONE, s, 0, 1)
+        != TCL_OK) {
+        xpathFreeAst (s);
+        xpathFreeAst (f);
+        freeKeyConstraints (kc);
+        return TCL_ERROR;
+    }
+    if (processSchemaXPath (interp, kc, NULL, SCHEMA_STEP_NONE, f, 1, 1)
+        != TCL_OK) {
+        xpathFreeAst (s);
+        xpathFreeAst (f);
+        freeKeyConstraints (kc);
+        return TCL_ERROR;
+    }
     xpathFreeAst (s);
+    xpathFreeAst (f);
+    if (sdata->cp->localkeys) {
+        kc1 = sdata->cp->localkeys;
+        while (kc1->next) kc1 = kc1->next;
+        kc1->next = kc;
+    } else {
+        sdata->cp->localkeys = kc;
+    }
     return TCL_OK;
 }
 

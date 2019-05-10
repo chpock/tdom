@@ -40,7 +40,7 @@ typedef enum {
   SCHEMA_CQUANT_REP,
   SCHEMA_CQUANT_PLUS,
   SCHEMA_CQUANT_NM,
-  SCHEMA_CQUANT_ERROR,
+  SCHEMA_CQUANT_ERROR
 } SchemaQuant;
 
 typedef int (*SchemaConstraintFunc) (Tcl_Interp *interp,
@@ -72,12 +72,35 @@ typedef unsigned int SchemaFlags;
 #define CONSTRAINT_TEXT_CHILD  16
 #define MIXED_CONTENT          32 
 
-typedef struct keyConstraint {
-    char           *name;
-    char           *ns;
-    struct keyConstraint *child;
-    struct keyConstraint *next;
-} keyConstraint;
+
+typedef enum {
+  SCHEMA_KEY_UNIQUE,
+  SCHEMA_KEY_KEY,
+  SCHEMA_KEY_KEYREF
+} KeyType;
+
+typedef enum {
+  SCHEMA_STEP_NONE,
+  SCHEMA_STEP_ELEMENT,
+  SCHEMA_STEP_DESCENDANT_ELEMENT,
+  SCHEMA_STEP_ATTRIBUTE,
+} StepType;
+
+typedef struct KeyStep 
+{
+    StepType type;
+    char    *name;
+    char    *ns;
+    struct KeyStep *next;
+} KeyStep;
+
+typedef struct KeyConstraint {
+    char    *name;
+    KeyType  type;
+    KeyStep *selectSteps;
+    KeyStep *fieldSteps;
+    struct KeyConstraint *next;
+} KeyConstraint;
 
 typedef struct SchemaCP
 {
@@ -92,7 +115,8 @@ typedef struct SchemaCP
     SchemaAttr      **attrs;
     unsigned int      numAttr;
     unsigned int      numReqAttr;
-    keyConstraint    *localkeys;
+    KeyConstraint    *localkeys;
+    int               nrKeys;
 } SchemaCP;
 
 typedef struct SchemaValidationStack
