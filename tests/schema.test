@@ -596,6 +596,17 @@ test schema-1.26 {prefixns} {
     set result
 } {1 {Command only allowed at lop level} 1 {Command only allowed at lop level} 1 {Method not allowed in nested schema define script} 1 {This recursive call is not allowed}}
 
+test schema-1.27 {define} {
+    tdom::schema create s
+    set result ""
+    s define {
+        set ::result "from inside define"
+        append ::result " " [expr {2+2}]
+    }
+    s delete
+    set result
+} {from inside define 4}
+    
 test schema-2.1 {grammar definition: ref} {
     tdom::schema create grammar
     grammar defpattern thisPattern {
@@ -4570,22 +4581,21 @@ test schema-19.1 {unique} {
         <doc><a/></doc>
         {<doc><a ref="1"/><a ref="foo"/></doc>}
     } {
-        lappend result [s validate $xml errMsg]
-        puts $errMsg
+        lappend result [s validate $xml]
     }
     s delete
     set result
 } {1 1 0 1}
 
-
 test schema-19.2 {unique} {
     set schema {
+        prefixns {ns1 http://tdom.org/test}
         defelement doc {
-            unique {${::schema-19.2}} @ref
+            unique ${::schema-19.2} @ref
         }
     }
     set result [list]
-    foreach selector {
+    foreach ::schema-19.2 {
         a
         ./../a
         /foo
@@ -4593,20 +4603,22 @@ test schema-19.2 {unique} {
         {a | b}
         a|b
         (a|b)
+        {a/b/c | b/c/d | c/d/e}
         .//a
         //a
         a/@ref
         a/b/c
         a//b/c
         (.//b|a)/c
+        ns1:a
+        a/.//b/c
     } {
-        set ::schema-19.2 $selector
         tdom::schema s
-        lappend result [catch {s define [subst $schema]} errMsg]
+        lappend result [catch {s define $schema} errMsg]
         #puts $errMsg
         s delete
     }
     set result
-} {0 1 1 0 0 0 1 0 1 1 0 1 1}
+} {0 1 1 0 1 1 1 1 0 1 1 0 1 1 0 1}
 
 }

@@ -3376,6 +3376,7 @@ extern void printAst (int depth, ast t);
 static int
 processSchemaXPath (
     Tcl_Interp *interp,
+    SchemaData *sdata,
     KeyConstraint *kc,
     KeyStep *lastStep,
     StepType nextType,
@@ -3384,10 +3385,13 @@ processSchemaXPath (
     int toplevel
     )
 {
-    ast child;
+    ast child, savedt;
     KeyStep *step;
+    Tcl_HashEntry *h;
+    int hnew;
+    SchemaCP *cp;
     
-    printAst (0, t);
+    /* if (toplevel) printAst (0, t); */
     while (t) {
         switch (t->type) {
         case GetContextNode:
@@ -3398,13 +3402,16 @@ processSchemaXPath (
             t = t->next;
             continue;
         case CombineSets:
+            SetResult ("CombineSets to be done.");
+            return TCL_ERROR;
+                
             if (!toplevel) {
                 SetResult ("Not a reduced XPath expression.");
                 return TCL_ERROR;
             }
             for (child = t->child; child != NULL; child = child->next) {
-                if (processSchemaXPath (interp, kc, NULL, SCHEMA_STEP_NONE,
-                                        child, field, 0)
+                if (processSchemaXPath (interp, sdata, kc, NULL,
+                                        SCHEMA_STEP_NONE, child, field, 0)
                     != TCL_OK) {
                     return TCL_ERROR;
                 }
@@ -3416,7 +3423,6 @@ processSchemaXPath (
                 return TCL_ERROR;
             }
             nextType = SCHEMA_STEP_DESCENDANT_ELEMENT;
-            
             break;
         case IsNSAttr:
         case IsAttr:
@@ -3429,9 +3435,25 @@ processSchemaXPath (
         case IsElement:
         case IsFQElement:
         case IsNSElement:
+            savedt = t;
             step = TMALLOC (KeyStep);
             memset (step, 0, sizeof (KeyStep));
             step->type = nextType;
+            if (t->type == IsFQElement || t->type == IsNSAttr) {
+                h = Tcl_CreateHashEntry (&sdata->namespace, t->strvalue,
+                                         &hnew);
+                step->ns = Tcl_GetHashKey (&sdata->namespace, h);
+                t = t->child;
+            }
+            h = Tcl_CreateHashEntry (&sdata->element, t->strvalue, &hnew);
+            if (hnew) {
+                cp = initSchemaCP (SCHEMA_CTYPE_NAME, step->ns,
+                                   Tcl_GetHashKey (&sdata->element, h));
+                cp->flags |= PLACEHOLDER_PATTERN_DEF;
+                REMEMBER_PATTERN (cp);
+                Tcl_SetHashValue (h, cp);
+            }
+            step->name = Tcl_GetHashKey (&sdata->element, h);
             if (lastStep) {
                 lastStep->next = step;
             } else {
@@ -3439,23 +3461,22 @@ processSchemaXPath (
                 else kc->selectSteps = step;
             }
             lastStep = step;
+            t = savedt;
             break;
         case AxisChild:
             nextType = SCHEMA_STEP_ELEMENT;
             break;
         case AxisAttribute:
+            if (!field) {
+                SetResult ("Attribute selection is only possible in reduced "
+                           "XPath expression for field selectors.");
+                return TCL_ERROR;
+            }
             nextType = SCHEMA_STEP_ATTRIBUTE;
             break;
         default:
             SetResult ("Not a reduced XPath expression.");
             return TCL_ERROR;
-        }
-        if (t->child) {
-            if (processSchemaXPath (interp, kc, lastStep, nextType,
-                                    t->child, field, 0)
-                != TCL_OK) {
-                return TCL_ERROR;
-            }
         }
         toplevel = 0;
         t = t->next;
@@ -3494,14 +3515,14 @@ uniquePatternCmd (
     }
     kc = TMALLOC (KeyConstraint);
     memset (kc, 0, sizeof (KeyConstraint));
-    if (processSchemaXPath (interp, kc, NULL, SCHEMA_STEP_NONE, s, 0, 1)
+    if (processSchemaXPath (interp, sdata, kc, NULL, SCHEMA_STEP_NONE, s, 0, 1)
         != TCL_OK) {
         xpathFreeAst (s);
         xpathFreeAst (f);
         freeKeyConstraints (kc);
         return TCL_ERROR;
     }
-    if (processSchemaXPath (interp, kc, NULL, SCHEMA_STEP_NONE, f, 1, 1)
+    if (processSchemaXPath (interp, sdata, kc, NULL, SCHEMA_STEP_NONE, f, 1, 1)
         != TCL_OK) {
         xpathFreeAst (s);
         xpathFreeAst (f);
