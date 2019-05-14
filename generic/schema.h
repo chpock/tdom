@@ -106,6 +106,12 @@ typedef enum {
 
 typedef struct 
 {
+    Tcl_HashTable ids;
+    int unknownIDrefs;
+} SchemaDocKey;
+    
+typedef struct 
+{
     Tcl_Obj *self;
     char *start;
     char *startNamespace;
@@ -147,6 +153,7 @@ typedef struct
     Tcl_DString *cdata;
     Tcl_HashTable ids;
     int unknownIDrefs;
+    Tcl_HashTable idTables;
 } SchemaData;
 
 int 
