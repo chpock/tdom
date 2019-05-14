@@ -469,7 +469,7 @@ initSchemaData (
         sizeof (SchemaQuant) * QUANTS_ARRAY_SIZE_INIT);
     sdata->quantsSize = QUANTS_ARRAY_SIZE_INIT;
     /* evalStub initialization */
-    sdata->evalStub = (Tcl_Obj **) (MALLOC (sizeof (Tcl_Obj*) * 4));
+    sdata->evalStub = (Tcl_Obj **) MALLOC (sizeof (Tcl_Obj*) * 4);
     sdata->evalStub[0] = Tcl_NewStringObj("::namespace", 11);
     Tcl_IncrRefCount (sdata->evalStub[0]);
     sdata->evalStub[1] = Tcl_NewStringObj("eval", 4);
@@ -477,18 +477,18 @@ initSchemaData (
     sdata->evalStub[2] = Tcl_NewStringObj("::tdom::schema", 14);
     Tcl_IncrRefCount (sdata->evalStub[2]);
     /* textStub initialization */
-    sdata->textStub = (Tcl_Obj **) (MALLOC (sizeof (Tcl_Obj*) * 4));
+    sdata->textStub = (Tcl_Obj **) MALLOC (sizeof (Tcl_Obj*) * 4);
     sdata->textStub[0] = Tcl_NewStringObj("::namespace", 11);
     Tcl_IncrRefCount (sdata->textStub[0]);
     sdata->textStub[1] = Tcl_NewStringObj("eval", 4);
     Tcl_IncrRefCount (sdata->textStub[1]);
     sdata->textStub[2] = Tcl_NewStringObj("::tdom::schema::text", 20);
     Tcl_IncrRefCount (sdata->textStub[2]);
-
     sdata->cdata = TMALLOC (Tcl_DString);
     Tcl_DStringInit (sdata->cdata);
     Tcl_InitHashTable (&sdata->ids, TCL_STRING_KEYS);
     sdata->unknownIDrefs = 0;
+    Tcl_InitHashTable (&sdata->idTables, TCL_STRING_KEYS);
     return sdata;
 }
 
@@ -499,6 +499,9 @@ static void schemaInstanceDelete (
     SchemaData *sdata = (SchemaData *) clientData;
     unsigned int i;
     SchemaValidationStack *down;
+    Tcl_HashEntry *h;
+    Tcl_HashSearch search;
+    SchemaDocKey *dk;
 
     /* Protect the clientData to be freed inside (even nested)
      * Tcl_Eval*() calls to avoid invalid mem access and postpone the
@@ -556,6 +559,14 @@ static void schemaInstanceDelete (
         Tcl_DecrRefCount (sdata->reportCmd);
     }
     Tcl_DeleteHashTable (&sdata->ids);
+    for (h = Tcl_FirstHashEntry (&sdata->idTables, &search);
+         h != NULL;
+         h = Tcl_NextHashEntry (&search)) {
+        dk = Tcl_GetHashValue (h);
+        Tcl_DeleteHashTable (&dk->ids);
+        FREE (dk);
+    }
+    Tcl_DeleteHashTable (&sdata->idTables);
     FREE (sdata);
 }
 
@@ -568,6 +579,7 @@ cleanupLastPattern (
     unsigned int i;
     Tcl_HashTable *hashTable;
     Tcl_HashEntry *entryPtr;
+
     SchemaCP *this, *previous, *current;
 
     for (i = from; i < sdata->numPatternList; i++) {
@@ -1558,6 +1570,64 @@ static int checkElementEnd (
     return 0;
 }
 
+static int
+checkDocKeys (
+    Tcl_Interp *interp,
+    SchemaData *sdata
+    ) 
+{
+    Tcl_HashEntry *h, *h1;
+    Tcl_HashSearch search, search1;
+    int haveErrMsg = 0;
+    SchemaDocKey *dk;
+
+    if (sdata->unknownIDrefs) {
+        haveErrMsg = 1;
+        SetResult ("References to unknown IDs:");
+        for (h = Tcl_FirstHashEntry (&sdata->ids, &search);
+             h != NULL;
+             h = Tcl_NextHashEntry (&search)) {
+            if (Tcl_GetHashValue (h) == 0) {
+                Tcl_AppendResult (interp, " '",
+                                  Tcl_GetHashKey (&sdata->ids, h),
+                                  "'", NULL);
+            }
+        }
+    }
+    if (sdata->idTables.numEntries) {
+        for (h = Tcl_FirstHashEntry (&sdata->idTables, &search);
+             h != NULL;
+             h = Tcl_NextHashEntry (&search)) {
+            dk = Tcl_GetHashValue (h);
+            if (dk->unknownIDrefs) {
+                if (haveErrMsg) {
+                    Tcl_AppendResult (interp, "\n", NULL);
+                } else {
+                    haveErrMsg = 1;
+                }
+                Tcl_AppendResult (interp,
+                                  "References to unknown IDs in ID space '",
+                                  Tcl_GetHashKey (&sdata->idTables, h),
+                                  "':", NULL);
+                for (h1 = Tcl_FirstHashEntry (&dk->ids, &search1);
+                     h1 != NULL;
+                     h1 = Tcl_NextHashEntry (&search1)) {
+                    if (Tcl_GetHashValue (h1) == 0) {
+                        Tcl_AppendResult (interp, " '",
+                                          Tcl_GetHashKey (&dk->ids, h1),
+                                          "'", NULL);
+                    }
+                }
+            }
+        }
+    }
+    if (haveErrMsg) {
+        sdata->validationState = VALIDATION_ERROR;
+        return 0;
+    }
+    return 1;
+}
+
 int
 probeElementEnd (
     Tcl_Interp *interp,
@@ -1599,20 +1669,7 @@ probeElementEnd (
         if (sdata->stack == NULL) {
             /* End of the first pattern (the tree root) without error. */
             /* Check for unknown ID references */
-            if (sdata->unknownIDrefs) {
-                Tcl_HashEntry *h;
-                Tcl_HashSearch search;
-                SetResult ("References to unknown IDs:");
-                for (h = Tcl_FirstHashEntry (&sdata->ids, &search);
-                     h != NULL;
-                     h = Tcl_NextHashEntry (&search)) {
-                    if (Tcl_GetHashValue (h) == 0) {
-                        Tcl_AppendResult (interp, " '",
-                                          Tcl_GetHashKey (&sdata->ids, h),
-                                          "'", NULL);
-                    }
-                }
-                sdata->validationState = VALIDATION_ERROR;
+            if (!checkDocKeys (interp, sdata)) {
                 return TCL_ERROR;
             }
             /*  We have successfully ended validation */
@@ -2138,6 +2195,10 @@ schemaReset (
     SchemaData *sdata
     )
 {
+    Tcl_HashEntry *h;
+    Tcl_HashSearch search;
+    SchemaDocKey *dk;
+    
     while (sdata->stack) popStack (sdata);
     sdata->validationState = VALIDATION_READY;
     sdata->skipDeep = 0;
@@ -2147,6 +2208,18 @@ schemaReset (
         Tcl_DeleteHashTable (&sdata->ids);
         Tcl_InitHashTable (&sdata->ids, TCL_STRING_KEYS);
         sdata->unknownIDrefs = 0;
+    }
+    if (sdata->idTables.numEntries) {
+        for (h = Tcl_FirstHashEntry (&sdata->idTables, &search);
+             h != NULL;
+             h = Tcl_NextHashEntry (&search)) {
+            dk = Tcl_GetHashValue (h);
+            if (&dk->ids.numEntries) {
+                Tcl_DeleteHashTable (&dk->ids);
+                Tcl_InitHashTable (&dk->ids, TCL_STRING_KEYS);
+                dk->unknownIDrefs = 0;
+            }
+        }
     }
 }
 
@@ -2692,7 +2765,7 @@ schemaInstanceCmd (
         if (!i) {objc--; objv++;}
         result = tcldom_prefixNSlist (&sdata->prefixns, interp, objc, objv,
                                       "prefixns");
-        if (sdata->prefix.numBuckets) {
+        if (sdata->prefix.numEntries) {
             Tcl_DeleteHashTable (&sdata->prefix);
             Tcl_InitHashTable (&sdata->prefix, TCL_STRING_KEYS);
         }
@@ -4593,6 +4666,31 @@ idImpl (
 }
 
 static int
+docidImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    SchemaDocKey *dk = (SchemaDocKey *) constraintData;
+    int hnew;
+    Tcl_HashEntry *h;
+
+    h = Tcl_CreateHashEntry (&dk->ids, text, &hnew);
+    if (hnew) {
+        Tcl_SetHashValue (h, 1);
+        return 1;
+    }
+    if (Tcl_GetHashValue (h) == 0) {
+        Tcl_SetHashValue (h, 1);
+        dk->unknownIDrefs--;
+        return 1;
+    } 
+    /* Duplicate ID value */
+    return 0;
+}
+
+static int
 idTCObjCmd (
     ClientData clientData,
     Tcl_Interp *interp,
@@ -4602,13 +4700,31 @@ idTCObjCmd (
 {
     SchemaData *sdata = GETASI;
     SchemaConstraint *sc;
+    Tcl_HashEntry *h;
+    int hnew;
+    SchemaDocKey *dk;
 
     CHECK_TI
     CHECK_TOPLEVEL
-    checkNrArgs (1,1,"no argument expected");
+    checkNrArgs (1,2,"?key_space?");
     ADD_CONSTRAINT (sdata, sc)
-    sc->constraint = idImpl;
-    sc->constraintData = (void *)sdata;
+    if (objc == 1) {
+        sc->constraint = idImpl;
+        sc->constraintData = (void *)sdata;
+    } else {
+        h = Tcl_CreateHashEntry (&sdata->idTables, Tcl_GetString (objv[1]),
+                                 &hnew);
+        if (hnew) {
+            dk = TMALLOC (SchemaDocKey);
+            Tcl_InitHashTable (&dk->ids, TCL_STRING_KEYS);
+            dk->unknownIDrefs = 0;
+            Tcl_SetHashValue (h, dk);
+        } else {
+            dk = Tcl_GetHashValue (h);
+        }
+        sc->constraint = docidImpl;
+        sc->constraintData = (void *)dk;
+    }
     return TCL_OK;
 }
 
@@ -4632,6 +4748,25 @@ idrefImpl (
 }
 
 static int
+docidrefImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    SchemaDocKey *dk = (SchemaDocKey *) constraintData;
+    int hnew;
+    Tcl_HashEntry *h;
+
+    h = Tcl_CreateHashEntry (&dk->ids, text, &hnew);
+    if (hnew) {
+        Tcl_SetHashValue (h, 0);
+        dk->unknownIDrefs++;
+    }
+    return 1;
+}
+
+static int
 idrefTCObjCmd (
     ClientData clientData,
     Tcl_Interp *interp,
@@ -4641,13 +4776,31 @@ idrefTCObjCmd (
 {
     SchemaData *sdata = GETASI;
     SchemaConstraint *sc;
+    Tcl_HashEntry *h;
+    int hnew;
+    SchemaDocKey *dk;
 
     CHECK_TI
     CHECK_TOPLEVEL
-    checkNrArgs (1,1,"no argument expected");
+    checkNrArgs (1,2,"?key_space?");
     ADD_CONSTRAINT (sdata, sc)
-    sc->constraint = idrefImpl;
-    sc->constraintData = (void *)sdata;
+    if (objc == 1) {
+        sc->constraint = idrefImpl;
+        sc->constraintData = (void *)sdata;
+    } else {
+        h = Tcl_CreateHashEntry (&sdata->idTables, Tcl_GetString (objv[1]),
+                                 &hnew);
+        if (hnew) {
+            dk = TMALLOC (SchemaDocKey);
+            Tcl_InitHashTable (&dk->ids, TCL_STRING_KEYS);
+            dk->unknownIDrefs = 0;
+            Tcl_SetHashValue (h, dk);
+        } else {
+            dk = Tcl_GetHashValue (h);
+        }
+        sc->constraint = docidrefImpl;
+        sc->constraintData = (void *)dk;
+    }
     return TCL_OK;
 }
 

@@ -3812,6 +3812,70 @@ test schema-14.27 {base64} {
     set result
 } {1 1 1 0 1 1 0 0}
 
+test schema-14.27 {element content id/idref} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            interleave {
+                element id *
+                element idref *
+                element ida *
+                element idrefa *
+            }
+        }
+        defelement id {text id}
+        defelement idref {text idref}
+        defelement ida {text {id a}}
+        defelement idrefa {text {idref a}}
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><id>abc</id><ida>abc</ida></doc>
+        <doc><idrefa>abc</idrefa></doc>
+        <doc><idrefa>abc</idrefa><idref>abc</idref></doc>
+        <doc><id>1</id><idrefa>abc</idrefa><idref>abc</idref><idrefa>foo</idrefa><idref>abc</idref></doc>
+        <doc><id>abc</id><idref>abc</idref><ida>abc</ida><idrefa>abc</idrefa></doc>
+        <doc><idref>abc</idref><id>abc</id><idrefa>abc</idrefa><ida>abc</ida></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 1 0 0 0 1 1}
+
+test schema-14.28 {element content id/idref} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            interleave {
+                element id *
+                element idref *
+                element ida *
+                element idrefa *
+            }
+        }
+        defelement id {text {id b}}
+        defelement idref {text {idref b}}
+        defelement ida {text {id a}}
+        defelement idrefa {text {idref a}}
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><id>abc</id><ida>abc</ida></doc>
+        <doc><idrefa>abc</idrefa></doc>
+        <doc><idrefa>abc</idrefa><idref>abc</idref></doc>
+        <doc><id>1</id><idrefa>abc</idrefa><idref>abc</idref><idrefa>foo</idrefa><idref>abc</idref></doc>
+        <doc><id>abc</id><idref>abc</idref><ida>abc</ida><idrefa>abc</idrefa></doc>
+        <doc><idref>abc</idref><id>abc</id><idrefa>abc</idrefa><ida>abc</ida></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 1 0 0 0 1 1}
+
 test schema-15.1 {constraint cmd tcl} {
     tdom::schema s
     s define {
