@@ -4676,6 +4676,10 @@ test schema-19.2 {unique} {
         (.//b|a)/c
         ns1:a
         a/.//b/c
+        {}
+        {    }
+        "
+                "
     } {
         tdom::schema s
         lappend result [catch {s define $schema} errMsg]
@@ -4683,6 +4687,46 @@ test schema-19.2 {unique} {
         s delete
     }
     set result
-} {0 1 1 0 1 1 1 1 0 1 1 0 1 1 0 1}
+} {0 1 1 0 1 1 1 1 0 1 1 0 1 1 0 1 1 1 1}
+
+test schema-19.3 {unique} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            unique item @lang
+            element item * {
+                attribute lang
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        {<doc><item lang="de"/><item lang="en"/><item lang="fr"/></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1}
+
+test schema-19.4 {unique} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            unique item {@lang @sub} "Combined field unique constraint"
+            element item * {
+                attribute lang
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        {<doc><item lang="de"/><item lang="en"/><item lang="fr"/></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1}
 
 }

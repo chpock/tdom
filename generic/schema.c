@@ -379,22 +379,26 @@ static void freeKeyConstraints (
 {
     KeyConstraint *knext;
     KeyStep *step, *snext;
-
+    int i;
+    
     while (kc) {
         knext = kc->next;
         if (kc->name) FREE (kc->name);
-        step = kc->selectSteps;
+        step = kc->selector;
         while (step) {
             snext = step->next;
             FREE (step);
             step = snext;
         }
-        step = kc->fieldSteps;
-        while (step) {
-            snext = step->next;
-            FREE (step);
-            step = snext;
+        for (i = 0; i < kc->nrFields; i++) {
+            step = kc->fields[i];
+            while (step) {
+                snext = step->next;
+                FREE (step);
+                step = snext;
+            }
         }
+        FREE (kc->fields);
         FREE (kc);
         kc = knext;
     }
@@ -3530,8 +3534,8 @@ processSchemaXPath (
             if (lastStep) {
                 lastStep->next = step;
             } else {
-                if (field) kc->fieldSteps = step;
-                else kc->selectSteps = step;
+                if (field) kc->fields[field-1] = step;
+                else kc->selector = step;
             }
             lastStep = step;
             t = savedt;
@@ -3566,44 +3570,66 @@ uniquePatternCmd (
     )
 {
     SchemaData *sdata = GETASI;
-    ast s, f;
+    ast t;
     char *errMsg = NULL;
     KeyConstraint *kc, *kc1;
+    int i, nrFields;
+    Tcl_Obj *elm;
 
     CHECK_SI
     CHECK_TOPLEVEL
-    checkNrArgs (3,3,"Expected: <selector> <fieldlist>");
-
+    checkNrArgs (3,4,"Expected: <selector> <fieldlist> ?<name>?");
+    if (sdata->cp->type != SCHEMA_CTYPE_NAME) {
+        SetResult ("The unique schema definition command is only "
+                   "allowed as direct child of an element.");
+    }
+    
     if (xpathParse (Tcl_GetString (objv[1]), NULL, XPATH_EXPR,
-                    sdata->prefixns, NULL, &s, &errMsg) < 0) {
+                    sdata->prefixns, NULL, &t, &errMsg) < 0) {
         SetResult3 ("Error in selector xpath: '", errMsg, "");
         FREE (errMsg);
         return TCL_ERROR;
     }
-    if (xpathParse (Tcl_GetString (objv[2]), NULL, XPATH_EXPR,
-                    sdata->prefixns, NULL, &f, &errMsg) < 0) {
-        SetResult3 ("Error in field xpath: '", errMsg, "");
-        FREE (errMsg);
+
+    if (Tcl_ListObjLength (interp, objv[2], &nrFields) != TCL_OK) {
+        SetResult ("The <fieldlist> argument must be a valid tcl list");
+        xpathFreeAst (t);
         return TCL_ERROR;
     }
+    
     kc = TMALLOC (KeyConstraint);
     memset (kc, 0, sizeof (KeyConstraint));
-    if (processSchemaXPath (interp, sdata, kc, NULL, SCHEMA_STEP_NONE, s, 0, 1)
+    kc->fields = MALLOC (sizeof (KeyStep*) * nrFields);
+
+    if (processSchemaXPath (interp, sdata, kc, NULL, SCHEMA_STEP_NONE, t, 0, 1)
         != TCL_OK) {
-        xpathFreeAst (s);
-        xpathFreeAst (f);
+        xpathFreeAst (t);
         freeKeyConstraints (kc);
         return TCL_ERROR;
     }
-    if (processSchemaXPath (interp, sdata, kc, NULL, SCHEMA_STEP_NONE, f, 1, 1)
-        != TCL_OK) {
-        xpathFreeAst (s);
-        xpathFreeAst (f);
-        freeKeyConstraints (kc);
-        return TCL_ERROR;
+    xpathFreeAst (t);
+
+    for (i = 0; i < nrFields; i++) {
+        Tcl_ListObjIndex (interp, objv[2], i, &elm);
+        if (xpathParse (Tcl_GetString (elm), NULL, XPATH_EXPR,
+                        sdata->prefixns, NULL, &t, &errMsg) < 0) {
+            SetResult3 ("Error in field xpath: '", errMsg, "");
+            FREE (errMsg);
+            xpathFreeAst (t);
+            freeKeyConstraints (kc);
+            return TCL_ERROR;
+        }
+        if (processSchemaXPath (interp, sdata, kc, NULL, SCHEMA_STEP_NONE, t, i+1, 1)
+            != TCL_OK) {
+            xpathFreeAst (t);
+            freeKeyConstraints (kc);
+            return TCL_ERROR;
+        }
+        xpathFreeAst (t);
     }
-    xpathFreeAst (s);
-    xpathFreeAst (f);
+    if (objc == 4) {
+        kc->name = tdomstrdup (Tcl_GetString (objv[3]));
+    }
     if (sdata->cp->localkeys) {
         kc1 = sdata->cp->localkeys;
         while (kc1->next) kc1 = kc1->next;

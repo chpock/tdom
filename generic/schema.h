@@ -17,7 +17,7 @@
 |
 |
 |   written by Rolf Ade
-|   Nov, Dec 2018
+|   2018-2019
 |
 \---------------------------------------------------------------------------*/
 
@@ -95,10 +95,11 @@ typedef struct KeyStep
 } KeyStep;
 
 typedef struct KeyConstraint {
-    char    *name;
-    KeyType  type;
-    KeyStep *selectSteps;
-    KeyStep *fieldSteps;
+    char     *name;
+    KeyType   type;
+    KeyStep  *selector;
+    KeyStep  **fields;
+    int       nrFields;
     struct KeyConstraint *next;
 } KeyConstraint;
 
