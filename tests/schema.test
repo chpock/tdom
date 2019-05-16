@@ -4687,7 +4687,25 @@ test schema-19.2 {unique} {
         s delete
     }
     set result
-} {0 1 1 0 1 1 1 1 0 1 1 0 1 1 0 1 1 1 1}
+} {0 1 1 0 0 0 1 0 0 1 1 0 1 1 0 1 1 1 1}
+
+test schema-19.2a {unique} {
+    set schema {
+        prefixns {ns1 http://tdom.org/test}
+        defelement doc {
+            unique ${::schema-19.2} {{@ref | div/@id} @lang}
+        }
+    }
+    set result [list]
+    foreach ::schema-19.2 {
+        {e/b | a/b | e/f }
+    } {
+        tdom::schema s
+        lappend result [catch {s define $schema}]
+        s delete
+    }
+    set result
+} 0
 
 test schema-19.3 {unique} {
     tdom::schema s

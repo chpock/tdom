@@ -92,13 +92,14 @@ typedef struct KeyStep
     char    *name;
     char    *ns;
     struct KeyStep *next;
+    struct KeyStep *child;
 } KeyStep;
 
 typedef struct KeyConstraint {
     char     *name;
     KeyType   type;
     KeyStep  *selector;
-    KeyStep  **fields;
+    KeyStep **fields;
     int       nrFields;
     struct KeyConstraint *next;
 } KeyConstraint;

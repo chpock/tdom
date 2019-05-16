@@ -378,23 +378,33 @@ static void freeKeyConstraints (
     )
 {
     KeyConstraint *knext;
-    KeyStep *step, *snext;
+    KeyStep *step, *snext, *child, *nchild;
     int i;
-    
+
     while (kc) {
         knext = kc->next;
         if (kc->name) FREE (kc->name);
         step = kc->selector;
         while (step) {
             snext = step->next;
-            FREE (step);
+            child = step;
+            while (child) {
+                nchild = child->child;
+                FREE (child);
+                child = nchild;
+            }
             step = snext;
         }
         for (i = 0; i < kc->nrFields; i++) {
             step = kc->fields[i];
             while (step) {
                 snext = step->next;
-                FREE (step);
+                child = step;
+                while (child) {
+                    nchild = child->child;
+                    FREE (child);
+                    child = nchild;
+                }
                 step = snext;
             }
         }
@@ -3455,7 +3465,6 @@ processSchemaXPath (
     Tcl_Interp *interp,
     SchemaData *sdata,
     KeyConstraint *kc,
-    KeyStep *lastStep,
     StepType nextType,
     ast t,
     int field,
@@ -3463,9 +3472,10 @@ processSchemaXPath (
     )
 {
     ast child, savedt;
-    KeyStep *step;
+    KeyStep *step, *curstep;
+    Tcl_HashTable *table;
     Tcl_HashEntry *h;
-    int hnew;
+    int rc, hnew;
     SchemaCP *cp;
     
     /* if (toplevel) printAst (0, t); */
@@ -3474,30 +3484,77 @@ processSchemaXPath (
         case GetContextNode:
             if (!toplevel) {
                 SetResult ("Not a reduced XPath expression.");
-                return TCL_ERROR;
+                return 0;
             }
             t = t->next;
             continue;
         case CombineSets:
-            SetResult ("CombineSets to be done.");
-            return TCL_ERROR;
-                
-            if (!toplevel) {
-                SetResult ("Not a reduced XPath expression.");
-                return TCL_ERROR;
+            child = t->child;
+            if (child->type == EvalSteps) {
+                savedt = NULL;
+                child = child->child;
+            } else {
+                savedt = child->next;
+                child->next = NULL;
             }
-            for (child = t->child; child != NULL; child = child->next) {
-                if (processSchemaXPath (interp, sdata, kc, NULL,
-                                        SCHEMA_STEP_NONE, child, field, 0)
-                    != TCL_OK) {
-                    return TCL_ERROR;
+            if (field) {
+                step = kc->fields[field-1];
+                kc->fields[field-1] = NULL;
+            } else {
+                step = kc->selector;
+                kc->selector = NULL;
+            }
+            if (!processSchemaXPath (interp, sdata, kc, SCHEMA_STEP_NONE,
+                                     child, field, toplevel)) {
+                if (savedt) child->next = savedt;
+                if (field) kc->fields[field-1] = step;
+                else kc->selector = step;
+                return 0;
+            }
+            if (step) {
+                if (field) {
+                    curstep = step;
+                    while (curstep->next) curstep = curstep->next;
+                    curstep->next = kc->fields[field-1];
+                } else {
+                    curstep = step;
+                    while (curstep->next) curstep = curstep->next;
+                    step->next = kc->selector;
+                }
+            } else {
+                if (field) {
+                    step = kc->fields[field-1];
+                } else {
+                    step = kc->selector;
                 }
             }
-            break;
+            if (field) kc->fields[field-1] = NULL;
+            else kc->selector = NULL;
+            if (savedt) child->next = savedt;
+            child = t->child->next;
+            if (child->type == EvalSteps) child = child->child;
+            rc = processSchemaXPath (interp, sdata, kc, SCHEMA_STEP_NONE,
+                                     child, field, toplevel);
+            if (field) {
+                if (kc->fields[field-1]) {
+                    curstep = step;
+                    while (curstep->next) curstep = curstep->next;
+                    curstep->next = kc->fields[field-1];
+                }
+                kc->fields[field-1] = step;
+            } else {
+                if (kc->selector) {
+                    curstep = step;
+                    while (curstep->next) curstep = curstep->next;
+                    curstep->next = kc->selector;
+                }
+                kc->selector = step;
+            }
+            return rc;
         case AxisDescendant:
             if (!toplevel) {
                 SetResult ("Not a reduced XPath expression.");
-                return TCL_ERROR;
+                return 0;
             }
             nextType = SCHEMA_STEP_DESCENDANT_ELEMENT;
             break;
@@ -3506,7 +3563,7 @@ processSchemaXPath (
             if (!field) {
                 SetResult ("Attribute selection is only possible in reduced "
                            "XPath expression for field selectors.");
-                return TCL_ERROR;
+                return 0;
             }
             /* Fall through */
         case IsElement:
@@ -3516,49 +3573,68 @@ processSchemaXPath (
             step = TMALLOC (KeyStep);
             memset (step, 0, sizeof (KeyStep));
             step->type = nextType;
+            if (t->type == IsAttr || t->type == IsNSAttr) {
+                table = &sdata->attrNames;
+            } else {
+                table = &sdata->element;
+            }
             if (t->type == IsFQElement || t->type == IsNSAttr) {
                 h = Tcl_CreateHashEntry (&sdata->namespace, t->strvalue,
                                          &hnew);
                 step->ns = Tcl_GetHashKey (&sdata->namespace, h);
                 t = t->child;
             }
-            h = Tcl_CreateHashEntry (&sdata->element, t->strvalue, &hnew);
-            if (hnew) {
+            h = Tcl_CreateHashEntry (table, t->strvalue, &hnew);
+            if (hnew && (table == &sdata->element)) {
                 cp = initSchemaCP (SCHEMA_CTYPE_NAME, step->ns,
                                    Tcl_GetHashKey (&sdata->element, h));
                 cp->flags |= PLACEHOLDER_PATTERN_DEF;
                 REMEMBER_PATTERN (cp);
                 Tcl_SetHashValue (h, cp);
             }
-            step->name = Tcl_GetHashKey (&sdata->element, h);
-            if (lastStep) {
-                lastStep->next = step;
+            step->name = Tcl_GetHashKey (table, h);
+            if (field) {
+                if (kc->fields[field-1]) {
+                    curstep = kc->fields[field-1];
+                    while (curstep->child) curstep = curstep->child;
+                    curstep->child = step;
+                } else {
+                    kc->fields[field-1] = step;
+                }
             } else {
-                if (field) kc->fields[field-1] = step;
-                else kc->selector = step;
+                if (kc->selector) {
+                    curstep = kc->selector;
+                    while (curstep->child) curstep = curstep->child;
+                    curstep->child = step;
+                } else {
+                    kc->selector = step;
+                }
             }
-            lastStep = step;
             t = savedt;
-            break;
-        case AxisChild:
-            nextType = SCHEMA_STEP_ELEMENT;
             break;
         case AxisAttribute:
             if (!field) {
                 SetResult ("Attribute selection is only possible in reduced "
                            "XPath expression for field selectors.");
-                return TCL_ERROR;
+                return 0;
             }
-            nextType = SCHEMA_STEP_ATTRIBUTE;
+            /* Fall through */
+        case AxisChild:
+            if (t->type == AxisChild) nextType = SCHEMA_STEP_ELEMENT;
+            else nextType = SCHEMA_STEP_ATTRIBUTE;
+            if (!processSchemaXPath (interp, sdata, kc, nextType,
+                                     t->child, field, 0)) {
+                return 0;
+            }
             break;
         default:
             SetResult ("Not a reduced XPath expression.");
-            return TCL_ERROR;
+            return 0;
         }
         toplevel = 0;
         t = t->next;
     }
-    return TCL_OK;
+    return 1;
 }
 
 static int
@@ -3596,13 +3672,20 @@ uniquePatternCmd (
         xpathFreeAst (t);
         return TCL_ERROR;
     }
+    if (nrFields == 0) {
+        SetResult ("Non empty fieldlist arugment expected.");
+        xpathFreeAst (t);
+        return TCL_ERROR;
+    }
     
     kc = TMALLOC (KeyConstraint);
     memset (kc, 0, sizeof (KeyConstraint));
     kc->fields = MALLOC (sizeof (KeyStep*) * nrFields);
-
-    if (processSchemaXPath (interp, sdata, kc, NULL, SCHEMA_STEP_NONE, t, 0, 1)
-        != TCL_OK) {
+    memset (kc->fields, 0, sizeof (KeyStep*) * nrFields);
+    kc->nrFields = nrFields;
+    
+    if (!processSchemaXPath (interp, sdata, kc, SCHEMA_STEP_NONE, t,
+                             0, 1)) {
         xpathFreeAst (t);
         freeKeyConstraints (kc);
         return TCL_ERROR;
@@ -3619,8 +3702,8 @@ uniquePatternCmd (
             freeKeyConstraints (kc);
             return TCL_ERROR;
         }
-        if (processSchemaXPath (interp, sdata, kc, NULL, SCHEMA_STEP_NONE, t, i+1, 1)
-            != TCL_OK) {
+        if (!processSchemaXPath (interp, sdata, kc, SCHEMA_STEP_NONE, t,
+                                 i+1, 1)) {
             xpathFreeAst (t);
             freeKeyConstraints (kc);
             return TCL_ERROR;
