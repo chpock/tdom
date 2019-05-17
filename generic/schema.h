@@ -104,6 +104,14 @@ typedef struct KeyConstraint {
     struct KeyConstraint *next;
 } KeyConstraint;
 
+typedef struct KeyState 
+{
+    struct KeyState *next;
+    KeyStep         *selector;
+    KeyStep        **fields;
+    Tcl_HashTable   *values;
+} KeyState;
+
 typedef struct SchemaCP
 {
     Schema_CP_Type    type;
@@ -129,6 +137,7 @@ typedef struct SchemaValidationStack
     int               activeChild;
     int               hasMatched;
     int              *interleaveState;
+    KeyState         *keyState;
 } SchemaValidationStack;
 
 typedef enum {
@@ -182,6 +191,7 @@ typedef struct
     unsigned int attrSize;
     SchemaValidationStack *stack;
     SchemaValidationStack *stackPool;
+    KeyState *keyStatePool;
     ValidationState validationState;
     unsigned int skipDeep;
     Tcl_DString *cdata;

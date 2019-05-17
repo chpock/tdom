@@ -516,6 +516,7 @@ static void schemaInstanceDelete (
     Tcl_HashEntry *h;
     Tcl_HashSearch search;
     SchemaDocKey *dk;
+    KeyState *ks, *nextks;
 
     /* Protect the clientData to be freed inside (even nested)
      * Tcl_Eval*() calls to avoid invalid mem access and postpone the
@@ -581,6 +582,13 @@ static void schemaInstanceDelete (
         FREE (dk);
     }
     Tcl_DeleteHashTable (&sdata->idTables);
+    ks = sdata->keyStatePool;
+    while (ks) {
+        nextks = ks->next;
+        FREE (ks->values);
+        FREE (ks);
+        ks = nextks;
+    }
     FREE (sdata);
 }
 
@@ -737,7 +745,9 @@ pushToStack (
     )
 {
     SchemaValidationStack *stackElm, *se;
-
+    KeyConstraint *kc;
+    KeyState *ks;
+    
     DBG(fprintf(stderr, "push to Stack:\n");serializeCP(pattern));
     if (sdata->stackPool) {
         stackElm = sdata->stackPool;
@@ -753,6 +763,27 @@ pushToStack (
         stackElm->interleaveState = MALLOC (sizeof (int) * pattern->nc);
         memset (stackElm->interleaveState, 0, sizeof (int) * pattern->nc);
     }
+    if (pattern->type == SCHEMA_CTYPE_NAME) {
+        /* Handle local key contraint matches */
+
+        /* And open new local key contraints, if necessary. */
+        kc = pattern->localkeys;
+        while (kc) {
+            if (sdata->keyStatePool) {
+                ks = sdata->keyStatePool;
+                sdata->keyStatePool = ks->next;
+            } else {
+                ks = TMALLOC (KeyState);
+                ks->values = TMALLOC (Tcl_HashTable);
+            }
+            Tcl_InitHashTable (ks->values, TCL_STRING_KEYS);
+            ks->selector = kc->selector;
+            ks->fields = kc->fields;
+            ks->next = stackElm->keyState;
+            stackElm->keyState = ks;
+            kc = kc->next;
+        }
+    }
     sdata->stack = stackElm;
 }
 
@@ -762,10 +793,26 @@ popStack (
     )
 {
     SchemaValidationStack *se;
+    KeyState *ks, *nextks;
     DBG(fprintf(stderr, "pop from Stack:\n");serializeCP(sdata->stack->pattern));
     if (sdata->stack->interleaveState) {
         FREE (sdata->stack->interleaveState);
         sdata->stack->interleaveState = NULL;
+    }
+    if (sdata->stack->pattern->type == SCHEMA_CTYPE_NAME) {
+        /* Check and cleanup local key contraints */
+        ks = sdata->stack->keyState;
+        while (ks) {
+            nextks = ks->next;
+            Tcl_DeleteHashTable (ks->values);
+            if (sdata->keyStatePool) {
+                ks->next = sdata->keyStatePool;
+            } else {
+                ks->next = NULL;
+            }
+            sdata->keyStatePool = ks;
+            ks = nextks;
+        }
     }
     se = sdata->stack->down;
     sdata->stack->down = sdata->stackPool;
