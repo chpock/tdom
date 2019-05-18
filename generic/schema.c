@@ -260,6 +260,14 @@ static void SetActiveSchemaData (SchemaData *v)
 
 #define S(str)  str, sizeof (str) -1
 
+#define getKeyState(ks) \
+    if (sdata->keyStatePool) { \
+        ks = sdata->keyStatePool; \
+        sdata->keyStatePool = ks->next; \
+    } else { \
+        ks = TMALLOC (KeyState); \
+    }
+
 static SchemaCP*
 initSchemaCP (
     Schema_CP_Type type,
@@ -517,6 +525,7 @@ static void schemaInstanceDelete (
     Tcl_HashSearch search;
     SchemaDocKey *dk;
     KeyState *ks, *nextks;
+    KeyTable *kt, *nextkt;
 
     /* Protect the clientData to be freed inside (even nested)
      * Tcl_Eval*() calls to avoid invalid mem access and postpone the
@@ -585,9 +594,14 @@ static void schemaInstanceDelete (
     ks = sdata->keyStatePool;
     while (ks) {
         nextks = ks->next;
-        FREE (ks->values);
         FREE (ks);
         ks = nextks;
+    }
+    kt = sdata->keyTablePool;
+    while (kt) {
+        nextkt = kt->next;
+        FREE (kt);
+        kt = nextkt;
     }
     FREE (sdata);
 }
@@ -746,7 +760,8 @@ pushToStack (
 {
     SchemaValidationStack *stackElm, *se;
     KeyConstraint *kc;
-    KeyState *ks;
+    KeyState *ks, *newks;
+    KeyTable *kt;
     
     DBG(fprintf(stderr, "push to Stack:\n");serializeCP(pattern));
     if (sdata->stackPool) {
@@ -763,20 +778,42 @@ pushToStack (
         stackElm->interleaveState = MALLOC (sizeof (int) * pattern->nc);
         memset (stackElm->interleaveState, 0, sizeof (int) * pattern->nc);
     }
-    if (pattern->type == SCHEMA_CTYPE_NAME) {
+    if (pattern->type == SCHEMA_CTYPE_NAME && se) {
         /* Handle local key contraint matches */
-
+        ks = se->keyState;
+        while (ks) {
+            if (ks->selector->name != pattern->name
+                || ks->selector->ns == pattern->namespace) continue;
+            if (ks->selector->child) {
+                getKeyState(newks);
+                newks->keyTable = ks->keyTable;
+                newks->ownTable = 0;
+                newks->selector = ks->selector->child;
+                newks->fields = ks->fields;
+                if (ks->type == SCHEMA_STEP_DESCENDANT_ELEMENT) {
+                    
+                }
+                newks->next = stackElm->keyState;
+                stackElm->keyState = newks;
+            } else {
+                /* Selector has matched, grab the fields */
+            }
+        }
+        
         /* And open new local key contraints, if necessary. */
         kc = pattern->localkeys;
         while (kc) {
-            if (sdata->keyStatePool) {
-                ks = sdata->keyStatePool;
-                sdata->keyStatePool = ks->next;
+            getKeyState (ks);
+            if (sdata->keyTablePool) {
+                kt = sdata->keyTablePool;
+                sdata->keyTablePool = kt->next;
             } else {
-                ks = TMALLOC (KeyState);
-                ks->values = TMALLOC (Tcl_HashTable);
+                kt = TMALLOC (KeyTable);
             }
-            Tcl_InitHashTable (ks->values, TCL_STRING_KEYS);
+            Tcl_InitHashTable (&kt->values, TCL_STRING_KEYS);
+            ks->keyTable = kt;
+            ks->ownTable = 1;
+            ks->type = kc->type;
             ks->selector = kc->selector;
             ks->fields = kc->fields;
             ks->next = stackElm->keyState;
@@ -804,12 +841,12 @@ popStack (
         ks = sdata->stack->keyState;
         while (ks) {
             nextks = ks->next;
-            Tcl_DeleteHashTable (ks->values);
-            if (sdata->keyStatePool) {
-                ks->next = sdata->keyStatePool;
-            } else {
-                ks->next = NULL;
+            if (ks->ownTable) {
+                ks->keyTable->next = sdata->keyTablePool;
+                sdata->keyTablePool = ks->keyTable;
+                Tcl_DeleteHashTable (&ks->keyTable->values);
             }
+            ks->next = sdata->keyStatePool;
             sdata->keyStatePool = ks;
             ks = nextks;
         }

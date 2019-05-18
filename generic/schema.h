@@ -104,12 +104,19 @@ typedef struct KeyConstraint {
     struct KeyConstraint *next;
 } KeyConstraint;
 
+typedef struct KeyTable {
+    struct KeyTable *next;
+    Tcl_HashTable    values;
+} KeyTable;
+
 typedef struct KeyState 
 {
     struct KeyState *next;
+    StepType         type;
     KeyStep         *selector;
     KeyStep        **fields;
-    Tcl_HashTable   *values;
+    int              ownTable;
+    KeyTable        *keyTable;
 } KeyState;
 
 typedef struct SchemaCP
@@ -192,6 +199,7 @@ typedef struct
     SchemaValidationStack *stack;
     SchemaValidationStack *stackPool;
     KeyState *keyStatePool;
+    KeyTable *keyTablePool;
     ValidationState validationState;
     unsigned int skipDeep;
     Tcl_DString *cdata;
