@@ -4612,5 +4612,115 @@ proc postValidation {g xml} {
     return $rc
 }
 
+test schema-20.1 {domunique} {
+    set schema {
+        prefixns {ns1 http://tdom.org/test}
+        defelement doc {
+            domunique ${::schema-20.1} @ref
+        }
+    }
+    set result [list]
+    foreach ::schema-20.1 {
+        a
+        ./../a
+        /foo
+        a/b
+        {a | b}
+        a|b
+        (a|b)
+        {a/b/c | b/c/d | c/d/e}
+        .//a
+        //a
+        a/@ref
+        a/b/c
+        {a//b[1]/c}
+        (.//b|a)/c
+        ns1:a
+        a/.//b/c
+        {}
+        {    }
+        "
+                "
+    } {
+        tdom::schema s
+        lappend result [catch {s define $schema} errMsg]
+        #puts $errMsg
+        s delete
+    }
+    set result
+} {0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1}
+
+test schema-20.2 {domunique} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            domunique item @ref
+            element item * {
+                attribute ref ?
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        {<doc><item ref="1"/><item ref="foo"/></doc>}
+        {<doc><item ref="1"/><item ref="1"/></doc>}
+    } {
+        lappend result [postValidation s $xml]
+    }
+    s delete
+    set result
+} {1 0}
+
+test schema-20.3 {domunique} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element items * {
+                element item * {
+                    attribute ref ?
+                }
+                domunique item @ref
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        {<doc><items><item ref="1"/><item ref="foo"/></items></doc>}
+        {<doc><items><item ref="1"/><item ref="1"/></items></doc>}
+        {<doc><items><item ref="1"/><item ref="foo"/></items><items><item ref="1"/><item ref="foo"/></items></doc>}
+        {<doc><items><item ref="1"/><item ref="foo"/></items><items><item ref="1"/><item ref="bar"/></items></doc>}
+        {<doc><items><item ref="1"/><item ref="foo"/></items><items><item ref="2"/><item ref="bar"/></items></doc>}
+        {<doc><items><item ref="1"/><item ref="foo"/></items><items><item ref="bar"/><item ref="bar"/></items></doc>}
+    } {
+        lappend result [postValidation s $xml]
+    }
+    s delete
+    set result
+} {1 0 1 1 1 0}
+
+test schema-20.4 {domunique} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            domunique item {@ref @id}
+            element item * {
+                attribute ref ?
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        {<doc><item ref="1"/><item ref="foo"/></doc>}
+        {<doc><item ref="1"/><item ref="1"/></doc>}
+        {<doc><item ref="1" id="a"/><item ref="foo" id="a"/></doc>}
+        {<doc><item ref="1" id="a"/><item ref="1" id="a"/></doc>}
+        {<doc><item ref="1" id="a"/><item ref="1" id="b"/></doc>}
+    } {
+        lappend result [postValidation s $xml]
+    }
+    s delete
+    set result
+} {1 0 1 0 1}
+
 
 }

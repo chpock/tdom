@@ -25,6 +25,7 @@
 
 #include <tdom.h>
 #include <tcldom.h>
+#include <domxpath.h>
 #include <schema.h>
 
 /* #define DEBUG */
@@ -372,6 +373,26 @@ static void serializeStack (
 
 /* DBG end */
 
+static void freedomKeyConstraints (
+    domKeyConstraint *kc
+    )
+{
+    domKeyConstraint *knext;
+    int i;
+
+    while (kc) {
+        knext = kc->next;
+        if (kc->name) FREE (kc->name);
+        xpathFreeAst (kc->selector);
+        for (i = 0; i < kc->nrFields; i++) {
+            xpathFreeAst (kc->fields[i]);
+        }
+        FREE (kc->fields);
+        FREE (kc);
+        kc = knext;
+    }
+}
+
 static void freeSchemaCP (
     SchemaCP *pattern
     )
@@ -407,6 +428,7 @@ static void freeSchemaCP (
             }
             FREE (pattern->attrs);
         }
+        freedomKeyConstraints (pattern->domKeys);
         break;
     }
     FREE (pattern);
@@ -2060,6 +2082,221 @@ validateString (
     return result;
 }
 
+static void
+schemaxpathRSFree (
+    xpathResultSet *rs
+    )
+{
+    if (rs->type == StringResult) FREE (rs->string);
+    FREE (rs->nodes);
+}
+
+static int
+checkdomKeyConstraints (
+    Tcl_Interp *interp,
+    SchemaData *sdata,
+    domNode    *node
+    )
+{
+    xpathResultSet nodeList, rs, frs;
+    domKeyConstraint *kc;
+    domNode *n;
+    domAttrNode *attr;
+    int rc, i, j, hnew, len, skip, first;
+    char *errMsg = NULL, *keystr;
+    Tcl_HashTable htable;
+    Tcl_DString dStr;
+
+    kc = sdata->stack->pattern->domKeys;
+    memset (&nodeList, 0, sizeof (xpathResultSet));
+    nodeList.type = EmptyResult;
+    memset (&rs, 0, sizeof (xpathResultSet));
+    rs.type = EmptyResult;
+    memset (&frs, 0, sizeof (xpathResultSet));
+    frs.type = EmptyResult;
+    Tcl_DStringInit (&dStr);
+    while (kc) {
+        xpathRSReset (&rs, NULL);
+        xpathRSReset (&nodeList, node);
+        Tcl_InitHashTable (&htable, TCL_STRING_KEYS);
+        rc = xpathEvalAst (kc->selector, &nodeList, node, &rs, &errMsg);
+        if (rc) {
+            if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"))) {
+                goto nextConstraint;
+            }
+            goto errorCleanup;
+        }
+        if (rs.type == EmptyResult) goto nextConstraint;
+        if (rs.type != xNodeSetResult) {
+            if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"))) {
+                goto nextConstraint;
+            }
+            SetResult ("INVALID_DOM_KEYCONSTRAINT");
+            goto errorCleanup;
+        }
+        for (i = 0; i < rs.nr_nodes; i++) {
+            n = rs.nodes[i];
+            if (n->nodeType != ELEMENT_NODE) {
+                if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"))) {
+                    break;
+                }
+                SetResult ("INVALID_DOM_KEYCONSTRAINT");
+                goto errorCleanup;
+            }
+            xpathRSReset (&nodeList, n);
+            if (kc->nrFields == 1) {
+                xpathRSReset (&frs, NULL);
+                rc = xpathEvalAst (kc->fields[0], &nodeList, n, &frs,
+                                   &errMsg);
+                if (rc) {
+                    if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"))) {
+                        break;
+                    }
+                    SetResult ("INVALID_DOM_KEYCONSTRAINT");
+                    goto errorCleanup;
+                }
+                if (frs.type != xNodeSetResult
+                    && frs.type != EmptyResult) {
+                    if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"))) {
+                        break;
+                    }
+                    SetResult ("INVALID_DOM_KEYCONSTRAINT");
+                    goto errorCleanup;
+                }
+                if (frs.type == EmptyResult || frs.nr_nodes == 0) {
+                    Tcl_CreateHashEntry (&htable, "", &hnew);
+                    if (!hnew) {
+                        if (recover (interp, sdata, S("DOM_KEYCONSTRAINT"))) {
+                            break;
+                        }
+                        SetResult ("DOM_KEYCONSTRAINT");
+                        goto errorCleanup;
+                    }
+                    continue;
+                }
+                if (frs.nr_nodes != 1) {
+                    if (recover (interp, sdata, S("DOM_KEYCONSTRAINT"))) {
+                        break;
+                    }
+                    SetResult ("DOM_KEYCONSTRAINT");
+                    goto errorCleanup;
+                }
+                if (frs.nodes[0]->nodeType != ELEMENT_NODE
+                    && frs.nodes[0]->nodeType != ATTRIBUTE_NODE) {
+                    if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"))) {
+                        break;
+                    }
+                    SetResult ("INVALID_DOM_KEYCONSTRAINT");
+                    goto errorCleanup;
+                }
+                if (frs.nodes[0]->nodeType == ATTRIBUTE_NODE) {
+                    attr = (domAttrNode *) frs.nodes[0];
+                    Tcl_CreateHashEntry (&htable, attr->nodeValue, &hnew);
+                    if (!hnew) {
+                        if (recover (interp, sdata, S("DOM_KEYCONSTRAINT"))) {
+                            break;
+                        }
+                        SetResult ("DOM_KEYCONSTRAINT");
+                        goto errorCleanup;
+                    }
+                } else {
+                    keystr = xpathGetStringValue (frs.nodes[0], &len);
+                    Tcl_CreateHashEntry (&htable, attr->nodeValue, &hnew);
+                    FREE(keystr);
+                    if (!hnew) {
+                        if (recover (interp, sdata, S("DOM_KEYCONSTRAINT"))) {
+                            break;
+                        }
+                        SetResult ("DOM_KEYCONSTRAINT");
+                        goto errorCleanup;
+                    }
+                }
+            } else {
+                Tcl_DStringSetLength (&dStr, 0);
+                skip = 1;
+                first = 0;
+                for (j = 0; j < kc->nrFields; j++) {
+                    xpathRSReset (&frs, NULL);
+                    rc = xpathEvalAst (kc->fields[j], &nodeList, n, &frs,
+                                       &errMsg);
+                    if (rc) {
+                        if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"))) {
+                            skip = 1;
+                            break;
+                        }
+                        SetResult ("INVALID_DOM_KEYCONSTRAINT");
+                        goto errorCleanup;
+                    }
+                    if (frs.type != xNodeSetResult
+                        && frs.type != EmptyResult) {
+                        if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"))) {
+                            skip = 1;
+                            break;
+                        }
+                        SetResult ("INVALID_DOM_KEYCONSTRAINT");
+                        goto errorCleanup;
+                    }
+                    if (frs.type == EmptyResult || frs.nr_nodes == 0) {
+                        if (first) first = 0;
+                        else Tcl_DStringAppend (&dStr, ":", 1);
+                        continue;
+                    }
+                    if (frs.nr_nodes != 1) {
+                        if (recover (interp, sdata, S("DOM_KEYCONSTRAINT"))) {
+                            skip = 1;
+                            break;
+                        }
+                        SetResult ("DOM_KEYCONSTRAINT");
+                        goto errorCleanup;
+                    }
+                    if (frs.nodes[0]->nodeType != ELEMENT_NODE
+                        && frs.nodes[0]->nodeType != ATTRIBUTE_NODE) {
+                        if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"))) {
+                            skip = 1;
+                            break;
+                        }
+                        SetResult ("INVALID_DOM_KEYCONSTRAINT");
+                        goto errorCleanup;
+                    }
+                    if (first) first = 0;
+                    else Tcl_DStringAppend (&dStr, ":", 1);
+                    if (frs.nodes[0]->nodeType == ATTRIBUTE_NODE) {
+                        attr = (domAttrNode *) frs.nodes[0];
+                        Tcl_DStringAppend (&dStr, attr->nodeValue,
+                                           attr->valueLength);
+                    } else {
+                        keystr = xpathGetStringValue (frs.nodes[0], &len);
+                        Tcl_DStringAppend (&dStr, keystr, len);
+                    }
+                }
+                if (skip) break;
+                Tcl_CreateHashEntry (&htable, Tcl_DStringValue (&dStr), &hnew);
+                if (!hnew) {
+                    if (recover (interp, sdata, S("DOM_KEYCONSTRAINT"))) {
+                        break;
+                    }
+                    SetResult ("DOM_KEYCONSTRAINT");
+                    goto errorCleanup;
+                }
+            }
+        }
+    nextConstraint:
+        Tcl_DeleteHashTable (&htable);
+        kc = kc->next;
+    }
+    schemaxpathRSFree (&frs);
+    schemaxpathRSFree (&rs);
+    schemaxpathRSFree (&nodeList);
+    return TCL_OK;
+
+errorCleanup:
+    Tcl_DeleteHashTable (&htable);
+    schemaxpathRSFree (&frs);
+    schemaxpathRSFree (&rs);
+    schemaxpathRSFree (&nodeList);
+    return TCL_ERROR;
+}
+
 static int
 validateDOM (
     Tcl_Interp *interp,
@@ -2108,6 +2345,11 @@ validateDOM (
         }
     }
 
+    if (sdata->stack->pattern->domKeys) {
+        if (checkdomKeyConstraints (interp, sdata, node) != TCL_OK)
+            return TCL_ERROR;
+    }
+    
     node = node->firstChild;
     while (node) {
         switch (node->nodeType) {
@@ -3416,6 +3658,74 @@ VirtualPatternObjCmd (
 }
 
 static int
+domuniquePatternCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    ast t;
+    char *errMsg = NULL;
+    domKeyConstraint *kc;
+    int i, nrFields;
+    Tcl_Obj *elm;
+
+    CHECK_SI
+    CHECK_TOPLEVEL
+    checkNrArgs (3,4,"Expected: <selector> <fieldlist> ?<name>?");
+    if (sdata->cp->type != SCHEMA_CTYPE_NAME) {
+        SetResult ("The domunique schema definition command is only "
+                   "allowed as direct child of an element.");
+    }
+    
+    if (xpathParse (Tcl_GetString (objv[1]), NULL, XPATH_EXPR,
+                    sdata->prefixns, NULL, &t, &errMsg) < 0) {
+        SetResult3 ("Error in selector xpath: '", errMsg, "");
+        FREE (errMsg);
+        return TCL_ERROR;
+    }
+
+    if (Tcl_ListObjLength (interp, objv[2], &nrFields) != TCL_OK) {
+        SetResult ("The <fieldlist> argument must be a valid tcl list");
+        xpathFreeAst (t);
+        return TCL_ERROR;
+    }
+    if (nrFields == 0) {
+        SetResult ("Non empty fieldlist arugment expected.");
+        xpathFreeAst (t);
+        return TCL_ERROR;
+    }
+    
+    kc = TMALLOC (domKeyConstraint);
+    memset (kc, 0, sizeof (domKeyConstraint));
+    kc->fields = MALLOC (sizeof (ast) * nrFields);
+    memset (kc->fields, 0, sizeof (ast) * nrFields);
+    kc->nrFields = nrFields;
+    kc->selector = t;
+    
+    for (i = 0; i < nrFields; i++) {
+        Tcl_ListObjIndex (interp, objv[2], i, &elm);
+        if (xpathParse (Tcl_GetString (elm), NULL, XPATH_EXPR,
+                        sdata->prefixns, NULL, &t, &errMsg) < 0) {
+            SetResult3 ("Error in field xpath: '", errMsg, "");
+            FREE (errMsg);
+            xpathFreeAst (t);
+            freedomKeyConstraints (kc);
+            return TCL_ERROR;
+        }
+        kc->fields[i] = t;
+    }
+    if (objc == 4) {
+        kc->name = tdomstrdup (Tcl_GetString (objv[3]));
+    }
+    kc->next = sdata->cp->domKeys;
+    sdata->cp->domKeys = kc;
+    return TCL_OK;
+}
+
+static int
 integerImpl (
     Tcl_Interp *interp,
     void *constraintData,
@@ -4716,6 +5026,10 @@ tDOM_SchemaInit (
     /* The 'virtual' "tcl" definition command */
     Tcl_CreateObjCommand (interp, "tdom::schema::tcl",
                           VirtualPatternObjCmd, NULL, NULL);
+
+    /* XPath contraints for DOM validation */
+    Tcl_CreateObjCommand (interp,"tdom::schema::domunique",
+                          domuniquePatternCmd, NULL, NULL);
     
     /* The text constraint commands */
     Tcl_CreateObjCommand (interp,"tdom::schema::text::integer",

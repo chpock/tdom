@@ -24,6 +24,9 @@
 #ifndef __SCHEMA_H__
 #define __SCHEMA_H__
 
+#include <tcldom.h>
+#include <domxpath.h>
+
 typedef enum {
   SCHEMA_CTYPE_ANY,
   SCHEMA_CTYPE_NAME,
@@ -72,6 +75,14 @@ typedef unsigned int SchemaFlags;
 #define CONSTRAINT_TEXT_CHILD  16
 #define MIXED_CONTENT          32 
 
+typedef struct domKeyConstraint {
+    char  *name;
+    ast    selector;
+    ast   *fields;
+    int    nrFields;
+    struct domKeyConstraint *next;
+} domKeyConstraint;
+
 typedef struct SchemaCP
 {
     Schema_CP_Type    type;
@@ -85,6 +96,7 @@ typedef struct SchemaCP
     SchemaAttr      **attrs;
     unsigned int      numAttr;
     unsigned int      numReqAttr;
+    domKeyConstraint *domKeys;
 } SchemaCP;
 
 typedef struct SchemaValidationStack
@@ -110,7 +122,7 @@ typedef struct
     int unknownIDrefs;
 } SchemaDocKey;
     
-typedef struct 
+typedef struct SchemaData_
 {
     Tcl_Obj *self;
     char *start;
