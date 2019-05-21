@@ -42,7 +42,6 @@
 #include <ctype.h>
 #include <expat.h>
 #include <domalloc.h>
-#include <schema.h>
 
 /*
  * tDOM provides it's own memory allocator which is optimized for
@@ -703,6 +702,12 @@ typedef struct domAttrNode {
 \-------------------------------------------------------------------------*/
 typedef int  (*domAddCallback)  (domNode * node, void * clientData);
 typedef void (*domFreeCallback) (domNode * node, void * clientData);
+
+/*--------------------------------------------------------------------------
+|   Forward declaration
+|
+\-------------------------------------------------------------------------*/
+typedef struct SchemaData_ SchemaData;
 
 /*--------------------------------------------------------------------------
 |   Function prototypes

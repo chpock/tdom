@@ -49,6 +49,7 @@
 #include <tcl.h>
 #include <dom.h>
 #include <domxpath.h>
+#include <schema.h>
 #include <tclexpat.h>
 
 
