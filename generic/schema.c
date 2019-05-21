@@ -812,18 +812,27 @@ pushToStack (
         ks = se->keyState;
         while (ks) {
             if (ks->selector->name != pattern->name
-                || ks->selector->ns == pattern->namespace) continue;
+                || ks->selector->ns != pattern->namespace) {
+                ks = ks->next;
+                continue;
+            }
             if (ks->selector->child) {
                 getKeyState(newks);
                 newks->keyTable = ks->keyTable;
                 newks->ownTable = 0;
                 newks->selector = ks->selector->child;
                 newks->fields = ks->fields;
-                if (ks->type == SCHEMA_STEP_DESCENDANT_ELEMENT) {
-                    
-                }
                 newks->next = stackElm->keyState;
                 stackElm->keyState = newks;
+                if (ks->type == SCHEMA_STEP_DESCENDANT_ELEMENT) {
+                    getKeyState(newks);
+                    newks->keyTable = ks->keyTable;
+                    newks->ownTable = 0;
+                    newks->selector = ks->selector;
+                    newks->fields = ks->fields;
+                    newks->next = stackElm->keyState;
+                    stackElm->keyState = newks;                    
+                }
             } else {
                 /* Selector has matched, grab the fields */
             }
