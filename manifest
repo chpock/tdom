@@ -1,5 +1,5 @@
-C Adding\sDOM\stree\spostvalidation\s(only)\slocal\skey\sconstraints\salong\sthe\slines\sof\sxsd\sunqiue\swith\sselector\sand\slist\sof\sfields\sbut\swith\sno\srestrictions\son\sthe\sXPath\sexpressions\s(other\sthen\sresulting\sa\snode\sset\sin\scase\sof\sselector\sand\sa\sresult\sset\swith\sone\snode\sin\scase\sof\sfield\sXPath\sexpression).
-D 2019-05-21T16:21:31.289
+C Added\soptional\sflag\sargument\sto\sdomunique.\sCurrently\sonly\sflag\scontrols,\sif\sempty\sfield\snot\ssets\sare\signored\s(or\sseen\sas\sthe\sempty\sstring).
+D 2019-05-21T22:24:06.361
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -134,8 +134,8 @@ F generic/domxslt.h 140fa73765d699bfced9554c2c6439c0d2e6695eec3a8e69e1d25c0bbdf2
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c abf69665ad49ed053885f7e7459d47be5abb057ba4ed919e96e83d636b016a30
 F generic/nodecmd.h e4a6d836834554a2a590cbd916cdee937945965ee55709e48b62976a66861ef8
-F generic/schema.c 6693d55eb40aefaeb327cadc23862f2f42ae454398dfa001a0e867bf180ddad8
-F generic/schema.h 3126cc692fc1f6d77221f63f7d90323d63289513063e1601fd017b72705607ae
+F generic/schema.c 84e7cd4b84a02694ef567cd018bbc5a46bb6f6f437ae28f634088c1ee30a1711
+F generic/schema.h 2e19865939e2d855536eb0ae4d8c274a555af9541989d7044b42cc88f48c6f7b
 F generic/tcldom.c 3ffc9edd5abbb81177b4116a1c0d461879a2aa6a6db25b40671042c82a193d24
 F generic/tcldom.h 04ce531dd54fe3fcb82ba77194e3634cd95fb5bb2f3f0b7197abfdde9af2f2fd
 F generic/tclexpat.c 57f37c0029b7ae78d1a4dc22a068b5682f6b8867b69113dffca2e460529d0b4b
@@ -204,7 +204,7 @@ F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
 F tests/pullparser.test e4b14ea0bdc9f9fd931f3bc559e78c309582a67a238170d58e0f20331f99890c
 F tests/pushpull.bench 664e8f512917537d96c4b71933d4d9a6da65fc6fe85bd7c459483830dc7d2faf
-F tests/schema.test 9fa88f48a3a57d25e9e77967233743df46865847b7a3e88877b3bd3cb6c50c52
+F tests/schema.test 2ad46a0c78093e4a32d977793d2367a9b4428e4483d2d2f6af313393ce5ef060
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
 F tests/tdomcmd.bench b07448ed4de08ccaa9734cf3fe15c695fd7066c993da58ff48d465747940e417
 F tests/tdomcmd.test 092401adf0609906d710f3ef8997cb4ca29bc208
@@ -230,11 +230,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 6b550b98f8375f99016b8ab33987cdeba487d80ad403246173453a47f7589542
-R ccba39edac82a2e17a1f8a217d45c92c
-T *branch * domlocalkey
-T *sym-domlocalkey *
-T -sym-schema *
+P f645e5dfe14b0b43d40e0b25d01767e3f283e97b136ddcbcb0523a61fd869b8c
+R 75ab110fc55f9ca4476764b84b5b53a2
 U rolf
-Z 19095a4dff9dd9fb15b47bbb8ecfc7bf
+Z 78d9c66fa7f18374616493c052790b30
 # Remove this line to create a well-formed Fossil manifest.

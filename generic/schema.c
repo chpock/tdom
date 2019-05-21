@@ -88,6 +88,13 @@ typedef struct
 } ValidateMethodData;
 
 /*----------------------------------------------------------------------------
+|   domKeyConstraint related flage
+|
+\---------------------------------------------------------------------------*/
+
+#define DKC_FLAG_IGNORE_EMPTY_FIELD_SET 1
+
+/*----------------------------------------------------------------------------
 |   Macros
 |
 \---------------------------------------------------------------------------*/
@@ -102,7 +109,7 @@ typedef struct
 #define SetBooleanResult(i) Tcl_ResetResult(interp); \
                      Tcl_SetBooleanObj(Tcl_GetObjResult(interp), (i))
 
-#define SPACE(c) ((c) == ' ' || (c) == '\n' || (c )== '\t' || (c) == '\r')
+#define SPACE(c) ((c) == ' ' || (c) == '\n' || (c) == '\t' || (c) == '\r')
     
 #define checkNrArgs(l,h,err) if (objc < l || objc > h) {      \
         SetResult (err);                                      \
@@ -372,6 +379,7 @@ static void serializeStack (
 )
 
 /* DBG end */
+
 
 static void freedomKeyConstraints (
     domKeyConstraint *kc
@@ -2164,6 +2172,9 @@ checkdomKeyConstraints (
                     goto errorCleanup;
                 }
                 if (frs.type == EmptyResult || frs.nr_nodes == 0) {
+                    if (kc->flags & DKC_FLAG_IGNORE_EMPTY_FIELD_SET) {
+                        continue;
+                    }
                     Tcl_CreateHashEntry (&htable, "", &hnew);
                     if (!hnew) {
                         if (recover (interp, sdata, S("DOM_KEYCONSTRAINT"))) {
@@ -2213,8 +2224,8 @@ checkdomKeyConstraints (
                 }
             } else {
                 Tcl_DStringSetLength (&dStr, 0);
-                skip = 1;
-                first = 0;
+                skip = 0;
+                first = 1;
                 for (j = 0; j < kc->nrFields; j++) {
                     xpathRSReset (&frs, NULL);
                     rc = xpathEvalAst (kc->fields[j], &nodeList, n, &frs,
@@ -2237,6 +2248,9 @@ checkdomKeyConstraints (
                         goto errorCleanup;
                     }
                     if (frs.type == EmptyResult || frs.nr_nodes == 0) {
+                        if (kc->flags & DKC_FLAG_IGNORE_EMPTY_FIELD_SET) {
+                            continue;
+                        }
                         if (first) first = 0;
                         else Tcl_DStringAppend (&dStr, ":", 1);
                         continue;
@@ -3669,15 +3683,39 @@ domuniquePatternCmd (
     ast t;
     char *errMsg = NULL;
     domKeyConstraint *kc;
-    int i, nrFields;
+    int i, nrFields, flags = 0, nrFlags;
     Tcl_Obj *elm;
 
     CHECK_SI
     CHECK_TOPLEVEL
-    checkNrArgs (3,4,"Expected: <selector> <fieldlist> ?<name>?");
+    checkNrArgs (3, 5, "Expected: <selector> <fieldlist> ?<name>? ?flags?");
     if (sdata->cp->type != SCHEMA_CTYPE_NAME) {
         SetResult ("The domunique schema definition command is only "
                    "allowed as direct child of an element.");
+    }
+    if (Tcl_ListObjLength (interp, objv[2], &nrFields) != TCL_OK) {
+        SetResult ("The <fieldlist> argument must be a valid tcl list");
+        return TCL_ERROR;
+    }
+    if (nrFields == 0) {
+        SetResult ("Non empty fieldlist arugment expected.");
+        xpathFreeAst (t);
+        return TCL_ERROR;
+    }
+    if (objc == 5) {
+        if (Tcl_ListObjLength (interp, objv[4], &nrFlags) != TCL_OK) {
+            SetResult ("The <flags> argument must be a valid tcl list");
+            return TCL_ERROR;
+        }
+        for (i = 0; i < nrFlags; i++) {
+            Tcl_ListObjIndex (interp, objv[4], i, &elm);
+            if (strcmp ("IGNORE_EMPTY_FIELD_SET", Tcl_GetString (elm)) == 0) {
+                flags |= DKC_FLAG_IGNORE_EMPTY_FIELD_SET;
+                continue;
+            }
+            SetResult3 ("Unknown flag '", Tcl_GetString (elm), "'");
+            return TCL_ERROR;
+        }
     }
     
     if (xpathParse (Tcl_GetString (objv[1]), NULL, XPATH_EXPR,
@@ -3687,16 +3725,6 @@ domuniquePatternCmd (
         return TCL_ERROR;
     }
 
-    if (Tcl_ListObjLength (interp, objv[2], &nrFields) != TCL_OK) {
-        SetResult ("The <fieldlist> argument must be a valid tcl list");
-        xpathFreeAst (t);
-        return TCL_ERROR;
-    }
-    if (nrFields == 0) {
-        SetResult ("Non empty fieldlist arugment expected.");
-        xpathFreeAst (t);
-        return TCL_ERROR;
-    }
     
     kc = TMALLOC (domKeyConstraint);
     memset (kc, 0, sizeof (domKeyConstraint));
@@ -3704,6 +3732,7 @@ domuniquePatternCmd (
     memset (kc->fields, 0, sizeof (ast) * nrFields);
     kc->nrFields = nrFields;
     kc->selector = t;
+    kc->flags = flags;
     
     for (i = 0; i < nrFields; i++) {
         Tcl_ListObjIndex (interp, objv[2], i, &elm);

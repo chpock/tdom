@@ -4664,12 +4664,37 @@ test schema-20.2 {domunique} {
     foreach xml {
         {<doc><item ref="1"/><item ref="foo"/></doc>}
         {<doc><item ref="1"/><item ref="1"/></doc>}
+        {<doc><item/><item ref="1"/></doc>}
+        {<doc><item/><item/></doc>}
     } {
         lappend result [postValidation s $xml]
     }
     s delete
     set result
-} {1 0}
+} {1 0 1 0}
+
+test schema-20.2a {domunique} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            domunique item @ref itemrefkey IGNORE_EMPTY_FIELD_SET
+            element item * {
+                attribute ref ?
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        {<doc><item ref="1"/><item ref="foo"/></doc>}
+        {<doc><item ref="1"/><item ref="1"/></doc>}
+        {<doc><item/><item ref="1"/></doc>}
+        {<doc><item/><item/></doc>}
+    } {
+        lappend result [postValidation s $xml]
+    }
+    s delete
+    set result
+} {1 0 1 1}
 
 test schema-20.3 {domunique} {
     tdom::schema s
@@ -4705,6 +4730,7 @@ test schema-20.4 {domunique} {
             domunique item {@ref @id}
             element item * {
                 attribute ref ?
+                attribute id ?
             }
         }
     }

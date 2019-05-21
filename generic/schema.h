@@ -80,6 +80,7 @@ typedef struct domKeyConstraint {
     ast    selector;
     ast   *fields;
     int    nrFields;
+    int    flags;
     struct domKeyConstraint *next;
 } domKeyConstraint;
 
