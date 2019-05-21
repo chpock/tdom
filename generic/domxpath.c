@@ -265,6 +265,28 @@ void xpathRSFree ( xpathResultSet *rs ) {
     rs->type = EmptyResult;
 }
 
+void
+xpathRSReset (
+    xpathResultSet *rs,
+    domNode *node
+    ) 
+{
+    if (rs->type == StringResult) FREE(rs->string);
+    if (node) {
+        if (!rs->nodes) {
+            rs->nodes     = (domNode**)MALLOC( INITIAL_SIZE*sizeof(domNode*));
+            rs->allocated = INITIAL_SIZE;
+        }
+        rs->nodes[0] = node;
+        rs->nr_nodes = 1;
+        rs->type = xNodeSetResult;
+    } else {
+        rs->nr_nodes = 0;
+        if (rs->nodes) rs->type = xNodeSetResult;
+        else rs->type = EmptyResult;
+    }
+}
+
 void rsPrint ( xpathResultSet *rs ) {
     int i = 0,l;  char tmp[80];
     switch (rs->type) {
@@ -5225,6 +5247,67 @@ int xpathEval (
     return 0;
 
 } /* xpathEval */
+
+
+int
+xpathEvalAst (
+    ast             t,
+    xpathResultSet *nodeList,
+    domNode        *node,
+    xpathResultSet *rs,
+    char          **errMsg
+    )
+{
+    int i, rc, first = 1, docOrder = 1;
+    xpathResultSet savedContext;
+    savedContext = *nodeList;
+
+    while (t) {
+        DBG (fprintf (stderr, "xpathEvalAst: eval step '%s'\n", 
+                      astType2str[t->type]);)
+        if (t->type == Pred) {
+            *errMsg = "Pred step not expected now!";
+            return XPATH_EVAL_ERR;
+        }
+        if (first) {
+            rc = xpathEvalStepAndPredicates (t, nodeList, node,
+                                             node, 0, &docOrder,
+                                             NULL, rs, errMsg);
+            CHECK_RC;
+            first = 0;
+        } else {
+            DBG( fprintf(stderr, "doing location step nodeList->nr_nodes=%d \n",
+                                 nodeList->nr_nodes);
+            )
+            if (rs->type != xNodeSetResult) {
+                *nodeList = savedContext;
+                return 0;
+            }
+
+            *nodeList = *rs;
+            xpathRSReset (rs, NULL);
+            for (i=0; i < nodeList->nr_nodes; i++) {
+                rc = xpathEvalStepAndPredicates (t, nodeList,
+                                                 nodeList->nodes[i],
+                                                 node, i, &docOrder, NULL,
+                                                 rs, errMsg);
+                if (rc) {
+                    *nodeList = savedContext;
+                    return rc;
+                }
+            }
+        }
+        DBG( fprintf(stderr, "result after location step: \n"); )
+        DBG( rsPrint( result); )
+
+        t = t->next;
+        /* skip the already processed Predicate parts */
+        while (t && t->type == Pred) t = t->next;
+        docOrder = 1;
+    }
+    *nodeList = savedContext;
+    return 0;
+}
 
 /*----------------------------------------------------------------------------
 |   xpathMatches
