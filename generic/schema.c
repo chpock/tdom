@@ -3830,10 +3830,6 @@ processSchemaXPath (
     while (t) {
         switch (t->type) {
         case GetContextNode:
-            if (!toplevel) {
-                SetResult ("Not a reduced XPath expression.");
-                return 0;
-            }
             t = t->next;
             continue;
         case CombineSets:

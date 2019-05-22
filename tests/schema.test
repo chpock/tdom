@@ -4651,6 +4651,7 @@ test schema-19.1 {unique} {
     set result
 } {1 1 0 1}
 
+
 test schema-19.2 {unique} {
     set schema {
         prefixns {ns1 http://tdom.org/test}
@@ -4680,14 +4681,15 @@ test schema-19.2 {unique} {
         {    }
         "
                 "
+        ./item/./foo/.
+        .
     } {
         tdom::schema s
-        lappend result [catch {s define $schema} errMsg]
-        #puts $errMsg
+        lappend result [catch {s define $schema}]
         s delete
     }
     set result
-} {0 1 1 0 0 0 1 0 0 1 1 0 1 1 0 1 1 1 1}
+} {0 1 1 0 0 0 1 0 0 1 1 0 1 1 0 1 1 1 1 0 0}
 
 test schema-19.2a {unique} {
     set schema {
