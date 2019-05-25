@@ -1,5 +1,5 @@
-C Started\swork.\s(Wenn\ses\sanders\snicht\sgeht,\sso\sgeht\ses\sdoch\sviel\sbesser.)
-D 2019-05-25T00:46:11.456
+C Added\sthe\snew\sCTYPE\salso\sto\sthe\sdebug\sfunctions.
+D 2019-05-25T12:32:39.439
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -134,7 +134,7 @@ F generic/domxslt.h 140fa73765d699bfced9554c2c6439c0d2e6695eec3a8e69e1d25c0bbdf2
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c abf69665ad49ed053885f7e7459d47be5abb057ba4ed919e96e83d636b016a30
 F generic/nodecmd.h e4a6d836834554a2a590cbd916cdee937945965ee55709e48b62976a66861ef8
-F generic/schema.c 4c29f8a139aedf3c38645c0eda210f7ae0452781b5b72cdcfc98ec518d02548b
+F generic/schema.c 0faaf6ad193a9d1e2ea878bf73ebb95dbe8943a8f649ca8e8eb6f00abfd1546c
 F generic/schema.h e6e0272d56af024626d24e68e9227641bcbbcec66bdcfebeb432c82f00edf81d
 F generic/tcldom.c 3ffc9edd5abbb81177b4116a1c0d461879a2aa6a6db25b40671042c82a193d24
 F generic/tcldom.h 04ce531dd54fe3fcb82ba77194e3634cd95fb5bb2f3f0b7197abfdde9af2f2fd
@@ -230,11 +230,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ba6bd2bb7cc770b410016a7729f73fcb1d8df7362eeac1f66f48308aef750d3e
-R 76281786a5528fc1af2ec2382e18c68a
-T *branch * keyspaces
-T *sym-keyspaces *
-T -sym-schema *
+P 11c1cd9dad3fef4487d831a4ea0a5666b3e8a582464f8af441b07020560a8141
+R 7b88096ef987e38068692e5795f2aa2e
 U rolf
-Z 0e750bf476c4860152c5418118c8bacb
+Z 178214635a4f80ec0b81e6af3c3c0ef1
 # Remove this line to create a well-formed Fossil manifest.

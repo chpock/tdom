@@ -315,10 +315,13 @@ static void serializeCP (
     fprintf (stderr, "CP %p type: %s\n",
              pattern, Schema_CP_Type2str[pattern->type]);
     switch (pattern->type) {
+    case SCHEMA_CTYPE_KEYSPACE:
+        fprintf (stderr, "\tName: '%s'\n", pattern->name);
+        break;
     case SCHEMA_CTYPE_NAME:
     case SCHEMA_CTYPE_PATTERN:
         fprintf (stderr, "\tName: '%s' Namespace: '%s'\n",
-                 pattern->name,pattern->namespace);
+                 pattern->name, pattern->namespace);
         if (pattern->flags & FORWARD_PATTERN_DEF) {
             fprintf (stderr, "\tAnonymously defined NAME\n");
         }
