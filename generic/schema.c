@@ -300,6 +300,7 @@ initSchemaCP (
         break;
     case SCHEMA_CTYPE_VIRTUAL:
     case SCHEMA_CTYPE_ANY:
+    case SCHEMA_CTYPE_KEYSPACE:
         /* Do nothing */
         break;
     }
@@ -927,6 +928,9 @@ matchElementStart (
                     case SCHEMA_CTYPE_VIRTUAL:
                         Tcl_Panic ("Virtual constrain in MIXED or CHOICE");
                         
+                    case SCHEMA_CTYPE_KEYSPACE:
+                        Tcl_Panic ("Keyspace constrain in MIXED or CHOICE");
+                        
                     }
                     if (!mayskip && mayMiss (candidate->quants[i]))
                         mayskip = 1;
@@ -956,6 +960,9 @@ matchElementStart (
                 popStack (sdata);
 
                 break;
+            case SCHEMA_CTYPE_KEYSPACE:
+
+                break;
             }
             if (!mayskip && mustMatch (cp->quants[ac], hm)) {
                 if (recover (interp, sdata, S("MISSING_CP"))) {
@@ -980,6 +987,7 @@ matchElementStart (
         }
         return -1;
 
+    case SCHEMA_CTYPE_KEYSPACE:
     case SCHEMA_CTYPE_VIRTUAL:
     case SCHEMA_CTYPE_CHOICE:
     case SCHEMA_CTYPE_TEXT:
@@ -1039,6 +1047,11 @@ matchElementStart (
             case SCHEMA_CTYPE_VIRTUAL:
                 Tcl_Panic ("Virtual constraint child of INTERLEAVE");
                 break;
+
+            case SCHEMA_CTYPE_KEYSPACE:
+                Tcl_Panic ("Keyspace constraint child of INTERLEAVE");
+                break;
+
             }
 
         }
@@ -1469,6 +1482,9 @@ static int checkElementEnd (
             }
             
             switch (cp->content[ac]->type) {
+            case SCHEMA_CTYPE_KEYSPACE:
+                break;
+                
             case SCHEMA_CTYPE_TEXT:
                 if (cp->content[ac]->nc) {
                     if (!checkText (interp, cp->content[ac], "")) {
@@ -1498,8 +1514,6 @@ static int checkElementEnd (
                         mayMiss = 1;
                         break;
 
-                    case SCHEMA_CTYPE_CHOICE:
-                        /* Can't happen */
                     case SCHEMA_CTYPE_NAME:
                     case SCHEMA_CTYPE_ANY:
                         continue;
@@ -1513,8 +1527,10 @@ static int checkElementEnd (
                         popStack (sdata);
                         break;
                         
+                    case SCHEMA_CTYPE_KEYSPACE:
                     case SCHEMA_CTYPE_VIRTUAL:
-                        Tcl_Panic ("Virtual constrain in MIXED or CHOICE");
+                    case SCHEMA_CTYPE_CHOICE:
+                        Tcl_Panic ("Invalid CTYPE in MIXED or CHOICE");
                         
                     }
                     if (mayMiss) break;
@@ -1549,6 +1565,7 @@ static int checkElementEnd (
         if (isName) return 1;
         return -1;
 
+    case SCHEMA_CTYPE_KEYSPACE:
     case SCHEMA_CTYPE_VIRTUAL:
     case SCHEMA_CTYPE_CHOICE:
     case SCHEMA_CTYPE_TEXT:
@@ -1761,6 +1778,9 @@ matchText (
                         case SCHEMA_CTYPE_CHOICE:
                             Tcl_Panic ("MIXED or CHOICE child of MIXED or CHOICE");
 
+                        case SCHEMA_CTYPE_KEYSPACE:
+                            Tcl_Panic ("Keyspace constrain in MIXED or CHOICE");
+                            
                         }
                     }
                     if (mustMatch (cp->quants[ac], hm)) {
@@ -1785,6 +1805,10 @@ matchText (
 
                 case SCHEMA_CTYPE_VIRTUAL:
                     if (!evalVirtual (interp, sdata, candidate)) return 0;
+                    break;
+
+                case SCHEMA_CTYPE_KEYSPACE:
+
                     break;
                     
                 case SCHEMA_CTYPE_NAME:
@@ -1842,11 +1866,18 @@ matchText (
                 case SCHEMA_CTYPE_CHOICE:
                     Tcl_Panic ("MIXED or CHOICE child of INTERLEAVE");
 
+                case SCHEMA_CTYPE_KEYSPACE:
+                    Tcl_Panic ("Keyspace child of INTERLEAVE");
+
                 case SCHEMA_CTYPE_VIRTUAL:
                     break;
                     
                 }
             }
+            
+        case SCHEMA_CTYPE_KEYSPACE:
+
+            break;
         }
         break;
     }
@@ -3646,11 +3677,8 @@ VirtualPatternObjCmd (
         return TCL_ERROR;
     }
 
-    switch (sdata->cp->type) {
-    case SCHEMA_CTYPE_NAME:
-    case SCHEMA_CTYPE_PATTERN:
-        break;
-    default:
+    if (sdata->cp->type != SCHEMA_CTYPE_NAME
+        && sdata->cp->type != SCHEMA_CTYPE_PATTERN) {
         SetResult ("The \"tcl\" schema definition command is only "
                    "allowed in sequential context (defelement, "
                    "element or defpattern)");
@@ -3672,7 +3700,7 @@ VirtualPatternObjCmd (
 }
 
 static int
-domuniquePatternCmd (
+domuniquePatternObjCmd (
     ClientData clientData,
     Tcl_Interp *interp,
     int objc,
@@ -3751,6 +3779,41 @@ domuniquePatternCmd (
     }
     kc->next = sdata->cp->domKeys;
     sdata->cp->domKeys = kc;
+    return TCL_OK;
+}
+
+static int
+keyspacePatternObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaCP *pattern;
+    int nrFlags;
+
+    CHECK_SI
+    CHECK_TOPLEVEL
+    checkNrArgs (2, 3, "Expected: <keyspace-name> ?flags?");
+    if (sdata->cp->type != SCHEMA_CTYPE_NAME
+        && sdata->cp->type != SCHEMA_CTYPE_PATTERN) {
+        SetResult ("The keyspace schema definition command is only "
+                   "allowed in sequential context (defelement, "
+                   "element or defpattern)");
+        return TCL_ERROR;
+    }
+    if (objc == 3) {
+        if (Tcl_ListObjLength (interp, objv[2], &nrFlags) != TCL_OK) {
+            SetResult ("The optional <flags> argument must be a valid tcl "
+                       "list");
+            return TCL_ERROR;
+        }
+    }
+    pattern = initSchemaCP (SCHEMA_CTYPE_KEYSPACE, NULL, NULL);
+    REMEMBER_PATTERN (pattern);
+
     return TCL_OK;
 }
 
@@ -5042,7 +5105,8 @@ tDOM_SchemaInit (
     Tcl_CreateObjCommand (interp, "tdom::schema::group",
                           AnonPatternObjCmd, (ClientData) 3, NULL);
 
-    /* The "attribute", "nsattribute", "namespace" and "text" definition commands. */
+    /* The "attribute", "nsattribute", "namespace" and "text"
+     * definition commands. */
     Tcl_CreateObjCommand (interp, "tdom::schema::attribute",
                           AttributePatternObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::nsattribute",
@@ -5058,7 +5122,11 @@ tDOM_SchemaInit (
 
     /* XPath contraints for DOM validation */
     Tcl_CreateObjCommand (interp,"tdom::schema::domunique",
-                          domuniquePatternCmd, NULL, NULL);
+                          domuniquePatternObjCmd, NULL, NULL);
+
+    /* Local key constraints */
+    Tcl_CreateObjCommand (interp, "tdom::schema::keyspace",
+                          keyspacePatternObjCmd, NULL, NULL);
     
     /* The text constraint commands */
     Tcl_CreateObjCommand (interp,"tdom::schema::text::integer",
