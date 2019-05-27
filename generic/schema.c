@@ -298,9 +298,12 @@ initSchemaCP (
         /* content/quant will be allocated, if the cp in fact has
          * constraints */
         break;
+    case SCHEMA_CTYPE_KEYSPACE_END:
+    case SCHEMA_CTYPE_KEYSPACE:
+        pattern->name = name;
+        break;
     case SCHEMA_CTYPE_VIRTUAL:
     case SCHEMA_CTYPE_ANY:
-    case SCHEMA_CTYPE_KEYSPACE:
         /* Do nothing */
         break;
     }
@@ -315,6 +318,7 @@ static void serializeCP (
     fprintf (stderr, "CP %p type: %s\n",
              pattern, Schema_CP_Type2str[pattern->type]);
     switch (pattern->type) {
+    case SCHEMA_CTYPE_KEYSPACE_END:
     case SCHEMA_CTYPE_KEYSPACE:
         fprintf (stderr, "\tName: '%s'\n", pattern->name);
         break;
@@ -931,6 +935,7 @@ matchElementStart (
                     case SCHEMA_CTYPE_VIRTUAL:
                         Tcl_Panic ("Virtual constrain in MIXED or CHOICE");
                         
+                    case SCHEMA_CTYPE_KEYSPACE_END:
                     case SCHEMA_CTYPE_KEYSPACE:
                         Tcl_Panic ("Keyspace constrain in MIXED or CHOICE");
                         
@@ -963,6 +968,9 @@ matchElementStart (
                 popStack (sdata);
 
                 break;
+            case SCHEMA_CTYPE_KEYSPACE_END:
+
+                break;
             case SCHEMA_CTYPE_KEYSPACE:
 
                 break;
@@ -991,6 +999,7 @@ matchElementStart (
         return -1;
 
     case SCHEMA_CTYPE_KEYSPACE:
+    case SCHEMA_CTYPE_KEYSPACE_END:
     case SCHEMA_CTYPE_VIRTUAL:
     case SCHEMA_CTYPE_CHOICE:
     case SCHEMA_CTYPE_TEXT:
@@ -1051,6 +1060,7 @@ matchElementStart (
                 Tcl_Panic ("Virtual constraint child of INTERLEAVE");
                 break;
 
+            case SCHEMA_CTYPE_KEYSPACE_END:
             case SCHEMA_CTYPE_KEYSPACE:
                 Tcl_Panic ("Keyspace constraint child of INTERLEAVE");
                 break;
@@ -1485,6 +1495,9 @@ static int checkElementEnd (
             }
             
             switch (cp->content[ac]->type) {
+            case SCHEMA_CTYPE_KEYSPACE_END:
+                break;
+
             case SCHEMA_CTYPE_KEYSPACE:
                 break;
                 
@@ -1530,6 +1543,7 @@ static int checkElementEnd (
                         popStack (sdata);
                         break;
                         
+                    case SCHEMA_CTYPE_KEYSPACE_END:
                     case SCHEMA_CTYPE_KEYSPACE:
                     case SCHEMA_CTYPE_VIRTUAL:
                     case SCHEMA_CTYPE_CHOICE:
@@ -1568,6 +1582,7 @@ static int checkElementEnd (
         if (isName) return 1;
         return -1;
 
+    case SCHEMA_CTYPE_KEYSPACE_END:
     case SCHEMA_CTYPE_KEYSPACE:
     case SCHEMA_CTYPE_VIRTUAL:
     case SCHEMA_CTYPE_CHOICE:
@@ -1781,6 +1796,7 @@ matchText (
                         case SCHEMA_CTYPE_CHOICE:
                             Tcl_Panic ("MIXED or CHOICE child of MIXED or CHOICE");
 
+                        case SCHEMA_CTYPE_KEYSPACE_END:
                         case SCHEMA_CTYPE_KEYSPACE:
                             Tcl_Panic ("Keyspace constrain in MIXED or CHOICE");
                             
@@ -1810,6 +1826,10 @@ matchText (
                     if (!evalVirtual (interp, sdata, candidate)) return 0;
                     break;
 
+                case SCHEMA_CTYPE_KEYSPACE:
+
+                    break;
+                    
                 case SCHEMA_CTYPE_KEYSPACE:
 
                     break;
@@ -1869,6 +1889,7 @@ matchText (
                 case SCHEMA_CTYPE_CHOICE:
                     Tcl_Panic ("MIXED or CHOICE child of INTERLEAVE");
 
+                case SCHEMA_CTYPE_KEYSPACE_END:
                 case SCHEMA_CTYPE_KEYSPACE:
                     Tcl_Panic ("Keyspace child of INTERLEAVE");
 
@@ -1877,6 +1898,10 @@ matchText (
                     
                 }
             }
+            
+        case SCHEMA_CTYPE_KEYSPACE:
+
+            break;
             
         case SCHEMA_CTYPE_KEYSPACE:
 
@@ -3795,11 +3820,12 @@ keyspacePatternObjCmd (
 {
     SchemaData *sdata = GETASI;
     SchemaCP *pattern;
-    int nrFlags;
+    int nrKeyspaces, i;
+    Tcl_Obj *ksObj;
 
     CHECK_SI
     CHECK_TOPLEVEL
-    checkNrArgs (2, 3, "Expected: <keyspace-name> ?flags?");
+    checkNrArgs (3, 3, "Expected: <keyspace-name list> pattern");
     if (sdata->cp->type != SCHEMA_CTYPE_NAME
         && sdata->cp->type != SCHEMA_CTYPE_PATTERN) {
         SetResult ("The keyspace schema definition command is only "
@@ -3807,16 +3833,28 @@ keyspacePatternObjCmd (
                    "element or defpattern)");
         return TCL_ERROR;
     }
-    if (objc == 3) {
-        if (Tcl_ListObjLength (interp, objv[2], &nrFlags) != TCL_OK) {
-            SetResult ("The optional <flags> argument must be a valid tcl "
-                       "list");
-            return TCL_ERROR;
-        }
+    if (Tcl_ListObjLength (interp, objv[1], &nrKeyspaces) != TCL_OK) {
+        SetResult ("The <keyspace-name list> argument must be a valid tcl "
+                   "list");
+        return TCL_ERROR;
     }
-    pattern = initSchemaCP (SCHEMA_CTYPE_KEYSPACE, NULL, NULL);
-    REMEMBER_PATTERN (pattern);
-
+    for (i = 0; i < nrKeyspaces; i++) {
+        Tcl_ListObjIndex (interp, objv[1], i, &ksObj);
+        pattern = initSchemaCP (SCHEMA_CTYPE_KEYSPACE,
+                                Tcl_GetString (ksObj), NULL);
+        REMEMBER_PATTERN (pattern);
+        addToContent (sdata, pattern, SCHEMA_CQUANT_ONE, 0, 0);
+    }
+    if (Tcl_EvalObjEx (interp, objv[2], TCL_EVAL_DIRECT) != TCL_OK) {
+        return TCL_ERROR;
+    }
+    for (i = 0; i < nrKeyspaces; i++) {
+        Tcl_ListObjIndex (interp, objv[1], i, &ksObj);
+        pattern = initSchemaCP (SCHEMA_CTYPE_KEYSPACE_END,
+                                Tcl_GetString (ksObj), NULL);
+        REMEMBER_PATTERN (pattern);
+        addToContent (sdata, pattern, SCHEMA_CQUANT_ONE, 0, 0);
+    }
     return TCL_OK;
 }
 
