@@ -4612,6 +4612,36 @@ proc postValidation {g xml} {
     return $rc
 }
 
+test schema-19.1 {keyspace} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element items * {
+                keyspace ref {
+                    element item * {
+                        attribute ref ? {
+                            key ref
+                        }
+                    }
+                }
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        {<doc><items><item ref="1"/><item ref="foo"/></items></doc>}
+        {<doc><items><item ref="1"/><item ref="1"/></items></doc>}
+        {<doc><items><item ref="1"/><item ref="foo"/></items><items><item ref="1"/><item ref="foo"/></items></doc>}
+        {<doc><items><item ref="1"/><item ref="foo"/></items><items><item ref="1"/><item ref="bar"/></items></doc>}
+        {<doc><items><item ref="1"/><item ref="foo"/></items><items><item ref="2"/><item ref="bar"/></items></doc>}
+        {<doc><items><item ref="1"/><item ref="foo"/></items><items><item ref="bar"/><item ref="bar"/></items></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 0 1 1 1 0}
+
 test schema-20.1 {domunique} {
     set schema {
         prefixns {ns1 http://tdom.org/test}

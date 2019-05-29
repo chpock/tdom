@@ -583,10 +583,11 @@ static void schemaInstanceDelete (
          h = Tcl_NextHashEntry (&search)) {
         ks = Tcl_GetHashValue (h);
         if (ks->active) {
-            Tcl_DeleteHashTable (&dk->ids);
+            Tcl_DeleteHashTable (&ks->ids);
         }
         FREE (ks);
     }
+    Tcl_DeleteHashTable (&sdata->keySpaces);
     FREE (sdata);
 }
 
@@ -987,7 +988,9 @@ matchElementStart (
                     }
                     Tcl_DeleteHashTable (&candidate->keySpace->ids);
                 }
-                break;
+                ac++;
+                hm = 0;
+                continue;
 
             case SCHEMA_CTYPE_KEYSPACE:
                 if (!candidate->keySpace->active) {
@@ -998,7 +1001,9 @@ matchElementStart (
                 } else {
                     candidate->keySpace->active++;
                 }
-                break;
+                ac++;
+                hm = 0;
+                continue;
             }
             if (!mayskip && mustMatch (cp->quants[ac], hm)) {
                 if (recover (interp, sdata, S("MISSING_CP"))) {
@@ -1521,9 +1526,24 @@ static int checkElementEnd (
             
             switch (cp->content[ac]->type) {
             case SCHEMA_CTYPE_KEYSPACE_END:
+                cp->content[ac]->keySpace->active--;
+                if (!cp->content[ac]->keySpace->active) {
+                    if (cp->content[ac]->keySpace->unknownIDrefs) {
+                        /* Recover or report error */
+                    }
+                    Tcl_DeleteHashTable (&cp->content[ac]->keySpace->ids);
+                }
                 break;
 
             case SCHEMA_CTYPE_KEYSPACE:
+                if (!cp->content[ac]->keySpace->active) {
+                    Tcl_InitHashTable (&cp->content[ac]->keySpace->ids,
+                                       TCL_STRING_KEYS);
+                    cp->content[ac]->keySpace->active = 1;
+                    cp->content[ac]->keySpace->unknownIDrefs = 0;
+                } else {
+                    cp->content[ac]->keySpace->active++;
+                }
                 break;
                 
             case SCHEMA_CTYPE_TEXT:
@@ -1852,11 +1872,24 @@ matchText (
                     break;
 
                 case SCHEMA_CTYPE_KEYSPACE:
-
+                    if (!cp->content[ac]->keySpace->active) {
+                        Tcl_InitHashTable (&cp->content[ac]->keySpace->ids,
+                                           TCL_STRING_KEYS);
+                        cp->content[ac]->keySpace->active = 1;
+                        cp->content[ac]->keySpace->unknownIDrefs = 0;
+                    } else {
+                        cp->content[ac]->keySpace->active++;
+                    }
                     break;
                     
                 case SCHEMA_CTYPE_KEYSPACE_END:
-
+                    cp->content[ac]->keySpace->active--;
+                    if (!cp->content[ac]->keySpace->active) {
+                        if (cp->content[ac]->keySpace->unknownIDrefs) {
+                            /* Recover or report error */
+                        }
+                        Tcl_DeleteHashTable (&cp->content[ac]->keySpace->ids);
+                    }
                     break;
                     
                 case SCHEMA_CTYPE_NAME:
@@ -1877,6 +1910,8 @@ matchText (
             popStack (sdata);
             continue;
 
+        case SCHEMA_CTYPE_KEYSPACE:
+        case SCHEMA_CTYPE_KEYSPACE_END:
         case SCHEMA_CTYPE_VIRTUAL:
         case SCHEMA_CTYPE_CHOICE:
         case SCHEMA_CTYPE_TEXT:
@@ -1923,13 +1958,6 @@ matchText (
                     
                 }
             }
-            
-        case SCHEMA_CTYPE_KEYSPACE:
-
-            break;
-            
-        case SCHEMA_CTYPE_KEYSPACE_END:
-
             break;
         }
         break;
@@ -2509,6 +2537,7 @@ schemaReset (
     Tcl_HashEntry *h;
     Tcl_HashSearch search;
     SchemaDocKey *dk;
+    SchemaKeySpace *ks;
     
     while (sdata->stack) popStack (sdata);
     sdata->validationState = VALIDATION_READY;
@@ -2530,6 +2559,19 @@ schemaReset (
                 Tcl_InitHashTable (&dk->ids, TCL_STRING_KEYS);
                 dk->unknownIDrefs = 0;
             }
+        }
+    }
+    if (sdata->keySpaces.numEntries) {
+        for (h = Tcl_FirstHashEntry (&sdata->keySpaces, &search);
+             h != NULL;
+             h = Tcl_NextHashEntry (&search)) {
+            ks = Tcl_GetHashValue (h);
+            if (ks->active && ks->ids.numEntries) {
+                Tcl_DeleteHashTable (&ks->ids);
+                Tcl_InitHashTable (&ks->ids, TCL_STRING_KEYS);
+            }
+            ks->unknownIDrefs = 0;
+            ks->active = 0;
         }
     }
 }
@@ -3867,16 +3909,6 @@ keyspacePatternObjCmd (
     }
     for (i = 0; i < nrKeyspaces; i++) {
         Tcl_ListObjIndex (interp, objv[1], i, &ksObj);
-        pattern = initSchemaCP (SCHEMA_CTYPE_KEYSPACE,
-                                Tcl_GetString (ksObj), NULL);
-        REMEMBER_PATTERN (pattern);
-        addToContent (sdata, pattern, SCHEMA_CQUANT_ONE, 0, 0);
-    }
-    if (Tcl_EvalObjEx (interp, objv[2], TCL_EVAL_DIRECT) != TCL_OK) {
-        return TCL_ERROR;
-    }
-    for (i = 0; i < nrKeyspaces; i++) {
-        Tcl_ListObjIndex (interp, objv[1], i, &ksObj);
         h = Tcl_CreateHashEntry (&sdata->keySpaces,
                                  Tcl_GetString (ksObj), &hnew);
         if (hnew) {
@@ -3887,10 +3919,24 @@ keyspacePatternObjCmd (
         } else {
             ks = Tcl_GetHashValue (h);
         }
+        pattern = initSchemaCP (SCHEMA_CTYPE_KEYSPACE,
+                                Tcl_GetString (ksObj), NULL);
+        pattern->keySpace = ks;
+        REMEMBER_PATTERN (pattern);
+        addToContent (sdata, pattern, SCHEMA_CQUANT_ONE, 0, 0);
+    }
+    sdata->currentEvals++;
+    if (Tcl_EvalObjEx (interp, objv[2], TCL_EVAL_DIRECT) != TCL_OK) {
+        return TCL_ERROR;
+    }
+    sdata->currentEvals--;
+    for (i = 0; i < nrKeyspaces; i++) {
+        Tcl_ListObjIndex (interp, objv[1], i, &ksObj);
+        h = Tcl_FindHashEntry (&sdata->keySpaces, Tcl_GetString(ksObj));
         pattern = initSchemaCP (SCHEMA_CTYPE_KEYSPACE_END,
                                 Tcl_GetString (ksObj), NULL);
         REMEMBER_PATTERN (pattern);
-        pattern->keySpace = ks;
+        pattern->keySpace = Tcl_GetHashValue (h);
         addToContent (sdata, pattern, SCHEMA_CQUANT_ONE, 0, 0);
     }
     return TCL_OK;
@@ -5087,6 +5133,118 @@ idrefTCObjCmd (
 }
 
 static int
+keyImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    SchemaKeySpace *ks = (SchemaKeySpace *) constraintData;
+    int hnew;
+    Tcl_HashEntry *h;
+
+    if (!ks->active) return 1;
+    h = Tcl_CreateHashEntry (&ks->ids, text, &hnew);
+    if (hnew) {
+        Tcl_SetHashValue (h, 1);
+        return 1;
+    }
+    if (Tcl_GetHashValue (h) == 0) {
+        Tcl_SetHashValue (h, 1);
+        ks->unknownIDrefs--;
+        return 1;
+    } else {
+        /* Duplicate ID value */
+        return 0;
+    }
+}
+
+static int
+keyTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+    Tcl_HashEntry *h;
+    int hnew;
+    SchemaKeySpace *ks;
+
+    CHECK_TI
+    CHECK_TOPLEVEL
+    checkNrArgs (2,2,"key_space");
+    ADD_CONSTRAINT (sdata, sc)
+    h = Tcl_CreateHashEntry (&sdata->keySpaces, Tcl_GetString (objv[1]), &hnew);
+    if (hnew) {
+        ks = TMALLOC (SchemaKeySpace);
+        ks->active = 0;
+        ks->unknownIDrefs = 0;
+        Tcl_SetHashValue (h, ks);
+    } else {
+        ks = Tcl_GetHashValue (h);
+    }
+    sc->constraint = keyImpl;
+    sc->constraintData = (void *) ks;
+    return TCL_OK;
+}
+
+static int
+keyrefImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    SchemaKeySpace *ks = (SchemaKeySpace *) constraintData;
+    int hnew;
+    Tcl_HashEntry *h;
+
+    if (!ks->active) return 1;
+    h = Tcl_CreateHashEntry (&ks->ids, text, &hnew);
+    if (hnew) {
+        Tcl_SetHashValue (h, 0);
+        ks->unknownIDrefs++;
+    }
+    return 1;
+}
+
+static int
+keyrefTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+    Tcl_HashEntry *h;
+    int hnew;
+    SchemaKeySpace *ks;
+
+    CHECK_TI
+    CHECK_TOPLEVEL
+    checkNrArgs (2,2,"key_space");
+    ADD_CONSTRAINT (sdata, sc)
+    h = Tcl_CreateHashEntry (&sdata->keySpaces, Tcl_GetString (objv[1]),
+                             &hnew);
+    if (hnew) {
+        ks = TMALLOC (SchemaKeySpace);
+        Tcl_InitHashTable (&ks->ids, TCL_STRING_KEYS);
+        ks->unknownIDrefs = 0;
+        Tcl_SetHashValue (h, ks);
+    } else {
+        ks = Tcl_GetHashValue (h);
+    }
+    sc->constraint = keyrefImpl;
+    sc->constraintData = (void *)ks;
+    return TCL_OK;
+}
+
+static int
 base64Impl (
     Tcl_Interp *interp,
     void *constraintData,
@@ -5248,6 +5406,10 @@ tDOM_SchemaInit (
                           idrefTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::base64",
                           base64TCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::key",
+                          keyTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::keyref",
+                          keyrefTCObjCmd, NULL, NULL);
 }
 
 
