@@ -648,11 +648,11 @@ schema define {
     element comment {text}
 
     defpattern PurchaseOrderType {
-        element shipTo {ref USAddress}
-        element billTo {ref USAddress}
+        element shipTo ! {ref USAddress}
+        element billTo ! {ref USAddress}
         element comment ?
         element items
-        attribute orderDate
+        attribute orderDate isodate
     }
 
     defpattern USAddress {
@@ -661,17 +661,17 @@ schema define {
         element city ! {text}
         element state ! {text}
         element zip ! {text isNumber}
-        attribute country ! {text {fixed "US"}}
+        attribute country ! {fixed "US"}
     }
 
     defelement items {
         element item * {
             element product ! {text}
-            element quntity ! {text {maxExcluse 100}}
-            element USPrice ! {text isNumber}
+            element quantity ! {text {maxExcluse 100}}
+            element USPrice ! {text integer}
             element comment
-            element shipDate ? {text isDate}
-            attribute partNum ! {text {pattern "\d{3}-[A-Z]{2}"}}
+            element shipDate ? {text isodate}
+            attribute partNum ! {pattern "\d{3}-[A-Z]{2}"}
         }
     }
 }
