@@ -1803,6 +1803,7 @@ matchText (
                     if (!sdata->evalError) {
                         SetResult ("Invalid text content");
                     }
+                    updateStack (se, cp, ac);
                     return 0;
 
                 case SCHEMA_CTYPE_CHOICE:
