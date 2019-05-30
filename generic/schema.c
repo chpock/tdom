@@ -984,7 +984,10 @@ matchElementStart (
                 candidate->keySpace->active--;
                 if (!candidate->keySpace->active) {
                     if (candidate->keySpace->unknownIDrefs) {
-                        /* Recover or report error */
+                        if (!recover (interp, sdata, S("UNKNOWN_KEYREF"))) {
+                            return 0;
+                        }
+                        candidate->keySpace->unknownIDrefs = 0;
                     }
                     Tcl_DeleteHashTable (&candidate->keySpace->ids);
                 }
@@ -1529,7 +1532,10 @@ static int checkElementEnd (
                 cp->content[ac]->keySpace->active--;
                 if (!cp->content[ac]->keySpace->active) {
                     if (cp->content[ac]->keySpace->unknownIDrefs) {
-                        /* Recover or report error */
+                        if (!recover (interp, sdata, S("UNKNOWN_KEYREF"))) {
+                            return 0;
+                        }
+                        cp->content[ac]->keySpace->unknownIDrefs = 0;
                     }
                     Tcl_DeleteHashTable (&cp->content[ac]->keySpace->ids);
                 }
@@ -1887,7 +1893,10 @@ matchText (
                     cp->content[ac]->keySpace->active--;
                     if (!cp->content[ac]->keySpace->active) {
                         if (cp->content[ac]->keySpace->unknownIDrefs) {
-                            /* Recover or report error */
+                            if (!recover (interp, sdata, S("UNKNOWN_KEYREF"))) {
+                                return 0;
+                            }
+                            cp->content[ac]->keySpace->unknownIDrefs = 0;
                         }
                         Tcl_DeleteHashTable (&cp->content[ac]->keySpace->ids);
                     }

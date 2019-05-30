@@ -4716,7 +4716,41 @@ test schema-19.2 {keyspace} {
     s delete
     set result
 } {s WRONG_ATTRIBUTE_VALUE s WRONG_ATTRIBUTE_VALUE 1 1}
-        
+
+test schema-19.3 {keyspace} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element items *
+        }
+        defelement items {
+            keyspace my {
+                element item *
+            }
+        }
+        defelement item {
+            attribute id ? {
+                key my
+            }
+            attribute ref ? {
+                keyref my
+            }
+        }
+    }
+    s reportcmd schema-18
+    set result [list]
+    foreach xml {
+        {<doc><items><item ref="1"/><item id="1"/></items></doc>}
+        {<doc><items><item ref="1" id="1"/></items></doc>}
+        {<doc><items><item ref="a" id="1"/></items></doc>}
+        {<doc><items><item ref="1"/><item id="1"/></items><items><item ref="1"/><item ref="1"/></items></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 1 s UNKNOWN_KEYREF 1 s UNKNOWN_KEYREF 1}
+
 test schema-20.1 {domunique} {
     set schema {
         prefixns {ns1 http://tdom.org/test}
