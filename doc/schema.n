@@ -432,6 +432,9 @@ If an optional quantifier is not given then it defaults to * in
 case of the mixed command and to ! for all other commands.
 .SH "Text constraint scripts"
 .PP
+Text - parsed character data, as XML calles it - must sometimes
+have to be of a certain kind, must comply to some rules etc to be
+valid.
 .PP
 The text constraint commands are:
 .TP
@@ -564,6 +567,34 @@ references within the document to one ID are possible.
 \&\fB\fBbase64\fP
 \&\fRThis text constraint match if text is valid according to
 RFC 4648.
+.SH "Local key constraints"
+.PP
+Document wide uniqueness and foreign key constraints are
+available with the text constraint commands id and idref.
+Keyspaces allow for sub-tree local uniqueness and foreign key
+constraints.
+.TP
+\&\fB\fBkeyspace\fP \fInames list>\fB \fI<constraint script>\fB
+\&\fRAny number of keyspaces are possible. A keyspace is
+either active or not. An inside a \fIconstraint
+script>\fR called keyspace with the same name does
+nothing.
+.PP
+This text constraint commands work with keyspaces:
+.TP
+\&\fB\fBkey\fP \fIname>\fB
+\&\fRIf the keyspace with the name \fIname>\fR is not
+active always matches. If the keyspace is active then
+reports error if there is already a key with the value.
+Otherwise, stores the value as key in this keyspace and
+matches.
+.TP
+\&\fB\fBkeyref\fP \fIname>\fB
+\&\fRIf the keyspace with the name \fIname>\fR is not
+active always matches. If the keyspace is active then
+reports error if there is still no key as the value at the
+end of the keyspace \fIname>\fR. Otherwise it
+matches.
 .SH Exampels
 .PP
 .UR "https://www.w3.org/TR/xmlschema-0/"
