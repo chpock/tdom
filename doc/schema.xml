@@ -379,7 +379,7 @@
 
     <commandlist>
       <commanddef>
-        <command><cmd>isint</cmd></command>
+        <command><cmd>integer</cmd></command>
         <desc></desc>
       </commanddef>
 

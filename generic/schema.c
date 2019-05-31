@@ -3793,7 +3793,7 @@ VirtualPatternObjCmd (
     pattern = initSchemaCP (SCHEMA_CTYPE_VIRTUAL, NULL, NULL);
     REMEMBER_PATTERN (pattern)
     /* We alloc for one arugment more: the always appended schema
-     * cmd, */
+     * cmd. */
     pattern->content = MALLOC (sizeof (Tcl_Obj*) * (objc));
     for (i = 1; i < objc; i++) {
         pattern->content[i-1] = (SchemaCP *) objv[i];
