@@ -371,7 +371,9 @@
   <section>
     <title>Text constraint scripts</title>
 
-    <p></p>
+    <p>Text - parsed character data, as XML calles it - must sometimes
+    have to be of a certain kind, must comply to some rules etc to be
+    valid.</p>
 
     <p>The text constraint commands are:</p>
 
@@ -513,7 +515,48 @@
       </commanddef>
     </commandlist>
   </section>
-  
+
+  <section>
+    <title>Local key constraints</title>
+
+    <p>Document wide uniqueness and foreign key constraints are
+    available with the text constraint commands id and idref.
+    Keyspaces allow for sub-tree local uniqueness and foreign key
+    constraints.</p>
+
+    <commandlist>
+        <commanddef>
+            <command><cmd>keyspace</cmd> <m>&kt;names list></m> <m>&lt;constraint script></m></command>
+            <desc>Any number of keyspaces are possible. A keyspace is
+            either active or not. An inside a <m>constraint
+            script></m> called keyspace with the same name does
+            nothing.</desc>
+        </commanddef>
+    </commandlist>
+
+    <p>This text constraint commands work with keyspaces:</p>
+
+    <commandlist>
+        <commanddef>
+            <command><cmd>key</cmd> <m>name></m></command>
+            <desc>If the keyspace with the name <m>name></m> is not
+            active always matches. If the keyspace is active then
+            reports error if there is already a key with the value.
+            Otherwise, stores the value as key in this keyspace and
+            matches.</desc>
+        </commanddef>
+        <commanddef>
+            <command><cmd>keyref</cmd> <m>name></m></command>
+            <desc>If the keyspace with the name <m>name></m> is not
+            active always matches. If the keyspace is active then
+            reports error if there is still no key as the value at the
+            end of the keyspace <m>name></m>. Otherwise it
+            matches.</desc>
+        </commanddef>
+    </commandlist>
+    
+  </section>
+
   <section>
     <title>Exampels</title>
 
@@ -605,11 +648,11 @@ schema define {
     element comment {text}
 
     defpattern PurchaseOrderType {
-        element shipTo {ref USAddress}
-        element billTo {ref USAddress}
+        element shipTo ! {ref USAddress}
+        element billTo ! {ref USAddress}
         element comment ?
         element items
-        attribute orderDate
+        attribute orderDate isodate
     }
 
     defpattern USAddress {
@@ -618,17 +661,17 @@ schema define {
         element city ! {text}
         element state ! {text}
         element zip ! {text isNumber}
-        attribute country ! {text {fixed "US"}}
+        attribute country ! {fixed "US"}
     }
 
     defelement items {
         element item * {
             element product ! {text}
-            element quntity ! {text {maxExcluse 100}}
-            element USPrice ! {text isNumber}
+            element quantity ! {text {maxExcluse 100}}
+            element USPrice ! {text integer}
             element comment
-            element shipDate ? {text isDate}
-            attribute partNum ! {text {pattern "\d{3}-[A-Z]{2}"}}
+            element shipDate ? {text isodate}
+            attribute partNum ! {pattern "\d{3}-[A-Z]{2}"}
         }
     }
 }

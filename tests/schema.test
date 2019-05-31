@@ -4580,6 +4580,54 @@ test schema-18.3 {reportcmd} {
     set result
 } {s UNKNOWN_ROOT_ELEMENT 1 s UNKNOWN_ROOT_ELEMENT 1 s UNKNOWN_ROOT_ELEMENT 1 s UNKNOWN_ROOT_ELEMENT 1}
 
+test schema-18.4 {reportcmd} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element items * {
+                element item * {
+                    attribute ref {integer}
+                }
+            }
+        }
+    }
+    s reportcmd schema-18
+    set result [list]
+    foreach xml {
+        {<doc><items><item ref="1"/><item ref="1"/></items><items><item ref="1"/><item ref="1"/></items></doc>}
+        {<doc><items><item ref="1"/><item ref="a"/></items><items><item ref="b"/><item ref="1"/></items></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 s WRONG_ATTRIBUTE_VALUE s WRONG_ATTRIBUTE_VALUE 1}
+
+test schema-18.5 {reportcmd} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element items * {
+                element item * {
+                    text {minLength 2}
+                }
+            }
+        }
+    }
+    s reportcmd schema-18
+    set result [list]
+    foreach xml {
+        {<doc><items><item>1</item></items></doc>}
+        {<doc><items><item>1</item><item/></items></doc>}
+        {<doc><items><item>>12</item><item>ab</item></items></doc>}
+
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {s WRONG_VALUE 1 s WRONG_VALUE s MISSING_TEXT 1 1}
+
 proc validatedSAX {g xml {keepEmpties 1}} {
     set args [list -validateCmd $g]
     if {!$keepEmpties} {
@@ -4611,6 +4659,97 @@ proc postValidation {g xml} {
     $doc delete
     return $rc
 }
+
+test schema-19.1 {keyspace} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element items * {
+                keyspace ref {
+                    element item * {
+                        attribute ref ? {
+                            key ref
+                        }
+                    }
+                }
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        {<doc><items><item ref="1"/><item ref="foo"/></items></doc>}
+        {<doc><items><item ref="1"/><item ref="1"/></items></doc>}
+        {<doc><items><item ref="1"/><item ref="foo"/></items><items><item ref="1"/><item ref="foo"/></items></doc>}
+        {<doc><items><item ref="1"/><item ref="foo"/></items><items><item ref="1"/><item ref="bar"/></items></doc>}
+        {<doc><items><item ref="1"/><item ref="foo"/></items><items><item ref="2"/><item ref="bar"/></items></doc>}
+        {<doc><items><item ref="1"/><item ref="foo"/></items><items><item ref="bar"/><item ref="bar"/></items></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 0 1 1 1 0}
+
+test schema-19.2 {keyspace} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element items * {
+                keyspace ref {
+                    element item * {
+                        attribute ref ? {
+                            key ref
+                        }
+                    }
+                }
+            }
+        }
+    }
+    s reportcmd schema-18
+    set result [list]
+    foreach xml {
+        {<doc><items><item ref="1"/><item ref="1"/></items><items><item ref="1"/><item ref="1"/></items></doc>}
+        {<doc><items><item ref="1"/><item ref="a"/></items><items><item ref="c"/><item ref="d"/></items></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {s WRONG_ATTRIBUTE_VALUE s WRONG_ATTRIBUTE_VALUE 1 1}
+
+test schema-19.3 {keyspace} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element items *
+        }
+        defelement items {
+            keyspace my {
+                element item *
+            }
+        }
+        defelement item {
+            attribute id ? {
+                key my
+            }
+            attribute ref ? {
+                keyref my
+            }
+        }
+    }
+    s reportcmd schema-18
+    set result [list]
+    foreach xml {
+        {<doc><items><item ref="1"/><item id="1"/></items></doc>}
+        {<doc><items><item ref="1" id="1"/></items></doc>}
+        {<doc><items><item ref="a" id="1"/></items></doc>}
+        {<doc><items><item ref="1"/><item id="1"/></items><items><item ref="1"/><item ref="1"/></items></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 1 s UNKNOWN_KEYREF 1 s UNKNOWN_KEYREF 1}
 
 test schema-20.1 {domunique} {
     set schema {

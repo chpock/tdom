@@ -298,6 +298,10 @@ initSchemaCP (
         /* content/quant will be allocated, if the cp in fact has
          * constraints */
         break;
+    case SCHEMA_CTYPE_KEYSPACE_END:
+    case SCHEMA_CTYPE_KEYSPACE:
+        pattern->name = name;
+        break;
     case SCHEMA_CTYPE_VIRTUAL:
     case SCHEMA_CTYPE_ANY:
         /* Do nothing */
@@ -314,10 +318,14 @@ static void serializeCP (
     fprintf (stderr, "CP %p type: %s\n",
              pattern, Schema_CP_Type2str[pattern->type]);
     switch (pattern->type) {
+    case SCHEMA_CTYPE_KEYSPACE_END:
+    case SCHEMA_CTYPE_KEYSPACE:
+        fprintf (stderr, "\tName: '%s'\n", pattern->name);
+        break;
     case SCHEMA_CTYPE_NAME:
     case SCHEMA_CTYPE_PATTERN:
         fprintf (stderr, "\tName: '%s' Namespace: '%s'\n",
-                 pattern->name,pattern->namespace);
+                 pattern->name, pattern->namespace);
         if (pattern->flags & FORWARD_PATTERN_DEF) {
             fprintf (stderr, "\tAnonymously defined NAME\n");
         }
@@ -490,6 +498,7 @@ initSchemaData (
     Tcl_InitHashTable (&sdata->ids, TCL_STRING_KEYS);
     sdata->unknownIDrefs = 0;
     Tcl_InitHashTable (&sdata->idTables, TCL_STRING_KEYS);
+    Tcl_InitHashTable (&sdata->keySpaces, TCL_STRING_KEYS);
     return sdata;
 }
 
@@ -503,6 +512,7 @@ static void schemaInstanceDelete (
     Tcl_HashEntry *h;
     Tcl_HashSearch search;
     SchemaDocKey *dk;
+    SchemaKeySpace *ks;
 
     /* Protect the clientData to be freed inside (even nested)
      * Tcl_Eval*() calls to avoid invalid mem access and postpone the
@@ -568,6 +578,16 @@ static void schemaInstanceDelete (
         FREE (dk);
     }
     Tcl_DeleteHashTable (&sdata->idTables);
+    for (h = Tcl_FirstHashEntry (&sdata->keySpaces, &search);
+         h != NULL;
+         h = Tcl_NextHashEntry (&search)) {
+        ks = Tcl_GetHashValue (h);
+        if (ks->active) {
+            Tcl_DeleteHashTable (&ks->ids);
+        }
+        FREE (ks);
+    }
+    Tcl_DeleteHashTable (&sdata->keySpaces);
     FREE (sdata);
 }
 
@@ -927,6 +947,10 @@ matchElementStart (
                     case SCHEMA_CTYPE_VIRTUAL:
                         Tcl_Panic ("Virtual constrain in MIXED or CHOICE");
                         
+                    case SCHEMA_CTYPE_KEYSPACE_END:
+                    case SCHEMA_CTYPE_KEYSPACE:
+                        Tcl_Panic ("Keyspace constrain in MIXED or CHOICE");
+                        
                     }
                     if (!mayskip && mayMiss (candidate->quants[i]))
                         mayskip = 1;
@@ -954,8 +978,35 @@ matchElementStart (
                     return 1;
                 }
                 popStack (sdata);
-
                 break;
+
+            case SCHEMA_CTYPE_KEYSPACE_END:
+                candidate->keySpace->active--;
+                if (!candidate->keySpace->active) {
+                    if (candidate->keySpace->unknownIDrefs) {
+                        if (!recover (interp, sdata, S("UNKNOWN_KEYREF"))) {
+                            return 0;
+                        }
+                        candidate->keySpace->unknownIDrefs = 0;
+                    }
+                    Tcl_DeleteHashTable (&candidate->keySpace->ids);
+                }
+                ac++;
+                hm = 0;
+                continue;
+
+            case SCHEMA_CTYPE_KEYSPACE:
+                if (!candidate->keySpace->active) {
+                    Tcl_InitHashTable (&candidate->keySpace->ids,
+                                       TCL_STRING_KEYS);
+                    candidate->keySpace->active = 1;
+                    candidate->keySpace->unknownIDrefs = 0;
+                } else {
+                    candidate->keySpace->active++;
+                }
+                ac++;
+                hm = 0;
+                continue;
             }
             if (!mayskip && mustMatch (cp->quants[ac], hm)) {
                 if (recover (interp, sdata, S("MISSING_CP"))) {
@@ -980,6 +1031,8 @@ matchElementStart (
         }
         return -1;
 
+    case SCHEMA_CTYPE_KEYSPACE:
+    case SCHEMA_CTYPE_KEYSPACE_END:
     case SCHEMA_CTYPE_VIRTUAL:
     case SCHEMA_CTYPE_CHOICE:
     case SCHEMA_CTYPE_TEXT:
@@ -1039,6 +1092,12 @@ matchElementStart (
             case SCHEMA_CTYPE_VIRTUAL:
                 Tcl_Panic ("Virtual constraint child of INTERLEAVE");
                 break;
+
+            case SCHEMA_CTYPE_KEYSPACE_END:
+            case SCHEMA_CTYPE_KEYSPACE:
+                Tcl_Panic ("Keyspace constraint child of INTERLEAVE");
+                break;
+
             }
 
         }
@@ -1469,6 +1528,30 @@ static int checkElementEnd (
             }
             
             switch (cp->content[ac]->type) {
+            case SCHEMA_CTYPE_KEYSPACE_END:
+                cp->content[ac]->keySpace->active--;
+                if (!cp->content[ac]->keySpace->active) {
+                    if (cp->content[ac]->keySpace->unknownIDrefs) {
+                        if (!recover (interp, sdata, S("UNKNOWN_KEYREF"))) {
+                            return 0;
+                        }
+                        cp->content[ac]->keySpace->unknownIDrefs = 0;
+                    }
+                    Tcl_DeleteHashTable (&cp->content[ac]->keySpace->ids);
+                }
+                break;
+
+            case SCHEMA_CTYPE_KEYSPACE:
+                if (!cp->content[ac]->keySpace->active) {
+                    Tcl_InitHashTable (&cp->content[ac]->keySpace->ids,
+                                       TCL_STRING_KEYS);
+                    cp->content[ac]->keySpace->active = 1;
+                    cp->content[ac]->keySpace->unknownIDrefs = 0;
+                } else {
+                    cp->content[ac]->keySpace->active++;
+                }
+                break;
+                
             case SCHEMA_CTYPE_TEXT:
                 if (cp->content[ac]->nc) {
                     if (!checkText (interp, cp->content[ac], "")) {
@@ -1498,8 +1581,6 @@ static int checkElementEnd (
                         mayMiss = 1;
                         break;
 
-                    case SCHEMA_CTYPE_CHOICE:
-                        /* Can't happen */
                     case SCHEMA_CTYPE_NAME:
                     case SCHEMA_CTYPE_ANY:
                         continue;
@@ -1513,8 +1594,11 @@ static int checkElementEnd (
                         popStack (sdata);
                         break;
                         
+                    case SCHEMA_CTYPE_KEYSPACE_END:
+                    case SCHEMA_CTYPE_KEYSPACE:
                     case SCHEMA_CTYPE_VIRTUAL:
-                        Tcl_Panic ("Virtual constrain in MIXED or CHOICE");
+                    case SCHEMA_CTYPE_CHOICE:
+                        Tcl_Panic ("Invalid CTYPE in MIXED or CHOICE");
                         
                     }
                     if (mayMiss) break;
@@ -1549,6 +1633,8 @@ static int checkElementEnd (
         if (isName) return 1;
         return -1;
 
+    case SCHEMA_CTYPE_KEYSPACE_END:
+    case SCHEMA_CTYPE_KEYSPACE:
     case SCHEMA_CTYPE_VIRTUAL:
     case SCHEMA_CTYPE_CHOICE:
     case SCHEMA_CTYPE_TEXT:
@@ -1723,6 +1809,7 @@ matchText (
                     if (!sdata->evalError) {
                         SetResult ("Invalid text content");
                     }
+                    updateStack (se, cp, ac);
                     return 0;
 
                 case SCHEMA_CTYPE_CHOICE:
@@ -1761,6 +1848,10 @@ matchText (
                         case SCHEMA_CTYPE_CHOICE:
                             Tcl_Panic ("MIXED or CHOICE child of MIXED or CHOICE");
 
+                        case SCHEMA_CTYPE_KEYSPACE_END:
+                        case SCHEMA_CTYPE_KEYSPACE:
+                            Tcl_Panic ("Keyspace constrain in MIXED or CHOICE");
+                            
                         }
                     }
                     if (mustMatch (cp->quants[ac], hm)) {
@@ -1786,6 +1877,30 @@ matchText (
                 case SCHEMA_CTYPE_VIRTUAL:
                     if (!evalVirtual (interp, sdata, candidate)) return 0;
                     break;
+
+                case SCHEMA_CTYPE_KEYSPACE:
+                    if (!cp->content[ac]->keySpace->active) {
+                        Tcl_InitHashTable (&cp->content[ac]->keySpace->ids,
+                                           TCL_STRING_KEYS);
+                        cp->content[ac]->keySpace->active = 1;
+                        cp->content[ac]->keySpace->unknownIDrefs = 0;
+                    } else {
+                        cp->content[ac]->keySpace->active++;
+                    }
+                    break;
+                    
+                case SCHEMA_CTYPE_KEYSPACE_END:
+                    cp->content[ac]->keySpace->active--;
+                    if (!cp->content[ac]->keySpace->active) {
+                        if (cp->content[ac]->keySpace->unknownIDrefs) {
+                            if (!recover (interp, sdata, S("UNKNOWN_KEYREF"))) {
+                                return 0;
+                            }
+                            cp->content[ac]->keySpace->unknownIDrefs = 0;
+                        }
+                        Tcl_DeleteHashTable (&cp->content[ac]->keySpace->ids);
+                    }
+                    break;
                     
                 case SCHEMA_CTYPE_NAME:
                 case SCHEMA_CTYPE_ANY:
@@ -1805,6 +1920,8 @@ matchText (
             popStack (sdata);
             continue;
 
+        case SCHEMA_CTYPE_KEYSPACE:
+        case SCHEMA_CTYPE_KEYSPACE_END:
         case SCHEMA_CTYPE_VIRTUAL:
         case SCHEMA_CTYPE_CHOICE:
         case SCHEMA_CTYPE_TEXT:
@@ -1842,11 +1959,16 @@ matchText (
                 case SCHEMA_CTYPE_CHOICE:
                     Tcl_Panic ("MIXED or CHOICE child of INTERLEAVE");
 
+                case SCHEMA_CTYPE_KEYSPACE_END:
+                case SCHEMA_CTYPE_KEYSPACE:
+                    Tcl_Panic ("Keyspace child of INTERLEAVE");
+
                 case SCHEMA_CTYPE_VIRTUAL:
                     break;
                     
                 }
             }
+            break;
         }
         break;
     }
@@ -2425,6 +2547,7 @@ schemaReset (
     Tcl_HashEntry *h;
     Tcl_HashSearch search;
     SchemaDocKey *dk;
+    SchemaKeySpace *ks;
     
     while (sdata->stack) popStack (sdata);
     sdata->validationState = VALIDATION_READY;
@@ -2446,6 +2569,19 @@ schemaReset (
                 Tcl_InitHashTable (&dk->ids, TCL_STRING_KEYS);
                 dk->unknownIDrefs = 0;
             }
+        }
+    }
+    if (sdata->keySpaces.numEntries) {
+        for (h = Tcl_FirstHashEntry (&sdata->keySpaces, &search);
+             h != NULL;
+             h = Tcl_NextHashEntry (&search)) {
+            ks = Tcl_GetHashValue (h);
+            if (ks->active && ks->ids.numEntries) {
+                Tcl_DeleteHashTable (&ks->ids);
+                Tcl_InitHashTable (&ks->ids, TCL_STRING_KEYS);
+            }
+            ks->unknownIDrefs = 0;
+            ks->active = 0;
         }
     }
 }
@@ -3646,11 +3782,8 @@ VirtualPatternObjCmd (
         return TCL_ERROR;
     }
 
-    switch (sdata->cp->type) {
-    case SCHEMA_CTYPE_NAME:
-    case SCHEMA_CTYPE_PATTERN:
-        break;
-    default:
+    if (sdata->cp->type != SCHEMA_CTYPE_NAME
+        && sdata->cp->type != SCHEMA_CTYPE_PATTERN) {
         SetResult ("The \"tcl\" schema definition command is only "
                    "allowed in sequential context (defelement, "
                    "element or defpattern)");
@@ -3672,7 +3805,7 @@ VirtualPatternObjCmd (
 }
 
 static int
-domuniquePatternCmd (
+domuniquePatternObjCmd (
     ClientData clientData,
     Tcl_Interp *interp,
     int objc,
@@ -3751,6 +3884,71 @@ domuniquePatternCmd (
     }
     kc->next = sdata->cp->domKeys;
     sdata->cp->domKeys = kc;
+    return TCL_OK;
+}
+
+static int
+keyspacePatternObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaCP *pattern;
+    int nrKeyspaces, i, hnew;
+    Tcl_Obj *ksObj;
+    SchemaKeySpace *ks;
+    Tcl_HashEntry *h;
+    
+    CHECK_SI
+    CHECK_TOPLEVEL
+    checkNrArgs (3, 3, "Expected: <keyspace-name list> pattern");
+    if (sdata->cp->type != SCHEMA_CTYPE_NAME
+        && sdata->cp->type != SCHEMA_CTYPE_PATTERN) {
+        SetResult ("The keyspace schema definition command is only "
+                   "allowed in sequential context (defelement, "
+                   "element or defpattern)");
+        return TCL_ERROR;
+    }
+    if (Tcl_ListObjLength (interp, objv[1], &nrKeyspaces) != TCL_OK) {
+        SetResult ("The <keyspace-name list> argument must be a valid tcl "
+                   "list");
+        return TCL_ERROR;
+    }
+    for (i = 0; i < nrKeyspaces; i++) {
+        Tcl_ListObjIndex (interp, objv[1], i, &ksObj);
+        h = Tcl_CreateHashEntry (&sdata->keySpaces,
+                                 Tcl_GetString (ksObj), &hnew);
+        if (hnew) {
+            ks = TMALLOC (SchemaKeySpace);
+            ks->active = 0;
+            ks->unknownIDrefs = 0;
+            Tcl_SetHashValue (h, ks);
+        } else {
+            ks = Tcl_GetHashValue (h);
+        }
+        pattern = initSchemaCP (SCHEMA_CTYPE_KEYSPACE,
+                                Tcl_GetString (ksObj), NULL);
+        pattern->keySpace = ks;
+        REMEMBER_PATTERN (pattern);
+        addToContent (sdata, pattern, SCHEMA_CQUANT_ONE, 0, 0);
+    }
+    sdata->currentEvals++;
+    if (Tcl_EvalObjEx (interp, objv[2], TCL_EVAL_DIRECT) != TCL_OK) {
+        return TCL_ERROR;
+    }
+    sdata->currentEvals--;
+    for (i = 0; i < nrKeyspaces; i++) {
+        Tcl_ListObjIndex (interp, objv[1], i, &ksObj);
+        h = Tcl_FindHashEntry (&sdata->keySpaces, Tcl_GetString(ksObj));
+        pattern = initSchemaCP (SCHEMA_CTYPE_KEYSPACE_END,
+                                Tcl_GetString (ksObj), NULL);
+        REMEMBER_PATTERN (pattern);
+        pattern->keySpace = Tcl_GetHashValue (h);
+        addToContent (sdata, pattern, SCHEMA_CQUANT_ONE, 0, 0);
+    }
     return TCL_OK;
 }
 
@@ -4945,6 +5143,118 @@ idrefTCObjCmd (
 }
 
 static int
+keyImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    SchemaKeySpace *ks = (SchemaKeySpace *) constraintData;
+    int hnew;
+    Tcl_HashEntry *h;
+
+    if (!ks->active) return 1;
+    h = Tcl_CreateHashEntry (&ks->ids, text, &hnew);
+    if (hnew) {
+        Tcl_SetHashValue (h, 1);
+        return 1;
+    }
+    if (Tcl_GetHashValue (h) == 0) {
+        Tcl_SetHashValue (h, 1);
+        ks->unknownIDrefs--;
+        return 1;
+    } else {
+        /* Duplicate ID value */
+        return 0;
+    }
+}
+
+static int
+keyTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+    Tcl_HashEntry *h;
+    int hnew;
+    SchemaKeySpace *ks;
+
+    CHECK_TI
+    CHECK_TOPLEVEL
+    checkNrArgs (2,2,"key_space");
+    ADD_CONSTRAINT (sdata, sc)
+    h = Tcl_CreateHashEntry (&sdata->keySpaces, Tcl_GetString (objv[1]), &hnew);
+    if (hnew) {
+        ks = TMALLOC (SchemaKeySpace);
+        ks->active = 0;
+        ks->unknownIDrefs = 0;
+        Tcl_SetHashValue (h, ks);
+    } else {
+        ks = Tcl_GetHashValue (h);
+    }
+    sc->constraint = keyImpl;
+    sc->constraintData = (void *) ks;
+    return TCL_OK;
+}
+
+static int
+keyrefImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    SchemaKeySpace *ks = (SchemaKeySpace *) constraintData;
+    int hnew;
+    Tcl_HashEntry *h;
+
+    if (!ks->active) return 1;
+    h = Tcl_CreateHashEntry (&ks->ids, text, &hnew);
+    if (hnew) {
+        Tcl_SetHashValue (h, 0);
+        ks->unknownIDrefs++;
+    }
+    return 1;
+}
+
+static int
+keyrefTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+    Tcl_HashEntry *h;
+    int hnew;
+    SchemaKeySpace *ks;
+
+    CHECK_TI
+    CHECK_TOPLEVEL
+    checkNrArgs (2,2,"key_space");
+    ADD_CONSTRAINT (sdata, sc)
+    h = Tcl_CreateHashEntry (&sdata->keySpaces, Tcl_GetString (objv[1]),
+                             &hnew);
+    if (hnew) {
+        ks = TMALLOC (SchemaKeySpace);
+        Tcl_InitHashTable (&ks->ids, TCL_STRING_KEYS);
+        ks->unknownIDrefs = 0;
+        Tcl_SetHashValue (h, ks);
+    } else {
+        ks = Tcl_GetHashValue (h);
+    }
+    sc->constraint = keyrefImpl;
+    sc->constraintData = (void *)ks;
+    return TCL_OK;
+}
+
+static int
 base64Impl (
     Tcl_Interp *interp,
     void *constraintData,
@@ -5042,7 +5352,8 @@ tDOM_SchemaInit (
     Tcl_CreateObjCommand (interp, "tdom::schema::group",
                           AnonPatternObjCmd, (ClientData) 3, NULL);
 
-    /* The "attribute", "nsattribute", "namespace" and "text" definition commands. */
+    /* The "attribute", "nsattribute", "namespace" and "text"
+     * definition commands. */
     Tcl_CreateObjCommand (interp, "tdom::schema::attribute",
                           AttributePatternObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::nsattribute",
@@ -5058,7 +5369,11 @@ tDOM_SchemaInit (
 
     /* XPath contraints for DOM validation */
     Tcl_CreateObjCommand (interp,"tdom::schema::domunique",
-                          domuniquePatternCmd, NULL, NULL);
+                          domuniquePatternObjCmd, NULL, NULL);
+
+    /* Local key constraints */
+    Tcl_CreateObjCommand (interp, "tdom::schema::keyspace",
+                          keyspacePatternObjCmd, NULL, NULL);
     
     /* The text constraint commands */
     Tcl_CreateObjCommand (interp,"tdom::schema::text::integer",
@@ -5101,6 +5416,10 @@ tDOM_SchemaInit (
                           idrefTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::base64",
                           base64TCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::key",
+                          keyTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::keyref",
+                          keyrefTCObjCmd, NULL, NULL);
 }
 
 

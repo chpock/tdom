@@ -34,7 +34,9 @@ typedef enum {
   SCHEMA_CTYPE_INTERLEAVE,
   SCHEMA_CTYPE_PATTERN,
   SCHEMA_CTYPE_TEXT,
-  SCHEMA_CTYPE_VIRTUAL
+  SCHEMA_CTYPE_VIRTUAL,
+  SCHEMA_CTYPE_KEYSPACE,
+  SCHEMA_CTYPE_KEYSPACE_END,
 } Schema_CP_Type;
 
 typedef enum {
@@ -84,6 +86,13 @@ typedef struct domKeyConstraint {
     struct domKeyConstraint *next;
 } domKeyConstraint;
 
+typedef struct 
+{
+    int active;
+    Tcl_HashTable ids;
+    int unknownIDrefs;
+} SchemaKeySpace;
+
 typedef struct SchemaCP
 {
     Schema_CP_Type    type;
@@ -98,6 +107,7 @@ typedef struct SchemaCP
     unsigned int      numAttr;
     unsigned int      numReqAttr;
     domKeyConstraint *domKeys;
+    SchemaKeySpace   *keySpace;
 } SchemaCP;
 
 typedef struct SchemaValidationStack
@@ -122,7 +132,7 @@ typedef struct
     Tcl_HashTable ids;
     int unknownIDrefs;
 } SchemaDocKey;
-    
+
 typedef struct SchemaData_
 {
     Tcl_Obj *self;
@@ -167,6 +177,7 @@ typedef struct SchemaData_
     Tcl_HashTable ids;
     int unknownIDrefs;
     Tcl_HashTable idTables;
+    Tcl_HashTable keySpaces;
 } SchemaData;
 
 int 
