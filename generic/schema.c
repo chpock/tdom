@@ -2334,7 +2334,7 @@ checkdomKeyConstraints (
                     }
                 } else {
                     keystr = xpathGetStringValue (frs.nodes[0], &len);
-                    Tcl_CreateHashEntry (&htable, attr->nodeValue, &hnew);
+                    Tcl_CreateHashEntry (&htable, keystr, &hnew);
                     FREE(keystr);
                     if (!hnew) {
                         if (recover (interp, sdata, S("DOM_KEYCONSTRAINT"))) {

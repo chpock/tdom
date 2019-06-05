@@ -4656,6 +4656,7 @@ proc validatedDOM {g xml {keepEmpties 0}} {
 proc postValidation {g xml} {
     set doc [dom parse $xml]
     set rc [$g domvalidate $doc errMsg]
+    #puts "error: $errMsg"
     $doc delete
     return $rc
 }
@@ -4886,6 +4887,27 @@ test schema-20.4 {domunique} {
     s delete
     set result
 } {1 0 1 0 1}
+
+test schema-20.5 {domunique} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            domunique item ref
+            element item * {
+                element ref ! text
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        {<doc><item><ref>1</ref></item><item><ref>foo</ref></item></doc>}
+        {<doc><item><ref>1</ref></item><item><ref>1</ref></item></doc>}
+    } {
+        lappend result [postValidation s $xml]
+    }
+    s delete
+    set result
+} {1 0}
 
 
 }
