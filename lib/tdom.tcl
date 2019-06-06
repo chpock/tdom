@@ -641,7 +641,7 @@ proc ::dom::xpathFunc::system-property { ctxNode pos
 # 
 # Just add more mappings (and mail them to the tDOM mailing list, please).
 
-proc tdom::IANAEncoding2TclEncoding {IANAName} {
+proc ::tdom::IANAEncoding2TclEncoding {IANAName} {
     
     # First the most widespread encodings with there
     # preferred MIME name, to speed lookup in this
@@ -739,7 +739,7 @@ proc tdom::IANAEncoding2TclEncoding {IANAName} {
 #   xmlOpenFileWorker
 #
 #----------------------------------------------------------------------------
-proc tdom::xmlOpenFileWorker {filename {encodingString {}} {forSimple 0} {forRead 0}} {
+proc ::tdom::xmlOpenFileWorker {filename {encodingString {}} {forSimple 0} {forRead 0}} {
 
     # This partly (mis-)use the encoding of a channel handed to [dom
     # parse -channel ..] as a marker: if the channel encoding is utf-8
@@ -875,7 +875,7 @@ proc tdom::xmlOpenFileWorker {filename {encodingString {}} {forSimple 0} {forRea
 #   xmlOpenFile
 #
 #----------------------------------------------------------------------------
-proc tdom::xmlOpenFile {filename {encodingString {}}} {
+proc ::tdom::xmlOpenFile {filename {encodingString {}}} {
 
     if {$encodingString != {}} {
         upvar $encodingString encString
@@ -889,7 +889,7 @@ proc tdom::xmlOpenFile {filename {encodingString {}}} {
 #   xmlReadFile
 #
 #----------------------------------------------------------------------------
-proc tdom::xmlReadFile {filename {encodingString {}}} {
+proc ::tdom::xmlReadFile {filename {encodingString {}}} {
 
     if {$encodingString != {}} {
         upvar $encodingString encString
@@ -905,7 +905,7 @@ proc tdom::xmlReadFile {filename {encodingString {}}} {
 #   xmlReadFileForSimple
 #
 #----------------------------------------------------------------------------
-proc tdom::xmlReadFileForSimple {filename {encodingString {}}} {
+proc ::tdom::xmlReadFileForSimple {filename {encodingString {}}} {
 
     if {$encodingString != {}} {
         upvar $encodingString encString
@@ -926,12 +926,12 @@ proc tdom::xmlReadFileForSimple {filename {encodingString {}}} {
 #----------------------------------------------------------------------------
 
 if {![catch {package require uri}]} {
-    proc tdom::extRefHandler {base systemId publicId} {
+    proc ::tdom::extRefHandler {base systemId publicId} {
         variable extRefHandlerDebug
         variable useForeignDTD
 
         if {$extRefHandlerDebug} {
-            puts stderr "tdom::extRefHandler called with:"
+            puts stderr "::tdom::extRefHandler called with:"
             puts stderr "\tbase:     '$base'"
             puts stderr "\tsystemId: '$systemId'"
             puts stderr "\tpublicId: '$publicId'"
@@ -971,7 +971,7 @@ if {![catch {package require uri}]} {
 #   filename.
 #
 #----------------------------------------------------------------------------
-proc tdom::baseURL {path} {
+proc ::tdom::baseURL {path} {
     # FIXME - path components need to be URL-encoded
 
     # Note [file join] will return path as is if it is already absolute.
@@ -1000,14 +1000,14 @@ namespace eval ::tDOM {
         extRefHandler baseURL
 }
 
-foreach cmd {
+foreach ::tdom::cmd {
     xmlOpenFile
     xmlReadFile
     xmlReadFileForSimple
     extRefHandler
     baseURL
 } {
-    interp alias {} tDOM::$cmd {} tdom::$cmd
+    interp alias {} tDOM::$::tdom::cmd {} tdom::$::tdom::cmd
 }
 
 # EOF

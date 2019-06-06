@@ -52,6 +52,8 @@ int  tcldom_nameCheck(Tcl_Interp *interp, char *name, char *nameType,
 void tcldom_createNodeObj(Tcl_Interp * interp, domNode *node,
                           char *objCmdName);
 
+int tcldom_prefixNSlist (char ***prefixnsPtr, Tcl_Interp *interp, int objc,
+                         Tcl_Obj *const objv[], const char *methodName);
 
 void tcldom_initialize(void);
 
@@ -69,8 +71,8 @@ Tcl_ObjCmdProc TclTdomObjCmd;
 
 #define STR_TDOM_VERSION(v) (VERSION)
 
-EXTERN int Tdom_Init     (Tcl_Interp *interp);
-EXTERN int Tdom_SafeInit (Tcl_Interp *interp);
+int Tdom_Init     (Tcl_Interp *interp);
+int Tdom_SafeInit (Tcl_Interp *interp);
 
 #endif
 
