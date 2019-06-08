@@ -1622,6 +1622,10 @@ static int checkElementEnd (
                 return 0;
                 
             case SCHEMA_CTYPE_ANY:
+                if (recover (interp, sdata, S("MISSING_ANY"))) {
+                    break;
+                }
+                return 0;
             case SCHEMA_CTYPE_NAME:
                 if (recover (interp, sdata, S("MISSING_ELEMENT"))) {
                     break;
