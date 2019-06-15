@@ -10,7 +10,7 @@
 #    schema-7.*: Validation checks.
 #    schema-8.*: tdom::schema validate method
 #    schema-9.*: Choice
-#    scheam-10.*: Any
+#    schema-10.*: Any
 #    schema-11.*: attribute, nsattribute
 #    schema-12.*: schemaCmd domvalidate
 #    schema-13.*: XML namespaces
@@ -2200,6 +2200,33 @@ test schema-10.4 {any} {
     s delete
     set result
 } {0 1 0 0}
+
+test schema-10.5 {any} {
+    tdom::schema create s
+    s define {
+        defelement doc {
+            element a
+            any http://foo.bar 2
+            element b
+        }
+        defelement a {}
+        defelement b {}
+    }
+    set result [list]
+    foreach xml {
+        {<doc><a/><something/><b/></doc>}
+        {<doc><a/><something/><something/><b/></doc>}
+        {<doc><a/><b/></doc>}
+        {<doc><a/><a><b>text</b><c><c><c/></c></c></a><b/></doc>}
+        {<doc xmlns:ns="http://foo.bar"><a/><ns:a/><ns:b>some</ns:b><b/></doc>}
+        {<doc xmlns:ns="http://foo.bar" xmlns:ns1="http://foo.bar"><a/><ns1:a/><ns:b>some</ns:b><b/></doc>}
+        {<doc xmlns:ns="http://foo.bar" xmlns:ns1="http://foo.grill"><a/><ns1:a/><ns:b>some</ns:b><b/></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 0 0 1 1 0}
 
 test schema-11.1 {attribute} {
     tdom::schema create s

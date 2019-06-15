@@ -302,8 +302,10 @@ initSchemaCP (
     case SCHEMA_CTYPE_KEYSPACE:
         pattern->name = name;
         break;
-    case SCHEMA_CTYPE_VIRTUAL:
     case SCHEMA_CTYPE_ANY:
+        pattern->namespace = namespace;
+        break;
+    case SCHEMA_CTYPE_VIRTUAL:
         /* Do nothing */
         break;
     }
@@ -341,6 +343,11 @@ static void serializeCP (
         fprintf (stderr, "\t%d childs\n", pattern->nc);
         break;
     case SCHEMA_CTYPE_ANY:
+        if (pattern->namespace) {
+            fprintf (stderr, "\tNamespace: '%s'\n",
+                     pattern->namespace);
+        }
+        break;
     case SCHEMA_CTYPE_TEXT:
     case SCHEMA_CTYPE_VIRTUAL:
         /* Do nothing */
@@ -892,6 +899,10 @@ matchElementStart (
                 break;
 
             case SCHEMA_CTYPE_ANY:
+                if (candidate->namespace &&
+                    candidate->namespace != namespace) {
+                    break;
+                }
                 updateStack (se, cp, ac);
                 sdata->skipDeep = 1;
                 return 1;
@@ -916,8 +927,11 @@ matchElementStart (
                         break;
 
                     case SCHEMA_CTYPE_ANY:
-                        sdata->skipDeep = 1;
+                        if (icp->namespace && icp->namespace != namespace) {
+                            break;
+                        }
                         updateStack (se, cp, ac);
+                        sdata->skipDeep = 1;
                         return 1;
 
                     case SCHEMA_CTYPE_NAME:
@@ -1057,6 +1071,9 @@ matchElementStart (
                 break;
 
             case SCHEMA_CTYPE_ANY:
+                if (icp->namespace && icp->namespace == namespace) {
+                    break;
+                }
                 sdata->skipDeep = 1;
                 if (mayskip && minOne (cp->quants[i])) mayskip = 0;
                 se->hasMatched = 1;
@@ -3333,16 +3350,33 @@ AnyPatternObjCmd (
     SchemaData *sdata = GETASI;
     SchemaCP *pattern;
     SchemaQuant quant;
-    int n, m;
+    char *ns = NULL;
+    int n, m, hnew;
+    Tcl_HashEntry *h;
 
     CHECK_SI
     CHECK_TOPLEVEL
-    checkNrArgs (1,2,"?quant?");
-    quant = getQuant (interp, sdata, objc == 1 ? NULL : objv[1], &n, &m);
-    if (quant == SCHEMA_CQUANT_ERROR) {
-        return TCL_ERROR;
+    checkNrArgs (1,3,"?namespace? ?quant?");
+    if (objc == 1) {
+        quant = SCHEMA_CQUANT_ONE;
+    } else if (objc == 2) {    
+        quant = getQuant (interp, sdata, objv[1], &n, &m);
+        if (quant == SCHEMA_CQUANT_ERROR) {
+            h = Tcl_CreateHashEntry (&sdata->namespace,
+                                     Tcl_GetString (objv[1]), &hnew);
+            ns = Tcl_GetHashKey (&sdata->namespace, h);
+            quant = SCHEMA_CQUANT_ONE;
+        }
+    } else {
+        h = Tcl_CreateHashEntry (&sdata->namespace,
+                                 Tcl_GetString (objv[1]), &hnew);
+        ns = Tcl_GetHashKey (&sdata->namespace, h);
+        quant = getQuant (interp, sdata, objv[2], &n, &m);
+        if (quant == SCHEMA_CQUANT_ERROR) {
+            return TCL_ERROR;
+        }
     }
-    pattern = initSchemaCP (SCHEMA_CTYPE_ANY, NULL, NULL);
+    pattern = initSchemaCP (SCHEMA_CTYPE_ANY, ns, NULL);
     REMEMBER_PATTERN (pattern)
     addToContent(sdata, pattern, quant, n, m);
     return TCL_OK;

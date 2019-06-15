@@ -242,12 +242,15 @@
       </commanddef>
 
       <commanddef>
-        <command><method>any</method> <m>?quant?</m></command>
-        <desc>The any command matches every element (with whatever
-        attributes) or subtree, no matter if known within the schema
-        or not. Please notice, that this mean the quantifier * and +
-        will eat up any elements until the enclosing element
-        ends.</desc>
+        <command><method>any</method> <m>?namespace?</m> <m>?quant?</m></command>
+        <desc>The any command matches every element (in the namespace
+        <m>namespace</m>, if that is given) (with whatever attributes)
+        or subtree, no matter if known within the schema or not.
+        Please notice, that in case of no <m>namespace</m> argument is
+        given this mean the quantifier * and + will eat up any
+        elements until the enclosing element ends. If you really have
+        a namespace that looks like a valid tDOM schema quantifier
+        you'll have to spell out always all two arguments.</desc>
       </commanddef>
 
       <commanddef>
