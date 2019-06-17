@@ -124,6 +124,9 @@ static char *Schema_CP_Type2str[] = {
     "INTERLEAVE",
     "PATTERN",
     "TEXT"
+    "VIRTUAL",
+    "KEYSPACE_START",
+    "KEYSPACE_END"
 };
 static char *Schema_Quant_Type2str[] = {
     "ONE",
