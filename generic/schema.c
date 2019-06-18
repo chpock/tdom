@@ -3603,7 +3603,7 @@ static int maybeAddAttr (
     name = Tcl_GetHashKey (&sdata->attrNames, h);
     if (!hnew) {
         /* Check, if there is already an attribute with this name
-         * / namespace */
+           and namespace */
         for (i = 0; i < sdata->numAttr; i++) {
             if (sdata->currentAttrs[i]->name == name
                 && sdata->currentAttrs[i]->namespace == namespace) {
@@ -3994,7 +3994,27 @@ keyspacePatternObjCmd (
 }
 
 static int
-integerImpl (
+integerImplXsd (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    char *c = text;
+    if (*c == 0) return 0;
+    if (*c == '-' || *c == '+') {
+        c++;
+        if (*c == 0) return 0;
+    }
+    while (isdigit(*c)) {
+        c++;
+    }
+    if (*c != 0) return 0;
+    return 1;
+}
+
+static int
+integerImplTcl (
     Tcl_Interp *interp,
     void *constraintData,
     char *text
@@ -4018,12 +4038,37 @@ integerTCObjCmd (
 {
     SchemaData *sdata = GETASI;
     SchemaConstraint *sc;
+    int type;
+
+    static const char *types[] = {
+        "xsd", "tcl", NULL
+    };
+    enum typeSyms {
+        t_xsd, t_tcl
+    };
 
     CHECK_TI
     CHECK_TOPLEVEL
-    checkNrArgs (1,1,"no argument expected");
+    checkNrArgs (1,2,"?xsd|tcl|json?");
+    if (objc == 1) {
+        type = t_xsd;
+    } else {
+        if (Tcl_GetIndexFromObj (interp, objv[1], types, "type", 0, &type)
+            != TCL_OK) {
+            return TCL_ERROR;
+        }
+    }
     ADD_CONSTRAINT (sdata, sc)
-    sc->constraint = integerImpl;
+    switch ((enum typeSyms) type) {
+    case t_xsd:
+        sc->constraint = integerImplXsd;
+        break;
+    case t_tcl:
+        sc->constraint = integerImplTcl;
+        break;
+    }
+    sc->constraintData = sdata;
+    
     return TCL_OK;
 }
 

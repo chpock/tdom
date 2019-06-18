@@ -382,8 +382,14 @@
 
     <commandlist>
       <commanddef>
-        <command><cmd>integer</cmd></command>
-        <desc></desc>
+        <command><cmd>integer</cmd> <m>?(xsd|tcl)?</command>
+        <desc>This text constraint match if the text value could be
+        parsed as an integer. If the optional argument to the command
+        is <m>tcl</m> everthing that returns TCL_OK if feeded into
+        Tcl_GetInt() matches. If the optional argument to the command
+        is <m>xsd</m> then the constraint match if the value is a
+        valid xsd:integer. Without argument <m>xsd</m> is the
+        default.</desc>
       </commanddef>
 
       <commanddef>

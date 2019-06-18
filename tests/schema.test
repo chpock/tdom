@@ -2878,12 +2878,66 @@ test schema-14.1 {text: integer} {
         <doc>eeee</doc>
         <doc>56666</doc>
         {<doc>   </doc>}
+        {<doc>  97  </doc>}
     } {
         lappend result [s validate $xml]
     }
     s delete
     set result
-} {0 0 1 0 1 0}
+} {0 0 1 0 1 0 0}
+
+test schema-14.1.1 {text: integer} {
+    tdom::schema s
+    s defelement doc {
+        text {
+            integer tcl
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc></doc>
+        <doc>5</doc>
+        <doc>eeee</doc>
+        <doc>56666</doc>
+        {<doc>   </doc>}
+        {<doc>  +34 </doc>}
+        {<doc>034</doc>}
+        {<doc>0034 </doc>}
+        {<doc>0xAB</doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 1 0 1 0 1 1 1 1}
+
+test schema-14.1.2 {text: integer} {
+    tdom::schema s
+    s defelement doc {
+        text {
+            integer xsd
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc></doc>
+        <doc>5</doc>
+        <doc>eeee</doc>
+        <doc>56666</doc>
+        {<doc>   </doc>}
+        {<doc>  +34 </doc>}
+        {<doc>034</doc>}
+        {<doc>0034 </doc>}
+        {<doc>0xAB</doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 1 0 1 0 0 1 0 0}
+
 
 proc proc-14.2 {param text} {
     if {$text in {one two tree}} {
