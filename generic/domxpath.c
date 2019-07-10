@@ -2278,7 +2278,7 @@ int xpathParse (
     XPathTokens tokens;
     int  i, l, len, newlen, slen;
     int  useNamespaceAxis = 0;
-    char tmp[900];
+    char tmp[200];
 
     DDBG(fprintf(stderr, "\nLex output following tokens for '%s':\n", xpath);)
     *errMsg = NULL;
@@ -2290,7 +2290,7 @@ int xpathParse (
     }
     DDBG(
         for (i=0; tokens[i].token != EOS; i++) {
-            fprintf(stderr, "%3d %-12s %5ld %8.3f %5d  %s\n",
+            fprintf(stderr, "%3d %-12s %5ld %8.3g %5d  %s\n",
                             i,
                             token2str[tokens[i].token-LPAR],
                             tokens[i].intvalue,
@@ -2323,7 +2323,7 @@ int xpathParse (
         memmove(*errMsg + len+6+newlen, "' ", 3);
 
         for (i=0; tokens[i].token != EOS; i++) {
-            sprintf(tmp, "%s\n%3s%3d %-12s %5ld %09.3f %5d  ",
+            sprintf(tmp, "%s\n%3s%3d %-12s %5ld %09.3g %5d  ",
                          (i==0) ? "\n\nParsed symbols:" : "",
                          (i==l) ? "-->" : "   ",
                           i,

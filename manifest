@@ -1,5 +1,5 @@
-C Replaced\sthe\slast\stwo\satof().
-D 2019-07-10T21:56:40.188
+C Fixed\sseg\sfault\sin\sreporting\scertain\sinvalid\sxpath\sexprs\swith\sa\snumber\swith\snr\sof\sdigits\sin\sa\scertain\srange.
+D 2019-07-10T23:27:53.501
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -122,7 +122,7 @@ F generic/domhtml5.h 5cca562a556e7662f2dce222640c32abb2777146
 F generic/domjson.c 1c33b0f4a2f022b69ae3d39f908081fa9724b75213a1b7f425cc0f093742dd64
 F generic/domjson.h b10c42af9ef7fc9d0ad4fac733ef6461df0cdd90
 F generic/domlock.c 54944f25f27ae220fc46cc2ac33d57b04500724c24c04eb59806126f13520fab
-F generic/domxpath.c dda6e276e3d9f88983eabc00c01b249263a1a7a88da3cbc62ab39690f2b67fcf
+F generic/domxpath.c c843326c5b481810281de8578bb8d5f9b8f19f98c54b5f85c7b02923042db983
 F generic/domxpath.h fe6f664710ce79ebcf81e1aed74e763e7113047119f1e8302f93f2a1103d43ac
 F generic/domxslt.c ee2c1ec66d8f1873eb19c9d6310d46d09d556d09c68b607a427cbe73e41fedbf
 F generic/domxslt.h 140fa73765d699bfced9554c2c6439c0d2e6695eec3a8e69e1d25c0bbdf28fc6
@@ -203,7 +203,7 @@ F tests/tdomcmd.test 092401adf0609906d710f3ef8997cb4ca29bc208
 F tests/xmlsimple.test bde808880ddcf0f8ba0b049da0f2258e332af11ddf43a3480f089d53e77c6e0d
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.bench 99e98467544b11bf625e6f72b2fb89c7516bfced
-F tests/xpath.test af08a3b18b5550765a167b9a01b48fa751ede7de32ac1c72b90b52a5df43e671
+F tests/xpath.test 715fb1c5462e7ccd5023a22b3e127a4c20c6e3502ed58717d02c80a70cc4e476
 F tests/xslt.test 495f9d797460470b7150e1e993e9cd1de76cbbf5c46855b5d9d6bdbf1d1411f6
 F unix/CONFIG 431b82a51451df40e38261b91e1a37060797ef655e8f981fab761de59f1e01e9
 F unix/speed-check.sh 7a8d91e7edf1cdc9bcfad5f28e1a068cb2843d05e49d8bd89d9b30a46511497d
@@ -222,8 +222,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 35e1b761e1dbcb5a5b1b2a7c777269c156b1e5ecb81e530650d6d605bdaa8833
-R 800bd60d78a48f49321f3da3aff284d5
+P 52d6965abbd3a71ae1c02be611067483cf3751d5d92923b14073ecf2bdc90134
+R 6006e3d1ddd043e91ed5219424ac6124
 U rolf
-Z 09c634c18689c2e4155426963ddff245
+Z d8a269a5da0a3ac187c5be9d2344fb72
 # Remove this line to create a well-formed Fossil manifest.
