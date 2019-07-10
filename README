@@ -1,57 +1,84 @@
 
 
-              tDOM - a XML/DOM/XPath/XSLT implementation for Tcl
-                          (Version 0.8.3)
+    tDOM - a XML/DOM/XPath/XSLT/HTML/JSON implementation for Tcl
+                          (Version 0.9.2)
 
-		    Jochen Loewer (loewerj@hotmail.com)
-                       Rolf Ade (rolf@pointsman.de)
 
-                       with some contributions by:
-
-                 Zoran Vasiljevic (zv@archiware.com)
-                
-
-This directory contains a freely distributable (under the Mozilla Public 
-License) thread-safe extension to Tcl/Tk called tDOM.
-
+This directory contains a freely distributable thread-safe extension
+to Tcl/Tk called tDOM.
 
 tDOM contains:
 
-    *  the newest version of Expat, the XML parser from James Clark,
-       including namespace and DTD support.
+    *  for convenience expat 2.2.5, the XML parser originated from
+       James Clark, although you're able to link tDOM with other
+       expat versions or the library provided by the system.
 
-    *  a modified version of Steve Ball's Tclexpat, the Tcl interface to 
-       expat, for event-like (SAX-like) XML parsing. The modifications
-       are for performance improvements, to make the newest Expat
-       features (XML namespace) available and for some additional features.
+    *  building a DOM tree from XML in one go implemented in C for
+       maximum performance and minimum memory usage, and DOM I and II
+       methods to work on such a tree using either a OO-like or a
+       handle syntax.
 
-    *  a (partial) DOM I and II implementation in C for maximum
-       performance and minimum memory need following the W3C DOM Core
-       Level 1 recommendation using a OO-like syntax.
+    *  a Tcl interface to expat for event-like (SAX-like) XML parsing.
 
-    *  a very complete, compliant and fast XPath implementation in C
-       following the November 99 W3C recommendation.
+    *  a complete, compliant and fast XPath implementation in C
+       following the November 99 W3C recommendation for navigating and
+       data extraction.
 
     *  a fast XSLT implementation in C following the W3C Recommendation
        16 November 1999.
     
-    *  a (partial) implementation in C of the XPointer (97) navigational 
-       functions.
+    *  optional DTD validation.
 
-    *  UTF-8 to 8 bit encoding back conversion functionality to support
-       Tcl version < 8.1x
+    *  a JSON parser which parses any possible JSON input into a DOM
+       tree without losing information.
 
-    *  optional DTD validation   
+    *  an efficient and Tcl'ish way to create XML and HTML documents
+       and JSON string.
 
-    *  additional convenience methods
+    *  as build option an interface to the gumbo HTML5 parser, which
+       also digests almost any other HTML.
+
+    *  an even faster simple XML parser for trusted XML input.
+
+    *  A slim Tcl interface to use expat as pull-parser.
+
+    *  additional convenience methods.
  
-    *  documentation in TMML, HTML and nroff format
+    *  and more.
 
 
-COMPILING/USING tDOM
+DOCUMENTATION
 
-    Depending on your platform, (unix or win) go to the corresponding
-    directory and invoke the configure script:
+    The documentation is included into the source distribution in HTML
+    and man format. Alternatively, read it online starting at
+    http://tdom.org/index.html/doc/trunk/doc/index.html
+
+
+GETTING THE CODE
+
+    The development repository is hosted at http://tdom.org and is
+    mirrored at http://core.tcl.tk/tdom. You are encouraged to use
+    trunk.
+
+    If you insist on using an older tDOM with lesser features and
+    probably more bugs, you should use the latest release 0.9.1. Get
+    the source code release from
+    http://tdom.org/downloads/tdom-0.9.1-src.tgz or
+    http://tdom.org/downloads/tdom-0.9.1-src.zip
+
+    Windows binaries (32 bit as well as 64 bit) of the 0.9.1 release
+    are also available. Get it from
+    http://tdom.org/downloads/tdom-0.9.1-windows-x64.zip and 
+    http://tdom.org/downloads/tdom-0.9.1-windows-x86.zip
+    
+    The provided windows binaries include (statically linked) the
+    HTML5 parser.
+
+
+COMPILING tDOM
+
+    Depending on your platform (unix/mac or win), go to the
+    corresponding directory and invoke the configure script:
 
         ../configure
         make 
@@ -59,22 +86,35 @@ COMPILING/USING tDOM
         make install
 
     Alternatively, you can build the tDOM package in just about any
-    directory elsewhere on the fileystem (since TEA-compatible).
+    directory elsewhere on the filesystem (since TEA-compatible).
     
-    You might also want to do "../configure --help" to get list of all
-    supported options of the configure script. In the "unix" directory
-    there is a "CONFIG" file containing some examples on how to invoke
-    the "configure" script for some common cases. You can peek
-    there. This file also includes a short description of the tDOM
-    specific configure options.
+    You might also want to do "../configure --help" to get a list of
+    all supported options of the configure script. In the "unix"
+    directory there is a "CONFIG" file containing some examples on how
+    to invoke the "configure" script for some common cases. You can
+    peek there. This file also includes a short description of the
+    tDOM specific configure options.
 
     Since tDOM is TEA-compatible you should be able to build it using
     the MinGW build environment for Windows. There is also the MSVC
     nmake file so you can compile the package with Microsoft tools.
+    Refer to the README in the win directory for more details about
+    building on Windows.
 
     The compile process will build the tDOM shared library suitable for
     loading into the Tcl shell using standard "package require" mechanism.
 
-Have fun! 
 
-- EOF -
+REPORTING BUGS
+
+    Please head to http://tdom.org/index.html/ticket and click on "New
+    Ticket". Log in as anonymous and report your findings. If you
+    prefer to have an individual login write Rolf a mail.
+
+
+HISTORY
+
+    tDOM was started by Jochen Loewer (loewerj@hotmail.com) and
+    developed by Jochen and Rolf Ade (rolf@pointsman.de) with
+    contributions by Zoran Vasiljevic (zv@archiware.com). Since more
+    than a dozen years it is maintained and developed by Rolf Ade.

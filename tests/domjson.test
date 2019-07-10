@@ -1,0 +1,518 @@
+# Features covered: JSON parser
+#
+# This file contains a collection of tests for the JSON parser.
+# Tested functionalities:
+#    json-1.*: JSON syntax tests
+#    json-2.*: Valid JSON, that could not parsed into DOM
+#    json-3.*: JSON unescaping
+#    json-4.*: Unicode
+#    json-5.*: Max nesting
+#    json-6.*: asJSON
+#    json-7.*: jsonType
+#    json-8.*: appendFromScript
+#    json-9.*: cloneNode
+# Copyright (c) 2017 Rolf Ade.
+
+source [file join [file dir [info script]] loadtdom.tcl]
+
+testConstraint needExpand 1
+if {$tcl_version < 8.5} {
+    testConstraint needExpand 0
+}
+
+namespace eval nodeCmds {
+    dom createNodeCmd elementNode e1
+    dom createNodeCmd -jsonType ARRAY elementNode jae1
+    dom createNodeCmd elementNode e2
+    dom createNodeCmd commentNode c
+    dom createNodeCmd textNode    t
+    dom createNodeCmd -jsonType TRUE textNode true
+    dom createNodeCmd -jsonType FALSE textNode false
+    dom createNodeCmd -jsonType NULL textNode null
+    dom createNodeCmd -jsonType NUMBER textNode number
+    dom createNodeCmd cdataNode   cdata
+    dom createNodeCmd piNode      pi
+}
+
+test json-1.1 {Parse JSON} {
+    set doc [dom parse -json {{"a":"avalue","b":"bvalue","c":0.123}}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} "<a>avalue</a><b>bvalue</b><c>0.123</c>"
+
+test json-1.2 {Parse JSON} {
+    set doc [dom parse -json { {"a" : [ "avalue" ] } }]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<a>avalue</a>}
+
+test json-1.3 {Parse JSON} {
+    set doc [dom parse -json {{"a":"a value","b":"1value"}}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} "<a>a value</a><b>1value</b>"
+
+test json-1.4 {Parse JSON - nested object} {
+    set doc [dom parse -json {{"a":{"aa":"aavalue","bb":"bbvalue"},"b":"bvalue","c":0.123}}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} "<a><aa>aavalue</aa><bb>bbvalue</bb></a><b>bvalue</b><c>0.123</c>"
+
+test json-1.5 {Parse JSON - array} {
+    set doc [dom parse -json {{"a": [1,2,3,4,"abc"]}}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} "<a>1234abc</a>"
+
+test json-1.6 {Parse JSON - true, false, null} {
+    set doc [dom parse -json {{"a":true,"b":false,"c":null,"d":"true","e":""}}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<a>true</a><b>false</b><c>null</c><d>true</d><e></e>}
+
+test json-1.7 {Parse JSON - array in nested object} {
+    set doc [dom parse -json {{"a":{"aa":[1,2,3,4,"abc"]},"b":"bvalue"}}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} "<a><aa>1234abc</aa></a><b>bvalue</b>"
+
+test json-1.8 {Parse JSON - true, false, null} {
+    set doc [dom parse -json -jsonroot "JSONObject" {{"a":true,"b":false,"c":null,"d":"true","e":""}}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<JSONObject><a>true</a><b>false</b><c>null</c><d>true</d><e></e></JSONObject>}
+
+test json-1.9 {JSON syntax error} {
+    set result [catch {dom parse -json {{"a" "a value"}}} errMsg]
+    list $result $errMsg
+} {1 {error "JSON syntax error" at position 5
+"{"a" " <--Error-- a value"}"}}
+
+test json-1.10 {JSON syntax error} {
+    set result [catch {dom parse -json {{"a":00.23}}} errMsg]
+    list $result $errMsg
+} {1 {error "JSON syntax error" at position 6
+"{"a":00 <--Error-- .23}"}}
+
+test json-1.11 {JSON syntax error} {
+    set result [catch {dom parse -json {{"a":-00.23}}} errMsg]
+    list $result $errMsg
+} {1 {error "JSON syntax error" at position 7
+"{"a":-00 <--Error-- .23}"}}
+
+test json-1.12 {JSON syntax error} {
+    set result [catch {dom parse -json {{"a":.23}}} errMsg]
+    list $result $errMsg
+} {1 {error "JSON syntax error" at position 5
+"{"a":. <--Error-- 23}"}}
+
+test json-1.13 {JSON syntax error} {
+    set result [catch {dom parse -json {{"a":-.23}}} errMsg]
+    list $result $errMsg
+} {1 {error "JSON syntax error" at position 6
+"{"a":-. <--Error-- 23}"}}
+
+test json-1.14 {JSON syntax error} {
+    set result [catch {dom parse -json {{"a":-}}} errMsg]
+    list $result $errMsg
+} {1 {error "JSON syntax error" at position 5
+"{"a":- <--Error-- }"}}
+
+test json-1.15 {Parse JSON - nested object} {
+    set doc [dom parse -json {["a",["aa","bb"],"b"]}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} "a<arraycontainer>aabb</arraycontainer>b"
+
+set notJsons {
+    {{null}}
+    {{1.23}}
+    {{"string"}}
+    {{"e":}}
+}
+test json-1.16 {Invalid input} {
+    set result ""
+    set ind 0
+    foreach notJson $notJsons {
+        if {![catch {dom parse -json $notJson docNode} errMsg]} {
+            lappend result $errMsg
+        }
+    }
+    set result
+} ""
+
+test json-1.17 {Literal binary 0 (NUL, '\0') is not allowed in input} {
+    catch {dom parse -json "\"a\u0000\""}
+} 1
+
+test json-1.18 {Escaped binary 0 (NUL, '\0') is OK} {
+    dom parse -json "\"a\\u0000\"" doc
+    set result [$doc asJSON]
+    $doc delete
+    set result
+} "\"a\\u0000\""
+
+test json-1.19 {Invalid input - uncompled \u escape} {
+    catch {dom parse -json {"ab\u00"}}
+} 1
+
+test json-1.20 {Escaped binary 0} {needExpand} {
+    dom parse -json "\"a\\u0000\"" doc
+    set textvalue [$doc selectNodes string(node())]
+    set result [string length $textvalue]
+    binary scan $textvalue c2 result2
+    lappend result {*}$result2
+    $doc delete
+    set result
+} {2 97 0}
+
+test json-2.1 {invalid xml name} {
+    set doc [dom parse -json {{"a":"a value","1b":"1value", "a\nb":"a\nb", "":"empty string"}}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<a>a value</a><1b>1value</1b><a
+b>a
+b</a
+b><>empty string</>}
+
+test json-3.1 {Unescaping} {
+    set doc [dom parse -json {{"a":"a\nvalue","b":"value\tvalue"}}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} "<a>a
+value</a><b>value\tvalue</b>"
+
+test json-3.2 {Unescaping} {
+    set doc [dom parse -json {{"a":"a\nvalue", "b":"12\u0077\u2221ec"}}]
+    set result [$doc asXML -indent none -escapeNonASCII]
+    $doc delete
+    set result
+} "<a>a
+value</a><b>12w&#8737;ec</b>"
+
+test json-3.3 {Unescaping} {
+    set doc [dom parse -json {{"a":"\u0077\u2221"}}]
+    set result [$doc asXML -indent none -escapeNonASCII]
+    $doc delete
+    set result
+} "<a>w&#8737;</a>"
+
+test json-3.4 {unescaping} {
+    set doc [dom parse -jsonroot json -json {["\\a"]}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<json>\a</json>}
+
+test json-3.4.1 {unescaping} {
+    set doc [dom parse -jsonroot json -json {["\\a","\u0071"]}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<json>\aq</json>}
+
+test json-3.5 {unescaping} {
+    set result [catch {dom parse -json {{"this":"a\lb"}}} errMsg]
+    list $result $errMsg
+} {1 {error "JSON syntax error" at position 11
+"{"this":"a\l <--Error-- b"}"}}
+
+test json-3.6 {unescaping} {
+    set doc [dom parse -json {{"this":"a\nbc"}}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<this>a
+bc</this>} 
+
+test json-3.7 {unescaping} {
+    set doc [dom parse -json {{"this":"a\u0077\t\u0078bc"}}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} "<this>aw\txbc</this>"
+
+test json-3.8 {unescaping} {
+    set doc [dom parse -json {{"this":"a\u000b"}}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} "<this>a\u000b</this>"
+
+test json-3.9 {unescaping} {
+    set doc [dom parse -json {{"this":"a\u0077","that":"\t\u0078bc"}}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} "<this>aw</this><that>\txbc</that>"
+
+test json-5.1 {-jsonmaxnesting 0} {
+    set result [catch {dom parse -json -jsonmaxnesting 0 {{"this":"that"}}} errMsg]
+    list $result $errMsg
+} {1 {error "Maximum JSON object/array nesting depth exceeded" at position 0
+"{ <--Error-- "this":"that"}"}}
+
+test json-5.2 {-jsonmaxnesting 0} {
+    set result [catch {dom parse -json -jsonmaxnesting 0 {["this","that"]}} errMsg]
+    list $result $errMsg
+} {1 {error "Maximum JSON object/array nesting depth exceeded" at position 0
+"[ <--Error-- "this","that"]"}}
+
+test json-5.3 {-jsonmaxnesting 0} {
+    set result [catch {dom parse -jsonroot o -json -jsonmaxnesting 0 {["this","that"]}} errMsg]
+    list $result $errMsg
+} {1 {error "Maximum JSON object/array nesting depth exceeded" at position 0
+"[ <--Error-- "this","that"]"}}
+
+test json-5.4 {-jsonmaxnesting} {
+    set doc [dom parse -json -jsonmaxnesting 2 {{"this":{"foo":"that"}}}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<this><foo>that</foo></this>}
+
+test json-5.5 {-jsonmaxnesting} {
+    set result [catch {dom parse -json -jsonmaxnesting 1 \
+                           {{"this":{"foo":"that"}}}} errMsg]
+    list $result $errMsg
+} {1 {error "Maximum JSON object/array nesting depth exceeded" at position 8
+"{"this":{ <--Error-- "foo":"that"}}"}}
+
+test json-5.6 {-jsonmaxnesting} {
+    set doc [dom parse -json -jsonmaxnesting 2 {
+        {
+            "this": {
+                "foo":"that",
+                "bar":"grill"
+            },
+            "two": "value",
+            "three": {
+                "t1":"t1value",
+                "t2":"t2value"
+            },
+            "four": ["a","b","c"]
+        }}]
+    set result [$doc asXML]
+    $doc delete
+    set result
+} {<this>
+    <foo>that</foo>
+    <bar>grill</bar>
+</this>
+<two>value</two>
+<three>
+    <t1>t1value</t1>
+    <t2>t2value</t2>
+</three>
+<four>abc</four>
+}
+
+set jsons {
+    {{"a":"avalue","b":"bvalue","c":0.123}}
+    {{"a":["avalue"]}}
+    {{"a":"a value","b":"1value"}}
+    {{"a":{"aa":"aavalue","bb":"bbvalue"},"b":"bvalue","c":0.123}}
+    {{"a":[1,2,3,4,"abc"]}}
+    {{"a":true,"b":false,"c":null,"d":"true","e":""}}
+    {{"a":{"aa":[1,2,3,4,"abc"]},"b":"bvalue"}}
+    {{"a":true,"b":false,"c":null,"d":"true","e":""}}
+    {["a",["aa","bb"],"b"]}
+    {{"a":"a\nvalue","b":"value\tvalue"}}
+    {["\\\\a"]}
+    {["a\"b"]}
+    {{"b":"a \"b c\" d","b":"a \"b c\" d"}}
+    {{"this":"a\nbc"}}
+    {{"this":{"foo":"that"}}}
+    {{"this":{"foo":"that","bar":"grill"},"two":"value","three":{"t1":"t1value","t2":"t2value"},"four":["a","b","c"]}}
+    {"only a string"}
+    {null}
+    {1.23}
+    {true}
+    {false}
+    {{}}
+    {[]}
+    {[[]]}
+    {[["x"]]}
+    {""}
+    {[[[[["a"]]]]]}
+    {{"x":[{"id":"foo"}]}}
+    {"http://foo.bar"}
+}
+test json-6.1 {asJSON} {
+    set failedlist [list]
+    set ind 0
+    foreach json $jsons {
+        set doc [dom parse -json $json]
+        set out [$doc asJSON]
+        if {$json ne $out} {
+            lappend failedlist "$ind : '$json' : '$out'"
+        }
+        incr ind
+    }
+    set failedlist
+} {}
+
+test json-6.2 {asJSON - slash will not be escaped while serializing} {
+    set doc [dom parse -json {"http:\/\/foo.bar"}]
+    set result [$doc asJSON]
+    $doc delete
+    set result
+} {"http://foo.bar"}
+
+test json-6.3 {asJSON - docNode serialization} {
+    dom createDocumentNode docNode
+    set result [$docNode asJSON]
+    $docNode delete
+    set result
+} {{}}
+
+test json-6.4 {asJSON - doc serialization} {
+    dom createDocument root docNode
+    set result [$docNode asJSON]
+    $docNode delete
+    set result
+} {{"root":""}}
+
+test json-6.5 {asJSON - serialization of control characters} {
+    set doc [dom parse -json "\"a\\u0000\\u0001\\u0002\\u0003\\u0004\\u0005\\u0006\\u0007\\u0008\\u0009\\u000A\\u000B\\u000C\\u000D\\u000E\\u000F\\u0010\\u0011\\u0012\\u0013\\u0014\\u0015\\u0016\\u0017\\u0018\\u0019\\u001A\\u001B\\u001C\\u001D\\u001E\\u001F\\u0020b\""]
+    set result [$doc asJSON]
+    $doc delete
+    set result
+} {"a\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\b\t\n\u000b\f\r\u000e\u000f\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f b"}
+
+test json-7.1 {jsonType} {
+    set doc [dom parse {<j>foo</j>}]
+    set root [$doc documentElement]
+    set result [list]
+    lappend result [$root asJSON]
+    lappend result [$root jsonType]
+    $root jsonType ARRAY
+    lappend result [$root asJSON]
+    $doc delete
+    set result
+} {{"foo"} NONE {["foo"]}}
+
+test json-7.2 {jsonType} {
+    set doc [dom createDocumentNode]
+    set result [$doc jsonType]
+    lappend result [$doc asJSON]
+    lappend result [catch {$doc jsonType foo}]
+    $doc jsonType ARRAY
+    lappend result [$doc asJSON]
+    $doc jsonType OBJECT
+    lappend result [$doc asJSON]
+    $doc delete
+    set result
+} {NONE {{}} 1 {[]} {{}}}
+
+test json-8.1 {appendFromScript} {
+    set doc [dom createDocumentNode]
+    $doc appendFromScript {
+        nodeCmds::e1
+    }
+    set result [list]
+    lappend result [$doc asJSON]
+    set root [$doc documentElement]
+    lappend result [$root asJSON]
+    $doc removeChild [$doc firstChild]
+    $doc appendFromScript {
+        nodeCmds::jae1
+    }
+    lappend result [$doc asJSON]
+    set root [$doc documentElement]
+    lappend result [$root asJSON]
+    lappend result [$root jsonType]
+    $doc delete
+    set result
+} {{{"e1":""}} {{}} {{"jae1":[]}} {[]} ARRAY}
+
+test json-8.2 {appendFromScript} {
+    set doc [dom createDocumentNode]
+    $doc appendFromScript {
+        nodeCmds::t "some string"
+    }
+    set result [$doc asJSON]
+    $doc delete
+    set result
+} {"some string"}
+
+test json-8.3 {appendFromScript} {
+    set doc [dom createDocumentNode]
+    $doc appendFromScript {
+        nodeCmds::t ""
+        nodeCmds::true ""
+        nodeCmds::false ""
+        nodeCmds::null ""
+    }
+    set result [$doc asJSON]
+    $doc delete
+    set result
+} {["",true,false,null]}
+
+test json-8.4 {appendFromScript - text node with type NUMBER} {
+    set doc [dom createDocumentNode]
+    $doc appendFromScript {
+        nodeCmds::number ""
+        nodeCmds::number "0"
+        nodeCmds::number "123456789012345678901234567890.12345679e-0003"
+        nodeCmds::number "42 "
+        nodeCmds::number " 42"
+        nodeCmds::number "-"
+    }
+    set result [$doc asJSON]
+    $doc delete
+    set result
+} {["",0,123456789012345678901234567890.12345679e-0003,"42 "," 42","-"]}
+
+test json-8.5 {createNodeCmd - wrong jsonType} {
+    catch {dom createNodeCmd -jsonType OBJECT textNode textNodeWithJsonTypeObject}
+} 1
+
+test json-9.1 {cloneNode -deep} {
+    dom parse -json {[["a",1,"b",{"foo":"bar","baz":"boo"},null],"",null]} doc
+    dom createDocument some other
+    $other documentElement root
+    $root appendChild [[$doc firstChild] cloneNode -deep]
+    set result [[$root firstChild] asJSON]
+    $doc delete
+    $other delete
+    set result
+} {["a",1,"b",{"foo":"bar","baz":"boo"},null]}
+
+test json-9.2 {cloneNode} {
+    dom parse -json {[["a",1,"b",{"foo":"bar","baz":"boo"},null],"",null]} doc
+    dom createDocument some other
+    $other documentElement root
+    $root appendChild [[$doc firstChild] cloneNode]
+    set result [[$root firstChild] asJSON]
+    $doc delete
+    $other delete
+    set result
+} {[]}
+
+test json-9.3 {cloneNode} {
+    dom parse -json {{"string":"bar","number":1,"boolean":true,"array":[1,2,3],"object":{"foo":"bar","baz":"boo"}}} doc
+    dom createDocument some other
+    $other documentElement root
+    foreach child [$doc childNodes] {
+        $root appendChild [$child cloneNode -deep]
+    }
+    set result [list]
+    foreach child [$root childNodes] {
+        lappend result [$child asJSON]
+    }
+    $doc delete
+    $other delete
+    set result
+} {{"bar"} 1 true {[1,2,3]} {{"foo":"bar","baz":"boo"}}}

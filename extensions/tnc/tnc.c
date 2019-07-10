@@ -9,20 +9,13 @@
 #include <string.h>
 #include <stdlib.h>
 
-/*
- * Beginning with 8.4, Tcl API is CONST'ified
- */
-#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION <= 3)
-# define CONST84
-#endif
-
 #ifndef TCL_THREADS
 # define TDomThreaded(x)
 #else
 # define TDomThreaded(x) x
 #endif
 
-/* The inital stack sizes must be at least 1 */
+/* The initial stack sizes must be at least 1 */
 #define TNC_INITCONTENTSTACKSIZE 512
 
 /*----------------------------------------------------------------------------
@@ -68,7 +61,7 @@ typedef struct TNC_contentStack
 typedef struct TNC_data
 {
     char             *doctypeName;            /* From DOCTYPE declaration */
-    int               ignoreWhiteCDATAs;      /* Flag: white space allowed in 
+    int               skipWhiteCDATAs;        /* Flag: white space allowed in 
                                                  current content model? */
     int               ignorePCDATA;           /* Flag: currently mixed content
                                                  model? */
@@ -89,7 +82,7 @@ typedef struct TNC_data
     int               elemContentsRewriten;   /* Signals, if the tagNames
                                                  entries point to
                                                  TNC_Contents */
-    int               status;                 /* While used with expat obj:
+    int               dtdstatus;                 /* While used with expat obj:
                                                  1 after successful parsed
                                                  DTD, 0 otherwise.
                                                  For validateCmd used for
@@ -181,13 +174,13 @@ enum TNC_Error {
     TNC_ERROR_NO_DOCTYPE_DECL,
     TNC_ERROR_WRONG_ROOT_ELEMENT,
     TNC_ERROR_NO_ATTRIBUTES,
-    TNC_ERROR_UNKOWN_ATTRIBUTE,
+    TNC_ERROR_UNKNOWN_ATTRIBUTE,
     TNC_ERROR_WRONG_FIXED_ATTVALUE,
     TNC_ERROR_MISSING_REQUIRED_ATTRIBUTE,
     TNC_ERROR_MORE_THAN_ONE_ID_ATT,
     TNC_ERROR_ID_ATT_DEFAULT,
     TNC_ERROR_DUPLICATE_ID_VALUE,
-    TNC_ERROR_UNKOWN_ID_REFERRED,
+    TNC_ERROR_UNKNOWN_ID_REFERRED,
     TNC_ERROR_ENTITY_ATTRIBUTE,
     TNC_ERROR_ENTITIES_ATTRIBUTE,
     TNC_ERROR_ATT_ENTITY_DEFAULT_MUST_BE_DECLARED,
@@ -270,9 +263,10 @@ TNC_ErrorString (int code)
 extern char *Tdom_InitStubs (Tcl_Interp *interp, char *version, int exact);
 
 static void
-signalNotValid (userData, code)
-    void        *userData;
-    int          code;
+signalNotValid (
+    void        *userData,
+    int          code
+)
 {
     TNC_Data *tncdata = (TNC_Data *) userData;
     TclGenExpatInfo *expat;
@@ -288,7 +282,7 @@ signalNotValid (userData, code)
         expat->result = Tcl_NewStringObj (s, -1);
         Tcl_IncrRefCount (expat->result);
     } else {
-        tncdata->status = 1;
+        tncdata->dtdstatus = 1;
         Tcl_SetResult (tncdata->interp, (char *)TNC_ErrorString (code),
                        TCL_VOLATILE);
     }
@@ -344,12 +338,13 @@ FindUniqueCmdName(
  */
 
 void
-TncStartDoctypeDeclHandler (userData, doctypeName, sysid, pubid, has_internal_subset)
-    void       *userData;
-    const char *doctypeName;
-    const char *sysid;
-    const char *pubid;
-    int         has_internal_subset;
+TncStartDoctypeDeclHandler (
+    void       *userData,
+    const char *doctypeName,
+    const char *sysid,
+    const char *pubid,
+    int         has_internal_subset
+)
 {
     TNC_Data *tncdata = (TNC_Data *) userData;
 
@@ -377,8 +372,9 @@ TncStartDoctypeDeclHandler (userData, doctypeName, sysid, pubid, has_internal_su
  */
 
 static void
-TncFreeTncModel (tmodel)
-    TNC_Content *tmodel;
+TncFreeTncModel (
+    TNC_Content *tmodel
+)
 {
     unsigned int i;
 
@@ -409,10 +405,11 @@ TncFreeTncModel (tmodel)
  */
 
 static void
-TncRewriteModel (emodel, tmodel, tagNames)
-    XML_Content   *emodel;
-    TNC_Content   *tmodel;
-    Tcl_HashTable *tagNames;
+TncRewriteModel (
+    XML_Content   *emodel,
+    TNC_Content   *tmodel,
+    Tcl_HashTable *tagNames
+)
 {
     Tcl_HashEntry *entryPtr;
     unsigned int i;
@@ -485,8 +482,9 @@ TncRewriteModel (emodel, tmodel, tagNames)
  */
 
 void
-TncEndDoctypeDeclHandler (userData)
-    void *userData;
+TncEndDoctypeDeclHandler (
+    void *userData
+)
 {
     TNC_Data *tncdata = (TNC_Data *) userData;
     Tcl_HashEntry *entryPtr, *ePtr1;
@@ -540,7 +538,7 @@ TncEndDoctypeDeclHandler (userData)
         }
         entryPtr = Tcl_NextHashEntry (&search);
     }
-    tncdata->status = 1;
+    tncdata->dtdstatus = 1;
 }
 
 
@@ -562,17 +560,17 @@ TncEndDoctypeDeclHandler (userData)
  */
 
 void
-TncEntityDeclHandler (userData, entityName, is_parameter_entity, value,
-                       value_length, base, systemId, publicId, notationName)
-    void *userData;
-    const char *entityName;
-    int is_parameter_entity;
-    const char *value;
-    int value_length;
-    const char *base;
-    const char *systemId;
-    const char *publicId;
-    const char *notationName;
+TncEntityDeclHandler (
+    void *userData,
+    const char *entityName,
+    int is_parameter_entity,
+    const char *value,
+    int value_length,
+    const char *base,
+    const char *systemId,
+    const char *publicId,
+    const char *notationName
+)
 {
     TNC_Data *tncdata = (TNC_Data *) userData;
     Tcl_HashEntry *entryPtr;
@@ -582,7 +580,7 @@ TncEntityDeclHandler (userData, entityName, is_parameter_entity, value,
 
     /* expat collects entity definitions internaly by itself. So this is
        maybe superfluous, if it possible to access the expat internal
-       represention. To study this is left to the reader. */
+       representation. To study this is left to the reader. */
 
     if (is_parameter_entity) return;
     entryPtr = Tcl_CreateHashEntry (tncdata->entityDecls, entityName, &newPtr);
@@ -635,12 +633,13 @@ TncEntityDeclHandler (userData, entityName, is_parameter_entity, value,
  */
 
 void
-TncNotationDeclHandler (userData, notationName, base, systemId, publicId)
-    void       *userData;
-    const char *notationName;
-    const char *base;
-    const char *systemId;
-    const char *publicId;
+TncNotationDeclHandler (
+    void       *userData,
+    const char *notationName,
+    const char *base,
+    const char *systemId,
+    const char *publicId
+)
 {
     TNC_Data *tncdata = (TNC_Data *) userData;
     Tcl_HashEntry *entryPtr;
@@ -674,10 +673,11 @@ TncNotationDeclHandler (userData, notationName, base, systemId, publicId)
  */
 
 void
-TncElementDeclCommand (userData, name, model)
-    void *userData;
-    const char *name;
-    XML_Content *model;
+TncElementDeclCommand (
+    void *userData,
+    const char *name,
+    XML_Content *model
+)
 {
     TNC_Data *tncdata = (TNC_Data *) userData;
     Tcl_HashEntry *entryPtr;
@@ -731,13 +731,14 @@ TncElementDeclCommand (userData, name, model)
  */
 
 void
-TncAttDeclCommand (userData, elname, attname, att_type, dflt, isrequired)
-    void       *userData;
-    const char *elname;
-    const char *attname;
-    const char *att_type;
-    const char *dflt;
-    int         isrequired;
+TncAttDeclCommand (
+    void       *userData,
+    const char *elname,
+    const char *attname,
+    const char *att_type,
+    const char *dflt,
+    int         isrequired
+)
 {
     TNC_Data *tncdata = (TNC_Data *) userData;
     Tcl_HashEntry *entryPtr, *entryPtr1;
@@ -1150,9 +1151,10 @@ printContentStack (TNC_Data *tncdata)
  */
 
 static int
-TncProbeElement (nameId, tncdata)
-    TNC_NameId *nameId;
-    TNC_Data   *tncdata;
+TncProbeElement (
+    TNC_NameId *nameId,
+    TNC_Data   *tncdata
+)
 {
     TNC_ContentStack *stackelm;
     TNC_Content *activeModel;
@@ -1217,7 +1219,7 @@ TncProbeElement (nameId, tncdata)
                   here, they don't.  Since the current cp has already
                   matched and isn't multiple, the current cp as a whole
                   is done.  But no contradiction detected, so return
-                  "search futher" */
+                  "search further" */
                 return -1;
             }
         }
@@ -1293,7 +1295,7 @@ TncProbeElement (nameId, tncdata)
                 tncdata->contentStackPtr--;
             }
         }
-        /* OK, nobody has claimed a match. Question is: try futher or is
+        /* OK, nobody has claimed a match. Question is: try further or is
            this a document structure error. */
         if (zeroMatchPossible ||
             stackelm->alreadymatched ||
@@ -1392,7 +1394,7 @@ TncProbeElement (nameId, tncdata)
         if (!stackelm->alreadymatched) {
             if (zeroMatchPossible) {
                 /* The stackelm hasn't matched, but don't have to
-                   after all.  Return try futher */
+                   after all.  Return try further */
                 return -1;
             } else {
                 /* No previous match, but at least one child is
@@ -1420,7 +1422,7 @@ TncProbeElement (nameId, tncdata)
                    where no required (quant NONE or PLUS) childs. */
                 if (stackelm->model->quant == XML_CQUANT_NONE ||
                     stackelm->model->quant == XML_CQUANT_OPT) {
-                    /* The entire seq isn't multiple. Just look futher. */
+                    /* The entire seq isn't multiple. Just look further. */
                     return -1;
                 }
             }
@@ -1430,8 +1432,8 @@ TncProbeElement (nameId, tncdata)
            last match) true and the entire seq may be
            multiple. Therefore start again with activeChild = 0, to
            see, if the current nameId starts a repeated match of the
-           seq.  By the way: zeroMatchPossible still has inital value
-           1, therefor no second initaliation is needed */
+           seq.  By the way: zeroMatchPossible still has initial value
+           1, therefor no second initialiation is needed */
         for (i = 0; i < seqstartindex; i++) {
             if ((&stackelm->model->children[i])->type == XML_CTYPE_NAME) {
                 if ((&stackelm->model->children[i])->nameId == nameId) {
@@ -1485,7 +1487,7 @@ TncProbeElement (nameId, tncdata)
            matched already ... */
         return -1;
     case XML_CTYPE_NAME:
-        /* NAME type dosen't occur at top level of a content model and is
+        /* NAME type doesn't occur at top level of a content model and is
            handled in some "shotcut" way directly in the CHOICE and SEQ cases.
            It's only here to pacify gcc -Wall. */
         printf ("error!!! - in TncProbeElement: XML_CTYPE_NAME shouldn't reached in any case.\n");
@@ -1517,12 +1519,13 @@ TncProbeElement (nameId, tncdata)
  */
 
 static int
-TncProbeAttribute (userData, elemAtts, attrName, attrValue, nrOfreq)
-    void *userData;
-    Tcl_HashTable *elemAtts;
-    char *attrName;
-    char *attrValue;
-    int *nrOfreq;
+TncProbeAttribute (
+    void *userData,
+    Tcl_HashTable *elemAtts,
+    char *attrName,
+    char *attrValue,
+    int *nrOfreq
+)
 {
     TNC_Data *tncdata = (TNC_Data *) userData;
     Tcl_HashEntry *entryPtr;
@@ -1533,7 +1536,7 @@ TncProbeAttribute (userData, elemAtts, attrName, attrValue, nrOfreq)
 
     entryPtr = Tcl_FindHashEntry (elemAtts, attrName);
     if (!entryPtr) {
-        signalNotValid (userData, TNC_ERROR_UNKOWN_ATTRIBUTE);
+        signalNotValid (userData, TNC_ERROR_UNKNOWN_ATTRIBUTE);
         return 0;
     }
     /* NOTE: attribute uniqueness per element is a wellformed
@@ -1773,10 +1776,11 @@ TncProbeAttribute (userData, elemAtts, attrName, attrValue, nrOfreq)
  */
 
 void
-TncElementStartCommand (userData, name, atts)
-    void *userData;
-    const char *name;
-    const char **atts;
+TncElementStartCommand (
+    void *userData,
+    const char *name,
+    const char **atts
+)
 {
     TNC_Data *tncdata = (TNC_Data *) userData;
     Tcl_HashEntry *entryPtr;
@@ -1795,7 +1799,7 @@ TncElementStartCommand (userData, name, atts)
        data out of the provided DTD isn't postprocessed by 
        TncElementStartCommand. We do this now.
        NOTE: Since there wasn't a doctype declaration, there is no
-       information avaliable which element is expected to be the
+       information available which element is expected to be the
        document element. Eventually it would be desirable, to set
        this somehow. For now, this means, that every valid subtree
        of the given DTD information is accepted.  */
@@ -1814,15 +1818,15 @@ TncElementStartCommand (userData, name, atts)
     switch (model->type) {
     case XML_CTYPE_MIXED:
     case XML_CTYPE_ANY:
-        tncdata->ignoreWhiteCDATAs = 1;
+        tncdata->skipWhiteCDATAs = 1;
         tncdata->ignorePCDATA = 1;
         break;
     case XML_CTYPE_EMPTY:
-        tncdata->ignoreWhiteCDATAs = 0;
+        tncdata->skipWhiteCDATAs = 0;
         break;
     case XML_CTYPE_CHOICE:
     case XML_CTYPE_SEQ:
-        tncdata->ignoreWhiteCDATAs = 1;
+        tncdata->skipWhiteCDATAs = 1;
         tncdata->ignorePCDATA = 0;
         break;
     case XML_CTYPE_NAME:
@@ -1936,8 +1940,9 @@ TncElementStartCommand (userData, name, atts)
  */
 
 static int
-TncProbeElementEnd (tncdata)
-    TNC_Data *tncdata;
+TncProbeElementEnd (
+    TNC_Data *tncdata
+)
 {
     TNC_ContentStack stackelm;
     unsigned int i;
@@ -2047,7 +2052,7 @@ TncProbeElementEnd (tncdata)
         }
         return 1;
     case XML_CTYPE_NAME:
-        /* NAME type dosen't occur at top level of a content model and is
+        /* NAME type doesn't occur at top level of a content model and is
            handled in some "shotcut" way directly in the CHOICE and SEQ cases.
            It's only here to pacify gcc -Wall. */
         fprintf (stderr, "error!!! - in TncProbeElementEnd: XML_CTYPE_NAME "
@@ -2080,9 +2085,10 @@ TncProbeElementEnd (tncdata)
  */
 
 void
-TncElementEndCommand (userData, name)
-    void       *userData;
-    const char *name;
+TncElementEndCommand (
+    void       *userData,
+    const char *name
+)
 {
     TNC_Data *tncdata = (TNC_Data *) userData;
     Tcl_HashEntry *entryPtr;
@@ -2093,7 +2099,7 @@ TncElementEndCommand (userData, name)
     printContentStack (tncdata);
 #endif
     while (1) {
-        if (!TncProbeElementEnd (tncdata, 0)) {
+        if (!TncProbeElementEnd (tncdata)) {
             signalNotValid (userData, TNC_ERROR_ELEMENT_CAN_NOT_END_HERE);
             return;
         }
@@ -2112,16 +2118,16 @@ TncElementEndCommand (userData, name)
         switch ((&tncdata->contentStack[tncdata->contentStackPtr - 1])->model->type) {
         case XML_CTYPE_MIXED:
         case XML_CTYPE_ANY:
-            tncdata->ignoreWhiteCDATAs = 1;
+            tncdata->skipWhiteCDATAs = 1;
             tncdata->ignorePCDATA = 1;
             break;
         case XML_CTYPE_EMPTY:
-            tncdata->ignoreWhiteCDATAs = 0;
+            tncdata->skipWhiteCDATAs = 0;
             break;
         case XML_CTYPE_CHOICE:
         case XML_CTYPE_SEQ:
         case XML_CTYPE_NAME:
-            tncdata->ignoreWhiteCDATAs = 1;
+            tncdata->skipWhiteCDATAs = 1;
             tncdata->ignorePCDATA = 0;
             break;
         }
@@ -2139,7 +2145,7 @@ TncElementEndCommand (userData, name)
                 printf ("value %p\n", Tcl_GetHashValue (entryPtr));
 #endif
                 if (!Tcl_GetHashValue (entryPtr)) {
-                    signalNotValid (userData, TNC_ERROR_UNKOWN_ID_REFERRED);
+                    signalNotValid (userData, TNC_ERROR_UNKNOWN_ID_REFERRED);
                 return;
                 }
             }
@@ -2165,16 +2171,17 @@ TncElementEndCommand (userData, name)
  */
 
 void
-TncCharacterdataCommand (userData, data, len)
-    void       *userData;
-    const char *data;
-    int         len;
+TncCharacterdataCommand (
+    void       *userData,
+    const char *data,
+    int         len
+)
 {
     TNC_Data *tncdata = (TNC_Data *) userData;
     int i;
     char *pc;
 
-    if (!tncdata->ignoreWhiteCDATAs && len > 0) {
+    if (!tncdata->skipWhiteCDATAs && len > 0) {
         signalNotValid (userData, TNC_ERROR_EMPTY_ELEMENT);
         return;
     }
@@ -2210,8 +2217,9 @@ TncCharacterdataCommand (userData, data, len)
  */
 
 void
-TncStartCdataSectionHandler (userData)
-    void *userData;
+TncStartCdataSectionHandler (
+    void *userData
+)
 {
     TNC_Data *tncdata = (TNC_Data *) userData;
 
@@ -2301,7 +2309,7 @@ static int validateTree (
     switch (node->nodeType) {
     case ELEMENT_NODE:
         TncElementStartCommand (tncdata, node->nodeName, NULL);
-        if (tncdata->status) return 0;
+        if (tncdata->dtdstatus) return 0;
         if (!validateNodeAttributes (tncdata, tncdata->elemAttInfo, node)) 
             return 0;
         if (node->firstChild) {
@@ -2312,13 +2320,13 @@ static int validateTree (
             }
         }
         TncElementEndCommand (tncdata, node->nodeName);
-        if (tncdata->status) return 0;
+        if (tncdata->dtdstatus) return 0;
         break;
     case TEXT_NODE:
     case CDATA_SECTION_NODE:
         TncCharacterdataCommand (tncdata, ((domTextNode*)node)->nodeValue, 
                                  ((domTextNode*)node)->valueLength);
-        if (tncdata->status) return 0;
+        if (tncdata->dtdstatus) return 0;
         break;
     case COMMENT_NODE:
     case PROCESSING_INSTRUCTION_NODE:
@@ -2353,7 +2361,7 @@ tnc_ValidateObjCmd (
     ClientData  clientData,
     Tcl_Interp *interp,
     int         objc,
-    Tcl_Obj    *CONST objv[]
+    Tcl_Obj    *const objv[]
     )
 {
     TNC_Data        *tncdata = (TNC_Data*) clientData;
@@ -2363,7 +2371,7 @@ tnc_ValidateObjCmd (
     Tcl_HashEntry   *entryPtr;
     TNC_Content     *model;
     
-    static CONST84 char *validateMethods[] = {
+    static const char *validateMethods[] = {
         "validateTree",   "validateDocument", "validateAttributes",
         "delete",
         NULL
@@ -2398,7 +2406,7 @@ tnc_ValidateObjCmd (
             SetResult ("The validateTree method needs a domNode as argument.");
             return TCL_ERROR;
         }
-        tncdata->status = 0;
+        tncdata->dtdstatus = 0;
         tncdata->idCheck = 0;
         if (tncdata->ids->numEntries) {
             Tcl_DeleteHashTable (tncdata->ids);
@@ -2464,7 +2472,7 @@ tnc_ValidateObjCmd (
             SetBooleanResult (0);
             return TCL_OK;
         }
-        tncdata->status = 0;
+        tncdata->dtdstatus = 0;
         tncdata->idCheck = 1;
         if (tncdata->ids->numEntries) {
             Tcl_DeleteHashTable (tncdata->ids);
@@ -2517,7 +2525,7 @@ tnc_ValidateObjCmd (
             return TCL_OK;
         }
         model = (TNC_Content *) Tcl_GetHashValue (entryPtr);
-        tncdata->status = 0;
+        tncdata->dtdstatus = 0;
         tncdata->idCheck = 0;
         if (tncdata->ids->numEntries) {
             Tcl_DeleteHashTable (tncdata->ids);
@@ -2570,8 +2578,9 @@ tnc_ValidateObjCmd (
  *
  *---------------------------------------------------------------------------- */
 static void
-FreeTncData (tncdata)
-    TNC_Data *tncdata;
+FreeTncData (
+    TNC_Data *tncdata
+)
 {
     Tcl_HashEntry *entryPtr, *attentryPtr;
     Tcl_HashSearch search, attsearch;
@@ -2658,23 +2667,24 @@ FreeTncData (tncdata)
  */
 
 void
-TncResetProc (interp, userData)
-    Tcl_Interp *interp;
-    void *userData;
+TncResetProc (
+    Tcl_Interp *interp,
+    void *userData
+)
 {
     TNC_Data *tncdata = (TNC_Data *) userData;
 
     FreeTncData (tncdata);
     Tcl_InitHashTable (tncdata->tagNames, TCL_STRING_KEYS);
     tncdata->elemContentsRewriten = 0;
-    tncdata->status = 0;
+    tncdata->dtdstatus = 0;
     tncdata->idCheck = 1;
     Tcl_InitHashTable (tncdata->attDefsTables, TCL_STRING_KEYS);
     Tcl_InitHashTable (tncdata->entityDecls, TCL_STRING_KEYS);
     Tcl_InitHashTable (tncdata->notationDecls, TCL_STRING_KEYS);
     Tcl_InitHashTable (tncdata->ids, TCL_STRING_KEYS);
     tncdata->doctypeName = NULL;
-    tncdata->ignoreWhiteCDATAs = 1;
+    tncdata->skipWhiteCDATAs = 1;
     tncdata->ignorePCDATA = 0;
     tncdata->contentStackPtr = 0;
 }
@@ -2707,7 +2717,7 @@ createTncData (
     tncdata->tagNames = (Tcl_HashTable *) MALLOC (sizeof (Tcl_HashTable));
     Tcl_InitHashTable (tncdata->tagNames, TCL_STRING_KEYS);
     tncdata->elemContentsRewriten = 0;
-    tncdata->status = 0;
+    tncdata->dtdstatus = 0;
     tncdata->idCheck = 1;
     tncdata->attDefsTables = 
         (Tcl_HashTable *) MALLOC (sizeof (Tcl_HashTable));
@@ -2723,7 +2733,7 @@ createTncData (
     tncdata->doctypeName = NULL;
     tncdata->interp = interp;
     tncdata->expatObj = expatObj;
-    tncdata->ignoreWhiteCDATAs = 1;
+    tncdata->skipWhiteCDATAs = 1;
     tncdata->ignorePCDATA = 0;
     tncdata->contentStack = (TNC_ContentStack *)
         MALLOC (sizeof (TNC_ContentStack) * TNC_INITCONTENTSTACKSIZE);
@@ -2751,9 +2761,10 @@ createTncData (
  */
 
 void
-TncFreeProc (interp, userData)
-    Tcl_Interp *interp;
-    void *userData;
+TncFreeProc (
+    Tcl_Interp *interp,
+    void *userData
+)
 {
     TNC_Data *tncdata = (TNC_Data *) userData;
 
@@ -2817,14 +2828,14 @@ TclTncObjCmd(dummy, interp, objc, objv)
      ClientData dummy;
      Tcl_Interp *interp;
      int objc;
-     Tcl_Obj *CONST objv[];
+     Tcl_Obj *const objv[];
 {
     char          *cmdName, s[20];
     CHandlerSet   *handlerSet;
     int            methodIndex, result;
     TNC_Data      *tncdata;
 
-    static CONST84 char *tncMethods[] = {
+    static const char *tncMethods[] = {
         "enable",  "remove", "getValidateCmd",
         NULL
     };
@@ -2904,14 +2915,14 @@ TclTncObjCmd(dummy, interp, objc, objv)
             return TCL_ERROR;
         }
         tncdata = (TNC_Data *) handlerSet->userData;
-        if (!tncdata->status) {
+        if (!tncdata->dtdstatus) {
             SetResult ("No complete and error free DTD data available.");
             return TCL_ERROR;
         }
         /* After we finished, the validator structure is its own command,
            there isn't a parser cmd anymore. */
         tncdata->expatObj = NULL;
-        tncdata->status = 0;
+        tncdata->dtdstatus = 0;
         handlerSet->userData = createTncData (interp, objv[1]);
         if (objc == 4) {
             cmdName = Tcl_GetStringFromObj (objv[3], NULL);
@@ -2972,7 +2983,7 @@ Tnc_Init (interp)
         return TCL_ERROR;
     }
 #endif
-    Tcl_PkgRequire (interp, "tdom", "0.8.0", 0);
+    Tcl_PkgRequire (interp, "tdom", NULL, 0);
     Tcl_CreateObjCommand (interp, "tnc", TclTncObjCmd, NULL, NULL );
     Tcl_PkgProvide (interp, "tnc", PACKAGE_VERSION);
     return TCL_OK;

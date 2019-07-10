@@ -699,7 +699,7 @@ external subset, the parser will call the -externalentitycommand script with
 empty values for the systemId and publicID arguments. This option must be set,
 before the first piece of data is parsed. Setting this option, after the
 parsing has started has no effect. The default is not to use a foreign DTD. The
-default is restored, after reseting the parser. Pleace notice, that a
+default is restored, after resetting the parser. Pleace notice, that a
 -paramentityparsing value of "never" (which is the default) suppresses any call
 to the -externalentitycommand script. Pleace notice, that, if the document also
 doesn't have an internal subset, the -startdoctypedeclcommand and
@@ -736,13 +736,21 @@ and -processinginstructioncommand). Otherwise it return the
 empty string.
 .RE
 .TP
-\&\fB\fBparser\fP \fBfree\fP
+\&\fB\fBparser\fP \fBdelete\fP
 \&\fR
 .RS
 .PP
 Deletes the parser and the parser command. A parser cannot
-be freed from within one of its handler callbacks (neither directly nor
+be deleted from within one of its handler callbacks (neither directly nor
 indirectly) and will raise a tcl error in this case.
+.RE
+.TP
+\&\fB\fBparser\fP \fBfree\fP
+\&\fR
+.RS
+.PP
+Another name to call the method \fIdelete\fR, see
+there.
 .RE
 .TP
 \&\fB\fBparser\fP \fBget\fP \fI-specifiedattributecount|-idattributeindex|-currentbytecount|-currentlinenumber|-currentcolumnnumber|-currentbyteindex\fB
@@ -833,7 +841,7 @@ of the parser to be used and will raise an error in this case.
 .RS
 .PP
 Resets the parser in preparation for parsing another
-document. A parser cannot be reseted from within one of its handler callbacks
+document. A parser cannot be reset from within one of its handler callbacks
 (neither directly nor indirectly) and will raise a tcl error in this
 cases.
 .RE

@@ -8,7 +8,7 @@
 |   to tDOM. Following http://wiki.tcl.tk/3358.
 |
 |   The contents of this file are subject to the Mozilla Public License
-|   Version 1.1 (the "License"); you may not use this file except in
+|   Version 2.0 (the "License"); you may not use this file except in
 |   compliance with the License. You may obtain a copy of the License at
 |   http://www.mozilla.org/MPL/
 |
@@ -46,21 +46,21 @@
 #undef TCL_STORAGE_CLASS
 #define TCL_STORAGE_CLASS DLLEXPORT
 
-TdomStubs *tdomStubsPtr;
+const TdomStubs *tdomStubsPtr;
 
 /*----------------------------------------------------------------------------
 |   Tdom_InitStubs
 |
 \---------------------------------------------------------------------------*/
 
-CONST char *
+const char *
 Tdom_InitStubs (
     Tcl_Interp *interp, 
     char *version, 
     int exact
     )
 {
-    CONST char *actualVersion;
+    const char *actualVersion;
     ClientData clientData = NULL;
 
 #if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION == 0)

@@ -6,11 +6,22 @@
 # RCS: @(#) $Id$
 #
 
-package require tcltest
+if {$tcl_version < 8.5} {
+    # We still support 8.4 to some degree
+    package require Tcl 8.4
+} else {
+    package require Tcl 8.4-
+}
+package require tcltest 2.2
 namespace import ::tcltest::*
-package require -exact tdom 0.8.3
-if {[lsearch [namespace children] ::tDOM] == -1} {
+catch {tcltest::loadTestedCommands}
+
+if {[catch {package require -exact tdom 0.9.2}]} {
+    if {[catch {load [file join [file dir [info script]] ../unix/libtdom0.9.2.so]}]} {
+        error "Unable to load the appropriate tDOM version!"
+    }
+}
+if {[info commands ::tdom::xmlReadFile] == ""} {
     # tcldomsh without the script library. Source the lib.
     source [file join [file dir [info script]] ../lib tdom.tcl]
 }
-

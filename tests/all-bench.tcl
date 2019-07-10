@@ -98,12 +98,9 @@ foreach {arg argValue} $argv {
 
 if {[llength $interpPaths] == 0} {
     lappend interpPaths [file dirname [info nameofexecutable]]
-    puts $interpPaths
 }
 
-puts [bench::locate $interpPattern $interpPaths]
-
-set interps [bench::versions [bench::locate $interpPattern $interpPaths]]
+set interps [bench::locate $interpPattern $interpPaths]
 
 if {![llength $interps]} {
     puts stderr "No interpreters found"
@@ -123,9 +120,12 @@ if {![llength $benchfiles]} {
     exit 1
 }
 
-set run $cmd
-lappend run $interps $benchfiles
-set results [eval $run]
+set results ""
+foreach interp $interps {
+    set run $cmd
+    lappend run $interp $benchfiles
+    set results [::bench::merge $results [eval $run]]
+}
 if {$norm ne ""} {
     set results [::bench::norm $results $norm]
 }

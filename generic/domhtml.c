@@ -11,7 +11,7 @@
 |
 |
 |   The contents of this file are subject to the Mozilla Public License
-|   Version 1.1 (the "License"); you may not use this file except in
+|   Version 2.0 (the "License"); you may not use this file except in
 |   compliance with the License. You may obtain a copy of the License at
 |   http://www.mozilla.org/MPL/
 |
@@ -100,11 +100,7 @@ struct Er {
 |   character entity references known to the system.
 |
 \---------------------------------------------------------------------------*/
-#if TclOnly8Bits
-#define ER_HASH_SIZE 107
-#else
 #define ER_HASH_SIZE 257
-#endif
 
 /*----------------------------------------------------------------------------
 |   The following flag is TRUE if entity reference hash table needs
@@ -165,104 +161,6 @@ static Er er_sequences[] = {
     { "gt",        ">",        0 },
     { "apos",      "'",        0 },
     { "quot",      "\"",       0 },
-#if TclOnly8Bits
-    { "nbsp",      "\240",     0 },
-    { "iexcl",     "\241",     0 }, /* inverted exclamation mark  */
-    { "cent",      "\242",     0 }, /* cent sign  */
-    { "pound",     "\243",     0 }, /* pound sterling sign  */
-    { "curren",    "\244",     0 }, /* general currency sign  */
-    { "yen",       "\245",     0 }, /* yen sign  */
-    { "brvbar",    "\246",     0 }, /* broken (vertical) bar  */
-    { "sect",      "\247",     0 }, /* section sign  */
-    { "uml",       "\250",     0 }, /* umlaut (dieresis)  */
-    { "copy",      "\251",     0 }, /* copyright sign  */
-    { "ordf",      "\252",     0 }, /* ordinal indicator, feminine  */
-    { "laquo",     "\253",     0 }, /* angle quotation mark, left  */
-    { "not",       "\254",     0 }, /* not sign  */
-    { "shy",       "\255",     0 }, /* soft hyphen  */
-    { "reg",       "\256",     0 }, /* registered sign  */
-    { "macr",      "\257",     0 }, /* macron  */
-    { "deg",       "\260",     0 }, /* degree sign  */
-    { "plusmn",    "\261",     0 }, /* plus-or-minus sign  */
-    { "sup2",      "\262",     0 }, /* superscript two  */
-    { "sup3",      "\263",     0 }, /* superscript three  */
-    { "acute",     "\264",     0 }, /* acute accent  */
-    { "micro",     "\265",     0 }, /* micro sign  */
-    { "para",      "\266",     0 }, /* pilcrow (paragraph sign)  */
-    { "middot",    "\267",     0 }, /* middle dot  */
-    { "cedil",     "\270",     0 }, /* cedilla  */
-    { "sup1",      "\271",     0 }, /* superscript one  */
-    { "ordm",      "\272",     0 }, /* ordinal indicator, masculine  */
-    { "raquo",     "\273",     0 }, /* angle quotation mark, right  */
-    { "frac14",    "\274",     0 }, /* fraction one-quarter  */
-    { "frac12",    "\275",     0 }, /* fraction one-half  */
-    { "frac34",    "\276",     0 }, /* fraction three-quarters  */
-    { "iquest",    "\277",     0 }, /* inverted question mark  */
-    { "Agrave",    "\300",     0 }, /* capital A, grave accent  */
-    { "Aacute",    "\301",     0 }, /* capital A, acute accent  */
-    { "Acirc",     "\302",     0 }, /* capital A, circumflex accent  */
-    { "Atilde",    "\303",     0 }, /* capital A, tilde  */
-    { "Auml",      "\304",     0 }, /* capital A, dieresis or umlaut mark  */
-    { "Aring",     "\305",     0 }, /* capital A, ring  */
-    { "AElig",     "\306",     0 }, /* capital AE diphthong (ligature)  */
-    { "Ccedil",    "\307",     0 }, /* capital C, cedilla  */
-    { "Egrave",    "\310",     0 }, /* capital E, grave accent  */
-    { "Eacute",    "\311",     0 }, /* capital E, acute accent  */
-    { "Ecirc",     "\312",     0 }, /* capital E, circumflex accent  */
-    { "Euml",      "\313",     0 }, /* capital E, dieresis or umlaut mark  */
-    { "Igrave",    "\314",     0 }, /* capital I, grave accent  */
-    { "Iacute",    "\315",     0 }, /* capital I, acute accent  */
-    { "Icirc",     "\316",     0 }, /* capital I, circumflex accent  */
-    { "Iuml",      "\317",     0 }, /* capital I, dieresis or umlaut mark  */
-    { "ETH",       "\320",     0 }, /* capital Eth, Icelandic  */
-    { "Ntilde",    "\321",     0 }, /* capital N, tilde  */
-    { "Ograve",    "\322",     0 }, /* capital O, grave accent  */
-    { "Oacute",    "\323",     0 }, /* capital O, acute accent  */
-    { "Ocirc",     "\324",     0 }, /* capital O, circumflex accent  */
-    { "Otilde",    "\325",     0 }, /* capital O, tilde  */
-    { "Ouml",      "\326",     0 }, /* capital O, dieresis or umlaut mark  */
-    { "times",     "\327",     0 }, /* multiply sign  */
-    { "Oslash",    "\330",     0 }, /* capital O, slash  */
-    { "Ugrave",    "\331",     0 }, /* capital U, grave accent  */
-    { "Uacute",    "\332",     0 }, /* capital U, acute accent  */
-    { "Ucirc",     "\333",     0 }, /* capital U, circumflex accent  */
-    { "Uuml",      "\334",     0 }, /* capital U, dieresis or umlaut mark  */
-    { "Yacute",    "\335",     0 }, /* capital Y, acute accent  */
-    { "THORN",     "\336",     0 }, /* capital THORN, Icelandic  */
-    { "szlig",     "\337",     0 }, /* small sharp s, German (sz ligature)  */
-    { "agrave",    "\340",     0 }, /* small a, grave accent  */
-    { "aacute",    "\341",     0 }, /* small a, acute accent  */
-    { "acirc",     "\342",     0 }, /* small a, circumflex accent  */
-    { "atilde",    "\343",     0 }, /* small a, tilde  */
-    { "auml",      "\344",     0 }, /* small a, dieresis or umlaut mark  */
-    { "aring",     "\345",     0 }, /* small a, ring  */
-    { "aelig",     "\346",     0 }, /* small ae diphthong (ligature)  */
-    { "ccedil",    "\347",     0 }, /* small c, cedilla  */
-    { "egrave",    "\350",     0 }, /* small e, grave accent  */
-    { "eacute",    "\351",     0 }, /* small e, acute accent  */
-    { "ecirc",     "\352",     0 }, /* small e, circumflex accent  */
-    { "euml",      "\353",     0 }, /* small e, dieresis or umlaut mark  */
-    { "igrave",    "\354",     0 }, /* small i, grave accent  */
-    { "iacute",    "\355",     0 }, /* small i, acute accent  */
-    { "icirc",     "\356",     0 }, /* small i, circumflex accent  */
-    { "iuml",      "\357",     0 }, /* small i, dieresis or umlaut mark  */
-    { "eth",       "\360",     0 }, /* small eth, Icelandic  */
-    { "ntilde",    "\361",     0 }, /* small n, tilde  */
-    { "ograve",    "\362",     0 }, /* small o, grave accent  */
-    { "oacute",    "\363",     0 }, /* small o, acute accent  */
-    { "ocirc",     "\364",     0 }, /* small o, circumflex accent  */
-    { "otilde",    "\365",     0 }, /* small o, tilde  */
-    { "ouml",      "\366",     0 }, /* small o, dieresis or umlaut mark  */
-    { "divide",    "\367",     0 }, /* divide sign  */
-    { "oslash",    "\370",     0 }, /* small o, slash  */
-    { "ugrave",    "\371",     0 }, /* small u, grave accent  */
-    { "uacute",    "\372",     0 }, /* small u, acute accent  */
-    { "ucirc",     "\373",     0 }, /* small u, circumflex accent  */
-    { "uuml",      "\374",     0 }, /* small u, dieresis or umlaut mark  */
-    { "yacute",    "\375",     0 }, /* small y, acute accent  */
-    { "thorn",     "\376",     0 }, /* small thorn, Icelandic  */
-    { "yuml",      "\377",     0 }, /* small y, dieresis or umlaut mark  */
-#else
     { "nbsp",      "\xC2\xA0",    0 },
     { "iexcl",     "\xC2\xA1",    0 },
     { "cent",      "\xC2\xA2",    0 },
@@ -513,7 +411,6 @@ static Er er_sequences[] = {
     { "clubs",     "\xE2\x99\xA3",    0 },
     { "hearts",    "\xE2\x99\xA5",    0 },
     { "diams",     "\xE2\x99\xA6",    0 },
-#endif
 };
 
 
@@ -576,6 +473,7 @@ static void TranslateEntityRefs (
 
     while (z[from]) {
         if (z[from]=='&') {
+            int isInvalid = 0;
             int i = from+1;
             int c;
 
@@ -598,6 +496,13 @@ static void TranslateEntityRefs (
                             value += c-'a' + 10;
                         } else {
                             /* error */
+			    isInvalid = 1;
+			    break;
+                        }
+                        if (value > 2097152) {
+                            /* error */
+			    isInvalid = 1;
+			    break;
                         }
                         i++;
                     }
@@ -608,17 +513,33 @@ static void TranslateEntityRefs (
                             value += c-'0';
                         } else {
                             /* error */
+  			    isInvalid = 1;
+			    break;
+                        }
+                        if (value > 2097152) {
+                            /* error */
+			    isInvalid = 1;
+			    break;
                         }
                         i++;
                     }
                 }
                 if (z[i]!=';') {
                     /* error */
+		    isInvalid = 1;
                 }
-                from = i+1;
-#if TclOnly8Bits
-                z[to++] = value;
-#else 
+		if (isInvalid) {
+		    /*
+		     * In case the character reference was invalid
+		     * it was a false alaram, no valid character
+		     * reference, just copy the source chars;
+		     */
+		    int j;
+		    for (j = from; j < i; j++) {
+		        z[to++] = z[j];
+		    }
+		    from = i;
+		} else {
                 if (value < 0x80) {
                     z[to++] = value;
                 } else if (value <= 0x7FF) {
@@ -631,9 +552,10 @@ static void TranslateEntityRefs (
                 } else {
                     /* error */
                 }
-#endif
+		    from = i+1;
+		}
             } else {
-                while (z[i] && isalpha((unsigned char)z[i])) {
+                while (z[i] && isalnum((unsigned char)z[i])) {
                    i++;
                 }
                 c = z[i];
@@ -736,6 +658,7 @@ HTML_SimpleParse (
                 if ( !SPACE(c) ) only_whites = 0;
                 x++;
             }
+                
             if (!(only_whites && ignoreWhiteSpaces) && parent_node) {
                 /*--------------------------------------------------------
                 |   allocate new TEXT node
@@ -743,7 +666,6 @@ HTML_SimpleParse (
                 tnode = (domTextNode*) domAlloc(sizeof(domTextNode));
                 memset(tnode, 0, sizeof(domTextNode));
                 tnode->nodeType    = TEXT_NODE;
-                tnode->nodeFlags   = 0;
                 tnode->ownerDocument = doc;
                 tnode->nodeNumber  = NODE_NO(doc);
                 tnode->valueLength = (x - start);
@@ -821,7 +743,7 @@ HTML_SimpleParse (
                     pnode = pnode->parentNode;
                 }
                 if (pnode == NULL) {
-                    /* begining tag was not found the way up the tag hierarchy
+                    /* beginning tag was not found the way up the tag hierarchy
                        -> ignore the tag */
                     DBG(fprintf(stderr,"ignoring closing '%s' \n", start+2);)
                     ignore = 1;
@@ -856,31 +778,31 @@ HTML_SimpleParse (
                         \--------------------------------------------------------------*/
                         autoclose = 0;
                         switch (pn[0]) {
-                            case 'a': if (!strcmp(pn,"a"))        autoclose = 1; break;
-                            case 'b': if (!strcmp(pn,"b"))        autoclose = 1; break;
-                            case 'c': if (!strcmp(pn,"colgroup")) autoclose = 1; break;
-                            case 'd': if (!strcmp(pn,"dd") ||
-                                          !strcmp(pn,"dt") ||
-                                          (!strcmp(start+2,"form") && !strcmp(pn,"div"))
-                                         )                        autoclose = 1; break;
-                            case 'h': if (!strcmp(pn,"head") ||
-                                          !strcmp(pn,"html"))     autoclose = 1; break;
-                            case 'f': if (!strcmp(pn,"font")||
-                                          !strcmp(pn,"form"))     autoclose = 1; break;
-                            case 'i': if (!strcmp(pn,"i"))        autoclose = 1; break;
-                            case 'l': if (!strcmp(pn,"li"))       autoclose = 1; break;
-                            case 'n': if (!strcmp(pn,"noscript")) autoclose = 1; break;
-                            case 'o': if (!strcmp(pn,"option"))   autoclose = 1; break;
-                            case 'p': if (!strcmp(pn,"p"))        autoclose = 1; break;
-                            case 's': if (!strcmp(pn,"span"))     autoclose = 1; break;
-                            case 't': if (!strcmp(pn,"tbody") ||
-                                          !strcmp(pn,"td")    ||
-                                          !strcmp(pn,"tfoot") ||
-                                          !strcmp(pn,"thead") ||
-                                          !strcmp(pn,"th")    ||
-                                          !strcmp(pn,"tr")    ||
-                                          !strcmp(pn,"tt"))       autoclose = 1; break;
-                            case 'u': if (!strcmp(pn,"ul"))       autoclose = 1; break; /* ext */
+                        case 'a': if (!strcmp(pn,"a"))        {autoclose = 1;} break;
+                        case 'b': if (!strcmp(pn,"b"))        {autoclose = 1;} break;
+                        case 'c': if (!strcmp(pn,"colgroup")) {autoclose = 1;} break;
+                        case 'd': if (!strcmp(pn,"dd") ||
+                                      !strcmp(pn,"dt") ||
+                                      (!strcmp(start+2,"form") && !strcmp(pn,"div"))
+                            )                        {autoclose = 1;}          break;
+                        case 'h': if (!strcmp(pn,"head") ||
+                                      !strcmp(pn,"html"))     {autoclose = 1;} break;
+                        case 'f': if (!strcmp(pn,"font")||
+                                      !strcmp(pn,"form"))     {autoclose = 1;} break;
+                        case 'i': if (!strcmp(pn,"i"))        {autoclose = 1;} break;
+                        case 'l': if (!strcmp(pn,"li"))       {autoclose = 1;} break;
+                        case 'n': if (!strcmp(pn,"noscript")) {autoclose = 1;} break;
+                        case 'o': if (!strcmp(pn,"option"))   {autoclose = 1;} break;
+                        case 'p': if (!strcmp(pn,"p"))        {autoclose = 1;} break;
+                        case 's': if (!strcmp(pn,"span"))     {autoclose = 1;} break;
+                        case 't': if (!strcmp(pn,"tbody") ||
+                                      !strcmp(pn,"td")    ||
+                                      !strcmp(pn,"tfoot") ||
+                                      !strcmp(pn,"thead") ||
+                                      !strcmp(pn,"th")    ||
+                                      !strcmp(pn,"tr")    ||
+                                      !strcmp(pn,"tt"))       {autoclose = 1;} break;
+                        case 'u': if (!strcmp(pn,"ul"))       {autoclose = 1;} break; /* ext */
                         }
                         /*---------------------------------------------------------------
                         |   check for tags for close inner tags
@@ -950,7 +872,6 @@ HTML_SimpleParse (
                         tnode = (domTextNode*) domAlloc(sizeof(domTextNode));
                         memset(tnode, 0, sizeof(domTextNode));
                         tnode->nodeType      = COMMENT_NODE;
-                        tnode->nodeFlags     = 0;
                         tnode->ownerDocument = doc;
                         tnode->nodeNumber    = NODE_NO(doc);
                         tnode->parentNode    = parent_node;
@@ -1029,7 +950,6 @@ HTML_SimpleParse (
                             tnode = (domTextNode*) domAlloc(sizeof(domTextNode));
                             memset(tnode, 0, sizeof(domTextNode));
                             tnode->nodeType      = TEXT_NODE;
-                            tnode->nodeFlags     = 0;
                             tnode->ownerDocument = doc;
                             tnode->nodeNumber    = NODE_NO(doc);
                             tnode->parentNode    = parent_node;
@@ -1072,8 +992,6 @@ HTML_SimpleParse (
                             MALLOC(sizeof(domProcessingInstructionNode));
                     memset(pinode, 0, sizeof(domProcessingInstructionNode));
                     pinode->nodeType      = PROCESSING_INSTRUCTION_NODE;
-                    pinode->nodeFlags     = 0;
-                    pinode->namespace     = 0;
                     pinode->ownerDocument = doc;
                     pinode->nodeNumber    = NODE_NO(doc);
                     pinode->parentNode    = parent_node;
@@ -1176,13 +1094,29 @@ HTML_SimpleParse (
             /*-----------------------------------------------------------
             |   create new DOM element node
             \----------------------------------------------------------*/
+            if (!parent_node && (strcmp(e,"html")!=0)) {
+                // Insert missing html tag
+                h = Tcl_CreateHashEntry(&HASHTAB(doc,tdom_tagNames), "html", &hnew);
+                node = (domNode*) domAlloc(sizeof(domNode));
+                memset(node, 0, sizeof(domNode));
+                node->nodeType      = ELEMENT_NODE;
+                node->nodeName      = (char *)&(h->key);
+                node->ownerDocument = doc;
+                node->nodeNumber    = NODE_NO(doc);
+                if (doc->rootNode->lastChild) {
+                    node->previousSibling = doc->rootNode->lastChild;
+                    doc->rootNode->lastChild->nextSibling = node;
+                } else {
+                    doc->rootNode->firstChild = node;
+                }
+                doc->rootNode->lastChild = node;
+                parent_node = node;
+                DBG(fprintf(stderr, "%d: Inserted missing tag '%s' hasContent=%d nodeNumber=%d\n", getDeep(node), node->nodeName, hasContent, node->nodeNumber);)
+            }
             h = Tcl_CreateHashEntry(&HASHTAB(doc,tdom_tagNames), e, &hnew);
-
             node = (domNode*) domAlloc(sizeof(domNode));
             memset(node, 0, sizeof(domNode));
             node->nodeType      = ELEMENT_NODE;
-            node->nodeFlags     = 0;
-            node->namespace     = 0;
             node->nodeName      = (char *)&(h->key);
             node->ownerDocument = doc;
             node->nodeNumber    = NODE_NO(doc);
@@ -1287,7 +1221,6 @@ HTML_SimpleParse (
                 attrnode->parentNode  = node;
                 attrnode->nodeName    = (char *)&(h->key);
                 attrnode->nodeType    = ATTRIBUTE_NODE;
-                attrnode->nodeFlags   = 0;
                 attrnode->nodeValue   = (char*)MALLOC(nArgVal+1);
                 attrnode->valueLength = nArgVal;
                 memmove(attrnode->nodeValue, ArgVal, nArgVal);
@@ -1330,22 +1263,22 @@ HTML_SimpleParse (
             |   check for empty HTML tags
             \----------------------------------------------------------*/
             switch (node->nodeName[0]) {
-                case 'a':  if (!strcmp(node->nodeName,"area"))     hasContent = 0; break;
-                case 'b':  if (!strcmp(node->nodeName,"br")     ||
-                               !strcmp(node->nodeName,"base")   ||
-                               !strcmp(node->nodeName,"basefont")) hasContent = 0; break;
-                case 'c':  if (!strcmp(node->nodeName,"col"))      hasContent = 0; break;
-                case 'e':  if (!strcmp(node->nodeName,"embed"))    hasContent = 0; break; /*ext*/
-                case 'f':  if (!strcmp(node->nodeName,"frame"))    hasContent = 0; break;
-                case 'h':  if (!strcmp(node->nodeName,"hr"))       hasContent = 0; break;
-                case 'i':  if (!strcmp(node->nodeName,"img")   ||
-                               !strcmp(node->nodeName,"input") ||
-                               !strcmp(node->nodeName,"isindex"))  hasContent = 0; break;
-                case 'l':  if (!strcmp(node->nodeName,"link"))     hasContent = 0; break;
-                case 'm':  if (!strcmp(node->nodeName,"meta"))     hasContent = 0; break;
-                case 'p':  if (!strcmp(node->nodeName,"param"))    hasContent = 0; break;
-                case 's':  if (!strcmp(node->nodeName,"spacer") ||                        /*ext*/
-                               !strcmp(node->nodeName,"source"))   hasContent = 0; break; /*html5*/
+            case 'a':  if (!strcmp(node->nodeName,"area"))     {hasContent = 0;} break;
+            case 'b':  if (!strcmp(node->nodeName,"br")     ||
+                           !strcmp(node->nodeName,"base")   ||
+                           !strcmp(node->nodeName,"basefont")) {hasContent = 0;} break;
+            case 'c':  if (!strcmp(node->nodeName,"col"))      {hasContent = 0;} break;
+            case 'e':  if (!strcmp(node->nodeName,"embed"))    {hasContent = 0;} break;
+            case 'f':  if (!strcmp(node->nodeName,"frame"))    {hasContent = 0;} break;
+            case 'h':  if (!strcmp(node->nodeName,"hr"))       {hasContent = 0;} break;
+            case 'i':  if (!strcmp(node->nodeName,"img")   ||
+                           !strcmp(node->nodeName,"input") ||
+                           !strcmp(node->nodeName,"isindex"))  {hasContent = 0;} break;
+            case 'l':  if (!strcmp(node->nodeName,"link"))     {hasContent = 0;} break;
+            case 'm':  if (!strcmp(node->nodeName,"meta"))     {hasContent = 0;} break;
+            case 'p':  if (!strcmp(node->nodeName,"param"))    {hasContent = 0;} break;
+            case 's':  if (!strcmp(node->nodeName,"spacer") || 
+                           !strcmp(node->nodeName,"source"))   {hasContent = 0;} break; /*html5*/
             }
 
             if (*x=='/') {
@@ -1396,7 +1329,6 @@ HTML_SimpleParse (
                     tnode = (domTextNode*) domAlloc(sizeof(domTextNode));
                     memset(tnode, 0, sizeof(domTextNode));
                     tnode->nodeType      = TEXT_NODE;
-                    tnode->nodeFlags     = 0;
                     tnode->ownerDocument = doc;
                     tnode->nodeNumber    = NODE_NO(doc);
                     tnode->parentNode    = node;
@@ -1431,22 +1363,22 @@ HTML_SimpleParse (
         \--------------------------------------------------------------*/
         autoclose = 0;
         switch (pn[0]) {
-            case 'b': if (!strcmp(pn,"body"))     autoclose = 1; break;
-            case 'c': if (!strcmp(pn,"colgroup")) autoclose = 1; break;
-            case 'd': if (!strcmp(pn,"dd") ||
-                          !strcmp(pn,"dt"))       autoclose = 1; break;
-            case 'h': if (!strcmp(pn,"head") ||
-                          !strcmp(pn,"html"))     autoclose = 1; break;
-            case 'l': if (!strcmp(pn,"li"))       autoclose = 1; break;
-            case 'o': if (!strcmp(pn,"option"))   autoclose = 1; break;
-            case 'p': if (!strcmp(pn,"p"))        autoclose = 1; break;
-            case 't': if (!strcmp(pn,"tbody") ||
-                          !strcmp(pn,"td")    ||
-                          !strcmp(pn,"tfoot") ||
-                          !strcmp(pn,"thead") ||
-                          !strcmp(pn,"th")    ||
-                          !strcmp(pn,"tr"))       autoclose = 1; break;
-            case 'u': if (!strcmp(pn,"ul"))       autoclose = 1; break; /* ext */
+        case 'b': if (!strcmp(pn,"body"))     {autoclose = 1;} break;
+        case 'c': if (!strcmp(pn,"colgroup")) {autoclose = 1;} break;
+        case 'd': if (!strcmp(pn,"dd") ||
+                      !strcmp(pn,"dt"))       {autoclose = 1;} break;
+        case 'h': if (!strcmp(pn,"head") ||
+                      !strcmp(pn,"html"))     {autoclose = 1;} break;
+        case 'l': if (!strcmp(pn,"li"))       {autoclose = 1;} break;
+        case 'o': if (!strcmp(pn,"option"))   {autoclose = 1;} break;
+        case 'p': if (!strcmp(pn,"p"))        {autoclose = 1;} break;
+        case 't': if (!strcmp(pn,"tbody") ||
+                      !strcmp(pn,"td")    ||
+                      !strcmp(pn,"tfoot") ||
+                      !strcmp(pn,"thead") ||
+                      !strcmp(pn,"th")    ||
+                      !strcmp(pn,"tr"))       {autoclose = 1;} break;
+        case 'u': if (!strcmp(pn,"ul"))       {autoclose = 1;} break; /* ext */
         }
         if (!autoclose) break;
         DBG(fprintf(stderr, "final autoclosed '%s'! \n", pn);)

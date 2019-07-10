@@ -9,13 +9,13 @@ package require tdom
 # installed. This code only ensures, that the tDOM script library gets
 # sourced, if the script is called with a tcldomsh out of the build
 # dir of a complete tDOM source installation.
-if {[lsearch [namespace children] ::tDOM] == -1} {
+if {[info commands ::tdom::xmlReadFile] == ""} {
     # tcldomsh without the script library. Source the lib.
     source [file join [file dir [info script]] ../lib tdom.tcl]
 }
 
 # Import the tDOM helper procs
-namespace import tDOM::*
+namespace import tdom::*
 
 set catalogfile ""
 set loglevel 0
@@ -113,8 +113,8 @@ proc extRefHandler {base systemId publicId} {
 
     set absolutURI [uri::resolve $base $systemId]
     incr usageCounter($absolutURI)
-    if {$usageCounter($absolutURI) > 10} {
-        error "Cirular import/include?"
+    if {$usageCounter($absolutURI) > 50} {
+        error "Circular import/include?"
     }
     switch $systemId {
         "notfound.xml" {
@@ -364,9 +364,9 @@ proc runTest {testcase} {
                 incr compareDIFF
                 log 1 "Result and ref differ."
                 log 2 "Ref:"
-                log 2 [$refinfosetdoc asXML]
+                log 2 [$refinfosetdoc asXML -indent none]
                 log 2 "Result:"
-                log 2 [$resultinfosetdoc asXML]
+                log 2 [$resultinfosetdoc asXML -indent none]
             } else {
                 incr compareOK
             }

@@ -8,7 +8,7 @@
 |   Main file for a standalone tclsh with tDOM build in ('big tclsh').
 |
 |   The contents of this file are subject to the Mozilla Public License
-|   Version 1.1 (the "License"); you may not use this file except in
+|   Version 2.0 (the "License"); you may not use this file except in
 |   compliance with the License. You may obtain a copy of the License at
 |   http://www.mozilla.org/MPL/
 |
@@ -40,8 +40,8 @@
 MODULE_SCOPE int Tcl_AppInit(Tcl_Interp *);
 MODULE_SCOPE int main(int, char **);
  
-extern int Tdom_Init _ANSI_ARGS_((Tcl_Interp *interp));
-extern int Tdom_SafeInit _ANSI_ARGS_((Tcl_Interp *interp));
+extern int Tdom_Init (Tcl_Interp *interp);
+extern int Tdom_SafeInit (Tcl_Interp *interp);
 
 #define MAX_SCRIPT_SIZE 10000
 /*----------------------------------------------------------------------------

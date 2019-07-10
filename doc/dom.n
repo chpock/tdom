@@ -230,7 +230,7 @@ specified, a simple but fast parser is used (conforms not fully to XML
 recommendation). That should double parsing and DOM generation speed. The
 encoding of the data is not transformed inside the parser. The simple parser
 does not respect any encoding information in the XML declaration. It skips over
-the internal DTD subset and ignores any information in it. Therefor it doesn't
+the internal DTD subset and ignores any information in it. Therefore it doesn't
 include defaulted attribute values into the tree, even if the according
 attribute declaration is in the internal subset. It also doesn't expand
 internal or external entity references other than the predefined entities and
@@ -239,13 +239,13 @@ character references.
 If \fI-html\fR is specified, a fast HTML parser is
 used, which tries to even parse badly formed HTML into a DOM tree.
 .IP "\fB-html5\fR"
-This option is only available, if tDOM was build
+This option is only available if tDOM was build
 with --enable-html5. Try the \fIfeatureinfo\fR method
-if you need to know, if this feature is build in. If
+if you need to know if this feature is build in. If
 \&\fI-html5\fR is specified, the gumbo lib html5 parser
-(https://github.com/google/gumbo-parser) is used, to
+(https://github.com/google/gumbo-parser) is used to
 build the DOM tree. This is, as far as it goes, XML
-namespace aware. Since this probably isn't wanted by a
+namespace-aware. Since this probably isn't wanted by a
 lot of users and adds only burden for no good in a lot
 of use cases \fI-html5\fR can be combined with
 \&\fI-ignorexmlns\fR, in which case all nodes and
@@ -253,7 +253,7 @@ attributes in the DOM tree are not in an XML
 namespace. All tag and attribute names in the DOM tree
 will be lower case, even for foreign elements not in
 the xhtml, svg or mathml namespace. The DOM tree may
-include nodes, that the parser inserted, because they
+include nodes, that the parser inserted because they
 are implied by the context (as <head>,
 <tbody>, etc.).
 .IP "\fB-json\fR"
@@ -283,36 +283,58 @@ doc and node methods. Please note that the element
 node names and the text node values within the tree
 may be outside of what the appropriate XML productions
 allow.
+.IP "\fB-jsonmaxnesting  \fIinteger\fP\fR"
+This option only has effect if used together
+with the \fI-json\fR option. The current implementation uses recursive descent JSON parser. In order to avoid using excess stack space, any JSON input that has more than a certain levels of nesting is considered invalid. The default maximum nesting is 2000. The option -jsonmaxnesting allows the user to adjust that.
+.IP "\fB--\fR"
+The option \fI--\fR marks the end of options.
+While respected in general this option is only needed
+in case of parsing JSON data, which may start with a
+"-".
 .IP "\fB-keepEmpties\fR"
 If \fI-keepEmpties\fR is
-specified, text nodes, which contain only whitespaces, will be part of the
+specified then text nodes which contain only whitespaces will be part of the
 resulting DOM tree. In default case (\fI-keepEmpties\fR not given) those empty
 text nodes are removed at parsing time.
+.IP "\fB-keepCDATA\fR"
+If \fI-keepCDATA\fR is
+specified then CDATA sections aren't added to the tree as text nodes
+(and, if necessary, combined with sibling text nodes into one text
+node) as without this option but are added as CDATA_SECTION_NODEs to
+the tree. Please note that the resulting tree isn't prepared for XPath
+selects or to be the source or the stylesheet of an XSLT
+transformation. If not combined with \fI-keepEmpties\fR only not
+whitespace only CDATA sections will be added to the resulting DOM
+tree.
 .IP "\fB-channel  \fI<channel-ID>\fP\fR"
 If \fI-channel <channel-ID>\fR is specified, the
 input to be parsed is read from the specified channel. The encoding setting of
 the channel (via fconfigure -encoding) is respected, ie the data read from the
-channel are converted to UTF-8 according to the encoding settings, befor the
+channel are converted to UTF-8 according to the encoding settings before the
 data is parsed.
 .IP "\fB-baseurl  \fI<baseURI>\fP\fR"
-If \fI-baseurl <baseURI>\fR is specified, the
-baseURI is used as the base URI of the document. External entities referenced
-in the document are resolved relative to this base URI. This base URI is also
-stored within the DOM tree.
+If \fI-baseurl <baseURI>\fR is specified,
+the baseURI is used as the base URI of the document.
+External entities references in the document are
+resolved relative to this base URI. This base URI is
+also stored within the DOM tree.
 .IP "\fB-feedbackAfter  \fI<#bytes>\fP\fR"
-If \fI-feedbackAfter <#bytes>\fR is specified, the
-tcl command given by \fI-feedbackcmd\fR is evaluated at the first
-element start within the document (or an external entity) after the
-start of the document or external entity or the last such call after
-#bytes.For backward compatibility, if no -feedbackcmd is given, but
-there is a tcl proc named ::dom::domParseFeedback then this proc is
-used as -feedbackcmd. If there isn't such a proc and -feedbackAfter is
-used, it is an error to not also use -feedbackcmd. If the called
-script raises error, then parsing will be aborted, the
-\&\fIdom parse\fR call returns error, with the script
-error msg as error msg. If the called script \fIreturn
--code break\fR, the parsing will abort and the \fIdom
-parse\fR call will return the empty string.
+If \fI-feedbackAfter <#bytes>\fR is
+specified, the tcl command given by
+\&\fI-feedbackcmd\fR is evaluated at the first element
+start within the document (or an external entity)
+after the start of the document or external entity or
+the last such call after #bytes. For backward
+compatibility if no -feedbackcmd is given but there is
+a tcl proc named ::dom::domParseFeedback this proc is
+used as -feedbackcmd. If there isn't such a proc and
+-feedbackAfter is used it is an error to not also use
+-feedbackcmd. If the called script raises error, then
+parsing will be aborted, the \fIdom parse\fR call
+returns error, with the script error msg as error msg.
+If the called script \fIreturn -code break\fR, the
+parsing will abort and the \fIdom parse\fR call will
+return the empty string.
 .IP "\fB-feedbackcmd  \fI<script>\fP\fR"
 If \fI-feedbackcmd <script>\fR is specified, the
 script \fIscript\fR is evaluated at the first
@@ -333,48 +355,53 @@ of the document. The actual evaluated command consists of this option followed
 by three arguments: the base uri, the system identifier of the entity and the
 public identifier of the entity. The base uri and the public identifier may be
 the empty list. The script has to return a tcl list consisting of three
-elements. The first element of this list signals, how the external entity is
-returned to the processor. At the moment, the two allowed types are "string"
+elements. The first element of this list signals how the external entity is
+returned to the processor. Currently the two allowed types are "string"
 and "channel". The second element of the list has to be the (absolute) base URI
 of the external entity to be parsed.  The third element of the list are data,
 either the already read data out of the external entity as string in the case
 of type "string", or the name of a tcl channel, in the case of type
 "channel". Note that if the script returns a tcl channel, it will not be closed
 by the processor.  It must be closed separately if it is no longer
-required.
+needed.
 .IP "\fB-useForeignDTD  \fI<boolean>\fP\fR"
 If <boolean> is true and the document does not have
 an external subset, the parser will call the -externalentitycommand script with
-empty values for the systemId and publicID arguments. Pleace notice, that, if
+empty values for the systemId and publicID arguments. Please note that if
 the document also doesn't have an internal subset, the
 -startdoctypedeclcommand and -enddoctypedeclcommand scripts, if set, are not
 called. The \fI-useForeignDTD\fR respects
 .IP "\fB-paramentityparsing  \fI<always|never|notstandalone>\fP\fR"
-The \fI-paramentityparsing\fR option controls, if the
-parser tries to resolve the external entities (including the external DTD
-subset) of the document, while building the DOM
-tree. \fI-paramentityparsing\fR requires an argument, which must be either
-"always", "never", or "notstandalone". The value "always" means, that the
-parser tries to resolves (recursively) all external entities of the XML
-source. This is the default, in case \fI-paramentityparsing\fR is omitted. The
-value "never" means, that only the given XML source is parsed and no external
-entity (including the external subset) will be resolved and parsed. The value
-"notstandalone" means, that all external entities will be resolved and parsed,
-with the execption of documents, which explicitly states standalone="yes" in
+The \fI-paramentityparsing\fR option controls,
+if the parser tries to resolve the external entities
+(including the external DTD subset) of the document
+while building the DOM tree.
+\&\fI-paramentityparsing\fR requires an argument, which
+must be either "always", "never", or "notstandalone".
+The value "always" means that the parser tries to
+resolves (recursively) all external entities of the
+XML source. This is the default in case
+\&\fI-paramentityparsing\fR is omitted. The value
+"never" means that only the given XML source is
+parsed and no external entity (including the external
+subset) will be resolved and parsed. The value
+"notstandalone" means, that all external entities will
+be resolved and parsed, with the exception of
+documents, which explicitly states standalone="yes" in
 their XML declaration.
 .IP "\fB-ignorexmlns\fR"
 It is recommended, that you only use this option
-together with the \fI-html5\fR option, if ever. If
-this option is given, no node within the created DOM
-tree will be internally marked as placed into an XML
-Namespace, even if there is a default namespace in
-scope for un-prefixed elements or even if the element
-has a defined namespace prefix. One consequence is of
-this is, that XPath node expressions on such a DOM
-tree doesn't work as expected. Prefixed element nodes
-can't be selected and element nodes without prefix
-will be seen by XPath expressions as if they haven't
-any namespace (no matter if they in fact in a default
+with the \fI-html5\fR option. If this option is
+given, no node within the created DOM tree will be
+internally marked as placed into an XML Namespace,
+even if there is a default namespace in scope for
+un-prefixed elements or even if the element has a
+defined namespace prefix. One consequence is that
+XPath node expressions on such a DOM tree doesn't work
+as expected. Prefixed element nodes can't be selected
+and element nodes without prefix will be seen by XPath
+expressions as if they are not in any namespace (no
+matter if they are in fact should be in a default
 namespace).
 .PP
 .RE
@@ -391,23 +418,13 @@ document element to create. The \fIobjVar\fR controls the
 memory handling as explained above.
 .TP
 \&\fB\fBdom\fP \fBcreateDocumentNode\fP ?\fIobjVar\fB?
-\&\fRCreates a new, 'empty' DOM document object without any element
+\&\fRCreates a new 'empty' DOM document object without any element
 node. \fIobjVar\fR controls the memory handling as explained above.
 .TP
-\&\fB\fBdom\fP \fBsetResultEncoding\fP ?\fIencodingName\fB?
-\&\fRIf \fIencodingName\fR is not given the current global
-result encoding is returned.  Otherwise the global result encoding is set to
-\&\fIencodingName\fR.  All character data, attribute values, etc. will
-then be converted from UTF-8, which is delivered from the Expat XML parser, to
-the given 8 bit encoding at XML/DOM parse time.  Valid values for
-\&\fIencodingName\fR are: utf-8, ascii, cp1250, cp1251, cp1252, cp1253,
-cp1254, cp1255, cp1256, cp437, cp850, en, iso8859-1, iso8859-2, iso8859-3,
-iso8859-4, iso8859-5, iso8859-6, iso8859-7, iso8859-8, iso8859-9, koi8-r.
-.TP
-\&\fB\fBdom\fP \fBcreateNodeCmd\fP \fI?-returnNodeCmd?\fB \fI?-tagName name?\fB \fI?-jsonType jsonType\fB \fI(element|comment|text|cdata|pi)Node\fB \fIcommandName\fB
+\&\fB\fBdom\fP \fBcreateNodeCmd\fP \fI?-returnNodeCmd?\fB \fI?-tagName name?\fB \fI?-jsonType jsonType?\fB \fI?-namespace URI?\fB \fI(element|comment|text|cdata|pi)Node\fB \fIcommandName\fB
 \&\fRThis method creates Tcl commands, which in turn create
 tDOM nodes. Tcl commands created by this command are only
-avaliable inside a script given to the domNode methods
+available inside a script given to the domNode methods
 \&\fIappendFromScript\fR or \fIinsertBeforeFromScript\fR. If
 a command created with \fIcreateNodeCmd\fR is invoked in
 any other context, it will return error. The created command
@@ -430,13 +447,22 @@ Which type of node is created by the command is determined by the
 first argument to the \fIcreateNodeCmd\fR. The syntax of the created
 command depends on the type of the node it creates.
 .PP
-If the first argument of the method is \fIelementNode\fR, the
-created command will create an element node. Without the
+If the command type to create is \fIelementNode\fR, the created
+command will create an element node, if called. Without the
 \&\fI-tagName\fR option the tag name of the created node is
 \&\fIcommandName\fR without namespace qualifiers. If the
 \&\fI-tagName\fR option was given then the created command the created
 elements will have this tag name. If the \fI-jsonType\fR option was
-given then the created node elements will have the given JSON type.
+given then the created node elements will have the given JSON type. If
+the \fI-namespace\fR option is given the created element node will be
+XML namespaced and in the namespace given by the option. The element
+name will be literal as given either by the command name or the
+\&\fI-tagname\fR option, if that was given. An appropriate XML
+namespace declaration will be automatically added, to bind the prefix
+(if the element name has one) or the default namespace (if the element
+name hasn't a prefix) to the namespace if such a binding isn't in
+scope.
+.PP
 The syntax of the created command is:
 
 
@@ -508,32 +534,32 @@ command is:
 \&\fB\fBdom\fP \fBsetStoreLineColumn\fP \fI?boolean\fB?
 \&\fRIf switched on, the DOM nodes will contain line and column
 position information for the original XML document after parsing. The default
-is, not to store line and column position information.
+is not to store line and column position information.
 .TP
 \&\fB\fBdom\fP \fBsetNameCheck\fP \fI?boolean\fB?
 \&\fRIf NameCheck is true, every method which expects an XML Name,
 a full qualified name or a processing instructing target will check, if the
-given string is valid according to his production rule. For commands created
+given string is valid according to its production rule. For commands created
 with the \fIcreateNodeCmd\fR method to be used in the context of
 \&\fIappendFromScript\fR the status of the flag at creation time
 decides. If NameCheck is true at creation time, the command will
-check his arguments, otherwise not. The \fIsetNameCheck\fR
+check its arguments, otherwise not. The \fIsetNameCheck\fR
 set this flag. It returns the current NameCheck flag state. The
 default state for NameCheck is true.
 .TP
 \&\fB\fBdom\fP \fBsetTextCheck\fP \fI?boolean\fB?
 \&\fRIf TextCheck is true, every command which expects XML Chars,
 a comment, a CDATA section value or a processing instructing value will check,
-if the given string is valid according to his production rule. For commands
+if the given string is valid according to its production rule. For commands
 created with the \fIcreateNodeCmd\fR method to be used in the
 context of \fIappendFromScript\fR the status of the flag at
 creation time decides. If TextCheck is true at creation time, the
-command will check his arguments, otherwise not.The
-\&\fIsetTextCheck\fR method set this flag. It returns the current
+command will check its arguments, otherwise not.The
+\&\fIsetTextCheck\fR method sets this flag. It returns the current
 TextCheck flag state. The default state for TextCheck is true.
 .TP
 \&\fB\fBdom\fP \fBsetObjectCommands\fP ?\fI(automatic|token|command)\fB?
-\&\fRControls, if documents and nodes are created as tcl commands or
+\&\fRControls if documents and nodes are created as tcl commands or
 as token to be
 used with the domNode and domDoc commands. If the mode is
 \&'automatic', then methods used at tcl commands will create tcl
@@ -543,49 +569,49 @@ the mode is 'token', then always token will be created. The method
 returns the current mode. This method is an experimental interface.
 .TP
 \&\fB\fBdom\fP \fBisName\fP \fIname\fB
-\&\fRReturns 1, if \fIname\fR is a valid XML Name according to
+\&\fRReturns 1 if \fIname\fR is a valid XML Name according to
 production 5 of the XML
-1.0 recommendation. This means, that \fIname\fR is a valid
+1.0 recommendation. This means that \fIname\fR is a valid
 XML element or attribute name. Otherwise it returns 0.
 .TP
 \&\fB\fBdom\fP \fBisPIName\fP \fIname\fB
-\&\fRReturns 1, if \fIname\fR is a valid XML processing instruction
+\&\fRReturns 1 if \fIname\fR is a valid XML processing instruction
 target according to
 production 17 of the XML 1.0 recommendation. Otherwise it returns 0.
 .TP
 \&\fB\fBdom\fP \fBisNCName\fP \fIname\fB
-\&\fRReturns 1, if \fIname\fR is a valid NCName according
+\&\fRReturns 1 if \fIname\fR is a valid NCName according
 to production 4 of the of the Namespaces in XML recommendation. Otherwise it returns
 0.
 .TP
 \&\fB\fBdom\fP \fBisQName\fP \fIname\fB
-\&\fRReturns 1, if \fIname\fR is a valid QName according
+\&\fRReturns 1 if \fIname\fR is a valid QName according
 to production 6 of the of the Namespaces in XML recommendation. Otherwise it returns
 0.
 .TP
 \&\fB\fBdom\fP \fBisCharData\fP \fIstring\fB
-\&\fRReturns 1, if every character in \fIstring\fR is
+\&\fRReturns 1 if every character in \fIstring\fR is
 a valid XML Char according to production 2 of the XML 1.0
 recommendation. Otherwise it returns 0.
 .TP
 \&\fB\fBdom\fP \fBisBMPCharData\fP \fIstring\fB
-\&\fRReturns 1, if every character in \fIstring\fR is
+\&\fRReturns 1 if every character in \fIstring\fR is
 a valid XML Char with a Unicode code point within the Basic
 Multilingual Plane (that means, that every character within the string
 is at most 3 bytes long). Otherwise it returns 0.
 .TP
 \&\fB\fBdom\fP \fBisComment\fP \fIstring\fB
-\&\fRReturns 1, if \fIstring\fR is
+\&\fRReturns 1 if \fIstring\fR is
 a valid comment according to production 15 of the XML 1.0
 recommendation. Otherwise it returns 0.
 .TP
 \&\fB\fBdom\fP \fBisCDATA\fP \fIstring\fB
-\&\fRReturns 1, if \fIstring\fR is
+\&\fRReturns 1 if \fIstring\fR is
 valid according to production 20 of the XML 1.0
 recommendation. Otherwise it returns 0.
 .TP
 \&\fB\fBdom\fP \fBisPIValue\fP \fIstring\fB
-\&\fRReturns 1, if \fIstring\fR is
+\&\fRReturns 1 if \fIstring\fR is
 valid according to production 16 of the XML 1.0
 recommendation. Otherwise it returns 0.
 .TP
@@ -597,31 +623,31 @@ the \fIfeature\fR argument are:
 .IP "\fBexpatversion\fR"
 Returns the version of the underlyling expat
 version as string, something like
-"exapt_2.1.0". This is. what the expat API
+"exapt_2.1.0". This is what the expat API
 function XML_ExpatVersion() returns.
 .IP "\fBexpatmajorversion\fR"
-Returns the major version of the underlyling
-expat version as integer.
+Returns the major version of the at build
+time used version as integer.
 .IP "\fBexpatminorversion\fR"
-Returns the minor version of the underlyling
-expat version as integer.
+Returns the minor version of the at build
+time used expat version as integer.
 .IP "\fBexpatmicroversion\fR"
-Returns the micro version of the underlyling
-expat version as integer.
+Returns the micro version of the at build
+time used expat version as integer.
 .IP "\fBdtd\fR"
-Returns as boolean, if build with
+Returns as boolean if build with
 \&\fI--enable-dtd\fR.
 .IP "\fBns\fR"
-Returns as boolean, if build with
+Returns as boolean if build with
 \&\fI--enable-ns\fR.
 .IP "\fBunknown\fR"
-Returns as boolean, if build with
+Returns as boolean if build with
 \&\fI--enable-unknown\fR.
 .IP "\fBtdomalloc\fR"
-Returns as boolean, if build with
+Returns as boolean if build with
 \&\fI--enable-tdomalloc\fR.
 .IP "\fBlessns\fR"
-Returns as boolean, if build with
+Returns as boolean if build with
 \&\fI--enable-lessns\fR.
 .IP "\fBTCL_UTF_MAX\fR"
 Returns the TCL_UTF_MAX value of the tcl
@@ -629,6 +655,11 @@ core, tDOM was build with as integer
 .IP "\fBhtml5\fR"
 Returns as boolean, if build with
 \&\fI--enable-html5\fR.
+.IP "\fBversionhash\fR"
+Returns the fossil repository version hash.
+.IP "\fBpullparser\fR"
+Returns as boolean if the pullparser command
+is build in.
 .RE
 .SH KEYWORDS
 XML, DOM, document, node, parsing

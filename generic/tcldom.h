@@ -9,7 +9,7 @@
 |
 | 
 |   The contents of this file are subject to the Mozilla Public License
-|   Version 1.1 (the "License"); you may not use this file except in
+|   Version 2.0 (the "License"); you may not use this file except in
 |   compliance with the License. You may obtain a copy of the License at
 |   http://www.mozilla.org/MPL/
 |
@@ -52,6 +52,8 @@ int  tcldom_nameCheck(Tcl_Interp *interp, char *name, char *nameType,
 void tcldom_createNodeObj(Tcl_Interp * interp, domNode *node,
                           char *objCmdName);
 
+int tcldom_prefixNSlist (char ***prefixnsPtr, Tcl_Interp *interp, int objc,
+                         Tcl_Obj *const objv[], const char *methodName);
 
 void tcldom_initialize(void);
 
@@ -69,8 +71,8 @@ Tcl_ObjCmdProc TclTdomObjCmd;
 
 #define STR_TDOM_VERSION(v) (VERSION)
 
-EXTERN int Tdom_Init     _ANSI_ARGS_((Tcl_Interp *interp));
-EXTERN int Tdom_SafeInit _ANSI_ARGS_((Tcl_Interp *interp));
+int Tdom_Init     (Tcl_Interp *interp);
+int Tdom_SafeInit (Tcl_Interp *interp);
 
 #endif
 

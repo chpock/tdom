@@ -9,7 +9,7 @@
 | 
 |
 |   The contents of this file are subject to the Mozilla Public License
-|   Version 1.1 (the "License"); you may not use this file except in
+|   Version 2.0 (the "License"); you may not use this file except in
 |   compliance with the License. You may obtain a copy of the License at
 |   http://www.mozilla.org/MPL/
 |
@@ -42,6 +42,7 @@
 #include <dom.h>
 #include <tdom.h>
 #include <tcldom.h>
+#include <tclpull.h>
 
 extern TdomStubs tdomStubs;
 
@@ -62,12 +63,12 @@ extern TdomStubs tdomStubs;
  */
 
 int
-Tdom_Init (interp)
-     Tcl_Interp *interp; /* Interpreter to initialize. */
-{
+Tdom_Init (
+     Tcl_Interp *interp /* Interpreter to initialize. */
+) {
         
 #ifdef USE_TCL_STUBS
-    Tcl_InitStubs(interp, "8", 0);
+    Tcl_InitStubs(interp, "8.4", 0);
 #endif
         
     domModuleInitialize();
@@ -90,6 +91,10 @@ Tdom_Init (interp)
     Tcl_CreateObjCommand(interp, "expat",       TclExpatObjCmd, NULL, NULL );
     Tcl_CreateObjCommand(interp, "xml::parser", TclExpatObjCmd, NULL, NULL );
 #endif
+
+#ifndef TDOM_NO_PULL
+    Tcl_CreateObjCommand(interp, "tdom::pullparser", tDOM_PullParserCmd, NULL, NULL );    
+#endif
     
 #ifdef USE_TCL_STUBS
     Tcl_PkgProvideEx(interp, PACKAGE_NAME, PACKAGE_VERSION, 
@@ -102,9 +107,9 @@ Tdom_Init (interp)
 }
 
 int
-Tdom_SafeInit (interp)
-     Tcl_Interp *interp;
-{
+Tdom_SafeInit (
+     Tcl_Interp *interp
+) {
     return Tdom_Init (interp);
 }
 

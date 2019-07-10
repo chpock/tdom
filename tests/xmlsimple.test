@@ -89,6 +89,99 @@ test simple-1.11 {simple doesn't catch all not wellformed input} {
                     <http://www.w3.org/1999/XSL/Transform> "/>}}
 } 0
 
+test simple-1.12 {CDATA section} {
+    set doc [dom parse -simple {<doc>foo <![CDATA[test of & <bad> format]]> bar </doc>}]
+    set result [$doc selectNodes count(doc/node())]
+    $doc delete
+    set result
+} 1
+
+test simple-1.13 {CDATA section} {
+    set doc [dom parse -simple {<doc>foo <![CDATA[test of & <bad> format]]> bar </doc>}]
+    set root [$doc documentElement]
+    set result [list]
+    foreach child [$root childNodes] {
+        lappend result [$child nodeType]
+    }
+    $doc delete
+    set result
+} {TEXT_NODE}
+
+test simple-1.14 {CDATA section} {
+    set doc [dom parse -simple {<doc>&lt;foo &amp; &gt;<![CDATA[test of & <bad> format]]>&apos; bar &quot;</doc>}]
+    set result [$doc selectNodes string(doc)]
+    $doc delete
+    set result
+} {<foo & >test of & <bad> format' bar "}
+# emacs: "
+
+test simple-1.15 {-keepCDATA} {
+    set doc [dom parse -simple -keepCDATA {<doc>foo <![CDATA[test of & <bad> format]]> bar </doc>}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc>foo <![CDATA[test of & <bad> format]]> bar </doc>}
+
+test simple-1.16 {-keepCDATA} {
+    set doc [dom parse -simple -keepCDATA {<doc>foo <![CDATA[test of & <bad> format]]> bar </doc>}]
+    set root [$doc documentElement]
+    set result [list]
+    foreach child [$root childNodes] {
+        lappend result [$child nodeType]
+    }
+    $doc delete
+    set result
+} {TEXT_NODE CDATA_SECTION_NODE TEXT_NODE}
+
+test simple-1.17 {-keepCDATA} {
+    set doc [dom parse -simple -keepCDATA {<doc><e><![CDATA[one]]></e></doc>}]
+    set result [list]
+    foreach child [$doc selectNodes doc/e/node()] {
+        lappend result [$child nodeType]
+    }
+    $doc delete
+    set result
+} {CDATA_SECTION_NODE}
+
+test simple-1.18 {-keepCDATA} {
+    set doc [dom parse -simple -keepCDATA {<doc><e><![CDATA[one]]><![CDATA[two]]></e></doc>}]
+    set result [list]
+    foreach child [$doc selectNodes doc/e/node()] {
+        lappend result [$child nodeType]
+    }
+    $doc delete
+    set result
+} {CDATA_SECTION_NODE CDATA_SECTION_NODE}
+
+test simple-1.19 {-keepCDATA} {
+    set doc [dom parse -simple -keepCDATA {<doc><e><![CDATA[]]></e></doc>}]
+    set result [$doc selectNodes count(doc/e/node())]
+    $doc delete
+    set result
+} 0
+
+test simple-1.20 {-keepCDATA white space only CDATA section} {
+    set doc [dom parse -simple -keepCDATA {<doc><e><![CDATA[
+    ]]></e></doc>}]
+    set result [$doc selectNodes count(doc/e/node())]
+    $doc delete
+    set result
+} 0
+
+test simple-1.21 {-keepCDATA and -keepEmpties} {
+    set doc [dom parse -simple -keepCDATA -keepEmpties {<doc><e><![CDATA[]]></e></doc>}]
+    set result [$doc selectNodes count(doc/e/node())]
+    $doc delete
+    set result
+} 1
+
+test simple-1.22 {namespaces} {
+    set doc [dom parse -simple {
+        <help><br xmlns:xsi="a"/><em xmlns:xsi="a">notes</em></help>
+    }]
+    $doc delete
+} {}
+
 test simple-2.1 {XML build in entities} {
     set doc [dom parse -simple {<doc>&lt;&gt;&amp;&apos;&quot;</doc>}]
     set root [$doc documentElement]
@@ -96,7 +189,6 @@ test simple-2.1 {XML build in entities} {
     $doc delete
     set result
 } {<>&'"}
-
 # emacs: "
 
 test simple-2.2 {character entities} {
@@ -107,7 +199,7 @@ test simple-2.2 {character entities} {
     set result
 } {AB}
 
-test simple-2.3 {character entities} {need_i18n} {
+test simple-2.3 {character entities} {
     set doc [dom parse -simple {<doc>&#214;&#xC4;&#xc4;</doc>}]
     set root [$doc documentElement]
     set result [$root text]

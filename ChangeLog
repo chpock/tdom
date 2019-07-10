@@ -1,7 +1,6 @@
 
 NOTICE: This file isn't kept up to date anymore. Look at the timeline
-of the leading fossil repository
-(https://46.163.78.80/cgi-bin/repros/tdom/timeline) or at the backup
+of the leading fossil repository (http://tdom.org) or at the backup
 repository at https://core.tcl.tk/tdom/timeline for detailed lists of
 code changes.
 
@@ -732,8 +731,8 @@ still be documented in the CHANGES file.
           the selectNodes method.
 
         * lib/tdom.tcl: Scripted xpath function element-available:
-          moved xsl:output to the avaliable elements, since it's in
-          fact avaliable in the meantime (with exception of the
+          moved xsl:output to the available elements, since it's in
+          fact available in the meantime (with exception of the
           'version' and 'cdata-section-elements' attributes) - the
           output options can be queried from the result doc, but it's
           the responsibility of the application, to serialize the tree
@@ -962,7 +961,7 @@ still be documented in the CHANGES file.
           in domNode usage msg for getElementByID. Improved error msg
           for getAttribute, if attribute is not found. Changed
           behavior of getElementByID: if no element with the given id
-          is found, returns now the emtpy string, not a TCL_ERROR
+          is found, returns now the empty string, not a TCL_ERROR
           (closer to DOM rec, getElementByID never raise an
           exception). Bug fix: nodeName now returns the per DOM rec
           correct values for comment and cdata section nodes (were as
@@ -1324,7 +1323,7 @@ still be documented in the CHANGES file.
 	  to match the already present "dom attachDocument".
 	  This is used only for threaded tdom builds.
 
-	* generic/domlock.c: changed lock caching to accomodate for
+	* generic/domlock.c: changed lock caching to accommodate for
 	  situation with huge number of created documnents
 	
 	  Also, added new "domDoc" command as a first-class tdom citizen,
@@ -1748,7 +1747,7 @@ still be documented in the CHANGES file.
           stylesheets: more checks for format-number formatting
           patters (although especically format-number patterns are
           still a can of worms), added parameter number check for
-          additional XPath function current(), template, paramter,
+          additional XPath function current(), template, parameter,
           variable, sort, choose, copy, and message elements.
 
 2003-03-26  Rolf Ade  <rolf@pointsman.de>
@@ -1934,7 +1933,7 @@ still be documented in the CHANGES file.
 
         * generic/domxslt.c: Made some functions static. Removed a
           TODO note, which already was done. Improved some error msgs
-          (now with line/column info, if avaliable). Bug fix:
+          (now with line/column info, if available). Bug fix:
           xsltXPathFuncs must return -1 to signal error, because if
           the source of the function call was inside of domxslt.c the
           result code (rc) check rule is rc < 0. Fixed text in a
@@ -2144,7 +2143,7 @@ still be documented in the CHANGES file.
 	* generic/domxpath.c
 	* generic/domalloc.c
 	* generic/domhtml.c
-	* generic/docxpath.c: added DBG macro arround some fprintf's
+	* generic/docxpath.c: added DBG macro around some fprintf's
 
 2002-11-28  Rolf Ade  <rolf@pointsman.de>
 
@@ -2300,7 +2299,7 @@ still be documented in the CHANGES file.
           certain // expr on certain documents. During analysis and
           testing, it turned out, that it would have been an even
           simpler approach, to simply expand the abbreviation // in
-          the according productions. Though, the choosen implentation
+          the according productions. Though, the chosen implementation
           seems often to be (slightly) faster and is a start to
           collect experiences with early predicate evaluation.
 

@@ -8,7 +8,7 @@
 |
 |
 |   The contents of this file are subject to the Mozilla Public License
-|   Version 1.1 (the "License"); you may not use this file except in
+|   Version 2.0 (the "License"); you may not use this file except in
 |   compliance with the License. You may obtain a copy of the License at
 |   http://www.mozilla.org/MPL/
 |
@@ -61,17 +61,6 @@
 # define RetError(m,p) *errStr=m; *pos=p; return TCL_ERROR;
 #endif
 #define SPACE(c)       ((c)==' ' || (c)=='\n' || (c)=='\t' || (c)=='\r')
-
-/*---------------------------------------------------------------------------
-|   type domActiveNS
-|
-\--------------------------------------------------------------------------*/
-typedef struct _domActiveNS {
-
-    int    depth;
-    domNS *namespace;
-
-} domActiveNS;
 
 /*----------------------------------------------------------------------------
 |   Begin Character Entity Translator
@@ -173,11 +162,7 @@ static Er er_sequences[] = {
     { "gt",        ">",        0 },
     { "apos",      "'",        0 },
     { "quot",      "\"",       0 },
-#if TclOnly8Bits
-    { "nbsp",      "\240",     0 },
-#else
     { "nbsp",      "\xC2\xA0",    0 },
-#endif
 };
 
 
@@ -287,9 +272,6 @@ static int TranslateEntityRefs (
                     /* error */
                 }
                 from = i+1;
-#if TclOnly8Bits
-                z[to++] = value;
-#else 
                 if (value < 0x80) {
                     z[to++] = value;
                 } else if (value <= 0x7FF) {
@@ -303,7 +285,6 @@ static int TranslateEntityRefs (
                     /* error */
                     return 0;
                 }
-#endif
             } else {
                 while (z[i] && isalpha((unsigned char)z[i])) {
                    i++;
@@ -342,37 +323,6 @@ static int TranslateEntityRefs (
 |   End Of Character Entity Translator
 \---------------------------------------------------------------------------*/
 
-
-/*---------------------------------------------------------------------------
-|   domIsNamespaceInScope
-|
-\--------------------------------------------------------------------------*/
-static int
-domIsNamespaceInScope (
-    domActiveNS *NSstack,
-    int          NSstackPos,
-    const char  *prefix,
-    const char  *namespaceURI
-)
-{
-    int    i;
-
-    for (i = NSstackPos; i >= 0; i--) {
-        if (NSstack[i].namespace->prefix[0] &&
-            (strcmp(NSstack[i].namespace->prefix, prefix)==0)) {
-            if (strcmp(NSstack[i].namespace->uri, namespaceURI)==0) {
-                /* OK, exactly the same namespace declaration is in scope */
-                return 1;
-            } else {
-                /* This prefix is currently assigned to another uri,
-                   we need a new NS declaration, to override this one */
-                return 0;
-            }
-        }
-    }
-    return 0;
-}
-
 /*----------------------------------------------------------------------------
 |   XML_SimpleParse (non recursive)
 |
@@ -387,6 +337,7 @@ XML_SimpleParse (
     domDocument *doc,
     domNode     *parent_nodeOld,
     int          ignoreWhiteSpaces,
+    int          keepCDATA,
     char       **errStr
 ) {
     register int   c;          /* Next character of the input file */
@@ -441,33 +392,53 @@ XML_SimpleParse (
                 x++;
             }
             if (!(only_whites && ignoreWhiteSpaces) && parent_node) {
-                /*--------------------------------------------------------
-                |   allocate new TEXT node
-                 \-------------------------------------------------------*/
-                tnode = (domTextNode*) domAlloc(sizeof(domTextNode));
-                memset(tnode, 0, sizeof(domTextNode));
-                tnode->nodeType    = TEXT_NODE;
-                tnode->nodeFlags   = 0;
-                tnode->ownerDocument = doc;
-                tnode->nodeNumber  = NODE_NO(doc);
-                tnode->valueLength = (x - start);
-                tnode->nodeValue   = (char*)MALLOC((x - start)+1);
-                memmove(tnode->nodeValue, start, (x - start));
-                *(tnode->nodeValue + (x - start)) = 0;
-                if (ampersandSeen) {
-                    if (!TranslateEntityRefs(tnode->nodeValue, 
-                                             &(tnode->valueLength) )) {
-                        RetError("Entity parsing error", (x - xml));
+                if (parent_node->lastChild
+                    && parent_node->lastChild->nodeType == TEXT_NODE) {
+                    /* normalize text node, i.e. there are no adjacent
+                     * text nodes */
+                    tnode = (domTextNode*)parent_node->lastChild;
+                    tnode->nodeValue = REALLOC(tnode->nodeValue,
+                                               tnode->valueLength + x - start + 1);
+                    memmove(tnode->nodeValue + tnode->valueLength,
+                            start, x - start);
+                    saved = tnode->valueLength;
+                    tnode->valueLength += (x - start);
+                    *(tnode->nodeValue + tnode->valueLength) = 0;
+                    if (ampersandSeen) {
+                        if (!TranslateEntityRefs(tnode->nodeValue + saved, 
+                                                 &(tnode->valueLength) )) {
+                            RetError("Entity parsing error", (x - xml));
+                        }
+                        tnode->valueLength += saved;
                     }
-                }
-                tnode->parentNode = parent_node;
-                if (parent_node->firstChild)  {
-                    parent_node->lastChild->nextSibling = (domNode*)tnode;
-                    tnode->previousSibling = parent_node->lastChild;
-                    parent_node->lastChild = (domNode*)tnode;
                 } else {
-                    parent_node->firstChild = parent_node->lastChild = 
-                        (domNode*)tnode;
+                    /*--------------------------------------------------------
+                      |   allocate new TEXT node
+                      \-------------------------------------------------------*/
+                    tnode = (domTextNode*) domAlloc(sizeof(domTextNode));
+                    memset(tnode, 0, sizeof(domTextNode));
+                    tnode->nodeType    = TEXT_NODE;
+                    tnode->ownerDocument = doc;
+                    tnode->nodeNumber  = NODE_NO(doc);
+                    tnode->valueLength = (x - start);
+                    tnode->nodeValue   = (char*)MALLOC((x - start)+1);
+                    memmove(tnode->nodeValue, start, (x - start));
+                    *(tnode->nodeValue + (x - start)) = 0;
+                    tnode->parentNode = parent_node;
+                    if (parent_node->firstChild)  {
+                        parent_node->lastChild->nextSibling = (domNode*)tnode;
+                        tnode->previousSibling = parent_node->lastChild;
+                        parent_node->lastChild = (domNode*)tnode;
+                    } else {
+                        parent_node->firstChild = parent_node->lastChild = 
+                            (domNode*)tnode;
+                    }
+                    if (ampersandSeen) {
+                        if (!TranslateEntityRefs(tnode->nodeValue, 
+                                                 &(tnode->valueLength) )) {
+                            RetError("Entity parsing error", (x - xml));
+                        }
+                    }
                 }
             }
 
@@ -533,7 +504,6 @@ XML_SimpleParse (
                         tnode = (domTextNode*) domAlloc(sizeof(domTextNode));
                         memset(tnode, 0, sizeof(domTextNode));
                         tnode->nodeType      = COMMENT_NODE;
-                        tnode->nodeFlags     = 0;
                         tnode->ownerDocument = doc;
                         tnode->nodeNumber    = NODE_NO(doc);
                         tnode->parentNode    = parent_node;
@@ -600,32 +570,62 @@ XML_SimpleParse (
                     \-------------------------------------------------------*/
                     x += 8;
                     start = x;
-                    while ( (*x!=0) &&
+                    only_whites = 1;
+                    while ( ((c=*x)!=0) &&
                             ((*x!=']') || (x[1]!=']') || (x[2]!='>'))) {
+                        if (only_whites &&
+                            (c != ' ')  &&
+                            (c != '\t') &&
+                            (c != '\n') &&
+                            (c != '\r') ) {
+                            only_whites = 0;
+                        }
                         x++;
                     }
                     if (*x) {
-                        if (parent_node && (x - start)) {
-                            /*----------------------------------------------------
-                            |   allocate new TEXT node for CDATA section data
-                            \---------------------------------------------------*/
-                            tnode = (domTextNode*) domAlloc(sizeof(domTextNode));
-                            memset(tnode, 0, sizeof(domTextNode));
-                            tnode->nodeType      = TEXT_NODE;
-                            tnode->nodeFlags     = 0;
-                            tnode->ownerDocument = doc;
-                            tnode->nodeNumber    = NODE_NO(doc);
-                            tnode->parentNode    = parent_node;
-                            tnode->valueLength   = (x - start);
-                            tnode->nodeValue     = (char*)MALLOC((x - start)+1);
-                            memmove(tnode->nodeValue, start, (x - start));
-                            *(tnode->nodeValue + (x - start)) = 0;
-                            if (parent_node->firstChild)  {
-                                parent_node->lastChild->nextSibling = (domNode*)tnode;
-                                tnode->previousSibling = parent_node->lastChild;
-                                parent_node->lastChild = (domNode*)tnode;
+                        if (parent_node && ((x - start) || keepCDATA)) {
+                            if (parent_node->lastChild
+                                && parent_node->lastChild->nodeType == TEXT_NODE
+                                && !keepCDATA) {
+                                if ((x - start) && !(only_whites && ignoreWhiteSpaces)) {
+                                    /* normalize text node, i.e. there
+                                     * are no adjacent text nodes */
+                                    tnode = (domTextNode*)parent_node->lastChild;
+                                    tnode->nodeValue =
+                                        REALLOC(tnode->nodeValue,
+                                                tnode->valueLength + x - start + 1);
+                                    memmove(tnode->nodeValue + tnode->valueLength,
+                                            start, x - start);
+                                    tnode->valueLength += (x - start);
+                                    *(tnode->nodeValue + tnode->valueLength) = 0;
+                                }
                             } else {
-                                parent_node->firstChild = parent_node->lastChild = (domNode*)tnode;
+                                if (!(only_whites && ignoreWhiteSpaces)
+                                    && ((x - start) || keepCDATA)) {
+                                    /*----------------------------------------------------
+                                      |   allocate new node for CDATA section data
+                                      \---------------------------------------------------*/
+                                    tnode = (domTextNode*) domAlloc(sizeof(domTextNode));
+                                    memset(tnode, 0, sizeof(domTextNode));
+                                    if (keepCDATA)
+                                        tnode->nodeType      = CDATA_SECTION_NODE;
+                                    else 
+                                        tnode->nodeType      = TEXT_NODE;
+                                    tnode->ownerDocument = doc;
+                                    tnode->nodeNumber    = NODE_NO(doc);
+                                    tnode->parentNode    = parent_node;
+                                    tnode->valueLength   = (x - start);
+                                    tnode->nodeValue     = (char*)MALLOC((x - start)+1);
+                                    memmove(tnode->nodeValue, start, (x - start));
+                                    *(tnode->nodeValue + (x - start)) = 0;
+                                    if (parent_node->firstChild)  {
+                                        parent_node->lastChild->nextSibling = (domNode*)tnode;
+                                        tnode->previousSibling = parent_node->lastChild;
+                                        parent_node->lastChild = (domNode*)tnode;
+                                    } else {
+                                        parent_node->firstChild = parent_node->lastChild = (domNode*)tnode;
+                                    }
+                                }
                             }
                         }
                         x += 3;
@@ -655,8 +655,6 @@ XML_SimpleParse (
                             domAlloc(sizeof(domProcessingInstructionNode));
                     memset(pinode, 0, sizeof(domProcessingInstructionNode));
                     pinode->nodeType      = PROCESSING_INSTRUCTION_NODE;
-                    pinode->nodeFlags     = 0;
-                    pinode->namespace     = 0;
                     pinode->ownerDocument = doc;
                     pinode->nodeNumber    = NODE_NO(doc);
                     pinode->parentNode    = parent_node;
@@ -736,8 +734,6 @@ XML_SimpleParse (
             node = (domNode*) domAlloc(sizeof(domNode));
             memset(node, 0, sizeof(domNode));
             node->nodeType      = ELEMENT_NODE;
-            node->nodeFlags     = 0;
-            node->namespace     = 0;
             node->nodeName      = (char *)&(h->key);
             node->ownerDocument = doc;
             node->nodeNumber    = NODE_NO(doc);
@@ -910,7 +906,6 @@ XML_SimpleParse (
                     attrnode->parentNode  = node;
                     attrnode->nodeName    = (char *)&(h->key);
                     attrnode->nodeType    = ATTRIBUTE_NODE;
-                    attrnode->nodeFlags   = 0;
                     attrnode->nodeValue   = (char*)MALLOC(nArgVal+1);
                     attrnode->valueLength = nArgVal;
                     memmove(attrnode->nodeValue, ArgVal, nArgVal);
@@ -1004,6 +999,14 @@ XML_SimpleParse (
                 if (*x!='>') {
                     RetError("Syntax Error",(x - xml - 1) );
                 }
+#ifdef TDOM_NS 
+                /* pop active namespaces */
+                while ( (activeNSpos >= 0) &&
+                        (activeNS[activeNSpos].depth == depth) )
+                {
+                    activeNSpos--;
+                } 
+#endif                                   
             }
             if (x[1] == 0) {
 #ifdef TDOM_NS
@@ -1042,6 +1045,7 @@ domDocument *
 XML_SimpleParseDocument (
     char    *xml,              /* Complete text of the file being parsed  */
     int      ignoreWhiteSpaces,
+    int      keepCDATA,
     char    *baseURI,
     Tcl_Obj *extResolver,
     int     *pos,
@@ -1054,7 +1058,7 @@ XML_SimpleParseDocument (
     }
     
     *pos = 0;
-    XML_SimpleParse (xml, pos, doc, NULL, ignoreWhiteSpaces, errStr);
+    XML_SimpleParse (xml, pos, doc, NULL, ignoreWhiteSpaces, keepCDATA, errStr);
     domSetDocumentElement (doc);
 
     return doc;

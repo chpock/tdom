@@ -131,7 +131,22 @@ used, which tries to even parse badly formed HTML into a DOM tree.</desc>
                 may be outside of what the appropriate XML productions
                 allow.</desc>
               </optdef>
+
+              <optdef>
+                <optname>-jsonmaxnesting</optname>
+                <optarg>integer</optarg>
+                <desc>This option only has effect if used together
+                with the <m>-json</m> option. The current implementation uses recursive descent JSON parser. In order to avoid using excess stack space, any JSON input that has more than a certain levels of nesting is considered invalid. The default maximum nesting is 2000. The option -jsonmaxnesting allows the user to adjust that.</desc>
+              </optdef>
               
+              <optdef>
+                <optname>--</optname> 
+                <desc>The option <m>--</m> marks the end of options.
+                While respected in general this option is only needed
+                in case of parsing JSON data, which may start with a
+                "-".</desc>
+              </optdef>
+
               <optdef>
                 <optname>-keepEmpties</optname> 
                 <desc>If <m>-keepEmpties</m> is
@@ -140,6 +155,19 @@ resulting DOM tree. In default case (<m>-keepEmpties</m> not given) those empty
 text nodes are removed at parsing time.</desc>
               </optdef>
 
+              <optdef>
+                <optname>-keepCDATA</optname> 
+                <desc>If <m>-keepCDATA</m> is
+specified then CDATA sections aren't added to the tree as text nodes
+(and, if necessary, combined with sibling text nodes into one text
+node) as without this option but are added as CDATA_SECTION_NODEs to
+the tree. Please note that the resulting tree isn't prepared for XPath
+selects or to be the source or the stylesheet of an XSLT
+transformation. If not combined with <m>-keepEmpties</m> only not
+whitespace only CDATA sections will be added to the resulting DOM
+                tree.</desc>
+              </optdef>
+              
               <optdef>
                 <optname>-channel</optname>
                 <optarg>&lt;channel-ID&gt;</optarg>
@@ -246,7 +274,7 @@ called. The <m>-useForeignDTD</m> respects </desc>
                 parsed and no external entity (including the external
                 subset) will be resolved and parsed. The value
                 "notstandalone" means, that all external entities will
-                be resolved and parsed, with the execption of
+                be resolved and parsed, with the exception of
                 documents, which explicitly states standalone="yes" in
                 their XML declaration.</desc>
               </optdef>
@@ -300,28 +328,11 @@ node. <m>objVar</m> controls the memory handling as explained above.</desc>
         </commanddef>
 
         <commanddef>
-          <command><cmd>dom</cmd> <method>setResultEncoding</method> ?<m>encodingName</m>?</command>
-          <desc>This option is for backward compatibility with Tcl
-          8.0. If tDOM is build with any newer Tcl version this option
-          does not has any effect. If <m>encodingName</m> is not given
-          the current global result encoding is returned. Otherwise
-          the global result encoding is set to <m>encodingName</m>.
-          All character data, attribute values etc. will then be
-          converted from UTF-8, which is delivered from the Expat XML
-          parser, to the given 8 bit encoding at XML/DOM parse time.
-          Valid values for <m>encodingName</m> are: utf-8, ascii,
-          cp1250, cp1251, cp1252, cp1253, cp1254, cp1255, cp1256,
-          cp437, cp850, en, iso8859-1, iso8859-2, iso8859-3,
-          iso8859-4, iso8859-5, iso8859-6, iso8859-7, iso8859-8,
-          iso8859-9, koi8-r.</desc>
-        </commanddef>
-
-        <commanddef>
           <command><cmd>dom</cmd> <method>createNodeCmd</method>
-<m>?-returnNodeCmd?</m> <m>?-tagName name?</m> <m>?-jsonType jsonType</m> <m>(element|comment|text|cdata|pi)Node</m> <m>commandName</m></command>
+<m>?-returnNodeCmd?</m> <m>?-tagName name?</m> <m>?-jsonType jsonType?</m> <m>?-namespace URI?</m> <m>(element|comment|text|cdata|pi)Node</m> <m>commandName</m></command>
           <desc>This method creates Tcl commands, which in turn create
           tDOM nodes. Tcl commands created by this command are only
-          avaliable inside a script given to the domNode methods
+          available inside a script given to the domNode methods
           <m>appendFromScript</m> or <m>insertBeforeFromScript</m>. If
           a command created with <m>createNodeCmd</m> is invoked in
           any other context, it will return error. The created command
@@ -343,14 +354,23 @@ Which type of node is created by the command is determined by the
 first argument to the <m>createNodeCmd</m>. The syntax of the created
 command depends on the type of the node it creates.</p>
 
-<p>If the first argument of the method is <m>elementNode</m>, the
-created command will create an element node, if called. Without the
+<p>If the command type to create is <m>elementNode</m>, the created
+command will create an element node, if called. Without the
 <m>-tagName</m> option the tag name of the created node is
 <m>commandName</m> without namespace qualifiers. If the
 <m>-tagName</m> option was given then the created command the created
 elements will have this tag name. If the <m>-jsonType</m> option was
-given then the created node elements will have the given JSON type.
-The syntax of the created command is:</p>
+given then the created node elements will have the given JSON type. If
+the <m>-namespace</m> option is given the created element node will be
+XML namespaced and in the namespace given by the option. The element
+name will be literal as given either by the command name or the
+<m>-tagname</m> option, if that was given. An appropriate XML
+namespace declaration will be automatically added, to bind the prefix
+(if the element name has one) or the default namespace (if the element
+name hasn't a prefix) to the namespace if such a binding isn't in
+scope.</p>
+
+<p>The syntax of the created command is:</p>
 
 <syntax>
 <cmd>elementNodeCmd</cmd> <m>?attributeName attributeValue ...? ?script?</m>
@@ -535,18 +555,18 @@ recommendation. Otherwise it returns 0.</desc>
                 </optdef>
                 <optdef>
                     <optname>expatmajorversion</optname>
-                    <desc>Returns the major version of the underlyling
-                    expat version as integer.</desc>
+                    <desc>Returns the major version of the at build
+                    time used expat version as integer.</desc>
                 </optdef>
                 <optdef>
                     <optname>expatminorversion</optname>
-                    <desc>Returns the minor version of the underlyling
-                    expat version as integer.</desc>
+                    <desc>Returns the minor version of the at build
+                    time used expat version as integer.</desc>
                 </optdef>
                 <optdef>
                     <optname>expatmicroversion</optname>
-                    <desc>Returns the micro version of the underlyling
-                    expat version as integer.</desc>
+                    <desc>Returns the micro version of the at build
+                    time used expat version as integer.</desc>
                 </optdef>
                 <optdef>
                     <optname>dtd</optname>
@@ -582,6 +602,15 @@ recommendation. Otherwise it returns 0.</desc>
                     <optname>html5</optname>
                     <desc>Returns as boolean, if build with
                     <m>--enable-html5</m>.</desc>
+                </optdef>
+                <optdef>
+                    <optname>versionhash</optname>
+                    <desc>Returns the fossil repository version hash.</desc>
+                </optdef>
+                <optdef>
+                    <optname>pullparser</optname>
+                    <desc>Returns as boolean if the pullparser command
+                    is build in.</desc>
                 </optdef>
             </optlist>
             </desc>   

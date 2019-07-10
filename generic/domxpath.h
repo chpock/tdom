@@ -12,7 +12,7 @@
 |
 |
 |   The contents of this file are subject to the Mozilla Public License
-|   Version 1.1 (the "License"); you may not use this file except in
+|   Version 2.0 (the "License"); you may not use this file except in
 |   compliance with the License. You may obtain a copy of the License at
 |   http://www.mozilla.org/MPL/
 |
@@ -75,7 +75,7 @@ typedef enum {
     Int, Real, Mult, Div, Mod, UnaryMinus, IsNSElement,
     IsNode, IsComment, IsText, IsPI, IsSpecificPI, IsElement,
     IsFQElement, GetVar, GetFQVar, Literal, ExecFunction, Pred,
-    EvalSteps, SelectRoot, CombineSets, Add, Substract, Less,
+    EvalSteps, SelectRoot, CombineSets, Add, Subtract, Less,
     LessOrEq, Greater, GreaterOrEq, Equal,  NotEqual, And, Or,
     IsNSAttr, IsAttr, AxisAncestor, AxisAncestorOrSelf, 
     AxisAttribute, AxisChild,

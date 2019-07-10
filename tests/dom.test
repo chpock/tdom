@@ -22,11 +22,11 @@ source [file join [file dir [info script]] loadtdom.tcl]
 
 test dom-1.1 {createDocument with root node name not a XML Name} {
     list [catch {dom createDocument "root node"} msg] $msg
-} "1 {invalid root element name}"
+} "1 {Invalid root element name 'root node'}"
 
 test dom-1.2 {createDocument with root node name not a XML Name} {
     list [catch {dom createDocument "1root"} msg] $msg
-} "1 {invalid root element name}"
+} "1 {Invalid root element name '1root'}"
 
 test dom-1.3 {createDocument - root name us-ascii} {
     dom createDocument "root" doc 
@@ -74,19 +74,19 @@ test dom-1.8 {createDocumentNS - check the NS of the created root} {
 
 test dom-1.9 {createDocumentNS with root name not a NCName} {
     list [catch {dom createDocumentNS "http://foo.bar" "foo bar" doc} msg] $msg
-} "1 {invalid local name}"
+} "1 {Invalid root element name 'foo bar'}"
 
 test dom-1.10 {createDocumentNS with root name not a NCName} {
     list [catch {dom createDocumentNS "http://foo.bar" "a:b:c" doc} msg] $msg
-} "1 {invalid local name}"
+} "1 {Invalid root element name 'a:b:c'}"
 
 test dom-1.11 {createDocumentNS with root name not a NCName} {
     list [catch {dom createDocumentNS "http://foo.bar" "a b:b" doc} msg] $msg
-} "1 {invalid prefix name}"
+} "1 {Invalid root element name 'a b:b'}"
 
 test dom-1.12 {createDocumentNS with root name not a NCName} {
     list [catch {dom createDocumentNS "http://foo.bar" "a:a b" doc} msg] $msg
-} "1 {invalid local name}"
+} "1 {Invalid root element name 'a:a b'}"
 
 test dom-1.13 {createDocumentNS - check root name} {
     set doc [dom createDocumentNS "http://foo.bar" foo:root]
@@ -116,6 +116,82 @@ test dom-1.15 {createDocument - rename the doc cmd} {
     rename $doc fooCmd
     fooCmd delete
     expr {[llength [info commands]] == $nrOfCommands}
+} {1}
+
+test dom-1.16 {createDocumentNS - empty namespace, no prefix} {
+    dom createDocumentNS "" doc doc
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc/>}
+
+test dom-1.17 {createDocumentNS -  namespace, no prefix} {
+    dom createDocumentNS "uri" doc doc
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc xmlns="uri"/>}
+
+test dom-1.18 {createDocumentNS -  namespace, no prefix} {
+    dom createDocumentNS "uri" doc doc
+    set result [$doc selectNodes -namespaces {ns uri} count(/ns:doc)]
+    $doc delete
+    set result
+} 1
+
+test dom-1.19 {createDocumentNS - namespace, prefix} {
+    dom createDocumentNS "uri" n1:doc doc
+    set result [$doc selectNodes -namespaces {ns uri} count(/ns:doc)]
+    $doc delete
+    set result
+} 1
+
+test dom-1.20 {createDocumentNS - empty namespace, prefix} {
+    catch {dom createDocumentNS "" n1:doc doc} errMsg
+    set errMsg
+} {Missing URI in Namespace declaration}
+
+test dom-1.21 {Explicit delete of scoped doc with domDoc cmd} {} {
+    dom createDocument test doc
+    domDoc $doc delete
+    unset doc
+} {}    
+
+proc dom-1.22 {doc} {
+    $doc delete
+}
+test dom-1.22 {Explicit delete of scoped doc in proc call from scope} {} {
+    dom createDocument test doc
+    dom-1.22 $doc
+    unset doc
+} {}    
+
+test dom-1.23 {Explicit delete of scoped doc} {
+    dom createDocument test doc
+    $doc delete
+    unset doc
+} {}    
+
+test dom-1.24 {Explicit delete of scoped doc} {
+    dom createDocument test doc
+    set result [catch {set doc foo} errMsg]
+    lappend result $errMsg
+    $doc delete
+    unset doc
+    set result
+} {1 {can't set "doc": var is read-only}}
+
+test dom-1.25 {Doc var} {
+    dom parse <test/> doc
+    dom parse <test/> doc
+    unset doc
+} {}
+
+test dom-1.26 {Doc var} {
+    dom parse <test/> doc
+    set result [catch {$doc documentElement doc}]
+    unset doc
+    set result
 } {1}
 
 test dom-2.1 {Don't quash white space at start or end of non white space content} {
@@ -236,7 +312,7 @@ proc extRefResolver {base systemId publicId} {
     if {$publicId == "DOMCMDTEST"} {
         return [list string $base $dom_dtd]
     } else {
-        return [::tDOM::extRefHandler $base $systemId $publicId]
+        return [::tdom::extRefHandler $base $systemId $publicId]
     }
 }
 
@@ -487,12 +563,7 @@ test dom-2.28 {parse document with undeclared xml prefix} {
     string range $errMsg 0 30
 } {Namespace prefix is not defined}
 
-# This is an expat bug. If XML_StopParser is called in the
-# elementstarthandler function for the document element and there
-# isn't anything else in the document then this document element, then
-# the XML_Parse() return code doesn't reflects this. This is an edge
-# case, see the next test below.
-test dom-2.29 {parse not well-formed document with undeclared xml prefix} {knownBug} {
+test dom-2.29 {parse not well-formed document with undeclared xml prefix} {
     catch {dom parse {<foo:e/>}} errMsg
     string range $errMsg 0 30
 } {Namespace prefix is not defined}
@@ -535,6 +606,78 @@ test dom-2.33 {end of options option} {
     $doc delete
     set result
 } -0.123
+
+test dom-2.34 {XML prefix declaration with empty namespace} {
+    catch {dom parse {<foo:doc xmlns:foo=""><e1/></foo:doc>}} errMsg
+    set errMsg
+} {Missing URI in Namespace declaration, referenced at line 1 character 22}
+
+test dom-2.35 {-keepCDATA} {
+    set doc [dom parse -keepCDATA {<doc>foo <![CDATA[test of & <bad> format]]> bar </doc>}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc>foo <![CDATA[test of & <bad> format]]> bar </doc>}
+
+test dom-2.36 {-keepCDATA} {
+    set doc [dom parse -keepCDATA {<doc>foo <![CDATA[test of & <bad> format]]> bar </doc>}]
+    set root [$doc documentElement]
+    set result [list]
+    foreach child [$root childNodes] {
+        lappend result [$child nodeType]
+    }
+    $doc delete
+    set result
+} {TEXT_NODE CDATA_SECTION_NODE TEXT_NODE}
+
+test dom-2.37 {-keepCDATA} {
+    set doc [dom parse -keepCDATA {<doc><e><![CDATA[one]]></e></doc>}]
+    set result [list]
+    foreach child [$doc selectNodes doc/e/node()] {
+        lappend result [$child nodeType]
+    }
+    $doc delete
+    set result
+} {CDATA_SECTION_NODE}
+
+test dom-2.38 {-keepCDATA} {
+    set doc [dom parse -keepCDATA {<doc><e><![CDATA[one]]><![CDATA[two]]></e></doc>}]
+    set result [list]
+    foreach child [$doc selectNodes doc/e/node()] {
+        lappend result [$child nodeType]
+    }
+    $doc delete
+    set result
+} {CDATA_SECTION_NODE CDATA_SECTION_NODE}
+
+test dom-2.39 {-keepCDATA} {
+    set doc [dom parse -keepCDATA {<doc><e><![CDATA[]]></e></doc>}]
+    set result [$doc selectNodes count(doc/e/node())]
+    $doc delete
+    set result
+} 0
+
+test dom-2.40 {-keepCDATA white space only CDATA section} {
+    set doc [dom parse -keepCDATA {<doc><e><![CDATA[
+    ]]></e></doc>}]
+    set result [$doc selectNodes count(doc/e/node())]
+    $doc delete
+    set result
+} 0
+
+test dom-2.41 {-keepCDATA and -keepEmpties} {
+    set doc [dom parse -keepCDATA -keepEmpties {<doc><e><![CDATA[]]></e></doc>}]
+    set result [$doc selectNodes count(doc/e/node())]
+    $doc delete
+    set result
+} 1
+
+test dom-2.42 {namespaces} {
+    set doc [dom parse {
+        <help><br xmlns:xsi="a"/><em xmlns:xsi="a">notes</em></help>
+    }]
+    $doc delete
+} {}
 
 test dom-3.1 {isName} {
     dom isName ":foo"
@@ -684,7 +827,7 @@ set nameStartChars [lsort -command sortCmd \
 # Append stop char needed by the test code to work properly.
 lappend nameStartChars 0x10000
 
-test dom-3.8 {isName} {longRunning && need_i18n} {
+test dom-3.8 {isName} {longRunning} {
     set ind 0
     set nr 0
     while {$nr < 65536} {
@@ -720,7 +863,7 @@ set nameChars [lsort -command sortCmd \
 # Append stop char needed by the test code to work properly.
 lappend nameChars 0x10000
 
-test dom-3.9 {isName} {longRunning && need_i18n} {
+test dom-3.9 {isName} {
     set ind 0
     set nr 0
     while {$nr < 65536} {
@@ -831,7 +974,7 @@ set XMLChars {
     0x9 0xA 0xD {0x20 0xD7FF} {0xE000 0xFFFD} {0x10000 0x10FFFF}
 }
 
-test dom-3.27 {isCharData} {longRunning && need_i18n} {
+test dom-3.27 {isCharData} {longRunning} {
     set ind 0
     set nr 1
     while {$nr < 65536} {
@@ -901,7 +1044,7 @@ test dom-3.37 {isCDATA} {
     dom isCDATA "valid: ]]> "
 } {0}
 
-test dom-3.38 {isCDATA} {need_i18n} {
+test dom-3.38 {isCDATA} {
     dom isCDATA "\ud7fa\ud7fb\ud7fc\ud7fd\ud7fe\ud7ff]]>"
 } {0}
 
@@ -924,12 +1067,12 @@ test dom-4.1 {-useForeignDTD 0} {
 } {}
 
 test dom-4.2 {-useForeignDTD 1 with document with internal subset} {need_uri} {
-    set baseURI file://[file join [pwd] [file dir [info script]] dom.test]
-    set ::tDOM::useForeignDTD "data/domCmd1.dtd"
+    set baseURI [tdom::baseURL [file join [pwd] [file dir [info script]] dom.test]]
+    set ::tdom::useForeignDTD "data/domCmd1.dtd"
     set doc [dom parse \
             -useForeignDTD 1 \
             -baseurl $baseURI \
-            -externalentitycommand ::tDOM::extRefHandler {
+            -externalentitycommand ::tdom::extRefHandler {
 <!DOCTYPE root [
     <!ATTLIST root fixed CDATA #FIXED "toThat">
 ]>
@@ -941,12 +1084,12 @@ test dom-4.2 {-useForeignDTD 1 with document with internal subset} {need_uri} {
 } {toThat}
 
 test dom-4.3 {-useForeignDTD 1 with document with internal subset} {need_uri} {
-    set baseURI file://[file join [pwd] [file dir [info script]] dom.test]
-    set ::tDOM::useForeignDTD "data/domCmd1.dtd"
+    set baseURI [tdom::baseURL [file join [pwd] [file dir [info script]] dom.test]]
+    set ::tdom::useForeignDTD "data/domCmd1.dtd"
     set doc [dom parse \
             -useForeignDTD 1 \
             -baseurl $baseURI \
-            -externalentitycommand ::tDOM::extRefHandler {
+            -externalentitycommand ::tdom::extRefHandler {
 <!DOCTYPE root [
     <!ATTLIST root fixed2 CDATA #FIXED "toThat">
 ]>
@@ -959,12 +1102,12 @@ test dom-4.3 {-useForeignDTD 1 with document with internal subset} {need_uri} {
 } {toThis toThat}
 
 test dom-4.4 {-useForeignDTD 1 with document without document declaration} {need_uri} {
-    set baseURI file://[file join [pwd] [file dir [info script]] dom.test]
-    set ::tDOM::useForeignDTD "data/domCmd1.dtd"
+    set baseURI [tdom::baseURL [file join [pwd] [file dir [info script]] dom.test]]
+    set ::tdom::useForeignDTD "data/domCmd1.dtd"
     set doc [dom parse \
             -useForeignDTD 1 \
             -baseurl $baseURI \
-            -externalentitycommand ::tDOM::extRefHandler <root/>]
+            -externalentitycommand ::tdom::extRefHandler <root/>]
     set root [$doc documentElement]
     set result [$root @fixed]
     $doc delete
@@ -972,12 +1115,12 @@ test dom-4.4 {-useForeignDTD 1 with document without document declaration} {need
 } {toThis}
 
 test dom-4.5 {-useForeignDTD 1 does not overwrite a given external subset} {need_uri} {
-    set baseURI file://[file join [pwd] [file dir [info script]] dom.test]
-    set ::tDOM::useForeignDTD "data/domCmd1.dtd"
+    set baseURI [tdom::baseURL [file join [pwd] [file dir [info script]] dom.test]]
+    set ::tdom::useForeignDTD "data/domCmd1.dtd"
     set doc [dom parse \
             -useForeignDTD 1 \
             -baseurl $baseURI \
-            -externalentitycommand ::tDOM::extRefHandler {
+            -externalentitycommand ::tdom::extRefHandler {
 <!DOCTYPE root SYSTEM "data/domCmd2.dtd">
 <root/>}]
     set root [$doc documentElement]
@@ -992,10 +1135,10 @@ test dom-4.6 {-useForeignDTD with nonboolean arg} {need_uri} {
 } {1 {expected boolean value but got "foo"}}
 
 test dom-5.1 {document with external subset} {need_uri} {
-    set baseURI file://[file join [pwd] [file dir [info script]] dom.test]
+    set baseURI [tdom::baseURL [file join [pwd] [file dir [info script]] dom.test]]
     set doc [dom parse \
             -baseurl $baseURI \
-            -externalentitycommand ::tDOM::extRefHandler {
+            -externalentitycommand ::tdom::extRefHandler {
 <!DOCTYPE root SYSTEM "data/domCmd2.dtd">
 <root/>}]
     set root [$doc documentElement]
@@ -1209,7 +1352,7 @@ test dom-5.8 {-externalentitycommand - nested external entities} -setup {
 } -result [list 1 {error "not well-formed (invalid token)" in entity "e3.xml" at line 1 character 2, referenced in entity "e2.xml" at line 1 character 4, referenced in entity "e1.xml" at line 1 character 4, referenced at line 6 character 21}]
 
 test dom-5.9 {Wrong option after -externalentitycommand} -body {
-    set result [catch {dom parse -externalentitycommand ::tDOM::extRefHandler \
+    set result [catch {dom parse -externalentitycommand ::tdom::extRefHandler \
                            -useForeignDTD foo}]
 } -result 1
 
@@ -1402,6 +1545,16 @@ test dom-7.19 {setTextCheck and appendFromScript - setTextCheck state at create 
     lappend result $errMsg
 } [list 1 "Invalid text value 'foo\u0003bar'"]
 
+test dom-7.19 {setNameCheck / createDocument} {
+    dom setNameCheck 0
+    dom createDocument "foo bar" doc
+    set result [$doc asXML -indent none]
+    $doc delete
+    dom setNameCheck 1
+    set result
+} {<foo bar/>}
+    
+
 test dom-8.1 {createDocumentNode} {
     set result [catch {dom createDocumentNode foo bar}]
 } {1}
@@ -1545,6 +1698,20 @@ test dom-9.6 {node token with result var argument} {
     domDoc $doc delete
     dom setObjectCommands automatic
 } {automatic}
+
+
+test dom-9.7 {Attempt to use the token to an already freed node} {
+    dom setObjectCommands token
+    set doc [dom createDocument one]
+    set top [domDoc $doc documentElement]
+    set elem [domDoc $doc createElement one]
+    domNode $elem delete
+    set result [catch {domNode $elem asList} errMsg]
+    lappend result $errMsg
+    domDoc $doc delete
+    dom setObjectCommands automatic
+    set result
+} {1 {Parameter "" is not a domNode.}}
     
 catch {namespace delete nodeCmds}
 
@@ -1651,6 +1818,10 @@ test dom-11.4 {featureinfo - dtd} -body {
 test dom-11.5 {featureinfo - jsonmaxnesting} {
     dom featureinfo jsonmaxnesting
 } 2000
+
+test dom-11.6 {featureinfo - versionhash} {
+    regexp {^[0-9a-fA-F]+$} [dom featureinfo versionhash]
+} 1
 
 proc ::dom::domParseFeedback {} {
     return -code break
@@ -1854,7 +2025,16 @@ test dom-12.15 {-feedbackAfter with -feedbackcmd and external entities, with err
                                <doc>&a;&b;</doc>}} msg]
     list $result $msg
 } -result [list 1 "Error in feedback cmd."]
-
+proc feedbackcmd-12.16 {} {
+    incr ::feedbackcmd-12.16
+}
+test dom-12.16 {-feedbackcmd setting interp result w/ invalid XML} -body {
+    set ::feedbackcmd-12.16 0
+    set result [catch {dom parse -feedbackcmd feedbackcmd-12.16 \
+                           -feedbackAfter 1 {<doc><e1/><e1/><e1></doc}} msg]
+    list $result $msg
+} -result [list 1 {error "unclosed token" at line 1 character 19
+"<doc><e1/><e1/><e1>< <--Error-- /doc"}]
 
 # cleanup
 ::tcltest::cleanupTests

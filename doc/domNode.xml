@@ -15,7 +15,8 @@
 -->
 
   <synopsis>
-    <syntax> $nodeObject <m>method</m>  <m>arg arg ...</m></syntax>
+    <syntax>$nodeObject <m>method</m> <m>arg arg ...</m></syntax>
+    <syntax>domNode <m>nodeToken</m> <m>method</m> <m>arg arg ...</m></syntax>
   </synopsis>
   <section>
     <title> DESCRIPTION </title>
@@ -57,7 +58,7 @@ nodes.</desc>
 
       <commanddef>
         <command><method>nodeValue</method> <m>?newValue?</m></command>
-        <desc>Returns the value of that node object. This is the the text or
+        <desc>Returns the value of that node object. This is the text or
 the data for element nodes of type TEXT_NODE, COMMENT_NODE,
 PROCESSING_INSTRUCTION_NODE or CDATA_SECTION_NODE). Otherwise it is empty. If
 the node is a TEXT_NODE, COMMENT_NODE or PROCESSING_INSTRUCTION_NODE and the
@@ -68,7 +69,7 @@ value.</desc>
 
       <commanddef>
         <command><method>hasChildNodes</method></command>
-        <desc>Returns 1 if the has children. Otherwise 0 is returned.</desc>
+        <desc>Returns 1 if the node has children. Otherwise 0 is returned.</desc>
       </commanddef>
 
       <commanddef>
@@ -88,7 +89,7 @@ the node in the sense of the DOM recommendation. This nodeList object is
 &quot;live&quot; in the sense that, for instance, changes to the children of
 the node object that it was created from are immediately reflected in the nodes
 returned by the NodeList accessors; it is not a static snapshot of the content
-of the node. The both accessors know by the nodeList object are &quot;item
+of the node. The two accessors known by the nodeList object are &quot;item
 &lt;index&gt;&quot;, which returns the indexth item in the collection, and
 &quot;length&quot;, which returns the number of nodes in the list.</desc>
       </commanddef>
@@ -105,13 +106,13 @@ of the node. The both accessors know by the nodeList object are &quot;item
       
       <commanddef>
         <command><method>nextSibling</method>  <variable>?objVar?</variable></command>
-        <desc>Returns the next sibling relativ to the current node as a node
+        <desc>Returns the next sibling relative to the current node as a node
 object.</desc>
       </commanddef>
 
       <commanddef>
         <command><method>previousSibling</method> <variable>?objVar?</variable></command>
-        <desc>Returns the next sibling relativ to the current node as a node
+        <desc>Returns the next sibling relative to the current node as a node
 object.</desc>
       </commanddef>
 
@@ -130,8 +131,8 @@ matching (glob style) <m>localname</m> and having the given namespace
 
       <commanddef>
         <command><method>getElementById</method> <m>id</m></command>
-        <desc>Returns the node having a id attribute with value
-<m>id</m> or the emtpy string, if no node has an id attribute with that value.</desc>
+        <desc>Returns the node having an id attribute with value
+<m>id</m> or the empty string if no node has an id attribute with that value.</desc>
       </commanddef>
 
       <commanddef>
@@ -142,7 +143,7 @@ matching (glob style) <m>localname</m> and having the given namespace
 
       <commanddef>
         <command><method>getAttribute</method> <m>attributeName  ?defaultValue?</m></command>
-        <desc>Returns the value of the attribute <m>attributeName</m>. If
+        <desc>Returns the value of the attribute <m>attributeName</m>. If the
 attribute is not available <m>defaultValue</m> is returned.</desc>
       </commanddef>
 
@@ -150,10 +151,11 @@ attribute is not available <m>defaultValue</m> is returned.</desc>
         <command><method>setAttribute</method> <m>attributeName newValue 
 ?attributeName newValue ...?</m></command>
         <desc>Sets the value for one or more attributes. Every
-<m>attributeName</m> is set to the corresponding <m>newValue</m>. If there
-isn't an attribute for one or more of the <m>attributeName</m> this will
-create that attribute.</desc>
-
+        <m>attributeName</m> is set to the corresponding
+        <m>newValue</m>. If there isn't an attribute for one or more
+        of the <m>attributeName</m>, this will create that attribute.
+        It is not recommended to set attributes that look like xml
+        namespace declarations.</desc>
       </commanddef>
 
       <commanddef>
@@ -195,18 +197,9 @@ method has the same effect as the method <b>setAttribute</b>.</p>
 
         <example>$node setAttributeNS "" attri "some Value"</example>
 
-<p>XML namespace nodes are not in any namespace. Set them this way:</p>
-
-        <example>$node setAttributeNS "" xmlns:myprefix "myNamespaceURI"
-$node setAttributeNS "" xmlns "newDefaultNamespace"</example>
-
-<p>If your <m>qualifiedName</m> has the prefix "xml" and you give the empty
-string as <m>uri</m>, the namespace of the attribute defaults to
-"http://www.w3.org/XML/1998/namespace", as the DOM 2 recommendation
-requests. With the exceptions of the special prefixes "xmlns" and "xml" you
-always must provide a non emtpy <m>uri</m>, if your <m>qualifiedName</m> has a
-prefix.</p>
-        </desc>
+<p>With the exceptions of the special prefixes "xmlns" and "xml" you
+always must provide a non empty <m>uri</m>, if your <m>qualifiedName</m> has a
+prefix. It is not recommended to set xml namespace declarations. The effects are complicated and not always obvious up to resulting a not well-formed serializations after further processing.</p></desc>
       </commanddef>
 
       <commanddef>
@@ -217,36 +210,52 @@ prefix.</p>
 
       <commanddef>
         <command><method>attributes</method> <option>?attributeNamePattern?</option></command>
-        <desc>Returns all attributes matching the <m>attributeNamePattern</m>.
-If <m>attributeNamePattern</m> isn't given all attributes are returned as a Tcl
-list.</desc>
+        <desc>Returns information about the attriubtes matching the
+        <m>attributeNamePattern</m>. If <m>attributeNamePattern</m>
+        isn't given, information about all attributes are returned.
+        The return value is a Tcl list, the elements just the
+        attriubute name in case of non namespaced attriubtes and three
+        element sublists for namespaced attributes. n case of an
+        "ordinary" namespaced attribute, the sublist elements are
+        {&lt;localname&gt; &lt;prefix&gt; &lt;namespace_uri&gt;}. In the special case of
+        an xml namespace declaration it is {&lt;the prefix defined&gt;
+        &lt;localname&gt; ""}.
+        </desc>
       </commanddef>
 
       <commanddef>
+        <command><method>attributeNames</method> <option>?attributeNamePattern?</option></command>
+        <desc>Returns a flat list of all attributes names (as found in
+        the XML source) matching the <m>attributeNamePattern</m>. If
+        <m>attributeNamePattern</m> isn't given, all attribute names
+        are returned as a Tcl list.</desc>
+      </commanddef>
+      
+      <commanddef>
         <command><method>appendChild</method> <m>newChild</m></command>
-        <desc>Append <m>newChild</m> to the end of the child list of the
+        <desc>Appends <m>newChild</m> to the end of the child list of the
 node.</desc>
       </commanddef>
 
       <commanddef>
         <command><method>insertBefore</method> <m>newChild</m>  <m>refChild</m></command>
-        <desc>Insert <m>newChild</m> before the <m>refChild</m> into the list of
+        <desc>Inserts <m>newChild</m> before the <m>refChild</m> into the list of
 children of node. If <m>refChild</m> is the empty string, insert
 <m>newChild</m> at the end of the child nodes list of that node.</desc>
       </commanddef>
 
       <commanddef>
         <command><method>replaceChild</method> <m>newChild</m>  <m>oldChild</m></command>
-        <desc>Replace <m>oldChild</m> with <m>newChild</m> in the list of
+        <desc>Replaces <m>oldChild</m> with <m>newChild</m> in the list of
 children of that node. The <m>oldChild</m> node will be part of the
 document fragment list after this operation.</desc>
       </commanddef>
 
       <commanddef>
         <command><method>removeChild</method> <m>child</m></command>
-        <desc>Removes <m>child</m> from the list of children of that node
+        <desc>Removes <m>child</m> from the list of children of that node.
 <m>child</m> will be part of the document fragment list after this
-operation. It is not physically deleted.</desc>
+operation.</desc>
       </commanddef>
 
       <commanddef>
@@ -365,12 +374,12 @@ always be seen as string literal by the xpath engine. Cast the value
 explicitly with the according xpath functions (number(), boolean()) to
 another data type, if needed.</p>
 
-<p>Simmilar to the above descibed way to inject literals in a secure
+<p>Similar to the way described above to inject literals in a secure
 way into the XPath expression using tcl variable references there is a
 syntax to inject element names from tcl variables. At every place
 where the XPath syntax allows a node test there could be a tcl
 variable reference (in any form), just the leading $ replaced with %.
-This allows to select nodes with 'strange' (invalid, according to the
+This allows one to select nodes with 'strange' (invalid, according to the
 appropriate XML production rule) node names which may be needed in
 case of working with JSON data.</p>
 
@@ -383,7 +392,7 @@ this fails, then the namespace definitions in scope of the context
 node will be used to resolve the prefix. If this option is given, any
 namespace prefix within the xpath expression will be first resolved
 against that given list (and ignoring the document global prefix /
-namespace list). If the list bind the same prefix to different
+namespace list). If the list binds the same prefix to different
 namespaces, then the first binding will win.  If this fails, then the
 namespace definitions in scope of the context node will be used to
 resolve the prefix, as usual.</p>
@@ -392,7 +401,7 @@ resolve the prefix, as usual.</p>
 <m>xpathQuery</m> will be looked up in a document specific cache. If
 the query is found, then the stored pre-compiled query will be used.
 If the query isn't found, it will be compiled and stored in the cache,
-for use in further calls. Please notice, that the <m>xpathQuery</m> as
+for use in further calls. Please note that the <m>xpathQuery</m> 
 given as string is used as key for the cache. This means, that equal
 XPath expressions, which differ only in white space are treated as
 different cache entries. Special care is needed, if the XPath
@@ -422,13 +431,13 @@ set childNodes [$root selectNodes -namespaces {default http://www.defaultnamespa
 
       <commanddef>
         <command><method>getLine</method></command>
-        <desc>Returns the line number of that node in the orignal parsed
+        <desc>Returns the line number of that node in the originally parsed
 XML.</desc>
       </commanddef>
       
       <commanddef>
         <command><method>getColumn</method></command>
-        <desc>Returns the column number of that node in the orignal parsed
+        <desc>Returns the column number of that node in the originally parsed
 XML.</desc>
       </commanddef>
 
@@ -439,7 +448,7 @@ nested Tcl list.</desc>
       </commanddef>
 
       <commanddef>
-        <command><method>asXML</method> <option>?-indent none/1..8?</option> <option>?-channel channelId?</option> <option>?-escapeNonASCII?</option> <option>-xmlDeclaration &lt;boolean&gt;?</option> <option>-encString &lt;string&gt;</option> <option>?-escapeAllQuot?</option> <option>?-indentAttrs?</option></command>
+        <command><method>asXML</method> <option>?-indent none/1..8?</option> <option>?-channel channelId?</option> <option>?-escapeNonASCII?</option> <option>-xmlDeclaration &lt;boolean&gt;?</option> <option>-encString &lt;string&gt;</option> <option>?-escapeAllQuot?</option> <option>?-indentAttrs?</option> <option>?-nogtescape?</option> <option>?-noEmptyElementTag?</option></command>
         <desc><p>Returns the DOM substree starting from the current
         node as the root node of the result as an (optional indented)
         XML string or sends the output directly to the given
@@ -450,7 +459,7 @@ nested Tcl list.</desc>
         PCDATA content will be escaped as character reference in
         decimal representation.</p>
 
-        <p>The flag <m>-xmlDeclaration</m> determines, whether there
+        <p>The flag <m>-xmlDeclaration</m> determines whether there
         will be an XML Declaration and a newline emitted before
         anything else. The default is, to do not. If this flag is
         given with a true argument then</p>
@@ -469,7 +478,17 @@ nested Tcl list.</desc>
         <p>If the option <m>-indentAttrs</m> is
         given, then attributes will each be separated with newlines
         and indented to the same level as the parent node plus the
-        value given as argument to <m>-indentAttrs</m> (0..8).</p></desc>
+        value given as argument to <m>-indentAttrs</m> (0..8).</p>
+
+        <p>If the option <m>-nogtescape</m> is given then the
+        character '>' won't get escaped in attribute values and text
+        content of elements. The default is to escape this
+        character.</p>
+
+        <p>If the option <m>-noEmptyElementTag</m> is given then no
+        empty tag syntax will be used. Instead, if an element has
+        empty content it will be serialized with an element start tag
+        and an immediately following element end tag.</p></desc>
 
       </commanddef>
 
@@ -477,13 +496,13 @@ nested Tcl list.</desc>
         <command><method>asHTML</method> <option>?-channel channelId?</option>
 <option>?-escapeNonASCII?</option>  <option>?-htmlEntities?</option></command>
         <desc>Returns the DOM substree starting from the current node as the
-root node of the result serialized acording to HTML rules (HTML elements are
-recognized regardless of case, without end tags for emtpy HTML elements etc.),
+root node of the result serialized according to HTML rules (HTML elements are
+recognized regardless of case, without end tags for empty HTML elements etc.),
 as string or sends the output directly to the given channelId. If the option
 <m>-escapeNonASCII</m> is given, every non 7 bit ASCII character in attribute
 values or element PCDATA content will be escaped as character reference in
 decimal representation. If the option <m>-htmlEntities</m> is given, a
-character is outputed using a HTML 4.01 character entity reference, if one is
+character is written using its HTML 4.01 character entity reference, if one is
 defined for it.</desc>
       </commanddef>
 
@@ -491,8 +510,7 @@ defined for it.</desc>
         <command><method>asText</method></command>
           <desc>For ELEMENT_NODEs, the asText method outputs 
 the string-value of every text node descendant of node in document
-order without any escaping. For every other node type, this method outputs the
-the XPath string value of that node.</desc>
+order without any escaping. For every other node type, this method outputs the XPath string value of that node.</desc>
       </commanddef>
 
       <commanddef>
@@ -512,7 +530,7 @@ given node.</desc>
         <command><method>insertBeforeFromScript</method> <m>tclScript</m> <m>refChild</m></command>
         <desc>Inserts the nodes created in the <m>tclScript</m> by
 Tcl functions, which have been built using <m>dom createNodeCmd</m>, before the
-<m>refChild</m> into to the list of children of node. If <m>refChild</m> is
+<m>refChild</m> into the list of children of node. If <m>refChild</m> is
 the empty string, the new nodes will be appended.</desc>
       </commanddef>
 
@@ -525,7 +543,7 @@ appends this subtree to the current node.</desc>
       <commanddef>
         <command><method>simpleTranslate</method> <m>outputVar</m>
 <m>specifications</m></command>
-        <desc>Translate the subtree starting at the object node according to
+        <desc>Translates the subtree starting at the object node according to
 the specifications in <m>specifications</m> and outputs the result in the
 variable <m>outputVar</m> . The translation is very similar to Cost Simple
 mode.</desc>
@@ -536,7 +554,7 @@ mode.</desc>
         <desc>Returns an XPath, which exactly addresses the given
 node in its document. This XPath is only valid as there are no changes to DOM
 tree made later one. With the -legacy option, other XPath expressions
-are returnd, which doesn't work in all cases.</desc>
+are returned, which doesn't work in all cases.</desc>
       </commanddef>
 
       <commanddef>
@@ -548,32 +566,32 @@ are returnd, which doesn't work in all cases.</desc>
       <commanddef>
         <command><method>baseURI</method> <m>?URI?</m></command>
         <desc>Returns the present baseURI of the node. If the optional 
-argument URI is given, sets the base URI of the node and of all of its child
-nodes out of the same enitity as node to the given URI.</desc>
+argument URI is given, it sets the base URI of the node and of all of its child
+nodes out of the same entity as node to the given URI.</desc>
       </commanddef>
 
       <commanddef>
         <command><method>disableOutputEscaping</method> <m>?boolean?</m></command>
-        <desc>This method works only for text nodes; for every other nodes it
+        <desc>This method works only for text nodes; for every other node it
 returns error. Without the optional argument it returns, if disabling output
 escaping is on. The return value 0 means, the characters of the text node will
 be escaped, to generate valid XML, if serialized. This is the default for
 every parsed or created text node (with the exception of that text nodes in a
 result tree of an XSLT transformation, for which disabling output escaping was
-requested explicitely in the stylesheet). The return value 1 means, that output
+requested explicitly in the stylesheet). The return value 1 means, that output
 escaping is disabled for this text node. If such a text node is serialized
-(with asXML or asHTML), it is literarily written, without escaping of the
+(with asXML or asHTML), it is literally written, without escaping of the
 special XML characters. If the optional boolean value <m>boolean</m> is given,
-the flag is set accordingly. You should not set this flag to 1, until you
-really know, what you do.</desc>
+the flag is set accordingly. You should not set this flag to 1 until you
+really know what you do.</desc>
       </commanddef>
 
       <commanddef>
         <command><method>precedes</method> <m>refnode</m></command>
         <desc>Compares the relative order of the node and <m>refnode</m>. Both
 nodes must be part of the same documents and not out of the fragment list of
-the document. Returns true, if node is in document order (in the sense of the
-XPath 1.0 recommendation) before <m>refnode</m> and false otherwise.</desc>
+the document. Returns true if node is in document order (in the sense of the
+XPath 1.0 recommendation) before <m>refnode</m>, and false otherwise.</desc>
       </commanddef>
 
 
@@ -606,10 +624,10 @@ list consisting of parameter name and value pairs.</p>
 <p>If the option <m>-ignoreUndeclaredParameters</m> is given, then parameter
 names in the <m>parameterList</m> given to the <m>-parameters</m> options that
 are not declared as top-level parameters in the stylesheet are silently
-ignored. Without this option, an error is raised, if the user tries to set a
-top-level parameter, which is not declared in the stylesheet.</p>
+ignored. Without this option, an error is raised if the user tries to set a
+top-level parameter which is not declared in the stylesheet.</p>
 
-<p>The option <m>-maxApplyDepth</m> expects a positiv integer as
+<p>The option <m>-maxApplyDepth</m> expects a positive integer as
 argument. By default, the xslt engine allows xslt templates to nest up
 to 3000 levels (and raises error if they nest deeper). This limit can
 be set by the <m>-maxApplyDepth</m> option.</p>
@@ -618,12 +636,12 @@ be set by the <m>-maxApplyDepth</m> option.</p>
 in the stylesheet. The actual command consists of the script, given as argument
 to the option, appended with the XML Fragment from instantiating the
 xsl:message element content as string (as if the XPath string() function would
-have been applied to the XML Fragment) and a flag, which indicates, if the
+have been applied to the XML Fragment) and a flag, which indicates whether the
 xsl:message has an attribute "terminate" with the value "yes". If the
 called script returns anything else then TCL_OK then the xslt
 transformation will be aborted, returning error. If the called script
-returns -code break, the error message is empty, otherwise the result
-code is reported. In case of terminated transformation, the outputVar,
+returns -code break the error message is empty, otherwise the result
+code is reported. In case of terminated transformation the outputVar,
 if given, is set to the empty string.</p>
 </desc>
       </commanddef>

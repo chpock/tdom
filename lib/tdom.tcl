@@ -9,7 +9,7 @@
 #
 #
 #   The contents of this file are subject to the Mozilla Public License
-#   Version 1.1 (the "License"); you may not use this file except in
+#   Version 2.0 (the "License"); you may not use this file except in
 #   compliance with the License. You may obtain a copy of the License at
 #   http://www.mozilla.org/MPL/
 #
@@ -51,11 +51,12 @@ namespace eval ::dom {
     }
 }
 
-namespace eval ::tDOM { 
+namespace eval ::tdom { 
     variable extRefHandlerDebug 0
     variable useForeignDTD ""
 
-    namespace export xmlOpenFile xmlReadFile extRefHandler baseURL
+    namespace export xmlOpenFile xmlReadFile xmlReadFileForSimple \
+        extRefHandler baseURL
 }
 
 #----------------------------------------------------------------------------
@@ -640,7 +641,7 @@ proc ::dom::xpathFunc::system-property { ctxNode pos
 # 
 # Just add more mappings (and mail them to the tDOM mailing list, please).
 
-proc tDOM::IANAEncoding2TclEncoding {IANAName} {
+proc ::tdom::IANAEncoding2TclEncoding {IANAName} {
     
     # First the most widespread encodings with there
     # preferred MIME name, to speed lookup in this
@@ -657,7 +658,7 @@ proc tDOM::IANAEncoding2TclEncoding {IANAName} {
     switch [string tolower $IANAName] {
         "us-ascii"    {return ascii}
         "utf-8"       {return utf-8}
-        "utf-16"      {return unicode; # not sure about this}
+        "utf-16"      {return unicode}
         "iso-8859-1"  {return iso8859-1}
         "iso-8859-2"  {return iso8859-2}
         "iso-8859-3"  {return iso8859-3}
@@ -735,11 +736,18 @@ proc tDOM::IANAEncoding2TclEncoding {IANAName} {
 }
 
 #----------------------------------------------------------------------------
-#   xmlOpenFile
+#   xmlOpenFileWorker
 #
 #----------------------------------------------------------------------------
-proc tDOM::xmlOpenFile {filename {encodingString {}}} {
+proc ::tdom::xmlOpenFileWorker {filename {encodingString {}} {forSimple 0} {forRead 0}} {
 
+    # This partly (mis-)use the encoding of a channel handed to [dom
+    # parse -channel ..] as a marker: if the channel encoding is utf-8
+    # then behind the scene Tcl_Read() is used, otherwise
+    # Tcl_ReadChars(). This is used for the encodings understood (and
+    # checked) by the used expat implementation: utf-8 and utf-16 (in
+    # either byte order).
+    
     set fd [open $filename]
 
     if {$encodingString != {}} {
@@ -759,17 +767,31 @@ proc tDOM::xmlOpenFile {filename {encodingString {}}} {
     
     # First check for BOM
     switch [string range $firstBytes 0 3] {
-        "feff" -
-        "fffe" {
+        "feff" {
             # feff: UTF-16, big-endian BOM
-            # ffef: UTF-16, little-endian BOM
+            if {$forSimple || $forRead} {
+                error "UTF-16be is not supported"
+            }
             seek $fd 0 start
-            set encString UTF-16            
-            fconfigure $fd -encoding identity
+            set encString UTF-16be
+            fconfigure $fd -encoding utf-8
+            return $fd
+        }
+        "fffe" {
+            # ffef: UTF-16, little-endian BOM
+            set encString UTF-16le          
+            if {$forSimple || $forRead} {
+                seek $fd 2 start
+                fconfigure $fd -encoding unicode
+            } else {
+                seek $fd 0 start
+                fconfigure $fd -encoding utf-8
+            }
             return $fd
         }
     }
-
+    
+    
     # If the entity has a XML Declaration, the first four characters
     # must be "<?xm".
     switch $firstBytes {
@@ -814,13 +836,25 @@ proc tDOM::xmlOpenFile {filename {encodingString {}}} {
             # UCS-4
             error "UCS-4 not supported"
         }
-        "003c003f" -
-        "3c003f00" {
+            "003c003f" {
             # UTF-16, big-endian, no BOM
-            # UTF-16, little-endian, no BOM
+            if {$forSimple} {
+                error "UTF-16be is not supported by the simple parser"
+            }
             seek $fd 0 start
-            set encoding identity
-            set encString UTF-16
+            set encoding utf-8
+            set encString UTF-16be
+        }
+        "3c003f00" {
+            # UTF-16, little-endian, no BOM
+            if {$forSimple} {
+                seek $fd 2 start
+                set encoding unicode
+            } else {
+                seek $fd 0 start
+                set encoding utf-8
+            }
+            set encString UTF-16le          
         }
         "4c6fa794" {
             # EBCDIC in some flavor
@@ -829,7 +863,7 @@ proc tDOM::xmlOpenFile {filename {encodingString {}}} {
         default {
             # UTF-8 without an encoding declaration
             seek $fd 0 start
-            set encoding identity
+            set encoding utf-8
             set encString "UTF-8"
         }
     }
@@ -838,16 +872,46 @@ proc tDOM::xmlOpenFile {filename {encodingString {}}} {
 }
 
 #----------------------------------------------------------------------------
-#   xmlReadFile
+#   xmlOpenFile
 #
 #----------------------------------------------------------------------------
-proc tDOM::xmlReadFile {filename {encodingString {}}} {
+proc ::tdom::xmlOpenFile {filename {encodingString {}}} {
 
     if {$encodingString != {}} {
         upvar $encodingString encString
     }
     
-    set fd [xmlOpenFile $filename encString]
+    set fd [xmlOpenFileWorker $filename encString]
+    return $fd
+}
+
+#----------------------------------------------------------------------------
+#   xmlReadFile
+#
+#----------------------------------------------------------------------------
+proc ::tdom::xmlReadFile {filename {encodingString {}}} {
+
+    if {$encodingString != {}} {
+        upvar $encodingString encString
+    }
+    
+    set fd [xmlOpenFileWorker $filename encString 0 1]
+    set data [read $fd [file size $filename]]
+    close $fd 
+    return $data
+}
+
+#----------------------------------------------------------------------------
+#   xmlReadFileForSimple
+#
+#----------------------------------------------------------------------------
+proc ::tdom::xmlReadFileForSimple {filename {encodingString {}}} {
+
+    if {$encodingString != {}} {
+        upvar $encodingString encString
+    }
+    
+    set fd [xmlOpenFileWorker $filename encString 1]
     set data [read $fd [file size $filename]]
     close $fd 
     return $data
@@ -862,12 +926,12 @@ proc tDOM::xmlReadFile {filename {encodingString {}}} {
 #----------------------------------------------------------------------------
 
 if {![catch {package require uri}]} {
-    proc tDOM::extRefHandler {base systemId publicId} {
+    proc ::tdom::extRefHandler {base systemId publicId} {
         variable extRefHandlerDebug
         variable useForeignDTD
 
         if {$extRefHandlerDebug} {
-            puts stderr "tDOM::extRefHandler called with:"
+            puts stderr "::tdom::extRefHandler called with:"
             puts stderr "\tbase:     '$base'"
             puts stderr "\tsystemId: '$systemId'"
             puts stderr "\tpublicId: '$publicId'"
@@ -876,7 +940,7 @@ if {![catch {package require uri}]} {
             if {$useForeignDTD != ""} {
                 set systemId $useForeignDTD
             } else {
-                error "::tDOM::useForeignDTD does\
+                error "::tdom::useForeignDTD does\
                         not point to the foreign DTD"
             }
         }
@@ -884,6 +948,13 @@ if {![catch {package require uri}]} {
         array set uriData [uri::split $absolutURI]
         switch $uriData(scheme) {
             file {
+                if {$::tcl_platform(platform) eq "windows"} {
+                    # Strip leading / for drive based paths
+                    if {[string match /?:* $uriData(path)]} {
+                        set uriData(path) [string range $uriData(path) 1 end]
+                    }
+                }
+                # FIXME - path should be URL-decoded
                 return [list string $absolutURI [xmlReadFile $uriData(path)]]
             }
             default {
@@ -900,16 +971,43 @@ if {![catch {package require uri}]} {
 #   filename.
 #
 #----------------------------------------------------------------------------
+proc ::tdom::baseURL {path} {
+    # FIXME - path components need to be URL-encoded
 
-proc tDOM::baseURL {path} {
-    switch [file pathtype $path] {
-        "relative" {
-            return "file://[pwd]/$path"
-        }
-        default {
-            return "file://$path"
+    # Note [file join] will return path as is if it is already absolute.
+    # Also on Windows, it will change \ -> /. This is necessary because
+    # file URIs must always use /, never \.
+    set path [file join [pwd] $path]
+
+    if {$::tcl_platform(platform) ne "windows"} {
+        return "file://$path"
+    } else {
+        if {[string match //* $path]} {
+            # UNC path
+            return "file:$path"
+        } else {
+            # Drive based path
+            return "file:///$path"
         }
     }
+}
+
+namespace eval ::tDOM { 
+    variable extRefHandlerDebug 0
+    variable useForeignDTD ""
+
+    namespace export xmlOpenFile xmlReadFile xmlReadFileForSimple \
+        extRefHandler baseURL
+}
+
+foreach ::tdom::cmd {
+    xmlOpenFile
+    xmlReadFile
+    xmlReadFileForSimple
+    extRefHandler
+    baseURL
+} {
+    interp alias {} tDOM::$::tdom::cmd {} tdom::$::tdom::cmd
 }
 
 # EOF

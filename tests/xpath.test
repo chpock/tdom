@@ -203,7 +203,7 @@ test xpath-3.20 {Infinity divided by Infinity} {
     $root selectNodes {(2 div 0) div (3 div 0)}
 } {NaN}
 
-test xpath-3.21 {Infinity divided by postive number} {
+test xpath-3.21 {Infinity divided by positive number} {
     $root selectNodes {(2.7 div 0) div 23}
 } {Infinity}
 
@@ -211,7 +211,7 @@ test xpath-3.22 {Infinity divided by negative number} {
     $root selectNodes {(2.7 div 0) div -23}
 } {-Infinity}
 
-test xpath-3.23 {-Infinity divided by postive number} {
+test xpath-3.23 {-Infinity divided by positive number} {
     $root selectNodes {(-2.7 div 0) div 23}
 } {-Infinity}
 
@@ -340,7 +340,7 @@ test xpath-4.5 {tcl coded additional XPath function} {
 test xpath-4.6 {tcl coded additional XPath function - error reported} {
     catch {$root selectNodes {mycontains(., 'bo', 'ba')}} errMsg
     set errMsg
-} {Tcl error while executing XPATH extension function 'mycontains':
+} {Tcl error while executing XPath extension function 'mycontains':
 mycontains(): wrong # of args!}
 
 proc ::dom::xpathFunc::wrongreturn {ctxNode pos nodeListNode nodeList args} {
@@ -350,7 +350,7 @@ proc ::dom::xpathFunc::wrongreturn {ctxNode pos nodeListNode nodeList args} {
 test xpath-4.7 {tcl coded additional XPath function - unknown return type} {
     catch {$root selectNodes {wrongreturn('foo')}} errMsg
     set errMsg
-} {Unknown type of return value "footype" from tcl coded XPath function "wrongreturn"!}
+} {Unknown type of return value "footype" from Tcl coded XPath function "wrongreturn"!}
 
 proc ::dom::xpathFunc::returnnumber {ctxNode pos nodeListNode nodeList args} {
     return [list number "42"]
@@ -482,7 +482,7 @@ proc ::dom::xpathFunc::errorStack {ctxNode pos nodeListNode nodeList args} {
 test xpath-4.18 {error stack in tcl coded additional XPath function} {
     set result [catch {$root selectNodes errorStack()} errMsg]
     lappend result $errMsg
-} {1 {Tcl error while executing XPATH extension function 'errorStack':
+} {1 {Tcl error while executing XPath extension function 'errorStack':
 Some error}}
 
 proc ::dom::xpathFunc::stringReturn {args} {return x}
@@ -548,9 +548,9 @@ test xpath-5.1 {erroneous XPath expr: missing right brace in predicate} {
 } {1 {Predicate: Expected "RBRACKET" for '*[1' 
 
 Parsed symbols:
-     0 WCARDNAME        0 0.000e+00     0  *
-     1 LBRACKET         0 0.000e+00     1  
-     2 INTNUMBER        1 1.000e+00     2  }}
+     0 WCARDNAME        0 00000.000     0  *
+     1 LBRACKET         0 00000.000     1  
+     2 INTNUMBER        1 00001.000     2  }}
 
 test xpath-5.2 {erroneous XPath expr: missing right brace in predicate} {
     set result [catch {$root selectNodes {*[1][@attr}} errMsg]
@@ -558,12 +558,12 @@ test xpath-5.2 {erroneous XPath expr: missing right brace in predicate} {
 } {1 {Predicate: Expected "RBRACKET" for '*[1][@attr' 
 
 Parsed symbols:
-     0 WCARDNAME        0 0.000e+00     0  *
-     1 LBRACKET         0 0.000e+00     1  
-     2 INTNUMBER        1 1.000e+00     2  
-     3 RBRACKET         0 0.000e+00     3  
-     4 LBRACKET         0 0.000e+00     4  
-     5 ATTRIBUTE        0 0.000e+00     9  attr}}
+     0 WCARDNAME        0 00000.000     0  *
+     1 LBRACKET         0 00000.000     1  
+     2 INTNUMBER        1 00001.000     2  
+     3 RBRACKET         0 00000.000     3  
+     4 LBRACKET         0 00000.000     4  
+     5 ATTRIBUTE        0 00000.000     9  attr}}
 
 test xpath-5.3 {erroneous XPath expr: missing left brace in predicate} {
     catch {$root selectNodes {*1]}}
@@ -860,7 +860,7 @@ test xpath-5.34 {tcl var resolution in expr} {
     # non empty string is always true
     set node [$doc selectNodes {/doc/e[$which]}]
     set result [llength $node]
-    # If another xpath data type is needed, cast explictly
+    # If another xpath data type is needed, cast explicitly
     set node [$doc selectNodes {/doc/e[number($which)]}]
     lappend result [llength $node]
     lappend result [$node @att]
@@ -1074,13 +1074,13 @@ test xpath-5.46 {Element name injected with tcl variable - wrong xpath syntax} {
 } {1 {Predicate: Expected "RBRACKET" for 'a[b %nodeName='another value']' 
 
 Parsed symbols:
-     0 WCARDNAME        0 0.000e+00     0  a
-     1 LBRACKET         0 0.000e+00     1  
-     2 WCARDNAME        0 0.000e+00     2  b
--->  3 WCARDNAME        1 0.000e+00    12  with spaces
-     4 EQUAL            0 0.000e+00    13  
-     5 LITERAL          0 0.000e+00    28  another value
-     6 RBRACKET         0 0.000e+00    29  }}
+     0 WCARDNAME        0 00000.000     0  a
+     1 LBRACKET         0 00000.000     1  
+     2 WCARDNAME        0 00000.000     2  b
+-->  3 WCARDNAME        1 00000.000    12  with spaces
+     4 EQUAL            0 00000.000    13  
+     5 LITERAL          0 00000.000    28  another value
+     6 RBRACKET         0 00000.000    29  }}
 
 test xpath-5.47 {Element name injected with tcl variable} {
     set doc [dom parse -json {{"a":{"":"the value"},"a":{"":"another value"}}}]
@@ -1308,6 +1308,66 @@ test xpath-7.9 {Attribute node as context node of an id() call} -setup {
 } -cleanup {
     $doc delete
 } -result ""
+
+test xpath-7.10 {processing-instruction with literal argument} -setup {
+    set doc [dom parse {<h>
+        <?mypi whatever?>
+        <stuff>does not matter</stuff>
+        </h>
+    }]
+} -body {
+    $doc selectNodes //processing-instruction('dontexist')
+} -cleanup {
+    $doc delete
+} -result {}
+
+test xpath-7.11 {processing-instruction with literal argument} -setup {
+    set doc [dom parse {<h>
+        <?mypi whatever?>
+        <stuff>does not matter</stuff>
+        </h>
+    }]
+} -body {
+    [$doc selectNodes //processing-instruction('mypi')] asXML -indent none
+} -cleanup {
+    $doc delete
+} -result {<?mypi whatever?>}
+
+test xpath-7.12 {string value of processing-instruction} -setup {
+    set doc [dom parse {<h>
+        <?mypi whatever?>
+        <stuff>does not matter</stuff>
+        </h>
+    }]
+} -body {
+    $doc selectNodes string(//processing-instruction('mypi'))
+} -cleanup {
+    $doc delete
+} -result {whatever}
+
+test xpath-7.13 {string value of processing-instruction} -setup {
+    set doc [dom parse {<h>
+        <?mypi whatever  ?>
+        <stuff>does not matter</stuff>
+        </h>
+    }]
+} -body {
+    $doc selectNodes string(//processing-instruction('mypi'))
+} -cleanup {
+    $doc delete
+} -result "whatever  "
+
+test xpath-7.14 {local-name value of processing-instruction} -setup {
+    set doc [dom parse {<h>
+        <?mypi whatever  ?>
+        <stuff>does not matter</stuff>
+        </h>
+    }]
+} -body {
+    $doc selectNodes local-name(//processing-instruction('mypi'))
+} -cleanup {
+    $doc delete
+} -result {mypi}
 
 # cleanup
 ::tcltest::cleanupTests

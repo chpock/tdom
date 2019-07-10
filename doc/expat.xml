@@ -557,7 +557,7 @@ external subset, the parser will call the -externalentitycommand script with
 empty values for the systemId and publicID arguments. This option must be set,
 before the first piece of data is parsed. Setting this option, after the
 parsing has started has no effect. The default is not to use a foreign DTD. The
-default is restored, after reseting the parser. Pleace notice, that a
+default is restored, after resetting the parser. Pleace notice, that a
 -paramentityparsing value of "never" (which is the default) suppresses any call
 to the -externalentitycommand script. Pleace notice, that, if the document also
 doesn't have an internal subset, the -startdoctypedeclcommand and
@@ -598,11 +598,18 @@ named handler set is returned.</p>
         </commanddef>
 
         <commanddef>
-          <command><cmd>parser</cmd> <method>free</method></command>
+          <command><cmd>parser</cmd> <method>delete</method></command>
 
           <desc><p>Deletes the parser and the parser command. A parser cannot
-be freed from within one of its handler callbacks (neither directly nor
+be deleted from within one of its handler callbacks (neither directly nor
 indirectly) and will raise a tcl error in this case.</p></desc>
+        </commanddef>
+
+        <commanddef>
+          <command><cmd>parser</cmd> <method>free</method></command>
+
+          <desc><p>Another name to call the method <m>delete</m>, see
+          there.</p></desc>
         </commanddef>
 
         <commanddef>
@@ -695,7 +702,7 @@ of the parser to be used and will raise an error in this case.</p></desc>
           <command><cmd>parser</cmd> <method>reset</method></command>
 
           <desc><p>Resets the parser in preparation for parsing another
-document. A parser cannot be reseted from within one of its handler callbacks
+document. A parser cannot be reset from within one of its handler callbacks
 (neither directly nor indirectly) and will raise a tcl error in this
 cases.</p></desc>
         </commanddef>
@@ -736,6 +743,8 @@ code then parsing is canceled altogether, but no error is raised.</p>
 
     <keywords>
       <keyword>SAX</keyword>
+      <keyword>push</keyword>
+      <keyword>pushparser</keyword>
     </keywords>
   </manpage>
 

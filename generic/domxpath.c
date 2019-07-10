@@ -12,7 +12,7 @@
 |
 |
 |   The contents of this file are subject to the Mozilla Public License
-|   Version 1.1 (the "License"); you may not use this file except in
+|   Version 2.0 (the "License"); you may not use this file except in
 |   compliance with the License. You may obtain a copy of the License at
 |   http://www.mozilla.org/MPL/
 |
@@ -195,7 +195,7 @@ static char *astType2str[] = {
     "Int", "Real", "Mult", "Div", "Mod", "UnaryMinus", "IsNSElement",
     "IsNode", "IsComment", "IsText", "IsPI", "IsSpecificPI", "IsElement",
     "IsFQElement", "GetVar", "GetFQVar", "Literal", "ExecFunction", "Pred",
-    "EvalSteps", "SelectRoot", "CombineSets", "Add", "Substract", "Less",
+    "EvalSteps", "SelectRoot", "CombineSets", "Add", "Subtract", "Less",
     "LessOrEq", "Greater", "GreaterOrEq", "Equal", "NotEqual", "And", "Or",
     "IsNSAttr", "IsAttr", "AxisAncestor", "AxisAncestorOrSelf",
     "AxisAttribute", "AxisChild",
@@ -247,7 +247,7 @@ static int xpathEvalPredicate (ast steps, domNode *exprContext,
                                xpathCBs *cbs, int *docOrder, char **errMsg);
 
 /*----------------------------------------------------------------------------
-|   xpath result set functions
+|   XPath result set functions
 |
 \---------------------------------------------------------------------------*/
 
@@ -294,7 +294,7 @@ void rsPrint ( xpathResultSet *rs ) {
              for (i=0; i<rs->nr_nodes; i++) {
                  if (rs->nodes[i]->nodeType == ELEMENT_NODE) {
                      fprintf(stderr, "%2d domNode%p %s ",
-                             i, rs->nodes[i], rs->nodes[i]->nodeName);
+                             i, (void *)rs->nodes[i], rs->nodes[i]->nodeName);
                      if (rs->nodes[i]->firstChild &&
                          rs->nodes[i]->firstChild->nodeType == TEXT_NODE)
                      {
@@ -312,7 +312,7 @@ void rsPrint ( xpathResultSet *rs ) {
                      memcpy(tmp, ((domTextNode*)rs->nodes[i])->nodeValue, l);
                      tmp[l] = '\0';
                      fprintf(stderr, "%2d domNode%p text:'%s' \n",
-                             i, rs->nodes[i], tmp);
+                             i,  (void *)rs->nodes[i], tmp);
                  } else
                  if (rs->nodes[i]->nodeType == COMMENT_NODE) {
                      l = ((domTextNode*)rs->nodes[i])->valueLength;
@@ -322,7 +322,7 @@ void rsPrint ( xpathResultSet *rs ) {
                      memcpy(&tmp[4+l], "-->", 3);
                      tmp[7+l] = '\0';
                      fprintf(stderr, "%2d domNode%p text:'%s' \n",
-                             i, rs->nodes[i], tmp);
+                             i,  (void *)rs->nodes[i], tmp);
                  } else
                  if (rs->nodes[i]->nodeType == ATTRIBUTE_NODE) {
                      fprintf(stderr, "%2d Attr %s='%*s'\n", i,
@@ -1473,7 +1473,7 @@ Production(AdditiveExpr)
             a = New2( Add, a, Recurse(MultiplicativeExpr));
         } else {
             Consume(MINUS);
-            a = New2( Substract, a, Recurse(MultiplicativeExpr));
+            a = New2( Subtract, a, Recurse(MultiplicativeExpr));
         }
     }
 EndProduction
@@ -2317,7 +2317,7 @@ int xpathParse (
         memmove(*errMsg + len+6+newlen, "' ", 3);
 
         for (i=0; tokens[i].token != EOS; i++) {
-            sprintf(tmp, "%s\n%3s%3d %-12s %5ld %.3e %5d  ",
+            sprintf(tmp, "%s\n%3s%3d %-12s %5ld %09.3f %5d  ",
                          (i==0) ? "\n\nParsed symbols:" : "",
                          (i==l) ? "-->" : "   ",
                           i,
@@ -2376,7 +2376,10 @@ int xpathNodeTest (
                 (step->child->strvalue[1] == '\0') &&
                 (node->ownerDocument->rootNode != node) &&
                 (step->child->intvalue == 0)) return 1;
-            if (node->namespace) return 0;
+            if (node->namespace
+                && (node->ownerDocument->namespaces[node->namespace-1]->prefix[0] != '\0'
+                    || node->ownerDocument->namespaces[node->namespace-1]->uri[0] != '\0')
+                ) return 0;
             return (strcmp(node->nodeName, step->child->strvalue)==0);
         }
         return 0;
@@ -2432,10 +2435,11 @@ int xpathNodeTest (
         return (node->nodeType == PROCESSING_INSTRUCTION_NODE);
     } else
     if (step->child->type == IsSpecificPI) {
-        return (strncmp (((domProcessingInstructionNode*)node)->targetValue,
-                         step->child->strvalue,
-                         ((domProcessingInstructionNode*)node)->targetLength)
-            == 0);
+        return (node->nodeType == PROCESSING_INSTRUCTION_NODE
+                && strncmp (((domProcessingInstructionNode*)node)->targetValue,
+                            step->child->strvalue,
+                            ((domProcessingInstructionNode*)node)->targetLength)
+                    == 0);
     } else
     if (step->child->type == IsComment) {
         return (node->nodeType == COMMENT_NODE);
@@ -2478,14 +2482,14 @@ static double xpathStringToNumber (
        Just to use strtod() isn't sufficient for a few reasons:
        - strtod() accepts a leading - or +, but XPath allows only a
          leading -
-       - strtod() accepts the string represention of a hexadecimal
+       - strtod() accepts the string representation of a hexadecimal
          number, but XPath does not
        - strtod() accepts an optional exponent but XPath does not
        - strtod() accepts leading whitespace including \f and \v, but
          XPath doesn't allow this characters. Since this two
          characters are not legal XML characters, they can not be part
          of a DOM tree and therefor there isn't a problem with XPath
-         expressions on DOM trees or in XSLT. But on tcl level it's
+         expressions on DOM trees or in XSLT. But on Tcl level it's
          possible, to feed that characters literal into the XPath
          engine.
     */
@@ -2822,6 +2826,65 @@ int xpathRound (double r) {
 }
 
 /*----------------------------------------------------------------------------
+|   idSplitAndAdd
+|
+\---------------------------------------------------------------------------*/
+static void
+idSplitAndAdd (
+    char           *idStr,
+    Tcl_HashTable  *ids,
+    xpathResultSet *result
+    ) 
+{
+    int            pwhite;
+    char          *pfrom, *pto;
+    Tcl_HashEntry *entryPtr;
+    domNode       *node;
+    
+    pwhite = 0;
+    pfrom = pto = idStr;
+    while (*pto) {
+        switch (*pto) {
+        case ' ' : case '\n': case '\r': case '\t':
+            if (pwhite) {
+                pto++;
+                continue;
+            }
+            *pto = '\0';
+            entryPtr = Tcl_FindHashEntry (ids, pfrom);
+            if (entryPtr) {
+                node = (domNode*) Tcl_GetHashValue (entryPtr);
+                /* Don't report nodes out of the fragment list */
+                if (node->parentNode != NULL ||
+                    (node == node->ownerDocument->documentElement)) {
+                    rsAddNode (result, node);
+                }
+            }
+            pwhite = 1;
+            pto++;
+            continue;
+        default:
+            if (pwhite) {
+                pfrom = pto;
+                pwhite = 0;
+            }
+            pto++;
+        }
+    }
+    if (!pwhite) {
+        entryPtr = Tcl_FindHashEntry (ids, pfrom);
+        if (entryPtr) {
+            node = (domNode*) Tcl_GetHashValue (entryPtr);
+            /* Don't report nodes out of the fragment list */
+            if (node->parentNode != NULL ||
+                (node == node->ownerDocument->documentElement)) {
+                rsAddNode (result, node);
+            }
+        }
+    }
+}
+
+/*----------------------------------------------------------------------------
 |   xpathEvalFunction
 |
 \---------------------------------------------------------------------------*/
@@ -2855,15 +2918,11 @@ xpathEvalFunction (
     char            *leftStr = NULL, *rightStr = NULL;
     const char      *str;
     Tcl_DString      dStr;
-#if TclOnly8Bits
-    char            *fStr;
-#else
     int              found, j;
     int              lenstr, fromlen, utfCharLen;
     char             utfBuf[TCL_UTF_MAX];
     Tcl_DString      tstr, tfrom, tto, tresult;
     Tcl_UniChar     *ufStr, *upfrom, unichar;
-#endif
 
     switch (step->intvalue) {
 
@@ -2980,9 +3039,6 @@ xpathEvalFunction (
         if      (step->intvalue == f_string)
             rsSetString (result, leftStr);
         else if (step->intvalue == f_stringLength) {
-#if TclOnly8Bits            
-            rsSetInt (result, strlen(leftStr));
-#else
             pto = leftStr;
             len = 0;
             while (*pto) {
@@ -2997,7 +3053,6 @@ xpathEvalFunction (
                 pto += i;
             }
             rsSetInt (result, len);
-#endif
         }
         else {
             pwhite = 1;
@@ -3077,62 +3132,12 @@ xpathEvalFunction (
         if (leftResult.type == xNodeSetResult) {
             for (i=0; i < leftResult.nr_nodes; i++) {
                 leftStr = xpathFuncStringForNode (leftResult.nodes[i]);
-                entryPtr = Tcl_FindHashEntry (ids, leftStr);
-                if (entryPtr) {
-                    node = (domNode*) Tcl_GetHashValue (entryPtr);
-                    /* Don't report nodes out of the fragment list */
-                    if (node->parentNode != NULL ||
-                        (node == node->ownerDocument->documentElement)) {
-                        rsAddNode (result, node);
-                    }
-                }
+                idSplitAndAdd (leftStr, ids, result);
                 FREE(leftStr);
-                /*xpathRSFree (&newNodeList);*/
             }
         } else {
             leftStr = xpathFuncString (&leftResult);
-            from = 0;
-            pwhite = 0;
-            pfrom = pto = leftStr;
-            while (*pto) {
-                switch (*pto) {
-                case ' ' : case '\n': case '\r': case '\t':
-                    if (pwhite) {
-                        pto++;
-                        continue;
-                    }
-                    *pto = '\0';
-                    entryPtr = Tcl_FindHashEntry (ids, pfrom);
-                    if (entryPtr) {
-                        node = (domNode*) Tcl_GetHashValue (entryPtr);
-                        /* Don't report nodes out of the fragment list */
-                        if (node->parentNode != NULL ||
-                            (node == node->ownerDocument->documentElement)) {
-                            rsAddNode (result, node);
-                        }
-                    }
-                    pwhite = 1;
-                    pto++;
-                    continue;
-                default:
-                    if (pwhite) {
-                        pfrom = pto;
-                        pwhite = 0;
-                    }
-                    pto++;
-                }
-            }
-            if (!pwhite) {
-                entryPtr = Tcl_FindHashEntry (ids, pfrom);
-                if (entryPtr) {
-                    node = (domNode*) Tcl_GetHashValue (entryPtr);
-                    /* Don't report nodes out of the fragment list */
-                    if (node->parentNode != NULL ||
-                        (node == node->ownerDocument->documentElement)) {
-                        rsAddNode (result, node);
-                    }
-                }
-            }
+            idSplitAndAdd (leftStr, ids, result);
             FREE(leftStr);
         }
         sortByDocOrder (result);
@@ -3405,30 +3410,9 @@ xpathEvalFunction (
             }
         } else {
             if (from < 0) from = 0;
-#if TclOnly8Bits
-            len = strlen(leftStr) - from;
-#else
             len = INT_MAX;
-#endif
         }
 
-#if TclOnly8Bits
-        if (from >= (int) strlen(leftStr)) {
-            rsSetString (result, "");
-            FREE(leftStr);
-            return XPATH_OK;
-        } else {
-            if ( (len == INT_MAX) || ((from + len) > (int) strlen(leftStr)) ) {
-                len =  strlen(leftStr) - from;
-            }
-        }
-        DBG(fprintf(stderr, "substring leftStr='%s' from=%d len=%d \n",
-                    leftStr, from, len);
-            )
-
-            *(leftStr+from+len) = '\0';
-        rsSetString (result, (leftStr+from));
-#else 
         pfrom = leftStr;
         while (*pfrom && (from > 0)) {
             i = UTF8_CHAR_LEN (*pfrom);
@@ -3457,7 +3441,6 @@ xpathEvalFunction (
             *pto = '\0';
         }
         rsSetString (result, pfrom);
-#endif
         FREE(leftStr);
         break;
 
@@ -3485,24 +3468,6 @@ xpathEvalFunction (
         replaceStr = xpathFuncString( &replaceResult );
 
 
-#if TclOnly8Bits
-        len = strlen(replaceStr);
-        pfrom = pto = leftStr;
-        while (*pfrom) {
-            fStr = strchr(rightStr, *pfrom);
-            if (fStr == NULL) {
-                *pto++ = *pfrom;
-            } else {
-                i = (fStr - rightStr);
-                if (i < len) {
-                    *pto++ = *(replaceStr+i);
-                }
-            }
-            pfrom++;
-        }
-        *pto = '\0';
-        rsSetString (result, leftStr);
-#else
         Tcl_DStringInit (&tstr);
         Tcl_DStringInit (&tfrom);
         Tcl_DStringInit (&tto);
@@ -3544,7 +3509,6 @@ xpathEvalFunction (
         Tcl_DStringFree (&tfrom);
         Tcl_DStringFree (&tto);
         Tcl_DStringFree (&tresult);
-#endif
 
         xpathRSFree( &replaceResult );
         xpathRSFree( &rightResult   );
@@ -3638,9 +3602,9 @@ xpathEvalFunction (
                     attr = attr->nextSibling;
                     i++;
                 }
-                sprintf(tmp,"id%p-%d", node, i);
+                sprintf(tmp,"id%p-%d", (void *)node, i);
             } else {
-                sprintf(tmp,"id%p", leftResult.nodes[0]);
+                sprintf(tmp,"id%p", (void *)leftResult.nodes[0]);
             }
             rsSetString (result, tmp);
         } else
@@ -3943,7 +3907,7 @@ static int xpathEvalStep (
             CHECK_RC;
             break;
         }
-        /* whithout following Pred step, // is the same as 
+        /* without following Pred step, // is the same as 
            AxisDescendantOrSelf, fall throu */
 
     case AxisDescendantLit:
@@ -4378,7 +4342,7 @@ static int xpathEvalStep (
         break;
 
     case Add:
-    case Substract:
+    case Subtract:
     case Mult:
     case Div:
     case Mod:
@@ -4423,7 +4387,7 @@ static int xpathEvalStep (
                 rsSetNaN (result);
             } else {
                 switch (step->type) {
-                case Substract:
+                case Subtract:
                     NaN1 = -1 * NaN1;
                     /* fall throu */   
                 case Add:
@@ -4472,7 +4436,7 @@ static int xpathEvalStep (
         }
         switch (step->type) {
         case Add:       rsSetReal (result, dLeft + dRight); break;
-        case Substract: rsSetReal (result, dLeft - dRight); break;
+        case Subtract: rsSetReal (result, dLeft - dRight); break;
         case Mult:      rsSetReal (result, dLeft * dRight); break;
         case Div:
             if (dRight == 0.0) {
@@ -4843,7 +4807,7 @@ static int xpathEvalStep (
                 }
                 break;
             case BoolResult:
-                /* pleftResult is a non-emtpy nodeset, therefor: */
+                /* pleftResult is a non-empty nodeset, therefor: */
                 dLeft = 1.0;
                 dRight = xpathFuncNumber (prightResult, &NaN);
                 if (NaN) break;
@@ -5747,11 +5711,13 @@ double xpathGetPrio (
                 return 0.0;
             }
         } else
+        if (steps->type == IsSpecificPI) {
+            return 0.0;
+        } else 
         if ( steps->type == IsNode
              || steps->type == IsText
              || steps->type == IsPI
              || steps->type == IsComment
-             || steps->type == IsSpecificPI
             ) {
             return -0.5;
         } else 
