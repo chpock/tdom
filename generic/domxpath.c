@@ -677,7 +677,7 @@ static XPathTokens xpathLexer (
 {
     int  l, allocated;
     int  i, k, start, offset;
-    char delim, *ps, save, tmpErr[80];
+    char delim, *ps, save, tmpErr[80], *tailptr;
     const char *uri;
     XPathTokens tokens;
     int token = EOS;
@@ -1111,8 +1111,14 @@ static XPathTokens xpathLexer (
                                    token = REALNUMBER;
                                }
                            }
-                           tokens[l].realvalue = (double)atof(ps);
+                           tokens[l].realvalue = strtod(ps, &tailptr);
                            xpath[i--] = save;
+                           if (tokens[l].realvalue == 0.0 && tailptr == ps) {
+                               sprintf (tmpErr, "Number value too large "
+                                        "at position %d", i);
+                               *errMsg = tdomstrdup (tmpErr);
+                               return tokens;
+                           }
                        } else {
                            sprintf (tmpErr, "Unexpected character '%c' at "
                                     "position %d", xpath[i], i);
@@ -2272,7 +2278,7 @@ int xpathParse (
     XPathTokens tokens;
     int  i, l, len, newlen, slen;
     int  useNamespaceAxis = 0;
-    char tmp[200];
+    char tmp[900];
 
     DDBG(fprintf(stderr, "\nLex output following tokens for '%s':\n", xpath);)
     *errMsg = NULL;
