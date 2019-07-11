@@ -548,9 +548,9 @@ test xpath-5.1 {erroneous XPath expr: missing right brace in predicate} {
 } {1 {Predicate: Expected "RBRACKET" for '*[1' 
 
 Parsed symbols:
-     0 WCARDNAME        0 00000.000     0  *
-     1 LBRACKET         0 00000.000     1  
-     2 INTNUMBER        1 00001.000     2  }}
+     0 WCARDNAME        0 000000000     0  *
+     1 LBRACKET         0 000000000     1  
+     2 INTNUMBER        1 000000001     2  }}
 
 test xpath-5.2 {erroneous XPath expr: missing right brace in predicate} {
     set result [catch {$root selectNodes {*[1][@attr}} errMsg]
@@ -558,12 +558,12 @@ test xpath-5.2 {erroneous XPath expr: missing right brace in predicate} {
 } {1 {Predicate: Expected "RBRACKET" for '*[1][@attr' 
 
 Parsed symbols:
-     0 WCARDNAME        0 00000.000     0  *
-     1 LBRACKET         0 00000.000     1  
-     2 INTNUMBER        1 00001.000     2  
-     3 RBRACKET         0 00000.000     3  
-     4 LBRACKET         0 00000.000     4  
-     5 ATTRIBUTE        0 00000.000     9  attr}}
+     0 WCARDNAME        0 000000000     0  *
+     1 LBRACKET         0 000000000     1  
+     2 INTNUMBER        1 000000001     2  
+     3 RBRACKET         0 000000000     3  
+     4 LBRACKET         0 000000000     4  
+     5 ATTRIBUTE        0 000000000     9  attr}}
 
 test xpath-5.3 {erroneous XPath expr: missing left brace in predicate} {
     catch {$root selectNodes {*1]}}
@@ -1074,13 +1074,13 @@ test xpath-5.46 {Element name injected with tcl variable - wrong xpath syntax} {
 } {1 {Predicate: Expected "RBRACKET" for 'a[b %nodeName='another value']' 
 
 Parsed symbols:
-     0 WCARDNAME        0 00000.000     0  a
-     1 LBRACKET         0 00000.000     1  
-     2 WCARDNAME        0 00000.000     2  b
--->  3 WCARDNAME        1 00000.000    12  with spaces
-     4 EQUAL            0 00000.000    13  
-     5 LITERAL          0 00000.000    28  another value
-     6 RBRACKET         0 00000.000    29  }}
+     0 WCARDNAME        0 000000000     0  a
+     1 LBRACKET         0 000000000     1  
+     2 WCARDNAME        0 000000000     2  b
+-->  3 WCARDNAME        1 000000000    12  with spaces
+     4 EQUAL            0 000000000    13  
+     5 LITERAL          0 000000000    28  another value
+     6 RBRACKET         0 000000000    29  }}
 
 test xpath-5.47 {Element name injected with tcl variable} {
     set doc [dom parse -json {{"a":{"":"the value"},"a":{"":"another value"}}}]
@@ -1184,6 +1184,12 @@ test xpath-5.57 {afl-fuzz found seg fault in reporting error in invalid expr} {
     set doc [dom createDocument doc]
     catch {$doc selectNodes /[string repeat 1 2500]}
     catch {$doc selectNodes /[string repeat 1 250]}
+    $doc delete
+} {}
+
+test xpath-5.58 {afl-fuzz found seg fault in reporting error in invalid expr} {
+    set doc [dom createDocument doc]
+    catch {$doc selectNodes concat([string repeat 1 250],1,1)}
     $doc delete
 } {}
 

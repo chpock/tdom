@@ -2724,7 +2724,7 @@ char * xpathFuncString (
                 if (IS_INF (rs->realvalue) == 1) return tdomstrdup ("Infinity");
                 else                             return tdomstrdup ("-Infinity");
             }
-            sprintf(tmp, "%f", rs->realvalue);
+            sprintf(tmp, "%g", rs->realvalue);
             /* strip trailing 0 and . */
             len = strlen(tmp);
             for (; (len > 0) && (tmp[len-1] == '0'); len--) tmp[len-1] = '\0';
