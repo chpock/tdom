@@ -1,5 +1,5 @@
-C An\sexample\sof\sdifferent\s'styles'\sof\sa\scertain\stype:\sThe\s'interger'\stext\sconstraint\snow\shas\stwo\sinterpretation\sof\san\sinteger\s-\swhat\sTcl_GetInt()\saccept\sand\swhat\sa\svalid\sxsd:integer\sis,\swhich\sis\squite\sdifferent.
-D 2019-06-18T22:18:39.260
+C Merged\sfrom\strunk.
+D 2019-07-12T22:26:12.688
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -56,7 +56,7 @@ F doc/tnc.xml f6d0115fbfac8393343b46e6fd1bba50deba17bc
 F expat/COPYING 1830cf88edd943aadba8ca7504d45113ca3431a2
 F expat/Changes 42c8d3621daa157ddc7018f83ac2303bab80d046
 F expat/README.md db185b4460bdcb21457e69f6e19a2d47573c3d39
-F expat/VERSION dd88aa7f5e0d19b28b550eb6f66a24d4ccf78300
+F expat/VERSION d83051ab4bdcc407a019a3f9c9b1a167ba698b549e57193bed57ebb86c27883b
 F expat/ascii.h 1309911caa8cff77c75576b8a03c36d547ecb5c3
 F expat/asciitab.h 3b70cd06ad474e1dcefcc540735ec12747cd2fa9
 F expat/expat.h d443adc9849af816665814b5b4da3c6955f438588e1f834543816c81e3b8c820
@@ -127,9 +127,9 @@ F generic/domhtml5.h 5cca562a556e7662f2dce222640c32abb2777146
 F generic/domjson.c 1c33b0f4a2f022b69ae3d39f908081fa9724b75213a1b7f425cc0f093742dd64
 F generic/domjson.h b10c42af9ef7fc9d0ad4fac733ef6461df0cdd90
 F generic/domlock.c 54944f25f27ae220fc46cc2ac33d57b04500724c24c04eb59806126f13520fab
-F generic/domxpath.c 078d9fea7701b4806f8b71d4b54136476a1d61808d768da24bb49adcc824597f
+F generic/domxpath.c 1fc938eeaa3b46b6a1dd2e49d9a2093fcdd56c1a19049044e8c79ad9aad7da06
 F generic/domxpath.h e00008ab268aaf052110a70db988f51fd45ba213c9b73fd1055340a080e5ea2f
-F generic/domxslt.c 8b8f2424c1480da3a077dfdb48305977a16e766d2ec8258130ce4a1314411ca0
+F generic/domxslt.c 870e1f136cd9d490074295385eaadaa8ce366c4e98858b0059ad8e65ff9c7a4d
 F generic/domxslt.h 140fa73765d699bfced9554c2c6439c0d2e6695eec3a8e69e1d25c0bbdf28fc6
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c abf69665ad49ed053885f7e7459d47be5abb057ba4ed919e96e83d636b016a30
@@ -211,8 +211,8 @@ F tests/tdomcmd.test 092401adf0609906d710f3ef8997cb4ca29bc208
 F tests/xmlsimple.test bde808880ddcf0f8ba0b049da0f2258e332af11ddf43a3480f089d53e77c6e0d
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.bench 99e98467544b11bf625e6f72b2fb89c7516bfced
-F tests/xpath.test af08a3b18b5550765a167b9a01b48fa751ede7de32ac1c72b90b52a5df43e671
-F tests/xslt.test 495f9d797460470b7150e1e993e9cd1de76cbbf5c46855b5d9d6bdbf1d1411f6
+F tests/xpath.test 7636f8032fa4eb17beeb554e1fd07e472ea35c9092bb914b6d8e7b007be64a79
+F tests/xslt.test 35a5408426b098bcc07bdecfb52f1ec4c8ac3e984224ba497e700420047621a4
 F unix/CONFIG 431b82a51451df40e38261b91e1a37060797ef655e8f981fab761de59f1e01e9
 F unix/speed-check.sh 7a8d91e7edf1cdc9bcfad5f28e1a068cb2843d05e49d8bd89d9b30a46511497d
 F unix/tclAppInit.c df2bcb1b98ffead12f8a55d0e084f780fef9ec21e9597a9bab1aaefb2f7c3a60
@@ -230,8 +230,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 8e9437ea75cd78cdc5cd6f2230ca8f80a1d45140e0154f35c26b25ecf4346a04
-R 25ec044cf321e4f9140567a940dc6152
+P 9a589897fb91e7aa6f9ec30c37ead4aa30d9115a47e3aaacc69336d76390ebca 7cf8bdeb6c518974f1281ab90cfd329002d694f514512fb422425de4d380f4a6
+R 52028e1a6f407c8d52040f6376071a0d
 U rolf
-Z 01a106367df5453ab6e6ec41b3695db4
+Z 9aff7bd9c785cc724f05b79fb05f538a
 # Remove this line to create a well-formed Fossil manifest.
