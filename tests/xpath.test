@@ -1196,7 +1196,7 @@ test xpath-5.58 {afl-fuzz found seg fault in reporting error in invalid expr} {
 test xpath-5.59 {afl-fuzz found floating point exception in mod calulation} {
     set doc [dom createDocument doc]
     set result [list]
-    lappend result [$doc selectNodes "1111111111111 mod -1"]
+    lappend result [$doc selectNodes "1111111111 mod -1"]
     lappend result [$doc selectNodes "111111111111111111111111111111111111111 mod -1"]
     $doc delete
     set result
