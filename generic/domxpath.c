@@ -677,7 +677,7 @@ static XPathTokens xpathLexer (
 {
     int  l, allocated;
     int  i, k, start, offset;
-    char delim, *ps, save, tmpErr[80];
+    char delim, *ps, save, tmpErr[80], *tailptr;
     const char *uri;
     XPathTokens tokens;
     int token = EOS;
@@ -1111,8 +1111,14 @@ static XPathTokens xpathLexer (
                                    token = REALNUMBER;
                                }
                            }
-                           tokens[l].realvalue = (double)atof(ps);
+                           tokens[l].realvalue = strtod(ps, &tailptr);
                            xpath[i--] = save;
+                           if (tokens[l].realvalue == 0.0 && tailptr == ps) {
+                               sprintf (tmpErr, "Number value too large "
+                                        "at position %d", i);
+                               *errMsg = tdomstrdup (tmpErr);
+                               return tokens;
+                           }
                        } else {
                            sprintf (tmpErr, "Unexpected character '%c' at "
                                     "position %d", xpath[i], i);
@@ -2284,7 +2290,7 @@ int xpathParse (
     }
     DDBG(
         for (i=0; tokens[i].token != EOS; i++) {
-            fprintf(stderr, "%3d %-12s %5ld %8.3f %5d  %s\n",
+            fprintf(stderr, "%3d %-12s %5ld %8.3g %5d  %s\n",
                             i,
                             token2str[tokens[i].token-LPAR],
                             tokens[i].intvalue,
@@ -2317,7 +2323,7 @@ int xpathParse (
         memmove(*errMsg + len+6+newlen, "' ", 3);
 
         for (i=0; tokens[i].token != EOS; i++) {
-            sprintf(tmp, "%s\n%3s%3d %-12s %5ld %09.3f %5d  ",
+            sprintf(tmp, "%s\n%3s%3d %-12s %5ld %09.3g %5d  ",
                          (i==0) ? "\n\nParsed symbols:" : "",
                          (i==l) ? "-->" : "   ",
                           i,
@@ -2718,7 +2724,7 @@ char * xpathFuncString (
                 if (IS_INF (rs->realvalue) == 1) return tdomstrdup ("Infinity");
                 else                             return tdomstrdup ("-Infinity");
             }
-            sprintf(tmp, "%f", rs->realvalue);
+            sprintf(tmp, "%g", rs->realvalue);
             /* strip trailing 0 and . */
             len = strlen(tmp);
             for (; (len > 0) && (tmp[len-1] == '0'); len--) tmp[len-1] = '\0';
