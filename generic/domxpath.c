@@ -4463,7 +4463,14 @@ static int xpathEvalStep (
             if ((int)dRight == 0) {
                 rsSetNaN (result);
             } else {
-                rsSetInt  (result, ((int)dLeft) % ((int)dRight));
+                if (dRight < LONG_MIN - 0.1
+                    || dRight > LONG_MAX + 0.1
+                    || dLeft < LONG_MIN - 0.1
+                    || dLeft > LONG_MAX + 0.1) {
+                    rsSetNaN (result);
+                } else {
+                    rsSetInt  (result, ((long)dLeft) % ((long)dRight));
+                }
             }
             break;
         default:        break;

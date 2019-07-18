@@ -1193,6 +1193,30 @@ test xpath-5.58 {afl-fuzz found seg fault in reporting error in invalid expr} {
     $doc delete
 } {}
 
+test xpath-5.59 {afl-fuzz found floating point exception in mod calulation} {
+    set doc [dom createDocument doc]
+    set result [list]
+    lappend result [$doc selectNodes "1111111111 mod -1"]
+    lappend result [$doc selectNodes "111111111111111111111111111111111111111 mod -1"]
+    $doc delete
+    set result
+} {0 NaN}
+
+test xpath-5.60 {afl-fuzz found floating point exception in mod calulation} {
+    set doc [dom createDocument doc]
+    set result [list]
+    for {set i 1} {$i < 20} {incr i} {
+        for {set j 1} {$j < 20} {incr j} {
+            set this [$doc selectNodes "$i mod $j"]
+            if {$this != ($i % $j)} {
+                lappend result [list $i $j $this [expr "$i % $j"]]
+            }
+        }
+    }
+    $doc delete
+    set result
+} {}
+
 set doc [dom parse {
 <root>
   <asub>asub2</asub>
