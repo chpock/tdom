@@ -1,5 +1,5 @@
-C Modified\stest\sto\swork\sas\sintended\son\s32-bit\salso.\sFixes\s[156ce3b130e8].
-D 2019-07-16T20:47:48.275
+C Added\stest\scases.
+D 2019-07-19T23:49:56.017
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -202,7 +202,7 @@ F tests/tdomcmd.bench b07448ed4de08ccaa9734cf3fe15c695fd7066c993da58ff48d4657479
 F tests/tdomcmd.test 092401adf0609906d710f3ef8997cb4ca29bc208
 F tests/xmlsimple.test bde808880ddcf0f8ba0b049da0f2258e332af11ddf43a3480f089d53e77c6e0d
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
-F tests/xpath.bench 99e98467544b11bf625e6f72b2fb89c7516bfced
+F tests/xpath.bench 96e9d0bf09ad46dea4a4dfe47e01e48844b5535845a4da12980d4ced8774eeba
 F tests/xpath.test 356f9014ba0dfda6c11ca9cb78e8a1488163aaad4b8661d46d7b5070dd809a27
 F tests/xslt.test 35a5408426b098bcc07bdecfb52f1ec4c8ac3e984224ba497e700420047621a4
 F unix/CONFIG 431b82a51451df40e38261b91e1a37060797ef655e8f981fab761de59f1e01e9
@@ -222,8 +222,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 7cf8bdeb6c518974f1281ab90cfd329002d694f514512fb422425de4d380f4a6
-R 934dd35ef98020361ba7973e594ccffe
+P 4aa07a679d6a190d6e520864eab106effa25146720b317b7efcbbd5244c0f155
+R e5e5db85f45e0b8938d6f60b151645ba
 U rolf
-Z a87e07b17ac35bc26ecfc1372aee62a1
+Z d9c439445885ae0a3c1316c00cadc20a
 # Remove this line to create a well-formed Fossil manifest.
