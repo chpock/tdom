@@ -93,8 +93,28 @@ foreach nrOf {1 10 50 100} {
                 e1
             }
         }
+        $root selectNodes -cache 1 string(e1)
     } -body {
-        $root selectNodes string(e1)
+        $root selectNodes -cache 1 string(e1)
+    } -post {
+        $doc delete
+    }
+
+}
+
+foreach nrOf {1 10 50 100} {
+
+    bench -desc "count(<nodeset with $nrOf nodes>)" -pre {
+        dom createDocument root doc
+        $doc documentElement root
+        $root appendFromScript {
+            for {set x 0} {$x < $nrOf} {incr x} {
+                e1
+            }
+        }
+        $root selectNodes -cache 1 count(e1)
+    } -body {
+        $root selectNodes -cache 1 count(e1)
     } -post {
         $doc delete
     }
