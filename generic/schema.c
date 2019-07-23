@@ -2660,10 +2660,11 @@ schemaInstanceInfoCmd (
     Tcl_Obj *resultObj, *elmObj;
     
     static const char *schemaInstanceInfoMethods[] = {
-        "defelements", "stack", NULL
+        "validationstate", "vstate", "defelements", "stack", "toplevel",
+        NULL
     };
     enum schemaInstanceInfoMethod {
-        m_defelements, m_stack
+        m_validationstate, m_vstate, m_defelements, m_stack, m_toplevel
     };
 
     static const char *schemaInstanceInfoStackMethods[] = {
@@ -2686,6 +2687,24 @@ schemaInstanceInfoCmd (
     
     Tcl_ResetResult (interp);
     switch ((enum schemaInstanceInfoMethod) methodIndex) {
+    case m_validationstate:
+    case m_vstate:
+        switch (sdata->validationState) {
+        case VALIDATION_READY:
+            SetResult ("READY");
+            break;
+        case VALIDATION_STARTED:
+            SetResult ("VALIDATING");
+            break;
+        case VALIDATION_FINISHED:
+            SetResult ("FINISHED");
+            break;
+        default:
+            SetResult ("Internal error: Invalid validation state");
+            return TCL_ERROR;
+        }
+        break;
+        
     case m_defelements:
         if (objc != 2) {
             Tcl_WrongNumArgs (interp, 1, objv, "defelements");
@@ -2730,6 +2749,20 @@ schemaInstanceInfoCmd (
             break;
         }
         
+    case m_toplevel:
+        if (objc != 2) {
+            Tcl_WrongNumArgs (interp, 1, objv, "no argument expected");
+            return TCL_ERROR;
+        }
+        if (!sdata->currentEvals) {
+            SetResult ("not called while schema evaluation");
+            return TCL_ERROR;
+        }
+        if (!sdata->defineToplevel && sdata->currentEvals > 1) {
+            SetBooleanResult (0);
+        } else {
+            SetBooleanResult (1);
+        }
     }
     
     return TCL_OK;
@@ -2757,16 +2790,15 @@ schemaInstanceCmd (
     domNode       *node;
 
     static const char *schemaInstanceMethods[] = {
-        "defelement", "defpattern",  "start",   "event", "delete",
-        "nrForwardDefinitions",      "state",   "reset", "define",
-        "validate",   "domvalidate", "deftext", "info",  "reportcmd",
-        "prefixns",   NULL
+        "defelement",  "defpattern",  "start", "event",     "delete",
+        "nrForwardDefinitions",       "reset", "define",    "validate",
+        "domvalidate", "deftext",     "info",  "reportcmd", "prefixns",
+        NULL
     };
     enum schemaInstanceMethod {
-        m_defelement,  m_defpattern,  m_start,   m_event, m_delete,
-        m_nrForwardDefinitions,       m_state,   m_reset, m_define,
-        m_validate,    m_domvalidate, m_deftext, m_info,  m_reportcmd,
-        m_prefixns
+        m_defelement,  m_defpattern, m_start, m_event,     m_delete,
+        m_nrForwardDefinitions,      m_reset, m_define,    m_validate,
+        m_domvalidate, m_deftext,    m_info,  m_reportcmd, m_prefixns
     };
 
     static const char *eventKeywords[] = {
@@ -3041,23 +3073,6 @@ schemaInstanceCmd (
             return TCL_ERROR;
         }
         SetIntResult(sdata->forwardPatternDefs);
-        break;
-
-    case m_state:
-        switch (sdata->validationState) {
-        case VALIDATION_READY:
-            SetResult ("READY");
-            break;
-        case VALIDATION_STARTED:
-            SetResult ("VALIDATING");
-            break;
-        case VALIDATION_FINISHED:
-            SetResult ("FINISHED");
-            break;
-        default:
-            SetResult ("Internal error: Invalid validation state");
-            return TCL_ERROR;
-        }
         break;
 
     case m_reset:
@@ -5403,6 +5418,9 @@ tDOM_SchemaInit (
     Tcl_Interp *interp
     )
 {
+    Tcl_CreateObjCommand (interp, "tdom::schema", tDOM_SchemaObjCmd,
+                          NULL, NULL);
+
     /* Inline definition commands. */
     Tcl_CreateObjCommand (interp, "tdom::schema::defelement",
                           schemaInstanceCmd, NULL, NULL);

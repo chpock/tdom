@@ -17,6 +17,10 @@
 #    schema-14.*: text
 #    schema-15.*: Constraint cmd tcl
 #    schema-16.*: interleave
+#    schema-17.*: info
+#    schema-18.*: reportcmd
+#    schema-19.*: keyspace
+#    schema-20.*: domunique
 #
 # Copyright (c) 2018 Rolf Ade.
 
@@ -689,21 +693,21 @@ test schema-4.1 {validation} {
     pullValidate grammar {
         <doc><e1/></doc>
     }
-    if {[grammar state] ne "FINISHED"} {
+    if {[grammar info vstate] ne "FINISHED"} {
         error "Wrong state."
     }
     grammar reset
     pullValidate grammar {
         <doc><e1/><e2/></doc>
     }
-    if {[grammar state] ne "FINISHED"} {
+    if {[grammar info validationstate] ne "FINISHED"} {
         error "Wrong state."
     }
     grammar reset
     pullValidate grammar {
         <doc><e1/><e2/><e2/><e2/></doc>
     }
-    if {[grammar state] ne "FINISHED"} {
+    if {[grammar info vstate] ne "FINISHED"} {
         error "Wrong state."
     }
     grammar delete

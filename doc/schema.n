@@ -273,8 +273,12 @@ the variable with that name is set to the empty string.
 \&\fB\fBdelete\fP
 \&\fRThis method deletes the validation command.
 .TP
-\&\fB\fBstate\fP
-\&\fRThis method returns the state of the validation command
+\&\fB\fBinfo\fP \fI?args?\fB
+\&\fRThis method bundles methods to query the state of and
+details about the schema command.
+.RS
+.IP "\fBvalidationstate\fR"
+This method returns the state of the validation command
 with respect to validation state. The possible return values
 and their meanings are:
 .RS
@@ -290,6 +294,9 @@ process of validating input.
 FINISHED
 The validation has finished, no futher
 events are expected.
+.RE
+.IP "\fBvstate\fR"
+This method is a shorter alias for validationstate; see there.
 .RE
 .TP
 \&\fB\fBreset\fP
@@ -345,12 +352,15 @@ With \fIconstraint script\fR or with a given text type
 argument a text matching this script or the text type is
 expected.
 .TP
-\&\fB\fBany\fP \fI?quant?\fB
-\&\fRThe any command matches every element (with whatever
-attributes) or subtree, no matter if known within the schema
-or not. Please notice, that this mean the quantifier * and +
-will eat up any elements until the enclosing element
-ends.
+\&\fB\fBany\fP \fI?namespace?\fB \fI?quant?\fB
+\&\fRThe any command matches every element (in the namespace
+\&\fInamespace\fR, if that is given) (with whatever attributes)
+or subtree, no matter if known within the schema or not.
+Please notice, that in case of no \fInamespace\fR argument is
+given this mean the quantifier * and + will eat up any
+elements until the enclosing element ends. If you really have
+a namespace that looks like a valid tDOM schema quantifier
+you'll have to spell out always all two arguments.
 .TP
 \&\fB\fBattribute\fP \fIname\fB \fI?quant?\fB \fI(?<constraint script>|\*(lqtype\*(lq typename?)\fB
 \&\fRThe attribute command defines a attribute (in no
@@ -438,8 +448,14 @@ valid.
 .PP
 The text constraint commands are:
 .TP
-\&\fB\fBisint\fP
-\&\fR
+\&\fB\fBinteger\fP \fI?(xsd|tcl)?\fB
+\&\fRThis text constraint match if the text value could be
+parsed as an integer. If the optional argument to the command
+is \fItcl\fR everthing that returns TCL_OK if feeded into
+Tcl_GetInt() matches. If the optional argument to the command
+is \fIxsd\fR then the constraint match if the value is a
+valid xsd:integer. Without argument \fIxsd\fR is the
+default.
 .TP
 \&\fB\fBfixed\fP \fIvalue\fB
 \&\fRThe text constraint only matches if the text value is
@@ -689,11 +705,11 @@ schema define {
     element comment {text}
 
     defpattern PurchaseOrderType {
-        element shipTo {ref USAddress}
-        element billTo {ref USAddress}
+        element shipTo ! {ref USAddress}
+        element billTo ! {ref USAddress}
         element comment ?
         element items
-        attribute orderDate
+        attribute orderDate isodate
     }
 
     defpattern USAddress {
@@ -702,17 +718,17 @@ schema define {
         element city ! {text}
         element state ! {text}
         element zip ! {text isNumber}
-        attribute country ! {text {fixed "US"}}
+        attribute country ! {fixed "US"}
     }
 
     defelement items {
         element item * {
             element product ! {text}
-            element quntity ! {text {maxExcluse 100}}
-            element USPrice ! {text isNumber}
+            element quantity ! {text {maxExcluse 100}}
+            element USPrice ! {text integer}
             element comment
-            element shipDate ? {text isDate}
-            attribute partNum ! {text {pattern "\ed{3}-[A-Z]{2}"}}
+            element shipDate ? {text isodate}
+            attribute partNum ! {pattern "\ed{3}-[A-Z]{2}"}
         }
     }
 }

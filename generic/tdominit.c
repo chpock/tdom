@@ -98,8 +98,6 @@ Tdom_Init (
 #endif
 
 #ifndef TDOM_NO_SCHEMA
-    Tcl_CreateObjCommand (interp, "tdom::schema", tDOM_SchemaObjCmd,
-                          NULL, NULL);
     tDOM_SchemaInit (interp);
 #endif
     

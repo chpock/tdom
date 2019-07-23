@@ -151,19 +151,31 @@
       </commanddef>
 
       <commanddef>
-        <command><method>state</method></command>
-        <desc>This method returns the state of the validation command
-        with respect to validation state. The possible return values
-        and their meanings are:
-        <dl>
-          <dt>READY</dt><dd>The validation command is ready to start
-          validation</dd>
-          <dt>VALIDATING</dt><dd>The validation command is in the
-          process of validating input.</dd>
-          <dt>FINISHED</dt><dd>The validation has finished, no futher
-          events are expected.</dd>
-        </dl>
-        </desc>
+          <command><method>info</method> <m>?args?</m></command>
+          <desc>This method bundles methods to query the state of and
+          details about the schema command.
+          <optlist>
+              <optdef>
+                  <optname>validationstate</optname>
+                  <desc>This method returns the state of the validation command
+                  with respect to validation state. The possible return values
+                  and their meanings are:
+                  <dl>
+                      <dt>READY</dt><dd>The validation command is ready to start
+                      validation</dd>
+                      <dt>VALIDATING</dt><dd>The validation command is in the
+                      process of validating input.</dd>
+                      <dt>FINISHED</dt><dd>The validation has finished, no futher
+                      events are expected.</dd>
+                  </dl>
+                  </desc>
+              </optdef>
+              <optdef>
+                  <optname>vstate</optname>
+                  <desc>This method is a shorter alias for validationstate; see there.</desc>
+              </optdef>
+          </optlist>
+          </desc>
       </commanddef>
       
       <commanddef>
@@ -382,7 +394,7 @@
 
     <commandlist>
       <commanddef>
-        <command><cmd>integer</cmd> <m>?(xsd|tcl)?</command>
+        <command><cmd>integer</cmd> <m>?(xsd|tcl)?</m></command>
         <desc>This text constraint match if the text value could be
         parsed as an integer. If the optional argument to the command
         is <m>tcl</m> everthing that returns TCL_OK if feeded into
