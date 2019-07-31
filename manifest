@@ -1,5 +1,5 @@
-C Gardening\saround.\sMoved\sgeneration\sof\sall\sschmea\srelated\sTcl\scommands\sto\stDOM_SchemaInit().\sMoved\sthe\smethod\s'status'\sas\s'validationstatus'\s(alias\s'vstatus')\sunder\sthe\s'info'\smethod\sand\sused\sthe\sopportunity\sto\sstart\sto\sdefine\sthe\sschema\scommand\smethod\sinfo.
-D 2019-07-23T23:54:45.832
+C Hardened\sisodate.
+D 2019-07-31T22:17:49.648
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -134,7 +134,7 @@ F generic/domxslt.h 140fa73765d699bfced9554c2c6439c0d2e6695eec3a8e69e1d25c0bbdf2
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c abf69665ad49ed053885f7e7459d47be5abb057ba4ed919e96e83d636b016a30
 F generic/nodecmd.h e4a6d836834554a2a590cbd916cdee937945965ee55709e48b62976a66861ef8
-F generic/schema.c 6f27302d0da9348042c26936962dccb19806e037fe0ad51ea78c57eae25e0b0f
+F generic/schema.c 63b1429d984622658adcdfbcf4268e2e36f8d7c5b693cb1a573eddeef8f92f82
 F generic/schema.h f207b35a46cad162cda0ed9dbe3206e0cf7d3e3d0b20e687d63e4220eff93441
 F generic/tcldom.c 3ffc9edd5abbb81177b4116a1c0d461879a2aa6a6db25b40671042c82a193d24
 F generic/tcldom.h 04ce531dd54fe3fcb82ba77194e3634cd95fb5bb2f3f0b7197abfdde9af2f2fd
@@ -204,7 +204,7 @@ F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
 F tests/pullparser.test e4b14ea0bdc9f9fd931f3bc559e78c309582a67a238170d58e0f20331f99890c
 F tests/pushpull.bench 664e8f512917537d96c4b71933d4d9a6da65fc6fe85bd7c459483830dc7d2faf
-F tests/schema.test e1fd700e7ff883c603aa6691d1a205943e60c4d1c75beda1bee0003ed9478090
+F tests/schema.test d77efababdd85264556c44d32ccb87becde3b4237ddedc9aae6167192f0f73e1
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
 F tests/tdomcmd.bench b07448ed4de08ccaa9734cf3fe15c695fd7066c993da58ff48d465747940e417
 F tests/tdomcmd.test 092401adf0609906d710f3ef8997cb4ca29bc208
@@ -230,8 +230,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P df3a907a200f4a600a6b32a008d259ec693943482d139ea25b29d34ef313b4a5
-R 6aa8c05478964094fc374f2387eddea7
+P e5493b6b50eef92138145e078e819bc6f68155ae3afb95be2dd337ae71efe0c0
+R b3a376fc624f6397179a4afd077911cb
 U rolf
-Z 3b35ff090cd15a8a6025f69bd4e2c1b6
+Z 2c00ed3b0c558862f522fa85ed3084d4
 # Remove this line to create a well-formed Fossil manifest.

@@ -4591,7 +4591,7 @@ isodateImpl (
     char *text
     )
 {
-    int i, y, m, d;
+    int i, y, m, d, seenNonzero = 0;
 
     if (*text == '-') {
         /* A bce date */
@@ -4599,13 +4599,16 @@ isodateImpl (
     }
     for (i = 0; i < 4; i++) {
         if (*text < '0' || *text > '9') return 0;
+        if (*text != '0') seenNonzero = 1;
         text++;
     }
     while (*text >= '0' && *text <= '9') text++;
     if (*text != '-') return 0;
-    y = atoi(text-4);
+    /* We only need to know the modulo of the year for 4, 100 and 400,
+     * for this the 4 last letters are enough */
+    y = atoi(text-3);
     /* There isn't a year 0. it's either 0001 or -0001 */
-    if (y == 0) return 0;
+    if (!seenNonzero) return 0;
     text++;
     for (i = 0; i < 2; i++) {
         if (*text < '0' || *text > '9') return 0;

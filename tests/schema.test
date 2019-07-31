@@ -3188,12 +3188,16 @@ test schema-14.9 {text: isodate} {
         <doc>1234-08-222</doc>
         {<doc> 1234-08-22</doc>}
         {<doc>1234-08-22 </doc>}
+        <doc>11234-08-22</doc>
+        <doc>0000-02-01</doc>
+        <doc>10000-08-22</doc>
+        <doc>10000-02-29</doc>
     } {
         lappend result [s validate $xml]
     }
     s delete
     set result
-} {0 0 0 0 0 1 0 0 0 1 0 1 1 0 1 1 0 0 0}
+} {0 0 0 0 0 1 0 0 0 1 0 1 1 0 1 1 0 0 0 1 0 1 1}
 
 test schema-14.10 {text: number} {
     tdom::schema s
