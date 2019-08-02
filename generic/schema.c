@@ -4606,7 +4606,7 @@ isodateImpl (
     if (*text != '-') return 0;
     /* We only need to know the modulo of the year for 4, 100 and 400,
      * for this the 4 last letters are enough */
-    y = atoi(text-3);
+    y = atoi(text-4);
     /* There isn't a year 0. it's either 0001 or -0001 */
     if (!seenNonzero) return 0;
     text++;
