@@ -1,5 +1,5 @@
-C Fixed\sbug\sintroduced\swith\sprefixns:\sthe\sshortcuts\sfrom\sprefixns\sare\sonly\sused\sfor\sschema\sdefiniton;\sthey\smean\snothing\sfor\sprefix/namespace\sin\sthe\sxml\sinput.
-D 2019-08-06T23:11:33.162
+C Removed\scruft\sfor\sversions\snot\ssupported\sanymore.
+D 2019-08-06T23:31:30.670
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -136,7 +136,7 @@ F generic/nodecmd.c abf69665ad49ed053885f7e7459d47be5abb057ba4ed919e96e83d636b01
 F generic/nodecmd.h e4a6d836834554a2a590cbd916cdee937945965ee55709e48b62976a66861ef8
 F generic/schema.c 8c8db21180be45a244919f356f315459c3fb4ab3402e398b7773c0f49bb5e477
 F generic/schema.h f207b35a46cad162cda0ed9dbe3206e0cf7d3e3d0b20e687d63e4220eff93441
-F generic/tcldom.c 3ffc9edd5abbb81177b4116a1c0d461879a2aa6a6db25b40671042c82a193d24
+F generic/tcldom.c 493a3bb6da1654fc9934ef1e9b380543da7344762d311b4d751aec71092b11ee
 F generic/tcldom.h 04ce531dd54fe3fcb82ba77194e3634cd95fb5bb2f3f0b7197abfdde9af2f2fd
 F generic/tclexpat.c 57f37c0029b7ae78d1a4dc22a068b5682f6b8867b69113dffca2e460529d0b4b
 F generic/tclexpat.h 5623856ef30bf3d32b78b1c016ee535cfd9c320aa7f83e4fee4e357a742a74fd
@@ -230,8 +230,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 4d478f979b1f5e126a58a9b4981a3c48a6a60eea09c25e2194a8eec88b683070
-R 8a98f27ff2c82c4f6b9f1c9a670c34ab
+P 40671ee8c38a593046f959a1c79e80ea44a1e2633d72ed5a48acf112c37bca8c
+R 23745d422112194f8d2654b458932fb5
 U rolf
-Z 9d8bbb11deb5cd38c13c8dd0533986bc
+Z 83cb2af5c1f9fc4f79d5dd90b151e82a
 # Remove this line to create a well-formed Fossil manifest.
