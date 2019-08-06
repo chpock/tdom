@@ -600,6 +600,18 @@ test schema-1.26 {prefixns} {
     set result
 } {1 {Command only allowed at lop level} 1 {Command only allowed at lop level} 1 {Method not allowed in nested schema define script} 1 {This recursive call is not allowed}}
 
+test schema-1.27 {prefixns} {
+    tdom::schema create s
+    s define {
+        prefixns {a http:://some.uri}
+        defelement doc a {}
+    }
+    set result [s validate {<b:doc xmlns:b="a"/>} errMsg]
+    lappend result $errMsg
+    s delete
+    set result
+} {0 {error "Unknown element" at line 1 character 20}}
+
 test schema-2.1 {grammar definition: ref} {
     tdom::schema create grammar
     grammar defpattern thisPattern {
@@ -2231,6 +2243,23 @@ test schema-10.5 {any} {
     s delete
     set result
 } {0 0 0 0 1 1 0}
+
+test schema-10.6 {any} {
+    tdom::schema create s
+    s define {
+        defelement doc {
+            any
+        }
+    }
+    set result [list]
+    foreach xml {
+        {<doc><a:some xmlns:a="uri"/></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1}
 
 test schema-11.1 {attribute} {
     tdom::schema create s

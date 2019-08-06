@@ -568,13 +568,17 @@ The default in case no split type argument is given is
 \&\fIwhitespace\fR.
 .RE
 .TP
-\&\fB\fBid\fP
+\&\fB\fBid \fI?keySpace?\fB\fP
 \&\fRThis text constraint command marks the text as a
 document wide ID (to be referenced by an idref). Every ID
 value within a document must be unique. It isn't an error if
-the ID isn't actually referenced within the document.
+the ID isn't actually referenced within the document. The
+optional argument \fIkeySpace\fR does all this for a named
+key space. The key space "" (the empty sting) is another key
+space as the \fIid\fR command without keySpace
+argument.
 .TP
-\&\fB\fBidref\fP
+\&\fB\fBidref \fI?keySpace?\fB\fP
 \&\fRThis text constraint command expects the text to be a
 reference to an ID within the document. The referenced ID may
 be later in the document, that the reference. Several

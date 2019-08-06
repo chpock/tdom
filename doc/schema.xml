@@ -516,14 +516,18 @@
         <m>whitespace</m>.</p></desc>
       </commanddef>
       <commanddef>
-        <command><cmd>id</cmd></command>
+        <command><cmd>id <m>?keySpace?</m></cmd></command>
         <desc>This text constraint command marks the text as a
         document wide ID (to be referenced by an idref). Every ID
         value within a document must be unique. It isn't an error if
-        the ID isn't actually referenced within the document.</desc>
+        the ID isn't actually referenced within the document. The
+        optional argument <m>keySpace</m> does all this for a named
+        key space. The key space "" (the empty sting) is another key
+        space as the <m>id</m> command without keySpace
+        argument.</desc>
       </commanddef>
       <commanddef>
-        <command><cmd>idref</cmd></command>
+        <command><cmd>idref <m>?keySpace?</m></cmd></command>
         <desc>This text constraint command expects the text to be a
         reference to an ID within the document. The referenced ID may
         be later in the document, that the reference. Several

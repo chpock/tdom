@@ -609,7 +609,7 @@ cleanupLastPattern (
 {
     unsigned int i;
     Tcl_HashTable *hashTable;
-    Tcl_HashEntry *entryPtr;
+    Tcl_HashEntry *h;
 
     SchemaCP *this, *previous, *current;
 
@@ -626,9 +626,9 @@ cleanupLastPattern (
             if (this->flags & FORWARD_PATTERN_DEF) {
                 sdata->forwardPatternDefs--;
             }
-            entryPtr = Tcl_FindHashEntry (hashTable, this->name);
+            h = Tcl_FindHashEntry (hashTable, this->name);
             previous = NULL;
-            current = Tcl_GetHashValue (entryPtr);
+            current = Tcl_GetHashValue (h);
             while (current != NULL && current != this) {
                 previous = current;
                 current = current->next;
@@ -641,9 +641,9 @@ cleanupLastPattern (
                 }
             } else {
                 if (current) {
-                    Tcl_SetHashValue (entryPtr, current->next);
+                    Tcl_SetHashValue (h, current->next);
                 } else {
-                    Tcl_DeleteHashEntry (entryPtr);
+                    Tcl_DeleteHashEntry (h);
                 }
             }
         }
@@ -1119,7 +1119,6 @@ matchElementStart (
                 break;
 
             }
-
         }
                 
         if (mayskip) break;
@@ -1161,10 +1160,10 @@ probeElement (
     void *namespace
     )
 {
-    Tcl_HashEntry *entryPtr;
+    Tcl_HashEntry *h;
     void *namespacePtr, *namePtr;
     SchemaCP *pattern;
-    int rc;
+    int rc = 1;
 
     if (sdata->skipDeep) {
         sdata->skipDeep++;
@@ -1180,14 +1179,39 @@ probeElement (
                  name, (char *)namespace);
         );
 
-    namespacePtr = getNamespacePtr (sdata, namespace);
-    entryPtr = Tcl_FindHashEntry (&sdata->element, name);
-    if (entryPtr) {
-        namePtr = Tcl_GetHashKey (&sdata->element, entryPtr);
+    /* This is problematic. If feeded with continuously new namespaces */
+    if (namespace) {
+        h = Tcl_FindHashEntry (&sdata->namespace, namespace);
     } else {
-        namePtr = NULL;
+        h = NULL;
     }
-
+    if (h) {
+        namespacePtr = Tcl_GetHashKey (&sdata->namespace, h);
+    } else {
+        if (namespace) {
+            /* This namespace isn't known at all by the schema; this
+             * element may only match an any condition. If it does we
+             * know only later. So we use namePtr and namespacePtr
+             * both NULL that match nothing else in the schema and
+             * will be able to look if there is such a possible any
+             * match in the schema. */
+            rc = 0;
+        }
+        namespacePtr = NULL;
+    }
+    if (!rc) {
+        /* Already the provided namespace isn't known to the schema,
+         * so the name in that namespace of course also. */
+        namePtr = NULL;
+    } else {
+        h = Tcl_FindHashEntry (&sdata->element, name);
+        if (h) {
+            namePtr = Tcl_GetHashKey (&sdata->element, h);
+        } else {
+            namePtr = NULL;
+        }
+    }
+    
     if (sdata->validationState == VALIDATION_READY) {
         /* The root of the tree to check. */
         if (sdata->start) {
@@ -1209,8 +1233,8 @@ probeElement (
             }
         }
     }
-    if (entryPtr) {
-        pattern = (SchemaCP *) Tcl_GetHashValue (entryPtr);
+    if (h) {
+        pattern = (SchemaCP *) Tcl_GetHashValue (h);
         while (pattern) {
             if (pattern->namespace == namespacePtr) {
                 break;
@@ -3476,7 +3500,7 @@ NamedPatternObjCmd (
     SchemaData *sdata = GETASI;
     Schema_CP_Type patternType = (Schema_CP_Type) clientData;
     Tcl_HashTable *hashTable;
-    Tcl_HashEntry *entryPtr;
+    Tcl_HashEntry *h;
     SchemaCP *pattern = NULL, *current;
     SchemaQuant quant;
     int hnew, n, m;
@@ -3495,12 +3519,12 @@ NamedPatternObjCmd (
     if (quant == SCHEMA_CQUANT_ERROR) {
         return TCL_ERROR;
     }
-    entryPtr = Tcl_CreateHashEntry (hashTable,
+    h = Tcl_CreateHashEntry (hashTable,
                                     Tcl_GetString(objv[1]), &hnew);
     if (objc < 4) {
         /* Reference to an element or pattern */
         if (!hnew) {
-            pattern = (SchemaCP *) Tcl_GetHashValue (entryPtr);
+            pattern = (SchemaCP *) Tcl_GetHashValue (h);
             while (pattern) {
                 if (pattern->namespace == sdata->currentNamespace) {
                     break;
@@ -3512,16 +3536,16 @@ NamedPatternObjCmd (
             pattern = initSchemaCP (
                 patternType,
                 sdata->currentNamespace,
-                Tcl_GetHashKey (hashTable, entryPtr)
+                Tcl_GetHashKey (hashTable, h)
                 );
             pattern->flags |= FORWARD_PATTERN_DEF;
             sdata->forwardPatternDefs++;
             if (!hnew) {
-                current = (SchemaCP *) Tcl_GetHashValue (entryPtr);
+                current = (SchemaCP *) Tcl_GetHashValue (h);
                 pattern->next = current;
             }
             REMEMBER_PATTERN (pattern);
-            Tcl_SetHashValue (entryPtr, pattern);
+            Tcl_SetHashValue (h, pattern);
         }
         addToContent (sdata, pattern, quant, n, m);
     } else {
@@ -3530,16 +3554,16 @@ NamedPatternObjCmd (
             pattern = initSchemaCP (
                 SCHEMA_CTYPE_NAME,
                 sdata->currentNamespace,
-                Tcl_GetHashKey (hashTable, entryPtr)
+                Tcl_GetHashKey (hashTable, h)
                 );
             pattern->flags |= PLACEHOLDER_PATTERN_DEF;
             REMEMBER_PATTERN (pattern);
-            Tcl_SetHashValue (entryPtr, pattern);
+            Tcl_SetHashValue (h, pattern);
         }
         pattern = initSchemaCP (
             SCHEMA_CTYPE_NAME,
             sdata->currentNamespace,
-            Tcl_GetHashKey (hashTable, entryPtr)
+            Tcl_GetHashKey (hashTable, h)
             );
         pattern->flags |= LOCAL_DEFINED_ELEMENT;
         return evalDefinition (interp, sdata, objv[3], pattern, quant, n, m);
