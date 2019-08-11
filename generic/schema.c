@@ -4088,7 +4088,7 @@ integerTCObjCmd (
 
     CHECK_TI
     CHECK_TOPLEVEL
-    checkNrArgs (1,2,"?xsd|tcl|json?");
+    checkNrArgs (1,2,"?xsd|tcl?");
     if (objc == 1) {
         type = t_xsd;
     } else {
@@ -4106,8 +4106,6 @@ integerTCObjCmd (
         sc->constraint = integerImplTcl;
         break;
     }
-    sc->constraintData = sdata;
-    
     return TCL_OK;
 }
 
@@ -4575,7 +4573,31 @@ numberTCObjCmd (
 }
 
 static int
-booleanImpl (
+booleanImplXsd (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    char *c = text;
+    switch (*c) {
+    case '0':
+    case '1':
+        c++;
+        if (*c == 0) return 1;
+        break;
+    case 't':
+        if (strcmp (text, "true") == 0) return 1;
+        break;
+    case 'f':
+        if (strcmp (text, "false") == 0) return 1;
+        break;
+    }
+    return 0;
+}
+
+static int
+booleanImplTcl (
     Tcl_Interp *interp,
     void *constraintData,
     char *text
@@ -4599,12 +4621,35 @@ booleanTCObjCmd (
 {
     SchemaData *sdata = GETASI;
     SchemaConstraint *sc;
+    int type;
 
+    static const char *types[] = {
+        "xsd", "tcl", NULL
+    };
+    enum typeSyms {
+        t_xsd, t_tcl
+    };
+    
     CHECK_TI
     CHECK_TOPLEVEL
-    checkNrArgs (1,1,"No arguments expected");
+    checkNrArgs (1,2,"?xsd|tcl?");
+    if (objc == 1) {
+        type = t_xsd;
+    } else {
+        if (Tcl_GetIndexFromObj (interp, objv[1], types, "type", 0, &type)
+            != TCL_OK) {
+            return TCL_ERROR;
+        }
+    }
     ADD_CONSTRAINT (sdata, sc)
-    sc->constraint = booleanImpl;
+    switch ((enum typeSyms) type) {
+    case t_xsd:
+        sc->constraint = booleanImplXsd;
+        break;
+    case t_tcl:
+        sc->constraint = booleanImplTcl;
+        break;
+    }
     return TCL_OK;
 }
 

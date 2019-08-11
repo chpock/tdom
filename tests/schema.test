@@ -3919,7 +3919,7 @@ test schema-14.27 {base64} {
     set result
 } {1 1 1 0 1 1 0 0}
 
-test schema-14.27 {element content id/idref} {
+test schema-14.28 {element content id/idref} {
     tdom::schema s
     s define {
         defelement doc {
@@ -3951,7 +3951,7 @@ test schema-14.27 {element content id/idref} {
     set result
 } {1 1 0 0 0 1 1}
 
-test schema-14.28 {element content id/idref} {
+test schema-14.29 {element content id/idref} {
     tdom::schema s
     s define {
         defelement doc {
@@ -3982,6 +3982,96 @@ test schema-14.28 {element content id/idref} {
     s delete
     set result
 } {1 1 0 0 0 1 1}
+
+test schema-14.30 {text: boolean (xsd)} {
+    tdom::schema s
+    s defelement doc {
+        text boolean
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc></doc>
+        <doc>5</doc>
+        <doc>00</doc>
+        <doc>01</doc>
+        <doc>1</doc>
+        <doc>11</doc>
+        <doc>false</doc>
+        {<doc>false </doc>}
+        <doc>False</doc>
+        <doc>FALSE</doc>
+        <doc>true</doc>
+        {<doc> true</doc>}
+        <doc>TrUe</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 0 0 0 1 0 1 0 0 0 1 0 0}
+
+test schema-14.30a {text: boolean (xsd)} {
+    tdom::schema s
+    s defelement doc {
+        text {boolean xsd}
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc></doc>
+        <doc>5</doc>
+        <doc>00</doc>
+        <doc>01</doc>
+        <doc>1</doc>
+        <doc>11</doc>
+        <doc>false</doc>
+        {<doc>false </doc>}
+        <doc>False</doc>
+        <doc>FALSE</doc>
+        <doc>true</doc>
+        {<doc> true</doc>}
+        <doc>TrUe</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 0 0 0 1 0 1 0 0 0 1 0 0}
+
+test schema-14.31 {text: boolean (tcl)} {
+    tdom::schema s
+    s defelement doc {
+        text {boolean tcl}
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc></doc>
+        <doc>5</doc>
+        <doc>0</doc>
+        <doc>01</doc>
+        <doc>1</doc>
+        <doc>11</doc>
+        <doc>false</doc>
+        <doc>f</doc>
+        <doc>no</doc>
+        {<doc>no </doc>}
+        <doc>n</doc>
+        {<doc> n </doc>}
+        {<doc>false </doc>}
+        <doc>False</doc>
+        <doc>FALSE</doc>
+        <doc>true</doc>
+        {<doc> true</doc>}
+        <doc>TrUe</doc>
+        <doc>ON</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 0 1 0 1 0 1 1 1 0 1 0 0 1 1 1 0 1 1}
 
 test schema-15.1 {constraint cmd tcl} {
     tdom::schema s
