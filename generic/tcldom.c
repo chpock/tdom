@@ -4737,7 +4737,7 @@ int tcldom_NodeObjCmd (
             break;
 
         case m_getAttributeNS:
-            CheckArgs(4,4,2,"uri localName");
+            CheckArgs(4,5,2,"uri localName");
             if (node->nodeType != ELEMENT_NODE) {
                 SetResult("NOT_AN_ELEMENT : there are no attributes");
                 return TCL_ERROR;
@@ -4749,7 +4749,12 @@ int tcldom_NodeObjCmd (
                 SetResult(attrs->nodeValue);
                 return TCL_OK;
             } 
-            sprintf(tmp,"attribute with localName %80.80s not found!",localName);
+            if (objc == 5) {
+                SetResult(Tcl_GetString(objv[4]));
+                return TCL_OK;
+            } 
+            sprintf(tmp,"attribute with localName %80.80s not found!",
+                    localName);
             SetResult(tmp);
             return TCL_ERROR;
 

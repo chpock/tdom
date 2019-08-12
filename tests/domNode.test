@@ -2387,6 +2387,42 @@ test domNode-28.1 {getAttributeNS} {
     set result
 } {p:attr1Value}
 
+test domNode-28.2 {getAttributeNS - default value} {
+    set doc [dom parse {
+<root attr1="attr1Value"
+      attr2="attr2Value"
+      p:attr1="p:attr1Value"
+      xmlns:p="ns1"/>}]
+    set root [$doc documentElement]
+    set result [$root getAttributeNS "not" attr1 "default"]
+    $doc delete
+    set result
+} {default}
+
+test domNode-28.3 {getAttributeNS - default value} {
+    set doc [dom parse {
+<root attr1="attr1Value"
+      attr2="attr2Value"
+      p:attr1="p:attr1Value"
+      xmlns:p="ns1"/>}]
+    set root [$doc documentElement]
+    set result [$root getAttributeNS "not" notexisting "some default"]
+    $doc delete
+    set result
+} {some default}
+
+test domNode-28.4 {getAttributeNS - default value} {
+    set doc [dom parse {
+<root attr1="attr1Value"
+      attr2="attr2Value"
+      p:attr1="p:attr1Value"
+      xmlns:p="ns1"/>}]
+    set root [$doc documentElement]
+    set result [$root getAttributeNS "ns1" notexisting "some other default"]
+    $doc delete
+    set result
+} {some other default}
+
 proc domAppendChild {parent name} {
     $parent ownerDocument doc
     $doc createElement $name node
