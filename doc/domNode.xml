@@ -184,7 +184,7 @@ that attribute the <m>defaultValue</m> is returned.</desc>
         <desc><p>Sets the value for one or more full qualified
 attributes. Every attribute <m>qualifiedName</m> with the namespace URI
 <m>uri</m> will be set to <m>newValue</m>. This will create a new attribute, if
-it wasn't avialble before. If you want to set an attribute within a namespace
+it wasn't available before. If you want to set an attribute within a namespace
 you must specify the attribute name with prefix, even if you want to set an
 already existing attribute to a new value. While searching, if the attribute
 already exists, only the given <m>uri</m> and the localname of the
@@ -192,13 +192,14 @@ already exists, only the given <m>uri</m> and the localname of the
 
         <example>$node setAttributeNS "http://some.uri.com/wow" prefix:attr1 attrValue</example>
 
-<p>If the uri is the empty string and the attribute name hasn't a prefix, this
-method has the same effect as the method <b>setAttribute</b>.</p>
+<p>If the uri is the empty string and the attribute name doesn't have
+a prefix, this method has the same effect as the method
+<b>setAttribute</b>.</p>
 
         <example>$node setAttributeNS "" attri "some Value"</example>
 
 <p>With the exceptions of the special prefixes "xmlns" and "xml" you
-always must provide a non empty <m>uri</m>, if your <m>qualifiedName</m> has a
+always must provide a non empty <m>uri</m> if your <m>qualifiedName</m> has a
 prefix. It is not recommended to set xml namespace declarations. The effects are complicated and not always obvious up to resulting a not well-formed serializations after further processing.</p></desc>
       </commanddef>
 
