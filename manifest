@@ -1,5 +1,5 @@
-C Corrected\sspeeling\sand\sbetter\swording.
-D 2019-08-16T13:04:51.402
+C Even\sa\sbit\sbetter\swording,\sprobably\s(at\sleast\sthe\snative\sspeaker\ssay\sso).
+D 2019-08-16T13:57:35.524
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -25,7 +25,7 @@ F doc/domDoc.n 60e61f82beef4dcb9fc64702a339165d24e2f1c137e88d9f3c1c5a3d450819a8
 F doc/domDoc.xml 72b489a049d94fb09c9a7f72c27700abb1e1c6e16c8d024e6b379a9d280c8fea
 F doc/domNode.html 6332872254ffbc696d2b385938cff866b8f3760518005a7a27aba5dce32bb84f
 F doc/domNode.n 3ab4017d0ab718992510274e503c55dc02d91fb62fec678803ba55eb2c566a45
-F doc/domNode.xml d3307fc2460a577ee47fc224f4b1d3852c7cee6f57c8752bd4ed18b47e61e97b
+F doc/domNode.xml e580ebf0214992646830c54da1960b07ca6e42501258bb0fca41d3cf1d0d6dfb
 F doc/expat.html e7b5071878f8e3d9f818054e00dac627b82c40ec60a9aa362b8a3b1be763598e
 F doc/expat.n a0464f49b085e48feef6e1ed3ecdee2ece407d724b4b63401ca7a058188ef8e8
 F doc/expat.xml a404af989ee943eafbd470b6de0778d442b5686f7d80bc42ca9c607dd9d4677e
@@ -222,8 +222,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 090cdefdab8b98f5c6dfac4d6c46d46629ebe5c9025ec3f2b27a4fea08162522
-R 1d1b158132b6df50fc66c9a6e41a7370
+P 7ec866b33fc47e5bef8961f7ec09f9cb5928c7db99f797ee6f195e52fc808a28
+R 7dd4ee76d4f0c441b0a735f25cdece86
 U rolf
-Z dfee3d078bd8d94274e4b4b2e4675aa3
+Z f6a2848ede49f5cae9e89cc8a037fc53
 # Remove this line to create a well-formed Fossil manifest.

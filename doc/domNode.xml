@@ -192,8 +192,8 @@ already exists, only the given <m>uri</m> and the localname of the
 
         <example>$node setAttributeNS "http://some.uri.com/wow" prefix:attr1 attrValue</example>
 
-<p>If the uri is the empty string and the attribute name doesn't have
-a prefix, this method has the same effect as the method
+<p>If the uri is the empty string and the attribute name has no
+prefix, this method has the same effect as the method
 <b>setAttribute</b>.</p>
 
         <example>$node setAttributeNS "" attri "some Value"</example>
