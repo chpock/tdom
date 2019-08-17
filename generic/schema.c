@@ -5370,7 +5370,6 @@ keyImpl (
     int hnew;
     Tcl_HashEntry *h;
 
-    fprintf (stderr, "keyImpl called: '%s'\n", text);
     if (!ks->active) return 1;
     h = Tcl_CreateHashEntry (&ks->ids, text, &hnew);
     if (hnew) {
