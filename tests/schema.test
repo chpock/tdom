@@ -4836,6 +4836,34 @@ test schema-18.5 {reportcmd} {
     set result
 } {s WRONG_VALUE 1 s WRONG_VALUE s MISSING_TEXT 1 1}
 
+test schema-18.6 {reportcmd} {
+    tdom::schema s
+    s define {
+        defelement item {
+            text {key lang}
+        }
+        defelement items {
+            element item +
+        }
+        defelement doc {
+            element items + 
+        }
+    }
+    s reportcmd schema-18
+    set result [list]
+    foreach xml {
+        {<doc><items><item>12</item><item>ab</item></items></doc>}
+        {<doc><items><item>12</item><item>12</item></items></doc>}
+        {<doc><items><item>12</item><item>12</item></items><items><item>ab</item><item>cd</item></items></doc>}
+        {<doc><items><item>12</item><item>12</item></items><items><item>ab</item><item>cd</item></items><items><item>12</item><item>12</item></items></doc>}
+    } {
+        lappend result [s validate $xml errMsg]
+        puts $errMsg
+    }
+    s delete
+    set result
+} {}
+
 proc validatedSAX {g xml {keepEmpties 1}} {
     set args [list -validateCmd $g]
     if {!$keepEmpties} {

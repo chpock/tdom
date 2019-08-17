@@ -790,12 +790,54 @@ popStack (
     sdata->stack = se;
 }
 
+static void
+finalizeElement (
+    SchemaData *sdata,
+    int ac
+    )
+{
+    SchemaValidationStack *se;
+    SchemaCP *cp, *cp1;
+    int i;
+
+    se = sdata->stack;
+    cp = se->pattern;
+    if (cp->type == SCHEMA_CTYPE_NAME || cp->type == SCHEMA_CTYPE_PATTERN) {
+        for (i = ac; i < cp->nc; i++) {
+            cp1 = cp->content[ac];
+            if (cp1->type == SCHEMA_CTYPE_KEYSPACE) {
+                if (!cp1->keySpace->active) {
+                    Tcl_InitHashTable (&cp1->keySpace->ids,
+                                       TCL_STRING_KEYS);
+                    cp1->keySpace->active = 1;
+                    cp1->keySpace->unknownIDrefs = 0;
+                } else {
+                    cp1->keySpace->active++;
+                }                    
+            } else if (cp->content[ac]->type == SCHEMA_CTYPE_KEYSPACE_END) {
+                cp1->keySpace->active--;
+                if (!cp1->keySpace->active) {
+                    cp1->keySpace->unknownIDrefs = 0;
+                    Tcl_DeleteHashTable (&cp1->keySpace->ids);
+                }
+            }
+        }
+    }
+    popStack (sdata);
+    if (cp->type != SCHEMA_CTYPE_NAME) {
+        finalizeElement (sdata, sdata->stack->activeChild + 1);
+    }
+}
+
+
 static int 
 recover (
     Tcl_Interp *interp,
     SchemaData *sdata,
     const char *errType,
-    int len
+    int len,
+    int popStack,
+    int ac
     )
 {
     Tcl_Obj *cmdPtr;
@@ -818,6 +860,10 @@ recover (
     if (rc != TCL_OK) {
         sdata->evalError = 1;
         return 0;
+    }
+    if (popStack) {
+        finalizeElement (sdata, ac+1);
+        sdata->skipDeep = 2;
     }
     return 1;
 }
@@ -892,10 +938,10 @@ matchElementStart (
             case SCHEMA_CTYPE_TEXT:
                 if (candidate->nc) {
                     if (!checkText (interp, candidate, "")) {
-                        if (recover (interp, sdata, S("MISSING_TEXT"))) {
-                            mayskip = 1;
-                            break;
-                        }                        
+                        if (recover (interp, sdata, S("MISSING_TEXT"),
+                                     1, ac)) {
+                            return 1;
+                        }            
                         return 0;
                     }
                 }
@@ -1001,7 +1047,8 @@ matchElementStart (
                 candidate->keySpace->active--;
                 if (!candidate->keySpace->active) {
                     if (candidate->keySpace->unknownIDrefs) {
-                        if (!recover (interp, sdata, S("UNKNOWN_KEYREF"))) {
+                        if (!recover (interp, sdata, S("UNKNOWN_KEYREF"),
+                                      0, 0)) {
                             return 0;
                         }
                         candidate->keySpace->unknownIDrefs = 0;
@@ -1026,10 +1073,9 @@ matchElementStart (
                 continue;
             }
             if (!mayskip && mustMatch (cp->quants[ac], hm)) {
-                if (recover (interp, sdata, S("MISSING_CP"))) {
+                if (recover (interp, sdata, S("MISSING_CP"), 1, ac)) {
                     /* Skip the just opened element tag and the following
                      * content of the current. */
-                    sdata->skipDeep = 2;
                     return 1;
                 }
                 return 0;
@@ -1038,10 +1084,9 @@ matchElementStart (
             hm = 0;
         }
         if (isName) {
-            if (recover (interp, sdata, "UNEXPECTED_ELEMENT", 15)) {
+            if (recover (interp, sdata, S("UNEXPECTED_ELEMENT"), 1, ac)) {
                 /* Skip the just opened element tag and the following
                  * content of the current. */
-                sdata->skipDeep = 2;
                 return 1;
             }
             return 0;
@@ -1122,8 +1167,7 @@ matchElementStart (
         }
                 
         if (mayskip) break;
-        if (recover (interp, sdata, S("UNCOMPLET_CP"))) {
-            sdata->skipDeep = 2;
+        if (recover (interp, sdata, S("UNCOMPLET_CP"), 1, ac)) {
             return 1;
         }
     }
@@ -1250,8 +1294,8 @@ probeElement (
         se = sdata->stack;
         if (se->pattern->type == SCHEMA_CTYPE_NAME
             && se->activeChild >= se->pattern->nc) {
-            if (recover (interp, sdata, S("UNEXPECTED_ELEMENT"))) {
-                sdata->skipDeep = 1;
+            if (recover (interp, sdata, S("UNEXPECTED_ELEMENT"), 1,
+                         se->activeChild)) {
                 return TCL_OK;
             }
             SetResult ("Unexpected child element \"");
@@ -1267,7 +1311,7 @@ probeElement (
         }
     } else {
         if (!pattern) {
-            if (recover (interp, sdata, S("UNKNOWN_ROOT_ELEMENT"))) {
+            if (recover (interp, sdata, S("UNKNOWN_ROOT_ELEMENT"), 0, 0)) {
                 sdata->skipDeep = 1;
                 return TCL_OK;
             }
@@ -1348,7 +1392,7 @@ int probeAttributes (
                     if (!checkText (interp, cp->attrs[i]->cp,
                                     (char *) atPtr[1])) {
                         if (!recover (interp, sdata,
-                                      S("WRONG_ATTRIBUTE_VALUE"))) {
+                                      S("WRONG_ATTRIBUTE_VALUE"), 0, 0)) {
                             if (nsatt) namespace[j] = '\xFF';
                             SetResult3 ("Attribute value doesn't match for "
                                         "attribute '", atPtr[0], "'");
@@ -1362,7 +1406,7 @@ int probeAttributes (
         }
         if (nsatt) namespace[j] = '\xFF';
         if (!found) {
-            if (!recover (interp, sdata, S("UNKNOWN_ATTRIBUTE"))) {
+            if (!recover (interp, sdata, S("UNKNOWN_ATTRIBUTE"), 0, 0)) {
                 SetResult3 ("Unknown attribute \"", atPtr[0], "\"");
                 return TCL_ERROR;
             }
@@ -1399,7 +1443,7 @@ int probeAttributes (
                 }
             }
             if (!found) {
-                if (!recover (interp, sdata, S("MISSING_ATTRIBUTE"))) {
+                if (!recover (interp, sdata, S("MISSING_ATTRIBUTE"), 0, 0)) {
                     if (cp->attrs[i]->namespace) {
                         Tcl_AppendResult (interp, " ", cp->attrs[i]->namespace,
                                           ":", cp->attrs[i]->name, NULL);
@@ -1459,7 +1503,7 @@ int probeDomAttributes (
                     if (!checkText (interp, cp->attrs[i]->cp,
                                     (char *) atPtr->nodeValue)) {
                         if (!recover (interp, sdata,
-                                      S("WRONG_ATTRIBUTE_VALUE"))) {
+                                      S("WRONG_ATTRIBUTE_VALUE"), 0, 0)) {
                             SetResult3 ("Attribute value doesn't match for "
                                         "attribute '", ln, "'");
                             return TCL_ERROR;
@@ -1472,7 +1516,7 @@ int probeDomAttributes (
             }
         }
         if (!found) {
-            if (!recover (interp, sdata, S("UNKNOWN_ATTRIBUTE"))) {
+            if (!recover (interp, sdata, S("UNKNOWN_ATTRIBUTE"), 0, 0)) {
                 if (ns) {
                     SetResult ("Unknown attribute \"");
                     Tcl_AppendResult (interp, ns, ":", atPtr->nodeName,
@@ -1521,7 +1565,7 @@ int probeDomAttributes (
                 atPtr = atPtr->nextSibling;
             }
             if (!found) {
-                if (!recover (interp, sdata, S("MISSING_ATTRIBUTE"))) {
+                if (!recover (interp, sdata, S("MISSING_ATTRIBUTE"), 0, 0)) {
                     if (cp->attrs[i]->namespace) {
                         Tcl_AppendResult (interp, " ", cp->attrs[i]->namespace,
                                           ":", cp->attrs[i]->name, NULL);
@@ -1576,7 +1620,7 @@ static int checkElementEnd (
                 cp->content[ac]->keySpace->active--;
                 if (!cp->content[ac]->keySpace->active) {
                     if (cp->content[ac]->keySpace->unknownIDrefs) {
-                        if (!recover (interp, sdata, S("UNKNOWN_KEYREF"))) {
+                        if (!recover (interp, sdata, S("UNKNOWN_KEYREF"), 0, 0)) {
                             return 0;
                         }
                         cp->content[ac]->keySpace->unknownIDrefs = 0;
@@ -1599,7 +1643,7 @@ static int checkElementEnd (
             case SCHEMA_CTYPE_TEXT:
                 if (cp->content[ac]->nc) {
                     if (!checkText (interp, cp->content[ac], "")) {
-                        if (recover (interp, sdata, S("MISSING_TEXT"))) {
+                        if (recover (interp, sdata, S("MISSING_TEXT"), 0, 0)) {
                             break;
                         }
                         return 0;
@@ -1648,7 +1692,7 @@ static int checkElementEnd (
                     if (mayMiss) break;
                 }
                 if (mayMiss) break;
-                if (!recover (interp, sdata, S("MISSING_ONE_OF_CHOICE"))) {
+                if (!recover (interp, sdata, S("MISSING_ONE_OF_CHOICE"), 0, 0)) {
                     return 0;
                 }
                 break;
@@ -1666,12 +1710,12 @@ static int checkElementEnd (
                 return 0;
                 
             case SCHEMA_CTYPE_ANY:
-                if (recover (interp, sdata, S("MISSING_ANY"))) {
+                if (recover (interp, sdata, S("MISSING_ANY"), 0, 0)) {
                     break;
                 }
                 return 0;
             case SCHEMA_CTYPE_NAME:
-                if (recover (interp, sdata, S("MISSING_ELEMENT"))) {
+                if (recover (interp, sdata, S("MISSING_ELEMENT"), 0, 0)) {
                     break;
                 }
                 return 0;
@@ -1694,7 +1738,7 @@ static int checkElementEnd (
     case SCHEMA_CTYPE_INTERLEAVE:
         for (i = 0; i < cp->nc; i++) {
             if (mustMatch (cp->quants[i], se->interleaveState[i])) {
-                if (recover (interp, sdata, S("MISSING_ONE_OF_INTERLEAVE"))) {
+                if (recover (interp, sdata, S("MISSING_ONE_OF_INTERLEAVE"), 0, 0)) {
                     break;
                 }
                 return 0;
@@ -1941,7 +1985,7 @@ matchText (
                     cp->content[ac]->keySpace->active--;
                     if (!cp->content[ac]->keySpace->active) {
                         if (cp->content[ac]->keySpace->unknownIDrefs) {
-                            if (!recover (interp, sdata, S("UNKNOWN_KEYREF"))) {
+                            if (!recover (interp, sdata, S("UNKNOWN_KEYREF"), 0, 0)) {
                                 return 0;
                             }
                             cp->content[ac]->keySpace->unknownIDrefs = 0;
@@ -2069,7 +2113,7 @@ probeText (
             return TCL_OK;
         }
     }
-    if (recover (interp, sdata, S("WRONG_VALUE"))) {
+    if (recover (interp, sdata, S("WRONG_VALUE"), 0, 0)) {
         return TCL_OK;
     }
     if (!sdata->evalError) {
@@ -2299,14 +2343,14 @@ checkdomKeyConstraints (
         Tcl_InitHashTable (&htable, TCL_STRING_KEYS);
         rc = xpathEvalAst (kc->selector, &nodeList, node, &rs, &errMsg);
         if (rc) {
-            if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"))) {
+            if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"), 0, 0)) {
                 goto nextConstraint;
             }
             goto errorCleanup;
         }
         if (rs.type == EmptyResult) goto nextConstraint;
         if (rs.type != xNodeSetResult) {
-            if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"))) {
+            if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"), 0, 0)) {
                 goto nextConstraint;
             }
             SetResult ("INVALID_DOM_KEYCONSTRAINT");
@@ -2315,7 +2359,7 @@ checkdomKeyConstraints (
         for (i = 0; i < rs.nr_nodes; i++) {
             n = rs.nodes[i];
             if (n->nodeType != ELEMENT_NODE) {
-                if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"))) {
+                if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"), 0, 0)) {
                     break;
                 }
                 SetResult ("INVALID_DOM_KEYCONSTRAINT");
@@ -2327,7 +2371,7 @@ checkdomKeyConstraints (
                 rc = xpathEvalAst (kc->fields[0], &nodeList, n, &frs,
                                    &errMsg);
                 if (rc) {
-                    if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"))) {
+                    if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"), 0, 0)) {
                         break;
                     }
                     SetResult ("INVALID_DOM_KEYCONSTRAINT");
@@ -2335,7 +2379,7 @@ checkdomKeyConstraints (
                 }
                 if (frs.type != xNodeSetResult
                     && frs.type != EmptyResult) {
-                    if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"))) {
+                    if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"), 0, 0)) {
                         break;
                     }
                     SetResult ("INVALID_DOM_KEYCONSTRAINT");
@@ -2347,7 +2391,7 @@ checkdomKeyConstraints (
                     }
                     Tcl_CreateHashEntry (&htable, "", &hnew);
                     if (!hnew) {
-                        if (recover (interp, sdata, S("DOM_KEYCONSTRAINT"))) {
+                        if (recover (interp, sdata, S("DOM_KEYCONSTRAINT"), 0, 0)) {
                             break;
                         }
                         SetResult ("DOM_KEYCONSTRAINT");
@@ -2356,7 +2400,7 @@ checkdomKeyConstraints (
                     continue;
                 }
                 if (frs.nr_nodes != 1) {
-                    if (recover (interp, sdata, S("DOM_KEYCONSTRAINT"))) {
+                    if (recover (interp, sdata, S("DOM_KEYCONSTRAINT"), 0, 0)) {
                         break;
                     }
                     SetResult ("DOM_KEYCONSTRAINT");
@@ -2364,7 +2408,7 @@ checkdomKeyConstraints (
                 }
                 if (frs.nodes[0]->nodeType != ELEMENT_NODE
                     && frs.nodes[0]->nodeType != ATTRIBUTE_NODE) {
-                    if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"))) {
+                    if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"), 0, 0)) {
                         break;
                     }
                     SetResult ("INVALID_DOM_KEYCONSTRAINT");
@@ -2374,7 +2418,7 @@ checkdomKeyConstraints (
                     attr = (domAttrNode *) frs.nodes[0];
                     Tcl_CreateHashEntry (&htable, attr->nodeValue, &hnew);
                     if (!hnew) {
-                        if (recover (interp, sdata, S("DOM_KEYCONSTRAINT"))) {
+                        if (recover (interp, sdata, S("DOM_KEYCONSTRAINT"), 0, 0)) {
                             break;
                         }
                         SetResult ("DOM_KEYCONSTRAINT");
@@ -2385,7 +2429,7 @@ checkdomKeyConstraints (
                     Tcl_CreateHashEntry (&htable, keystr, &hnew);
                     FREE(keystr);
                     if (!hnew) {
-                        if (recover (interp, sdata, S("DOM_KEYCONSTRAINT"))) {
+                        if (recover (interp, sdata, S("DOM_KEYCONSTRAINT"), 0, 0)) {
                             break;
                         }
                         SetResult ("DOM_KEYCONSTRAINT");
@@ -2401,7 +2445,7 @@ checkdomKeyConstraints (
                     rc = xpathEvalAst (kc->fields[j], &nodeList, n, &frs,
                                        &errMsg);
                     if (rc) {
-                        if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"))) {
+                        if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"), 0, 0)) {
                             skip = 1;
                             break;
                         }
@@ -2410,7 +2454,7 @@ checkdomKeyConstraints (
                     }
                     if (frs.type != xNodeSetResult
                         && frs.type != EmptyResult) {
-                        if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"))) {
+                        if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"), 0, 0)) {
                             skip = 1;
                             break;
                         }
@@ -2426,7 +2470,7 @@ checkdomKeyConstraints (
                         continue;
                     }
                     if (frs.nr_nodes != 1) {
-                        if (recover (interp, sdata, S("DOM_KEYCONSTRAINT"))) {
+                        if (recover (interp, sdata, S("DOM_KEYCONSTRAINT"), 0, 0)) {
                             skip = 1;
                             break;
                         }
@@ -2435,7 +2479,7 @@ checkdomKeyConstraints (
                     }
                     if (frs.nodes[0]->nodeType != ELEMENT_NODE
                         && frs.nodes[0]->nodeType != ATTRIBUTE_NODE) {
-                        if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"))) {
+                        if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"), 0, 0)) {
                             skip = 1;
                             break;
                         }
@@ -2456,7 +2500,7 @@ checkdomKeyConstraints (
                 if (skip) break;
                 Tcl_CreateHashEntry (&htable, Tcl_DStringValue (&dStr), &hnew);
                 if (!hnew) {
-                    if (recover (interp, sdata, S("DOM_KEYCONSTRAINT"))) {
+                    if (recover (interp, sdata, S("DOM_KEYCONSTRAINT"), 0, 0)) {
                         break;
                     }
                     SetResult ("DOM_KEYCONSTRAINT");
@@ -5326,6 +5370,7 @@ keyImpl (
     int hnew;
     Tcl_HashEntry *h;
 
+    fprintf (stderr, "keyImpl called: '%s'\n", text);
     if (!ks->active) return 1;
     h = Tcl_CreateHashEntry (&ks->ids, text, &hnew);
     if (hnew) {
