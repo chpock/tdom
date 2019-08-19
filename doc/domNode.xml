@@ -211,11 +211,11 @@ prefix. It is not recommended to set xml namespace declarations. The effects are
 
       <commanddef>
         <command><method>attributes</method> <option>?attributeNamePattern?</option></command>
-        <desc>Returns information about the attriubtes matching the
+        <desc>Returns information about the attributes matching the
         <m>attributeNamePattern</m>. If <m>attributeNamePattern</m>
         isn't given, information about all attributes are returned.
         The return value is a Tcl list, the elements just the
-        attriubute name in case of non namespaced attriubtes and three
+        attribute name in case of non namespaced attributes and three
         element sublists for namespaced attributes. n case of an
         "ordinary" namespaced attribute, the sublist elements are
         {&lt;localname&gt; &lt;prefix&gt; &lt;namespace_uri&gt;}. In the special case of
