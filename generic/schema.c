@@ -841,7 +841,7 @@ recover (
     )
 {
     Tcl_Obj *cmdPtr;
-    int rc;
+    int rc, savedac;
 
     if (!sdata->reportCmd) return 0;
     cmdPtr = Tcl_DuplicateObj (sdata->reportCmd);
@@ -853,8 +853,15 @@ recover (
         Tcl_NewStringObj (errType, len)
         );
     sdata->currentEvals++;
+    if (sdata->stack) {
+        savedac = sdata->stack->activeChild;
+        sdata->stack->activeChild = ac;
+    }
     rc = Tcl_EvalObjEx (interp, cmdPtr,
                         TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT);
+    if (sdata->stack) {
+        sdata->stack->activeChild = savedac;
+    }
     sdata->currentEvals--;
     Tcl_DecrRefCount (cmdPtr);
     if (rc != TCL_OK) {
