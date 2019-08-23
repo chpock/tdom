@@ -4,18 +4,18 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x55bd61f17b30">NAME</a> · <a href="#SECTid0x55bd61f18190">SYNOPSIS</a> · <a href="#SECTid0x55bd61f12610">DESCRIPTION </a> · <a href="#SECTid0x55bd61f6f140">Schema definition scripts</a> · <a href="#SECTid0x55bd61f78080">Quantity specifier</a> · <a href="#SECTid0x55bd61f79f10">Text constraint scripts</a> · <a href="#SECTid0x55bd61f82e70">Local key constraints</a> · <a href="#SECTid0x55bd61f84c80">Exampels</a>
+<a href="#SECTid0x56063934db40">NAME</a> · <a href="#SECTid0x56063934e1a0">SYNOPSIS</a> · <a href="#SECTid0x560639348610">DESCRIPTION </a> · <a href="#SECTid0x5606393a58d0">Schema definition scripts</a> · <a href="#SECTid0x5606393af9a0">Quantity specifier</a> · <a href="#SECTid0x5606393b1830">Text constraint scripts</a> · <a href="#SECTid0x5606393ba860">Local key constraints</a> · <a href="#SECTid0x5606393bc670">Exampels</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x55bd61f17b30">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x56063934db40">NAME</a></h2><p class="namesection">
 <b class="names">tdom::schema - </b><br>Create a schema validation command</p>
 
-  <h2><a name="SECTid0x55bd61f18190">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x56063934e1a0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">tdom::schema</b> <i class="m">?create?</i> <i class="m">cmdName</i>
     </pre>
 
-  <h2><a name="SECTid0x55bd61f12610">DESCRIPTION </a></h2><p>This command creates validation commands with a simple API. The
+  <h2><a name="SECTid0x560639348610">DESCRIPTION </a></h2><p>This command creates validation commands with a simple API. The
     validation commands have methods to define a schema and are able
     to validate XML or DOM trees (and to some degree other kind of
     hierarchical data) against this schema.</p><p>Additionally, a validation command may be used as argument to
@@ -73,6 +73,15 @@
         command raises error.</dd>
       
 
+      
+        <dt>
+<b class="method">deftext</b> <i class="m">name</i> <i class="m">&lt;constraint script&gt;</i>
+</dt>
+        <dd>This method defines a bundle of text constraints, that
+        can be referred by <i class="m">name</i> while defining constrains on
+        text element or attribute values.</dd>
+      
+      
       
         <dt>
 <b class="method">define</b> <i class="m">&lt;definition script&gt;</i>
@@ -202,7 +211,7 @@
 
     </dl>
 
-  <h2><a name="SECTid0x55bd61f6f140">Schema definition scripts</a></h2><p>Schema definition scripts are ordinary Tcl scripts that are
+  <h2><a name="SECTid0x5606393a58d0">Schema definition scripts</a></h2><p>Schema definition scripts are ordinary Tcl scripts that are
     evaluatend in the namespace tdom::schema. The below listed schema
     definition commands in this tcl namespace allow to define a wide
     variety of document structures. Every schema definition command
@@ -311,14 +320,31 @@
         <dt>
 <b class="method">nsattribute</b> <i class="m">name</i> <i class="m">namespace</i> <i class="m">?quant?</i> <i class="m">(?&lt;constraint script&gt;|"type" typename?)</i>
 </dt>
-        <dd>This command does the same as the command <i class="m">attribute</i>, just for the attribute <i class="m">name</i> in the namespace <i class="m">namespace</i>.</dd>
+        <dd>This command does the same as the command
+        <i class="m">attribute</i>, just for the attribute <i class="m">name</i> in the
+        namespace <i class="m">namespace</i>.</dd>
       
 
       
         <dt>
 <b class="method">namespace</b> <i class="m">uri</i> <i class="m">&lt;definition script&gt;</i>
 </dt>
-        <dd>Evaluates the <i class="m">definition script</i> with context namespace <i class="m">uri</i>. Every element or ref command name will be looked up in the namespace <i class="m">uri</i> and local defined element will be in that namespace.</dd>
+        <dd>Evaluates the <i class="m">definition script</i> with context
+        namespace <i class="m">uri</i>. Every element or ref command name will
+        be looked up in the namespace <i class="m">uri</i> and local defined
+        element will be in that namespace.</dd>
+      
+
+      
+        <dt>
+<b class="method">tcl</b> <i class="m">tclcmd</i> <i class="m">?arg arg ...?</i>
+</dt>
+        <dd>Evaluates the Tcl script <i class="m">tclcmd arg arg ... </i> and
+        the schema command appended to the argument list. This
+        validation command is only allowed in strict sequential
+        context (not in choice, mixed and interleave). If the return
+        code is something else than 0 (TCL_OK) then this ia a
+        validation error.</dd>
       
       
       
@@ -356,6 +382,17 @@
 
       
         <dt>
+<b class="method">deftext</b> <i class="m">name</i> <i class="m">&lt;constraint script&gt;</i>
+</dt>
+        <dd>This defines a named bundle of text constraints exactly
+        as a <i>schemacmd deftext</i> call. This is meant as toplevel
+        command of a <i>schemacmd define</i> script. This command is
+        not allowed nested in an other definition script command and
+        will raise error, if you call it there.</dd>
+      
+      
+      
+        <dt>
 <b class="method">start</b> <i class="m">name</i> <i class="m">?namespace?</i>
 </dt>
         <dd>This command works exactly as a <i>schemacmd start</i>
@@ -366,7 +403,7 @@
       
     </dl>
 
-  <h2><a name="SECTid0x55bd61f78080">Quantity specifier</a></h2><p>Serveral schema definition commands expects a quantifier as
+  <h2><a name="SECTid0x5606393af9a0">Quantity specifier</a></h2><p>Serveral schema definition commands expects a quantifier as
     one of their arguments, which specifies how often the content
     particle specified by the command is expected. The valid values
     for a <i class="m">quant</i> argument are:</p><dl class="optlist">
@@ -411,9 +448,11 @@
     </dl><p>If an optional quantifier is not given then it defaults to * in
     case of the mixed command and to ! for all other commands.</p>
 
-  <h2><a name="SECTid0x55bd61f79f10">Text constraint scripts</a></h2><p>Text - parsed character data, as XML calles it - must sometimes
+  <h2><a name="SECTid0x5606393b1830">Text constraint scripts</a></h2><p>Text - parsed character data, as XML calles it - must sometimes
     have to be of a certain kind, must comply to some rules etc to be
-    valid.</p><p>The text constraint commands are:</p><dl class="commandlist">
+    valid. The text constraint script arguments to the text,
+    attribute, nsattribute and deftext commands allow the following
+    text constraint commands to check text for certain properties.</p><p>The text constraint commands are:</p><dl class="commandlist">
       
         <dt>
 <b class="cmd">integer</b> <i class="m">?(xsd|tcl)?</i>
@@ -443,6 +482,7 @@
         the text to validate appended to the argument list. The return
         value of the tcl command is interpreted as a boolean.</dd>
       
+
       
         <dt>
 <b class="cmd">enumeration</b> <i class="m">list</i>
@@ -454,7 +494,7 @@
       
       
         <dt>
-<b class="cmd">match</b> <i class="m">?-nocase?</i> <i class="m">glob style match pattern</i>
+<b class="cmd">match</b> <i class="m">?-nocase?</i> <i class="m">glob_style_match_pattern&gt;</i>
 </dt>
         <dd>This text constraint match if the text value match the
         glob style pattern given as argument. It follows the rules of
@@ -591,13 +631,13 @@
       
     </dl>
 
-  <h2><a name="SECTid0x55bd61f82e70">Local key constraints</a></h2><p>Document wide uniqueness and foreign key constraints are
+  <h2><a name="SECTid0x5606393ba860">Local key constraints</a></h2><p>Document wide uniqueness and foreign key constraints are
     available with the text constraint commands id and idref.
     Keyspaces allow for sub-tree local uniqueness and foreign key
     constraints.</p><dl class="commandlist">
         
             <dt>
-<b class="cmd">keyspace</b> <i class="m">names list&gt;</i> <i class="m">&lt;constraint script&gt;</i>
+<b class="cmd">keyspace</b> <i class="m">&lt;names list&gt;</i> <i class="m">&lt;constraint script&gt;</i>
 </dt>
             <dd>Any number of keyspaces are possible. A keyspace is
             either active or not. An inside a <i class="m">constraint
@@ -607,9 +647,9 @@
     </dl><p>This text constraint commands work with keyspaces:</p><dl class="commandlist">
         
             <dt>
-<b class="cmd">key</b> <i class="m">name&gt;</i>
+<b class="cmd">key</b> <i class="m">&lt;name&gt;</i>
 </dt>
-            <dd>If the keyspace with the name <i class="m">name&gt;</i> is not
+            <dd>If the keyspace with the name <i class="m">&lt;name&gt;</i> is not
             active always matches. If the keyspace is active then
             reports error if there is already a key with the value.
             Otherwise, stores the value as key in this keyspace and
@@ -617,17 +657,17 @@
         
         
             <dt>
-<b class="cmd">keyref</b> <i class="m">name&gt;</i>
+<b class="cmd">keyref</b> <i class="m">&lt;name&gt;</i>
 </dt>
-            <dd>If the keyspace with the name <i class="m">name&gt;</i> is not
+            <dd>If the keyspace with the name <i class="m">&lt;name&gt;</i> is not
             active always matches. If the keyspace is active then
             reports error if there is still no key as the value at the
-            end of the keyspace <i class="m">name&gt;</i>. Otherwise it
+            end of the keyspace <i class="m">&lt;name&gt;</i>. Otherwise it
             matches.</dd>
         
     </dl>
 
-  <h2><a name="SECTid0x55bd61f84c80">Exampels</a></h2><p>The XML Schema Part 0: Primer Second Edition
+  <h2><a name="SECTid0x5606393bc670">Exampels</a></h2><p>The XML Schema Part 0: Primer Second Edition
     (<a href="https://www.w3.org/TR/xmlschema-0/">https://www.w3.org/TR/xmlschema-0/</a>) starts with this
     example schema:</p><pre class="example">
 &lt;xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;

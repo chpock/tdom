@@ -221,6 +221,11 @@ command are resolved in that namespace. If there is already a
 pattern definition for the name/namespace combination the
 command raises error.
 .TP
+\&\fB\fBdeftext\fP \fIname\fB \fI<constraint script>\fB
+\&\fRThis method defines a bundle of text constraints, that
+can be referred by \fIname\fR while defining constrains on
+text element or attribute values.
+.TP
 \&\fB\fBdefine\fP \fI<definition script>\fB
 \&\fRThis method allows to define several elements or pattern
 or a whole schema with one call.
@@ -377,10 +382,23 @@ them is the bareword "type" then the following is used as a
 text type name.
 .TP
 \&\fB\fBnsattribute\fP \fIname\fB \fInamespace\fB \fI?quant?\fB \fI(?<constraint script>|\*(lqtype\*(lq typename?)\fB
-\&\fRThis command does the same as the command \fIattribute\fR, just for the attribute \fIname\fR in the namespace \fInamespace\fR.
+\&\fRThis command does the same as the command
+\&\fIattribute\fR, just for the attribute \fIname\fR in the
+namespace \fInamespace\fR.
 .TP
 \&\fB\fBnamespace\fP \fIuri\fB \fI<definition script>\fB
-\&\fREvaluates the \fIdefinition script\fR with context namespace \fIuri\fR. Every element or ref command name will be looked up in the namespace \fIuri\fR and local defined element will be in that namespace.
+\&\fREvaluates the \fIdefinition script\fR with context
+namespace \fIuri\fR. Every element or ref command name will
+be looked up in the namespace \fIuri\fR and local defined
+element will be in that namespace.
+.TP
+\&\fB\fBtcl\fP \fItclcmd\fB \fI?arg arg ...?\fB
+\&\fREvaluates the Tcl script \fItclcmd arg arg ... \fR and
+the schema command appended to the argument list. This
+validation command is only allowed in strict sequential
+context (not in choice, mixed and interleave). If the return
+code is something else than 0 (TCL_OK) then this ia a
+validation error.
 .TP
 \&\fB\fBprefixns\fP \fI?prefixUriList?\fB
 \&\fRThis defines a prefix to namespace URI mapping exactly
@@ -402,6 +420,13 @@ defpattern\fR call. This is meant as toplevel command of a
 \&\fIschemacmd define\fR script. This command is not allowed
 nested in an other definition script command and will raise
 error, if you call it there.
+.TP
+\&\fB\fBdeftext\fP \fIname\fB \fI<constraint script>\fB
+\&\fRThis defines a named bundle of text constraints exactly
+as a \fIschemacmd deftext\fR call. This is meant as toplevel
+command of a \fIschemacmd define\fR script. This command is
+not allowed nested in an other definition script command and
+will raise error, if you call it there.
 .TP
 \&\fB\fBstart\fP \fIname\fB \fI?namespace?\fB
 \&\fRThis command works exactly as a \fIschemacmd start\fR
@@ -444,7 +469,9 @@ case of the mixed command and to ! for all other commands.
 .PP
 Text - parsed character data, as XML calles it - must sometimes
 have to be of a certain kind, must comply to some rules etc to be
-valid.
+valid. The text constraint script arguments to the text,
+attribute, nsattribute and deftext commands allow the following
+text constraint commands to check text for certain properties.
 .PP
 The text constraint commands are:
 .TP
@@ -471,7 +498,7 @@ value of the tcl command is interpreted as a boolean.
 one element (respecting case and any whitespace) of the
 argument \fIlist\fR, which has to be a valid Tcl list.
 .TP
-\&\fB\fBmatch\fP \fI?-nocase?\fB \fIglob style match pattern\fB
+\&\fB\fBmatch\fP \fI?-nocase?\fB \fIglob_style_match_pattern>\fB
 .UR "https://www.tcl.tk/man/tcl8.6/TclCmd/string.htm#M35"
 <URL: https://www.tcl.tk/man/tcl8.6/TclCmd/string.htm#M35>
 .UE
@@ -594,7 +621,7 @@ available with the text constraint commands id and idref.
 Keyspaces allow for sub-tree local uniqueness and foreign key
 constraints.
 .TP
-\&\fB\fBkeyspace\fP \fInames list>\fB \fI<constraint script>\fB
+\&\fB\fBkeyspace\fP \fI<names list>\fB \fI<constraint script>\fB
 \&\fRAny number of keyspaces are possible. A keyspace is
 either active or not. An inside a \fIconstraint
 script>\fR called keyspace with the same name does
@@ -602,18 +629,18 @@ nothing.
 .PP
 This text constraint commands work with keyspaces:
 .TP
-\&\fB\fBkey\fP \fIname>\fB
-\&\fRIf the keyspace with the name \fIname>\fR is not
+\&\fB\fBkey\fP \fI<name>\fB
+\&\fRIf the keyspace with the name \fI<name>\fR is not
 active always matches. If the keyspace is active then
 reports error if there is already a key with the value.
 Otherwise, stores the value as key in this keyspace and
 matches.
 .TP
-\&\fB\fBkeyref\fP \fIname>\fB
-\&\fRIf the keyspace with the name \fIname>\fR is not
+\&\fB\fBkeyref\fP \fI<name>\fB
+\&\fRIf the keyspace with the name \fI<name>\fR is not
 active always matches. If the keyspace is active then
 reports error if there is still no key as the value at the
-end of the keyspace \fIname>\fR. Otherwise it
+end of the keyspace \fI<name>\fR. Otherwise it
 matches.
 .SH Exampels
 .PP

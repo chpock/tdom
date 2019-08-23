@@ -1,5 +1,5 @@
-C Cleanly\sclose\sopen\skeyspace\sconstraints\seven\sin\scase\sof\serror\srecovering\sby\sskiping\sthe\sremaining\scontent\smodel\sof\sthe\senclosing\selement\safter\svalidation\serror.\sFixed\sinterleave\schecking\s(which\scould\smiss\sto\scomplained\sabout\smissing\schilds\sin\sthe\sinterleave\scontent).
-D 2019-08-23T17:36:58.602
+C Added\sdocumentation\sto\sfew\scommands,\simplemented\searlier.
+D 2019-08-23T22:56:31.042
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -39,9 +39,9 @@ F doc/manpage.css 3b4ec1d641048933a7e6bffc659de9519030a959
 F doc/pullparser.html 3afeaa6c3960776a6dfc09df4395aace9c73c05389861bf8de1ce5943f7cc73b
 F doc/pullparser.n 5f5672e8bb2dd221602040cd212234da6b6ed8c99c5daa60be9fa0c476529c09
 F doc/pullparser.xml 6032c1e8c8d001068c227601dba9860824f8acc709c87fd8e36ac4a596b6a2f2
-F doc/schema.html 1d3bcddeb96a8700d32695a228c66eab87126c35b626e69dd421aec3a108a64c
-F doc/schema.n d83f7a42856f8bc6fba8c748c9c674830af6d23d90f39f0f13d46e016db4ba3f
-F doc/schema.xml a2b5f466b73800882602ed8936242203345ced9136905c75cced9a26b710b878
+F doc/schema.html fe17a4a564ff0a320625d43de68777a2db7af0cdcf3d87dd1b91364f5da4efc3
+F doc/schema.n f2fe65599426af29bcbc6928cb32b5e46de9b7b462394c8c0db9c190f6438289
+F doc/schema.xml 418f460a8f8881791c6b6049182ce3362cbdc5bc19747f3c6a2a6db7e551f3cb
 F doc/tDOM.xml 04db7d0ccfea39aae21f4fe07b8f05d5bff8a84193cfce2aa5faa2f42c076377
 F doc/tdomcmd.html 9b4d9ff443499554adf2346ff0efc0317a98bd6e1fc3fc79a6e476b71fe85fed
 F doc/tdomcmd.n c06a5ff035f16a2a52636b69d9ebe6ba84ff5101922ed27b551146c4d61d6cda
@@ -230,9 +230,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 5cf43bf74a9ee11dba048f76a90632424835458c7047e4cf3e5113201f7e6f92 2c03ac9cd68a78ceddceae203d81d04f97d88ea14968338490695ee10acd8721
-R 80c79d8949246f1ea6476ad3ae45d11e
-T +closed 2c03ac9cd68a78ceddceae203d81d04f97d88ea14968338490695ee10acd8721
+P 37403bd128fc1c9fdf4d1edc606a3cf8e4f475795121659d62be2ae708eba260
+R 83fceb5290bb900d7858ded9ef7b0b05
 U rolf
-Z 24d88440f45244767f53ed10f8376e0d
+Z 69193db64871a02ee07365c2e96a0463
 # Remove this line to create a well-formed Fossil manifest.

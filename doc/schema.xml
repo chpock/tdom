@@ -74,6 +74,13 @@
       </commanddef>
 
       <commanddef>
+        <command><method>deftext</method> <m>name</m> <m>&lt;constraint script></m></command>
+        <desc>This method defines a bundle of text constraints, that
+        can be referred by <m>name</m> while defining constrains on
+        text element or attribute values.</desc>
+      </commanddef>
+      
+      <commanddef>
         <command><method>define</method> <m>&lt;definition script></m></command>
         <desc>This method allows to define several elements or pattern
         or a whole schema with one call.</desc>
@@ -283,12 +290,27 @@
 
       <commanddef>
         <command><method>nsattribute</method> <m>name</m> <m>namespace</m> <m>?quant?</m> <m>(?&lt;constraint script>|"type" typename?)</m></command>
-        <desc>This command does the same as the command <m>attribute</m>, just for the attribute <m>name</m> in the namespace <m>namespace</m>.</desc>
+        <desc>This command does the same as the command
+        <m>attribute</m>, just for the attribute <m>name</m> in the
+        namespace <m>namespace</m>.</desc>
       </commanddef>
 
       <commanddef>
         <command><method>namespace</method> <m>uri</m> <m>&lt;definition script></m></command>
-        <desc>Evaluates the <m>definition script</m> with context namespace <m>uri</m>. Every element or ref command name will be looked up in the namespace <m>uri</m> and local defined element will be in that namespace.</desc>
+        <desc>Evaluates the <m>definition script</m> with context
+        namespace <m>uri</m>. Every element or ref command name will
+        be looked up in the namespace <m>uri</m> and local defined
+        element will be in that namespace.</desc>
+      </commanddef>
+
+      <commanddef>
+        <command><method>tcl</method> <m>tclcmd</m> <m>?arg arg ...?</m></command>
+        <desc>Evaluates the Tcl script <m>tclcmd arg arg ... </m> and
+        the schema command appended to the argument list. This
+        validation command is only allowed in strict sequential
+        context (not in choice, mixed and interleave). If the return
+        code is something else than 0 (TCL_OK) then this ia a
+        validation error.</desc>
       </commanddef>
       
       <commanddef>
@@ -318,6 +340,15 @@
         error, if you call it there.</desc>
       </commanddef>
 
+      <commanddef>
+        <command><method>deftext</method> <m>name</m> <m>&lt;constraint script></m></command>
+        <desc>This defines a named bundle of text constraints exactly
+        as a <i>schemacmd deftext</i> call. This is meant as toplevel
+        command of a <i>schemacmd define</i> script. This command is
+        not allowed nested in an other definition script command and
+        will raise error, if you call it there.</desc>
+      </commanddef>
+      
       <commanddef>
         <command><method>start</method> <m>name</m> <m>?namespace?</m></command>
         <desc>This command works exactly as a <i>schemacmd start</i>
@@ -388,7 +419,9 @@
 
     <p>Text - parsed character data, as XML calles it - must sometimes
     have to be of a certain kind, must comply to some rules etc to be
-    valid.</p>
+    valid. The text constraint script arguments to the text,
+    attribute, nsattribute and deftext commands allow the following
+    text constraint commands to check text for certain properties.</p>
 
     <p>The text constraint commands are:</p>
 
@@ -416,6 +449,7 @@
         the text to validate appended to the argument list. The return
         value of the tcl command is interpreted as a boolean.</desc>
       </commanddef>
+
       <commanddef>
         <command><cmd>enumeration</cmd> <m>list</m></command>
         <desc>This text constraint match if the text value is equal to
@@ -424,7 +458,7 @@
         </desc>
       </commanddef>
       <commanddef>
-        <command><cmd>match</cmd> <m>?-nocase?</m> <m>glob style match pattern</m></command>
+        <command><cmd>match</cmd> <m>?-nocase?</m> <m>glob_style_match_pattern></m></command>
         <desc>This text constraint match if the text value match the
         glob style pattern given as argument. It follows the rules of
         the Tcl [string match] command, see
@@ -551,7 +585,7 @@
 
     <commandlist>
         <commanddef>
-            <command><cmd>keyspace</cmd> <m>&kt;names list></m> <m>&lt;constraint script></m></command>
+            <command><cmd>keyspace</cmd> <m>&lt;names list></m> <m>&lt;constraint script></m></command>
             <desc>Any number of keyspaces are possible. A keyspace is
             either active or not. An inside a <m>constraint
             script></m> called keyspace with the same name does
@@ -563,19 +597,19 @@
 
     <commandlist>
         <commanddef>
-            <command><cmd>key</cmd> <m>name></m></command>
-            <desc>If the keyspace with the name <m>name></m> is not
+            <command><cmd>key</cmd> <m>&lt;name></m></command>
+            <desc>If the keyspace with the name <m>&lt;name></m> is not
             active always matches. If the keyspace is active then
             reports error if there is already a key with the value.
             Otherwise, stores the value as key in this keyspace and
             matches.</desc>
         </commanddef>
         <commanddef>
-            <command><cmd>keyref</cmd> <m>name></m></command>
-            <desc>If the keyspace with the name <m>name></m> is not
+            <command><cmd>keyref</cmd> <m>&lt;name></m></command>
+            <desc>If the keyspace with the name <m>&lt;name></m> is not
             active always matches. If the keyspace is active then
             reports error if there is still no key as the value at the
-            end of the keyspace <m>name></m>. Otherwise it
+            end of the keyspace <m>&lt;name></m>. Otherwise it
             matches.</desc>
         </commanddef>
     </commandlist>
