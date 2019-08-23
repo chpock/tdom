@@ -4665,6 +4665,36 @@ test schema-16.15 {interleave} {
     set result
 } {0 1 0 1 0 1 1 0}
 
+
+test schema-16.16 {interleave} {
+    tdom::schema s
+    s define {
+        foreach e {a b1 b11 b2 c} {
+            defelement $e {}
+        }
+        defelement items {
+            interleave {
+                element a
+                element b ?
+            }
+            element c
+        }
+        defelement doc {
+            element items +
+        }
+    }
+    set result [list]
+    foreach xml {
+        {<doc><items><b/><a/><c/></items></doc>}
+        {<doc><items><b/><a/><c/></items><items><a/><b/><c/></items></doc>}
+        {<doc><items><b/><b/><c/></items><items><a/><c/></items><items><b/><a/><c/></items></doc>}
+    } {
+        lappend result [s validate $xml errMsg]
+    }
+    s delete
+    set result
+} {1 1 0}
+
 test schema-17.1 {info} {
     tdom::schema s
     s define {
@@ -4835,6 +4865,181 @@ test schema-18.5 {reportcmd} {
     s delete
     set result
 } {s WRONG_VALUE 1 s WRONG_VALUE s MISSING_TEXT 1 1}
+
+test schema-18.6 {reportcmd} {
+    tdom::schema s
+    s define {
+        defelement item {
+            text {
+                key lang
+                minLength 2
+            }
+        }
+        defelement items {
+            keyspace lang {
+                element item +
+            }
+        }
+        defelement doc {
+            element items + 
+        }
+    }
+    s reportcmd schema-18
+    set result [list]
+    foreach xml {
+        {<doc><items><item>12</item><item>ab</item></items></doc>}
+        {<doc><items><item>12</item><item>12</item></items></doc>}
+        {<doc><items><item>12</item><item>12</item></items><items><item>ab</item><item>cd</item></items></doc>}
+        {<doc><items><item>12</item><item>12</item></items><items><item>ab</item><item>cd</item></items><items><item>12</item><item>12</item></items></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 s WRONG_VALUE 1 s WRONG_VALUE 1 s WRONG_VALUE s WRONG_VALUE 1}
+
+proc schema-18.7 {args} {
+    global result
+    lappend result "tclcallback"
+}
+
+test schema-18.7 {reportcmd} {
+    tdom::schema s
+    s define {
+        defelement a {}
+        defelement b {}
+        defelement c {}
+        defelement items {
+            interleave {
+                element a
+                element b
+            }
+            tcl schema-18.7
+            element c
+        }
+        defelement doc {
+            element items +
+        }
+    }
+    s reportcmd schema-18
+    set result [list]
+    foreach xml {
+        {<doc><items><b/><a/><c/></items></doc>}
+        {<doc><items><b/><a/><c/></items><items><a/><b/><c/></items></doc>}
+        {<doc><items><b/><a/><c/></items><items><b/><c/></items><items><a/><b/><c/></items></doc>}
+        {<doc><items><b/><a/><c/></items><items><a/><c/></items><items><b/><a/></items></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {tclcallback 1 tclcallback tclcallback 1 tclcallback s MISSING_ONE_OF_INTERLEAVE tclcallback 1 tclcallback s MISSING_ONE_OF_INTERLEAVE tclcallback s MISSING_ELEMENT 1}
+
+test schema-18.8 {reportcmd} {
+    tdom::schema s
+    s define {
+        defelement a {}
+        defelement b {}
+        defelement c {}
+        defelement items {
+            element a
+            element b
+            element c
+        }
+        defelement doc {
+            element items +
+        }
+    }
+    s reportcmd schema-18
+    set result [list]
+    foreach xml {
+        {<doc><items><a/><b/><c/></items><items><a/><c/></items><items><b/><a/></items></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {s MISSING_CP s MISSING_CP 1}
+
+test schema-18.9 {reportcmd} {
+    tdom::schema s
+    s define {
+        defelement a {}
+        defelement b {}
+        defelement c {}
+        defelement doc {
+            group + {
+                element a
+                element b
+                element c
+            }
+        }
+    }
+    s reportcmd schema-18
+    set result [list]
+    foreach xml {
+        {<doc><a/><b/><c/><a/><c/><b/><a/></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {s MISSING_CP 1}
+
+test schema-18.10 {reportcmd} {
+    tdom::schema s
+    s define {
+        defelement a {}
+        defelement b {}
+        defelement c {}
+        defelement doc {
+            group + {
+                element a
+                element b
+                group + {
+                    element c
+                }
+            }
+        }
+    }
+    s reportcmd schema-18
+    set result [list]
+    foreach xml {
+        {<doc><a/><b/><c/><a/><b/><a/></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {s MISSING_CP 1}
+
+test schema-18.11 {reportcmd} {
+    tdom::schema s
+    s define {
+        defelement a {}
+        defelement b {}
+        defelement c {}
+        defelement doc {
+            element a
+            element b
+            element c
+        }
+    }
+    s reportcmd schema-18
+    set result [list]
+    foreach xml {
+        <doc><a/><b/><c/></doc>
+        <doc><a/><c/></doc>
+        <doc><b/><c/></doc>
+        <doc><a/><a/><b/><c/></doc>
+        <doc><a/><b/><b/><c/></doc>
+        <doc><a/><b/><c/><e/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 s MISSING_CP 1 s MISSING_CP 1 s MISSING_CP 1 s MISSING_CP 1 s UNEXPECTED_ELEMENT 1}
 
 proc validatedSAX {g xml {keepEmpties 1}} {
     set args [list -validateCmd $g]
