@@ -260,14 +260,6 @@ static void SetActiveSchemaData (SchemaData *v)
         se->hasMatched = 1;                       \
     }
 
-#define serializeElementName(rObj, cp)                  \
-    rObj = Tcl_NewObj();                                \
-    if (cp->namespace) {                                \
-        Tcl_SetStringObj (rObj, cp->namespace, -1);     \
-        Tcl_AppendToObj (rObj, ":", 1);                 \
-    }                                                   \
-    Tcl_AppendToObj (rObj, cp->name, -1);
-
 #define S(str)  str, sizeof (str) -1
 
 static SchemaCP*
@@ -1319,6 +1311,7 @@ probeElement (
             return TCL_ERROR;
         }
     } else {
+        sdata->validationState = VALIDATION_STARTED;
         if (!pattern) {
             if (recover (interp, sdata, S("UNKNOWN_ROOT_ELEMENT"), 0, 0)) {
                 sdata->skipDeep = 1;
@@ -1328,7 +1321,6 @@ probeElement (
             return TCL_ERROR;
         }
         pushToStack (sdata, pattern);
-        sdata->validationState = VALIDATION_STARTED;
         return TCL_OK;
     }
 
@@ -2721,6 +2713,24 @@ evalConstraints (
     return result;
 }
 
+/* cp must be of type SCHEMA_CTYPE_NAME for useful results */
+static Tcl_Obj*
+serializeElementName (
+    Tcl_Interp *interp,
+    SchemaCP *cp
+    )
+{
+    Tcl_Obj *rObj;
+
+    rObj = Tcl_NewObj();
+    Tcl_ListObjAppendElement (interp, rObj, Tcl_NewStringObj (cp->name, -1));
+    if (cp->namespace) {
+        Tcl_ListObjAppendElement (interp, rObj,
+                                  Tcl_NewStringObj (cp->namespace, -1));
+    }
+    return rObj;
+}
+
 static int
 schemaInstanceInfoCmd (
     SchemaData *sdata,
@@ -2738,10 +2748,11 @@ schemaInstanceInfoCmd (
     
     static const char *schemaInstanceInfoMethods[] = {
         "validationstate", "vstate", "defelements", "stack", "toplevel",
-        NULL
+        "expected", NULL
     };
     enum schemaInstanceInfoMethod {
-        m_validationstate, m_vstate, m_defelements, m_stack, m_toplevel
+        m_validationstate, m_vstate, m_defelements, m_stack, m_toplevel,
+        m_expected
     };
 
     static const char *schemaInstanceInfoStackMethods[] = {
@@ -2795,7 +2806,7 @@ schemaInstanceInfoCmd (
             if (!cp) continue;
             if (cp->flags & FORWARD_PATTERN_DEF
                 || cp->flags & PLACEHOLDER_PATTERN_DEF) continue;
-            serializeElementName (elmObj, cp);
+            elmObj = serializeElementName (interp, cp);
             if (Tcl_ListObjAppendElement (interp, resultObj, elmObj) != TCL_OK)
                 return TCL_ERROR;
         }
@@ -2820,7 +2831,7 @@ schemaInstanceInfoCmd (
             while (se->pattern->type != SCHEMA_CTYPE_NAME) {
                 se = se->down;
             }
-            serializeElementName (elmObj, se->pattern);
+            elmObj = serializeElementName (interp, se->pattern);
             Tcl_SetObjResult (interp, elmObj);
             return TCL_OK;
             break;
@@ -2839,6 +2850,23 @@ schemaInstanceInfoCmd (
             SetBooleanResult (0);
         } else {
             SetBooleanResult (1);
+        }
+
+    case m_expected:
+        if (sdata->validationState != VALIDATION_STARTED) {
+            SetResult ("No validation started");
+            return TCL_ERROR;
+        }
+        if (!sdata->stack) {
+            if (sdata->start) {
+                Tcl_AppendElement (interp, sdata->start);
+                if (sdata->startNamespace) {
+                    Tcl_AppendElement (interp, sdata->startNamespace);
+                }
+            } else {
+                /* do the same as defelements: factor that out */
+            }
+        } else {
         }
     }
     
@@ -2865,6 +2893,7 @@ schemaInstanceCmd (
     char          *xmlstr, *errMsg;
     domDocument   *doc;
     domNode       *node;
+    Tcl_Obj       *obj;
 
     static const char *schemaInstanceMethods[] = {
         "defelement",  "defpattern",  "start", "event",     "delete",
@@ -3196,8 +3225,8 @@ schemaInstanceCmd (
                            "document or a element node");
                 return TCL_ERROR;
             }
-            sdata->validationState = VALIDATION_STARTED;
         }
+        sdata->validationState = VALIDATION_STARTED;
         if (validateDOM (interp, sdata, node) == TCL_OK) {
             SetBooleanResult (1);
             if (objc == 4) {
