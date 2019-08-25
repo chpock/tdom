@@ -449,6 +449,9 @@ static void freeSchemaCP (
         freedomKeyConstraints (pattern->domKeys);
         break;
     }
+    if (pattern->defScript) {
+        Tcl_DecrRefCount (pattern->defScript);
+    }
     FREE (pattern);
 }
 
@@ -2744,15 +2747,16 @@ schemaInstanceInfoCmd (
     Tcl_HashSearch search;
     SchemaCP *cp;
     SchemaValidationStack *se;
-    Tcl_Obj *resultObj, *elmObj;
+    Tcl_Obj *rObj, *elmObj;
+    void *ns;
     
     static const char *schemaInstanceInfoMethods[] = {
         "validationstate", "vstate", "defelements", "stack", "toplevel",
-        "expected", NULL
+        "expected", "definition", NULL
     };
     enum schemaInstanceInfoMethod {
         m_validationstate, m_vstate, m_defelements, m_stack, m_toplevel,
-        m_expected
+        m_expected, m_definition
     };
 
     static const char *schemaInstanceInfoStackMethods[] = {
@@ -2798,7 +2802,7 @@ schemaInstanceInfoCmd (
             Tcl_WrongNumArgs (interp, 1, objv, "defelements");
             return TCL_ERROR;
         }
-        resultObj = Tcl_GetObjResult (interp);
+        rObj = Tcl_GetObjResult (interp);
         for (h = Tcl_FirstHashEntry (&sdata->element, &search);
              h != NULL;
              h = Tcl_NextHashEntry (&search)) {
@@ -2807,7 +2811,7 @@ schemaInstanceInfoCmd (
             if (cp->flags & FORWARD_PATTERN_DEF
                 || cp->flags & PLACEHOLDER_PATTERN_DEF) continue;
             elmObj = serializeElementName (interp, cp);
-            if (Tcl_ListObjAppendElement (interp, resultObj, elmObj) != TCL_OK)
+            if (Tcl_ListObjAppendElement (interp, rObj, elmObj) != TCL_OK)
                 return TCL_ERROR;
         }
         break;
@@ -2868,8 +2872,44 @@ schemaInstanceInfoCmd (
             }
         } else {
         }
+        break;
+        
+    case m_definition:
+        if (objc < 3 && objc > 4) {
+            Tcl_WrongNumArgs (interp, 1, objv, "name ?namespace?");
+            return TCL_ERROR;
+        }
+        h = Tcl_FindHashEntry (&sdata->element, Tcl_GetString (objv[2]));
+        if (!h) {
+            SetResult ("Unknown element");
+            return TCL_ERROR;
+        }
+        cp = Tcl_GetHashValue (h);
+        ns = NULL;
+        if (objc == 4) {
+            ns = getNamespacePtr (sdata, Tcl_GetString (objv[3]));
+        }
+        while (cp && cp->namespace != ns) {
+            cp = cp->next;
+        }
+        if (!cp) {
+            SetResult ("Unknown element");
+            return TCL_ERROR;
+        }
+        if (cp->flags & LOCAL_DEFINED_ELEMENT) {
+            Tcl_AppendElement (interp, "element");
+        } else {
+            Tcl_AppendElement (interp, "defelement");
+        }
+        Tcl_AppendElement (interp, cp->name);
+        if (cp->namespace) {
+            Tcl_AppendElement (interp, cp->namespace);
+        }
+        if (cp->defScript) {
+            Tcl_AppendElement (interp, Tcl_GetString (cp->defScript));
+        }
+        break;
     }
-    
     return TCL_OK;
 }
 
@@ -3024,6 +3064,8 @@ schemaInstanceCmd (
                 }
                 pattern->flags &= ~PLACEHOLDER_PATTERN_DEF;
             }
+            pattern->defScript = objv[patternIndex];
+            Tcl_IncrRefCount (pattern->defScript);
         } else {
             cleanupLastPattern (sdata, savedNumPatternList);
         }

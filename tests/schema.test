@@ -4742,6 +4742,28 @@ test schema-17.3 {info} {
     set result
 } {a b}
 
+test schema-17.4 {info} {
+    tdom::schema s
+    s define {
+        defelement b {
+            element b1 1 text
+            element a
+            element b2
+        }
+        defelement a {
+            element a1
+            element a2
+        }
+    }
+    set result [s info definition b]
+    s delete
+    set result
+} {defelement b {
+            element b1 1 text
+            element a
+            element b2
+        }}
+
 proc schema-18 {args} {
     lappend ::result {*}$args
 }

@@ -108,6 +108,7 @@ typedef struct SchemaCP
     unsigned int      numReqAttr;
     domKeyConstraint *domKeys;
     SchemaKeySpace   *keySpace;
+    Tcl_Obj          *defScript;
 } SchemaCP;
 
 typedef struct SchemaValidationStack
