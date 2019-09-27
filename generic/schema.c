@@ -2734,6 +2734,30 @@ serializeElementName (
     return rObj;
 }
 
+static void
+definedElements (
+    SchemaData *sdata,
+    Tcl_Interp *interp
+    )
+{
+    Tcl_Obj *rObj, *elmObj;
+    Tcl_HashEntry *h;
+    Tcl_HashSearch search;
+    SchemaCP *cp;
+    
+    rObj = Tcl_GetObjResult (interp);
+    for (h = Tcl_FirstHashEntry (&sdata->element, &search);
+         h != NULL;
+         h = Tcl_NextHashEntry (&search)) {
+        cp = (SchemaCP *) Tcl_GetHashValue (h);
+        if (!cp) continue;
+        if (cp->flags & FORWARD_PATTERN_DEF
+            || cp->flags & PLACEHOLDER_PATTERN_DEF) continue;
+        elmObj = serializeElementName (interp, cp);
+        Tcl_ListObjAppendElement (interp, rObj, elmObj);
+    }
+}
+    
 static int
 schemaInstanceInfoCmd (
     SchemaData *sdata,
@@ -2744,18 +2768,17 @@ schemaInstanceInfoCmd (
 {
     int methodIndex;
     Tcl_HashEntry *h;
-    Tcl_HashSearch search;
     SchemaCP *cp;
     SchemaValidationStack *se;
-    Tcl_Obj *rObj, *elmObj;
+    Tcl_Obj *elmObj;
     void *ns;
     
     static const char *schemaInstanceInfoMethods[] = {
-        "validationstate", "vstate", "defelements", "stack", "toplevel",
+        "validationstate", "vstate", "definedElements", "stack", "toplevel",
         "expected", "definition", NULL
     };
     enum schemaInstanceInfoMethod {
-        m_validationstate, m_vstate, m_defelements, m_stack, m_toplevel,
+        m_validationstate, m_vstate, m_definedElements, m_stack, m_toplevel,
         m_expected, m_definition
     };
 
@@ -2797,23 +2820,12 @@ schemaInstanceInfoCmd (
         }
         break;
         
-    case m_defelements:
+    case m_definedElements:
         if (objc != 2) {
-            Tcl_WrongNumArgs (interp, 1, objv, "defelements");
+            Tcl_WrongNumArgs (interp, 1, objv, "definedElements");
             return TCL_ERROR;
         }
-        rObj = Tcl_GetObjResult (interp);
-        for (h = Tcl_FirstHashEntry (&sdata->element, &search);
-             h != NULL;
-             h = Tcl_NextHashEntry (&search)) {
-            cp = (SchemaCP *) Tcl_GetHashValue (h);
-            if (!cp) continue;
-            if (cp->flags & FORWARD_PATTERN_DEF
-                || cp->flags & PLACEHOLDER_PATTERN_DEF) continue;
-            elmObj = serializeElementName (interp, cp);
-            if (Tcl_ListObjAppendElement (interp, rObj, elmObj) != TCL_OK)
-                return TCL_ERROR;
-        }
+        definedElements (sdata, interp);
         break;
 
     case m_stack:
@@ -2868,7 +2880,7 @@ schemaInstanceInfoCmd (
                     Tcl_AppendElement (interp, sdata->startNamespace);
                 }
             } else {
-                /* do the same as defelements: factor that out */
+                definedElements (sdata, interp);
             }
         } else {
         }
@@ -2933,7 +2945,6 @@ schemaInstanceCmd (
     char          *xmlstr, *errMsg;
     domDocument   *doc;
     domNode       *node;
-    Tcl_Obj       *obj;
 
     static const char *schemaInstanceMethods[] = {
         "defelement",  "defpattern",  "start", "event",     "delete",

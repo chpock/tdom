@@ -4702,7 +4702,7 @@ test schema-17.1 {info} {
             defelement $e {}
         }
     }
-    set result [lsort [s info defelements]]
+    set result [lsort [s info definedElements]]
     s delete
     set result
 } {a b1 b11 b2 c}
@@ -4719,7 +4719,7 @@ test schema-17.2 {info} {
             element a2
         }
     }
-    set result [lsort [s info defelements]]
+    set result [lsort [s info definedElements]]
     s delete
     set result
 } {a b}
@@ -4737,7 +4737,7 @@ test schema-17.3 {info} {
             element a2
         }
     }
-    set result [lsort [s info defelements]]
+    set result [lsort [s info definedElements]]
     s delete
     set result
 } {a b}
