@@ -2757,7 +2757,120 @@ definedElements (
         Tcl_ListObjAppendElement (interp, rObj, elmObj);
     }
 }
+
+static void
+getFrontExpected (
+    SchemaValidationStack *se,
+    Tcl_Interp *interp,
+    Tcl_Obj *rObj
+    )
+{
+    int ac, hm, i;
+    SchemaCP *cp, *ic, *jc;
+
+    getContext (cp, ac, hm);
+    if (hasMatched(cp->quants[ac], hm)) {
+        ac++;
+        hm = 0;
+    }
+    switch (cp->type) {
+    case SCHEMA_CTYPE_INTERLEAVE:
+        if (se->interleaveState) {
+            for (i = 0; i < cp->nc; i++) {
+                if (se->interleaveState[i] && maxOne (cp->quants[i])) {
+                    continue;
+                }
+                
+            }
+            
+            
+            break;
+        }
+        /* Fall through */
+    case SCHEMA_CTYPE_NAME:
+    case SCHEMA_CTYPE_PATTERN:
+        while (ac < cp->nc) {
+            ic = cp->content[ac];
+            switch (ic->type) {
+            case SCHEMA_CTYPE_NAME:
+                Tcl_ListObjAppendElement (interp, rObj,
+                                          serializeElementName (interp, ic));
+                break;
+            case SCHEMA_CTYPE_INTERLEAVE:
+            case SCHEMA_CTYPE_PATTERN:
+                /* Mumble mumble */
+                break;
+
+            case SCHEMA_CTYPE_ANY:
+                Tcl_ListObjAppendElement (interp, rObj,
+                                          Tcl_NewStringObj ("<any>", 5));
+                break;
+
+            case SCHEMA_CTYPE_TEXT:
+                Tcl_ListObjAppendElement (interp, rObj,
+                                          Tcl_NewStringObj ("#text", 5));
+                break;
+                
+            case SCHEMA_CTYPE_CHOICE:
+                for (i = 0; i < ic->nc; i++) {
+                    jc = ic->content[i];
+                    switch (jc->type) {
+                    case SCHEMA_CTYPE_NAME:
+                        Tcl_ListObjAppendElement (
+                            interp, rObj, serializeElementName (interp, jc)
+                            );
+                        break;
+                    case SCHEMA_CTYPE_INTERLEAVE:
+                    case SCHEMA_CTYPE_PATTERN:
+                        /* Mumble mumble */
+                        break;
+
+                    case SCHEMA_CTYPE_ANY:
+                        Tcl_ListObjAppendElement (
+                            interp, rObj, Tcl_NewStringObj ("<any>", 5)
+                            );
+                        break;
+
+                    case SCHEMA_CTYPE_TEXT:
+                        Tcl_ListObjAppendElement (
+                            interp, rObj, Tcl_NewStringObj ("#text", 5)
+                            );
+                        break;
+                    case SCHEMA_CTYPE_CHOICE:
+                        Tcl_Panic ("MIXED or CHOICE child of MIXED or CHOICE");
+
+                    case SCHEMA_CTYPE_VIRTUAL:
+                    case SCHEMA_CTYPE_KEYSPACE:
+                    case SCHEMA_CTYPE_KEYSPACE_END:
+                        break;
+                    }
+                }
+                break;
+
+            case SCHEMA_CTYPE_VIRTUAL:
+            case SCHEMA_CTYPE_KEYSPACE:
+            case SCHEMA_CTYPE_KEYSPACE_END:
+                break;
+            }
+                    
+        }
+        break;
+        
+        
+    case SCHEMA_CTYPE_ANY:
+    case SCHEMA_CTYPE_CHOICE:
+    case SCHEMA_CTYPE_TEXT:
+    case SCHEMA_CTYPE_VIRTUAL:
+    case SCHEMA_CTYPE_KEYSPACE:
+    case SCHEMA_CTYPE_KEYSPACE_END:
+        Tcl_Panic ("Invalid CTYPE onto the validation stack!");
+    }
+    if (cp->type == SCHEMA_CTYPE_NAME) {
+        return;
+    }
     
+}
+
 static int
 schemaInstanceInfoCmd (
     SchemaData *sdata,
@@ -2772,14 +2885,15 @@ schemaInstanceInfoCmd (
     SchemaValidationStack *se;
     Tcl_Obj *elmObj;
     void *ns;
+    Tcl_Obj *rObj;
     
     static const char *schemaInstanceInfoMethods[] = {
         "validationstate", "vstate", "definedElements", "stack", "toplevel",
-        "expected", "definition", NULL
+        "pastexpected", "frontexpected", "definition", NULL
     };
     enum schemaInstanceInfoMethod {
         m_validationstate, m_vstate, m_definedElements, m_stack, m_toplevel,
-        m_expected, m_definition
+        m_pastexpected, m_frontexpected, m_definition
     };
 
     static const char *schemaInstanceInfoStackMethods[] = {
@@ -2867,8 +2981,9 @@ schemaInstanceInfoCmd (
         } else {
             SetBooleanResult (1);
         }
+        return TCL_OK;
 
-    case m_expected:
+    case m_frontexpected:
         if (sdata->validationState != VALIDATION_STARTED) {
             SetResult ("No validation started");
             return TCL_ERROR;
@@ -2883,7 +2998,12 @@ schemaInstanceInfoCmd (
                 definedElements (sdata, interp);
             }
         } else {
+            rObj = Tcl_GetObjResult (interp);
+            getFrontExpected (sdata->stack, interp, rObj);
         }
+        return TCL_OK;
+        
+    case m_pastexpected:
         break;
         
     case m_definition:
