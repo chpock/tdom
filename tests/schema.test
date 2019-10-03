@@ -4784,6 +4784,29 @@ test schema-17.5 {info frontexpected} {
     set result
 } {a c b toplevel musthave}
 
+test schema-17.6 {info frontexpected} {
+    tdom::schema s
+    s prefixns {foo http://foo.bar}
+    s define {
+        defelement doc {
+            choice ? {
+                element a
+                element c
+                element b
+            }
+            element toplevel ?
+            namespace foo {
+                element musthave
+            }
+            element aftermust
+        }
+    }
+    s event start doc
+    set result [s info frontexpected]
+    s delete
+    set result
+} {a c b toplevel {musthave http://foo.bar}}
+
 proc schema-18 {args} {
     lappend ::result {*}$args
 }
