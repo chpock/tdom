@@ -4764,6 +4764,26 @@ test schema-17.4 {info} {
             element b2
         }}
 
+test schema-17.5 {info frontexpected} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            choice ? {
+                element a
+                element c
+                element b
+            }
+            element toplevel ?
+            element musthave
+            element aftermust
+        }
+    }
+    s event start doc
+    set result [s info frontexpected]
+    s delete
+    set result
+} {a c b toplevel musthave}
+
 proc schema-18 {args} {
     lappend ::result {*}$args
 }

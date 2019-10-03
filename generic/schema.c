@@ -742,6 +742,25 @@ addToContent (
     }
 }
 
+static SchemaValidationStack * 
+getStackElement (
+    SchemaData *sdata,
+    SchemaCP *pattern
+    )
+{
+    SchemaValidationStack *stackElm;
+
+    if (sdata->stackPool) {
+        stackElm = sdata->stackPool;
+        sdata->stackPool = stackElm->down;
+    } else {
+        stackElm = TMALLOC (SchemaValidationStack);
+    }
+    memset (stackElm, 0, sizeof (SchemaValidationStack));
+    stackElm->pattern = pattern;
+    return stackElm;
+}
+
 static void
 pushToStack (
     SchemaData *sdata,
@@ -766,6 +785,16 @@ pushToStack (
         memset (stackElm->interleaveState, 0, sizeof (int) * pattern->nc);
     }
     sdata->stack = stackElm;
+}
+
+static void
+repoolStackElement (
+    SchemaData *sdata,
+    SchemaValidationStack *se
+    ) 
+{
+    se->down = sdata->stackPool;
+    sdata->stackPool = se;
 }
 
 static void
@@ -2760,36 +2789,32 @@ definedElements (
 
 static void
 getFrontExpected (
+    SchemaData *sdata,
     SchemaValidationStack *se,
     Tcl_Interp *interp,
+    Tcl_HashTable *seenCPs,
     Tcl_Obj *rObj
     )
 {
-    int ac, hm, i;
+    int ac, hm, i, hnew;
     SchemaCP *cp, *ic, *jc;
+    SchemaValidationStack *se1;
 
     getContext (cp, ac, hm);
-    if (hasMatched(cp->quants[ac], hm)) {
-        ac++;
-        hm = 0;
-    }
+    if (hm && maxOne(cp->quants[ac])) ac++;
     switch (cp->type) {
     case SCHEMA_CTYPE_INTERLEAVE:
-        if (se->interleaveState) {
-            for (i = 0; i < cp->nc; i++) {
-                if (se->interleaveState[i] && maxOne (cp->quants[i])) {
-                    continue;
-                }
-                
-            }
-            
-            
-            break;
-        }
+        ac = 0;
         /* Fall through */
     case SCHEMA_CTYPE_NAME:
     case SCHEMA_CTYPE_PATTERN:
         while (ac < cp->nc) {
+            if (se->interleaveState
+                && se->interleaveState[ac]
+                && maxOne (cp->quants[ac])) {
+                ac++;
+                continue;
+            }
             ic = cp->content[ac];
             switch (ic->type) {
             case SCHEMA_CTYPE_NAME:
@@ -2798,7 +2823,12 @@ getFrontExpected (
                 break;
             case SCHEMA_CTYPE_INTERLEAVE:
             case SCHEMA_CTYPE_PATTERN:
-                /* Mumble mumble */
+                Tcl_CreateHashEntry (seenCPs, ic, &hnew);
+                if (hnew) {
+                    se1 = getStackElement (sdata, ic);
+                    getFrontExpected (sdata, se1, interp, seenCPs, rObj);
+                    repoolStackElement (sdata, se1);
+                }
                 break;
 
             case SCHEMA_CTYPE_ANY:
@@ -2822,15 +2852,19 @@ getFrontExpected (
                         break;
                     case SCHEMA_CTYPE_INTERLEAVE:
                     case SCHEMA_CTYPE_PATTERN:
-                        /* Mumble mumble */
+                        Tcl_CreateHashEntry (seenCPs, jc, &hnew);
+                        if (hnew) {
+                            se1 = getStackElement (sdata, ic);
+                            getFrontExpected (sdata, se1, interp, seenCPs,
+                                              rObj);
+                            repoolStackElement (sdata, se1);
+                        }
                         break;
-
                     case SCHEMA_CTYPE_ANY:
                         Tcl_ListObjAppendElement (
                             interp, rObj, Tcl_NewStringObj ("<any>", 5)
                             );
                         break;
-
                     case SCHEMA_CTYPE_TEXT:
                         Tcl_ListObjAppendElement (
                             interp, rObj, Tcl_NewStringObj ("#text", 5)
@@ -2852,10 +2886,10 @@ getFrontExpected (
             case SCHEMA_CTYPE_KEYSPACE_END:
                 break;
             }
-                    
+            if (minOne (cp->quants[ac])) return;
+            ac++;
         }
         break;
-        
         
     case SCHEMA_CTYPE_ANY:
     case SCHEMA_CTYPE_CHOICE:
@@ -2868,7 +2902,9 @@ getFrontExpected (
     if (cp->type == SCHEMA_CTYPE_NAME) {
         return;
     }
-    
+    if (se->down) {
+        getFrontExpected (sdata, se->down, interp, seenCPs, rObj);
+    }
 }
 
 static int
@@ -2886,6 +2922,7 @@ schemaInstanceInfoCmd (
     Tcl_Obj *elmObj;
     void *ns;
     Tcl_Obj *rObj;
+    Tcl_HashTable seenCPs;
     
     static const char *schemaInstanceInfoMethods[] = {
         "validationstate", "vstate", "definedElements", "stack", "toplevel",
@@ -2998,8 +3035,11 @@ schemaInstanceInfoCmd (
                 definedElements (sdata, interp);
             }
         } else {
-            rObj = Tcl_GetObjResult (interp);
-            getFrontExpected (sdata->stack, interp, rObj);
+            rObj = Tcl_NewObj();
+            Tcl_InitHashTable (&seenCPs, TCL_ONE_WORD_KEYS);
+            getFrontExpected (sdata, sdata->stack, interp, &seenCPs, rObj);
+            Tcl_DeleteHashTable (&seenCPs);
+            Tcl_SetObjResult (interp, rObj);
         }
         return TCL_OK;
         
