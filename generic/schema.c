@@ -922,18 +922,28 @@ checkText (
     return 1;
 }
 
+/* The argument ac points to the child of the current top-most stack
+ * element pattern which is to evaluate. */
 static int
 evalVirtual (
     Tcl_Interp *interp,
     SchemaData *sdata,
-    SchemaCP *cp
+    int ac
     )
 {
-    int rc;
+    SchemaCP *cp;
+    int savedac, savedhm, rc;
 
+    cp = sdata->stack->pattern->content[ac];
+    savedac = sdata->stack->activeChild;
+    savedhm = sdata->stack->hasMatched;
+    sdata->stack->activeChild = ac;
+    sdata->stack->hasMatched = 1;
     cp->content[cp->nc-1] = (SchemaCP *) sdata->self;
     rc = Tcl_EvalObjv (interp, cp->nc, (Tcl_Obj **) cp->content,
                        TCL_EVAL_GLOBAL);
+    sdata->stack->activeChild = savedac;
+    sdata->stack->hasMatched = savedhm;    
     if (rc != TCL_OK) {
         sdata->evalError = 1;
         return 0;
@@ -1053,7 +1063,7 @@ matchElementStart (
                 break;
 
             case SCHEMA_CTYPE_VIRTUAL:
-                if (evalVirtual (interp, sdata, candidate)) {
+                if (evalVirtual (interp, sdata, ac)) {
                     /* Virtual contraints are always quant ONE, so
                      * that the virtual constraints are called while
                      * looking if an element can end. Therefor we use
@@ -1731,7 +1741,7 @@ static int checkElementEnd (
                 break;
                 
             case SCHEMA_CTYPE_VIRTUAL:
-                if (evalVirtual (interp, sdata, cp->content[ac])) break;
+                if (evalVirtual (interp, sdata, ac)) break;
                 else return 0;
                 
             case SCHEMA_CTYPE_INTERLEAVE:
@@ -1793,6 +1803,7 @@ checkDocKeys (
     int haveErrMsg = 0;
     SchemaDocKey *dk;
 
+    /* TODO: add recovering */
     if (sdata->unknownIDrefs) {
         haveErrMsg = 1;
         SetResult ("References to unknown IDs:");
@@ -1967,8 +1978,7 @@ matchText (
                             break;
 
                         case SCHEMA_CTYPE_VIRTUAL:
-                            if (!evalVirtual (interp, sdata, ic)) return 0;
-                            break;
+                            Tcl_Panic ("Virtual constrain in MIXED or CHOICE");
                             
                         case SCHEMA_CTYPE_CHOICE:
                             Tcl_Panic ("MIXED or CHOICE child of MIXED or CHOICE");
@@ -2000,7 +2010,7 @@ matchText (
                     break;
 
                 case SCHEMA_CTYPE_VIRTUAL:
-                    if (!evalVirtual (interp, sdata, candidate)) return 0;
+                    if (!evalVirtual (interp, sdata, ac)) return 0;
                     break;
 
                 case SCHEMA_CTYPE_KEYSPACE:
@@ -2890,7 +2900,7 @@ getFrontExpected (
             case SCHEMA_CTYPE_KEYSPACE_END:
                 break;
             }
-            if (minOne (cp->quants[ac])) return;
+            if (minOne (cp->quants[ac])) break;
             ac++;
         }
         break;
@@ -3025,9 +3035,11 @@ schemaInstanceInfoCmd (
         return TCL_OK;
 
     case m_frontexpected:
-        if (sdata->validationState != VALIDATION_STARTED) {
-            SetResult ("No validation started");
+        if (sdata->validationState == VALIDATION_ERROR) {
+            SetResult ("Validation command in error state.");
             return TCL_ERROR;
+        } else if (sdata->validationState == VALIDATION_FINISHED) {
+            return TCL_OK;
         }
         if (!sdata->stack) {
             if (sdata->start) {
@@ -4165,7 +4177,7 @@ VirtualPatternObjCmd (
         && sdata->cp->type != SCHEMA_CTYPE_PATTERN) {
         SetResult ("The \"tcl\" schema definition command is only "
                    "allowed in sequential context (defelement, "
-                   "element or defpattern)");
+                   "element, group or defpattern)");
         return TCL_ERROR;
     }
 

@@ -22,7 +22,7 @@
 #    schema-19.*: keyspace
 #    schema-20.*: domunique
 #
-# Copyright (c) 2018 Rolf Ade.
+# Copyright (c) 2018-2019 Rolf Ade.
 
 source [file join [file dir [info script]] loadtdom.tcl]
 
@@ -4830,6 +4830,62 @@ test schema-17.7 {info frontexpected} {
     set result
 } {{#text} a c b toplevel {musthave http://foo.bar}}
 
+test schema-17.8 {info frontexpected} {
+    tdom::schema s
+    s defelement doc {
+        choice ? {
+            element a
+            element c
+            element b
+        }
+        element toplevel ?
+        element musthave
+        element aftermust
+    }
+    set result [s info frontexpected]
+    s define {
+        foreach elm {a b c} {
+            defelement $elm {}
+        }
+    }
+    lappend result {*}[lsort [s info frontexpected]]
+    s event start doc
+    lappend result {*}[s info frontexpected]
+    s event start c
+    s event end
+    lappend result {*}[s info frontexpected]    
+    s delete
+    set result
+} {doc a b c doc a c b toplevel musthave toplevel musthave}
+
+proc schema-17.9 {scmd} {
+    global result
+    set result [$scmd info frontexpected]
+}
+                  
+test schema-17.9 {info frontexpected from scripted constrain} {
+    tdom::schema s
+    s define {
+        defpattern some {
+            element a ?
+            group ? {
+                element b ?
+                tcl schema-17.9
+            }
+            element c
+        }
+        defelement doc {
+            ref some ?
+            element may ?
+            element must
+        }
+    }
+    set result ""
+    lappend [s validate {<doc><must/></doc>}]
+    s delete
+    set result
+} {c may must}
+    
 proc schema-18 {args} {
     lappend ::result {*}$args
 }
