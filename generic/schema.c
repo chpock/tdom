@@ -2842,6 +2842,10 @@ getFrontExpected (
                 break;
                 
             case SCHEMA_CTYPE_CHOICE:
+                if (ic->flags & MIXED_CONTENT) {
+                    Tcl_ListObjAppendElement (interp, rObj,
+                                              Tcl_NewStringObj ("#text", 5));
+                }
                 for (i = 0; i < ic->nc; i++) {
                     jc = ic->content[i];
                     switch (jc->type) {
