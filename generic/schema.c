@@ -761,10 +761,14 @@ getStackElement (
     return stackElm;
 }
 
+/* The ac argument is the currend looked at child of the stack top
+ * (which is not pattern, in case the looked ad child of the stack top
+ * is SCHEMA_CTYPE_CHOICE). */
 static void
 pushToStack (
     SchemaData *sdata,
-    SchemaCP *pattern
+    SchemaCP *pattern,
+    int ac
     )
 {
     SchemaValidationStack *stackElm, *se;
@@ -778,6 +782,7 @@ pushToStack (
     }
     memset (stackElm, 0, sizeof (SchemaValidationStack));
     se = sdata->stack;
+    if (se) se->activeChild = ac;
     stackElm->down = se;
     stackElm->pattern = pattern;
     if (pattern->type == SCHEMA_CTYPE_INTERLEAVE) {
@@ -1004,8 +1009,8 @@ matchElementStart (
                              candidate->name, candidate->namespace));
                 if (candidate->name == name
                     && candidate->namespace == namespace) {
+                    pushToStack (sdata, candidate, ac);
                     updateStack (se, cp, ac);
-                    pushToStack (sdata, candidate);
                     return 1;
                 }
                 break;
@@ -1028,7 +1033,7 @@ matchElementStart (
                     case SCHEMA_CTYPE_NAME:
                         if (icp->name == name
                             && icp->namespace == namespace) {
-                            pushToStack (sdata, icp);
+                            pushToStack (sdata, icp, ac);
                             updateStack (se, cp, ac);
                             return 1;
                         }
@@ -1039,7 +1044,7 @@ matchElementStart (
 
                     case SCHEMA_CTYPE_INTERLEAVE:
                     case SCHEMA_CTYPE_PATTERN:
-                        pushToStack (sdata, icp);
+                        pushToStack (sdata, icp, ac);
                         rc = matchElementStart (interp, sdata, name, namespace);
                         if (rc == 1) {
                             updateStack (se, cp, ac);
@@ -1076,7 +1081,7 @@ matchElementStart (
 
             case SCHEMA_CTYPE_INTERLEAVE:
             case SCHEMA_CTYPE_PATTERN:
-                pushToStack (sdata, candidate);
+                pushToStack (sdata, candidate, ac);
                 rc = matchElementStart (interp, sdata, name, namespace);
                 if (rc == 1) {
                     updateStack (se, cp, ac);
@@ -1175,7 +1180,7 @@ matchElementStart (
             case SCHEMA_CTYPE_NAME:
                 if (icp->name == name
                     && icp->namespace == namespace) {
-                    pushToStack (sdata, icp);
+                    pushToStack (sdata, icp, 0);
                     se->hasMatched = 1;
                     se->interleaveState[i] = 1;
                     return 1;
@@ -1187,7 +1192,7 @@ matchElementStart (
 
             case SCHEMA_CTYPE_INTERLEAVE:
             case SCHEMA_CTYPE_PATTERN:
-                pushToStack (sdata, icp);
+                pushToStack (sdata, icp, 0);
                 rc = matchElementStart (interp, sdata, name, namespace);
                 if (rc == 1) {
                     se->hasMatched = 1;
@@ -1362,7 +1367,7 @@ probeElement (
             SetResult ("Unknown element");
             return TCL_ERROR;
         }
-        pushToStack (sdata, pattern);
+        pushToStack (sdata, pattern, 0);
         return TCL_OK;
     }
 
@@ -1718,7 +1723,7 @@ static int checkElementEnd (
                         
                     case SCHEMA_CTYPE_INTERLEAVE:
                     case SCHEMA_CTYPE_PATTERN:
-                        pushToStack (sdata, ic);
+                        pushToStack (sdata, ic, ac);
                         if (checkElementEnd (interp, sdata)) {
                             mayMiss = 1;
                         }
@@ -1746,7 +1751,7 @@ static int checkElementEnd (
                 
             case SCHEMA_CTYPE_INTERLEAVE:
             case SCHEMA_CTYPE_PATTERN:
-                pushToStack (sdata, cp->content[ac]);
+                pushToStack (sdata, cp->content[ac], ac);
                 rc = checkElementEnd (interp, sdata);
                 popStack (sdata);
                 if (rc) break;
@@ -1969,7 +1974,7 @@ matchText (
 
                         case SCHEMA_CTYPE_INTERLEAVE:
                         case SCHEMA_CTYPE_PATTERN:
-                            pushToStack (sdata, ic);
+                            pushToStack (sdata, ic, ac);
                             if (matchText (interp, sdata, text)) {
                                 updateStack (se, cp, ac);
                                 return 1;
@@ -1997,7 +2002,7 @@ matchText (
 
                 case SCHEMA_CTYPE_INTERLEAVE:
                 case SCHEMA_CTYPE_PATTERN:
-                    pushToStack (sdata, candidate);
+                    pushToStack (sdata, candidate, ac);
                     if (matchText (interp, sdata, text)) {
                         updateStack (se, cp, ac);
                         return 1;
@@ -2083,7 +2088,7 @@ matchText (
 
                 case SCHEMA_CTYPE_INTERLEAVE:
                 case SCHEMA_CTYPE_PATTERN:
-                    pushToStack (sdata, ic);
+                    pushToStack (sdata, ic, 0);
                     if (matchText (interp, sdata, text)) {
                         updateStack (se, cp, ac);
                         return 1;
@@ -2917,7 +2922,10 @@ getFrontExpected (
         return;
     }
     if (se->down) {
+        hm = se->down->hasMatched;
+        se->down->hasMatched = 1;
         getFrontExpected (sdata, se->down, interp, seenCPs, rObj);
+        se->down->hasMatched = hm;
     }
 }
 
