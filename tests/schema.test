@@ -4885,7 +4885,45 @@ test schema-17.9 {info frontexpected from scripted constrain} {
     s delete
     set result
 } {c may must}
-    
+
+test schema-17.10 {info frontexpected interleave} {
+    set defs {
+        {
+            interleave {
+                element a ?
+                element b
+                element c ?
+            }
+            element d
+        }
+        {
+            interleave {
+                element a ?
+                element b ?
+                element c ?
+            }
+            element d
+        }
+        {
+            interleave ? {
+                element a ?
+                element b
+                element c ?
+            }
+            element d
+        }
+    }
+    set result [list]
+    foreach def $defs {
+        tdom::schema s
+        s defelement doc $def
+        s event start doc
+        lappend result {*}[s info frontexpected]
+        s delete
+    }
+    set result
+} {a b c a b c a b c d}
+
 proc schema-18 {args} {
     lappend ::result {*}$args
 }

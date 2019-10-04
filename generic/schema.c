@@ -2811,7 +2811,7 @@ getFrontExpected (
     Tcl_Obj *rObj
     )
 {
-    int ac, hm, i, hnew;
+    int ac, hm, i, hnew, mustMatch;
     SchemaCP *cp, *ic, *jc;
     SchemaValidationStack *se1;
 
@@ -2820,6 +2820,7 @@ getFrontExpected (
     switch (cp->type) {
     case SCHEMA_CTYPE_INTERLEAVE:
         ac = 0;
+        mustMatch = 0;
         /* Fall through */
     case SCHEMA_CTYPE_NAME:
     case SCHEMA_CTYPE_PATTERN:
@@ -2905,7 +2906,10 @@ getFrontExpected (
             case SCHEMA_CTYPE_KEYSPACE_END:
                 break;
             }
-            if (minOne (cp->quants[ac])) break;
+            if (minOne (cp->quants[ac])) {
+                if (cp->type == SCHEMA_CTYPE_INTERLEAVE) mustMatch = 1;
+                else break;
+            }
             ac++;
         }
         break;
@@ -2919,6 +2923,9 @@ getFrontExpected (
         Tcl_Panic ("Invalid CTYPE onto the validation stack!");
     }
     if (cp->type == SCHEMA_CTYPE_NAME) {
+        return;
+    }
+    if (cp->type == SCHEMA_CTYPE_INTERLEAVE && mustMatch) {
         return;
     }
     if (se->down) {
