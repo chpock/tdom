@@ -4206,7 +4206,7 @@ VirtualPatternObjCmd (
         Tcl_IncrRefCount (objv[i]);
     }
     pattern->nc = objc;
-    addToContent (sdata, pattern, SCHEMA_CQUANT_ONE, 0, 0);
+    addToContent (sdata, pattern, SCHEMA_CQUANT_OPT, 0, 0);
     return TCL_OK;
 }
 

@@ -417,10 +417,10 @@
     <title>Text constraint scripts</title>
 
     <p>Text - parsed character data, as XML calles it - must sometimes
-    have to be of a certain kind, must comply to some rules etc to be
-    valid. The text constraint script arguments to the text,
-    attribute, nsattribute and deftext commands allow the following
-    text constraint commands to check text for certain properties.</p>
+    be of a certain kind, must comply to some rules etc to be valid.
+    The text constraint script arguments to the text, attribute,
+    nsattribute and deftext commands allow the following text
+    constraint commands to check text for certain properties.</p>
 
     <p>The text constraint commands are:</p>
 
@@ -438,7 +438,7 @@
 
       <commanddef>
         <command><cmd>fixed</cmd> <m>value</m></command>
-        <desc>The text constraint only matches if the text value is
+        <desc>The text constraint only match if the text value is
         string equal to the given value.</desc>
       </commanddef>
       
