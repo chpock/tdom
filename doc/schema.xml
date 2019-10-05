@@ -373,8 +373,7 @@
       <optdef>
         <optname>!</optname>
         <desc>The content particle must occur exactly once in valid
-        documents. This is the default, if a quantifier is
-        omitted.</desc>
+        documents.</desc>
       </optdef>
     
       <optdef>
@@ -550,7 +549,7 @@
         <m>whitespace</m>.</p></desc>
       </commanddef>
       <commanddef>
-        <command><cmd>id <m>?keySpace?</m></cmd></command>
+        <command><cmd>id</cmd> <m>?keySpace?</m></command>
         <desc>This text constraint command marks the text as a
         document wide ID (to be referenced by an idref). Every ID
         value within a document must be unique. It isn't an error if
@@ -561,7 +560,7 @@
         argument.</desc>
       </commanddef>
       <commanddef>
-        <command><cmd>idref <m>?keySpace?</m></cmd></command>
+        <command><cmd>idref</cmd> <m>?keySpace?</m></command>
         <desc>This text constraint command expects the text to be a
         reference to an ID within the document. The referenced ID may
         be later in the document, that the reference. Several

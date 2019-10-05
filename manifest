@@ -1,5 +1,5 @@
-C More\scorrect\shandling\sof\sinterleave\scontent\sparticle\sin\svalidation\sstate\sintrospection.
-D 2019-10-04T16:13:16.731
+C Minor\swork\son\sthe\sdocumentation.
+D 2019-10-05T00:06:55.909
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -41,7 +41,7 @@ F doc/pullparser.n 5f5672e8bb2dd221602040cd212234da6b6ed8c99c5daa60be9fa0c476529
 F doc/pullparser.xml 6032c1e8c8d001068c227601dba9860824f8acc709c87fd8e36ac4a596b6a2f2
 F doc/schema.html fe17a4a564ff0a320625d43de68777a2db7af0cdcf3d87dd1b91364f5da4efc3
 F doc/schema.n f2fe65599426af29bcbc6928cb32b5e46de9b7b462394c8c0db9c190f6438289
-F doc/schema.xml 418f460a8f8881791c6b6049182ce3362cbdc5bc19747f3c6a2a6db7e551f3cb
+F doc/schema.xml 6d0265f499c1601b381c6e78190eee8814d0e4ab5f1466f155572b2ec1292ab9
 F doc/tDOM.xml 04db7d0ccfea39aae21f4fe07b8f05d5bff8a84193cfce2aa5faa2f42c076377
 F doc/tdomcmd.html 9b4d9ff443499554adf2346ff0efc0317a98bd6e1fc3fc79a6e476b71fe85fed
 F doc/tdomcmd.n c06a5ff035f16a2a52636b69d9ebe6ba84ff5101922ed27b551146c4d61d6cda
@@ -230,8 +230,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 5dd7e9928d051885a01dcd1d284caf8ee8c8a512df6b0d92f7ea1abeacd3b3ce
-R a5d80db8b29de6e613d3a3c9cc8f713f
+P 4c3f653e15e08be8f9c7be0d0fc43a06bb4f86707ac2f9d60796d6d631e12686
+R 692146bbbb466b3ebbad3329239e82e0
 U rolf
-Z 65dae02943241fd928bbe1499b5d5768
+Z 1ab6014d262255f86318f784d2976724
 # Remove this line to create a well-formed Fossil manifest.
