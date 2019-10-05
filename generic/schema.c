@@ -123,7 +123,7 @@ static char *Schema_CP_Type2str[] = {
     "CHOICE",
     "INTERLEAVE",
     "PATTERN",
-    "TEXT"
+    "TEXT",
     "VIRTUAL",
     "KEYSPACE_START",
     "KEYSPACE_END"
@@ -133,7 +133,8 @@ static char *Schema_Quant_Type2str[] = {
     "OPT",
     "REP",
     "PLUS",
-    "NM"
+    "NM",
+    "ERROR"
 };
 #endif
 
@@ -965,7 +966,7 @@ matchElementStart (
     )
 {
     SchemaCP *cp, *candidate, *icp;
-    int hm, ac, i, mayskip, rc;
+    int hm, ac, i, rc, missing;
     int isName = 0;
     SchemaValidationStack *se;
 
@@ -980,7 +981,6 @@ matchElementStart (
     case SCHEMA_CTYPE_PATTERN:
         while (ac < cp->nc) {
             candidate = cp->content[ac];
-            mayskip = 0;
             switch (candidate->type) {
             case SCHEMA_CTYPE_TEXT:
                 if (candidate->nc) {
@@ -1051,7 +1051,6 @@ matchElementStart (
                             return 1;
                         }
                         popStack (sdata);
-                        if (rc == -1) mayskip = 1;
                         break;
 
                     case SCHEMA_CTYPE_VIRTUAL:
@@ -1062,19 +1061,12 @@ matchElementStart (
                         Tcl_Panic ("Keyspace constrain in MIXED or CHOICE");
                         
                     }
-                    if (!mayskip && mayMiss (candidate->quants[i]))
-                        mayskip = 1;
                 }
                 break;
 
             case SCHEMA_CTYPE_VIRTUAL:
                 if (evalVirtual (interp, sdata, ac)) {
-                    /* Virtual contraints are always quant ONE, so
-                     * that the virtual constraints are called while
-                     * looking if an element can end. Therefor we use
-                     * here the already present mayskip mechanism to
-                     * try further, after calling the tcl script. */
-                    mayskip = 1;
+                    hm = 1;
                     break;
                 }
                 else return 0;
@@ -1119,7 +1111,7 @@ matchElementStart (
                 hm = 0;
                 continue;
             }
-            if (!mayskip && mustMatch (cp->quants[ac], hm)) {
+            if (mustMatch (cp->quants[ac], hm)) {
                 if (recover (interp, sdata, S("MISSING_CP"), 1, ac)) {
                     /* Skip the just opened element tag and the following
                      * content of the current. */
@@ -1150,29 +1142,20 @@ matchElementStart (
         Tcl_Panic ("Invalid CTYPE onto the validation stack!");
 
     case SCHEMA_CTYPE_INTERLEAVE:
-        mayskip = 1;
+        missing = 0;
         for (i = 0; i < cp->nc; i++) {
-            if (se->interleaveState[i]) {
-                if (maxOne (cp->quants[i])) continue;
-            } else {
-                if (minOne (cp->quants[i])) mayskip = 0;
-            }
+            if (se->interleaveState[i] && maxOne (cp->quants[i]))
+                continue;
             icp = cp->content[i];
             switch (icp->type) {
             case SCHEMA_CTYPE_TEXT:
-                if (icp->nc) {
-                    if (!checkText (interp, icp, "")) {
-                        mayskip = 0;
-                    }
-                }
                 break;
 
             case SCHEMA_CTYPE_ANY:
-                if (icp->namespace && icp->namespace == namespace) {
+                if (icp->namespace && icp->namespace != namespace) {
                     break;
                 }
                 sdata->skipDeep = 1;
-                if (mayskip && minOne (cp->quants[i])) mayskip = 0;
                 se->hasMatched = 1;
                 se->interleaveState[i] = 1;
                 return 1;
@@ -1200,7 +1183,6 @@ matchElementStart (
                     return 1;
                 }
                 popStack (sdata);
-                if (mayskip && rc != -1) mayskip = 0;
                 break;
 
             case SCHEMA_CTYPE_VIRTUAL:
@@ -1213,12 +1195,14 @@ matchElementStart (
                 break;
 
             }
+            if (!missing && minOne (cp->quants[i])) missing = 1;
         }
-        if (mayskip) break;
-        if (recover (interp, sdata, S("MISSING_ONE_OF_INTERLEAVE"), 1, ac)) {
-            return 1;
+        if (missing) {
+            if (recover (interp, sdata, S("MISSING_ONE_OF_INTERLEAVE"), 1, ac)) {
+                return 1;
+            } 
+            return 0;
         }
-        return 0;
     }
     return -1;
 }
@@ -1662,7 +1646,6 @@ static int checkElementEnd (
             if (mayMiss (cp->quants[ac])) {
                 ac++; continue;
             }
-            
             switch (cp->content[ac]->type) {
             case SCHEMA_CTYPE_KEYSPACE_END:
                 cp->content[ac]->keySpace->active--;
@@ -4206,7 +4189,7 @@ VirtualPatternObjCmd (
         Tcl_IncrRefCount (objv[i]);
     }
     pattern->nc = objc;
-    addToContent (sdata, pattern, SCHEMA_CQUANT_OPT, 0, 0);
+    addToContent (sdata, pattern, SCHEMA_CQUANT_ONE, 0, 0);
     return TCL_OK;
 }
 

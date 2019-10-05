@@ -1528,7 +1528,7 @@ test schema-7.15 {choice with optional choices} {
         lappend result [s validate $xml]
     }
     set result
-} {0 0 1 0 1 1 1}
+} {0 0 1 0 1 1 0}
 
 test schema-7.15a {choice with optional choices} {
     tdom::schema create s
@@ -1618,7 +1618,7 @@ test schema-7.16 {choice with optional choices} {
         lappend result [s validate $xml]
     }
     set result
-} {0 0 1 0 1 1 1 1 1}
+} {0 0 1 0 1 1 1 1 0}
 
 test schema-7.17 {choice with optional choices} {
     tdom::schema create s
@@ -1652,7 +1652,7 @@ test schema-7.17 {choice with optional choices} {
         lappend result [s validate $xml]
     }
     set result
-} {0 0 1 0 1 1 0 0 1}
+} {0 0 1 0 1 1 0 0 0}
 
 test schema-7.18 {choice} {
     tdom::schema create s
@@ -1734,7 +1734,7 @@ test schema-7.19 {choice with quantified choice} {
         lappend result [s validate $xml]
     }
     set result
-} {0 0 1 1 0 0 0 1 0 0 1}
+} {0 0 1 1 0 0 0 1 0 0 0}
 
 test schema-7.20 {group with only optional content} {
     tdom::schema create s
@@ -4664,7 +4664,6 @@ test schema-16.15 {interleave} {
     s delete
     set result
 } {0 1 0 1 0 1 1 0}
-
 
 test schema-16.16 {interleave} {
     tdom::schema s
