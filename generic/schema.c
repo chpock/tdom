@@ -123,7 +123,7 @@ static char *Schema_CP_Type2str[] = {
     "CHOICE",
     "INTERLEAVE",
     "PATTERN",
-    "TEXT"
+    "TEXT",
     "VIRTUAL",
     "KEYSPACE_START",
     "KEYSPACE_END"
@@ -133,7 +133,8 @@ static char *Schema_Quant_Type2str[] = {
     "OPT",
     "REP",
     "PLUS",
-    "NM"
+    "NM",
+    "ERROR"
 };
 #endif
 
@@ -1069,12 +1070,7 @@ matchElementStart (
 
             case SCHEMA_CTYPE_VIRTUAL:
                 if (evalVirtual (interp, sdata, ac)) {
-                    /* Virtual contraints are always quant ONE, so
-                     * that the virtual constraints are called while
-                     * looking if an element can end. Therefor we use
-                     * here the already present mayskip mechanism to
-                     * try further, after calling the tcl script. */
-                    mayskip = 1;
+                    hm = 1;
                     break;
                 }
                 else return 0;
@@ -1088,6 +1084,7 @@ matchElementStart (
                     return 1;
                 }
                 popStack (sdata);
+                if (rc == -1) mayskip = 1;
                 break;
 
             case SCHEMA_CTYPE_KEYSPACE_END:
@@ -4206,7 +4203,7 @@ VirtualPatternObjCmd (
         Tcl_IncrRefCount (objv[i]);
     }
     pattern->nc = objc;
-    addToContent (sdata, pattern, SCHEMA_CQUANT_OPT, 0, 0);
+    addToContent (sdata, pattern, SCHEMA_CQUANT_ONE, 0, 0);
     return TCL_OK;
 }
 

@@ -4695,6 +4695,34 @@ test schema-16.16 {interleave} {
     set result
 } {1 1 0}
 
+test schema-16.17 {interleave with all content cp optional} {
+    tdom::schema s
+    s defelement doc {
+        interleave {
+            element a ?
+            element b ?
+            element c ?
+        }
+        element d
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/><d/></doc>
+        <doc><b/><d/></doc>
+        <doc><c/><d/></doc>
+        <doc><a/><c/><d/></doc>
+        <doc><b/><c/><d/></doc>
+        <doc><c/><a/><d/></doc>
+        <doc><c/><a/><b/><d/></doc>
+        <doc><c/><a/><b/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 1 1 1 1 1 1 0}
+
 test schema-17.1 {info} {
     tdom::schema s
     s define {
@@ -4922,7 +4950,7 @@ test schema-17.10 {info frontexpected interleave} {
         s delete
     }
     set result
-} {a b c a b c a b c d}
+} {a b c a b c d a b c d}
 
 proc schema-18 {args} {
     lappend ::result {*}$args
