@@ -2800,7 +2800,7 @@ definedElements (
 }
 
 static void
-getFrontExpected (
+getNextExpected (
     SchemaData *sdata,
     SchemaValidationStack *se,
     Tcl_Interp *interp,
@@ -2839,7 +2839,7 @@ getFrontExpected (
                 Tcl_CreateHashEntry (seenCPs, ic, &hnew);
                 if (hnew) {
                     se1 = getStackElement (sdata, ic);
-                    getFrontExpected (sdata, se1, interp, seenCPs, rObj);
+                    getNextExpected (sdata, se1, interp, seenCPs, rObj);
                     repoolStackElement (sdata, se1);
                 }
                 break;
@@ -2872,7 +2872,7 @@ getFrontExpected (
                         Tcl_CreateHashEntry (seenCPs, jc, &hnew);
                         if (hnew) {
                             se1 = getStackElement (sdata, ic);
-                            getFrontExpected (sdata, se1, interp, seenCPs,
+                            getNextExpected (sdata, se1, interp, seenCPs,
                                               rObj);
                             repoolStackElement (sdata, se1);
                         }
@@ -2928,7 +2928,7 @@ getFrontExpected (
     if (se->down) {
         hm = se->down->hasMatched;
         se->down->hasMatched = 1;
-        getFrontExpected (sdata, se->down, interp, seenCPs, rObj);
+        getNextExpected (sdata, se->down, interp, seenCPs, rObj);
         se->down->hasMatched = hm;
     }
 }
@@ -2952,11 +2952,11 @@ schemaInstanceInfoCmd (
     
     static const char *schemaInstanceInfoMethods[] = {
         "validationstate", "vstate", "definedElements", "stack", "toplevel",
-        "pastexpected", "frontexpected", "definition", NULL
+        "pastexpected", "nextexpected", "definition", NULL
     };
     enum schemaInstanceInfoMethod {
         m_validationstate, m_vstate, m_definedElements, m_stack, m_toplevel,
-        m_pastexpected, m_frontexpected, m_definition
+        m_pastexpected, m_nextexpected, m_definition
     };
 
     static const char *schemaInstanceInfoStackMethods[] = {
@@ -3046,7 +3046,7 @@ schemaInstanceInfoCmd (
         }
         return TCL_OK;
 
-    case m_frontexpected:
+    case m_nextexpected:
         if (sdata->validationState == VALIDATION_ERROR) {
             SetResult ("Validation command in error state.");
             return TCL_ERROR;
@@ -3065,7 +3065,7 @@ schemaInstanceInfoCmd (
         } else {
             rObj = Tcl_NewObj();
             Tcl_InitHashTable (&seenCPs, TCL_ONE_WORD_KEYS);
-            getFrontExpected (sdata, sdata->stack, interp, &seenCPs, rObj);
+            getNextExpected (sdata, sdata->stack, interp, &seenCPs, rObj);
             Tcl_DeleteHashTable (&seenCPs);
             Tcl_SetObjResult (interp, rObj);
         }
