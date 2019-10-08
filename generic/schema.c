@@ -2799,7 +2799,7 @@ definedElements (
     }
 }
 
-static void
+static int
 getNextExpected (
     SchemaData *sdata,
     SchemaValidationStack *se,
@@ -2808,9 +2808,10 @@ getNextExpected (
     Tcl_Obj *rObj
     )
 {
-    int ac, hm, i, hnew, mustMatch;
+    int ac, hm, i, hnew, mustMatch, mayskip, rc;
     SchemaCP *cp, *ic, *jc;
     SchemaValidationStack *se1;
+    Tcl_Obj *thisObj;
 
     getContext (cp, ac, hm);
     if (hm && maxOne(cp->quants[ac])) ac++;
@@ -2829,6 +2830,7 @@ getNextExpected (
                 continue;
             }
             ic = cp->content[ac];
+            mayskip = 0;
             switch (ic->type) {
             case SCHEMA_CTYPE_NAME:
                 Tcl_ListObjAppendElement (interp, rObj,
@@ -2839,19 +2841,31 @@ getNextExpected (
                 Tcl_CreateHashEntry (seenCPs, ic, &hnew);
                 if (hnew) {
                     se1 = getStackElement (sdata, ic);
-                    getNextExpected (sdata, se1, interp, seenCPs, rObj);
+                    mayskip = getNextExpected (sdata, se1, interp, seenCPs,
+                                               rObj);
                     repoolStackElement (sdata, se1);
                 }
                 break;
 
             case SCHEMA_CTYPE_ANY:
-                Tcl_ListObjAppendElement (interp, rObj,
-                                          Tcl_NewStringObj ("<any>", 5));
+                if (ic->namespace) {
+                    thisObj = Tcl_NewObj();
+                    Tcl_AppendStringsToObj (thisObj, ic->namespace,
+                                            ":<any>", NULL);
+                        
+                    Tcl_ListObjAppendElement (interp, rObj, thisObj);
+                } else {
+                    Tcl_ListObjAppendElement (interp, rObj,
+                                              Tcl_NewStringObj ("<any>", 5));
+                }
                 break;
 
             case SCHEMA_CTYPE_TEXT:
                 Tcl_ListObjAppendElement (interp, rObj,
                                           Tcl_NewStringObj ("#text", 5));
+                if (ic->nc == 0 || checkText (interp, ic, "")) {
+                    mayskip = 1;
+                }
                 break;
                 
             case SCHEMA_CTYPE_CHOICE:
@@ -2872,8 +2886,8 @@ getNextExpected (
                         Tcl_CreateHashEntry (seenCPs, jc, &hnew);
                         if (hnew) {
                             se1 = getStackElement (sdata, ic);
-                            getNextExpected (sdata, se1, interp, seenCPs,
-                                              rObj);
+                            mayskip = getNextExpected (sdata, se1, interp,
+                                                       seenCPs, rObj);
                             repoolStackElement (sdata, se1);
                         }
                         break;
@@ -2903,10 +2917,9 @@ getNextExpected (
             case SCHEMA_CTYPE_KEYSPACE_END:
                 break;
             }
-            if (minOne (cp->quants[ac])) {
-                if (cp->type == SCHEMA_CTYPE_INTERLEAVE) mustMatch = 1;
-                else break;
-            }
+            if (cp->type == SCHEMA_CTYPE_INTERLEAVE && minOne(cp->quants[ac]))
+                mustMatch = 1;
+            else if (!mayskip && minOne (cp->quants[ac])) break;
             ac++;
         }
         break;
@@ -2920,17 +2933,19 @@ getNextExpected (
         Tcl_Panic ("Invalid CTYPE onto the validation stack!");
     }
     if (cp->type == SCHEMA_CTYPE_NAME) {
-        return;
+        return 0;
     }
     if (cp->type == SCHEMA_CTYPE_INTERLEAVE && mustMatch) {
-        return;
+        return 0;
     }
     if (se->down) {
         hm = se->down->hasMatched;
         se->down->hasMatched = 1;
-        getNextExpected (sdata, se->down, interp, seenCPs, rObj);
+        rc = getNextExpected (sdata, se->down, interp, seenCPs, rObj);
         se->down->hasMatched = hm;
+        return rc;
     }
+    return 1;
 }
 
 static int
@@ -3716,8 +3731,7 @@ AnyPatternObjCmd (
     SchemaCP *pattern;
     SchemaQuant quant;
     char *ns = NULL;
-    int n, m, hnew;
-    Tcl_HashEntry *h;
+    int n, m;
 
     CHECK_SI
     CHECK_TOPLEVEL
@@ -3727,15 +3741,11 @@ AnyPatternObjCmd (
     } else if (objc == 2) {    
         quant = getQuant (interp, sdata, objv[1], &n, &m);
         if (quant == SCHEMA_CQUANT_ERROR) {
-            h = Tcl_CreateHashEntry (&sdata->namespace,
-                                     Tcl_GetString (objv[1]), &hnew);
-            ns = Tcl_GetHashKey (&sdata->namespace, h);
+            ns = getNamespacePtr (sdata, Tcl_GetString (objv[1]));
             quant = SCHEMA_CQUANT_ONE;
         }
     } else {
-        h = Tcl_CreateHashEntry (&sdata->namespace,
-                                 Tcl_GetString (objv[1]), &hnew);
-        ns = Tcl_GetHashKey (&sdata->namespace, h);
+        ns = getNamespacePtr (sdata, Tcl_GetString (objv[1]));
         quant = getQuant (interp, sdata, objv[2], &n, &m);
         if (quant == SCHEMA_CQUANT_ERROR) {
             return TCL_ERROR;

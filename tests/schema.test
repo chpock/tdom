@@ -2133,6 +2133,34 @@ test schema-9.8 {choice as choice child} {
     set result
 } {0 1 0 1 1 1 0}
 
+test schema-9.9 {choice with optional cp belong the choices} {
+    tdom::schema create grammar
+    grammar define {
+        defelement doc {
+            element e1
+            choice {
+                element e2
+                element e3 ?
+            }
+            element e4 ?
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        {<doc><e1/></doc>}
+        {<doc><e1/><e2/></doc>}
+        {<doc><e1/><e3/></doc>}
+        {<doc><e1/><e4/></doc>}
+        {<doc><e1/><e2/><e4/></doc>}
+        {<doc><e1/><e3/><e4/></doc>}
+    } {
+        lappend result [grammar validate $xml]
+    }
+    grammar delete
+    set result
+} {0 1 1 1 1 1 1}
+
 test schema-10.1 {any} {
     tdom::schema create s
     s define {
@@ -4951,6 +4979,52 @@ test schema-17.10 {info nextexpected interleave} {
     }
     set result
 } {a b c a b c d a b c d}
+
+test schema-17.11 {info nextexpected interleave} {
+    set defs {
+        {
+            group + {
+                element a ?
+                element b ?
+                element c ?
+            }
+            element d
+        }
+    }
+    set result [list]
+    foreach def $defs {
+        tdom::schema s
+        s defelement doc $def
+        s event start doc
+        s event start b
+        s event end
+        set result [s info nextexpected]
+        s delete
+    }
+    set result
+} {c a b c d}
+
+test schema-17.12 {info nextexpected interleave} {
+    tdom::schema s
+    s define {
+        prefixns {ns1 http://foo.bar}
+        defelement doc {
+            element a
+            any
+            any ns1 ?
+            element b ?
+        }
+    }
+    s event start doc
+    s event start a
+    s event end
+    set result [s info nextexpected]
+    s event start something
+    s event end
+    lappend result {*}[s info nextexpected]
+    s delete
+    set result
+} {<any> http://foo.bar:<any> b}
 
 proc schema-18 {args} {
     lappend ::result {*}$args
