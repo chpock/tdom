@@ -4837,8 +4837,8 @@ test schema-17.5 {info nextexpected} {
     s event start doc
     set result [s info nextexpected]
     s delete
-    set result
-} {a c b toplevel musthave}
+    lsort $result
+} {a b c musthave toplevel}
 
 test schema-17.6 {info nextexpected} {
     tdom::schema s
@@ -4860,8 +4860,8 @@ test schema-17.6 {info nextexpected} {
     s event start doc
     set result [s info nextexpected]
     s delete
-    set result
-} {a c b toplevel {musthave http://foo.bar}}
+    lsort $result
+} {a b c {musthave http://foo.bar} toplevel}
 
 test schema-17.7 {info nextexpected} {
     tdom::schema s
@@ -4883,8 +4883,8 @@ test schema-17.7 {info nextexpected} {
     s event start doc
     set result [s info nextexpected]
     s delete
-    set result
-} {{#text} a c b toplevel {musthave http://foo.bar}}
+    lsort $result
+} {a b c {musthave http://foo.bar} toplevel {{#text} {}}}
 
 test schema-17.8 {info nextexpected} {
     tdom::schema s
@@ -4906,17 +4906,17 @@ test schema-17.8 {info nextexpected} {
     }
     lappend result {*}[lsort [s info nextexpected]]
     s event start doc
-    lappend result {*}[s info nextexpected]
+    lappend result {*}[lsort [s info nextexpected]]
     s event start c
     s event end
-    lappend result {*}[s info nextexpected]    
+    lappend result {*}[lsort [s info nextexpected]]
     s delete
     set result
-} {doc a b c doc a c b toplevel musthave toplevel musthave}
+} {doc a b c doc a b c musthave toplevel musthave toplevel}
 
 proc schema-17.9 {scmd} {
     global result
-    set result [$scmd info nextexpected]
+    lappend result {*}[lsort [$scmd info nextexpected]]
 }
                   
 test schema-17.9 {info nextexpected from scripted constrain} {
@@ -4974,7 +4974,7 @@ test schema-17.10 {info nextexpected interleave} {
         tdom::schema s
         s defelement doc $def
         s event start doc
-        lappend result {*}[s info nextexpected]
+        lappend result {*}[lsort [s info nextexpected]]
         s delete
     }
     set result
@@ -4984,9 +4984,9 @@ test schema-17.11 {info nextexpected interleave} {
     set defs {
         {
             group + {
+                element c ?
                 element a ?
                 element b ?
-                element c ?
             }
             element d
         }
@@ -4998,11 +4998,11 @@ test schema-17.11 {info nextexpected interleave} {
         s event start doc
         s event start b
         s event end
-        set result [s info nextexpected]
+        set result [lsort [s info nextexpected]]
         s delete
     }
     set result
-} {c a b c d}
+} {a b c d}
 
 test schema-17.12 {info nextexpected interleave} {
     tdom::schema s
@@ -5018,13 +5018,13 @@ test schema-17.12 {info nextexpected interleave} {
     s event start doc
     s event start a
     s event end
-    set result [s info nextexpected]
+    set result [lsort [s info nextexpected]]
     s event start something
     s event end
-    lappend result {*}[s info nextexpected]
+    lappend result {*}[lsort [s info nextexpected]]
     s delete
     set result
-} {<any> http://foo.bar:<any> b}
+} {{<any> {}} {<any> http://foo.bar} b}
 
 proc schema-18 {args} {
     lappend ::result {*}$args

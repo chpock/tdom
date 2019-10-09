@@ -2775,6 +2775,42 @@ serializeElementName (
     return rObj;
 }
 
+/* cp must be of type SCHEMA_CTYPE_ANY for useful results */
+static Tcl_Obj*
+serializeAnyCP (
+    Tcl_Interp *interp,
+    SchemaCP *cp
+    )
+{
+    Tcl_Obj *rObj;
+
+    rObj = Tcl_NewObj();
+    Tcl_ListObjAppendElement (interp, rObj, Tcl_NewStringObj ("<any>", 5));
+    if (cp->namespace) {
+        Tcl_ListObjAppendElement (interp, rObj,
+                                  Tcl_NewStringObj (cp->namespace, -1));
+    } else {
+        Tcl_ListObjAppendElement (interp, rObj, Tcl_NewObj());
+    }
+    return rObj;
+}
+
+/* The cp argument may be NULL. If it isn't NULL cp must be of type
+ * SCHEMA_CTYPE_TEXT for useful results */
+static Tcl_Obj*
+serializeTextCP (
+    Tcl_Interp *interp,
+    SchemaCP *cp
+    )
+{
+    Tcl_Obj *rObj;
+
+    rObj = Tcl_NewObj();
+    Tcl_ListObjAppendElement (interp, rObj, Tcl_NewStringObj ("#text", 5));
+    Tcl_ListObjAppendElement (interp, rObj, Tcl_NewObj());
+    return rObj;
+}
+
 static void
 definedElements (
     SchemaData *sdata,
@@ -2811,7 +2847,6 @@ getNextExpected (
     int ac, hm, i, hnew, mustMatch, mayskip, rc;
     SchemaCP *cp, *ic, *jc;
     SchemaValidationStack *se1;
-    Tcl_Obj *thisObj;
 
     getContext (cp, ac, hm);
     if (hm && maxOne(cp->quants[ac])) ac++;
@@ -2848,21 +2883,13 @@ getNextExpected (
                 break;
 
             case SCHEMA_CTYPE_ANY:
-                if (ic->namespace) {
-                    thisObj = Tcl_NewObj();
-                    Tcl_AppendStringsToObj (thisObj, ic->namespace,
-                                            ":<any>", NULL);
-                        
-                    Tcl_ListObjAppendElement (interp, rObj, thisObj);
-                } else {
-                    Tcl_ListObjAppendElement (interp, rObj,
-                                              Tcl_NewStringObj ("<any>", 5));
-                }
+                Tcl_ListObjAppendElement (interp, rObj,
+                                          serializeAnyCP (interp, ic));
                 break;
 
             case SCHEMA_CTYPE_TEXT:
                 Tcl_ListObjAppendElement (interp, rObj,
-                                          Tcl_NewStringObj ("#text", 5));
+                                          serializeTextCP (interp, ic));
                 if (ic->nc == 0 || checkText (interp, ic, "")) {
                     mayskip = 1;
                 }
@@ -2871,7 +2898,7 @@ getNextExpected (
             case SCHEMA_CTYPE_CHOICE:
                 if (ic->flags & MIXED_CONTENT) {
                     Tcl_ListObjAppendElement (interp, rObj,
-                                              Tcl_NewStringObj ("#text", 5));
+                                              serializeTextCP (interp, NULL));
                 }
                 for (i = 0; i < ic->nc; i++) {
                     jc = ic->content[i];
@@ -2893,12 +2920,12 @@ getNextExpected (
                         break;
                     case SCHEMA_CTYPE_ANY:
                         Tcl_ListObjAppendElement (
-                            interp, rObj, Tcl_NewStringObj ("<any>", 5)
+                            interp, rObj, serializeAnyCP (interp, jc)
                             );
                         break;
                     case SCHEMA_CTYPE_TEXT:
                         Tcl_ListObjAppendElement (
-                            interp, rObj, Tcl_NewStringObj ("#text", 5)
+                            interp, rObj, serializeTextCP (interp, jc)
                             );
                         break;
                     case SCHEMA_CTYPE_CHOICE:
@@ -2956,14 +2983,14 @@ schemaInstanceInfoCmd (
     Tcl_Obj *const objv[]
     )
 {
-    int methodIndex;
+    int methodIndex, len, i, hnew;
     Tcl_HashEntry *h;
     SchemaCP *cp;
     SchemaValidationStack *se;
-    Tcl_Obj *elmObj;
     void *ns;
-    Tcl_Obj *rObj;
-    Tcl_HashTable seenCPs;
+    Tcl_Obj *rObj, *r2Obj, *thisObj;
+    Tcl_HashTable localHash;
+    Tcl_HashSearch search;
     
     static const char *schemaInstanceInfoMethods[] = {
         "validationstate", "vstate", "definedElements", "stack", "toplevel",
@@ -3039,8 +3066,8 @@ schemaInstanceInfoCmd (
             while (se->pattern->type != SCHEMA_CTYPE_NAME) {
                 se = se->down;
             }
-            elmObj = serializeElementName (interp, se->pattern);
-            Tcl_SetObjResult (interp, elmObj);
+            rObj = serializeElementName (interp, se->pattern);
+            Tcl_SetObjResult (interp, rObj);
             return TCL_OK;
             break;
         }
@@ -3079,10 +3106,36 @@ schemaInstanceInfoCmd (
             }
         } else {
             rObj = Tcl_NewObj();
-            Tcl_InitHashTable (&seenCPs, TCL_ONE_WORD_KEYS);
-            getNextExpected (sdata, sdata->stack, interp, &seenCPs, rObj);
-            Tcl_DeleteHashTable (&seenCPs);
-            Tcl_SetObjResult (interp, rObj);
+            Tcl_InitHashTable (&localHash, TCL_ONE_WORD_KEYS);
+            getNextExpected (sdata, sdata->stack, interp, &localHash, rObj);
+            Tcl_DeleteHashTable (&localHash);
+            Tcl_ListObjLength (interp, rObj, &len);
+            if (len <= 1) {
+                Tcl_SetObjResult (interp, rObj);
+            } else {
+                Tcl_InitHashTable (&localHash, TCL_STRING_KEYS);
+                for (i = 0; i < len; i++) {
+                    Tcl_ListObjIndex (interp, rObj, i, &thisObj);
+                    h = Tcl_CreateHashEntry (
+                        &localHash, Tcl_GetString (thisObj), &hnew
+                        );
+                    if (hnew) {
+                        Tcl_SetHashValue (h, thisObj);
+                    }
+                }
+                r2Obj = Tcl_NewObj();
+                len = 0;
+                for (h = Tcl_FirstHashEntry (&localHash, &search);
+                     h != NULL;
+                     h = Tcl_NextHashEntry (&search)) {
+                    Tcl_ListObjAppendElement (interp, r2Obj,
+                                              Tcl_GetHashValue (h));
+                    len++;
+                }
+                Tcl_DeleteHashTable (&localHash);
+                Tcl_DecrRefCount (rObj);
+                Tcl_SetObjResult (interp, r2Obj);
+            }
         }
         return TCL_OK;
         
