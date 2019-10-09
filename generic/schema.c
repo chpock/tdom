@@ -123,7 +123,7 @@ static char *Schema_CP_Type2str[] = {
     "CHOICE",
     "INTERLEAVE",
     "PATTERN",
-    "TEXT"
+    "TEXT",
     "VIRTUAL",
     "KEYSPACE_START",
     "KEYSPACE_END"
@@ -133,7 +133,8 @@ static char *Schema_Quant_Type2str[] = {
     "OPT",
     "REP",
     "PLUS",
-    "NM"
+    "NM",
+    "ERROR"
 };
 #endif
 
@@ -259,14 +260,6 @@ static void SetActiveSchemaData (SchemaData *v)
         se->activeChild = ac;                     \
         se->hasMatched = 1;                       \
     }
-
-#define serializeElementName(rObj, cp)                  \
-    rObj = Tcl_NewObj();                                \
-    if (cp->namespace) {                                \
-        Tcl_SetStringObj (rObj, cp->namespace, -1);     \
-        Tcl_AppendToObj (rObj, ":", 1);                 \
-    }                                                   \
-    Tcl_AppendToObj (rObj, cp->name, -1);
 
 #define S(str)  str, sizeof (str) -1
 
@@ -456,6 +449,9 @@ static void freeSchemaCP (
         }
         freedomKeyConstraints (pattern->domKeys);
         break;
+    }
+    if (pattern->defScript) {
+        Tcl_DecrRefCount (pattern->defScript);
     }
     FREE (pattern);
 }
@@ -747,10 +743,33 @@ addToContent (
     }
 }
 
+static SchemaValidationStack * 
+getStackElement (
+    SchemaData *sdata,
+    SchemaCP *pattern
+    )
+{
+    SchemaValidationStack *stackElm;
+
+    if (sdata->stackPool) {
+        stackElm = sdata->stackPool;
+        sdata->stackPool = stackElm->down;
+    } else {
+        stackElm = TMALLOC (SchemaValidationStack);
+    }
+    memset (stackElm, 0, sizeof (SchemaValidationStack));
+    stackElm->pattern = pattern;
+    return stackElm;
+}
+
+/* The ac argument is the currend looked at child of the stack top
+ * (which is not pattern, in case the looked ad child of the stack top
+ * is SCHEMA_CTYPE_CHOICE). */
 static void
 pushToStack (
     SchemaData *sdata,
-    SchemaCP *pattern
+    SchemaCP *pattern,
+    int ac
     )
 {
     SchemaValidationStack *stackElm, *se;
@@ -764,6 +783,7 @@ pushToStack (
     }
     memset (stackElm, 0, sizeof (SchemaValidationStack));
     se = sdata->stack;
+    if (se) se->activeChild = ac;
     stackElm->down = se;
     stackElm->pattern = pattern;
     if (pattern->type == SCHEMA_CTYPE_INTERLEAVE) {
@@ -771,6 +791,16 @@ pushToStack (
         memset (stackElm->interleaveState, 0, sizeof (int) * pattern->nc);
     }
     sdata->stack = stackElm;
+}
+
+static void
+repoolStackElement (
+    SchemaData *sdata,
+    SchemaValidationStack *se
+    ) 
+{
+    se->down = sdata->stackPool;
+    sdata->stackPool = se;
 }
 
 static void
@@ -898,18 +928,28 @@ checkText (
     return 1;
 }
 
+/* The argument ac points to the child of the current top-most stack
+ * element pattern which is to evaluate. */
 static int
 evalVirtual (
     Tcl_Interp *interp,
     SchemaData *sdata,
-    SchemaCP *cp
+    int ac
     )
 {
-    int rc;
+    SchemaCP *cp;
+    int savedac, savedhm, rc;
 
+    cp = sdata->stack->pattern->content[ac];
+    savedac = sdata->stack->activeChild;
+    savedhm = sdata->stack->hasMatched;
+    sdata->stack->activeChild = ac;
+    sdata->stack->hasMatched = 1;
     cp->content[cp->nc-1] = (SchemaCP *) sdata->self;
     rc = Tcl_EvalObjv (interp, cp->nc, (Tcl_Obj **) cp->content,
                        TCL_EVAL_GLOBAL);
+    sdata->stack->activeChild = savedac;
+    sdata->stack->hasMatched = savedhm;    
     if (rc != TCL_OK) {
         sdata->evalError = 1;
         return 0;
@@ -970,8 +1010,8 @@ matchElementStart (
                              candidate->name, candidate->namespace));
                 if (candidate->name == name
                     && candidate->namespace == namespace) {
+                    pushToStack (sdata, candidate, ac);
                     updateStack (se, cp, ac);
-                    pushToStack (sdata, candidate);
                     return 1;
                 }
                 break;
@@ -994,7 +1034,7 @@ matchElementStart (
                     case SCHEMA_CTYPE_NAME:
                         if (icp->name == name
                             && icp->namespace == namespace) {
-                            pushToStack (sdata, icp);
+                            pushToStack (sdata, icp, ac);
                             updateStack (se, cp, ac);
                             return 1;
                         }
@@ -1005,7 +1045,7 @@ matchElementStart (
 
                     case SCHEMA_CTYPE_INTERLEAVE:
                     case SCHEMA_CTYPE_PATTERN:
-                        pushToStack (sdata, icp);
+                        pushToStack (sdata, icp, ac);
                         rc = matchElementStart (interp, sdata, name, namespace);
                         if (rc == 1) {
                             updateStack (se, cp, ac);
@@ -1029,26 +1069,22 @@ matchElementStart (
                 break;
 
             case SCHEMA_CTYPE_VIRTUAL:
-                if (evalVirtual (interp, sdata, candidate)) {
-                    /* Virtual contraints are always quant ONE, so
-                     * that the virtual constraints are called while
-                     * looking if an element can end. Therefor we use
-                     * here the already present mayskip mechanism to
-                     * try further, after calling the tcl script. */
-                    mayskip = 1;
+                if (evalVirtual (interp, sdata, ac)) {
+                    hm = 1;
                     break;
                 }
                 else return 0;
 
             case SCHEMA_CTYPE_INTERLEAVE:
             case SCHEMA_CTYPE_PATTERN:
-                pushToStack (sdata, candidate);
+                pushToStack (sdata, candidate, ac);
                 rc = matchElementStart (interp, sdata, name, namespace);
                 if (rc == 1) {
                     updateStack (se, cp, ac);
                     return 1;
                 }
                 popStack (sdata);
+                if (rc == -1) mayskip = 1;
                 break;
 
             case SCHEMA_CTYPE_KEYSPACE_END:
@@ -1141,7 +1177,7 @@ matchElementStart (
             case SCHEMA_CTYPE_NAME:
                 if (icp->name == name
                     && icp->namespace == namespace) {
-                    pushToStack (sdata, icp);
+                    pushToStack (sdata, icp, 0);
                     se->hasMatched = 1;
                     se->interleaveState[i] = 1;
                     return 1;
@@ -1153,7 +1189,7 @@ matchElementStart (
 
             case SCHEMA_CTYPE_INTERLEAVE:
             case SCHEMA_CTYPE_PATTERN:
-                pushToStack (sdata, icp);
+                pushToStack (sdata, icp, 0);
                 rc = matchElementStart (interp, sdata, name, namespace);
                 if (rc == 1) {
                     se->hasMatched = 1;
@@ -1319,6 +1355,7 @@ probeElement (
             return TCL_ERROR;
         }
     } else {
+        sdata->validationState = VALIDATION_STARTED;
         if (!pattern) {
             if (recover (interp, sdata, S("UNKNOWN_ROOT_ELEMENT"), 0, 0)) {
                 sdata->skipDeep = 1;
@@ -1327,8 +1364,7 @@ probeElement (
             SetResult ("Unknown element");
             return TCL_ERROR;
         }
-        pushToStack (sdata, pattern);
-        sdata->validationState = VALIDATION_STARTED;
+        pushToStack (sdata, pattern, 0);
         return TCL_OK;
     }
 
@@ -1684,7 +1720,7 @@ static int checkElementEnd (
                         
                     case SCHEMA_CTYPE_INTERLEAVE:
                     case SCHEMA_CTYPE_PATTERN:
-                        pushToStack (sdata, ic);
+                        pushToStack (sdata, ic, ac);
                         if (checkElementEnd (interp, sdata)) {
                             mayMiss = 1;
                         }
@@ -1707,12 +1743,12 @@ static int checkElementEnd (
                 break;
                 
             case SCHEMA_CTYPE_VIRTUAL:
-                if (evalVirtual (interp, sdata, cp->content[ac])) break;
+                if (evalVirtual (interp, sdata, ac)) break;
                 else return 0;
                 
             case SCHEMA_CTYPE_INTERLEAVE:
             case SCHEMA_CTYPE_PATTERN:
-                pushToStack (sdata, cp->content[ac]);
+                pushToStack (sdata, cp->content[ac], ac);
                 rc = checkElementEnd (interp, sdata);
                 popStack (sdata);
                 if (rc) break;
@@ -1769,6 +1805,7 @@ checkDocKeys (
     int haveErrMsg = 0;
     SchemaDocKey *dk;
 
+    /* TODO: add recovering */
     if (sdata->unknownIDrefs) {
         haveErrMsg = 1;
         SetResult ("References to unknown IDs:");
@@ -1934,7 +1971,7 @@ matchText (
 
                         case SCHEMA_CTYPE_INTERLEAVE:
                         case SCHEMA_CTYPE_PATTERN:
-                            pushToStack (sdata, ic);
+                            pushToStack (sdata, ic, ac);
                             if (matchText (interp, sdata, text)) {
                                 updateStack (se, cp, ac);
                                 return 1;
@@ -1943,8 +1980,7 @@ matchText (
                             break;
 
                         case SCHEMA_CTYPE_VIRTUAL:
-                            if (!evalVirtual (interp, sdata, ic)) return 0;
-                            break;
+                            Tcl_Panic ("Virtual constrain in MIXED or CHOICE");
                             
                         case SCHEMA_CTYPE_CHOICE:
                             Tcl_Panic ("MIXED or CHOICE child of MIXED or CHOICE");
@@ -1963,7 +1999,7 @@ matchText (
 
                 case SCHEMA_CTYPE_INTERLEAVE:
                 case SCHEMA_CTYPE_PATTERN:
-                    pushToStack (sdata, candidate);
+                    pushToStack (sdata, candidate, ac);
                     if (matchText (interp, sdata, text)) {
                         updateStack (se, cp, ac);
                         return 1;
@@ -1976,7 +2012,7 @@ matchText (
                     break;
 
                 case SCHEMA_CTYPE_VIRTUAL:
-                    if (!evalVirtual (interp, sdata, candidate)) return 0;
+                    if (!evalVirtual (interp, sdata, ac)) return 0;
                     break;
 
                 case SCHEMA_CTYPE_KEYSPACE:
@@ -2049,7 +2085,7 @@ matchText (
 
                 case SCHEMA_CTYPE_INTERLEAVE:
                 case SCHEMA_CTYPE_PATTERN:
-                    pushToStack (sdata, ic);
+                    pushToStack (sdata, ic, 0);
                     if (matchText (interp, sdata, text)) {
                         updateStack (se, cp, ac);
                         return 1;
@@ -2721,6 +2757,224 @@ evalConstraints (
     return result;
 }
 
+/* cp must be of type SCHEMA_CTYPE_NAME for useful results */
+static Tcl_Obj*
+serializeElementName (
+    Tcl_Interp *interp,
+    SchemaCP *cp
+    )
+{
+    Tcl_Obj *rObj;
+
+    rObj = Tcl_NewObj();
+    Tcl_ListObjAppendElement (interp, rObj, Tcl_NewStringObj (cp->name, -1));
+    if (cp->namespace) {
+        Tcl_ListObjAppendElement (interp, rObj,
+                                  Tcl_NewStringObj (cp->namespace, -1));
+    }
+    return rObj;
+}
+
+/* cp must be of type SCHEMA_CTYPE_ANY for useful results */
+static Tcl_Obj*
+serializeAnyCP (
+    Tcl_Interp *interp,
+    SchemaCP *cp
+    )
+{
+    Tcl_Obj *rObj;
+
+    rObj = Tcl_NewObj();
+    Tcl_ListObjAppendElement (interp, rObj, Tcl_NewStringObj ("<any>", 5));
+    if (cp->namespace) {
+        Tcl_ListObjAppendElement (interp, rObj,
+                                  Tcl_NewStringObj (cp->namespace, -1));
+    } else {
+        Tcl_ListObjAppendElement (interp, rObj, Tcl_NewObj());
+    }
+    return rObj;
+}
+
+/* The cp argument may be NULL. If it isn't NULL cp must be of type
+ * SCHEMA_CTYPE_TEXT for useful results */
+static Tcl_Obj*
+serializeTextCP (
+    Tcl_Interp *interp,
+    SchemaCP *cp
+    )
+{
+    Tcl_Obj *rObj;
+
+    rObj = Tcl_NewObj();
+    Tcl_ListObjAppendElement (interp, rObj, Tcl_NewStringObj ("#text", 5));
+    Tcl_ListObjAppendElement (interp, rObj, Tcl_NewObj());
+    return rObj;
+}
+
+static void
+definedElements (
+    SchemaData *sdata,
+    Tcl_Interp *interp
+    )
+{
+    Tcl_Obj *rObj, *elmObj;
+    Tcl_HashEntry *h;
+    Tcl_HashSearch search;
+    SchemaCP *cp;
+    
+    rObj = Tcl_GetObjResult (interp);
+    for (h = Tcl_FirstHashEntry (&sdata->element, &search);
+         h != NULL;
+         h = Tcl_NextHashEntry (&search)) {
+        cp = (SchemaCP *) Tcl_GetHashValue (h);
+        if (!cp) continue;
+        if (cp->flags & FORWARD_PATTERN_DEF
+            || cp->flags & PLACEHOLDER_PATTERN_DEF) continue;
+        elmObj = serializeElementName (interp, cp);
+        Tcl_ListObjAppendElement (interp, rObj, elmObj);
+    }
+}
+
+static int
+getNextExpected (
+    SchemaData *sdata,
+    SchemaValidationStack *se,
+    Tcl_Interp *interp,
+    Tcl_HashTable *seenCPs,
+    Tcl_Obj *rObj
+    )
+{
+    int ac, hm, i, hnew, mustMatch, mayskip, rc;
+    SchemaCP *cp, *ic, *jc;
+    SchemaValidationStack *se1;
+
+    getContext (cp, ac, hm);
+    if (hm && maxOne(cp->quants[ac])) ac++;
+    switch (cp->type) {
+    case SCHEMA_CTYPE_INTERLEAVE:
+        ac = 0;
+        mustMatch = 0;
+        /* Fall through */
+    case SCHEMA_CTYPE_NAME:
+    case SCHEMA_CTYPE_PATTERN:
+        while (ac < cp->nc) {
+            if (se->interleaveState
+                && se->interleaveState[ac]
+                && maxOne (cp->quants[ac])) {
+                ac++;
+                continue;
+            }
+            ic = cp->content[ac];
+            mayskip = 0;
+            switch (ic->type) {
+            case SCHEMA_CTYPE_NAME:
+                Tcl_ListObjAppendElement (interp, rObj,
+                                          serializeElementName (interp, ic));
+                break;
+            case SCHEMA_CTYPE_INTERLEAVE:
+            case SCHEMA_CTYPE_PATTERN:
+                Tcl_CreateHashEntry (seenCPs, ic, &hnew);
+                if (hnew) {
+                    se1 = getStackElement (sdata, ic);
+                    mayskip = getNextExpected (sdata, se1, interp, seenCPs,
+                                               rObj);
+                    repoolStackElement (sdata, se1);
+                }
+                break;
+
+            case SCHEMA_CTYPE_ANY:
+                Tcl_ListObjAppendElement (interp, rObj,
+                                          serializeAnyCP (interp, ic));
+                break;
+
+            case SCHEMA_CTYPE_TEXT:
+                Tcl_ListObjAppendElement (interp, rObj,
+                                          serializeTextCP (interp, ic));
+                if (ic->nc == 0 || checkText (interp, ic, "")) {
+                    mayskip = 1;
+                }
+                break;
+                
+            case SCHEMA_CTYPE_CHOICE:
+                if (ic->flags & MIXED_CONTENT) {
+                    Tcl_ListObjAppendElement (interp, rObj,
+                                              serializeTextCP (interp, NULL));
+                }
+                for (i = 0; i < ic->nc; i++) {
+                    jc = ic->content[i];
+                    switch (jc->type) {
+                    case SCHEMA_CTYPE_NAME:
+                        Tcl_ListObjAppendElement (
+                            interp, rObj, serializeElementName (interp, jc)
+                            );
+                        break;
+                    case SCHEMA_CTYPE_INTERLEAVE:
+                    case SCHEMA_CTYPE_PATTERN:
+                        Tcl_CreateHashEntry (seenCPs, jc, &hnew);
+                        if (hnew) {
+                            se1 = getStackElement (sdata, ic);
+                            mayskip = getNextExpected (sdata, se1, interp,
+                                                       seenCPs, rObj);
+                            repoolStackElement (sdata, se1);
+                        }
+                        break;
+                    case SCHEMA_CTYPE_ANY:
+                        Tcl_ListObjAppendElement (
+                            interp, rObj, serializeAnyCP (interp, jc)
+                            );
+                        break;
+                    case SCHEMA_CTYPE_TEXT:
+                        Tcl_ListObjAppendElement (
+                            interp, rObj, serializeTextCP (interp, jc)
+                            );
+                        break;
+                    case SCHEMA_CTYPE_CHOICE:
+                        Tcl_Panic ("MIXED or CHOICE child of MIXED or CHOICE");
+
+                    case SCHEMA_CTYPE_VIRTUAL:
+                    case SCHEMA_CTYPE_KEYSPACE:
+                    case SCHEMA_CTYPE_KEYSPACE_END:
+                        break;
+                    }
+                }
+                break;
+
+            case SCHEMA_CTYPE_VIRTUAL:
+            case SCHEMA_CTYPE_KEYSPACE:
+            case SCHEMA_CTYPE_KEYSPACE_END:
+                break;
+            }
+            if (cp->type == SCHEMA_CTYPE_INTERLEAVE && minOne(cp->quants[ac]))
+                mustMatch = 1;
+            else if (!mayskip && minOne (cp->quants[ac])) break;
+            ac++;
+        }
+        break;
+        
+    case SCHEMA_CTYPE_ANY:
+    case SCHEMA_CTYPE_CHOICE:
+    case SCHEMA_CTYPE_TEXT:
+    case SCHEMA_CTYPE_VIRTUAL:
+    case SCHEMA_CTYPE_KEYSPACE:
+    case SCHEMA_CTYPE_KEYSPACE_END:
+        Tcl_Panic ("Invalid CTYPE onto the validation stack!");
+    }
+    if (cp->type == SCHEMA_CTYPE_NAME) {
+        return 0;
+    }
+    if (cp->type == SCHEMA_CTYPE_INTERLEAVE && mustMatch) {
+        return 0;
+    }
+    if (se->down) {
+        hm = se->down->hasMatched;
+        se->down->hasMatched = 1;
+        rc = getNextExpected (sdata, se->down, interp, seenCPs, rObj);
+        se->down->hasMatched = hm;
+        return rc;
+    }
+    return 1;
+}
+
 static int
 schemaInstanceInfoCmd (
     SchemaData *sdata,
@@ -2729,19 +2983,22 @@ schemaInstanceInfoCmd (
     Tcl_Obj *const objv[]
     )
 {
-    int methodIndex;
+    int methodIndex, len, i, hnew;
     Tcl_HashEntry *h;
-    Tcl_HashSearch search;
     SchemaCP *cp;
     SchemaValidationStack *se;
-    Tcl_Obj *resultObj, *elmObj;
+    void *ns;
+    Tcl_Obj *rObj, *r2Obj, *thisObj;
+    Tcl_HashTable localHash;
+    Tcl_HashSearch search;
     
     static const char *schemaInstanceInfoMethods[] = {
-        "validationstate", "vstate", "defelements", "stack", "toplevel",
-        NULL
+        "validationstate", "vstate", "definedElements", "stack", "toplevel",
+        "pastexpected", "nextexpected", "definition", NULL
     };
     enum schemaInstanceInfoMethod {
-        m_validationstate, m_vstate, m_defelements, m_stack, m_toplevel
+        m_validationstate, m_vstate, m_definedElements, m_stack, m_toplevel,
+        m_pastexpected, m_nextexpected, m_definition
     };
 
     static const char *schemaInstanceInfoStackMethods[] = {
@@ -2782,23 +3039,12 @@ schemaInstanceInfoCmd (
         }
         break;
         
-    case m_defelements:
+    case m_definedElements:
         if (objc != 2) {
-            Tcl_WrongNumArgs (interp, 1, objv, "defelements");
+            Tcl_WrongNumArgs (interp, 1, objv, "definedElements");
             return TCL_ERROR;
         }
-        resultObj = Tcl_GetObjResult (interp);
-        for (h = Tcl_FirstHashEntry (&sdata->element, &search);
-             h != NULL;
-             h = Tcl_NextHashEntry (&search)) {
-            cp = (SchemaCP *) Tcl_GetHashValue (h);
-            if (!cp) continue;
-            if (cp->flags & FORWARD_PATTERN_DEF
-                || cp->flags & PLACEHOLDER_PATTERN_DEF) continue;
-            serializeElementName (elmObj, cp);
-            if (Tcl_ListObjAppendElement (interp, resultObj, elmObj) != TCL_OK)
-                return TCL_ERROR;
-        }
+        definedElements (sdata, interp);
         break;
 
     case m_stack:
@@ -2820,8 +3066,8 @@ schemaInstanceInfoCmd (
             while (se->pattern->type != SCHEMA_CTYPE_NAME) {
                 se = se->down;
             }
-            serializeElementName (elmObj, se->pattern);
-            Tcl_SetObjResult (interp, elmObj);
+            rObj = serializeElementName (interp, se->pattern);
+            Tcl_SetObjResult (interp, rObj);
             return TCL_OK;
             break;
         }
@@ -2840,8 +3086,98 @@ schemaInstanceInfoCmd (
         } else {
             SetBooleanResult (1);
         }
+        return TCL_OK;
+
+    case m_nextexpected:
+        if (sdata->validationState == VALIDATION_ERROR) {
+            SetResult ("Validation command in error state.");
+            return TCL_ERROR;
+        } else if (sdata->validationState == VALIDATION_FINISHED) {
+            return TCL_OK;
+        }
+        if (!sdata->stack) {
+            if (sdata->start) {
+                Tcl_AppendElement (interp, sdata->start);
+                if (sdata->startNamespace) {
+                    Tcl_AppendElement (interp, sdata->startNamespace);
+                }
+            } else {
+                definedElements (sdata, interp);
+            }
+        } else {
+            rObj = Tcl_NewObj();
+            Tcl_InitHashTable (&localHash, TCL_ONE_WORD_KEYS);
+            getNextExpected (sdata, sdata->stack, interp, &localHash, rObj);
+            Tcl_DeleteHashTable (&localHash);
+            Tcl_ListObjLength (interp, rObj, &len);
+            if (len <= 1) {
+                Tcl_SetObjResult (interp, rObj);
+            } else {
+                Tcl_InitHashTable (&localHash, TCL_STRING_KEYS);
+                for (i = 0; i < len; i++) {
+                    Tcl_ListObjIndex (interp, rObj, i, &thisObj);
+                    h = Tcl_CreateHashEntry (
+                        &localHash, Tcl_GetString (thisObj), &hnew
+                        );
+                    if (hnew) {
+                        Tcl_SetHashValue (h, thisObj);
+                    }
+                }
+                r2Obj = Tcl_NewObj();
+                len = 0;
+                for (h = Tcl_FirstHashEntry (&localHash, &search);
+                     h != NULL;
+                     h = Tcl_NextHashEntry (&search)) {
+                    Tcl_ListObjAppendElement (interp, r2Obj,
+                                              Tcl_GetHashValue (h));
+                    len++;
+                }
+                Tcl_DeleteHashTable (&localHash);
+                Tcl_DecrRefCount (rObj);
+                Tcl_SetObjResult (interp, r2Obj);
+            }
+        }
+        return TCL_OK;
+        
+    case m_pastexpected:
+        break;
+        
+    case m_definition:
+        if (objc < 3 && objc > 4) {
+            Tcl_WrongNumArgs (interp, 1, objv, "name ?namespace?");
+            return TCL_ERROR;
+        }
+        h = Tcl_FindHashEntry (&sdata->element, Tcl_GetString (objv[2]));
+        if (!h) {
+            SetResult ("Unknown element");
+            return TCL_ERROR;
+        }
+        cp = Tcl_GetHashValue (h);
+        ns = NULL;
+        if (objc == 4) {
+            ns = getNamespacePtr (sdata, Tcl_GetString (objv[3]));
+        }
+        while (cp && cp->namespace != ns) {
+            cp = cp->next;
+        }
+        if (!cp) {
+            SetResult ("Unknown element");
+            return TCL_ERROR;
+        }
+        if (cp->flags & LOCAL_DEFINED_ELEMENT) {
+            Tcl_AppendElement (interp, "element");
+        } else {
+            Tcl_AppendElement (interp, "defelement");
+        }
+        Tcl_AppendElement (interp, cp->name);
+        if (cp->namespace) {
+            Tcl_AppendElement (interp, cp->namespace);
+        }
+        if (cp->defScript) {
+            Tcl_AppendElement (interp, Tcl_GetString (cp->defScript));
+        }
+        break;
     }
-    
     return TCL_OK;
 }
 
@@ -2995,6 +3331,8 @@ schemaInstanceCmd (
                 }
                 pattern->flags &= ~PLACEHOLDER_PATTERN_DEF;
             }
+            pattern->defScript = objv[patternIndex];
+            Tcl_IncrRefCount (pattern->defScript);
         } else {
             cleanupLastPattern (sdata, savedNumPatternList);
         }
@@ -3196,8 +3534,8 @@ schemaInstanceCmd (
                            "document or a element node");
                 return TCL_ERROR;
             }
-            sdata->validationState = VALIDATION_STARTED;
         }
+        sdata->validationState = VALIDATION_STARTED;
         if (validateDOM (interp, sdata, node) == TCL_OK) {
             SetBooleanResult (1);
             if (objc == 4) {
@@ -3446,8 +3784,7 @@ AnyPatternObjCmd (
     SchemaCP *pattern;
     SchemaQuant quant;
     char *ns = NULL;
-    int n, m, hnew;
-    Tcl_HashEntry *h;
+    int n, m;
 
     CHECK_SI
     CHECK_TOPLEVEL
@@ -3457,15 +3794,11 @@ AnyPatternObjCmd (
     } else if (objc == 2) {    
         quant = getQuant (interp, sdata, objv[1], &n, &m);
         if (quant == SCHEMA_CQUANT_ERROR) {
-            h = Tcl_CreateHashEntry (&sdata->namespace,
-                                     Tcl_GetString (objv[1]), &hnew);
-            ns = Tcl_GetHashKey (&sdata->namespace, h);
+            ns = getNamespacePtr (sdata, Tcl_GetString (objv[1]));
             quant = SCHEMA_CQUANT_ONE;
         }
     } else {
-        h = Tcl_CreateHashEntry (&sdata->namespace,
-                                 Tcl_GetString (objv[1]), &hnew);
-        ns = Tcl_GetHashKey (&sdata->namespace, h);
+        ns = getNamespacePtr (sdata, Tcl_GetString (objv[1]));
         quant = getQuant (interp, sdata, objv[2], &n, &m);
         if (quant == SCHEMA_CQUANT_ERROR) {
             return TCL_ERROR;
@@ -3919,7 +4252,7 @@ VirtualPatternObjCmd (
         && sdata->cp->type != SCHEMA_CTYPE_PATTERN) {
         SetResult ("The \"tcl\" schema definition command is only "
                    "allowed in sequential context (defelement, "
-                   "element or defpattern)");
+                   "element, group or defpattern)");
         return TCL_ERROR;
     }
 

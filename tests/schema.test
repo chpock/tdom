@@ -22,7 +22,7 @@
 #    schema-19.*: keyspace
 #    schema-20.*: domunique
 #
-# Copyright (c) 2018 Rolf Ade.
+# Copyright (c) 2018-2019 Rolf Ade.
 
 source [file join [file dir [info script]] loadtdom.tcl]
 
@@ -2132,6 +2132,34 @@ test schema-9.8 {choice as choice child} {
     grammar delete
     set result
 } {0 1 0 1 1 1 0}
+
+test schema-9.9 {choice with optional cp belong the choices} {
+    tdom::schema create grammar
+    grammar define {
+        defelement doc {
+            element e1
+            choice {
+                element e2
+                element e3 ?
+            }
+            element e4 ?
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        {<doc><e1/></doc>}
+        {<doc><e1/><e2/></doc>}
+        {<doc><e1/><e3/></doc>}
+        {<doc><e1/><e4/></doc>}
+        {<doc><e1/><e2/><e4/></doc>}
+        {<doc><e1/><e3/><e4/></doc>}
+    } {
+        lappend result [grammar validate $xml]
+    }
+    grammar delete
+    set result
+} {0 1 1 1 1 1 1}
 
 test schema-10.1 {any} {
     tdom::schema create s
@@ -4695,6 +4723,34 @@ test schema-16.16 {interleave} {
     set result
 } {1 1 0}
 
+test schema-16.17 {interleave with all content cp optional} {
+    tdom::schema s
+    s defelement doc {
+        interleave {
+            element a ?
+            element b ?
+            element c ?
+        }
+        element d
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/><d/></doc>
+        <doc><b/><d/></doc>
+        <doc><c/><d/></doc>
+        <doc><a/><c/><d/></doc>
+        <doc><b/><c/><d/></doc>
+        <doc><c/><a/><d/></doc>
+        <doc><c/><a/><b/><d/></doc>
+        <doc><c/><a/><b/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 1 1 1 1 1 1 0}
+
 test schema-17.1 {info} {
     tdom::schema s
     s define {
@@ -4702,7 +4758,7 @@ test schema-17.1 {info} {
             defelement $e {}
         }
     }
-    set result [lsort [s info defelements]]
+    set result [lsort [s info definedElements]]
     s delete
     set result
 } {a b1 b11 b2 c}
@@ -4719,7 +4775,7 @@ test schema-17.2 {info} {
             element a2
         }
     }
-    set result [lsort [s info defelements]]
+    set result [lsort [s info definedElements]]
     s delete
     set result
 } {a b}
@@ -4737,10 +4793,238 @@ test schema-17.3 {info} {
             element a2
         }
     }
-    set result [lsort [s info defelements]]
+    set result [lsort [s info definedElements]]
     s delete
     set result
 } {a b}
+
+test schema-17.4 {info} {
+    tdom::schema s
+    s define {
+        defelement b {
+            element b1 1 text
+            element a
+            element b2
+        }
+        defelement a {
+            element a1
+            element a2
+        }
+    }
+    set result [s info definition b]
+    s delete
+    set result
+} {defelement b {
+            element b1 1 text
+            element a
+            element b2
+        }}
+
+test schema-17.5 {info nextexpected} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            choice ? {
+                element a
+                element c
+                element b
+            }
+            element toplevel ?
+            element musthave
+            element aftermust
+        }
+    }
+    s event start doc
+    set result [s info nextexpected]
+    s delete
+    lsort $result
+} {a b c musthave toplevel}
+
+test schema-17.6 {info nextexpected} {
+    tdom::schema s
+    s prefixns {foo http://foo.bar}
+    s define {
+        defelement doc {
+            choice ? {
+                element a
+                element c
+                element b
+            }
+            element toplevel ?
+            namespace foo {
+                element musthave
+            }
+            element aftermust
+        }
+    }
+    s event start doc
+    set result [s info nextexpected]
+    s delete
+    lsort $result
+} {a b c {musthave http://foo.bar} toplevel}
+
+test schema-17.7 {info nextexpected} {
+    tdom::schema s
+    s prefixns {foo http://foo.bar}
+    s define {
+        defelement doc {
+            mixed {
+                element a
+                element c
+                element b
+            }
+            element toplevel ?
+            namespace foo {
+                element musthave
+            }
+            element aftermust
+        }
+    }
+    s event start doc
+    set result [s info nextexpected]
+    s delete
+    lsort $result
+} {a b c {musthave http://foo.bar} toplevel {{#text} {}}}
+
+test schema-17.8 {info nextexpected} {
+    tdom::schema s
+    s defelement doc {
+        choice ? {
+            element a
+            element c
+            element b
+        }
+        element toplevel ?
+        element musthave
+        element aftermust
+    }
+    set result [s info nextexpected]
+    s define {
+        foreach elm {a b c} {
+            defelement $elm {}
+        }
+    }
+    lappend result {*}[lsort [s info nextexpected]]
+    s event start doc
+    lappend result {*}[lsort [s info nextexpected]]
+    s event start c
+    s event end
+    lappend result {*}[lsort [s info nextexpected]]
+    s delete
+    set result
+} {doc a b c doc a b c musthave toplevel musthave toplevel}
+
+proc schema-17.9 {scmd} {
+    global result
+    lappend result {*}[lsort [$scmd info nextexpected]]
+}
+                  
+test schema-17.9 {info nextexpected from scripted constrain} {
+    tdom::schema s
+    s define {
+        defpattern some {
+            element a ?
+            group ? {
+                element b ?
+                tcl schema-17.9
+            }
+            element c
+        }
+        defelement doc {
+            ref some ?
+            element may ?
+            element must
+        }
+    }
+    set result ""
+    lappend [s validate {<doc><must/></doc>}]
+    s delete
+    set result
+} {c may must}
+
+test schema-17.10 {info nextexpected interleave} {
+    set defs {
+        {
+            interleave {
+                element a ?
+                element b
+                element c ?
+            }
+            element d
+        }
+        {
+            interleave {
+                element a ?
+                element b ?
+                element c ?
+            }
+            element d
+        }
+        {
+            interleave ? {
+                element a ?
+                element b
+                element c ?
+            }
+            element d
+        }
+    }
+    set result [list]
+    foreach def $defs {
+        tdom::schema s
+        s defelement doc $def
+        s event start doc
+        lappend result {*}[lsort [s info nextexpected]]
+        s delete
+    }
+    set result
+} {a b c a b c d a b c d}
+
+test schema-17.11 {info nextexpected interleave} {
+    set defs {
+        {
+            group + {
+                element c ?
+                element a ?
+                element b ?
+            }
+            element d
+        }
+    }
+    set result [list]
+    foreach def $defs {
+        tdom::schema s
+        s defelement doc $def
+        s event start doc
+        s event start b
+        s event end
+        set result [lsort [s info nextexpected]]
+        s delete
+    }
+    set result
+} {a b c d}
+
+test schema-17.12 {info nextexpected interleave} {
+    tdom::schema s
+    s define {
+        prefixns {ns1 http://foo.bar}
+        defelement doc {
+            element a
+            any
+            any ns1 ?
+            element b ?
+        }
+    }
+    s event start doc
+    s event start a
+    s event end
+    set result [lsort [s info nextexpected]]
+    s event start something
+    s event end
+    lappend result {*}[lsort [s info nextexpected]]
+    s delete
+    set result
+} {{<any> {}} {<any> http://foo.bar} b}
 
 proc schema-18 {args} {
     lappend ::result {*}$args
