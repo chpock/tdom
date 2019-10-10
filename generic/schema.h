@@ -158,6 +158,7 @@ typedef struct SchemaData_
     int       cleanupAfterEval;
     int       evalError;
     Tcl_Obj  *reportCmd;
+    SchemaValidationStack *lastMatchse;
     Tcl_Obj **evalStub;
     Tcl_Obj **textStub;
     char *currentNamespace;

@@ -4980,7 +4980,7 @@ test schema-17.10 {info nextexpected interleave} {
     set result
 } {a b c a b c d a b c d}
 
-test schema-17.11 {info nextexpected interleave} {
+test schema-17.11 {info nextexpected} {
     set defs {
         {
             group + {
@@ -5004,7 +5004,7 @@ test schema-17.11 {info nextexpected interleave} {
     set result
 } {a b c d}
 
-test schema-17.12 {info nextexpected interleave} {
+test schema-17.12 {info nextexpected} {
     tdom::schema s
     s define {
         prefixns {ns1 http://foo.bar}
@@ -5025,6 +5025,34 @@ test schema-17.12 {info nextexpected interleave} {
     s delete
     set result
 } {{<any> {}} {<any> http://foo.bar} b}
+
+proc schema-17.13 {scmd} {
+    global result
+    lappend result {*}[lsort [$scmd info pastexpected]]
+}
+test schema-17.13 {info pastexpected} {
+    set defs {
+        {
+            group + {
+                element c ?
+                element a ?
+                element b ?
+                tcl schema-17.13
+            }
+            element d
+        }
+    }
+    set result [list]
+    foreach def $defs {
+        tdom::schema s
+        s defelement doc $def
+        s event start doc
+        puts [s info nextexpected]
+        catch {s event start unknownElement}
+        s delete
+    }
+    set result
+} {a b c}
 
 proc schema-18 {args} {
     lappend ::result {*}$args

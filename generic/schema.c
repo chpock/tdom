@@ -762,9 +762,6 @@ getStackElement (
     return stackElm;
 }
 
-/* The ac argument is the currend looked at child of the stack top
- * (which is not pattern, in case the looked ad child of the stack top
- * is SCHEMA_CTYPE_CHOICE). */
 static void
 pushToStack (
     SchemaData *sdata,
@@ -2975,6 +2972,43 @@ getNextExpected (
     return 1;
 }
 
+static Tcl_Obj *
+unifyMatchList (
+    Tcl_Interp *interp,
+    Tcl_HashTable *htable,
+    Tcl_Obj *list
+    )
+{
+    int len, i, hnew;
+    Tcl_HashEntry *h;
+    Tcl_Obj *rObj, *thisObj;
+    Tcl_HashSearch search;
+    
+    rObj = Tcl_NewObj();
+    Tcl_ListObjLength (interp, list, &len);
+    if (len == 0) return rObj;
+    if (len == 1) {
+        Tcl_ListObjIndex (interp, list, 0, &thisObj);
+        Tcl_ListObjAppendElement (interp, rObj, thisObj);
+        return rObj;
+    }
+    Tcl_InitHashTable (htable, TCL_STRING_KEYS);
+    for (i = 0; i < len; i++) {
+        Tcl_ListObjIndex (interp, list, i, &thisObj);
+        h = Tcl_CreateHashEntry (htable, Tcl_GetString (thisObj), &hnew);
+        if (hnew) {
+            Tcl_SetHashValue (h, thisObj);
+        }
+    }
+    for (h = Tcl_FirstHashEntry (htable, &search);
+         h != NULL;
+         h = Tcl_NextHashEntry (&search)) {
+        Tcl_ListObjAppendElement (interp, rObj, Tcl_GetHashValue (h));
+    }
+    Tcl_DeleteHashTable (htable);
+    return rObj;
+}
+
 static int
 schemaInstanceInfoCmd (
     SchemaData *sdata,
@@ -2983,14 +3017,13 @@ schemaInstanceInfoCmd (
     Tcl_Obj *const objv[]
     )
 {
-    int methodIndex, len, i, hnew;
+    int methodIndex;
     Tcl_HashEntry *h;
     SchemaCP *cp;
     SchemaValidationStack *se;
     void *ns;
-    Tcl_Obj *rObj, *r2Obj, *thisObj;
+    Tcl_Obj *rObj;
     Tcl_HashTable localHash;
-    Tcl_HashSearch search;
     
     static const char *schemaInstanceInfoMethods[] = {
         "validationstate", "vstate", "definedElements", "stack", "toplevel",
@@ -3089,10 +3122,8 @@ schemaInstanceInfoCmd (
         return TCL_OK;
 
     case m_nextexpected:
-        if (sdata->validationState == VALIDATION_ERROR) {
-            SetResult ("Validation command in error state.");
-            return TCL_ERROR;
-        } else if (sdata->validationState == VALIDATION_FINISHED) {
+        if (sdata->validationState == VALIDATION_ERROR
+            || sdata->validationState == VALIDATION_FINISHED) {
             return TCL_OK;
         }
         if (!sdata->stack) {
@@ -3109,37 +3140,26 @@ schemaInstanceInfoCmd (
             Tcl_InitHashTable (&localHash, TCL_ONE_WORD_KEYS);
             getNextExpected (sdata, sdata->stack, interp, &localHash, rObj);
             Tcl_DeleteHashTable (&localHash);
-            Tcl_ListObjLength (interp, rObj, &len);
-            if (len <= 1) {
-                Tcl_SetObjResult (interp, rObj);
-            } else {
-                Tcl_InitHashTable (&localHash, TCL_STRING_KEYS);
-                for (i = 0; i < len; i++) {
-                    Tcl_ListObjIndex (interp, rObj, i, &thisObj);
-                    h = Tcl_CreateHashEntry (
-                        &localHash, Tcl_GetString (thisObj), &hnew
-                        );
-                    if (hnew) {
-                        Tcl_SetHashValue (h, thisObj);
-                    }
-                }
-                r2Obj = Tcl_NewObj();
-                len = 0;
-                for (h = Tcl_FirstHashEntry (&localHash, &search);
-                     h != NULL;
-                     h = Tcl_NextHashEntry (&search)) {
-                    Tcl_ListObjAppendElement (interp, r2Obj,
-                                              Tcl_GetHashValue (h));
-                    len++;
-                }
-                Tcl_DeleteHashTable (&localHash);
-                Tcl_DecrRefCount (rObj);
-                Tcl_SetObjResult (interp, r2Obj);
-            }
+            Tcl_SetObjResult (interp, unifyMatchList (interp, &localHash,
+                                                      rObj));
+            Tcl_DecrRefCount (rObj);
         }
         return TCL_OK;
         
     case m_pastexpected:
+        if (sdata->validationState == VALIDATION_READY || !sdata->stack)
+            return TCL_OK;
+        se = sdata->lastMatchse;
+        if (!se) se = sdata->stack;
+        rObj = Tcl_NewObj();
+        Tcl_InitHashTable (&localHash, TCL_ONE_WORD_KEYS);
+        getNextExpected (sdata, se, interp, &localHash, rObj);
+        Tcl_DeleteHashTable (&localHash);
+        Tcl_SetObjResult (interp, unifyMatchList (interp, &localHash,
+                                                  rObj));
+        Tcl_DecrRefCount (rObj);
+        
+        
         break;
         
     case m_definition:
