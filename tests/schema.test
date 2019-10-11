@@ -641,6 +641,82 @@ test schema-2.2 {grammar definition: ref} {
     set result
 } {0 2}
 
+test schema-2.3 {forward definded ref} {
+    set defs {
+        {
+            ref thisPattern ?
+        }
+        {
+            ref thatPattern
+        }
+        {
+            ref thisPattern ?
+            ref thatPattern
+        }
+        {
+            ref thisPattern ?
+            element a
+        }
+        {
+            ref thatPattern
+            element a
+        }
+    }
+    set xmlinput {
+        <doc/>
+        <doc><a/></doc>
+        <doc><unknown/></doc>
+    }
+    set result [list]
+    foreach def $defs {
+        tdom::schema create s
+        s defelement doc $def
+        foreach xml $xmlinput {
+            lappend result [s validate $xml errMsg]
+        }
+        s delete
+    }
+    set result
+} {1 0 0 1 0 0 1 0 0 0 1 0 0 1 0}
+
+test schema-2.4 {forward definded element} {
+    set defs {
+        {
+            element thisElement ?
+        }
+        {
+            element thatElement
+        }
+        {
+            element thisElement ?
+            element thatElement
+        }
+        {
+            element thisElement ?
+            element a
+        }
+        {
+            element thatElement
+            element a
+        }
+    }
+    set xmlinput {
+        <doc/>
+        <doc><a/></doc>
+        <doc><unknown/></doc>
+    }
+    set result [list]
+    foreach def $defs {
+        tdom::schema create s
+        s defelement doc $def
+        foreach xml $xmlinput {
+            lappend result [s validate $xml errMsg]
+        }
+        s delete
+    }
+    set result
+} {1 0 0 0 0 0 0 0 0 0 1 0 0 0 0}
+
 test schema-3.1 {grammar definition: choice} {
     tdom::schema create grammar
     grammar defelement doc {
