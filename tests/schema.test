@@ -5102,19 +5102,63 @@ test schema-17.12 {info nextexpected} {
     set result
 } {{<any> {}} {<any> http://foo.bar} b}
 
-proc schema-17.13 {scmd} {
+proc schema-17.13 {scmd args} {
     global result
     lappend result {*}[lsort [$scmd info pastexpected]]
 }
 test schema-17.13 {info pastexpected} {
     set defs {
         {
+            element a
+            element b ?
+        }
+        {
+            element a ?
+            element b
+        }
+        {
+            element a ?
+            element b ?
+        }
+    }
+    set xmlinput {
+        <doc/>
+        <doc><a/></doc>
+        <doc><b/></doc>
+        <doc><a/><b/></doc>
+        <doc><unknown/></doc>
+        <doc><a/><unknown/></doc>
+    }
+    set result [list]
+    set defnr 0
+    foreach def $defs {
+        tdom::schema s
+        s defelement doc $def
+        s reportcmd schema-17.13
+        set xmlnr 0
+        foreach xml $xmlinput {
+            lappend result $defnr/$xmlnr: [s validate $xml errMsg]
+            incr xmlnr
+        }
+        s delete
+        incr defnr
+    }
+    set result
+} {}
+
+proc schema-17.14 {scmd} {
+    global result
+    lappend result {*}[lsort [$scmd info pastexpected]]
+}
+test schema-17.14 {info pastexpected} {
+    set defs {
+        {
             group + {
                 element c ?
                 element a ?
                 element b ?
-                tcl schema-17.13
             }
+            tcl schema-17.14
             element d
         }
     }
@@ -5123,12 +5167,11 @@ test schema-17.13 {info pastexpected} {
         tdom::schema s
         s defelement doc $def
         s event start doc
-        puts [s info nextexpected]
         catch {s event start unknownElement}
         s delete
     }
     set result
-} {a b c}
+} {a b c d}
 
 proc schema-18 {args} {
     lappend ::result {*}$args

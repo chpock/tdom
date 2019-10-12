@@ -557,6 +557,11 @@ static void schemaInstanceDelete (
         FREE (sdata->stack);
         sdata->stack = down;
     }
+    while (sdata->lastMatchse) {
+        down = sdata->lastMatchse->down;
+        FREE (sdata->lastMatchse);
+        sdata->lastMatchse = down;
+    }
     while (sdata->stackPool) {
         down = sdata->stackPool->down;
         FREE (sdata->stackPool);
@@ -769,25 +774,17 @@ pushToStack (
     int ac
     )
 {
-    SchemaValidationStack *stackElm, *se;
+    SchemaValidationStack *se;
 
     DBG(fprintf(stderr, "push to Stack:\n");serializeCP(pattern));
-    if (sdata->stackPool) {
-        stackElm = sdata->stackPool;
-        sdata->stackPool = stackElm->down;
-    } else {
-        stackElm = TMALLOC (SchemaValidationStack);
-    }
-    memset (stackElm, 0, sizeof (SchemaValidationStack));
-    se = sdata->stack;
-    if (se) se->activeChild = ac;
-    stackElm->down = se;
-    stackElm->pattern = pattern;
+    se = getStackElement (sdata, pattern);
+    if (sdata->stack) sdata->stack->activeChild = ac;
+    se->down = sdata->stack;
     if (pattern->type == SCHEMA_CTYPE_INTERLEAVE) {
-        stackElm->interleaveState = MALLOC (sizeof (int) * pattern->nc);
-        memset (stackElm->interleaveState, 0, sizeof (int) * pattern->nc);
+        se->interleaveState = MALLOC (sizeof (int) * pattern->nc);
+        memset (se->interleaveState, 0, sizeof (int) * pattern->nc);
     }
-    sdata->stack = stackElm;
+    sdata->stack = se;
 }
 
 static void
@@ -796,26 +793,64 @@ repoolStackElement (
     SchemaValidationStack *se
     ) 
 {
+    if (se->interleaveState) {
+        FREE (se->interleaveState);
+        se->interleaveState = NULL;
+    }
     se->down = sdata->stackPool;
     sdata->stackPool = se;
 }
 
 static void
-popStack (
-    SchemaData *sdata
+savelastMatchse (
+    SchemaData *sdata,
+    int add
+    )
+{
+    SchemaValidationStack *se, *nextse;
+    
+    if (!add) {
+        se = sdata->lastMatchse;
+        while (se) {
+            nextse = se->down;
+            repoolStackElement (sdata, se);
+            se = nextse;
+        }
+    }
+    se = getStackElement (sdata, sdata->stack->pattern);
+    se->activeChild = sdata->stack->activeChild;
+    se->hasMatched = sdata->stack->hasMatched;
+    se->down = NULL;
+    if (se->pattern->type == SCHEMA_CTYPE_INTERLEAVE) {
+        se->interleaveState = MALLOC (sizeof (int) * se->pattern->nc);
+        memcpy (se->interleaveState, sdata->stack->interleaveState,
+                se->pattern->nc);
+    }
+    if (sdata->lastMatchse && add) {
+        nextse = sdata->lastMatchse;
+        while (nextse->down) {
+            nextse = nextse->down;
+        }
+        nextse->down = se;
+    } else {
+        sdata->lastMatchse = se;
+    }
+}
+
+static void
+popFromStack (
+    SchemaData *sdata,
+    SchemaValidationStack **stack
     )
 {
     SchemaValidationStack *se;
     DBG(fprintf(stderr, "pop from Stack:\n");serializeCP(sdata->stack->pattern));
-    if (sdata->stack->interleaveState) {
-        FREE (sdata->stack->interleaveState);
-        sdata->stack->interleaveState = NULL;
-    }
-    se = sdata->stack->down;
-    sdata->stack->down = sdata->stackPool;
-    sdata->stackPool = sdata->stack;
-    sdata->stack = se;
+    se = (*stack)->down;
+    repoolStackElement (sdata, *stack);
+    *stack = se;
 }
+
+#define popStack(sdata) popFromStack (sdata, &sdata->stack)
 
 static void
 finalizeElement (
@@ -869,7 +904,7 @@ recover (
     )
 {
     Tcl_Obj *cmdPtr;
-    int rc, savedac;
+    int rc;
 
     if (!sdata->reportCmd) return 0;
     cmdPtr = Tcl_DuplicateObj (sdata->reportCmd);
@@ -881,15 +916,8 @@ recover (
         Tcl_NewStringObj (errType, len)
         );
     sdata->currentEvals++;
-    if (sdata->stack) {
-        savedac = sdata->stack->activeChild;
-        sdata->stack->activeChild = ac;
-    }
     rc = Tcl_EvalObjEx (interp, cmdPtr,
                         TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT);
-    if (sdata->stack) {
-        sdata->stack->activeChild = savedac;
-    }
     sdata->currentEvals--;
     Tcl_DecrRefCount (cmdPtr);
     if (rc != TCL_OK) {
@@ -2684,6 +2712,7 @@ schemaReset (
     SchemaKeySpace *ks;
     
     while (sdata->stack) popStack (sdata);
+    while (sdata->lastMatchse) popFromStack (sdata, &sdata->lastMatchse);
     sdata->validationState = VALIDATION_READY;
     sdata->skipDeep = 0;
     sdata->evalError = 0;
