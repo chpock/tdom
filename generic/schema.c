@@ -554,16 +554,22 @@ static void schemaInstanceDelete (
     FREE (sdata->quants);
     while (sdata->stack) {
         down = sdata->stack->down;
+        if (sdata->stack->interleaveState)
+            FREE (sdata->stack->interleaveState);
         FREE (sdata->stack);
         sdata->stack = down;
     }
     while (sdata->lastMatchse) {
         down = sdata->lastMatchse->down;
+        if (sdata->lastMatchse->interleaveState)
+            FREE (sdata->lastMatchse->interleaveState);
         FREE (sdata->lastMatchse);
         sdata->lastMatchse = down;
     }
     while (sdata->stackPool) {
         down = sdata->stackPool->down;
+        /* interleaveState always got cleand up at puting se back to
+         * pool */
         FREE (sdata->stackPool);
         sdata->stackPool = down;
     }
