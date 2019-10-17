@@ -78,7 +78,7 @@
 
 typedef struct
 {
-    SchemaData *sdata;
+    SchemaData    *sdata;
     Tcl_Interp    *interp;
     XML_Parser     parser;
     Tcl_DString   *cdata;
@@ -87,6 +87,50 @@ typedef struct
     int            maxUriLen;
 } ValidateMethodData;
 
+typedef enum {
+    DOM_KEYCONSTRAINT,
+    INVALID_DOM_KEYCONSTRAINT,
+    MISSING_ANY,
+    MISSING_ATTRIBUTE,
+    MISSING_CP,
+    MISSING_ELEMENT,
+    MISSING_ONE_OF_CHOICE,
+    MISSING_ONE_OF_INTERLEAVE,
+    MISSING_TEXT,
+    UNEXPECTED_DOCUMENT_ELEMENT,
+    UNEXPECTED_DOCUMENT_ELEMENT_NAMESPACE,
+    UNEXPECTED_ELEMENT,
+    UNKNOWN_ATTRIBUTE,
+    INVALID_KEYREF,
+    UNKNOWN_ROOT_ELEMENT,
+    UNKOWN_GLOBAL_ID,
+    UNKOWN_ID,
+    INVALID_ATTRIBUTE_VALUE,
+    INVALID_VALUE
+} ValidationErrorType;
+
+static char *ValidationErrorType2str[] = {
+    "DOM_KEYCONSTRAINT",
+    "INVALID_DOM_KEYCONSTRAINT",
+    "MISSING_ANY",
+    "MISSING_ATTRIBUTE",
+    "MISSING_CP",
+    "MISSING_ELEMENT",
+    "MISSING_ONE_OF_CHOICE",
+    "MISSING_ONE_OF_INTERLEAVE",
+    "MISSING_TEXT",
+    "UNEXPECTED_DOCUMENT_ELEMENT",
+    "UNEXPECTED_DOCUMENT_ELEMENT_NAMESPACE",
+    "UNEXPECTED_ELEMENT",
+    "UNKNOWN_ATTRIBUTE",
+    "INVALID_KEYREF",
+    "UNKNOWN_ROOT_ELEMENT",
+    "UNKOWN_GLOBAL_ID",
+    "UNKOWN_ID",
+    "INVALID_ATTRIBUTE_VALUE",
+    "INVALID_VALUE"
+};
+    
 /*----------------------------------------------------------------------------
 |   domKeyConstraint related flage
 |
@@ -102,8 +146,16 @@ typedef struct
 
 #define SetResult(str) Tcl_ResetResult(interp); \
                      Tcl_SetStringObj(Tcl_GetObjResult(interp), (str), -1)
+#define SetResultV(str) if (!sdata->evalError) { \
+        Tcl_ResetResult(interp);                                        \
+        Tcl_SetStringObj(Tcl_GetObjResult(interp), (str), -1);          \
+    }
 #define SetResult3(str1,str2,str3) Tcl_ResetResult(interp);     \
                      Tcl_AppendResult(interp, (str1), (str2), (str3), NULL)
+#define SetResult3V(str1,str2,str3) if (!sdata->evalError) {            \
+        Tcl_ResetResult(interp);                                        \
+        Tcl_AppendResult(interp, (str1), (str2), (str3), NULL);         \
+    }
 #define SetIntResult(i) Tcl_ResetResult(interp);                        \
                      Tcl_SetIntObj(Tcl_GetObjResult(interp), (i))
 #define SetBooleanResult(i) Tcl_ResetResult(interp); \
@@ -253,6 +305,7 @@ static void SetActiveSchemaData (SchemaData *v)
 
 
 #define updateStack(se,cp,ac)                     \
+    se->startChild = ac;                          \
     if (maxOne (cp->quants[ac])) {                \
         se->activeChild = ac + 1;                 \
         se->hasMatched = 0;                       \
@@ -898,6 +951,58 @@ finalizeElement (
     }
 }
 
+static int 
+recoverex (
+    Tcl_Interp *interp,
+    SchemaData *sdata,
+    ValidationErrorType errorType
+    )
+{
+    Tcl_Obj *cmdPtr;
+    int rc;
+
+    if (!sdata->reportCmd || sdata->evalError) return 0;
+    cmdPtr = Tcl_DuplicateObj (sdata->reportCmd);
+    Tcl_IncrRefCount(cmdPtr);
+    Tcl_ListObjAppendElement (interp, cmdPtr,
+                              sdata->self);
+    Tcl_ListObjAppendElement (
+        interp, cmdPtr,
+        Tcl_NewStringObj (ValidationErrorType2str[errorType], -1)
+        );
+    sdata->currentEvals++;
+    rc = Tcl_EvalObjEx (interp, cmdPtr,
+                        TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT);
+    sdata->currentEvals--;
+    Tcl_DecrRefCount (cmdPtr);
+    if (rc != TCL_OK) {
+        sdata->evalError = 1;
+        return 0;
+    }
+    switch (errorType) {
+    case DOM_KEYCONSTRAINT:
+    case INVALID_DOM_KEYCONSTRAINT:
+    case MISSING_ANY:
+    case MISSING_ATTRIBUTE:
+    case MISSING_CP:
+    case MISSING_ELEMENT:
+    case MISSING_ONE_OF_CHOICE:
+    case MISSING_ONE_OF_INTERLEAVE:
+    case MISSING_TEXT:
+    case UNEXPECTED_DOCUMENT_ELEMENT:
+    case UNEXPECTED_DOCUMENT_ELEMENT_NAMESPACE:
+    case UNEXPECTED_ELEMENT:
+    case UNKNOWN_ATTRIBUTE:
+    case INVALID_KEYREF:
+    case UNKNOWN_ROOT_ELEMENT:
+    case UNKOWN_GLOBAL_ID:
+    case UNKOWN_ID:
+    case INVALID_ATTRIBUTE_VALUE:
+    case INVALID_VALUE:
+        break;
+    }
+    return 0;
+}
 
 static int 
 recover (
@@ -912,7 +1017,7 @@ recover (
     Tcl_Obj *cmdPtr;
     int rc;
 
-    if (!sdata->reportCmd) return 0;
+    if (!sdata->reportCmd || sdata->evalError) return 0;
     cmdPtr = Tcl_DuplicateObj (sdata->reportCmd);
     Tcl_IncrRefCount(cmdPtr);
     Tcl_ListObjAppendElement (interp, cmdPtr,
@@ -1122,7 +1227,7 @@ matchElementStart (
                 candidate->keySpace->active--;
                 if (!candidate->keySpace->active) {
                     if (candidate->keySpace->unknownIDrefs) {
-                        if (!recover (interp, sdata, S("UNKNOWN_KEYREF"),
+                        if (!recover (interp, sdata, S("INVALID_KEYREF"),
                                       0, 0)) {
                             return 0;
                         }
@@ -1299,7 +1404,6 @@ probeElement (
                  name, (char *)namespace);
         );
 
-    /* This is problematic. If feeded with continuously new namespaces */
     if (namespace) {
         h = Tcl_FindHashEntry (&sdata->namespace, namespace);
     } else {
@@ -1336,17 +1440,34 @@ probeElement (
         /* The root of the tree to check. */
         if (sdata->start) {
             if (strcmp (name, sdata->start) != 0) {
+                if (recover (interp, sdata, S("UNEXPECTED_DOCUMENT_ELEMENT"),
+                             0, 0)) {
+                    sdata->validationState = VALIDATION_FINISHED;
+                    return TCL_OK;
+                }
                 SetResult ("Root element doesn't match");
                 return TCL_ERROR;
             }
             if (namespace) {
                 if (!sdata->startNamespace||
                     strcmp (namespace, sdata->startNamespace) != 0) {
+                    if (recover (interp, sdata,
+                                 S("UNEXPECTED_DOCUMENT_ELEMENT_NAMESPACE"),
+                                 0, 0)) {
+                        sdata->validationState = VALIDATION_FINISHED;
+                        return TCL_OK;
+                    }
                     SetResult ("Root element namespace doesn't match");
                     return TCL_ERROR;
                 }
             } else {
                 if (sdata->startNamespace) {
+                    if (recover (interp, sdata,
+                                 S("UNEXPECTED_DOCUMENT_ELEMENT_NAMESPACE"),
+                                 0, 0)) {
+                        sdata->validationState = VALIDATION_FINISHED;
+                        return TCL_OK;
+                    }
                     SetResult ("Root element namespace doesn't match");
                     return TCL_ERROR;
                 }
@@ -1468,10 +1589,10 @@ int probeAttributes (
                     if (!checkText (interp, cp->attrs[i]->cp,
                                     (char *) atPtr[1])) {
                         if (!recover (interp, sdata,
-                                      S("WRONG_ATTRIBUTE_VALUE"), 0, 0)) {
+                                      S("INVALID_ATTRIBUTE_VALUE"), 0, 0)) {
                             if (nsatt) namespace[j] = '\xFF';
-                            SetResult3 ("Attribute value doesn't match for "
-                                        "attribute '", atPtr[0], "'");
+                            SetResult3V ("Attribute value doesn't match for "
+                                         "attribute '", atPtr[0], "'");
                             return TCL_ERROR;
                         }
                     }
@@ -1483,14 +1604,16 @@ int probeAttributes (
         if (nsatt) namespace[j] = '\xFF';
         if (!found) {
             if (!recover (interp, sdata, S("UNKNOWN_ATTRIBUTE"), 0, 0)) {
-                SetResult3 ("Unknown attribute \"", atPtr[0], "\"");
+                SetResult3V ("Unknown attribute \"", atPtr[0], "\"");
                 return TCL_ERROR;
             }
         }
     }
     if (reqAttr != cp->numReqAttr) {
         /* Lookup the missing attribute(s) */
-        SetResult ("Missing mandatory attribute(s):");
+        if (!sdata->evalError) {
+            SetResult ("Missing mandatory attribute(s):");
+        }
         for (i = 0; i < cp->numAttr; i++) {
             if (!cp->attrs[i]->required) continue;
             found = 0;
@@ -1579,9 +1702,9 @@ int probeDomAttributes (
                     if (!checkText (interp, cp->attrs[i]->cp,
                                     (char *) atPtr->nodeValue)) {
                         if (!recover (interp, sdata,
-                                      S("WRONG_ATTRIBUTE_VALUE"), 0, 0)) {
-                            SetResult3 ("Attribute value doesn't match for "
-                                        "attribute '", ln, "'");
+                                      S("INVALID_ATTRIBUTE_VALUE"), 0, 0)) {
+                            SetResult3V ("Attribute value doesn't match for "
+                                         "attribute '", ln, "'");
                             return TCL_ERROR;
                         }
                     }
@@ -1593,15 +1716,18 @@ int probeDomAttributes (
         }
         if (!found) {
             if (!recover (interp, sdata, S("UNKNOWN_ATTRIBUTE"), 0, 0)) {
-                if (ns) {
-                    SetResult ("Unknown attribute \"");
-                    Tcl_AppendResult (interp, ns, ":", atPtr->nodeName,
-                                      "\"");
-                } else {
-                    SetResult3 ("Unknown attribute \"", atPtr->nodeName, "\"");
+                if (!sdata->evalError) {
+                    if (ns) {
+                        SetResult ("Unknown attribute \"");
+                        Tcl_AppendResult (interp, ns, ":", atPtr->nodeName,
+                                          "\"");
+                    } else {
+                        SetResult3 ("Unknown attribute \"", atPtr->nodeName,
+                                    "\"");
+                    }
+                    sdata->validationState = VALIDATION_ERROR;
+                    return TCL_ERROR;
                 }
-                sdata->validationState = VALIDATION_ERROR;
-                return TCL_ERROR;
             }
         }
     nextAttr:
@@ -1609,7 +1735,9 @@ int probeDomAttributes (
     }
     if (reqAttr != cp->numReqAttr) {
         /* Lookup the missing attribute(s) */
-        SetResult ("Missing mandatory attribute(s):");
+        if (!sdata->evalError) {
+            SetResult ("Missing mandatory attribute(s):");
+        }
         for (i = 0; i < cp->numAttr; i++) {
             if (!cp->attrs[i]->required) continue;
             found = 0;
@@ -1642,12 +1770,15 @@ int probeDomAttributes (
             }
             if (!found) {
                 if (!recover (interp, sdata, S("MISSING_ATTRIBUTE"), 0, 0)) {
-                    if (cp->attrs[i]->namespace) {
-                        Tcl_AppendResult (interp, " ", cp->attrs[i]->namespace,
-                                          ":", cp->attrs[i]->name, NULL);
-                    } else {
-                        Tcl_AppendResult (interp, " ", cp->attrs[i]->name,
-                                          NULL);
+                    if (!sdata->evalError) {
+                        if (cp->attrs[i]->namespace) {
+                            Tcl_AppendResult (interp, " ",
+                                              cp->attrs[i]->namespace, ":",
+                                              cp->attrs[i]->name, NULL);
+                        } else {
+                            Tcl_AppendResult (interp, " ", cp->attrs[i]->name,
+                                              NULL);
+                        }
                     }
                 }
             }
@@ -1696,7 +1827,7 @@ static int checkElementEnd (
                 cp->content[ac]->keySpace->active--;
                 if (!cp->content[ac]->keySpace->active) {
                     if (cp->content[ac]->keySpace->unknownIDrefs) {
-                        if (!recover (interp, sdata, S("UNKNOWN_KEYREF"), 0, 0)) {
+                        if (!recover (interp, sdata, S("INVALID_KEYREF"), 0, 0)) {
                             return 0;
                         }
                         cp->content[ac]->keySpace->unknownIDrefs = 0;
@@ -1837,16 +1968,19 @@ checkDocKeys (
     SchemaDocKey *dk;
 
     /* TODO: add recovering */
+    if (sdata->evalError) return 0;
     if (sdata->unknownIDrefs) {
-        haveErrMsg = 1;
-        SetResult ("References to unknown IDs:");
-        for (h = Tcl_FirstHashEntry (&sdata->ids, &search);
-             h != NULL;
-             h = Tcl_NextHashEntry (&search)) {
-            if (Tcl_GetHashValue (h) == 0) {
-                Tcl_AppendResult (interp, " '",
-                                  Tcl_GetHashKey (&sdata->ids, h),
-                                  "'", NULL);
+        if (!recover (interp, sdata, S("UNKOWN_ID"), 0, 0)) {
+            haveErrMsg = 1;
+            SetResult ("References to unknown IDs:");
+            for (h = Tcl_FirstHashEntry (&sdata->ids, &search);
+                 h != NULL;
+                 h = Tcl_NextHashEntry (&search)) {
+                if (Tcl_GetHashValue (h) == 0) {
+                    Tcl_AppendResult (interp, " '",
+                                      Tcl_GetHashKey (&sdata->ids, h),
+                                      "'", NULL);
+                }
             }
         }
     }
@@ -1856,22 +1990,24 @@ checkDocKeys (
              h = Tcl_NextHashEntry (&search)) {
             dk = Tcl_GetHashValue (h);
             if (dk->unknownIDrefs) {
-                if (haveErrMsg) {
-                    Tcl_AppendResult (interp, "\n", NULL);
-                } else {
-                    haveErrMsg = 1;
-                }
-                Tcl_AppendResult (interp,
-                                  "References to unknown IDs in ID space '",
-                                  Tcl_GetHashKey (&sdata->idTables, h),
-                                  "':", NULL);
-                for (h1 = Tcl_FirstHashEntry (&dk->ids, &search1);
-                     h1 != NULL;
-                     h1 = Tcl_NextHashEntry (&search1)) {
-                    if (Tcl_GetHashValue (h1) == 0) {
-                        Tcl_AppendResult (interp, " '",
-                                          Tcl_GetHashKey (&dk->ids, h1),
-                                          "'", NULL);
+                if (!recover (interp, sdata, S("UNKOWN_GLOBAL_ID"), 0, 0)) {
+                    if (haveErrMsg) {
+                        Tcl_AppendResult (interp, "\n", NULL);
+                    } else {
+                        haveErrMsg = 1;
+                    }
+                    Tcl_AppendResult (interp,
+                                      "References to unknown IDs in ID space '",
+                                      Tcl_GetHashKey (&sdata->idTables, h),
+                                      "':", NULL);
+                    for (h1 = Tcl_FirstHashEntry (&dk->ids, &search1);
+                         h1 != NULL;
+                         h1 = Tcl_NextHashEntry (&search1)) {
+                        if (Tcl_GetHashValue (h1) == 0) {
+                            Tcl_AppendResult (interp, " '",
+                                              Tcl_GetHashKey (&dk->ids, h1),
+                                              "'", NULL);
+                        }
                     }
                 }
             }
@@ -1928,7 +2064,7 @@ probeElementEnd (
             if (!checkDocKeys (interp, sdata)) {
                 return TCL_ERROR;
             }
-            /*  We have successfully ended validation */
+            /*  We have successfully finished validation */
             sdata->validationState = VALIDATION_FINISHED;
         }
         DBG(
@@ -1937,7 +2073,7 @@ probeElementEnd (
             );
         return TCL_OK;
     }
-    SetResult ("Missing mandatory content");
+    SetResultV ("Missing mandatory content");
     sdata->validationState = VALIDATION_ERROR;
     DBG(
         fprintf(stderr, "probeElementEnd: CAN'T end here.\n");
@@ -1975,10 +2111,14 @@ matchText (
                         updateStack (se, cp, ac);
                         return 1;
                     }
-                    if (!sdata->evalError) {
-                        SetResult ("Invalid text content");
+                    if (sdata->evalError) return 0;
+                    if (recover (interp, sdata, S("INVALID_VALUE"), 0, 0)) {
+                        updateStack (se, cp, ac);
+                        return 1;
+                    } else {
+                        return 0;
                     }
-                    updateStack (se, cp, ac);
+                    SetResult ("Invalid text content");
                     return 0;
 
                 case SCHEMA_CTYPE_CHOICE:
@@ -2011,19 +2151,26 @@ matchText (
                             break;
 
                         case SCHEMA_CTYPE_VIRTUAL:
-                            Tcl_Panic ("Virtual constrain in MIXED or CHOICE");
+                            Tcl_Panic ("Virtual constrain in MIXED or"
+                                       " CHOICE");
                             
                         case SCHEMA_CTYPE_CHOICE:
-                            Tcl_Panic ("MIXED or CHOICE child of MIXED or CHOICE");
+                            Tcl_Panic ("MIXED or CHOICE child of MIXED or"
+                                       " CHOICE");
 
                         case SCHEMA_CTYPE_KEYSPACE_END:
                         case SCHEMA_CTYPE_KEYSPACE:
-                            Tcl_Panic ("Keyspace constrain in MIXED or CHOICE");
+                            Tcl_Panic ("Keyspace constrain in MIXED or"
+                                       " CHOICE");
                             
                         }
                     }
                     if (mustMatch (cp->quants[ac], hm)) {
-                        SetResult ("Unexpected text content");
+                        if (recover (interp, sdata, S("MISSING_ONE_OF_CHOICE"),
+                                                      0, 0)) {
+                            break;
+                        }
+                        SetResultV ("Unexpected text content");
                         return 0;
                     }
                     break;
@@ -2037,7 +2184,11 @@ matchText (
                     }
                     popStack (sdata);
                     if (mustMatch (cp->quants[ac], hm)) {
-                        SetResult ("Unexpected text content");
+                        if (recover (interp, sdata, S("MISSING_CP"),
+                                                      0, 0)) {
+                            break;
+                        }
+                        SetResultV ("Unexpected text content");
                         return 0;
                     }
                     break;
@@ -2061,7 +2212,8 @@ matchText (
                     cp->content[ac]->keySpace->active--;
                     if (!cp->content[ac]->keySpace->active) {
                         if (cp->content[ac]->keySpace->unknownIDrefs) {
-                            if (!recover (interp, sdata, S("UNKNOWN_KEYREF"), 0, 0)) {
+                            if (!recover (interp, sdata, S("INVALID_KEYREF"),
+                                          0, 0)) {
                                 return 0;
                             }
                             cp->content[ac]->keySpace->unknownIDrefs = 0;
@@ -2073,7 +2225,11 @@ matchText (
                 case SCHEMA_CTYPE_NAME:
                 case SCHEMA_CTYPE_ANY:
                     if (mustMatch (cp->quants[ac], hm)) {
-                        SetResult ("Unexpected text content");
+                        if (recover (interp, sdata, S("MISSING_ELEMENT"),
+                                                      0, 0)) {
+                            break;
+                        }
+                        SetResultV ("Unexpected text content");
                         return 0;
                     }
                     break;
@@ -2082,7 +2238,10 @@ matchText (
                 ac++;
             }
             if (isName) {
-                SetResult ("Unexpected text content");
+                if (recover (interp, sdata, S("MISSING_ELEMENT"), 0, 0)) {
+                    return 1;
+                }
+                SetResultV ("Unexpected text content");
                 return 0;
             }
             popStack (sdata);
@@ -2188,9 +2347,6 @@ probeText (
         if (matchText (interp, sdata, text)) {
             return TCL_OK;
         }
-    }
-    if (recover (interp, sdata, S("WRONG_VALUE"), 0, 0)) {
-        return TCL_OK;
     }
     if (!sdata->evalError) {
         SetResult ("Text content doesn't match");

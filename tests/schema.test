@@ -5270,7 +5270,7 @@ test schema-18.4 {reportcmd} {
     }
     s delete
     set result
-} {1 s WRONG_ATTRIBUTE_VALUE s WRONG_ATTRIBUTE_VALUE 1}
+} {1 s INVALID_ATTRIBUTE_VALUE s INVALID_ATTRIBUTE_VALUE 1}
 
 test schema-18.5 {reportcmd} {
     tdom::schema s
@@ -5295,7 +5295,7 @@ test schema-18.5 {reportcmd} {
     }
     s delete
     set result
-} {s WRONG_VALUE 1 s WRONG_VALUE s MISSING_TEXT 1 1}
+} {s INVALID_VALUE 1 s INVALID_VALUE s MISSING_TEXT 1 1}
 
 test schema-18.6 {reportcmd} {
     tdom::schema s
@@ -5327,7 +5327,7 @@ test schema-18.6 {reportcmd} {
     }
     s delete
     set result
-} {1 s WRONG_VALUE 1 s WRONG_VALUE 1 s WRONG_VALUE s WRONG_VALUE 1}
+} {1 s INVALID_VALUE 1 s INVALID_VALUE 1 s INVALID_VALUE s INVALID_VALUE 1}
 
 proc schema-18.7 {args} {
     global result
@@ -5560,7 +5560,7 @@ test schema-19.2 {keyspace} {
     }
     s delete
     set result
-} {s WRONG_ATTRIBUTE_VALUE s WRONG_ATTRIBUTE_VALUE 1 1}
+} {s INVALID_ATTRIBUTE_VALUE s INVALID_ATTRIBUTE_VALUE 1 1}
 
 test schema-19.3 {keyspace} {
     tdom::schema s
@@ -5594,7 +5594,7 @@ test schema-19.3 {keyspace} {
     }
     s delete
     set result
-} {1 1 s UNKNOWN_KEYREF 1 s UNKNOWN_KEYREF 1}
+} {1 1 s INVALID_KEYREF 1 s INVALID_KEYREF 1}
 
 test schema-20.1 {domunique} {
     set schema {
