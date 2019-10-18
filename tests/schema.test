@@ -848,7 +848,7 @@ test schema-4.2 {validation} {
     set result
 } {1 0 1 1 0}
 
-test schema-4.3 {domvalidate} {
+test schema-4.3 {validation} {
     tdom::schema s 
     s define {
         defelement addressBook {
@@ -877,6 +877,31 @@ test schema-4.3 {domvalidate} {
     s delete
     set result
 } 1
+
+proc schema-4.4 {scmd} {
+    global result
+    catch {$scmd event start foo} errMsg
+    lappend result $errMsg
+}
+
+test schema-4.4 {event on itself in called script} {
+    tdom::schema s
+    s defelement doc {
+        element a ?
+        tcl schema-4.4
+        element b ?
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/></doc>
+        <doc><a/><b/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {{This method is not allowed in nested evaluation} 1 {This method is not allowed in nested evaluation} 1 {This method is not allowed in nested evaluation} 1}
 
 test schema-5.1 {dom parse -validateCmd} {
     set result [catch {

@@ -187,14 +187,14 @@ static void SetActiveSchemaData (SchemaData *v)
     if (clientData != NULL) {                                           \
         savedsdata = GETASI;                                            \
         if (savedsdata == sdata) {                                      \
-            SetResult ("This recursive call is not allowed"); \
+            SetResult ("This recursive call is not allowed");           \
             return TCL_ERROR;                                           \
         }                                                               \
     }
       
 #define CHECK_EVAL                                                      \
     if (sdata->currentEvals) {                                          \
-        SetResult ("Method not allowed in nested schema define script"); \
+        SetResult ("This method is not allowed in nested evaluation");  \
         return TCL_ERROR;                                               \
     }
     
@@ -946,8 +946,10 @@ evalVirtual (
     sdata->stack->activeChild = ac;
     sdata->stack->hasMatched = 1;
     cp->content[cp->nc-1] = (SchemaCP *) sdata->self;
+    sdata->currentEvals++;
     rc = Tcl_EvalObjv (interp, cp->nc, (Tcl_Obj **) cp->content,
                        TCL_EVAL_GLOBAL);
+    sdata->currentEvals--;
     sdata->stack->activeChild = savedac;
     sdata->stack->hasMatched = savedhm;    
     if (rc != TCL_OK) {
