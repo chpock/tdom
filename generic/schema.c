@@ -1908,7 +1908,9 @@ probeElementEnd (
             );
         return TCL_OK;
     }
-    SetResult ("Missing mandatory content");
+    if (!sdata->evalError) {
+        SetResult ("Missing mandatory content");
+    }
     sdata->validationState = VALIDATION_ERROR;
     DBG(
         fprintf(stderr, "probeElementEnd: CAN'T end here.\n");

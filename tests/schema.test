@@ -903,6 +903,31 @@ test schema-4.4 {event on itself in called script} {
     set result
 } {{This method is not allowed in nested evaluation} 1 {This method is not allowed in nested evaluation} 1 {This method is not allowed in nested evaluation} 1}
 
+proc schema-4.5 {scmd} {
+    global result
+    $scmd event start foo
+}
+
+test schema-4.5 {event on itself in called script} {
+    tdom::schema s
+    s defelement doc {
+        element a ?
+        tcl schema-4.5
+        element b ?
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/></doc>
+        <doc><a/><b/></doc>
+    } {
+        lappend result [s validate $xml errMsg]
+        lappend result $errMsg
+    }
+    s delete
+    set result
+} {0 {error "This method is not allowed in nested evaluation" at line 1 character 6} 0 {error "This method is not allowed in nested evaluation" at line 1 character 15} 0 {error "This method is not allowed in nested evaluation" at line 1 character 13}}
+
 test schema-5.1 {dom parse -validateCmd} {
     set result [catch {
         [dom parse -validateCmd tdom::schema <doc/>]
