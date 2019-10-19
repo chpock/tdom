@@ -21,6 +21,7 @@
 #    schema-18.*: reportcmd
 #    schema-19.*: keyspace
 #    schema-20.*: domunique
+#    schema-21.*: internal: buffers
 #
 # Copyright (c) 2018-2019 Rolf Ade.
 
@@ -5732,5 +5733,22 @@ test schema-20.5 {domunique} {
     set result
 } {1 0}
 
+test schema-21.1 {CONTENT_ARRAY_SIZE_INIT} {
+    tdom::schema s
+    s defelement doc {
+        for {set i 1} {$i <= 30} {incr i} {
+            element e ?
+        }
+    }
+    set result [list]
+    foreach xml [list <doc/> \
+                     <doc>[string repeat <e/> 9]</doc> \
+                     <doc>[string repeat <e/> 27]</doc>  \
+                     <doc>[string repeat <e/> 37]</doc>] {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 1 1 0}
 
 }

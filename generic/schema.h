@@ -152,8 +152,6 @@ typedef struct SchemaData_
     unsigned int patternListSize;
     unsigned int forwardPatternDefs;
     SchemaQuant *quants;
-    unsigned int numQuants;
-    unsigned int quantsSize;
     int       currentEvals;
     int       cleanupAfterEval;
     int       evalError;

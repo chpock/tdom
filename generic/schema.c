@@ -55,9 +55,6 @@
 #ifndef ANON_PATTERN_ARRAY_SIZE_INIT
 #  define ANON_PATTERN_ARRAY_SIZE_INIT 256
 #endif
-#ifndef QUANTS_ARRAY_SIZE_INIT
-#  define QUANTS_ARRAY_SIZE_INIT 8
-#endif
 #ifndef STACK_SIZE_INIT
 #  define STACK_SIZE_INIT 16
 #endif
@@ -480,9 +477,6 @@ initSchemaData (
     sdata->patternList = (SchemaCP **) MALLOC (
         sizeof (SchemaCP*) * ANON_PATTERN_ARRAY_SIZE_INIT);
     sdata->patternListSize = ANON_PATTERN_ARRAY_SIZE_INIT;
-    sdata->quants = (SchemaQuant *) MALLOC (
-        sizeof (SchemaQuant) * QUANTS_ARRAY_SIZE_INIT);
-    sdata->quantsSize = QUANTS_ARRAY_SIZE_INIT;
     /* evalStub initialization */
     sdata->evalStub = (Tcl_Obj **) MALLOC (sizeof (Tcl_Obj*) * 4);
     sdata->evalStub[0] = Tcl_NewStringObj("::namespace", 11);
@@ -548,9 +542,6 @@ static void schemaInstanceDelete (
         freeSchemaCP (sdata->patternList[i]);
     }
     FREE (sdata->patternList);
-    if (sdata->numQuants) {
-        FREE (sdata->quants);
-    }
     FREE (sdata->quants);
     while (sdata->stack) {
         down = sdata->stack->down;
