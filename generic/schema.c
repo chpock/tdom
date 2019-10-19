@@ -55,12 +55,6 @@
 #ifndef ANON_PATTERN_ARRAY_SIZE_INIT
 #  define ANON_PATTERN_ARRAY_SIZE_INIT 256
 #endif
-#ifndef STACK_SIZE_INIT
-#  define STACK_SIZE_INIT 16
-#endif
-#ifndef STACK_LIST_SIZE_INIT
-#  define STACK_LIST_SIZE_INIT 64
-#endif
 #ifndef URI_BUFFER_LEN_INIT
 #  define URI_BUFFER_LEN_INIT 128
 #endif
