@@ -21,6 +21,7 @@
 #    schema-18.*: reportcmd
 #    schema-19.*: keyspace
 #    schema-20.*: domunique
+#    schema-21.*: internal: buffers
 #
 # Copyright (c) 2018-2019 Rolf Ade.
 
@@ -848,7 +849,7 @@ test schema-4.2 {validation} {
     set result
 } {1 0 1 1 0}
 
-test schema-4.3 {domvalidate} {
+test schema-4.3 {validation} {
     tdom::schema s 
     s define {
         defelement addressBook {
@@ -877,6 +878,70 @@ test schema-4.3 {domvalidate} {
     s delete
     set result
 } 1
+
+proc schema-4.4 {scmd} {
+    global result
+    catch {$scmd event start foo} errMsg
+    lappend result $errMsg
+}
+
+test schema-4.4 {event on itself in called script} {
+    tdom::schema s
+    s defelement doc {
+        element a ?
+        tcl schema-4.4
+        element b ?
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/></doc>
+        <doc><a/><b/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {{This method is not allowed in nested evaluation} 1 {This method is not allowed in nested evaluation} 1 {This method is not allowed in nested evaluation} 1}
+
+proc schema-4.5 {scmd} {
+    global result
+    $scmd event start foo
+}
+
+test schema-4.5 {event on itself in called script} {
+    tdom::schema s
+    s defelement doc {
+        element a ?
+        tcl schema-4.5
+        element b ?
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/></doc>
+        <doc><a/><b/></doc>
+    } {
+        lappend result [s validate $xml errMsg]
+        lappend result $errMsg
+    }
+    s delete
+    set result
+} {0 {error "This method is not allowed in nested evaluation" at line 1 character 6} 0 {error "This method is not allowed in nested evaluation" at line 1 character 15} 0 {error "This method is not allowed in nested evaluation" at line 1 character 13}}
+
+test schema-4.6 {event start with namespace} {
+    tdom::schema s
+    s defelement doc http://tdom.org/test {
+        element a 1 {
+            attribute att1
+        }
+    }
+    s event start doc http://tdom.org/test
+    s event start a http://tdom.org/test
+    s event end
+    s event end
+    s delete
+} {}
 
 test schema-5.1 {dom parse -validateCmd} {
     set result [catch {
@@ -5753,5 +5818,22 @@ test schema-20.5 {domunique} {
     set result
 } {1 0}
 
+test schema-21.1 {CONTENT_ARRAY_SIZE_INIT} {
+    tdom::schema s
+    s defelement doc {
+        for {set i 1} {$i <= 30} {incr i} {
+            element e ?
+        }
+    }
+    set result [list]
+    foreach xml [list <doc/> \
+                     <doc>[string repeat <e/> 9]</doc> \
+                     <doc>[string repeat <e/> 27]</doc>  \
+                     <doc>[string repeat <e/> 37]</doc>] {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 1 1 0}
 
 }
