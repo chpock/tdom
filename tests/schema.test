@@ -929,6 +929,20 @@ test schema-4.5 {event on itself in called script} {
     set result
 } {0 {error "This method is not allowed in nested evaluation" at line 1 character 6} 0 {error "This method is not allowed in nested evaluation" at line 1 character 15} 0 {error "This method is not allowed in nested evaluation" at line 1 character 13}}
 
+test schema-4.6 {event start with namespace} {
+    tdom::schema s
+    s defelement doc http://tdom.org/test {
+        element a 1 {
+            attribute att1
+        }
+    }
+    s event start doc http://tdom.org/test
+    s event start a http://tdom.org/test
+    s event end
+    s event end
+    s delete
+} {}
+
 test schema-5.1 {dom parse -validateCmd} {
     set result [catch {
         [dom parse -validateCmd tdom::schema <doc/>]

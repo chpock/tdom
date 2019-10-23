@@ -1384,15 +1384,50 @@ probeElement (
     return TCL_ERROR;
 }
 
+int probeAttribute (
+    Tcl_Interp *interp,
+    SchemaData *sdata,
+    const char *name,
+    const char *ns,
+    char *value,
+    int *isrequiered
+    )
+{
+    int i;
+    SchemaCP *cp;
+    
+    cp = sdata->stack->pattern;
+    *isrequiered = 0;
+    for (i = 0; i < cp->numAttr; i++) {
+        if (cp->attrs[i]->namespace == ns
+            && cp->attrs[i]->name == name) {
+            if (cp->attrs[i]->cp) {
+                if (!checkText (interp, cp->attrs[i]->cp, value)) {
+                    if (!recover (interp, sdata,
+                                  S("WRONG_ATTRIBUTE_VALUE"), 0, 0)) {
+                        SetResult3 ("Attribute value doesn't match for "
+                                    "attribute '", name , "'");
+                        return 0;
+                    }
+                }
+            }
+            if (cp->attrs[i]->required) *isrequiered = 1;
+            return 1;
+        }
+    }
+    return 0;
+}
+    
 int probeAttributes (
     Tcl_Interp *interp,
     SchemaData *sdata,
     const char **attr
     )
 {
-    char   **atPtr, *ln, *namespace;
-    int i, j, found, nsatt, reqAttr = 0;
+    char   **atPtr, *ln, *namespace, *ns;
+    int i, j, found, nsatt, req, reqAttr = 0;
     SchemaCP *cp;
+    Tcl_HashEntry *h;
 
     cp = sdata->stack->pattern;
     for (atPtr = (char **) attr; atPtr[0] && atPtr[1]; atPtr += 2) {
@@ -1412,37 +1447,26 @@ int probeAttributes (
             ln = atPtr[0];
             nsatt = 0;
         }
-        for (i = 0; i < cp->numAttr; i++) {
-            if (nsatt) {
-                if (!cp->attrs[i]->namespace
-                    || (strcmp (cp->attrs[i]->namespace, namespace) != 0))
-                    continue;
-            }
-            if (strcmp (ln, cp->attrs[i]->name) == 0) {
-                found = 1;
-                if (cp->attrs[i]->cp) {
-                    if (!checkText (interp, cp->attrs[i]->cp,
-                                    (char *) atPtr[1])) {
-                        if (!recover (interp, sdata,
-                                      S("WRONG_ATTRIBUTE_VALUE"), 0, 0)) {
-                            if (nsatt) namespace[j] = '\xFF';
-                            SetResult3 ("Attribute value doesn't match for "
-                                        "attribute '", atPtr[0], "'");
-                            return TCL_ERROR;
-                        }
-                    }
-                }
-                if (cp->attrs[i]->required) reqAttr++;
-                break;
-            }
+        h = Tcl_FindHashEntry (&sdata->attrNames, ln);
+        if (!h) goto unknowncleanup;
+        ln = Tcl_GetHashKey (&sdata->attrNames, h);
+        if (namespace) {
+            h = Tcl_FindHashEntry (&sdata->namespace, namespace);
+            if (!h) goto unknowncleanup;
+            ns = Tcl_GetHashKey (&sdata->namespace, h);
+        } else {
+            ns = NULL;
         }
-        if (nsatt) namespace[j] = '\xFF';
+        found = probeAttribute (interp, sdata, ln, ns, atPtr[1], &req);
+        reqAttr += req;
+    unknowncleanup:
         if (!found) {
             if (!recover (interp, sdata, S("UNKNOWN_ATTRIBUTE"), 0, 0)) {
                 SetResult3 ("Unknown attribute \"", atPtr[0], "\"");
                 return TCL_ERROR;
             }
         }
+        if (nsatt) namespace[j] = '\xFF';
     }
     if (reqAttr != cp->numReqAttr) {
         /* Lookup the missing attribute(s) */
@@ -1466,8 +1490,10 @@ int probeAttributes (
                         continue;
                     }
                     if (strcmp (cp->attrs[i]->namespace, namespace) != 0) {
+                        if (nsatt) namespace[j] = '\xFF';
                         continue;
                     }
+                    if (nsatt) namespace[j] = '\xFF';
                 }
                 if (strcmp (atPtr[0], cp->attrs[i]->name) == 0) {
                     found = 1;
@@ -1499,9 +1525,10 @@ int probeDomAttributes (
     )
 {
     domAttrNode *atPtr;
-    int i, found, reqAttr = 0;
+    int i, found, req, reqAttr = 0;
     const char *ns, *ln;
     SchemaCP *cp;
+    Tcl_HashEntry *h;
 
     cp = sdata->stack->pattern;
     atPtr = attr;
@@ -1523,30 +1550,19 @@ int probeDomAttributes (
             ns = NULL;
             ln = atPtr->nodeName;
         }
-        for (i = 0; i < cp->numAttr; i++) {
-            if (ns) {
-                if (!cp->attrs[i]->namespace) continue;
-                if (strcmp (ns, cp->attrs[i]->namespace) != 0) continue;
-            } else {
-                if (cp->attrs[i]->namespace) continue;
-            }
-            if (strcmp (ln, cp->attrs[i]->name) == 0) {
-                if (cp->attrs[i]->cp) {
-                    if (!checkText (interp, cp->attrs[i]->cp,
-                                    (char *) atPtr->nodeValue)) {
-                        if (!recover (interp, sdata,
-                                      S("WRONG_ATTRIBUTE_VALUE"), 0, 0)) {
-                            SetResult3 ("Attribute value doesn't match for "
-                                        "attribute '", ln, "'");
-                            return TCL_ERROR;
-                        }
-                    }
-                }
-                found = 1;
-                if (cp->attrs[i]->required) reqAttr++;
-                break;
-            }
+        h = Tcl_FindHashEntry (&sdata->attrNames, ln);
+        if (!h) goto unknown;
+        ln = Tcl_GetHashKey (&sdata->attrNames, h);
+        if (ns) {
+            h = Tcl_FindHashEntry (&sdata->namespace, ns);
+            if (!h) goto unknown;
+            ns = Tcl_GetHashKey (&sdata->namespace, h);
+        } else {
+            ns = NULL;
         }
+        found = probeAttribute (interp, sdata, ln, ns, atPtr->nodeValue, &req);
+        reqAttr += req;
+    unknown:
         if (!found) {
             if (!recover (interp, sdata, S("UNKNOWN_ATTRIBUTE"), 0, 0)) {
                 if (ns) {
@@ -1612,6 +1628,61 @@ int probeDomAttributes (
             sdata->validationState = VALIDATION_ERROR;
             return TCL_ERROR;
         }
+    }
+    return TCL_OK;
+}
+int probeEventAttribute (
+    Tcl_Interp *interp,
+    SchemaData *sdata,
+    Tcl_Obj *attr,
+    int len
+    )
+{
+    int i, found, req, reqAttr = 0;
+    char *name, *ns;
+    SchemaCP *cp;
+    Tcl_HashEntry *h;
+    Tcl_Obj *attname, *attns, *attvalue;
+
+    cp = sdata->stack->pattern;
+    for (i = 0; i < len; i += 2) {
+        Tcl_ListObjIndex (interp, attr, i, &attname);
+        Tcl_ListObjIndex (interp, attr, i+1, &attvalue);
+        if (Tcl_ListObjLength (interp, attname, &len) == TCL_OK) {
+            if (len == 2) {
+                Tcl_ListObjIndex (interp, attname, 1, &attns);
+                Tcl_ListObjIndex (interp, attname, 1, &attname);
+            }
+        }
+        h = Tcl_FindHashEntry (&sdata->attrNames, Tcl_GetString (attname));
+        if (!h) goto unknown;
+        name = Tcl_GetHashKey (&sdata->attrNames, h);
+        if (attns) {
+            h = Tcl_FindHashEntry (&sdata->namespace, Tcl_GetString (attns));
+            if (!h) goto unknown;
+            ns = Tcl_GetHashKey (&sdata->namespace, h);
+        }
+        found = probeAttribute (interp, sdata, name, ns,
+                                Tcl_GetString (attvalue), &req);
+        reqAttr += req;
+    unknown:
+        if (!found) {
+            if (!recover (interp, sdata, S("UNKNOWN_ATTRIBUTE"), 0, 0)) {
+                if (ns) {
+                    SetResult ("Unknown attribute \"");
+                    Tcl_AppendResult (interp, ns, ":", ns,
+                                      "\"");
+                } else {
+                    SetResult3 ("Unknown attribute \"", name, "\"");
+                }
+                sdata->validationState = VALIDATION_ERROR;
+                return TCL_ERROR;
+            }
+        }
+    }
+    if (reqAttr != cp->numReqAttr) {
+        SetResult ("Missing mandatory attribute(s)");
+        return TCL_ERROR;
     }
     return TCL_OK;
 }
@@ -3180,7 +3251,7 @@ schemaInstanceCmd (
 {
     int            methodIndex, keywordIndex, hnew, patternIndex;
     int            result = TCL_OK, forwardDef = 0, i = 0, j;
-    int            savedDefineToplevel, type, len;
+    int            savedDefineToplevel, type, len, checkAttr;
     unsigned int   savedNumPatternList;
     SchemaData    *savedsdata = NULL, *sdata = (SchemaData *) clientData;
     Tcl_HashTable *hashTable;
@@ -3436,13 +3507,37 @@ schemaInstanceCmd (
                 return TCL_ERROR;
             }
             namespacePtr = NULL;
+            checkAttr = 0;
             if (objc == 6) {
                 namespacePtr = getNamespacePtr (sdata,
                                                 Tcl_GetString (objv[5]));
             }
+            if (objc >= 5) {
+                if (Tcl_ListObjLength (interp, objv[4], &len) != TCL_OK) {
+                    namespacePtr = getNamespacePtr (sdata,
+                                                    Tcl_GetString (objv[4]));
+                } else {
+                    if (len == 1) {
+                        namespacePtr = getNamespacePtr (
+                            sdata, Tcl_GetString (objv[4])
+                            );
+                    } else if (len % 2 != 0) {
+                        SetResult ("Invalid attribute information");
+                        return TCL_ERROR;
+                    } else {
+                        checkAttr = 1;
+                    }
+                }
+            }
             result = probeElement (interp, sdata, Tcl_GetString (objv[3]),
                                    namespacePtr);
+            if (result == TCL_OK && checkAttr) {
+                if (!probeEventAttribute (interp, sdata, objv[4], len)) {
+                    return TCL_ERROR;
+                }
+            }
             break;
+            
         case k_elementend:
             if (objc != 3) {
                 Tcl_WrongNumArgs (interp, 3, objv, "No arguments expected.");
