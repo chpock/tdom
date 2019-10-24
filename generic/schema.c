@@ -1646,12 +1646,16 @@ int probeEventAttribute (
 
     cp = sdata->stack->pattern;
     for (i = 0; i < len; i += 2) {
+        found = 0;
+        ns = NULL;
+        name = NULL;
+        attns = NULL;
         Tcl_ListObjIndex (interp, attr, i, &attname);
         Tcl_ListObjIndex (interp, attr, i+1, &attvalue);
         if (Tcl_ListObjLength (interp, attname, &len) == TCL_OK) {
             if (len == 2) {
                 Tcl_ListObjIndex (interp, attname, 1, &attns);
-                Tcl_ListObjIndex (interp, attname, 1, &attname);
+                Tcl_ListObjIndex (interp, attname, 0, &attname);
             }
         }
         h = Tcl_FindHashEntry (&sdata->attrNames, Tcl_GetString (attname));
@@ -1670,7 +1674,7 @@ int probeEventAttribute (
             if (!recover (interp, sdata, S("UNKNOWN_ATTRIBUTE"), 0, 0)) {
                 if (ns) {
                     SetResult ("Unknown attribute \"");
-                    Tcl_AppendResult (interp, ns, ":", ns,
+                    Tcl_AppendResult (interp, ns, ":", name,
                                       "\"");
                 } else {
                     SetResult3 ("Unknown attribute \"", name, "\"");
@@ -3251,7 +3255,7 @@ schemaInstanceCmd (
 {
     int            methodIndex, keywordIndex, hnew, patternIndex;
     int            result = TCL_OK, forwardDef = 0, i = 0, j;
-    int            savedDefineToplevel, type, len, checkAttr;
+    int            savedDefineToplevel, type, len;
     unsigned int   savedNumPatternList;
     SchemaData    *savedsdata = NULL, *sdata = (SchemaData *) clientData;
     Tcl_HashTable *hashTable;
@@ -3261,6 +3265,7 @@ schemaInstanceCmd (
     char          *xmlstr, *errMsg;
     domDocument   *doc;
     domNode       *node;
+    Tcl_Obj       *attData;
 
     static const char *schemaInstanceMethods[] = {
         "defelement",  "defpattern",  "start", "event",     "delete",
@@ -3507,34 +3512,39 @@ schemaInstanceCmd (
                 return TCL_ERROR;
             }
             namespacePtr = NULL;
-            checkAttr = 0;
+            len = 0;
+            attData = NULL;
             if (objc == 6) {
                 namespacePtr = getNamespacePtr (sdata,
                                                 Tcl_GetString (objv[5]));
             }
             if (objc >= 5) {
                 if (Tcl_ListObjLength (interp, objv[4], &len) != TCL_OK) {
-                    namespacePtr = getNamespacePtr (sdata,
-                                                    Tcl_GetString (objv[4]));
+                    if (objc == 6) {
+                        SetResult ("Invalid attribute information");
+                        return TCL_ERROR;
+                    } else {
+                        namespacePtr =
+                            getNamespacePtr (sdata, Tcl_GetString (objv[4]));
+                        len = 0;
+                    }
                 } else {
                     if (len == 1) {
-                        namespacePtr = getNamespacePtr (
-                            sdata, Tcl_GetString (objv[4])
-                            );
+                        namespacePtr =
+                            getNamespacePtr (sdata, Tcl_GetString (objv[4]));
+                        len = 0;
                     } else if (len % 2 != 0) {
                         SetResult ("Invalid attribute information");
                         return TCL_ERROR;
                     } else {
-                        checkAttr = 1;
+                        attData = objv[4];
                     }
                 }
             }
             result = probeElement (interp, sdata, Tcl_GetString (objv[3]),
                                    namespacePtr);
-            if (result == TCL_OK && checkAttr) {
-                if (!probeEventAttribute (interp, sdata, objv[4], len)) {
-                    return TCL_ERROR;
-                }
+            if (result == TCL_OK) {
+                result = probeEventAttribute (interp, sdata, attData, len);
             }
             break;
             

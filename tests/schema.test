@@ -932,15 +932,55 @@ test schema-4.5 {event on itself in called script} {
 test schema-4.6 {event start with namespace} {
     tdom::schema s
     s defelement doc http://tdom.org/test {
+        element a ! text
+    }
+    s event start doc http://tdom.org/test
+    s event start a http://tdom.org/test
+    s event text "some text"
+    s event end
+    s event end
+    s delete
+} {}
+
+test schema-4.7 {event start with namespace} {
+    tdom::schema s
+    s defelement doc http://tdom.org/test {
         element a 1 {
             attribute att1
         }
     }
     s event start doc http://tdom.org/test
-    s event start a http://tdom.org/test
+    set result [catch {s event start a http://tdom.org/test} errMsg]
+    lappend result $errMsg
+    s delete
+    set result
+} {1 {Missing mandatory attribute(s)}}
+
+test schema-4.8 {event start with namespace} {
+    tdom::schema s
+    s defelement doc http://tdom.org/test {
+        element a 1 {
+            attribute att1
+        }
+    }
+    s event start doc http://tdom.org/test
+    s event start a {att1 "some data"} http://tdom.org/test
     s event end
     s event end
     s delete
+} {}
+
+test schema-4.9 {event start with namespace w/ namespaced attribute} {
+    tdom::schema s
+    s defelement doc http://tdom.org/test {
+        element a 1 {
+            nsattribute att1 http://tdom.org/test
+        }
+    }
+    s event start doc http://tdom.org/test
+    s event start a {{att1 http://tdom.org/test} "some data"} http://tdom.org/test
+    s event end
+    s event end
 } {}
 
 test schema-5.1 {dom parse -validateCmd} {
