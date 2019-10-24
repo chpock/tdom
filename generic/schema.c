@@ -5019,7 +5019,28 @@ nmtokensTCObjCmd (
 }
 
 static int
-numberImpl (
+numberImplXsd (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    char *c = text;
+    if (!*c) return 0;
+    if (*c == '-' || *c == '+') c++;
+    while (isdigit(*c)) {
+        c++;
+    }
+    if (*c == '.') c++;
+    while (isdigit(*c)) {
+        c++;
+    }
+    if (*c) return 0;
+    return 1;
+}
+
+static int
+numberImplTcl (
     Tcl_Interp *interp,
     void *constraintData,
     char *text
@@ -5043,12 +5064,35 @@ numberTCObjCmd (
 {
     SchemaData *sdata = GETASI;
     SchemaConstraint *sc;
+    int type;
+
+    static const char *types[] = {
+        "xsd", "tcl", NULL
+    };
+    enum typeSyms {
+        t_xsd, t_tcl
+    };
 
     CHECK_TI
     CHECK_TOPLEVEL
-    checkNrArgs (1,1,"No arguments expected");
+    checkNrArgs (1,2,"?xsd|tcl?");
+    if (objc == 1) {
+        type = t_xsd;
+    } else {
+        if (Tcl_GetIndexFromObj (interp, objv[1], types, "type", 0, &type)
+            != TCL_OK) {
+            return TCL_ERROR;
+        }
+    }
     ADD_CONSTRAINT (sdata, sc)
-    sc->constraint = numberImpl;
+    switch ((enum typeSyms) type) {
+    case t_xsd:
+        sc->constraint = numberImplXsd;
+        break;
+    case t_tcl:
+        sc->constraint = numberImplTcl;
+        break;
+    }
     return TCL_OK;
 }
 

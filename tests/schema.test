@@ -3437,17 +3437,18 @@ test schema-14.9 {text: isodate} {
     set result
 } {0 0 0 0 0 1 0 0 0 1 0 1 1 0 1 1 0 0 0 1 0 1 1}
 
-test schema-14.10 {text: number} {
+test schema-14.10 {text: number tcl} {
     tdom::schema s
     s define {
         defelement doc {
-            text number
+            text {number tcl}
         }
     }
     set result [list]
     foreach xml {
         <doc/>
         <doc></doc>
+        {<doc> </doc>}
         <doc>foo</doc>
         <doc>1</doc>
         <doc>12</doc>
@@ -3462,7 +3463,38 @@ test schema-14.10 {text: number} {
     }
     s delete
     set result
-} {0 0 0 1 1 0 1 1 1 1 0}
+} {0 0 0 0 1 1 0 1 1 1 1 0}
+
+test schema-14.10a {text: number xsd} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            text number
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc></doc>
+        {<doc> </doc>}
+        <doc>foo</doc>
+        <doc>1</doc>
+        {<doc> 1</doc>}
+        {<doc>1 </doc>}
+        {<doc> 1 </doc>}
+        <doc>12</doc>
+        <doc>1234-12-31</doc>
+        <doc>-14.23</doc>
+        <doc>.777</doc>
+        <doc>-1.2e5</doc>
+        {<doc> -1.2e5 </doc>}
+        {<doc> -1.2e5 e</doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 0 0 1 0 0 0 1 0 1 1 0 0 0}
 
 test schema-14.11 {text: maxLength} {
     tdom::schema s
