@@ -932,15 +932,55 @@ test schema-4.5 {event on itself in called script} {
 test schema-4.6 {event start with namespace} {
     tdom::schema s
     s defelement doc http://tdom.org/test {
+        element a ! text
+    }
+    s event start doc http://tdom.org/test
+    s event start a http://tdom.org/test
+    s event text "some text"
+    s event end
+    s event end
+    s delete
+} {}
+
+test schema-4.7 {event start with namespace} {
+    tdom::schema s
+    s defelement doc http://tdom.org/test {
         element a 1 {
             attribute att1
         }
     }
     s event start doc http://tdom.org/test
-    s event start a http://tdom.org/test
+    set result [catch {s event start a http://tdom.org/test} errMsg]
+    lappend result $errMsg
+    s delete
+    set result
+} {1 {Missing mandatory attribute(s)}}
+
+test schema-4.8 {event start with namespace} {
+    tdom::schema s
+    s defelement doc http://tdom.org/test {
+        element a 1 {
+            attribute att1
+        }
+    }
+    s event start doc http://tdom.org/test
+    s event start a {att1 "some data"} http://tdom.org/test
     s event end
     s event end
     s delete
+} {}
+
+test schema-4.9 {event start with namespace w/ namespaced attribute} {
+    tdom::schema s
+    s defelement doc http://tdom.org/test {
+        element a 1 {
+            nsattribute att1 http://tdom.org/test
+        }
+    }
+    s event start doc http://tdom.org/test
+    s event start a {{att1 http://tdom.org/test} "some data"} http://tdom.org/test
+    s event end
+    s event end
 } {}
 
 test schema-5.1 {dom parse -validateCmd} {
@@ -3397,17 +3437,18 @@ test schema-14.9 {text: isodate} {
     set result
 } {0 0 0 0 0 1 0 0 0 1 0 1 1 0 1 1 0 0 0 1 0 1 1}
 
-test schema-14.10 {text: number} {
+test schema-14.10 {text: number tcl} {
     tdom::schema s
     s define {
         defelement doc {
-            text number
+            text {number tcl}
         }
     }
     set result [list]
     foreach xml {
         <doc/>
         <doc></doc>
+        {<doc> </doc>}
         <doc>foo</doc>
         <doc>1</doc>
         <doc>12</doc>
@@ -3422,7 +3463,38 @@ test schema-14.10 {text: number} {
     }
     s delete
     set result
-} {0 0 0 1 1 0 1 1 1 1 0}
+} {0 0 0 0 1 1 0 1 1 1 1 0}
+
+test schema-14.10a {text: number xsd} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            text number
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc></doc>
+        {<doc> </doc>}
+        <doc>foo</doc>
+        <doc>1</doc>
+        {<doc> 1</doc>}
+        {<doc>1 </doc>}
+        {<doc> 1 </doc>}
+        <doc>12</doc>
+        <doc>1234-12-31</doc>
+        <doc>-14.23</doc>
+        <doc>.777</doc>
+        <doc>-1.2e5</doc>
+        {<doc> -1.2e5 </doc>}
+        {<doc> -1.2e5 e</doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 0 0 1 0 0 0 1 0 1 1 0 0 0}
 
 test schema-14.11 {text: maxLength} {
     tdom::schema s
