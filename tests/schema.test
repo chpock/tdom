@@ -4359,7 +4359,7 @@ test schema-15.2 {constraint cmd tcl} {
 } {1 {} astartaendastartaend}
 
 proc schema-15.3 {type cmd} {
-    lappend ::schema-15.3 $type [$cmd info stack inside]
+    lappend ::schema-15.3 $type [$cmd info stack top]
 }
 
 test schema-15.3 {constraint cmd tcl} {
@@ -5309,6 +5309,29 @@ test schema-17.14 {info pastexpected} {
     }
     set result
 } {a b c d}
+
+proc schema-17.15 {type cmd} {
+    lappend ::result $type [$cmd info stack ]
+}
+
+test schema-17.15 {info inside} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element a *
+        }
+        defelement a {
+            tcl schema-17.15 astart
+            element b ! text
+            element c ! text
+            tcl schema-17.15 aend
+        }
+    }
+    set result {}
+    s validate {<doc><a><b>foo</b><c/></a><a><b></b><c>bar</c></a></doc>}
+    s delete
+    set result
+} {1 {} astart {a doc} aend a astart a aend a}
 
 proc schema-18 {args} {
     lappend ::result {*}$args

@@ -80,7 +80,6 @@ typedef struct
 
 typedef enum {
     DOM_KEYCONSTRAINT,
-    INVALID_DOM_KEYCONSTRAINT,
     MISSING_ANY,
     MISSING_ATTRIBUTE,
     MISSING_CP,
@@ -102,7 +101,6 @@ typedef enum {
 
 static char *ValidationErrorType2str[] = {
     "DOM_KEYCONSTRAINT",
-    "INVALID_DOM_KEYCONSTRAINT",
     "MISSING_ANY",
     "MISSING_ATTRIBUTE",
     "MISSING_CP",
@@ -966,7 +964,6 @@ recoverex (
     }
     switch (errorType) {
     case DOM_KEYCONSTRAINT:
-    case INVALID_DOM_KEYCONSTRAINT:
     case MISSING_ANY:
     case MISSING_ATTRIBUTE:
     case MISSING_CP:
@@ -2029,7 +2026,6 @@ checkDocKeys (
     int haveErrMsg = 0;
     SchemaDocKey *dk;
 
-    /* TODO: add recovering */
     if (sdata->evalError) return 0;
     if (sdata->unknownIDrefs) {
         if (!recover (interp, sdata, S("UNKOWN_ID"), 0, 0)) {
@@ -2637,45 +2633,29 @@ checkdomKeyConstraints (
         Tcl_InitHashTable (&htable, TCL_STRING_KEYS);
         rc = xpathEvalAst (kc->selector, &nodeList, node, &rs, &errMsg);
         if (rc) {
-            if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"), 0, 0)) {
-                goto nextConstraint;
-            }
+            SetResult (errMsg);
             goto errorCleanup;
         }
         if (rs.type == EmptyResult) goto nextConstraint;
         if (rs.type != xNodeSetResult) {
-            if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"), 0, 0)) {
-                goto nextConstraint;
-            }
             SetResult ("INVALID_DOM_KEYCONSTRAINT");
             goto errorCleanup;
         }
         for (i = 0; i < rs.nr_nodes; i++) {
             n = rs.nodes[i];
             if (n->nodeType != ELEMENT_NODE) {
-                if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"), 0, 0)) {
-                    break;
-                }
                 SetResult ("INVALID_DOM_KEYCONSTRAINT");
                 goto errorCleanup;
             }
             xpathRSReset (&nodeList, n);
             if (kc->nrFields == 1) {
                 xpathRSReset (&frs, NULL);
-                rc = xpathEvalAst (kc->fields[0], &nodeList, n, &frs,
-                                   &errMsg);
+                rc = xpathEvalAst (kc->fields[0], &nodeList, n, &frs, &errMsg);
                 if (rc) {
-                    if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"), 0, 0)) {
-                        break;
-                    }
-                    SetResult ("INVALID_DOM_KEYCONSTRAINT");
+                    SetResult (errMsg);
                     goto errorCleanup;
                 }
-                if (frs.type != xNodeSetResult
-                    && frs.type != EmptyResult) {
-                    if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"), 0, 0)) {
-                        break;
-                    }
+                if (frs.type != xNodeSetResult && frs.type != EmptyResult) {
                     SetResult ("INVALID_DOM_KEYCONSTRAINT");
                     goto errorCleanup;
                 }
@@ -2702,9 +2682,6 @@ checkdomKeyConstraints (
                 }
                 if (frs.nodes[0]->nodeType != ELEMENT_NODE
                     && frs.nodes[0]->nodeType != ATTRIBUTE_NODE) {
-                    if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"), 0, 0)) {
-                        break;
-                    }
                     SetResult ("INVALID_DOM_KEYCONSTRAINT");
                     goto errorCleanup;
                 }
@@ -2739,19 +2716,11 @@ checkdomKeyConstraints (
                     rc = xpathEvalAst (kc->fields[j], &nodeList, n, &frs,
                                        &errMsg);
                     if (rc) {
-                        if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"), 0, 0)) {
-                            skip = 1;
-                            break;
-                        }
-                        SetResult ("INVALID_DOM_KEYCONSTRAINT");
+                        SetResult (errMsg);
                         goto errorCleanup;
                     }
                     if (frs.type != xNodeSetResult
                         && frs.type != EmptyResult) {
-                        if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"), 0, 0)) {
-                            skip = 1;
-                            break;
-                        }
                         SetResult ("INVALID_DOM_KEYCONSTRAINT");
                         goto errorCleanup;
                     }
@@ -2773,10 +2742,6 @@ checkdomKeyConstraints (
                     }
                     if (frs.nodes[0]->nodeType != ELEMENT_NODE
                         && frs.nodes[0]->nodeType != ATTRIBUTE_NODE) {
-                        if (recover (interp, sdata, S("INVALID_DOM_KEYCONSTRAINT"), 0, 0)) {
-                            skip = 1;
-                            break;
-                        }
                         SetResult ("INVALID_DOM_KEYCONSTRAINT");
                         goto errorCleanup;
                     }
@@ -3334,16 +3299,36 @@ schemaInstanceInfoCmd (
         break;
 
     case m_stack:
-        if (Tcl_GetIndexFromObj (interp, objv[2],
+        if (objc != 3) {
+            Tcl_WrongNumArgs (interp, 2, objv, "top|inside");
+            return TCL_ERROR;
+        }
+        if (Tcl_GetIndexFromObj (interp, objv[3],
                                  schemaInstanceInfoStackMethods,
                                  "method", 0, &methodIndex)
             != TCL_OK) {
             return TCL_ERROR;
         }
         switch ((enum schemaInstanceInfoStackMethod) methodIndex) {
-        case m_top:
-            break;
         case m_inside:
+            if (!sdata->stack) {
+                Tcl_ResetResult (interp);
+                return TCL_OK;
+            }
+            se = sdata->stack;
+            rObj = Tcl_NewObj();
+            while (se) {
+                if (se->pattern->type == SCHEMA_CTYPE_NAME) {
+                    Tcl_ListObjAppendElement (interp, rObj,
+                        serializeElementName (interp, se->pattern));
+                }
+                se = se->down;
+            }
+            Tcl_SetObjResult (interp, rObj);
+            return TCL_OK;
+            break;
+            
+        case m_top:
             if (!sdata->stack) {
                 Tcl_ResetResult (interp);
                 return TCL_OK;
