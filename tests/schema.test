@@ -922,12 +922,12 @@ test schema-4.5 {event on itself in called script} {
         <doc><a/></doc>
         <doc><a/><b/></doc>
     } {
-        lappend result [s validate $xml errMsg]
+        lappend result [catch {s validate $xml errMsg} errMsg]
         lappend result $errMsg
     }
     s delete
     set result
-} {0 {error "This method is not allowed in nested evaluation" at line 1 character 6} 0 {error "This method is not allowed in nested evaluation" at line 1 character 15} 0 {error "This method is not allowed in nested evaluation" at line 1 character 13}}
+} {1 {error "This method is not allowed in nested evaluation" at line 1 character 6} 1 {error "This method is not allowed in nested evaluation" at line 1 character 15} 1 {error "This method is not allowed in nested evaluation" at line 1 character 13}}
 
 test schema-4.6 {event start with namespace} {
     tdom::schema s
@@ -982,6 +982,22 @@ test schema-4.9 {event start with namespace w/ namespaced attribute} {
     s event end
     s event end
 } {}
+
+proc schema-4.10 {scmd} {
+    error "Error raised in schema-4.10"
+}
+test schema-4.10 {event - tcl error in called script} {
+    tdom::schema s
+    s defelement doc {
+        tcl schema-4.10
+        element a
+    }
+    s event start doc 
+    set result [catch {s event start a} errMsg]
+    lappend result $errMsg
+    s delete
+    set result
+} {1 {Error raised in schema-4.10}}
 
 test schema-5.1 {dom parse -validateCmd} {
     set result [catch {
@@ -5311,7 +5327,7 @@ test schema-17.14 {info pastexpected} {
 } {a b c d}
 
 proc schema-17.15 {type cmd} {
-    lappend ::result $type [$cmd info stack ]
+    lappend ::result $type [$cmd info stack inside]
 }
 
 test schema-17.15 {info inside} {
@@ -5331,7 +5347,7 @@ test schema-17.15 {info inside} {
     s validate {<doc><a><b>foo</b><c/></a><a><b></b><c>bar</c></a></doc>}
     s delete
     set result
-} {1 {} astart {a doc} aend a astart a aend a}
+} {astart {a doc} aend {a doc} astart {a doc} aend {a doc}}
 
 proc schema-18 {args} {
     lappend ::result {*}$args

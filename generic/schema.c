@@ -3303,7 +3303,7 @@ schemaInstanceInfoCmd (
             Tcl_WrongNumArgs (interp, 2, objv, "top|inside");
             return TCL_ERROR;
         }
-        if (Tcl_GetIndexFromObj (interp, objv[3],
+        if (Tcl_GetIndexFromObj (interp, objv[2],
                                  schemaInstanceInfoStackMethods,
                                  "method", 0, &methodIndex)
             != TCL_OK) {
@@ -3800,7 +3800,11 @@ schemaInstanceCmd (
                 Tcl_SetVar (interp, Tcl_GetString (objv[3]),
                             Tcl_GetStringResult (interp), 0);
             }
-            SetBooleanResult (0);
+            if (sdata->evalError) {
+                return TCL_ERROR;
+            } else {
+                SetBooleanResult (0);
+            }
         }
         schemaReset (sdata);
         break;
