@@ -1,5 +1,5 @@
-C Fixed\snot\salways\spoping\sup\sof\stcl\serrors\sin\scalled\sscript\sduring\svalidation.
-D 2019-10-26T01:20:27.132
+C Added\sa\stest.
+D 2019-10-28T00:33:07.881
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -204,7 +204,7 @@ F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
 F tests/pullparser.test e4b14ea0bdc9f9fd931f3bc559e78c309582a67a238170d58e0f20331f99890c
 F tests/pushpull.bench 664e8f512917537d96c4b71933d4d9a6da65fc6fe85bd7c459483830dc7d2faf
-F tests/schema.test f398e26b5e50b1ac5475c49652644e49d0fe68ef821105e466c02314e48497da
+F tests/schema.test 8276a2f3737bc79c6b2eee512c51975c80ee7c963c0c6910c76f13fb5f00c790
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
 F tests/tdomcmd.bench b07448ed4de08ccaa9734cf3fe15c695fd7066c993da58ff48d465747940e417
 F tests/tdomcmd.test 092401adf0609906d710f3ef8997cb4ca29bc208
@@ -230,8 +230,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a77a3f3b2360b82163ebbc72328b34aa7cfd0acdaadab46f54155c45a6b789d2
-R 986f1ded0f84b513f98e78117b374e95
+P a43c523416a006f86e1e35852c69c4969bf750e6fa300f8ce2c78e2eeb04e8be
+R 8b3910e75e7e55b7b34f6aadb677ac22
 U rolf
-Z 9aa64c2bb11a2369a821ac75a95d233b
+Z 4b75e3de9127986a9f8a1e183340c6b9
 # Remove this line to create a well-formed Fossil manifest.

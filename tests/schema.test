@@ -1564,6 +1564,33 @@ test schema-7.11 {loop over seq} {
     set result
 } {1 1 1 0}
 
+test schema-7.11b {loop over seq} {
+    tdom::schema create grammar
+    grammar define {
+        defelement doc {
+            group 2 {
+                element a ?
+                element b ?
+            }
+            element c
+        }
+        foreach e {a b c} {
+            defelement $e {}
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc><c/></doc>
+        <doc><a/><b/><c/></doc>
+        <doc><a/><b/><a/><b/><c/></doc>
+        <doc><a/><b/><a/><b/></doc>
+    } {
+        lappend result [grammar validate $xml]
+    }
+    grammar delete
+    set result
+} {1 1 1 0}
+
 test schema-7.12 {loop over seq} {
     tdom::schema create grammar
     grammar define {
