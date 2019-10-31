@@ -5428,7 +5428,7 @@ test schema-18.2 {reportcmd} {
     lappend result $rc
     s delete
     set result
-} {s MISSING_CP 1}
+} {s MISSING_ELEMENT 1}
 
 test schema-18.3 {reportcmd} {
     tdom::schema s
@@ -5567,7 +5567,7 @@ test schema-18.7 {reportcmd} {
     }
     s delete
     set result
-} {tclcallback 1 tclcallback tclcallback 1 tclcallback s MISSING_ONE_OF_INTERLEAVE tclcallback 1 tclcallback s MISSING_ONE_OF_INTERLEAVE tclcallback s MISSING_ELEMENT 1}
+} {tclcallback 1 tclcallback tclcallback 1 tclcallback s MISSING_ELEMENT tclcallback 1 tclcallback s MISSING_ELEMENT tclcallback s MISSING_ELEMENT 1}
 
 test schema-18.8 {reportcmd} {
     tdom::schema s
@@ -5593,7 +5593,7 @@ test schema-18.8 {reportcmd} {
     }
     s delete
     set result
-} {s MISSING_CP s MISSING_CP 1}
+} {s MISSING_ELEMENT s MISSING_ELEMENT 1}
 
 test schema-18.9 {reportcmd} {
     tdom::schema s
@@ -5618,7 +5618,7 @@ test schema-18.9 {reportcmd} {
     }
     s delete
     set result
-} {s MISSING_CP 1}
+} {s MISSING_ELEMENT 1}
 
 test schema-18.10 {reportcmd} {
     tdom::schema s
@@ -5645,7 +5645,7 @@ test schema-18.10 {reportcmd} {
     }
     s delete
     set result
-} {s MISSING_CP 1}
+} {s MISSING_ELEMENT 1}
 
 test schema-18.11 {reportcmd} {
     tdom::schema s
@@ -5673,7 +5673,7 @@ test schema-18.11 {reportcmd} {
     }
     s delete
     set result
-} {1 s MISSING_CP 1 s MISSING_CP 1 s MISSING_CP 1 s MISSING_CP 1 s UNEXPECTED_ELEMENT 1}
+} {1 s MISSING_ELEMENT 1 s MISSING_ELEMENT 1 s MISSING_ELEMENT 1 s MISSING_ELEMENT 1 s UNEXPECTED_ELEMENT 1}
 
 proc validatedSAX {g xml {keepEmpties 1}} {
     set args [list -validateCmd $g]
