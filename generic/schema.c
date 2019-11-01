@@ -826,26 +826,6 @@ getStackElement (
 }
 
 static void
-pushToStack (
-    SchemaData *sdata,
-    SchemaCP *pattern,
-    int ac
-    )
-{
-    SchemaValidationStack *se;
-
-    DBG(fprintf(stderr, "push to Stack:\n");serializeCP(pattern));
-    se = getStackElement (sdata, pattern);
-    /* if (sdata->stack) sdata->stack->activeChild = ac; */
-    se->down = sdata->stack;
-    if (pattern->type == SCHEMA_CTYPE_INTERLEAVE) {
-        se->interleaveState = MALLOC (sizeof (int) * pattern->nc);
-        memset (se->interleaveState, 0, sizeof (int) * pattern->nc);
-    }
-    sdata->stack = se;
-}
-
-static void
 repoolStackElement (
     SchemaData *sdata,
     SchemaValidationStack *se
@@ -857,6 +837,35 @@ repoolStackElement (
     }
     se->down = sdata->stackPool;
     sdata->stackPool = se;
+}
+
+static void
+pushToStack (
+    SchemaData *sdata,
+    SchemaCP *pattern,
+    int ac
+    )
+{
+    SchemaValidationStack *se, *nextse;
+
+    DBG(fprintf(stderr, "push to Stack:\n");serializeCP(pattern));
+    if (pattern->type == SCHEMA_CTYPE_NAME && sdata->lastMatchse) {
+        se = sdata->lastMatchse;
+        while (se) {
+            nextse = se->down;
+            repoolStackElement (sdata, se);
+            se = nextse;
+        }
+        sdata->lastMatchse = NULL;
+    }
+    se = getStackElement (sdata, pattern);
+    /* if (sdata->stack) sdata->stack->activeChild = ac; */
+    se->down = sdata->stack;
+    if (pattern->type == SCHEMA_CTYPE_INTERLEAVE) {
+        se->interleaveState = MALLOC (sizeof (int) * pattern->nc);
+        memset (se->interleaveState, 0, sizeof (int) * pattern->nc);
+    }
+    sdata->stack = se;
 }
 
 static void
@@ -902,13 +911,43 @@ popFromStack (
     )
 {
     SchemaValidationStack *se;
-    DBG(fprintf(stderr, "pop from Stack:\n");serializeCP(sdata->stack->pattern));
+    DBG(fprintf(stderr, "popFromStack:\n"); serializeCP((*stack)->pattern));
     se = (*stack)->down;
     repoolStackElement (sdata, *stack);
     *stack = se;
 }
 
-#define popStack(sdata) popFromStack (sdata, &sdata->stack)
+static void
+popStack (
+    SchemaData *sdata
+    )
+{
+    SchemaValidationStack *se, *nextse;
+    DBG(fprintf(stderr, "popStack:\n"); serializeCP(sdata->stack->pattern));
+    if (sdata->stack->pattern->type == SCHEMA_CTYPE_NAME) {
+        se = sdata->lastMatchse;
+        while (se) {
+            nextse = se->down;
+            repoolStackElement (sdata, se);
+            se = nextse;
+        }
+        sdata->lastMatchse = NULL;
+        se = sdata->stack->down;
+        repoolStackElement (sdata, sdata->stack);
+        sdata->stack = se;
+    } else {
+        if (sdata->stack->activeChild > 0 || sdata->stack->hasMatched) {
+            se = sdata->stack->down;
+            sdata->stack->down = sdata->lastMatchse;
+            sdata->lastMatchse = sdata->stack;
+            sdata->stack = se;
+        } else {
+            se = sdata->stack->down;
+            repoolStackElement (sdata, sdata->stack);
+            sdata->stack = se;
+        }
+    }
+}
 
 static void
 finalizeElement (
