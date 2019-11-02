@@ -117,7 +117,6 @@ typedef struct SchemaValidationStack
     SchemaCP *pattern;
     struct SchemaValidationStack *next;
     struct SchemaValidationStack *down;
-    int               startChild;
     int               activeChild;
     int               hasMatched;
     int              *interleaveState;

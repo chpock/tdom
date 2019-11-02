@@ -2919,7 +2919,7 @@ test schema-12.2 {domvalidate} {
     $doc delete
     s delete
     set result
-} {0 {Unexpected child element "some" for element "some"}}
+} {0 {Element "some" doesn't match}}
 
 test schema-12.3 {domvalidate w/ attribute} {
     tdom::schema s

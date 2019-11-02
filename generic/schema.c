@@ -305,21 +305,19 @@ static void SetActiveSchemaData (SchemaData *v)
     (hm) == 0 ? minOne(quant) : 0
 
 
-#define getContext(cp, ac, hm)        \
-    cp = se->pattern;                 \
-    ac = se->activeChild;             \
-    hm = se->hasMatched;
+#define getContext(cp, ac, hm)                    \
+    cp = se->pattern;                             \
+    ac = se->activeChild;                         \
+    hm = se->hasMatched;                          \
+    if (hm && maxOne (cp->quants[ac])) {          \
+        ac += + 1;                                \
+        hm = 0;                                   \
+    }                                             \
 
 
 #define updateStack(se,cp,ac)                     \
-    se->startChild = ac;                          \
-    if (maxOne (cp->quants[ac])) {                \
-        se->activeChild = ac + 1;                 \
-        se->hasMatched = 0;                       \
-    } else {                                      \
-        se->activeChild = ac;                     \
-        se->hasMatched = 1;                       \
-    }
+    se->activeChild = ac;                         \
+    se->hasMatched = 1;                           \
 
 static SchemaCP*
 initSchemaCP (
@@ -859,7 +857,6 @@ pushToStack (
         sdata->lastMatchse = NULL;
     }
     se = getStackElement (sdata, pattern);
-    /* if (sdata->stack) sdata->stack->activeChild = ac; */
     se->down = sdata->stack;
     if (pattern->type == SCHEMA_CTYPE_INTERLEAVE) {
         se->interleaveState = MALLOC (sizeof (int) * pattern->nc);
@@ -1557,27 +1554,7 @@ probeElement (
         pattern = NULL;
     }
 
-    if (sdata->stack) {
-        SchemaValidationStack *se;
-        se = sdata->stack;
-        if (se->pattern->type == SCHEMA_CTYPE_NAME
-            && se->activeChild >= se->pattern->nc) {
-            if (recover (interp, sdata, UNEXPECTED_ELEMENT, name, namespace,
-                         NULL, se->pattern->nc)) {
-                return TCL_OK;
-            }
-            SetResult ("Unexpected child element \"");
-            if (namespacePtr) {
-                Tcl_AppendResult (interp, namespacePtr, ":", NULL);
-            }
-            Tcl_AppendResult (interp, name, "\" for element \"", NULL);
-            if (se->pattern->namespace) {
-                Tcl_AppendResult (interp, namespace, ":", NULL);
-            }
-            Tcl_AppendResult (interp, name, "\"", NULL);
-            return TCL_ERROR;
-        }
-    } else {
+    if (!sdata->stack) {
         sdata->validationState = VALIDATION_STARTED;
         if (!pattern) {
             if (recover (interp, sdata, UNKNOWN_ROOT_ELEMENT, name, namespace,
