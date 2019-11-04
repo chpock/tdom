@@ -88,6 +88,7 @@ typedef struct domKeyConstraint {
 
 typedef struct 
 {
+    char *name;
     int active;
     Tcl_HashTable ids;
     int unknownIDrefs;
@@ -156,6 +157,7 @@ typedef struct SchemaData_
     int       cleanupAfterEval;
     int       evalError;
     Tcl_Obj  *reportCmd;
+    SchemaValidationStack *lastMatchse;
     Tcl_Obj **evalStub;
     Tcl_Obj **textStub;
     char *currentNamespace;
@@ -171,6 +173,10 @@ typedef struct SchemaData_
     SchemaValidationStack *stack;
     SchemaValidationStack *stackPool;
     ValidationState validationState;
+    int vaction;
+    const char *vname;
+    const char *vns;
+    const char *vtext;
     unsigned int skipDeep;
     Tcl_DString *cdata;
     Tcl_HashTable ids;
@@ -181,13 +187,6 @@ typedef struct SchemaData_
 
 int 
 schemaInstanceCmd (
-    ClientData clientData,
-    Tcl_Interp *interp,
-    int objc,
-    Tcl_Obj *const objv[]
-    );
-
-int tDOM_SchemaObjCmd (
     ClientData clientData,
     Tcl_Interp *interp,
     int objc,
