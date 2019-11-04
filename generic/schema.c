@@ -866,42 +866,6 @@ pushToStack (
 }
 
 static void
-savelastMatchse (
-    SchemaData *sdata,
-    int add
-    )
-{
-    SchemaValidationStack *se, *nextse;
-    
-    if (!add) {
-        se = sdata->lastMatchse;
-        while (se) {
-            nextse = se->down;
-            repoolStackElement (sdata, se);
-            se = nextse;
-        }
-    }
-    se = getStackElement (sdata, sdata->stack->pattern);
-    se->activeChild = sdata->stack->activeChild;
-    se->hasMatched = sdata->stack->hasMatched;
-    se->down = NULL;
-    if (se->pattern->type == SCHEMA_CTYPE_INTERLEAVE) {
-        se->interleaveState = MALLOC (sizeof (int) * se->pattern->nc);
-        memcpy (se->interleaveState, sdata->stack->interleaveState,
-                se->pattern->nc);
-    }
-    if (sdata->lastMatchse && add) {
-        nextse = sdata->lastMatchse;
-        while (nextse->down) {
-            nextse = nextse->down;
-        }
-        nextse->down = se;
-    } else {
-        sdata->lastMatchse = se;
-    }
-}
-
-static void
 popFromStack (
     SchemaData *sdata,
     SchemaValidationStack **stack
@@ -3136,7 +3100,7 @@ definedElements (
 }
 
 static int
-getNextExpected (
+getNextExpectedWorker (
     SchemaData *sdata,
     SchemaValidationStack *se,
     Tcl_Interp *interp,
@@ -3144,7 +3108,7 @@ getNextExpected (
     Tcl_Obj *rObj
     )
 {
-    int ac, hm, i, hnew, mustMatch, mayskip, rc;
+    int ac, hm, i, hnew, mustMatch, mayskip;
     SchemaCP *cp, *ic, *jc;
     SchemaValidationStack *se1;
 
@@ -3176,8 +3140,8 @@ getNextExpected (
                 Tcl_CreateHashEntry (seenCPs, ic, &hnew);
                 if (hnew) {
                     se1 = getStackElement (sdata, ic);
-                    mayskip = getNextExpected (sdata, se1, interp, seenCPs,
-                                               rObj);
+                    mayskip = getNextExpectedWorker (sdata, se1, interp,
+                                                     seenCPs, rObj);
                     repoolStackElement (sdata, se1);
                 }
                 break;
@@ -3213,8 +3177,9 @@ getNextExpected (
                         Tcl_CreateHashEntry (seenCPs, jc, &hnew);
                         if (hnew) {
                             se1 = getStackElement (sdata, ic);
-                            mayskip = getNextExpected (sdata, se1, interp,
-                                                       seenCPs, rObj);
+                            mayskip = getNextExpectedWorker (
+                                sdata, se1, interp, seenCPs, rObj
+                                );
                             repoolStackElement (sdata, se1);
                         }
                         break;
@@ -3265,13 +3230,6 @@ getNextExpected (
     if (cp->type == SCHEMA_CTYPE_INTERLEAVE && mustMatch) {
         return 0;
     }
-    if (se->down) {
-        hm = se->down->hasMatched;
-        se->down->hasMatched = 1;
-        rc = getNextExpected (sdata, se->down, interp, seenCPs, rObj);
-        se->down->hasMatched = hm;
-        return rc;
-    }
     return 1;
 }
 
@@ -3312,6 +3270,48 @@ unifyMatchList (
     return rObj;
 }
 
+static void
+getNextExpected (
+    SchemaData *sdata,
+    Tcl_Interp *interp
+    )
+{
+    int remainingLastMatch, count;
+    Tcl_Obj *rObj;
+    Tcl_HashTable localHash;
+    SchemaValidationStack *se;
+
+    remainingLastMatch = 0;
+    if (sdata->lastMatchse) {
+        se = sdata->lastMatchse;
+        while (se->down) {
+            remainingLastMatch++;
+            se = se->down;
+        }
+    } else {
+        se = sdata->stack;
+    }
+    rObj = Tcl_NewObj();
+    Tcl_InitHashTable (&localHash, TCL_ONE_WORD_KEYS);
+    while (getNextExpectedWorker (sdata, se, interp, &localHash, rObj)) {
+        if (remainingLastMatch) {
+            count = 0;
+            se = sdata->lastMatchse;
+            while (count < remainingLastMatch) {
+                se = se->down;
+                count++;
+            }
+            remainingLastMatch--;
+        } else {
+            se = se->down;
+        }
+    }
+    Tcl_DeleteHashTable (&localHash);
+    Tcl_SetObjResult (interp, unifyMatchList (interp, &localHash,
+                                              rObj));
+    Tcl_DecrRefCount (rObj);
+}
+
 static int
 schemaInstanceInfoCmd (
     SchemaData *sdata,
@@ -3326,16 +3326,14 @@ schemaInstanceInfoCmd (
     SchemaValidationStack *se;
     void *ns;
     Tcl_Obj *rObj;
-    Tcl_HashTable localHash;
     
     static const char *schemaInstanceInfoMethods[] = {
         "validationstate", "vstate", "definedElements", "stack", "toplevel",
-        "pastexpected", "nextexpected", "definition", "validationaction",
-        "vaction", NULL
+        "expected", "definition", "validationaction", "vaction", NULL
     };
     enum schemaInstanceInfoMethod {
         m_validationstate, m_vstate, m_definedElements, m_stack, m_toplevel,
-        m_pastexpected, m_nextexpected, m_definition, m_validationaction,
+        m_expected, m_definition, m_validationaction,
         m_vaction
     };
 
@@ -3420,7 +3418,6 @@ schemaInstanceInfoCmd (
             }
             Tcl_SetObjResult (interp, rObj);
             return TCL_OK;
-            break;
             
         case m_top:
             if (!sdata->stack) {
@@ -3434,7 +3431,6 @@ schemaInstanceInfoCmd (
             rObj = serializeElementName (interp, se->pattern);
             Tcl_SetObjResult (interp, rObj);
             return TCL_OK;
-            break;
         }
         
     case m_toplevel:
@@ -3453,7 +3449,7 @@ schemaInstanceInfoCmd (
         }
         return TCL_OK;
 
-    case m_nextexpected:
+    case m_expected:
         if (objc != 2) {
             Tcl_WrongNumArgs (interp, 2, objv, "");
             return TCL_ERROR;
@@ -3472,34 +3468,8 @@ schemaInstanceInfoCmd (
                 definedElements (sdata, interp);
             }
         } else {
-            rObj = Tcl_NewObj();
-            Tcl_InitHashTable (&localHash, TCL_ONE_WORD_KEYS);
-            getNextExpected (sdata, sdata->stack, interp, &localHash, rObj);
-            Tcl_DeleteHashTable (&localHash);
-            Tcl_SetObjResult (interp, unifyMatchList (interp, &localHash,
-                                                      rObj));
-            Tcl_DecrRefCount (rObj);
+            getNextExpected (sdata, interp);
         }
-        return TCL_OK;
-        
-    case m_pastexpected:
-        if (objc != 2) {
-            Tcl_WrongNumArgs (interp, 2, objv, "");
-            return TCL_ERROR;
-        }
-        if (sdata->validationState == VALIDATION_READY || !sdata->stack)
-            return TCL_OK;
-        se = sdata->lastMatchse;
-        if (!se) se = sdata->stack;
-        rObj = Tcl_NewObj();
-        Tcl_InitHashTable (&localHash, TCL_ONE_WORD_KEYS);
-        getNextExpected (sdata, se, interp, &localHash, rObj);
-        Tcl_DeleteHashTable (&localHash);
-        Tcl_SetObjResult (interp, unifyMatchList (interp, &localHash,
-                                                  rObj));
-        Tcl_DecrRefCount (rObj);
-        
-        
         break;
         
     case m_definition:

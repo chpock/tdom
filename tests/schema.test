@@ -5076,7 +5076,7 @@ test schema-17.4 {info} {
             element b2
         }}
 
-test schema-17.5 {info nextexpected} {
+test schema-17.5 {info expected} {
     tdom::schema s
     s define {
         defelement doc {
@@ -5091,12 +5091,12 @@ test schema-17.5 {info nextexpected} {
         }
     }
     s event start doc
-    set result [s info nextexpected]
+    set result [s info expected]
     s delete
     lsort $result
 } {a b c musthave toplevel}
 
-test schema-17.6 {info nextexpected} {
+test schema-17.6 {info expected} {
     tdom::schema s
     s prefixns {foo http://foo.bar}
     s define {
@@ -5114,12 +5114,12 @@ test schema-17.6 {info nextexpected} {
         }
     }
     s event start doc
-    set result [s info nextexpected]
+    set result [s info expected]
     s delete
     lsort $result
 } {a b c {musthave http://foo.bar} toplevel}
 
-test schema-17.7 {info nextexpected} {
+test schema-17.7 {info expected} {
     tdom::schema s
     s prefixns {foo http://foo.bar}
     s define {
@@ -5137,12 +5137,12 @@ test schema-17.7 {info nextexpected} {
         }
     }
     s event start doc
-    set result [s info nextexpected]
+    set result [s info expected]
     s delete
     lsort $result
 } {a b c {musthave http://foo.bar} toplevel {{#text} {}}}
 
-test schema-17.8 {info nextexpected} {
+test schema-17.8 {info expected} {
     tdom::schema s
     s defelement doc {
         choice ? {
@@ -5154,28 +5154,28 @@ test schema-17.8 {info nextexpected} {
         element musthave
         element aftermust
     }
-    set result [s info nextexpected]
+    set result [s info expected]
     s define {
         foreach elm {a b c} {
             defelement $elm {}
         }
     }
-    lappend result {*}[lsort [s info nextexpected]]
+    lappend result {*}[lsort [s info expected]]
     s event start doc
-    lappend result {*}[lsort [s info nextexpected]]
+    lappend result {*}[lsort [s info expected]]
     s event start c
     s event end
-    lappend result {*}[lsort [s info nextexpected]]
+    lappend result {*}[lsort [s info expected]]
     s delete
     set result
 } {doc a b c doc a b c musthave toplevel musthave toplevel}
 
 proc schema-17.9 {scmd} {
     global result
-    lappend result {*}[lsort [$scmd info nextexpected]]
+    lappend result {*}[lsort [$scmd info expected]]
 }
                   
-test schema-17.9 {info nextexpected from scripted constrain} {
+test schema-17.9 {info expected from scripted constrain} {
     tdom::schema s
     s define {
         defpattern some {
@@ -5198,7 +5198,7 @@ test schema-17.9 {info nextexpected from scripted constrain} {
     set result
 } {c may must}
 
-test schema-17.10 {info nextexpected interleave} {
+test schema-17.10 {info expected interleave} {
     set defs {
         {
             interleave {
@@ -5230,13 +5230,13 @@ test schema-17.10 {info nextexpected interleave} {
         tdom::schema s
         s defelement doc $def
         s event start doc
-        lappend result {*}[lsort [s info nextexpected]]
+        lappend result {*}[lsort [s info expected]]
         s delete
     }
     set result
 } {a b c a b c d a b c d}
 
-test schema-17.11 {info nextexpected} {
+test schema-17.11 {info expected} {
     set defs {
         {
             group + {
@@ -5254,13 +5254,13 @@ test schema-17.11 {info nextexpected} {
         s event start doc
         s event start b
         s event end
-        set result [lsort [s info nextexpected]]
+        set result [lsort [s info expected]]
         s delete
     }
     set result
 } {a b c d}
 
-test schema-17.12 {info nextexpected} {
+test schema-17.12 {info expected} {
     tdom::schema s
     s define {
         prefixns {ns1 http://foo.bar}
@@ -5274,19 +5274,19 @@ test schema-17.12 {info nextexpected} {
     s event start doc
     s event start a
     s event end
-    set result [lsort [s info nextexpected]]
+    set result [lsort [s info expected]]
     s event start something
     s event end
-    lappend result {*}[lsort [s info nextexpected]]
+    lappend result {*}[lsort [s info expected]]
     s delete
     set result
 } {{<any> {}} {<any> http://foo.bar} b}
 
 proc schema-17.13 {scmd args} {
     global result
-    lappend result {*}[lsort [$scmd info pastexpected]]
+    lappend result {*}[lsort [$scmd info expected]]
 }
-test schema-17.13 {info pastexpected} {
+test schema-17.13 {info expected} {
     set defs {
         {
             element a
@@ -5328,9 +5328,9 @@ test schema-17.13 {info pastexpected} {
 
 proc schema-17.14 {scmd} {
     global result
-    lappend result {*}[lsort [$scmd info pastexpected]]
+    lappend result {*}[lsort [$scmd info expected]]
 }
-test schema-17.14 {info pastexpected} {
+test schema-17.14 {info expected} {
     set defs {
         {
             group + {
