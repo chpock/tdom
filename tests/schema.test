@@ -1751,6 +1751,7 @@ test schema-7.15 {choice with optional choices} {
     } {
         lappend result [s validate $xml]
     }
+    s delete
     set result
 } {0 0 1 0 1 1 1}
 
@@ -1779,6 +1780,7 @@ test schema-7.15a {choice with optional choices} {
     } {
         lappend result [s validate $xml]
     }
+    s delete
     set result
 } {1 1 0 1 0 0 1}
 
@@ -1807,6 +1809,7 @@ test schema-7.15b {choice with optional choices} {
     } {
         lappend result [s validate $xml]
     }
+    s delete
     set result
 } {1 1 0 1 0 0 1}
 
@@ -1841,6 +1844,7 @@ test schema-7.16 {choice with optional choices} {
     } {
         lappend result [s validate $xml]
     }
+    s delete
     set result
 } {0 0 1 0 1 1 1 1 1}
 
@@ -1875,6 +1879,7 @@ test schema-7.17 {choice with optional choices} {
     } {
         lappend result [s validate $xml]
     }
+    s delete
     set result
 } {0 0 1 0 1 1 0 0 1}
 
@@ -1909,20 +1914,9 @@ test schema-7.18 {choice} {
     } {
         lappend result [s validate $xml]
     }
+    s delete
     set result
 } {0 0 1 0 0 1 0 0 0}
-
-        # <doc/>
-        # <doc><a/></doc>
-        # <doc><a/><c/></doc>
-        # <doc><a/><a/><c/></doc>
-        # <doc><a/><a/></doc>
-        # <doc><a/><a/><a/></doc>
-        # <doc><a/><a/><a/><c/></doc>
-        # <doc><aa/><c/></doc>
-        # <doc><aa/><ab/><aa/><c/></doc>
-        # <doc><aa/><ab/><aa/><aa/><ab/><c/></doc>
-        # <doc><c/></doc>
 
 test schema-7.19 {choice with quantified choice} {
     tdom::schema create s
@@ -1957,6 +1951,7 @@ test schema-7.19 {choice with quantified choice} {
     } {
         lappend result [s validate $xml]
     }
+    s delete
     set result
 } {0 0 1 1 0 0 0 1 0 0 1}
 
@@ -1982,11 +1977,43 @@ test schema-7.20 {group with only optional content} {
         <doc><a/><a/><c/></doc>
         <doc><a/><b/></doc>
         <doc><a/><b/><c/></doc>
+        <doc><b/><c/></doc>
     } {
         lappend result [s validate $xml]
     }
+    s delete
     set result
-} {0 1 1 0 1 1}
+} {0 1 1 0 1 1 0}
+
+test schema-7.21 {group with only optional content} {
+    set def {
+        group + {
+            element c ?
+            element a ?
+            element b ?
+        }
+        element d
+    }
+    set result [list]
+    tdom::schema s
+    s defelement doc $def
+    foreach xml {
+        <doc/>
+        <doc><a/></doc>
+        <doc><a/><c/><d/></doc>
+        <doc><c/><d/></doc>
+        <doc><a/><a/><c/><d/></doc>
+        <doc><a/><b/><d/></doc>
+        <doc><a/><b/><c/><d/></doc>
+        <doc><b/><c/><d/></doc>
+        <doc><d/></doc>
+        <doc><d/><d/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 1 1 1 1 1 1 1 0}
 
 test schema-8.1 {validate method} {
     tdom::schema create grammar
@@ -5196,7 +5223,7 @@ test schema-17.9 {info expected from scripted constrain} {
     lappend [s validate {<doc><must/></doc>}]
     s delete
     set result
-} {c may must}
+} {a b c may must}
 
 test schema-17.10 {info expected interleave} {
     set defs {
@@ -5280,11 +5307,11 @@ test schema-17.12 {info expected} {
     lappend result {*}[lsort [s info expected]]
     s delete
     set result
-} {{<any> {}} {<any> http://foo.bar} b}
+} {{<any> {}} {<any> http://foo.bar} {<elementend> {}} b}
 
 proc schema-17.13 {scmd args} {
-    global result
-    lappend result {*}[lsort [$scmd info expected]]
+    global fromReportCmd
+    set fromReportCmd [lsort [$scmd info expected]]
 }
 test schema-17.13 {info expected} {
     set defs {
@@ -5317,16 +5344,18 @@ test schema-17.13 {info expected} {
         s reportcmd schema-17.13
         set xmlnr 0
         foreach xml $xmlinput {
+            set fromReportCmd ""
             lappend result $defnr/$xmlnr: [s validate $xml errMsg]
+            lappend result {*}$fromReportCmd
             incr xmlnr
         }
         s delete
         incr defnr
     }
     set result
-} {}
+} {0/0: 1 a 0/1: 1 0/2: 1 a 0/3: 1 0/4: 1 a 0/5: 1 {<elementend> {}} b 1/0: 1 a b 1/1: 1 b 1/2: 1 1/3: 1 1/4: 1 a b 1/5: 1 b 2/0: 1 2/1: 1 2/2: 1 2/3: 1 2/4: 1 {<elementend> {}} a b 2/5: 1 {<elementend> {}} b}
 
-proc schema-17.14 {scmd} {
+proc schema-17.14 {scmd args} {
     global result
     lappend result {*}[lsort [$scmd info expected]]
 }
@@ -5345,13 +5374,14 @@ test schema-17.14 {info expected} {
     set result [list]
     foreach def $defs {
         tdom::schema s
+        s reportcmd schema-17.14
         s defelement doc $def
         s event start doc
-        catch {s event start unknownElement}
+        s event start unknownElement
         s delete
     }
     set result
-} {a b c d}
+} {a b c d a b c d}
 
 proc schema-17.15 {type cmd} {
     lappend ::result $type [$cmd info stack inside]

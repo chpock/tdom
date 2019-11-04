@@ -1100,21 +1100,15 @@ evalVirtual (
     int ac
     )
 {
+    int rc;
     SchemaCP *cp;
-    int savedac, savedhm, rc;
 
     cp = sdata->stack->pattern->content[ac];
-    savedac = sdata->stack->activeChild;
-    savedhm = sdata->stack->hasMatched;
-    sdata->stack->activeChild = ac;
-    sdata->stack->hasMatched = 1;
     cp->content[cp->nc-1] = (SchemaCP *) sdata->self;
     sdata->currentEvals++;
     rc = Tcl_EvalObjv (interp, cp->nc, (Tcl_Obj **) cp->content,
                        TCL_EVAL_GLOBAL);
     sdata->currentEvals--;
-    sdata->stack->activeChild = savedac;
-    sdata->stack->hasMatched = savedhm;    
     if (rc != TCL_OK) {
         sdata->evalError = 1;
         return 0;
@@ -2507,8 +2501,8 @@ startElement(
         XML_StopParser (vdata->parser, 0);
         return;
     }
-    if (atts[0] || (sdata->stack
-                    && sdata->stack->pattern->attrs)) {
+    if (sdata->skipDeep == 0
+        && (atts[0] || (sdata->stack && sdata->stack->pattern->attrs))) {
         if (probeAttributes (vdata->interp, sdata, atts)
             != TCL_OK) {
             sdata->validationState = VALIDATION_ERROR;
@@ -2867,16 +2861,18 @@ validateDOM (
         != TCL_OK) {
         return TCL_ERROR;
     }
-    if (node->firstAttr) {
-        if (probeDomAttributes (interp, sdata, node->firstAttr) != TCL_OK) {
-            return TCL_ERROR;
-        }
-    } else {
-        if (sdata->stack->pattern->numReqAttr) {
-            /* probeDomAttributes fills interp result with a msg which
-             * required attributes are missing. */
-            probeDomAttributes (interp, sdata, NULL);
-            return TCL_ERROR;
+    if (sdata->skipDeep == 0) {
+        if (node->firstAttr) {
+            if (probeDomAttributes (interp, sdata, node->firstAttr) != TCL_OK) {
+                return TCL_ERROR;
+            }
+        } else {
+            if (sdata->stack->pattern->numReqAttr) {
+                /* probeDomAttributes fills interp result with a msg which
+                 * required attributes are missing. */
+                probeDomAttributes (interp, sdata, NULL);
+                return TCL_ERROR;
+            }
         }
     }
 
@@ -3075,6 +3071,20 @@ serializeTextCP (
     return rObj;
 }
 
+static Tcl_Obj*
+serializeElementEnd (
+    Tcl_Interp *interp
+    )
+{
+    Tcl_Obj *rObj;
+
+    rObj = Tcl_NewObj();
+    Tcl_ListObjAppendElement (interp, rObj,
+                              Tcl_NewStringObj ("<elementend>", 12));
+    Tcl_ListObjAppendElement (interp, rObj, Tcl_NewObj());
+    return rObj;
+}
+
 static void
 definedElements (
     SchemaData *sdata,
@@ -3207,12 +3217,20 @@ getNextExpectedWorker (
             case SCHEMA_CTYPE_VIRTUAL:
             case SCHEMA_CTYPE_KEYSPACE:
             case SCHEMA_CTYPE_KEYSPACE_END:
+                mayskip = 1;
                 break;
             }
-            if (cp->type == SCHEMA_CTYPE_INTERLEAVE && minOne(cp->quants[ac]))
-                mustMatch = 1;
-            else if (!mayskip && minOne (cp->quants[ac])) break;
+            if (cp->type == SCHEMA_CTYPE_INTERLEAVE) {
+                if (minOne(cp->quants[ac])) mustMatch = 1;
+            } else {
+                if (!mayskip && minOne (cp->quants[ac])) break;
+            }
             ac++;
+        }
+        if (cp->type == SCHEMA_CTYPE_NAME && ac == cp->nc) {
+            Tcl_ListObjAppendElement (
+                interp, rObj, serializeElementEnd (interp)
+                );
         }
         break;
         
@@ -3838,7 +3856,7 @@ schemaInstanceCmd (
             }
             result = probeElement (interp, sdata, Tcl_GetString (objv[3]),
                                    namespacePtr);
-            if (result == TCL_OK) {
+            if (sdata->skipDeep == 0 && result == TCL_OK) {
                 result = probeEventAttribute (interp, sdata, attData, len);
             }
             break;
