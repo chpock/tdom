@@ -5406,6 +5406,158 @@ test schema-17.15 {info inside} {
     set result
 } {astart {a doc} aend {a doc} astart {a doc} aend {a doc}}
 
+test schema-17.16 {info expected} {
+    tdom::schema s
+    s defelement doc {
+        element a
+        group {
+            group {
+                group {
+                    element aaaa
+                    element bbbb ?
+                }
+                element bbb ?
+            }
+            element bb ?
+        }
+        element b
+    }
+    set result [list]
+    foreach xml {
+        <doc><a/></doc>
+        <doc><a/><aaaa/></doc>
+        <doc><a/><aaaa/><b/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s reportcmd schema-17.13
+    foreach xml {
+        <doc><a/></doc>
+        <doc><a/><aaaa/></doc>
+        <doc><a/><aaaa/><b/></doc>
+    } {
+        set fromReportCmd ""
+        lappend result [s validate $xml]
+        lappend result {*}$fromReportCmd
+    }
+    s delete
+    set result
+} {0 0 1 1 aaaa 1 b bb bbb bbbb 1}
+
+test schema-17.16a {info expected} {
+    tdom::schema s
+    s defelement doc {
+        element a
+        group {
+            group {
+                group {
+                    element aaaa *
+                    element bbbb ?
+                }
+                element bbb ?
+            }
+            element bb ?
+        }
+        element b
+    }
+    set result [list]
+    foreach xml {
+        <doc><a/></doc>
+        <doc><a/><aaaa/></doc>
+        <doc><a/><aaaa/><b/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s reportcmd schema-17.13
+    foreach xml {
+        <doc><a/></doc>
+        <doc><a/><aaaa/></doc>
+        <doc><a/><aaaa/><b/></doc>
+    } {
+        set fromReportCmd ""
+        lappend result [s validate $xml]
+        lappend result {*}$fromReportCmd
+    }
+    s delete
+    set result
+} {0 0 1 1 aaaa b bb bbb bbbb 1 aaaa b bb bbb bbbb 1}
+
+test schema-17.16b {info expected} {
+    tdom::schema s
+    s defelement doc {
+        element a
+        group {
+            group {
+                group {
+                    element aaaa ?
+                    element bbbb ?
+                }
+                element bbb ?
+            }
+            element bb ?
+        }
+        element b
+    }
+    set result [list]
+    foreach xml {
+        <doc><a/></doc>
+        <doc><a/><aaaa/></doc>
+        <doc><a/><aaaa/><b/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s reportcmd schema-17.13
+    foreach xml {
+        <doc><a/></doc>
+        <doc><a/><aaaa/></doc>
+        <doc><a/><aaaa/><b/></doc>
+    } {
+        set fromReportCmd ""
+        lappend result [s validate $xml]
+        lappend result {*}$fromReportCmd
+    }
+    s delete
+    set result
+} {0 0 1 1 aaaa b bb bbb bbbb 1 b bb bbb bbbb 1}
+
+test schema-17.16c {info expected} {
+    tdom::schema s
+    s defelement doc {
+        element a
+        group {
+            group {
+                group {
+                    element aaaa +
+                    element bbbb ?
+                }
+                element bbb ?
+            }
+            element bb ?
+        }
+        element b
+    }
+    set result [list]
+    foreach xml {
+        <doc><a/></doc>
+        <doc><a/><aaaa/></doc>
+        <doc><a/><aaaa/><b/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s reportcmd schema-17.13
+    foreach xml {
+        <doc><a/></doc>
+        <doc><a/><aaaa/></doc>
+        <doc><a/><aaaa/><b/></doc>
+    } {
+        set fromReportCmd ""
+        lappend result [s validate $xml]
+        lappend result {*}$fromReportCmd
+    }
+    s delete
+    set result
+} {0 0 1 1 aaaa 1 aaaa b bb bbb bbbb 1}
+
 proc schema-18 {args} {
     lappend ::result {*}$args
 }

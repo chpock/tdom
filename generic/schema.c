@@ -3118,7 +3118,7 @@ getNextExpectedWorker (
     Tcl_Obj *rObj
     )
 {
-    int ac, hm, i, hnew, mustMatch, mayskip;
+    int ac, hm, i, hnew, mustMatch, mayskip, rc;
     SchemaCP *cp, *ic, *jc;
     SchemaValidationStack *se1;
 
@@ -3223,14 +3223,26 @@ getNextExpectedWorker (
             if (cp->type == SCHEMA_CTYPE_INTERLEAVE) {
                 if (minOne(cp->quants[ac])) mustMatch = 1;
             } else {
-                if (!mayskip && minOne (cp->quants[ac])) break;
+                if (!mayskip && !hm && minOne (cp->quants[ac])) break;
             }
             ac++;
+            hm = 0;
         }
-        if (cp->type == SCHEMA_CTYPE_NAME && ac == cp->nc) {
-            Tcl_ListObjAppendElement (
-                interp, rObj, serializeElementEnd (interp)
-                );
+        rc = 1;
+        if (cp->type == SCHEMA_CTYPE_NAME) {
+            if (ac == cp->nc) {
+                /* The curently open element can end here, no
+                 * mandatory elements missing */
+                Tcl_ListObjAppendElement (
+                    interp, rObj, serializeElementEnd (interp)
+                    );
+            }
+            rc = 0;
+        } else if (cp->type == SCHEMA_CTYPE_INTERLEAVE) {
+            if (mustMatch) rc = 0;
+        } else {
+            /* SCHEMA_CTYPE_PATTERN */
+            if (ac < cp->nc) rc = 0;
         }
         break;
         
@@ -3242,13 +3254,7 @@ getNextExpectedWorker (
     case SCHEMA_CTYPE_KEYSPACE_END:
         Tcl_Panic ("Invalid CTYPE onto the validation stack!");
     }
-    if (cp->type == SCHEMA_CTYPE_NAME) {
-        return 0;
-    }
-    if (cp->type == SCHEMA_CTYPE_INTERLEAVE && mustMatch) {
-        return 0;
-    }
-    return 1;
+    return rc;
 }
 
 static Tcl_Obj *
@@ -3294,11 +3300,13 @@ getNextExpected (
     Tcl_Interp *interp
     )
 {
-    int remainingLastMatch, count;
+    int remainingLastMatch, count, rc;
     Tcl_Obj *rObj;
     Tcl_HashTable localHash;
     SchemaValidationStack *se;
 
+    rObj = Tcl_NewObj();
+    Tcl_InitHashTable (&localHash, TCL_ONE_WORD_KEYS);
     remainingLastMatch = 0;
     if (sdata->lastMatchse) {
         se = sdata->lastMatchse;
@@ -3306,27 +3314,31 @@ getNextExpected (
             remainingLastMatch++;
             se = se->down;
         }
-    } else {
-        se = sdata->stack;
+        while (se && getNextExpectedWorker (sdata, se, interp, &localHash, rObj)) {
+            if (remainingLastMatch) {
+                count = 1;
+                se = sdata->lastMatchse;
+                while (count < remainingLastMatch) {
+                    se = se->down;
+                    count++;
+                }
+                remainingLastMatch--;
+            } else break;
+        }
     }
-    rObj = Tcl_NewObj();
-    Tcl_InitHashTable (&localHash, TCL_ONE_WORD_KEYS);
-    while (getNextExpectedWorker (sdata, se, interp, &localHash, rObj)) {
-        if (remainingLastMatch) {
-            count = 0;
-            se = sdata->lastMatchse;
-            while (count < remainingLastMatch) {
-                se = se->down;
-                count++;
-            }
-            remainingLastMatch--;
-        } else {
-            se = se->down;
+    
+    se = sdata->stack;
+    while (se) {
+        rc = getNextExpectedWorker (sdata, se, interp, &localHash, rObj);
+        if (se->pattern->type == SCHEMA_CTYPE_NAME) break;
+        se = se->down;
+        if (!rc) {
+            if (mayMiss(se->pattern->quants[se->activeChild])) continue;
+            break;
         }
     }
     Tcl_DeleteHashTable (&localHash);
-    Tcl_SetObjResult (interp, unifyMatchList (interp, &localHash,
-                                              rObj));
+    Tcl_SetObjResult (interp, unifyMatchList (interp, &localHash, rObj));
     Tcl_DecrRefCount (rObj);
 }
 
