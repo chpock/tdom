@@ -5857,6 +5857,18 @@ test schema-18.11 {reportcmd} {
     set result
 } {1 s MISSING_ELEMENT 1 s MISSING_ELEMENT 1 s MISSING_ELEMENT 1 s MISSING_ELEMENT 1 s UNEXPECTED_ELEMENT 1}
 
+test schema-18.12 {non existing reportcmd cmd} {
+    tdom::schema s
+    s defelement doc {
+        element a
+    }
+    s reportcmd ::tdom::_dontExists_
+    set result [catch {s validate <doc/>} errMsg]
+    lappend result $errMsg
+    s delete
+    set result
+} {1 {error "invalid command name "::tdom::_dontExists_"" at line 1 character 6}}
+
 proc validatedSAX {g xml {keepEmpties 1}} {
     set args [list -validateCmd $g]
     if {!$keepEmpties} {

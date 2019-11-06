@@ -81,12 +81,6 @@
       </commanddef>
       
       <commanddef>
-        <command><method>define</method> <m>&lt;definition script></m></command>
-        <desc>This method allows to define several elements or pattern
-        or a whole schema with one call.</desc>
-      </commanddef>
-      
-      <commanddef>
         <command><method>start</method> <m>documentElement</m> <m>?namespace?</m></command>
         <desc>This method defines the name and namespace of the root
         element of a tree to validate. If this method is used then the
@@ -100,6 +94,16 @@
         element will be valid as root of a tree to validate.</desc>
       </commanddef>
 
+      <commanddef>
+        <command><method>define</method> <m>&lt;definition script></m></command>
+        <desc>This method allows to define several elements or pattern
+        or a whole schema with one call. All schema command methods so
+        far (<m>prefixns</m>, <m>defelement</m>, <m>defpattern</m>,
+        <m>deftext</m> and <m>start</m>) are allowed top level in the
+        <m>definition script</m>. The <m>define</m> method itself
+        isn't allowed recursively.</desc>
+      </commanddef>
+      
       <commanddef>
         <command><method>event</method> <m>(start|end|text)</m> <m>?event specific data?</m></command>
         <desc>This method allows to validate hierarchical data against

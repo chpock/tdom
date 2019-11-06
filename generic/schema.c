@@ -4328,8 +4328,7 @@ NamedPatternObjCmd (
     if (quant == SCHEMA_CQUANT_ERROR) {
         return TCL_ERROR;
     }
-    h = Tcl_CreateHashEntry (hashTable,
-                                    Tcl_GetString(objv[1]), &hnew);
+    h = Tcl_CreateHashEntry (hashTable, Tcl_GetString(objv[1]), &hnew);
     if (objc < 4) {
         /* Reference to an element or pattern */
         if (!hnew) {
