@@ -3570,6 +3570,18 @@ schemaInstanceInfoCmd (
     return TCL_OK;
 }
 
+/* This implements the script interface to the created schema commands.
+
+   Since validation may call out to tcl scripts those scripts may
+   delete the schema command (which just validates input by calling
+   out to a tcl script). This is handled by tcl evaluation level
+   counting and postponing the schema data deletion until back on top.
+
+   After any code by this function that may have called out to a tcl
+   script it is important not to return locally but to signal the
+   return value with the result variable and ensure to reach the code
+   at the end of schemaInstanceCmd.
+ */
 int
 schemaInstanceCmd (
     ClientData clientData,
@@ -3932,7 +3944,7 @@ schemaInstanceCmd (
                             Tcl_GetStringResult (interp), 0);
             }
             if (sdata->evalError) {
-                return TCL_ERROR;
+                 result = TCL_ERROR;
             } else {
                 SetBooleanResult (0);
             }
