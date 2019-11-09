@@ -6598,8 +6598,14 @@ int tcldom_parse (
     return TCL_ERROR;
 #else
     parser = XML_ParserCreate_MM(NULL, MEM_SUITE, NULL);
+#ifndef TDOM_NO_SCHEMA
+    sdata->parser = parser;
+    if (sdata->validationState != VALIDATION_READY) {
+        SetResult ("The configured schema command is busy.");
+        return TCL_ERROR;
+    }
+#endif
     Tcl_ResetResult(interp);
-
     doc = domReadDocument(parser, xml_string,
                           xml_string_len,
                           ignoreWhiteSpaces,

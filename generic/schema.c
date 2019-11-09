@@ -2595,6 +2595,7 @@ validateString (
     vdata.interp = interp;
     vdata.sdata = sdata;
     vdata.parser = parser;
+    sdata->parser = parser;
     Tcl_DStringInit (&cdata);
     vdata.cdata = &cdata;
     vdata.onlyWhiteSpace = 1;
@@ -2623,6 +2624,7 @@ validateString (
     } else {
         result = TCL_OK;
     }
+    sdata->parser = NULL;
     XML_ParserFree (parser);
     Tcl_DStringFree (&cdata);
     FREE (vdata.uri);
@@ -2981,6 +2983,8 @@ schemaReset (
             ks->active = 0;
         }
     }
+    sdata->parser = NULL;
+    sdata->node = NULL;
 }
 
 static int
@@ -3350,7 +3354,7 @@ schemaInstanceInfoCmd (
     Tcl_Obj *const objv[]
     )
 {
-    int methodIndex;
+    int methodIndex, line, column;
     Tcl_HashEntry *h;
     SchemaCP *cp;
     SchemaValidationStack *se;
@@ -3359,12 +3363,13 @@ schemaInstanceInfoCmd (
     
     static const char *schemaInstanceInfoMethods[] = {
         "validationstate", "vstate", "definedElements", "stack", "toplevel",
-        "expected", "definition", "validationaction", "vaction", NULL
+        "expected", "definition", "validationaction", "vaction", "line",
+        "column", NULL
     };
     enum schemaInstanceInfoMethod {
         m_validationstate, m_vstate, m_definedElements, m_stack, m_toplevel,
-        m_expected, m_definition, m_validationaction,
-        m_vaction
+        m_expected, m_definition, m_validationaction, m_vaction, m_line,
+        m_column
     };
 
     static const char *schemaInstanceInfoStackMethods[] = {
@@ -3565,6 +3570,26 @@ schemaInstanceInfoCmd (
             SetResult (sdata->vtext);
             break;
         }
+        break;
+
+    case m_line:
+        if (!sdata->parser && !sdata->node) break;
+        if (sdata->parser) {
+            SetIntResult (XML_GetCurrentLineNumber (sdata->parser));
+            break;
+        }
+        if (domGetLineColumn(sdata->node, &line, &column) < 0) break;
+        SetIntResult (line);
+        break;
+        
+    case m_column:
+        if (!sdata->parser && !sdata->node) break;
+        if (sdata->parser) {
+            SetIntResult (XML_GetCurrentColumnNumber (sdata->parser));
+            break;
+        }
+        if (domGetLineColumn(sdata->node, &line, &column) < 0) break;
+        SetIntResult (column);
         break;
     }
     return TCL_OK;

@@ -815,6 +815,12 @@ TclExpatInstanceCmd (
             break;
         }
         data = Tcl_GetStringFromObj(objv[2], &len);
+#ifndef TDOM_NO_SCHEMA
+        if (expat->sdata) {
+            expat->sdata->parser = expat->parser;
+        }
+        break;
+#endif
         result = TclExpatParse(interp, expat, data, len, EXPAT_INPUT_STRING);
         if (expat->final || result != TCL_OK) {
 #ifndef TDOM_NO_SCHEMA
@@ -834,7 +840,11 @@ TclExpatInstanceCmd (
             break;
         }
 #ifndef TDOM_NO_SCHEMA
-        resetsdata = 1;
+        if (expat->sdata) {
+            resetsdata = 1;
+            expat->sdata->parser = expat->parser;
+        }
+        break;
 #endif
         data = Tcl_GetString(objv[2]);
         result = TclExpatParse(interp, expat, data, len, EXPAT_INPUT_CHANNEL);
