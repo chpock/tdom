@@ -534,6 +534,11 @@ TclExpatInitializeParser(
     expat->eContents              = NULL;
     expat->finished               = 0;
     expat->parsingState           = 0;
+#ifndef TDOM_NO_SCHEMA
+    if (expat->sdata) {
+        tDOM_schemaReset (expat->sdata, 1);
+    }
+#endif
 
     if (resetOptions) {
         expat->final              = 1;
@@ -794,6 +799,10 @@ TclExpatInstanceCmd (
                            "callback", TCL_STATIC);
             result = TCL_ERROR;
         } else {
+            if (expat->sdata) {
+                expat->sdata->inuse--;
+                tDOM_schemaReset (expat->sdata, 1);
+            }
             Tcl_DeleteCommand(interp, Tcl_GetString(expat->name));
             result = TCL_OK;
         }
@@ -817,9 +826,16 @@ TclExpatInstanceCmd (
         data = Tcl_GetStringFromObj(objv[2], &len);
 #ifndef TDOM_NO_SCHEMA
         if (expat->sdata) {
+            if (expat->parsingState == 0) {
+                if (expat->sdata->validationState != VALIDATION_READY) {
+                    Tcl_SetResult (interp, "The configured schema command "
+                                   "is busy", TCL_STATIC);
+                    result = TCL_ERROR;
+                    break;
+                }
+            }
             expat->sdata->parser = expat->parser;
         }
-        break;
 #endif
         result = TclExpatParse(interp, expat, data, len, EXPAT_INPUT_STRING);
         if (expat->final || result != TCL_OK) {
@@ -841,14 +857,23 @@ TclExpatInstanceCmd (
         }
 #ifndef TDOM_NO_SCHEMA
         if (expat->sdata) {
-            resetsdata = 1;
+            if (expat->parsingState == 0) {
+                if (expat->sdata->validationState != VALIDATION_READY) {
+                    Tcl_SetResult (interp, "The configured schema command "
+                                   "is busy", TCL_STATIC);
+                    result = TCL_ERROR;
+                    break;
+                }
+            }
             expat->sdata->parser = expat->parser;
         }
-        break;
 #endif
         data = Tcl_GetString(objv[2]);
         result = TclExpatParse(interp, expat, data, len, EXPAT_INPUT_CHANNEL);
         if (expat->final || result != TCL_OK) {
+#ifndef TDOM_NO_SCHEMA
+            resetsdata = 1;
+#endif
             expat->final = 1;
             expat->finished = 1;
         }
@@ -863,12 +888,25 @@ TclExpatInstanceCmd (
             break;
         }
 #ifndef TDOM_NO_SCHEMA
-        resetsdata = 1;
+        if (expat->sdata) {
+            if (expat->parsingState == 0) {
+                if (expat->sdata->validationState != VALIDATION_READY) {
+                    Tcl_SetResult (interp, "The configured schema command "
+                                   "is busy", TCL_STATIC);
+                    result = TCL_ERROR;
+                    break;
+                }
+            }
+            expat->sdata->parser = expat->parser;
+        }
 #endif
         data = Tcl_GetString(objv[2]);
         result = TclExpatParse (interp, expat, data, len, 
                                 EXPAT_INPUT_FILENAME);
         if (expat->final || result != TCL_OK) {
+#ifndef TDOM_NO_SCHEMA
+            resetsdata = 1;
+#endif
             expat->final = 1;
             expat->finished = 1;
         }
@@ -891,7 +929,7 @@ TclExpatInstanceCmd (
 
 #ifndef TDOM_NO_SCHEMA
   if (resetsdata && expat->sdata) {
-      schemaReset (expat->sdata);
+      tDOM_schemaReset (expat->sdata, 1);
   }
 #endif
   return result;
@@ -1199,6 +1237,9 @@ TclExpatConfigure (
   int rc;
   char *handlerSetName = NULL;
   TclHandlerSet *tmpTclHandlerSet, *activeTclHandlerSet = NULL;
+#ifndef TDOM_NO_SCHEMA
+  char *schemacmd;
+#endif
 
   if (expat->firstTclHandlerSet 
       && (strcmp ("default", expat->firstTclHandlerSet->name)==0)) {
@@ -1588,19 +1629,34 @@ TclExpatConfigure (
 
 #ifndef TDOM_NO_SCHEMA
     case EXPAT_VALIDATECMD:
-        if (!Tcl_GetCommandInfo(interp, Tcl_GetString(objv[1]), &cmdInfo)) {
-            SetResult3("The \"-validateCmd\" argument \"",
-                       Tcl_GetString(objv[1]),
-                       "\" is not a tDOM validation command.");
-            return TCL_ERROR;
+        schemacmd = Tcl_GetString (objv[1]);
+        if (schemacmd[0] == '\0') {
+            if (expat->sdata) {
+                expat->sdata->inuse--;
+                tDOM_schemaReset (expat->sdata, 1);
+                expat->sdata = NULL;
+            }
+        } else {
+            if (expat->sdata) {
+                expat->sdata->inuse--;
+                tDOM_schemaReset (expat->sdata, 1);
+                expat->sdata = NULL;
+            }                
+            if (!Tcl_GetCommandInfo(interp, schemacmd, &cmdInfo)) {
+                SetResult3("The \"-validateCmd\" argument \"",
+                           Tcl_GetString(objv[1]),
+                           "\" is not a tDOM validation command.");
+                return TCL_ERROR;
+            }
+            if (cmdInfo.objProc != schemaInstanceCmd) {
+                SetResult3("The \"-validateCmd\" argument \"",
+                           Tcl_GetString(objv[1]),
+                           "\" is not a tDOM validation command.");
+                return TCL_ERROR;
+            }
+            expat->sdata = (SchemaData *) cmdInfo.objClientData;
+            expat->sdata->inuse++;
         }
-        if (cmdInfo.objProc != schemaInstanceCmd) {
-            SetResult3("The \"-validateCmd\" argument \"",
-                       Tcl_GetString(objv[1]),
-                       "\" is not a tDOM validation command.");
-            return TCL_ERROR;
-        }
-        expat->sdata = (SchemaData *) cmdInfo.objClientData;
 #endif
     }
 

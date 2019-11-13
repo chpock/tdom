@@ -664,7 +664,6 @@ void tcldom_createNodeObj (
 |   tcldom_setInterpAndReturnVar
 |
 \---------------------------------------------------------------------------*/
-static
 int tcldom_setInterpAndReturnVar (
     Tcl_Interp *interp,
     domNode    *node,
@@ -4366,7 +4365,8 @@ int tcldom_NodeObjCmd (
     char         tmp[200], prefix[MAX_PREFIX_LEN], *method, *nodeName,
                  *str, *attr_name, *attr_val, *filter;
     const char  *localName, *uri, *nsStr;
-    int          result, length, methodIndex, i, line, column;
+    int          result, length, methodIndex, i;
+    long         line, column;
     int          nsIndex, bool, hnew, legacy, jsonType, fromToken = 0;
     Tcl_Obj     *namePtr, *resultPtr;
     Tcl_Obj     *mobjv[MAX_REWRITE_ARGS];
@@ -6599,10 +6599,13 @@ int tcldom_parse (
 #else
     parser = XML_ParserCreate_MM(NULL, MEM_SUITE, NULL);
 #ifndef TDOM_NO_SCHEMA
-    sdata->parser = parser;
-    if (sdata->validationState != VALIDATION_READY) {
-        SetResult ("The configured schema command is busy.");
-        return TCL_ERROR;
+    if (sdata) {
+        sdata->inuse++;
+        sdata->parser = parser;
+        if (sdata->validationState != VALIDATION_READY) {
+            SetResult ("The configured schema command is busy");
+            return TCL_ERROR;
+        }
     }
 #endif
     Tcl_ResetResult(interp);
@@ -6625,7 +6628,10 @@ int tcldom_parse (
                           interp,
                           &status);
 #ifndef TDOM_NO_SCHEMA
-    if (sdata) schemaReset (sdata);
+    if (sdata) {
+        sdata->inuse--;
+        tDOM_schemaReset (sdata, 1);
+    }
 #endif
     if (doc == NULL) {
         char s[50];

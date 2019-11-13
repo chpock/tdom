@@ -2343,8 +2343,8 @@ domException2String (
 int
 domGetLineColumn (
     domNode *node,
-    int     *line,
-    int     *column
+    long     *line,
+    long     *column
 )
 {
     char *v;
