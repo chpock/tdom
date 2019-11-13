@@ -4,18 +4,18 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x56063934db40">NAME</a> · <a href="#SECTid0x56063934e1a0">SYNOPSIS</a> · <a href="#SECTid0x560639348610">DESCRIPTION </a> · <a href="#SECTid0x5606393a58d0">Schema definition scripts</a> · <a href="#SECTid0x5606393af9a0">Quantity specifier</a> · <a href="#SECTid0x5606393b1830">Text constraint scripts</a> · <a href="#SECTid0x5606393ba860">Local key constraints</a> · <a href="#SECTid0x5606393bc670">Exampels</a>
+<a href="#SECTid0x556942858b10">NAME</a> · <a href="#SECTid0x5569428a9fe0">SYNOPSIS</a> · <a href="#SECTid0x5569428287a0">DESCRIPTION </a> · <a href="#SECTid0x556942818120">Schema definition scripts</a> · <a href="#SECTid0x55694288e600">Quantity specifier</a> · <a href="#SECTid0x556942890450">Text constraint scripts</a> · <a href="#SECTid0x5569428994d0">Local key constraints</a> · <a href="#SECTid0x55694289b2e0">Exampels</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x56063934db40">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x556942858b10">NAME</a></h2><p class="namesection">
 <b class="names">tdom::schema - </b><br>Create a schema validation command</p>
 
-  <h2><a name="SECTid0x56063934e1a0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x5569428a9fe0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">tdom::schema</b> <i class="m">?create?</i> <i class="m">cmdName</i>
     </pre>
 
-  <h2><a name="SECTid0x560639348610">DESCRIPTION </a></h2><p>This command creates validation commands with a simple API. The
+  <h2><a name="SECTid0x5569428287a0">DESCRIPTION </a></h2><p>This command creates validation commands with a simple API. The
     validation commands have methods to define a schema and are able
     to validate XML or DOM trees (and to some degree other kind of
     hierarchical data) against this schema.</p><p>Additionally, a validation command may be used as argument to
@@ -84,14 +84,6 @@
       
       
         <dt>
-<b class="method">define</b> <i class="m">&lt;definition script&gt;</i>
-</dt>
-        <dd>This method allows to define several elements or pattern
-        or a whole schema with one call.</dd>
-      
-      
-      
-        <dt>
 <b class="method">start</b> <i class="m">documentElement</i> <i class="m">?namespace?</i>
 </dt>
         <dd>This method defines the name and namespace of the root
@@ -106,6 +98,18 @@
         element will be valid as root of a tree to validate.</dd>
       
 
+      
+        <dt>
+<b class="method">define</b> <i class="m">&lt;definition script&gt;</i>
+</dt>
+        <dd>This method allows to define several elements or pattern
+        or a whole schema with one call. All schema command methods so
+        far (<i class="m">prefixns</i>, <i class="m">defelement</i>, <i class="m">defpattern</i>,
+        <i class="m">deftext</i> and <i class="m">start</i>) are allowed top level in the
+        <i class="m">definition script</i>. The <i class="m">define</i> method itself
+        isn't allowed recursively.</dd>
+      
+      
       
         <dt>
 <b class="method">event</b> <i class="m">(start|end|text)</i> <i class="m">?event specific data?</i>
@@ -199,6 +203,36 @@
                   <dt><b>vstate</b></dt>
                   <dd>This method is a shorter alias for validationstate; see there.</dd>
               
+              
+                  <dt><b>line</b></dt>
+                  <dd>If the schema command is currently validating
+                  this method returns the line part of the parsing
+                  position information and the empty string in all
+                  other cases. If the schema command is currently
+                  post-validating a DOM tree there may be not position
+                  information stored at certain or all nodes. The
+                  empty string is returned in this cases.</dd>
+              
+              
+                  <dt><b>column</b></dt>
+                  <dd>If the schema command is currently validating
+                  this method returns the column part of the parsing
+                  position information and the empty string in all
+                  other cases. If the schema command is currently
+                  post-validating a DOM tree there may be not position
+                  information stored at certain or all nodes. The
+                  empty string is returned in this cases.</dd>
+              
+              
+                  <dt><b>domNode</b></dt>
+                  <dd>If the schema command is currently
+                  post-validating a DOM tree ist command returns the
+                  current parent node command (the node, whose content
+                  is currently validated) and the empty string
+                  otherwhise. It is recommended that you don't use
+                  this method. Or at least leaf the DOM tree alone,
+                  use it read-only.</dd>
+              
           </dl>
           </dd>
       
@@ -211,7 +245,7 @@
 
     </dl>
 
-  <h2><a name="SECTid0x5606393a58d0">Schema definition scripts</a></h2><p>Schema definition scripts are ordinary Tcl scripts that are
+  <h2><a name="SECTid0x556942818120">Schema definition scripts</a></h2><p>Schema definition scripts are ordinary Tcl scripts that are
     evaluatend in the namespace tdom::schema. The below listed schema
     definition commands in this tcl namespace allow to define a wide
     variety of document structures. Every schema definition command
@@ -403,15 +437,14 @@
       
     </dl>
 
-  <h2><a name="SECTid0x5606393af9a0">Quantity specifier</a></h2><p>Serveral schema definition commands expects a quantifier as
+  <h2><a name="SECTid0x55694288e600">Quantity specifier</a></h2><p>Serveral schema definition commands expects a quantifier as
     one of their arguments, which specifies how often the content
     particle specified by the command is expected. The valid values
     for a <i class="m">quant</i> argument are:</p><dl class="optlist">
       
         <dt><b>!</b></dt>
         <dd>The content particle must occur exactly once in valid
-        documents. This is the default, if a quantifier is
-        omitted.</dd>
+        documents.</dd>
       
     
       
@@ -448,11 +481,11 @@
     </dl><p>If an optional quantifier is not given then it defaults to * in
     case of the mixed command and to ! for all other commands.</p>
 
-  <h2><a name="SECTid0x5606393b1830">Text constraint scripts</a></h2><p>Text - parsed character data, as XML calles it - must sometimes
-    have to be of a certain kind, must comply to some rules etc to be
-    valid. The text constraint script arguments to the text,
-    attribute, nsattribute and deftext commands allow the following
-    text constraint commands to check text for certain properties.</p><p>The text constraint commands are:</p><dl class="commandlist">
+  <h2><a name="SECTid0x556942890450">Text constraint scripts</a></h2><p>Text - parsed character data, as XML calles it - must sometimes
+    be of a certain kind, must comply to some rules etc to be valid.
+    The text constraint script arguments to the text, attribute,
+    nsattribute and deftext commands allow the following text
+    constraint commands to check text for certain properties.</p><p>The text constraint commands are:</p><dl class="commandlist">
       
         <dt>
 <b class="cmd">integer</b> <i class="m">?(xsd|tcl)?</i>
@@ -470,7 +503,7 @@
         <dt>
 <b class="cmd">fixed</b> <i class="m">value</i>
 </dt>
-        <dd>The text constraint only matches if the text value is
+        <dd>The text constraint only match if the text value is
         string equal to the given value.</dd>
       
       
@@ -605,8 +638,9 @@
 </dd>
       
       
-        <dt><b class="cmd">id <i class="m">?keySpace?</i>
-</b></dt>
+        <dt>
+<b class="cmd">id</b> <i class="m">?keySpace?</i>
+</dt>
         <dd>This text constraint command marks the text as a
         document wide ID (to be referenced by an idref). Every ID
         value within a document must be unique. It isn't an error if
@@ -617,8 +651,9 @@
         argument.</dd>
       
       
-        <dt><b class="cmd">idref <i class="m">?keySpace?</i>
-</b></dt>
+        <dt>
+<b class="cmd">idref</b> <i class="m">?keySpace?</i>
+</dt>
         <dd>This text constraint command expects the text to be a
         reference to an ID within the document. The referenced ID may
         be later in the document, that the reference. Several
@@ -631,7 +666,7 @@
       
     </dl>
 
-  <h2><a name="SECTid0x5606393ba860">Local key constraints</a></h2><p>Document wide uniqueness and foreign key constraints are
+  <h2><a name="SECTid0x5569428994d0">Local key constraints</a></h2><p>Document wide uniqueness and foreign key constraints are
     available with the text constraint commands id and idref.
     Keyspaces allow for sub-tree local uniqueness and foreign key
     constraints.</p><dl class="commandlist">
@@ -667,7 +702,7 @@
         
     </dl>
 
-  <h2><a name="SECTid0x5606393bc670">Exampels</a></h2><p>The XML Schema Part 0: Primer Second Edition
+  <h2><a name="SECTid0x55694289b2e0">Exampels</a></h2><p>The XML Schema Part 0: Primer Second Edition
     (<a href="https://www.w3.org/TR/xmlschema-0/">https://www.w3.org/TR/xmlschema-0/</a>) starts with this
     example schema:</p><pre class="example">
 &lt;xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;

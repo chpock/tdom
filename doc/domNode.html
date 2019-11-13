@@ -4,18 +4,18 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x561e82e6b640">NAME</a> · <a href="#SECTid0x561e82d945a0">SYNOPSIS</a> · <a href="#SECTid0x561e82e49c80"> DESCRIPTION </a> · <a href="#SECTid0x561e82ebbf40">SEE ALSO</a> · <a href="#SECTid0x561e82ebc2d0">KEYWORDS</a>
+<a href="#SECTid0x5569427a27e0">NAME</a> · <a href="#SECTid0x556942858860">SYNOPSIS</a> · <a href="#SECTid0x556942833710"> DESCRIPTION </a> · <a href="#SECTid0x556942885030">SEE ALSO</a> · <a href="#SECTid0x5569428853c0">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x561e82e6b640">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x5569427a27e0">NAME</a></h2><p class="namesection">
 <b class="names">domNode - </b><br>Manipulates an instance of a DOM node object</p>
 
 
 
-  <h2><a name="SECTid0x561e82d945a0">SYNOPSIS</a></h2><pre class="syntax">$nodeObject <i class="m">method</i> <i class="m">arg arg ...</i>
+  <h2><a name="SECTid0x556942858860">SYNOPSIS</a></h2><pre class="syntax">$nodeObject <i class="m">method</i> <i class="m">arg arg ...</i>
 </pre><pre class="syntax">domNode <i class="m">nodeToken</i> <i class="m">method</i> <i class="m">arg arg ...</i>
 </pre>
-  <h2><a name="SECTid0x561e82e49c80"> DESCRIPTION </a></h2><p>This command manipulates one particular instance of a DOM node object.
+  <h2><a name="SECTid0x556942833710"> DESCRIPTION </a></h2><p>This command manipulates one particular instance of a DOM node object.
 <i class="m">method</i> indicates a specific method of the node class. These methods
 should closely conform to the W3C recommendation "Document Object Model
 (Core) Level 1" (<a href="http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html">http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html</a>)
@@ -209,8 +209,8 @@ already exists, only the given <i class="m">uri</i> and the localname of the
 
         <pre class="example">$node setAttributeNS "http://some.uri.com/wow" prefix:attr1 attrValue</pre>
 
-<p>If the uri is the empty string and the attribute name doesn't have
-a prefix, this method has the same effect as the method
+<p>If the uri is the empty string and the attribute name has no
+prefix, this method has the same effect as the method
 <b>setAttribute</b>.</p>
 
         <pre class="example">$node setAttributeNS "" attri "some Value"</pre>
@@ -233,11 +233,11 @@ prefix. It is not recommended to set xml namespace declarations. The effects are
         <dt>
 <b class="method">attributes</b> <b class="option">?attributeNamePattern?</b>
 </dt>
-        <dd>Returns information about the attriubtes matching the
+        <dd>Returns information about the attributes matching the
         <i class="m">attributeNamePattern</i>. If <i class="m">attributeNamePattern</i>
         isn't given, information about all attributes are returned.
         The return value is a Tcl list, the elements just the
-        attriubute name in case of non namespaced attriubtes and three
+        attribute name in case of non namespaced attributes and three
         element sublists for namespaced attributes. n case of an
         "ordinary" namespaced attribute, the sublist elements are
         {&lt;localname&gt; &lt;prefix&gt; &lt;namespace_uri&gt;}. In the special case of
@@ -754,9 +754,9 @@ name as the given method within the namespace <tt class="l">::dom::domNode</tt> 
 be executed. This allows quick method additions on Tcl level.</p>
 
 
-  <h2><a name="SECTid0x561e82ebbf40">SEE ALSO</a></h2><p class="seealso">dom, domDoc</p>
+  <h2><a name="SECTid0x556942885030">SEE ALSO</a></h2><p class="seealso">dom, domDoc</p>
   
-  <h2><a name="SECTid0x561e82ebc2d0">KEYWORDS</a></h2><p class="keywords">
+  <h2><a name="SECTid0x5569428853c0">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-XML">XML</a>, <a class="keyword" href="keyword-index.html#KW-DOM">DOM</a>, <a class="keyword" href="keyword-index.html#KW-document">document</a>, <a class="keyword" href="keyword-index.html#KW-node">node</a>, <a class="keyword" href="keyword-index.html#KW-parsing">parsing</a>
 </p>
   

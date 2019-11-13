@@ -300,8 +300,8 @@ already exists, only the given \fIuri\fR and the localname of the
 $node setAttributeNS "http://some.uri.com/wow" prefix:attr1 attrValue
 .CE
 .PP
-If the uri is the empty string and the attribute name doesn't have
-a prefix, this method has the same effect as the method
+If the uri is the empty string and the attribute name has no
+prefix, this method has the same effect as the method
 \&\fBsetAttribute\fR.
 
 
@@ -320,11 +320,11 @@ prefix. It is not recommended to set xml namespace declarations. The effects are
 the namespace \fIuri\fR.
 .TP
 \&\fB\fBattributes\fP \fB?attributeNamePattern?\fP
-\&\fRReturns information about the attriubtes matching the
+\&\fRReturns information about the attributes matching the
 \&\fIattributeNamePattern\fR. If \fIattributeNamePattern\fR
 isn't given, information about all attributes are returned.
 The return value is a Tcl list, the elements just the
-attriubute name in case of non namespaced attriubtes and three
+attribute name in case of non namespaced attributes and three
 element sublists for namespaced attributes. n case of an
 "ordinary" namespaced attribute, the sublist elements are
 {<localname> <prefix> <namespace_uri>}. In the special case of

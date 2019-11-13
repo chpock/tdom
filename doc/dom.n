@@ -627,7 +627,7 @@ version as string, something like
 function XML_ExpatVersion() returns.
 .IP "\fBexpatmajorversion\fR"
 Returns the major version of the at build
-time used version as integer.
+time used expat version as integer.
 .IP "\fBexpatminorversion\fR"
 Returns the minor version of the at build
 time used expat version as integer.
@@ -660,6 +660,9 @@ Returns the fossil repository version hash.
 .IP "\fBpullparser\fR"
 Returns as boolean if the pullparser command
 is build in.
+.IP "\fBschema\fR"
+Returns as boolean if the tDOM schema features
+are build in.
 .RE
 .SH KEYWORDS
 XML, DOM, document, node, parsing

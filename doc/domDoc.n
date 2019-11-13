@@ -438,14 +438,14 @@ element names of the document, for which the text node children will be
 serialized as CDATA section nodes.
 .TP
 \&\fB\fBselectNodesNamespaces\fP \fB?prefixUriList?\fP
-\&\fRThis method allows one to control a document global prefix
-to namespace URI mapping, which will be used for selectNodes
+\&\fRThis method gives control to a document global prefix to
+namespace URI mapping, which will be used for selectNodes
 method calls (on document as well as on all nodes, which
-belongs to the document) if it is not overwritten by using
-the -namespaces option of the selectNodes method. Any
-namespace prefix within an xpath expression will be first
-resolved against this list. If the list binds the same prefix
-to different namespaces, then the first binding will win. If a
+belongs to the document) if it is not overwritten by using the
+-namespaces option of the selectNodes method. Any namespace
+prefix within an xpath expression will be first resolved
+against this list. If the list binds the same prefix to
+different namespaces, then the first binding will win. If a
 prefix could not resolved against the document global prefix /
 namespaces list, then the namespace definitions in scope of
 the context node will be used to resolve the prefix, as usual.
