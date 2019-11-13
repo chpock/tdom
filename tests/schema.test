@@ -1088,6 +1088,54 @@ test schema-6.1 {expat parser with -validateCmd} {
     set result
 } 1
 
+test schema-6.2 {expat parser with -validateCmd} {
+    tdom::schema create grammar
+    grammar defelement doc {
+        element e1
+        element e2 *
+    }
+    foreach e {e1 e2} {
+        grammar defelement $e {}
+    }
+    ::xml::parser p -validateCmd grammar -final 0
+    set result [list]
+    p parse {<doc><e}
+    lappend result [catch {grammar validate <doc><e1/><e2/><e2/></doc>} errMsg]
+    lappend result $errMsg
+    lappend result [grammar info vstate]
+    p parse {1/></doc>}
+    p configure -final 1
+    p reset
+    lappend result [grammar validate <doc><e1/><e2/><e2/></doc>]
+    grammar delete
+    p delete
+    set result
+} {1 {The schema command is busy} VALIDATING 1}
+
+test schema-6.3 {expat parser with -validateCmd} {knownBug} {
+    tdom::schema create grammar
+    grammar defelement doc {
+        element e1
+        element e2 *
+    }
+    foreach e {e1 e2} {
+        grammar defelement $e {}
+    }
+    ::xml::parser p -validateCmd grammar -final 0
+    set result [list]
+    p parse {<do}
+    lappend result [catch {grammar validate <doc><e1/><e2/><e2/></doc>} errMsg]
+    lappend result $errMsg
+    lappend result [grammar info vstate]
+    p parse {c><e1/></doc>}
+    p configure -final 1
+    p reset
+    lappend result [grammar validate <doc><e1/><e2/><e2/></doc>]
+    grammar delete
+    p delete
+    set result
+} {1 {The schema command is busy} VALIDATING 1}
+
 test schema-7.1 {group} {
     tdom::schema create grammar
     grammar defelement doc {
@@ -5577,6 +5625,48 @@ test schema-17.16c {info expected} {
     s delete
     set result
 } {0 0 1 1 aaaa 1 aaaa b bb bbb bbbb 1}
+
+proc schema-17.17 {scmd args} {
+    global fromReportCmd
+    set fromReportCmd [list [$scmd info line] [$scmd info column]]
+}
+test schema-17.17 {info expected} {
+    tdom::schema s
+    s defelement doc {
+        element a
+        group {
+            group {
+                group {
+                    element aaaa +
+                    element bbbb ?
+                }
+                element bbb ?
+            }
+            element bb ?
+        }
+        element b
+    }
+    set result [list]
+    foreach xml {
+        <doc><a/></doc>
+        <doc><a/><aaaa/></doc>
+        <doc><a/><aaaa/><b/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s reportcmd schema-17.17
+    foreach xml {
+        <doc><a/></doc>
+        <doc><a/><aaaa/></doc>
+        <doc><a/><aaaa/><b/></doc>
+    } {
+        set fromReportCmd ""
+        lappend result [s validate $xml]
+        lappend result {*}$fromReportCmd
+    }
+    s delete
+    set result
+} {0 0 1 1 1 9 1 1 16 1}
 
 proc schema-18 {args} {
     lappend ::result {*}$args

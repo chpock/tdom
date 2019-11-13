@@ -165,6 +165,8 @@ static char *ValidationErrorType2str[] = {
     }
 #define SetIntResult(i) Tcl_ResetResult(interp);                        \
                      Tcl_SetIntObj(Tcl_GetObjResult(interp), (i))
+#define SetLongResult(i) Tcl_ResetResult(interp);                        \
+                     Tcl_SetLongObj(Tcl_GetObjResult(interp), (i))
 #define SetBooleanResult(i) Tcl_ResetResult(interp); \
                      Tcl_SetBooleanObj(Tcl_GetObjResult(interp), (i))
 
@@ -577,8 +579,8 @@ static void schemaInstanceDelete (
      * Tcl_Eval*() calls to avoid invalid mem access and postpone the
      * cleanup until the Tcl_Eval*() calls are finished (done in
      * schemaInstanceCmd(). */
-    if (sdata->currentEvals) {
-        sdata->cleanupAfterEval = 1;
+    if (sdata->currentEvals || sdata->inuse > 0) {
+        sdata->cleanupAfterUse = 1;
         return;
     }
     Tcl_DecrRefCount (sdata->self);
@@ -2595,6 +2597,7 @@ validateString (
     vdata.interp = interp;
     vdata.sdata = sdata;
     vdata.parser = parser;
+    sdata->parser = parser;
     Tcl_DStringInit (&cdata);
     vdata.cdata = &cdata;
     vdata.onlyWhiteSpace = 1;
@@ -2623,6 +2626,7 @@ validateString (
     } else {
         result = TCL_OK;
     }
+    sdata->parser = NULL;
     XML_ParserFree (parser);
     Tcl_DStringFree (&cdata);
     FREE (vdata.uri);
@@ -2853,7 +2857,7 @@ validateDOM (
     } else {
         ln = node->nodeName;
     }
-    
+    sdata->node = node;
     if (probeElement (interp, sdata, ln,
                       node->namespace ?
                       node->ownerDocument->namespaces[node->namespace-1]->uri
@@ -2934,7 +2938,7 @@ validateDOM (
     return TCL_OK;
 }
 
-void
+static void
 schemaReset (
     SchemaData *sdata
     )
@@ -2943,7 +2947,7 @@ schemaReset (
     Tcl_HashSearch search;
     SchemaDocKey *dk;
     SchemaKeySpace *ks;
-    
+
     while (sdata->stack) popStack (sdata);
     while (sdata->lastMatchse) popFromStack (sdata, &sdata->lastMatchse);
     sdata->validationState = VALIDATION_READY;
@@ -2981,6 +2985,24 @@ schemaReset (
             ks->active = 0;
         }
     }
+    sdata->parser = NULL;
+    sdata->node = NULL;
+}
+
+void
+tDOM_schemaReset (
+    SchemaData *sdata,
+    int lookforCleanup
+    )
+{
+    if (lookforCleanup) {
+        if (sdata->cleanupAfterUse && sdata->inuse == 0
+            && sdata->currentEvals == 0) {
+            schemaInstanceDelete (sdata);
+            return;
+        }
+    }
+    schemaReset (sdata);
 }
 
 static int
@@ -3351,6 +3373,7 @@ schemaInstanceInfoCmd (
     )
 {
     int methodIndex;
+    long line, column;
     Tcl_HashEntry *h;
     SchemaCP *cp;
     SchemaValidationStack *se;
@@ -3359,12 +3382,13 @@ schemaInstanceInfoCmd (
     
     static const char *schemaInstanceInfoMethods[] = {
         "validationstate", "vstate", "definedElements", "stack", "toplevel",
-        "expected", "definition", "validationaction", "vaction", NULL
+        "expected", "definition", "validationaction", "vaction", "line",
+        "column", "domNode", NULL
     };
     enum schemaInstanceInfoMethod {
         m_validationstate, m_vstate, m_definedElements, m_stack, m_toplevel,
-        m_expected, m_definition, m_validationaction,
-        m_vaction
+        m_expected, m_definition, m_validationaction, m_vaction, m_line,
+        m_column, m_domNode
     };
 
     static const char *schemaInstanceInfoStackMethods[] = {
@@ -3566,6 +3590,30 @@ schemaInstanceInfoCmd (
             break;
         }
         break;
+
+    case m_line:
+        if (!sdata->parser && !sdata->node) break;
+        if (sdata->parser) {
+            SetLongResult (XML_GetCurrentLineNumber (sdata->parser));
+            break;
+        }
+        if (domGetLineColumn(sdata->node, &line, &column) < 0) break;
+        SetLongResult (line);
+        break;
+        
+    case m_column:
+        if (!sdata->parser && !sdata->node) break;
+        if (sdata->parser) {
+            SetLongResult (XML_GetCurrentColumnNumber (sdata->parser));
+            break;
+        }
+        if (domGetLineColumn(sdata->node, &line, &column) < 0) break;
+        SetLongResult (column);
+        break;
+
+    case m_domNode:
+        if (!sdata->node) break;
+        return tcldom_setInterpAndReturnVar (interp, sdata->node, 0, NULL);
     }
     return TCL_OK;
 }
@@ -3932,6 +3980,10 @@ schemaInstanceCmd (
             Tcl_WrongNumArgs (interp, 2, objv, "<xml> ?resultVarName?");
             return TCL_ERROR;
         }
+        if (sdata->validationState != VALIDATION_READY) {
+            SetResult ("The schema command is busy");
+            return TCL_ERROR;
+        }
         xmlstr = Tcl_GetStringFromObj (objv[2], &len);
         if (validateString (interp, sdata, xmlstr, len) == TCL_OK) {
             SetBooleanResult (1);
@@ -4044,7 +4096,8 @@ schemaInstanceCmd (
         break;
 
     }
-    if (sdata->cleanupAfterEval && sdata->currentEvals == 0) {
+    if (sdata->cleanupAfterUse && sdata->currentEvals == 0
+        && !(sdata->inuse > 0)) {
         schemaInstanceDelete (sdata);
     }
     return result;

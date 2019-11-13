@@ -153,8 +153,9 @@ typedef struct SchemaData_
     unsigned int patternListSize;
     unsigned int forwardPatternDefs;
     SchemaQuant *quants;
+    int       inuse;
     int       currentEvals;
-    int       cleanupAfterEval;
+    int       cleanupAfterUse;
     int       evalError;
     Tcl_Obj  *reportCmd;
     SchemaValidationStack *lastMatchse;
@@ -183,6 +184,8 @@ typedef struct SchemaData_
     int unknownIDrefs;
     Tcl_HashTable idTables;
     Tcl_HashTable keySpaces;
+    XML_Parser parser;
+    domNode *node;
 } SchemaData;
 
 int 
@@ -236,8 +239,9 @@ probeText (
     );
 
 void
-schemaReset (
-    SchemaData *sdata
+tDOM_schemaReset (
+    SchemaData *sdata,
+    int lookforCleanup
     );
 
 #endif 

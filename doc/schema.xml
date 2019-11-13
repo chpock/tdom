@@ -185,6 +185,36 @@
                   <optname>vstate</optname>
                   <desc>This method is a shorter alias for validationstate; see there.</desc>
               </optdef>
+              <optdef>
+                  <optname>line</optname>
+                  <desc>If the schema command is currently validating
+                  this method returns the line part of the parsing
+                  position information and the empty string in all
+                  other cases. If the schema command is currently
+                  post-validating a DOM tree there may be not position
+                  information stored at certain or all nodes. The
+                  empty string is returned in this cases.</desc>
+              </optdef>
+              <optdef>
+                  <optname>column</optname>
+                  <desc>If the schema command is currently validating
+                  this method returns the column part of the parsing
+                  position information and the empty string in all
+                  other cases. If the schema command is currently
+                  post-validating a DOM tree there may be not position
+                  information stored at certain or all nodes. The
+                  empty string is returned in this cases.</desc>
+              </optdef>
+              <optdef>
+                  <optname>domNode</optname>
+                  <desc>If the schema command is currently
+                  post-validating a DOM tree ist command returns the
+                  current parent node command (the node, whose content
+                  is currently validated) and the empty string
+                  otherwhise. It is recommended that you don't use
+                  this method. Or at least leaf the DOM tree alone,
+                  use it read-only.</desc>
+              </optdef>
           </optlist>
           </desc>
       </commanddef>
