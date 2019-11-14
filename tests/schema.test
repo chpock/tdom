@@ -642,7 +642,7 @@ test schema-2.2 {grammar definition: ref} {
     set result
 } {0 2}
 
-test schema-2.3 {forward definded ref} {
+test schema-2.3 {forward defined ref} {
     set defs {
         {
             ref thisPattern ?
@@ -679,6 +679,18 @@ test schema-2.3 {forward definded ref} {
     }
     set result
 } {1 0 0 1 0 0 1 0 0 0 1 0 0 1 0}
+
+test schema-2.3a {forward defined ref} {
+    tdom::schema s
+    s defelement doc {
+        ref some
+        element a
+    }
+    set result [s validate <doc><a/></doc>]
+    lappend result [s nrForwardDefinitions]
+    s delete
+    set result
+} {1 2}
 
 test schema-2.4 {forward definded element} {
     set defs {

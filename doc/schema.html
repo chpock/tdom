@@ -4,21 +4,22 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x556942858b10">NAME</a> · <a href="#SECTid0x5569428a9fe0">SYNOPSIS</a> · <a href="#SECTid0x5569428287a0">DESCRIPTION </a> · <a href="#SECTid0x556942818120">Schema definition scripts</a> · <a href="#SECTid0x55694288e600">Quantity specifier</a> · <a href="#SECTid0x556942890450">Text constraint scripts</a> · <a href="#SECTid0x5569428994d0">Local key constraints</a> · <a href="#SECTid0x55694289b2e0">Exampels</a>
+<a href="#SECTid0x560e9533c640">NAME</a> · <a href="#SECTid0x560e9528d120">SYNOPSIS</a> · <a href="#SECTid0x560e9531a800">DESCRIPTION </a> · <a href="#SECTid0x560e95375c20">Schema definition scripts</a> · <a href="#SECTid0x560e95380850">Quantity specifier</a> · <a href="#SECTid0x560e953826a0">Text constraint scripts</a> · <a href="#SECTid0x560e9538c4b0">Local key constraints</a> · <a href="#SECTid0x560e9538e2c0">Exampels</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x556942858b10">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x560e9533c640">NAME</a></h2><p class="namesection">
 <b class="names">tdom::schema - </b><br>Create a schema validation command</p>
 
-  <h2><a name="SECTid0x5569428a9fe0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x560e9528d120">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">tdom::schema</b> <i class="m">?create?</i> <i class="m">cmdName</i>
     </pre>
 
-  <h2><a name="SECTid0x5569428287a0">DESCRIPTION </a></h2><p>This command creates validation commands with a simple API. The
+  <h2><a name="SECTid0x560e9531a800">DESCRIPTION </a></h2><p>This command creates validation commands with a simple API. The
     validation commands have methods to define a schema and are able
-    to validate XML or DOM trees (and to some degree other kind of
-    hierarchical data) against this schema.</p><p>Additionally, a validation command may be used as argument to
+    to validate XML data or to post-validate a tDOM DOM tree (and to
+    some degree other kind of hierarchical data) against this
+    schema.</p><p>Additionally, a validation command may be used as argument to
     the <i class="m">-validateCmd</i> option of the <i class="m">dom parse</i> and the
     <i class="m">expat</i> commands to enable validation additional to what they
     otherwise do.</p><p>The valid methods of the created commands are:</p><dl class="commandlist">
@@ -245,14 +246,13 @@
 
     </dl>
 
-  <h2><a name="SECTid0x556942818120">Schema definition scripts</a></h2><p>Schema definition scripts are ordinary Tcl scripts that are
+  <h2><a name="SECTid0x560e95375c20">Schema definition scripts</a></h2><p>Schema definition scripts are ordinary Tcl scripts that are
     evaluatend in the namespace tdom::schema. The below listed schema
     definition commands in this tcl namespace allow to define a wide
     variety of document structures. Every schema definition command
     establish a validation constraint on the content which has to
-    match or must be optional to render the content as valid. It is a
-    validation error if the element in the XML source has additional
-    (not matched) content.</p><p>The schema definition commands are:</p><dl class="commandlist">
+    match or must be optional to qualify the content as valid. It is a
+    validation error if there is additional (not matched) content.</p><p>The schema definition commands are:</p><dl class="commandlist">
       
         <dt>
 <b class="method">element</b> <i class="m">name</i> <i class="m">?quant?</i> <i class="m">?&lt;definition script&gt;?</i>
@@ -266,7 +266,10 @@
         "locally" defined by the <i class="m">definition script</i>. Forward
         references to so far not defined elements or pattern or other
         local definitions of the same name inside the <i class="m">definition
-        script</i> are allowed. </dd>
+        script</i> are allowed. If a forward referenced element isn't
+        defined until validation then only an empty element with name
+        <i class="m">name</i> and namespace <i class="m">namespace</i> and no attributes
+        matches. </dd>
       
 
       
@@ -274,37 +277,49 @@
 <b class="method">ref</b> <i class="m">name</i> <i class="m">?quant?</i>
 </dt>
         <dd>This command refers to the content particle defined with
-        <i class="m">defpattern</i> with the name <i class="m">name</i> in the current context
-        namespace. Forward references to a so far not defined pattern
-        or recursive references are allowed.</dd>
+        <i class="m">defpattern</i> with the name <i class="m">name</i> in the current
+        context namespace. Forward references to a so far not defined
+        pattern or recursive references are allowed. If a forward
+        referenced pattern isn't defined until validation no content
+        whatsoever is expected ("empty match").</dd>
       
 
       
         <dt>
 <b class="method">group</b> <i class="m">?quant?</i> <i class="m">&lt;definition script&gt;</i>
 </dt>
-        <dd></dd>
+        <dd>This method allows to group a sequence of content
+        particle, defined by the <i class="m">definition script&gt;</i>, that have
+        to match in this sequence order.</dd>
       
       
       
         <dt>
 <b class="method">choice</b> <i class="m">?quant?</i> <i class="m">&lt;definition script&gt;</i>
 </dt>
-        <dd></dd>
+        <dd>This schema contraint match if one of the top level
+        content particle defined by the <i class="m">definition script&gt;</i>
+        match. If one of this top level content particle is optional
+        this constraint matches the "empty match".
+        </dd>
       
 
       
         <dt>
 <b class="method">interleave</b> <i class="m">?quant?</i> <i class="m">&lt;definition script&gt;</i>
 </dt>
-        <dd></dd>
+        <dd>This schema constraint match after every of the top level
+        content particle defined by the <i class="m">definition script&gt;</i>
+        have matched in any arbitrary order.</dd>
       
 
       
         <dt>
 <b class="method">mixed</b> <i class="m">?quant?</i> <i class="m">&lt;definition script&gt;</i>
 </dt>
-        <dd></dd>
+        <dd>This schema constraint match for any text (including the
+        empty one) and every top level content particle defined by the
+        <i class="m">definition script&gt;</i> with default quantifier *.</dd>
       
 
       
@@ -340,7 +355,7 @@
         namespace) to the enclosing element. The first definition of
         <i class="m">name</i> inside an element definition wins; later
         definitions of the same name are silently ignored. After the
-        <i class="m">name</i> argument there may be one of the qunatifieres ? or
+        <i class="m">name</i> argument there may be one of the quantifieres ? or
         !. If there is, this will be used. Otherwise the attribute
         will be required (must be present in the xml source). If there
         is one argument more this argument is evaluated as constraint
@@ -437,7 +452,7 @@
       
     </dl>
 
-  <h2><a name="SECTid0x55694288e600">Quantity specifier</a></h2><p>Serveral schema definition commands expects a quantifier as
+  <h2><a name="SECTid0x560e95380850">Quantity specifier</a></h2><p>Serveral schema definition commands expects a quantifier as
     one of their arguments, which specifies how often the content
     particle specified by the command is expected. The valid values
     for a <i class="m">quant</i> argument are:</p><dl class="optlist">
@@ -481,7 +496,7 @@
     </dl><p>If an optional quantifier is not given then it defaults to * in
     case of the mixed command and to ! for all other commands.</p>
 
-  <h2><a name="SECTid0x556942890450">Text constraint scripts</a></h2><p>Text - parsed character data, as XML calles it - must sometimes
+  <h2><a name="SECTid0x560e953826a0">Text constraint scripts</a></h2><p>Text - parsed character data, as XML calles it - must sometimes
     be of a certain kind, must comply to some rules etc to be valid.
     The text constraint script arguments to the text, attribute,
     nsattribute and deftext commands allow the following text
@@ -556,16 +571,36 @@
 </dd>
       
       
-        <dt><b class="cmd">number</b></dt>
-        <dd></dd>
+        <dt>
+<b class="cmd">number</b> <i class="m">?(xsd|tcl)?</i>
+</dt>
+        <dd>This text constraint match if the text value could be
+        parsed as a number. If the optional argument to the command is
+        <i class="m">tcl</i> everthing that returns TCL_OK if feeded into
+        Tcl_GetDouble() matches. If the optional argument to the command
+        is <i class="m">xsd</i> then the constraint match if the value is a
+        valid xsd:decimal. Without argument <i class="m">xsd</i> is the
+        default.</dd>
       
       
-        <dt><b class="cmd">boolean</b></dt>
-        <dd></dd>
+        <dt>
+<b class="cmd">boolean</b> <i class="m">?(xsd|tcl)?</i>
+</dt>
+        <dd>This text constraint match if the text value could be
+        parsed as a boolean. If the optional argument to the command is
+        <i class="m">tcl</i> everthing that returns TCL_OK if feeded into
+        Tcl_GetBoolean() matches. If the optional argument to the command
+        is <i class="m">xsd</i> then the constraint match if the value is a
+        valid xsd:boolean. Without argument <i class="m">xsd</i> is the
+        default.</dd>
       
       
         <dt><b class="cmd">isodate</b></dt>
-        <dd></dd>
+        <dd>This text constraint match if the text value is a
+        xsd:date. This is basically like an ISO 8601 date of the form
+        JJJJ-MM-DD. It follows the date rules of the gregorian
+        calendar for all dates. A preceding minus sign for bce dates
+        is allowed. There is no year 0.</dd>
       
       
         <dt>
@@ -666,7 +701,7 @@
       
     </dl>
 
-  <h2><a name="SECTid0x5569428994d0">Local key constraints</a></h2><p>Document wide uniqueness and foreign key constraints are
+  <h2><a name="SECTid0x560e9538c4b0">Local key constraints</a></h2><p>Document wide uniqueness and foreign key constraints are
     available with the text constraint commands id and idref.
     Keyspaces allow for sub-tree local uniqueness and foreign key
     constraints.</p><dl class="commandlist">
@@ -702,7 +737,7 @@
         
     </dl>
 
-  <h2><a name="SECTid0x55694289b2e0">Exampels</a></h2><p>The XML Schema Part 0: Primer Second Edition
+  <h2><a name="SECTid0x560e9538e2c0">Exampels</a></h2><p>The XML Schema Part 0: Primer Second Edition
     (<a href="https://www.w3.org/TR/xmlschema-0/">https://www.w3.org/TR/xmlschema-0/</a>) starts with this
     example schema:</p><pre class="example">
 &lt;xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;

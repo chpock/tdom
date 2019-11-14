@@ -16,8 +16,9 @@
     
     <p>This command creates validation commands with a simple API. The
     validation commands have methods to define a schema and are able
-    to validate XML or DOM trees (and to some degree other kind of
-    hierarchical data) against this schema.</p>
+    to validate XML data or to post-validate a tDOM DOM tree (and to
+    some degree other kind of hierarchical data) against this
+    schema.</p>
 
     <p>Additionally, a validation command may be used as argument to
     the <m>-validateCmd</m> option of the <m>dom parse</m> and the
@@ -235,9 +236,8 @@
     definition commands in this tcl namespace allow to define a wide
     variety of document structures. Every schema definition command
     establish a validation constraint on the content which has to
-    match or must be optional to render the content as valid. It is a
-    validation error if the element in the XML source has additional
-    (not matched) content.</p>
+    match or must be optional to qualify the content as valid. It is a
+    validation error if there is additional (not matched) content.</p>
 
     <p>The schema definition commands are:</p>
 
@@ -253,35 +253,50 @@
         "locally" defined by the <m>definition script</m>. Forward
         references to so far not defined elements or pattern or other
         local definitions of the same name inside the <m>definition
-        script</m> are allowed. </desc>
+        script</m> are allowed. If a forward referenced element isn't
+        defined until validation then only an empty element with name
+        <m>name</m> and namespace <m>namespace</m> and no attributes
+        matches. </desc>
       </commanddef>
 
       <commanddef>
         <command><method>ref</method> <m>name</m> <m>?quant?</m></command>
         <desc>This command refers to the content particle defined with
-        <m>defpattern</m> with the name <m>name</m> in the current context
-        namespace. Forward references to a so far not defined pattern
-        or recursive references are allowed.</desc>
+        <m>defpattern</m> with the name <m>name</m> in the current
+        context namespace. Forward references to a so far not defined
+        pattern or recursive references are allowed. If a forward
+        referenced pattern isn't defined until validation no content
+        whatsoever is expected ("empty match").</desc>
       </commanddef>
 
       <commanddef>
         <command><method>group</method> <m>?quant?</m> <m>&lt;definition script></m></command>
-        <desc></desc>
+        <desc>This method allows to group a sequence of content
+        particle, defined by the <m>definition script></m>, that have
+        to match in this sequence order.</desc>
       </commanddef>
       
       <commanddef>
         <command><method>choice</method> <m>?quant?</m> <m>&lt;definition script></m></command>
-        <desc></desc>
+        <desc>This schema contraint match if one of the top level
+        content particle defined by the <m>definition script></m>
+        match. If one of this top level content particle is optional
+        this constraint matches the "empty match".
+        </desc>
       </commanddef>
 
       <commanddef>
         <command><method>interleave</method> <m>?quant?</m> <m>&lt;definition script></m></command>
-        <desc></desc>
+        <desc>This schema constraint match after every of the top level
+        content particle defined by the <m>definition script></m>
+        have matched in any arbitrary order.</desc>
       </commanddef>
 
       <commanddef>
         <command><method>mixed</method> <m>?quant?</m> <m>&lt;definition script></m></command>
-        <desc></desc>
+        <desc>This schema constraint match for any text (including the
+        empty one) and every top level content particle defined by the
+        <m>definition script></m> with default quantifier *.</desc>
       </commanddef>
 
       <commanddef>
@@ -311,7 +326,7 @@
         namespace) to the enclosing element. The first definition of
         <m>name</m> inside an element definition wins; later
         definitions of the same name are silently ignored. After the
-        <m>name</m> argument there may be one of the qunatifieres ? or
+        <m>name</m> argument there may be one of the quantifieres ? or
         !. If there is, this will be used. Otherwise the attribute
         will be required (must be present in the xml source). If there
         is one argument more this argument is evaluated as constraint
@@ -514,16 +529,32 @@
         <url>https://www.w3.org/TR/xml/#NT-Nmtokens</url></desc>
       </commanddef>
       <commanddef>
-        <command><cmd>number</cmd></command>
-        <desc></desc>
+        <command><cmd>number</cmd> <m>?(xsd|tcl)?</m></command>
+        <desc>This text constraint match if the text value could be
+        parsed as a number. If the optional argument to the command is
+        <m>tcl</m> everthing that returns TCL_OK if feeded into
+        Tcl_GetDouble() matches. If the optional argument to the command
+        is <m>xsd</m> then the constraint match if the value is a
+        valid xsd:decimal. Without argument <m>xsd</m> is the
+        default.</desc>
       </commanddef>
       <commanddef>
-        <command><cmd>boolean</cmd></command>
-        <desc></desc>
+        <command><cmd>boolean</cmd> <m>?(xsd|tcl)?</m></command>
+        <desc>This text constraint match if the text value could be
+        parsed as a boolean. If the optional argument to the command is
+        <m>tcl</m> everthing that returns TCL_OK if feeded into
+        Tcl_GetBoolean() matches. If the optional argument to the command
+        is <m>xsd</m> then the constraint match if the value is a
+        valid xsd:boolean. Without argument <m>xsd</m> is the
+        default.</desc>
       </commanddef>
       <commanddef>
         <command><cmd>isodate</cmd></command>
-        <desc></desc>
+        <desc>This text constraint match if the text value is a
+        xsd:date. This is basically like an ISO 8601 date of the form
+        JJJJ-MM-DD. It follows the date rules of the gregorian
+        calendar for all dates. A preceding minus sign for bce dates
+        is allowed. There is no year 0.</desc>
       </commanddef>
       <commanddef>
         <command><cmd>maxLength</cmd> <m>length</m></command>
