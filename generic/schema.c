@@ -5578,7 +5578,7 @@ isodateImpl (
     char *text
     )
 {
-    int i, y, m, d, seenNonzero = 0;
+    int i, y, m, d, h, min, seenNonzero = 0, timezone = 0;
 
     if (*text == '-') {
         /* A bce date */
@@ -5609,7 +5609,7 @@ isodateImpl (
         if (*text < '0' || *text > '9') return 0;
         text++;
     }
-    if (*text != '\0') return 0;
+    if (*text != '\0') timezone = 1;
     d = atoi(text-2);
     if (d < 1) return 0;
     switch (m) {
@@ -5635,6 +5635,38 @@ isodateImpl (
             if (d > 28) return 0;
         }
         break;
+    }
+    if (!timezone) return 1;
+    switch (*text) {
+    case 'Z':
+        text++;
+        if (*text != '\0') return 0;
+        break;
+    case '+':
+    case '-':
+        text++;
+        for (i = 0; i < 2; i++) {
+            if (*text < '0' || *text > '9') return 0;
+            text++;
+        }
+        if (*text != ':') return 0;
+        h = atoi(text-2);
+        if (h > 14) return 0;
+        text++;
+        for (i = 0; i < 2; i++) {
+            if (*text < '0' || *text > '9') return 0;
+            text++;
+        }
+        if (*text != '\0') return 0;
+        min = atoi(text-2);
+        if (h < 14) {
+            if (min > 59) return 0;
+        } else {
+            if (min != 0) return 0;
+        }
+        break;
+    default:
+        return 0;
     }
     return 1;
 }
