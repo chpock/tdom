@@ -867,9 +867,11 @@ schema define {
     # Purchase order schema for Example.com.
     # Copyright 2000 Example.com. All rights reserved.
 
-    element purchaseOrder {ref PurchaseOrderType}
+    defelement purchaseOrder {ref PurchaseOrderType}
 
-    element comment {text}
+    foreach elm {comment name street city state product} {
+        defelement $elm text
+    }
 
     defpattern PurchaseOrderType {
         element shipTo ! {ref USAddress}
@@ -880,22 +882,22 @@ schema define {
     }
 
     defpattern USAddress {
-        element name ! {text}
-        element street ! {text}
-        element city ! {text}
-        element state ! {text}
-        element zip ! {text isNumber}
+        element name
+        element street
+        element city
+        element state
+        element zip ! {text number}
         attribute country ! {fixed "US"}
     }
 
     defelement items {
         element item * {
-            element product ! {text}
-            element quantity ! {text {maxExcluse 100}}
-            element USPrice ! {text integer}
+            element product
+            element quantity ! {text integer}
+            element USPrice ! {text number}
             element comment
             element shipDate ? {text isodate}
-            attribute partNum ! {pattern "\ed{3}-[A-Z]{2}"}
+            attribute partNum ! {pattern "^\ed{3}-[A-Z]{2}$"}
         }
     }
 }
@@ -908,7 +910,7 @@ schema define {
 .UE
 The RELAX NG Tutorial
 () starts with
-described at     this example:
+this example:
 .CS
 
 Consider a simple XML representation of an email address book:
