@@ -225,7 +225,10 @@ command raises error.
 \&\fB\fBdeftext\fP \fIname\fB \fI<constraint script>\fB
 \&\fRThis method defines a bundle of text constraints, that
 can be referred by \fIname\fR while defining constrains on
-text element or attribute values.
+text element or attribute values. If there is already a text
+type definition with this name, the command raises error. A
+text type must be defined before it can be used in schema
+definition scripts.
 .TP
 \&\fB\fBstart\fP \fIdocumentElement\fB \fI?namespace?\fB
 \&\fRThis method defines the name and namespace of the root
@@ -331,6 +334,82 @@ is currently validated) and the empty string
 otherwhise. It is recommended that you don't use
 this method. Or at least leaf the DOM tree alone,
 use it read-only.
+.IP "\fBnrForwardDefinitions\fR"
+Returns the at least used once referenced
+element and ref particles that aren't defined so far
+(summed together).
+.IP "\fBdefinedElements\fR"
+Returns in no particular order the defined
+elements in the grammer as list. If an element is
+namespaced its list entry will be itself a list with
+two elements, with the name as first and the
+namespace as second element.
+.IP "\fBexpected\fR"
+Returns in no
+particular order all posible next events (since the
+last successful event match, if there was one) as a
+list. If an element is namespaced its list entry
+will be itself a list with two elements, with the
+name as first and the namespace as second element.
+If text is a possible next event the list entry will
+be a two elements list, with #text as first element
+and the empty space as second. If an any element
+constraint is possible the list entry will be a two
+elements list, with <any> as first element and
+the empty space as second. If an any element in a
+certain namespace constraint is possible the list
+entry will be a two elements list, with <any> as
+first element and the namespace as second. If
+element end is a possible event the list entry will
+be a two elements list with <elementend> and the
+empty string as second element.
+.IP "\fBdefinition name ?namespace?\fR"
+Returns the code that defines the given
+element. The command raises error if there isn' a
+definition of that element.
+.IP "\fBvaction ?name|namespace|text?\fR"
+If the schema command is currently processing
+a validation event this method returns information
+about what the command is doing. If the command is
+called without the optional argument the possible
+return values and their meanings are:
+.RS
+.TP
+NONE
+.TP
+MATCH_ELEMENT_START
+.TP
+MATCH_ELEMENT_END
+.TP
+MATCH_TEXT
+.TP
+MATCH_ATTRIBUTE_TEXT
+.TP
+MATCH_GLOBAL
+.TP
+MATCH_DOM_KEYCONSTRAINT
+If called with one of the possible optional
+arguments the command returns detail information
+depending on current action.
+.TP
+name
+Return the name of the element
+that has to match in case of
+MATCH_ELEMENT_START. Return the name of the
+closed element in case of MATCH_ELEMENT_END.
+Return the name of the parent element in case of
+MATCH_TEXT.
+.TP
+namespace
+Return the namespace of
+the element that has to match in case of
+MATCH_ELEMENT_START. Return the namespace of the
+closed element in case of MATCH_ELEMENT_END.
+Return the namespace of the parent element in
+case of MATCH_TEXT.
+.TP
+text
+.RE
 .RE
 .TP
 \&\fB\fBreset\fP

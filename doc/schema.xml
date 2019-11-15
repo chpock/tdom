@@ -77,7 +77,10 @@
         <command><method>deftext</method> <m>name</m> <m>&lt;constraint script></m></command>
         <desc>This method defines a bundle of text constraints, that
         can be referred by <m>name</m> while defining constrains on
-        text element or attribute values.</desc>
+        text element or attribute values. If there is already a text
+        type definition with this name, the command raises error. A
+        text type must be defined before it can be used in schema
+        definition scripts.</desc>
       </commanddef>
       
       <commanddef>
@@ -214,6 +217,83 @@
                   otherwhise. It is recommended that you don't use
                   this method. Or at least leaf the DOM tree alone,
                   use it read-only.</desc>
+              </optdef>
+              <optdef>
+                  <optname>nrForwardDefinitions</optname>
+                  <desc>Returns the at least used once referenced
+                  element and ref particles that aren't defined so far
+                  (summed together).</desc>
+              </optdef>
+              <optdef>
+                  <optname>definedElements</optname>
+                  <desc>Returns in no particular order the defined
+                  elements in the grammer as list. If an element is
+                  namespaced its list entry will be itself a list with
+                  two elements, with the name as first and the
+                  namespace as second element.</desc>
+              </optdef>
+              <optdef>
+                  <optname>expected</optname> <desc>Returns in no
+                  particular order all posible next events (since the
+                  last successful event match, if there was one) as a
+                  list. If an element is namespaced its list entry
+                  will be itself a list with two elements, with the
+                  name as first and the namespace as second element.
+                  If text is a possible next event the list entry will
+                  be a two elements list, with #text as first element
+                  and the empty space as second. If an any element
+                  constraint is possible the list entry will be a two
+                  elements list, with &lt;any> as first element and
+                  the empty space as second. If an any element in a
+                  certain namespace constraint is possible the list
+                  entry will be a two elements list, with &lt;any> as
+                  first element and the namespace as second. If
+                  element end is a possible event the list entry will
+                  be a two elements list with &lt;elementend> and the
+                  empty string as second element.</desc>
+              </optdef>
+              <optdef>
+                  <optname>definition name ?namespace?</optname>
+                  <desc>Returns the code that defines the given
+                  element. The command raises error if there isn' a
+                  definition of that element.
+                  </desc>
+              </optdef>
+              <optdef>
+                  <optname>vaction ?name|namespace|text?</optname>
+                  <desc>If the schema command is currently processing
+                  a validation event this method returns information
+                  about what the command is doing. If the command is
+                  called without the optional argument the possible
+                  return values and their meanings are:
+                  <dl>
+                      <dt>NONE</dt><dd></dd>
+                      <dt>MATCH_ELEMENT_START</dt><dd></dd>
+                      <dt>MATCH_ELEMENT_END</dt><dd></dd>
+                      <dt>MATCH_TEXT</dt><dd></dd>
+                      <dt>MATCH_ATTRIBUTE_TEXT</dt><dd></dd>
+                      <dt>MATCH_GLOBAL</dt><dd></dd>
+                      <dt>MATCH_DOM_KEYCONSTRAINT</dt><dd></dd>
+                  </dl>
+                  If called with one of the possible optional
+                  arguments the command returns detail information
+                  depending on current action.
+                  <dl>
+                      <dt>name</dt><dd>Return the name of the element
+                      that has to match in case of
+                      MATCH_ELEMENT_START. Return the name of the
+                      closed element in case of MATCH_ELEMENT_END.
+                      Return the name of the parent element in case of
+                      MATCH_TEXT.</dd>
+                      <dt>namespace</dt><dd>Return the namespace of
+                      the element that has to match in case of
+                      MATCH_ELEMENT_START. Return the namespace of the
+                      closed element in case of MATCH_ELEMENT_END.
+                      Return the namespace of the parent element in
+                      case of MATCH_TEXT.</dd>
+                      <dt>text</dt><dd></dd>
+                  </dl>
+                  </desc>
               </optdef>
           </optlist>
           </desc>

@@ -1032,7 +1032,7 @@ recover (
         break;
     case UNKOWN_GLOBAL_ID:
     case UNKOWN_ID:
-        sdata->vaction = MATCH_TEXT;
+        sdata->vaction = MATCH_GLOBAL;
         break;
     case INVALID_ATTRIBUTE_VALUE:
         sdata->vaction = MATCH_ATTRIBUTE_TEXT;
@@ -3546,7 +3546,7 @@ schemaInstanceInfoCmd (
         }
         h = Tcl_FindHashEntry (&sdata->element, Tcl_GetString (objv[2]));
         if (!h) {
-            SetResult ("Unknown element");
+            SetResult ("Unknown element definition");
             return TCL_ERROR;
         }
         cp = Tcl_GetHashValue (h);
@@ -3557,15 +3557,13 @@ schemaInstanceInfoCmd (
         while (cp && cp->namespace != ns) {
             cp = cp->next;
         }
-        if (!cp) {
-            SetResult ("Unknown element");
+        if (!cp
+            || cp->flags & LOCAL_DEFINED_ELEMENT
+            || cp->flags & PLACEHOLDER_PATTERN_DEF) {
+            SetResult ("Unknown element definition");
             return TCL_ERROR;
         }
-        if (cp->flags & LOCAL_DEFINED_ELEMENT) {
-            Tcl_AppendElement (interp, "element");
-        } else {
-            Tcl_AppendElement (interp, "defelement");
-        }
+        Tcl_AppendElement (interp, "defelement");
         Tcl_AppendElement (interp, cp->name);
         if (cp->namespace) {
             Tcl_AppendElement (interp, cp->namespace);
@@ -3577,6 +3575,11 @@ schemaInstanceInfoCmd (
 
     case m_vaction:
     case m_validationaction:
+        if (sdata->validationState != VALIDATION_STARTED
+            || sdata->currentEvals == 0) {
+            SetResult ("NONE");
+            break;
+        }
         if (objc == 2) {
             SetResult (ValidationAction2str[sdata->vaction]);
             break;
