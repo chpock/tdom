@@ -968,6 +968,15 @@ recover (
     SchemaValidationStack *se;
 
     if (!sdata->reportCmd || sdata->evalError) return 0;
+    /* If non SCHEMA_CTYPE_NAME and the pattern hasn't already matched
+     * that's a pattern pushed on stack to look for (probe) if it
+     * matches (or allows empty match). Even if the pattern fail it
+     * may be optional; recovering is done at the caller level in case
+     * the pattern isn't optional. */
+    if (sdata->stack
+        && sdata->stack->pattern->type != SCHEMA_CTYPE_NAME
+        && sdata->stack->activeChild == 0
+        && sdata->stack->hasMatched == 0) return 0;
     cmdPtr = Tcl_DuplicateObj (sdata->reportCmd);
     Tcl_IncrRefCount(cmdPtr);
     Tcl_ListObjAppendElement (interp, cmdPtr,
@@ -2009,7 +2018,11 @@ static int checkElementEnd (
                 rc = checkElementEnd (interp, sdata);
                 popStack (sdata);
                 if (rc) break;
-                return 0;
+                if (!recover (interp, sdata, MISSING_ELEMENT_MATCH_END, NULL,
+                              NULL, NULL, 0)) {
+                    return 0;
+                }
+                break;
                 
             case SCHEMA_CTYPE_ANY:
             case SCHEMA_CTYPE_NAME:
@@ -2032,7 +2045,6 @@ static int checkElementEnd (
     case SCHEMA_CTYPE_ANY:
         /* Never pushed onto stack */
         Tcl_Panic ("Invalid CTYPE onto the validation stack!");
-        return 0;
 
     case SCHEMA_CTYPE_INTERLEAVE:
         for (i = 0; i < cp->nc; i++) {
@@ -2046,6 +2058,7 @@ static int checkElementEnd (
         }
         return -1;
     }
+    /* Not reached */
     return 0;
 }
 
@@ -2121,10 +2134,11 @@ probeElementEnd (
 {
     int rc;
     
-    DBG(
+    DBG(if (sdata->stack) {
         fprintf (stderr, "probeElementEnd: look if current stack top can end "
                  " name: '%s' deep: %d\n",
                  sdata->stack->pattern->name, getDeep (sdata->stack));
+        } else {fprintf (stderr, "stack is NULL\n");}
         );
 
     if (sdata->skipDeep) {
@@ -2148,7 +2162,6 @@ probeElementEnd (
         popStack (sdata);
         rc = checkElementEnd (interp, sdata);
     }
-
     if (rc) {
         popStack (sdata);
         if (sdata->stack == NULL) {

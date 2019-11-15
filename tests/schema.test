@@ -6008,6 +6008,44 @@ test schema-18.12 {non existing reportcmd cmd} {
     set result
 } {1 {error "invalid command name "::tdom::_dontExists_"" at line 1 character 6}}
 
+proc 18-13 {scmd errType} {
+    global result
+    lappend result {reportcmd called}
+}
+
+test schema-18.13 {reportcmd} {
+    tdom::schema s
+    s define {
+        defelement header {
+            group {
+                choice {
+                    group  {
+                        element prevlocs 
+                        element latestloc ?
+                    }
+                    group  {
+                        element latestloc 
+                        element prevlocs ?
+                    }
+                }
+            }
+        }
+    }
+    s reportcmd 18-13
+    set result [list]
+    foreach xml {
+        <header/>
+        <header><prevlocs/></header>
+        <header><latestloc/></header>
+        <header><prevlocs/><latestloc/></header>
+        <header><latestloc/><prevlocs/></header>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {{reportcmd called} 1 1 1 1 1}
+
 proc validatedSAX {g xml {keepEmpties 1}} {
     set args [list -validateCmd $g]
     if {!$keepEmpties} {
