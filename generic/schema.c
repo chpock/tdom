@@ -3396,12 +3396,12 @@ schemaInstanceInfoCmd (
     static const char *schemaInstanceInfoMethods[] = {
         "validationstate", "vstate", "definedElements", "stack", "toplevel",
         "expected", "definition", "validationaction", "vaction", "line",
-        "column", "domNode", NULL
+        "column", "domNode", "nrForwardDefinitions", NULL
     };
     enum schemaInstanceInfoMethod {
         m_validationstate, m_vstate, m_definedElements, m_stack, m_toplevel,
         m_expected, m_definition, m_validationaction, m_vaction, m_line,
-        m_column, m_domNode
+        m_column, m_domNode, m_nrForwardDefinitions
     };
 
     static const char *schemaInstanceInfoStackMethods[] = {
@@ -3627,6 +3627,15 @@ schemaInstanceInfoCmd (
     case m_domNode:
         if (!sdata->node) break;
         return tcldom_setInterpAndReturnVar (interp, sdata->node, 0, NULL);
+
+    case m_nrForwardDefinitions:
+        if (objc != 2) {
+            Tcl_WrongNumArgs(interp, 2, objv, "");
+            return TCL_ERROR;
+        }
+        SetIntResult(sdata->forwardPatternDefs);
+        break;
+
     }
     return TCL_OK;
 }
@@ -3666,15 +3675,14 @@ schemaInstanceCmd (
     Tcl_Obj       *attData;
 
     static const char *schemaInstanceMethods[] = {
-        "defelement",  "defpattern",  "start", "event",     "delete",
-        "nrForwardDefinitions",       "reset", "define",    "validate",
-        "domvalidate", "deftext",     "info",  "reportcmd", "prefixns",
-        NULL
+        "defelement", "defpattern", "start",    "event",       "delete",
+        "reset",      "define",     "validate", "domvalidate", "deftext",
+        "info",       "reportcmd",  "prefixns",  NULL
     };
     enum schemaInstanceMethod {
-        m_defelement,  m_defpattern, m_start, m_event,     m_delete,
-        m_nrForwardDefinitions,      m_reset, m_define,    m_validate,
-        m_domvalidate, m_deftext,    m_info,  m_reportcmd, m_prefixns
+        m_defelement, m_defpattern, m_start,    m_event,       m_delete,
+        m_reset,      m_define,     m_validate, m_domvalidate, m_deftext,
+        m_info,       m_reportcmd,  m_prefixns
     };
 
     static const char *eventKeywords[] = {
@@ -3973,14 +3981,6 @@ schemaInstanceCmd (
         /* We return immediately here to avoid clashes with postponed
            sdata cleanup at the end of the function. */
         return TCL_OK;
-
-    case m_nrForwardDefinitions:
-        if (objc != 2) {
-            Tcl_WrongNumArgs(interp, 2, objv, "");
-            return TCL_ERROR;
-        }
-        SetIntResult(sdata->forwardPatternDefs);
-        break;
 
     case m_reset:
         CHECK_EVAL

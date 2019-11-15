@@ -404,17 +404,17 @@ test schema-1.22 {nrForwardDefinitions} {
     set result [list]
     s define {
         defelement e {
-            lappend ::result [s nrForwardDefinitions]
+            lappend ::result [s info nrForwardDefinitions]
             element e1
-            lappend ::result [s nrForwardDefinitions]
+            lappend ::result [s info nrForwardDefinitions]
             element e1
-            lappend ::result [s nrForwardDefinitions]
+            lappend ::result [s info nrForwardDefinitions]
             element e2
-            lappend ::result [s nrForwardDefinitions]
+            lappend ::result [s info nrForwardDefinitions]
         }
         foreach e {e1 e2} {
             defelement $e {text}
-            lappend ::result [s nrForwardDefinitions]
+            lappend ::result [s info nrForwardDefinitions]
         }
     }
     s delete
@@ -632,12 +632,12 @@ test schema-2.1 {grammar definition: ref} {
 
 test schema-2.2 {grammar definition: ref} {
     tdom::schema create grammar
-    set result [grammar nrForwardDefinitions]
+    set result [grammar info nrForwardDefinitions]
     grammar defelement doc {
         ref thisPattern
         ref thatPattern ?
     }
-    lappend result [grammar nrForwardDefinitions]
+    lappend result [grammar info nrForwardDefinitions]
     grammar delete
     set result
 } {0 2}
@@ -687,7 +687,7 @@ test schema-2.3a {forward defined ref} {
         element a
     }
     set result [s validate <doc><a/></doc>]
-    lappend result [s nrForwardDefinitions]
+    lappend result [s info nrForwardDefinitions]
     s delete
     set result
 } {1 2}
