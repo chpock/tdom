@@ -211,11 +211,11 @@
               <optdef>
                   <optname>domNode</optname>
                   <desc>If the schema command is currently
-                  post-validating a DOM tree ist command returns the
+                  post-validating a DOM tree this command returns the
                   current parent node command (the node, whose content
                   is currently validated) and the empty string
                   otherwhise. It is recommended that you don't use
-                  this method. Or at least leaf the DOM tree alone,
+                  this method. Or at least leave the DOM tree alone,
                   use it read-only.</desc>
               </optdef>
               <optdef>
