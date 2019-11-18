@@ -2970,8 +2970,7 @@ test schema-11.7 {attribute} {
     foreach def $defs {
         puts $def
         tdom::schema create s
-        lappend result [catch {s define $def} errMsg]
-        puts $errMsg
+        lappend result [catch {s define $def}]
         s delete
     }
     set result

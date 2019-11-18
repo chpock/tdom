@@ -29,7 +29,7 @@
 #include <schema.h>
 
 /* #define DEBUG */
-#define DDEBUG
+/* #define DDEBUG */
 /*----------------------------------------------------------------------------
 |   Debug Macros
 |
@@ -4593,7 +4593,6 @@ AttributePatternObjCmd (
     CHECK_SI
     CHECK_TOPLEVEL
 
-        serializeCP (sdata->cp);
     if (sdata->cp->type != SCHEMA_CTYPE_NAME) {
         SetResult ("The commands attribute and nsattribute are only allowed toplevel in element definition scripts");
         return TCL_ERROR;
