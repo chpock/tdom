@@ -2959,6 +2959,24 @@ test schema-11.6 {nsattribute} {
     set result
 } {1 {Missing mandatory attribute(s): http://www.w3.org/XML/1998/namespace:lang, referenced at line 1 character 19} 1 {Missing mandatory attribute(s): foo, referenced at line 1 character 23} 1 {Unknown attribute "unknown", referenced at line 1 character 24} 1 {Missing mandatory attribute(s): foo http://www.w3.org/XML/1998/namespace:lang, referenced at line 1 character 9}}
 
+test schema-11.7 {attribute} {
+    set defs {
+        {defelement doc {attribute foo}}
+        {defelement doc {group {attribute foo}}}
+        {defpattern some {attribute foo}}
+        {defelement doc {element {attribute foo}}}
+    }
+    set result [list]
+    foreach def $defs {
+        puts $def
+        tdom::schema create s
+        lappend result [catch {s define $def} errMsg]
+        puts $errMsg
+        s delete
+    }
+    set result
+} {0 1 1 0}
+
 test schema-12.1 {domvalidate} {
     tdom::schema s 
     s define {

@@ -413,7 +413,8 @@
         script, defining the value constrains of the attribute.
         Otherwise, if there are two more arguments and the first of
         them is the bareword "type" then the following is used as a
-        text type name.</desc>
+        text type name. This command is only allowed at top level in
+        the definition script of an defelement/element script.</desc>
       </commanddef>
 
       <commanddef>
