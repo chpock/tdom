@@ -799,10 +799,12 @@ TclExpatInstanceCmd (
                            "callback", TCL_STATIC);
             result = TCL_ERROR;
         } else {
+#ifndef TDOM_NO_SCHEMA
             if (expat->sdata) {
                 expat->sdata->inuse--;
                 tDOM_schemaReset (expat->sdata, 1);
             }
+#endif
             Tcl_DeleteCommand(interp, Tcl_GetString(expat->name));
             result = TCL_OK;
         }

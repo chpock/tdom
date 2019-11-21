@@ -1,5 +1,5 @@
-C Removed\sslipped\sthrou\sdebuging\sinstrumentalization.
-D 2019-11-18T22:42:11.398
+C Fixed\s-DTDOM_NO_SCHEMA=1\sbuild.
+D 2019-11-21T00:57:03.006
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -138,8 +138,8 @@ F generic/schema.c 3965d9f63a381e8904be25c5587c94a12dac44e0aba43ec6aca57ce248f31
 F generic/schema.h 68817ccd51f885eae068ca616732841e3cb4ff62946ab50c1ebdc3498a609a20
 F generic/tcldom.c a0fd03fe41f92cc5a5130064c56fa64931770230fbee8b8a7fad795fd7a29658
 F generic/tcldom.h 4750be773b4e394f7cdf39c3bc88ab5037a276b427063969c86e8e7445d03732
-F generic/tclexpat.c 2a05033f062db77634b2e2d6df7b8e30a26dd447e174ea26dd8dbef067defdff
-F generic/tclexpat.h 5623856ef30bf3d32b78b1c016ee535cfd9c320aa7f83e4fee4e357a742a74fd
+F generic/tclexpat.c 3a079d4982a60c9677e03ff9c796d42d1ec249292763521690decb96720d305a
+F generic/tclexpat.h 17696c275b5ac909733886bbf72490d2f4d84be7ab2f0c8bf9a7545df2283bda
 F generic/tclpull.c 9a1d16cd22c1601ba120d86a0ed739c9bade96a8dfea237678db54e64f7de93f
 F generic/tclpull.h 8e1aac98bdad497c669c901494939eecd6c2f57ea51c4f5d4dac502db48527d4
 F generic/tdom.decls 26593c07732dca37caa7a4b56226f2b2700590a30a61af4cb7757cfa3e28c89e
@@ -230,8 +230,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P b3b2ce77f0192b61815edfe0a0da0b9b9528d1e398b89f539859af76e4517486
-R 681d547029143da297d1032c2d0b9a67
+P 22b17ef648f1daac5ec76767d9ab0c84c51cf8c89465f720fcc0d9350f0a22d6
+R 4b4dd899f1b1e9abf9859c496ab325b3
 U rolf
-Z 937b729ec8906df9b21d9e2a44123ca3
+Z d0317a462edf98d378a0b5e68219dbc9
 # Remove this line to create a well-formed Fossil manifest.
