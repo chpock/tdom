@@ -194,7 +194,7 @@
                   this method returns the line part of the parsing
                   position information and the empty string in all
                   other cases. If the schema command is currently
-                  post-validating a DOM tree there may be not position
+                  post-validating a DOM tree there may be no position
                   information stored at certain or all nodes. The
                   empty string is returned in this cases.</desc>
               </optdef>
@@ -204,7 +204,7 @@
                   this method returns the column part of the parsing
                   position information and the empty string in all
                   other cases. If the schema command is currently
-                  post-validating a DOM tree there may be not position
+                  post-validating a DOM tree there may be no position
                   information stored at certain or all nodes. The
                   empty string is returned in this cases.</desc>
               </optdef>
