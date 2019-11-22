@@ -1083,6 +1083,34 @@ test schema-5.4 {define} {
     grammar delete
 } {}
 
+test schema-5.5 {validate tmml doc files} {
+    tdom::schema s
+    set docdir [file join [file dir [info script]] ../doc]
+    set file [file join $docdir tmml.schema]
+    set fd [open $file]
+    set tmmlschema [read $fd]
+    close $fd
+    s define $tmmlschema
+    set result {}
+    foreach tmmlfile {
+        domDoc.xml
+        domNode.xml
+        dom.xml
+        expatapi.xml
+        expat.xml
+        pullparser.xml
+        schema.xml
+        tdomcmd.xml
+    } {
+        set file [file join $docdir $tmmlfile]
+        set fd [open $file]
+        set tmmldoc [read $fd]
+        close $fd
+        lappend result [s validate $tmmldoc]
+    }
+    s delete
+    set result
+} {1 1 1 1 1 1 1 1}
 
 test schema-6.1 {expat parser with -validateCmd} {
     tdom::schema create grammar
@@ -2968,7 +2996,6 @@ test schema-11.7 {attribute} {
     }
     set result [list]
     foreach def $defs {
-        puts $def
         tdom::schema create s
         lappend result [catch {s define $def}]
         s delete
