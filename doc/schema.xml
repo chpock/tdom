@@ -610,6 +610,33 @@
         <url>https://www.w3.org/TR/xml/#NT-Nmtokens</url></desc>
       </commanddef>
       <commanddef>
+        <command><cmd>name</cmd></command>
+        <desc>This text constraint match if the text value match the
+        XML name production
+        <url>https://www.w3.org/TR/xml/#NT-Name</url>. This means the
+        text value must start with a letter, underscore (_), or colon (:),
+        and may contain only letters, digits, underscores (_), colons
+        (:), hyphens (-), and periods (.).</desc>
+      </commanddef>
+      <commanddef>
+        <command><cmd>ncname</cmd></command>
+        <desc>This text constraint match if the text value match the
+        XML ncname production
+        <url>https://www.w3.org/TR/xml-names/#NT-NCName</url>. This
+        means the text value must start with a letter or underscore (_),
+        and may contain only letters, digits, underscores (_), hyphens
+        (-), and periods (.) (The only difference to the name
+        constraint is that colons are not permitted.)</desc>
+      </commanddef>
+      <commanddef>
+        <command><cmd>qname</cmd></command>
+        <desc>This text constraint match if the text value match the
+        XML qname production
+        <url>https://www.w3.org/TR/xml-names/#NT-QName</url>. This
+        means the text value is either a ncname or two ncnames joined
+        by a colon (:).</desc>
+      </commanddef>
+      <commanddef>
         <command><cmd>number</cmd> <m>?(xsd|tcl)?</m></command>
         <desc>This text constraint match if the text value could be
         parsed as a number. If the optional argument to the command is

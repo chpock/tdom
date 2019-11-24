@@ -6455,6 +6455,93 @@ base64TCObjCmd (
     return TCL_OK;
 }
 
+static int
+nameImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    return domIsNAME (text);
+}
+
+static int
+nameTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+
+    CHECK_TI
+    CHECK_TOPLEVEL
+    checkNrArgs (1,1,"No arguments expected");
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = nameImpl;
+    return TCL_OK;
+}
+
+static int
+ncnameImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    return domIsNCNAME (text);
+}
+
+static int
+ncnameTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+
+    CHECK_TI
+    CHECK_TOPLEVEL
+    checkNrArgs (1,1,"No arguments expected");
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = ncnameImpl;
+    return TCL_OK;
+}
+
+static int
+qnameImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    return domIsQNAME (text);
+}
+
+static int
+qnameTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+
+    CHECK_TI
+    CHECK_TOPLEVEL
+    checkNrArgs (1,1,"No arguments expected");
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = qnameImpl;
+    return TCL_OK;
+}
+
 void
 tDOM_SchemaInit (
     Tcl_Interp *interp
@@ -6566,6 +6653,12 @@ tDOM_SchemaInit (
                           keyTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::keyref",
                           keyrefTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::name",
+                          nameTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::ncname",
+                          ncnameTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::qname",
+                          qnameTCObjCmd, NULL, NULL);
 }
 
 
