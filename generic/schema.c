@@ -27,6 +27,7 @@
 #include <tcldom.h>
 #include <domxpath.h>
 #include <schema.h>
+#include <stdint.h>
 
 /* #define DEBUG */
 /* #define DDEBUG */
@@ -4935,10 +4936,48 @@ integerImplXsd (
 {
     char *c = text;
     if (*c == 0) return 0;
-    if (*c == '-' || *c == '+') {
+    switch ((intptr_t)constraintData) {
+    case 0:
+        /* integer */
+        if (*c == '-' || *c == '+') c++;
+        break;
+    case 1:
+        /* negativeInteger */
+        if (*c != '-') return 0;
         c++;
-        if (*c == 0) return 0;
+        while (*c == '0') c++;
+        break;
+    case 2:
+        /* nonNegativeInteger */
+        if (*c == '+') c++;
+        else if (*c == '-') {
+            c++;
+            if (*c == '0') {
+                c++;
+                while (*c == '0') c++;
+                if (*c == 0) return 1;
+            }
+            return 0;
+        }
+        break;
+    case 3:
+        /* nonPositiveInteger */
+        if (*c == '-') c++;
+        else {
+            if (*c == '+') c++;
+            if (*c == 0) return 0;
+            while (*c == '0') c++;
+            if (*c == 0) return 1;
+            return 0;
+        }
+        break;
+    case 4:
+        /* positiveInteger */
+        if (*c == '+') c++;
+        while (*c == '0') c++;
+        break;
     }
+    if (*c == 0) return 0;
     while (isdigit(*c)) {
         c++;
     }
@@ -4958,6 +4997,28 @@ integerImplTcl (
     if (Tcl_GetInt (interp, text, &n) != TCL_OK) {
         return 0;
     }
+    switch ((intptr_t)constraintData) {
+    case 0:
+        /* integer */
+        break;
+    case 1:
+        /* negativeInteger */
+        if (n >= 0) return 0;
+        break;
+    case 2:
+        /* nonNegativeInteger */
+        if (n < 0) return 0;
+        break;
+    case 3:
+        /* nonPositiveInteger */
+        if (n > 0) return 0;
+        break;
+    case 4:
+        /* positiveInteger */
+        if (n <= 0) return 0;
+        break;
+    }
+    
     return 1;
 }
 
@@ -5000,6 +5061,7 @@ integerTCObjCmd (
         sc->constraint = integerImplTcl;
         break;
     }
+    sc->constraintData = clientData;
     return TCL_OK;
 }
 
@@ -6610,7 +6672,15 @@ tDOM_SchemaInit (
     
     /* The text constraint commands */
     Tcl_CreateObjCommand (interp,"tdom::schema::text::integer",
-                          integerTCObjCmd, NULL, NULL);
+                          integerTCObjCmd, (ClientData) 0, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::negativeInteger",
+                          integerTCObjCmd, (ClientData) 1, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::nonNegativeInteger",
+                          integerTCObjCmd, (ClientData) 2, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::nonPositiveInteger",
+                          integerTCObjCmd, (ClientData) 3, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::positiveInteger",
+                          integerTCObjCmd, (ClientData) 4, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::text::tcl",
                           tclTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::text::fixed",

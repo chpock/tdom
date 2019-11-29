@@ -566,6 +566,34 @@
       </commanddef>
 
       <commanddef>
+        <command><cmd>negativeInteger</cmd> <m>?(xsd|tcl)?</m></command>
+        <desc>This text constraint match the same text values as the
+        <m>integer</m> text constraint (see there) with the additional
+        constraint that the value must be &lt; zero.</desc>
+      </commanddef>
+      
+      <commanddef>
+        <command><cmd>nonNegativeInteger</cmd> <m>?(xsd|tcl)?</m></command>
+        <desc>This text constraint match the same text values as the
+        <m>integer</m> text constraint (see there) with the additional
+        constraint that the value must be &gt;= zero.</desc>
+      </commanddef>
+
+      <commanddef>
+        <command><cmd>nonPositiveInteger</cmd> <m>?(xsd|tcl)?</m></command>
+        <desc>This text constraint match the same text values as the
+        <m>integer</m> text constraint (see there) with the additional
+        constraint that the value must be &lt;= zero.</desc>
+      </commanddef>
+
+      <commanddef>
+        <command><cmd>positiveInteger</cmd> <m>?(xsd|tcl)?</m></command>
+        <desc>This text constraint match the same text values as the
+        <m>integer</m> text constraint (see there) with the additional
+        constraint that the value must be &gt; zero.</desc>
+      </commanddef>
+      
+      <commanddef>
         <command><cmd>fixed</cmd> <m>value</m></command>
         <desc>The text constraint only match if the text value is
         string equal to the given value.</desc>

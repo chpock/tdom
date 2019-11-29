@@ -4525,6 +4525,264 @@ test schema-14.31 {text: boolean (tcl)} {
     set result
 } {0 0 0 1 0 1 0 1 1 1 0 1 0 0 1 1 1 0 1 1}
 
+test schema-14.32 {text: negativeInteger} {
+    tdom::schema s
+    s defelement doc {
+        text negativeInteger
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc>5782</doc>
+        <doc>3</doc>
+        <doc>+2</doc>
+        <doc>+002</doc>
+        <doc>1</doc>
+        <doc>01</doc>
+        <doc>+0</doc>
+        <doc>+000</doc>
+        <doc>0</doc>
+        <doc>-0</doc>
+        <doc>-000</doc>
+        <doc>-002</doc>
+        <doc>-1</doc>
+        <doc>-12345</doc>
+        <doc>-</doc>
+        <doc>+</doc>
+        {<doc> </doc>}
+        {<doc> -23 </doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 0 0 0 0}
+
+test schema-14.32.1 {text: negativeInteger tcl} {
+    tdom::schema s
+    s defelement doc {
+        text {negativeInteger tcl}
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc>5782</doc>
+        <doc>3</doc>
+        <doc>+2</doc>
+        <doc>+002</doc>
+        <doc>1</doc>
+        <doc>01</doc>
+        <doc>+0</doc>
+        <doc>+000</doc>
+        <doc>0</doc>
+        <doc>-0</doc>
+        <doc>-000</doc>
+        <doc>-002</doc>
+        <doc>-1</doc>
+        <doc>-12345</doc>
+        <doc>-</doc>
+        <doc>+</doc>
+        {<doc> </doc>}
+        {<doc> -23 </doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 0 0 0 1}
+
+test schema-14.33 {text: nonNegativeInteger} {
+    tdom::schema s
+    s defelement doc {
+        text nonNegativeInteger
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc>5782</doc>
+        <doc>3</doc>
+        <doc>+2</doc>
+        <doc>+002</doc>
+        <doc>1</doc>
+        <doc>01</doc>
+        <doc>+0</doc>
+        <doc>+000</doc>
+        <doc>0</doc>
+        <doc>-0</doc>
+        <doc>-000</doc>
+        <doc>-002</doc>
+        <doc>-1</doc>
+        <doc>-12345</doc>
+        <doc>-</doc>
+        <doc>+</doc>
+        {<doc> </doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0}
+
+test schema-14.33.1 {text: nonNegativeInteger tcl} {
+    tdom::schema s
+    s defelement doc {
+        text {nonNegativeInteger tcl}
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc>5782</doc>
+        <doc>3</doc>
+        <doc>+2</doc>
+        <doc>+002</doc>
+        <doc>1</doc>
+        <doc>01</doc>
+        <doc>+0</doc>
+        <doc>+000</doc>
+        <doc>0</doc>
+        <doc>-0</doc>
+        <doc>-000</doc>
+        <doc>-002</doc>
+        <doc>-1</doc>
+        <doc>-12345</doc>
+        <doc>-</doc>
+        <doc>+</doc>
+        {<doc> </doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0}
+
+test schema-14.34 {text: nonPositiveInteger} {
+    tdom::schema s
+    s defelement doc {
+        text nonPositiveInteger
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc>5782</doc>
+        <doc>3</doc>
+        <doc>+2</doc>
+        <doc>+002</doc>
+        <doc>1</doc>
+        <doc>01</doc>
+        <doc>+0</doc>
+        <doc>+000</doc>
+        <doc>0</doc>
+        <doc>-0</doc>
+        <doc>-000</doc>
+        <doc>-002</doc>
+        <doc>-1</doc>
+        <doc>-12345</doc>
+        <doc>-</doc>
+        <doc>+</doc>
+        {<doc> </doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 0 0 0}
+
+test schema-14.34.1 {text: nonPositiveInteger tcl} {
+    tdom::schema s
+    s defelement doc {
+        text {nonPositiveInteger tcl}
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc>5782</doc>
+        <doc>3</doc>
+        <doc>+2</doc>
+        <doc>+002</doc>
+        <doc>1</doc>
+        <doc>01</doc>
+        <doc>+0</doc>
+        <doc>+000</doc>
+        <doc>0</doc>
+        <doc>-0</doc>
+        <doc>-000</doc>
+        <doc>-002</doc>
+        <doc>-1</doc>
+        <doc>-12345</doc>
+        <doc>-</doc>
+        <doc>+</doc>
+        {<doc> </doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 0 0 0}
+
+test schema-14.35 {text: positiveInteger} {
+    tdom::schema s
+    s defelement doc {
+        text positiveInteger
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc>5782</doc>
+        <doc>3</doc>
+        <doc>+2</doc>
+        <doc>+002</doc>
+        <doc>1</doc>
+        <doc>01</doc>
+        <doc>+0</doc>
+        <doc>+000</doc>
+        <doc>0</doc>
+        <doc>-0</doc>
+        <doc>-000</doc>
+        <doc>-002</doc>
+        <doc>-1</doc>
+        <doc>-12345</doc>
+        <doc>-</doc>
+        <doc>+</doc>
+        {<doc> </doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0}
+
+test schema-14.35.1 {text: positiveInteger tcl} {
+    tdom::schema s
+    s defelement doc {
+        text {positiveInteger tcl}
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc>5782</doc>
+        <doc>3</doc>
+        <doc>+2</doc>
+        <doc>+002</doc>
+        <doc>1</doc>
+        <doc>01</doc>
+        <doc>+0</doc>
+        <doc>+000</doc>
+        <doc>0</doc>
+        <doc>-0</doc>
+        <doc>-000</doc>
+        <doc>-002</doc>
+        <doc>-1</doc>
+        <doc>-12345</doc>
+        <doc>-</doc>
+        <doc>+</doc>
+        {<doc> </doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0}
+
 test schema-15.1 {constraint cmd tcl} {
     tdom::schema s
     s define {
