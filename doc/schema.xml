@@ -771,6 +771,13 @@
         <desc>This text constraint match if text is valid according to
         RFC 4648.</desc>
       </commanddef>
+      <commanddef>
+        <command><cmd>hexBinary</cmd></command>
+        <desc>This text constraint match if text is a sequence of
+        binary octets in hexadecimal encoding, where each binary octet
+        is a two-character hexadecimal number. Lowercase and uppercase
+        letters A through F are permitted.</desc>
+      </commanddef>
     </commandlist>
   </section>
 

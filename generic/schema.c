@@ -6604,6 +6604,47 @@ qnameTCObjCmd (
     return TCL_OK;
 }
 
+static int
+hexBinaryImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    int count = 0;
+
+    if (*text == 0) return 0;
+    while (*text) {
+        if ((*text >= '0' && *text <= '9')
+            || (*text >= 'A' && *text <= 'F')
+            || (*text >= 'a' && *text <= 'f')) {
+            text++;
+            count++;
+        } else return 0;
+    }
+    if (count % 2 == 0) return 1;
+    return 0;
+}
+
+static int
+hexBinaryTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+
+    CHECK_TI
+    CHECK_TOPLEVEL
+    checkNrArgs (1,1,"No arguments expected");
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = hexBinaryImpl;
+    return TCL_OK;
+}
+
 void
 tDOM_SchemaInit (
     Tcl_Interp *interp
@@ -6729,6 +6770,8 @@ tDOM_SchemaInit (
                           ncnameTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::qname",
                           qnameTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::hexBinary",
+                          hexBinaryTCObjCmd, NULL, NULL);
 }
 
 

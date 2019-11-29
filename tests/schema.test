@@ -4783,6 +4783,32 @@ test schema-14.35.1 {text: positiveInteger tcl} {
     set result
 } {0 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0}
 
+test schema-14.36 {text: hexBinary} {
+    tdom::schema s
+    s defelement doc {
+        text {hexBinary}
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc>5782</doc>
+        <doc>3ABCDEF0</doc>
+        <doc>+2</doc>
+        <doc>2</doc>
+        <doc>abcd</doc>
+        <doc>abcde</doc>
+        <doc>abcdef</doc>
+        <doc>abcdefg</doc>
+        {<doc> a0123b</doc>}
+        {<doc>a0123b </doc>}
+        <doc>a0123b</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 1 0 0 1 0 1 0 0 0 1}
+
 test schema-15.1 {constraint cmd tcl} {
     tdom::schema s
     s define {
