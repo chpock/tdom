@@ -2,9 +2,6 @@
 |   Copyright (C) 1999  Jochen C. Loewer (loewerj@hotmail.com)
 +----------------------------------------------------------------------------
 |
-|   $Id$
-|
-|
 |   A DOM interface upon the expat XML parser for the C language
 |   according to the W3C recommendation REC-DOM-Level-1-19981001
 |

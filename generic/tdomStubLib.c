@@ -2,8 +2,6 @@
 |   Copyright (c) 2007 Rolf Ade (rolf@pointsman.de)
 +-----------------------------------------------------------------------------
 |
-|   $Id$
-|
 |   Implements entry point, which has to be called by C coded extensions
 |   to tDOM. Following http://wiki.tcl.tk/3358.
 |

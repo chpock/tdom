@@ -2,9 +2,6 @@
 |   Copyright (c) 1999 Jochen Loewer (loewerj@hotmail.com)
 +-----------------------------------------------------------------------------
 |
-|   $Id$
-|
-|
 |   A DOM implementation for Tcl using James Clark's expat XML parser
 |
 |
