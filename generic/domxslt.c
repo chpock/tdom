@@ -2,9 +2,6 @@
 |   Copyright (c) 2000 Jochen Loewer (loewerj@hotmail.com)
 |-----------------------------------------------------------------------------
 |
-|   $Id$
-|
-|
 |   A XSLT implementation for tDOM, according to the W3C
 |   recommendation (16 Nov 1999).
 |   See http://www.w3.org/TR/1999/REC-xslt-19991116 for details.
