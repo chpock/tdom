@@ -6645,6 +6645,66 @@ hexBinaryTCObjCmd (
     return TCL_OK;
 }
 
+static int
+unsignedIntTypesImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    char *c;
+    int count = 0;
+    int nrDigits[] = {3, 5, 10, 20};
+    char *max[] = {
+        "255",
+        "65535",
+        "4294967295",
+        "18446744073709551615"
+    };
+    
+    if (*text == '+') text++;
+    if (*text == 0) return 0;
+    if (*text == '0') {
+        text++;
+        while (*text == '0') text++;
+        if (*text == 0) return 1;
+    }
+    c = text;
+    while (*text) {
+        if (*text >= '0' && *text <= '9') {
+            text++;
+            count++;
+        } else return 0;
+    }
+    if (count < nrDigits[(intptr_t) constraintData]) return 1;
+    if (count == nrDigits[(intptr_t) constraintData]) {
+        if (strcmp (max[(intptr_t) constraintData], c) >= 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+static int
+unsignedIntTypesTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+
+    CHECK_TI
+    CHECK_TOPLEVEL
+    checkNrArgs (1,1,"No arguments expected");
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = unsignedIntTypesImpl;
+    sc->constraintData = clientData;
+    return TCL_OK;
+}
+
 void
 tDOM_SchemaInit (
     Tcl_Interp *interp
@@ -6772,6 +6832,14 @@ tDOM_SchemaInit (
                           qnameTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::hexBinary",
                           hexBinaryTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::unsignedByte",
+                          unsignedIntTypesTCObjCmd, (ClientData) 0, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::unsignedShort",
+                          unsignedIntTypesTCObjCmd, (ClientData) 1, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::unsignedInt",
+                          unsignedIntTypesTCObjCmd, (ClientData) 2, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::unsignedLong",
+                          unsignedIntTypesTCObjCmd, (ClientData) 3, NULL);
 }
 
 

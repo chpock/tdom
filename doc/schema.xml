@@ -778,6 +778,34 @@
         is a two-character hexadecimal number. Lowercase and uppercase
         letters A through F are permitted.</desc>
       </commanddef>
+      <commanddef>
+        <command><cmd>unsignedByte</cmd></command>
+        <desc>This text constraint match if the text value is a
+        xsd:unsignedByte. This is an integer between 0 and 255, both
+        included, optionally preceded by a + sign and leading
+        zeros.</desc>
+      </commanddef>
+      <commanddef>
+        <command><cmd>unsignedShort</cmd></command>
+        <desc>This text constraint match if the text value is a
+        xsd:unsignedShort. This is an integer between 0 and 65535,
+        both included, optionally preceded by a + sign and leading
+        zeros.</desc>
+      </commanddef>
+      <commanddef>
+        <command><cmd>unsignedInt</cmd></command>
+        <desc>This text constraint match if the text value is a
+        xsd:unsignedInt. This is an integer between 0 and 4294967295,
+        both included, optionally preceded by a + sign and leading
+        zeros.</desc>
+      </commanddef>
+      <commanddef>
+        <command><cmd>unsignedLong</cmd></command>
+        <desc>This text constraint match if the text value is a
+        xsd:unsignedLong. This is an integer between 0 and
+        18446744073709551615, both included, optionally preceded by a
+        + sign and leading zeros.</desc>
+      </commanddef>
     </commandlist>
   </section>
 

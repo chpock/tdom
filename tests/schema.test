@@ -4809,6 +4809,146 @@ test schema-14.36 {text: hexBinary} {
     set result
 } {0 1 1 0 0 1 0 1 0 0 0 1}
 
+test schema-14.37 {text: unsignedByte} {
+    tdom::schema s
+    s defelement doc {
+        text {unsignedByte}
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc>7</doc>
+        <doc>+255</doc>
+        <doc>-255</doc>
+        <doc>-000255</doc>
+        <doc>256</doc>
+        <doc>65535</doc>
+        <doc>000000000000000065535</doc>
+        <doc>65536</doc>
+        <doc>4294967295</doc>
+        <doc>00000000000000004294967295</doc>
+        <doc>4294967296</doc>
+        <doc>18446744073709551615</doc>
+        <doc>018446744073709551615</doc>
+        <doc>18446744073709551616</doc>
+        <doc>28446744073709551614</doc>
+        <doc>3ABCDEF0</doc>
+        {<doc> a0123b</doc>}
+        {<doc>a0123b </doc>}
+        <doc>a0123b</doc>
+        <doc>1.2</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0}
+
+test schema-14.38 {text: unsignedShort} {
+    tdom::schema s
+    s defelement doc {
+        text {unsignedShort}
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc>7</doc>
+        <doc>+255</doc>
+        <doc>-255</doc>
+        <doc>-000255</doc>
+        <doc>256</doc>
+        <doc>65535</doc>
+        <doc>000000000000000065535</doc>
+        <doc>65536</doc>
+        <doc>4294967295</doc>
+        <doc>00000000000000004294967295</doc>
+        <doc>4294967296</doc>
+        <doc>18446744073709551615</doc>
+        <doc>018446744073709551615</doc>
+        <doc>18446744073709551616</doc>
+        <doc>28446744073709551614</doc>
+        <doc>3ABCDEF0</doc>
+        {<doc> a0123b</doc>}
+        {<doc>a0123b </doc>}
+        <doc>a0123b</doc>
+        <doc>1.2</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 1 0 0 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0}
+
+test schema-14.39 {text: unsignedInt} {
+    tdom::schema s
+    s defelement doc {
+        text {unsignedInt}
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc>7</doc>
+        <doc>+255</doc>
+        <doc>-255</doc>
+        <doc>-000255</doc>
+        <doc>256</doc>
+        <doc>65535</doc>
+        <doc>000000000000000065535</doc>
+        <doc>65536</doc>
+        <doc>4294967295</doc>
+        <doc>00000000000000004294967295</doc>
+        <doc>4294967296</doc>
+        <doc>18446744073709551615</doc>
+        <doc>018446744073709551615</doc>
+        <doc>18446744073709551616</doc>
+        <doc>28446744073709551614</doc>
+        <doc>3ABCDEF0</doc>
+        {<doc> a0123b</doc>}
+        {<doc>a0123b </doc>}
+        <doc>a0123b</doc>
+        <doc>1.2</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 1 0 0 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0}
+
+test schema-14.40 {text: unsignedLong} {
+    tdom::schema s
+    s defelement doc {
+        text {unsignedLong}
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc>7</doc>
+        <doc>+255</doc>
+        <doc>-255</doc>
+        <doc>-000255</doc>
+        <doc>256</doc>
+        <doc>65535</doc>
+        <doc>000000000000000065535</doc>
+        <doc>65536</doc>
+        <doc>4294967295</doc>
+        <doc>00000000000000004294967295</doc>
+        <doc>4294967296</doc>
+        <doc>18446744073709551615</doc>
+        <doc>018446744073709551615</doc>
+        <doc>18446744073709551616</doc>
+        <doc>28446744073709551614</doc>
+        <doc>3ABCDEF0</doc>
+        {<doc> a0123b</doc>}
+        {<doc>a0123b </doc>}
+        <doc>a0123b</doc>
+        <doc>1.2</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 1 0 0 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0}
+
 test schema-15.1 {constraint cmd tcl} {
     tdom::schema s
     s define {
