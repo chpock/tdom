@@ -267,7 +267,8 @@
                   called without the optional argument the possible
                   return values and their meanings are:
                   <dl>
-                      <dt>NONE</dt><dd></dd>
+                      <dt>NONE</dt><dd>The schema command currently
+                      doesn't process a validation event.</dd>
                       <dt>MATCH_ELEMENT_START</dt><dd></dd>
                       <dt>MATCH_ELEMENT_END</dt><dd></dd>
                       <dt>MATCH_TEXT</dt><dd></dd>
