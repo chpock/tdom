@@ -507,6 +507,10 @@ static void freeSchemaCP (
             FREE (pattern->attrs);
         }
         freedomKeyConstraints (pattern->domKeys);
+        if (pattern->childs) {
+            Tcl_DeleteHashTable (pattern->childs);
+            FREE (pattern->childs);
+        }
         break;
     }
     if (pattern->defScript) {
@@ -1140,6 +1144,7 @@ matchElementStart (
     int hm, ac, i, mayskip, rc;
     int isName = 0;
     SchemaValidationStack *se;
+    Tcl_HashEntry *h;
 
     if (!sdata->stack) return 0;
     se = sdata->stack;
@@ -1189,6 +1194,20 @@ matchElementStart (
                 break;
 
             case SCHEMA_CTYPE_CHOICE:
+                if (candidate->childs) {
+                    h = Tcl_FindHashEntry (candidate->childs, name);
+                    if (h) {
+                        icp = Tcl_GetHashValue (h);
+                        if (icp->namespace == namespace) {
+                            pushToStack (sdata, icp, ac);
+                            updateStack (se, cp, ac);
+                            return 1;
+                        }
+                    }
+                    /* TODO: Short-cut in case of no match (looking
+                     * for emtpy match, recovering). For now fall
+                     * throu to simple, serial approach. */
+                }
                 for (i = 0; i < candidate->nc; i++) {
                     icp = candidate->content[i];
                     switch (icp->type) {
@@ -4330,7 +4349,8 @@ evalDefinition (
     SchemaAttr **savedCurrentAttrs;
     unsigned int savedContenSize;
     unsigned int savedAttrSize, savedNumAttr, savedNumReqAttr;
-    int result, i;
+    int result, i, onlyName, hnew;
+    Tcl_HashEntry *h;
 
     /* Save some state of sdata .. */
     savedCP = sdata->cp;
@@ -4364,12 +4384,44 @@ evalDefinition (
 
     if (result == TCL_OK) {
         REMEMBER_PATTERN (pattern);
+        onlyName = 1;
         for (i = 0; i < pattern->nc; i++) {
+            if (onlyName
+                && pattern->content[i]->type != SCHEMA_CTYPE_NAME
+                && pattern->content[i]->type != SCHEMA_CTYPE_TEXT) {
+                onlyName = 0;
+            }
             if (pattern->content[i]->type == SCHEMA_CTYPE_PATTERN) {
                 if (pattern->content[i]->flags & CONSTRAINT_TEXT_CHILD) {
                     pattern->flags |= CONSTRAINT_TEXT_CHILD;
                     break;
                 }
+            }
+        }
+        if (pattern->type == SCHEMA_CTYPE_CHOICE
+            && onlyName
+            && pattern->nc > 4) {
+            pattern->childs = TMALLOC (Tcl_HashTable);
+            Tcl_InitHashTable (pattern->childs, TCL_ONE_WORD_KEYS);
+            hnew = 1;
+            for (i = 0; i < pattern->nc; i++) {
+                if (pattern->content[i]->type != SCHEMA_CTYPE_NAME) {
+                    continue;
+                }
+                h = Tcl_CreateHashEntry (pattern->childs,
+                                         pattern->content[i]->name, &hnew);
+                if (!hnew) {
+                    break;
+                }
+                Tcl_SetHashValue (h, pattern->content[i]);
+            }
+            if (!hnew) {
+                /* No simple lookup possible because of more than one
+                 * elements with the same local name belong the
+                 * choices. Rewind. */
+                Tcl_DeleteHashTable (pattern->childs);
+                FREE (pattern->childs);
+                pattern->childs = NULL;
             }
         }
         addToContent (sdata, pattern, quant, n, m);

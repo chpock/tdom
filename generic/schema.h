@@ -104,6 +104,7 @@ typedef struct SchemaCP
     struct SchemaCP **content;
     SchemaQuant      *quants;
     unsigned int      nc;
+    Tcl_HashTable    *childs;
     SchemaAttr      **attrs;
     unsigned int      numAttr;
     unsigned int      numReqAttr;
