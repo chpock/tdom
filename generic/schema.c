@@ -5650,7 +5650,7 @@ isodateImpl (
     char *text
     )
 {
-    int i, y, m, d, h, min, seenNonzero = 0, timezone = 0;
+    int i, y, m, d, h, min, seenNonzero = 0;
 
     if (*text == '-') {
         /* A bce date */
@@ -5681,7 +5681,6 @@ isodateImpl (
         if (*text < '0' || *text > '9') return 0;
         text++;
     }
-    if (*text != '\0') timezone = 1;
     d = atoi(text-2);
     if (d < 1) return 0;
     switch (m) {
@@ -5708,7 +5707,7 @@ isodateImpl (
         }
         break;
     }
-    if (!timezone) return 1;
+    if (*text == '\0') return 1;
     switch (*text) {
     case 'Z':
         text++;
@@ -5754,6 +5753,18 @@ isodateTCObjCmd (
     SchemaData *sdata = GETASI;
     SchemaConstraint *sc;
 
+    if (!sdata) {
+        checkNrArgs (2,2,"<text>");
+        Tcl_SetObjResult (interp,
+                          Tcl_NewBooleanObj (
+                              isodateImpl (NULL, NULL,
+                                           Tcl_GetString (objv[1]))));
+        return TCL_OK;
+    }
+    if (!sdata->isTextConstraint) {
+        SetResult ("Command called in invalid schema context");
+        return TCL_ERROR;
+    }
     CHECK_TI
     checkNrArgs (1,1,"No arguments expected");
     ADD_CONSTRAINT (sdata, sc)

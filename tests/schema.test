@@ -4951,9 +4951,13 @@ test schema-14.40 {text: unsignedLong} {
 
 test schema-14.41 {text constrains commands outside text constraint} {
     set cmds [info command tdom::schema::text::*]
+    set skiplist {
+        ::tdom::schema::text::isodate
+    }
     set result {}
     tdom::schema s
     foreach cmd $cmds {
+        if {$cmd in $skiplist} continue
         lappend result [catch {$cmd "some text"}]
         lappend result [catch {
             s define [subst "{$cmd}"]
@@ -4973,14 +4977,63 @@ test schema-14.41 {text constrains commands outside text constraint} {
             }]
         } errMsg]
     }
-    if {$result eq [lrepeat [expr {[llength $cmds] * 4}] 1]} {
+    if {$result eq [lrepeat [expr {([llength $cmds] - [llength $skiplist]) * 4}] 1]} {
         set result 1
     } else {
+        puts $result
         set result 0
     }
     set result
 } 1
-                      
+
+test schema-14.42 {isodate outside schema context} {
+    set result {}
+    foreach txt {
+        ""
+        foo
+        1
+        12
+        1234-12-31
+        1234-14-31
+        1234-12-00
+        1234-02-31
+        2000-02-29
+        2001-02-29
+        2004-02-29
+        -2004-02-29
+        1900-02-29
+        1234-02-01
+        1234-08-10
+        1234-08-222
+        " 1234-08-22"
+        "1234-08-22 "
+        11234-08-22
+        0000-02-01
+        10000-08-22
+        10000-02-29
+        10000-02-29Z
+        2012-03-07Z
+        "2012-03-07Z "
+        2012-03-07a
+        2012-03-07+
+        2012-03-07+00:00
+        2012-03-07-00:00
+        2012-03-07+02:00
+        2012-03-07+02:70
+        2012-03-07+12:30
+        2012-03-07+14:30
+        2012-03-07+14:00
+        2012-03-07-14:00
+        2012-03-07-14:01
+        2012-03-07-2:30
+        2012-03-07-02:30Z
+        "2012-03-07-02:30 "
+    } {
+        lappend result [tdom::schema::text::isodate $txt]
+    }
+    set result
+} {0 0 0 0 1 0 0 0 1 0 1 1 0 1 1 0 0 0 1 0 1 1 1 1 0 0 0 1 1 1 0 1 0 1 1 0 0 0 0}
+
 test schema-15.1 {constraint cmd tcl} {
     tdom::schema s
     s define {
