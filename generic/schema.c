@@ -5042,7 +5042,6 @@ integerTCObjCmd (
     };
 
     CHECK_TI
-    CHECK_TOPLEVEL
     checkNrArgs (1,2,"?xsd|tcl?");
     if (objc == 1) {
         type = t_xsd;
@@ -5132,7 +5131,6 @@ tclTCObjCmd (
     int i;
 
     CHECK_TI
-    CHECK_TOPLEVEL
     if (objc < 2) {
         SetResult ("Expected: tclcmd ?arg arg ...?");
         return TCL_ERROR;
@@ -5185,7 +5183,6 @@ fixedTCObjCmd (
     SchemaConstraint *sc;
 
     CHECK_TI
-    CHECK_TOPLEVEL
     checkNrArgs (2,2,"Expected: <fixed value>");
     ADD_CONSTRAINT (sdata, sc)
     sc->constraint = fixedImpl;
@@ -5233,7 +5230,6 @@ enumerationTCObjCmd (
     Tcl_Obj *value;
 
     CHECK_TI
-    CHECK_TOPLEVEL
     checkNrArgs (2,2,"Expected: <value list>");
     if (Tcl_ListObjLength (interp, objv[1], &len) != TCL_OK) {
         SetResult ("The argument must be a valid tcl list");
@@ -5297,7 +5293,6 @@ matchTCObjCmd (
     SchemaConstraint *sc;
 
     CHECK_TI
-    CHECK_TOPLEVEL
     checkNrArgs (2,3,"Expected: ?-nocase? <match pattern>");
     if (objc == 3) {
         if (strcmp ("-nocase", Tcl_GetString (objv[1])) != 0) {
@@ -5359,7 +5354,6 @@ regexpTCObjCmd (
     SchemaConstraint *sc;
 
     CHECK_TI
-    CHECK_TOPLEVEL
     checkNrArgs (2,2,"Expected: <regexp>");
     /* Compile it as syntax test (plus caches the complied regexp in
      * the internal value) */
@@ -5429,7 +5423,6 @@ nmtokenTCObjCmd (
     SchemaConstraint *sc;
 
     CHECK_TI
-    CHECK_TOPLEVEL
     checkNrArgs (1,1,"No arguments expected");
     ADD_CONSTRAINT (sdata, sc)
     sc->constraint = nmtokenImpl;
@@ -5487,7 +5480,6 @@ nmtokensTCObjCmd (
     SchemaConstraint *sc;
 
     CHECK_TI
-    CHECK_TOPLEVEL
     checkNrArgs (1,1,"No arguments expected");
     ADD_CONSTRAINT (sdata, sc)
     sc->constraint = nmtokensImpl;
@@ -5550,7 +5542,6 @@ numberTCObjCmd (
     };
 
     CHECK_TI
-    CHECK_TOPLEVEL
     checkNrArgs (1,2,"?xsd|tcl?");
     if (objc == 1) {
         type = t_xsd;
@@ -5631,7 +5622,6 @@ booleanTCObjCmd (
     };
     
     CHECK_TI
-    CHECK_TOPLEVEL
     checkNrArgs (1,2,"?xsd|tcl?");
     if (objc == 1) {
         type = t_xsd;
@@ -5765,7 +5755,6 @@ isodateTCObjCmd (
     SchemaConstraint *sc;
 
     CHECK_TI
-    CHECK_TOPLEVEL
     checkNrArgs (1,1,"No arguments expected");
     ADD_CONSTRAINT (sdata, sc)
     sc->constraint = isodateImpl;
@@ -5808,7 +5797,6 @@ maxLengthTCObjCmd (
     long len;
 
     CHECK_TI
-    CHECK_TOPLEVEL
     checkNrArgs (2,2,"Expected: <maximal length as integer>");
     if (Tcl_GetLongFromObj (interp, objv[1], &len) != TCL_OK) {
         SetResult ("Expected: <maximal length as integer>");
@@ -5859,7 +5847,6 @@ minLengthTCObjCmd (
     long len;
 
     CHECK_TI
-    CHECK_TOPLEVEL
     checkNrArgs (2,2,"Expected: <minimum length as integer>");
     if (Tcl_GetLongFromObj (interp, objv[1], &len) != TCL_OK) {
         SetResult ("Expected: <minimum length as integer>");
@@ -5909,7 +5896,6 @@ oneOfTCObjCmd (
     int rc;
 
     CHECK_TI
-    CHECK_TOPLEVEL
     checkNrArgs (2,2,"Expected: <text constraint script>");
     
     cp = initSchemaCP (SCHEMA_CTYPE_CHOICE, NULL, NULL);
@@ -5939,7 +5925,6 @@ allOfTCObjCmd (
     int rc;
 
     CHECK_TI
-    CHECK_TOPLEVEL
     checkNrArgs (2,2,"Expected: <text constraint script>");
     
     cp = initSchemaCP (SCHEMA_CTYPE_CHOICE, NULL, NULL);
@@ -5995,7 +5980,6 @@ stripTCObjCmd (
     int rc;
 
     CHECK_TI
-    CHECK_TOPLEVEL
     checkNrArgs (2,2,"Expected: <text constraint script>");
     
     cp = initSchemaCP (SCHEMA_CTYPE_CHOICE, NULL, NULL);
@@ -6124,7 +6108,6 @@ splitTCObjCmd (
     };
 
     CHECK_TI
-    CHECK_TOPLEVEL
     if (objc < 2) {
         SetResult("Expected: ?type ?args?? <text constraint script>");
         return TCL_ERROR;
@@ -6248,7 +6231,6 @@ idTCObjCmd (
     SchemaDocKey *dk;
 
     CHECK_TI
-    CHECK_TOPLEVEL
     checkNrArgs (1,2,"?key_space?");
     ADD_CONSTRAINT (sdata, sc)
     if (objc == 1) {
@@ -6324,7 +6306,6 @@ idrefTCObjCmd (
     SchemaDocKey *dk;
 
     CHECK_TI
-    CHECK_TOPLEVEL
     checkNrArgs (1,2,"?key_space?");
     ADD_CONSTRAINT (sdata, sc)
     if (objc == 1) {
@@ -6389,7 +6370,6 @@ keyTCObjCmd (
     SchemaKeySpace *ks;
 
     CHECK_TI
-    CHECK_TOPLEVEL
     checkNrArgs (2,2,"key_space");
     ADD_CONSTRAINT (sdata, sc)
     h = Tcl_CreateHashEntry (&sdata->keySpaces, Tcl_GetString (objv[1]), &hnew);
@@ -6441,7 +6421,6 @@ keyrefTCObjCmd (
     SchemaKeySpace *ks;
 
     CHECK_TI
-    CHECK_TOPLEVEL
     checkNrArgs (2,2,"key_space");
     ADD_CONSTRAINT (sdata, sc)
     h = Tcl_CreateHashEntry (&sdata->keySpaces, Tcl_GetString (objv[1]),
@@ -6510,7 +6489,6 @@ base64TCObjCmd (
     SchemaConstraint *sc;
 
     CHECK_TI
-    CHECK_TOPLEVEL
     checkNrArgs (1,1,"No arguments expected");
     ADD_CONSTRAINT (sdata, sc)
     sc->constraint = base64Impl;
@@ -6539,7 +6517,6 @@ nameTCObjCmd (
     SchemaConstraint *sc;
 
     CHECK_TI
-    CHECK_TOPLEVEL
     checkNrArgs (1,1,"No arguments expected");
     ADD_CONSTRAINT (sdata, sc)
     sc->constraint = nameImpl;
@@ -6568,7 +6545,6 @@ ncnameTCObjCmd (
     SchemaConstraint *sc;
 
     CHECK_TI
-    CHECK_TOPLEVEL
     checkNrArgs (1,1,"No arguments expected");
     ADD_CONSTRAINT (sdata, sc)
     sc->constraint = ncnameImpl;
@@ -6597,7 +6573,6 @@ qnameTCObjCmd (
     SchemaConstraint *sc;
 
     CHECK_TI
-    CHECK_TOPLEVEL
     checkNrArgs (1,1,"No arguments expected");
     ADD_CONSTRAINT (sdata, sc)
     sc->constraint = qnameImpl;
@@ -6638,7 +6613,6 @@ hexBinaryTCObjCmd (
     SchemaConstraint *sc;
 
     CHECK_TI
-    CHECK_TOPLEVEL
     checkNrArgs (1,1,"No arguments expected");
     ADD_CONSTRAINT (sdata, sc)
     sc->constraint = hexBinaryImpl;
@@ -6697,7 +6671,6 @@ unsignedIntTypesTCObjCmd (
     SchemaConstraint *sc;
 
     CHECK_TI
-    CHECK_TOPLEVEL
     checkNrArgs (1,1,"No arguments expected");
     ADD_CONSTRAINT (sdata, sc)
     sc->constraint = unsignedIntTypesImpl;

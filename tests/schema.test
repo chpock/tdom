@@ -4949,6 +4949,38 @@ test schema-14.40 {text: unsignedLong} {
     set result
 } {0 1 1 0 0 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0}
 
+test schema-14.41 {text constrains commands outside text constraint} {
+    set cmds [info command tdom::schema::text::*]
+    set result {}
+    tdom::schema s
+    foreach cmd $cmds {
+        lappend result [catch {$cmd "some text"}]
+        lappend result [catch {
+            s define [subst "{$cmd}"]
+        } errMsg]
+        lappend result [catch {
+            s define [subst {
+                start doc
+                $cmd
+            }]
+        } errMsg]
+        lappend result [catch {
+            s define [subst {
+                start doc
+                defelement doc {
+                    $cmd
+                }
+            }]
+        } errMsg]
+    }
+    if {$result eq [lrepeat [expr {[llength $cmds] * 4}] 1]} {
+        set result 1
+    } else {
+        set result 0
+    }
+    set result
+} 1
+                      
 test schema-15.1 {constraint cmd tcl} {
     tdom::schema s
     s define {
