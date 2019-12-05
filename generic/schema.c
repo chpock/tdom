@@ -28,6 +28,24 @@
 #include <domxpath.h>
 #include <schema.h>
 #include <stdint.h>
+#include <fcntl.h>
+
+#ifdef _MSC_VER
+#include <io.h>
+#else
+#include <unistd.h>
+#endif
+
+#ifndef TDOM_EXPAT_READ_SIZE
+# define TDOM_EXPAT_READ_SIZE (1024*8)
+#endif
+#ifndef O_BINARY
+#ifdef _O_BINARY
+#define O_BINARY _O_BINARY
+#else
+#define O_BINARY 0
+#endif
+#endif
 
 /* #define DEBUG */
 /* #define DDEBUG */
@@ -2647,6 +2665,97 @@ validateString (
     return result;
 }
 
+static int
+validateFile (
+    Tcl_Interp *interp,
+    SchemaData *sdata,
+    char *filename
+    )
+{
+    XML_Parser parser;
+    char sep = '\xFF';
+    ValidateMethodData vdata;
+    Tcl_DString cdata;
+    Tcl_Obj *resultObj;
+    char sl[50], sc[50];
+    int result, fd;
+
+    parser = XML_ParserCreate_MM (NULL, MEM_SUITE, &sep);
+    vdata.interp = interp;
+    vdata.sdata = sdata;
+    vdata.parser = parser;
+    sdata->parser = parser;
+    Tcl_DStringInit (&cdata);
+    vdata.cdata = &cdata;
+    vdata.onlyWhiteSpace = 1;
+    vdata.uri = (char *) MALLOC (URI_BUFFER_LEN_INIT);
+    vdata.maxUriLen = URI_BUFFER_LEN_INIT;
+    XML_SetUserData (parser, &vdata);
+    XML_SetElementHandler (parser, startElement, endElement);
+    XML_SetCharacterDataHandler (parser, characterDataHandler);
+
+    fd = open(filename, O_BINARY|O_RDONLY);
+    if (fd < 0) {
+        Tcl_ResetResult (interp);
+        Tcl_AppendResult (interp, "error opening file \"",
+                          filename, "\"", (char *) NULL);
+        result = TCL_ERROR;
+        goto cleanup;
+    }
+    for (;;) {
+        int nread;
+        char *fbuf = XML_GetBuffer (parser, TDOM_EXPAT_READ_SIZE);
+        if (!fbuf) {
+            close (fd);
+            Tcl_ResetResult (interp);
+            Tcl_SetResult (interp, "Out of memory\n", NULL);
+            result = TCL_ERROR;
+            goto cleanup;
+        }
+        nread = read(fd, fbuf, TDOM_EXPAT_READ_SIZE);
+        if (nread < 0) {
+            close (fd);
+            Tcl_ResetResult (interp);
+            Tcl_AppendResult (interp, "error reading from file \"",
+                              filename, "\"", (char *) NULL);
+            result = TCL_ERROR;
+            goto cleanup;
+        }
+        result = XML_ParseBuffer (parser, nread, nread == 0);
+        if (result != XML_STATUS_OK || !nread
+            || sdata->validationState == VALIDATION_ERROR) {
+            close (fd);
+            break;
+        }
+    }
+    if (result != XML_STATUS_OK
+        || sdata->validationState == VALIDATION_ERROR) {
+        resultObj = Tcl_NewObj ();
+        sprintf(sl, "%ld", XML_GetCurrentLineNumber(parser));
+        sprintf(sc, "%ld", XML_GetCurrentColumnNumber(parser));
+        if (sdata->validationState == VALIDATION_ERROR) {
+            Tcl_AppendStringsToObj (resultObj, "error \"",
+                                    Tcl_GetStringResult (interp),
+                                    "\" at line ", sl, " character ", sc, NULL);
+        } else {
+            Tcl_AppendStringsToObj (resultObj, "error \"",
+                                    XML_ErrorString(XML_GetErrorCode(parser)),
+                                    "\" at line ", sl, " character ", sc, NULL);
+        }
+        Tcl_SetObjResult (interp, resultObj);
+        result = TCL_ERROR;
+    } else {
+        result = TCL_OK;
+    }
+cleanup:
+    sdata->parser = NULL;
+    XML_ParserFree (parser);
+    Tcl_DStringFree (&cdata);
+    FREE (vdata.uri);
+    while (sdata->stack) popStack (sdata);
+    return result;
+}
+
 static void
 schemaxpathRSFree (
     xpathResultSet *rs
@@ -3678,14 +3787,14 @@ schemaInstanceCmd (
     Tcl_Obj       *attData;
 
     static const char *schemaInstanceMethods[] = {
-        "defelement", "defpattern", "start",    "event",       "delete",
-        "reset",      "define",     "validate", "domvalidate", "deftext",
-        "info",       "reportcmd",  "prefixns",  NULL
+        "defelement", "defpattern", "start",    "event",        "delete",
+        "reset",      "define",     "validate", "domvalidate",  "deftext",
+        "info",       "reportcmd",  "prefixns", "validatefile",  NULL
     };
     enum schemaInstanceMethod {
-        m_defelement, m_defpattern, m_start,    m_event,       m_delete,
-        m_reset,      m_define,     m_validate, m_domvalidate, m_deftext,
-        m_info,       m_reportcmd,  m_prefixns
+        m_defelement, m_defpattern, m_start,    m_event,        m_delete,
+        m_reset,      m_define,     m_validate, m_domvalidate,  m_deftext,
+        m_info,       m_reportcmd,  m_prefixns, m_validatefile
     };
 
     static const char *eventKeywords[] = {
@@ -4020,6 +4129,36 @@ schemaInstanceCmd (
         schemaReset (sdata);
         break;
 
+    case m_validatefile:
+        CHECK_EVAL
+        if (objc < 3 || objc > 4) {
+            Tcl_WrongNumArgs (interp, 2, objv, "<filename> ?resultVarName?");
+            return TCL_ERROR;
+        }
+        if (sdata->validationState != VALIDATION_READY) {
+            SetResult ("The schema command is busy");
+            return TCL_ERROR;
+        }
+        xmlstr = Tcl_GetString (objv[2]);
+        if (validateFile (interp, sdata, xmlstr) == TCL_OK) {
+            SetBooleanResult (1);
+            if (objc == 4) {
+                Tcl_SetVar (interp, Tcl_GetString (objv[3]), "", 0);
+            }
+        } else {
+            if (objc == 4) {
+                Tcl_SetVar (interp, Tcl_GetString (objv[3]),
+                            Tcl_GetStringResult (interp), 0);
+            }
+            if (sdata->evalError) {
+                 result = TCL_ERROR;
+            } else {
+                SetBooleanResult (0);
+            }
+        }
+        schemaReset (sdata);
+        break;
+        
     case m_domvalidate:
         CHECK_EVAL
         if (objc < 3 || objc > 4) {
