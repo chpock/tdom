@@ -847,8 +847,7 @@ repoolStackElement (
 static void
 pushToStack (
     SchemaData *sdata,
-    SchemaCP *pattern,
-    int ac
+    SchemaCP *pattern
     )
 {
     SchemaValidationStack *se, *nextse;
@@ -1187,7 +1186,7 @@ matchElementStart (
                              candidate->name, candidate->namespace));
                 if (candidate->name == name
                     && candidate->namespace == namespace) {
-                    pushToStack (sdata, candidate, ac);
+                    pushToStack (sdata, candidate);
                     updateStack (se, cp, ac);
                     return 1;
                 }
@@ -1199,7 +1198,7 @@ matchElementStart (
                     if (h) {
                         icp = Tcl_GetHashValue (h);
                         if (icp->namespace == namespace) {
-                            pushToStack (sdata, icp, ac);
+                            pushToStack (sdata, icp);
                             updateStack (se, cp, ac);
                             return 1;
                         }
@@ -1225,7 +1224,7 @@ matchElementStart (
                     case SCHEMA_CTYPE_NAME:
                         if (icp->name == name
                             && icp->namespace == namespace) {
-                            pushToStack (sdata, icp, ac);
+                            pushToStack (sdata, icp);
                             updateStack (se, cp, ac);
                             return 1;
                         }
@@ -1236,7 +1235,7 @@ matchElementStart (
 
                     case SCHEMA_CTYPE_INTERLEAVE:
                     case SCHEMA_CTYPE_PATTERN:
-                        pushToStack (sdata, icp, ac);
+                        pushToStack (sdata, icp);
                         rc = matchElementStart (interp, sdata, name, namespace);
                         if (rc == 1) {
                             updateStack (se, cp, ac);
@@ -1268,7 +1267,7 @@ matchElementStart (
 
             case SCHEMA_CTYPE_INTERLEAVE:
             case SCHEMA_CTYPE_PATTERN:
-                pushToStack (sdata, candidate, ac);
+                pushToStack (sdata, candidate);
                 rc = matchElementStart (interp, sdata, name, namespace);
                 if (rc == 1) {
                     updateStack (se, cp, ac);
@@ -1371,7 +1370,7 @@ matchElementStart (
             case SCHEMA_CTYPE_NAME:
                 if (icp->name == name
                     && icp->namespace == namespace) {
-                    pushToStack (sdata, icp, 0);
+                    pushToStack (sdata, icp);
                     se->hasMatched = 1;
                     se->interleaveState[i] = 1;
                     return 1;
@@ -1383,7 +1382,7 @@ matchElementStart (
 
             case SCHEMA_CTYPE_INTERLEAVE:
             case SCHEMA_CTYPE_PATTERN:
-                pushToStack (sdata, icp, 0);
+                pushToStack (sdata, icp);
                 rc = matchElementStart (interp, sdata, name, namespace);
                 if (rc == 1) {
                     se->hasMatched = 1;
@@ -1554,7 +1553,7 @@ probeElement (
             SetResult ("Unknown element");
             return TCL_ERROR;
         }
-        pushToStack (sdata, pattern, 0);
+        pushToStack (sdata, pattern);
         return TCL_OK;
     }
 
@@ -2005,7 +2004,7 @@ static int checkElementEnd (
                         
                     case SCHEMA_CTYPE_INTERLEAVE:
                     case SCHEMA_CTYPE_PATTERN:
-                        pushToStack (sdata, ic, ac);
+                        pushToStack (sdata, ic);
                         if (checkElementEnd (interp, sdata)) {
                             mayMiss = 1;
                         }
@@ -2034,7 +2033,7 @@ static int checkElementEnd (
                 
             case SCHEMA_CTYPE_INTERLEAVE:
             case SCHEMA_CTYPE_PATTERN:
-                pushToStack (sdata, cp->content[ac], ac);
+                pushToStack (sdata, cp->content[ac]);
                 rc = checkElementEnd (interp, sdata);
                 popStack (sdata);
                 if (rc) break;
@@ -2269,7 +2268,7 @@ matchText (
 
                         case SCHEMA_CTYPE_INTERLEAVE:
                         case SCHEMA_CTYPE_PATTERN:
-                            pushToStack (sdata, ic, ac);
+                            pushToStack (sdata, ic);
                             if (matchText (interp, sdata, text)) {
                                 updateStack (se, cp, ac);
                                 return 1;
@@ -2304,7 +2303,7 @@ matchText (
 
                 case SCHEMA_CTYPE_INTERLEAVE:
                 case SCHEMA_CTYPE_PATTERN:
-                    pushToStack (sdata, candidate, ac);
+                    pushToStack (sdata, candidate);
                     if (matchText (interp, sdata, text)) {
                         updateStack (se, cp, ac);
                         return 1;
@@ -2404,7 +2403,7 @@ matchText (
 
                 case SCHEMA_CTYPE_INTERLEAVE:
                 case SCHEMA_CTYPE_PATTERN:
-                    pushToStack (sdata, ic, 0);
+                    pushToStack (sdata, ic);
                     if (matchText (interp, sdata, text)) {
                         updateStack (se, cp, ac);
                         return 1;

@@ -1,5 +1,5 @@
-C Try\san\sO(n)\sapproach\sfor\ssimple\schoice\scases.
-D 2019-12-05T13:27:05.152
+C Merged\sfrom\sschema.
+D 2019-12-06T01:52:14.603
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -134,7 +134,7 @@ F generic/domxslt.h 0cb8e327683a0ffeb2a7094add6cd82ec1ae49c7c704f20d8d6f7d6523e7
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c ee14ed666ca6d18977f7301545c52ac71b3ce73c49233ff8f8b3aa4144008d24
 F generic/nodecmd.h d2201b69de9507f86e94750f0b72867ec9150795712ef18c5b5b87f35a689f75
-F generic/schema.c 2ebf5749093de3cb05101e7e35d1a6f64047c41f09e642be78b569797b0d2e29
+F generic/schema.c 7983ec0f8c13818de13fe6dc97eb79807448898115cd4dfd84145e0ff8289933
 F generic/schema.h 577ec42a9ac6e62a1aa95d5f6d63eb529ed48aa2e76bb3da7d1f6bc23e9bc19b
 F generic/tcldom.c 5912e126b36eee9b6188d9877341c54ec96173b9cd7f36ebf822395009abd2fa
 F generic/tcldom.h c8bda18533dcfeb0dde99bc7fa2cd2fc19cb90239538a65ee98bb8e9dd4d8ad6
@@ -230,11 +230,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 8b2322acee7223d4dacfcb7628f114c4d0b3773e94987ff765c03e1409afa778
-R 0c08ca8bf1535c463cf9b1bdbe78b654
-T *branch * mixedoptimization
-T *sym-mixedoptimization *
-T -sym-schema *
+P 4b65eabd783ad6a9b5df67357417fd8e9b0e1291449ee62f3edb6e70b40b1b91 5fe79f9b36ff0d2cee3924a4908a44f56524243ab096de1fe2c04af4f17f9bd4
+R 9a5f1e336e624e6170e126d259024be4
 U rolf
-Z d9e3ddb429f7667e87f59c041c76dbb6
+Z 5022557b597fb0e04199f67673a8ee23
 # Remove this line to create a well-formed Fossil manifest.
