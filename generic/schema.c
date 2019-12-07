@@ -2222,8 +2222,6 @@ matchText (
                                  text, ac)) {
                         updateStack (se, cp, ac);
                         return 1;
-                    } else {
-                        return 0;
                     }
                     SetResult ("Invalid text content");
                     return 0;
@@ -6688,6 +6686,49 @@ unsignedIntTypesTCObjCmd (
     return TCL_OK;
 }
 
+static void
+setvarImplFree (
+    void *constraintData
+    )
+{
+    FREE (constraintData);
+}
+
+static int
+setvarImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    char *varName = (char *)constraintData;
+
+    if (!Tcl_SetVar (interp, varName, text, TCL_LEAVE_ERR_MSG)) {
+        return 0;
+    }
+    return 1;
+}
+
+static int
+setvarTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+
+    CHECK_TI
+    checkNrArgs (2,2,"<tcl variable name>");
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = setvarImpl;
+    sc->freeData = setvarImplFree;
+    sc->constraintData = tdomstrdup (Tcl_GetString (objv[1]));
+    return TCL_OK;
+}
+
 void
 tDOM_SchemaInit (
     Tcl_Interp *interp
@@ -6823,6 +6864,8 @@ tDOM_SchemaInit (
                           unsignedIntTypesTCObjCmd, (ClientData) 2, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::unsignedLong",
                           unsignedIntTypesTCObjCmd, (ClientData) 3, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::setvar",
+                          setvarTCObjCmd, (ClientData) 3, NULL);
 }
 
 

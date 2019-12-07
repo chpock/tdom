@@ -5034,6 +5034,32 @@ test schema-14.42 {isodate outside schema context} {
     set result
 } {0 0 0 0 1 0 0 0 1 0 1 1 0 1 1 0 0 0 1 0 1 1 1 1 0 0 0 1 1 1 0 1 0 1 1 0 0 0 0}
 
+test schema-14.43 {text constraint setvar} {
+    tdom::schema s
+    namespace eval ::schema-14.43 { }
+    s defelement doc {
+        text {
+            setvar from_schema-14.43
+            setvar ::schema-14.43::foo
+        }
+    }
+    s validate "<doc>this</doc>"
+    s delete
+    list ${::schema-14.43::foo} ${from_schema-14.43}
+} {this this}
+
+test schema-14.44 {text constraint setvar} {
+    tdom::schema s
+    namespace eval ::schema-14.43 { }
+    s defelement doc {
+        element a ! {text {setvar from_schema-14.44}}
+        element b ! {text {setvar from_schema-14.44}}
+    }
+    set result [s validate "<doc><a>a</a><b>b</b></doc>"]
+    s delete
+    lappend result ${from_schema-14.44}
+} {1 b}
+
 test schema-15.1 {constraint cmd tcl} {
     tdom::schema s
     s define {
