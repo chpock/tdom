@@ -3182,7 +3182,7 @@ test schema-12.5 {domvalidate doch w/ xml namespace} {
     set result
 } {1 1 1 1 1 1 1 1}
 
-test schema-12.5a {domvalidate doch w/ xml namespace} {
+test schema-12.5a {domvalidate doc w/ xml namespace} {
     tdom::schema s 
     s prefixns {fb http://foo.bar}
     s define {
@@ -3234,6 +3234,32 @@ test schema-12.5a {domvalidate doch w/ xml namespace} {
     s delete
     set result
 } {1 1 1 1 1 1 1 1}
+
+proc dummycallback {args} {}
+
+test schema-12.6 {domvalidate only root} {
+    tdom::schema s
+    s reportcmd dummycallback
+    s start doc
+    set doc [dom parse <doc/>]
+    set result [s domvalidate $doc]
+    s defelement doc {}
+    lappend result [s domvalidate $doc]
+    s delete
+    $doc delete
+    set result
+} {1 1}
+
+test schema-12.7 {domvalidate invalid root} {
+    tdom::schema s
+    s start doc
+    s reportcmd dummycallback
+    set doc [dom parse <dos/>]
+    set result [s domvalidate $doc]
+    s delete
+    $doc delete
+    set result
+} 1
 
 test schema-13.1 {XML namespaces} {
     tdom::schema create s

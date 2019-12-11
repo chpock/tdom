@@ -2876,6 +2876,8 @@ validateDOM (
         != TCL_OK) {
         return TCL_ERROR;
     }
+    /* In case of UNKNOWN_ROOT_ELEMENT and reportCmd is set sdata->stack is NULL. */
+    if (!sdata->stack) return TCL_OK;
     if (sdata->skipDeep == 0) {
         if (node->firstAttr) {
             if (probeDomAttributes (interp, sdata, node->firstAttr) != TCL_OK) {

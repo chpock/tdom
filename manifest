@@ -1,5 +1,5 @@
-C Added\sthe\stext\sconstraint\scommand\ssetvar,\swhich\sexpects\sthe\sname\sof\sa\stcl\svar\sas\sargument\sand\sset\sthis\svariable\sto\sthe\stext\sto\svalidate.
-D 2019-12-07T01:59:13.855
+C Fixed\sseg\sfault\sin\scase\sof\sUNKNOWN_ROOT_ELEMENT\sand\sreportCmd\sis\sset.
+D 2019-12-11T23:06:51.460
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -134,7 +134,7 @@ F generic/domxslt.h 0cb8e327683a0ffeb2a7094add6cd82ec1ae49c7c704f20d8d6f7d6523e7
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c ee14ed666ca6d18977f7301545c52ac71b3ce73c49233ff8f8b3aa4144008d24
 F generic/nodecmd.h d2201b69de9507f86e94750f0b72867ec9150795712ef18c5b5b87f35a689f75
-F generic/schema.c f724059fd8eb1dbaf21321f63aacb7f5e3c6dd402a8442c98859644f3c5c4a1b
+F generic/schema.c ab8c8dccf0965f8583ba376b4add315832e7820d215f7ad8ddb4147a568b8099
 F generic/schema.h 68817ccd51f885eae068ca616732841e3cb4ff62946ab50c1ebdc3498a609a20
 F generic/tcldom.c 5912e126b36eee9b6188d9877341c54ec96173b9cd7f36ebf822395009abd2fa
 F generic/tcldom.h c8bda18533dcfeb0dde99bc7fa2cd2fc19cb90239538a65ee98bb8e9dd4d8ad6
@@ -204,7 +204,7 @@ F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
 F tests/pullparser.test e4b14ea0bdc9f9fd931f3bc559e78c309582a67a238170d58e0f20331f99890c
 F tests/pushpull.bench 664e8f512917537d96c4b71933d4d9a6da65fc6fe85bd7c459483830dc7d2faf
-F tests/schema.test c39881a024b0f8ec668c022d55404c7dc86e55f32ce6206aa4c37c8f7567f413
+F tests/schema.test dafe5fb562d2082d9ae4e39729b9733736fe118d288c91a4906aba3ce050a08c
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
 F tests/tdomcmd.bench b07448ed4de08ccaa9734cf3fe15c695fd7066c993da58ff48d465747940e417
 F tests/tdomcmd.test 092401adf0609906d710f3ef8997cb4ca29bc208
@@ -230,8 +230,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 5fe79f9b36ff0d2cee3924a4908a44f56524243ab096de1fe2c04af4f17f9bd4
-R 50a44a517c4f1f146f3644398e536f5a
+P 366ed3d250c6a483ed31085ac828890f4ea572cd7f7707df3b13122896a37247
+R 8c784fc0598367062876381d6ca2cc62
 U rolf
-Z d0aac62a8924a8d5f85a009ba73cd6a1
+Z 8a6c4abe8ff8e3b6b57b4094de98807e
 # Remove this line to create a well-formed Fossil manifest.
