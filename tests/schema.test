@@ -29,6 +29,8 @@ source [file join [file dir [info script]] loadtdom.tcl]
 
 if {[dom featureinfo schema]} {
 
+proc dummycallback {args} {}
+
 test schema-1.1 {create} {
     tdom::schema create grammar
     grammar start doc
@@ -1010,6 +1012,22 @@ test schema-4.10 {event - tcl error in called script} {
     s delete
     set result
 } {1 {Error raised in schema-4.10}}
+
+test schema-4.11 {event - invalid root} {
+    tdom::schema s
+    s defelement doc {}
+    s reportcmd dummycallback
+    s event start doo
+    s delete
+} {}
+
+test schema-4.12 {event - text without root} {
+    tdom::schema s
+    s defelement doc {}
+    s reportcmd dummycallback
+    s event text foo
+    s delete
+} {}
 
 test schema-5.1 {dom parse -validateCmd} {
     set result [catch {
@@ -3234,8 +3252,6 @@ test schema-12.5a {domvalidate doc w/ xml namespace} {
     s delete
     set result
 } {1 1 1 1 1 1 1 1}
-
-proc dummycallback {args} {}
 
 test schema-12.6 {domvalidate only root} {
     tdom::schema s

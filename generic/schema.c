@@ -2876,7 +2876,8 @@ validateDOM (
         != TCL_OK) {
         return TCL_ERROR;
     }
-    /* In case of UNKNOWN_ROOT_ELEMENT and reportCmd is set sdata->stack is NULL. */
+    /* In case of UNKNOWN_ROOT_ELEMENT and reportCmd is set
+     * sdata->stack is NULL. */
     if (!sdata->stack) return TCL_OK;
     if (sdata->skipDeep == 0) {
         if (node->firstAttr) {
@@ -3952,6 +3953,9 @@ schemaInstanceCmd (
             }
             result = probeElement (interp, sdata, Tcl_GetString (objv[3]),
                                    namespacePtr);
+            /* In case of UNKNOWN_ROOT_ELEMENT and reportCmd is set
+             * sdata->stack is NULL. */
+            if (!sdata->stack) break;
             if (sdata->skipDeep == 0 && result == TCL_OK) {
                 result = probeEventAttribute (interp, sdata, attData, len);
             }
