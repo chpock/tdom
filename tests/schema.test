@@ -217,6 +217,33 @@ test schema-1.13 {define lots of elements} {
     s delete
 } {}
 
+test schema-1.14 {refer local element definition with element} {
+    tdom::schema create s
+    s define {
+        defelement elm1 {
+            element elm ! {
+                element a ! {
+                    text
+                }
+            }
+        }
+        defelement elm2 {
+            element elm
+        }
+    }
+    set result [list]
+    foreach xml {
+        <elm1><elm><a>foo</a></elm></elm1>
+        <elm1><elm></elm></elm1>
+        <elm2><elm><a>foo</a></elm></elm2>
+        <elm2><elm></elm></elm2>
+    } {
+        lappend result [s validate $xml ]
+    }
+    s delete
+    set result 
+} {1 0 0 1}
+
 test schema-1.14 {define start w/ namespace} {
     tdom::schema create s
     s start doc http://foo.bar
@@ -1025,9 +1052,11 @@ test schema-4.12 {event - text without root} {
     tdom::schema s
     s defelement doc {}
     s reportcmd dummycallback
-    s event text foo
+    set result [catch {s event text foo} errMsg]
+    lappend result $errMsg
     s delete
-} {}
+    set result
+} {1 {No validation started}}
 
 test schema-5.1 {dom parse -validateCmd} {
     set result [catch {
