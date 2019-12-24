@@ -644,12 +644,16 @@ test schema-1.27 {prefixns} {
 
 test schema-1.28 {defelement} {
     tdom::schema s
-    s defelement e {
-        defelement a {
-            element b
+    set result [catch {
+        s defelement e {
+            defelement a {
+                element b
+            }
         }
-    }
-} {}
+    }]
+    s delete
+    set result
+} 1
         
 test schema-2.1 {grammar definition: ref} {
     tdom::schema create grammar

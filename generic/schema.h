@@ -141,6 +141,7 @@ typedef struct SchemaData_
     char *start;
     char *startNamespace;
     Tcl_HashTable element;
+    Tcl_HashTable elementTypes;
     Tcl_HashTable namespace;
     Tcl_HashEntry *emptyNamespace;
     char **prefixns;

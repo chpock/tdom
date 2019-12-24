@@ -532,6 +532,7 @@ initSchemaData (
     sdata->self = Tcl_NewStringObj (name, len);
     Tcl_IncrRefCount (sdata->self);
     Tcl_InitHashTable (&sdata->element, TCL_STRING_KEYS);
+    Tcl_InitHashTable (&sdata->elementTypes, TCL_STRING_KEYS);
     Tcl_InitHashTable (&sdata->prefix, TCL_STRING_KEYS);
     Tcl_InitHashTable (&sdata->pattern, TCL_STRING_KEYS);
     Tcl_InitHashTable (&sdata->attrNames, TCL_STRING_KEYS);
@@ -599,6 +600,7 @@ static void schemaInstanceDelete (
     }
     Tcl_DeleteHashTable (&sdata->namespace);
     Tcl_DeleteHashTable (&sdata->element);
+    Tcl_DeleteHashTable (&sdata->elementTypes);
     Tcl_DeleteHashTable (&sdata->prefix);
     Tcl_DeleteHashTable (&sdata->pattern);
     Tcl_DeleteHashTable (&sdata->attrNames);
