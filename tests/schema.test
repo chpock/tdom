@@ -642,6 +642,15 @@ test schema-1.27 {prefixns} {
     set result
 } {0 {error "Unknown element" at line 1 character 20}}
 
+test schema-1.28 {defelement} {
+    tdom::schema s
+    s defelement e {
+        defelement a {
+            element b
+        }
+    }
+} {}
+        
 test schema-2.1 {grammar definition: ref} {
     tdom::schema create grammar
     grammar defpattern thisPattern {

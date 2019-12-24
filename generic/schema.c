@@ -252,6 +252,9 @@ static void SetActiveSchemaData (SchemaData *v)
             SetResult ("This recursive call is not allowed");           \
             return TCL_ERROR;                                           \
         }                                                               \
+    } else if (!sdata->defineToplevel) {                                \
+        SetResult ("Command only allowed at lop level");                \
+        return TCL_ERROR;                                               \
     }
       
 #define CHECK_EVAL                                                      \
@@ -3681,12 +3684,12 @@ schemaInstanceCmd (
     static const char *schemaInstanceMethods[] = {
         "defelement", "defpattern", "start",    "event",       "delete",
         "reset",      "define",     "validate", "domvalidate", "deftext",
-        "info",       "reportcmd",  "prefixns",  NULL
+        "info",       "reportcmd",  "prefixns", "defelementtype", NULL
     };
     enum schemaInstanceMethod {
         m_defelement, m_defpattern, m_start,    m_event,       m_delete,
         m_reset,      m_define,     m_validate, m_domvalidate, m_deftext,
-        m_info,       m_reportcmd,  m_prefixns
+        m_info,       m_reportcmd,  m_prefixns, m_defelementtype
     };
 
     static const char *eventKeywords[] = {
@@ -3699,8 +3702,8 @@ schemaInstanceCmd (
     };
 
     if (sdata == NULL) {
-        /* Inline defined defelement, defpattern, deftext, start or
-         * prefixns */
+        /* Inline defined defelement, defelementtype, defpattern,
+         * deftext, start or prefixns */
         sdata = GETASI;
         CHECK_SI;
         if (!sdata->defineToplevel && sdata->currentEvals > 1) {
@@ -4078,10 +4081,6 @@ schemaInstanceCmd (
 
     case m_prefixns:
         CHECK_RECURSIVE_CALL
-        if (clientData == NULL && !sdata->defineToplevel) {
-            SetResult ("Command only allowed at lop level");
-            return TCL_ERROR;
-        }
         if (objc != 2-i && objc != 3-i) {
             Tcl_WrongNumArgs (interp, 2-i, objv, "?prefixUriList?");
             return TCL_ERROR;
@@ -4109,7 +4108,17 @@ schemaInstanceCmd (
             }
         }
         break;
-        
+
+    case m_defelementtype:
+        CHECK_RECURSIVE_CALL
+        if (objc != 5-i && objc != 6-i) {
+            Tcl_WrongNumArgs (interp, 1-i, objv, "<type_name> <name>"
+                 " ?<namespace>? pattern");
+            return TCL_ERROR;
+        }
+        /* todo */
+        break;
+            
     default:
         Tcl_SetResult (interp, "unknown method", NULL);
         result = TCL_ERROR;
@@ -6745,6 +6754,8 @@ tDOM_SchemaInit (
 
     /* Inline definition commands. */
     Tcl_CreateObjCommand (interp, "tdom::schema::defelement",
+                          schemaInstanceCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp, "tdom::schema::defelementtype",
                           schemaInstanceCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::defpattern",
                           schemaInstanceCmd, NULL, NULL);
