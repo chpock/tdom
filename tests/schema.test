@@ -22,6 +22,7 @@
 #    schema-19.*: keyspace
 #    schema-20.*: domunique
 #    schema-21.*: internal: buffers
+
 #
 # Copyright (c) 2018-2019 Rolf Ade.
 
@@ -7007,5 +7008,107 @@ test schema-21.1 {CONTENT_ARRAY_SIZE_INIT} {
     s delete
     set result
 } {1 1 1 0}
+
+test schema-22.1 {defelementtype} {
+    tdom::schema s
+    s defelementtype a_type a {
+        element e1
+    }
+    s defelement doc {
+        elementtype a_type
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/></doc>
+        <doc><a><e1/></a></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 1}
+
+test schema-22.2 {defelementtype} {
+    tdom::schema s
+    s defelement doc {
+        elementtype a_type
+    }
+    s defelementtype a_type a {
+        element e1
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/></doc>
+        <doc><a><e1/></a></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 1}
+
+test schema-22.3 {defelementtype} {
+    tdom::schema s
+    s defelement doc {
+        elementtype a
+        elementtype a2
+    }
+    s defelementtype a a {
+        element e1
+    }
+    s defelementtype a2 a {
+        element e2
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/></doc>
+        <doc><a><e1/></a></doc>
+        <doc><a><e1/></a><a><e2/></a></doc>
+        <doc><a><e1/></a><a><e1/></a></doc>
+        <doc><a><e2/></a><a><e1/></a></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 0 1 0 0}
+
+test schema-22.4 {defelementtype} {
+    tdom::schema s
+    catch {s defelement doc {
+        elementtype a
+        elementtype a2
+        error "my"
+    }}
+    s defelement doc {
+        elementtype a
+        elementtype a2
+    }
+    # catch {s defelementtype a a {
+    #     element e1
+    #     error my
+    # }}
+    # s defelementtype a a {
+    #     element e1
+    # }
+    # catch {s defelementtype a2 a {
+    #     element e2
+    #     error my
+    # }}
+    # s defelementtype a2 a {
+    #     element e2
+    # }
+    set result [list]
+    foreach xml {
+        <doc><a><e2/></a><a><e1/></a></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 0 1 0 0}
 
 }
