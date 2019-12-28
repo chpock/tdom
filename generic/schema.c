@@ -395,6 +395,9 @@ static void serializeCP (
         if (pattern->flags & LOCAL_DEFINED_ELEMENT) {
             fprintf (stderr, "\tLocal defined NAME\n");
         }
+        if (pattern->flags & ELEMENTTYPE_DEF) {
+            fprintf (stderr, "\tElementtype '%s'\n", pattern->typeName);
+        }
         /* Fall thru. */
     case SCHEMA_CTYPE_CHOICE:
     case SCHEMA_CTYPE_INTERLEAVE:
@@ -723,7 +726,6 @@ cleanupLastPattern (
         freeSchemaCP (sdata->patternList[i]);
     }
     sdata->numPatternList = from;
-    fprintf (stderr, "end of cleanupLastPattern %d\n", sdata->numPatternList);
 }
 
 static void
@@ -3823,6 +3825,9 @@ schemaInstanceCmd (
             pattern->defScript = objv[patternIndex];
             Tcl_IncrRefCount (pattern->defScript);
         } else {
+            if (forwardDef) {
+                pattern->nc = 0;
+            }
             cleanupLastPattern (sdata, savedNumPatternList);
         }
         sdata->defineToplevel = savedDefineToplevel;
@@ -4201,6 +4206,9 @@ schemaInstanceCmd (
             pattern->defScript = objv[patternIndex];
             Tcl_IncrRefCount (pattern->defScript);
         } else {
+            if (forwardDef) {
+                pattern->nc = 0;
+            }
             cleanupLastPattern (sdata, savedNumPatternList);
         }
         sdata->defineToplevel = savedDefineToplevel;
@@ -4522,10 +4530,9 @@ NamedPatternObjCmd (
     }
     h = Tcl_CreateHashEntry (hashTable, Tcl_GetString(objv[1]), &hnew);
     if (objc < 4) {
-        /* Reference to an element or pattern */
+        /* Reference to an element, elementtype or pattern */
         if (!hnew) {
             pattern = (SchemaCP *) Tcl_GetHashValue (h);
-            fprintf (stderr, "HIER %s %s\n", Tcl_GetString (objv[1]), pattern->name);
             while (pattern) {
                 if (pattern->namespace == sdata->currentNamespace) {
                     break;
@@ -4542,6 +4549,7 @@ NamedPatternObjCmd (
             if (clientData == (ClientData) 1) {
                 pattern->typeName = pattern->name;
                 pattern->name = NULL;
+                pattern->flags |= ELEMENTTYPE_DEF;
             }
             pattern->flags |= FORWARD_PATTERN_DEF;
             sdata->forwardPatternDefs++;
