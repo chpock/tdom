@@ -393,7 +393,10 @@ static void serializeCP (
             fprintf (stderr, "\tAs placeholder defined NAME\n");
         }
         if (pattern->flags & LOCAL_DEFINED_ELEMENT) {
-            fprintf (stderr, "\tAs placeholder defined NAME\n");
+            fprintf (stderr, "\tLocal defined NAME\n");
+        }
+        if (pattern->flags & ELEMENTTYPE_DEF) {
+            fprintf (stderr, "\tElementtype '%s'\n", pattern->typeName);
         }
         /* Fall thru. */
     case SCHEMA_CTYPE_CHOICE:
@@ -532,7 +535,7 @@ initSchemaData (
     sdata->self = Tcl_NewStringObj (name, len);
     Tcl_IncrRefCount (sdata->self);
     Tcl_InitHashTable (&sdata->element, TCL_STRING_KEYS);
-    Tcl_InitHashTable (&sdata->elementTypes, TCL_STRING_KEYS);
+    Tcl_InitHashTable (&sdata->elementType, TCL_STRING_KEYS);
     Tcl_InitHashTable (&sdata->prefix, TCL_STRING_KEYS);
     Tcl_InitHashTable (&sdata->pattern, TCL_STRING_KEYS);
     Tcl_InitHashTable (&sdata->attrNames, TCL_STRING_KEYS);
@@ -600,7 +603,7 @@ static void schemaInstanceDelete (
     }
     Tcl_DeleteHashTable (&sdata->namespace);
     Tcl_DeleteHashTable (&sdata->element);
-    Tcl_DeleteHashTable (&sdata->elementTypes);
+    Tcl_DeleteHashTable (&sdata->elementType);
     Tcl_DeleteHashTable (&sdata->prefix);
     Tcl_DeleteHashTable (&sdata->pattern);
     Tcl_DeleteHashTable (&sdata->attrNames);
@@ -673,6 +676,7 @@ cleanupLastPattern (
     )
 {
     unsigned int i;
+    char *name;
     Tcl_HashTable *hashTable;
     Tcl_HashEntry *h;
 
@@ -682,16 +686,23 @@ cleanupLastPattern (
         this = sdata->patternList[i];
         hashTable = NULL;
         if (this->type == SCHEMA_CTYPE_NAME) {
-            hashTable = &sdata->element;
+            if (this->flags & ELEMENTTYPE_DEF) {
+                hashTable = &sdata->elementType;
+                name = this->typeName;
+            } else {
+                hashTable = &sdata->element;
+                name = this->name;
+            }
         }
         if (this->type == SCHEMA_CTYPE_PATTERN) {
             hashTable = &sdata->pattern;
+            name = this->name;
         }
-        if (this->name && hashTable) {
+        if (name && hashTable) {
             if (this->flags & FORWARD_PATTERN_DEF) {
                 sdata->forwardPatternDefs--;
             }
-            h = Tcl_FindHashEntry (hashTable, this->name);
+            h = Tcl_FindHashEntry (hashTable, name);
             previous = NULL;
             current = Tcl_GetHashValue (h);
             while (current != NULL && current != this) {
@@ -705,7 +716,7 @@ cleanupLastPattern (
                     previous->next = NULL;
                 }
             } else {
-                if (current) {
+                if (current && current->next) {
                     Tcl_SetHashValue (h, current->next);
                 } else {
                     Tcl_DeleteHashEntry (h);
@@ -3669,14 +3680,14 @@ schemaInstanceCmd (
     Tcl_Obj *const objv[]
     )
 {
-    int            methodIndex, keywordIndex, hnew, patternIndex;
+    int            methodIndex, keywordIndex, hnew, hnew1, patternIndex;
     int            result = TCL_OK, forwardDef = 0, i = 0, j;
     int            savedDefineToplevel, type, len;
     unsigned int   savedNumPatternList;
     SchemaData    *savedsdata = NULL, *sdata = (SchemaData *) clientData;
     Tcl_HashTable *hashTable;
     Tcl_HashEntry *h, *h1;
-    SchemaCP      *pattern, *current = NULL;
+    SchemaCP      *pattern, *thiscp, *current = NULL;
     void          *namespacePtr, *savedNamespacePtr;
     char          *xmlstr, *errMsg;
     domDocument   *doc;
@@ -3814,6 +3825,9 @@ schemaInstanceCmd (
             pattern->defScript = objv[patternIndex];
             Tcl_IncrRefCount (pattern->defScript);
         } else {
+            if (forwardDef) {
+                pattern->nc = 0;
+            }
             cleanupLastPattern (sdata, savedNumPatternList);
         }
         sdata->defineToplevel = savedDefineToplevel;
@@ -4118,7 +4132,90 @@ schemaInstanceCmd (
                  " ?<namespace>? pattern");
             return TCL_ERROR;
         }
-        /* todo */
+        savedNumPatternList = sdata->numPatternList;
+        namespacePtr = NULL;
+        patternIndex = 4-i;
+        if (objc == 6-i) {
+            patternIndex = 5-i;
+            namespacePtr = getNamespacePtr (sdata, Tcl_GetString (objv[4-i]));
+        }
+        h = Tcl_CreateHashEntry (&sdata->elementType , Tcl_GetString (objv[2-i]),
+                                 &hnew);
+        pattern = NULL;
+        if (!hnew) {
+            pattern = (SchemaCP *) Tcl_GetHashValue (h);
+            while (pattern) {
+                if (pattern->namespace == namespacePtr) {
+                    if (pattern->flags & FORWARD_PATTERN_DEF) {
+                        forwardDef = 1;
+                        break;
+                    }
+                    SetResult ("Element type already defined in this "
+                               "namespace");
+                    return TCL_ERROR;
+                }
+                pattern = pattern->next;
+            }
+        }
+        h1 = Tcl_CreateHashEntry (&sdata->element , Tcl_GetString (objv[3-i]),
+                                  &hnew1);
+        if (hnew1) {
+            thiscp = initSchemaCP (SCHEMA_CTYPE_NAME, namespacePtr,
+                                   Tcl_GetString (objv[3-i]));
+            REMEMBER_PATTERN (thiscp);
+            thiscp->flags |= PLACEHOLDER_PATTERN_DEF;
+            Tcl_SetHashValue (h1, thiscp);
+        }
+        if (pattern == NULL) {
+            pattern = initSchemaCP (SCHEMA_CTYPE_NAME, namespacePtr,
+                                    Tcl_GetHashKey (&sdata->element, h1));
+            pattern->flags |= ELEMENTTYPE_DEF;
+            pattern->typeName = Tcl_GetHashKey (&sdata->elementType, h);
+            if (!hnew) {
+                current = (SchemaCP *) Tcl_GetHashValue (h);
+                pattern->next = current;
+            }
+            REMEMBER_PATTERN (pattern);
+            Tcl_SetHashValue (h, pattern);
+        }
+        
+        SETASI(sdata);
+        savedDefineToplevel = sdata->defineToplevel;
+        savedNamespacePtr = sdata->currentNamespace;
+        sdata->defineToplevel = 0;
+        sdata->currentNamespace = namespacePtr;
+        sdata->cp = pattern;
+        sdata->numAttr = 0;
+        sdata->numReqAttr = 0;
+        sdata->currentAttrs = NULL;
+        sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
+        sdata->evalStub[3] = objv[patternIndex];
+        sdata->currentEvals++;
+        result = Tcl_EvalObjv (interp, 4, sdata->evalStub, TCL_EVAL_GLOBAL);
+        sdata->currentEvals--;
+        sdata->currentNamespace = NULL;
+        pattern->attrs = sdata->currentAttrs;
+        pattern->numAttr = sdata->numAttr;
+        pattern->numReqAttr = sdata->numReqAttr;
+        if (result == TCL_OK) {
+            if (forwardDef) {
+                sdata->forwardPatternDefs--;
+                pattern->name = Tcl_GetHashKey (&sdata->element, h1);
+                pattern->flags &= ~FORWARD_PATTERN_DEF;
+            }
+            pattern->defScript = objv[patternIndex];
+            Tcl_IncrRefCount (pattern->defScript);
+        } else {
+            if (forwardDef) {
+                pattern->nc = 0;
+            }
+            cleanupLastPattern (sdata, savedNumPatternList);
+        }
+        sdata->defineToplevel = savedDefineToplevel;
+        sdata->currentNamespace = savedNamespacePtr;
+        if (!savedDefineToplevel) {
+            SETASI(savedsdata);
+        }
         break;
             
     default:
@@ -4393,7 +4490,8 @@ evalDefinition (
     return result;
 }
 
-/* Implements the schema definition commands "element" and "ref" */
+/* Implements the schema definition commands "element", "elementtype"
+ * and "ref" */
 static int
 NamedPatternObjCmd (
     ClientData clientData,
@@ -4412,11 +4510,17 @@ NamedPatternObjCmd (
 
     CHECK_SI
     CHECK_TOPLEVEL
-    if (patternType == SCHEMA_CTYPE_NAME) {
+    if (clientData == 0) {
         checkNrArgs (2,4,"Expected: elementName ?quant? ?pattern?");
+        patternType = SCHEMA_CTYPE_NAME;
         hashTable = &sdata->element;
+    } else if (clientData == (ClientData) 1) {
+        checkNrArgs (2,3,"Expected: elementtypeName ?quant?");
+        patternType = SCHEMA_CTYPE_NAME;
+        hashTable = &sdata->elementType;            
     } else {
         checkNrArgs (2,3,"Expected: patternName ?quant?");
+        patternType = SCHEMA_CTYPE_PATTERN;
         hashTable = &sdata->pattern;
     }
 
@@ -4426,7 +4530,7 @@ NamedPatternObjCmd (
     }
     h = Tcl_CreateHashEntry (hashTable, Tcl_GetString(objv[1]), &hnew);
     if (objc < 4) {
-        /* Reference to an element or pattern */
+        /* Reference to an element, elementtype or pattern */
         if (!hnew) {
             pattern = (SchemaCP *) Tcl_GetHashValue (h);
             while (pattern) {
@@ -4442,6 +4546,11 @@ NamedPatternObjCmd (
                 sdata->currentNamespace,
                 Tcl_GetHashKey (hashTable, h)
                 );
+            if (clientData == (ClientData) 1) {
+                pattern->typeName = pattern->name;
+                pattern->name = NULL;
+                pattern->flags |= ELEMENTTYPE_DEF;
+            }
             pattern->flags |= FORWARD_PATTERN_DEF;
             sdata->forwardPatternDefs++;
             if (!hnew) {
@@ -6772,13 +6881,14 @@ tDOM_SchemaInit (
     Tcl_CreateObjCommand (interp, "tdom::schema::any",
                           AnyPatternObjCmd, NULL, NULL);
 
-    /* The named pattern commands "element" and "ref". */
+    /* The named pattern commands "element", "elementtype" and
+     * "ref". */
     Tcl_CreateObjCommand (interp, "tdom::schema::element",
-                          NamedPatternObjCmd,
-                          (ClientData) SCHEMA_CTYPE_NAME, NULL);
+                          NamedPatternObjCmd, (ClientData) 0, NULL);
+    Tcl_CreateObjCommand (interp, "tdom::schema::elementtype",
+                          NamedPatternObjCmd, (ClientData) 1, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::ref",
-                          NamedPatternObjCmd,
-                          (ClientData) SCHEMA_CTYPE_PATTERN, NULL);
+                          NamedPatternObjCmd, (ClientData) 2, NULL);
 
     /* The anonymous pattern commands "choise", "mixed", "interleave"
      * and "group". */
