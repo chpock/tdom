@@ -23,6 +23,7 @@
 #    schema-20.*: domunique
 #    schema-21.*: internal: buffers
 #    schema-22.*: defelementtype, elementtype
+#    schema-23.*: validatefile
 #
 # Copyright (c) 2018-2019 Rolf Ade.
 
@@ -7169,5 +7170,18 @@ test schema-22.5 {defelementtype} {
     s delete
     set result
 } {0 0 0 1 0 0}
+
+test schema-23.1 {validatefile} {
+    tdom::schema s
+    s define {
+        set fd [open [file join [file dir [info script]] ../doc/tmml.schema] r]
+        eval [read $fd]
+        close $fd
+    }
+    set result [s validatefile [file join [file dir [info script]] ../doc/schema.xml] errMsg]
+    puts $errMsg
+    s delete
+    set result
+} 1
 
 }
