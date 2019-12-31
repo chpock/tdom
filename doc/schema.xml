@@ -59,6 +59,26 @@
       </commanddef>
 
       <commanddef>
+        <command><method>defelementtype</method> <m>typename</m> <m>name</m> <m>?namespace?</m> <m>&lt;definition script></m></command>
+        <desc>This method defines the elementtype <m>typename</m>
+        (optional in the namespace <m>namespace</m>) in the schema. If
+        the element type is refered in a definition script with the
+        schema command elementype the validation engine expects an
+        elment namend <m>name</m> (in the namespace <m>namespace</m>,
+        if given) and the content model <m>definition script</m>.
+        Defining element types seems only sensible if you really have
+        elments with the same name and namespache but different
+        content models. The <m>definition script</m> is evaluated and
+        defines the content model of the element. If the
+        <m>namespace</m> argument is given, any <m>element</m> or
+        <m>ref</m> references in the definition script not wrapped
+        inside a <m>namespace</m> command are resolved in that
+        namespace. If there is already a elementtype definition for
+        the name/namespace combination the command raises
+        error.</desc>
+      </commanddef>
+
+      <commanddef>
         <command><method>defpattern</method> <m>name</m> <m>?namespace?</m> <m>&lt;definition script></m></command>
         <desc>This method defines a (maybe complex) content particle
         with the <m>name</m> (optional in the namespace
@@ -101,10 +121,11 @@
         <command><method>define</method> <m>&lt;definition script></m></command>
         <desc>This method allows to define several elements or pattern
         or a whole schema with one call. All schema command methods so
-        far (<m>prefixns</m>, <m>defelement</m>, <m>defpattern</m>,
-        <m>deftext</m> and <m>start</m>) are allowed top level in the
-        <m>definition script</m>. The <m>define</m> method itself
-        isn't allowed recursively.</desc>
+        far (<m>prefixns</m>, <m>defelement</m>,
+        <m>defelementtype</m>, <m>defpattern</m>, <m>deftext</m> and
+        <m>start</m>) are allowed top level in the <m>definition
+        script</m>. The <m>define</m> method itself isn't allowed
+        recursively.</desc>
       </commanddef>
       
       <commanddef>
@@ -147,6 +168,19 @@
         name is set to a validation error message. If the XML string
         is valid and the optional <m>objVar</m> argument is given,
         then the variable with that name is set to the empty string.</desc>
+      </commanddef>
+
+      <commanddef>
+        <command><method>validatefile</method> <m>filename</m> <m>?objVar?</m></command>
+        <desc>Returns true if the content of <m>filename</m> is valid
+        or false otherwise. The given file is feeded as binary stream
+        to expat, therefor only US-ASCII, ISO-8859-1, UTF-8 or UTF-16
+        encoded data will work with this method. If validation failed
+        and the optional <m>objVar</m> argument is given, then the
+        variable with that name is set to a validation error message.
+        If the XML string is valid and the optional <m>objVar</m>
+        argument is given, then the variable with that name is set to
+        the empty string.</desc>
       </commanddef>
 
       <commanddef>
