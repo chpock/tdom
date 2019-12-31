@@ -2,9 +2,6 @@
 |   Copyright (c) 1999-2001 Jochen Loewer (loewerj@hotmail.com)
 |-----------------------------------------------------------------------------
 |
-|   $Id$
-|
-|
 |   A XPath implementation (lexer/parser/evaluator) for tDOM,
 |   the DOM implementation for Tcl.
 |   Based on November 16 1999 Recommendation of the W3C
