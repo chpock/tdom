@@ -44,6 +44,10 @@
     <DEF cat="manpage" name="schema" manpage="schema"/>
     <DEF cat="schema" name="tdom::schema" manpage="schema"/>
     <DEF cat="cmd" name="tdom::schema" manpage="schema"/>
+    <KWD name="Validation" manpage="schema"/>
+    <KWD name="Postvalidation" manpage="schema"/>
+    <KWD name="DOM" manpage="schema"/>
+    <KWD name="SAX" manpage="schema"/>
     <MAN id="tdomcmd" title="tdom"/>
     <DEF cat="manpage" name="tdomcmd" manpage="tdomcmd"/>
     <DEF cat="cmd" name="tdom" manpage="tdomcmd"/>

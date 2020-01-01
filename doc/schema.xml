@@ -1070,5 +1070,12 @@ schema define {
 }
       
     </example>
-  </section>
+</section>
+
+<keywords>
+    <keyword>Validation</keyword>
+    <keyword>Postvalidation</keyword>
+    <keyword>DOM</keyword>
+    <keyword>SAX</keyword>
+</keywords>
 </manpage>
