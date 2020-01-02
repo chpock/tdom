@@ -24,6 +24,7 @@
 #    schema-21.*: internal: buffers
 #    schema-22.*: defelementtype, elementtype
 #    schema-23.*: validatefile
+#    schema-24.*: validatechannel
 #
 # Copyright (c) 2018-2019 Rolf Ade.
 
@@ -7178,8 +7179,21 @@ test schema-23.1 {validatefile} {
         eval [read $fd]
         close $fd
     }
-    set result [s validatefile [file join [file dir [info script]] ../doc/schema.xml] errMsg]
-    puts $errMsg
+    set result [s validatefile [file join [file dir [info script]] ../doc/schema.xml]]
+    s delete
+    set result
+} 1
+
+test schema-24.1 {validatechannel} {
+    tdom::schema s
+    s define {
+        set fd [open [file join [file dir [info script]] ../doc/tmml.schema] r]
+        eval [read $fd]
+        close $fd
+    }
+    set fd [open [file join [file dir [info script]] ../doc/schema.xml] r]
+    set result [s validatechannel $fd]
+    close $fd
     s delete
     set result
 } 1

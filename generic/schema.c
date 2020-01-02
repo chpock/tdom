@@ -2675,7 +2675,6 @@ validateString (
     XML_ParserFree (parser);
     Tcl_DStringFree (&cdata);
     FREE (vdata.uri);
-    while (sdata->stack) popStack (sdata);
     return result;
 }
 
@@ -2766,7 +2765,71 @@ cleanup:
     XML_ParserFree (parser);
     Tcl_DStringFree (&cdata);
     FREE (vdata.uri);
-    while (sdata->stack) popStack (sdata);
+    return result;
+}
+
+static int
+validateChannel (
+    Tcl_Interp *interp,
+    SchemaData *sdata,
+    Tcl_Channel channel
+    )
+{
+    XML_Parser parser;
+    char sep = '\xFF';
+    ValidateMethodData vdata;
+    Tcl_DString cdata;
+    Tcl_Obj *resultObj, *bufObj;
+    char sl[50], sc[50], *str;
+    int result = TCL_OK, len, done, tclLen, rc;
+
+    parser = XML_ParserCreate_MM (NULL, MEM_SUITE, &sep);
+    vdata.interp = interp;
+    vdata.sdata = sdata;
+    vdata.parser = parser;
+    sdata->parser = parser;
+    Tcl_DStringInit (&cdata);
+    vdata.cdata = &cdata;
+    vdata.onlyWhiteSpace = 1;
+    vdata.uri = (char *) MALLOC (URI_BUFFER_LEN_INIT);
+    vdata.maxUriLen = URI_BUFFER_LEN_INIT;
+    XML_SetUserData (parser, &vdata);
+    XML_SetElementHandler (parser, startElement, endElement);
+    XML_SetCharacterDataHandler (parser, characterDataHandler);
+
+    bufObj = Tcl_NewObj();
+    Tcl_SetObjLength (bufObj, 6144);
+    do {
+        len = Tcl_ReadChars (channel, bufObj, 1024, 0);
+        done = (len < 1024);
+        str = Tcl_GetStringFromObj(bufObj, &tclLen);
+        rc = XML_Parse (parser, str, tclLen, done);
+        if (rc != XML_STATUS_OK 
+            || sdata->validationState == VALIDATION_ERROR) {
+            resultObj = Tcl_NewObj ();
+            sprintf(sl, "%ld", XML_GetCurrentLineNumber(parser));
+            sprintf(sc, "%ld", XML_GetCurrentColumnNumber(parser));
+            if (sdata->validationState == VALIDATION_ERROR) {
+                Tcl_AppendStringsToObj (resultObj, "error \"",
+                                        Tcl_GetStringResult (interp),
+                                        "\" at line ", sl, " character ", sc,
+                                        NULL);
+            } else {
+                Tcl_AppendStringsToObj (resultObj, "error \"",
+                                        XML_ErrorString(XML_GetErrorCode(parser)),
+                                        "\" at line ", sl, " character ", sc,
+                                        NULL);
+            }
+            Tcl_SetObjResult (interp, resultObj);
+            result = TCL_ERROR;
+            break;
+        }
+    } while (!done);
+    Tcl_DecrRefCount (bufObj);
+    sdata->parser = NULL;
+    XML_ParserFree (parser);
+    Tcl_DStringFree (&cdata);
+    FREE (vdata.uri);
     return result;
 }
 
@@ -3790,7 +3853,7 @@ schemaInstanceCmd (
     )
 {
     int            methodIndex, keywordIndex, hnew, hnew1, patternIndex;
-    int            result = TCL_OK, forwardDef = 0, i = 0, j;
+    int            result = TCL_OK, forwardDef = 0, i = 0, j, mode;
     int            savedDefineToplevel, type, len;
     unsigned int   savedNumPatternList;
     SchemaData    *savedsdata = NULL, *sdata = (SchemaData *) clientData;
@@ -3802,18 +3865,19 @@ schemaInstanceCmd (
     domDocument   *doc;
     domNode       *node;
     Tcl_Obj       *attData;
+    Tcl_Channel  chan = NULL;
 
     static const char *schemaInstanceMethods[] = {
         "defelement", "defpattern", "start",    "event",        "delete",
         "reset",      "define",     "validate", "domvalidate",  "deftext",
         "info",       "reportcmd",  "prefixns", "validatefile",
-        "defelementtype", NULL
+        "validatechannel",          "defelementtype", NULL
     };
     enum schemaInstanceMethod {
         m_defelement, m_defpattern, m_start,    m_event,        m_delete,
         m_reset,      m_define,     m_validate, m_domvalidate,  m_deftext,
         m_info,       m_reportcmd,  m_prefixns, m_validatefile,
-        m_defelementtype
+        m_validatechannel,          m_defelementtype
     };
 
     static const char *eventKeywords[] = {
@@ -4166,6 +4230,40 @@ schemaInstanceCmd (
         }
         xmlstr = Tcl_GetString (objv[2]);
         if (validateFile (interp, sdata, xmlstr) == TCL_OK) {
+            SetBooleanResult (1);
+            if (objc == 4) {
+                Tcl_SetVar (interp, Tcl_GetString (objv[3]), "", 0);
+            }
+        } else {
+            if (objc == 4) {
+                Tcl_SetVar (interp, Tcl_GetString (objv[3]),
+                            Tcl_GetStringResult (interp), 0);
+            }
+            if (sdata->evalError) {
+                 result = TCL_ERROR;
+            } else {
+                SetBooleanResult (0);
+            }
+        }
+        schemaReset (sdata);
+        break;
+
+    case m_validatechannel:
+        CHECK_EVAL
+        if (objc < 3 || objc > 4) {
+            Tcl_WrongNumArgs (interp, 2, objv, "<channel> ?resultVarName?");
+            return TCL_ERROR;
+        }
+        if (sdata->validationState != VALIDATION_READY) {
+            SetResult ("The schema command is busy");
+            return TCL_ERROR;
+        }
+        chan = Tcl_GetChannel(interp, Tcl_GetString (objv[2]), &mode);
+        if (chan == NULL) {
+            SetResult ("The channel argument isn't a tcl channel");
+            return TCL_ERROR;
+        }
+        if (validateChannel (interp, sdata, chan) == TCL_OK) {
             SetBooleanResult (1);
             if (objc == 4) {
                 Tcl_SetVar (interp, Tcl_GetString (objv[3]), "", 0);
