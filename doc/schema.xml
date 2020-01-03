@@ -184,6 +184,19 @@
       </commanddef>
 
       <commanddef>
+        <command><method>validatechannel</method> <m>channel</m> <m>?objVar?</m></command>
+        <desc>Returns true if the content read ouf of the tcl channel
+        <m>channel</m> is valid or false otherwise. Since data read
+        out of a tcl channel is UTF-8 encoded any misleading encoding
+        declaration at the beginning of the data will lead to errors.
+        If the validation failed and the optional <m>objVar</m>
+        argument is given, then the variable with that name is set to
+        a validation error message. If the XML string is valid and the
+        optional <m>objVar</m> argument is given, then the variable
+        with that name is set to the empty string.</desc>
+      </commanddef>
+      
+      <commanddef>
         <command><method>domvalidate</method> <m>domNode</m> <m>?objVar?</m></command>
         <desc>Returns true if the first argument is a valid tree or
         false otherwise. If validation failed and the optional

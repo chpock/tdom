@@ -1,5 +1,5 @@
-C Added\sschema\scommand\svalidatechannel,\swhich\sreads\sthe\sdata\sstream\sto\svalidate\sfrom\sa\stcl\schannel.
-D 2020-01-02T02:19:22.976
+C Added\sdocumentation\sfor\sthe\sschema\scommand\smethod\svalidatechannel.
+D 2020-01-03T00:52:20.824
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -41,7 +41,7 @@ F doc/pullparser.n 5f5672e8bb2dd221602040cd212234da6b6ed8c99c5daa60be9fa0c476529
 F doc/pullparser.xml 6032c1e8c8d001068c227601dba9860824f8acc709c87fd8e36ac4a596b6a2f2
 F doc/schema.html e153578be3ec79a6c90764e3f0843f6aed723e2dcd8f6cae29e8f85c4e632899
 F doc/schema.n 9ce1474869f5676df7fd5716ce2149dae5ebb947bfc17bc3ce3759f55823ce34
-F doc/schema.xml 7a060a193edcbd0b9fb0b2abbd9f8eaed4de000b9205e4b82419292dbe569dbe
+F doc/schema.xml 08e884560a3639db9fca423238b82b42ecf47d77ba82330e3317dfe57bac6076
 F doc/tDOM.xml 04db7d0ccfea39aae21f4fe07b8f05d5bff8a84193cfce2aa5faa2f42c076377
 F doc/tdomcmd.html 3f96630823dbeff586dd3fb7e5cc6214a40f0219e2ba37e6986353cbcfc7d665
 F doc/tdomcmd.n c06a5ff035f16a2a52636b69d9ebe6ba84ff5101922ed27b551146c4d61d6cda
@@ -229,8 +229,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P d2f4f6bacf99dfdd025e190342876bc63fc27f118f64d0d921ce87c579021c5b
-R 4902637e6bde4f7f47f7a457ef217945
+P c5bd39ed92cd7273a00ea4aa8f8fc405b54e7835b1e51dfee3644e31456c825f
+R 21cbb592d84ed15357f7dcf2ba6e09a5
 U rolf
-Z fcd04ec552c14bc1f78b8c59881ee9f3
+Z b26e90558241063b2a463154630d7d96
 # Remove this line to create a well-formed Fossil manifest.
