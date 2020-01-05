@@ -3585,12 +3585,12 @@ schemaInstanceInfoCmd (
     static const char *schemaInstanceInfoMethods[] = {
         "validationstate", "vstate", "definedElements", "stack", "toplevel",
         "expected", "definition", "validationaction", "vaction", "line",
-        "column", "domNode", "nrForwardDefinitions", NULL
+        "column", "domNode", "nrForwardDefinitions", "typedefinition", NULL
     };
     enum schemaInstanceInfoMethod {
         m_validationstate, m_vstate, m_definedElements, m_stack, m_toplevel,
         m_expected, m_definition, m_validationaction, m_vaction, m_line,
-        m_column, m_domNode, m_nrForwardDefinitions
+        m_column, m_domNode, m_nrForwardDefinitions, m_typedefinition
     };
 
     static const char *schemaInstanceInfoStackMethods[] = {
@@ -3753,6 +3753,41 @@ schemaInstanceInfoCmd (
             return TCL_ERROR;
         }
         Tcl_AppendElement (interp, "defelement");
+        Tcl_AppendElement (interp, cp->name);
+        if (cp->namespace) {
+            Tcl_AppendElement (interp, cp->namespace);
+        }
+        if (cp->defScript) {
+            Tcl_AppendElement (interp, Tcl_GetString (cp->defScript));
+        }
+        break;
+
+    case m_typedefinition:
+        if (objc < 3 && objc > 4) {
+            Tcl_WrongNumArgs (interp, 1, objv, "name ?namespace?");
+            return TCL_ERROR;
+        }
+        h = Tcl_FindHashEntry (&sdata->elementType, Tcl_GetString (objv[2]));
+        if (!h) {
+            SetResult ("Unknown elementtype definition");
+            return TCL_ERROR;
+        }
+        cp = Tcl_GetHashValue (h);
+        ns = NULL;
+        if (objc == 4) {
+            ns = getNamespacePtr (sdata, Tcl_GetString (objv[3]));
+        }
+        while (cp && cp->namespace != ns) {
+            cp = cp->next;
+        }
+        if (!cp
+            || cp->flags & LOCAL_DEFINED_ELEMENT
+            || cp->flags & PLACEHOLDER_PATTERN_DEF) {
+            SetResult ("Unknown elementtype definition");
+            return TCL_ERROR;
+        }
+        Tcl_AppendElement (interp, "defelementtype");
+        Tcl_AppendElement (interp, cp->typeName);
         Tcl_AppendElement (interp, cp->name);
         if (cp->namespace) {
             Tcl_AppendElement (interp, cp->namespace);

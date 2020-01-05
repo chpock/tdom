@@ -6389,6 +6389,21 @@ test schema-17.17 {info expected} {
     set result
 } {0 0 1 1 1 9 1 1 16 1}
 
+test schema-17.18 {info typedefinition} {
+    tdom::schema s
+    s prefixns {ns http://my.foo}
+    s defelementtype a b ns {
+        elementtype a
+        elementtype a2
+    }
+    set result [s info typedefinition a ns]
+    s delete
+    set result
+} {defelementtype a b http://my.foo {
+        elementtype a
+        elementtype a2
+    }}
+
 proc schema-18 {args} {
     lappend ::result {*}$args
 }
