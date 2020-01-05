@@ -7187,6 +7187,24 @@ test schema-22.5 {defelementtype} {
     set result
 } {0 0 0 1 0 0}
 
+test schema-22.6 {defelementtype} {
+    tdom::schema s
+    s prefixns {ns http://my.foo}
+    s defelement doc ns {
+        elementtype a
+        elementtype a2
+    }
+    s defelementtype a a ns {
+        elementtype e1
+    }
+    s defelementtype a2 a ns {
+        elementtype e2
+    }
+    set result [lsort -index 0 [s info definedElementtypes]]
+    s delete
+    set result
+} {{a http://my.foo} {a2 http://my.foo}}
+
 test schema-23.1 {validatefile} {
     tdom::schema s
     s define {

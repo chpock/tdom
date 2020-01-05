@@ -3259,6 +3259,23 @@ serializeElementName (
     return rObj;
 }
 
+static Tcl_Obj*
+serializeElementTypeName (
+    Tcl_Interp *interp,
+    SchemaCP *cp
+    )
+{
+    Tcl_Obj *rObj;
+
+    rObj = Tcl_NewObj();
+    Tcl_ListObjAppendElement (interp, rObj, Tcl_NewStringObj (cp->typeName, -1));
+    if (cp->namespace) {
+        Tcl_ListObjAppendElement (interp, rObj,
+                                  Tcl_NewStringObj (cp->namespace, -1));
+    }
+    return rObj;
+}
+
 /* cp must be of type SCHEMA_CTYPE_ANY for useful results */
 static Tcl_Obj*
 serializeAnyCP (
@@ -3329,6 +3346,30 @@ definedElements (
         if (cp->flags & FORWARD_PATTERN_DEF
             || cp->flags & PLACEHOLDER_PATTERN_DEF) continue;
         elmObj = serializeElementName (interp, cp);
+        Tcl_ListObjAppendElement (interp, rObj, elmObj);
+    }
+}
+
+static void
+definedElementtypes (
+    SchemaData *sdata,
+    Tcl_Interp *interp
+    )
+{
+    Tcl_Obj *rObj, *elmObj;
+    Tcl_HashEntry *h;
+    Tcl_HashSearch search;
+    SchemaCP *cp;
+    
+    rObj = Tcl_GetObjResult (interp);
+    for (h = Tcl_FirstHashEntry (&sdata->elementType, &search);
+         h != NULL;
+         h = Tcl_NextHashEntry (&search)) {
+        cp = (SchemaCP *) Tcl_GetHashValue (h);
+        if (!cp) continue;
+        if (cp->flags & FORWARD_PATTERN_DEF
+            || cp->flags & PLACEHOLDER_PATTERN_DEF) continue;
+        elmObj = serializeElementTypeName (interp, cp);
         Tcl_ListObjAppendElement (interp, rObj, elmObj);
     }
 }
@@ -3585,12 +3626,14 @@ schemaInstanceInfoCmd (
     static const char *schemaInstanceInfoMethods[] = {
         "validationstate", "vstate", "definedElements", "stack", "toplevel",
         "expected", "definition", "validationaction", "vaction", "line",
-        "column", "domNode", "nrForwardDefinitions", "typedefinition", NULL
+        "column", "domNode", "nrForwardDefinitions", "typedefinition",
+        "definedElementtypes", NULL
     };
     enum schemaInstanceInfoMethod {
         m_validationstate, m_vstate, m_definedElements, m_stack, m_toplevel,
         m_expected, m_definition, m_validationaction, m_vaction, m_line,
-        m_column, m_domNode, m_nrForwardDefinitions, m_typedefinition
+        m_column, m_domNode, m_nrForwardDefinitions, m_typedefinition,
+        m_definedElementtypes
     };
 
     static const char *schemaInstanceInfoStackMethods[] = {
@@ -3644,6 +3687,14 @@ schemaInstanceInfoCmd (
             return TCL_ERROR;
         }
         definedElements (sdata, interp);
+        break;
+
+    case m_definedElementtypes:
+        if (objc != 2) {
+            Tcl_WrongNumArgs (interp, 1, objv, "definedElementtypes");
+            return TCL_ERROR;
+        }
+        definedElementtypes (sdata, interp);
         break;
 
     case m_stack:
