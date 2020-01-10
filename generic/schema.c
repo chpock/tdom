@@ -3383,7 +3383,7 @@ getNextExpectedWorker (
     Tcl_Obj *rObj
     )
 {
-    int ac, hm, i, hnew, mustMatch, mayskip, rc;
+    int ac, hm, i, hnew, mustMatch, mayskip, rc = 1;
     SchemaCP *cp, *ic, *jc;
     SchemaValidationStack *se1;
 
@@ -3493,7 +3493,6 @@ getNextExpectedWorker (
             ac++;
             hm = 0;
         }
-        rc = 1;
         if (cp->type == SCHEMA_CTYPE_NAME) {
             if (ac == cp->nc) {
                 /* The curently open element can end here, no
