@@ -1,5 +1,5 @@
-C Pacified\sa\s(bogus)\scompiler\swarning.
-D 2020-01-10T23:26:41.876
+C Removed\sunused\shistorical\srelict.
+D 2020-01-10T23:59:06.949
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -218,7 +218,6 @@ F unix/tclAppInit.c df2bcb1b98ffead12f8a55d0e084f780fef9ec21e9597a9bab1aaefb2f7c
 F win/README 565751141aadfe155d7f95c202496b523f8dcc88
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F win/makefile.vc 264e2b65aebc7c1311803f0f4474d146b2f42cc8eadbd0e9052ba041d32b0ab2
-F win/mkd.bat 85d3fe58ce051a778447fb2bfc7384867d21cef0
 F win/nmakehlp.c 194ae7c24886245c679cb4c9ea7e6daaaebb5fcd
 F win/pkgIndex.tcl 915cf5788165a425755dd5b959fbbc4f13428d3191ac36e3e5e1ef733dc25f4b
 F win/rules-ext.vc e788fcfc1e69b11946e18b8f67e0870b3bd38913
@@ -229,8 +228,8 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f3cb326ad5d5ee7488317aac97bbecc4f345826175b22dbd7ecaf55bc9883e88
-R ac13b0acd4ccc85e739c7cde9dccba1a
+P 21822aeab7c1b225c25179291f01aea5acb0b67aa423b97191403c36829c3eb4
+R 7fd83a3370f63fa22b11631ca3bb0eca
 U rolf
-Z b3ed5e4766a242a4391b8f50bc148a85
+Z 5efe4dc67eda2e06862e8798e4426f99
 # Remove this line to create a well-formed Fossil manifest.
