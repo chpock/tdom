@@ -1,5 +1,5 @@
-C Removed\sunused\shistorical\srelict.
-D 2020-01-10T23:59:06.949
+C Merged\sfrom\strunk.
+D 2020-01-11T02:18:03.497
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -83,7 +83,6 @@ F extensions/example/configure.in 68a3a3201a8a8b6ba56b40ba5feee1072b03dede
 F extensions/example/example.c a8d16832ce63ed38438e6d0ef12299c288bce3f4
 F extensions/example/exampletest.tcl c699cc2c17a2baa598e56b2e760ddfaeb5769e8e
 F extensions/example/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
-F extensions/example/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
 F extensions/example/pkgIndex.tcl.in e6cc33c6f45df109209f4d8412cf2d5ea434e34e
 F extensions/example/tcl.m4 9404ac273b962ddaf946d3170c5183e55d0984b3
 F extensions/tdomhtml/CONFIG 7a3703be0e018ead9b6558ce6d82f356620dbfd8
@@ -93,7 +92,6 @@ F extensions/tdomhtml/configure.in 22c8425b9c44c0583ccbadaf3ea3cc7185987ceb
 F extensions/tdomhtml/doc/tdomhtml.n da39a3ee5e6b4b0d3255bfef95601890afd80709
 F extensions/tdomhtml/doc/tdomhtml.tmml da39a3ee5e6b4b0d3255bfef95601890afd80709
 F extensions/tdomhtml/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
-F extensions/tdomhtml/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
 F extensions/tdomhtml/pkgIndex.tcl.in 2612d2a8fd5a213a1379ad5570c229d82810dcb5
 F extensions/tdomhtml/tdomhtml.tcl 6901a0fb8db80954dd635e181934b9e3ba3a1864551155f3d5c01355ddbf0a45
 F extensions/tdomhtml/win/makefile.vc a6ba491c8f63a88c607c443e7a80f1369cb3c40c
@@ -102,7 +100,6 @@ F extensions/tnc/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
 F extensions/tnc/configure 9dd4089f8912fb1b2df266fc6ae2d8f81735c42e x
 F extensions/tnc/configure.in d15ed29caa0e95f17f9df4686553dd6636549c61
 F extensions/tnc/install-sh bdd5e293591621ae60d9824d86a4b1c5f22c3d00 x
-F extensions/tnc/mkinstalldirs 16a24a00cc884da1c078cc99eed2c733c05cc33e x
 F extensions/tnc/pkgIndex.tcl.in 6c224c2cdbb494f621ec008f96fe4a552a79a7b7
 F extensions/tnc/test.tcl 545cdec17e6702cef9f79184fdf1ce0166b8c412
 F extensions/tnc/tests/all.tcl 845c9dab65c294c3570f69cc731d6fef62efbd03
@@ -147,7 +144,6 @@ F generic/tdomDecls.h bb5dab03565238020e266948808cf094c5db1227e4288e16fd493a70e8
 F generic/tdomStubInit.c 375ebd144c8e09dbe2fe4864e799da2bd0fbe3bce2855346487634c3be49daf0
 F generic/tdomStubLib.c 4a055f9c974246a9f7dd99de1a7686d1a96be8f02be699fdf4a760fdc813eb45
 F generic/tdominit.c 0a82c72f6dd3f2a3ac214e5a1ec97758a6301b0feade2fd41a775aace8c49859
-F generic/win32.h 946429cbb10aa9e1ae6116bb45114da9acc8cdce
 F generic/xmlsimple.c be39c8ff62d31e70ddcac4e5afa05797ee1971d2ada0a670648e74b47b3074d2
 F generic/xmlsimple.h 3cb9d055e60643afcdfe9ab407adf1e8bb5dbafb
 F lib/tdom.tcl 09d732922620415020cdb362b92b05c97e008191e6a12ddc88269f5f5a5c698e
@@ -224,12 +220,12 @@ F win/rules-ext.vc e788fcfc1e69b11946e18b8f67e0870b3bd38913
 F win/rules.vc 996a623bd2ea3dc2fac239a1b845ca51695c8012
 F win/targets.vc 79dea1c6a94a94e6ed8bae9e0195149b25a69923
 F win/tdom.rc 1463128845bffe1fdf24ab99f562727830855516
-F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
-F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
+F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
+F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 21822aeab7c1b225c25179291f01aea5acb0b67aa423b97191403c36829c3eb4
-R 7fd83a3370f63fa22b11631ca3bb0eca
+P 9a72a2020203c0fcca329f9f47ca6d78f862bfaf50b5319cf1868e545bf9b0d5 1564f442a9aee4afa54c60b5f86917a8b6d49ffddb42f9843683a10dafec713b
+R 6f5a9770045fc2d0fa4966188bb72ae0
 U rolf
-Z 5efe4dc67eda2e06862e8798e4426f99
+Z 3cdf84f88aed4090d7d61ea8a51dc7ae
 # Remove this line to create a well-formed Fossil manifest.
