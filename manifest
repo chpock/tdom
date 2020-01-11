@@ -1,5 +1,5 @@
-C Updated\sto\sexpat\s2.2.9.
-D 2019-12-31T00:46:14.094
+C Removed\sunused\shistorical\srelict.
+D 2020-01-11T00:00:36.492
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -210,7 +210,6 @@ F unix/tclAppInit.c df2bcb1b98ffead12f8a55d0e084f780fef9ec21e9597a9bab1aaefb2f7c
 F win/README 565751141aadfe155d7f95c202496b523f8dcc88
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F win/makefile.vc 264e2b65aebc7c1311803f0f4474d146b2f42cc8eadbd0e9052ba041d32b0ab2
-F win/mkd.bat 85d3fe58ce051a778447fb2bfc7384867d21cef0
 F win/nmakehlp.c 194ae7c24886245c679cb4c9ea7e6daaaebb5fcd
 F win/pkgIndex.tcl 915cf5788165a425755dd5b959fbbc4f13428d3191ac36e3e5e1ef733dc25f4b
 F win/rules-ext.vc e788fcfc1e69b11946e18b8f67e0870b3bd38913
@@ -221,9 +220,9 @@ F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
 F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 14a8728e63fc275e6c00933b138075e44d92c073d5b608a31bf4a7ffb6cfe3e2 f3e9bae528b0d59db2414fd55099edba6f97b9ac15a7edc45d43ea76a7f901f2
-R b317963b896a72b85f3c01cadbec36f9
-T +closed f3e9bae528b0d59db2414fd55099edba6f97b9ac15a7edc45d43ea76a7f901f2
+P d619d316b86893855b9098fd201e285e3cf93055cc68377b9b6b45fc5866d0d3
+Q +9a72a2020203c0fcca329f9f47ca6d78f862bfaf50b5319cf1868e545bf9b0d5
+R 5427a4ea20d3aedac171e4a7b9c47a74
 U rolf
-Z a79d6afdddd715392c1fcc59942099e1
+Z 7a7772ca07c6a116289b277356dc5136
 # Remove this line to create a well-formed Fossil manifest.
