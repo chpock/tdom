@@ -1,5 +1,5 @@
-C Removed\smore\sunused\shistorical\srelicts.
-D 2020-01-11T00:32:06.155
+C Minor\sgardening.
+D 2020-01-11T00:40:24.781
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -212,12 +212,12 @@ F win/rules-ext.vc e788fcfc1e69b11946e18b8f67e0870b3bd38913
 F win/rules.vc 996a623bd2ea3dc2fac239a1b845ca51695c8012
 F win/targets.vc 79dea1c6a94a94e6ed8bae9e0195149b25a69923
 F win/tdom.rc 1463128845bffe1fdf24ab99f562727830855516
-F xe/README dfc06d7a2e091472866a69b2498f6e4bd6388105
-F xe/xe 4fb11c118cfc5236d1a46c18b6342671539c724a874a83a2c93427124d4fb40c x
+F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
+F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a97966286a1d58ba284b2b36a0aaa0cb859f0ca7fefe49d0f44a938dd0a76988
-R 0fed1c4cbafef0fbe065dbddad57f013
+P 346bcf0b870bb15477900026b400c278fa8bc21c1382c747e27e1eebde7e56d5
+R 9ab8ad39e4b78db2ae829251ec9d81c8
 U rolf
-Z 8faf5d798168823a730b140c402dc57a
+Z cc2bc43f3a0a6d1baf71aca22e65b0a0
 # Remove this line to create a well-formed Fossil manifest.
