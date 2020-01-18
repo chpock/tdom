@@ -536,6 +536,9 @@ static void freeSchemaCP (
     if (pattern->defScript) {
         Tcl_DecrRefCount (pattern->defScript);
     }
+    if (pattern->associated) {
+        Tcl_DecrRefCount (pattern->associated);
+    }
     FREE (pattern);
 }
 
@@ -5375,6 +5378,38 @@ keyspacePatternObjCmd (
 }
 
 static int
+associatePatternObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    
+    CHECK_SI
+    CHECK_TOPLEVEL
+    checkNrArgs (2, 2, "Expected: data");
+    switch (sdata->cp->type) {
+    case SCHEMA_CTYPE_NAME:
+    case SCHEMA_CTYPE_PATTERN:
+    case SCHEMA_CTYPE_INTERLEAVE:
+        break;
+    default:
+        SetResult ("The associate schema definition command is only "
+                   "allowed inside of global or local element, pattern or "
+                   "interleval context");
+        return TCL_ERROR;
+    }
+    if (sdata->cp->associated) {
+        Tcl_DecrRefCount (sdata->cp->associated);
+    }
+    sdata->cp->associated = objv[1];
+    Tcl_IncrRefCount (sdata->cp->associated);
+    return TCL_OK;
+}
+
+static int
 integerImplXsd (
     Tcl_Interp *interp,
     void *constraintData,
@@ -7247,6 +7282,10 @@ tDOM_SchemaInit (
     /* Local key constraints */
     Tcl_CreateObjCommand (interp, "tdom::schema::keyspace",
                           keyspacePatternObjCmd, NULL, NULL);
+    
+    /* The associate command */
+    Tcl_CreateObjCommand (interp,"tdom::schema::associate",
+                          associatePatternObjCmd, NULL, NULL);
     
     /* The text constraint commands */
     Tcl_CreateObjCommand (interp,"tdom::schema::text::integer",
