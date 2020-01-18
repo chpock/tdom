@@ -6488,7 +6488,6 @@ typedef struct
     SchemaCP   *cp;
 } splitTclTCData;
 
-
 static int
 splitTclImpl (
     Tcl_Interp *interp,
@@ -7179,6 +7178,70 @@ setvarTCObjCmd (
     return TCL_OK;
 }
 
+typedef struct
+{
+    char *varname;
+    char *value;
+    Tcl_Interp *interp;
+} linkvarTCData;
+
+static void
+linkvarImplFree (
+    void *constraintData
+    )
+{
+    linkvarTCData *linkvarData = (linkvarTCData *) constraintData;
+    Tcl_UnlinkVar (linkvarData->interp, linkvarData->varname);
+    if (linkvarData->value) FREE (linkvarData->value);
+    FREE (linkvarData->varname);
+    FREE (linkvarData);
+}
+
+static int
+linkvarImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    linkvarTCData *linkvarData = (linkvarTCData *) constraintData;
+
+    if (linkvarData->value) FREE (linkvarData->value);
+    linkvarData->value = tdomstrdup (text);
+    return 1;
+}
+
+static int
+linkvarTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    linkvarTCData *linkvarData;
+    SchemaConstraint *sc;
+
+    CHECK_TI
+    checkNrArgs (2,2,"<tcl variable name>");
+    linkvarData = TMALLOC (linkvarTCData);
+    memset (linkvarData, 0, sizeof (linkvarTCData));
+    if (Tcl_LinkVar (interp, Tcl_GetString (objv[1]),
+                     (char *) &(linkvarData->value),
+                     TCL_LINK_STRING | TCL_LINK_READ_ONLY)) {
+        FREE (linkvarData);
+        return TCL_ERROR;
+    }
+    linkvarData->varname = tdomstrdup (Tcl_GetString (objv[1]));
+    linkvarData->interp = interp;
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = linkvarImpl;
+    sc->freeData = linkvarImplFree;
+    sc->constraintData = linkvarData;
+    return TCL_OK;
+}
+        
 void
 tDOM_SchemaInit (
     Tcl_Interp *interp
@@ -7319,6 +7382,8 @@ tDOM_SchemaInit (
                           unsignedIntTypesTCObjCmd, (ClientData) 3, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::setvar",
                           setvarTCObjCmd, (ClientData) 3, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::linkvar",
+                          linkvarTCObjCmd, (ClientData) 3, NULL);
 }
 
 

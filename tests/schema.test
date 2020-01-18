@@ -5173,6 +5173,29 @@ test schema-14.44 {text constraint setvar} {
     lappend result ${from_schema-14.44}
 } {1 b}
 
+proc schema-14.45 {args} {
+    lappend ::result ${::from_schema-14.45} ${::schema-14.45::foo}
+    return 1
+}
+
+test schema-14.45 {text constraint linkvar} {
+    tdom::schema s
+    namespace eval ::schema-14.45 { }
+    set ::schema-14.45::foo "foo from namespace"
+    set from_schema-14.45 "foo"
+    set result [list]
+    s defelement doc {
+        text {
+            linkvar from_schema-14.45
+            linkvar ::schema-14.45::foo
+            tcl schema-14.45
+        }
+    }
+    s validate "<doc>this</doc>"
+    s delete
+    list ${::schema-14.45::foo} ${from_schema-14.45}
+} {this this}
+
 test schema-15.1 {constraint cmd tcl} {
     tdom::schema s
     s define {
