@@ -6486,7 +6486,7 @@ int tcldom_parse (
                 || takeGUMBOParser
 #endif
             ) {
-            Tcl_AppendResult(interp, "simple, JSON or HTML parser(s) "
+            Tcl_AppendResult(interp, "simple, JSON and HTML parser "
                              " don't support channel reading", NULL);
             return TCL_ERROR;
         }

@@ -22,12 +22,17 @@
 #    schema-19.*: keyspace
 #    schema-20.*: domunique
 #    schema-21.*: internal: buffers
+#    schema-22.*: defelementtype, elementtype
+#    schema-23.*: validatefile
+#    schema-24.*: validatechannel
 #
 # Copyright (c) 2018-2019 Rolf Ade.
 
 source [file join [file dir [info script]] loadtdom.tcl]
 
 if {[dom featureinfo schema]} {
+
+proc dummycallback {args} {}
 
 test schema-1.1 {create} {
     tdom::schema create grammar
@@ -214,6 +219,33 @@ test schema-1.13 {define lots of elements} {
     }
     s delete
 } {}
+
+test schema-1.14 {refer local element definition with element} {
+    tdom::schema create s
+    s define {
+        defelement elm1 {
+            element elm ! {
+                element a ! {
+                    text
+                }
+            }
+        }
+        defelement elm2 {
+            element elm
+        }
+    }
+    set result [list]
+    foreach xml {
+        <elm1><elm><a>foo</a></elm></elm1>
+        <elm1><elm></elm></elm1>
+        <elm2><elm><a>foo</a></elm></elm2>
+        <elm2><elm></elm></elm2>
+    } {
+        lappend result [s validate $xml ]
+    }
+    s delete
+    set result 
+} {1 0 0 1}
 
 test schema-1.14 {define start w/ namespace} {
     tdom::schema create s
@@ -613,6 +645,45 @@ test schema-1.27 {prefixns} {
     set result
 } {0 {error "Unknown element" at line 1 character 20}}
 
+test schema-1.28 {defelement} {
+    tdom::schema s
+    set result [catch {
+        s defelement e {
+            defelement a {
+                element b
+            }
+        }
+    }]
+    s delete
+    set result
+} 1
+        
+test schema-1.29 {defelement} {
+    tdom::schema s
+    catch {
+        s defelement e {
+            element a 
+            element b
+            error "some"
+        }
+    }
+    s defelement e {
+        element a 
+        element b
+    }
+    set result [list]
+    foreach xml {
+        <e/>
+        <e><a/></e>
+        <e><a/><b/></e>
+        <e><a/><b/><b/></e>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 1 0}
+
 test schema-2.1 {grammar definition: ref} {
     tdom::schema create grammar
     grammar defpattern thisPattern {
@@ -1010,6 +1081,24 @@ test schema-4.10 {event - tcl error in called script} {
     s delete
     set result
 } {1 {Error raised in schema-4.10}}
+
+test schema-4.11 {event - invalid root} {
+    tdom::schema s
+    s defelement doc {}
+    s reportcmd dummycallback
+    s event start doo
+    s delete
+} {}
+
+test schema-4.12 {event - text without root} {
+    tdom::schema s
+    s defelement doc {}
+    s reportcmd dummycallback
+    set result [catch {s event text foo} errMsg]
+    lappend result $errMsg
+    s delete
+    set result
+} {1 {No validation started}}
 
 test schema-5.1 {dom parse -validateCmd} {
     set result [catch {
@@ -3182,7 +3271,7 @@ test schema-12.5 {domvalidate doch w/ xml namespace} {
     set result
 } {1 1 1 1 1 1 1 1}
 
-test schema-12.5a {domvalidate doch w/ xml namespace} {
+test schema-12.5a {domvalidate doc w/ xml namespace} {
     tdom::schema s 
     s prefixns {fb http://foo.bar}
     s define {
@@ -3234,6 +3323,30 @@ test schema-12.5a {domvalidate doch w/ xml namespace} {
     s delete
     set result
 } {1 1 1 1 1 1 1 1}
+
+test schema-12.6 {domvalidate only root} {
+    tdom::schema s
+    s reportcmd dummycallback
+    s start doc
+    set doc [dom parse <doc/>]
+    set result [s domvalidate $doc]
+    s defelement doc {}
+    lappend result [s domvalidate $doc]
+    s delete
+    $doc delete
+    set result
+} {1 1}
+
+test schema-12.7 {domvalidate invalid root} {
+    tdom::schema s
+    s start doc
+    s reportcmd dummycallback
+    set doc [dom parse <dos/>]
+    set result [s domvalidate $doc]
+    s delete
+    $doc delete
+    set result
+} 1
 
 test schema-13.1 {XML namespaces} {
     tdom::schema create s
@@ -5034,6 +5147,32 @@ test schema-14.42 {isodate outside schema context} {
     set result
 } {0 0 0 0 1 0 0 0 1 0 1 1 0 1 1 0 0 0 1 0 1 1 1 1 0 0 0 1 1 1 0 1 0 1 1 0 0 0 0}
 
+test schema-14.43 {text constraint setvar} {
+    tdom::schema s
+    namespace eval ::schema-14.43 { }
+    s defelement doc {
+        text {
+            setvar from_schema-14.43
+            setvar ::schema-14.43::foo
+        }
+    }
+    s validate "<doc>this</doc>"
+    s delete
+    list ${::schema-14.43::foo} ${from_schema-14.43}
+} {this this}
+
+test schema-14.44 {text constraint setvar} {
+    tdom::schema s
+    namespace eval ::schema-14.43 { }
+    s defelement doc {
+        element a ! {text {setvar from_schema-14.44}}
+        element b ! {text {setvar from_schema-14.44}}
+    }
+    set result [s validate "<doc><a>a</a><b>b</b></doc>"]
+    s delete
+    lappend result ${from_schema-14.44}
+} {1 b}
+
 test schema-15.1 {constraint cmd tcl} {
     tdom::schema s
     s define {
@@ -6250,6 +6389,21 @@ test schema-17.17 {info expected} {
     set result
 } {0 0 1 1 1 9 1 1 16 1}
 
+test schema-17.18 {info typedefinition} {
+    tdom::schema s
+    s prefixns {ns http://my.foo}
+    s defelementtype a b ns {
+        elementtype a
+        elementtype a2
+    }
+    set result [s info typedefinition a ns]
+    s delete
+    set result
+} {defelementtype a b http://my.foo {
+        elementtype a
+        elementtype a2
+    }}
+
 proc schema-18 {args} {
     lappend ::result {*}$args
 }
@@ -6897,5 +7051,184 @@ test schema-21.1 {CONTENT_ARRAY_SIZE_INIT} {
     s delete
     set result
 } {1 1 1 0}
+
+test schema-22.1 {defelementtype} {
+    tdom::schema s
+    s defelementtype a_type a {
+        element e1
+    }
+    s defelement doc {
+        elementtype a_type
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/></doc>
+        <doc><a><e1/></a></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 1}
+
+test schema-22.2 {defelementtype} {
+    tdom::schema s
+    s defelement doc {
+        elementtype a_type
+    }
+    s defelementtype a_type a {
+        element e1
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/></doc>
+        <doc><a><e1/></a></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 1}
+
+test schema-22.3 {defelementtype} {
+    tdom::schema s
+    s defelement doc {
+        elementtype a
+        elementtype a2
+    }
+    s defelementtype a a {
+        element e1
+    }
+    s defelementtype a2 a {
+        element e2
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/></doc>
+        <doc><a><e1/></a></doc>
+        <doc><a><e1/></a><a><e2/></a></doc>
+        <doc><a><e1/></a><a><e1/></a></doc>
+        <doc><a><e2/></a><a><e1/></a></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 0 1 0 0}
+
+test schema-22.4 {defelementtype} {
+    tdom::schema s
+    catch {s defelement doc {
+        elementtype a
+        elementtype a2
+        error "my"
+    }}
+    s defelement doc {
+        elementtype a
+        elementtype a2
+    }
+    catch {s defelementtype a a {
+        element e1
+        error my
+    }}
+    s defelementtype a a {
+        element e1
+    }
+    catch {s defelementtype a2 a {
+        element e2
+        error my
+    }}
+    s defelementtype a2 a {
+        element e2
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/></doc>
+        <doc><a><e1/></a></doc>
+        <doc><a><e1/></a><a><e2/></a></doc>
+        <doc><a><e1/></a><a><e1/></a></doc>
+        <doc><a><e2/></a><a><e1/></a></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 0 1 0 0}
+
+test schema-22.5 {defelementtype} {
+    tdom::schema s
+    s prefixns {ns http://my.foo}
+    s defelement doc ns {
+        elementtype a
+        elementtype a2
+    }
+    s defelementtype a a ns {
+        element e1
+    }
+    s defelementtype a2 a ns {
+        element e2
+    }
+    set result [list]
+    foreach xml {
+        {<doc xmlns='http://my.foo'/>}
+        {<doc xmlns='http://my.foo'><a/></doc>}
+        {<doc xmlns='http://my.foo'><a><e1/></a></doc>}
+        {<doc xmlns='http://my.foo'><a><e1/></a><a><e2/></a></doc>}
+        {<doc xmlns='http://my.foo'><a><e1/></a><a><e1/></a></doc>}
+        {<doc xmlns='http://my.foo'><a><e2/></a><a><e1/></a></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 0 1 0 0}
+
+test schema-22.6 {defelementtype} {
+    tdom::schema s
+    s prefixns {ns http://my.foo}
+    s defelement doc ns {
+        elementtype a
+        elementtype a2
+    }
+    s defelementtype a a ns {
+        elementtype e1
+    }
+    s defelementtype a2 a ns {
+        elementtype e2
+    }
+    set result [lsort -index 0 [s info definedElementtypes]]
+    s delete
+    set result
+} {{a http://my.foo} {a2 http://my.foo}}
+
+test schema-23.1 {validatefile} {
+    tdom::schema s
+    s define {
+        set fd [open [file join [file dir [info script]] ../doc/tmml.schema] r]
+        eval [read $fd]
+        close $fd
+    }
+    set result [s validatefile [file join [file dir [info script]] ../doc/schema.xml]]
+    s delete
+    set result
+} 1
+
+test schema-24.1 {validatechannel} {
+    tdom::schema s
+    s define {
+        set fd [open [file join [file dir [info script]] ../doc/tmml.schema] r]
+        eval [read $fd]
+        close $fd
+    }
+    set fd [open [file join [file dir [info script]] ../doc/schema.xml] r]
+    set result [s validatechannel $fd]
+    close $fd
+    s delete
+    set result
+} 1
 
 }

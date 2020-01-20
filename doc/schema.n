@@ -209,6 +209,24 @@ command are resolved in that namespace. If there is already a
 element definition for the name/namespace combination the
 command raises error.
 .TP
+\&\fB\fBdefelementtype\fP \fItypename\fB \fIname\fB \fI?namespace?\fB \fI<definition script>\fB
+\&\fRThis method defines the elementtype \fItypename\fR
+(optional in the namespace \fInamespace\fR) in the schema. If
+the element type is refered in a definition script with the
+schema command elementype the validation engine expects an
+elment namend \fIname\fR (in the namespace \fInamespace\fR,
+if given) and the content model \fIdefinition script\fR.
+Defining element types seems only sensible if you really have
+elments with the same name and namespache but different
+content models. The \fIdefinition script\fR is evaluated and
+defines the content model of the element. If the
+\&\fInamespace\fR argument is given, any \fIelement\fR or
+\&\fIref\fR references in the definition script not wrapped
+inside a \fInamespace\fR command are resolved in that
+namespace. If there is already a elementtype definition for
+the name/namespace combination the command raises
+error.
+.TP
 \&\fB\fBdefpattern\fP \fIname\fB \fI?namespace?\fB \fI<definition script>\fB
 \&\fRThis method defines a (maybe complex) content particle
 with the \fIname\fR (optional in the namespace
@@ -245,10 +263,11 @@ element will be valid as root of a tree to validate.
 \&\fB\fBdefine\fP \fI<definition script>\fB
 \&\fRThis method allows to define several elements or pattern
 or a whole schema with one call. All schema command methods so
-far (\fIprefixns\fR, \fIdefelement\fR, \fIdefpattern\fR,
-\&\fIdeftext\fR and \fIstart\fR) are allowed top level in the
-\&\fIdefinition script\fR. The \fIdefine\fR method itself
-isn't allowed recursively.
+far (\fIprefixns\fR, \fIdefelement\fR,
+\&\fIdefelementtype\fR, \fIdefpattern\fR, \fIdeftext\fR and
+\&\fIstart\fR) are allowed top level in the \fIdefinition
+script\fR. The \fIdefine\fR method itself isn't allowed
+recursively.
 .TP
 \&\fB\fBevent\fP \fI(start|end|text)\fB \fI?event specific data?\fB
 \&\fRThis method allows to validate hierarchical data against
@@ -274,6 +293,17 @@ false otherwise. If validation failed and the optional
 name is set to a validation error message. If the XML string
 is valid and the optional \fIobjVar\fR argument is given,
 then the variable with that name is set to the empty string.
+.TP
+\&\fB\fBvalidatefile\fP \fIfilename\fB \fI?objVar?\fB
+\&\fRReturns true if the content of \fIfilename\fR is valid
+or false otherwise. The given file is feeded as binary stream
+to expat, therefor only US-ASCII, ISO-8859-1, UTF-8 or UTF-16
+encoded data will work with this method. If validation failed
+and the optional \fIobjVar\fR argument is given, then the
+variable with that name is set to a validation error message.
+If the XML string is valid and the optional \fIobjVar\fR
+argument is given, then the variable with that name is set to
+the empty string.
 .TP
 \&\fB\fBdomvalidate\fP \fIdomNode\fB \fI?objVar?\fB
 \&\fRReturns true if the first argument is a valid tree or
@@ -315,7 +345,7 @@ If the schema command is currently validating
 this method returns the line part of the parsing
 position information and the empty string in all
 other cases. If the schema command is currently
-post-validating a DOM tree there may be not position
+post-validating a DOM tree there may be no position
 information stored at certain or all nodes. The
 empty string is returned in this cases.
 .IP "\fBcolumn\fR"
@@ -323,16 +353,16 @@ If the schema command is currently validating
 this method returns the column part of the parsing
 position information and the empty string in all
 other cases. If the schema command is currently
-post-validating a DOM tree there may be not position
+post-validating a DOM tree there may be no position
 information stored at certain or all nodes. The
 empty string is returned in this cases.
 .IP "\fBdomNode\fR"
 If the schema command is currently
-post-validating a DOM tree ist command returns the
+post-validating a DOM tree this command returns the
 current parent node command (the node, whose content
 is currently validated) and the empty string
 otherwhise. It is recommended that you don't use
-this method. Or at least leaf the DOM tree alone,
+this method. Or at least leave the DOM tree alone,
 use it read-only.
 .IP "\fBnrForwardDefinitions\fR"
 Returns the at least used once referenced
@@ -376,6 +406,8 @@ return values and their meanings are:
 .RS
 .TP
 NONE
+The schema command currently
+doesn't process a validation event.
 .TP
 MATCH_ELEMENT_START
 .TP
@@ -500,7 +532,8 @@ is one argument more this argument is evaluated as constraint
 script, defining the value constrains of the attribute.
 Otherwise, if there are two more arguments and the first of
 them is the bareword "type" then the following is used as a
-text type name.
+text type name. This command is only allowed at top level in
+the definition script of an defelement/element script.
 .TP
 \&\fB\fBnsattribute\fP \fIname\fB \fInamespace\fB \fI?quant?\fB \fI(?<constraint script>|\*(lqtype\*(lq typename?)\fB
 \&\fRThis command does the same as the command
@@ -604,6 +637,26 @@ is \fIxsd\fR then the constraint match if the value is a
 valid xsd:integer. Without argument \fIxsd\fR is the
 default.
 .TP
+\&\fB\fBnegativeInteger\fP \fI?(xsd|tcl)?\fB
+\&\fRThis text constraint match the same text values as the
+\&\fIinteger\fR text constraint (see there) with the additional
+constraint that the value must be < zero.
+.TP
+\&\fB\fBnonNegativeInteger\fP \fI?(xsd|tcl)?\fB
+\&\fRThis text constraint match the same text values as the
+\&\fIinteger\fR text constraint (see there) with the additional
+constraint that the value must be >= zero.
+.TP
+\&\fB\fBnonPositiveInteger\fP \fI?(xsd|tcl)?\fB
+\&\fRThis text constraint match the same text values as the
+\&\fIinteger\fR text constraint (see there) with the additional
+constraint that the value must be <= zero.
+.TP
+\&\fB\fBpositiveInteger\fP \fI?(xsd|tcl)?\fB
+\&\fRThis text constraint match the same text values as the
+\&\fIinteger\fR text constraint (see there) with the additional
+constraint that the value must be > zero.
+.TP
 \&\fB\fBfixed\fP \fIvalue\fB
 \&\fRThe text constraint only match if the text value is
 string equal to the given value.
@@ -647,6 +700,39 @@ XML nmtoken production
 .UE
 \&\fRThis text constraint match if the text value match the
 XML nmtokens production
+.TP
+\&\fB\fBname\fP
+.UR "https://www.w3.org/TR/xml/#NT-Name"
+<URL: https://www.w3.org/TR/xml/#NT-Name>
+.UE
+\&\fRThis text constraint match if the text value match the
+XML name production
+\&. This means the
+text value must start with a letter, underscore (_), or colon (:),
+and may contain only letters, digits, underscores (_), colons
+(:), hyphens (-), and periods (.).
+.TP
+\&\fB\fBncname\fP
+.UR "https://www.w3.org/TR/xml-names/#NT-NCName"
+<URL: https://www.w3.org/TR/xml-names/#NT-NCName>
+.UE
+\&\fRThis text constraint match if the text value match the
+XML ncname production
+\&. This
+means the text value must start with a letter or underscore (_),
+and may contain only letters, digits, underscores (_), hyphens
+(-), and periods (.) (The only difference to the name
+constraint is that colons are not permitted.)
+.TP
+\&\fB\fBqname\fP
+.UR "https://www.w3.org/TR/xml-names/#NT-QName"
+<URL: https://www.w3.org/TR/xml-names/#NT-QName>
+.UE
+\&\fRThis text constraint match if the text value match the
+XML qname production
+\&. This
+means the text value is either a ncname or two ncnames joined
+by a colon (:).
 .TP
 \&\fB\fBnumber\fP \fI?(xsd|tcl)?\fB
 \&\fRThis text constraint match if the text value could be
@@ -750,6 +836,36 @@ references within the document to one ID are possible.
 \&\fB\fBbase64\fP
 \&\fRThis text constraint match if text is valid according to
 RFC 4648.
+.TP
+\&\fB\fBhexBinary\fP
+\&\fRThis text constraint match if text is a sequence of
+binary octets in hexadecimal encoding, where each binary octet
+is a two-character hexadecimal number. Lowercase and uppercase
+letters A through F are permitted.
+.TP
+\&\fB\fBunsignedByte\fP
+\&\fRThis text constraint match if the text value is a
+xsd:unsignedByte. This is an integer between 0 and 255, both
+included, optionally preceded by a + sign and leading
+zeros.
+.TP
+\&\fB\fBunsignedShort\fP
+\&\fRThis text constraint match if the text value is a
+xsd:unsignedShort. This is an integer between 0 and 65535,
+both included, optionally preceded by a + sign and leading
+zeros.
+.TP
+\&\fB\fBunsignedInt\fP
+\&\fRThis text constraint match if the text value is a
+xsd:unsignedInt. This is an integer between 0 and 4294967295,
+both included, optionally preceded by a + sign and leading
+zeros.
+.TP
+\&\fB\fBunsignedLong\fP
+\&\fRThis text constraint match if the text value is a
+xsd:unsignedLong. This is an integer between 0 and
+18446744073709551615, both included, optionally preceded by a
++ sign and leading zeros.
 .SH "Local key constraints"
 .PP
 Document wide uniqueness and foreign key constraints are
