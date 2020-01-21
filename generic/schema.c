@@ -3639,10 +3639,10 @@ schemaInstanceInfoCmd (
     };
 
     static const char *schemaInstanceInfoStackMethods[] = {
-        "top", "inside", NULL
+        "top", "inside", "associated", NULL
     };
     enum schemaInstanceInfoStackMethod {
-        m_top, m_inside
+        m_top, m_inside, m_associated
     };
 
     static const char *schemaInstanceInfoVactionMethods[] = {
@@ -3710,13 +3710,12 @@ schemaInstanceInfoCmd (
             != TCL_OK) {
             return TCL_ERROR;
         }
+        if (!sdata->stack) {
+            return TCL_OK;
+        }
+        se = sdata->stack;
         switch ((enum schemaInstanceInfoStackMethod) methodIndex) {
         case m_inside:
-            if (!sdata->stack) {
-                Tcl_ResetResult (interp);
-                return TCL_OK;
-            }
-            se = sdata->stack;
             rObj = Tcl_NewObj();
             while (se) {
                 if (se->pattern->type == SCHEMA_CTYPE_NAME) {
@@ -3729,16 +3728,18 @@ schemaInstanceInfoCmd (
             return TCL_OK;
             
         case m_top:
-            if (!sdata->stack) {
-                Tcl_ResetResult (interp);
-                return TCL_OK;
-            }
-            se = sdata->stack;
             while (se->pattern->type != SCHEMA_CTYPE_NAME) {
                 se = se->down;
             }
             rObj = serializeElementName (interp, se->pattern);
             Tcl_SetObjResult (interp, rObj);
+            return TCL_OK;
+
+        case m_associated:
+            if (!se->pattern->associated) {
+                return TCL_OK;
+            }
+            Tcl_SetObjResult (interp, se->pattern->associated);
             return TCL_OK;
         }
         

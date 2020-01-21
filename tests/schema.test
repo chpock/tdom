@@ -6404,6 +6404,58 @@ test schema-17.18 {info typedefinition} {
         elementtype a2
     }}
 
+proc schema-17.19 {schemacmd} {
+    lappend ::result [$schemacmd info stack associated]
+}
+test schema-17.19 {info stack associated} {
+    tdom::schema s
+    s defelement doc {
+        element a +
+    }
+    s defelement a {
+        associate "fo bar baz"
+        tcl schema-17.19
+    }
+    set result [list]
+    foreach xml {
+        <doc><a/></doc>
+        <doc><a/><a/></doc>
+    } {
+        lappend result [s validate $xml]
+        
+    }
+    s delete
+    set result
+} {{fo bar baz} 1 {fo bar baz} {fo bar baz} 1}
+
+proc schema-17.20 {schemacmd args} {
+    lappend ::result [$schemacmd info stack associated]
+}
+test schema-17.20 {info stack associated} {
+    tdom::schema s
+    s defelement doc {
+        element a +
+    }
+    s defelement a {
+        associate "fo bar baz"
+        # Only local defined
+        element b ?
+    }
+    s reportcmd schema-17.20
+    set result [list]
+    foreach xml {
+        <doc></doc>
+        <doc><a/></doc>
+        <doc><a><b/></a></doc>
+        <doc><a><c/></a></doc>
+        <doc><a/><b/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {{} 1 1 1 {fo bar baz} 1 {} 1}
+
 proc schema-18 {args} {
     lappend ::result {*}$args
 }

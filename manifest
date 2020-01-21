@@ -1,5 +1,5 @@
-C Save\swork.
-D 2020-01-18T02:05:25.268
+C Added\smethod\sinfo\sstack\sassociate\sto\srequest\sdata\sassociated\swith\sthe\sassociate\sdefinition\sscript\scommand.
+D 2020-01-21T00:54:49.263
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -39,9 +39,9 @@ F doc/manpage.css 3b4ec1d641048933a7e6bffc659de9519030a959
 F doc/pullparser.html 164e7e037e2d00308f67ca0708f6b193cbb0db11748c8533c58ddcd9d2f177fb
 F doc/pullparser.n 5f5672e8bb2dd221602040cd212234da6b6ed8c99c5daa60be9fa0c476529c09
 F doc/pullparser.xml 6032c1e8c8d001068c227601dba9860824f8acc709c87fd8e36ac4a596b6a2f2
-F doc/schema.html e153578be3ec79a6c90764e3f0843f6aed723e2dcd8f6cae29e8f85c4e632899
-F doc/schema.n 9ce1474869f5676df7fd5716ce2149dae5ebb947bfc17bc3ce3759f55823ce34
-F doc/schema.xml 08e884560a3639db9fca423238b82b42ecf47d77ba82330e3317dfe57bac6076
+F doc/schema.html 128d4e9f6e020bbb7fa80d363eb95f12374e81c560afb01aee4ae70f16ae0145
+F doc/schema.n a70a0a30de60a307b73caf28b1f8f28cb62ba49297e65702b89f366c3f13166e
+F doc/schema.xml 59236881181c86282de4562437909fd680061cea95a75e078213fe5a7693b631
 F doc/tDOM.xml 04db7d0ccfea39aae21f4fe07b8f05d5bff8a84193cfce2aa5faa2f42c076377
 F doc/tdomcmd.html 3f96630823dbeff586dd3fb7e5cc6214a40f0219e2ba37e6986353cbcfc7d665
 F doc/tdomcmd.n c06a5ff035f16a2a52636b69d9ebe6ba84ff5101922ed27b551146c4d61d6cda
@@ -130,7 +130,7 @@ F generic/domxslt.h 0cb8e327683a0ffeb2a7094add6cd82ec1ae49c7c704f20d8d6f7d6523e7
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c ee14ed666ca6d18977f7301545c52ac71b3ce73c49233ff8f8b3aa4144008d24
 F generic/nodecmd.h d2201b69de9507f86e94750f0b72867ec9150795712ef18c5b5b87f35a689f75
-F generic/schema.c 609fcd52316f6048152216bb5bbfd9670a7fa41bcc70966eef056719e9724ac7
+F generic/schema.c 1fcd647761b85ad31e77ab71019dba5eecf262aa5e29ee8037ca8cd209a55557
 F generic/schema.h 6b2f710bc7f88474df7d45f75798f4c34ce7dbdf7a94e1cbd8d1bef76021c721
 F generic/tcldom.c 8bb158abda4b8d039e0528a347f54cd3c9ad04abf10eb214a996bc1e5546d18b
 F generic/tcldom.h c8bda18533dcfeb0dde99bc7fa2cd2fc19cb90239538a65ee98bb8e9dd4d8ad6
@@ -199,7 +199,7 @@ F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
 F tests/pullparser.test e4b14ea0bdc9f9fd931f3bc559e78c309582a67a238170d58e0f20331f99890c
 F tests/pushpull.bench 664e8f512917537d96c4b71933d4d9a6da65fc6fe85bd7c459483830dc7d2faf
-F tests/schema.test cb0045ccbe0efefc000fc76c263e0e7d7999a3e22922151f400e59b3e6394f77
+F tests/schema.test 91d2b4a1e5e1a931b88974f38a93915a68fc8d2217d35c94aa75bf4b39cbecb7
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
 F tests/tdomcmd.bench b07448ed4de08ccaa9734cf3fe15c695fd7066c993da58ff48d465747940e417
 F tests/tdomcmd.test 092401adf0609906d710f3ef8997cb4ca29bc208
@@ -224,11 +224,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 8cd9ca1c3ad6199d85b290e1aaa1f91fede9634afd9f53a1fef6a541601175c7
-R c6089175b2fb6f693c3f717fb4850fbd
-T *branch * associate
-T *sym-associate *
-T -sym-schema *
+P 59815422e294cd42c803bbe93be47c749d25b805a49f361869643e991834873f
+R 02546db4afca9e6c414612ab9c31c790
 U rolf
-Z b49f00341f4639c36080fcf59d387655
+Z 3712569a3635bc458e18cc899cb20be4
 # Remove this line to create a well-formed Fossil manifest.
