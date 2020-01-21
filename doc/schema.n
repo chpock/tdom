@@ -286,6 +286,22 @@ Checks if the current validation state allows the
 given text content. It raises error, if not.
 .RE
 .TP
+\&\fB\fBstack\fP \fI(top|inside|associated)\fB
+\&\fRIn Tcl scripts evaluated by validation this method
+provides information about the current validation stack.
+Called outside this context the method returns the empty
+string.
+.RS
+.IP "\fBtop\fR"
+Returns the element which content is currently
+checked (the at the moment open element tag).
+.IP "\fBinside\fR"
+Returns all currently open elements as a list.
+.IP "\fBassociated\fR"
+Returns the data associated with the current top
+most stack content particle or the empty string it there isn't.
+.RE
+.TP
 \&\fB\fBvalidate\fP \fI<XML string>\fB \fI?objVar?\fB
 \&\fRReturns true if the \fI<XML string>\fR is valid or
 false otherwise. If validation failed and the optional
@@ -304,6 +320,17 @@ variable with that name is set to a validation error message.
 If the XML string is valid and the optional \fIobjVar\fR
 argument is given, then the variable with that name is set to
 the empty string.
+.TP
+\&\fB\fBvalidatechannel\fP \fIchannel\fB \fI?objVar?\fB
+\&\fRReturns true if the content read ouf of the tcl channel
+\&\fIchannel\fR is valid or false otherwise. Since data read
+out of a tcl channel is UTF-8 encoded any misleading encoding
+declaration at the beginning of the data will lead to errors.
+If the validation failed and the optional \fIobjVar\fR
+argument is given, then the variable with that name is set to
+a validation error message. If the XML string is valid and the
+optional \fIobjVar\fR argument is given, then the variable
+with that name is set to the empty string.
 .TP
 \&\fB\fBdomvalidate\fP \fIdomNode\fB \fI?objVar?\fB
 \&\fRReturns true if the first argument is a valid tree or
@@ -554,6 +581,15 @@ context (not in choice, mixed and interleave). If the return
 code is something else than 0 (TCL_OK) then this ia a
 validation error.
 .TP
+\&\fB\fBassociate\fP \fIdata\fB
+\&\fRThis command is only allowed top-level inside the
+definition scripts of the element, elementtype, pattern or
+interleave content particle. Associate the as argument given
+\&\fIdata\fR with the currently defined content particle and
+may be requested in scripts evaluated while validating the
+content of that particle with the schema command method call
+\&\fIinfo stack associated\fR.
+.TP
 \&\fB\fBprefixns\fP \fI?prefixUriList?\fB
 \&\fRThis defines a prefix to namespace URI mapping exactly
 as a \fIschemacmd prefixns\fR call. This is meant as toplevel
@@ -562,8 +598,15 @@ not allowed nested in an other definition script command and
 will raise error, if you call it there.
 .TP
 \&\fB\fBdefelement\fP \fIname\fB \fI?namespace?\fB \fI<definition script>\fB
-\&\fRThis defines an element type exactly as a \fIschemacmd
+\&\fRThis defines an element exactly as a \fIschemacmd
 defelement\fR call. This is meant as toplevel command of a
+\&\fIschemacmd define\fR script. This command is not allowed
+nested in an other definition script command and will raise
+error, if you call it there.
+.TP
+\&\fB\fBdefelementtype\fP \fIname\fB \fI?namespace?\fB \fI<definition script>\fB
+\&\fRThis defines an elementtype exactly as a \fIschemacmd
+defelementtype\fR call. This is meant as toplevel command of a
 \&\fIschemacmd define\fR script. This command is not allowed
 nested in an other definition script command and will raise
 error, if you call it there.
@@ -1088,4 +1131,5 @@ schema define {
       
     
 .CE
-
+.SH KEYWORDS
+Validation, Postvalidation, DOM, SAX

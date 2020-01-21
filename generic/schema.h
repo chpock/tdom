@@ -112,6 +112,7 @@ typedef struct SchemaCP
     domKeyConstraint *domKeys;
     SchemaKeySpace   *keySpace;
     Tcl_Obj          *defScript;
+    Tcl_Obj          *associated;
 } SchemaCP;
 
 typedef struct SchemaValidationStack
