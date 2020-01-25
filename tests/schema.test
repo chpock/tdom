@@ -6805,6 +6805,39 @@ test schema-18.13 {reportcmd} {
     set result
 } {{reportcmd called} 1 1 1 1 1}
 
+# proc schema-18.14 {scmd args} {
+#     lappend ::result [$scmd info vaction]
+#     lappend ::result [$scmd info vaction name]
+#     lappend ::result [$scmd info vaction namespace]
+#     lappend ::result [$scmd info vaction text]
+# }
+# test schema-18.14 {info vaction in reportcmd} {
+#     tdom::schema s
+#     s reportcmd schema-18.14
+#     s define {
+#         defelement doc {
+#             element e + {
+#                 attribute attr1 {
+#                     fixed on
+#                 }
+#                 text {
+#                     minLength 4
+#                 }
+#             }
+#         }
+#     }
+#     set result [list]
+#     foreach xml {
+#         <doc/>
+#         <doc><e>123</e></doc>
+#         {<doc><e attr1="off">1234</e></doc>}
+#     } {
+#         lappend result [s validate $xml]
+#     }
+#     s delete
+#     set result
+# } {}
+
 proc validatedSAX {g xml {keepEmpties 1}} {
     set args [list -validateCmd $g]
     if {!$keepEmpties} {

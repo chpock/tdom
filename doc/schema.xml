@@ -160,35 +160,6 @@
       </commanddef>
 
       <commanddef>
-        <command><method>stack</method> <m>(top|inside|associated)</m></command>
-        <desc>In Tcl scripts evaluated by validation this method
-        provides information about the current validation stack.
-        Called outside this context the method returns the empty
-        string.
-        <optlist>
-          <optdef>
-            <optname>top</optname>
-            <desc>Returns the element which content is currently
-            checked (the at the moment open element tag).
-            </desc>
-          </optdef>
-
-          <optdef>
-            <optname>inside</optname>
-            <desc>Returns all currently open elements as a list.</desc>
-          </optdef>
-          
-          <optdef>
-            <optname>associated</optname>
-            <desc>Returns the data associated with the current top
-            most stack content particle or the empty string it there isn't.
-            </desc>
-          </optdef>
-        </optlist>
-        </desc>
-      </commanddef>
-      
-      <commanddef>
         <command><method>validate</method> <m>&lt;XML string></m> <m>?objVar?</m></command>
         <desc>Returns true if the <m>&lt;XML string></m> is valid or
         false otherwise. If validation failed and the optional
@@ -295,8 +266,8 @@
               </optdef>
               <optdef>
                   <optname>nrForwardDefinitions</optname>
-                  <desc>Returns the at least used once referenced
-                  element and ref particles that aren't defined so far
+                  <desc>Returns how much element, elementtype and ref
+                  pattern are referenced that aren't defined so far
                   (summed together).</desc>
               </optdef>
               <optdef>
@@ -359,16 +330,50 @@
                       that has to match in case of
                       MATCH_ELEMENT_START. Return the name of the
                       closed element in case of MATCH_ELEMENT_END.
-                      Return the name of the parent element in case of
-                      MATCH_TEXT.</dd>
+                      Returns the name of the attribute in case of
+                      MATCH_ATTRIBUTE_TEXT. Return the name of the
+                      parent element in case of MATCH_TEXT.</dd>
+                      
                       <dt>namespace</dt><dd>Return the namespace of
                       the element that has to match in case of
                       MATCH_ELEMENT_START. Return the namespace of the
                       closed element in case of MATCH_ELEMENT_END.
-                      Return the namespace of the parent element in
-                      case of MATCH_TEXT.</dd>
-                      <dt>text</dt><dd></dd>
+                      Returns the namespace of the attribute in case
+                      of MATCH_ATTRIBUTE_TEXT. Return the namespace of
+                      the parent element in case of MATCH_TEXT.</dd>
+                      
+                      <dt>text</dt><dd>Return the text in case of
+                      MATCH_TEXTReturns the value of the attribute in
+                      case of MATCH_ATTRIBUTE_TEXT.</dd>
                   </dl>
+                  </desc>
+              </optdef>
+              <optdef>
+                  <optname>stack top|inside|associated</optname>
+                  <desc>In Tcl scripts evaluated by validation this method
+                  provides information about the current validation stack.
+                  Called outside this context the method returns the empty
+                  string.
+                  <optlist>
+                      <optdef>
+                          <optname>top</optname>
+                          <desc>Returns the element which content is currently
+                          checked (the at the moment open element tag).
+                          </desc>
+                      </optdef>
+                      
+                      <optdef>
+                          <optname>inside</optname>
+                          <desc>Returns all currently open elements as a list.</desc>
+                      </optdef>
+                      
+                      <optdef>
+                          <optname>associated</optname>
+                          <desc>Returns the data associated with the current top
+                          most stack content particle or the empty string it there isn't.
+                          </desc>
+                      </optdef>
+                  </optlist>
                   </desc>
               </optdef>
           </optlist>
@@ -918,7 +923,7 @@
             <command><cmd>keyspace</cmd> <m>&lt;names list></m> <m>&lt;constraint script></m></command>
             <desc>Any number of keyspaces are possible. A keyspace is
             either active or not. An inside a <m>constraint
-            script></m> called keyspace with the same name does
+            script</m> called keyspace with the same name does
             nothing.</desc>
         </commanddef>
     </commandlist>

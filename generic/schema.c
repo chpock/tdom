@@ -1079,7 +1079,7 @@ recover (
     rc = Tcl_EvalObjEx (interp, cmdPtr,
                         TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT);
     sdata->currentEvals--;
-    sdata->vaction = MATCH_GLOBAL;
+    sdata->vaction = 0;
     sdata->vname = NULL;
     sdata->vns = NULL;
     sdata->vtext = NULL;
@@ -5147,7 +5147,7 @@ NamespacePatternObjCmd (
 }
 
 static int
-TextPatternObjCmd (
+TextPatternObjCmd  (
     ClientData clientData,
     Tcl_Interp *interp,
     int objc,
