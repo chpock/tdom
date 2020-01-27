@@ -540,6 +540,9 @@ static void freeSchemaCP (
     if (pattern->defScript) {
         Tcl_DecrRefCount (pattern->defScript);
     }
+    if (pattern->associated) {
+        Tcl_DecrRefCount (pattern->associated);
+    }
     FREE (pattern);
 }
 
@@ -3655,10 +3658,10 @@ schemaInstanceInfoCmd (
     };
 
     static const char *schemaInstanceInfoStackMethods[] = {
-        "top", "inside", NULL
+        "top", "inside", "associated", NULL
     };
     enum schemaInstanceInfoStackMethod {
-        m_top, m_inside
+        m_top, m_inside, m_associated
     };
 
     static const char *schemaInstanceInfoVactionMethods[] = {
@@ -3726,13 +3729,12 @@ schemaInstanceInfoCmd (
             != TCL_OK) {
             return TCL_ERROR;
         }
+        if (!sdata->stack) {
+            return TCL_OK;
+        }
+        se = sdata->stack;
         switch ((enum schemaInstanceInfoStackMethod) methodIndex) {
         case m_inside:
-            if (!sdata->stack) {
-                Tcl_ResetResult (interp);
-                return TCL_OK;
-            }
-            se = sdata->stack;
             rObj = Tcl_NewObj();
             while (se) {
                 if (se->pattern->type == SCHEMA_CTYPE_NAME) {
@@ -3745,16 +3747,18 @@ schemaInstanceInfoCmd (
             return TCL_OK;
             
         case m_top:
-            if (!sdata->stack) {
-                Tcl_ResetResult (interp);
-                return TCL_OK;
-            }
-            se = sdata->stack;
             while (se->pattern->type != SCHEMA_CTYPE_NAME) {
                 se = se->down;
             }
             rObj = serializeElementName (interp, se->pattern);
             Tcl_SetObjResult (interp, rObj);
+            return TCL_OK;
+
+        case m_associated:
+            if (!se->pattern->associated) {
+                return TCL_OK;
+            }
+            Tcl_SetObjResult (interp, se->pattern->associated);
             return TCL_OK;
         }
         
@@ -5423,6 +5427,38 @@ keyspacePatternObjCmd (
         pattern->keySpace = Tcl_GetHashValue (h);
         addToContent (sdata, pattern, SCHEMA_CQUANT_ONE, 0, 0);
     }
+    return TCL_OK;
+}
+
+static int
+associatePatternObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    
+    CHECK_SI
+    CHECK_TOPLEVEL
+    checkNrArgs (2, 2, "Expected: data");
+    switch (sdata->cp->type) {
+    case SCHEMA_CTYPE_NAME:
+    case SCHEMA_CTYPE_PATTERN:
+    case SCHEMA_CTYPE_INTERLEAVE:
+        break;
+    default:
+        SetResult ("The associate schema definition command is only "
+                   "allowed inside of global or local element, pattern or "
+                   "interleval context");
+        return TCL_ERROR;
+    }
+    if (sdata->cp->associated) {
+        Tcl_DecrRefCount (sdata->cp->associated);
+    }
+    sdata->cp->associated = objv[1];
+    Tcl_IncrRefCount (sdata->cp->associated);
     return TCL_OK;
 }
 
@@ -7299,6 +7335,10 @@ tDOM_SchemaInit (
     /* Local key constraints */
     Tcl_CreateObjCommand (interp, "tdom::schema::keyspace",
                           keyspacePatternObjCmd, NULL, NULL);
+    
+    /* The associate command */
+    Tcl_CreateObjCommand (interp,"tdom::schema::associate",
+                          associatePatternObjCmd, NULL, NULL);
     
     /* The text constraint commands */
     Tcl_CreateObjCommand (interp,"tdom::schema::text::integer",
