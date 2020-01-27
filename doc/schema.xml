@@ -206,6 +206,20 @@
       </commanddef>
       
       <commanddef>
+        <command><method>reportcmd</method></command>
+        <desc>This method expects the name of a tcl command to be
+        called in case of validation error. This command will be
+        called with two arguments: the schema command, that is rasing
+        the validation error, and an validation error code. The
+        possible error codes are:
+        <ul>
+            <li>
+            </li>
+        </ul>
+        </desc>
+      </commanddef>
+
+      <commanddef>
         <command><method>delete</method></command>
         <desc>This method deletes the validation command.</desc>
       </commanddef>
