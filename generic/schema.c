@@ -36,6 +36,9 @@
 #include <unistd.h>
 #endif
 
+#ifndef TDOM_CHOICE_HASH_THRESHOLD
+# define TDOM_CHOICE_HASH_THRESHOLD 5
+#endif
 #ifndef TDOM_EXPAT_READ_SIZE
 # define TDOM_EXPAT_READ_SIZE (1024*8)
 #endif
@@ -593,6 +596,7 @@ initSchemaData (
     sdata->unknownIDrefs = 0;
     Tcl_InitHashTable (&sdata->idTables, TCL_STRING_KEYS);
     Tcl_InitHashTable (&sdata->keySpaces, TCL_STRING_KEYS);
+    sdata->choiceHashThreshold = TDOM_CHOICE_HASH_THRESHOLD;
     return sdata;
 }
 
@@ -3962,7 +3966,7 @@ schemaInstanceCmd (
 {
     int            methodIndex, keywordIndex, hnew, hnew1, patternIndex;
     int            result = TCL_OK, forwardDef = 0, i = 0, j, mode;
-    int            savedDefineToplevel, type, len;
+    int            savedDefineToplevel, type, len, n;
     unsigned int   savedNumPatternList;
     SchemaData    *savedsdata = NULL, *sdata = (SchemaData *) clientData;
     Tcl_HashTable *hashTable;
@@ -3979,24 +3983,32 @@ schemaInstanceCmd (
         "defelement", "defpattern", "start",    "event",        "delete",
         "reset",      "define",     "validate", "domvalidate",  "deftext",
         "info",       "reportcmd",  "prefixns", "validatefile",
-        "validatechannel",          "defelementtype", NULL
+        "validatechannel",          "defelementtype",           "set",
+        NULL
     };
     enum schemaInstanceMethod {
         m_defelement, m_defpattern, m_start,    m_event,        m_delete,
         m_reset,      m_define,     m_validate, m_domvalidate,  m_deftext,
         m_info,       m_reportcmd,  m_prefixns, m_validatefile,
-        m_validatechannel,          m_defelementtype
+        m_validatechannel,          m_defelementtype,           m_set
     };
 
     static const char *eventKeywords[] = {
         "start", "end", "text", NULL
     };
-
     enum eventKeyword
     {
         k_elementstart, k_elementend, k_text
     };
 
+    static const char *setKeywords[] = {
+        "choiceHashThreshold",  NULL
+    };
+    enum setKeyword
+    {
+        s_choiceHashThreshold
+    };
+        
     if (sdata == NULL) {
         /* Inline defined defelement, defelementtype, defpattern,
          * deftext, start or prefixns */
@@ -4565,6 +4577,33 @@ schemaInstanceCmd (
         }
         break;
             
+    case m_set:
+        if (objc < 3 || objc > 4) {
+            Tcl_WrongNumArgs (interp, 2, objv, "setting ?value?");
+            return TCL_ERROR;
+        }        
+        if (Tcl_GetIndexFromObj (interp, objv[2], setKeywords,
+                                 "setting", 0, &keywordIndex)
+            != TCL_OK) {
+            return TCL_ERROR;
+        }
+        switch ((enum setKeyword) keywordIndex) {
+        case s_choiceHashThreshold:
+            if (objc == 4) {
+                if (Tcl_GetIntFromObj (interp, objv[3], &n) != TCL_OK) {
+                    SetResult ("Invalid threshold value");
+                    return TCL_ERROR;
+                }
+                if (n < 0) {
+                    SetResult ("Invalid threshold value");
+                    return TCL_ERROR;
+                }
+                sdata->choiceHashThreshold = n;
+            }
+            SetIntResult (sdata->choiceHashThreshold);
+        }
+        break;
+        
     default:
         Tcl_SetResult (interp, "unknown method", NULL);
         result = TCL_ERROR;
@@ -4839,7 +4878,7 @@ evalDefinition (
         }
         if (pattern->type == SCHEMA_CTYPE_CHOICE
             && onlyName
-            && pattern->nc > 4) {
+            && pattern->nc > sdata->choiceHashThreshold) {
             pattern->childs = TMALLOC (Tcl_HashTable);
             Tcl_InitHashTable (pattern->childs, TCL_ONE_WORD_KEYS);
             hnew = 1;
@@ -4856,7 +4895,7 @@ evalDefinition (
             }
             if (!hnew) {
                 /* No simple lookup possible because of more than one
-                 * elements with the same local name belong the
+                 * elements with the same local name belong to the
                  * choices. Rewind. */
                 Tcl_DeleteHashTable (pattern->childs);
                 FREE (pattern->childs);
