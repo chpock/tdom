@@ -534,9 +534,9 @@ static void freeSchemaCP (
             FREE (pattern->attrs);
         }
         freedomKeyConstraints (pattern->domKeys);
-        if (pattern->childs) {
-            Tcl_DeleteHashTable (pattern->childs);
-            FREE (pattern->childs);
+        if (pattern->typedata) {
+            Tcl_DeleteHashTable ((Tcl_HashTable *) pattern->typedata);
+            FREE (pattern->typedata);
         }
         break;
     }
@@ -1234,8 +1234,9 @@ matchElementStart (
                 break;
 
             case SCHEMA_CTYPE_CHOICE:
-                if (candidate->childs) {
-                    h = Tcl_FindHashEntry (candidate->childs, name);
+                if (candidate->typedata) {
+                    h = Tcl_FindHashEntry ((Tcl_HashTable *)candidate->typedata,
+                                           name);
                     if (h) {
                         icp = Tcl_GetHashValue (h);
                         if (icp->namespace == namespace) {
@@ -4829,6 +4830,7 @@ evalDefinition (
     unsigned int savedAttrSize, savedNumAttr, savedNumReqAttr;
     int result, i, onlyName, hnew;
     Tcl_HashEntry *h;
+    Tcl_HashTable *t;
 
     /* Save some state of sdata .. */
     savedCP = sdata->cp;
@@ -4879,15 +4881,14 @@ evalDefinition (
         if (pattern->type == SCHEMA_CTYPE_CHOICE
             && onlyName
             && pattern->nc > sdata->choiceHashThreshold) {
-            pattern->childs = TMALLOC (Tcl_HashTable);
-            Tcl_InitHashTable (pattern->childs, TCL_ONE_WORD_KEYS);
+            t = TMALLOC (Tcl_HashTable);
+            Tcl_InitHashTable (t, TCL_ONE_WORD_KEYS);
             hnew = 1;
             for (i = 0; i < pattern->nc; i++) {
                 if (pattern->content[i]->type != SCHEMA_CTYPE_NAME) {
                     continue;
                 }
-                h = Tcl_CreateHashEntry (pattern->childs,
-                                         pattern->content[i]->name, &hnew);
+                h = Tcl_CreateHashEntry (t, pattern->content[i]->name, &hnew);
                 if (!hnew) {
                     break;
                 }
@@ -4897,10 +4898,10 @@ evalDefinition (
                 /* No simple lookup possible because of more than one
                  * elements with the same local name belong to the
                  * choices. Rewind. */
-                Tcl_DeleteHashTable (pattern->childs);
-                FREE (pattern->childs);
-                pattern->childs = NULL;
+                Tcl_DeleteHashTable (t);
+                FREE (t);
             }
+            pattern->typedata = (void *)t;
         }
         addToContent (sdata, pattern, quant, n, m);
     } else {

@@ -2609,6 +2609,35 @@ test schema-9.9 {choice with optional cp belong the choices} {
     set result
 } {0 1 1 1 1 1 1}
 
+test schema-9.10 {choice with may choices} {
+    tdom::schema create grammar
+    grammar define {
+        defelement doc {
+            element e1
+            choice * {
+                for {set i 1} {$i <= 20} {incr i} {
+                    element ee$i
+                }
+            }
+            element e2 ?
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        {<doc><e1/></doc>}
+        {<doc><e1/><e2/></doc>}
+        {<doc><e1/><ee3/></doc>}
+        {<doc><e1/><ee4/></doc>}
+        {<doc><e1/><e2/><ee4/></doc>}
+        {<doc><e1/><ee2/><e2/></doc>}
+    } {
+        lappend result [grammar validate $xml]
+    }
+    grammar delete
+    set result
+} {0 1 1 1 1 0 1}
+
 test schema-10.1 {any} {
     tdom::schema create s
     s define {
