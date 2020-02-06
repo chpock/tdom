@@ -2638,6 +2638,38 @@ test schema-9.10 {choice with may choices} {
     set result
 } {0 1 1 1 1 0 1}
 
+test schema-9.11 {choice with may choices} {
+    tdom::schema create grammar
+    grammar define {
+        defelement doc {
+            element e1
+            choice * {
+                for {set i 1} {$i <= 20} {incr i} {
+                    namespace foo {
+                        element ee$i
+                    }
+                    element ee$i
+                }
+            }
+            element e2 ?
+        }
+    }
+    set result [list]
+    foreach xml {
+        {<doc xmlns:foo="foo"/>}
+        {<doc xmlns:foo="foo"><e1/></doc>}
+        {<doc xmlns:foo="foo"><e1/><e2/></doc>}
+        {<doc xmlns:foo="foo"><e1/><ee3/></doc>}
+        {<doc xmlns:foo="foo"><e1/><foo:ee4/></doc>}
+        {<doc xmlns:foo="foo"><e1/><e2/><ee4/></doc>}
+        {<doc xmlns:foo="foo"><e1/><foo:ee2/><e2/></doc>}
+    } {
+        lappend result [grammar validate $xml]
+    }
+    grammar delete
+    set result
+} {0 1 1 1 1 0 1}
+
 test schema-10.1 {any} {
     tdom::schema create s
     s define {

@@ -4894,14 +4894,15 @@ evalDefinition (
                 }
                 Tcl_SetHashValue (h, pattern->content[i]);
             }
-            if (!hnew) {
+            if (hnew) {
+                pattern->typedata = (void *)t;
+            } else {
                 /* No simple lookup possible because of more than one
-                 * elements with the same local name belong to the
+                 * element with the same local name belong to the
                  * choices. Rewind. */
                 Tcl_DeleteHashTable (t);
                 FREE (t);
             }
-            pattern->typedata = (void *)t;
         }
         addToContent (sdata, pattern, quant, n, m);
     } else {
