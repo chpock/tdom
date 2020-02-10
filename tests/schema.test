@@ -684,6 +684,48 @@ test schema-1.29 {defelement} {
     set result
 } {0 0 1 0}
 
+test schema-1.30 {recurive allowed element} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element n
+        }
+        defelement n {
+            element n ?
+        }
+    }
+    set xml "<doc>"
+    # That's 200000 (and one) nesting level
+    append xml [string repeat "<n><n><n><n><n><n><n><n><n><n>" 20000]
+    append xml "<n/>"
+    append xml [string repeat "</n></n></n></n></n></n></n></n></n></n>" 20000]
+    append xml "</doc>"
+    set result [s validate $xml]
+    s delete
+    set result
+} 1
+
+test schema-1.31 {recurive allowed element} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element n
+        }
+        defelement n {
+            element n ?
+        }
+    }
+    set xml "<doc>"
+    # That's 200000 (and one) nesting level
+    append xml [string repeat "<n><n><n><n><n><n><n><n><n><n>" 20000]
+    append xml "<a/>"
+    append xml [string repeat "</n></n></n></n></n></n></n></n></n></n>" 20000]
+    append xml "</doc>"
+    set result [s validate $xml errMsg]
+    s delete
+    list $result $errMsg
+} {0 {error "Element "a" doesn't match" at line 1 character 600009}}
+
 test schema-2.1 {grammar definition: ref} {
     tdom::schema create grammar
     grammar defpattern thisPattern {
