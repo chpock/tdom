@@ -726,6 +726,20 @@ test schema-1.31 {recurive allowed element} {
     list $result $errMsg
 } {0 {error "Element "a" doesn't match" at line 1 character 600009}}
 
+test schema-1.32 {Unknown root element} {
+    tdom::schema s
+    s define {
+        defelement e {
+            element doc ? {
+                element e
+            }
+        }
+    }
+    set result [s validate <doc><e><doc><e/></doc></e></doc>]
+    s delete
+    set result
+} 0
+ 
 test schema-2.1 {grammar definition: ref} {
     tdom::schema create grammar
     grammar defpattern thisPattern {
@@ -7440,6 +7454,56 @@ test schema-22.6 {defelementtype} {
     s delete
     set result
 } {{a http://my.foo} {a2 http://my.foo}}
+
+test schema-22.7 {defelementtype} {
+    tdom::schema s
+    s defelement doc {
+        elementtype e1type
+        elementtype e2type *
+    }
+    foreach e {e1 e2} {
+        s defelementtype ${e}type $e {}
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><e1/></doc>
+        <doc><e1/><e2/></doc>
+        <doc><e1/><e2/><e2/></doc>
+        <doc><e1/><e2/><e2/><e2/></doc>
+        <doc><e1/><e2/><e2/><e2/><e1/></doc>
+        <doc><e2/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 1 1 1 0 0}
+
+test schema-22.8 {defelementtype} {
+    tdom::schema s
+    s defelementtype doctype doc {
+        elementtype e1type
+        elementtype e2type *
+    }
+    foreach e {e1 e2} {
+        s defelementtype ${e}type $e {}
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><e1/></doc>
+        <doc><e1/><e2/></doc>
+        <doc><e1/><e2/><e2/></doc>
+        <doc><e1/><e2/><e2/><e2/></doc>
+        <doc><e1/><e2/><e2/><e2/><e1/></doc>
+        <doc><e2/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 0 0 0 0 0}
 
 test schema-23.1 {validatefile} {
     tdom::schema s

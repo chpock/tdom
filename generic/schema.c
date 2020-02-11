@@ -1488,7 +1488,7 @@ probeElement (
     Tcl_HashEntry *h;
     void *namespacePtr, *namePtr;
     SchemaCP *pattern;
-    int rc = 1;
+    int rc = 1, reportError;
 
     if (sdata->skipDeep) {
         sdata->skipDeep++;
@@ -1586,7 +1586,16 @@ probeElement (
 
     if (!sdata->stack) {
         sdata->validationState = VALIDATION_STARTED;
-        if (!pattern) {
+        reportError = 0;
+        if (pattern) {
+            if (pattern->flags & PLACEHOLDER_PATTERN_DEF
+                || pattern->flags & FORWARD_PATTERN_DEF) {
+                reportError = 1;
+            }
+        } else {
+            reportError = 1;
+        }
+        if (reportError) {
             if (recover (interp, sdata, UNKNOWN_ROOT_ELEMENT, name, namespace,
                          NULL, 0)) {
                 sdata->skipDeep = 1;

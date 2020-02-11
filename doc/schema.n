@@ -224,8 +224,9 @@ defines the content model of the element. If the
 \&\fIref\fR references in the definition script not wrapped
 inside a \fInamespace\fR command are resolved in that
 namespace. If there is already a elementtype definition for
-the name/namespace combination the command raises
-error.
+the name/namespace combination the command raises error. The
+document element of any XML to validate cannot be a
+\&\fIdefelementtype\fR defined element.
 .TP
 \&\fB\fBdefpattern\fP \fIname\fB \fI?namespace?\fB \fI<definition script>\fB
 \&\fRThis method defines a (maybe complex) content particle
@@ -501,7 +502,15 @@ defined until validation then only an empty element with name
 \&\fIname\fR and namespace \fInamespace\fR and no attributes
 matches.
 .TP
-\&\fB\fBref\fP \fIname\fB \fI?quant?\fB
+\&\fB\fBelementtype\fP \fIname\fB \fI?quant?\fB
+\&\fRThis command refers to the element definined with
+\&\fIdefelementtype\fR with the type name \fIname\fR in the
+current context namespace. Forward references to a so far not
+defined element types or recursive references are allowed. If
+a forward referenced element type isn't defined until
+validation no content or attributes are expected.
+.TP
+\&\fB\fBref\fP \fIname\fB         \fI?quant?\fB
 \&\fRThis command refers to the content particle defined with
 \&\fIdefpattern\fR with the name \fIname\fR in the current
 context namespace. Forward references to a so far not defined

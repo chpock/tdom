@@ -74,8 +74,9 @@
         <m>ref</m> references in the definition script not wrapped
         inside a <m>namespace</m> command are resolved in that
         namespace. If there is already a elementtype definition for
-        the name/namespace combination the command raises
-        error.</desc>
+        the name/namespace combination the command raises error. The
+        document element of any XML to validate cannot be a
+        <m>defelementtype</m> defined element.</desc>
       </commanddef>
 
       <commanddef>
@@ -416,7 +417,18 @@
       </commanddef>
 
       <commanddef>
-        <command><method>ref</method> <m>name</m> <m>?quant?</m></command>
+        <command><method>elementtype</method> <m>name</m> <m>?quant?</m></command>
+        <desc>This command refers to the element definined with
+        <m>defelementtype</m> with the type name <m>name</m> in the
+        current context namespace. Forward references to a so far not
+        defined element types or recursive references are allowed. If
+        a forward referenced element type isn't defined until
+        validation no content or attributes are expected.</desc>
+      </commanddef>
+      
+      <commanddef>
+        <command><method>ref</method> <m>name</m>
+        <m>?quant?</m></command>
         <desc>This command refers to the content particle defined with
         <m>defpattern</m> with the name <m>name</m> in the current
         context namespace. Forward references to a so far not defined
