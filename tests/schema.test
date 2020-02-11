@@ -1283,7 +1283,7 @@ test schema-6.2 {expat parser with -validateCmd} {
     set result
 } {1 {The schema command is busy} VALIDATING 1}
 
-test schema-6.3 {expat parser with -validateCmd} {knownBug} {
+test schema-6.3 {expat parser with -validateCmd} {
     tdom::schema create grammar
     grammar defelement doc {
         element e1
@@ -1306,6 +1306,87 @@ test schema-6.3 {expat parser with -validateCmd} {knownBug} {
     p delete
     set result
 } {1 {The schema command is busy} VALIDATING 1}
+
+test schema-6.4 {expat parser with -validateCmd} {
+    tdom::schema create grammar
+    grammar defelement doc {
+        element e1
+        element e2 *
+    }
+    foreach e {e1 e2} {
+        grammar defelement $e {}
+    }
+    ::xml::parser p -validateCmd grammar -final 0
+    set result [list]
+    p parse {<do}
+    lappend result [catch {grammar validate <doc><e1/><e2/><e2/></doc>} errMsg]
+    lappend result $errMsg
+    lappend result [grammar info vstate]
+    p parse {c}
+    p parse {><e1/></doc>}
+    p configure -final 1
+    p reset
+    lappend result [grammar validate <doc><e1/><e2/><e2/></doc>]
+    grammar delete
+    p delete
+    set result
+} {1 {The schema command is busy} VALIDATING 1}
+
+proc elementstart-6.5 {name attList} {
+    lappend ::result $name
+}
+
+test schema-6.5 {expat parser with -validateCmd} {
+    tdom::schema create grammar
+    grammar defelement doc {
+        element e1
+        element e2 *
+    }
+    foreach e {e1 e2} {
+        grammar defelement $e {}
+    }
+    ::xml::parser p -validateCmd grammar -final 0\
+        -elementstartcommand elementstart-6.5
+    set result [list]
+    p parse {<do}
+    p parse {c}
+    p parse {><e1/></doc>}
+    p configure -final 1
+    p reset
+    lappend result [grammar validate <doc><e1/><e2/><e2/></doc>]
+    grammar delete
+    p delete
+    set result
+} {doc e1 1}
+
+proc elementstart-6.6 {name attList} {
+    lappend ::result $name
+    if {$name eq "doc"} {
+        grammar delete
+    }
+}
+
+test schema-6.6 {expat parser with -validateCmd} {
+    tdom::schema create grammar
+    grammar defelement doc {
+        element e1
+        element e2 *
+    }
+    foreach e {e1 e2} {
+        grammar defelement $e {}
+    }
+    ::xml::parser p -validateCmd grammar -final 0\
+        -elementstartcommand elementstart-6.6
+    set result [list]
+    p parse {<do}
+    p parse {c}
+    p parse {><e1/></doc>}
+    p configure -final 1
+    p reset
+    lappend result [info command grammar]
+    p delete
+    set result
+} {doc e1 {}}
 
 test schema-7.1 {group} {
     tdom::schema create grammar

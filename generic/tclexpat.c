@@ -847,6 +847,13 @@ TclExpatInstanceCmd (
             expat->final = 1;
             expat->finished = 1;
         }
+#ifndef TDOM_NO_SCHEMA
+        if (expat->sdata
+            && expat->final == 0
+            && expat->sdata->validationState == VALIDATION_READY) {
+            expat->sdata->validationState = VALIDATION_STARTED;
+        }
+#endif
         break;
         
     case EXPAT_PARSECHANNEL:
