@@ -1571,31 +1571,24 @@ probeElement (
                 }
             }
         }
-    }
-    if (h) {
-        pattern = (SchemaCP *) Tcl_GetHashValue (h);
-        while (pattern) {
-            if (pattern->namespace == namespacePtr) {
-                break;
-            }
-            pattern = pattern->next;
-        }
-    } else {
-        pattern = NULL;
-    }
-
-    if (!sdata->stack) {
-        sdata->validationState = VALIDATION_STARTED;
         reportError = 0;
-        if (pattern) {
-            if (pattern->flags & PLACEHOLDER_PATTERN_DEF
-                || pattern->flags & FORWARD_PATTERN_DEF) {
-                reportError = 1;
+        if (h) {
+            pattern = (SchemaCP *) Tcl_GetHashValue (h);
+            while (pattern) {
+                if (pattern->namespace == namespacePtr) {
+                    if (pattern->flags & PLACEHOLDER_PATTERN_DEF
+                        || pattern->flags & FORWARD_PATTERN_DEF) {
+                        reportError = 1;
+                    }
+                    break;
+                }
+                pattern = pattern->next;
             }
         } else {
-            reportError = 1;
+            pattern = NULL;
         }
-        if (reportError) {
+        sdata->validationState = VALIDATION_STARTED;
+        if (reportError || pattern == NULL) {
             if (recover (interp, sdata, UNKNOWN_ROOT_ELEMENT, name, namespace,
                          NULL, 0)) {
                 sdata->skipDeep = 1;
@@ -4430,7 +4423,6 @@ schemaInstanceCmd (
                 return TCL_ERROR;
             }
         }
-        sdata->validationState = VALIDATION_STARTED;
         if (validateDOM (interp, sdata, node) == TCL_OK) {
             SetBooleanResult (1);
             if (objc == 4) {

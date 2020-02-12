@@ -847,13 +847,6 @@ TclExpatInstanceCmd (
             expat->final = 1;
             expat->finished = 1;
         }
-#ifndef TDOM_NO_SCHEMA
-        if (expat->sdata
-            && expat->final == 0
-            && expat->sdata->validationState == VALIDATION_READY) {
-            expat->sdata->validationState = VALIDATION_STARTED;
-        }
-#endif
         break;
         
     case EXPAT_PARSECHANNEL:
@@ -2372,7 +2365,8 @@ TclGenExpatElementStartHandler(
       if (probeElement (expat->interp, expat->sdata, name, NULL) != TCL_OK) {
           TclExpatHandlerResult (expat, NULL, TCL_ERROR);
       }
-      if (atts[0] || expat->sdata->stack->pattern->attrs) {
+      if (atts[0] || (expat->sdata->stack
+                      && expat->sdata->stack->pattern->attrs)) {
           if (probeAttributes (expat->interp, expat->sdata, atts)
               != TCL_OK) {
               expat->sdata->validationState = VALIDATION_ERROR;

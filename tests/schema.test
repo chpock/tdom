@@ -1319,7 +1319,7 @@ test schema-6.3 {expat parser with -validateCmd} {
     grammar delete
     p delete
     set result
-} {1 {The schema command is busy} VALIDATING 1}
+} {0 1 READY 1}
 
 test schema-6.4 {expat parser with -validateCmd} {
     tdom::schema create grammar
@@ -1344,7 +1344,7 @@ test schema-6.4 {expat parser with -validateCmd} {
     grammar delete
     p delete
     set result
-} {1 {The schema command is busy} VALIDATING 1}
+} {0 1 READY 1}
 
 proc elementstart-6.5 {name attList} {
     lappend ::result $name
