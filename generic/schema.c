@@ -715,12 +715,16 @@ cleanupLastPattern (
         this = sdata->patternList[i];
         hashTable = NULL;
         if (this->type == SCHEMA_CTYPE_NAME) {
-            if (this->flags & ELEMENTTYPE_DEF) {
-                hashTable = &sdata->elementType;
-                name = this->typeName;
-            } else {
-                hashTable = &sdata->element;
-                name = this->name;
+            /* Local defined  elements aren't saved under  their local
+             * name bucket in the sdata->element hash table. */
+            if (!(this->flags & LOCAL_DEFINED_ELEMENT)) {
+                if (this->flags & ELEMENTTYPE_DEF) {
+                    hashTable = &sdata->elementType;
+                    name = this->typeName;
+                } else {
+                    hashTable = &sdata->element;
+                    name = this->name;
+                }
             }
         }
         if (this->type == SCHEMA_CTYPE_PATTERN) {

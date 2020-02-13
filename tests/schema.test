@@ -739,7 +739,27 @@ test schema-1.32 {Unknown root element} {
     s delete
     set result
 } 0
- 
+
+test schema-1.33 {Error after local defined element} {
+    tdom::schema s
+    set result [catch {
+        s define {
+            defelement a {
+                element b ! {
+                    element c ! {}
+                    error "triggered"
+                }
+                element a ! {
+                    element c ! {}
+                }
+                error
+            }
+        }
+    }]
+    s delete
+    set result
+} 1
+
 test schema-2.1 {grammar definition: ref} {
     tdom::schema create grammar
     grammar defpattern thisPattern {
