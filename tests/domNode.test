@@ -1228,6 +1228,19 @@ test domNode-12.10 {cloneNode -deep} {
     set result
 } {y {}}
 
+test domNode-12.11 {cloneNode -deep w/ disableOutputEscaping} {
+    dom parse "<doc><td/></doc>" doc
+    $doc createTextNode "a&nbsp;b" textnode 
+    $textnode disableOutputEscaping 1
+    $doc documentElement root
+    $root firstChild td
+    $td appendChild $textnode
+    $root appendChild [$td cloneNode -deep]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc><td>a&nbsp;b</td><td>a&nbsp;b</td></doc>}
+
 namespace eval nodeCmds {
     dom createNodeCmd elementNode e1
     dom createNodeCmd elementNode e2
