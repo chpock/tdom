@@ -4598,17 +4598,11 @@ domCloneNode (
     }
     if (node->nodeType != ELEMENT_NODE) {
         domTextNode *t1node, *tnode = (domTextNode*)node;
-        if (tnode->info) {
-            t1node = domNewTextNode(tnode->ownerDocument,
-                                    tnode->nodeValue, tnode->valueLength,
-                                    tnode->nodeType);
-            t1node->info = tnode->info;
-            return (domNode*) t1node;
-        } else {
-            return (domNode*) domNewTextNode(tnode->ownerDocument,
-                                             tnode->nodeValue, tnode->valueLength,
-                                             tnode->nodeType);
-        }
+        t1node = domNewTextNode(tnode->ownerDocument, tnode->nodeValue,
+                                tnode->valueLength, tnode->nodeType);
+        t1node->info = tnode->info;
+        t1node->nodeFlags = tnode->nodeFlags;
+        return (domNode*) t1node;
     }
 
     n = domNewElementNode(node->ownerDocument, node->nodeName);
@@ -4622,9 +4616,7 @@ domCloneNode (
     while (attr != NULL) {
         nattr = domSetAttribute (n, attr->nodeName, attr->nodeValue );
         nattr->namespace = attr->namespace;
-        if (attr->nodeFlags & IS_NS_NODE) {
-            nattr->nodeFlags |= IS_NS_NODE;
-        }
+        nattr->nodeFlags = attr->nodeFlags;
         attr = attr->nextSibling;
     }
 
