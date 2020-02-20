@@ -286,11 +286,12 @@
               </optdef>
               <optdef>
                   <optname>domNode</optname>
-                  <desc>If the schema command is currently
-                  post-validating a DOM tree this command returns the
-                  current parent node command (the node, whose content
-                  is currently validated) and the empty string
-                  otherwhise. It is recommended that you don't use
+                  <desc>If the schema command isn't currently
+                  post-validating a DOM tree this method returns the
+                  emtpy string. Otherwise, it returns the node on
+                  which the validation engine is currently looking at
+                  in case, the node is an ELEMENT_NODE or the parent
+                  node, if not. It is recommended that you don't use
                   this method. Or at least leave the DOM tree alone,
                   use it read-only.</desc>
               </optdef>

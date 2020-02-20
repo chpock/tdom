@@ -3070,6 +3070,7 @@ validateDOM (
     )
 {
     char *ln;
+    domNode *savednode;
 
     if (node->namespace) {
         if (node->ownerDocument->namespaces[node->namespace-1]->prefix[0] == '\0') {
@@ -3089,6 +3090,7 @@ validateDOM (
     } else {
         ln = node->nodeName;
     }
+    savednode = sdata->node;
     sdata->node = node;
     if (probeElement (interp, sdata, ln,
                       node->namespace ?
@@ -3170,6 +3172,7 @@ validateDOM (
         Tcl_DStringSetLength (sdata->cdata, 0);
     }
     if (probeElementEnd (interp, sdata) != TCL_OK) return TCL_ERROR;
+    sdata->node = savednode;
     return TCL_OK;
 }
 
