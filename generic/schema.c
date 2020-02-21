@@ -1102,12 +1102,10 @@ recover (
     }
     switch (errorType) {
     case MISSING_ELEMENT_MATCH_START:
+    case UNEXPECTED_ELEMENT:
         finalizeElement (sdata, ac+1);
         sdata->skipDeep = 2;
         break;
-    case UNEXPECTED_ELEMENT:
-        sdata->skipDeep = 1;
-        break;        
     case DOM_KEYCONSTRAINT:
     case MISSING_ATTRIBUTE:
     case MISSING_ELEMENT_MATCH_END:

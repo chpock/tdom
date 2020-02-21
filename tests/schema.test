@@ -7147,6 +7147,51 @@ test schema-19.3 {keyspace} {
     set result
 } {1 1 s INVALID_KEYREF 1 s INVALID_KEYREF 1}
 
+proc log19.4 {msg scmd} {
+    lappend ::result $msg
+}
+proc report19.4 {scmd errortype} {
+    lappend ::result $errortype
+}
+test schema-19.4 {keyspace w/ recover} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element m * {
+                tcl log19.4 "before a"
+                element a ? {
+                    keyspace lang {
+                        element a1 ? {
+                            attribute lang ? {key lang}
+                        }
+                    }
+                    keyspace lang {
+                        element a2 ? {text {key lang}}
+                    }
+                }
+                tcl log19.4 "before b"
+                element b ? {
+                    keyspace lang {
+                        element b1 ? {
+                            attribute lang ? {key lang}
+                        }
+                    }
+                }
+            }
+        }
+    }
+    s reportcmd report19.4
+    set result [list]
+    foreach xml {
+        {<doc><m><a><a1 lang="en"/><a1/><a1/></a></m><m><b><b1 lang="de"/><b1/><b1/></b></m></doc>}
+    } {
+        lappend result [s validate $xml errMsg]
+        puts $errMsg
+    }
+    s delete
+    set result
+} {{before a} UNEXPECTED_ELEMENT {before b} {before a} {before b} UNEXPECTED_ELEMENT 1}
+
 test schema-20.1 {domunique} {
     set schema {
         prefixns {ns1 http://tdom.org/test}
