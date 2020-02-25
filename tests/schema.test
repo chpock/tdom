@@ -7051,7 +7051,7 @@ proc validatedDOM {g xml {keepEmpties 0}} {
 proc postValidation {g xml} {
     set doc [dom parse $xml]
     set rc [$g domvalidate $doc errMsg]
-    #puts "error: $errMsg"
+    #puts "error  : $errMsg"
     $doc delete
     return $rc
 }
@@ -7348,6 +7348,35 @@ test schema-20.5 {domunique} {
     s delete
     set result
 } {1 0}
+
+proc schema-20.6 {scmd errortype} {
+    lappend ::result $errortype \
+        [$scmd info vaction name] \
+        [$scmd info vaction text] \
+        [[$scmd info domNode] nodeName]
+}
+
+test schema-20.6 {domunique} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            domunique item ref itemunique
+            element item * {
+                element ref ! text
+            }
+        }
+    }
+    s reportcmd schema-20.6
+    set result [list]
+    foreach xml {
+        {<doc><item><ref>1</ref></item><item><ref>foo</ref></item></doc>}
+        {<doc><item><ref>foo</ref></item><item><ref>foo</ref></item></doc>}
+    } {
+        lappend result [postValidation s $xml]
+    }
+    s delete
+    set result
+} {1 DOM_KEYCONSTRAINT itemunique foo doc 1}
 
 test schema-21.1 {CONTENT_ARRAY_SIZE_INIT} {
     tdom::schema s

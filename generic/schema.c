@@ -2935,21 +2935,21 @@ checkdomKeyConstraints (
                     }
                     Tcl_CreateHashEntry (&htable, "", &hnew);
                     if (!hnew) {
-                        if (recover (interp, sdata, DOM_KEYCONSTRAINT, NULL,
-                                     NULL, NULL, 0)) {
+                        if (recover (interp, sdata, DOM_KEYCONSTRAINT,
+                                     kc->name, NULL, "", 0)) {
                             break;
                         }
-                        SetResult ("DOM_KEYCONSTRAINT");
+                        SetResultV ("DOM_KEYCONSTRAINT");
                         goto errorCleanup;
                     }
                     continue;
                 }
                 if (frs.nr_nodes != 1) {
-                    if (recover (interp, sdata, DOM_KEYCONSTRAINT, NULL, NULL,
-                                 NULL, 0)) {
+                    if (recover (interp, sdata, DOM_KEYCONSTRAINT, kc->name,
+                                 NULL, NULL, 0)) {
                         break;
                     }
-                    SetResult ("DOM_KEYCONSTRAINT");
+                    SetResultV ("DOM_KEYCONSTRAINT");
                     goto errorCleanup;
                 }
                 if (frs.nodes[0]->nodeType != ELEMENT_NODE
@@ -2961,25 +2961,27 @@ checkdomKeyConstraints (
                     attr = (domAttrNode *) frs.nodes[0];
                     Tcl_CreateHashEntry (&htable, attr->nodeValue, &hnew);
                     if (!hnew) {
-                        if (recover (interp, sdata, DOM_KEYCONSTRAINT, NULL,
-                                     NULL, NULL, 0)) {
+                        if (recover (interp, sdata, DOM_KEYCONSTRAINT,
+                                     kc->name, NULL, attr->nodeValue, 0)) {
                             break;
                         }
-                        SetResult ("DOM_KEYCONSTRAINT");
+                        SetResultV ("DOM_KEYCONSTRAINT");
                         goto errorCleanup;
                     }
                 } else {
                     keystr = xpathGetStringValue (frs.nodes[0], &len);
                     Tcl_CreateHashEntry (&htable, keystr, &hnew);
-                    FREE(keystr);
                     if (!hnew) {
-                        if (recover (interp, sdata, DOM_KEYCONSTRAINT, NULL,
-                                     NULL, NULL, 0)) {
+                        if (recover (interp, sdata, DOM_KEYCONSTRAINT,
+                                     kc->name, NULL, keystr, 0)) {
+                            FREE(keystr);
                             break;
                         }
-                        SetResult ("DOM_KEYCONSTRAINT");
+                        FREE(keystr);
+                        SetResultV ("DOM_KEYCONSTRAINT");
                         goto errorCleanup;
                     }
+                    FREE(keystr);
                 }
             } else {
                 Tcl_DStringSetLength (&dStr, 0);
@@ -3007,12 +3009,12 @@ checkdomKeyConstraints (
                         continue;
                     }
                     if (frs.nr_nodes != 1) {
-                        if (recover (interp, sdata, DOM_KEYCONSTRAINT, NULL,
-                                     NULL, NULL, 0)) {
+                        if (recover (interp, sdata, DOM_KEYCONSTRAINT,
+                                     kc->name, NULL, NULL, 0)) {
                             skip = 1;
                             break;
                         }
-                        SetResult ("DOM_KEYCONSTRAINT");
+                        SetResultV ("DOM_KEYCONSTRAINT");
                         goto errorCleanup;
                     }
                     if (frs.nodes[0]->nodeType != ELEMENT_NODE
@@ -3034,11 +3036,11 @@ checkdomKeyConstraints (
                 if (skip) break;
                 Tcl_CreateHashEntry (&htable, Tcl_DStringValue (&dStr), &hnew);
                 if (!hnew) {
-                    if (recover (interp, sdata, DOM_KEYCONSTRAINT, NULL, NULL,
-                                 NULL, 0)) {
+                    if (recover (interp, sdata, DOM_KEYCONSTRAINT, 
+                                 kc->name,NULL, Tcl_DStringValue (&dStr), 0)) {
                         break;
                     }
-                    SetResult ("DOM_KEYCONSTRAINT");
+                    SetResultV ("DOM_KEYCONSTRAINT");
                     goto errorCleanup;
                 }
             }
