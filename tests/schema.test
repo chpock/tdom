@@ -25,6 +25,7 @@
 #    schema-22.*: defelementtype, elementtype
 #    schema-23.*: validatefile
 #    schema-24.*: validatechannel
+#    schema-25.*: domxpathboolean
 #
 # Copyright (c) 2018-2019 Rolf Ade.
 
@@ -7624,5 +7625,126 @@ test schema-24.1 {validatechannel} {
     s delete
     set result
 } 1
+
+test schema-25.1 {domxpathboolean} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element width ! text
+            element length ! text
+            element height ! text
+            domxpathboolean "width * length * height <= 20000"  volumeconstraint
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc><width>1</width><length>3</length><height>5</height></doc>
+        <doc><width>2000.0</width><length>100.0</length><height>2.0</height></doc>
+        <doc><width>2000.0</width><length>100.0</length><height>-2</height></doc>
+        <doc><width>2.3</width><length>3.5</length><height>7.6</height></doc>
+        <doc><width>1</width><length>1</length><height>foo</height></doc>
+        <doc><width>1</width><length>1</length><height>2000-01-01</height></doc>
+        <doc><width></width><length></length><height></height></doc>
+    } {
+        lappend result [postValidation s $xml]
+    }
+    s delete
+    set result
+} {1 0 1 1 0 0 0}
+
+test schema-25.2 {domxpathboolean} {
+    tdom::schema s
+    s prefixns {
+        this http://that.org
+        other http://this.org
+    }
+        
+    s define {
+        defelement doc this {
+            element width ! text
+            namespace other {
+                element length ! text
+            }
+            element height ! text
+            domxpathboolean "this:width * other:length * this:height <= 20000"  volumeconstraint
+        }
+    }
+    set result [list]
+    foreach xml {
+        {<doc xmlns="http://that.org" xmlns:foo="http://this.org"><width>1</width><foo:length>3</foo:length><height>5</height></doc>}
+        {<doc xmlns="http://that.org" xmlns:foo="http://this.org"><width>2000.0</width><foo:length>100.0</foo:length><height>2.0</height></doc>}
+        {<doc xmlns="http://that.org" xmlns:foo="http://this.org"><width>2000.0</width><foo:length>100.0</foo:length><height>-2</height></doc>}
+        {<doc xmlns="http://that.org" xmlns:foo="http://this.org"><width>2.3</width><foo:length>3.5</foo:length><height>7.6</height></doc>}
+        {<doc xmlns="http://that.org" xmlns:foo="http://this.org"><width>1</width><foo:length>1</foo:length><height>foo</height></doc>}
+        {<doc xmlns="http://that.org" xmlns:foo="http://this.org"><width>1</width><foo:length>1</foo:length><height>2000-01-01</height></doc>}
+        {<doc xmlns="http://that.org" xmlns:foo="http://this.org"><width></width><foo:length></foo:length><height></height></doc>}
+    } {
+        lappend result [postValidation s $xml]
+    }
+    s delete
+    set result
+} {1 0 1 1 0 0 0}
+
+proc schema-25.3 {scmd errortype} {
+    lappend ::result $errortype [$scmd info vaction name]
+}
+test schema-25.3 {domxpathboolean} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element width ! text
+            element length ! text
+            element height ! text
+            domxpathboolean "width * length * height <= 20000"  volumeconstraint
+        }
+    }
+    s reportcmd schema-25.3
+    set result [list]
+    foreach xml {
+        <doc><width>1</width><length>3</length><height>5</height></doc>
+        <doc><width>2000.0</width><length>100.0</length><height>2.0</height></doc>
+        <doc><width>2000.0</width><length>100.0</length><height>-2</height></doc>
+        <doc><width>2.3</width><length>3.5</length><height>7.6</height></doc>
+        <doc><width>1</width><length>1</length><height>foo</height></doc>
+        <doc><width>1</width><length>1</length><height>2000-01-01</height></doc>
+        <doc><width></width><length></length><height></height></doc>
+    } {
+        lappend result [postValidation s $xml]
+    }
+    s delete
+    set result
+} {1 DOM_XPATH_BOOLEAN volumeconstraint 1 1 1 DOM_XPATH_BOOLEAN volumeconstraint 1 DOM_XPATH_BOOLEAN volumeconstraint 1 DOM_XPATH_BOOLEAN volumeconstraint 1}
+
+test schema-25.4 {domxpathboolean} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element width ! text
+            element length ! text
+            element height ! text
+            domxpathboolean "width * length * height <= 20000"  volume
+            domunique width|length|height . unique
+            domxpathboolean "width < length and length < height"  sequence
+        }
+    }
+    s reportcmd schema-25.3
+    set result [list]
+    set nr 1
+    foreach xml {
+        <doc><width>1</width><length>3</length><height>5</height></doc>
+        <doc><width>2000.0</width><length>100.0</length><height>2.0</height></doc>
+        <doc><width>2000.0</width><length>100.0</length><height>-2</height></doc>
+        <doc><width>2.3</width><length>3.5</length><height>7.6</height></doc>
+        <doc><width>1</width><length>1</length><height>foo</height></doc>
+        <doc><width>1</width><length>1</length><height>2000-01-01</height></doc>
+        <doc><width></width><length></length><height></height></doc>
+    } {
+        lappend result "Nr$nr:"
+        incr nr
+        lappend result [postValidation s $xml]
+    }
+    s delete
+    set result
+} {Nr1: 1 Nr2: DOM_XPATH_BOOLEAN volume DOM_XPATH_BOOLEAN sequence 1 Nr3: DOM_XPATH_BOOLEAN sequence 1 Nr4: 1 Nr5: DOM_XPATH_BOOLEAN volume DOM_KEYCONSTRAINT unique DOM_XPATH_BOOLEAN sequence 1 Nr6: DOM_XPATH_BOOLEAN volume DOM_KEYCONSTRAINT unique DOM_XPATH_BOOLEAN sequence 1 Nr7: DOM_XPATH_BOOLEAN volume DOM_KEYCONSTRAINT unique DOM_XPATH_BOOLEAN sequence 1}
 
 }

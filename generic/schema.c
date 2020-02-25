@@ -17,7 +17,7 @@
 |
 |
 |   written by Rolf Ade
-|   2018-2019
+|   2018-2020
 |
 \---------------------------------------------------------------------------*/
 
@@ -106,7 +106,8 @@ typedef enum {
     MATCH_ELEMENT_END,
     MATCH_TEXT,
     MATCH_ATTRIBUTE_TEXT,
-    MATCH_DOM_KEYCONSTRAINT
+    MATCH_DOM_KEYCONSTRAINT,
+    MATCH_DOM_XPATH_BOOLEAN
 } ValidationAction;
 
 static char *ValidationAction2str[] = {
@@ -115,11 +116,13 @@ static char *ValidationAction2str[] = {
     "MATCH_ELEMENT_END",
     "MATCH_TEXT",
     "MATCH_ATTRIBUTE_TEXT",
-    "MATCH_DOM_KEYCONSTRAINT"
+    "MATCH_DOM_KEYCONSTRAINT",
+    "MATCH_DOM_XPATH_BOOLEAN"
 };
     
 typedef enum {
     DOM_KEYCONSTRAINT,
+    DOM_XPATH_BOOLEAN,
     MISSING_ATTRIBUTE,
     MISSING_ELEMENT_MATCH_START,
     MISSING_ELEMENT_MATCH_END,
@@ -141,6 +144,7 @@ typedef enum {
 
 static char *ValidationErrorType2str[] = {
     "DOM_KEYCONSTRAINT",
+    "DOM_XPATH_BOOLEAN",
     "MISSING_ATTRIBUTE",
     "MISSING_ELEMENT",
     "MISSING_ELEMENT",
@@ -166,6 +170,7 @@ static char *ValidationErrorType2str[] = {
 \---------------------------------------------------------------------------*/
 
 #define DKC_FLAG_IGNORE_EMPTY_FIELD_SET 1
+#define DKC_FLAG_BOOLEAN 2
 
 /*----------------------------------------------------------------------------
 |   Macros
@@ -1041,6 +1046,9 @@ recover (
     case DOM_KEYCONSTRAINT:
         sdata->vaction = MATCH_DOM_KEYCONSTRAINT;
         break;
+    case DOM_XPATH_BOOLEAN:
+        sdata->vaction = MATCH_DOM_XPATH_BOOLEAN;
+        break;
     case MISSING_ATTRIBUTE:
     case UNKNOWN_ATTRIBUTE:
     case MISSING_ELEMENT_MATCH_START:
@@ -1107,6 +1115,7 @@ recover (
         sdata->skipDeep = 2;
         break;
     case DOM_KEYCONSTRAINT:
+    case DOM_XPATH_BOOLEAN:
     case MISSING_ATTRIBUTE:
     case MISSING_ELEMENT_MATCH_END:
     case MISSING_ELEMENT_MATCH_TEXT:
@@ -2897,20 +2906,32 @@ checkdomKeyConstraints (
     memset (&frs, 0, sizeof (xpathResultSet));
     frs.type = EmptyResult;
     Tcl_DStringInit (&dStr);
+    xpathRSReset (&nodeList, node);
     while (kc) {
         xpathRSReset (&rs, NULL);
-        xpathRSReset (&nodeList, node);
-        Tcl_InitHashTable (&htable, TCL_STRING_KEYS);
         rc = xpathEvalAst (kc->selector, &nodeList, node, &rs, &errMsg);
         if (rc) {
             SetResult (errMsg);
             goto errorCleanup;
+        }
+        if (kc->flags & DKC_FLAG_BOOLEAN) {
+            i = xpathFuncBoolean (&rs);
+            if (!i) {
+                if (!recover (interp, sdata, DOM_XPATH_BOOLEAN, kc->name,
+                              NULL, NULL, 0)) {
+                    SetResultV ("INVALID_DOM_XPATH_BOOLEAN");
+                    goto booleanErrorCleanup;
+                }
+            }
+            kc = kc->next;
+            continue;
         }
         if (rs.type == EmptyResult) goto nextConstraint;
         if (rs.type != xNodeSetResult) {
             SetResult ("INVALID_DOM_KEYCONSTRAINT");
             goto errorCleanup;
         }
+        Tcl_InitHashTable (&htable, TCL_STRING_KEYS);
         for (i = 0; i < rs.nr_nodes; i++) {
             n = rs.nodes[i];
             if (n->nodeType != ELEMENT_NODE) {
@@ -3031,6 +3052,7 @@ checkdomKeyConstraints (
                     } else {
                         keystr = xpathGetStringValue (frs.nodes[0], &len);
                         Tcl_DStringAppend (&dStr, keystr, len);
+                        FREE (keystr);
                     }
                 }
                 if (skip) break;
@@ -3045,8 +3067,8 @@ checkdomKeyConstraints (
                 }
             }
         }
-    nextConstraint:
         Tcl_DeleteHashTable (&htable);
+    nextConstraint:
         kc = kc->next;
     }
     schemaxpathRSFree (&frs);
@@ -3056,6 +3078,7 @@ checkdomKeyConstraints (
 
 errorCleanup:
     Tcl_DeleteHashTable (&htable);
+booleanErrorCleanup:
     schemaxpathRSFree (&frs);
     schemaxpathRSFree (&rs);
     schemaxpathRSFree (&nodeList);
@@ -5341,7 +5364,7 @@ domuniquePatternObjCmd (
     SchemaData *sdata = GETASI;
     ast t;
     char *errMsg = NULL;
-    domKeyConstraint *kc;
+    domKeyConstraint *kc, *kc1;
     int i, nrFields, flags = 0, nrFlags;
     Tcl_Obj *elm;
 
@@ -5408,8 +5431,67 @@ domuniquePatternObjCmd (
     if (objc == 4) {
         kc->name = tdomstrdup (Tcl_GetString (objv[3]));
     }
-    kc->next = sdata->cp->domKeys;
-    sdata->cp->domKeys = kc;
+    /* Apppend to end so that the constraints are checked in
+     * definition order */
+    if (sdata->cp->domKeys) {
+        kc1 = sdata->cp->domKeys;
+        while (1) {
+            if (kc1->next) kc1 = kc1->next;
+            else break;
+        }
+        kc1->next = kc;
+    } else {
+        sdata->cp->domKeys = kc;
+    }
+    return TCL_OK;
+}
+
+static int
+domxpathbooleanPatternObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    ast t;
+    char *errMsg = NULL;
+    domKeyConstraint *kc, *kc1;
+
+    CHECK_SI
+    CHECK_TOPLEVEL
+    checkNrArgs (2, 3, "Expected: <selector> ?<name>?");
+    if (sdata->cp->type != SCHEMA_CTYPE_NAME) {
+        SetResult ("The domxpathboolean schema definition command is only "
+                   "allowed as direct child of an element.");
+    }
+    if (xpathParse (Tcl_GetString (objv[1]), NULL, XPATH_EXPR,
+                    sdata->prefixns, NULL, &t, &errMsg) < 0) {
+        SetResult3 ("Error in selector xpath: '", errMsg, "");
+        FREE (errMsg);
+        return TCL_ERROR;
+    }
+
+    kc = TMALLOC (domKeyConstraint);
+    memset (kc, 0, sizeof (domKeyConstraint));
+    kc->selector = t;
+    kc->flags |= DKC_FLAG_BOOLEAN;
+    if (objc == 3) {
+        kc->name = tdomstrdup (Tcl_GetString (objv[2]));
+    }
+    /* Apppend to end so that the constraints are checked in
+     * definition order */
+    if (sdata->cp->domKeys) {
+        kc1 = sdata->cp->domKeys;
+        while (1) {
+            if (kc1->next) kc1 = kc1->next;
+            else break;
+        }
+        kc1->next = kc;
+    } else {
+        sdata->cp->domKeys = kc;
+    }
     return TCL_OK;
 }
 
@@ -7380,6 +7462,8 @@ tDOM_SchemaInit (
     /* XPath contraints for DOM validation */
     Tcl_CreateObjCommand (interp,"tdom::schema::domunique",
                           domuniquePatternObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::domxpathboolean",
+                          domxpathbooleanPatternObjCmd, NULL, NULL);
 
     /* Local key constraints */
     Tcl_CreateObjCommand (interp, "tdom::schema::keyspace",
