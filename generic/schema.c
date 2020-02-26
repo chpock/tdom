@@ -17,7 +17,7 @@
 |
 |
 |   written by Rolf Ade
-|   2018-2019
+|   2018-2020
 |
 \---------------------------------------------------------------------------*/
 
@@ -36,6 +36,9 @@
 #include <unistd.h>
 #endif
 
+#ifndef TDOM_CHOICE_HASH_THRESHOLD
+# define TDOM_CHOICE_HASH_THRESHOLD 5
+#endif
 #ifndef TDOM_EXPAT_READ_SIZE
 # define TDOM_EXPAT_READ_SIZE (1024*8)
 #endif
@@ -103,7 +106,8 @@ typedef enum {
     MATCH_ELEMENT_END,
     MATCH_TEXT,
     MATCH_ATTRIBUTE_TEXT,
-    MATCH_DOM_KEYCONSTRAINT
+    MATCH_DOM_KEYCONSTRAINT,
+    MATCH_DOM_XPATH_BOOLEAN
 } ValidationAction;
 
 static char *ValidationAction2str[] = {
@@ -112,11 +116,13 @@ static char *ValidationAction2str[] = {
     "MATCH_ELEMENT_END",
     "MATCH_TEXT",
     "MATCH_ATTRIBUTE_TEXT",
-    "MATCH_DOM_KEYCONSTRAINT"
+    "MATCH_DOM_KEYCONSTRAINT",
+    "MATCH_DOM_XPATH_BOOLEAN"
 };
     
 typedef enum {
     DOM_KEYCONSTRAINT,
+    DOM_XPATH_BOOLEAN,
     MISSING_ATTRIBUTE,
     MISSING_ELEMENT_MATCH_START,
     MISSING_ELEMENT_MATCH_END,
@@ -138,6 +144,7 @@ typedef enum {
 
 static char *ValidationErrorType2str[] = {
     "DOM_KEYCONSTRAINT",
+    "DOM_XPATH_BOOLEAN",
     "MISSING_ATTRIBUTE",
     "MISSING_ELEMENT",
     "MISSING_ELEMENT",
@@ -163,6 +170,7 @@ static char *ValidationErrorType2str[] = {
 \---------------------------------------------------------------------------*/
 
 #define DKC_FLAG_IGNORE_EMPTY_FIELD_SET 1
+#define DKC_FLAG_BOOLEAN 2
 
 /*----------------------------------------------------------------------------
 |   Macros
@@ -531,6 +539,10 @@ static void freeSchemaCP (
             FREE (pattern->attrs);
         }
         freedomKeyConstraints (pattern->domKeys);
+        if (pattern->typedata) {
+            Tcl_DeleteHashTable ((Tcl_HashTable *) pattern->typedata);
+            FREE (pattern->typedata);
+        }
         break;
     }
     if (pattern->defScript) {
@@ -589,6 +601,7 @@ initSchemaData (
     sdata->unknownIDrefs = 0;
     Tcl_InitHashTable (&sdata->idTables, TCL_STRING_KEYS);
     Tcl_InitHashTable (&sdata->keySpaces, TCL_STRING_KEYS);
+    sdata->choiceHashThreshold = TDOM_CHOICE_HASH_THRESHOLD;
     return sdata;
 }
 
@@ -707,12 +720,16 @@ cleanupLastPattern (
         this = sdata->patternList[i];
         hashTable = NULL;
         if (this->type == SCHEMA_CTYPE_NAME) {
-            if (this->flags & ELEMENTTYPE_DEF) {
-                hashTable = &sdata->elementType;
-                name = this->typeName;
-            } else {
-                hashTable = &sdata->element;
-                name = this->name;
+            /* Local defined  elements aren't saved under  their local
+             * name bucket in the sdata->element hash table. */
+            if (!(this->flags & LOCAL_DEFINED_ELEMENT)) {
+                if (this->flags & ELEMENTTYPE_DEF) {
+                    hashTable = &sdata->elementType;
+                    name = this->typeName;
+                } else {
+                    hashTable = &sdata->element;
+                    name = this->name;
+                }
             }
         }
         if (this->type == SCHEMA_CTYPE_PATTERN) {
@@ -1029,6 +1046,9 @@ recover (
     case DOM_KEYCONSTRAINT:
         sdata->vaction = MATCH_DOM_KEYCONSTRAINT;
         break;
+    case DOM_XPATH_BOOLEAN:
+        sdata->vaction = MATCH_DOM_XPATH_BOOLEAN;
+        break;
     case MISSING_ATTRIBUTE:
     case UNKNOWN_ATTRIBUTE:
     case MISSING_ELEMENT_MATCH_START:
@@ -1090,13 +1110,12 @@ recover (
     }
     switch (errorType) {
     case MISSING_ELEMENT_MATCH_START:
+    case UNEXPECTED_ELEMENT:
         finalizeElement (sdata, ac+1);
         sdata->skipDeep = 2;
         break;
-    case UNEXPECTED_ELEMENT:
-        sdata->skipDeep = 1;
-        break;        
     case DOM_KEYCONSTRAINT:
+    case DOM_XPATH_BOOLEAN:
     case MISSING_ATTRIBUTE:
     case MISSING_ELEMENT_MATCH_END:
     case MISSING_ELEMENT_MATCH_TEXT:
@@ -1176,6 +1195,7 @@ matchElementStart (
     int hm, ac, i, mayskip, rc;
     int isName = 0;
     SchemaValidationStack *se;
+    Tcl_HashEntry *h;
 
     if (!sdata->stack) return 0;
     se = sdata->stack;
@@ -1225,6 +1245,21 @@ matchElementStart (
                 break;
 
             case SCHEMA_CTYPE_CHOICE:
+                if (candidate->typedata) {
+                    h = Tcl_FindHashEntry ((Tcl_HashTable *)candidate->typedata,
+                                           name);
+                    if (h) {
+                        icp = Tcl_GetHashValue (h);
+                        if (icp->namespace == namespace) {
+                            pushToStack (sdata, icp);
+                            updateStack (se, cp, ac);
+                            return 1;
+                        }
+                    }
+                    /* TODO: Short-cut in case of no match (looking
+                     * for emtpy match, recovering). For now fall
+                     * throu to simple, serial approach. */
+                }
                 for (i = 0; i < candidate->nc; i++) {
                     icp = candidate->content[i];
                     switch (icp->type) {
@@ -1464,7 +1499,7 @@ probeElement (
     Tcl_HashEntry *h;
     void *namespacePtr, *namePtr;
     SchemaCP *pattern;
-    int rc = 1;
+    int rc = 1, reportError;
 
     if (sdata->skipDeep) {
         sdata->skipDeep++;
@@ -1547,22 +1582,24 @@ probeElement (
                 }
             }
         }
-    }
-    if (h) {
-        pattern = (SchemaCP *) Tcl_GetHashValue (h);
-        while (pattern) {
-            if (pattern->namespace == namespacePtr) {
-                break;
+        reportError = 0;
+        if (h) {
+            pattern = (SchemaCP *) Tcl_GetHashValue (h);
+            while (pattern) {
+                if (pattern->namespace == namespacePtr) {
+                    if (pattern->flags & PLACEHOLDER_PATTERN_DEF
+                        || pattern->flags & FORWARD_PATTERN_DEF) {
+                        reportError = 1;
+                    }
+                    break;
+                }
+                pattern = pattern->next;
             }
-            pattern = pattern->next;
+        } else {
+            pattern = NULL;
         }
-    } else {
-        pattern = NULL;
-    }
-
-    if (!sdata->stack) {
         sdata->validationState = VALIDATION_STARTED;
-        if (!pattern) {
+        if (reportError || pattern == NULL) {
             if (recover (interp, sdata, UNKNOWN_ROOT_ELEMENT, name, namespace,
                          NULL, 0)) {
                 sdata->skipDeep = 1;
@@ -2869,20 +2906,32 @@ checkdomKeyConstraints (
     memset (&frs, 0, sizeof (xpathResultSet));
     frs.type = EmptyResult;
     Tcl_DStringInit (&dStr);
+    xpathRSReset (&nodeList, node);
     while (kc) {
         xpathRSReset (&rs, NULL);
-        xpathRSReset (&nodeList, node);
-        Tcl_InitHashTable (&htable, TCL_STRING_KEYS);
         rc = xpathEvalAst (kc->selector, &nodeList, node, &rs, &errMsg);
         if (rc) {
             SetResult (errMsg);
             goto errorCleanup;
+        }
+        if (kc->flags & DKC_FLAG_BOOLEAN) {
+            i = xpathFuncBoolean (&rs);
+            if (!i) {
+                if (!recover (interp, sdata, DOM_XPATH_BOOLEAN, kc->name,
+                              NULL, NULL, 0)) {
+                    SetResultV ("INVALID_DOM_XPATH_BOOLEAN");
+                    goto booleanErrorCleanup;
+                }
+            }
+            kc = kc->next;
+            continue;
         }
         if (rs.type == EmptyResult) goto nextConstraint;
         if (rs.type != xNodeSetResult) {
             SetResult ("INVALID_DOM_KEYCONSTRAINT");
             goto errorCleanup;
         }
+        Tcl_InitHashTable (&htable, TCL_STRING_KEYS);
         for (i = 0; i < rs.nr_nodes; i++) {
             n = rs.nodes[i];
             if (n->nodeType != ELEMENT_NODE) {
@@ -2907,21 +2956,21 @@ checkdomKeyConstraints (
                     }
                     Tcl_CreateHashEntry (&htable, "", &hnew);
                     if (!hnew) {
-                        if (recover (interp, sdata, DOM_KEYCONSTRAINT, NULL,
-                                     NULL, NULL, 0)) {
+                        if (recover (interp, sdata, DOM_KEYCONSTRAINT,
+                                     kc->name, NULL, "", 0)) {
                             break;
                         }
-                        SetResult ("DOM_KEYCONSTRAINT");
+                        SetResultV ("DOM_KEYCONSTRAINT");
                         goto errorCleanup;
                     }
                     continue;
                 }
                 if (frs.nr_nodes != 1) {
-                    if (recover (interp, sdata, DOM_KEYCONSTRAINT, NULL, NULL,
-                                 NULL, 0)) {
+                    if (recover (interp, sdata, DOM_KEYCONSTRAINT, kc->name,
+                                 NULL, NULL, 0)) {
                         break;
                     }
-                    SetResult ("DOM_KEYCONSTRAINT");
+                    SetResultV ("DOM_KEYCONSTRAINT");
                     goto errorCleanup;
                 }
                 if (frs.nodes[0]->nodeType != ELEMENT_NODE
@@ -2933,25 +2982,27 @@ checkdomKeyConstraints (
                     attr = (domAttrNode *) frs.nodes[0];
                     Tcl_CreateHashEntry (&htable, attr->nodeValue, &hnew);
                     if (!hnew) {
-                        if (recover (interp, sdata, DOM_KEYCONSTRAINT, NULL,
-                                     NULL, NULL, 0)) {
+                        if (recover (interp, sdata, DOM_KEYCONSTRAINT,
+                                     kc->name, NULL, attr->nodeValue, 0)) {
                             break;
                         }
-                        SetResult ("DOM_KEYCONSTRAINT");
+                        SetResultV ("DOM_KEYCONSTRAINT");
                         goto errorCleanup;
                     }
                 } else {
                     keystr = xpathGetStringValue (frs.nodes[0], &len);
                     Tcl_CreateHashEntry (&htable, keystr, &hnew);
-                    FREE(keystr);
                     if (!hnew) {
-                        if (recover (interp, sdata, DOM_KEYCONSTRAINT, NULL,
-                                     NULL, NULL, 0)) {
+                        if (recover (interp, sdata, DOM_KEYCONSTRAINT,
+                                     kc->name, NULL, keystr, 0)) {
+                            FREE(keystr);
                             break;
                         }
-                        SetResult ("DOM_KEYCONSTRAINT");
+                        FREE(keystr);
+                        SetResultV ("DOM_KEYCONSTRAINT");
                         goto errorCleanup;
                     }
+                    FREE(keystr);
                 }
             } else {
                 Tcl_DStringSetLength (&dStr, 0);
@@ -2979,12 +3030,12 @@ checkdomKeyConstraints (
                         continue;
                     }
                     if (frs.nr_nodes != 1) {
-                        if (recover (interp, sdata, DOM_KEYCONSTRAINT, NULL,
-                                     NULL, NULL, 0)) {
+                        if (recover (interp, sdata, DOM_KEYCONSTRAINT,
+                                     kc->name, NULL, NULL, 0)) {
                             skip = 1;
                             break;
                         }
-                        SetResult ("DOM_KEYCONSTRAINT");
+                        SetResultV ("DOM_KEYCONSTRAINT");
                         goto errorCleanup;
                     }
                     if (frs.nodes[0]->nodeType != ELEMENT_NODE
@@ -3001,22 +3052,23 @@ checkdomKeyConstraints (
                     } else {
                         keystr = xpathGetStringValue (frs.nodes[0], &len);
                         Tcl_DStringAppend (&dStr, keystr, len);
+                        FREE (keystr);
                     }
                 }
                 if (skip) break;
                 Tcl_CreateHashEntry (&htable, Tcl_DStringValue (&dStr), &hnew);
                 if (!hnew) {
-                    if (recover (interp, sdata, DOM_KEYCONSTRAINT, NULL, NULL,
-                                 NULL, 0)) {
+                    if (recover (interp, sdata, DOM_KEYCONSTRAINT, 
+                                 kc->name,NULL, Tcl_DStringValue (&dStr), 0)) {
                         break;
                     }
-                    SetResult ("DOM_KEYCONSTRAINT");
+                    SetResultV ("DOM_KEYCONSTRAINT");
                     goto errorCleanup;
                 }
             }
         }
-    nextConstraint:
         Tcl_DeleteHashTable (&htable);
+    nextConstraint:
         kc = kc->next;
     }
     schemaxpathRSFree (&frs);
@@ -3026,6 +3078,7 @@ checkdomKeyConstraints (
 
 errorCleanup:
     Tcl_DeleteHashTable (&htable);
+booleanErrorCleanup:
     schemaxpathRSFree (&frs);
     schemaxpathRSFree (&rs);
     schemaxpathRSFree (&nodeList);
@@ -3040,6 +3093,7 @@ validateDOM (
     )
 {
     char *ln;
+    domNode *savednode;
 
     if (node->namespace) {
         if (node->ownerDocument->namespaces[node->namespace-1]->prefix[0] == '\0') {
@@ -3059,6 +3113,7 @@ validateDOM (
     } else {
         ln = node->nodeName;
     }
+    savednode = sdata->node;
     sdata->node = node;
     if (probeElement (interp, sdata, ln,
                       node->namespace ?
@@ -3140,6 +3195,7 @@ validateDOM (
         Tcl_DStringSetLength (sdata->cdata, 0);
     }
     if (probeElementEnd (interp, sdata) != TCL_OK) return TCL_ERROR;
+    sdata->node = savednode;
     return TCL_OK;
 }
 
@@ -3943,7 +3999,7 @@ schemaInstanceCmd (
 {
     int            methodIndex, keywordIndex, hnew, hnew1, patternIndex;
     int            result = TCL_OK, forwardDef = 0, i = 0, j, mode;
-    int            savedDefineToplevel, type, len;
+    int            savedDefineToplevel, type, len, n;
     unsigned int   savedNumPatternList;
     SchemaData    *savedsdata = NULL, *sdata = (SchemaData *) clientData;
     Tcl_HashTable *hashTable;
@@ -3960,24 +4016,32 @@ schemaInstanceCmd (
         "defelement", "defpattern", "start",    "event",        "delete",
         "reset",      "define",     "validate", "domvalidate",  "deftext",
         "info",       "reportcmd",  "prefixns", "validatefile",
-        "validatechannel",          "defelementtype", NULL
+        "validatechannel",          "defelementtype",           "set",
+        NULL
     };
     enum schemaInstanceMethod {
         m_defelement, m_defpattern, m_start,    m_event,        m_delete,
         m_reset,      m_define,     m_validate, m_domvalidate,  m_deftext,
         m_info,       m_reportcmd,  m_prefixns, m_validatefile,
-        m_validatechannel,          m_defelementtype
+        m_validatechannel,          m_defelementtype,           m_set
     };
 
     static const char *eventKeywords[] = {
         "start", "end", "text", NULL
     };
-
     enum eventKeyword
     {
         k_elementstart, k_elementend, k_text
     };
 
+    static const char *setKeywords[] = {
+        "choiceHashThreshold",  NULL
+    };
+    enum setKeyword
+    {
+        s_choiceHashThreshold
+    };
+        
     if (sdata == NULL) {
         /* Inline defined defelement, defelementtype, defpattern,
          * deftext, start or prefixns */
@@ -4389,7 +4453,6 @@ schemaInstanceCmd (
                 return TCL_ERROR;
             }
         }
-        sdata->validationState = VALIDATION_STARTED;
         if (validateDOM (interp, sdata, node) == TCL_OK) {
             SetBooleanResult (1);
             if (objc == 4) {
@@ -4546,6 +4609,33 @@ schemaInstanceCmd (
         }
         break;
             
+    case m_set:
+        if (objc < 3 || objc > 4) {
+            Tcl_WrongNumArgs (interp, 2, objv, "setting ?value?");
+            return TCL_ERROR;
+        }        
+        if (Tcl_GetIndexFromObj (interp, objv[2], setKeywords,
+                                 "setting", 0, &keywordIndex)
+            != TCL_OK) {
+            return TCL_ERROR;
+        }
+        switch ((enum setKeyword) keywordIndex) {
+        case s_choiceHashThreshold:
+            if (objc == 4) {
+                if (Tcl_GetIntFromObj (interp, objv[3], &n) != TCL_OK) {
+                    SetResult ("Invalid threshold value");
+                    return TCL_ERROR;
+                }
+                if (n < 0) {
+                    SetResult ("Invalid threshold value");
+                    return TCL_ERROR;
+                }
+                sdata->choiceHashThreshold = n;
+            }
+            SetIntResult (sdata->choiceHashThreshold);
+        }
+        break;
+        
     default:
         Tcl_SetResult (interp, "unknown method", NULL);
         result = TCL_ERROR;
@@ -4769,7 +4859,9 @@ evalDefinition (
     SchemaAttr **savedCurrentAttrs;
     unsigned int savedContenSize;
     unsigned int savedAttrSize, savedNumAttr, savedNumReqAttr;
-    int result, i;
+    int result, i, onlyName, hnew;
+    Tcl_HashEntry *h;
+    Tcl_HashTable *t;
 
     /* Save some state of sdata .. */
     savedCP = sdata->cp;
@@ -4803,12 +4895,44 @@ evalDefinition (
 
     if (result == TCL_OK) {
         REMEMBER_PATTERN (pattern);
+        onlyName = 1;
         for (i = 0; i < pattern->nc; i++) {
+            if (onlyName
+                && pattern->content[i]->type != SCHEMA_CTYPE_NAME
+                && pattern->content[i]->type != SCHEMA_CTYPE_TEXT) {
+                onlyName = 0;
+            }
             if (pattern->content[i]->type == SCHEMA_CTYPE_PATTERN) {
                 if (pattern->content[i]->flags & CONSTRAINT_TEXT_CHILD) {
                     pattern->flags |= CONSTRAINT_TEXT_CHILD;
                     break;
                 }
+            }
+        }
+        if (pattern->type == SCHEMA_CTYPE_CHOICE
+            && onlyName
+            && pattern->nc > sdata->choiceHashThreshold) {
+            t = TMALLOC (Tcl_HashTable);
+            Tcl_InitHashTable (t, TCL_ONE_WORD_KEYS);
+            hnew = 1;
+            for (i = 0; i < pattern->nc; i++) {
+                if (pattern->content[i]->type != SCHEMA_CTYPE_NAME) {
+                    continue;
+                }
+                h = Tcl_CreateHashEntry (t, pattern->content[i]->name, &hnew);
+                if (!hnew) {
+                    break;
+                }
+                Tcl_SetHashValue (h, pattern->content[i]);
+            }
+            if (hnew) {
+                pattern->typedata = (void *)t;
+            } else {
+                /* No simple lookup possible because of more than one
+                 * element with the same local name belong to the
+                 * choices. Rewind. */
+                Tcl_DeleteHashTable (t);
+                FREE (t);
             }
         }
         addToContent (sdata, pattern, quant, n, m);
@@ -5240,7 +5364,7 @@ domuniquePatternObjCmd (
     SchemaData *sdata = GETASI;
     ast t;
     char *errMsg = NULL;
-    domKeyConstraint *kc;
+    domKeyConstraint *kc, *kc1;
     int i, nrFields, flags = 0, nrFlags;
     Tcl_Obj *elm;
 
@@ -5307,8 +5431,67 @@ domuniquePatternObjCmd (
     if (objc == 4) {
         kc->name = tdomstrdup (Tcl_GetString (objv[3]));
     }
-    kc->next = sdata->cp->domKeys;
-    sdata->cp->domKeys = kc;
+    /* Apppend to end so that the constraints are checked in
+     * definition order */
+    if (sdata->cp->domKeys) {
+        kc1 = sdata->cp->domKeys;
+        while (1) {
+            if (kc1->next) kc1 = kc1->next;
+            else break;
+        }
+        kc1->next = kc;
+    } else {
+        sdata->cp->domKeys = kc;
+    }
+    return TCL_OK;
+}
+
+static int
+domxpathbooleanPatternObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    ast t;
+    char *errMsg = NULL;
+    domKeyConstraint *kc, *kc1;
+
+    CHECK_SI
+    CHECK_TOPLEVEL
+    checkNrArgs (2, 3, "Expected: <selector> ?<name>?");
+    if (sdata->cp->type != SCHEMA_CTYPE_NAME) {
+        SetResult ("The domxpathboolean schema definition command is only "
+                   "allowed as direct child of an element.");
+    }
+    if (xpathParse (Tcl_GetString (objv[1]), NULL, XPATH_EXPR,
+                    sdata->prefixns, NULL, &t, &errMsg) < 0) {
+        SetResult3 ("Error in selector xpath: '", errMsg, "");
+        FREE (errMsg);
+        return TCL_ERROR;
+    }
+
+    kc = TMALLOC (domKeyConstraint);
+    memset (kc, 0, sizeof (domKeyConstraint));
+    kc->selector = t;
+    kc->flags |= DKC_FLAG_BOOLEAN;
+    if (objc == 3) {
+        kc->name = tdomstrdup (Tcl_GetString (objv[2]));
+    }
+    /* Apppend to end so that the constraints are checked in
+     * definition order */
+    if (sdata->cp->domKeys) {
+        kc1 = sdata->cp->domKeys;
+        while (1) {
+            if (kc1->next) kc1 = kc1->next;
+            else break;
+        }
+        kc1->next = kc;
+    } else {
+        sdata->cp->domKeys = kc;
+    }
     return TCL_OK;
 }
 
@@ -7279,6 +7462,8 @@ tDOM_SchemaInit (
     /* XPath contraints for DOM validation */
     Tcl_CreateObjCommand (interp,"tdom::schema::domunique",
                           domuniquePatternObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::domxpathboolean",
+                          domxpathbooleanPatternObjCmd, NULL, NULL);
 
     /* Local key constraints */
     Tcl_CreateObjCommand (interp, "tdom::schema::keyspace",

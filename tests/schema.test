@@ -25,6 +25,7 @@
 #    schema-22.*: defelementtype, elementtype
 #    schema-23.*: validatefile
 #    schema-24.*: validatechannel
+#    schema-25.*: domxpathboolean
 #
 # Copyright (c) 2018-2019 Rolf Ade.
 
@@ -684,6 +685,82 @@ test schema-1.29 {defelement} {
     set result
 } {0 0 1 0}
 
+test schema-1.30 {recurive allowed element} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element n
+        }
+        defelement n {
+            element n ?
+        }
+    }
+    set xml "<doc>"
+    # That's 200000 (and one) nesting level
+    append xml [string repeat "<n><n><n><n><n><n><n><n><n><n>" 20000]
+    append xml "<n/>"
+    append xml [string repeat "</n></n></n></n></n></n></n></n></n></n>" 20000]
+    append xml "</doc>"
+    set result [s validate $xml]
+    s delete
+    set result
+} 1
+
+test schema-1.31 {recurive allowed element} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element n
+        }
+        defelement n {
+            element n ?
+        }
+    }
+    set xml "<doc>"
+    # That's 200000 (and one) nesting level
+    append xml [string repeat "<n><n><n><n><n><n><n><n><n><n>" 20000]
+    append xml "<a/>"
+    append xml [string repeat "</n></n></n></n></n></n></n></n></n></n>" 20000]
+    append xml "</doc>"
+    set result [s validate $xml errMsg]
+    s delete
+    list $result $errMsg
+} {0 {error "Element "a" doesn't match" at line 1 character 600009}}
+
+test schema-1.32 {Unknown root element} {
+    tdom::schema s
+    s define {
+        defelement e {
+            element doc ? {
+                element e
+            }
+        }
+    }
+    set result [s validate <doc><e><doc><e/></doc></e></doc>]
+    s delete
+    set result
+} 0
+
+test schema-1.33 {Error after local defined element} {
+    tdom::schema s
+    set result [catch {
+        s define {
+            defelement a {
+                element b ! {
+                    element c ! {}
+                    error "triggered"
+                }
+                element a ! {
+                    element c ! {}
+                }
+                error
+            }
+        }
+    }]
+    s delete
+    set result
+} 1
+
 test schema-2.1 {grammar definition: ref} {
     tdom::schema create grammar
     grammar defpattern thisPattern {
@@ -1241,7 +1318,7 @@ test schema-6.2 {expat parser with -validateCmd} {
     set result
 } {1 {The schema command is busy} VALIDATING 1}
 
-test schema-6.3 {expat parser with -validateCmd} {knownBug} {
+test schema-6.3 {expat parser with -validateCmd} {
     tdom::schema create grammar
     grammar defelement doc {
         element e1
@@ -1263,7 +1340,88 @@ test schema-6.3 {expat parser with -validateCmd} {knownBug} {
     grammar delete
     p delete
     set result
-} {1 {The schema command is busy} VALIDATING 1}
+} {0 1 READY 1}
+
+test schema-6.4 {expat parser with -validateCmd} {
+    tdom::schema create grammar
+    grammar defelement doc {
+        element e1
+        element e2 *
+    }
+    foreach e {e1 e2} {
+        grammar defelement $e {}
+    }
+    ::xml::parser p -validateCmd grammar -final 0
+    set result [list]
+    p parse {<do}
+    lappend result [catch {grammar validate <doc><e1/><e2/><e2/></doc>} errMsg]
+    lappend result $errMsg
+    lappend result [grammar info vstate]
+    p parse {c}
+    p parse {><e1/></doc>}
+    p configure -final 1
+    p reset
+    lappend result [grammar validate <doc><e1/><e2/><e2/></doc>]
+    grammar delete
+    p delete
+    set result
+} {0 1 READY 1}
+
+proc elementstart-6.5 {name attList} {
+    lappend ::result $name
+}
+
+test schema-6.5 {expat parser with -validateCmd} {
+    tdom::schema create grammar
+    grammar defelement doc {
+        element e1
+        element e2 *
+    }
+    foreach e {e1 e2} {
+        grammar defelement $e {}
+    }
+    ::xml::parser p -validateCmd grammar -final 0\
+        -elementstartcommand elementstart-6.5
+    set result [list]
+    p parse {<do}
+    p parse {c}
+    p parse {><e1/></doc>}
+    p configure -final 1
+    p reset
+    lappend result [grammar validate <doc><e1/><e2/><e2/></doc>]
+    grammar delete
+    p delete
+    set result
+} {doc e1 1}
+
+proc elementstart-6.6 {name attList} {
+    lappend ::result $name
+    if {$name eq "doc"} {
+        grammar delete
+    }
+}
+
+test schema-6.6 {expat parser with -validateCmd} {
+    tdom::schema create grammar
+    grammar defelement doc {
+        element e1
+        element e2 *
+    }
+    foreach e {e1 e2} {
+        grammar defelement $e {}
+    }
+    ::xml::parser p -validateCmd grammar -final 0\
+        -elementstartcommand elementstart-6.6
+    set result [list]
+    p parse {<do}
+    p parse {c}
+    p parse {><e1/></doc>}
+    p configure -final 1
+    p reset
+    lappend result [info command grammar]
+    p delete
+    set result
+} {doc e1 {}}
 
 test schema-7.1 {group} {
     tdom::schema create grammar
@@ -2608,6 +2766,67 @@ test schema-9.9 {choice with optional cp belong the choices} {
     grammar delete
     set result
 } {0 1 1 1 1 1 1}
+
+test schema-9.10 {choice with may choices} {
+    tdom::schema create grammar
+    grammar define {
+        defelement doc {
+            element e1
+            choice * {
+                for {set i 1} {$i <= 20} {incr i} {
+                    element ee$i
+                }
+            }
+            element e2 ?
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        {<doc><e1/></doc>}
+        {<doc><e1/><e2/></doc>}
+        {<doc><e1/><ee3/></doc>}
+        {<doc><e1/><ee4/></doc>}
+        {<doc><e1/><e2/><ee4/></doc>}
+        {<doc><e1/><ee2/><e2/></doc>}
+    } {
+        lappend result [grammar validate $xml]
+    }
+    grammar delete
+    set result
+} {0 1 1 1 1 0 1}
+
+test schema-9.11 {choice with may choices} {
+    tdom::schema create grammar
+    grammar define {
+        defelement doc {
+            element e1
+            choice * {
+                for {set i 1} {$i <= 20} {incr i} {
+                    namespace foo {
+                        element ee$i
+                    }
+                    element ee$i
+                }
+            }
+            element e2 ?
+        }
+    }
+    set result [list]
+    foreach xml {
+        {<doc xmlns:foo="foo"/>}
+        {<doc xmlns:foo="foo"><e1/></doc>}
+        {<doc xmlns:foo="foo"><e1/><e2/></doc>}
+        {<doc xmlns:foo="foo"><e1/><ee3/></doc>}
+        {<doc xmlns:foo="foo"><e1/><foo:ee4/></doc>}
+        {<doc xmlns:foo="foo"><e1/><e2/><ee4/></doc>}
+        {<doc xmlns:foo="foo"><e1/><foo:ee2/><e2/></doc>}
+    } {
+        lappend result [grammar validate $xml]
+    }
+    grammar delete
+    set result
+} {0 1 1 1 1 0 1}
 
 test schema-10.1 {any} {
     tdom::schema create s
@@ -6805,7 +7024,9 @@ test schema-18.13 {reportcmd} {
     set result
 } {{reportcmd called} 1 1 1 1 1}
 
-# proc schema-18.14 {scmd args} {
+# proc schema-18.14 {scmd errortype} {
+#     lappend ::result $errortype
+#     lappend ::result "hier: [$scmd info expected]"
 #     lappend ::result [$scmd info vaction]
 #     lappend ::result [$scmd info vaction name]
 #     lappend ::result [$scmd info vaction namespace]
@@ -6829,6 +7050,7 @@ test schema-18.13 {reportcmd} {
 #     set result [list]
 #     foreach xml {
 #         <doc/>
+#         <doc><b/></doc>
 #         <doc><e>123</e></doc>
 #         {<doc><e attr1="off">1234</e></doc>}
 #     } {
@@ -6866,7 +7088,7 @@ proc validatedDOM {g xml {keepEmpties 0}} {
 proc postValidation {g xml} {
     set doc [dom parse $xml]
     set rc [$g domvalidate $doc errMsg]
-    #puts "error: $errMsg"
+    #puts "error  : $errMsg"
     $doc delete
     return $rc
 }
@@ -6961,6 +7183,51 @@ test schema-19.3 {keyspace} {
     s delete
     set result
 } {1 1 s INVALID_KEYREF 1 s INVALID_KEYREF 1}
+
+proc log19.4 {msg scmd} {
+    lappend ::result $msg
+}
+proc report19.4 {scmd errortype} {
+    lappend ::result $errortype
+}
+test schema-19.4 {keyspace w/ recover} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element m * {
+                tcl log19.4 "before a"
+                element a ? {
+                    keyspace lang {
+                        element a1 ? {
+                            attribute lang ? {key lang}
+                        }
+                    }
+                    keyspace lang {
+                        element a2 ? {text {key lang}}
+                    }
+                }
+                tcl log19.4 "before b"
+                element b ? {
+                    keyspace lang {
+                        element b1 ? {
+                            attribute lang ? {key lang}
+                        }
+                    }
+                }
+            }
+        }
+    }
+    s reportcmd report19.4
+    set result [list]
+    foreach xml {
+        {<doc><m><a><a1 lang="en"/><a1/><a1/></a></m><m><b><b1 lang="de"/><b1/><b1/></b></m></doc>}
+    } {
+        lappend result [s validate $xml errMsg]
+        puts $errMsg
+    }
+    s delete
+    set result
+} {{before a} UNEXPECTED_ELEMENT {before b} {before a} {before b} UNEXPECTED_ELEMENT 1}
 
 test schema-20.1 {domunique} {
     set schema {
@@ -7118,6 +7385,35 @@ test schema-20.5 {domunique} {
     s delete
     set result
 } {1 0}
+
+proc schema-20.6 {scmd errortype} {
+    lappend ::result $errortype \
+        [$scmd info vaction name] \
+        [$scmd info vaction text] \
+        [[$scmd info domNode] nodeName]
+}
+
+test schema-20.6 {domunique} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            domunique item ref itemunique
+            element item * {
+                element ref ! text
+            }
+        }
+    }
+    s reportcmd schema-20.6
+    set result [list]
+    foreach xml {
+        {<doc><item><ref>1</ref></item><item><ref>foo</ref></item></doc>}
+        {<doc><item><ref>foo</ref></item><item><ref>foo</ref></item></doc>}
+    } {
+        lappend result [postValidation s $xml]
+    }
+    s delete
+    set result
+} {1 DOM_KEYCONSTRAINT itemunique foo doc 1}
 
 test schema-21.1 {CONTENT_ARRAY_SIZE_INIT} {
     tdom::schema s
@@ -7290,6 +7586,56 @@ test schema-22.6 {defelementtype} {
     set result
 } {{a http://my.foo} {a2 http://my.foo}}
 
+test schema-22.7 {defelementtype} {
+    tdom::schema s
+    s defelement doc {
+        elementtype e1type
+        elementtype e2type *
+    }
+    foreach e {e1 e2} {
+        s defelementtype ${e}type $e {}
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><e1/></doc>
+        <doc><e1/><e2/></doc>
+        <doc><e1/><e2/><e2/></doc>
+        <doc><e1/><e2/><e2/><e2/></doc>
+        <doc><e1/><e2/><e2/><e2/><e1/></doc>
+        <doc><e2/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 1 1 1 0 0}
+
+test schema-22.8 {defelementtype} {
+    tdom::schema s
+    s defelementtype doctype doc {
+        elementtype e1type
+        elementtype e2type *
+    }
+    foreach e {e1 e2} {
+        s defelementtype ${e}type $e {}
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><e1/></doc>
+        <doc><e1/><e2/></doc>
+        <doc><e1/><e2/><e2/></doc>
+        <doc><e1/><e2/><e2/><e2/></doc>
+        <doc><e1/><e2/><e2/><e2/><e1/></doc>
+        <doc><e2/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 0 0 0 0 0}
+
 test schema-23.1 {validatefile} {
     tdom::schema s
     s define {
@@ -7315,5 +7661,126 @@ test schema-24.1 {validatechannel} {
     s delete
     set result
 } 1
+
+test schema-25.1 {domxpathboolean} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element width ! text
+            element length ! text
+            element height ! text
+            domxpathboolean "width * length * height <= 20000"  volumeconstraint
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc><width>1</width><length>3</length><height>5</height></doc>
+        <doc><width>2000.0</width><length>100.0</length><height>2.0</height></doc>
+        <doc><width>2000.0</width><length>100.0</length><height>-2</height></doc>
+        <doc><width>2.3</width><length>3.5</length><height>7.6</height></doc>
+        <doc><width>1</width><length>1</length><height>foo</height></doc>
+        <doc><width>1</width><length>1</length><height>2000-01-01</height></doc>
+        <doc><width></width><length></length><height></height></doc>
+    } {
+        lappend result [postValidation s $xml]
+    }
+    s delete
+    set result
+} {1 0 1 1 0 0 0}
+
+test schema-25.2 {domxpathboolean} {
+    tdom::schema s
+    s prefixns {
+        this http://that.org
+        other http://this.org
+    }
+        
+    s define {
+        defelement doc this {
+            element width ! text
+            namespace other {
+                element length ! text
+            }
+            element height ! text
+            domxpathboolean "this:width * other:length * this:height <= 20000"  volumeconstraint
+        }
+    }
+    set result [list]
+    foreach xml {
+        {<doc xmlns="http://that.org" xmlns:foo="http://this.org"><width>1</width><foo:length>3</foo:length><height>5</height></doc>}
+        {<doc xmlns="http://that.org" xmlns:foo="http://this.org"><width>2000.0</width><foo:length>100.0</foo:length><height>2.0</height></doc>}
+        {<doc xmlns="http://that.org" xmlns:foo="http://this.org"><width>2000.0</width><foo:length>100.0</foo:length><height>-2</height></doc>}
+        {<doc xmlns="http://that.org" xmlns:foo="http://this.org"><width>2.3</width><foo:length>3.5</foo:length><height>7.6</height></doc>}
+        {<doc xmlns="http://that.org" xmlns:foo="http://this.org"><width>1</width><foo:length>1</foo:length><height>foo</height></doc>}
+        {<doc xmlns="http://that.org" xmlns:foo="http://this.org"><width>1</width><foo:length>1</foo:length><height>2000-01-01</height></doc>}
+        {<doc xmlns="http://that.org" xmlns:foo="http://this.org"><width></width><foo:length></foo:length><height></height></doc>}
+    } {
+        lappend result [postValidation s $xml]
+    }
+    s delete
+    set result
+} {1 0 1 1 0 0 0}
+
+proc schema-25.3 {scmd errortype} {
+    lappend ::result $errortype [$scmd info vaction name]
+}
+test schema-25.3 {domxpathboolean} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element width ! text
+            element length ! text
+            element height ! text
+            domxpathboolean "width * length * height <= 20000"  volumeconstraint
+        }
+    }
+    s reportcmd schema-25.3
+    set result [list]
+    foreach xml {
+        <doc><width>1</width><length>3</length><height>5</height></doc>
+        <doc><width>2000.0</width><length>100.0</length><height>2.0</height></doc>
+        <doc><width>2000.0</width><length>100.0</length><height>-2</height></doc>
+        <doc><width>2.3</width><length>3.5</length><height>7.6</height></doc>
+        <doc><width>1</width><length>1</length><height>foo</height></doc>
+        <doc><width>1</width><length>1</length><height>2000-01-01</height></doc>
+        <doc><width></width><length></length><height></height></doc>
+    } {
+        lappend result [postValidation s $xml]
+    }
+    s delete
+    set result
+} {1 DOM_XPATH_BOOLEAN volumeconstraint 1 1 1 DOM_XPATH_BOOLEAN volumeconstraint 1 DOM_XPATH_BOOLEAN volumeconstraint 1 DOM_XPATH_BOOLEAN volumeconstraint 1}
+
+test schema-25.4 {domxpathboolean} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element width ! text
+            element length ! text
+            element height ! text
+            domxpathboolean "width * length * height <= 20000"  volume
+            domunique width|length|height . unique
+            domxpathboolean "width < length and length < height"  sequence
+        }
+    }
+    s reportcmd schema-25.3
+    set result [list]
+    set nr 1
+    foreach xml {
+        <doc><width>1</width><length>3</length><height>5</height></doc>
+        <doc><width>2000.0</width><length>100.0</length><height>2.0</height></doc>
+        <doc><width>2000.0</width><length>100.0</length><height>-2</height></doc>
+        <doc><width>2.3</width><length>3.5</length><height>7.6</height></doc>
+        <doc><width>1</width><length>1</length><height>foo</height></doc>
+        <doc><width>1</width><length>1</length><height>2000-01-01</height></doc>
+        <doc><width></width><length></length><height></height></doc>
+    } {
+        lappend result "Nr$nr:"
+        incr nr
+        lappend result [postValidation s $xml]
+    }
+    s delete
+    set result
+} {Nr1: 1 Nr2: DOM_XPATH_BOOLEAN volume DOM_XPATH_BOOLEAN sequence 1 Nr3: DOM_XPATH_BOOLEAN sequence 1 Nr4: 1 Nr5: DOM_XPATH_BOOLEAN volume DOM_KEYCONSTRAINT unique DOM_XPATH_BOOLEAN sequence 1 Nr6: DOM_XPATH_BOOLEAN volume DOM_KEYCONSTRAINT unique DOM_XPATH_BOOLEAN sequence 1 Nr7: DOM_XPATH_BOOLEAN volume DOM_KEYCONSTRAINT unique DOM_XPATH_BOOLEAN sequence 1}
 
 }

@@ -74,8 +74,9 @@
         <m>ref</m> references in the definition script not wrapped
         inside a <m>namespace</m> command are resolved in that
         namespace. If there is already a elementtype definition for
-        the name/namespace combination the command raises
-        error.</desc>
+        the name/namespace combination the command raises error. The
+        document element of any XML to validate cannot be a
+        <m>defelementtype</m> defined element.</desc>
       </commanddef>
 
       <commanddef>
@@ -270,11 +271,12 @@
               </optdef>
               <optdef>
                   <optname>domNode</optname>
-                  <desc>If the schema command is currently
-                  post-validating a DOM tree this command returns the
-                  current parent node command (the node, whose content
-                  is currently validated) and the empty string
-                  otherwhise. It is recommended that you don't use
+                  <desc>If the schema command isn't currently
+                  post-validating a DOM tree this method returns the
+                  emtpy string. Otherwise, it returns the node on
+                  which the validation engine is currently looking at
+                  in case, the node is an ELEMENT_NODE or the parent
+                  node, if not. It is recommended that you don't use
                   this method. Or at least leave the DOM tree alone,
                   use it read-only.</desc>
               </optdef>
@@ -435,6 +437,16 @@
       </commanddef>
 
       <commanddef>
+        <command><method>elementtype</method> <m>name</m> <m>?quant?</m></command>
+        <desc>This command refers to the element definined with
+        <m>defelementtype</m> with the type name <m>name</m> in the
+        current context namespace. Forward references to a so far not
+        defined element types or recursive references are allowed. If
+        a forward referenced element type isn't defined until
+        validation no content or attributes are expected.</desc>
+      </commanddef>
+      
+      <commanddef>
         <command><method>ref</method> <m>name</m> <m>?quant?</m></command>
         <desc>This command refers to the content particle defined with
         <m>defpattern</m> with the name <m>name</m> in the current
@@ -462,9 +474,10 @@
 
       <commanddef>
         <command><method>interleave</method> <m>?quant?</m> <m>&lt;definition script></m></command>
-        <desc>This schema constraint match after every of the top level
-        content particle defined by the <m>definition script></m>
-        have matched in any arbitrary order.</desc>
+        <desc>This schema constraint match after every of the top
+        level content particle with quant must defined by the
+        <m>definition script></m> have matched in any arbitrary
+        order.</desc>
       </commanddef>
 
       <commanddef>
@@ -533,7 +546,7 @@
         the schema command appended to the argument list. This
         validation command is only allowed in strict sequential
         context (not in choice, mixed and interleave). If the return
-        code is something else than 0 (TCL_OK) then this ia a
+        code is something else than 0 (TCL_OK) then this is a
         validation error.</desc>
       </commanddef>
 
@@ -547,7 +560,46 @@
         content of that particle with the schema command method call
         <m>info stack associated</m>.</desc>
       </commanddef>
-      
+
+      <commanddef>
+        <command><method>domunique</method> <m>selector</m> <m>fieldlist</m> <m>?name?</m> <m>?IGNORE_EMPTY_FIELD_SET?</m></command>
+        <desc>If not postvalidating a DOM tree with <m>domvalidate</m>
+        this constraint always match. If postvalidating this
+        constraint resembles the xsd key/keyref mechanism. The
+        <m>selector</m> argument may be any valid XPath expression
+        (without the xsd limits). Several <m>domunique</m> command
+        within one element definition are allowed. They are checked
+        in definition order. </desc>
+      </commanddef>
+
+      <commanddef>
+        <command><method>domxpathboolean</method> <m>XPath_expr</m> <m>?name?</m></command>
+        <desc><p>If not postvalidating a DOM tree with
+        <m>domvalidate</m> this constraint always match. If
+        postvalidating this constraint matches if the result of the
+        <m>XPath_expr</m> argument (with the node matching the schema
+        parent of the <m>domxpathboolean</m> command as context node)
+        - converted to a boolean by XPath rules - is true. Several
+        <m>domxpathboolean</m> command within one element definition
+        are allowed. They are checked in definition order.</p>
+
+        <p>This enables if-then checks depending on more than one element. Consider</p>
+
+        <example>
+tdom::schema s
+s define {
+    defelement doc {
+        element a ! text
+        element b ! text
+        element c ! text
+        domxpathboolean "a * b * c &gt;= 20000" volume
+        domxpathboolean "a &gt; b and b &gt; c" sequence
+    }
+}
+        </example>
+        </desc>
+      </commanddef>
+
       <commanddef>
         <command><method>prefixns</method> <m>?prefixUriList?</m></command>
         <desc>This defines a prefix to namespace URI mapping exactly

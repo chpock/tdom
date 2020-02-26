@@ -17,7 +17,7 @@
 |
 |
 |   written by Rolf Ade
-|   Nov, Dec 2018
+|   2018-2020
 |
 \---------------------------------------------------------------------------*/
 
@@ -106,6 +106,7 @@ typedef struct SchemaCP
     struct SchemaCP **content;
     SchemaQuant      *quants;
     unsigned int      nc;
+    void             *typedata;
     SchemaAttr      **attrs;
     unsigned int      numAttr;
     unsigned int      numReqAttr;
@@ -190,6 +191,7 @@ typedef struct SchemaData_
     Tcl_HashTable keySpaces;
     XML_Parser parser;
     domNode *node;
+    int choiceHashThreshold;
 } SchemaData;
 
 int 

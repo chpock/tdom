@@ -2365,7 +2365,8 @@ TclGenExpatElementStartHandler(
       if (probeElement (expat->interp, expat->sdata, name, NULL) != TCL_OK) {
           TclExpatHandlerResult (expat, NULL, TCL_ERROR);
       }
-      if (atts[0] || expat->sdata->stack->pattern->attrs) {
+      if (atts[0] || (expat->sdata->stack
+                      && expat->sdata->stack->pattern->attrs)) {
           if (probeAttributes (expat->interp, expat->sdata, atts)
               != TCL_OK) {
               expat->sdata->validationState = VALIDATION_ERROR;
