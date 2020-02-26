@@ -7024,42 +7024,67 @@ test schema-18.13 {reportcmd} {
     set result
 } {{reportcmd called} 1 1 1 1 1}
 
-# proc schema-18.14 {scmd errortype} {
-#     lappend ::result $errortype
-#     lappend ::result "hier: [$scmd info expected]"
-#     lappend ::result [$scmd info vaction]
-#     lappend ::result [$scmd info vaction name]
-#     lappend ::result [$scmd info vaction namespace]
-#     lappend ::result [$scmd info vaction text]
-# }
-# test schema-18.14 {info vaction in reportcmd} {
-#     tdom::schema s
-#     s reportcmd schema-18.14
-#     s define {
-#         defelement doc {
-#             element e + {
-#                 attribute attr1 {
-#                     fixed on
-#                 }
-#                 text {
-#                     minLength 4
-#                 }
-#             }
-#         }
-#     }
-#     set result [list]
-#     foreach xml {
-#         <doc/>
-#         <doc><b/></doc>
-#         <doc><e>123</e></doc>
-#         {<doc><e attr1="off">1234</e></doc>}
-#     } {
-#         lappend result [s validate $xml]
-#     }
-#     s delete
-#     set result
-# } {}
+proc schema-18.14 {scmd errortype} {
+    lappend ::result $errortype
+    lappend ::result [$scmd info expected]
+    lappend ::result [$scmd info vaction]
+    lappend ::result [$scmd info vaction name]
+    lappend ::result [$scmd info vaction namespace]
+    lappend ::result [$scmd info vaction text]
+}
+test schema-18.14 {info vaction in reportcmd} {
+    tdom::schema s
+    s reportcmd schema-18.14
+    s define {
+        defelement doc {
+            element e + {
+                attribute attr1 {
+                    fixed on
+                }
+                text {
+                    minLength 4
+                }
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><b/></doc>
+        <doc><e>123</e></doc>
+        {<doc><e attr1="off">1234</e></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {MISSING_ELEMENT e MATCH_ELEMENT_END doc {} {} 1 MISSING_ELEMENT e MATCH_ELEMENT_START b {} {} 1 MISSING_ATTRIBUTE {{{#text} {}}} MATCH_ELEMENT_START attr1 {} {} INVALID_VALUE {{{#text} {}}} MATCH_TEXT e {} 123 1 INVALID_ATTRIBUTE_VALUE {{{#text} {}}} MATCH_ATTRIBUTE_TEXT attr1 {} off 1}
 
+test schema-18.15 {info vaction in reportcmd} {
+    tdom::schema s
+    s reportcmd schema-18.14
+    s define {
+        defelement doc {
+            element e + {
+                attribute attr1
+                attribute attr2 ? {
+                    minLength 3
+                }
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        {<doc><e attr1=""/></doc>}
+        {<doc><e attr2="a"/></doc>}
+        {<doc><e attr2="123" foo=""/></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 INVALID_ATTRIBUTE_VALUE {{<elementend> {}}} MATCH_ATTRIBUTE_TEXT attr2 {} a MISSING_ATTRIBUTE {{<elementend> {}}} MATCH_ELEMENT_START attr1 {} {} 1 UNKNOWN_ATTRIBUTE {{<elementend> {}}} MATCH_ELEMENT_START foo {} {} MISSING_ATTRIBUTE {{<elementend> {}}} MATCH_ELEMENT_START attr1 {} {} 1}
+    
 proc validatedSAX {g xml {keepEmpties 1}} {
     set args [list -validateCmd $g]
     if {!$keepEmpties} {

@@ -213,10 +213,22 @@
         called with two arguments: the schema command, that is rasing
         the validation error, and an validation error code. The
         possible error codes are:
-        <ul>
-            <li>
-            </li>
-        </ul>
+        <dl>
+            <dt>MISSING_ELEMENT</dt><dd></dd>
+            <dt>MISSING_TEXT</dt><dd></dd>
+            <dt>UNEXPECTED_ELEMENT</dt><dd></dd>
+            <dt>UNEXPECTED_ROOT_ELEMENT</dt><dd></dd>
+            <dt>UNKNOWN_ROOT_ELEMENT</dt><dd></dd>
+            <dt>UNKNOWN_ATTRIBUTE</dt><dd></dd>
+            <dt>MISSING_ATTRIBUTE</dt><dd></dd>
+            <dt>INVALID_ATTRIBUTE_VALUE</dt><dd></dd>
+            <dt>DOM_KEYCONSTRAINT</dt><dd></dd>
+            <dt>DOM_XPATH_BOOLEAN</dt><dd></dd>
+            <dt>INVALID_KEYREF</dt><dd></dd>
+            <dt>INVALID_VALUE</dt><dd></dd>
+            <dt>UNKOWN_GLOBAL_ID</dt><dd></dd>
+            <dt>UNKOWN_ID</dt><dd></dd>
+        </dl>
         </desc>
       </commanddef>
 
@@ -323,20 +335,23 @@
               </optdef>
               <optdef>
                   <optname>vaction ?name|namespace|text?</optname>
-                  <desc>If the schema command is currently processing
-                  a validation event this method returns information
-                  about what the command is doing. If the command is
-                  called without the optional argument the possible
-                  return values and their meanings are:
+                  <desc><p>This method returns useful information only if
+                  the schema command waits for the reportcmd script to
+                  finish while recovering from a validation error.
+                  Otherwise it returns NONE.</p>
+                  <p>If the command is called without the optional
+                  argument the possible return values and their
+                  meanings are:</p>
                   <dl>
                       <dt>NONE</dt><dd>The schema command currently
-                      doesn't process a validation event.</dd>
-                      <dt>MATCH_ELEMENT_START</dt><dd></dd>
-                      <dt>MATCH_ELEMENT_END</dt><dd></dd>
-                      <dt>MATCH_TEXT</dt><dd></dd>
-                      <dt>MATCH_ATTRIBUTE_TEXT</dt><dd></dd>
-                      <dt>MATCH_GLOBAL</dt><dd></dd>
-                      <dt>MATCH_DOM_KEYCONSTRAINT</dt><dd></dd>
+                      doesn't recover from a validation event.</dd>
+                      <dt>MATCH_ELEMENT_START</dt><dd>Element start event, which includs looking for missing or unknown attributes.</dd>
+                      <dt>MATCH_ELEMENT_END</dt><dd>Element end event.</dd>
+                      <dt>MATCH_TEXT</dt><dd>Validating text between tags.</dd>
+                      <dt>MATCH_ATTRIBUTE_TEXT</dt><dd>Attribute text value contraint check</dd>
+                      <dt>MATCH_GLOBAL</dt><dd>Checking global IDs</dd>
+                      <dt>MATCH_DOM_KEYCONSTRAINT</dt><dd>Checking domuniqe constaint</dd>
+                      <dt>MATCH_DOM_XPATH_BOOLEAN</dt><dd>Checking domxpathboolean constaint</dd>
                   </dl>
                   If called with one of the possible optional
                   arguments the command returns detail information
@@ -358,9 +373,9 @@
                       of MATCH_ATTRIBUTE_TEXT. Return the namespace of
                       the parent element in case of MATCH_TEXT.</dd>
                       
-                      <dt>text</dt><dd>Return the text in case of
-                      MATCH_TEXTReturns the value of the attribute in
-                      case of MATCH_ATTRIBUTE_TEXT.</dd>
+                      <dt>text</dt><dd>Return the text to match in
+                      case of MATCH_TEXT. Returns the value of the
+                      attribute in case of MATCH_ATTRIBUTE_TEXT.</dd>
                   </dl>
                   </desc>
               </optdef>
