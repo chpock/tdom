@@ -1039,8 +1039,11 @@ recover (
         interp, cmdPtr,
         Tcl_NewStringObj (ValidationErrorType2str[errorType], -1)
         );
-    sdata->vname = name;
-    sdata->vns = ns;
+    /* In case of unknown element the name/ns arguments of recover()
+     * are NULL, but sdata->vname/sdata->vns are already
+     * pre-filled. */
+    if (name) sdata->vname = name;
+    if (ns) sdata->vns = ns;
     sdata->vtext = text;
     switch (errorType) {
     case DOM_KEYCONSTRAINT:
@@ -1099,7 +1102,7 @@ recover (
     rc = Tcl_EvalObjEx (interp, cmdPtr,
                         TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT);
     sdata->currentEvals--;
-    sdata->vaction = MATCH_GLOBAL;
+    sdata->vaction = 0;
     sdata->vname = NULL;
     sdata->vns = NULL;
     sdata->vtext = NULL;
@@ -1230,6 +1233,10 @@ matchElementStart (
                 }
                 updateStack (se, cp, ac);
                 sdata->skipDeep = 1;
+                /* See comment in probeElement: sdata->vname and
+                 * sdata->vns may be pre-filled. We reset it here.*/
+                sdata->vname = NULL;
+                sdata->vns = NULL;
                 return 1;
 
             case SCHEMA_CTYPE_NAME:
@@ -1272,6 +1279,11 @@ matchElementStart (
                         }
                         updateStack (se, cp, ac);
                         sdata->skipDeep = 1;
+                        /* See comment in probeElement: sdata->vname
+                         * and sdata->vns may be pre-filled. We reset it
+                         * here.*/
+                        sdata->vname = NULL;
+                        sdata->vns = NULL;
                         return 1;
 
                     case SCHEMA_CTYPE_NAME:
@@ -1418,6 +1430,10 @@ matchElementStart (
                 if (mayskip && minOne (cp->quants[i])) mayskip = 0;
                 se->hasMatched = 1;
                 se->interleaveState[i] = 1;
+                /* See comment in probeElement: sdata->vname and
+                 * sdata->vns may be pre-filled. We reset it here.*/
+                sdata->vname = NULL;
+                sdata->vns = NULL;
                 return 1;
 
             case SCHEMA_CTYPE_NAME:
@@ -1531,6 +1547,12 @@ probeElement (
              * will be able to look if there is such a possible any
              * match in the schema. */
             rc = 0;
+            /* If there isn't a matching any cp this is a validation
+             * error. To have the node name/namespace information
+             * available in case of recovering we prefill the sdata
+             * struct here.*/
+            sdata->vname = name;
+            sdata->vns = namespace;
         }
         namespacePtr = NULL;
     }
@@ -1544,6 +1566,8 @@ probeElement (
             namePtr = Tcl_GetHashKey (&sdata->element, h);
         } else {
             namePtr = NULL;
+            /* Prefill in case of validation error. See above.  */
+            sdata->vname = name;
         }
     }
     
@@ -3215,6 +3239,9 @@ schemaReset (
     sdata->skipDeep = 0;
     sdata->evalError = 0;
     sdata->vaction = 0;
+    sdata->vname = NULL;
+    sdata->vns = NULL;
+    sdata->text = NULL;
     Tcl_DStringSetLength (sdata->cdata, 0);
     if (sdata->ids.numEntries) {
         Tcl_DeleteHashTable (&sdata->ids);
@@ -5271,7 +5298,7 @@ NamespacePatternObjCmd (
 }
 
 static int
-TextPatternObjCmd (
+TextPatternObjCmd  (
     ClientData clientData,
     Tcl_Interp *interp,
     int objc,
