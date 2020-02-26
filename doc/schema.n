@@ -385,11 +385,12 @@ post-validating a DOM tree there may be no position
 information stored at certain or all nodes. The
 empty string is returned in this cases.
 .IP "\fBdomNode\fR"
-If the schema command is currently
-post-validating a DOM tree this command returns the
-current parent node command (the node, whose content
-is currently validated) and the empty string
-otherwhise. It is recommended that you don't use
+If the schema command isn't currently
+post-validating a DOM tree this method returns the
+emtpy string. Otherwise, it returns the node on
+which the validation engine is currently looking at
+in case, the node is an ELEMENT_NODE or the parent
+node, if not. It is recommended that you don't use
 this method. Or at least leave the DOM tree alone,
 use it read-only.
 .IP "\fBnrForwardDefinitions\fR"
@@ -510,7 +511,7 @@ defined element types or recursive references are allowed. If
 a forward referenced element type isn't defined until
 validation no content or attributes are expected.
 .TP
-\&\fB\fBref\fP \fIname\fB         \fI?quant?\fB
+\&\fB\fBref\fP \fIname\fB \fI?quant?\fB
 \&\fRThis command refers to the content particle defined with
 \&\fIdefpattern\fR with the name \fIname\fR in the current
 context namespace. Forward references to a so far not defined
@@ -530,9 +531,10 @@ match. If one of this top level content particle is optional
 this constraint matches the "empty match".
 .TP
 \&\fB\fBinterleave\fP \fI?quant?\fB \fI<definition script>\fB
-\&\fRThis schema constraint match after every of the top level
-content particle defined by the \fIdefinition script>\fR
-have matched in any arbitrary order.
+\&\fRThis schema constraint match after every of the top
+level content particle with quant must defined by the
+\&\fIdefinition script>\fR have matched in any arbitrary
+order.
 .TP
 \&\fB\fBmixed\fP \fI?quant?\fB \fI<definition script>\fB
 \&\fRThis schema constraint match for any text (including the
@@ -598,6 +600,48 @@ interleave content particle. Associate the as argument given
 may be requested in scripts evaluated while validating the
 content of that particle with the schema command method call
 \&\fIinfo stack associated\fR.
+.TP
+\&\fB\fBdomunique\fP \fIselector\fB \fIfieldlist\fB \fI?name?\fB \fI?IGNORE_EMPTY_FIELD_SET?\fB
+\&\fRIf not postvalidating a DOM tree with \fIdomvalidate\fR
+this constraint always match. If postvalidating this
+constraint resembles the xsd key/keyref mechanism. The
+\&\fIselector\fR argument may be any valid XPath expression
+(without the xsd limits). Several \fIdomunique\fR command
+within one element definition are allowed. They are checked
+in definition order.
+.TP
+\&\fB\fBdomxpathboolean\fP \fIXPath_expr\fB \fI?name?\fB
+\&\fR
+.RS
+.PP
+If not postvalidating a DOM tree with
+\&\fIdomvalidate\fR this constraint always match. If
+postvalidating this constraint matches if the result of the
+\&\fIXPath_expr\fR argument (with the node matching the schema
+parent of the \fIdomxpathboolean\fR command as context node)
+- converted to a boolean by XPath rules - is true. Several
+\&\fIdomxpathboolean\fR command within one element definition
+are allowed. They are checked in definition order.
+.PP
+This enables if-then checks depending on more than one element. Consider
+
+
+        
+.CS
+
+tdom::schema s
+s define {
+    defelement doc {
+        element a ! text
+        element b ! text
+        element c ! text
+        domxpathboolean "a * b * c >= 20000" volume
+        domxpathboolean "a > b and b > c" sequence
+    }
+}
+        
+.CE
+.RE
 .TP
 \&\fB\fBprefixns\fP \fI?prefixUriList?\fB
 \&\fRThis defines a prefix to namespace URI mapping exactly

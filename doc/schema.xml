@@ -428,8 +428,7 @@
       </commanddef>
       
       <commanddef>
-        <command><method>ref</method> <m>name</m>
-        <m>?quant?</m></command>
+        <command><method>ref</method> <m>name</m> <m>?quant?</m></command>
         <desc>This command refers to the content particle defined with
         <m>defpattern</m> with the name <m>name</m> in the current
         context namespace. Forward references to a so far not defined
@@ -456,9 +455,10 @@
 
       <commanddef>
         <command><method>interleave</method> <m>?quant?</m> <m>&lt;definition script></m></command>
-        <desc>This schema constraint match after every of the top level
-        content particle defined by the <m>definition script></m>
-        have matched in any arbitrary order.</desc>
+        <desc>This schema constraint match after every of the top
+        level content particle with quant must defined by the
+        <m>definition script></m> have matched in any arbitrary
+        order.</desc>
       </commanddef>
 
       <commanddef>
@@ -541,7 +541,46 @@
         content of that particle with the schema command method call
         <m>info stack associated</m>.</desc>
       </commanddef>
-      
+
+      <commanddef>
+        <command><method>domunique</method> <m>selector</m> <m>fieldlist</m> <m>?name?</m> <m>?IGNORE_EMPTY_FIELD_SET?</m></command>
+        <desc>If not postvalidating a DOM tree with <m>domvalidate</m>
+        this constraint always match. If postvalidating this
+        constraint resembles the xsd key/keyref mechanism. The
+        <m>selector</m> argument may be any valid XPath expression
+        (without the xsd limits). Several <m>domunique</m> command
+        within one element definition are allowed. They are checked
+        in definition order. </desc>
+      </commanddef>
+
+      <commanddef>
+        <command><method>domxpathboolean</method> <m>XPath_expr</m> <m>?name?</m></command>
+        <desc><p>If not postvalidating a DOM tree with
+        <m>domvalidate</m> this constraint always match. If
+        postvalidating this constraint matches if the result of the
+        <m>XPath_expr</m> argument (with the node matching the schema
+        parent of the <m>domxpathboolean</m> command as context node)
+        - converted to a boolean by XPath rules - is true. Several
+        <m>domxpathboolean</m> command within one element definition
+        are allowed. They are checked in definition order.</p>
+
+        <p>This enables if-then checks depending on more than one element. Consider</p>
+
+        <example>
+tdom::schema s
+s define {
+    defelement doc {
+        element a ! text
+        element b ! text
+        element c ! text
+        domxpathboolean "a * b * c &gt;= 20000" volume
+        domxpathboolean "a &gt; b and b &gt; c" sequence
+    }
+}
+        </example>
+        </desc>
+      </commanddef>
+
       <commanddef>
         <command><method>prefixns</method> <m>?prefixUriList?</m></command>
         <desc>This defines a prefix to namespace URI mapping exactly
