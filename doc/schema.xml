@@ -527,7 +527,7 @@
         the schema command appended to the argument list. This
         validation command is only allowed in strict sequential
         context (not in choice, mixed and interleave). If the return
-        code is something else than 0 (TCL_OK) then this ia a
+        code is something else than 0 (TCL_OK) then this is a
         validation error.</desc>
       </commanddef>
 
