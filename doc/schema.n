@@ -639,12 +639,14 @@ be looked up in the namespace \fIuri\fR and local defined
 element will be in that namespace.
 .TP
 \&\fB\fBtcl\fP \fItclcmd\fB \fI?arg arg ...?\fB
-\&\fREvaluates the Tcl script \fItclcmd arg arg ... \fR and
-the schema command appended to the argument list. This
+\&\fREvaluates the Tcl script \fItclcmd arg arg ... \fR. This
 validation command is only allowed in strict sequential
 context (not in choice, mixed and interleave). If the return
-code is something else than 0 (TCL_OK) then this is a
-validation error.
+code is something else than 0 (TCL_OK) then this is an
+error (which isn't catched and reported by reportcmd).
+.TP
+\&\fB\fBself\fP
+\&\fRReturns the schema command.
 .TP
 \&\fB\fBassociate\fP \fIdata\fB
 \&\fRThis command is only allowed top-level inside the

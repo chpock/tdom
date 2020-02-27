@@ -515,7 +515,7 @@ static void freeSchemaCP (
         /* do nothing */
         break;
     case SCHEMA_CTYPE_VIRTUAL:
-        for (i = 0; i < pattern->nc - 1; i++) {
+        for (i = 0; i < pattern->nc; i++) {
             Tcl_DecrRefCount ((Tcl_Obj *)pattern->content[i]);
         }
         FREE (pattern->content);
@@ -1174,7 +1174,6 @@ evalVirtual (
     SchemaCP *cp;
 
     cp = sdata->stack->pattern->content[ac];
-    cp->content[cp->nc-1] = (SchemaCP *) sdata->self;
     sdata->currentEvals++;
     rc = Tcl_EvalObjv (interp, cp->nc, (Tcl_Obj **) cp->content,
                        TCL_EVAL_GLOBAL);
@@ -5368,15 +5367,33 @@ VirtualPatternObjCmd (
 
     pattern = initSchemaCP (SCHEMA_CTYPE_VIRTUAL, NULL, NULL);
     REMEMBER_PATTERN (pattern)
-    /* We alloc for one arugment more: the always appended schema
-     * cmd. */
-    pattern->content = MALLOC (sizeof (Tcl_Obj*) * (objc));
-    for (i = 1; i < objc; i++) {
-        pattern->content[i-1] = (SchemaCP *) objv[i];
-        Tcl_IncrRefCount (objv[i]);
+    pattern->content = MALLOC (sizeof (Tcl_Obj*) * (objc-1));
+    for (i = 0; i < objc-1; i++) {
+        pattern->content[i] = (SchemaCP *) objv[i+1];
+        Tcl_IncrRefCount (objv[i+1]);
     }
-    pattern->nc = objc;
+    pattern->nc = objc-1;
     addToContent (sdata, pattern, SCHEMA_CQUANT_ONE, 0, 0);
+    return TCL_OK;
+}
+
+static int
+SelfObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+
+    CHECK_SI
+    CHECK_TOPLEVEL
+    if (objc != 1) {
+        SetResult ("No argument expected");
+        return TCL_ERROR;
+    }
+    Tcl_SetObjResult (interp, Tcl_DuplicateObj (sdata->self));
     return TCL_OK;
 }
 
@@ -7482,9 +7499,11 @@ tDOM_SchemaInit (
     Tcl_CreateObjCommand (interp, "tdom::schema::text",
                           TextPatternObjCmd, NULL, NULL);
 
-    /* The 'virtual' "tcl" definition command */
+    /* The 'virtual' "tcl" and the "self" definition command */
     Tcl_CreateObjCommand (interp, "tdom::schema::tcl",
                           VirtualPatternObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp, "tdom::schema::self",
+                          SelfObjCmd, NULL, NULL);
 
     /* XPath contraints for DOM validation */
     Tcl_CreateObjCommand (interp,"tdom::schema::domunique",

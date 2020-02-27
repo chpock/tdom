@@ -1049,7 +1049,7 @@ test schema-4.4 {event on itself in called script} {
     tdom::schema s
     s defelement doc {
         element a ?
-        tcl schema-4.4
+        tcl schema-4.4 [self]
         element b ?
     }
     set result [list]
@@ -1073,7 +1073,7 @@ test schema-4.5 {event on itself in called script} {
     tdom::schema s
     s defelement doc {
         element a ?
-        tcl schema-4.5
+        tcl schema-4.5 [self]
         element b ?
     }
     set result [list]
@@ -1149,7 +1149,7 @@ proc schema-4.10 {scmd} {
 test schema-4.10 {event - tcl error in called script} {
     tdom::schema s
     s defelement doc {
-        tcl schema-4.10
+        tcl schema-4.10 [self]
         element a
     }
     s event start doc 
@@ -2503,7 +2503,7 @@ test schema-8.7 {Delete schema cmd in script called by validation} {
     tdom::schema s
     lappend result [info commands s]
     s defelement doc {
-        tcl schema-8.7
+        tcl schema-8.7 [self]
     }
     lappend result [catch {s validate <doc/>} errMsg]
     lappend result $errMsg
@@ -5396,9 +5396,9 @@ test schema-15.1 {constraint cmd tcl} {
     tdom::schema s
     s define {
         defelement a {
-            tcl append ::schema-15.1
+            tcl append ::schema-15.1 [self]
             element b
-            tcl append ::schema-15.1
+            tcl append ::schema-15.1 [self]
         }
     }
     set ::schema-15.1 ""
@@ -5447,10 +5447,10 @@ test schema-15.3 {constraint cmd tcl} {
             element a *
         }
         defelement a {
-            tcl schema-15.3 astart
+            tcl schema-15.3 astart [self]
             element b ! text
             element c ! text
-            tcl schema-15.3 aend
+            tcl schema-15.3 aend [self]
         }
     }
     set schema-15.3 ""
@@ -5472,7 +5472,7 @@ test schema-15.4 {constraint cmd tcl} {
         }
         defpattern docContent {
             element a
-            tcl schema-15.4 "in docContent"
+            tcl schema-15.4 "in docContent" [self]
             text
             element b
         }
@@ -6217,7 +6217,7 @@ test schema-17.9 {info expected from scripted constrain} {
             element a ?
             group ? {
                 element b ?
-                tcl schema-17.9
+                tcl schema-17.9 [self]
             }
             element c
         }
@@ -6375,7 +6375,7 @@ test schema-17.14 {info expected} {
                 element a ?
                 element b ?
             }
-            tcl schema-17.14
+            tcl schema-17.14 [self]
             element d
         }
     }
@@ -6402,10 +6402,10 @@ test schema-17.15 {info inside} {
             element a *
         }
         defelement a {
-            tcl schema-17.15 astart
+            tcl schema-17.15 astart [self]
             element b ! text
             element c ! text
-            tcl schema-17.15 aend
+            tcl schema-17.15 aend [self]
         }
     }
     set result {}
@@ -6633,7 +6633,7 @@ test schema-17.19 {info stack associated} {
     }
     s defelement a {
         associate "fo bar baz"
-        tcl schema-17.19
+        tcl schema-17.19 [self]
     }
     set result [list]
     foreach xml {
@@ -7209,7 +7209,7 @@ test schema-19.3 {keyspace} {
     set result
 } {1 1 s INVALID_KEYREF 1 s INVALID_KEYREF 1}
 
-proc log19.4 {msg scmd} {
+proc log19.4 {msg} {
     lappend ::result $msg
 }
 proc report19.4 {scmd errortype} {

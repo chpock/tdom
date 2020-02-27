@@ -1,5 +1,5 @@
-C Fixed\sbuild\sbreaking\stypo\sin\slast\scommit.
-D 2020-02-27T15:11:15.621
+C Changed\sthe\s"tcl"\sschema\sconstraint\scommand:\sit\sjust\sevaluates\sthe\sgiven\sarguments\swithout\sappending\sthe\sschema\scommand\sto\sthe\sargument\slist.\sAdded\snew\s"self"\sschema\sconstraint\scommand,\swhich\sreturns\sthe\sschema\scommand.
+D 2020-02-27T16:53:07.197
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -39,9 +39,9 @@ F doc/manpage.css 3b4ec1d641048933a7e6bffc659de9519030a959
 F doc/pullparser.html 164e7e037e2d00308f67ca0708f6b193cbb0db11748c8533c58ddcd9d2f177fb
 F doc/pullparser.n 5f5672e8bb2dd221602040cd212234da6b6ed8c99c5daa60be9fa0c476529c09
 F doc/pullparser.xml 6032c1e8c8d001068c227601dba9860824f8acc709c87fd8e36ac4a596b6a2f2
-F doc/schema.html f34c6582f77bd269dad6a11c17c2fd497e92327869286b40a85f782a7c30ce79
-F doc/schema.n f09d51c2b547d37706e8ba7c3b5664c838bc9efda6ce570b3334e0ff6de9cb9a
-F doc/schema.xml 7f04b17c815f2ba85253f8394a005dfa610b380d8556efef59473d205396152d
+F doc/schema.html 84f03bb99c6481cff20874f80035d889803f5535b92e3cadad6d58c6e49ca27f
+F doc/schema.n 182c1f728339db9d5e995f9a536cb4740ae6d3352fec606f75868e3532fb612f
+F doc/schema.xml 96c675eaa532a0113a4330e23706baaef777e97f52e68c44b89b71c76b516aac
 F doc/tDOM.xml 04db7d0ccfea39aae21f4fe07b8f05d5bff8a84193cfce2aa5faa2f42c076377
 F doc/tdomcmd.html 3f96630823dbeff586dd3fb7e5cc6214a40f0219e2ba37e6986353cbcfc7d665
 F doc/tdomcmd.n c06a5ff035f16a2a52636b69d9ebe6ba84ff5101922ed27b551146c4d61d6cda
@@ -130,7 +130,7 @@ F generic/domxslt.h 0cb8e327683a0ffeb2a7094add6cd82ec1ae49c7c704f20d8d6f7d6523e7
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c ee14ed666ca6d18977f7301545c52ac71b3ce73c49233ff8f8b3aa4144008d24
 F generic/nodecmd.h d2201b69de9507f86e94750f0b72867ec9150795712ef18c5b5b87f35a689f75
-F generic/schema.c 96993a5e5a5d1bc27a74ee504b1c1b98169c86617aacedb46171eaa9436f587a
+F generic/schema.c e9a9d6f793be433832fb56e3cda231913cc6403d8828f2d93f9f705c2a11ff0c
 F generic/schema.h 5ab42b6af2b997207e827ae97bc2fd5ce2892034d23dba88243b833d9cd57d5a
 F generic/tcldom.c 8bb158abda4b8d039e0528a347f54cd3c9ad04abf10eb214a996bc1e5546d18b
 F generic/tcldom.h c8bda18533dcfeb0dde99bc7fa2cd2fc19cb90239538a65ee98bb8e9dd4d8ad6
@@ -199,7 +199,7 @@ F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
 F tests/pullparser.test e4b14ea0bdc9f9fd931f3bc559e78c309582a67a238170d58e0f20331f99890c
 F tests/pushpull.bench 664e8f512917537d96c4b71933d4d9a6da65fc6fe85bd7c459483830dc7d2faf
-F tests/schema.test 01ff2a037a2e40fafe4946ea443a14ca3fc348875e0d2f027cd08d583531abd3
+F tests/schema.test 0ae98d9716373c2a9de766c423198a2bd1c64cd00d04095de0448d1946de8aa8
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
 F tests/tdomcmd.bench b07448ed4de08ccaa9734cf3fe15c695fd7066c993da58ff48d465747940e417
 F tests/tdomcmd.test 092401adf0609906d710f3ef8997cb4ca29bc208
@@ -224,8 +224,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 0ccd2835a767ed6787779bc0c8bec2c5d24ba711f41bb5a8826fb05cd214ab62
-R 5419d5560f3184eedc47b8488a945422
+P 2de9f383a809348a0b1fce84019438410af6c34e9b2f833b4fc7fb99ab99b513
+R dfe13cdf1789b2afabb78d2f6783f19f
 U rolf
-Z e5c945b5c6ce58a48f3502076a2554e1
+Z eed72cd6f16b922dd04c8cdeb49cf5a5
 # Remove this line to create a well-formed Fossil manifest.

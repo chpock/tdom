@@ -557,14 +557,18 @@
 
       <commanddef>
         <command><method>tcl</method> <m>tclcmd</m> <m>?arg arg ...?</m></command>
-        <desc>Evaluates the Tcl script <m>tclcmd arg arg ... </m> and
-        the schema command appended to the argument list. This
+        <desc>Evaluates the Tcl script <m>tclcmd arg arg ... </m>. This
         validation command is only allowed in strict sequential
         context (not in choice, mixed and interleave). If the return
-        code is something else than 0 (TCL_OK) then this is a
-        validation error.</desc>
+        code is something else than 0 (TCL_OK) then this is an
+        error (which isn't catched and reported by reportcmd).</desc>
       </commanddef>
 
+      <commanddef>
+        <command><method>self</method></command>
+        <desc>Returns the schema command.</desc>
+      </commanddef>
+      
       <commanddef>
         <command><method>associate</method> <m>data</m></command>
         <desc>This command is only allowed top-level inside the
