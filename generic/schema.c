@@ -3241,7 +3241,7 @@ schemaReset (
     sdata->vaction = 0;
     sdata->vname = NULL;
     sdata->vns = NULL;
-    sdata->text = NULL;
+    sdata->vtext = NULL;
     Tcl_DStringSetLength (sdata->cdata, 0);
     if (sdata->ids.numEntries) {
         Tcl_DeleteHashTable (&sdata->ids);
