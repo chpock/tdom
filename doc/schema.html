@@ -4,18 +4,18 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x555edfafd910">NAME</a> · <a href="#SECTid0x555edfa6aab0">SYNOPSIS</a> · <a href="#SECTid0x555edfaf4810">DESCRIPTION </a> · <a href="#SECTid0x555edfb56c90">Schema definition scripts</a> · <a href="#SECTid0x555edfb65230">Quantity specifier</a> · <a href="#SECTid0x555edfb67080">Text constraint scripts</a> · <a href="#SECTid0x555edfb75100">Local key constraints</a> · <a href="#SECTid0x555edfb76f10">Exampels</a> · <a href="#SECTid0x555edfb78e90">KEYWORDS</a>
+<a href="#SECTid0x564e46da0910">NAME</a> · <a href="#SECTid0x564e46d0dab0">SYNOPSIS</a> · <a href="#SECTid0x564e46d97810">DESCRIPTION </a> · <a href="#SECTid0x564e46dfc020">Schema definition scripts</a> · <a href="#SECTid0x564e46e0a5c0">Quantity specifier</a> · <a href="#SECTid0x564e46e0c410">Text constraint scripts</a> · <a href="#SECTid0x564e46e1a490">Local key constraints</a> · <a href="#SECTid0x564e46e1c2a0">Exampels</a> · <a href="#SECTid0x564e46e1e220">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x555edfafd910">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x564e46da0910">NAME</a></h2><p class="namesection">
 <b class="names">tdom::schema - </b><br>Create a schema validation command</p>
 
-  <h2><a name="SECTid0x555edfa6aab0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x564e46d0dab0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">tdom::schema</b> <i class="m">?create?</i> <i class="m">cmdName</i>
     </pre>
 
-  <h2><a name="SECTid0x555edfaf4810">DESCRIPTION </a></h2><p>This command creates validation commands with a simple API. The
+  <h2><a name="SECTid0x564e46d97810">DESCRIPTION </a></h2><p>This command creates validation commands with a simple API. The
     validation commands have methods to define a schema and are able
     to validate XML data or to post-validate a tDOM DOM tree (and to
     some degree other kind of hierarchical data) against this
@@ -177,37 +177,6 @@
 
       
         <dt>
-<b class="method">stack</b> <i class="m">(top|inside|associated)</i>
-</dt>
-        <dd>In Tcl scripts evaluated by validation this method
-        provides information about the current validation stack.
-        Called outside this context the method returns the empty
-        string.
-        <dl class="optlist">
-          
-            <dt><b>top</b></dt>
-            <dd>Returns the element which content is currently
-            checked (the at the moment open element tag).
-            </dd>
-          
-
-          
-            <dt><b>inside</b></dt>
-            <dd>Returns all currently open elements as a list.</dd>
-          
-          
-          
-            <dt><b>associated</b></dt>
-            <dd>Returns the data associated with the current top
-            most stack content particle or the empty string it there isn't.
-            </dd>
-          
-        </dl>
-        </dd>
-      
-      
-      
-        <dt>
 <b class="method">validate</b> <i class="m">&lt;XML string&gt;</i> <i class="m">?objVar?</i>
 </dt>
         <dd>Returns true if the <i class="m">&lt;XML string&gt;</i> is valid or
@@ -260,6 +229,32 @@
         the variable with that name is set to the empty string. </dd>
       
       
+      
+        <dt><b class="method">reportcmd</b></dt>
+        <dd>This method expects the name of a tcl command to be
+        called in case of validation error. This command will be
+        called with two arguments: the schema command, that is rasing
+        the validation error, and an validation error code. The
+        possible error codes are:
+        <dl>
+            <dt>MISSING_ELEMENT</dt><dd></dd>
+            <dt>MISSING_TEXT</dt><dd></dd>
+            <dt>UNEXPECTED_ELEMENT</dt><dd></dd>
+            <dt>UNEXPECTED_ROOT_ELEMENT</dt><dd></dd>
+            <dt>UNKNOWN_ROOT_ELEMENT</dt><dd></dd>
+            <dt>UNKNOWN_ATTRIBUTE</dt><dd></dd>
+            <dt>MISSING_ATTRIBUTE</dt><dd></dd>
+            <dt>INVALID_ATTRIBUTE_VALUE</dt><dd></dd>
+            <dt>DOM_KEYCONSTRAINT</dt><dd></dd>
+            <dt>DOM_XPATH_BOOLEAN</dt><dd></dd>
+            <dt>INVALID_KEYREF</dt><dd></dd>
+            <dt>INVALID_VALUE</dt><dd></dd>
+            <dt>UNKOWN_GLOBAL_ID</dt><dd></dd>
+            <dt>UNKOWN_ID</dt><dd></dd>
+        </dl>
+        </dd>
+      
+
       
         <dt><b class="method">delete</b></dt>
         <dd>This method deletes the validation command.</dd>
@@ -324,8 +319,8 @@
               
               
                   <dt><b>nrForwardDefinitions</b></dt>
-                  <dd>Returns the at least used once referenced
-                  element and ref particles that aren't defined so far
+                  <dd>Returns how much element, elementtype and ref
+                  pattern are referenced that aren't defined so far
                   (summed together).</dd>
               
               
@@ -365,20 +360,24 @@
               
               
                   <dt><b>vaction ?name|namespace|text?</b></dt>
-                  <dd>If the schema command is currently processing
-                  a validation event this method returns information
-                  about what the command is doing. If the command is
-                  called without the optional argument the possible
-                  return values and their meanings are:
+                  <dd>
+<p>This method returns useful information only if
+                  the schema command waits for the reportcmd script to
+                  finish while recovering from a validation error.
+                  Otherwise it returns NONE.</p>
+                  <p>If the command is called without the optional
+                  argument the possible return values and their
+                  meanings are:</p>
                   <dl>
                       <dt>NONE</dt><dd>The schema command currently
-                      doesn't process a validation event.</dd>
-                      <dt>MATCH_ELEMENT_START</dt><dd></dd>
-                      <dt>MATCH_ELEMENT_END</dt><dd></dd>
-                      <dt>MATCH_TEXT</dt><dd></dd>
-                      <dt>MATCH_ATTRIBUTE_TEXT</dt><dd></dd>
-                      <dt>MATCH_GLOBAL</dt><dd></dd>
-                      <dt>MATCH_DOM_KEYCONSTRAINT</dt><dd></dd>
+                      doesn't recover from a validation event.</dd>
+                      <dt>MATCH_ELEMENT_START</dt><dd>Element start event, which includs looking for missing or unknown attributes.</dd>
+                      <dt>MATCH_ELEMENT_END</dt><dd>Element end event.</dd>
+                      <dt>MATCH_TEXT</dt><dd>Validating text between tags.</dd>
+                      <dt>MATCH_ATTRIBUTE_TEXT</dt><dd>Attribute text value contraint check</dd>
+                      <dt>MATCH_GLOBAL</dt><dd>Checking global IDs</dd>
+                      <dt>MATCH_DOM_KEYCONSTRAINT</dt><dd>Checking domuniqe constaint</dd>
+                      <dt>MATCH_DOM_XPATH_BOOLEAN</dt><dd>Checking domxpathboolean constaint</dd>
                   </dl>
                   If called with one of the possible optional
                   arguments the command returns detail information
@@ -388,15 +387,49 @@
                       that has to match in case of
                       MATCH_ELEMENT_START. Return the name of the
                       closed element in case of MATCH_ELEMENT_END.
-                      Return the name of the parent element in case of
-                      MATCH_TEXT.</dd>
+                      Returns the name of the attribute in case of
+                      MATCH_ATTRIBUTE_TEXT. Return the name of the
+                      parent element in case of MATCH_TEXT.</dd>
+                      
                       <dt>namespace</dt><dd>Return the namespace of
                       the element that has to match in case of
                       MATCH_ELEMENT_START. Return the namespace of the
                       closed element in case of MATCH_ELEMENT_END.
-                      Return the namespace of the parent element in
-                      case of MATCH_TEXT.</dd>
-                      <dt>text</dt><dd></dd>
+                      Returns the namespace of the attribute in case
+                      of MATCH_ATTRIBUTE_TEXT. Return the namespace of
+                      the parent element in case of MATCH_TEXT.</dd>
+                      
+                      <dt>text</dt><dd>Return the text to match in
+                      case of MATCH_TEXT. Returns the value of the
+                      attribute in case of MATCH_ATTRIBUTE_TEXT.</dd>
+                  </dl>
+                  </dd>
+              
+              
+                  <dt><b>stack top|inside|associated</b></dt>
+                  <dd>In Tcl scripts evaluated by validation this method
+                  provides information about the current validation stack.
+                  Called outside this context the method returns the empty
+                  string.
+                  <dl class="optlist">
+                      
+                          <dt><b>top</b></dt>
+                          <dd>Returns the element which content is currently
+                          checked (the at the moment open element tag).
+                          </dd>
+                      
+                      
+                      
+                          <dt><b>inside</b></dt>
+                          <dd>Returns all currently open elements as a list.</dd>
+                      
+                      
+                      
+                          <dt><b>associated</b></dt>
+                          <dd>Returns the data associated with the current top
+                          most stack content particle or the empty string it there isn't.
+                          </dd>
+                      
                   </dl>
                   </dd>
               
@@ -412,7 +445,7 @@
 
     </dl>
 
-  <h2><a name="SECTid0x555edfb56c90">Schema definition scripts</a></h2><p>Schema definition scripts are ordinary Tcl scripts that are
+  <h2><a name="SECTid0x564e46dfc020">Schema definition scripts</a></h2><p>Schema definition scripts are ordinary Tcl scripts that are
     evaluatend in the namespace tdom::schema. The below listed schema
     definition commands in this tcl namespace allow to define a wide
     variety of document structures. Every schema definition command
@@ -572,7 +605,7 @@
         the schema command appended to the argument list. This
         validation command is only allowed in strict sequential
         context (not in choice, mixed and interleave). If the return
-        code is something else than 0 (TCL_OK) then this ia a
+        code is something else than 0 (TCL_OK) then this is a
         validation error.</dd>
       
 
@@ -700,7 +733,7 @@ s define {
       
     </dl>
 
-  <h2><a name="SECTid0x555edfb65230">Quantity specifier</a></h2><p>Serveral schema definition commands expects a quantifier as
+  <h2><a name="SECTid0x564e46e0a5c0">Quantity specifier</a></h2><p>Serveral schema definition commands expects a quantifier as
     one of their arguments, which specifies how often the content
     particle specified by the command is expected. The valid values
     for a <i class="m">quant</i> argument are:</p><dl class="optlist">
@@ -744,7 +777,7 @@ s define {
     </dl><p>If an optional quantifier is not given then it defaults to * in
     case of the mixed command and to ! for all other commands.</p>
 
-  <h2><a name="SECTid0x555edfb67080">Text constraint scripts</a></h2><p>Text - parsed character data, as XML calles it - must sometimes
+  <h2><a name="SECTid0x564e46e0c410">Text constraint scripts</a></h2><p>Text - parsed character data, as XML calles it - must sometimes
     be of a certain kind, must comply to some rules etc to be valid.
     The text constraint script arguments to the text, attribute,
     nsattribute and deftext commands allow the following text
@@ -1047,7 +1080,7 @@ s define {
       
     </dl>
 
-  <h2><a name="SECTid0x555edfb75100">Local key constraints</a></h2><p>Document wide uniqueness and foreign key constraints are
+  <h2><a name="SECTid0x564e46e1a490">Local key constraints</a></h2><p>Document wide uniqueness and foreign key constraints are
     available with the text constraint commands id and idref.
     Keyspaces allow for sub-tree local uniqueness and foreign key
     constraints.</p><dl class="commandlist">
@@ -1057,7 +1090,7 @@ s define {
 </dt>
             <dd>Any number of keyspaces are possible. A keyspace is
             either active or not. An inside a <i class="m">constraint
-            script&gt;</i> called keyspace with the same name does
+            script</i> called keyspace with the same name does
             nothing.</dd>
         
     </dl><p>This text constraint commands work with keyspaces:</p><dl class="commandlist">
@@ -1083,7 +1116,7 @@ s define {
         
     </dl>
 
-  <h2><a name="SECTid0x555edfb76f10">Exampels</a></h2><p>The XML Schema Part 0: Primer Second Edition
+  <h2><a name="SECTid0x564e46e1c2a0">Exampels</a></h2><p>The XML Schema Part 0: Primer Second Edition
     (<a href="https://www.w3.org/TR/xmlschema-0/">https://www.w3.org/TR/xmlschema-0/</a>) starts with this
     example schema:</p><pre class="example">
 &lt;xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
@@ -1252,7 +1285,7 @@ schema define {
       
     </pre>
 
-<h2><a name="SECTid0x555edfb78e90">KEYWORDS</a></h2><p class="keywords">
+<h2><a name="SECTid0x564e46e1e220">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-Validation">Validation</a>, <a class="keyword" href="keyword-index.html#KW-Postvalidation">Postvalidation</a>, <a class="keyword" href="keyword-index.html#KW-DOM">DOM</a>, <a class="keyword" href="keyword-index.html#KW-SAX">SAX</a>
 </p>
 </div><hr class="navsep"><div class="navbar" align="center">

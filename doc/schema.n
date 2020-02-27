@@ -287,22 +287,6 @@ Checks if the current validation state allows the
 given text content. It raises error, if not.
 .RE
 .TP
-\&\fB\fBstack\fP \fI(top|inside|associated)\fB
-\&\fRIn Tcl scripts evaluated by validation this method
-provides information about the current validation stack.
-Called outside this context the method returns the empty
-string.
-.RS
-.IP "\fBtop\fR"
-Returns the element which content is currently
-checked (the at the moment open element tag).
-.IP "\fBinside\fR"
-Returns all currently open elements as a list.
-.IP "\fBassociated\fR"
-Returns the data associated with the current top
-most stack content particle or the empty string it there isn't.
-.RE
-.TP
 \&\fB\fBvalidate\fP \fI<XML string>\fB \fI?objVar?\fB
 \&\fRReturns true if the \fI<XML string>\fR is valid or
 false otherwise. If validation failed and the optional
@@ -340,6 +324,43 @@ false otherwise. If validation failed and the optional
 name is set to a validation error message. If the dom tree is
 valid and the optional \fIobjVar\fR argument is given, then
 the variable with that name is set to the empty string.
+.TP
+\&\fB\fBreportcmd\fP
+\&\fRThis method expects the name of a tcl command to be
+called in case of validation error. This command will be
+called with two arguments: the schema command, that is rasing
+the validation error, and an validation error code. The
+possible error codes are:
+.RS
+.TP
+MISSING_ELEMENT
+.TP
+MISSING_TEXT
+.TP
+UNEXPECTED_ELEMENT
+.TP
+UNEXPECTED_ROOT_ELEMENT
+.TP
+UNKNOWN_ROOT_ELEMENT
+.TP
+UNKNOWN_ATTRIBUTE
+.TP
+MISSING_ATTRIBUTE
+.TP
+INVALID_ATTRIBUTE_VALUE
+.TP
+DOM_KEYCONSTRAINT
+.TP
+DOM_XPATH_BOOLEAN
+.TP
+INVALID_KEYREF
+.TP
+INVALID_VALUE
+.TP
+UNKOWN_GLOBAL_ID
+.TP
+UNKOWN_ID
+.RE
 .TP
 \&\fB\fBdelete\fP
 \&\fRThis method deletes the validation command.
@@ -394,8 +415,8 @@ node, if not. It is recommended that you don't use
 this method. Or at least leave the DOM tree alone,
 use it read-only.
 .IP "\fBnrForwardDefinitions\fR"
-Returns the at least used once referenced
-element and ref particles that aren't defined so far
+Returns how much element, elementtype and ref
+pattern are referenced that aren't defined so far
 (summed together).
 .IP "\fBdefinedElements\fR"
 Returns in no particular order the defined
@@ -427,28 +448,41 @@ Returns the code that defines the given
 element. The command raises error if there isn' a
 definition of that element.
 .IP "\fBvaction ?name|namespace|text?\fR"
-If the schema command is currently processing
-a validation event this method returns information
-about what the command is doing. If the command is
-called without the optional argument the possible
-return values and their meanings are:
 .RS
+.PP
+This method returns useful information only if
+the schema command waits for the reportcmd script to
+finish while recovering from a validation error.
+Otherwise it returns NONE.
+.PP
+If the command is called without the optional
+argument the possible return values and their
+meanings are:
 .TP
 NONE
 The schema command currently
-doesn't process a validation event.
+doesn't recover from a validation event.
 .TP
 MATCH_ELEMENT_START
+Element start event, which includs looking for missing or unknown attributes.
 .TP
 MATCH_ELEMENT_END
+Element end event.
 .TP
 MATCH_TEXT
+Validating text between tags.
 .TP
 MATCH_ATTRIBUTE_TEXT
+Attribute text value contraint check
 .TP
 MATCH_GLOBAL
+Checking global IDs
 .TP
 MATCH_DOM_KEYCONSTRAINT
+Checking domuniqe constaint
+.TP
+MATCH_DOM_XPATH_BOOLEAN
+Checking domxpathboolean constaint
 If called with one of the possible optional
 arguments the command returns detail information
 depending on current action.
@@ -458,18 +492,38 @@ Return the name of the element
 that has to match in case of
 MATCH_ELEMENT_START. Return the name of the
 closed element in case of MATCH_ELEMENT_END.
-Return the name of the parent element in case of
-MATCH_TEXT.
+Returns the name of the attribute in case of
+MATCH_ATTRIBUTE_TEXT. Return the name of the
+parent element in case of MATCH_TEXT.
 .TP
 namespace
 Return the namespace of
 the element that has to match in case of
 MATCH_ELEMENT_START. Return the namespace of the
 closed element in case of MATCH_ELEMENT_END.
-Return the namespace of the parent element in
-case of MATCH_TEXT.
+Returns the namespace of the attribute in case
+of MATCH_ATTRIBUTE_TEXT. Return the namespace of
+the parent element in case of MATCH_TEXT.
 .TP
 text
+Return the text to match in
+case of MATCH_TEXT. Returns the value of the
+attribute in case of MATCH_ATTRIBUTE_TEXT.
+.RE
+.IP "\fBstack top|inside|associated\fR"
+In Tcl scripts evaluated by validation this method
+provides information about the current validation stack.
+Called outside this context the method returns the empty
+string.
+.RS
+.IP "\fBtop\fR"
+Returns the element which content is currently
+checked (the at the moment open element tag).
+.IP "\fBinside\fR"
+Returns all currently open elements as a list.
+.IP "\fBassociated\fR"
+Returns the data associated with the current top
+most stack content particle or the empty string it there isn't.
 .RE
 .RE
 .TP
@@ -589,7 +643,7 @@ element will be in that namespace.
 the schema command appended to the argument list. This
 validation command is only allowed in strict sequential
 context (not in choice, mixed and interleave). If the return
-code is something else than 0 (TCL_OK) then this ia a
+code is something else than 0 (TCL_OK) then this is a
 validation error.
 .TP
 \&\fB\fBassociate\fP \fIdata\fB
@@ -972,7 +1026,7 @@ constraints.
 \&\fB\fBkeyspace\fP \fI<names list>\fB \fI<constraint script>\fB
 \&\fRAny number of keyspaces are possible. A keyspace is
 either active or not. An inside a \fIconstraint
-script>\fR called keyspace with the same name does
+script\fR called keyspace with the same name does
 nothing.
 .PP
 This text constraint commands work with keyspaces:
