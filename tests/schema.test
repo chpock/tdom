@@ -6647,6 +6647,28 @@ test schema-17.19 {info stack associated} {
     set result
 } {{fo bar baz} 1 {fo bar baz} {fo bar baz} 1}
 
+test schema-17.19a {info stack associated} {
+    tdom::schema s
+    s defelement doc {
+        element a +
+    }
+    s defelement a {
+        associate "fo bar baz"
+        tcl schema-17.19 [self]
+        element b
+    }
+    set result [list]
+    foreach xml {
+        <doc><a><b/></a></doc>
+        <doc><a><b/></a><a><b/></a></doc>
+    } {
+        lappend result [s validate $xml]
+        
+    }
+    s delete
+    set result
+} {{fo bar baz} 1 {fo bar baz} {fo bar baz} 1}
+
 proc schema-17.20 {schemacmd args} {
     lappend ::result [$schemacmd info stack associated]
 }
