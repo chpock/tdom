@@ -59,7 +59,7 @@ typedef struct
     SchemaConstraintFreeFunc freeData;
 } SchemaConstraint;
 
-typedef struct
+typedef struct SchemaAttr
 {
     char              *namespace;
     char              *name;

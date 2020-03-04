@@ -512,7 +512,7 @@ static void freeSchemaCP (
 {
     int i;
     SchemaConstraint *sc;
-
+    
     switch (pattern->type) {
     case SCHEMA_CTYPE_ANY:
         /* do nothing */
@@ -4733,7 +4733,6 @@ schemaInstanceCmd (
                 sdata->attributeHashThreshold = n;
             }
             SetIntResult (sdata->attributeHashThreshold);
-            
         }
         break;
         
