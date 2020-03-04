@@ -39,6 +39,9 @@
 #ifndef TDOM_CHOICE_HASH_THRESHOLD
 # define TDOM_CHOICE_HASH_THRESHOLD 5
 #endif
+#ifndef TDOM_ATTRIBUTE_HASH_THRESHOLD
+# define TDOM_ATTRIBUTE_HASH_THRESHOLD 5
+#endif
 #ifndef TDOM_EXPAT_READ_SIZE
 # define TDOM_EXPAT_READ_SIZE (1024*8)
 #endif
@@ -602,6 +605,7 @@ initSchemaData (
     Tcl_InitHashTable (&sdata->idTables, TCL_STRING_KEYS);
     Tcl_InitHashTable (&sdata->keySpaces, TCL_STRING_KEYS);
     sdata->choiceHashThreshold = TDOM_CHOICE_HASH_THRESHOLD;
+    sdata->attributeHashThreshold = TDOM_ATTRIBUTE_HASH_THRESHOLD;
     return sdata;
 }
 
@@ -1675,9 +1679,34 @@ int probeAttribute (
 {
     int i;
     SchemaCP *cp;
+    Tcl_HashTable *t;
+    Tcl_HashEntry *h;
+    SchemaAttr *attr;
     
     cp = sdata->stack->pattern;
     *isrequiered = 0;
+    if (cp->typedata) {
+        t = (Tcl_HashTable *) cp->typedata;
+        h = Tcl_FindHashEntry (t, name);
+        if (!h) return 0;
+        attr = (SchemaAttr *) Tcl_GetHashValue (h);
+        while (attr && attr->namespace != ns) {
+            attr = attr->next;
+        }
+        if (!attr) return 0;
+        if (attr->cp) {
+            if (!checkText (interp, attr->cp, value)) {
+                if (!recover (interp, sdata, INVALID_ATTRIBUTE_VALUE, name,
+                              ns, value, 0)) {
+                    SetResult3V ("Attribute value doesn't match for "
+                                 "attribute '", name , "'");
+                    return 0;
+                }
+            }
+        }
+        if (attr->required) *isrequiered = 1;
+        return 1;
+    }
     for (i = 0; i < cp->numAttr; i++) {
         if (cp->attrs[i]->namespace == ns
             && cp->attrs[i]->name == name) {
@@ -4003,6 +4032,32 @@ schemaInstanceInfoCmd (
     return TCL_OK;
 }
 
+static void
+attributeLookupPreperation (
+    SchemaData *sdata,
+    SchemaCP   *cp
+    )
+{
+    Tcl_HashTable *t;
+    int i, hnew;
+    Tcl_HashEntry *h;
+    SchemaAttr *attr;
+    
+    if (cp->numAttr <= sdata->attributeHashThreshold) return;
+    t = TMALLOC (Tcl_HashTable);
+    Tcl_InitHashTable (t, TCL_STRING_KEYS);
+    for (i = 0; i < cp->numAttr; i++) {
+        h = Tcl_CreateHashEntry (t, cp->attrs[i]->name, &hnew);
+        if (hnew) {
+            Tcl_SetHashValue (h, cp->attrs[i]);
+        } else {
+            attr = (SchemaAttr *) Tcl_GetHashValue (h);
+            cp->attrs[i]->next = attr->next;
+            attr->next = cp->attrs[i];
+        }
+    }
+}
+
 /* This implements the script interface to the created schema commands.
 
    Since validation may call out to tcl scripts those scripts may
@@ -4061,11 +4116,11 @@ schemaInstanceCmd (
     };
 
     static const char *setKeywords[] = {
-        "choiceHashThreshold",  NULL
+        "choiceHashThreshold", "attributeHashThreshold", NULL
     };
     enum setKeyword
     {
-        s_choiceHashThreshold
+        s_choiceHashThreshold, s_attributeHashThreshold
     };
         
     if (sdata == NULL) {
@@ -4169,6 +4224,9 @@ schemaInstanceCmd (
         pattern->numAttr = sdata->numAttr;
         pattern->numReqAttr = sdata->numReqAttr;
         if (result == TCL_OK) {
+            if (pattern->numAttr) {
+                attributeLookupPreperation (sdata, pattern);
+            }
             if (forwardDef) {
                 if (pattern->flags & FORWARD_PATTERN_DEF) {
                     sdata->forwardPatternDefs--;
@@ -4615,6 +4673,9 @@ schemaInstanceCmd (
         pattern->numAttr = sdata->numAttr;
         pattern->numReqAttr = sdata->numReqAttr;
         if (result == TCL_OK) {
+            if (pattern->numAttr) {
+                attributeLookupPreperation (sdata, pattern);
+            }
             if (forwardDef) {
                 sdata->forwardPatternDefs--;
                 pattern->name = Tcl_GetHashKey (&sdata->element, h1);
@@ -4659,6 +4720,20 @@ schemaInstanceCmd (
                 sdata->choiceHashThreshold = n;
             }
             SetIntResult (sdata->choiceHashThreshold);
+        case s_attributeHashThreshold:
+            if (objc == 4) {
+                if (Tcl_GetIntFromObj (interp, objv[3], &n) != TCL_OK) {
+                    SetResult ("Invalid threshold value");
+                    return TCL_ERROR;
+                }
+                if (n < 0) {
+                    SetResult ("Invalid threshold value");
+                    return TCL_ERROR;
+                }
+                sdata->attributeHashThreshold = n;
+            }
+            SetIntResult (sdata->attributeHashThreshold);
+            
         }
         break;
         
@@ -4921,6 +4996,9 @@ evalDefinition (
 
     if (result == TCL_OK) {
         REMEMBER_PATTERN (pattern);
+        if (pattern->numAttr) {
+            attributeLookupPreperation (sdata, pattern);
+        }
         onlyName = 1;
         for (i = 0; i < pattern->nc; i++) {
             if (onlyName
@@ -4938,7 +5016,7 @@ evalDefinition (
         if (pattern->type == SCHEMA_CTYPE_CHOICE
             && onlyName
             && pattern->nc > sdata->choiceHashThreshold) {
-            t = TMALLOC (Tcl_HashTable);
+            t =  TMALLOC (Tcl_HashTable);
             Tcl_InitHashTable (t, TCL_ONE_WORD_KEYS);
             hnew = 1;
             for (i = 0; i < pattern->nc; i++) {
