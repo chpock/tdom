@@ -1674,7 +1674,7 @@ int probeAttribute (
     const char *name,
     const char *ns,
     char *value,
-    int *isrequiered
+    int *isrequired
     )
 {
     int i;
@@ -1684,7 +1684,7 @@ int probeAttribute (
     SchemaAttr *attr;
     
     cp = sdata->stack->pattern;
-    *isrequiered = 0;
+    *isrequired = 0;
     if (cp->typedata) {
         t = (Tcl_HashTable *) cp->typedata;
         h = Tcl_FindHashEntry (t, name);
@@ -1704,7 +1704,7 @@ int probeAttribute (
                 }
             }
         }
-        if (attr->required) *isrequiered = 1;
+        if (attr->required) *isrequired = 1;
         return 1;
     }
     for (i = 0; i < cp->numAttr; i++) {
@@ -1720,7 +1720,7 @@ int probeAttribute (
                     }
                 }
             }
-            if (cp->attrs[i]->required) *isrequiered = 1;
+            if (cp->attrs[i]->required) *isrequired = 1;
             return 1;
         }
     }
@@ -1759,12 +1759,11 @@ int probeAttributes (
         h = Tcl_FindHashEntry (&sdata->attrNames, ln);
         if (!h) goto unknowncleanup;
         ln = Tcl_GetHashKey (&sdata->attrNames, h);
+        ns = NULL;
         if (namespace) {
             h = Tcl_FindHashEntry (&sdata->namespace, namespace);
             if (!h) goto unknowncleanup;
             ns = Tcl_GetHashKey (&sdata->namespace, h);
-        } else {
-            ns = NULL;
         }
         found = probeAttribute (interp, sdata, ln, ns, atPtr[1], &req);
         reqAttr += req;
@@ -1772,7 +1771,16 @@ int probeAttributes (
         if (!found) {
             if (!recover (interp, sdata, UNKNOWN_ATTRIBUTE, ln, namespace,
                           NULL, 0)) {
-                SetResult3V ("Unknown attribute \"", atPtr[0], "\"");
+                if (!sdata->evalError) {
+                    if (nsatt) {
+                        SetResult ("Unknown attribute \"");
+                        Tcl_AppendResult (interp, namespace, ":", ln, "\"",
+                                          NULL);
+                    } else {
+                        SetResult3 ("Unknown attribute \"", ln, "\"");
+                    }
+                }
+                if (nsatt) namespace[j] = '\xFF';
                 return TCL_ERROR;
             }
         }
@@ -1787,8 +1795,8 @@ int probeAttributes (
             if (!cp->attrs[i]->required) continue;
             found = 0;
             for (atPtr = (char **) attr; atPtr[0] && atPtr[1]; atPtr += 2) {
+                ln = atPtr[0];
                 if (cp->attrs[i]->namespace) {
-                    ln = atPtr[0];
                     j = 0;
                     while (*ln && *ln != '\xFF') {
                         j++, ln++;
@@ -1807,7 +1815,7 @@ int probeAttributes (
                     }
                     if (nsatt) namespace[j] = '\xFF';
                 }
-                if (strcmp (atPtr[0], cp->attrs[i]->name) == 0) {
+                if (strcmp (ln, cp->attrs[i]->name) == 0) {
                     found = 1;
                     break;
                 }
@@ -1883,14 +1891,14 @@ int probeDomAttributes (
                     if (ns) {
                         SetResult ("Unknown attribute \"");
                         Tcl_AppendResult (interp, ns, ":", atPtr->nodeName,
-                                          "\"");
+                                          "\"", NULL);
                     } else {
                         SetResult3 ("Unknown attribute \"", atPtr->nodeName,
                                     "\"");
                     }
                     sdata->validationState = VALIDATION_ERROR;
-                    return TCL_ERROR;
                 }
+                return TCL_ERROR;
             }
         }
     nextAttr:
@@ -2000,8 +2008,7 @@ int probeEventAttribute (
                           NULL, 0)) {
                 if (ns) {
                     SetResult ("Unknown attribute \"");
-                    Tcl_AppendResult (interp, ns, ":", name,
-                                      "\"");
+                    Tcl_AppendResult (interp, ns, ":", name, "\"", NULL);
                 } else {
                     SetResult3 ("Unknown attribute \"", name, "\"");
                 }
@@ -4033,7 +4040,7 @@ schemaInstanceInfoCmd (
 }
 
 static void
-attributeLookupPreperation (
+attributeLookupPreparation (
     SchemaData *sdata,
     SchemaCP   *cp
     )
@@ -4056,6 +4063,7 @@ attributeLookupPreperation (
             attr->next = cp->attrs[i];
         }
     }
+    cp->typedata = (void *)t;
 }
 
 /* This implements the script interface to the created schema commands.
@@ -4225,7 +4233,7 @@ schemaInstanceCmd (
         pattern->numReqAttr = sdata->numReqAttr;
         if (result == TCL_OK) {
             if (pattern->numAttr) {
-                attributeLookupPreperation (sdata, pattern);
+                attributeLookupPreparation (sdata, pattern);
             }
             if (forwardDef) {
                 if (pattern->flags & FORWARD_PATTERN_DEF) {
@@ -4674,7 +4682,7 @@ schemaInstanceCmd (
         pattern->numReqAttr = sdata->numReqAttr;
         if (result == TCL_OK) {
             if (pattern->numAttr) {
-                attributeLookupPreperation (sdata, pattern);
+                attributeLookupPreparation (sdata, pattern);
             }
             if (forwardDef) {
                 sdata->forwardPatternDefs--;
@@ -4996,7 +5004,7 @@ evalDefinition (
     if (result == TCL_OK) {
         REMEMBER_PATTERN (pattern);
         if (pattern->numAttr) {
-            attributeLookupPreperation (sdata, pattern);
+            attributeLookupPreparation (sdata, pattern);
         }
         onlyName = 1;
         for (i = 0; i < pattern->nc; i++) {
@@ -5222,6 +5230,7 @@ static int maybeAddAttr (
     attr = TMALLOC (SchemaAttr);
     attr->namespace = namespace;
     attr->name = name;
+    attr->next = NULL;
     attr->required = required;
     if (scriptObj) {
         cp = initSchemaCP (SCHEMA_CTYPE_CHOICE, NULL, NULL);
