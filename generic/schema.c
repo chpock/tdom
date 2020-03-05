@@ -39,6 +39,9 @@
 #ifndef TDOM_CHOICE_HASH_THRESHOLD
 # define TDOM_CHOICE_HASH_THRESHOLD 5
 #endif
+#ifndef TDOM_ATTRIBUTE_HASH_THRESHOLD
+# define TDOM_ATTRIBUTE_HASH_THRESHOLD 5
+#endif
 #ifndef TDOM_EXPAT_READ_SIZE
 # define TDOM_EXPAT_READ_SIZE (1024*8)
 #endif
@@ -509,7 +512,7 @@ static void freeSchemaCP (
 {
     int i;
     SchemaConstraint *sc;
-
+    
     switch (pattern->type) {
     case SCHEMA_CTYPE_ANY:
         /* do nothing */
@@ -602,6 +605,7 @@ initSchemaData (
     Tcl_InitHashTable (&sdata->idTables, TCL_STRING_KEYS);
     Tcl_InitHashTable (&sdata->keySpaces, TCL_STRING_KEYS);
     sdata->choiceHashThreshold = TDOM_CHOICE_HASH_THRESHOLD;
+    sdata->attributeHashThreshold = TDOM_ATTRIBUTE_HASH_THRESHOLD;
     return sdata;
 }
 
@@ -1670,14 +1674,39 @@ int probeAttribute (
     const char *name,
     const char *ns,
     char *value,
-    int *isrequiered
+    int *isrequired
     )
 {
     int i;
     SchemaCP *cp;
+    Tcl_HashTable *t;
+    Tcl_HashEntry *h;
+    SchemaAttr *attr;
     
     cp = sdata->stack->pattern;
-    *isrequiered = 0;
+    *isrequired = 0;
+    if (cp->typedata) {
+        t = (Tcl_HashTable *) cp->typedata;
+        h = Tcl_FindHashEntry (t, name);
+        if (!h) return 0;
+        attr = (SchemaAttr *) Tcl_GetHashValue (h);
+        while (attr && attr->namespace != ns) {
+            attr = attr->next;
+        }
+        if (!attr) return 0;
+        if (attr->cp) {
+            if (!checkText (interp, attr->cp, value)) {
+                if (!recover (interp, sdata, INVALID_ATTRIBUTE_VALUE, name,
+                              ns, value, 0)) {
+                    SetResult3V ("Attribute value doesn't match for "
+                                 "attribute '", name , "'");
+                    return 0;
+                }
+            }
+        }
+        if (attr->required) *isrequired = 1;
+        return 1;
+    }
     for (i = 0; i < cp->numAttr; i++) {
         if (cp->attrs[i]->namespace == ns
             && cp->attrs[i]->name == name) {
@@ -1691,7 +1720,7 @@ int probeAttribute (
                     }
                 }
             }
-            if (cp->attrs[i]->required) *isrequiered = 1;
+            if (cp->attrs[i]->required) *isrequired = 1;
             return 1;
         }
     }
@@ -1730,12 +1759,11 @@ int probeAttributes (
         h = Tcl_FindHashEntry (&sdata->attrNames, ln);
         if (!h) goto unknowncleanup;
         ln = Tcl_GetHashKey (&sdata->attrNames, h);
+        ns = NULL;
         if (namespace) {
             h = Tcl_FindHashEntry (&sdata->namespace, namespace);
             if (!h) goto unknowncleanup;
             ns = Tcl_GetHashKey (&sdata->namespace, h);
-        } else {
-            ns = NULL;
         }
         found = probeAttribute (interp, sdata, ln, ns, atPtr[1], &req);
         reqAttr += req;
@@ -1743,7 +1771,16 @@ int probeAttributes (
         if (!found) {
             if (!recover (interp, sdata, UNKNOWN_ATTRIBUTE, ln, namespace,
                           NULL, 0)) {
-                SetResult3V ("Unknown attribute \"", atPtr[0], "\"");
+                if (!sdata->evalError) {
+                    if (nsatt) {
+                        SetResult ("Unknown attribute \"");
+                        Tcl_AppendResult (interp, namespace, ":", ln, "\"",
+                                          NULL);
+                    } else {
+                        SetResult3 ("Unknown attribute \"", ln, "\"");
+                    }
+                }
+                if (nsatt) namespace[j] = '\xFF';
                 return TCL_ERROR;
             }
         }
@@ -1758,8 +1795,8 @@ int probeAttributes (
             if (!cp->attrs[i]->required) continue;
             found = 0;
             for (atPtr = (char **) attr; atPtr[0] && atPtr[1]; atPtr += 2) {
+                ln = atPtr[0];
                 if (cp->attrs[i]->namespace) {
-                    ln = atPtr[0];
                     j = 0;
                     while (*ln && *ln != '\xFF') {
                         j++, ln++;
@@ -1778,7 +1815,7 @@ int probeAttributes (
                     }
                     if (nsatt) namespace[j] = '\xFF';
                 }
-                if (strcmp (atPtr[0], cp->attrs[i]->name) == 0) {
+                if (strcmp (ln, cp->attrs[i]->name) == 0) {
                     found = 1;
                     break;
                 }
@@ -1854,14 +1891,14 @@ int probeDomAttributes (
                     if (ns) {
                         SetResult ("Unknown attribute \"");
                         Tcl_AppendResult (interp, ns, ":", atPtr->nodeName,
-                                          "\"");
+                                          "\"", NULL);
                     } else {
                         SetResult3 ("Unknown attribute \"", atPtr->nodeName,
                                     "\"");
                     }
                     sdata->validationState = VALIDATION_ERROR;
-                    return TCL_ERROR;
                 }
+                return TCL_ERROR;
             }
         }
     nextAttr:
@@ -1971,8 +2008,7 @@ int probeEventAttribute (
                           NULL, 0)) {
                 if (ns) {
                     SetResult ("Unknown attribute \"");
-                    Tcl_AppendResult (interp, ns, ":", name,
-                                      "\"");
+                    Tcl_AppendResult (interp, ns, ":", name, "\"", NULL);
                 } else {
                     SetResult3 ("Unknown attribute \"", name, "\"");
                 }
@@ -4003,6 +4039,33 @@ schemaInstanceInfoCmd (
     return TCL_OK;
 }
 
+static void
+attributeLookupPreparation (
+    SchemaData *sdata,
+    SchemaCP   *cp
+    )
+{
+    Tcl_HashTable *t;
+    int i, hnew;
+    Tcl_HashEntry *h;
+    SchemaAttr *attr;
+    
+    if (cp->numAttr <= sdata->attributeHashThreshold) return;
+    t = TMALLOC (Tcl_HashTable);
+    Tcl_InitHashTable (t, TCL_STRING_KEYS);
+    for (i = 0; i < cp->numAttr; i++) {
+        h = Tcl_CreateHashEntry (t, cp->attrs[i]->name, &hnew);
+        if (hnew) {
+            Tcl_SetHashValue (h, cp->attrs[i]);
+        } else {
+            attr = (SchemaAttr *) Tcl_GetHashValue (h);
+            cp->attrs[i]->next = attr->next;
+            attr->next = cp->attrs[i];
+        }
+    }
+    cp->typedata = (void *)t;
+}
+
 /* This implements the script interface to the created schema commands.
 
    Since validation may call out to tcl scripts those scripts may
@@ -4061,11 +4124,11 @@ schemaInstanceCmd (
     };
 
     static const char *setKeywords[] = {
-        "choiceHashThreshold",  NULL
+        "choiceHashThreshold", "attributeHashThreshold", NULL
     };
     enum setKeyword
     {
-        s_choiceHashThreshold
+        s_choiceHashThreshold, s_attributeHashThreshold
     };
         
     if (sdata == NULL) {
@@ -4169,6 +4232,9 @@ schemaInstanceCmd (
         pattern->numAttr = sdata->numAttr;
         pattern->numReqAttr = sdata->numReqAttr;
         if (result == TCL_OK) {
+            if (pattern->numAttr) {
+                attributeLookupPreparation (sdata, pattern);
+            }
             if (forwardDef) {
                 if (pattern->flags & FORWARD_PATTERN_DEF) {
                     sdata->forwardPatternDefs--;
@@ -4615,6 +4681,9 @@ schemaInstanceCmd (
         pattern->numAttr = sdata->numAttr;
         pattern->numReqAttr = sdata->numReqAttr;
         if (result == TCL_OK) {
+            if (pattern->numAttr) {
+                attributeLookupPreparation (sdata, pattern);
+            }
             if (forwardDef) {
                 sdata->forwardPatternDefs--;
                 pattern->name = Tcl_GetHashKey (&sdata->element, h1);
@@ -4659,6 +4728,19 @@ schemaInstanceCmd (
                 sdata->choiceHashThreshold = n;
             }
             SetIntResult (sdata->choiceHashThreshold);
+        case s_attributeHashThreshold:
+            if (objc == 4) {
+                if (Tcl_GetIntFromObj (interp, objv[3], &n) != TCL_OK) {
+                    SetResult ("Invalid threshold value");
+                    return TCL_ERROR;
+                }
+                if (n < 0) {
+                    SetResult ("Invalid threshold value");
+                    return TCL_ERROR;
+                }
+                sdata->attributeHashThreshold = n;
+            }
+            SetIntResult (sdata->attributeHashThreshold);
         }
         break;
         
@@ -4921,6 +5003,9 @@ evalDefinition (
 
     if (result == TCL_OK) {
         REMEMBER_PATTERN (pattern);
+        if (pattern->numAttr) {
+            attributeLookupPreparation (sdata, pattern);
+        }
         onlyName = 1;
         for (i = 0; i < pattern->nc; i++) {
             if (onlyName
@@ -4938,7 +5023,7 @@ evalDefinition (
         if (pattern->type == SCHEMA_CTYPE_CHOICE
             && onlyName
             && pattern->nc > sdata->choiceHashThreshold) {
-            t = TMALLOC (Tcl_HashTable);
+            t =  TMALLOC (Tcl_HashTable);
             Tcl_InitHashTable (t, TCL_ONE_WORD_KEYS);
             hnew = 1;
             for (i = 0; i < pattern->nc; i++) {
@@ -5145,6 +5230,7 @@ static int maybeAddAttr (
     attr = TMALLOC (SchemaAttr);
     attr->namespace = namespace;
     attr->name = name;
+    attr->next = NULL;
     attr->required = required;
     if (scriptObj) {
         cp = initSchemaCP (SCHEMA_CTYPE_CHOICE, NULL, NULL);

@@ -3311,6 +3311,200 @@ test schema-11.7 {attribute} {
     set result
 } {0 1 1 0}
 
+test schema-11.8 {attribute} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element e ! {
+                attribute abc
+                attribute def
+                attribute ghi
+                attribute jkl
+                attribute mno
+                attribute pqr
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        {<doc><e abc="" def="" ghi="" jkl="" mno="" pqr=""/></doc>}
+        {<doc><e abc="" def="" ghi="" jkl="" pqr=""/></doc>}
+        {<doc><e unknown="" abc="" def="" ghi="" jkl="" mno="" pqr=""/></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 0 0}
+
+test schema-11.8a {attribute} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element e ! {
+                attribute abc
+                attribute def
+                attribute ghi
+                attribute optional ?
+                attribute jkl
+                attribute mno
+                attribute pqr
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        {<doc><e abc="" def="" ghi="" jkl="" mno="" pqr=""/></doc>}
+        {<doc><e abc="" def="" ghi="" jkl="" pqr=""/></doc>}
+        {<doc><e unknown="" abc="" def="" ghi="" jkl="" mno="" pqr=""/></doc>}
+        {<doc><e optional="foo" abc="" def="" ghi="" jkl="" mno="" pqr=""/></doc>}
+        {<doc><e optional="foo" abc="" def="" ghi="" jkl="" pqr=""/></doc>}
+        {<doc><e optional="foo" unknown="" abc="" def="" ghi="" jkl="" mno="" pqr=""/></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 0 0 1 0 0}
+
+proc schema-11.8b {scmd errType} {
+    lappend ::result $errType
+    lappend ::result [$scmd info vaction name]
+    lappend ::result [$scmd info vaction namespace]
+}
+
+test schema-11.8b {attribute} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element e ! {
+                attribute abc
+                attribute def
+                attribute ghi
+                attribute optional ?
+                attribute jkl
+                attribute mno
+                attribute pqr
+            }
+        }
+    }
+    s reportcmd schema-11.8b
+    set result [list]
+    foreach xml {
+        {<doc><e abc="" def="" ghi="" jkl="" mno="" pqr=""/></doc>}
+        {<doc><e abc="" def="" ghi="" jkl="" pqr=""/></doc>}
+        {<doc><e unknown="" abc="" def="" ghi="" jkl="" mno="" pqr=""/></doc>}
+        {<doc><e optional="foo" abc="" def="" ghi="" jkl="" mno="" pqr=""/></doc>}
+        {<doc><e optional="foo" abc="" def="" ghi="" jkl="" pqr=""/></doc>}
+        {<doc><e optional="foo" unknown="" abc="" def="" ghi="" jkl="" mno="" pqr=""/></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 MISSING_ATTRIBUTE mno {} 1 UNKNOWN_ATTRIBUTE unknown {} 1 1 MISSING_ATTRIBUTE mno {} 1 UNKNOWN_ATTRIBUTE unknown {} 1}
+
+test schema-11.9 {attribute} {
+    tdom::schema s
+    s define {
+        prefixns {ns1 http://foo.bar ns2 http://foo.grill ns3 http://bar.grill}
+        defelement doc {
+            element e ! {
+                nsattribute abc ns1
+                nsattribute abc ns2
+                attribute abc
+                attribute def
+                attribute optional ?
+                nsattribute optional ns3 ?
+                attribute ghi
+                attribute jkl
+                attribute mno
+                attribute pqr
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        {<doc xmlns:ns1="http://foo.bar" xmlns:ns2="http://foo.grill"><e def="" ghi="" jkl="" mno="" pqr="" ns2:abc="" ns1:abc=""/></doc>}
+        {<doc xmlns:ns1="http://foo.bar" xmlns:ns2="http://foo.grill"><e abc="" def="" ghi="" jkl="" mno="" pqr="" ns2:abc="" ns1:abc=""/></doc>}
+        {<doc xmlns:ns1="http://foo.bar" xmlns:ns2="http://foo.grill" xmlns:ns3="http://bar.grill"><e abc="" def="" ghi="" jkl="" mno="" pqr="" ns2:abc="" ns1:abc="" ns3:abc=""/></doc>}
+        {<doc xmlns:ns1="http://foo.bar" xmlns:ns2="http://foo.grill"><e optional="this" def="" ghi="" jkl="" mno="" pqr="" ns2:abc="" ns1:abc=""/></doc>}
+        {<doc xmlns:ns1="http://foo.bar" xmlns:ns2="http://foo.grill"><e optional="this" abc="" def="" ghi="" jkl="" mno="" pqr="" ns2:abc="" ns1:abc=""/></doc>}
+        {<doc xmlns:ns1="http://foo.bar" xmlns:ns2="http://foo.grill" xmlns:ns3="http://bar.grill"><e abc="" optional="this" ns3:optional="that" def="" ghi="" jkl="" mno="" pqr="" ns2:abc="" ns1:abc="" ns3:abc=""/></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 0 0 1 0}
+
+test schema-11.10 {attribute} {
+    tdom::schema s
+    s define {
+        prefixns {ns1 http://foo.bar ns2 http://foo.grill}
+        defelement doc {
+            element e ! {
+                nsattribute abc ns1
+                nsattribute abc ns2
+                attribute abc
+                attribute def
+                attribute ghi
+                attribute jkl
+                attribute mno
+                attribute pqr
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        {<doc xmlns:ns1="http://foo.bar" xmlns:ns2="http://foo.grill"><e def="" ghi="" jkl="" mno="" pqr="" ns2:abc="" ns1:abc=""/></doc>}
+        {<doc xmlns:ns1="http://foo.bar" xmlns:ns2="http://foo.grill"><e abc="" def="" ghi="" jkl="" mno="" pqr="" ns2:abc="" ns1:abc=""/></doc>}
+        {<doc xmlns:ns1="http://foo.bar" xmlns:ns2="http://foo.grill" xmlns:ns3="http://bar.grill"><e abc="" def="" ghi="" jkl="" mno="" pqr="" ns2:abc="" ns1:abc="" ns3:abc=""/></doc>}
+    } {
+        dom parse $xml doc
+        lappend result [s domvalidate $doc]
+        $doc delete
+    }
+    s delete
+    set result
+} {0 1 0}
+
+test schema-11.10a {attribute} {
+    tdom::schema s
+    s define {
+        prefixns {ns1 http://foo.bar ns2 http://foo.grill ns3 http://bar.grill}
+        defelement doc {
+            element e ! {
+                nsattribute abc ns1
+                nsattribute abc ns2
+                attribute abc
+                attribute def
+                attribute optional ?
+                nsattribute optional ns3 ?
+                attribute ghi
+                attribute jkl
+                attribute mno
+                attribute pqr
+            }
+        }
+    }
+    s reportcmd schema-11.8b
+    set result [list]
+    foreach xml {
+        {<doc xmlns:ns1="http://foo.bar" xmlns:ns2="http://foo.grill"><e def="" ghi="" jkl="" mno="" pqr="" ns2:abc="" ns1:abc=""/></doc>}
+        {<doc xmlns:ns1="http://foo.bar" xmlns:ns2="http://foo.grill"><e abc="" def="" ghi="" jkl="" mno="" pqr="" ns2:abc="" ns1:abc=""/></doc>}
+        {<doc xmlns:ns1="http://foo.bar" xmlns:ns2="http://foo.grill"><e abc="" def="" ghi="" jkl="" mno="" pqr="" ns2:abc=""/></doc>}
+        {<doc xmlns:ns1="http://foo.bar" xmlns:ns2="http://foo.grill" xmlns:ns3="http://bar.grill"><e abc="" def="" ghi="" jkl="" mno="" pqr="" ns2:abc="" ns1:abc="" ns3:abc=""/></doc>}
+        {<doc xmlns:ns1="http://foo.bar" xmlns:ns2="http://foo.grill"><e optional="this" def="" ghi="" jkl="" mno="" pqr="" ns2:abc="" ns1:abc=""/></doc>}
+        {<doc xmlns:ns1="http://foo.bar" xmlns:ns2="http://foo.grill"><e optional="this" abc="" def="" ghi="" jkl="" mno="" pqr="" ns2:abc="" ns1:abc=""/></doc>}
+        {<doc xmlns:ns1="http://foo.bar" xmlns:ns2="http://foo.grill" xmlns:ns3="http://bar.grill"><e abc="" optional="this" ns3:optional="that" def="" ghi="" jkl="" mno="" pqr="" ns2:abc="" ns1:abc="" ns3:abc=""/></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {MISSING_ATTRIBUTE abc {} 1 1 MISSING_ATTRIBUTE abc http://foo.bar 1 UNKNOWN_ATTRIBUTE abc http://bar.grill 1 MISSING_ATTRIBUTE abc {} 1 1 UNKNOWN_ATTRIBUTE abc http://bar.grill 1}
+
 test schema-12.1 {domvalidate} {
     tdom::schema s 
     s define {
@@ -5312,7 +5506,6 @@ test schema-14.41 {text constrains commands outside text constraint} {
     if {$result eq [lrepeat [expr {([llength $cmds] - [llength $skiplist]) * 4}] 1]} {
         set result 1
     } else {
-        puts $result
         set result 0
     }
     set result
@@ -7269,8 +7462,7 @@ test schema-19.4 {keyspace w/ recover} {
     foreach xml {
         {<doc><m><a><a1 lang="en"/><a1/><a1/></a></m><m><b><b1 lang="de"/><b1/><b1/></b></m></doc>}
     } {
-        lappend result [s validate $xml errMsg]
-        puts $errMsg
+        lappend result [s validate $xml]
     }
     s delete
     set result

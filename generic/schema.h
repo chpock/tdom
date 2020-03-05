@@ -59,11 +59,12 @@ typedef struct
     SchemaConstraintFreeFunc freeData;
 } SchemaConstraint;
 
-typedef struct
+typedef struct SchemaAttr
 {
     char              *namespace;
     char              *name;
     int                required;
+    struct SchemaAttr *next;
     struct SchemaCP   *cp;
 } SchemaAttr;
 
@@ -192,6 +193,7 @@ typedef struct SchemaData_
     XML_Parser parser;
     domNode *node;
     int choiceHashThreshold;
+    int attributeHashThreshold;
 } SchemaData;
 
 int 
