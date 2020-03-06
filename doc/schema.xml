@@ -218,6 +218,7 @@
             <dt>MISSING_TEXT</dt><dd></dd>
             <dt>UNEXPECTED_ELEMENT</dt><dd></dd>
             <dt>UNEXPECTED_ROOT_ELEMENT</dt><dd></dd>
+            <dt>UNEXPECTED_TEXT</dt><dd></dd>
             <dt>UNKNOWN_ROOT_ELEMENT</dt><dd></dd>
             <dt>UNKNOWN_ATTRIBUTE</dt><dd></dd>
             <dt>MISSING_ATTRIBUTE</dt><dd></dd>

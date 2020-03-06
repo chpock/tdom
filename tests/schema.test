@@ -26,6 +26,7 @@
 #    schema-23.*: validatefile
 #    schema-24.*: validatechannel
 #    schema-25.*: domxpathboolean
+#    schema-26.*: info domNode
 #
 # Copyright (c) 2018-2019 Rolf Ade.
 
@@ -8021,5 +8022,88 @@ test schema-25.4 {domxpathboolean} {
     s delete
     set result
 } {Nr1: 1 Nr2: DOM_XPATH_BOOLEAN volume DOM_XPATH_BOOLEAN sequence 1 Nr3: DOM_XPATH_BOOLEAN sequence 1 Nr4: 1 Nr5: DOM_XPATH_BOOLEAN volume DOM_KEYCONSTRAINT unique DOM_XPATH_BOOLEAN sequence 1 Nr6: DOM_XPATH_BOOLEAN volume DOM_KEYCONSTRAINT unique DOM_XPATH_BOOLEAN sequence 1 Nr7: DOM_XPATH_BOOLEAN volume DOM_KEYCONSTRAINT unique DOM_XPATH_BOOLEAN sequence 1}
+
+proc schema-26.1 {scmd} {
+    lappend ::result "fromtcl: [[$scmd info domNode] nodeName]"
+}
+
+test schema-26.1 {info domNode} {
+    tdom::schema s
+    s defelement doc {
+        tcl schema-26.1 [self]
+        element e ?
+    }
+    set result ""
+    lappend result [s info domNode]
+    foreach xml {
+        <doc/>
+        <doc><e/></doc>
+        {<doc>unexpected text</doc>}
+        {<doc>unexpected text<e/></doc>}
+        {<doc>unexpected text<unknown/></doc>}
+        <doc><unknown/></doc>
+    } {
+        dom parse $xml doc
+        lappend result [s domvalidate $doc]
+        $doc delete
+    }
+    s delete
+    set result
+} {{} {fromtcl: doc} 1 {fromtcl: doc} 1 {fromtcl: doc} 0 {fromtcl: doc} 0 {fromtcl: doc} 0 {fromtcl: doc} 0}
+
+
+proc schema-26.2 {scmd errortype} {
+    lappend ::result $errortype [[$scmd info domNode] nodeName]
+}
+test schema-26.2 {info domNode} {
+    tdom::schema s
+    s defelement doc {
+        tcl schema-26.1 [self]
+        element e ?
+    }
+    s reportcmd schema-26.2
+    set result ""
+    lappend result [s info domNode]
+    foreach xml {
+        <doc/>
+        <doc><e/></doc>
+        {<doc>unexpected text</doc>}
+        {<doc>unexpected text<e/></doc>}
+        {<doc>unexpected text<unknown/></doc>}
+        <doc><unknown/></doc>
+    } {
+        dom parse $xml doc
+        lappend result [s domvalidate $doc]
+        $doc delete
+    }
+    s delete
+    set result
+} {{} {fromtcl: doc} 1 {fromtcl: doc} 1 {fromtcl: doc} UNEXPECTED_TEXT doc {fromtcl: doc} 1 {fromtcl: doc} UNEXPECTED_TEXT doc {fromtcl: doc} 1 {fromtcl: doc} UNEXPECTED_TEXT doc {fromtcl: doc} UNEXPECTED_ELEMENT unknown 1 {fromtcl: doc} UNEXPECTED_ELEMENT unknown 1}
+
+proc schema-26.3 {scmd errortype} {
+    lappend ::result $errortype [$scmd info domNode]
+}
+test schema-26.3 {info domNode} {
+    tdom::schema s
+    s defelement doc {
+        tcl schema-26.3 [self] "fromTcl"
+        element e ?
+    }
+    s reportcmd schema-26.3
+    set result ""
+    lappend result [s info domNode]
+    foreach xml {
+        <doc/>
+        <doc><e/></doc>
+        {<doc>unexpected text</doc>}
+        {<doc>unexpected text<e/></doc>}
+        {<doc>unexpected text<unknown/></doc>}
+        <doc><unknown/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {{} fromTcl {} 1 fromTcl {} 1 fromTcl {} UNEXPECTED_TEXT {} fromTcl {} 1 fromTcl {} UNEXPECTED_TEXT {} fromTcl {} 1 fromTcl {} UNEXPECTED_TEXT {} fromTcl {} UNEXPECTED_ELEMENT {} 1 fromTcl {} UNEXPECTED_ELEMENT {} 1}
 
 }

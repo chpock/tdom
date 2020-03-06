@@ -192,6 +192,7 @@ typedef struct SchemaData_
     Tcl_HashTable keySpaces;
     XML_Parser parser;
     domNode *node;
+    domNode *insideNode;
     int choiceHashThreshold;
     int attributeHashThreshold;
 } SchemaData;

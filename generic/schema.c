@@ -104,7 +104,7 @@ typedef struct
 } ValidateMethodData;
 
 typedef enum {
-    MATCH_GLOBAL,
+    MATCH_GLOBAL = 1,
     MATCH_ELEMENT_START,
     MATCH_ELEMENT_END,
     MATCH_TEXT,
@@ -114,6 +114,7 @@ typedef enum {
 } ValidationAction;
 
 static char *ValidationAction2str[] = {
+    "NOT_USED",
     "MATCH_GLOBAL",
     "MATCH_ELEMENT_START",
     "MATCH_ELEMENT_END",
@@ -129,7 +130,7 @@ typedef enum {
     MISSING_ATTRIBUTE,
     MISSING_ELEMENT_MATCH_START,
     MISSING_ELEMENT_MATCH_END,
-    MISSING_ELEMENT_MATCH_TEXT,
+    UNEXPECTED_TEXT,
     MISSING_TEXT_MATCH_START,
     MISSING_TEXT_MATCH_END,
     UNEXPECTED_ROOT_ELEMENT,
@@ -151,7 +152,7 @@ static char *ValidationErrorType2str[] = {
     "MISSING_ATTRIBUTE",
     "MISSING_ELEMENT",
     "MISSING_ELEMENT",
-    "MISSING_ELEMENT",
+    "UNEXPECTED_TEXT",
     "MISSING_TEXT",
     "MISSING_TEXT",
     "UNEXPECTED_ROOT_ELEMENT",
@@ -1079,7 +1080,7 @@ recover (
         }
         sdata->vaction = MATCH_ELEMENT_END;
         break;
-    case MISSING_ELEMENT_MATCH_TEXT:
+    case UNEXPECTED_TEXT:
         sdata->vaction = MATCH_TEXT;
         break;
     case INVALID_KEYREF_MATCH_TEXT:
@@ -1125,7 +1126,7 @@ recover (
     case DOM_XPATH_BOOLEAN:
     case MISSING_ATTRIBUTE:
     case MISSING_ELEMENT_MATCH_END:
-    case MISSING_ELEMENT_MATCH_TEXT:
+    case UNEXPECTED_TEXT:
     case MISSING_TEXT_MATCH_START:
     case MISSING_TEXT_MATCH_END:
     case UNEXPECTED_ROOT_ELEMENT:
@@ -2404,7 +2405,7 @@ matchText (
                         }
                     }
                     if (mustMatch (cp->quants[ac], hm)) {
-                        if (recover (interp, sdata, MISSING_ELEMENT_MATCH_TEXT,
+                        if (recover (interp, sdata, UNEXPECTED_TEXT,
                                      NULL, NULL, text, 0)) {
                             break;
                         }
@@ -2422,7 +2423,7 @@ matchText (
                     }
                     popStack (sdata);
                     if (mustMatch (cp->quants[ac], hm)) {
-                        if (recover (interp, sdata, MISSING_ELEMENT_MATCH_TEXT,
+                        if (recover (interp, sdata, UNEXPECTED_TEXT,
                                      NULL, NULL, text, 0)) {
                             break;
                         }
@@ -2464,7 +2465,7 @@ matchText (
                 case SCHEMA_CTYPE_NAME:
                 case SCHEMA_CTYPE_ANY:
                     if (mustMatch (cp->quants[ac], hm)) {
-                        if (recover (interp, sdata, MISSING_ELEMENT_MATCH_TEXT,
+                        if (recover (interp, sdata, UNEXPECTED_TEXT,
                                      NULL, NULL, text, ac)) {
                             break;
                         }
@@ -2477,7 +2478,7 @@ matchText (
                 ac++;
             }
             if (isName) {
-                if (recover (interp, sdata, MISSING_ELEMENT_MATCH_TEXT, NULL,
+                if (recover (interp, sdata, UNEXPECTED_TEXT, NULL,
                              NULL, text, 0)) {
                     return 1;
                 }
@@ -3152,7 +3153,7 @@ validateDOM (
     )
 {
     char *ln;
-    domNode *savednode;
+    domNode *savednode, *savedinsideNode;
 
     if (node->namespace) {
         if (node->ownerDocument->namespaces[node->namespace-1]->prefix[0] == '\0') {
@@ -3203,7 +3204,9 @@ validateDOM (
         if (checkdomKeyConstraints (interp, sdata, node) != TCL_OK)
             return TCL_ERROR;
     }
-    
+
+    savedinsideNode = sdata->insideNode;
+    sdata->insideNode = node;
     node = node->firstChild;
     while (node) {
         switch (node->nodeType) {
@@ -3255,6 +3258,7 @@ validateDOM (
     }
     if (probeElementEnd (interp, sdata) != TCL_OK) return TCL_ERROR;
     sdata->node = savednode;
+    sdata->insideNode = savedinsideNode;
     return TCL_OK;
 }
 
@@ -3310,6 +3314,7 @@ schemaReset (
     }
     sdata->parser = NULL;
     sdata->node = NULL;
+    sdata->insideNode = NULL;
 }
 
 void
@@ -4025,8 +4030,17 @@ schemaInstanceInfoCmd (
 
     case m_domNode:
         if (!sdata->node) break;
-        return tcldom_setInterpAndReturnVar (interp, sdata->node, 0, NULL);
-
+        /* We distinguish between calls from reportCmd and others
+         * (from scripts called with the tcl cmd). */
+        if (sdata->vaction) {
+            /* This is the case: called from reportCmd. */
+            return tcldom_setInterpAndReturnVar (interp, sdata->node, 0, NULL);
+        } else {
+            /* This is the case: called from a with tcl called script. */
+            return tcldom_setInterpAndReturnVar (interp, sdata->insideNode, 0, NULL);
+        }
+        break;
+        
     case m_nrForwardDefinitions:
         if (objc != 2) {
             Tcl_WrongNumArgs(interp, 2, objv, "");
