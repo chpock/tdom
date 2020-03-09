@@ -2335,9 +2335,9 @@ matchText (
 
     DBG(fprintf (stderr, "matchText called with text '%s'\n", text));
     
+    se = sdata->stack;
+    getContext (cp, ac, hm);
     while (1) {
-        se = sdata->stack;
-        getContext (cp, ac, hm);
         switch (cp->type) {
         case SCHEMA_CTYPE_NAME:
             isName = 1;
@@ -2486,6 +2486,9 @@ matchText (
                 return 0;
             }
             popStack (sdata);
+            se = sdata->stack;
+            getContext (cp, ac, hm);
+            ac++;
             continue;
 
         case SCHEMA_CTYPE_KEYSPACE:

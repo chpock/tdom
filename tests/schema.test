@@ -18,7 +18,7 @@
 #    schema-15.*: Constraint cmd tcl
 #    schema-16.*: interleave
 #    schema-17.*: info
-#    schema-18.*: reportcmd
+#    schema-18.*: reportcmd, validation error recover
 #    schema-19.*: keyspace
 #    schema-20.*: domunique
 #    schema-21.*: internal: buffers
@@ -7300,7 +7300,37 @@ test schema-18.15 {info vaction in reportcmd} {
     s delete
     set result
 } {1 INVALID_ATTRIBUTE_VALUE {{<elementend> {}}} MATCH_ATTRIBUTE_TEXT attr2 {} a MISSING_ATTRIBUTE {{<elementend> {}}} MATCH_ELEMENT_START attr1 {} {} 1 UNKNOWN_ATTRIBUTE {{<elementend> {}}} MATCH_ELEMENT_START foo {} {} MISSING_ATTRIBUTE {{<elementend> {}}} MATCH_ELEMENT_START attr1 {} {} 1}
-    
+
+proc appendtoresult {scmd errortype} {
+    lappend ::result $errortype
+}
+test schema-18.16 {unexpected text} {
+    set defs {
+        {
+            defelement doc {
+                ref r1
+            }
+            defpattern r1 {
+                element e ? {}
+            }
+        }
+        {
+            defelement doc {
+                element e ? {}
+            }
+        }
+    }
+    set result [list]
+    foreach def $defs {
+        tdom::schema s
+        s reportcmd appendtoresult
+        s define $def
+        lappend result [s validate {<doc>unexpected text<e/></doc>}]
+        s delete
+    }
+    set result
+} {UNEXPECTED_TEXT 1 UNEXPECTED_TEXT 1}
+
 proc validatedSAX {g xml {keepEmpties 1}} {
     set args [list -validateCmd $g]
     if {!$keepEmpties} {
