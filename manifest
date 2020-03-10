@@ -1,5 +1,5 @@
-C A\sbit\sbetter\s(and\smore\scorrect)\sdocumentation\sof\sthe\sinfo\sdomNode\smethod.
-D 2020-03-10T20:27:00.727
+C Pacified\scompiler,\swhich\s(rightly)\ssaw\sthat\stwo\svariables\smay\sbe\sused\suninitialized\sin\sa\sfunction\scall\sbut\sdidn't\srealize\sthat\sthis\svariables\sare\snot\sused\sby\sthe\scalled\sfunction,\sin\sthe\scode\spath\sthat\slet\sthe\svariables\suninitialized.
+D 2020-03-10T21:14:20.353
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -130,7 +130,7 @@ F generic/domxslt.h 0cb8e327683a0ffeb2a7094add6cd82ec1ae49c7c704f20d8d6f7d6523e7
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c ee14ed666ca6d18977f7301545c52ac71b3ce73c49233ff8f8b3aa4144008d24
 F generic/nodecmd.h d2201b69de9507f86e94750f0b72867ec9150795712ef18c5b5b87f35a689f75
-F generic/schema.c 1ae17dd058a0edc7e00a641c0032fabed212524eae610b6decfe1dd778c1c415
+F generic/schema.c 8d55ab7aa69a73769117a326b87fe3b1ba9d683d7d90b05dc6e84a31165f4835
 F generic/schema.h 8a5e7c94a91bd816622ff542e8580a762304de79faa115c74421f0e3d1100fbe
 F generic/tcldom.c 8bb158abda4b8d039e0528a347f54cd3c9ad04abf10eb214a996bc1e5546d18b
 F generic/tcldom.h c8bda18533dcfeb0dde99bc7fa2cd2fc19cb90239538a65ee98bb8e9dd4d8ad6
@@ -224,8 +224,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 63d2a7101fa256f2a5e4d81d0012c5dcb7f4c16945430fb88aca542a6b8ee846
-R 9681fe63c8805666285815c4e4b44035
+P 52fa6690b24bf793f17e0064259249a7261bbe9af3ffb927f01a925024720c59
+R cef96aaa75fc022a62b0a5a573aee41c
 U rolf
-Z 936e227563a1d40318279e8f439ec509
+Z 88f6a8b68a3b0abcd4696508e6c99331
 # Remove this line to create a well-formed Fossil manifest.

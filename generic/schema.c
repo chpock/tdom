@@ -4947,6 +4947,7 @@ AnyPatternObjCmd (
     checkNrArgs (1,3,"?namespace? ?quant?");
     if (objc == 1) {
         quant = SCHEMA_CQUANT_ONE;
+        n = 0; m = 0;
     } else if (objc == 2) {    
         quant = getQuant (interp, sdata, objv[1], &n, &m);
         if (quant == SCHEMA_CQUANT_ERROR) {
