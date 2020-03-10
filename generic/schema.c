@@ -3292,7 +3292,7 @@ schemaReset (
              h != NULL;
              h = Tcl_NextHashEntry (&search)) {
             dk = Tcl_GetHashValue (h);
-            if (&dk->ids.numEntries) {
+            if ((&dk->ids)->numEntries) {
                 Tcl_DeleteHashTable (&dk->ids);
                 Tcl_InitHashTable (&dk->ids, TCL_STRING_KEYS);
                 dk->unknownIDrefs = 0;
