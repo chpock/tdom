@@ -7685,6 +7685,20 @@ test schema-20.6 {domunique} {
     set result
 } {1 DOM_KEYCONSTRAINT itemunique foo doc 1}
 
+test schema-20.7 {domunique} {
+    tdom::schema s
+    set result [catch {s define {
+        defelement doc {
+            domunique item {}
+            element item * {
+                attribute ref ?
+            }
+        }
+    }}]
+    s delete
+    set result
+} {1}
+
 test schema-21.1 {CONTENT_ARRAY_SIZE_INIT} {
     tdom::schema s
     s defelement doc {

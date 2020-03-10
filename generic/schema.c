@@ -3295,7 +3295,7 @@ schemaReset (
              h != NULL;
              h = Tcl_NextHashEntry (&search)) {
             dk = Tcl_GetHashValue (h);
-            if (&dk->ids.numEntries) {
+            if ((&dk->ids)->numEntries) {
                 Tcl_DeleteHashTable (&dk->ids);
                 Tcl_InitHashTable (&dk->ids, TCL_STRING_KEYS);
                 dk->unknownIDrefs = 0;
@@ -4950,6 +4950,7 @@ AnyPatternObjCmd (
     checkNrArgs (1,3,"?namespace? ?quant?");
     if (objc == 1) {
         quant = SCHEMA_CQUANT_ONE;
+        n = 0; m = 0;
     } else if (objc == 2) {    
         quant = getQuant (interp, sdata, objv[1], &n, &m);
         if (quant == SCHEMA_CQUANT_ERROR) {
@@ -5527,8 +5528,7 @@ domuniquePatternObjCmd (
         return TCL_ERROR;
     }
     if (nrFields == 0) {
-        SetResult ("Non empty fieldlist arugment expected.");
-        xpathFreeAst (t);
+        SetResult ("Non empty fieldlist argument expected.");
         return TCL_ERROR;
     }
     if (objc == 5) {
