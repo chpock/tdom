@@ -286,9 +286,11 @@
                   <optname>domNode</optname>
                   <desc>If the schema command isn't currently
                   post-validating a DOM tree this method returns the
-                  emtpy string. Otherwise, it returns the node on
-                  which the validation engine is currently looking at
-                  in case, the node is an ELEMENT_NODE or the parent
+                  emtpy string. Otherwise, if the schema command waits
+                  for the reportcmd script to finish while recovering
+                  from a validation error it returns the node on which
+                  the validation engine is currently looking at in
+                  case, the node is an ELEMENT_NODE or the parent
                   node, if not. It is recommended that you don't use
                   this method. Or at least leave the DOM tree alone,
                   use it read-only.</desc>
