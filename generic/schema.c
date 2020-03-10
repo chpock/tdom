@@ -5525,8 +5525,7 @@ domuniquePatternObjCmd (
         return TCL_ERROR;
     }
     if (nrFields == 0) {
-        SetResult ("Non empty fieldlist arugment expected.");
-        xpathFreeAst (t);
+        SetResult ("Non empty fieldlist argument expected.");
         return TCL_ERROR;
     }
     if (objc == 5) {
