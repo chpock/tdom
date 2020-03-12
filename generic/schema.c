@@ -2032,7 +2032,7 @@ static int checkElementEnd (
 {
     SchemaValidationStack *se;
     SchemaCP *cp, *ic;
-    int hm, ac, i, mayMiss, rc;
+    int hm, ac, i, mayskip, rc;
     int isName = 0;
 
     DBG(fprintf (stderr, "checkElementEnd:\n");
@@ -2096,10 +2096,10 @@ static int checkElementEnd (
                 break;
 
             case SCHEMA_CTYPE_CHOICE:
-                mayMiss = 0;
+                mayskip = 0;
                 for (i = 0; i < cp->content[ac]->nc; i++) {
                     if (mayMiss (cp->content[ac]->quants[i])) {
-                        mayMiss = 1;
+                        mayskip = 1;
                         break;
                     }
                     ic = cp->content[ac]->content[i];
@@ -2110,7 +2110,7 @@ static int checkElementEnd (
                                 continue;
                             }
                         }
-                        mayMiss = 1;
+                        mayskip = 1;
                         break;
 
                     case SCHEMA_CTYPE_NAME:
@@ -2121,7 +2121,7 @@ static int checkElementEnd (
                     case SCHEMA_CTYPE_PATTERN:
                         pushToStack (sdata, ic);
                         if (checkElementEnd (interp, sdata)) {
-                            mayMiss = 1;
+                            mayskip = 1;
                         }
                         popStack (sdata);
                         break;
@@ -2133,9 +2133,9 @@ static int checkElementEnd (
                         Tcl_Panic ("Invalid CTYPE in MIXED or CHOICE");
                         
                     }
-                    if (mayMiss) break;
+                    if (mayskip) break;
                 }
-                if (mayMiss) break;
+                if (mayskip) break;
                 if (!recover (interp, sdata, MISSING_ELEMENT_MATCH_END, NULL,
                               NULL, NULL, 0)) {
                     return 0;
@@ -2331,7 +2331,7 @@ matchText (
 {
     SchemaCP *cp, *candidate, *ic;
     SchemaValidationStack *se;
-    int ac, hm, isName = 0, i;
+    int ac, hm, isName = 0, i, mayskip;
 
     DBG(fprintf (stderr, "matchText called with text '%s'\n", text));
     
@@ -2502,7 +2502,13 @@ matchText (
             break;
 
         case SCHEMA_CTYPE_INTERLEAVE:
+            mayskip = 1;
             for (i = 0; i < cp->nc; i++) {
+                if (se->interleaveState[i]) {
+                    if (maxOne (cp->quants[i])) continue;
+                } else {
+                    if (minOne (cp->quants[i])) mayskip = 0;
+                }
                 ic = cp->content[i];
                 switch (ic->type) {
                 case SCHEMA_CTYPE_TEXT:
@@ -2539,10 +2545,24 @@ matchText (
                     
                 }
             }
-            break;
+            if (!mayskip) {
+                if (recover (interp, sdata, UNEXPECTED_TEXT, NULL, NULL, text,
+                             ac)) {
+                    break;
+                }
+                SetResultV ("Unexpected text content");
+                return 0;
+            }
+            popStack (sdata);
+            se = sdata->stack;
+            getContext (cp, ac, hm);
+            ac++;
+            continue;
         }
+        /* Not reached, but this is inside a while (1) {} loop ...*/
         break;
     }
+    /* Not reached, but at least makes the compiler happy. */
     return 0;
 }
 
