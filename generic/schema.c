@@ -292,7 +292,13 @@ static void SetActiveSchemaData (SchemaData *v)
         SetResult ("This method is not allowed in nested evaluation");  \
         return TCL_ERROR;                                               \
     }
-    
+
+#define CHECK_REWIND                                                    \
+    if (sdata->rewind) {                                                \
+        rewindStack (sdata);                                            \
+        sdata->rewind = 0;                                              \
+    }                                                                   \
+
 #define REMEMBER_PATTERN(pattern)                                       \
     if (sdata->numPatternList == sdata->patternListSize) {              \
         sdata->patternList = (SchemaCP **) REALLOC (                    \
@@ -351,10 +357,12 @@ static void SetActiveSchemaData (SchemaData *v)
     }                                             \
 
 
-#define updateStack(se,cp,ac)                     \
-    se->activeChild = ac;                         \
-    se->hasMatched = 1;                           \
-
+#define updateStack(sdata,cp,ac)                  \
+    if (!sdata->rewind) {                         \
+        se->activeChild = ac;                     \
+        se->hasMatched = 1;                       \
+    }                                             \
+    
 static SchemaCP*
 initSchemaCP (
     Schema_CP_Type type,
@@ -1011,6 +1019,14 @@ finalizeElement (
     }
 }
 
+static void
+rewindStack (
+    SchemaData *sdata
+    ) 
+{
+    return;
+}
+
 static int 
 recover (
     Tcl_Interp *interp,
@@ -1122,11 +1138,13 @@ recover (
         finalizeElement (sdata, ac+1);
         sdata->skipDeep = 2;
         break;
+    case UNEXPECTED_TEXT:
+        sdata->rewind = 1;
+        break;
     case DOM_KEYCONSTRAINT:
     case DOM_XPATH_BOOLEAN:
     case MISSING_ATTRIBUTE:
     case MISSING_ELEMENT_MATCH_END:
-    case UNEXPECTED_TEXT:
     case MISSING_TEXT_MATCH_START:
     case MISSING_TEXT_MATCH_END:
     case UNEXPECTED_ROOT_ELEMENT:
@@ -1235,7 +1253,7 @@ matchElementStart (
                     candidate->namespace != namespace) {
                     break;
                 }
-                updateStack (se, cp, ac);
+                updateStack (sdata, cp, ac);
                 sdata->skipDeep = 1;
                 /* See comment in probeElement: sdata->vname and
                  * sdata->vns may be pre-filled. We reset it here.*/
@@ -1250,7 +1268,7 @@ matchElementStart (
                 if (candidate->name == name
                     && candidate->namespace == namespace) {
                     pushToStack (sdata, candidate);
-                    updateStack (se, cp, ac);
+                    updateStack (sdata, cp, ac);
                     return 1;
                 }
                 break;
@@ -1263,7 +1281,7 @@ matchElementStart (
                         icp = Tcl_GetHashValue (h);
                         if (icp->namespace == namespace) {
                             pushToStack (sdata, icp);
-                            updateStack (se, cp, ac);
+                            updateStack (sdata, cp, ac);
                             return 1;
                         }
                     }
@@ -1281,7 +1299,7 @@ matchElementStart (
                         if (icp->namespace && icp->namespace != namespace) {
                             break;
                         }
-                        updateStack (se, cp, ac);
+                        updateStack (sdata, cp, ac);
                         sdata->skipDeep = 1;
                         /* See comment in probeElement: sdata->vname
                          * and sdata->vns may be pre-filled. We reset it
@@ -1294,7 +1312,7 @@ matchElementStart (
                         if (icp->name == name
                             && icp->namespace == namespace) {
                             pushToStack (sdata, icp);
-                            updateStack (se, cp, ac);
+                            updateStack (sdata, cp, ac);
                             return 1;
                         }
                         break;
@@ -1307,7 +1325,7 @@ matchElementStart (
                         pushToStack (sdata, icp);
                         rc = matchElementStart (interp, sdata, name, namespace);
                         if (rc == 1) {
-                            updateStack (se, cp, ac);
+                            updateStack (sdata, cp, ac);
                             return 1;
                         }
                         popStack (sdata);
@@ -1339,7 +1357,7 @@ matchElementStart (
                 pushToStack (sdata, candidate);
                 rc = matchElementStart (interp, sdata, name, namespace);
                 if (rc == 1) {
-                    updateStack (se, cp, ac);
+                    updateStack (sdata, cp, ac);
                     return 1;
                 }
                 popStack (sdata);
@@ -2348,13 +2366,13 @@ matchText (
                 switch (candidate->type) {
                 case SCHEMA_CTYPE_TEXT:
                     if (checkText (interp, candidate, text)) {
-                        updateStack (se, cp, ac);
+                        updateStack (sdata, cp, ac);
                         return 1;
                     }
                     if (sdata->evalError) return 0;
                     if (recover (interp, sdata, INVALID_VALUE, NULL, NULL,
                                  text, ac)) {
-                        updateStack (se, cp, ac);
+                        updateStack (sdata, cp, ac);
                         return 1;
                     }
                     SetResult ("Invalid text content");
@@ -2362,7 +2380,7 @@ matchText (
 
                 case SCHEMA_CTYPE_CHOICE:
                     if (candidate->flags & MIXED_CONTENT) {
-                        updateStack (se, cp, ac);
+                        updateStack (sdata, cp, ac);
                         return 1;
                     }
                     for (i = 0; i < candidate->nc; i++) {
@@ -2370,7 +2388,7 @@ matchText (
                         switch (ic->type) {
                         case SCHEMA_CTYPE_TEXT:
                             if (checkText (interp, ic, text)) {
-                                updateStack (se, cp, ac);
+                                updateStack (sdata, cp, ac);
                                 return 1;
                             }
                             break;
@@ -2383,7 +2401,7 @@ matchText (
                         case SCHEMA_CTYPE_PATTERN:
                             pushToStack (sdata, ic);
                             if (matchText (interp, sdata, text)) {
-                                updateStack (se, cp, ac);
+                                updateStack (sdata, cp, ac);
                                 return 1;
                             }
                             popStack (sdata);
@@ -2418,7 +2436,7 @@ matchText (
                 case SCHEMA_CTYPE_PATTERN:
                     pushToStack (sdata, candidate);
                     if (matchText (interp, sdata, text)) {
-                        updateStack (se, cp, ac);
+                        updateStack (sdata, cp, ac);
                         return 1;
                     }
                     popStack (sdata);
@@ -2527,7 +2545,7 @@ matchText (
                 case SCHEMA_CTYPE_PATTERN:
                     pushToStack (sdata, ic);
                     if (matchText (interp, sdata, text)) {
-                        updateStack (se, cp, ac);
+                        updateStack (sdata, cp, ac);
                         return 1;
                     }
                     popStack (sdata);
@@ -2591,6 +2609,7 @@ probeText (
 
     if (sdata->stack->pattern->flags & CONSTRAINT_TEXT_CHILD) {
         if (matchText (interp, sdata, text)) {
+            CHECK_REWIND;
             return TCL_OK;
         }
     } else {
@@ -2609,6 +2628,7 @@ probeText (
         }
         if (only_whites)  return TCL_OK;
         if (matchText (interp, sdata, text)) {
+            CHECK_REWIND;
             return TCL_OK;
         }
     }
@@ -3297,6 +3317,7 @@ schemaReset (
 
     while (sdata->stack) popStack (sdata);
     while (sdata->lastMatchse) popFromStack (sdata, &sdata->lastMatchse);
+    sdata->rewind = 0;
     sdata->validationState = VALIDATION_READY;
     sdata->skipDeep = 0;
     sdata->evalError = 0;
