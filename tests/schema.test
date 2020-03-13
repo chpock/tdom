@@ -6325,6 +6325,26 @@ test schema-17.5 {info expected} {
     lsort $result
 } {a b c musthave toplevel}
 
+test schema-17.5a {info expected} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            choice ? {
+                element a
+                element c
+                element b
+            }
+            element toplevel ?
+            element musthave
+            element aftermust
+        }
+    }
+    s event start doc
+    set result [s info expected -ignorematched]
+    s delete
+    lsort $result
+} {a b c musthave toplevel}
+
 test schema-17.6 {info expected} {
     tdom::schema s
     s prefixns {foo http://foo.bar}
@@ -6348,6 +6368,29 @@ test schema-17.6 {info expected} {
     lsort $result
 } {a b c {musthave http://foo.bar} toplevel}
 
+test schema-17.6a {info expected} {
+    tdom::schema s
+    s prefixns {foo http://foo.bar}
+    s define {
+        defelement doc {
+            choice ? {
+                element a
+                element c
+                element b
+            }
+            element toplevel ?
+            namespace foo {
+                element musthave
+            }
+            element aftermust
+        }
+    }
+    s event start doc
+    set result [s info expected -ignorematched]
+    s delete
+    lsort $result
+} {a b c {musthave http://foo.bar} toplevel}
+
 test schema-17.7 {info expected} {
     tdom::schema s
     s prefixns {foo http://foo.bar}
@@ -6367,6 +6410,29 @@ test schema-17.7 {info expected} {
     }
     s event start doc
     set result [s info expected]
+    s delete
+    lsort $result
+} {a b c {musthave http://foo.bar} toplevel {{#text} {}}}
+
+test schema-17.7a {info expected} {
+    tdom::schema s
+    s prefixns {foo http://foo.bar}
+    s define {
+        defelement doc {
+            mixed {
+                element a
+                element c
+                element b
+            }
+            element toplevel ?
+            namespace foo {
+                element musthave
+            }
+            element aftermust
+        }
+    }
+    s event start doc
+    set result [s info expected -ignorematched]
     s delete
     lsort $result
 } {a b c {musthave http://foo.bar} toplevel {{#text} {}}}
@@ -6395,6 +6461,34 @@ test schema-17.8 {info expected} {
     s event start c
     s event end
     lappend result {*}[lsort [s info expected]]
+    s delete
+    set result
+} {doc a b c doc a b c musthave toplevel musthave toplevel}
+
+test schema-17.8a {info expected} {
+    tdom::schema s
+    s defelement doc {
+        choice ? {
+            element a
+            element c
+            element b
+        }
+        element toplevel ?
+        element musthave
+        element aftermust
+    }
+    set result [s info expected -ignorematched]
+    s define {
+        foreach elm {a b c} {
+            defelement $elm {}
+        }
+    }
+    lappend result {*}[lsort [s info expected -ignorematched]]
+    s event start doc
+    lappend result {*}[lsort [s info expected -ignorematched]]
+    s event start c
+    s event end
+    lappend result {*}[lsort [s info expected -ignorematched]]
     s delete
     set result
 } {doc a b c doc a b c musthave toplevel musthave toplevel}
@@ -6465,6 +6559,44 @@ test schema-17.10 {info expected interleave} {
     set result
 } {a b c a b c d a b c d}
 
+test schema-17.10a {info expected interleave} {
+    set defs {
+        {
+            interleave {
+                element a ?
+                element b
+                element c ?
+            }
+            element d
+        }
+        {
+            interleave {
+                element a ?
+                element b ?
+                element c ?
+            }
+            element d
+        }
+        {
+            interleave ? {
+                element a ?
+                element b
+                element c ?
+            }
+            element d
+        }
+    }
+    set result [list]
+    foreach def $defs {
+        tdom::schema s
+        s defelement doc $def
+        s event start doc
+        lappend result {*}[lsort [s info expected -ignorematched]]
+        s delete
+    }
+    set result
+} {a b c a b c d a b c d}
+
 test schema-17.11 {info expected} {
     set defs {
         {
@@ -6489,6 +6621,30 @@ test schema-17.11 {info expected} {
     set result
 } {a b c d}
 
+test schema-17.11a {info expected} {
+    set defs {
+        {
+            group + {
+                element c ?
+                element a ?
+                element b ?
+            }
+            element d
+        }
+    }
+    set result [list]
+    foreach def $defs {
+        tdom::schema s
+        s defelement doc $def
+        s event start doc
+        s event start b
+        s event end
+        set result [lsort [s info expected -ignorematched]]
+        s delete
+    }
+    set result
+} {a b c d}
+
 test schema-17.12 {info expected} {
     tdom::schema s
     s define {
@@ -6507,6 +6663,28 @@ test schema-17.12 {info expected} {
     s event start something
     s event end
     lappend result {*}[lsort [s info expected]]
+    s delete
+    set result
+} {{<any> {}} {<any> http://foo.bar} {<elementend> {}} b}
+
+test schema-17.12a {info expected} {
+    tdom::schema s
+    s define {
+        prefixns {ns1 http://foo.bar}
+        defelement doc {
+            element a
+            any
+            any ns1 ?
+            element b ?
+        }
+    }
+    s event start doc
+    s event start a
+    s event end
+    set result [lsort [s info expected -ignorematched]]
+    s event start something
+    s event end
+    lappend result {*}[lsort [s info expected -ignorematched]]
     s delete
     set result
 } {{<any> {}} {<any> http://foo.bar} {<elementend> {}} b}
@@ -6557,11 +6735,85 @@ test schema-17.13 {info expected} {
     set result
 } {0/0: 1 a 0/1: 1 0/2: 1 a 0/3: 1 0/4: 1 a 0/5: 1 {<elementend> {}} b 1/0: 1 a b 1/1: 1 b 1/2: 1 1/3: 1 1/4: 1 a b 1/5: 1 b 2/0: 1 2/1: 1 2/2: 1 2/3: 1 2/4: 1 {<elementend> {}} a b 2/5: 1 {<elementend> {}} b}
 
+proc schema-17.13a {scmd args} {
+    global fromReportCmd
+    set fromReportCmd [lsort [$scmd info expected -ignorematched]]
+}
+test schema-17.13a {info expected} {
+    set defs {
+        {
+            element a
+            element b ?
+        }
+        {
+            element a ?
+            element b
+        }
+        {
+            element a ?
+            element b ?
+        }
+    }
+    set xmlinput {
+        <doc/>
+        <doc><a/></doc>
+        <doc><b/></doc>
+        <doc><a/><b/></doc>
+        <doc><unknown/></doc>
+        <doc><a/><unknown/></doc>
+    }
+    set result [list]
+    set defnr 0
+    foreach def $defs {
+        tdom::schema s
+        s defelement doc $def
+        s reportcmd schema-17.13
+        set xmlnr 0
+        foreach xml $xmlinput {
+            set fromReportCmd ""
+            lappend result $defnr/$xmlnr: [s validate $xml errMsg]
+            lappend result {*}$fromReportCmd
+            incr xmlnr
+        }
+        s delete
+        incr defnr
+    }
+    set result
+} {0/0: 1 a 0/1: 1 0/2: 1 a 0/3: 1 0/4: 1 a 0/5: 1 {<elementend> {}} b 1/0: 1 a b 1/1: 1 b 1/2: 1 1/3: 1 1/4: 1 a b 1/5: 1 b 2/0: 1 2/1: 1 2/2: 1 2/3: 1 2/4: 1 {<elementend> {}} a b 2/5: 1 {<elementend> {}} b}
+
 proc schema-17.14 {scmd args} {
     global result
     lappend result {*}[lsort [$scmd info expected]]
 }
 test schema-17.14 {info expected} {
+    set defs {
+        {
+            group + {
+                element c ?
+                element a ?
+                element b ?
+            }
+            tcl schema-17.14 [self]
+            element d
+        }
+    }
+    set result [list]
+    foreach def $defs {
+        tdom::schema s
+        s reportcmd schema-17.14
+        s defelement doc $def
+        s event start doc
+        s event start unknownElement
+        s delete
+    }
+    set result
+} {a b c d a b c d}
+
+proc schema-17.14a {scmd args} {
+    global result
+    lappend result {*}[lsort [$scmd info expected -ignorematched]]
+}
+test schema-17.14a {info expected} {
     set defs {
         {
             group + {
