@@ -3515,7 +3515,7 @@ getNextExpectedWorker (
     SchemaValidationStack *se1;
 
     getContext (cp, ac, hm);
-    if (ignoreMatched) {
+    if (ignoreMatched && hm) {
         ac++;
     } else {
         if (hm && maxOne(cp->quants[ac])) ac++;
