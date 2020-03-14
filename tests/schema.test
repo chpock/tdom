@@ -3506,6 +3506,25 @@ test schema-11.10a {attribute} {
     set result
 } {MISSING_ATTRIBUTE abc {} 1 1 MISSING_ATTRIBUTE abc http://foo.bar 1 UNKNOWN_ATTRIBUTE abc http://bar.grill 1 MISSING_ATTRIBUTE abc {} 1 1 UNKNOWN_ATTRIBUTE abc http://bar.grill 1}
 
+proc schema-11.11 {scmd errType} {
+    lappend ::result $errType
+}
+test schema-11.11 {attribute - required missing} {
+    tdom::schema s
+    s defelement doc {
+        element a + {
+            attribute mode
+        }
+    }
+    s reportcmd schema-11.11
+    set result ""
+    set doc [dom parse <doc><a/></doc>]
+    lappend result [s domvalidate $doc]
+    $doc delete
+    s delete
+    set result
+} {MISSING_ATTRIBUTE 1}
+
 test schema-12.1 {domvalidate} {
     tdom::schema s 
     s define {

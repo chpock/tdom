@@ -3192,10 +3192,14 @@ validateDOM (
             }
         } else {
             if (sdata->stack->pattern->numReqAttr) {
-                /* probeDomAttributes fills interp result with a msg which
-                 * required attributes are missing. */
-                probeDomAttributes (interp, sdata, NULL);
-                return TCL_ERROR;
+                /* probeDomAttributes fills interp result with a msg
+                 * which required attributes are missing in case of no
+                 * reportCmd. In case of reportCmd
+                 * probeDomAttributes() returns only error in the case
+                 * of error in called scripts. */
+                if (probeDomAttributes (interp, sdata, NULL) != TCL_OK) {
+                    return TCL_ERROR;
+                }
             }
         }
     }
