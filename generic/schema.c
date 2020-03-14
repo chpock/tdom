@@ -3521,6 +3521,7 @@ getNextExpectedWorker (
     getContext (cp, ac, hm);
     if (ignoreMatched && hm) {
         ac++;
+        hm = 0;
     } else {
         if (hm && maxOne(cp->quants[ac])) ac++;
     }
@@ -3902,10 +3903,11 @@ schemaInstanceInfoCmd (
             return TCL_ERROR;
         }
         ignoreMatched = 0;
-        if (objc == 3
-            && strcmp (Tcl_GetString (objv[2]), "-ignorematched") != 0) {
-            SetResult ("Expected -ignorematched");
-            return TCL_ERROR;
+        if (objc == 3) {
+            if (strcmp (Tcl_GetString (objv[2]), "-ignorematched") != 0) {
+                SetResult ("Expected -ignorematched");
+                return TCL_ERROR;
+            }
             ignoreMatched = 1;
         }
         

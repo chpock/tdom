@@ -6662,7 +6662,7 @@ test schema-17.11a {info expected} {
         s delete
     }
     set result
-} {a b c d}
+} {d}
 
 test schema-17.12 {info expected} {
     tdom::schema s
@@ -6991,7 +6991,7 @@ test schema-17.16a {info expected} {
     }
     s delete
     set result
-} {0 0 1 1 aaaa b bb bbb bbbb 1 aaaa b bb bbb bbbb 1}
+} {0 0 1 1 aaaa b bb bbb bbbb 1 b bb bbb bbbb 1}
 
 test schema-17.16a_1 {info expected} {
     tdom::schema s
@@ -7029,7 +7029,7 @@ test schema-17.16a_1 {info expected} {
     }
     s delete
     set result
-} {0 0 1 1 aaaa b bb bbb bbbb 1 aaaa b bb bbb bbbb 1}
+} {0 0 1 1 aaaa b bb bbb bbbb 1 b bb bbb bbbb 1}
 
 test schema-17.16b {info expected} {
     tdom::schema s
@@ -7237,6 +7237,38 @@ test schema-17.20 {info stack associated} {
     s delete
     set result
 } {{} 1 1 1 {fo bar baz} 1 {} 1}
+
+proc schema-17.21 {scmd errorInfo} {
+    lappend ::result [$scmd info expected]
+}
+test schema-17.21 {info expected} {
+    tdom::schema s
+    s defelement doc {
+        element a + {}
+        element b ! {}
+    }
+    s reportcmd schema-17.21
+    set result ""
+    lappend result [s validate {<doc><a/><unexpected/></doc>}]
+    s delete
+    set result
+} {{a b} 1}
+
+proc schema-17.21a {scmd errorInfo} {
+    lappend ::result [$scmd info expected -ignorematched]
+}
+test schema-17.21a {info expected} {
+    tdom::schema s
+    s defelement doc {
+        element a + {}
+        element b ! {}
+    }
+    s reportcmd schema-17.21a
+    set result ""
+    lappend result [s validate {<doc><a/><unexpected/></doc>}]
+    s delete
+    set result
+} {b 1}
 
 proc schema-18 {args} {
     lappend ::result {*}$args
