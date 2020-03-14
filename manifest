@@ -1,5 +1,5 @@
-C Fixed\sbug\sin\scase\sof\smissing\srequired\sattributes\sw/\sreportCmd.
-D 2020-03-14T02:45:27.146
+C Gardening.
+D 2020-03-14T02:48:04.374
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -130,7 +130,7 @@ F generic/domxslt.h 0cb8e327683a0ffeb2a7094add6cd82ec1ae49c7c704f20d8d6f7d6523e7
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c ee14ed666ca6d18977f7301545c52ac71b3ce73c49233ff8f8b3aa4144008d24
 F generic/nodecmd.h d2201b69de9507f86e94750f0b72867ec9150795712ef18c5b5b87f35a689f75
-F generic/schema.c c35612c69abcd25d42771fe646295948b1e408c0ca0d4fc10b0f63fb51220f49
+F generic/schema.c 329e12acbbd700ce03f15fe007c4fae052d1908cd729de638bfae85884a7fd80
 F generic/schema.h 8a5e7c94a91bd816622ff542e8580a762304de79faa115c74421f0e3d1100fbe
 F generic/tcldom.c 8bb158abda4b8d039e0528a347f54cd3c9ad04abf10eb214a996bc1e5546d18b
 F generic/tcldom.h c8bda18533dcfeb0dde99bc7fa2cd2fc19cb90239538a65ee98bb8e9dd4d8ad6
@@ -224,8 +224,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f552cf0e3e0b823bd292bb0eecc9471d8f5a9f1d9e90090575fa296db05ed4c6
-R cf7adc0cd6dad3a5a9f49ea5da3e2329
+P c24f9bedb36e8a5c4882166c748597ef4be4b2d511f487659cbfca69db8ebd8b
+R 69557286ed0bcdc836ea37616082baa5
 U rolf
-Z 3c77eeb93130399332ca09ef5596176e
+Z 444428c6af432ad31785a1f33fe9c15c
 # Remove this line to create a well-formed Fossil manifest.

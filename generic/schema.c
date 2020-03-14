@@ -3198,7 +3198,6 @@ validateDOM (
                  * probeDomAttributes() returns only error in the case
                  * of error in called scripts. */
                 if (probeDomAttributes (interp, sdata, NULL) != TCL_OK) {
-                    /* fprintf (stderr, "HIER\n"); */
                     return TCL_ERROR;
                 }
             }
