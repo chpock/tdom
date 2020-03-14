@@ -3235,10 +3235,14 @@ validateDOM (
             }
         } else {
             if (sdata->stack->pattern->numReqAttr) {
-                /* probeDomAttributes fills interp result with a msg which
-                 * required attributes are missing. */
-                probeDomAttributes (interp, sdata, NULL);
-                return TCL_ERROR;
+                /* probeDomAttributes fills interp result with a msg
+                 * which required attributes are missing in case of no
+                 * reportCmd. In case of reportCmd
+                 * probeDomAttributes() returns only error in the case
+                 * of error in called scripts. */
+                if (probeDomAttributes (interp, sdata, NULL) != TCL_OK) {
+                    return TCL_ERROR;
+                }
             }
         }
     }
@@ -3550,7 +3554,8 @@ getNextExpectedWorker (
     SchemaValidationStack *se,
     Tcl_Interp *interp,
     Tcl_HashTable *seenCPs,
-    Tcl_Obj *rObj
+    Tcl_Obj *rObj,
+    int ignoreMatched
     )
 {
     int ac, hm, i, hnew, mustMatch, mayskip, rc = 1;
@@ -3558,7 +3563,12 @@ getNextExpectedWorker (
     SchemaValidationStack *se1;
 
     getContext (cp, ac, hm);
-    if (hm && maxOne(cp->quants[ac])) ac++;
+    if (ignoreMatched && hm) {
+        ac++;
+        hm = 0;
+    } else {
+        if (hm && maxOne(cp->quants[ac])) ac++;
+    }
     switch (cp->type) {
     case SCHEMA_CTYPE_INTERLEAVE:
         ac = 0;
@@ -3586,7 +3596,8 @@ getNextExpectedWorker (
                 if (hnew) {
                     se1 = getStackElement (sdata, ic);
                     mayskip = getNextExpectedWorker (sdata, se1, interp,
-                                                     seenCPs, rObj);
+                                                     seenCPs, rObj,
+                                                     ignoreMatched);
                     repoolStackElement (sdata, se1);
                 }
                 break;
@@ -3623,7 +3634,8 @@ getNextExpectedWorker (
                         if (hnew) {
                             se1 = getStackElement (sdata, ic);
                             mayskip = getNextExpectedWorker (
-                                sdata, se1, interp, seenCPs, rObj
+                                sdata, se1, interp, seenCPs, rObj,
+                                ignoreMatched
                                 );
                             repoolStackElement (sdata, se1);
                         }
@@ -3731,7 +3743,8 @@ unifyMatchList (
 static void
 getNextExpected (
     SchemaData *sdata,
-    Tcl_Interp *interp
+    Tcl_Interp *interp,
+    int         ignoreMatched
     )
 {
     int remainingLastMatch, count, rc;
@@ -3748,7 +3761,8 @@ getNextExpected (
             remainingLastMatch++;
             se = se->down;
         }
-        while (se && getNextExpectedWorker (sdata, se, interp, &localHash, rObj)) {
+        while (se && getNextExpectedWorker (sdata, se, interp, &localHash, rObj,
+                   ignoreMatched)) {
             if (remainingLastMatch) {
                 count = 1;
                 se = sdata->lastMatchse;
@@ -3763,7 +3777,8 @@ getNextExpected (
     
     se = sdata->stack;
     while (se) {
-        rc = getNextExpectedWorker (sdata, se, interp, &localHash, rObj);
+        rc = getNextExpectedWorker (sdata, se, interp, &localHash, rObj,
+                                    ignoreMatched);
         if (se->pattern->type == SCHEMA_CTYPE_NAME) break;
         se = se->down;
         if (!rc) {
@@ -3784,7 +3799,7 @@ schemaInstanceInfoCmd (
     Tcl_Obj *const objv[]
     )
 {
-    int methodIndex;
+    int methodIndex, ignoreMatched;
     long line, column;
     Tcl_HashEntry *h;
     SchemaCP *cp;
@@ -3927,10 +3942,19 @@ schemaInstanceInfoCmd (
         return TCL_OK;
 
     case m_expected:
-        if (objc != 2) {
-            Tcl_WrongNumArgs (interp, 2, objv, "");
+        if (objc != 2 && objc != 3) {
+            Tcl_WrongNumArgs (interp, 2, objv, "?-ignorematched?");
             return TCL_ERROR;
         }
+        ignoreMatched = 0;
+        if (objc == 3) {
+            if (strcmp (Tcl_GetString (objv[2]), "-ignorematched") != 0) {
+                SetResult ("Expected -ignorematched");
+                return TCL_ERROR;
+            }
+            ignoreMatched = 1;
+        }
+        
         if (sdata->validationState == VALIDATION_ERROR
             || sdata->validationState == VALIDATION_FINISHED) {
             return TCL_OK;
@@ -3945,7 +3969,7 @@ schemaInstanceInfoCmd (
                 definedElements (sdata, interp);
             }
         } else {
-            getNextExpected (sdata, interp);
+            getNextExpected (sdata, interp, ignoreMatched);
         }
         break;
         
