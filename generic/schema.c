@@ -2425,7 +2425,7 @@ matchText (
                     if (mustMatch (cp->quants[ac], hm)) {
                         if (recover (interp, sdata, UNEXPECTED_TEXT,
                                      NULL, NULL, text, 0)) {
-                            break;
+                            return 1;
                         }
                         SetResultV ("Unexpected text content");
                         return 0;
@@ -2443,7 +2443,7 @@ matchText (
                     if (mustMatch (cp->quants[ac], hm)) {
                         if (recover (interp, sdata, UNEXPECTED_TEXT,
                                      NULL, NULL, text, 0)) {
-                            break;
+                            return 1;
                         }
                         SetResultV ("Unexpected text content");
                         return 0;
@@ -2485,7 +2485,7 @@ matchText (
                     if (mustMatch (cp->quants[ac], hm)) {
                         if (recover (interp, sdata, UNEXPECTED_TEXT,
                                      NULL, NULL, text, ac)) {
-                            break;
+                            return 1;
                         }
                         SetResultV ("Unexpected text content");
                         return 0;
@@ -2566,7 +2566,7 @@ matchText (
             if (!mayskip) {
                 if (recover (interp, sdata, UNEXPECTED_TEXT, NULL, NULL, text,
                              ac)) {
-                    break;
+                    return 1;
                 }
                 SetResultV ("Unexpected text content");
                 return 0;
