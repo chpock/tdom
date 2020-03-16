@@ -7736,7 +7736,7 @@ test schema-18.17 {unexpected text} {
     set result
 } {}
 
-test schema-18.18 {missing element} {
+test schema-18.18 {missing element at MATCH_ELEMENT_END} {
     set defs {
         {
             defelement doc {
@@ -7755,7 +7755,19 @@ test schema-18.18 {missing element} {
         }
         {
             defelement doc {
+                element a0 ! {}
                 ref r1
+            }
+            defpattern r1 {
+                element a ! {}
+                element b ! {}
+            }
+        }
+        {
+            defelement doc {
+                element a0 ! {}
+                ref r1
+                element b0 ! {}
             }
             defpattern r1 {
                 element a ! {}
@@ -7773,6 +7785,35 @@ test schema-18.18 {missing element} {
     }
     set result
 } {}
+
+test schema-18.19 {unexpected text} {
+    tdom::schema s
+    s reportcmd appendtoresult
+    s define {
+        defelement doc {
+            ref r1 ?
+            element c ? {}
+        }
+        defpattern r1 {
+            element a ? {}
+            element b ? {}
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc>unexpected_text<c/></doc>
+        <doc>unexpected_text<a/><c/></doc>
+        <doc><a/>unexpected_text<c/></doc>
+        <doc><a/>unexpected_text<b/><c/></doc>
+        <doc><a/><b/>unexpected_text<c/></doc>
+        <doc><a/><b/><c/>unexpected_text</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {UNEXPECTED_TEXT 1 UNEXPECTED_TEXT 1 UNEXPECTED_TEXT 1 UNEXPECTED_TEXT 1 UNEXPECTED_TEXT 1 UNEXPECTED_TEXT 1}
+
 
 proc validatedSAX {g xml {keepEmpties 1}} {
     set args [list -validateCmd $g]

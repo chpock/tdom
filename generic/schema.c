@@ -1024,7 +1024,14 @@ rewindStack (
     SchemaData *sdata
     ) 
 {
-    return;
+    SchemaValidationStack *se;
+
+    while (sdata->lastMatchse) {
+        se = sdata->lastMatchse;
+        sdata->lastMatchse = se->down;
+        se->down = sdata->stack;
+        sdata->stack = se;
+    }
 }
 
 static int 
