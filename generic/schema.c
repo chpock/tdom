@@ -3624,7 +3624,7 @@ getNextExpectedWorker (
                 break;
             }
             if (cp->type == SCHEMA_CTYPE_INTERLEAVE) {
-                if (minOne(cp->quants[ac])) mustMatch = 1;
+                if (!mustMatch && minOne(cp->quants[ac])) mustMatch = 1;
             } else {
                 if (!mayskip && !hm && minOne (cp->quants[ac])) break;
             }
