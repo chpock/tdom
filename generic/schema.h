@@ -165,7 +165,7 @@ typedef struct SchemaData_
     int       evalError;
     Tcl_Obj  *reportCmd;
     SchemaValidationStack *lastMatchse;
-    int       rewind;
+    int       recoverFlags;
     Tcl_Obj **evalStub;
     Tcl_Obj **textStub;
     char *currentNamespace;

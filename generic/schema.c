@@ -167,7 +167,15 @@ static char *ValidationErrorType2str[] = {
     "INVALID_ATTRIBUTE_VALUE",
     "INVALID_VALUE"
 };
-    
+
+/*----------------------------------------------------------------------------
+|   Recover related flage
+|
+\---------------------------------------------------------------------------*/
+
+#define RECOVER_FLAG_REWIND 1
+#define RECOVER_FLAG_DONT_REPORT 2
+
 /*----------------------------------------------------------------------------
 |   domKeyConstraint related flage
 |
@@ -294,9 +302,9 @@ static void SetActiveSchemaData (SchemaData *v)
     }
 
 #define CHECK_REWIND                                                    \
-    if (sdata->rewind) {                                                \
+    if (sdata->recoverFlags & RECOVER_FLAG_REWIND) {                    \
         rewindStack (sdata);                                            \
-        sdata->rewind = 0;                                              \
+        sdata->recoverFlags &= ~RECOVER_FLAG_REWIND;                    \
     }                                                                   \
 
 #define REMEMBER_PATTERN(pattern)                                       \
@@ -358,7 +366,7 @@ static void SetActiveSchemaData (SchemaData *v)
 
 
 #define updateStack(sdata,cp,ac)                  \
-    if (!sdata->rewind) {                         \
+    if (!(sdata->recoverFlags & RECOVER_FLAG_REWIND)) { \
         se->activeChild = ac;                     \
         se->hasMatched = 1;                       \
     }                                             \
@@ -1146,7 +1154,7 @@ recover (
         sdata->skipDeep = 2;
         break;
     case UNEXPECTED_TEXT:
-        sdata->rewind = 1;
+        sdata->recoverFlags |= RECOVER_FLAG_REWIND;
         break;
     case DOM_KEYCONSTRAINT:
     case DOM_XPATH_BOOLEAN:
@@ -3328,7 +3336,7 @@ schemaReset (
 
     while (sdata->stack) popStack (sdata);
     while (sdata->lastMatchse) popFromStack (sdata, &sdata->lastMatchse);
-    sdata->rewind = 0;
+    sdata->recoverFlags = 0;
     sdata->validationState = VALIDATION_READY;
     sdata->skipDeep = 0;
     sdata->evalError = 0;

@@ -7736,6 +7736,10 @@ test schema-18.17 {unexpected text} {
     set result
 } {}
 
+proc schema-18.18 {scmd errortype} {
+    lappend ::result $errortype
+    lappend ::result [$scmd info expected]
+}
 test schema-18.18 {missing element at MATCH_ELEMENT_END} {
     set defs {
         {
@@ -7778,7 +7782,7 @@ test schema-18.18 {missing element at MATCH_ELEMENT_END} {
     set result [list]
     foreach def $defs {
         tdom::schema s
-        s reportcmd appendtoresult
+        s reportcmd schema-18.18
         s define $def
         lappend result [s validate {<doc/>}]
         s delete
