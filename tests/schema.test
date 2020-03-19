@@ -7288,7 +7288,7 @@ test schema-18.1 {reportcmd} {
     lappend result $rc
     s delete
     set result
-} {s MISSING_TEXT s MISSING_ELEMENT 1}
+} {s MISSING_TEXT 1}
 
 test schema-18.1a {reportcmd} {
     tdom::schema s
@@ -7734,7 +7734,7 @@ test schema-18.17 {unexpected text} {
     }
     s delete
     set result
-} {}
+} {UNEXPECTED_TEXT MISSING_ELEMENT 1 UNEXPECTED_TEXT MISSING_ELEMENT 1 UNEXPECTED_TEXT MISSING_ELEMENT 1 UNEXPECTED_TEXT 1}
 
 proc schema-18.18 {scmd errortype} {
     lappend ::result $errortype
@@ -7788,7 +7788,7 @@ test schema-18.18 {missing element at MATCH_ELEMENT_END} {
         s delete
     }
     set result
-} {}
+} {MISSING_ELEMENT a 1 MISSING_ELEMENT a 1 MISSING_ELEMENT a0 1 MISSING_ELEMENT a0 1}
 
 test schema-18.19 {unexpected text} {
     tdom::schema s
@@ -7818,6 +7818,33 @@ test schema-18.19 {unexpected text} {
     set result
 } {UNEXPECTED_TEXT 1 UNEXPECTED_TEXT 1 UNEXPECTED_TEXT 1 UNEXPECTED_TEXT 1 UNEXPECTED_TEXT 1 UNEXPECTED_TEXT 1}
 
+test schema-18.20 {Missing element on element end} {
+    tdom::schema s
+    s reportcmd appendtoresult
+    s define {
+        defelement doc {
+            element a * {
+                element b ! {}
+                element c ! {}
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc></doc>
+        <doc><a/></doc>
+        <doc><a>unexpected_text</a></doc>
+        <doc><a><b/>unexpected_text</a></doc>
+        <doc><a><b/></a></doc>
+        <doc><a><b/></a><a/></doc>
+        <doc><a><b/></a><a><b/><c/></a><a><b/><c/>unexpected</a></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 1 MISSING_ELEMENT 1 UNEXPECTED_TEXT MISSING_ELEMENT 1 UNEXPECTED_TEXT MISSING_ELEMENT 1 MISSING_ELEMENT 1 MISSING_ELEMENT MISSING_ELEMENT 1 MISSING_ELEMENT UNEXPECTED_TEXT 1}
 
 proc validatedSAX {g xml {keepEmpties 1}} {
     set args [list -validateCmd $g]

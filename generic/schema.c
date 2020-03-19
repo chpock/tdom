@@ -1058,6 +1058,7 @@ recover (
     SchemaValidationStack *se;
 
     if (!sdata->reportCmd || sdata->evalError) return 0;
+    if (sdata->recoverFlags & RECOVER_FLAG_DONT_REPORT) return 1;
     /* If non SCHEMA_CTYPE_NAME and the pattern hasn't already matched
      * that's a pattern pushed on stack to look for (probe) if it
      * matches (or allows empty match). Even if the pattern fail it
@@ -1156,12 +1157,14 @@ recover (
     case UNEXPECTED_TEXT:
         sdata->recoverFlags |= RECOVER_FLAG_REWIND;
         break;
+    case MISSING_ELEMENT_MATCH_END:
+    case MISSING_TEXT_MATCH_END:
+        sdata->recoverFlags |= RECOVER_FLAG_DONT_REPORT;
+        break;        
     case DOM_KEYCONSTRAINT:
     case DOM_XPATH_BOOLEAN:
     case MISSING_ATTRIBUTE:
-    case MISSING_ELEMENT_MATCH_END:
     case MISSING_TEXT_MATCH_START:
-    case MISSING_TEXT_MATCH_END:
     case UNEXPECTED_ROOT_ELEMENT:
     case UNKNOWN_ATTRIBUTE:
     case INVALID_KEYREF_MATCH_START:
@@ -2329,6 +2332,7 @@ probeElementEnd (
         popStack (sdata);
         rc = checkElementEnd (interp, sdata);
     }
+    sdata->recoverFlags &= ~RECOVER_FLAG_DONT_REPORT;
     if (rc) {
         popStack (sdata);
         if (sdata->stack == NULL) {
