@@ -18,7 +18,7 @@
 #    schema-15.*: Constraint cmd tcl
 #    schema-16.*: interleave
 #    schema-17.*: info
-#    schema-18.*: reportcmd
+#    schema-18.*: reportcmd, validation error recover
 #    schema-19.*: keyspace
 #    schema-20.*: domunique
 #    schema-21.*: internal: buffers
@@ -7288,7 +7288,7 @@ test schema-18.1 {reportcmd} {
     lappend result $rc
     s delete
     set result
-} {s MISSING_TEXT s MISSING_ELEMENT 1}
+} {s MISSING_TEXT 1}
 
 test schema-18.1a {reportcmd} {
     tdom::schema s
@@ -7679,7 +7679,173 @@ test schema-18.15 {info vaction in reportcmd} {
     s delete
     set result
 } {1 INVALID_ATTRIBUTE_VALUE {{<elementend> {}}} MATCH_ATTRIBUTE_TEXT attr2 {} a MISSING_ATTRIBUTE {{<elementend> {}}} MATCH_ELEMENT_START attr1 {} {} 1 UNKNOWN_ATTRIBUTE {{<elementend> {}}} MATCH_ELEMENT_START foo {} {} MISSING_ATTRIBUTE {{<elementend> {}}} MATCH_ELEMENT_START attr1 {} {} 1}
-    
+
+proc appendtoresult {scmd errortype} {
+    lappend ::result $errortype
+}
+test schema-18.16 {unexpected text} {
+    set defs {
+        {
+            defelement doc {
+                ref r1
+            }
+            defpattern r1 {
+                element e ? {}
+            }
+        }
+        {
+            defelement doc {
+                element e ? {}
+            }
+        }
+    }
+    set result [list]
+    foreach def $defs {
+        tdom::schema s
+        s reportcmd appendtoresult
+        s define $def
+        lappend result [s validate {<doc>unexpected text<e/></doc>}]
+        s delete
+    }
+    set result
+} {UNEXPECTED_TEXT 1 UNEXPECTED_TEXT 1}
+
+test schema-18.17 {unexpected text} {
+    tdom::schema s
+    s reportcmd appendtoresult
+    s define {
+        defelement doc {
+            ref r1
+            element c ! {}
+        }
+        defpattern r1 {
+            element a ! {}
+            element b ! {}
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc>unexpected_text</doc>
+        <doc><a/>unexpected_text</doc>
+        <doc><a/><b/>unexpected_text</doc>
+        <doc><a/><b/><c/>unexpected_text</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {UNEXPECTED_TEXT MISSING_ELEMENT 1 UNEXPECTED_TEXT MISSING_ELEMENT 1 UNEXPECTED_TEXT MISSING_ELEMENT 1 UNEXPECTED_TEXT 1}
+
+proc schema-18.18 {scmd errortype} {
+    lappend ::result $errortype
+    lappend ::result [$scmd info expected]
+}
+test schema-18.18 {missing element at MATCH_ELEMENT_END} {
+    set defs {
+        {
+            defelement doc {
+                ref r1
+            }
+            defpattern r1 {
+                element a ! {}
+                element b ! {}
+            }
+        }
+        {
+            defelement doc {
+                element a 1 {}
+                element b 1 {}
+            }
+        }
+        {
+            defelement doc {
+                element a0 ! {}
+                ref r1
+            }
+            defpattern r1 {
+                element a ! {}
+                element b ! {}
+            }
+        }
+        {
+            defelement doc {
+                element a0 ! {}
+                ref r1
+                element b0 ! {}
+            }
+            defpattern r1 {
+                element a ! {}
+                element b ! {}
+            }
+        }
+    }
+    set result [list]
+    foreach def $defs {
+        tdom::schema s
+        s reportcmd schema-18.18
+        s define $def
+        lappend result [s validate {<doc/>}]
+        s delete
+    }
+    set result
+} {MISSING_ELEMENT a 1 MISSING_ELEMENT a 1 MISSING_ELEMENT a0 1 MISSING_ELEMENT a0 1}
+
+test schema-18.19 {unexpected text} {
+    tdom::schema s
+    s reportcmd appendtoresult
+    s define {
+        defelement doc {
+            ref r1 ?
+            element c ? {}
+        }
+        defpattern r1 {
+            element a ? {}
+            element b ? {}
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc>unexpected_text<c/></doc>
+        <doc>unexpected_text<a/><c/></doc>
+        <doc><a/>unexpected_text<c/></doc>
+        <doc><a/>unexpected_text<b/><c/></doc>
+        <doc><a/><b/>unexpected_text<c/></doc>
+        <doc><a/><b/><c/>unexpected_text</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {UNEXPECTED_TEXT 1 UNEXPECTED_TEXT 1 UNEXPECTED_TEXT 1 UNEXPECTED_TEXT 1 UNEXPECTED_TEXT 1 UNEXPECTED_TEXT 1}
+
+test schema-18.20 {Missing element on element end} {
+    tdom::schema s
+    s reportcmd appendtoresult
+    s define {
+        defelement doc {
+            element a * {
+                element b ! {}
+                element c ! {}
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc></doc>
+        <doc><a/></doc>
+        <doc><a>unexpected_text</a></doc>
+        <doc><a><b/>unexpected_text</a></doc>
+        <doc><a><b/></a></doc>
+        <doc><a><b/></a><a/></doc>
+        <doc><a><b/></a><a><b/><c/></a><a><b/><c/>unexpected</a></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 1 MISSING_ELEMENT 1 UNEXPECTED_TEXT MISSING_ELEMENT 1 UNEXPECTED_TEXT MISSING_ELEMENT 1 MISSING_ELEMENT 1 MISSING_ELEMENT MISSING_ELEMENT 1 MISSING_ELEMENT UNEXPECTED_TEXT 1}
+
 proc validatedSAX {g xml {keepEmpties 1}} {
     set args [list -validateCmd $g]
     if {!$keepEmpties} {
