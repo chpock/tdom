@@ -175,6 +175,7 @@ static char *ValidationErrorType2str[] = {
 
 #define RECOVER_FLAG_REWIND 1
 #define RECOVER_FLAG_DONT_REPORT 2
+#define RECOVER_FLAG_IGNORE 4
 
 /*----------------------------------------------------------------------------
 |   domKeyConstraint related flage
@@ -1150,6 +1151,16 @@ recover (
     }
     switch (errorType) {
     case MISSING_ELEMENT_MATCH_START:
+        if (strcmp (Tcl_GetStringResult (interp), "ignore") == 0) {
+            /* Rewind stack to last match and ignore the just opened
+             * Element. */
+            sdata->recoverFlags |= RECOVER_FLAG_IGNORE;
+            return 1;
+        } else {
+            finalizeElement (sdata, ac+1);
+            sdata->skipDeep = 2;
+        }
+        break;
     case UNEXPECTED_ELEMENT:
         finalizeElement (sdata, ac+1);
         sdata->skipDeep = 2;
@@ -1415,11 +1426,14 @@ matchElementStart (
             if (!mayskip && mustMatch (cp->quants[ac], hm)) {
                 if (recover (interp, sdata, MISSING_ELEMENT_MATCH_START, name,
                              namespace, NULL, ac)) {
-                    /* Skip the just opened element tag and the following
-                     * content of the current. */
-                    return 1;
+                    if (!(sdata->recoverFlags & RECOVER_FLAG_IGNORE)) {
+                        return 1;
+                    }
+                    /* This fail throu to skip to the next
+                     * candidate. */
+                } else {
+                    return 0;
                 }
-                return 0;
             }
             ac++;
             hm = 0;
@@ -1516,7 +1530,10 @@ matchElementStart (
         if (mayskip) break;
         if (recover (interp, sdata, MISSING_ELEMENT_MATCH_START, name,
                      namespace, NULL, cp->nc)) {
-            return 1;
+            if (!(sdata->recoverFlags & RECOVER_FLAG_IGNORE)) {
+                return 1;
+            }
+            break;
         }
         return 0;
     }

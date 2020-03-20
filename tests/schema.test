@@ -6712,6 +6712,7 @@ proc schema-17.13 {scmd args} {
     global fromReportCmd
     set fromReportCmd [lsort [$scmd info expected]]
 }
+
 test schema-17.13 {info expected} {
     set defs {
         {
@@ -6786,7 +6787,7 @@ test schema-17.13a {info expected} {
     foreach def $defs {
         tdom::schema s
         s defelement doc $def
-        s reportcmd schema-17.13
+        s reportcmd schema-17.13a
         set xmlnr 0
         foreach xml $xmlinput {
             set fromReportCmd ""
@@ -7269,6 +7270,57 @@ test schema-17.21a {info expected} {
     s delete
     set result
 } {b 1}
+
+proc schema-17.22 {scmd errorInfo} {
+    global fromReportCmd
+    if {[$scmd info vaction] eq "MATCH_ELEMENT_START"} {
+        lappend fromReportCmd "[lsort [$scmd info expected]] [$scmd info vaction name]"
+        if {$errorInfo eq "MISSING_ELEMENT"} {
+            return ignore
+        }
+    } else {
+        lappend fromReportCmd "END_EVENT [$scmd info expected]"
+    }
+}
+# <doc/>
+# <doc><a/></doc>
+# <doc><b/></doc>
+# <doc><c/></doc>
+# <doc><a/><b/></doc>
+# <doc><a/><c/></doc>
+# <doc><b/><c/></doc>
+# <doc><unknown/></doc>
+# <doc><a/><unknown/></doc>
+test schema-17.22 {info expected} {
+    set defs {
+        {
+            element a
+            element b
+            element c
+        }
+    }
+    set xmlinput {
+        <doc><b/></doc>
+        <doc><c/></doc>
+    }
+    set result [list]
+    set defnr 0
+    foreach def $defs {
+        tdom::schema s
+        s defelement doc $def
+        s reportcmd schema-17.22
+        set xmlnr 0
+        foreach xml $xmlinput {
+            set fromReportCmd ""
+            lappend result $defnr/$xmlnr: [s validate $xml errMsg]
+            lappend result {*}$fromReportCmd
+            incr xmlnr
+        }
+        s delete
+        incr defnr
+    }
+    set result
+} {0/0: 1 {a b} {END_EVENT c}}
 
 proc schema-18 {args} {
     lappend ::result {*}$args
