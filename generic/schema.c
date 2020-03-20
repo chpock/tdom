@@ -1426,14 +1426,14 @@ matchElementStart (
             if (!mayskip && mustMatch (cp->quants[ac], hm)) {
                 if (recover (interp, sdata, MISSING_ELEMENT_MATCH_START, name,
                              namespace, NULL, ac)) {
-                    if (!(sdata->recoverFlags & RECOVER_FLAG_IGNORE)) {
-                        return 1;
+                    if (sdata->recoverFlags & RECOVER_FLAG_IGNORE) {
+                        /* We pretend the ac content particel had
+                         * matched. */
+                        updateStack (sdata, cp, ac);
                     }
-                    /* This fail throu to skip to the next
-                     * candidate. */
-                } else {
-                    return 0;
+                    return 1;
                 }
+                return 0;
             }
             ac++;
             hm = 0;
@@ -1530,10 +1530,7 @@ matchElementStart (
         if (mayskip) break;
         if (recover (interp, sdata, MISSING_ELEMENT_MATCH_START, name,
                      namespace, NULL, cp->nc)) {
-            if (!(sdata->recoverFlags & RECOVER_FLAG_IGNORE)) {
-                return 1;
-            }
-            break;
+            return 1;
         }
         return 0;
     }
@@ -1694,18 +1691,30 @@ probeElement (
     }
 
     /* The normal case: we're inside the tree */
-    rc = matchElementStart (interp, sdata, (char *) namePtr, namespacePtr);
-    while (rc == -1) {
-        popStack (sdata);
+    /* In case of recovering we unwind the call statck to have updated
+     * stack elements, to be able to pretend, we have seen a mandatory
+     * element. But with the so reached stack the current open element
+     * has to probed again. */
+    while (1) {
         rc = matchElementStart (interp, sdata, (char *) namePtr, namespacePtr);
-    };
-    if (rc) {
-        DBG(
-            fprintf (stderr, "probeElement: element '%s' match\n", name);
-            serializeStack (sdata);
-            fprintf (stderr, "\n");
-            );
-        return TCL_OK;
+        while (rc == -1) {
+            popStack (sdata);
+            rc = matchElementStart (interp, sdata, (char *) namePtr, namespacePtr);
+        };
+        if (rc) {
+            DBG(
+                fprintf (stderr, "probeElement: element '%s' match\n", name);
+                serializeStack (sdata);
+                fprintf (stderr, "\n");
+                );
+            if (sdata->recoverFlags & RECOVER_FLAG_IGNORE) {
+                fprintf (stderr, "HIER\n");
+                sdata->recoverFlags &= ~RECOVER_FLAG_IGNORE;
+                continue;
+            }
+            return TCL_OK;
+        }
+        break;
     }
     DBG(
         fprintf (stderr, "element '%s' DOESN'T match\n", name);
