@@ -1141,8 +1141,8 @@ recover (
                         TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT);
     sdata->currentEvals--;
     sdata->vaction = 0;
-    sdata->vname = NULL;
-    sdata->vns = NULL;
+    if (name) sdata->vname = name;
+    if (ns) sdata->vns = ns;
     sdata->vtext = NULL;
     Tcl_DecrRefCount (cmdPtr);
     if (rc != TCL_OK) {
@@ -1152,12 +1152,12 @@ recover (
     switch (errorType) {
     case MISSING_ELEMENT_MATCH_START:
         if (strcmp (Tcl_GetStringResult (interp), "ignore") == 0) {
-            /* Rewind stack to last match and ignore the just opened
-             * Element. */
             sdata->recoverFlags |= RECOVER_FLAG_IGNORE;
             return 1;
         } else {
-            finalizeElement (sdata, ac+1);
+            /* Rewind stack to last match and ignore the just opened
+             * Element. */
+           finalizeElement (sdata, ac+1);
             sdata->skipDeep = 2;
         }
         break;
@@ -1696,10 +1696,12 @@ probeElement (
      * element. But with the so reached stack the current open element
      * has to probed again. */
     while (1) {
-        rc = matchElementStart (interp, sdata, (char *) namePtr, namespacePtr);
+        rc = matchElementStart (interp, sdata, (char *) namePtr,
+                                namespacePtr);
         while (rc == -1) {
             popStack (sdata);
-            rc = matchElementStart (interp, sdata, (char *) namePtr, namespacePtr);
+            rc = matchElementStart (interp, sdata, (char *) namePtr,
+                                    namespacePtr);
         };
         if (rc) {
             DBG(
@@ -1708,7 +1710,6 @@ probeElement (
                 fprintf (stderr, "\n");
                 );
             if (sdata->recoverFlags & RECOVER_FLAG_IGNORE) {
-                fprintf (stderr, "HIER\n");
                 sdata->recoverFlags &= ~RECOVER_FLAG_IGNORE;
                 continue;
             }

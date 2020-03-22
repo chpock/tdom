@@ -7274,12 +7274,12 @@ test schema-17.21a {info expected} {
 proc schema-17.22 {scmd errorInfo} {
     global fromReportCmd
     if {[$scmd info vaction] eq "MATCH_ELEMENT_START"} {
-        lappend fromReportCmd "[lsort [$scmd info expected]] [$scmd info vaction name]"
+        lappend fromReportCmd "matching [$scmd info vaction name]" "expecting [lsort [$scmd info expected]]"
         if {$errorInfo eq "MISSING_ELEMENT"} {
             return ignore
         }
     } else {
-        lappend fromReportCmd "END_EVENT [$scmd info expected]"
+        lappend fromReportCmd "END_EVENT expecting [$scmd info expected]"
     }
 }
 # <doc/>
@@ -7300,8 +7300,15 @@ test schema-17.22 {info expected} {
         }
     }
     set xmlinput {
+        <doc/>
+        <doc><a/></doc>
         <doc><b/></doc>
         <doc><c/></doc>
+        <doc><a/><b/></doc>
+        <doc><a/><c/></doc>
+        <doc><b/><c/></doc>
+        <doc><unknown/></doc>
+        <doc><a/><unknown/></doc>
     }
     set result [list]
     set defnr 0
@@ -7320,7 +7327,7 @@ test schema-17.22 {info expected} {
         incr defnr
     }
     set result
-} {0/0: 1 {a b} {END_EVENT c}}
+} {0/0: 1 a b END_EVENT c 0/1: 1 a c b c}
 
 proc schema-18 {args} {
     lappend ::result {*}$args
