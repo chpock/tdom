@@ -7282,15 +7282,6 @@ proc schema-17.22 {scmd errorInfo} {
         lappend fromReportCmd "END_EVENT expecting [$scmd info expected]"
     }
 }
-# <doc/>
-# <doc><a/></doc>
-# <doc><b/></doc>
-# <doc><c/></doc>
-# <doc><a/><b/></doc>
-# <doc><a/><c/></doc>
-# <doc><b/><c/></doc>
-# <doc><unknown/></doc>
-# <doc><a/><unknown/></doc>
 test schema-17.22 {info expected} {
     set defs {
         {
@@ -7327,7 +7318,7 @@ test schema-17.22 {info expected} {
         incr defnr
     }
     set result
-} {0/0: 1 a b END_EVENT c 0/1: 1 a c b c}
+} {0/0: 1 MISSING_ELEMENT {END_EVENT expecting a} 0/1: 1 MISSING_ELEMENT {END_EVENT expecting b} 0/2: 1 MISSING_ELEMENT {matching b} {expecting a} MISSING_ELEMENT {END_EVENT expecting c} 0/3: 1 MISSING_ELEMENT {matching c} {expecting a} MISSING_ELEMENT {matching c} {expecting b} 0/4: 1 MISSING_ELEMENT {END_EVENT expecting c} 0/5: 1 MISSING_ELEMENT {matching c} {expecting b} 0/6: 1 MISSING_ELEMENT {matching b} {expecting a} 0/7: 1 MISSING_ELEMENT {matching unknown} {expecting a} MISSING_ELEMENT {matching unknown} {expecting b} MISSING_ELEMENT {matching unknown} {expecting c} UNEXPECTED_ELEMENT {matching unknown} {expecting {<elementend> {}}} 0/8: 1 MISSING_ELEMENT {matching unknown} {expecting b} MISSING_ELEMENT {matching unknown} {expecting c} UNEXPECTED_ELEMENT {matching unknown} {expecting {<elementend> {}}}}
 
 proc schema-18 {args} {
     lappend ::result {*}$args
