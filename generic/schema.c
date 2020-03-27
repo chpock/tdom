@@ -175,6 +175,7 @@ static char *ValidationErrorType2str[] = {
 
 #define RECOVER_FLAG_REWIND 1
 #define RECOVER_FLAG_DONT_REPORT 2
+#define RECOVER_FLAG_IGNORE 4
 
 /*----------------------------------------------------------------------------
 |   domKeyConstraint related flage
@@ -365,11 +366,11 @@ static void SetActiveSchemaData (SchemaData *v)
     }                                             \
 
 
-#define updateStack(sdata,cp,ac)                  \
+#define updateStack(sdata,se,ac)                        \
     if (!(sdata->recoverFlags & RECOVER_FLAG_REWIND)) { \
-        se->activeChild = ac;                     \
-        se->hasMatched = 1;                       \
-    }                                             \
+        se->activeChild = ac;                 \
+        se->hasMatched = 1;                   \
+    }                                                   \
     
 static SchemaCP*
 initSchemaCP (
@@ -1140,8 +1141,8 @@ recover (
                         TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT);
     sdata->currentEvals--;
     sdata->vaction = 0;
-    sdata->vname = NULL;
-    sdata->vns = NULL;
+    if (name) sdata->vname = name;
+    if (ns) sdata->vns = ns;
     sdata->vtext = NULL;
     Tcl_DecrRefCount (cmdPtr);
     if (rc != TCL_OK) {
@@ -1150,9 +1151,29 @@ recover (
     }
     switch (errorType) {
     case MISSING_ELEMENT_MATCH_START:
+        if (strcmp (Tcl_GetStringResult (interp), "ignore") == 0) {
+            sdata->recoverFlags |= RECOVER_FLAG_IGNORE;
+            return 1;
+        } else if (strcmp (Tcl_GetStringResult (interp), "vanish") == 0) {
+            sdata->recoverFlags |= RECOVER_FLAG_REWIND;
+            sdata->skipDeep = 1;
+            return 1;
+        } else {
+            /* Rewind stack to last match and ignore the just opened
+             * Element. */
+           finalizeElement (sdata, ac+1);
+            sdata->skipDeep = 2;
+        }
+        break;
     case UNEXPECTED_ELEMENT:
-        finalizeElement (sdata, ac+1);
-        sdata->skipDeep = 2;
+        if (strcmp (Tcl_GetStringResult (interp), "vanish") == 0) {
+            sdata->recoverFlags |= RECOVER_FLAG_REWIND;
+            sdata->skipDeep = 1;
+            return 1;
+        } else {
+            finalizeElement (sdata, ac+1);
+            sdata->skipDeep = 2;
+        }
         break;
     case UNEXPECTED_TEXT:
         sdata->recoverFlags |= RECOVER_FLAG_REWIND;
@@ -1271,7 +1292,7 @@ matchElementStart (
                     candidate->namespace != namespace) {
                     break;
                 }
-                updateStack (sdata, cp, ac);
+                updateStack (sdata, se, ac);
                 sdata->skipDeep = 1;
                 /* See comment in probeElement: sdata->vname and
                  * sdata->vns may be pre-filled. We reset it here.*/
@@ -1286,7 +1307,7 @@ matchElementStart (
                 if (candidate->name == name
                     && candidate->namespace == namespace) {
                     pushToStack (sdata, candidate);
-                    updateStack (sdata, cp, ac);
+                    updateStack (sdata, se, ac);
                     return 1;
                 }
                 break;
@@ -1299,7 +1320,7 @@ matchElementStart (
                         icp = Tcl_GetHashValue (h);
                         if (icp->namespace == namespace) {
                             pushToStack (sdata, icp);
-                            updateStack (sdata, cp, ac);
+                            updateStack (sdata, se, ac);
                             return 1;
                         }
                     }
@@ -1317,7 +1338,7 @@ matchElementStart (
                         if (icp->namespace && icp->namespace != namespace) {
                             break;
                         }
-                        updateStack (sdata, cp, ac);
+                        updateStack (sdata, se, ac);
                         sdata->skipDeep = 1;
                         /* See comment in probeElement: sdata->vname
                          * and sdata->vns may be pre-filled. We reset it
@@ -1330,7 +1351,7 @@ matchElementStart (
                         if (icp->name == name
                             && icp->namespace == namespace) {
                             pushToStack (sdata, icp);
-                            updateStack (sdata, cp, ac);
+                            updateStack (sdata, se, ac);
                             return 1;
                         }
                         break;
@@ -1343,7 +1364,7 @@ matchElementStart (
                         pushToStack (sdata, icp);
                         rc = matchElementStart (interp, sdata, name, namespace);
                         if (rc == 1) {
-                            updateStack (sdata, cp, ac);
+                            updateStack (sdata, se, ac);
                             return 1;
                         }
                         popStack (sdata);
@@ -1375,7 +1396,7 @@ matchElementStart (
                 pushToStack (sdata, candidate);
                 rc = matchElementStart (interp, sdata, name, namespace);
                 if (rc == 1) {
-                    updateStack (sdata, cp, ac);
+                    updateStack (sdata, se, ac);
                     return 1;
                 }
                 popStack (sdata);
@@ -1415,8 +1436,11 @@ matchElementStart (
             if (!mayskip && mustMatch (cp->quants[ac], hm)) {
                 if (recover (interp, sdata, MISSING_ELEMENT_MATCH_START, name,
                              namespace, NULL, ac)) {
-                    /* Skip the just opened element tag and the following
-                     * content of the current. */
+                    if (sdata->recoverFlags & RECOVER_FLAG_IGNORE) {
+                        /* We pretend the ac content particel had
+                         * matched. */
+                        updateStack (sdata, se, ac);
+                    }
                     return 1;
                 }
                 return 0;
@@ -1427,8 +1451,6 @@ matchElementStart (
         if (isName) {
             if (recover (interp, sdata, UNEXPECTED_ELEMENT, name, namespace,
                          NULL, 0)) {
-                /* Skip the just opened element tag and the following
-                 * content of the current. */
                 return 1;
             }
             return 0;
@@ -1467,7 +1489,6 @@ matchElementStart (
                     break;
                 }
                 sdata->skipDeep = 1;
-                if (mayskip && minOne (cp->quants[i])) mayskip = 0;
                 se->hasMatched = 1;
                 se->interleaveState[i] = 1;
                 /* See comment in probeElement: sdata->vname and
@@ -1494,8 +1515,10 @@ matchElementStart (
                 pushToStack (sdata, icp);
                 rc = matchElementStart (interp, sdata, name, namespace);
                 if (rc == 1) {
-                    se->hasMatched = 1;
-                    se->interleaveState[i] = 1;
+                    if (!(sdata->recoverFlags & RECOVER_FLAG_REWIND)) {
+                        se->hasMatched = 1;
+                        se->interleaveState[i] = 1;
+                    }
                     return 1;
                 }
                 popStack (sdata);
@@ -1677,18 +1700,34 @@ probeElement (
     }
 
     /* The normal case: we're inside the tree */
-    rc = matchElementStart (interp, sdata, (char *) namePtr, namespacePtr);
-    while (rc == -1) {
-        popStack (sdata);
-        rc = matchElementStart (interp, sdata, (char *) namePtr, namespacePtr);
-    };
-    if (rc) {
-        DBG(
-            fprintf (stderr, "probeElement: element '%s' match\n", name);
-            serializeStack (sdata);
-            fprintf (stderr, "\n");
-            );
-        return TCL_OK;
+    /* In case of recovering and if the user wants a required cp to be
+     * treated as matched (or in other words: that the validation
+     * engine should ignore the mandatory state of the cp) we unwind
+     * the call stack to have updated stack elements, to be able to
+     * pretend, we have seen the mandatory cp. Now try to match the
+     * open element from this stack state. */
+    while (1) {
+        rc = matchElementStart (interp, sdata, (char *) namePtr,
+                                namespacePtr);
+        while (rc == -1) {
+            popStack (sdata);
+            rc = matchElementStart (interp, sdata, (char *) namePtr,
+                                    namespacePtr);
+        };
+        if (rc) {
+            DBG(
+                fprintf (stderr, "probeElement: element '%s' match\n", name);
+                serializeStack (sdata);
+                fprintf (stderr, "\n");
+                );
+            if (sdata->recoverFlags & RECOVER_FLAG_IGNORE) {
+                sdata->recoverFlags &= ~RECOVER_FLAG_IGNORE;
+                continue;
+            }
+            CHECK_REWIND;
+            return TCL_OK;
+        }
+        break;
     }
     DBG(
         fprintf (stderr, "element '%s' DOESN'T match\n", name);
@@ -2385,13 +2424,13 @@ matchText (
                 switch (candidate->type) {
                 case SCHEMA_CTYPE_TEXT:
                     if (checkText (interp, candidate, text)) {
-                        updateStack (sdata, cp, ac);
+                        updateStack (sdata, se, ac);
                         return 1;
                     }
                     if (sdata->evalError) return 0;
                     if (recover (interp, sdata, INVALID_VALUE, NULL, NULL,
                                  text, ac)) {
-                        updateStack (sdata, cp, ac);
+                        updateStack (sdata, se, ac);
                         return 1;
                     }
                     SetResult ("Invalid text content");
@@ -2399,7 +2438,7 @@ matchText (
 
                 case SCHEMA_CTYPE_CHOICE:
                     if (candidate->flags & MIXED_CONTENT) {
-                        updateStack (sdata, cp, ac);
+                        updateStack (sdata, se, ac);
                         return 1;
                     }
                     for (i = 0; i < candidate->nc; i++) {
@@ -2407,7 +2446,7 @@ matchText (
                         switch (ic->type) {
                         case SCHEMA_CTYPE_TEXT:
                             if (checkText (interp, ic, text)) {
-                                updateStack (sdata, cp, ac);
+                                updateStack (sdata, se, ac);
                                 return 1;
                             }
                             break;
@@ -2420,7 +2459,7 @@ matchText (
                         case SCHEMA_CTYPE_PATTERN:
                             pushToStack (sdata, ic);
                             if (matchText (interp, sdata, text)) {
-                                updateStack (sdata, cp, ac);
+                                updateStack (sdata, se, ac);
                                 return 1;
                             }
                             popStack (sdata);
@@ -2455,7 +2494,7 @@ matchText (
                 case SCHEMA_CTYPE_PATTERN:
                     pushToStack (sdata, candidate);
                     if (matchText (interp, sdata, text)) {
-                        updateStack (sdata, cp, ac);
+                        updateStack (sdata, se, ac);
                         return 1;
                     }
                     popStack (sdata);
@@ -2550,8 +2589,10 @@ matchText (
                 switch (ic->type) {
                 case SCHEMA_CTYPE_TEXT:
                     if (checkText (interp, ic, text)) {
-                        se->hasMatched = 1;
-                        se->interleaveState[i] = 1;
+                        if (!(sdata->recoverFlags & RECOVER_FLAG_REWIND)) {
+                            se->hasMatched = 1;
+                            se->interleaveState[i] = 1;
+                        }
                         return 1;
                     }
                     break;
@@ -2564,7 +2605,7 @@ matchText (
                 case SCHEMA_CTYPE_PATTERN:
                     pushToStack (sdata, ic);
                     if (matchText (interp, sdata, text)) {
-                        updateStack (sdata, cp, ac);
+                        updateStack (sdata, se, ac);
                         return 1;
                     }
                     popStack (sdata);

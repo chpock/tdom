@@ -6712,6 +6712,7 @@ proc schema-17.13 {scmd args} {
     global fromReportCmd
     set fromReportCmd [lsort [$scmd info expected]]
 }
+
 test schema-17.13 {info expected} {
     set defs {
         {
@@ -6786,7 +6787,7 @@ test schema-17.13a {info expected} {
     foreach def $defs {
         tdom::schema s
         s defelement doc $def
-        s reportcmd schema-17.13
+        s reportcmd schema-17.13a
         set xmlnr 0
         foreach xml $xmlinput {
             set fromReportCmd ""
@@ -7269,6 +7270,114 @@ test schema-17.21a {info expected} {
     s delete
     set result
 } {b 1}
+
+proc schema-17.22 {scmd errorInfo} {
+    global fromReportCmd
+    if {[$scmd info vaction] eq "MATCH_ELEMENT_START"} {
+        lappend fromReportCmd "matching [$scmd info vaction name]" "expecting [lsort [$scmd info expected]]"
+        if {$errorInfo eq "MISSING_ELEMENT"} {
+            return ignore
+        }
+    } else {
+        lappend fromReportCmd "END_EVENT expecting [$scmd info expected]"
+    }
+}
+test schema-17.22 {return "ignore" from recover script for MISSING_ELEMENT_MATCH_START} {
+    set defs {
+        {
+            element a
+            element b
+            element c
+        }
+    }
+    set xmlinput {
+        <doc/>
+        <doc><a/></doc>
+        <doc><b/></doc>
+        <doc><c/></doc>
+        <doc><a/><b/></doc>
+        <doc><a/><c/></doc>
+        <doc><b/><c/></doc>
+        <doc><unknown/></doc>
+        <doc><a/><unknown/></doc>
+    }
+    set result [list]
+    set defnr 0
+    foreach def $defs {
+        tdom::schema s
+        s defelement doc $def
+        s reportcmd schema-17.22
+        set xmlnr 0
+        foreach xml $xmlinput {
+            set fromReportCmd ""
+            lappend result $defnr/$xmlnr: [s validate $xml errMsg]
+            lappend result {*}$fromReportCmd
+            incr xmlnr
+        }
+        s delete
+        incr defnr
+    }
+    set result
+} {0/0: 1 {END_EVENT expecting a} 0/1: 1 {END_EVENT expecting b} 0/2: 1 {matching b} {expecting a} {END_EVENT expecting c} 0/3: 1 {matching c} {expecting a} {matching c} {expecting b} 0/4: 1 {END_EVENT expecting c} 0/5: 1 {matching c} {expecting b} 0/6: 1 {matching b} {expecting a} 0/7: 1 {matching unknown} {expecting a} {matching unknown} {expecting b} {matching unknown} {expecting c} {matching unknown} {expecting {<elementend> {}}} 0/8: 1 {matching unknown} {expecting b} {matching unknown} {expecting c} {matching unknown} {expecting {<elementend> {}}}}
+
+proc schema-17.23 {scmd errorInfo} {
+    global fromReportCmd
+    if {[$scmd info vaction] eq "MATCH_ELEMENT_START"} {
+        lappend fromReportCmd "matching [$scmd info vaction name]" "expecting [lsort [$scmd info expected]]"
+        if {$errorInfo in {"MISSING_ELEMENT" "UNEXPECTED_ELEMENT"}} {
+            return vanish
+        }
+    } else {
+        lappend fromReportCmd "END_EVENT expecting [$scmd info expected]"
+    }
+}
+test schema-17.23 {return "vanish" from recover handler} {
+    set def {
+        defelement doc {
+            element a
+            ref b
+            element d ?
+        }
+        defpattern b {
+            element b
+            ref c
+        }
+        defpattern c {
+            element c +
+        }
+    }
+    set xmlinput {
+        <doc/>
+        <doc><a/></doc>
+        <doc><b/></doc>
+        <doc><c/></doc>
+        <doc><a/><b/></doc>
+        <doc><a/><c/></doc>
+        <doc><b/><c/></doc>
+        <doc><unknown/></doc>
+        <doc><a/><unknown/></doc>
+        <doc><a/><unknown/><b/><c/></doc>
+        <doc><a/><unknown/><b/><c/><d/></doc>
+        <doc><a/><b/><unknown/><c/></doc>
+        <doc><a/><b/><unknown/><c/><d/></doc>
+        <doc><a/><b/><c/><unknown/></doc>
+        <doc><a/><b/><c/><unknown/><d/></doc>
+        <doc><a/><b/><unknown/><c/><unknown1/><c/><d/><unknown2/><unknown3/></doc>
+    }
+    set result [list]
+    tdom::schema s
+    s define $def
+    s reportcmd schema-17.23
+    set xmlnr 0
+    foreach xml $xmlinput {
+        set fromReportCmd ""
+        lappend result $xmlnr: [s validate $xml errMsg]
+        lappend result {*}$fromReportCmd
+        incr xmlnr
+    }
+    s delete
+    set result
+} {0: 1 {END_EVENT expecting a} 1: 1 {END_EVENT expecting b} 2: 1 {matching b} {expecting a} {END_EVENT expecting a} 3: 1 {matching c} {expecting a} {END_EVENT expecting a} 4: 1 {END_EVENT expecting c} 5: 1 {matching c} {expecting b} {END_EVENT expecting b} 6: 1 {matching b} {expecting a} {matching c} {expecting a} {END_EVENT expecting a} 7: 1 {matching unknown} {expecting a} {END_EVENT expecting a} 8: 1 {matching unknown} {expecting b} {END_EVENT expecting b} 9: 1 {matching unknown} {expecting b} 10: 1 {matching unknown} {expecting b} 11: 1 {matching unknown} {expecting c} 12: 1 {matching unknown} {expecting c} 13: 1 {matching unknown} {expecting {<elementend> {}} c d} 14: 1 {matching unknown} {expecting {<elementend> {}} c d} 15: 1 {matching unknown} {expecting c} {matching unknown1} {expecting {<elementend> {}} c d} {matching unknown2} {expecting {<elementend> {}}} {matching unknown3} {expecting {<elementend> {}}}}
 
 proc schema-18 {args} {
     lappend ::result {*}$args
