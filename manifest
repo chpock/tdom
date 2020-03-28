@@ -1,5 +1,5 @@
-C Fixed\sinfo\sdefinedElements\sand\sinfo\sdefinedElementtypes.\sAdded\sinfo\sdefinedPatterns\sand\sinfo\spatterndefinition.
-D 2020-03-28T01:28:48.341
+C Merged\sthe\sdone\sgood\sthings\sfrom\swio\sin.
+D 2020-03-28T01:30:10.422
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -224,8 +224,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 3b5fdf0979b152a63a233e3d0edf439f1493315954f02e36d3a66c51693042ac
+P 1711ee96ee5f3816cbde037ec2da86ad5566799c6887b143a840b105b8767004
 R 94b10c5debf4577e901a238de01c68ee
 U rolf
-Z 5d89ded3a1acdc1d919ee7e843e830f9
+Z 0b94bb7f05f499c2234a4064c8d74299
 # Remove this line to create a well-formed Fossil manifest.
