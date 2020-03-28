@@ -3855,6 +3855,29 @@ test schema-13.2 {XML namespaces} {
     set result
 } {0 0 0 0 1}
 
+test schema-13.3 {Not namespaced elements inside namespaced ones} {
+    tdom::schema s
+    s define {
+        defelement doc ns1 {
+            namespace "" {
+                element e
+            }
+        }
+        defelement e {text {fixed "here"}}
+    }
+    set result ""
+    foreach xml {
+        {<doc xmlns="ns1"><e xmlns="">here</e></doc>}
+        {<a:doc xmlns:a="ns1"><e xmlns="">here</e></a:doc>}
+        {<a:doc xmlns:a="ns1"><e>here</e></a:doc>}
+        {<doc xmlns="ns1"><e>here</e></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 1 1 0}
+
 test schema-14.1 {text: integer} {
     tdom::schema s
     s defelement doc {

@@ -1,5 +1,5 @@
-C Merged\sthe\sdone\sgood\sthings\sfrom\swio\sin.
-D 2020-03-28T01:30:10.422
+C Added\sa\stest.
+D 2020-03-28T02:13:05.887
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -199,7 +199,7 @@ F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
 F tests/pullparser.test e4b14ea0bdc9f9fd931f3bc559e78c309582a67a238170d58e0f20331f99890c
 F tests/pushpull.bench 664e8f512917537d96c4b71933d4d9a6da65fc6fe85bd7c459483830dc7d2faf
-F tests/schema.test 1b96d43d864b7423552749d2cf28a8f071acf78ec3dff25ec2cbceca2177addd
+F tests/schema.test 1c3467814d0e224edc04f0207eff2a16acd48e032b7336c90f66e525c473e457
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
 F tests/tdomcmd.bench b07448ed4de08ccaa9734cf3fe15c695fd7066c993da58ff48d465747940e417
 F tests/tdomcmd.test 092401adf0609906d710f3ef8997cb4ca29bc208
@@ -224,8 +224,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 1711ee96ee5f3816cbde037ec2da86ad5566799c6887b143a840b105b8767004
-R 94b10c5debf4577e901a238de01c68ee
+P 9fefd2eabf2d2d99f2ea58180485fa793b5d2f7d815624e63e7c347b56f0479a
+R 5f488c585d925086bf41f98b9d1d1586
 U rolf
-Z 0b94bb7f05f499c2234a4064c8d74299
+Z ae96ee5dd159fb4aa476530edb4a6d47
 # Remove this line to create a well-formed Fossil manifest.
