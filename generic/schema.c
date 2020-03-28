@@ -3562,7 +3562,7 @@ serializeElementEnd (
 
 static void
 definedElements (
-    SchemaData *sdata,
+    Tcl_HashTable *htable,
     Tcl_Interp *interp
     )
 {
@@ -3572,15 +3572,20 @@ definedElements (
     SchemaCP *cp;
     
     rObj = Tcl_GetObjResult (interp);
-    for (h = Tcl_FirstHashEntry (&sdata->element, &search);
+    for (h = Tcl_FirstHashEntry (htable, &search);
          h != NULL;
          h = Tcl_NextHashEntry (&search)) {
         cp = (SchemaCP *) Tcl_GetHashValue (h);
-        if (!cp) continue;
-        if (cp->flags & FORWARD_PATTERN_DEF
-            || cp->flags & PLACEHOLDER_PATTERN_DEF) continue;
-        elmObj = serializeElementName (interp, cp);
-        Tcl_ListObjAppendElement (interp, rObj, elmObj);
+        while (cp) {
+            if (cp->flags & FORWARD_PATTERN_DEF
+                || cp->flags & PLACEHOLDER_PATTERN_DEF) {
+                cp = cp->next;
+                continue;
+            }
+            elmObj = serializeElementName (interp, cp);
+            Tcl_ListObjAppendElement (interp, rObj, elmObj);
+            cp = cp->next;
+        }
     }
 }
 
@@ -3600,11 +3605,18 @@ definedElementtypes (
          h != NULL;
          h = Tcl_NextHashEntry (&search)) {
         cp = (SchemaCP *) Tcl_GetHashValue (h);
-        if (!cp) continue;
-        if (cp->flags & FORWARD_PATTERN_DEF
-            || cp->flags & PLACEHOLDER_PATTERN_DEF) continue;
-        elmObj = serializeElementTypeName (interp, cp);
-        Tcl_ListObjAppendElement (interp, rObj, elmObj);
+        while (cp) {
+            if (cp->flags & FORWARD_PATTERN_DEF
+                || cp->flags & PLACEHOLDER_PATTERN_DEF) {
+                cp = cp->next;
+                continue;
+            }
+            if (cp->flags & FORWARD_PATTERN_DEF
+                || cp->flags & PLACEHOLDER_PATTERN_DEF) continue;
+            elmObj = serializeElementTypeName (interp, cp);
+            Tcl_ListObjAppendElement (interp, rObj, elmObj);
+            cp = cp->next;
+        }
     }
 }
 
@@ -3871,13 +3883,13 @@ schemaInstanceInfoCmd (
         "validationstate", "vstate", "definedElements", "stack", "toplevel",
         "expected", "definition", "validationaction", "vaction", "line",
         "column", "domNode", "nrForwardDefinitions", "typedefinition",
-        "definedElementtypes", NULL
+        "definedElementtypes", "patterndefinition", "definedPatterns", NULL
     };
     enum schemaInstanceInfoMethod {
         m_validationstate, m_vstate, m_definedElements, m_stack, m_toplevel,
         m_expected, m_definition, m_validationaction, m_vaction, m_line,
         m_column, m_domNode, m_nrForwardDefinitions, m_typedefinition,
-        m_definedElementtypes
+        m_definedElementtypes, m_patterndefinition, m_definedPatterns
     };
 
     static const char *schemaInstanceInfoStackMethods[] = {
@@ -3930,9 +3942,17 @@ schemaInstanceInfoCmd (
             Tcl_WrongNumArgs (interp, 1, objv, "definedElements");
             return TCL_ERROR;
         }
-        definedElements (sdata, interp);
+        definedElements (&sdata->element, interp);
         break;
 
+    case m_definedPatterns:
+        if (objc != 2) {
+            Tcl_WrongNumArgs (interp, 1, objv, "definedPatterns");
+            return TCL_ERROR;
+        }
+        definedElements (&sdata->pattern, interp);
+        break;
+        
     case m_definedElementtypes:
         if (objc != 2) {
             Tcl_WrongNumArgs (interp, 1, objv, "definedElementtypes");
@@ -4026,7 +4046,7 @@ schemaInstanceInfoCmd (
                     Tcl_AppendElement (interp, sdata->startNamespace);
                 }
             } else {
-                definedElements (sdata, interp);
+                definedElements (&sdata->element, interp);
             }
         } else {
             getNextExpected (sdata, interp, ignoreMatched);
@@ -4067,6 +4087,40 @@ schemaInstanceInfoCmd (
         }
         break;
 
+    case m_patterndefinition:
+        if (objc < 3 && objc > 4) {
+            Tcl_WrongNumArgs (interp, 1, objv, "name ?namespace?");
+            return TCL_ERROR;
+        }
+        h = Tcl_FindHashEntry (&sdata->pattern, Tcl_GetString (objv[2]));
+        if (!h) {
+            SetResult ("Unknown pattern definition");
+            return TCL_ERROR;
+        }
+        cp = Tcl_GetHashValue (h);
+        ns = NULL;
+        if (objc == 4) {
+            ns = getNamespacePtr (sdata, Tcl_GetString (objv[3]));
+        }
+        while (cp && cp->namespace != ns) {
+            cp = cp->next;
+        }
+        if (!cp
+            || cp->flags & LOCAL_DEFINED_ELEMENT
+            || cp->flags & PLACEHOLDER_PATTERN_DEF) {
+            SetResult ("Unknown pattern definition");
+            return TCL_ERROR;
+        }
+        Tcl_AppendElement (interp, "defpattern");
+        Tcl_AppendElement (interp, cp->name);
+        if (cp->namespace) {
+            Tcl_AppendElement (interp, cp->namespace);
+        }
+        if (cp->defScript) {
+            Tcl_AppendElement (interp, Tcl_GetString (cp->defScript));
+        }
+        break;
+        
     case m_typedefinition:
         if (objc < 3 && objc > 4) {
             Tcl_WrongNumArgs (interp, 1, objv, "name ?namespace?");
@@ -4709,6 +4763,14 @@ schemaInstanceCmd (
         break;
 
     case m_reportcmd:
+        if (objc == 2) {
+            if (sdata->reportCmd) {
+                Tcl_SetObjResult (interp, sdata->reportCmd);
+            } else {
+                Tcl_SetObjResult (interp, Tcl_NewObj());
+            }
+            break;
+        }
         if (objc != 3) {
             Tcl_WrongNumArgs (interp, 2, objv, "<tcl-cmd>");
             return TCL_ERROR;
@@ -4716,8 +4778,12 @@ schemaInstanceCmd (
         if (sdata->reportCmd) {
             Tcl_DecrRefCount (sdata->reportCmd);
         }
-        sdata->reportCmd = objv[2];
-        Tcl_IncrRefCount (sdata->reportCmd);
+        if (strlen (Tcl_GetString (objv[2])) == 0) {
+            sdata->reportCmd = NULL;
+        } else {
+            sdata->reportCmd = objv[2];
+            Tcl_IncrRefCount (sdata->reportCmd);
+        }
         break;
 
     case m_prefixns:
