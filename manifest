@@ -1,5 +1,5 @@
-C Merged\sthe\sdone\sgood\sthings\sfrom\swio\sin.
-D 2020-03-28T01:30:10.422
+C Temporary\sbranch.
+D 2020-03-29T14:28:15.402
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -224,8 +224,11 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 1711ee96ee5f3816cbde037ec2da86ad5566799c6887b143a840b105b8767004
+P 9fefd2eabf2d2d99f2ea58180485fa793b5d2f7d815624e63e7c347b56f0479a
 R 94b10c5debf4577e901a238de01c68ee
+T *branch * fixmistake
+T *sym-fixmistake *
+T -sym-wip *
 U rolf
-Z 0b94bb7f05f499c2234a4064c8d74299
+Z 54d713fe0a5bcdb58a1c4d5eeac5696c
 # Remove this line to create a well-formed Fossil manifest.
