@@ -36,6 +36,16 @@ if {[dom featureinfo schema]} {
 
 proc dummycallback {args} {}
 
+proc sortcps {a b} {
+    switch [string compare [lindex $a 0] [lindex $b 0]] {
+        -1 {return -1}
+        1 {return 1}
+        default {
+            return [string compare [lindex $a 1] [lindex $b 1]]
+        }
+    }
+}
+
 test schema-1.1 {create} {
     tdom::schema create grammar
     grammar start doc
@@ -6302,6 +6312,35 @@ test schema-17.3 {info} {
     set result
 } {a b}
 
+test schema-17.3a {info definedElements} {
+    tdom::schema s
+    s define {
+        prefixns {ns1 http://ns1.foo ns2 http://ns2.foo}
+        defelement b ns1 {
+            element b1 1 text
+            element a
+            element b2
+        }
+        defelement b ns2 {
+            element b1 1 text
+            element a
+            element b2
+        }
+        defelement b {
+            element b1 1 text
+            element a
+            element b2
+        }
+        defelement a {
+            element a1
+            element a2
+        }
+    }
+    set result [lsort -command sortcps [s info definedElements]]
+    s delete
+    set result
+} {a b {b http://ns1.foo} {b http://ns2.foo}}
+
 test schema-17.4 {info} {
     tdom::schema s
     s define {
@@ -7379,6 +7418,41 @@ test schema-17.23 {return "vanish" from recover handler} {
     set result
 } {0: 1 {END_EVENT expecting a} 1: 1 {END_EVENT expecting b} 2: 1 {matching b} {expecting a} {END_EVENT expecting a} 3: 1 {matching c} {expecting a} {END_EVENT expecting a} 4: 1 {END_EVENT expecting c} 5: 1 {matching c} {expecting b} {END_EVENT expecting b} 6: 1 {matching b} {expecting a} {matching c} {expecting a} {END_EVENT expecting a} 7: 1 {matching unknown} {expecting a} {END_EVENT expecting a} 8: 1 {matching unknown} {expecting b} {END_EVENT expecting b} 9: 1 {matching unknown} {expecting b} 10: 1 {matching unknown} {expecting b} 11: 1 {matching unknown} {expecting c} 12: 1 {matching unknown} {expecting c} 13: 1 {matching unknown} {expecting {<elementend> {}} c d} 14: 1 {matching unknown} {expecting {<elementend> {}} c d} 15: 1 {matching unknown} {expecting c} {matching unknown1} {expecting {<elementend> {}} c d} {matching unknown2} {expecting {<elementend> {}}} {matching unknown3} {expecting {<elementend> {}}}}
 
+test schema-17.24 {info patterndefinition} {
+    tdom::schema s
+    set result ""
+    s defpattern foo {element bar; element baz}
+    lappend result [s info patterndefinition foo]
+    s defpattern foo someNamespace {element e1; element e2}
+    lappend result [s info patterndefinition foo someNamespace]
+    lappend result [catch {s info patterndefinition dontexists} errMsg]
+    lappend result $errMsg
+    lappend result [catch {s info patterndefinition foo wrongNamespace} errMsg]
+    lappend result $errMsg
+    s delete
+    set result
+} {{defpattern foo {element bar; element baz}} {defpattern foo someNamespace {element e1; element e2}} 1 {Unknown pattern definition} 1 {Unknown pattern definition}}
+
+
+test schema-17.25 {info definedPatterns} {
+    tdom::schema create grammar
+    grammar defpattern thisPattern {
+        element a
+        element b
+    }
+    grammar defpattern thatPattern someNamespace {
+        element c
+        element d
+    }
+    grammar defelement doc {
+        ref thisPattern
+        ref thatPattern ?
+    }
+    set result [lsort -index 0 [grammar info definedPatterns]]
+    grammar delete
+    set result
+} {{thatPattern someNamespace} thisPattern}
+
 proc schema-18 {args} {
     lappend ::result {*}$args
 }
@@ -7955,6 +8029,23 @@ test schema-18.20 {Missing element on element end} {
     set result
 } {1 1 MISSING_ELEMENT 1 UNEXPECTED_TEXT MISSING_ELEMENT 1 UNEXPECTED_TEXT MISSING_ELEMENT 1 MISSING_ELEMENT 1 MISSING_ELEMENT MISSING_ELEMENT 1 MISSING_ELEMENT UNEXPECTED_TEXT 1}
 
+test schema-18.21 {reportcmd argument handling} {
+    tdom::schema s
+    set result ""
+    lappend result [s reportcmd]
+    s reportcmd ""
+    lappend result [s reportcmd]
+    s reportcmd dummycallback
+    lappend result [s reportcmd]
+    s reportcmd ""
+    s reportcmd ""
+    lappend result [s reportcmd]
+    s reportcmd dummycallback
+    lappend result [s reportcmd]
+    s delete
+    set result
+} {{} {} dummycallback {} dummycallback}
+    
 proc validatedSAX {g xml {keepEmpties 1}} {
     set args [list -validateCmd $g]
     if {!$keepEmpties} {
@@ -8494,6 +8585,20 @@ test schema-22.6 {defelementtype} {
     set result
 } {{a http://my.foo} {a2 http://my.foo}}
 
+test schema-22.6 {info definedElementtypes} {
+    tdom::schema s
+    s prefixns {ns1 http://ns1.foo ns2 http://ns2.foo}
+    s defelementtype a a ns1 {
+        elementtype e1
+    }
+    s defelementtype a a ns2 {
+        elementtype e2
+    }
+    set result [lsort -command sortcps [s info definedElementtypes]]
+    s delete
+    set result
+} {{a http://ns1.foo} {a http://ns2.foo}}
+
 test schema-22.7 {defelementtype} {
     tdom::schema s
     s defelement doc {
@@ -8690,6 +8795,24 @@ test schema-25.4 {domxpathboolean} {
     s delete
     set result
 } {Nr1: 1 Nr2: DOM_XPATH_BOOLEAN volume DOM_XPATH_BOOLEAN sequence 1 Nr3: DOM_XPATH_BOOLEAN sequence 1 Nr4: 1 Nr5: DOM_XPATH_BOOLEAN volume DOM_KEYCONSTRAINT unique DOM_XPATH_BOOLEAN sequence 1 Nr6: DOM_XPATH_BOOLEAN volume DOM_KEYCONSTRAINT unique DOM_XPATH_BOOLEAN sequence 1 Nr7: DOM_XPATH_BOOLEAN volume DOM_KEYCONSTRAINT unique DOM_XPATH_BOOLEAN sequence 1}
+
+test schema-25.5 {domxpathboolean - xpath argument invalid} {
+    tdom::schema s
+    set result [catch {
+        s defelement doc {
+            domxpathboolean "a + + b"
+        }
+    } errMsg]
+    lappend result $errMsg
+    s delete
+    set result
+} {1 {Error in selector xpath: 'NodeTest: Expected "WCARDNAME" for 'a + + b' 
+
+Parsed symbols:
+     0 WCARDNAME        0 000000000     0  a
+     1 PLUS             0 000000000     2  
+     2 PLUS             0 000000000     4  
+     3 WCARDNAME        0 000000000     6  b}}
 
 proc schema-26.1 {scmd} {
     lappend ::result "fromtcl: [[$scmd info domNode] nodeName]"

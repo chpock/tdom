@@ -1,5 +1,5 @@
-C Merged\sso\sfar\sdone\swork:\srecovering\sscript\smay\snow\sdecide\sabout\srecover\sstrategy\sby\sreturn\svalue\sin\scase\sof\sMISSING_ELEMENT\swith\selement\sstart\sevent.\sBeside\sthe\sdefault\s"ignore\sthe\selement\sand\sthe\srest\sof\sthe\scurrent\sparent\selement\scontent\sand\scontinue\swith\sthe\sparents\ssibling"\snow\sthere\sis\s"ignore",\sadvising\sthe\svalidation\sengine\sto\spretend\sthe\smissing\smandatory\selement\shad\smatched\sand\swe\sare\slooking\sfor\sthe\selement\sstart\sevent\sfrom\sthere,\sand\s"vanish",\sadvising\sthe\svalidation\sengine\sto\sskip\sthe\selement\sas\sit\swould\shaven't\sbeen\sin\sthe\sinput\sXML.\sIn\scase\sof\sUNEXPECTED_ELEMENT\sin\selement\sstart\sevent\sthe\sresult\s"vanish"\sadvices\sthe\svalidation\sengine\sto\sskip\sthe\selement\s(which\sallows\sto\ssee\sfurther\sunexpected\selements\sin\sthe\ssource).
-D 2020-03-27T00:54:15.476
+C Merged\sthe\sdone\sgood\sthings\sfrom\swip\sin.
+D 2020-03-29T14:31:08.051
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -41,7 +41,7 @@ F doc/pullparser.n 5f5672e8bb2dd221602040cd212234da6b6ed8c99c5daa60be9fa0c476529
 F doc/pullparser.xml 6032c1e8c8d001068c227601dba9860824f8acc709c87fd8e36ac4a596b6a2f2
 F doc/schema.html 84f03bb99c6481cff20874f80035d889803f5535b92e3cadad6d58c6e49ca27f
 F doc/schema.n 182c1f728339db9d5e995f9a536cb4740ae6d3352fec606f75868e3532fb612f
-F doc/schema.xml cbe77f77e4d95a227fa58af16253368db2a3a0502aa32ecdb84dd30450ebbca5
+F doc/schema.xml 8474c451ab287be8af3b84ba8ba412d0e3c5f87812651102de61fa4cb1dcb11b
 F doc/tDOM.xml 04db7d0ccfea39aae21f4fe07b8f05d5bff8a84193cfce2aa5faa2f42c076377
 F doc/tdomcmd.html 3f96630823dbeff586dd3fb7e5cc6214a40f0219e2ba37e6986353cbcfc7d665
 F doc/tdomcmd.n c06a5ff035f16a2a52636b69d9ebe6ba84ff5101922ed27b551146c4d61d6cda
@@ -130,7 +130,7 @@ F generic/domxslt.h 0cb8e327683a0ffeb2a7094add6cd82ec1ae49c7c704f20d8d6f7d6523e7
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c ee14ed666ca6d18977f7301545c52ac71b3ce73c49233ff8f8b3aa4144008d24
 F generic/nodecmd.h d2201b69de9507f86e94750f0b72867ec9150795712ef18c5b5b87f35a689f75
-F generic/schema.c d1ef23288d8aa19f41297f79330b2d1b32a0ec41d7a12b830b1b0b6e1d95a767
+F generic/schema.c 9d24c9ffb144095236ba3bf76778cbd7d58706cf6e73e12e25ad495575c21147
 F generic/schema.h 8917b10f88eb023c20111ada752e0551f3112d556a3813c0e73610a00837149a
 F generic/tcldom.c 8bb158abda4b8d039e0528a347f54cd3c9ad04abf10eb214a996bc1e5546d18b
 F generic/tcldom.h c8bda18533dcfeb0dde99bc7fa2cd2fc19cb90239538a65ee98bb8e9dd4d8ad6
@@ -199,7 +199,7 @@ F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
 F tests/pullparser.test e4b14ea0bdc9f9fd931f3bc559e78c309582a67a238170d58e0f20331f99890c
 F tests/pushpull.bench 664e8f512917537d96c4b71933d4d9a6da65fc6fe85bd7c459483830dc7d2faf
-F tests/schema.test 6bab87c4c6f13f13b506b896b0f2a7679912a964bf7e5ec5d9b9fee1b4269a28
+F tests/schema.test 1b96d43d864b7423552749d2cf28a8f071acf78ec3dff25ec2cbceca2177addd
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
 F tests/tdomcmd.bench b07448ed4de08ccaa9734cf3fe15c695fd7066c993da58ff48d465747940e417
 F tests/tdomcmd.test 092401adf0609906d710f3ef8997cb4ca29bc208
@@ -224,8 +224,9 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 33ac16a9c250c5ccb1fa22475ea2b1401bca54bf4191f8aa69ca241b35606b44 3b5fdf0979b152a63a233e3d0edf439f1493315954f02e36d3a66c51693042ac
-R f2a7c0063ee395f947259bd674b07c11
+P f90aa277b4511ae3e97f384aadcb39dd77cebfab87f53abb7be0cf9daddd29b3 5567ad361dc096a4c4fb8f8ddcd0cdf408110103c4cab5387cd0d0e7bdcb4174
+R 94b10c5debf4577e901a238de01c68ee
+T +closed 5567ad361dc096a4c4fb8f8ddcd0cdf408110103c4cab5387cd0d0e7bdcb4174
 U rolf
-Z f6789cbcfb1d43758e3fbb9b57b63be9
+Z dea6354d713bc37c73fe64dae74e8b6e
 # Remove this line to create a well-formed Fossil manifest.

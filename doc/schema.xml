@@ -207,12 +207,14 @@
       </commanddef>
       
       <commanddef>
-        <command><method>reportcmd</method></command>
+        <command><method>reportcmd</method> <m>?cmdName?</m></command>
         <desc>This method expects the name of a tcl command to be
         called in case of validation error. This command will be
         called with two arguments: the schema command, that is rasing
-        the validation error, and an validation error code. The
-        possible error codes are:
+        the validation error, and a validation error code. For more
+        detailed information see <ref
+        refid="recovering">Recovering</ref>.The possible error codes
+        are:
         <dl>
             <dt>MISSING_ELEMENT</dt><dd></dd>
             <dt>MISSING_TEXT</dt><dd></dd>
@@ -310,6 +312,22 @@
                   namespace as second element.</desc>
               </optdef>
               <optdef>
+                  <optname>definedElementtypes</optname>
+                  <desc>Returns in no particular order the defined
+                  element types in the grammer as list. If an element
+                  type is namespaced its list entry will be itself a
+                  list with two elements, with the name as first and
+                  the namespace as second element.</desc>
+              </optdef>
+              <optdef>
+                  <optname>definedPatterns</optname>
+                  <desc>Returns in no particular order the defined
+                  named pattern in the grammer as list. If a named
+                  pattern is namespaced its list entry will be itself
+                  a list with two elements, with the name as first and
+                  the namespace as second element.</desc>
+              </optdef>
+              <optdef>
                   <optname>expected</optname> <desc>Returns in no
                   particular order all posible next events (since the
                   last successful event match, if there was one) as a
@@ -332,8 +350,23 @@
               <optdef>
                   <optname>definition name ?namespace?</optname>
                   <desc>Returns the code that defines the given
-                  element. The command raises error if there isn' a
+                  element. The command raises error if there isn't a
                   definition of that element.
+                  </desc>
+              </optdef>
+              <optdef>
+                  <optname>typedefinition name ?namespace?</optname>
+                  <desc>Returns the code that defines the given
+                  element type definition. The command raises error if
+                  there isn't a definition of that element.
+                  </desc>
+              </optdef>
+              <optdef>
+                  <optname>patterndefinition name ?namespace?</optname>
+                  <desc>Returns the code that defines the given
+                  pattern definition. The command raises error if
+                  there isn't a definition of a pattern with that name
+                  and, if given, namespace.
                   </desc>
               </optdef>
               <optdef>
@@ -553,9 +586,10 @@
       <commanddef>
         <command><method>namespace</method> <m>uri</m> <m>&lt;definition script></m></command>
         <desc>Evaluates the <m>definition script</m> with context
-        namespace <m>uri</m>. Every element or ref command name will
-        be looked up in the namespace <m>uri</m> and local defined
-        element will be in that namespace.</desc>
+        namespace <m>uri</m>. Every element, element type or ref
+        command name will be looked up in the namespace <m>uri</m> and
+        local defined element will be in that namespace. The empty
+        string as <m>uri</m> means no namespace.</desc>
       </commanddef>
 
       <commanddef>
@@ -728,7 +762,7 @@ s define {
     </optlist>
 
     <p>If an optional quantifier is not given then it defaults to * in
-    case of the mixed command and to ! for all other commands.</p>
+    case of the <m>mixed</m> command and to ! for all other commands.</p>
   </section>
 
   <section>
@@ -1037,6 +1071,13 @@ s define {
         </commanddef>
     </commandlist>
     
+  </section>
+
+  <section id="recovering">
+      <title>Recovering</title>
+
+      <p>
+      </p>
   </section>
 
   <section>
