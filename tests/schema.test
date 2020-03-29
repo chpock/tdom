@@ -7476,6 +7476,39 @@ test schema-17.25 {info definedPatterns} {
     set result
 } {{thatPattern someNamespace} thisPattern}
 
+proc schema-17.26 {scmd errorInfo} {
+    global fromReportCmd
+    if {$errorInfo eq "MISSING_ELEMENT" && [$scmd info vaction] eq "MATCH_ELEMENT_END"} {
+        return "ignore"
+    }
+}
+
+test schema-17.26 {return "ignore" from recover handler for element end event} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element a
+            ref b
+            element d ?
+        }
+        defpattern b {
+            element b
+            ref c
+        }
+        defpattern c {
+            element c +
+        }
+    }
+    s reportcmd schema-17.26
+    set result ""
+    foreach xml {
+        <doc/>
+    } {
+    global fromReportCmd
+        
+        lappend result [s validate $xml]
+        
+    
 proc schema-18 {args} {
     lappend ::result {*}$args
 }

@@ -1180,7 +1180,9 @@ recover (
         break;
     case MISSING_ELEMENT_MATCH_END:
     case MISSING_TEXT_MATCH_END:
-        sdata->recoverFlags |= RECOVER_FLAG_DONT_REPORT;
+        if (strcmp (Tcl_GetStringResult (interp), "ignore") != 0) {
+            sdata->recoverFlags |= RECOVER_FLAG_DONT_REPORT;
+        }
         break;        
     case DOM_KEYCONSTRAINT:
     case DOM_XPATH_BOOLEAN:
