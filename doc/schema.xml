@@ -208,13 +208,15 @@
       
       <commanddef>
         <command><method>reportcmd</method> <m>?cmdName?</m></command>
-        <desc>This method expects the name of a tcl command to be
-        called in case of validation error. This command will be
-        called with two arguments: the schema command, that is rasing
-        the validation error, and a validation error code. For more
-        detailed information see <ref
-        refid="recovering">Recovering</ref>.The possible error codes
-        are:
+        <desc>Without the optional argument this method returns the
+        current Tcl command, which is called in case of validation
+        error or the empty string if there isn&apos;t set a Tcl
+        command at call time. Otherwise, this method expects the name
+        of a tcl command to be called in case of validation error.
+        This command will be called (on global scope) with two
+        arguments: the schema command, that is rasing the validation
+        error, and a validation error code. The
+        possible error codes are:
         <dl>
             <dt>MISSING_ELEMENT</dt><dd></dd>
             <dt>MISSING_TEXT</dt><dd></dd>
@@ -232,6 +234,8 @@
             <dt>UNKOWN_GLOBAL_ID</dt><dd></dd>
             <dt>UNKOWN_ID</dt><dd></dd>
         </dl>
+        <p> For more detailed information see <ref
+        refid="recovering">Recovering</ref>.</p>
         </desc>
       </commanddef>
 

@@ -1474,7 +1474,7 @@ matchElementStart (
             if (se->interleaveState[i]) {
                 if (maxOne (cp->quants[i])) continue;
             } else {
-                if (minOne (cp->quants[i])) mayskip = 0;
+                if (mayskip && minOne (cp->quants[i])) mayskip = 0;
             }
             icp = cp->content[i];
             switch (icp->type) {
@@ -1487,7 +1487,7 @@ matchElementStart (
                 break;
 
             case SCHEMA_CTYPE_ANY:
-                if (icp->namespace && icp->namespace == namespace) {
+                if (icp->namespace && icp->namespace != namespace) {
                     break;
                 }
                 sdata->skipDeep = 1;
@@ -1541,6 +1541,18 @@ matchElementStart (
         if (mayskip) break;
         if (recover (interp, sdata, MISSING_ELEMENT_MATCH_START, name,
                      namespace, NULL, cp->nc)) {
+            if (sdata->recoverFlags & RECOVER_FLAG_IGNORE) {
+                /* We mark the first so far not matched mandatory
+                 * interleave child cp as matched */
+                for (i = 0; i < cp->nc; i++) {
+                    if (!se->interleaveState[i]) {
+                        if (minOne (cp->quants[i])) {
+                            se->interleaveState[i] = 1;
+                            break;
+                        }
+                    }
+                }
+            }
             return 1;
         }
         return 0;
