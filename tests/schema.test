@@ -7390,16 +7390,17 @@ test schema-17.22a {return "ignore" from recover script for MISSING_ELEMENT_MATC
                 element b
                 element c
             }
+            element d ?
         }
     }
     set xmlinput {
         <doc/>
-        <doc><a/></doc>
-        <doc><b/></doc>
-        <doc><c/></doc>
-        <doc><a/><b/></doc>
-        <doc><a/><c/></doc>
-        <doc><b/><c/></doc>
+        <doc><a/><d/></doc>
+        <doc><b/><d/></doc>
+        <doc><c/><d/>/doc>
+        <doc><a/><b/><d/></doc>
+        <doc><a/><c/><d/></doc>
+        <doc><c/><b/><d/></doc>
         <doc><unknown/></doc>
         <doc><a/><unknown/></doc>
     }
@@ -8149,7 +8150,23 @@ test schema-18.21 {reportcmd argument handling} {
     s delete
     set result
 } {{} {} dummycallback {} dummycallback}
-    
+
+proc schema-18.22 {that scmd errorType} {
+    lappend ::result $that $errorType
+}  
+test schema-18.22 {reportcmd with arguments} {
+    tdom::schema s 
+    s reportcmd "schema-18.22 this"
+    s defelement doc {
+        element a
+        element b
+    }
+    set result ""
+    lappend result [s validate {<doc><a/></doc>}]
+    s delete
+    set result
+} {this MISSING_ELEMENT 1}
+
 proc validatedSAX {g xml {keepEmpties 1}} {
     set args [list -validateCmd $g]
     if {!$keepEmpties} {

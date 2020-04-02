@@ -169,13 +169,14 @@ static char *ValidationErrorType2str[] = {
 };
 
 /*----------------------------------------------------------------------------
-|   Recover related flage
+|   Recovering related flage
 |
 \---------------------------------------------------------------------------*/
 
 #define RECOVER_FLAG_REWIND 1
 #define RECOVER_FLAG_DONT_REPORT 2
 #define RECOVER_FLAG_IGNORE 4
+#define RECOVER_FLAG_MATCH_END_CONTINUE 8
 
 /*----------------------------------------------------------------------------
 |   domKeyConstraint related flage
@@ -744,14 +745,16 @@ cleanupLastPattern (
         if (this->type == SCHEMA_CTYPE_NAME) {
             /* Local defined  elements aren't saved under  their local
              * name bucket in the sdata->element hash table. */
-            if (!(this->flags & LOCAL_DEFINED_ELEMENT)) {
-                if (this->flags & ELEMENTTYPE_DEF) {
-                    hashTable = &sdata->elementType;
-                    name = this->typeName;
-                } else {
-                    hashTable = &sdata->element;
-                    name = this->name;
-                }
+            if (this->flags & LOCAL_DEFINED_ELEMENT) {
+                freeSchemaCP (sdata->patternList[i]);
+                continue;
+            }
+            if (this->flags & ELEMENTTYPE_DEF) {
+                hashTable = &sdata->elementType;
+                name = this->typeName;
+            } else {
+                hashTable = &sdata->element;
+                name = this->name;
             }
         }
         if (this->type == SCHEMA_CTYPE_PATTERN) {
@@ -1181,6 +1184,8 @@ recover (
     case MISSING_ELEMENT_MATCH_END:
     case MISSING_TEXT_MATCH_END:
         if (strcmp (Tcl_GetStringResult (interp), "ignore") != 0) {
+            sdata->recoverFlags |= RECOVER_FLAG_MATCH_END_CONTINUE;
+        } else {
             sdata->recoverFlags |= RECOVER_FLAG_DONT_REPORT;
         }
         break;        
