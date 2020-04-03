@@ -189,8 +189,6 @@ static char *ValidationErrorType2str[] = {
 |   Macros
 |
 \---------------------------------------------------------------------------*/
-#define TMALLOC(t) (t*)MALLOC(sizeof(t))
-
 #define SetResult(str) Tcl_ResetResult(interp); \
                      Tcl_SetStringObj(Tcl_GetObjResult(interp), (str), -1)
 #define SetResultV(str) if (!sdata->evalError) { \
@@ -371,7 +369,22 @@ static void SetActiveSchemaData (SchemaData *v)
         se->activeChild = ac;                 \
         se->hasMatched = 1;                   \
     }                                                   \
-    
+
+
+#ifndef TCL_THREADS
+SchemaData *
+tdomGetSchemadata (Tcl_Interp *interp) 
+{
+    return activeSchemaData;
+}
+#else
+SchemaData *
+tdomGetSchemadata (void) 
+{
+    return GETASI;
+}
+#endif
+
 static SchemaCP*
 initSchemaCP (
     Schema_CP_Type type,
