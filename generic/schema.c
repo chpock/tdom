@@ -2898,7 +2898,7 @@ static int
 validateFile (
     Tcl_Interp *interp,
     SchemaData *sdata,
-    char *filename
+    Tcl_Obj *filename
     )
 {
     XML_Parser parser;
@@ -2923,7 +2923,7 @@ validateFile (
     XML_SetElementHandler (parser, startElement, endElement);
     XML_SetCharacterDataHandler (parser, characterDataHandler);
 
-    fd = open(filename, O_BINARY|O_RDONLY);
+    fd = open(Tcl_FSGetNativePath (filename), O_BINARY|O_RDONLY);
     if (fd < 0) {
         Tcl_ResetResult (interp);
         Tcl_AppendResult (interp, "error opening file \"",
@@ -4682,8 +4682,7 @@ schemaInstanceCmd (
             SetResult ("The schema command is busy");
             return TCL_ERROR;
         }
-        xmlstr = Tcl_GetString (objv[2]);
-        if (validateFile (interp, sdata, xmlstr) == TCL_OK) {
+        if (validateFile (interp, sdata, objv[2]) == TCL_OK) {
             SetBooleanResult (1);
             if (objc == 4) {
                 Tcl_SetVar (interp, Tcl_GetString (objv[3]), "", 0);
