@@ -1,5 +1,5 @@
-C Merged\sthe\sdone\sgood\sthings\sfrom\swip\sin.
-D 2020-03-29T14:31:08.051
+C Cherry-picked:\sAttempt\sto\smake\svalidatefile\swork\scross-plattform\seven\swith\sother\sthan\s7-bit\sASCII\sonly\spaths.
+D 2020-04-08T16:55:24.269
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -130,7 +130,7 @@ F generic/domxslt.h 0cb8e327683a0ffeb2a7094add6cd82ec1ae49c7c704f20d8d6f7d6523e7
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c ee14ed666ca6d18977f7301545c52ac71b3ce73c49233ff8f8b3aa4144008d24
 F generic/nodecmd.h d2201b69de9507f86e94750f0b72867ec9150795712ef18c5b5b87f35a689f75
-F generic/schema.c 9d24c9ffb144095236ba3bf76778cbd7d58706cf6e73e12e25ad495575c21147
+F generic/schema.c 5b7e7d488e8a3d29ee5f836a69ac17e159f37b69299e4be7abc0071cc1ea5ec3
 F generic/schema.h 8917b10f88eb023c20111ada752e0551f3112d556a3813c0e73610a00837149a
 F generic/tcldom.c 8bb158abda4b8d039e0528a347f54cd3c9ad04abf10eb214a996bc1e5546d18b
 F generic/tcldom.h c8bda18533dcfeb0dde99bc7fa2cd2fc19cb90239538a65ee98bb8e9dd4d8ad6
@@ -224,9 +224,9 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f90aa277b4511ae3e97f384aadcb39dd77cebfab87f53abb7be0cf9daddd29b3 5567ad361dc096a4c4fb8f8ddcd0cdf408110103c4cab5387cd0d0e7bdcb4174
-R 94b10c5debf4577e901a238de01c68ee
-T +closed 5567ad361dc096a4c4fb8f8ddcd0cdf408110103c4cab5387cd0d0e7bdcb4174
+P 6f6b54d366b6f982c673a6aea2f4d0ea19979c83e50ece19de747dfd62d6e11c
+Q +8c019904c465577cc08553c49c22c3c8c5e349c5a0018c4ea4b4f4a3ce04ea75
+R eafac8312c62e6615ef35b8dda7bba8d
 U rolf
-Z dea6354d713bc37c73fe64dae74e8b6e
+Z 6641ae10901093516cda30b88d07ead7
 # Remove this line to create a well-formed Fossil manifest.
