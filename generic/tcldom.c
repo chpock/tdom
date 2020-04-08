@@ -6234,10 +6234,6 @@ int tcldom_parse (
                           "DOM tree to create as argument.");
                 return TCL_ERROR;
             }
-            if (!domIsNAME(jsonRoot)) {
-                SetResult("-jsonroot value: not a valid element name");
-                return TCL_ERROR;
-            }
             objv++; objc--; continue;
             
         case o_simple:
