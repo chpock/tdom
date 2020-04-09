@@ -2885,7 +2885,7 @@ static int
 validateFile (
     Tcl_Interp *interp,
     SchemaData *sdata,
-    Tcl_Obj *filename
+    Tcl_Obj *filenameObj
     )
 {
     XML_Parser parser;
@@ -2894,7 +2894,9 @@ validateFile (
     Tcl_DString cdata;
     Tcl_Obj *resultObj;
     char sl[50], sc[50];
+    char *filename;
     int result, fd;
+    Tcl_DString translatedFilename;
 
     parser = XML_ParserCreate_MM (NULL, MEM_SUITE, &sep);
     vdata.interp = interp;
@@ -2910,7 +2912,13 @@ validateFile (
     XML_SetElementHandler (parser, startElement, endElement);
     XML_SetCharacterDataHandler (parser, characterDataHandler);
 
-    fd = open(Tcl_FSGetNativePath (filename), O_BINARY|O_RDONLY);
+    filename = Tcl_TranslateFileName (interp, Tcl_GetString (filenameObj),
+                                      &translatedFilename);
+    if (filename == NULL) {
+        result = TCL_ERROR;
+        goto cleanup;
+    }
+    fd = open(filename, O_BINARY|O_RDONLY);
     if (fd < 0) {
         Tcl_ResetResult (interp);
         Tcl_AppendResult (interp, "error opening file \"",
@@ -2961,9 +2969,11 @@ validateFile (
         Tcl_SetObjResult (interp, resultObj);
         result = TCL_ERROR;
     } else {
+        Tcl_DStringFree (&translatedFilename);
         result = TCL_OK;
     }
 cleanup:
+    Tcl_DStringFree (&translatedFilename);
     sdata->parser = NULL;
     XML_ParserFree (parser);
     Tcl_DStringFree (&cdata);
