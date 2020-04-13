@@ -60,7 +60,7 @@ extern TdomStubs tdomStubs;
  *----------------------------------------------------------------------------
  */
 
-int
+EXTERN int
 Tdom_Init (
      Tcl_Interp *interp /* Interpreter to initialize. */
 ) {
@@ -110,7 +110,7 @@ Tdom_Init (
     return TCL_OK;
 }
 
-int
+EXTERN int
 Tdom_SafeInit (
      Tcl_Interp *interp
 ) {

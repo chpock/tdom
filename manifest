@@ -1,5 +1,5 @@
-C Attempt\sto\smake\svalidatefile\swork\scross-plattform\seven\swith\sother\sthan\s7-bit\sASCII\sonly\spaths.
-D 2020-04-04T14:59:09.381
+C This\sis\sapparently\sthe\sright\smagic.
+D 2020-04-13T23:51:52.477
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -152,7 +152,7 @@ F generic/tdom.h 6c6d8419600004d242826737ea9c9cda91cad43b9e704d0bb00bf39fefdbf85
 F generic/tdomDecls.h cccb9227475e40c17aec24a23814cf4bffb597c441af9a874370e11291447bc5
 F generic/tdomStubInit.c 4bd8265b7d7e5a031bb9f2ca182f735a8f67ea9a4051e82105a002e89821b4ac
 F generic/tdomStubLib.c 4a055f9c974246a9f7dd99de1a7686d1a96be8f02be699fdf4a760fdc813eb45
-F generic/tdominit.c bf6351415c60e98205453916739115c990e3aa7af54e94f49435790dad043ff5
+F generic/tdominit.c 17dbbeaf80d102d6b70f7cac3084b200fd7a8b0a5e5cc4c8569a0149d2bd741a
 F generic/xmlsimple.c be39c8ff62d31e70ddcac4e5afa05797ee1971d2ada0a670648e74b47b3074d2
 F generic/xmlsimple.h 3cb9d055e60643afcdfe9ab407adf1e8bb5dbafb
 F lib/tdom.tcl 09d732922620415020cdb362b92b05c97e008191e6a12ddc88269f5f5a5c698e
@@ -233,8 +233,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c4c28aed767e58a34e166a553e5da106c6464f4a6ad06959b29dcd8eee9e5638
-R c3c22504c837e11bbd413c3192f75a3e
+P 8c019904c465577cc08553c49c22c3c8c5e349c5a0018c4ea4b4f4a3ce04ea75
+R 0975894749d8d6a24905176169a34e22
 U rolf
-Z 05cfc72e84527452a2ab9e6da066e9e7
+Z 598d78c96ab6424fa3e1c39dde34a7d2
 # Remove this line to create a well-formed Fossil manifest.
