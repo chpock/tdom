@@ -4974,7 +4974,7 @@ $as_echo "file not found" >&6; }
 
 
 
-    vars="-I${srcdir}/../../generic"
+    vars="-I${srcdir}/../../generic -I${srcdir}/../../expat"
     for i in $vars; do
 	PKG_INCLUDES="$PKG_INCLUDES $i"
     done

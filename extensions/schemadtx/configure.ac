@@ -80,7 +80,7 @@ TDOM_LOAD_CONFIG
 
 TEA_ADD_SOURCES([schemadtx.c])
 TEA_ADD_HEADERS([])
-TEA_ADD_INCLUDES([-I${srcdir}/../../generic])
+TEA_ADD_INCLUDES([-I${srcdir}/../../generic -I${srcdir}/../../expat])
 TEA_ADD_LIBS([${TDOM_STUB_LIB_SPEC}])
 TEA_ADD_CFLAGS([-DUSE_TDOM_STUBS=1])
 TEA_ADD_STUB_SOURCES([])
