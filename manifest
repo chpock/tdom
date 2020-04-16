@@ -1,5 +1,5 @@
-C Another,\sless\sambiguous\sattempt\sto\smake\svalidatefile\swork\scross-plattform\swith\snon\s7-bit\sASCII\spaths.
-D 2020-04-09T00:37:01.561
+C Do\sinteger\sstored\sin\spointer\sas\sthe\sbooks\ssay.
+D 2020-04-16T20:41:17.534
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -13,8 +13,8 @@ F README.AOL 34b4178830536f5183328420bc28b8063fbf6b598010ecf105c2ecfdbfc3ffa1
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/toschema.tcl 33297d0aacfebb772acced580c8065266b472e57f772a2a99cd4cd86dd44e50f
 F apps/xslt.tcl 64103132fbe0a1fbf61cf3506608cb7ea5cbfddd247d207d95d8e96a071e1846
-F configure 3f5e6e6d75f05174777f234a4453f3879b75cb475c5991128e7e19afc82f2337 x
-F configure.ac 8c2b9ba6172d837b6388bcab5ae0101e755435628b17f8db2c11ffc1f10258a0
+F configure ea552b077faab9b856de12ffa7e6b11738a031f977cd638be5c5f6e0a7eb5f36 x
+F configure.ac 2cf8d4254689f3917c173e0dde874f2742d86705d090bfb4585c4554a3ba61fa
 F doc/INDEX.MAP 8b9f0c2e18efc29fcf581669e175dec860f54026ef7fef4b8d7403bca442fb71
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html b4a8d2a4b261d8380849b9fa2b4026f1e08248aab543551db47a34b60a43c69a
@@ -130,7 +130,7 @@ F generic/domxslt.h 0cb8e327683a0ffeb2a7094add6cd82ec1ae49c7c704f20d8d6f7d6523e7
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c ee14ed666ca6d18977f7301545c52ac71b3ce73c49233ff8f8b3aa4144008d24
 F generic/nodecmd.h d2201b69de9507f86e94750f0b72867ec9150795712ef18c5b5b87f35a689f75
-F generic/schema.c 7704a48f875ff57afd09dac33d820d422619cdc367ff83981124e701d0ac2704
+F generic/schema.c c134067f9235ca9f5cc1457158525231e91978bf2548d3dcd90079bdcd40c771
 F generic/schema.h 8917b10f88eb023c20111ada752e0551f3112d556a3813c0e73610a00837149a
 F generic/tcldom.c 8bb158abda4b8d039e0528a347f54cd3c9ad04abf10eb214a996bc1e5546d18b
 F generic/tcldom.h c8bda18533dcfeb0dde99bc7fa2cd2fc19cb90239538a65ee98bb8e9dd4d8ad6
@@ -224,8 +224,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 82e3ed67580a98e9ae0c8e05a45c12c6e341c4f51a2c8d035954c9c587834c59
-R 566f0fd5a638ff873397e4e4e4436feb
+P 614925b4281842ad4934c024028f77e3c6b5e8e2653a1edc267e16f9aaa948d1
+R 2a1fb8ab027ee6cf305f4c6f8123d6d4
 U rolf
-Z 253c9c1291193f398468615f7ad8d024
+Z 8666a48f5e63ed2cfc12bbe557d7ae4e
 # Remove this line to create a well-formed Fossil manifest.

@@ -36,23 +36,6 @@
 #include <unistd.h>
 #endif
 
-#ifndef TDOM_CHOICE_HASH_THRESHOLD
-# define TDOM_CHOICE_HASH_THRESHOLD 5
-#endif
-#ifndef TDOM_ATTRIBUTE_HASH_THRESHOLD
-# define TDOM_ATTRIBUTE_HASH_THRESHOLD 5
-#endif
-#ifndef TDOM_EXPAT_READ_SIZE
-# define TDOM_EXPAT_READ_SIZE (1024*8)
-#endif
-#ifndef O_BINARY
-#ifdef _O_BINARY
-#define O_BINARY _O_BINARY
-#else
-#define O_BINARY 0
-#endif
-#endif
-
 /* #define DEBUG */
 /* #define DDEBUG */
 /*----------------------------------------------------------------------------
@@ -70,6 +53,21 @@
 # define DDBG(x)
 #endif
 
+
+/*----------------------------------------------------------------------------
+| Choice/attribute handling method threshold
+|
+\---------------------------------------------------------------------------*/
+#ifndef TDOM_CHOICE_HASH_THRESHOLD
+# define TDOM_CHOICE_HASH_THRESHOLD 5
+#endif
+#ifndef TDOM_ATTRIBUTE_HASH_THRESHOLD
+# define TDOM_ATTRIBUTE_HASH_THRESHOLD 5
+#endif
+#ifndef TDOM_EXPAT_READ_SIZE
+# define TDOM_EXPAT_READ_SIZE (1024*8)
+#endif
+
 /*----------------------------------------------------------------------------
 |   Initial buffer sizes
 |
@@ -85,6 +83,32 @@
 #endif
 #ifndef ATTR_ARRAY_INIT
 #  define ATTR_ARRAY_INIT 4
+#endif
+
+/*----------------------------------------------------------------------------
+|   Local defines
+|
+\---------------------------------------------------------------------------*/
+#ifndef O_BINARY
+# ifdef _O_BINARY
+#  define O_BINARY _O_BINARY
+# else
+#  define O_BINARY 0
+# endif
+#endif
+#if !defined(PTR2UINT)
+# if defined(HAVE_UINTPTR_T) || defined(uintptr_t)
+#  define PTR2UINT(p) ((unsigned int)(uintptr_t)(p))
+# else
+#  define PTR2UINT(p) ((unsigned int)(p))
+# endif
+#endif
+#if !defined(UINT2PTR)
+# if defined(HAVE_UINTPTR_T) || defined(uintptr_t)
+#  define UINT2PTR(p) ((void *)(uintptr_t)(p))
+# else
+#  define UINT2PTR(p) ((void *)(p))
+# endif
 #endif
 
 /*----------------------------------------------------------------------------
@@ -6792,7 +6816,7 @@ maxLengthImpl (
     char *text
     )
 {
-    long maxlen = (long) constraintData;
+    unsigned int maxlen = PTR2UINT(constraintData);
     int len = 0, clen;
 
     while (*text != '\0') {
@@ -6818,11 +6842,11 @@ maxLengthTCObjCmd (
 {
     SchemaData *sdata = GETASI;
     SchemaConstraint *sc;
-    long len;
+    int len;
 
     CHECK_TI
     checkNrArgs (2,2,"Expected: <maximal length as integer>");
-    if (Tcl_GetLongFromObj (interp, objv[1], &len) != TCL_OK) {
+    if (Tcl_GetIntFromObj (interp, objv[1], &len) != TCL_OK) {
         SetResult ("Expected: <maximal length as integer>");
         return TCL_ERROR;
     }
@@ -6831,7 +6855,7 @@ maxLengthTCObjCmd (
     }
     ADD_CONSTRAINT (sdata, sc)
     sc->constraint = maxLengthImpl;
-    sc->constraintData = (void *)len;
+    sc->constraintData = UINT2PTR(len);
     return TCL_OK;
 }
 
@@ -6842,9 +6866,8 @@ minLengthImpl (
     char *text
     )
 {
-    long minlen = (long) constraintData;
+    unsigned int minlen = PTR2UINT(constraintData);
     int len = 0, clen;
-
     while (*text != '\0') {
         clen = UTF8_CHAR_LEN (*text);
         if (!clen) {
@@ -6868,11 +6891,11 @@ minLengthTCObjCmd (
 {
     SchemaData *sdata = GETASI;
     SchemaConstraint *sc;
-    long len;
+    int len;
 
     CHECK_TI
     checkNrArgs (2,2,"Expected: <minimum length as integer>");
-    if (Tcl_GetLongFromObj (interp, objv[1], &len) != TCL_OK) {
+    if (Tcl_GetIntFromObj (interp, objv[1], &len) != TCL_OK) {
         SetResult ("Expected: <minimum length as integer>");
         return TCL_ERROR;
     }
@@ -6881,7 +6904,7 @@ minLengthTCObjCmd (
     }
     ADD_CONSTRAINT (sdata, sc)
     sc->constraint = minLengthImpl;
-    sc->constraintData = (void *)len;
+    sc->constraintData = UINT2PTR(len);
     return TCL_OK;
 }
 
