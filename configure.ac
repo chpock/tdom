@@ -81,6 +81,28 @@ TDOM_PATH_EXPAT
 TDOM_EXPAT_ENTROPY
 
 #--------------------------------------------------------------------
+# We need the UINT2PTR and PTR2UINT macros, so make sure that intptr_t
+# is defined.
+#--------------------------------------------------------------------
+
+AC_CHECK_TYPE([uintptr_t], [
+    AC_DEFINE([HAVE_UINTPTR_T], 1, [Do we have the uintptr_t type?])], [
+    AC_CACHE_CHECK([for pointer-size unsigned integer type], tcl_cv_uintptr_t, [
+    for tcl_cv_uintptr_t in "unsigned int" "unsigned long" "unsigned long long" \
+	    none; do
+	if test "$tcl_cv_uintptr_t" != none; then
+	    AC_COMPILE_IFELSE([AC_LANG_BOOL_COMPILE_TRY([AC_INCLUDES_DEFAULT],
+		    [[sizeof (void *) <= sizeof ($tcl_cv_uintptr_t)]])],
+		[tcl_ok=yes], [tcl_ok=no])
+	    test "$tcl_ok" = yes && break; fi
+    done])
+    if test "$tcl_cv_uintptr_t" != none; then
+	AC_DEFINE_UNQUOTED([uintptr_t], [$tcl_cv_uintptr_t], [Unsigned integer
+	   type wide enough to hold a pointer.])
+    fi
+])
+
+#--------------------------------------------------------------------
 # Add HTML5 parsing support.
 #--------------------------------------------------------------------
 
