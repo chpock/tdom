@@ -1,5 +1,5 @@
-C Enhanced\sthe\stDOM\sC\sAPI.\sNow,\sbinary\sextensions\sto\stDOM\smay\senhance\sthe\sschema\sfeature.\sAs\suse\scase\sadded\ssample\sextension\sschemadtx\swith\sthe\simplementation\sof\san\sextended\stext\sconstraint\s(gtin\schecksum).
-D 2020-04-17T00:35:29.611
+C Prepare\sfor\smore\sinfo\sexpected\soptions.
+D 2020-04-17T17:53:07.552
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -139,7 +139,7 @@ F generic/domxslt.h 0cb8e327683a0ffeb2a7094add6cd82ec1ae49c7c704f20d8d6f7d6523e7
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c ee14ed666ca6d18977f7301545c52ac71b3ce73c49233ff8f8b3aa4144008d24
 F generic/nodecmd.h d2201b69de9507f86e94750f0b72867ec9150795712ef18c5b5b87f35a689f75
-F generic/schema.c 71b1708c006598089fc537167abbf18aa426da7e928e5fdfee3ba4d6333ccade
+F generic/schema.c 0b284483550ebcc39bc74d2702d5e0265d9e5cb762cfff4baaab1cd178ab26c5
 F generic/schema.h 8917b10f88eb023c20111ada752e0551f3112d556a3813c0e73610a00837149a
 F generic/tcldom.c 8bb158abda4b8d039e0528a347f54cd3c9ad04abf10eb214a996bc1e5546d18b
 F generic/tcldom.h b83344768ac6121267471d92def0e88d1cd1d30fd8b995c385c41474d29f3fd7
@@ -233,9 +233,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P e1553ee7867de549cc4897fce8cec69f98b116119c333a5f173aeae699997996 26cc7bb789fc81f29382a37641619c91c497b62e772f17e41aed9292909e3b9f
-R 20bc298551b5b6af9cb02cafd352165b
-T +closed 26cc7bb789fc81f29382a37641619c91c497b62e772f17e41aed9292909e3b9f
+P 575f00682928fc783071150fcf06094a1638faff4dfb6f6d3b8ad66272030ba0
+R 5d69dc6c4e93bcb7651a5129ea04255a
 U rolf
-Z a04c474629eeeebe5abadb16e2e9f0ab
+Z 437e9462e246df6588ab786526f46905
 # Remove this line to create a well-formed Fossil manifest.

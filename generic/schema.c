@@ -202,6 +202,14 @@ static char *ValidationErrorType2str[] = {
 #define RECOVER_FLAG_IGNORE 4
 
 /*----------------------------------------------------------------------------
+|   [schemacmd info expected] related flags
+|
+\---------------------------------------------------------------------------*/
+
+#define EXPECTED_IGNORE_MATCHED 1
+#define EXPECTED_ONLY_MANDATORY 2
+
+/*----------------------------------------------------------------------------
 |   domKeyConstraint related flage
 |
 \---------------------------------------------------------------------------*/
@@ -3674,7 +3682,7 @@ getNextExpectedWorker (
     Tcl_Interp *interp,
     Tcl_HashTable *seenCPs,
     Tcl_Obj *rObj,
-    int ignoreMatched
+    int expectedFlags
     )
 {
     int ac, hm, i, hnew, mustMatch, mayskip, rc = 1;
@@ -3682,11 +3690,14 @@ getNextExpectedWorker (
     SchemaValidationStack *se1;
 
     getContext (cp, ac, hm);
-    if (ignoreMatched && hm) {
+    if ((expectedFlags & EXPECTED_IGNORE_MATCHED) && hm) {
         ac++;
         hm = 0;
     } else {
-        if (hm && maxOne(cp->quants[ac])) ac++;
+        if (hm && maxOne(cp->quants[ac])) {
+            ac++;
+            hm = 0;
+        }
     }
     switch (cp->type) {
     case SCHEMA_CTYPE_INTERLEAVE:
@@ -3716,7 +3727,7 @@ getNextExpectedWorker (
                     se1 = getStackElement (sdata, ic);
                     mayskip = getNextExpectedWorker (sdata, se1, interp,
                                                      seenCPs, rObj,
-                                                     ignoreMatched);
+                                                     expectedFlags);
                     repoolStackElement (sdata, se1);
                 }
                 break;
@@ -3754,7 +3765,7 @@ getNextExpectedWorker (
                             se1 = getStackElement (sdata, ic);
                             mayskip = getNextExpectedWorker (
                                 sdata, se1, interp, seenCPs, rObj,
-                                ignoreMatched
+                                expectedFlags
                                 );
                             repoolStackElement (sdata, se1);
                         }
@@ -3863,7 +3874,7 @@ static void
 getNextExpected (
     SchemaData *sdata,
     Tcl_Interp *interp,
-    int         ignoreMatched
+    int         expectedFlags
     )
 {
     int remainingLastMatch, count, rc;
@@ -3881,7 +3892,7 @@ getNextExpected (
             se = se->down;
         }
         while (se && getNextExpectedWorker (sdata, se, interp, &localHash, rObj,
-                   ignoreMatched)) {
+                   expectedFlags)) {
             if (remainingLastMatch) {
                 count = 1;
                 se = sdata->lastMatchse;
@@ -3897,7 +3908,7 @@ getNextExpected (
     se = sdata->stack;
     while (se) {
         rc = getNextExpectedWorker (sdata, se, interp, &localHash, rObj,
-                                    ignoreMatched);
+                                    expectedFlags);
         if (se->pattern->type == SCHEMA_CTYPE_NAME) break;
         se = se->down;
         if (!rc) {
@@ -3918,7 +3929,7 @@ schemaInstanceInfoCmd (
     Tcl_Obj *const objv[]
     )
 {
-    int methodIndex, ignoreMatched;
+    int methodIndex, expectedFlags;
     long line, column;
     Tcl_HashEntry *h;
     SchemaCP *cp;
@@ -3952,7 +3963,15 @@ schemaInstanceInfoCmd (
     enum schemaInstanceInfoVactionMethod {
         m_name, m_namespace, m_text
     };
-    
+
+    static const char *schemaInstanceInfoExpectedOptions[] = {
+        "-ignorematched", "-onlymandatory", NULL
+    };
+    enum schemaInstanceInfoExpectedOption 
+    {
+        o_ignorematched, o_onlymandatory
+    };
+            
     if (objc < 2) {
         Tcl_WrongNumArgs (interp, 1, objv, "subcommand ?arguments?");
         return TCL_ERROR;
@@ -4069,22 +4088,32 @@ schemaInstanceInfoCmd (
         return TCL_OK;
 
     case m_expected:
-        if (objc != 2 && objc != 3) {
-            Tcl_WrongNumArgs (interp, 2, objv, "?-ignorematched?");
+        if (objc < 2 && objc > 4) {
+            Tcl_WrongNumArgs (interp, 2, objv, "?-ignorematched? ?-onlymandatory?");
             return TCL_ERROR;
         }
-        ignoreMatched = 0;
-        if (objc == 3) {
-            if (strcmp (Tcl_GetString (objv[2]), "-ignorematched") != 0) {
-                SetResult ("Expected -ignorematched");
-                return TCL_ERROR;
-            }
-            ignoreMatched = 1;
-        }
-        
         if (sdata->validationState == VALIDATION_ERROR
             || sdata->validationState == VALIDATION_FINISHED) {
             return TCL_OK;
+        }
+        expectedFlags = 0;
+        while (objc > 2) {
+            if (Tcl_GetIndexFromObj (interp, objv[2],
+                                     schemaInstanceInfoExpectedOptions,
+                                     "option", 0, &methodIndex)
+                != TCL_OK) {
+                return TCL_ERROR;
+            }
+            switch ((enum schemaInstanceInfoExpectedOption) methodIndex) {
+            case o_ignorematched:
+                expectedFlags |= EXPECTED_IGNORE_MATCHED;
+                break;
+            case o_onlymandatory:
+                expectedFlags |= EXPECTED_ONLY_MANDATORY;
+                break;
+            }
+            objv++;
+            objc--;
         }
         if (!sdata->stack) {
             if (sdata->start) {
@@ -4096,7 +4125,7 @@ schemaInstanceInfoCmd (
                 definedElements (&sdata->element, interp);
             }
         } else {
-            getNextExpected (sdata, interp, ignoreMatched);
+            getNextExpected (sdata, interp, expectedFlags);
         }
         break;
         
