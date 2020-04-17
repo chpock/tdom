@@ -60,13 +60,15 @@ extern TdomStubs tdomStubs;
  *----------------------------------------------------------------------------
  */
 
-int
+EXTERN int
 Tdom_Init (
      Tcl_Interp *interp /* Interpreter to initialize. */
 ) {
         
 #ifdef USE_TCL_STUBS
-    Tcl_InitStubs(interp, "8.4", 0);
+    if (Tcl_InitStubs(interp, "8.4", 0) == NULL) {
+        return TCL_ERROR;
+    }
 #endif
         
     domModuleInitialize();
@@ -108,7 +110,7 @@ Tdom_Init (
     return TCL_OK;
 }
 
-int
+EXTERN int
 Tdom_SafeInit (
      Tcl_Interp *interp
 ) {
