@@ -3690,7 +3690,8 @@ getNextExpectedWorker (
     SchemaValidationStack *se1;
 
     getContext (cp, ac, hm);
-    if ((expectedFlags & EXPECTED_IGNORE_MATCHED) && hm) {
+    if (((expectedFlags & EXPECTED_IGNORE_MATCHED)
+         || (expectedFlags & EXPECTED_ONLY_MANDATORY)) && hm) {
         ac++;
         hm = 0;
     } else {
@@ -3717,8 +3718,12 @@ getNextExpectedWorker (
             mayskip = 0;
             switch (ic->type) {
             case SCHEMA_CTYPE_NAME:
-                Tcl_ListObjAppendElement (interp, rObj,
-                                          serializeElementName (interp, ic));
+                if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
+                    || minOne (cp->quants[ac])) {
+                    Tcl_ListObjAppendElement (
+                        interp, rObj, serializeElementName (interp, ic)
+                        );
+                }
                 break;
             case SCHEMA_CTYPE_INTERLEAVE:
             case SCHEMA_CTYPE_PATTERN:
@@ -3733,30 +3738,45 @@ getNextExpectedWorker (
                 break;
 
             case SCHEMA_CTYPE_ANY:
-                Tcl_ListObjAppendElement (interp, rObj,
-                                          serializeAnyCP (interp, ic));
+                if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
+                    || minOne (cp->quants[ac])) {
+                    Tcl_ListObjAppendElement (interp, rObj,
+                                              serializeAnyCP (interp, ic));
+                }
                 break;
 
             case SCHEMA_CTYPE_TEXT:
-                Tcl_ListObjAppendElement (interp, rObj,
-                                          serializeTextCP (interp, ic));
+                if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
+                    || minOne (cp->quants[ac])) {
+                    Tcl_ListObjAppendElement (interp, rObj,
+                                              serializeTextCP (interp, ic));
+                }
                 if (ic->nc == 0 || checkText (interp, ic, "")) {
                     mayskip = 1;
                 }
                 break;
                 
             case SCHEMA_CTYPE_CHOICE:
+                if ((expectedFlags & EXPECTED_ONLY_MANDATORY)
+                    &&  mayMiss (cp->quants[ac])) {
+                    break;
+                }
                 if (ic->flags & MIXED_CONTENT) {
-                    Tcl_ListObjAppendElement (interp, rObj,
-                                              serializeTextCP (interp, NULL));
+                    if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)) {
+                        Tcl_ListObjAppendElement (
+                            interp, rObj, serializeTextCP (interp, NULL));
+                    }
                 }
                 for (i = 0; i < ic->nc; i++) {
                     jc = ic->content[i];
                     switch (jc->type) {
                     case SCHEMA_CTYPE_NAME:
-                        Tcl_ListObjAppendElement (
-                            interp, rObj, serializeElementName (interp, jc)
-                            );
+                        if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
+                            || minOne (cp->quants[i])) {
+                            Tcl_ListObjAppendElement (
+                                interp, rObj, serializeElementName (interp, jc)
+                                );
+                        }
                         break;
                     case SCHEMA_CTYPE_INTERLEAVE:
                     case SCHEMA_CTYPE_PATTERN:
@@ -3771,14 +3791,20 @@ getNextExpectedWorker (
                         }
                         break;
                     case SCHEMA_CTYPE_ANY:
-                        Tcl_ListObjAppendElement (
-                            interp, rObj, serializeAnyCP (interp, jc)
-                            );
+                        if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
+                            || minOne (cp->quants[i])) {
+                            Tcl_ListObjAppendElement (
+                                interp, rObj, serializeAnyCP (interp, jc)
+                                );
+                        }
                         break;
                     case SCHEMA_CTYPE_TEXT:
-                        Tcl_ListObjAppendElement (
-                            interp, rObj, serializeTextCP (interp, jc)
-                            );
+                        if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
+                            || minOne (cp->quants[i])) {
+                            Tcl_ListObjAppendElement (
+                                interp, rObj, serializeTextCP (interp, jc)
+                                );
+                        }
                         break;
                     case SCHEMA_CTYPE_CHOICE:
                         Tcl_Panic ("MIXED or CHOICE child of MIXED or CHOICE");
@@ -3808,7 +3834,8 @@ getNextExpectedWorker (
         if (cp->type == SCHEMA_CTYPE_NAME) {
             if (ac == cp->nc) {
                 /* The curently open element can end here, no
-                 * mandatory elements missing */
+                 * mandatory elements missing.
+                 * The element end is always mandatory.*/
                 Tcl_ListObjAppendElement (
                     interp, rObj, serializeElementEnd (interp)
                     );
