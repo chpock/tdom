@@ -6602,21 +6602,17 @@ test schema-17.8a {info expected -ignorematched} {
         element aftermust
     }
     set result [s info expected -ignorematched]
-    lappend result |
     s define {
         foreach elm {a b c} {
             defelement $elm {}
         }
     }
     lappend result {*}[lsort [s info expected -ignorematched]]
-    lappend result |
     s event start doc
     lappend result {*}[lsort [s info expected -ignorematched]]
-    lappend result |
     s event start c
     s event end
     lappend result {*}[lsort [s info expected -ignorematched]]
-    lappend result |
     s delete
     set result
 } {doc a b c doc a b c musthave toplevel musthave toplevel}
@@ -6647,13 +6643,12 @@ test schema-17.8b {info expected -onlymandatory} {
     lappend result {*}[lsort [s info expected -onlymandatory]]
     s delete
     set result
-} {doc a b c doc a b c musthave toplevel musthave toplevel}
+} {doc a b c doc musthave musthave}
 
 proc schema-17.9 {scmd} {
     global result
     lappend result {*}[lsort [$scmd info expected]]
 }
-                  
 test schema-17.9 {info expected from scripted constrain} {
     tdom::schema s
     s define {
@@ -6672,10 +6667,37 @@ test schema-17.9 {info expected from scripted constrain} {
         }
     }
     set result ""
-    lappend [s validate {<doc><must/></doc>}]
+    lappend result [s validate {<doc><must/></doc>}]
     s delete
     set result
 } {a b c may must}
+
+proc schema-17.9a {scmd} {
+    global result
+    lappend result {*}[lsort [$scmd info expected -onlymandatory]]
+}
+test schema-17.9a {info expected from scripted constrain} {
+    tdom::schema s
+    s define {
+        defpattern some {
+            element a ?
+            group ? {
+                element b ?
+                tcl schema-17.9a [self]
+            }
+            element c
+        }
+        defelement doc {
+            ref some ?
+            element may ?
+            element must
+        }
+    }
+    set result ""
+    lappend result [s validate {<doc><must/></doc>}]
+    s delete
+    set result
+} {must}
 
 test schema-17.10 {info expected interleave} {
     set defs {
