@@ -3689,12 +3689,17 @@ getNextExpectedWorker (
     )
 {
     int ac, hm, i, hnew, mustMatch, mayskip, rc = 1;
+    int probeMayskip = 0;
     SchemaCP *cp, *ic, *jc;
     SchemaValidationStack *se1;
 
+    if (expectedFlags & EXPECTED_PROBE_MAYSKIP) {
+        probeMayskip = 1;
+    }
     getContext (cp, ac, hm);
-    if (((expectedFlags & EXPECTED_IGNORE_MATCHED)
-         || (expectedFlags & EXPECTED_ONLY_MANDATORY)) && hm) {
+    if ((expectedFlags & EXPECTED_IGNORE_MATCHED
+         || expectedFlags & EXPECTED_ONLY_MANDATORY)
+        && hm) {
         ac++;
         hm = 0;
     } else {
@@ -3717,11 +3722,16 @@ getNextExpectedWorker (
                 ac++;
                 continue;
             }
+            if (expectedFlags & EXPECTED_ONLY_MANDATORY
+                && mayMiss (cp->quants[ac])) {
+                ac++;
+                continue;
+            }
             ic = cp->content[ac];
             mayskip = 0;
             switch (ic->type) {
             case SCHEMA_CTYPE_NAME:
-                if (expectedFlags | EXPECTED_PROBE_MAYSKIP) break;
+                if (probeMayskip) break;
                 if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
                     || minOne (cp->quants[ac])) {
                     Tcl_ListObjAppendElement (
@@ -3731,16 +3741,20 @@ getNextExpectedWorker (
                 break;
             case SCHEMA_CTYPE_INTERLEAVE:
             case SCHEMA_CTYPE_PATTERN:
-                if ((expectedFlags & EXPECTED_ONLY_MANDATORY) && !se->hasMatched) {
+                if (expectedFlags & EXPECTED_ONLY_MANDATORY
+                    && !se->hasMatched) {
                     expectedFlags |= EXPECTED_PROBE_MAYSKIP;
                     se1 = getStackElement (sdata, ic);
                     mayskip = getNextExpectedWorker (sdata, se1, interp,
                                                      seenCPs, rObj,
                                                      expectedFlags);
                     repoolStackElement (sdata, se1);
-                    expectedFlags &= ~EXPECTED_PROBE_MAYSKIP;
-                    if (mayskip) continue;
+                    if (!probeMayskip) {
+                        expectedFlags &= ~EXPECTED_PROBE_MAYSKIP;
+                    }
+                    if (mayskip) break;
                 }
+                if (probeMayskip) break;
                 Tcl_CreateHashEntry (seenCPs, ic, &hnew);
                 if (hnew) {
                     se1 = getStackElement (sdata, ic);
@@ -3752,7 +3766,7 @@ getNextExpectedWorker (
                 break;
 
             case SCHEMA_CTYPE_ANY:
-                if (expectedFlags | EXPECTED_PROBE_MAYSKIP) break;
+                if (probeMayskip) break;
                 if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
                     || minOne (cp->quants[ac])) {
                     Tcl_ListObjAppendElement (interp, rObj,
@@ -3761,7 +3775,7 @@ getNextExpectedWorker (
                 break;
 
             case SCHEMA_CTYPE_TEXT:
-                if (expectedFlags | EXPECTED_PROBE_MAYSKIP) break;
+                if (probeMayskip) break;
                 if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
                     || minOne (cp->quants[ac])) {
                     Tcl_ListObjAppendElement (interp, rObj,
@@ -3773,12 +3787,8 @@ getNextExpectedWorker (
                 break;
                 
             case SCHEMA_CTYPE_CHOICE:
-                if ((expectedFlags & EXPECTED_ONLY_MANDATORY)
-                    &&  mayMiss (cp->quants[ac])) {
-                    break;
-                }
                 if (ic->flags & MIXED_CONTENT) {
-                    if (expectedFlags | EXPECTED_PROBE_MAYSKIP) break;
+                    if (probeMayskip) break;
                     if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)) {
                         Tcl_ListObjAppendElement (
                             interp, rObj, serializeTextCP (interp, NULL));
@@ -3788,7 +3798,7 @@ getNextExpectedWorker (
                     jc = ic->content[i];
                     switch (jc->type) {
                     case SCHEMA_CTYPE_NAME:
-                        if (expectedFlags | EXPECTED_PROBE_MAYSKIP) break;
+                        if (probeMayskip) break;
                         if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
                             || minOne (cp->quants[i])) {
                             Tcl_ListObjAppendElement (
@@ -3799,6 +3809,7 @@ getNextExpectedWorker (
                     case SCHEMA_CTYPE_INTERLEAVE:
                     case SCHEMA_CTYPE_PATTERN:
                         Tcl_CreateHashEntry (seenCPs, jc, &hnew);
+                        
                         if (hnew) {
                             se1 = getStackElement (sdata, ic);
                             mayskip = getNextExpectedWorker (
@@ -3809,7 +3820,7 @@ getNextExpectedWorker (
                         }
                         break;
                     case SCHEMA_CTYPE_ANY:
-                        if (expectedFlags | EXPECTED_PROBE_MAYSKIP) break;
+                        if (probeMayskip) break;
                         if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
                             || minOne (cp->quants[i])) {
                             Tcl_ListObjAppendElement (
@@ -3818,7 +3829,7 @@ getNextExpectedWorker (
                         }
                         break;
                     case SCHEMA_CTYPE_TEXT:
-                        if (expectedFlags | EXPECTED_PROBE_MAYSKIP) break;
+                        if (probeMayskip) break;
                         if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
                             || minOne (cp->quants[i])) {
                             Tcl_ListObjAppendElement (
@@ -3962,10 +3973,7 @@ getNextExpected (
                                     expectedFlags);
         if (se->pattern->type == SCHEMA_CTYPE_NAME) break;
         se = se->down;
-        if (!rc) {
-            /* if (mayMiss(se->pattern->quants[se->activeChild])) continue; */
-            break;
-        }
+        if (!rc) break;
     }
     Tcl_DeleteHashTable (&localHash);
     Tcl_SetObjResult (interp, unifyMatchList (interp, &localHash, rObj));
