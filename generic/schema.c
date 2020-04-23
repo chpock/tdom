@@ -208,6 +208,7 @@ static char *ValidationErrorType2str[] = {
 
 #define EXPECTED_IGNORE_MATCHED 1
 #define EXPECTED_ONLY_MANDATORY 2
+#define EXPECTED_PROBE_MAYSKIP 4
 
 /*----------------------------------------------------------------------------
 |   domKeyConstraint related flage
@@ -1020,7 +1021,7 @@ popStack (
         repoolStackElement (sdata, sdata->stack);
         sdata->stack = se;
     } else {
-        if (sdata->stack->activeChild > 0 || sdata->stack->hasMatched) {
+        if (sdata->stack->hasMatched) {
             se = sdata->stack->down;
             sdata->stack->down = sdata->lastMatchse;
             sdata->lastMatchse = sdata->stack;
@@ -3720,6 +3721,7 @@ getNextExpectedWorker (
             mayskip = 0;
             switch (ic->type) {
             case SCHEMA_CTYPE_NAME:
+                if (expectedFlags | EXPECTED_PROBE_MAYSKIP) break;
                 if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
                     || minOne (cp->quants[ac])) {
                     Tcl_ListObjAppendElement (
@@ -3729,6 +3731,16 @@ getNextExpectedWorker (
                 break;
             case SCHEMA_CTYPE_INTERLEAVE:
             case SCHEMA_CTYPE_PATTERN:
+                if ((expectedFlags & EXPECTED_ONLY_MANDATORY) && !se->hasMatched) {
+                    expectedFlags |= EXPECTED_PROBE_MAYSKIP;
+                    se1 = getStackElement (sdata, ic);
+                    mayskip = getNextExpectedWorker (sdata, se1, interp,
+                                                     seenCPs, rObj,
+                                                     expectedFlags);
+                    repoolStackElement (sdata, se1);
+                    expectedFlags &= ~EXPECTED_PROBE_MAYSKIP;
+                    if (mayskip) continue;
+                }
                 Tcl_CreateHashEntry (seenCPs, ic, &hnew);
                 if (hnew) {
                     se1 = getStackElement (sdata, ic);
@@ -3740,6 +3752,7 @@ getNextExpectedWorker (
                 break;
 
             case SCHEMA_CTYPE_ANY:
+                if (expectedFlags | EXPECTED_PROBE_MAYSKIP) break;
                 if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
                     || minOne (cp->quants[ac])) {
                     Tcl_ListObjAppendElement (interp, rObj,
@@ -3748,6 +3761,7 @@ getNextExpectedWorker (
                 break;
 
             case SCHEMA_CTYPE_TEXT:
+                if (expectedFlags | EXPECTED_PROBE_MAYSKIP) break;
                 if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
                     || minOne (cp->quants[ac])) {
                     Tcl_ListObjAppendElement (interp, rObj,
@@ -3764,6 +3778,7 @@ getNextExpectedWorker (
                     break;
                 }
                 if (ic->flags & MIXED_CONTENT) {
+                    if (expectedFlags | EXPECTED_PROBE_MAYSKIP) break;
                     if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)) {
                         Tcl_ListObjAppendElement (
                             interp, rObj, serializeTextCP (interp, NULL));
@@ -3773,6 +3788,7 @@ getNextExpectedWorker (
                     jc = ic->content[i];
                     switch (jc->type) {
                     case SCHEMA_CTYPE_NAME:
+                        if (expectedFlags | EXPECTED_PROBE_MAYSKIP) break;
                         if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
                             || minOne (cp->quants[i])) {
                             Tcl_ListObjAppendElement (
@@ -3793,6 +3809,7 @@ getNextExpectedWorker (
                         }
                         break;
                     case SCHEMA_CTYPE_ANY:
+                        if (expectedFlags | EXPECTED_PROBE_MAYSKIP) break;
                         if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
                             || minOne (cp->quants[i])) {
                             Tcl_ListObjAppendElement (
@@ -3801,6 +3818,7 @@ getNextExpectedWorker (
                         }
                         break;
                     case SCHEMA_CTYPE_TEXT:
+                        if (expectedFlags | EXPECTED_PROBE_MAYSKIP) break;
                         if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
                             || minOne (cp->quants[i])) {
                             Tcl_ListObjAppendElement (
@@ -3936,12 +3954,16 @@ getNextExpected (
     
     se = sdata->stack;
     while (se) {
+        if (!se->hasMatched && se->pattern->type != SCHEMA_CTYPE_NAME) {
+            se = se->down;
+            continue;
+        }
         rc = getNextExpectedWorker (sdata, se, interp, &localHash, rObj,
                                     expectedFlags);
         if (se->pattern->type == SCHEMA_CTYPE_NAME) break;
         se = se->down;
         if (!rc) {
-            if (mayMiss(se->pattern->quants[se->activeChild])) continue;
+            /* if (mayMiss(se->pattern->quants[se->activeChild])) continue; */
             break;
         }
     }

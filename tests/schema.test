@@ -6670,7 +6670,31 @@ test schema-17.9 {info expected from scripted constrain} {
     lappend result [s validate {<doc><must/></doc>}]
     s delete
     set result
-} {a b c may must}
+} {a b c may must 1}
+
+test schema-17.9.1 {info expected from scripted constrain} {
+    tdom::schema s
+    s define {
+        defpattern some {
+            element a ?
+            group ? {
+                element b ?
+                tcl schema-17.9 [self]
+            }
+            element c
+        }
+        defelement doc {
+            element othermay ?
+            ref some ?
+            element may ?
+            element must
+        }
+    }
+    set result ""
+    lappend result [s validate {<doc><must/></doc>}]
+    s delete
+    set result
+} {a b c may must othermay 1}
 
 proc schema-17.9a {scmd} {
     global result
@@ -6697,7 +6721,7 @@ test schema-17.9a {info expected from scripted constrain} {
     lappend result [s validate {<doc><must/></doc>}]
     s delete
     set result
-} {must}
+} {must 1}
 
 test schema-17.10 {info expected interleave} {
     set defs {
