@@ -3775,20 +3775,48 @@ getNextExpectedWorker (
                 break;
 
             case SCHEMA_CTYPE_TEXT:
-                if (probeMayskip) break;
-                if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
-                    || minOne (cp->quants[ac])) {
-                    Tcl_ListObjAppendElement (interp, rObj,
-                                              serializeTextCP (interp, ic));
-                }
                 if (ic->nc == 0 || checkText (interp, ic, "")) {
                     mayskip = 1;
+                }
+                if (probeMayskip) break;
+                if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
+                    || mayskip == 0) {
+                    Tcl_ListObjAppendElement (interp, rObj,
+                                              serializeTextCP (interp, ic));
                 }
                 break;
                 
             case SCHEMA_CTYPE_CHOICE:
+                if (probeMayskip) {
+                    for (i = 0; i < ic->nc; i++) {
+                        if (mayMiss (ic->quants[i])) {
+                            mayskip = 1;
+                            break;
+                        }
+                        jc = ic->content[i];
+                        switch (jc->type) {
+                        case SCHEMA_CTYPE_INTERLEAVE:
+                        case SCHEMA_CTYPE_PATTERN:
+                            se1 = getStackElement (sdata, ic);
+                            mayskip = getNextExpectedWorker (
+                                sdata, se1, interp, seenCPs, rObj,
+                                expectedFlags
+                                );
+                            repoolStackElement (sdata, se1);
+                            break;
+                        case SCHEMA_CTYPE_TEXT:
+                            if (ic->nc == 0 || checkText (interp, ic, "")) {
+                                mayskip = 1;
+                            }
+                            break;
+                        default:
+                            break;
+                        }
+                        if (mayskip) break;
+                    }
+                    break;
+                }
                 if (ic->flags & MIXED_CONTENT) {
-                    if (probeMayskip) break;
                     if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)) {
                         Tcl_ListObjAppendElement (
                             interp, rObj, serializeTextCP (interp, NULL));
@@ -3798,7 +3826,6 @@ getNextExpectedWorker (
                     jc = ic->content[i];
                     switch (jc->type) {
                     case SCHEMA_CTYPE_NAME:
-                        if (probeMayskip) break;
                         if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
                             || minOne (cp->quants[i])) {
                             Tcl_ListObjAppendElement (
@@ -3809,7 +3836,6 @@ getNextExpectedWorker (
                     case SCHEMA_CTYPE_INTERLEAVE:
                     case SCHEMA_CTYPE_PATTERN:
                         Tcl_CreateHashEntry (seenCPs, jc, &hnew);
-                        
                         if (hnew) {
                             se1 = getStackElement (sdata, ic);
                             mayskip = getNextExpectedWorker (
@@ -3820,7 +3846,6 @@ getNextExpectedWorker (
                         }
                         break;
                     case SCHEMA_CTYPE_ANY:
-                        if (probeMayskip) break;
                         if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
                             || minOne (cp->quants[i])) {
                             Tcl_ListObjAppendElement (
@@ -3829,7 +3854,6 @@ getNextExpectedWorker (
                         }
                         break;
                     case SCHEMA_CTYPE_TEXT:
-                        if (probeMayskip) break;
                         if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
                             || minOne (cp->quants[i])) {
                             Tcl_ListObjAppendElement (

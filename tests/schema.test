@@ -6723,6 +6723,32 @@ test schema-17.9a {info expected from scripted constrain} {
     set result
 } {must 1}
 
+test schema-17.9a.1 {info expected from scripted constrain} {
+    tdom::schema s
+    s define {
+        defpattern some {
+            element a ?
+            group ? {
+                element b ?
+                tcl schema-17.9a [self]
+            }
+            choice ! {
+                element c1 
+                ref some ?
+            }
+        }
+        defelement doc {
+            ref some ?
+            element may ?
+            element must
+        }
+    }
+    set result ""
+    lappend result [s validate {<doc><must/></doc>}]
+    s delete
+    set result
+} {must 1}
+
 test schema-17.10 {info expected interleave} {
     set defs {
         {
