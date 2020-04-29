@@ -687,7 +687,7 @@ static void schemaInstanceDelete (
     /* Protect the clientData to be freed inside (even nested)
      * Tcl_Eval*() calls to avoid invalid mem access and postpone the
      * cleanup until the Tcl_Eval*() calls are finished (done in
-     * schemaInstanceCmd(). */
+     * schemaInstanceCmd()). */
     if (sdata->currentEvals || sdata->inuse > 0) {
         sdata->cleanupAfterUse = 1;
         return;
@@ -786,6 +786,7 @@ cleanupLastPattern (
     for (i = from; i < sdata->numPatternList; i++) {
         this = sdata->patternList[i];
         hashTable = NULL;
+        name = NULL;
         if (this->type == SCHEMA_CTYPE_NAME) {
             /* Local defined  elements aren't saved under  their local
              * name bucket in the sdata->element hash table. */
@@ -4375,14 +4376,14 @@ schemaInstanceCmd (
 
     static const char *schemaInstanceMethods[] = {
         "defelement", "defpattern", "start",    "event",        "delete",
-        "reset",      "define",     "validate", "domvalidate",  "deftext",
+        "reset",      "define",     "validate", "domvalidate",  "deftexttype",
         "info",       "reportcmd",  "prefixns", "validatefile",
         "validatechannel",          "defelementtype",           "set",
         NULL
     };
     enum schemaInstanceMethod {
         m_defelement, m_defpattern, m_start,    m_event,        m_delete,
-        m_reset,      m_define,     m_validate, m_domvalidate,  m_deftext,
+        m_reset,      m_define,     m_validate, m_domvalidate,  m_deftexttype,
         m_info,       m_reportcmd,  m_prefixns, m_validatefile,
         m_validatechannel,          m_defelementtype,           m_set
     };
@@ -4405,11 +4406,11 @@ schemaInstanceCmd (
         
     if (sdata == NULL) {
         /* Inline defined defelement, defelementtype, defpattern,
-         * deftext, start or prefixns */
+         * deftexttype, start or prefixns */
         sdata = GETASI;
         CHECK_SI;
         if (!sdata->defineToplevel && sdata->currentEvals > 1) {
-            SetResult ("Method not allowed in nested schema define script");
+            SetResult ("Command not allowed in nested schema define script");
             return TCL_ERROR;
         }
         i = 1;
@@ -4559,7 +4560,7 @@ schemaInstanceCmd (
         SETASI(savedsdata);
         break;
 
-    case m_deftext:
+    case m_deftexttype:
         CHECK_RECURSIVE_CALL
         if (objc !=  4-i) {
             Tcl_WrongNumArgs (interp, 2-i, objv, "<name>"
@@ -4573,17 +4574,16 @@ schemaInstanceCmd (
                        "name");
             return TCL_ERROR;
         }
-        savedsdata = GETASI;
-        if (savedsdata == sdata) {
-            SetResult ("Recursive call of schema command is not allowed");
-            return TCL_ERROR;
-        }
         pattern = initSchemaCP (SCHEMA_CTYPE_CHOICE, NULL, NULL);
         pattern->type = SCHEMA_CTYPE_TEXT;
         REMEMBER_PATTERN (pattern)
         SETASI(sdata);
+        savedDefineToplevel = sdata->defineToplevel;
         result = evalConstraints (interp, sdata, pattern, objv[3-i]);
-        SETASI(savedsdata);
+        sdata->defineToplevel = savedDefineToplevel;
+        if (!savedDefineToplevel) {
+            SETASI(savedsdata);
+        }
         if (result == TCL_OK) {
             Tcl_SetHashValue (h, pattern);
         } else {
@@ -7825,7 +7825,7 @@ tDOM_SchemaInit (
                           schemaInstanceCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::defpattern",
                           schemaInstanceCmd, NULL, NULL);
-    Tcl_CreateObjCommand (interp, "tdom::schema::deftext",
+    Tcl_CreateObjCommand (interp, "tdom::schema::deftexttype",
                           schemaInstanceCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::start",
                           schemaInstanceCmd, NULL, NULL);

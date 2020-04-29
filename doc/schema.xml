@@ -95,7 +95,7 @@
       </commanddef>
 
       <commanddef>
-        <command><method>deftext</method> <m>name</m> <m>&lt;constraint script></m></command>
+        <command><method>deftexttype</method> <m>name</m> <m>&lt;constraint script></m></command>
         <desc>This method defines a bundle of text constraints, that
         can be referred by <m>name</m> while defining constrains on
         text element or attribute values. If there is already a text
@@ -123,7 +123,7 @@
         <desc>This method allows to define several elements or pattern
         or a whole schema with one call. All schema command methods so
         far (<m>prefixns</m>, <m>defelement</m>,
-        <m>defelementtype</m>, <m>defpattern</m>, <m>deftext</m> and
+        <m>defelementtype</m>, <m>defpattern</m>, <m>deftexttype</m> and
         <m>start</m>) are allowed top level in the <m>definition
         script</m>. The <m>define</m> method itself isn't allowed
         recursively.</desc>
@@ -693,9 +693,9 @@ s define {
       </commanddef>
 
       <commanddef>
-        <command><method>deftext</method> <m>name</m> <m>&lt;constraint script></m></command>
+        <command><method>deftexttype</method> <m>name</m> <m>&lt;constraint script></m></command>
         <desc>This defines a named bundle of text constraints exactly
-        as a <i>schemacmd deftext</i> call. This is meant as toplevel
+        as a <i>schemacmd deftexttype</i> call. This is meant as toplevel
         command of a <i>schemacmd define</i> script. This command is
         not allowed nested in an other definition script command and
         will raise error, if you call it there.</desc>
@@ -771,7 +771,7 @@ s define {
     <p>Text - parsed character data, as XML calles it - must sometimes
     be of a certain kind, must comply to some rules etc to be valid.
     The text constraint script arguments to the text, attribute,
-    nsattribute and deftext commands allow the following text
+    nsattribute and deftexttype commands allow the following text
     constraint commands to check text for certain properties.</p>
 
     <p>The text constraint commands are:</p>
