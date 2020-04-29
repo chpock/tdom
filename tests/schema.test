@@ -386,7 +386,7 @@ test schema-1.19 {call top level schema cmd in definition script} {
     set result [catch {s define {
         defelement e {
             element e1 1 {
-                deftext foo {minLength 1}
+                deftexttype foo {minLength 1}
                 defelement bar {}
             }
             element bar
@@ -401,7 +401,7 @@ test schema-1.20 {call top level schema cmd in definition script} {
     tdom::schema create s
     set result [catch {s defelement e {
             element e1 1 {
-                deftext foo {minLength 1}
+                deftexttype foo {minLength 1}
                 defelement bar {}
             }
             element bar
@@ -643,7 +643,7 @@ test schema-1.26 {prefixns} {
     lappend result $errMsg
     s delete
     set result
-} {1 {Command only allowed at lop level} 1 {Command only allowed at lop level} 1 {Method not allowed in nested schema define script} 1 {This recursive call is not allowed}}
+} {1 {Command only allowed at lop level} 1 {Command only allowed at lop level} 1 {Command not allowed in nested schema define script} 1 {This recursive call is not allowed}}
 
 test schema-1.27 {prefixns} {
     tdom::schema create s
@@ -771,6 +771,45 @@ test schema-1.33 {Error after local defined element} {
     s delete
     set result
 } 1
+
+test schema-1.34 {defelement nested in defelement nested in define} {
+    tdom::schema s
+    set result [catch {
+        s define {
+            defelement a {
+                defelement b {
+                    element c ! {}
+                }
+            }
+        }
+    } errMsg]
+    s delete
+    lappend result $errMsg
+} {1 {Command not allowed in nested schema define script}}
+
+test schema-1.35 {deftexttype nested in deftexttype nested in define} {
+    tdom::schema s
+    set result [catch {
+        s define {
+            deftexttype foo {
+                minLength 2
+                ::tdom::schema::deftexttype bar {
+                    maxLength 2
+                }
+            }
+        }
+    } errMsg]
+    s define {
+        deftexttype foo {
+            minLength 2
+        }
+        deftexttype bar {
+            maxLength 2
+        }
+    }
+    s delete
+    lappend result $errMsg
+} {1 {Command called in invalid schema context}}
 
 test schema-2.1 {grammar definition: ref} {
     tdom::schema create grammar
@@ -4475,9 +4514,9 @@ test schema-14.17 {text: oneOf w/ allOf} {
     set result
 } {0 0 1 1 1 1 0 0 0 0}
 
-test schema-14.18 {deftext} {
+test schema-14.18 {deftexttype} {
     tdom::schema s
-    s deftext len2-4 {
+    s deftexttype len2-4 {
         minLength 2
         maxLength 4
     }
@@ -4510,9 +4549,101 @@ test schema-14.18 {deftext} {
     set result
 } {0 1 0 1 0 1 0 1 0 1 1 0 1 0 1 0 1 0 0 1 0 1 1 0}
 
-test schema-14.19 {deftext} {
+test schema-14.18a {deftexttype} {
     tdom::schema s
-    s deftext len2-4 {
+    s define {
+        deftexttype len2-4 {
+            minLength 2
+            maxLength 4
+        }
+        defelement doc {
+            element e ! {text type len2-4}
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><e/></doc>
+        <doc><e></e></doc>
+        {<doc><e> </e></doc>}
+        {<doc><e>1</e></doc>}
+        {<doc><e>12</e></doc>}
+        {<doc><e>  </e></doc>}
+        {<doc><e>123</e></doc>}
+        {<doc><e>1234</e></doc>}
+        {<doc><e>1234 </e></doc>}
+        {<doc><e>12345</e></doc>}
+        {<doc><e>123&#x1234;</e></doc>}
+    } {
+        lappend result [s validate $xml]
+        set rc [catch {dom parse -validateCmd s $xml doc}]
+        if {$rc == 0} {
+            $doc delete
+        }
+        lappend result $rc
+    }
+    s delete
+    set result
+} {0 1 0 1 0 1 0 1 0 1 1 0 1 0 1 0 1 0 0 1 0 1 1 0}
+
+test schema-14.18b {deftexttype} {
+    tdom::schema s
+    s define {
+        deftexttype len2-4 {
+            minLength 2
+            maxLength 4
+        }
+        tdom::schema s1
+        s1 define {
+            deftexttype len2-4 {
+                minLength 2
+                maxLength 4
+            }
+            defelement doc {
+                element e ! {text type len2-4}
+            }
+        }            
+        defelement doc {
+            element e ! {text type len2-4}
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><e/></doc>
+        <doc><e></e></doc>
+        {<doc><e> </e></doc>}
+        {<doc><e>1</e></doc>}
+        {<doc><e>12</e></doc>}
+        {<doc><e>  </e></doc>}
+        {<doc><e>123</e></doc>}
+        {<doc><e>1234</e></doc>}
+        {<doc><e>1234 </e></doc>}
+        {<doc><e>12345</e></doc>}
+        {<doc><e>123&#x1234;</e></doc>}
+    } {
+        lappend result [s validate $xml]
+        lappend result [s1 validate $xml]
+        set rc [catch {dom parse -validateCmd s $xml doc}]
+        if {$rc == 0} {
+            $doc delete
+        }
+        lappend result $rc
+        set rc [catch {dom parse -validateCmd s1 $xml doc}]
+        if {$rc == 0} {
+            $doc delete
+        }
+        lappend result $rc
+    }
+    s1 delete
+    s delete
+    set result
+} {0 0 1 1 0 0 1 1 0 0 1 1 0 0 1 1 0 0 1 1 1 1 0 0 1 1 0 0 1 1 0 0 1 1 0 0 0 0 1 1 0 0 1 1 1 1 0 0}
+
+
+test schema-14.19 {deftexttype} {
+    tdom::schema s
+    s deftexttype len2-4 {
         minLength 2
         maxLength 4
     }
@@ -4547,9 +4678,9 @@ test schema-14.19 {deftext} {
     set result
 } {0 1 0 1 1 0 0 1 1 0 0 1 1 0 0 1 0 1 0 1}
 
-test schema-14.19a {deftext} {
+test schema-14.19a {deftexttype} {
     tdom::schema s
-    s deftext len2-4 {
+    s deftexttype len2-4 {
         minLength 2
         maxLength 4
     }
@@ -4583,9 +4714,9 @@ test schema-14.19a {deftext} {
     set result
 } {0 1 0 1 1 0 0 1 1 0 0 1 1 0 0 1 0 1 0 1}
 
-test schema-14.20 {deftext} {
+test schema-14.20 {deftexttype} {
     tdom::schema s
-    s deftext len2-4 {
+    s deftexttype len2-4 {
         minLength 2
         maxLength 4
     }
@@ -4617,9 +4748,9 @@ test schema-14.20 {deftext} {
     set result
 } {0 0 1 0 1 0 1 0 0 0}
 
-test schema-14.20a {deftext} {
+test schema-14.20a {deftexttype} {
     tdom::schema s
-    s deftext len2-4 {
+    s deftexttype len2-4 {
         minLength 2
         maxLength 4
     }
