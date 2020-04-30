@@ -1075,8 +1075,6 @@ finalizeElement (
     }
 }
 
-
-
 static void
 rewindStack (
     SchemaData *sdata
@@ -1296,6 +1294,26 @@ evalVirtual (
     return 1;
 }
 
+/* Check, if the pattern to probe does not call itself (even
+ * indirectly) without a match inbetween.*/
+static int inline
+recursivePattern (
+    SchemaValidationStack *se,
+    SchemaCP *pattern
+    )
+{
+    int rc = 0;
+    
+    while (se && se->pattern->type != SCHEMA_CTYPE_NAME) {
+        if (!se->hasMatched && se->pattern == pattern) {
+            rc = 1;
+            break;
+        }
+        se = se->down;
+    }
+    return rc;
+}
+
 static int
 matchElementStart (
     Tcl_Interp *interp,
@@ -1408,8 +1426,13 @@ matchElementStart (
                     case SCHEMA_CTYPE_CHOICE:
                         Tcl_Panic ("MIXED or CHOICE child of MIXED or CHOICE");
 
-                    case SCHEMA_CTYPE_INTERLEAVE:
                     case SCHEMA_CTYPE_PATTERN:
+                        if (recursivePattern (se, icp)) {
+                            mayskip = 1;
+                            continue;
+                        }
+                        /* fall throu */
+                    case SCHEMA_CTYPE_INTERLEAVE:
                         pushToStack (sdata, icp);
                         rc = matchElementStart (interp, sdata, name, namespace);
                         if (rc == 1) {
@@ -1440,8 +1463,13 @@ matchElementStart (
                 }
                 else return 0;
 
-            case SCHEMA_CTYPE_INTERLEAVE:
             case SCHEMA_CTYPE_PATTERN:
+                if (recursivePattern (se, candidate)) {
+                    mayskip = 1;
+                    break;
+                }
+                /* fall throu */
+            case SCHEMA_CTYPE_INTERLEAVE:
                 pushToStack (sdata, candidate);
                 rc = matchElementStart (interp, sdata, name, namespace);
                 if (rc == 1) {
@@ -1559,8 +1587,13 @@ matchElementStart (
             case SCHEMA_CTYPE_CHOICE:
                 Tcl_Panic ("MIXED or CHOICE child of INTERLEAVE");
 
-            case SCHEMA_CTYPE_INTERLEAVE:
             case SCHEMA_CTYPE_PATTERN:
+                if (recursivePattern (se, icp)) {
+                    mayskip = 1;
+                    continue;
+                }
+                /* fall throu */
+            case SCHEMA_CTYPE_INTERLEAVE:
                 pushToStack (sdata, icp);
                 rc = matchElementStart (interp, sdata, name, namespace);
                 if (rc == 1) {
@@ -2241,8 +2274,13 @@ static int checkElementEnd (
                     case SCHEMA_CTYPE_ANY:
                         continue;
                         
-                    case SCHEMA_CTYPE_INTERLEAVE:
                     case SCHEMA_CTYPE_PATTERN:
+                        if (recursivePattern (se, ic)) {
+                            mayskip = 1;
+                            break;
+                        }
+                        /* fall throu */
+                    case SCHEMA_CTYPE_INTERLEAVE:
                         pushToStack (sdata, ic);
                         if (checkElementEnd (interp, sdata)) {
                             mayskip = 1;
@@ -2270,8 +2308,13 @@ static int checkElementEnd (
                 if (evalVirtual (interp, sdata, ac)) break;
                 else return 0;
                 
-            case SCHEMA_CTYPE_INTERLEAVE:
             case SCHEMA_CTYPE_PATTERN:
+                if (recursivePattern (se, cp->content[ac])) {
+                    mayskip = 1;
+                    break;
+                }
+                /* fall throu */
+            case SCHEMA_CTYPE_INTERLEAVE:
                 pushToStack (sdata, cp->content[ac]);
                 rc = checkElementEnd (interp, sdata);
                 popStack (sdata);
@@ -2504,8 +2547,12 @@ matchText (
                         case SCHEMA_CTYPE_ANY:
                             break;
 
-                        case SCHEMA_CTYPE_INTERLEAVE:
                         case SCHEMA_CTYPE_PATTERN:
+                            if (recursivePattern (se, ic)) {
+                                break;
+                            }
+                            /* fall throu */
+                        case SCHEMA_CTYPE_INTERLEAVE:
                             pushToStack (sdata, ic);
                             if (matchText (interp, sdata, text)) {
                                 updateStack (sdata, se, ac);
@@ -2539,8 +2586,12 @@ matchText (
                     }
                     break;
 
-                case SCHEMA_CTYPE_INTERLEAVE:
                 case SCHEMA_CTYPE_PATTERN:
+                    if (recursivePattern (se, candidate)) {
+                        break;
+                    }
+                    /* fall throu */
+                case SCHEMA_CTYPE_INTERLEAVE:
                     pushToStack (sdata, candidate);
                     if (matchText (interp, sdata, text)) {
                         updateStack (sdata, se, ac);
@@ -2650,8 +2701,12 @@ matchText (
                 case SCHEMA_CTYPE_ANY:
                     break;
 
-                case SCHEMA_CTYPE_INTERLEAVE:
                 case SCHEMA_CTYPE_PATTERN:
+                    if (recursivePattern (se, ic)) {
+                        break;
+                    }
+                    /* fall throu */
+                case SCHEMA_CTYPE_INTERLEAVE:
                     pushToStack (sdata, ic);
                     if (matchText (interp, sdata, text)) {
                         updateStack (sdata, se, ac);
@@ -3740,8 +3795,12 @@ getNextExpectedWorker (
                         );
                 }
                 break;
-            case SCHEMA_CTYPE_INTERLEAVE:
             case SCHEMA_CTYPE_PATTERN:
+                if (recursivePattern (se, ic)) {
+                    break;
+                }
+                /* Fall through */
+            case SCHEMA_CTYPE_INTERLEAVE:
                 if (expectedFlags & EXPECTED_ONLY_MANDATORY
                     && !se->hasMatched) {
                     expectedFlags |= EXPECTED_PROBE_MAYSKIP;
@@ -3796,8 +3855,13 @@ getNextExpectedWorker (
                         }
                         jc = ic->content[i];
                         switch (jc->type) {
-                        case SCHEMA_CTYPE_INTERLEAVE:
                         case SCHEMA_CTYPE_PATTERN:
+                            if (recursivePattern (se, ic)) {
+                                mayskip = 1;
+                                break;
+                            }
+                            /* fall throu */
+                        case SCHEMA_CTYPE_INTERLEAVE:
                             se1 = getStackElement (sdata, ic);
                             mayskip = getNextExpectedWorker (
                                 sdata, se1, interp, seenCPs, rObj,
@@ -3834,8 +3898,12 @@ getNextExpectedWorker (
                                 );
                         }
                         break;
-                    case SCHEMA_CTYPE_INTERLEAVE:
                     case SCHEMA_CTYPE_PATTERN:
+                        if (recursivePattern (se, jc)) {
+                            break;
+                        }
+                        /* Fall through */
+                    case SCHEMA_CTYPE_INTERLEAVE:
                         Tcl_CreateHashEntry (seenCPs, jc, &hnew);
                         if (hnew) {
                             se1 = getStackElement (sdata, ic);
