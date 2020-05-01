@@ -36,7 +36,7 @@
           you may use the &quot;prefix&quot; pointing to the namespace
           URI in the current prefixUriList, set by this method. If the
           list map the same prefix to different namespace URIs the
-          frist one win. If there isn't such a prefix the namespace
+          first one win. If there isn't such a prefix the namespace
           argument is used literally as namespace URI. If the method
           is called without argument it returns the current
           prefixUriList. If the method is called with the empty string
