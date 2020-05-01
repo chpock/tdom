@@ -328,23 +328,24 @@
                   the namespace as second element.</desc>
               </optdef>
               <optdef>
-                  <optname>expected</optname> <desc>Returns in no
-                  particular order all posible next events (since the
-                  last successful event match, if there was one) as a
-                  list. If an element is namespaced its list entry
-                  will be itself a list with two elements, with the
-                  name as first and the namespace as second element.
-                  If text is a possible next event the list entry will
-                  be a two elements list, with #text as first element
-                  and the empty space as second. If an any element
+                  <optname>expected</optname>
+                  <desc>Returns in no particular order all posible
+                  next events (since the last successful event match,
+                  if there was one) as a list. If an element is
+                  namespaced its list entry will be itself a list with
+                  two elements, with the name as first and the
+                  namespace as second element. If text is a possible
+                  next event the list entry will be a two elements
+                  list, with #text as first element and the empty
+                  space as second. If an any element constraint is
+                  possible the list entry will be a two elements list,
+                  with &lt;any> as first element and the empty space
+                  as second. If an any element in a certain namespace
                   constraint is possible the list entry will be a two
                   elements list, with &lt;any> as first element and
-                  the empty space as second. If an any element in a
-                  certain namespace constraint is possible the list
-                  entry will be a two elements list, with &lt;any> as
-                  first element and the namespace as second. If
-                  element end is a possible event the list entry will
-                  be a two elements list with &lt;elementend> and the
+                  the namespace as second. If element end is a
+                  possible event the list entry will be a two elements
+                  list with &lt;elementend> as first element and the
                   empty string as second element.</desc>
               </optdef>
               <optdef>
