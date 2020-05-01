@@ -386,7 +386,7 @@
                       <dt>MATCH_TEXT</dt><dd>Validating text between tags.</dd>
                       <dt>MATCH_ATTRIBUTE_TEXT</dt><dd>Attribute text value contraint check</dd>
                       <dt>MATCH_GLOBAL</dt><dd>Checking global IDs</dd>
-                      <dt>MATCH_DOM_KEYCONSTRAINT</dt><dd>Checking domuniqe constaint</dd>
+                      <dt>MATCH_DOM_KEYCONSTRAINT</dt><dd>Checking domunique constaint</dd>
                       <dt>MATCH_DOM_XPATH_BOOLEAN</dt><dd>Checking domxpathboolean constaint</dd>
                   </dl>
                   If called with one of the possible optional
