@@ -36,23 +36,6 @@
 #include <unistd.h>
 #endif
 
-#ifndef TDOM_CHOICE_HASH_THRESHOLD
-# define TDOM_CHOICE_HASH_THRESHOLD 5
-#endif
-#ifndef TDOM_ATTRIBUTE_HASH_THRESHOLD
-# define TDOM_ATTRIBUTE_HASH_THRESHOLD 5
-#endif
-#ifndef TDOM_EXPAT_READ_SIZE
-# define TDOM_EXPAT_READ_SIZE (1024*8)
-#endif
-#ifndef O_BINARY
-#ifdef _O_BINARY
-#define O_BINARY _O_BINARY
-#else
-#define O_BINARY 0
-#endif
-#endif
-
 /* #define DEBUG */
 /* #define DDEBUG */
 /*----------------------------------------------------------------------------
@@ -70,6 +53,21 @@
 # define DDBG(x)
 #endif
 
+
+/*----------------------------------------------------------------------------
+| Choice/attribute handling method threshold
+|
+\---------------------------------------------------------------------------*/
+#ifndef TDOM_CHOICE_HASH_THRESHOLD
+# define TDOM_CHOICE_HASH_THRESHOLD 5
+#endif
+#ifndef TDOM_ATTRIBUTE_HASH_THRESHOLD
+# define TDOM_ATTRIBUTE_HASH_THRESHOLD 5
+#endif
+#ifndef TDOM_EXPAT_READ_SIZE
+# define TDOM_EXPAT_READ_SIZE (1024*8)
+#endif
+
 /*----------------------------------------------------------------------------
 |   Initial buffer sizes
 |
@@ -85,6 +83,32 @@
 #endif
 #ifndef ATTR_ARRAY_INIT
 #  define ATTR_ARRAY_INIT 4
+#endif
+
+/*----------------------------------------------------------------------------
+|   Local defines
+|
+\---------------------------------------------------------------------------*/
+#ifndef O_BINARY
+# ifdef _O_BINARY
+#  define O_BINARY _O_BINARY
+# else
+#  define O_BINARY 0
+# endif
+#endif
+#if !defined(PTR2UINT)
+# if defined(HAVE_UINTPTR_T) || defined(uintptr_t)
+#  define PTR2UINT(p) ((unsigned int)(uintptr_t)(p))
+# else
+#  define PTR2UINT(p) ((unsigned int)(p))
+# endif
+#endif
+#if !defined(UINT2PTR)
+# if defined(HAVE_UINTPTR_T) || defined(uintptr_t)
+#  define UINT2PTR(p) ((void *)(uintptr_t)(p))
+# else
+#  define UINT2PTR(p) ((void *)(p))
+# endif
 #endif
 
 /*----------------------------------------------------------------------------
@@ -179,6 +203,15 @@ static char *ValidationErrorType2str[] = {
 #define RECOVER_FLAG_MATCH_END_CONTINUE 8
 
 /*----------------------------------------------------------------------------
+|   [schemacmd info expected] related flags
+|
+\---------------------------------------------------------------------------*/
+
+#define EXPECTED_IGNORE_MATCHED 1
+#define EXPECTED_ONLY_MANDATORY 2
+#define EXPECTED_PROBE_MAYSKIP 4
+
+/*----------------------------------------------------------------------------
 |   domKeyConstraint related flage
 |
 \---------------------------------------------------------------------------*/
@@ -190,8 +223,6 @@ static char *ValidationErrorType2str[] = {
 |   Macros
 |
 \---------------------------------------------------------------------------*/
-#define TMALLOC(t) (t*)MALLOC(sizeof(t))
-
 #define SetResult(str) Tcl_ResetResult(interp); \
                      Tcl_SetStringObj(Tcl_GetObjResult(interp), (str), -1)
 #define SetResultV(str) if (!sdata->evalError) { \
@@ -372,7 +403,22 @@ static void SetActiveSchemaData (SchemaData *v)
         se->activeChild = ac;                 \
         se->hasMatched = 1;                   \
     }                                                   \
-    
+
+
+#ifndef TCL_THREADS
+SchemaData *
+tdomGetSchemadata (Tcl_Interp *interp) 
+{
+    return activeSchemaData;
+}
+#else
+SchemaData *
+tdomGetSchemadata (void) 
+{
+    return GETASI;
+}
+#endif
+
 static SchemaCP*
 initSchemaCP (
     Schema_CP_Type type,
@@ -643,7 +689,7 @@ static void schemaInstanceDelete (
     /* Protect the clientData to be freed inside (even nested)
      * Tcl_Eval*() calls to avoid invalid mem access and postpone the
      * cleanup until the Tcl_Eval*() calls are finished (done in
-     * schemaInstanceCmd(). */
+     * schemaInstanceCmd()). */
     if (sdata->currentEvals || sdata->inuse > 0) {
         sdata->cleanupAfterUse = 1;
         return;
@@ -742,6 +788,7 @@ cleanupLastPattern (
     for (i = from; i < sdata->numPatternList; i++) {
         this = sdata->patternList[i];
         hashTable = NULL;
+        name = NULL;
         if (this->type == SCHEMA_CTYPE_NAME) {
             /* Local defined  elements aren't saved under  their local
              * name bucket in the sdata->element hash table. */
@@ -978,7 +1025,7 @@ popStack (
         repoolStackElement (sdata, sdata->stack);
         sdata->stack = se;
     } else {
-        if (sdata->stack->activeChild > 0 || sdata->stack->hasMatched) {
+        if (sdata->stack->hasMatched) {
             se = sdata->stack->down;
             sdata->stack->down = sdata->lastMatchse;
             sdata->lastMatchse = sdata->stack;
@@ -1254,6 +1301,26 @@ evalVirtual (
     return 1;
 }
 
+/* Check, if the pattern to probe does not call itself (even
+ * indirectly) without a match inbetween.*/
+static int inline
+recursivePattern (
+    SchemaValidationStack *se,
+    SchemaCP *pattern
+    )
+{
+    int rc = 0;
+    
+    while (se && se->pattern->type != SCHEMA_CTYPE_NAME) {
+        if (!se->hasMatched && se->pattern == pattern) {
+            rc = 1;
+            break;
+        }
+        se = se->down;
+    }
+    return rc;
+}
+
 static int
 matchElementStart (
     Tcl_Interp *interp,
@@ -1366,8 +1433,13 @@ matchElementStart (
                     case SCHEMA_CTYPE_CHOICE:
                         Tcl_Panic ("MIXED or CHOICE child of MIXED or CHOICE");
 
-                    case SCHEMA_CTYPE_INTERLEAVE:
                     case SCHEMA_CTYPE_PATTERN:
+                        if (recursivePattern (se, icp)) {
+                            mayskip = 1;
+                            continue;
+                        }
+                        /* fall throu */
+                    case SCHEMA_CTYPE_INTERLEAVE:
                         pushToStack (sdata, icp);
                         rc = matchElementStart (interp, sdata, name, namespace);
                         if (rc == 1) {
@@ -1398,8 +1470,13 @@ matchElementStart (
                 }
                 else return 0;
 
-            case SCHEMA_CTYPE_INTERLEAVE:
             case SCHEMA_CTYPE_PATTERN:
+                if (recursivePattern (se, candidate)) {
+                    mayskip = 1;
+                    break;
+                }
+                /* fall throu */
+            case SCHEMA_CTYPE_INTERLEAVE:
                 pushToStack (sdata, candidate);
                 rc = matchElementStart (interp, sdata, name, namespace);
                 if (rc == 1) {
@@ -1444,7 +1521,7 @@ matchElementStart (
                 if (recover (interp, sdata, MISSING_ELEMENT_MATCH_START, name,
                              namespace, NULL, ac)) {
                     if (sdata->recoverFlags & RECOVER_FLAG_IGNORE) {
-                        /* We pretend the ac content particel had
+                        /* We pretend the ac content particle had
                          * matched. */
                         updateStack (sdata, se, ac);
                     }
@@ -1517,8 +1594,13 @@ matchElementStart (
             case SCHEMA_CTYPE_CHOICE:
                 Tcl_Panic ("MIXED or CHOICE child of INTERLEAVE");
 
-            case SCHEMA_CTYPE_INTERLEAVE:
             case SCHEMA_CTYPE_PATTERN:
+                if (recursivePattern (se, icp)) {
+                    mayskip = 1;
+                    continue;
+                }
+                /* fall throu */
+            case SCHEMA_CTYPE_INTERLEAVE:
                 pushToStack (sdata, icp);
                 rc = matchElementStart (interp, sdata, name, namespace);
                 if (rc == 1) {
@@ -2211,8 +2293,13 @@ static int checkElementEnd (
                     case SCHEMA_CTYPE_ANY:
                         continue;
                         
-                    case SCHEMA_CTYPE_INTERLEAVE:
                     case SCHEMA_CTYPE_PATTERN:
+                        if (recursivePattern (se, ic)) {
+                            mayskip = 1;
+                            break;
+                        }
+                        /* fall throu */
+                    case SCHEMA_CTYPE_INTERLEAVE:
                         pushToStack (sdata, ic);
                         if (checkElementEnd (interp, sdata)) {
                             mayskip = 1;
@@ -2240,8 +2327,13 @@ static int checkElementEnd (
                 if (evalVirtual (interp, sdata, ac)) break;
                 else return 0;
                 
-            case SCHEMA_CTYPE_INTERLEAVE:
             case SCHEMA_CTYPE_PATTERN:
+                if (recursivePattern (se, cp->content[ac])) {
+                    mayskip = 1;
+                    break;
+                }
+                /* fall throu */
+            case SCHEMA_CTYPE_INTERLEAVE:
                 pushToStack (sdata, cp->content[ac]);
                 rc = checkElementEnd (interp, sdata);
                 popStack (sdata);
@@ -2474,8 +2566,12 @@ matchText (
                         case SCHEMA_CTYPE_ANY:
                             break;
 
-                        case SCHEMA_CTYPE_INTERLEAVE:
                         case SCHEMA_CTYPE_PATTERN:
+                            if (recursivePattern (se, ic)) {
+                                break;
+                            }
+                            /* fall throu */
+                        case SCHEMA_CTYPE_INTERLEAVE:
                             pushToStack (sdata, ic);
                             if (matchText (interp, sdata, text)) {
                                 updateStack (sdata, se, ac);
@@ -2509,8 +2605,12 @@ matchText (
                     }
                     break;
 
-                case SCHEMA_CTYPE_INTERLEAVE:
                 case SCHEMA_CTYPE_PATTERN:
+                    if (recursivePattern (se, candidate)) {
+                        break;
+                    }
+                    /* fall throu */
+                case SCHEMA_CTYPE_INTERLEAVE:
                     pushToStack (sdata, candidate);
                     if (matchText (interp, sdata, text)) {
                         updateStack (sdata, se, ac);
@@ -2620,8 +2720,12 @@ matchText (
                 case SCHEMA_CTYPE_ANY:
                     break;
 
-                case SCHEMA_CTYPE_INTERLEAVE:
                 case SCHEMA_CTYPE_PATTERN:
+                    if (recursivePattern (se, ic)) {
+                        break;
+                    }
+                    /* fall throu */
+                case SCHEMA_CTYPE_INTERLEAVE:
                     pushToStack (sdata, ic);
                     if (matchText (interp, sdata, text)) {
                         updateStack (sdata, se, ac);
@@ -2904,7 +3008,7 @@ static int
 validateFile (
     Tcl_Interp *interp,
     SchemaData *sdata,
-    char *filename
+    Tcl_Obj *filenameObj
     )
 {
     XML_Parser parser;
@@ -2913,7 +3017,9 @@ validateFile (
     Tcl_DString cdata;
     Tcl_Obj *resultObj;
     char sl[50], sc[50];
+    char *filename;
     int result, fd;
+    Tcl_DString translatedFilename;
 
     parser = XML_ParserCreate_MM (NULL, MEM_SUITE, &sep);
     vdata.interp = interp;
@@ -2929,6 +3035,12 @@ validateFile (
     XML_SetElementHandler (parser, startElement, endElement);
     XML_SetCharacterDataHandler (parser, characterDataHandler);
 
+    filename = Tcl_TranslateFileName (interp, Tcl_GetString (filenameObj),
+                                      &translatedFilename);
+    if (filename == NULL) {
+        result = TCL_ERROR;
+        goto cleanup;
+    }
     fd = open(filename, O_BINARY|O_RDONLY);
     if (fd < 0) {
         Tcl_ResetResult (interp);
@@ -2980,9 +3092,11 @@ validateFile (
         Tcl_SetObjResult (interp, resultObj);
         result = TCL_ERROR;
     } else {
+        Tcl_DStringFree (&translatedFilename);
         result = TCL_OK;
     }
 cleanup:
+    Tcl_DStringFree (&translatedFilename);
     sdata->parser = NULL;
     XML_ParserFree (parser);
     Tcl_DStringFree (&cdata);
@@ -3646,19 +3760,28 @@ getNextExpectedWorker (
     Tcl_Interp *interp,
     Tcl_HashTable *seenCPs,
     Tcl_Obj *rObj,
-    int ignoreMatched
+    int expectedFlags
     )
 {
     int ac, hm, i, hnew, mustMatch, mayskip, rc = 1;
+    int probeMayskip = 0;
     SchemaCP *cp, *ic, *jc;
     SchemaValidationStack *se1;
 
+    if (expectedFlags & EXPECTED_PROBE_MAYSKIP) {
+        probeMayskip = 1;
+    }
     getContext (cp, ac, hm);
-    if (ignoreMatched && hm) {
+    if ((expectedFlags & EXPECTED_IGNORE_MATCHED
+         || expectedFlags & EXPECTED_ONLY_MANDATORY)
+        && hm) {
         ac++;
         hm = 0;
     } else {
-        if (hm && maxOne(cp->quants[ac])) ac++;
+        if (hm && maxOne(cp->quants[ac])) {
+            ac++;
+            hm = 0;
+        }
     }
     switch (cp->type) {
     case SCHEMA_CTYPE_INTERLEAVE:
@@ -3672,74 +3795,157 @@ getNextExpectedWorker (
                 && se->interleaveState[ac]
                 && maxOne (cp->quants[ac])) {
                 ac++;
+                hm = 0;
+                continue;
+            }
+            if (expectedFlags & EXPECTED_ONLY_MANDATORY
+                && !(mustMatch (cp->quants[ac], hm))) {
+                ac++;
+                hm = 0;
                 continue;
             }
             ic = cp->content[ac];
             mayskip = 0;
             switch (ic->type) {
             case SCHEMA_CTYPE_NAME:
+                if (probeMayskip) break;
                 Tcl_ListObjAppendElement (interp, rObj,
                                           serializeElementName (interp, ic));
                 break;
-            case SCHEMA_CTYPE_INTERLEAVE:
             case SCHEMA_CTYPE_PATTERN:
+                if (recursivePattern (se, ic)) {
+                    break;
+                }
+                /* Fall through */
+            case SCHEMA_CTYPE_INTERLEAVE:
+                if (expectedFlags & EXPECTED_ONLY_MANDATORY
+                    && !se->hasMatched) {
+                    expectedFlags |= EXPECTED_PROBE_MAYSKIP;
+                    se1 = getStackElement (sdata, ic);
+                    mayskip = getNextExpectedWorker (sdata, se1, interp,
+                                                     seenCPs, rObj,
+                                                     expectedFlags);
+                    repoolStackElement (sdata, se1);
+                    if (!probeMayskip) {
+                        expectedFlags &= ~EXPECTED_PROBE_MAYSKIP;
+                    }
+                    if (mayskip) break;
+                }
+                if (probeMayskip) break;
                 Tcl_CreateHashEntry (seenCPs, ic, &hnew);
                 if (hnew) {
                     se1 = getStackElement (sdata, ic);
                     mayskip = getNextExpectedWorker (sdata, se1, interp,
                                                      seenCPs, rObj,
-                                                     ignoreMatched);
+                                                     expectedFlags);
                     repoolStackElement (sdata, se1);
                 }
                 break;
 
             case SCHEMA_CTYPE_ANY:
-                Tcl_ListObjAppendElement (interp, rObj,
-                                          serializeAnyCP (interp, ic));
+                if (probeMayskip) break;
+                if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
+                    || minOne (cp->quants[ac])) {
+                    Tcl_ListObjAppendElement (interp, rObj,
+                                              serializeAnyCP (interp, ic));
+                }
                 break;
 
             case SCHEMA_CTYPE_TEXT:
-                Tcl_ListObjAppendElement (interp, rObj,
-                                          serializeTextCP (interp, ic));
                 if (ic->nc == 0 || checkText (interp, ic, "")) {
                     mayskip = 1;
+                }
+                if (probeMayskip) break;
+                if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
+                    || mayskip == 0) {
+                    Tcl_ListObjAppendElement (interp, rObj,
+                                              serializeTextCP (interp, ic));
                 }
                 break;
                 
             case SCHEMA_CTYPE_CHOICE:
+                if (probeMayskip) {
+                    for (i = 0; i < ic->nc; i++) {
+                        if (mayMiss (ic->quants[i])) {
+                            mayskip = 1;
+                            break;
+                        }
+                        jc = ic->content[i];
+                        switch (jc->type) {
+                        case SCHEMA_CTYPE_PATTERN:
+                            if (recursivePattern (se, ic)) {
+                                mayskip = 1;
+                                break;
+                            }
+                            /* fall throu */
+                        case SCHEMA_CTYPE_INTERLEAVE:
+                            se1 = getStackElement (sdata, ic);
+                            mayskip = getNextExpectedWorker (
+                                sdata, se1, interp, seenCPs, rObj,
+                                expectedFlags
+                                );
+                            repoolStackElement (sdata, se1);
+                            break;
+                        case SCHEMA_CTYPE_TEXT:
+                            if (ic->nc == 0 || checkText (interp, ic, "")) {
+                                mayskip = 1;
+                            }
+                            break;
+                        default:
+                            break;
+                        }
+                        if (mayskip) break;
+                    }
+                    break;
+                }
                 if (ic->flags & MIXED_CONTENT) {
-                    Tcl_ListObjAppendElement (interp, rObj,
-                                              serializeTextCP (interp, NULL));
+                    if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)) {
+                        Tcl_ListObjAppendElement (
+                            interp, rObj, serializeTextCP (interp, NULL));
+                    }
                 }
                 for (i = 0; i < ic->nc; i++) {
                     jc = ic->content[i];
                     switch (jc->type) {
                     case SCHEMA_CTYPE_NAME:
-                        Tcl_ListObjAppendElement (
-                            interp, rObj, serializeElementName (interp, jc)
-                            );
+                        if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
+                            || minOne (cp->quants[i])) {
+                            Tcl_ListObjAppendElement (
+                                interp, rObj, serializeElementName (interp, jc)
+                                );
+                        }
                         break;
-                    case SCHEMA_CTYPE_INTERLEAVE:
                     case SCHEMA_CTYPE_PATTERN:
+                        if (recursivePattern (se, jc)) {
+                            break;
+                        }
+                        /* Fall through */
+                    case SCHEMA_CTYPE_INTERLEAVE:
                         Tcl_CreateHashEntry (seenCPs, jc, &hnew);
                         if (hnew) {
                             se1 = getStackElement (sdata, ic);
                             mayskip = getNextExpectedWorker (
                                 sdata, se1, interp, seenCPs, rObj,
-                                ignoreMatched
+                                expectedFlags
                                 );
                             repoolStackElement (sdata, se1);
                         }
                         break;
                     case SCHEMA_CTYPE_ANY:
-                        Tcl_ListObjAppendElement (
-                            interp, rObj, serializeAnyCP (interp, jc)
-                            );
+                        if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
+                            || minOne (cp->quants[i])) {
+                            Tcl_ListObjAppendElement (
+                                interp, rObj, serializeAnyCP (interp, jc)
+                                );
+                        }
                         break;
                     case SCHEMA_CTYPE_TEXT:
-                        Tcl_ListObjAppendElement (
-                            interp, rObj, serializeTextCP (interp, jc)
-                            );
+                        if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
+                            || minOne (cp->quants[i])) {
+                            Tcl_ListObjAppendElement (
+                                interp, rObj, serializeTextCP (interp, jc)
+                                );
+                        }
                         break;
                     case SCHEMA_CTYPE_CHOICE:
                         Tcl_Panic ("MIXED or CHOICE child of MIXED or CHOICE");
@@ -3769,7 +3975,8 @@ getNextExpectedWorker (
         if (cp->type == SCHEMA_CTYPE_NAME) {
             if (ac == cp->nc) {
                 /* The curently open element can end here, no
-                 * mandatory elements missing */
+                 * mandatory elements missing.
+                 * The element end is always mandatory.*/
                 Tcl_ListObjAppendElement (
                     interp, rObj, serializeElementEnd (interp)
                     );
@@ -3835,7 +4042,7 @@ static void
 getNextExpected (
     SchemaData *sdata,
     Tcl_Interp *interp,
-    int         ignoreMatched
+    int         expectedFlags
     )
 {
     int remainingLastMatch, count, rc;
@@ -3853,7 +4060,7 @@ getNextExpected (
             se = se->down;
         }
         while (se && getNextExpectedWorker (sdata, se, interp, &localHash, rObj,
-                   ignoreMatched)) {
+                   expectedFlags)) {
             if (remainingLastMatch) {
                 count = 1;
                 se = sdata->lastMatchse;
@@ -3868,14 +4075,15 @@ getNextExpected (
     
     se = sdata->stack;
     while (se) {
+        if (!se->hasMatched && se->pattern->type != SCHEMA_CTYPE_NAME) {
+            se = se->down;
+            continue;
+        }
         rc = getNextExpectedWorker (sdata, se, interp, &localHash, rObj,
-                                    ignoreMatched);
+                                    expectedFlags);
         if (se->pattern->type == SCHEMA_CTYPE_NAME) break;
         se = se->down;
-        if (!rc) {
-            if (mayMiss(se->pattern->quants[se->activeChild])) continue;
-            break;
-        }
+        if (!rc) break;
     }
     Tcl_DeleteHashTable (&localHash);
     Tcl_SetObjResult (interp, unifyMatchList (interp, &localHash, rObj));
@@ -3890,7 +4098,7 @@ schemaInstanceInfoCmd (
     Tcl_Obj *const objv[]
     )
 {
-    int methodIndex, ignoreMatched;
+    int methodIndex, expectedFlags;
     long line, column;
     Tcl_HashEntry *h;
     SchemaCP *cp;
@@ -3924,7 +4132,15 @@ schemaInstanceInfoCmd (
     enum schemaInstanceInfoVactionMethod {
         m_name, m_namespace, m_text
     };
-    
+
+    static const char *schemaInstanceInfoExpectedOptions[] = {
+        "-ignorematched", "-onlymandatory", NULL
+    };
+    enum schemaInstanceInfoExpectedOption 
+    {
+        o_ignorematched, o_onlymandatory
+    };
+            
     if (objc < 2) {
         Tcl_WrongNumArgs (interp, 1, objv, "subcommand ?arguments?");
         return TCL_ERROR;
@@ -4041,22 +4257,32 @@ schemaInstanceInfoCmd (
         return TCL_OK;
 
     case m_expected:
-        if (objc != 2 && objc != 3) {
-            Tcl_WrongNumArgs (interp, 2, objv, "?-ignorematched?");
+        if (objc < 2 && objc > 4) {
+            Tcl_WrongNumArgs (interp, 2, objv, "?-ignorematched? ?-onlymandatory?");
             return TCL_ERROR;
         }
-        ignoreMatched = 0;
-        if (objc == 3) {
-            if (strcmp (Tcl_GetString (objv[2]), "-ignorematched") != 0) {
-                SetResult ("Expected -ignorematched");
-                return TCL_ERROR;
-            }
-            ignoreMatched = 1;
-        }
-        
         if (sdata->validationState == VALIDATION_ERROR
             || sdata->validationState == VALIDATION_FINISHED) {
             return TCL_OK;
+        }
+        expectedFlags = 0;
+        while (objc > 2) {
+            if (Tcl_GetIndexFromObj (interp, objv[2],
+                                     schemaInstanceInfoExpectedOptions,
+                                     "option", 0, &methodIndex)
+                != TCL_OK) {
+                return TCL_ERROR;
+            }
+            switch ((enum schemaInstanceInfoExpectedOption) methodIndex) {
+            case o_ignorematched:
+                expectedFlags |= EXPECTED_IGNORE_MATCHED;
+                break;
+            case o_onlymandatory:
+                expectedFlags |= EXPECTED_ONLY_MANDATORY;
+                break;
+            }
+            objv++;
+            objc--;
         }
         if (!sdata->stack) {
             if (sdata->start) {
@@ -4068,7 +4294,7 @@ schemaInstanceInfoCmd (
                 definedElements (&sdata->element, interp);
             }
         } else {
-            getNextExpected (sdata, interp, ignoreMatched);
+            getNextExpected (sdata, interp, expectedFlags);
         }
         break;
         
@@ -4318,14 +4544,14 @@ schemaInstanceCmd (
 
     static const char *schemaInstanceMethods[] = {
         "defelement", "defpattern", "start",    "event",        "delete",
-        "reset",      "define",     "validate", "domvalidate",  "deftext",
+        "reset",      "define",     "validate", "domvalidate",  "deftexttype",
         "info",       "reportcmd",  "prefixns", "validatefile",
         "validatechannel",          "defelementtype",           "set",
         NULL
     };
     enum schemaInstanceMethod {
         m_defelement, m_defpattern, m_start,    m_event,        m_delete,
-        m_reset,      m_define,     m_validate, m_domvalidate,  m_deftext,
+        m_reset,      m_define,     m_validate, m_domvalidate,  m_deftexttype,
         m_info,       m_reportcmd,  m_prefixns, m_validatefile,
         m_validatechannel,          m_defelementtype,           m_set
     };
@@ -4348,11 +4574,11 @@ schemaInstanceCmd (
         
     if (sdata == NULL) {
         /* Inline defined defelement, defelementtype, defpattern,
-         * deftext, start or prefixns */
+         * deftexttype, start or prefixns */
         sdata = GETASI;
         CHECK_SI;
         if (!sdata->defineToplevel && sdata->currentEvals > 1) {
-            SetResult ("Method not allowed in nested schema define script");
+            SetResult ("Command not allowed in nested schema define script");
             return TCL_ERROR;
         }
         i = 1;
@@ -4502,7 +4728,7 @@ schemaInstanceCmd (
         SETASI(savedsdata);
         break;
 
-    case m_deftext:
+    case m_deftexttype:
         CHECK_RECURSIVE_CALL
         if (objc !=  4-i) {
             Tcl_WrongNumArgs (interp, 2-i, objv, "<name>"
@@ -4516,17 +4742,16 @@ schemaInstanceCmd (
                        "name");
             return TCL_ERROR;
         }
-        savedsdata = GETASI;
-        if (savedsdata == sdata) {
-            SetResult ("Recursive call of schema command is not allowed");
-            return TCL_ERROR;
-        }
         pattern = initSchemaCP (SCHEMA_CTYPE_CHOICE, NULL, NULL);
         pattern->type = SCHEMA_CTYPE_TEXT;
         REMEMBER_PATTERN (pattern)
         SETASI(sdata);
+        savedDefineToplevel = sdata->defineToplevel;
         result = evalConstraints (interp, sdata, pattern, objv[3-i]);
-        SETASI(savedsdata);
+        sdata->defineToplevel = savedDefineToplevel;
+        if (!savedDefineToplevel) {
+            SETASI(savedsdata);
+        }
         if (result == TCL_OK) {
             Tcl_SetHashValue (h, pattern);
         } else {
@@ -4688,8 +4913,7 @@ schemaInstanceCmd (
             SetResult ("The schema command is busy");
             return TCL_ERROR;
         }
-        xmlstr = Tcl_GetString (objv[2]);
-        if (validateFile (interp, sdata, xmlstr) == TCL_OK) {
+        if (validateFile (interp, sdata, objv[2]) == TCL_OK) {
             SetBooleanResult (1);
             if (objc == 4) {
                 Tcl_SetVar (interp, Tcl_GetString (objv[3]), "", 0);
@@ -6802,7 +7026,7 @@ maxLengthImpl (
     char *text
     )
 {
-    long maxlen = (long) constraintData;
+    unsigned int maxlen = PTR2UINT(constraintData);
     int len = 0, clen;
 
     while (*text != '\0') {
@@ -6828,11 +7052,11 @@ maxLengthTCObjCmd (
 {
     SchemaData *sdata = GETASI;
     SchemaConstraint *sc;
-    long len;
+    int len;
 
     CHECK_TI
     checkNrArgs (2,2,"Expected: <maximal length as integer>");
-    if (Tcl_GetLongFromObj (interp, objv[1], &len) != TCL_OK) {
+    if (Tcl_GetIntFromObj (interp, objv[1], &len) != TCL_OK) {
         SetResult ("Expected: <maximal length as integer>");
         return TCL_ERROR;
     }
@@ -6841,7 +7065,7 @@ maxLengthTCObjCmd (
     }
     ADD_CONSTRAINT (sdata, sc)
     sc->constraint = maxLengthImpl;
-    sc->constraintData = (void *)len;
+    sc->constraintData = UINT2PTR(len);
     return TCL_OK;
 }
 
@@ -6852,9 +7076,8 @@ minLengthImpl (
     char *text
     )
 {
-    long minlen = (long) constraintData;
+    unsigned int minlen = PTR2UINT(constraintData);
     int len = 0, clen;
-
     while (*text != '\0') {
         clen = UTF8_CHAR_LEN (*text);
         if (!clen) {
@@ -6878,11 +7101,11 @@ minLengthTCObjCmd (
 {
     SchemaData *sdata = GETASI;
     SchemaConstraint *sc;
-    long len;
+    int len;
 
     CHECK_TI
     checkNrArgs (2,2,"Expected: <minimum length as integer>");
-    if (Tcl_GetLongFromObj (interp, objv[1], &len) != TCL_OK) {
+    if (Tcl_GetIntFromObj (interp, objv[1], &len) != TCL_OK) {
         SetResult ("Expected: <minimum length as integer>");
         return TCL_ERROR;
     }
@@ -6891,7 +7114,7 @@ minLengthTCObjCmd (
     }
     ADD_CONSTRAINT (sdata, sc)
     sc->constraint = minLengthImpl;
-    sc->constraintData = (void *)len;
+    sc->constraintData = UINT2PTR(len);
     return TCL_OK;
 }
 
@@ -7770,7 +7993,7 @@ tDOM_SchemaInit (
                           schemaInstanceCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::defpattern",
                           schemaInstanceCmd, NULL, NULL);
-    Tcl_CreateObjCommand (interp, "tdom::schema::deftext",
+    Tcl_CreateObjCommand (interp, "tdom::schema::deftexttype",
                           schemaInstanceCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::start",
                           schemaInstanceCmd, NULL, NULL);

@@ -71,6 +71,7 @@
 #  define tdomstrdup        strdup
 # endif /* TCL_MEM_DEBUG */
 #endif /* USE_NORMAL_ALLOCATOR */
+#define TMALLOC(t) (t*)MALLOC(sizeof(t))
 
 #if defined(TCL_MEM_DEBUG) || defined(NS_AOLSERVER) 
    static void* my_malloc(size_t size){return Tcl_Alloc(size);}

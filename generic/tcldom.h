@@ -50,8 +50,6 @@ void tcldom_createNodeObj(Tcl_Interp * interp, domNode *node,
                           char *objCmdName);
 
 domNode * tcldom_getNodeFromObj(Tcl_Interp  *interp, Tcl_Obj *nodeObj);
-domDocument * tcldom_getDocumentFromName(Tcl_Interp  *interp, char *docName,
-                                         char **errMsg);
 int tcldom_prefixNSlist (char ***prefixnsPtr, Tcl_Interp *interp, int objc,
                          Tcl_Obj *const objv[], const char *methodName);
 int tcldom_setInterpAndReturnVar (Tcl_Interp *interp, domNode *node,
@@ -62,7 +60,6 @@ void tcldom_initialize(void);
 Tcl_ObjCmdProc tcldom_DomObjCmd;
 Tcl_ObjCmdProc tcldom_DocObjCmd;
 Tcl_ObjCmdProc tcldom_NodeObjCmd;
-Tcl_ObjCmdProc TclExpatObjCmd;
 Tcl_ObjCmdProc tcldom_unknownCmd;
 Tcl_ObjCmdProc TclTdomObjCmd;
 

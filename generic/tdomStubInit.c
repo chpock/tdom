@@ -30,6 +30,7 @@ const TdomStubs tdomStubs = {
     XML_GetIdAttributeIndex, /* 15 */
     tcldom_getNodeFromName, /* 16 */
     tcldom_getDocumentFromName, /* 17 */
+    tdomGetSchemadata, /* 18 */
 };
 
 /* !END!: Do not edit above this line. */

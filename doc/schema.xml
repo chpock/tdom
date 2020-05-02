@@ -36,7 +36,7 @@
           you may use the &quot;prefix&quot; pointing to the namespace
           URI in the current prefixUriList, set by this method. If the
           list map the same prefix to different namespace URIs the
-          frist one win. If there isn't such a prefix the namespace
+          first one win. If there isn't such a prefix the namespace
           argument is used literally as namespace URI. If the method
           is called without argument it returns the current
           prefixUriList. If the method is called with the empty string
@@ -95,7 +95,7 @@
       </commanddef>
 
       <commanddef>
-        <command><method>deftext</method> <m>name</m> <m>&lt;constraint script></m></command>
+        <command><method>deftexttype</method> <m>name</m> <m>&lt;constraint script></m></command>
         <desc>This method defines a bundle of text constraints, that
         can be referred by <m>name</m> while defining constrains on
         text element or attribute values. If there is already a text
@@ -123,7 +123,7 @@
         <desc>This method allows to define several elements or pattern
         or a whole schema with one call. All schema command methods so
         far (<m>prefixns</m>, <m>defelement</m>,
-        <m>defelementtype</m>, <m>defpattern</m>, <m>deftext</m> and
+        <m>defelementtype</m>, <m>defpattern</m>, <m>deftexttype</m> and
         <m>start</m>) are allowed top level in the <m>definition
         script</m>. The <m>define</m> method itself isn't allowed
         recursively.</desc>
@@ -331,23 +331,24 @@
                   the namespace as second element.</desc>
               </optdef>
               <optdef>
-                  <optname>expected</optname> <desc>Returns in no
-                  particular order all posible next events (since the
-                  last successful event match, if there was one) as a
-                  list. If an element is namespaced its list entry
-                  will be itself a list with two elements, with the
-                  name as first and the namespace as second element.
-                  If text is a possible next event the list entry will
-                  be a two elements list, with #text as first element
-                  and the empty space as second. If an any element
+                  <optname>expected</optname>
+                  <desc>Returns in no particular order all posible
+                  next events (since the last successful event match,
+                  if there was one) as a list. If an element is
+                  namespaced its list entry will be itself a list with
+                  two elements, with the name as first and the
+                  namespace as second element. If text is a possible
+                  next event the list entry will be a two elements
+                  list, with #text as first element and the empty
+                  space as second. If an any element constraint is
+                  possible the list entry will be a two elements list,
+                  with &lt;any> as first element and the empty space
+                  as second. If an any element in a certain namespace
                   constraint is possible the list entry will be a two
                   elements list, with &lt;any> as first element and
-                  the empty space as second. If an any element in a
-                  certain namespace constraint is possible the list
-                  entry will be a two elements list, with &lt;any> as
-                  first element and the namespace as second. If
-                  element end is a possible event the list entry will
-                  be a two elements list with &lt;elementend> and the
+                  the namespace as second. If element end is a
+                  possible event the list entry will be a two elements
+                  list with &lt;elementend> as first element and the
                   empty string as second element.</desc>
               </optdef>
               <optdef>
@@ -389,7 +390,7 @@
                       <dt>MATCH_TEXT</dt><dd>Validating text between tags.</dd>
                       <dt>MATCH_ATTRIBUTE_TEXT</dt><dd>Attribute text value contraint check</dd>
                       <dt>MATCH_GLOBAL</dt><dd>Checking global IDs</dd>
-                      <dt>MATCH_DOM_KEYCONSTRAINT</dt><dd>Checking domuniqe constaint</dd>
+                      <dt>MATCH_DOM_KEYCONSTRAINT</dt><dd>Checking domunique constaint</dd>
                       <dt>MATCH_DOM_XPATH_BOOLEAN</dt><dd>Checking domxpathboolean constaint</dd>
                   </dl>
                   If called with one of the possible optional
@@ -696,9 +697,9 @@ s define {
       </commanddef>
 
       <commanddef>
-        <command><method>deftext</method> <m>name</m> <m>&lt;constraint script></m></command>
+        <command><method>deftexttype</method> <m>name</m> <m>&lt;constraint script></m></command>
         <desc>This defines a named bundle of text constraints exactly
-        as a <i>schemacmd deftext</i> call. This is meant as toplevel
+        as a <i>schemacmd deftexttype</i> call. This is meant as toplevel
         command of a <i>schemacmd define</i> script. This command is
         not allowed nested in an other definition script command and
         will raise error, if you call it there.</desc>
@@ -774,7 +775,7 @@ s define {
     <p>Text - parsed character data, as XML calles it - must sometimes
     be of a certain kind, must comply to some rules etc to be valid.
     The text constraint script arguments to the text, attribute,
-    nsattribute and deftext commands allow the following text
+    nsattribute and deftexttype commands allow the following text
     constraint commands to check text for certain properties.</p>
 
     <p>The text constraint commands are:</p>
