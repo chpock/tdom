@@ -6514,7 +6514,7 @@ test schema-17.5 {info expected} {
     lsort $result
 } {a b c musthave toplevel}
 
-test schema-17.5a {info expected} {
+test schema-17.5a {info expected -ignorematched} {
     tdom::schema s
     s define {
         defelement doc {
@@ -6533,6 +6533,26 @@ test schema-17.5a {info expected} {
     s delete
     lsort $result
 } {a b c musthave toplevel}
+
+test schema-17.5b {info expected} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            choice ? {
+                element a
+                element c
+                element b
+            }
+            element toplevel ?
+            element musthave
+            element aftermust
+        }
+    }
+    s event start doc
+    set result [s info expected -onlymandatory]
+    s delete
+    lsort $result
+} {musthave}
 
 test schema-17.6 {info expected} {
     tdom::schema s
@@ -6557,7 +6577,7 @@ test schema-17.6 {info expected} {
     lsort $result
 } {a b c {musthave http://foo.bar} toplevel}
 
-test schema-17.6a {info expected} {
+test schema-17.6a {info expected -ignorematched} {
     tdom::schema s
     s prefixns {foo http://foo.bar}
     s define {
@@ -6579,6 +6599,29 @@ test schema-17.6a {info expected} {
     s delete
     lsort $result
 } {a b c {musthave http://foo.bar} toplevel}
+
+test schema-17.6b {info expected -onlymandatory} {
+    tdom::schema s
+    s prefixns {foo http://foo.bar}
+    s define {
+        defelement doc {
+            choice ? {
+                element a
+                element c
+                element b
+            }
+            element toplevel ?
+            namespace foo {
+                element musthave
+            }
+            element aftermust
+        }
+    }
+    s event start doc
+    set result [s info expected -onlymandatory]
+    s delete
+    lsort $result
+} {{musthave http://foo.bar}}
 
 test schema-17.7 {info expected} {
     tdom::schema s
@@ -6603,7 +6646,7 @@ test schema-17.7 {info expected} {
     lsort $result
 } {a b c {musthave http://foo.bar} toplevel {{#text} {}}}
 
-test schema-17.7a {info expected} {
+test schema-17.7a {info expected -ignorematched} {
     tdom::schema s
     s prefixns {foo http://foo.bar}
     s define {
@@ -6625,6 +6668,29 @@ test schema-17.7a {info expected} {
     s delete
     lsort $result
 } {a b c {musthave http://foo.bar} toplevel {{#text} {}}}
+
+test schema-17.7b {info expected -onlymandatory} {
+    tdom::schema s
+    s prefixns {foo http://foo.bar}
+    s define {
+        defelement doc {
+            mixed {
+                element a
+                element c
+                element b
+            }
+            element toplevel ?
+            namespace foo {
+                element musthave
+            }
+            element aftermust
+        }
+    }
+    s event start doc
+    set result [s info expected -onlymandatory]
+    s delete
+    lsort $result
+} {{musthave http://foo.bar}}
 
 test schema-17.8 {info expected} {
     tdom::schema s
@@ -6654,7 +6720,7 @@ test schema-17.8 {info expected} {
     set result
 } {doc a b c doc a b c musthave toplevel musthave toplevel}
 
-test schema-17.8a {info expected} {
+test schema-17.8a {info expected -ignorematched} {
     tdom::schema s
     s defelement doc {
         choice ? {
@@ -6682,11 +6748,38 @@ test schema-17.8a {info expected} {
     set result
 } {doc a b c doc a b c musthave toplevel musthave toplevel}
 
+test schema-17.8b {info expected -onlymandatory} {
+    tdom::schema s
+    s defelement doc {
+        choice ? {
+            element a
+            element c
+            element b
+        }
+        element toplevel ?
+        element musthave
+        element aftermust
+    }
+    set result [s info expected -ignorematched]
+    s define {
+        foreach elm {a b c} {
+            defelement $elm {}
+        }
+    }
+    lappend result {*}[lsort [s info expected -onlymandatory]]
+    s event start doc
+    lappend result {*}[lsort [s info expected -onlymandatory]]
+    s event start c
+    s event end
+    lappend result {*}[lsort [s info expected -onlymandatory]]
+    s delete
+    set result
+} {doc a b c doc musthave musthave}
+
 proc schema-17.9 {scmd} {
     global result
     lappend result {*}[lsort [$scmd info expected]]
 }
-                  
 test schema-17.9 {info expected from scripted constrain} {
     tdom::schema s
     s define {
@@ -6705,10 +6798,87 @@ test schema-17.9 {info expected from scripted constrain} {
         }
     }
     set result ""
-    lappend [s validate {<doc><must/></doc>}]
+    lappend result [s validate {<doc><must/></doc>}]
     s delete
     set result
-} {a b c may must}
+} {a b c may must 1}
+
+test schema-17.9.1 {info expected from scripted constrain} {
+    tdom::schema s
+    s define {
+        defpattern some {
+            element a ?
+            group ? {
+                element b ?
+                tcl schema-17.9 [self]
+            }
+            element c
+        }
+        defelement doc {
+            element othermay ?
+            ref some ?
+            element may ?
+            element must
+        }
+    }
+    set result ""
+    lappend result [s validate {<doc><must/></doc>}]
+    s delete
+    set result
+} {a b c may must othermay 1}
+
+proc schema-17.9a {scmd} {
+    global result
+    lappend result {*}[lsort [$scmd info expected -onlymandatory]]
+}
+test schema-17.9a {info expected from scripted constrain} {
+    tdom::schema s
+    s define {
+        defpattern some {
+            element a ?
+            group ? {
+                element b ?
+                tcl schema-17.9a [self]
+            }
+            element c
+        }
+        defelement doc {
+            ref some ?
+            element may ?
+            element must
+        }
+    }
+    set result ""
+    lappend result [s validate {<doc><must/></doc>}]
+    s delete
+    set result
+} {must 1}
+
+test schema-17.9a.1 {info expected from scripted constrain} {
+    tdom::schema s
+    s define {
+        defpattern some {
+            element a ?
+            group ? {
+                element b ?
+                tcl schema-17.9a [self]
+            }
+            choice ! {
+                element c1 
+                ref some ?
+            }
+        }
+        defelement doc {
+            ref some ?
+            element may ?
+            element must
+        }
+    }
+    set result ""
+    lappend result [s validate {<doc><must/></doc>}]
+    s delete
+    set result
+} {must 1}
 
 test schema-17.10 {info expected interleave} {
     set defs {
