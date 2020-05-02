@@ -1514,7 +1514,7 @@ matchElementStart (
                 if (recover (interp, sdata, MISSING_ELEMENT_MATCH_START, name,
                              namespace, NULL, ac)) {
                     if (sdata->recoverFlags & RECOVER_FLAG_IGNORE) {
-                        /* We pretend the ac content particel had
+                        /* We pretend the ac content particle had
                          * matched. */
                         updateStack (sdata, se, ac);
                     }
@@ -3776,11 +3776,13 @@ getNextExpectedWorker (
                 && se->interleaveState[ac]
                 && maxOne (cp->quants[ac])) {
                 ac++;
+                hm = 0;
                 continue;
             }
             if (expectedFlags & EXPECTED_ONLY_MANDATORY
-                && mayMiss (cp->quants[ac])) {
+                && !(mustMatch (cp->quants[ac], hm))) {
                 ac++;
+                hm = 0;
                 continue;
             }
             ic = cp->content[ac];
@@ -3788,12 +3790,8 @@ getNextExpectedWorker (
             switch (ic->type) {
             case SCHEMA_CTYPE_NAME:
                 if (probeMayskip) break;
-                if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
-                    || minOne (cp->quants[ac])) {
-                    Tcl_ListObjAppendElement (
-                        interp, rObj, serializeElementName (interp, ic)
-                        );
-                }
+                Tcl_ListObjAppendElement (interp, rObj,
+                                          serializeElementName (interp, ic));
                 break;
             case SCHEMA_CTYPE_PATTERN:
                 if (recursivePattern (se, ic)) {
