@@ -6412,12 +6412,44 @@ test schema-16.17 {interleave with all content cp optional} {
         <doc><c/><a/><d/></doc>
         <doc><c/><a/><b/><d/></doc>
         <doc><c/><a/><b/></doc>
+        <doc><d/></doc>
     } {
         lappend result [s validate $xml]
     }
     s delete
     set result
-} {0 1 1 1 1 1 1 1 0}
+} {0 1 1 1 1 1 1 1 0 1}
+
+test schema-16.18 {interleave with all content cp optional} {
+    tdom::schema s
+    s defelement doc {
+        interleave {
+            element a ?
+            element b ?
+            choice {
+                element c ?
+                element c1 ?
+                element c2 ?
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/></doc>
+        <doc><b/></doc>
+        <doc><c/></doc>
+        <doc><a/><c/></doc>
+        <doc><b/><c/></doc>
+        <doc><c/><a/></doc>
+        <doc><c/><a/><b/><d/></doc>
+        <doc><c/><a/><b/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 1 1 1 1 1 1 0 1}
 
 test schema-17.1 {info} {
     tdom::schema s
