@@ -133,10 +133,24 @@ used, which tries to even parse badly formed HTML into a DOM tree.</desc>
               </optdef>
 
               <optdef>
+                <optname>-jsonroot &lt;document element name&gt;</optname>
+                <desc>If given makes the given element name the
+                document element of the resulting doc. The parsed
+                content of the JSON string will be the childs of this
+                document element node.</desc>
+              </optdef>
+              
+              <optdef>
                 <optname>-jsonmaxnesting</optname>
                 <optarg>integer</optarg>
                 <desc>This option only has effect if used together
-                with the <m>-json</m> option. The current implementation uses recursive descent JSON parser. In order to avoid using excess stack space, any JSON input that has more than a certain levels of nesting is considered invalid. The default maximum nesting is 2000. The option -jsonmaxnesting allows the user to adjust that.</desc>
+                with the <m>-json</m> option. The current
+                implementation uses a recursive descent JSON parser.
+                In order to avoid using excess stack space, any JSON
+                input that has more than a certain levels of nesting
+                is considered invalid. The default maximum nesting is
+                2000. The option -jsonmaxnesting allows the user to
+                adjust that.</desc>
               </optdef>
               
               <optdef>
@@ -507,6 +521,12 @@ a valid XML Char according to production 2 of the <ref href="http://www.w3.org/T
 recommendation. Otherwise it returns 0.</desc>
         </commanddef>
 
+        <commanddef>
+          <command><cmd>dom</cmd> <method>clearString</method> <m>string</m></command>
+          <desc>Returns the string given as argument cleared out from any characters not
+          allowed as XML parsed character data.</desc>
+        </commanddef>
+        
         <commanddef>
           <command><cmd>dom</cmd> <method>isBMPCharData</method>
 <m>string</m></command>
