@@ -219,6 +219,8 @@ static char dom_usage[] =
     "    setTextCheck ?boolean?                           \n"
     "    setObjectCommands ?(automatic|token|command)?    \n"
     "    isCharData string                                \n"
+    "    clearString string                               \n"
+    "    isBMPCharData string                             \n"
     "    isComment string                                 \n"
     "    isCDATA string                                   \n"
     "    isPIValue string                                 \n"
@@ -6771,10 +6773,10 @@ int tcldom_DomObjCmd (
 {
     GetTcldomTSD()
 
-    char        * method, tmp[300];
+    char        * method, tmp[300], *clearedStr;
     int           methodIndex, result, i, bool;
     Tcl_CmdInfo   cmdInfo;
-    Tcl_Obj     * mobjv[MAX_REWRITE_ARGS];
+    Tcl_Obj     * mobjv[MAX_REWRITE_ARGS], *newObj;
 
     static const char *domMethods[] = {
         "createDocument",  "createDocumentNS",   "createNodeCmd",
@@ -6783,7 +6785,7 @@ int tcldom_DomObjCmd (
         "isQName",         "isComment",          "isCDATA",
         "isPIValue",       "isNCName",           "createDocumentNode",
         "setNameCheck",    "setTextCheck",       "setObjectCommands",
-        "featureinfo",     "isBMPCharData",
+        "featureinfo",     "isBMPCharData",      "clearString",
 #ifdef TCL_THREADS
         "attachDocument",  "detachDocument",
 #endif
@@ -6796,7 +6798,7 @@ int tcldom_DomObjCmd (
         m_isQName,           m_isComment,          m_isCDATA,
         m_isPIValue,         m_isNCName,           m_createDocumentNode,
         m_setNameCheck,      m_setTextCheck,       m_setObjectCommands,
-        m_featureinfo,       m_isBMPCharData
+        m_featureinfo,       m_isBMPCharData,      m_clearString
 #ifdef TCL_THREADS
         ,m_attachDocument,   m_detachDocument
 #endif
@@ -7025,6 +7027,18 @@ int tcldom_DomObjCmd (
         case m_isBMPCharData:
             CheckArgs(3,3,2,"string");
             SetBooleanResult(domIsBMPChar(Tcl_GetString(objv[2])));
+            return TCL_OK;
+
+        case m_clearString:
+            CheckArgs(3,3,2,"string");
+            clearedStr = domClearString (Tcl_GetString (objv[2]), &bool);
+            if (bool) {
+                newObj = Tcl_NewStringObj (clearedStr, -1);
+                FREE (clearedStr);
+                Tcl_SetObjResult (interp, newObj);
+            } else {
+                Tcl_SetObjResult (interp, objv[2]);
+            }
             return TCL_OK;
                 
     }

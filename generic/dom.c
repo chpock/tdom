@@ -352,6 +352,59 @@ domIsChar (
 }
 
 /*---------------------------------------------------------------------------
+|   domClearString
+|
+\--------------------------------------------------------------------------*/
+char *
+domClearString (
+    char *str,
+    int *haveToFree
+    )
+{
+    const char *p, *s;
+    char *p1, *clearedstr;
+    int   clen, i, rewrite = 0;
+    
+    p = str;
+    while (*p) {
+        clen = UTF8_CHAR_LEN(*p);
+        if (clen > 4 || !UTF8_XMLCHAR((unsigned const char*)p,clen)) {
+            rewrite = 1;
+            break;
+        }
+        p += clen;
+    }
+    if (!rewrite) {
+        *haveToFree = 0;
+        return str;
+    }
+    s = p;
+    p += clen;
+    while (*p) p++;
+    clearedstr = MALLOC (sizeof(char) * (p-str));
+    p1 = clearedstr;
+    while (str < s) {
+        *p1 = *str;
+        p1++; str++;
+    }
+    str += clen;
+    while (*str) {
+        clen = UTF8_CHAR_LEN(*str);
+        if (clen <= 4 && UTF8_XMLCHAR((unsigned const char*)str,clen)) {
+            for (i = 0; i < clen; i++) {
+                *p1 = *str;
+                p1++; str++;
+            }
+        } else {
+            str += clen;
+        }
+    }
+    *p1 = '\0';
+    *haveToFree = 1;
+    return clearedstr;
+}
+
+/*---------------------------------------------------------------------------
 |   domIsBMPChar 
 |
 \--------------------------------------------------------------------------*/

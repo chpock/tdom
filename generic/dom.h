@@ -832,6 +832,7 @@ int            domIsPINAME (const char *name);
 int            domIsQNAME (const char *name);
 int            domIsNCNAME (const char *name);
 int            domIsChar (const char *str);
+char *         domClearString (char *str, int *haveToFree);
 int            domIsBMPChar (const char *str);
 int            domIsComment (const char *str);
 int            domIsCDATA (const char *str);
