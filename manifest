@@ -1,5 +1,5 @@
-C Merged\sfrom\strunk.
-D 2020-05-13T23:50:18.222
+C There\sis\sstill\sa\sbit\swork\sleft\sto\sdo\sin\scheckElementEnd.
+D 2020-05-14T23:12:03.922
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -208,7 +208,7 @@ F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
 F tests/pullparser.test e4b14ea0bdc9f9fd931f3bc559e78c309582a67a238170d58e0f20331f99890c
 F tests/pushpull.bench 664e8f512917537d96c4b71933d4d9a6da65fc6fe85bd7c459483830dc7d2faf
-F tests/schema.test 3f28e587112da73449ec75c66bf507e9fbaba09f668b1f1f52db73dfd694e596
+F tests/schema.test 3afc62d52e55344ecd34ad3de50147d44888161c574c5dc85c07177b931feb7d
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
 F tests/tdomcmd.bench b07448ed4de08ccaa9734cf3fe15c695fd7066c993da58ff48d465747940e417
 F tests/tdomcmd.test 092401adf0609906d710f3ef8997cb4ca29bc208
@@ -233,8 +233,9 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a88689ecce107674754040f3c10b8c552698e6ac6592f421fcbd4a5bbf49f2af 5300f428a6194bd556bb0dce9d568c82dd46d3c425d1def59dd83f71e4279d3c
-R 8dba8ab92cd8362e5ae636f38e30b33d
+P 1fc373ed259f37a7804bb01c4718ade26ad0f1892951b361acad1a773c88d10f
+Q +7f5d9b26dbe4c796e93d51ae0cfe9fdadae27f3f5a4b7c1a7969b214a5c03c08
+R 823998a6f6d9ace39c64093d189bbe2f
 U rolf
-Z 5e5726071085de5b0aa926db56f7cff4
+Z 80c91e56deed72804ee022b5fab62ae9
 # Remove this line to create a well-formed Fossil manifest.
