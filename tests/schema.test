@@ -6428,6 +6428,72 @@ test schema-16.18 {interleave with all content cp optional} {
     set result
 } {1 1 1 1 1 1 1 0 1}
 
+test schema-16.19 {interleave with all content cp optional} {
+    tdom::schema s
+    s defelement doc {
+        interleave {
+            element a ?
+            element b ?
+            choice {
+                element c ?
+                element c1 ?
+                element c2 ?
+            }
+        }
+        element d
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/><d/></doc>
+        <doc><b/><d/></doc>
+        <doc><c/><d/></doc>
+        <doc><a/><c/><d/></doc>
+        <doc><b/><c/><d/></doc>
+        <doc><c/><a/><d/></doc>
+        <doc><c/><a/><b/><d/></doc>
+        <doc><c/><a/><b/></doc>
+        <doc><d/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 1 1 1 1 1 1 0 1}
+
+test schema-16.20 {interleave with all content cp optional} {
+    tdom::schema s
+    s defelement doc {
+        interleave {
+            element a ?
+            element b ?
+            group {
+                element c ?
+                element c1 ?
+                element c2 ?
+            }
+        }
+        element d
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/><d/></doc>
+        <doc><b/><d/></doc>
+        <doc><c/><d/></doc>
+        <doc><a/><c/><d/></doc>
+        <doc><b/><c/><d/></doc>
+        <doc><c/><a/><d/></doc>
+        <doc><c/><a/><b/><d/></doc>
+        <doc><c/><a/><b/></doc>
+        <doc><d/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 1 1 1 1 1 1 0 1}
+
 test schema-17.1 {info} {
     tdom::schema s
     s define {

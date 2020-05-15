@@ -1323,7 +1323,7 @@ matchElementStart (
     )
 {
     SchemaCP *cp, *candidate, *icp;
-    int hm, ac, i, mayskip, rc;
+    int hm, ac, i, mayskip, thismayskip, rc;
     int isName = 0;
     SchemaValidationStack *se;
     Tcl_HashEntry *h;
@@ -1546,18 +1546,19 @@ matchElementStart (
     case SCHEMA_CTYPE_INTERLEAVE:
         mayskip = 1;
         for (i = 0; i < cp->nc; i++) {
+            thismayskip = 0;
             if (se->interleaveState[i]) {
                 if (maxOne (cp->quants[i])) continue;
-            } else {
-                if (minOne (cp->quants[i])) mayskip = 0;
             }
             icp = cp->content[i];
             switch (icp->type) {
             case SCHEMA_CTYPE_TEXT:
                 if (icp->nc) {
-                    if (!checkText (interp, icp, "")) {
-                        mayskip = 0;
+                    if (checkText (interp, icp, "")) {
+                        thismayskip = 1;
                     }
+                } else {
+                    thismayskip = 1;
                 }
                 break;
 
@@ -1589,8 +1590,8 @@ matchElementStart (
 
             case SCHEMA_CTYPE_PATTERN:
                 if (recursivePattern (se, icp)) {
-                    mayskip = 1;
-                    continue;
+                    thismayskip = 1;
+                    break;
                 }
                 /* fall throu */
             case SCHEMA_CTYPE_INTERLEAVE:
@@ -1604,7 +1605,7 @@ matchElementStart (
                     return 1;
                 }
                 popStack (sdata);
-                if (mayskip && rc != -1) mayskip = 0;
+                if (rc == -1) thismayskip = 1;
                 break;
 
             case SCHEMA_CTYPE_VIRTUAL:
@@ -1617,6 +1618,7 @@ matchElementStart (
                 break;
 
             }
+            if (!thismayskip && minOne (cp->quants[i])) mayskip = 0;
         }
         if (mayskip) break;
         if (recover (interp, sdata, MISSING_ELEMENT_MATCH_START, name,
