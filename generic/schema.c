@@ -2191,7 +2191,7 @@ static int checkElementEnd (
 {
     SchemaValidationStack *se;
     SchemaCP *cp, *ic;
-    int hm, ac, i, mayskip, rc;
+    int hm, ac, i, thismayskip, rc;
     int isName = 0;
 
     DBG(fprintf (stderr, "checkElementEnd:\n");
@@ -2199,10 +2199,14 @@ static int checkElementEnd (
     se = sdata->stack;
     getContext (cp, ac, hm);
 
+    if (cp->type == SCHEMA_CTYPE_INTERLEAVE) {
+        ac = 0; hm = 0;
+    }
     switch (cp->type) {
     case SCHEMA_CTYPE_NAME:
         isName = 1;
         /* Fall through */
+    case SCHEMA_CTYPE_INTERLEAVE:
     case SCHEMA_CTYPE_PATTERN:
         if (ac < cp->nc && (hasMatched (cp->quants[ac], hm))) {
             DBG(fprintf (stderr, "ac %d has matched, skiping to next ac\n", ac));
@@ -2211,10 +2215,15 @@ static int checkElementEnd (
         while (ac < cp->nc) {
             DBG(fprintf (stderr, "ac %d hm %d mayMiss: %d\n",
                          ac, hm, mayMiss (cp->quants[ac])));
-            if (mayMiss (cp->quants[ac])) {
-                ac++; continue;
+            if (se->interleaveState) {
+                if (se->interleaveState[ac]) {
+                    ac++; continue;
+                }
+            } else {
+                if (mayMiss (cp->quants[ac])) {
+                    ac++; continue;
+                }
             }
-            
             switch (cp->content[ac]->type) {
             case SCHEMA_CTYPE_KEYSPACE_END:
                 cp->content[ac]->keySpace->active--;
@@ -2255,10 +2264,10 @@ static int checkElementEnd (
                 break;
 
             case SCHEMA_CTYPE_CHOICE:
-                mayskip = 0;
+                thismayskip = 0;
                 for (i = 0; i < cp->content[ac]->nc; i++) {
                     if (mayMiss (cp->content[ac]->quants[i])) {
-                        mayskip = 1;
+                        thismayskip = 1;
                         break;
                     }
                     ic = cp->content[ac]->content[i];
@@ -2269,7 +2278,7 @@ static int checkElementEnd (
                                 continue;
                             }
                         }
-                        mayskip = 1;
+                        thismayskip = 1;
                         break;
 
                     case SCHEMA_CTYPE_NAME:
@@ -2278,14 +2287,14 @@ static int checkElementEnd (
                         
                     case SCHEMA_CTYPE_PATTERN:
                         if (recursivePattern (se, ic)) {
-                            mayskip = 1;
+                            thismayskip = 1;
                             break;
                         }
                         /* fall throu */
                     case SCHEMA_CTYPE_INTERLEAVE:
                         pushToStack (sdata, ic);
                         if (checkElementEnd (interp, sdata)) {
-                            mayskip = 1;
+                            thismayskip = 1;
                         }
                         popStack (sdata);
                         break;
@@ -2297,9 +2306,9 @@ static int checkElementEnd (
                         Tcl_Panic ("Invalid CTYPE in MIXED or CHOICE");
                         
                     }
-                    if (mayskip) break;
+                    if (thismayskip) break;
                 }
-                if (mayskip) break;
+                if (thismayskip) break;
                 if (!recover (interp, sdata, MISSING_ELEMENT_MATCH_END, NULL,
                               NULL, NULL, 0)) {
                     return 0;
@@ -2312,7 +2321,7 @@ static int checkElementEnd (
                 
             case SCHEMA_CTYPE_PATTERN:
                 if (recursivePattern (se, cp->content[ac])) {
-                    mayskip = 1;
+                    thismayskip = 1;
                     break;
                 }
                 /* fall throu */
