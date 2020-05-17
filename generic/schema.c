@@ -849,7 +849,7 @@ addToContent (
     unsigned int savedContenSize;
 
     if (sdata->cp->type == SCHEMA_CTYPE_CHOICE
-         || sdata->cp->type == SCHEMA_CTYPE_INTERLEAVE) {
+        || sdata->cp->type == SCHEMA_CTYPE_INTERLEAVE) {
         if (pattern->type == SCHEMA_CTYPE_CHOICE) {
             if (pattern->flags & MIXED_CONTENT) {
                 sdata->cp->flags |= MIXED_CONTENT;
@@ -2191,7 +2191,7 @@ static int checkElementEnd (
 {
     SchemaValidationStack *se;
     SchemaCP *cp, *ic;
-    int hm, ac, i, thismayskip, rc;
+    int hm, ac, i, thismayskip, mayskip = 0, rc;
     int isName = 0;
 
     DBG(fprintf (stderr, "checkElementEnd:\n");
@@ -2200,7 +2200,7 @@ static int checkElementEnd (
     getContext (cp, ac, hm);
 
     if (cp->type == SCHEMA_CTYPE_INTERLEAVE) {
-        ac = 0; hm = 0;
+        ac = 0; hm = 0; mayskip = 1;
     }
     switch (cp->type) {
     case SCHEMA_CTYPE_NAME:
@@ -2219,13 +2219,13 @@ static int checkElementEnd (
                 if (se->interleaveState[ac]) {
                     ac++; continue;
                 }
-            } else {
-                if (mayMiss (cp->quants[ac])) {
-                    ac++; continue;
-                }
+            }
+            if (mayMiss (cp->quants[ac])) {
+                ac++; continue;
             }
             switch (cp->content[ac]->type) {
             case SCHEMA_CTYPE_KEYSPACE_END:
+                /* Don't happen as INTERLEAVE child */
                 cp->content[ac]->keySpace->active--;
                 if (!cp->content[ac]->keySpace->active) {
                     if (cp->content[ac]->keySpace->unknownIDrefs) {
@@ -2241,6 +2241,7 @@ static int checkElementEnd (
                 break;
 
             case SCHEMA_CTYPE_KEYSPACE:
+                /* Don't happen as INTERLEAVE child */
                 if (!cp->content[ac]->keySpace->active) {
                     Tcl_InitHashTable (&cp->content[ac]->keySpace->ids,
                                        TCL_STRING_KEYS);
@@ -2264,6 +2265,7 @@ static int checkElementEnd (
                 break;
 
             case SCHEMA_CTYPE_CHOICE:
+                /* Don't happen as INTERLEAVE child */
                 thismayskip = 0;
                 for (i = 0; i < cp->content[ac]->nc; i++) {
                     if (mayMiss (cp->content[ac]->quants[i])) {
@@ -2321,7 +2323,6 @@ static int checkElementEnd (
                 
             case SCHEMA_CTYPE_PATTERN:
                 if (recursivePattern (se, cp->content[ac])) {
-                    thismayskip = 1;
                     break;
                 }
                 /* fall throu */
@@ -2330,21 +2331,24 @@ static int checkElementEnd (
                 rc = checkElementEnd (interp, sdata);
                 popStack (sdata);
                 if (rc) break;
-                if (!recover (interp, sdata, MISSING_ELEMENT_MATCH_END, NULL,
-                              NULL, NULL, 0)) {
-                    return 0;
+                if (recover (interp, sdata, MISSING_ELEMENT_MATCH_END,
+                             NULL, NULL, NULL, 0)) {
+                    break;
                 }
-                break;
+                return 0;
                 
             case SCHEMA_CTYPE_ANY:
             case SCHEMA_CTYPE_NAME:
-                if (recover (interp, sdata, MISSING_ELEMENT_MATCH_END, NULL,
-                             NULL, NULL, 0)) {
+                if (recover (interp, sdata, MISSING_ELEMENT_MATCH_END,
+                             NULL, NULL, NULL, 0)) {
                     break;
                 }
                 return 0;
             }
             ac++;
+        }
+        if (se->interleaveState) {
+            if (!mayskip) return 0;
         }
         if (isName) return 1;
         return -1;
@@ -2358,17 +2362,6 @@ static int checkElementEnd (
         /* Never pushed onto stack */
         Tcl_Panic ("Invalid CTYPE onto the validation stack!");
 
-    case SCHEMA_CTYPE_INTERLEAVE:
-        for (i = 0; i < cp->nc; i++) {
-            if (mustMatch (cp->quants[i], se->interleaveState[i])) {
-                if (recover (interp, sdata, MISSING_ELEMENT_MATCH_END, NULL,
-                             NULL, NULL, 0)) {
-                    break;
-                }
-                return 0;
-            }
-        }
-        return -1;
     }
     /* Not reached */
     return 0;
