@@ -1,5 +1,5 @@
-C Fixed\selement\sstart\sevent\sin\scase\sof\sa\scomplex\scontent\sas\schild\sof\sinterleave\swhich\sisn't\soptional\sby\squant\sbut\sis\sbecause\sall\sof\sits\sconstituents\sare\soptional.
-D 2020-05-15T01:34:59.736
+C Fixed\sgross\sbug\sin\sinfo\sexpected,\swhich\sjust\swas\snot\striggered\sso\sfar.
+D 2020-05-20T14:01:27.447
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -139,7 +139,7 @@ F generic/domxslt.h 0cb8e327683a0ffeb2a7094add6cd82ec1ae49c7c704f20d8d6f7d6523e7
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c ee14ed666ca6d18977f7301545c52ac71b3ce73c49233ff8f8b3aa4144008d24
 F generic/nodecmd.h d2201b69de9507f86e94750f0b72867ec9150795712ef18c5b5b87f35a689f75
-F generic/schema.c 38dce356764cd068fadc89c227e148909eb924753b05cf059eedf60802566a2f
+F generic/schema.c 64d59facb49f918a245a5980f266049d8597930cbfc6d6c9fac44d767316ec41
 F generic/schema.h 8917b10f88eb023c20111ada752e0551f3112d556a3813c0e73610a00837149a
 F generic/tcldom.c db67636194529287599abf7992e22f57dd9ebbb82a40cbf5aae9cca9cb5e4d30
 F generic/tcldom.h b83344768ac6121267471d92def0e88d1cd1d30fd8b995c385c41474d29f3fd7
@@ -233,8 +233,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 9f3926e748a7670011f972357952a47e3144514b8dcfd1906413dd0687d1f6da
-R c990873a3f3ad2197b4498be1ba180dd
+P 748fb8a4324c7cf89e5595ac209860cb706fd6e685ab0a249fb5dabc27b0ce7f
+R 3efebf8fc4bf8a7338bbcb396a8eda13
 U rolf
-Z c912ce4c71c0d0f40aa541fabad7e756
+Z 87d2847b48cb52c7890b4f1bf9168b61
 # Remove this line to create a well-formed Fossil manifest.

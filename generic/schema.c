@@ -3906,7 +3906,7 @@ getNextExpectedWorker (
                     case SCHEMA_CTYPE_INTERLEAVE:
                         Tcl_CreateHashEntry (seenCPs, jc, &hnew);
                         if (hnew) {
-                            se1 = getStackElement (sdata, ic);
+                            se1 = getStackElement (sdata, jc);
                             mayskip = getNextExpectedWorker (
                                 sdata, se1, interp, seenCPs, rObj,
                                 expectedFlags
