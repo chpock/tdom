@@ -85,6 +85,8 @@ typedef struct domKeyConstraint {
     ast   *fields;
     int    nrFields;
     int    flags;
+    char  *emptyFieldSetValue;
+    int    efsv_len;
     struct domKeyConstraint *next;
 } domKeyConstraint;
 

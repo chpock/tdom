@@ -560,6 +560,7 @@ static void freedomKeyConstraints (
     while (kc) {
         knext = kc->next;
         if (kc->name) FREE (kc->name);
+        if (kc->emptyFieldSetValue) FREE (kc->emptyFieldSetValue);
         xpathFreeAst (kc->selector);
         for (i = 0; i < kc->nrFields; i++) {
             xpathFreeAst (kc->fields[i]);
@@ -3173,7 +3174,7 @@ checkdomKeyConstraints (
     domNode *n;
     domAttrNode *attr;
     int rc, i, j, hnew, len, skip, first;
-    char *errMsg = NULL, *keystr;
+    char *errMsg = NULL, *keystr, *efsv;
     Tcl_HashTable htable;
     Tcl_DString dStr;
 
@@ -3233,10 +3234,14 @@ checkdomKeyConstraints (
                     if (kc->flags & DKC_FLAG_IGNORE_EMPTY_FIELD_SET) {
                         continue;
                     }
-                    Tcl_CreateHashEntry (&htable, "", &hnew);
+                    efsv = "";
+                    if (kc->emptyFieldSetValue) {
+                        efsv = kc->emptyFieldSetValue;
+                    }
+                    Tcl_CreateHashEntry (&htable, efsv, &hnew);
                     if (!hnew) {
                         if (recover (interp, sdata, DOM_KEYCONSTRAINT,
-                                     kc->name, NULL, "", 0)) {
+                                     kc->name, NULL, efsv, 0)) {
                             break;
                         }
                         SetResultV ("DOM_KEYCONSTRAINT");
@@ -3304,8 +3309,15 @@ checkdomKeyConstraints (
                         if (kc->flags & DKC_FLAG_IGNORE_EMPTY_FIELD_SET) {
                             continue;
                         }
-                        if (first) first = 0;
-                        else Tcl_DStringAppend (&dStr, ":", 1);
+                        if (kc->emptyFieldSetValue) {
+                            if (first) first = 0;
+                            else Tcl_DStringAppend (&dStr, ":", 1);
+                            Tcl_DStringAppend (&dStr, kc->emptyFieldSetValue,
+                                               kc->efsv_len);
+                        } else {
+                            if (first) first = 0;
+                            else Tcl_DStringAppend (&dStr, ":", 1);
+                        }
                         continue;
                     }
                     if (frs.nr_nodes != 1) {
@@ -5930,12 +5942,12 @@ domuniquePatternObjCmd (
     ast t;
     char *errMsg = NULL;
     domKeyConstraint *kc, *kc1;
-    int i, nrFields, flags = 0, nrFlags;
+    int i, nrFields, flags = 0;
     Tcl_Obj *elm;
 
     CHECK_SI
     CHECK_TOPLEVEL
-    checkNrArgs (3, 5, "Expected: <selector> <fieldlist> ?<name>? ?flags?");
+    checkNrArgs (3, 6, "Expected: <selector> <fieldlist> ?<name>? ?\"IGNORE_EMPTY_FIELD_SET\"|(?\"EMPTY_FIELD_SET_VALUE\" <emptyFieldSetValue?)");
     if (sdata->cp->type != SCHEMA_CTYPE_NAME) {
         SetResult ("The domunique schema definition command is only "
                    "allowed as direct child of an element.");
@@ -5949,17 +5961,15 @@ domuniquePatternObjCmd (
         return TCL_ERROR;
     }
     if (objc == 5) {
-        if (Tcl_ListObjLength (interp, objv[4], &nrFlags) != TCL_OK) {
-            SetResult ("The <flags> argument must be a valid tcl list");
+        if (strcmp (Tcl_GetString (objv[4]), "IGNORE_EMPTY_FIELD_SET") != 0) {
+            SetResult3 ("Unknown flag '", Tcl_GetString (objv[4]), "'");
             return TCL_ERROR;
         }
-        for (i = 0; i < nrFlags; i++) {
-            Tcl_ListObjIndex (interp, objv[4], i, &elm);
-            if (strcmp ("IGNORE_EMPTY_FIELD_SET", Tcl_GetString (elm)) == 0) {
-                flags |= DKC_FLAG_IGNORE_EMPTY_FIELD_SET;
-                continue;
-            }
-            SetResult3 ("Unknown flag '", Tcl_GetString (elm), "'");
+        flags |= DKC_FLAG_IGNORE_EMPTY_FIELD_SET;
+    }
+    if (objc == 6) {
+        if (strcmp (Tcl_GetString (objv[4]), "EMPTY_FIELD_SET_VALUE") != 0) {
+            SetResult3 ("Unknown flag '", Tcl_GetString (objv[4]), "'");
             return TCL_ERROR;
         }
     }
@@ -5970,7 +5980,6 @@ domuniquePatternObjCmd (
         FREE (errMsg);
         return TCL_ERROR;
     }
-
     
     kc = TMALLOC (domKeyConstraint);
     memset (kc, 0, sizeof (domKeyConstraint));
@@ -5979,7 +5988,6 @@ domuniquePatternObjCmd (
     kc->nrFields = nrFields;
     kc->selector = t;
     kc->flags = flags;
-    
     for (i = 0; i < nrFields; i++) {
         Tcl_ListObjIndex (interp, objv[2], i, &elm);
         if (xpathParse (Tcl_GetString (elm), NULL, XPATH_EXPR,
@@ -5992,8 +6000,12 @@ domuniquePatternObjCmd (
         }
         kc->fields[i] = t;
     }
-    if (objc == 4) {
+    if (objc >= 4) {
         kc->name = tdomstrdup (Tcl_GetString (objv[3]));
+    }
+    if (objc == 6) {
+        kc->emptyFieldSetValue = tdomstrdup (Tcl_GetString (objv[5]));
+        kc->efsv_len = strlen (kc->emptyFieldSetValue);
     }
     /* Apppend to end so that the constraints are checked in
      * definition order */
