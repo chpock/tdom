@@ -3179,6 +3179,7 @@ checkdomKeyConstraints (
     char *errMsg = NULL, *keystr, *efsv;
     Tcl_HashTable htable;
     Tcl_DString dStr;
+    xpathCBs cbs;
 
     kc = sdata->stack->pattern->domKeys;
     memset (&nodeList, 0, sizeof (xpathResultSet));
@@ -3189,9 +3190,13 @@ checkdomKeyConstraints (
     frs.type = EmptyResult;
     Tcl_DStringInit (&dStr);
     xpathRSReset (&nodeList, node);
+    cbs.funcCB         = tcldom_xpathFuncCallBack;
+    cbs.funcClientData = interp;
+    cbs.varCB          = NULL;
+    cbs.varClientData  = NULL;
     while (kc) {
         xpathRSReset (&rs, NULL);
-        rc = xpathEvalAst (kc->selector, &nodeList, node, &rs, &errMsg);
+        rc = xpathEvalAst (kc->selector, &nodeList, node, &cbs, &rs, &errMsg);
         if (rc) {
             SetResult (errMsg);
             goto errorCleanup;
@@ -3223,7 +3228,8 @@ checkdomKeyConstraints (
             xpathRSReset (&nodeList, n);
             if (kc->nrFields == 1) {
                 xpathRSReset (&frs, NULL);
-                rc = xpathEvalAst (kc->fields[0], &nodeList, n, &frs, &errMsg);
+                rc = xpathEvalAst (kc->fields[0], &nodeList, n, &cbs, &frs,
+                                   &errMsg);
                 if (rc) {
                     SetResult (errMsg);
                     goto errorCleanup;
@@ -3296,8 +3302,8 @@ checkdomKeyConstraints (
                 first = 1;
                 for (j = 0; j < kc->nrFields; j++) {
                     xpathRSReset (&frs, NULL);
-                    rc = xpathEvalAst (kc->fields[j], &nodeList, n, &frs,
-                                       &errMsg);
+                    rc = xpathEvalAst (kc->fields[j], &nodeList, n, &cbs,
+                                       &frs, &errMsg);
                     if (rc) {
                         SetResult (errMsg);
                         goto errorCleanup;
@@ -3352,7 +3358,8 @@ checkdomKeyConstraints (
                 Tcl_CreateHashEntry (&htable, Tcl_DStringValue (&dStr), &hnew);
                 if (!hnew) {
                     if (recover (interp, sdata, DOM_KEYCONSTRAINT, 
-                                 kc->name,NULL, Tcl_DStringValue (&dStr), 0)) {
+                                 kc->name, NULL, Tcl_DStringValue (&dStr),
+                                 0)) {
                         break;
                     }
                     SetResultV ("DOM_KEYCONSTRAINT");

@@ -5264,6 +5264,7 @@ xpathEvalAst (
     ast             t,
     xpathResultSet *nodeList,
     domNode        *node,
+    xpathCBs       * cbs,
     xpathResultSet *rs,
     char          **errMsg
     )
@@ -5282,7 +5283,7 @@ xpathEvalAst (
         if (first) {
             rc = xpathEvalStepAndPredicates (t, nodeList, node,
                                              node, 0, &docOrder,
-                                             NULL, rs, errMsg);
+                                             cbs, rs, errMsg);
             CHECK_RC;
             first = 0;
         } else {

@@ -9286,20 +9286,26 @@ proc ::dom::xpathFunc::compare {ctxNode pos nodeListType nodeList args} {
     return [list number [string compare $arg1 $arg2]]
 }
 
+proc schema-25.6 {scmd errorType} {
+    lappend ::result $errorType [$scmd info vaction name]
+}
 test schema-25.6 {domxpathboolean - scripted XPath function} {
     tdom::schema s
+    s reportcmd schema-25.6
     s define {
         defelement doc {
             element a ! {
                 text
-                domxpathboolean {compare('foo','bar') < 0} first
-                domxpathboolean {compare('foo','bar') > 0} second
+                domxpathboolean {compare('foo','bar') > 0} first
+                domxpathboolean {compare('foo','bar') < 0} second
             }
         }
     }
     set doc [dom parse {<doc><a>2020-07-30</a></doc>}]
-    set result [s domvalidate $doc error]
-} {0}
+    set result ""
+    lappend result [s domvalidate $doc]
+    set result
+} {DOM_XPATH_BOOLEAN second 1}
 
 proc schema-26.1 {scmd} {
     lappend ::result "fromtcl: [[$scmd info domNode] nodeName]"
