@@ -1,5 +1,5 @@
-C Integrated\sbug\sfix\sbranch:\sHandling\sof\snot\sper\squantifier\sbut\sper\sall\schilds\soptional\scontent\sparticle.
-D 2020-05-27T00:34:57.370
+C Scripted\sXPath\sfunctions\sin\sdomunique/domxpathboolean\sXPath\sexpression\scrashes.
+D 2020-05-30T01:04:19.339
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -208,7 +208,7 @@ F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
 F tests/pullparser.test e4b14ea0bdc9f9fd931f3bc559e78c309582a67a238170d58e0f20331f99890c
 F tests/pushpull.bench 664e8f512917537d96c4b71933d4d9a6da65fc6fe85bd7c459483830dc7d2faf
-F tests/schema.test c23b65445116644af2d0d762ccfd7066069b06689a5c443f19e0035c805b4361
+F tests/schema.test ea80a27f66374daf791c4e246ba35c4108e38d05d62be2f73ae31b148059b385
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
 F tests/tdomcmd.bench b07448ed4de08ccaa9734cf3fe15c695fd7066c993da58ff48d465747940e417
 F tests/tdomcmd.test 092401adf0609906d710f3ef8997cb4ca29bc208
@@ -233,9 +233,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 426dea4ca8a156acdc0c2910e5ec6dd278c46e80dc3658a7f3d68c79c7082d23 4369e1130b28d5723d13257323611cc26c3dbe12da418bdc765cd3563aa86989
-R 67957065791d0d841e14e93e678003ee
-T +closed 4369e1130b28d5723d13257323611cc26c3dbe12da418bdc765cd3563aa86989
+P 32945e114cd1e466116fa4d777826d97ea41241aab46cb1372f2d9bdb5c36292
+R 206bb83fb0cfb10ca9612ceb9fe069ef
 U rolf
-Z 80edb1fac050c4b99392e33e0b6f48a4
+Z f69a2d8e83039849d29c27c7760530cd
 # Remove this line to create a well-formed Fossil manifest.
