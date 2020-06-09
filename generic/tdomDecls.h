@@ -14,53 +14,53 @@ extern "C" {
  */
 
 /* 0 */
-int		TclExpatObjCmd(ClientData dummy, Tcl_Interp *interp,
+EXTERN int		TclExpatObjCmd(ClientData dummy, Tcl_Interp *interp,
 				int objc, Tcl_Obj *const objv[]);
 /* 1 */
-int		CheckExpatParserObj(Tcl_Interp *interp,
+EXTERN int		CheckExpatParserObj(Tcl_Interp *interp,
 				Tcl_Obj *const nameObj);
 /* 2 */
-int		CHandlerSetInstall(Tcl_Interp *interp,
+EXTERN int		CHandlerSetInstall(Tcl_Interp *interp,
 				Tcl_Obj *const expatObj,
 				CHandlerSet *handlerSet);
 /* 3 */
-int		CHandlerSetRemove(Tcl_Interp *interp,
+EXTERN int		CHandlerSetRemove(Tcl_Interp *interp,
 				Tcl_Obj *const expatObj,
 				char *handlerSetName);
 /* 4 */
-CHandlerSet *	CHandlerSetCreate(char *name);
+EXTERN CHandlerSet *	CHandlerSetCreate(char *name);
 /* 5 */
-CHandlerSet *	CHandlerSetGet(Tcl_Interp *interp,
+EXTERN CHandlerSet *	CHandlerSetGet(Tcl_Interp *interp,
 				Tcl_Obj *const expatObj,
 				char *handlerSetName);
 /* 6 */
-void *		CHandlerSetGetUserData(Tcl_Interp *interp,
+EXTERN void *		CHandlerSetGetUserData(Tcl_Interp *interp,
 				Tcl_Obj *const expatObj,
 				char *handlerSetName);
 /* 7 */
-TclGenExpatInfo * GetExpatInfo(Tcl_Interp *interp,
+EXTERN TclGenExpatInfo * GetExpatInfo(Tcl_Interp *interp,
 				Tcl_Obj *const expatObj);
 /* 8 */
-XML_Size		XML_GetCurrentLineNumber(XML_Parser parser);
+EXTERN XML_Size		XML_GetCurrentLineNumber(XML_Parser parser);
 /* 9 */
-XML_Size		XML_GetCurrentColumnNumber(XML_Parser parser);
+EXTERN XML_Size		XML_GetCurrentColumnNumber(XML_Parser parser);
 /* 10 */
-XML_Index	XML_GetCurrentByteIndex(XML_Parser parser);
+EXTERN XML_Index	XML_GetCurrentByteIndex(XML_Parser parser);
 /* 11 */
-int		XML_GetCurrentByteCount(XML_Parser parser);
+EXTERN int		XML_GetCurrentByteCount(XML_Parser parser);
 /* 12 */
-enum XML_Status	XML_SetBase(XML_Parser parser, const XML_Char *base);
+EXTERN enum XML_Status	XML_SetBase(XML_Parser parser, const XML_Char *base);
 /* 13 */
-const XML_Char *	 XML_GetBase(XML_Parser parser);
+EXTERN const XML_Char *	 XML_GetBase(XML_Parser parser);
 /* 14 */
-int		XML_GetSpecifiedAttributeCount(XML_Parser parser);
+EXTERN int		XML_GetSpecifiedAttributeCount(XML_Parser parser);
 /* 15 */
-int		XML_GetIdAttributeIndex(XML_Parser parser);
+EXTERN int		XML_GetIdAttributeIndex(XML_Parser parser);
 /* 16 */
-domNode *	tcldom_getNodeFromName(Tcl_Interp *interp,
+EXTERN domNode *	tcldom_getNodeFromName(Tcl_Interp *interp,
 				char *nodeName, char **errMsg);
 /* 17 */
-domDocument *	tcldom_getDocumentFromName(Tcl_Interp *interp,
+EXTERN domDocument *	tcldom_getDocumentFromName(Tcl_Interp *interp,
 				char *docName, char **errMsg);
 
 typedef struct TdomStubs {
@@ -87,7 +87,7 @@ typedef struct TdomStubs {
     domDocument * (*tcldom_getDocumentFromName) (Tcl_Interp *interp, char *docName, char **errMsg); /* 17 */
 } TdomStubs;
 
-const TdomStubs *tdomStubsPtr;
+extern const TdomStubs *tdomStubsPtr;
 
 #ifdef __cplusplus
 }
