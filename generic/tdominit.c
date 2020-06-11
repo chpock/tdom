@@ -41,7 +41,7 @@
 #include <tcldom.h>
 #include <tclpull.h>
 
-extern TdomStubs tdomStubs;
+const TdomStubs *tdomStubsPtr;
 
 /*
  *----------------------------------------------------------------------------
@@ -95,7 +95,7 @@ Tdom_Init (
     
 #ifdef USE_TCL_STUBS
     Tcl_PkgProvideEx(interp, PACKAGE_NAME, PACKAGE_VERSION, 
-                     (ClientData) &tdomStubs);
+                     (ClientData) tdomStubsPtr);
 #else
     Tcl_PkgProvide(interp, PACKAGE_NAME, PACKAGE_VERSION);
 #endif

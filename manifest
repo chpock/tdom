@@ -1,5 +1,5 @@
-C Reverted\spart\sof\s[d41caf001d9d4d2a],\sas\sattempt\sto\sfix\s[c6cc9e097be16bd3].
-D 2020-06-09T22:51:28.156
+C Reverted\smy\sfix\sfor\s[c6cc9e097be16bd3]\sfrom\sthe\sprevious\scommit\sand\sapplied\sthe\sbetter\sone\sproposed\sby\smr_calvin.
+D 2020-06-11T00:48:44.133
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -133,10 +133,10 @@ F generic/tclpull.c 85a5b5f089f34355cc456969f14d6a1fc782908071435269378fbbf26bb7
 F generic/tclpull.h 8e1aac98bdad497c669c901494939eecd6c2f57ea51c4f5d4dac502db48527d4
 F generic/tdom.decls 26593c07732dca37caa7a4b56226f2b2700590a30a61af4cb7757cfa3e28c89e
 F generic/tdom.h d27e43748242d5fe7dd98b8c7aa4a5a891d015bf
-F generic/tdomDecls.h 52221e226619df9fcdfe6f6703fea216c27407051832d2d3a1761d8ec0e004ed
+F generic/tdomDecls.h 50a0589a95b7a93a83885d3a9b205457fc812e1bf87ef19898cff0276eab340d
 F generic/tdomStubInit.c 375ebd144c8e09dbe2fe4864e799da2bd0fbe3bce2855346487634c3be49daf0
 F generic/tdomStubLib.c 4a055f9c974246a9f7dd99de1a7686d1a96be8f02be699fdf4a760fdc813eb45
-F generic/tdominit.c 5d1fefee69f619cce7233cde33ae6f8c923edef114c130e612bf3ea76fb403da
+F generic/tdominit.c 05d172630270f1987ad89f96184d4eb79f63e3361dc99c2e30d3e7b30ee90099
 F generic/xmlsimple.c be39c8ff62d31e70ddcac4e5afa05797ee1971d2ada0a670648e74b47b3074d2
 F generic/xmlsimple.h 3cb9d055e60643afcdfe9ab407adf1e8bb5dbafb
 F lib/tdom.tcl 09d732922620415020cdb362b92b05c97e008191e6a12ddc88269f5f5a5c698e
@@ -216,8 +216,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 5300f428a6194bd556bb0dce9d568c82dd46d3c425d1def59dd83f71e4279d3c
-R 4dff9b07ffbc4cab1f40510a6a7ab1f2
+P 2d46161b9f0e45aec8e923323a4f5c9cadb1c259933d12323f7aace9bdbb0fae
+R 0220226760062257d810b8f53eabb177
 U rolf
-Z 20fe2cdc00fba04f6354cc43fbf59b1d
+Z 872ac96276fd149d3d10c1fb1ae8052f
 # Remove this line to create a well-formed Fossil manifest.
