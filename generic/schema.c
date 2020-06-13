@@ -5583,7 +5583,7 @@ NamedPatternObjCmd (
     } else {
         /* Local definition of this element */
         if (hnew) {
-            pattern = initSchemaCP (
+            pattern = initSchemaCP(
                 SCHEMA_CTYPE_NAME,
                 sdata->currentNamespace,
                 Tcl_GetHashKey (hashTable, h)
@@ -7982,6 +7982,68 @@ setvarTCObjCmd (
     return TCL_OK;
 }
 
+typedef struct
+{
+    char *buf;
+    int   allocedLen;
+} whitespaceTCData;
+
+static int
+whitespaceTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaCP *cp;
+    SchemaConstraint *sc;
+    int rc;
+
+    CHECK_TI
+    checkNrArgs (3,3,"(\"preserve\"|\"replace\"|\"collapse\") "
+                 "<text constraint script>");
+    cp = initSchemaCP (SCHEMA_CTYPE_CHOICE, NULL, NULL);
+    cp->type = SCHEMA_CTYPE_TEXT;
+    REMEMBER_PATTERN (cp)
+    switch (Tcl_GetString(objv[1])[0]) {
+    case 'p':
+        if (strcmp(Tcl_GetString (objv[0]), "preserve")) {
+            checkNrArgs (3,3,"(\"preserve\"|\"replace\"|\"collapse\") "
+                         "<text constraint script>");
+        }
+        rc = evalConstraints (interp, sdata, cp, objv[2]);
+        if (rc == TCL_OK) {
+            ADD_CONSTRAINT (sdata, sc)
+            sc->constraint = checkText;
+            sc->constraintData = (void *)cp;
+            return TCL_OK;
+        }
+        return TCL_ERROR;
+        break;
+    case 'r':
+        if (strcmp(Tcl_GetString (objv[0]), "replace")) {
+            checkNrArgs (3,3,"(\"preserve\"|\"replace\"|\"collapse\") "
+                         "<text constraint script>");
+        }
+        break;
+    case 'c':
+        if (strcmp(Tcl_GetString (objv[0]), "collapse")) {
+            checkNrArgs (3,3,"(\"preserve\"|\"replace\"|\"collapse\") "
+                         "<text constraint script>");
+        }
+        break;
+    default:
+        break;
+    }
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = setvarImpl;
+    sc->freeData = setvarImplFree;
+    sc->constraintData = tdomstrdup (Tcl_GetString (objv[1]));
+    return TCL_OK;
+}
+
 void
 tDOM_SchemaInit (
     Tcl_Interp *interp
@@ -8130,6 +8192,8 @@ tDOM_SchemaInit (
                           unsignedIntTypesTCObjCmd, (ClientData) 3, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::setvar",
                           setvarTCObjCmd, (ClientData) 3, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text:whitespace",
+                          whitespaceTCObjCmd, (ClientData) 3, NULL);
 }
 
 
