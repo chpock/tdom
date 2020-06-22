@@ -84,6 +84,9 @@
 #ifndef ATTR_ARRAY_INIT
 #  define ATTR_ARRAY_INIT 4
 #endif
+#ifndef WHITESPACETC_BUFFER_LEN_INIT
+#  define WHITESPACETC_BUFFER_LEN_INIT 200
+#endif
 
 /*----------------------------------------------------------------------------
 |   Local defines
@@ -769,6 +772,9 @@ static void schemaInstanceDelete (
         FREE (ks);
     }
     Tcl_DeleteHashTable (&sdata->keySpaces);
+    if (sdata->wsbufLen) {
+        FREE (sdata->wsbuf);
+    }
     FREE (sdata);
 }
 
@@ -7984,9 +7990,98 @@ setvarTCObjCmd (
 
 typedef struct
 {
-    char *buf;
-    int   allocedLen;
-} whitespaceTCData;
+    SchemaCP *cp;
+    SchemaData *sdata;
+} WhitespaceTCData;
+
+static void
+whitespaceImplFree (
+    void *constraintData
+    )
+{
+    WhitespaceTCData *wsdata = (WhitespaceTCData *) constraintData;
+
+    FREE (wsdata);
+}
+
+static int
+whitespaceImplReplace (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    WhitespaceTCData *wsdata = (WhitespaceTCData *) constraintData;
+    char *p, *c, *alloced;
+    SchemaData *sdata;
+
+    sdata = wsdata->sdata;
+    p = text;
+    c = sdata->wsbuf;
+    alloced = sdata->wsbuf + sdata->wsbufLen;
+    while (*p) {
+        if (*p == '\t' || *p == '\n' || *p == '\n') {
+            *c = ' ';
+        } else {
+            *c = *p;
+        }
+        c++;
+        if (c == alloced) {
+            sdata->wsbuf = REALLOC (sdata->wsbuf, 2 * sdata->wsbufLen);
+            c = sdata->wsbuf + sdata->wsbufLen;
+            sdata->wsbufLen *= 2;
+            alloced = sdata->wsbuf + sdata->wsbufLen;
+        }
+        p++;
+    }
+    *c = '\0';
+    return checkText (interp, wsdata->cp, wsdata->sdata->wsbuf);
+}
+
+static int
+whitespaceImplCollapse (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    WhitespaceTCData *wsdata = (WhitespaceTCData *) constraintData;
+    char *p, *c, *alloced;
+    SchemaData *sdata;
+
+    sdata = wsdata->sdata;
+    p = text;
+    c = sdata->wsbuf;
+    alloced = sdata->wsbuf + sdata->wsbufLen;
+    while (IS_XML_WHITESPACE(*p)) p++;
+    while (*p) {
+        if (IS_XML_WHITESPACE (*p)) {
+            *c = ' ';
+            c++;
+            if (c == alloced) {
+                sdata->wsbuf = REALLOC (sdata->wsbuf, 2 * sdata->wsbufLen);
+                c = sdata->wsbuf + sdata->wsbufLen;
+                sdata->wsbufLen *= 2;
+                alloced = sdata->wsbuf + sdata->wsbufLen;
+            }
+            p++;
+            while (IS_XML_WHITESPACE (*p)) p++;
+            if (!*p) c--;
+        } else {
+            *c = *p;
+            c++;
+            if (c == alloced) {
+                sdata->wsbuf = REALLOC (sdata->wsbuf, 2 * sdata->wsbufLen);
+                c = sdata->wsbuf + sdata->wsbufLen;
+                sdata->wsbufLen *= 2;
+                alloced = sdata->wsbuf + sdata->wsbufLen;
+            }
+            p++;
+        }
+    }
+    *c = '\0';
+    return checkText (interp, wsdata->cp, wsdata->sdata->wsbuf);
+}
 
 static int
 whitespaceTCObjCmd (
@@ -7999,48 +8094,50 @@ whitespaceTCObjCmd (
     SchemaData *sdata = GETASI;
     SchemaCP *cp;
     SchemaConstraint *sc;
-    int rc;
+    int type;
+    WhitespaceTCData *wsdata;
 
+    static const char *types[] = {
+        "preserve", "replace", "collapse", NULL
+    };
+    enum typeSyms {
+        t_preserve, t_replace, t_collapse
+    };
+        
     CHECK_TI
     checkNrArgs (3,3,"(\"preserve\"|\"replace\"|\"collapse\") "
                  "<text constraint script>");
+    if (Tcl_GetIndexFromObj (interp, objv[1], types, "type", 0, &type)
+        != TCL_OK) {
+        return TCL_ERROR;
+    }
     cp = initSchemaCP (SCHEMA_CTYPE_CHOICE, NULL, NULL);
     cp->type = SCHEMA_CTYPE_TEXT;
     REMEMBER_PATTERN (cp)
-    switch (Tcl_GetString(objv[1])[0]) {
-    case 'p':
-        if (strcmp(Tcl_GetString (objv[0]), "preserve")) {
-            checkNrArgs (3,3,"(\"preserve\"|\"replace\"|\"collapse\") "
-                         "<text constraint script>");
-        }
-        rc = evalConstraints (interp, sdata, cp, objv[2]);
-        if (rc == TCL_OK) {
-            ADD_CONSTRAINT (sdata, sc)
-            sc->constraint = checkText;
-            sc->constraintData = (void *)cp;
-            return TCL_OK;
-        }
+    if (evalConstraints (interp, sdata, cp, objv[2]) != TCL_OK) {
         return TCL_ERROR;
-        break;
-    case 'r':
-        if (strcmp(Tcl_GetString (objv[0]), "replace")) {
-            checkNrArgs (3,3,"(\"preserve\"|\"replace\"|\"collapse\") "
-                         "<text constraint script>");
-        }
-        break;
-    case 'c':
-        if (strcmp(Tcl_GetString (objv[0]), "collapse")) {
-            checkNrArgs (3,3,"(\"preserve\"|\"replace\"|\"collapse\") "
-                         "<text constraint script>");
-        }
-        break;
-    default:
-        break;
+    }
+    if (type == t_preserve) {
+        ADD_CONSTRAINT (sdata, sc)
+        sc->constraint = checkText;
+        sc->constraintData = (void *)cp;
+        return TCL_OK;
     }
     ADD_CONSTRAINT (sdata, sc)
-    sc->constraint = setvarImpl;
-    sc->freeData = setvarImplFree;
-    sc->constraintData = tdomstrdup (Tcl_GetString (objv[1]));
+    sc->freeData = whitespaceImplFree;
+    if (sdata->wsbufLen == 0) {
+        sdata->wsbuf = (char *) MALLOC (WHITESPACETC_BUFFER_LEN_INIT);
+        sdata->wsbufLen = WHITESPACETC_BUFFER_LEN_INIT;
+    }
+    wsdata = TMALLOC (WhitespaceTCData);
+    wsdata->sdata = sdata;
+    wsdata->cp = cp;
+    sc->constraintData = (void *)wsdata;
+    if (type == t_replace) {
+        sc->constraint = whitespaceImplReplace;
+    } else {
+        sc->constraint = whitespaceImplCollapse;
+    }
     return TCL_OK;
 }
 
@@ -8192,7 +8289,7 @@ tDOM_SchemaInit (
                           unsignedIntTypesTCObjCmd, (ClientData) 3, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::setvar",
                           setvarTCObjCmd, (ClientData) 3, NULL);
-    Tcl_CreateObjCommand (interp,"tdom::schema::text:whitespace",
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::whitespace",
                           whitespaceTCObjCmd, (ClientData) 3, NULL);
 }
 
