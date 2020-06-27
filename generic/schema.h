@@ -198,6 +198,8 @@ typedef struct SchemaData_
     domNode *insideNode;
     int choiceHashThreshold;
     int attributeHashThreshold;
+    char *wsbuf;
+    int wsbufLen;
 } SchemaData;
 
 int 
