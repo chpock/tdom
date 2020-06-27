@@ -799,10 +799,17 @@ s define {
 
       <commanddef>
         <command><cmd>whitespace</cmd> <m>(preserve|replace|collapse)</m> <m>&lt;constraint script></m></command>
-        <desc>This text constraint command does whitespace
-        normalization to the text value and checks the resulting text
-        with the text constraints of the constraint script
-        argument.</desc>
+        <desc>This text constraint command does whitespace (#x20
+        (space, ' '), #x9 (tab, \t), #xA (linefeed, \n), and #xD
+        (carriage return, \r) normalization to the text value and
+        checks the resulting text with the text constraints of the
+        constraint script argument. The normalization method
+        <m>preserve</m> keeps everything as it is; this is another way
+        to say <m>allOf</m>. The <m>replace</m> normalization method
+        replaces any single whitespace character (as above) to a
+        space. The <m>collapse</m> normalization method removes all
+        leading and trailing whitespace and all the other sequences of
+        contiguous whitespace are replaced by a single space.</desc>
       </commanddef>
 
       <commanddef>
@@ -983,7 +990,7 @@ s define {
             handed to the <m>tclcmd</m>, which is evaluated on global
             level, appended with every given arg and the text to split
             as last argument. This call must return a valid tcl list,
-            which elements are tested..</dd>
+            which elements are tested.</dd>
         </dl>
         <p>The default in case no split type argument is given is
         <m>whitespace</m>.</p></desc>

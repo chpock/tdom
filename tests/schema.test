@@ -5752,7 +5752,7 @@ test schema-14.45 {text constraint whitespace} {
         text {
             whitespace preserve {
                 oneOf {
-                    enumeration foo
+                    fixed foo
                     allOf {
                         minLength 5
                         integer
@@ -5781,7 +5781,7 @@ test schema-14.46 {text constraint whitespace} {
     s defelement doc {
         text {
             whitespace replace {
-                enumeration [list "foo bar"]
+                fixed "foo bar"
             }
         }
     }
@@ -5806,7 +5806,7 @@ test schema-14.47 {text constraint whitespace} {
     s defelement doc {
         text {
             whitespace collapse {
-                enumeration [list "foo bar"]
+                fixed "foo bar"
             }
         }
     }
@@ -5833,7 +5833,7 @@ test schema-14.48 {text constraint whitespace} {
     s defelement doc {
         text {
             whitespace preserve {
-                enumeration [list "foo[string repeat " " 300]bar"]
+                fixed "foo[string repeat " " 300]bar"
             }
         }
     }
@@ -5848,6 +5848,74 @@ test schema-14.48 {text constraint whitespace} {
     s delete
     set result
 } {0 1}
+
+test schema-14.49 {text constraint whitespace} {
+    tdom::schema s
+    s defelement doc {
+        text {
+            whitespace collapse {
+                fixed "foo [string repeat "x" 1200]bar"
+            }
+        }
+    }
+    set xmls {
+        <doc/>
+    }
+    lappend xmls "<doc>[string repeat " " 300]foo[string repeat " " 300][string repeat "x" 1200]bar[string repeat " " 300]</doc>"
+    set result [list]
+    foreach xml $xmls {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1}
+
+test schema-14.50 {text constraint whitespace} {
+    tdom::schema s
+    s defelement doc {
+        element b ! {
+            text {
+                whitespace replace {
+                    fixed "foo[string repeat " " 400]bar"
+                }
+            }
+        }
+    }
+    set xml <doc> 
+    append xml <b> foo [string repeat "&#xA; \t&#xD;" 100] bar </b>
+    append xml </doc>
+    set result [s validate $xml]
+    s delete
+    set result
+} 1
+
+test schema-14.51 {text constraint whitespace} {
+    tdom::schema s
+    s defelement doc {
+        element a ! {
+            text {
+                whitespace collapse {
+                    fixed "foo [string repeat "x" 1200]bar"
+                }
+            }
+        }
+        element b ! {
+            text {
+                whitespace replace {
+                    fixed "foo[string repeat " " 8000]bar"
+                }
+            }
+        }
+    }
+    set xml <doc> 
+    append xml <a> [string repeat " " 20] foo " " [string repeat x 1200] bar \
+        [string repeat " " 8000] </a>
+    append xml <b> foo [string repeat "&#xA; \t&#xD;" 2000] bar </b>
+    append xml </doc>
+    set result [s validate $xml]
+    s delete
+    set result
+} 1
 
 test schema-15.1 {constraint cmd tcl} {
     tdom::schema s

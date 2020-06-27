@@ -8020,7 +8020,7 @@ whitespaceImplReplace (
     c = sdata->wsbuf;
     alloced = sdata->wsbuf + sdata->wsbufLen;
     while (*p) {
-        if (*p == '\t' || *p == '\n' || *p == '\n') {
+        if (*p == '\t' || *p == '\n' || *p == '\r') {
             *c = ' ';
         } else {
             *c = *p;
@@ -8035,7 +8035,7 @@ whitespaceImplReplace (
         p++;
     }
     *c = '\0';
-    return checkText (interp, wsdata->cp, wsdata->sdata->wsbuf);
+    return checkText (interp, wsdata->cp, sdata->wsbuf);
 }
 
 static int
