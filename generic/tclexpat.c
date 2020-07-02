@@ -98,8 +98,6 @@ typedef enum {
     EXPAT_INPUT_FILENAME
 } TclExpat_InputType;
 
-
-
 /*----------------------------------------------------------------------------
 |   local globals
 |
@@ -344,9 +342,6 @@ TclExpatObjCmd(
     Tcl_Obj *const objv[]
 ) {
   TclGenExpatInfo *genexpat;
-  int ns_mode = 0;
-  char *nsoption;
-
 
   /*
    * Create the data structures for this parser.
@@ -378,21 +373,20 @@ TclExpatObjCmd(
   }
 
   genexpat->paramentityparsing = XML_PARAM_ENTITY_PARSING_NEVER;
-  
-  if (objc > 1) {
-      nsoption = Tcl_GetString(objv[1]);
-      if (strcmp(nsoption,"-namespace")==0) {
-          ns_mode = 1;
-          objv++;
-          objc--;
-      }
-  }
-  genexpat->ns_mode = ns_mode;
   genexpat->nsSeparator = ':';
 
+  if (objc > 0) {
+      /*
+       * Handle configuration options
+       */
+      if (TclExpatConfigure(interp, genexpat, objc - 1, objv + 1) != TCL_OK) {
+          TclExpatDeleteCmd (genexpat);
+          return TCL_ERROR;
+      }
+  }
   if (TclExpatInitializeParser(interp, genexpat, 0) != TCL_OK) {
-    FREE( (char*) genexpat);
-    return TCL_ERROR;
+      TclExpatDeleteCmd (genexpat);
+      return TCL_ERROR;
   }
 
   /*
@@ -402,16 +396,6 @@ TclExpatObjCmd(
   Tcl_CreateObjCommand(interp, Tcl_GetString(genexpat->name),
                                TclExpatInstanceCmd, (ClientData) genexpat,
                                TclExpatDeleteCmd);
-  /*
-   * Handle configuration options
-   */
-
-  if (objc > 1) {
-      if (TclExpatConfigure(interp, genexpat, objc - 1, objv + 1) != TCL_OK) {
-          return TCL_ERROR;
-      }
-  }
-
   Tcl_SetObjResult(interp, genexpat->name);
 
   return TCL_OK;
@@ -549,6 +533,9 @@ TclExpatInitializeParser(
         Tcl_DecrRefCount (expat->baseURI);
         expat->baseURI = NULL;
     }
+    XML_SetParamEntityParsing(expat->parser,
+                              expat->paramentityparsing);
+    XML_UseForeignDTD (expat->parser, (unsigned char)expat->useForeignDTD);
     
     /*
      * Set handlers for the parser to routines in this module.
@@ -1106,6 +1093,7 @@ TclExpatConfigure (
     "-endnamespacedeclcommand",
     "-ignorewhitecdata",
     "-useForeignDTD",
+    "-namespace",
 
     "-commentcommand",
     "-notstandalonecommand",
@@ -1134,6 +1122,7 @@ TclExpatConfigure (
     EXPAT_ENDNAMESPACEDECLCMD,
     EXPAT_IGNOREWHITECDATA,
     EXPAT_USEFOREIGNDTD,
+    EXPAT_NAMESPACE,
 
     EXPAT_COMMENTCMD, EXPAT_NOTSTANDALONECMD,
     EXPAT_STARTCDATASECTIONCMD, EXPAT_ENDCDATASECTIONCMD,
@@ -1168,12 +1157,28 @@ TclExpatConfigure (
       && (strcmp ("default", expat->firstTclHandlerSet->name)==0)) {
       activeTclHandlerSet = expat->firstTclHandlerSet;
   }
-  while (objc > 1) {
+  while (objc > 0) {
     if (Tcl_GetIndexFromObj(interp, objPtr[0], switches,
 			    "switch", 0, &optionIndex) != TCL_OK) {
         return TCL_ERROR;
     }
+    if (objc == 1) {
+        if (optionIndex != EXPAT_NAMESPACE) {
+            Tcl_WrongNumArgs (interp, 1, objv, "<value>");
+            return TCL_ERROR;
+        }
+    }
     switch ((enum switches) optionIndex) {
+      case EXPAT_NAMESPACE:             /* -namespace */
+
+        /* This option is a creation time / set once one */
+        if (!expat->parser) {
+            expat->ns_mode = 1;
+        }
+        objPtr++;
+        objc--;
+        continue;
+        
       case EXPAT_FINAL:			/* -final */
 
 	if (Tcl_GetBooleanFromObj(interp, objPtr[1], &bool) != TCL_OK) {
@@ -1183,21 +1188,24 @@ TclExpatConfigure (
         expat->final = bool;
 	break;
 
-      case EXPAT_BASE:			/* -base */
+      case EXPAT_BASE:			/* -baseurl */
 
-        if (expat->finished) {
-            if (expat->baseURI) {
-                Tcl_DecrRefCount (expat->baseURI);
-            }
+        if (expat->baseURI) {
+            Tcl_DecrRefCount (expat->baseURI);
+            expat->baseURI = NULL;
+        }
+        if (!expat->parser || expat->finished) {
             expat->baseURI = objPtr[1];
             Tcl_IncrRefCount (expat->baseURI);
-        } else {
-            if (XML_SetBase(expat->parser, Tcl_GetString(objPtr[1]))
-                == 0) {
-                Tcl_SetResult(interp, "unable to set base URL", NULL);
-                return TCL_ERROR;
+	} else {
+            if (expat->parser) {
+                if (XML_SetBase(expat->parser, Tcl_GetString(objPtr[1]))
+                    == 0) {
+                    Tcl_SetResult(interp, "unable to set base URL", NULL);
+                    return TCL_ERROR;
+                }
             }
-	}
+        }
 	break;
 
       case EXPAT_ELEMENTSTARTCMD:	/* -elementstartcommand */
@@ -1361,9 +1369,16 @@ TclExpatConfigure (
         if (Tcl_GetBooleanFromObj (interp, objPtr[1], &bool) != TCL_OK) {
             return TCL_ERROR;
         }
-        /* Cannot be changed after parsing as started (which is kind of
-           understandable). We silently ignore return code. */
-        XML_UseForeignDTD (expat->parser, (unsigned char)bool);
+        if (expat->parser) {
+            /* Cannot be changed after parsing as started (which is
+               kind of understandable). */
+            if (XML_UseForeignDTD (expat->parser, (unsigned char)bool)
+                != XML_ERROR_NONE) {
+                expat->useForeignDTD = bool;
+            }
+        } else {
+            expat->useForeignDTD = bool;
+        }
         break;
 
       case EXPAT_COMMENTCMD:      /* -commentcommand */
@@ -1485,29 +1500,26 @@ TclExpatConfigure (
           break;
 
       case EXPAT_PARAMENTITYPARSING: /* -paramentityparsing */
-	  /* ericm@scriptics */
 	  if (Tcl_GetIndexFromObj(interp, objPtr[1], paramEntityParsingValues,
 		  "value", 0, &value) != TCL_OK) {
               return TCL_ERROR;
 	  }
-	  switch ((enum paramEntityParsingValues) value) {
-	      case EXPAT_PARAMENTITYPARSINGALWAYS:
-		  XML_SetParamEntityParsing(expat->parser,
-			  XML_PARAM_ENTITY_PARSING_ALWAYS);
-                  expat->paramentityparsing = XML_PARAM_ENTITY_PARSING_ALWAYS;
-		  break;
-	      case EXPAT_PARAMENTITYPARSINGNEVER:
-		  XML_SetParamEntityParsing(expat->parser,
-			  XML_PARAM_ENTITY_PARSING_NEVER);
-                  expat->paramentityparsing = XML_PARAM_ENTITY_PARSING_NEVER;
-		  break;
-	      case EXPAT_PARAMENTITYPARSINGNOTSTANDALONE:
-		  XML_SetParamEntityParsing(expat->parser,
-			  XML_PARAM_ENTITY_PARSING_UNLESS_STANDALONE);
-                  expat->paramentityparsing = 
-                      XML_PARAM_ENTITY_PARSING_UNLESS_STANDALONE;
-		  break;
+          switch ((enum paramEntityParsingValues) value) {
+          case EXPAT_PARAMENTITYPARSINGALWAYS:
+              expat->paramentityparsing = XML_PARAM_ENTITY_PARSING_ALWAYS;
+              break;
+          case EXPAT_PARAMENTITYPARSINGNEVER:
+              expat->paramentityparsing = XML_PARAM_ENTITY_PARSING_NEVER;
+              break;
+          case EXPAT_PARAMENTITYPARSINGNOTSTANDALONE:
+              expat->paramentityparsing = 
+                  XML_PARAM_ENTITY_PARSING_UNLESS_STANDALONE;
+              break;
 	  }
+          if (expat->parser) {
+              XML_SetParamEntityParsing (expat->parser,
+                                         expat->paramentityparsing);
+          }
 	  break;
 
     case EXPAT_HANDLERSET:
@@ -1696,9 +1708,9 @@ TclExpatCget (
           Tcl_SetResult(interp, expat->final ? "1" : "0", NULL);
           return TCL_OK;
 
-      case EXPAT_BASE:			/* -base */
+      case EXPAT_BASE:			/* -baseurl */
 
-          if (expat->finished) {
+          if (!expat->parser || expat->finished) {
               Tcl_SetResult (interp, expat->baseURI != NULL
                              ? Tcl_GetString (expat->baseURI) : "", NULL);
           } else {
