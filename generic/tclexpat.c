@@ -1094,6 +1094,7 @@ TclExpatConfigure (
     "-ignorewhitecdata",
     "-useForeignDTD",
     "-namespace",
+    "-namespaceseparator",
 
     "-commentcommand",
     "-notstandalonecommand",
@@ -1123,6 +1124,7 @@ TclExpatConfigure (
     EXPAT_IGNOREWHITECDATA,
     EXPAT_USEFOREIGNDTD,
     EXPAT_NAMESPACE,
+    EXPAT_NAMESPACESEPARATOR,
 
     EXPAT_COMMENTCMD, EXPAT_NOTSTANDALONECMD,
     EXPAT_STARTCDATASECTIONCMD, EXPAT_ENDCDATASECTIONCMD,
@@ -1149,9 +1151,10 @@ TclExpatConfigure (
   int optionIndex, value, bool;
   Tcl_Obj *const *objPtr = objv;
   Tcl_CmdInfo cmdInfo;
-  int rc;
+  int rc, len;
   char *handlerSetName = NULL;
   TclHandlerSet *tmpTclHandlerSet, *activeTclHandlerSet = NULL;
+  Tcl_UniChar uniChar;
 
   if (expat->firstTclHandlerSet 
       && (strcmp ("default", expat->firstTclHandlerSet->name)==0)) {
@@ -1164,7 +1167,7 @@ TclExpatConfigure (
     }
     if (objc == 1) {
         if (optionIndex != EXPAT_NAMESPACE) {
-            Tcl_WrongNumArgs (interp, 1, objv, "<value>");
+            Tcl_WrongNumArgs (interp, 1, objPtr, "<value>");
             return TCL_ERROR;
         }
     }
@@ -1178,6 +1181,32 @@ TclExpatConfigure (
         objPtr++;
         objc--;
         continue;
+
+      case EXPAT_NAMESPACESEPARATOR:    /* -namespaceseparator */
+
+        len = Tcl_GetCharLength (objPtr[1]);
+        if (len > 1) {
+            Tcl_SetResult (interp, "invalid -namespaceseparator argument",
+                           NULL);
+            return TCL_ERROR;
+        }
+        if (len == 0) {
+            if (!expat->parser) {
+                expat->nsSeparator = 0;
+            }
+            break;
+        }
+        Tcl_UtfToUniChar (Tcl_GetString (objPtr[1]), &uniChar);
+        if (uniChar > 255) {
+            Tcl_SetResult (interp, "invalid -namespaceseparator argument",
+                           NULL);
+            return TCL_ERROR;
+        }
+        /* This option is a creation time / set once one */
+        if (!expat->parser) {
+            expat->nsSeparator = uniChar;
+        }
+        break;
         
       case EXPAT_FINAL:			/* -final */
 
@@ -1549,7 +1578,7 @@ TclExpatConfigure (
         break;
 
     case EXPAT_NOEXPAND:
-        if (Tcl_GetBooleanFromObj (interp, objv[1], &bool) != TCL_OK) {
+        if (Tcl_GetBooleanFromObj (interp, objPtr[1], &bool) != TCL_OK) {
             return TCL_ERROR;
         }
         if (bool) {
@@ -1625,6 +1654,7 @@ TclExpatCget (
         "-handlerset",
         "-noexpand",
         "-namespace",
+        "-namespaceseparator",
         (char *) NULL
     };
     enum switches {
@@ -1649,12 +1679,16 @@ TclExpatCget (
         EXPAT_NOWHITESPACE,
         EXPAT_HANDLERSET,
         EXPAT_NOEXPAND,
-        EXPAT_NAMESPACE
+        EXPAT_NAMESPACE,
+        EXPAT_NAMESPACESEPARATOR
     };
-    int optionIndex;
+    int optionIndex, len;
     TclHandlerSet *activeTclHandlerSet = NULL;
     char *handlerSetName = NULL;
     Tcl_Obj*  objPtr;
+    char utfBuf[TCL_UTF_MAX];
+    Tcl_DString dStr;
+    Tcl_UniChar uniChar;
 
     if (Tcl_GetIndexFromObj(interp, objv[0], switches,
 			    "switch", 0, &optionIndex) != TCL_OK) {
@@ -1749,6 +1783,18 @@ TclExpatCget (
       case EXPAT_NAMESPACE: /* -namespace */
 
         SetIntResult (interp, expat->ns_mode);
+        return TCL_OK;
+
+      case EXPAT_NAMESPACESEPARATOR: /* -namespaceseparator */
+
+        if (expat->nsSeparator) {
+            uniChar = expat->nsSeparator;
+            len = Tcl_UniCharToUtf (uniChar, utfBuf);
+            Tcl_DStringInit (&dStr);
+            Tcl_DStringAppend (&dStr, utfBuf, len);
+            Tcl_DStringResult (interp, &dStr);
+            Tcl_DStringFree (&dStr);
+        }
         return TCL_OK;
 
       case EXPAT_NOWHITESPACE:

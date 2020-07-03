@@ -1,9 +1,9 @@
-C The\sexpat\scommand\soption\s-namespace\snow\smay\sappear\sanywhere\sin\sthe\soptions\slist.\sImproved\sexpad\scommand\soption\schecking.\sFixed\sthe\sone\stest,\sthat\swithout\sneed\sin\sthe\scontext\sused\sthe\s-noexpand\soption\sand\sthat\ssyntactically\swrong.\sAdded\sa\sfew\sbasic\stexts\sfor\s-noexpand.\sFixed\s<parser>\scget\s-useForeignDTD.
-D 2020-07-02T01:42:39.138
+C User\sconfigurable\sseparator\scharacter\sbetween\snamespace\sURI\sand\slocal\sname\sfor\sXML\snamespace-aware\sSAX\sparser:\sAdded\sthe\soption\s-namespaceseparator\sto\sthe\sexpat\scommand.
+D 2020-07-03T11:12:39.016
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
-F CHANGES 01ccf075780650e7fc80bfb6b67717a4f418cba9521a2cf30108c1a9c5f73fe8
+F CHANGES 0bffbd8d3fd05ae2f69b48ee1f46800e002fc2490d8665cd474577daf849b4c6
 F ChangeLog 9b60ec8bfbae84e4f1a97aaee24be00ccea212b7
 F LICENSE 7c00b00fe8e88c48498a54c103dd7df03faeeb039c783279d5fb54dfca307b77
 F MPL_2.0.html 326b847674d6f5846c5b260fb437372e21232c23e3911f3a94f766a62459126c
@@ -26,9 +26,9 @@ F doc/domDoc.xml 72b489a049d94fb09c9a7f72c27700abb1e1c6e16c8d024e6b379a9d280c8fe
 F doc/domNode.html 6332872254ffbc696d2b385938cff866b8f3760518005a7a27aba5dce32bb84f
 F doc/domNode.n 3ab4017d0ab718992510274e503c55dc02d91fb62fec678803ba55eb2c566a45
 F doc/domNode.xml 0e93a883996dd9b3c056857726a18d6e32ab7a2d8712d34dff125428c90fb522
-F doc/expat.html e7b5071878f8e3d9f818054e00dac627b82c40ec60a9aa362b8a3b1be763598e
-F doc/expat.n a0464f49b085e48feef6e1ed3ecdee2ece407d724b4b63401ca7a058188ef8e8
-F doc/expat.xml a404af989ee943eafbd470b6de0778d442b5686f7d80bc42ca9c607dd9d4677e
+F doc/expat.html db757530cc5fe2f8ba659fc89d2ec789deed2a1b74160ddd9a7850f3edd61c0f
+F doc/expat.n 241a7b7f5062194e08332f7d872d8fc7eda64432f3e2d17a5095d30b8da33f82
+F doc/expat.xml c32fea8c2916212631bed175a9631df4bb7ec783a5e7d4bd153fe5f2e873e387
 F doc/expatapi.html fd32353769fa6dad1ce2dc59caafb02af8e21f3da5cf72147347638078121f72
 F doc/expatapi.n c46bf0503057037c929f4dbd465e3aa0372e701f3211bee6fc19379557f42122
 F doc/expatapi.xml f978d9a0b6df6878e1f94e427c018240efaf33f6d8dfa456051cfe551b15d4c3
@@ -127,7 +127,7 @@ F generic/nodecmd.c ee14ed666ca6d18977f7301545c52ac71b3ce73c49233ff8f8b3aa414400
 F generic/nodecmd.h d2201b69de9507f86e94750f0b72867ec9150795712ef18c5b5b87f35a689f75
 F generic/tcldom.c b47893b21d10eeb359bec8e253df2a1cbaec9a23c87ac0b7743b334bc733d6f8
 F generic/tcldom.h afa34c95c821b0f7401853e7bd8c1ff344d8e1640982b7ec250228601dd46e76
-F generic/tclexpat.c d52da1f4f15da4e3697e966f4a967258d56c1ebbe1ca190401c40b04d7dc955e
+F generic/tclexpat.c 0f4c1220c6c07199a63942616fb31e0eebff421ad85eb66a09b2d1aabbecc20f
 F generic/tclexpat.h 79502484629c99554b998df93e178a69d8484a851ca5739616a37423c2de7d60
 F generic/tclpull.c 85a5b5f089f34355cc456969f14d6a1fc782908071435269378fbbf26bb70627
 F generic/tclpull.h 8e1aac98bdad497c669c901494939eecd6c2f57ea51c4f5d4dac502db48527d4
@@ -186,7 +186,7 @@ F tests/html5reader.test 9e17b12e5bc027d40b65cbab3937643d22dcbbd93620f416473d719
 F tests/htmlreader.test 6e08308d4aa9aafa8661aa0b9f4d17de4c1a40b0abc4db4379f744c428162859
 F tests/i18n.test 68643e220f65147bc51c12daa86339aac905ac547d6a2888c7f7527518f8b1d5
 F tests/loadtdom.tcl 3b38fc099fad11ee2db6629dca2f85045c0fa5fc6929700c99b512afe134eba5
-F tests/namespace.test d99810104c50eabf46ed7c0e4902b75b02fc4e9b54a040f40741fc73d97fb42c
+F tests/namespace.test 0a13b2bf59bb088525ca7b64d0b2bce6a349c627ca3dd1c17a4cc969d16fe57c
 F tests/parser.test 697503e89df356a86e1ec8ffbfb98e3322ccb7ca1ece33beba6d20bdf5ec0597
 F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
@@ -216,8 +216,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 5a424c365fd7741e6fca3d1d8e12034113deb7006cfb61fe179da1cb28fc05e9
-R cb8474457c297d47ec6105eb52c71f46
+P 3779fdc2c3c0e3815768559ec15f74da0fc8b858fbfffef03ab0556166a0a406
+R 11eee5278de14b9e44310789db11a33f
 U rolf
-Z 78a30d90e1436c3fe7d985fcf05a85b5
+Z ca7dc73468826ee91a20dd6df1352033
 # Remove this line to create a well-formed Fossil manifest.
