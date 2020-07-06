@@ -244,7 +244,7 @@ static char *ValidationErrorType2str[] = {
 #define SetBooleanResult(i) Tcl_ResetResult(interp); \
                      Tcl_SetBooleanObj(Tcl_GetObjResult(interp), (i))
 
-#define SPACE(c) ((c) == ' ' || (c) == '\n' || (c) == '\t' || (c) == '\r')
+#define SPACE(c) IS_XML_WHITESPACE ((c))
     
 #define checkNrArgs(l,h,err) if (objc < l || objc > h) {      \
         SetResult (err);                                      \
@@ -8053,9 +8053,9 @@ whitespaceImplCollapse (
     p = text;
     c = sdata->wsbuf;
     alloced = sdata->wsbuf + sdata->wsbufLen;
-    while (IS_XML_WHITESPACE(*p)) p++;
+    while (SPACE(*p)) p++;
     while (*p) {
-        if (IS_XML_WHITESPACE (*p)) {
+        if (SPACE (*p)) {
             *c = ' ';
             c++;
             if (c == alloced) {
@@ -8065,7 +8065,7 @@ whitespaceImplCollapse (
                 alloced = sdata->wsbuf + sdata->wsbufLen;
             }
             p++;
-            while (IS_XML_WHITESPACE (*p)) p++;
+            while (SPACE (*p)) p++;
             if (!*p) c--;
         } else {
             *c = *p;
