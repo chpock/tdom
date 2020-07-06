@@ -8141,6 +8141,56 @@ whitespaceTCObjCmd (
     return TCL_OK;
 }
 
+static int
+notImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    SchemaCP *cp = (SchemaCP *) constraintData;
+    SchemaConstraint *sc;
+    int i;
+
+    /* Look also at checkText and oneOfImpl */
+    for (i = 0; i < cp->nc; i++) {
+        sc = (SchemaConstraint *) cp->content[i];
+        if ((sc->constraint) (interp, sc->constraintData, text)) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+static int
+notTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaCP *cp;
+    SchemaConstraint *sc;
+    int rc;
+
+    CHECK_TI
+    checkNrArgs (2,2,"Expected: <text constraint script>");
+    
+    cp = initSchemaCP (SCHEMA_CTYPE_CHOICE, NULL, NULL);
+    cp->type = SCHEMA_CTYPE_TEXT;
+    REMEMBER_PATTERN (cp)
+    rc = evalConstraints (interp, sdata, cp, objv[1]);
+    if (rc == TCL_OK) {
+        ADD_CONSTRAINT (sdata, sc)
+        sc->constraint = notImpl;
+        sc->constraintData = (void *)cp;
+        return TCL_OK;
+    }
+    return TCL_ERROR;
+}
+
 void
 tDOM_SchemaInit (
     Tcl_Interp *interp
@@ -8291,6 +8341,8 @@ tDOM_SchemaInit (
                           setvarTCObjCmd, (ClientData) 3, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::whitespace",
                           whitespaceTCObjCmd, (ClientData) 3, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::not",
+                          notTCObjCmd, (ClientData) 3, NULL);
 }
 
 

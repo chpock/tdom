@@ -1039,6 +1039,16 @@ s define {
             commmand.</desc>
         </commanddef>
         <commanddef>
+            <command><cmd>not</cmd> <m>&lt;constraint script></m></command>
+            <desc>This text constraint match if none of the text
+            constraints defined in the argument <m>constraint
+            script</m> match the text. It stops after the first
+            matching constaint in the <m>constraint script</m> and
+            reports validation error. The text constraints in the
+            <m>constraint script</m> are probed in the order of
+            definition.</desc>
+        </commanddef>
+        <commanddef>
             <command><cmd>strip</cmd> <m>&lt;constraint script></m></command>
             <desc>This text constraint command tests all text constraints
             in the evaluated <m>constraint script></m> with the text to

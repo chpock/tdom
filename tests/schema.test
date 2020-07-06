@@ -5917,6 +5917,33 @@ test schema-14.51 {text constraint whitespace} {
     set result
 } 1
 
+test schema-14.52 {text constraint whitespace} {
+    tdom::schema s
+    s defelement doc {
+        element a + {
+            text {
+                not {
+                    fixed foo
+                    fixed bar
+                }
+            }
+        }
+    }
+    set result ""
+    foreach xml {
+        <doc><a>foo</a></doc>
+        <doc><a>bar</a></doc>
+        <doc><a>grill</a></doc>
+        <doc><a/></doc>
+        <doc><a/><a>grill</a></doc>
+        <doc><a/><a>bar</a></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 1 1 1 0}
+
 test schema-15.1 {constraint cmd tcl} {
     tdom::schema s
     s define {
