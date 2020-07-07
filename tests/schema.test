@@ -4236,12 +4236,13 @@ test schema-14.9 {text: isodate} {
         <doc>2012-03-07-2:30</doc>
         <doc>2012-03-07-02:30Z</doc>
         {<doc>2012-03-07-02:30 </doc>}
+        <doc>02027-02-01</doc>
     } {
         lappend result [s validate $xml]
     }
     s delete
     set result
-} {0 0 0 0 0 1 0 0 0 1 0 1 1 0 1 1 0 0 0 1 0 1 1 1 1 0 0 0 1 1 1 0 1 0 1 1 0 0 0 0}
+} {0 0 0 0 0 1 0 0 0 1 0 1 1 0 1 1 0 0 0 1 0 1 1 1 1 0 0 0 1 1 1 0 1 0 1 1 0 0 0 0 0}
 
 test schema-14.10 {text: number tcl} {
     tdom::schema s
@@ -5714,11 +5715,12 @@ test schema-14.42 {isodate outside schema context} {
         2012-03-07-2:30
         2012-03-07-02:30Z
         "2012-03-07-02:30 "
+        02027-02-01
     } {
         lappend result [tdom::schema::text::isodate $txt]
     }
     set result
-} {0 0 0 0 1 0 0 0 1 0 1 1 0 1 1 0 0 0 1 0 1 1 1 1 0 0 0 1 1 1 0 1 0 1 1 0 0 0 0}
+} {0 0 0 0 1 0 0 0 1 0 1 1 0 1 1 0 0 0 1 0 1 1 1 1 0 0 0 1 1 1 0 1 0 1 1 0 0 0 0 0}
 
 test schema-14.43 {text constraint setvar} {
     tdom::schema s

@@ -6913,12 +6913,20 @@ isodateImpl (
         /* A bce date */
         text++;
     }
-    for (i = 0; i < 4; i++) {
-        if (*text < '0' || *text > '9') return 0;
-        if (*text != '0') seenNonzero = 1;
+    i = 1;
+    /* Parse year */
+    while (*text >= '0' && *text <= '9') {
+        if (*text > '0' && !seenNonzero) seenNonzero = i;
         text++;
+        i++;
     }
-    while (*text >= '0' && *text <= '9') text++;
+    /* Premature end */
+    if (i < 5) return 0;
+    if (i > 5) {
+        /* The year has more than 4 digits. Only allowed if in fact
+         * needed (no extra leading zeros). */
+        if (seenNonzero > 1) return 0;
+    }
     if (*text != '-') return 0;
     /* We only need to know the modulo of the year for 4, 100 and 400,
      * for this the 4 last letters are enough */
@@ -6926,6 +6934,7 @@ isodateImpl (
     /* There isn't a year 0. it's either 0001 or -0001 */
     if (!seenNonzero) return 0;
     text++;
+    /* Parse month */
     for (i = 0; i < 2; i++) {
         if (*text < '0' || *text > '9') return 0;
         text++;
@@ -6934,6 +6943,7 @@ isodateImpl (
     m = atoi(text-2);
     if (m < 1 || m > 12) return 0;
     text++;
+    /* Parse day */
     for (i = 0; i < 2; i++) {
         if (*text < '0' || *text > '9') return 0;
         text++;
@@ -6964,7 +6974,9 @@ isodateImpl (
         }
         break;
     }
+    /* Date part end */
     if (*text == '\0') return 1;
+    /* Parse optional time part */
     switch (*text) {
     case 'Z':
         text++;

@@ -1,5 +1,5 @@
-C Cleand\sup\swhite\sspace\smacros.
-D 2020-07-06T21:44:52.180
+C Fixed\sisodate\stext\sconstraint\simplementation,\sextra\sleading\szeros\swas\snot\sdetected.
+D 2020-07-07T22:16:23.912
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -139,7 +139,7 @@ F generic/domxslt.h 0cb8e327683a0ffeb2a7094add6cd82ec1ae49c7c704f20d8d6f7d6523e7
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c ee14ed666ca6d18977f7301545c52ac71b3ce73c49233ff8f8b3aa4144008d24
 F generic/nodecmd.h d2201b69de9507f86e94750f0b72867ec9150795712ef18c5b5b87f35a689f75
-F generic/schema.c 9d798efbbb6ec29d3dcee8f920da54bd86c6581d71658b1593c1c0d5b45373b0
+F generic/schema.c 5c9f8d015e6f9b3fdde78982b04544db8e8efb2170b4f154ee219731fa0f2032
 F generic/schema.h cf703b991402a7c26ca3226b366c7abd40a86e91df7bf1c5bc6f355dc19d0e51
 F generic/tcldom.c e0d3501b8e768b0c27b151d1ab385082b02fc7ef4dfc563610437eb781b9cbf7
 F generic/tcldom.h b83344768ac6121267471d92def0e88d1cd1d30fd8b995c385c41474d29f3fd7
@@ -208,7 +208,7 @@ F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
 F tests/pullparser.test e4b14ea0bdc9f9fd931f3bc559e78c309582a67a238170d58e0f20331f99890c
 F tests/pushpull.bench 664e8f512917537d96c4b71933d4d9a6da65fc6fe85bd7c459483830dc7d2faf
-F tests/schema.test 03b1f603bcffe1e17bbcdc290aba47cf21cee35fc8cdc0a421dbdfd5451a59a7
+F tests/schema.test 3e36c1933efee069b29625ddfc61bfcb7313709be207eeebd0e88cf72f101c2b
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
 F tests/tdomcmd.bench b07448ed4de08ccaa9734cf3fe15c695fd7066c993da58ff48d465747940e417
 F tests/tdomcmd.test 092401adf0609906d710f3ef8997cb4ca29bc208
@@ -233,8 +233,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P eb634411085246b37e33511ba3db90e511ec30bfb4b1b12814c5a34a9fdd4838
-R 529db031b3708ccf448341ebacd81c14
+P 8007e1bf7d67f958467bf4043d299acef67b988ac9cd4ae295c3bea1796d6cf8
+R 433cbcbecf0091aad8576cd5fb08c872
 U rolf
-Z dfa166f6de84c65865a7a08f10e1bb1e
+Z abc4bddf4e3b56683c13664c02073c92
 # Remove this line to create a well-formed Fossil manifest.
