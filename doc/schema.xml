@@ -788,6 +788,15 @@ s define {
     <m>tdom::schema::text</m>. They raise error in case they are
     called outside of a text constraint script.</p>
 
+    <p>A few of the following text type commands are exposed as
+    general Tcl commands. They are defined in the namespace tdom::type
+    and are called as documented below with the text to check appended
+    to the argument list. They return a logical value. Please note,
+    that the commands may not accept staring or ending white space. It
+    is noted with the command documentatin, if the command is
+    available in the tdom::type.
+    </p>
+
     <subsection>
         <title>The tcl text constraint command</title>
         <p>The <m>tcl</m> text constraint command dispatches the check
@@ -923,7 +932,8 @@ s define {
                 gregorian calendar for all dates. A preceding minus
                 sign for bce dates is allowed. There is no year 0. The
                 year may have more than 4 digits, but only if needed
-                (no extra leading zeros).</desc>
+                (no extra leading zeros). This is available as common
+                tcl command tdom::type::date.</desc>
             </commanddef>
             <commanddef>
                 <command><cmd>time</cmd></command>
@@ -936,7 +946,8 @@ s define {
                 digits. Additional fractional seconds (with a point
                 ('.') as separater) are allowed, but not just a
                 dangling point. The time value 24:00:00 (whitout
-                fractional part) is allowed.</desc>
+                fractional part) is allowed. This is available as
+                common tcl command tdom::type::time.</desc>
             </commanddef>
             <commanddef>
                 <command><cmd>dateTime</cmd></command>
@@ -947,7 +958,8 @@ s define {
                 follow the rules of the <m>date</m> command; see
                 there. The time part (including the signaling 'T'
                 character) is mandatory and follow the rules of the
-                <m>time</m> command, see there.</desc>
+                <m>time</m> command, see there. This is available as
+                common tcl command tdom::type::dateTime.</desc>
             </commanddef>
             <commanddef>
                 <command><cmd>base64</cmd></command>

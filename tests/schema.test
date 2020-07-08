@@ -27,8 +27,9 @@
 #    schema-24.*: validatechannel
 #    schema-25.*: domxpathboolean
 #    schema-26.*: info domNode
+#    schema-27.*: Text constraint commands available outsite schema context
 #
-# Copyright (c) 2018-2019 Rolf Ade.
+# Copyright (c) 2018-2020 Rolf Ade.
 
 source [file join [file dir [info script]] loadtdom.tcl]
 
@@ -5639,15 +5640,9 @@ test schema-14.40 {text: unsignedLong} {
 
 test schema-14.41 {text constrains commands outside text constraint} {
     set cmds [info command tdom::schema::text::*]
-    set skiplist {
-        ::tdom::schema::text::date
-        ::tdom::schema::text::dateTime
-        ::tdom::schema::text::time
-    }
     set result {}
     tdom::schema s
     foreach cmd $cmds {
-        if {$cmd in $skiplist} continue
         lappend result [catch {$cmd "some text"}]
         lappend result [catch {
             s define [subst "{$cmd}"]
@@ -5667,62 +5662,13 @@ test schema-14.41 {text constrains commands outside text constraint} {
             }]
         } errMsg]
     }
-    if {$result eq [lrepeat [expr {([llength $cmds] - [llength $skiplist]) * 4}] 1]} {
+    if {$result eq [lrepeat [expr {[llength $cmds] * 4}] 1]} {
         set result 1
     } else {
         set result 0
     }
     set result
 } 1
-
-test schema-14.42 {date outside schema context} {
-    set result {}
-    foreach txt {
-        ""
-        foo
-        1
-        12
-        1234-12-31
-        1234-14-31
-        1234-12-00
-        1234-02-31
-        2000-02-29
-        2001-02-29
-        2004-02-29
-        -2004-02-29
-        1900-02-29
-        1234-02-01
-        1234-08-10
-        1234-08-222
-        " 1234-08-22"
-        "1234-08-22 "
-        11234-08-22
-        0000-02-01
-        10000-08-22
-        10000-02-29
-        10000-02-29Z
-        2012-03-07Z
-        "2012-03-07Z "
-        2012-03-07a
-        2012-03-07+
-        2012-03-07+00:00
-        2012-03-07-00:00
-        2012-03-07+02:00
-        2012-03-07+02:70
-        2012-03-07+12:30
-        2012-03-07+14:30
-        2012-03-07+14:00
-        2012-03-07-14:00
-        2012-03-07-14:01
-        2012-03-07-2:30
-        2012-03-07-02:30Z
-        "2012-03-07-02:30 "
-        02027-02-01
-    } {
-        lappend result [tdom::schema::text::date $txt]
-    }
-    set result
-} {0 0 0 0 1 0 0 0 1 0 1 1 0 1 1 0 0 0 1 0 1 1 1 1 0 0 0 1 1 1 0 1 0 1 1 0 0 0 0 0}
 
 test schema-14.43 {text constraint setvar} {
     tdom::schema s
@@ -5948,43 +5894,6 @@ test schema-14.52 {text constraint whitespace} {
     set result
 } {0 0 1 1 1 0}
 
-test schema-14.53 {dateTime outside schema context} {
-    set result ""
-    foreach txt {
-        ""
-        foo
-        1
-        2020-07-08T15:58:17
-        2020-07-08T15:20:00
-        2020-07-08T15:20:17.7
-        2020-07-08T15:58:17+02:00
-        2020-07-08T15:20:17.789
-        2020-07-08T15:20:17.7890
-        2020-07-08T15:20:17.0
-        2020-07-08T15:20:17.
-        2020-07-08T15:20:17.+02:00
-        2020-07-08T15:20:17.Z
-        2020-07-08T15:20:17+Z
-        2020-07-08T00:20
-        2020-07-08T00:60:00
-        2020-07-08T24:00:00
-        2020-07-08T24:00:00.1
-        2020-07-08T24:01:00
-        2020-07-08T24:00:01
-        2020-12-2215:20:00
-        2020-12-22
-        2020-07-08T15:20:17.789+02:00
-        2020-07-08T15:20:17-02:00
-        2020-07-08T15:20:17-02:00.0
-        2020-07-08T15:20:17.0-02:00
-        " 2020-07-08T15:20:17.0-02:00"
-        "2020-07-08T15:20:17.0-02:00 "
-    } {
-        lappend result [tdom::schema::text::dateTime $txt]
-    }
-    set result
-} {0 0 0 1 1 1 1 1 1 1 0 0 0 0 0 0 1 0 0 0 0 0 1 1 0 1 0 0}
-
 test schema-14.54 {text constraint dateTime} {
     tdom::schema s
     s define {
@@ -6072,36 +5981,6 @@ test schema-14.55 {text constraint time} {
     s delete
     set result
 } {0 0 0 0 1 1 1 1 1 1 1 0 0 0 0 0 0 1 0 0 0 1 1 0 1 0 0}
-
-test schema-14.56 {time outside schema context} {
-    set result ""
-    foreach txt {
-        ""
-        foo
-        1
-        07:15:00
-        07:15:00.023
-        07:15:00+05:00
-        07:15:00Z
-        00:00:00
-        24:00:00
-        7:15:00
-        07:15
-        07:15.4:23
-        12:60:12
-        12:61:12
-        12:71:12
-        24:31:12
-        25:31:12
-        55:31:12
-        12:31:60
-        12:31:61
-        12:31:77
-    } {
-        lappend result [tdom::schema::text::time $txt]
-    }
-    set result
-} {0 0 0 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0}
 
 test schema-15.1 {constraint cmd tcl} {
     tdom::schema s
@@ -9746,5 +9625,187 @@ test schema-26.3 {info domNode} {
     s delete
     set result
 } {{} fromTcl {} 1 fromTcl {} 1 fromTcl {} UNEXPECTED_TEXT {} fromTcl {} 1 fromTcl {} UNEXPECTED_TEXT {} fromTcl {} 1 fromTcl {} UNEXPECTED_TEXT {} fromTcl {} UNEXPECTED_ELEMENT {} 1 fromTcl {} UNEXPECTED_ELEMENT {} 1}
+
+proc schema-27.1 {args} {
+    lappend ::result [::tdom::type::time 23:24:45]
+}
+
+test schema-27.1 {Called from evaluated code} {
+    tdom::schema s
+    s defelement doc {
+        tcl schema-27.1
+        element e 1
+    }
+    set result ""
+    lappend result [s validate <doc><e/></doc>]
+    s delete
+    set result
+} {1 1}
+
+test schema-27.2 {Called from evaluated code} {
+    tdom::schema s
+    s defelement doc {
+        text {
+            tcl schema-27.1
+        }
+    }
+    set result ""
+    lappend result [s validate <doc>foo</doc>]
+    s delete
+    set result
+} {1 1}
+
+test schema-27.3 {Called from recover script} {
+    tdom::schema s
+    s defelement doc {
+        element e 1
+    }
+    s reportcmd schema-27.1
+    set result ""
+    lappend result [s validate <doc/>]
+    s delete
+    set result
+} {1 1}
+
+test schema-27.4 {Called as part of validation} {
+    tdom::schema s
+    s defelement doc {
+        tcl schema-27.1
+        element e 1
+    }
+    set result ""
+    lappend result [s validate <doc><e/></doc>]
+    s delete
+    set result
+} {1 1}
+
+test schema-27.5 {Called during schema script evaluation} {
+    tdom::schema s
+    set result ""
+    s defelement doc {
+        set ::result [::tdom::type::time 12:20:00]
+        element e 1
+    }
+    s delete
+    set result
+} 1
+
+
+test schema-27.6 {date outside schema context} {
+    set result {}
+    foreach txt {
+        ""
+        foo
+        1
+        12
+        1234-12-31
+        1234-14-31
+        1234-12-00
+        1234-02-31
+        2000-02-29
+        2001-02-29
+        2004-02-29
+        -2004-02-29
+        1900-02-29
+        1234-02-01
+        1234-08-10
+        1234-08-222
+        " 1234-08-22"
+        "1234-08-22 "
+        11234-08-22
+        0000-02-01
+        10000-08-22
+        10000-02-29
+        10000-02-29Z
+        2012-03-07Z
+        "2012-03-07Z "
+        2012-03-07a
+        2012-03-07+
+        2012-03-07+00:00
+        2012-03-07-00:00
+        2012-03-07+02:00
+        2012-03-07+02:70
+        2012-03-07+12:30
+        2012-03-07+14:30
+        2012-03-07+14:00
+        2012-03-07-14:00
+        2012-03-07-14:01
+        2012-03-07-2:30
+        2012-03-07-02:30Z
+        "2012-03-07-02:30 "
+        02027-02-01
+    } {
+        lappend result [tdom::type::date $txt]
+    }
+    set result
+} {0 0 0 0 1 0 0 0 1 0 1 1 0 1 1 0 0 0 1 0 1 1 1 1 0 0 0 1 1 1 0 1 0 1 1 0 0 0 0 0}
+
+
+test schema-27.7 {dateTime outside schema context} {
+    set result ""
+    foreach txt {
+        ""
+        foo
+        1
+        2020-07-08T15:58:17
+        2020-07-08T15:20:00
+        2020-07-08T15:20:17.7
+        2020-07-08T15:58:17+02:00
+        2020-07-08T15:20:17.789
+        2020-07-08T15:20:17.7890
+        2020-07-08T15:20:17.0
+        2020-07-08T15:20:17.
+        2020-07-08T15:20:17.+02:00
+        2020-07-08T15:20:17.Z
+        2020-07-08T15:20:17+Z
+        2020-07-08T00:20
+        2020-07-08T00:60:00
+        2020-07-08T24:00:00
+        2020-07-08T24:00:00.1
+        2020-07-08T24:01:00
+        2020-07-08T24:00:01
+        2020-12-2215:20:00
+        2020-12-22
+        2020-07-08T15:20:17.789+02:00
+        2020-07-08T15:20:17-02:00
+        2020-07-08T15:20:17-02:00.0
+        2020-07-08T15:20:17.0-02:00
+        " 2020-07-08T15:20:17.0-02:00"
+        "2020-07-08T15:20:17.0-02:00 "
+    } {
+        lappend result [tdom::type::dateTime $txt]
+    }
+    set result
+} {0 0 0 1 1 1 1 1 1 1 0 0 0 0 0 0 1 0 0 0 0 0 1 1 0 1 0 0}
+
+test schema-27.8 {time outside schema context} {
+    set result ""
+    foreach txt {
+        ""
+        foo
+        1
+        07:15:00
+        07:15:00.023
+        07:15:00+05:00
+        07:15:00Z
+        00:00:00
+        24:00:00
+        7:15:00
+        07:15
+        07:15.4:23
+        12:60:12
+        12:61:12
+        12:71:12
+        24:31:12
+        25:31:12
+        55:31:12
+        12:31:60
+        12:31:61
+        12:31:77
+    } {
+        lappend result [tdom::type::time $txt]
+    }
+    set result
+} {0 0 0 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0}
 
 }

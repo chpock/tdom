@@ -7069,18 +7069,6 @@ dateTCObjCmd (
     SchemaData *sdata = GETASI;
     SchemaConstraint *sc;
 
-    if (!sdata) {
-        checkNrArgs (2,2,"<text>");
-        Tcl_SetObjResult (interp,
-                          Tcl_NewBooleanObj (
-                              isodateImpl (interp, NULL,
-                                           Tcl_GetString (objv[1]))));
-        return TCL_OK;
-    }
-    if (!sdata->isTextConstraint) {
-        SetResult ("Command called in invalid schema context");
-        return TCL_ERROR;
-    }
     CHECK_TI
     checkNrArgs (1,1,"No arguments expected");
     ADD_CONSTRAINT (sdata, sc)
@@ -7100,18 +7088,6 @@ dateTimeTCObjCmd (
     SchemaData *sdata = GETASI;
     SchemaConstraint *sc;
 
-    if (!sdata) {
-        checkNrArgs (2,2,"<text>");
-        Tcl_SetObjResult (interp,
-                          Tcl_NewBooleanObj (
-                              isodateImpl (interp, (void *) 1,
-                                           Tcl_GetString (objv[1]))));
-        return TCL_OK;
-    }
-    if (!sdata->isTextConstraint) {
-        SetResult ("Command called in invalid schema context");
-        return TCL_ERROR;
-    }
     CHECK_TI
     checkNrArgs (1,1,"No arguments expected");
     ADD_CONSTRAINT (sdata, sc)
@@ -7131,18 +7107,6 @@ timeTCObjCmd (
     SchemaData *sdata = GETASI;
     SchemaConstraint *sc;
 
-    if (!sdata) {
-        checkNrArgs (2,2,"<text>");
-        Tcl_SetObjResult (interp,
-                          Tcl_NewBooleanObj (
-                              isodateImpl (interp, (void *) 2,
-                                           Tcl_GetString (objv[1]))));
-        return TCL_OK;
-    }
-    if (!sdata->isTextConstraint) {
-        SetResult ("Command called in invalid schema context");
-        return TCL_ERROR;
-    }
     CHECK_TI
     checkNrArgs (1,1,"No arguments expected");
     ADD_CONSTRAINT (sdata, sc)
@@ -8313,6 +8277,54 @@ notTCObjCmd (
     return TCL_ERROR;
 }
 
+static int
+dateObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    checkNrArgs (2,2,"<text>");
+    Tcl_SetObjResult (interp,
+                      Tcl_NewBooleanObj (
+                          isodateImpl (interp, NULL,
+                                       Tcl_GetString (objv[1]))));
+    return TCL_OK;
+}
+
+static int
+dateTimeObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    checkNrArgs (2,2,"<text>");
+    Tcl_SetObjResult (interp,
+                      Tcl_NewBooleanObj (
+                          isodateImpl (interp, (void *) 1,
+                                       Tcl_GetString (objv[1]))));
+    return TCL_OK;
+}
+
+static int
+timeObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    checkNrArgs (2,2,"<text>");
+    Tcl_SetObjResult (interp,
+                      Tcl_NewBooleanObj (
+                          isodateImpl (interp, (void *) 2,
+                                       Tcl_GetString (objv[1]))));
+    return TCL_OK;
+}
+
 void
 tDOM_SchemaInit (
     Tcl_Interp *interp
@@ -8469,6 +8481,15 @@ tDOM_SchemaInit (
                           whitespaceTCObjCmd, (ClientData) 3, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::not",
                           notTCObjCmd, (ClientData) 3, NULL);
+
+    /* Exposed text type commands */
+    Tcl_CreateObjCommand (interp,"tdom::type::date",
+                          dateObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::type::dateTime",
+                          dateTimeObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::type::time",
+                          timeObjCmd, NULL, NULL);
+
 }
 
 
