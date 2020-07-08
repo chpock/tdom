@@ -4187,11 +4187,11 @@ test schema-14.8 {text: nmtoken, nmtokens} {
     set result
 } {1 1 1 0 0 1 1 1 1 1 1 1 0 0 0}
 
-test schema-14.9 {text: isodate} {
+test schema-14.9 {text: date} {
     tdom::schema s
     s define {
         defelement doc {
-            text isodate
+            text date
         }
     }
     set result [list]
@@ -4394,7 +4394,7 @@ test schema-14.14 {text: one of two types} {
                     minLength 1
                     maxLength 3
                 }
-                text {isodate}
+                text {date}
             }
         }
     }
@@ -4424,7 +4424,7 @@ test schema-14.15 {text: oneOf} {
             text {
                 oneOf {
                     maxLength 3
-                    isodate
+                    date
                 }
             }
         }
@@ -4456,7 +4456,7 @@ test schema-14.16 {text: oneOf} {
                 minLength 1
                 oneOf {
                     maxLength 3
-                    isodate
+                    date
                 }
             }
         }
@@ -4491,7 +4491,7 @@ test schema-14.17 {text: oneOf w/ allOf} {
                         maxLength 3
                         minLength 1
                     }
-                    isodate                    
+                    date                    
                 }
             }
         }
@@ -5640,7 +5640,8 @@ test schema-14.40 {text: unsignedLong} {
 test schema-14.41 {text constrains commands outside text constraint} {
     set cmds [info command tdom::schema::text::*]
     set skiplist {
-        ::tdom::schema::text::isodate
+        ::tdom::schema::text::date
+        ::tdom::schema::text::dateTime
     }
     set result {}
     tdom::schema s
@@ -5673,7 +5674,7 @@ test schema-14.41 {text constrains commands outside text constraint} {
     set result
 } 1
 
-test schema-14.42 {isodate outside schema context} {
+test schema-14.42 {date outside schema context} {
     set result {}
     foreach txt {
         ""
@@ -5717,7 +5718,7 @@ test schema-14.42 {isodate outside schema context} {
         "2012-03-07-02:30 "
         02027-02-01
     } {
-        lappend result [tdom::schema::text::isodate $txt]
+        lappend result [tdom::schema::text::date $txt]
     }
     set result
 } {0 0 0 0 1 0 0 0 1 0 1 1 0 1 1 0 0 0 1 0 1 1 1 1 0 0 0 1 1 1 0 1 0 1 1 0 0 0 0 0}
@@ -5945,6 +5946,88 @@ test schema-14.52 {text constraint whitespace} {
     s delete
     set result
 } {0 0 1 1 1 0}
+
+test schema-14.53 {dateTime outside schema context} {
+    set result ""
+    foreach txt {
+        ""
+        foo
+        1
+        2020-07-08T15:58:17
+        2020-07-08T15:20:00
+        2020-07-08T15:20:17.7
+        2020-07-08T15:58:17+02:00
+        2020-07-08T15:20:17.789
+        2020-07-08T15:20:17.7890
+        2020-07-08T15:20:17.0
+        2020-07-08T15:20:17.
+        2020-07-08T15:20:17.+02:00
+        2020-07-08T15:20:17.Z
+        2020-07-08T15:20:17+Z
+        2020-07-08T00:20
+        2020-07-08T00:60:00
+        2020-07-08T24:00:00
+        2020-07-08T24:00:00.1
+        2020-07-08T24:01:00
+        2020-07-08T24:00:01
+        2020-12-2215:20:00
+        2020-12-22
+        2020-07-08T15:20:17.789+02:00
+        2020-07-08T15:20:17-02:00
+        2020-07-08T15:20:17-02:00.0
+        2020-07-08T15:20:17.0-02:00
+        " 2020-07-08T15:20:17.0-02:00"
+        "2020-07-08T15:20:17.0-02:00 "
+    } {
+        lappend result [tdom::schema::text::dateTime $txt]
+    }
+    set result
+} {0 0 0 1 1 1 1 1 1 1 0 0 0 0 0 0 1 0 0 0 0 0 1 1 0 1 0 0}
+
+test schema-14.54 {text constraint dateTime} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            text dateTime
+        }
+    }
+    set result ""
+    foreach xml {
+        <doc/>
+        <doc></doc>
+        <doc>foo</doc>
+        <doc>1</doc>
+        <doc>2020-07-08T15:58:17</doc>
+        <doc>2020-07-08T15:20:00</doc>
+        <doc>2020-07-08T15:20:17.7</doc>
+        <doc>2020-07-08T15:58:17+02:00</doc>
+        <doc>2020-07-08T15:20:17.789</doc>
+        <doc>2020-07-08T15:20:17.7890</doc>
+        <doc>2020-07-08T15:20:17.0</doc>
+        <doc>2020-07-08T15:20:17.</doc>
+        <doc>2020-07-08T15:20:17.+02:00</doc>
+        <doc>2020-07-08T15:20:17.Z</doc>
+        <doc>2020-07-08T15:20:17+Z</doc>
+        <doc>2020-07-08T00:20</doc>
+        <doc>2020-07-08T00:60:00</doc>
+        <doc>2020-07-08T24:00:00</doc>
+        <doc>2020-07-08T24:00:00.1</doc>
+        <doc>2020-07-08T24:01:00</doc>
+        <doc>2020-07-08T24:00:01</doc>
+        <doc>2020-12-2215:20:00</doc>
+        <doc>2020-12-22</doc>
+        <doc>2020-07-08T15:20:17.789+02:00</doc>
+        <doc>2020-07-08T15:20:17-02:00</doc>
+        <doc>2020-07-08T15:20:17-02:00.0</doc>
+        <doc>2020-07-08T15:20:17.0-02:00</doc>
+        "<doc> 2020-07-08T15:20:17.0-02:00</doc>"
+        "<doc>2020-07-08T15:20:17.0-02:00 </doc>"
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 0 0 1 1 1 1 1 1 1 0 0 0 0 0 0 1 0 0 0 0 0 1 1 0 1 0 0}
 
 test schema-15.1 {constraint cmd tcl} {
     tdom::schema s

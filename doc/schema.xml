@@ -913,12 +913,32 @@ s define {
                 default.</desc>
             </commanddef>
             <commanddef>
-                <command><cmd>isodate</cmd></command>
-                <desc>This text constraint match if the text value is a
-                xsd:date. This is basically like an ISO 8601 date of the form
-                JJJJ-MM-DD. It follows the date rules of the gregorian
-                calendar for all dates. A preceding minus sign for bce dates
-                is allowed. There is no year 0.</desc>
+                <command><cmd>date</cmd></command>
+                <desc>This text constraint match if the text value is
+                a xsd:date. This is basically like an ISO 8601 date of
+                the form YYYY-MM-DD, with optional time zone part
+                (either the letter Z or plus (+) or minus (-) followed
+                by hh:mm and with maximum allowed positiv or negativ
+                time zone 14:00). It follows the date rules of the
+                gregorian calendar for all dates. A preceding minus
+                sign for bce dates is allowed. There is no year 0. The
+                year may have more than 4 digits, but only if needed
+                (no extra leading zeros).</desc>
+            </commanddef>
+            <commanddef>
+                <command><cmd>dateTime</cmd></command>
+                <desc>This text constraint match if the text value is
+                a xsd:dateTime. This is basically like an ISO 8601
+                date time of the form YYYY-MM-DDThh:mm:ss with
+                optional time zone part. The date and time zone parts
+                follow the rules of the <m>date</m> command; see
+                there. The time part (including the signaling 'T'
+                character) is mandatory, all three parts (hours,
+                minutes, seconds) must be spelled out with 2 digits.
+                Additional fractional seconds (with a point ('.') as
+                separater) are allowed, but not just a dangling point.
+                The time value 24:00:00 (whitout fractional part) is
+                allowed.</desc>
             </commanddef>
             <commanddef>
                 <command><cmd>base64</cmd></command>
@@ -1242,7 +1262,7 @@ schema define {
         element billTo ! {ref USAddress}
         element comment ?
         element items
-        attribute orderDate isodate
+        attribute orderDate date
     }
 
     defpattern USAddress {
@@ -1260,7 +1280,7 @@ schema define {
             element quantity ! {text integer}
             element USPrice ! {text number}
             element comment
-            element shipDate ? {text isodate}
+            element shipDate ? {text date}
             attribute partNum ! {pattern "^\d{3}-[A-Z]{2}$"}
         }
     }

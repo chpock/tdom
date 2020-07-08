@@ -6907,7 +6907,7 @@ isodateImpl (
     char *text
     )
 {
-    int i, y, m, d, h, min, seenNonzero = 0;
+    int i, y, m, d, h, min, s, zh, zm, seenNonzero = 0;
 
     if (*text == '-') {
         /* A bce date */
@@ -6975,8 +6975,51 @@ isodateImpl (
         break;
     }
     /* Date part end */
+    if (constraintData) {
+        /* Time part starts */
+        if (*text != 'T') return 0;
+        text++;
+        /* Parse hour part */
+        if (*text < '0' || *text > '9') return 0;
+        h = (*text - 48) * 10;
+        text++;
+        if (*text < '0' || *text > '9') return 0;
+        h += (*text - 48);
+        if (h > 24) return 0;
+        text++;
+        if (*text != ':') return 0;
+        text++;
+        /* Parse minute part */
+        if (*text < '0' || *text > '9') return 0;
+        min = (*text - 48) * 10;
+        text++;
+        if (*text < '0' || *text > '9') return 0;
+        min += (*text - 48);
+        if (min > 59) return 0;
+        text++;
+        if (*text != ':') return 0;
+        text++;
+        /* Parse seconds part */
+        if (*text < '0' || *text > '9') return 0;
+        s = (*text - 48) * 10;
+        text++;
+        if (*text < '0' || *text > '9') return 0;
+        s += (*text - 48);
+        if (s > 59) return 0;
+        text++;
+        /* Check for optional fraction seconds part */
+        if (*text == '.') {
+            if (h == 24) return 0;
+            text++;
+            /* Dangling decimal point is not allowed */
+            if (*text < '0' || *text > '9') return 0;
+            text++;
+            while (*text >= '0' && *text <= '9') text++;
+        }
+        if (h == 24 && (min > 0 || s > 0)) return 0;
+    }
     if (*text == '\0') return 1;
-    /* Parse optional time part */
+    /* Parse optional time zone part */
     switch (*text) {
     case 'Z':
         text++;
@@ -6990,19 +7033,19 @@ isodateImpl (
             text++;
         }
         if (*text != ':') return 0;
-        h = atoi(text-2);
-        if (h > 14) return 0;
+        zh = atoi(text-2);
+        if (zh > 14) return 0;
         text++;
         for (i = 0; i < 2; i++) {
             if (*text < '0' || *text > '9') return 0;
             text++;
         }
         if (*text != '\0') return 0;
-        min = atoi(text-2);
-        if (h < 14) {
-            if (min > 59) return 0;
+        zm = atoi(text-2);
+        if (zh < 14) {
+            if (zm > 59) return 0;
         } else {
-            if (min != 0) return 0;
+            if (zm != 0) return 0;
         }
         break;
     default:
@@ -7012,7 +7055,7 @@ isodateImpl (
 }
 
 static int
-isodateTCObjCmd (
+dateTCObjCmd (
     ClientData clientData,
     Tcl_Interp *interp,
     int objc,
@@ -7026,7 +7069,7 @@ isodateTCObjCmd (
         checkNrArgs (2,2,"<text>");
         Tcl_SetObjResult (interp,
                           Tcl_NewBooleanObj (
-                              isodateImpl (NULL, NULL,
+                              isodateImpl (interp, NULL,
                                            Tcl_GetString (objv[1]))));
         return TCL_OK;
     }
@@ -7038,6 +7081,37 @@ isodateTCObjCmd (
     checkNrArgs (1,1,"No arguments expected");
     ADD_CONSTRAINT (sdata, sc)
     sc->constraint = isodateImpl;
+    return TCL_OK;
+}
+
+static int
+dateTimeTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+
+    if (!sdata) {
+        checkNrArgs (2,2,"<text>");
+        Tcl_SetObjResult (interp,
+                          Tcl_NewBooleanObj (
+                              isodateImpl (interp, (void *) 1,
+                                           Tcl_GetString (objv[1]))));
+        return TCL_OK;
+    }
+    if (!sdata->isTextConstraint) {
+        SetResult ("Command called in invalid schema context");
+        return TCL_ERROR;
+    }
+    CHECK_TI
+    checkNrArgs (1,1,"No arguments expected");
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = isodateImpl;
+    sc->constraintData = (void *) 1;
     return TCL_OK;
 }
 
@@ -8309,8 +8383,10 @@ tDOM_SchemaInit (
                           numberTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::boolean",
                           booleanTCObjCmd, NULL, NULL);
-    Tcl_CreateObjCommand (interp,"tdom::schema::text::isodate",
-                          isodateTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::date",
+                          dateTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::dateTime",
+                          dateTimeTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::maxLength",
                           maxLengthTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::minLength",
