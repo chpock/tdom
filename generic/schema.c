@@ -6909,76 +6909,80 @@ isodateImpl (
 {
     int i, y, m, d, h, min, s, zh, zm, seenNonzero = 0;
 
-    if (*text == '-') {
-        /* A bce date */
-        text++;
-    }
-    i = 1;
-    /* Parse year */
-    while (*text >= '0' && *text <= '9') {
-        if (*text > '0' && !seenNonzero) seenNonzero = i;
-        text++;
-        i++;
-    }
-    /* Premature end */
-    if (i < 5) return 0;
-    if (i > 5) {
-        /* The year has more than 4 digits. Only allowed if in fact
-         * needed (no extra leading zeros). */
-        if (seenNonzero > 1) return 0;
-    }
-    if (*text != '-') return 0;
-    /* We only need to know the modulo of the year for 4, 100 and 400,
-     * for this the 4 last letters are enough */
-    y = atoi(text-4);
-    /* There isn't a year 0. it's either 0001 or -0001 */
-    if (!seenNonzero) return 0;
-    text++;
-    /* Parse month */
-    for (i = 0; i < 2; i++) {
-        if (*text < '0' || *text > '9') return 0;
-        text++;
-    }
-    if (*text != '-') return 0;
-    m = atoi(text-2);
-    if (m < 1 || m > 12) return 0;
-    text++;
-    /* Parse day */
-    for (i = 0; i < 2; i++) {
-        if (*text < '0' || *text > '9') return 0;
-        text++;
-    }
-    d = atoi(text-2);
-    if (d < 1) return 0;
-    switch (m) {
-    case 1:
-    case 3:
-    case 5:
-    case 7:
-    case 8:
-    case 10:
-    case 12:
-        if (d > 31) return 0;
-        break;
-    case 4:
-    case 6:
-    case 9:
-    case 11:
-        if (d > 30) return 0;
-        break;
-    case 2:
-        if (y % 4 == 0 && (y % 100 != 0 || y % 400 == 0)) {
-            if (d > 29) return 0;
-        } else {
-            if (d > 28) return 0;
+    if (constraintData < (void *)2) {
+        if (*text == '-') {
+            /* A bce date */
+            text++;
         }
-        break;
+        i = 1;
+        /* Parse year */
+        while (*text >= '0' && *text <= '9') {
+            if (*text > '0' && !seenNonzero) seenNonzero = i;
+            text++;
+            i++;
+        }
+        /* Premature end */
+        if (i < 5) return 0;
+        if (i > 5) {
+            /* The year has more than 4 digits. Only allowed if in fact
+             * needed (no extra leading zeros). */
+            if (seenNonzero > 1) return 0;
+        }
+        if (*text != '-') return 0;
+        /* We only need to know the modulo of the year for 4, 100 and 400,
+         * for this the 4 last letters are enough */
+        y = atoi(text-4);
+        /* There isn't a year 0. it's either 0001 or -0001 */
+        if (!seenNonzero) return 0;
+        text++;
+        /* Parse month */
+        for (i = 0; i < 2; i++) {
+            if (*text < '0' || *text > '9') return 0;
+            text++;
+        }
+        if (*text != '-') return 0;
+        m = atoi(text-2);
+        if (m < 1 || m > 12) return 0;
+        text++;
+        /* Parse day */
+        for (i = 0; i < 2; i++) {
+            if (*text < '0' || *text > '9') return 0;
+            text++;
+        }
+        d = atoi(text-2);
+        if (d < 1) return 0;
+        switch (m) {
+        case 1:
+        case 3:
+        case 5:
+        case 7:
+        case 8:
+        case 10:
+        case 12:
+            if (d > 31) return 0;
+            break;
+        case 4:
+        case 6:
+        case 9:
+        case 11:
+            if (d > 30) return 0;
+            break;
+        case 2:
+            if (y % 4 == 0 && (y % 100 != 0 || y % 400 == 0)) {
+                if (d > 29) return 0;
+            } else {
+                if (d > 28) return 0;
+            }
+            break;
+        }
     }
     /* Date part end */
     if (constraintData) {
-        /* Time part starts */
-        if (*text != 'T') return 0;
-        text++;
+        if (constraintData == (void *)1) {
+            /* Time part starts */
+            if (*text != 'T') return 0;
+            text++;
+        }
         /* Parse hour part */
         if (*text < '0' || *text > '9') return 0;
         h = (*text - 48) * 10;
@@ -7081,6 +7085,7 @@ dateTCObjCmd (
     checkNrArgs (1,1,"No arguments expected");
     ADD_CONSTRAINT (sdata, sc)
     sc->constraint = isodateImpl;
+    sc->constraintData = (void *) 0;
     return TCL_OK;
 }
 
@@ -7112,6 +7117,37 @@ dateTimeTCObjCmd (
     ADD_CONSTRAINT (sdata, sc)
     sc->constraint = isodateImpl;
     sc->constraintData = (void *) 1;
+    return TCL_OK;
+}
+
+static int
+timeTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+
+    if (!sdata) {
+        checkNrArgs (2,2,"<text>");
+        Tcl_SetObjResult (interp,
+                          Tcl_NewBooleanObj (
+                              isodateImpl (interp, (void *) 2,
+                                           Tcl_GetString (objv[1]))));
+        return TCL_OK;
+    }
+    if (!sdata->isTextConstraint) {
+        SetResult ("Command called in invalid schema context");
+        return TCL_ERROR;
+    }
+    CHECK_TI
+    checkNrArgs (1,1,"No arguments expected");
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = isodateImpl;
+    sc->constraintData = (void *) 2;
     return TCL_OK;
 }
 
@@ -8387,6 +8423,8 @@ tDOM_SchemaInit (
                           dateTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::dateTime",
                           dateTimeTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::time",
+                          timeTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::maxLength",
                           maxLengthTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::minLength",

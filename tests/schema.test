@@ -5642,6 +5642,7 @@ test schema-14.41 {text constrains commands outside text constraint} {
     set skiplist {
         ::tdom::schema::text::date
         ::tdom::schema::text::dateTime
+        ::tdom::schema::text::time
     }
     set result {}
     tdom::schema s
@@ -6028,6 +6029,79 @@ test schema-14.54 {text constraint dateTime} {
     s delete
     set result
 } {0 0 0 0 1 1 1 1 1 1 1 0 0 0 0 0 0 1 0 0 0 0 0 1 1 0 1 0 0}
+
+test schema-14.55 {text constraint time} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            text time
+        }
+    }
+    set result ""
+    foreach xml {
+        <doc/>
+        <doc></doc>
+        <doc>foo</doc>
+        <doc>1</doc>
+        <doc>15:58:17</doc>
+        <doc>15:20:00</doc>
+        <doc>15:20:17.7</doc>
+        <doc>15:58:17+02:00</doc>
+        <doc>15:20:17.789</doc>
+        <doc>15:20:17.7890</doc>
+        <doc>15:20:17.0</doc>
+        <doc>15:20:17.</doc>
+        <doc>15:20:17.+02:00</doc>
+        <doc>15:20:17.Z</doc>
+        <doc>15:20:17+Z</doc>
+        <doc>00:20</doc>
+        <doc>00:60:00</doc>
+        <doc>24:00:00</doc>
+        <doc>24:00:00.1</doc>
+        <doc>24:01:00</doc>
+        <doc>24:00:01</doc>
+        <doc>15:20:17.789+02:00</doc>
+        <doc>15:20:17-02:00</doc>
+        <doc>15:20:17-02:00.0</doc>
+        <doc>15:20:17.0-02:00</doc>
+        "<doc> 15:20:17.0-02:00</doc>"
+        "<doc>T15:20:17.0-02:00 </doc>"
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 0 0 1 1 1 1 1 1 1 0 0 0 0 0 0 1 0 0 0 1 1 0 1 0 0}
+
+test schema-14.56 {time outside schema context} {
+    set result ""
+    foreach txt {
+        ""
+        foo
+        1
+        07:15:00
+        07:15:00.023
+        07:15:00+05:00
+        07:15:00Z
+        00:00:00
+        24:00:00
+        7:15:00
+        07:15
+        07:15.4:23
+        12:60:12
+        12:61:12
+        12:71:12
+        24:31:12
+        25:31:12
+        55:31:12
+        12:31:60
+        12:31:61
+        12:31:77
+    } {
+        lappend result [tdom::schema::text::time $txt]
+    }
+    set result
+} {0 0 0 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0}
 
 test schema-15.1 {constraint cmd tcl} {
     tdom::schema s
