@@ -9808,4 +9808,34 @@ test schema-27.8 {time outside schema context} {
     set result
 } {0 0 0 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0}
 
+test schema-27.9 {duration outside schema context} {
+    set result ""
+    foreach txt {
+        ""
+        foo
+        1
+        P2Y6M5DT12H35M30S
+        P1DT2H        
+        P20M
+        PT20M
+        P0Y20M0D
+        P0Y
+        -P60D
+        PT1M30.5S
+        P-20M
+        P20MT
+        P1YM5D
+        P15.5Y
+        P1D2H
+        1Y2M
+        P2M1Y
+        P
+        PT15.S
+        PT.5S
+    } {
+        lappend result [tdom::type::duration $txt]
+    }
+    set result
+} {0 0 0 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0}
+
 }

@@ -962,6 +962,18 @@ s define {
                 common tcl command tdom::type::dateTime.</desc>
             </commanddef>
             <commanddef>
+                <command><cmd>duration</cmd></command>
+                <desc>This text constraint match if the text value is
+                a xsd:duration. This is basically like an ISO 8601
+                duration of the form PnYnMnDTnHnMnS. All parts other
+                then the starting P and - if one of H, M or S is given
+                - T are optional. In case the following sign letter is
+                S n may be a decimal (with at least one digit before
+                and after the dot), otherwise it must be a (positiv)
+                integer. This is available as common tcl command
+                tdom::type::duration.</desc>
+            </commanddef>
+            <commanddef>
                 <command><cmd>base64</cmd></command>
                 <desc>This text constraint match if text is valid according to
                 RFC 4648.</desc>

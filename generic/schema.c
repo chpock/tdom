@@ -8278,6 +8278,83 @@ notTCObjCmd (
 }
 
 static int
+durationImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    /* PnYnMnDTnHnMnS */
+    int p, n, seen = 0, seenT = 0;
+    char des[9] = " YMDTHMS";
+    
+    if (*text == '-') {
+        /* Negative duration is allowed */
+        text++;
+    }
+    if (*text != 'P') return 0;
+    text++;
+    p = 0;
+    while (*text) {
+        n = 0;
+        while (*text >= '0' && *text <= '9') {
+            n++;
+            text++;
+        }
+        if (!*text) return 0;
+        if (*text == '.') {
+            if (p < 4 || !n) return 0;
+            text++;
+            if (!*text) return 0;
+            /* Ensure at least one digit after . */
+            if (*text < '0' || *text > '9') return 0;
+            text++;
+            while (*text >= '0' && *text <= '9') text++;
+            if (*text != 'S') return 0;
+            text++;
+            if (*text) return 0;
+            return 1;
+        }
+        for (; p < 8; p++) {
+            if (*text == des[p]) break;
+        }
+        if (p ==  4) {
+            if (n) return 0;
+            seenT = 1;
+            text++;
+            if (!*text) return 0;
+            continue;
+        } else {
+            if (!n) return 0;
+            seen = 1;
+        }
+        if (p > 4 && !seenT) return 0;
+        if (p == 8 || !seen) return 0;
+        text++;
+    }
+    if (!p) return 0;
+    return 1;
+}
+
+static int
+durationTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+
+    CHECK_TI
+    checkNrArgs (1,1,"No arguments expected");
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = durationImpl;
+    return TCL_OK;
+}
+
+static int
 dateObjCmd (
     ClientData clientData,
     Tcl_Interp *interp,
@@ -8322,6 +8399,22 @@ timeObjCmd (
                       Tcl_NewBooleanObj (
                           isodateImpl (interp, (void *) 2,
                                        Tcl_GetString (objv[1]))));
+    return TCL_OK;
+}
+
+static int
+durationObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    checkNrArgs (2,2,"<text>");
+    Tcl_SetObjResult (interp,
+                      Tcl_NewBooleanObj (
+                          durationImpl (interp, NULL,
+                                        Tcl_GetString (objv[1]))));
     return TCL_OK;
 }
 
@@ -8437,6 +8530,8 @@ tDOM_SchemaInit (
                           dateTimeTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::time",
                           timeTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::duration",
+                          durationTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::maxLength",
                           maxLengthTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::minLength",
@@ -8489,6 +8584,8 @@ tDOM_SchemaInit (
                           dateTimeObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp,"tdom::type::time",
                           timeObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::type::duration",
+                          durationObjCmd, NULL, NULL);
 
 }
 
