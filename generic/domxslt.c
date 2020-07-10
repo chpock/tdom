@@ -2,9 +2,6 @@
 |   Copyright (c) 2000 Jochen Loewer (loewerj@hotmail.com)
 |-----------------------------------------------------------------------------
 |
-|   $Id$
-|
-|
 |   A XSLT implementation for tDOM, according to the W3C
 |   recommendation (16 Nov 1999).
 |   See http://www.w3.org/TR/1999/REC-xslt-19991116 for details.
@@ -2862,7 +2859,7 @@ static int xsltAddTemplate (
 )
 {
     xsltTemplate  *tpl, *t;
-    char          *prioStr, *str, prefix[MAX_PREFIX_LEN];
+    char          *prioStr, *str, prefix[MAX_PREFIX_LEN], *tailptr;
     const char    *localName;
     int            rc, hnew;
     domNS         *ns;
@@ -2970,8 +2967,16 @@ static int xsltAddTemplate (
 
     prioStr = getAttr(node,"priority", a_prio);
     if (prioStr) {
-        tpl->prio = (double)atof(prioStr);
-    } 
+        tpl->prio = strtod (prioStr, &tailptr);
+        if (tpl->prio == 0.0 && prioStr == tailptr) {
+            /* If the template has a name attribute, it is already stored in
+               in the namedTemplates hash table and will be freed. */
+            if (!tpl->name) {
+                FREE ((char*)tpl);
+            }
+            return -1;
+        }
+    }
     
     sDoc = xs->subDocs;
     while (sDoc) {

@@ -2,9 +2,6 @@
 |   Copyright (C) 1999-2000  Jochen C. Loewer (loewerj@hotmail.com)
 +----------------------------------------------------------------------------
 |
-|   $Id$
-|
-|
 |   A special memory allocator, which uses pre-allocated / bit masked
 |   based administration of memory block with fixed sizes, like
 |   DOM nodes. This will hopefully save some memory.

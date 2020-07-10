@@ -1153,14 +1153,14 @@ test xslt-8.1 {current() not allowed in pattern} {
 } {The 'current' function is not allowed in Pattern. for '*[current() != 'notthis']' 
 
 Parsed symbols:
-     0 WCARDNAME        0 00000.000     0  *
-     1 LBRACKET         0 00000.000     1  
-     2 FUNCTION         0 00000.000     8  current
-     3 LPAR             0 00000.000     9  
-     4 RPAR             0 00000.000    10  
-     5 NOTEQ            0 00000.000    13  
-     6 LITERAL          0 00000.000    23  notthis
-     7 RBRACKET         0 00000.000    24  }
+     0 WCARDNAME        0 000000000     0  *
+     1 LBRACKET         0 000000000     1  
+     2 FUNCTION         0 000000000     8  current
+     3 LPAR             0 000000000     9  
+     4 RPAR             0 000000000    10  
+     5 NOTEQ            0 000000000    13  
+     6 LITERAL          0 000000000    23  notthis
+     7 RBRACKET         0 000000000    24  }
 
 set xslt-8.2.xml {<?xml version="1.0"?>
 <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet" xmlns:html="http://www.w3.org/TR/REC-html40">

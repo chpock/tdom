@@ -2,9 +2,6 @@
 |   Copyright (c) 1999 Jochen Loewer (loewerj@hotmail.com)
 +-----------------------------------------------------------------------------
 |
-|   $Id$
-|
-|
 |   A DOM implementation for Tcl using James Clark's expat XML parser
 |
 |
@@ -222,6 +219,8 @@ static char dom_usage[] =
     "    setTextCheck ?boolean?                           \n"
     "    setObjectCommands ?(automatic|token|command)?    \n"
     "    isCharData string                                \n"
+    "    clearString string                               \n"
+    "    isBMPCharData string                             \n"
     "    isComment string                                 \n"
     "    isCDATA string                                   \n"
     "    isPIValue string                                 \n"
@@ -399,22 +398,8 @@ const Tcl_ObjType tdomNodeType = {
 |   Prototypes for procedures defined later in this file:
 |
 \---------------------------------------------------------------------------*/
-#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION <= 3)
-/*
- * Before Tcl 8.4, Tcl_VarTraceProc and Tcl_CmdDeleteProc were not
- * CONST84'ified. When compiling with -DTCL_NO_DEPRECATED, CONST84 is
- * gone, therefore we can't use the function type definitions of
- * Tcl_VarTraceProc and Tcl_CmdDeleteProc for these old version.
- * 
- */
-static char * tcldom_docTrace(
-    ClientData clientData, Tcl_Interp *interp,
-    const char *part1, const char *part2, int flags);
-static void tcldom_docCmdDeleteProc(ClientData clientData);
-#else 
 static Tcl_VarTraceProc  tcldom_docTrace;
 static Tcl_CmdDeleteProc tcldom_docCmdDeleteProc;
-#endif
 
 static void tcldom_treeAsJSON(Tcl_Obj *jstring, domNode *node,
                               Tcl_Channel channel, int indent,
@@ -4752,7 +4737,7 @@ int tcldom_NodeObjCmd (
             break;
 
         case m_getAttributeNS:
-            CheckArgs(4,4,2,"uri localName");
+            CheckArgs(4,5,2,"uri localName");
             if (node->nodeType != ELEMENT_NODE) {
                 SetResult("NOT_AN_ELEMENT : there are no attributes");
                 return TCL_ERROR;
@@ -4764,7 +4749,12 @@ int tcldom_NodeObjCmd (
                 SetResult(attrs->nodeValue);
                 return TCL_OK;
             } 
-            sprintf(tmp,"attribute with localName %80.80s not found!",localName);
+            if (objc == 5) {
+                SetResult(Tcl_GetString(objv[4]));
+                return TCL_OK;
+            } 
+            sprintf(tmp,"attribute with localName %80.80s not found!",
+                    localName);
             SetResult(tmp);
             return TCL_ERROR;
 
@@ -6248,10 +6238,6 @@ int tcldom_parse (
                           "DOM tree to create as argument.");
                 return TCL_ERROR;
             }
-            if (!domIsNAME(jsonRoot)) {
-                SetResult("-jsonroot value: not a valid element name");
-                return TCL_ERROR;
-            }
             objv++; objc--; continue;
             
         case o_simple:
@@ -6794,10 +6780,10 @@ int tcldom_DomObjCmd (
 {
     GetTcldomTSD()
 
-    char        * method, tmp[300];
+    char        * method, tmp[300], *clearedStr;
     int           methodIndex, result, i, bool;
     Tcl_CmdInfo   cmdInfo;
-    Tcl_Obj     * mobjv[MAX_REWRITE_ARGS];
+    Tcl_Obj     * mobjv[MAX_REWRITE_ARGS], *newObj;
 
     static const char *domMethods[] = {
         "createDocument",  "createDocumentNS",   "createNodeCmd",
@@ -6806,7 +6792,7 @@ int tcldom_DomObjCmd (
         "isQName",         "isComment",          "isCDATA",
         "isPIValue",       "isNCName",           "createDocumentNode",
         "setNameCheck",    "setTextCheck",       "setObjectCommands",
-        "featureinfo",     "isBMPCharData",
+        "featureinfo",     "isBMPCharData",      "clearString",
 #ifdef TCL_THREADS
         "attachDocument",  "detachDocument",
 #endif
@@ -6819,7 +6805,7 @@ int tcldom_DomObjCmd (
         m_isQName,           m_isComment,          m_isCDATA,
         m_isPIValue,         m_isNCName,           m_createDocumentNode,
         m_setNameCheck,      m_setTextCheck,       m_setObjectCommands,
-        m_featureinfo,       m_isBMPCharData
+        m_featureinfo,       m_isBMPCharData,      m_clearString
 #ifdef TCL_THREADS
         ,m_attachDocument,   m_detachDocument
 #endif
@@ -7048,6 +7034,18 @@ int tcldom_DomObjCmd (
         case m_isBMPCharData:
             CheckArgs(3,3,2,"string");
             SetBooleanResult(domIsBMPChar(Tcl_GetString(objv[2])));
+            return TCL_OK;
+
+        case m_clearString:
+            CheckArgs(3,3,2,"string");
+            clearedStr = domClearString (Tcl_GetString (objv[2]), &bool);
+            if (bool) {
+                newObj = Tcl_NewStringObj (clearedStr, -1);
+                FREE (clearedStr);
+                Tcl_SetObjResult (interp, newObj);
+            } else {
+                Tcl_SetObjResult (interp, objv[2]);
+            }
             return TCL_OK;
                 
     }

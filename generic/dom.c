@@ -2,9 +2,6 @@
 |   Copyright (C) 1999  Jochen C. Loewer (loewerj@hotmail.com)
 +----------------------------------------------------------------------------
 |
-|   $Id$
-|
-|
 |   A DOM interface upon the expat XML parser for the C language
 |   according to the W3C recommendation REC-DOM-Level-1-19981001
 |
@@ -571,6 +568,59 @@ domIsChar (
         else return 0;
     }
     return 1;
+}
+
+/*---------------------------------------------------------------------------
+|   domClearString
+|
+\--------------------------------------------------------------------------*/
+char *
+domClearString (
+    char *str,
+    int *haveToFree
+    )
+{
+    const char *p, *s;
+    char *p1, *clearedstr;
+    int   clen, i, rewrite = 0;
+    
+    p = str;
+    while (*p) {
+        clen = UTF8_CHAR_LEN(*p);
+        if (clen > 4 || !UTF8_XMLCHAR((unsigned const char*)p,clen)) {
+            rewrite = 1;
+            break;
+        }
+        p += clen;
+    }
+    if (!rewrite) {
+        *haveToFree = 0;
+        return str;
+    }
+    s = p;
+    p += clen;
+    while (*p) p++;
+    clearedstr = MALLOC (sizeof(char) * (p-str));
+    p1 = clearedstr;
+    while (str < s) {
+        *p1 = *str;
+        p1++; str++;
+    }
+    str += clen;
+    while (*str) {
+        clen = UTF8_CHAR_LEN(*str);
+        if (clen <= 4 && UTF8_XMLCHAR((unsigned const char*)str,clen)) {
+            for (i = 0; i < clen; i++) {
+                *p1 = *str;
+                p1++; str++;
+            }
+        } else {
+            str += clen;
+        }
+    }
+    *p1 = '\0';
+    *haveToFree = 1;
+    return clearedstr;
 }
 
 /*---------------------------------------------------------------------------
@@ -6525,17 +6575,11 @@ domCloneNode (
     }
     if (node->nodeType != ELEMENT_NODE) {
         domTextNode *t1node, *tnode = (domTextNode*)node;
-        if (tnode->info) {
-            t1node = domNewTextNode(tnode->ownerDocument,
-                                    tnode->nodeValue, tnode->valueLength,
-                                    tnode->nodeType);
-            t1node->info = tnode->info;
-            return (domNode*) t1node;
-        } else {
-            return (domNode*) domNewTextNode(tnode->ownerDocument,
-                                             tnode->nodeValue, tnode->valueLength,
-                                             tnode->nodeType);
-        }
+        t1node = domNewTextNode(tnode->ownerDocument, tnode->nodeValue,
+                                tnode->valueLength, tnode->nodeType);
+        t1node->info = tnode->info;
+        t1node->nodeFlags = tnode->nodeFlags;
+        return (domNode*) t1node;
     }
 
     n = domNewElementNode(node->ownerDocument, node->nodeName);
@@ -6549,9 +6593,7 @@ domCloneNode (
     while (attr != NULL) {
         nattr = domSetAttribute (n, attr->nodeName, attr->nodeValue );
         nattr->namespace = attr->namespace;
-        if (attr->nodeFlags & IS_NS_NODE) {
-            nattr->nodeFlags |= IS_NS_NODE;
-        }
+        nattr->nodeFlags = attr->nodeFlags;
         attr = attr->nextSibling;
     }
 

@@ -1095,6 +1095,27 @@ test dom-3.41 {isPIValue} {
 } {0}
 
 
+test dom-3.43 {clearString} {
+    set result [list]
+    foreach str {
+        \u0001
+        a\u0002
+        \u0003b
+        a\u0004b
+        a\u0004\u0005b
+        a\u0004c\u0005b
+        a\u0004d\u0005\u0006b
+        a\u0004d\u0005\uD800\uD801\uD802_foo_bar
+        \uD800\uD801\uD802_foo_bar_baz\uD802_didum\uDFFF
+        \uD800\uD801\uD802_foo_bar_baz\uD802_didum\uE000
+        \u0004\u0005\uDABC
+        abc
+    } {
+        lappend result [dom clearString $str]
+    }
+    set result
+} [list {} a b ab ab acb adb ad_foo_bar _foo_bar_baz_didum _foo_bar_baz_didum\uE000 {} abc]
+
 test dom-4.1 {-useForeignDTD 0} {
     set doc [dom parse -useForeignDTD 0 {<root/>}]
     $doc delete

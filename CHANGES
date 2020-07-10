@@ -1,3 +1,17 @@
+2020-07-03  Rolf Ade  <rolf@pointsman.de>
+
+        User configurable separator character between namespace URI
+        and local name for XML namespace-aware SAX parser:  Added the
+        option -namespaceseparator to the expat command.
+
+2020-05-14  Rolf Ade  <rolf@pointsman.de>
+
+        Added method clearString to the dom command.
+
+2019-12-31  Rolf Ade  <rolf@pointsman.de>
+
+        Updated to expat 2.2.9.
+
 2018-10-12  Rolf Ade  <rolf@pointsman.de>
 
         Updated to expat 2.2.6.

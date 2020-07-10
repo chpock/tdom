@@ -1228,6 +1228,19 @@ test domNode-12.10 {cloneNode -deep} {
     set result
 } {y {}}
 
+test domNode-12.11 {cloneNode -deep w/ disableOutputEscaping} {
+    dom parse "<doc><td/></doc>" doc
+    $doc createTextNode "a&nbsp;b" textnode 
+    $textnode disableOutputEscaping 1
+    $doc documentElement root
+    $root firstChild td
+    $td appendChild $textnode
+    $root appendChild [$td cloneNode -deep]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc><td>a&nbsp;b</td><td>a&nbsp;b</td></doc>}
+
 namespace eval nodeCmds {
     dom createNodeCmd elementNode e1
     dom createNodeCmd elementNode e2
@@ -2386,6 +2399,42 @@ test domNode-28.1 {getAttributeNS} {
     $doc delete
     set result
 } {p:attr1Value}
+
+test domNode-28.2 {getAttributeNS - default value} {
+    set doc [dom parse {
+<root attr1="attr1Value"
+      attr2="attr2Value"
+      p:attr1="p:attr1Value"
+      xmlns:p="ns1"/>}]
+    set root [$doc documentElement]
+    set result [$root getAttributeNS "not" attr1 "default"]
+    $doc delete
+    set result
+} {default}
+
+test domNode-28.3 {getAttributeNS - default value} {
+    set doc [dom parse {
+<root attr1="attr1Value"
+      attr2="attr2Value"
+      p:attr1="p:attr1Value"
+      xmlns:p="ns1"/>}]
+    set root [$doc documentElement]
+    set result [$root getAttributeNS "not" notexisting "some default"]
+    $doc delete
+    set result
+} {some default}
+
+test domNode-28.4 {getAttributeNS - default value} {
+    set doc [dom parse {
+<root attr1="attr1Value"
+      attr2="attr2Value"
+      p:attr1="p:attr1Value"
+      xmlns:p="ns1"/>}]
+    set root [$doc documentElement]
+    set result [$root getAttributeNS "ns1" notexisting "some other default"]
+    $doc delete
+    set result
+} {some other default}
 
 proc domAppendChild {parent name} {
     $parent ownerDocument doc

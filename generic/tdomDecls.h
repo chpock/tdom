@@ -87,7 +87,7 @@ typedef struct TdomStubs {
     domDocument * (*tcldom_getDocumentFromName) (Tcl_Interp *interp, char *docName, char **errMsg); /* 17 */
 } TdomStubs;
 
-const TdomStubs *tdomStubsPtr;
+EXTERN const TdomStubs *tdomStubsPtr;
 
 #ifdef __cplusplus
 }

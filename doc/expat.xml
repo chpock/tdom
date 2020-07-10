@@ -63,6 +63,22 @@ command. You can't enable (nor disable) namespace parsing with
         </optdef>
 
         <optdef>
+          <optname>-namespaceseparator</optname>
+          <optarg>char</optarg>
+
+          <desc><p>This option has only effect, if used together with
+          the option <m>-namespace</m>. If given, this option
+          determines the character inserted between namespace URI and
+          the local name, while reporting an XML element name to a
+          handler script. The default is the character ':'. The
+          value must be a one-character string less or equal to
+          \u00FF, preferably a 7-bit ASCII character or the empty
+          string. If the value is the empty string (as well, as if the
+          value is \x00) the namespace URI and the local name will be
+          concatenated without any separator.</p></desc>
+        </optdef>
+        
+        <optdef>
           <optname>-final</optname>
           <optarg>boolean</optarg>
 

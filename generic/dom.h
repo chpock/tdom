@@ -2,9 +2,6 @@
 |   Copyright (C) 1999  Jochen C. Loewer (loewerj@hotmail.com)
 +----------------------------------------------------------------------------
 |
-|   $Id$
-|
-|
 |   A DOM interface upon the expat XML parser for the C language
 |   according to the W3C recommendation REC-DOM-Level-1-19981001
 |
@@ -836,6 +833,7 @@ int            domIsPINAME (const char *name);
 int            domIsQNAME (const char *name);
 int            domIsNCNAME (const char *name);
 int            domIsChar (const char *str);
+char *         domClearString (char *str, int *haveToFree);
 int            domIsBMPChar (const char *str);
 int            domIsComment (const char *str);
 int            domIsCDATA (const char *str);

@@ -129,6 +129,11 @@ test entity-3.3 {-useForeignDTD} {
     set ::extrefhandlerCalled
 } {1}
 
+test entity-3.4 {cget -useForeignDTD} {
+    set parser [expat entity-4.4 -useForeignDTD 1]
+    $parser cget -useForeignDTD
+} 1
+
 proc extrefhandler-4 {args} {
     global notexistendpath
     # Search for a not existing file path

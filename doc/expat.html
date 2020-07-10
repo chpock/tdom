@@ -4,21 +4,21 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x1708960">NAME</a> · <a href="#SECTid0x160bf00">SYNOPSIS</a> · <a href="#SECTid0x16ee020">DESCRIPTION</a> · <a href="#SECTid0x16eed60">COMMAND OPTIONS</a> · <a href="#SECTid0x1746b80"> COMMAND METHODS </a> · <a href="#SECTid0x174d660">Callback Command Return Codes</a> · <a href="#SECTid0x174e1f0">SEE ALSO</a> · <a href="#SECTid0x174e5b0">KEYWORDS</a>
+<a href="#SECTid0x55a05e76c910">NAME</a> · <a href="#SECTid0x55a05e6bbd60">SYNOPSIS</a> · <a href="#SECTid0x55a05e763ef0">DESCRIPTION</a> · <a href="#SECTid0x55a05e764c30">COMMAND OPTIONS</a> · <a href="#SECTid0x55a05e7c84e0"> COMMAND METHODS </a> · <a href="#SECTid0x55a05e7cefc0">Callback Command Return Codes</a> · <a href="#SECTid0x55a05e7cfb50">SEE ALSO</a> · <a href="#SECTid0x55a05e7cff10">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-    <h2><a name="SECTid0x1708960">NAME</a></h2><p class="namesection">
+    <h2><a name="SECTid0x55a05e76c910">NAME</a></h2><p class="namesection">
 <b class="names">expat - </b><br>Creates an instance of an expat parser object</p>
 
 
 
-    <h2><a name="SECTid0x160bf00">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+    <h2><a name="SECTid0x55a05e6bbd60">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">expat</b> ?<i class="m">parsername</i>? ?<i class="m">-namespace</i>? ?<i class="m">arg arg ..</i>
 
 <b class="cmd">xml::parser</b> ?<i class="m">parsername</i>? ?<i class="m">-namespace</i>? ?<i class="m">arg arg ..</i>
 </pre>
-    <h2><a name="SECTid0x16ee020">DESCRIPTION</a></h2><p>The parser created with <i class="m">expat</i> or <i class="m">xml::parser</i>
+    <h2><a name="SECTid0x55a05e763ef0">DESCRIPTION</a></h2><p>The parser created with <i class="m">expat</i> or <i class="m">xml::parser</i>
 (which is just another name for the same command in an own namespace) are able
 to parse any kind of well-formed XML. The parsers are stream oriented XML
 parser. This means that you register handler scripts with the parser prior to
@@ -35,7 +35,7 @@ in memory "tDOM" DOM tree, while the parser is parsing the input.</p><p>It is po
 and C level handlers for most of the events. If the event occurs, they are
 called in turn.</p>
 
-    <h2><a name="SECTid0x16eed60">COMMAND OPTIONS</a></h2><dl class="optlist">
+    <h2><a name="SECTid0x55a05e764c30">COMMAND OPTIONS</a></h2><dl class="optlist">
         
           <dt><b>-namespace</b></dt>
 
@@ -47,6 +47,24 @@ command. You can't enable (nor disable) namespace parsing with
 </dd>
         
 
+        
+          <dt>
+<b>-namespaceseparator</b> <i>char</i>
+</dt>
+          
+
+          <dd><p>This option has only effect, if used together with
+          the option <i class="m">-namespace</i>. If given, this option
+          determines the character inserted between namespace URI and
+          the local name, while reporting an XML element name to a
+          handler script. The default is the character ':'. The
+          value must be a one-character string less or equal to
+          \u00FF, preferably a 7-bit ASCII character or the empty
+          string. If the value is the empty string (as well, as if the
+          value is \x00) the namespace URI and the local name will be
+          concatenated without any separator.</p></dd>
+        
+        
         
           <dt>
 <b>-final</b> <i>boolean</i>
@@ -615,7 +633,7 @@ enddoctypedeclcommand scripts, if set, are not called.</dd>
         
 
       </dl>
-    <h2><a name="SECTid0x1746b80"> COMMAND METHODS </a></h2><dl class="commandlist">
+    <h2><a name="SECTid0x55a05e7c84e0"> COMMAND METHODS </a></h2><dl class="commandlist">
         
           <dt>
 <b class="cmd">parser</b> <b class="method">configure</b> <i class="m">option value ?option value?</i>
@@ -775,7 +793,7 @@ cases.</p></dd>
         
       </dl>
 
-    <h2><a name="SECTid0x174d660">Callback Command Return Codes</a></h2><p>A script invoked for any of the parser callback commands, such as
+    <h2><a name="SECTid0x55a05e7cefc0">Callback Command Return Codes</a></h2><p>A script invoked for any of the parser callback commands, such as
 -elementstartcommand, -elementendcommand, etc, may return an error code other
 than "ok" or "error". All callbacks may in addition return
 "break" or "continue".</p><p>If a callback script returns an "error" error code then
@@ -789,11 +807,13 @@ script out of this Tcl handler set and processing continues with the next
 (sibling) element. This does not influence any other handler set.</p><p>If a callback script returns a "return" error
 code then parsing is canceled altogether, but no error is raised.</p>
 
-    <h2><a name="SECTid0x174e1f0">SEE ALSO</a></h2><p class="seealso">
+    <h2><a name="SECTid0x55a05e7cfb50">SEE ALSO</a></h2><p class="seealso">
 <a href="expatapi.html">expatapi</a>, <a href="tdomcmd.html">tdom</a>
 </p>
 
-    <h2><a name="SECTid0x174e5b0">KEYWORDS</a></h2><p class="keywords"><a class="keyword" href="keyword-index.html#KW-SAX">SAX</a></p>
+    <h2><a name="SECTid0x55a05e7cff10">KEYWORDS</a></h2><p class="keywords">
+<a class="keyword" href="keyword-index.html#KW-SAX">SAX</a>, <a class="keyword" href="keyword-index.html#KW-push">push</a>, <a class="keyword" href="keyword-index.html#KW-pushparser">pushparser</a>
+</p>
   </div><hr class="navsep"><div class="navbar" align="center">
 <a class="navaid" href="index.html">Contents</a> · <a class="navaid" href="category-index.html">Index</a> · <a class="navaid" href="keyword-index.html">Keywords</a> · <a class="navaid" href="http://tdom.org">Repository</a>
 </div>
