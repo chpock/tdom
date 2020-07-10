@@ -304,11 +304,15 @@ called. The <m>-useForeignDTD</m> respects </desc>
                 un-prefixed elements or even if the element has a
                 defined namespace prefix. One consequence is that
                 XPath node expressions on such a DOM tree doesn't work
-                as expected. Prefixed element nodes can't be selected
-                and element nodes without prefix will be seen by XPath
-                expressions as if they are not in any namespace (no
-                matter if they are in fact should be in a default
-                namespace).
+                as may be expected. Prefixed element nodes can't be
+                selected naively and element nodes without prefix will
+                be seen by XPath expressions as if they are not in any
+                namespace (no matter if they are in fact should be in
+                a default namespace). If you need to inject prefixed
+                node names into an XPath expression use the '%' syntax
+                described in the documentation of the of the
+                <command>domNode</command> command method
+                <method>>selectNodes</method>.
                 </desc>
               </optdef>
 
