@@ -727,7 +727,9 @@ domDocument *  domReadDocument   (XML_Parser parser,
                                   Tcl_Obj *extResolver,
                                   int   useForeignDTD,
                                   int   paramEntityParsing,
+#ifndef TDOM_NO_DTD_VALIDATION
                                   int   dtdvalidation,
+#endif
                                   Tcl_Interp *interp,
                                   int  *status);
 

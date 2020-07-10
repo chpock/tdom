@@ -1225,7 +1225,9 @@ int tcldom_appendXML (
                           extResolver,
                           0,
                           (int) XML_PARAM_ENTITY_PARSING_ALWAYS,
+#ifndef TDOM_NO_DTD_VALIDATION
                           0,
+#endif
                           interp,
                           &resultcode);
     if (extResolver) {
@@ -6160,7 +6162,9 @@ int tcldom_parse (
     int          useForeignDTD       = 0;
     int          paramEntityParsing  = (int)XML_PARAM_ENTITY_PARSING_ALWAYS;
     int          keepCDATA           = 0;
+#ifndef TDOM_NO_DTD_VALIDATION
     int          dtdvalidation       = 0;
+#endif
     int          status              = 0;
     domDocument *doc;
     Tcl_Obj     *newObjName = NULL;
@@ -6177,7 +6181,11 @@ int tcldom_parse (
         "-html5",
 #endif
         "-jsonmaxnesting",        "-ignorexmlns",   "--",
-        "-keepCDATA",             "-dtdvalidation", NULL
+        "-keepCDATA",
+#ifndef TDOM_NO_DTD_VALIDATION
+        "-dtdvalidation",
+#endif
+        NULL
     };
     enum parseOption {
         o_keepEmpties,            o_simple,         o_html,
@@ -6188,7 +6196,10 @@ int tcldom_parse (
         o_htmlfive,
 #endif
         o_jsonmaxnesting,         o_ignorexmlns,    o_LAST,
-        o_keepCDATA,              o_dtdvalidation
+        o_keepCDATA
+#ifndef TDOM_NO_DTD_VALIDATION
+        ,o_dtdvalidation
+#endif
     };
 
     static const char *paramEntityParsingValues[] = {
@@ -6415,9 +6426,11 @@ int tcldom_parse (
             keepCDATA = 1;
             objv++;  objc--; break;
             
+#ifndef TDOM_NO_DTD_VALIDATION
         case o_dtdvalidation:
             dtdvalidation = 1;
             objv++;  objc--; break;
+#endif
             
         }
         if ((enum parseOption) optionIndex == o_LAST) break;
@@ -6577,7 +6590,9 @@ int tcldom_parse (
                           extResolver,
                           useForeignDTD,
                           paramEntityParsing,
+#ifndef TDOM_NO_DTD_VALIDATION
                           dtdvalidation,
+#endif
                           interp,
                           &status);
     if (doc == NULL) {
@@ -6669,14 +6684,15 @@ int tcldom_featureinfo (
         "expatmicroversion", "dtd",                "ns",
         "unknown",           "tdomalloc",          "lessns",
         "html5",             "jsonmaxnesting",     "versionhash",
-        "pullparser",        "TCL_UTF_MAX",        NULL
+        "pullparser",        "TCL_UTF_MAX",        "dtdvalidation",
+        NULL
     };
     enum feature {
         o_expatversion,      o_expatmajorversion,  o_expatminorversion,
         o_expatmicroversion, o_dtd,                o_ns,
         o_unknown,           o_tdomalloc,          o_lessns,
         o_html5,             o_jsonmaxnesting,     o_versionhash,
-        o_pullparser,        o_TCL_UTF_MAX,
+        o_pullparser,        o_TCL_UTF_MAX,        o_dtdvalidation
     };
 
     if (Tcl_GetIndexFromObj(interp, objv[1], features, "feature", 0,
@@ -6762,6 +6778,14 @@ int tcldom_featureinfo (
         break;
     case o_TCL_UTF_MAX:
         SetIntResult(TCL_UTF_MAX);
+        break;
+    case o_dtdvalidation:
+#ifndef TDOM_NO_DTD_VALIDATION
+        result = 1;
+#else
+        result = 0;
+#endif
+        SetBooleanResult(result);
         break;
     }
     return TCL_OK;

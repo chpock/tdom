@@ -380,9 +380,10 @@ way into the XPath expression using tcl variable references there is a
 syntax to inject element names from tcl variables. At every place
 where the XPath syntax allows a node test there could be a tcl
 variable reference (in any form), just the leading $ replaced with %.
-This allows one to select nodes with 'strange' (invalid, according to the
-appropriate XML production rule) node names which may be needed in
-case of working with JSON data.</p>
+This allows one to select nodes with 'strange' (invalid, according to
+the appropriate XML production rule) node names which may be needed in
+case of working with JSON data or if the DOM tree was build with
+<m>-ignorexmlns</m>.</p>
 
 <p>The option <m>-namespaces</m> expects a tcl list with prefix /
 namespace pairs as argument. If this option is not given, then any

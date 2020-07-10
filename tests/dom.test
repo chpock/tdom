@@ -20,6 +20,8 @@
 
 source [file join [file dir [info script]] loadtdom.tcl]
 
+testConstraint dtdvalidation [dom featureinfo dtdvalidation]
+
 test dom-1.1 {createDocument with root node name not a XML Name} {
     list [catch {dom createDocument "root node"} msg] $msg
 } "1 {Invalid root element name 'root node'}"
@@ -688,7 +690,7 @@ proc dom-2.42-resolver {base systemId publicId} {
     }
 }
 
-test dom-2.42 {-dtdvalidation} {
+test dom-2.42 {-dtdvalidation} {dtdvalidation} {
     set file [file join [file dir [info script]] data/REC-xslt-19991116.xml]
     set fd [open $file]
     set doc [dom parse -dtdvalidation \
@@ -698,7 +700,7 @@ test dom-2.42 {-dtdvalidation} {
     $doc delete
 } {}
 
-test dom-2.43 {-dtdvalidation / invalid dtd} {
+test dom-2.43 {-dtdvalidation / invalid dtd} {dtdvalidation} {
     set result [catch {
         dom parse -dtdvalidation {<!DOCTYPE root [
             <!ELEMENT root (#PCDATA|a|b|a)*>]>

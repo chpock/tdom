@@ -267,6 +267,47 @@ AC_DEFUN(TDOM_ENABLE_HTML5, [
 ])
 
 #------------------------------------------------------------------------
+# TDOM_ENABLE_DTD_VALIDATION --
+#
+#   Building with validation features.
+#
+# Arguments:
+#   None
+#   
+# Results:
+#
+#   Adds the following arguments to configure:
+#       --enable-dtdvalidation=yes|no
+#
+#   Defines the following vars:
+#
+#   Sets the following vars:
+#
+#------------------------------------------------------------------------
+
+AC_DEFUN(TDOM_ENABLE_DTD_VALIDATION, [
+    AC_MSG_CHECKING([whether to enable dtd valiation])
+    AC_ARG_ENABLE(dtdvalidation,
+        AC_HELP_STRING([--enable-dtdvalidation],
+            [build with valiation features (default: on)]),
+        [tcl_ok=$enableval], [tcl_ok=yes])
+
+    if test "${enable_dtdvalidation+set}" = set; then
+        enableval="$enable_dtdvalidation"
+        tcl_ok=$enableval
+    else
+        tcl_ok=yes
+    fi
+
+    if test "$tcl_ok" = "no" ; then
+        AC_MSG_RESULT([no])
+        AC_DEFINE(TDOM_NO_DTD_VALIDATION)
+    else
+        AC_MSG_RESULT([yes])
+    fi
+])
+
+#------------------------------------------------------------------------
 # TDOM_PATH_AOLSERVER
 #
 #   Allows the building with support for AOLserver 

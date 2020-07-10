@@ -123,6 +123,7 @@ typedef struct _domActiveBaseURI {
 } domActiveBaseURI;
 
 
+#ifndef TDOM_NO_DTD_VALIDATION
 /* The elements of TNC_Content carry exactly the same information
    as expats XML_Content. But the element is identified by his
    Tcl_HashEntry entry within the "tagNames" Hashtable (see TNC_Data)
@@ -260,6 +261,7 @@ TNC_ErrorString (int code)
         return message[code];
     return 0;
 }
+#endif
 
 /*---------------------------------------------------------------------------
 |   type domReadInfo
@@ -287,8 +289,11 @@ typedef struct _domReadInfo {
     int               baseURIstackPos;
     domActiveBaseURI *baseURIstack;
     int               insideDTD;
+#ifndef TDOM_NO_DTD_VALIDATION
     int               dtdvalidation;
+#endif
     int               status;
+#ifndef TDOM_NO_DTD_VALIDATION
     /* DTD validation releated struct members follow */
     char             *doctypeName;            /* From DOCTYPE declaration */
     int               skipWhiteCDATAs;        /* Flag: white space allowed in 
@@ -334,6 +339,7 @@ typedef struct _domReadInfo {
                                                  content model on the stack */
     TNC_ContentStack *contentStack;           /* Stack for the currently
                                                  nested open content models. */
+#endif
 } domReadInfo;
 
 /*----------------------------------------------------------------------------
@@ -342,6 +348,7 @@ typedef struct _domReadInfo {
 \---------------------------------------------------------------------------*/
 static void DispatchPCDATA (domReadInfo *info);
 
+#ifndef TDOM_NO_DTD_VALIDATION
 #define CHECK_UTF_CHARLEN(d) if (!(d)) { \
                                 signalNotValid (userData, TNC_ERROR_ONLY_THREE_BYTE_UTF8);\
                                 return;\
@@ -357,6 +364,7 @@ static void DispatchPCDATA (domReadInfo *info);
                                 FREE (copy);\
                                 return;\
                                 }
+#endif
 
 #ifndef TCL_THREADS
 
@@ -431,6 +439,7 @@ domProcessingInstructionNode * coerceToProcessingInstructionNode( domNode *n ) {
 }
 
 
+#ifndef TDOM_NO_DTD_VALIDATION
 static void
 signalNotValid (userData, code)
     void        *userData;
@@ -449,6 +458,7 @@ signalNotValid (userData, code)
                       NULL);
     XML_StopParser(tncdata->parser, 1);
 }
+#endif
 
 /*---------------------------------------------------------------------------
 |   domIsNAME
@@ -1334,6 +1344,7 @@ domPreviousSibling (
 
 #ifndef  TDOM_NO_EXPAT
 
+#ifndef TDOM_NO_DTD_VALIDATION
 /*
  *----------------------------------------------------------------------------
  *
@@ -2257,6 +2268,7 @@ TncProbeElementEnd (
         return 1;
     }
 }
+#endif
 
 /*---------------------------------------------------------------------------
 |   startElement
@@ -2308,6 +2320,7 @@ startElement(
 
     DispatchPCDATA (info);
 
+#ifndef TDOM_NO_DTD_VALIDATION
     if (info->dtdvalidation) {
         domReadInfo *tncdata = info;
         Tcl_HashEntry *entryPtr;
@@ -2444,6 +2457,7 @@ startElement(
         printf ("TncElementStartCommand end\n");
 #endif
     }
+#endif
     
     h = Tcl_CreateHashEntry(&HASHTAB(info->document,tdom_tagNames), name,
                             &hnew);
@@ -2724,6 +2738,7 @@ endElement (
 
     DispatchPCDATA (info);
 
+#ifndef TDOM_NO_DTD_VALIDATION
     if (info->dtdvalidation) {
         domReadInfo *tncdata = info;
         Tcl_HashEntry *entryPtr;
@@ -2787,7 +2802,7 @@ endElement (
             }
         }
     }
-    
+#endif
     
     info->depth--;
     if (!info->ignorexmlns) {
@@ -2826,6 +2841,7 @@ characterDataHandler (
     domReadInfo   *info = userData;
 
     Tcl_DStringAppend (info->cdata, data, len);
+#ifndef TDOM_NO_DTD_VALIDATION
     if (info->dtdvalidation) {
         domReadInfo *tncdata = info;
         int i;
@@ -2848,7 +2864,7 @@ characterDataHandler (
             }
         }
     }
-    
+#endif    
     return;
     
 }
@@ -3490,6 +3506,7 @@ endDoctypeDeclHandler (
     info->insideDTD = 0;
 }
 
+#ifndef TDOM_NO_DTD_VALIDATION
 /*
  *----------------------------------------------------------------------------
  *
@@ -4060,7 +4077,7 @@ TncFreeValidationData (
     FREE ((char *) info->ids);
     FREE ((char *) info->contentStack);
 }
-
+#endif
 
 /*---------------------------------------------------------------------------
 |   domReadDocument
@@ -4082,7 +4099,9 @@ domReadDocument (
     Tcl_Obj    *extResolver,
     int         useForeignDTD,
     int         paramEntityParsing,
+#ifndef TDOM_NO_DTD_VALIDATION
     int         dtdvalidation,
+#endif
     Tcl_Interp *interp,
     int        *resultcode
 )
@@ -4129,6 +4148,7 @@ domReadDocument (
         MALLOC (sizeof(domActiveBaseURI) * info.baseURIstackSize);
     info.insideDTD            = 0;
     info.status               = 0;
+#ifndef TDOM_NO_DTD_VALIDATION
     info.dtdvalidation        = dtdvalidation;
     
     if (dtdvalidation) {
@@ -4156,7 +4176,7 @@ domReadDocument (
         info.contentStackSize = TNC_INITCONTENTSTACKSIZE;
         info.contentStackPtr = 0;
     }
-    
+#endif    
     XML_SetUserData(parser, &info);
     XML_SetBase (parser, baseurl);
     /* We must use XML_GetBase(), because XML_SetBase copies the baseURI,
@@ -4179,12 +4199,13 @@ domReadDocument (
     if (keepCDATA) {
         XML_SetCdataSectionHandler(parser, startCDATA, endCDATA);
     }
+#ifndef TDOM_NO_DTD_VALIDATION
     if (dtdvalidation) {
         XML_SetElementDeclHandler (parser, TncElementDeclCommand);
         XML_SetAttlistDeclHandler (parser, TncAttDeclCommand);
         XML_SetNotationDeclHandler (parser, TncNotationDeclHandler);
     }
-
+#endif
     if (channel == NULL) {
         status = XML_Parse(parser, xml, length, 1);
         switch (status) {
@@ -4200,7 +4221,9 @@ domReadDocument (
             FREE ( info.baseURIstack );
             Tcl_DStringFree (info.cdata);
             FREE ( info.cdata);
+#ifndef TDOM_NO_DTD_VALIDATION
             if (info.dtdvalidation) TncFreeValidationData (&info);
+#endif
             domFreeDocument (doc, NULL, NULL);
             *resultcode = info.status;
             return NULL;
@@ -4214,7 +4237,9 @@ domReadDocument (
             FREE ( info.baseURIstack );
             Tcl_DStringFree (info.cdata);
             FREE ( info.cdata);
+#ifndef TDOM_NO_DTD_VALIDATION
             if (info.dtdvalidation) TncFreeValidationData (&info);
+#endif
             domFreeDocument (doc, NULL, NULL);
             *resultcode = info.status;
             return NULL;
@@ -4240,7 +4265,9 @@ domReadDocument (
                     FREE ( info.baseURIstack );
                     Tcl_DStringFree (info.cdata);
                     FREE ( info.cdata);
+#ifndef TDOM_NO_DTD_VALIDATION
                     if (info.dtdvalidation) TncFreeValidationData (&info);
+#endif
                     domFreeDocument (doc, NULL, NULL);
                     *resultcode = info.status;
                     return NULL;
@@ -4269,7 +4296,9 @@ domReadDocument (
                     FREE ( info.baseURIstack );
                     Tcl_DStringFree (info.cdata);
                     FREE ( info.cdata);
+#ifndef TDOM_NO_DTD_VALIDATION
                     if (info.dtdvalidation) TncFreeValidationData (&info);
+#endif
                     domFreeDocument (doc, NULL, NULL);
                     Tcl_DecrRefCount (bufObj);
                     *resultcode = info.status;
@@ -4285,8 +4314,10 @@ domReadDocument (
     FREE ( info.baseURIstack );
     Tcl_DStringFree (info.cdata);
     FREE ( info.cdata);
+#ifndef TDOM_NO_DTD_VALIDATION
     if (info.dtdvalidation) TncFreeValidationData (&info);
-
+#endif
+    
     domSetDocumentElement (doc);
 
     return doc;
@@ -7147,7 +7178,9 @@ typedef struct _tdomCmdReadInfo {
     int               baseURIstackPos;
     domActiveBaseURI *baseURIstack;
     int               insideDTD;
+#ifndef TDOM_NO_DTD_VALIDATION
     int               dtdvalidation;
+#endif
     /* Now the tdom cmd specific elements */
     int               tdomStatus;
     Tcl_Obj          *extResolver;
@@ -7220,7 +7253,9 @@ tdom_resetProc (
     info->interp            = interp;
     info->activeNSpos       = -1;
     info->insideDTD         = 0;
+#ifndef TDOM_NO_DTD_VALIDATION
     info->dtdvalidation     = 0;
+#endif            
     info->baseURIstackPos   = 0;
     info->tdomStatus        = 0;
 
@@ -7358,7 +7393,9 @@ TclTdomObjCmd (dummy, interp, objc, objv)
         info->baseURIstack      = (domActiveBaseURI*) 
             MALLOC (sizeof(domActiveBaseURI) * info->baseURIstackSize);
         info->insideDTD         = 0;
+#ifndef TDOM_NO_DTD_VALIDATION
         info->dtdvalidation     = 0;
+#endif
         info->tdomStatus        = 0;
         info->extResolver       = NULL;
 
