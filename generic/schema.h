@@ -85,6 +85,8 @@ typedef struct domKeyConstraint {
     ast   *fields;
     int    nrFields;
     int    flags;
+    char  *emptyFieldSetValue;
+    int    efsv_len;
     struct domKeyConstraint *next;
 } domKeyConstraint;
 
@@ -196,6 +198,8 @@ typedef struct SchemaData_
     domNode *insideNode;
     int choiceHashThreshold;
     int attributeHashThreshold;
+    char *wsbuf;
+    int wsbufLen;
 } SchemaData;
 
 int 

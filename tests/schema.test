@@ -27,8 +27,9 @@
 #    schema-24.*: validatechannel
 #    schema-25.*: domxpathboolean
 #    schema-26.*: info domNode
+#    schema-27.*: Text constraint commands available outsite schema context
 #
-# Copyright (c) 2018-2019 Rolf Ade.
+# Copyright (c) 2018-2020 Rolf Ade.
 
 source [file join [file dir [info script]] loadtdom.tcl]
 
@@ -4210,11 +4211,11 @@ test schema-14.8 {text: nmtoken, nmtokens} {
     set result
 } {1 1 1 0 0 1 1 1 1 1 1 1 0 0 0}
 
-test schema-14.9 {text: isodate} {
+test schema-14.9 {text: date} {
     tdom::schema s
     s define {
         defelement doc {
-            text isodate
+            text date
         }
     }
     set result [list]
@@ -4259,12 +4260,13 @@ test schema-14.9 {text: isodate} {
         <doc>2012-03-07-2:30</doc>
         <doc>2012-03-07-02:30Z</doc>
         {<doc>2012-03-07-02:30 </doc>}
+        <doc>02027-02-01</doc>
     } {
         lappend result [s validate $xml]
     }
     s delete
     set result
-} {0 0 0 0 0 1 0 0 0 1 0 1 1 0 1 1 0 0 0 1 0 1 1 1 1 0 0 0 1 1 1 0 1 0 1 1 0 0 0 0}
+} {0 0 0 0 0 1 0 0 0 1 0 1 1 0 1 1 0 0 0 1 0 1 1 1 1 0 0 0 1 1 1 0 1 0 1 1 0 0 0 0 0}
 
 test schema-14.10 {text: number tcl} {
     tdom::schema s
@@ -4416,7 +4418,7 @@ test schema-14.14 {text: one of two types} {
                     minLength 1
                     maxLength 3
                 }
-                text {isodate}
+                text {date}
             }
         }
     }
@@ -4446,7 +4448,7 @@ test schema-14.15 {text: oneOf} {
             text {
                 oneOf {
                     maxLength 3
-                    isodate
+                    date
                 }
             }
         }
@@ -4478,7 +4480,7 @@ test schema-14.16 {text: oneOf} {
                 minLength 1
                 oneOf {
                     maxLength 3
-                    isodate
+                    date
                 }
             }
         }
@@ -4513,7 +4515,7 @@ test schema-14.17 {text: oneOf w/ allOf} {
                         maxLength 3
                         minLength 1
                     }
-                    isodate                    
+                    date                    
                 }
             }
         }
@@ -5661,13 +5663,9 @@ test schema-14.40 {text: unsignedLong} {
 
 test schema-14.41 {text constrains commands outside text constraint} {
     set cmds [info command tdom::schema::text::*]
-    set skiplist {
-        ::tdom::schema::text::isodate
-    }
     set result {}
     tdom::schema s
     foreach cmd $cmds {
-        if {$cmd in $skiplist} continue
         lappend result [catch {$cmd "some text"}]
         lappend result [catch {
             s define [subst "{$cmd}"]
@@ -5687,61 +5685,13 @@ test schema-14.41 {text constrains commands outside text constraint} {
             }]
         } errMsg]
     }
-    if {$result eq [lrepeat [expr {([llength $cmds] - [llength $skiplist]) * 4}] 1]} {
+    if {$result eq [lrepeat [expr {[llength $cmds] * 4}] 1]} {
         set result 1
     } else {
         set result 0
     }
     set result
 } 1
-
-test schema-14.42 {isodate outside schema context} {
-    set result {}
-    foreach txt {
-        ""
-        foo
-        1
-        12
-        1234-12-31
-        1234-14-31
-        1234-12-00
-        1234-02-31
-        2000-02-29
-        2001-02-29
-        2004-02-29
-        -2004-02-29
-        1900-02-29
-        1234-02-01
-        1234-08-10
-        1234-08-222
-        " 1234-08-22"
-        "1234-08-22 "
-        11234-08-22
-        0000-02-01
-        10000-08-22
-        10000-02-29
-        10000-02-29Z
-        2012-03-07Z
-        "2012-03-07Z "
-        2012-03-07a
-        2012-03-07+
-        2012-03-07+00:00
-        2012-03-07-00:00
-        2012-03-07+02:00
-        2012-03-07+02:70
-        2012-03-07+12:30
-        2012-03-07+14:30
-        2012-03-07+14:00
-        2012-03-07-14:00
-        2012-03-07-14:01
-        2012-03-07-2:30
-        2012-03-07-02:30Z
-        "2012-03-07-02:30 "
-    } {
-        lappend result [tdom::schema::text::isodate $txt]
-    }
-    set result
-} {0 0 0 0 1 0 0 0 1 0 1 1 0 1 1 0 0 0 1 0 1 1 1 1 0 0 0 1 1 1 0 1 0 1 1 0 0 0 0}
 
 test schema-14.43 {text constraint setvar} {
     tdom::schema s
@@ -5768,6 +5718,292 @@ test schema-14.44 {text constraint setvar} {
     s delete
     lappend result ${from_schema-14.44}
 } {1 b}
+
+test schema-14.45 {text constraint whitespace} {
+    tdom::schema s
+    s defelement doc {
+        text {
+            whitespace preserve {
+                oneOf {
+                    fixed foo
+                    allOf {
+                        minLength 5
+                        integer
+                    }
+                }
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc></doc>
+        <doc>foo</doc>
+        <doc>12345</doc>
+        <doc>1234</doc>
+        <doc>1234a</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 1 1 0 0}
+
+test schema-14.46 {text constraint whitespace} {
+    tdom::schema s
+    s defelement doc {
+        text {
+            whitespace replace {
+                fixed "foo bar"
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc></doc>
+        {<doc>foo bar</doc>}
+        {<doc>foo
+bar</doc>}
+        {<doc>foo	bar</doc>}
+        {<doc>foo	 bar</doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 1 1 1 0}
+
+test schema-14.47 {text constraint whitespace} {
+    tdom::schema s
+    s defelement doc {
+        text {
+            whitespace collapse {
+                fixed "foo bar"
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc></doc>
+        {<doc>foo bar</doc>}
+        {<doc>foo
+bar</doc>}
+        {<doc>foo	bar</doc>}
+        {<doc>foo	 bar</doc>}
+        {<doc>  foo  bar  </doc>}
+        {<doc>  foo  bar  rr</doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 1 1 1 1 1 0}
+
+test schema-14.48 {text constraint whitespace} {
+    tdom::schema s
+    s defelement doc {
+        text {
+            whitespace preserve {
+                fixed "foo[string repeat " " 300]bar"
+            }
+        }
+    }
+    set xmls {
+        <doc/>
+    }
+    lappend xmls "<doc>foo[string repeat " " 300]bar</doc>"
+    set result [list]
+    foreach xml $xmls {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1}
+
+test schema-14.49 {text constraint whitespace} {
+    tdom::schema s
+    s defelement doc {
+        text {
+            whitespace collapse {
+                fixed "foo [string repeat "x" 1200]bar"
+            }
+        }
+    }
+    set xmls {
+        <doc/>
+    }
+    lappend xmls "<doc>[string repeat " " 300]foo[string repeat " " 300][string repeat "x" 1200]bar[string repeat " " 300]</doc>"
+    set result [list]
+    foreach xml $xmls {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1}
+
+test schema-14.50 {text constraint whitespace} {
+    tdom::schema s
+    s defelement doc {
+        element b ! {
+            text {
+                whitespace replace {
+                    fixed "foo[string repeat " " 400]bar"
+                }
+            }
+        }
+    }
+    set xml <doc> 
+    append xml <b> foo [string repeat "&#xA; \t&#xD;" 100] bar </b>
+    append xml </doc>
+    set result [s validate $xml]
+    s delete
+    set result
+} 1
+
+test schema-14.51 {text constraint whitespace} {
+    tdom::schema s
+    s defelement doc {
+        element a ! {
+            text {
+                whitespace collapse {
+                    fixed "foo [string repeat "x" 1200]bar"
+                }
+            }
+        }
+        element b ! {
+            text {
+                whitespace replace {
+                    fixed "foo[string repeat " " 8000]bar"
+                }
+            }
+        }
+    }
+    set xml <doc> 
+    append xml <a> [string repeat " " 20] foo " " [string repeat x 1200] bar \
+        [string repeat " " 8000] </a>
+    append xml <b> foo [string repeat "&#xA; \t&#xD;" 2000] bar </b>
+    append xml </doc>
+    set result [s validate $xml]
+    s delete
+    set result
+} 1
+
+test schema-14.52 {text constraint whitespace} {
+    tdom::schema s
+    s defelement doc {
+        element a + {
+            text {
+                not {
+                    fixed foo
+                    fixed bar
+                }
+            }
+        }
+    }
+    set result ""
+    foreach xml {
+        <doc><a>foo</a></doc>
+        <doc><a>bar</a></doc>
+        <doc><a>grill</a></doc>
+        <doc><a/></doc>
+        <doc><a/><a>grill</a></doc>
+        <doc><a/><a>bar</a></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 1 1 1 0}
+
+test schema-14.54 {text constraint dateTime} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            text dateTime
+        }
+    }
+    set result ""
+    foreach xml {
+        <doc/>
+        <doc></doc>
+        <doc>foo</doc>
+        <doc>1</doc>
+        <doc>2020-07-08T15:58:17</doc>
+        <doc>2020-07-08T15:20:00</doc>
+        <doc>2020-07-08T15:20:17.7</doc>
+        <doc>2020-07-08T15:58:17+02:00</doc>
+        <doc>2020-07-08T15:20:17.789</doc>
+        <doc>2020-07-08T15:20:17.7890</doc>
+        <doc>2020-07-08T15:20:17.0</doc>
+        <doc>2020-07-08T15:20:17.</doc>
+        <doc>2020-07-08T15:20:17.+02:00</doc>
+        <doc>2020-07-08T15:20:17.Z</doc>
+        <doc>2020-07-08T15:20:17+Z</doc>
+        <doc>2020-07-08T00:20</doc>
+        <doc>2020-07-08T00:60:00</doc>
+        <doc>2020-07-08T24:00:00</doc>
+        <doc>2020-07-08T24:00:00.1</doc>
+        <doc>2020-07-08T24:01:00</doc>
+        <doc>2020-07-08T24:00:01</doc>
+        <doc>2020-12-2215:20:00</doc>
+        <doc>2020-12-22</doc>
+        <doc>2020-07-08T15:20:17.789+02:00</doc>
+        <doc>2020-07-08T15:20:17-02:00</doc>
+        <doc>2020-07-08T15:20:17-02:00.0</doc>
+        <doc>2020-07-08T15:20:17.0-02:00</doc>
+        "<doc> 2020-07-08T15:20:17.0-02:00</doc>"
+        "<doc>2020-07-08T15:20:17.0-02:00 </doc>"
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 0 0 1 1 1 1 1 1 1 0 0 0 0 0 0 1 0 0 0 0 0 1 1 0 1 0 0}
+
+test schema-14.55 {text constraint time} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            text time
+        }
+    }
+    set result ""
+    foreach xml {
+        <doc/>
+        <doc></doc>
+        <doc>foo</doc>
+        <doc>1</doc>
+        <doc>15:58:17</doc>
+        <doc>15:20:00</doc>
+        <doc>15:20:17.7</doc>
+        <doc>15:58:17+02:00</doc>
+        <doc>15:20:17.789</doc>
+        <doc>15:20:17.7890</doc>
+        <doc>15:20:17.0</doc>
+        <doc>15:20:17.</doc>
+        <doc>15:20:17.+02:00</doc>
+        <doc>15:20:17.Z</doc>
+        <doc>15:20:17+Z</doc>
+        <doc>00:20</doc>
+        <doc>00:60:00</doc>
+        <doc>24:00:00</doc>
+        <doc>24:00:00.1</doc>
+        <doc>24:01:00</doc>
+        <doc>24:00:01</doc>
+        <doc>15:20:17.789+02:00</doc>
+        <doc>15:20:17-02:00</doc>
+        <doc>15:20:17-02:00.0</doc>
+        <doc>15:20:17.0-02:00</doc>
+        "<doc> 15:20:17.0-02:00</doc>"
+        "<doc>T15:20:17.0-02:00 </doc>"
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 0 0 1 1 1 1 1 1 1 0 0 0 0 0 0 1 0 0 0 1 1 0 1 0 0}
 
 test schema-15.1 {constraint cmd tcl} {
     tdom::schema s
@@ -6391,7 +6627,7 @@ test schema-16.16 {interleave} {
     set result
 } {1 1 0}
 
-test schema-16.17 {interleave with all content cp optional} {
+test schema-16.17 {interleave with all child cp optional} {
     tdom::schema s
     s defelement doc {
         interleave {
@@ -6444,12 +6680,117 @@ test schema-16.18 {interleave with all content cp optional} {
         <doc><c/><a/></doc>
         <doc><c/><a/><b/><d/></doc>
         <doc><c/><a/><b/></doc>
+        <doc><c2/><a/><b/></doc>
+        <doc><c/><b/><a/><c1/></doc>
     } {
         lappend result [s validate $xml]
     }
     s delete
     set result
-} {1 1 1 1 1 1 1 0 1}
+} {1 1 1 1 1 1 1 0 1 1 0}
+
+test schema-16.19 {interleave with all child cp optional} {
+    tdom::schema s
+    s defelement doc {
+        interleave {
+            element a ?
+            element b ?
+            choice {
+                element c ?
+                element c1 ?
+                element c2 ?
+            }
+        }
+        element d
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/><d/></doc>
+        <doc><b/><d/></doc>
+        <doc><c/><d/></doc>
+        <doc><a/><c/><d/></doc>
+        <doc><b/><c/><d/></doc>
+        <doc><c/><a/><d/></doc>
+        <doc><c/><a/><b/><d/></doc>
+        <doc><c/><a/><b/></doc>
+        <doc><d/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 1 1 1 1 1 1 0 1}
+
+test schema-16.20 {interleave with all child cp optional} {
+    tdom::schema s
+    s defelement doc {
+        interleave {
+            element a ?
+            element b ?
+            group {
+                element c ?
+                element c1 ?
+                element c2 ?
+            }
+        }
+        element d
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/><d/></doc>
+        <doc><b/><d/></doc>
+        <doc><c/><d/></doc>
+        <doc><a/><c/><d/></doc>
+        <doc><b/><c/><d/></doc>
+        <doc><c/><a/><d/></doc>
+        <doc><c/><a/><b/><d/></doc>
+        <doc><c/><a/><b/></doc>
+        <doc><d/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 1 1 1 1 1 1 0 1}
+
+test schema-16.21 {interleave with all child cp optional} {
+    tdom::schema s
+    s defelement doc {
+        interleave {
+            element a ?
+            element b ?
+            group {
+                element c ?
+                element c1 ?
+                element c2 ?
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/></doc>
+        <doc><b/></doc>
+        <doc><c/></doc>
+        <doc><a/><c/></doc>
+        <doc><b/><c/></doc>
+        <doc><c/><a/></doc>
+        <doc><c/><a/><b/><d/></doc>
+        <doc><c/><a/><b/></doc>
+        <doc><c2/><a/><b/></doc>
+        <doc><c/><b/><a/><c1/></doc>
+        <doc><b/><c/><c2/><a/></doc>
+        <doc><b/><c/><c2/><a/><c1/></doc>
+        <doc><b/><c/><c1/><c2/><a/></doc>
+        <doc><b/><c/><c2/><c1/><a/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 1 1 1 1 1 1 0 1 1 0 1 0 1 0}
 
 test schema-17.1 {info} {
     tdom::schema s
@@ -8752,6 +9093,29 @@ test schema-20.2a {domunique} {
     set result
 } {1 0 1 1}
 
+test schema-20.2b {domunique} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            domunique item @ref itemrefkey EMPTY_FIELD_SET_VALUE abc
+            element item * {
+                attribute ref ?
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        {<doc><item ref="abc"/><item ref="foo"/></doc>}
+        {<doc><item ref="abc"/><item ref="abc"/></doc>}
+        {<doc><item/><item ref="abc"/></doc>}
+        {<doc><item/><item/></doc>}
+    } {
+        lappend result [postValidation s $xml]
+    }
+    s delete
+    set result
+} {1 0 0 0}
+
 test schema-20.3 {domunique} {
     tdom::schema s
     s define {
@@ -9268,6 +9632,38 @@ Parsed symbols:
      2 PLUS             0 000000000     4  
      3 WCARDNAME        0 000000000     6  b}}
 
+proc ::dom::xpathFunc::compare {ctxNode pos nodeListType nodeList args} {
+    if {[llength $args] != 4} {
+        error "XPath function date: Expected two arguments but got
+               [expr {[llength $args] / 2}]"
+    }
+    lassign $args arg1Typ arg1Value arg2Typ arg2Value
+    set arg1 [::dom::xpathFuncHelper::coerce2string $arg1Typ $arg1Value]
+    set arg2 [::dom::xpathFuncHelper::coerce2string $arg2Typ $arg2Value]
+    return [list number [string compare $arg1 $arg2]]
+}
+
+proc schema-25.6 {scmd errorType} {
+    lappend ::result $errorType [$scmd info vaction name]
+}
+test schema-25.6 {domxpathboolean - scripted XPath function} {
+    tdom::schema s
+    s reportcmd schema-25.6
+    s define {
+        defelement doc {
+            element a ! {
+                text
+                domxpathboolean {compare('foo','bar') > 0} first
+                domxpathboolean {compare('foo','bar') < 0} second
+            }
+        }
+    }
+    set doc [dom parse {<doc><a>2020-07-30</a></doc>}]
+    set result ""
+    lappend result [s domvalidate $doc]
+    set result
+} {DOM_XPATH_BOOLEAN second 1}
+
 proc schema-26.1 {scmd} {
     lappend ::result "fromtcl: [[$scmd info domNode] nodeName]"
 }
@@ -9350,5 +9746,217 @@ test schema-26.3 {info domNode} {
     s delete
     set result
 } {{} fromTcl {} 1 fromTcl {} 1 fromTcl {} UNEXPECTED_TEXT {} fromTcl {} 1 fromTcl {} UNEXPECTED_TEXT {} fromTcl {} 1 fromTcl {} UNEXPECTED_TEXT {} fromTcl {} UNEXPECTED_ELEMENT {} 1 fromTcl {} UNEXPECTED_ELEMENT {} 1}
+
+proc schema-27.1 {args} {
+    lappend ::result [::tdom::type::time 23:24:45]
+}
+
+test schema-27.1 {Called from evaluated code} {
+    tdom::schema s
+    s defelement doc {
+        tcl schema-27.1
+        element e 1
+    }
+    set result ""
+    lappend result [s validate <doc><e/></doc>]
+    s delete
+    set result
+} {1 1}
+
+test schema-27.2 {Called from evaluated code} {
+    tdom::schema s
+    s defelement doc {
+        text {
+            tcl schema-27.1
+        }
+    }
+    set result ""
+    lappend result [s validate <doc>foo</doc>]
+    s delete
+    set result
+} {1 1}
+
+test schema-27.3 {Called from recover script} {
+    tdom::schema s
+    s defelement doc {
+        element e 1
+    }
+    s reportcmd schema-27.1
+    set result ""
+    lappend result [s validate <doc/>]
+    s delete
+    set result
+} {1 1}
+
+test schema-27.4 {Called as part of validation} {
+    tdom::schema s
+    s defelement doc {
+        tcl schema-27.1
+        element e 1
+    }
+    set result ""
+    lappend result [s validate <doc><e/></doc>]
+    s delete
+    set result
+} {1 1}
+
+test schema-27.5 {Called during schema script evaluation} {
+    tdom::schema s
+    set result ""
+    s defelement doc {
+        set ::result [::tdom::type::time 12:20:00]
+        element e 1
+    }
+    s delete
+    set result
+} 1
+
+
+test schema-27.6 {date outside schema context} {
+    set result {}
+    foreach txt {
+        ""
+        foo
+        1
+        12
+        1234-12-31
+        1234-14-31
+        1234-12-00
+        1234-02-31
+        2000-02-29
+        2001-02-29
+        2004-02-29
+        -2004-02-29
+        1900-02-29
+        1234-02-01
+        1234-08-10
+        1234-08-222
+        " 1234-08-22"
+        "1234-08-22 "
+        11234-08-22
+        0000-02-01
+        10000-08-22
+        10000-02-29
+        10000-02-29Z
+        2012-03-07Z
+        "2012-03-07Z "
+        2012-03-07a
+        2012-03-07+
+        2012-03-07+00:00
+        2012-03-07-00:00
+        2012-03-07+02:00
+        2012-03-07+02:70
+        2012-03-07+12:30
+        2012-03-07+14:30
+        2012-03-07+14:00
+        2012-03-07-14:00
+        2012-03-07-14:01
+        2012-03-07-2:30
+        2012-03-07-02:30Z
+        "2012-03-07-02:30 "
+        02027-02-01
+    } {
+        lappend result [tdom::type::date $txt]
+    }
+    set result
+} {0 0 0 0 1 0 0 0 1 0 1 1 0 1 1 0 0 0 1 0 1 1 1 1 0 0 0 1 1 1 0 1 0 1 1 0 0 0 0 0}
+
+
+test schema-27.7 {dateTime outside schema context} {
+    set result ""
+    foreach txt {
+        ""
+        foo
+        1
+        2020-07-08T15:58:17
+        2020-07-08T15:20:00
+        2020-07-08T15:20:17.7
+        2020-07-08T15:58:17+02:00
+        2020-07-08T15:20:17.789
+        2020-07-08T15:20:17.7890
+        2020-07-08T15:20:17.0
+        2020-07-08T15:20:17.
+        2020-07-08T15:20:17.+02:00
+        2020-07-08T15:20:17.Z
+        2020-07-08T15:20:17+Z
+        2020-07-08T00:20
+        2020-07-08T00:60:00
+        2020-07-08T24:00:00
+        2020-07-08T24:00:00.1
+        2020-07-08T24:01:00
+        2020-07-08T24:00:01
+        2020-12-2215:20:00
+        2020-12-22
+        2020-07-08T15:20:17.789+02:00
+        2020-07-08T15:20:17-02:00
+        2020-07-08T15:20:17-02:00.0
+        2020-07-08T15:20:17.0-02:00
+        " 2020-07-08T15:20:17.0-02:00"
+        "2020-07-08T15:20:17.0-02:00 "
+    } {
+        lappend result [tdom::type::dateTime $txt]
+    }
+    set result
+} {0 0 0 1 1 1 1 1 1 1 0 0 0 0 0 0 1 0 0 0 0 0 1 1 0 1 0 0}
+
+test schema-27.8 {time outside schema context} {
+    set result ""
+    foreach txt {
+        ""
+        foo
+        1
+        07:15:00
+        07:15:00.023
+        07:15:00+05:00
+        07:15:00Z
+        00:00:00
+        24:00:00
+        7:15:00
+        07:15
+        07:15.4:23
+        12:60:12
+        12:61:12
+        12:71:12
+        24:31:12
+        25:31:12
+        55:31:12
+        12:31:60
+        12:31:61
+        12:31:77
+    } {
+        lappend result [tdom::type::time $txt]
+    }
+    set result
+} {0 0 0 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0}
+
+test schema-27.9 {duration outside schema context} {
+    set result ""
+    foreach txt {
+        ""
+        foo
+        1
+        P2Y6M5DT12H35M30S
+        P1DT2H        
+        P20M
+        PT20M
+        P0Y20M0D
+        P0Y
+        -P60D
+        PT1M30.5S
+        P-20M
+        P20MT
+        P1YM5D
+        P15.5Y
+        P1D2H
+        1Y2M
+        P2M1Y
+        P
+        PT15.S
+        PT.5S
+    } {
+        lappend result [tdom::type::duration $txt]
+    }
+    set result
+} {0 0 0 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0}
 
 }

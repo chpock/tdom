@@ -209,6 +209,112 @@ test parser-1.17 {parser delete} {
     parser-1.17 delete
 } {}
 
+proc cdh-1.18 {data} {
+    if {[string trim $data] ne ""} {
+        append ::result "cdh:$data"
+    }
+}
+proc dh-1.18 {data} {
+    if {[string trim $data] ne ""} {
+        append ::result "dh:$data"
+    }
+}
+
+test parser-1.18 {parser option -noexpand} {
+    catch {rename parser-1.18 {}}
+    set parser [expat parser-1.18]
+    $parser configure \
+        -noexpand 1 \
+        -defaultcommand dh-1.18 \
+        -characterdatacommand cdh-1.18
+    set result ""
+    $parser parse {<!DOCTYPE xml [
+      <!ELEMENT xml (#PCDATA) >                                  
+      <!ENTITY xxx "this was the xxx entity">
+     ]>
+     <xml>foo&xxx;bar</xml>}
+    set result
+} {cdh:foodh:&xxx;cdh:bar}
+
+test parser-1.19 {parser option -noexpand} {
+    catch {rename parser-1.19 {}}
+    set parser [expat parser-1.19]
+    $parser configure \
+        -noexpand 0 \
+        -defaultcommand dh-1.18 \
+        -characterdatacommand cdh-1.18
+    set result ""
+    $parser parse {<!DOCTYPE xml [
+      <!ELEMENT xml (#PCDATA) >                                  
+      <!ENTITY xxx "this was the xxx entity">
+     ]>
+     <xml>foo&xxx;bar</xml>}
+    set result
+} {cdh:foothis was the xxx entitybar}
+
+test parser-1.20 {parser option -noexpand} {
+    catch {rename parser-1.20 {}}
+    set parser [expat parser-1.20]
+    $parser configure \
+        -noexpand 1 \
+        -characterdatacommand cdh-1.18
+    set result ""
+    $parser parse {<!DOCTYPE xml [
+      <!ELEMENT xml (#PCDATA) >                                  
+      <!ENTITY xxx "this was the xxx entity">
+     ]>
+     <xml>foo&xxx;bar</xml>}
+    set result
+} {cdh:foocdh:bar}
+
+test parser-1.21 {parser option -noexpand} {
+    catch {rename parser-1.21 {}}
+    set parser [expat parser-1.21]
+    $parser configure \
+        -noexpand 1 \
+        -defaultcommand dh-1.18
+    set result ""
+    $parser parse {<!DOCTYPE xml [
+      <!ELEMENT xml (#PCDATA) >                                  
+      <!ENTITY xxx "this was the xxx entity">
+     ]>
+     <xml>foo&xxx;bar</xml>}
+    set result
+} {dh:&xxx;}
+
+test parser-1.22 {parser option -noexpand} {
+    catch {rename parser-1.22 {}}
+    set parser [expat parser-1.18]
+    $parser configure \
+        -noexpand 1 \
+        -defaultcommand dh-1.18
+    set result ""
+    $parser parse {<!DOCTYPE xml [
+      <!ELEMENT xml (#PCDATA) >                                  
+      <!ENTITY xxx "this was the xxx entity">
+     ]>
+     <xml>foo&xxx;bar</xml>}
+    set result
+} {dh:&xxx;}
+
+test parser-1.23 {Unknown option flag} {
+    catch {rename xml::parser-1.23 {}}
+    catch {
+        set parser [xml::parser parser-1.23 \
+                        -elementstartcommand EStart \
+                        -boo]
+    }
+} 1
+
+test parser-1.24 {Missing option argument} {
+    catch {rename xml::parser-1.24 {}}
+    catch {
+        set parser [xml::parser parser-1.23 \
+                        -elementstartcommand]
+                        
+    }
+} 1
+
 # Test break return code from callback
 
 test parser-2.1 {break in callback} {
@@ -626,7 +732,7 @@ proc elementend-12.1 {parser args} {
 test parser-12.1 {currentmarkup method} {
     catch {unset result}
     set result ""
-    set p [expat parser-12.1 -noexpand]
+    set p [expat parser-12.1]
     $p configure \
         -elementstartcommand [list elementstart-12.1 $p] \
         -elementendcommand [list elementend-12.1 $p]

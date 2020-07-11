@@ -205,6 +205,20 @@ creating the parser with the \fBexpat\fR or \fBxml::parser\fR
 command. You can't enable (nor disable) namespace parsing with
 \&\fB<parserobj> configure ...\fR.
 .RE
+.IP "\fB-namespaceseparator  \fIchar\fP\fR"
+.RS
+.PP
+This option has only effect, if used together with
+the option \fI-namespace\fR. If given, this option
+determines the character inserted between namespace URI and
+the local name, while reporting an XML element name to a
+handler script. The default is the character ':'. The
+value must be a one-character string less or equal to
+\&\eu00FF, preferably a 7-bit ASCII character or the empty
+string. If the value is the empty string (as well, as if the
+value is \ex00) the namespace URI and the local name will be
+concatenated without any separator.
+.RE
 .IP "\fB-final  \fIboolean\fP\fR"
 .RS
 .PP

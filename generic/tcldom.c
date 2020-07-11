@@ -1380,7 +1380,6 @@ int tcldom_xpathResultSet (
 |   tcldom_xpathFuncCallBack
 |
 \---------------------------------------------------------------------------*/
-static
 int tcldom_xpathFuncCallBack (
     void            *clientData,
     char            *functionName,

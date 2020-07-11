@@ -84,6 +84,9 @@
 #ifndef ATTR_ARRAY_INIT
 #  define ATTR_ARRAY_INIT 4
 #endif
+#ifndef WHITESPACETC_BUFFER_LEN_INIT
+#  define WHITESPACETC_BUFFER_LEN_INIT 200
+#endif
 
 /*----------------------------------------------------------------------------
 |   Local defines
@@ -242,7 +245,7 @@ static char *ValidationErrorType2str[] = {
 #define SetBooleanResult(i) Tcl_ResetResult(interp); \
                      Tcl_SetBooleanObj(Tcl_GetObjResult(interp), (i))
 
-#define SPACE(c) ((c) == ' ' || (c) == '\n' || (c) == '\t' || (c) == '\r')
+#define SPACE(c) IS_XML_WHITESPACE ((c))
     
 #define checkNrArgs(l,h,err) if (objc < l || objc > h) {      \
         SetResult (err);                                      \
@@ -561,6 +564,7 @@ static void freedomKeyConstraints (
     while (kc) {
         knext = kc->next;
         if (kc->name) FREE (kc->name);
+        if (kc->emptyFieldSetValue) FREE (kc->emptyFieldSetValue);
         xpathFreeAst (kc->selector);
         for (i = 0; i < kc->nrFields; i++) {
             xpathFreeAst (kc->fields[i]);
@@ -769,6 +773,9 @@ static void schemaInstanceDelete (
         FREE (ks);
     }
     Tcl_DeleteHashTable (&sdata->keySpaces);
+    if (sdata->wsbufLen) {
+        FREE (sdata->wsbuf);
+    }
     FREE (sdata);
 }
 
@@ -852,7 +859,7 @@ addToContent (
     unsigned int savedContenSize;
 
     if (sdata->cp->type == SCHEMA_CTYPE_CHOICE
-         || sdata->cp->type == SCHEMA_CTYPE_INTERLEAVE) {
+        || sdata->cp->type == SCHEMA_CTYPE_INTERLEAVE) {
         if (pattern->type == SCHEMA_CTYPE_CHOICE) {
             if (pattern->flags & MIXED_CONTENT) {
                 sdata->cp->flags |= MIXED_CONTENT;
@@ -1330,7 +1337,7 @@ matchElementStart (
     )
 {
     SchemaCP *cp, *candidate, *icp;
-    int hm, ac, i, mayskip, rc;
+    int hm, ac, i, mayskip, thismayskip, rc;
     int isName = 0;
     SchemaValidationStack *se;
     Tcl_HashEntry *h;
@@ -1553,6 +1560,7 @@ matchElementStart (
     case SCHEMA_CTYPE_INTERLEAVE:
         mayskip = 1;
         for (i = 0; i < cp->nc; i++) {
+            thismayskip = 0;
             if (se->interleaveState[i]) {
                 if (maxOne (cp->quants[i])) continue;
             } else {
@@ -1562,9 +1570,11 @@ matchElementStart (
             switch (icp->type) {
             case SCHEMA_CTYPE_TEXT:
                 if (icp->nc) {
-                    if (!checkText (interp, icp, "")) {
-                        mayskip = 0;
+                    if (checkText (interp, icp, "")) {
+                        thismayskip = 1;
                     }
+                } else {
+                    thismayskip = 1;
                 }
                 break;
 
@@ -1596,8 +1606,8 @@ matchElementStart (
 
             case SCHEMA_CTYPE_PATTERN:
                 if (recursivePattern (se, icp)) {
-                    mayskip = 1;
-                    continue;
+                    thismayskip = 1;
+                    break;
                 }
                 /* fall throu */
             case SCHEMA_CTYPE_INTERLEAVE:
@@ -1611,7 +1621,7 @@ matchElementStart (
                     return 1;
                 }
                 popStack (sdata);
-                if (mayskip && rc != -1) mayskip = 0;
+                if (rc == -1) thismayskip = 1;
                 break;
 
             case SCHEMA_CTYPE_VIRTUAL:
@@ -1624,6 +1634,7 @@ matchElementStart (
                 break;
 
             }
+            if (!thismayskip && minOne (cp->quants[i])) mayskip = 0;
         }
         if (mayskip) break;
         if (recover (interp, sdata, MISSING_ELEMENT_MATCH_START, name,
@@ -2208,7 +2219,7 @@ static int checkElementEnd (
 {
     SchemaValidationStack *se;
     SchemaCP *cp, *ic;
-    int hm, ac, i, mayskip, rc;
+    int hm, ac, i, thismayskip, mayskip = 0, rc;
     int isName = 0;
 
     DBG(fprintf (stderr, "checkElementEnd:\n");
@@ -2216,10 +2227,14 @@ static int checkElementEnd (
     se = sdata->stack;
     getContext (cp, ac, hm);
 
+    if (cp->type == SCHEMA_CTYPE_INTERLEAVE) {
+        ac = 0; hm = 0; mayskip = 1;
+    }
     switch (cp->type) {
     case SCHEMA_CTYPE_NAME:
         isName = 1;
         /* Fall through */
+    case SCHEMA_CTYPE_INTERLEAVE:
     case SCHEMA_CTYPE_PATTERN:
         if (ac < cp->nc && (hasMatched (cp->quants[ac], hm))) {
             DBG(fprintf (stderr, "ac %d has matched, skiping to next ac\n", ac));
@@ -2228,12 +2243,17 @@ static int checkElementEnd (
         while (ac < cp->nc) {
             DBG(fprintf (stderr, "ac %d hm %d mayMiss: %d\n",
                          ac, hm, mayMiss (cp->quants[ac])));
+            if (se->interleaveState) {
+                if (se->interleaveState[ac]) {
+                    ac++; continue;
+                }
+            }
             if (mayMiss (cp->quants[ac])) {
                 ac++; continue;
             }
-            
             switch (cp->content[ac]->type) {
             case SCHEMA_CTYPE_KEYSPACE_END:
+                /* Don't happen as INTERLEAVE child */
                 cp->content[ac]->keySpace->active--;
                 if (!cp->content[ac]->keySpace->active) {
                     if (cp->content[ac]->keySpace->unknownIDrefs) {
@@ -2249,6 +2269,7 @@ static int checkElementEnd (
                 break;
 
             case SCHEMA_CTYPE_KEYSPACE:
+                /* Don't happen as INTERLEAVE child */
                 if (!cp->content[ac]->keySpace->active) {
                     Tcl_InitHashTable (&cp->content[ac]->keySpace->ids,
                                        TCL_STRING_KEYS);
@@ -2272,10 +2293,11 @@ static int checkElementEnd (
                 break;
 
             case SCHEMA_CTYPE_CHOICE:
-                mayskip = 0;
+                /* Don't happen as INTERLEAVE child */
+                thismayskip = 0;
                 for (i = 0; i < cp->content[ac]->nc; i++) {
                     if (mayMiss (cp->content[ac]->quants[i])) {
-                        mayskip = 1;
+                        thismayskip = 1;
                         break;
                     }
                     ic = cp->content[ac]->content[i];
@@ -2286,7 +2308,7 @@ static int checkElementEnd (
                                 continue;
                             }
                         }
-                        mayskip = 1;
+                        thismayskip = 1;
                         break;
 
                     case SCHEMA_CTYPE_NAME:
@@ -2295,14 +2317,14 @@ static int checkElementEnd (
                         
                     case SCHEMA_CTYPE_PATTERN:
                         if (recursivePattern (se, ic)) {
-                            mayskip = 1;
+                            thismayskip = 1;
                             break;
                         }
                         /* fall throu */
                     case SCHEMA_CTYPE_INTERLEAVE:
                         pushToStack (sdata, ic);
                         if (checkElementEnd (interp, sdata)) {
-                            mayskip = 1;
+                            thismayskip = 1;
                         }
                         popStack (sdata);
                         break;
@@ -2314,9 +2336,9 @@ static int checkElementEnd (
                         Tcl_Panic ("Invalid CTYPE in MIXED or CHOICE");
                         
                     }
-                    if (mayskip) break;
+                    if (thismayskip) break;
                 }
-                if (mayskip) break;
+                if (thismayskip) break;
                 if (!recover (interp, sdata, MISSING_ELEMENT_MATCH_END, NULL,
                               NULL, NULL, 0)) {
                     return 0;
@@ -2329,7 +2351,6 @@ static int checkElementEnd (
                 
             case SCHEMA_CTYPE_PATTERN:
                 if (recursivePattern (se, cp->content[ac])) {
-                    mayskip = 1;
                     break;
                 }
                 /* fall throu */
@@ -2338,21 +2359,24 @@ static int checkElementEnd (
                 rc = checkElementEnd (interp, sdata);
                 popStack (sdata);
                 if (rc) break;
-                if (!recover (interp, sdata, MISSING_ELEMENT_MATCH_END, NULL,
-                              NULL, NULL, 0)) {
-                    return 0;
+                if (recover (interp, sdata, MISSING_ELEMENT_MATCH_END,
+                             NULL, NULL, NULL, 0)) {
+                    break;
                 }
-                break;
+                return 0;
                 
             case SCHEMA_CTYPE_ANY:
             case SCHEMA_CTYPE_NAME:
-                if (recover (interp, sdata, MISSING_ELEMENT_MATCH_END, NULL,
-                             NULL, NULL, 0)) {
+                if (recover (interp, sdata, MISSING_ELEMENT_MATCH_END,
+                             NULL, NULL, NULL, 0)) {
                     break;
                 }
                 return 0;
             }
             ac++;
+        }
+        if (se->interleaveState) {
+            if (!mayskip) return 0;
         }
         if (isName) return 1;
         return -1;
@@ -2366,17 +2390,6 @@ static int checkElementEnd (
         /* Never pushed onto stack */
         Tcl_Panic ("Invalid CTYPE onto the validation stack!");
 
-    case SCHEMA_CTYPE_INTERLEAVE:
-        for (i = 0; i < cp->nc; i++) {
-            if (mustMatch (cp->quants[i], se->interleaveState[i])) {
-                if (recover (interp, sdata, MISSING_ELEMENT_MATCH_END, NULL,
-                             NULL, NULL, 0)) {
-                    break;
-                }
-                return 0;
-            }
-        }
-        return -1;
     }
     /* Not reached */
     return 0;
@@ -3190,9 +3203,10 @@ checkdomKeyConstraints (
     domNode *n;
     domAttrNode *attr;
     int rc, i, j, hnew, len, skip, first;
-    char *errMsg = NULL, *keystr;
+    char *errMsg = NULL, *keystr, *efsv;
     Tcl_HashTable htable;
     Tcl_DString dStr;
+    xpathCBs cbs;
 
     kc = sdata->stack->pattern->domKeys;
     memset (&nodeList, 0, sizeof (xpathResultSet));
@@ -3203,9 +3217,13 @@ checkdomKeyConstraints (
     frs.type = EmptyResult;
     Tcl_DStringInit (&dStr);
     xpathRSReset (&nodeList, node);
+    cbs.funcCB         = tcldom_xpathFuncCallBack;
+    cbs.funcClientData = interp;
+    cbs.varCB          = NULL;
+    cbs.varClientData  = NULL;
     while (kc) {
         xpathRSReset (&rs, NULL);
-        rc = xpathEvalAst (kc->selector, &nodeList, node, &rs, &errMsg);
+        rc = xpathEvalAst (kc->selector, &nodeList, node, &cbs, &rs, &errMsg);
         if (rc) {
             SetResult (errMsg);
             goto errorCleanup;
@@ -3237,7 +3255,8 @@ checkdomKeyConstraints (
             xpathRSReset (&nodeList, n);
             if (kc->nrFields == 1) {
                 xpathRSReset (&frs, NULL);
-                rc = xpathEvalAst (kc->fields[0], &nodeList, n, &frs, &errMsg);
+                rc = xpathEvalAst (kc->fields[0], &nodeList, n, &cbs, &frs,
+                                   &errMsg);
                 if (rc) {
                     SetResult (errMsg);
                     goto errorCleanup;
@@ -3250,10 +3269,14 @@ checkdomKeyConstraints (
                     if (kc->flags & DKC_FLAG_IGNORE_EMPTY_FIELD_SET) {
                         continue;
                     }
-                    Tcl_CreateHashEntry (&htable, "", &hnew);
+                    efsv = "";
+                    if (kc->emptyFieldSetValue) {
+                        efsv = kc->emptyFieldSetValue;
+                    }
+                    Tcl_CreateHashEntry (&htable, efsv, &hnew);
                     if (!hnew) {
                         if (recover (interp, sdata, DOM_KEYCONSTRAINT,
-                                     kc->name, NULL, "", 0)) {
+                                     kc->name, NULL, efsv, 0)) {
                             break;
                         }
                         SetResultV ("DOM_KEYCONSTRAINT");
@@ -3306,8 +3329,8 @@ checkdomKeyConstraints (
                 first = 1;
                 for (j = 0; j < kc->nrFields; j++) {
                     xpathRSReset (&frs, NULL);
-                    rc = xpathEvalAst (kc->fields[j], &nodeList, n, &frs,
-                                       &errMsg);
+                    rc = xpathEvalAst (kc->fields[j], &nodeList, n, &cbs,
+                                       &frs, &errMsg);
                     if (rc) {
                         SetResult (errMsg);
                         goto errorCleanup;
@@ -3321,8 +3344,15 @@ checkdomKeyConstraints (
                         if (kc->flags & DKC_FLAG_IGNORE_EMPTY_FIELD_SET) {
                             continue;
                         }
-                        if (first) first = 0;
-                        else Tcl_DStringAppend (&dStr, ":", 1);
+                        if (kc->emptyFieldSetValue) {
+                            if (first) first = 0;
+                            else Tcl_DStringAppend (&dStr, ":", 1);
+                            Tcl_DStringAppend (&dStr, kc->emptyFieldSetValue,
+                                               kc->efsv_len);
+                        } else {
+                            if (first) first = 0;
+                            else Tcl_DStringAppend (&dStr, ":", 1);
+                        }
                         continue;
                     }
                     if (frs.nr_nodes != 1) {
@@ -3355,7 +3385,8 @@ checkdomKeyConstraints (
                 Tcl_CreateHashEntry (&htable, Tcl_DStringValue (&dStr), &hnew);
                 if (!hnew) {
                     if (recover (interp, sdata, DOM_KEYCONSTRAINT, 
-                                 kc->name,NULL, Tcl_DStringValue (&dStr), 0)) {
+                                 kc->name, NULL, Tcl_DStringValue (&dStr),
+                                 0)) {
                         break;
                     }
                     SetResultV ("DOM_KEYCONSTRAINT");
@@ -3923,7 +3954,7 @@ getNextExpectedWorker (
                     case SCHEMA_CTYPE_INTERLEAVE:
                         Tcl_CreateHashEntry (seenCPs, jc, &hnew);
                         if (hnew) {
-                            se1 = getStackElement (sdata, ic);
+                            se1 = getStackElement (sdata, jc);
                             mayskip = getNextExpectedWorker (
                                 sdata, se1, interp, seenCPs, rObj,
                                 expectedFlags
@@ -5579,7 +5610,7 @@ NamedPatternObjCmd (
     } else {
         /* Local definition of this element */
         if (hnew) {
-            pattern = initSchemaCP (
+            pattern = initSchemaCP(
                 SCHEMA_CTYPE_NAME,
                 sdata->currentNamespace,
                 Tcl_GetHashKey (hashTable, h)
@@ -5947,12 +5978,12 @@ domuniquePatternObjCmd (
     ast t;
     char *errMsg = NULL;
     domKeyConstraint *kc, *kc1;
-    int i, nrFields, flags = 0, nrFlags;
+    int i, nrFields, flags = 0;
     Tcl_Obj *elm;
 
     CHECK_SI
     CHECK_TOPLEVEL
-    checkNrArgs (3, 5, "Expected: <selector> <fieldlist> ?<name>? ?flags?");
+    checkNrArgs (3, 6, "Expected: <selector> <fieldlist> ?<name>? ?\"IGNORE_EMPTY_FIELD_SET\"|(?\"EMPTY_FIELD_SET_VALUE\" <emptyFieldSetValue?)");
     if (sdata->cp->type != SCHEMA_CTYPE_NAME) {
         SetResult ("The domunique schema definition command is only "
                    "allowed as direct child of an element.");
@@ -5966,17 +5997,15 @@ domuniquePatternObjCmd (
         return TCL_ERROR;
     }
     if (objc == 5) {
-        if (Tcl_ListObjLength (interp, objv[4], &nrFlags) != TCL_OK) {
-            SetResult ("The <flags> argument must be a valid tcl list");
+        if (strcmp (Tcl_GetString (objv[4]), "IGNORE_EMPTY_FIELD_SET") != 0) {
+            SetResult3 ("Unknown flag '", Tcl_GetString (objv[4]), "'");
             return TCL_ERROR;
         }
-        for (i = 0; i < nrFlags; i++) {
-            Tcl_ListObjIndex (interp, objv[4], i, &elm);
-            if (strcmp ("IGNORE_EMPTY_FIELD_SET", Tcl_GetString (elm)) == 0) {
-                flags |= DKC_FLAG_IGNORE_EMPTY_FIELD_SET;
-                continue;
-            }
-            SetResult3 ("Unknown flag '", Tcl_GetString (elm), "'");
+        flags |= DKC_FLAG_IGNORE_EMPTY_FIELD_SET;
+    }
+    if (objc == 6) {
+        if (strcmp (Tcl_GetString (objv[4]), "EMPTY_FIELD_SET_VALUE") != 0) {
+            SetResult3 ("Unknown flag '", Tcl_GetString (objv[4]), "'");
             return TCL_ERROR;
         }
     }
@@ -5987,7 +6016,6 @@ domuniquePatternObjCmd (
         FREE (errMsg);
         return TCL_ERROR;
     }
-
     
     kc = TMALLOC (domKeyConstraint);
     memset (kc, 0, sizeof (domKeyConstraint));
@@ -5996,7 +6024,6 @@ domuniquePatternObjCmd (
     kc->nrFields = nrFields;
     kc->selector = t;
     kc->flags = flags;
-    
     for (i = 0; i < nrFields; i++) {
         Tcl_ListObjIndex (interp, objv[2], i, &elm);
         if (xpathParse (Tcl_GetString (elm), NULL, XPATH_EXPR,
@@ -6009,8 +6036,12 @@ domuniquePatternObjCmd (
         }
         kc->fields[i] = t;
     }
-    if (objc == 4) {
+    if (objc >= 4) {
         kc->name = tdomstrdup (Tcl_GetString (objv[3]));
+    }
+    if (objc == 6) {
+        kc->emptyFieldSetValue = tdomstrdup (Tcl_GetString (objv[5]));
+        kc->efsv_len = strlen (kc->emptyFieldSetValue);
     }
     /* Apppend to end so that the constraints are checked in
      * definition order */
@@ -6897,64 +6928,123 @@ isodateImpl (
     char *text
     )
 {
-    int i, y, m, d, h, min, seenNonzero = 0;
+    int i, y, m, d, h, min, s, zh, zm, seenNonzero = 0;
 
-    if (*text == '-') {
-        /* A bce date */
-        text++;
-    }
-    for (i = 0; i < 4; i++) {
-        if (*text < '0' || *text > '9') return 0;
-        if (*text != '0') seenNonzero = 1;
-        text++;
-    }
-    while (*text >= '0' && *text <= '9') text++;
-    if (*text != '-') return 0;
-    /* We only need to know the modulo of the year for 4, 100 and 400,
-     * for this the 4 last letters are enough */
-    y = atoi(text-4);
-    /* There isn't a year 0. it's either 0001 or -0001 */
-    if (!seenNonzero) return 0;
-    text++;
-    for (i = 0; i < 2; i++) {
-        if (*text < '0' || *text > '9') return 0;
-        text++;
-    }
-    if (*text != '-') return 0;
-    m = atoi(text-2);
-    if (m < 1 || m > 12) return 0;
-    text++;
-    for (i = 0; i < 2; i++) {
-        if (*text < '0' || *text > '9') return 0;
-        text++;
-    }
-    d = atoi(text-2);
-    if (d < 1) return 0;
-    switch (m) {
-    case 1:
-    case 3:
-    case 5:
-    case 7:
-    case 8:
-    case 10:
-    case 12:
-        if (d > 31) return 0;
-        break;
-    case 4:
-    case 6:
-    case 9:
-    case 11:
-        if (d > 30) return 0;
-        break;
-    case 2:
-        if (y % 4 == 0 && (y % 100 != 0 || y % 400 == 0)) {
-            if (d > 29) return 0;
-        } else {
-            if (d > 28) return 0;
+    if (constraintData < (void *)2) {
+        if (*text == '-') {
+            /* A bce date */
+            text++;
         }
-        break;
+        i = 1;
+        /* Parse year */
+        while (*text >= '0' && *text <= '9') {
+            if (*text > '0' && !seenNonzero) seenNonzero = i;
+            text++;
+            i++;
+        }
+        /* Premature end */
+        if (i < 5) return 0;
+        if (i > 5) {
+            /* The year has more than 4 digits. Only allowed if in fact
+             * needed (no extra leading zeros). */
+            if (seenNonzero > 1) return 0;
+        }
+        if (*text != '-') return 0;
+        /* We only need to know the modulo of the year for 4, 100 and 400,
+         * for this the 4 last letters are enough */
+        y = atoi(text-4);
+        /* There isn't a year 0. it's either 0001 or -0001 */
+        if (!seenNonzero) return 0;
+        text++;
+        /* Parse month */
+        for (i = 0; i < 2; i++) {
+            if (*text < '0' || *text > '9') return 0;
+            text++;
+        }
+        if (*text != '-') return 0;
+        m = atoi(text-2);
+        if (m < 1 || m > 12) return 0;
+        text++;
+        /* Parse day */
+        for (i = 0; i < 2; i++) {
+            if (*text < '0' || *text > '9') return 0;
+            text++;
+        }
+        d = atoi(text-2);
+        if (d < 1) return 0;
+        switch (m) {
+        case 1:
+        case 3:
+        case 5:
+        case 7:
+        case 8:
+        case 10:
+        case 12:
+            if (d > 31) return 0;
+            break;
+        case 4:
+        case 6:
+        case 9:
+        case 11:
+            if (d > 30) return 0;
+            break;
+        case 2:
+            if (y % 4 == 0 && (y % 100 != 0 || y % 400 == 0)) {
+                if (d > 29) return 0;
+            } else {
+                if (d > 28) return 0;
+            }
+            break;
+        }
+    }
+    /* Date part end */
+    if (constraintData) {
+        if (constraintData == (void *)1) {
+            /* Time part starts */
+            if (*text != 'T') return 0;
+            text++;
+        }
+        /* Parse hour part */
+        if (*text < '0' || *text > '9') return 0;
+        h = (*text - 48) * 10;
+        text++;
+        if (*text < '0' || *text > '9') return 0;
+        h += (*text - 48);
+        if (h > 24) return 0;
+        text++;
+        if (*text != ':') return 0;
+        text++;
+        /* Parse minute part */
+        if (*text < '0' || *text > '9') return 0;
+        min = (*text - 48) * 10;
+        text++;
+        if (*text < '0' || *text > '9') return 0;
+        min += (*text - 48);
+        if (min > 59) return 0;
+        text++;
+        if (*text != ':') return 0;
+        text++;
+        /* Parse seconds part */
+        if (*text < '0' || *text > '9') return 0;
+        s = (*text - 48) * 10;
+        text++;
+        if (*text < '0' || *text > '9') return 0;
+        s += (*text - 48);
+        if (s > 59) return 0;
+        text++;
+        /* Check for optional fraction seconds part */
+        if (*text == '.') {
+            if (h == 24) return 0;
+            text++;
+            /* Dangling decimal point is not allowed */
+            if (*text < '0' || *text > '9') return 0;
+            text++;
+            while (*text >= '0' && *text <= '9') text++;
+        }
+        if (h == 24 && (min > 0 || s > 0)) return 0;
     }
     if (*text == '\0') return 1;
+    /* Parse optional time zone part */
     switch (*text) {
     case 'Z':
         text++;
@@ -6968,19 +7058,19 @@ isodateImpl (
             text++;
         }
         if (*text != ':') return 0;
-        h = atoi(text-2);
-        if (h > 14) return 0;
+        zh = atoi(text-2);
+        if (zh > 14) return 0;
         text++;
         for (i = 0; i < 2; i++) {
             if (*text < '0' || *text > '9') return 0;
             text++;
         }
         if (*text != '\0') return 0;
-        min = atoi(text-2);
-        if (h < 14) {
-            if (min > 59) return 0;
+        zm = atoi(text-2);
+        if (zh < 14) {
+            if (zm > 59) return 0;
         } else {
-            if (min != 0) return 0;
+            if (zm != 0) return 0;
         }
         break;
     default:
@@ -6990,7 +7080,7 @@ isodateImpl (
 }
 
 static int
-isodateTCObjCmd (
+dateTCObjCmd (
     ClientData clientData,
     Tcl_Interp *interp,
     int objc,
@@ -7000,22 +7090,49 @@ isodateTCObjCmd (
     SchemaData *sdata = GETASI;
     SchemaConstraint *sc;
 
-    if (!sdata) {
-        checkNrArgs (2,2,"<text>");
-        Tcl_SetObjResult (interp,
-                          Tcl_NewBooleanObj (
-                              isodateImpl (NULL, NULL,
-                                           Tcl_GetString (objv[1]))));
-        return TCL_OK;
-    }
-    if (!sdata->isTextConstraint) {
-        SetResult ("Command called in invalid schema context");
-        return TCL_ERROR;
-    }
     CHECK_TI
     checkNrArgs (1,1,"No arguments expected");
     ADD_CONSTRAINT (sdata, sc)
     sc->constraint = isodateImpl;
+    sc->constraintData = (void *) 0;
+    return TCL_OK;
+}
+
+static int
+dateTimeTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+
+    CHECK_TI
+    checkNrArgs (1,1,"No arguments expected");
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = isodateImpl;
+    sc->constraintData = (void *) 1;
+    return TCL_OK;
+}
+
+static int
+timeTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+
+    CHECK_TI
+    checkNrArgs (1,1,"No arguments expected");
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = isodateImpl;
+    sc->constraintData = (void *) 2;
     return TCL_OK;
 }
 
@@ -7978,6 +8095,350 @@ setvarTCObjCmd (
     return TCL_OK;
 }
 
+typedef struct
+{
+    SchemaCP *cp;
+    SchemaData *sdata;
+} WhitespaceTCData;
+
+static void
+whitespaceImplFree (
+    void *constraintData
+    )
+{
+    WhitespaceTCData *wsdata = (WhitespaceTCData *) constraintData;
+
+    FREE (wsdata);
+}
+
+static int
+whitespaceImplReplace (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    WhitespaceTCData *wsdata = (WhitespaceTCData *) constraintData;
+    char *p, *c, *alloced;
+    SchemaData *sdata;
+
+    sdata = wsdata->sdata;
+    p = text;
+    c = sdata->wsbuf;
+    alloced = sdata->wsbuf + sdata->wsbufLen;
+    while (*p) {
+        if (*p == '\t' || *p == '\n' || *p == '\r') {
+            *c = ' ';
+        } else {
+            *c = *p;
+        }
+        c++;
+        if (c == alloced) {
+            sdata->wsbuf = REALLOC (sdata->wsbuf, 2 * sdata->wsbufLen);
+            c = sdata->wsbuf + sdata->wsbufLen;
+            sdata->wsbufLen *= 2;
+            alloced = sdata->wsbuf + sdata->wsbufLen;
+        }
+        p++;
+    }
+    *c = '\0';
+    return checkText (interp, wsdata->cp, sdata->wsbuf);
+}
+
+static int
+whitespaceImplCollapse (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    WhitespaceTCData *wsdata = (WhitespaceTCData *) constraintData;
+    char *p, *c, *alloced;
+    SchemaData *sdata;
+
+    sdata = wsdata->sdata;
+    p = text;
+    c = sdata->wsbuf;
+    alloced = sdata->wsbuf + sdata->wsbufLen;
+    while (SPACE(*p)) p++;
+    while (*p) {
+        if (SPACE (*p)) {
+            *c = ' ';
+            c++;
+            if (c == alloced) {
+                sdata->wsbuf = REALLOC (sdata->wsbuf, 2 * sdata->wsbufLen);
+                c = sdata->wsbuf + sdata->wsbufLen;
+                sdata->wsbufLen *= 2;
+                alloced = sdata->wsbuf + sdata->wsbufLen;
+            }
+            p++;
+            while (SPACE (*p)) p++;
+            if (!*p) c--;
+        } else {
+            *c = *p;
+            c++;
+            if (c == alloced) {
+                sdata->wsbuf = REALLOC (sdata->wsbuf, 2 * sdata->wsbufLen);
+                c = sdata->wsbuf + sdata->wsbufLen;
+                sdata->wsbufLen *= 2;
+                alloced = sdata->wsbuf + sdata->wsbufLen;
+            }
+            p++;
+        }
+    }
+    *c = '\0';
+    return checkText (interp, wsdata->cp, wsdata->sdata->wsbuf);
+}
+
+static int
+whitespaceTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaCP *cp;
+    SchemaConstraint *sc;
+    int type;
+    WhitespaceTCData *wsdata;
+
+    static const char *types[] = {
+        "preserve", "replace", "collapse", NULL
+    };
+    enum typeSyms {
+        t_preserve, t_replace, t_collapse
+    };
+        
+    CHECK_TI
+    checkNrArgs (3,3,"(\"preserve\"|\"replace\"|\"collapse\") "
+                 "<text constraint script>");
+    if (Tcl_GetIndexFromObj (interp, objv[1], types, "type", 0, &type)
+        != TCL_OK) {
+        return TCL_ERROR;
+    }
+    cp = initSchemaCP (SCHEMA_CTYPE_CHOICE, NULL, NULL);
+    cp->type = SCHEMA_CTYPE_TEXT;
+    REMEMBER_PATTERN (cp)
+    if (evalConstraints (interp, sdata, cp, objv[2]) != TCL_OK) {
+        return TCL_ERROR;
+    }
+    if (type == t_preserve) {
+        ADD_CONSTRAINT (sdata, sc)
+        sc->constraint = checkText;
+        sc->constraintData = (void *)cp;
+        return TCL_OK;
+    }
+    ADD_CONSTRAINT (sdata, sc)
+    sc->freeData = whitespaceImplFree;
+    if (sdata->wsbufLen == 0) {
+        sdata->wsbuf = (char *) MALLOC (WHITESPACETC_BUFFER_LEN_INIT);
+        sdata->wsbufLen = WHITESPACETC_BUFFER_LEN_INIT;
+    }
+    wsdata = TMALLOC (WhitespaceTCData);
+    wsdata->sdata = sdata;
+    wsdata->cp = cp;
+    sc->constraintData = (void *)wsdata;
+    if (type == t_replace) {
+        sc->constraint = whitespaceImplReplace;
+    } else {
+        sc->constraint = whitespaceImplCollapse;
+    }
+    return TCL_OK;
+}
+
+static int
+notImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    SchemaCP *cp = (SchemaCP *) constraintData;
+    SchemaConstraint *sc;
+    int i;
+
+    /* Look also at checkText and oneOfImpl */
+    for (i = 0; i < cp->nc; i++) {
+        sc = (SchemaConstraint *) cp->content[i];
+        if ((sc->constraint) (interp, sc->constraintData, text)) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+static int
+notTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaCP *cp;
+    SchemaConstraint *sc;
+    int rc;
+
+    CHECK_TI
+    checkNrArgs (2,2,"Expected: <text constraint script>");
+    
+    cp = initSchemaCP (SCHEMA_CTYPE_CHOICE, NULL, NULL);
+    cp->type = SCHEMA_CTYPE_TEXT;
+    REMEMBER_PATTERN (cp)
+    rc = evalConstraints (interp, sdata, cp, objv[1]);
+    if (rc == TCL_OK) {
+        ADD_CONSTRAINT (sdata, sc)
+        sc->constraint = notImpl;
+        sc->constraintData = (void *)cp;
+        return TCL_OK;
+    }
+    return TCL_ERROR;
+}
+
+static int
+durationImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    /* PnYnMnDTnHnMnS */
+    int p, n, seen = 0, seenT = 0;
+    char des[9] = " YMDTHMS";
+    
+    if (*text == '-') {
+        /* Negative duration is allowed */
+        text++;
+    }
+    if (*text != 'P') return 0;
+    text++;
+    p = 0;
+    while (*text) {
+        n = 0;
+        while (*text >= '0' && *text <= '9') {
+            n++;
+            text++;
+        }
+        if (!*text) return 0;
+        if (*text == '.') {
+            if (p < 4 || !n) return 0;
+            text++;
+            if (!*text) return 0;
+            /* Ensure at least one digit after . */
+            if (*text < '0' || *text > '9') return 0;
+            text++;
+            while (*text >= '0' && *text <= '9') text++;
+            if (*text != 'S') return 0;
+            text++;
+            if (*text) return 0;
+            return 1;
+        }
+        for (; p < 8; p++) {
+            if (*text == des[p]) break;
+        }
+        if (p ==  4) {
+            if (n) return 0;
+            seenT = 1;
+            text++;
+            if (!*text) return 0;
+            continue;
+        } else {
+            if (!n) return 0;
+            seen = 1;
+        }
+        if (p > 4 && !seenT) return 0;
+        if (p == 8 || !seen) return 0;
+        text++;
+    }
+    if (!p) return 0;
+    return 1;
+}
+
+static int
+durationTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+
+    CHECK_TI
+    checkNrArgs (1,1,"No arguments expected");
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = durationImpl;
+    return TCL_OK;
+}
+
+static int
+dateObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    checkNrArgs (2,2,"<text>");
+    Tcl_SetObjResult (interp,
+                      Tcl_NewBooleanObj (
+                          isodateImpl (interp, NULL,
+                                       Tcl_GetString (objv[1]))));
+    return TCL_OK;
+}
+
+static int
+dateTimeObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    checkNrArgs (2,2,"<text>");
+    Tcl_SetObjResult (interp,
+                      Tcl_NewBooleanObj (
+                          isodateImpl (interp, (void *) 1,
+                                       Tcl_GetString (objv[1]))));
+    return TCL_OK;
+}
+
+static int
+timeObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    checkNrArgs (2,2,"<text>");
+    Tcl_SetObjResult (interp,
+                      Tcl_NewBooleanObj (
+                          isodateImpl (interp, (void *) 2,
+                                       Tcl_GetString (objv[1]))));
+    return TCL_OK;
+}
+
+static int
+durationObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    checkNrArgs (2,2,"<text>");
+    Tcl_SetObjResult (interp,
+                      Tcl_NewBooleanObj (
+                          durationImpl (interp, NULL,
+                                        Tcl_GetString (objv[1]))));
+    return TCL_OK;
+}
+
 void
 tDOM_SchemaInit (
     Tcl_Interp *interp
@@ -8084,8 +8545,14 @@ tDOM_SchemaInit (
                           numberTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::boolean",
                           booleanTCObjCmd, NULL, NULL);
-    Tcl_CreateObjCommand (interp,"tdom::schema::text::isodate",
-                          isodateTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::date",
+                          dateTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::dateTime",
+                          dateTimeTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::time",
+                          timeTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::duration",
+                          durationTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::maxLength",
                           maxLengthTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::minLength",
@@ -8126,6 +8593,21 @@ tDOM_SchemaInit (
                           unsignedIntTypesTCObjCmd, (ClientData) 3, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::setvar",
                           setvarTCObjCmd, (ClientData) 3, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::whitespace",
+                          whitespaceTCObjCmd, (ClientData) 3, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::not",
+                          notTCObjCmd, (ClientData) 3, NULL);
+
+    /* Exposed text type commands */
+    Tcl_CreateObjCommand (interp,"tdom::type::date",
+                          dateObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::type::dateTime",
+                          dateTimeObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::type::time",
+                          timeObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::type::duration",
+                          durationObjCmd, NULL, NULL);
+
 }
 
 
