@@ -715,6 +715,22 @@ test dom-2.44 {namespaces} {
     $doc delete
 } {}
 
+test dom-2.45 {-dtdvalidation / no dtd} {dtdvalidation} {
+    set result [catch {
+        #dom parse -dtdvalidation <root><e/></root>
+        dom parse -dtdvalidation <root/>
+    } errMsg]
+    set result
+} 1
+
+test dom-2.46 {Unknown empty element} {dtdvalidation} {
+    set result [catch {
+        dom parse -dtdvalidation {<!DOCTYPE root [
+            <!ELEMENT root (a*)>]>
+            <root><b/></root>}} errMsg]
+    set result
+} 1
+
 test dom-3.1 {isName} {
     dom isName ":foo"
 } {1}
