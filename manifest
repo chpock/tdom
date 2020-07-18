@@ -1,5 +1,5 @@
-C Merged\sfrom\sschema.
-D 2020-07-11T14:18:47.720
+C Fixed\smatchElementStart\sin\scase\sof\snon\sinterleave\scp\swith\sonly\soptional\schilds\sin\ssequential\scontent.
+D 2020-07-18T14:14:25.802
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -139,7 +139,7 @@ F generic/domxslt.h 0cb8e327683a0ffeb2a7094add6cd82ec1ae49c7c704f20d8d6f7d6523e7
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c ee14ed666ca6d18977f7301545c52ac71b3ce73c49233ff8f8b3aa4144008d24
 F generic/nodecmd.h d2201b69de9507f86e94750f0b72867ec9150795712ef18c5b5b87f35a689f75
-F generic/schema.c d5148b7dbad675d87321bb211b0874ab752fa3864b88022c6e2a49b54453e8a0
+F generic/schema.c 7f0ff96043498ec3ce8901e5e5b70eddb1d27e535a97e915932c7aa7deb335a8
 F generic/schema.h cf703b991402a7c26ca3226b366c7abd40a86e91df7bf1c5bc6f355dc19d0e51
 F generic/tcldom.c e0d3501b8e768b0c27b151d1ab385082b02fc7ef4dfc563610437eb781b9cbf7
 F generic/tcldom.h b83344768ac6121267471d92def0e88d1cd1d30fd8b995c385c41474d29f3fd7
@@ -233,8 +233,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f63309e59ea11257f953048b669f33cfc405c033525c58d04e6df7b927ebb21d 45a05b0b4f0c5f34df6b601ba4ae158303a4ba6248bd121d40df3b79b3cd9cc9
-R 8dccf15e06f949ea3766f871145dae3f
+P 3416d9f172a294ac5283537631e59e13e480d1cd242df6240236ca790be2c0a3
+R 6ad805f73cba0675485f2ce647fe2f2a
 U rolf
-Z 3020e8e3f0d70ec5e4c4b27394d61bc1
+Z 276899550c1108ecbd127ad9dd383248
 # Remove this line to create a well-formed Fossil manifest.

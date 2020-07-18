@@ -1563,8 +1563,6 @@ matchElementStart (
             thismayskip = 0;
             if (se->interleaveState[i]) {
                 if (maxOne (cp->quants[i])) continue;
-            } else {
-                if (mayskip && minOne (cp->quants[i])) mayskip = 0;
             }
             icp = cp->content[i];
             switch (icp->type) {
