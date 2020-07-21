@@ -1237,7 +1237,7 @@ recover (
         break;
     case MISSING_ELEMENT_MATCH_END:
     case MISSING_TEXT_MATCH_END:
-        if (strcmp (Tcl_GetStringResult (interp), "ignore") != 0) {
+        if (strcmp (Tcl_GetStringResult (interp), "ignore") == 0) {
             sdata->recoverFlags |= RECOVER_FLAG_MATCH_END_CONTINUE;
         } else {
             sdata->recoverFlags |= RECOVER_FLAG_DONT_REPORT;
