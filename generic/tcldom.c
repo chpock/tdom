@@ -161,6 +161,8 @@
 #define SERIALIZE_ESCAPE_ALL_QUOT 32
 #define SERIALIZE_NO_GT_ESCAPE 64
 #define SERIALIZE_NO_EMPTY_ELEMENT_TAG 128
+#define SERIALIZE_INDENT_WITH_TAB 256
+#define SERIALIZE_INDENT_ATTR_WITH_TAB 512
 
 /*----------------------------------------------------------------------------
 |   Module Globals
@@ -242,7 +244,7 @@ static char doc_usage[] =
     "    createTextNode text ?objVar?            \n"
     "    createComment text ?objVar?             \n"
     "    createProcessingInstruction target data ?objVar? \n"
-    "    asXML ?-indent <none,0..8>? ?-channel <channel>? ?-escapeNonASCII? ?-escapeAllQuot? ?-doctypeDeclaration <boolean>?\n"
+    "    asXML ?-indent <none,tabs,0..8>? ?-channel <channel>? ?-escapeNonASCII? ?-escapeAllQuot? ?-doctypeDeclaration <boolean>?\n"
     "    asHTML ?-channel <channelId>? ?-escapeNonASCII? ?-htmlEntities?\n"
     "    asText                                  \n"
     "    asJSON ?-indent <none,0..8>?            \n"
@@ -339,7 +341,7 @@ static char node_usage[] =
     "    getColumn                    \n"
     "    @<attrName> ?defaultValue?   \n"
     "    asList                       \n"
-    "    asXML ?-indent <none,0..8>? ?-channel <channel>? ?-escapeNonASCII? ?-escapeAllQuot? ?-doctypeDeclaration <boolean>?\n"
+    "    asXML ?-indent <none,tabs,0..8>? ?-channel <channel>? ?-escapeNonASCII? ?-escapeAllQuot? ?-doctypeDeclaration <boolean>?\n"
     "    asHTML ?-channel <channelId>? ?-escapeNonASCII? ?-htmlEntities?\n"
     "    asText                       \n"
     "    asJSON ?-indent <none,0..8>? \n"
@@ -2876,8 +2878,14 @@ void tcldom_treeAsXML (
     }
 
     if ((indent != -1) && doIndent) {
-        for(i=0; i<level; i++) {
-            writeChars(xmlString, chan, "        ", indent);
+        if (outputFlags & SERIALIZE_INDENT_WITH_TAB) {
+            for(i=0; i<level; i++) {
+                writeChars(xmlString, chan, "\t", 1);
+            }
+        } else {
+            for(i=0; i<level; i++) {
+                writeChars(xmlString, chan, "        ", indent);
+            }
         }
     }
 
@@ -2912,10 +2920,18 @@ void tcldom_treeAsXML (
         if (indentAttrs > -1) {
             writeChars(xmlString, chan, "\n", 1);
             if ((indent != -1) && doIndent) {
-                for(i=0; i<level; i++) {
-                    writeChars(xmlString, chan, "        ", indent);
+                if (outputFlags & SERIALIZE_INDENT_WITH_TAB) {
+                    for(i=0; i<level; i++) {
+                        writeChars(xmlString, chan, "\t", 1);
+                    }
+                } else {
+                    for(i=0; i<level; i++) {
+                        writeChars(xmlString, chan, "        ", indent);
+                    }
                 }
-                if (indentAttrs) {
+                if (outputFlags & SERIALIZE_INDENT_ATTR_WITH_TAB) {
+                    writeChars(xmlString, chan, "\t", 1);
+                } else {
                     writeChars(xmlString, chan, "        ", indentAttrs);
                 }
             }
@@ -3007,8 +3023,14 @@ void tcldom_treeAsXML (
         }
     } else {
         if ((indent != -1) && hasElements) {
-            for(i=0; i<level; i++) {
-                writeChars(xmlString, chan, "        ", indent);
+            if (outputFlags & SERIALIZE_INDENT_WITH_TAB) {
+                for(i=0; i<level; i++) {
+                    writeChars(xmlString, chan, "\t", 1);
+                }
+            } else {
+                for(i=0; i<level; i++) {
+                    writeChars(xmlString, chan, "        ", indent);
+                }
             }
         }
         writeChars (xmlString, chan, "</", 2);
@@ -3468,7 +3490,7 @@ static int serializeAsXML (
         case m_indent:
             if (objc < 4) {
                 SetResult("-indent must have an argument "
-                          "(0..8 or 'no'/'none')");
+                          "(0..8 or 'no'/'none'/'tabs')");
                 goto cleanup;
             }
             if (strcmp("none", Tcl_GetString(objv[3]))==0) {
@@ -3477,8 +3499,12 @@ static int serializeAsXML (
             else if (strcmp("no", Tcl_GetString(objv[3]))==0) {
                 indent = -1;
             }
+            else if (strcmp("tabs", Tcl_GetString(objv[3]))==0) {
+                outputFlags |= SERIALIZE_INDENT_WITH_TAB;
+            }
             else if (Tcl_GetIntFromObj(interp, objv[3], &indent) != TCL_OK) {
-                SetResult( "indent must be an integer (0..8) or 'no'/'none'");
+                SetResult( "indent must be an integer (0..8) or "
+                           "'no'/'none'/'tabs'");
                 goto cleanup;
             }
             objc -= 2;
@@ -3488,7 +3514,7 @@ static int serializeAsXML (
         case m_indentAttrs:
             if (objc < 4) {
                 SetResult("-indentAttrs must have an argument "
-                          "(0..8 or 'no'/'none')");
+                          "(0..8 or 'no'/'none'/'tabs')");
                 goto cleanup;
             }
             if (strcmp("none", Tcl_GetString(objv[3]))==0) {
@@ -3497,8 +3523,12 @@ static int serializeAsXML (
             else if (strcmp("no", Tcl_GetString(objv[3]))==0) {
                 indentAttrs = -1;
             }
+            else if (strcmp("tabs", Tcl_GetString(objv[3]))==0) {
+                outputFlags |= SERIALIZE_INDENT_ATTR_WITH_TAB;
+            }
             else if (Tcl_GetIntFromObj(interp, objv[3], &indentAttrs) != TCL_OK) {
-                SetResult( "indentAttrs must be an integer (0..8) or 'no'/'none'");
+                SetResult( "indentAttrs must be an integer (0..8) or "
+                           "'no'/'none'/'tabs'");
                 goto cleanup;
             }
             if (indentAttrs > 8) indentAttrs = 8;

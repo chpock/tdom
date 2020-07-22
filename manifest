@@ -1,5 +1,5 @@
-C Minor\sDocumentation\swork.
-D 2020-07-10T00:08:02.691
+C Added\s"tabs"\sas\spossible\svalue\sto\sasXML\s-indent\sand\sdo\sthe\sindentation\swith\stabs,\sif\sgiven.
+D 2020-07-22T00:49:26.544
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -22,7 +22,7 @@ F doc/dom.n 8679dc2b07eca3e154c6bc1031898ccb04cb4fe7dd0bce009724c8c5d7b04d1f
 F doc/dom.xml 263730cb05f740cc31cee77a8493ac207b3f2ed7b04944cb4a98d36c699cc2b1
 F doc/domDoc.html 3455a43a87cedfe4dfef476f86fb2e9ba4bf96add28e9a47535f32f0f0a98ec9
 F doc/domDoc.n 60e61f82beef4dcb9fc64702a339165d24e2f1c137e88d9f3c1c5a3d450819a8
-F doc/domDoc.xml b845b9970097bc10eab6958a46571922eb78d5f51eb8b1c065feb41087e25ba9
+F doc/domDoc.xml 1fd61a302b98118e04f2f2b167f9f5d81cc0f0095f0d20db4b794fb921580f18
 F doc/domNode.html 6332872254ffbc696d2b385938cff866b8f3760518005a7a27aba5dce32bb84f
 F doc/domNode.n 3ab4017d0ab718992510274e503c55dc02d91fb62fec678803ba55eb2c566a45
 F doc/domNode.xml 0e93a883996dd9b3c056857726a18d6e32ab7a2d8712d34dff125428c90fb522
@@ -125,7 +125,7 @@ F generic/domxslt.h 0cb8e327683a0ffeb2a7094add6cd82ec1ae49c7c704f20d8d6f7d6523e7
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c ee14ed666ca6d18977f7301545c52ac71b3ce73c49233ff8f8b3aa4144008d24
 F generic/nodecmd.h d2201b69de9507f86e94750f0b72867ec9150795712ef18c5b5b87f35a689f75
-F generic/tcldom.c b47893b21d10eeb359bec8e253df2a1cbaec9a23c87ac0b7743b334bc733d6f8
+F generic/tcldom.c f9225db846dd94876fdb1d2152786ecd9b6cbdc07b21e6592b733550adb13597
 F generic/tcldom.h afa34c95c821b0f7401853e7bd8c1ff344d8e1640982b7ec250228601dd46e76
 F generic/tclexpat.c 0f4c1220c6c07199a63942616fb31e0eebff421ad85eb66a09b2d1aabbecc20f
 F generic/tclexpat.h 79502484629c99554b998df93e178a69d8484a851ca5739616a37423c2de7d60
@@ -175,7 +175,7 @@ F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.bench 5446ce379127b8d5700f18a5a0848e580313d0d7
 F tests/dom.test 854e2723ac723079021bbc6d60a418e747bd0dac50de4240bd861f25701a4aef
-F tests/domDoc.test b8aee0923b9a4bb4da28fc626791d28713a89b2fb6e562d16c89b7f989693934
+F tests/domDoc.test e15c2b9d66901c65830ee4f92944f2f52d22209c85f359c7dc4128009e0722a8
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test 4c53cbeb4323610f52e4b6d3ff4ca9336fa7b61f9f78d90a2aea391d60d3f5f6
 F tests/domjson.test 78fdbe48b3cd050ad01ad7555409eabf1a6f345cc1c5b3d9839a805e92d1faa5
@@ -216,8 +216,11 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 515c90d02594dd560ff8080ddf502098830606979a0b63bf205a6d1313769b18
-R 27cef89e03a900e9a8a65c63a8519146
+P 57cf34150501e7815b18dfabd47d115247698215f5124d3807cf1cdfb0157bad
+R 69405a42d218d33b042351abe68f7e76
+T *branch * tabs
+T *sym-tabs *
+T -sym-trunk *
 U rolf
-Z 27ae76287f3c6f963a00baeb8e129dbf
+Z fb9bfdcd751ca487e322dd7fd47e2608
 # Remove this line to create a well-formed Fossil manifest.
