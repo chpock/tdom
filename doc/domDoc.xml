@@ -111,11 +111,21 @@ usually a result of a XSLT transformation.</desc>
         </commanddef>
 
       <commanddef>
-        <command><method>asXML</method> <option>?-indent none/1..8?</option> <option>?-channel channelId?</option> <option>?-escapeNonASCII?</option> <option>?-doctypeDeclaration &lt;boolean&gt;?</option> <option>-xmlDeclaration &lt;boolean&gt;?</option> <option>-encString &lt;string&gt;</option> <option>?-escapeAllQuot?</option> <option>?-indentAttrs?</option> <option>?-nogtescape?</option> <option>?-noEmptyElementTag?</option></command>
+        <command><method>asXML</method> <option>?-indent none/tabs/1..8?</option> <option>?-channel channelId?</option> <option>?-escapeNonASCII?</option> <option>?-doctypeDeclaration &lt;boolean&gt;?</option> <option>-xmlDeclaration &lt;boolean&gt;?</option> <option>-encString &lt;string&gt;</option> <option>?-escapeAllQuot?</option> <option>?-indentAttrs?</option> <option>?-nogtescape?</option> <option>?-noEmptyElementTag?</option></command>
         <desc><p>Returns the DOM tree as an (optional indented) XML
         string or sends the output directly to the given
         channelId.</p>
 
+        <p>The -indent option requires "no", "none", "tabs" or a
+        natural number betwenn 0 and 8, both included, as value. With
+        the values "no" or "none" no additional white space outside of
+        markup will be added to the serialization. I. Otherwise, it's
+        a "pretty-print" serialization, due to inserting white space
+        between end and the next start tag according to the nesting
+        level. The level indentation wide is given with the number. If
+        the value is "tabs", then indentation is done with tabs, one
+        tab per level.</p>
+        
         <p>If the option <m>-escapeNonASCII</m> is given,
         every non 7 bit ASCII character in attribute values or element
         PCDATA content will be escaped as character reference in
@@ -543,7 +553,7 @@ bool, number, string, nodes, attrnodes or mixed).</p>
 
           <p>See the documentation of the of the
           <command>domNode</command> command method
-          <method>>selectNodes</method> for a detailed description of
+          <method>selectNodes</method> for a detailed description of
           the arguments.</p>
           </desc>
       </commanddef>
