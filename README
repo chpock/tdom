@@ -57,12 +57,12 @@ DOCUMENTATION
 GETTING THE CODE
 
     The development repository is hosted at http://tdom.org and is
-    mirrored at http://core.tcl.tk/tdom. You are encouraged to use
-    trunk.
+    mirrored at http://core.tcl.tk/tdom. You are invited to use
+    trunk which you get as tarball with
+    http://tdom.org/index.html/tarball/trunk/tdom-trunk.tar.gz or as zip
+    archive with https://tdom.org/index.html/zip/trunk/tdom-trunk.zip
 
-    If you insist on using an older tDOM with lesser features and
-    probably more bugs, you should use the latest release 0.9.1. Get
-    the source code release from
+    The latest release is 0.9.1. Get the source code from
     http://tdom.org/downloads/tdom-0.9.1-src.tgz or
     http://tdom.org/downloads/tdom-0.9.1-src.zip
 
