@@ -1,5 +1,5 @@
-C Minor\sDocumentation\swork.
-D 2020-07-10T00:08:02.691
+C Cherry-pick\sby\shand\sof\s[c4947454bce0].
+D 2020-07-23T00:03:22.538
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -100,7 +100,7 @@ F extensions/tnc/test.tcl 545cdec17e6702cef9f79184fdf1ce0166b8c412
 F extensions/tnc/tests/all.tcl 845c9dab65c294c3570f69cc731d6fef62efbd03
 F extensions/tnc/tests/loadtnc.tcl c9b49c87af627263d40dcfbdd005bfddbc2a6ab5c8636d25618034c724e91c71
 F extensions/tnc/tests/tnc.test 5176eb3e9fb9fd6956f85580c8667127e23bf1b5ec905e68f623f3f2af5365bc
-F extensions/tnc/tnc.c 283471debf5af0be6d37cb06032d0e8b4c448497a94210631ab0288bf1239fff
+F extensions/tnc/tnc.c bdaaf6c42f97a740240a5f0cf38e9a07a3d8778b78aa1e9a15050191ac2bc53d
 F extensions/tnc/win/makefile.vc b512d0f3eb67d83ace6f626d20b6ed8c895e609d
 F extensions/tnc/win/nmakehlp.c 194ae7c24886245c679cb4c9ea7e6daaaebb5fcd
 F extensions/tnc/win/rules-ext.vc e788fcfc1e69b11946e18b8f67e0870b3bd38913
@@ -216,8 +216,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 515c90d02594dd560ff8080ddf502098830606979a0b63bf205a6d1313769b18
-R 27cef89e03a900e9a8a65c63a8519146
+P 57cf34150501e7815b18dfabd47d115247698215f5124d3807cf1cdfb0157bad
+R f8b12bb755361fd526b21f241853e24a
 U rolf
-Z 27ae76287f3c6f963a00baeb8e129dbf
+Z 7f4f86b7bb86b59a998eb2140f2fa697
 # Remove this line to create a well-formed Fossil manifest.
