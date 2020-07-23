@@ -1,10 +1,5 @@
 
-## tDOM - a XML / DOM / XPath / XSLT / HTML / JSON implementation for Tcl
-##(Version 0.9.2)
-
-
-This directory contains a freely distributable thread-safe extension
-to Tcl/Tk called tDOM.
+## tDOM - a XML / DOM / XPath / XSLT / HTML / JSON implementation for Tcl Version 0.9.2
 
 ### tDOM contains:
 
@@ -39,7 +34,9 @@ to Tcl/Tk called tDOM.
 
    *  an even faster simple XML parser for trusted XML input.
 
-   *  A slim Tcl interface to use expat as pull-parser.
+   *  a slim Tcl interface to use expat as pull-parser.
+
+   *  a secure way to share DOM trees by threads
 
    *  additional convenience methods.
 
@@ -116,3 +113,8 @@ tDOM was started by Jochen Loewer (loewerj@hotmail.com) and
 developed by Jochen and Rolf Ade (rolf@pointsman.de) with
 contributions by Zoran Vasiljevic (zv@archiware.com). Since more
 than a dozen years it is maintained and developed by Rolf Ade.
+
+
+### ... ahh, Licensing!!
+
+Sigh. See LICENSE file.
