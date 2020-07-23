@@ -162,6 +162,8 @@
 #define SERIALIZE_ESCAPE_ALL_QUOT 32
 #define SERIALIZE_NO_GT_ESCAPE 64
 #define SERIALIZE_NO_EMPTY_ELEMENT_TAG 128
+#define SERIALIZE_INDENT_WITH_TAB 256
+#define SERIALIZE_INDENT_ATTR_WITH_TAB 512
 
 /*----------------------------------------------------------------------------
 |   Module Globals
@@ -243,7 +245,7 @@ static char doc_usage[] =
     "    createTextNode text ?objVar?            \n"
     "    createComment text ?objVar?             \n"
     "    createProcessingInstruction target data ?objVar? \n"
-    "    asXML ?-indent <none,0..8>? ?-channel <channel>? ?-escapeNonASCII? ?-escapeAllQuot? ?-doctypeDeclaration <boolean>?\n"
+    "    asXML ?-indent <none,tabs,0..8>? ?-channel <channel>? ?-escapeNonASCII? ?-escapeAllQuot? ?-doctypeDeclaration <boolean>?\n"
     "    asHTML ?-channel <channelId>? ?-escapeNonASCII? ?-htmlEntities?\n"
     "    asText                                  \n"
     "    asJSON ?-indent <none,0..8>?            \n"
@@ -340,7 +342,7 @@ static char node_usage[] =
     "    getColumn                    \n"
     "    @<attrName> ?defaultValue?   \n"
     "    asList                       \n"
-    "    asXML ?-indent <none,0..8>? ?-channel <channel>? ?-escapeNonASCII? ?-escapeAllQuot? ?-doctypeDeclaration <boolean>?\n"
+    "    asXML ?-indent <none,tabs,0..8>? ?-channel <channel>? ?-escapeNonASCII? ?-escapeAllQuot? ?-doctypeDeclaration <boolean>?\n"
     "    asHTML ?-channel <channelId>? ?-escapeNonASCII? ?-htmlEntities?\n"
     "    asText                       \n"
     "    asJSON ?-indent <none,0..8>? \n"
@@ -404,8 +406,7 @@ static Tcl_CmdDeleteProc tcldom_docCmdDeleteProc;
 
 static void tcldom_treeAsJSON(Tcl_Obj *jstring, domNode *node,
                               Tcl_Channel channel, int indent,
-                              int level,
-                              int inside);
+                              int outputFlags, int level, int inside);
 
 #ifdef TCL_THREADS
 
@@ -2878,8 +2879,14 @@ void tcldom_treeAsXML (
     }
 
     if ((indent != -1) && doIndent) {
-        for(i=0; i<level; i++) {
-            writeChars(xmlString, chan, "        ", indent);
+        if (outputFlags & SERIALIZE_INDENT_WITH_TAB) {
+            for(i=0; i<level; i++) {
+                writeChars(xmlString, chan, "\t", 1);
+            }
+        } else {
+            for(i=0; i<level; i++) {
+                writeChars(xmlString, chan, "        ", indent);
+            }
         }
     }
 
@@ -2914,10 +2921,18 @@ void tcldom_treeAsXML (
         if (indentAttrs > -1) {
             writeChars(xmlString, chan, "\n", 1);
             if ((indent != -1) && doIndent) {
-                for(i=0; i<level; i++) {
-                    writeChars(xmlString, chan, "        ", indent);
+                if (outputFlags & SERIALIZE_INDENT_WITH_TAB) {
+                    for(i=0; i<level; i++) {
+                        writeChars(xmlString, chan, "\t", 1);
+                    }
+                } else {
+                    for(i=0; i<level; i++) {
+                        writeChars(xmlString, chan, "        ", indent);
+                    }
                 }
-                if (indentAttrs) {
+                if (outputFlags & SERIALIZE_INDENT_ATTR_WITH_TAB) {
+                    writeChars(xmlString, chan, "\t", 1);
+                } else {
                     writeChars(xmlString, chan, "        ", indentAttrs);
                 }
             }
@@ -3009,8 +3024,14 @@ void tcldom_treeAsXML (
         }
     } else {
         if ((indent != -1) && hasElements) {
-            for(i=0; i<level; i++) {
-                writeChars(xmlString, chan, "        ", indent);
+            if (outputFlags & SERIALIZE_INDENT_WITH_TAB) {
+                for(i=0; i<level; i++) {
+                    writeChars(xmlString, chan, "\t", 1);
+                }
+            } else {
+                for(i=0; i<level; i++) {
+                    writeChars(xmlString, chan, "        ", indent);
+                }
             }
         }
         writeChars (xmlString, chan, "</", 2);
@@ -3104,6 +3125,7 @@ void tcldom_childsAsJSON (
     domNode     *node, /* Must be an ELEMENT_NODE */
     Tcl_Channel  channel,
     int          indent,
+    int          outputFlags,
     int          level,
     int          inside
     )
@@ -3177,7 +3199,7 @@ void tcldom_childsAsJSON (
                 /* Exactly one 'relevant' child node, a text node;
                  * serialize it as simple token value. */
                 tcldom_treeAsJSON (jstring, child, channel, indent,
-                                   level, JSON_ARRAY);
+                                   outputFlags, level, JSON_ARRAY);
                 return;
             }
         }
@@ -3195,13 +3217,18 @@ void tcldom_childsAsJSON (
             }
             if (indent > -1) {
                 writeChars(jstring, channel, "\n", 1);
-                if (first) level++;
-                for (i = 0; i < level; i++) {
-                    writeChars(jstring, channel, "        ", indent);
+                if (outputFlags & SERIALIZE_INDENT_WITH_TAB) {
+                    for (i = 0; i < level; i++) {
+                        writeChars(jstring, channel, "\t", 1);
+                    }
+                } else {
+                    for (i = 0; i < level; i++) {
+                        writeChars(jstring, channel, "        ", indent);
+                    }
                 }
             }
             tcldom_treeAsJSON (jstring, child, channel, indent,
-                               level, JSON_ARRAY);
+                               outputFlags, level, JSON_ARRAY);
             child = child->nextSibling;
             while (child
                    && child->nodeType != TEXT_NODE
@@ -3212,8 +3239,14 @@ void tcldom_childsAsJSON (
         if (indent > -1 && first == 0) {
             writeChars(jstring, channel, "\n", 1);
             level--;
-            for (i = 0; i < level; i++) {
-                writeChars(jstring, channel, "        ", indent);
+            if (outputFlags & SERIALIZE_INDENT_WITH_TAB) {
+                for (i = 0; i < level; i++) {
+                    writeChars(jstring, channel, "\t", 1);
+                }
+            } else {
+                for (i = 0; i < level; i++) {
+                    writeChars(jstring, channel, "        ", indent);
+                }
             }
         }
         writeChars(jstring, channel, "]",1);
@@ -3229,13 +3262,18 @@ void tcldom_childsAsJSON (
             }
             if (indent > -1) {
                 writeChars(jstring, channel, "\n", 1);
-                if (first) level++;
-                for (i = 0; i < level; i++) {
-                    writeChars(jstring, channel, "        ", indent);
+                if (outputFlags & SERIALIZE_INDENT_WITH_TAB) {
+                    for (i = 0; i < level; i++) {
+                        writeChars(jstring, channel, "\t", 1);
+                    }
+                } else {
+                    for (i = 0; i < level; i++) {
+                        writeChars(jstring, channel, "        ", indent);
+                    }
                 }
             }
             tcldom_treeAsJSON (jstring, child, channel, indent,
-                               level, JSON_OBJECT);
+                               outputFlags, level, JSON_OBJECT);
             child = child->nextSibling;
             /* Inside of a JSON_OBJECT, only element childs make
              * semantically sense. */
@@ -3246,8 +3284,14 @@ void tcldom_childsAsJSON (
         if (indent > -1 && first == 0) {
             writeChars(jstring, channel, "\n", 1);
             level--;
-            for (i = 0; i < level; i++) {
-                writeChars(jstring, channel, "        ", indent);
+            if (outputFlags & SERIALIZE_INDENT_WITH_TAB) {
+                for (i = 0; i < level; i++) {
+                    writeChars(jstring, channel, "\t", 1);
+                }
+            } else {
+                for (i = 0; i < level; i++) {
+                    writeChars(jstring, channel, "        ", indent);
+                }
             }
         }
         writeChars(jstring, channel, "}",1);
@@ -3268,6 +3312,7 @@ void tcldom_treeAsJSON (
     domNode     *node,  /* Must not be NULL */
     Tcl_Channel  channel,
     int          indent,
+    int          outputFlags,
     int          level,
     int          inside
     )
@@ -3368,19 +3413,22 @@ void tcldom_treeAsJSON (
             tcldom_AppendEscapedJSON (jstring, channel,
                                       node->nodeName, -1);
             writeChars (jstring, channel, ":", 1);
+            if (indent > -1 || outputFlags & SERIALIZE_INDENT_WITH_TAB) {
+                writeChars (jstring, channel, " ", 1);
+            }
             tcldom_childsAsJSON (jstring, node, channel, indent,
-                                 level, inside);
+                                 outputFlags, level, inside);
             break;
         case JSON_ARRAY:
             /* Since we're already inside of an array, the element can
                only be interpreted as a container for a nested JSON
                object or array. */
             tcldom_childsAsJSON (jstring, node, channel, indent,
-                                 level, inside);
+                                 outputFlags, level, inside);
             break;
         case JSON_START:
             tcldom_childsAsJSON (jstring, node, channel, indent,
-                                 level, inside);            
+                                 outputFlags, level, inside);            
             break;
         }
         return;
@@ -3470,7 +3518,7 @@ static int serializeAsXML (
         case m_indent:
             if (objc < 4) {
                 SetResult("-indent must have an argument "
-                          "(0..8 or 'no'/'none')");
+                          "(0..8 or 'no'/'none'/'tabs')");
                 goto cleanup;
             }
             if (strcmp("none", Tcl_GetString(objv[3]))==0) {
@@ -3479,8 +3527,12 @@ static int serializeAsXML (
             else if (strcmp("no", Tcl_GetString(objv[3]))==0) {
                 indent = -1;
             }
+            else if (strcmp("tabs", Tcl_GetString(objv[3]))==0) {
+                outputFlags |= SERIALIZE_INDENT_WITH_TAB;
+            }
             else if (Tcl_GetIntFromObj(interp, objv[3], &indent) != TCL_OK) {
-                SetResult( "indent must be an integer (0..8) or 'no'/'none'");
+                SetResult( "indent must be an integer (0..8) or "
+                           "'no'/'none'/'tabs'");
                 goto cleanup;
             }
             objc -= 2;
@@ -3490,7 +3542,7 @@ static int serializeAsXML (
         case m_indentAttrs:
             if (objc < 4) {
                 SetResult("-indentAttrs must have an argument "
-                          "(0..8 or 'no'/'none')");
+                          "(0..8 or 'no'/'none'/'tabs')");
                 goto cleanup;
             }
             if (strcmp("none", Tcl_GetString(objv[3]))==0) {
@@ -3499,8 +3551,12 @@ static int serializeAsXML (
             else if (strcmp("no", Tcl_GetString(objv[3]))==0) {
                 indentAttrs = -1;
             }
+            else if (strcmp("tabs", Tcl_GetString(objv[3]))==0) {
+                outputFlags |= SERIALIZE_INDENT_ATTR_WITH_TAB;
+            }
             else if (Tcl_GetIntFromObj(interp, objv[3], &indentAttrs) != TCL_OK) {
-                SetResult( "indentAttrs must be an integer (0..8) or 'no'/'none'");
+                SetResult( "indentAttrs must be an integer (0..8) or "
+                           "'no'/'none'/'tabs'");
                 goto cleanup;
             }
             if (indentAttrs > 8) indentAttrs = 8;
@@ -3755,7 +3811,7 @@ static int serializeAsJSON (
 )
 {
     char       *channelId;
-    int         optionIndex, mode, indent = -1;
+    int         optionIndex, mode, outputFlags = 0, indent = -1;
     Tcl_Obj    *resultPtr;
     Tcl_Channel chan = (Tcl_Channel) NULL;
 
@@ -3817,6 +3873,11 @@ static int serializeAsJSON (
             else if (strcmp("no", Tcl_GetString(objv[3]))==0) {
                 indent = -1;
             }
+            else if (strcmp("tabs", Tcl_GetString(objv[3]))==0) {
+                /* User wants indentation */
+                indent = 0;
+                outputFlags |= SERIALIZE_INDENT_WITH_TAB;
+            }
             else if (Tcl_GetIntFromObj(interp, objv[3], &indent) != TCL_OK) {
                 SetResult( "indent must be an integer (0..8) or 'no'/'none'");
                 return TCL_ERROR;
@@ -3831,7 +3892,8 @@ static int serializeAsJSON (
         }
     }
     resultPtr = Tcl_NewStringObj("", 0);
-    tcldom_treeAsJSON(resultPtr, node, chan, indent, 0, JSON_START);
+    tcldom_treeAsJSON(resultPtr, node, chan, indent, outputFlags, 0,
+                      JSON_START);
     Tcl_AppendResult(interp, Tcl_GetString(resultPtr), NULL);
     Tcl_DecrRefCount(resultPtr);
     return TCL_OK;

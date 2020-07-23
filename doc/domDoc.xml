@@ -111,11 +111,21 @@ usually a result of a XSLT transformation.</desc>
         </commanddef>
 
       <commanddef>
-        <command><method>asXML</method> <option>?-indent none/1..8?</option> <option>?-channel channelId?</option> <option>?-escapeNonASCII?</option> <option>?-doctypeDeclaration &lt;boolean&gt;?</option> <option>-xmlDeclaration &lt;boolean&gt;?</option> <option>-encString &lt;string&gt;</option> <option>?-escapeAllQuot?</option> <option>?-indentAttrs?</option> <option>?-nogtescape?</option> <option>?-noEmptyElementTag?</option></command>
+        <command><method>asXML</method> <option>?-indent none/tabs/1..8?</option> <option>?-channel channelId?</option> <option>?-escapeNonASCII?</option> <option>?-doctypeDeclaration &lt;boolean&gt;?</option> <option>-xmlDeclaration &lt;boolean&gt;?</option> <option>-encString &lt;string&gt;</option> <option>?-escapeAllQuot?</option> <option>?-indentAttrs?</option> <option>?-nogtescape?</option> <option>?-noEmptyElementTag?</option></command>
         <desc><p>Returns the DOM tree as an (optional indented) XML
         string or sends the output directly to the given
         channelId.</p>
 
+        <p>The -indent option requires "no", "none", "tabs" or a
+        natural number betwenn 0 and 8, both included, as value. With
+        the values "no" or "none" no additional white space outside of
+        markup will be added to the serialization. I. Otherwise, it's
+        a "pretty-print" serialization, due to inserting white space
+        between end and the next start tag according to the nesting
+        level. The level indentation wide is given with the number. If
+        the value is "tabs", then indentation is done with tabs, one
+        tab per level.</p>
+        
         <p>If the option <m>-escapeNonASCII</m> is given,
         every non 7 bit ASCII character in attribute values or element
         PCDATA content will be escaped as character reference in
@@ -541,60 +551,10 @@ of attribute name / value pairs. If <m>typeVar</m> is given
 the result type name is stored into that variable (empty,
 bool, number, string, nodes, attrnodes or mixed).</p>
 
-<p>The argument <m>xpathQuery</m> has to be a valid XPath
-expression. However, there is one exception to that rule. Tcl variable
-names can appear in the XPath statement at any position where it is
-legal according to the rules of the XPath syntax to put an XPath
-variable. The value of the variable is substituted for the variable
-name. Ignoring the syntax rules of XPath the Tcl variable name may be
-any legal Tcl var name: local variables, global variables, array
-entries and so on.  The value will always be seen as string literal by
-the xpath engine. Cast the value explicitly with the according xpath
-functions (number(), boolean()) to another data type, if needed.</p>
-
-<p>The option <m>-namespaces</m> expects a tcl list with prefix /
-namespace pairs as argument. If this option is not given, then any
-namespace prefix within the xpath expression will be first resolved
-against the list of prefix / namespace pairs set with the
-selectNodesNamespaces method for the document the node belongs to. If
-this fails, then the namespace definitions in scope of the context
-node will be used to resolve the prefix. If this option is given, any
-namespace prefix within the xpath expression will be first resolved
-against that given list (and ignoring the document global prefix /
-namespace list). If the list binds the same prefix to different
-namespaces, then the first binding will win.  If this fails, then the
-namespace definitions in scope of the context node will be used to
-resolve the prefix, as usual.</p>
-
-<p>If the <m>-cache</m> option is used with a true value, then the
-<m>xpathQuery</m> will be looked up in a document specific cache. If
-the query is found, then the stored pre-compiled query will be used.
-If the query isn't found, it will be compiled and stored in the cache,
-for use in further calls. Please notice, that the <m>xpathQuery</m> as
-given as string is used as key for the cache. This means that equal
-XPath expressions, which differ only in white space, are treated as
-different cache entries. Special care is needed if the XPath
-expression includes namespace prefixes or references to tcl variables.
-Both namespace prefixes and tcl variable references will be resolved
-according to the XML prefix namespace mappings and tcl variable values
-at expression compilation time. If the same XPath expression is used
-later on in a context with other XML prefix namespace mappings or
-values of the used tcl variables, make sure to first remove the
-compiled expression from the cache with the help of the
-<method>deleteXPathCache</method> method, to force a recompilation.
-Without using the <m>-cache</m> option such consideration is never
-needed.</p>
-
-<p>Examples:</p>
-          <example>set paragraphNodes [$node selectNodes {chapter[3]//para[@type='warning' or @type='error'} ]
-foreach paragraph $paragraphNodes {
-    lappend  values [$paragraph selectNodes attribute::type]
-}
-
-set doc [dom parse {&lt;doc xmlns="http://www.defaultnamespace.org"&gt;&lt;child/&gt;&lt;/doc&gt;}]
-set root [$doc documentElement]
-set childNodes [$root selectNodes -namespaces {default http://www.defaultnamespace.org} default:child]</example>
-
+          <p>See the documentation of the of the
+          <command>domNode</command> command method
+          <method>selectNodes</method> for a detailed description of
+          the arguments.</p>
           </desc>
       </commanddef>
 
