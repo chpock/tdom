@@ -403,8 +403,8 @@ static void SetActiveSchemaData (SchemaData *v)
 
 #define updateStack(sdata,se,ac)                        \
     if (!(sdata->recoverFlags & RECOVER_FLAG_REWIND)) { \
-        se->activeChild = ac;                 \
-        se->hasMatched = 1;                   \
+        se->activeChild = ac;                           \
+        se->hasMatched = 1;                             \
     }                                                   \
 
 
@@ -980,7 +980,6 @@ pushToStack (
     )
 {
     SchemaValidationStack *se, *nextse;
-
     DBG(fprintf(stderr, "push to Stack:\n");serializeCP(pattern));
     if (pattern->type == SCHEMA_CTYPE_NAME && sdata->lastMatchse) {
         se = sdata->lastMatchse;
@@ -2210,6 +2209,21 @@ int probeEventAttribute (
     return TCL_OK;
 }
 
+/* Returns either -1, 0, 1, 2
+
+   -1 means a pattern or an interleave ended may end, look further at
+   parents next sibling.
+
+   0 means rewind with validation error.
+
+   1 means element content may end here.
+
+   2 means recovering requested further error reporting about missing childs
+   in the current element. To be able to to answer a [info expected] on
+   the occasion of the next error, we update the stack in this case
+   and let probeElementEnd restart checkElementEnd again with this
+   stack state.
+*/
 static int checkElementEnd (
     Tcl_Interp *interp,
     SchemaData *sdata
@@ -2241,10 +2255,8 @@ static int checkElementEnd (
         while (ac < cp->nc) {
             DBG(fprintf (stderr, "ac %d hm %d mayMiss: %d\n",
                          ac, hm, mayMiss (cp->quants[ac])));
-            if (se->interleaveState) {
-                if (se->interleaveState[ac]) {
-                    ac++; continue;
-                }
+            if (se->interleaveState && se->interleaveState[ac]) {
+                ac++; continue;
             }
             if (mayMiss (cp->quants[ac])) {
                 ac++; continue;
@@ -2321,7 +2333,7 @@ static int checkElementEnd (
                         /* fall throu */
                     case SCHEMA_CTYPE_INTERLEAVE:
                         pushToStack (sdata, ic);
-                        if (checkElementEnd (interp, sdata)) {
+                        if (checkElementEnd (interp, sdata) == -1) {
                             thismayskip = 1;
                         }
                         popStack (sdata);
@@ -2341,6 +2353,10 @@ static int checkElementEnd (
                               NULL, NULL, 0)) {
                     return 0;
                 }
+                if (sdata->recoverFlags & RECOVER_FLAG_MATCH_END_CONTINUE) {
+                    updateStack (sdata, se, ac);
+                    return 2;
+                }
                 break;
                 
             case SCHEMA_CTYPE_VIRTUAL:
@@ -2355,18 +2371,38 @@ static int checkElementEnd (
             case SCHEMA_CTYPE_INTERLEAVE:
                 pushToStack (sdata, cp->content[ac]);
                 rc = checkElementEnd (interp, sdata);
-                popStack (sdata);
-                if (rc) break;
-                if (recover (interp, sdata, MISSING_ELEMENT_MATCH_END,
-                             NULL, NULL, NULL, 0)) {
-                    break;
+                if (rc == 0) {
+                    popStack (sdata);
+                    if (sdata->stack->pattern->type == SCHEMA_CTYPE_NAME
+                        || sdata->stack->activeChild
+                        || sdata->stack->hasMatched) {
+                        if (recover (interp, sdata, MISSING_ELEMENT_MATCH_END,
+                                     NULL, NULL, NULL, 0)) {
+                            if (sdata->recoverFlags &
+                                RECOVER_FLAG_MATCH_END_CONTINUE) {
+                                updateStack (sdata, se, ac);
+                                return 2;
+                            }
+                            break;
+                        }
+                    }
+                    return 0;
                 }
-                return 0;
+                if (rc == 2) {
+                    updateStack (sdata, se, ac);
+                    return 2;
+                }
+                popStack (sdata);
+                break;
                 
             case SCHEMA_CTYPE_ANY:
             case SCHEMA_CTYPE_NAME:
                 if (recover (interp, sdata, MISSING_ELEMENT_MATCH_END,
                              NULL, NULL, NULL, 0)) {
+                    if (sdata->recoverFlags & RECOVER_FLAG_MATCH_END_CONTINUE) {
+                        updateStack (sdata, se, ac);
+                        return 2;
+                    }
                     break;
                 }
                 return 0;
@@ -2488,28 +2524,35 @@ probeElementEnd (
         return TCL_ERROR;
     }
 
-    rc = checkElementEnd (interp, sdata);
-    while (rc == -1) {
-        popStack (sdata);
+    while (1) {
         rc = checkElementEnd (interp, sdata);
-    }
-    sdata->recoverFlags &= ~RECOVER_FLAG_DONT_REPORT;
-    if (rc) {
-        popStack (sdata);
-        if (sdata->stack == NULL) {
-            /* End of the first pattern (the tree root) without error. */
-            /* Check for unknown ID references */
-            if (!checkDocKeys (interp, sdata)) {
-                return TCL_ERROR;
-            }
-            /*  We have successfully finished validation */
-            sdata->validationState = VALIDATION_FINISHED;
+        while (rc == -1) {
+            popStack (sdata);
+            rc = checkElementEnd (interp, sdata);
         }
-        DBG(
-            fprintf(stderr, "probeElementEnd: _CAN_ end here.\n");
-            serializeStack (sdata);
-            );
-        return TCL_OK;
+        sdata->recoverFlags &= ~RECOVER_FLAG_DONT_REPORT;
+        if (rc == 2) {
+            sdata->recoverFlags &= ~RECOVER_FLAG_MATCH_END_CONTINUE;
+            continue;
+        }
+        if (rc == 1) {
+            popStack (sdata);
+            if (sdata->stack == NULL) {
+                /* End of the first pattern (the tree root) without error. */
+                /* Check for unknown ID references */
+                if (!checkDocKeys (interp, sdata)) {
+                    return TCL_ERROR;
+                }
+                /*  We have successfully finished validation */
+                sdata->validationState = VALIDATION_FINISHED;
+            }
+            DBG(
+                fprintf(stderr, "probeElementEnd: _CAN_ end here.\n");
+                serializeStack (sdata);
+                );
+            return TCL_OK;
+        }
+        break;
     }
     SetResultV ("Missing mandatory content");
     sdata->validationState = VALIDATION_ERROR;
