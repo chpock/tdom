@@ -26,7 +26,7 @@
     <m>expat</m> commands to enable validation additional to what they
     otherwise do.</p>
 
-    <p>The valid methods of the created commands are:</p>
+    <p>The methods of the created commands are:</p>
 
     <commandlist>
       <commanddef>
@@ -206,7 +206,7 @@
         valid and the optional <m>objVar</m> argument is given, then
         the variable with that name is set to the empty string. </desc>
       </commanddef>
-      
+
       <commanddef>
         <command><method>reportcmd</method> <m>?cmdName?</m></command>
         <desc>This method expects the name of a tcl command to be
@@ -233,6 +233,8 @@
             <dt>UNKOWN_GLOBAL_ID</dt><dd></dd>
             <dt>UNKOWN_ID</dt><dd></dd>
         </dl>
+        <p> For more detailed information see section <ref
+        refid="recovering">Recovering</ref>.</p>
         </desc>
       </commanddef>
 
@@ -1194,8 +1196,41 @@ s define {
   <section id="recovering">
       <title>Recovering</title>
 
-      <p>
-      </p>
+      <p>By default the validation engine stops at the first detected
+      validation violation and reports that finding. It does so by
+      result false (and set, if given, the result variable with an
+      error message) in case the schema command itself is used to
+      validate input. If the schema command is used by a SAX parser or
+      the DOM parser it does so by throwing error.</p>
+
+      <p>If a <m>reportcmd</m> is set this command is called on global
+      level appended with the schema command and an error type as
+      arguments if a validation violation is detected. Then the
+      validation recovers from the error and continues. For some
+      validation errors the reocver strategy can be determined with
+      the script result of the reportcmd.</p>
+
+      <p>With a <m>reportcmd</m> (which doesen&amp;t throw error if
+      called) the validation engine will never report validation
+      failure to its caller. The validation engine recovers, continues
+      and report the next error, if one happen and so until the end of
+      the input. The schema command will return true and the SAX
+      parser and DOM builder will process normally until the end of
+      the input, as if there would not have been validation.</p>
+
+      <p>Please note, that this happens only for validation errors. It
+      isn't possible to recover from well-formedness errors. If the
+      input isn't well-formed the schema command returns false and
+      set, if given, the result variable with an error message about
+      the well-formedness error.</p>
+
+      <p>If the <m>reportcmd</m> throws error while called by the
+      validation engine then validation stops and the schema command
+      thows error with the error message of the script.</p>
+
+      
+
+      
   </section>
 
   <section>

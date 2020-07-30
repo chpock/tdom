@@ -3895,6 +3895,29 @@ test schema-13.2 {XML namespaces} {
     set result
 } {0 0 0 0 1}
 
+test schema-13.3 {Not namespaced elements inside namespaced ones} {
+    tdom::schema s
+    s define {
+        defelement doc ns1 {
+            namespace "" {
+                element e
+            }
+        }
+        defelement e {text {fixed "here"}}
+    }
+    set result ""
+    foreach xml {
+        {<doc xmlns="ns1"><e xmlns="">here</e></doc>}
+        {<a:doc xmlns:a="ns1"><e xmlns="">here</e></a:doc>}
+        {<a:doc xmlns:a="ns1"><e>here</e></a:doc>}
+        {<doc xmlns="ns1"><e>here</e></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 1 1 0}
+
 test schema-14.1 {text: integer} {
     tdom::schema s
     s defelement doc {
@@ -6633,7 +6656,7 @@ test schema-16.17 {interleave with all child cp optional} {
     set result
 } {0 1 1 1 1 1 1 1 0 1}
 
-test schema-16.18 {interleave with all child cp optional} {
+test schema-16.18 {interleave with all content cp optional} {
     tdom::schema s
     s defelement doc {
         interleave {
@@ -8127,6 +8150,82 @@ test schema-17.25 {info definedPatterns} {
     set result
 } {{thatPattern someNamespace} thisPattern}
 
+proc schema-17.26 {scmd errorInfo} {
+    global fromReportCmd
+    if {$errorInfo eq "MISSING_ELEMENT" && [$scmd info vaction] eq "MATCH_ELEMENT_END"} {
+        lappend fromReportCmd "END_EVENT [$scmd info vaction name]" "expecting [lsort [$scmd info expected]]"
+        return "ignore"
+    } else {
+        lappend fromReportCmd "[$scmd info vaction] expecting [$scmd info expected]"
+    }
+}
+
+test schema-17.26 {return "ignore" from recover handler for element end event} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element a
+            ref bpat
+            element d
+        }
+        defpattern bpat {
+            element b
+            ref c
+        }
+        defpattern c {
+            element c +
+        }
+    }
+    s reportcmd schema-17.26
+    set result ""
+    set xmlnr 0
+    foreach xml {
+        <doc/>
+        <doc><a/></doc>
+        <doc><a/><b/></doc>
+        <doc><a/><b/><d/></doc>
+        <doc><a/><b/><c/><d/></doc>
+        <doc><a/><b/><c/><c/><c/><d/></doc>
+    } {
+        set ::fromReportCmd ""
+        lappend result $xmlnr: [s validate $xml errMsg]
+        lappend result {*}$fromReportCmd
+        incr xmlnr
+    }
+    s delete
+    set result
+} {0: 1 {END_EVENT doc} {expecting a} {END_EVENT doc} {expecting b} {END_EVENT doc} {expecting d} 1: 1 {END_EVENT doc} {expecting b} {END_EVENT doc} {expecting d} 2: 1 {END_EVENT doc} {expecting c} {END_EVENT doc} {expecting d} 3: 1 {MATCH_ELEMENT_START expecting c} 4: 1 5: 1}
+
+test schema-17.27 {return "ignore" from recover handler for element end event} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element a
+            element b
+            element c
+            element d
+        }
+    }
+    s reportcmd schema-17.26
+    set result ""
+    set xmlnr 0
+    foreach xml {
+        <doc/>
+        <doc><a/></doc>
+        <doc><a/><b/></doc>
+        <doc><a/><b/><d/></doc>
+        <doc><a/><b/><c/><d/></doc>
+        <doc><a/><b/><c/><c/><c/><d/></doc>
+    } {
+        set ::fromReportCmd ""
+        lappend result $xmlnr: [s validate $xml errMsg]
+        lappend result {*}$fromReportCmd
+        incr xmlnr
+    }
+    s delete
+    set result
+} {0: 1 {END_EVENT doc} {expecting a} {END_EVENT doc} {expecting b} {END_EVENT doc} {expecting c} {END_EVENT doc} {expecting d} 1: 1 {END_EVENT doc} {expecting b} {END_EVENT doc} {expecting c} {END_EVENT doc} {expecting d} 2: 1 {END_EVENT doc} {expecting c} {END_EVENT doc} {expecting d} 3: 1 {MATCH_ELEMENT_START expecting c} 4: 1 5: 1 {MATCH_ELEMENT_START expecting d}}
+
 proc schema-18 {args} {
     lappend ::result {*}$args
 }
@@ -8719,7 +8818,23 @@ test schema-18.21 {reportcmd argument handling} {
     s delete
     set result
 } {{} {} dummycallback {} dummycallback}
-    
+
+proc schema-18.22 {that scmd errorType} {
+    lappend ::result $that $errorType
+}  
+test schema-18.22 {reportcmd with arguments} {
+    tdom::schema s 
+    s reportcmd "schema-18.22 this"
+    s defelement doc {
+        element a
+        element b
+    }
+    set result ""
+    lappend result [s validate {<doc><a/></doc>}]
+    s delete
+    set result
+} {this MISSING_ELEMENT 1}
+
 proc validatedSAX {g xml {keepEmpties 1}} {
     set args [list -validateCmd $g]
     if {!$keepEmpties} {
