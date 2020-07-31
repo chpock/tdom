@@ -2401,6 +2401,30 @@ test schema-7.21 {group with only optional content} {
     set result
 } {0 0 1 1 1 1 1 1 1 0}
 
+test schema-7.22 {Constraint text content in seq} {
+    tdom::schema s
+    s defelement doc {
+        element a
+        text {
+            minLength 4
+        }
+        element b
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/>1234<b/></doc>
+        <doc><a/>123<b/></doc>
+        <doc><a/>12345<b/></doc>
+        {<doc><a/>    <b/></doc>}
+        {<doc>  <a/>    <b/></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 0 1 1 1}
+        
 test schema-8.1 {validate method} {
     tdom::schema create grammar
     grammar defelement doc {
@@ -8225,6 +8249,37 @@ test schema-17.27 {return "ignore" from recover handler for element end event} {
     s delete
     set result
 } {0: 1 {END_EVENT doc} {expecting a} {END_EVENT doc} {expecting b} {END_EVENT doc} {expecting c} {END_EVENT doc} {expecting d} 1: 1 {END_EVENT doc} {expecting b} {END_EVENT doc} {expecting c} {END_EVENT doc} {expecting d} 2: 1 {END_EVENT doc} {expecting c} {END_EVENT doc} {expecting d} 3: 1 {MATCH_ELEMENT_START expecting c} 4: 1 5: 1 {MATCH_ELEMENT_START expecting d}}
+
+proc schema-17.28 {userarg scmd errType} {
+    append ::result $userarg $scmd $errType
+}
+
+test schema-17.28 {reportcmd with additional args} {
+    tdom::schema s
+    s defelement doc {
+        element a
+    }
+    s reportcmd "schema-17.28 foo"
+    set result ""
+    s validate <doc><wrong/></doc
+    s delete
+    set result
+} foosMISSING_ELEMENT
+
+proc schema-17.29 {args} {
+    error "triggered"
+}
+
+test schema-17.29 {error in reportcmd} {
+    tdom::schema s
+    s defelement doc {
+        element a
+    }
+    s reportcmd schema-17.29
+    set result [catch {s validate <doc><wrong/></doc} errMsg]
+    s delete
+    append result $errMsg
+} {1error "triggered" at line 1 character 13}
 
 proc schema-18 {args} {
     lappend ::result {*}$args

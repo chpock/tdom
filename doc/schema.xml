@@ -208,12 +208,12 @@
       </commanddef>
 
       <commanddef>
-        <command><method>reportcmd</method> <m>?cmdName?</m></command>
+        <command><method>reportcmd</method> <m>?cmd?</m></command>
         <desc>This method expects the name of a tcl command to be
         called in case of validation error. This command will be
-        called with two arguments: the schema command, that is rasing
-        the validation error, and a validation error code. For more
-        detailed information see <ref
+        called with two arguments appended: the schema command, that
+        is rasing the validation error, and a validation error code.
+        For more detailed information see <ref
         refid="recovering">Recovering</ref>.The possible error codes
         are:
         <dl>
@@ -388,7 +388,7 @@
                       <dt>MATCH_ELEMENT_START</dt><dd>Element start event, which includs looking for missing or unknown attributes.</dd>
                       <dt>MATCH_ELEMENT_END</dt><dd>Element end event.</dd>
                       <dt>MATCH_TEXT</dt><dd>Validating text between tags.</dd>
-                      <dt>MATCH_ATTRIBUTE_TEXT</dt><dd>Attribute text value contraint check</dd>
+                      <dt>MATCH_ATTRIBUTE_TEXT</dt><dd>Attribute text value constraint check</dd>
                       <dt>MATCH_GLOBAL</dt><dd>Checking global IDs</dd>
                       <dt>MATCH_DOM_KEYCONSTRAINT</dt><dd>Checking domunique constaint</dd>
                       <dt>MATCH_DOM_XPATH_BOOLEAN</dt><dd>Checking domxpathboolean constaint</dd>
@@ -1197,8 +1197,8 @@ s define {
       <title>Recovering</title>
 
       <p>By default the validation engine stops at the first detected
-      validation violation and reports that finding. It does so by
-      result false (and set, if given, the result variable with an
+      validation violation and report that finding. It does so by
+      return false (and set, if given, the result variable with an
       error message) in case the schema command itself is used to
       validate input. If the schema command is used by a SAX parser or
       the DOM parser it does so by throwing error.</p>
