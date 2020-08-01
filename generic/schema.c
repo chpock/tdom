@@ -8417,6 +8417,56 @@ durationTCObjCmd (
 }
 
 static int
+lengthImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    unsigned int length = PTR2UINT(constraintData);
+    int len = 0, clen;
+    while (*text != '\0') {
+        clen = UTF8_CHAR_LEN (*text);
+        if (!clen) {
+            SetResult ("Invalid UTF-8 character");
+            return 0;
+        }
+        len++;
+        if (len > length) return 0;
+        text += clen;
+    }
+    if (len == length) return 1;
+    return 0;
+}
+
+static int
+lengthTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+    int len;
+
+    CHECK_TI
+    checkNrArgs (2,2,"Expected: <length as integer>");
+    if (Tcl_GetIntFromObj (interp, objv[1], &len) != TCL_OK) {
+        SetResult ("Expected: <length as integer>");
+        return TCL_ERROR;
+    }
+    if (len < 0) {
+        SetResult ("The length must be at least 0");
+    }
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = lengthImpl;
+    sc->constraintData = UINT2PTR(len);
+    return TCL_OK;
+}
+
+static int
 dateObjCmd (
     ClientData clientData,
     Tcl_Interp *interp,
@@ -8638,6 +8688,8 @@ tDOM_SchemaInit (
                           whitespaceTCObjCmd, (ClientData) 3, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::not",
                           notTCObjCmd, (ClientData) 3, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::length",
+                          lengthTCObjCmd, (ClientData) 3, NULL);
 
     /* Exposed text type commands */
     Tcl_CreateObjCommand (interp,"tdom::type::date",

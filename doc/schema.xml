@@ -1064,6 +1064,12 @@ s define {
             regular expression given as argument. <url>https://www.tcl.tk/man/tcl8.6/TclCmd/re_syntax.htm</url> describes the regular expression syntax</desc>
         </commanddef>
         <commanddef>
+            <command><cmd>length</cmd> <m>length</m></command>
+            <desc>This text constraint match if the length of the text
+            value (in characters, not bytes) is <m>length</m>. The
+            length argument must be a positive integer or zero.</desc>
+        </commanddef>
+        <commanddef>
             <command><cmd>maxLength</cmd> <m>length</m></command>
             <desc>This text constraint match if the length of the text
             value (in characters, not bytes) is at most <m>length</m>. The

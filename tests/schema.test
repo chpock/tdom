@@ -6029,6 +6029,55 @@ test schema-14.55 {text constraint time} {
     set result
 } {0 0 0 0 1 1 1 1 1 1 1 0 0 0 0 0 0 1 0 0 0 1 1 0 1 0 0}
 
+test schema-14.56 {length} {
+    tdom::schema s
+    s defelement doc {
+        element e ! {
+            text {length 2}
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc><e/></doc>
+        <doc><e></e></doc>
+        {<doc><e>1</e></doc>}
+        {<doc><e>12</e></doc>}
+        {<doc><e>  </e></doc>}
+        {<doc><e>123</e></doc>}
+        {<doc><e>1&#x1234;</e></doc>}
+    } {
+        lappend result [s validate $xml]
+        set rc [catch {dom parse -validateCmd s $xml doc}]
+        if {$rc == 0} {
+            $doc delete
+        }
+        lappend result $rc
+    }
+    s delete
+    set result
+} {0 1 0 1 0 1 1 0 1 0 0 1 1 0}
+
+test schema-14.57 {length} {
+    tdom::schema s
+    s defelement doc {
+        element e ! {
+            text {length 0}
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc><e/></doc>
+        <doc><e></e></doc>
+        {<doc><e>1</e></doc>}
+        {<doc><e>12</e></doc>}
+        {<doc><e>  </e></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 1 0 0 0}
+
 test schema-15.1 {constraint cmd tcl} {
     tdom::schema s
     s define {
