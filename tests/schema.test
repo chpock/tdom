@@ -6865,6 +6865,31 @@ test schema-16.21 {interleave with all child cp optional} {
     set result
 } {1 1 1 1 1 1 1 0 1 1 0 1 0 1 0}
 
+test schema-16.22 {interleave} {
+    tdom::schema s
+    s defelement doc {
+        interleave {
+            element a 
+            element b *
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/></doc>
+        <doc><b/></doc>
+        <doc><a/><b/><b/><b/></doc>
+        <doc><b/><a/><b/><b/></doc>
+        <doc><b/><b/><a/><b/></doc>
+        <doc><b/><b/><b/><a/></doc>
+        <doc><a/><c/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 0 1 1 1 1 0}
+
 test schema-17.1 {info} {
     tdom::schema s
     s define {
