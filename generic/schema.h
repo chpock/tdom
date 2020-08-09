@@ -249,7 +249,8 @@ int
 probeText (
     Tcl_Interp *interp,
     SchemaData *sdata,
-    char *text
+    char *text,
+    int *only_whites
     );
 
 void

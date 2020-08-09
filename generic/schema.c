@@ -36,7 +36,7 @@
 #include <unistd.h>
 #endif
 
-/* #define DEBUG */
+#define DEBUG
 /* #define DDEBUG */
 /*----------------------------------------------------------------------------
 |   Debug Macros
@@ -2825,10 +2825,11 @@ int
 probeText (
     Tcl_Interp *interp,
     SchemaData *sdata,
-    char *text
+    char *text,
+    int *only_whites
     )
 {
-    int only_whites;
+    int myonly_whites;
     char *pc;
 
     DBG(fprintf (stderr, "probeText started, text: '%s'\n", text);)
@@ -2850,20 +2851,15 @@ probeText (
             return TCL_OK;
         }
     } else {
-        only_whites = 1;
-        pc = text;
-        while (*pc) {
-            if ( (*pc == ' ')  ||
-                 (*pc == '\n') ||
-                 (*pc == '\r') ||
-                 (*pc == '\t') ) {
-                pc++;
-                continue;
-            }
-            only_whites = 0;
-            break;
+        if (only_whites) {
+            myonly_whites = *only_whites;
+        } else {
+            myonly_whites = 1;
+            pc = text;
+            while (SPACE (*pc)) pc++;
+            if (*pc) myonly_whites = 0;
         }
-        if (only_whites)  return TCL_OK;
+        if (myonly_whites)  return TCL_OK;
         if (matchText (interp, sdata, text)) {
             CHECK_REWIND;
             return TCL_OK;
@@ -2892,7 +2888,7 @@ startElement(
     sdata = vdata->sdata;
     if (!sdata->skipDeep && sdata->stack && Tcl_DStringLength (vdata->cdata)) {
         if (probeText (vdata->interp, sdata,
-                       Tcl_DStringValue (vdata->cdata)) != TCL_OK) {
+                       Tcl_DStringValue (vdata->cdata), NULL) != TCL_OK) {
             sdata->validationState = VALIDATION_ERROR;
             XML_StopParser (vdata->parser, 0);
             Tcl_DStringSetLength (vdata->cdata, 0);
@@ -2954,7 +2950,7 @@ endElement (
     }
     if (!sdata->skipDeep && sdata->stack && Tcl_DStringLength (vdata->cdata)) {
         if (probeText (vdata->interp, sdata,
-                       Tcl_DStringValue (vdata->cdata)) != TCL_OK) {
+                       Tcl_DStringValue (vdata->cdata), NULL) != TCL_OK) {
             sdata->validationState = VALIDATION_ERROR;
             XML_StopParser (vdata->parser, 0);
             Tcl_DStringSetLength (vdata->cdata, 0);
@@ -3525,7 +3521,7 @@ validateDOM (
         case ELEMENT_NODE:
             if (Tcl_DStringLength (sdata->cdata)) {
                 if (probeText (interp, sdata,
-                               Tcl_DStringValue (sdata->cdata)) != TCL_OK)
+                               Tcl_DStringValue (sdata->cdata), NULL) != TCL_OK)
                     return TCL_ERROR;
                 Tcl_DStringSetLength (sdata->cdata, 0);
             }
@@ -3540,7 +3536,7 @@ validateDOM (
                                    ((domTextNode *) node)->nodeValue,
                                    ((domTextNode *) node)->valueLength);
                 if (probeText (interp, sdata,
-                               Tcl_DStringValue (sdata->cdata)) != TCL_OK) {
+                               Tcl_DStringValue (sdata->cdata), NULL) != TCL_OK) {
                     Tcl_DStringSetLength (sdata->cdata, 0);
                     return TCL_ERROR;
                 }
@@ -3564,7 +3560,7 @@ validateDOM (
         node = node->nextSibling;
     }
     if (Tcl_DStringLength (sdata->cdata)) {
-        if (probeText (interp, sdata, Tcl_DStringValue (sdata->cdata))
+        if (probeText (interp, sdata, Tcl_DStringValue (sdata->cdata), NULL)
             != TCL_OK) return TCL_ERROR;
         Tcl_DStringSetLength (sdata->cdata, 0);
     }
@@ -4925,7 +4921,7 @@ schemaInstanceCmd (
                 Tcl_WrongNumArgs (interp, 3, objv, "<text>");
                 return TCL_ERROR;
             }
-            result = probeText (interp, sdata, Tcl_GetString (objv[3]));
+            result = probeText (interp, sdata, Tcl_GetString (objv[3]), NULL);
             break;
         }
         break;

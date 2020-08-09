@@ -1,5 +1,5 @@
-C Added\stest.
-D 2020-08-02T23:37:18.257
+C Save\swork.
+D 2020-08-09T20:27:21.169
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -121,7 +121,7 @@ F extensions/tnc/win/rules-ext.vc e788fcfc1e69b11946e18b8f67e0870b3bd38913
 F extensions/tnc/win/rules.vc 8157e2a811cf5e93683d6b0fbf5d91d153aa4535
 F extensions/tnc/win/targets.vc 79dea1c6a94a94e6ed8bae9e0195149b25a69923
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
-F generic/dom.c eae4fc47773440b891f85a5296fcaf61bb5af71c6fc0a59d62acbd5947ff88e9
+F generic/dom.c 32c5c9b3e7891a23b34c9f6deea7778de9a679a2766638ae170f2195d00f3510
 F generic/dom.h 59bcfd5a74b0fb4a56a20280d771e3326f78970670073a5612d010e69977e8f1
 F generic/domalloc.c 09885df64d53ed8e6e6b683142ae30722fa65bb8d60b0a7a0fda6d93ad4c95ec
 F generic/domalloc.h 4775b6d763f94ee36121997852c293fa5a3d3747fd2d565f13f3095e0c5c77bf
@@ -139,11 +139,11 @@ F generic/domxslt.h 0cb8e327683a0ffeb2a7094add6cd82ec1ae49c7c704f20d8d6f7d6523e7
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c ee14ed666ca6d18977f7301545c52ac71b3ce73c49233ff8f8b3aa4144008d24
 F generic/nodecmd.h d2201b69de9507f86e94750f0b72867ec9150795712ef18c5b5b87f35a689f75
-F generic/schema.c 4d7c2786b47b2d1bcfdb88061e10853d7b921eb6fc8db3f51cbe9bff3d969c29
-F generic/schema.h cf703b991402a7c26ca3226b366c7abd40a86e91df7bf1c5bc6f355dc19d0e51
+F generic/schema.c c065c8e997ef6e9b47713cdcf203026497442593ca7a0cc2ae40064034385086
+F generic/schema.h 2956e679292a1d395f8e4a3504f4cb42d65ac12707273d9b950b25a1a7228ed4
 F generic/tcldom.c 0a88935f488ed74232fbf771b7b97a219457e5bb8b0e279646312869af5c4d0e
 F generic/tcldom.h b83344768ac6121267471d92def0e88d1cd1d30fd8b995c385c41474d29f3fd7
-F generic/tclexpat.c 34b9d52c71babb81f7ea2665307dca7de07fcb1c3affc3d7dcb10ee07f608f27
+F generic/tclexpat.c 6eee1e6b467170faed423d5d8ae65c14e971d904a07bb3eec61420a786962e88
 F generic/tclexpat.h 17696c275b5ac909733886bbf72490d2f4d84be7ab2f0c8bf9a7545df2283bda
 F generic/tclpull.c 9a1d16cd22c1601ba120d86a0ed739c9bade96a8dfea237678db54e64f7de93f
 F generic/tclpull.h 8e1aac98bdad497c669c901494939eecd6c2f57ea51c4f5d4dac502db48527d4
@@ -208,7 +208,7 @@ F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
 F tests/pullparser.test e4b14ea0bdc9f9fd931f3bc559e78c309582a67a238170d58e0f20331f99890c
 F tests/pushpull.bench 664e8f512917537d96c4b71933d4d9a6da65fc6fe85bd7c459483830dc7d2faf
-F tests/schema.test 891232599fdce02581abb3823ad9a1dced61ac495f34eb4b492638baddff602f
+F tests/schema.test 432fb75304ff38830ee6fb0433614fb5359793741eb20250434e5ef209ed42de
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
 F tests/tdomcmd.bench b07448ed4de08ccaa9734cf3fe15c695fd7066c993da58ff48d465747940e417
 F tests/tdomcmd.test 092401adf0609906d710f3ef8997cb4ca29bc208
@@ -233,8 +233,11 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P cc382337fc4e00fbf13e1c426e28831fe2fad29dfc9b7fb16daa1165bd4ae490
-R 2711175bcba8fff7cf896dc7e9aee688
+P fc793568d209ebd31d702e15d8c6358c75c6de8311afa6b13ca948094b7953aa
+R 345048ec1bce91aa53a7c0a7e9d3eb2a
+T *branch * wsrelevance
+T *sym-wsrelevance *
+T -sym-schema *
 U rolf
-Z b3c984c984953d06ea65c52f448e9b08
+Z b3a65fb8a344c3fdc0009fb9c3d965af
 # Remove this line to create a well-formed Fossil manifest.
