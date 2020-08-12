@@ -5925,6 +5925,10 @@ TextPatternObjCmd  (
         pattern = initSchemaCP (SCHEMA_CTYPE_CHOICE, NULL, NULL);
         pattern->type = SCHEMA_CTYPE_TEXT;
     } else {
+        if (strcmp("type", Tcl_GetString (objv[1])) != 0) {
+            SetResult ("Expected: ?<definition script>? | type <name>");
+            return TCL_ERROR;
+        }
         h = Tcl_FindHashEntry (&sdata->textDef, Tcl_GetString (objv[2]));
         if (!h) {
             SetResult3 ("Unknown text type \"", Tcl_GetString (objv[2]), "\"");
