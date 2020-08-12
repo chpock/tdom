@@ -4570,7 +4570,7 @@ test schema-14.18 {deftexttype} {
         maxLength 4
     }
     s defelement doc {
-         element e ! {text type len2-4}
+         element e ! {text typs len2-4}
     }
     set result [list]
     foreach xml {
@@ -6077,6 +6077,19 @@ test schema-14.57 {length} {
     s delete
     set result
 } {1 1 0 0 0}
+
+test schema-14.58 {text constraint command syntax} {
+    tdom::schema s
+    s deftexttype len2-4 {
+        minLength 2
+        maxLength 4
+    }
+    set result [catch {s defelement doc {
+        element e ! {text typs len2-4}
+    }}]
+    s delete
+    set result
+} 1
 
 test schema-15.1 {constraint cmd tcl} {
     tdom::schema s
