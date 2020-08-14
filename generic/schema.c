@@ -36,7 +36,7 @@
 #include <unistd.h>
 #endif
 
-#define DEBUG
+/* #define DEBUG */
 /* #define DDEBUG */
 /*----------------------------------------------------------------------------
 |   Debug Macros
@@ -436,6 +436,8 @@ initSchemaCP (
     pattern->type = type;
     switch (type) {
     case SCHEMA_CTYPE_NAME:
+        pattern->flags |= CONSTRAINT_TEXT_CHILD;
+        /* Fall thru. */
     case SCHEMA_CTYPE_PATTERN:
         pattern->namespace = (char *)namespace;
         pattern->name = name;
@@ -858,6 +860,12 @@ addToContent (
     SchemaCP *savedCP = NULL;
     unsigned int savedContenSize;
 
+    if (sdata->cp->type == SCHEMA_CTYPE_NAME
+        && sdata->cp->flags & CONSTRAINT_TEXT_CHILD
+        && (pattern->type != SCHEMA_CTYPE_TEXT
+            || pattern->nc == 0)) {
+        sdata->cp->flags &= ~CONSTRAINT_TEXT_CHILD;
+    }
     if (sdata->cp->type == SCHEMA_CTYPE_CHOICE
         || sdata->cp->type == SCHEMA_CTYPE_INTERLEAVE) {
         if (pattern->type == SCHEMA_CTYPE_CHOICE) {
@@ -2846,6 +2854,9 @@ probeText (
     }
 
     if (sdata->stack->pattern->flags & CONSTRAINT_TEXT_CHILD) {
+        if (!*text && sdata->stack->pattern->nc == 0) {
+            return TCL_OK;
+        }
         if (matchText (interp, sdata, text)) {
             CHECK_REWIND;
             return TCL_OK;
@@ -3670,9 +3681,6 @@ evalConstraints (
     sdata->isTextConstraint = savedIsTextConstraint;
     sdata->cp = savedCP;
     sdata->contentSize = savedContenSize;
-    if (sdata->cp && !sdata->isAttributeConstaint && cp->nc) {
-        sdata->cp->flags |= CONSTRAINT_TEXT_CHILD;
-    }
     return result;
 }
 
@@ -5521,28 +5529,25 @@ evalDefinition (
     sdata->currentAttrs = savedCurrentAttrs;
     sdata->attrSize = savedAttrSize;
 
-    if (result == TCL_OK) {
-        REMEMBER_PATTERN (pattern);
-        if (pattern->numAttr) {
-            attributeLookupPreparation (sdata, pattern);
-        }
+    if (result != TCL_OK) {
+        freeSchemaCP (pattern);
+        return result;
+    }
+
+    REMEMBER_PATTERN (pattern);
+    if (pattern->numAttr) {
+        attributeLookupPreparation (sdata, pattern);
+    }
+    if (pattern->type == SCHEMA_CTYPE_CHOICE) {
         onlyName = 1;
         for (i = 0; i < pattern->nc; i++) {
-            if (onlyName
-                && pattern->content[i]->type != SCHEMA_CTYPE_NAME
+            if (pattern->content[i]->type != SCHEMA_CTYPE_NAME
                 && pattern->content[i]->type != SCHEMA_CTYPE_TEXT) {
                 onlyName = 0;
-            }
-            if (pattern->content[i]->type == SCHEMA_CTYPE_PATTERN) {
-                if (pattern->content[i]->flags & CONSTRAINT_TEXT_CHILD) {
-                    pattern->flags |= CONSTRAINT_TEXT_CHILD;
-                    break;
-                }
+                break;
             }
         }
-        if (pattern->type == SCHEMA_CTYPE_CHOICE
-            && onlyName
-            && pattern->nc > sdata->choiceHashThreshold) {
+        if (onlyName && pattern->nc > sdata->choiceHashThreshold) {
             t =  TMALLOC (Tcl_HashTable);
             Tcl_InitHashTable (t, TCL_ONE_WORD_KEYS);
             hnew = 1;
@@ -5566,11 +5571,9 @@ evalDefinition (
                 FREE (t);
             }
         }
-        addToContent (sdata, pattern, quant, n, m);
-    } else {
-        freeSchemaCP (pattern);
     }
-    return result;
+    addToContent (sdata, pattern, quant, n, m);
+    return TCL_OK;
 }
 
 /* Implements the schema definition commands "element", "elementtype"
@@ -5914,6 +5917,7 @@ TextPatternObjCmd  (
     SchemaQuant quant = SCHEMA_CQUANT_OPT;
     SchemaCP *pattern;
     Tcl_HashEntry *h;
+    int result = TCL_OK;
 
     CHECK_SI
     CHECK_TOPLEVEL
@@ -5936,16 +5940,19 @@ TextPatternObjCmd  (
         }
         quant = SCHEMA_CQUANT_ONE;
         pattern = (SchemaCP *) Tcl_GetHashValue (h);
-        sdata->cp->flags |= CONSTRAINT_TEXT_CHILD;
     }
-    if (objc < 3) {
-        REMEMBER_PATTERN (pattern)
-    }
-    addToContent (sdata, pattern, quant, 0, 0);
     if (objc == 2) {
-        return evalConstraints (interp, sdata, pattern, objv[1]);
+        result = evalConstraints (interp, sdata, pattern, objv[1]);
     }
-    return TCL_OK;
+    if (result == TCL_OK) {
+        if (objc < 3) {
+            REMEMBER_PATTERN (pattern)
+        }
+        addToContent (sdata, pattern, quant, 0, 0);
+    } else {
+        freeSchemaCP (pattern);
+    }
+    return result;
 }
 
 static int
