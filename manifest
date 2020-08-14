@@ -1,5 +1,5 @@
-C Clarified\sand\sfixed\swhite\sspace\sonly\stext\shandling\sbetween\stags.
-D 2020-08-14T22:22:22.230
+C Documentation\sproof\sreading\swork.
+D 2020-08-14T22:50:20.280
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -39,9 +39,9 @@ F doc/manpage.css 3b4ec1d641048933a7e6bffc659de9519030a959
 F doc/pullparser.html 164e7e037e2d00308f67ca0708f6b193cbb0db11748c8533c58ddcd9d2f177fb
 F doc/pullparser.n 5f5672e8bb2dd221602040cd212234da6b6ed8c99c5daa60be9fa0c476529c09
 F doc/pullparser.xml 6032c1e8c8d001068c227601dba9860824f8acc709c87fd8e36ac4a596b6a2f2
-F doc/schema.html 5810bd2a9f00f500a4243e59daa308e08ce16827d492a5c3e761ca72b45dc002
-F doc/schema.n f66f94a000aba5027994525f3b3e4f0383e17fd1fe6e7f059e0a498130291895
-F doc/schema.xml 92dce5962a71fd4b0aae7360ac384a492c9ed6054337cfd0b92046df75506563
+F doc/schema.html e0b2ff13d504d73cee36dacdaf481989e24af3c517e60b2cf48a561e471af6f7
+F doc/schema.n 54dcfc3406a5d6903dc6ea178c065a969adcae835255e05f06a8d0bb43638c1d
+F doc/schema.xml 37739a1600de201addc55ae59c9aaded1db2b8c2ab71067cca3e98904d0596b3
 F doc/tDOM.xml 04db7d0ccfea39aae21f4fe07b8f05d5bff8a84193cfce2aa5faa2f42c076377
 F doc/tdomcmd.html 3f96630823dbeff586dd3fb7e5cc6214a40f0219e2ba37e6986353cbcfc7d665
 F doc/tdomcmd.n c06a5ff035f16a2a52636b69d9ebe6ba84ff5101922ed27b551146c4d61d6cda
@@ -233,9 +233,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P cb52548fdcd61d45ca776d9f61d2b9fb3e34239efb24129ddd5276c5c813274a 3e242dbc289841ec547b29d261aa824dcb371816fe67a0c0bf508cf2f1480cc6
-R aab3161fe37f0d8a921c3000bd4cf885
-T +closed 3e242dbc289841ec547b29d261aa824dcb371816fe67a0c0bf508cf2f1480cc6
+P 317939234e5f81bb7ae874ed67c74b63e52e71a238ca79ec2bf9fb1d35c0c082
+R 11e77570187ac8c622a6ab0abcb6d181
 U rolf
-Z 522b79451f7bd8727160ff70b034065b
+Z cbf694f322130df879ed2602369909d8
 # Remove this line to create a well-formed Fossil manifest.

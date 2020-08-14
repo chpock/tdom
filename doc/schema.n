@@ -329,7 +329,7 @@ the variable with that name is set to the empty string.
 \&\fRThis method expects the name of a tcl command to be
 called in case of validation error. This command will be
 called with two arguments appended: the schema command, that
-is rasing the validation error, and a validation error code.
+raises the validation error, and a validation error code.
 For more detailed information see Recovering.The possible error codes
 are:
 .RS
@@ -389,7 +389,7 @@ The validation command is in the
 process of validating input.
 .TP
 FINISHED
-The validation has finished, no futher
+The validation has finished, no further
 events are expected.
 .RE
 .IP "\fBvstate\fR"
@@ -413,7 +413,7 @@ empty string is returned in this cases.
 .IP "\fBdomNode\fR"
 If the schema command isn't currently
 post-validating a DOM tree this method returns the
-emtpy string. Otherwise, if the schema command waits
+empty string. Otherwise, if the schema command waits
 for the reportcmd script to finish while recovering
 from a validation error it returns the node on which
 the validation engine is currently looking at in
@@ -427,24 +427,24 @@ pattern are referenced that aren't defined so far
 (summed together).
 .IP "\fBdefinedElements\fR"
 Returns in no particular order the defined
-elements in the grammer as list. If an element is
+elements in the grammar as list. If an element is
 namespaced its list entry will be itself a list with
 two elements, with the name as first and the
 namespace as second element.
 .IP "\fBdefinedElementtypes\fR"
 Returns in no particular order the defined
-element types in the grammer as list. If an element
+element types in the grammar as list. If an element
 type is namespaced its list entry will be itself a
 list with two elements, with the name as first and
 the namespace as second element.
 .IP "\fBdefinedPatterns\fR"
 Returns in no particular order the defined
-named pattern in the grammer as list. If a named
+named pattern in the grammar as list. If a named
 pattern is namespaced its list entry will be itself
 a list with two elements, with the name as first and
 the namespace as second element.
 .IP "\fBexpected\fR"
-Returns in no particular order all posible
+Returns in no particular order all possible
 next events (since the last successful event match,
 if there was one) as a list. If an element is
 namespaced its list entry will be itself a list with
@@ -507,10 +507,10 @@ MATCH_GLOBAL
 Checking global IDs
 .TP
 MATCH_DOM_KEYCONSTRAINT
-Checking domunique constaint
+Checking domunique constraint
 .TP
 MATCH_DOM_XPATH_BOOLEAN
-Checking domxpathboolean constaint
+Checking domxpathboolean constant
 .PP
 If called with one of the possible optional
 arguments the command returns detail information
@@ -558,11 +558,11 @@ most stack content particle or the empty string it there isn't.
 .TP
 \&\fB\fBreset\fP
 \&\fRThis method resets the validation command into state
-READY (while preserving the defined grammer).
+READY (while preserving the defined grammar).
 .SH "Schema definition scripts"
 .PP
 Schema definition scripts are ordinary Tcl scripts that are
-evaluatend in the namespace tdom::schema. The below listed schema
+evaluated in the namespace tdom::schema. The below listed schema
 definition commands in this tcl namespace allow to define a wide
 variety of document structures. Every schema definition command
 establish a validation constraint on the content which has to
@@ -591,7 +591,7 @@ defined until validation then only an empty element with name
 matches.
 .TP
 \&\fB\fBelementtype\fP \fIname\fB \fI?quant?\fB
-\&\fRThis command refers to the element definined with
+\&\fRThis command refers to the element defined with
 \&\fIdefelementtype\fR with the type name \fIname\fR in the
 current context namespace. Forward references to a so far not
 defined element types or recursive references are allowed. If
@@ -612,7 +612,7 @@ particle, defined by the \fIdefinition script>\fR, that have
 to match in this sequence order.
 .TP
 \&\fB\fBchoice\fP \fI?quant?\fB \fI<definition script>\fB
-\&\fRThis schema contraint match if one of the top level
+\&\fRThis schema constraint match if one of the top level
 content particle defined by the \fIdefinition script>\fR
 match. If one of this top level content particle is optional
 this constraint matches the "empty match".
@@ -650,13 +650,13 @@ you'll have to spell out always all two arguments.
 namespace) to the enclosing element. The first definition of
 \&\fIname\fR inside an element definition wins; later
 definitions of the same name are silently ignored. After the
-\&\fIname\fR argument there may be one of the quantifieres ? or
+\&\fIname\fR argument there may be one of the quantifiers ? or
 !. If there is, this will be used. Otherwise the attribute
-will be required (must be present in the xml source). If there
+will be required (must be present in the XML source). If there
 is one argument more this argument is evaluated as constraint
 script, defining the value constrains of the attribute.
 Otherwise, if there are two more arguments and the first of
-them is the bareword "type" then the following is used as a
+them is the bare-word "type" then the following is used as a
 text type name. This command is only allowed at top level in
 the definition script of an defelement/element script.
 .TP
@@ -665,12 +665,12 @@ the definition script of an defelement/element script.
 \&\fIattribute\fR, just for the attribute \fIname\fR in the
 namespace \fInamespace\fR.
 .TP
-\&\fB\fBnamespace\fP \fIuri\fB \fI<definition script>\fB
+\&\fB\fBnamespace\fP \fIURI\fB \fI<definition script>\fB
 \&\fREvaluates the \fIdefinition script\fR with context
-namespace \fIuri\fR. Every element, element type or ref
-command name will be looked up in the namespace \fIuri\fR and
+namespace \fIURI\fR. Every element, element type or ref
+command name will be looked up in the namespace \fIURI\fR and
 local defined element will be in that namespace. The empty
-string as \fIuri\fR means no namespace.
+string as \fIURI\fR means no namespace.
 .TP
 \&\fB\fBtcl\fP \fItclcmd\fB \fI?arg arg ...?\fB
 \&\fREvaluates the Tcl script \fItclcmd arg arg ... \fR. This
@@ -698,7 +698,7 @@ constraint resembles the xsd key/keyref mechanism. The
 \&\fIselector\fR argument may be any valid XPath expression
 (without the xsd limits). Several \fIdomunique\fR command
 within one element definition are allowed. They are checked in
-definition order. The argument name is avaliable in the
+definition order. The argument name is available in the
 recovering script per \fIinfo vaction name\fR. If the
 \&\fIfieldlist\fR doesn't select something for a node of the
 result set of the \fIselector\fR then the key value will be
@@ -743,48 +743,48 @@ s define {
 .TP
 \&\fB\fBprefixns\fP \fI?prefixUriList?\fB
 \&\fRThis defines a prefix to namespace URI mapping exactly
-as a \fIschemacmd prefixns\fR call. This is meant as toplevel
+as a \fIschemacmd prefixns\fR call. This is meant as top-level
 command of a \fIschemacmd define\fR script. This command is
 not allowed nested in an other definition script command and
 will raise error, if you call it there.
 .TP
 \&\fB\fBdefelement\fP \fIname\fB \fI?namespace?\fB \fI<definition script>\fB
 \&\fRThis defines an element exactly as a \fIschemacmd
-defelement\fR call. This is meant as toplevel command of a
+defelement\fR call. This is meant as top-level command of a
 \&\fIschemacmd define\fR script. This command is not allowed
 nested in an other definition script command and will raise
 error, if you call it there.
 .TP
 \&\fB\fBdefelementtype\fP \fIname\fB \fI?namespace?\fB \fI<definition script>\fB
 \&\fRThis defines an elementtype exactly as a \fIschemacmd
-defelementtype\fR call. This is meant as toplevel command of a
+defelementtype\fR call. This is meant as top-level command of a
 \&\fIschemacmd define\fR script. This command is not allowed
 nested in an other definition script command and will raise
 error, if you call it there.
 .TP
 \&\fB\fBdefpattern\fP \fIname\fB \fI?namespace?\fB \fI<definition script>\fB
 \&\fRThis defines a named pattern exactly as a \fIschemacmd
-defpattern\fR call. This is meant as toplevel command of a
+defpattern\fR call. This is meant as top-level command of a
 \&\fIschemacmd define\fR script. This command is not allowed
 nested in an other definition script command and will raise
 error, if you call it there.
 .TP
 \&\fB\fBdeftexttype\fP \fIname\fB \fI<constraint script>\fB
 \&\fRThis defines a named bundle of text constraints exactly
-as a \fIschemacmd deftexttype\fR call. This is meant as toplevel
+as a \fIschemacmd deftexttype\fR call. This is meant as top-level
 command of a \fIschemacmd define\fR script. This command is
 not allowed nested in an other definition script command and
 will raise error, if you call it there.
 .TP
 \&\fB\fBstart\fP \fIname\fB \fI?namespace?\fB
 \&\fRThis command works exactly as a \fIschemacmd start\fR
-call. This is meant as toplevel command of a \fIschemacmd
+call. This is meant as top-level command of a \fIschemacmd
 define\fR script. This command is not allowed nested in an
 other definition script command and will raise error, if you
 call it there.
 .SH "Quantity specifier"
 .PP
-Serveral schema definition commands expects a quantifier as
+Several schema definition commands expects a quantifier as
 one of their arguments, which specifies how often the content
 particle specified by the command is expected. The valid values
 for a \fIquant\fR argument are:
@@ -814,7 +814,7 @@ If an optional quantifier is not given then it defaults to * in
 case of the \fImixed\fR command and to ! for all other commands.
 .SH "Text constraint scripts"
 .PP
-Text - parsed character data, as XML calles it - must sometimes
+Text - parsed character data, as XML calls it - must sometimes
 be of a certain kind, must comply to some rules etc to be valid.
 The text constraint script arguments to the text, attribute,
 nsattribute and deftexttype commands are evaluated in the Tcl
@@ -895,7 +895,7 @@ XML nmtokens production
 \&\fB\fBinteger\fP \fI?(xsd|tcl)?\fB
 \&\fRThis text constraint match if the text value could be
 parsed as an integer. If the optional argument to the command
-is \fItcl\fR everthing that returns TCL_OK if feeded into
+is \fItcl\fR everything that returns TCL_OK if feeded into
 Tcl_GetInt() matches. If the optional argument to the command
 is \fIxsd\fR then the constraint match if the value is a
 valid xsd:integer. Without argument \fIxsd\fR is the
@@ -924,7 +924,7 @@ constraint that the value must be > zero.
 \&\fB\fBnumber\fP \fI?(xsd|tcl)?\fB
 \&\fRThis text constraint match if the text value could be
 parsed as a number. If the optional argument to the command is
-\&\fItcl\fR everthing that returns TCL_OK if feeded into
+\&\fItcl\fR everything that returns TCL_OK if feeded into
 Tcl_GetDouble() matches. If the optional argument to the command
 is \fIxsd\fR then the constraint match if the value is a
 valid xsd:decimal. Without argument \fIxsd\fR is the
@@ -933,7 +933,7 @@ default.
 \&\fB\fBboolean\fP \fI?(xsd|tcl)?\fB
 \&\fRThis text constraint match if the text value could be
 parsed as a boolean. If the optional argument to the command is
-\&\fItcl\fR everthing that returns TCL_OK if feeded into
+\&\fItcl\fR everything that returns TCL_OK if feeded into
 Tcl_GetBoolean() matches. If the optional argument to the command
 is \fIxsd\fR then the constraint match if the value is a
 valid xsd:boolean. Without argument \fIxsd\fR is the
@@ -944,9 +944,9 @@ default.
 a xsd:date. This is basically like an ISO 8601 date of
 the form YYYY-MM-DD, with optional time zone part
 (either the letter Z or plus (+) or minus (-) followed
-by hh:mm and with maximum allowed positiv or negativ
+by hh:mm and with maximum allowed positive or negative
 time zone 14:00). It follows the date rules of the
-gregorian calendar for all dates. A preceding minus
+Gregorian calendar for all dates. A preceding minus
 sign for bce dates is allowed. There is no year 0. The
 year may have more than 4 digits, but only if needed
 (no extra leading zeros). This is available as common
@@ -960,8 +960,8 @@ time zone part follow the rules of the \fIdate\fR
 command; see there. All three parts of the time value
 (hours, minutes, seconds) must be spelled out with 2
 digits. Additional fractional seconds (with a point
-('.') as separater) are allowed, but not just a
-dangling point. The time value 24:00:00 (whitout
+('.') as separator) are allowed, but not just a
+dangling point. The time value 24:00:00 (without
 fractional part) is allowed. This is available as
 common tcl command tdom::type::time.
 .TP
@@ -983,7 +983,7 @@ duration of the form PnYnMnDTnHnMnS. All parts other
 then the starting P and - if one of H, M or S is given
 - T are optional. In case the following sign letter is
 S n may be a decimal (with at least one digit before
-and after the dot), otherwise it must be a (positiv)
+and after the dot), otherwise it must be a (positive)
 integer. This is available as common tcl command
 tdom::type::duration.
 .TP
@@ -1020,7 +1020,7 @@ zeros.
 xsd:unsignedLong. This is an integer between 0 and
 18446744073709551615, both included, optionally preceded by a
 + sign and leading zeros.
-.SS "Logical construcsts"
+.SS "Logical constructs"
 .TP
 \&\fB\fBoneOf\fP \fI<constraint script>\fB
 \&\fRThis text constraint match if one of the text
@@ -1031,35 +1031,35 @@ text constraints in the order of definition.
 \&\fB\fBallOf\fP \fI<constraint script>\fB
 \&\fRThis text constraint match if all of the text
 constraints defined in the argument \fIconstraint script\fR
-match the text. It stops after the first match failues and
+match the text. It stops after the first match failure and
 probes the text constraints in the order of definition. Since
-the schema definition commmand \fItext\fR also expects all
+the schema definition command \fItext\fR also expects all
 text constraints to match the text constraint \fIallOf\fR is
 useful mostly together with the \fIoneOf\fR text constraint
-commmand.
+command.
 .TP
 \&\fB\fBnot\fP \fI<constraint script>\fB
 \&\fRThis text constraint match if none of the text
 constraints defined in the argument \fIconstraint
 script\fR match the text. It stops after the first
-matching constaint in the \fIconstraint script\fR and
+matching constraint in the \fIconstraint script\fR and
 reports validation error. The text constraints in the
 \&\fIconstraint script\fR are probed in the order of
 definition.
-.SS "Contraints on processed text value"
+.SS "Constraints on processed text value"
 .TP
 \&\fB\fBwhitespace\fP \fI(preserve|replace|collapse)\fB \fI<constraint script>\fB
-\&\fRThis text constraint command does whitespace (#x20
+\&\fRThis text constraint command does white-space (#x20
 (space, ' '), #x9 (tab, \et), #xA (linefeed, \en), and #xD
 (carriage return, \er) normalization to the text value and
 checks the resulting text with the text constraints of the
 constraint script argument. The normalization method
 \&\fIpreserve\fR keeps everything as it is; this is another way
 to say \fIallOf\fR. The \fIreplace\fR normalization method
-replaces any single whitespace character (as above) to a
+replaces any single white-space character (as above) to a
 space. The \fIcollapse\fR normalization method removes all
-leading and trailing whitespace and all the other sequences of
-contiguous whitespace are replaced by a single space.
+leading and trailing white-space and all the other sequences of
+contiguous white-space are replaced by a single space.
 .TP
 \&\fB\fBsplit\fP \fI?type ?args??\fB\fI<constraint script>\fB
 \&\fR
@@ -1100,7 +1100,7 @@ string equal to the given value.
 .TP
 \&\fB\fBenumeration\fP \fIlist\fB
 \&\fRThis text constraint match if the text value is equal to
-one element (respecting case and any whitespace) of the
+one element (respecting case and any white-space) of the
 argument \fIlist\fR, which has to be a valid Tcl list.
 .TP
 \&\fB\fBmatch\fP \fI?-nocase?\fB \fIglob_style_match_pattern>\fB
@@ -1190,7 +1190,7 @@ If a \fIreportcmd\fR is set this command is called on global
 level appended with the schema command and an error type as
 arguments if a validation violation is detected. Then the
 validation recovers from the error and continues. For some
-validation errors the reocver strategy can be determined with
+validation errors the recover strategy can be determined with
 the script result of the reportcmd.
 .PP
 With a \fIreportcmd\fR (which doesen&t throw error if
@@ -1209,8 +1209,8 @@ the well-formedness error.
 .PP
 If the \fIreportcmd\fR throws error while called by the
 validation engine then validation stops and the schema command
-thows error with the error message of the script.
-.SH Exampels
+throws error with the error message of the script.
+.SH Examples
 .PP
 .UR "https://www.w3.org/TR/xmlschema-0/"
 <URL: https://www.w3.org/TR/xmlschema-0/>
@@ -1290,7 +1290,7 @@ example schema:
 .CE
 .PP
 A somewhat one-to-one translation of that into a tDOM schema
-defintion script would be:
+definition script would be:
 .CS
 
 tdom::schema schema      
