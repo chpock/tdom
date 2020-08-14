@@ -1,5 +1,5 @@
-C Documentation\sproof\sreading\swork.
-D 2020-08-14T22:50:20.280
+C Save\swork.
+D 2020-08-14T23:58:54.459
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -39,9 +39,9 @@ F doc/manpage.css 3b4ec1d641048933a7e6bffc659de9519030a959
 F doc/pullparser.html 164e7e037e2d00308f67ca0708f6b193cbb0db11748c8533c58ddcd9d2f177fb
 F doc/pullparser.n 5f5672e8bb2dd221602040cd212234da6b6ed8c99c5daa60be9fa0c476529c09
 F doc/pullparser.xml 6032c1e8c8d001068c227601dba9860824f8acc709c87fd8e36ac4a596b6a2f2
-F doc/schema.html e0b2ff13d504d73cee36dacdaf481989e24af3c517e60b2cf48a561e471af6f7
+F doc/schema.html 5c724c133d0ad6b1d5c126c336608e9d152998836ecea5b968ab18a94daebd44
 F doc/schema.n 54dcfc3406a5d6903dc6ea178c065a969adcae835255e05f06a8d0bb43638c1d
-F doc/schema.xml 37739a1600de201addc55ae59c9aaded1db2b8c2ab71067cca3e98904d0596b3
+F doc/schema.xml e839d3a1bdd9b645e32811a5c2bafc2f82caa6ddde24f1a0e0b6c50c92bf9902
 F doc/tDOM.xml 04db7d0ccfea39aae21f4fe07b8f05d5bff8a84193cfce2aa5faa2f42c076377
 F doc/tdomcmd.html 3f96630823dbeff586dd3fb7e5cc6214a40f0219e2ba37e6986353cbcfc7d665
 F doc/tdomcmd.n c06a5ff035f16a2a52636b69d9ebe6ba84ff5101922ed27b551146c4d61d6cda
@@ -233,8 +233,11 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 317939234e5f81bb7ae874ed67c74b63e52e71a238ca79ec2bf9fb1d35c0c082
-R 11e77570187ac8c622a6ab0abcb6d181
+P d2ba60ec1f5d7f7442148ae93bfc40a4c6d9acf048991f9d8f6ce994f17422c0
+R b007a3a30841688f364e314131cfbb9e
+T *branch * docwork
+T *sym-docwork *
+T -sym-schema *
 U rolf
-Z cbf694f322130df879ed2602369909d8
+Z 6e6d4a86ff8266c0fd2093f5e457b65b
 # Remove this line to create a well-formed Fossil manifest.

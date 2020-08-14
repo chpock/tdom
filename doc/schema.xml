@@ -15,8 +15,8 @@
   <section>
     <title>DESCRIPTION </title>    
     
-    <p>This command creates validation commands with a simple API. The
-    validation commands have methods to define a schema and are able
+    <p>Every call of this command creates a new validation command. A
+    validation command has methods to define a schema and is able
     to validate XML data or to post-validate a tDOM DOM tree (and to
     some degree other kind of hierarchical data) against this
     schema.</p>
@@ -186,9 +186,9 @@
 
       <commanddef>
         <command><method>validatechannel</method> <m>channel</m> <m>?objVar?</m></command>
-        <desc>Returns true if the content read out of the tcl channel
+        <desc>Returns true if the content read out of the Tcl channel
         <m>channel</m> is valid or false otherwise. Since data read
-        out of a tcl channel is UTF-8 encoded any misleading encoding
+        out of a Tcl channel is UTF-8 encoded any misleading encoding
         declaration at the beginning of the data will lead to errors.
         If the validation failed and the optional <m>objVar</m>
         argument is given, then the variable with that name is set to
@@ -209,7 +209,7 @@
 
       <commanddef>
         <command><method>reportcmd</method> <m>?cmd?</m></command>
-        <desc>This method expects the name of a tcl command to be
+        <desc>This method expects the name of a Tcl command to be
         called in case of validation error. This command will be
         called with two arguments appended: the schema command, that
         raises the validation error, and a validation error code.
@@ -465,7 +465,7 @@
 
     <p>Schema definition scripts are ordinary Tcl scripts that are
     evaluated in the namespace tdom::schema. The below listed schema
-    definition commands in this tcl namespace allow to define a wide
+    definition commands in this Tcl namespace allow to define a wide
     variety of document structures. Every schema definition command
     establish a validation constraint on the content which has to
     match or must be optional to qualify the content as valid. It is a
@@ -772,7 +772,7 @@ s define {
       <optdef>
         <optname>{n m}</optname> <desc>The content particle must occur
         n to m times (both inclusive) in a row in valid documents. The
-        quantifier must be a tcl list with two elements. Both elements
+        quantifier must be a Tcl list with two elements. Both elements
         must be integers, with n >= 0 and n &lt; m.</desc>
       </optdef>
     </optlist>
@@ -811,9 +811,9 @@ s define {
         <commandlist>
             <commanddef>
                 <command><cmd>tcl</cmd> <m>tclcmd</m> <m>?arg arg ...?</m></command>
-                <desc>Evaluates the tcl script <m>tclcmd arg arg ... </m> and
+                <desc>Evaluates the Tcl script <m>tclcmd arg arg ... </m> and
                 the text to validate appended to the argument list. The return
-                value of the tcl command is interpreted as a boolean.</desc>
+                value of the Tcl command is interpreted as a boolean.</desc>
             </commanddef>
         </commandlist>
     </subsection>
@@ -939,7 +939,7 @@ s define {
                 sign for bce dates is allowed. There is no year 0. The
                 year may have more than 4 digits, but only if needed
                 (no extra leading zeros). This is available as common
-                tcl command tdom::type::date.</desc>
+                Tcl command tdom::type::date.</desc>
             </commanddef>
             <commanddef>
                 <command><cmd>time</cmd></command>
@@ -953,7 +953,7 @@ s define {
                 ('.') as separator) are allowed, but not just a
                 dangling point. The time value 24:00:00 (without
                 fractional part) is allowed. This is available as
-                common tcl command tdom::type::time.</desc>
+                common Tcl command tdom::type::time.</desc>
             </commanddef>
             <commanddef>
                 <command><cmd>dateTime</cmd></command>
@@ -965,7 +965,7 @@ s define {
                 there. The time part (including the signaling 'T'
                 character) is mandatory and follow the rules of the
                 <m>time</m> command, see there. This is available as
-                common tcl command tdom::type::dateTime.</desc>
+                common Tcl command tdom::type::dateTime.</desc>
             </commanddef>
             <commanddef>
                 <command><cmd>duration</cmd></command>
@@ -976,7 +976,7 @@ s define {
                 - T are optional. In case the following sign letter is
                 S n may be a decimal (with at least one digit before
                 and after the dot), otherwise it must be a (positive)
-                integer. This is available as common tcl command
+                integer. This is available as common Tcl command
                 tdom::type::duration.</desc>
             </commanddef>
             <commanddef>
@@ -1087,7 +1087,7 @@ s define {
                 <dt>tcl tclcmd ?arg ...?</dt><dd>The text to split is
                 handed to the <m>tclcmd</m>, which is evaluated on global
                 level, appended with every given arg and the text to split
-                as last argument. This call must return a valid tcl list,
+                as last argument. This call must return a valid Tcl list,
                 which elements are tested.</dd>
             </dl>
             <p>The default in case no split type argument is given is
@@ -1245,6 +1245,8 @@ s define {
       <p>If the <m>reportcmd</m> throws error while called by the
       validation engine then validation stops and the schema command
       throws error with the error message of the script.</p>
+
+      
       
   </section>
 
