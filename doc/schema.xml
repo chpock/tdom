@@ -61,14 +61,14 @@
 
       <commanddef>
         <command><method>defelementtype</method> <m>typename</m> <m>name</m> <m>?namespace?</m> <m>&lt;definition script></m></command>
-        <desc>This method defines the elementtype <m>typename</m>
+        <desc>This method defines the element type <m>typename</m>
         (optional in the namespace <m>namespace</m>) in the schema. If
-        the element type is refered in a definition script with the
-        schema command elementype the validation engine expects an
-        elment namend <m>name</m> (in the namespace <m>namespace</m>,
+        the element type is referred in a definition script with the
+        schema command elementtype the validation engine expects an
+        element named <m>name</m> (in the namespace <m>namespace</m>,
         if given) and the content model <m>definition script</m>.
         Defining element types seems only sensible if you really have
-        elments with the same name and namespache but different
+        elements with the same name and namespace but different
         content models. The <m>definition script</m> is evaluated and
         defines the content model of the element. If the
         <m>namespace</m> argument is given, any <m>element</m> or
@@ -112,7 +112,7 @@
         root element must match for validity. If <m>start</m> isn't
         used, any with <m>defelement</m> defined element may be the
         root of a valid document. The <m>start</m> method may be used
-        serveral times with varying arguments during the lifetime of a
+        several times with varying arguments during the lifetime of a
         validation command. If the command is called with just the
         empty string (and no namespace argument), the validation
         constrain for the root element is removed and any defined
@@ -140,8 +140,8 @@
             <optname>start</optname>
             <optarg>name ?attributes? ?namespace? </optarg>
             <desc>Checks if the current validation state allows the
-            element <m>name</m> in the <m>namespace</m> is allowed to
-            start here. It raises error, if not.</desc>
+            element <m>name</m> in the <m>namespace</m> to start here.
+            It raises error, if not.</desc>
           </optdef>
 
           <optdef>
@@ -186,7 +186,7 @@
 
       <commanddef>
         <command><method>validatechannel</method> <m>channel</m> <m>?objVar?</m></command>
-        <desc>Returns true if the content read ouf of the tcl channel
+        <desc>Returns true if the content read out of the tcl channel
         <m>channel</m> is valid or false otherwise. Since data read
         out of a tcl channel is UTF-8 encoded any misleading encoding
         declaration at the beginning of the data will lead to errors.
@@ -385,7 +385,7 @@
                   <dl>
                       <dt>NONE</dt><dd>The schema command currently
                       doesn't recover from a validation event.</dd>
-                      <dt>MATCH_ELEMENT_START</dt><dd>Element start event, which includs looking for missing or unknown attributes.</dd>
+                      <dt>MATCH_ELEMENT_START</dt><dd>Element start event, which includes looking for missing or unknown attributes.</dd>
                       <dt>MATCH_ELEMENT_END</dt><dd>Element end event.</dd>
                       <dt>MATCH_TEXT</dt><dd>Validating text between tags.</dd>
                       <dt>MATCH_ATTRIBUTE_TEXT</dt><dd>Attribute text value constraint check</dd>
@@ -393,9 +393,9 @@
                       <dt>MATCH_DOM_KEYCONSTRAINT</dt><dd>Checking domunique constaint</dd>
                       <dt>MATCH_DOM_XPATH_BOOLEAN</dt><dd>Checking domxpathboolean constaint</dd>
                   </dl>
-                  If called with one of the possible optional
+                  <p>If called with one of the possible optional
                   arguments the command returns detail information
-                  depending on current action.
+                  depending on current action.</p>
                   <dl>
                       <dt>name</dt><dd>Return the name of the element
                       that has to match in case of
@@ -469,7 +469,11 @@
     variety of document structures. Every schema definition command
     establish a validation constraint on the content which has to
     match or must be optional to qualify the content as valid. It is a
-    validation error if there is additional (not matched) content.</p>
+    validation error if there is additional (not matched) content.
+    White space only text (in the XML sense of white space) between
+    any different tags is ignored, with the exception of text only
+    elements (for which even white space only text will be considered
+    as significant content).</p>
 
     <p>The schema definition commands are:</p>
 
@@ -794,9 +798,9 @@ s define {
     general Tcl commands. They are defined in the namespace tdom::type
     and are called as documented below with the text to check appended
     to the argument list. They return a logical value. Please note,
-    that the commands may not accept staring or ending white space. It
-    is noted with the command documentatin, if the command is
-    available in the tdom::type.
+    that the commands may not accept starting or ending white space. It
+    is noted with the command documentation, if the command is
+    available in the tdom::type namespace.
     </p>
 
     <subsection>
@@ -1019,11 +1023,43 @@ s define {
     </subsection>
 
     <subsection>
-        <title>
-        </title>
-        <p>The text constraint commands are:</p>
+        <title>Logical construcsts</title>
         <commandlist>
         <commanddef>
+            <command><cmd>oneOf</cmd> <m>&lt;constraint script></m></command>
+            <desc>This text constraint match if one of the text
+            constraints defined in the argument <m>constraint script</m>
+            match the text. It stops after the first match and probes the
+            text constraints in the order of definition.</desc>
+        </commanddef>
+        <commanddef>
+            <command><cmd>allOf</cmd> <m>&lt;constraint script></m></command>
+            <desc>This text constraint match if all of the text
+            constraints defined in the argument <m>constraint script</m>
+            match the text. It stops after the first match failues and
+            probes the text constraints in the order of definition. Since
+            the schema definition commmand <m>text</m> also expects all
+            text constraints to match the text constraint <m>allOf</m> is
+            useful mostly together with the <m>oneOf</m> text constraint
+            commmand.</desc>
+        </commanddef>
+        <commanddef>
+            <command><cmd>not</cmd> <m>&lt;constraint script></m></command>
+            <desc>This text constraint match if none of the text
+            constraints defined in the argument <m>constraint
+            script</m> match the text. It stops after the first
+            matching constaint in the <m>constraint script</m> and
+            reports validation error. The text constraints in the
+            <m>constraint script</m> are probed in the order of
+            definition.</desc>
+        </commanddef>
+        </commandlist>
+    </subsection>
+
+    <subsection>
+        <title>Contraints on processed text value</title>
+        <commandlist>
+            <commanddef>
             <command><cmd>whitespace</cmd> <m>(preserve|replace|collapse)</m> <m>&lt;constraint script></m></command>
             <desc>This text constraint command does whitespace (#x20
             (space, ' '), #x9 (tab, \t), #xA (linefeed, \n), and #xD
@@ -1037,7 +1073,38 @@ s define {
             leading and trailing whitespace and all the other sequences of
             contiguous whitespace are replaced by a single space.</desc>
         </commanddef>
-        
+        <commanddef>
+            <command><cmd>split</cmd> <m>?type ?args??</m><m>&lt;constraint script></m></command>
+            <desc><p>This text constraint command splits the text to test
+            into a list of values and tests all elements of that list for
+            the text constraints in the evaluated <m>constraint
+            script></m>.</p>
+            <p>The available types are:</p>
+            <dl>
+                <dt>whitespace</dt><dd>The text to split is striped of all
+                white space at start and end splited into a list at any
+                successive white space.</dd>
+                <dt>tcl tclcmd ?arg ...?</dt><dd>The text to split is
+                handed to the <m>tclcmd</m>, which is evaluated on global
+                level, appended with every given arg and the text to split
+                as last argument. This call must return a valid tcl list,
+                which elements are tested.</dd>
+            </dl>
+            <p>The default in case no split type argument is given is
+            <m>whitespace</m>.</p></desc>
+        </commanddef>
+        <commanddef>
+            <command><cmd>strip</cmd> <m>&lt;constraint script></m></command>
+            <desc>This text constraint command tests all text constraints
+            in the evaluated <m>constraint script></m> with the text to
+            test striped of all white space at start and end.</desc>
+        </commanddef>
+        </commandlist>
+    </subsection>
+
+    <subsection>
+        <title>Various other string properties</title>
+        <commandlist>
         <commanddef>
             <command><cmd>fixed</cmd> <m>value</m></command>
             <desc>The text constraint only match if the text value is
@@ -1082,60 +1149,6 @@ s define {
             The length argument must be an integer greater zero.</desc>
         </commanddef>
         <commanddef>
-            <command><cmd>oneOf</cmd> <m>&lt;constraint script></m></command>
-            <desc>This text constraint match if one of the text
-            constraints defined in the argument <m>constraint script</m>
-            match the text. It stops after the first match and probes the
-            text constraints in the order of definition.</desc>
-        </commanddef>
-        <commanddef>
-            <command><cmd>allOf</cmd> <m>&lt;constraint script></m></command>
-            <desc>This text constraint match if all of the text
-            constraints defined in the argument <m>constraint script</m>
-            match the text. It stops after the first match failues and
-            probes the text constraints in the order of definition. Since
-            the schema definition commmand <m>text</m> also expects all
-            text constraints to match the text constraint <m>allOf</m> is
-            useful mostly together with the <m>oneOf</m> text constraint
-            commmand.</desc>
-        </commanddef>
-        <commanddef>
-            <command><cmd>not</cmd> <m>&lt;constraint script></m></command>
-            <desc>This text constraint match if none of the text
-            constraints defined in the argument <m>constraint
-            script</m> match the text. It stops after the first
-            matching constaint in the <m>constraint script</m> and
-            reports validation error. The text constraints in the
-            <m>constraint script</m> are probed in the order of
-            definition.</desc>
-        </commanddef>
-        <commanddef>
-            <command><cmd>strip</cmd> <m>&lt;constraint script></m></command>
-            <desc>This text constraint command tests all text constraints
-            in the evaluated <m>constraint script></m> with the text to
-            test striped of all white space at start and end.</desc>
-        </commanddef>
-        <commanddef>
-            <command><cmd>split</cmd> <m>?type ?args??</m><m>&lt;constraint script></m></command>
-            <desc><p>This text constraint command splits the text to test
-            into a list of values and tests all elements of that list for
-            the text constraints in the evaluated <m>constraint
-            script></m>.</p>
-            <p>The available types are:</p>
-            <dl>
-                <dt>whitespace</dt><dd>The text to split is striped of all
-                white space at start and end splited into a list at any
-                successive white space.</dd>
-                <dt>tcl tclcmd ?arg ...?</dt><dd>The text to split is
-                handed to the <m>tclcmd</m>, which is evaluated on global
-                level, appended with every given arg and the text to split
-                as last argument. This call must return a valid tcl list,
-                which elements are tested.</dd>
-            </dl>
-            <p>The default in case no split type argument is given is
-            <m>whitespace</m>.</p></desc>
-        </commanddef>
-        <commanddef>
             <command><cmd>id</cmd> <m>?keySpace?</m></command>
             <desc>This text constraint command marks the text as a
             document wide ID (to be referenced by an idref). Every ID
@@ -1153,9 +1166,8 @@ s define {
             be later in the document, that the reference. Several
             references within the document to one ID are possible.</desc>
         </commanddef>
-    </commandlist>
-        </subsection>
-
+        </commandlist>
+    </subsection>
   </section>
 
   <section>
@@ -1233,9 +1245,6 @@ s define {
       <p>If the <m>reportcmd</m> throws error while called by the
       validation engine then validation stops and the schema command
       thows error with the error message of the script.</p>
-
-      
-
       
   </section>
 

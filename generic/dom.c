@@ -1653,11 +1653,8 @@ DispatchPCDATA (
 checkTextConstraints:
 #ifndef TDOM_NO_SCHEMA
     if (info->sdata) {
-        if (!only_whites
-            || info->sdata->stack->pattern->flags & CONSTRAINT_TEXT_CHILD) {
-            if (probeText (info->interp, info->sdata, s) != TCL_OK) {
-                XML_StopParser(info->parser, 0);
-            }
+        if (probeText (info->interp, info->sdata, s, &only_whites) != TCL_OK) {
+            XML_StopParser(info->parser, 0);
         }
     }
 #endif

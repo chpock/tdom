@@ -2423,8 +2423,46 @@ test schema-7.22 {Constraint text content in seq} {
     }
     s delete
     set result
-} {0 1 0 1 1 1}
-        
+} {0 1 0 1 0 0}
+
+test schema-7.23 {Whitespace in implicit defined element} {
+    tdom::schema s
+    s defelement doc {
+        element a
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/></doc>
+        <doc><a></a></doc>
+        {<doc>  <a></a></doc>}
+        {<doc>  <a></a>  </doc>}
+        {<doc>  <a>  </a>  </doc>}
+        {<doc><a>12</a></doc>}
+        {<doc><a>  </a></doc>}
+        {<doc><a/>    <b/></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 1 1 1 0 0 0 0}
+
+test schema-7.23a {Whitespace in implicit defined element} {
+    tdom::schema s
+    s defelement doc {
+        element a
+    }
+    set result [list]
+    foreach xml {
+        {<doc><a>  </a></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0}
+
 test schema-8.1 {validate method} {
     tdom::schema create grammar
     grammar defelement doc {
@@ -4570,7 +4608,7 @@ test schema-14.18 {deftexttype} {
         maxLength 4
     }
     s defelement doc {
-         element e ! {text typs len2-4}
+         element e ! {text type len2-4}
     }
     set result [list]
     foreach xml {
@@ -6087,6 +6125,20 @@ test schema-14.58 {text constraint command syntax} {
     set result [catch {s defelement doc {
         element e ! {text typs len2-4}
     }}]
+    s delete
+    set result
+} 1
+
+test schema-14.59 {} {
+    tdom::schema s
+    s defelement doc {
+        element a
+    }
+    set result [catch {
+        s defelement a {
+            text {error "triggered"}
+        }
+    }]
     s delete
     set result
 } 1

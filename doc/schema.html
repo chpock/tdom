@@ -4,25 +4,25 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x564487ad5910">NAME</a> · <a href="#SECTid0x564487a430c0">SYNOPSIS</a> · <a href="#SECTid0x564487acc7b0">DESCRIPTION </a> · <a href="#SECTid0x564487b31040">Schema definition scripts</a> · <a href="#SECTid0x564487b3f9a0">Quantity specifier</a> · <a href="#SECTid0x564487b417f0">Text constraint scripts</a> · <a href="#SECTid0x564487b4f870">Local key constraints</a> · <a href="#SECTid0x564487b51680">Exampels</a> · <a href="#SECTid0x564487b53600">KEYWORDS</a>
+<a href="#SECTid0x5593e3d7e630">NAME</a> · <a href="#SECTid0x5593e3cd3120">SYNOPSIS</a> · <a href="#SECTid0x5593e3d5c810">DESCRIPTION </a> · <a href="#SECTid0x5593e3dd2a60">Schema definition scripts</a> · <a href="#SECTid0x5593e3de1e40">Quantity specifier</a> · <a href="#SECTid0x5593e3de3da0">Text constraint scripts</a> · <a href="#SECTid0x5593e3df7020">Local key constraints</a> · <a href="#SECTid0x5593e3df8e30">Recovering</a> · <a href="#SECTid0x5593e3df9fe0">Exampels</a> · <a href="#SECTid0x5593e3dfbf60">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x564487ad5910">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x5593e3d7e630">NAME</a></h2><p class="namesection">
 <b class="names">tdom::schema - </b><br>Create a schema validation command</p>
 
-  <h2><a name="SECTid0x564487a430c0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x5593e3cd3120">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">tdom::schema</b> <i class="m">?create?</i> <i class="m">cmdName</i>
     </pre>
 
-  <h2><a name="SECTid0x564487acc7b0">DESCRIPTION </a></h2><p>This command creates validation commands with a simple API. The
+  <h2><a name="SECTid0x5593e3d5c810">DESCRIPTION </a></h2><p>This command creates validation commands with a simple API. The
     validation commands have methods to define a schema and are able
     to validate XML data or to post-validate a tDOM DOM tree (and to
     some degree other kind of hierarchical data) against this
     schema.</p><p>Additionally, a validation command may be used as argument to
     the <i class="m">-validateCmd</i> option of the <i class="m">dom parse</i> and the
     <i class="m">expat</i> commands to enable validation additional to what they
-    otherwise do.</p><p>The valid methods of the created commands are:</p><dl class="commandlist">
+    otherwise do.</p><p>The methods of the created commands are:</p><dl class="commandlist">
       
           <dt>
 <b class="method">prefixns</b> <i class="m">?prefixUriList?</i>
@@ -33,7 +33,7 @@
           you may use the "prefix" pointing to the namespace
           URI in the current prefixUriList, set by this method. If the
           list map the same prefix to different namespace URIs the
-          frist one win. If there isn't such a prefix the namespace
+          first one win. If there isn't such a prefix the namespace
           argument is used literally as namespace URI. If the method
           is called without argument it returns the current
           prefixUriList. If the method is called with the empty string
@@ -61,14 +61,14 @@
         <dt>
 <b class="method">defelementtype</b> <i class="m">typename</i> <i class="m">name</i> <i class="m">?namespace?</i> <i class="m">&lt;definition script&gt;</i>
 </dt>
-        <dd>This method defines the elementtype <i class="m">typename</i>
+        <dd>This method defines the element type <i class="m">typename</i>
         (optional in the namespace <i class="m">namespace</i>) in the schema. If
-        the element type is refered in a definition script with the
-        schema command elementype the validation engine expects an
-        elment namend <i class="m">name</i> (in the namespace <i class="m">namespace</i>,
+        the element type is referred in a definition script with the
+        schema command elementtype the validation engine expects an
+        element named <i class="m">name</i> (in the namespace <i class="m">namespace</i>,
         if given) and the content model <i class="m">definition script</i>.
         Defining element types seems only sensible if you really have
-        elments with the same name and namespache but different
+        elements with the same name and namespace but different
         content models. The <i class="m">definition script</i> is evaluated and
         defines the content model of the element. If the
         <i class="m">namespace</i> argument is given, any <i class="m">element</i> or
@@ -99,7 +99,7 @@
 
       
         <dt>
-<b class="method">deftext</b> <i class="m">name</i> <i class="m">&lt;constraint script&gt;</i>
+<b class="method">deftexttype</b> <i class="m">name</i> <i class="m">&lt;constraint script&gt;</i>
 </dt>
         <dd>This method defines a bundle of text constraints, that
         can be referred by <i class="m">name</i> while defining constrains on
@@ -118,7 +118,7 @@
         root element must match for validity. If <i class="m">start</i> isn't
         used, any with <i class="m">defelement</i> defined element may be the
         root of a valid document. The <i class="m">start</i> method may be used
-        serveral times with varying arguments during the lifetime of a
+        several times with varying arguments during the lifetime of a
         validation command. If the command is called with just the
         empty string (and no namespace argument), the validation
         constrain for the root element is removed and any defined
@@ -132,7 +132,7 @@
         <dd>This method allows to define several elements or pattern
         or a whole schema with one call. All schema command methods so
         far (<i class="m">prefixns</i>, <i class="m">defelement</i>,
-        <i class="m">defelementtype</i>, <i class="m">defpattern</i>, <i class="m">deftext</i> and
+        <i class="m">defelementtype</i>, <i class="m">defpattern</i>, <i class="m">deftexttype</i> and
         <i class="m">start</i>) are allowed top level in the <i class="m">definition
         script</i>. The <i class="m">define</i> method itself isn't allowed
         recursively.</dd>
@@ -152,8 +152,8 @@
 </dt>
             
             <dd>Checks if the current validation state allows the
-            element <i class="m">name</i> in the <i class="m">namespace</i> is allowed to
-            start here. It raises error, if not.</dd>
+            element <i class="m">name</i> in the <i class="m">namespace</i> to start here.
+            It raises error, if not.</dd>
           
 
           
@@ -206,7 +206,7 @@
         <dt>
 <b class="method">validatechannel</b> <i class="m">channel</i> <i class="m">?objVar?</i>
 </dt>
-        <dd>Returns true if the content read ouf of the tcl channel
+        <dd>Returns true if the content read out of the tcl channel
         <i class="m">channel</i> is valid or false otherwise. Since data read
         out of a tcl channel is UTF-8 encoded any misleading encoding
         declaration at the beginning of the data will lead to errors.
@@ -228,19 +228,23 @@
         valid and the optional <i class="m">objVar</i> argument is given, then
         the variable with that name is set to the empty string. </dd>
       
+
       
-      
-        <dt><b class="method">reportcmd</b></dt>
+        <dt>
+<b class="method">reportcmd</b> <i class="m">?cmd?</i>
+</dt>
         <dd>This method expects the name of a tcl command to be
         called in case of validation error. This command will be
-        called with two arguments: the schema command, that is rasing
-        the validation error, and an validation error code. The
-        possible error codes are:
+        called with two arguments appended: the schema command, that
+        is rasing the validation error, and a validation error code.
+        For more detailed information see <a href="#SECTid0x5593e3df8e30">Recovering</a>.The possible error codes
+        are:
         <dl>
             <dt>MISSING_ELEMENT</dt><dd></dd>
             <dt>MISSING_TEXT</dt><dd></dd>
             <dt>UNEXPECTED_ELEMENT</dt><dd></dd>
             <dt>UNEXPECTED_ROOT_ELEMENT</dt><dd></dd>
+            <dt>UNEXPECTED_TEXT</dt><dd></dd>
             <dt>UNKNOWN_ROOT_ELEMENT</dt><dd></dd>
             <dt>UNKNOWN_ATTRIBUTE</dt><dd></dd>
             <dt>MISSING_ATTRIBUTE</dt><dd></dd>
@@ -252,6 +256,7 @@
             <dt>UNKOWN_GLOBAL_ID</dt><dd></dd>
             <dt>UNKOWN_ID</dt><dd></dd>
         </dl>
+        <p> For more detailed information see section <a href="#SECTid0x5593e3df8e30">Recovering</a>.</p>
         </dd>
       
 
@@ -310,9 +315,11 @@
                   <dt><b>domNode</b></dt>
                   <dd>If the schema command isn't currently
                   post-validating a DOM tree this method returns the
-                  emtpy string. Otherwise, it returns the node on
-                  which the validation engine is currently looking at
-                  in case, the node is an ELEMENT_NODE or the parent
+                  emtpy string. Otherwise, if the schema command waits
+                  for the reportcmd script to finish while recovering
+                  from a validation error it returns the node on which
+                  the validation engine is currently looking at in
+                  case, the node is an ELEMENT_NODE or the parent
                   node, if not. It is recommended that you don't use
                   this method. Or at least leave the DOM tree alone,
                   use it read-only.</dd>
@@ -332,30 +339,62 @@
                   namespace as second element.</dd>
               
               
-                  <dt><b>expected</b></dt> <dd>Returns in no
-                  particular order all posible next events (since the
-                  last successful event match, if there was one) as a
-                  list. If an element is namespaced its list entry
-                  will be itself a list with two elements, with the
-                  name as first and the namespace as second element.
-                  If text is a possible next event the list entry will
-                  be a two elements list, with #text as first element
-                  and the empty space as second. If an any element
+                  <dt><b>definedElementtypes</b></dt>
+                  <dd>Returns in no particular order the defined
+                  element types in the grammer as list. If an element
+                  type is namespaced its list entry will be itself a
+                  list with two elements, with the name as first and
+                  the namespace as second element.</dd>
+              
+              
+                  <dt><b>definedPatterns</b></dt>
+                  <dd>Returns in no particular order the defined
+                  named pattern in the grammer as list. If a named
+                  pattern is namespaced its list entry will be itself
+                  a list with two elements, with the name as first and
+                  the namespace as second element.</dd>
+              
+              
+                  <dt><b>expected</b></dt>
+                  <dd>Returns in no particular order all posible
+                  next events (since the last successful event match,
+                  if there was one) as a list. If an element is
+                  namespaced its list entry will be itself a list with
+                  two elements, with the name as first and the
+                  namespace as second element. If text is a possible
+                  next event the list entry will be a two elements
+                  list, with #text as first element and the empty
+                  space as second. If an any element constraint is
+                  possible the list entry will be a two elements list,
+                  with &lt;any&gt; as first element and the empty space
+                  as second. If an any element in a certain namespace
                   constraint is possible the list entry will be a two
                   elements list, with &lt;any&gt; as first element and
-                  the empty space as second. If an any element in a
-                  certain namespace constraint is possible the list
-                  entry will be a two elements list, with &lt;any&gt; as
-                  first element and the namespace as second. If
-                  element end is a possible event the list entry will
-                  be a two elements list with &lt;elementend&gt; and the
+                  the namespace as second. If element end is a
+                  possible event the list entry will be a two elements
+                  list with &lt;elementend&gt; as first element and the
                   empty string as second element.</dd>
               
               
                   <dt><b>definition name ?namespace?</b></dt>
                   <dd>Returns the code that defines the given
-                  element. The command raises error if there isn' a
+                  element. The command raises error if there isn't a
                   definition of that element.
+                  </dd>
+              
+              
+                  <dt><b>typedefinition name ?namespace?</b></dt>
+                  <dd>Returns the code that defines the given
+                  element type definition. The command raises error if
+                  there isn't a definition of that element.
+                  </dd>
+              
+              
+                  <dt><b>patterndefinition name ?namespace?</b></dt>
+                  <dd>Returns the code that defines the given
+                  pattern definition. The command raises error if
+                  there isn't a definition of a pattern with that name
+                  and, if given, namespace.
                   </dd>
               
               
@@ -371,17 +410,17 @@
                   <dl>
                       <dt>NONE</dt><dd>The schema command currently
                       doesn't recover from a validation event.</dd>
-                      <dt>MATCH_ELEMENT_START</dt><dd>Element start event, which includs looking for missing or unknown attributes.</dd>
+                      <dt>MATCH_ELEMENT_START</dt><dd>Element start event, which includes looking for missing or unknown attributes.</dd>
                       <dt>MATCH_ELEMENT_END</dt><dd>Element end event.</dd>
                       <dt>MATCH_TEXT</dt><dd>Validating text between tags.</dd>
-                      <dt>MATCH_ATTRIBUTE_TEXT</dt><dd>Attribute text value contraint check</dd>
+                      <dt>MATCH_ATTRIBUTE_TEXT</dt><dd>Attribute text value constraint check</dd>
                       <dt>MATCH_GLOBAL</dt><dd>Checking global IDs</dd>
-                      <dt>MATCH_DOM_KEYCONSTRAINT</dt><dd>Checking domuniqe constaint</dd>
+                      <dt>MATCH_DOM_KEYCONSTRAINT</dt><dd>Checking domunique constaint</dd>
                       <dt>MATCH_DOM_XPATH_BOOLEAN</dt><dd>Checking domxpathboolean constaint</dd>
                   </dl>
-                  If called with one of the possible optional
+                  <p>If called with one of the possible optional
                   arguments the command returns detail information
-                  depending on current action.
+                  depending on current action.</p>
                   <dl>
                       <dt>name</dt><dd>Return the name of the element
                       that has to match in case of
@@ -445,13 +484,17 @@
 
     </dl>
 
-  <h2><a name="SECTid0x564487b31040">Schema definition scripts</a></h2><p>Schema definition scripts are ordinary Tcl scripts that are
+  <h2><a name="SECTid0x5593e3dd2a60">Schema definition scripts</a></h2><p>Schema definition scripts are ordinary Tcl scripts that are
     evaluatend in the namespace tdom::schema. The below listed schema
     definition commands in this tcl namespace allow to define a wide
     variety of document structures. Every schema definition command
     establish a validation constraint on the content which has to
     match or must be optional to qualify the content as valid. It is a
-    validation error if there is additional (not matched) content.</p><p>The schema definition commands are:</p><dl class="commandlist">
+    validation error if there is additional (not matched) content.
+    White space only text (in the XML sense of white space) between
+    any different tags is ignored, with the exception of text only
+    elements (for which even white space only text will be considered
+    as significant content).</p><p>The schema definition commands are:</p><dl class="commandlist">
       
         <dt>
 <b class="method">element</b> <i class="m">name</i> <i class="m">?quant?</i> <i class="m">?&lt;definition script&gt;?</i>
@@ -592,9 +635,10 @@
 <b class="method">namespace</b> <i class="m">uri</i> <i class="m">&lt;definition script&gt;</i>
 </dt>
         <dd>Evaluates the <i class="m">definition script</i> with context
-        namespace <i class="m">uri</i>. Every element or ref command name will
-        be looked up in the namespace <i class="m">uri</i> and local defined
-        element will be in that namespace.</dd>
+        namespace <i class="m">uri</i>. Every element, element type or ref
+        command name will be looked up in the namespace <i class="m">uri</i> and
+        local defined element will be in that namespace. The empty
+        string as <i class="m">uri</i> means no namespace.</dd>
       
 
       
@@ -628,15 +672,23 @@
 
       
         <dt>
-<b class="method">domunique</b> <i class="m">selector</i> <i class="m">fieldlist</i> <i class="m">?name?</i> <i class="m">?IGNORE_EMPTY_FIELD_SET?</i>
+<b class="method">domunique</b> <i class="m">selector</i> <i class="m">fieldlist</i> <i class="m">?name?</i> <i class="m">?"IGNORE_EMPTY_FIELD_SET"|("EMPTY_FIELD_SET_VALUE" emptyFieldSetValue)?</i>
 </dt>
         <dd>If not postvalidating a DOM tree with <i class="m">domvalidate</i>
         this constraint always match. If postvalidating this
         constraint resembles the xsd key/keyref mechanism. The
         <i class="m">selector</i> argument may be any valid XPath expression
         (without the xsd limits). Several <i class="m">domunique</i> command
-        within one element definition are allowed. They are checked
-        in definition order. </dd>
+        within one element definition are allowed. They are checked in
+        definition order. The argument name is avaliable in the
+        recovering script per <i class="m">info vaction name</i>. If the
+        <i class="m">fieldlist</i> doesn't select something for a node of the
+        result set of the <i class="m">selector</i> then the key value will be
+        the empty string, by default. If the arguments
+        <i class="m">EMPTY_FIELD_SET_VALUE &lt;value&gt;</i> are given a empty node
+        set will have the key value <i class="m">value</i>. If instead the flag
+        <i class="m">IGNORE_EMPTY_FIELD_SET</i> flag is given then an empty node
+        set result will not have any key value.</dd>
       
 
       
@@ -716,10 +768,10 @@ s define {
 
       
         <dt>
-<b class="method">deftext</b> <i class="m">name</i> <i class="m">&lt;constraint script&gt;</i>
+<b class="method">deftexttype</b> <i class="m">name</i> <i class="m">&lt;constraint script&gt;</i>
 </dt>
         <dd>This defines a named bundle of text constraints exactly
-        as a <i>schemacmd deftext</i> call. This is meant as toplevel
+        as a <i>schemacmd deftexttype</i> call. This is meant as toplevel
         command of a <i>schemacmd define</i> script. This command is
         not allowed nested in an other definition script command and
         will raise error, if you call it there.</dd>
@@ -737,7 +789,7 @@ s define {
       
     </dl>
 
-  <h2><a name="SECTid0x564487b3f9a0">Quantity specifier</a></h2><p>Serveral schema definition commands expects a quantifier as
+  <h2><a name="SECTid0x5593e3de1e40">Quantity specifier</a></h2><p>Serveral schema definition commands expects a quantifier as
     one of their arguments, which specifies how often the content
     particle specified by the command is expected. The valid values
     for a <i class="m">quant</i> argument are:</p><dl class="optlist">
@@ -779,312 +831,430 @@ s define {
         must be integers, with n &gt;= 0 and n &lt; m.</dd>
       
     </dl><p>If an optional quantifier is not given then it defaults to * in
-    case of the mixed command and to ! for all other commands.</p>
+    case of the <i class="m">mixed</i> command and to ! for all other commands.</p>
 
-  <h2><a name="SECTid0x564487b417f0">Text constraint scripts</a></h2><p>Text - parsed character data, as XML calles it - must sometimes
+  <h2><a name="SECTid0x5593e3de3da0">Text constraint scripts</a></h2><p>Text - parsed character data, as XML calles it - must sometimes
     be of a certain kind, must comply to some rules etc to be valid.
     The text constraint script arguments to the text, attribute,
-    nsattribute and deftext commands allow the following text
-    constraint commands to check text for certain properties.</p><p>The text constraint commands are:</p><dl class="commandlist">
-      
-        <dt>
-<b class="cmd">integer</b> <i class="m">?(xsd|tcl)?</i>
-</dt>
-        <dd>This text constraint match if the text value could be
-        parsed as an integer. If the optional argument to the command
-        is <i class="m">tcl</i> everthing that returns TCL_OK if feeded into
-        Tcl_GetInt() matches. If the optional argument to the command
-        is <i class="m">xsd</i> then the constraint match if the value is a
-        valid xsd:integer. Without argument <i class="m">xsd</i> is the
-        default.</dd>
-      
-
-      
-        <dt>
-<b class="cmd">negativeInteger</b> <i class="m">?(xsd|tcl)?</i>
-</dt>
-        <dd>This text constraint match the same text values as the
-        <i class="m">integer</i> text constraint (see there) with the additional
-        constraint that the value must be &lt; zero.</dd>
-      
-      
-      
-        <dt>
-<b class="cmd">nonNegativeInteger</b> <i class="m">?(xsd|tcl)?</i>
-</dt>
-        <dd>This text constraint match the same text values as the
-        <i class="m">integer</i> text constraint (see there) with the additional
-        constraint that the value must be &gt;= zero.</dd>
-      
-
-      
-        <dt>
-<b class="cmd">nonPositiveInteger</b> <i class="m">?(xsd|tcl)?</i>
-</dt>
-        <dd>This text constraint match the same text values as the
-        <i class="m">integer</i> text constraint (see there) with the additional
-        constraint that the value must be &lt;= zero.</dd>
-      
-
-      
-        <dt>
-<b class="cmd">positiveInteger</b> <i class="m">?(xsd|tcl)?</i>
-</dt>
-        <dd>This text constraint match the same text values as the
-        <i class="m">integer</i> text constraint (see there) with the additional
-        constraint that the value must be &gt; zero.</dd>
-      
-      
-      
-        <dt>
-<b class="cmd">fixed</b> <i class="m">value</i>
-</dt>
-        <dd>The text constraint only match if the text value is
-        string equal to the given value.</dd>
-      
-      
-      
-        <dt>
+    nsattribute and deftexttype commands are evaluated in the Tcl
+    namespace <i class="m">tdom::schema::text</i> namespace and allow the
+    following text constraint commands to check text for certain
+    properties. The commands are defined in the Tcl namespace
+    <i class="m">tdom::schema::text</i>. They raise error in case they are
+    called outside of a text constraint script.</p><p>A few of the following text type commands are exposed as
+    general Tcl commands. They are defined in the namespace tdom::type
+    and are called as documented below with the text to check appended
+    to the argument list. They return a logical value. Please note,
+    that the commands may not accept starting or ending white space. It
+    is noted with the command documentation, if the command is
+    available in the tdom::type namespace.
+    </p>
+        <h3><a name="SECTid0x5593e3de47b0">The tcl text constraint command</a></h3>
+        <p>The <i class="m">tcl</i> text constraint command dispatches the check
+        to an arbitrary Tcl command, thus enable any programmable
+        decision rules.</p>
+        <dl class="commandlist">
+            
+                <dt>
 <b class="cmd">tcl</b> <i class="m">tclcmd</i> <i class="m">?arg arg ...?</i>
 </dt>
-        <dd>Evaluates the tcl script <i class="m">tclcmd arg arg ... </i> and
-        the text to validate appended to the argument list. The return
-        value of the tcl command is interpreted as a boolean.</dd>
-      
+                <dd>Evaluates the tcl script <i class="m">tclcmd arg arg ... </i> and
+                the text to validate appended to the argument list. The return
+                value of the tcl command is interpreted as a boolean.</dd>
+            
+        </dl>
+    
+        <h3><a name="SECTid0x5593e3de5590">Basic XML types</a></h3>
+        <dl class="commandlist">
+            
+                <dt><b class="cmd">name</b></dt>
+                <dd>This text constraint match if the text value match the
+                XML name production
+                <a href="https://www.w3.org/TR/xml/#NT-Name">https://www.w3.org/TR/xml/#NT-Name</a>. This means the
+                text value must start with a letter, underscore (_), or colon (:),
+                and may contain only letters, digits, underscores (_), colons
+                (:), hyphens (-), and periods (.).</dd>
+            
+            
+                <dt><b class="cmd">ncname</b></dt>
+                <dd>This text constraint match if the text value match the
+                XML ncname production
+                <a href="https://www.w3.org/TR/xml-names/#NT-NCName">https://www.w3.org/TR/xml-names/#NT-NCName</a>. This
+                means the text value must start with a letter or underscore (_),
+                and may contain only letters, digits, underscores (_), hyphens
+                (-), and periods (.) (The only difference to the name
+                constraint is that colons are not permitted.)</dd>
+            
+            
+                <dt><b class="cmd">qname</b></dt>
+                <dd>This text constraint match if the text value match the
+                XML qname production
+                <a href="https://www.w3.org/TR/xml-names/#NT-QName">https://www.w3.org/TR/xml-names/#NT-QName</a>. This
+                means the text value is either a ncname or two ncnames joined
+                by a colon (:).</dd>
+            
+            
+                <dt><b class="cmd">nmtoken</b></dt>
+                <dd>This text constraint match if the text value match the
+                XML nmtoken production
+                <a href="https://www.w3.org/TR/xml/#NT-Nmtoken">https://www.w3.org/TR/xml/#NT-Nmtoken</a>
+</dd>
+            
+            
+                <dt><b class="cmd">nmtokens</b></dt>
+                <dd>This text constraint match if the text value match the
+                XML nmtokens production
+                <a href="https://www.w3.org/TR/xml/#NT-Nmtokens">https://www.w3.org/TR/xml/#NT-Nmtokens</a>
+</dd>
+            
+        </dl>
+    
+        <h3><a name="SECTid0x5593e3de7560">Basic type tests</a></h3>
+        <p>
+        </p>
+        <dl class="commandlist">
+            
+                <dt>
+<b class="cmd">integer</b> <i class="m">?(xsd|tcl)?</i>
+</dt>
+                <dd>This text constraint match if the text value could be
+                parsed as an integer. If the optional argument to the command
+                is <i class="m">tcl</i> everthing that returns TCL_OK if feeded into
+                Tcl_GetInt() matches. If the optional argument to the command
+                is <i class="m">xsd</i> then the constraint match if the value is a
+                valid xsd:integer. Without argument <i class="m">xsd</i> is the
+                default.</dd>
+            
 
-      
-        <dt>
-<b class="cmd">enumeration</b> <i class="m">list</i>
+            
+                <dt>
+<b class="cmd">negativeInteger</b> <i class="m">?(xsd|tcl)?</i>
 </dt>
-        <dd>This text constraint match if the text value is equal to
-        one element (respecting case and any whitespace) of the
-        argument <i class="m">list</i>, which has to be a valid Tcl list.
-        </dd>
-      
-      
-        <dt>
-<b class="cmd">match</b> <i class="m">?-nocase?</i> <i class="m">glob_style_match_pattern&gt;</i>
+                <dd>This text constraint match the same text values as the
+                <i class="m">integer</i> text constraint (see there) with the additional
+                constraint that the value must be &lt; zero.</dd>
+            
+            
+            
+                <dt>
+<b class="cmd">nonNegativeInteger</b> <i class="m">?(xsd|tcl)?</i>
 </dt>
-        <dd>This text constraint match if the text value match the
-        glob style pattern given as argument. It follows the rules of
-        the Tcl [string match] command, see
-        <a href="https://www.tcl.tk/man/tcl8.6/TclCmd/string.htm#M35">https://www.tcl.tk/man/tcl8.6/TclCmd/string.htm#M35</a>.</dd>
-      
-      
-        <dt>
-<b class="cmd">regexp</b> <i class="m">expression</i>
+                <dd>This text constraint match the same text values as the
+                <i class="m">integer</i> text constraint (see there) with the additional
+                constraint that the value must be &gt;= zero.</dd>
+            
+
+            
+                <dt>
+<b class="cmd">nonPositiveInteger</b> <i class="m">?(xsd|tcl)?</i>
 </dt>
-        <dd>This text constraint match if the text value match the
-        regular expression given as argument. <a href="https://www.tcl.tk/man/tcl8.6/TclCmd/re_syntax.htm">https://www.tcl.tk/man/tcl8.6/TclCmd/re_syntax.htm</a> describes the regular expression syntax</dd>
-      
-      
-        <dt><b class="cmd">nmtoken</b></dt>
-        <dd>This text constraint match if the text value match the
-        XML nmtoken production
-        <a href="https://www.w3.org/TR/xml/#NT-Nmtoken">https://www.w3.org/TR/xml/#NT-Nmtoken</a>
-</dd>
-      
-      
-        <dt><b class="cmd">nmtokens</b></dt>
-        <dd>This text constraint match if the text value match the
-        XML nmtokens production
-        <a href="https://www.w3.org/TR/xml/#NT-Nmtokens">https://www.w3.org/TR/xml/#NT-Nmtokens</a>
-</dd>
-      
-      
-        <dt><b class="cmd">name</b></dt>
-        <dd>This text constraint match if the text value match the
-        XML name production
-        <a href="https://www.w3.org/TR/xml/#NT-Name">https://www.w3.org/TR/xml/#NT-Name</a>. This means the
-        text value must start with a letter, underscore (_), or colon (:),
-        and may contain only letters, digits, underscores (_), colons
-        (:), hyphens (-), and periods (.).</dd>
-      
-      
-        <dt><b class="cmd">ncname</b></dt>
-        <dd>This text constraint match if the text value match the
-        XML ncname production
-        <a href="https://www.w3.org/TR/xml-names/#NT-NCName">https://www.w3.org/TR/xml-names/#NT-NCName</a>. This
-        means the text value must start with a letter or underscore (_),
-        and may contain only letters, digits, underscores (_), hyphens
-        (-), and periods (.) (The only difference to the name
-        constraint is that colons are not permitted.)</dd>
-      
-      
-        <dt><b class="cmd">qname</b></dt>
-        <dd>This text constraint match if the text value match the
-        XML qname production
-        <a href="https://www.w3.org/TR/xml-names/#NT-QName">https://www.w3.org/TR/xml-names/#NT-QName</a>. This
-        means the text value is either a ncname or two ncnames joined
-        by a colon (:).</dd>
-      
-      
-        <dt>
+                <dd>This text constraint match the same text values as the
+                <i class="m">integer</i> text constraint (see there) with the additional
+                constraint that the value must be &lt;= zero.</dd>
+            
+
+            
+                <dt>
+<b class="cmd">positiveInteger</b> <i class="m">?(xsd|tcl)?</i>
+</dt>
+                <dd>This text constraint match the same text values as the
+                <i class="m">integer</i> text constraint (see there) with the additional
+                constraint that the value must be &gt; zero.</dd>
+            
+
+            
+                <dt>
 <b class="cmd">number</b> <i class="m">?(xsd|tcl)?</i>
 </dt>
-        <dd>This text constraint match if the text value could be
-        parsed as a number. If the optional argument to the command is
-        <i class="m">tcl</i> everthing that returns TCL_OK if feeded into
-        Tcl_GetDouble() matches. If the optional argument to the command
-        is <i class="m">xsd</i> then the constraint match if the value is a
-        valid xsd:decimal. Without argument <i class="m">xsd</i> is the
-        default.</dd>
-      
-      
-        <dt>
+                <dd>This text constraint match if the text value could be
+                parsed as a number. If the optional argument to the command is
+                <i class="m">tcl</i> everthing that returns TCL_OK if feeded into
+                Tcl_GetDouble() matches. If the optional argument to the command
+                is <i class="m">xsd</i> then the constraint match if the value is a
+                valid xsd:decimal. Without argument <i class="m">xsd</i> is the
+                default.</dd>
+            
+            
+                <dt>
 <b class="cmd">boolean</b> <i class="m">?(xsd|tcl)?</i>
 </dt>
-        <dd>This text constraint match if the text value could be
-        parsed as a boolean. If the optional argument to the command is
-        <i class="m">tcl</i> everthing that returns TCL_OK if feeded into
-        Tcl_GetBoolean() matches. If the optional argument to the command
-        is <i class="m">xsd</i> then the constraint match if the value is a
-        valid xsd:boolean. Without argument <i class="m">xsd</i> is the
-        default.</dd>
-      
-      
-        <dt><b class="cmd">isodate</b></dt>
-        <dd>This text constraint match if the text value is a
-        xsd:date. This is basically like an ISO 8601 date of the form
-        JJJJ-MM-DD. It follows the date rules of the gregorian
-        calendar for all dates. A preceding minus sign for bce dates
-        is allowed. There is no year 0.</dd>
-      
-      
-        <dt>
-<b class="cmd">maxLength</b> <i class="m">length</i>
-</dt>
-        <dd>This text constraint match if the length of the text
-        value (in characters, not bytes) is at most <i class="m">length</i>. The
-        length argument must be an integer greater zero.</dd>
-      
-      
-        <dt>
-<b class="cmd">minLength</b> <i class="m">length</i>
-</dt>
-        <dd>This text constraint match if the length of the text
-        value (in characters, not bytes) is at least <i class="m">length</i>.
-        The length argument must be an integer greater zero.</dd>
-      
-      
-        <dt>
+                <dd>This text constraint match if the text value could be
+                parsed as a boolean. If the optional argument to the command is
+                <i class="m">tcl</i> everthing that returns TCL_OK if feeded into
+                Tcl_GetBoolean() matches. If the optional argument to the command
+                is <i class="m">xsd</i> then the constraint match if the value is a
+                valid xsd:boolean. Without argument <i class="m">xsd</i> is the
+                default.</dd>
+            
+            
+                <dt><b class="cmd">date</b></dt>
+                <dd>This text constraint match if the text value is
+                a xsd:date. This is basically like an ISO 8601 date of
+                the form YYYY-MM-DD, with optional time zone part
+                (either the letter Z or plus (+) or minus (-) followed
+                by hh:mm and with maximum allowed positiv or negativ
+                time zone 14:00). It follows the date rules of the
+                gregorian calendar for all dates. A preceding minus
+                sign for bce dates is allowed. There is no year 0. The
+                year may have more than 4 digits, but only if needed
+                (no extra leading zeros). This is available as common
+                tcl command tdom::type::date.</dd>
+            
+            
+                <dt><b class="cmd">time</b></dt>
+                <dd>This text constraint match if the text value is
+                a xsd:time. This is basically like an ISO 8601 time of
+                the form hh:mm:ss with optional time zone part. The
+                time zone part follow the rules of the <i class="m">date</i>
+                command; see there. All three parts of the time value
+                (hours, minutes, seconds) must be spelled out with 2
+                digits. Additional fractional seconds (with a point
+                ('.') as separater) are allowed, but not just a
+                dangling point. The time value 24:00:00 (whitout
+                fractional part) is allowed. This is available as
+                common tcl command tdom::type::time.</dd>
+            
+            
+                <dt><b class="cmd">dateTime</b></dt>
+                <dd>This text constraint match if the text value is
+                a xsd:dateTime. This is basically like an ISO 8601
+                date time of the form YYYY-MM-DDThh:mm:ss with
+                optional time zone part. The date and time zone parts
+                follow the rules of the <i class="m">date</i> command; see
+                there. The time part (including the signaling 'T'
+                character) is mandatory and follow the rules of the
+                <i class="m">time</i> command, see there. This is available as
+                common tcl command tdom::type::dateTime.</dd>
+            
+            
+                <dt><b class="cmd">duration</b></dt>
+                <dd>This text constraint match if the text value is
+                a xsd:duration. This is basically like an ISO 8601
+                duration of the form PnYnMnDTnHnMnS. All parts other
+                then the starting P and - if one of H, M or S is given
+                - T are optional. In case the following sign letter is
+                S n may be a decimal (with at least one digit before
+                and after the dot), otherwise it must be a (positiv)
+                integer. This is available as common tcl command
+                tdom::type::duration.</dd>
+            
+            
+                <dt><b class="cmd">base64</b></dt>
+                <dd>This text constraint match if text is valid according to
+                RFC 4648.</dd>
+            
+            
+                <dt><b class="cmd">hexBinary</b></dt>
+                <dd>This text constraint match if text is a sequence of
+                binary octets in hexadecimal encoding, where each binary octet
+                is a two-character hexadecimal number. Lowercase and uppercase
+                letters A through F are permitted.</dd>
+            
+            
+                <dt><b class="cmd">unsignedByte</b></dt>
+                <dd>This text constraint match if the text value is a
+                xsd:unsignedByte. This is an integer between 0 and 255, both
+                included, optionally preceded by a + sign and leading
+                zeros.</dd>
+            
+            
+                <dt><b class="cmd">unsignedShort</b></dt>
+                <dd>This text constraint match if the text value is a
+                xsd:unsignedShort. This is an integer between 0 and 65535,
+                both included, optionally preceded by a + sign and leading
+                zeros.</dd>
+            
+            
+                <dt><b class="cmd">unsignedInt</b></dt>
+                <dd>This text constraint match if the text value is a
+                xsd:unsignedInt. This is an integer between 0 and 4294967295,
+                both included, optionally preceded by a + sign and leading
+                zeros.</dd>
+            
+            
+                <dt><b class="cmd">unsignedLong</b></dt>
+                <dd>This text constraint match if the text value is a
+                xsd:unsignedLong. This is an integer between 0 and
+                18446744073709551615, both included, optionally preceded by a
+                + sign and leading zeros.</dd>
+            
+        </dl>
+    
+        <h3><a name="SECTid0x5593e3dee7d0">Logical construcsts</a></h3>
+        <dl class="commandlist">
+        
+            <dt>
 <b class="cmd">oneOf</b> <i class="m">&lt;constraint script&gt;</i>
 </dt>
-        <dd>This text constraint match if one of the text
-        constraints defined in the argument <i class="m">constraint script</i>
-        match the text. It stops after the first match and probes the
-        text constraints in the order of definition.</dd>
-      
-      
-        <dt>
+            <dd>This text constraint match if one of the text
+            constraints defined in the argument <i class="m">constraint script</i>
+            match the text. It stops after the first match and probes the
+            text constraints in the order of definition.</dd>
+        
+        
+            <dt>
 <b class="cmd">allOf</b> <i class="m">&lt;constraint script&gt;</i>
 </dt>
-        <dd>This text constraint match if all of the text
-        constraints defined in the argument <i class="m">constraint script</i>
-        match the text. It stops after the first match failues and
-        probes the text constraints in the order of definition. Since
-        the schema definition commmand <i class="m">text</i> also expects all
-        text constraints to match the text constraint <i class="m">allOf</i> is
-        useful mostly together with the <i class="m">oneOf</i> text constraint
-        commmand.</dd>
-      
-      
-        <dt>
-<b class="cmd">strip</b> <i class="m">&lt;constraint script&gt;</i>
+            <dd>This text constraint match if all of the text
+            constraints defined in the argument <i class="m">constraint script</i>
+            match the text. It stops after the first match failues and
+            probes the text constraints in the order of definition. Since
+            the schema definition commmand <i class="m">text</i> also expects all
+            text constraints to match the text constraint <i class="m">allOf</i> is
+            useful mostly together with the <i class="m">oneOf</i> text constraint
+            commmand.</dd>
+        
+        
+            <dt>
+<b class="cmd">not</b> <i class="m">&lt;constraint script&gt;</i>
 </dt>
-        <dd>This text constraint command tests all text constraints
-        in the evaluated <i class="m">constraint script&gt;</i> with the text to
-        test striped of all white space at start and end.</dd>
-      
-      
-        <dt>
+            <dd>This text constraint match if none of the text
+            constraints defined in the argument <i class="m">constraint
+            script</i> match the text. It stops after the first
+            matching constaint in the <i class="m">constraint script</i> and
+            reports validation error. The text constraints in the
+            <i class="m">constraint script</i> are probed in the order of
+            definition.</dd>
+        
+        </dl>
+    
+        <h3><a name="SECTid0x5593e3df0600">Contraints on processed text value</a></h3>
+        <dl class="commandlist">
+            
+            <dt>
+<b class="cmd">whitespace</b> <i class="m">(preserve|replace|collapse)</i> <i class="m">&lt;constraint script&gt;</i>
+</dt>
+            <dd>This text constraint command does whitespace (#x20
+            (space, ' '), #x9 (tab, \t), #xA (linefeed, \n), and #xD
+            (carriage return, \r) normalization to the text value and
+            checks the resulting text with the text constraints of the
+            constraint script argument. The normalization method
+            <i class="m">preserve</i> keeps everything as it is; this is another way
+            to say <i class="m">allOf</i>. The <i class="m">replace</i> normalization method
+            replaces any single whitespace character (as above) to a
+            space. The <i class="m">collapse</i> normalization method removes all
+            leading and trailing whitespace and all the other sequences of
+            contiguous whitespace are replaced by a single space.</dd>
+        
+        
+            <dt>
 <b class="cmd">split</b> <i class="m">?type ?args??</i><i class="m">&lt;constraint script&gt;</i>
 </dt>
-        <dd>
+            <dd>
 <p>This text constraint command splits the text to test
-        into a list of values and tests all elements of that list for
-        the text constraints in the evaluated <i class="m">constraint
-        script&gt;</i>.</p>
-        <p>The available types are:</p>
-        <dl>
-            <dt>whitespace</dt><dd>The text to split is striped of all
-            white space at start and end splited into a list at any
-            successive white space.</dd>
-            <dt>tcl tclcmd ?arg ...?</dt><dd>The text to split is
-            handed to the <i class="m">tclcmd</i>, which is evaluated on global
-            level, appended with every given arg and the text to split
-            as last argument. This call must return a valid tcl list,
-            which elements are tested..</dd>
-        </dl>
-        <p>The default in case no split type argument is given is
-        <i class="m">whitespace</i>.</p>
+            into a list of values and tests all elements of that list for
+            the text constraints in the evaluated <i class="m">constraint
+            script&gt;</i>.</p>
+            <p>The available types are:</p>
+            <dl>
+                <dt>whitespace</dt><dd>The text to split is striped of all
+                white space at start and end splited into a list at any
+                successive white space.</dd>
+                <dt>tcl tclcmd ?arg ...?</dt><dd>The text to split is
+                handed to the <i class="m">tclcmd</i>, which is evaluated on global
+                level, appended with every given arg and the text to split
+                as last argument. This call must return a valid tcl list,
+                which elements are tested.</dd>
+            </dl>
+            <p>The default in case no split type argument is given is
+            <i class="m">whitespace</i>.</p>
 </dd>
-      
-      
-        <dt>
+        
+        
+            <dt>
+<b class="cmd">strip</b> <i class="m">&lt;constraint script&gt;</i>
+</dt>
+            <dd>This text constraint command tests all text constraints
+            in the evaluated <i class="m">constraint script&gt;</i> with the text to
+            test striped of all white space at start and end.</dd>
+        
+        </dl>
+    
+        <h3><a name="SECTid0x5593e3df2fc0">Various other string properties</a></h3>
+        <dl class="commandlist">
+        
+            <dt>
+<b class="cmd">fixed</b> <i class="m">value</i>
+</dt>
+            <dd>The text constraint only match if the text value is
+            string equal to the given value.</dd>
+        
+        
+        
+            <dt>
+<b class="cmd">enumeration</b> <i class="m">list</i>
+</dt>
+            <dd>This text constraint match if the text value is equal to
+            one element (respecting case and any whitespace) of the
+            argument <i class="m">list</i>, which has to be a valid Tcl list.
+            </dd>
+        
+        
+            <dt>
+<b class="cmd">match</b> <i class="m">?-nocase?</i> <i class="m">glob_style_match_pattern&gt;</i>
+</dt>
+            <dd>This text constraint match if the text value match the
+            glob style pattern given as argument. It follows the rules of
+            the Tcl [string match] command, see
+            <a href="https://www.tcl.tk/man/tcl8.6/TclCmd/string.htm#M35">https://www.tcl.tk/man/tcl8.6/TclCmd/string.htm#M35</a>.</dd>
+        
+        
+            <dt>
+<b class="cmd">regexp</b> <i class="m">expression</i>
+</dt>
+            <dd>This text constraint match if the text value match the
+            regular expression given as argument. <a href="https://www.tcl.tk/man/tcl8.6/TclCmd/re_syntax.htm">https://www.tcl.tk/man/tcl8.6/TclCmd/re_syntax.htm</a> describes the regular expression syntax</dd>
+        
+        
+            <dt>
+<b class="cmd">length</b> <i class="m">length</i>
+</dt>
+            <dd>This text constraint match if the length of the text
+            value (in characters, not bytes) is <i class="m">length</i>. The
+            length argument must be a positive integer or zero.</dd>
+        
+        
+            <dt>
+<b class="cmd">maxLength</b> <i class="m">length</i>
+</dt>
+            <dd>This text constraint match if the length of the text
+            value (in characters, not bytes) is at most <i class="m">length</i>. The
+            length argument must be an integer greater zero.</dd>
+        
+        
+            <dt>
+<b class="cmd">minLength</b> <i class="m">length</i>
+</dt>
+            <dd>This text constraint match if the length of the text
+            value (in characters, not bytes) is at least <i class="m">length</i>.
+            The length argument must be an integer greater zero.</dd>
+        
+        
+            <dt>
 <b class="cmd">id</b> <i class="m">?keySpace?</i>
 </dt>
-        <dd>This text constraint command marks the text as a
-        document wide ID (to be referenced by an idref). Every ID
-        value within a document must be unique. It isn't an error if
-        the ID isn't actually referenced within the document. The
-        optional argument <i class="m">keySpace</i> does all this for a named
-        key space. The key space "" (the empty sting) is another key
-        space as the <i class="m">id</i> command without keySpace
-        argument.</dd>
-      
-      
-        <dt>
+            <dd>This text constraint command marks the text as a
+            document wide ID (to be referenced by an idref). Every ID
+            value within a document must be unique. It isn't an error if
+            the ID isn't actually referenced within the document. The
+            optional argument <i class="m">keySpace</i> does all this for a named
+            key space. The key space "" (the empty sting) is another key
+            space as the <i class="m">id</i> command without keySpace
+            argument.</dd>
+        
+        
+            <dt>
 <b class="cmd">idref</b> <i class="m">?keySpace?</i>
 </dt>
-        <dd>This text constraint command expects the text to be a
-        reference to an ID within the document. The referenced ID may
-        be later in the document, that the reference. Several
-        references within the document to one ID are possible.</dd>
-      
-      
-        <dt><b class="cmd">base64</b></dt>
-        <dd>This text constraint match if text is valid according to
-        RFC 4648.</dd>
-      
-      
-        <dt><b class="cmd">hexBinary</b></dt>
-        <dd>This text constraint match if text is a sequence of
-        binary octets in hexadecimal encoding, where each binary octet
-        is a two-character hexadecimal number. Lowercase and uppercase
-        letters A through F are permitted.</dd>
-      
-      
-        <dt><b class="cmd">unsignedByte</b></dt>
-        <dd>This text constraint match if the text value is a
-        xsd:unsignedByte. This is an integer between 0 and 255, both
-        included, optionally preceded by a + sign and leading
-        zeros.</dd>
-      
-      
-        <dt><b class="cmd">unsignedShort</b></dt>
-        <dd>This text constraint match if the text value is a
-        xsd:unsignedShort. This is an integer between 0 and 65535,
-        both included, optionally preceded by a + sign and leading
-        zeros.</dd>
-      
-      
-        <dt><b class="cmd">unsignedInt</b></dt>
-        <dd>This text constraint match if the text value is a
-        xsd:unsignedInt. This is an integer between 0 and 4294967295,
-        both included, optionally preceded by a + sign and leading
-        zeros.</dd>
-      
-      
-        <dt><b class="cmd">unsignedLong</b></dt>
-        <dd>This text constraint match if the text value is a
-        xsd:unsignedLong. This is an integer between 0 and
-        18446744073709551615, both included, optionally preceded by a
-        + sign and leading zeros.</dd>
-      
-    </dl>
+            <dd>This text constraint command expects the text to be a
+            reference to an ID within the document. The referenced ID may
+            be later in the document, that the reference. Several
+            references within the document to one ID are possible.</dd>
+        
+        </dl>
+    
 
-  <h2><a name="SECTid0x564487b4f870">Local key constraints</a></h2><p>Document wide uniqueness and foreign key constraints are
+  <h2><a name="SECTid0x5593e3df7020">Local key constraints</a></h2><p>Document wide uniqueness and foreign key constraints are
     available with the text constraint commands id and idref.
     Keyspaces allow for sub-tree local uniqueness and foreign key
     constraints.</p><dl class="commandlist">
@@ -1120,7 +1290,31 @@ s define {
         
     </dl>
 
-  <h2><a name="SECTid0x564487b51680">Exampels</a></h2><p>The XML Schema Part 0: Primer Second Edition
+  <h2><a name="SECTid0x5593e3df8e30">Recovering</a></h2><p>By default the validation engine stops at the first detected
+      validation violation and report that finding. It does so by
+      return false (and set, if given, the result variable with an
+      error message) in case the schema command itself is used to
+      validate input. If the schema command is used by a SAX parser or
+      the DOM parser it does so by throwing error.</p><p>If a <i class="m">reportcmd</i> is set this command is called on global
+      level appended with the schema command and an error type as
+      arguments if a validation violation is detected. Then the
+      validation recovers from the error and continues. For some
+      validation errors the reocver strategy can be determined with
+      the script result of the reportcmd.</p><p>With a <i class="m">reportcmd</i> (which doesen&amp;t throw error if
+      called) the validation engine will never report validation
+      failure to its caller. The validation engine recovers, continues
+      and report the next error, if one happen and so until the end of
+      the input. The schema command will return true and the SAX
+      parser and DOM builder will process normally until the end of
+      the input, as if there would not have been validation.</p><p>Please note, that this happens only for validation errors. It
+      isn't possible to recover from well-formedness errors. If the
+      input isn't well-formed the schema command returns false and
+      set, if given, the result variable with an error message about
+      the well-formedness error.</p><p>If the <i class="m">reportcmd</i> throws error while called by the
+      validation engine then validation stops and the schema command
+      thows error with the error message of the script.</p>
+
+  <h2><a name="SECTid0x5593e3df9fe0">Exampels</a></h2><p>The XML Schema Part 0: Primer Second Edition
     (<a href="https://www.w3.org/TR/xmlschema-0/">https://www.w3.org/TR/xmlschema-0/</a>) starts with this
     example schema:</p><pre class="example">
 &lt;xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
@@ -1208,7 +1402,7 @@ schema define {
         element billTo ! {ref USAddress}
         element comment ?
         element items
-        attribute orderDate isodate
+        attribute orderDate date
     }
 
     defpattern USAddress {
@@ -1226,7 +1420,7 @@ schema define {
             element quantity ! {text integer}
             element USPrice ! {text number}
             element comment
-            element shipDate ? {text isodate}
+            element shipDate ? {text date}
             attribute partNum ! {pattern "^\d{3}-[A-Z]{2}$"}
         }
     }
@@ -1289,7 +1483,7 @@ schema define {
       
     </pre>
 
-<h2><a name="SECTid0x564487b53600">KEYWORDS</a></h2><p class="keywords">
+<h2><a name="SECTid0x5593e3dfbf60">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-Validation">Validation</a>, <a class="keyword" href="keyword-index.html#KW-Postvalidation">Postvalidation</a>, <a class="keyword" href="keyword-index.html#KW-DOM">DOM</a>, <a class="keyword" href="keyword-index.html#KW-SAX">SAX</a>
 </p>
 </div><hr class="navsep"><div class="navbar" align="center">

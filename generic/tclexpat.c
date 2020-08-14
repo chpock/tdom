@@ -642,7 +642,7 @@ TclExpatFreeParser(
  *	None.
  *
  * Side effects:
- *	Stores the markup context in expapt->currentmarkup.
+ *	Stores the markup context in expat->currentmarkup.
  *
  *----------------------------------------------------------------------------
  */
@@ -2903,7 +2903,8 @@ TclExpatDispatchPCDATA(
   
 #ifndef TDOM_NO_SCHEMA
   if (expat->sdata) {
-      if (probeText (expat->interp, expat->sdata, s) != TCL_OK) {
+      if (probeText (expat->interp, expat->sdata, s,
+                     expat->needWSCheck ? &onlyWhiteSpace : NULL) != TCL_OK) {
           TclExpatHandlerResult (expat, NULL, TCL_ERROR);
       }
   }
