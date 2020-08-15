@@ -24,25 +24,24 @@
     <p>Additionally, a validation command may be used as argument to
     the <m>-validateCmd</m> option of the <m>dom parse</m> and the
     <m>expat</m> commands to enable validation additional to what they
-    otherwise do.</p>
+    do otherwise.</p>
 
-    <p>The methods of the created commands are:</p>
+    <p>The methods of created commands are:</p>
 
     <commandlist>
       <commanddef>
           <command><method>prefixns</method> <m>?prefixUriList?</m></command>
           <desc>This method gives control to a prefix (or
-          abbreviation) to namespace URI mapping. Everywhere a
-          namespace argument is expected in the schema command methods
-          you may use the &quot;prefix&quot; pointing to the namespace
-          URI in the current prefixUriList, set by this method. If the
-          list map the same prefix to different namespace URIs the
-          first one win. If there isn't such a prefix the namespace
-          argument is used literally as namespace URI. If the method
-          is called without argument it returns the current
-          prefixUriList. If the method is called with the empty string
-          any namespace URI arguments are used literally. This is the
-          default.
+          abbreviation) to namespace URI mapping. Wherever a namespace
+          argument is expected in the schema command methods you may
+          use the &quot;prefix&quot; pointing to the namespace URI in
+          the current prefixUriList, set by this method. If the list
+          maps the same prefix to different namespace URIs, the first
+          one win. If there is no such a prefix the namespace argument
+          is used literally as namespace URI. If the method is called
+          without argument it returns the current prefixUriList. If
+          the method is called with the empty string any namespace URI
+          arguments are used literally. This is the default.
           </desc>
       </commanddef>
 
@@ -63,8 +62,8 @@
         <command><method>defelementtype</method> <m>typename</m> <m>name</m> <m>?namespace?</m> <m>&lt;definition script></m></command>
         <desc>This method defines the element type <m>typename</m>
         (optional in the namespace <m>namespace</m>) in the schema. If
-        the element type is referred in a definition script with the
-        schema command elementtype the validation engine expects an
+        the element type is used in a definition script with the
+        schema command elementtype, the validation engine expects an
         element named <m>name</m> (in the namespace <m>namespace</m>,
         if given) and the content model <m>definition script</m>.
         Defining element types seems only sensible if you really have
@@ -84,7 +83,7 @@
         <command><method>defpattern</method> <m>name</m> <m>?namespace?</m> <m>&lt;definition script></m></command>
         <desc>This method defines a (maybe complex) content particle
         with the <m>name</m> (optional in the namespace
-        <m>namespace</m>) in the schema, to be referenced in other
+        <m>namespace</m>) in the schema, to be used in other
         definition scripts with the definition command <m>ref</m>. The
         <m>definition script</m> is evaluated and defines the content
         model of the content particle. If the <m>namespace</m>
@@ -97,8 +96,8 @@
 
       <commanddef>
         <command><method>deftexttype</method> <m>name</m> <m>&lt;constraint script></m></command>
-        <desc>This method defines a bundle of text constraints, that
-        can be referred by <m>name</m> while defining constrains on
+        <desc>This method defines a bundle of text constraints that
+        can be referred to by <m>name</m> while defining constrains on
         text element or attribute values. If there is already a text
         type definition with this name, the command raises error. A
         text type must be defined before it can be used in schema
@@ -108,14 +107,14 @@
       <commanddef>
         <command><method>start</method> <m>documentElement</m> <m>?namespace?</m></command>
         <desc>This method defines the name and namespace of the root
-        element of a tree to validate. If this method is used then the
-        root element must match for validity. If <m>start</m> isn't
-        used, any with <m>defelement</m> defined element may be the
+        element of a tree to validate. If this method is used, then
+        the root element must match for validity. If <m>start</m> is
+        not used, any element defined by <m>defelement</m> may be the
         root of a valid document. The <m>start</m> method may be used
         several times with varying arguments during the lifetime of a
         validation command. If the command is called with just the
         empty string (and no namespace argument), the validation
-        constrain for the root element is removed and any defined
+        constraint for the root element is removed and any defined
         element will be valid as root of a tree to validate.</desc>
       </commanddef>
 
@@ -141,21 +140,21 @@
             <optarg>name ?attributes? ?namespace? </optarg>
             <desc>Checks if the current validation state allows the
             element <m>name</m> in the <m>namespace</m> to start here.
-            It raises error, if not.</desc>
+            It raises error if not.</desc>
           </optdef>
 
           <optdef>
             <optname>end</optname>
             <desc>Checks if the current innermost open element may end
-            here in the current state without violate validation
-            constrains. It raises error, if not.</desc>
+            here in the current state without violation of validation
+            constrains. It raises error if not.</desc>
           </optdef>
           
           <optdef>
             <optname>text</optname>
             <optarg>text</optarg>
             <desc>Checks if the current validation state allows the
-            given text content. It raises error, if not.</desc>
+            given text content. It raises error if not.</desc>
           </optdef>
         </optlist>
         </desc>
@@ -164,58 +163,57 @@
       <commanddef>
         <command><method>validate</method> <m>&lt;XML string></m> <m>?objVar?</m></command>
         <desc>Returns true if the <m>&lt;XML string></m> is valid or
-        false otherwise. If validation failed and the optional
-        <m>objVar</m> argument is given, then the variable with that
+        false otherwise. If validation has failed and the optional
+        <m>objVar</m> argument is given, the variable with that
         name is set to a validation error message. If the XML string
         is valid and the optional <m>objVar</m> argument is given,
-        then the variable with that name is set to the empty string.</desc>
+        the variable with that name is set to the empty string.</desc>
       </commanddef>
 
       <commanddef>
         <command><method>validatefile</method> <m>filename</m> <m>?objVar?</m></command>
         <desc>Returns true if the content of <m>filename</m> is valid
         or false otherwise. The given file is feeded as binary stream
-        to expat, therefor only US-ASCII, ISO-8859-1, UTF-8 or UTF-16
+        to expat, therefore only US-ASCII, ISO-8859-1, UTF-8 or UTF-16
         encoded data will work with this method. If validation failed
-        and the optional <m>objVar</m> argument is given, then the
-        variable with that name is set to a validation error message.
-        If the XML string is valid and the optional <m>objVar</m>
-        argument is given, then the variable with that name is set to
-        the empty string.</desc>
+        and the optional <m>objVar</m> argument is given, the variable
+        with that name is set to a validation error message. If the
+        XML string is valid and the optional <m>objVar</m> argument is
+        given, the variable with that name is set to the empty
+        string.</desc>
       </commanddef>
 
       <commanddef>
         <command><method>validatechannel</method> <m>channel</m> <m>?objVar?</m></command>
-        <desc>Returns true if the content read out of the Tcl channel
+        <desc>Returns true if the content read from the Tcl channel
         <m>channel</m> is valid or false otherwise. Since data read
-        out of a Tcl channel is UTF-8 encoded any misleading encoding
+        out of a Tcl channel is UTF-8 encoded, any misleading encoding
         declaration at the beginning of the data will lead to errors.
-        If the validation failed and the optional <m>objVar</m>
-        argument is given, then the variable with that name is set to
-        a validation error message. If the XML string is valid and the
-        optional <m>objVar</m> argument is given, then the variable
-        with that name is set to the empty string.</desc>
+        If the validation fails and the optional <m>objVar</m>
+        argument is given, the variable with that name is set to a
+        validation error message. If the XML string is valid and the
+        optional <m>objVar</m> argument is given, the variable with
+        that name is set to the empty string.</desc>
       </commanddef>
       
       <commanddef>
         <command><method>domvalidate</method> <m>domNode</m> <m>?objVar?</m></command>
         <desc>Returns true if the first argument is a valid tree or
         false otherwise. If validation failed and the optional
-        <m>objVar</m> argument is given, then the variable with that
-        name is set to a validation error message. If the dom tree is
-        valid and the optional <m>objVar</m> argument is given, then
-        the variable with that name is set to the empty string. </desc>
+        <m>objVar</m> argument is given, the variable with that name
+        is set to a validation error message. If the dom tree is valid
+        and the optional <m>objVar</m> argument is given, the variable
+        with that name is set to the empty string. </desc>
       </commanddef>
 
       <commanddef>
         <command><method>reportcmd</method> <m>?cmd?</m></command>
         <desc>This method expects the name of a Tcl command to be
         called in case of validation error. This command will be
-        called with two arguments appended: the schema command, that
+        called with two arguments appended: the schema command which
         raises the validation error, and a validation error code.
-        For more detailed information see <ref
-        refid="recovering">Recovering</ref>.The possible error codes
-        are:
+
+        <p>The possible error codes are:</p>
         <dl>
             <dt>MISSING_ELEMENT</dt><dd></dd>
             <dt>MISSING_TEXT</dt><dd></dd>
@@ -269,13 +267,13 @@
               </optdef>
               <optdef>
                   <optname>line</optname>
-                  <desc>If the schema command is currently validating
+                  <desc>If the schema command is currently validating,
                   this method returns the line part of the parsing
                   position information and the empty string in all
                   other cases. If the schema command is currently
                   post-validating a DOM tree there may be no position
-                  information stored at certain or all nodes. The
-                  empty string is returned in this cases.</desc>
+                  information stored at some or all nodes. The
+                  empty string is returned in these cases.</desc>
               </optdef>
               <optdef>
                   <optname>column</optname>
@@ -284,8 +282,8 @@
                   position information and the empty string in all
                   other cases. If the schema command is currently
                   post-validating a DOM tree there may be no position
-                  information stored at certain or all nodes. The
-                  empty string is returned in this cases.</desc>
+                  information stored at some or all nodes. The
+                  empty string is returned in these cases.</desc>
               </optdef>
               <optdef>
                   <optname>domNode</optname>
@@ -1246,7 +1244,27 @@ s define {
       validation engine then validation stops and the schema command
       throws error with the error message of the script.</p>
 
-      
+      <p>While validating basically three events happen: an element
+      start tag has to match, a piece of text has to match or an
+      element end tag has to match. The method <m>info vaction</m>
+      called in the recovering script or any script code called from
+      there returns, which event triggered the error report
+      (MATCH_ELEMENT_START, MATCH_TEXT, MATCH_ELEMENT_END,
+      respectively). While the command walks throu the schema looking
+      if the event matches other, data driven events (as, for example
+      checking, if any keyref within a keyspace exists).</p>
+
+      <p>Several of the validation error codes appended as second
+      argument to the <m>reportcmd</m> calls may happen at more than
+      one validation event. The <m>info vaction</m> method and its
+      subcommands provide information about the current validation
+      event to match.
+      </p>
+
+      <p>If a structural validation error happens, the default
+      recovering strategy is to ignore any following (or missing)
+      content within the current subtree and to continue with the
+      element end event of the element.</p>
       
   </section>
 
