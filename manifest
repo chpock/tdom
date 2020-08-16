@@ -1,5 +1,5 @@
-C Documentation\sproof\sreading\swork.
-D 2020-08-14T22:50:20.280
+C Added\ssome\stests.
+D 2020-08-16T00:49:36.995
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -208,7 +208,7 @@ F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
 F tests/pullparser.test e4b14ea0bdc9f9fd931f3bc559e78c309582a67a238170d58e0f20331f99890c
 F tests/pushpull.bench 664e8f512917537d96c4b71933d4d9a6da65fc6fe85bd7c459483830dc7d2faf
-F tests/schema.test 7baf440e3509591f9537800daf99fd12cce5f423697eaf50c8f19bc029db96a2
+F tests/schema.test 92008954b2a5e6053bf640980543f463f83d9e19142669e80f434d1c0d5bbd45
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
 F tests/tdomcmd.bench b07448ed4de08ccaa9734cf3fe15c695fd7066c993da58ff48d465747940e417
 F tests/tdomcmd.test 092401adf0609906d710f3ef8997cb4ca29bc208
@@ -233,8 +233,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 317939234e5f81bb7ae874ed67c74b63e52e71a238ca79ec2bf9fb1d35c0c082
-R 11e77570187ac8c622a6ab0abcb6d181
+P d2ba60ec1f5d7f7442148ae93bfc40a4c6d9acf048991f9d8f6ce994f17422c0
+R 140fd194cbf097c73aee56703ef1ea3b
 U rolf
-Z cbf694f322130df879ed2602369909d8
+Z 1a6e40915c2031a085d4138e76b74245
 # Remove this line to create a well-formed Fossil manifest.

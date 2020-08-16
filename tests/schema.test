@@ -6129,7 +6129,7 @@ test schema-14.58 {text constraint command syntax} {
     set result
 } 1
 
-test schema-14.59 {} {
+test schema-14.59 {Tcl error in text constraint script} {
     tdom::schema s
     s defelement doc {
         element a
@@ -6142,6 +6142,97 @@ test schema-14.59 {} {
     s delete
     set result
 } 1
+
+test schema-14.60 {Empty element} {
+    tdom::schema s
+    s defelement doc {
+        element a
+    }
+    s defelement a {
+        attribute att ?
+    }
+    ::xml::parser p -validateCmd s
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/></doc>
+        {<doc> <a/></doc>}
+        {<doc> <a att="some"/></doc>}
+        {<doc> <a att="some"></a> </doc>}
+        {<doc> <a att="some"> </a> </doc>}
+    } {
+        lappend result [s validate $xml]
+        lappend result [catch {p parse $xml}]
+        set doc ""
+        lappend result [catch {set doc [dom parse -validateCmd s $xml]}]
+        if {$doc ne ""} {
+            $doc delete
+        }
+    }
+    s delete
+    p delete
+    set result
+} {0 1 1 1 0 0 1 0 0 1 0 0 1 0 0 0 1 1}
+
+test schema-14.61 {Empty element} {
+    tdom::schema s
+    s defelement doc {
+        element a
+    }
+    s defelement a {
+        attribute att ?
+        text
+    }
+    ::xml::parser p -validateCmd s
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/></doc>
+        {<doc> <a/></doc>}
+        {<doc> <a att="some"/></doc>}
+        {<doc> <a att="some"></a> </doc>}
+        {<doc> <a att="some"> </a> </doc>}
+    } {
+        lappend result [s validate $xml]
+        lappend result [catch {p parse $xml}]
+        set doc ""
+        lappend result [catch {set doc [dom parse -validateCmd s $xml]}]
+        if {$doc ne ""} {
+            $doc delete
+        }
+    }
+    s delete
+    p delete
+    set result
+} {0 1 1 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0}
+
+test schema-14.62 {Empty element} {
+    tdom::schema s
+    s defelement doc {
+        element a
+    }
+    ::xml::parser p -validateCmd s
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc><a/></doc>
+        {<doc> <a/></doc>}
+        {<doc> <a></a></doc>}
+        {<doc> <a att="some"></a> </doc>}
+        {<doc> <a> </a> </doc>}
+    } {
+        lappend result [s validate $xml]
+        lappend result [catch {p parse $xml}]
+        set doc ""
+        lappend result [catch {set doc [dom parse -validateCmd s $xml]}]
+        if {$doc ne ""} {
+            $doc delete
+        }
+    }
+    s delete
+    p delete
+    set result
+} {0 1 1 1 0 0 1 0 0 1 0 0 0 1 1 0 1 1}
 
 test schema-15.1 {constraint cmd tcl} {
     tdom::schema s
