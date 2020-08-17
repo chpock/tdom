@@ -63,7 +63,7 @@ The latest release is 0.9.1. Get the source code as
 as [zip archive](http://tdom.org/downloads/tdom-0.9.1-src.zip).
 
 Windows binaries of the 0.9.1 release are also available. Get it for
-[64 bit](http://tdom.org/downloads/tdom-0.9.1-windows-x64.zip or [32
+[64 bit](http://tdom.org/downloads/tdom-0.9.1-windows-x64.zip) or [32
 bit](http://tdom.org/downloads/tdom-0.9.1-windows-x86.zip).
 
 The provided windows binaries include (statically linked) the
