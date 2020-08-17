@@ -1691,7 +1691,7 @@ TclExpatConfigure (
                            "\" is not a tDOM validation command.");
                 return TCL_ERROR;
             }
-            if (cmdInfo.objProc != schemaInstanceCmd) {
+            if (cmdInfo.objProc != tDOM_schemaInstanceCmd) {
                 SetResult3("The \"-validateCmd\" argument \"",
                            Tcl_GetString(objv[1]),
                            "\" is not a tDOM validation command.");
@@ -2420,12 +2420,13 @@ TclGenExpatElementStartHandler(
 
 #ifndef TDOM_NO_SCHEMA
   if (expat->sdata) {
-      if (probeElement (expat->interp, expat->sdata, name, NULL) != TCL_OK) {
+      if (tDOM_probeElement (expat->interp, expat->sdata, name, NULL)
+          != TCL_OK) {
           TclExpatHandlerResult (expat, NULL, TCL_ERROR);
       }
       if (atts[0] || (expat->sdata->stack
                       && expat->sdata->stack->pattern->attrs)) {
-          if (probeAttributes (expat->interp, expat->sdata, atts)
+          if (tDOM_probeAttributes (expat->interp, expat->sdata, atts)
               != TCL_OK) {
               expat->sdata->validationState = VALIDATION_ERROR;
               TclExpatHandlerResult (expat, NULL, TCL_ERROR);
@@ -2551,7 +2552,7 @@ TclGenExpatElementEndHandler(
 
 #ifndef TDOM_NO_SCHEMA
   if (expat->sdata) {
-      if (probeElementEnd (expat->interp, expat->sdata) != TCL_OK) {
+      if (tDOM_probeElementEnd (expat->interp, expat->sdata) != TCL_OK) {
           TclExpatHandlerResult (expat, NULL, TCL_ERROR);
       }
   }
@@ -2903,7 +2904,7 @@ TclExpatDispatchPCDATA(
   
 #ifndef TDOM_NO_SCHEMA
   if (expat->sdata) {
-      if (probeText (expat->interp, expat->sdata, s,
+      if (tDOM_probeText (expat->interp, expat->sdata, s,
                      expat->needWSCheck ? &onlyWhiteSpace : NULL) != TCL_OK) {
           TclExpatHandlerResult (expat, NULL, TCL_ERROR);
       }

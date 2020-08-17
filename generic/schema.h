@@ -203,7 +203,7 @@ typedef struct SchemaData_
 } SchemaData;
 
 int 
-schemaInstanceCmd (
+tDOM_schemaInstanceCmd (
     ClientData clientData,
     Tcl_Interp *interp,
     int objc,
@@ -215,14 +215,15 @@ void tDOM_SchemaInit (
     );
 
 int
-probeElement (
+tDOM_probeElement (
     Tcl_Interp *interp,
     SchemaData *sdata,
     const char *name,
     void *namespace
     );
 
-int probeAttributes (
+int
+tDOM_probeAttributes (
     Tcl_Interp *interp,
     SchemaData *sdata,
     const char **attr
@@ -233,20 +234,20 @@ typedef struct domNode domNode;
 typedef struct domAttrNode domAttrNode;
 typedef struct domTextNode domTextNode;
 
-int probeDomAttributes (
+int tDOM_probeDomAttributes (
     Tcl_Interp *interp,
     SchemaData *sdata,
     domAttrNode *attr
     );
     
 int
-probeElementEnd (
+tDOM_probeElementEnd (
     Tcl_Interp * interp,
     SchemaData *sdata
     );
 
 int
-probeText (
+tDOM_probeText (
     Tcl_Interp *interp,
     SchemaData *sdata,
     char *text,
