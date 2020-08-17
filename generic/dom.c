@@ -1433,14 +1433,14 @@ elemNSfound:
     }
 #ifndef TDOM_NO_SCHEMA
     if (info->sdata) {
-        if (probeElement (info->interp, info->sdata, node->nodeName,
+        if (tDOM_probeElement (info->interp, info->sdata, node->nodeName,
                           node->namespace ?
                           info->document->namespaces[node->namespace-1]->uri
                           : NULL)
             != TCL_OK) {
             XML_StopParser(info->parser, 0);
         } else {
-            if (probeDomAttributes (info->interp, info->sdata,
+            if (tDOM_probeDomAttributes (info->interp, info->sdata,
                                     node->firstAttr)
                 != TCL_OK) {
                 XML_StopParser(info->parser, 0);
@@ -1488,7 +1488,7 @@ endElement (
     }
 #ifndef TDOM_NO_SCHEMA
     if (info->sdata) {
-        if (probeElementEnd (info->interp, info->sdata) != TCL_OK) {
+        if (tDOM_probeElementEnd (info->interp, info->sdata) != TCL_OK) {
             XML_StopParser(info->parser, 0);
         }
     }
@@ -1653,7 +1653,8 @@ DispatchPCDATA (
 checkTextConstraints:
 #ifndef TDOM_NO_SCHEMA
     if (info->sdata) {
-        if (probeText (info->interp, info->sdata, s, &only_whites) != TCL_OK) {
+        if (tDOM_probeText (info->interp, info->sdata, s, &only_whites)
+            != TCL_OK) {
             XML_StopParser(info->parser, 0);
         }
     }

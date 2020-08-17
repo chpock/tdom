@@ -695,7 +695,7 @@ static void schemaInstanceDelete (
     /* Protect the clientData to be freed inside (even nested)
      * Tcl_Eval*() calls to avoid invalid mem access and postpone the
      * cleanup until the Tcl_Eval*() calls are finished (done in
-     * schemaInstanceCmd()). */
+     * tDOM_schemaInstanceCmd()). */
     if (sdata->currentEvals || sdata->inuse > 0) {
         sdata->cleanupAfterUse = 1;
         return;
@@ -1382,7 +1382,7 @@ matchElementStart (
                 }
                 updateStack (sdata, se, ac);
                 sdata->skipDeep = 1;
-                /* See comment in probeElement: sdata->vname and
+                /* See comment in tDOM_probeElement: sdata->vname and
                  * sdata->vns may be pre-filled. We reset it here.*/
                 sdata->vname = NULL;
                 sdata->vns = NULL;
@@ -1428,7 +1428,7 @@ matchElementStart (
                         }
                         updateStack (sdata, se, ac);
                         sdata->skipDeep = 1;
-                        /* See comment in probeElement: sdata->vname
+                        /* See comment in tDOM_probeElement: sdata->vname
                          * and sdata->vns may be pre-filled. We reset it
                          * here.*/
                         sdata->vname = NULL;
@@ -1590,7 +1590,7 @@ matchElementStart (
                 sdata->skipDeep = 1;
                 se->hasMatched = 1;
                 se->interleaveState[i] = 1;
-                /* See comment in probeElement: sdata->vname and
+                /* See comment in tDOM_probeElement: sdata->vname and
                  * sdata->vns may be pre-filled. We reset it here.*/
                 sdata->vname = NULL;
                 sdata->vns = NULL;
@@ -1685,7 +1685,7 @@ getNamespacePtr (
 }
 
 int
-probeElement (
+tDOM_probeElement (
     Tcl_Interp *interp,
     SchemaData *sdata,
     const char *name,
@@ -1707,7 +1707,7 @@ probeElement (
     }
 
     DBG(
-        fprintf (stderr, "probeElement: look if '%s' in ns '%s' match\n",
+        fprintf (stderr, "tDOM_probeElement: look if '%s' in ns '%s' match\n",
                  name, (char *)namespace);
         );
 
@@ -1833,7 +1833,8 @@ probeElement (
         };
         if (rc) {
             DBG(
-                fprintf (stderr, "probeElement: element '%s' match\n", name);
+                fprintf (stderr, "tDOM_probeElement: element '%s' match\n",
+                         name);
                 serializeStack (sdata);
                 fprintf (stderr, "\n");
                 );
@@ -1920,7 +1921,7 @@ int probeAttribute (
     return 0;
 }
     
-int probeAttributes (
+int tDOM_probeAttributes (
     Tcl_Interp *interp,
     SchemaData *sdata,
     const char **attr
@@ -2033,7 +2034,7 @@ int probeAttributes (
     return TCL_OK;
 }
 
-int probeDomAttributes (
+int tDOM_probeDomAttributes (
     Tcl_Interp *interp,
     SchemaData *sdata,
     domAttrNode *attr
@@ -2229,7 +2230,7 @@ int probeEventAttribute (
    2 means recovering requested further error reporting about missing childs
    in the current element. To be able to to answer a [info expected] on
    the occasion of the next error, we update the stack in this case
-   and let probeElementEnd restart checkElementEnd again with this
+   and let tDOM_probeElementEnd restart checkElementEnd again with this
    stack state.
 */
 static int checkElementEnd (
@@ -2502,7 +2503,7 @@ checkDocKeys (
 }
 
 int
-probeElementEnd (
+tDOM_probeElementEnd (
     Tcl_Interp *interp,
     SchemaData *sdata
     )
@@ -2510,8 +2511,8 @@ probeElementEnd (
     int rc;
     
     DBG(if (sdata->stack) {
-        fprintf (stderr, "probeElementEnd: look if current stack top can end "
-                 " name: '%s' deep: %d\n",
+        fprintf (stderr, "tDOM_probeElementEnd: look if current stack top can "
+                 " end name: '%s' deep: %d\n",
                  sdata->stack->pattern->name, getDeep (sdata->stack));
         } else {fprintf (stderr, "stack is NULL\n");}
         );
@@ -2555,7 +2556,7 @@ probeElementEnd (
                 sdata->validationState = VALIDATION_FINISHED;
             }
             DBG(
-                fprintf(stderr, "probeElementEnd: _CAN_ end here.\n");
+                fprintf(stderr, "tDOM_probeElementEnd: _CAN_ end here.\n");
                 serializeStack (sdata);
                 );
             return TCL_OK;
@@ -2565,7 +2566,7 @@ probeElementEnd (
     SetResultV ("Missing mandatory content");
     sdata->validationState = VALIDATION_ERROR;
     DBG(
-        fprintf(stderr, "probeElementEnd: CAN'T end here.\n");
+        fprintf(stderr, "tDOM_probeElementEnd: CAN'T end here.\n");
         serializeStack (sdata);
         );
     return TCL_ERROR;
@@ -2830,7 +2831,7 @@ matchText (
 }
 
 int
-probeText (
+tDOM_probeText (
     Tcl_Interp *interp,
     SchemaData *sdata,
     char *text,
@@ -2840,7 +2841,7 @@ probeText (
     int myonly_whites;
     char *pc;
 
-    DBG(fprintf (stderr, "probeText started, text: '%s'\n", text);)
+    DBG(fprintf (stderr, "tDOM_probeText started, text: '%s'\n", text);)
     if (sdata->skipDeep) {
         return TCL_OK;
     }
@@ -2898,7 +2899,7 @@ startElement(
     DBG(fprintf (stderr, "startElement: '%s'\n", name);)
     sdata = vdata->sdata;
     if (!sdata->skipDeep && sdata->stack && Tcl_DStringLength (vdata->cdata)) {
-        if (probeText (vdata->interp, sdata,
+        if (tDOM_probeText (vdata->interp, sdata,
                        Tcl_DStringValue (vdata->cdata), NULL) != TCL_OK) {
             sdata->validationState = VALIDATION_ERROR;
             XML_StopParser (vdata->parser, 0);
@@ -2929,7 +2930,7 @@ startElement(
         s = name;
     }
 
-    if (probeElement (vdata->interp, sdata, s, namespace)
+    if (tDOM_probeElement (vdata->interp, sdata, s, namespace)
         != TCL_OK) {
         sdata->validationState = VALIDATION_ERROR;
         XML_StopParser (vdata->parser, 0);
@@ -2937,7 +2938,7 @@ startElement(
     }
     if (sdata->skipDeep == 0
         && (atts[0] || (sdata->stack && sdata->stack->pattern->attrs))) {
-        if (probeAttributes (vdata->interp, sdata, atts)
+        if (tDOM_probeAttributes (vdata->interp, sdata, atts)
             != TCL_OK) {
             sdata->validationState = VALIDATION_ERROR;
             XML_StopParser (vdata->parser, 0);
@@ -2960,7 +2961,7 @@ endElement (
         return;
     }
     if (!sdata->skipDeep && sdata->stack && Tcl_DStringLength (vdata->cdata)) {
-        if (probeText (vdata->interp, sdata,
+        if (tDOM_probeText (vdata->interp, sdata,
                        Tcl_DStringValue (vdata->cdata), NULL) != TCL_OK) {
             sdata->validationState = VALIDATION_ERROR;
             XML_StopParser (vdata->parser, 0);
@@ -2973,7 +2974,7 @@ endElement (
         Tcl_DStringSetLength (vdata->cdata, 0);
         vdata->onlyWhiteSpace = 1;
     }
-    if (probeElementEnd (vdata->interp, sdata)
+    if (tDOM_probeElementEnd (vdata->interp, sdata)
         != TCL_OK) {
         sdata->validationState = VALIDATION_ERROR;
         XML_StopParser (vdata->parser, 0);
@@ -3490,7 +3491,7 @@ validateDOM (
     }
     savednode = sdata->node;
     sdata->node = node;
-    if (probeElement (interp, sdata, ln,
+    if (tDOM_probeElement (interp, sdata, ln,
                       node->namespace ?
                       node->ownerDocument->namespaces[node->namespace-1]->uri
                       : NULL)
@@ -3502,17 +3503,18 @@ validateDOM (
     if (!sdata->stack) return TCL_OK;
     if (sdata->skipDeep == 0) {
         if (node->firstAttr) {
-            if (probeDomAttributes (interp, sdata, node->firstAttr) != TCL_OK) {
+            if (tDOM_probeDomAttributes (interp, sdata, node->firstAttr)
+                != TCL_OK) {
                 return TCL_ERROR;
             }
         } else {
             if (sdata->stack->pattern->numReqAttr) {
-                /* probeDomAttributes fills interp result with a msg
-                 * which required attributes are missing in case of no
-                 * reportCmd. In case of reportCmd
-                 * probeDomAttributes() returns only error in the case
-                 * of error in called scripts. */
-                if (probeDomAttributes (interp, sdata, NULL) != TCL_OK) {
+                /* tDOM_probeDomAttributes fills interp result with a
+                 * msg which required attributes are missing in case
+                 * of no reportCmd. In case of reportCmd
+                 * tDOM_probeDomAttributes() returns only error in the
+                 * case of error in called scripts. */
+                if (tDOM_probeDomAttributes (interp, sdata, NULL) != TCL_OK) {
                     return TCL_ERROR;
                 }
             }
@@ -3531,7 +3533,7 @@ validateDOM (
         switch (node->nodeType) {
         case ELEMENT_NODE:
             if (Tcl_DStringLength (sdata->cdata)) {
-                if (probeText (interp, sdata,
+                if (tDOM_probeText (interp, sdata,
                                Tcl_DStringValue (sdata->cdata), NULL) != TCL_OK)
                     return TCL_ERROR;
                 Tcl_DStringSetLength (sdata->cdata, 0);
@@ -3546,7 +3548,7 @@ validateDOM (
                 Tcl_DStringAppend (sdata->cdata,
                                    ((domTextNode *) node)->nodeValue,
                                    ((domTextNode *) node)->valueLength);
-                if (probeText (interp, sdata,
+                if (tDOM_probeText (interp, sdata,
                                Tcl_DStringValue (sdata->cdata), NULL) != TCL_OK) {
                     Tcl_DStringSetLength (sdata->cdata, 0);
                     return TCL_ERROR;
@@ -3571,11 +3573,11 @@ validateDOM (
         node = node->nextSibling;
     }
     if (Tcl_DStringLength (sdata->cdata)) {
-        if (probeText (interp, sdata, Tcl_DStringValue (sdata->cdata), NULL)
-            != TCL_OK) return TCL_ERROR;
+        if (tDOM_probeText (interp, sdata, Tcl_DStringValue (sdata->cdata),
+                            NULL) != TCL_OK) return TCL_ERROR;
         Tcl_DStringSetLength (sdata->cdata, 0);
     }
-    if (probeElementEnd (interp, sdata) != TCL_OK) return TCL_ERROR;
+    if (tDOM_probeElementEnd (interp, sdata) != TCL_OK) return TCL_ERROR;
     sdata->node = savednode;
     sdata->insideNode = savedinsideNode;
     return TCL_OK;
@@ -4593,10 +4595,10 @@ attributeLookupPreparation (
    After any code by this function that may have called out to a tcl
    script it is important not to return locally but to signal the
    return value with the result variable and ensure to reach the code
-   at the end of schemaInstanceCmd.
+   at the end of tDOM_schemaInstanceCmd.
  */
 int
-schemaInstanceCmd (
+tDOM_schemaInstanceCmd (
     ClientData clientData,
     Tcl_Interp *interp,
     int objc,
@@ -4906,7 +4908,7 @@ schemaInstanceCmd (
                     }
                 }
             }
-            result = probeElement (interp, sdata, Tcl_GetString (objv[3]),
+            result = tDOM_probeElement (interp, sdata, Tcl_GetString (objv[3]),
                                    namespacePtr);
             /* In case of UNKNOWN_ROOT_ELEMENT and reportCmd is set
              * sdata->stack is NULL. */
@@ -4921,7 +4923,7 @@ schemaInstanceCmd (
                 Tcl_WrongNumArgs (interp, 3, objv, "No arguments expected.");
                 return TCL_ERROR;
             }
-            result = probeElementEnd (interp, sdata);
+            result = tDOM_probeElementEnd (interp, sdata);
             break;
 
         case k_text:
@@ -4929,7 +4931,7 @@ schemaInstanceCmd (
                 Tcl_WrongNumArgs (interp, 3, objv, "<text>");
                 return TCL_ERROR;
             }
-            result = probeText (interp, sdata, Tcl_GetString (objv[3]), NULL);
+            result = tDOM_probeText (interp, sdata, Tcl_GetString (objv[3]), NULL);
             break;
         }
         break;
@@ -5342,7 +5344,7 @@ tDOM_SchemaObjCmd (
     case m_create:
         sdata = initSchemaData (objv[ind]);
         Tcl_CreateObjCommand (interp, Tcl_GetString(objv[ind]),
-                              schemaInstanceCmd,
+                              tDOM_schemaInstanceCmd,
                               (ClientData) sdata,
                               schemaInstanceDelete);
         Tcl_SetObjResult (interp, objv[ind]);
@@ -8547,17 +8549,17 @@ tDOM_SchemaInit (
 
     /* Inline definition commands. */
     Tcl_CreateObjCommand (interp, "tdom::schema::defelement",
-                          schemaInstanceCmd, NULL, NULL);
+                          tDOM_schemaInstanceCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::defelementtype",
-                          schemaInstanceCmd, NULL, NULL);
+                          tDOM_schemaInstanceCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::defpattern",
-                          schemaInstanceCmd, NULL, NULL);
+                          tDOM_schemaInstanceCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::deftexttype",
-                          schemaInstanceCmd, NULL, NULL);
+                          tDOM_schemaInstanceCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::start",
-                          schemaInstanceCmd, NULL, NULL);
+                          tDOM_schemaInstanceCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::prefixns",
-                          schemaInstanceCmd, NULL, NULL);
+                          tDOM_schemaInstanceCmd, NULL, NULL);
 
     /* The "any" definition command. */
     Tcl_CreateObjCommand (interp, "tdom::schema::any",

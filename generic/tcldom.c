@@ -6502,7 +6502,7 @@ int tcldom_parse (
                            "\" is not a tDOM validation command.");
                 return TCL_ERROR;
             }
-            if (cmdInfo.objProc != schemaInstanceCmd) {
+            if (cmdInfo.objProc != tDOM_schemaInstanceCmd) {
                 SetResult3("The \"-validateCmd\" argument \"",
                            Tcl_GetString(objv[1]),
                            "\" is not a tDOM validation command.");
