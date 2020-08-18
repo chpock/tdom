@@ -1459,7 +1459,7 @@ schema define {
         element email
     }
     foreach e {name email} {
-        defelement $e {text}
+        defelement $e text
     }
 }
       
