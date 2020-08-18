@@ -8353,6 +8353,8 @@ test schema-17.23 {return "vanish" from recover handler} {
         <doc><a/><b/><c/><unknown/></doc>
         <doc><a/><b/><c/><unknown/><d/></doc>
         <doc><a/><b/><unknown/><c/><unknown1/><c/><d/><unknown2/><unknown3/></doc>
+        <doc><a/><unknown><some>foo<unknown>content</unknown></some></unknown><b/><unknown><some>foo<unknown>content</unknown></some></unknown><c/></doc>
+        <doc><a/><b/><unknown1/><unknown2/><c/><d/></doc>
     }
     set result [list]
     tdom::schema s
@@ -8367,7 +8369,7 @@ test schema-17.23 {return "vanish" from recover handler} {
     }
     s delete
     set result
-} {0: 1 {END_EVENT expecting a} 1: 1 {END_EVENT expecting b} 2: 1 {matching b} {expecting a} {END_EVENT expecting a} 3: 1 {matching c} {expecting a} {END_EVENT expecting a} 4: 1 {END_EVENT expecting c} 5: 1 {matching c} {expecting b} {END_EVENT expecting b} 6: 1 {matching b} {expecting a} {matching c} {expecting a} {END_EVENT expecting a} 7: 1 {matching unknown} {expecting a} {END_EVENT expecting a} 8: 1 {matching unknown} {expecting b} {END_EVENT expecting b} 9: 1 {matching unknown} {expecting b} 10: 1 {matching unknown} {expecting b} 11: 1 {matching unknown} {expecting c} 12: 1 {matching unknown} {expecting c} 13: 1 {matching unknown} {expecting {<elementend> {}} c d} 14: 1 {matching unknown} {expecting {<elementend> {}} c d} 15: 1 {matching unknown} {expecting c} {matching unknown1} {expecting {<elementend> {}} c d} {matching unknown2} {expecting {<elementend> {}}} {matching unknown3} {expecting {<elementend> {}}}}
+} {0: 1 {END_EVENT expecting a} 1: 1 {END_EVENT expecting b} 2: 1 {matching b} {expecting a} {END_EVENT expecting a} 3: 1 {matching c} {expecting a} {END_EVENT expecting a} 4: 1 {END_EVENT expecting c} 5: 1 {matching c} {expecting b} {END_EVENT expecting b} 6: 1 {matching b} {expecting a} {matching c} {expecting a} {END_EVENT expecting a} 7: 1 {matching unknown} {expecting a} {END_EVENT expecting a} 8: 1 {matching unknown} {expecting b} {END_EVENT expecting b} 9: 1 {matching unknown} {expecting b} 10: 1 {matching unknown} {expecting b} 11: 1 {matching unknown} {expecting c} 12: 1 {matching unknown} {expecting c} 13: 1 {matching unknown} {expecting {<elementend> {}} c d} 14: 1 {matching unknown} {expecting {<elementend> {}} c d} 15: 1 {matching unknown} {expecting c} {matching unknown1} {expecting {<elementend> {}} c d} {matching unknown2} {expecting {<elementend> {}}} {matching unknown3} {expecting {<elementend> {}}} 16: 1 {matching unknown} {expecting b} {matching unknown} {expecting c} 17: 1 {matching unknown1} {expecting c} {matching unknown2} {expecting c}}
 
 test schema-17.24 {info patterndefinition} {
     tdom::schema s
