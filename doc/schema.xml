@@ -1264,7 +1264,16 @@ s define {
       <p>If a structural validation error happens, the default
       recovering strategy is to ignore any following (or missing)
       content within the current subtree and to continue with the
-      element end event of the element.</p>
+      element end event of the subtree.</p>
+
+      <p>Returning "ignore" from the recovering script in case of
+      error type MISSING_ELEMENT recovers by ignoring the failed
+      contraint and continuing to match the event further against the
+      schema.</p>
+
+      <p>Returing "vanish" from the recover script In case of the
+      error types MISSING_ELEMENT and UNEXPECTED_ELEMENT recovers by
+      ignoring the event.</p>
       
   </section>
 
