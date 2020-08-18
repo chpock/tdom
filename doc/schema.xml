@@ -293,8 +293,8 @@
                   for the reportcmd script to finish while recovering
                   from a validation error it returns the node on which
                   the validation engine is currently looking at in
-                  case, the node is an ELEMENT_NODE or the parent
-                  node, if not. It is recommended that you don't use
+                  case the node is an ELEMENT_NODE or, if not, its
+                  parent node. It is recommended that you do not use
                   this method. Or at least leave the DOM tree alone,
                   use it read-only.</desc>
               </optdef>
@@ -392,10 +392,10 @@
                       <dt>MATCH_DOM_XPATH_BOOLEAN</dt><dd>Checking domxpathboolean constant</dd>
                   </dl>
                   <p>If called with one of the possible optional
-                  arguments the command returns detail information
+                  arguments, the command returns detail information
                   depending on current action.</p>
                   <dl>
-                      <dt>name</dt><dd>Return the name of the element
+                      <dt>name</dt><dd>Returns the name of the element
                       that has to match in case of
                       MATCH_ELEMENT_START. Return the name of the
                       closed element in case of MATCH_ELEMENT_END.
@@ -403,7 +403,7 @@
                       MATCH_ATTRIBUTE_TEXT. Return the name of the
                       parent element in case of MATCH_TEXT.</dd>
                       
-                      <dt>namespace</dt><dd>Return the namespace of
+                      <dt>namespace</dt><dd>Returns the namespace of
                       the element that has to match in case of
                       MATCH_ELEMENT_START. Return the namespace of the
                       closed element in case of MATCH_ELEMENT_END.
@@ -411,7 +411,7 @@
                       of MATCH_ATTRIBUTE_TEXT. Return the namespace of
                       the parent element in case of MATCH_TEXT.</dd>
                       
-                      <dt>text</dt><dd>Return the text to match in
+                      <dt>text</dt><dd>Returns the text to match in
                       case of MATCH_TEXT. Returns the value of the
                       attribute in case of MATCH_ATTRIBUTE_TEXT.</dd>
                   </dl>
@@ -426,8 +426,8 @@
                   <optlist>
                       <optdef>
                           <optname>top</optname>
-                          <desc>Returns the element which content is currently
-                          checked (the at the moment open element tag).
+                          <desc>Returns the element whose content is currently
+                          checked (the open element tag at this moment).
                           </desc>
                       </optdef>
                       
@@ -438,8 +438,9 @@
                       
                       <optdef>
                           <optname>associated</optname>
-                          <desc>Returns the data associated with the current top
-                          most stack content particle or the empty string it there isn't.
+                          <desc>Returns the data associated with the
+                          current top most stack content particle or
+                          the empty string it there isn't any.
                           </desc>
                       </optdef>
                   </optlist>
@@ -461,33 +462,33 @@
   <section>
     <title>Schema definition scripts</title>
 
-    <p>Schema definition scripts are ordinary Tcl scripts that are
-    evaluated in the namespace tdom::schema. The below listed schema
-    definition commands in this Tcl namespace allow to define a wide
-    variety of document structures. Every schema definition command
-    establish a validation constraint on the content which has to
-    match or must be optional to qualify the content as valid. It is a
-    validation error if there is additional (not matched) content.
-    White space only text (in the XML sense of white space) between
-    any different tags is ignored, with the exception of text only
-    elements (for which even white space only text will be considered
-    as significant content).</p>
+    <p>Schema definition scripts are ordinary Tcl scripts evaluated in
+    the namespace tdom::schema. The schema definition commands listed
+    below in this Tcl namespace allow to define a wide variety of
+    document structures. Every schema definition command establishes a
+    validation constraint on the content which has to match or must be
+    optional to qualify the content as valid. It is a validation error
+    if there is additional (not matched) content. White space only
+    text (in the XML sense of white space) between any different tags
+    is ignored, with the exception of text only elements (for which
+    even white space only text will be considered as significant
+    content).</p>
 
     <p>The schema definition commands are:</p>
 
     <commandlist>
       <commanddef>
         <command><method>element</method> <m>name</m> <m>?quant?</m> <m>?&lt;definition script>?</m></command>
-        <desc>If the optional argument <m>definition script</m> isn't
+        <desc>If the optional argument <m>definition script</m> is not
         given this command refers to the element defined with
         <m>defelement</m> with the name <m>name</m> in the current
         context namespace. If the <m>defelement script</m> argument is
         given, then the validation constraint expects an element with
         the name <m>name</m> in the current namespace with content
         "locally" defined by the <m>definition script</m>. Forward
-        references to so far not defined elements or pattern or other
+        references to so far not defined elements or patterns or other
         local definitions of the same name inside the <m>definition
-        script</m> are allowed. If a forward referenced element isn't
+        script</m> are allowed. If a forward referenced element is not
         defined until validation then only an empty element with name
         <m>name</m> and namespace <m>namespace</m> and no attributes
         matches. </desc>
@@ -497,10 +498,11 @@
         <command><method>elementtype</method> <m>name</m> <m>?quant?</m></command>
         <desc>This command refers to the element defined with
         <m>defelementtype</m> with the type name <m>name</m> in the
-        current context namespace. Forward references to a so far not
+        current context namespace. Forward references to so far not
         defined element types or recursive references are allowed. If
-        a forward referenced element type isn't defined until
-        validation no content or attributes are expected.</desc>
+        a forward referenced element type is not defined until
+        validation any empty element without attributes will be
+        accepted.</desc>
       </commanddef>
       
       <commanddef>
@@ -508,38 +510,38 @@
         <desc>This command refers to the content particle defined with
         <m>defpattern</m> with the name <m>name</m> in the current
         context namespace. Forward references to a so far not defined
-        pattern or recursive references are allowed. If a forward
-        referenced pattern isn't defined until validation no content
+        pattern and recursive references are allowed. If a forward
+        referenced pattern is not defined until validation no content
         whatsoever is expected ("empty match").</desc>
       </commanddef>
 
       <commanddef>
         <command><method>group</method> <m>?quant?</m> <m>&lt;definition script></m></command>
         <desc>This method allows to group a sequence of content
-        particle, defined by the <m>definition script></m>, that have
+        particles defined by the <m>definition script></m>, which have
         to match in this sequence order.</desc>
       </commanddef>
       
       <commanddef>
         <command><method>choice</method> <m>?quant?</m> <m>&lt;definition script></m></command>
         <desc>This schema constraint match if one of the top level
-        content particle defined by the <m>definition script></m>
-        match. If one of this top level content particle is optional
+        content particles defined by the <m>definition script></m>
+        matches. If one of this top level content particle is optional
         this constraint matches the "empty match".
         </desc>
       </commanddef>
 
       <commanddef>
         <command><method>interleave</method> <m>?quant?</m> <m>&lt;definition script></m></command>
-        <desc>This schema constraint match after every of the top
-        level content particle with quant must defined by the
-        <m>definition script></m> have matched in any arbitrary
-        order.</desc>
+        <desc>This schema constraint match after every of the required
+        top level content particles defined by the <m>definition
+        script></m> have matched (and, optional, some or all other) in
+        any arbitrary order.</desc>
       </commanddef>
 
       <commanddef>
         <command><method>mixed</method> <m>?quant?</m> <m>&lt;definition script></m></command>
-        <desc>This schema constraint match for any text (including the
+        <desc>This schema constraint matches for any text (including the
         empty one) and every top level content particle defined by the
         <m>definition script></m> with default quantifier *.</desc>
       </commanddef>
@@ -558,34 +560,34 @@
         <desc>The any command matches every element (in the namespace
         <m>namespace</m>, if that is given) (with whatever attributes)
         or subtree, no matter if known within the schema or not.
-        Please notice, that in case of no <m>namespace</m> argument is
-        given this mean the quantifier * and + will eat up any
+        Please note that in case of no <m>namespace</m> argument is
+        given that means that the quantifier * and + will eat up any
         elements until the enclosing element ends. If you really have
         a namespace that looks like a valid tDOM schema quantifier
-        you'll have to spell out always all two arguments.</desc>
+        you will have to spell out always both arguments.</desc>
       </commanddef>
 
       <commanddef>
         <command><method>attribute</method> <m>name</m> <m>?quant?</m> <m>(?&lt;constraint script>|"type" typename?)</m></command>
-        <desc>The attribute command defines a attribute (in no
+        <desc>The attribute command defines an attribute (in no
         namespace) to the enclosing element. The first definition of
         <m>name</m> inside an element definition wins; later
         definitions of the same name are silently ignored. After the
         <m>name</m> argument there may be one of the quantifiers ? or
-        !. If there is, this will be used. Otherwise the attribute
-        will be required (must be present in the XML source). If there
-        is one argument more this argument is evaluated as constraint
+        !. If there is, it will be used. Otherwise the attribute will
+        be required (must be present in the XML source). If there is
+        one argument more this argument is evaluated as constraint
         script, defining the value constrains of the attribute.
         Otherwise, if there are two more arguments and the first of
-        them is the bare-word "type" then the following is used as a
-        text type name. This command is only allowed at top level in
+        them is the bare-word "type" the following argument is used as
+        a text type name. This command is only allowed at top level in
         the definition script of an defelement/element script.</desc>
       </commanddef>
 
       <commanddef>
         <command><method>nsattribute</method> <m>name</m> <m>namespace</m> <m>?quant?</m> <m>(?&lt;constraint script>|"type" typename?)</m></command>
         <desc>This command does the same as the command
-        <m>attribute</m>, just for the attribute <m>name</m> in the
+        <m>attribute</m>, for the attribute <m>name</m> in the
         namespace <m>namespace</m>.</desc>
       </commanddef>
 
@@ -593,9 +595,9 @@
         <command><method>namespace</method> <m>URI</m> <m>&lt;definition script></m></command>
         <desc>Evaluates the <m>definition script</m> with context
         namespace <m>URI</m>. Every element, element type or ref
-        command name will be looked up in the namespace <m>URI</m> and
-        local defined element will be in that namespace. The empty
-        string as <m>URI</m> means no namespace.</desc>
+        command name will be looked up in the namespace <m>URI</m>,
+        and local defined elements will be in that namespace. The
+        empty string as <m>URI</m> means no namespace.</desc>
       </commanddef>
 
       <commanddef>
@@ -1256,9 +1258,9 @@ s define {
 
       <p>Several of the validation error codes appended as second
       argument to the <m>reportcmd</m> calls may happen at more than
-      one validation event. The <m>info vaction</m> method and its
-      subcommands provide information about the current validation
-      event to match.
+      one kind of validation event. The <m>info vaction</m> method and
+      its subcommands provide information about the current validation
+      event and the
       </p>
 
       <p>If a structural validation error happens, the default
@@ -1268,7 +1270,7 @@ s define {
 
       <p>Returning "ignore" from the recovering script in case of
       error type MISSING_ELEMENT recovers by ignoring the failed
-      contraint and continuing to match the event further against the
+      contraint and continues to match the event further against the
       schema.</p>
 
       <p>Returing "vanish" from the recover script In case of the
