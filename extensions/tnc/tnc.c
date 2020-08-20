@@ -2101,7 +2101,7 @@ TncElementEndCommand (
     /* Calling XML_StopParser() in an element start event doesn't
      * always prevent expat from calling the element end handler.
      * (Yes, it's an expat thing, raised a few bugs upstream.) */
-    if (tncdata->status == TCL_ERROR) return;
+    if (tncdata->dtdstatus == TCL_ERROR) return;
     while (1) {
         if (!TncProbeElementEnd (tncdata)) {
             signalNotValid (userData, TNC_ERROR_ELEMENT_CAN_NOT_END_HERE);
