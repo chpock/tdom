@@ -596,17 +596,17 @@
         <desc>Evaluates the <m>definition script</m> with context
         namespace <m>URI</m>. Every element, element type or ref
         command name will be looked up in the namespace <m>URI</m>,
-        and local defined elements will be in that namespace. The
+        and local defined elements will be in that namespace. An
         empty string as <m>URI</m> means no namespace.</desc>
       </commanddef>
 
       <commanddef>
         <command><method>tcl</method> <m>tclcmd</m> <m>?arg arg ...?</m></command>
-        <desc>Evaluates the Tcl script <m>tclcmd arg arg ... </m>. This
-        validation command is only allowed in strict sequential
+        <desc>Evaluates the Tcl script <m>tclcmd arg arg ... </m>.
+        This validation command is only allowed in strict sequential
         context (not in choice, mixed and interleave). If the return
-        code is something else than 0 (TCL_OK) then this is an
-        error (which isn't catched and reported by reportcmd).</desc>
+        code is something else than 0 (TCL_OK) this is an error (which
+        is not catched and reported by reportcmd).</desc>
       </commanddef>
 
       <commanddef>
@@ -616,46 +616,47 @@
       
       <commanddef>
         <command><method>associate</method> <m>data</m></command>
-        <desc>This command is only allowed top-level inside the
-        definition scripts of the element, elementtype, pattern or
-        interleave content particle. Associate the as argument given
-        <m>data</m> with the currently defined content particle and
-        may be requested in scripts evaluated while validating the
-        content of that particle with the schema command method call
-        <m>info stack associated</m>.</desc>
+        <desc>This command is only allowed top-level inside definition
+        scripts of the element, elementtype, pattern or interleave
+        content particles. Associates the <m>data</m> given as argument
+        with the currently defined content particle and may be
+        requested in scripts evaluated while validating the content of
+        that particle with the schema command method call <m>info
+        stack associated</m>.</desc>
       </commanddef>
 
       <commanddef>
         <command><method>domunique</method> <m>selector</m> <m>fieldlist</m> <m>?name?</m> <m>?"IGNORE_EMPTY_FIELD_SET"|("EMPTY_FIELD_SET_VALUE" emptyFieldSetValue)?</m></command>
         <desc>If not postvalidating a DOM tree with <m>domvalidate</m>
-        this constraint always match. If postvalidating this
+        this constraint always matches. If postvalidating this
         constraint resembles the xsd key/keyref mechanism. The
         <m>selector</m> argument may be any valid XPath expression
-        (without the xsd limits). Several <m>domunique</m> command
+        (without the xsd limits). Several <m>domunique</m> commands
         within one element definition are allowed. They are checked in
         definition order. The argument name is available in the
         recovering script per <m>info vaction name</m>. If the
         <m>fieldlist</m> doesn't select something for a node of the
-        result set of the <m>selector</m> then the key value will be
-        the empty string, by default. If the arguments
-        <m>EMPTY_FIELD_SET_VALUE &lt;value></m> are given a empty node
-        set will have the key value <m>value</m>. If instead the flag
-        <m>IGNORE_EMPTY_FIELD_SET</m> flag is given then an empty node
-        set result will not have any key value.</desc>
+        result set of the <m>selector</m> the key value will be the
+        empty string by default. If the arguments
+        <m>EMPTY_FIELD_SET_VALUE &lt;value></m> are given an empty
+        node set will have the key value <m>value</m>. If instead the
+        flag <m>IGNORE_EMPTY_FIELD_SET</m> flag is given an empty
+        node set result will not have any key value.</desc>
       </commanddef>
 
       <commanddef>
         <command><method>domxpathboolean</method> <m>XPath_expr</m> <m>?name?</m></command>
         <desc><p>If not postvalidating a DOM tree with
-        <m>domvalidate</m> this constraint always match. If
-        postvalidating this constraint matches if the result of the
-        <m>XPath_expr</m> argument (with the node matching the schema
-        parent of the <m>domxpathboolean</m> command as context node)
-        - converted to a boolean by XPath rules - is true. Several
-        <m>domxpathboolean</m> command within one element definition
+        <m>domvalidate</m> this constraint always matches. If
+        postvalidating the <m>XPath_expr</m> argument is evaluated
+        (with the node matching the schema parent of the
+        <m>domxpathboolean</m> command as context node). The
+        constraint maches if the result of this XPath expression,
+        converted to boolean by XPath rules, is true. Several
+        <m>domxpathboolean</m> commands within one element definition
         are allowed. They are checked in definition order.</p>
 
-        <p>This enables if-then checks depending on more than one element. Consider</p>
+        <p>This enables checks depending on more than one element. Consider</p>
 
         <example>
 tdom::schema s
