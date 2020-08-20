@@ -164,7 +164,7 @@ proc 2.8-resolver {base systemId publicId} {
 }
 
 test tnc-2.8 {Validate REC-xslt-19991116.xml} {
-    set ::tDOM::extRefHandlerDebug 1
+    set ::tdom::extRefHandlerDebug 1
     set parser [expat -externalentitycommand 2.8-resolver  \
                     -paramentityparsing always]
     tnc $parser enable

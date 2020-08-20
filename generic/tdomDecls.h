@@ -90,7 +90,7 @@ typedef struct TdomStubs {
     SchemaData * (*tdomGetSchemadata) (void); /* 18 */
 } TdomStubs;
 
-EXTERN const TdomStubs *tdomStubsPtr;
+extern const TdomStubs *tdomStubsPtr;
 
 #ifdef __cplusplus
 }
