@@ -1,5 +1,5 @@
-C Merged\sfrom\sschema.
-D 2020-08-20T16:18:31.370
+C More\stweaks\sfor\s8.4\sbuild.
+D 2020-08-20T21:54:05.335
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -208,7 +208,7 @@ F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
 F tests/pullparser.test e4b14ea0bdc9f9fd931f3bc559e78c309582a67a238170d58e0f20331f99890c
 F tests/pushpull.bench 664e8f512917537d96c4b71933d4d9a6da65fc6fe85bd7c459483830dc7d2faf
-F tests/schema.test 913ff99b87ee2a24c228d5482dcde392da2a0a20748ac1390afded5de918543b
+F tests/schema.test cc0fd7a183414f0d96362e787eee0a49a4bb4ab2ecb95bd3843a84ca1e334737
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
 F tests/tdomcmd.bench b07448ed4de08ccaa9734cf3fe15c695fd7066c993da58ff48d465747940e417
 F tests/tdomcmd.test 092401adf0609906d710f3ef8997cb4ca29bc208
@@ -233,8 +233,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 876b0756ee0630caedc887488f4ee6e3b32707bb68c6d4bcb6e1d193b4183df1 d0fe2d44da58578f7ac8aaf62db44c2a11bd607c813f428143f149a8b5b2ba66
-R c7d83bc4e142a18681a469e57b8430ab
+P 89c94160dafe0cabdfb6b67cc285589a3ccd0ddb7474db430ff91d4481fd3d2d
+R a93b07a83c40d5d2cda0bd3159b63f19
 U rolf
-Z 651e0e8472cd074b2c5dbae93f97860c
+Z 1795b42e0fc674bdad77d4677d8770aa
 # Remove this line to create a well-formed Fossil manifest.

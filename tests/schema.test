@@ -36,11 +36,12 @@ source [file join [file dir [info script]] loadtdom.tcl]
 if {[dom featureinfo schema]} {
 
 testConstraint 8.5 [package vsatisfies [package present Tcl] 8.5]
-    
+testConstraint listformat [package vsatisfies [package present Tcl] 8.5]
+
 proc dummycallback {args} {}
 
 proc sortcps {a b} {
-    switch [string compare [lindex $a 0] [lindex $b 0]] {
+    switch -- [string compare [lindex $a 0] [lindex $b 0]] {
         -1 {return -1}
         1 {return 1}
         default {
@@ -4065,7 +4066,7 @@ proc proc-14.2 {param text} {
     return false
 }
 
-test schema-14.2 {text: tcl} {
+test schema-14.2 {text: tcl} {8.5} {
     tdom::schema s
     s define {
         defelement doc {
@@ -4093,7 +4094,7 @@ test schema-14.2 {text: tcl} {
     set result
 } {0 0 1 0 0}
 
-test schema-14.3 {attribute text: tcl} {
+test schema-14.3 {attribute text: tcl} {8.5} {
     tdom::schema s
     s define {
         defelement doc {
@@ -5725,7 +5726,7 @@ test schema-14.40 {text: unsignedLong} {
     set result
 } {0 1 1 0 0 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0}
 
-test schema-14.41 {text constrains commands outside text constraint} {
+test schema-14.41 {text constrains commands outside text constraint} {8.5} {
     set cmds [info command tdom::schema::text::*]
     set result {}
     tdom::schema s
@@ -7275,7 +7276,7 @@ test schema-17.6b {info expected -onlymandatory} {
     lsort $result
 } {{musthave http://foo.bar}}
 
-test schema-17.7 {info expected} {
+test schema-17.7 {info expected} {listformat} {
     tdom::schema s
     s prefixns {foo http://foo.bar}
     s define {
@@ -7298,7 +7299,7 @@ test schema-17.7 {info expected} {
     lsort $result
 } {a b c {musthave http://foo.bar} toplevel {{#text} {}}}
 
-test schema-17.7a {info expected -ignorematched} {
+test schema-17.7a {info expected -ignorematched} {listformat} {
     tdom::schema s
     s prefixns {foo http://foo.bar}
     s define {
@@ -7430,9 +7431,11 @@ test schema-17.8b {info expected -onlymandatory} {8.5} {
 
 proc schema-17.9 {scmd} {
     global result
-    lappend result {*}[lsort [$scmd info expected]]
+    foreach e [lsort [$scmd info expected]] {
+        lappend result $e
+    }
 }
-test schema-17.9 {info expected from scripted constrain} {8.5} {
+test schema-17.9 {info expected from scripted constrain} {
     tdom::schema s
     s define {
         defpattern some {
@@ -7481,9 +7484,11 @@ test schema-17.9.1 {info expected from scripted constrain} {
 
 proc schema-17.9a {scmd} {
     global result
-    lappend result {*}[lsort [$scmd info expected -onlymandatory]]
+    foreach e [lsort [$scmd info expected -onlymandatory]] {
+        lappend result $e
+    }
 }
-test schema-17.9a {info expected from scripted constrain} {8.5} {
+test schema-17.9a {info expected from scripted constrain} {
     tdom::schema s
     s define {
         defpattern some {
@@ -7795,9 +7800,11 @@ test schema-17.13a {info expected} {8.5} {
 
 proc schema-17.14 {scmd args} {
     global result
-    lappend result {*}[lsort [$scmd info expected]]
+    foreach e [lsort [$scmd info expected]] {
+        lappend result $e
+    }
 }
-test schema-17.14 {info expected} {8.5} {
+test schema-17.14 {info expected} {
     set defs {
         {
             group + {
@@ -7823,9 +7830,11 @@ test schema-17.14 {info expected} {8.5} {
 
 proc schema-17.14a {scmd args} {
     global result
-    lappend result {*}[lsort [$scmd info expected -ignorematched]]
+    foreach e [lsort [$scmd info expected -ignorematched]] {
+        lappend result $e
+    }
 }
-test schema-17.14a {info expected} {8.5} {
+test schema-17.14a {info expected} {
     set defs {
         {
             group + {
@@ -8516,9 +8525,11 @@ test schema-17.29 {error in reportcmd} {
 } {1error "triggered" at line 1 character 13}
 
 proc schema-18 {args} {
-    lappend ::result {*}$args
+    foreach arg $args {
+        lappend ::result $arg
+    }
 }
-test schema-18.1 {reportcmd} {8.5} {
+test schema-18.1 {reportcmd} {
     tdom::schema s
     s define {
         defelement doc {
@@ -8872,7 +8883,7 @@ proc schema-18.14 {scmd errortype} {
     lappend ::result [$scmd info vaction namespace]
     lappend ::result [$scmd info vaction text]
 }
-test schema-18.14 {info vaction in reportcmd} {
+test schema-18.14 {info vaction in reportcmd} {listformat} {
     tdom::schema s
     s reportcmd schema-18.14
     s define {
@@ -9929,7 +9940,7 @@ proc ::dom::xpathFunc::compare {ctxNode pos nodeListType nodeList args} {
 proc schema-25.6 {scmd errorType} {
     lappend ::result $errorType [$scmd info vaction name]
 }
-test schema-25.6 {domxpathboolean - scripted XPath function} {
+test schema-25.6 {domxpathboolean - scripted XPath function} {8.5} {
     tdom::schema s
     s reportcmd schema-25.6
     s define {
