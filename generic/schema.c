@@ -113,6 +113,9 @@
 #  define UINT2PTR(p) ((void *)(p))
 # endif
 #endif
+#ifndef TCL_MATCH_NOCASE
+# define TCL_MATCH_NOCASE 1
+#endif
 
 /*----------------------------------------------------------------------------
 |   Local typedefs
@@ -3275,7 +3278,7 @@ checkdomKeyConstraints (
         rc = xpathEvalAst (kc->selector, &nodeList, node, &cbs, &rs, &errMsg);
         if (rc) {
             SetResult (errMsg);
-            goto errorCleanup;
+            goto booleanErrorCleanup;
         }
         if (kc->flags & DKC_FLAG_BOOLEAN) {
             i = xpathFuncBoolean (&rs);
