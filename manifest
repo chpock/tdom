@@ -1,5 +1,5 @@
-C Fixed\stnc.
-D 2020-08-20T12:23:12.216
+C Updated\sextensions\sconfigure.
+D 2020-08-20T13:22:58.063
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -82,7 +82,7 @@ F extensions/example/pkgIndex.tcl.in e6cc33c6f45df109209f4d8412cf2d5ea434e34e
 F extensions/example/tcl.m4 9404ac273b962ddaf946d3170c5183e55d0984b3
 F extensions/tdomhtml/CONFIG 7a3703be0e018ead9b6558ce6d82f356620dbfd8
 F extensions/tdomhtml/Makefile.in 1008fe906a0b7150e5b83f69e43a231886821db7
-F extensions/tdomhtml/configure 860b39cea2e8d514bd1047c4b4dca061edcedc48 x
+F extensions/tdomhtml/configure 47edbb79649c148c4c439b93a329e70e647e1225aa35236bbc5643c9e3484190 x
 F extensions/tdomhtml/configure.in 22c8425b9c44c0583ccbadaf3ea3cc7185987ceb
 F extensions/tdomhtml/doc/tdomhtml.n da39a3ee5e6b4b0d3255bfef95601890afd80709
 F extensions/tdomhtml/doc/tdomhtml.tmml da39a3ee5e6b4b0d3255bfef95601890afd80709
@@ -92,7 +92,7 @@ F extensions/tdomhtml/tdomhtml.tcl 6901a0fb8db80954dd635e181934b9e3ba3a186455115
 F extensions/tdomhtml/win/makefile.vc a6ba491c8f63a88c607c443e7a80f1369cb3c40c
 F extensions/tnc/Makefile.in 46fcdfeab187868596d1fb43201d0f62dcf973b4
 F extensions/tnc/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
-F extensions/tnc/configure 9dd4089f8912fb1b2df266fc6ae2d8f81735c42e x
+F extensions/tnc/configure 67ced6d84ab6e1dd814a265e7648d8e856b91b695aabb20195c4575b42291686 x
 F extensions/tnc/configure.in d15ed29caa0e95f17f9df4686553dd6636549c61
 F extensions/tnc/install-sh bdd5e293591621ae60d9824d86a4b1c5f22c3d00 x
 F extensions/tnc/pkgIndex.tcl.in 6c224c2cdbb494f621ec008f96fe4a552a79a7b7
@@ -216,8 +216,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 7c05b27190405aa3c0de9fcd309175fdf50aa07b44384343fa80572ea5bbf2cb
-R 3bc651932f9a9f316d59241a13957bd1
+P 6ee5a58b81a2c8ef3fcda6ca91f1fb55aabbb3244960ff4fab996f20508fd549
+R 6b42c6f9bd074bf98cc011e6b3529541
 U rolf
-Z b2b043c4c232026bff2c3b20e7df83d8
+Z 6f524748dbf76857adc79c75bc1bd940
 # Remove this line to create a well-formed Fossil manifest.
