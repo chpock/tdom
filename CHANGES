@@ -1,5 +1,9 @@
 2020-08-21  Rolf Ade  <rolf@pointsman.de>
 
+        Added the tdom::schema command..
+
+2020-08-21  Rolf Ade  <rolf@pointsman.de>
+
         Added -onlyContents and -breakLines to asHTML.
 
 2020-08-17  Rolf Ade  <rolf@pointsman.de>
