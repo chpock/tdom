@@ -1,3 +1,11 @@
+2020-08-21  Rolf Ade  <rolf@pointsman.de>
+
+        Added -onlyContents and -breakLines to asHTML.
+
+2020-08-17  Rolf Ade  <rolf@pointsman.de>
+
+        Updated TEA.
+
 2020-07-23  Rolf Ade  <rolf@pointsman.de>
 
         Added -indent value "tab" to asXML and asJSON.
