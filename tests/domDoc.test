@@ -354,6 +354,23 @@ test domDoc-1.36 {asXML -indent tabs -indentAttrs <num>} {
     set result
 } "<doc>\n\t<a\n\t  a1=\"a1\"\n\t  a2=\"a2\">\n\t\t<b/>\n\t</a>\n\t<c>\n\t\t<d\n\t\t  a1=\"a1\"\n\t\t  a2=\"a2\">\n\t\t\t<f/>\n\t\t</d>\n\t</c>\n\t<g/>\n</doc>\n"
 
+test domDoc-1.37 {asHTML -onlyContents} {
+    set doc [dom parse {<html><body><p>boo</p></body></html>}]
+    set result [[$doc documentElement] asHTML -onlyContents]
+    $doc delete
+    set result
+} {<body><p>boo</p></body>}
+
+test domDoc-1.38 {asHTML -breakLines} {
+    set doc [dom parse {<html><body><p>boo</p></body></html>}]
+    set result [$doc asHTML -breakLines]
+    $doc delete
+    set result
+} {<html
+><body
+><p
+>boo</p></body></html>}
+
 set doc [dom parse <root/>]
 
 test domDoc-2.1 {publicId - no publicId there} {

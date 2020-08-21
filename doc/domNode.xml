@@ -455,24 +455,26 @@ nested Tcl list.</desc>
         XML string or sends the output directly to the given
         channelId.</p>
 
-        <p>See the documentation of the of the <command> domDoc
-        </command> command method <method>asXML</method> for a
-        detailed description of the arguments.</p>
+        <p>See the documentation of the of the
+        <command>domDoc</command> command method
+        <method>asXML</method> for a detailed description of the
+        arguments.</p>
         </desc>
       </commanddef>
 
       <commanddef>
-        <command><method>asHTML</method> <option>?-channel channelId?</option>
-<option>?-escapeNonASCII?</option>  <option>?-htmlEntities?</option></command>
-        <desc>Returns the DOM substree starting from the current node as the
-root node of the result serialized according to HTML rules (HTML elements are
-recognized regardless of case, without end tags for empty HTML elements etc.),
-as string or sends the output directly to the given channelId. If the option
-<m>-escapeNonASCII</m> is given, every non 7 bit ASCII character in attribute
-values or element PCDATA content will be escaped as character reference in
-decimal representation. If the option <m>-htmlEntities</m> is given, a
-character is written using its HTML 4.01 character entity reference, if one is
-defined for it.</desc>
+        <command><method>asHTML</method> <option>?-channel
+channelId?</option> <option>?-escapeNonASCII?</option> <option>?-htmlEntities?</option> <option>?-doctypeDeclaration &lt;boolean&gt;?</option> <option>?-breakLines?</option> <option>?-onlyContents?</option></command>
+        <desc><p>Returns the DOM substree starting from the current
+        node as the root node of the result serialized according to
+        HTML rules (HTML elements are recognized regardless of case,
+        without end tags for empty HTML elements etc.), as string or
+        sends the output directly to the given channelId.</p>
+
+        <p>See the documentation of the the <command>domDoc</command>
+        method <method>asHTML</method> for a detailed description of
+        the arguments.</p>
+        </desc>
       </commanddef>
 
       <commanddef>
