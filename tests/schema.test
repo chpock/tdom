@@ -9761,6 +9761,28 @@ test schema-22.8 {defelementtype} {
     set result
 } {0 0 0 0 0 0 0}
 
+test schema-22.9 {defelementtype} {
+    tdom::schema s
+    s defelement doc {
+        elementtype e1type
+        elementtype e2type *
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        {<doc><e1 foo="bar"/></doc>}
+        <doc><a/><b/></doc>
+        <doc><e1/><e2>grill</e2><e2/></doc>
+        <doc><e1/><e2/><e2/><e2/></doc>
+        <doc><e1/><e2/><e2/><e2/><e1/></doc>
+        <doc><e2/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 0 0 0 0 0}
+
 test schema-23.1 {validatefile} {
     tdom::schema s
     s define {
