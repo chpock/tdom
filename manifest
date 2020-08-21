@@ -1,5 +1,5 @@
-C Added\s-onlyContents\sand\s-breakLines\sto\sasHTML.
-D 2020-08-21T00:07:07.375
+C Started\s-onlyContents\sfor\sasXML.
+D 2020-08-21T00:38:25.337
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -125,7 +125,7 @@ F generic/domxslt.h 0cb8e327683a0ffeb2a7094add6cd82ec1ae49c7c704f20d8d6f7d6523e7
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c ee14ed666ca6d18977f7301545c52ac71b3ce73c49233ff8f8b3aa4144008d24
 F generic/nodecmd.h d2201b69de9507f86e94750f0b72867ec9150795712ef18c5b5b87f35a689f75
-F generic/tcldom.c 6a79ac8dec661b35cc05131f5849b9fa393647d4ef9ef6f911abdc3ea3470388
+F generic/tcldom.c 25b84785fab36ad31ea242ab7a4a55ca9663df35a5dea06753294c68a73ee465
 F generic/tcldom.h afa34c95c821b0f7401853e7bd8c1ff344d8e1640982b7ec250228601dd46e76
 F generic/tclexpat.c 0f4c1220c6c07199a63942616fb31e0eebff421ad85eb66a09b2d1aabbecc20f
 F generic/tclexpat.h 79502484629c99554b998df93e178a69d8484a851ca5739616a37423c2de7d60
@@ -216,8 +216,11 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 41812bb9133a83d47df859500ed6d3ce600ec205a90bd77abffa2c4c56801eef
-R eaf643bb4f11c095e3045fcbb07101b5
+P 59ab627f46c02732111a8d272ecad4a82ddb75fe960b8a6d1bb47fb85b6d416a
+R d994698a47f171f0a3c016a4d94e0bb5
+T *branch * asXMLonlyContents
+T *sym-asXMLonlyContents *
+T -sym-trunk *
 U rolf
-Z 166a46045f42bc3d4fea02547eec69f2
+Z c9aa671c3e092c69153a24388fc3754d
 # Remove this line to create a well-formed Fossil manifest.

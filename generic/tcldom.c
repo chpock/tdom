@@ -163,6 +163,7 @@
 #define SERIALIZE_NO_EMPTY_ELEMENT_TAG 128
 #define SERIALIZE_INDENT_WITH_TAB 256
 #define SERIALIZE_INDENT_ATTR_WITH_TAB 512
+#define SERIALIZE_ONLY_CONTENTS 1024
 
 /*----------------------------------------------------------------------------
 |   Module Globals
@@ -2832,6 +2833,7 @@ void tcldom_treeAsXML (
             }
             writeChars(xmlString, chan, ">\n", 2);
         }
+        outputFlags &= ~SERIALIZE_ONLY_CONTENTS;
         child = doc->rootNode->firstChild;
         while (child) {
             tcldom_treeAsXML(xmlString, child, indent, level, doIndent, chan,
@@ -2921,41 +2923,43 @@ void tcldom_treeAsXML (
         return;
     }
 
-    writeChars(xmlString, chan, "<", 1);
-    writeChars(xmlString, chan, node->nodeName, -1);
+    if (!(outputFlags & SERIALIZE_ONLY_CONTENTS)) {
+        writeChars(xmlString, chan, "<", 1);
+        writeChars(xmlString, chan, node->nodeName, -1);
 
-    attrs = node->firstAttr;
-    while (attrs) {
-        if (indentAttrs > -1) {
-            writeChars(xmlString, chan, "\n", 1);
-            if ((indent != -1) && doIndent) {
-                if (outputFlags & SERIALIZE_INDENT_WITH_TAB) {
-                    for(i=0; i<level; i++) {
+        attrs = node->firstAttr;
+        while (attrs) {
+            if (indentAttrs > -1) {
+                writeChars(xmlString, chan, "\n", 1);
+                if ((indent != -1) && doIndent) {
+                    if (outputFlags & SERIALIZE_INDENT_WITH_TAB) {
+                        for(i=0; i<level; i++) {
+                            writeChars(xmlString, chan, "\t", 1);
+                        }
+                    } else {
+                        for(i=0; i<level; i++) {
+                            writeChars(xmlString, chan, "        ", indent);
+                        }
+                    }
+                    if (outputFlags & SERIALIZE_INDENT_ATTR_WITH_TAB) {
                         writeChars(xmlString, chan, "\t", 1);
-                    }
-                } else {
-                    for(i=0; i<level; i++) {
-                        writeChars(xmlString, chan, "        ", indent);
+                    } else {
+                        writeChars(xmlString, chan, "        ", indentAttrs);
                     }
                 }
-                if (outputFlags & SERIALIZE_INDENT_ATTR_WITH_TAB) {
-                    writeChars(xmlString, chan, "\t", 1);
-                } else {
-                    writeChars(xmlString, chan, "        ", indentAttrs);
-                }
+            } else {
+                writeChars(xmlString, chan, " ", 1);
             }
-        } else {
-            writeChars(xmlString, chan, " ", 1);
+            writeChars(xmlString, chan, attrs->nodeName, -1);
+            writeChars(xmlString, chan, "=\"", 2);
+            tcldom_AppendEscaped(xmlString, chan, attrs->nodeValue, 
+                                 attrs->valueLength,
+                                 outputFlags | SERIALIZE_FOR_ATTR);
+            writeChars(xmlString, chan, "\"", 1);
+            attrs = attrs->nextSibling;
         }
-        writeChars(xmlString, chan, attrs->nodeName, -1);
-        writeChars(xmlString, chan, "=\"", 2);
-        tcldom_AppendEscaped(xmlString, chan, attrs->nodeValue, 
-                             attrs->valueLength,
-                             outputFlags | SERIALIZE_FOR_ATTR);
-        writeChars(xmlString, chan, "\"", 1);
-        attrs = attrs->nextSibling;
     }
-
+    
     hasElements = 0;
     first       = 1;
     doIndent    = 1;
@@ -2993,14 +2997,18 @@ void tcldom_treeAsXML (
                 hasElements = 1;
             }
             if (first) {
-                writeChars(xmlString, chan, ">", 1);
-                if ((indent != -1) && hasElements) {
-                    writeChars(xmlString, chan, "\n", 1);
+                if (!(outputFlags & SERIALIZE_ONLY_CONTENTS)) {
+                    writeChars(xmlString, chan, ">", 1);
+                    if ((indent != -1) && hasElements) {
+                        writeChars(xmlString, chan, "\n", 1);
+                    }
                 }
+                first = 0;
             }
-            first = 0;
             tcldom_treeAsXML(xmlString, child, indent, level+1, doIndent,
-                             chan, NULL, cdataChild, outputFlags, indentAttrs);
+                             chan, NULL, cdataChild,
+                             outputFlags & ~SERIALIZE_ONLY_CONTENTS,
+                             indentAttrs);
             doIndent = 0;
             if (  (child->nodeType == ELEMENT_NODE)
                 ||(child->nodeType == PROCESSING_INSTRUCTION_NODE)
@@ -3012,42 +3020,44 @@ void tcldom_treeAsXML (
         }
     }
 
-    if (first) {
-        if (indent != -1) {
-            if (outputFlags & SERIALIZE_NO_EMPTY_ELEMENT_TAG) {
-                writeChars (xmlString, chan, "></", 3);
-                writeChars(xmlString, chan, node->nodeName, -1);
+    if (!(outputFlags & SERIALIZE_ONLY_CONTENTS)) {
+        if (first) {
+            if (indent != -1) {
+                if (outputFlags & SERIALIZE_NO_EMPTY_ELEMENT_TAG) {
+                    writeChars (xmlString, chan, "></", 3);
+                    writeChars(xmlString, chan, node->nodeName, -1);
+                    writeChars(xmlString, chan, ">\n", 2);
+                } else {
+                    writeChars(xmlString, chan, "/>\n", 3);
+                }
+            } else {
+                if (outputFlags & SERIALIZE_NO_EMPTY_ELEMENT_TAG) {
+                    writeChars (xmlString, chan, "></", 3);
+                    writeChars(xmlString, chan, node->nodeName, -1);
+                    writeChars(xmlString, chan, ">", 1);
+                } else {
+                    writeChars(xmlString, chan, "/>",   2);
+                }
+            }
+        } else {
+            if ((indent != -1) && hasElements) {
+                if (outputFlags & SERIALIZE_INDENT_WITH_TAB) {
+                    for(i=0; i<level; i++) {
+                        writeChars(xmlString, chan, "\t", 1);
+                    }
+                } else {
+                    for(i=0; i<level; i++) {
+                        writeChars(xmlString, chan, "        ", indent);
+                    }
+                }
+            }
+            writeChars (xmlString, chan, "</", 2);
+            writeChars(xmlString, chan, node->nodeName, -1);
+            if (indent != -1) {
                 writeChars(xmlString, chan, ">\n", 2);
             } else {
-                writeChars(xmlString, chan, "/>\n", 3);
+                writeChars(xmlString, chan, ">",   1);
             }
-        } else {
-            if (outputFlags & SERIALIZE_NO_EMPTY_ELEMENT_TAG) {
-                writeChars (xmlString, chan, "></", 3);
-                writeChars(xmlString, chan, node->nodeName, -1);
-                writeChars(xmlString, chan, ">", 1);
-            } else {
-                writeChars(xmlString, chan, "/>",   2);
-            }
-        }
-    } else {
-        if ((indent != -1) && hasElements) {
-            if (outputFlags & SERIALIZE_INDENT_WITH_TAB) {
-                for(i=0; i<level; i++) {
-                    writeChars(xmlString, chan, "\t", 1);
-                }
-            } else {
-                for(i=0; i<level; i++) {
-                    writeChars(xmlString, chan, "        ", indent);
-                }
-            }
-        }
-        writeChars (xmlString, chan, "</", 2);
-        writeChars(xmlString, chan, node->nodeName, -1);
-        if (indent != -1) {
-            writeChars(xmlString, chan, ">\n", 2);
-        } else {
-            writeChars(xmlString, chan, ">",   1);
         }
     }
 }
@@ -3506,13 +3516,13 @@ static int serializeAsXML (
     static const char *asXMLOptions[] = {
         "-indent", "-channel", "-escapeNonASCII", "-doctypeDeclaration",
         "-xmlDeclaration", "-encString", "-escapeAllQuot", "-indentAttrs",
-        "-nogtescape", "-noEmptyElementTag",
+        "-nogtescape", "-noEmptyElementTag", "-onlyContents",
         NULL
     };
     enum asXMLOption {
         m_indent, m_channel, m_escapeNonASCII, m_doctypeDeclaration,
         m_xmlDeclaration, m_encString, m_escapeAllQuot, m_indentAttrs,
-        m_nogtescape, m_noEmptyElementTag
+        m_nogtescape, m_noEmptyElementTag, m_onlyContents
     };
     
     indent = 4;
@@ -3663,6 +3673,12 @@ static int serializeAsXML (
 
         case m_noEmptyElementTag:
             outputFlags |= SERIALIZE_NO_EMPTY_ELEMENT_TAG;
+            objc -= 1;
+            objv += 1;
+            break;
+
+        case m_onlyContents:
+            outputFlags |= SERIALIZE_ONLY_CONTENTS;
             objc -= 1;
             objv += 1;
             break;
