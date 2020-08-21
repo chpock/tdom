@@ -133,6 +133,3 @@ typedef struct TclGenExpatInfo {
 
 #include "dom.h"
 #include "tdomDecls.h"
-
-
-

@@ -23,6 +23,10 @@
    
    *  optional DTD validation.
 
+   *  a rich and Tcl'ish language to describe structures and to
+      validate XML data or DOM trees or other forms of hierarchically
+      data with that.
+   
    *  a JSON parser which parses any possible JSON input into a DOM
       tree without losing information.
 
@@ -58,13 +62,13 @@ which you get as
 [tarball](http://tdom.org/index.html/tarball/trunk/tdom-trunk.tar.gz)
 or as [zip archive](http://tdom.org/index.html/zip/trunk/tdom-trunk.zip)
 
-The latest release is 0.9.1. Get the source code as
-[tarball](http://tdom.org/downloads/tdom-0.9.1-src.tgz) or
-as [zip archive](http://tdom.org/downloads/tdom-0.9.1-src.zip).
+The latest release is 0.9.2. Get the source code as
+[tarball](http://tdom.org/downloads/tdom-0.9.2-src.tgz) or
+as [zip archive](http://tdom.org/downloads/tdom-0.9.2-src.zip).
 
-Windows binaries of the 0.9.1 release are also available. Get it for
-[64 bit](http://tdom.org/downloads/tdom-0.9.1-windows-x64.zip) or [32
-bit](http://tdom.org/downloads/tdom-0.9.1-windows-x86.zip).
+Windows binaries of the 0.9.2 release are also available. Get it for
+[64 bit](http://tdom.org/downloads/tdom-0.9.2-windows-x64.zip) or [32
+bit](http://tdom.org/downloads/tdom-0.9.2-windows-x86.zip).
 
 The provided windows binaries include (statically linked) the
 HTML5 parser.

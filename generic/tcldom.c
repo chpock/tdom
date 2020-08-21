@@ -48,6 +48,7 @@
 #include <domhtml5.h>
 #include <nodecmd.h>
 #include <tcldom.h>
+#include <schema.h>
 #include <versionhash.h>
 
 /* #define DEBUG */
@@ -663,7 +664,6 @@ void tcldom_createNodeObj (
 |   tcldom_setInterpAndReturnVar
 |
 \---------------------------------------------------------------------------*/
-static
 int tcldom_setInterpAndReturnVar (
     Tcl_Interp *interp,
     domNode    *node,
@@ -1226,6 +1226,9 @@ int tcldom_appendXML (
                           extResolver,
                           0,
                           (int) XML_PARAM_ENTITY_PARSING_ALWAYS,
+#ifndef TDOM_NO_SCHEMA
+                          NULL,
+#endif
                           interp,
                           &resultcode);
     if (extResolver) {
@@ -1378,7 +1381,6 @@ int tcldom_xpathResultSet (
 |   tcldom_xpathFuncCallBack
 |
 \---------------------------------------------------------------------------*/
-static
 int tcldom_xpathFuncCallBack (
     void            *clientData,
     char            *functionName,
@@ -4027,9 +4029,8 @@ int tcldom_prefixNSlist (
     int      len, i, result;
     Tcl_Obj *objPtr, *listPtr;
 
-    CheckArgs (2,3,2, "?prefixUriList?");
     i = 0;
-    if (objc == 2) {
+    if (objc == 1) {
         if (!prefixns) return TCL_OK;
         listPtr = Tcl_NewListObj (0, NULL);
         i = 0;
@@ -4042,10 +4043,10 @@ int tcldom_prefixNSlist (
         Tcl_SetObjResult (interp, listPtr);
         return TCL_OK;
     }
-    result = Tcl_ListObjLength (interp, objv[2], &len);
+    result = Tcl_ListObjLength (interp, objv[1], &len);
     if (result != TCL_OK || (len % 2) != 0) {
-        SetResult3 ("The optional argument to the ", methodName, 
-                   " method must be a 'prefix namespace' pairs list");
+        SetResult3 ("The optional argument to ", methodName, 
+                   " must be a 'prefix namespace' pairs list");
         return TCL_ERROR;
     }
     if (prefixns) {
@@ -4065,11 +4066,11 @@ int tcldom_prefixNSlist (
         *prefixnsPtr = prefixns;
     }
     for (i = 0; i < len; i++) {
-        Tcl_ListObjIndex (interp, objv[2], i, &objPtr);
+        Tcl_ListObjIndex (interp, objv[1], i, &objPtr);
         prefixns[i] = tdomstrdup (Tcl_GetString (objPtr));
     }
     prefixns[len] = NULL;
-    Tcl_SetObjResult (interp, objv[2]);
+    Tcl_SetObjResult (interp, objv[1]);
     return TCL_OK;
 }
 
@@ -4448,7 +4449,8 @@ int tcldom_NodeObjCmd (
     char         tmp[200], prefix[MAX_PREFIX_LEN], *method, *nodeName,
                  *str, *attr_name, *attr_val, *filter;
     const char  *localName, *uri, *nsStr;
-    int          result, length, methodIndex, i, line, column;
+    int          result, length, methodIndex, i;
+    long         line, column;
     int          nsIndex, bool, hnew, legacy, jsonType, fromToken = 0;
     Tcl_Obj     *namePtr, *resultPtr;
     Tcl_Obj     *mobjv[MAX_REWRITE_ARGS];
@@ -6007,8 +6009,10 @@ int tcldom_DocObjCmd (
             return cdataSectionElements (doc, interp, objc, objv);
 
         case m_selectNodesNamespaces:
-            return tcldom_prefixNSlist (&(doc->prefixNSMappings), interp, objc,
-                                        objv, "selectNodesNamespaces");
+            CheckArgs (2,3,2, "?prefixUriList?");
+            return tcldom_prefixNSlist (&(doc->prefixNSMappings), interp,
+                                        --objc, ++objv,
+                                        "selectNodesNamespaces");
             
         case m_renameNode:
             return renameNodes (doc, interp, objc, objv);
@@ -6251,7 +6255,9 @@ int tcldom_parse (
     XML_Parser   parser;
     Tcl_Channel  chan = (Tcl_Channel) NULL;
     Tcl_CmdInfo  cmdInfo;
-
+#ifndef TDOM_NO_SCHEMA
+    SchemaData  *sdata = NULL;
+#endif
     static const char *parseOptions[] = {
         "-keepEmpties",           "-simple",        "-html",
         "-feedbackAfter",         "-channel",       "-baseurl",
@@ -6260,8 +6266,11 @@ int tcldom_parse (
 #ifdef TDOM_HAVE_GUMBO
         "-html5",
 #endif
+#ifndef TDOM_NO_SCHEMA
+        "-validateCmd",
+#endif
         "-jsonmaxnesting",        "-ignorexmlns",   "--",
-        "-keepCDATA",                NULL
+        "-keepCDATA",             NULL
     };
     enum parseOption {
         o_keepEmpties,            o_simple,         o_html,
@@ -6270,6 +6279,9 @@ int tcldom_parse (
         o_feedbackcmd,            o_json,           o_jsonroot,
 #ifdef TDOM_HAVE_GUMBO
         o_htmlfive,
+#endif
+#ifndef TDOM_NO_SCHEMA
+        o_validateCmd,
 #endif
         o_jsonmaxnesting,         o_ignorexmlns,    o_LAST,
         o_keepCDATA
@@ -6497,8 +6509,32 @@ int tcldom_parse (
             
         case o_keepCDATA:
             keepCDATA = 1;
-            objv++;  objc--; break;
+            objv++;  objc--; continue;
             
+#ifndef TDOM_NO_SCHEMA
+        case o_validateCmd:
+            objv++; objc--;
+            if (objc < 2) {
+                SetResult("The \"dom parse\" option \"-validateCmd\" "
+                          "requires a tDOM validation command as argument.");
+                return TCL_ERROR;
+            }
+            if (!Tcl_GetCommandInfo(interp, Tcl_GetString(objv[1]),
+                                    &cmdInfo)) {
+                SetResult3("The \"-validateCmd\" argument \"",
+                           Tcl_GetString(objv[1]),
+                           "\" is not a tDOM validation command.");
+                return TCL_ERROR;
+            }
+            if (cmdInfo.objProc != tDOM_schemaInstanceCmd) {
+                SetResult3("The \"-validateCmd\" argument \"",
+                           Tcl_GetString(objv[1]),
+                           "\" is not a tDOM validation command.");
+                return TCL_ERROR;
+            }
+            sdata = (SchemaData *) cmdInfo.objClientData;
+            objv++;  objc--; continue;
+#endif
         }
         if ((enum parseOption) optionIndex == o_LAST) break;
     }
@@ -6533,7 +6569,7 @@ int tcldom_parse (
                 || takeGUMBOParser
 #endif
             ) {
-            Tcl_AppendResult(interp, "simple, JSON or HTML parser(s) "
+            Tcl_AppendResult(interp, "simple, JSON and HTML parser "
                              " don't support channel reading", NULL);
             return TCL_ERROR;
         }
@@ -6642,8 +6678,17 @@ int tcldom_parse (
     return TCL_ERROR;
 #else
     parser = XML_ParserCreate_MM(NULL, MEM_SUITE, NULL);
+#ifndef TDOM_NO_SCHEMA
+    if (sdata) {
+        sdata->inuse++;
+        sdata->parser = parser;
+        if (sdata->validationState != VALIDATION_READY) {
+            SetResult ("The configured schema command is busy");
+            return TCL_ERROR;
+        }
+    }
+#endif
     Tcl_ResetResult(interp);
-
     doc = domReadDocument(parser, xml_string,
                           xml_string_len,
                           ignoreWhiteSpaces,
@@ -6657,8 +6702,17 @@ int tcldom_parse (
                           extResolver,
                           useForeignDTD,
                           paramEntityParsing,
+#ifndef TDOM_NO_SCHEMA
+                          sdata,
+#endif
                           interp,
                           &status);
+#ifndef TDOM_NO_SCHEMA
+    if (sdata) {
+        sdata->inuse--;
+        tDOM_schemaReset (sdata, 1);
+    }
+#endif
     if (doc == NULL) {
         char s[50];
         long byteIndex, i;
@@ -6748,14 +6802,15 @@ int tcldom_featureinfo (
         "expatmicroversion", "dtd",                "ns",
         "unknown",           "tdomalloc",          "lessns",
         "html5",             "jsonmaxnesting",     "versionhash",
-        "pullparser",        "TCL_UTF_MAX",        NULL
+        "pullparser",        "TCL_UTF_MAX",        "schema",
+        NULL
     };
     enum feature {
         o_expatversion,      o_expatmajorversion,  o_expatminorversion,
         o_expatmicroversion, o_dtd,                o_ns,
         o_unknown,           o_tdomalloc,          o_lessns,
         o_html5,             o_jsonmaxnesting,     o_versionhash,
-        o_pullparser,        o_TCL_UTF_MAX,
+        o_pullparser,        o_TCL_UTF_MAX,        o_schema
     };
 
     if (Tcl_GetIndexFromObj(interp, objv[1], features, "feature", 0,
@@ -6833,6 +6888,14 @@ int tcldom_featureinfo (
         break;
     case o_pullparser:
 #ifndef TDOM_NO_PULL
+        result = 1;
+#else
+        result = 0;
+#endif
+        SetBooleanResult(result);
+        break;
+    case o_schema:
+#ifndef TDOM_NO_SCHEMA
         result = 1;
 #else
         result = 0;

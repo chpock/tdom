@@ -4,38 +4,40 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x55a05e76c910">NAME</a> · <a href="#SECTid0x55a05e6bbd60">SYNOPSIS</a> · <a href="#SECTid0x55a05e763ef0">DESCRIPTION</a> · <a href="#SECTid0x55a05e764c30">COMMAND OPTIONS</a> · <a href="#SECTid0x55a05e7c84e0"> COMMAND METHODS </a> · <a href="#SECTid0x55a05e7cefc0">Callback Command Return Codes</a> · <a href="#SECTid0x55a05e7cfb50">SEE ALSO</a> · <a href="#SECTid0x55a05e7cff10">KEYWORDS</a>
+<a href="#SECTid0x5575961dc910">NAME</a> · <a href="#SECTid0x55759612bd60">SYNOPSIS</a> · <a href="#SECTid0x5575961d3ef0">DESCRIPTION</a> · <a href="#SECTid0x5575961d4cc0">COMMAND OPTIONS</a> · <a href="#SECTid0x557596234b50"> COMMAND METHODS </a> · <a href="#SECTid0x55759623b630">Callback Command Return Codes</a> · <a href="#SECTid0x55759623c1c0">SEE ALSO</a> · <a href="#SECTid0x55759623c580">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-    <h2><a name="SECTid0x55a05e76c910">NAME</a></h2><p class="namesection">
+    <h2><a name="SECTid0x5575961dc910">NAME</a></h2><p class="namesection">
 <b class="names">expat - </b><br>Creates an instance of an expat parser object</p>
 
 
 
-    <h2><a name="SECTid0x55a05e6bbd60">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+    <h2><a name="SECTid0x55759612bd60">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">expat</b> ?<i class="m">parsername</i>? ?<i class="m">-namespace</i>? ?<i class="m">arg arg ..</i>
 
 <b class="cmd">xml::parser</b> ?<i class="m">parsername</i>? ?<i class="m">-namespace</i>? ?<i class="m">arg arg ..</i>
 </pre>
-    <h2><a name="SECTid0x55a05e763ef0">DESCRIPTION</a></h2><p>The parser created with <i class="m">expat</i> or <i class="m">xml::parser</i>
+    <h2><a name="SECTid0x5575961d3ef0">DESCRIPTION</a></h2><p>The parser created with <i class="m">expat</i> or <i class="m">xml::parser</i>
 (which is just another name for the same command in an own namespace) are able
 to parse any kind of well-formed XML. The parsers are stream oriented XML
 parser. This means that you register handler scripts with the parser prior to
 starting the parse. These handler scripts are called when the parser discovers
 the associated structures in the document being parsed.  A start tag is an
 example of the kind of structures for which you may register a handler
-script.</p><p>The parsers do not validate the XML document. They do parse the internal DTD
-and, at request, external DTD and external entities, if you resolve the
-identifier of the external entities with the -externalentitycommand script (see
-there).</p><p>Additionly, the Tcl extension code that implements this command provides an
+script.</p><p>The parsers always check for XML well-formedness of the input (and
+report error, if the input isn't well-formed). They parse the internal
+DTD and, at request, external DTD and external entities, if you
+resolve the identifier of the external entities with the
+-externalentitycommand script (see there). If you use the -validateCmd
+option (see there), the input is additionally validated.</p><p>Additionly, the Tcl extension code that implements this command provides an
 API for adding C level coded handlers. Up to now, there exists the parser
 extension command "tdom". The handler set installed by this extension build an
 in memory "tDOM" DOM tree, while the parser is parsing the input.</p><p>It is possible to register an arbitrary amount of different handler scripts
 and C level handlers for most of the events. If the event occurs, they are
 called in turn.</p>
 
-    <h2><a name="SECTid0x55a05e764c30">COMMAND OPTIONS</a></h2><dl class="optlist">
+    <h2><a name="SECTid0x5575961d4cc0">COMMAND OPTIONS</a></h2><dl class="optlist">
         
           <dt><b>-namespace</b></dt>
 
@@ -86,6 +88,19 @@ the data.</p>
 <p>If this option is set to "1" then documents which are not well-formed upon
 end of input will generate an error.</p>
 </dd>
+        
+
+        
+          <dt>
+<b>-validateCmd</b> <i>&lt;tdom schema cmd&gt;</i>
+</dt>
+          
+
+          <dd><p>This option expects the name of a tDOM schema
+          command. If this option is given, then the input is also
+          validated. If the schema command hasn't set a reportcmd then
+          the first validation error will stop further parsing (as a
+          well-formedness error).</p></dd>
         
 
         
@@ -633,7 +648,7 @@ enddoctypedeclcommand scripts, if set, are not called.</dd>
         
 
       </dl>
-    <h2><a name="SECTid0x55a05e7c84e0"> COMMAND METHODS </a></h2><dl class="commandlist">
+    <h2><a name="SECTid0x557596234b50"> COMMAND METHODS </a></h2><dl class="commandlist">
         
           <dt>
 <b class="cmd">parser</b> <b class="method">configure</b> <i class="m">option value ?option value?</i>
@@ -793,7 +808,7 @@ cases.</p></dd>
         
       </dl>
 
-    <h2><a name="SECTid0x55a05e7cefc0">Callback Command Return Codes</a></h2><p>A script invoked for any of the parser callback commands, such as
+    <h2><a name="SECTid0x55759623b630">Callback Command Return Codes</a></h2><p>A script invoked for any of the parser callback commands, such as
 -elementstartcommand, -elementendcommand, etc, may return an error code other
 than "ok" or "error". All callbacks may in addition return
 "break" or "continue".</p><p>If a callback script returns an "error" error code then
@@ -807,11 +822,11 @@ script out of this Tcl handler set and processing continues with the next
 (sibling) element. This does not influence any other handler set.</p><p>If a callback script returns a "return" error
 code then parsing is canceled altogether, but no error is raised.</p>
 
-    <h2><a name="SECTid0x55a05e7cfb50">SEE ALSO</a></h2><p class="seealso">
+    <h2><a name="SECTid0x55759623c1c0">SEE ALSO</a></h2><p class="seealso">
 <a href="expatapi.html">expatapi</a>, <a href="tdomcmd.html">tdom</a>
 </p>
 
-    <h2><a name="SECTid0x55a05e7cff10">KEYWORDS</a></h2><p class="keywords">
+    <h2><a name="SECTid0x55759623c580">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-SAX">SAX</a>, <a class="keyword" href="keyword-index.html#KW-push">push</a>, <a class="keyword" href="keyword-index.html#KW-pushparser">pushparser</a>
 </p>
   </div><hr class="navsep"><div class="navbar" align="center">

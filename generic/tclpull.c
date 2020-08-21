@@ -834,10 +834,10 @@ tDOM_PullParserInstanceCmd (
         case PULLPARSERSTATE_PARSE_ERROR:
             if ((enum method) methodIndex == m_line) {
                 Tcl_SetObjResult(interp,
-                    Tcl_NewIntObj (XML_GetCurrentLineNumber(pullInfo->parser)));
+                    Tcl_NewLongObj (XML_GetCurrentLineNumber(pullInfo->parser)));
             } else {
                 Tcl_SetObjResult(interp,
-                    Tcl_NewIntObj (XML_GetCurrentColumnNumber(pullInfo->parser)));
+                    Tcl_NewLongObj (XML_GetCurrentColumnNumber(pullInfo->parser)));
             }
             break;
         case PULLPARSERSTATE_START_DOCUMENT:

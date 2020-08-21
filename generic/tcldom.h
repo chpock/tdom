@@ -49,15 +49,17 @@ int  tcldom_nameCheck(Tcl_Interp *interp, char *name, char *nameType,
 void tcldom_createNodeObj(Tcl_Interp * interp, domNode *node,
                           char *objCmdName);
 
+domNode * tcldom_getNodeFromObj(Tcl_Interp  *interp, Tcl_Obj *nodeObj);
 int tcldom_prefixNSlist (char ***prefixnsPtr, Tcl_Interp *interp, int objc,
                          Tcl_Obj *const objv[], const char *methodName);
+int tcldom_setInterpAndReturnVar (Tcl_Interp *interp, domNode *node,
+                                  int setVariable, Tcl_Obj *var_name);
 
 void tcldom_initialize(void);
 
 Tcl_ObjCmdProc tcldom_DomObjCmd;
 Tcl_ObjCmdProc tcldom_DocObjCmd;
 Tcl_ObjCmdProc tcldom_NodeObjCmd;
-Tcl_ObjCmdProc TclExpatObjCmd;
 Tcl_ObjCmdProc tcldom_unknownCmd;
 Tcl_ObjCmdProc TclTdomObjCmd;
 

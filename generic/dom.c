@@ -46,6 +46,7 @@
 #include <tcl.h>
 #include <dom.h>
 #include <domxpath.h>
+#include <schema.h>
 #include <tclexpat.h>
 
 
@@ -148,6 +149,9 @@ typedef struct _domReadInfo {
     int               baseURIstackPos;
     domActiveBaseURI *baseURIstack;
     int               insideDTD;
+#ifndef TDOM_NO_SCHEMA
+    SchemaData       *sdata;
+#endif
     int               status;
 
 } domReadInfo;
@@ -1427,7 +1431,23 @@ elemNSfound:
             }
         }
     }
-
+#ifndef TDOM_NO_SCHEMA
+    if (info->sdata) {
+        if (tDOM_probeElement (info->interp, info->sdata, node->nodeName,
+                          node->namespace ?
+                          info->document->namespaces[node->namespace-1]->uri
+                          : NULL)
+            != TCL_OK) {
+            XML_StopParser(info->parser, 0);
+        } else {
+            if (tDOM_probeDomAttributes (info->interp, info->sdata,
+                                    node->firstAttr)
+                != TCL_OK) {
+                XML_StopParser(info->parser, 0);
+            }
+        }
+    }
+#endif
     info->depth++;
 }
 
@@ -1466,6 +1486,13 @@ endElement (
             info->baseURIstackPos--;
         }
     }
+#ifndef TDOM_NO_SCHEMA
+    if (info->sdata) {
+        if (tDOM_probeElementEnd (info->interp, info->sdata) != TCL_OK) {
+            XML_StopParser(info->parser, 0);
+        }
+    }
+#endif
 }
 
 /*---------------------------------------------------------------------------
@@ -1530,10 +1557,18 @@ DispatchPCDATA (
     domLineColumn *lc;
     Tcl_HashEntry *h;
     char          *s;
-    int            len, hnew;
+    int            len, hnew, only_whites;
     
     len = Tcl_DStringLength (info->cdata);
+#ifndef TDOM_NO_SCHEMA
+    if (!len && !info->cdataSection
+        && !(info->sdata
+             && info->sdata->stack
+             && info->sdata->stack->pattern->flags & CONSTRAINT_TEXT_CHILD))
+        return;
+#else
     if (!len && !info->cdataSection) return;
+#endif
     s = Tcl_DStringValue (info->cdata);
     
     parentNode = info->currentNode;
@@ -1549,11 +1584,12 @@ DispatchPCDATA (
         memmove(node->nodeValue + node->valueLength, s, len);
         node->valueLength += len;
 
+        only_whites = 0;
     } else {
 
         if (info->ignoreWhiteSpaces) {
             char *pc;
-            int   i, only_whites;
+            int   i;
 
             only_whites = 1;
             for (i=0, pc = s; i < len; i++, pc++) {
@@ -1566,8 +1602,7 @@ DispatchPCDATA (
                 }
             }
             if (only_whites) {
-                Tcl_DStringSetLength (info->cdata, 0);
-                return;
+                goto checkTextConstraints;
             }
         }
 
@@ -1615,6 +1650,15 @@ DispatchPCDATA (
             lc->column       = XML_GetCurrentColumnNumber(info->parser);
         }
     }
+checkTextConstraints:
+#ifndef TDOM_NO_SCHEMA
+    if (info->sdata) {
+        if (tDOM_probeText (info->interp, info->sdata, s, &only_whites)
+            != TCL_OK) {
+            XML_StopParser(info->parser, 0);
+        }
+    }
+#endif
     Tcl_DStringSetLength (info->cdata, 0);
 }
 
@@ -2143,6 +2187,9 @@ domReadDocument (
     Tcl_Obj    *extResolver,
     int         useForeignDTD,
     int         paramEntityParsing,
+#ifndef TDOM_NO_SCHEMA
+    SchemaData *sdata,
+#endif
     Tcl_Interp *interp,
     int        *resultcode
 )
@@ -2189,7 +2236,10 @@ domReadDocument (
         MALLOC (sizeof(domActiveBaseURI) * info.baseURIstackSize);
     info.insideDTD            = 0;
     info.status               = 0;
-
+#ifndef TDOM_NO_SCHEMA
+    info.sdata                = sdata;
+#endif
+    
     XML_SetUserData(parser, &info);
     XML_SetBase (parser, baseurl);
     /* We must use XML_GetBase(), because XML_SetBase copies the baseURI,
@@ -2341,8 +2391,8 @@ domException2String (
 int
 domGetLineColumn (
     domNode *node,
-    int     *line,
-    int     *column
+    long     *line,
+    long     *column
 )
 {
     char *v;
@@ -5171,6 +5221,9 @@ typedef struct _tdomCmdReadInfo {
     int               baseURIstackPos;
     domActiveBaseURI *baseURIstack;
     int               insideDTD;
+#ifndef TDOM_NO_SCHEMA
+    SchemaData       *sdata;
+#endif
     /* Now the tdom cmd specific elements */
     int               tdomStatus;
     Tcl_Obj          *extResolver;
@@ -5382,7 +5435,9 @@ TclTdomObjCmd (dummy, interp, objc, objv)
         info->insideDTD         = 0;
         info->tdomStatus        = 0;
         info->extResolver       = NULL;
-
+#ifndef TDOM_NO_SCHEMA
+        info->sdata             = NULL;
+#endif
         handlerSet->userData    = info;
 
         CHandlerSetInstall (interp, objv[1], handlerSet);

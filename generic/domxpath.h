@@ -172,6 +172,8 @@ int    xpathEval    (domNode *node, domNode *exprContext, char *xpath,
                      char **prefixMappings, xpathCBs *cbs,
                      xpathParseVarCB *parseVarCB, Tcl_HashTable *catch, 
                      char **errMsg, xpathResultSet *rs);
+int    xpathEvalAst (ast t, xpathResultSet *nodeList, domNode *node,
+                     xpathCBs *cbs, xpathResultSet *rs, char **errMsg);
 int    xpathMatches (ast steps, domNode * exprContext, domNode *nodeToMatch,
                      xpathCBs *cbs, char **errMsg 
                     );
@@ -185,7 +187,8 @@ int xpathEvalSteps (ast steps, xpathResultSet *nodeList,
 #define xpathRSInit(x) (x)->type = EmptyResult; \
                        (x)->intvalue = 0; \
                        (x)->nr_nodes = 0;
-void   xpathRSFree (xpathResultSet *rs );
+void   xpathRSFree (xpathResultSet *rs);
+void   xpathRSReset (xpathResultSet *rs, domNode *ode);
 
 int    xpathFuncBoolean  (xpathResultSet *rs);
 double xpathFuncNumber   (xpathResultSet *rs, int *NaN);
@@ -207,6 +210,21 @@ void rsCopy         ( xpathResultSet *to, xpathResultSet *from );
 
 /* This function is only used for debugging code */
 void rsPrint        ( xpathResultSet *rs );
+
+/* This function is used (outside of tcldom.c) only by schema.c. It
+ * has to have a prototype somewhere. */
+int tcldom_xpathFuncCallBack (
+    void            *clientData,
+    char            *functionName,
+    domNode         *ctxNode,
+    int              position,
+    xpathResultSet  *nodeList,
+    domNode         *exprContext,
+    int              argc,
+    xpathResultSets *args,
+    xpathResultSet  *result,
+    char           **errMsg
+    );
 
 #endif
 

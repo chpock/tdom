@@ -636,6 +636,11 @@ recommendation. Otherwise it returns 0.</desc>
                     <desc>Returns as boolean if the pullparser command
                     is build in.</desc>
                 </optdef>
+                <optdef>
+                    <optname>schema</optname>
+                    <desc>Returns as boolean if the tDOM schema features
+                    are build in.</desc>
+                </optdef>
             </optlist>
             </desc>   
         </commanddef>
