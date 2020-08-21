@@ -9781,7 +9781,7 @@ test schema-22.9 {defelementtype} {
     }
     s delete
     set result
-} {0 0 0 0 0 0 0}
+} {0 0 1 0 1 1 1}
 
 test schema-23.1 {validatefile} {
     tdom::schema s
