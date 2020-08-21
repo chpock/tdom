@@ -678,7 +678,7 @@ s define {
         <desc>This defines a prefix to namespace URI mapping exactly
         as a <i>schemacmd prefixns</i> call. This is meant as top-level
         command of a <i>schemacmd define</i> script. This command is
-        not allowed nested in an other definition script command and
+        not allowed nested in another definition script command and
         will raise error, if you call it there.</desc>
       </commanddef>
 
@@ -687,7 +687,7 @@ s define {
         <desc>This defines an element exactly as a <i>schemacmd
         defelement</i> call. This is meant as top-level command of a
         <i>schemacmd define</i> script. This command is not allowed
-        nested in an other definition script command and will raise
+        nested in another definition script command and will raise
         error, if you call it there.</desc>
       </commanddef>
 
@@ -696,7 +696,7 @@ s define {
         <desc>This defines an elementtype exactly as a <i>schemacmd
         defelementtype</i> call. This is meant as top-level command of a
         <i>schemacmd define</i> script. This command is not allowed
-        nested in an other definition script command and will raise
+        nested in another definition script command and will raise
         error, if you call it there.</desc>
       </commanddef>
 
@@ -705,7 +705,7 @@ s define {
         <desc>This defines a named pattern exactly as a <i>schemacmd
         defpattern</i> call. This is meant as top-level command of a
         <i>schemacmd define</i> script. This command is not allowed
-        nested in an other definition script command and will raise
+        nested in another definition script command and will raise
         error, if you call it there.</desc>
       </commanddef>
 
@@ -714,7 +714,7 @@ s define {
         <desc>This defines a named bundle of text constraints exactly
         as a <i>schemacmd deftexttype</i> call. This is meant as top-level
         command of a <i>schemacmd define</i> script. This command is
-        not allowed nested in an other definition script command and
+        not allowed nested in another definition script command and
         will raise error, if you call it there.</desc>
       </commanddef>
       
@@ -722,8 +722,8 @@ s define {
         <command><method>start</method> <m>name</m> <m>?namespace?</m></command>
         <desc>This command works exactly as a <i>schemacmd start</i>
         call. This is meant as top-level command of a <i>schemacmd
-        define</i> script. This command is not allowed nested in an
-        other definition script command and will raise error, if you
+        define</i> script. This command is not allowed nested in
+        another definition script command and will raise error, if you
         call it there.</desc>
       </commanddef>
     </commandlist>
@@ -734,7 +734,7 @@ s define {
     <title>Quantity specifier</title>
 
     <p>Several schema definition commands expects a quantifier as
-    one of their arguments, which specifies how often the content
+    one of their arguments, which determines how often the content
     particle specified by the command is expected. The valid values
     for a <m>quant</m> argument are:</p>
 
