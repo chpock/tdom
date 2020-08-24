@@ -516,21 +516,29 @@ channelId.
 .PP
 See the documentation of the of the
 .TP
-\&\fB domDoc
-\&\fR command method \fBasXML\fP for a
-detailed description of the arguments.
+\&\fBdomDoc
+\&\fR command method
+\&\fBasXML\fP for a detailed description of the
+arguments.
 .RE
 .TP
-\&\fB\fBasHTML\fP \fB?-channel channelId?\fP \fB?-escapeNonASCII?\fP  \fB?-htmlEntities?\fP
-\&\fRReturns the DOM substree starting from the current node as the
-root node of the result serialized according to HTML rules (HTML elements are
-recognized regardless of case, without end tags for empty HTML elements etc.),
-as string or sends the output directly to the given channelId. If the option
-\&\fI-escapeNonASCII\fR is given, every non 7 bit ASCII character in attribute
-values or element PCDATA content will be escaped as character reference in
-decimal representation. If the option \fI-htmlEntities\fR is given, a
-character is written using its HTML 4.01 character entity reference, if one is
-defined for it.
+\&\fB\fBasHTML\fP \fB?-channel channelId?\fP \fB?-escapeNonASCII?\fP \fB?-htmlEntities?\fP \fB?-doctypeDeclaration <boolean>?\fP \fB?-breakLines?\fP \fB?-onlyContents?\fP
+\&\fR
+.RS
+.PP
+Returns the DOM substree starting from the current
+node as the root node of the result serialized according to
+HTML rules (HTML elements are recognized regardless of case,
+without end tags for empty HTML elements etc.), as string or
+sends the output directly to the given channelId.
+.PP
+See the documentation of the the
+.TP
+\&\fBdomDoc
+\&\fR
+method \fBasHTML\fP for a detailed description of
+the arguments.
+.RE
 .TP
 \&\fB\fBasText\fP
 \&\fRFor ELEMENT_NODEs, the asText method outputs

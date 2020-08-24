@@ -283,9 +283,20 @@ doc and node methods. Please note that the element
 node names and the text node values within the tree
 may be outside of what the appropriate XML productions
 allow.
+.IP "\fB-jsonroot <document element name>\fR"
+If given makes the given element name the
+document element of the resulting doc. The parsed
+content of the JSON string will be the childs of this
+document element node.
 .IP "\fB-jsonmaxnesting  \fIinteger\fP\fR"
 This option only has effect if used together
-with the \fI-json\fR option. The current implementation uses recursive descent JSON parser. In order to avoid using excess stack space, any JSON input that has more than a certain levels of nesting is considered invalid. The default maximum nesting is 2000. The option -jsonmaxnesting allows the user to adjust that.
+with the \fI-json\fR option. The current
+implementation uses a recursive descent JSON parser.
+In order to avoid using excess stack space, any JSON
+input that has more than a certain levels of nesting
+is considered invalid. The default maximum nesting is
+2000. The option -jsonmaxnesting allows the user to
+adjust that.
 .IP "\fB--\fR"
 The option \fI--\fR marks the end of options.
 While respected in general this option is only needed
@@ -398,11 +409,17 @@ even if there is a default namespace in scope for
 un-prefixed elements or even if the element has a
 defined namespace prefix. One consequence is that
 XPath node expressions on such a DOM tree doesn't work
-as expected. Prefixed element nodes can't be selected
-and element nodes without prefix will be seen by XPath
-expressions as if they are not in any namespace (no
-matter if they are in fact should be in a default
-namespace).
+as may be expected. Prefixed element nodes can't be
+selected naively and element nodes without prefix will
+be seen by XPath expressions as if they are not in any
+namespace (no matter if they are in fact should be in
+a default namespace). If you need to inject prefixed
+node names into an XPath expression use the '%' syntax
+described in the documentation of the of the
+.TP
+\&\fBdomNode
+\&\fR command method
+\&\fB>selectNodes\fP.
 .PP
 .RE
 .TP
@@ -593,6 +610,10 @@ to production 6 of the of the Namespaces in XML recommendation. Otherwise it ret
 \&\fRReturns 1 if every character in \fIstring\fR is
 a valid XML Char according to production 2 of the XML 1.0
 recommendation. Otherwise it returns 0.
+.TP
+\&\fB\fBdom\fP \fBclearString\fP \fIstring\fB
+\&\fRReturns the string given as argument cleared out from any characters not
+allowed as XML parsed character data.
 .TP
 \&\fB\fBdom\fP \fBisBMPCharData\fP \fIstring\fB
 \&\fRReturns 1 if every character in \fIstring\fR is

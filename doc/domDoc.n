@@ -299,26 +299,44 @@ empty content it will be serialized with an element start tag
 and an immediately following element end tag.
 .RE
 .TP
-\&\fB\fBasHTML\fP \fB?-channel channelId?\fP \fB?-escapeNonASCII?\fP \fB?-htmlEntities?\fP \fB?-doctypeDeclaration <boolean>?\fP
-\&\fRReturns the DOM tree serialized according to HTML rules
+\&\fB\fBasHTML\fP \fB?-channel channelId?\fP \fB?-escapeNonASCII?\fP \fB?-htmlEntities?\fP \fB?-doctypeDeclaration <boolean>?\fP \fB?-breakLines?\fP \fB?-onlyContents?\fP
+\&\fR
+.RS
+.PP
+Returns the DOM tree serialized according to HTML rules
 (HTML elements are recognized regardless of case, without end
 tags for empty HTML elements etc.) as string or sends the
-output directly to the given channelId. If the option
-\&\fI-escapeNonASCII\fR is given, every non 7 bit ASCII
-character in attribute values or element PCDATA content will
-be escaped as character reference in decimal representation.
+output directly to the given channelId.
+.PP
+If the option \fI-escapeNonASCII\fR is given, every non 7
+bit ASCII character in attribute values or element PCDATA
+content will be escaped as character reference in decimal
+representation.
+.PP
 If the option \fI-htmlEntities\fR is given, a character is
 written using its HTML 4.01 character entity reference, if it
-has one. If the flag \fI-doctypeDeclaration\fR is given there
-will be a DOCTYPE declaration emitted before the first node of
-the document. The default is, to do not. The DOCTYPE name will
+has one.
+.PP
+If the option \fI-breakLines\fR is given the serialization
+outputs "\en>" instead of ">" for the opening tags of
+elements.
+.PP
+If the option \fI-onlyContents\fR is given only all child
+nodes are serialized. This option is ignored by document
+nodes.
+.PP
+If the flag \fI-doctypeDeclaration\fR is given there will
+be a DOCTYPE declaration emitted before the first node of the
+document. The default is, to do not. The DOCTYPE name will
 always be the element name of the document element without
 case normalization. An external entity declaration of the
 external subset is only emitted, if the document has a system
 identifier. The doctype declaration will be written from the
-available information, without check, if this is a known
-(w3c) HTML version information or if the document confirms to
-the given HTML version.
+available information, without check, if this is a known (w3c)
+HTML version information or if the document confirms to the
+given HTML version. All nodes types other than document nodes
+ignore this option.
+.RE
 .TP
 \&\fB\fBasText\fP
 \&\fRThe asText method returns the tree by serializing the

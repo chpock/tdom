@@ -160,7 +160,7 @@ Database Class:	\\fB\\$3\\fR
 .TH schema n "" Tcl ""
 .BS
 .SH NAME
-tdom::schema \- Create a schema validation command
+tdom::schema \- Creates a schema validation command
 .SH SYNOPSIS
 .nf
 package require tdom
@@ -171,8 +171,8 @@ package require tdom
 .BE
 .SH "DESCRIPTION "
 .PP
-This command creates validation commands with a simple API. The
-validation commands have methods to define a schema and are able
+Every call of this command creates a new validation command. A
+validation command has methods to define a schema and is able
 to validate XML data or to post-validate a tDOM DOM tree (and to
 some degree other kind of hierarchical data) against this
 schema.
@@ -180,23 +180,22 @@ schema.
 Additionally, a validation command may be used as argument to
 the \fI-validateCmd\fR option of the \fIdom parse\fR and the
 \&\fIexpat\fR commands to enable validation additional to what they
-otherwise do.
+do otherwise.
 .PP
-The methods of the created commands are:
+The methods of created commands are:
 .TP
 \&\fB\fBprefixns\fP \fI?prefixUriList?\fB
 \&\fRThis method gives control to a prefix (or
-abbreviation) to namespace URI mapping. Everywhere a
-namespace argument is expected in the schema command methods
-you may use the "prefix" pointing to the namespace
-URI in the current prefixUriList, set by this method. If the
-list map the same prefix to different namespace URIs the
-first one win. If there isn't such a prefix the namespace
-argument is used literally as namespace URI. If the method
-is called without argument it returns the current
-prefixUriList. If the method is called with the empty string
-any namespace URI arguments are used literally. This is the
-default.
+abbreviation) to namespace URI mapping. Wherever a namespace
+argument is expected in the schema command methods you may
+use the "prefix" pointing to the namespace URI in
+the current prefixUriList, set by this method. If the list
+maps the same prefix to different namespace URIs, the first
+one win. If there is no such a prefix the namespace argument
+is used literally as namespace URI. If the method is called
+without argument it returns the current prefixUriList. If
+the method is called with the empty string any namespace URI
+arguments are used literally. This is the default.
 .TP
 \&\fB\fBdefelement\fP \fIname\fB \fI?namespace?\fB \fI<definition script>\fB
 \&\fRThis method defines the element \fIname\fR (optional in
@@ -212,8 +211,8 @@ command raises error.
 \&\fB\fBdefelementtype\fP \fItypename\fB \fIname\fB \fI?namespace?\fB \fI<definition script>\fB
 \&\fRThis method defines the element type \fItypename\fR
 (optional in the namespace \fInamespace\fR) in the schema. If
-the element type is referred in a definition script with the
-schema command elementtype the validation engine expects an
+the element type is used in a definition script with the
+schema command elementtype, the validation engine expects an
 element named \fIname\fR (in the namespace \fInamespace\fR,
 if given) and the content model \fIdefinition script\fR.
 Defining element types seems only sensible if you really have
@@ -231,7 +230,7 @@ document element of any XML to validate cannot be a
 \&\fB\fBdefpattern\fP \fIname\fB \fI?namespace?\fB \fI<definition script>\fB
 \&\fRThis method defines a (maybe complex) content particle
 with the \fIname\fR (optional in the namespace
-\&\fInamespace\fR) in the schema, to be referenced in other
+\&\fInamespace\fR) in the schema, to be used in other
 definition scripts with the definition command \fIref\fR. The
 \&\fIdefinition script\fR is evaluated and defines the content
 model of the content particle. If the \fInamespace\fR
@@ -242,8 +241,8 @@ pattern definition for the name/namespace combination the
 command raises error.
 .TP
 \&\fB\fBdeftexttype\fP \fIname\fB \fI<constraint script>\fB
-\&\fRThis method defines a bundle of text constraints, that
-can be referred by \fIname\fR while defining constrains on
+\&\fRThis method defines a bundle of text constraints that
+can be referred to by \fIname\fR while defining constrains on
 text element or attribute values. If there is already a text
 type definition with this name, the command raises error. A
 text type must be defined before it can be used in schema
@@ -251,14 +250,14 @@ definition scripts.
 .TP
 \&\fB\fBstart\fP \fIdocumentElement\fB \fI?namespace?\fB
 \&\fRThis method defines the name and namespace of the root
-element of a tree to validate. If this method is used then the
-root element must match for validity. If \fIstart\fR isn't
-used, any with \fIdefelement\fR defined element may be the
+element of a tree to validate. If this method is used, then
+the root element must match for validity. If \fIstart\fR is
+not used, any element defined by \fIdefelement\fR may be the
 root of a valid document. The \fIstart\fR method may be used
 several times with varying arguments during the lifetime of a
 validation command. If the command is called with just the
 empty string (and no namespace argument), the validation
-constrain for the root element is removed and any defined
+constraint for the root element is removed and any defined
 element will be valid as root of a tree to validate.
 .TP
 \&\fB\fBdefine\fP \fI<definition script>\fB
@@ -277,62 +276,62 @@ the content constrains of the validation command.
 .IP "\fBstart  \fIname ?attributes? ?namespace? \fP\fR"
 Checks if the current validation state allows the
 element \fIname\fR in the \fInamespace\fR to start here.
-It raises error, if not.
+It raises error if not.
 .IP "\fBend\fR"
 Checks if the current innermost open element may end
-here in the current state without violate validation
-constrains. It raises error, if not.
+here in the current state without violation of validation
+constrains. It raises error if not.
 .IP "\fBtext  \fItext\fP\fR"
 Checks if the current validation state allows the
-given text content. It raises error, if not.
+given text content. It raises error if not.
 .RE
 .TP
 \&\fB\fBvalidate\fP \fI<XML string>\fB \fI?objVar?\fB
 \&\fRReturns true if the \fI<XML string>\fR is valid or
-false otherwise. If validation failed and the optional
-\&\fIobjVar\fR argument is given, then the variable with that
+false otherwise. If validation has failed and the optional
+\&\fIobjVar\fR argument is given, the variable with that
 name is set to a validation error message. If the XML string
 is valid and the optional \fIobjVar\fR argument is given,
-then the variable with that name is set to the empty string.
+the variable with that name is set to the empty string.
 .TP
 \&\fB\fBvalidatefile\fP \fIfilename\fB \fI?objVar?\fB
 \&\fRReturns true if the content of \fIfilename\fR is valid
 or false otherwise. The given file is feeded as binary stream
-to expat, therefor only US-ASCII, ISO-8859-1, UTF-8 or UTF-16
+to expat, therefore only US-ASCII, ISO-8859-1, UTF-8 or UTF-16
 encoded data will work with this method. If validation failed
-and the optional \fIobjVar\fR argument is given, then the
-variable with that name is set to a validation error message.
-If the XML string is valid and the optional \fIobjVar\fR
-argument is given, then the variable with that name is set to
-the empty string.
+and the optional \fIobjVar\fR argument is given, the variable
+with that name is set to a validation error message. If the
+XML string is valid and the optional \fIobjVar\fR argument is
+given, the variable with that name is set to the empty
+string.
 .TP
 \&\fB\fBvalidatechannel\fP \fIchannel\fB \fI?objVar?\fB
-\&\fRReturns true if the content read out of the tcl channel
+\&\fRReturns true if the content read from the Tcl channel
 \&\fIchannel\fR is valid or false otherwise. Since data read
-out of a tcl channel is UTF-8 encoded any misleading encoding
+out of a Tcl channel is UTF-8 encoded, any misleading encoding
 declaration at the beginning of the data will lead to errors.
-If the validation failed and the optional \fIobjVar\fR
-argument is given, then the variable with that name is set to
-a validation error message. If the XML string is valid and the
-optional \fIobjVar\fR argument is given, then the variable
-with that name is set to the empty string.
+If the validation fails and the optional \fIobjVar\fR
+argument is given, the variable with that name is set to a
+validation error message. If the XML string is valid and the
+optional \fIobjVar\fR argument is given, the variable with
+that name is set to the empty string.
 .TP
 \&\fB\fBdomvalidate\fP \fIdomNode\fB \fI?objVar?\fB
 \&\fRReturns true if the first argument is a valid tree or
 false otherwise. If validation failed and the optional
-\&\fIobjVar\fR argument is given, then the variable with that
-name is set to a validation error message. If the dom tree is
-valid and the optional \fIobjVar\fR argument is given, then
-the variable with that name is set to the empty string.
+\&\fIobjVar\fR argument is given, the variable with that name
+is set to a validation error message. If the dom tree is valid
+and the optional \fIobjVar\fR argument is given, the variable
+with that name is set to the empty string.
 .TP
 \&\fB\fBreportcmd\fP \fI?cmd?\fB
-\&\fRThis method expects the name of a tcl command to be
+\&\fRThis method expects the name of a Tcl command to be
 called in case of validation error. This command will be
-called with two arguments appended: the schema command, that
+called with two arguments appended: the schema command which
 raises the validation error, and a validation error code.
-For more detailed information see Recovering.The possible error codes
-are:
 .RS
+.PP
+The possible error codes are:
 .TP
 MISSING_ELEMENT
 .TP
@@ -395,21 +394,21 @@ events are expected.
 .IP "\fBvstate\fR"
 This method is a shorter alias for validationstate; see there.
 .IP "\fBline\fR"
-If the schema command is currently validating
+If the schema command is currently validating,
 this method returns the line part of the parsing
 position information and the empty string in all
 other cases. If the schema command is currently
 post-validating a DOM tree there may be no position
-information stored at certain or all nodes. The
-empty string is returned in this cases.
+information stored at some or all nodes. The
+empty string is returned in these cases.
 .IP "\fBcolumn\fR"
 If the schema command is currently validating
 this method returns the column part of the parsing
 position information and the empty string in all
 other cases. If the schema command is currently
 post-validating a DOM tree there may be no position
-information stored at certain or all nodes. The
-empty string is returned in this cases.
+information stored at some or all nodes. The
+empty string is returned in these cases.
 .IP "\fBdomNode\fR"
 If the schema command isn't currently
 post-validating a DOM tree this method returns the
@@ -417,8 +416,8 @@ empty string. Otherwise, if the schema command waits
 for the reportcmd script to finish while recovering
 from a validation error it returns the node on which
 the validation engine is currently looking at in
-case, the node is an ELEMENT_NODE or the parent
-node, if not. It is recommended that you don't use
+case the node is an ELEMENT_NODE or, if not, its
+parent node. It is recommended that you do not use
 this method. Or at least leave the DOM tree alone,
 use it read-only.
 .IP "\fBnrForwardDefinitions\fR"
@@ -513,11 +512,11 @@ MATCH_DOM_XPATH_BOOLEAN
 Checking domxpathboolean constant
 .PP
 If called with one of the possible optional
-arguments the command returns detail information
+arguments, the command returns detail information
 depending on current action.
 .TP
 name
-Return the name of the element
+Returns the name of the element
 that has to match in case of
 MATCH_ELEMENT_START. Return the name of the
 closed element in case of MATCH_ELEMENT_END.
@@ -526,7 +525,7 @@ MATCH_ATTRIBUTE_TEXT. Return the name of the
 parent element in case of MATCH_TEXT.
 .TP
 namespace
-Return the namespace of
+Returns the namespace of
 the element that has to match in case of
 MATCH_ELEMENT_START. Return the namespace of the
 closed element in case of MATCH_ELEMENT_END.
@@ -535,7 +534,7 @@ of MATCH_ATTRIBUTE_TEXT. Return the namespace of
 the parent element in case of MATCH_TEXT.
 .TP
 text
-Return the text to match in
+Returns the text to match in
 case of MATCH_TEXT. Returns the value of the
 attribute in case of MATCH_ATTRIBUTE_TEXT.
 .RE
@@ -546,13 +545,14 @@ Called outside this context the method returns the empty
 string.
 .RS
 .IP "\fBtop\fR"
-Returns the element which content is currently
-checked (the at the moment open element tag).
+Returns the element whose content is currently
+checked (the open element tag at this moment).
 .IP "\fBinside\fR"
 Returns all currently open elements as a list.
 .IP "\fBassociated\fR"
-Returns the data associated with the current top
-most stack content particle or the empty string it there isn't.
+Returns the data associated with the
+current top most stack content particle or
+the empty string it there isn't any.
 .RE
 .RE
 .TP
@@ -561,31 +561,31 @@ most stack content particle or the empty string it there isn't.
 READY (while preserving the defined grammar).
 .SH "Schema definition scripts"
 .PP
-Schema definition scripts are ordinary Tcl scripts that are
-evaluated in the namespace tdom::schema. The below listed schema
-definition commands in this tcl namespace allow to define a wide
-variety of document structures. Every schema definition command
-establish a validation constraint on the content which has to
-match or must be optional to qualify the content as valid. It is a
-validation error if there is additional (not matched) content.
-White space only text (in the XML sense of white space) between
-any different tags is ignored, with the exception of text only
-elements (for which even white space only text will be considered
-as significant content).
+Schema definition scripts are ordinary Tcl scripts evaluated in
+the namespace tdom::schema. The schema definition commands listed
+below in this Tcl namespace allow to define a wide variety of
+document structures. Every schema definition command establishes a
+validation constraint on the content which has to match or must be
+optional to qualify the content as valid. It is a validation error
+if there is additional (not matched) content. White space only
+text (in the XML sense of white space) between any different tags
+is ignored, with the exception of text only elements (for which
+even white space only text will be considered as significant
+content).
 .PP
 The schema definition commands are:
 .TP
 \&\fB\fBelement\fP \fIname\fB \fI?quant?\fB \fI?<definition script>?\fB
-\&\fRIf the optional argument \fIdefinition script\fR isn't
+\&\fRIf the optional argument \fIdefinition script\fR is not
 given this command refers to the element defined with
 \&\fIdefelement\fR with the name \fIname\fR in the current
 context namespace. If the \fIdefelement script\fR argument is
 given, then the validation constraint expects an element with
 the name \fIname\fR in the current namespace with content
 "locally" defined by the \fIdefinition script\fR. Forward
-references to so far not defined elements or pattern or other
+references to so far not defined elements or patterns or other
 local definitions of the same name inside the \fIdefinition
-script\fR are allowed. If a forward referenced element isn't
+script\fR are allowed. If a forward referenced element is not
 defined until validation then only an empty element with name
 \&\fIname\fR and namespace \fInamespace\fR and no attributes
 matches.
@@ -593,38 +593,39 @@ matches.
 \&\fB\fBelementtype\fP \fIname\fB \fI?quant?\fB
 \&\fRThis command refers to the element defined with
 \&\fIdefelementtype\fR with the type name \fIname\fR in the
-current context namespace. Forward references to a so far not
+current context namespace. Forward references to so far not
 defined element types or recursive references are allowed. If
-a forward referenced element type isn't defined until
-validation no content or attributes are expected.
+a forward referenced element type is not defined until
+validation any empty element without attributes will be
+accepted.
 .TP
 \&\fB\fBref\fP \fIname\fB \fI?quant?\fB
 \&\fRThis command refers to the content particle defined with
 \&\fIdefpattern\fR with the name \fIname\fR in the current
 context namespace. Forward references to a so far not defined
-pattern or recursive references are allowed. If a forward
-referenced pattern isn't defined until validation no content
+pattern and recursive references are allowed. If a forward
+referenced pattern is not defined until validation no content
 whatsoever is expected ("empty match").
 .TP
 \&\fB\fBgroup\fP \fI?quant?\fB \fI<definition script>\fB
 \&\fRThis method allows to group a sequence of content
-particle, defined by the \fIdefinition script>\fR, that have
+particles defined by the \fIdefinition script>\fR, which have
 to match in this sequence order.
 .TP
 \&\fB\fBchoice\fP \fI?quant?\fB \fI<definition script>\fB
 \&\fRThis schema constraint match if one of the top level
-content particle defined by the \fIdefinition script>\fR
-match. If one of this top level content particle is optional
+content particles defined by the \fIdefinition script>\fR
+matches. If one of this top level content particle is optional
 this constraint matches the "empty match".
 .TP
 \&\fB\fBinterleave\fP \fI?quant?\fB \fI<definition script>\fB
-\&\fRThis schema constraint match after every of the top
-level content particle with quant must defined by the
-\&\fIdefinition script>\fR have matched in any arbitrary
-order.
+\&\fRThis schema constraint match after every of the required
+top level content particles defined by the \fIdefinition
+script>\fR have matched (and, optional, some or all other) in
+any arbitrary order.
 .TP
 \&\fB\fBmixed\fP \fI?quant?\fB \fI<definition script>\fB
-\&\fRThis schema constraint match for any text (including the
+\&\fRThis schema constraint matches for any text (including the
 empty one) and every top level content particle defined by the
 \&\fIdefinition script>\fR with default quantifier *.
 .TP
@@ -639,89 +640,90 @@ expected.
 \&\fRThe any command matches every element (in the namespace
 \&\fInamespace\fR, if that is given) (with whatever attributes)
 or subtree, no matter if known within the schema or not.
-Please notice, that in case of no \fInamespace\fR argument is
-given this mean the quantifier * and + will eat up any
+Please note that in case of no \fInamespace\fR argument is
+given that means that the quantifier * and + will eat up any
 elements until the enclosing element ends. If you really have
 a namespace that looks like a valid tDOM schema quantifier
-you'll have to spell out always all two arguments.
+you will have to spell out always both arguments.
 .TP
 \&\fB\fBattribute\fP \fIname\fB \fI?quant?\fB \fI(?<constraint script>|\*(lqtype\*(lq typename?)\fB
-\&\fRThe attribute command defines a attribute (in no
+\&\fRThe attribute command defines an attribute (in no
 namespace) to the enclosing element. The first definition of
 \&\fIname\fR inside an element definition wins; later
 definitions of the same name are silently ignored. After the
 \&\fIname\fR argument there may be one of the quantifiers ? or
-!. If there is, this will be used. Otherwise the attribute
-will be required (must be present in the XML source). If there
-is one argument more this argument is evaluated as constraint
+!. If there is, it will be used. Otherwise the attribute will
+be required (must be present in the XML source). If there is
+one argument more this argument is evaluated as constraint
 script, defining the value constrains of the attribute.
 Otherwise, if there are two more arguments and the first of
-them is the bare-word "type" then the following is used as a
-text type name. This command is only allowed at top level in
+them is the bare-word "type" the following argument is used as
+a text type name. This command is only allowed at top level in
 the definition script of an defelement/element script.
 .TP
 \&\fB\fBnsattribute\fP \fIname\fB \fInamespace\fB \fI?quant?\fB \fI(?<constraint script>|\*(lqtype\*(lq typename?)\fB
 \&\fRThis command does the same as the command
-\&\fIattribute\fR, just for the attribute \fIname\fR in the
+\&\fIattribute\fR, for the attribute \fIname\fR in the
 namespace \fInamespace\fR.
 .TP
 \&\fB\fBnamespace\fP \fIURI\fB \fI<definition script>\fB
 \&\fREvaluates the \fIdefinition script\fR with context
 namespace \fIURI\fR. Every element, element type or ref
-command name will be looked up in the namespace \fIURI\fR and
-local defined element will be in that namespace. The empty
-string as \fIURI\fR means no namespace.
+command name will be looked up in the namespace \fIURI\fR,
+and local defined elements will be in that namespace. An
+empty string as \fIURI\fR means no namespace.
 .TP
 \&\fB\fBtcl\fP \fItclcmd\fB \fI?arg arg ...?\fB
-\&\fREvaluates the Tcl script \fItclcmd arg arg ... \fR. This
-validation command is only allowed in strict sequential
+\&\fREvaluates the Tcl script \fItclcmd arg arg ... \fR.
+This validation command is only allowed in strict sequential
 context (not in choice, mixed and interleave). If the return
-code is something else than 0 (TCL_OK) then this is an
-error (which isn't catched and reported by reportcmd).
+code is something else than 0 (TCL_OK) this is an error (which
+is not catched and reported by reportcmd).
 .TP
 \&\fB\fBself\fP
 \&\fRReturns the schema command.
 .TP
 \&\fB\fBassociate\fP \fIdata\fB
-\&\fRThis command is only allowed top-level inside the
-definition scripts of the element, elementtype, pattern or
-interleave content particle. Associate the as argument given
-\&\fIdata\fR with the currently defined content particle and
-may be requested in scripts evaluated while validating the
-content of that particle with the schema command method call
-\&\fIinfo stack associated\fR.
+\&\fRThis command is only allowed top-level inside definition
+scripts of the element, elementtype, pattern or interleave
+content particles. Associates the \fIdata\fR given as argument
+with the currently defined content particle and may be
+requested in scripts evaluated while validating the content of
+that particle with the schema command method call \fIinfo
+stack associated\fR.
 .TP
 \&\fB\fBdomunique\fP \fIselector\fB \fIfieldlist\fB \fI?name?\fB \fI?\*(lqIGNORE_EMPTY_FIELD_SET\*(lq|(\*(lqEMPTY_FIELD_SET_VALUE\*(lq emptyFieldSetValue)?\fB
 \&\fRIf not postvalidating a DOM tree with \fIdomvalidate\fR
-this constraint always match. If postvalidating this
+this constraint always matches. If postvalidating this
 constraint resembles the xsd key/keyref mechanism. The
 \&\fIselector\fR argument may be any valid XPath expression
-(without the xsd limits). Several \fIdomunique\fR command
+(without the xsd limits). Several \fIdomunique\fR commands
 within one element definition are allowed. They are checked in
 definition order. The argument name is available in the
 recovering script per \fIinfo vaction name\fR. If the
 \&\fIfieldlist\fR doesn't select something for a node of the
-result set of the \fIselector\fR then the key value will be
-the empty string, by default. If the arguments
-\&\fIEMPTY_FIELD_SET_VALUE <value>\fR are given a empty node
-set will have the key value \fIvalue\fR. If instead the flag
-\&\fIIGNORE_EMPTY_FIELD_SET\fR flag is given then an empty node
-set result will not have any key value.
+result set of the \fIselector\fR the key value will be the
+empty string by default. If the arguments
+\&\fIEMPTY_FIELD_SET_VALUE <value>\fR are given an empty
+node set will have the key value \fIvalue\fR. If instead the
+flag \fIIGNORE_EMPTY_FIELD_SET\fR flag is given an empty
+node set result will not have any key value.
 .TP
 \&\fB\fBdomxpathboolean\fP \fIXPath_expr\fB \fI?name?\fB
 \&\fR
 .RS
 .PP
 If not postvalidating a DOM tree with
-\&\fIdomvalidate\fR this constraint always match. If
-postvalidating this constraint matches if the result of the
-\&\fIXPath_expr\fR argument (with the node matching the schema
-parent of the \fIdomxpathboolean\fR command as context node)
-- converted to a boolean by XPath rules - is true. Several
-\&\fIdomxpathboolean\fR command within one element definition
+\&\fIdomvalidate\fR this constraint always matches. If
+postvalidating the \fIXPath_expr\fR argument is evaluated
+(with the node matching the schema parent of the
+\&\fIdomxpathboolean\fR command as context node). The
+constraint maches if the result of this XPath expression,
+converted to boolean by XPath rules, is true. Several
+\&\fIdomxpathboolean\fR commands within one element definition
 are allowed. They are checked in definition order.
 .PP
-This enables if-then checks depending on more than one element. Consider
+This enables checks depending on more than one element. Consider
 
 
         
@@ -745,55 +747,55 @@ s define {
 \&\fRThis defines a prefix to namespace URI mapping exactly
 as a \fIschemacmd prefixns\fR call. This is meant as top-level
 command of a \fIschemacmd define\fR script. This command is
-not allowed nested in an other definition script command and
+not allowed nested in another definition script command and
 will raise error, if you call it there.
 .TP
 \&\fB\fBdefelement\fP \fIname\fB \fI?namespace?\fB \fI<definition script>\fB
 \&\fRThis defines an element exactly as a \fIschemacmd
 defelement\fR call. This is meant as top-level command of a
 \&\fIschemacmd define\fR script. This command is not allowed
-nested in an other definition script command and will raise
+nested in another definition script command and will raise
 error, if you call it there.
 .TP
 \&\fB\fBdefelementtype\fP \fIname\fB \fI?namespace?\fB \fI<definition script>\fB
 \&\fRThis defines an elementtype exactly as a \fIschemacmd
 defelementtype\fR call. This is meant as top-level command of a
 \&\fIschemacmd define\fR script. This command is not allowed
-nested in an other definition script command and will raise
+nested in another definition script command and will raise
 error, if you call it there.
 .TP
 \&\fB\fBdefpattern\fP \fIname\fB \fI?namespace?\fB \fI<definition script>\fB
 \&\fRThis defines a named pattern exactly as a \fIschemacmd
 defpattern\fR call. This is meant as top-level command of a
 \&\fIschemacmd define\fR script. This command is not allowed
-nested in an other definition script command and will raise
+nested in another definition script command and will raise
 error, if you call it there.
 .TP
 \&\fB\fBdeftexttype\fP \fIname\fB \fI<constraint script>\fB
 \&\fRThis defines a named bundle of text constraints exactly
 as a \fIschemacmd deftexttype\fR call. This is meant as top-level
 command of a \fIschemacmd define\fR script. This command is
-not allowed nested in an other definition script command and
+not allowed nested in another definition script command and
 will raise error, if you call it there.
 .TP
 \&\fB\fBstart\fP \fIname\fB \fI?namespace?\fB
 \&\fRThis command works exactly as a \fIschemacmd start\fR
 call. This is meant as top-level command of a \fIschemacmd
-define\fR script. This command is not allowed nested in an
-other definition script command and will raise error, if you
+define\fR script. This command is not allowed nested in
+another definition script command and will raise error, if you
 call it there.
 .SH "Quantity specifier"
 .PP
-Several schema definition commands expects a quantifier as
-one of their arguments, which specifies how often the content
+Several schema definition commands expect a quantifier as
+one of their arguments which determines how often the content
 particle specified by the command is expected. The valid values
 for a \fIquant\fR argument are:
 .IP "\fB!\fR"
-The content particle must occur exactly once in valid
+The content particle has to occur exactly once in valid
 documents.
 .IP "\fB?\fR"
-The content particle must occur at most once in valid
-documents.
+The content particle may not occur more than once in
+valid documents - the partice is optional.
 .IP "\fB*\fR"
 The content particle may occur zero or more times in a
 row in valid documents.
@@ -806,31 +808,31 @@ valid documents. The quantifier must be an integer greater
 zero.
 .IP "\fB{n m}\fR"
 The content particle must occur
-n to m times (both inclusive) in a row in valid documents. The
-quantifier must be a tcl list with two elements. Both elements
-must be integers, with n >= 0 and n < m.
+at least n and at most m times in a row in valid documents.
+The quantifier must be a Tcl list with two elements. Both
+elements must be integers, with n >= 0 and n < m.
 .PP
-If an optional quantifier is not given then it defaults to * in
+If an optional quantifier is not given, it defaults to * in
 case of the \fImixed\fR command and to ! for all other commands.
 .SH "Text constraint scripts"
 .PP
-Text - parsed character data, as XML calls it - must sometimes
-be of a certain kind, must comply to some rules etc to be valid.
-The text constraint script arguments to the text, attribute,
-nsattribute and deftexttype commands are evaluated in the Tcl
-namespace \fItdom::schema::text\fR namespace and allow the
-following text constraint commands to check text for certain
-properties. The commands are defined in the Tcl namespace
+Text (parsed character data, as XML calls it) sometimes has to
+be of a certain kind or comply with certain rules to be valid. The
+text constraint script arguments to text, attribute, nsattribute
+and deftexttype commands are evaluated in the Tcl namespace
+\&\fItdom::schema::text\fR namespace and allow the ensuing text
+constraint commands to check text for certain properties. The
+commands are defined in the Tcl namespace
 \&\fItdom::schema::text\fR. They raise error in case they are
 called outside of a text constraint script.
 .PP
-A few of the following text type commands are exposed as
-general Tcl commands. They are defined in the namespace tdom::type
-and are called as documented below with the text to check appended
-to the argument list. They return a logical value. Please note,
-that the commands may not accept starting or ending white space. It
-is noted with the command documentation, if the command is
-available in the tdom::type namespace.
+A few of the ensuing text type commands are exposed as general
+Tcl commands. They are defined in the namespace tdom::type and are
+called as documented below with the text to check appended to the
+argument list. They return a logical value. Please note that the
+commands may not accept starting or ending white space. If a
+command is available in the tdom::type namespace is recorded in
+its documentation.
 .SS "The tcl text constraint command"
 .PP
 The \fItcl\fR text constraint command dispatches the check
@@ -838,9 +840,9 @@ to an arbitrary Tcl command, thus enable any programmable
 decision rules.
 .TP
 \&\fB\fBtcl\fP \fItclcmd\fB \fI?arg arg ...?\fB
-\&\fREvaluates the tcl script \fItclcmd arg arg ... \fR and
+\&\fREvaluates the Tcl script \fItclcmd arg arg ... \fR and
 the text to validate appended to the argument list. The return
-value of the tcl command is interpreted as a boolean.
+value of the Tcl command is interpreted as a boolean.
 .SS "Basic XML types"
 .TP
 \&\fB\fBname\fP
@@ -950,7 +952,7 @@ Gregorian calendar for all dates. A preceding minus
 sign for bce dates is allowed. There is no year 0. The
 year may have more than 4 digits, but only if needed
 (no extra leading zeros). This is available as common
-tcl command tdom::type::date.
+Tcl command tdom::type::date.
 .TP
 \&\fB\fBtime\fP
 \&\fRThis text constraint match if the text value is
@@ -963,7 +965,7 @@ digits. Additional fractional seconds (with a point
 ('.') as separator) are allowed, but not just a
 dangling point. The time value 24:00:00 (without
 fractional part) is allowed. This is available as
-common tcl command tdom::type::time.
+common Tcl command tdom::type::time.
 .TP
 \&\fB\fBdateTime\fP
 \&\fRThis text constraint match if the text value is
@@ -974,7 +976,7 @@ follow the rules of the \fIdate\fR command; see
 there. The time part (including the signaling 'T'
 character) is mandatory and follow the rules of the
 \&\fItime\fR command, see there. This is available as
-common tcl command tdom::type::dateTime.
+common Tcl command tdom::type::dateTime.
 .TP
 \&\fB\fBduration\fP
 \&\fRThis text constraint match if the text value is
@@ -984,7 +986,7 @@ then the starting P and - if one of H, M or S is given
 - T are optional. In case the following sign letter is
 S n may be a decimal (with at least one digit before
 and after the dot), otherwise it must be a (positive)
-integer. This is available as common tcl command
+integer. This is available as common Tcl command
 tdom::type::duration.
 .TP
 \&\fB\fBbase64\fP
@@ -1081,7 +1083,7 @@ tcl tclcmd ?arg ...?
 The text to split is
 handed to the \fItclcmd\fR, which is evaluated on global
 level, appended with every given arg and the text to split
-as last argument. This call must return a valid tcl list,
+as last argument. This call must return a valid Tcl list,
 which elements are tested.
 .PP
 The default in case no split type argument is given is
@@ -1210,6 +1212,36 @@ the well-formedness error.
 If the \fIreportcmd\fR throws error while called by the
 validation engine then validation stops and the schema command
 throws error with the error message of the script.
+.PP
+While validating basically three events happen: an element
+start tag has to match, a piece of text has to match or an
+element end tag has to match. The method \fIinfo vaction\fR
+called in the recovering script or any script code called from
+there returns, which event triggered the error report
+(MATCH_ELEMENT_START, MATCH_TEXT, MATCH_ELEMENT_END,
+respectively). While the command walks throu the schema looking
+if the event matches other, data driven events (as, for example
+checking, if any keyref within a keyspace exists).
+.PP
+Several of the validation error codes appended as second
+argument to the \fIreportcmd\fR calls may happen at more than
+one kind of validation event. The \fIinfo vaction\fR method and
+its subcommands provide information about the current validation
+event and the
+.PP
+If a structural validation error happens, the default
+recovering strategy is to ignore any following (or missing)
+content within the current subtree and to continue with the
+element end event of the subtree.
+.PP
+Returning "ignore" from the recovering script in case of
+error type MISSING_ELEMENT recovers by ignoring the failed
+contraint and continues to match the event further against the
+schema.
+.PP
+Returing "vanish" from the recover script In case of the
+error types MISSING_ELEMENT and UNEXPECTED_ELEMENT recovers by
+ignoring the event.
 .SH Examples
 .PP
 .UR "https://www.w3.org/TR/xmlschema-0/"
@@ -1398,7 +1430,7 @@ schema define {
         element email
     }
     foreach e {name email} {
-        defelement $e {text}
+        defelement $e text
     }
 }
       
