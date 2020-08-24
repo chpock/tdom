@@ -2,7 +2,7 @@
 <manpage id="schema" cat="schema" title="schema">
   <namesection>
     <name>tdom::schema</name>
-    <desc>Create a schema validation command</desc>
+    <desc>Creates a schema validation command</desc>
   </namesection>
 
   <synopsis>
@@ -733,22 +733,22 @@ s define {
   <section>
     <title>Quantity specifier</title>
 
-    <p>Several schema definition commands expects a quantifier as
-    one of their arguments, which determines how often the content
+    <p>Several schema definition commands expect a quantifier as
+    one of their arguments which determines how often the content
     particle specified by the command is expected. The valid values
     for a <m>quant</m> argument are:</p>
 
     <optlist>
       <optdef>
         <optname>!</optname>
-        <desc>The content particle must occur exactly once in valid
+        <desc>The content particle has to occur exactly once in valid
         documents.</desc>
       </optdef>
     
       <optdef>
         <optname>?</optname>
-        <desc>The content particle must occur at most once in valid
-        documents.</desc>
+        <desc>The content particle may not occur more than once in
+        valid documents - the partice is optional.</desc>
       </optdef>
     
       <optdef>
@@ -772,36 +772,36 @@ s define {
     
       <optdef>
         <optname>{n m}</optname> <desc>The content particle must occur
-        n to m times (both inclusive) in a row in valid documents. The
-        quantifier must be a Tcl list with two elements. Both elements
-        must be integers, with n >= 0 and n &lt; m.</desc>
+        at least n and at most m times in a row in valid documents.
+        The quantifier must be a Tcl list with two elements. Both
+        elements must be integers, with n >= 0 and n &lt; m.</desc>
       </optdef>
     </optlist>
 
-    <p>If an optional quantifier is not given then it defaults to * in
+    <p>If an optional quantifier is not given, it defaults to * in
     case of the <m>mixed</m> command and to ! for all other commands.</p>
   </section>
 
   <section>
     <title>Text constraint scripts</title>
 
-    <p>Text - parsed character data, as XML calls it - must sometimes
-    be of a certain kind, must comply to some rules etc to be valid.
-    The text constraint script arguments to the text, attribute,
-    nsattribute and deftexttype commands are evaluated in the Tcl
-    namespace <m>tdom::schema::text</m> namespace and allow the
-    following text constraint commands to check text for certain
-    properties. The commands are defined in the Tcl namespace
+    <p>Text (parsed character data, as XML calls it) sometimes has to
+    be of a certain kind or comply with certain rules to be valid. The
+    text constraint script arguments to text, attribute, nsattribute
+    and deftexttype commands are evaluated in the Tcl namespace
+    <m>tdom::schema::text</m> namespace and allow the ensuing text
+    constraint commands to check text for certain properties. The
+    commands are defined in the Tcl namespace
     <m>tdom::schema::text</m>. They raise error in case they are
     called outside of a text constraint script.</p>
 
-    <p>A few of the following text type commands are exposed as
-    general Tcl commands. They are defined in the namespace tdom::type
-    and are called as documented below with the text to check appended
-    to the argument list. They return a logical value. Please note,
-    that the commands may not accept starting or ending white space. It
-    is noted with the command documentation, if the command is
-    available in the tdom::type namespace.
+    <p>A few of the ensuing text type commands are exposed as general
+    Tcl commands. They are defined in the namespace tdom::type and are
+    called as documented below with the text to check appended to the
+    argument list. They return a logical value. Please note that the
+    commands may not accept starting or ending white space. If a
+    command is available in the tdom::type namespace is recorded in
+    its documentation.
     </p>
 
     <subsection>
