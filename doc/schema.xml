@@ -605,7 +605,7 @@
         <desc>Evaluates the Tcl script <m>tclcmd arg arg ... </m>.
         This validation command is only allowed in strict sequential
         context (not in choice, mixed and interleave). If the return
-        code is something else than 0 (TCL_OK) this is an error (which
+        code is something else than TCL_OK, this is an error (which
         is not catched and reported by reportcmd).</desc>
       </commanddef>
 
@@ -1250,22 +1250,21 @@ s define {
       validation engine then validation stops and the schema command
       throws error with the error message of the script.</p>
 
-      <p>While validating basically three events happen: an element
-      start tag has to match, a piece of text has to match or an
-      element end tag has to match. The method <m>info vaction</m>
+      <p>While validating basically three events can happen: an
+      element start tag has to match, a piece of text has to match or
+      an element end tag has to match. The method <m>info vaction</m>
       called in the recovering script or any script code called from
-      there returns, which event triggered the error report
+      there returns, which event has triggered the error report
       (MATCH_ELEMENT_START, MATCH_TEXT, MATCH_ELEMENT_END,
       respectively). While the command walks throu the schema looking
-      if the event matches other, data driven events (as, for example
-      checking, if any keyref within a keyspace exists).</p>
+      whether the event matches other, data driven events (as, for example
+      checking, if any keyref within a keyspace exists) may happen.</p>
 
-      <p>Several of the validation error codes appended as second
-      argument to the <m>reportcmd</m> calls may happen at more than
+      <p>Several of the validation error codes, appended as second
+      argument to the <m>reportcmd</m> calls, may happen at more than
       one kind of validation event. The <m>info vaction</m> method and
       its subcommands provide information about the current validation
-      event and the
-      </p>
+      event, if called from the report command.</p>
 
       <p>If a structural validation error happens, the default
       recovering strategy is to ignore any following (or missing)
@@ -1277,7 +1276,7 @@ s define {
       contraint and continues to match the event further against the
       schema.</p>
 
-      <p>Returing "vanish" from the recover script In case of the
+      <p>Returning "vanish" from the recover script in case of the
       error types MISSING_ELEMENT and UNEXPECTED_ELEMENT recovers by
       ignoring the event.</p>
       
