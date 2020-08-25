@@ -4,40 +4,40 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x5642e72bd910">NAME</a> · <a href="#SECTid0x5642e7227110">SYNOPSIS</a> · <a href="#SECTid0x5642e72b4810">DESCRIPTION </a> · <a href="#SECTid0x5642e732a9e0">Schema definition scripts</a> · <a href="#SECTid0x5642e7339dc0">Quantity specifier</a> · <a href="#SECTid0x5642e733bd50">Text constraint scripts</a> · <a href="#SECTid0x5642e734f050">Local key constraints</a> · <a href="#SECTid0x5642e7350e70">Recovering</a> · <a href="#SECTid0x5642e7352e20">Examples</a> · <a href="#SECTid0x5642e7354d90">KEYWORDS</a>
+<a href="#SECTid0x564b1bd87910">NAME</a> · <a href="#SECTid0x564b1bcf0aa0">SYNOPSIS</a> · <a href="#SECTid0x564b1bd7e810">DESCRIPTION </a> · <a href="#SECTid0x564b1bdf4a10">Schema definition scripts</a> · <a href="#SECTid0x564b1be03e00">Quantity specifier</a> · <a href="#SECTid0x564b1be05d90">Text constraint scripts</a> · <a href="#SECTid0x564b1be19090">Local key constraints</a> · <a href="#SECTid0x564b1be1aeb0">Recovering</a> · <a href="#SECTid0x564b1be1ce60">Examples</a> · <a href="#SECTid0x564b1be1edd0">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x5642e72bd910">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x564b1bd87910">NAME</a></h2><p class="namesection">
 <b class="names">tdom::schema - </b><br>Creates a schema validation command</p>
 
-  <h2><a name="SECTid0x5642e7227110">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x564b1bcf0aa0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">tdom::schema</b> <i class="m">?create?</i> <i class="m">cmdName</i>
     </pre>
 
-  <h2><a name="SECTid0x5642e72b4810">DESCRIPTION </a></h2><p>Every call of this command creates a new validation command. A
+  <h2><a name="SECTid0x564b1bd7e810">DESCRIPTION </a></h2><p>Every call of this command creates a new validation command. A
     validation command has methods to define a schema and is able
     to validate XML data or to post-validate a tDOM DOM tree (and to
     some degree other kind of hierarchical data) against this
-    schema.</p><p>Additionally, a validation command may be used as argument to
-    the <i class="m">-validateCmd</i> option of the <i class="m">dom parse</i> and the
-    <i class="m">expat</i> commands to enable validation additional to what they
-    do otherwise.</p><p>The methods of created commands are:</p><dl class="commandlist">
+    schema.</p><p>Also, a validation command may be used as argument to the
+    <i class="m">-validateCmd</i> option of the <i class="m">dom parse</i> and the
+    <i class="m">expat</i> commands to enable validation additionally to what
+    they do otherwise.</p><p>The methods of created commands are:</p><dl class="commandlist">
       
           <dt>
 <b class="method">prefixns</b> <i class="m">?prefixUriList?</i>
 </dt>
-          <dd>This method gives control to a prefix (or
-          abbreviation) to namespace URI mapping. Wherever a namespace
-          argument is expected in the schema command methods you may
-          use the "prefix" pointing to the namespace URI in
-          the current prefixUriList, set by this method. If the list
-          maps the same prefix to different namespace URIs, the first
-          one win. If there is no such a prefix the namespace argument
-          is used literally as namespace URI. If the method is called
-          without argument it returns the current prefixUriList. If
-          the method is called with the empty string any namespace URI
-          arguments are used literally. This is the default.
+          <dd>This method controls prefix (or abbreviation) to
+          namespace URI mapping. Wherever a namespace argument is
+          expected in the schema command methods the
+          "prefix" the prefix could be used instead of the
+          namespace URI. If the list maps the same prefix to different
+          namespace URIs, the first one wins. If there is no such a
+          prefix, the namespace argument is used literally as
+          namespace URI. If the method is called without argument, it
+          returns the current prefixUriList. If the method is called
+          with the empty string, any namespace URI arguments are used
+          literally. This is the default.
           </dd>
       
 
@@ -52,7 +52,7 @@
         given, any <i class="m">element</i> or <i class="m">ref</i> references in the
         definition script not wrapped inside a <i class="m">namespace</i>
         command are resolved in that namespace. If there is already a
-        element definition for the name/namespace combination the
+        element definition for the name/namespace combination, the
         command raises error.</dd>
       
 
@@ -73,8 +73,8 @@
         <i class="m">namespace</i> argument is given, any <i class="m">element</i> or
         <i class="m">ref</i> references in the definition script not wrapped
         inside a <i class="m">namespace</i> command are resolved in that
-        namespace. If there is already a elementtype definition for
-        the name/namespace combination the command raises error. The
+        namespace. If there is already an elementtype definition for
+        the name/namespace combination, the command raises error. The
         document element of any XML to validate cannot be a
         <i class="m">defelementtype</i> defined element.</dd>
       
@@ -92,7 +92,7 @@
         argument is given, any <i class="m">element</i> or <i class="m">ref</i> references
         in the definition script not wrapped inside a <i class="m">namespace</i>
         command are resolved in that namespace. If there is already a
-        pattern definition for the name/namespace combination the
+        pattern definition for the name/namespace combination, the
         command raises error.</dd>
       
 
@@ -101,7 +101,7 @@
 <b class="method">deftexttype</b> <i class="m">name</i> <i class="m">&lt;constraint script&gt;</i>
 </dt>
         <dd>This method defines a bundle of text constraints that
-        can be referred to by <i class="m">name</i> while defining constrains on
+        can be referred to by <i class="m">name</i> while defining constraints on
         text element or attribute values. If there is already a text
         type definition with this name, the command raises error. A
         text type must be defined before it can be used in schema
@@ -141,8 +141,8 @@
         <dt>
 <b class="method">event</b> <i class="m">(start|end|text)</i> <i class="m">?event specific data?</i>
 </dt>
-        <dd>This method allows to validate hierarchical data against
-        the content constrains of the validation command.
+        <dd>This method allows the validation of hierarchical data against
+        the content constraints of the validation command.
 
         <dl class="optlist">
           
@@ -158,8 +158,8 @@
           
             <dt><b>end</b></dt>
             <dd>Checks if the current innermost open element may end
-            here in the current state without violation of validation
-            constrains. It raises error if not.</dd>
+            there in the current state without violation of validation
+            constraints. It raises error if not.</dd>
           
           
           
@@ -178,8 +178,8 @@
         <dt>
 <b class="method">validate</b> <i class="m">&lt;XML string&gt;</i> <i class="m">?objVar?</i>
 </dt>
-        <dd>Returns true if the <i class="m">&lt;XML string&gt;</i> is valid or
-        false otherwise. If validation has failed and the optional
+        <dd>Returns true if the <i class="m">&lt;XML string&gt;</i> is valid, or
+        false, otherwise. If validation has failed and the optional
         <i class="m">objVar</i> argument is given, the variable with that
         name is set to a validation error message. If the XML string
         is valid and the optional <i class="m">objVar</i> argument is given,
@@ -190,15 +190,15 @@
         <dt>
 <b class="method">validatefile</b> <i class="m">filename</i> <i class="m">?objVar?</i>
 </dt>
-        <dd>Returns true if the content of <i class="m">filename</i> is valid
-        or false otherwise. The given file is feeded as binary stream
+        <dd>Returns true if the content of <i class="m">filename</i> is valid,
+        or false, otherwise. The given file is feeded as binary stream
         to expat, therefore only US-ASCII, ISO-8859-1, UTF-8 or UTF-16
-        encoded data will work with this method. If validation failed
-        and the optional <i class="m">objVar</i> argument is given, the variable
-        with that name is set to a validation error message. If the
-        XML string is valid and the optional <i class="m">objVar</i> argument is
-        given, the variable with that name is set to the empty
-        string.</dd>
+        encoded data will work with this method. If validation has
+        failed and the optional <i class="m">objVar</i> argument is given, the
+        variable with that name is set to a validation error message.
+        If the XML string is valid and the optional <i class="m">objVar</i>
+        argument is given, the variable with that name is set to the
+        empty string.</dd>
       
 
       
@@ -206,7 +206,7 @@
 <b class="method">validatechannel</b> <i class="m">channel</i> <i class="m">?objVar?</i>
 </dt>
         <dd>Returns true if the content read from the Tcl channel
-        <i class="m">channel</i> is valid or false otherwise. Since data read
+        <i class="m">channel</i> is valid, or false, otherwise. Since data read
         out of a Tcl channel is UTF-8 encoded, any misleading encoding
         declaration at the beginning of the data will lead to errors.
         If the validation fails and the optional <i class="m">objVar</i>
@@ -220,8 +220,8 @@
         <dt>
 <b class="method">domvalidate</b> <i class="m">domNode</i> <i class="m">?objVar?</i>
 </dt>
-        <dd>Returns true if the first argument is a valid tree or
-        false otherwise. If validation failed and the optional
+        <dd>Returns true if the first argument is a valid tree, or
+        false, otherwise. If validation has failed and the optional
         <i class="m">objVar</i> argument is given, the variable with that name
         is set to a validation error message. If the dom tree is valid
         and the optional <i class="m">objVar</i> argument is given, the variable
@@ -255,7 +255,7 @@
             <dt>UNKOWN_GLOBAL_ID</dt><dd></dd>
             <dt>UNKOWN_ID</dt><dd></dd>
         </dl>
-        <p> For more detailed information see section <a href="#SECTid0x5642e7350e70">Recovering</a>.</p>
+        <p> For more detailed information see section <a href="#SECTid0x564b1be1aeb0">Recovering</a>.</p>
         </dd>
       
 
@@ -294,9 +294,9 @@
                   <dt><b>line</b></dt>
                   <dd>If the schema command is currently validating,
                   this method returns the line part of the parsing
-                  position information and the empty string in all
+                  position information, and the empty string in all
                   other cases. If the schema command is currently
-                  post-validating a DOM tree there may be no position
+                  post-validating a DOM tree, there may be no position
                   information stored at some or all nodes. The
                   empty string is returned in these cases.</dd>
               
@@ -304,9 +304,9 @@
                   <dt><b>column</b></dt>
                   <dd>If the schema command is currently validating
                   this method returns the column part of the parsing
-                  position information and the empty string in all
+                  position information, and the empty string in all
                   other cases. If the schema command is currently
-                  post-validating a DOM tree there may be no position
+                  post-validating a DOM tree, there may be no position
                   information stored at some or all nodes. The
                   empty string is returned in these cases.</dd>
               
@@ -325,15 +325,15 @@
               
               
                   <dt><b>nrForwardDefinitions</b></dt>
-                  <dd>Returns how much element, elementtype and ref
-                  pattern are referenced that aren't defined so far
-                  (summed together).</dd>
+                  <dd>Returns how many elements, element types and
+                  ref patterns are referenced that aren't defined so
+                  far (summed together).</dd>
               
               
                   <dt><b>definedElements</b></dt>
                   <dd>Returns in no particular order the defined
                   elements in the grammar as list. If an element is
-                  namespaced its list entry will be itself a list with
+                  namespaced, its list entry will be itself a list with
                   two elements, with the name as first and the
                   namespace as second element.</dd>
               
@@ -341,7 +341,7 @@
                   <dt><b>definedElementtypes</b></dt>
                   <dd>Returns in no particular order the defined
                   element types in the grammar as list. If an element
-                  type is namespaced its list entry will be itself a
+                  type is namespaced, its list entry will be itself a
                   list with two elements, with the name as first and
                   the namespace as second element.</dd>
               
@@ -349,7 +349,7 @@
                   <dt><b>definedPatterns</b></dt>
                   <dd>Returns in no particular order the defined
                   named pattern in the grammar as list. If a named
-                  pattern is namespaced its list entry will be itself
+                  pattern is namespaced, its list entry will be itself
                   a list with two elements, with the name as first and
                   the namespace as second element.</dd>
               
@@ -361,23 +361,23 @@
                   namespaced its list entry will be itself a list with
                   two elements, with the name as first and the
                   namespace as second element. If text is a possible
-                  next event the list entry will be a two elements
+                  next event, the list entry will be a two elements
                   list, with #text as first element and the empty
-                  space as second. If an any element constraint is
-                  possible the list entry will be a two elements list,
-                  with &lt;any&gt; as first element and the empty space
+                  string as second. If an any element constraint is
+                  possible. the list entry will be a two elements list,
+                  with &lt;any&gt; as first element and the empty string
                   as second. If an any element in a certain namespace
-                  constraint is possible the list entry will be a two
+                  constraint is possible, the list entry will be a two
                   elements list, with &lt;any&gt; as first element and
                   the namespace as second. If element end is a
-                  possible event the list entry will be a two elements
+                  possible event, the list entry will be a two elements
                   list with &lt;elementend&gt; as first element and the
                   empty string as second element.</dd>
               
               
                   <dt><b>definition name ?namespace?</b></dt>
                   <dd>Returns the code that defines the given
-                  element. The command raises error if there isn't a
+                  element. The command raises error if there is no
                   definition of that element.
                   </dd>
               
@@ -385,14 +385,14 @@
                   <dt><b>typedefinition name ?namespace?</b></dt>
                   <dd>Returns the code that defines the given
                   element type definition. The command raises error if
-                  there isn't a definition of that element.
+                  there is no definition of that element.
                   </dd>
               
               
                   <dt><b>patterndefinition name ?namespace?</b></dt>
                   <dd>Returns the code that defines the given
                   pattern definition. The command raises error if
-                  there isn't a definition of a pattern with that name
+                  there is no definition of a pattern with that name
                   and, if given, namespace.
                   </dd>
               
@@ -408,7 +408,7 @@
                   meanings are:</p>
                   <dl>
                       <dt>NONE</dt><dd>The schema command currently
-                      doesn't recover from a validation event.</dd>
+                      does not recover from a validation event.</dd>
                       <dt>MATCH_ELEMENT_START</dt><dd>Element start event, which includes looking for missing or unknown attributes.</dd>
                       <dt>MATCH_ELEMENT_END</dt><dd>Element end event.</dd>
                       <dt>MATCH_TEXT</dt><dd>Validating text between tags.</dd>
@@ -423,18 +423,18 @@
                   <dl>
                       <dt>name</dt><dd>Returns the name of the element
                       that has to match in case of
-                      MATCH_ELEMENT_START. Return the name of the
+                      MATCH_ELEMENT_START. Returns the name of the
                       closed element in case of MATCH_ELEMENT_END.
                       Returns the name of the attribute in case of
-                      MATCH_ATTRIBUTE_TEXT. Return the name of the
+                      MATCH_ATTRIBUTE_TEXT. Returns the name of the
                       parent element in case of MATCH_TEXT.</dd>
                       
                       <dt>namespace</dt><dd>Returns the namespace of
                       the element that has to match in case of
-                      MATCH_ELEMENT_START. Return the namespace of the
+                      MATCH_ELEMENT_START. Returns the namespace of the
                       closed element in case of MATCH_ELEMENT_END.
                       Returns the namespace of the attribute in case
-                      of MATCH_ATTRIBUTE_TEXT. Return the namespace of
+                      of MATCH_ATTRIBUTE_TEXT. Returns the namespace of
                       the parent element in case of MATCH_TEXT.</dd>
                       
                       <dt>text</dt><dd>Returns the text to match in
@@ -466,7 +466,7 @@
                           <dt><b>associated</b></dt>
                           <dd>Returns the data associated with the
                           current top most stack content particle or
-                          the empty string it there isn't any.
+                          the empty string if there isn't any.
                           </dd>
                       
                   </dl>
@@ -484,17 +484,17 @@
 
     </dl>
 
-  <h2><a name="SECTid0x5642e732a9e0">Schema definition scripts</a></h2><p>Schema definition scripts are ordinary Tcl scripts evaluated in
+  <h2><a name="SECTid0x564b1bdf4a10">Schema definition scripts</a></h2><p>Schema definition scripts are ordinary Tcl scripts evaluated in
     the namespace tdom::schema. The schema definition commands listed
-    below in this Tcl namespace allow to define a wide variety of
-    document structures. Every schema definition command establishes a
-    validation constraint on the content which has to match or must be
-    optional to qualify the content as valid. It is a validation error
-    if there is additional (not matched) content. White space only
-    text (in the XML sense of white space) between any different tags
-    is ignored, with the exception of text only elements (for which
-    even white space only text will be considered as significant
-    content).</p><p>The schema definition commands are:</p><dl class="commandlist">
+    below in this Tcl namespace allow the definition of a wide variety
+    of document structures. Every schema definition command
+    establishes a validation constraint on the content which has to
+    match or must be optional to qualify the content as valid. It is a
+    validation error if there is additional (not matched) content.
+    White-space-only text (in the XML sense of white space) between
+    any different tags is ignored, with the exception of text only
+    elements (for which even white-space-only text will be considered
+    as significant content).</p><p>The schema definition commands are:</p><dl class="commandlist">
       
         <dt>
 <b class="method">element</b> <i class="m">name</i> <i class="m">?quant?</i> <i class="m">?&lt;definition script&gt;?</i>
@@ -503,13 +503,13 @@
         given this command refers to the element defined with
         <i class="m">defelement</i> with the name <i class="m">name</i> in the current
         context namespace. If the <i class="m">defelement script</i> argument is
-        given, then the validation constraint expects an element with
-        the name <i class="m">name</i> in the current namespace with content
+        given, the validation constraint expects an element with the
+        name <i class="m">name</i> in the current namespace with content
         "locally" defined by the <i class="m">definition script</i>. Forward
         references to so far not defined elements or patterns or other
         local definitions of the same name inside the <i class="m">definition
         script</i> are allowed. If a forward referenced element is not
-        defined until validation then only an empty element with name
+        defined until validation, only an empty element with name
         <i class="m">name</i> and namespace <i class="m">namespace</i> and no attributes
         matches. </dd>
       
@@ -552,7 +552,7 @@
         <dt>
 <b class="method">choice</b> <i class="m">?quant?</i> <i class="m">&lt;definition script&gt;</i>
 </dt>
-        <dd>This schema constraint match if one of the top level
+        <dd>This schema constraint matches if one of the top level
         content particles defined by the <i class="m">definition script&gt;</i>
         matches. If one of this top level content particle is optional
         this constraint matches the "empty match".
@@ -563,7 +563,7 @@
         <dt>
 <b class="method">interleave</b> <i class="m">?quant?</i> <i class="m">&lt;definition script&gt;</i>
 </dt>
-        <dd>This schema constraint match after every of the required
+        <dd>This schema constraint matches after every of the required
         top level content particles defined by the <i class="m">definition
         script&gt;</i> have matched (and, optional, some or all other) in
         any arbitrary order.</dd>
@@ -615,7 +615,7 @@
         !. If there is, it will be used. Otherwise the attribute will
         be required (must be present in the XML source). If there is
         one argument more this argument is evaluated as constraint
-        script, defining the value constrains of the attribute.
+        script, defining the value constraints of the attribute.
         Otherwise, if there are two more arguments and the first of
         them is the bare-word "type" the following argument is used as
         a text type name. This command is only allowed at top level in
@@ -683,7 +683,7 @@
         within one element definition are allowed. They are checked in
         definition order. The argument name is available in the
         recovering script per <i class="m">info vaction name</i>. If the
-        <i class="m">fieldlist</i> doesn't select something for a node of the
+        <i class="m">fieldlist</i> does not select something for a node of the
         result set of the <i class="m">selector</i> the key value will be the
         empty string by default. If the arguments
         <i class="m">EMPTY_FIELD_SET_VALUE &lt;value&gt;</i> are given an empty
@@ -791,7 +791,7 @@ s define {
       
     </dl>
 
-  <h2><a name="SECTid0x5642e7339dc0">Quantity specifier</a></h2><p>Several schema definition commands expect a quantifier as
+  <h2><a name="SECTid0x564b1be03e00">Quantity specifier</a></h2><p>Several schema definition commands expect a quantifier as
     one of their arguments which determines how often the content
     particle specified by the command is expected. The valid values
     for a <i class="m">quant</i> argument are:</p><dl class="optlist">
@@ -835,7 +835,7 @@ s define {
     </dl><p>If an optional quantifier is not given, it defaults to * in
     case of the <i class="m">mixed</i> command and to ! for all other commands.</p>
 
-  <h2><a name="SECTid0x5642e733bd50">Text constraint scripts</a></h2><p>Text (parsed character data, as XML calls it) sometimes has to
+  <h2><a name="SECTid0x564b1be05d90">Text constraint scripts</a></h2><p>Text (parsed character data, as XML calls it) sometimes has to
     be of a certain kind or comply with certain rules to be valid. The
     text constraint script arguments to text, attribute, nsattribute
     and deftexttype commands are evaluated in the Tcl namespace
@@ -851,7 +851,7 @@ s define {
     command is available in the tdom::type namespace is recorded in
     its documentation.
     </p>
-        <h3><a name="SECTid0x5642e733c750">The tcl text constraint command</a></h3>
+        <h3><a name="SECTid0x564b1be06790">The tcl text constraint command</a></h3>
         <p>The <i class="m">tcl</i> text constraint command dispatches the check
         to an arbitrary Tcl command, thus enable any programmable
         decision rules.</p>
@@ -866,7 +866,7 @@ s define {
             
         </dl>
     
-        <h3><a name="SECTid0x5642e733d530">Basic XML types</a></h3>
+        <h3><a name="SECTid0x564b1be07570">Basic XML types</a></h3>
         <dl class="commandlist">
             
                 <dt><b class="cmd">name</b></dt>
@@ -913,7 +913,7 @@ s define {
             
         </dl>
     
-        <h3><a name="SECTid0x5642e733f540">Basic type tests</a></h3>
+        <h3><a name="SECTid0x564b1be09580">Basic type tests</a></h3>
         <p>
         </p>
         <dl class="commandlist">
@@ -1084,7 +1084,7 @@ s define {
             
         </dl>
     
-        <h3><a name="SECTid0x5642e73467f0">Logical constructs</a></h3>
+        <h3><a name="SECTid0x564b1be10830">Logical constructs</a></h3>
         <dl class="commandlist">
         
             <dt>
@@ -1122,7 +1122,7 @@ s define {
         
         </dl>
     
-        <h3><a name="SECTid0x5642e7348620">Constraints on processed text value</a></h3>
+        <h3><a name="SECTid0x564b1be12660">Constraints on processed text value</a></h3>
         <dl class="commandlist">
             
             <dt>
@@ -1174,7 +1174,7 @@ s define {
         
         </dl>
     
-        <h3><a name="SECTid0x5642e734aff0">Various other string properties</a></h3>
+        <h3><a name="SECTid0x564b1be15030">Various other string properties</a></h3>
         <dl class="commandlist">
         
             <dt>
@@ -1258,7 +1258,7 @@ s define {
         </dl>
     
 
-  <h2><a name="SECTid0x5642e734f050">Local key constraints</a></h2><p>Document wide uniqueness and foreign key constraints are
+  <h2><a name="SECTid0x564b1be19090">Local key constraints</a></h2><p>Document wide uniqueness and foreign key constraints are
     available with the text constraint commands id and idref.
     Keyspaces allow for sub-tree local uniqueness and foreign key
     constraints.</p><dl class="commandlist">
@@ -1294,7 +1294,7 @@ s define {
         
     </dl>
 
-  <h2><a name="SECTid0x5642e7350e70">Recovering</a></h2><p>By default the validation engine stops at the first detected
+  <h2><a name="SECTid0x564b1be1aeb0">Recovering</a></h2><p>By default the validation engine stops at the first detected
       validation violation and reports that finding. It does so by
       return false (and sets, if given, the result variable with an
       error message) in case the schema command itself is used to
@@ -1340,7 +1340,7 @@ s define {
       error types MISSING_ELEMENT and UNEXPECTED_ELEMENT recovers by
       ignoring the event.</p>
 
-  <h2><a name="SECTid0x5642e7352e20">Examples</a></h2><p>The XML Schema Part 0: Primer Second Edition
+  <h2><a name="SECTid0x564b1be1ce60">Examples</a></h2><p>The XML Schema Part 0: Primer Second Edition
     (<a href="https://www.w3.org/TR/xmlschema-0/">https://www.w3.org/TR/xmlschema-0/</a>) starts with this
     example schema:</p><pre class="example">
 &lt;xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
@@ -1509,7 +1509,7 @@ schema define {
       
     </pre>
 
-<h2><a name="SECTid0x5642e7354d90">KEYWORDS</a></h2><p class="keywords">
+<h2><a name="SECTid0x564b1be1edd0">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-Validation">Validation</a>, <a class="keyword" href="keyword-index.html#KW-Postvalidation">Postvalidation</a>, <a class="keyword" href="keyword-index.html#KW-DOM">DOM</a>, <a class="keyword" href="keyword-index.html#KW-SAX">SAX</a>
 </p>
 </div><hr class="navsep"><div class="navbar" align="center">

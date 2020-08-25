@@ -1,5 +1,5 @@
-C More\sdoc\swork.
-D 2020-08-25T19:36:16.685
+C Still\sdoc\swork.
+D 2020-08-25T22:24:43.375
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -39,9 +39,9 @@ F doc/manpage.css 3b4ec1d641048933a7e6bffc659de9519030a959
 F doc/pullparser.html 164e7e037e2d00308f67ca0708f6b193cbb0db11748c8533c58ddcd9d2f177fb
 F doc/pullparser.n 5f5672e8bb2dd221602040cd212234da6b6ed8c99c5daa60be9fa0c476529c09
 F doc/pullparser.xml 6032c1e8c8d001068c227601dba9860824f8acc709c87fd8e36ac4a596b6a2f2
-F doc/schema.html d28d95813a355f9e4f7d8965f321ced48d9952379d66c2761cf00e3805dec8fd
+F doc/schema.html 2b9c6edbdb9c4143e6a5fdde31fac1f272008b3aa78285a0cbb938696e6365bb
 F doc/schema.n db05737ff09f3d7428f62b4cd50421adede7bb7611988b47a8ed1c1c4cd5ccf8
-F doc/schema.xml 9b46d702a901fdce06af1dbd5ad6bfb24543522650dff3489ec8fc66cbae11cf
+F doc/schema.xml e6c25d214090f95fa695943de89de01bf7a3a07ff0f2b0a948ac61ee5adc924d
 F doc/tDOM.xml 04db7d0ccfea39aae21f4fe07b8f05d5bff8a84193cfce2aa5faa2f42c076377
 F doc/tdomcmd.html 3f96630823dbeff586dd3fb7e5cc6214a40f0219e2ba37e6986353cbcfc7d665
 F doc/tdomcmd.n c06a5ff035f16a2a52636b69d9ebe6ba84ff5101922ed27b551146c4d61d6cda
@@ -233,8 +233,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 7e45e966d10ad1fc381b0ceb23ee421283d7e7166b8a95f3af5c33af070a4796
-R 91972985df336d2a48cf667c88af9398
+P 7e92058c27f449380fae6234af944356966f6856dfcf860da979be008a7da8d6
+R 2eb1d355ba5da95e6a8f2e2283ae90d8
 U rolf
-Z e2c6f098e24f85d67136d0324856df90
+Z afd7cebb275281eca600b5dcaa53029d
 # Remove this line to create a well-formed Fossil manifest.
