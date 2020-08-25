@@ -1,6 +1,6 @@
 
 ## tDOM - a XML / DOM / XPath / XSLT / HTML / JSON implementation for Tcl
-###(version 0.9.2)
+### Version 0.9.2
 
 ### tDOM contains:
 

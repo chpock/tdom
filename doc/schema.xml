@@ -824,41 +824,43 @@ s define {
         <commandlist>
             <commanddef>
                 <command><cmd>name</cmd></command>
-                <desc>This text constraint match if the text value match the
-                XML name production
-                <url>https://www.w3.org/TR/xml/#NT-Name</url>. This means the
-                text value must start with a letter, underscore (_), or colon (:),
-                and may contain only letters, digits, underscores (_), colons
-                (:), hyphens (-), and periods (.).</desc>
+                <desc>This text constraint matches if the text value
+                matches the XML name production
+                <url>https://www.w3.org/TR/xml/#NT-Name</url>. This
+                means that the text value must start with a letter,
+                underscore (_), or colon (:), and may contain only
+                letters, digits, underscores (_), colons (:), hyphens
+                (-), and periods (.).</desc>
             </commanddef>
             <commanddef>
                 <command><cmd>ncname</cmd></command>
-                <desc>This text constraint match if the text value match the
-                XML ncname production
-                <url>https://www.w3.org/TR/xml-names/#NT-NCName</url>. This
-                means the text value must start with a letter or underscore (_),
-                and may contain only letters, digits, underscores (_), hyphens
-                (-), and periods (.) (The only difference to the name
+                <desc>This text constraint matches if the text value
+                matches the XML ncname production
+                <url>https://www.w3.org/TR/xml-names/#NT-NCName</url>.
+                This means that the text value must start with a
+                letter or underscore (_), and may contain only
+                letters, digits, underscores (_), hyphens (-), and
+                periods (.) (The only difference to the name
                 constraint is that colons are not permitted.)</desc>
             </commanddef>
             <commanddef>
                 <command><cmd>qname</cmd></command>
-                <desc>This text constraint match if the text value match the
-                XML qname production
-                <url>https://www.w3.org/TR/xml-names/#NT-QName</url>. This
-                means the text value is either a ncname or two ncnames joined
-                by a colon (:).</desc>
+                <desc>This text constraint matches if the text value
+                matches the XML qname production
+                <url>https://www.w3.org/TR/xml-names/#NT-QName</url>.
+                This means that the text value is either a ncname or
+                two ncnames joined by a colon (:).</desc>
             </commanddef>
             <commanddef>
                 <command><cmd>nmtoken</cmd></command>
-                <desc>This text constraint match if the text value match the
-                XML nmtoken production
+                <desc>This text constraint matches if the text value
+                matches the XML nmtoken production
                 <url>https://www.w3.org/TR/xml/#NT-Nmtoken</url></desc>
             </commanddef>
             <commanddef>
                 <command><cmd>nmtokens</cmd></command>
-                <desc>This text constraint match if the text value match the
-                XML nmtokens production
+                <desc>This text constraint matches if the text value
+                matches the XML nmtokens production
                 <url>https://www.w3.org/TR/xml/#NT-Nmtokens</url></desc>
             </commanddef>
         </commandlist>
@@ -871,67 +873,67 @@ s define {
         <commandlist>
             <commanddef>
                 <command><cmd>integer</cmd> <m>?(xsd|tcl)?</m></command>
-                <desc>This text constraint match if the text value could be
+                <desc>This text constraint matches if the text value could be
                 parsed as an integer. If the optional argument to the command
-                is <m>tcl</m> everything that returns TCL_OK if feeded into
+                is <m>tcl</m>, everything that returns TCL_OK if feeded into
                 Tcl_GetInt() matches. If the optional argument to the command
-                is <m>xsd</m> then the constraint match if the value is a
+                is <m>xsd</m>, the constraint matches if the value is a
                 valid xsd:integer. Without argument <m>xsd</m> is the
                 default.</desc>
             </commanddef>
 
             <commanddef>
                 <command><cmd>negativeInteger</cmd> <m>?(xsd|tcl)?</m></command>
-                <desc>This text constraint match the same text values as the
-                <m>integer</m> text constraint (see there) with the additional
-                constraint that the value must be &lt; zero.</desc>
+                <desc>This text constraint matches the same text values as the
+                <m>integer</m> text constraint (see there), with the additional
+                constraint, that the value must be &lt; zero.</desc>
             </commanddef>
             
             <commanddef>
                 <command><cmd>nonNegativeInteger</cmd> <m>?(xsd|tcl)?</m></command>
-                <desc>This text constraint match the same text values as the
-                <m>integer</m> text constraint (see there) with the additional
-                constraint that the value must be &gt;= zero.</desc>
+                <desc>This text constraint matches the same text values as the
+                <m>integer</m> text constraint (see there), with the additional
+                constraint, that the value must be &gt;= zero.</desc>
             </commanddef>
 
             <commanddef>
                 <command><cmd>nonPositiveInteger</cmd> <m>?(xsd|tcl)?</m></command>
-                <desc>This text constraint match the same text values as the
-                <m>integer</m> text constraint (see there) with the additional
-                constraint that the value must be &lt;= zero.</desc>
+                <desc>This text constraint matches the same text values as the
+                <m>integer</m> text constraint (see there), with the additional
+                constraint, that the value must be &lt;= zero.</desc>
             </commanddef>
 
             <commanddef>
                 <command><cmd>positiveInteger</cmd> <m>?(xsd|tcl)?</m></command>
-                <desc>This text constraint match the same text values as the
-                <m>integer</m> text constraint (see there) with the additional
-                constraint that the value must be &gt; zero.</desc>
+                <desc>This text constraint matches the same text values as the
+                <m>integer</m> text constraint (see there), with the additional
+                constraint, that the value must be &gt; zero.</desc>
             </commanddef>
 
             <commanddef>
                 <command><cmd>number</cmd> <m>?(xsd|tcl)?</m></command>
-                <desc>This text constraint match if the text value could be
+                <desc>This text constraint matches if the text value could be
                 parsed as a number. If the optional argument to the command is
-                <m>tcl</m> everything that returns TCL_OK if feeded into
+                <m>tcl</m>, everything that returns TCL_OK if feeded into
                 Tcl_GetDouble() matches. If the optional argument to the command
-                is <m>xsd</m> then the constraint match if the value is a
+                is <m>xsd</m>, the constraint matches if the value is a
                 valid xsd:decimal. Without argument <m>xsd</m> is the
                 default.</desc>
             </commanddef>
             <commanddef>
                 <command><cmd>boolean</cmd> <m>?(xsd|tcl)?</m></command>
-                <desc>This text constraint match if the text value could be
+                <desc>This text constraint matches if the text value could be
                 parsed as a boolean. If the optional argument to the command is
-                <m>tcl</m> everything that returns TCL_OK if feeded into
+                <m>tcl</m>, everything that returns TCL_OK if feeded into
                 Tcl_GetBoolean() matches. If the optional argument to the command
-                is <m>xsd</m> then the constraint match if the value is a
+                is <m>xsd</m>, the constraint matches if the value is a
                 valid xsd:boolean. Without argument <m>xsd</m> is the
                 default.</desc>
             </commanddef>
             <commanddef>
                 <command><cmd>date</cmd></command>
-                <desc>This text constraint match if the text value is
-                a xsd:date. This is basically like an ISO 8601 date of
+                <desc>This text constraint matches if the text value is
+                a xsd:date, which is basically like an ISO 8601 date of
                 the form YYYY-MM-DD, with optional time zone part
                 (either the letter Z or plus (+) or minus (-) followed
                 by hh:mm and with maximum allowed positive or negative
@@ -944,8 +946,8 @@ s define {
             </commanddef>
             <commanddef>
                 <command><cmd>time</cmd></command>
-                <desc>This text constraint match if the text value is
-                a xsd:time. This is basically like an ISO 8601 time of
+                <desc>This text constraint matches if the text value is
+                a xsd:time, which is basically like an ISO 8601 time of
                 the form hh:mm:ss with optional time zone part. The
                 time zone part follow the rules of the <m>date</m>
                 command; see there. All three parts of the time value
@@ -958,64 +960,64 @@ s define {
             </commanddef>
             <commanddef>
                 <command><cmd>dateTime</cmd></command>
-                <desc>This text constraint match if the text value is
-                a xsd:dateTime. This is basically like an ISO 8601
+                <desc>This text constraint matches if the text value
+                is a xsd:dateTime, which is basically like an ISO 8601
                 date time of the form YYYY-MM-DDThh:mm:ss with
                 optional time zone part. The date and time zone parts
-                follow the rules of the <m>date</m> command; see
-                there. The time part (including the signaling 'T'
-                character) is mandatory and follow the rules of the
-                <m>time</m> command, see there. This is available as
-                common Tcl command tdom::type::dateTime.</desc>
+                follows the rules of the <m>date</m> and <m>time</m>
+                command; see there. The time part (including the
+                signaling 'T' character) is mandatory. This is
+                available as common Tcl command
+                tdom::type::dateTime.</desc>
             </commanddef>
             <commanddef>
                 <command><cmd>duration</cmd></command>
-                <desc>This text constraint match if the text value is
-                a xsd:duration. This is basically like an ISO 8601
+                <desc>This text constraint matches if the text value is
+                a xsd:duration, which is basically like an ISO 8601
                 duration of the form PnYnMnDTnHnMnS. All parts other
-                then the starting P and - if one of H, M or S is given
+                than the starting P and - if one of H, M or S is given
                 - T are optional. In case the following sign letter is
-                S n may be a decimal (with at least one digit before
+                S, n may be a decimal (with at least one digit before
                 and after the dot), otherwise it must be a (positive)
                 integer. This is available as common Tcl command
                 tdom::type::duration.</desc>
             </commanddef>
             <commanddef>
                 <command><cmd>base64</cmd></command>
-                <desc>This text constraint match if text is valid according to
+                <desc>This text constraint matches if text is valid according to
                 RFC 4648.</desc>
             </commanddef>
             <commanddef>
                 <command><cmd>hexBinary</cmd></command>
-                <desc>This text constraint match if text is a sequence of
+                <desc>This text constraint matches if text is a sequence of
                 binary octets in hexadecimal encoding, where each binary octet
                 is a two-character hexadecimal number. Lowercase and uppercase
                 letters A through F are permitted.</desc>
             </commanddef>
             <commanddef>
                 <command><cmd>unsignedByte</cmd></command>
-                <desc>This text constraint match if the text value is a
+                <desc>This text constraint matches if the text value is a
                 xsd:unsignedByte. This is an integer between 0 and 255, both
                 included, optionally preceded by a + sign and leading
                 zeros.</desc>
             </commanddef>
             <commanddef>
                 <command><cmd>unsignedShort</cmd></command>
-                <desc>This text constraint match if the text value is a
+                <desc>This text constraint matches if the text value is a
                 xsd:unsignedShort. This is an integer between 0 and 65535,
                 both included, optionally preceded by a + sign and leading
                 zeros.</desc>
             </commanddef>
             <commanddef>
                 <command><cmd>unsignedInt</cmd></command>
-                <desc>This text constraint match if the text value is a
+                <desc>This text constraint matches if the text value is a
                 xsd:unsignedInt. This is an integer between 0 and 4294967295,
                 both included, optionally preceded by a + sign and leading
                 zeros.</desc>
             </commanddef>
             <commanddef>
                 <command><cmd>unsignedLong</cmd></command>
-                <desc>This text constraint match if the text value is a
+                <desc>This text constraint matches if the text value is a
                 xsd:unsignedLong. This is an integer between 0 and
                 18446744073709551615, both included, optionally preceded by a
                 + sign and leading zeros.</desc>
@@ -1028,27 +1030,27 @@ s define {
         <commandlist>
         <commanddef>
             <command><cmd>oneOf</cmd> <m>&lt;constraint script></m></command>
-            <desc>This text constraint match if one of the text
+            <desc>This text constraint matches if one of the text
             constraints defined in the argument <m>constraint script</m>
-            match the text. It stops after the first match and probes the
+            matches the text. It stops after the first matches and probes the
             text constraints in the order of definition.</desc>
         </commanddef>
         <commanddef>
             <command><cmd>allOf</cmd> <m>&lt;constraint script></m></command>
-            <desc>This text constraint match if all of the text
+            <desc>This text constraint matches if all of the text
             constraints defined in the argument <m>constraint script</m>
-            match the text. It stops after the first match failure and
+            matches the text. It stops after the first match failure and
             probes the text constraints in the order of definition. Since
             the schema definition command <m>text</m> also expects all
-            text constraints to match the text constraint <m>allOf</m> is
-            useful mostly together with the <m>oneOf</m> text constraint
+            text constraints to match the text constraint, <m>allOf</m> is
+            useful mostly in connection with the <m>oneOf</m> text constraint
             command.</desc>
         </commanddef>
         <commanddef>
             <command><cmd>not</cmd> <m>&lt;constraint script></m></command>
-            <desc>This text constraint match if none of the text
+            <desc>This text constraint matches if none of the text
             constraints defined in the argument <m>constraint
-            script</m> match the text. It stops after the first
+            script</m> matches the text. It stops after the first
             matching constraint in the <m>constraint script</m> and
             reports validation error. The text constraints in the
             <m>constraint script</m> are probed in the order of
@@ -1071,7 +1073,7 @@ s define {
             to say <m>allOf</m>. The <m>replace</m> normalization method
             replaces any single white-space character (as above) to a
             space. The <m>collapse</m> normalization method removes all
-            leading and trailing white-space and all the other sequences of
+            leading and trailing white-space, and all the other sequences of
             contiguous white-space are replaced by a single space.</desc>
         </commanddef>
         <commanddef>
@@ -1082,14 +1084,14 @@ s define {
             script></m>.</p>
             <p>The available types are:</p>
             <dl>
-                <dt>whitespace</dt><dd>The text to split is striped of all
-                white space at start and end splited into a list at any
-                successive white space.</dd>
+                <dt>whitespace</dt><dd>The text to split is stripped
+                of all white space at start and end and splitted into
+                a list at any successive white space.</dd>
                 <dt>tcl tclcmd ?arg ...?</dt><dd>The text to split is
-                handed to the <m>tclcmd</m>, which is evaluated on global
-                level, appended with every given arg and the text to split
-                as last argument. This call must return a valid Tcl list,
-                which elements are tested.</dd>
+                handed to the <m>tclcmd</m>, which is evaluated on
+                global level, appended with every given arg and the
+                text to split as last argument. This call must return
+                a valid Tcl list whose elements are tested.</dd>
             </dl>
             <p>The default in case no split type argument is given is
             <m>whitespace</m>.</p></desc>
@@ -1098,7 +1100,7 @@ s define {
             <command><cmd>strip</cmd> <m>&lt;constraint script></m></command>
             <desc>This text constraint command tests all text constraints
             in the evaluated <m>constraint script></m> with the text to
-            test striped of all white space at start and end.</desc>
+            test stripped of all white space at start and end.</desc>
         </commanddef>
         </commandlist>
     </subsection>
@@ -1108,44 +1110,44 @@ s define {
         <commandlist>
         <commanddef>
             <command><cmd>fixed</cmd> <m>value</m></command>
-            <desc>The text constraint only match if the text value is
+            <desc>The text constraint only matches if the text value is
             string equal to the given value.</desc>
         </commanddef>
         
         <commanddef>
             <command><cmd>enumeration</cmd> <m>list</m></command>
-            <desc>This text constraint match if the text value is equal to
+            <desc>This text constraint matches if the text value is equal to
             one element (respecting case and any white-space) of the
             argument <m>list</m>, which has to be a valid Tcl list.
             </desc>
         </commanddef>
         <commanddef>
             <command><cmd>match</cmd> <m>?-nocase?</m> <m>glob_style_match_pattern></m></command>
-            <desc>This text constraint match if the text value match the
+            <desc>This text constraint matches if the text value matches the
             glob style pattern given as argument. It follows the rules of
             the Tcl [string match] command, see
             <url>https://www.tcl.tk/man/tcl8.6/TclCmd/string.htm#M35</url>.</desc>
         </commanddef>
         <commanddef>
             <command><cmd>regexp</cmd> <m>expression</m></command>
-            <desc>This text constraint match if the text value match the
+            <desc>This text constraint matches if the text value matches the
             regular expression given as argument. <url>https://www.tcl.tk/man/tcl8.6/TclCmd/re_syntax.htm</url> describes the regular expression syntax</desc>
         </commanddef>
         <commanddef>
             <command><cmd>length</cmd> <m>length</m></command>
-            <desc>This text constraint match if the length of the text
+            <desc>This text constraint matches if the length of the text
             value (in characters, not bytes) is <m>length</m>. The
             length argument must be a positive integer or zero.</desc>
         </commanddef>
         <commanddef>
             <command><cmd>maxLength</cmd> <m>length</m></command>
-            <desc>This text constraint match if the length of the text
+            <desc>This text constraint matches if the length of the text
             value (in characters, not bytes) is at most <m>length</m>. The
             length argument must be an integer greater zero.</desc>
         </commanddef>
         <commanddef>
             <command><cmd>minLength</cmd> <m>length</m></command>
-            <desc>This text constraint match if the length of the text
+            <desc>This text constraint matches if the length of the text
             value (in characters, not bytes) is at least <m>length</m>.
             The length argument must be an integer greater zero.</desc>
         </commanddef>
@@ -1157,14 +1159,14 @@ s define {
             the ID isn't actually referenced within the document. The
             optional argument <m>keySpace</m> does all this for a named
             key space. The key space "" (the empty sting) is another key
-            space as the <m>id</m> command without keySpace
+            space then the <m>id</m> command without keySpace
             argument.</desc>
         </commanddef>
         <commanddef>
             <command><cmd>idref</cmd> <m>?keySpace?</m></command>
             <desc>This text constraint command expects the text to be a
             reference to an ID within the document. The referenced ID may
-            be later in the document, that the reference. Several
+            appear later in the document, that the reference. Several
             references within the document to one ID are possible.</desc>
         </commanddef>
         </commandlist>
@@ -1194,18 +1196,18 @@ s define {
     <commandlist>
         <commanddef>
             <command><cmd>key</cmd> <m>&lt;name></m></command>
-            <desc>If the keyspace with the name <m>&lt;name></m> is not
-            active always matches. If the keyspace is active then
-            reports error if there is already a key with the value.
-            Otherwise, stores the value as key in this keyspace and
-            matches.</desc>
+            <desc>If the keyspace with the name <m>&lt;name></m> is
+            not active the constraint always matches. If the keyspace
+            is active, reports error if there is already a key with
+            the value. Otherwise it stores the value as key in this
+            keyspace and matches.</desc>
         </commanddef>
         <commanddef>
             <command><cmd>keyref</cmd> <m>&lt;name></m></command>
             <desc>If the keyspace with the name <m>&lt;name></m> is not
             active always matches. If the keyspace is active then
             reports error if there is still no key as the value at the
-            end of the keyspace <m>&lt;name></m>. Otherwise it
+            end of the keyspace <m>&lt;name></m>. Otherwise, it
             matches.</desc>
         </commanddef>
     </commandlist>
@@ -1216,31 +1218,32 @@ s define {
       <title>Recovering</title>
 
       <p>By default the validation engine stops at the first detected
-      validation violation and report that finding. It does so by
-      return false (and set, if given, the result variable with an
+      validation violation and reports that finding. It does so by
+      return false (and sets, if given, the result variable with an
       error message) in case the schema command itself is used to
       validate input. If the schema command is used by a SAX parser or
-      the DOM parser it does so by throwing error.</p>
+      the DOM parser, it does so by throwing error.</p>
 
       <p>If a <m>reportcmd</m> is set this command is called on global
       level appended with the schema command and an error type as
-      arguments if a validation violation is detected. Then the
+      arguments in case a validation violation is detected. Then the
       validation recovers from the error and continues. For some
       validation errors the recover strategy can be determined with
       the script result of the reportcmd.</p>
 
-      <p>With a <m>reportcmd</m> (which doesen&amp;t throw error if
+      <p>With a <m>reportcmd</m> (which does not throw error if
       called) the validation engine will never report validation
-      failure to its caller. The validation engine recovers, continues
-      and report the next error, if one happen and so until the end of
-      the input. The schema command will return true and the SAX
-      parser and DOM builder will process normally until the end of
-      the input, as if there would not have been validation.</p>
+      failure to its caller. The validation engine recovers,
+      continues, and reports the next error (if occuring) and so on
+      until the end of the input. The schema command will return true
+      and the SAX parser and DOM builder will process normally until
+      the end of the input, as if there had not been a validation
+      error.</p>
 
-      <p>Please note, that this happens only for validation errors. It
-      isn't possible to recover from well-formedness errors. If the
-      input isn't well-formed the schema command returns false and
-      set, if given, the result variable with an error message about
+      <p>Please note that this happens only for validation errors. It
+      is not possible to recover from well-formedness errors. If the
+      input is not well-formed, the schema command returns false and
+      sets (if given) the result variable with an error message about
       the well-formedness error.</p>
 
       <p>If the <m>reportcmd</m> throws error while called by the
@@ -1356,7 +1359,7 @@ s define {
 &lt;/xsd:schema>
     </example>
 
-    <p>A somewhat one-to-one translation of that into a tDOM schema
+    <p>A likely one-to-one translation of that into a tDOM schema
     definition script would be:</p>
 
     <example>
