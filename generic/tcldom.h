@@ -70,8 +70,8 @@ Tcl_ObjCmdProc TclTdomObjCmd;
 
 #define STR_TDOM_VERSION(v) (VERSION)
 
-int Tdom_Init     (Tcl_Interp *interp);
-int Tdom_SafeInit (Tcl_Interp *interp);
+EXTERN int Tdom_Init     (Tcl_Interp *interp);
+EXTERN int Tdom_SafeInit (Tcl_Interp *interp);
 
 #endif
 
