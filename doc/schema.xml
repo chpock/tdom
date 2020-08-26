@@ -34,13 +34,13 @@
           <desc>This method controls prefix (or abbreviation) to
           namespace URI mapping. Wherever a namespace argument is
           expected in the schema command methods the
-          &quot;prefix&quot; the prefix could be used instead of the
-          namespace URI. If the list maps the same prefix to different
-          namespace URIs, the first one wins. If there is no such a
-          prefix, the namespace argument is used literally as
-          namespace URI. If the method is called without argument, it
-          returns the current prefixUriList. If the method is called
-          with the empty string, any namespace URI arguments are used
+          &quot;prefix&quot; could be used instead of the namespace
+          URI. If the list maps the same prefix to different namespace
+          URIs, the first one wins. If there is no such prefix, the
+          namespace argument is used literally as namespace URI. If
+          the method is called without argument, it returns the
+          current prefixUriList. If the method is called with the
+          empty string, any namespace URI arguments are used
           literally. This is the default.
           </desc>
       </commanddef>
@@ -107,10 +107,10 @@
       <commanddef>
         <command><method>start</method> <m>documentElement</m> <m>?namespace?</m></command>
         <desc>This method defines the name and namespace of the root
-        element of a tree to validate. If this method is used, then
-        the root element must match for validity. If <m>start</m> is
-        not used, any element defined by <m>defelement</m> may be the
-        root of a valid document. The <m>start</m> method may be used
+        element of a tree to validate. If this method is used, the
+        root element must match for validity. If <m>start</m> is not
+        used, any element defined by <m>defelement</m> may be the root
+        of a valid document. The <m>start</m> method may be used
         several times with varying arguments during the lifetime of a
         validation command. If the command is called with just the
         empty string (and no namespace argument), the validation
@@ -120,7 +120,7 @@
 
       <commanddef>
         <command><method>define</method> <m>&lt;definition script></m></command>
-        <desc>This method allows to define several elements or pattern
+        <desc>This method allows to define several elements or patterns
         or a whole schema with one call. All schema command methods so
         far (<m>prefixns</m>, <m>defelement</m>,
         <m>defelementtype</m>, <m>defpattern</m>, <m>deftexttype</m> and
@@ -209,7 +209,7 @@
       <commanddef>
         <command><method>reportcmd</method> <m>?cmd?</m></command>
         <desc>This method expects the name of a Tcl command to be
-        called in case of validation error. This command will be
+        called in case of validation error. The command will be
         called with two arguments appended: the schema command which
         raises the validation error, and a validation error code.
 
@@ -676,7 +676,7 @@ s define {
       <commanddef>
         <command><method>prefixns</method> <m>?prefixUriList?</m></command>
         <desc>This defines a prefix to namespace URI mapping exactly
-        as a <i>schemacmd prefixns</i> call. This is meant as top-level
+        as a <i>schemacmd prefixns</i> would. It is meant as top-level
         command of a <i>schemacmd define</i> script. This command is
         not allowed nested in another definition script command and
         will raise error, if you call it there.</desc>
@@ -685,7 +685,7 @@ s define {
       <commanddef>
         <command><method>defelement</method> <m>name</m> <m>?namespace?</m> <m>&lt;definition script></m></command>
         <desc>This defines an element exactly as a <i>schemacmd
-        defelement</i> call. This is meant as top-level command of a
+        defelement</i> call would. It is meant as top-level command of a
         <i>schemacmd define</i> script. This command is not allowed
         nested in another definition script command and will raise
         error, if you call it there.</desc>
@@ -694,16 +694,16 @@ s define {
       <commanddef>
         <command><method>defelementtype</method> <m>name</m> <m>?namespace?</m> <m>&lt;definition script></m></command>
         <desc>This defines an elementtype exactly as a <i>schemacmd
-        defelementtype</i> call. This is meant as top-level command of a
-        <i>schemacmd define</i> script. This command is not allowed
-        nested in another definition script command and will raise
-        error, if you call it there.</desc>
+        defelementtype</i> call would. It is meant as top-level
+        command of a <i>schemacmd define</i> script. This command is
+        not allowed nested in another definition script command and
+        will raise error, if you call it there.</desc>
       </commanddef>
 
       <commanddef>
         <command><method>defpattern</method> <m>name</m> <m>?namespace?</m> <m>&lt;definition script></m></command>
         <desc>This defines a named pattern exactly as a <i>schemacmd
-        defpattern</i> call. This is meant as top-level command of a
+        defpattern</i> call would. It is meant as top-level command of a
         <i>schemacmd define</i> script. This command is not allowed
         nested in another definition script command and will raise
         error, if you call it there.</desc>
@@ -712,16 +712,16 @@ s define {
       <commanddef>
         <command><method>deftexttype</method> <m>name</m> <m>&lt;constraint script></m></command>
         <desc>This defines a named bundle of text constraints exactly
-        as a <i>schemacmd deftexttype</i> call. This is meant as top-level
-        command of a <i>schemacmd define</i> script. This command is
-        not allowed nested in another definition script command and
-        will raise error, if you call it there.</desc>
+        as a <i>schemacmd deftexttype</i> call would. It is meant as
+        top-level command of a <i>schemacmd define</i> script. This
+        command is not allowed nested in another definition script
+        command and will raise error, if you call it there.</desc>
       </commanddef>
       
       <commanddef>
         <command><method>start</method> <m>name</m> <m>?namespace?</m></command>
         <desc>This command works exactly as a <i>schemacmd start</i>
-        call. This is meant as top-level command of a <i>schemacmd
+        call would. It is meant as top-level command of a <i>schemacmd
         define</i> script. This command is not allowed nested in
         another definition script command and will raise error, if you
         call it there.</desc>
@@ -748,7 +748,7 @@ s define {
       <optdef>
         <optname>?</optname>
         <desc>The content particle may not occur more than once in
-        valid documents - the partice is optional.</desc>
+        valid documents - the particle is optional.</desc>
       </optdef>
     
       <optdef>

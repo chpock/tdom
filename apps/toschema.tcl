@@ -1,3 +1,9 @@
+# This is a (too) simple DTD to tDOM schema converter.
+#
+# It should work for not namespaced document types and namespaced
+# document types with the elements in a default namespace. In case of
+# namespaced document types with prefixed elements the generated
+# schema file will not be usable, but may be a starting point.
 
 package require tdom
 package require uri
@@ -78,7 +84,18 @@ proc fromDTD_generate {} {
             puts "Document element not defined."
             exit 1
         }
-        puts "start $dtdStart"
+        set ns ""
+        foreach {attkey attDef} [array get dtdAttributes $dtdStart,*] {
+            lassign $attDef attname type default isRequired
+            if {$attname eq "xmlns"} {
+                set ns $default
+            }
+        }
+        if {$ns eq ""} {
+            puts "start $dtdStart"
+        } else {
+            puts "start $dtdStart $ns"
+        }
     }
     set elements [lsort [array names dtdElements]]
     set startInd [lsearch -exact $elements $dtdStart]
@@ -140,6 +157,7 @@ proc fromDTD_generate {} {
             set parts [split $attname ":"]
             if {[llength $parts] == 2} {
                 set prefix [lindex $parts 0]
+                if {$prefix eq "xmlns"} continue
                 if {![info exists nslookup($prefix)]} {
                     # Hmmm. Either dtd error or the namespace is
                     # defined somewhere on the ancestors. To be
@@ -149,6 +167,7 @@ proc fromDTD_generate {} {
                     set cmd "nsattribute [lindex $parts 1] $nslookup($prefix)"
                 }
             } else {
+                if {$attname eq "xmlns"} continue
                 set cmd "attribute $attname"
             }
             if {$isRequired && $default != ""} {
@@ -232,7 +251,7 @@ proc fromDTD {file} {
 }
 
 proc usage {} {
-    puts "$argv0 ?options? file"
+    puts "$argv0 <XML-with-DTD>"
 }
 
 proc run {args} {

@@ -127,6 +127,10 @@ with a Tcl that is also built with Visual Studio 2017.
 # Building with Visual C++ 6 (32-bit) or Windows 2003 SDK (for 64-bit)
 ======================================================================
 
+Building with Visual C++ 6 with the included expat isn't any more
+possible, because expat dropped support for this. If you still want to
+build with this toolset use an expat version prior to 2.2.8.
+
 Steps similar to above except that HTML5 support is not available due
 to Gumbo needing C99 support. The GUMBODIR option should be left out
 on the nmake build commands.

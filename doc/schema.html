@@ -4,18 +4,18 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x55a5eb637630">NAME</a> · <a href="#SECTid0x55a5eb587aa0">SYNOPSIS</a> · <a href="#SECTid0x55a5eb615890">DESCRIPTION </a> · <a href="#SECTid0x55a5eb68ba10">Schema definition scripts</a> · <a href="#SECTid0x55a5eb69ae00">Quantity specifier</a> · <a href="#SECTid0x55a5eb69cd90">Text constraint scripts</a> · <a href="#SECTid0x55a5eb6b0090">Local key constraints</a> · <a href="#SECTid0x55a5eb6b1eb0">Recovering</a> · <a href="#SECTid0x55a5eb6b3e80">Examples</a> · <a href="#SECTid0x55a5eb6b5df0">KEYWORDS</a>
+<a href="#SECTid0x56487d590630">NAME</a> · <a href="#SECTid0x56487d4e1110">SYNOPSIS</a> · <a href="#SECTid0x56487d56e810">DESCRIPTION </a> · <a href="#SECTid0x56487d5e4a10">Schema definition scripts</a> · <a href="#SECTid0x56487d5f3e50">Quantity specifier</a> · <a href="#SECTid0x56487d5f5de0">Text constraint scripts</a> · <a href="#SECTid0x56487d6090e0">Local key constraints</a> · <a href="#SECTid0x56487d60af00">Recovering</a> · <a href="#SECTid0x56487d60ced0">Examples</a> · <a href="#SECTid0x56487d60ee40">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x55a5eb637630">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x56487d590630">NAME</a></h2><p class="namesection">
 <b class="names">tdom::schema - </b><br>Creates a schema validation command</p>
 
-  <h2><a name="SECTid0x55a5eb587aa0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x56487d4e1110">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">tdom::schema</b> <i class="m">?create?</i> <i class="m">cmdName</i>
     </pre>
 
-  <h2><a name="SECTid0x55a5eb615890">DESCRIPTION </a></h2><p>Every call of this command creates a new validation command. A
+  <h2><a name="SECTid0x56487d56e810">DESCRIPTION </a></h2><p>Every call of this command creates a new validation command. A
     validation command has methods to define a schema and is able
     to validate XML data or to post-validate a tDOM DOM tree (and to
     some degree other kind of hierarchical data) against this
@@ -30,13 +30,13 @@
           <dd>This method controls prefix (or abbreviation) to
           namespace URI mapping. Wherever a namespace argument is
           expected in the schema command methods the
-          "prefix" the prefix could be used instead of the
-          namespace URI. If the list maps the same prefix to different
-          namespace URIs, the first one wins. If there is no such a
-          prefix, the namespace argument is used literally as
-          namespace URI. If the method is called without argument, it
-          returns the current prefixUriList. If the method is called
-          with the empty string, any namespace URI arguments are used
+          "prefix" could be used instead of the namespace
+          URI. If the list maps the same prefix to different namespace
+          URIs, the first one wins. If there is no such prefix, the
+          namespace argument is used literally as namespace URI. If
+          the method is called without argument, it returns the
+          current prefixUriList. If the method is called with the
+          empty string, any namespace URI arguments are used
           literally. This is the default.
           </dd>
       
@@ -113,10 +113,10 @@
 <b class="method">start</b> <i class="m">documentElement</i> <i class="m">?namespace?</i>
 </dt>
         <dd>This method defines the name and namespace of the root
-        element of a tree to validate. If this method is used, then
-        the root element must match for validity. If <i class="m">start</i> is
-        not used, any element defined by <i class="m">defelement</i> may be the
-        root of a valid document. The <i class="m">start</i> method may be used
+        element of a tree to validate. If this method is used, the
+        root element must match for validity. If <i class="m">start</i> is not
+        used, any element defined by <i class="m">defelement</i> may be the root
+        of a valid document. The <i class="m">start</i> method may be used
         several times with varying arguments during the lifetime of a
         validation command. If the command is called with just the
         empty string (and no namespace argument), the validation
@@ -128,7 +128,7 @@
         <dt>
 <b class="method">define</b> <i class="m">&lt;definition script&gt;</i>
 </dt>
-        <dd>This method allows to define several elements or pattern
+        <dd>This method allows to define several elements or patterns
         or a whole schema with one call. All schema command methods so
         far (<i class="m">prefixns</i>, <i class="m">defelement</i>,
         <i class="m">defelementtype</i>, <i class="m">defpattern</i>, <i class="m">deftexttype</i> and
@@ -233,7 +233,7 @@
 <b class="method">reportcmd</b> <i class="m">?cmd?</i>
 </dt>
         <dd>This method expects the name of a Tcl command to be
-        called in case of validation error. This command will be
+        called in case of validation error. The command will be
         called with two arguments appended: the schema command which
         raises the validation error, and a validation error code.
 
@@ -255,7 +255,7 @@
             <dt>UNKOWN_GLOBAL_ID</dt><dd></dd>
             <dt>UNKOWN_ID</dt><dd></dd>
         </dl>
-        <p> For more detailed information see section <a href="#SECTid0x55a5eb6b1eb0">Recovering</a>.</p>
+        <p> For more detailed information see section <a href="#SECTid0x56487d60af00">Recovering</a>.</p>
         </dd>
       
 
@@ -484,7 +484,7 @@
 
     </dl>
 
-  <h2><a name="SECTid0x55a5eb68ba10">Schema definition scripts</a></h2><p>Schema definition scripts are ordinary Tcl scripts evaluated in
+  <h2><a name="SECTid0x56487d5e4a10">Schema definition scripts</a></h2><p>Schema definition scripts are ordinary Tcl scripts evaluated in
     the namespace tdom::schema. The schema definition commands listed
     below in this Tcl namespace allow the definition of a wide variety
     of document structures. Every schema definition command
@@ -729,7 +729,7 @@ s define {
 <b class="method">prefixns</b> <i class="m">?prefixUriList?</i>
 </dt>
         <dd>This defines a prefix to namespace URI mapping exactly
-        as a <i>schemacmd prefixns</i> call. This is meant as top-level
+        as a <i>schemacmd prefixns</i> would. It is meant as top-level
         command of a <i>schemacmd define</i> script. This command is
         not allowed nested in another definition script command and
         will raise error, if you call it there.</dd>
@@ -740,7 +740,7 @@ s define {
 <b class="method">defelement</b> <i class="m">name</i> <i class="m">?namespace?</i> <i class="m">&lt;definition script&gt;</i>
 </dt>
         <dd>This defines an element exactly as a <i>schemacmd
-        defelement</i> call. This is meant as top-level command of a
+        defelement</i> call would. It is meant as top-level command of a
         <i>schemacmd define</i> script. This command is not allowed
         nested in another definition script command and will raise
         error, if you call it there.</dd>
@@ -751,10 +751,10 @@ s define {
 <b class="method">defelementtype</b> <i class="m">name</i> <i class="m">?namespace?</i> <i class="m">&lt;definition script&gt;</i>
 </dt>
         <dd>This defines an elementtype exactly as a <i>schemacmd
-        defelementtype</i> call. This is meant as top-level command of a
-        <i>schemacmd define</i> script. This command is not allowed
-        nested in another definition script command and will raise
-        error, if you call it there.</dd>
+        defelementtype</i> call would. It is meant as top-level
+        command of a <i>schemacmd define</i> script. This command is
+        not allowed nested in another definition script command and
+        will raise error, if you call it there.</dd>
       
 
       
@@ -762,7 +762,7 @@ s define {
 <b class="method">defpattern</b> <i class="m">name</i> <i class="m">?namespace?</i> <i class="m">&lt;definition script&gt;</i>
 </dt>
         <dd>This defines a named pattern exactly as a <i>schemacmd
-        defpattern</i> call. This is meant as top-level command of a
+        defpattern</i> call would. It is meant as top-level command of a
         <i>schemacmd define</i> script. This command is not allowed
         nested in another definition script command and will raise
         error, if you call it there.</dd>
@@ -773,10 +773,10 @@ s define {
 <b class="method">deftexttype</b> <i class="m">name</i> <i class="m">&lt;constraint script&gt;</i>
 </dt>
         <dd>This defines a named bundle of text constraints exactly
-        as a <i>schemacmd deftexttype</i> call. This is meant as top-level
-        command of a <i>schemacmd define</i> script. This command is
-        not allowed nested in another definition script command and
-        will raise error, if you call it there.</dd>
+        as a <i>schemacmd deftexttype</i> call would. It is meant as
+        top-level command of a <i>schemacmd define</i> script. This
+        command is not allowed nested in another definition script
+        command and will raise error, if you call it there.</dd>
       
       
       
@@ -784,14 +784,14 @@ s define {
 <b class="method">start</b> <i class="m">name</i> <i class="m">?namespace?</i>
 </dt>
         <dd>This command works exactly as a <i>schemacmd start</i>
-        call. This is meant as top-level command of a <i>schemacmd
+        call would. It is meant as top-level command of a <i>schemacmd
         define</i> script. This command is not allowed nested in
         another definition script command and will raise error, if you
         call it there.</dd>
       
     </dl>
 
-  <h2><a name="SECTid0x55a5eb69ae00">Quantity specifier</a></h2><p>Several schema definition commands expect a quantifier as
+  <h2><a name="SECTid0x56487d5f3e50">Quantity specifier</a></h2><p>Several schema definition commands expect a quantifier as
     one of their arguments which determines how often the content
     particle specified by the command is expected. The valid values
     for a <i class="m">quant</i> argument are:</p><dl class="optlist">
@@ -804,7 +804,7 @@ s define {
       
         <dt><b>?</b></dt>
         <dd>The content particle may not occur more than once in
-        valid documents - the partice is optional.</dd>
+        valid documents - the particle is optional.</dd>
       
     
       
@@ -835,7 +835,7 @@ s define {
     </dl><p>If an optional quantifier is not given, it defaults to * in
     case of the <i class="m">mixed</i> command and to ! for all other commands.</p>
 
-  <h2><a name="SECTid0x55a5eb69cd90">Text constraint scripts</a></h2><p>Text (parsed character data, as XML calls it) sometimes has to
+  <h2><a name="SECTid0x56487d5f5de0">Text constraint scripts</a></h2><p>Text (parsed character data, as XML calls it) sometimes has to
     be of a certain kind or comply with certain rules to be valid. The
     text constraint script arguments to text, attribute, nsattribute
     and deftexttype commands are evaluated in the Tcl namespace
@@ -851,7 +851,7 @@ s define {
     command is available in the tdom::type namespace is recorded in
     its documentation.
     </p>
-        <h3><a name="SECTid0x55a5eb69d790">The tcl text constraint command</a></h3>
+        <h3><a name="SECTid0x56487d5f67e0">The tcl text constraint command</a></h3>
         <p>The <i class="m">tcl</i> text constraint command dispatches the check
         to an arbitrary Tcl command, thus enable any programmable
         decision rules.</p>
@@ -866,7 +866,7 @@ s define {
             
         </dl>
     
-        <h3><a name="SECTid0x55a5eb69e570">Basic XML types</a></h3>
+        <h3><a name="SECTid0x56487d5f75c0">Basic XML types</a></h3>
         <dl class="commandlist">
             
                 <dt><b class="cmd">name</b></dt>
@@ -913,7 +913,7 @@ s define {
             
         </dl>
     
-        <h3><a name="SECTid0x55a5eb6a0580">Basic type tests</a></h3>
+        <h3><a name="SECTid0x56487d5f95d0">Basic type tests</a></h3>
         <p>
         </p>
         <dl class="commandlist">
@@ -1084,7 +1084,7 @@ s define {
             
         </dl>
     
-        <h3><a name="SECTid0x55a5eb6a7830">Logical constructs</a></h3>
+        <h3><a name="SECTid0x56487d600880">Logical constructs</a></h3>
         <dl class="commandlist">
         
             <dt>
@@ -1122,7 +1122,7 @@ s define {
         
         </dl>
     
-        <h3><a name="SECTid0x55a5eb6a9660">Constraints on processed text value</a></h3>
+        <h3><a name="SECTid0x56487d6026b0">Constraints on processed text value</a></h3>
         <dl class="commandlist">
             
             <dt>
@@ -1174,7 +1174,7 @@ s define {
         
         </dl>
     
-        <h3><a name="SECTid0x55a5eb6ac030">Various other string properties</a></h3>
+        <h3><a name="SECTid0x56487d605080">Various other string properties</a></h3>
         <dl class="commandlist">
         
             <dt>
@@ -1258,7 +1258,7 @@ s define {
         </dl>
     
 
-  <h2><a name="SECTid0x55a5eb6b0090">Local key constraints</a></h2><p>Document wide uniqueness and foreign key constraints are
+  <h2><a name="SECTid0x56487d6090e0">Local key constraints</a></h2><p>Document wide uniqueness and foreign key constraints are
     available with the text constraint commands id and idref.
     Keyspaces allow for sub-tree local uniqueness and foreign key
     constraints.</p><dl class="commandlist">
@@ -1294,7 +1294,7 @@ s define {
         
     </dl>
 
-  <h2><a name="SECTid0x55a5eb6b1eb0">Recovering</a></h2><p>By default the validation engine stops at the first detected
+  <h2><a name="SECTid0x56487d60af00">Recovering</a></h2><p>By default the validation engine stops at the first detected
       validation violation and reports that finding. It does so by
       return false (and sets, if given, the result variable with an
       error message) in case the schema command itself is used to
@@ -1339,7 +1339,7 @@ s define {
       error types MISSING_ELEMENT and UNEXPECTED_ELEMENT recovers by
       ignoring the event.</p>
 
-  <h2><a name="SECTid0x55a5eb6b3e80">Examples</a></h2><p>The XML Schema Part 0: Primer Second Edition
+  <h2><a name="SECTid0x56487d60ced0">Examples</a></h2><p>The XML Schema Part 0: Primer Second Edition
     (<a href="https://www.w3.org/TR/xmlschema-0/">https://www.w3.org/TR/xmlschema-0/</a>) starts with this
     example schema:</p><pre class="example">
 &lt;xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
@@ -1508,7 +1508,7 @@ schema define {
       
     </pre>
 
-<h2><a name="SECTid0x55a5eb6b5df0">KEYWORDS</a></h2><p class="keywords">
+<h2><a name="SECTid0x56487d60ee40">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-Validation">Validation</a>, <a class="keyword" href="keyword-index.html#KW-Postvalidation">Postvalidation</a>, <a class="keyword" href="keyword-index.html#KW-DOM">DOM</a>, <a class="keyword" href="keyword-index.html#KW-SAX">SAX</a>
 </p>
 </div><hr class="navsep"><div class="navbar" align="center">

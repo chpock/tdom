@@ -188,13 +188,13 @@ The methods of created commands are:
 \&\fRThis method controls prefix (or abbreviation) to
 namespace URI mapping. Wherever a namespace argument is
 expected in the schema command methods the
-"prefix" the prefix could be used instead of the
-namespace URI. If the list maps the same prefix to different
-namespace URIs, the first one wins. If there is no such a
-prefix, the namespace argument is used literally as
-namespace URI. If the method is called without argument, it
-returns the current prefixUriList. If the method is called
-with the empty string, any namespace URI arguments are used
+"prefix" could be used instead of the namespace
+URI. If the list maps the same prefix to different namespace
+URIs, the first one wins. If there is no such prefix, the
+namespace argument is used literally as namespace URI. If
+the method is called without argument, it returns the
+current prefixUriList. If the method is called with the
+empty string, any namespace URI arguments are used
 literally. This is the default.
 .TP
 \&\fB\fBdefelement\fP \fIname\fB \fI?namespace?\fB \fI<definition script>\fB
@@ -250,10 +250,10 @@ definition scripts.
 .TP
 \&\fB\fBstart\fP \fIdocumentElement\fB \fI?namespace?\fB
 \&\fRThis method defines the name and namespace of the root
-element of a tree to validate. If this method is used, then
-the root element must match for validity. If \fIstart\fR is
-not used, any element defined by \fIdefelement\fR may be the
-root of a valid document. The \fIstart\fR method may be used
+element of a tree to validate. If this method is used, the
+root element must match for validity. If \fIstart\fR is not
+used, any element defined by \fIdefelement\fR may be the root
+of a valid document. The \fIstart\fR method may be used
 several times with varying arguments during the lifetime of a
 validation command. If the command is called with just the
 empty string (and no namespace argument), the validation
@@ -261,7 +261,7 @@ constraint for the root element is removed and any defined
 element will be valid as root of a tree to validate.
 .TP
 \&\fB\fBdefine\fP \fI<definition script>\fB
-\&\fRThis method allows to define several elements or pattern
+\&\fRThis method allows to define several elements or patterns
 or a whole schema with one call. All schema command methods so
 far (\fIprefixns\fR, \fIdefelement\fR,
 \&\fIdefelementtype\fR, \fIdefpattern\fR, \fIdeftexttype\fR and
@@ -326,7 +326,7 @@ with that name is set to the empty string.
 .TP
 \&\fB\fBreportcmd\fP \fI?cmd?\fB
 \&\fRThis method expects the name of a Tcl command to be
-called in case of validation error. This command will be
+called in case of validation error. The command will be
 called with two arguments appended: the schema command which
 raises the validation error, and a validation error code.
 .RS
@@ -745,42 +745,42 @@ s define {
 .TP
 \&\fB\fBprefixns\fP \fI?prefixUriList?\fB
 \&\fRThis defines a prefix to namespace URI mapping exactly
-as a \fIschemacmd prefixns\fR call. This is meant as top-level
+as a \fIschemacmd prefixns\fR would. It is meant as top-level
 command of a \fIschemacmd define\fR script. This command is
 not allowed nested in another definition script command and
 will raise error, if you call it there.
 .TP
 \&\fB\fBdefelement\fP \fIname\fB \fI?namespace?\fB \fI<definition script>\fB
 \&\fRThis defines an element exactly as a \fIschemacmd
-defelement\fR call. This is meant as top-level command of a
+defelement\fR call would. It is meant as top-level command of a
 \&\fIschemacmd define\fR script. This command is not allowed
 nested in another definition script command and will raise
 error, if you call it there.
 .TP
 \&\fB\fBdefelementtype\fP \fIname\fB \fI?namespace?\fB \fI<definition script>\fB
 \&\fRThis defines an elementtype exactly as a \fIschemacmd
-defelementtype\fR call. This is meant as top-level command of a
-\&\fIschemacmd define\fR script. This command is not allowed
-nested in another definition script command and will raise
-error, if you call it there.
+defelementtype\fR call would. It is meant as top-level
+command of a \fIschemacmd define\fR script. This command is
+not allowed nested in another definition script command and
+will raise error, if you call it there.
 .TP
 \&\fB\fBdefpattern\fP \fIname\fB \fI?namespace?\fB \fI<definition script>\fB
 \&\fRThis defines a named pattern exactly as a \fIschemacmd
-defpattern\fR call. This is meant as top-level command of a
+defpattern\fR call would. It is meant as top-level command of a
 \&\fIschemacmd define\fR script. This command is not allowed
 nested in another definition script command and will raise
 error, if you call it there.
 .TP
 \&\fB\fBdeftexttype\fP \fIname\fB \fI<constraint script>\fB
 \&\fRThis defines a named bundle of text constraints exactly
-as a \fIschemacmd deftexttype\fR call. This is meant as top-level
-command of a \fIschemacmd define\fR script. This command is
-not allowed nested in another definition script command and
-will raise error, if you call it there.
+as a \fIschemacmd deftexttype\fR call would. It is meant as
+top-level command of a \fIschemacmd define\fR script. This
+command is not allowed nested in another definition script
+command and will raise error, if you call it there.
 .TP
 \&\fB\fBstart\fP \fIname\fB \fI?namespace?\fB
 \&\fRThis command works exactly as a \fIschemacmd start\fR
-call. This is meant as top-level command of a \fIschemacmd
+call would. It is meant as top-level command of a \fIschemacmd
 define\fR script. This command is not allowed nested in
 another definition script command and will raise error, if you
 call it there.
@@ -795,7 +795,7 @@ The content particle has to occur exactly once in valid
 documents.
 .IP "\fB?\fR"
 The content particle may not occur more than once in
-valid documents - the partice is optional.
+valid documents - the particle is optional.
 .IP "\fB*\fR"
 The content particle may occur zero or more times in a
 row in valid documents.
