@@ -27,7 +27,17 @@
 #include <tcldom.h>
 #include <domxpath.h>
 #include <schema.h>
-#include <stdint.h>
+/* Limbo for build with VC++ 6 */
+#if defined(_MSC_VER) && _MSC_VER <= 1200
+ #define inline _inline
+ typedef __int32 int32_t;
+ typedef unsigned __int32 uint32_t;
+ typedef __int64 int64_t;
+ typedef unsigned __int64 uint64_t;
+ typedef unsigned long intptr_t;
+#else
+ #include <stdint.h>
+#endif
 #include <fcntl.h>
 
 #ifdef _MSC_VER
