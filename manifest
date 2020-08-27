@@ -1,5 +1,5 @@
-C More\slast\stweaks\son\sdocumentation\sand\sexample\sscripts.
-D 2020-08-26T21:24:45.183
+C Doh.\sMissed\sto\sadd\sthe\snew\ssource\sfile\sto\svisual\sstudio\snmake\smakefile.vc.
+D 2020-08-27T16:32:27.129
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -222,7 +222,7 @@ F unix/speed-check.sh 7a8d91e7edf1cdc9bcfad5f28e1a068cb2843d05e49d8bd89d9b30a465
 F unix/tclAppInit.c df2bcb1b98ffead12f8a55d0e084f780fef9ec21e9597a9bab1aaefb2f7c3a60
 F win/README 69a6da038cb99711a2c95fd44e314e9ce74bb2c4ed8ed319dac6fd6daff2c13d
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F win/makefile.vc 264e2b65aebc7c1311803f0f4474d146b2f42cc8eadbd0e9052ba041d32b0ab2
+F win/makefile.vc 665565e2e00b64134027e02115d467730a6f6a5ef245e5f5aaf40d87c743cba6
 F win/nmakehlp.c 194ae7c24886245c679cb4c9ea7e6daaaebb5fcd
 F win/pkgIndex.tcl 915cf5788165a425755dd5b959fbbc4f13428d3191ac36e3e5e1ef733dc25f4b
 F win/rules-ext.vc e788fcfc1e69b11946e18b8f67e0870b3bd38913
@@ -233,8 +233,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 1a40df78695932beceeb5839e2f55459b282e78cbf193c4f89bb69a31bff5329
-R 9473792ec0cfd19e08a366751e72b97b
+P ce17b26681fdad9f1fb641209b0eb1e20f3b1a4f10846d438d1bd0fd8d693b42
+R e6ba3798e876b84521ed2e8a2a9c7420
 U rolf
-Z 812f3ce6046e613d86f6dff43fd45741
+Z a058a43b7ee23a9d05d1c46fd4a0b1b4
 # Remove this line to create a well-formed Fossil manifest.

@@ -41,6 +41,7 @@ PRJ_OBJS = \
 	$(TMP_DIR)\tclexpat.obj    \
 	$(TMP_DIR)\tcldom.obj      \
 	$(TMP_DIR)\tclpull.obj     \
+	$(TMP_DIR)\schema.obj      \
 	$(TMP_DIR)\tdomStubInit.obj\
 	$(TMP_DIR)\tdomStubLib.obj \
 	$(TMP_DIR)\tdominit.obj
