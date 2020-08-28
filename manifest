@@ -1,5 +1,5 @@
-C Doh.\sMissed\sto\sadd\sthe\snew\ssource\sfile\sto\svisual\sstudio\snmake\smakefile.vc.
-D 2020-08-27T16:32:27.129
+C Fix\stdom\sversion\slookup\sin\snmake\sbuild.\sconfigure.in\shas\schanged\sto\sconfigure.ac.
+D 2020-08-28T15:14:15.934
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -115,7 +115,7 @@ F extensions/tnc/tests/all.tcl 845c9dab65c294c3570f69cc731d6fef62efbd03
 F extensions/tnc/tests/loadtnc.tcl c9b49c87af627263d40dcfbdd005bfddbc2a6ab5c8636d25618034c724e91c71
 F extensions/tnc/tests/tnc.test 3a144815194f81b3ec4222e868e0832c009ebd707fefa598dfcfa5d3ec1debb8
 F extensions/tnc/tnc.c 283471debf5af0be6d37cb06032d0e8b4c448497a94210631ab0288bf1239fff
-F extensions/tnc/win/makefile.vc b512d0f3eb67d83ace6f626d20b6ed8c895e609d
+F extensions/tnc/win/makefile.vc 51edf6f542aa90a9195b4a217d15ae7a4df488faa15c4ca723bc2705640b6bc9
 F extensions/tnc/win/nmakehlp.c 194ae7c24886245c679cb4c9ea7e6daaaebb5fcd
 F extensions/tnc/win/rules-ext.vc e788fcfc1e69b11946e18b8f67e0870b3bd38913
 F extensions/tnc/win/rules.vc 8157e2a811cf5e93683d6b0fbf5d91d153aa4535
@@ -233,8 +233,11 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ce17b26681fdad9f1fb641209b0eb1e20f3b1a4f10846d438d1bd0fd8d693b42
-R e6ba3798e876b84521ed2e8a2a9c7420
-U rolf
-Z a058a43b7ee23a9d05d1c46fd4a0b1b4
+P d099d66e3c9ec01120fa7fe7d57ecf36f3b9ba99593a0cda787f13608e3fe747
+R 167d0cdb7e0070db6ad7591e8822283f
+T *branch * nmake-fixes-0.9.2
+T *sym-nmake-fixes-0.9.2 *
+T -sym-trunk *
+U apnadkarni
+Z c1aa41c0fa65cfdd10fc53e8efa7ab81
 # Remove this line to create a well-formed Fossil manifest.
