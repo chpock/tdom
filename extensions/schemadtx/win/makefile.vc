@@ -1,6 +1,6 @@
 #------------------------------------------------------------- -*- makefile -*-
 #
-# Makefile for tnc
+# Makefile for schemadtx
 #
 # Basic build, test and install
 #   nmake /f makefile.vc INSTALLDIR=c:\tcl
@@ -17,10 +17,10 @@
 #------------------------------------------------------------------------------
 
 
-PROJECT = tnc
+PROJECT = schemadtx
 !include "rules-ext.vc"
 
-PRJ_OBJS = $(TMP_DIR)\tnc.obj
+PRJ_OBJS = $(TMP_DIR)\schemadtx.obj
 
 !if [echo TDOM_DOTVERSION = \> versions.vc] \
    || [nmakehlp -V ..\..\..\configure.ac ^[tdom^] >> versions.vc]
@@ -41,8 +41,6 @@ PRJ_DEFINES = -D _CRT_SECURE_NO_DEPRECATE -D _CRT_NONSTDC_NO_DEPRECATE \
 TDOMLIBPATH    = "$(TDOMROOT)\win\$(BUILDDIRTOP)"
 
 PRJ_INCLUDES = -I$(TDOMROOT)\generic -I$(TDOMROOT)\expat
-
-TNCDIR         = $(TDOMROOT)\extensions\tnc
 
 !if !$(STATIC_BUILD)
 PRJ_LIBS  = $(TDOMLIBPATH)\tdomstub$(TDOMVER).lib
