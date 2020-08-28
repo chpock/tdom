@@ -160,7 +160,12 @@ gtinTCObjCmd (dummy, interp, objc, objv)
  *
  *----------------------------------------------------------------------------
  */
+#if defined(_MSC_VER) || defined(__MINGW32__) 
+#  undef TCL_STORAGE_CLASS
+#  define TCL_STORAGE_CLASS DLLEXPORT
+#endif
 
+EXTERN
 int
 Schemadtx_Init (interp)
     Tcl_Interp *interp;

@@ -1,5 +1,5 @@
-C Fix\stdom\sversion\slookup\sin\snmake\sbuild.\sconfigure.in\shas\schanged\sto\sconfigure.ac.
-D 2020-08-28T15:14:15.934
+C nmake/VC++\ssupport\sfor\sschemadtx
+D 2020-08-28T15:15:47.150
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -90,10 +90,15 @@ F extensions/schemadtx/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
 F extensions/schemadtx/configure fa5552c28b938b5b4733bc03390502e9ecf0a26b1995b596b63533058013da57 x
 F extensions/schemadtx/configure.ac f7523142dbb77cde51d4333393d5dd8c1fd92ad995358a9723ecb1fc3739346f
 F extensions/schemadtx/pkgIndex.tcl.in 93156e39702854530db4e84803b1812b2d472449ac47358344810a29c56530a7
-F extensions/schemadtx/schemadtx.c 1c3887b0f8cd29b6a4a4a7d9aab45aa947fa5dde697ae8307f77605a7a237b5e
+F extensions/schemadtx/schemadtx.c 0d437b57049f6f00c8dac82c4326634a45e01ceee3de23faef49e4bb8a76f610
 F extensions/schemadtx/tests/all.tcl 01c5540732680c9bc11b36f8b44fb7be2cd4621de7d536d97e72d88ed03102e7
 F extensions/schemadtx/tests/loadschemadtx.tcl 3b669926e01801833d6caaf55e748ae92291438014d116ff10fbc658e678e603
 F extensions/schemadtx/tests/schemadtx.test 6c36dec706e91edd4a05ddad059a3276dcbf6d4f71d60fe0a91d21ae8e6ad684
+F extensions/schemadtx/win/makefile.vc 1377e9de79e06c7c90bb9414f8f11daa2a9f119e77a7a229c121dbe118133d6e
+F extensions/schemadtx/win/nmakehlp.c 194ae7c24886245c679cb4c9ea7e6daaaebb5fcd
+F extensions/schemadtx/win/rules-ext.vc e788fcfc1e69b11946e18b8f67e0870b3bd38913
+F extensions/schemadtx/win/rules.vc 8157e2a811cf5e93683d6b0fbf5d91d153aa4535
+F extensions/schemadtx/win/targets.vc 79dea1c6a94a94e6ed8bae9e0195149b25a69923
 F extensions/tdomhtml/CONFIG 7a3703be0e018ead9b6558ce6d82f356620dbfd8
 F extensions/tdomhtml/Makefile.in 1008fe906a0b7150e5b83f69e43a231886821db7
 F extensions/tdomhtml/configure 47edbb79649c148c4c439b93a329e70e647e1225aa35236bbc5643c9e3484190 x
@@ -233,11 +238,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P d099d66e3c9ec01120fa7fe7d57ecf36f3b9ba99593a0cda787f13608e3fe747
-R 167d0cdb7e0070db6ad7591e8822283f
-T *branch * nmake-fixes-0.9.2
-T *sym-nmake-fixes-0.9.2 *
-T -sym-trunk *
+P 012ab480db4c81e8bbc6cacea7150e441e19c0c7bfb8341f1e02e00b061af5b3
+R 1279f535173e6632c102819132b8f631
 U apnadkarni
-Z c1aa41c0fa65cfdd10fc53e8efa7ab81
+Z bd905155da51a6a2d9ac160b60148469
 # Remove this line to create a well-formed Fossil manifest.
