@@ -21,12 +21,13 @@
 |
 \---------------------------------------------------------------------------*/
 
-#ifndef TDOM_NO_SCHEMA
-
 #include <tdom.h>
 #include <tcldom.h>
 #include <domxpath.h>
 #include <schema.h>
+
+#ifndef TDOM_NO_SCHEMA
+
 #include <stdint.h>
 #include <fcntl.h>
 
@@ -8713,6 +8714,14 @@ tDOM_SchemaInit (
     Tcl_CreateObjCommand (interp,"tdom::type::duration",
                           durationObjCmd, NULL, NULL);
 
+}
+
+#else   /* #ifndef TDOM_NO_SCHEMA */
+
+SchemaData *
+tdomGetSchemadata (void) 
+{
+    return 0;
 }
 
 
