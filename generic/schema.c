@@ -28,7 +28,7 @@
 
 #ifndef TDOM_NO_SCHEMA
 
-#include <stdint.h>
+#include <inttypes.h>
 #include <fcntl.h>
 
 #ifdef _MSC_VER

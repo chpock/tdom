@@ -701,11 +701,7 @@ typedef struct domAttrNode {
 typedef int  (*domAddCallback)  (domNode * node, void * clientData);
 typedef void (*domFreeCallback) (domNode * node, void * clientData);
 
-/*--------------------------------------------------------------------------
-|   Forward declaration
-|
-\-------------------------------------------------------------------------*/
-typedef struct SchemaData_ SchemaData;
+#include <schema.h>
 
 /*--------------------------------------------------------------------------
 |   Function prototypes
