@@ -1,5 +1,5 @@
-C Added\sdummy\sfunction\sfor\sthe\stdom\sstubs\stable\sin\scase\sof\sbuild\swithout\sthe\svalidation\sengine.\sFix\sfor\s[3114185884].
-D 2020-09-03T00:03:36.620
+C Fix\sfor\s[011b8f3578fa].
+D 2020-09-18T23:50:11.801
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -229,7 +229,7 @@ F win/README 69a6da038cb99711a2c95fd44e314e9ce74bb2c4ed8ed319dac6fd6daff2c13d
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F win/makefile.vc 665565e2e00b64134027e02115d467730a6f6a5ef245e5f5aaf40d87c743cba6
 F win/nmakehlp.c 194ae7c24886245c679cb4c9ea7e6daaaebb5fcd
-F win/pkgIndex.tcl 915cf5788165a425755dd5b959fbbc4f13428d3191ac36e3e5e1ef733dc25f4b
+F win/pkgIndex.tcl eaf0d953ad11d652382ea77523c91c97d1aedcc1035fd3967b432abd018060a3
 F win/rules-ext.vc e788fcfc1e69b11946e18b8f67e0870b3bd38913
 F win/rules.vc 996a623bd2ea3dc2fac239a1b845ca51695c8012
 F win/targets.vc 79dea1c6a94a94e6ed8bae9e0195149b25a69923
@@ -238,8 +238,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 42740a7c75b34363b3aab14d6afc1e68c1c9f0ac27300b50d46c8b588eb5b1f7
-R 22c6f4e31e0d8a4c1321c8977c76cef5
+P 2f379d66ee250026204a925be9a592bc504bb9384183816094ee3c47ecc2bd6e
+R 013ee1bd611bb42a075e3f18b187a62f
 U rolf
-Z 45dfcbb75f1da9340cef687ca97843e1
+Z f8c3af4752d339144bfe6ea1767d3010
 # Remove this line to create a well-formed Fossil manifest.
