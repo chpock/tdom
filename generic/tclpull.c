@@ -785,7 +785,7 @@ tDOM_PullParserInstanceCmd (
         }
 #endif
         pullInfo->mode = PULLPARSEMODE_FIND;
-        /* As long as we don't evalute any tcl script code during a
+        /* As long as we don't evaluate any Tcl script code during a
          * pull parser method call this should be secure. */
         pullInfo->findElement = Tcl_GetString (objv[2]);
         Tcl_DStringSetLength (pullInfo->cdata, 0);

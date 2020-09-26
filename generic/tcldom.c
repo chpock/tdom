@@ -5396,7 +5396,7 @@ int tcldom_NodeObjCmd (
 
         case m_getBaseURI:
             CheckArgs(2,2,2,"");
-            /* fall thru */
+            /* fall through */
 
         case m_baseURI:    
             CheckArgs(2,3,2,"?URI?");

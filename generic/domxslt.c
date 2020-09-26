@@ -991,7 +991,7 @@ static void formatValue (
 
     case latin_upper:
         upper = 1;
-        /* fall thru */
+        /* fall through */
     case latin_lower:
         /* Home grown algorithm. (And I'm really not happy with it.)
            Please let rolf@pointsman.de know how to do this better /
@@ -1036,7 +1036,7 @@ static void formatValue (
 
     case roman_upper:
         upper = 1;
-        /* fall thru */
+        /* fall through */
     case roman_lower:
         /* Algorithm follows the idear of the converter
            at http://mini.net/cgi-bin/wikit/1749.html */
@@ -2952,8 +2952,9 @@ static int xsltAddTemplate (
         }
         tpl->mode = localName;
         if (rc < 0) {
-            /* If the template has a name attribute, it is already stored in
-               in the namedTemplates hash table and will be freed. */
+            /* If the template has a name attribute, it is already
+             * stored in the namedTemplates hash table and will be
+             * freed. */
             if (!tpl->name) {
                 FREE ((char*)tpl);
             }
@@ -2969,8 +2970,9 @@ static int xsltAddTemplate (
     if (prioStr) {
         tpl->prio = strtod (prioStr, &tailptr);
         if (tpl->prio == 0.0 && prioStr == tailptr) {
-            /* If the template has a name attribute, it is already stored in
-               in the namedTemplates hash table and will be freed. */
+            /* If the template has a name attribute, it is already
+             * stored in the namedTemplates hash table and will be
+             * freed. */
             if (!tpl->name) {
                 FREE ((char*)tpl);
             }
@@ -4362,7 +4364,7 @@ static int ExecAction (
                         attr = (domAttrNode*)rs.nodes[i];
                         if (attr ->nodeFlags & IS_NS_NODE) {
                             /* If someone selects explicitly namespace nodes
-                               to copy-of with e.g namespace::* (remember: @*
+                               to copy-of with e.g. namespace::* (remember: @*
                                doesn't select namespace nodes), we must this
                                handle separately.*/
                             /* The xmlns:xml namespace node will always
@@ -4960,7 +4962,7 @@ static int ExecAction (
                element is in a namespace, that should be excluded. We
                follow saxon and xalan, which both add the namespace of
                the literal result element always to the result tree,
-               to ensure, that the result tree is conform to the XML
+               to ensure that the result tree is conform to the XML
                namespace recommendation. */
             if (actionNode->namespace) {
                 ns = actionNode->ownerDocument->namespaces[actionNode->namespace-1];
@@ -6918,7 +6920,7 @@ xsltResetState (
      * the xml source. */
     /* XML documents don't have excludeNS and extensionNS information
        and the already parsed XSLT documents information is
-       preserved, therefor we don't touch excludeNS and extensionNS
+       preserved, therefore, we don't touch excludeNS and extensionNS
        information */
     /* This loop works only as coded, because, the first subdoc will
      * always be the primary XSLT doc, so xs->subDocs will not
@@ -7253,7 +7255,7 @@ int xsltProcess (
         StripXMLSpace (xs, xmlNode);
     }
 
-    /* add the xml doc to the doc list */
+    /* add the XML doc to the doc list */
     sdoc = (xsltSubDoc*)MALLOC(sizeof (xsltSubDoc));
     sdoc->doc = xmlNode->ownerDocument;
     baseURI = findBaseURI (xmlNode);

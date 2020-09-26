@@ -414,7 +414,7 @@ typedef unsigned int domDocFlags;
 #define VAR_TRACE                32
 
 /*--------------------------------------------------------------------------
-|   a index to the namespace records
+|   an index to the namespace records
 |
 \-------------------------------------------------------------------------*/
 typedef unsigned int domNameSpaceIndex;

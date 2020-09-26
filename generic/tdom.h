@@ -71,7 +71,7 @@ typedef struct CHandlerSet {
 
 /*----------------------------------------------------------------------------
 |   The structure below is used to refer to an event handler set
-|   of tcl scripts.
+|   of Tcl scripts.
 \---------------------------------------------------------------------------*/
 
 typedef struct TclHandlerSet {

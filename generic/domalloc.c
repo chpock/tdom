@@ -2,7 +2,7 @@
 |   Copyright (C) 1999-2000  Jochen C. Loewer (loewerj@hotmail.com)
 +----------------------------------------------------------------------------
 |
-|   A special memory allocator, which uses pre-allocated / bit masked
+|   A special memory allocator, which uses preallocated / bit masked
 |   based administration of memory blocks with fixed sizes, like
 |   DOM nodes. This will hopefully save some memory.
 |

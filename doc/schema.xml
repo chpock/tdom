@@ -228,8 +228,8 @@
             <dt>DOM_XPATH_BOOLEAN</dt><dd></dd>
             <dt>INVALID_KEYREF</dt><dd></dd>
             <dt>INVALID_VALUE</dt><dd></dd>
-            <dt>UNKOWN_GLOBAL_ID</dt><dd></dd>
-            <dt>UNKOWN_ID</dt><dd></dd>
+            <dt>UNKNOWN_GLOBAL_ID</dt><dd></dd>
+            <dt>UNKNOWN_ID</dt><dd></dd>
         </dl>
         <p> For more detailed information see section <ref
         refid="recovering">Recovering</ref>.</p>
