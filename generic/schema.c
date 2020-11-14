@@ -8480,6 +8480,41 @@ lengthTCObjCmd (
 }
 
 static int
+typeImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    return checkText (interp, constraintData, text);
+}
+
+static int
+typeTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+    Tcl_HashEntry *h;
+
+    CHECK_TI
+    checkNrArgs (2,2,"Expected: <text type name>");
+    h = Tcl_FindHashEntry (&sdata->textDef, Tcl_GetString (objv[1]));
+    if (!h) {
+        SetResult3 ("Unknown text type \"", Tcl_GetString (objv[2]), "\"");
+        return TCL_ERROR;
+    }
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = typeImpl;
+    sc->constraintData = Tcl_GetHashValue (h);
+    return TCL_OK;
+}
+
+static int
 dateObjCmd (
     ClientData clientData,
     Tcl_Interp *interp,
@@ -8703,6 +8738,8 @@ tDOM_SchemaInit (
                           notTCObjCmd, (ClientData) 3, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::length",
                           lengthTCObjCmd, (ClientData) 3, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::type",
+                          typeTCObjCmd, NULL, NULL);
 
     /* Exposed text type commands */
     Tcl_CreateObjCommand (interp,"tdom::type::date",

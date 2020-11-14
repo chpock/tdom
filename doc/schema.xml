@@ -1056,6 +1056,11 @@ s define {
             <m>constraint script</m> are probed in the order of
             definition.</desc>
         </commanddef>
+        <commanddef>
+            <command><cmd>type</cmd> <m>text type name</m></command>
+            <desc>This text constraint matches if the text type given
+            as argument matches.</desc>
+        </commanddef>
         </commandlist>
     </subsection>
 
