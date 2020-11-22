@@ -1,5 +1,5 @@
-C Added\stect\sconstaint\scommand\stype.
-D 2020-11-14T02:38:02.664
+C Fixed\serror\smsg\sof\smethod\sgetAttributeNS\sin\scase\sof\swrong\snumber\sof\sarguments.\sFixed\serror\smsg\sof\smethod\sgetAttributeNS\sin\scase\sof\sattribute\snot\sfound\sand\sno\sdefault\svalue\sgiven.
+D 2020-11-22T19:56:25.153
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -146,7 +146,7 @@ F generic/nodecmd.c ee14ed666ca6d18977f7301545c52ac71b3ce73c49233ff8f8b3aa414400
 F generic/nodecmd.h d2201b69de9507f86e94750f0b72867ec9150795712ef18c5b5b87f35a689f75
 F generic/schema.c 2aa1c1e8ce09ee78e44d845a3a6d6a207bd6026d07186f20885fe133374215dd
 F generic/schema.h c2226c373a794d62e8586e63d6356be5c8215d2802b91921346820521f30b80a
-F generic/tcldom.c 14c6ca5b0211654b83e6c5858747fcd956f8c0498bd092859643fc01a0be3c2a
+F generic/tcldom.c 62a665657278b1a0c71a5a33d264ff2fc8975a8aa750c157385856254132e113
 F generic/tcldom.h 37ee136d483b683c7e3e9e94ce8284520c7998cb1340047fc540dd7701825dc6
 F generic/tclexpat.c 9796c45c6cf414a85fae95377d80514c3203d97a014a782f9d0ac0f0d2e076ce
 F generic/tclexpat.h 145406289081e71aca82c6a432f0b2eb6d4550a7eefa2ff9fa047dfe27d0fa61
@@ -238,8 +238,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a8fac2ca99903be74f42f7c9c6ad10fbf417256474f2598f868189df57cfabbe
-R 3025684b7336f7f0a5af30e5dd6fc0bc
+P e3086ac2477efd91a8a09c00b89191529b445d63c0b39d8708c76fd602252f5b
+R e6b3b7cb39490442a75112a658a9e2a3
 U rolf
-Z e34605385e3dc8974a8fce1634093c43
+Z ac03b1c00c4bca7845fbc953771e622b
 # Remove this line to create a well-formed Fossil manifest.
