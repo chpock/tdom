@@ -244,7 +244,7 @@ install-libraries: libraries
 	@echo "Installing header files in $(DESTDIR)$(includedir)"
 	@list='$(PKG_HEADERS)'; for i in $$list; do \
 	    echo "Installing $(srcdir)/$$i" ; \
-	    $(INSTALL_DATA) $(srcdir)/$$i $(DESTDIR)$(includedir) ; \
+	    $(INSTALL_DATA) $(srcdir)/$$i "$(DESTDIR)$(includedir)" ; \
 	done;
 
 #========================================================================
@@ -467,12 +467,12 @@ install-lib-binaries: binaries
 	@list='$(PKG_TCL_SOURCES)'; for p in $$list; do \
 	  if test -f $(srcdir)/$$p; then \
 	    destp=`basename $$p`; \
-	    echo " Install $$destp $(DESTDIR)$(pkglibdir)/$$destp"; \
+	    echo "Installing $$destp $(DESTDIR)$(pkglibdir)/$$destp"; \
 	    $(INSTALL_DATA) $(srcdir)/$$p "$(DESTDIR)$(pkglibdir)/$$destp"; \
 	  fi; \
 	done
 	@if test "x$(SHARED_BUILD)" = "x1"; then \
-	    echo " Install pkgIndex.tcl $(DESTDIR)$(pkglibdir)"; \
+	    echo "Installing pkgIndex.tcl $(DESTDIR)$(pkglibdir)"; \
 	    $(INSTALL_DATA) pkgIndex.tcl "$(DESTDIR)$(pkglibdir)"; \
 	fi
 
