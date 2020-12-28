@@ -6993,6 +6993,12 @@ xsltCompileStylesheet (
     domAttrNode    *attr;
     xsltTemplate   *tpl;
 
+    if (!xsltDoc->documentElement) {
+        *errMsg = tdomstrdup ("Document has no element node - can't be a valid "
+                              "XSLT 1.0 stylesheet.");
+        return NULL;
+    }
+            
     *errMsg = NULL;
     xs = (xsltState *) MALLOC (sizeof (xsltState));
     
