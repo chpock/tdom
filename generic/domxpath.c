@@ -45,7 +45,7 @@
 |                           function, made lexer utf-8 aware, node sets
 |                           could now include nodes of different types,
 |                           better IEEE 754 rules support, code
-|                           restructured, serveral optimizations and bug
+|                           restructured, several optimizations and bug
 |                           fixes.
 |
 |   written by Jochen Loewer
@@ -945,7 +945,7 @@ static XPathTokens xpathLexer (
                            token = DOT;
                            break;
                        }
-                       /* DOT followed by digit, ie a REAL.
+                       /* DOT followed by digit, i.e. a REAL.
                           Handled by default. Fall throu */
 
             default:   if ( isNCNameStart (&xpath[i])) {
@@ -2513,7 +2513,7 @@ static double xpathStringToNumber (
        - strtod() accepts leading whitespace including \f and \v, but
          XPath doesn't allow this characters. Since this two
          characters are not legal XML characters, they can not be part
-         of a DOM tree and therefor there isn't a problem with XPath
+         of a DOM tree and therefore there isn't a problem with XPath
          expressions on DOM trees or in XSLT. But on Tcl level it's
          possible, to feed that characters literal into the XPath
          engine.
@@ -4839,7 +4839,7 @@ static int xpathEvalStep (
                 }
                 break;
             case BoolResult:
-                /* pleftResult is a non-empty nodeset, therefor: */
+                /* pleftResult is a nonempty nodeset, therefore: */
                 dLeft = 1.0;
                 dRight = xpathFuncNumber (prightResult, &NaN);
                 if (NaN) break;
@@ -5661,7 +5661,7 @@ int xpathMatches (
                     xpathRSFree (&nodeList); return 0;
                 }
 
-                /* if the nr_nodes of nodeList is > 1 (ie. we filter a
+                /* if the nr_nodes of nodeList is > 1 (i.e. we filter a
                    FillNodeList step, not only a FillWithCurrentNode
                    step), build the resulting nodeList context after
                    this predicate */

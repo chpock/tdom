@@ -266,11 +266,11 @@ convertGumboToDom (
             if (ignoreWhiteSpaces) {
                 continue;
             }
-            /* fall thru */;
+            /* fall through */;
         case GUMBO_NODE_CDATA:
         case GUMBO_NODE_TEXT:
             nodeType = TEXT_NODE
-            /* fall thru */;
+            /* fall through */;
         case GUMBO_NODE_COMMENT:
             if (nodeType == ALL_NODES) nodeType = COMMENT_NODE;
             node = (domNode*)domNewTextNode(parent->ownerDocument,

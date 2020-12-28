@@ -171,8 +171,8 @@ typedef enum {
     INVALID_KEYREF_MATCH_END,
     INVALID_KEYREF_MATCH_TEXT,
     UNKNOWN_ROOT_ELEMENT,
-    UNKOWN_GLOBAL_ID,
-    UNKOWN_ID,
+    UNKNOWN_GLOBAL_ID,
+    UNKNOWN_ID,
     INVALID_ATTRIBUTE_VALUE,
     INVALID_VALUE
 } ValidationErrorType;
@@ -193,8 +193,8 @@ static char *ValidationErrorType2str[] = {
     "INVALID_KEYREF",
     "INVALID_KEYREF",
     "UNKNOWN_ROOT_ELEMENT",
-    "UNKOWN_GLOBAL_ID",
-    "UNKOWN_ID",
+    "UNKNOWN_GLOBAL_ID",
+    "UNKNOWN_ID",
     "INVALID_ATTRIBUTE_VALUE",
     "INVALID_VALUE"
 };
@@ -441,11 +441,11 @@ initSchemaCP (
     switch (type) {
     case SCHEMA_CTYPE_NAME:
         pattern->flags |= CONSTRAINT_TEXT_CHILD;
-        /* Fall thru. */
+        /* Fall through. */
     case SCHEMA_CTYPE_PATTERN:
         pattern->namespace = (char *)namespace;
         pattern->name = name;
-        /* Fall thru. */
+        /* Fall through. */
     case SCHEMA_CTYPE_CHOICE:
     case SCHEMA_CTYPE_INTERLEAVE:
         pattern->content = (SchemaCP**) MALLOC (
@@ -501,7 +501,7 @@ static void serializeCP (
         if (pattern->flags & ELEMENTTYPE_DEF) {
             fprintf (stderr, "\tElementtype '%s'\n", pattern->typeName);
         }
-        /* Fall thru. */
+        /* Fall through. */
     case SCHEMA_CTYPE_CHOICE:
     case SCHEMA_CTYPE_INTERLEAVE:
         fprintf (stderr, "\t%d childs\n", pattern->nc);
@@ -742,7 +742,7 @@ static void schemaInstanceDelete (
     }
     while (sdata->stackPool) {
         down = sdata->stackPool->down;
-        /* interleaveState always got cleand up at puting se back to
+        /* interleaveState always got cleand up at putting se back to
          * pool */
         FREE (sdata->stackPool);
         sdata->stackPool = down;
@@ -1196,8 +1196,8 @@ recover (
         }
         sdata->vaction = MATCH_TEXT;
         break;
-    case UNKOWN_GLOBAL_ID:
-    case UNKOWN_ID:
+    case UNKNOWN_GLOBAL_ID:
+    case UNKNOWN_ID:
         sdata->vaction = MATCH_GLOBAL;
         break;
     case INVALID_ATTRIBUTE_VALUE:
@@ -1264,8 +1264,8 @@ recover (
     case INVALID_KEYREF_MATCH_END:
     case INVALID_KEYREF_MATCH_TEXT:
     case UNKNOWN_ROOT_ELEMENT:
-    case UNKOWN_GLOBAL_ID:
-    case UNKOWN_ID:
+    case UNKNOWN_GLOBAL_ID:
+    case UNKNOWN_ID:
     case INVALID_ATTRIBUTE_VALUE:
     case INVALID_VALUE:
         break;
@@ -1417,7 +1417,7 @@ matchElementStart (
                         }
                     }
                     /* TODO: Short-cut in case of no match (looking
-                     * for emtpy match, recovering). For now fall
+                     * for empty match, recovering). For now fall
                      * throu to simple, serial approach. */
                 }
                 for (i = 0; i < candidate->nc; i++) {
@@ -2232,7 +2232,7 @@ int probeEventAttribute (
    1 means element content may end here.
 
    2 means recovering requested further error reporting about missing childs
-   in the current element. To be able to to answer a [info expected] on
+   in the current element. To be able to answer a [info expected] on
    the occasion of the next error, we update the stack in this case
    and let tDOM_probeElementEnd restart checkElementEnd again with this
    stack state.
@@ -2455,7 +2455,7 @@ checkDocKeys (
 
     if (sdata->evalError) return 0;
     if (sdata->unknownIDrefs) {
-        if (!recover (interp, sdata, UNKOWN_ID, NULL, NULL, NULL, 0)) {
+        if (!recover (interp, sdata, UNKNOWN_ID, NULL, NULL, NULL, 0)) {
             haveErrMsg = 1;
             SetResult ("References to unknown IDs:");
             for (h = Tcl_FirstHashEntry (&sdata->ids, &search);
@@ -2475,7 +2475,7 @@ checkDocKeys (
              h = Tcl_NextHashEntry (&search)) {
             dk = Tcl_GetHashValue (h);
             if (dk->unknownIDrefs) {
-                if (!recover (interp, sdata, UNKOWN_GLOBAL_ID, NULL, NULL,
+                if (!recover (interp, sdata, UNKNOWN_GLOBAL_ID, NULL, NULL,
                               NULL, 0)) {
                     if (haveErrMsg) {
                         Tcl_AppendResult (interp, "\n", NULL);
@@ -4056,7 +4056,7 @@ getNextExpectedWorker (
         }
         if (cp->type == SCHEMA_CTYPE_NAME) {
             if (ac == cp->nc) {
-                /* The curently open element can end here, no
+                /* The currently open element can end here, no
                  * mandatory elements missing.
                  * The element end is always mandatory.*/
                 Tcl_ListObjAppendElement (
@@ -4591,12 +4591,12 @@ attributeLookupPreparation (
 
 /* This implements the script interface to the created schema commands.
 
-   Since validation may call out to tcl scripts those scripts may
+   Since validation may call out to Tcl scripts those scripts may
    delete the schema command (which just validates input by calling
-   out to a tcl script). This is handled by tcl evaluation level
+   out to a Tcl script). This is handled by Tcl evaluation level
    counting and postponing the schema data deletion until back on top.
 
-   After any code by this function that may have called out to a tcl
+   After any code by this function that may have called out to a Tcl
    script it is important not to return locally but to signal the
    return value with the result variable and ensure to reach the code
    at the end of tDOM_schemaInstanceCmd.
@@ -5765,9 +5765,9 @@ static int maybeAddAttr (
         cp = initSchemaCP (SCHEMA_CTYPE_CHOICE, NULL, NULL);
         cp->type = SCHEMA_CTYPE_TEXT;
         REMEMBER_PATTERN (cp)
-        sdata->isAttributeConstaint = 1;
+        sdata->isAttributeConstraint = 1;
         result = evalConstraints (interp, sdata, cp, scriptObj);
-        sdata->isAttributeConstaint = 0;
+        sdata->isAttributeConstraint = 0;
         attr->cp = cp;
     } else if (type) {
         attr->cp = type;
@@ -6097,7 +6097,7 @@ domuniquePatternObjCmd (
         kc->emptyFieldSetValue = tdomstrdup (Tcl_GetString (objv[5]));
         kc->efsv_len = strlen (kc->emptyFieldSetValue);
     }
-    /* Apppend to end so that the constraints are checked in
+    /* Append to end so that the constraints are checked in
      * definition order */
     if (sdata->cp->domKeys) {
         kc1 = sdata->cp->domKeys;
@@ -6146,7 +6146,7 @@ domxpathbooleanPatternObjCmd (
     if (objc == 3) {
         kc->name = tdomstrdup (Tcl_GetString (objv[2]));
     }
-    /* Apppend to end so that the constraints are checked in
+    /* Append to end so that the constraints are checked in
      * definition order */
     if (sdata->cp->domKeys) {
         kc1 = sdata->cp->domKeys;
@@ -6786,7 +6786,7 @@ nmtokensImpl (
             return 0;
         }
         if (!UTF8_GET_NAMING_NMTOKEN (p, clen)) {
-            SetResult ("Invalid charcter: attribute value isn't a NMTOKENS");
+            SetResult ("Invalid character: attribute value isn't a NMTOKENS");
             return 0;
         }
         tokenSeen = 1;
@@ -8480,6 +8480,41 @@ lengthTCObjCmd (
 }
 
 static int
+typeImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    return checkText (interp, constraintData, text);
+}
+
+static int
+typeTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+    Tcl_HashEntry *h;
+
+    CHECK_TI
+    checkNrArgs (2,2,"Expected: <text type name>");
+    h = Tcl_FindHashEntry (&sdata->textDef, Tcl_GetString (objv[1]));
+    if (!h) {
+        SetResult3 ("Unknown text type \"", Tcl_GetString (objv[2]), "\"");
+        return TCL_ERROR;
+    }
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = typeImpl;
+    sc->constraintData = Tcl_GetHashValue (h);
+    return TCL_OK;
+}
+
+static int
 dateObjCmd (
     ClientData clientData,
     Tcl_Interp *interp,
@@ -8606,7 +8641,7 @@ tDOM_SchemaInit (
     Tcl_CreateObjCommand (interp, "tdom::schema::self",
                           SelfObjCmd, NULL, NULL);
 
-    /* XPath contraints for DOM validation */
+    /* XPath constraints for DOM validation */
     Tcl_CreateObjCommand (interp,"tdom::schema::domunique",
                           domuniquePatternObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::domxpathboolean",
@@ -8703,6 +8738,8 @@ tDOM_SchemaInit (
                           notTCObjCmd, (ClientData) 3, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::length",
                           lengthTCObjCmd, (ClientData) 3, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::type",
+                          typeTCObjCmd, NULL, NULL);
 
     /* Exposed text type commands */
     Tcl_CreateObjCommand (interp,"tdom::type::date",

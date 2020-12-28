@@ -6237,6 +6237,34 @@ test schema-14.62 {Empty element} {
     set result
 } {0 1 1 1 0 0 1 0 0 1 0 0 0 1 1 0 1 1}
 
+test schema-14.63 {type} {
+    tdom::schema s
+    s define {
+        deftexttype len2-4 {
+            minLength 2
+            maxLength 4
+        }
+        defelement doc {
+            element e + {
+                text {
+                    type len2-4
+                    integer
+                }
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc><e>1</e></doc>
+        <doc><e>12</e></doc>
+        <doc><e>12a</e></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 0}
+
 test schema-15.1 {constraint cmd tcl} {
     tdom::schema s
     s define {

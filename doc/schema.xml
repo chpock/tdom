@@ -228,8 +228,8 @@
             <dt>DOM_XPATH_BOOLEAN</dt><dd></dd>
             <dt>INVALID_KEYREF</dt><dd></dd>
             <dt>INVALID_VALUE</dt><dd></dd>
-            <dt>UNKOWN_GLOBAL_ID</dt><dd></dd>
-            <dt>UNKOWN_ID</dt><dd></dd>
+            <dt>UNKNOWN_GLOBAL_ID</dt><dd></dd>
+            <dt>UNKNOWN_ID</dt><dd></dd>
         </dl>
         <p> For more detailed information see section <ref
         refid="recovering">Recovering</ref>.</p>
@@ -1055,6 +1055,11 @@ s define {
             reports validation error. The text constraints in the
             <m>constraint script</m> are probed in the order of
             definition.</desc>
+        </commanddef>
+        <commanddef>
+            <command><cmd>type</cmd> <m>text type name</m></command>
+            <desc>This text constraint matches if the text type given
+            as argument matches.</desc>
         </commanddef>
         </commandlist>
     </subsection>

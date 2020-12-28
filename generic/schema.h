@@ -173,7 +173,7 @@ typedef struct SchemaData_
     char *currentNamespace;
     int   defineToplevel;
     int   isTextConstraint;
-    int   isAttributeConstaint;
+    int   isAttributeConstraint;
     SchemaCP *cp;
     unsigned int contentSize;
     SchemaAttr **currentAttrs;

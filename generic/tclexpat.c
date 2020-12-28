@@ -449,7 +449,7 @@ FindUniqueCmdName(
  * TclExpatInitializeParser --
  *
  *	Create or re-initializes (if it already exists) the expat
- *	parser and initialise (some of) the TclExpatInfo structure.
+ *	parser and initialize (some of) the TclExpatInfo structure.
  *
  *	Note that callback commands are not affected by this routine,
  *	to allow a reset to leave these intact.

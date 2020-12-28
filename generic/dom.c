@@ -1359,7 +1359,7 @@ elemNSfound:
            of id(). If some elements share the same ID, the first in
            document order should be used. Doing it this way, this is
            guaranteed for unchanged DOM trees. There are problems, if
-           the DOM tree is changed, befor using id() */
+           the DOM tree is changed, before using id() */
         if (hnew) {
             Tcl_SetHashValue (h, node);
         }

@@ -104,7 +104,7 @@ struct Er {
 |   The following flag is TRUE if entity reference hash table needs
 |   to be initialized.
 |
-|   Hash table is used read-only, therefore just one copy, protected with
+|   Hash table is used read-only, therefore, just one copy, protected with
 |   mutex when used in threading environments. The mutex is used only for
 |   initial setup of the table.
 |
@@ -174,7 +174,7 @@ static Er er_sequences[] = {
 \---------------------------------------------------------------------------*/
 static void ErInit (void)
 {
-    size_t i;  /* For looping thru the list of entity references */
+    size_t i;  /* For looping through the list of entity references */
     int h;  /* The hash on a entity */
 
     for(i=0; i<sizeof(er_sequences)/sizeof(er_sequences[0]); i++){
