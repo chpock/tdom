@@ -16,7 +16,7 @@ package require tcltest 2.2
 namespace import ::tcltest::*
 catch {tcltest::loadTestedCommands}
 
-if {[catch {package require -exact tdom 0.9.2}]} {
+if {[catch {package require -exact tdom 0.9.3}]} {
     if {[catch {load [file join [file dir [info script]] ../unix/libtdom0.9.2.so]}]} {
         error "Unable to load the appropriate tDOM version!"
     }
