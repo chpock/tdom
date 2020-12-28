@@ -229,11 +229,6 @@ tDOM_probeAttributes (
     const char **attr
     );
 
-typedef struct domDocument domDocument;
-typedef struct domNode domNode;
-typedef struct domAttrNode domAttrNode;
-typedef struct domTextNode domTextNode;
-
 int tDOM_probeDomAttributes (
     Tcl_Interp *interp,
     SchemaData *sdata,
