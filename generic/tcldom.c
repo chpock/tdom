@@ -4406,6 +4406,7 @@ static int convertToXSLTCmd (
                                                       tcldom_xpathFuncCallBack,
                                                       interp, 0, &errMsg);
     if (!clientData) {
+        doc->nodeFlags &= ~DONT_FREE;
         SetResult(errMsg);
         if (setVariable) {
             objVar = Tcl_GetString(var_name);
