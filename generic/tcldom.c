@@ -2904,7 +2904,7 @@ void tcldom_treeAsXML (
         case COMMENT_NODE:
             if (indent != -1) {
                 for(i=0; i<level; i++) {
-                    writeChars(xmlString, chan, "        ", indent);
+                    writeChars(xmlString, chan, indBuf, indBufCount);
                 }
             }
             writeChars(xmlString, chan, "<!--", 4);
@@ -2917,7 +2917,7 @@ void tcldom_treeAsXML (
         case PROCESSING_INSTRUCTION_NODE:
             if (indent != -1) {
                 for(i=0; i<level; i++) {
-                    writeChars(xmlString, chan, "        ", indent);
+                    writeChars(xmlString, chan, indBuf, indBufCount);
                 }
             }
             writeChars(xmlString, chan, "<?", 2);

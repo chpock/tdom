@@ -371,6 +371,20 @@ test domDoc-1.38 {asHTML -breakLines} {
 ><p
 >boo</p></body></html>}
 
+test domDoc-1.39 {asXML -indent tabs w/ comment} {
+    set doc [dom parse {<doc><a><!-- comment one --><b/><!-- comment two --></a><!-- comment three --></doc>}]
+    set result [$doc asXML -indent tabs]
+    $doc delete
+    set result
+} "<doc>\n\t<a\>\n\t\t<!-- comment one -->\n\t\t<b/>\n\t\t<!-- comment two -->\n\t</a>\n\t<!-- comment three -->\n</doc>\n"
+
+test domDoc-1.40 {asXML -indent tabs w/ processing-instruction} {
+    set doc [dom parse {<doc><a><?p 1?><b/><?p 2?></a><?p 3?></doc>}]
+    set result [$doc asXML -indent tabs]
+    $doc delete
+    set result
+} "<doc>\n\t<a\>\n\t\t<?p 1?>\n\t\t<b/>\n\t\t<?p 2?>\n\t</a>\n\t<?p 3?>\n</doc>\n"
+
 set doc [dom parse <root/>]
 
 test domDoc-2.1 {publicId - no publicId there} {

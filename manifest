@@ -1,5 +1,5 @@
-C Better\simplementation\sof\sindentation\swith\stabs\sor\swhite\sspace.
-D 2021-01-06T18:16:00.345
+C If\sasXML\s-indent\stab\sis\sused\snow\scomments\sand\sprocessing\sinstructions\sare\salso\sindented\swith\stabs.
+D 2021-01-06T22:34:09.984
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -146,7 +146,7 @@ F generic/nodecmd.c ee14ed666ca6d18977f7301545c52ac71b3ce73c49233ff8f8b3aa414400
 F generic/nodecmd.h d2201b69de9507f86e94750f0b72867ec9150795712ef18c5b5b87f35a689f75
 F generic/schema.c 6d77c0ecc9746709d187d46d39c208f341da729590ee8b55d510b07f5af5dd87
 F generic/schema.h 91b424bd18fcb85d0062ba46147c0ae73acfcf8d22477e4ba46aca87f16f4514
-F generic/tcldom.c f8a12a7ee272ad1d2fcfea6a4b25b8d59e0522cd89af0f26d71943380c9245de
+F generic/tcldom.c 79c8f0bd498b10eedd9ed473732e6ba5757903a45caa318516e6d847e0212215
 F generic/tcldom.h 37ee136d483b683c7e3e9e94ce8284520c7998cb1340047fc540dd7701825dc6
 F generic/tclexpat.c 9796c45c6cf414a85fae95377d80514c3203d97a014a782f9d0ac0f0d2e076ce
 F generic/tclexpat.h 145406289081e71aca82c6a432f0b2eb6d4550a7eefa2ff9fa047dfe27d0fa61
@@ -196,7 +196,7 @@ F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.bench 5446ce379127b8d5700f18a5a0848e580313d0d7
 F tests/dom.test e12106616f82c356a2dd38082747acf32f5a26d72cfd257e987b2d8b5cc2622e
-F tests/domDoc.test cb833d2139c8d9671e50f3cf4155b85e082674bcc534562128be0dee3419e71d
+F tests/domDoc.test d725aafa5cc40dd1ff72680f4a1f204c7a2ee7e3978ae299435af5877923cc3b
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test 4c53cbeb4323610f52e4b6d3ff4ca9336fa7b61f9f78d90a2aea391d60d3f5f6
 F tests/domjson.test bdfbe938f33931f56f9496aac425b2183373f4cb926b95a04fa095bd3b75cd3d
@@ -238,8 +238,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 226d987aaae2b82a9ea5c3381423b5b0f2fab6235dbdbe691678c30ea4f33964
-R a9ca7fb31ea8888897d4c63b2086a17b
+P a4dcb11f16aca780c3352d66b2592a9ab95e780838ad3ee30893b13566cba93b
+R ae3d3d337d46530ea9eefb56dc9937a9
 U rolf
-Z ce85d568a553a05e0f94dd79487c78cb
+Z 318c21fa6a0288af512a33c52cc0b479
 # Remove this line to create a well-formed Fossil manifest.
