@@ -1,3 +1,50 @@
+
+2020-12-28  Rolf Ade  <rolf@pointsman.de>
+
+        Updated to expat 2.2.10.
+
+--- Release 0.9.2, 27. Aug. 2020 --- 
+
+2020-08-21  Rolf Ade  <rolf@pointsman.de>
+
+        Added tdom::schema command.
+
+2020-08-21  Rolf Ade  <rolf@pointsman.de>
+
+        Added -onlyContents and -breakLines to asHTML.
+
+2020-08-17  Rolf Ade  <rolf@pointsman.de>
+
+        Updated TEA.
+
+2020-07-23  Rolf Ade  <rolf@pointsman.de>
+
+        Added -indent value "tab" to asXML and asJSON.
+
+2020-07-03  Rolf Ade  <rolf@pointsman.de>
+
+        User configurable separator character between namespace URI
+        and local name for XML namespace-aware SAX parser:  Added the
+        option -namespaceseparator to the expat command.
+
+2020-05-14  Rolf Ade  <rolf@pointsman.de>
+
+        Added method clearString to the dom command.
+
+2019-12-31  Rolf Ade  <rolf@pointsman.de>
+
+        Updated to expat 2.2.9.
+
+2018-10-12  Rolf Ade  <rolf@pointsman.de>
+
+        Updated to expat 2.2.6.
+
+2018-08-08  Rolf Ade  <rolf@pointsman.de>
+
+        Changed the license to MPL 2.0.
+
+--- Release 0.9.1, 24. Jul. 2018 --- 
+
 2018-07-16  Rolf Ade  <rolf@pointsman.de>
 
         The package name is tDOM, but it always has been requested by

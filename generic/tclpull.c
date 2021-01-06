@@ -4,7 +4,7 @@
 |
 |
 |   The contents of this file are subject to the Mozilla Public License
-|   Version 1.1 (the "License"); you may not use this file except in
+|   Version 2.0 (the "License"); you may not use this file except in
 |   compliance with the License. You may obtain a copy of the License at
 |   http://www.mozilla.org/MPL/
 |
@@ -785,7 +785,7 @@ tDOM_PullParserInstanceCmd (
         }
 #endif
         pullInfo->mode = PULLPARSEMODE_FIND;
-        /* As long as we don't evalute any tcl script code during a
+        /* As long as we don't evaluate any Tcl script code during a
          * pull parser method call this should be secure. */
         pullInfo->findElement = Tcl_GetString (objv[2]);
         Tcl_DStringSetLength (pullInfo->cdata, 0);
@@ -834,10 +834,10 @@ tDOM_PullParserInstanceCmd (
         case PULLPARSERSTATE_PARSE_ERROR:
             if ((enum method) methodIndex == m_line) {
                 Tcl_SetObjResult(interp,
-                    Tcl_NewIntObj (XML_GetCurrentLineNumber(pullInfo->parser)));
+                    Tcl_NewLongObj (XML_GetCurrentLineNumber(pullInfo->parser)));
             } else {
                 Tcl_SetObjResult(interp,
-                    Tcl_NewIntObj (XML_GetCurrentColumnNumber(pullInfo->parser)));
+                    Tcl_NewLongObj (XML_GetCurrentColumnNumber(pullInfo->parser)));
             }
             break;
         case PULLPARSERSTATE_START_DOCUMENT:

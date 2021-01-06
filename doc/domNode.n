@@ -288,7 +288,7 @@ that attribute the \fIdefaultValue\fR is returned.
 Sets the value for one or more full qualified
 attributes. Every attribute \fIqualifiedName\fR with the namespace URI
 \&\fIuri\fR will be set to \fInewValue\fR. This will create a new attribute, if
-it wasn't avialble before. If you want to set an attribute within a namespace
+it wasn't available before. If you want to set an attribute within a namespace
 you must specify the attribute name with prefix, even if you want to set an
 already existing attribute to a new value. While searching, if the attribute
 already exists, only the given \fIuri\fR and the localname of the
@@ -300,8 +300,9 @@ already exists, only the given \fIuri\fR and the localname of the
 $node setAttributeNS "http://some.uri.com/wow" prefix:attr1 attrValue
 .CE
 .PP
-If the uri is the empty string and the attribute name hasn't a prefix, this
-method has the same effect as the method \fBsetAttribute\fR.
+If the uri is the empty string and the attribute name has no
+prefix, this method has the same effect as the method
+\&\fBsetAttribute\fR.
 
 
         
@@ -310,7 +311,7 @@ $node setAttributeNS "" attri "some Value"
 .CE
 .PP
 With the exceptions of the special prefixes "xmlns" and "xml" you
-always must provide a non empty \fIuri\fR, if your \fIqualifiedName\fR has a
+always must provide a non empty \fIuri\fR if your \fIqualifiedName\fR has a
 prefix. It is not recommended to set xml namespace declarations. The effects are complicated and not always obvious up to resulting a not well-formed serializations after further processing.
 .RE
 .TP
@@ -319,11 +320,11 @@ prefix. It is not recommended to set xml namespace declarations. The effects are
 the namespace \fIuri\fR.
 .TP
 \&\fB\fBattributes\fP \fB?attributeNamePattern?\fP
-\&\fRReturns information about the attriubtes matching the
+\&\fRReturns information about the attributes matching the
 \&\fIattributeNamePattern\fR. If \fIattributeNamePattern\fR
 isn't given, information about all attributes are returned.
 The return value is a Tcl list, the elements just the
-attriubute name in case of non namespaced attriubtes and three
+attribute name in case of non namespaced attributes and three
 element sublists for namespaced attributes. n case of an
 "ordinary" namespaced attribute, the sublist elements are
 {<localname> <prefix> <namespace_uri>}. In the special case of
@@ -504,7 +505,7 @@ XML.
 \&\fRReturns the DOM substree starting form the current node as a
 nested Tcl list.
 .TP
-\&\fB\fBasXML\fP \fB?-indent none/1..8?\fP \fB?-channel channelId?\fP \fB?-escapeNonASCII?\fP \fB-xmlDeclaration <boolean>?\fP \fB-encString <string>\fP \fB?-escapeAllQuot?\fP \fB?-indentAttrs?\fP \fB?-nogtescape?\fP \fB?-noEmptyElementTag?\fP
+\&\fB\fBasXML\fP \fB?-indent none/tabs/1..8?\fP \fB?-channel channelId?\fP \fB?-escapeNonASCII?\fP \fB?-doctypeDeclaration <boolean>?\fP \fB-xmlDeclaration <boolean>?\fP \fB-encString <string>\fP \fB?-escapeAllQuot?\fP \fB?-indentAttrs?\fP \fB?-nogtescape?\fP \fB?-noEmptyElementTag?\fP
 \&\fR
 .RS
 .PP
@@ -513,53 +514,31 @@ node as the root node of the result as an (optional indented)
 XML string or sends the output directly to the given
 channelId.
 .PP
-If the option \fI-escapeNonASCII\fR is given,
-every non 7 bit ASCII character in attribute values or element
-PCDATA content will be escaped as character reference in
-decimal representation.
-.PP
-The flag \fI-xmlDeclaration\fR determines whether there
-will be an XML Declaration and a newline emitted before
-anything else. The default is, to do not. If this flag is
-given with a true argument then
-.PP
-\&\fI-encString\fR sets the encoding value in the XML
-Declaration. Otherwise, this option is ignored. Please note,
-that this option just enhance the string representation of the
-generated XML Declaration with an encoding information string,
-nothing more. It's up to the user to handle encoding in case
-of writing to a channel or reparsing.
-.PP
-If the option \fI-escapeAllQuot\fR is given,
-quotation marks will be escaped with &quot; even in text
-content of elements.
-.PP
-If the option \fI-indentAttrs\fR is
-given, then attributes will each be separated with newlines
-and indented to the same level as the parent node plus the
-value given as argument to \fI-indentAttrs\fR (0..8).
-.PP
-If the option \fI-nogtescape\fR is given then the
-character '>' won't get escaped in attribute values and text
-content of elements. The default is to escape this
-character.
-.PP
-If the option \fI-noEmptyElementTag\fR is given then no
-empty tag syntax will be used. Instead, if an element has
-empty content it will be serialized with an element start tag
-and an immediately following element end tag.
+See the documentation of the of the
+.TP
+\&\fBdomDoc
+\&\fR command method
+\&\fBasXML\fP for a detailed description of the
+arguments.
 .RE
 .TP
-\&\fB\fBasHTML\fP \fB?-channel channelId?\fP \fB?-escapeNonASCII?\fP  \fB?-htmlEntities?\fP
-\&\fRReturns the DOM substree starting from the current node as the
-root node of the result serialized according to HTML rules (HTML elements are
-recognized regardless of case, without end tags for empty HTML elements etc.),
-as string or sends the output directly to the given channelId. If the option
-\&\fI-escapeNonASCII\fR is given, every non 7 bit ASCII character in attribute
-values or element PCDATA content will be escaped as character reference in
-decimal representation. If the option \fI-htmlEntities\fR is given, a
-character is written using its HTML 4.01 character entity reference, if one is
-defined for it.
+\&\fB\fBasHTML\fP \fB?-channel channelId?\fP \fB?-escapeNonASCII?\fP \fB?-htmlEntities?\fP \fB?-doctypeDeclaration <boolean>?\fP \fB?-breakLines?\fP \fB?-onlyContents?\fP
+\&\fR
+.RS
+.PP
+Returns the DOM substree starting from the current
+node as the root node of the result serialized according to
+HTML rules (HTML elements are recognized regardless of case,
+without end tags for empty HTML elements etc.), as string or
+sends the output directly to the given channelId.
+.PP
+See the documentation of the the
+.TP
+\&\fBdomDoc
+\&\fR
+method \fBasHTML\fP for a detailed description of
+the arguments.
+.RE
 .TP
 \&\fB\fBasText\fP
 \&\fRFor ELEMENT_NODEs, the asText method outputs

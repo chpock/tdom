@@ -4,17 +4,17 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0xc37960">NAME</a> · <a href="#SECTid0xbe8eb0">SYNOPSIS</a> · <a href="#SECTid0xb3ad40">DESCRIPTION </a> · <a href="#SECTid0xc83270">KEYWORDS</a>
+<a href="#SECTid0x5579b5f8c910">NAME</a> · <a href="#SECTid0x5579b5edbb80">SYNOPSIS</a> · <a href="#SECTid0x5579b5f83930">DESCRIPTION </a> · <a href="#SECTid0x5579b5ff2110">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0xc37960">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x5579b5f8c910">NAME</a></h2><p class="namesection">
 <b class="names">dom - </b><br>Create an in-memory DOM tree from XML</p>
   
-  <h2><a name="SECTid0xbe8eb0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x5579b5edbb80">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">dom</b> <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
 
-  <h2><a name="SECTid0xb3ad40">DESCRIPTION </a></h2><p>This command provides the creation of DOM trees in memory. In
+  <h2><a name="SECTid0x5579b5f83930">DESCRIPTION </a></h2><p>This command provides the creation of DOM trees in memory. In
 the usual case a string containing a XML information is parsed and converted
 into a DOM tree. Other possible parse input may be HTML or JSON.
 The <i class="m">method</i> indicates a specific subcommand. </p><p>The valid methods are:</p><dl class="commandlist">
@@ -124,12 +124,26 @@ used, which tries to even parse badly formed HTML into a DOM tree.</dd>
               
 
               
+                <dt><b>-jsonroot &lt;document element name&gt;</b></dt>
+                <dd>If given makes the given element name the
+                document element of the resulting doc. The parsed
+                content of the JSON string will be the childs of this
+                document element node.</dd>
+              
+              
+              
                 <dt>
 <b>-jsonmaxnesting</b> <i>integer</i>
 </dt>
                 
                 <dd>This option only has effect if used together
-                with the <i class="m">-json</i> option. The current implementation uses recursive descent JSON parser. In order to avoid using excess stack space, any JSON input that has more than a certain levels of nesting is considered invalid. The default maximum nesting is 2000. The option -jsonmaxnesting allows the user to adjust that.</dd>
+                with the <i class="m">-json</i> option. The current
+                implementation uses a recursive descent JSON parser.
+                In order to avoid using excess stack space, any JSON
+                input that has more than a certain levels of nesting
+                is considered invalid. The default maximum nesting is
+                2000. The option -jsonmaxnesting allows the user to
+                adjust that.</dd>
               
               
               
@@ -297,11 +311,15 @@ called. The <i class="m">-useForeignDTD</i> respects </dd>
                 un-prefixed elements or even if the element has a
                 defined namespace prefix. One consequence is that
                 XPath node expressions on such a DOM tree doesn't work
-                as expected. Prefixed element nodes can't be selected
-                and element nodes without prefix will be seen by XPath
-                expressions as if they are not in any namespace (no
-                matter if they are in fact should be in a default
-                namespace).
+                as may be expected. Prefixed element nodes can't be
+                selected naively and element nodes without prefix will
+                be seen by XPath expressions as if they are not in any
+                namespace (no matter if they are in fact should be in
+                a default namespace). If you need to inject prefixed
+                node names into an XPath expression use the '%' syntax
+                described in the documentation of the of the
+                <b class="command">domNode</b> command method
+                <b class="method">&gt;selectNodes</b>.
                 </dd>
               
 
@@ -534,6 +552,14 @@ recommendation. Otherwise it returns 0.</dd>
 
         
           <dt>
+<b class="cmd">dom</b> <b class="method">clearString</b> <i class="m">string</i>
+</dt>
+          <dd>Returns the string given as argument cleared out from any characters not
+          allowed as XML parsed character data.</dd>
+        
+        
+        
+          <dt>
 <b class="cmd">dom</b> <b class="method">isBMPCharData</b>
 <i class="m">string</i>
 </dt>
@@ -590,18 +616,18 @@ recommendation. Otherwise it returns 0.</dd>
                 
                 
                     <dt><b>expatmajorversion</b></dt>
-                    <dd>Returns the major version of the underlyling
-                    expat version as integer.</dd>
+                    <dd>Returns the major version of the at build
+                    time used expat version as integer.</dd>
                 
                 
                     <dt><b>expatminorversion</b></dt>
-                    <dd>Returns the minor version of the underlyling
-                    expat version as integer.</dd>
+                    <dd>Returns the minor version of the at build
+                    time used expat version as integer.</dd>
                 
                 
                     <dt><b>expatmicroversion</b></dt>
-                    <dd>Returns the micro version of the underlyling
-                    expat version as integer.</dd>
+                    <dd>Returns the micro version of the at build
+                    time used expat version as integer.</dd>
                 
                 
                     <dt><b>dtd</b></dt>
@@ -647,12 +673,17 @@ recommendation. Otherwise it returns 0.</dd>
                     <dd>Returns as boolean if the pullparser command
                     is build in.</dd>
                 
+                
+                    <dt><b>schema</b></dt>
+                    <dd>Returns as boolean if the tDOM schema features
+                    are build in.</dd>
+                
             </dl>
             </dd>   
         
     </dl>
 
-<h2><a name="SECTid0xc83270">KEYWORDS</a></h2><p class="keywords">
+<h2><a name="SECTid0x5579b5ff2110">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-XML">XML</a>, <a class="keyword" href="keyword-index.html#KW-DOM">DOM</a>, <a class="keyword" href="keyword-index.html#KW-document">document</a>, <a class="keyword" href="keyword-index.html#KW-node">node</a>, <a class="keyword" href="keyword-index.html#KW-parsing">parsing</a>
 </p>
 </div><hr class="navsep"><div class="navbar" align="center">

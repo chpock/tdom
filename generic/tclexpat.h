@@ -68,7 +68,7 @@ typedef struct CHandlerSet {
 
 /*----------------------------------------------------------------------------
 |   The structure below is used to refer to an event handler set
-|   of tcl scripts.
+|   of Tcl scripts.
 \---------------------------------------------------------------------------*/
 
 typedef struct TclHandlerSet {
@@ -136,6 +136,9 @@ typedef struct TclGenExpatInfo {
     int useForeignDTD;
     const char *currentmarkup;  /* Used to transfer data for method */
     int currentmarkuplen;       /* currentmarkup */
+#ifndef TDOM_NO_SCHEMA
+    SchemaData *sdata;          /* Validation / Schema data */
+#endif
  
     TclHandlerSet *firstTclHandlerSet;
     CHandlerSet *firstCHandlerSet;
@@ -151,23 +154,23 @@ typedef struct TclGenExpatInfo {
 #  define TCL_STORAGE_CLASS DLLEXPORT
 #endif
 
-EXTERN Tcl_ObjCmdProc TclExpatObjCmd;
+Tcl_ObjCmdProc TclExpatObjCmd;
 
-EXTERN int CheckExpatParserObj (Tcl_Interp *interp,
-				Tcl_Obj *const nameObj);
-EXTERN int CHandlerSetInstall (Tcl_Interp *interp,
-			       Tcl_Obj *const expatObj,
-			       CHandlerSet *handlerSet);
-EXTERN int CHandlerSetRemove (Tcl_Interp *interp,
-			      Tcl_Obj *const expatObj,
-			      char *handlerSetName);
-EXTERN CHandlerSet * CHandlerSetCreate (char *name);
-EXTERN CHandlerSet * CHandlerSetGet (Tcl_Interp *interp,
-                                     Tcl_Obj *const expatObj,
-				     char *handlerSetName);
-EXTERN void * CHandlerSetGetUserData (Tcl_Interp *interp,
-                                      Tcl_Obj *const expatObj,
-				      char *handlerSetName);
+int CheckExpatParserObj (Tcl_Interp *interp,
+ 			Tcl_Obj *const nameObj);
+int CHandlerSetInstall (Tcl_Interp *interp,
+ 		       Tcl_Obj *const expatObj,
+ 		       CHandlerSet *handlerSet);
+int CHandlerSetRemove (Tcl_Interp *interp,
+ 		      Tcl_Obj *const expatObj,
+ 		      char *handlerSetName);
+CHandlerSet * CHandlerSetCreate (char *name);
+CHandlerSet * CHandlerSetGet (Tcl_Interp *interp,
+                              Tcl_Obj *const expatObj,
+ 			     char *handlerSetName);
+void * CHandlerSetGetUserData (Tcl_Interp *interp,
+                               Tcl_Obj *const expatObj,
+ 			      char *handlerSetName);
 
-EXTERN TclGenExpatInfo * GetExpatInfo (Tcl_Interp *interp,
+TclGenExpatInfo * GetExpatInfo (Tcl_Interp *interp,
 				       Tcl_Obj *const expatObj);

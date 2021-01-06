@@ -105,6 +105,22 @@ xmlns:x='urn:schema'><Test/></x:Test>
     list $::result [eval keysort $::nsdecls]
 } {{{} http://www.zveno.com/Schemas x urn:schema urn:schema:Test http://www.zveno.com/Schemas:Test} {}}
 
+test ns-1.5 {Place of -namespace option in arg list} {
+    set ::result {}
+    set ::nsdecls {}
+
+    catch {rename xml::ns-1.5 {}}
+    set parser [xml::parser ns-1.4 \
+            -startnamespacedeclcommand NSDeclStart \
+            -namespace \
+            -elementstartcommand EStart]
+    $parser parse {<?xml version="1.0"?>
+<x:Test xmlns="http://tdom.org/Schemas"
+xmlns:x='urn:schema'><Test/></x:Test>
+}
+    list $::result [eval keysort $::nsdecls]
+} {{{} http://tdom.org/Schemas x urn:schema urn:schema:Test http://tdom.org/Schemas:Test} {}}
+
 test ns-2.0 {Multiple namespace declarations, same prefix} {
     set ::result {}
     set ::nsdecls {}
@@ -126,6 +142,76 @@ test ns-2.0 {Multiple namespace declarations, same prefix} {
 }
     list $::result [eval keysort $::nsdecls]
 } {{Test x http://www.zveno.com/Schemas http://www.zveno.com/Schemas:Test http://www.zveno.com/Schemas:y x urn:schema urn:schema:Test urn:schema:z} {}}
+
+test ns-3.1 {-namespaceseparator} {
+    set result ""
+    
+    catch {rename xml::ns-3.1 {}}
+    set parser [xml::parser ns-3.1 \
+                    -namespace \
+                    -namespaceseparator = \
+                    -elementstartcommand EStart]
+    $parser parse {<?xml version="1.0"?>
+<Test>
+  <x:Test xmlns:x="http://tdom.org/Schemas">
+    <x:y/>
+  </x:Test>
+  <x:Test xmlns:x='urn:schema'>
+    <x:z/>
+  </x:Test>
+</Test>
+}
+    set result
+} {Test http://tdom.org/Schemas=Test http://tdom.org/Schemas=y urn:schema=Test urn:schema=z}
+
+test ns-3.2 {-namespaceseparator} {
+    set result ""
+    
+    catch {rename xml::ns-3.2 {}}
+    set parser [xml::parser ns-3.2 \
+                    -namespace \
+                    -namespaceseparator "" \
+                    -elementstartcommand EStart]
+    $parser parse {<?xml version="1.0"?>
+<Test>
+  <x:Test xmlns:x="http://tdom.org/Schemas">
+    <x:y/>
+  </x:Test>
+  <x:Test xmlns:x='urn:schema'>
+    <x:z/>
+  </x:Test>
+</Test>
+}
+    set result
+} "Test http://tdom.org/SchemasTest http://tdom.org/Schemasy urn:schemaTest urn:schemaz"
+
+test ns-3.3 {-namespaceseparator} {
+    set result ""
+    
+    catch {rename xml::ns-3.3 {}}
+    set parser [xml::parser ns-3.3 \
+                    -namespace \
+                    -namespaceseparator \x00 \
+                    -elementstartcommand EStart]
+    $parser parse {<?xml version="1.0"?>
+<Test>
+  <x:Test xmlns:x="http://tdom.org/Schemas">
+    <x:y/>
+  </x:Test>
+  <x:Test xmlns:x='urn:schema'>
+    <x:z/>
+  </x:Test>
+</Test>
+}
+    set result
+} "Test http://tdom.org/SchemasTest http://tdom.org/Schemasy urn:schemaTest urn:schemaz"
+
+test ns-3.4 {-namespaceseparator} {
+    catch {rename xml::ns-3.4 {}}
+    set parser [xml::parser ns-3.4 \
+                    -namespaceseparator =]
+    $parser cget -namespaceseparator
+} =
 
 foreach parser [info commands ns-*] {
     $parser free

@@ -2,16 +2,13 @@
 |   Copyright (C) 1999-2000  Jochen C. Loewer (loewerj@hotmail.com)
 +----------------------------------------------------------------------------
 |
-|   $Id$
-|
-|
-|   A special memory allocator, which uses pre-allocated / bit masked
+|   A special memory allocator, which uses preallocated / bit masked
 |   based administration of memory block with fixed sizes, like
 |   DOM nodes. This will hopefully save some memory.
 |
 |
 |   The contents of this file are subject to the Mozilla Public License
-|   Version 1.1 (the "License"); you may not use this file except in
+|   Version 2.0 (the "License"); you may not use this file except in
 |   compliance with the License. You may obtain a copy of the License at
 |   http://www.mozilla.org/MPL/
 |

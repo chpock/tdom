@@ -19,7 +19,7 @@ dnl	to configure the system for the local environment.
 # so that we create the export library with the dll.
 #-----------------------------------------------------------------------
 
-AC_INIT([tdom], [0.9.1])
+AC_INIT([tdom], [0.9.3])
 
 #--------------------------------------------------------------------
 # Call TEA_INIT as the first TEA_ macro to set up initial vars.
@@ -81,6 +81,28 @@ TDOM_PATH_EXPAT
 TDOM_EXPAT_ENTROPY
 
 #--------------------------------------------------------------------
+# We need the UINT2PTR and PTR2UINT macros, so make sure that intptr_t
+# is defined.
+#--------------------------------------------------------------------
+
+AC_CHECK_TYPE([uintptr_t], [
+    AC_DEFINE([HAVE_UINTPTR_T], 1, [Do we have the uintptr_t type?])], [
+    AC_CACHE_CHECK([for pointer-size unsigned integer type], tcl_cv_uintptr_t, [
+    for tcl_cv_uintptr_t in "unsigned int" "unsigned long" "unsigned long long" \
+	    none; do
+	if test "$tcl_cv_uintptr_t" != none; then
+	    AC_COMPILE_IFELSE([AC_LANG_BOOL_COMPILE_TRY([AC_INCLUDES_DEFAULT],
+		    [[sizeof (void *) <= sizeof ($tcl_cv_uintptr_t)]])],
+		[tcl_ok=yes], [tcl_ok=no])
+	    test "$tcl_ok" = yes && break; fi
+    done])
+    if test "$tcl_cv_uintptr_t" != none; then
+	AC_DEFINE_UNQUOTED([uintptr_t], [$tcl_cv_uintptr_t], [Unsigned integer
+	   type wide enough to hold a pointer.])
+    fi
+])
+
+#--------------------------------------------------------------------
 # Add HTML5 parsing support.
 #--------------------------------------------------------------------
 
@@ -109,6 +131,7 @@ TEA_ADD_SOURCES([generic/xmlsimple.c \
                  generic/tdominit.c  \
                  generic/tclexpat.c  \
                  generic/tclpull.c   \
+                 generic/schema.c \
                  generic/tdomStubInit.c])
 TEA_ADD_HEADERS([generic/tdom.h])
 TEA_ADD_INCLUDES([-I${srcdir}/generic ${AOL_INCLUDES} ${HTML5_INCLUDES}])
@@ -219,6 +242,7 @@ TDOM_ENABLE_NS
 TDOM_ENABLE_UNKNOWN
 TDOM_ENABLE_TDOMALLOC
 TDOM_ENABLE_LESS_NS
+TDOM_ENABLE_SCHEMA
 
 TDOMSHELL=tcldomsh
 AC_SUBST(TDOMSHELL)

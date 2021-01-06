@@ -2,15 +2,12 @@
 |   Copyright (C) 1999  Jochen C. Loewer (loewerj@hotmail.com)
 +----------------------------------------------------------------------------
 |
-|   $Id$
-|
-|
 |   A DOM interface upon the expat XML parser for the C language
 |   according to the W3C recommendation REC-DOM-Level-1-19981001
 |
 |
 |   The contents of this file are subject to the Mozilla Public License
-|   Version 1.1 (the "License"); you may not use this file except in
+|   Version 2.0 (the "License"); you may not use this file except in
 |   compliance with the License. You may obtain a copy of the License at
 |   http://www.mozilla.org/MPL/
 |
@@ -74,6 +71,7 @@
 #  define tdomstrdup        strdup
 # endif /* TCL_MEM_DEBUG */
 #endif /* USE_NORMAL_ALLOCATOR */
+#define TMALLOC(t) (t*)MALLOC(sizeof(t))
 
 #if defined(TCL_MEM_DEBUG) || defined(NS_AOLSERVER) 
    static void* my_malloc(size_t size){return Tcl_Alloc(size);}
@@ -420,7 +418,7 @@ typedef unsigned int domDocFlags;
 #define VAR_TRACE                32
 
 /*--------------------------------------------------------------------------
-|   a index to the namespace records
+|   an index to the namespace records
 |
 \-------------------------------------------------------------------------*/
 typedef unsigned int domNameSpaceIndex;
@@ -567,8 +565,8 @@ typedef struct _domActiveNS {
 \-------------------------------------------------------------------------*/
 typedef struct domLineColumn {
 
-    int   line;
-    int   column;
+    long  line;
+    long  column;
 
 } domLineColumn;
 
@@ -707,6 +705,8 @@ typedef struct domAttrNode {
 typedef int  (*domAddCallback)  (domNode * node, void * clientData);
 typedef void (*domFreeCallback) (domNode * node, void * clientData);
 
+#include <schema.h>
+
 /*--------------------------------------------------------------------------
 |   Function prototypes
 |
@@ -734,6 +734,9 @@ domDocument *  domReadDocument   (XML_Parser parser,
                                   Tcl_Obj *extResolver,
                                   int   useForeignDTD,
                                   int   paramEntityParsing,
+#ifndef TDOM_NO_SCHEMA
+                                  SchemaData *sdata,
+#endif
                                   Tcl_Interp *interp,
                                   int  *status);
 
@@ -809,7 +812,7 @@ domNS *        domLookupURI     (domNode *node, char *uri);
 domNS *        domGetNamespaceByIndex (domDocument *doc, int nsIndex);
 domNS *        domNewNamespace (domDocument *doc, const char *prefix,
                                 const char *namespaceURI);
-int            domGetLineColumn (domNode *node, int *line, int *column);
+int            domGetLineColumn (domNode *node, long *line, long *column);
 
 int            domXPointerChild (domNode * node, int all, int instance, domNodeType type,
                                  char *element, char *attrName, char *attrValue,
@@ -839,6 +842,7 @@ int            domIsPINAME (const char *name);
 int            domIsQNAME (const char *name);
 int            domIsNCNAME (const char *name);
 int            domIsChar (const char *str);
+char *         domClearString (char *str, int *haveToFree);
 int            domIsBMPChar (const char *str);
 int            domIsComment (const char *str);
 int            domIsCDATA (const char *str);

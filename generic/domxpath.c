@@ -2,9 +2,6 @@
 |   Copyright (c) 1999-2001 Jochen Loewer (loewerj@hotmail.com)
 |-----------------------------------------------------------------------------
 |
-|   $Id$
-|
-|
 |   A XPath implementation (lexer/parser/evaluator) for tDOM,
 |   the DOM implementation for Tcl.
 |   Based on November 16 1999 Recommendation of the W3C
@@ -12,7 +9,7 @@
 |
 |
 |   The contents of this file are subject to the Mozilla Public License
-|   Version 1.1 (the "License"); you may not use this file except in
+|   Version 2.0 (the "License"); you may not use this file except in
 |   compliance with the License. You may obtain a copy of the License at
 |   http://www.mozilla.org/MPL/
 |
@@ -48,7 +45,7 @@
 |                           function, made lexer utf-8 aware, node sets
 |                           could now include nodes of different types,
 |                           better IEEE 754 rules support, code
-|                           restructured, serveral optimizations and bug
+|                           restructured, several optimizations and bug
 |                           fixes.
 |
 |   written by Jochen Loewer
@@ -263,6 +260,28 @@ void xpathRSFree ( xpathResultSet *rs ) {
         if (rs->string) FREE((char*)rs->string);
     }
     rs->type = EmptyResult;
+}
+
+void
+xpathRSReset (
+    xpathResultSet *rs,
+    domNode *node
+    ) 
+{
+    if (rs->type == StringResult) FREE(rs->string);
+    if (node) {
+        if (!rs->nodes) {
+            rs->nodes     = (domNode**)MALLOC( INITIAL_SIZE*sizeof(domNode*));
+            rs->allocated = INITIAL_SIZE;
+        }
+        rs->nodes[0] = node;
+        rs->nr_nodes = 1;
+        rs->type = xNodeSetResult;
+    } else {
+        rs->nr_nodes = 0;
+        if (rs->nodes) rs->type = xNodeSetResult;
+        else rs->type = EmptyResult;
+    }
 }
 
 void rsPrint ( xpathResultSet *rs ) {
@@ -677,7 +696,7 @@ static XPathTokens xpathLexer (
 {
     int  l, allocated;
     int  i, k, start, offset;
-    char delim, *ps, save, tmpErr[80];
+    char delim, *ps, save, tmpErr[80], *tailptr;
     const char *uri;
     XPathTokens tokens;
     int token = EOS;
@@ -926,7 +945,7 @@ static XPathTokens xpathLexer (
                            token = DOT;
                            break;
                        }
-                       /* DOT followed by digit, ie a REAL.
+                       /* DOT followed by digit, i.e. a REAL.
                           Handled by default. Fall throu */
 
             default:   if ( isNCNameStart (&xpath[i])) {
@@ -1111,8 +1130,14 @@ static XPathTokens xpathLexer (
                                    token = REALNUMBER;
                                }
                            }
-                           tokens[l].realvalue = (double)atof(ps);
+                           tokens[l].realvalue = strtod(ps, &tailptr);
                            xpath[i--] = save;
+                           if (tokens[l].realvalue == 0.0 && tailptr == ps) {
+                               sprintf (tmpErr, "Number value too large "
+                                        "at position %d", i);
+                               *errMsg = tdomstrdup (tmpErr);
+                               return tokens;
+                           }
                        } else {
                            sprintf (tmpErr, "Unexpected character '%c' at "
                                     "position %d", xpath[i], i);
@@ -2284,7 +2309,7 @@ int xpathParse (
     }
     DDBG(
         for (i=0; tokens[i].token != EOS; i++) {
-            fprintf(stderr, "%3d %-12s %5ld %8.3f %5d  %s\n",
+            fprintf(stderr, "%3d %-12s %5ld %8.3g %5d  %s\n",
                             i,
                             token2str[tokens[i].token-LPAR],
                             tokens[i].intvalue,
@@ -2317,7 +2342,7 @@ int xpathParse (
         memmove(*errMsg + len+6+newlen, "' ", 3);
 
         for (i=0; tokens[i].token != EOS; i++) {
-            sprintf(tmp, "%s\n%3s%3d %-12s %5ld %09.3f %5d  ",
+            sprintf(tmp, "%s\n%3s%3d %-12s %5ld %09.3g %5d  ",
                          (i==0) ? "\n\nParsed symbols:" : "",
                          (i==l) ? "-->" : "   ",
                           i,
@@ -2435,10 +2460,11 @@ int xpathNodeTest (
         return (node->nodeType == PROCESSING_INSTRUCTION_NODE);
     } else
     if (step->child->type == IsSpecificPI) {
-        return (strncmp (((domProcessingInstructionNode*)node)->targetValue,
-                         step->child->strvalue,
-                         ((domProcessingInstructionNode*)node)->targetLength)
-            == 0);
+        return (node->nodeType == PROCESSING_INSTRUCTION_NODE
+                && strncmp (((domProcessingInstructionNode*)node)->targetValue,
+                            step->child->strvalue,
+                            ((domProcessingInstructionNode*)node)->targetLength)
+                    == 0);
     } else
     if (step->child->type == IsComment) {
         return (node->nodeType == COMMENT_NODE);
@@ -2487,7 +2513,7 @@ static double xpathStringToNumber (
        - strtod() accepts leading whitespace including \f and \v, but
          XPath doesn't allow this characters. Since this two
          characters are not legal XML characters, they can not be part
-         of a DOM tree and therefor there isn't a problem with XPath
+         of a DOM tree and therefore there isn't a problem with XPath
          expressions on DOM trees or in XSLT. But on Tcl level it's
          possible, to feed that characters literal into the XPath
          engine.
@@ -2717,7 +2743,7 @@ char * xpathFuncString (
                 if (IS_INF (rs->realvalue) == 1) return tdomstrdup ("Infinity");
                 else                             return tdomstrdup ("-Infinity");
             }
-            sprintf(tmp, "%f", rs->realvalue);
+            sprintf(tmp, "%g", rs->realvalue);
             /* strip trailing 0 and . */
             len = strlen(tmp);
             for (; (len > 0) && (tmp[len-1] == '0'); len--) tmp[len-1] = '\0';
@@ -2821,6 +2847,65 @@ int xpathRound (double r) {
         return (int)floor (r + 0.5);
     } else {
         return (int)(r + 0.5);
+    }
+}
+
+/*----------------------------------------------------------------------------
+|   idSplitAndAdd
+|
+\---------------------------------------------------------------------------*/
+static void
+idSplitAndAdd (
+    char           *idStr,
+    Tcl_HashTable  *ids,
+    xpathResultSet *result
+    ) 
+{
+    int            pwhite;
+    char          *pfrom, *pto;
+    Tcl_HashEntry *entryPtr;
+    domNode       *node;
+    
+    pwhite = 0;
+    pfrom = pto = idStr;
+    while (*pto) {
+        switch (*pto) {
+        case ' ' : case '\n': case '\r': case '\t':
+            if (pwhite) {
+                pto++;
+                continue;
+            }
+            *pto = '\0';
+            entryPtr = Tcl_FindHashEntry (ids, pfrom);
+            if (entryPtr) {
+                node = (domNode*) Tcl_GetHashValue (entryPtr);
+                /* Don't report nodes out of the fragment list */
+                if (node->parentNode != NULL ||
+                    (node == node->ownerDocument->documentElement)) {
+                    rsAddNode (result, node);
+                }
+            }
+            pwhite = 1;
+            pto++;
+            continue;
+        default:
+            if (pwhite) {
+                pfrom = pto;
+                pwhite = 0;
+            }
+            pto++;
+        }
+    }
+    if (!pwhite) {
+        entryPtr = Tcl_FindHashEntry (ids, pfrom);
+        if (entryPtr) {
+            node = (domNode*) Tcl_GetHashValue (entryPtr);
+            /* Don't report nodes out of the fragment list */
+            if (node->parentNode != NULL ||
+                (node == node->ownerDocument->documentElement)) {
+                rsAddNode (result, node);
+            }
+        }
     }
 }
 
@@ -3072,62 +3157,12 @@ xpathEvalFunction (
         if (leftResult.type == xNodeSetResult) {
             for (i=0; i < leftResult.nr_nodes; i++) {
                 leftStr = xpathFuncStringForNode (leftResult.nodes[i]);
-                entryPtr = Tcl_FindHashEntry (ids, leftStr);
-                if (entryPtr) {
-                    node = (domNode*) Tcl_GetHashValue (entryPtr);
-                    /* Don't report nodes out of the fragment list */
-                    if (node->parentNode != NULL ||
-                        (node == node->ownerDocument->documentElement)) {
-                        rsAddNode (result, node);
-                    }
-                }
+                idSplitAndAdd (leftStr, ids, result);
                 FREE(leftStr);
-                /*xpathRSFree (&newNodeList);*/
             }
         } else {
             leftStr = xpathFuncString (&leftResult);
-            from = 0;
-            pwhite = 0;
-            pfrom = pto = leftStr;
-            while (*pto) {
-                switch (*pto) {
-                case ' ' : case '\n': case '\r': case '\t':
-                    if (pwhite) {
-                        pto++;
-                        continue;
-                    }
-                    *pto = '\0';
-                    entryPtr = Tcl_FindHashEntry (ids, pfrom);
-                    if (entryPtr) {
-                        node = (domNode*) Tcl_GetHashValue (entryPtr);
-                        /* Don't report nodes out of the fragment list */
-                        if (node->parentNode != NULL ||
-                            (node == node->ownerDocument->documentElement)) {
-                            rsAddNode (result, node);
-                        }
-                    }
-                    pwhite = 1;
-                    pto++;
-                    continue;
-                default:
-                    if (pwhite) {
-                        pfrom = pto;
-                        pwhite = 0;
-                    }
-                    pto++;
-                }
-            }
-            if (!pwhite) {
-                entryPtr = Tcl_FindHashEntry (ids, pfrom);
-                if (entryPtr) {
-                    node = (domNode*) Tcl_GetHashValue (entryPtr);
-                    /* Don't report nodes out of the fragment list */
-                    if (node->parentNode != NULL ||
-                        (node == node->ownerDocument->documentElement)) {
-                        rsAddNode (result, node);
-                    }
-                }
-            }
+            idSplitAndAdd (leftStr, ids, result);
             FREE(leftStr);
         }
         sortByDocOrder (result);
@@ -4447,7 +4482,14 @@ static int xpathEvalStep (
             if ((int)dRight == 0) {
                 rsSetNaN (result);
             } else {
-                rsSetInt  (result, ((int)dLeft) % ((int)dRight));
+                if (dRight < LONG_MIN - 0.1
+                    || dRight > LONG_MAX + 0.1
+                    || dLeft < LONG_MIN - 0.1
+                    || dLeft > LONG_MAX + 0.1) {
+                    rsSetNaN (result);
+                } else {
+                    rsSetInt  (result, ((long)dLeft) % ((long)dRight));
+                }
             }
             break;
         default:        break;
@@ -4797,7 +4839,7 @@ static int xpathEvalStep (
                 }
                 break;
             case BoolResult:
-                /* pleftResult is a non-empty nodeset, therefor: */
+                /* pleftResult is a nonempty nodeset, therefore: */
                 dLeft = 1.0;
                 dRight = xpathFuncNumber (prightResult, &NaN);
                 if (NaN) break;
@@ -5216,6 +5258,68 @@ int xpathEval (
 
 } /* xpathEval */
 
+
+int
+xpathEvalAst (
+    ast             t,
+    xpathResultSet *nodeList,
+    domNode        *node,
+    xpathCBs       * cbs,
+    xpathResultSet *rs,
+    char          **errMsg
+    )
+{
+    int i, rc, first = 1, docOrder = 1;
+    xpathResultSet savedContext;
+    savedContext = *nodeList;
+
+    while (t) {
+        DBG (fprintf (stderr, "xpathEvalAst: eval step '%s'\n", 
+                      astType2str[t->type]);)
+        if (t->type == Pred) {
+            *errMsg = "Pred step not expected now!";
+            return XPATH_EVAL_ERR;
+        }
+        if (first) {
+            rc = xpathEvalStepAndPredicates (t, nodeList, node,
+                                             node, 0, &docOrder,
+                                             cbs, rs, errMsg);
+            CHECK_RC;
+            first = 0;
+        } else {
+            DBG( fprintf(stderr, "doing location step nodeList->nr_nodes=%d \n",
+                                 nodeList->nr_nodes);
+            )
+            if (rs->type != xNodeSetResult) {
+                *nodeList = savedContext;
+                return 0;
+            }
+
+            *nodeList = *rs;
+            xpathRSReset (rs, NULL);
+            for (i=0; i < nodeList->nr_nodes; i++) {
+                rc = xpathEvalStepAndPredicates (t, nodeList,
+                                                 nodeList->nodes[i],
+                                                 node, i, &docOrder, NULL,
+                                                 rs, errMsg);
+                if (rc) {
+                    *nodeList = savedContext;
+                    return rc;
+                }
+            }
+        }
+        DBG( fprintf(stderr, "result after location step: \n"); )
+        DBG( rsPrint( result); )
+
+        t = t->next;
+        /* skip the already processed Predicate parts */
+        while (t && t->type == Pred) t = t->next;
+        docOrder = 1;
+    }
+    *nodeList = savedContext;
+    return 0;
+}
+
 /*----------------------------------------------------------------------------
 |   xpathMatches
 |
@@ -5557,7 +5661,7 @@ int xpathMatches (
                     xpathRSFree (&nodeList); return 0;
                 }
 
-                /* if the nr_nodes of nodeList is > 1 (ie. we filter a
+                /* if the nr_nodes of nodeList is > 1 (i.e. we filter a
                    FillNodeList step, not only a FillWithCurrentNode
                    step), build the resulting nodeList context after
                    this predicate */
@@ -5701,11 +5805,13 @@ double xpathGetPrio (
                 return 0.0;
             }
         } else
+        if (steps->type == IsSpecificPI) {
+            return 0.0;
+        } else 
         if ( steps->type == IsNode
              || steps->type == IsText
              || steps->type == IsPI
              || steps->type == IsComment
-             || steps->type == IsSpecificPI
             ) {
             return -0.5;
         } else 

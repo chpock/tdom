@@ -393,7 +393,7 @@ TncFreeTncModel (
  * TncRewriteModel --
  *
  *	This helper procedure creates recursively a TNC_Content from
- *      a XML_Content.
+ *      an XML_Content.
  *
  * Results:
  *	None.
@@ -1418,7 +1418,7 @@ TncProbeElement (
                    child later. Error in document structure. */
                 return 0;
             } else {
-                /* OK, SEQ has matched befor. But after the last match, there
+                /* OK, SEQ has matched before. But after the last match, there
                    where no required (quant NONE or PLUS) childs. */
                 if (stackelm->model->quant == XML_CQUANT_NONE ||
                     stackelm->model->quant == XML_CQUANT_OPT) {
@@ -1430,10 +1430,10 @@ TncProbeElement (
         /* The last untreated case is alreadymatched true,
            zeroMatchPossible (of the rest of the seq childs after the
            last match) true and the entire seq may be
-           multiple. Therefore start again with activeChild = 0, to
+           multiple. Therefore, start again with activeChild = 0, to
            see, if the current nameId starts a repeated match of the
            seq.  By the way: zeroMatchPossible still has initial value
-           1, therefor no second initialiation is needed */
+           1, therefore, no second initialiation is needed */
         for (i = 0; i < seqstartindex; i++) {
             if ((&stackelm->model->children[i])->type == XML_CTYPE_NAME) {
                 if ((&stackelm->model->children[i])->nameId == nameId) {
@@ -1540,7 +1540,7 @@ TncProbeAttribute (
         return 0;
     }
     /* NOTE: attribute uniqueness per element is a wellformed
-               constrain and therefor done by expat. */
+               constrain and therefore done by expat. */
     attDecl = (TNC_AttDecl *) Tcl_GetHashValue (entryPtr);
     switch (attDecl->att_type) {
     case TNC_ATTTYPE_CDATA:
@@ -2133,8 +2133,8 @@ TncElementEndCommand (
         }
     } else {
         /* This means, the root element is closed,
-           therefor the place to check, if every IDREF points
-           to a ID. */
+           therefore, the place to check, if every IDREF points
+           to an ID. */
         if (tncdata->idCheck) {
             for (entryPtr = Tcl_FirstHashEntry (tncdata->ids, &search);
                  entryPtr != NULL;
@@ -2286,7 +2286,7 @@ validateNodeAttributes (
  *
  * validateTree --
  *
- *	Validates a complete DOM (sub-)tree against a the DTD informations in
+ *	Validates a complete DOM (sub-)tree against the DTD information in
  *      the given tncdata structure. The node argument acts as root of the
  *      (sub-)tree.
  *

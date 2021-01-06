@@ -39,6 +39,7 @@
 #include <dom.h>
 #include <tclexpat.h>
 #include <fcntl.h>
+#include <schema.h>
 
 #ifdef _MSC_VER
 #include <io.h>
@@ -86,6 +87,8 @@
                          expat->firstTclHandlerSet = activeTclHandlerSet; \
                          activeTclHandlerSet->nextHandlerSet = tmpTclHandlerSet; \
                       }
+#define SetResult3(str1,str2,str3) Tcl_ResetResult(interp);     \
+                     Tcl_AppendResult(interp, (str1), (str2), (str3), NULL)
 
 /*----------------------------------------------------------------------------
 |   typedefs
@@ -97,8 +100,6 @@ typedef enum {
     EXPAT_INPUT_CHANNEL,
     EXPAT_INPUT_FILENAME
 } TclExpat_InputType;
-
-
 
 /*----------------------------------------------------------------------------
 |   local globals
@@ -344,9 +345,6 @@ TclExpatObjCmd(
     Tcl_Obj *const objv[]
 ) {
   TclGenExpatInfo *genexpat;
-  int ns_mode = 0;
-  char *nsoption;
-
 
   /*
    * Create the data structures for this parser.
@@ -378,21 +376,20 @@ TclExpatObjCmd(
   }
 
   genexpat->paramentityparsing = XML_PARAM_ENTITY_PARSING_NEVER;
-  
-  if (objc > 1) {
-      nsoption = Tcl_GetString(objv[1]);
-      if (strcmp(nsoption,"-namespace")==0) {
-          ns_mode = 1;
-          objv++;
-          objc--;
-      }
-  }
-  genexpat->ns_mode = ns_mode;
   genexpat->nsSeparator = ':';
 
+  if (objc > 0) {
+      /*
+       * Handle configuration options
+       */
+      if (TclExpatConfigure(interp, genexpat, objc - 1, objv + 1) != TCL_OK) {
+          TclExpatDeleteCmd (genexpat);
+          return TCL_ERROR;
+      }
+  }
   if (TclExpatInitializeParser(interp, genexpat, 0) != TCL_OK) {
-    FREE( (char*) genexpat);
-    return TCL_ERROR;
+      TclExpatDeleteCmd (genexpat);
+      return TCL_ERROR;
   }
 
   /*
@@ -402,16 +399,6 @@ TclExpatObjCmd(
   Tcl_CreateObjCommand(interp, Tcl_GetString(genexpat->name),
                                TclExpatInstanceCmd, (ClientData) genexpat,
                                TclExpatDeleteCmd);
-  /*
-   * Handle configuration options
-   */
-
-  if (objc > 1) {
-      if (TclExpatConfigure(interp, genexpat, objc - 1, objv + 1) != TCL_OK) {
-          return TCL_ERROR;
-      }
-  }
-
   Tcl_SetObjResult(interp, genexpat->name);
 
   return TCL_OK;
@@ -462,7 +449,7 @@ FindUniqueCmdName(
  * TclExpatInitializeParser --
  *
  *	Create or re-initializes (if it already exists) the expat
- *	parser and initialise (some of) the TclExpatInfo structure.
+ *	parser and initialize (some of) the TclExpatInfo structure.
  *
  *	Note that callback commands are not affected by this routine,
  *	to allow a reset to leave these intact.
@@ -531,6 +518,11 @@ TclExpatInitializeParser(
     expat->eContents              = NULL;
     expat->finished               = 0;
     expat->parsingState           = 0;
+#ifndef TDOM_NO_SCHEMA
+    if (expat->sdata) {
+        tDOM_schemaReset (expat->sdata, 1);
+    }
+#endif
 
     if (resetOptions) {
         expat->final              = 1;
@@ -549,6 +541,9 @@ TclExpatInitializeParser(
         Tcl_DecrRefCount (expat->baseURI);
         expat->baseURI = NULL;
     }
+    XML_SetParamEntityParsing(expat->parser,
+                              expat->paramentityparsing);
+    XML_UseForeignDTD (expat->parser, (unsigned char)expat->useForeignDTD);
     
     /*
      * Set handlers for the parser to routines in this module.
@@ -647,7 +642,7 @@ TclExpatFreeParser(
  *	None.
  *
  * Side effects:
- *	Stores the markup context in expapt->currentmarkup.
+ *	Stores the markup context in expat->currentmarkup.
  *
  *----------------------------------------------------------------------------
  */
@@ -706,7 +701,10 @@ TclExpatInstanceCmd (
   TclGenExpatInfo *expat = (TclGenExpatInfo *) clientData;
   char *data;
   int len = 0, optionIndex, result = TCL_OK;
-
+#ifndef TDOM_NO_SCHEMA
+  int resetsdata = 0;
+#endif
+  
   static const char *options[] = {
       "configure", "cget", "currentmarkup", "free", "get",
       "parse", "parsechannel", "parsefile", "reset", "delete",
@@ -788,6 +786,12 @@ TclExpatInstanceCmd (
                            "callback", TCL_STATIC);
             result = TCL_ERROR;
         } else {
+#ifndef TDOM_NO_SCHEMA
+            if (expat->sdata) {
+                expat->sdata->inuse--;
+                tDOM_schemaReset (expat->sdata, 1);
+            }
+#endif
             Tcl_DeleteCommand(interp, Tcl_GetString(expat->name));
             result = TCL_OK;
         }
@@ -809,8 +813,24 @@ TclExpatInstanceCmd (
             break;
         }
         data = Tcl_GetStringFromObj(objv[2], &len);
+#ifndef TDOM_NO_SCHEMA
+        if (expat->sdata) {
+            if (expat->parsingState == 0) {
+                if (expat->sdata->validationState != VALIDATION_READY) {
+                    Tcl_SetResult (interp, "The configured schema command "
+                                   "is busy", TCL_STATIC);
+                    result = TCL_ERROR;
+                    break;
+                }
+            }
+            expat->sdata->parser = expat->parser;
+        }
+#endif
         result = TclExpatParse(interp, expat, data, len, EXPAT_INPUT_STRING);
         if (expat->final || result != TCL_OK) {
+#ifndef TDOM_NO_SCHEMA
+            resetsdata = 1;
+#endif
             expat->final = 1;
             expat->finished = 1;
         }
@@ -824,9 +844,25 @@ TclExpatInstanceCmd (
             result = TCL_ERROR;
             break;
         }
+#ifndef TDOM_NO_SCHEMA
+        if (expat->sdata) {
+            if (expat->parsingState == 0) {
+                if (expat->sdata->validationState != VALIDATION_READY) {
+                    Tcl_SetResult (interp, "The configured schema command "
+                                   "is busy", TCL_STATIC);
+                    result = TCL_ERROR;
+                    break;
+                }
+            }
+            expat->sdata->parser = expat->parser;
+        }
+#endif
         data = Tcl_GetString(objv[2]);
         result = TclExpatParse(interp, expat, data, len, EXPAT_INPUT_CHANNEL);
         if (expat->final || result != TCL_OK) {
+#ifndef TDOM_NO_SCHEMA
+            resetsdata = 1;
+#endif
             expat->final = 1;
             expat->finished = 1;
         }
@@ -840,10 +876,26 @@ TclExpatInstanceCmd (
             result = TCL_ERROR;
             break;
         }
+#ifndef TDOM_NO_SCHEMA
+        if (expat->sdata) {
+            if (expat->parsingState == 0) {
+                if (expat->sdata->validationState != VALIDATION_READY) {
+                    Tcl_SetResult (interp, "The configured schema command "
+                                   "is busy", TCL_STATIC);
+                    result = TCL_ERROR;
+                    break;
+                }
+            }
+            expat->sdata->parser = expat->parser;
+        }
+#endif
         data = Tcl_GetString(objv[2]);
         result = TclExpatParse (interp, expat, data, len, 
                                 EXPAT_INPUT_FILENAME);
         if (expat->final || result != TCL_OK) {
+#ifndef TDOM_NO_SCHEMA
+            resetsdata = 1;
+#endif
             expat->final = 1;
             expat->finished = 1;
         }
@@ -864,6 +916,11 @@ TclExpatInstanceCmd (
 
   }
 
+#ifndef TDOM_NO_SCHEMA
+  if (resetsdata && expat->sdata) {
+      tDOM_schemaReset (expat->sdata, 1);
+  }
+#endif
   return result;
 }
 
@@ -1106,6 +1163,8 @@ TclExpatConfigure (
     "-endnamespacedeclcommand",
     "-ignorewhitecdata",
     "-useForeignDTD",
+    "-namespace",
+    "-namespaceseparator",
 
     "-commentcommand",
     "-notstandalonecommand",
@@ -1121,6 +1180,9 @@ TclExpatConfigure (
     "-ignorewhitespace",
     "-handlerset",
     "-noexpand",
+#ifndef TDOM_NO_SCHEMA
+    "-validateCmd",
+#endif
     (char *) NULL
   };
   enum switches {
@@ -1134,6 +1196,8 @@ TclExpatConfigure (
     EXPAT_ENDNAMESPACEDECLCMD,
     EXPAT_IGNOREWHITECDATA,
     EXPAT_USEFOREIGNDTD,
+    EXPAT_NAMESPACE,
+    EXPAT_NAMESPACESEPARATOR,
 
     EXPAT_COMMENTCMD, EXPAT_NOTSTANDALONECMD,
     EXPAT_STARTCDATASECTIONCMD, EXPAT_ENDCDATASECTIONCMD,
@@ -1145,6 +1209,9 @@ TclExpatConfigure (
     EXPAT_NOWHITESPACE,
     EXPAT_HANDLERSET,
     EXPAT_NOEXPAND
+#ifndef TDOM_NO_SCHEMA
+    ,EXPAT_VALIDATECMD
+#endif
   };
   static const char *paramEntityParsingValues[] = {
       "always",
@@ -1160,20 +1227,66 @@ TclExpatConfigure (
   int optionIndex, value, bool;
   Tcl_Obj *const *objPtr = objv;
   Tcl_CmdInfo cmdInfo;
-  int rc;
+  int rc, len;
   char *handlerSetName = NULL;
   TclHandlerSet *tmpTclHandlerSet, *activeTclHandlerSet = NULL;
+  Tcl_UniChar uniChar;
+#ifndef TDOM_NO_SCHEMA
+  char *schemacmd;
+#endif
 
   if (expat->firstTclHandlerSet 
       && (strcmp ("default", expat->firstTclHandlerSet->name)==0)) {
       activeTclHandlerSet = expat->firstTclHandlerSet;
   }
-  while (objc > 1) {
+  while (objc > 0) {
     if (Tcl_GetIndexFromObj(interp, objPtr[0], switches,
 			    "switch", 0, &optionIndex) != TCL_OK) {
         return TCL_ERROR;
     }
+    if (objc == 1) {
+        if (optionIndex != EXPAT_NAMESPACE) {
+            Tcl_WrongNumArgs (interp, 1, objPtr, "<value>");
+            return TCL_ERROR;
+        }
+    }
     switch ((enum switches) optionIndex) {
+      case EXPAT_NAMESPACE:             /* -namespace */
+
+        /* This option is a creation time / set once one */
+        if (!expat->parser) {
+            expat->ns_mode = 1;
+        }
+        objPtr++;
+        objc--;
+        continue;
+
+      case EXPAT_NAMESPACESEPARATOR:    /* -namespaceseparator */
+
+        len = Tcl_GetCharLength (objPtr[1]);
+        if (len > 1) {
+            Tcl_SetResult (interp, "invalid -namespaceseparator argument",
+                           NULL);
+            return TCL_ERROR;
+        }
+        if (len == 0) {
+            if (!expat->parser) {
+                expat->nsSeparator = 0;
+            }
+            break;
+        }
+        Tcl_UtfToUniChar (Tcl_GetString (objPtr[1]), &uniChar);
+        if (uniChar > 255) {
+            Tcl_SetResult (interp, "invalid -namespaceseparator argument",
+                           NULL);
+            return TCL_ERROR;
+        }
+        /* This option is a creation time / set once one */
+        if (!expat->parser) {
+            expat->nsSeparator = uniChar;
+        }
+        break;
+        
       case EXPAT_FINAL:			/* -final */
 
 	if (Tcl_GetBooleanFromObj(interp, objPtr[1], &bool) != TCL_OK) {
@@ -1183,21 +1296,24 @@ TclExpatConfigure (
         expat->final = bool;
 	break;
 
-      case EXPAT_BASE:			/* -base */
+      case EXPAT_BASE:			/* -baseurl */
 
-        if (expat->finished) {
-            if (expat->baseURI) {
-                Tcl_DecrRefCount (expat->baseURI);
-            }
+        if (expat->baseURI) {
+            Tcl_DecrRefCount (expat->baseURI);
+            expat->baseURI = NULL;
+        }
+        if (!expat->parser || expat->finished) {
             expat->baseURI = objPtr[1];
             Tcl_IncrRefCount (expat->baseURI);
-        } else {
-            if (XML_SetBase(expat->parser, Tcl_GetString(objPtr[1]))
-                == 0) {
-                Tcl_SetResult(interp, "unable to set base URL", NULL);
-                return TCL_ERROR;
+	} else {
+            if (expat->parser) {
+                if (XML_SetBase(expat->parser, Tcl_GetString(objPtr[1]))
+                    == 0) {
+                    Tcl_SetResult(interp, "unable to set base URL", NULL);
+                    return TCL_ERROR;
+                }
             }
-	}
+        }
 	break;
 
       case EXPAT_ELEMENTSTARTCMD:	/* -elementstartcommand */
@@ -1361,9 +1477,16 @@ TclExpatConfigure (
         if (Tcl_GetBooleanFromObj (interp, objPtr[1], &bool) != TCL_OK) {
             return TCL_ERROR;
         }
-        /* Cannot be changed after parsing as started (which is kind of
-           understandable). We silently ignore return code. */
-        XML_UseForeignDTD (expat->parser, (unsigned char)bool);
+        if (expat->parser) {
+            /* Cannot be changed after parsing as started (which is
+               kind of understandable). */
+            if (XML_UseForeignDTD (expat->parser, (unsigned char)bool)
+                != XML_ERROR_NONE) {
+                expat->useForeignDTD = bool;
+            }
+        } else {
+            expat->useForeignDTD = bool;
+        }
         break;
 
       case EXPAT_COMMENTCMD:      /* -commentcommand */
@@ -1485,29 +1608,26 @@ TclExpatConfigure (
           break;
 
       case EXPAT_PARAMENTITYPARSING: /* -paramentityparsing */
-	  /* ericm@scriptics */
 	  if (Tcl_GetIndexFromObj(interp, objPtr[1], paramEntityParsingValues,
 		  "value", 0, &value) != TCL_OK) {
               return TCL_ERROR;
 	  }
-	  switch ((enum paramEntityParsingValues) value) {
-	      case EXPAT_PARAMENTITYPARSINGALWAYS:
-		  XML_SetParamEntityParsing(expat->parser,
-			  XML_PARAM_ENTITY_PARSING_ALWAYS);
-                  expat->paramentityparsing = XML_PARAM_ENTITY_PARSING_ALWAYS;
-		  break;
-	      case EXPAT_PARAMENTITYPARSINGNEVER:
-		  XML_SetParamEntityParsing(expat->parser,
-			  XML_PARAM_ENTITY_PARSING_NEVER);
-                  expat->paramentityparsing = XML_PARAM_ENTITY_PARSING_NEVER;
-		  break;
-	      case EXPAT_PARAMENTITYPARSINGNOTSTANDALONE:
-		  XML_SetParamEntityParsing(expat->parser,
-			  XML_PARAM_ENTITY_PARSING_UNLESS_STANDALONE);
-                  expat->paramentityparsing = 
-                      XML_PARAM_ENTITY_PARSING_UNLESS_STANDALONE;
-		  break;
+          switch ((enum paramEntityParsingValues) value) {
+          case EXPAT_PARAMENTITYPARSINGALWAYS:
+              expat->paramentityparsing = XML_PARAM_ENTITY_PARSING_ALWAYS;
+              break;
+          case EXPAT_PARAMENTITYPARSINGNEVER:
+              expat->paramentityparsing = XML_PARAM_ENTITY_PARSING_NEVER;
+              break;
+          case EXPAT_PARAMENTITYPARSINGNOTSTANDALONE:
+              expat->paramentityparsing = 
+                  XML_PARAM_ENTITY_PARSING_UNLESS_STANDALONE;
+              break;
 	  }
+          if (expat->parser) {
+              XML_SetParamEntityParsing (expat->parser,
+                                         expat->paramentityparsing);
+          }
 	  break;
 
     case EXPAT_HANDLERSET:
@@ -1537,7 +1657,7 @@ TclExpatConfigure (
         break;
 
     case EXPAT_NOEXPAND:
-        if (Tcl_GetBooleanFromObj (interp, objv[1], &bool) != TCL_OK) {
+        if (Tcl_GetBooleanFromObj (interp, objPtr[1], &bool) != TCL_OK) {
             return TCL_ERROR;
         }
         if (bool) {
@@ -1550,6 +1670,37 @@ TclExpatConfigure (
         expat->noexpand = bool;
         break;
 
+#ifndef TDOM_NO_SCHEMA
+    case EXPAT_VALIDATECMD:
+        schemacmd = Tcl_GetString (objv[1]);
+        if (schemacmd[0] == '\0') {
+            if (expat->sdata) {
+                expat->sdata->inuse--;
+                tDOM_schemaReset (expat->sdata, 1);
+                expat->sdata = NULL;
+            }
+        } else {
+            if (expat->sdata) {
+                expat->sdata->inuse--;
+                tDOM_schemaReset (expat->sdata, 1);
+                expat->sdata = NULL;
+            }                
+            if (!Tcl_GetCommandInfo(interp, schemacmd, &cmdInfo)) {
+                SetResult3("The \"-validateCmd\" argument \"",
+                           Tcl_GetString(objv[1]),
+                           "\" is not a tDOM validation command.");
+                return TCL_ERROR;
+            }
+            if (cmdInfo.objProc != tDOM_schemaInstanceCmd) {
+                SetResult3("The \"-validateCmd\" argument \"",
+                           Tcl_GetString(objv[1]),
+                           "\" is not a tDOM validation command.");
+                return TCL_ERROR;
+            }
+            expat->sdata = (SchemaData *) cmdInfo.objClientData;
+            expat->sdata->inuse++;
+        }
+#endif
     }
 
     objPtr += 2;
@@ -1613,6 +1764,7 @@ TclExpatCget (
         "-handlerset",
         "-noexpand",
         "-namespace",
+        "-namespaceseparator",
         (char *) NULL
     };
     enum switches {
@@ -1637,12 +1789,16 @@ TclExpatCget (
         EXPAT_NOWHITESPACE,
         EXPAT_HANDLERSET,
         EXPAT_NOEXPAND,
-        EXPAT_NAMESPACE
+        EXPAT_NAMESPACE,
+        EXPAT_NAMESPACESEPARATOR
     };
-    int optionIndex;
+    int optionIndex, len;
     TclHandlerSet *activeTclHandlerSet = NULL;
     char *handlerSetName = NULL;
     Tcl_Obj*  objPtr;
+    char utfBuf[TCL_UTF_MAX];
+    Tcl_DString dStr;
+    Tcl_UniChar uniChar;
 
     if (Tcl_GetIndexFromObj(interp, objv[0], switches,
 			    "switch", 0, &optionIndex) != TCL_OK) {
@@ -1696,9 +1852,9 @@ TclExpatCget (
           Tcl_SetResult(interp, expat->final ? "1" : "0", NULL);
           return TCL_OK;
 
-      case EXPAT_BASE:			/* -base */
+      case EXPAT_BASE:			/* -baseurl */
 
-          if (expat->finished) {
+          if (!expat->parser || expat->finished) {
               Tcl_SetResult (interp, expat->baseURI != NULL
                              ? Tcl_GetString (expat->baseURI) : "", NULL);
           } else {
@@ -1737,6 +1893,18 @@ TclExpatCget (
       case EXPAT_NAMESPACE: /* -namespace */
 
         SetIntResult (interp, expat->ns_mode);
+        return TCL_OK;
+
+      case EXPAT_NAMESPACESEPARATOR: /* -namespaceseparator */
+
+        if (expat->nsSeparator) {
+            uniChar = expat->nsSeparator;
+            len = Tcl_UniCharToUtf (uniChar, utfBuf);
+            Tcl_DStringInit (&dStr);
+            Tcl_DStringAppend (&dStr, utfBuf, len);
+            Tcl_DStringResult (interp, &dStr);
+            Tcl_DStringFree (&dStr);
+        }
         return TCL_OK;
 
       case EXPAT_NOWHITESPACE:
@@ -2225,12 +2393,8 @@ TclGenExpatElementStartHandler(
               Tcl_ListObjAppendElement(expat->interp, cmdPtr,
                                        Tcl_NewStringObj((char *)name, -1));
               Tcl_ListObjAppendElement(expat->interp, cmdPtr, atList);
-#if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
-              result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
-#else
               result = Tcl_EvalObjEx(expat->interp, cmdPtr, 
-                                     TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT);
-#endif /* TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0 */
+                                     TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT );
 
               Tcl_DecrRefCount(cmdPtr);
               Tcl_Release((ClientData) expat->interp);
@@ -2254,6 +2418,22 @@ TclGenExpatElementStartHandler(
       activeCHandlerSet = activeCHandlerSet->nextHandlerSet;
   }
 
+#ifndef TDOM_NO_SCHEMA
+  if (expat->sdata) {
+      if (tDOM_probeElement (expat->interp, expat->sdata, name, NULL)
+          != TCL_OK) {
+          TclExpatHandlerResult (expat, NULL, TCL_ERROR);
+      }
+      if (atts[0] || (expat->sdata->stack
+                      && expat->sdata->stack->pattern->attrs)) {
+          if (tDOM_probeAttributes (expat->interp, expat->sdata, atts)
+              != TCL_OK) {
+              expat->sdata->validationState = VALIDATION_ERROR;
+              TclExpatHandlerResult (expat, NULL, TCL_ERROR);
+          }
+      }
+  }
+#endif
   return;
 }
 
@@ -2345,12 +2525,8 @@ TclGenExpatElementEndHandler(
 
               Tcl_ListObjAppendElement(expat->interp, cmdPtr,
                                        Tcl_NewStringObj((char *)name, -1));
-#if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
-              result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
-#else
               result = Tcl_EvalObjEx(expat->interp, cmdPtr, 
                                      TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT );
-#endif /* TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0 */
 
               Tcl_DecrRefCount(cmdPtr);
               Tcl_Release((ClientData) expat->interp);
@@ -2374,6 +2550,13 @@ TclGenExpatElementEndHandler(
       activeCHandlerSet = activeCHandlerSet->nextHandlerSet;
   }
 
+#ifndef TDOM_NO_SCHEMA
+  if (expat->sdata) {
+      if (tDOM_probeElementEnd (expat->interp, expat->sdata) != TCL_OK) {
+          TclExpatHandlerResult (expat, NULL, TCL_ERROR);
+      }
+  }
+#endif
   return;
 }
 
@@ -2383,7 +2566,9 @@ TclGenExpatElementEndHandler(
  *
  * TclGenExpatStartNamespaceDeclHandler --
  *
- *	Called by expat for each start tag.
+ *	Called by expat for each namespace declaration command (and is
+ *	called before the start tag handler on which the namespace is
+ *	declared).
  *
  * Results:
  *	None.
@@ -2415,14 +2600,6 @@ TclGenExpatStartNamespaceDeclHandler(
 
       switch (activeTclHandlerSet->status) {
       case TCL_CONTINUE:
-          /*
-           * We're currently skipping elements looking for the
-           * close of the continued element.
-           */
-
-          activeTclHandlerSet->continueCount++;
-          goto nextTcl;
-          break;
       case TCL_BREAK:
           goto nextTcl;
           break;
@@ -2446,12 +2623,8 @@ TclGenExpatStartNamespaceDeclHandler(
                                Tcl_NewStringObj((char *)prefix, -1));
       Tcl_ListObjAppendElement(expat->interp, cmdPtr,
                                Tcl_NewStringObj((char *)uri,    -1));
-#if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
-      result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
-#else
       result = Tcl_EvalObjEx(expat->interp, cmdPtr, 
                              TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT);
-#endif /* TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0 */
 
       Tcl_DecrRefCount(cmdPtr);
       Tcl_Release((ClientData) expat->interp);
@@ -2478,7 +2651,8 @@ TclGenExpatStartNamespaceDeclHandler(
  *
  * TclGenExpatEndNamespaceDeclHandler --
  *
- *	Called by expat for each end tag.
+ *	Called by expat for the end of scope for any namespace (and
+ *	after the handler for the according element tag.
  *
  * Results:
  *	None.
@@ -2509,16 +2683,6 @@ TclGenExpatEndNamespaceDeclHandler(
 
       switch (activeTclHandlerSet->status) {
       case TCL_CONTINUE:
-          /*
-           * We're currently skipping elements looking for the
-           * end of the currently open element.
-           */
-
-          if (!--(activeTclHandlerSet->continueCount)) {
-              activeTclHandlerSet->status = TCL_OK;
-          }
-          goto nextTcl;
-          break;
       case TCL_BREAK:
           goto nextTcl;
           break;
@@ -2539,12 +2703,8 @@ TclGenExpatEndNamespaceDeclHandler(
       Tcl_Preserve((ClientData) expat->interp);
 
       Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)prefix, -1));
-#if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
-      result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
-#else
       result = Tcl_EvalObjEx(expat->interp, cmdPtr, 
                              TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT);
-#endif /* if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0 */
 
       Tcl_DecrRefCount(cmdPtr);
       Tcl_Release((ClientData) expat->interp);
@@ -2716,12 +2876,8 @@ TclExpatDispatchPCDATA(
 
           Tcl_ListObjAppendElement(expat->interp, cmdPtr,
                                    Tcl_NewStringObj((char *)s, len));
-#if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
-          result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
-#else
           result = Tcl_EvalObjEx(expat->interp, cmdPtr, 
                                  TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT);
-#endif /* TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0 */
 
           Tcl_DecrRefCount(cmdPtr);
           Tcl_Release((ClientData) expat->interp);
@@ -2745,6 +2901,15 @@ TclExpatDispatchPCDATA(
       }
       activeCHandlerSet = activeCHandlerSet->nextHandlerSet;
   }
+  
+#ifndef TDOM_NO_SCHEMA
+  if (expat->sdata) {
+      if (tDOM_probeText (expat->interp, expat->sdata, s,
+                     expat->needWSCheck ? &onlyWhiteSpace : NULL) != TCL_OK) {
+          TclExpatHandlerResult (expat, NULL, TCL_ERROR);
+      }
+  }
+#endif
   Tcl_DecrRefCount (expat->cdata);
   expat->cdata = NULL;
   return;
@@ -2811,12 +2976,8 @@ TclGenExpatProcessingInstructionHandler(
 
       Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)target, strlen(target)));
       Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)data, strlen(data)));
-#if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
-      result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
-#else
       result = Tcl_EvalObjEx(expat->interp, cmdPtr, 
                              TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT);
-#endif /* if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0 */
 
       Tcl_DecrRefCount(cmdPtr);
       Tcl_Release((ClientData) expat->interp);
@@ -2896,12 +3057,8 @@ TclGenExpatDefaultHandler(
       Tcl_Preserve((ClientData) expat->interp);
 
       Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)s, len));
-#if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
-      result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
-#else
       result = Tcl_EvalObjEx(expat->interp, cmdPtr, 
                              TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT);
-#endif /* if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0 */
 
       Tcl_DecrRefCount(cmdPtr);
       Tcl_Release((ClientData) expat->interp);
@@ -3016,12 +3173,8 @@ TclGenExpatEntityDeclHandler(
       } else {
           Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)notationName, strlen(notationName)));
       }
-#if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
-      result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
-#else
       result = Tcl_EvalObjEx(expat->interp, cmdPtr,
                              TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT);
-#endif /* if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0 */
 
       Tcl_DecrRefCount(cmdPtr);
       Tcl_Release((ClientData) expat->interp);
@@ -3115,12 +3268,8 @@ TclGenExpatNotationDeclHandler(
       } else {
           Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)publicId, strlen(publicId)));
       }
-#if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
-      result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
-#else
       result = Tcl_EvalObjEx(expat->interp, cmdPtr, 
                              TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT);
-#endif /* if TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0 */
 
       Tcl_DecrRefCount(cmdPtr);
       Tcl_Release((ClientData) expat->interp);
@@ -3278,12 +3427,8 @@ TclGenExpatExternalEntityRefHandler(
 	      Tcl_NewStringObj("", 0));
       }
 
-#if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
-      result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
-#else
       result = Tcl_EvalObjEx(expat->interp, cmdPtr, 
                              TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT);
-#endif /* TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0 */
 
       Tcl_DecrRefCount(cmdPtr);
       Tcl_Release((ClientData) expat->interp);
@@ -3568,12 +3713,8 @@ TclGenExpatCommentHandler(
       Tcl_ListObjAppendElement(expat->interp, cmdPtr,
                                Tcl_NewStringObj((char *)data, strlen(data)));
 
-#if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
-      result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
-#else
       result = Tcl_EvalObjEx(expat->interp, cmdPtr, 
                              TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT);
-#endif /* TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0 */
 
       Tcl_DecrRefCount(cmdPtr);
       Tcl_Release((ClientData) expat->interp);
@@ -3647,12 +3788,8 @@ TclGenExpatNotStandaloneHandler(
       Tcl_IncrRefCount(cmdPtr);
       Tcl_Preserve((ClientData) expat->interp);
 
-#if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
-      result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
-#else
       result = Tcl_EvalObjEx(expat->interp, cmdPtr, 
                              TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT);
-#endif /* TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0 */
 
       Tcl_DecrRefCount(cmdPtr);
       Tcl_Release((ClientData) expat->interp);
@@ -3727,12 +3864,8 @@ TclGenExpatStartCdataSectionHandler(
       Tcl_IncrRefCount(cmdPtr);
       Tcl_Preserve((ClientData) expat->interp);
 
-#if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
-      result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
-#else
       result = Tcl_EvalObjEx(expat->interp, cmdPtr, 
                              TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT);
-#endif /* TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0 */
 
       Tcl_DecrRefCount(cmdPtr);
       Tcl_Release((ClientData) expat->interp);
@@ -3804,12 +3937,8 @@ TclGenExpatEndCdataSectionHandler(
       Tcl_IncrRefCount(cmdPtr);
       Tcl_Preserve((ClientData) expat->interp);
 
-#if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
-      result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
-#else
       result = Tcl_EvalObjEx(expat->interp, cmdPtr, 
                              TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT);
-#endif /* TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0 */
 
       Tcl_DecrRefCount(cmdPtr);
       Tcl_Release((ClientData) expat->interp);
@@ -3965,12 +4094,8 @@ TclGenExpatElementDeclHandler(
 
       Tcl_ListObjAppendElement(expat->interp, cmdPtr, content);
 
-#if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
-      result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
-#else
       result = Tcl_EvalObjEx(expat->interp, cmdPtr, 
                              TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT);
-#endif /* TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0 */
 
       Tcl_DecrRefCount(cmdPtr);
 
@@ -4066,12 +4191,8 @@ TclGenExpatAttlistDeclHandler(
       Tcl_ListObjAppendElement (expat->interp, cmdPtr,
                                 Tcl_NewIntObj (isrequired));
 
-#if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
-      result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
-#else
       result = Tcl_EvalObjEx(expat->interp, cmdPtr, 
                              TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT);
-#endif /* TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0 */
       
       Tcl_DecrRefCount(cmdPtr);
       Tcl_Release((ClientData) expat->interp);
@@ -4169,12 +4290,8 @@ TclGenExpatStartDoctypeDeclHandler(
       Tcl_ListObjAppendElement(expat->interp, cmdPtr,
                            Tcl_NewIntObj(has_internal_subset));
 
-#if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
-      result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
-#else
       result = Tcl_EvalObjEx(expat->interp, cmdPtr, 
                              TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT);
-#endif /* TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0 */
       
       Tcl_DecrRefCount(cmdPtr);
       Tcl_Release((ClientData) expat->interp);
@@ -4250,12 +4367,8 @@ TclGenExpatEndDoctypeDeclHandler(
       Tcl_IncrRefCount(cmdPtr);
       Tcl_Preserve((ClientData) expat->interp);
 
-#if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
-      result = Tcl_GlobalEvalObj(expat->interp, cmdPtr);
-#else
       result = Tcl_EvalObjEx(expat->interp, cmdPtr, 
                              TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT);
-#endif /* TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0 */
       
       Tcl_DecrRefCount(cmdPtr);
       Tcl_Release((ClientData) expat->interp);
@@ -4352,12 +4465,8 @@ TclGenExpatXmlDeclHandler (
                                     Tcl_NewBooleanObj (standalone));
       }
 
-#if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0)
-      result = Tcl_GlobalEvalObj (expat->interp, cmdPtr);
-#else
       result = Tcl_EvalObjEx(expat->interp, cmdPtr, 
                              TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT);
-#endif /* TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION == 0 */
       
       Tcl_DecrRefCount(cmdPtr);
       Tcl_Release((ClientData) expat->interp);

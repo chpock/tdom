@@ -4,15 +4,15 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x1eae960">NAME</a> · <a href="#SECTid0x1e5ff20">SYNOPSIS</a> · <a href="#SECTid0x1e97f70">DESCRIPTION </a> · <a href="#SECTid0x1efaea0">SEE ALSO</a> · <a href="#SECTid0x1efb230">KEYWORDS</a>
+<a href="#SECTid0x555cdce50630">NAME</a> · <a href="#SECTid0x555cdcd86bb0">SYNOPSIS</a> · <a href="#SECTid0x555cdce2ed50">DESCRIPTION </a> · <a href="#SECTid0x555cdce9c530">SEE ALSO</a> · <a href="#SECTid0x555cdce9c8c0">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x1eae960">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x555cdce50630">NAME</a></h2><p class="namesection">
 <b class="names">domDoc - </b><br>Manipulates an instance of a DOM document object</p>
   
-  <h2><a name="SECTid0x1e5ff20">SYNOPSIS</a></h2><pre class="syntax">domDocObjCmd <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre><pre class="syntax">domDoc <i class="m">docToken</i> <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
+  <h2><a name="SECTid0x555cdcd86bb0">SYNOPSIS</a></h2><pre class="syntax">domDocObjCmd <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre><pre class="syntax">domDoc <i class="m">docToken</i> <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
 
-  <h2><a name="SECTid0x1e97f70">DESCRIPTION </a></h2><p>This command manipulates one particular instance of a document
+  <h2><a name="SECTid0x555cdce2ed50">DESCRIPTION </a></h2><p>This command manipulates one particular instance of a document
 object. <i class="m">method</i> indicates a specific method of the document class. These
 methods should closely conform to the W3C recommendation "Document Object Model
 (Core) Level 1" (<a href="http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html">http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html</a>). Look
@@ -110,13 +110,23 @@ usually a result of a XSLT transformation.</dd>
 
       
         <dt>
-<b class="method">asXML</b> <b class="option">?-indent none/1..8?</b> <b class="option">?-channel channelId?</b> <b class="option">?-escapeNonASCII?</b> <b class="option">?-doctypeDeclaration &lt;boolean&gt;?</b> <b class="option">-xmlDeclaration &lt;boolean&gt;?</b> <b class="option">-encString &lt;string&gt;</b> <b class="option">?-escapeAllQuot?</b> <b class="option">?-indentAttrs?</b> <b class="option">?-nogtescape?</b> <b class="option">?-noEmptyElementTag?</b>
+<b class="method">asXML</b> <b class="option">?-indent none/tabs/1..8?</b> <b class="option">?-channel channelId?</b> <b class="option">?-escapeNonASCII?</b> <b class="option">?-doctypeDeclaration &lt;boolean&gt;?</b> <b class="option">-xmlDeclaration &lt;boolean&gt;?</b> <b class="option">-encString &lt;string&gt;</b> <b class="option">?-escapeAllQuot?</b> <b class="option">?-indentAttrs?</b> <b class="option">?-nogtescape?</b> <b class="option">?-noEmptyElementTag?</b>
 </dt>
         <dd>
 <p>Returns the DOM tree as an (optional indented) XML
         string or sends the output directly to the given
         channelId.</p>
 
+        <p>The -indent option requires "no", "none", "tabs" or a
+        natural number betwenn 0 and 8, both included, as value. With
+        the values "no" or "none" no additional white space outside of
+        markup will be added to the serialization. I. Otherwise, it's
+        a "pretty-print" serialization, due to inserting white space
+        between end and the next start tag according to the nesting
+        level. The level indentation wide is given with the number. If
+        the value is "tabs", then indentation is done with tabs, one
+        tab per level.</p>
+        
         <p>If the option <i class="m">-escapeNonASCII</i> is given,
         every non 7 bit ASCII character in attribute values or element
         PCDATA content will be escaped as character reference in
@@ -167,27 +177,43 @@ usually a result of a XSLT transformation.</dd>
       
         <dt>
 <b class="method">asHTML</b> <b class="option">?-channel
-channelId?</b> <b class="option">?-escapeNonASCII?</b> <b class="option">?-htmlEntities?</b> <b class="option">?-doctypeDeclaration &lt;boolean&gt;?</b>
+channelId?</b> <b class="option">?-escapeNonASCII?</b> <b class="option">?-htmlEntities?</b> <b class="option">?-doctypeDeclaration &lt;boolean&gt;?</b> <b class="option">?-breakLines?</b> <b class="option">?-onlyContents?</b>
 </dt> 
-        <dd>Returns the DOM tree serialized according to HTML rules
+        <dd>
+<p>Returns the DOM tree serialized according to HTML rules
         (HTML elements are recognized regardless of case, without end
         tags for empty HTML elements etc.) as string or sends the
-        output directly to the given channelId. If the option
-        <i class="m">-escapeNonASCII</i> is given, every non 7 bit ASCII
-        character in attribute values or element PCDATA content will
-        be escaped as character reference in decimal representation.
-        If the option <i class="m">-htmlEntities</i> is given, a character is
+        output directly to the given channelId.</p>
+
+        <p>If the option <i class="m">-escapeNonASCII</i> is given, every non 7
+        bit ASCII character in attribute values or element PCDATA
+        content will be escaped as character reference in decimal
+        representation.</p>
+        
+        <p>If the option <i class="m">-htmlEntities</i> is given, a character is
         written using its HTML 4.01 character entity reference, if it
-        has one. If the flag <i class="m">-doctypeDeclaration</i> is given there
-        will be a DOCTYPE declaration emitted before the first node of
-        the document. The default is, to do not. The DOCTYPE name will
+        has one.</p>
+
+        <p>If the option <i class="m">-breakLines</i> is given the serialization
+        outputs "\n&gt;" instead of "&gt;" for the opening tags of
+        elements.</p>
+
+        <p>If the option <i class="m">-onlyContents</i> is given only all child
+        nodes are serialized. This option is ignored by document
+        nodes.</p>
+        
+        <p>If the flag <i class="m">-doctypeDeclaration</i> is given there will
+        be a DOCTYPE declaration emitted before the first node of the
+        document. The default is, to do not. The DOCTYPE name will
         always be the element name of the document element without
         case normalization. An external entity declaration of the
         external subset is only emitted, if the document has a system
         identifier. The doctype declaration will be written from the
-        available information, without check, if this is a known
-        (w3c) HTML version information or if the document confirms to
-        the given HTML version.</dd>
+        available information, without check, if this is a known (w3c)
+        HTML version information or if the document confirms to the
+        given HTML version. All nodes types other than document nodes
+        ignore this option.</p>
+</dd>
       
 
       
@@ -341,14 +367,14 @@ serialized as CDATA section nodes.</dd>
         <dt>
 <b class="method">selectNodesNamespaces</b> <b class="option">?prefixUriList?</b>
 </dt>
-        <dd>This method allows one to control a document global prefix
-        to namespace URI mapping, which will be used for selectNodes
+        <dd>This method gives control to a document global prefix to
+        namespace URI mapping, which will be used for selectNodes
         method calls (on document as well as on all nodes, which
-        belongs to the document) if it is not overwritten by using
-        the -namespaces option of the selectNodes method. Any
-        namespace prefix within an xpath expression will be first
-        resolved against this list. If the list binds the same prefix
-        to different namespaces, then the first binding will win. If a
+        belongs to the document) if it is not overwritten by using the
+        -namespaces option of the selectNodes method. Any namespace
+        prefix within an xpath expression will be first resolved
+        against this list. If the list binds the same prefix to
+        different namespaces, then the first binding will win. If a
         prefix could not resolved against the document global prefix /
         namespaces list, then the namespace definitions in scope of
         the context node will be used to resolve the prefix, as usual.
@@ -590,60 +616,10 @@ of attribute name / value pairs. If <i class="m">typeVar</i> is given
 the result type name is stored into that variable (empty,
 bool, number, string, nodes, attrnodes or mixed).</p>
 
-<p>The argument <i class="m">xpathQuery</i> has to be a valid XPath
-expression. However, there is one exception to that rule. Tcl variable
-names can appear in the XPath statement at any position where it is
-legal according to the rules of the XPath syntax to put an XPath
-variable. The value of the variable is substituted for the variable
-name. Ignoring the syntax rules of XPath the Tcl variable name may be
-any legal Tcl var name: local variables, global variables, array
-entries and so on.  The value will always be seen as string literal by
-the xpath engine. Cast the value explicitly with the according xpath
-functions (number(), boolean()) to another data type, if needed.</p>
-
-<p>The option <i class="m">-namespaces</i> expects a tcl list with prefix /
-namespace pairs as argument. If this option is not given, then any
-namespace prefix within the xpath expression will be first resolved
-against the list of prefix / namespace pairs set with the
-selectNodesNamespaces method for the document the node belongs to. If
-this fails, then the namespace definitions in scope of the context
-node will be used to resolve the prefix. If this option is given, any
-namespace prefix within the xpath expression will be first resolved
-against that given list (and ignoring the document global prefix /
-namespace list). If the list binds the same prefix to different
-namespaces, then the first binding will win.  If this fails, then the
-namespace definitions in scope of the context node will be used to
-resolve the prefix, as usual.</p>
-
-<p>If the <i class="m">-cache</i> option is used with a true value, then the
-<i class="m">xpathQuery</i> will be looked up in a document specific cache. If
-the query is found, then the stored pre-compiled query will be used.
-If the query isn't found, it will be compiled and stored in the cache,
-for use in further calls. Please notice, that the <i class="m">xpathQuery</i> as
-given as string is used as key for the cache. This means that equal
-XPath expressions, which differ only in white space, are treated as
-different cache entries. Special care is needed if the XPath
-expression includes namespace prefixes or references to tcl variables.
-Both namespace prefixes and tcl variable references will be resolved
-according to the XML prefix namespace mappings and tcl variable values
-at expression compilation time. If the same XPath expression is used
-later on in a context with other XML prefix namespace mappings or
-values of the used tcl variables, make sure to first remove the
-compiled expression from the cache with the help of the
-<b class="method">deleteXPathCache</b> method, to force a recompilation.
-Without using the <i class="m">-cache</i> option such consideration is never
-needed.</p>
-
-<p>Examples:</p>
-          <pre class="example">set paragraphNodes [$node selectNodes {chapter[3]//para[@type='warning' or @type='error'} ]
-foreach paragraph $paragraphNodes {
-    lappend  values [$paragraph selectNodes attribute::type]
-}
-
-set doc [dom parse {&lt;doc xmlns="http://www.defaultnamespace.org"&gt;&lt;child/&gt;&lt;/doc&gt;}]
-set root [$doc documentElement]
-set childNodes [$root selectNodes -namespaces {default http://www.defaultnamespace.org} default:child]</pre>
-
+          <p>See the documentation of the of the
+          <b class="command">domNode</b> command method
+          <b class="method">selectNodes</b> for a detailed description of
+          the arguments.</p>
           </dd>
       
 
@@ -692,9 +668,9 @@ tried to be executed. This allows quick method additions on Tcl level.</p><p>New
 are not moved into the tree they are automatically deleted as soon as the whole
 document gets deleted.</p>
 
-    <h2><a name="SECTid0x1efaea0">SEE ALSO</a></h2><p class="seealso">dom, domNode</p>
+    <h2><a name="SECTid0x555cdce9c530">SEE ALSO</a></h2><p class="seealso">dom, domNode</p>
 
-    <h2><a name="SECTid0x1efb230">KEYWORDS</a></h2><p class="keywords">
+    <h2><a name="SECTid0x555cdce9c8c0">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-DOMnodecreation">DOM node creation</a>, <a class="keyword" href="keyword-index.html#KW-documentelement">document element</a>
 </p>
 

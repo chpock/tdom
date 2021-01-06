@@ -23,7 +23,7 @@ PROJECT = tnc
 PRJ_OBJS = $(TMP_DIR)\tnc.obj
 
 !if [echo TDOM_DOTVERSION = \> versions.vc] \
-   || [nmakehlp -V ..\..\..\configure.in ^[tdom^] >> versions.vc]
+   || [nmakehlp -V ..\..\..\configure.ac ^[tdom^] >> versions.vc]
 !error *** Could not figure out tdom version.
 !endif
 !include versions.vc

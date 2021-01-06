@@ -2,15 +2,12 @@
 |   Copyright (C) 1999  Jochen C. Loewer (loewerj@hotmail.com)
 +----------------------------------------------------------------------------
 |
-|   $Id$
-|
-|
 |   A DOM interface upon the expat XML parser for the C language
 |   according to the W3C recommendation REC-DOM-Level-1-19981001
 |
 |
 |   The contents of this file are subject to the Mozilla Public License
-|   Version 1.1 (the "License"); you may not use this file except in
+|   Version 2.0 (the "License"); you may not use this file except in
 |   compliance with the License. You may obtain a copy of the License at
 |   http://www.mozilla.org/MPL/
 |
@@ -49,6 +46,7 @@
 #include <tcl.h>
 #include <dom.h>
 #include <domxpath.h>
+#include <schema.h>
 #include <tclexpat.h>
 
 
@@ -151,6 +149,9 @@ typedef struct _domReadInfo {
     int               baseURIstackPos;
     domActiveBaseURI *baseURIstack;
     int               insideDTD;
+#ifndef TDOM_NO_SCHEMA
+    SchemaData       *sdata;
+#endif
     int               status;
 
 } domReadInfo;
@@ -352,6 +353,59 @@ domIsChar (
         else return 0;
     }
     return 1;
+}
+
+/*---------------------------------------------------------------------------
+|   domClearString
+|
+\--------------------------------------------------------------------------*/
+char *
+domClearString (
+    char *str,
+    int *haveToFree
+    )
+{
+    const char *p, *s;
+    char *p1, *clearedstr;
+    int   clen, i, rewrite = 0;
+    
+    p = str;
+    while (*p) {
+        clen = UTF8_CHAR_LEN(*p);
+        if (clen > 4 || !UTF8_XMLCHAR((unsigned const char*)p,clen)) {
+            rewrite = 1;
+            break;
+        }
+        p += clen;
+    }
+    if (!rewrite) {
+        *haveToFree = 0;
+        return str;
+    }
+    s = p;
+    p += clen;
+    while (*p) p++;
+    clearedstr = MALLOC (sizeof(char) * (p-str));
+    p1 = clearedstr;
+    while (str < s) {
+        *p1 = *str;
+        p1++; str++;
+    }
+    str += clen;
+    while (*str) {
+        clen = UTF8_CHAR_LEN(*str);
+        if (clen <= 4 && UTF8_XMLCHAR((unsigned const char*)str,clen)) {
+            for (i = 0; i < clen; i++) {
+                *p1 = *str;
+                p1++; str++;
+            }
+        } else {
+            str += clen;
+        }
+    }
+    *p1 = '\0';
+    *haveToFree = 1;
+    return clearedstr;
 }
 
 /*---------------------------------------------------------------------------
@@ -1126,8 +1180,6 @@ startElement(
     }
     memset(node, 0, sizeof(domNode));
     node->nodeType      = ELEMENT_NODE;
-    node->nodeFlags     = 0;
-    node->namespace     = 0;
     node->nodeName      = (char *)&(h->key);
     node->nodeNumber    = NODE_NO(info->document);
     node->ownerDocument = info->document;
@@ -1307,7 +1359,7 @@ elemNSfound:
            of id(). If some elements share the same ID, the first in
            document order should be used. Doing it this way, this is
            guaranteed for unchanged DOM trees. There are problems, if
-           the DOM tree is changed, befor using id() */
+           the DOM tree is changed, before using id() */
         if (hnew) {
             Tcl_SetHashValue (h, node);
         }
@@ -1330,10 +1382,7 @@ elemNSfound:
         attrnode->nodeType = ATTRIBUTE_NODE;
         if (atPtr == idAttPtr) {
             attrnode->nodeFlags |= IS_ID_ATTRIBUTE;
-        } else {
-            attrnode->nodeFlags = 0;
         }
-        attrnode->namespace   = 0;
         attrnode->nodeName    = (char *)&(h->key);
         attrnode->parentNode  = node;
         len = strlen(atPtr[1]);
@@ -1382,7 +1431,23 @@ elemNSfound:
             }
         }
     }
-
+#ifndef TDOM_NO_SCHEMA
+    if (info->sdata) {
+        if (tDOM_probeElement (info->interp, info->sdata, node->nodeName,
+                          node->namespace ?
+                          info->document->namespaces[node->namespace-1]->uri
+                          : NULL)
+            != TCL_OK) {
+            XML_StopParser(info->parser, 0);
+        } else {
+            if (tDOM_probeDomAttributes (info->interp, info->sdata,
+                                    node->firstAttr)
+                != TCL_OK) {
+                XML_StopParser(info->parser, 0);
+            }
+        }
+    }
+#endif
     info->depth++;
 }
 
@@ -1421,6 +1486,13 @@ endElement (
             info->baseURIstackPos--;
         }
     }
+#ifndef TDOM_NO_SCHEMA
+    if (info->sdata) {
+        if (tDOM_probeElementEnd (info->interp, info->sdata) != TCL_OK) {
+            XML_StopParser(info->parser, 0);
+        }
+    }
+#endif
 }
 
 /*---------------------------------------------------------------------------
@@ -1485,10 +1557,18 @@ DispatchPCDATA (
     domLineColumn *lc;
     Tcl_HashEntry *h;
     char          *s;
-    int            len, hnew;
+    int            len, hnew, only_whites;
     
     len = Tcl_DStringLength (info->cdata);
+#ifndef TDOM_NO_SCHEMA
+    if (!len && !info->cdataSection
+        && !(info->sdata
+             && info->sdata->stack
+             && info->sdata->stack->pattern->flags & CONSTRAINT_TEXT_CHILD))
+        return;
+#else
     if (!len && !info->cdataSection) return;
+#endif
     s = Tcl_DStringValue (info->cdata);
     
     parentNode = info->currentNode;
@@ -1504,11 +1584,12 @@ DispatchPCDATA (
         memmove(node->nodeValue + node->valueLength, s, len);
         node->valueLength += len;
 
+        only_whites = 0;
     } else {
 
         if (info->ignoreWhiteSpaces) {
             char *pc;
-            int   i, only_whites;
+            int   i;
 
             only_whites = 1;
             for (i=0, pc = s; i < len; i++, pc++) {
@@ -1521,8 +1602,7 @@ DispatchPCDATA (
                 }
             }
             if (only_whites) {
-                Tcl_DStringSetLength (info->cdata, 0);
-                return;
+                goto checkTextConstraints;
             }
         }
 
@@ -1537,7 +1617,6 @@ DispatchPCDATA (
             node->nodeType    = CDATA_SECTION_NODE;
         else 
             node->nodeType    = TEXT_NODE;
-        node->nodeFlags   = 0;
         node->nodeNumber  = NODE_NO(info->document);
         node->valueLength = len;
         node->nodeValue   = (char*)MALLOC(len);
@@ -1571,6 +1650,15 @@ DispatchPCDATA (
             lc->column       = XML_GetCurrentColumnNumber(info->parser);
         }
     }
+checkTextConstraints:
+#ifndef TDOM_NO_SCHEMA
+    if (info->sdata) {
+        if (tDOM_probeText (info->interp, info->sdata, s, &only_whites)
+            != TCL_OK) {
+            XML_StopParser(info->parser, 0);
+        }
+    }
+#endif
     Tcl_DStringSetLength (info->cdata, 0);
 }
 
@@ -1610,7 +1698,6 @@ commentHandler (
     }
     memset(node, 0, sizeof(domTextNode));
     node->nodeType    = COMMENT_NODE;
-    node->nodeFlags   = 0;
     node->nodeNumber  = NODE_NO(info->document);
     node->valueLength = len;
     node->nodeValue   = (char*)MALLOC(len);
@@ -1692,8 +1779,6 @@ processingInstructionHandler(
     }
     memset(node, 0, sizeof(domProcessingInstructionNode));
     node->nodeType    = PROCESSING_INSTRUCTION_NODE;
-    node->nodeFlags   = 0;
-    node->namespace   = 0;
     node->nodeNumber  = NODE_NO(info->document);
 
     if (info->baseURIstack[info->baseURIstackPos].baseURI 
@@ -2102,6 +2187,9 @@ domReadDocument (
     Tcl_Obj    *extResolver,
     int         useForeignDTD,
     int         paramEntityParsing,
+#ifndef TDOM_NO_SCHEMA
+    SchemaData *sdata,
+#endif
     Tcl_Interp *interp,
     int        *resultcode
 )
@@ -2148,7 +2236,10 @@ domReadDocument (
         MALLOC (sizeof(domActiveBaseURI) * info.baseURIstackSize);
     info.insideDTD            = 0;
     info.status               = 0;
-
+#ifndef TDOM_NO_SCHEMA
+    info.sdata                = sdata;
+#endif
+    
     XML_SetUserData(parser, &info);
     XML_SetBase (parser, baseurl);
     /* We must use XML_GetBase(), because XML_SetBase copies the baseURI,
@@ -2300,8 +2391,8 @@ domException2String (
 int
 domGetLineColumn (
     domNode *node,
-    int     *line,
-    int     *column
+    long     *line,
+    long     *column
 )
 {
     char *v;
@@ -2425,8 +2516,6 @@ domCreateDoc (
         h = Tcl_CreateHashEntry (doc->baseURIs, (char*)rootNode, &hnew);
         Tcl_SetHashValue (h, tdomstrdup (baseURI));
         rootNode->nodeFlags |= HAS_BASEURI;
-    } else {
-        rootNode->nodeFlags = 0;
     }
     rootNode->namespace     = 0;
     h = Tcl_CreateHashEntry(&HASHTAB(doc,tdom_tagNames), "", &hnew);
@@ -2478,7 +2567,6 @@ domCreateDocument (
     node = (domNode*) domAlloc(sizeof(domNode));
     memset(node, 0, sizeof(domNode));
     node->nodeType        = ELEMENT_NODE;
-    node->nodeFlags       = 0;
     node->nodeNumber      = NODE_NO(doc);
     node->ownerDocument   = doc;
     node->nodeName        = (char *)&(h->key);
@@ -3916,7 +4004,6 @@ domNewTextNode(
     node = (domTextNode*) domAlloc(sizeof(domTextNode));
     memset(node, 0, sizeof(domTextNode));
     node->nodeType      = nodeType;
-    node->nodeFlags     = 0;
     node->nodeNumber    = NODE_NO(doc);
     node->ownerDocument = doc;
     node->valueLength   = length;
@@ -3971,7 +4058,6 @@ domEscapeCData (
     }
 }
 
-
 /*---------------------------------------------------------------------------
 |   domAppendNewTextNode
 |
@@ -3987,7 +4073,7 @@ domAppendNewTextNode(
 {
     domTextNode   *node;
 
-    if (!length) {
+    if (!length && (nodeType == TEXT_NODE)) {
         return NULL;
     }
 
@@ -4006,7 +4092,6 @@ domAppendNewTextNode(
     node = (domTextNode*) domAlloc(sizeof(domTextNode));
     memset(node, 0, sizeof(domTextNode));
     node->nodeType      = nodeType;
-    node->nodeFlags     = 0;
     if (disableOutputEscaping) {
         node->nodeFlags |= DISABLE_OUTPUT_ESCAPING;
     }
@@ -4435,8 +4520,6 @@ domNewProcessingInstructionNode(
     node = (domProcessingInstructionNode*) domAlloc(sizeof(domProcessingInstructionNode));
     memset(node, 0, sizeof(domProcessingInstructionNode));
     node->nodeType      = PROCESSING_INSTRUCTION_NODE;
-    node->nodeFlags     = 0;
-    node->namespace     = 0;
     node->nodeNumber    = NODE_NO(doc);
     node->ownerDocument = doc;
     node->targetLength  = targetLength;
@@ -4478,8 +4561,6 @@ domNewElementNode(
     node = (domNode*) domAlloc(sizeof(domNode));
     memset(node, 0, sizeof(domNode));
     node->nodeType      = ELEMENT_NODE;
-    node->nodeFlags     = 0;
-    node->namespace     = 0;
     node->nodeNumber    = NODE_NO(doc);
     node->ownerDocument = doc;
     node->nodeName      = (char *)&(h->key);
@@ -4523,8 +4604,6 @@ domNewElementNodeNS (
     node = (domNode*) domAlloc(sizeof(domNode));
     memset(node, 0, sizeof(domNode));
     node->nodeType      = ELEMENT_NODE;
-    node->nodeFlags     = 0;
-    node->namespace     = 0;
     node->nodeNumber    = NODE_NO(doc);
     node->ownerDocument = doc;
     node->nodeName      = (char *)&(h->key);
@@ -4570,17 +4649,11 @@ domCloneNode (
     }
     if (node->nodeType != ELEMENT_NODE) {
         domTextNode *t1node, *tnode = (domTextNode*)node;
-        if (tnode->info) {
-            t1node = domNewTextNode(tnode->ownerDocument,
-                                    tnode->nodeValue, tnode->valueLength,
-                                    tnode->nodeType);
-            t1node->info = tnode->info;
-            return (domNode*) t1node;
-        } else {
-            return (domNode*) domNewTextNode(tnode->ownerDocument,
-                                             tnode->nodeValue, tnode->valueLength,
-                                             tnode->nodeType);
-        }
+        t1node = domNewTextNode(tnode->ownerDocument, tnode->nodeValue,
+                                tnode->valueLength, tnode->nodeType);
+        t1node->info = tnode->info;
+        t1node->nodeFlags = tnode->nodeFlags;
+        return (domNode*) t1node;
     }
 
     n = domNewElementNode(node->ownerDocument, node->nodeName);
@@ -4594,9 +4667,7 @@ domCloneNode (
     while (attr != NULL) {
         nattr = domSetAttribute (n, attr->nodeName, attr->nodeValue );
         nattr->namespace = attr->namespace;
-        if (attr->nodeFlags & IS_NS_NODE) {
-            nattr->nodeFlags |= IS_NS_NODE;
-        }
+        nattr->nodeFlags = attr->nodeFlags;
         attr = attr->nextSibling;
     }
 
@@ -5150,16 +5221,19 @@ typedef struct _tdomCmdReadInfo {
     int               baseURIstackPos;
     domActiveBaseURI *baseURIstack;
     int               insideDTD;
+#ifndef TDOM_NO_SCHEMA
+    SchemaData       *sdata;
+#endif
     /* Now the tdom cmd specific elements */
     int               tdomStatus;
     Tcl_Obj          *extResolver;
 
 } tdomCmdReadInfo;
 
-EXTERN int tcldom_returnDocumentObj (Tcl_Interp *interp, 
-                                     domDocument *document,
-                                     int setVariable, Tcl_Obj *var_name,
-                                     int trace, int forOwnerDocument);
+int tcldom_returnDocumentObj (Tcl_Interp *interp, 
+                              domDocument *document,
+                              int setVariable, Tcl_Obj *var_name,
+                              int trace, int forOwnerDocument);
 
 void
 tdom_freeProc (
@@ -5361,7 +5435,9 @@ TclTdomObjCmd (dummy, interp, objc, objv)
         info->insideDTD         = 0;
         info->tdomStatus        = 0;
         info->extResolver       = NULL;
-
+#ifndef TDOM_NO_SCHEMA
+        info->sdata             = NULL;
+#endif
         handlerSet->userData    = info;
 
         CHandlerSetInstall (interp, objv[1], handlerSet);

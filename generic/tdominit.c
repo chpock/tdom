@@ -2,14 +2,11 @@
 |   Copyright (c) 1999 Jochen Loewer (loewerj@hotmail.com)
 +-----------------------------------------------------------------------------
 |
-|   $Id$
-|
-|
 |   A DOM implementation for Tcl using James Clark's expat XML parser
 | 
 |
 |   The contents of this file are subject to the Mozilla Public License
-|   Version 1.1 (the "License"); you may not use this file except in
+|   Version 2.0 (the "License"); you may not use this file except in
 |   compliance with the License. You may obtain a copy of the License at
 |   http://www.mozilla.org/MPL/
 |
@@ -43,6 +40,7 @@
 #include <tdom.h>
 #include <tcldom.h>
 #include <tclpull.h>
+#include <schema.h>
 
 extern TdomStubs tdomStubs;
 
@@ -62,13 +60,15 @@ extern TdomStubs tdomStubs;
  *----------------------------------------------------------------------------
  */
 
-int
+EXTERN int
 Tdom_Init (
      Tcl_Interp *interp /* Interpreter to initialize. */
 ) {
         
 #ifdef USE_TCL_STUBS
-    Tcl_InitStubs(interp, "8", 0);
+    if (Tcl_InitStubs(interp, "8.4", 0) == NULL) {
+        return TCL_ERROR;
+    }
 #endif
         
     domModuleInitialize();
@@ -95,6 +95,10 @@ Tdom_Init (
 #ifndef TDOM_NO_PULL
     Tcl_CreateObjCommand(interp, "tdom::pullparser", tDOM_PullParserCmd, NULL, NULL );    
 #endif
+
+#ifndef TDOM_NO_SCHEMA
+    tDOM_SchemaInit (interp);
+#endif
     
 #ifdef USE_TCL_STUBS
     Tcl_PkgProvideEx(interp, PACKAGE_NAME, PACKAGE_VERSION, 
@@ -106,7 +110,7 @@ Tdom_Init (
     return TCL_OK;
 }
 
-int
+EXTERN int
 Tdom_SafeInit (
      Tcl_Interp *interp
 ) {

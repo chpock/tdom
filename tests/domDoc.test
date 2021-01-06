@@ -37,7 +37,7 @@
 
 source [file join [file dir [info script]] loadtdom.tcl]
 
-test domDoc-1.1 {asXML -escapeNonASCII} {need_i18n} {
+test domDoc-1.1 {asXML -escapeNonASCII} {
     set doc [dom parse [tdom::xmlReadFile \
             [file join [file dir [info script]] data/i18n_1.xml]]]
     set result [$doc asXML -escapeNonASCII]
@@ -46,7 +46,7 @@ test domDoc-1.1 {asXML -escapeNonASCII} {need_i18n} {
 } {<test>&#1072;&#1073;&#1074;&#1075;&#1076;&#1077;&#1078;&#1079;&#1080;&#1081;</test>
 }
 
-test domDoc-1.2 {asXML -escapeNonASCII; comments and PI's are not altered} {need_i18n} {
+test domDoc-1.2 {asXML -escapeNonASCII; comments and PI's are not altered} {
     set doc [dom parse [tdom::xmlReadFile \
             [file join [file dir [info script]] data/i18n_2.xml]]]
     set result [$doc asXML -indent none -escapeNonASCII]
@@ -56,7 +56,7 @@ test domDoc-1.2 {asXML -escapeNonASCII; comments and PI's are not altered} {need
 german umlauts: &#228;&#246;&#252;&#223;
 </root>"
 
-test domDoc-1.3 {asHTML -escapeNonASCII -htmlEntities} {need_i18n} {
+test domDoc-1.3 {asHTML -escapeNonASCII -htmlEntities} {
     set doc [dom parse {<html><body>&#228;&#xfc;&#8222;&#8223;&#8224;</body></html>}]
     set result [$doc asHTML -escapeNonASCII -htmlEntities]
     $doc delete
@@ -318,6 +318,58 @@ test domDoc-1.31 {asXML '"' in attribute value} {
     $doc delete
     set result
 } {<doc attr="foo&quot;bar"/>}
+
+test domDoc-1.32 {asXML -indent tabs} {
+    set doc [dom parse {<doc><a><b/></a></doc>}]
+    set result [$doc asXML -indent tabs]
+    $doc delete
+    set result
+} "<doc>\n\t<a>\n\t\t<b/>\n\t</a>\n</doc>\n"
+
+test domDoc-1.33 {asXML -indent tabs} {
+    set doc [dom parse {<doc><a><b/></a><c><d><f/></d></c><g/></doc>}]
+    set result [$doc asXML -indent tabs]
+    $doc delete
+    set result
+} "<doc>\n\t<a>\n\t\t<b/>\n\t</a>\n\t<c>\n\t\t<d>\n\t\t\t<f/>\n\t\t</d>\n\t</c>\n\t<g/>\n</doc>\n"
+
+test domDoc-1.34 {asXML -indent tabs -noEmptyElementTag} {
+    set doc [dom parse {<doc><a><b/></a><c><d><f/></d></c><g/></doc>}]
+    set result [$doc asXML -indent tabs -noEmptyElementTag]
+    $doc delete
+    set result
+} "<doc>\n\t<a>\n\t\t<b></b>\n\t</a>\n\t<c>\n\t\t<d>\n\t\t\t<f></f>\n\t\t</d>\n\t</c>\n\t<g></g>\n</doc>\n"
+
+test domDoc-1.35 {asXML -indent tabs -indentAttrs tabs} {
+    set doc [dom parse {<doc><a a1="a1" a2="a2"><b/></a><c><d a1="a1" a2="a2"><f/></d></c><g/></doc>}]
+    set result [$doc asXML -indent tabs -indentAttrs tabs]
+    $doc delete
+    set result
+} "<doc>\n\t<a\n\t\ta1=\"a1\"\n\t\ta2=\"a2\">\n\t\t<b/>\n\t</a>\n\t<c>\n\t\t<d\n\t\t\ta1=\"a1\"\n\t\t\ta2=\"a2\">\n\t\t\t<f/>\n\t\t</d>\n\t</c>\n\t<g/>\n</doc>\n"
+
+test domDoc-1.36 {asXML -indent tabs -indentAttrs <num>} {
+    set doc [dom parse {<doc><a a1="a1" a2="a2"><b/></a><c><d a1="a1" a2="a2"><f/></d></c><g/></doc>}]
+    set result [$doc asXML -indent tabs -indentAttrs 2]
+    $doc delete
+    set result
+} "<doc>\n\t<a\n\t  a1=\"a1\"\n\t  a2=\"a2\">\n\t\t<b/>\n\t</a>\n\t<c>\n\t\t<d\n\t\t  a1=\"a1\"\n\t\t  a2=\"a2\">\n\t\t\t<f/>\n\t\t</d>\n\t</c>\n\t<g/>\n</doc>\n"
+
+test domDoc-1.37 {asHTML -onlyContents} {
+    set doc [dom parse {<html><body><p>boo</p></body></html>}]
+    set result [[$doc documentElement] asHTML -onlyContents]
+    $doc delete
+    set result
+} {<body><p>boo</p></body>}
+
+test domDoc-1.38 {asHTML -breakLines} {
+    set doc [dom parse {<html><body><p>boo</p></body></html>}]
+    set result [$doc asHTML -breakLines]
+    $doc delete
+    set result
+} {<html
+><body
+><p
+>boo</p></body></html>}
 
 set doc [dom parse <root/>]
 
@@ -1395,7 +1447,7 @@ test domDoc-25.4 {selectNodesNamespaces} {
     lappend result $errMsg
     $doc delete
     set result
-} {1 {The optional argument to the selectNodesNamespaces method must be a 'prefix namespace' pairs list}}
+} {1 {The optional argument to selectNodesNamespaces must be a 'prefix namespace' pairs list}}
 
 test domDoc-25.5 {selectNodesNamespaces} {
     set doc [dom parse {<root xmlns="rootdefaultNS">

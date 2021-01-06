@@ -133,10 +133,24 @@ used, which tries to even parse badly formed HTML into a DOM tree.</desc>
               </optdef>
 
               <optdef>
+                <optname>-jsonroot &lt;document element name&gt;</optname>
+                <desc>If given makes the given element name the
+                document element of the resulting doc. The parsed
+                content of the JSON string will be the childs of this
+                document element node.</desc>
+              </optdef>
+              
+              <optdef>
                 <optname>-jsonmaxnesting</optname>
                 <optarg>integer</optarg>
                 <desc>This option only has effect if used together
-                with the <m>-json</m> option. The current implementation uses recursive descent JSON parser. In order to avoid using excess stack space, any JSON input that has more than a certain levels of nesting is considered invalid. The default maximum nesting is 2000. The option -jsonmaxnesting allows the user to adjust that.</desc>
+                with the <m>-json</m> option. The current
+                implementation uses a recursive descent JSON parser.
+                In order to avoid using excess stack space, any JSON
+                input that has more than a certain levels of nesting
+                is considered invalid. The default maximum nesting is
+                2000. The option -jsonmaxnesting allows the user to
+                adjust that.</desc>
               </optdef>
               
               <optdef>
@@ -290,11 +304,15 @@ called. The <m>-useForeignDTD</m> respects </desc>
                 un-prefixed elements or even if the element has a
                 defined namespace prefix. One consequence is that
                 XPath node expressions on such a DOM tree doesn't work
-                as expected. Prefixed element nodes can't be selected
-                and element nodes without prefix will be seen by XPath
-                expressions as if they are not in any namespace (no
-                matter if they are in fact should be in a default
-                namespace).
+                as may be expected. Prefixed element nodes can't be
+                selected naively and element nodes without prefix will
+                be seen by XPath expressions as if they are not in any
+                namespace (no matter if they are in fact should be in
+                a default namespace). If you need to inject prefixed
+                node names into an XPath expression use the '%' syntax
+                described in the documentation of the of the
+                <command>domNode</command> command method
+                <method>>selectNodes</method>.
                 </desc>
               </optdef>
 
@@ -508,6 +526,12 @@ recommendation. Otherwise it returns 0.</desc>
         </commanddef>
 
         <commanddef>
+          <command><cmd>dom</cmd> <method>clearString</method> <m>string</m></command>
+          <desc>Returns the string given as argument cleared out from any characters not
+          allowed as XML parsed character data.</desc>
+        </commanddef>
+        
+        <commanddef>
           <command><cmd>dom</cmd> <method>isBMPCharData</method>
 <m>string</m></command>
           <desc>Returns 1 if every character in <m>string</m> is
@@ -555,18 +579,18 @@ recommendation. Otherwise it returns 0.</desc>
                 </optdef>
                 <optdef>
                     <optname>expatmajorversion</optname>
-                    <desc>Returns the major version of the underlyling
-                    expat version as integer.</desc>
+                    <desc>Returns the major version of the at build
+                    time used expat version as integer.</desc>
                 </optdef>
                 <optdef>
                     <optname>expatminorversion</optname>
-                    <desc>Returns the minor version of the underlyling
-                    expat version as integer.</desc>
+                    <desc>Returns the minor version of the at build
+                    time used expat version as integer.</desc>
                 </optdef>
                 <optdef>
                     <optname>expatmicroversion</optname>
-                    <desc>Returns the micro version of the underlyling
-                    expat version as integer.</desc>
+                    <desc>Returns the micro version of the at build
+                    time used expat version as integer.</desc>
                 </optdef>
                 <optdef>
                     <optname>dtd</optname>
@@ -611,6 +635,11 @@ recommendation. Otherwise it returns 0.</desc>
                     <optname>pullparser</optname>
                     <desc>Returns as boolean if the pullparser command
                     is build in.</desc>
+                </optdef>
+                <optdef>
+                    <optname>schema</optname>
+                    <desc>Returns as boolean if the tDOM schema features
+                    are build in.</desc>
                 </optdef>
             </optlist>
             </desc>   

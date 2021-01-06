@@ -181,6 +181,19 @@ test dom-1.24 {Explicit delete of scoped doc} {
     set result
 } {1 {can't set "doc": var is read-only}}
 
+test dom-1.25 {Doc var} {
+    dom parse <test/> doc
+    dom parse <test/> doc
+    unset doc
+} {}
+
+test dom-1.26 {Doc var} {
+    dom parse <test/> doc
+    set result [catch {$doc documentElement doc}]
+    unset doc
+    set result
+} {1}
+
 test dom-2.1 {Don't quash white space at start or end of non white space content} {
     set doc [dom parse {<root>
     some content
@@ -814,7 +827,7 @@ set nameStartChars [lsort -command sortCmd \
 # Append stop char needed by the test code to work properly.
 lappend nameStartChars 0x10000
 
-test dom-3.8 {isName} {longRunning && need_i18n} {
+test dom-3.8 {isName} {longRunning} {
     set ind 0
     set nr 0
     while {$nr < 65536} {
@@ -850,7 +863,7 @@ set nameChars [lsort -command sortCmd \
 # Append stop char needed by the test code to work properly.
 lappend nameChars 0x10000
 
-test dom-3.9 {isName} {longRunning && need_i18n} {
+test dom-3.9 {isName} {
     set ind 0
     set nr 0
     while {$nr < 65536} {
@@ -961,7 +974,7 @@ set XMLChars {
     0x9 0xA 0xD {0x20 0xD7FF} {0xE000 0xFFFD} {0x10000 0x10FFFF}
 }
 
-test dom-3.27 {isCharData} {longRunning && need_i18n} {
+test dom-3.27 {isCharData} {longRunning} {
     set ind 0
     set nr 1
     while {$nr < 65536} {
@@ -1031,7 +1044,7 @@ test dom-3.37 {isCDATA} {
     dom isCDATA "valid: ]]> "
 } {0}
 
-test dom-3.38 {isCDATA} {need_i18n} {
+test dom-3.38 {isCDATA} {
     dom isCDATA "\ud7fa\ud7fb\ud7fc\ud7fd\ud7fe\ud7ff]]>"
 } {0}
 
@@ -1047,6 +1060,27 @@ test dom-3.41 {isPIValue} {
     dom isPIValue "some invalid processing instruction data?>"
 } {0}
 
+
+test dom-3.43 {clearString} {
+    set result [list]
+    foreach str {
+        \u0001
+        a\u0002
+        \u0003b
+        a\u0004b
+        a\u0004\u0005b
+        a\u0004c\u0005b
+        a\u0004d\u0005\u0006b
+        a\u0004d\u0005\uD800\uD801\uD802_foo_bar
+        \uD800\uD801\uD802_foo_bar_baz\uD802_didum\uDFFF
+        \uD800\uD801\uD802_foo_bar_baz\uD802_didum\uE000
+        \u0004\u0005\uDABC
+        abc
+    } {
+        lappend result [dom clearString $str]
+    }
+    set result
+} [list {} a b ab ab acb adb ad_foo_bar _foo_bar_baz_didum _foo_bar_baz_didum\uE000 {} abc]
 
 test dom-4.1 {-useForeignDTD 0} {
     set doc [dom parse -useForeignDTD 0 {<root/>}]
@@ -1630,6 +1664,153 @@ test dom-8.11 {createDocumentNode} {
     catch {dom createDocumentNode -jsonType FOO docNode} errMsg
     set errMsg
 } {bad jsonType "FOO": must be NONE, ARRAY, OBJECT, NULL, TRUE, FALSE, STRING, or NUMBER}
+
+test dom-8.12 {createDocumentNode - method check} {
+    set docNode [dom createDocumentNode]
+    set result [$docNode documentElement]
+    $docNode delete
+    set result
+} {}
+test dom-8.13 {createDocumentNode - method check} {
+    set docNode [dom createDocumentNode]
+    set result [$docNode getElementsByTagName foo]
+    $docNode delete
+    set result
+} {}
+test dom-8.14 {createDocumentNode - method check} {
+    set docNode [dom createDocumentNode]
+    set result [$docNode getElementsByTagNameNS http://bar.org foo]
+    $docNode delete
+    set result
+} {}
+test dom-8.15 {createDocumentNode - method check} {
+    set docNode [dom createDocumentNode]
+    set newElement [$docNode createElement child]
+    set result [$newElement asXML -indent none]
+    $docNode delete
+    set result
+} {<child/>}
+test dom-8.16 {createDocumentNode - method check} {
+    set docNode [dom createDocumentNode]
+    $docNode delete
+} {}
+test dom-8.17 {createDocumentNode - method check} {
+    set docNode [dom createDocumentNode]
+    set node [$docNode createCDATASection "<someText>"]
+    set result [$node asXML -indent none]
+    $docNode delete
+    set result
+} {<![CDATA[<someText>]]>}
+test dom-8.18 {createDocumentNode - method check} {
+    set docNode [dom createDocumentNode]
+    set node [$docNode createTextNode "a&b"]
+    set result [$node asXML -indent none]
+    $docNode delete
+    set result
+} {a&amp;b}
+test dom-8.19 {createDocumentNode - method check} {
+    set docNode [dom createDocumentNode]
+    set node [$docNode createComment "some comment"]
+    set result [$node asXML -indent none]
+    $docNode delete
+    set result
+} {<!--some comment-->}
+test dom-8.20 {createDocumentNode - method check} {
+    set docNode [dom createDocumentNode]
+    set node [$docNode createProcessingInstruction foo bar]
+    set result [$node asXML -indent none]
+    $docNode delete
+    set result
+} {<?foo bar?>}
+test dom-8.21 {createDocumentNode - method check} {
+    set docNode [dom createDocumentNode]
+    set node [$docNode createElementNS http://foo.org p:bar]
+    $docNode appendChild $node
+    set result [$docNode asXML -indent none]
+    $docNode delete
+    set result
+} {<p:bar xmlns:p="http://foo.org"/>}
+test dom-8.22 {createDocumentNode - method check} {
+    set docNode [dom createDocumentNode]
+    set result [$docNode getDefaultOutputMethod]
+    $docNode delete
+    set result
+} {xml}
+test dom-8.23 {createDocumentNode - method check} {
+    set docNode [dom createDocumentNode]
+    set result [$docNode asXML -indent none]
+    $docNode delete
+    set result
+} {}
+test dom-8.24 {createDocumentNode - method check} {
+    set docNode [dom createDocumentNode]
+    set result [$docNode asHTML]
+    $docNode delete
+    set result
+} {}
+test dom-8.25 {createDocumentNode - method check} {
+    set docNode [dom createDocumentNode]
+    set identityTransformation [dom parse {<xsl:stylesheet version="1.0"
+ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:template match="@*|node()">
+  <xsl:copy>
+    <xsl:apply-templates select="@*|node()"/>
+  </xsl:copy>
+</xsl:template>
+    </xsl:stylesheet>}]
+    set resultdoc [$docNode xslt $identityTransformation]
+    set result [$resultdoc asXML -indent none]
+    $resultdoc delete
+    $identityTransformation delete
+    $docNode delete
+    set result
+} {}
+test dom-8.26 {createDocumentNode - method check} {
+    set docNode [dom createDocumentNode]
+    set result ""
+    lappend result [$docNode publicId]
+    $docNode publicId data
+    lappend result [$docNode publicId]
+    $docNode delete
+    set result
+} {{} data}
+test dom-8.27 {createDocumentNode - method check} {
+    set docNode [dom createDocumentNode]
+    set result ""
+    lappend result [$docNode systemId]
+    $docNode systemId data
+    lappend result [$docNode systemId]
+    $docNode delete
+    set result
+} {{} data}
+test dom-8.28 {createDocumentNode - method check} {
+    set docNode [dom createDocumentNode]
+    set result ""
+    lappend result [$docNode internalSubset]
+    $docNode internalSubset data
+    lappend result [$docNode internalSubset]
+    $docNode delete
+    set result
+} {{} data}
+test dom-8.29 {createDocumentNode - method check} {
+    set docNode [dom createDocumentNode]
+    set result [catch {$docNode toXSLTcmd}]
+    $docNode delete
+    set result
+} {1}
+test dom-8.30 {createDocumentNode - method check} {
+    set docNode [dom createDocumentNode]
+    set result [$docNode asText]
+    $docNode delete
+    set result
+} {}
+test dom-8.31 {createDocumentNode - method check} {
+    set docNode [dom createDocumentNode]
+    $docNode normalize
+    set result [$docNode asXML -indent none]
+    $docNode delete
+    set result
+} {}
 
 test dom-9.1 {setObjectCommands} {
     dom setObjectCommands

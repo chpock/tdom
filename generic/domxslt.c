@@ -2,16 +2,13 @@
 |   Copyright (c) 2000 Jochen Loewer (loewerj@hotmail.com)
 |-----------------------------------------------------------------------------
 |
-|   $Id$
-|
-|
 |   A XSLT implementation for tDOM, according to the W3C
 |   recommendation (16 Nov 1999).
 |   See http://www.w3.org/TR/1999/REC-xslt-19991116 for details.
 |
 |
 |   The contents of this file are subject to the Mozilla Public License
-|   Version 1.1 (the "License"); you may not use this file except in
+|   Version 2.0 (the "License"); you may not use this file except in
 |   compliance with the License. You may obtain a copy of the License at
 |   http://www.mozilla.org/MPL/
 |
@@ -545,7 +542,7 @@ reportError (
     Tcl_DString dStr;
     char buffer[1024];
     const char *baseURI;
-    int  line, column;
+    long  line, column;
 
     Tcl_DStringInit (&dStr);
     baseURI = findBaseURI (node);
@@ -555,7 +552,7 @@ reportError (
     }
     if (node->nodeFlags & HAS_LINE_COLUMN) {
         domGetLineColumn (node, &line, &column);
-        sprintf (buffer, " at line %d, column %d:\n", line, column);
+        sprintf (buffer, " at line %ld, column %ld:\n", line, column);
         Tcl_DStringAppend (&dStr, buffer, -1);
         Tcl_DStringAppend (&dStr, str, -1);
     } else {
@@ -994,7 +991,7 @@ static void formatValue (
 
     case latin_upper:
         upper = 1;
-        /* fall thru */
+        /* fall through */
     case latin_lower:
         /* Home grown algorithm. (And I'm really not happy with it.)
            Please let rolf@pointsman.de know how to do this better /
@@ -1039,7 +1036,7 @@ static void formatValue (
 
     case roman_upper:
         upper = 1;
-        /* fall thru */
+        /* fall through */
     case roman_lower:
         /* Algorithm follows the idear of the converter
            at http://mini.net/cgi-bin/wikit/1749.html */
@@ -2862,7 +2859,7 @@ static int xsltAddTemplate (
 )
 {
     xsltTemplate  *tpl, *t;
-    char          *prioStr, *str, prefix[MAX_PREFIX_LEN];
+    char          *prioStr, *str, prefix[MAX_PREFIX_LEN], *tailptr;
     const char    *localName;
     int            rc, hnew;
     domNS         *ns;
@@ -2955,8 +2952,9 @@ static int xsltAddTemplate (
         }
         tpl->mode = localName;
         if (rc < 0) {
-            /* If the template has a name attribute, it is already stored in
-               in the namedTemplates hash table and will be freed. */
+            /* If the template has a name attribute, it is already
+             * stored in the namedTemplates hash table and will be
+             * freed. */
             if (!tpl->name) {
                 FREE ((char*)tpl);
             }
@@ -2970,8 +2968,17 @@ static int xsltAddTemplate (
 
     prioStr = getAttr(node,"priority", a_prio);
     if (prioStr) {
-        tpl->prio = (double)atof(prioStr);
-    } 
+        tpl->prio = strtod (prioStr, &tailptr);
+        if (tpl->prio == 0.0 && prioStr == tailptr) {
+            /* If the template has a name attribute, it is already
+             * stored in the namedTemplates hash table and will be
+             * freed. */
+            if (!tpl->name) {
+                FREE ((char*)tpl);
+            }
+            return -1;
+        }
+    }
     
     sDoc = xs->subDocs;
     while (sDoc) {
@@ -3493,9 +3500,14 @@ static int xsltNumber (
         } else {
             Tcl_DStringInit (&dStr);
             if (currentNode->nodeType == ELEMENT_NODE) {
-                /* TODO: This is wrong. Instead this should use the
-                   "expanded-name" of the current node. */
-                Tcl_DStringAppend (&dStr, currentNode->nodeName, -1);
+                if (!currentNode->parentNode &&
+                    currentNode == currentNode->ownerDocument->rootNode) {
+                    Tcl_DStringAppend (&dStr, "/", 1);
+                } else {
+                    /* TODO: This is wrong. Instead this should use the
+                       "expanded-name" of the current node. */
+                    Tcl_DStringAppend (&dStr, currentNode->nodeName, -1);
+                }
             } else 
             if (currentNode->nodeType == ATTRIBUTE_NODE) {
                 Tcl_DStringAppend (&dStr, "@", 1);
@@ -4343,10 +4355,16 @@ static int ExecAction (
             if (rs.type == xNodeSetResult) {
                 for (i=0; i<rs.nr_nodes; i++) {
                     if (rs.nodes[i]->nodeType == ATTRIBUTE_NODE) {
+                        if (xs->lastNode->firstChild) {
+                            /* Adding an Attribute to an element after
+                               children have been added to it is an error.
+                               Ignore the attribute. */
+                            continue;
+                        }
                         attr = (domAttrNode*)rs.nodes[i];
                         if (attr ->nodeFlags & IS_NS_NODE) {
                             /* If someone selects explicitly namespace nodes
-                               to copy-of with e.g namespace::* (remember: @*
+                               to copy-of with e.g. namespace::* (remember: @*
                                doesn't select namespace nodes), we must this
                                handle separately.*/
                             /* The xmlns:xml namespace node will always
@@ -4419,7 +4437,7 @@ static int ExecAction (
             rc = evalAttrTemplates( xs, context, currentNode, currentPos,
                                     str, &str2, errMsg);
             CHECK_RC;
-            if (!domIsNAME (str2)) {
+            if (!domIsQNAME (str2)) {
                 reportError (actionNode, "xsl:element: Element name is not a"
                              " valid QName.", errMsg);
                 FREE(str2);
@@ -4944,7 +4962,7 @@ static int ExecAction (
                element is in a namespace, that should be excluded. We
                follow saxon and xalan, which both add the namespace of
                the literal result element always to the result tree,
-               to ensure, that the result tree is conform to the XML
+               to ensure that the result tree is conform to the XML
                namespace recommendation. */
             if (actionNode->namespace) {
                 ns = actionNode->ownerDocument->namespaces[actionNode->namespace-1];
@@ -5776,8 +5794,11 @@ getExternalDocument (
        a good idea?) */
     doc = domReadDocument (parser, xmlstring, len, 0, 0, storeLineColumn,
                            0, 0, NULL, chan, extbase, extResolver, 0, 
-                           (int) XML_PARAM_ENTITY_PARSING_ALWAYS, interp,
-                           &resultcode);
+                           (int) XML_PARAM_ENTITY_PARSING_ALWAYS,
+#ifndef TDOM_NO_SCHEMA
+                           NULL,
+#endif
+                           interp, &resultcode);
     if (xsltDoc->extResolver) {
         Tcl_DecrRefCount (extResolver);
     }
@@ -6899,7 +6920,7 @@ xsltResetState (
      * the xml source. */
     /* XML documents don't have excludeNS and extensionNS information
        and the already parsed XSLT documents information is
-       preserved, therefor we don't touch excludeNS and extensionNS
+       preserved, therefore, we don't touch excludeNS and extensionNS
        information */
     /* This loop works only as coded, because, the first subdoc will
      * always be the primary XSLT doc, so xs->subDocs will not
@@ -6972,6 +6993,12 @@ xsltCompileStylesheet (
     domAttrNode    *attr;
     xsltTemplate   *tpl;
 
+    if (!xsltDoc->documentElement) {
+        *errMsg = tdomstrdup ("Document has no element node - can't be a valid "
+                              "XSLT 1.0 stylesheet.");
+        return NULL;
+    }
+            
     *errMsg = NULL;
     xs = (xsltState *) MALLOC (sizeof (xsltState));
     
@@ -7234,7 +7261,7 @@ int xsltProcess (
         StripXMLSpace (xs, xmlNode);
     }
 
-    /* add the xml doc to the doc list */
+    /* add the XML doc to the doc list */
     sdoc = (xsltSubDoc*)MALLOC(sizeof (xsltSubDoc));
     sdoc->doc = xmlNode->ownerDocument;
     baseURI = findBaseURI (xmlNode);

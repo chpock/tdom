@@ -206,6 +206,47 @@ AC_DEFUN(TDOM_ENABLE_LESS_NS, [
 ])
 
 #------------------------------------------------------------------------
+# TDOM_ENABLE_SCHEMA --
+#
+#   Building with validation features.
+#
+# Arguments:
+#   None
+#   
+# Results:
+#
+#   Adds the following arguments to configure:
+#       --enable-validation=yes|no
+#
+#   Defines the following vars:
+#
+#   Sets the following vars:
+#
+#------------------------------------------------------------------------
+
+AC_DEFUN(TDOM_ENABLE_SCHEMA, [
+    AC_MSG_CHECKING([whether to enable valiation features])
+    AC_ARG_ENABLE(schema,
+        AC_HELP_STRING([--enable-schema],
+            [build with valiation features (default: on)]),
+        [tcl_ok=$enableval], [tcl_ok=yes])
+
+    if test "${enable_schema+set}" = set; then
+        enableval="$enable_schema"
+        tcl_ok=$enableval
+    else
+        tcl_ok=yes
+    fi
+
+    if test "$tcl_ok" = "no" ; then
+        AC_MSG_RESULT([no])
+        AC_DEFINE(TDOM_NO_SCHEMA)
+    else
+        AC_MSG_RESULT([yes])
+    fi
+])
+
+#------------------------------------------------------------------------
 # TDOM_ENABLE_HTML5 --
 #
 #   Building with gumbo support for HTML5 parsing (dom parse -html5)
@@ -225,6 +266,7 @@ AC_DEFUN(TDOM_ENABLE_LESS_NS, [
 #------------------------------------------------------------------------
 
 AC_DEFUN(TDOM_ENABLE_HTML5, [
+    AC_PATH_TOOL([PKG_CONFIG],[pkg-config])
     AC_MSG_CHECKING([whether to enable support for HTML5 parsing (using gumbo)])
     AC_ARG_ENABLE(html5,
         AC_HELP_STRING([--enable-html5],
@@ -241,24 +283,22 @@ AC_DEFUN(TDOM_ENABLE_HTML5, [
     HTML5_INCLUDES=""
     if test "$tcl_ok" = "yes" ; then
         # Check if pkg-config is available
-        PKGCONFIG=no
-        pkg-config --version > /dev/null 2>&1 && PKGCONFIG=yes
-        if test "$PKGCONFIG" = no; then
+        if test "x$PKG_CONFIG" = x; then
             tcl_ok=no
 	    AC_MSG_ERROR([cannot find pkg-config needed for --enable-html5.])
         fi
     fi
     if test "$tcl_ok" = "yes" ; then
-        HAVEGUMBO=`pkg-config --exists gumbo && echo "1"`
+        HAVEGUMBO=`$PKG_CONFIG --exists gumbo && echo "1"`
         if test "$HAVEGUMBO" = "1" ; then
             AC_MSG_RESULT([yes])
             AC_DEFINE(TDOM_HAVE_GUMBO)
             if test "${TEA_PLATFORM}" = "windows" ; then
-                HTML5_LIBS="-Wl,-Bstatic `pkg-config --static --libs gumbo` -Wl,-Bdynamic"
+                HTML5_LIBS="-Wl,-Bstatic `$PKG_CONFIG --static --libs gumbo` -Wl,-Bdynamic"
             else
-                HTML5_LIBS="`pkg-config --libs gumbo`"
+                HTML5_LIBS="`$PKG_CONFIG --libs gumbo`"
             fi
-            HTML5_INCLUDES="`pkg-config --cflags gumbo`"
+            HTML5_INCLUDES="`$PKG_CONFIG --cflags gumbo`"
         else
             AC_MSG_ERROR([The required lib gumbo not found])
         fi
@@ -369,8 +409,7 @@ AC_DEFUN(TDOM_PATH_EXPAT, [
         AC_MSG_RESULT([Using bundled expat distribution])
         TEA_ADD_SOURCES([expat/xmlrole.c \
                          expat/xmltok.c \
-                         expat/xmlparse.c \
-                         expat/loadlibrary.c])
+                         expat/xmlparse.c])
         TEA_ADD_INCLUDES([-I${srcdir}/expat])
         AC_DEFINE([XML_POOR_ENTROPY], 1,
           [Define to use poor entropy in lack of better source.])
