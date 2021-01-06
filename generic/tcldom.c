@@ -2785,8 +2785,8 @@ void tcldom_treeAsXML (
     domDocument   *doc;
     int            isDoc = 0;
     int            level = 0, cdataChild = 0;
-    int            i;
-    char           prefix[MAX_PREFIX_LEN], *start, *p;
+    int            i, indBufCount, attindBufCount;
+    char           prefix[MAX_PREFIX_LEN], *start, *p, *indBuf, *attindBuf;
     const char    *localName;
     Tcl_HashEntry *h;
     Tcl_DString    dStr;
@@ -2841,6 +2841,20 @@ void tcldom_treeAsXML (
             writeChars(xmlString, chan, ">\n", 2);
         }
         node = doc->rootNode->firstChild;
+    }
+    if (outputFlags & SERIALIZE_INDENT_WITH_TAB) {
+        indBuf = "\t";
+        indBufCount = 1;
+    } else {
+        indBuf = "        ";
+        indBufCount = indent;
+    }
+    if (outputFlags & SERIALIZE_INDENT_ATTR_WITH_TAB) {
+        attindBuf = "\t";
+        attindBufCount = 1;
+    } else {
+        attindBuf = "        ";
+        attindBufCount = indentAttrs;
     }
     while (node) {
         switch (node->nodeType) {
@@ -2926,14 +2940,8 @@ void tcldom_treeAsXML (
                   (node->previousSibling->nodeType == COMMENT_NODE)))
                 )
             {
-                if (outputFlags & SERIALIZE_INDENT_WITH_TAB) {
-                    for(i=0; i<level; i++) {
-                        writeChars(xmlString, chan, "\t", 1);
-                    }
-                } else {
-                    for(i=0; i<level; i++) {
-                        writeChars(xmlString, chan, "        ", indent);
-                    }
+                for(i=0; i<level; i++) {
+                    writeChars(xmlString, chan, indBuf, indBufCount);
                 }
             }
             writeChars(xmlString, chan, "<", 1);
@@ -2944,20 +2952,10 @@ void tcldom_treeAsXML (
                 if (indentAttrs > -1) {
                     writeChars(xmlString, chan, "\n", 1);
                     if (indent != -1) {
-                        if (outputFlags & SERIALIZE_INDENT_WITH_TAB) {
-                            for(i=0; i<level; i++) {
-                                writeChars(xmlString, chan, "\t", 1);
-                            }
-                        } else {
-                            for(i=0; i<level; i++) {
-                                writeChars(xmlString, chan, "        ", indent);
-                            }
+                        for(i=0; i<level; i++) {
+                            writeChars(xmlString, chan, indBuf, indBufCount);
                         }
-                        if (outputFlags & SERIALIZE_INDENT_ATTR_WITH_TAB) {
-                            writeChars(xmlString, chan, "\t", 1);
-                        } else {
-                            writeChars(xmlString, chan, "        ", indentAttrs);
-                        }
+                        writeChars(xmlString, chan, attindBuf, attindBufCount);
                     }
                 } else {
                     writeChars(xmlString, chan, " ", 1);
@@ -3078,14 +3076,8 @@ void tcldom_treeAsXML (
                                || node->firstChild->nodeType == PROCESSING_INSTRUCTION_NODE
                                || node->firstChild->nodeType == COMMENT_NODE )
                         ) {
-                        if (outputFlags & SERIALIZE_INDENT_WITH_TAB) {
-                            for(i=0; i<level; i++) {
-                                writeChars(xmlString, chan, "\t", 1);
-                            }
-                        } else {
-                            for(i=0; i<level; i++) {
-                                writeChars(xmlString, chan, "        ", indent);
-                            }
+                        for(i=0; i<level; i++) {
+                            writeChars(xmlString, chan, indBuf, indBufCount);
                         }
                     }
                     writeChars (xmlString, chan, "</", 2);
