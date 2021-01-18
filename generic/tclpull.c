@@ -272,6 +272,7 @@ startElement(
 
             if (strcmp (name, findElement) == 0) {
                 match = 1;
+                break;
             }
         }
         if (!match) {

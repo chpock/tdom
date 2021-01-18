@@ -1,5 +1,5 @@
-C Add\ssupport\sfor\smultiple\snames\sin\sfind-element
-D 2021-01-18T15:52:00.912
+C Don't\sdo\stoo\smuch\swork
+D 2021-01-18T15:59:11.993
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -150,7 +150,7 @@ F generic/tcldom.c c54da6733df51159d721a1ca3183a1ca4af384da01b9051aa24a8aea50c00
 F generic/tcldom.h 37ee136d483b683c7e3e9e94ce8284520c7998cb1340047fc540dd7701825dc6
 F generic/tclexpat.c 9796c45c6cf414a85fae95377d80514c3203d97a014a782f9d0ac0f0d2e076ce
 F generic/tclexpat.h 145406289081e71aca82c6a432f0b2eb6d4550a7eefa2ff9fa047dfe27d0fa61
-F generic/tclpull.c e4683451ded3e2d0b0563f3d81fd3560ea92827903ddb169778d362bc99d217c
+F generic/tclpull.c 5fbeffa5dba3ab4b4421e3598a43d49da0da8262383e6d5452fe59617488cad8
 F generic/tclpull.h 8e1aac98bdad497c669c901494939eecd6c2f57ea51c4f5d4dac502db48527d4
 F generic/tdom.decls b60863867ae6d7daf8ce3fc330ba375cd5111c21f58fbe556561327634da787b
 F generic/tdom.h bce1f220f5ab0719579fddce1bb7bc28c6a77a322d3cd2d0a4022984d44df028
@@ -238,11 +238,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 2b327d36f3d7e57824ece141c5cdb1b34f1b3a87204bd46920cb2960c2da2b70
-R 9870b95963a18f09574f2c7ad7cf40ab
-T *branch * find-multiple-elements
-T *sym-find-multiple-elements *
-T -sym-trunk *
+P 9a2bc3a9f711f5d269049c074807947d925f5f1b757be4324c83163183cc6e2b
+R f8dd664e894fbbd46d92fa02b3f039c2
 U mjanssen
-Z ca0f5730b8b6309da7ec2498a925029a
+Z 7755752e3a3e0ab66ddc354b5a90f618
 # Remove this line to create a well-formed Fossil manifest.
