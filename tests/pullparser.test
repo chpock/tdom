@@ -771,7 +771,7 @@ test pp-4.15 {find-element} {
     set result [pp next]
     lappend result [pp tag]
     for {set i 0} {$i < 3} {incr i} {
-        lappend result [pp find-element a b c]
+        lappend result [pp find-element -names {a b c}]
         lappend result [pp tag]
     }
     while {[pp next] ne "END_DOCUMENT"} {}

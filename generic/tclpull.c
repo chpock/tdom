@@ -97,7 +97,7 @@ typedef struct tDOM_PullParserInfo
     int             ignoreWhiteSpaces;
     PullParseMode   mode;
     int             skipDepth;
-    Tcl_Obj  *const*firstFindElement;
+    Tcl_Obj       **firstFindElement;
     int             countFindElement;
 #ifdef EXPAT_RESUME_BUG
     long            elmStartCounter;
@@ -486,7 +486,7 @@ tDOM_PullParserInstanceCmd (
     )
 {
     tDOM_PullParserInfo *pullInfo = clientdata;
-    int methodIndex, len, result, mode, fd;
+    int methodIndex, len, result, mode, fd, optionIndex;
     char *data;
     const char **atts;
     Tcl_Obj *resultPtr;
@@ -497,6 +497,9 @@ tDOM_PullParserInstanceCmd (
         "next", "state", "tag", "attributes",
         "text", "delete", "reset", "skip",
         "find-element", "line", "column", NULL
+    };
+    static const char *const findelement_options[] = {
+        "-names", NULL
     };
 
     enum method {
@@ -777,9 +780,21 @@ tDOM_PullParserInstanceCmd (
         break;
         
     case m_find_element:
-        if (objc < 3) {
-            Tcl_WrongNumArgs (interp, 2, objv, "elementName1 ?elementName2 ....?");
+        
+        if (objc < 3 || objc > 4) {
+            Tcl_WrongNumArgs (interp, 2, objv, "-names list"); 
             return TCL_ERROR;
+        } else if (objc == 3) {
+            /* Single argument version */
+            Tcl_ListObjGetElements(interp, objv[2], &pullInfo->countFindElement, &pullInfo->firstFindElement);
+        } else {
+            if (Tcl_GetIndexFromObj (interp, objv[2], findelement_options, "option", 0,
+                                                         &optionIndex) != TCL_OK) {
+                 return TCL_ERROR;
+             } else {
+               Tcl_ListObjGetElements(interp, objv[3], &pullInfo->countFindElement, &pullInfo->firstFindElement);
+             }
+
         }
         if (pullInfo->state != PULLPARSERSTATE_START_TAG
             && pullInfo->state != PULLPARSERSTATE_END_TAG
@@ -799,8 +814,6 @@ tDOM_PullParserInstanceCmd (
         pullInfo->mode = PULLPARSEMODE_FIND;
         /* As long as we don't evaluate any Tcl script code during a
          * pull parser method call this should be secure. */
-        pullInfo->firstFindElement = &objv[2];
-        pullInfo->countFindElement = objc-2;
         Tcl_DStringSetLength (pullInfo->cdata, 0);
         XML_SetCharacterDataHandler (pullInfo->parser, NULL);
         XML_SetEndElementHandler (pullInfo->parser, NULL);
