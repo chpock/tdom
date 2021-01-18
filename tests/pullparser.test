@@ -764,6 +764,20 @@ test pp-4.14 {find-element} {
     pp delete
     set result
 } {START_TAG END_TAG doc END_DOCUMENT 1 {No next event after END_DOCUMENT}}
+
+test pp-4.15 {find-element} {
+    tdom::pullparser pp
+    pp input {<doc><a><b/></a><a><b><c/></b></a><a><b/></a></doc>}
+    set result [pp next]
+    lappend result [pp tag]
+    for {set i 0} {$i < 3} {incr i} {
+        lappend result [pp find-element a b c]
+        lappend result [pp tag]
+    }
+    while {[pp next] ne "END_DOCUMENT"} {}
+    pp delete
+    set result
+} {START_TAG doc START_TAG a START_TAG b START_TAG a}
     
 test pp-5.1 {CDATA section} {
     tdom::pullparser pp

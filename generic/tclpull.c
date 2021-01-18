@@ -97,7 +97,8 @@ typedef struct tDOM_PullParserInfo
     int             ignoreWhiteSpaces;
     PullParseMode   mode;
     int             skipDepth;
-    char           *findElement;
+    Tcl_Obj  *const*firstFindElement;
+    int             countFindElement;
 #ifdef EXPAT_RESUME_BUG
     long            elmStartCounter;
 #endif
@@ -247,6 +248,7 @@ startElement(
 {
     tDOM_PullParserInfo *pullInfo = userData;
     int hnew;
+    int match;
     Tcl_HashEntry *h;
     
     DBG(fprintf(stderr, "startElement tag %s\n", name));
@@ -261,9 +263,18 @@ startElement(
         pullInfo->skipDepth++;
         return;
     case PULLPARSEMODE_FIND:
-        DBG(fprintf (stderr, "PULLPARSEMODE_FIND this %s search for %s\n",
-                     name, pullInfo->findElement));
-        if (strcmp (name, pullInfo->findElement) != 0) {
+        match = 0;
+        for (int i=0 ; i < pullInfo->countFindElement ; i++) {
+            char * findElement = Tcl_GetString(pullInfo->firstFindElement[i]);
+
+            DBG(fprintf (stderr, "PULLPARSEMODE_FIND this %s search for %s\n",
+                name, findElement));
+
+            if (strcmp (name, findElement) == 0) {
+                match = 1;
+            }
+        }
+        if (!match) {
             return;
         }
         pullInfo->mode = PULLPARSEMODE_NORMAL;
@@ -765,8 +776,8 @@ tDOM_PullParserInstanceCmd (
         break;
         
     case m_find_element:
-        if (objc != 3) {
-            Tcl_WrongNumArgs (interp, 2, objv, "elementName");
+        if (objc < 3) {
+            Tcl_WrongNumArgs (interp, 2, objv, "elementName1 ?elementName2 ....?");
             return TCL_ERROR;
         }
         if (pullInfo->state != PULLPARSERSTATE_START_TAG
@@ -787,7 +798,8 @@ tDOM_PullParserInstanceCmd (
         pullInfo->mode = PULLPARSEMODE_FIND;
         /* As long as we don't evaluate any Tcl script code during a
          * pull parser method call this should be secure. */
-        pullInfo->findElement = Tcl_GetString (objv[2]);
+        pullInfo->firstFindElement = &objv[2];
+        pullInfo->countFindElement = objc-2;
         Tcl_DStringSetLength (pullInfo->cdata, 0);
         XML_SetCharacterDataHandler (pullInfo->parser, NULL);
         XML_SetEndElementHandler (pullInfo->parser, NULL);
