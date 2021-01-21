@@ -778,7 +778,37 @@ test pp-4.15 {find-element} {
     pp delete
     set result
 } {START_TAG doc START_TAG a START_TAG b START_TAG a}
-    
+
+test pp-4.16 {find-element} {
+    tdom::pullparser pp
+    pp input {<doc><a><b/></a><a><b><c/></b></a><a><b/></a></doc>}
+    set result [pp next]
+    lappend result [pp tag]
+    for {set i 0} {$i < 3} {incr i} {
+        lappend result [pp find-element -names {a b c} -hash]
+        lappend result [pp tag]
+    }
+    pp delete
+    set result
+} {START_TAG doc START_TAG a START_TAG b START_TAG a}
+
+test pp-4.17 {find-element} {
+    tdom::pullparser pp
+    pp input {<doc><a><b/></a><a><b><c/></b></a><a><b/></a></doc>}
+    set result [pp next]
+    lappend result [pp tag]
+    lappend result [pp find-element -names {a b c}]
+    lappend result [pp tag]
+    lappend result [pp find-element -names {a b c} -hash]
+    lappend result [pp tag]
+    lappend result [pp find-element -names {a b c}]
+    lappend result [pp tag]
+    lappend result [pp find-element -names {a b c} -hash]
+    lappend result [pp tag]
+    pp delete
+    set result
+} {START_TAG doc START_TAG a START_TAG b START_TAG a START_TAG b}
+
 test pp-5.1 {CDATA section} {
     tdom::pullparser pp
     pp input {<doc><![CDATA[ some text  ]]></doc>}
