@@ -134,13 +134,15 @@
       </commanddef>
 
       <commanddef>
-        <command><method>find-element</method> <m>tagname</m></command>
+        <command><method>find-element</method> <o>tagname</o> <o>tagname | -names tagnames</o></command>
         <desc>This method is only valid in states
         <m>START_DOCUMENT</m>, <m>START_TAG</m> and <m>END_TAG</m>. It
         skips forward until the next element start tag with tag name
-        <m>tagname</m> and returns the new start START_TAG. If there
-        isn't such an element the parser stops at the end of the input
-        and returns END_DOCUMENT.</desc>
+        <m>tagname</m> and returns the new state START_TAG. If a list
+        of tagnames is provided with the <m>-names</m> option, any of
+        the <m>tagnames</m> match. If there isn't such an element the
+        parser stops at the end of the input and returns
+        END_DOCUMENT.</desc>
       </commanddef>
 
       <commanddef>
