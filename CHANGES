@@ -1,4 +1,10 @@
 
+2021-01-22  Rolf Ade  <rolf@pointsman.de>
+
+        Pull-parser command find-element enhanced - skip forward
+        not only to a specific element but to the first out of a list
+        of elements.
+
 2020-12-28  Rolf Ade  <rolf@pointsman.de>
 
         Updated to expat 2.2.10.

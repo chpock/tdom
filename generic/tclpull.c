@@ -1005,12 +1005,14 @@ tDOM_PullParserInstanceCmd (
         tDOM_CleanupInputSource (pullInfo);
         pullInfo->state = PULLPARSERSTATE_READY;
         pullInfo->nextState = 0;
+        pullInfo->mode = PULLPARSEMODE_NORMAL;
         Tcl_DStringSetLength (pullInfo->cdata, 0);
         if (XML_ParserReset (pullInfo->parser, NULL) != XML_TRUE) {
             SetResult ("Parser reset failed!");
             return TCL_ERROR;
         }
         XML_SetElementHandler (pullInfo->parser, startElement, endElement);
+        XML_SetCharacterDataHandler (pullInfo->parser, characterDataHandler);
         XML_SetUserData (pullInfo->parser, pullInfo);
         break;
         
