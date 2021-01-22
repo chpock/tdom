@@ -496,6 +496,21 @@ test pp-3.8 {skip} {
     set result
 } {START_TAG END_TAG doc END_DOCUMENT 1 {No next event after END_DOCUMENT}}
 
+test pp-3.9 {skip} {
+    tdom::pullparser pp
+    pp input {<doc><parse error></doc>}
+    set result [pp next]
+    lappend result [catch {pp skip}]
+    pp reset
+    pp input {<doc>text</doc>}
+    lappend result [pp next]
+    lappend result [pp tag]
+    lappend result [pp next]
+    lappend result [pp text]
+    pp delete
+    set result
+} {START_TAG 1 START_TAG doc TEXT text}
+
 test pp-4.1 {find-element} {
     tdom::pullparser pp
     pp input {<doc><a>foo bar</a><b>baz</b><c>grill</c><d>here</d></doc>}
