@@ -1,7 +1,7 @@
 
 2021-01-22  Rolf Ade  <rolf@pointsman.de>
 
-        Enhance the pull-parser command find-element - skip forward
+        Pull-parser command find-element enhanced - skip forward
         not only to a specific element but to the first out of a list
         of elements.
 
