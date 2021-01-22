@@ -76,7 +76,10 @@ typedef enum {
     PULLPARSEMODE_SKIP,
     PULLPARSEMODE_FIND
 } PullParseMode;
-    
+
+#define PULLPARSER_FIND_HASH     1
+#define PULLPARSER_FIND_REVERSE  2
+
 typedef struct tDOM_PullParserInfo 
 {
     XML_Parser      parser;
@@ -100,6 +103,7 @@ typedef struct tDOM_PullParserInfo
     Tcl_Obj       **firstFindElement;
     int             countFindElement;
     Tcl_HashTable  *findElements;
+    int             findFlags;
 #ifdef EXPAT_RESUME_BUG
     long            elmStartCounter;
 #endif
@@ -263,13 +267,21 @@ startElement(
         DBG(fprintf (stderr, "PULLPARSEMODE_SKIP\n"));
         pullInfo->skipDepth++;
         return;
+
     case PULLPARSEMODE_FIND:
         match = 0;
-        if (pullInfo->countFindElement < 0) {
+        if (pullInfo->findFlags & PULLPARSER_FIND_HASH) {
             h = Tcl_FindHashEntry (pullInfo->findElements, name);
-            if (h) {
-                match = 1;
-                break;
+            if (pullInfo->findFlags & PULLPARSER_FIND_REVERSE) {
+                if (!h) {
+                    match = 1;
+                    break;
+                }
+            } else {
+                if (h) {
+                    match = 1;
+                    break;
+                }
             }
         } else {
             for (int i=0 ; i < pullInfo->countFindElement ; i++) {
@@ -278,11 +290,18 @@ startElement(
                 DBG(fprintf (stderr, "PULLPARSEMODE_FIND this %s search "
                              "for %s\n", name, findElement));
                 if (strcmp (name, findElement) == 0) {
-                    match = 1;
-                    break;
+                    if (!(pullInfo->findFlags & PULLPARSER_FIND_REVERSE)) {
+                        match = 1;
+                    }
+                    goto resultfound;
                 }
             }
+            if (pullInfo->findFlags & PULLPARSER_FIND_REVERSE) {
+                match = 1;
+            }
+            break;
         }
+    resultfound:
         if (!match) {
             return;
         }
@@ -496,7 +515,8 @@ tDOM_PullParserInstanceCmd (
     )
 {
     tDOM_PullParserInfo *pullInfo = clientdata;
-    int methodIndex, len, result, mode, fd, optionIndex, i, hnew, hash, repeat;
+    int methodIndex, len, result, mode, fd, optionIndex, i, hnew, hash;
+    int repeat, revers;
     char *data;
     const char **atts;
     Tcl_Obj *resultPtr, *tclObj, *elmObj;
@@ -509,7 +529,7 @@ tDOM_PullParserInstanceCmd (
         "find-element", "line", "column", NULL
     };
     static const char *const findelement_options[] = {
-        "-names", "-hash", "-next", NULL
+        "-names", "-hash", "-next", "-not", NULL
     };
 
     enum method {
@@ -520,7 +540,7 @@ tDOM_PullParserInstanceCmd (
     };
 
     enum findelemet_option {
-        o_names, o_hash, o_next
+        o_names, o_hash, o_next, o_not
     };
 
     if (objc == 1) {
@@ -795,6 +815,7 @@ tDOM_PullParserInstanceCmd (
         
     case m_find_element:
         
+        pullInfo->findFlags = 0;
         if (pullInfo->state != PULLPARSERSTATE_START_TAG
             && pullInfo->state != PULLPARSERSTATE_END_TAG
             && pullInfo->state != PULLPARSERSTATE_START_DOCUMENT) {
@@ -803,7 +824,8 @@ tDOM_PullParserInstanceCmd (
             return TCL_ERROR;
         }
         if (objc < 3 || objc > 5) {
-            Tcl_WrongNumArgs (interp, 2, objv, "name | -names list ?-hash?"); 
+            Tcl_WrongNumArgs (interp, 2, objv, "name | -names list ?-hash? "
+                              "| -not list ?-hash?"); 
             return TCL_ERROR;
         } else if (objc == 3) {
             /* Single argument version */
@@ -815,6 +837,7 @@ tDOM_PullParserInstanceCmd (
             objc -= 2;
             hash = 0;
             repeat = 0;
+            revers = 0;
             tclObj = NULL;
             while (objc > 0) {
                 if (Tcl_GetIndexFromObj (interp, objv[0], findelement_options,
@@ -824,7 +847,7 @@ tDOM_PullParserInstanceCmd (
                 }
                 switch ((enum findelemet_option) optionIndex) {
                 case o_names:
-                    if (!objc) {
+                    if (objc < 2) {
                         SetResult ("The -names option requires an argument");
                         return TCL_ERROR;
                     }
@@ -844,6 +867,18 @@ tDOM_PullParserInstanceCmd (
                     objv++;;
                     objc--;
                     break;
+
+                case o_not:
+                    if (objc < 2) {
+                        SetResult ("The -not option requires an argument");
+                        return TCL_ERROR;
+                    }
+                    revers = 1;
+                    tclObj = objv[1];
+                    objv++; objv++;
+                    objc--; objc--;
+                    break;
+                    
                 }
             }
             if (repeat && (tclObj || hash)) {
@@ -855,9 +890,8 @@ tDOM_PullParserInstanceCmd (
                 return TCL_ERROR;
             }
             if (repeat) {
-                if (pullInfo->countFindElement >= 0) {
-                    SetResult ("Last find-element call was not of the form "
-                               "-names <names> -hash");
+                if (!(pullInfo->findFlags & PULLPARSER_FIND_HASH)) {
+                    SetResult ("Last find-element call was not a hashed one.");
                     return TCL_ERROR;
                 }
                 goto find_method_doit;
@@ -867,7 +901,11 @@ tDOM_PullParserInstanceCmd (
                 SetResult ("-names argument is not a proper list");
                 return TCL_ERROR;
             }
+            if (revers) {
+                pullInfo->findFlags |= PULLPARSER_FIND_REVERSE;
+            }
             if (hash) {
+                pullInfo->findFlags |= PULLPARSER_FIND_HASH;
                 Tcl_DeleteHashTable (pullInfo->findElements);
                 Tcl_InitHashTable (pullInfo->findElements, TCL_STRING_KEYS);
                 for (i = 0; i < pullInfo->countFindElement; i++) {
@@ -893,8 +931,6 @@ tDOM_PullParserInstanceCmd (
 
     find_method_doit:
         pullInfo->mode = PULLPARSEMODE_FIND;
-        /* As long as we don't evaluate any Tcl script code during a
-         * pull parser method call this should be secure. */
         Tcl_DStringSetLength (pullInfo->cdata, 0);
         XML_SetCharacterDataHandler (pullInfo->parser, NULL);
         XML_SetEndElementHandler (pullInfo->parser, NULL);

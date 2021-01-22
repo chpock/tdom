@@ -809,6 +809,30 @@ test pp-4.17 {find-element} {
     set result
 } {START_TAG doc START_TAG a START_TAG b START_TAG a START_TAG b}
 
+test pp-4.18 {find-element -not} {
+    tdom::pullparser pp
+    pp input {<doc><a><b/></a><a><b><c/></b></a><a><b/></a></doc>}
+    set result [pp next]
+    while {[pp state] ne "END_DOCUMENT"} {
+        lappend result [pp tag]
+        lappend result [pp find-element -not {a b}]
+    }
+    pp delete
+    set result
+} {START_TAG doc START_TAG c END_DOCUMENT}
+
+test pp-4.19 {find-element -not -hash} {
+    tdom::pullparser pp
+    pp input {<doc><a><b/></a><a><b><c/></b></a><a><b/></a></doc>}
+    set result [pp next]
+    while {[pp state] ne "END_DOCUMENT"} {
+        lappend result [pp tag]
+        lappend result [pp find-element -not {a b} -hash]
+    }
+    pp delete
+    set result
+} {START_TAG doc START_TAG c END_DOCUMENT}
+
 test pp-5.1 {CDATA section} {
     tdom::pullparser pp
     pp input {<doc><![CDATA[ some text  ]]></doc>}

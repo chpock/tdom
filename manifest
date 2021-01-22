@@ -1,5 +1,5 @@
-C How\sabout\shashing\sthe\selements\sto\sfind.
-D 2021-01-21T13:58:49.976
+C Added\s-not\sflag\sto\sfind-element,\sexpecting\sa\slist\sof\snames,\swith\soptional\s-hash\sflag,\ssearching\sfor\sthe\snext\selement\sname\snot\sin\sthe\slist.
+D 2021-01-22T13:13:21.672
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -150,7 +150,7 @@ F generic/tcldom.c c54da6733df51159d721a1ca3183a1ca4af384da01b9051aa24a8aea50c00
 F generic/tcldom.h 37ee136d483b683c7e3e9e94ce8284520c7998cb1340047fc540dd7701825dc6
 F generic/tclexpat.c 9796c45c6cf414a85fae95377d80514c3203d97a014a782f9d0ac0f0d2e076ce
 F generic/tclexpat.h 145406289081e71aca82c6a432f0b2eb6d4550a7eefa2ff9fa047dfe27d0fa61
-F generic/tclpull.c e4bc9fe6e5eee86d7e54b6f326d00e8f841f9a29fd947af5e30ab0d46b53b051
+F generic/tclpull.c 06fbfbe71efadf3f2634e096163b97cefde47a720150fbef4efa0a8188b259ea
 F generic/tclpull.h 8e1aac98bdad497c669c901494939eecd6c2f57ea51c4f5d4dac502db48527d4
 F generic/tdom.decls b60863867ae6d7daf8ce3fc330ba375cd5111c21f58fbe556561327634da787b
 F generic/tdom.h bce1f220f5ab0719579fddce1bb7bc28c6a77a322d3cd2d0a4022984d44df028
@@ -211,7 +211,7 @@ F tests/namespace.test 0a13b2bf59bb088525ca7b64d0b2bce6a349c627ca3dd1c17a4cc969d
 F tests/parser.test 697503e89df356a86e1ec8ffbfb98e3322ccb7ca1ece33beba6d20bdf5ec0597
 F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
-F tests/pullparser.test b3a5b261ed8ef0a14a2a3ffe348e7bf48ad28107d80bd4d84334c45dd9868e3d
+F tests/pullparser.test 0baa4011d47e086f1c93a2a7d018dd6cf651f1308131f98c30d01b7e14b37bce
 F tests/pushpull.bench 664e8f512917537d96c4b71933d4d9a6da65fc6fe85bd7c459483830dc7d2faf
 F tests/schema.test 340424ee7fbae5351bd591054f8e5b1c7ea8f06bee1c4ceac801344c3ef79e2b
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
@@ -238,11 +238,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P e0c5c9ae41880a95561541dfe387a06b19220d774d590db46a341ea1d209bb45
-R 7ef2863e59208976136b8834e2bb38f4
-T *branch * find-multiple-elements-hashed
-T *sym-find-multiple-elements-hashed *
-T -sym-find-multiple-elements *
+P 5d2ee3aaa3f2a46970137ffba25d6104fac93e74b9921e8e35e44272493afac7
+R 2b57734ceea0be20382ece9fc974c4b9
 U rolf
-Z 8e20ababdecd872f7c923b81437fc870
+Z 1c5578e781600ac053dedf38fc154375
 # Remove this line to create a well-formed Fossil manifest.
