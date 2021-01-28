@@ -7334,7 +7334,7 @@ int xsltProcess (
     }
     /* Make the first ELEMENT_NODE the documentElement. There could
        be text, comment or PI nodes before the first element node.
-       If the root node doesn't have an element node under it's childs,
+       If the root node doesn't have an element node under it's children,
        fall back to the firstChild as documentElement. */
     domSetDocumentElement (xs->resultDoc);
 

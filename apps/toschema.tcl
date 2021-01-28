@@ -53,7 +53,7 @@ proc fromDTD_serialize {level type quant name content} {
             if {$level == 1 && $quant eq ""} {
                 # At least directly below defelement there isn't any
                 # need to wrap a ! SEQ into a group container -
-                # defelement childs are already processed as sequence
+                # defelement children are already processed as sequence
                 # while validating.
                 foreach cp $content {
                     fromDTD_serialize $level {*}$cp

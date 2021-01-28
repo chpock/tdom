@@ -504,7 +504,7 @@ static void serializeCP (
         /* Fall through. */
     case SCHEMA_CTYPE_CHOICE:
     case SCHEMA_CTYPE_INTERLEAVE:
-        fprintf (stderr, "\t%d childs\n", pattern->nc);
+        fprintf (stderr, "\t%d children\n", pattern->nc);
         break;
     case SCHEMA_CTYPE_ANY:
         if (pattern->namespace) {
@@ -2231,7 +2231,7 @@ int probeEventAttribute (
 
    1 means element content may end here.
 
-   2 means recovering requested further error reporting about missing childs
+   2 means recovering requested further error reporting about missing children
    in the current element. To be able to answer a [info expected] on
    the occasion of the next error, we update the stack in this case
    and let tDOM_probeElementEnd restart checkElementEnd again with this

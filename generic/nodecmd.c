@@ -868,7 +868,7 @@ nodecmd_insertBeforeFromScript (
         /* If node is the root node of a document and refChild
            is in deed a child of this node, then 
            refChild->parentNode will be NULL. In this case, we
-           loop throu the childs of node, to see, if the refChild
+           loop throu the children of node, to see, if the refChild
            is valid. */
         Tcl_ResetResult (interp);
         if (node->ownerDocument->rootNode == node) {

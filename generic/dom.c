@@ -3470,7 +3470,7 @@ domRemoveChild (
         /* If node is the root node of a document and child
            is in deed a child of this node, then 
            child->parentNode will be NULL. In this case, we
-           loop throu the childs of node, to see, if the child
+           loop throu the children of node, to see, if the child
            is valid. */
         if (node->ownerDocument->rootNode == node) {
             n = node->firstChild;
@@ -3695,7 +3695,7 @@ domInsertBefore (
             /* If node is the root node of a document and referenceChild
                is in deed a child of this node, then 
                referenceChild->parentNode will be NULL. In this case, we
-               loop throu the childs of node, to see, if the referenceChild
+               loop throu the children of node, to see, if the referenceChild
                is valid. */
             if (node->ownerDocument->rootNode == node) {
                 n = node->firstChild;
@@ -3735,7 +3735,7 @@ domInsertBefore (
             /* For now, we simply don't allow the rootNode of
                another element as childToInsert. The way to go may
                be simply to treat the rootNode as DocumentFragment
-               and to insert all childs of that rootNode before the
+               and to insert all children of that rootNode before the
                referenceChild.  This would result in a document
                without documentElement, which then should be
                handled right by other methods. This is planed, but
@@ -3872,7 +3872,7 @@ domReplaceChild (
         /* If node is the root node of a document and oldChild
            is in deed a child of this node, then 
            oldChild->parentNode will be NULL. In this case, we
-           loop throu the childs of node, to see, if the oldChild
+           loop throu the children of node, to see, if the oldChild
            is valid. */
         if (node->ownerDocument->rootNode == node) {
             n = node->firstChild;
@@ -5100,7 +5100,7 @@ domXPointerDescendant (
             }
         }
         if (!found) {
-            /* recurs into childs */
+            /* recurs into children */
             result = domXPointerDescendant (child, all, instance, i,
                                             type, element, attrName,
                                             attrValue, attrLen,

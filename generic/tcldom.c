@@ -3157,7 +3157,7 @@ void tcldom_childsAsJSON (
         /* Need 'heuristic rule' to decide, what to do. */
         switch (inside) {
         case JSON_OBJECT:
-            /* The childs to serialize are the value of an object member. */
+            /* The children to serialize are the value of an object member. */
             /* No content at all. This could be an empty string,
              * an empty object or an empty array. We default to
              * empty string. */
@@ -3165,7 +3165,7 @@ void tcldom_childsAsJSON (
             return;
         case JSON_START:
         case JSON_ARRAY:
-            /* The childs, we serialize are the value of an array
+            /* The children, we serialize are the value of an array
              * element. The node is a container for either a
              * (nested, in case of JSON_ARRAY) array or an object. */
             /* Look, if the name of the container gives a hint.*/
@@ -3285,7 +3285,7 @@ void tcldom_childsAsJSON (
             tcldom_treeAsJSON (jstring, child, channel, indent,
                                outputFlags, level, JSON_OBJECT);
             child = child->nextSibling;
-            /* Inside of a JSON_OBJECT, only element childs make
+            /* Inside of a JSON_OBJECT, only element children make
              * semantically sense. */
             while (child && child->nodeType != ELEMENT_NODE) {
                 child = child->nextSibling;

@@ -120,19 +120,19 @@
 
       <commanddef>
         <command><method>define</method> <m>&lt;definition script></m></command>
-        <desc>This method allows to define several elements or patterns
-        or a whole schema with one call. All schema command methods so
-        far (<m>prefixns</m>, <m>defelement</m>,
-        <m>defelementtype</m>, <m>defpattern</m>, <m>deftexttype</m> and
-        <m>start</m>) are allowed top level in the <m>definition
-        script</m>. The <m>define</m> method itself isn't allowed
-        recursively.</desc>
+        <desc>This method defines several elements or patterns or a
+        whole schema with one call, by evaluating the <m>definition
+        script></m>. All schema command methods so far
+        (<m>prefixns</m>, <m>defelement</m>, <m>defelementtype</m>,
+        <m>defpattern</m>, <m>deftexttype</m> and <m>start</m>) are
+        allowed top level in the <m>definition script</m>. The
+        <m>define</m> method itself isn't allowed recursively.</desc>
       </commanddef>
       
       <commanddef>
         <command><method>event</method> <m>(start|end|text)</m> <m>?event specific data?</m></command>
-        <desc>This method allows the validation of hierarchical data against
-        the content constraints of the validation command.
+        <desc>This method enables validation of hierarchical data against
+        the content constraints of the validation command. 
 
         <optlist>
           <optdef>
@@ -173,7 +173,7 @@
       <commanddef>
         <command><method>validatefile</method> <m>filename</m> <m>?objVar?</m></command>
         <desc>Returns true if the content of <m>filename</m> is valid,
-        or false, otherwise. The given file is feeded as binary stream
+        or false, otherwise. The given file is fed as binary stream
         to expat, therefore only US-ASCII, ISO-8859-1, UTF-8 or UTF-16
         encoded data will work with this method. If validation has
         failed and the optional <m>objVar</m> argument is given, the
@@ -517,9 +517,9 @@
 
       <commanddef>
         <command><method>group</method> <m>?quant?</m> <m>&lt;definition script></m></command>
-        <desc>This method allows to group a sequence of content
-        particles defined by the <m>definition script></m>, which have
-        to match in this sequence order.</desc>
+        <desc>This method group a sequence of content particles
+        defined by the <m>definition script></m>, which have to match
+        in this sequence order.</desc>
       </commanddef>
       
       <commanddef>
@@ -875,7 +875,7 @@ s define {
                 <command><cmd>integer</cmd> <m>?(xsd|tcl)?</m></command>
                 <desc>This text constraint matches if the text value could be
                 parsed as an integer. If the optional argument to the command
-                is <m>tcl</m>, everything that returns TCL_OK if feeded into
+                is <m>tcl</m>, everything that returns TCL_OK if fed into
                 Tcl_GetInt() matches. If the optional argument to the command
                 is <m>xsd</m>, the constraint matches if the value is a
                 valid xsd:integer. Without argument <m>xsd</m> is the
@@ -914,7 +914,7 @@ s define {
                 <command><cmd>number</cmd> <m>?(xsd|tcl)?</m></command>
                 <desc>This text constraint matches if the text value could be
                 parsed as a number. If the optional argument to the command is
-                <m>tcl</m>, everything that returns TCL_OK if feeded into
+                <m>tcl</m>, everything that returns TCL_OK if fed into
                 Tcl_GetDouble() matches. If the optional argument to the command
                 is <m>xsd</m>, the constraint matches if the value is a
                 valid xsd:decimal. Without argument <m>xsd</m> is the
@@ -924,7 +924,7 @@ s define {
                 <command><cmd>boolean</cmd> <m>?(xsd|tcl)?</m></command>
                 <desc>This text constraint matches if the text value could be
                 parsed as a boolean. If the optional argument to the command is
-                <m>tcl</m>, everything that returns TCL_OK if feeded into
+                <m>tcl</m>, everything that returns TCL_OK if fed into
                 Tcl_GetBoolean() matches. If the optional argument to the command
                 is <m>xsd</m>, the constraint matches if the value is a
                 valid xsd:boolean. Without argument <m>xsd</m> is the
@@ -1090,8 +1090,8 @@ s define {
             <p>The available types are:</p>
             <dl>
                 <dt>whitespace</dt><dd>The text to split is stripped
-                of all white space at start and end and splitted into
-                a list at any successive white space.</dd>
+                of all white space at start and end and split into a
+                list at any successive white space.</dd>
                 <dt>tcl tclcmd ?arg ...?</dt><dd>The text to split is
                 handed to the <m>tclcmd</m>, which is evaluated on
                 global level, appended with every given arg and the
@@ -1239,7 +1239,7 @@ s define {
       <p>With a <m>reportcmd</m> (which does not throw error if
       called) the validation engine will never report validation
       failure to its caller. The validation engine recovers,
-      continues, and reports the next error (if occuring) and so on
+      continues, and reports the next error (if occurrin)g and so on
       until the end of the input. The schema command will return true
       and the SAX parser and DOM builder will process normally until
       the end of the input, as if there had not been a validation

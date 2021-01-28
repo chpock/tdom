@@ -1339,10 +1339,10 @@ TncProbeElement (
             seqstartindex = 0;
         }
         /* This time zeroMatchPossible flags, if every of the remaining
-           childs - that may every child, if !alreadymatched - doesn't
-           must occur.  We assume, the (outstanding childs of, in case
+           children - that may every child, if !alreadymatched - doesn't
+           must occur.  We assume, the (outstanding children of, in case
            of alreadymatched) current stackelement model has only
-           optional childs, and set to wrong, if we find any
+           optional children, and set to false, if we find any
            non-optional child */
         zeroMatchPossible = 1;
         for (i = seqstartindex; i < stackelm->model->numchildren; i++) {
@@ -1419,7 +1419,7 @@ TncProbeElement (
                 return 0;
             } else {
                 /* OK, SEQ has matched before. But after the last match, there
-                   where no required (quant NONE or PLUS) childs. */
+                   where no required (quant NONE or PLUS) children. */
                 if (stackelm->model->quant == XML_CQUANT_NONE ||
                     stackelm->model->quant == XML_CQUANT_OPT) {
                     /* The entire seq isn't multiple. Just look further. */
@@ -1428,7 +1428,7 @@ TncProbeElement (
             }
         }
         /* The last untreated case is alreadymatched true,
-           zeroMatchPossible (of the rest of the seq childs after the
+           zeroMatchPossible (of the rest of the seq children after the
            last match) true and the entire seq may be
            multiple. Therefore, start again with activeChild = 0, to
            see, if the current nameId starts a repeated match of the

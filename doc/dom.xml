@@ -136,8 +136,8 @@ used, which tries to even parse badly formed HTML into a DOM tree.</desc>
                 <optname>-jsonroot &lt;document element name&gt;</optname>
                 <desc>If given makes the given element name the
                 document element of the resulting doc. The parsed
-                content of the JSON string will be the childs of this
-                document element node.</desc>
+                content of the JSON string will be the children of
+                this document element node.</desc>
               </optdef>
               
               <optdef>
