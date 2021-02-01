@@ -8505,7 +8505,7 @@ typeTCObjCmd (
     checkNrArgs (2,2,"Expected: <text type name>");
     h = Tcl_FindHashEntry (&sdata->textDef, Tcl_GetString (objv[1]));
     if (!h) {
-        SetResult3 ("Unknown text type \"", Tcl_GetString (objv[2]), "\"");
+        SetResult3 ("Unknown text type \"", Tcl_GetString (objv[1]), "\"");
         return TCL_ERROR;
     }
     ADD_CONSTRAINT (sdata, sc)

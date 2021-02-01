@@ -6265,6 +6265,24 @@ test schema-14.63 {type} {
     set result
 } {0 1 0}
 
+test schema-14.64 {text type} {
+    tdom::schema s
+    set result [catch {s define {
+        deftexttype ns1:mytype {
+            integer
+        }
+        defelement doc {
+            element child 1 {
+                attribute attr ? {
+                    type ns1:
+                }
+            }
+        }
+    }}]
+    s delete
+    set result
+} {1}
+
 test schema-15.1 {constraint cmd tcl} {
     tdom::schema s
     s define {
