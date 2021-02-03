@@ -773,8 +773,11 @@ s define {
       <optdef>
         <optname>{n m}</optname> <desc>The content particle must occur
         at least n and at most m times in a row in valid documents.
-        The quantifier must be a Tcl list with two elements. Both
-        elements must be integers, with n >= 0 and n &lt; m.</desc>
+        The quantifier must be a Tcl list with two elements. The first
+        element of this list must be an integer with n >= 0. If the
+        second list element is the character *, then there is no upper
+        limit. Otherwise the second list element must be an integer
+        with n &lt; m.</desc>
       </optdef>
     </optlist>
 

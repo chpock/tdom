@@ -908,8 +908,15 @@ addToContent (
         }
     }
     if (quant == SCHEMA_CQUANT_NM) {
-        int i;
-        int newChilds = (n >= m) ? n : m;
+        int i, newChilds, thisquant;
+        if (m == -1) {
+            m = n + 1;
+            newChilds = m;
+            thisquant = SCHEMA_CQUANT_REP;
+        } else {
+            newChilds = (n >= m) ? n : m;
+            thisquant = SCHEMA_CQUANT_OPT;
+        }
         while (sdata->cp->nc + newChilds >= sdata->contentSize) {
             sdata->cp->content =
                 REALLOC (sdata->cp->content,
@@ -927,7 +934,7 @@ addToContent (
         }
         for (i = n; i < m; i++) {
             sdata->cp->content[sdata->cp->nc+i] = pattern;
-            sdata->cp->quants[sdata->cp->nc+i] = SCHEMA_CQUANT_OPT;
+            sdata->cp->quants[sdata->cp->nc+i] = thisquant;
         }
         sdata->cp->nc = sdata->cp->nc + newChilds;
     } else {
@@ -5429,21 +5436,31 @@ getQuant (
         return SCHEMA_CQUANT_ERROR;
     }
     Tcl_ListObjIndex (interp, quantObj, 1, &thisObj);
-    if (Tcl_GetIntFromObj (interp, thisObj, m) != TCL_OK) {
-        SetResult ("Invalid quant specifier");
-        return SCHEMA_CQUANT_ERROR;
+    if (Tcl_GetIntFromObj (interp, thisObj, m) == TCL_OK) {
+        if (*n > *m) {
+            SetResult ("Invalid quant specifier");
+            return SCHEMA_CQUANT_ERROR;
+        }
+        if (*n == 0 && *m == 1) {
+            return SCHEMA_CQUANT_OPT;
+        }
+        if (*n == 1 && *m == 1) {
+            return SCHEMA_CQUANT_ONE;
+        }
+        return SCHEMA_CQUANT_NM;
+    } else {
+        quantStr = Tcl_GetStringFromObj (thisObj, &len);
+        if (len == 1 && quantStr[0] == '*') {
+            if (*n == 0) {
+                return SCHEMA_CQUANT_REP;
+            }
+            *m = -1;
+            return SCHEMA_CQUANT_NM;
+        } else {
+            SetResult ("Invalid quant specifier");
+            return SCHEMA_CQUANT_ERROR;
+        }
     }
-    if (*n > *m) {
-        SetResult ("Invalid quant specifier");
-        return SCHEMA_CQUANT_ERROR;
-    }
-    if (*n == 0 && *m == 1) {
-        return SCHEMA_CQUANT_OPT;
-    }
-    if (*n == 1 && *m == 1) {
-        return SCHEMA_CQUANT_ONE;
-    }
-    return SCHEMA_CQUANT_NM;
 }
 
 /* Implements the schema definition command "any" */

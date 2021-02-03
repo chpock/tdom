@@ -815,6 +815,62 @@ test schema-1.35 {deftexttype nested in deftexttype nested in define} {
     lappend result $errMsg
 } {1 {Command called in invalid schema context}}
 
+test schema-1.36 {list quant with *} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element child {2 *}
+        }
+    }
+    set xmls {
+        <doc/>
+        <doc><child/></doc>
+        <doc><child/><child/></doc>
+        <doc><child/><child/><child/></doc>
+    }
+    lappend xmls "<doc>[string repeat <child/> 100]</doc>"
+    set result ""
+    foreach xml $xmls {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 1 1 1}
+
+test schema-1.37 {invalid quant} {
+    tdom::schema s
+    set result [catch {s define {
+        defelement doc {element foo {a b c} {text}}
+    }}]
+    lappend result [catch {s define {
+        defelement doc {element foo {* *} {text}}
+    }}]
+    s delete
+    set result
+} {1 1}
+
+test schema-1.38 {list quant with *} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element child {0 *}
+        }
+    }
+    set xmls {
+        <doc/>
+        <doc><child/></doc>
+        <doc><child/><child/></doc>
+        <doc><child/><child/><child/></doc>
+    }
+    lappend xmls "<doc>[string repeat <child/> 100]</doc>"
+    set result ""
+    foreach xml $xmls {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 1 1 1 1}
+
 test schema-2.1 {grammar definition: ref} {
     tdom::schema create grammar
     grammar defpattern thisPattern {
