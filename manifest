@@ -1,5 +1,5 @@
-C Added\sa\sway\sto\sexpress\s"at\sleast\sn\stimes\sand\sthen\sunbound"\sin\stdom\sschemas.
-D 2021-02-03T22:53:46.240
+C Cleaned\sup\sthe\sapparently\smess\sin\sthe\srepository\sby\shand.\sPicked,\swhat's\snew\sin\sbranches\stoschema\sand\swip,\sclosed\sboth\sbranches\sand\sbuild\sthis\snew\stoschema\sfrom\strunk.\sWhich\swas\sall,\swhat\sI\swanted\sto\sdo:\sto\sbring\sup\smy\sfeature\sbranch\sto\swhat\shappend\son\strunk\sin\sthe\smeantime.\sSee\shttps://fossil-scm.org/forum/forumpost/5c1a100b2d\sfor\sthe\sproblems\sI\sstruggled\swhile\strying\sto\sdo\sthis.
+D 2021-02-05T00:21:13.926
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -11,7 +11,10 @@ F Makefile.in abaf3911c3cf29d2459722d0856d76bebb81fc367a1e0da39227d93a64eb2562
 F README.AOL 60c1b681acde3a3396a1598164f42f429fde721bfde8ac8b2654b851ac68b01c
 F README.md 0e115a9940373bdaac80cf4dd82b354b89309c544ba9de6c498c0ac271b064f9
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
-F apps/toschema.tcl d9cb806e8f1a10ee9a6d6e8b3bd5944124a12001a086b5bc8511b6e92f9af620
+F apps/toschema.tcl 1cae27e1f2ef83351641728e85ec64ea711ca8d99f8db3004da06b4484e4c6cf
+F apps/validate.tcl 7c74bf0dd10843353a689d234147f484794333ea8ff758516732260481224e84
+F apps/walker.tcl 36cf25e297b6922a34a8126c6d3d45c1c2b85dfb0a7872b832bfd3aa75817b24
+F apps/xsd2schema.tcl 502654639d08938ad941f43a99d0c268dc24bf3741cbcb7b5d24b61d70c7ec9f
 F apps/xslt.tcl 64103132fbe0a1fbf61cf3506608cb7ea5cbfddd247d207d95d8e96a071e1846
 F configure b03ca5e2c6e3bc2d620c64b608e453bc18c79b013def3a0d40d44cccc7c82e6a x
 F configure.ac 1ab4f46d2501e7feec71ac70fcbcb5f5866ceb6fa47ed1e5b02969dd958eb618
@@ -238,8 +241,11 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P afd73d0e7f72ca96c1ceb387338508a636ad0c471d026d5ce77b84bcb4ade46f
-R 6eed343582f8796eef36d6dbffebb54d
+P 049f31fab5a6ce18edb73c9b80e25dba5e27e007c478baad4bddd5e011347cba
+R b5e5178067bc942bcba8175824a1a6a3
+T *branch * toschema
+T *sym-toschema *
+T -sym-trunk *
 U rolf
-Z 257c81e117a995c10a4aaca5920a5d00
+Z 1295006371710c73f08c7c2c5d138e85
 # Remove this line to create a well-formed Fossil manifest.

@@ -12,6 +12,11 @@ variable dtdStart ""
 variable dtdFinished 0
 variable indent 4
 
+if {[info commands ::tdom::xmlReadFile] == ""} {
+    # tcldomsh without the script library. Source the lib.
+    source [file join [file dir [info script]] ../lib tdom.tcl]
+}
+
 proc indent {} {
     variable indent
     upvar level level
@@ -98,9 +103,11 @@ proc fromDTD_generate {} {
         }
     }
     set elements [lsort [array names dtdElements]]
-    set startInd [lsearch -exact $elements $dtdStart]
-    set elements [lreplace $elements $startInd $startInd]
-    set elements [linsert $elements 0 $dtdStart]
+    if {$dtdStart ne "" && [info exists dtdElements($dtdStart)]} {
+        set startInd [lsearch -exact $elements $dtdStart]
+        set elements [lreplace $elements $startInd $startInd]
+        set elements [linsert $elements 0 $dtdStart]
+    }
     set level 1
     foreach name $elements {
         # First round over attributes to get possible namespace
@@ -185,13 +192,13 @@ proc fromDTD_generate {} {
                     puts "[indent]$cmd [expr {$isRequired ? "" : "?"}] \{nmtoken\}"
                 }
                 "ID" {
-                    puts "[indent]$cmd [expr {$isRequired ? "" : "?"}] \{nmtoken;id\}"
+                    puts "[indent]$cmd [expr {$isRequired ? "" : "?"}] \{name;id\}"
                 }
                 "IDREF" {
-                    puts "[indent]$cmd [expr {$isRequired ? "" : "?"}] \{idref\}"
+                    puts "[indent]$cmd [expr {$isRequired ? "" : "?"}] \{name;idref\}"
                 }
                 "IDREFS" {
-                    puts "[indent]$cmd [expr {$isRequired ? "" : "?"}] \{split \{idref\}\}"
+                    puts "[indent]$cmd [expr {$isRequired ? "" : "?"}] \{split \{name;idref\}\}"
                 }
                 "NMTOKENS" {
                     puts "[indent]$cmd [expr {$isRequired ? "" : "?"}] \{nmtokens\}"
@@ -236,8 +243,7 @@ proc fromDTD_attlistDecl {elname name type default isRequired} {
     set dtdAttributes($elname,$name) [list $name $type $default $isRequired]
 }
 
-proc fromDTD {file} {
-
+proc setupFromDTDParser {file} {
     ::xml::parser p \
         -baseurl [tdom::baseURL $file] \
         -paramentityparsing always \
@@ -246,8 +252,18 @@ proc fromDTD {file} {
         -enddoctypedeclcommand fromDTD_endDoctypeDecl \
         -elementdeclcommand fromDTD_elementDecl \
         -attlistdeclcommand fromDTD_attlistDecl
-        
+}    
+
+proc fromDTD {file} {
+    setupFromDTDParser $file
     p parse [tdom::xmlReadFile $file]
+    p free
+}
+
+proc fromDTDfile {file} {
+    setupFromDTDParser $file
+    p parse "<!DOCTYPE svg SYSTEM \"$file\"><svg/>"
+    p free
 }
 
 proc usage {} {
@@ -266,6 +282,9 @@ proc run {args} {
             ".xml" {
                 fromDTD $file
             }
+            ".dtd" {
+                fromDTDfile $file
+            }
             default {
                 set needToGuess 1
             }
@@ -274,8 +293,9 @@ proc run {args} {
             # Just probe everything we have in no specific order
             foreach reader {
                 fromDTD
+                fromDTDfile
             } {
-                if {![catch {$reader $file}]} {
+                if {![catch {$reader $file} errMsg]} {
                     return
                 }
             }
