@@ -140,13 +140,17 @@ proc xsd::getQuant {node} {
             }
         }
         default {
-            if {$max < $min} {
-                # Huch, contradiction
-                return
-            } elseif {$max == $min} {
-                return $min
+            if {$max eq "unbounded"} {
+                return "{$min *}"
             } else {
-                return "{$min $max}"
+                if {$max < $min} {
+                    # Huch, contradiction
+                    return
+                } elseif {$max == $min} {
+                    return $min
+                } else {
+                    return "{$min $max}"
+                }
             }
         }
     }
