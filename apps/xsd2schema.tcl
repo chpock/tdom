@@ -535,6 +535,15 @@ rproc xsd::whiteSpace {node} {
 
 }
 
+# Debug proc
+proc xsd::parents {node} {
+    set node [$node parentNode]
+    while {$node ne ""} {
+        puts [$node localName]
+        set node [$node parentNode]
+    }
+}
+
 rproc xsd::union {node} {
     sput "oneOf \{"
     incr level
@@ -816,9 +825,13 @@ rproc xsd::complexType {node} {
 }
 
 rproc xsd::simpleContent {node} {
+    sput "text \{"
+    incr level
     foreach child [$node selectNodes xsd:*] {
         [$child localName] $child
     }
+    incr level -1
+    sput "\}"
 }
 
 rproc xsd::complexContent {node} {
