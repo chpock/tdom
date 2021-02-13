@@ -66,7 +66,21 @@ proc xsd::prefix {ns} {
     variable xsddata
     return [dict get $xsddata nsprefix $ns]
 }
-    
+
+proc xsd::saveReset {args} {
+    foreach var $args {
+        uplevel "set __saved_$var $var; set $var \"\""
+    }
+}
+
+proc xsd::restoreSaved {} {
+    uplevel {
+        foreach __var [info vars __saved_*] {
+            set [string range $__var 8 end] $__var
+        }
+    }
+}
+
 proc rproc {name args body} {
     proc $name $args "variable level;upvar result result;$body"
 }
@@ -732,6 +746,7 @@ rproc xsd::elementWorker {node} {
 rproc xsd::element {node} {
     variable xsddata
     variable targetNS
+    variable atts
     
     if {[$node hasAttribute ref]} {
         lassign [resolveFQ [$node @ref] $node] ns name
@@ -741,13 +756,32 @@ rproc xsd::element {node} {
             sput "namespace [$dict get $xsddata nsprefix $ns] \{"
             incr level
             sput "element $name [getQuant $node]"
-            incr level
+            incr level -1
             sput "\}"
         }
         return
     }
-    sputnnl "element [$node @name] [getQuant $node] "
+    saveReset result atts
+    #sputnnl "element [$node @name] [getQuant $node] "
     elementWorker $node
+    if {$result eq ""} {
+        if {$atts eq ""} {
+            sput "element [$node @name] [getQuant $node] "
+        } else {
+            sput "element [$node @name] [getQuant $node] \{"
+            incr level
+            foreach ns [dict keys $atts] {
+                if {$ns eq ""} {
+                    foreach name [dict keys $ns] {
+                    }
+                }
+            }
+            incr level -1
+            sput "\}"
+        }
+    } else {
+    }
+    restoreSaved
 }
 
 rproc xsd::simpleType {node} {
@@ -768,12 +802,11 @@ rproc xsd::simpleType {node} {
 
 rproc xsd::complexType {node} {
     if {[$node @mixed 0]} {
-        set atts ""
         foreach child [$node selectNodes xsd:*] {
             switch [$child localName] {
                 "attribute" -
                 "attributeGroup" {
-                    lappend atts $child
+                    [$child localName] $child
                 }
                 "choice" {
                     set quant [getQuant $child]
@@ -851,10 +884,6 @@ rproc xsd::complexContent {node} {
 
 rproc xsd::anyAttribute {node} {
     sputce "anyAttribute not implemented"
-}
-
-proc xsd::getSimpleType {ns type} {
-
 }
 
 rproc xsd::extension {node} {
@@ -1011,7 +1040,9 @@ rproc xsd::textType {node {start ""}} {
 
 rproc xsd::attribute {node} {
     variable xsddata
-    
+    variable atts
+
+    saveReset result
     switch [$node @use "optional"] {
         "prohibited" {
             return "# LOOK_AT: attribute use 'prohibited' not supported"
@@ -1036,26 +1067,19 @@ rproc xsd::attribute {node} {
         set start "nsattribute $name [dict get $xsddata nsprefix $ns] $quant"
     }
     if {[$node hasAttribute fixed]} {
-        sput "$start \{fixed [::list [$node @fixed]]\}"
+        dict set atts $ns $name content "fixed [::list [$node @fixed]]" 
+        restoreSaved
         return
     }
     if {[$node hasAttribute type]} {
         textType $node $start
     } else {
-        set childs [$node selectNodes xsd:*]
-        if {[llength $childs]} {
-            # Local definition by simpleType
-            sput "$start \{"
-            incr level
-            foreach child [$node selectNodes xsd:*] {
-                [$child localName] $child
-            }
-            incr level -1
-            sput "\}"
-        } else {
-            sput $start
+        foreach child [$node selectNodes xsd:*] {
+            [$child localName] $child
         }
     }
+    dict set atts $ns $name content $result
+    restoreSaved
 }
 
 proc xsd::notation {node} {
@@ -1130,6 +1154,7 @@ proc xsd::generateSchema {file} {
     variable output
     variable schema ""
     variable currentBase ""
+    variable atts ""
     
     set basedir [file dirname [file normalize [lindex $file 0]]]
     set xsddoc [dom parse [xmlReadFile [lindex $file 0]]]
