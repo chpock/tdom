@@ -3554,22 +3554,15 @@ validateDOM (
 
         case TEXT_NODE:
         case CDATA_SECTION_NODE:
-            if (node == node->parentNode->firstChild
-                && node == node->parentNode->lastChild) {
-                Tcl_DStringAppend (sdata->cdata,
-                                   ((domTextNode *) node)->nodeValue,
-                                   ((domTextNode *) node)->valueLength);
-                if (tDOM_probeText (interp, sdata,
-                               Tcl_DStringValue (sdata->cdata), NULL) != TCL_OK) {
-                    Tcl_DStringSetLength (sdata->cdata, 0);
-                    return TCL_ERROR;
-                }
-                Tcl_DStringSetLength (sdata->cdata, 0);
-                break;
-            }
             Tcl_DStringAppend (sdata->cdata,
                                ((domTextNode *) node)->nodeValue,
                                ((domTextNode *) node)->valueLength);
+            if (tDOM_probeText (interp, sdata,
+                                Tcl_DStringValue (sdata->cdata), NULL) != TCL_OK) {
+                Tcl_DStringSetLength (sdata->cdata, 0);
+                return TCL_ERROR;
+            }
+            Tcl_DStringSetLength (sdata->cdata, 0);
             break;
 
         case COMMENT_NODE:
@@ -3582,11 +3575,6 @@ validateDOM (
             return TCL_ERROR;
         }
         node = node->nextSibling;
-    }
-    if (Tcl_DStringLength (sdata->cdata)) {
-        if (tDOM_probeText (interp, sdata, Tcl_DStringValue (sdata->cdata),
-                            NULL) != TCL_OK) return TCL_ERROR;
-        Tcl_DStringSetLength (sdata->cdata, 0);
     }
     if (tDOM_probeElementEnd (interp, sdata) != TCL_OK) return TCL_ERROR;
     sdata->node = savednode;

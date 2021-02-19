@@ -1287,6 +1287,41 @@ test schema-4.12 {event - text without root} {
     set result
 } {1 {No validation started}}
 
+test schema-4.13 {event - successive text nodes} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            text integer
+            text {
+                oneOf {
+                    integer
+                    fixed "foo"
+                }
+            }
+            text number
+        }
+    }
+    set result ""
+    foreach input {
+        {1 2 3}
+        {1 foo 3.2}
+        {1 2 3 4}
+        {foo 2 3}
+        {1 foo}
+    } {
+        lappend result [catch {
+            s event start doc
+            foreach value $input {
+                s event text $value
+            }
+            s event end
+        }]
+        s reset
+    }
+    s delete
+    set result
+} {0 0 1 1 1}
+            
 test schema-5.1 {dom parse -validateCmd} {
     set result [catch {
         [dom parse -validateCmd tdom::schema <doc/>]
@@ -3951,6 +3986,41 @@ test schema-12.7 {domvalidate invalid root} {
     $doc delete
     set result
 } 1
+
+dom createNodeCmd textNode    t
+test schema-12.8 {domvalidate - successive text nodes} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            text integer
+            text {
+                oneOf {
+                    integer
+                    fixed "foo"
+                }
+            }
+            text number
+        }
+    }
+    set result ""
+    foreach input {
+        {1 2 3}
+        {1 foo 3.2}
+        {1 2 3 4}
+    } {
+        set doc [dom createDocument doc]
+        set root [$doc documentElement]
+        $root appendFromScript {
+            foreach value $input {
+                t $value
+            }
+        }
+        lappend result [s domvalidate $doc]
+        $doc delete
+    }
+    s delete
+    set result
+} {1 1 0}
 
 test schema-13.1 {XML namespaces} {
     tdom::schema create s
