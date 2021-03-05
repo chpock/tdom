@@ -69,14 +69,14 @@ proc xsd::prefix {ns} {
 
 proc xsd::saveReset {args} {
     foreach var $args {
-        uplevel "set __saved_$var $var; set $var \"\""
+        uplevel "set __saved_$var \[set $var\]; set $var \"\""
     }
 }
 
 proc xsd::restoreSaved {} {
     uplevel {
         foreach __var [info vars __saved_*] {
-            set [string range $__var 8 end] $__var
+            set [string range $__var 8 end] [set $__var]
         }
     }
 }
@@ -764,6 +764,7 @@ rproc xsd::element {node} {
     saveReset result atts
     #sputnnl "element [$node @name] [getQuant $node] "
     elementWorker $node
+    puts "hier '$result'"
     if {$result eq ""} {
         if {$atts eq ""} {
             sput "element [$node @name] [getQuant $node] "
@@ -780,6 +781,19 @@ rproc xsd::element {node} {
             sput "\}"
         }
     } else {
+        sput "element [$node @name] [getQuant $node] \{"
+        incr level
+        if {$atts ne ""} {
+            foreach ns [dict keys $atts] {
+                if {$ns eq ""} {
+                    foreach name [dict keys $ns] {
+                    }
+                }
+            }
+        }
+        sput $result
+        incr level -1
+        sput "\}"
     }
     restoreSaved
 }
@@ -1078,7 +1092,12 @@ rproc xsd::attribute {node} {
             [$child localName] $child
         }
     }
-    dict set atts $ns $name content $result
+    if {[catch {
+        dict set atts $ns $name content $result
+    }]} {
+        puts hier
+        puts $atts
+    }
     restoreSaved
 }
 
