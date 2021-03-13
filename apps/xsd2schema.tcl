@@ -73,10 +73,19 @@ proc xsd::saveReset {args} {
     }
 }
 
-proc xsd::restoreSaved {} {
-    uplevel {
-        foreach __var [info vars __saved_*] {
-            set [string range $__var 8 end] [set $__var]
+proc xsd::restoreSaved {{keeplocalcopies 0}} {
+    if {$keeplocalcopies} {
+        uplevel {
+            foreach __var [info vars __saved_*] {
+                set _[string range $__var 8 end] [set [string range $__var 8 end]]
+                set [string range $__var 8 end] [set $__var]
+            }
+        }
+    } else {
+        uplevel {
+            foreach __var [info vars __saved_*] {
+                set [string range $__var 8 end] [set $__var]
+            }
         }
     }
 }
@@ -677,13 +686,9 @@ rproc xsd::elementWorker {node} {
             if {$texttypecode eq ""} {
                 append result "text\n"
             } elseif {[string first " " $texttypecode] > -1} {
-                append result "\{\n"
-                incr level
                 sput "text \{$texttypecode\}"
-                incr level -1
-                sput "\}"
             } else {
-                append result "\{text $texttypecode\}\n"
+                append result "text $texttypecode"
             }
             return
         }
@@ -733,13 +738,13 @@ rproc xsd::elementWorker {node} {
         return
     } else {
         # Local defined type
-        append result "\{\n"
-        incr level
+        #append result "\{\n"
+        #incr level
         foreach child [$node selectNodes xsd:*] {
             [$child localName] $child
         }
-        incr level -1
-        sput "\}"
+        #incr level -1
+        #sput "\}"
     }
 }
 
@@ -764,14 +769,14 @@ rproc xsd::element {node} {
     saveReset result atts
     #sputnnl "element [$node @name] [getQuant $node] "
     elementWorker $node
-    puts "hier '$result'"
-    if {$result eq ""} {
-        if {$atts eq ""} {
-            sput "element [$node @name] [getQuant $node] "
+    restoreSaved 1
+    if {$_result eq ""} {
+        if {$_atts eq ""} {
+            sput "element [$node @name] [getQuant $node]"
         } else {
             sput "element [$node @name] [getQuant $node] \{"
             incr level
-            foreach ns [dict keys $atts] {
+            foreach ns [dict keys $_atts] {
                 if {$ns eq ""} {
                     foreach name [dict keys $ns] {
                     }
@@ -783,19 +788,18 @@ rproc xsd::element {node} {
     } else {
         sput "element [$node @name] [getQuant $node] \{"
         incr level
-        if {$atts ne ""} {
-            foreach ns [dict keys $atts] {
+        if {$_atts ne ""} {
+            foreach ns [dict keys $_atts] {
                 if {$ns eq ""} {
                     foreach name [dict keys $ns] {
                     }
                 }
             }
         }
-        sput $result
+        sput $_result
         incr level -1
         sput "\}"
     }
-    restoreSaved
 }
 
 rproc xsd::simpleType {node} {
