@@ -1866,20 +1866,6 @@ test dom-9.6 {node token with result var argument} {
     domDoc $doc delete
     dom setObjectCommands automatic
 } {automatic}
-
-
-test dom-9.7 {Attempt to use the token to an already freed node} {
-    dom setObjectCommands token
-    set doc [dom createDocument one]
-    set top [domDoc $doc documentElement]
-    set elem [domDoc $doc createElement one]
-    domNode $elem delete
-    set result [catch {domNode $elem asList} errMsg]
-    lappend result $errMsg
-    domDoc $doc delete
-    dom setObjectCommands automatic
-    set result
-} {1 {Parameter "" is not a domNode.}}
     
 catch {namespace delete nodeCmds}
 
