@@ -6409,6 +6409,38 @@ test schema-14.64 {text type} {
     set result
 } {1}
 
+test schema-14.65 {text double} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            text double
+        }
+    }
+    set result ""
+    foreach xml {
+        <doc/>
+        <doc></doc>
+        <doc>foo</doc>
+        {<doc> </doc>}
+        <doc>1</doc>
+        <doc>234567.</doc>
+        <doc>.2345</doc>
+        <doc>.</doc>
+        <doc>0x2</doc>
+        <doc>0X2</doc>
+        <doc>-1.2344e56</doc>
+        <doc>NaN</doc>
+        <doc>nan</doc>
+        <doc>-Inf</doc>
+        <doc>-.23</doc>
+        
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 0 0 1 1 1 0 0 0 1 1 0 0 1}
+
 test schema-15.1 {constraint cmd tcl} {
     tdom::schema s
     s define {

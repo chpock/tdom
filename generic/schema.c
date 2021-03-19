@@ -8519,6 +8519,73 @@ typeTCObjCmd (
     return TCL_OK;
 }
 
+
+static int
+doubleImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    /* Since tcl calls setlocale(LC_NUMERIC, "C") using strtod for
+     * simplicity should be ok, at least with respect to locale. */
+    double d;
+    char *tail;
+
+    d = strtod (text, &tail);
+    if (d == 0 && text == tail) return 0;
+    if (tail[0]) return 0;
+    switch (text[0]) {
+    case '0':
+        /* No hexadecimal format. */
+        if (text[1] == 'x' || text[1] == 'X') return 0;
+        break;
+    case 'i':    
+    case 'n':
+        /* NaN and INF are case sensitive. */
+        return 0;
+    case '+':
+        /* No + sign for NaN and INF. */
+        if (!isdigit(text[1]) && text[1] != '.') return 0;
+        break;
+    case 'N':
+        /* NaN is case sensitive */
+        if (text[1] != 'a' || text[2] != 'N') return 0;
+        break;
+    case '-':
+        /* Check for -INF.*/
+        if (isdigit(text[1]) || text[1] == '.') break;
+        if (text[1] != 'I' || text[2] != 'N' || text[3] != 'N') return 0;
+        break;
+        /* fall through */
+    case 'I':
+        /* INF is case sensitive */
+        if (text[1] != 'N' || text[2] != 'F') return 0;
+        break;
+    default:
+        /* do nothing */
+        break;
+    }
+    return 1;
+}
+
+static int
+doubleTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+
+    CHECK_TI
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = doubleImpl;
+    return TCL_OK;
+}
+
 static int
 dateObjCmd (
     ClientData clientData,
@@ -8745,6 +8812,8 @@ tDOM_SchemaInit (
                           lengthTCObjCmd, (ClientData) 3, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::type",
                           typeTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::double",
+                          doubleTCObjCmd, NULL, NULL);
 
     /* Exposed text type commands */
     Tcl_CreateObjCommand (interp,"tdom::type::date",
