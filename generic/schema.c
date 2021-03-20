@@ -6824,7 +6824,7 @@ nmtokensTCObjCmd (
 }
 
 static int
-numberImplXsd (
+decimalImpl (
     Tcl_Interp *interp,
     void *constraintData,
     char *text
@@ -6845,22 +6845,7 @@ numberImplXsd (
 }
 
 static int
-numberImplTcl (
-    Tcl_Interp *interp,
-    void *constraintData,
-    char *text
-    )
-{
-    double d;
-
-    if (Tcl_GetDouble (interp, text, &d) != TCL_OK) {
-        return 0;
-    }
-    return 1;
-}
-
-static int
-numberTCObjCmd (
+decimalTCObjCmd (
     ClientData clientData,
     Tcl_Interp *interp,
     int objc,
@@ -6869,34 +6854,11 @@ numberTCObjCmd (
 {
     SchemaData *sdata = GETASI;
     SchemaConstraint *sc;
-    int type;
-
-    static const char *types[] = {
-        "xsd", "tcl", NULL
-    };
-    enum typeSyms {
-        t_xsd, t_tcl
-    };
 
     CHECK_TI
-    checkNrArgs (1,2,"?xsd|tcl?");
-    if (objc == 1) {
-        type = t_xsd;
-    } else {
-        if (Tcl_GetIndexFromObj (interp, objv[1], types, "type", 0, &type)
-            != TCL_OK) {
-            return TCL_ERROR;
-        }
-    }
+    checkNrArgs (1,1,"No arguments expected");
     ADD_CONSTRAINT (sdata, sc)
-    switch ((enum typeSyms) type) {
-    case t_xsd:
-        sc->constraint = numberImplXsd;
-        break;
-    case t_tcl:
-        sc->constraint = numberImplTcl;
-        break;
-    }
+    sc->constraint = decimalImpl;
     return TCL_OK;
 }
 
@@ -8519,9 +8481,23 @@ typeTCObjCmd (
     return TCL_OK;
 }
 
+static int
+doubleImplTcl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    double d;
+
+    if (Tcl_GetDouble (interp, text, &d) != TCL_OK) {
+        return 0;
+    }
+    return 1;
+}
 
 static int
-doubleImpl (
+doubleImplXsd (
     Tcl_Interp *interp,
     void *constraintData,
     char *text
@@ -8579,10 +8555,34 @@ doubleTCObjCmd (
 {
     SchemaData *sdata = GETASI;
     SchemaConstraint *sc;
+    int type;
 
+    static const char *types[] = {
+        "xsd", "tcl", NULL
+    };
+    enum typeSyms {
+        t_xsd, t_tcl
+    };
+    
     CHECK_TI
+    checkNrArgs (1,2,"?xsd|tcl?");
+    if (objc == 1) {
+        type = t_xsd;
+    } else {
+        if (Tcl_GetIndexFromObj (interp, objv[1], types, "type", 0, &type)
+            != TCL_OK) {
+            return TCL_ERROR;
+        }
+    }
     ADD_CONSTRAINT (sdata, sc)
-    sc->constraint = doubleImpl;
+    switch ((enum typeSyms) type) {
+    case t_xsd:
+        sc->constraint = doubleImplXsd;
+        break;
+    case t_tcl:
+        sc->constraint = doubleImplTcl;
+        break;
+    }
     return TCL_OK;
 }
 
@@ -8752,8 +8752,8 @@ tDOM_SchemaInit (
                           nmtokenTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp, "tdom::schema::text::nmtokens",
                           nmtokensTCObjCmd, NULL, NULL);
-    Tcl_CreateObjCommand (interp,"tdom::schema::text::number",
-                          numberTCObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::decimal",
+                          decimalTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::boolean",
                           booleanTCObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::date",

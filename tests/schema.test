@@ -1298,7 +1298,7 @@ test schema-4.13 {event - successive text nodes} {
                     fixed "foo"
                 }
             }
-            text number
+            text decimal
         }
     }
     set result ""
@@ -3999,7 +3999,7 @@ test schema-12.8 {domvalidate - successive text nodes} {
                     fixed "foo"
                 }
             }
-            text number
+            text decimal
         }
     }
     set result ""
@@ -4459,11 +4459,11 @@ test schema-14.9 {text: date} {
     set result
 } {0 0 0 0 0 1 0 0 0 1 0 1 1 0 1 1 0 0 0 1 0 1 1 1 1 0 0 0 1 1 1 0 1 0 1 1 0 0 0 0 0}
 
-test schema-14.10 {text: number tcl} {
+test schema-14.10 {text: double tcl} {
     tdom::schema s
     s define {
         defelement doc {
-            text {number tcl}
+            text {double tcl}
         }
     }
     set result [list]
@@ -4487,11 +4487,11 @@ test schema-14.10 {text: number tcl} {
     set result
 } {0 0 0 0 1 1 0 1 1 1 1 0}
 
-test schema-14.10a {text: number xsd} {
+test schema-14.10a {text: decimal xsd} {
     tdom::schema s
     s define {
         defelement doc {
-            text number
+            text decimal
         }
     }
     set result [list]
@@ -5044,7 +5044,7 @@ test schema-14.22 {split} {
             element a 1 {
                 text {
                     split {
-                        number
+                        decimal
                     }
                 }
             }
@@ -5083,7 +5083,7 @@ test schema-14.23 {split} {
             element a 1 {
                 text {
                     split tcl schema-14.23 {
-                        number
+                        decimal
                     }
                 }
             }
@@ -5129,7 +5129,7 @@ test schema-14.24 {split} {
             element a 1 {
                 text {
                     split tcl schema-14.24 {
-                        number
+                        decimal
                     }
                 }
             }
@@ -5169,7 +5169,7 @@ test schema-14.24a {split} {
             element a 1 {
                 text {
                     split tcl schema-14.24a foo bar {
-                        number
+                        decimal
                     }
                 }
             }
