@@ -1,5 +1,5 @@
-C Backouted\s[36e470e5a63b3a].\sTurned\sout\swhat\sshould\shave\sbeen\sclear\sright\sfrom\sthe\sstart\sthat\scheating\saround\sin\sthe\sbackground\swith\sthe\sstring\svalue\sof\sa\sTcl_Obj\sis\snot\sa\sgood\sidea.
-D 2021-03-18T02:12:05.390
+C Expat\s2.3.0
+D 2021-04-01T00:12:03.072
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -55,23 +55,23 @@ F doc/tnc.n 0e8fa5f4ba1f8f3763ca8357ee7968fb6f0496e4
 F doc/tnc.xml f6d0115fbfac8393343b46e6fd1bba50deba17bc
 F expat/COPYING 1830cf88edd943aadba8ca7504d45113ca3431a2
 F expat/Changes 748a88e62e95abb205887aef3ce2eccae032b03d4f36fb7801ba5ea7e25ff3c7
-F expat/README.md 23184d620b38d529c0ad0c466d129753fe83cada98145cfa79313c05b9dc098e
-F expat/VERSION 45c13711ac1747758de8b3b1c155a386620bee3a930d7d52345cf341f24303a5
+F expat/README.md 592a8a1b7ef746e778aa9ee4aed2c06ce120f6f71f1f312ff2e1c517b108955b
+F expat/VERSION a38fa8d4d48eaf43dbc93b61379dea4ce81e050c8815e6197fe4c9e7a0b24c7f
 F expat/ascii.h 1309911caa8cff77c75576b8a03c36d547ecb5c3
 F expat/asciitab.h 2cc5f3c873bf186b33c4b8de59873ba266faf3c0599cb39347323b5253763384
-F expat/expat.h e3cf0dfa10dba152f20139904b2a14a479283baf704544d4999da7df6fc51bb8
+F expat/expat.h 7d2d4c76ce1bd423dadf216dbbd3a230df3038742a978938c672d90a54a90ac1
 F expat/expat_external.h 81aa6f265c30e99c6f133517b678c33af85434a2e7df09714971d2c6def1b356
 F expat/iasciitab.h cc6d84de9d7a46bfd3968e323179031db651d6a1b71ac5ab1cc2f712ff088380
 F expat/internal.h 56750263c77de35efcbaee3dfbdc3bf6d03989cc738ebdab3bf19be6ad20a634
 F expat/latin1tab.h 2ac1f6c91cc24c3a1c0d5d66d506a9590d433cdedc07516986a00ed1ec4aff19
 F expat/nametab.h 224b8aacdc45d3b88b79573c711d9a71742de203626c0371b333e4bd67eda9eb
-F expat/siphash.h 9fe68063cf3cf96d1ef4a221c1901a75757c677d26a3114b8225565e16457c32
+F expat/siphash.h e912e702f017450b38f98eb20918a751131d52d487a5287df88b29d08100da4b
 F expat/utf8tab.h 5a324aeca0fac25d75f99eb5d1ac66c0f94aeba56057b6e2ca56d63bdf3cf4fb
 F expat/winconfig.h e8a2b77c39eb2fc4a3af1a45c1437a7c6a3149617aedf861c33ca40b908a571e
-F expat/xmlparse.c 03a8e0d686f33347bb148f70869d4e8953d475a5a59ea3f1b4b7a4fa8cc8d9df
+F expat/xmlparse.c 1492ae73035e5c0a1baeeeb21b86e7f8bb002c061bc6305ebcd6a03830ce4761
 F expat/xmlrole.c 92c924ac7296f88cd6713a4c727a59786e6585e8a4852faa3862bac4077135f6
 F expat/xmlrole.h a6b4e825d6f26da81043abb81691c9f35202a488437e67eb16f04453ce169dd1
-F expat/xmltok.c 8930ddf68efdf4e78688fdc1dd4531be37f9321874a6e2cc86a0067bb25b727a
+F expat/xmltok.c 72a42296ff17ab1dd67aabc44494312bcb53b41cd7469cfb27095817d6c0719a
 F expat/xmltok.h c31900027d589728fc274af47d969195411a9ccdcd24eb5fc2bd94951d0b4b50
 F expat/xmltok_impl.c f53e2be4c85252bb466abf1eecb34561e880d4e3c1adc49132b2f8e99b43d403
 F expat/xmltok_impl.h 30a270ed1a04cd5dc9a0ad4bdb9bf7061d99e106c0a013b6c5254beede7e4e33
@@ -238,9 +238,11 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 02d50847454c6606d43141ccec150e52c3a0ee142a2c1c12458c0c56de43185e
-Q -36e470e5a63b3aa219c36adea8c0b5d9612fce79e315ce3c1ee4ccc657f7de0e
-R bb75753e751375cb31b2afc02a8c4089
+P cc4953c8a28396f0aefe121f4205d6ef425126cd9370c1f90d9a054dcaefd256
+R 43af93a0f4fb0073fbd52ca0ca5990f9
+T *branch * expat-update
+T *sym-expat-update *
+T -sym-trunk *
 U rolf
-Z 07ee8e3631444467e5f347ff059dcc4c
+Z 5510783a0d89ea62f68b62111604c429
 # Remove this line to create a well-formed Fossil manifest.
