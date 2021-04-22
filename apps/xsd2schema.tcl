@@ -697,38 +697,19 @@ rproc xsd::elementWorker {node} {
             return
         } elseif {[dict exists $xsddata namespace $thisns complexType $type]} {
             set xsd [dict get $xsddata namespace $thisns complexType $type xsd]
-            set attdefinitions [$xsd selectNodes {
-                xsd:attribute
-                | xsd:atttributeGroup
-            }]
-            set haveScriptStart 0
-            if {[llength $attdefinitions]} {
-                set haveScriptStart 1
-                append result "\{\n"
-                incr level
-                foreach child $attdefinitions {
-                    [$child localName] $child
-                }
+            # During the first pass of processGlobalComplexTypes there
+            # may be no atts key so far.
+            set atts ""
+            if {[dict exists $xsddata namespace $thisns complexType $type atts]} {
+                set atts [dict get $xsddata namespace $thisns complexType $type atts]
             }
             if {$thisns eq $targetNS} {
-                if {$haveScriptStart} {
-                    sput "ref $type"
-                } else {
-                    append result "\{ref $type\}\n"
-                }
+                generateAttributes $atts
+                sput "ref $type"
             } else {
-                if {!$haveScriptStart} {
-                    append result "\{\n"
-                    incr level
-                }
-                sput "namespace [dict get $xsddata nsprefix $thisns] \{ref $type\}"
-                if {!$haveScriptStart} {
-                    incr level -1
-                    sput "\}"
-                }
-            }
-            if {$haveScriptStart} {
-                incr level -1
+                sput "namespace [dict get $xsddata nsprefix $thisns] \{"
+                generateAttributes $atts
+                sput "ref $type"
                 sput "\}"
             }
             return
@@ -746,6 +727,38 @@ rproc xsd::elementWorker {node} {
         #incr level -1
         #sput "\}"
     }
+}
+
+rproc xsd::generateAttributes {_atts} {
+    incr level
+    dict for {ns nsattdata} $_atts {
+        foreach name [dict keys $nsattdata] {
+            if {$ns eq ""} {
+                set start "attribute $name [dict get $nsattdata $name quant]"
+            } else {
+                set start "nsattribute $name $ns [dict get $nsattdata $name quant]"
+            }
+            set content \
+                [split [string trim [dict get $nsattdata $name content]] "\n"]
+            if {[llength $content] > 1} {
+                sput "$start \{"
+                incr level
+                foreach line $content {
+                    sput $line
+                }
+                incr level -1
+                sput "\}"
+            } else {
+                set thiscontent [lindex $content 0]
+                if {[string first " " $thiscontent] > 0} {
+                    sput "$start \{$thiscontent\}"
+                } else {
+                    sput "$start $thiscontent"
+                }
+            }
+        }
+    }
+    incr level -1
 }
 
 rproc xsd::element {node} {
@@ -775,27 +788,13 @@ rproc xsd::element {node} {
             sput "element [$node @name] [getQuant $node]"
         } else {
             sput "element [$node @name] [getQuant $node] \{"
-            incr level
-            foreach ns [dict keys $_atts] {
-                if {$ns eq ""} {
-                    foreach name [dict keys $ns] {
-                    }
-                }
-            }
-            incr level -1
+            generateAttributes $_atts
             sput "\}"
         }
     } else {
         sput "element [$node @name] [getQuant $node] \{"
+        generateAttributes $_atts
         incr level
-        if {$_atts ne ""} {
-            foreach ns [dict keys $_atts] {
-                if {$ns eq ""} {
-                    foreach name [dict keys $ns] {
-                    }
-                }
-            }
-        }
         sput $_result
         incr level -1
         sput "\}"
@@ -858,18 +857,13 @@ rproc xsd::complexType {node} {
             # mixed complexType with attributes only
             sput text
         }
-        foreach child $atts {
-            [$child localName] $child
-        }
-    } else {
-        foreach child [$node selectNodes {
-            xsd:*[local-name() != 'attribute' and local-name() != 'attributeGroup']
-        }] {
-            [$child localName] $child
-        }
         foreach child [$node selectNodes {
             xsd:*[local-name() = 'attribute' or local-name() = 'attributeGroup']
         }] {
+            [$child localName] $child
+        }
+    } else {
+        foreach child [$node selectNodes xsd:*] {
             [$child localName] $child
         }
     }
@@ -930,14 +924,7 @@ rproc xsd::extension {node} {
             
         }
     }
-    foreach child [$xsd selectNodes {
-        xsd:*[local-name() != 'attribute' and local-name() != 'attributeGroup']
-    }] {
-        [$child localName] $child
-    }
-    foreach child [$node selectNodes {
-        xsd:*[local-name() = 'attribute' or local-name() = 'attributeGroup']
-    }] {
+    foreach child [$xsd selectNodes xsd:*] {
         [$child localName] $child
     }
     set currentBase $savedCurrentBase
@@ -1023,30 +1010,14 @@ rproc xsd::attributeGroup {node} {
     }
 }
 
-rproc xsd::textType {node {start ""}} {
+rproc xsd::textType {node} {
     variable xsddata
     
     set type [$node @type]
     lassign [resolveFQ $type $node] typens typename
     # Check for basic data type
     if {$typens eq "http://www.w3.org/2001/XMLSchema"} {
-        set texttypecode [mapXsdTypeToSchema $typename]
-        sputnnl $start
-        if {$texttypecode ne ""} {
-            if {[string first " " $texttypecode] > -1} {
-                sput " \{"
-                incr level
-                foreach line [split $texttypecode "\n"] {
-                    sput $line
-                }
-                incr level -1
-                sput "\}"
-            } else {
-                append result " $texttypecode\n"
-            }
-        } else {
-            append result "\n"
-        }
+        sput [mapXsdTypeToSchema $typename]
     } else {
         if {$typens eq ""} {
             sput "$start type $typename"
@@ -1063,7 +1034,7 @@ rproc xsd::attribute {node} {
     saveReset result
     switch [$node @use "optional"] {
         "prohibited" {
-            return "# LOOK_AT: attribute use 'prohibited' not supported"
+            sput "# LOOK_AT: attribute use 'prohibited' not supported"
         }
         "optional" {
             set quant ?
@@ -1079,29 +1050,21 @@ rproc xsd::attribute {node} {
     } else {
         lassign [resolveFQ [$node @name] $node 1] ns name
     }
-    if {$ns eq ""} {
-        set start "attribute $name $quant"
-    } else {
-        set start "nsattribute $name [dict get $xsddata nsprefix $ns] $quant"
-    }
     if {[$node hasAttribute fixed]} {
-        dict set atts $ns $name content "fixed [::list [$node @fixed]]" 
+        dict set atts $ns $name content "fixed [::list [$node @fixed]]"
+        dict set atts $ns $name quant $quant
         restoreSaved
         return
     }
     if {[$node hasAttribute type]} {
-        textType $node $start
+        textType $node 
     } else {
         foreach child [$node selectNodes xsd:*] {
             [$child localName] $child
         }
     }
-    if {[catch {
-        dict set atts $ns $name content $result
-    }]} {
-        puts hier
-        puts $atts
-    }
+    dict set atts $ns $name content $result
+    dict set atts $ns $name quant $quant
     restoreSaved
 }
 
@@ -1134,16 +1097,36 @@ proc xsd::processGlobalComplexTypes {} {
     variable xsddata
     variable targetNS
     variable level
+    variable atts
 
+    # We need two passes about the complex types. The first, to get
+    # the attribute definitions of the complex type, which are stored
+    # in the xsddata dict. The second pass writes the defpattern (and
+    # any element used by the complexType, which itself refers to a
+    # complexType via the type attribute can be written with ref and
+    # the now know attribute definitions.
+
+    dict for {targetNS nsdata} [dict get $xsddata namespace] {
+        if {![dict exists $nsdata complexType]} continue
+        dict for {complexType ctdata} [dict get $nsdata complexType] {
+            set atts ""
+            set result ""
+            set xsd [dict get $ctdata xsd]
+            foreach child [$xsd selectNodes xsd:*] {
+                [$child localName] $child
+            }
+            dict set xsddata namespace $targetNS complexType $complexType atts $atts
+        }
+    }
+    
     incr level
     dict for {targetNS nsdata} [dict get $xsddata namespace] {
         if {![dict exists $nsdata complexType]} continue
         dict for {complexType ctdata} [dict get $nsdata complexType] {
+            set atts ""
             set xsd [dict get $ctdata xsd]
             set result "defpattern $complexType [dict get $xsddata nsprefix $targetNS] \{\n"
-            foreach child [$xsd selectNodes {
-                xsd:*[local-name() != 'attribute' and local-name() != 'attributeGroup']
-            }] {
+            foreach child [$xsd selectNodes xsd:*] {
                 [$child localName] $child
             }
             append result "\}"
@@ -1156,14 +1139,22 @@ proc xsd::processGlobalComplexTypes {} {
 proc xsd::processGlobalElements {} {
     variable xsddata
     variable targetNS
-
+    variable atts
+    
     set result ""
     dict for {targetNS nsdata} [dict get $xsddata namespace] {
         if {![dict exists $nsdata element]} continue
         dict for {element elmdata} [dict get $nsdata element] {
+            set atts ""
             set xsd [dict get $elmdata xsd]
-            set result "defelement $element $targetNS "
+            set result "defelement $element "
+            if {$targetNS ne ""} {
+                append result "$targetNS "
+            }
+            append result "\{\n"
             elementWorker $xsd
+            generateAttributes $atts
+            append result "\}\n"
             out 1
         }
     }
