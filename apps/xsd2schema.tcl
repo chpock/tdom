@@ -244,6 +244,7 @@ rproc xsd::import {import} {
     variable xsddata
     variable targetNS
     variable basedir
+    variable localCopies
     
     set schemaLocation [$import @schemaLocation ""]
     if {$schemaLocation eq ""} {
@@ -254,6 +255,9 @@ rproc xsd::import {import} {
         return
     }
     dict set xsddata imported $schemaLocation ""
+    if {[info exists localCopies($schemaLocation)]} {
+        set schemaLocation $localCopies($schemaLocation)
+    }
     set savedTargetNS $targetNS
     try {
         set xsddoc [dom parse [xmlReadFile [file join $basedir $schemaLocation]]]
@@ -265,8 +269,10 @@ rproc xsd::import {import} {
         processToplevel $xsd
     } on error errMsg {
         sputce "Can't access\n[$import asXML]$errMsg"
-        out
-        exit
+        if {$::xsd::standalone} {
+            out
+            exit
+        }
     } finally {
         set targetNS $savedTargetNS
     }
@@ -294,8 +300,10 @@ rproc xsd::include {include} {
         processToplevel $xsd
     } on error errMsg {
         sputce "Can't access\n[$include asXML]$errMsg"
-        out
-        exit
+        if {$::xsd::standalone} {
+            out
+            exit
+        }
     }        
 }
 
@@ -322,8 +330,10 @@ rproc xsd::redefine {redefine} {
         processToplevel $xsd
     } on error errMsg {
         sputce "Can't access\n[$redefine asXML]$errMsg"
-        out
-        exit
+        if {$::xsd::standalone} {
+            out
+            exit
+        }
     }
 }
 
@@ -386,7 +396,8 @@ proc xsd::mapXsdTypeToSchema {type} {
         "int" -
         "long" -
         "NOTATION" -
-        "short" {
+        "short" -
+        "yearMonthDuration" {
             return "tcl ::xsd::tclxsdtypes $type"
         }
         "IDREFS" {
@@ -436,8 +447,7 @@ rproc xsd::restriction {node} {
 
     set savedCurrentBase $currentBase
     set currentBase [$node @base $currentBase]
-    set base $currentBase
-    lassign [resolveFQ $base $node] typens type
+    lassign [resolveFQ $currentBase $node] typens type
     set context [[$node parentNode] localName] 
     switch $context {
         "simpleContent" -
@@ -573,7 +583,7 @@ rproc xsd::union {node} {
     set memberTypes [$node @memberTypes ""]
     if {$memberTypes ne ""} {
         foreach memberType $memberTypes {
-
+            textType $node $memberType
         }
     } else {
         foreach child [$node selectNodes xsd:*] {
@@ -693,7 +703,7 @@ rproc xsd::elementWorker {node} {
             return
         }
         if {[dict exists $xsddata namespace $thisns simpleType $type]} {
-            sput "\{text type [prefix $thisns]:$type\}"
+            sput "text type [prefix $thisns]:$type"
             return
         } elseif {[dict exists $xsddata namespace $thisns complexType $type]} {
             set xsd [dict get $xsddata namespace $thisns complexType $type xsd]
@@ -802,16 +812,16 @@ rproc xsd::element {node} {
 }
 
 rproc xsd::simpleType {node} {
-    set forattribute 1
-    if {[[$node parentNode] localName] ne "attribute"} {
-        set forattribute 0
+    set openbrace 0
+    if {[[$node parentNode] localName] eq "element"} {
+        set openbrace 1
         sput "text \{"
         incr level
     }
     foreach child [$node selectNodes xsd:*] {
         [$child localName] $child
     }
-    if {!$forattribute} {
+    if {$openbrace} {
         incr level -1
         sput "\}"
     }
@@ -904,8 +914,7 @@ rproc xsd::extension {node} {
     
     set savedCurrentBase $currentBase
     set currentBase [$node @base $currentBase]
-    set base $currentBase
-    lassign [resolveFQ $base $node] typens type
+    lassign [resolveFQ $currentBase $node] typens type
     set context [[$node parentNode] localName] 
     switch $context {
         "simpleContent" {
@@ -1010,19 +1019,21 @@ rproc xsd::attributeGroup {node} {
     }
 }
 
-rproc xsd::textType {node} {
+rproc xsd::textType {node {type ""}} {
     variable xsddata
     
-    set type [$node @type]
+    if {$type eq ""} {
+        set type [$node @type]
+    }
     lassign [resolveFQ $type $node] typens typename
     # Check for basic data type
     if {$typens eq "http://www.w3.org/2001/XMLSchema"} {
         sput [mapXsdTypeToSchema $typename]
     } else {
         if {$typens eq ""} {
-            sput "$start type $typename"
+            sput "type $typename"
         } else {
-            sput "$start type [dict get $xsddata nsprefix $$typens]:$typename"
+            sput "type [dict get $xsddata nsprefix $typens]:$typename"
         }
     }
 }    
@@ -1190,6 +1201,14 @@ proc xsd::generateSchema {file} {
     }
 }
 
+foreach {ref localCopy} {
+    http://www.w3.org/2001/xml.xsd xml.xsd
+    http://www.w3.org/XML/2008/06/xlink.xsd xlink.xsd
+} {
+    set xsd::localCopies($ref) [file join [file dir [info script]] $localCopy]
+}
+    
+set xsd::standalone 0
 if {[info exists argv0] && [file tail [info script]] eq [file tail $argv0]} {
     if {$argc != 1} {
         puts stderr "Usage: $argv0 <xsd-file>"
@@ -1197,4 +1216,5 @@ if {[info exists argv0] && [file tail [info script]] eq [file tail $argv0]} {
     }
     set ::xsd::output ""
     xsd::generateSchema [lindex $argv 0]
-}
+    set xsd::standalone 1
+} 
