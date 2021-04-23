@@ -18,6 +18,7 @@ if {$argc < 1} {
 source xsd2schema.tcl
 
 set schemaFileCounter 0
+set schemaErrorConversion 0
 
 proc worker {xsddoc path xmlfiles} {
     
@@ -28,7 +29,7 @@ proc worker {xsddoc path xmlfiles} {
 
 array set query {
     allxsd {/ts:testSet/ts:testGroup/ts:schemaTest/ts:schemaDocument}
-    validxsd {/ts:testSet/ts:testGroup/ts:schemaTest[ts:expected/@validity = 'valid']/ts:schemaDocument}
+    validxsd {/ts:testSet/ts:testGroup[ts:schemaTest[ts:expected/@validity = 'valid']]}
     invalidxsd {/ts:testSet/ts:testGroup/ts:schemaTest[ts:expected/@validity = 'invalid']/ts:schemaDocument}
     invalidxml {/ts:testSet/ts:testGroup
         [ts:schemaTest[ts:expected/@validity = 'valid']
@@ -38,13 +39,13 @@ array set query {
 
 proc walktestSet {file} {
     global query
-    
+
     set base [file dir $file]
     set set [dom parse [xmlReadFile $file]]
     $set selectNodesNamespaces {
         ts "http://www.w3.org/XML/2004/xml-schema-test-suite/"
     }
-    foreach testGroup [$set selectNodes $query(invalidxml)] {
+    foreach testGroup [$set selectNodes $query(validxsd)] {
         set xsdfile [file normalize \
                          [file join $base [$testGroup selectNodes {
                              string(ts:schemaTest/ts:schemaDocument/@xlink:href)
@@ -53,10 +54,11 @@ proc walktestSet {file} {
         if {[catch {
             s define [xsd::generateSchema $xsdfile]
         } errMsg]} {
+            incr ::schemaErrorConversion 
             puts $::schemaFileCounter
             puts "xsdfile: $xsdfile"
             puts $::errorInfo
-            exit
+            #exit
         }
         incr ::schemaFileCounter
         foreach instanceTest [$testGroup selectNodes {ts:intanceTest[ts:expected/@validity = 'invalid']}] {
@@ -88,3 +90,4 @@ proc walksuite {file} {
 
 walksuite [lindex $argv 0]
 puts "# of looked at xsd files: $schemaFileCounter"
+puts "# of errors in converssion:: $schemaErrorConversion"
