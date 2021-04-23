@@ -692,7 +692,7 @@ s define {
       </commanddef>
 
       <commanddef>
-        <command><method>defelementtype</method> <m>name</m> <m>?namespace?</m> <m>&lt;definition script></m></command>
+        <command><method>defelementtype</method> <m>typename</m> <m>name</m> <m>?namespace?</m> <m>&lt;definition script></m></command>
         <desc>This defines an elementtype exactly as a <i>schemacmd
         defelementtype</i> call would. It is meant as top-level
         command of a <i>schemacmd define</i> script. This command is
