@@ -15,8 +15,7 @@
 -->
 
   <synopsis>
-    <syntax>$nodeObject <m>method</m> <m>arg arg ...</m></syntax>
-    <syntax>domNode <m>nodeToken</m> <m>method</m> <m>arg arg ...</m></syntax>
+    <syntax> $nodeObject <m>method</m>  <m>arg arg ...</m></syntax>
   </synopsis>
   <section>
     <title> DESCRIPTION </title>
