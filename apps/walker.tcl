@@ -91,4 +91,4 @@ proc walksuite {file} {
 
 walksuite [lindex $argv 0]
 puts "# of looked at xsd files: $schemaFileCounter"
-puts "# of errors in converssion:: $schemaErrorConversion"
+puts "# of errors in conversion:: $schemaErrorConversion"
