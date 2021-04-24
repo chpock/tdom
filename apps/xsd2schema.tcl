@@ -201,6 +201,8 @@ proc xsd::nsfromprefix {contextNode prefix} {
 }
 
 proc xsd::resolveFQ {name node {forAtt 0}} {
+    variable targetNS
+
     if {[string first : $name] > -1} {
         lassign [split $name :] prefix name
         return [::list [nsfromprefix $node $prefix] $name]
@@ -208,6 +210,7 @@ proc xsd::resolveFQ {name node {forAtt 0}} {
         if {$forAtt} {
             return [::list "" $name]
         } else {
+            # return [::list $targetNS $name]
             return [::list \
                         [lindex [lindex [$node selectNodes {
                             namespace::*[name()='']
@@ -609,6 +612,10 @@ rproc xsd::list {node} {
     sput "\}"
 }
 
+rproc xsd::assert {node} {
+    sputce "assert not implemented"
+}
+
 proc xsd::processGlobalSimpleTypes {} {
     variable xsddata
     variable targetNS
@@ -781,7 +788,7 @@ rproc xsd::element {node} {
         if {$targetNS eq $ns} {
             sput "element $name [getQuant $node]"
         } else {
-            sput "namespace [$dict get $xsddata nsprefix $ns] \{"
+            sput "namespace [dict get $xsddata nsprefix $ns] \{"
             incr level
             sput "element $name [getQuant $node]"
             incr level -1
@@ -919,14 +926,14 @@ rproc xsd::extension {node} {
     switch $context {
         "simpleContent" {
             if {![dict exists $xsddata namespace $typens simpleType $type]} {
-                sputce "simpleType $type in $namespace $typens not found for extension"
+                sputce "simpleType $type in $typens not found for extension"
                 return
             }
             set xsd [dict get $xsddata namespace $typens simpleType $type xsd]
         }
         "complexContent" {
             if {![dict exists $xsddata namespace $typens complexType $type]} {
-                sputce "complexType $type in $namespace $typens not found for extension"
+                sputce "complexType $type in $typens not found for extension"
                 return
             }
             set xsd [dict get $xsddata namespace $typens complexType $type xsd]
@@ -1043,9 +1050,10 @@ rproc xsd::attribute {node} {
     variable atts
 
     saveReset result
+    set prohibited 0
     switch [$node @use "optional"] {
         "prohibited" {
-            sput "# LOOK_AT: attribute use 'prohibited' not supported"
+            set prohibited 1
         }
         "optional" {
             set quant ?
@@ -1060,6 +1068,13 @@ rproc xsd::attribute {node} {
         set node [dict get $xsddata namespace $ns attribute $name xsd]
     } else {
         lassign [resolveFQ [$node @name] $node 1] ns name
+    }
+    if {$prohibited} {
+        if {[dict exists atts $ns $name]} {
+            dict delete atts $ns $name
+        }
+        restoreSaved
+        return
     }
     if {[$node hasAttribute fixed]} {
         dict set atts $ns $name content "fixed [::list [$node @fixed]]"
@@ -1093,9 +1108,9 @@ proc xsd::processGlobalGroup {} {
         if {![dict exists $nsdata group]} continue
         dict for {group data} [dict get $nsdata group] {
             set xsd [dict get $data xsd]
-            append result "\ndefpattern $group [dict get $xsddata nsprefix $targetNS] \{\n"
+            set result "\ndefpattern $group [dict get $xsddata nsprefix $targetNS] \{\n"
             foreach child [$xsd selectNodes xsd:*] {
-                append result "[[$child localName] $child]\n"
+                [$child localName] $child
             }
             append result "\}"
             out
@@ -1150,9 +1165,10 @@ proc xsd::processGlobalComplexTypes {} {
 proc xsd::processGlobalElements {} {
     variable xsddata
     variable targetNS
+    variable level
     variable atts
     
-    set result ""
+    incr level
     dict for {targetNS nsdata} [dict get $xsddata namespace] {
         if {![dict exists $nsdata element]} continue
         dict for {element elmdata} [dict get $nsdata element] {
@@ -1191,11 +1207,13 @@ proc xsd::generateSchema {file} {
 
     xsd::prolog
     xsd::processToplevel $xsd
-    xsd::processNamespaces
-    xsd::processGlobalSimpleTypes
-    xsd::processGlobalGroup
-    xsd::processGlobalComplexTypes
-    xsd::processGlobalElements
+    if {[dict exists $xsddata namespace]} {
+        xsd::processNamespaces
+        xsd::processGlobalSimpleTypes
+        xsd::processGlobalGroup
+        xsd::processGlobalComplexTypes
+        xsd::processGlobalElements
+    }
     if {$output eq "collect"} {
         return $schema
     }

@@ -56,6 +56,7 @@ proc walktestSet {file} {
         } errMsg]} {
             incr ::schemaErrorConversion 
             puts $::schemaFileCounter
+            puts "testset: $file"
             puts "xsdfile: $xsdfile"
             puts $::errorInfo
             #exit
