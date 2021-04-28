@@ -202,15 +202,15 @@ proc xsd::nsfromprefix {contextNode prefix} {
 
 proc xsd::resolveFQ {name node {forAtt 0}} {
     variable targetNS
+    variable mainTargetNS
 
     if {[string first : $name] > -1} {
         lassign [split $name :] prefix name
         return [::list [nsfromprefix $node $prefix] $name]
     } else {
         if {$forAtt} {
-            return [::list "" $name]
+            return [::list $targetNS $name]
         } else {
-            # return [::list $targetNS $name]
             return [::list \
                         [lindex [lindex [$node selectNodes {
                             namespace::*[name()='']
@@ -248,6 +248,7 @@ rproc xsd::import {import} {
     variable targetNS
     variable basedir
     variable localCopies
+    variable schemadocs
     
     set schemaLocation [$import @schemaLocation ""]
     if {$schemaLocation eq ""} {
@@ -264,6 +265,7 @@ rproc xsd::import {import} {
     set savedTargetNS $targetNS
     try {
         set xsddoc [dom parse [xmlReadFile [file join $basedir $schemaLocation]]]
+        lappend schemadocs $xsddoc
         $xsddoc selectNodesNamespaces {
             xsd "http://www.w3.org/2001/XMLSchema"
         }
@@ -284,6 +286,7 @@ rproc xsd::import {import} {
 rproc xsd::include {include} {
     variable xsddata
     variable basedir
+    variable schemadocs
     
     set schemaLocation [$include @schemaLocation ""]
     if {$schemaLocation eq ""} {
@@ -296,6 +299,7 @@ rproc xsd::include {include} {
     dict set xsddata included $schemaLocation ""
     try {
         set xsddoc [dom parse [xmlReadFile [file join $basedir $schemaLocation]]]
+        lappend schemadocs $xsddoc
         $xsddoc selectNodesNamespaces {
             xsd "http://www.w3.org/2001/XMLSchema"
         }
@@ -313,7 +317,9 @@ rproc xsd::include {include} {
 rproc xsd::redefine {redefine} {
     variable xsddata
     variable basedir
-
+    variable redefining
+    variable schemadocs
+    
     set schemaLocation [$redefine @schemaLocation ""]
     if {$schemaLocation eq ""} {
         sputce "redefine: skiping because of missing schemaLocation\n[$redefine asXML]"
@@ -324,8 +330,10 @@ rproc xsd::redefine {redefine} {
     }
     sputce "Global element redefine just includes, but does not actually redefine, so far"
     dict set xsddata redefined $schemaLocation ""
+    set storedredefining $redefining
     try {
         set xsddoc [dom parse [xmlReadFile [file join $basedir $schemaLocation]]]
+        lappend schemadocs $xsddoc
         $xsddoc selectNodesNamespaces {
             xsd "http://www.w3.org/2001/XMLSchema"
         }
@@ -338,6 +346,7 @@ rproc xsd::redefine {redefine} {
             exit
         }
     }
+    set redefining $storedredefining
 }
 
 proc xsd::processToplevel {xsd} {
@@ -356,6 +365,11 @@ proc xsd::processToplevel {xsd} {
             }
             "annotation" {
                 annotation $toplevelelm
+            }
+            "attribute" {
+                set name [$toplevelelm @name ""]
+                dict set xsddata namespace $targetNS attribute $name xsd $toplevelelm
+                dict set xsddata namespace $targetNS attribute $name namespace $targetNS
             }
             default {
                 set name [$toplevelelm @name ""]
@@ -498,9 +512,9 @@ rproc xsd::restriction {node} {
             sputce "complexType restriction to do"
         }
     }
-    # foreach child [$node selectNodes xsd:*] {
-    #     [$child localName] $child
-    # }
+    foreach child [$node selectNodes xsd:*] {
+        [$child localName] $child
+    }
     set currentBase $savedCurrentBase
 }
 
@@ -1047,6 +1061,7 @@ rproc xsd::textType {node {type ""}} {
 
 rproc xsd::attribute {node} {
     variable xsddata
+    variable targetNS
     variable atts
 
     saveReset result
@@ -1068,6 +1083,9 @@ rproc xsd::attribute {node} {
         set node [dict get $xsddata namespace $ns attribute $name xsd]
     } else {
         lassign [resolveFQ [$node @name] $node 1] ns name
+    }
+    if {$ns eq $targetNS} {
+        set ns ""
     }
     if {$prohibited} {
         if {[dict exists atts $ns $name]} {
@@ -1125,7 +1143,7 @@ proc xsd::processGlobalComplexTypes {} {
     variable level
     variable atts
 
-    # We need two passes about the complex types. The first, to get
+    # We need two passes for the complex types. The first, to get
     # the attribute definitions of the complex type, which are stored
     # in the xsddata dict. The second pass writes the defpattern (and
     # any element used by the complexType, which itself refers to a
@@ -1190,21 +1208,26 @@ proc xsd::processGlobalElements {} {
 proc xsd::generateSchema {file} {
     variable level 0
     variable targetNS ""
+    variable mainTargetNS ""
     variable basedir
     variable xsddata  [dict create]
     variable output
     variable schema ""
     variable currentBase ""
     variable atts ""
+    variable redefining 0
+    variable schemadocs ""
     
     set basedir [file dirname [file normalize [lindex $file 0]]]
     set xsddoc [dom parse [xmlReadFile [lindex $file 0]]]
+    lappend schemadocs $xsddoc
     $xsddoc selectNodesNamespaces {
         xsd "http://www.w3.org/2001/XMLSchema"
     }
     set xsd [$xsddoc documentElement]
     set targetNS [$xsd @targetNamespace ""]
-
+    set mainTargetNS $targetNS
+    
     xsd::prolog
     xsd::processToplevel $xsd
     if {[dict exists $xsddata namespace]} {
@@ -1213,6 +1236,9 @@ proc xsd::generateSchema {file} {
         xsd::processGlobalGroup
         xsd::processGlobalComplexTypes
         xsd::processGlobalElements
+    }
+    foreach doc $schemadocs {
+        $doc delete
     }
     if {$output eq "collect"} {
         return $schema
