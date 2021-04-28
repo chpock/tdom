@@ -6393,21 +6393,56 @@ test schema-14.63 {type} {
 
 test schema-14.64 {text type} {
     tdom::schema s
-    set result [catch {s define {
-        deftexttype ns1:mytype {
-            integer
-        }
+    s define {
         defelement doc {
             element child 1 {
                 attribute attr ? {
-                    type ns1:
+                    type ns1:mytype
                 }
             }
         }
-    }}]
-    s delete
+        deftexttype ns1:mytype {
+            integer
+        }
+    }
+    set result [list]
+    foreach xml {
+        {<doc><child attr="0"/></doc>}
+        {<doc><child attr="1"/></doc>}
+        {<doc><child attr="foo"/></doc>}
+        {<doc><child attr=""/></doc>}
+        {<doc><child attrb="1"/></doc>}
+        {<doc><child attr="1"/><child attr="1"/></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
     set result
-} {1}
+} {1 1 0 0 0 0}
+
+test schema-14.65 {text type} {
+    tdom::schema s
+    s define {
+        defelement doc {
+            element child 1 {
+                attribute attr ? {
+                    type ns1:mytype
+                }
+            }
+        }
+    }
+    set result [list]
+    foreach xml {
+        {<doc><child attr="0"/></doc>}
+        {<doc><child attr="1"/></doc>}
+        {<doc><child attr="foo"/></doc>}
+        {<doc><child attr=""/></doc>}
+        {<doc><child attrb="1"/></doc>}
+        {<doc><child attr="1"/><child attr="1"/></doc>}
+    } {
+        lappend result [s validate $xml]
+    }
+    set result
+} {1 1 1 1 0 0}
 
 test schema-15.1 {constraint cmd tcl} {
     tdom::schema s

@@ -97,11 +97,13 @@
       <commanddef>
         <command><method>deftexttype</method> <m>name</m> <m>&lt;constraint script></m></command>
         <desc>This method defines a bundle of text constraints that
-        can be referred to by <m>name</m> while defining constraints on
-        text element or attribute values. If there is already a text
-        type definition with this name, the command raises error. A
-        text type must be defined before it can be used in schema
-        definition scripts.</desc>
+        can be referred to by <m>name</m> while defining constraints
+        on text element or attribute values. If there is already a
+        text type definition with this name, the command raises error.
+        A text type may be referred before it is defined in the
+        schema. If a referred text type isn't defined anywhere in the
+        schema then any text will match this type during
+        validation.</desc>
       </commanddef>
       
       <commanddef>
