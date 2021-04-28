@@ -4815,13 +4815,19 @@ tDOM_schemaInstanceCmd (
         h = Tcl_CreateHashEntry (&sdata->textDef, Tcl_GetString (objv[2-i]),
                                  &hnew);
         if (!hnew) {
-            SetResult ("There is already a text type definition with this "
-                       "name");
-            return TCL_ERROR;
+            pattern = Tcl_GetHashValue (h);
+            if (pattern->flags & FORWARD_PATTERN_DEF) {
+                forwardDef = 1;
+            } else {
+                SetResult ("There is already a text type definition with "
+                           "this name");
+                return TCL_ERROR;
+            }
+        } else {
+            pattern = initSchemaCP (SCHEMA_CTYPE_CHOICE, NULL, NULL);
+            pattern->type = SCHEMA_CTYPE_TEXT;
+            REMEMBER_PATTERN (pattern);
         }
-        pattern = initSchemaCP (SCHEMA_CTYPE_CHOICE, NULL, NULL);
-        pattern->type = SCHEMA_CTYPE_TEXT;
-        REMEMBER_PATTERN (pattern)
         SETASI(sdata);
         savedDefineToplevel = sdata->defineToplevel;
         result = evalConstraints (interp, sdata, pattern, objv[3-i]);
@@ -4830,9 +4836,16 @@ tDOM_schemaInstanceCmd (
             SETASI(savedsdata);
         }
         if (result == TCL_OK) {
-            Tcl_SetHashValue (h, pattern);
+            if (forwardDef) {
+                pattern->flags &= ~FORWARD_PATTERN_DEF;
+                sdata->forwardPatternDefs--;
+            } else {
+                Tcl_SetHashValue (h, pattern);
+            }
         } else {
-            Tcl_DeleteHashEntry (h);
+            if (!forwardDef) {
+                Tcl_DeleteHashEntry (h);
+            }
         }
         break;
         
@@ -8505,13 +8518,19 @@ typeTCObjCmd (
     SchemaData *sdata = GETASI;
     SchemaConstraint *sc;
     Tcl_HashEntry *h;
+    int hnew;
+    SchemaCP *pattern = NULL;
 
     CHECK_TI
     checkNrArgs (2,2,"Expected: <text type name>");
-    h = Tcl_FindHashEntry (&sdata->textDef, Tcl_GetString (objv[1]));
-    if (!h) {
-        SetResult3 ("Unknown text type \"", Tcl_GetString (objv[1]), "\"");
-        return TCL_ERROR;
+    h = Tcl_CreateHashEntry (&sdata->textDef, Tcl_GetString (objv[1]), &hnew);
+    if (hnew) {
+        pattern = initSchemaCP (SCHEMA_CTYPE_CHOICE, NULL, NULL);
+        pattern->type = SCHEMA_CTYPE_TEXT;
+        REMEMBER_PATTERN (pattern)
+        pattern->flags |= FORWARD_PATTERN_DEF;
+        sdata->forwardPatternDefs++;
+        Tcl_SetHashValue (h, pattern);
     }
     ADD_CONSTRAINT (sdata, sc)
     sc->constraint = typeImpl;
