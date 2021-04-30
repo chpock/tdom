@@ -1,5 +1,5 @@
-C Various\sminor\sand\snot\sso\sminor\sfixes\sand\senhancements.
-D 2021-04-30T11:04:51.327
+C More\simprovements\sincluding\shandling\sof\sattributeGroups\sreferencing\sitself\s(allowed\sin\sxsd\s1.1)\sand\savoid\sof\spossible\sname\sconflicts\sof\scomplexType/group\s(which\sboth\sare\stranslated\sinto\sdefpattern).
+D 2021-04-30T19:31:59.714
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -16,7 +16,7 @@ F apps/stests/xml.xsd 7147fa90a578cf56ad8a329e962c89f0879791416ade43e8782cfd2515
 F apps/toschema.tcl 1cae27e1f2ef83351641728e85ec64ea711ca8d99f8db3004da06b4484e4c6cf
 F apps/validate.tcl 7c74bf0dd10843353a689d234147f484794333ea8ff758516732260481224e84
 F apps/walker.tcl b65bab446362ad6a5714fd6725f27b9e85cff4553acae63f768da39e853a5e9d
-F apps/xsd2schema.tcl faffd49a676c06324c97be7812f76723536e5220989d4b92ce4ccf366cad752a
+F apps/xsd2schema.tcl 28ba74bf6c3668a8f680c3935513ffe13f79b9772f2bd9570dde7041474383d4
 F apps/xslt.tcl 64103132fbe0a1fbf61cf3506608cb7ea5cbfddd247d207d95d8e96a071e1846
 F configure b03ca5e2c6e3bc2d620c64b608e453bc18c79b013def3a0d40d44cccc7c82e6a x
 F configure.ac 1ab4f46d2501e7feec71ac70fcbcb5f5866ceb6fa47ed1e5b02969dd958eb618
@@ -243,8 +243,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P fd8662a1e6839fa0d8cab7c72a5b469346c0eeb4786c340b7100737466c18e4e
-R 3cf01ab32d5a0a6db8dc936111203566
+P be358b1ccf8e8a7daf09d26a4e66b99b40353bc0ab2f69d80975ad875149c86f
+R 31a72d289b22515178e74610879b7590
 U rolf
-Z ff512099bef35b6ca671075780db3303
+Z 673b20a9cf7bdf6a88c1005ef684928a
 # Remove this line to create a well-formed Fossil manifest.

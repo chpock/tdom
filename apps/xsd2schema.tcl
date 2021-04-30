@@ -602,10 +602,10 @@ rproc xsd::pattern {node} {
             sputce "[$node @value]"
             sput "regexp {^.*$}"
         } else {
-            sput "regexp \{^\$$regexp$\}"
+            sput "regexp \{^$regexp\$\}"
         }
     } else {
-        sput "regexp \{^\$$regexp$\}"
+        sput "regexp \{^$regexp\$\}"
     }
 }
 
@@ -670,6 +670,10 @@ rproc xsd::alternative {node} {
     sputce "alternative not implemented"
 }
 
+rproc xsd::explicitTimezone {node} {
+    sputce "explicitTimezone not implemented"
+}
+
 proc xsd::processGlobalSimpleTypes {} {
     variable xsddata
     variable targetNS
@@ -732,9 +736,19 @@ rproc xsd::all {node} {
 }
 
 rproc xsd::group {node} {
+    variable targetNS
+    
     set ref [$node @ref ""]
     lassign [resolveFQ $ref $node] ns name
-    sput "ref $name [getQuant $node]"
+    if {$ns eq $targetNS} {
+        sput "ref ($name) [getQuant $node]"
+    } else {
+        sput "namespace $ns \{"
+        incr level
+        sput "ref ($name) [getQuant $node]"
+        incr level -1
+        sput "\}"
+    }
 }
 
 rproc xsd::elementWorker {node} {
@@ -1082,14 +1096,26 @@ rproc xsd::anyAttribute {node} {
 
 rproc xsd::attributeGroup {node} {
     variable xsddata
-
+    variable attgroupStack
+    variable targetNamespace
+    
+    # The limbo dance with attgroupStack is necessary because xsd 1.1
+    # allows a recursive attribute reference to itself (xsd 1.0 does
+    # not).
     if {[$node hasAttribute ref]} {
         lassign [resolveFQ [$node @ref] $node 1] ns name
+        if {"${ns}:$name" in $attgroupStack} {
+            return
+        }
         set node [dict get $xsddata namespace $ns attributeGroup $name xsd]
+    } else {
+        lassign [resolveFQ [$node @name] $node 1] ns name
     }
+    lappend attgroupStack ${ns}:$name
     foreach child [$node selectNodes xsd:*] {
         [$child localName] $child
     }
+    set attgroupStack [lrange $attgroupStack 0 end-1]
 }
 
 rproc xsd::textType {node {type ""}} {
@@ -1178,7 +1204,7 @@ proc xsd::processGlobalGroup {} {
         if {![dict exists $nsdata group]} continue
         dict for {group data} [dict get $nsdata group] {
             set xsd [dict get $data xsd]
-            set result "\ndefpattern $group [prefix $targetNS] \{\n"
+            set result "\ndefpattern ($group) [prefix $targetNS] \{\n"
             foreach child [$xsd selectNodes xsd:*] {
                 [$child localName] $child
             }
@@ -1272,6 +1298,7 @@ proc xsd::generateSchema {file} {
     variable atts ""
     variable redefining 0
     variable schemadocs ""
+    variable attgroupStack ""
     
     set basedir [file dirname [file normalize [lindex $file 0]]]
     set xsddoc [dom parse [xmlReadFile [lindex $file 0]]]
