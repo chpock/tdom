@@ -6707,7 +6707,7 @@ regexpTCObjCmd (
     checkNrArgs (2,2,"Expected: <regexp>");
     /* Compile it as syntax test (plus caches the complied regexp in
      * the internal value) */
-    if (!Tcl_GetRegExpFromObj (interp, objv[1], 0)) {
+    if (!Tcl_GetRegExpFromObj (interp, objv[1], TCL_REG_ADVANCED)) {
         return TCL_ERROR;
     }
     ADD_CONSTRAINT (sdata, sc)

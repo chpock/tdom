@@ -1,5 +1,5 @@
-C Allow\sforward\sreferences\sto\stext\stypes.
-D 2021-04-28T23:35:37.830
+C Allow\sthe\sthe\susual\sregexp\ssyntax\s(case-sensitive)\sfor\sthe\stext\sconstraint\scommand\sregexp\s-\snot\sonly\sno\sreason\sto\sdo\snot\sbut\sthat\salso\smatches\sbetter\sthe\sxsd\sregexp\sdialect.
+D 2021-04-30T19:35:09.563
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -144,7 +144,7 @@ F generic/domxslt.h 0cb8e327683a0ffeb2a7094add6cd82ec1ae49c7c704f20d8d6f7d6523e7
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 94e793939c9f3a35a1c82ae910d1482e2267ed920ad70abfcb3ff9d43f2a3c9f
 F generic/nodecmd.h d2201b69de9507f86e94750f0b72867ec9150795712ef18c5b5b87f35a689f75
-F generic/schema.c c6b88e8645905ec6e83d750b47b6575b6b8920fc9b652816b4bafce61aa77230
+F generic/schema.c 27c40a16c5e4c5167effddcd5af92d81de09ca760f8563d91497fa14b0f47d49
 F generic/schema.h 91b424bd18fcb85d0062ba46147c0ae73acfcf8d22477e4ba46aca87f16f4514
 F generic/tcldom.c a2c6152a9580bccfb6bc7b94ad84a0f4954e5d11d7e7a4f22feb54edddee6817
 F generic/tcldom.h 37ee136d483b683c7e3e9e94ce8284520c7998cb1340047fc540dd7701825dc6
@@ -238,8 +238,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c82d05a3215893a743fac61cf377fbd4e64d78c0763391a242869cd46b471a3e
-R 191239ea8a27ba6e217a345464d43180
+P e4fcea86e8c6d263348aca0282ce614007ab929381a7c38728891d3bb916f4a0
+R 1151c0e678d3ffb9fc8e21e4870f8b12
 U rolf
-Z e54ba899121be3bee1555650f01ea1f5
+Z b090e9ebbdfeac923039ae6855446bf6
 # Remove this line to create a well-formed Fossil manifest.
