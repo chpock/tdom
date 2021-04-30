@@ -211,11 +211,13 @@ proc xsd::resolveFQ {name node {forAtt 0}} {
         if {$forAtt} {
             return [::list $targetNS $name]
         } else {
-            return [::list \
-                        [lindex [lindex [$node selectNodes {
-                            namespace::*[name()='']
-                        }] 0] 1]\
-                        $name]
+            set docElemNode [[$node ownerDocument] documentElement]
+            if {![$docElemNode hasAttribute targetNamespace]} {
+                # Include of a "chameleon" xsd
+                return [::list $targetNS $name]
+            } else {
+                return [::list [$docElemNode @targetNamespace] $name]
+            }
         }
     }
 }
@@ -248,13 +250,21 @@ rproc xsd::import {import} {
     variable targetNS
     variable basedir
     variable localCopies
+    variable knownNamespaces
     variable schemadocs
     
     set schemaLocation [$import @schemaLocation ""]
     if {$schemaLocation eq ""} {
-        sputce "import: skiping because of missing schemaLocation\n[$import asXML]"
-        return
+        set namespace [$import @namespace ""]
+        if {[info exists knownNamespaces($namespace)]} {
+            set schemaLocation [file normalize $knownNamespaces($namespace)]
+        }
+        if {$schemaLocation eq ""} {
+            sputce "import: skiping because of missing schemaLocation\n[$import asXML]"
+            return
+        }
     }
+    
     if {[dict exists $xsddata imported $schemaLocation]} {
         return
     }
@@ -278,9 +288,8 @@ rproc xsd::import {import} {
             out
             exit
         }
-    } finally {
-        set targetNS $savedTargetNS
     }
+    set targetNS $savedTargetNS
 }
 
 rproc xsd::include {include} {
@@ -499,7 +508,7 @@ rproc xsd::restriction {node} {
                     set typens $targetNS
                 }
                 if {$typens ne ""} {
-                    sput "type [dict get $xsddata nsprefix $typens]:$type"
+                    sput "type [prefix $typens]:$type"
                 } else {
                     sput "type $type"
                 }
@@ -574,11 +583,34 @@ rproc xsd::pattern {node} {
     foreach child [$node selectNodes xsd:*] {
         [$child localName] $child
     }
-    sput "regexp \{^[$node @value]$\}"
+    # The additional xsd pattern character classes (not supported by
+    # the tcl regexp):
+    # \i [:A-Z_a-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]
+    # \c [-.0-9:A-Z_a-z\u00B7\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u037D\u037F-\u1FFF\u200C-\u200D\u203F\u2040\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]
+    # Also not supported by the the tcl repexp:
+    # Character class substraction
+    set regexp [$node @value]
+    if {[catch {regexp -- $regexp "foo"}]} {
+        set regexp [string map \
+                        [::list {\i} {[:A-Z_a-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]} \
+                             {\c} {[-.0-9:A-Z_a-z\u00B7\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u037D\u037F-\u1FFF\u200C-\u200D\u203F\u2040\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]}] \
+                        $regexp]
+        if {[catch {regexp -- $regexp "foo"}]} {
+            # It isn't so simple, probably character class substraction is involved
+            sputce "The xsd pattern could not be converted."
+            sputce "The orignal pattern is:"
+            sputce "[$node @value]"
+            sput "regexp {^.*$}"
+        } else {
+            sput "regexp \{^\$$regexp$\}"
+        }
+    } else {
+        sput "regexp \{^\$$regexp$\}"
+    }
 }
 
 rproc xsd::totalDigits {node} {
-
+    
 }
 
 rproc xsd::whiteSpace {node} {
@@ -630,6 +662,14 @@ rproc xsd::assert {node} {
     sputce "assert not implemented"
 }
 
+rproc xsd::assertion {node} {
+    sputce "assertion not implemented"
+}
+
+rproc xsd::alternative {node} {
+    sputce "alternative not implemented"
+}
+
 proc xsd::processGlobalSimpleTypes {} {
     variable xsddata
     variable targetNS
@@ -641,7 +681,7 @@ proc xsd::processGlobalSimpleTypes {} {
         dict for {simpleType stdata} [dict get $nsdata simpleType] {
             set xsd [dict get $stdata xsd]
             if {$targetNS ne ""} {
-                set result "deftexttype [dict get $xsddata nsprefix $targetNS]:$simpleType \{\n"
+                set result "deftexttype [prefix $targetNS]:$simpleType \{\n"
             } else {
                 set result "deftexttype $simpleType \{\n"
             }
@@ -724,7 +764,11 @@ rproc xsd::elementWorker {node} {
             return
         }
         if {[dict exists $xsddata namespace $thisns simpleType $type]} {
-            sput "text type [prefix $thisns]:$type"
+            set start "text type "
+            if {$thisns ne ""} {
+                append start "[prefix $thisns]:"
+            }
+            sput "$start$type"
             return
         } elseif {[dict exists $xsddata namespace $thisns complexType $type]} {
             set xsd [dict get $xsddata namespace $thisns complexType $type xsd]
@@ -738,7 +782,7 @@ rproc xsd::elementWorker {node} {
                 generateAttributes $atts
                 sput "ref $type"
             } else {
-                sput "namespace [dict get $xsddata nsprefix $thisns] \{"
+                sput "namespace [prefix $thisns] \{"
                 generateAttributes $atts
                 sput "ref $type"
                 sput "\}"
@@ -802,7 +846,7 @@ rproc xsd::element {node} {
         if {$targetNS eq $ns} {
             sput "element $name [getQuant $node]"
         } else {
-            sput "namespace [dict get $xsddata nsprefix $ns] \{"
+            sput "namespace [prefix $ns] \{"
             incr level
             sput "element $name [getQuant $node]"
             incr level -1
@@ -925,10 +969,6 @@ rproc xsd::complexContent {node} {
     }
 }
 
-rproc xsd::anyAttribute {node} {
-    sputce "anyAttribute not implemented"
-}
-
 rproc xsd::extension {node} {
     variable xsddata
     variable currentBase
@@ -971,6 +1011,10 @@ rproc xsd::keyref {node} {
 
 rproc xsd::unique {node} {
     sputce "unique not implemented"
+}
+
+rproc xsd::openContent {node} {
+    sputce "openContent not implemented"
 }
 
 rproc xsd::any {node} {
@@ -1016,23 +1060,31 @@ rproc xsd::any {node} {
                 if {[llength $nsonly] == 1} {
                     sput "any [lindex $nsonly 0] $quant"
                 } else {
-                    append result "choice $quant \{\n"
+                    sput "choice $quant \{\n"
+                    incr level
                     foreach ns $nsonly {
-                        append result "any $ns\n"
+                        sput "any $ns\n"
                     }
-                    append result "\}"
+                    incr level -1
+                    sput "\}"
                 }
             }
         }
     }
-    return $result
+}
+
+rproc xsd::anyAttribute {node} {
+    variable atts
+    sputce "anyAttribute not implemented"
+    dict set atts "" dummyAttForAny content ""
+    dict set atts "" dummyAttForAny quant ?
 }
 
 rproc xsd::attributeGroup {node} {
     variable xsddata
 
     if {[$node hasAttribute ref]} {
-        lassign [resolveFQ [$node @ref] $node] ns name
+        lassign [resolveFQ [$node @ref] $node 1] ns name
         set node [dict get $xsddata namespace $ns attributeGroup $name xsd]
     }
     foreach child [$node selectNodes xsd:*] {
@@ -1054,7 +1106,7 @@ rproc xsd::textType {node {type ""}} {
         if {$typens eq ""} {
             sput "type $typename"
         } else {
-            sput "type [dict get $xsddata nsprefix $typens]:$typename"
+            sput "type [prefix $typens]:$typename"
         }
     }
 }    
@@ -1126,7 +1178,7 @@ proc xsd::processGlobalGroup {} {
         if {![dict exists $nsdata group]} continue
         dict for {group data} [dict get $nsdata group] {
             set xsd [dict get $data xsd]
-            set result "\ndefpattern $group [dict get $xsddata nsprefix $targetNS] \{\n"
+            set result "\ndefpattern $group [prefix $targetNS] \{\n"
             foreach child [$xsd selectNodes xsd:*] {
                 [$child localName] $child
             }
@@ -1169,7 +1221,7 @@ proc xsd::processGlobalComplexTypes {} {
         dict for {complexType ctdata} [dict get $nsdata complexType] {
             set atts ""
             set xsd [dict get $ctdata xsd]
-            set result "defpattern $complexType [dict get $xsddata nsprefix $targetNS] \{\n"
+            set result "defpattern $complexType [prefix $targetNS] \{\n"
             foreach child [$xsd selectNodes xsd:*] {
                 [$child localName] $child
             }
@@ -1192,13 +1244,16 @@ proc xsd::processGlobalElements {} {
         dict for {element elmdata} [dict get $nsdata element] {
             set atts ""
             set xsd [dict get $elmdata xsd]
+            set result ""
+            elementWorker $xsd
+            set storedContent $result
             set result "defelement $element "
             if {$targetNS ne ""} {
-                append result "$targetNS "
+                append result "[prefix $targetNS] "
             }
             append result "\{\n"
-            elementWorker $xsd
             generateAttributes $atts
+            append result $storedContent
             append result "\}\n"
             out 1
         }
@@ -1251,7 +1306,13 @@ foreach {ref localCopy} {
 } {
     set xsd::localCopies($ref) [file join [file dir [info script]] $localCopy]
 }
-    
+
+foreach {namespace localCopy} {
+    http://www.w3.org/XML/1998/namespace xml.xsd
+} {
+    set xsd::knownNamespaces($namespace) [file join [file dir [info script]] $localCopy]
+}
+
 set xsd::standalone 0
 if {[info exists argv0] && [file tail [info script]] eq [file tail $argv0]} {
     if {$argc != 1} {
