@@ -26,6 +26,8 @@ namespace eval xsd {
         NMTOKEN nmtoken
         QName qname
     }]
+
+    namespace unknown forwardCompatibility
 }
 
 # Not used by the converter code itself but written to the created
@@ -54,6 +56,10 @@ proc xsd::prolog {} {
         puts "proc ::xsd::tclxsdtypes {type value} \{[info body ::xsd::tclxsdtypes]\}"
         puts "# Prolog end"
     }
+}
+
+proc xsd::forwardCompatibility {args} {
+    return
 }
 
 proc xsd::indent {} {
@@ -110,7 +116,7 @@ rproc xsd::sputc {text} {
 
 rproc xsd::sputce {text} {
     foreach line [split $text "\n"] {
-        append result "\n[indent]# LOOK_AT $line\n"
+        append result "[indent]# LOOK_AT $line\n"
     }
 }
 
@@ -270,7 +276,7 @@ rproc xsd::import {import} {
     }
     dict set xsddata imported $schemaLocation ""
     if {[info exists localCopies($schemaLocation)]} {
-        set schemaLocation $localCopies($schemaLocation)
+        set schemaLocation [file normalize $localCopies($schemaLocation)]
     }
     set savedTargetNS $targetNS
     try {
@@ -507,10 +513,12 @@ rproc xsd::restriction {node} {
                 if {$typens eq ""} {
                     set typens $targetNS
                 }
-                if {$typens ne ""} {
-                    sput "type [prefix $typens]:$type"
-                } else {
-                    sput "type $type"
+                if {$type ne ""} {
+                    if {$typens ne ""} {
+                        sput "type [prefix $typens]:$type"
+                    } else {
+                        sput "type $type"
+                    }
                 }
             }
             if {$context eq "simpleContent"} {
@@ -542,7 +550,7 @@ rproc xsd::length {node} {
     foreach child [$node selectNodes xsd:*] {
         [$child localName] $child
     }
-    sput "length \{[$node @value]\}"
+    sput "length [$node @value]"
 }
 
 rproc xsd::maxExclusive {node} {
@@ -587,6 +595,7 @@ rproc xsd::pattern {node} {
     # the tcl regexp):
     # \i [:A-Z_a-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]
     # \c [-.0-9:A-Z_a-z\u00B7\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u037D\u037F-\u1FFF\u200C-\u200D\u203F\u2040\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]
+    # (and the reverse ones \I und \C)
     # Also not supported by the the tcl repexp:
     # Character class substraction
     set regexp [$node @value]
@@ -1336,6 +1345,7 @@ foreach {ref localCopy} {
 
 foreach {namespace localCopy} {
     http://www.w3.org/XML/1998/namespace xml.xsd
+    http://www.w3.org/1999/xlink xlink.xsd
 } {
     set xsd::knownNamespaces($namespace) [file join [file dir [info script]] $localCopy]
 }
