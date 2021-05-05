@@ -1,5 +1,5 @@
-C Allow\sthe\sthe\susual\sregexp\ssyntax\s(case-sensitive)\sfor\sthe\stext\sconstraint\scommand\sregexp\s-\snot\sonly\sno\sreason\sto\sdo\snot\sbut\sthat\salso\smatches\sbetter\sthe\sxsd\sregexp\sdialect.
-D 2021-04-30T19:35:09.563
+C Adapted\scode\sto\sdeal\swith\sTip\s543.
+D 2021-05-05T13:51:39.710
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -146,7 +146,7 @@ F generic/nodecmd.c 94e793939c9f3a35a1c82ae910d1482e2267ed920ad70abfcb3ff9d43f2a
 F generic/nodecmd.h d2201b69de9507f86e94750f0b72867ec9150795712ef18c5b5b87f35a689f75
 F generic/schema.c 27c40a16c5e4c5167effddcd5af92d81de09ca760f8563d91497fa14b0f47d49
 F generic/schema.h 91b424bd18fcb85d0062ba46147c0ae73acfcf8d22477e4ba46aca87f16f4514
-F generic/tcldom.c a2c6152a9580bccfb6bc7b94ad84a0f4954e5d11d7e7a4f22feb54edddee6817
+F generic/tcldom.c a28ce2d5c2d6d5bd817c9b583a3c316a28d9edf773fbffcd66ca3cdb4078561e
 F generic/tcldom.h 37ee136d483b683c7e3e9e94ce8284520c7998cb1340047fc540dd7701825dc6
 F generic/tclexpat.c 9796c45c6cf414a85fae95377d80514c3203d97a014a782f9d0ac0f0d2e076ce
 F generic/tclexpat.h 145406289081e71aca82c6a432f0b2eb6d4550a7eefa2ff9fa047dfe27d0fa61
@@ -238,8 +238,11 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P e4fcea86e8c6d263348aca0282ce614007ab929381a7c38728891d3bb916f4a0
-R 1151c0e678d3ffb9fc8e21e4870f8b12
+P fdf4cbc1b8c4aecaa2a17aa5296c23eb6e2595cf96c2ffadf332eafb46080024
+R f86ebb1f162eabff383e582689ac5c41
+T *branch * towardsTcl9
+T *sym-towardsTcl9 *
+T -sym-trunk *
 U rolf
-Z b090e9ebbdfeac923039ae6855446bf6
+Z b20e6891d3f72a9b373aa7aa0e4fe697
 # Remove this line to create a well-formed Fossil manifest.
