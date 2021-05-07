@@ -529,6 +529,20 @@ static void printXML (domNode *node, int level, int maxlevel) {
 }
 #endif /* #ifdef DEBUG */
 
+#if (TCL_MAJOR_VERSION >= 9)
+static int Tcl_UniCharLen (
+    const Tcl_UniChar *unichars
+    )
+{
+    int i = 0;
+    while (unichars[i] != '\0') {
+        i++;
+        unichars++;
+    }
+    return i;
+}
+#endif /* TCL_MAJOR_VERSION >= 9 */
+
 /*----------------------------------------------------------------------------
 |   reportError
 |

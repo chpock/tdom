@@ -1,5 +1,5 @@
-C Adapted\scode\sto\sdeal\swith\sTip\s543.
-D 2021-05-05T13:51:39.710
+C Work-around\sfor\ssome\sfail\sout\sof\sTIP\s542.
+D 2021-05-07T00:37:24.653
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -139,7 +139,7 @@ F generic/domjson.h b10c42af9ef7fc9d0ad4fac733ef6461df0cdd90
 F generic/domlock.c 5bc199269c92217b7f0f3cd713a5cfe6b51672cc577dd54d7e5b2364605ca30f
 F generic/domxpath.c 88a12a2b45d5090f9fffe54e0d5962d8d47029497e18ff2b292665b1683e3d2b
 F generic/domxpath.h 7d37b763e4e90d3e97c985c73d893b6ca26198ad1e61fad937d8147a254a2f0d
-F generic/domxslt.c 1610b492ae33b12636b44e9d516ba96415fc04649a7b7d54673343b1d3bc71ee
+F generic/domxslt.c 3a26f66937c58cd57391b3898985ca6c642e6e0053d8472aa2027412afc29e0c
 F generic/domxslt.h 0cb8e327683a0ffeb2a7094add6cd82ec1ae49c7c704f20d8d6f7d6523e74da8
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 94e793939c9f3a35a1c82ae910d1482e2267ed920ad70abfcb3ff9d43f2a3c9f
@@ -238,11 +238,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P fdf4cbc1b8c4aecaa2a17aa5296c23eb6e2595cf96c2ffadf332eafb46080024
-R f86ebb1f162eabff383e582689ac5c41
-T *branch * towardsTcl9
-T *sym-towardsTcl9 *
-T -sym-trunk *
+P f1dbc9d96c680b9c9a4c64443abc4bac26c11a98d41ca0e8a3b1bc364b0b1fac
+R 6119e75575e4565406344391adb8fff5
 U rolf
-Z b20e6891d3f72a9b373aa7aa0e4fe697
+Z 3b7cf266cef93e8ec0e97dbc1c383ae1
 # Remove this line to create a well-formed Fossil manifest.
