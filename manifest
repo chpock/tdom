@@ -1,5 +1,5 @@
-C Allow\sthe\sthe\susual\sregexp\ssyntax\s(case-sensitive)\sfor\sthe\stext\sconstraint\scommand\sregexp\s-\snot\sonly\sno\sreason\sto\sdo\snot\sbut\sthat\salso\smatches\sbetter\sthe\sxsd\sregexp\sdialect.
-D 2021-04-30T19:35:09.563
+C Added\sLDFLAGS\sto\sthe\svarious\sMakefile.in,\sas\sfix\sfor\s[33972ca1bba1e689].
+D 2021-06-01T22:33:38.857
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -7,7 +7,7 @@ F CHANGES 4fa2efaf00d55a7232b8b0e091d3b3df5634eef1bec1d043476c59bcef5eedb1
 F ChangeLog 9b60ec8bfbae84e4f1a97aaee24be00ccea212b7
 F LICENSE 7c00b00fe8e88c48498a54c103dd7df03faeeb039c783279d5fb54dfca307b77
 F MPL_2.0.html 326b847674d6f5846c5b260fb437372e21232c23e3911f3a94f766a62459126c
-F Makefile.in abaf3911c3cf29d2459722d0856d76bebb81fc367a1e0da39227d93a64eb2562
+F Makefile.in 463f631ebf8e94bdb8dc2fb410a81f6cda98586ab6053ef091a09efb62f14cc4
 F README.AOL 60c1b681acde3a3396a1598164f42f429fde721bfde8ac8b2654b851ac68b01c
 F README.md 0e115a9940373bdaac80cf4dd82b354b89309c544ba9de6c498c0ac271b064f9
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
@@ -76,7 +76,7 @@ F expat/xmltok.h c31900027d589728fc274af47d969195411a9ccdcd24eb5fc2bd94951d0b4b5
 F expat/xmltok_impl.c f53e2be4c85252bb466abf1eecb34561e880d4e3c1adc49132b2f8e99b43d403
 F expat/xmltok_impl.h 30a270ed1a04cd5dc9a0ad4bdb9bf7061d99e106c0a013b6c5254beede7e4e33
 F expat/xmltok_ns.c 2a3acaa4fd589d35b25abd31bb72b9d7fb7b55d3834ed1014968ff5a30160417
-F extensions/example/Makefile.in fff10db0bbe3655dbf6e54ed9032fecb7d94ee9d
+F extensions/example/Makefile.in 74af47e4786c4a89ba4a0df8655b474314c5c4902b4a65b98049d71183078a2a
 F extensions/example/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
 F extensions/example/configure 4236423d0319e1b25c0ab06ef1fc32dd2a81f915 x
 F extensions/example/configure.in 68a3a3201a8a8b6ba56b40ba5feee1072b03dede
@@ -85,7 +85,7 @@ F extensions/example/exampletest.tcl c699cc2c17a2baa598e56b2e760ddfaeb5769e8e
 F extensions/example/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F extensions/example/pkgIndex.tcl.in e6cc33c6f45df109209f4d8412cf2d5ea434e34e
 F extensions/example/tcl.m4 9404ac273b962ddaf946d3170c5183e55d0984b3
-F extensions/schemadtx/Makefile.in fff10db0bbe3655dbf6e54ed9032fecb7d94ee9d
+F extensions/schemadtx/Makefile.in 74af47e4786c4a89ba4a0df8655b474314c5c4902b4a65b98049d71183078a2a
 F extensions/schemadtx/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
 F extensions/schemadtx/configure fa5552c28b938b5b4733bc03390502e9ecf0a26b1995b596b63533058013da57 x
 F extensions/schemadtx/configure.ac f7523142dbb77cde51d4333393d5dd8c1fd92ad995358a9723ecb1fc3739346f
@@ -109,7 +109,7 @@ F extensions/tdomhtml/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F extensions/tdomhtml/pkgIndex.tcl.in 2612d2a8fd5a213a1379ad5570c229d82810dcb5
 F extensions/tdomhtml/tdomhtml.tcl 6901a0fb8db80954dd635e181934b9e3ba3a1864551155f3d5c01355ddbf0a45
 F extensions/tdomhtml/win/makefile.vc a6ba491c8f63a88c607c443e7a80f1369cb3c40c
-F extensions/tnc/Makefile.in 46fcdfeab187868596d1fb43201d0f62dcf973b4
+F extensions/tnc/Makefile.in c51faf11e968837f696422a9b051c3544d59c495cece41e2b24921dbe1c2946c
 F extensions/tnc/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
 F extensions/tnc/configure 67ced6d84ab6e1dd814a265e7648d8e856b91b695aabb20195c4575b42291686 x
 F extensions/tnc/configure.in d15ed29caa0e95f17f9df4686553dd6636549c61
@@ -238,8 +238,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P e4fcea86e8c6d263348aca0282ce614007ab929381a7c38728891d3bb916f4a0
-R 1151c0e678d3ffb9fc8e21e4870f8b12
+P fdf4cbc1b8c4aecaa2a17aa5296c23eb6e2595cf96c2ffadf332eafb46080024
+R 3d52e7a374d718a8bd853144fc449cfe
 U rolf
-Z b090e9ebbdfeac923039ae6855446bf6
+Z 7ae6e085f884dc12cf2e42743d83812c
 # Remove this line to create a well-formed Fossil manifest.
