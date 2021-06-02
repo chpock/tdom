@@ -1,4 +1,8 @@
 
+2021-06-02  Rolf Ade  <rolf@pointsman.de>
+
+        Updated to expat 2.3.0.
+
 2021-01-22  Rolf Ade  <rolf@pointsman.de>
 
         Pull-parser command find-element enhanced - skip forward
