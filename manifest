@@ -1,5 +1,5 @@
-C Expat\s2.3.0
-D 2021-04-01T00:12:03.072
+C Reviewed\sintegration\sof\sexpat-2.3.0.
+D 2021-06-02T23:30:32.185
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -53,9 +53,8 @@ F doc/tmml.schema 0d252aeabfec23f7844bcac9029e93b32a5bc508dbd1d5533ceb0182ebd07c
 F doc/tnc.html fd11d1d7d31c6c98852e74a082403021b2b3791067d2d94f7f2200b814c49653
 F doc/tnc.n 0e8fa5f4ba1f8f3763ca8357ee7968fb6f0496e4
 F doc/tnc.xml f6d0115fbfac8393343b46e6fd1bba50deba17bc
-F expat/COPYING 1830cf88edd943aadba8ca7504d45113ca3431a2
-F expat/Changes 748a88e62e95abb205887aef3ce2eccae032b03d4f36fb7801ba5ea7e25ff3c7
-F expat/README.md 592a8a1b7ef746e778aa9ee4aed2c06ce120f6f71f1f312ff2e1c517b108955b
+F expat/COPYING 16364a0ac925b5138828bf94ce893bdc938c66b8786667c4e20334fa8b9a4132
+F expat/Changes 6fc91eb557e861a5ba1e71a593038cc6357a8ee154fb9ce98719e599a9182b34
 F expat/VERSION a38fa8d4d48eaf43dbc93b61379dea4ce81e050c8815e6197fe4c9e7a0b24c7f
 F expat/ascii.h 1309911caa8cff77c75576b8a03c36d547ecb5c3
 F expat/asciitab.h 2cc5f3c873bf186b33c4b8de59873ba266faf3c0599cb39347323b5253763384
@@ -238,11 +237,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P cc4953c8a28396f0aefe121f4205d6ef425126cd9370c1f90d9a054dcaefd256
-R 43af93a0f4fb0073fbd52ca0ca5990f9
-T *branch * expat-update
-T *sym-expat-update *
-T -sym-trunk *
+P 0a93cb62bb8c0cb316b148f91e95952b5c4fc2f5a9d594e3272e278bfb12cddb
+R 948778971279bca6683bafd6c76a7855
 U rolf
-Z 5510783a0d89ea62f68b62111604c429
+Z 724c1499d9ba35fa74c041b31cb38417
 # Remove this line to create a well-formed Fossil manifest.
