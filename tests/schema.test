@@ -1568,6 +1568,26 @@ test schema-6.6 {expat parser with -validateCmd} {
     set result
 } {doc e1 {}}
 
+test schema-6.7 {expat parser with deleted -validateCmd} {
+    tdom::schema create grammar
+    grammar defelement doc {
+        element e1
+        element e2 *
+    }
+    foreach e {e1 e2} {
+        grammar defelement $e {}
+    }
+    ::xml::parser p -validateCmd grammar
+    p parse "<doc><e1/><e2/><e2/></doc>"
+    p reset
+    grammar delete
+    p parse "<doc><e1/><e2/><e2/></doc>"
+    p reset
+    set result [catch {p parse "<doc><e1/><e1/><e2/><e2/></doc>"}]
+    p delete
+    set result
+} {1}
+
 test schema-7.1 {group} {
     tdom::schema create grammar
     grammar defelement doc {
