@@ -78,6 +78,7 @@ typedef unsigned int SchemaFlags;
 #define CONSTRAINT_TEXT_CHILD  16
 #define MIXED_CONTENT          32
 #define ELEMENTTYPE_DEF        64
+#define FORWARD_TYPE_DEF      128
 
 typedef struct domKeyConstraint {
     char  *name;
@@ -103,7 +104,7 @@ typedef struct SchemaCP
     Schema_CP_Type    type;
     char             *namespace;
     char             *name;
-    char             *typeName;
+    struct SchemaCP  *typeptr;
     struct SchemaCP  *next;
     SchemaFlags       flags;
     struct SchemaCP **content;
