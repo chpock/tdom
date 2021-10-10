@@ -5631,7 +5631,7 @@ ElementPatternObjCmd (
         if (objc == 5) {
             istype = 1;
             ind = 4;
-        } else {
+        } else if (objc == 4) {
             localdef = 1;
         }
     }
@@ -5728,6 +5728,30 @@ ElementPatternObjCmd (
         }
     } else {
         /* Reference to an element. */
+        if (!hnew) {
+            pattern = (SchemaCP *) Tcl_GetHashValue (h);
+            while (pattern) {
+                if (pattern->namespace == sdata->currentNamespace) {
+                    break;
+                }
+                pattern = pattern->next;
+            }
+        }
+        if (!pattern) {
+            pattern = initSchemaCP (
+                SCHEMA_CTYPE_NAME,
+                sdata->currentNamespace,
+                Tcl_GetHashKey (&sdata->element, h)
+                );
+            pattern->flags |= FORWARD_PATTERN_DEF;
+            sdata->forwardPatternDefs++;
+            if (!hnew) {
+                current = (SchemaCP *) Tcl_GetHashValue (h);
+                pattern->next = current;
+            }
+            REMEMBER_PATTERN (pattern);
+        }
+        Tcl_SetHashValue (h, pattern);
         addToContent (sdata, pattern, quant, n, m);
     }
     return TCL_OK;
