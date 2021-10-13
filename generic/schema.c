@@ -608,6 +608,7 @@ static void freeSchemaCP (
         }
         /* Fall throu */
     default:
+        if (pattern->flags & TYPED_ELEMENT) break;
         FREE (pattern->content);
         FREE (pattern->quants);
         if (pattern->attrs) {
@@ -647,6 +648,7 @@ initSchemaData (
     Tcl_IncrRefCount (sdata->self);
     Tcl_InitHashTable (&sdata->element, TCL_STRING_KEYS);
     Tcl_InitHashTable (&sdata->elementType, TCL_STRING_KEYS);
+    Tcl_InitHashTable (&sdata->elementTypeInstance, TCL_ONE_WORD_KEYS);
     Tcl_InitHashTable (&sdata->prefix, TCL_STRING_KEYS);
     Tcl_InitHashTable (&sdata->pattern, TCL_STRING_KEYS);
     Tcl_InitHashTable (&sdata->attrNames, TCL_STRING_KEYS);
@@ -717,6 +719,7 @@ static void schemaInstanceDelete (
     Tcl_DeleteHashTable (&sdata->namespace);
     Tcl_DeleteHashTable (&sdata->element);
     Tcl_DeleteHashTable (&sdata->elementType);
+    Tcl_DeleteHashTable (&sdata->elementTypeInstance);
     Tcl_DeleteHashTable (&sdata->prefix);
     Tcl_DeleteHashTable (&sdata->pattern);
     Tcl_DeleteHashTable (&sdata->attrNames);
@@ -803,9 +806,11 @@ cleanupLastPattern (
         hashTable = NULL;
         name = NULL;
         if (this->type == SCHEMA_CTYPE_NAME) {
-            /* Local defined  elements aren't saved under  their local
-             * name bucket in the sdata->element hash table. */
-            if (this->flags & LOCAL_DEFINED_ELEMENT) {
+            /* Local defined elements and typed elements aren't saved
+             * under their local name bucket in the sdata->element
+             * hash table. */
+            if (this->flags & LOCAL_DEFINED_ELEMENT
+                || this->flags | TYPED_ELEMENT) {
                 freeSchemaCP (sdata->patternList[i]);
                 continue;
             }
@@ -826,23 +831,25 @@ cleanupLastPattern (
                 sdata->forwardPatternDefs--;
             }
             h = Tcl_FindHashEntry (hashTable, name);
-            previous = NULL;
-            current = Tcl_GetHashValue (h);
-            while (current != NULL && current != this) {
-                previous = current;
-                current = current->next;
-            }
-            if (previous) {
-                if (current->next) {
-                    previous->next = current->next;
-                } else {
-                    previous->next = NULL;
+            if (h) {
+                previous = NULL;
+                current = Tcl_GetHashValue (h);
+                while (current != NULL && current != this) {
+                    previous = current;
+                    current = current->next;
                 }
-            } else {
-                if (current && current->next) {
-                    Tcl_SetHashValue (h, current->next);
+                if (previous) {
+                    if (current->next) {
+                        previous->next = current->next;
+                    } else {
+                        previous->next = NULL;
+                    }
                 } else {
-                    Tcl_DeleteHashEntry (h);
+                    if (current && current->next) {
+                        Tcl_SetHashValue (h, current->next);
+                    } else {
+                        Tcl_DeleteHashEntry (h);
+                    }
                 }
             }
         }
@@ -4606,7 +4613,7 @@ tDOM_schemaInstanceCmd (
     int            methodIndex, keywordIndex, hnew, patternIndex;
     int            result = TCL_OK, forwardDef = 0, i = 0, j, mode;
     int            savedDefineToplevel, type, len, n;
-    unsigned int   savedNumPatternList;
+    unsigned int   savedNumPatternList, nrTypeInstances;
     SchemaData    *savedsdata = NULL, *sdata = (SchemaData *) clientData;
     Tcl_HashTable *hashTable;
     Tcl_HashEntry *h, *h1;
@@ -4616,7 +4623,8 @@ tDOM_schemaInstanceCmd (
     domDocument   *doc;
     domNode       *node;
     Tcl_Obj       *attData;
-    Tcl_Channel  chan = NULL;
+    Tcl_Channel    chan = NULL;
+    SchemaCP     **typeInstances;
 
     static const char *schemaInstanceMethods[] = {
         "defelement", "defpattern", "start",    "event",        "delete",
@@ -5181,9 +5189,8 @@ tDOM_schemaInstanceCmd (
         }
         if (pattern == NULL) {
             pattern = initSchemaCP (SCHEMA_CTYPE_NAME, namespacePtr,
-                                    Tcl_GetHashKey (&sdata->element, h));
+                                    Tcl_GetHashKey (&sdata->elementType, h));
             pattern->flags |= ELEMENTTYPE_DEF;
-            pattern->name = Tcl_GetHashKey (&sdata->elementType, h);
             if (!hnew) {
                 current = (SchemaCP *) Tcl_GetHashValue (h);
                 pattern->next = current;
@@ -5191,9 +5198,16 @@ tDOM_schemaInstanceCmd (
             REMEMBER_PATTERN (pattern);
             Tcl_SetHashValue (h, pattern);
         }
-        
-        /* TODO: Save the elements with forward definition of this
-         * type and set to the actuall content afterwards. */
+        if (forwardDef) {
+            /* Save the instace pattern with forward definition of this
+             * type and set to the actual content afterwards. */
+            typeInstances = pattern->content;
+            nrTypeInstances = pattern->numAttr;
+            pattern->content = (SchemaCP**) MALLOC (
+                sizeof(SchemaCP*) * CONTENT_ARRAY_SIZE_INIT
+                );
+            pattern->numAttr = 0;
+        }
         SETASI(sdata);
         savedDefineToplevel = sdata->defineToplevel;
         savedNamespacePtr = sdata->currentNamespace;
@@ -5218,14 +5232,27 @@ tDOM_schemaInstanceCmd (
             }
             if (forwardDef) {
                 sdata->forwardPatternDefs--;
-                pattern->name = Tcl_GetHashKey (&sdata->element, h);
                 pattern->flags &= ~FORWARD_PATTERN_DEF;
+                for (i = 0; i < nrTypeInstances; i++) {
+                    typeInstances[i]->content = pattern->content;
+                    typeInstances[i]->quants = pattern->quants;
+                    typeInstances[i]->nc = pattern->nc;
+                    typeInstances[i]->typedata = pattern->typedata;
+                    typeInstances[i]->attrs = pattern->attrs;
+                    typeInstances[i]->numAttr = pattern->numAttr;
+                    typeInstances[i]->numReqAttr = pattern->numReqAttr;
+                    typeInstances[i]->domKeys = pattern->domKeys;
+                    typeInstances[i]->keySpace = pattern->keySpace;
+                    /* TODO: decide what to do with associated */
+                }
+                FREE (typeInstances);
             }
             pattern->defScript = objv[patternIndex];
             Tcl_IncrRefCount (pattern->defScript);
         } else {
             if (forwardDef) {
-                pattern->nc = 0;
+                pattern->content = typeInstances;
+                pattern->numAttr = nrTypeInstances;
             }
             cleanupLastPattern (sdata, savedNumPatternList);
         }
@@ -5604,7 +5631,8 @@ ElementPatternObjCmd (
     Tcl_HashEntry *h;
     SchemaCP *pattern = NULL, *typePattern = NULL, *current;
     SchemaQuant quant;
-    int hnew, n, m, istype = 0, ind = 3, localdef = 0, forwardDef = 0;
+    int hnew, n, m, typed = 0, ind = 3, localdef = 0;
+    char *namePtr;
 
     CHECK_SI
     CHECK_TOPLEVEL
@@ -5622,36 +5650,47 @@ ElementPatternObjCmd (
         quant = SCHEMA_CQUANT_ONE;
         if (objc == 4) {
             /* Reference to type */
-            istype = 1;
+            typed = 1;
         } else {
             ind = 2;
             localdef = 1;
         }
     } else {
         if (objc == 5) {
-            istype = 1;
+            typed = 1;
             ind = 4;
         } else if (objc == 4) {
             localdef = 1;
         }
     }
-    if (istype) {
-        /* Type lookup is done up front because it may error out in
-         * case of invalid syntax. */
-        if (strcmp (Tcl_GetString(objv[ind-1]), "type") == 0) {
+    if (typed) {
+            if (strcmp (Tcl_GetString(objv[ind-1]), "type") == 0) {
             SetResult("Expected: elementName ?quant? ?(pattern|\"type\" "
                       "typename)?");
             return TCL_ERROR;
         }
-        h = Tcl_CreateHashEntry (&sdata->elementType, Tcl_GetString(objv[ind]),
-                                 &hnew);
+    }
+    h = Tcl_CreateHashEntry (&sdata->element, Tcl_GetString(objv[1]), &hnew);
+    namePtr = Tcl_GetHashKey (&sdata->element, h);
+    if (hnew) {
+        pattern = initSchemaCP( SCHEMA_CTYPE_NAME, sdata->currentNamespace,
+                                namePtr);
+        if (typed || localdef) {
+            pattern->flags |= PLACEHOLDER_PATTERN_DEF;
+        } else {
+            pattern->flags |= FORWARD_PATTERN_DEF;
+        }
+        Tcl_SetHashValue (h, pattern);
+        REMEMBER_PATTERN (pattern);
+    }
+    pattern = NULL;
+    if (typed) {
+        h = Tcl_CreateHashEntry (&sdata->elementType,
+                                 Tcl_GetString (objv[ind]), &hnew);
         if (!hnew) {
             typePattern = (SchemaCP *) Tcl_GetHashValue (h);
             while (typePattern) {
                 if (typePattern->namespace == sdata->currentNamespace) {
-                    if (typePattern->flags & FORWARD_PATTERN_DEF) {
-                        forwardDef = 1;
-                    }
                     break;
                 }
                 typePattern = typePattern->next;
@@ -5663,69 +5702,74 @@ ElementPatternObjCmd (
                 sdata->currentNamespace,
                 Tcl_GetHashKey (&sdata->elementType, h));
             typePattern->flags |= (ELEMENTTYPE_DEF & FORWARD_PATTERN_DEF);
-            typePattern->name = Tcl_GetHashKey (&sdata->elementType, h);
+            sdata->forwardPatternDefs++;
             REMEMBER_PATTERN (typePattern);
+            /* We (ab)use the numAttr for the allocated content length
+             * for forward defined types, to be able to store the
+             * instance pattern until the type pattern is eventually
+             * defined. */
+            typePattern->numAttr = CONTENT_ARRAY_SIZE_INIT;
             if (!hnew) {
                 current = (SchemaCP *) Tcl_GetHashValue (h);
                 typePattern->next = current;
             }
             Tcl_SetHashValue (h, typePattern);
         }
-    }
-    h = Tcl_CreateHashEntry (&sdata->element, Tcl_GetString(objv[1]), &hnew);
-    if (hnew) {
-        pattern = initSchemaCP(
-            SCHEMA_CTYPE_NAME,
-            sdata->currentNamespace,
-            Tcl_GetHashKey (&sdata->element, h)
-            );
-        REMEMBER_PATTERN (pattern);
-        if (istype || localdef ) {
-            pattern->flags |= PLACEHOLDER_PATTERN_DEF;
-        } else {
-            pattern->flags |= FORWARD_PATTERN_DEF;
-        }
-        Tcl_SetHashValue (h, pattern);
-    }
-    if (istype || localdef) {
-        pattern = initSchemaCP (
-            SCHEMA_CTYPE_NAME,
-            sdata->currentNamespace,
-            Tcl_GetHashKey (&sdata->element, h)
-            );
-        Tcl_SetHashValue (h, pattern);
-        if (istype) {
-            pattern->flags |= ELEMENTTYPE_DEF;
-            pattern->typeptr = typePattern;
-            if (forwardDef) {
-                /* Use the content array of the forwarded defined type
-                 * pattern to store the elements of that type until
-                 * the type is in fact defined, at which point the
-                 * content of the elements of that type can be set. */
-                if (sdata->cp->nc == sdata->contentSize) {
-                    sdata->cp->content =
-                        REALLOC (sdata->cp->content,
-                                 2 * sdata->contentSize
-                                 * sizeof (SchemaCP*));
+        h = Tcl_CreateHashEntry (&sdata->elementTypeInstance,
+                                 namePtr, &hnew);
+        if (!hnew) {
+            pattern = (SchemaCP *) Tcl_GetHashValue (h);
+            while (pattern) {
+                if (pattern->namespace == sdata->currentNamespace
+                    && pattern->typeptr == typePattern) {
+                    break;
                 }
-                sdata->cp->content[sdata->cp->nc] = pattern;
-                sdata->cp->nc++;
-            } else {
-                pattern->content = typePattern->content;
-                pattern->quants = typePattern->quants;
-                pattern->nc = typePattern->nc;
-                pattern->typedata = typePattern->typedata;
-                pattern->attrs = typePattern->attrs;
-                pattern->numAttr = typePattern->numAttr;
-                pattern->numReqAttr = typePattern->numReqAttr;
-                pattern->domKeys = typePattern->domKeys;
-                pattern->keySpace = typePattern->keySpace;
+                pattern = pattern->next;
             }
-            REMEMBER_PATTERN (pattern);
-        } else {
-            pattern->flags |= LOCAL_DEFINED_ELEMENT;
-            return evalDefinition (interp, sdata, objv[3], pattern, quant, n, m);
         }
+        if (!pattern) {
+            pattern = initSchemaCP (SCHEMA_CTYPE_NAME, sdata->currentNamespace,
+                                    namePtr);
+            pattern->flags |= TYPED_ELEMENT;
+            REMEMBER_PATTERN (pattern);
+            if (!hnew) {
+                current = (SchemaCP *) Tcl_GetHashValue (h);
+                pattern->next = current;
+            }
+            Tcl_SetHashValue (h, pattern);
+            pattern->typeptr = typePattern;
+        }
+        if (typePattern->flags & FORWARD_PATTERN_DEF) {
+            /* Remember the instance pattern with the type pattern
+             * (a bit misusing struct mebers) to be able to set
+             * the instance pattern to the actual content if the
+             * type pattern is eventually defined. */
+            if (typePattern->nc == typePattern->numAttr) {
+                typePattern->content =
+                    REALLOC (typePattern->content,
+                             2 * typePattern->numAttr * sizeof (SchemaCP*));
+                typePattern->numAttr *= 2;
+            }
+            typePattern->content[typePattern->nc] = pattern;
+        } else {
+            pattern->content = typePattern->content;
+            pattern->quants = typePattern->quants;
+            pattern->nc = typePattern->nc;
+            pattern->typedata = typePattern->typedata;
+            pattern->attrs = typePattern->attrs;
+            pattern->numAttr = typePattern->numAttr;
+            pattern->numReqAttr = typePattern->numReqAttr;
+            pattern->domKeys = typePattern->domKeys;
+            pattern->keySpace = typePattern->keySpace;
+            /* TODO: decide what to do with associated */
+        }
+        addToContent (sdata, pattern, quant, n, m);
+    } else if (localdef) {
+        pattern = initSchemaCP (SCHEMA_CTYPE_NAME, sdata->currentNamespace,
+                                namePtr);
+        pattern->flags |= LOCAL_DEFINED_ELEMENT;
+        REMEMBER_PATTERN (pattern);
+        return evalDefinition (interp, sdata, objv[ind], pattern, quant, n, m);
     } else {
         /* Reference to an element. */
         if (!hnew) {
@@ -5738,11 +5782,8 @@ ElementPatternObjCmd (
             }
         }
         if (!pattern) {
-            pattern = initSchemaCP (
-                SCHEMA_CTYPE_NAME,
-                sdata->currentNamespace,
-                Tcl_GetHashKey (&sdata->element, h)
-                );
+            pattern = initSchemaCP (SCHEMA_CTYPE_NAME, sdata->currentNamespace,
+                                    namePtr);
             pattern->flags |= FORWARD_PATTERN_DEF;
             sdata->forwardPatternDefs++;
             if (!hnew) {
@@ -5750,8 +5791,8 @@ ElementPatternObjCmd (
                 pattern->next = current;
             }
             REMEMBER_PATTERN (pattern);
+            Tcl_SetHashValue (h, pattern);
         }
-        Tcl_SetHashValue (h, pattern);
         addToContent (sdata, pattern, quant, n, m);
     }
     return TCL_OK;

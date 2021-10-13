@@ -497,7 +497,7 @@
       </commanddef>
 
       <commanddef>
-        <command><method>elementtypepattern"</method> <m>name</m> <m>?quant?</m></command>
+        <command><method>elementtype</method> <m>name</m> <m>?quant?</m></command>
         <desc>This command refers to the element defined with
         <m>defelementtype</m> with the type name <m>name</m> in the
         current context namespace. Forward references to so far not
