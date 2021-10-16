@@ -37,7 +37,7 @@
 #include <unistd.h>
 #endif
 
-/* #define DEBUG */
+#define DEBUG
 /* #define DDEBUG */
 /*----------------------------------------------------------------------------
 |   Debug Macros
@@ -794,42 +794,43 @@ cleanupLastPattern (
     unsigned int from
     )
 {
-    unsigned int i;
+    unsigned int i, j, k, freed;
     char *name;
     Tcl_HashTable *hashTable;
     Tcl_HashEntry *h;
 
-    SchemaCP *this, *previous, *current;
+    SchemaCP *this, *previous, *current, *typePattern;
 
+    fprintf (stderr, "numPatternList %d\n", sdata->numPatternList);
     for (i = from; i < sdata->numPatternList; i++) {
         this = sdata->patternList[i];
         hashTable = NULL;
-        name = NULL;
+        name = this->name;
+        fprintf (stderr, "cleanupLastPattern name %s i %d\n", name, i);
         if (this->type == SCHEMA_CTYPE_NAME) {
             /* Local defined elements and typed elements aren't saved
              * under their local name bucket in the sdata->element
              * hash table. */
-            if (this->flags & LOCAL_DEFINED_ELEMENT
-                || this->flags & TYPED_ELEMENT) {
+            if (this->flags & LOCAL_DEFINED_ELEMENT) {
                 freeSchemaCP (sdata->patternList[i]);
                 continue;
             }
             if (this->flags & ELEMENTTYPE_DEF) {
                 hashTable = &sdata->elementType;
-                name = this->name;
+            } if (this->flags & TYPED_ELEMENT) {
+                hashTable = &sdata->elementTypeInstance;
             } else {
                 hashTable = &sdata->element;
-                name = this->name;
             }
         } else if (this->type == SCHEMA_CTYPE_PATTERN) {
             hashTable = &sdata->pattern;
-            name = this->name;
         }
         if (name && hashTable) {
             if (this->flags & FORWARD_PATTERN_DEF) {
                 sdata->forwardPatternDefs--;
             }
             h = Tcl_FindHashEntry (hashTable, name);
+            fprintf (stderr, "cleanupLastPattern name %s i %d\n", name, i);
             if (h) {
                 previous = NULL;
                 current = Tcl_GetHashValue (h);
@@ -848,6 +849,35 @@ cleanupLastPattern (
                         Tcl_SetHashValue (h, current->next);
                     } else {
                         Tcl_DeleteHashEntry (h);
+                    }
+                }
+            }
+            if (this->flags & TYPED_ELEMENT) {
+                /* If the type of the element is forward defined, then
+                 * the pointer to the below freed cp is noted in the
+                 * forward type definition. Clean that up. */
+                /* First step: Check, if the typePtr is still valid. */
+                freed = 0;
+                for (j = from; j < i; j++) {
+                    if (this->typeptr == sdata->patternList[j]) {
+                        freed = 1;
+                        break;
+                    }
+                }
+                if (!freed) {
+                    typePattern = this->typeptr;
+                    if (typePattern->flags & FORWARD_PATTERN_DEF) {
+                        for (k = 0; k < typePattern->nc; k++) {
+                            if (this == typePattern->content[k]) {
+                                /* Later noted pattern are allocated
+                                 * latter than this and will be freed
+                                 * later on in this cleanupLastPattern
+                                 * call, so this is save and
+                                 * efficient. */
+                                typePattern->nc = k;
+                                break;
+                            }
+                        }
                     }
                 }
             }
@@ -5249,6 +5279,7 @@ tDOM_schemaInstanceCmd (
             Tcl_IncrRefCount (pattern->defScript);
         } else {
             if (forwardDef) {
+                FREE (pattern->content);
                 pattern->content = typeInstances;
                 pattern->nc = nrTypeInstances;
                 pattern->numAttr = typeInstancesLen;
@@ -5678,12 +5709,13 @@ ElementPatternObjCmd (
             pattern->flags |= PLACEHOLDER_PATTERN_DEF;
         } else {
             pattern->flags |= FORWARD_PATTERN_DEF;
+            sdata->forwardPatternDefs++;
         }
         Tcl_SetHashValue (h, pattern);
         REMEMBER_PATTERN (pattern);
     }
-    pattern = NULL;
     if (typed) {
+        pattern = NULL;
         h = Tcl_CreateHashEntry (&sdata->elementType,
                                  Tcl_GetString (objv[ind]), &hnew);
         if (!hnew) {
@@ -5782,18 +5814,18 @@ ElementPatternObjCmd (
                 }
                 pattern = pattern->next;
             }
-        }
-        if (!pattern) {
-            pattern = initSchemaCP (SCHEMA_CTYPE_NAME, sdata->currentNamespace,
-                                    namePtr);
-            pattern->flags |= FORWARD_PATTERN_DEF;
-            sdata->forwardPatternDefs++;
-            if (!hnew) {
-                current = (SchemaCP *) Tcl_GetHashValue (h);
-                pattern->next = current;
+            if (!pattern) {
+                pattern = initSchemaCP (SCHEMA_CTYPE_NAME, sdata->currentNamespace,
+                                        namePtr);
+                pattern->flags |= FORWARD_PATTERN_DEF;
+                sdata->forwardPatternDefs++;
+                if (!hnew) {
+                    current = (SchemaCP *) Tcl_GetHashValue (h);
+                    pattern->next = current;
+                }
+                REMEMBER_PATTERN (pattern);
+                Tcl_SetHashValue (h, pattern);
             }
-            REMEMBER_PATTERN (pattern);
-            Tcl_SetHashValue (h, pattern);
         }
         addToContent (sdata, pattern, quant, n, m);
     }
