@@ -80,6 +80,7 @@ typedef unsigned int SchemaFlags;
 #define ELEMENTTYPE_DEF        64
 #define FORWARD_TYPE_DEF      128
 #define TYPED_ELEMENT         256
+#define HASH_ENTRY_DELETED    512
 
 typedef struct domKeyConstraint {
     char  *name;

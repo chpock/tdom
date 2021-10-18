@@ -37,7 +37,7 @@
 #include <unistd.h>
 #endif
 
-#define DEBUG
+/* #define DEBUG */
 /* #define DDEBUG */
 /*----------------------------------------------------------------------------
 |   Debug Macros
@@ -501,6 +501,10 @@ static void serializeCP (
         if (pattern->flags & ELEMENTTYPE_DEF) {
             fprintf (stderr, "\tElementtype '%s'\n", pattern->name);
         }
+        if (pattern->flags & TYPED_ELEMENT) {
+            fprintf (stderr, "\tTyped element - type '%s'\n",
+                     pattern->typeptr->name);
+        }
         /* Fall through. */
     case SCHEMA_CTYPE_CHOICE:
     case SCHEMA_CTYPE_INTERLEAVE:
@@ -794,19 +798,17 @@ cleanupLastPattern (
     unsigned int from
     )
 {
-    unsigned int i, j, k, freed;
+    unsigned int i, j, k, freed, isElement;
     char *name;
     Tcl_HashTable *hashTable;
-    Tcl_HashEntry *h;
+    Tcl_HashEntry *h, *h1;
+    SchemaCP *this, *previous, *current, *typePattern, *this1;
 
-    SchemaCP *this, *previous, *current, *typePattern;
-
-    fprintf (stderr, "numPatternList %d\n", sdata->numPatternList);
     for (i = from; i < sdata->numPatternList; i++) {
         this = sdata->patternList[i];
         hashTable = NULL;
+        isElement = 0;
         name = this->name;
-        fprintf (stderr, "cleanupLastPattern name %s i %d\n", name, i);
         if (this->type == SCHEMA_CTYPE_NAME) {
             /* Local defined elements and typed elements aren't saved
              * under their local name bucket in the sdata->element
@@ -817,10 +819,15 @@ cleanupLastPattern (
             }
             if (this->flags & ELEMENTTYPE_DEF) {
                 hashTable = &sdata->elementType;
-            } if (this->flags & TYPED_ELEMENT) {
+            } else if (this->flags & TYPED_ELEMENT) {
                 hashTable = &sdata->elementTypeInstance;
+                if (this->flags & HASH_ENTRY_DELETED) {
+                    freeSchemaCP (sdata->patternList[i]);
+                    continue;
+                }
             } else {
                 hashTable = &sdata->element;
+                isElement = 1;
             }
         } else if (this->type == SCHEMA_CTYPE_PATTERN) {
             hashTable = &sdata->pattern;
@@ -830,7 +837,6 @@ cleanupLastPattern (
                 sdata->forwardPatternDefs--;
             }
             h = Tcl_FindHashEntry (hashTable, name);
-            fprintf (stderr, "cleanupLastPattern name %s i %d\n", name, i);
             if (h) {
                 previous = NULL;
                 current = Tcl_GetHashValue (h);
@@ -838,17 +844,43 @@ cleanupLastPattern (
                     previous = current;
                     current = current->next;
                 }
-                if (previous) {
-                    if (current && current->next) {
-                        previous->next = current->next;
-                    } else {
-                        previous->next = NULL;
-                    }
-                } else {
-                    if (current && current->next) {
-                        Tcl_SetHashValue (h, current->next);
-                    } else {
-                        Tcl_DeleteHashEntry (h);
+                if (current) {
+                    if (previous) {
+                        if (current->next) {
+                            previous->next = current->next;
+                        } else {
+                            previous->next = NULL;
+                        }
+                    } else  {
+                        if (current->next) {
+                            Tcl_SetHashValue (h, current->next);
+                        } else {
+                            if (isElement) {
+                                /* Typed elements with the same name
+                                 * use the pointer to the key string
+                                 * of the below deleted hash entry in
+                                 * the name element of the pattern
+                                 * structure. Additionally the pointer
+                                 * to the key string is used as key in
+                                 * the elementTypeInstance hash table.
+                                 * We mark every element instance
+                                 * pattern stored in
+                                 * elementTypeInstance under this key
+                                 * and delete the entry. */
+                                h1 = Tcl_FindHashEntry (
+                                    &sdata->elementTypeInstance, name
+                                    );
+                                if (h1) {
+                                    this1 = (SchemaCP *) Tcl_GetHashValue (h1);
+                                    while (this1) {
+                                        this1->flags |= HASH_ENTRY_DELETED;
+                                        this1 = this1->next;
+                                    }
+                                    Tcl_DeleteHashEntry (h1);
+                                }
+                            }
+                            Tcl_DeleteHashEntry (h);
+                        }
                     }
                 }
             }
@@ -870,7 +902,7 @@ cleanupLastPattern (
                         for (k = 0; k < typePattern->nc; k++) {
                             if (this == typePattern->content[k]) {
                                 /* Later noted pattern are allocated
-                                 * latter than this and will be freed
+                                 * later than this and will be freed
                                  * later on in this cleanupLastPattern
                                  * call, so this is save and
                                  * efficient. */
@@ -5225,8 +5257,10 @@ tDOM_schemaInstanceCmd (
             Tcl_SetHashValue (h, pattern);
         }
         if (forwardDef) {
-            /* Save the instace pattern with forward definition of this
-             * type and set to the actual content afterwards. */
+            /* The type was already forward defined. Save the witht
+             the forward defined pattern stored instance elements to
+             be able to set the actual content of the instance pattern
+             after the type content is eventually definded below. */
             typeInstances = pattern->content;
             nrTypeInstances = pattern->nc;
             typeInstancesLen = pattern->numAttr;

@@ -10047,6 +10047,10 @@ test schema-22.9 {defelementtype} {
             defelementtype e1type text
             defelementtype e2type {
                 element c
+                for {set i 1} {$i <= 100} {incr i} {
+                    attribute att$i ?
+                }
+                attribute musthave 
             }
             error "triggered"
         }
@@ -10065,8 +10069,11 @@ test schema-22.9 {defelementtype} {
         defelementtype e1type text
         defelementtype e2type {
             element c
+            for {set i 1} {$i <= 100} {incr i} {
+                attribute att$i ?
+            }
+            attribute musthave !
         }
-        error "triggered"
     }
     s defelement doc {
         element e1 type e1type
@@ -10082,14 +10089,22 @@ test schema-22.9 {defelementtype} {
             <e2><c/></e2>
             <a><a1><a1/></a1></a>
             <b><b1>foo</b1><b1><c/></b1></b>
+         </doc>
+        }
+        {<doc>
+            <e1></e1>
+            <e2 att17="foo" musthave=""><c/></e2>
+            <e2 att1="foo" att27="bar" musthave=""><c/></e2>
+            <a><a1><a1/></a1></a>
+            <b><b1>foo</b1><b1 att17="foo" musthave="grill"><c/></b1></b>
+         </doc>
         }
     } {
         lappend result [s validate $xml]
     }
     s delete
     set result
-} {1}
-
+} {0 1}
 
 test schema-23.1 {validatefile} {
     tdom::schema s
