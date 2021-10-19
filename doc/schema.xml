@@ -59,24 +59,24 @@
       </commanddef>
 
       <commanddef>
-        <command><method>defelementtype</method> <m>typename</m> <m>name</m> <m>?namespace?</m> <m>&lt;definition script></m></command>
+        <command><method>defelementtype</method> <m>typename</m> <m>?namespace?</m> <m>&lt;definition script></m></command>
         <desc>This method defines the element type <m>typename</m>
         (optional in the namespace <m>namespace</m>) in the schema. If
         the element type is used in a definition script with the
-        schema command elementtype, the validation engine expects an
-        element named <m>name</m> (in the namespace <m>namespace</m>,
-        if given) and the content model <m>definition script</m>.
-        Defining element types seems only sensible if you really have
-        elements with the same name and namespace but different
-        content models. The <m>definition script</m> is evaluated and
-        defines the content model of the element. If the
-        <m>namespace</m> argument is given, any <m>element</m> or
-        <m>ref</m> references in the definition script not wrapped
-        inside a <m>namespace</m> command are resolved in that
-        namespace. If there is already an elementtype definition for
-        the name/namespace combination, the command raises error. The
-        document element of any XML to validate cannot be a
-        <m>defelementtype</m> defined element.</desc>
+        schema command element, the validation engine expects an
+        element content according to content model <m>definition
+        script</m>. Defining (and using) element types seems only
+        sensible if you really have elements with the same name and
+        namespace but different content models. The <m>definition
+        script</m> is evaluated and defines the content model of the
+        element it is assgned to. If the <m>namespace</m> argument is
+        given, any <m>element</m> or <m>ref</m> references in the
+        definition script not wrapped inside a <m>namespace</m>
+        command are resolved in that namespace. If there is already an
+        elementtype definition for the typename/namespace combination,
+        the command raises error. The document element of any XML to
+        validate cannot be a <m>defelementtype</m> defined
+        element.</desc>
       </commanddef>
 
       <commanddef>
@@ -480,33 +480,27 @@
 
     <commandlist>
       <commanddef>
-        <command><method>element</method> <m>name</m> <m>?quant?</m> <m>?&lt;definition script>?</m></command>
-        <desc>If the optional argument <m>definition script</m> is not
-        given this command refers to the element defined with
-        <m>defelement</m> with the name <m>name</m> in the current
-        context namespace. If the <m>defelement script</m> argument is
-        given, the validation constraint expects an element with the
-        name <m>name</m> in the current namespace with content
-        "locally" defined by the <m>definition script</m>. Forward
-        references to so far not defined elements or patterns or other
-        local definitions of the same name inside the <m>definition
+        <command><method>element</method> <m>name</m> <m>?quant?</m> <m>(?&lt;definition script>|"type" typename)?</m></command>
+        <desc><p>If neither the optional argument <m>definition
+        script</m> nor the string "type" and a <m>typename</m> is given this
+        command refers to the element defined with <m>defelement</m>
+        with the name <m>name</m> in the current context namespace.</p>
+        <p>If the string "type" and a <m>typename</m> is given then
+        the content of the element is described by the content model
+        defined with <m>defelementtype</m> with the name
+        <m>typename</m> in the current context namespace.</p>
+        <p>If the <m>defelement script</m> argument is given, the
+        validation constraint expects an element with the name
+        <m>name</m> in the current namespace with content "locally"
+        defined by the <m>definition script</m>. Forward references to
+        so far not defined elements or patterns or other local
+        definitions of the same name inside the <m>definition
         script</m> are allowed. If a forward referenced element is not
         defined until validation, only an empty element with name
         <m>name</m> and namespace <m>namespace</m> and no attributes
-        matches. </desc>
+        matches.</p></desc>
       </commanddef>
 
-      <commanddef>
-        <command><method>elementtype</method> <m>name</m> <m>?quant?</m></command>
-        <desc>This command refers to the element defined with
-        <m>defelementtype</m> with the type name <m>name</m> in the
-        current context namespace. Forward references to so far not
-        defined element types or recursive references are allowed. If
-        a forward referenced element type is not defined until
-        validation any empty element without attributes will be
-        accepted.</desc>
-      </commanddef>
-      
       <commanddef>
         <command><method>ref</method> <m>name</m> <m>?quant?</m></command>
         <desc>This command refers to the content particle defined with
@@ -694,7 +688,7 @@ s define {
       </commanddef>
 
       <commanddef>
-        <command><method>defelementtype</method> <m>typename</m> <m>name</m> <m>?namespace?</m> <m>&lt;definition script></m></command>
+        <command><method>defelementtype</method> <m>typename</m> <m>?namespace?</m> <m>&lt;definition script></m></command>
         <desc>This defines an elementtype exactly as a <i>schemacmd
         defelementtype</i> call would. It is meant as top-level
         command of a <i>schemacmd define</i> script. This command is

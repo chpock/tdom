@@ -810,9 +810,8 @@ cleanupLastPattern (
         isElement = 0;
         name = this->name;
         if (this->type == SCHEMA_CTYPE_NAME) {
-            /* Local defined elements and typed elements aren't saved
-             * under their local name bucket in the sdata->element
-             * hash table. */
+            /* Local defined elements aren't saved under their local
+             * name bucket in the sdata->element hash table. */
             if (this->flags & LOCAL_DEFINED_ELEMENT) {
                 freeSchemaCP (sdata->patternList[i]);
                 continue;
