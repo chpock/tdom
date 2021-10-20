@@ -208,24 +208,24 @@ command are resolved in that namespace. If there is already a
 element definition for the name/namespace combination, the
 command raises error.
 .TP
-\&\fB\fBdefelementtype\fP \fItypename\fB \fIname\fB \fI?namespace?\fB \fI<definition script>\fB
+\&\fB\fBdefelementtype\fP \fItypename\fB \fI?namespace?\fB \fI<definition script>\fB
 \&\fRThis method defines the element type \fItypename\fR
 (optional in the namespace \fInamespace\fR) in the schema. If
 the element type is used in a definition script with the
-schema command elementtype, the validation engine expects an
-element named \fIname\fR (in the namespace \fInamespace\fR,
-if given) and the content model \fIdefinition script\fR.
-Defining element types seems only sensible if you really have
-elements with the same name and namespace but different
-content models. The \fIdefinition script\fR is evaluated and
-defines the content model of the element. If the
-\&\fInamespace\fR argument is given, any \fIelement\fR or
-\&\fIref\fR references in the definition script not wrapped
-inside a \fInamespace\fR command are resolved in that
-namespace. If there is already an elementtype definition for
-the name/namespace combination, the command raises error. The
-document element of any XML to validate cannot be a
-\&\fIdefelementtype\fR defined element.
+schema command element, the validation engine expects an
+element content according to content model \fIdefinition
+script\fR. Defining (and using) element types seems only
+sensible if you really have elements with the same name and
+namespace but different content models. The \fIdefinition
+script\fR is evaluated and defines the content model of the
+element it is assgned to. If the \fInamespace\fR argument is
+given, any \fIelement\fR or \fIref\fR references in the
+definition script not wrapped inside a \fInamespace\fR
+command are resolved in that namespace. If there is already an
+elementtype definition for the typename/namespace combination,
+the command raises error. The document element of any XML to
+validate cannot be a \fIdefelementtype\fR defined
+element.
 .TP
 \&\fB\fBdefpattern\fP \fIname\fB \fI?namespace?\fB \fI<definition script>\fB
 \&\fRThis method defines a (maybe complex) content particle
@@ -242,11 +242,13 @@ command raises error.
 .TP
 \&\fB\fBdeftexttype\fP \fIname\fB \fI<constraint script>\fB
 \&\fRThis method defines a bundle of text constraints that
-can be referred to by \fIname\fR while defining constraints on
-text element or attribute values. If there is already a text
-type definition with this name, the command raises error. A
-text type must be defined before it can be used in schema
-definition scripts.
+can be referred to by \fIname\fR while defining constraints
+on text element or attribute values. If there is already a
+text type definition with this name, the command raises error.
+A text type may be referred before it is defined in the
+schema. If a referred text type isn't defined anywhere in the
+schema then any text will match this type during
+validation.
 .TP
 \&\fB\fBstart\fP \fIdocumentElement\fB \fI?namespace?\fB
 \&\fRThis method defines the name and namespace of the root
@@ -261,16 +263,16 @@ constraint for the root element is removed and any defined
 element will be valid as root of a tree to validate.
 .TP
 \&\fB\fBdefine\fP \fI<definition script>\fB
-\&\fRThis method allows to define several elements or patterns
-or a whole schema with one call. All schema command methods so
-far (\fIprefixns\fR, \fIdefelement\fR,
-\&\fIdefelementtype\fR, \fIdefpattern\fR, \fIdeftexttype\fR and
-\&\fIstart\fR) are allowed top level in the \fIdefinition
-script\fR. The \fIdefine\fR method itself isn't allowed
-recursively.
+\&\fRThis method defines several elements or patterns or a
+whole schema with one call, by evaluating the \fIdefinition
+script>\fR. All schema command methods so far
+(\fIprefixns\fR, \fIdefelement\fR, \fIdefelementtype\fR,
+\&\fIdefpattern\fR, \fIdeftexttype\fR and \fIstart\fR) are
+allowed top level in the \fIdefinition script\fR. The
+\&\fIdefine\fR method itself isn't allowed recursively.
 .TP
 \&\fB\fBevent\fP \fI(start|end|text)\fB \fI?event specific data?\fB
-\&\fRThis method allows the validation of hierarchical data against
+\&\fRThis method enables validation of hierarchical data against
 the content constraints of the validation command.
 .RS
 .IP "\fBstart  \fIname ?attributes? ?namespace? \fP\fR"
@@ -296,7 +298,7 @@ the variable with that name is set to the empty string.
 .TP
 \&\fB\fBvalidatefile\fP \fIfilename\fB \fI?objVar?\fB
 \&\fRReturns true if the content of \fIfilename\fR is valid,
-or false, otherwise. The given file is feeded as binary stream
+or false, otherwise. The given file is fed as binary stream
 to expat, therefore only US-ASCII, ISO-8859-1, UTF-8 or UTF-16
 encoded data will work with this method. If validation has
 failed and the optional \fIobjVar\fR argument is given, the
@@ -359,9 +361,9 @@ INVALID_KEYREF
 .TP
 INVALID_VALUE
 .TP
-UNKOWN_GLOBAL_ID
+UNKNOWN_GLOBAL_ID
 .TP
-UNKOWN_ID
+UNKNOWN_ID
 .PP
 For more detailed information see section Recovering.
 .RE
@@ -575,29 +577,31 @@ as significant content).
 .PP
 The schema definition commands are:
 .TP
-\&\fB\fBelement\fP \fIname\fB \fI?quant?\fB \fI?<definition script>?\fB
-\&\fRIf the optional argument \fIdefinition script\fR is not
-given this command refers to the element defined with
-\&\fIdefelement\fR with the name \fIname\fR in the current
-context namespace. If the \fIdefelement script\fR argument is
-given, the validation constraint expects an element with the
-name \fIname\fR in the current namespace with content
-"locally" defined by the \fIdefinition script\fR. Forward
-references to so far not defined elements or patterns or other
-local definitions of the same name inside the \fIdefinition
+\&\fB\fBelement\fP \fIname\fB \fI?quant?\fB \fI(?<definition script>|\*(lqtype\*(lq typename)?\fB
+\&\fR
+.RS
+.PP
+If neither the optional argument \fIdefinition
+script\fR nor the string "type" and a \fItypename\fR is given this
+command refers to the element defined with \fIdefelement\fR
+with the name \fIname\fR in the current context namespace.
+.PP
+If the string "type" and a \fItypename\fR is given then
+the content of the element is described by the content model
+defined with \fIdefelementtype\fR with the name
+\&\fItypename\fR in the current context namespace.
+.PP
+If the \fIdefelement script\fR argument is given, the
+validation constraint expects an element with the name
+\&\fIname\fR in the current namespace with content "locally"
+defined by the \fIdefinition script\fR. Forward references to
+so far not defined elements or patterns or other local
+definitions of the same name inside the \fIdefinition
 script\fR are allowed. If a forward referenced element is not
 defined until validation, only an empty element with name
 \&\fIname\fR and namespace \fInamespace\fR and no attributes
 matches.
-.TP
-\&\fB\fBelementtype\fP \fIname\fB \fI?quant?\fB
-\&\fRThis command refers to the element defined with
-\&\fIdefelementtype\fR with the type name \fIname\fR in the
-current context namespace. Forward references to so far not
-defined element types or recursive references are allowed. If
-a forward referenced element type is not defined until
-validation any empty element without attributes will be
-accepted.
+.RE
 .TP
 \&\fB\fBref\fP \fIname\fB \fI?quant?\fB
 \&\fRThis command refers to the content particle defined with
@@ -608,9 +612,9 @@ referenced pattern is not defined until validation no content
 whatsoever is expected ("empty match").
 .TP
 \&\fB\fBgroup\fP \fI?quant?\fB \fI<definition script>\fB
-\&\fRThis method allows to group a sequence of content
-particles defined by the \fIdefinition script>\fR, which have
-to match in this sequence order.
+\&\fRThis method group a sequence of content particles
+defined by the \fIdefinition script>\fR, which have to match
+in this sequence order.
 .TP
 \&\fB\fBchoice\fP \fI?quant?\fB \fI<definition script>\fB
 \&\fRThis schema constraint matches if one of the top level
@@ -757,7 +761,7 @@ defelement\fR call would. It is meant as top-level command of a
 nested in another definition script command and will raise
 error, if you call it there.
 .TP
-\&\fB\fBdefelementtype\fP \fIname\fB \fI?namespace?\fB \fI<definition script>\fB
+\&\fB\fBdefelementtype\fP \fItypename\fB \fI?namespace?\fB \fI<definition script>\fB
 \&\fRThis defines an elementtype exactly as a \fIschemacmd
 defelementtype\fR call would. It is meant as top-level
 command of a \fIschemacmd define\fR script. This command is
@@ -809,8 +813,11 @@ zero.
 .IP "\fB{n m}\fR"
 The content particle must occur
 at least n and at most m times in a row in valid documents.
-The quantifier must be a Tcl list with two elements. Both
-elements must be integers, with n >= 0 and n < m.
+The quantifier must be a Tcl list with two elements. The first
+element of this list must be an integer with n >= 0. If the
+second list element is the character *, then there is no upper
+limit. Otherwise the second list element must be an integer
+with n < m.
 .PP
 If an optional quantifier is not given, it defaults to * in
 case of the \fImixed\fR command and to ! for all other commands.
@@ -899,7 +906,7 @@ matches the XML nmtokens production
 \&\fB\fBinteger\fP \fI?(xsd|tcl)?\fB
 \&\fRThis text constraint matches if the text value could be
 parsed as an integer. If the optional argument to the command
-is \fItcl\fR, everything that returns TCL_OK if feeded into
+is \fItcl\fR, everything that returns TCL_OK if fed into
 Tcl_GetInt() matches. If the optional argument to the command
 is \fIxsd\fR, the constraint matches if the value is a
 valid xsd:integer. Without argument \fIxsd\fR is the
@@ -928,7 +935,7 @@ constraint, that the value must be > zero.
 \&\fB\fBnumber\fP \fI?(xsd|tcl)?\fB
 \&\fRThis text constraint matches if the text value could be
 parsed as a number. If the optional argument to the command is
-\&\fItcl\fR, everything that returns TCL_OK if feeded into
+\&\fItcl\fR, everything that returns TCL_OK if fed into
 Tcl_GetDouble() matches. If the optional argument to the command
 is \fIxsd\fR, the constraint matches if the value is a
 valid xsd:decimal. Without argument \fIxsd\fR is the
@@ -937,7 +944,7 @@ default.
 \&\fB\fBboolean\fP \fI?(xsd|tcl)?\fB
 \&\fRThis text constraint matches if the text value could be
 parsed as a boolean. If the optional argument to the command is
-\&\fItcl\fR, everything that returns TCL_OK if feeded into
+\&\fItcl\fR, everything that returns TCL_OK if fed into
 Tcl_GetBoolean() matches. If the optional argument to the command
 is \fIxsd\fR, the constraint matches if the value is a
 valid xsd:boolean. Without argument \fIxsd\fR is the
@@ -1050,6 +1057,10 @@ matching constraint in the \fIconstraint script\fR and
 reports validation error. The text constraints in the
 \&\fIconstraint script\fR are probed in the order of
 definition.
+.TP
+\&\fB\fBtype\fP \fItext type name\fB
+\&\fRThis text constraint matches if the text type given
+as argument matches.
 .SS "Constraints on processed text value"
 .TP
 \&\fB\fBwhitespace\fP \fI(preserve|replace|collapse)\fB \fI<constraint script>\fB
@@ -1078,8 +1089,8 @@ The available types are:
 .TP
 whitespace
 The text to split is stripped
-of all white space at start and end and splitted into
-a list at any successive white space.
+of all white space at start and end and split into a
+list at any successive white space.
 .TP
 tcl tclcmd ?arg ...?
 The text to split is
@@ -1200,7 +1211,7 @@ the script result of the reportcmd.
 With a \fIreportcmd\fR (which does not throw error if
 called) the validation engine will never report validation
 failure to its caller. The validation engine recovers,
-continues, and reports the next error (if occuring) and so on
+continues, and reports the next error (if occurrin)g and so on
 until the end of the input. The schema command will return true
 and the SAX parser and DOM builder will process normally until
 the end of the input, as if there had not been a validation
