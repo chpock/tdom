@@ -64,6 +64,9 @@ typedef struct CHandlerSet {
     XML_XmlDeclHandler               xmlDeclCommand;
     /* C func for <!ENTITY decls's */
     XML_EntityDeclHandler            entityDeclCommand;
+    /* C func for XML end by bulk parsing */
+    XML_BulkXMLEndHandler            bulkXmlEndCommand;
+
 } CHandlerSet;
 
 /*----------------------------------------------------------------------------
@@ -104,6 +107,7 @@ typedef struct TclHandlerSet {
     Tcl_Obj *endDoctypeDeclCommand;    /* Script for <!DOCTYPE decl ends */
     Tcl_Obj *xmlDeclCommand;           /* Script for <?XML decl's */
     Tcl_Obj *entityDeclCommand;        /* Script for <!ENTITY decl's */
+    Tcl_Obj *bulkXmlEndCommand;        /* Script for XML end by bulk parsing */
 } TclHandlerSet;
 
 typedef struct expatElemContent {
@@ -136,6 +140,7 @@ typedef struct TclGenExpatInfo {
     int useForeignDTD;
     const char *currentmarkup;  /* Used to transfer data for method */
     int currentmarkuplen;       /* currentmarkup */
+    int bulk;
 #ifndef TDOM_NO_SCHEMA
     SchemaData *sdata;          /* Validation / Schema data */
 #endif

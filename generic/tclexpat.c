@@ -127,7 +127,7 @@ static int      TclExpatInitializeParser (Tcl_Interp *interp,
                     TclGenExpatInfo *expat, int resetOptions );
 static void     TclExpatFreeParser  (TclGenExpatInfo *expat);
 static int      TclExpatParse (Tcl_Interp *interp,
-                    TclGenExpatInfo *expat, char *data, int len,
+                    TclGenExpatInfo *expat, const char *data, int len,
                                TclExpat_InputType type);
 static int      TclExpatConfigure (Tcl_Interp *interp,
                     TclGenExpatInfo *expat, int objc, Tcl_Obj *const objv[]);
@@ -209,6 +209,8 @@ static void     TclGenExpatEntityDeclHandler (void *userData,
                                               const XML_Char *systemId,
                                               const XML_Char *publicId,
 					      const XML_Char *notationName);
+/* Prototypes for the TclExpat Bulk handlers */
+static void     TclGenExpatBulkXMLEndHandler(void *userData);
 
 /*
  *----------------------------------------------------------------------------
@@ -234,32 +236,9 @@ CreateTclHandlerSet (
     TclHandlerSet *handlerSet;
 
     handlerSet = (TclHandlerSet*) MALLOC (sizeof (TclHandlerSet)); \
+    memset(handlerSet, 0, sizeof(*handlerSet));
     handlerSet->name                      = tdomstrdup (name);
-    handlerSet->ignoreWhiteCDATAs         = 0;
     handlerSet->status                    = TCL_OK;
-    handlerSet->continueCount             = 0;
-    handlerSet->nextHandlerSet            = NULL;
-
-    handlerSet->elementstartcommand      = NULL;
-    handlerSet->elementendcommand        = NULL;
-    handlerSet->startnsdeclcommand       = NULL;
-    handlerSet->endnsdeclcommand         = NULL;
-    handlerSet->datacommand              = NULL;
-    handlerSet->picommand                = NULL;
-    handlerSet->defaultcommand           = NULL;
-    handlerSet->notationcommand          = NULL;
-    handlerSet->externalentitycommand    = NULL;
-    handlerSet->unknownencodingcommand   = NULL;
-    handlerSet->commentCommand           = NULL;
-    handlerSet->notStandaloneCommand     = NULL;
-    handlerSet->startCdataSectionCommand = NULL;
-    handlerSet->endCdataSectionCommand   = NULL;
-    handlerSet->elementDeclCommand       = NULL;
-    handlerSet->attlistDeclCommand       = NULL;
-    handlerSet->startDoctypeDeclCommand  = NULL;
-    handlerSet->endDoctypeDeclCommand    = NULL;
-    handlerSet->xmlDeclCommand           = NULL;
-    handlerSet->entityDeclCommand        = NULL;
     return handlerSet;
 }
 
@@ -287,37 +266,8 @@ CHandlerSetCreate (
     CHandlerSet *handlerSet;
 
     handlerSet = (CHandlerSet *) MALLOC (sizeof (CHandlerSet));
+    memset(handlerSet, 0, sizeof(*handlerSet));
     handlerSet->name                     = tdomstrdup (name);
-    handlerSet->ignoreWhiteCDATAs        = 0;
-    handlerSet->nextHandlerSet           = NULL;
-
-    handlerSet->userData                 = NULL;
-
-    handlerSet->resetProc                = NULL;
-    handlerSet->freeProc                 = NULL;
-    handlerSet->initParseProc            = NULL;
-    handlerSet->parserResetProc          = NULL;
-
-    handlerSet->elementstartcommand      = NULL;
-    handlerSet->elementendcommand        = NULL;
-    handlerSet->startnsdeclcommand       = NULL;
-    handlerSet->endnsdeclcommand         = NULL;
-    handlerSet->datacommand              = NULL;
-    handlerSet->picommand                = NULL;
-    handlerSet->defaultcommand           = NULL;
-    handlerSet->notationcommand          = NULL;
-    handlerSet->externalentitycommand    = NULL;
-    handlerSet->unknownencodingcommand   = NULL;
-    handlerSet->commentCommand           = NULL;
-    handlerSet->notStandaloneCommand     = NULL;
-    handlerSet->startCdataSectionCommand = NULL;
-    handlerSet->endCdataSectionCommand   = NULL;
-    handlerSet->elementDeclCommand       = NULL;
-    handlerSet->attlistDeclCommand       = NULL;
-    handlerSet->startDoctypeDeclCommand  = NULL;
-    handlerSet->endDoctypeDeclCommand    = NULL;
-    handlerSet->xmlDeclCommand           = NULL;
-    handlerSet->entityDeclCommand        = NULL;
     return handlerSet;
 }
 
@@ -581,6 +531,7 @@ TclExpatInitializeParser(
     XML_SetXmlDeclHandler (expat->parser, TclGenExpatXmlDeclHandler);
     XML_SetEntityDeclHandler (expat->parser,
                               TclGenExpatEntityDeclHandler);
+
     if (expat->noexpand) {
         XML_SetDefaultHandler(expat->parser,
                               TclGenExpatDefaultHandler);
@@ -945,13 +896,13 @@ static int
 TclExpatParse (
     Tcl_Interp *interp,
     TclGenExpatInfo *expat,
-    char *data,
+    const char *data,
     int len,
     TclExpat_InputType type
 ) {
   int result, mode, done;
   size_t bytesread;
-  char s[255], buf[8*1024];
+  char buf[8*1024];
   int fd;
   XML_Parser  parser;
   Tcl_Channel channel = NULL;
@@ -965,6 +916,10 @@ TclExpatParse (
       if ((result = TclExpatInitializeParser (interp, expat, 0)) != TCL_OK) 
           return TCL_ERROR;
   }
+  /* todo: add -bulk ?boolean? option to enable/disable bulk, so we don't
+  * need to consider bulkXmlEnd-handler as bulk parsing flag. */
+  XML_SetBulkXMLEndHandler (expat->parser,
+                             expat->bulk ? TclGenExpatBulkXMLEndHandler : NULL);
 
   if (!expat->parsingState) {
       activeCHandlerSet = expat->firstCHandlerSet;
@@ -1086,6 +1041,7 @@ TclExpatParse (
   }
 
   if (!result) {
+      char s[255];
       if (expat->status == ERROR_IN_EXTREFHANDLER) {
           Tcl_SetObjResult (interp, expat->result);
       }
@@ -1180,6 +1136,7 @@ TclExpatConfigure (
     "-ignorewhitespace",
     "-handlerset",
     "-noexpand",
+    "-bulkxmlendcommand",
 #ifndef TDOM_NO_SCHEMA
     "-validateCmd",
 #endif
@@ -1208,7 +1165,8 @@ TclExpatConfigure (
     EXPAT_ENTITYDECLCOMMAND,
     EXPAT_NOWHITESPACE,
     EXPAT_HANDLERSET,
-    EXPAT_NOEXPAND
+    EXPAT_NOEXPAND,
+    EXPAT_BULKXMLENDCMD
 #ifndef TDOM_NO_SCHEMA
     ,EXPAT_VALIDATECMD
 #endif
@@ -1670,6 +1628,22 @@ TclExpatConfigure (
         expat->noexpand = bool;
         break;
 
+    case EXPAT_BULKXMLENDCMD:		/* -bulkxmlendcommand */
+
+        CheckDefaultTclHandlerSet;
+        if (activeTclHandlerSet->bulkXmlEndCommand != NULL) {
+          Tcl_DecrRefCount(activeTclHandlerSet->bulkXmlEndCommand);
+          activeTclHandlerSet->bulkXmlEndCommand = NULL;
+        }
+
+        (void)Tcl_GetStringFromObj(objPtr[1], &len);
+        expat->bulk = (len != 0);
+        if (len) {
+          activeTclHandlerSet->bulkXmlEndCommand = objPtr[1];
+          Tcl_IncrRefCount(activeTclHandlerSet->bulkXmlEndCommand);
+        }
+        break;
+
 #ifndef TDOM_NO_SCHEMA
     case EXPAT_VALIDATECMD:
         schemacmd = Tcl_GetString (objv[1]);
@@ -1765,6 +1739,7 @@ TclExpatCget (
         "-noexpand",
         "-namespace",
         "-namespaceseparator",
+        "-bulkxmlendcommand",
         (char *) NULL
     };
     enum switches {
@@ -1790,7 +1765,8 @@ TclExpatCget (
         EXPAT_HANDLERSET,
         EXPAT_NOEXPAND,
         EXPAT_NAMESPACE,
-        EXPAT_NAMESPACESEPARATOR
+        EXPAT_NAMESPACESEPARATOR,
+        EXPAT_BULKXMLENDCMD
     };
     int optionIndex, len;
     TclHandlerSet *activeTclHandlerSet = NULL;
@@ -2118,6 +2094,15 @@ TclExpatCget (
 
         if (activeTclHandlerSet->entityDeclCommand) {
             Tcl_SetObjResult(interp, activeTclHandlerSet->entityDeclCommand);
+        } else {
+            Tcl_SetResult(interp, "", NULL);
+        }
+        return TCL_OK;
+
+      case EXPAT_BULKXMLENDCMD:		/* -bulkxmlendcommand */
+
+        if (activeTclHandlerSet->bulkXmlEndCommand) {
+            Tcl_SetObjResult(interp, activeTclHandlerSet->bulkXmlEndCommand);
         } else {
             Tcl_SetResult(interp, "", NULL);
         }
@@ -3191,6 +3176,89 @@ TclGenExpatEntityDeclHandler(
                                                 entityname, is_param, value,
                                                 length, base, systemId,
                                                 publicId, notationName);
+      }
+      activeCHandlerSet = activeCHandlerSet->nextHandlerSet;
+  }
+  return;
+}
+
+/*
+ *----------------------------------------------------------------------------
+ *
+ * TclGenExpatBulkXMLEndHandler --
+ *
+ *	Called by expat for notifying a next chunk XML by bulk parsing.
+ *
+ * Results:
+ *	None.
+ *
+ * Side Effects:
+ *	Callback scripts are invoked.
+ *
+ *----------------------------------------------------------------------------
+ */
+
+static void
+TclGenExpatBulkXMLEndHandler(
+    void *userData
+) {
+  TclGenExpatInfo *expat = (TclGenExpatInfo *) userData;
+  Tcl_Obj *cmdPtr; int dupCmdPtr = 0;
+  int result;
+  TclHandlerSet *activeTclHandlerSet;
+  CHandlerSet *activeCHandlerSet;
+
+  TclExpatDispatchPCDATA(expat);
+
+  if (expat->status != TCL_OK) {
+      return;
+  }
+
+  activeTclHandlerSet = expat->firstTclHandlerSet;
+  while (activeTclHandlerSet) {
+
+      switch (activeTclHandlerSet->status) {
+      case TCL_CONTINUE:
+      case TCL_BREAK:
+          goto nextTcl;
+          break;
+      default:
+          ;
+      }
+
+      if (activeTclHandlerSet->bulkXmlEndCommand == NULL) {
+          goto nextTcl;
+      }
+
+      /*
+       * Take a copy of the callback script so that arguments may be appended.
+       */
+
+      cmdPtr = activeTclHandlerSet->bulkXmlEndCommand;
+      if (Tcl_IsShared(cmdPtr)) {
+        dupCmdPtr = 1;
+        cmdPtr = Tcl_DuplicateObj(cmdPtr);
+        Tcl_IncrRefCount(cmdPtr);
+      }
+      Tcl_Preserve((ClientData) expat->interp);
+
+      result = Tcl_EvalObjEx(expat->interp, cmdPtr,
+                             TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT);
+
+      if (dupCmdPtr) {
+        Tcl_DecrRefCount(cmdPtr);
+      }
+      Tcl_Release((ClientData) expat->interp);
+
+      TclExpatHandlerResult(expat, activeTclHandlerSet, result);
+  nextTcl:
+      activeTclHandlerSet = activeTclHandlerSet->nextHandlerSet;
+  }
+
+  activeCHandlerSet = expat->firstCHandlerSet;
+  while (activeCHandlerSet) {
+      if (activeCHandlerSet->bulkXmlEndCommand) {
+          activeCHandlerSet->bulkXmlEndCommand (activeCHandlerSet->userData);
       }
       activeCHandlerSet = activeCHandlerSet->nextHandlerSet;
   }
@@ -4588,6 +4656,9 @@ TclExpatDeleteCmd(
       }
       if (activeTclHandlerSet->entityDeclCommand) {
           Tcl_DecrRefCount (activeTclHandlerSet->entityDeclCommand);
+      }
+      if (activeTclHandlerSet->bulkXmlEndCommand) {
+          Tcl_DecrRefCount (activeTclHandlerSet->bulkXmlEndCommand);
       }
 
       tmpTclHandlerSet = activeTclHandlerSet;
