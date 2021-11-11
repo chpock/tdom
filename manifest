@@ -1,5 +1,5 @@
-C xml-parser\sextended\swith\sbulk\sparsing\sfacilities,\sif\s-bulkxmlendcommand\shandler\sspecified\smultiple\sXML\schunks\sin\ssingle\sstream/data\scan\sbe\sparsed\sin\sone\sgo
-D 2021-11-11T18:16:30.659
+C avoid\sto\sinvoke\sbulk\sxml-end\shandler\sfor\sempty\sblock\s(e.\sg.\srepeated\scall\sof\sXML_ParseBuffer\swith\sfinal=1\sinvoked\sat\send\sof\sfile)
+D 2021-11-11T21:03:32.493
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -67,7 +67,7 @@ F expat/nametab.h 224b8aacdc45d3b88b79573c711d9a71742de203626c0371b333e4bd67eda9
 F expat/siphash.h e912e702f017450b38f98eb20918a751131d52d487a5287df88b29d08100da4b
 F expat/utf8tab.h 5a324aeca0fac25d75f99eb5d1ac66c0f94aeba56057b6e2ca56d63bdf3cf4fb
 F expat/winconfig.h e8a2b77c39eb2fc4a3af1a45c1437a7c6a3149617aedf861c33ca40b908a571e
-F expat/xmlparse.c ec16a2c59003bce1b940f4448c70efe2fcb2926f54af7558b463225658821984
+F expat/xmlparse.c 6c49e1809c3126e0a38a566538e7468887e099c03ae8a1c816175d4b0f66ca42
 F expat/xmlrole.c 92c924ac7296f88cd6713a4c727a59786e6585e8a4852faa3862bac4077135f6
 F expat/xmlrole.h a6b4e825d6f26da81043abb81691c9f35202a488437e67eb16f04453ce169dd1
 F expat/xmltok.c 72a42296ff17ab1dd67aabc44494312bcb53b41cd7469cfb27095817d6c0719a
@@ -237,12 +237,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 001a39426b412b2e6ba31dae464709c8cb1b6b701239ca376c2b80bb2e0b70b9
-R 3bb4673fb1dc992716f883921d2c089d
-T *bgcolor * #DCF3D6
-T *branch * experimental/bulk-xml-parse
-T *sym-experimental/bulk-xml-parse *
-T -sym-trunk *
+P 1f0952c22443c065a5c85a0e8e04256baf8b21d98c0112c9b96da683ffa7d134
+R 6320437a8f6dcb0ed78b66223657110c
 U sebres
-Z 41b8ca8277ea30d0623cf5f409c66ed4
+Z 571d7356737051520fa75207577f2a14
 # Remove this line to create a well-formed Fossil manifest.
