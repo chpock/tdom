@@ -1,5 +1,5 @@
-C avoid\sto\sinvoke\sbulk\sxml-end\shandler\sfor\sempty\sblock\s(e.\sg.\srepeated\scall\sof\sXML_ParseBuffer\swith\sfinal=1\sinvoked\sat\send\sof\sfile)
-D 2021-11-11T21:03:32.493
+C more\stests\s(covering\sproperly\sstop\son\serror/return\sin\sbulk\sXML-end\shandler)
+D 2021-11-12T09:59:26.078
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -207,7 +207,7 @@ F tests/htmlreader.test 6e08308d4aa9aafa8661aa0b9f4d17de4c1a40b0abc4db4379f744c4
 F tests/i18n.test 3e754eb159b720ea82e137046a7722c720d6918ccfe7479fc9aea32bc3075a12
 F tests/loadtdom.tcl e9d3251af57fce2b88f64882e9c0891dde6e60335a3b21876754265f878c10e6
 F tests/namespace.test 0a13b2bf59bb088525ca7b64d0b2bce6a349c627ca3dd1c17a4cc969d16fe57c
-F tests/parser.test d8abba912b8cb12f01322f17c88545b393c1f7800baaf5acbc7e5b8810dfde12
+F tests/parser.test 19b73d012b9afa8bc84359161c9a2dd47304c8565c0ef3cf4e0064ce75debad4
 F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
 F tests/pullparser.test df079ff6a5a6b11b4d0f409ca3fc17cc4a5956d31801872f9f1f95e35032dec5
@@ -237,8 +237,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 1f0952c22443c065a5c85a0e8e04256baf8b21d98c0112c9b96da683ffa7d134
-R 6320437a8f6dcb0ed78b66223657110c
+P 09bb4833cab07042ad116a5953d0aa2d3c5b94b32cdac88daabfd8870c249f63
+R acc3ff8d4d44515b4cc7bf4bcbda8f39
 U sebres
-Z 571d7356737051520fa75207577f2a14
+Z c02cd5e79e5a97529d62ea8e663f93c8
 # Remove this line to create a well-formed Fossil manifest.

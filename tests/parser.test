@@ -912,6 +912,7 @@ test parser-12.9 {currentmarkup method - comment} {
 test parser-13.0 {no-bulk parsing - error by 2nd XML} -body {
     set p [xml::parser -final 1]
     $p parse {<X id="1"><a><b></b></a></X>  <Y id="2"><c><d></d></c></Y>  <Z id="3"><e><f>+2</f></e></Z>  }
+} -cleanup {
     $p free
 } -returnCodes error -match glob -result {*junk after document element* line 1 char* 30}
 
@@ -931,10 +932,10 @@ test parser-13.1 {bulk parsing - common handling} -setup {
       <Y id="2"><c><d></d></c></Y>
       <Z id="3"><e><f></f></e></Z>
     }
-    $p free
     set ::res
 } -cleanup {
-   unset -nocomplain ::res
+    $p free
+    unset -nocomplain ::res
 } -result [list \
       X id 1 -> a -> b -> <- //b <- //a <- //X . \
       Y id 2 -> c -> d -> <- //d <- //c <- //Y . \
@@ -950,11 +951,39 @@ test parser-13.2 {bulk parsing - position of XML in bulkxmlend-handler} -setup {
         if {[$p get -currentbytecount]} {return -code error "unexpected: currentbytecount must be 0."}
     }} $p]
     $p parse {<X id="1"><a><b></b></a></X>  <Y id="2"><c><d></d></c></Y>  <Z id="3"><e><f>+2</f></e></Z>  }
-    $p free
     set ::res
 } -cleanup {
-   unset -nocomplain ::res
+    $p free
+    unset -nocomplain ::res
 } -result {0 30 60 92}
+
+test parser-13.4 {bulk parsing - stop on error in XML-end handler} -body {
+    set p [xml::parser]
+    $p configure -final 1 -bulkxmlendcommand [list apply {p {
+        return -code error "test error at [$p get -currentbyteindex]"
+    }} $p]
+    $p parse {<X id="1"><a><b></b></a></X>  <Y id="2"><c><d></d></c></Y>  <Z id="3"><e><f>+2</f></e></Z>  }
+} -cleanup {
+    $p free
+} -returnCodes error -match glob -result {*test error at 30*}
+
+test parser-13.4 {bulk parsing - stop on return in XML-end handler} -setup {
+    set ::res {}
+} -body {
+    set p [xml::parser]
+    $p configure -final 1 -elementendcommand {apply {{name} {
+        set ::res $name
+    }}} -bulkxmlendcommand [list apply {p {
+        if {$::res eq "Y"} {
+            return -code return
+        }
+    }} $p]
+    $p parse {<X id="1"><a><b></b></a></X>  <Y id="2"><c><d></d></c></Y>  <Z id="3"><e><f>+2</f></e></Z>  }
+    set ::res
+} -cleanup {
+    $p free
+    unset -nocomplain ::res
+} -result Y
 
 # cleanup
 ::tcltest::cleanupTests
