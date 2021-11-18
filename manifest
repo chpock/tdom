@@ -1,5 +1,5 @@
-C update\sexpat\sto\sv.2.4.1
-D 2021-11-18T14:12:56.810
+C version\sbump
+D 2021-11-18T14:24:11.381
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -55,7 +55,7 @@ F doc/tnc.n 0e8fa5f4ba1f8f3763ca8357ee7968fb6f0496e4
 F doc/tnc.xml f6d0115fbfac8393343b46e6fd1bba50deba17bc
 F expat/COPYING 16364a0ac925b5138828bf94ce893bdc938c66b8786667c4e20334fa8b9a4132
 F expat/Changes 2993ee38893097509c9e9fa0d8a4fbe840c3f6148d6c61acf6e392d27388150d
-F expat/VERSION a38fa8d4d48eaf43dbc93b61379dea4ce81e050c8815e6197fe4c9e7a0b24c7f
+F expat/VERSION 8f14c7fafdabcf2e2fc59dce71919a820d34d8ac031b2de5c7759104dcc67845
 F expat/ascii.h e8752c5f09c75d1c5b6eaf50d359c8b2b173d5243ccb2f468b858e35d36d04c3
 F expat/asciitab.h 7e665d7c5c93a5cd7f182a64dccd2a0771842d00f58706f99cc28e4554ddf9da
 F expat/expat.h 3fb0a85396e64d77c9aebbd7786e1c188dc20f9463fde9e2c143ba4528333d7d
@@ -237,11 +237,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 001a39426b412b2e6ba31dae464709c8cb1b6b701239ca376c2b80bb2e0b70b9
-R 0fd748fac06ef6086d5a55dd5c02491e
-T *branch * libexpat-2.4.1
-T *sym-libexpat-2.4.1 *
-T -sym-trunk *
+P e3d7bd99ae24bb8999e1790e07e83cb3e1919ad67ddf585bb907354d80afb547
+R cb5959755aa0ee9e2a001095b4c7fdb1
 U sebres
-Z 9cdf7af24f9c9b4caeacb2edf2fe39d8
+Z 4efe73cc58c8dc3df09dd51ba1ec423e
 # Remove this line to create a well-formed Fossil manifest.
