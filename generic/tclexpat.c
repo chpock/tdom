@@ -901,8 +901,6 @@ TclExpatParse (
     TclExpat_InputType type
 ) {
   int result, mode, done;
-  size_t bytesread;
-  char buf[8*1024];
   int fd;
   XML_Parser  parser;
   Tcl_Channel channel = NULL;
@@ -973,10 +971,16 @@ TclExpatParse (
       Tcl_DStringFree (&dStr);
       expat->parsingState = 2;
       if (useBinary) {
+          parser = expat->parser;
+          size_t bytesread;
           do {
-              bytesread = Tcl_Read (channel, buf, sizeof (buf));
-              done = bytesread < sizeof (buf);
-              result = XML_Parse (expat->parser, buf, bytesread, done);
+              char *buf = XML_GetBuffer (parser, TDOM_EXPAT_READ_SIZE);
+              if (!buf) {
+                result = XML_ERROR_NO_MEMORY; break;
+              }
+              bytesread = Tcl_Read (channel, buf, TDOM_EXPAT_READ_SIZE);
+              done = !bytesread || Tcl_Eof(channel);
+              result = XML_ParseBuffer (parser, bytesread, done);
               if (result != XML_STATUS_OK) break;
           } while (!done);
       } else {
