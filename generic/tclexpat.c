@@ -3207,7 +3207,6 @@ TclGenExpatBulkXMLEndHandler(
     void *userData
 ) {
   TclGenExpatInfo *expat = (TclGenExpatInfo *) userData;
-  Tcl_Obj *cmdPtr; int dupCmdPtr = 0;
   int result;
   TclHandlerSet *activeTclHandlerSet;
   CHandlerSet *activeCHandlerSet;
@@ -3234,24 +3233,11 @@ TclGenExpatBulkXMLEndHandler(
           goto nextTcl;
       }
 
-      /*
-       * Take a copy of the callback script so that arguments may be appended.
-       */
-
-      cmdPtr = activeTclHandlerSet->bulkXmlEndCommand;
-      if (Tcl_IsShared(cmdPtr)) {
-        dupCmdPtr = 1;
-        cmdPtr = Tcl_DuplicateObj(cmdPtr);
-        Tcl_IncrRefCount(cmdPtr);
-      }
       Tcl_Preserve((ClientData) expat->interp);
 
-      result = Tcl_EvalObjEx(expat->interp, cmdPtr,
+      result = Tcl_EvalObjEx(expat->interp, activeTclHandlerSet->bulkXmlEndCommand,
                              TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT);
 
-      if (dupCmdPtr) {
-        Tcl_DecrRefCount(cmdPtr);
-      }
       Tcl_Release((ClientData) expat->interp);
 
       TclExpatHandlerResult(expat, activeTclHandlerSet, result);
