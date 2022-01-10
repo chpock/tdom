@@ -4401,7 +4401,7 @@ schemaInstanceInfoCmd (
         return TCL_OK;
 
     case m_expected:
-        if (objc < 2 && objc > 4) {
+        if (objc < 2 || objc > 4) {
             Tcl_WrongNumArgs (interp, 2, objv, "?-ignorematched? ?-onlymandatory?");
             return TCL_ERROR;
         }
@@ -4443,7 +4443,7 @@ schemaInstanceInfoCmd (
         break;
         
     case m_definition:
-        if (objc < 3 && objc > 4) {
+        if (objc < 3 || objc > 4) {
             Tcl_WrongNumArgs (interp, 1, objv, "name ?namespace?");
             return TCL_ERROR;
         }
@@ -4477,7 +4477,7 @@ schemaInstanceInfoCmd (
         break;
 
     case m_patterndefinition:
-        if (objc < 3 && objc > 4) {
+        if (objc < 3 || objc > 4) {
             Tcl_WrongNumArgs (interp, 1, objv, "name ?namespace?");
             return TCL_ERROR;
         }
@@ -4509,7 +4509,7 @@ schemaInstanceInfoCmd (
         break;
         
     case m_typedefinition:
-        if (objc < 3 && objc > 4) {
+        if (objc < 3 || objc > 4) {
             Tcl_WrongNumArgs (interp, 2, objv, "name ?namespace?");
             return TCL_ERROR;
         }
@@ -4948,7 +4948,7 @@ tDOM_schemaInstanceCmd (
         }
         switch ((enum eventKeyword) keywordIndex) {
         case k_elementstart:
-            if (objc < 4 && objc > 6) {
+            if (objc < 4 || objc > 6) {
                 Tcl_WrongNumArgs (interp, 3, objv, "<elementname>"
                     "?<attInfo>? ?<namespace>?");
                 return TCL_ERROR;

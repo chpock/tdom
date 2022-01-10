@@ -1,5 +1,5 @@
-C Fixed\spossible\sbufffer\soverrun\sbecause\sof\stoo\ssmall\sbuffer\sfor\sa\ssprintf.
-D 2022-01-10T01:07:06.939
+C Fixed\sargument\scleck\sof\sa\sfew\sschema\scommands.
+D 2022-01-10T01:35:38.478
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -143,7 +143,7 @@ F generic/domxslt.h 0cb8e327683a0ffeb2a7094add6cd82ec1ae49c7c704f20d8d6f7d6523e7
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 94e793939c9f3a35a1c82ae910d1482e2267ed920ad70abfcb3ff9d43f2a3c9f
 F generic/nodecmd.h d2201b69de9507f86e94750f0b72867ec9150795712ef18c5b5b87f35a689f75
-F generic/schema.c b59543814bcce933474feef7a2ec49b8e615ddcdc2cec9049aaa775a7203d445
+F generic/schema.c 2bd80a3d63d837408ea67c354c97fd1d05f91453a0ff88eacc1f37f77e7dcc0e
 F generic/schema.h f57a01bd6afa3cfae4aca517e326ce73ea58c2ef39f1802f02b0bdbd106fa8c7
 F generic/tcldom.c 78a595deadbe632577a39e3ac606fc9ea33edc060cc1a341119a9b5b56ebb415
 F generic/tcldom.h 37ee136d483b683c7e3e9e94ce8284520c7998cb1340047fc540dd7701825dc6
@@ -237,8 +237,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 001a39426b412b2e6ba31dae464709c8cb1b6b701239ca376c2b80bb2e0b70b9
-R b3647231c5c5b8da4d9c26e35bbb1523
+P c18371f74a9009aeb966faea78c1d182e98e6f376f033d5e3ae683067ab06772
+R 0a500ee7def0ba23185bd45c5b2312d8
 U rolf
-Z 240354664da9ab2d3a333adb9695fe35
+Z 19e0e2e6049851ab4021bc8c4ce93af9
 # Remove this line to create a well-formed Fossil manifest.
