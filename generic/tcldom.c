@@ -1395,7 +1395,7 @@ int tcldom_xpathFuncCallBack (
 )
 {
     Tcl_Interp  *interp = (Tcl_Interp*) clientData;
-    char         tclxpathFuncName[200], objCmdName[80];
+    char         tclxpathFuncName[220], objCmdName[80];
     char         *errStr, *typeStr;
     Tcl_Obj     *resultPtr, *objv[MAX_REWRITE_ARGS], *type, *value, *nodeObj,
                 *tmpObj;
@@ -1407,7 +1407,7 @@ int tcldom_xpathFuncCallBack (
     DBG(fprintf(stderr, "tcldom_xpathFuncCallBack functionName=%s "
                 "position=%d argc=%d\n", functionName, position, argc);)
 
-    if (strlen(functionName) > 199) {
+    if (strlen(functionName) > 200) {
         *errMsg = (char*)MALLOC (80 + strlen (functionName));
         strcpy (*errMsg, "Unreasonable long XPath function name: \"");
         strcat (*errMsg, functionName);
