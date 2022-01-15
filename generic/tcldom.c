@@ -170,11 +170,14 @@
 |
 \---------------------------------------------------------------------------*/
 #ifndef TCL_THREADS
-    static int        storeLineColumn       = 0;
-    static int        dontCreateObjCommands = 0;
-    static int        dontCheckCharData     = 0;
-    static int        dontCheckName         = 0;
-    static int        domCreateCmdMode      = 0;
+    static int         storeLineColumn       = 0;
+    static int         dontCreateObjCommands = 0;
+    static int         dontCheckCharData     = 0;
+    static int         dontCheckName         = 0;
+    static int         domCreateCmdMode      = 0; 
+    /* BLAP stands for BillionLaughsAttackProtection */
+    static float       BLAPMaximumAmplification;
+    unsigned long long BLAPActivationThreshold;
 #   define TSD(x)     x
 #   define GetTcldomTSD()
 #else
@@ -184,6 +187,8 @@
         int        dontCheckCharData;
         int        dontCheckName;
         int        domCreateCmdMode;
+        float      BLAPMaximumAmplification;
+        unsigned long long BLAPActivationThreshold;
     } ThreadSpecificData;
     static Tcl_ThreadDataKey dataKey;
     static Tcl_HashTable     sharedDocs;
