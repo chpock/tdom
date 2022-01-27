@@ -6673,12 +6673,13 @@ int tcldom_parse (
     parser = XML_ParserCreate_MM(NULL, MEM_SUITE, NULL);
 #ifndef TDOM_NO_SCHEMA
     if (sdata) {
-        sdata->inuse++;
-        sdata->parser = parser;
         if (sdata->validationState != VALIDATION_READY) {
+            XML_ParserFree(parser);
             SetResult ("The configured schema command is busy");
             return TCL_ERROR;
         }
+        sdata->inuse++;
+        sdata->parser = parser;
     }
 #endif
     Tcl_ResetResult(interp);
