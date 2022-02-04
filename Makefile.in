@@ -265,7 +265,7 @@ test: binaries libraries
 	@cp $(srcdir)/lib/tdom.tcl .
 	$(TCLSH) `@CYGPATH@ $(srcdir)/tests/all.tcl` $(TESTFLAGS) \
 	    -load "package ifneeded $(PACKAGE_NAME) $(PACKAGE_VERSION) \
-		[list load `@CYGPATH@ $(PKG_LIB_FILE)` [string tolower $(PACKAGE_NAME)]]"
+		[list load `@CYGPATH@ $(PKG_LIB_FILE)` [string totitle $(PACKAGE_NAME)]]"
 
 shell: binaries libraries
 	@$(TCLSH) $(SCRIPT)
