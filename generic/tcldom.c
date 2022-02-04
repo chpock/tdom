@@ -1395,7 +1395,7 @@ int tcldom_xpathFuncCallBack (
 )
 {
     Tcl_Interp  *interp = (Tcl_Interp*) clientData;
-    char         tclxpathFuncName[200], objCmdName[80];
+    char         tclxpathFuncName[220], objCmdName[80];
     char         *errStr, *typeStr;
     Tcl_Obj     *resultPtr, *objv[MAX_REWRITE_ARGS], *type, *value, *nodeObj,
                 *tmpObj;
@@ -1407,7 +1407,7 @@ int tcldom_xpathFuncCallBack (
     DBG(fprintf(stderr, "tcldom_xpathFuncCallBack functionName=%s "
                 "position=%d argc=%d\n", functionName, position, argc);)
 
-    if (strlen(functionName) > 199) {
+    if (strlen(functionName) > 200) {
         *errMsg = (char*)MALLOC (80 + strlen (functionName));
         strcpy (*errMsg, "Unreasonable long XPath function name: \"");
         strcat (*errMsg, functionName);
@@ -6545,7 +6545,12 @@ int tcldom_parse (
             SetResult(dom_usage);
             return TCL_ERROR;
         }
-        xml_string = Tcl_GetStringFromObj( objv[1], &xml_string_len);
+        /* xml_string = Tcl_GetStringFromObj( objv[1], &xml_string_len); */
+        xml_string = Tcl_GetByteArrayFromObj( objv[1], &xml_string_len);
+        /* int i; */
+        /* for (i=0; i < xml_string_len; i++) { */
+        /*     printf("%2X ",xml_string[i] & 0xff); */
+        /* } */
         if (objc == 3) {
             newObjName = objv[2];
             setVariable = 1;
@@ -6673,12 +6678,13 @@ int tcldom_parse (
     parser = XML_ParserCreate_MM(NULL, MEM_SUITE, NULL);
 #ifndef TDOM_NO_SCHEMA
     if (sdata) {
-        sdata->inuse++;
-        sdata->parser = parser;
         if (sdata->validationState != VALIDATION_READY) {
+            XML_ParserFree(parser);
             SetResult ("The configured schema command is busy");
             return TCL_ERROR;
         }
+        sdata->inuse++;
+        sdata->parser = parser;
     }
 #endif
     Tcl_ResetResult(interp);
@@ -6736,7 +6742,7 @@ int tcldom_parse (
                     s[1] = '\0';
                     for (i=-20; i < 40; i++) {
                         if ((byteIndex+i)>=0) {
-                            if (xml_string[byteIndex+i]) {
+                            if (byteIndex+i < xml_string_len) {
                                 s[0] = xml_string[byteIndex+i];
                                 Tcl_AppendResult(interp, s, NULL);
                                 if (i==0) {
