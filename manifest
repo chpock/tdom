@@ -1,5 +1,5 @@
-C Prepare\sfor\sTIP\s595\sfallout.
-D 2022-02-04T17:20:34.731
+C Made\sfeature\scheck\stest\sconstraints\swork\swith\s9.0.
+D 2022-02-04T19:58:40.999
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -212,7 +212,7 @@ F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
 F tests/pullparser.test df079ff6a5a6b11b4d0f409ca3fc17cc4a5956d31801872f9f1f95e35032dec5
 F tests/pushpull.bench 664e8f512917537d96c4b71933d4d9a6da65fc6fe85bd7c459483830dc7d2faf
-F tests/schema.test c799c81257054c9aacc010af6864b8fea77ec641b1e7fc80f404dd8325dcf1e6
+F tests/schema.test 3e31278b6e6e87d3e3ecf94e4f55086d6f6babfe65987f7353bc99cb9b2e8264
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
 F tests/tdomcmd.bench b07448ed4de08ccaa9734cf3fe15c695fd7066c993da58ff48d465747940e417
 F tests/tdomcmd.test 092401adf0609906d710f3ef8997cb4ca29bc208
@@ -237,8 +237,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 436f9b8957d68fe98cae98d79bfce5e489f18befcb4bc44e9bf291f018e677cb
-R e654947650d5d499b2e93660a9c589b4
+P 0f17fa49306ca2091917b4e1dcc904906e1f24e3d98e97b6b5866861941e0452
+R 181fdf56581464456aa2b834cef4a522
 U rolf
-Z 8b40803b1d317a7eef05b5a0222b13c7
+Z f8fe281f0bfcf39a4b335b9cc361d9d1
 # Remove this line to create a well-formed Fossil manifest.
