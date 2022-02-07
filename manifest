@@ -1,5 +1,5 @@
-C Made\smore\sfeature\scheck\stest\sconstraints\swork\swith\s9.0
-D 2022-02-04T20:12:08.665
+C Fixed\s[52669bfb64a].
+D 2022-02-07T11:37:59.833
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -197,7 +197,7 @@ F tests/dom.bench 5446ce379127b8d5700f18a5a0848e580313d0d7
 F tests/dom.test cc44cd1101e38370893ed129a3ebb1b9b8d8295b3420f17b052afd6a3266115b
 F tests/domDoc.test cb833d2139c8d9671e50f3cf4155b85e082674bcc534562128be0dee3419e71d
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
-F tests/domNode.test 90c6d028ad54479b4500e8290e95ce5118ecd669366711a7f9f49a0102050a6a
+F tests/domNode.test 609c1252a2616bac46f16f1c05050b3514250abfe55cbe6056ad9c8fb29d2619
 F tests/domjson.test bdfbe938f33931f56f9496aac425b2183373f4cb926b95a04fa095bd3b75cd3d
 F tests/domnamespace.test f68dee13e2325518e96b318bf9fe76ae6903dc38d5602c4b0f48f90c0dc3038c
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
@@ -237,8 +237,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 12909b2975add43d236a43a3cd6bfca4559ad47d9c6f6c60247fa63a5a3538b4
-R 11f71e5903590c3e3de1b4308b34f95d
+P 52669bfb64ae11bb8e68545c49fef6182004d1ca9faacfc80becf786cc911674
+R 3cd2382b7fc6be35c6154dec5ae41a51
 U rolf
-Z d3dbaee1d73b569a92f3506c985feaad
+Z 5646e3161fb061fa7866dab7d6b725a4
 # Remove this line to create a well-formed Fossil manifest.
