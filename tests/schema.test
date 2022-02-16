@@ -35,8 +35,8 @@ source [file join [file dir [info script]] loadtdom.tcl]
 
 if {[dom featureinfo schema]} {
 
-testConstraint 8.5 [package vsatisfies [package present Tcl] 8.5]
-testConstraint listformat [package vsatisfies [package present Tcl] 8.5]
+testConstraint 8.5 [package vsatisfies [package present Tcl] 8.5-]
+testConstraint listformat [package vsatisfies [package present Tcl] 8.5-]
 
 proc dummycallback {args} {}
 
@@ -1450,6 +1450,17 @@ test schema-5.5 {validate tmml doc files} {
     s delete
     set result
 } {1 1 1 1 1 1 1 1}
+
+test schema-5.6 {validate tmml doc files} {
+    tdom::schema s
+    s defelement doc {
+        element e1
+        element e2 *
+    }
+    s event start doc
+    set result [catch {dom parse -validateCmd s {<doc><e1/></doc>}}]
+    set result
+} {1}
 
 test schema-6.1 {expat parser with -validateCmd} {
     tdom::schema create grammar
