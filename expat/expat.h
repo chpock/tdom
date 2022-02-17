@@ -267,6 +267,12 @@ XML_ParserCreate_MM(const XML_Char *encoding,
 XMLPARSEAPI(XML_Bool)
 XML_ParserReset(XML_Parser parser, const XML_Char *encoding);
 
+/* Ignore white spaces before XML declaration. This avoids error
+   XML or text declaration not at start of entity.
+*/
+XMLPARSEAPI(void)
+XML_IgnoreSpace(XML_Parser parser);
+
 /* atts is array of name/value pairs, terminated by 0;
    names and values are 0 terminated.
 */

@@ -169,6 +169,18 @@ prolog0(PROLOG_STATE *state, int tok, const char *ptr, const char *end,
 }
 
 static int PTRCALL
+prolog0ws(PROLOG_STATE *state, int tok, const char *ptr, const char *end,
+        const ENCODING *enc) {
+  switch (tok) {
+  case XML_TOK_PROLOG_S:
+  case XML_TOK_BOM:
+    return XML_ROLE_NONE;
+  }
+  state->handler = prolog0;
+  return prolog0(state, tok, ptr, end, enc);
+}
+
+static int PTRCALL
 prolog1(PROLOG_STATE *state, int tok, const char *ptr, const char *end,
         const ENCODING *enc) {
   switch (tok) {
@@ -1241,6 +1253,16 @@ XmlPrologStateInit(PROLOG_STATE *state) {
   state->includeLevel = 0;
   state->inEntityValue = 0;
 #endif /* XML_DTD */
+}
+
+/* This switches to prolog0ws ignoring whitespaces (XML_TOK_PROLOG_S)
+ * before XML_TOK_XML_DECL
+ */
+void
+XmlPrologStateIgnoreSpace(PROLOG_STATE *state) {
+  if (state->handler == prolog0) {
+    state->handler = prolog0ws;
+  }
 }
 
 #ifdef XML_DTD

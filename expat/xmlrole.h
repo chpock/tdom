@@ -127,6 +127,7 @@ typedef struct prolog_state {
 #endif /* XML_DTD */
 } PROLOG_STATE;
 
+void XmlPrologStateIgnoreSpace(PROLOG_STATE *);
 void XmlPrologStateInit(PROLOG_STATE *);
 #ifdef XML_DTD
 void XmlPrologStateInitExternalEntity(PROLOG_STATE *);

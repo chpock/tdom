@@ -1,5 +1,5 @@
-C merge\strunk
-D 2022-02-16T17:05:21.676
+C xml::parser:\soption\s"-ignorewhitespace"\sextended,\sif\sset\sto\strue\sthe\sparser\swouldn't\sthrow\serror\s"XML\sor\stext\sdeclaration\snot\sat\sstart\sof\sentity"\son\sspaces\sbefore\sXML\sdeclaration
+D 2022-02-17T15:12:57.516
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -58,7 +58,7 @@ F expat/Changes a883811bd51886d15e63a515ae3e7b996944bd9f101552c8ae200b859c754bb8
 F expat/VERSION ff2ec5548a0718fb5d8c8f73a7b44a718a2d166ed3a82166f6a2b58e38da2e7f
 F expat/ascii.h e8752c5f09c75d1c5b6eaf50d359c8b2b173d5243ccb2f468b858e35d36d04c3
 F expat/asciitab.h 7e665d7c5c93a5cd7f182a64dccd2a0771842d00f58706f99cc28e4554ddf9da
-F expat/expat.h 3f68b3aa3fc13e49657eae0ff3b793ff46e711e89853c7fb171f8677c331e5ef
+F expat/expat.h 61c63bf2743650b62275930dd3c7667dc746171b5d06b0145bd873ec266389dc
 F expat/expat_external.h 22207c9c718f4a09ada2847842290117f178ecb9bdc1f0d6d4dc4cb8632b80b7
 F expat/iasciitab.h de065bf25c951d50bf37f238c113b4c6b89d406592061bd67dcff5816e501459
 F expat/internal.h db0e75f1f15ab30f0358742f3722a1c266834ffc8a2fb448c8819e23715f72e1
@@ -67,9 +67,9 @@ F expat/nametab.h 30cd38454c40812806f55053f58791c8b1db8ce293d83e10b5d31ed517add4
 F expat/siphash.h e912e702f017450b38f98eb20918a751131d52d487a5287df88b29d08100da4b
 F expat/utf8tab.h 2f04b270d7c0d005f203477515a1a054e7538e1ed013cb48ecd4a4e2489b208b
 F expat/winconfig.h d6e2291c3526d9187d6ee4a7815eece93d4f9a456b8ae2a8ce66c56a75a4c563
-F expat/xmlparse.c 8ff9218fd563a946ddd91b34d8dacaea9ebc62a3b226af8e39dc87ecb441c581
-F expat/xmlrole.c bc08f52c6d34264e6ca8e693bf84864952518da81f06262f25f9b03d8610a8b5
-F expat/xmlrole.h f8bc403be5ddd1f6ef457923c1a1383582e52b60963cf6f660afe752c8744756
+F expat/xmlparse.c d54eb884da867357a35b124ebfc0f34299ad8ca0aaf2ec5ef5c95fafaece97e0
+F expat/xmlrole.c f06040eaea70a55ef24ca42e76bf5572203f46a46015eb89794001196107211a
+F expat/xmlrole.h b234bee2df5b368e4b546f91d178bffc2a41e70fb4d69061561bfcb5857e51ef
 F expat/xmltok.c 433770886dd1e06b9b01451af1b615d2d66b5ad8492183f945215f0357842394
 F expat/xmltok.h d545486973cd4ed2e35f29ef1572364c6730a59b093a66669983c510de9abad0
 F expat/xmltok_impl.c 3f6a1b404f0581daa53813056ae58ff161a827112cafc350cf02d53eef712e4d
@@ -147,7 +147,7 @@ F generic/schema.c 2bd80a3d63d837408ea67c354c97fd1d05f91453a0ff88eacc1f37f77e7dc
 F generic/schema.h f57a01bd6afa3cfae4aca517e326ce73ea58c2ef39f1802f02b0bdbd106fa8c7
 F generic/tcldom.c 81aa523710c84af9aaa65fcfa6ccf26902f6570bbe6873943609088ff0d17f1d
 F generic/tcldom.h 37ee136d483b683c7e3e9e94ce8284520c7998cb1340047fc540dd7701825dc6
-F generic/tclexpat.c 6d28d31918605c108815adfc47f646750b06d8cd952e09e00c2b36fd5fd6ff3b
+F generic/tclexpat.c b23b0ae1d33b9deb275dcea95aca2616aef23787641d85caf122f6a27aaf5408
 F generic/tclexpat.h 726364eee06d63698253e340a100a9a9b893c7fb8806f8abc57150fc6aeec088
 F generic/tclpull.c c39d29858eb67421c0e796b60467ecd15e7a0215bd635374b785c8268e321b16
 F generic/tclpull.h 8e1aac98bdad497c669c901494939eecd6c2f57ea51c4f5d4dac502db48527d4
@@ -207,7 +207,7 @@ F tests/htmlreader.test 6e08308d4aa9aafa8661aa0b9f4d17de4c1a40b0abc4db4379f744c4
 F tests/i18n.test 68643e220f65147bc51c12daa86339aac905ac547d6a2888c7f7527518f8b1d5
 F tests/loadtdom.tcl e9d3251af57fce2b88f64882e9c0891dde6e60335a3b21876754265f878c10e6
 F tests/namespace.test 0a13b2bf59bb088525ca7b64d0b2bce6a349c627ca3dd1c17a4cc969d16fe57c
-F tests/parser.test 19b73d012b9afa8bc84359161c9a2dd47304c8565c0ef3cf4e0064ce75debad4
+F tests/parser.test 11ea02307a59d78dfaa93388340d9ade2ff2f30e28dfed7a239e488e004a041a
 F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
 F tests/pullparser.test df079ff6a5a6b11b4d0f409ca3fc17cc4a5956d31801872f9f1f95e35032dec5
@@ -237,8 +237,11 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 6dfe577aaf20d613dc6f8e279fcdd6ed99e005becb3446ca4fb44cc4e23b34d2 9eb49501a25f7ade3a9518fb3732c6a50d222722655df3e8267880cb91ec9d47
-R 77158ee6e36b2718aa04f64b0f49650a
+P dbcd60f504c1bd991522835b4df03e54a4afdad251456030e91f2fdf780cc824
+R 17aa7c8062ba03562392f85ba1811215
+T *branch * experimental/bulk-ignore-ws
+T *sym-experimental/bulk-ignore-ws *
+T -sym-experimental/bulk-xml-parse *
 U sebres
-Z cc6a58451eb073d2de215da10220f618
+Z 7a208534655a910dab1d0607ef34db64
 # Remove this line to create a well-formed Fossil manifest.

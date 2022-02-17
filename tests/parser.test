@@ -908,6 +908,23 @@ test parser-12.9 {currentmarkup method - comment} {
     set result
 } {comment: <!-- A comment -->}
 
+# shouldn't throw "XML or text declaration not at start of entity":
+test parser-12.10 {xml declaration after whitespace (newline)} -setup {
+    set ::res {}
+} -body {
+    set p [xml::parser -final 1 -ignorewhitespace 1]
+    $p configure -elementstartcommand [list apply {{p name args} {
+        lappend ::res $name ->
+        lappend ::res "p:[$p get -currentbyteindex], l:[$p get -currentlinenumber], c:[$p get -currentcolumnnumber]"
+    }} $p] -elementendcommand [list apply {{p name} {
+        lappend ::res <- //$name
+    }} $p]
+    $p parse [subst { \r \r\n \n  <?xml version="1.0"?><X/>}]
+    set res
+} -cleanup {
+    $p free
+    unset -nocomplain ::res
+} -result {X -> {p:30, l:4, c:23} <- //X}
 
 test parser-13.0 {no-bulk parsing - error by 2nd XML} -body {
     set p [xml::parser -final 1]
