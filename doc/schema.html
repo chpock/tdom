@@ -4,18 +4,18 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x556659791bf0">NAME</a> · <a href="#SECTid0x556659877990">SYNOPSIS</a> · <a href="#SECTid0x556659871c50">DESCRIPTION </a> · <a href="#SECTid0x5566598dc990">Schema definition scripts</a> · <a href="#SECTid0x5566598ebc10">Quantity specifier</a> · <a href="#SECTid0x5566598edc50">Text constraint scripts</a> · <a href="#SECTid0x556659901460">Local key constraints</a> · <a href="#SECTid0x556659903280">Recovering</a> · <a href="#SECTid0x556659905250">Examples</a> · <a href="#SECTid0x556659906db0">KEYWORDS</a>
+<a href="#SECTid0x562f8c42c890">NAME</a> · <a href="#SECTid0x562f8c445890">SYNOPSIS</a> · <a href="#SECTid0x562f8c424080">DESCRIPTION </a> · <a href="#SECTid0x562f8c3d8fc0">Schema definition scripts</a> · <a href="#SECTid0x562f8c41ce30">Quantity specifier</a> · <a href="#SECTid0x562f8c43aff0">Text constraint scripts</a> · <a href="#SECTid0x562f8c3ede10">Local key constraints</a> · <a href="#SECTid0x562f8c292330">Recovering</a> · <a href="#SECTid0x562f8c293e80">Examples</a> · <a href="#SECTid0x562f8c439a10">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x556659791bf0">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x562f8c42c890">NAME</a></h2><p class="namesection">
 <b class="names">tdom::schema - </b><br>Creates a schema validation command</p>
 
-  <h2><a name="SECTid0x556659877990">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x562f8c445890">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">tdom::schema</b> <i class="m">?create?</i> <i class="m">cmdName</i>
     </pre>
 
-  <h2><a name="SECTid0x556659871c50">DESCRIPTION </a></h2><p>Every call of this command creates a new validation command. A
+  <h2><a name="SECTid0x562f8c424080">DESCRIPTION </a></h2><p>Every call of this command creates a new validation command. A
     validation command has methods to define a schema and is able
     to validate XML data or to post-validate a tDOM DOM tree (and to
     some degree other kind of hierarchical data) against this
@@ -257,7 +257,7 @@
             <dt>UNKNOWN_GLOBAL_ID</dt><dd></dd>
             <dt>UNKNOWN_ID</dt><dd></dd>
         </dl>
-        <p> For more detailed information see section <a href="#SECTid0x556659903280">Recovering</a>.</p>
+        <p> For more detailed information see section <a href="#SECTid0x562f8c292330">Recovering</a>.</p>
         </dd>
       
 
@@ -486,7 +486,7 @@
 
     </dl>
 
-  <h2><a name="SECTid0x5566598dc990">Schema definition scripts</a></h2><p>Schema definition scripts are ordinary Tcl scripts evaluated in
+  <h2><a name="SECTid0x562f8c3d8fc0">Schema definition scripts</a></h2><p>Schema definition scripts are ordinary Tcl scripts evaluated in
     the namespace tdom::schema. The schema definition commands listed
     below in this Tcl namespace allow the definition of a wide variety
     of document structures. Every schema definition command
@@ -787,7 +787,7 @@ s define {
       
     </dl>
 
-  <h2><a name="SECTid0x5566598ebc10">Quantity specifier</a></h2><p>Several schema definition commands expect a quantifier as
+  <h2><a name="SECTid0x562f8c41ce30">Quantity specifier</a></h2><p>Several schema definition commands expect a quantifier as
     one of their arguments which determines how often the content
     particle specified by the command is expected. The valid values
     for a <i class="m">quant</i> argument are:</p><dl class="optlist">
@@ -834,7 +834,7 @@ s define {
     </dl><p>If an optional quantifier is not given, it defaults to * in
     case of the <i class="m">mixed</i> command and to ! for all other commands.</p>
 
-  <h2><a name="SECTid0x5566598edc50">Text constraint scripts</a></h2><p>Text (parsed character data, as XML calls it) sometimes has to
+  <h2><a name="SECTid0x562f8c43aff0">Text constraint scripts</a></h2><p>Text (parsed character data, as XML calls it) sometimes has to
     be of a certain kind or comply with certain rules to be valid. The
     text constraint script arguments to text, attribute, nsattribute
     and deftexttype commands are evaluated in the Tcl namespace
@@ -850,7 +850,7 @@ s define {
     command is available in the tdom::type namespace is recorded in
     its documentation.
     </p>
-        <h3><a name="SECTid0x5566598ee650">The tcl text constraint command</a></h3>
+        <h3><a name="SECTid0x562f8c43b8d0">The tcl text constraint command</a></h3>
         <p>The <i class="m">tcl</i> text constraint command dispatches the check
         to an arbitrary Tcl command, thus enable any programmable
         decision rules.</p>
@@ -865,7 +865,7 @@ s define {
             
         </dl>
     
-        <h3><a name="SECTid0x5566598ef430">Basic XML types</a></h3>
+        <h3><a name="SECTid0x562f8c3e54f0">Basic XML types</a></h3>
         <dl class="commandlist">
             
                 <dt><b class="cmd">name</b></dt>
@@ -912,7 +912,7 @@ s define {
             
         </dl>
     
-        <h3><a name="SECTid0x5566598f1440">Basic type tests</a></h3>
+        <h3><a name="SECTid0x562f8c3da9b0">Basic type tests</a></h3>
         <p>
         </p>
         <dl class="commandlist">
@@ -1083,7 +1083,7 @@ s define {
             
         </dl>
     
-        <h3><a name="SECTid0x5566598f86f0">Logical constructs</a></h3>
+        <h3><a name="SECTid0x562f8c420430">Logical constructs</a></h3>
         <dl class="commandlist">
         
             <dt>
@@ -1128,7 +1128,7 @@ s define {
         
         </dl>
     
-        <h3><a name="SECTid0x5566598faa40">Constraints on processed text value</a></h3>
+        <h3><a name="SECTid0x562f8c462e80">Constraints on processed text value</a></h3>
         <dl class="commandlist">
             
             <dt>
@@ -1180,7 +1180,7 @@ s define {
         
         </dl>
     
-        <h3><a name="SECTid0x5566598fd400">Various other string properties</a></h3>
+        <h3><a name="SECTid0x562f8c43dd80">Various other string properties</a></h3>
         <dl class="commandlist">
         
             <dt>
@@ -1264,7 +1264,7 @@ s define {
         </dl>
     
 
-  <h2><a name="SECTid0x556659901460">Local key constraints</a></h2><p>Document wide uniqueness and foreign key constraints are
+  <h2><a name="SECTid0x562f8c3ede10">Local key constraints</a></h2><p>Document wide uniqueness and foreign key constraints are
     available with the text constraint commands id and idref.
     Keyspaces allow for sub-tree local uniqueness and foreign key
     constraints.</p><dl class="commandlist">
@@ -1300,7 +1300,7 @@ s define {
         
     </dl>
 
-  <h2><a name="SECTid0x556659903280">Recovering</a></h2><p>By default the validation engine stops at the first detected
+  <h2><a name="SECTid0x562f8c292330">Recovering</a></h2><p>By default the validation engine stops at the first detected
       validation violation and reports that finding. It does so by
       return false (and sets, if given, the result variable with an
       error message) in case the schema command itself is used to
@@ -1310,14 +1310,14 @@ s define {
       arguments in case a validation violation is detected. Then the
       validation recovers from the error and continues. For some
       validation errors the recover strategy can be determined with
-      the script result of the reportcmd.</p><p>With a <i class="m">reportcmd</i> (which does not throw error if
-      called) the validation engine will never report validation
-      failure to its caller. The validation engine recovers,
-      continues, and reports the next error (if occurrin)g and so on
-      until the end of the input. The schema command will return true
-      and the SAX parser and DOM builder will process normally until
-      the end of the input, as if there had not been a validation
-      error.</p><p>Please note that this happens only for validation errors. It
+      the script result of the reportcmd.</p><p>With a <i class="m">reportcmd</i> (as long as the <i class="m">reportcmd</i> does
+      not throw error while called) the validation engine will never
+      report validation failure to its caller. The validation engine
+      recovers, continues, and reports the next error (if occurrin)g
+      and so on until the end of the input. The schema command will
+      return true and the SAX parser and DOM builder will process
+      normally until the end of the input, as if there had not been a
+      validation error.</p><p>Please note that this happens only for validation errors. It
       is not possible to recover from well-formedness errors. If the
       input is not well-formed, the schema command returns false and
       sets (if given) the result variable with an error message about
@@ -1345,7 +1345,7 @@ s define {
       error types MISSING_ELEMENT and UNEXPECTED_ELEMENT recovers by
       ignoring the event.</p>
 
-  <h2><a name="SECTid0x556659905250">Examples</a></h2><p>The XML Schema Part 0: Primer Second Edition
+  <h2><a name="SECTid0x562f8c293e80">Examples</a></h2><p>The XML Schema Part 0: Primer Second Edition
     (<a href="https://www.w3.org/TR/xmlschema-0/">https://www.w3.org/TR/xmlschema-0/</a>) starts with this
     example schema:</p><pre class="example">
 &lt;xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
@@ -1514,7 +1514,7 @@ schema define {
       
     </pre>
 
-<h2><a name="SECTid0x556659906db0">KEYWORDS</a></h2><p class="keywords">
+<h2><a name="SECTid0x562f8c439a10">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-Validation">Validation</a>, <a class="keyword" href="keyword-index.html#KW-Postvalidation">Postvalidation</a>, <a class="keyword" href="keyword-index.html#KW-DOM">DOM</a>, <a class="keyword" href="keyword-index.html#KW-SAX">SAX</a>
 </p>
 </div><hr class="navsep"><div class="navbar" align="center">

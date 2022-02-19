@@ -4,17 +4,17 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x5579b5f8c910">NAME</a> · <a href="#SECTid0x5579b5edbb80">SYNOPSIS</a> · <a href="#SECTid0x5579b5f83930">DESCRIPTION </a> · <a href="#SECTid0x5579b5ff2110">KEYWORDS</a>
+<a href="#SECTid0x562f8c2f3400">NAME</a> · <a href="#SECTid0x562f8c3365c0">SYNOPSIS</a> · <a href="#SECTid0x562f8c3d3810">DESCRIPTION </a> · <a href="#SECTid0x562f8c43b3e0">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x5579b5f8c910">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x562f8c2f3400">NAME</a></h2><p class="namesection">
 <b class="names">dom - </b><br>Create an in-memory DOM tree from XML</p>
   
-  <h2><a name="SECTid0x5579b5edbb80">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x562f8c3365c0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">dom</b> <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
 
-  <h2><a name="SECTid0x5579b5f83930">DESCRIPTION </a></h2><p>This command provides the creation of DOM trees in memory. In
+  <h2><a name="SECTid0x562f8c3d3810">DESCRIPTION </a></h2><p>This command provides the creation of DOM trees in memory. In
 the usual case a string containing a XML information is parsed and converted
 into a DOM tree. Other possible parse input may be HTML or JSON.
 The <i class="m">method</i> indicates a specific subcommand. </p><p>The valid methods are:</p><dl class="commandlist">
@@ -127,8 +127,8 @@ used, which tries to even parse badly formed HTML into a DOM tree.</dd>
                 <dt><b>-jsonroot &lt;document element name&gt;</b></dt>
                 <dd>If given makes the given element name the
                 document element of the resulting doc. The parsed
-                content of the JSON string will be the childs of this
-                document element node.</dd>
+                content of the JSON string will be the children of
+                this document element node.</dd>
               
               
               
@@ -323,7 +323,41 @@ called. The <i class="m">-useForeignDTD</i> respects </dd>
                 </dd>
               
 
-            </dl>
+              
+                <dt>
+<b>-billionLaughsAttackProtectionMaximumAmplification</b> <i>&lt;float&gt;</i>
+</dt>
+                
+                <dd>This option together with
+                <i class="m">-billionLaughsAttackProtectionActivationThreshold</i>
+                gives control over the parser limits that protects
+                against billion laugh attacks
+                (<a href="https://en.wikipedia.org/wiki/Billion_laughs_attack">https://en.wikipedia.org/wiki/Billion_laughs_attack</a>).
+                This option expects a float &gt;= 1.0 as argument. You
+                should never need to use this option, because the
+                default value (100.0) should work for any real data.
+                If you ever need to increase this value for non-attack
+                payload, please report.</dd>
+              
+              
+              
+                <dt>
+<b>-billionLaughsAttackProtectionActivationThreshold</b> <i>&lt;long&gt;</i>
+</dt>
+                
+                <dd>This option together with
+                <i class="m">-billionLaughsAttackProtectionMaximumAmplification</i>
+                gives control over the parser limits that protects
+                against billion laugh attacks
+                (<a href="https://en.wikipedia.org/wiki/Billion_laughs_attack">https://en.wikipedia.org/wiki/Billion_laughs_attack</a>).
+                This option expects a positiv integer as argument. You
+                should never need to use this option, because the
+                default value (8388608) should work for any real data.
+                If you ever need to increase this value for non-attack
+                payload, please report.</dd>
+              
+
+          </dl>
 <p></p>
 </dd>
         
@@ -683,7 +717,7 @@ recommendation. Otherwise it returns 0.</dd>
         
     </dl>
 
-<h2><a name="SECTid0x5579b5ff2110">KEYWORDS</a></h2><p class="keywords">
+<h2><a name="SECTid0x562f8c43b3e0">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-XML">XML</a>, <a class="keyword" href="keyword-index.html#KW-DOM">DOM</a>, <a class="keyword" href="keyword-index.html#KW-document">document</a>, <a class="keyword" href="keyword-index.html#KW-node">node</a>, <a class="keyword" href="keyword-index.html#KW-parsing">parsing</a>
 </p>
 </div><hr class="navsep"><div class="navbar" align="center">

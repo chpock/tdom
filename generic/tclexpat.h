@@ -130,7 +130,9 @@ typedef struct TclGenExpatInfo {
     int parsingState;           /* 0 == freshly (re-)initialized
                                    1 == initParserProcs called
                                    2 == parsing an input chunk */
-    XML_Char nsSeparator;       
+    XML_Char nsSeparator;
+    float maximumAmplification; /* Billion Laughts Attack Protection 1 */
+    long activationThreshold;   /* Billion Laughts Attack Protection 2 */
     int paramentityparsing;     
     int noexpand;
     int useForeignDTD;
