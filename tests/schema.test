@@ -35,8 +35,8 @@ source [file join [file dir [info script]] loadtdom.tcl]
 
 if {[dom featureinfo schema]} {
 
-testConstraint 8.5 [package vsatisfies [package present Tcl] 8.5]
-testConstraint listformat [package vsatisfies [package present Tcl] 8.5]
+testConstraint 8.5 [package vsatisfies [package present Tcl] 8.5-]
+testConstraint listformat [package vsatisfies [package present Tcl] 8.5-]
 
 proc dummycallback {args} {}
 
@@ -871,6 +871,34 @@ test schema-1.38 {list quant with *} {
     set result
 } {1 1 1 1 1}
 
+test schema-1.39 {defelement - wrong # of args} { 
+    tdom::schema s
+    set result ""
+    catch {
+        s define {
+            defelement e
+        }
+    } errMsg
+    lappend result $errMsg
+    catch {
+        s defelement e
+    } errMsg
+    lappend result $errMsg
+    catch {
+        s define {
+            defelement e 1 2 3
+        }
+    } errMsg
+    lappend result $errMsg
+    catch {
+        s defelement e 1 2 3
+    } errMsg
+    lappend result $errMsg
+    s delete
+    set result
+} {{wrong # args: should be "defelement <name> ?<namespace>? pattern"} {wrong # args: should be "s defelement <name> ?<namespace>? pattern"} {wrong # args: should be "defelement <name> ?<namespace>? pattern"} {wrong # args: should be "s defelement <name> ?<namespace>? pattern"}}
+
+
 test schema-2.1 {grammar definition: ref} {
     tdom::schema create grammar
     grammar defpattern thisPattern {
@@ -1423,6 +1451,17 @@ test schema-5.5 {validate tmml doc files} {
     set result
 } {1 1 1 1 1 1 1 1}
 
+test schema-5.6 {validate tmml doc files} {
+    tdom::schema s
+    s defelement doc {
+        element e1
+        element e2 *
+    }
+    s event start doc
+    set result [catch {dom parse -validateCmd s {<doc><e1/></doc>}}]
+    set result
+} {1}
+
 test schema-6.1 {expat parser with -validateCmd} {
     tdom::schema create grammar
     grammar defelement doc {
@@ -1567,6 +1606,26 @@ test schema-6.6 {expat parser with -validateCmd} {
     p delete
     set result
 } {doc e1 {}}
+
+test schema-6.7 {expat parser with deleted -validateCmd} {
+    tdom::schema create grammar
+    grammar defelement doc {
+        element e1
+        element e2 *
+    }
+    foreach e {e1 e2} {
+        grammar defelement $e {}
+    }
+    ::xml::parser p -validateCmd grammar
+    p parse "<doc><e1/><e2/><e2/></doc>"
+    p reset
+    grammar delete
+    p parse "<doc><e1/><e2/><e2/></doc>"
+    p reset
+    set result [catch {p parse "<doc><e1/><e1/><e2/><e2/></doc>"}]
+    p delete
+    set result
+} {1}
 
 test schema-7.1 {group} {
     tdom::schema create grammar
@@ -8126,7 +8185,7 @@ test schema-17.16 {info expected} {8.5} {
     set result
 } {0 0 1 1 aaaa 1 b bb bbb bbbb 1}
 
-test schema-17.16_1{info expected} {8.5} {
+test schema-17.16_1 {info expected} {8.5} {
     tdom::schema s
     s defelement doc {
         element a
@@ -8361,18 +8420,34 @@ test schema-17.17 {info expected} {8.5} {
 test schema-17.18 {info typedefinition} {
     tdom::schema s
     s prefixns {ns http://my.foo}
-    s defelementtype a b ns {
-        elementtype a
-        elementtype a2
+    s defelementtype a ns {
+        element a type a
+        element a type a2
     }
     set result [s info typedefinition a ns]
     s delete
     set result
-} {defelementtype a b http://my.foo {
-        elementtype a
-        elementtype a2
+} {defelementtype a http://my.foo {
+        element a type a
+        element a type a2
     }}
 
+test schema-17.18a {info typedefinition} {
+    tdom::schema s
+    s prefixns {ns http://my.foo}
+    s define {
+        defelementtype a ns {
+            element a type a
+            element a type a2
+        }
+    }
+    set result [s info typedefinition a ns]
+    s delete
+    set result
+} {defelementtype a http://my.foo {
+            element a type a
+            element a type a2
+        }}
 proc schema-17.19 {schemacmd} {
     lappend ::result [$schemacmd info stack associated]
 }
@@ -9753,11 +9828,11 @@ test schema-21.1 {CONTENT_ARRAY_SIZE_INIT} {
 
 test schema-22.1 {defelementtype} {
     tdom::schema s
-    s defelementtype a_type a {
+    s defelementtype a_type {
         element e1
     }
     s defelement doc {
-        elementtype a_type
+        element a type a_type
     }
     set result [list]
     foreach xml {
@@ -9774,9 +9849,9 @@ test schema-22.1 {defelementtype} {
 test schema-22.2 {defelementtype} {
     tdom::schema s
     s defelement doc {
-        elementtype a_type
+        element a type a_type
     }
-    s defelementtype a_type a {
+    s defelementtype a_type {
         element e1
     }
     set result [list]
@@ -9794,13 +9869,13 @@ test schema-22.2 {defelementtype} {
 test schema-22.3 {defelementtype} {
     tdom::schema s
     s defelement doc {
-        elementtype a
-        elementtype a2
+        element a type a
+        element a type a2
     }
-    s defelementtype a a {
+    s defelementtype a {
         element e1
     }
-    s defelementtype a2 a {
+    s defelementtype a2 {
         element e2
     }
     set result [list]
@@ -9821,26 +9896,26 @@ test schema-22.3 {defelementtype} {
 test schema-22.4 {defelementtype} {
     tdom::schema s
     catch {s defelement doc {
-        elementtype a
-        elementtype a2
+        element atype a
+        element a type a2
         error "my"
     }}
     s defelement doc {
-        elementtype a
-        elementtype a2
+        element a type a
+        element a type a2
     }
-    catch {s defelementtype a a {
+    catch {s defelementtype a  {
         element e1
         error my
     }}
-    s defelementtype a a {
+    s defelementtype a {
         element e1
     }
-    catch {s defelementtype a2 a {
+    catch {s defelementtype a2 {
         element e2
         error my
     }}
-    s defelementtype a2 a {
+    s defelementtype a2 {
         element e2
     }
     set result [list]
@@ -9862,13 +9937,13 @@ test schema-22.5 {defelementtype} {
     tdom::schema s
     s prefixns {ns http://my.foo}
     s defelement doc ns {
-        elementtype a
-        elementtype a2
+        element a type a
+        element a type a2
     }
-    s defelementtype a a ns {
+    s defelementtype a ns {
         element e1
     }
-    s defelementtype a2 a ns {
+    s defelementtype a2 ns {
         element e2
     }
     set result [list]
@@ -9890,28 +9965,28 @@ test schema-22.6 {defelementtype} {
     tdom::schema s
     s prefixns {ns http://my.foo}
     s defelement doc ns {
-        elementtype a
-        elementtype a2
+        element a type a
+        element a type a2
     }
-    s defelementtype a a ns {
-        elementtype e1
+    s defelementtype a ns {
+        element e type e1
     }
-    s defelementtype a2 a ns {
-        elementtype e2
+    s defelementtype a2 ns {
+        element e type e2
     }
     set result [lsort -index 0 [s info definedElementtypes]]
     s delete
     set result
 } {{a http://my.foo} {a2 http://my.foo}}
 
-test schema-22.6 {info definedElementtypes} {
+test schema-22.6a {info definedElementtypes} {
     tdom::schema s
     s prefixns {ns1 http://ns1.foo ns2 http://ns2.foo}
-    s defelementtype a a ns1 {
-        elementtype e1
+    s defelementtype a ns1 {
+        element e type e1
     }
-    s defelementtype a a ns2 {
-        elementtype e2
+    s defelementtype a ns2 {
+        element e type e2
     }
     set result [lsort -command sortcps [s info definedElementtypes]]
     s delete
@@ -9921,11 +9996,11 @@ test schema-22.6 {info definedElementtypes} {
 test schema-22.7 {defelementtype} {
     tdom::schema s
     s defelement doc {
-        elementtype e1type
-        elementtype e2type *
+        element e1 type e1type
+        element e2 * type e2type
     }
     foreach e {e1 e2} {
-        s defelementtype ${e}type $e {}
+        s defelementtype ${e}type {}
     }
     set result [list]
     foreach xml {
@@ -9945,34 +10020,9 @@ test schema-22.7 {defelementtype} {
 
 test schema-22.8 {defelementtype} {
     tdom::schema s
-    s defelementtype doctype doc {
-        elementtype e1type
-        elementtype e2type *
-    }
-    foreach e {e1 e2} {
-        s defelementtype ${e}type $e {}
-    }
-    set result [list]
-    foreach xml {
-        <doc/>
-        <doc><e1/></doc>
-        <doc><e1/><e2/></doc>
-        <doc><e1/><e2/><e2/></doc>
-        <doc><e1/><e2/><e2/><e2/></doc>
-        <doc><e1/><e2/><e2/><e2/><e1/></doc>
-        <doc><e2/></doc>
-    } {
-        lappend result [s validate $xml]
-    }
-    s delete
-    set result
-} {0 0 0 0 0 0 0}
-
-test schema-22.9 {defelementtype} {
-    tdom::schema s
     s defelement doc {
-        elementtype e1type
-        elementtype e2type *
+        element e1 type e1type
+        element e2 * type e2type
     }
     set result [list]
     foreach xml {
@@ -9983,12 +10033,89 @@ test schema-22.9 {defelementtype} {
         <doc><e1/><e2/><e2/><e2/></doc>
         <doc><e1/><e2/><e2/><e2/><e1/></doc>
         <doc><e2/></doc>
+        <doc><e1/></doc>
     } {
         lappend result [s validate $xml]
     }
     s delete
     set result
-} {0 0 1 0 1 1 1}
+} {0 0 0 0 1 0 0 1}
+
+test schema-22.9 {defelementtype} {
+    tdom::schema s
+    catch {
+        s define {
+            defelement a {
+                element a1 type a1type
+            }
+            defelement b {
+                element b1 type e1type
+                element b1 ? type e2type
+            }
+            defelementtype a1type {
+                element a1
+            }
+            defelementtype e1type text
+            defelementtype e2type {
+                element c
+                for {set i 1} {$i <= 100} {incr i} {
+                    attribute att$i ?
+                }
+                attribute musthave 
+            }
+            error "triggered"
+        }
+    }
+    s define {
+        defelement a {
+            element a1 type a1type
+        }
+        defelement b {
+            element b1 type e1type
+            element b1 ? type e2type
+        }
+        defelementtype a1type {
+            element a1
+        }
+        defelementtype e1type text
+        defelementtype e2type {
+            element c
+            for {set i 1} {$i <= 100} {incr i} {
+                attribute att$i ?
+            }
+            attribute musthave !
+        }
+    }
+    s defelement doc {
+        element e1 type e1type
+        element e2 * type e2type
+        element a
+        element b +
+    }
+    set result [list]
+    foreach xml {
+        {<doc>
+            <e1></e1>
+            <e2><c/></e2>
+            <e2><c/></e2>
+            <a><a1><a1/></a1></a>
+            <b><b1>foo</b1><b1><c/></b1></b>
+         </doc>
+        }
+        {<doc>
+            <e1></e1>
+            <e2 att17="foo" musthave=""><c/></e2>
+            <e2 att1="foo" att27="bar" musthave=""><c/></e2>
+            <a><a1><a1/></a1></a>
+            <b><b1>foo</b1><b1 att17="foo" musthave="grill"><c/></b1></b>
+         </doc>
+        }
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1}
 
 test schema-23.1 {validatefile} {
     tdom::schema s

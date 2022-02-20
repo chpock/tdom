@@ -316,7 +316,37 @@ called. The <m>-useForeignDTD</m> respects </desc>
                 </desc>
               </optdef>
 
-            </optlist>
+              <optdef>
+                <optname>-billionLaughsAttackProtectionMaximumAmplification</optname>
+                <optarg>&lt;float&gt;</optarg>
+                <desc>This option together with
+                <m>-billionLaughsAttackProtectionActivationThreshold</m>
+                gives control over the parser limits that protects
+                against billion laugh attacks
+                (<url>https://en.wikipedia.org/wiki/Billion_laughs_attack</url>).
+                This option expects a float >= 1.0 as argument. You
+                should never need to use this option, because the
+                default value (100.0) should work for any real data.
+                If you ever need to increase this value for non-attack
+                payload, please report.</desc>
+              </optdef>
+              
+              <optdef>
+                <optname>-billionLaughsAttackProtectionActivationThreshold</optname>
+                <optarg>&lt;long&gt;</optarg>
+                <desc>This option together with
+                <m>-billionLaughsAttackProtectionMaximumAmplification</m>
+                gives control over the parser limits that protects
+                against billion laugh attacks
+                (<url>https://en.wikipedia.org/wiki/Billion_laughs_attack</url>).
+                This option expects a positiv integer as argument. You
+                should never need to use this option, because the
+                default value (8388608) should work for any real data.
+                If you ever need to increase this value for non-attack
+                payload, please report.</desc>
+              </optdef>
+
+          </optlist>
 <p/>
 </desc>
         </commanddef>

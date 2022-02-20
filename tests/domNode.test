@@ -51,7 +51,8 @@
 
 source [file join [file dir [info script]] loadtdom.tcl]
 
-testConstraint threaded [info exists tcl_platform(threaded)]
+testConstraint threaded [expr {[info exists tcl_platform(threaded)] 
+                               || [package vsatisfies [package present Tcl] 9.0-]}]
 
 test domNode-1.1 {too less arguments to nodecmd} {
     set doc [dom createDocument "root"]

@@ -50,6 +50,7 @@
 #include <tcldom.h>
 #include <schema.h>
 #include <versionhash.h>
+#include <float.h>
 
 /* #define DEBUG */
 /*----------------------------------------------------------------------------
@@ -1395,7 +1396,7 @@ int tcldom_xpathFuncCallBack (
 )
 {
     Tcl_Interp  *interp = (Tcl_Interp*) clientData;
-    char         tclxpathFuncName[200], objCmdName[80];
+    char         tclxpathFuncName[220], objCmdName[80];
     char         *errStr, *typeStr;
     Tcl_Obj     *resultPtr, *objv[MAX_REWRITE_ARGS], *type, *value, *nodeObj,
                 *tmpObj;
@@ -1407,7 +1408,7 @@ int tcldom_xpathFuncCallBack (
     DBG(fprintf(stderr, "tcldom_xpathFuncCallBack functionName=%s "
                 "position=%d argc=%d\n", functionName, position, argc);)
 
-    if (strlen(functionName) > 199) {
+    if (strlen(functionName) > 200) {
         *errMsg = (char*)MALLOC (80 + strlen (functionName));
         strcpy (*errMsg, "Unreasonable long XPath function name: \"");
         strcat (*errMsg, functionName);
@@ -6243,6 +6244,8 @@ int tcldom_parse (
     int          paramEntityParsing  = (int)XML_PARAM_ENTITY_PARSING_ALWAYS;
     int          keepCDATA           = 0;
     int          status              = 0;
+    double       maximumAmplification = 0.0;
+    long         activationThreshold = 0;
     domDocument *doc;
     Tcl_Obj     *newObjName = NULL;
     XML_Parser   parser;
@@ -6263,7 +6266,10 @@ int tcldom_parse (
         "-validateCmd",
 #endif
         "-jsonmaxnesting",        "-ignorexmlns",   "--",
-        "-keepCDATA",             NULL
+        "-keepCDATA",
+        "-billionLaughsAttackProtectionMaximumAmplification",
+        "-billionLaughsAttackProtectionActivationThreshold",
+        NULL
     };
     enum parseOption {
         o_keepEmpties,            o_simple,         o_html,
@@ -6277,7 +6283,9 @@ int tcldom_parse (
         o_validateCmd,
 #endif
         o_jsonmaxnesting,         o_ignorexmlns,    o_LAST,
-        o_keepCDATA
+        o_keepCDATA,
+        o_billionLaughsAttackProtectionMaximumAmplification,
+        o_billionLaughsAttackProtectionActivationThreshold
     };
 
     static const char *paramEntityParsingValues[] = {
@@ -6503,6 +6511,52 @@ int tcldom_parse (
         case o_keepCDATA:
             keepCDATA = 1;
             objv++;  objc--; continue;
+
+        case o_billionLaughsAttackProtectionMaximumAmplification:
+            objv++; objc--;
+            if (objc < 2) {
+                SetResult("The \"dom parse\" option \""
+                          "-billionLaughsAttackProtectionMaximumAmplification"
+                          "\" requires a float >= 1.0 as argument.");
+                return TCL_ERROR;
+            }
+            if (Tcl_GetDoubleFromObj (interp, objv[1], &maximumAmplification)
+                != TCL_OK) {
+                SetResult("The \"dom parse\" option \""
+                          "-billionLaughsAttackProtectionMaximumAmplification"
+                          "\" requires a float >= 1.0 as argument.");
+                return TCL_ERROR;
+            }
+            if (maximumAmplification > FLT_MAX || maximumAmplification < 1.0) {
+                SetResult("The \"dom parse\" option \""
+                          "-billionLaughsAttackProtectionMaximumAmplification"
+                          "\" requires a float >= 1.0 as argument.");
+                return TCL_ERROR;
+            }
+            objv++;  objc--; continue;
+
+        case o_billionLaughsAttackProtectionActivationThreshold:
+            objv++; objc--;
+            if (objc < 2) {
+                SetResult("The \"dom parse\" option \""
+                          "-billionLaughsAttackProtectionActivationThreshold"
+                          "\" requires a long > 0 as argument.");
+                return TCL_ERROR;
+            }
+            if (Tcl_GetLongFromObj (interp, objv[1], &activationThreshold)
+                != TCL_OK) {
+                SetResult("The \"dom parse\" option \""
+                          "-billionLaughsAttackProtectionActivationThreshold"
+                          "\" requires a long > 0 as argument.");
+                return TCL_ERROR;
+            }
+            if (activationThreshold < 1) {
+                SetResult("The \"dom parse\" option \""
+                          "-billionLaughsAttackProtectionActivationThreshold"
+                          "\" requires a long > 0 as argument.");
+                return TCL_ERROR;
+            }
+            objv++;  objc--; continue;
             
 #ifndef TDOM_NO_SCHEMA
         case o_validateCmd:
@@ -6673,14 +6727,38 @@ int tcldom_parse (
     parser = XML_ParserCreate_MM(NULL, MEM_SUITE, NULL);
 #ifndef TDOM_NO_SCHEMA
     if (sdata) {
+        if (sdata->validationState != VALIDATION_READY) {
+            XML_ParserFree(parser);
+            SetResult ("The configured schema command is busy");
+            return TCL_ERROR;
+        }
         sdata->inuse++;
         sdata->parser = parser;
-        if (sdata->validationState != VALIDATION_READY) {
-            SetResult ("The configured schema command is busy");
+    }
+#endif
+#ifdef XML_DTD
+    if (maximumAmplification >= 1.0f) {
+        if (XML_SetBillionLaughsAttackProtectionMaximumAmplification (
+                parser, maximumAmplification) == XML_FALSE) {
+            SetResult("The \"dom parse\" option \""
+                      "-billionLaughsAttackProtectionMaximumAmplification"
+                      "\" requires a float >= 1.0 as argument.");
+            XML_ParserFree(parser);
+            return TCL_ERROR;
+        }
+    }
+    if (activationThreshold > 0) {
+        if (XML_SetBillionLaughsAttackProtectionActivationThreshold (
+                parser, activationThreshold) == XML_FALSE) {
+            XML_ParserFree(parser);
+            SetResult("The \"dom parse\" option \""
+                      "-billionLaughsAttackProtectionActivationThreshold"
+                      "\" requires a long > 0 as argument.");
             return TCL_ERROR;
         }
     }
 #endif
+
     Tcl_ResetResult(interp);
     doc = domReadDocument(parser, xml_string,
                           xml_string_len,

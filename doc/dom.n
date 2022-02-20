@@ -286,8 +286,8 @@ allow.
 .IP "\fB-jsonroot <document element name>\fR"
 If given makes the given element name the
 document element of the resulting doc. The parsed
-content of the JSON string will be the childs of this
-document element node.
+content of the JSON string will be the children of
+this document element node.
 .IP "\fB-jsonmaxnesting  \fIinteger\fP\fR"
 This option only has effect if used together
 with the \fI-json\fR option. The current
@@ -420,6 +420,34 @@ described in the documentation of the of the
 \&\fBdomNode
 \&\fR command method
 \&\fB>selectNodes\fP.
+.IP "\fB-billionLaughsAttackProtectionMaximumAmplification  \fI<float>\fP\fR"
+.UR "https://en.wikipedia.org/wiki/Billion_laughs_attack"
+<URL: https://en.wikipedia.org/wiki/Billion_laughs_attack>
+.UE
+This option together with
+\&\fI-billionLaughsAttackProtectionActivationThreshold\fR
+gives control over the parser limits that protects
+against billion laugh attacks
+().
+This option expects a float >= 1.0 as argument. You
+should never need to use this option, because the
+default value (100.0) should work for any real data.
+If you ever need to increase this value for non-attack
+payload, please report.
+.IP "\fB-billionLaughsAttackProtectionActivationThreshold  \fI<long>\fP\fR"
+.UR "https://en.wikipedia.org/wiki/Billion_laughs_attack"
+<URL: https://en.wikipedia.org/wiki/Billion_laughs_attack>
+.UE
+This option together with
+\&\fI-billionLaughsAttackProtectionMaximumAmplification\fR
+gives control over the parser limits that protects
+against billion laugh attacks
+().
+This option expects a positiv integer as argument. You
+should never need to use this option, because the
+default value (8388608) should work for any real data.
+If you ever need to increase this value for non-attack
+payload, please report.
 .PP
 .RE
 .TP

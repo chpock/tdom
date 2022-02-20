@@ -729,6 +729,34 @@ default is restored, after resetting the parser. Pleace notice, that a
 to the -externalentitycommand script. Pleace notice, that, if the document also
 doesn't have an internal subset, the -startdoctypedeclcommand and
 enddoctypedeclcommand scripts, if set, are not called.
+.IP "\fB-billionLaughsAttackProtectionMaximumAmplification  \fI<float>\fP\fR"
+.UR "https://en.wikipedia.org/wiki/Billion_laughs_attack"
+<URL: https://en.wikipedia.org/wiki/Billion_laughs_attack>
+.UE
+This option together with
+\&\fI-billionLaughsAttackProtectionActivationThreshold\fR
+gives control over the parser limits that protects
+against billion laugh attacks
+().
+This option expects a float >= 1.0 as argument. You
+should never need to use this option, because the
+default value (100.0) should work for any real data.
+If you ever need to increase this value for non-attack
+payload, please report.
+.IP "\fB-billionLaughsAttackProtectionActivationThreshold  \fI<long>\fP\fR"
+.UR "https://en.wikipedia.org/wiki/Billion_laughs_attack"
+<URL: https://en.wikipedia.org/wiki/Billion_laughs_attack>
+.UE
+This option together with
+\&\fI-billionLaughsAttackProtectionMaximumAmplification\fR
+gives control over the parser limits that protects
+against billion laugh attacks
+().
+This option expects a positiv integer as argument. You
+should never need to use this option, because the
+default value (8388608) should work for any real data.
+If you ever need to increase this value for non-attack
+payload, please report.
 .SH " COMMAND METHODS "
 .TP
 \&\fB\fBparser\fP \fBconfigure\fP \fIoption value ?option value?\fB

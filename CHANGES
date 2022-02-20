@@ -1,4 +1,20 @@
 
+2022-02-19  Rolf Ade  <rolf@pointsman.de>
+
+        Added the options
+        -billionLaughsAttackProtectionMaximumAmplification and
+        -billionLaughsAttackProtectionActivationThreshold to dom parse
+        and the by the xml::parser/expat command created parser
+        commands.
+            
+2022-02-14  Rolf Ade  <rolf@pointsman.de>
+
+        Updated to expat 2.4.4.
+
+2021-06-02  Rolf Ade  <rolf@pointsman.de>
+
+        Updated to expat 2.3.0.
+
 2021-01-22  Rolf Ade  <rolf@pointsman.de>
 
         Pull-parser command find-element enhanced - skip forward

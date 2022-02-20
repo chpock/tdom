@@ -309,11 +309,34 @@ test parser-1.23 {Unknown option flag} {
 test parser-1.24 {Missing option argument} {
     catch {rename xml::parser-1.24 {}}
     catch {
-        set parser [xml::parser parser-1.23 \
+        set parser [xml::parser parser-1.24 \
                         -elementstartcommand]
                         
     }
 } 1
+
+test parser-1.25 {billion laughs attact proctection options} {
+    catch {xml::parser-1.25 delete}
+    xml::parser xml::parser-1.25
+    foreach {option value} {
+        -billionLaughsAttackProtectionMaximumAmplification foo
+        -billionLaughsAttackProtectionMaximumAmplification 0
+        -billionLaughsAttackProtectionMaximumAmplification -2.0
+        -billionLaughsAttackProtectionMaximumAmplification 23
+        -billionLaughsAttackProtectionActivationThreshold bar
+        -billionLaughsAttackProtectionActivationThreshold 0
+        -billionLaughsAttackProtectionActivationThreshold -7
+        -billionLaughsAttackProtectionActivationThreshold 20000000000
+    } {
+        lappend result [catch {
+            xml::parser-1.25 configure $option $value
+        }]
+    }
+    xml::parser-1.25 delete
+    set result
+} {1 1 1 0 1 1 1 0}
+    
+
 
 # Test break return code from callback
 
