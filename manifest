@@ -1,5 +1,5 @@
-C Added\sthe\soptions\s-billionLaughsAttackProtectionMaximumAmplification\sand\s-billionLaughsAttackProtectionActivationThreshold\sto\sdom\sparse\sand\sthe\sby\sthe\sxml::parser/expat\scommand\screated\sparser\scommands.
-D 2022-02-19T00:55:44.063
+C Fixed\stypo.
+D 2022-02-26T16:06:59.318
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -41,7 +41,7 @@ F doc/pullparser.n 45c9bc45edf706595a130aa2afcf9890a80fe64eb492df6e88514ab8e3162
 F doc/pullparser.xml 4060ebb3744090b95e9e93551c23d8b5213ed58a7ad1fce2437fef617f3ba528
 F doc/schema.html 8d2bbd2ef64a6a27031408fc4893d43bcc169335843af250f3e6f7eac704543a
 F doc/schema.n 8028ed4371c2cb683bf8642596f7e1ff59883855dfddf9a21a4f1f15816fd0be
-F doc/schema.xml 4208102a23ee6fde36fab80808203edf287b845404a5942dd75cfbe587af5f97
+F doc/schema.xml 20b97a023e8f383a9c8ecebf4c3da4c6489d77218f281d568b03f5d3977fb2e7
 F doc/tDOM.xml 04db7d0ccfea39aae21f4fe07b8f05d5bff8a84193cfce2aa5faa2f42c076377
 F doc/tdomcmd.html 3f96630823dbeff586dd3fb7e5cc6214a40f0219e2ba37e6986353cbcfc7d665
 F doc/tdomcmd.n c06a5ff035f16a2a52636b69d9ebe6ba84ff5101922ed27b551146c4d61d6cda
@@ -237,8 +237,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 9eb49501a25f7ade3a9518fb3732c6a50d222722655df3e8267880cb91ec9d47
-R 8f4f19f68fd49b88981f4a7cb0b668d4
+P c51c2869289c094cc809af9e173cf670d6037b00f76f381202e65aca3fc240d9
+R 6815185c8c0bafd396e798387abb2356
 U rolf
-Z afa1438713937a70646ac654e5ebe58c
+Z 0ee1e7a6ce9eee73164c55d47fd2bada
 # Remove this line to create a well-formed Fossil manifest.

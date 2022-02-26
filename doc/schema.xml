@@ -1238,7 +1238,7 @@ s define {
       <p>With a <m>reportcmd</m> (as long as the <m>reportcmd</m> does
       not throw error while called) the validation engine will never
       report validation failure to its caller. The validation engine
-      recovers, continues, and reports the next error (if occurrin)g
+      recovers, continues, and reports the next error (if occurring)
       and so on until the end of the input. The schema command will
       return true and the SAX parser and DOM builder will process
       normally until the end of the input, as if there had not been a
