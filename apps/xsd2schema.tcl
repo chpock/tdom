@@ -15,7 +15,7 @@ namespace eval xsd {
     variable targetNS
     variable schema
     variable output "collect"
-    variable unsupportedFeaturesSeen
+    variable nrLookAt 0
     variable xsd2schemaName [dict create {*}{
         base64Binary base64
         decimal number
@@ -115,6 +115,7 @@ rproc xsd::sputc {text} {
 }
 
 rproc xsd::sputce {text} {
+    incr ::xsd::nrLookAt
     foreach line [split $text "\n"] {
         append result "[indent]# LOOK_AT $line\n"
     }
@@ -479,7 +480,13 @@ rproc xsd::restriction {node} {
 
     set savedCurrentBase $currentBase
     set currentBase [$node @base $currentBase]
-    lassign [resolveFQ $currentBase $node] typens type
+    if {[string first : $currentBase] > -1} {
+        lassign [split $currentBase :] prefix type
+    } else {
+        set prefix ""
+        set type $currentBase
+    }
+    set typens [nsfromprefix $node $prefix]
     set context [[$node parentNode] localName] 
     switch $context {
         "simpleContent" -
@@ -770,10 +777,10 @@ rproc xsd::elementWorker {node} {
         # First check, if the type name is full qualified
         if {[string first : $type] > -1} {
             lassign [split $type :] prefix type
-            set thisns [nsfromprefix $node $prefix]
         } else {
-            set thisns $targetNS
+            set prefix ""
         }
+        set thisns [nsfromprefix $node $prefix]
         # Check for text only element with basic data type
         if {$thisns eq "http://www.w3.org/2001/XMLSchema"} {
             set texttypecode [mapXsdTypeToSchema $type]
@@ -998,7 +1005,13 @@ rproc xsd::extension {node} {
     
     set savedCurrentBase $currentBase
     set currentBase [$node @base $currentBase]
-    lassign [resolveFQ $currentBase $node] typens type
+    if {[string first : $currentBase] > -1} {
+        lassign [split $currentBase :] prefix type
+    } else {
+        set type $currentBase
+        set prefix ""
+    }
+    set typens [nsfromprefix $node $prefix]
     set context [[$node parentNode] localName] 
     switch $context {
         "simpleContent" {
@@ -1308,6 +1321,7 @@ proc xsd::generateSchema {file} {
     variable redefining 0
     variable schemadocs ""
     variable attgroupStack ""
+    variable nrLookAt 0
     
     set basedir [file dirname [file normalize [lindex $file 0]]]
     set xsddoc [dom parse [xmlReadFile [lindex $file 0]]]
