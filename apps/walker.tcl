@@ -19,7 +19,7 @@ source xsd2schema.tcl
 
 set schemaFileCounter 0
 set schemaErrorConversion 0
-
+set lookAtCounter 0
 proc worker {xsddoc path xmlfiles} {
     
     # if {[$doc selectNodes {count(//xsd:simpleContent/xsd:restriction[xsd:attribute])}]} {
@@ -45,7 +45,7 @@ proc walktestSet {file} {
     $set selectNodesNamespaces {
         ts "http://www.w3.org/XML/2004/xml-schema-test-suite/"
     }
-    foreach testGroup [$set selectNodes $query(validxsd)] {
+    foreach testGroup [$set selectNodes $query(invalidxml)] {
         set xsdfile [file normalize \
                          [file join $base [$testGroup selectNodes {
                              string(ts:schemaTest/ts:schemaDocument/@xlink:href)
@@ -53,6 +53,7 @@ proc walktestSet {file} {
         tdom::schema s
         if {[catch {
             s define [xsd::generateSchema $xsdfile]
+            incr ::lookAtCounter $xsd::nrLookAt
         } errMsg]} {
             incr ::schemaErrorConversion 
             puts $::schemaFileCounter
@@ -91,4 +92,5 @@ proc walksuite {file} {
 
 walksuite [lindex $argv 0]
 puts "# of looked at xsd files: $schemaFileCounter"
-puts "# of errors in conversion:: $schemaErrorConversion"
+puts "# of errors in conversion: $schemaErrorConversion"
+puts "# of look ats $lookAtCounter"

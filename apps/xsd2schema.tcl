@@ -5,6 +5,10 @@
 # evaluated within the xsd namespace.
 
 package require tdom
+if {[info commands ::tdom::xmlReadFile] == ""} {
+    # tcldomsh without the script library. Source the lib.
+    source [file join [file dir [info script]] ../lib tdom.tcl]
+}
 namespace import tdom::*
 
 namespace eval xsd {
