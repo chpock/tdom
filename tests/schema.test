@@ -5911,6 +5911,58 @@ test schema-14.40 {text: unsignedLong} {
     set result
 } {0 1 1 0 0 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0}
 
+
+test schema-14.37.1 {text: byte} {
+    tdom::schema s
+    s defelement doc {
+        text {byte}
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc>7</doc>
+        <doc>+127</doc>
+        <doc>-128</doc>
+        <doc>-129</doc>
+        <doc>-0002</doc>
+        <doc>128</doc>
+        {<doc> 34</doc>}
+        <doc>0</doc>
+        {<doc>101 </doc>}
+        <doc>a</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 1 1 0 1 0 0 1 0 0}
+
+test schema-14.38.1 {text: short} {
+    tdom::schema s
+    s defelement doc {
+        text {short}
+    }
+    set result [list]
+    foreach xml {
+        <doc/>
+        <doc>7</doc>
+        <doc>+255</doc>
+        <doc>-255</doc>
+        <doc>-000255</doc>
+        <doc>256</doc>
+        <doc>32767</doc>
+        <doc>32768</doc>
+        <doc>-32768</doc>
+        <doc>-32769</doc>
+        <doc>-0</doc>
+        <doc>-b</doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 1 1 1 1 1 0 1 0 1 0}
+
 test schema-14.41 {text constrains commands outside text constraint} {8.5} {
     set cmds [info command tdom::schema::text::*]
     set result {}

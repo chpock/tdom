@@ -8349,6 +8349,75 @@ unsignedIntTypesTCObjCmd (
     return TCL_OK;
 }
 
+static int
+intTypesImpl (
+    Tcl_Interp *interp,
+    void *constraintData,
+    char *text
+    )
+{
+    char *c;
+    int count = 0;
+    int nrDigits[] = {3, 5, 10, 20};
+    char *compare;
+    char *max[] = {
+        "127",
+        "32767",
+        "2147483647",
+        "9223372036854775807"
+    };
+    char *min[] = {
+        "128",
+        "32768",
+        "2147483648",
+        "9223372036854775808"
+    };
+
+    if (*text == '-') {
+        compare = min[(intptr_t) constraintData];
+    } else {
+        compare = max[(intptr_t) constraintData];
+    }
+    if (*text == '+' || *text == '-') text++;
+    if (*text == 0) return 0;
+    if (*text == '0') {
+        text++;
+        while (*text == '0') text++;
+        if (*text == 0) return 1;
+    }
+    c = text;
+    while (*text) {
+        if (*text >= '0' && *text <= '9') {
+            text++;
+            count++;
+        } else return 0;
+    }
+    if (count < nrDigits[(intptr_t) constraintData]) return 1;
+    if (count == nrDigits[(intptr_t) constraintData]) {
+        if (strcmp (compare, c) >= 0) return 1;
+    }
+    return 0;
+}
+
+static int
+intTypesTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+
+    CHECK_TI
+    checkNrArgs (1,1,"No arguments expected");
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = intTypesImpl;
+    sc->constraintData = clientData;
+    return TCL_OK;
+}
+
 static void
 setvarImplFree (
     void *constraintData
@@ -8976,6 +9045,14 @@ tDOM_SchemaInit (
                           unsignedIntTypesTCObjCmd, (ClientData) 2, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::unsignedLong",
                           unsignedIntTypesTCObjCmd, (ClientData) 3, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::byte",
+                          intTypesTCObjCmd, (ClientData) 0, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::short",
+                          intTypesTCObjCmd, (ClientData) 1, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::int",
+                          intTypesTCObjCmd, (ClientData) 2, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::long",
+                          intTypesTCObjCmd, (ClientData) 3, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::setvar",
                           setvarTCObjCmd, (ClientData) 3, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::whitespace",
