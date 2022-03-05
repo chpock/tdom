@@ -1031,6 +1031,31 @@ zeros.
 xsd:unsignedLong. This is an integer between 0 and
 18446744073709551615, both included, optionally preceded by a
 + sign and leading zeros.
+.TP
+\&\fB\fBbyte\fP
+\&\fRThis text constraint matches if the text value
+is a xsd:byte. This is an integer between -128 and
+127, both included, optionally preceded by a + or a -
+sign and leading zeros.
+.TP
+\&\fB\fBshort\fP
+\&\fRThis text constraint matches if the text value is a
+xsd:short. This is an integer between -32768 and 32767,
+both included, optionally preceded by a + or a - sign and leading
+zeros.
+.TP
+\&\fB\fBint\fP
+\&\fRThis text constraint matches if the text value
+is a xsd:int. This is an integer between -2147483648
+and 2147483647, both included, optionally preceded by
+a + or a - sign and leading zeros.
+.TP
+\&\fB\fBlong\fP
+\&\fRThis text constraint matches if the text value
+is a xsd:long. This is an integer between
+-9223372036854775808 and 9223372036854775807, both
+included, optionally preceded by a + or a - sign and
+leading zeros.
 .SS "Logical constructs"
 .TP
 \&\fB\fBoneOf\fP \fI<constraint script>\fB
@@ -1211,7 +1236,7 @@ the script result of the reportcmd.
 With a \fIreportcmd\fR (as long as the \fIreportcmd\fR does
 not throw error while called) the validation engine will never
 report validation failure to its caller. The validation engine
-recovers, continues, and reports the next error (if occurrin)g
+recovers, continues, and reports the next error (if occurring)
 and so on until the end of the input. The schema command will
 return true and the SAX parser and DOM builder will process
 normally until the end of the input, as if there had not been a
