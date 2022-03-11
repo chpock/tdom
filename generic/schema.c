@@ -132,6 +132,8 @@ typedef struct
     int            onlyWhiteSpace;
     char          *uri;
     int            maxUriLen;
+    Tcl_Obj       *baseuriObj;
+    Tcl_Obj       *externalentitycommandObj;
 } ValidateMethodData;
 
 typedef enum {
@@ -3089,35 +3091,79 @@ characterDataHandler (
 }
 
 static int
-validateString (
-    Tcl_Interp *interp,
+externalEntityRefHandler (
+    XML_Parser  parser,
+    const char *openEntityNames,
+    const char *base,
+    const char *systemId,
+    const char *publicId
+)
+{
+    return 1;
+}
+
+static int validateOptions (
     SchemaData *sdata,
-    char *xmlstr,
-    int len
+    ValidateMethodData *vdata,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
     )
 {
     XML_Parser parser;
     char sep = '\xFF';
-    ValidateMethodData vdata;
     Tcl_DString cdata;
     Tcl_Obj *resultObj;
     char sl[50], sc[50];
-    int result;
+    char *xmlstr, *filename;
+    int result, len, fd;
+    Tcl_DString translatedFilename;
+    int optionIndex;
+    
+    static const char *validateOptions[] = {
+        "-baseurl", "--externalentitycommand", NULL
+    };
+    enum validateOption {
+        o_baseurl, o_externalentitycommand
+    };
+
+    while (objc > 2) {
+        if (Tcl_GetIndexFromObj (interp, objv[0], validateOptions,
+                                 "option", 0, &optionIndex) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        switch ((enum validateOption) optionIndex) {
+        case o_baseurl:
+            vdata->baseuriObj = objv[1];
+            Tcl_IncrRefCount (objv[1]);
+            break;
+        case o_externalentitycommand:
+            vdata->externalentitycommandObj = objv[1];
+            Tcl_IncrRefCount (objv[1]);
+            break;
+        }
+        objc -= 2;
+        objv += 2;
+    }
 
     parser = XML_ParserCreate_MM (NULL, MEM_SUITE, &sep);
-    vdata.interp = interp;
-    vdata.sdata = sdata;
-    vdata.parser = parser;
+    vdata->interp = interp;
+    vdata->sdata = sdata;
+    vdata->parser = parser;
     sdata->parser = parser;
     Tcl_DStringInit (&cdata);
-    vdata.cdata = &cdata;
-    vdata.onlyWhiteSpace = 1;
-    vdata.uri = (char *) MALLOC (URI_BUFFER_LEN_INIT);
-    vdata.maxUriLen = URI_BUFFER_LEN_INIT;
-    XML_SetUserData (parser, &vdata);
+    vdata->cdata = &cdata;
+    vdata->onlyWhiteSpace = 1;
+    vdata->uri = (char *) MALLOC (URI_BUFFER_LEN_INIT);
+    vdata->maxUriLen = URI_BUFFER_LEN_INIT;
+    XML_SetUserData (parser, vdata);
     XML_SetElementHandler (parser, startElement, endElement);
     XML_SetCharacterDataHandler (parser, characterDataHandler);
+    if (vdata->externalentitycommandObj) {
+        XML_SetExternalEntityRefHandler (parser, externalEntityRefHandler);
+    }
 
+    xmlstr = Tcl_GetStringFromObj (objv[0], &len);
     if (XML_Parse (parser, xmlstr, len, 1) != XML_STATUS_OK
         || sdata->validationState == VALIDATION_ERROR) {
         resultObj = Tcl_NewObj ();
@@ -3137,10 +3183,23 @@ validateString (
     } else {
         result = TCL_OK;
     }
-    sdata->parser = NULL;
-    XML_ParserFree (parser);
-    Tcl_DStringFree (&cdata);
-    FREE (vdata.uri);
+    if (sdata->evalError) {
+        result = TCL_ERROR;
+    } else {
+        if (result == TCL_OK) {
+            SetBooleanResult (1);
+            if (objc == 2) {
+                Tcl_SetVar (interp, Tcl_GetString (objv[1]), "", 0);
+            }
+        } else {
+            if (objc == 2) {
+                Tcl_SetVar (interp, Tcl_GetString (objv[1]),
+                            Tcl_GetStringResult (interp), 0);
+            }
+            result = TCL_OK;
+            SetBooleanResult (0);
+        }
+    }
     return result;
 }
 
@@ -4675,12 +4734,13 @@ tDOM_schemaInstanceCmd (
     Tcl_HashEntry *h, *h1;
     SchemaCP      *pattern, *current = NULL;
     void          *namespacePtr, *savedNamespacePtr;
-    char          *xmlstr, *errMsg;
+    char          *errMsg;
     domDocument   *doc;
     domNode       *node;
     Tcl_Obj       *attData;
     Tcl_Channel    chan = NULL;
     SchemaCP     **typeInstances;
+    ValidateMethodData vdata;
 
     static const char *schemaInstanceMethods[] = {
         "defelement", "defpattern", "start",    "event",        "delete",
@@ -5029,30 +5089,22 @@ tDOM_schemaInstanceCmd (
     case m_validate:
         CHECK_EVAL
         if (objc < 3 || objc > 4) {
-            Tcl_WrongNumArgs (interp, 2, objv, "<xml> ?resultVarName?");
+            Tcl_WrongNumArgs (interp, 2, objv, "?-baseurl <baseurl>? "
+                              "?-externalentitycommand <cmd>? "
+                              "<xml> ?resultVarName?");
             return TCL_ERROR;
         }
         if (sdata->validationState != VALIDATION_READY) {
             SetResult ("The schema command is busy");
             return TCL_ERROR;
         }
-        xmlstr = Tcl_GetStringFromObj (objv[2], &len);
-        if (validateString (interp, sdata, xmlstr, len) == TCL_OK) {
-            SetBooleanResult (1);
-            if (objc == 4) {
-                Tcl_SetVar (interp, Tcl_GetString (objv[3]), "", 0);
-            }
-        } else {
-            if (objc == 4) {
-                Tcl_SetVar (interp, Tcl_GetString (objv[3]),
-                            Tcl_GetStringResult (interp), 0);
-            }
-            if (sdata->evalError) {
-                 result = TCL_ERROR;
-            } else {
-                SetBooleanResult (0);
-            }
+        objc -= 2;
+        objv += 2;
+        if (validateOptions(sdata, &vdata, interp, objc, objv) != TCL_OK) {
+            result = TCL_ERROR;
         }
+        /* interp result is handled by validateOptions */
+        
         schemaReset (sdata);
         break;
 
