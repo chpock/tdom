@@ -201,6 +201,12 @@ static char *ValidationErrorType2str[] = {
     "INVALID_VALUE"
 };
 
+typedef enum {
+    string,
+    file,
+    channel
+} ValidationInput;
+
 /*----------------------------------------------------------------------------
 |   Recovering related flage
 |
@@ -3127,6 +3133,7 @@ static int validateOptions (
         o_baseurl, o_externalentitycommand
     };
 
+    memset (vdata, 0, sizeof (ValidateMethodData));
     while (objc > 2) {
         if (Tcl_GetIndexFromObj (interp, objv[0], validateOptions,
                                  "option", 0, &optionIndex) != TCL_OK) {
@@ -3183,6 +3190,11 @@ static int validateOptions (
     } else {
         result = TCL_OK;
     }
+    XML_ParserFree (parser);
+    sdata->parser = NULL;
+    FREE (vdata->uri);
+    Tcl_DStringFree (&cdata);
+    
     if (sdata->evalError) {
         result = TCL_ERROR;
     } else {
