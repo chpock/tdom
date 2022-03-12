@@ -318,6 +318,7 @@ test parser-1.24 {Missing option argument} {
 test parser-1.25 {billion laughs attact proctection options} {
     catch {xml::parser-1.25 delete}
     xml::parser xml::parser-1.25
+    set result ""
     foreach {option value} {
         -billionLaughsAttackProtectionMaximumAmplification foo
         -billionLaughsAttackProtectionMaximumAmplification 0
