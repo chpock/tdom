@@ -1,5 +1,5 @@
-C Unified\soption\shandling\sof\sthe\sschema\scommand\smethos\svalidate,\svalidatefile\sand\svalidatechannel.
-D 2022-03-12T02:32:31.383
+C More\ssimplification\sand\scentralisation\sof\svalidate/validatefile/validatestring\sschema\scommand\smethod\simplementation.
+D 2022-03-12T17:07:58.699
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -143,7 +143,7 @@ F generic/domxslt.h 0cb8e327683a0ffeb2a7094add6cd82ec1ae49c7c704f20d8d6f7d6523e7
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 94e793939c9f3a35a1c82ae910d1482e2267ed920ad70abfcb3ff9d43f2a3c9f
 F generic/nodecmd.h d2201b69de9507f86e94750f0b72867ec9150795712ef18c5b5b87f35a689f75
-F generic/schema.c 8663bbf74ed8221bf90b53c8999adb715f76e2e72eefb169c0e27bd566b635d4
+F generic/schema.c b26862906c09d94ccc6d6fe18c29a4469897b2ed5e1c81073862b4fc589b1a02
 F generic/schema.h f57a01bd6afa3cfae4aca517e326ce73ea58c2ef39f1802f02b0bdbd106fa8c7
 F generic/tcldom.c b496b2ba0861b39837e417fa6136f78a97e7149d6e83e8ac95e8e4cf8bae4649
 F generic/tcldom.h 37ee136d483b683c7e3e9e94ce8284520c7998cb1340047fc540dd7701825dc6
@@ -237,8 +237,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 2c1232e0acb7cb07a6fd18e239f71621f6b346dc419d636d730a106633ec75d8
-R fdabeca3e54cab8a704e3b67b9520af4
+P f3c0bd5e9aa641a7a0fbfae92cfd8d12da93c5ee139f34f140e1e74126f752b2
+R 714aefb1f596cd1634d73c761df0ce52
 U rolf
-Z 9f78013006adace2e0b4427dd15d4215
+Z 7682bdcd7f37b68a72fb83a7d0f68aba
 # Remove this line to create a well-formed Fossil manifest.
