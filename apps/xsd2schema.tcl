@@ -420,7 +420,6 @@ proc xsd::mapXsdTypeToSchema {type} {
             return [dict get $xsd2schemaName $type]
         }
         "anyURI" -
-        "byte" -
         "double" -
         "ENTITIES" -
         "ENTITY" -
@@ -430,10 +429,7 @@ proc xsd::mapXsdTypeToSchema {type} {
         "gMonthDay" -
         "gYear" -
         "gYearMonth" -
-        "int" -
-        "long" -
         "NOTATION" -
-        "short" -
         "yearMonthDuration" {
             return "tcl ::xsd::tclxsdtypes $type"
         }
@@ -447,12 +443,15 @@ proc xsd::mapXsdTypeToSchema {type} {
             return "split nmtoken"
         }
         "boolean" -
+        "byte" -
         "date" -
         "dateTime" -
         "double" -
         "duration" -
         "hexBinary" -
+        "int" -
         "integer" -
+        "long" -
         "negativeInteger" -
         "nonNegativeInteger" -
         "nonPositiveInteger" -
@@ -461,6 +460,7 @@ proc xsd::mapXsdTypeToSchema {type} {
         "unsignedInt" -
         "unsignedLong" -
         "unsignedShort" -
+        "short" -
         "time" {
             return $type
         }

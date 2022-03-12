@@ -20,6 +20,8 @@ source xsd2schema.tcl
 set schemaFileCounter 0
 set schemaErrorConversion 0
 set lookAtCounter 0
+set wrongOK 0
+set wrongError 0
 proc worker {xsddoc path xmlfiles} {
     
     # if {[$doc selectNodes {count(//xsd:simpleContent/xsd:restriction[xsd:attribute])}]} {
@@ -66,6 +68,12 @@ proc walktestSet {file} {
         foreach instanceTest [$testGroup selectNodes {ts:intanceTest[ts:expected/@validity = 'invalid']}] {
             if {[s validatefile [file normalize [file join $base [$instanceTest selectNodes {string(ts:instanceDocument/@xlink:href)}]]]]} {
                 incr ::wrongOK
+            }
+            s reset
+        }
+        foreach instanceTest [$testGroup selectNodes {ts:intanceTest[ts:expected/@validity = 'valid']}] {
+            if {![s validatefile [file normalize [file join $base [$instanceTest selectNodes {string(ts:instanceDocument/@xlink:href)}]]]]} {
+                incr ::wrongError
             }
             s reset
         }
