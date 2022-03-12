@@ -202,9 +202,9 @@ static char *ValidationErrorType2str[] = {
 };
 
 typedef enum {
-    string,
-    file,
-    channel
+    STRING,
+    FILENAME,
+    CHANNEL
 } ValidationInput;
 
 /*----------------------------------------------------------------------------
@@ -3108,7 +3108,8 @@ externalEntityRefHandler (
     return 1;
 }
 
-static int validateOptions (
+static int validateSource (
+    ValidationInput source,
     SchemaData *sdata,
     ValidateMethodData *vdata,
     Tcl_Interp *interp,
@@ -3119,12 +3120,13 @@ static int validateOptions (
     XML_Parser parser;
     char sep = '\xFF';
     Tcl_DString cdata;
-    Tcl_Obj *resultObj;
+    Tcl_Obj *resultObj, *bufObj;
     char sl[50], sc[50];
-    char *xmlstr, *filename;
-    int result, len, fd;
+    char *xmlstr, *filename, *str;
+    int result, len, fd, mode, done, tclLen, rc;
     Tcl_DString translatedFilename;
     int optionIndex;
+    Tcl_Channel channel;
     
     static const char *validateOptions[] = {
         "-baseurl", "--externalentitycommand", NULL
@@ -3170,26 +3172,134 @@ static int validateOptions (
         XML_SetExternalEntityRefHandler (parser, externalEntityRefHandler);
     }
 
-    xmlstr = Tcl_GetStringFromObj (objv[0], &len);
-    if (XML_Parse (parser, xmlstr, len, 1) != XML_STATUS_OK
-        || sdata->validationState == VALIDATION_ERROR) {
-        resultObj = Tcl_NewObj ();
-        sprintf(sl, "%ld", XML_GetCurrentLineNumber(parser));
-        sprintf(sc, "%ld", XML_GetCurrentColumnNumber(parser));
-        if (sdata->validationState == VALIDATION_ERROR) {
-            Tcl_AppendStringsToObj (resultObj, "error \"",
-                                    Tcl_GetStringResult (interp),
-                                    "\" at line ", sl, " character ", sc, NULL);
+    switch (source) {
+    case STRING:
+        xmlstr = Tcl_GetStringFromObj (objv[0], &len);
+        if (XML_Parse (parser, xmlstr, len, 1) != XML_STATUS_OK
+            || sdata->validationState == VALIDATION_ERROR) {
+            resultObj = Tcl_NewObj ();
+            sprintf(sl, "%ld", XML_GetCurrentLineNumber(parser));
+            sprintf(sc, "%ld", XML_GetCurrentColumnNumber(parser));
+            if (sdata->validationState == VALIDATION_ERROR) {
+                Tcl_AppendStringsToObj (resultObj, "error \"",
+                                        Tcl_GetStringResult (interp),
+                                        "\" at line ", sl, " character ", sc, NULL);
+            } else {
+                Tcl_AppendStringsToObj (resultObj, "error \"",
+                                        XML_ErrorString(XML_GetErrorCode(parser)),
+                                        "\" at line ", sl, " character ", sc, NULL);
+            }
+            Tcl_SetObjResult (interp, resultObj);
+            result = TCL_ERROR;
         } else {
-            Tcl_AppendStringsToObj (resultObj, "error \"",
-                                    XML_ErrorString(XML_GetErrorCode(parser)),
-                                    "\" at line ", sl, " character ", sc, NULL);
+            result = TCL_OK;
         }
-        Tcl_SetObjResult (interp, resultObj);
-        result = TCL_ERROR;
-    } else {
+        break;
+        
+    case FILENAME:
+        filename = Tcl_TranslateFileName (interp, Tcl_GetString (objv[0]),
+                                          &translatedFilename);
+        if (filename == NULL) {
+            result = TCL_ERROR;
+            goto cleanup;
+        }
+        fd = open(filename, O_BINARY|O_RDONLY);
+        if (fd < 0) {
+            Tcl_ResetResult (interp);
+            Tcl_AppendResult (interp, "error opening file \"",
+                              filename, "\"", (char *) NULL);
+            result = TCL_ERROR;
+            goto cleanup;
+        }
+        for (;;) {
+            int nread;
+            char *fbuf = XML_GetBuffer (parser, TDOM_EXPAT_READ_SIZE);
+            if (!fbuf) {
+                close (fd);
+                Tcl_ResetResult (interp);
+                Tcl_SetResult (interp, "Out of memory\n", NULL);
+                result = TCL_ERROR;
+                goto cleanup;
+            }
+            nread = read(fd, fbuf, TDOM_EXPAT_READ_SIZE);
+            if (nread < 0) {
+                close (fd);
+                Tcl_ResetResult (interp);
+                Tcl_AppendResult (interp, "error reading from file \"",
+                                  filename, "\"", (char *) NULL);
+                result = TCL_ERROR;
+                goto cleanup;
+            }
+            result = XML_ParseBuffer (parser, nread, nread == 0);
+            if (result != XML_STATUS_OK || !nread
+                || sdata->validationState == VALIDATION_ERROR) {
+                close (fd);
+                break;
+            }
+        }
+        if (result != XML_STATUS_OK
+            || sdata->validationState == VALIDATION_ERROR) {
+            resultObj = Tcl_NewObj ();
+            sprintf(sl, "%ld", XML_GetCurrentLineNumber(parser));
+            sprintf(sc, "%ld", XML_GetCurrentColumnNumber(parser));
+            if (sdata->validationState == VALIDATION_ERROR) {
+                Tcl_AppendStringsToObj (resultObj, "error \"",
+                                        Tcl_GetStringResult (interp),
+                                        "\" at line ", sl, " character ", sc, NULL);
+            } else {
+                Tcl_AppendStringsToObj (resultObj, "error \"",
+                                        XML_ErrorString(XML_GetErrorCode(parser)),
+                                        "\" at line ", sl, " character ", sc, NULL);
+            }
+            Tcl_SetObjResult (interp, resultObj);
+            result = TCL_ERROR;
+        } else {
+            result = TCL_OK;
+        }
+    cleanup:
+        Tcl_DStringFree (&translatedFilename);
+        break;
+        
+    case CHANNEL:
+        channel = Tcl_GetChannel(interp, Tcl_GetString (objv[0]), &mode);
+        if (channel == NULL) {
+            SetResult ("The channel argument isn't a tcl channel");
+            result = TCL_ERROR;
+            break;
+        }
+        bufObj = Tcl_NewObj();
+        Tcl_SetObjLength (bufObj, 6144);
         result = TCL_OK;
+        do {
+            len = Tcl_ReadChars (channel, bufObj, 1024, 0);
+            done = (len < 1024);
+            str = Tcl_GetStringFromObj(bufObj, &tclLen);
+            rc = XML_Parse (parser, str, tclLen, done);
+            if (rc != XML_STATUS_OK 
+                || sdata->validationState == VALIDATION_ERROR) {
+                resultObj = Tcl_NewObj ();
+                sprintf(sl, "%ld", XML_GetCurrentLineNumber(parser));
+                sprintf(sc, "%ld", XML_GetCurrentColumnNumber(parser));
+                if (sdata->validationState == VALIDATION_ERROR) {
+                    Tcl_AppendStringsToObj (resultObj, "error \"",
+                                            Tcl_GetStringResult (interp),
+                                            "\" at line ", sl, " character ", sc,
+                                            NULL);
+                } else {
+                    Tcl_AppendStringsToObj (resultObj, "error \"",
+                                            XML_ErrorString(XML_GetErrorCode(parser)),
+                                            "\" at line ", sl, " character ", sc,
+                                            NULL);
+                }
+                Tcl_SetObjResult (interp, resultObj);
+                result = TCL_ERROR;
+                break;
+            }
+        } while (!done);
+        Tcl_DecrRefCount (bufObj);
+        break;
     }
+    
     XML_ParserFree (parser);
     sdata->parser = NULL;
     FREE (vdata->uri);
@@ -3212,171 +3322,6 @@ static int validateOptions (
             SetBooleanResult (0);
         }
     }
-    return result;
-}
-
-static int
-validateFile (
-    Tcl_Interp *interp,
-    SchemaData *sdata,
-    Tcl_Obj *filenameObj
-    )
-{
-    XML_Parser parser;
-    char sep = '\xFF';
-    ValidateMethodData vdata;
-    Tcl_DString cdata;
-    Tcl_Obj *resultObj;
-    char sl[50], sc[50];
-    char *filename;
-    int result, fd;
-    Tcl_DString translatedFilename;
-
-    parser = XML_ParserCreate_MM (NULL, MEM_SUITE, &sep);
-    vdata.interp = interp;
-    vdata.sdata = sdata;
-    vdata.parser = parser;
-    sdata->parser = parser;
-    Tcl_DStringInit (&cdata);
-    vdata.cdata = &cdata;
-    vdata.onlyWhiteSpace = 1;
-    vdata.uri = (char *) MALLOC (URI_BUFFER_LEN_INIT);
-    vdata.maxUriLen = URI_BUFFER_LEN_INIT;
-    XML_SetUserData (parser, &vdata);
-    XML_SetElementHandler (parser, startElement, endElement);
-    XML_SetCharacterDataHandler (parser, characterDataHandler);
-
-    filename = Tcl_TranslateFileName (interp, Tcl_GetString (filenameObj),
-                                      &translatedFilename);
-    if (filename == NULL) {
-        result = TCL_ERROR;
-        goto cleanup;
-    }
-    fd = open(filename, O_BINARY|O_RDONLY);
-    if (fd < 0) {
-        Tcl_ResetResult (interp);
-        Tcl_AppendResult (interp, "error opening file \"",
-                          filename, "\"", (char *) NULL);
-        result = TCL_ERROR;
-        goto cleanup;
-    }
-    for (;;) {
-        int nread;
-        char *fbuf = XML_GetBuffer (parser, TDOM_EXPAT_READ_SIZE);
-        if (!fbuf) {
-            close (fd);
-            Tcl_ResetResult (interp);
-            Tcl_SetResult (interp, "Out of memory\n", NULL);
-            result = TCL_ERROR;
-            goto cleanup;
-        }
-        nread = read(fd, fbuf, TDOM_EXPAT_READ_SIZE);
-        if (nread < 0) {
-            close (fd);
-            Tcl_ResetResult (interp);
-            Tcl_AppendResult (interp, "error reading from file \"",
-                              filename, "\"", (char *) NULL);
-            result = TCL_ERROR;
-            goto cleanup;
-        }
-        result = XML_ParseBuffer (parser, nread, nread == 0);
-        if (result != XML_STATUS_OK || !nread
-            || sdata->validationState == VALIDATION_ERROR) {
-            close (fd);
-            break;
-        }
-    }
-    if (result != XML_STATUS_OK
-        || sdata->validationState == VALIDATION_ERROR) {
-        resultObj = Tcl_NewObj ();
-        sprintf(sl, "%ld", XML_GetCurrentLineNumber(parser));
-        sprintf(sc, "%ld", XML_GetCurrentColumnNumber(parser));
-        if (sdata->validationState == VALIDATION_ERROR) {
-            Tcl_AppendStringsToObj (resultObj, "error \"",
-                                    Tcl_GetStringResult (interp),
-                                    "\" at line ", sl, " character ", sc, NULL);
-        } else {
-            Tcl_AppendStringsToObj (resultObj, "error \"",
-                                    XML_ErrorString(XML_GetErrorCode(parser)),
-                                    "\" at line ", sl, " character ", sc, NULL);
-        }
-        Tcl_SetObjResult (interp, resultObj);
-        result = TCL_ERROR;
-    } else {
-        Tcl_DStringFree (&translatedFilename);
-        result = TCL_OK;
-    }
-cleanup:
-    Tcl_DStringFree (&translatedFilename);
-    sdata->parser = NULL;
-    XML_ParserFree (parser);
-    Tcl_DStringFree (&cdata);
-    FREE (vdata.uri);
-    return result;
-}
-
-static int
-validateChannel (
-    Tcl_Interp *interp,
-    SchemaData *sdata,
-    Tcl_Channel channel
-    )
-{
-    XML_Parser parser;
-    char sep = '\xFF';
-    ValidateMethodData vdata;
-    Tcl_DString cdata;
-    Tcl_Obj *resultObj, *bufObj;
-    char sl[50], sc[50], *str;
-    int result = TCL_OK, len, done, tclLen, rc;
-
-    parser = XML_ParserCreate_MM (NULL, MEM_SUITE, &sep);
-    vdata.interp = interp;
-    vdata.sdata = sdata;
-    vdata.parser = parser;
-    sdata->parser = parser;
-    Tcl_DStringInit (&cdata);
-    vdata.cdata = &cdata;
-    vdata.onlyWhiteSpace = 1;
-    vdata.uri = (char *) MALLOC (URI_BUFFER_LEN_INIT);
-    vdata.maxUriLen = URI_BUFFER_LEN_INIT;
-    XML_SetUserData (parser, &vdata);
-    XML_SetElementHandler (parser, startElement, endElement);
-    XML_SetCharacterDataHandler (parser, characterDataHandler);
-
-    bufObj = Tcl_NewObj();
-    Tcl_SetObjLength (bufObj, 6144);
-    do {
-        len = Tcl_ReadChars (channel, bufObj, 1024, 0);
-        done = (len < 1024);
-        str = Tcl_GetStringFromObj(bufObj, &tclLen);
-        rc = XML_Parse (parser, str, tclLen, done);
-        if (rc != XML_STATUS_OK 
-            || sdata->validationState == VALIDATION_ERROR) {
-            resultObj = Tcl_NewObj ();
-            sprintf(sl, "%ld", XML_GetCurrentLineNumber(parser));
-            sprintf(sc, "%ld", XML_GetCurrentColumnNumber(parser));
-            if (sdata->validationState == VALIDATION_ERROR) {
-                Tcl_AppendStringsToObj (resultObj, "error \"",
-                                        Tcl_GetStringResult (interp),
-                                        "\" at line ", sl, " character ", sc,
-                                        NULL);
-            } else {
-                Tcl_AppendStringsToObj (resultObj, "error \"",
-                                        XML_ErrorString(XML_GetErrorCode(parser)),
-                                        "\" at line ", sl, " character ", sc,
-                                        NULL);
-            }
-            Tcl_SetObjResult (interp, resultObj);
-            result = TCL_ERROR;
-            break;
-        }
-    } while (!done);
-    Tcl_DecrRefCount (bufObj);
-    sdata->parser = NULL;
-    XML_ParserFree (parser);
-    Tcl_DStringFree (&cdata);
-    FREE (vdata.uri);
     return result;
 }
 
@@ -4738,7 +4683,7 @@ tDOM_schemaInstanceCmd (
     )
 {
     int            methodIndex, keywordIndex, hnew, patternIndex;
-    int            result = TCL_OK, forwardDef = 0, i = 0, j, mode;
+    int            result = TCL_OK, forwardDef = 0, i = 0, j;
     int            savedDefineToplevel, type, len, n;
     unsigned int   savedNumPatternList, nrTypeInstances, typeInstancesLen;
     SchemaData    *savedsdata = NULL, *sdata = (SchemaData *) clientData;
@@ -4750,7 +4695,6 @@ tDOM_schemaInstanceCmd (
     domDocument   *doc;
     domNode       *node;
     Tcl_Obj       *attData;
-    Tcl_Channel    chan = NULL;
     SchemaCP     **typeInstances;
     ValidateMethodData vdata;
 
@@ -5100,7 +5044,7 @@ tDOM_schemaInstanceCmd (
 
     case m_validate:
         CHECK_EVAL
-        if (objc < 3 || objc > 4) {
+        if (objc < 3) {
             Tcl_WrongNumArgs (interp, 2, objv, "?-baseurl <baseurl>? "
                               "?-externalentitycommand <cmd>? "
                               "<xml> ?resultVarName?");
@@ -5112,17 +5056,16 @@ tDOM_schemaInstanceCmd (
         }
         objc -= 2;
         objv += 2;
-        if (validateOptions(sdata, &vdata, interp, objc, objv) != TCL_OK) {
+        if (validateSource (STRING, sdata, &vdata, interp, objc, objv)
+            != TCL_OK) {
             result = TCL_ERROR;
         }
-        /* interp result is handled by validateOptions */
-        
         schemaReset (sdata);
         break;
 
     case m_validatefile:
         CHECK_EVAL
-        if (objc < 3 || objc > 4) {
+        if (objc < 3) {
             Tcl_WrongNumArgs (interp, 2, objv, "<filename> ?resultVarName?");
             return TCL_ERROR;
         }
@@ -5130,28 +5073,18 @@ tDOM_schemaInstanceCmd (
             SetResult ("The schema command is busy");
             return TCL_ERROR;
         }
-        if (validateFile (interp, sdata, objv[2]) == TCL_OK) {
-            SetBooleanResult (1);
-            if (objc == 4) {
-                Tcl_SetVar (interp, Tcl_GetString (objv[3]), "", 0);
-            }
-        } else {
-            if (objc == 4) {
-                Tcl_SetVar (interp, Tcl_GetString (objv[3]),
-                            Tcl_GetStringResult (interp), 0);
-            }
-            if (sdata->evalError) {
-                 result = TCL_ERROR;
-            } else {
-                SetBooleanResult (0);
-            }
+        objc -= 2;
+        objv += 2;
+        if (validateSource (FILENAME, sdata, &vdata, interp, objc, objv)
+            != TCL_OK) {
+            result = TCL_ERROR;
         }
         schemaReset (sdata);
         break;
 
     case m_validatechannel:
         CHECK_EVAL
-        if (objc < 3 || objc > 4) {
+        if (objc < 3) {
             Tcl_WrongNumArgs (interp, 2, objv, "<channel> ?resultVarName?");
             return TCL_ERROR;
         }
@@ -5159,26 +5092,11 @@ tDOM_schemaInstanceCmd (
             SetResult ("The schema command is busy");
             return TCL_ERROR;
         }
-        chan = Tcl_GetChannel(interp, Tcl_GetString (objv[2]), &mode);
-        if (chan == NULL) {
-            SetResult ("The channel argument isn't a tcl channel");
-            return TCL_ERROR;
-        }
-        if (validateChannel (interp, sdata, chan) == TCL_OK) {
-            SetBooleanResult (1);
-            if (objc == 4) {
-                Tcl_SetVar (interp, Tcl_GetString (objv[3]), "", 0);
-            }
-        } else {
-            if (objc == 4) {
-                Tcl_SetVar (interp, Tcl_GetString (objv[3]),
-                            Tcl_GetStringResult (interp), 0);
-            }
-            if (sdata->evalError) {
-                 result = TCL_ERROR;
-            } else {
-                SetBooleanResult (0);
-            }
+        objc -= 2;
+        objv += 2;
+        if (validateSource (CHANNEL, sdata, &vdata, interp, objc, objv)
+            != TCL_OK) {
+            result = TCL_ERROR;
         }
         schemaReset (sdata);
         break;
