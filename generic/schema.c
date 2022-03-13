@@ -3096,18 +3096,6 @@ characterDataHandler (
     Tcl_DStringAppend (vdata->cdata, s, len);
 }
 
-static int
-externalEntityRefHandler (
-    XML_Parser  parser,
-    const char *openEntityNames,
-    const char *base,
-    const char *systemId,
-    const char *publicId
-)
-{
-    return 1;
-}
-
 static void
 schemaxpathRSFree (
     xpathResultSet *rs
@@ -4469,6 +4457,253 @@ static void validateReportError (
     Tcl_SetObjResult (interp, resultObj);
 }
     
+static int
+externalEntityRefHandler (
+    XML_Parser  parser,
+    const char *openEntityNames,
+    const char *base,
+    const char *systemId,
+    const char *publicId
+)
+{
+    ValidateMethodData *vdata;
+    Tcl_Obj *cmdPtr, *resultObj, *resultTypeObj, *extbaseObj, *xmlstringObj;
+    Tcl_Obj *channelIdObj;
+    int result, mode, done, byteIndex, i;
+    int keepresult = 0;
+    size_t len;
+    int tclLen;
+    XML_Parser extparser, oldparser = NULL;
+    char buf[4096], *resultType, *extbase, *xmlstring, *channelId, s[50];
+    Tcl_Channel chan = (Tcl_Channel) NULL;
+    enum XML_Status status;
+    const char *interpResult;
+    
+    vdata = (ValidateMethodData *) XML_GetUserData (parser);
+    if (vdata->externalentitycommandObj == NULL) {
+        Tcl_AppendResult (vdata->interp, "Can't read external entity \"",
+                          systemId, "\": No -externalentitycommand given",
+                          NULL);
+        return 0;
+    }
+
+    cmdPtr = Tcl_NewStringObj(Tcl_GetString(vdata->externalentitycommandObj), -1);
+    Tcl_IncrRefCount(cmdPtr);
+
+    if (base) {
+        Tcl_ListObjAppendElement(vdata->interp, cmdPtr,
+                                 Tcl_NewStringObj(base, strlen(base)));
+    } else {
+        Tcl_ListObjAppendElement(vdata->interp, cmdPtr,
+                                 Tcl_NewObj());
+    }
+
+    /* For a document with doctype declaration, the systemId is always
+       != NULL. But if the document doesn't have a doctype declaration
+       and the user uses -useForeignDTD 1, the externalEntityRefHandler
+       will be called with a systemId (and publicId and openEntityNames)
+       == NULL. */
+    if (systemId) {
+        Tcl_ListObjAppendElement(vdata->interp, cmdPtr,
+                                 Tcl_NewStringObj(systemId, strlen(systemId)));
+    } else {
+        Tcl_ListObjAppendElement(vdata->interp, cmdPtr,
+                                 Tcl_NewObj());
+    }
+
+    if (publicId) {
+        Tcl_ListObjAppendElement(vdata->interp, cmdPtr,
+                                 Tcl_NewStringObj(publicId, strlen(publicId)));
+    } else {
+        Tcl_ListObjAppendElement(vdata->interp, cmdPtr,
+                                 Tcl_NewObj());
+    }
+
+ 
+    result = Tcl_EvalObjEx (vdata->interp, cmdPtr, 
+                            TCL_EVAL_DIRECT | TCL_EVAL_GLOBAL);
+
+    Tcl_DecrRefCount(cmdPtr);
+
+    if (result != TCL_OK) {
+        vdata->sdata->evalError = 1;
+        return 0;
+    }
+
+    extparser = XML_ExternalEntityParserCreate (parser, openEntityNames, 0);
+
+    resultObj = Tcl_GetObjResult (vdata->interp);
+    Tcl_IncrRefCount (resultObj);
+
+    result = Tcl_ListObjLength (vdata->interp, resultObj, &tclLen);
+    if ((result != TCL_OK) || (tclLen != 3)) {
+        goto wrongScriptResult;
+    }
+    result = Tcl_ListObjIndex (vdata->interp, resultObj, 0, &resultTypeObj);
+    if (result != TCL_OK) {
+        goto wrongScriptResult;
+    }
+    resultType = Tcl_GetString(resultTypeObj);
+
+    if (strcmp (resultType, "string") == 0) {
+        result = Tcl_ListObjIndex (vdata->interp, resultObj, 2, &xmlstringObj);
+        xmlstring = Tcl_GetString(xmlstringObj);
+        len = strlen (xmlstring);
+        chan = NULL;
+    } else if (strcmp (resultType, "channel") == 0) {
+        xmlstring = NULL;
+        len = 0;
+        result = Tcl_ListObjIndex (vdata->interp, resultObj, 2, &channelIdObj);
+        channelId = Tcl_GetString(channelIdObj);
+        chan = Tcl_GetChannel (vdata->interp, channelId, &mode);
+        if (chan == (Tcl_Channel) NULL) {
+            goto wrongScriptResult;
+        }
+        if ((mode & TCL_READABLE) == 0) {
+            return 0;
+        }
+    } else if (strcmp (resultType, "filename") == 0) {
+        /* result type "filename" not yet implemented */
+        return 0;
+    } else {
+        goto wrongScriptResult;
+    }
+
+    result = Tcl_ListObjIndex (vdata->interp, resultObj, 1, &extbaseObj);
+    if (result != TCL_OK) {
+        goto wrongScriptResult;
+    }
+    extbase = Tcl_GetString(extbaseObj);
+
+    /* TODO: what to do, if this document was already parsed before ? */
+
+    if (!extparser) {
+        Tcl_DecrRefCount (resultObj);
+        Tcl_SetResult (vdata->interp,
+                       "unable to create expat external entity parser",
+                       NULL);
+        return 0;
+    }
+
+    oldparser = vdata->parser;
+    vdata->parser = extparser;
+    XML_SetBase (extparser, extbase);
+
+    Tcl_ResetResult (vdata->interp);
+    result = 1;
+    if (chan == NULL) {
+        status = XML_Parse(extparser, xmlstring, strlen (xmlstring), 1);
+        switch (status) {
+        case XML_STATUS_ERROR:
+            interpResult = Tcl_GetStringResult(vdata->interp);
+            sprintf(s, "%ld", XML_GetCurrentLineNumber(extparser));
+            if (interpResult[0] == '\0') {
+                Tcl_ResetResult (vdata->interp);
+                Tcl_AppendResult(vdata->interp, "error \"",
+                                 XML_ErrorString(XML_GetErrorCode(extparser)),
+                                 "\" in entity \"", systemId,
+                                 "\" at line ", s, " character ", NULL);
+                sprintf(s, "%ld", XML_GetCurrentColumnNumber(extparser));
+                Tcl_AppendResult(vdata->interp, s, NULL);
+                byteIndex = XML_GetCurrentByteIndex(extparser);
+                if (byteIndex != -1) {
+                    Tcl_AppendResult(vdata->interp, "\n\"", NULL);
+                    s[1] = '\0';
+                    for (i=-20; i < 40; i++) {
+                        if ((byteIndex+i)>=0) {
+                            if (xmlstring[byteIndex+i]) {
+                                s[0] = xmlstring[byteIndex+i];
+                                Tcl_AppendResult(vdata->interp, s, NULL);
+                                if (i==0) {
+                                    Tcl_AppendResult(vdata->interp,
+                                                     " <--Error-- ", NULL);
+                                }
+                            } else {
+                                break;
+                            }
+                        }
+                    }
+                    Tcl_AppendResult(vdata->interp, "\"",NULL);
+                }
+            } else {
+                Tcl_AppendResult(vdata->interp, ", referenced in entity \"",
+                                 systemId, 
+                                 "\" at line ", s, " character ", NULL);
+                sprintf(s, "%ld", XML_GetCurrentColumnNumber(extparser));
+                Tcl_AppendResult(vdata->interp, s, NULL);
+            }
+            keepresult = 1;
+            result = 0;
+            break;
+        case XML_STATUS_SUSPENDED:
+            XML_StopParser (oldparser, 1);
+            keepresult = 1;
+            break;
+        default:
+            break;
+        }
+    } else {
+        do {
+            len = Tcl_Read (chan, buf, sizeof(buf));
+            done = len < sizeof(buf);
+            status = XML_Parse (extparser, buf, len, done);
+            switch (status) {
+            case XML_STATUS_ERROR:
+                interpResult = Tcl_GetStringResult(vdata->interp);
+                sprintf(s, "%ld", XML_GetCurrentLineNumber(extparser));
+                if (interpResult[0] == '\0') {
+                    Tcl_ResetResult (vdata->interp);
+                    Tcl_AppendResult(vdata->interp, "error \"",
+                                     XML_ErrorString(XML_GetErrorCode(extparser)),
+                                     "\" in entity \"", systemId,
+                                     "\" at line ", s, " character ", NULL);
+                    sprintf(s, "%ld", XML_GetCurrentColumnNumber(extparser));
+                    Tcl_AppendResult(vdata->interp, s, NULL);
+                } else {
+                    Tcl_AppendResult(vdata->interp, ", referenced in entity \"",
+                                     systemId, 
+                                     "\" at line ", s, " character ", NULL);
+                    sprintf(s, "%ld", XML_GetCurrentColumnNumber(extparser));
+                    Tcl_AppendResult(vdata->interp, s, NULL);
+                }
+                result = 0;
+                keepresult = 1;
+                done = 1;
+                break;
+            case XML_STATUS_SUSPENDED:
+                XML_StopParser (oldparser, 1);
+                keepresult = 1;
+                done = 1;
+                break;
+            default:
+                break;
+            }
+        } while (!done);
+    }
+
+    if (!keepresult) {
+        Tcl_ResetResult (vdata->interp);
+    }
+    XML_ParserFree (extparser);
+    vdata->parser = oldparser;
+    Tcl_DecrRefCount (resultObj);
+    return result;
+
+ wrongScriptResult:
+    Tcl_DecrRefCount (resultObj);
+    Tcl_ResetResult (vdata->interp);
+    XML_ParserFree (extparser);
+    if (oldparser) {
+        vdata->parser = oldparser;
+    }
+    vdata->sdata->evalError = 1;
+    Tcl_AppendResult (vdata->interp, "The -externalentitycommand script "
+                      "has to return a Tcl list with 3 elements.\n"
+                      "Syntax: {string|channel|filename <baseurl> <data>}\n",
+                      NULL);
+    return 0;
+}
+
 static int validateSource (
     ValidationInput source,
     SchemaData *sdata,
