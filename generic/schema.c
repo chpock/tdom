@@ -4445,6 +4445,30 @@ attributeLookupPreparation (
     cp->typedata = (void *)t;
 }
 
+static void validateReportError (
+    Tcl_Interp *interp,
+    SchemaData *sdata,
+    XML_Parser parser
+    )
+{
+    Tcl_Obj *resultObj;
+    char sl[50], sc[50];
+
+    resultObj = Tcl_NewObj ();
+    sprintf(sl, "%ld", XML_GetCurrentLineNumber(parser));
+    sprintf(sc, "%ld", XML_GetCurrentColumnNumber(parser));
+    if (sdata->validationState == VALIDATION_ERROR) {
+        Tcl_AppendStringsToObj (resultObj, "error \"",
+                                Tcl_GetStringResult (interp),
+                                "\" at line ", sl, " character ", sc, NULL);
+    } else {
+        Tcl_AppendStringsToObj (resultObj, "error \"",
+                                XML_ErrorString(XML_GetErrorCode(parser)),
+                                "\" at line ", sl, " character ", sc, NULL);
+    }
+    Tcl_SetObjResult (interp, resultObj);
+}
+    
 static int validateSource (
     ValidationInput source,
     SchemaData *sdata,
@@ -4457,8 +4481,7 @@ static int validateSource (
     XML_Parser parser;
     char sep = '\xFF';
     Tcl_DString cdata;
-    Tcl_Obj *resultObj, *bufObj;
-    char sl[50], sc[50];
+    Tcl_Obj *bufObj;
     char *xmlstr, *filename, *str;
     int result, len, fd, mode, done, tclLen, rc;
     Tcl_DString translatedFilename;
@@ -4527,19 +4550,7 @@ static int validateSource (
         xmlstr = Tcl_GetStringFromObj (objv[0], &len);
         if (XML_Parse (parser, xmlstr, len, 1) != XML_STATUS_OK
             || sdata->validationState == VALIDATION_ERROR) {
-            resultObj = Tcl_NewObj ();
-            sprintf(sl, "%ld", XML_GetCurrentLineNumber(parser));
-            sprintf(sc, "%ld", XML_GetCurrentColumnNumber(parser));
-            if (sdata->validationState == VALIDATION_ERROR) {
-                Tcl_AppendStringsToObj (resultObj, "error \"",
-                                        Tcl_GetStringResult (interp),
-                                        "\" at line ", sl, " character ", sc, NULL);
-            } else {
-                Tcl_AppendStringsToObj (resultObj, "error \"",
-                                        XML_ErrorString(XML_GetErrorCode(parser)),
-                                        "\" at line ", sl, " character ", sc, NULL);
-            }
-            Tcl_SetObjResult (interp, resultObj);
+            validateReportError (interp, sdata, parser);
             result = TCL_ERROR;
         } else {
             result = TCL_OK;
@@ -4589,19 +4600,7 @@ static int validateSource (
         }
         if (result != XML_STATUS_OK
             || sdata->validationState == VALIDATION_ERROR) {
-            resultObj = Tcl_NewObj ();
-            sprintf(sl, "%ld", XML_GetCurrentLineNumber(parser));
-            sprintf(sc, "%ld", XML_GetCurrentColumnNumber(parser));
-            if (sdata->validationState == VALIDATION_ERROR) {
-                Tcl_AppendStringsToObj (resultObj, "error \"",
-                                        Tcl_GetStringResult (interp),
-                                        "\" at line ", sl, " character ", sc, NULL);
-            } else {
-                Tcl_AppendStringsToObj (resultObj, "error \"",
-                                        XML_ErrorString(XML_GetErrorCode(parser)),
-                                        "\" at line ", sl, " character ", sc, NULL);
-            }
-            Tcl_SetObjResult (interp, resultObj);
+            validateReportError (interp, sdata, parser);
             result = TCL_ERROR;
         } else {
             result = TCL_OK;
@@ -4627,21 +4626,7 @@ static int validateSource (
             rc = XML_Parse (parser, str, tclLen, done);
             if (rc != XML_STATUS_OK 
                 || sdata->validationState == VALIDATION_ERROR) {
-                resultObj = Tcl_NewObj ();
-                sprintf(sl, "%ld", XML_GetCurrentLineNumber(parser));
-                sprintf(sc, "%ld", XML_GetCurrentColumnNumber(parser));
-                if (sdata->validationState == VALIDATION_ERROR) {
-                    Tcl_AppendStringsToObj (resultObj, "error \"",
-                                            Tcl_GetStringResult (interp),
-                                            "\" at line ", sl, " character ", sc,
-                                            NULL);
-                } else {
-                    Tcl_AppendStringsToObj (resultObj, "error \"",
-                                            XML_ErrorString(XML_GetErrorCode(parser)),
-                                            "\" at line ", sl, " character ", sc,
-                                            NULL);
-                }
-                Tcl_SetObjResult (interp, resultObj);
+                validateReportError (interp, sdata, parser);
                 result = TCL_ERROR;
                 break;
             }
