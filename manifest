@@ -1,5 +1,5 @@
-C Merged\sfrom\strunk.
-D 2022-03-13T02:02:16.101
+C Added\smore\sof\sthe\sstuff\sneeded\sto\scontrol\sexternal\senity\sresolving.
+D 2022-03-15T01:31:33.084
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -143,7 +143,7 @@ F generic/domxslt.h 0cb8e327683a0ffeb2a7094add6cd82ec1ae49c7c704f20d8d6f7d6523e7
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 94e793939c9f3a35a1c82ae910d1482e2267ed920ad70abfcb3ff9d43f2a3c9f
 F generic/nodecmd.h d2201b69de9507f86e94750f0b72867ec9150795712ef18c5b5b87f35a689f75
-F generic/schema.c 56d9e6de51444d66db6f796340ef282db6d036ba109fd91540129b9cddfde521
+F generic/schema.c bbd40175b23069d5005eb4140f875b4a8c2e13d4c473ae56473d183da4f1820f
 F generic/schema.h f57a01bd6afa3cfae4aca517e326ce73ea58c2ef39f1802f02b0bdbd106fa8c7
 F generic/tcldom.c b496b2ba0861b39837e417fa6136f78a97e7149d6e83e8ac95e8e4cf8bae4649
 F generic/tcldom.h 37ee136d483b683c7e3e9e94ce8284520c7998cb1340047fc540dd7701825dc6
@@ -237,8 +237,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P eb7992629ce1f77151d17e3c6e975d6b621cc10c41c0af9d166a2689c6552582 873752e46dc3de58722f8e9b57193b70651cbbe87d55b43d5d792333744bfc89
-R 264e932e9c08ef761065e4cbdf2d95c4
+P d1015acf159c49e5e79201ea200c4a684c3bb87420b85aab9662e869554db3dd
+R 86abdd092afbb86f6224fa5e61010626
 U rolf
-Z 3611d0b343381ac4a43851c9f949961e
+Z c2767e6121afbd7c92284baae62c8316
 # Remove this line to create a well-formed Fossil manifest.

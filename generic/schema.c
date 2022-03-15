@@ -132,7 +132,6 @@ typedef struct
     int            onlyWhiteSpace;
     char          *uri;
     int            maxUriLen;
-    Tcl_Obj       *baseuriObj;
     Tcl_Obj       *externalentitycommandObj;
 } ValidateMethodData;
 
@@ -4547,9 +4546,7 @@ externalEntityRefHandler (
 
     if (strcmp (resultType, "string") == 0) {
         result = Tcl_ListObjIndex (vdata->interp, resultObj, 2, &xmlstringObj);
-        xmlstring = Tcl_GetString(xmlstringObj);
-        len = strlen (xmlstring);
-        chan = NULL;
+        xmlstring = Tcl_GetStringFromObj (xmlstringObj, (int*)&len);
     } else if (strcmp (resultType, "channel") == 0) {
         xmlstring = NULL;
         len = 0;
@@ -4717,22 +4714,38 @@ static int validateSource (
     char sep = '\xFF';
     Tcl_DString cdata;
     Tcl_Obj *bufObj;
-    char *xmlstr, *filename, *str;
-    int result, len, fd, mode, done, tclLen, rc;
+    char *xmlstr, *filename, *str, *baseurl = NULL;
+    int result, len, fd, mode, done, tclLen, rc, value, useForeignDTD = 0;
+    int paramEntityParsing = XML_PARAM_ENTITY_PARSING_ALWAYS;
     Tcl_DString translatedFilename;
     int optionIndex;
     Tcl_Channel channel;
     
     static const char *validateOptions[] = {
-        "-baseurl", "--externalentitycommand", NULL
+        "-baseurl", "-externalentitycommand", "-paramentityparsing",
+        "-useForeignDTD", NULL
     };
     enum validateOption {
-        o_baseurl, o_externalentitycommand
+        o_baseurl, o_externalentitycommand, o_paramentityparsing,
+        o_useForeignDTD
+    };
+
+    static const char *paramEntityParsingValues[] = {
+        "always",
+        "never",
+        "notstandalone",
+        (char *) NULL
+    };
+    enum paramEntityParsingValue {
+        EXPAT_PARAMENTITYPARSINGALWAYS,
+        EXPAT_PARAMENTITYPARSINGNEVER,
+        EXPAT_PARAMENTITYPARSINGNOTSTANDALONE
     };
 
     if (objc < 3) {
         Tcl_WrongNumArgs (interp, 2, objv, "?-baseurl <baseurl>? "
                           "?-externalentitycommand <cmd>? "
+                          "?-paramentityparsing (always|never|standalone? "
                           "<xml> ?resultVarName?");
         return TCL_ERROR;
     }
@@ -4744,6 +4757,9 @@ static int validateSource (
     objv += 2;
 
     memset (vdata, 0, sizeof (ValidateMethodData));
+    vdata->externalentitycommandObj =
+        Tcl_NewStringObj ("::tdom::extRefHandler", 21);
+    Tcl_IncrRefCount (vdata->externalentitycommandObj);
     while (objc > 2) {
         if (Tcl_GetIndexFromObj (interp, objv[0], validateOptions,
                                  "option", 0, &optionIndex) != TCL_OK) {
@@ -4751,13 +4767,39 @@ static int validateSource (
         }
         switch ((enum validateOption) optionIndex) {
         case o_baseurl:
-            vdata->baseuriObj = objv[1];
-            Tcl_IncrRefCount (objv[1]);
+            baseurl = Tcl_GetString (objv[1]);
             break;
         case o_externalentitycommand:
+            if (vdata->externalentitycommandObj) 
+                Tcl_DecrRefCount (vdata->externalentitycommandObj);
             vdata->externalentitycommandObj = objv[1];
             Tcl_IncrRefCount (objv[1]);
             break;
+        case o_paramentityparsing:
+            if (Tcl_GetIndexFromObj(interp, objv[1], 
+                                    paramEntityParsingValues, "value", 0, 
+                                    &value) != TCL_OK) {
+                Tcl_DecrRefCount (vdata->externalentitycommandObj);
+                return TCL_ERROR;
+            }
+            switch ((enum paramEntityParsingValue) value) {
+            case EXPAT_PARAMENTITYPARSINGALWAYS:
+                paramEntityParsing = XML_PARAM_ENTITY_PARSING_ALWAYS;
+                break;
+            case EXPAT_PARAMENTITYPARSINGNEVER:
+                paramEntityParsing = XML_PARAM_ENTITY_PARSING_NEVER;
+                break;
+            case EXPAT_PARAMENTITYPARSINGNOTSTANDALONE:
+                paramEntityParsing = XML_PARAM_ENTITY_PARSING_UNLESS_STANDALONE;
+                break;
+            }
+        case o_useForeignDTD:
+            if (Tcl_GetBooleanFromObj(interp, objv[1], &useForeignDTD)
+                != TCL_OK) {
+                Tcl_DecrRefCount (vdata->externalentitycommandObj);
+                return TCL_ERROR;
+            }
+            
         }
         objc -= 2;
         objv += 2;
@@ -4774,11 +4816,14 @@ static int validateSource (
     vdata->uri = (char *) MALLOC (URI_BUFFER_LEN_INIT);
     vdata->maxUriLen = URI_BUFFER_LEN_INIT;
     XML_SetUserData (parser, vdata);
+    XML_SetBase (parser, baseurl);
     XML_SetElementHandler (parser, startElement, endElement);
     XML_SetCharacterDataHandler (parser, characterDataHandler);
     if (vdata->externalentitycommandObj) {
         XML_SetExternalEntityRefHandler (parser, externalEntityRefHandler);
     }
+    XML_UseForeignDTD (parser, (unsigned char) useForeignDTD);
+    XML_SetParamEntityParsing (parser, paramEntityParsing);
 
     switch (source) {
     case STRING:
@@ -4874,6 +4919,7 @@ static int validateSource (
     sdata->parser = NULL;
     FREE (vdata->uri);
     Tcl_DStringFree (&cdata);
+    Tcl_DecrRefCount (vdata->externalentitycommandObj);
     
     if (sdata->evalError) {
         result = TCL_ERROR;
