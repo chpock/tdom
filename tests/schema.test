@@ -2778,7 +2778,6 @@ test schema-8.7 {Delete schema cmd in script called by validation} {
 } {{} s {in schema-8.7} 1 {error "this is deliberate" at line 1 character 6} {} 1}
 
 proc extRefHandler-8.8 {base systemId publicId} {
-    puts $systemId
     switch $systemId {
         "e1" {return [list string $base "o"]}
         "e2" {return [list string $base "<ee>abc</ee>"]}
