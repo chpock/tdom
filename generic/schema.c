@@ -4931,9 +4931,6 @@ static int validateSource (
     } else {
         if (result == TCL_OK) {
             SetBooleanResult (1);
-            if (objc == 2) {
-                Tcl_SetVar (interp, Tcl_GetString (objv[1]), "", 0);
-            }
         } else {
             if (objc == 2) {
                 Tcl_SetVar (interp, Tcl_GetString (objv[1]),

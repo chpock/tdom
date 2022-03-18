@@ -2802,8 +2802,7 @@ test schema-8.8 {External entities} {
             <doc>b&e1;o<e>&e2;</e></doc>
         }
     } {
-        lappend result [s validate -externalentitycommand extRefHandler-8.8 $xml errMsg]
-        puts $errMsg
+        lappend result [s validate -externalentitycommand extRefHandler-8.8 $xml]
     }
     s delete
     set result
@@ -3457,10 +3456,10 @@ test schema-11.4 {attribute} {
             }
         }
     }
-    set result [s validate {<doc><e foo="bar"/></doc>} errMsg]
+    set result [s validate {<doc><e foo="bar"/></doc>}]
     s delete
-    lappend result $errMsg
-} {1 {}}
+    set result
+} {1}
 
 test schema-11.4_1 {attribute} {
     tdom::schema create s
@@ -3473,10 +3472,10 @@ test schema-11.4_1 {attribute} {
             }
         }
     }
-    set result [s validate {<doc><e foo="bar"/></doc>} errMsg]
+    set result [s validate {<doc><e foo="bar"/></doc>}]
     s delete
-    lappend result $errMsg
-} {1 {}}
+    set result
+} {1}
 
 test schema-11.4a {attribute} {
     tdom::schema create s
@@ -3504,10 +3503,10 @@ test schema-11.4b {attribute} {
             }
         }
     }
-    set result [s validate {<doc><e xml:lang="en" foo="bar"/></doc>} errMsg]
+    set result [s validate {<doc><e xml:lang="en" foo="bar"/></doc>}]
     s delete
-    lappend result $errMsg
-} {1 {}}
+    set result 
+} {1}
 
 test schema-11.5 {nsattribute} {
     tdom::schema create s
@@ -6597,11 +6596,12 @@ test schema-15.1 {constraint cmd tcl} {
         }
     }
     set ::schema-15.1 ""
+    set msg "nottouched"
     set result [s validate {<a><b/></a>} msg]
     s delete
     lappend result $msg ${::schema-15.1}
     set result
-} {1 {} ss}
+} {1 nottouched ss}
 
 proc schema-15.2-astart {args} {
     append ::schema-15.2 astart
@@ -6625,11 +6625,12 @@ test schema-15.2 {constraint cmd tcl} {
         }
     }
     set schema-15.2 ""
+    set msg "nottouched"
     set result [s validate {<doc><a><b>foo</b><c/></a><a><b></b><c>bar</c></a></doc>} msg]
     s delete
     lappend result $msg ${schema-15.2}
     set result
-} {1 {} astartaendastartaend}
+} {1 nottouched astartaendastartaend}
 
 proc schema-15.3 {type cmd} {
     lappend ::schema-15.3 $type [$cmd info stack top]
@@ -6649,11 +6650,12 @@ test schema-15.3 {constraint cmd tcl} {8.5} {
         }
     }
     set schema-15.3 ""
+    set msg "nottouched"
     set result [s validate {<doc><a><b>foo</b><c/></a><a><b></b><c>bar</c></a></doc>} msg]
     s delete
     lappend result $msg {*}${schema-15.3}
     set result
-} {1 {} astart a aend a astart a aend a}
+} {1 nottouched astart a aend a astart a aend a}
 
 proc schema-15.4 {text cmd} {
     if {$text ne "in docContent"} {error "unexpected text argument"}
