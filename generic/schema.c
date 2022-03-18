@@ -4772,8 +4772,13 @@ static int validateSource (
         case o_externalentitycommand:
             if (vdata->externalentitycommandObj) 
                 Tcl_DecrRefCount (vdata->externalentitycommandObj);
-            vdata->externalentitycommandObj = objv[1];
-            Tcl_IncrRefCount (objv[1]);
+            Tcl_GetStringFromObj (objv[1], &len);
+            if (len) {
+                vdata->externalentitycommandObj = objv[1];
+                Tcl_IncrRefCount (objv[1]);
+            } else {
+                vdata->externalentitycommandObj = NULL;
+            }
             break;
         case o_paramentityparsing:
             if (Tcl_GetIndexFromObj(interp, objv[1], 
