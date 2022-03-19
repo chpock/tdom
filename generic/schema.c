@@ -201,9 +201,9 @@ static char *ValidationErrorType2str[] = {
 };
 
 typedef enum {
-    STRING,
-    FILENAME,
-    CHANNEL
+    VALIDATE_STRING,
+    VALIDATE_FILENAME,
+    VALIDATE_CHANNEL
 } ValidationInput;
 
 /*----------------------------------------------------------------------------
@@ -4831,7 +4831,7 @@ static int validateSource (
     XML_SetParamEntityParsing (parser, paramEntityParsing);
 
     switch (source) {
-    case STRING:
+    case VALIDATE_STRING:
         xmlstr = Tcl_GetStringFromObj (objv[0], &len);
         if (XML_Parse (parser, xmlstr, len, 1) != XML_STATUS_OK
             || sdata->validationState == VALIDATION_ERROR) {
@@ -4842,7 +4842,7 @@ static int validateSource (
         }
         break;
         
-    case FILENAME:
+    case VALIDATE_FILENAME:
         filename = Tcl_TranslateFileName (interp, Tcl_GetString (objv[0]),
                                           &translatedFilename);
         if (filename == NULL) {
@@ -4894,7 +4894,7 @@ static int validateSource (
         Tcl_DStringFree (&translatedFilename);
         break;
         
-    case CHANNEL:
+    case VALIDATE_CHANNEL:
         channel = Tcl_GetChannel(interp, Tcl_GetString (objv[0]), &mode);
         if (channel == NULL) {
             SetResult ("The channel argument isn't a tcl channel");
@@ -5325,15 +5325,18 @@ tDOM_schemaInstanceCmd (
         break;
 
     case m_validate:
-        result = validateSource (STRING, sdata, &vdata, interp, objc, objv);
+        result = validateSource (VALIDATE_STRING, sdata, &vdata, interp,
+                                 objc, objv);
         break;
 
     case m_validatefile:
-        result = validateSource (FILENAME, sdata, &vdata, interp, objc, objv);
+        result = validateSource (VALIDATE_FILENAME, sdata, &vdata, interp,
+                                 objc, objv);
         break;
 
     case m_validatechannel:
-        result = validateSource (CHANNEL, sdata, &vdata, interp, objc, objv);
+        result = validateSource (VALIDATE_CHANNEL, sdata, &vdata, interp,
+                                 objc, objv);
         break;
         
     case m_domvalidate:

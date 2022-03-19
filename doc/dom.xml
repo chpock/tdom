@@ -262,13 +262,15 @@ needed.</desc>
 
               <optdef>
                 <optname>-useForeignDTD</optname>
-                <optarg>&lt;boolean&gt;</optarg>
-                <desc>If &lt;boolean&gt; is true and the document does not have
-an external subset, the parser will call the -externalentitycommand script with
-empty values for the systemId and publicID arguments. Please note that if
-the document also doesn't have an internal subset, the
--startdoctypedeclcommand and -enddoctypedeclcommand scripts, if set, are not
-called. The <m>-useForeignDTD</m> respects </desc>
+                <optarg>&lt;boolean&gt;</optarg> <desc>If
+                &lt;boolean&gt; is true and the document does not have
+                an external subset, the parser will call the
+                -externalentitycommand script with empty values for
+                the systemId and publicID arguments. Please note that
+                if the document also doesn't have an internal subset,
+                the -startdoctypedeclcommand and
+                -enddoctypedeclcommand scripts, if set, are not
+                called.</desc>
               </optdef>
 
               <optdef>
