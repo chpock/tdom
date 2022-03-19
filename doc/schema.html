@@ -4,18 +4,18 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x5560bc403450">NAME</a> · <a href="#SECTid0x5560bc3a3b40">SYNOPSIS</a> · <a href="#SECTid0x5560bc4e3740">DESCRIPTION </a> · <a href="#SECTid0x5560bc551bc0">Schema definition scripts</a> · <a href="#SECTid0x5560bc560e40">Quantity specifier</a> · <a href="#SECTid0x5560bc562e80">Text constraint scripts</a> · <a href="#SECTid0x5560bc577910">Local key constraints</a> · <a href="#SECTid0x5560bc579730">Recovering</a> · <a href="#SECTid0x5560bc57b810">Examples</a> · <a href="#SECTid0x5560bc57d370">KEYWORDS</a>
+<a href="#SECTid0x5605c9e49450">NAME</a> · <a href="#SECTid0x5605c9e884f0">SYNOPSIS</a> · <a href="#SECTid0x5605c9f297a0">DESCRIPTION </a> · <a href="#SECTid0x5605c9f9a210">Schema definition scripts</a> · <a href="#SECTid0x5605c9fa9490">Quantity specifier</a> · <a href="#SECTid0x5605c9fab4d0">Text constraint scripts</a> · <a href="#SECTid0x5605c9fbff60">Local key constraints</a> · <a href="#SECTid0x5605c9fc1d80">Recovering</a> · <a href="#SECTid0x5605c9fc3e60">Examples</a> · <a href="#SECTid0x5605c9fc59c0">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x5560bc403450">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x5605c9e49450">NAME</a></h2><p class="namesection">
 <b class="names">tdom::schema - </b><br>Creates a schema validation command</p>
 
-  <h2><a name="SECTid0x5560bc3a3b40">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x5605c9e884f0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">tdom::schema</b> <i class="m">?create?</i> <i class="m">cmdName</i>
     </pre>
 
-  <h2><a name="SECTid0x5560bc4e3740">DESCRIPTION </a></h2><p>Every call of this command creates a new validation command. A
+  <h2><a name="SECTid0x5605c9f297a0">DESCRIPTION </a></h2><p>Every call of this command creates a new validation command. A
     validation command has methods to define a schema and is able
     to validate XML data or to post-validate a tDOM DOM tree (and to
     some degree other kind of hierarchical data) against this
@@ -178,14 +178,101 @@
 
       
         <dt>
-<b class="method">validate</b> <i class="m">&lt;XML string&gt;</i> <i class="m">?objVar?</i>
+<b class="method">validate</b> ?<i class="m">options</i>? <i class="m">&lt;XML string&gt;</i> <i class="m">?objVar?</i>
 </dt>
-        <dd>Returns true if the <i class="m">&lt;XML string&gt;</i> is valid, or
+        <dd>
+<p>Returns true if the <i class="m">&lt;XML string&gt;</i> is valid, or
         false, otherwise. If validation has failed and the optional
         <i class="m">objVar</i> argument is given, the variable with that
         name is set to a validation error message. If the XML string
         is valid and the optional <i class="m">objVar</i> argument is given,
-        the variable with that name is set to the empty string.</dd>
+        the variable with that name is set to the empty string.</p>
+
+        <p>The valid options are:</p>
+        <dl class="optlist">
+            
+                <dt>
+<b>-baseurl</b> <i>&lt;baseURI&gt;</i>
+</dt>
+                
+                <dd>If <i class="m">-baseurl &lt;baseURI&gt;</i> is specified,
+                the baseURI is used as the base URI of the document.
+                External entities references in the document are
+                resolved relative to this base URI. This base URI is
+                also stored within the DOM tree.</dd>
+            
+            
+                <dt>
+<b>-externalentitycommand</b> <i>&lt;script&gt;</i>
+</dt>
+                
+                <dd>If <i class="m">-externalentitycommand &lt;script&gt;</i>
+                is specified, the specified tcl script is called to
+                resolve any external entities of the document. The
+                default is "::tdom::extRefHandler", which is a simple
+                file URL resolver defined by the script part of the
+                package. Setting the option value to the empty string
+                disables resolving of external entities. The actual
+                evaluated command consists of this option followed by
+                three arguments: the base uri, the system identifier
+                of the entity and the public identifier of the entity.
+                The base uri and the public identifier may be the
+                empty list. The script has to return a tcl list
+                consisting of three elements. The first element of
+                this list signals how the external entity is returned
+                to the processor. Currently the two allowed types are
+                "string" and "channel". The second element of the list
+                has to be the (absolute) base URI of the external
+                entity to be parsed. The third element of the list are
+                data, either the already read data out of the external
+                entity as string in the case of type "string", or the
+                name of a tcl channel, in the case of type "channel".
+                Note that if the script returns a tcl channel, it will
+                not be closed by the processor. It must be closed
+                separately if it is no longer needed.</dd>
+            
+
+            
+                <dt>
+<b>-paramentityparsing</b> <i>&lt;always|never|notstandalone&gt;</i>
+</dt>
+                
+                <dd>The <i class="m">-paramentityparsing</i> option controls,
+                if the parser tries to resolve the external entities
+                (including the external DTD subset) of the document
+                while building the DOM tree.
+                <i class="m">-paramentityparsing</i> requires an argument, which
+                must be either "always", "never", or "notstandalone".
+                The value "always" means that the parser tries to
+                resolves (recursively) all external entities of the
+                XML source. This is the default in case
+                <i class="m">-paramentityparsing</i> is omitted. The value
+                "never" means that only the given XML source is
+                parsed and no external entity (including the external
+                subset) will be resolved and parsed. The value
+                "notstandalone" means, that all external entities will
+                be resolved and parsed, with the exception of
+                documents, which explicitly states standalone="yes" in
+                their XML declaration.</dd>
+            
+
+            
+                <dt>
+<b>-useForeignDTD</b> <i>&lt;boolean&gt;</i>
+</dt>
+                
+                <dd>If &lt;boolean&gt; is true and the document does
+                not have an external subset, the parser will call the
+                -externalentitycommand script with empty values for
+                the systemId and publicID arguments. Please note that
+                if the document also doesn't have an internal subset,
+                the -startdoctypedeclcommand and
+                -enddoctypedeclcommand scripts, if set, are not
+                called.</dd>
+            
+            
+        </dl>
+        </dd>
       
 
       
@@ -257,7 +344,7 @@
             <dt>UNKNOWN_GLOBAL_ID</dt><dd></dd>
             <dt>UNKNOWN_ID</dt><dd></dd>
         </dl>
-        <p> For more detailed information see section <a href="#SECTid0x5560bc579730">Recovering</a>.</p>
+        <p> For more detailed information see section <a href="#SECTid0x5605c9fc1d80">Recovering</a>.</p>
         </dd>
       
 
@@ -486,7 +573,7 @@
 
     </dl>
 
-  <h2><a name="SECTid0x5560bc551bc0">Schema definition scripts</a></h2><p>Schema definition scripts are ordinary Tcl scripts evaluated in
+  <h2><a name="SECTid0x5605c9f9a210">Schema definition scripts</a></h2><p>Schema definition scripts are ordinary Tcl scripts evaluated in
     the namespace tdom::schema. The schema definition commands listed
     below in this Tcl namespace allow the definition of a wide variety
     of document structures. Every schema definition command
@@ -787,7 +874,7 @@ s define {
       
     </dl>
 
-  <h2><a name="SECTid0x5560bc560e40">Quantity specifier</a></h2><p>Several schema definition commands expect a quantifier as
+  <h2><a name="SECTid0x5605c9fa9490">Quantity specifier</a></h2><p>Several schema definition commands expect a quantifier as
     one of their arguments which determines how often the content
     particle specified by the command is expected. The valid values
     for a <i class="m">quant</i> argument are:</p><dl class="optlist">
@@ -834,7 +921,7 @@ s define {
     </dl><p>If an optional quantifier is not given, it defaults to * in
     case of the <i class="m">mixed</i> command and to ! for all other commands.</p>
 
-  <h2><a name="SECTid0x5560bc562e80">Text constraint scripts</a></h2><p>Text (parsed character data, as XML calls it) sometimes has to
+  <h2><a name="SECTid0x5605c9fab4d0">Text constraint scripts</a></h2><p>Text (parsed character data, as XML calls it) sometimes has to
     be of a certain kind or comply with certain rules to be valid. The
     text constraint script arguments to text, attribute, nsattribute
     and deftexttype commands are evaluated in the Tcl namespace
@@ -850,7 +937,7 @@ s define {
     command is available in the tdom::type namespace is recorded in
     its documentation.
     </p>
-        <h3><a name="SECTid0x5560bc563880">The tcl text constraint command</a></h3>
+        <h3><a name="SECTid0x5605c9fabed0">The tcl text constraint command</a></h3>
         <p>The <i class="m">tcl</i> text constraint command dispatches the check
         to an arbitrary Tcl command, thus enable any programmable
         decision rules.</p>
@@ -865,7 +952,7 @@ s define {
             
         </dl>
     
-        <h3><a name="SECTid0x5560bc564660">Basic XML types</a></h3>
+        <h3><a name="SECTid0x5605c9faccb0">Basic XML types</a></h3>
         <dl class="commandlist">
             
                 <dt><b class="cmd">name</b></dt>
@@ -912,7 +999,7 @@ s define {
             
         </dl>
     
-        <h3><a name="SECTid0x5560bc566670">Basic type tests</a></h3>
+        <h3><a name="SECTid0x5605c9faecc0">Basic type tests</a></h3>
         <p>
         </p>
         <dl class="commandlist">
@@ -1112,7 +1199,7 @@ s define {
             
         </dl>
     
-        <h3><a name="SECTid0x5560bc56eba0">Logical constructs</a></h3>
+        <h3><a name="SECTid0x5605c9fb71f0">Logical constructs</a></h3>
         <dl class="commandlist">
         
             <dt>
@@ -1157,7 +1244,7 @@ s define {
         
         </dl>
     
-        <h3><a name="SECTid0x5560bc570ef0">Constraints on processed text value</a></h3>
+        <h3><a name="SECTid0x5605c9fb9540">Constraints on processed text value</a></h3>
         <dl class="commandlist">
             
             <dt>
@@ -1209,7 +1296,7 @@ s define {
         
         </dl>
     
-        <h3><a name="SECTid0x5560bc5738b0">Various other string properties</a></h3>
+        <h3><a name="SECTid0x5605c9fbbf00">Various other string properties</a></h3>
         <dl class="commandlist">
         
             <dt>
@@ -1293,7 +1380,7 @@ s define {
         </dl>
     
 
-  <h2><a name="SECTid0x5560bc577910">Local key constraints</a></h2><p>Document wide uniqueness and foreign key constraints are
+  <h2><a name="SECTid0x5605c9fbff60">Local key constraints</a></h2><p>Document wide uniqueness and foreign key constraints are
     available with the text constraint commands id and idref.
     Keyspaces allow for sub-tree local uniqueness and foreign key
     constraints.</p><dl class="commandlist">
@@ -1329,7 +1416,7 @@ s define {
         
     </dl>
 
-  <h2><a name="SECTid0x5560bc579730">Recovering</a></h2><p>By default the validation engine stops at the first detected
+  <h2><a name="SECTid0x5605c9fc1d80">Recovering</a></h2><p>By default the validation engine stops at the first detected
       validation violation and reports that finding. It does so by
       return false (and sets, if given, the result variable with an
       error message) in case the schema command itself is used to
@@ -1374,7 +1461,7 @@ s define {
       error types MISSING_ELEMENT and UNEXPECTED_ELEMENT recovers by
       ignoring the event.</p>
 
-  <h2><a name="SECTid0x5560bc57b810">Examples</a></h2><p>The XML Schema Part 0: Primer Second Edition
+  <h2><a name="SECTid0x5605c9fc3e60">Examples</a></h2><p>The XML Schema Part 0: Primer Second Edition
     (<a href="https://www.w3.org/TR/xmlschema-0/">https://www.w3.org/TR/xmlschema-0/</a>) starts with this
     example schema:</p><pre class="example">
 &lt;xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
@@ -1543,7 +1630,7 @@ schema define {
       
     </pre>
 
-<h2><a name="SECTid0x5560bc57d370">KEYWORDS</a></h2><p class="keywords">
+<h2><a name="SECTid0x5605c9fc59c0">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-Validation">Validation</a>, <a class="keyword" href="keyword-index.html#KW-Postvalidation">Postvalidation</a>, <a class="keyword" href="keyword-index.html#KW-DOM">DOM</a>, <a class="keyword" href="keyword-index.html#KW-SAX">SAX</a>
 </p>
 </div><hr class="navsep"><div class="navbar" align="center">

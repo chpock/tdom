@@ -376,12 +376,15 @@ of type "string", or the name of a tcl channel, in the case of type
 by the processor.  It must be closed separately if it is no longer
 needed.
 .IP "\fB-useForeignDTD  \fI<boolean>\fP\fR"
-If <boolean> is true and the document does not have
-an external subset, the parser will call the -externalentitycommand script with
-empty values for the systemId and publicID arguments. Please note that if
-the document also doesn't have an internal subset, the
--startdoctypedeclcommand and -enddoctypedeclcommand scripts, if set, are not
-called. The \fI-useForeignDTD\fR respects
+If
+<boolean> is true and the document does not have
+an external subset, the parser will call the
+-externalentitycommand script with empty values for
+the systemId and publicID arguments. Please note that
+if the document also doesn't have an internal subset,
+the -startdoctypedeclcommand and
+-enddoctypedeclcommand scripts, if set, are not
+called.
 .IP "\fB-paramentityparsing  \fI<always|never|notstandalone>\fP\fR"
 The \fI-paramentityparsing\fR option controls,
 if the parser tries to resolve the external entities

@@ -1,4 +1,10 @@
 
+2022-19-03  Rolf Ade  <rolf@pointsman.de>
+
+        Schema command mathods validate, validatefile and
+        validatechannel enhanced with options to control external
+        entitiy resolving.
+
 2022-02-19  Rolf Ade  <rolf@pointsman.de>
 
         Added the options
