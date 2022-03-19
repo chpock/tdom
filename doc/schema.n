@@ -297,7 +297,7 @@ false, otherwise. If validation has failed and the optional
 \&\fIobjVar\fR argument is given, the variable with that
 name is set to a validation error message. If the XML string
 is valid and the optional \fIobjVar\fR argument is given,
-the variable with that name is set to the empty string.
+the variable will be untouched.
 .PP
 The valid options are:
 .IP "\fB-baseurl  \fI<baseURI>\fP\fR"
@@ -360,27 +360,30 @@ the -startdoctypedeclcommand and
 called.
 .RE
 .TP
-\&\fB\fBvalidatefile\fP \fIfilename\fB \fI?objVar?\fB
+\&\fB\fBvalidatefile\fP ?\fIoptions\fB? \fIfilename\fB \fI?objVar?\fB
 \&\fRReturns true if the content of \fIfilename\fR is valid,
-or false, otherwise. The given file is fed as binary stream
-to expat, therefore only US-ASCII, ISO-8859-1, UTF-8 or UTF-16
+or false, otherwise. The given file is fed as binary stream to
+expat, therefore only US-ASCII, ISO-8859-1, UTF-8 or UTF-16
 encoded data will work with this method. If validation has
 failed and the optional \fIobjVar\fR argument is given, the
 variable with that name is set to a validation error message.
-If the XML string is valid and the optional \fIobjVar\fR
-argument is given, the variable with that name is set to the
-empty string.
+If the XML data is valid and the optional \fIobjVar\fR
+argument is given, the variable will be untouched. The allowed
+options and their meaning are the same as for the
+\&\fIvalidate\fR method; see there for a description.
 .TP
-\&\fB\fBvalidatechannel\fP \fIchannel\fB \fI?objVar?\fB
+\&\fB\fBvalidatechannel\fP ?\fIoptions\fB? \fIchannel\fB \fI?objVar?\fB
 \&\fRReturns true if the content read from the Tcl channel
 \&\fIchannel\fR is valid, or false, otherwise. Since data read
 out of a Tcl channel is UTF-8 encoded, any misleading encoding
 declaration at the beginning of the data will lead to errors.
 If the validation fails and the optional \fIobjVar\fR
 argument is given, the variable with that name is set to a
-validation error message. If the XML string is valid and the
-optional \fIobjVar\fR argument is given, the variable with
-that name is set to the empty string.
+validation error message. If the XML data is valid and the
+optional \fIobjVar\fR argument is given, the variable will be
+untouched. The allowed options and their meaning are the same
+as for the \fIvalidate\fR method; see there for a
+description.
 .TP
 \&\fB\fBdomvalidate\fP \fIdomNode\fB \fI?objVar?\fB
 \&\fRReturns true if the first argument is a valid tree, or

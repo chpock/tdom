@@ -169,7 +169,7 @@
         <m>objVar</m> argument is given, the variable with that
         name is set to a validation error message. If the XML string
         is valid and the optional <m>objVar</m> argument is given,
-        the variable with that name is set to the empty string.</p>
+        the variable will be untouched.</p>
 
         <p>The valid options are:</p>
         <optlist>
@@ -251,29 +251,32 @@
       </commanddef>
 
       <commanddef>
-        <command><method>validatefile</method> <m>filename</m> <m>?objVar?</m></command>
+        <command><method>validatefile</method> ?<m>options</m>? <m>filename</m> <m>?objVar?</m></command>
         <desc>Returns true if the content of <m>filename</m> is valid,
-        or false, otherwise. The given file is fed as binary stream
-        to expat, therefore only US-ASCII, ISO-8859-1, UTF-8 or UTF-16
+        or false, otherwise. The given file is fed as binary stream to
+        expat, therefore only US-ASCII, ISO-8859-1, UTF-8 or UTF-16
         encoded data will work with this method. If validation has
         failed and the optional <m>objVar</m> argument is given, the
         variable with that name is set to a validation error message.
-        If the XML string is valid and the optional <m>objVar</m>
-        argument is given, the variable with that name is set to the
-        empty string.</desc>
+        If the XML data is valid and the optional <m>objVar</m>
+        argument is given, the variable will be untouched. The allowed
+        options and their meaning are the same as for the
+        <m>validate</m> method; see there for a description.</desc>
       </commanddef>
 
       <commanddef>
-        <command><method>validatechannel</method> <m>channel</m> <m>?objVar?</m></command>
+        <command><method>validatechannel</method> ?<m>options</m>? <m>channel</m> <m>?objVar?</m></command>
         <desc>Returns true if the content read from the Tcl channel
         <m>channel</m> is valid, or false, otherwise. Since data read
         out of a Tcl channel is UTF-8 encoded, any misleading encoding
         declaration at the beginning of the data will lead to errors.
         If the validation fails and the optional <m>objVar</m>
         argument is given, the variable with that name is set to a
-        validation error message. If the XML string is valid and the
-        optional <m>objVar</m> argument is given, the variable with
-        that name is set to the empty string.</desc>
+        validation error message. If the XML data is valid and the
+        optional <m>objVar</m> argument is given, the variable will be
+        untouched. The allowed options and their meaning are the same
+        as for the <m>validate</m> method; see there for a
+        description.</desc>
       </commanddef>
       
       <commanddef>
