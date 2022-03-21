@@ -1,5 +1,5 @@
-C Improved\sdocumentation.
-D 2022-03-19T17:11:38.074
+C Mostly\sdone\sfore\s-simple.
+D 2022-03-21T23:44:46.045
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -145,7 +145,7 @@ F generic/nodecmd.c 94e793939c9f3a35a1c82ae910d1482e2267ed920ad70abfcb3ff9d43f2a
 F generic/nodecmd.h d2201b69de9507f86e94750f0b72867ec9150795712ef18c5b5b87f35a689f75
 F generic/schema.c 2bba8c105a9ca4db370474ae01397d004f77455a271ae7534e89dabad267b562
 F generic/schema.h f57a01bd6afa3cfae4aca517e326ce73ea58c2ef39f1802f02b0bdbd106fa8c7
-F generic/tcldom.c b496b2ba0861b39837e417fa6136f78a97e7149d6e83e8ac95e8e4cf8bae4649
+F generic/tcldom.c 440ead29be4f5842666bf4e588fc200ae636bfa7e5bef4e57cd3e2a9c6c8df15
 F generic/tcldom.h 37ee136d483b683c7e3e9e94ce8284520c7998cb1340047fc540dd7701825dc6
 F generic/tclexpat.c 6c034bf882c575c26a33bc722f9202b1ae9f54657e56a02aae4e8f37d4344074
 F generic/tclexpat.h 95d915d74bb4b99ef3b80de00b0adce28931e6015ac63226b99db4817d9e313c
@@ -157,8 +157,8 @@ F generic/tdomDecls.h cccb9227475e40c17aec24a23814cf4bffb597c441af9a874370e11291
 F generic/tdomStubInit.c 4bd8265b7d7e5a031bb9f2ca182f735a8f67ea9a4051e82105a002e89821b4ac
 F generic/tdomStubLib.c 4a055f9c974246a9f7dd99de1a7686d1a96be8f02be699fdf4a760fdc813eb45
 F generic/tdominit.c 17dbbeaf80d102d6b70f7cac3084b200fd7a8b0a5e5cc4c8569a0149d2bd741a
-F generic/xmlsimple.c 59733d6a0f53194c0e649471cfbecec54e7ed9aaf4defd4dec9c740fdefd71b6
-F generic/xmlsimple.h 3cb9d055e60643afcdfe9ab407adf1e8bb5dbafb
+F generic/xmlsimple.c d2cf467c9f2dfe9f1fc740f78a6cd16d3be1b6f647c0d41709d0bdf4455e748e
+F generic/xmlsimple.h 5b25247a3652d3c6bc6d20652bcbfbd953efbc472403e6c0e9c7ef8332a7b13d
 F lib/tdom.tcl 09d732922620415020cdb362b92b05c97e008191e6a12ddc88269f5f5a5c698e
 F macosx/README 75fe1f6617f6cb7e4480cff5367b5c26fcd8dd207e2321f35dceebafccf4c99c
 F pkgIndex.tcl.in 8358a02ba3bb4f47263ad5ef971956715c436c5424a60765392845a3c78369c1
@@ -216,7 +216,7 @@ F tests/schema.test f67e9dd121184e623e20adcf4d26071c00ed93709256d4baa1232f7945a3
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
 F tests/tdomcmd.bench b07448ed4de08ccaa9734cf3fe15c695fd7066c993da58ff48d465747940e417
 F tests/tdomcmd.test 092401adf0609906d710f3ef8997cb4ca29bc208
-F tests/xmlsimple.test bde808880ddcf0f8ba0b049da0f2258e332af11ddf43a3480f089d53e77c6e0d
+F tests/xmlsimple.test 099321ebd7604cf7c0b4b83fdc706eb94c4cc3cb80a66cf5b351174d3bcfe976
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.bench a8a90cbce1e276d05c6ff2c54ef04ffb3166c16e4094a543c694256ea4d68355
 F tests/xpath.test d46b16e82170cfa5722bd5985e167f915fd1fbbd33913d5429c3dcb885a96a53
@@ -237,8 +237,11 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 2081bea03fa17bb986f8ea1fbec4d199b3be7600464032ef7cb9e331eda7e556
-R 4435572a344b0d2df69f47a1117c3fa3
+P 8675c9954e20c72231e5f00e6e0be24100150bda2126aa9cf31062b9bd0adb7e
+R 32da622bfbe130264538e3cc45cb19f0
+T *branch * parseforrest
+T *sym-parseforrest *
+T -sym-trunk *
 U rolf
-Z ce3e42ce2aa3d51e4b5c4752af26b364
+Z 95bcf4e0369db3a9f8efaf834d74a130
 # Remove this line to create a well-formed Fossil manifest.

@@ -6243,6 +6243,7 @@ int tcldom_parse (
     int          useForeignDTD       = 0;
     int          paramEntityParsing  = (int)XML_PARAM_ENTITY_PARSING_ALWAYS;
     int          keepCDATA           = 0;
+    int          forrest             = 0;
     int          status              = 0;
     double       maximumAmplification = 0.0;
     long         activationThreshold = 0;
@@ -6269,6 +6270,7 @@ int tcldom_parse (
         "-keepCDATA",
         "-billionLaughsAttackProtectionMaximumAmplification",
         "-billionLaughsAttackProtectionActivationThreshold",
+        "-forrest",
         NULL
     };
     enum parseOption {
@@ -6285,7 +6287,8 @@ int tcldom_parse (
         o_jsonmaxnesting,         o_ignorexmlns,    o_LAST,
         o_keepCDATA,
         o_billionLaughsAttackProtectionMaximumAmplification,
-        o_billionLaughsAttackProtectionActivationThreshold
+        o_billionLaughsAttackProtectionActivationThreshold,
+        o_forrest
     };
 
     static const char *paramEntityParsingValues[] = {
@@ -6582,6 +6585,10 @@ int tcldom_parse (
             sdata = (SchemaData *) cmdInfo.objClientData;
             objv++;  objc--; continue;
 #endif
+        case o_forrest:
+            forrest = 1;
+            objv++;  objc--; continue;
+            
         }
         if ((enum parseOption) optionIndex == o_LAST) break;
     }
@@ -6681,8 +6688,9 @@ int tcldom_parse (
             doc = HTML_SimpleParseDocument(xml_string, ignoreWhiteSpaces,
                                            &byteIndex, &errStr);
         } else {
+            fprintf (stderr, "forrest %d\n", forrest);
             doc = XML_SimpleParseDocument(xml_string, ignoreWhiteSpaces,
-                                          keepCDATA,
+                                          keepCDATA, forrest,
                                           baseURI, extResolver,
                                           &byteIndex, &errStr);
         }
