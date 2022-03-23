@@ -187,7 +187,11 @@ test simple-1.23 {-forrest} {
     set result [$doc asXML -indent none]
     $doc delete
     set result
-} {<one>1</one><two>2</tow>}
+} {<one>1</one><two>2</two>}
+
+test simple-1.24 {-forrest} {
+    catch {dom parse -simple -forrest {<one>1</one><two>2}}
+} {1}
 
 test simple-2.1 {XML build in entities} {
     set doc [dom parse -simple {<doc>&lt;&gt;&amp;&apos;&quot;</doc>}]

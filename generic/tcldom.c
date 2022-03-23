@@ -6686,9 +6686,8 @@ int tcldom_parse (
 
         if (takeHTMLParser) {
             doc = HTML_SimpleParseDocument(xml_string, ignoreWhiteSpaces,
-                                           &byteIndex, &errStr);
+                                           forrest, &byteIndex, &errStr);
         } else {
-            fprintf (stderr, "forrest %d\n", forrest);
             doc = XML_SimpleParseDocument(xml_string, ignoreWhiteSpaces,
                                           keepCDATA, forrest,
                                           baseURI, extResolver,

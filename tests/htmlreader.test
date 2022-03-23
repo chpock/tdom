@@ -499,7 +499,28 @@ test html-3.2 {Bad data} {
     $doc delete
     set result
 } {<html><a></a></html>}
-        
+
+test html-3.3 {Single root} {
+    set doc [dom parse -html {<head><title>Some</title></head><body>text</body>}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<html><head><title>Some</title></head><body>text</body></html>}
+
+test html-3.4 {-forrest} {
+    set doc [dom parse -html -forrest {<head><title>Some</title></head><body>text</body>}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<head><title>Some</title></head><body>text</body>}
+
+test html-3.5 {-forrest} {
+    set doc [dom parse -html -forrest {<head><title>Some</title></head><body>text</body>}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<head><title>Some</title></head><body>text</body>}
+
 test html-4.1 {Tag name case normalization} {
     set doc [dom parse -html {<HtmL><boDY></BODy></HTml>}]
     set result [$doc asHTML]

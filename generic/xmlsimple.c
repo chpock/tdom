@@ -1030,6 +1030,7 @@ XML_SimpleParse (
         }
     }
     if (forrest && parent_node == parent) {
+        FREE ((char *) activeNS);
         return TCL_OK;
     }
     RetError("Unexpected end",(x - xml) );
@@ -1067,7 +1068,8 @@ XML_SimpleParseDocument (
 
     if (forrest) {
         // Create umbreall tag
-        h = Tcl_CreateHashEntry(&HASHTAB(doc,tdom_tagNames), "forrestroot", &hnew);
+        h = Tcl_CreateHashEntry(&HASHTAB(doc,tdom_tagNames), "forrestroot",
+                                &hnew);
         node = (domNode*) domAlloc(sizeof(domNode));
         memset(node, 0, sizeof(domNode));
         node->nodeType      = ELEMENT_NODE;
@@ -1076,7 +1078,6 @@ XML_SimpleParseDocument (
         doc->rootNode->firstChild = node;
         doc->rootNode->lastChild = node;
     }
-    
     
     *pos = 0;
     XML_SimpleParse (xml, pos, doc, node, ignoreWhiteSpaces, keepCDATA,
