@@ -729,6 +729,7 @@ domDocument *  domReadDocument   (XML_Parser parser,
                                   const char *baseurl,
                                   Tcl_Obj *extResolver,
                                   int   useForeignDTD,
+                                  int   forrest,
                                   int   paramEntityParsing,
 #ifndef TDOM_NO_SCHEMA
                                   SchemaData *sdata,

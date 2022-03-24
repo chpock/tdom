@@ -1226,6 +1226,7 @@ int tcldom_appendXML (
                           NULL,
                           extResolver,
                           0,
+                          0,
                           (int) XML_PARAM_ENTITY_PARSING_ALWAYS,
 #ifndef TDOM_NO_SCHEMA
                           NULL,
@@ -6779,6 +6780,7 @@ int tcldom_parse (
                           baseURI,
                           extResolver,
                           useForeignDTD,
+                          forrest,
                           paramEntityParsing,
 #ifndef TDOM_NO_SCHEMA
                           sdata,
@@ -6813,7 +6815,7 @@ int tcldom_parse (
                 Tcl_AppendResult(interp, "error \"", 
                                  XML_ErrorString(XML_GetErrorCode(parser)),
                                  "\" at line ", s, " character ", NULL);
-                sprintf(s, "%ld", XML_GetCurrentColumnNumber(parser));
+                sprintf(s, "%ld", XML_GetCurrentColumnNumber(parser) - forrest);
                 Tcl_AppendResult(interp, s, NULL);
                 byteIndex = XML_GetCurrentByteIndex(parser);
                 if ((byteIndex != -1) && (chan == NULL)) {

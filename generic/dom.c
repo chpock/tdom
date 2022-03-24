@@ -73,6 +73,7 @@
 
 #define INITIAL_BASEURISTACK_SIZE 4;
 
+#define XML_GetLine (XML_GetCurrentLineNumber(info->parser) - info->forrest)
 /*---------------------------------------------------------------------------
 |   Globals
 |   In threading environment, some are located in domDocument structure
@@ -149,6 +150,7 @@ typedef struct _domReadInfo {
     int               baseURIstackPos;
     domActiveBaseURI *baseURIstack;
     int               insideDTD;
+    int               forrest;
 #ifndef TDOM_NO_SCHEMA
     SchemaData       *sdata;
 #endif
@@ -1227,7 +1229,7 @@ startElement(
     if (info->storeLineColumn) {
         lc = (domLineColumn*) ( ((char*)node) + sizeof(domNode));
         node->nodeFlags |= HAS_LINE_COLUMN;
-        lc->line         = XML_GetCurrentLineNumber(info->parser);
+        lc->line         = XML_GetLine;
         lc->column       = XML_GetCurrentColumnNumber(info->parser);
     }
 
@@ -1646,7 +1648,7 @@ DispatchPCDATA (
         if (info->storeLineColumn) {
             lc = (domLineColumn*) ( ((char*)node) + sizeof(domTextNode) );
             node->nodeFlags |= HAS_LINE_COLUMN;
-            lc->line         = XML_GetCurrentLineNumber(info->parser);
+            lc->line         = XML_GetLine;
             lc->column       = XML_GetCurrentColumnNumber(info->parser);
         }
     }
@@ -1735,7 +1737,7 @@ commentHandler (
     if (info->storeLineColumn) {
         lc = (domLineColumn*) ( ((char*)node) + sizeof(domTextNode) );
         node->nodeFlags |= HAS_LINE_COLUMN;
-        lc->line         = XML_GetCurrentLineNumber(info->parser);
+        lc->line         = XML_GetLine;
         lc->column       = XML_GetCurrentColumnNumber(info->parser);
     }
 }
@@ -1822,7 +1824,7 @@ processingInstructionHandler(
     if (info->storeLineColumn) {
         lc = (domLineColumn*)(((char*)node)+sizeof(domProcessingInstructionNode));
         node->nodeFlags |= HAS_LINE_COLUMN;
-        lc->line         = XML_GetCurrentLineNumber(info->parser);
+        lc->line         = XML_GetLine;
         lc->column       = XML_GetCurrentColumnNumber(info->parser);
     }
 }
@@ -1882,7 +1884,7 @@ externalEntityRefHandler (
     int result, mode, done, byteIndex, i;
     int keepresult = 0;
     size_t len;
-    int tclLen;
+    int tclLen, storedForrest;
     XML_Parser extparser, oldparser = NULL;
     char buf[4096], *resultType, *extbase, *xmlstring, *channelId, s[50];
     Tcl_Channel chan = (Tcl_Channel) NULL;
@@ -2005,7 +2007,9 @@ externalEntityRefHandler (
     XML_SetBase (extparser, extbase);
     storedNextFeedbackPosition = info->nextFeedbackPosition;
     info->nextFeedbackPosition = info->feedbackAfter;
-
+    storedForrest = info->forrest;
+    info->forrest = 0;
+    
     Tcl_ResetResult (info->interp);
     result = 1;
     if (chan == NULL) {
@@ -2107,6 +2111,7 @@ externalEntityRefHandler (
     XML_ParserFree (extparser);
     info->parser = oldparser;
     info->nextFeedbackPosition = storedNextFeedbackPosition;
+    info->forrest = storedForrest;
     Tcl_DecrRefCount (resultObj);
     return result;
 
@@ -2186,6 +2191,7 @@ domReadDocument (
     const char *baseurl,
     Tcl_Obj    *extResolver,
     int         useForeignDTD,
+    int         forrest,
     int         paramEntityParsing,
 #ifndef TDOM_NO_SCHEMA
     SchemaData *sdata,
@@ -2235,10 +2241,15 @@ domReadDocument (
     info.baseURIstack         = (domActiveBaseURI*) 
         MALLOC (sizeof(domActiveBaseURI) * info.baseURIstackSize);
     info.insideDTD            = 0;
+    info.forrest              = forrest;
     info.status               = 0;
 #ifndef TDOM_NO_SCHEMA
     info.sdata                = sdata;
 #endif
+    
+    if (forrest) {
+        XML_Parse (parser, "<forrestroot>\n", 14, 0);
+    }
     
     XML_SetUserData(parser, &info);
     XML_SetBase (parser, baseurl);
@@ -2263,9 +2274,11 @@ domReadDocument (
         XML_SetCdataSectionHandler(parser, startCDATA, endCDATA);
     }
     
-
     if (channel == NULL) {
-        status = XML_Parse(parser, xml, length, 1);
+        status = XML_Parse (parser, xml, length, forrest ? 0 : 1);
+        if (forrest && status == XML_STATUS_OK) {
+            status = XML_Parse (parser, "</forrestroot>", 14, 1);
+        }
         switch (status) {
         case XML_STATUS_SUSPENDED:
             DBG(fprintf(stderr, "XML_STATUS_SUSPENDED\n");)

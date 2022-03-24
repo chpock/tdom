@@ -15,6 +15,7 @@
 #    dom-10.*: createNodeCmd
 #    dom-11.*: featureinfo
 #    dom-12.*: -feedbackAfter
+#    dom-13.*: -forrest
 #
 # Copyright (c) 2002, 2003, 2004 Rolf Ade.
 
@@ -2212,6 +2213,18 @@ test dom-12.16 {-feedbackcmd setting interp result w/ invalid XML} -body {
 } -result [list 1 {error "unclosed token" at line 1 character 19
 "<doc><e1/><e1/><e1>< <--Error-- /doc"}]
 
+test dom-13.1 {-forrest} -body {
+    dom parse -forrest {<one>1</one><two>2</two>} doc
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} -result {<one>1</one><two>2</two>}
+
+test dom-13.2 {-forrest} -body {
+    catch {dom parse -forrest {<one>1</one><two>2}} errMsg
+} -result {1}
+
+puts $errMsg
 # cleanup
 ::tcltest::cleanupTests
 return
