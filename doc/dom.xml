@@ -319,6 +319,15 @@ needed.</desc>
               </optdef>
 
               <optdef>
+                <optname>-forrest</optname>
+                <desc>If this option is given, there is no need for a
+                single root, any sequence of well-formed, balanced
+                subtrees will be parsed into a DOM tree. If used
+                together with -json or -html5 this option is ignored.
+                </desc>
+              </optdef>
+              
+              <optdef>
                 <optname>-billionLaughsAttackProtectionMaximumAmplification</optname>
                 <optarg>&lt;float&gt;</optarg>
                 <desc>This option together with

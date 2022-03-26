@@ -423,6 +423,11 @@ described in the documentation of the of the
 \&\fBdomNode
 \&\fR command method
 \&\fB>selectNodes\fP.
+.IP "\fB-forrest\fR"
+If this option is given, there is no need for a
+single root, any sequence of well-formed, balanced
+subtrees will be parsed into a DOM tree. If used
+together with -json or -html5 this option is ignored.
 .IP "\fB-billionLaughsAttackProtectionMaximumAmplification  \fI<float>\fP\fR"
 .UR "https://en.wikipedia.org/wiki/Billion_laughs_attack"
 <URL: https://en.wikipedia.org/wiki/Billion_laughs_attack>
