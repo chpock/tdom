@@ -1419,7 +1419,7 @@ HTML_SimpleParseDocument (
     int hnew;
 
     if (forrest) {
-        // Create umbreall tag
+        // Create umbrella tag
         h = Tcl_CreateHashEntry(&HASHTAB(doc,tdom_tagNames), "forrestroot",
                                 &hnew);
         node = (domNode*) domAlloc(sizeof(domNode));

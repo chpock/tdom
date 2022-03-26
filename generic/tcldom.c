@@ -6227,7 +6227,7 @@ int tcldom_parse (
     GetTcldomTSD()
 
     char        *xml_string, *option, *errStr, *channelId, *baseURI = NULL;
-    char        *jsonRoot = NULL;
+    char        *xmlError = NULL, *jsonRoot = NULL;
     Tcl_Obj     *extResolver = NULL;
     Tcl_Obj     *feedbackCmd = NULL;
     const char  *interpResult;
@@ -6803,19 +6803,28 @@ int tcldom_parse (
             Tcl_ResetResult(interp);
             XML_ParserFree(parser);
             return TCL_OK;
+        case 5:
+            /* Forrest parsing error detected at closing umbrella
+             * tag. */
+            xmlError = "premature end";
+            /* Fall throuh */
         default:
             interpResult = Tcl_GetStringResult(interp);
-            sprintf(s, "%ld", XML_GetCurrentLineNumber(parser));
+            sprintf(s, "%ld", XML_GetCurrentLineNumber(parser) - forrest);
             if (interpResult[0] == '\0') {
                 /* If the interp result isn't empty, then there was an error
                    in an enternal entity and the interp result has already the
                    error msg. If we don't got a document, but interp result is
                    empty, the error occurred in the main document and we
                    build the error msg as follows. */
+                /* Nothing to do in case of -forrest - since no DTD,
+                 * no external entities. */
                 Tcl_AppendResult(interp, "error \"", 
-                                 XML_ErrorString(XML_GetErrorCode(parser)),
+                                 (xmlError == NULL ?
+                                  XML_ErrorString(XML_GetErrorCode(parser))
+                                  : xmlError),
                                  "\" at line ", s, " character ", NULL);
-                sprintf(s, "%ld", XML_GetCurrentColumnNumber(parser) - forrest);
+                sprintf(s, "%ld", XML_GetCurrentColumnNumber(parser));
                 Tcl_AppendResult(interp, s, NULL);
                 byteIndex = XML_GetCurrentByteIndex(parser);
                 if ((byteIndex != -1) && (chan == NULL)) {

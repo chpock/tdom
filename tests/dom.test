@@ -2221,10 +2221,9 @@ test dom-13.1 {-forrest} -body {
 } -result {<one>1</one><two>2</two>}
 
 test dom-13.2 {-forrest} -body {
-    catch {dom parse -forrest {<one>1</one><two>2}} errMsg
+    catch {dom parse -forrest {<one>1</one><two>2}}
 } -result {1}
 
-puts $errMsg
 # cleanup
 ::tcltest::cleanupTests
 return

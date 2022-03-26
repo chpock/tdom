@@ -1884,7 +1884,7 @@ externalEntityRefHandler (
     int result, mode, done, byteIndex, i;
     int keepresult = 0;
     size_t len;
-    int tclLen, storedForrest;
+    int tclLen;
     XML_Parser extparser, oldparser = NULL;
     char buf[4096], *resultType, *extbase, *xmlstring, *channelId, s[50];
     Tcl_Channel chan = (Tcl_Channel) NULL;
@@ -2007,8 +2007,6 @@ externalEntityRefHandler (
     XML_SetBase (extparser, extbase);
     storedNextFeedbackPosition = info->nextFeedbackPosition;
     info->nextFeedbackPosition = info->feedbackAfter;
-    storedForrest = info->forrest;
-    info->forrest = 0;
     
     Tcl_ResetResult (info->interp);
     result = 1;
@@ -2111,7 +2109,6 @@ externalEntityRefHandler (
     XML_ParserFree (extparser);
     info->parser = oldparser;
     info->nextFeedbackPosition = storedNextFeedbackPosition;
-    info->forrest = storedForrest;
     Tcl_DecrRefCount (resultObj);
     return result;
 
@@ -2248,6 +2245,7 @@ domReadDocument (
 #endif
     
     if (forrest) {
+        /* Call the umbrella start tag before handler installation */
         XML_Parse (parser, "<forrestroot>\n", 14, 0);
     }
     
@@ -2278,6 +2276,9 @@ domReadDocument (
         status = XML_Parse (parser, xml, length, forrest ? 0 : 1);
         if (forrest && status == XML_STATUS_OK) {
             status = XML_Parse (parser, "</forrestroot>", 14, 1);
+            if (status == XML_STATUS_ERROR) {
+                info.status = 5;
+            }
         }
         switch (status) {
         case XML_STATUS_SUSPENDED:
