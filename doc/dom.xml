@@ -297,6 +297,15 @@ needed.</desc>
 
 
               <optdef>
+                <optname>-forrest</optname>
+                <desc>If this option is given, there is no need for a
+                single root, any sequence of well-formed, balanced
+                subtrees will be parsed into a DOM tree. If used
+                together with -json or -html5 this option is ignored.
+                </desc>
+              </optdef>
+              
+              <optdef>
                 <optname>-ignorexmlns</optname>
                 <desc>It is recommended, that you only use this option
                 with the <m>-html5</m> option. If this option is
@@ -318,15 +327,6 @@ needed.</desc>
                 </desc>
               </optdef>
 
-              <optdef>
-                <optname>-forrest</optname>
-                <desc>If this option is given, there is no need for a
-                single root, any sequence of well-formed, balanced
-                subtrees will be parsed into a DOM tree. If used
-                together with -json or -html5 this option is ignored.
-                </desc>
-              </optdef>
-              
               <optdef>
                 <optname>-billionLaughsAttackProtectionMaximumAmplification</optname>
                 <optarg>&lt;float&gt;</optarg>

@@ -2224,6 +2224,52 @@ test dom-13.2 {-forrest} -body {
     catch {dom parse -forrest {<one>1</one><two>2}}
 } -result {1}
 
+test dom-13.3 {-forrest} -body {
+    dom parse -forrest {<one>1</one><two>2</two>some text} doc
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} -result {<one>1</one><two>2</two>some text}
+
+test dom-13.4 {-forrest -channel} -setup {
+    set xmlfile [makeFile {<one>1</one><two>2</two>} dom.xml]
+} -body {
+    set fd [open $xmlfile]
+    set doc [dom parse -channel $fd -forrest]
+    close $fd
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} -cleanup {
+    removeFile dom.xml
+} -result {<one>1</one><two>2</two>}
+
+test dom-13.5 {-forrest -channel} -setup {
+    set xmlfile [makeFile {<one>1</one><two>2} dom.xml]
+} -body {
+    set fd [open $xmlfile]
+    set result [catch {set doc [dom parse -channel $fd -forrest]} errMsg]
+    close $fd
+    list $result $errMsg
+} -cleanup {
+    removeFile dom.xml
+} -result {1 {}}
+
+test dom-13.6 {-forrest -channel} -setup {
+    # makeFile appends a newline at end
+    set xmlfile [makeFile {<one>1</one><two>2</two>some text} dom.xml]
+} -body {
+    set fd [open $xmlfile]
+    set doc [dom parse -channel $fd -forrest]
+    close $fd
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} -cleanup {
+    removeFile dom.xml
+} -result {<one>1</one><two>2</two>some text
+}
+
 # cleanup
 ::tcltest::cleanupTests
 return

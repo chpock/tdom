@@ -1574,8 +1574,13 @@ DispatchPCDATA (
     s = Tcl_DStringValue (info->cdata);
     
     parentNode = info->currentNode;
-    if (!parentNode) return;
-
+    if (!parentNode) {
+        if (info->forrest) {
+            parentNode = info->document->rootNode;
+        } else {
+            return;
+        }
+    }
     if (   parentNode->lastChild 
         && parentNode->lastChild->nodeType == TEXT_NODE
         && !info->cdataSection) {
@@ -1625,7 +1630,9 @@ DispatchPCDATA (
         memmove(node->nodeValue, s, len);
 
         node->ownerDocument = info->document;
-        node->parentNode = parentNode;
+        if (info->currentNode) {
+            node->parentNode = parentNode;
+        }
         if (parentNode->nodeType == ELEMENT_NODE) {
             if (parentNode->firstChild)  {
                 parentNode->lastChild->nextSibling = (domNode*)node;
@@ -2204,7 +2211,7 @@ domReadDocument (
     char            buf[8192];
     Tcl_Obj        *bufObj;
     Tcl_DString     dStr;
-    int             useBinary;
+    int             useBinary, inputend = 0;
     char           *str;
     domDocument    *doc = domCreateDoc(baseurl, storeLineColumn);
 
@@ -2276,6 +2283,7 @@ domReadDocument (
         status = XML_Parse (parser, xml, length, forrest ? 0 : 1);
         if (forrest && status == XML_STATUS_OK) {
             status = XML_Parse (parser, "</forrestroot>", 14, 1);
+            DispatchPCDATA (&info);
             if (status == XML_STATUS_ERROR) {
                 info.status = 5;
             }
@@ -2315,9 +2323,22 @@ domReadDocument (
         Tcl_DStringFree (&dStr);
         if (useBinary) {
             do {
-                len = Tcl_Read (channel, buf, sizeof(buf));
-                done = len < sizeof(buf);
-                status = XML_Parse (parser, buf, len, done);
+                if (inputend) {
+                    done = 1;
+                    status = XML_Parse (parser, "</forrestroot>", 14, 1);
+                    DispatchPCDATA (&info);
+                    if (status == XML_STATUS_ERROR) {
+                        info.status = 5;
+                    }
+                } else {
+                    len = Tcl_Read (channel, buf, sizeof(buf));
+                    done = len < sizeof(buf);
+                    if (forrest && done) {
+                        done = 0;
+                        inputend = 1;
+                    }
+                    status = XML_Parse (parser, buf, len, done);
+                }
                 switch (status) {
                 case XML_STATUS_SUSPENDED:
                     DBG(fprintf(stderr, "XML_STATUS_SUSPENDED\n"););
@@ -2342,10 +2363,23 @@ domReadDocument (
             bufObj = Tcl_NewObj();
             Tcl_SetObjLength (bufObj, 6144);
             do {
-                len = Tcl_ReadChars (channel, bufObj, 1024, 0);
-                done = (len < 1024);
-                str = Tcl_GetStringFromObj(bufObj, &tclLen);
-                status = XML_Parse (parser, str, tclLen, done);
+                if (inputend) {
+                    done = 1;
+                    status = XML_Parse (parser, "</forrestroot>", 14, 1);
+                    DispatchPCDATA (&info);
+                    if (status == XML_STATUS_ERROR) {
+                        info.status = 5;
+                    }
+                } else {
+                    len = Tcl_ReadChars (channel, bufObj, 1024, 0);
+                    done = (len < 1024);
+                    if (forrest && done) {
+                        done = 0;
+                        inputend = 1;
+                    }
+                    str = Tcl_GetStringFromObj(bufObj, &tclLen);
+                    status = XML_Parse (parser, str, tclLen, done);
+                }
                 switch (status) {
                 case XML_STATUS_SUSPENDED:
                     DBG(fprintf(stderr, "XML_STATUS_SUSPENDED\n"););
