@@ -128,6 +128,7 @@ typedef struct _domActiveBaseURI {
 |   type domReadInfo
 |
 \--------------------------------------------------------------------------*/
+/* Keep in sync with tdomCmdReadInfo below */
 typedef struct _domReadInfo {
 
     XML_Parser        parser;
@@ -5247,6 +5248,8 @@ domXPointerAncestor (
 |   type tdomCmdReadInfo
 |
 \--------------------------------------------------------------------------*/
+/* The struct members until the tdom cmd specific elements must be the
+ * same as for domReadInfo. */
 typedef struct _tdomCmdReadInfo {
 
     XML_Parser        parser;
@@ -5269,6 +5272,7 @@ typedef struct _tdomCmdReadInfo {
     int               baseURIstackPos;
     domActiveBaseURI *baseURIstack;
     int               insideDTD;
+    int               forrest;
 #ifndef TDOM_NO_SCHEMA
     SchemaData       *sdata;
 #endif
@@ -5483,6 +5487,7 @@ TclTdomObjCmd (dummy, interp, objc, objv)
         info->insideDTD         = 0;
         info->tdomStatus        = 0;
         info->extResolver       = NULL;
+        info->forrest           = 0;
 #ifndef TDOM_NO_SCHEMA
         info->sdata             = NULL;
 #endif

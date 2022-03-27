@@ -193,6 +193,13 @@ test simple-1.24 {-forrest} {
     catch {dom parse -simple -forrest {<one>1</one><two>2}}
 } {1}
 
+test simple-1.25 {-forrest} {
+    set doc [dom parse -simple -forrest {<one>1</one>some text<two>2</two>other text}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<one>1</one>some text<two>2</two>other text}
+
 test simple-2.1 {XML build in entities} {
     set doc [dom parse -simple {<doc>&lt;&gt;&amp;&apos;&quot;</doc>}]
     set root [$doc documentElement]
