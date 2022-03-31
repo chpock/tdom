@@ -2253,7 +2253,7 @@ test dom-13.5 {-forrest -channel} -setup {
     list $result $errMsg
 } -cleanup {
     removeFile dom.xml
-} -result {1 {}}
+} -result {1 {error "premature end" at line 2 character 2}}
 
 test dom-13.6 {-forrest -channel} -setup {
     # makeFile appends a newline at end

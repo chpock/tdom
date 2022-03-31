@@ -1468,6 +1468,11 @@ endElement (
 
     DispatchPCDATA (info);
     
+    if (info->forrest && info->depth == 0) {
+        XML_StopParser (info->parser, 0);
+        info->status = 6;
+        return;
+    }
     info->depth--;
     if (!info->ignorexmlns) {
         /* pop active namespaces */
@@ -2202,6 +2207,8 @@ domReadDocument (
     SchemaData *sdata,
 #endif
     Tcl_Interp *interp,
+    long       *errorLine,
+    long       *errorColumn,
     int        *resultcode
 )
 {
@@ -2283,8 +2290,9 @@ domReadDocument (
     if (channel == NULL) {
         status = XML_Parse (parser, xml, length, forrest ? 0 : 1);
         if (forrest && status == XML_STATUS_OK) {
-            status = XML_Parse (parser, "</forrestroot>", 14, 1);
+            XML_SetElementHandler (parser, NULL, NULL);
             DispatchPCDATA (&info);
+            status = XML_Parse (parser, "</forrestroot>", 14, 1);
             if (status == XML_STATUS_ERROR) {
                 info.status = 5;
             }
@@ -2326,6 +2334,7 @@ domReadDocument (
             do {
                 if (inputend) {
                     done = 1;
+                    XML_SetElementHandler (parser, NULL, NULL);
                     status = XML_Parse (parser, "</forrestroot>", 14, 1);
                     DispatchPCDATA (&info);
                     if (status == XML_STATUS_ERROR) {
@@ -2366,6 +2375,7 @@ domReadDocument (
             do {
                 if (inputend) {
                     done = 1;
+                    XML_SetElementHandler (parser, NULL, NULL);
                     status = XML_Parse (parser, "</forrestroot>", 14, 1);
                     DispatchPCDATA (&info);
                     if (status == XML_STATUS_ERROR) {

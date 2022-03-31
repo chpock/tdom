@@ -5690,6 +5690,8 @@ getExternalDocument (
     XML_Parser    parser;
     Tcl_Channel   chan;
     Tcl_DString   dStr;
+    long          errorLine = 0, errorColumn = 0;
+    
     
     if (isStylesheet && (href[0] == '\0')) {
         *errMsg = tdomstrdup("Recursive import/include: stylesheet tries "
@@ -5798,7 +5800,7 @@ getExternalDocument (
 #ifndef TDOM_NO_SCHEMA
                            NULL,
 #endif
-                           interp, &resultcode);
+                           interp, &errorLine, &errorColumn, &resultcode);
     if (xsltDoc->extResolver) {
         Tcl_DecrRefCount (extResolver);
     }

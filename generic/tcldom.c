@@ -1194,6 +1194,7 @@ int tcldom_appendXML (
     domDocument *doc;
     domNode     *nodeToAppend;
     XML_Parser   parser;
+    long         errorLine = 0, errorColumn = 0;
 
     GetTcldomTSD()
 
@@ -1232,6 +1233,8 @@ int tcldom_appendXML (
                           NULL,
 #endif
                           interp,
+                          &errorLine,
+                          &errorColumn,
                           &resultcode);
     if (extResolver) {
         Tcl_DecrRefCount(extResolver);
@@ -6247,7 +6250,7 @@ int tcldom_parse (
     int          forrest             = 0;
     int          status              = 0;
     double       maximumAmplification = 0.0;
-    long         activationThreshold = 0;
+    long         activationThreshold = 0, errorLine = 0, errorColumn = 0;
     domDocument *doc;
     Tcl_Obj     *newObjName = NULL;
     XML_Parser   parser;
@@ -6786,6 +6789,8 @@ int tcldom_parse (
                           sdata,
 #endif
                           interp,
+                          &errorLine,
+                          &errorColumn,
                           &status);
 #ifndef TDOM_NO_SCHEMA
     if (sdata) {
@@ -6794,7 +6799,10 @@ int tcldom_parse (
     }
 #endif
     if (doc == NULL) {
-        char s[50];
+        char sl[50];
+        char sc[50];
+        char sb[2];
+        
         long byteIndex, i;
         
         switch (status) {
@@ -6810,7 +6818,7 @@ int tcldom_parse (
             /* Fall throuh */
         default:
             interpResult = Tcl_GetStringResult(interp);
-            sprintf(s, "%ld", XML_GetCurrentLineNumber(parser) - forrest);
+            sprintf(sl, "%ld", XML_GetCurrentLineNumber(parser) - forrest);
             if (interpResult[0] == '\0') {
                 /* If the interp result isn't empty, then there was an error
                    in an enternal entity and the interp result has already the
@@ -6823,18 +6831,18 @@ int tcldom_parse (
                                  (xmlError == NULL ?
                                   XML_ErrorString(XML_GetErrorCode(parser))
                                   : xmlError),
-                                 "\" at line ", s, " character ", NULL);
-                sprintf(s, "%ld", XML_GetCurrentColumnNumber(parser));
-                Tcl_AppendResult(interp, s, NULL);
+                                 "\" at line ", sl, " character ", NULL);
+                sprintf(sc, "%ld", XML_GetCurrentColumnNumber(parser));
+                Tcl_AppendResult(interp, sc, NULL);
                 byteIndex = XML_GetCurrentByteIndex(parser);
                 if ((byteIndex != -1) && (chan == NULL)) {
                     Tcl_AppendResult(interp, "\n\"", NULL);
-                    s[1] = '\0';
+                    sb[1] = '\0';
                     for (i=-20; i < 40; i++) {
                         if ((byteIndex+i)>=0) {
                             if (xml_string[byteIndex+i]) {
-                                s[0] = xml_string[byteIndex+i];
-                                Tcl_AppendResult(interp, s, NULL);
+                                sb[0] = xml_string[byteIndex+i];
+                                Tcl_AppendResult(interp, sb, NULL);
                                 if (i==0) {
                                     Tcl_AppendResult(interp, " <--Error-- ", NULL);
                                 }
@@ -6854,10 +6862,11 @@ int tcldom_parse (
                      * interp has already an error msg, that parsing
                      * error was in an external entity. Therefore, we
                      * just add the place of the referencing entity in
-                     * the mail document.*/
-                    Tcl_AppendResult(interp, ", referenced at line ", s, NULL);
-                    sprintf(s, "%ld", XML_GetCurrentColumnNumber(parser));
-                    Tcl_AppendResult(interp, " character ", s, NULL);
+                     * the main document.*/
+                    Tcl_AppendResult(interp, ", referenced at line ", sl,
+                                     NULL);
+                    sprintf(sc, "%ld", XML_GetCurrentColumnNumber(parser));
+                    Tcl_AppendResult(interp, " character ", sc, NULL);
                 }
             }
             XML_ParserFree(parser);

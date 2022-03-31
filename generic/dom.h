@@ -735,6 +735,8 @@ domDocument *  domReadDocument   (XML_Parser parser,
                                   SchemaData *sdata,
 #endif
                                   Tcl_Interp *interp,
+                                  long *errorLine,
+                                  long *errorColumn,
                                   int  *status);
 
 void           domFreeDocument   (domDocument *doc, 
