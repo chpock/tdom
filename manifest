@@ -1,5 +1,5 @@
 C wip
-D 2022-03-31T01:24:34.924
+D 2022-03-31T22:58:56.912
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -125,7 +125,7 @@ F extensions/tnc/win/rules-ext.vc e788fcfc1e69b11946e18b8f67e0870b3bd38913
 F extensions/tnc/win/rules.vc 8157e2a811cf5e93683d6b0fbf5d91d153aa4535
 F extensions/tnc/win/targets.vc 79dea1c6a94a94e6ed8bae9e0195149b25a69923
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
-F generic/dom.c 024471b66360a4382da77d2f9a713b202323b1ebe55f023ce0921384d3d637b4
+F generic/dom.c 6e23749c989597d9610738caa878a173b544927789e88f584d7b9370b263fd0d
 F generic/dom.h 84451243c861883370eb6872da1ec00553c632a50eec101c5f89e3393f2a6bd5
 F generic/domalloc.c 7a6a2fdde25d04ffef0330259ceb781ffa2150c2314dd88784f924f6f331ef9e
 F generic/domalloc.h 961f83bb46dec27dbcf36ed430ed81b1f485a1fdfaa2f7df8b60bbcf861d0fe3
@@ -237,8 +237,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f5e136f14ab8f9df8053472ccc45ac3ff76c6481fcd04ebde536390cc165b07c
-R 799ed2b20bb5d113d4665159a06bf747
+P 9803aaacc1f073def50d54d7bd50c5d60ca00710c8f5ddf1560518822fec5573
+R d12bbbdb9fa30a0482d77f64870f7df7
 U rolf
-Z 26e0abb1559bc350747da4ae9a1c2320
+Z 6250cd9e6d9554f7c8be0d3fd36efdce
 # Remove this line to create a well-formed Fossil manifest.
