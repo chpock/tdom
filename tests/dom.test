@@ -2270,6 +2270,10 @@ test dom-13.6 {-forrest -channel} -setup {
 } -result {<one>1</one><two>2</two>some text
 }
 
+test dom-13.2 {-forrest} -body {
+    catch {dom parse -forrest {<one>1</one><two>2<two></notopenedend>}}
+} -result {1}
+
 # cleanup
 ::tcltest::cleanupTests
 return

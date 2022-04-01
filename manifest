@@ -1,5 +1,5 @@
-C wip
-D 2022-03-31T22:58:56.912
+C Reduced\sdomReadDocument\simplementation\sredundancy.
+D 2022-04-01T15:03:31.121
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -125,7 +125,7 @@ F extensions/tnc/win/rules-ext.vc e788fcfc1e69b11946e18b8f67e0870b3bd38913
 F extensions/tnc/win/rules.vc 8157e2a811cf5e93683d6b0fbf5d91d153aa4535
 F extensions/tnc/win/targets.vc 79dea1c6a94a94e6ed8bae9e0195149b25a69923
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
-F generic/dom.c 6e23749c989597d9610738caa878a173b544927789e88f584d7b9370b263fd0d
+F generic/dom.c c4822eb272ea97b10ffbf21959e8d6766bdcac90a14e8fb9918f32fb122c7183
 F generic/dom.h 84451243c861883370eb6872da1ec00553c632a50eec101c5f89e3393f2a6bd5
 F generic/domalloc.c 7a6a2fdde25d04ffef0330259ceb781ffa2150c2314dd88784f924f6f331ef9e
 F generic/domalloc.h 961f83bb46dec27dbcf36ed430ed81b1f485a1fdfaa2f7df8b60bbcf861d0fe3
@@ -194,7 +194,7 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.bench 5446ce379127b8d5700f18a5a0848e580313d0d7
-F tests/dom.test 85f8fb3f5e81694e6892822da90b4b31c492f7a6beb01e37c5b98afe1123c9ad
+F tests/dom.test 0e0240ce164f1ccf5ff7acb18d197283050189134f47ed37607a91ee525914e7
 F tests/domDoc.test cb833d2139c8d9671e50f3cf4155b85e082674bcc534562128be0dee3419e71d
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test 609c1252a2616bac46f16f1c05050b3514250abfe55cbe6056ad9c8fb29d2619
@@ -237,8 +237,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 9803aaacc1f073def50d54d7bd50c5d60ca00710c8f5ddf1560518822fec5573
-R d12bbbdb9fa30a0482d77f64870f7df7
+P 8a28e0979e0c21a3a5b3bc6c460bda3c6c17294f306a6370f876a9265e46e3fa
+R 0b139a79c386a2ffdb0705531cb027af
 U rolf
-Z 6250cd9e6d9554f7c8be0d3fd36efdce
+Z 2ae45c407f14288dc2b314bdd1c521ac
 # Remove this line to create a well-formed Fossil manifest.

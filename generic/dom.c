@@ -1477,10 +1477,20 @@ endElement (
 
     DispatchPCDATA (info);
     
-    if (info->forrest && info->depth == 0) {
-        XML_StopParser (info->parser, 0);
-        info->status->status = 6;
-        return;
+    if (info->forrest) {
+        if (info->depth == 0) {
+            /* Input has </forrestroot> after the closing tag of the
+             * last tree. */
+            XML_StopParser (info->parser, 0);
+            info->status->status = 6;
+            return;
+        } else if (info->depth == 1) {
+            /* Toplevel XML tree closed */
+            /* Miss-use struct member to signal. */
+            info->status->errorLine = -1;
+        } else {
+            info->status->errorLine = 0;
+        }
     }
     info->depth--;
     if (!info->ignorexmlns) {
@@ -2228,7 +2238,7 @@ domReadDocument (
     char            buf[8192];
     Tcl_Obj        *bufObj;
     Tcl_DString     dStr;
-    int             useBinary, inputend = 0;
+    int             useBinary = 0, inputend = 0;
     char           *str;
     domReadStatus   readstatus;
     domDocument    *doc = domCreateDoc(baseurl, storeLineColumn);
@@ -2310,130 +2320,76 @@ domReadDocument (
                 info.status->status = 5;
             }
         }
-        switch (status) {
-        case XML_STATUS_SUSPENDED:
-            DBG(fprintf(stderr, "XML_STATUS_SUSPENDED\n");)
-            if (info.status->status == TCL_BREAK) {
-                Tcl_ResetResult(interp);
-            }
-            /* fall throu */
-        case XML_STATUS_ERROR:
-            DBG(fprintf(stderr, "XML_STATUS_ERROR\n");)
-            FREE ( info.activeNS );
-            FREE ( info.baseURIstack );
-            Tcl_DStringFree (info.cdata);
-            FREE ( info.cdata);
-            domFreeDocument (doc, NULL, NULL);
-            *resultcode = info.status->status;
-            return NULL;
-        case XML_STATUS_OK:
-            break;
-        }
     } else {
         Tcl_DStringInit (&dStr);
-        if (Tcl_GetChannelOption (interp, channel, "-encoding", &dStr) != TCL_OK) {
-            FREE ( (char*) info.activeNS );
-            FREE ( info.baseURIstack );
-            Tcl_DStringFree (info.cdata);
-            FREE ( info.cdata);
+        if (Tcl_GetChannelOption (interp, channel, "-encoding", &dStr)
+            != TCL_OK) {
             domFreeDocument (doc, NULL, NULL);
-            *resultcode = info.status->status;
-            return NULL;
+            *resultcode = TCL_ERROR;
+            doc = NULL;
+            goto cleanup;
         }
-        if (strcmp (Tcl_DStringValue (&dStr), "utf-8")==0 ) useBinary = 1;
-        else useBinary = 0;
-        Tcl_DStringFree (&dStr);
-        if (useBinary) {
-            do {
-                if (inputend) {
-                    done = 1;
-                    XML_SetElementHandler (parser, NULL, NULL);
-                    status = XML_Parse (parser, "</forrestroot>", 14, 1);
-                    DispatchPCDATA (&info);
-                    if (status == XML_STATUS_ERROR) {
-                        info.status->status = 5;
-                    }
-                } else {
-                    len = Tcl_Read (channel, buf, sizeof(buf));
-                    done = len < sizeof(buf);
-                    if (forrest && done) {
-                        done = 0;
-                        inputend = 1;
-                    }
-                    status = XML_Parse (parser, buf, len, done);
-                }
-                switch (status) {
-                case XML_STATUS_SUSPENDED:
-                    DBG(fprintf(stderr, "XML_STATUS_SUSPENDED\n"););
-                    if (info.status->status == TCL_BREAK) {
-                        Tcl_ResetResult(interp);
-                    }
-                    /* fall throu */
-                case XML_STATUS_ERROR:
-                    DBG(fprintf(stderr, "XML_STATUS_ERROR\n");)
-                    FREE ( info.activeNS );
-                    FREE ( info.baseURIstack );
-                    Tcl_DStringFree (info.cdata);
-                    FREE ( info.cdata);
-                    domFreeDocument (doc, NULL, NULL);
-                    *resultcode = info.status->status;
-                    return NULL;
-                case XML_STATUS_OK:
-                    break;
-                }
-            } while (!done);
+        if (strcmp (Tcl_DStringValue (&dStr), "utf-8")==0 ) {
+            useBinary = 1;
         } else {
             bufObj = Tcl_NewObj();
             Tcl_SetObjLength (bufObj, 6144);
-            do {
-                if (inputend) {
-                    done = 1;
-                    XML_SetElementHandler (parser, NULL, NULL);
-                    status = XML_Parse (parser, "</forrestroot>", 14, 1);
-                    DispatchPCDATA (&info);
-                    if (status == XML_STATUS_ERROR) {
-                        info.status->status = 5;
-                    }
-                } else {
-                    len = Tcl_ReadChars (channel, bufObj, 1024, 0);
-                    done = (len < 1024);
-                    if (forrest && done) {
-                        done = 0;
-                        inputend = 1;
-                    }
-                    str = Tcl_GetStringFromObj(bufObj, &tclLen);
-                    status = XML_Parse (parser, str, tclLen, done);
-                }
-                switch (status) {
-                case XML_STATUS_SUSPENDED:
-                    DBG(fprintf(stderr, "XML_STATUS_SUSPENDED\n"););
-                    if (info.status->status == TCL_BREAK) {
-                        Tcl_ResetResult(interp);
-                    }
-                    /* fall throu */
-                case XML_STATUS_ERROR:
-                    DBG(fprintf(stderr, "XML_STATUS_ERROR\n");)
-                    FREE ( info.activeNS );
-                    FREE ( info.baseURIstack );
-                    Tcl_DStringFree (info.cdata);
-                    FREE ( info.cdata);
-                    domFreeDocument (doc, NULL, NULL);
-                    Tcl_DecrRefCount (bufObj);
-                    *resultcode = info.status->status;
-                    return NULL;
-                case XML_STATUS_OK:
-                    break;
-                }
-            } while (!done);
-            Tcl_DecrRefCount (bufObj);
         }
+        Tcl_DStringFree (&dStr);
+        do {
+            if (useBinary) {
+                len = Tcl_Read (channel, buf, sizeof(buf));
+                done = len < sizeof(buf);
+            } else {
+                len = Tcl_ReadChars (channel, bufObj, 1024, 0);
+                done = (len < 1024);
+                str = Tcl_GetStringFromObj (bufObj, &tclLen);
+            }
+            if (forrest && done) {
+                done = 0;
+                inputend = 1;
+            }
+            if (useBinary) {
+                status = XML_Parse (parser, buf, len, done);
+            } else {
+                status = XML_Parse (parser, str, tclLen, done);
+            }
+            if (inputend) {
+                done = 1;
+                XML_SetElementHandler (parser, NULL, NULL);
+                status = XML_Parse (parser, "</forrestroot>", 14, 1);
+                DispatchPCDATA (&info);
+                if (status == XML_STATUS_ERROR) {
+                    info.status->status = 5;
+                }
+            }
+        } while (!done);
     }
+    switch (status) {
+    case XML_STATUS_SUSPENDED:
+        DBG(fprintf(stderr, "XML_STATUS_SUSPENDED\n");)
+            if (info.status->status == TCL_BREAK) {
+                Tcl_ResetResult(interp);
+            }
+        /* fall throu */
+    case XML_STATUS_ERROR:
+        DBG(fprintf(stderr, "XML_STATUS_ERROR\n");)
+        domFreeDocument (doc, NULL, NULL);
+        *resultcode = info.status->status;
+        doc = NULL;
+    case XML_STATUS_OK:
+        break;
+    }
+    if (!useBinary && channel != NULL) {
+        Tcl_DecrRefCount (bufObj);
+    }
+cleanup:
     FREE ( info.activeNS );
     FREE ( info.baseURIstack );
     Tcl_DStringFree (info.cdata);
     FREE ( info.cdata);
 
-    domSetDocumentElement (doc);
+    if (doc) domSetDocumentElement (doc);
 
     return doc;
 }
