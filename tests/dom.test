@@ -2270,9 +2270,16 @@ test dom-13.6 {-forrest -channel} -setup {
 } -result {<one>1</one><two>2</two>some text
 }
 
-test dom-13.2 {-forrest} -body {
+test dom-13.7 {-forrest} -body {
     catch {dom parse -forrest {<one>1</one><two>2<two></notopenedend>}}
 } -result {1}
+
+test dom-13.8 {-forrest} {
+    set xml {<one><two></one>}
+    catch {dom parse $xml} errMsg1
+    catch {dom parse -forrest $xml} errMsg2
+    expr {$errMsg1 eq $errMsg2}
+} {1}
 
 # cleanup
 ::tcltest::cleanupTests

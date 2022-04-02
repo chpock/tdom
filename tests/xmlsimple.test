@@ -200,6 +200,13 @@ test simple-1.25 {-forrest} {
     set result
 } {<one>1</one>some text<two>2</two>other text}
 
+test simple-1.26 {-forrest} {
+    set xml {<one><two></one>}
+    catch {dom parse -simple $xml} errMsg1
+    catch {dom parse -simple -forrest $xml} errMsg2
+    expr {$errMsg1 eq $errMsg2}
+} {1}
+
 test simple-2.1 {XML build in entities} {
     set doc [dom parse -simple {<doc>&lt;&gt;&amp;&apos;&quot;</doc>}]
     set root [$doc documentElement]

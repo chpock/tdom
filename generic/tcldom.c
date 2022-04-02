@@ -6834,7 +6834,7 @@ int tcldom_parse (
                                  "\" at line ", sl, " character ", NULL);
                 sprintf(sc, "%ld", XML_GetCurrentColumnNumber(parser));
                 Tcl_AppendResult(interp, sc, NULL);
-                byteIndex = XML_GetCurrentByteIndex(parser);
+                byteIndex = XML_GetCurrentByteIndex(parser) - forrest * 14;
                 if ((byteIndex != -1) && (chan == NULL)) {
                     Tcl_AppendResult(interp, "\n\"", NULL);
                     sb[1] = '\0';
