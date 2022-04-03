@@ -4,17 +4,17 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x562f8c2f3400">NAME</a> · <a href="#SECTid0x562f8c3365c0">SYNOPSIS</a> · <a href="#SECTid0x562f8c3d3810">DESCRIPTION </a> · <a href="#SECTid0x562f8c43b3e0">KEYWORDS</a>
+<a href="#SECTid0x55dfd8b9e450">NAME</a> · <a href="#SECTid0x55dfd8bdd5e0">SYNOPSIS</a> · <a href="#SECTid0x55dfd8c7e8e0">DESCRIPTION </a> · <a href="#SECTid0x55dfd8ce6370">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x562f8c2f3400">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x55dfd8b9e450">NAME</a></h2><p class="namesection">
 <b class="names">dom - </b><br>Create an in-memory DOM tree from XML</p>
   
-  <h2><a name="SECTid0x562f8c3365c0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x55dfd8bdd5e0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">dom</b> <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
 
-  <h2><a name="SECTid0x562f8c3d3810">DESCRIPTION </a></h2><p>This command provides the creation of DOM trees in memory. In
+  <h2><a name="SECTid0x55dfd8c7e8e0">DESCRIPTION </a></h2><p>This command provides the creation of DOM trees in memory. In
 the usual case a string containing a XML information is parsed and converted
 into a DOM tree. Other possible parse input may be HTML or JSON.
 The <i class="m">method</i> indicates a specific subcommand. </p><p>The valid methods are:</p><dl class="commandlist">
@@ -267,13 +267,15 @@ needed.</dd>
                 <dt>
 <b>-useForeignDTD</b> <i>&lt;boolean&gt;</i>
 </dt>
-                
-                <dd>If &lt;boolean&gt; is true and the document does not have
-an external subset, the parser will call the -externalentitycommand script with
-empty values for the systemId and publicID arguments. Please note that if
-the document also doesn't have an internal subset, the
--startdoctypedeclcommand and -enddoctypedeclcommand scripts, if set, are not
-called. The <i class="m">-useForeignDTD</i> respects </dd>
+                 <dd>If
+                &lt;boolean&gt; is true and the document does not have
+                an external subset, the parser will call the
+                -externalentitycommand script with empty values for
+                the systemId and publicID arguments. Please note that
+                if the document also doesn't have an internal subset,
+                the -startdoctypedeclcommand and
+                -enddoctypedeclcommand scripts, if set, are not
+                called.</dd>
               
 
               
@@ -717,7 +719,7 @@ recommendation. Otherwise it returns 0.</dd>
         
     </dl>
 
-<h2><a name="SECTid0x562f8c43b3e0">KEYWORDS</a></h2><p class="keywords">
+<h2><a name="SECTid0x55dfd8ce6370">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-XML">XML</a>, <a class="keyword" href="keyword-index.html#KW-DOM">DOM</a>, <a class="keyword" href="keyword-index.html#KW-document">document</a>, <a class="keyword" href="keyword-index.html#KW-node">node</a>, <a class="keyword" href="keyword-index.html#KW-parsing">parsing</a>
 </p>
 </div><hr class="navsep"><div class="navbar" align="center">

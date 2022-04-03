@@ -288,35 +288,102 @@ Checks if the current validation state allows the
 given text content. It raises error if not.
 .RE
 .TP
-\&\fB\fBvalidate\fP \fI<XML string>\fB \fI?objVar?\fB
-\&\fRReturns true if the \fI<XML string>\fR is valid, or
+\&\fB\fBvalidate\fP ?\fIoptions\fB? \fI<XML string>\fB \fI?objVar?\fB
+\&\fR
+.RS
+.PP
+Returns true if the \fI<XML string>\fR is valid, or
 false, otherwise. If validation has failed and the optional
 \&\fIobjVar\fR argument is given, the variable with that
 name is set to a validation error message. If the XML string
 is valid and the optional \fIobjVar\fR argument is given,
-the variable with that name is set to the empty string.
+the variable will be untouched.
+.PP
+The valid options are:
+.IP "\fB-baseurl  \fI<baseURI>\fP\fR"
+If \fI-baseurl <baseURI>\fR is specified,
+the baseURI is used as the base URI of the document.
+External entities references in the document are
+resolved relative to this base URI. This base URI is
+also stored within the DOM tree.
+.IP "\fB-externalentitycommand  \fI<script>\fP\fR"
+If \fI-externalentitycommand <script>\fR
+is specified, the specified tcl script is called to
+resolve any external entities of the document. The
+default is "::tdom::extRefHandler", which is a simple
+file URL resolver defined by the script part of the
+package. Setting the option value to the empty string
+disables resolving of external entities. The actual
+evaluated command consists of this option followed by
+three arguments: the base uri, the system identifier
+of the entity and the public identifier of the entity.
+The base uri and the public identifier may be the
+empty list. The script has to return a tcl list
+consisting of three elements. The first element of
+this list signals how the external entity is returned
+to the processor. Currently the two allowed types are
+"string" and "channel". The second element of the list
+has to be the (absolute) base URI of the external
+entity to be parsed. The third element of the list are
+data, either the already read data out of the external
+entity as string in the case of type "string", or the
+name of a tcl channel, in the case of type "channel".
+Note that if the script returns a tcl channel, it will
+not be closed by the processor. It must be closed
+separately if it is no longer needed.
+.IP "\fB-paramentityparsing  \fI<always|never|notstandalone>\fP\fR"
+The \fI-paramentityparsing\fR option controls,
+if the parser tries to resolve the external entities
+(including the external DTD subset) of the document
+while building the DOM tree.
+\&\fI-paramentityparsing\fR requires an argument, which
+must be either "always", "never", or "notstandalone".
+The value "always" means that the parser tries to
+resolves (recursively) all external entities of the
+XML source. This is the default in case
+\&\fI-paramentityparsing\fR is omitted. The value
+"never" means that only the given XML source is
+parsed and no external entity (including the external
+subset) will be resolved and parsed. The value
+"notstandalone" means, that all external entities will
+be resolved and parsed, with the exception of
+documents, which explicitly states standalone="yes" in
+their XML declaration.
+.IP "\fB-useForeignDTD  \fI<boolean>\fP\fR"
+If <boolean> is true and the document does
+not have an external subset, the parser will call the
+-externalentitycommand script with empty values for
+the systemId and publicID arguments. Please note that
+if the document also doesn't have an internal subset,
+the -startdoctypedeclcommand and
+-enddoctypedeclcommand scripts, if set, are not
+called.
+.RE
 .TP
-\&\fB\fBvalidatefile\fP \fIfilename\fB \fI?objVar?\fB
+\&\fB\fBvalidatefile\fP ?\fIoptions\fB? \fIfilename\fB \fI?objVar?\fB
 \&\fRReturns true if the content of \fIfilename\fR is valid,
-or false, otherwise. The given file is fed as binary stream
-to expat, therefore only US-ASCII, ISO-8859-1, UTF-8 or UTF-16
+or false, otherwise. The given file is fed as binary stream to
+expat, therefore only US-ASCII, ISO-8859-1, UTF-8 or UTF-16
 encoded data will work with this method. If validation has
 failed and the optional \fIobjVar\fR argument is given, the
 variable with that name is set to a validation error message.
-If the XML string is valid and the optional \fIobjVar\fR
-argument is given, the variable with that name is set to the
-empty string.
+If the XML data is valid and the optional \fIobjVar\fR
+argument is given, the variable will be untouched. The allowed
+options and their meaning are the same as for the
+\&\fIvalidate\fR method; see there for a description.
 .TP
-\&\fB\fBvalidatechannel\fP \fIchannel\fB \fI?objVar?\fB
+\&\fB\fBvalidatechannel\fP ?\fIoptions\fB? \fIchannel\fB \fI?objVar?\fB
 \&\fRReturns true if the content read from the Tcl channel
 \&\fIchannel\fR is valid, or false, otherwise. Since data read
 out of a Tcl channel is UTF-8 encoded, any misleading encoding
 declaration at the beginning of the data will lead to errors.
 If the validation fails and the optional \fIobjVar\fR
 argument is given, the variable with that name is set to a
-validation error message. If the XML string is valid and the
-optional \fIobjVar\fR argument is given, the variable with
-that name is set to the empty string.
+validation error message. If the XML data is valid and the
+optional \fIobjVar\fR argument is given, the variable will be
+untouched. The allowed options and their meaning are the same
+as for the \fIvalidate\fR method; see there for a
+description.
 .TP
 \&\fB\fBdomvalidate\fP \fIdomNode\fB \fI?objVar?\fB
 \&\fRReturns true if the first argument is a valid tree, or
