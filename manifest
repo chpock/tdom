@@ -1,5 +1,5 @@
-C Much\sbetter\sapproach\sfor\sdom\sparse\s-forrest\sw/\sexpat:\suse\san\senternal\sentity\sparser.
-D 2022-04-14T16:32:30.537
+C Documentation\swork.
+D 2022-04-14T22:09:44.379
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -18,9 +18,9 @@ F configure.ac 1ab4f46d2501e7feec71ac70fcbcb5f5866ceb6fa47ed1e5b02969dd958eb618
 F doc/INDEX.MAP 8b9f0c2e18efc29fcf581669e175dec860f54026ef7fef4b8d7403bca442fb71
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html b4a8d2a4b261d8380849b9fa2b4026f1e08248aab543551db47a34b60a43c69a
-F doc/dom.html c9659bad5ce26b11988596ef7b37156c3d2f98900923e40ff7287f1f2841b2e7
-F doc/dom.n 751e237823ee86a455cc6805f3dcacda9d86c2409afae4cffc3a9f3cdd919c95
-F doc/dom.xml 32f08482ab48497250efc84ab329f4bee13e5a04e3745d14bb82093dcb623cb9
+F doc/dom.html 93e8563aeb7adbab11fbc3db219fdcd0585c5e9095a922ebc22463fee9bcb30b
+F doc/dom.n 93486867e1f9ccecbd8b0a1313c3bbe5fc86461c9a67373ee29a8c805a8769d6
+F doc/dom.xml e50b52fd01de6acb90ced08135d98604b3c755e4743a1d9ce2a13fd3fe44a626
 F doc/domDoc.html 891309056173c2d4d8e03e1d8e75766f1f68d96fda2ae4c27ad5b1bd1cbf2d4c
 F doc/domDoc.n 4019cd03e83b9b10f8b3203ec0e1844c1dfcf69b45fcb765fbd41f88fdeac1dd
 F doc/domDoc.xml a58db783182c8dbec752e86e46d8233de57867f184a87e60f05e193049c0db06
@@ -237,8 +237,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 71ad27132ddac7a3295e6ebfed9f1c9119b6a325c2962cd41f902c56c3d557f5
-R 09bdc8541cc01d07f57a2022f85ba6ee
+P 5efae5139b73ae7b7fb3856f14cdfb1a53aae55db0360dd7638630f34eebfa95
+R da5671364d9c104ca390d4190c59a8e8
 U rolf
-Z 69fedfeff4750f8f0c395c9a2e51c14f
+Z c3b3f04e71f41b91ee3bc5a56f520883
 # Remove this line to create a well-formed Fossil manifest.

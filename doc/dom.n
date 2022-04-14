@@ -225,16 +225,24 @@ rename $document ""
 .PP
 The valid options are:
 .IP "\fB-simple\fR"
-If \fI-simple\fR is
-specified, a simple but fast parser is used (conforms not fully to XML
-recommendation). That should double parsing and DOM generation speed. The
-encoding of the data is not transformed inside the parser. The simple parser
-does not respect any encoding information in the XML declaration. It skips over
-the internal DTD subset and ignores any information in it. Therefore it doesn't
-include defaulted attribute values into the tree, even if the according
-attribute declaration is in the internal subset. It also doesn't expand
-internal or external entity references other than the predefined entities and
-character references.
+If \fI-simple\fR is specified, a simple but
+fast parser is used (conforms not fully to XML
+recommendation). That should double parsing and DOM
+generation speed. The encoding of the data is not
+transformed inside the parser. The simple parser does
+not respect any encoding information in the XML
+declaration. It skips over the internal DTD subset and
+ignores any information in it. Therefore it doesn't
+include defaulted attribute values into the tree, even
+if the according attribute declaration is in the
+internal subset. It also doesn't expand internal or
+external entity references other than the predefined
+entities and character references. If the HTML
+document given to parse does not have a single root
+element (as it was leagl up to HTML 4.01) and the
+-forrest option is not used then a html node will be
+inserted as document element, with the HTML input data
+top level elements as childs.
 .IP "\fB-html\fR"
 If \fI-html\fR is specified, a fast HTML parser is
 used, which tries to even parse badly formed HTML into a DOM tree.
@@ -406,8 +414,11 @@ their XML declaration.
 .IP "\fB-forrest\fR"
 If this option is given, there is no need for a
 single root, any sequence of well-formed, balanced
-subtrees will be parsed into a DOM tree. If used
-together with -json or -html5 this option is ignored.
+subtrees will be parsed into a DOM tree. This works
+for the expat DOM builder, the simple xml parser
+enabled with \fI-simple\fR and the simple HTML parser
+enabled -with \fI-html\fR. If used together with
+\&\fI-json\fR or \fI-html5\fR this option is ignored.
 .IP "\fB-ignorexmlns\fR"
 It is recommended, that you only use this option
 with the \fI-html5\fR option. If this option is
