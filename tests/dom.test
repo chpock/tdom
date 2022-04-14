@@ -1400,6 +1400,19 @@ test dom-5.9 {Wrong option after -externalentitycommand} -body {
                            -useForeignDTD foo}]
 } -result 1
 
+proc dom-5.9 {args} {
+    return [list string "" {text<one>1</one><two>2</two>more text}]
+}
+
+test dom-5.9 {-externalentitycommand - external entity is a forrest} {
+    set doc [dom parse -externalentitycommand dom-5.9 \
+                 {<!DOCTYPE doc [<!ENTITY e1 PUBLIC "e1" "e1.xml">]>
+                     <doc>&e1;</doc>}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc>text<one>1</one><two>2</two>more text</doc>}
+
 test dom-6.1 {use in slave interpreter} {
     set slave [interp create]
     load {} tdom $slave
@@ -2253,7 +2266,7 @@ test dom-13.5 {-forrest -channel} -setup {
     list $result $errMsg
 } -cleanup {
     removeFile dom.xml
-} -result {1 {error "premature end" at line 2 character 2}}
+} -result {1 {error "asynchronous entity" at line 2 character 0}}
 
 test dom-13.6 {-forrest -channel} -setup {
     # makeFile appends a newline at end
@@ -2271,7 +2284,7 @@ test dom-13.6 {-forrest -channel} -setup {
 }
 
 test dom-13.7 {-forrest} -body {
-    catch {dom parse -forrest {<one>1</one><two>2<two></notopenedend>}}
+    catch {dom parse -forrest {<one>1</one><two>2<two></notopen>}}
 } -result {1}
 
 test dom-13.8 {-forrest} {
@@ -2280,6 +2293,11 @@ test dom-13.8 {-forrest} {
     catch {dom parse -forrest $xml} errMsg2
     expr {$errMsg1 eq $errMsg2}
 } {1}
+
+test dom-13.9 {-forrest} {
+    catch {dom parse -forrest {<one></two></one><one></two></one></wrong>}}
+} 1
+
 
 # cleanup
 ::tcltest::cleanupTests

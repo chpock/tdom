@@ -566,6 +566,13 @@ typedef struct domLineColumn {
 
 } domLineColumn;
 
+typedef struct {
+    int  errorCode;
+    long errorLine;
+    long errorColumn;
+    long byteIndex;
+} domParseForrestErrorData;
+
 
 /*--------------------------------------------------------------------------
 |   domNode
@@ -735,8 +742,7 @@ domDocument *  domReadDocument   (XML_Parser parser,
                                   SchemaData *sdata,
 #endif
                                   Tcl_Interp *interp,
-                                  long *errorLine,
-                                  long *errorColumn,
+                                  domParseForrestErrorData *forrestError,
                                   int  *status);
 
 void           domFreeDocument   (domDocument *doc, 

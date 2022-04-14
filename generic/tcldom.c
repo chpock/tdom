@@ -1194,7 +1194,7 @@ int tcldom_appendXML (
     domDocument *doc;
     domNode     *nodeToAppend;
     XML_Parser   parser;
-    long         errorLine = 0, errorColumn = 0;
+    domParseForrestErrorData forrestError;
 
     GetTcldomTSD()
 
@@ -1233,8 +1233,7 @@ int tcldom_appendXML (
                           NULL,
 #endif
                           interp,
-                          &errorLine,
-                          &errorColumn,
+                          &forrestError,
                           &resultcode);
     if (extResolver) {
         Tcl_DecrRefCount(extResolver);
@@ -6230,7 +6229,7 @@ int tcldom_parse (
     GetTcldomTSD()
 
     char        *xml_string, *option, *errStr, *channelId, *baseURI = NULL;
-    char        *xmlError = NULL, *jsonRoot = NULL;
+    char        *jsonRoot = NULL;
     Tcl_Obj     *extResolver = NULL;
     Tcl_Obj     *feedbackCmd = NULL;
     const char  *interpResult;
@@ -6250,7 +6249,8 @@ int tcldom_parse (
     int          forrest             = 0;
     int          status              = 0;
     double       maximumAmplification = 0.0;
-    long         activationThreshold = 0, errorLine = 0, errorColumn = 0;
+    long         activationThreshold = 0;
+    domParseForrestErrorData forrestError;
     domDocument *doc;
     Tcl_Obj     *newObjName = NULL;
     XML_Parser   parser;
@@ -6591,6 +6591,10 @@ int tcldom_parse (
 #endif
         case o_forrest:
             forrest = 1;
+            forrestError.errorLine = 0;
+            forrestError.errorColumn = 0;
+            forrestError.byteIndex = 0;
+            forrestError.errorCode = 0;
             objv++;  objc--; continue;
             
         }
@@ -6789,8 +6793,7 @@ int tcldom_parse (
                           sdata,
 #endif
                           interp,
-                          &errorLine,
-                          &errorColumn,
+                          &forrestError,
                           &status);
 #ifndef TDOM_NO_SCHEMA
     if (sdata) {
@@ -6802,6 +6805,7 @@ int tcldom_parse (
         char sl[50];
         char sc[50];
         char sb[2];
+        int expatErrorCode;
         
         long byteIndex, i;
         
@@ -6811,30 +6815,28 @@ int tcldom_parse (
             Tcl_ResetResult(interp);
             XML_ParserFree(parser);
             return TCL_OK;
-        case 5:
-            /* Forrest parsing error detected at closing umbrella
-             * tag. */
-            xmlError = "premature end";
-            /* Fall throuh */
         default:
             interpResult = Tcl_GetStringResult(interp);
-            sprintf(sl, "%ld", XML_GetCurrentLineNumber(parser) - forrest);
             if (interpResult[0] == '\0') {
                 /* If the interp result isn't empty, then there was an error
                    in an enternal entity and the interp result has already the
                    error msg. If we don't got a document, but interp result is
                    empty, the error occurred in the main document and we
                    build the error msg as follows. */
-                /* Nothing to do in case of -forrest - since no DTD,
-                 * no external entities. */
-                Tcl_AppendResult(interp, "error \"", 
-                                 (xmlError == NULL ?
-                                  XML_ErrorString(XML_GetErrorCode(parser))
-                                  : xmlError),
-                                 "\" at line ", sl, " character ", NULL);
-                sprintf(sc, "%ld", XML_GetCurrentColumnNumber(parser));
-                Tcl_AppendResult(interp, sc, NULL);
-                byteIndex = XML_GetCurrentByteIndex(parser) - forrest * 14;
+                if (forrest) {
+                    sprintf(sl, "%ld", forrestError.errorLine);
+                    sprintf(sc, "%ld", forrestError.errorColumn);
+                    byteIndex = forrestError.byteIndex;
+                    expatErrorCode = forrestError.errorCode;
+                } else {
+                    sprintf(sl, "%ld", XML_GetCurrentLineNumber(parser));
+                    sprintf(sc, "%ld", XML_GetCurrentColumnNumber(parser));
+                    byteIndex = XML_GetCurrentByteIndex(parser);
+                    expatErrorCode = XML_GetErrorCode(parser);
+                }
+                Tcl_AppendResult(interp, "error \"",
+                                 XML_ErrorString(expatErrorCode),
+                                 "\" at line ", sl, " character ", sc, NULL);
                 if ((byteIndex != -1) && (chan == NULL)) {
                     Tcl_AppendResult(interp, "\n\"", NULL);
                     sb[1] = '\0';
@@ -6863,6 +6865,7 @@ int tcldom_parse (
                      * error was in an external entity. Therefore, we
                      * just add the place of the referencing entity in
                      * the main document.*/
+                    sprintf(sl, "%ld", XML_GetCurrentLineNumber(parser));
                     Tcl_AppendResult(interp, ", referenced at line ", sl,
                                      NULL);
                     sprintf(sc, "%ld", XML_GetCurrentColumnNumber(parser));
