@@ -5690,6 +5690,8 @@ getExternalDocument (
     XML_Parser    parser;
     Tcl_Channel   chan;
     Tcl_DString   dStr;
+    domParseForrestErrorData forrestError;
+    
     
     if (isStylesheet && (href[0] == '\0')) {
         *errMsg = tdomstrdup("Recursive import/include: stylesheet tries "
@@ -5793,12 +5795,12 @@ getExternalDocument (
     /* keep white space, no fiddling with the encoding (is this
        a good idea?) */
     doc = domReadDocument (parser, xmlstring, len, 0, 0, storeLineColumn,
-                           0, 0, NULL, chan, extbase, extResolver, 0, 
+                           0, 0, NULL, chan, extbase, extResolver, 0, 0,
                            (int) XML_PARAM_ENTITY_PARSING_ALWAYS,
 #ifndef TDOM_NO_SCHEMA
                            NULL,
 #endif
-                           interp, &resultcode);
+                           interp, &forrestError, &resultcode);
     if (xsltDoc->extResolver) {
         Tcl_DecrRefCount (extResolver);
     }

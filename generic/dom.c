@@ -127,6 +127,8 @@ typedef struct _domActiveBaseURI {
 |   type domReadInfo
 |
 \--------------------------------------------------------------------------*/
+
+/* Keep in sync with tdomCmdReadInfo below */
 typedef struct _domReadInfo {
 
     XML_Parser        parser;
@@ -155,6 +157,7 @@ typedef struct _domReadInfo {
     int               status;
 
 } domReadInfo;
+
 
 /*----------------------------------------------------------------------------
 |   Prototypes
@@ -1227,7 +1230,7 @@ startElement(
     if (info->storeLineColumn) {
         lc = (domLineColumn*) ( ((char*)node) + sizeof(domNode));
         node->nodeFlags |= HAS_LINE_COLUMN;
-        lc->line         = XML_GetCurrentLineNumber(info->parser);
+        lc->line         = XML_GetCurrentLineNumber (info->parser);
         lc->column       = XML_GetCurrentColumnNumber(info->parser);
     }
 
@@ -1572,8 +1575,9 @@ DispatchPCDATA (
     s = Tcl_DStringValue (info->cdata);
     
     parentNode = info->currentNode;
-    if (!parentNode) return;
-
+    if (!parentNode) {
+        return;
+    }
     if (   parentNode->lastChild 
         && parentNode->lastChild->nodeType == TEXT_NODE
         && !info->cdataSection) {
@@ -1623,7 +1627,9 @@ DispatchPCDATA (
         memmove(node->nodeValue, s, len);
 
         node->ownerDocument = info->document;
-        node->parentNode = parentNode;
+        if (info->currentNode) {
+            node->parentNode = parentNode;
+        }
         if (parentNode->nodeType == ELEMENT_NODE) {
             if (parentNode->firstChild)  {
                 parentNode->lastChild->nextSibling = (domNode*)node;
@@ -1646,7 +1652,7 @@ DispatchPCDATA (
         if (info->storeLineColumn) {
             lc = (domLineColumn*) ( ((char*)node) + sizeof(domTextNode) );
             node->nodeFlags |= HAS_LINE_COLUMN;
-            lc->line         = XML_GetCurrentLineNumber(info->parser);
+            lc->line         = XML_GetCurrentLineNumber (info->parser);
             lc->column       = XML_GetCurrentColumnNumber(info->parser);
         }
     }
@@ -1735,7 +1741,7 @@ commentHandler (
     if (info->storeLineColumn) {
         lc = (domLineColumn*) ( ((char*)node) + sizeof(domTextNode) );
         node->nodeFlags |= HAS_LINE_COLUMN;
-        lc->line         = XML_GetCurrentLineNumber(info->parser);
+        lc->line         = XML_GetCurrentLineNumber (info->parser);
         lc->column       = XML_GetCurrentColumnNumber(info->parser);
     }
 }
@@ -1822,7 +1828,7 @@ processingInstructionHandler(
     if (info->storeLineColumn) {
         lc = (domLineColumn*)(((char*)node)+sizeof(domProcessingInstructionNode));
         node->nodeFlags |= HAS_LINE_COLUMN;
-        lc->line         = XML_GetCurrentLineNumber(info->parser);
+        lc->line         = XML_GetCurrentLineNumber (info->parser);
         lc->column       = XML_GetCurrentColumnNumber(info->parser);
     }
 }
@@ -2005,7 +2011,7 @@ externalEntityRefHandler (
     XML_SetBase (extparser, extbase);
     storedNextFeedbackPosition = info->nextFeedbackPosition;
     info->nextFeedbackPosition = info->feedbackAfter;
-
+    
     Tcl_ResetResult (info->interp);
     result = 1;
     if (chan == NULL) {
@@ -2186,11 +2192,13 @@ domReadDocument (
     const char *baseurl,
     Tcl_Obj    *extResolver,
     int         useForeignDTD,
+    int         forrest,
     int         paramEntityParsing,
 #ifndef TDOM_NO_SCHEMA
     SchemaData *sdata,
 #endif
     Tcl_Interp *interp,
+    domParseForrestErrorData *forrestError,
     int        *resultcode
 )
 {
@@ -2201,10 +2209,11 @@ domReadDocument (
     char            buf[8192];
     Tcl_Obj        *bufObj;
     Tcl_DString     dStr;
-    int             useBinary;
+    int             useBinary = 0;
     char           *str;
     domDocument    *doc = domCreateDoc(baseurl, storeLineColumn);
-
+    domNode        *thisNode;
+    
     if (extResolver) {
         doc->extResolver = tdomstrdup (Tcl_GetString (extResolver));
     }
@@ -2263,105 +2272,93 @@ domReadDocument (
         XML_SetCdataSectionHandler(parser, startCDATA, endCDATA);
     }
     
-
+    if (forrest) {
+        /* The created external entity parser inherits all the
+         * configuration and will happily parse a forrest. */
+        parser = XML_ExternalEntityParserCreate (parser, "forrest", 0);
+        info.parser = parser;
+        info.currentNode = doc->rootNode;
+    }
+    
     if (channel == NULL) {
-        status = XML_Parse(parser, xml, length, 1);
-        switch (status) {
-        case XML_STATUS_SUSPENDED:
-            DBG(fprintf(stderr, "XML_STATUS_SUSPENDED\n");)
-            if (info.status == TCL_BREAK) {
-                Tcl_ResetResult(interp);
-            }
-            /* fall throu */
-        case XML_STATUS_ERROR:
-            DBG(fprintf(stderr, "XML_STATUS_ERROR\n");)
-            FREE ( info.activeNS );
-            FREE ( info.baseURIstack );
-            Tcl_DStringFree (info.cdata);
-            FREE ( info.cdata);
-            domFreeDocument (doc, NULL, NULL);
-            *resultcode = info.status;
-            return NULL;
-        case XML_STATUS_OK:
-            break;
-        }
+        status = XML_Parse (parser, xml, length, 1);
     } else {
         Tcl_DStringInit (&dStr);
-        if (Tcl_GetChannelOption (interp, channel, "-encoding", &dStr) != TCL_OK) {
-            FREE ( (char*) info.activeNS );
-            FREE ( info.baseURIstack );
-            Tcl_DStringFree (info.cdata);
-            FREE ( info.cdata);
+        if (Tcl_GetChannelOption (interp, channel, "-encoding", &dStr)
+            != TCL_OK) {
             domFreeDocument (doc, NULL, NULL);
-            *resultcode = info.status;
-            return NULL;
+            *resultcode = TCL_ERROR;
+            doc = NULL;
+            goto cleanup;
         }
-        if (strcmp (Tcl_DStringValue (&dStr), "utf-8")==0 ) useBinary = 1;
-        else useBinary = 0;
-        Tcl_DStringFree (&dStr);
-        if (useBinary) {
-            do {
-                len = Tcl_Read (channel, buf, sizeof(buf));
-                done = len < sizeof(buf);
-                status = XML_Parse (parser, buf, len, done);
-                switch (status) {
-                case XML_STATUS_SUSPENDED:
-                    DBG(fprintf(stderr, "XML_STATUS_SUSPENDED\n"););
-                    if (info.status == TCL_BREAK) {
-                        Tcl_ResetResult(interp);
-                    }
-                    /* fall throu */
-                case XML_STATUS_ERROR:
-                    DBG(fprintf(stderr, "XML_STATUS_ERROR\n");)
-                    FREE ( info.activeNS );
-                    FREE ( info.baseURIstack );
-                    Tcl_DStringFree (info.cdata);
-                    FREE ( info.cdata);
-                    domFreeDocument (doc, NULL, NULL);
-                    *resultcode = info.status;
-                    return NULL;
-                case XML_STATUS_OK:
-                    break;
-                }
-            } while (!done);
+        if (strcmp (Tcl_DStringValue (&dStr), "utf-8")==0 ) {
+            useBinary = 1;
         } else {
             bufObj = Tcl_NewObj();
             Tcl_SetObjLength (bufObj, 6144);
-            do {
+        }
+        Tcl_DStringFree (&dStr);
+        do {
+            if (useBinary) {
+                len = Tcl_Read (channel, buf, sizeof(buf));
+                done = len < sizeof(buf);
+            } else {
                 len = Tcl_ReadChars (channel, bufObj, 1024, 0);
                 done = (len < 1024);
-                str = Tcl_GetStringFromObj(bufObj, &tclLen);
+                str = Tcl_GetStringFromObj (bufObj, &tclLen);
+            }
+            if (useBinary) {
+                status = XML_Parse (parser, buf, len, done);
+            } else {
                 status = XML_Parse (parser, str, tclLen, done);
-                switch (status) {
-                case XML_STATUS_SUSPENDED:
-                    DBG(fprintf(stderr, "XML_STATUS_SUSPENDED\n"););
-                    if (info.status == TCL_BREAK) {
-                        Tcl_ResetResult(interp);
-                    }
-                    /* fall throu */
-                case XML_STATUS_ERROR:
-                    DBG(fprintf(stderr, "XML_STATUS_ERROR\n");)
-                    FREE ( info.activeNS );
-                    FREE ( info.baseURIstack );
-                    Tcl_DStringFree (info.cdata);
-                    FREE ( info.cdata);
-                    domFreeDocument (doc, NULL, NULL);
-                    Tcl_DecrRefCount (bufObj);
-                    *resultcode = info.status;
-                    return NULL;
-                case XML_STATUS_OK:
-                    break;
-                }
-            } while (!done);
-            Tcl_DecrRefCount (bufObj);
-        }
+            }
+        } while (!done);
     }
+    switch (status) {
+    case XML_STATUS_SUSPENDED:
+        DBG(fprintf(stderr, "XML_STATUS_SUSPENDED\n");)
+            if (info.status == TCL_BREAK) {
+                Tcl_ResetResult(interp);
+            }
+        /* fall throu */
+    case XML_STATUS_ERROR:
+        DBG(fprintf(stderr, "XML_STATUS_ERROR\n");)
+        domFreeDocument (doc, NULL, NULL);
+        *resultcode = info.status;
+        doc = NULL;
+        if (forrest) {
+            forrestError->errorLine = XML_GetCurrentLineNumber(parser);
+            forrestError->errorColumn = XML_GetCurrentColumnNumber(parser);
+            forrestError->byteIndex = XML_GetCurrentByteIndex(parser);
+            forrestError->errorCode = XML_GetErrorCode(parser);
+        }
+        break;
+    case XML_STATUS_OK:
+        if (forrest) {
+            info.currentNode = doc->rootNode;
+            DispatchPCDATA (&info);
+            thisNode = doc->rootNode->firstChild;
+            while (thisNode) {
+                thisNode->parentNode = NULL;
+                thisNode = thisNode->nextSibling;
+            }
+        }
+        break;
+    }
+    if (!useBinary && channel != NULL) {
+        Tcl_DecrRefCount (bufObj);
+    }
+cleanup:
     FREE ( info.activeNS );
     FREE ( info.baseURIstack );
     Tcl_DStringFree (info.cdata);
     FREE ( info.cdata);
-
-    domSetDocumentElement (doc);
+    if (forrest) {
+        /* This is the external entity parser, the main parser will be
+         * freed in caller context. */
+        XML_ParserFree (parser);
+    }
+    if (doc) domSetDocumentElement (doc);
 
     return doc;
 }
@@ -5199,6 +5196,8 @@ domXPointerAncestor (
 |   type tdomCmdReadInfo
 |
 \--------------------------------------------------------------------------*/
+/* The struct members until the tdom cmd specific elements must be the
+ * same as for domReadInfo. */
 typedef struct _tdomCmdReadInfo {
 
     XML_Parser        parser;
@@ -5224,6 +5223,7 @@ typedef struct _tdomCmdReadInfo {
 #ifndef TDOM_NO_SCHEMA
     SchemaData       *sdata;
 #endif
+    int               status;
     /* Now the tdom cmd specific elements */
     int               tdomStatus;
     Tcl_Obj          *extResolver;
@@ -5318,7 +5318,7 @@ tdom_initParseProc (
     info->baseURIstack[0].baseURI = XML_GetBase (info->parser);
     info->baseURIstack[0].depth = 0;
     info->tdomStatus = 2;
-    
+    info->status = 0;
 }
 
 static void
@@ -5438,6 +5438,7 @@ TclTdomObjCmd (dummy, interp, objc, objv)
 #ifndef TDOM_NO_SCHEMA
         info->sdata             = NULL;
 #endif
+        info->status            = 0;
         handlerSet->userData    = info;
 
         CHandlerSetInstall (interp, objv[1], handlerSet);

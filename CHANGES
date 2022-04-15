@@ -1,7 +1,11 @@
 
-2022-19-03  Rolf Ade  <rolf@pointsman.de>
+2022-04-17  Rolf Ade  <rolf@pointsman.de>
 
-        Schema command mathods validate, validatefile and
+        Added option -forrest to dom parse.
+
+2022-03-19  Rolf Ade  <rolf@pointsman.de>
+
+        Schema command methods validate, validatefile and
         validatechannel enhanced with options to control external
         entitiy resolving.
 
