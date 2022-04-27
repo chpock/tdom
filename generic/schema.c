@@ -601,7 +601,10 @@ static void freeSchemaCP (
     
     switch (pattern->type) {
     case SCHEMA_CTYPE_ANY:
-        /* do nothing */
+        if (pattern->typedata) {
+            Tcl_DeleteHashTable ((Tcl_HashTable *) pattern->typedata);
+            FREE (pattern->typedata);
+        }
         break;
     case SCHEMA_CTYPE_VIRTUAL:
         for (i = 0; i < pattern->nc; i++) {
@@ -5788,28 +5791,48 @@ AnyPatternObjCmd (
     SchemaCP *pattern;
     SchemaQuant quant;
     char *ns = NULL;
-    int n, m;
+    int n, m, nrns, i, hnew;
+    Tcl_Obj *nsObj;
+    Tcl_HashTable *t = NULL;
 
     CHECK_SI
     CHECK_TOPLEVEL
-    checkNrArgs (1,3,"?namespace? ?quant?");
+    checkNrArgs (1,3,"?namespace list? ?quant?");
     if (objc == 1) {
         quant = SCHEMA_CQUANT_ONE;
         n = 0; m = 0;
+        goto createpattern;
     } else if (objc == 2) {    
         quant = getQuant (interp, sdata, objv[1], &n, &m);
-        if (quant == SCHEMA_CQUANT_ERROR) {
-            ns = getNamespacePtr (sdata, Tcl_GetString (objv[1]));
-            quant = SCHEMA_CQUANT_ONE;
+        if (quant != SCHEMA_CQUANT_ERROR) {
+            goto createpattern;
         }
+        quant = SCHEMA_CQUANT_ONE;
     } else {
-        ns = getNamespacePtr (sdata, Tcl_GetString (objv[1]));
         quant = getQuant (interp, sdata, objv[2], &n, &m);
         if (quant == SCHEMA_CQUANT_ERROR) {
             return TCL_ERROR;
         }
     }
+    if (Tcl_ListObjLength (interp, objv[1], &nrns) != TCL_OK) {
+        SetResult ("The <namespace list> argument must be a valid tcl list");
+        return TCL_ERROR;
+    }
+    if (nrns == 1) {
+        Tcl_ListObjIndex (interp, objv[1], 0, &nsObj);
+        ns = getNamespacePtr (sdata, Tcl_GetString (nsObj));
+    } else {
+        t = TMALLOC (Tcl_HashTable);
+        Tcl_InitHashTable (t, TCL_ONE_WORD_KEYS);
+        for (i = 0; i < nrns; i++) {
+            Tcl_ListObjIndex (interp, objv[1], i, &nsObj);
+            ns = getNamespacePtr (sdata, Tcl_GetString (nsObj));
+            Tcl_CreateHashEntry (t, ns, &hnew);
+        }
+    }
+createpattern:
     pattern = initSchemaCP (SCHEMA_CTYPE_ANY, ns, NULL);
+    if (t) pattern->typedata = (void*)t;
     REMEMBER_PATTERN (pattern)
     addToContent(sdata, pattern, quant, n, m);
     return TCL_OK;
@@ -6038,7 +6061,7 @@ ElementPatternObjCmd (
         }
         if (typePattern->flags & FORWARD_PATTERN_DEF) {
             /* Remember the instance pattern with the type pattern
-             * (a bit misusing struct mebers) to be able to set
+             * (a bit misusing struct members) to be able to set
              * the instance pattern to the actual content if the
              * type pattern is eventually defined. */
             if (typePattern->nc == typePattern->numAttr) {
