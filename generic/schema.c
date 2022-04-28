@@ -522,6 +522,10 @@ static void serializeCP (
             fprintf (stderr, "\tNamespace: '%s'\n",
                      pattern->namespace);
         }
+        if (pattern->typedata) {
+            fprintf (stderr, "\t%d namespaces\n",
+                     (Tcl_HashTable*)pattern->typedata->numEntries);
+        }            
         break;
     case SCHEMA_CTYPE_TEXT:
     case SCHEMA_CTYPE_VIRTUAL:
@@ -1468,6 +1472,12 @@ matchElementStart (
                     candidate->namespace != namespace) {
                     break;
                 }
+                if (candidate->typedata) {
+                    h = Tcl_FindHashEntry (
+                        (Tcl_HashTable *)candidate->typedata, namespace
+                        );
+                    if (!h) break;
+                }
                 updateStack (sdata, se, ac);
                 sdata->skipDeep = 1;
                 /* See comment in tDOM_probeElement: sdata->vname and
@@ -1513,6 +1523,11 @@ matchElementStart (
                     case SCHEMA_CTYPE_ANY:
                         if (icp->namespace && icp->namespace != namespace) {
                             break;
+                        }
+                        if (icp->typedata) {
+                            h = Tcl_FindHashEntry (
+                                (Tcl_HashTable *)icp->typedata, namespace);
+                            if (!h) break;
                         }
                         updateStack (sdata, se, ac);
                         sdata->skipDeep = 1;
@@ -1674,6 +1689,11 @@ matchElementStart (
             case SCHEMA_CTYPE_ANY:
                 if (icp->namespace && icp->namespace != namespace) {
                     break;
+                }
+                if (icp->typedata) {
+                    h = Tcl_FindHashEntry (
+                        (Tcl_HashTable *)icp->typedata, namespace);
+                    if (!h) break;
                 }
                 sdata->skipDeep = 1;
                 se->hasMatched = 1;
@@ -3583,13 +3603,26 @@ serializeAnyCP (
     SchemaCP *cp
     )
 {
-    Tcl_Obj *rObj;
+    Tcl_Obj *rObj, *nslistLObj;
+    Tcl_HashTable *t;
+    Tcl_HashEntry *h;
+    Tcl_HashSearch search;
 
     rObj = Tcl_NewObj();
     Tcl_ListObjAppendElement (interp, rObj, Tcl_NewStringObj ("<any>", 5));
     if (cp->namespace) {
         Tcl_ListObjAppendElement (interp, rObj,
                                   Tcl_NewStringObj (cp->namespace, -1));
+    } else if (cp->typedata) {
+        nslistLObj = Tcl_NewObj();
+        t = (Tcl_HashTable *)cp->typedata;
+        for (h = Tcl_FirstHashEntry (t, &search); h != NULL;
+             h = Tcl_NextHashEntry (&search)) {
+            Tcl_ListObjAppendElement (
+                interp, nslistLObj, Tcl_NewStringObj (Tcl_GetHashKey (t, h), -1)
+                );
+        }
+        Tcl_ListObjAppendElement (interp, rObj, nslistLObj);
     } else {
         Tcl_ListObjAppendElement (interp, rObj, Tcl_NewObj());
     }
