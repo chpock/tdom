@@ -419,6 +419,9 @@ static void SetActiveSchemaData (SchemaData *v)
     }                                                   \
 
 
+static const char *unknownNS = "<unknownNamespace";
+
+
 #ifndef TCL_THREADS
 SchemaData *
 tdomGetSchemadata (Tcl_Interp *interp) 
@@ -1468,15 +1471,27 @@ matchElementStart (
                 break;
 
             case SCHEMA_CTYPE_ANY:
-                if (candidate->namespace &&
-                    candidate->namespace != namespace) {
-                    break;
-                }
-                if (candidate->typedata) {
-                    h = Tcl_FindHashEntry (
-                        (Tcl_HashTable *)candidate->typedata, namespace
-                        );
-                    if (!h) break;
+                if (candidate->namespace || candidate->typedata) {
+                    /* The any wildcard is limited to one or several
+                     * namespaces (the empty namespace may be one of
+                     * them). */
+                    if (namespace) {
+                        if (candidate->typedata) {
+                            h = Tcl_FindHashEntry (
+                                (Tcl_HashTable *)candidate->typedata,
+                                namespace);
+                            if (!h) break;
+                        } else {
+                            if (candidate->namespace != namespace) {
+                                break;
+                            }
+                        }
+                    } else {
+                        if (candidate->namespace !=
+                            (char *)sdata->emptyNamespace) {
+                            break;
+                        }
+                    }
                 }
                 updateStack (sdata, se, ac);
                 sdata->skipDeep = 1;
@@ -1521,13 +1536,27 @@ matchElementStart (
                         break;
 
                     case SCHEMA_CTYPE_ANY:
-                        if (icp->namespace && icp->namespace != namespace) {
-                            break;
-                        }
-                        if (icp->typedata) {
-                            h = Tcl_FindHashEntry (
-                                (Tcl_HashTable *)icp->typedata, namespace);
-                            if (!h) break;
+                        if (icp->namespace || icp->typedata) {
+                            /* The any wildcard is limited to one or several
+                             * namespaces (the empty namespace may be one of
+                             * them). */
+                            if (namespace) {
+                                if (icp->typedata) {
+                                    h = Tcl_FindHashEntry (
+                                        (Tcl_HashTable *)icp->typedata,
+                                        namespace);
+                                    if (!h) break;
+                                } else {
+                                    if (icp->namespace != namespace) {
+                                        break;
+                                    }
+                                }
+                            } else {
+                                if (icp->namespace !=
+                                    (char *) sdata->emptyNamespace) {
+                                    break;
+                                }
+                            }
                         }
                         updateStack (sdata, se, ac);
                         sdata->skipDeep = 1;
@@ -1687,13 +1716,27 @@ matchElementStart (
                 break;
 
             case SCHEMA_CTYPE_ANY:
-                if (icp->namespace && icp->namespace != namespace) {
-                    break;
-                }
-                if (icp->typedata) {
-                    h = Tcl_FindHashEntry (
-                        (Tcl_HashTable *)icp->typedata, namespace);
-                    if (!h) break;
+                if (icp->namespace || icp->typedata) {
+                    /* The any wildcard is limited to one or several
+                     * namespaces (the empty namespace may be one of
+                     * them). */
+                    if (namespace) {
+                        if (icp->typedata) {
+                            h = Tcl_FindHashEntry (
+                                (Tcl_HashTable *)icp->typedata,
+                                namespace);
+                            if (!h) break;
+                        } else {
+                            if (icp->namespace != namespace) {
+                                break;
+                            }
+                        }
+                    } else {
+                        if (icp->namespace !=
+                            (char *) sdata->emptyNamespace) {
+                            break;
+                        }
+                    }
                 }
                 sdata->skipDeep = 1;
                 se->hasMatched = 1;
@@ -1841,8 +1884,10 @@ tDOM_probeElement (
              * struct here.*/
             sdata->vname = name;
             sdata->vns = namespace;
+            namespacePtr = (void *) unknownNS;
+        } else {
+            namespacePtr = NULL;
         }
-        namespacePtr = NULL;
     }
     if (!rc) {
         /* Already the provided namespace isn't known to the schema,
@@ -3610,17 +3655,21 @@ serializeAnyCP (
 
     rObj = Tcl_NewObj();
     Tcl_ListObjAppendElement (interp, rObj, Tcl_NewStringObj ("<any>", 5));
-    if (cp->namespace) {
-        Tcl_ListObjAppendElement (interp, rObj,
-                                  Tcl_NewStringObj (cp->namespace, -1));
-    } else if (cp->typedata) {
+    if (cp->namespace || cp->typedata) {
         nslistLObj = Tcl_NewObj();
-        t = (Tcl_HashTable *)cp->typedata;
-        for (h = Tcl_FirstHashEntry (t, &search); h != NULL;
-             h = Tcl_NextHashEntry (&search)) {
-            Tcl_ListObjAppendElement (
-                interp, nslistLObj, Tcl_NewStringObj (Tcl_GetHashKey (t, h), -1)
-                );
+        if (cp->namespace) {
+            Tcl_ListObjAppendElement (interp, nslistLObj,
+                                      Tcl_NewStringObj (cp->namespace, -1));
+        }
+        if (cp->typedata) {
+            t = (Tcl_HashTable *)cp->typedata;
+            for (h = Tcl_FirstHashEntry (t, &search); h != NULL;
+                 h = Tcl_NextHashEntry (&search)) {
+                Tcl_ListObjAppendElement (
+                    interp, nslistLObj,
+                    Tcl_NewStringObj (Tcl_GetHashKey (t, h), -1)
+                    );
+            }
         }
         Tcl_ListObjAppendElement (interp, rObj, nslistLObj);
     } else {
@@ -5823,7 +5872,7 @@ AnyPatternObjCmd (
     SchemaData *sdata = GETASI;
     SchemaCP *pattern;
     SchemaQuant quant;
-    char *ns = NULL;
+    char *ns = NULL, *ns1;
     int n, m, nrns, i, hnew;
     Tcl_Obj *nsObj;
     Tcl_HashTable *t = NULL;
@@ -5853,14 +5902,24 @@ AnyPatternObjCmd (
     }
     if (nrns == 1) {
         Tcl_ListObjIndex (interp, objv[1], 0, &nsObj);
-        ns = getNamespacePtr (sdata, Tcl_GetString (nsObj));
+        ns1 = Tcl_GetString (nsObj);
+        if (ns1[0] == '\0') {
+            ns = (char *) sdata->emptyNamespace;
+        } else {
+            ns = getNamespacePtr (sdata, Tcl_GetString (nsObj));
+        }
     } else {
         t = TMALLOC (Tcl_HashTable);
         Tcl_InitHashTable (t, TCL_ONE_WORD_KEYS);
         for (i = 0; i < nrns; i++) {
             Tcl_ListObjIndex (interp, objv[1], i, &nsObj);
-            ns = getNamespacePtr (sdata, Tcl_GetString (nsObj));
-            Tcl_CreateHashEntry (t, ns, &hnew);
+            ns1 = Tcl_GetString (nsObj);
+            if (ns1[0] == '\0') {
+                ns = (char *) sdata->emptyNamespace;
+            } else {
+                ns1 = getNamespacePtr (sdata, Tcl_GetString (nsObj));
+                Tcl_CreateHashEntry (t, ns1, &hnew);
+            }
         }
     }
 createpattern:

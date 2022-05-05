@@ -3253,6 +3253,64 @@ test schema-10.6 {any} {
     set result
 } {1}
 
+test schema-10.7 {any} {
+    set xmls {
+        {<doc><a/><something/><b/></doc>}
+        {<doc><a/><b/><b/></doc>}
+        {<doc><a/><b/></doc>}
+        {<doc><a/><a><b>text</b><c><c><c/></c></c></a><b/></doc>}
+        {<doc xmlns:ns="http://foo.bar"><a/><ns:b>some</ns:b><b/></doc>}
+        {<doc xmlns:ns="http://foo.bar" xmlns:ns1="http://foo.grill"><a/><ns1:a/><b/></doc>}
+    }
+    set result [list]
+    foreach schema {
+        {
+            defelement doc {
+                element a
+                any
+                element b
+            }
+        }
+        {
+            defelement doc {
+                element a
+                any {""}
+                element b
+            }
+        }
+        {
+            defelement doc {
+                element a
+                any {"" http://foo.grill}
+                element b
+            }
+        }
+        {
+            defelement doc {
+                element a
+                any {http://foo.grill http://foo.bar}
+                element b
+            }
+        }
+        {
+            prefixns {bar http://foo.bar grill http://foo.grill}
+            defelement doc {
+                element a
+                any {bar grill}
+                element b
+            }
+        }
+    } {
+        tdom::schema create s
+        s define $schema
+        foreach xml $xmls {
+            lappend result [s validate $xml]
+        }
+        s delete
+    }
+    set result
+} {1 1 0 1 1 1 1 1 0 1 0 0 1 1 0 1 0 1 0 0 0 0 1 1 0 0 0 0 1 1}
+
 test schema-11.1 {attribute} {
     tdom::schema create s
     s define {
@@ -8056,6 +8114,50 @@ test schema-17.12a {info expected} {8.5} {
     s delete
     set result
 } {{<any> {}} {<any> http://foo.bar} {<elementend> {}} b}
+
+test schema-17.12b {info expected} {8.5} {
+    tdom::schema s
+    s define {
+        prefixns {ns1 http://foo.bar}
+        defelement doc {
+            element a
+            any {""}
+            any ns1 ?
+            element b ?
+        }
+    }
+    s event start doc
+    s event start a
+    s event end
+    set result [lsort [s info expected]]
+    s event start something
+    s event end
+    lappend result {*}[lsort [s info expected]]
+    s delete
+    set result
+} {{<any> {{}}} {<any> http://foo.bar} {<elementend> {}} b}
+
+test schema-17.12b {info expected} {8.5} {
+    tdom::schema s
+    s define {
+        prefixns {ns1 http://foo.bar}
+        defelement doc {
+            element a
+            any {"" ns1}
+            any ns1 ?
+            element b ?
+        }
+    }
+    s event start doc
+    s event start a
+    s event end
+    set result [lsort [s info expected]]
+    s event start something
+    s event end
+    lappend result {*}[lsort [s info expected]]
+    s delete
+    set result
+} {{<any> {{} http://foo.bar}} {<any> http://foo.bar} {<elementend> {}} b}
 
 proc schema-17.13 {scmd args} {
     global fromReportCmd
