@@ -1431,6 +1431,41 @@ recursivePattern (
 }
 
 static int
+matchingAny (
+    char *name,
+    char *namespace,
+    SchemaData *sdata,
+    SchemaCP *candidate
+    )
+{
+    Tcl_HashEntry *h;
+    
+    if (candidate->namespace || candidate->typedata) {
+        /* The any wildcard is limited to one or several
+         * namespaces (the empty namespace may be one of
+         * them). */
+        if (namespace) {
+            if (candidate->typedata) {
+                h = Tcl_FindHashEntry (
+                    (Tcl_HashTable *)candidate->typedata,
+                    namespace);
+                if (!h) return 0;
+            } else {
+                if (candidate->namespace != namespace) {
+                    return 0;
+                }
+            }
+        } else {
+            if (candidate->namespace !=
+                (char *)sdata->emptyNamespace) {
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+
+static int
 matchElementStart (
     Tcl_Interp *interp,
     SchemaData *sdata,
@@ -1471,28 +1506,7 @@ matchElementStart (
                 break;
 
             case SCHEMA_CTYPE_ANY:
-                if (candidate->namespace || candidate->typedata) {
-                    /* The any wildcard is limited to one or several
-                     * namespaces (the empty namespace may be one of
-                     * them). */
-                    if (namespace) {
-                        if (candidate->typedata) {
-                            h = Tcl_FindHashEntry (
-                                (Tcl_HashTable *)candidate->typedata,
-                                namespace);
-                            if (!h) break;
-                        } else {
-                            if (candidate->namespace != namespace) {
-                                break;
-                            }
-                        }
-                    } else {
-                        if (candidate->namespace !=
-                            (char *)sdata->emptyNamespace) {
-                            break;
-                        }
-                    }
-                }
+                if (!matchingAny (name, namespace, sdata, candidate)) break;
                 updateStack (sdata, se, ac);
                 sdata->skipDeep = 1;
                 /* See comment in tDOM_probeElement: sdata->vname and
@@ -1536,28 +1550,7 @@ matchElementStart (
                         break;
 
                     case SCHEMA_CTYPE_ANY:
-                        if (icp->namespace || icp->typedata) {
-                            /* The any wildcard is limited to one or several
-                             * namespaces (the empty namespace may be one of
-                             * them). */
-                            if (namespace) {
-                                if (icp->typedata) {
-                                    h = Tcl_FindHashEntry (
-                                        (Tcl_HashTable *)icp->typedata,
-                                        namespace);
-                                    if (!h) break;
-                                } else {
-                                    if (icp->namespace != namespace) {
-                                        break;
-                                    }
-                                }
-                            } else {
-                                if (icp->namespace !=
-                                    (char *) sdata->emptyNamespace) {
-                                    break;
-                                }
-                            }
-                        }
+                        if (!matchingAny (name, namespace, sdata, icp)) break;
                         updateStack (sdata, se, ac);
                         sdata->skipDeep = 1;
                         /* See comment in tDOM_probeElement: sdata->vname
@@ -1716,28 +1709,7 @@ matchElementStart (
                 break;
 
             case SCHEMA_CTYPE_ANY:
-                if (icp->namespace || icp->typedata) {
-                    /* The any wildcard is limited to one or several
-                     * namespaces (the empty namespace may be one of
-                     * them). */
-                    if (namespace) {
-                        if (icp->typedata) {
-                            h = Tcl_FindHashEntry (
-                                (Tcl_HashTable *)icp->typedata,
-                                namespace);
-                            if (!h) break;
-                        } else {
-                            if (icp->namespace != namespace) {
-                                break;
-                            }
-                        }
-                    } else {
-                        if (icp->namespace !=
-                            (char *) sdata->emptyNamespace) {
-                            break;
-                        }
-                    }
-                }
+                if (!matchingAny (name, namespace, sdata, icp)) break;
                 sdata->skipDeep = 1;
                 se->hasMatched = 1;
                 se->interleaveState[i] = 1;
@@ -5873,15 +5845,17 @@ AnyPatternObjCmd (
     SchemaCP *pattern;
     SchemaQuant quant;
     char *ns = NULL, *ns1;
-    int n, m, nrns, i, hnew;
+    int n, m, nrns, i, hnew, revert, listind;
     Tcl_Obj *nsObj;
     Tcl_HashTable *t = NULL;
 
     CHECK_SI
     CHECK_TOPLEVEL
-    checkNrArgs (1,3,"?namespace list? ?quant?");
+    checkNrArgs (1,4,"(?namespace list? ?quant?) | (-not <namespace list> ?quant?)");
+    quant = SCHEMA_CQUANT_ONE;
+    revert = 0;
+    listind = 1;
     if (objc == 1) {
-        quant = SCHEMA_CQUANT_ONE;
         n = 0; m = 0;
         goto createpattern;
     } else if (objc == 2) {    
@@ -5891,17 +5865,40 @@ AnyPatternObjCmd (
         }
         quant = SCHEMA_CQUANT_ONE;
     } else {
-        quant = getQuant (interp, sdata, objv[2], &n, &m);
-        if (quant == SCHEMA_CQUANT_ERROR) {
-            return TCL_ERROR;
+        if (strcmp (Tcl_GetString (objv[1]), "--") == 0) {
+            if (objc == 4) {
+                quant = getQuant (interp, sdata, objv[3], &n, &m);
+                if (quant == SCHEMA_CQUANT_ERROR) {
+                    return TCL_ERROR;
+                }
+            }
+            listind = 2;
+        } else if (strcmp (Tcl_GetString (objv[1]), "-not") == 0) {
+            if (objc == 4) {
+                quant = getQuant (interp, sdata, objv[3], &n, &m);
+                if (quant == SCHEMA_CQUANT_ERROR) {
+                    return TCL_ERROR;
+                }
+            }
+            revert = 1;
+            listind = 2;
+        } else {
+            if (objc > 3) {
+                SetResult ("Wrong number of arguments.");
+                return TCL_ERROR;
+            }
+            quant = getQuant (interp, sdata, objv[2], &n, &m);
+            if (quant == SCHEMA_CQUANT_ERROR) {
+                return TCL_ERROR;
+            }
         }
     }
-    if (Tcl_ListObjLength (interp, objv[1], &nrns) != TCL_OK) {
+    if (Tcl_ListObjLength (interp, objv[listind], &nrns) != TCL_OK) {
         SetResult ("The <namespace list> argument must be a valid tcl list");
         return TCL_ERROR;
     }
     if (nrns == 1) {
-        Tcl_ListObjIndex (interp, objv[1], 0, &nsObj);
+        Tcl_ListObjIndex (interp, objv[listind], 0, &nsObj);
         ns1 = Tcl_GetString (nsObj);
         if (ns1[0] == '\0') {
             ns = (char *) sdata->emptyNamespace;
@@ -5912,7 +5909,7 @@ AnyPatternObjCmd (
         t = TMALLOC (Tcl_HashTable);
         Tcl_InitHashTable (t, TCL_ONE_WORD_KEYS);
         for (i = 0; i < nrns; i++) {
-            Tcl_ListObjIndex (interp, objv[1], i, &nsObj);
+            Tcl_ListObjIndex (interp, objv[listind], i, &nsObj);
             ns1 = Tcl_GetString (nsObj);
             if (ns1[0] == '\0') {
                 ns = (char *) sdata->emptyNamespace;
@@ -5925,6 +5922,7 @@ AnyPatternObjCmd (
 createpattern:
     pattern = initSchemaCP (SCHEMA_CTYPE_ANY, ns, NULL);
     if (t) pattern->typedata = (void*)t;
+    if (revert) pattern->flags |= ANY_NOT;
     REMEMBER_PATTERN (pattern)
     addToContent(sdata, pattern, quant, n, m);
     return TCL_OK;
