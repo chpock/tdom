@@ -420,6 +420,7 @@ static void SetActiveSchemaData (SchemaData *v)
 
 
 static const char *unknownNS = "<unknownNamespace";
+static char *emptyStr = "";
 
 
 #ifndef TCL_THREADS
@@ -659,7 +660,7 @@ initSchemaData (
     Tcl_Obj *cmdNameObj)
 {
     SchemaData *sdata;
-    int hnew, len;
+    int len;
     char *name;
 
     sdata = TMALLOC (SchemaData);
@@ -675,8 +676,6 @@ initSchemaData (
     Tcl_InitHashTable (&sdata->attrNames, TCL_STRING_KEYS);
     Tcl_InitHashTable (&sdata->namespace, TCL_STRING_KEYS);
     Tcl_InitHashTable (&sdata->textDef, TCL_STRING_KEYS);
-    sdata->emptyNamespace = Tcl_CreateHashEntry (
-        &sdata->namespace, "", &hnew);
     sdata->patternList = (SchemaCP **) MALLOC (
         sizeof (SchemaCP*) * ANON_PATTERN_ARRAY_SIZE_INIT);
     sdata->patternListSize = ANON_PATTERN_ARRAY_SIZE_INIT;
@@ -1439,30 +1438,54 @@ matchingAny (
     )
 {
     Tcl_HashEntry *h;
-    
-    if (candidate->namespace || candidate->typedata) {
-        /* The any wildcard is limited to one or several
-         * namespaces (the empty namespace may be one of
-         * them). */
-        if (namespace) {
-            if (candidate->typedata) {
-                h = Tcl_FindHashEntry (
-                    (Tcl_HashTable *)candidate->typedata,
-                    namespace);
-                if (!h) return 0;
+
+    if (candidate->flags & ANY_NOT) {
+        if (candidate->namespace || candidate->typedata) {
+            /* The any wildcard is limited to one or several
+             * namespaces (the empty namespace may be one of
+             * them). */
+            if (namespace) {
+                if (candidate->typedata) {
+                    h = Tcl_FindHashEntry (
+                        (Tcl_HashTable *)candidate->typedata,
+                        namespace);
+                    if (h) return 0;
+                } else {
+                    if (candidate->namespace == namespace) {
+                        return 0;
+                    }
+                }
             } else {
-                if (candidate->namespace != namespace) {
+                if (candidate->namespace == emptyStr) {
                     return 0;
                 }
             }
-        } else {
-            if (candidate->namespace !=
-                (char *)sdata->emptyNamespace) {
-                return 0;
+        }
+        return 1;
+    } else {
+        if (candidate->namespace || candidate->typedata) {
+            /* The any wildcard is limited to one or several
+             * namespaces (the empty namespace may be one of
+             * them). */
+            if (namespace) {
+                if (candidate->typedata) {
+                    h = Tcl_FindHashEntry (
+                        (Tcl_HashTable *)candidate->typedata,
+                        namespace);
+                    if (!h) return 0;
+                } else {
+                    if (candidate->namespace != namespace) {
+                        return 0;
+                    }
+                }
+            } else {
+                if (candidate->namespace != emptyStr) {
+                    return 0;
+                }
             }
         }
+        return 1;
     }
-    return 1;
 }
 
 static int
@@ -1796,15 +1819,13 @@ getNamespacePtr (
     int hnew;
 
     if (!ns) return NULL;
+    if (ns[0] == '\0') return NULL;
     h = Tcl_FindHashEntry (&sdata->prefix, ns);
     if (h) {
         return Tcl_GetHashValue (h);
     }
     h = Tcl_CreateHashEntry (&sdata->namespace, ns, &hnew);
-    if (h != sdata->emptyNamespace) {
-        return Tcl_GetHashKey (&sdata->namespace, h);
-    }
-    return NULL;
+    return Tcl_GetHashKey (&sdata->namespace, h);
 }
 
 int
@@ -5901,7 +5922,7 @@ AnyPatternObjCmd (
         Tcl_ListObjIndex (interp, objv[listind], 0, &nsObj);
         ns1 = Tcl_GetString (nsObj);
         if (ns1[0] == '\0') {
-            ns = (char *) sdata->emptyNamespace;
+            ns = emptyStr;
         } else {
             ns = getNamespacePtr (sdata, Tcl_GetString (nsObj));
         }
@@ -5912,7 +5933,7 @@ AnyPatternObjCmd (
             Tcl_ListObjIndex (interp, objv[listind], i, &nsObj);
             ns1 = Tcl_GetString (nsObj);
             if (ns1[0] == '\0') {
-                ns = (char *) sdata->emptyNamespace;
+                ns = emptyStr;
             } else {
                 ns1 = getNamespacePtr (sdata, Tcl_GetString (nsObj));
                 Tcl_CreateHashEntry (t, ns1, &hnew);

@@ -3311,6 +3311,64 @@ test schema-10.7 {any} {
     set result
 } {1 1 0 1 1 1 1 1 0 1 0 0 1 1 0 1 0 1 0 0 0 0 1 1 0 0 0 0 1 1}
 
+test schema-10.8 {any -not} {
+    set xmls {
+        {<doc><a/><something/><b/></doc>}
+        {<doc><a/><b/><b/></doc>}
+        {<doc><a/><b/></doc>}
+        {<doc><a/><a><b>text</b><c><c><c/></c></c></a><b/></doc>}
+        {<doc xmlns:ns="http://foo.bar"><a/><ns:b>some</ns:b><b/></doc>}
+        {<doc xmlns:ns="http://foo.bar" xmlns:ns1="http://foo.grill"><a/><ns1:a/><b/></doc>}
+    }
+    set result [list]
+    foreach schema {
+        {
+            defelement doc {
+                element a
+                any -not {}
+                element b
+            }
+        }
+        {
+            defelement doc {
+                element a
+                any -not {""}
+                element b
+            }
+        }
+        {
+            defelement doc {
+                element a
+                any -not {"" http://foo.grill}
+                element b
+            }
+        }
+        {
+            defelement doc {
+                element a
+                any -not {http://foo.grill http://foo.bar}
+                element b
+            }
+        }
+        {
+            prefixns {bar http://foo.bar grill http://foo.grill}
+            defelement doc {
+                element a
+                any -not {bar grill}
+                element b
+            }
+        }
+    } {
+        tdom::schema create s
+        s define $schema
+        foreach xml $xmls {
+            lappend result [s validate $xml]
+        }
+        s delete
+    }
+    set result
+} {1 1 0 1 1 1 0 0 0 0 1 1 0 0 0 0 1 0 1 1 0 1 0 0 1 1 0 1 0 0}
+
 test schema-11.1 {attribute} {
     tdom::schema create s
     s define {
