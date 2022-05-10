@@ -5866,16 +5866,37 @@ AnyPatternObjCmd (
     SchemaCP *pattern;
     SchemaQuant quant;
     char *ns = NULL, *ns1;
-    int n, m, nrns, i, hnew, revert, listind;
+    int n, m, nrns, i, hnew, revert, optionIndex;
     Tcl_Obj *nsObj;
     Tcl_HashTable *t = NULL;
 
+    static const char *anyOptions[] = {
+        "-not", "--", NULL
+    };
+    enum anyOption {
+        o_not, o_Last
+    };
+    
     CHECK_SI
     CHECK_TOPLEVEL
-    checkNrArgs (1,4,"(?namespace list? ?quant?) | (-not <namespace list> ?quant?)");
-    quant = SCHEMA_CQUANT_ONE;
     revert = 0;
-    listind = 1;
+    while (objc > 1) {
+        if (Tcl_GetIndexFromObj(interp, objv[1], anyOptions, "option", 0,
+                                &optionIndex) != TCL_OK) {
+            break;
+        }
+        switch ((enum anyOption) optionIndex) {
+        case o_not:
+            revert = 1;
+            objv++;  objc--; continue;
+        case o_Last:
+            objv++;  objc--; break;
+        }
+        if ((enum anyOption) optionIndex == o_Last) break;
+    }
+    checkNrArgs (1,3,"(options? ?namespace list? ?quant?");
+    
+    quant = SCHEMA_CQUANT_ONE;
     if (objc == 1) {
         n = 0; m = 0;
         goto createpattern;
@@ -5886,40 +5907,17 @@ AnyPatternObjCmd (
         }
         quant = SCHEMA_CQUANT_ONE;
     } else {
-        if (strcmp (Tcl_GetString (objv[1]), "--") == 0) {
-            if (objc == 4) {
-                quant = getQuant (interp, sdata, objv[3], &n, &m);
-                if (quant == SCHEMA_CQUANT_ERROR) {
-                    return TCL_ERROR;
-                }
-            }
-            listind = 2;
-        } else if (strcmp (Tcl_GetString (objv[1]), "-not") == 0) {
-            if (objc == 4) {
-                quant = getQuant (interp, sdata, objv[3], &n, &m);
-                if (quant == SCHEMA_CQUANT_ERROR) {
-                    return TCL_ERROR;
-                }
-            }
-            revert = 1;
-            listind = 2;
-        } else {
-            if (objc > 3) {
-                SetResult ("Wrong number of arguments.");
-                return TCL_ERROR;
-            }
-            quant = getQuant (interp, sdata, objv[2], &n, &m);
-            if (quant == SCHEMA_CQUANT_ERROR) {
-                return TCL_ERROR;
-            }
+        quant = getQuant (interp, sdata, objv[2], &n, &m);
+        if (quant == SCHEMA_CQUANT_ERROR) {
+            return TCL_ERROR;
         }
     }
-    if (Tcl_ListObjLength (interp, objv[listind], &nrns) != TCL_OK) {
+    if (Tcl_ListObjLength (interp, objv[1], &nrns) != TCL_OK) {
         SetResult ("The <namespace list> argument must be a valid tcl list");
         return TCL_ERROR;
     }
     if (nrns == 1) {
-        Tcl_ListObjIndex (interp, objv[listind], 0, &nsObj);
+        Tcl_ListObjIndex (interp, objv[1], 0, &nsObj);
         ns1 = Tcl_GetString (nsObj);
         if (ns1[0] == '\0') {
             ns = emptyStr;
@@ -5930,7 +5928,7 @@ AnyPatternObjCmd (
         t = TMALLOC (Tcl_HashTable);
         Tcl_InitHashTable (t, TCL_ONE_WORD_KEYS);
         for (i = 0; i < nrns; i++) {
-            Tcl_ListObjIndex (interp, objv[listind], i, &nsObj);
+            Tcl_ListObjIndex (interp, objv[1], i, &nsObj);
             ns1 = Tcl_GetString (nsObj);
             if (ns1[0] == '\0') {
                 ns = emptyStr;

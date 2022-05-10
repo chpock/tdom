@@ -3369,6 +3369,86 @@ test schema-10.8 {any -not} {
     set result
 } {1 1 0 1 1 1 0 0 0 0 1 1 0 0 0 0 1 0 1 1 0 1 0 0 1 1 0 1 0 0}
 
+test schema-10.9 {any --} {
+    set xmls {
+        {<doc><a/><something/><b/></doc>}
+        {<doc xmlns:ns="-not"><a/><ns:b>some</ns:b><b/></doc>}
+        {<doc xmlns:ns="http://foo.bar"><a/><ns:b>some</ns:b><b/></doc>}
+    }
+    tdom::schema create s
+    s define {
+        defelement doc {
+            element a
+            any -- -not
+            element b
+        }
+    }
+    set result ""
+    foreach xml $xmls {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 0}        
+
+test schema-10.10 {any} {
+    set xmls {
+        {<doc><a/><something/><b/></doc>}
+        {<doc xmlns:ns="--"><a/><ns:b/><b/></doc>}
+        {<doc><a/><b/></doc>}
+        {<doc><a/><a><b>text</b><c><c><c/></c></c></a><b/></doc>}
+        {<doc xmlns:ns="http://foo.bar"><a/><ns:b>some</ns:b><b/></doc>}
+        {<doc xmlns:ns="http://foo.bar" xmlns:ns1="http://foo.grill"><a/><ns1:a/><b/></doc>}
+    }
+    set result [list]
+    foreach schema {
+        {
+            defelement doc {
+                element a
+                any --
+                element b
+            }
+        }
+        {
+            defelement doc {
+                element a
+                any -- {""}
+                element b
+            }
+        }
+        {
+            defelement doc {
+                element a
+                any -- {"" http://foo.grill}
+                element b
+            }
+        }
+        {
+            defelement doc {
+                element a
+                any -- {http://foo.grill http://foo.bar}
+                element b
+            }
+        }
+        {
+            prefixns {bar http://foo.bar grill http://foo.grill}
+            defelement doc {
+                element a
+                any -- {bar grill}
+                element b
+            }
+        }
+    } {
+        tdom::schema create s
+        s define $schema
+        foreach xml $xmls {
+            lappend result [s validate $xml]
+        }
+        s delete
+    }
+    set result
+} {1 1 0 1 1 1 1 0 0 1 0 0 1 0 0 1 0 1 0 0 0 0 1 1 0 0 0 0 1 1}
+
 test schema-11.1 {attribute} {
     tdom::schema create s
     s define {
