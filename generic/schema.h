@@ -81,6 +81,7 @@ typedef unsigned int SchemaFlags;
 #define FORWARD_TYPE_DEF      128
 #define TYPED_ELEMENT         256
 #define HASH_ENTRY_DELETED    512
+#define ANY_NOT              1024 
 
 typedef struct domKeyConstraint {
     char  *name;
@@ -154,7 +155,6 @@ typedef struct SchemaData_
     Tcl_HashTable elementType;
     Tcl_HashTable elementTypeInstance;
     Tcl_HashTable namespace;
-    Tcl_HashEntry *emptyNamespace;
     char **prefixns;
     Tcl_HashTable prefix;
     Tcl_HashTable pattern;

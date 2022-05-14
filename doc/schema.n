@@ -707,15 +707,19 @@ With \fIconstraint script\fR or with a given text type
 argument a text matching this script or the text type is
 expected.
 .TP
-\&\fB\fBany\fP \fI?namespace?\fB \fI?quant?\fB
-\&\fRThe any command matches every element (in the namespace
-\&\fInamespace\fR, if that is given) (with whatever attributes)
-or subtree, no matter if known within the schema or not.
+\&\fB\fBany\fP ?\fIoptions\fB? \fI?<namespace list>?\fB \fI?quant?\fB
+\&\fRWithout arguments the any command matches every element.
+If the \fI<namespace list>\fR argument is given, this
+matches any elment in a namespace out of that list. The empty
+string means elements with no namespace. If additionally the
+option \fI-not\fR is given then this maches every element
+with a namespace not in the list. The only other recognized
+option is \fI--\fR which signals the end of any options.
 Please note that in case of no \fInamespace\fR argument is
 given that means that the quantifier * and + will eat up any
 elements until the enclosing element ends. If you really have
-a namespace that looks like a valid tDOM schema quantifier
-you will have to spell out always both arguments.
+a namespace that looks like a valid tDOM schema quantifier you
+will have to spell out always both arguments.
 .TP
 \&\fB\fBattribute\fP \fIname\fB \fI?quant?\fB \fI(?<constraint script>|\*(lqtype\*(lq typename?)\fB
 \&\fRThe attribute command defines an attribute (in no
