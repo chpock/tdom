@@ -633,15 +633,18 @@
       </commanddef>
 
       <commanddef>
-        <command><method>any</method> <m>?namespace?</m> <m>?quant?</m></command>
-        <desc>The any command matches every element (in the namespace
-        <m>namespace</m>, if that is given) (with whatever attributes)
-        or subtree, no matter if known within the schema or not.
-        Please note that in case of no <m>namespace</m> argument is
-        given that means that the quantifier * and + will eat up any
-        elements until the enclosing element ends. If you really have
-        a namespace that looks like a valid tDOM schema quantifier
-        you will have to spell out always both arguments.</desc>
+        <command><method>any</method> ?<m>options</m>? <m>?&lt;namespace list>?</m> <m>?quant?</m></command>
+        <desc>Without arguments the any command matches every element.
+        If the <m>&lt;namespace list></m> argument is given, this
+        matches any elment in a namespace out of that list. The empty
+        string means elements with no namespace. If additionally the
+        option <m>-not</m> is given then this maches every element
+        with a namespace not in the list. Please note that in case of
+        no <m>namespace</m> argument is given that means that the
+        quantifier * and + will eat up any elements until the
+        enclosing element ends. If you really have a namespace that
+        looks like a valid tDOM schema quantifier you will have to
+        spell out always both arguments.</desc>
       </commanddef>
 
       <commanddef>
