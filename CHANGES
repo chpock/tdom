@@ -11,7 +11,7 @@
 
         Schema command methods validate, validatefile and
         validatechannel enhanced with options to control external
-        entitiy resolving.
+        entity resolving.
 
 2022-02-19  Rolf Ade  <rolf@pointsman.de>
 
