@@ -406,12 +406,14 @@ typedef unsigned int domAttrFlags;
 
 typedef unsigned int domDocFlags;
 
-#define OUTPUT_DEFAULT_INDENT     1
-#define NEEDS_RENUMBERING         2
-#define DONT_FREE                 4
-#define IGNORE_XMLNS              8
-#define DOCUMENT_CMD             16
-#define VAR_TRACE                32
+#define OUTPUT_DEFAULT_INDENT      1
+#define NEEDS_RENUMBERING          2
+#define DONT_FREE                  4
+#define IGNORE_XMLNS               8
+#define DOCUMENT_CMD              16
+#define VAR_TRACE                 32
+#define INSIDE_FROM_SCRIPT        64
+#define DELETE_AFTER_FROM_SCRIPT 128
 
 /*--------------------------------------------------------------------------
 |   an index to the namespace records
