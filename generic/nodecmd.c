@@ -782,18 +782,23 @@ nodecmd_appendFromScript (
 ) {
     int ret, insideEval;
     domNode *oldLastChild, *child, *nextChild;
-
+    domDocument *doc;
+    char objCmdName[80];
+    Tcl_CmdInfo cmd_info;
+    ClientData clientData = NULL;
+    
     if (node->nodeType != ELEMENT_NODE) {
         Tcl_SetResult (interp, "NOT_AN_ELEMENT : can't append nodes", NULL);
         return TCL_ERROR;
     }
     
+    doc = node->ownerDocument;
     oldLastChild = node->lastChild;
 
     StackPush((void *)node);
-    insideEval = (node->ownerDocument->nodeFlags & INSIDE_FROM_SCRIPT);
+    insideEval = (doc->nodeFlags & INSIDE_FROM_SCRIPT);
     if (!insideEval) {
-        node->ownerDocument->nodeFlags |= INSIDE_FROM_SCRIPT;
+        doc->nodeFlags |= INSIDE_FROM_SCRIPT;
     }
     Tcl_AllowExceptions(interp);
     ret = Tcl_EvalObjEx(interp, cmdObj, 0);
@@ -824,8 +829,19 @@ nodecmd_appendFromScript (
 
     if (!insideEval) {
         /* Top level reached */
-        if (node->ownerDocument->nodeFlags & DELETE_AFTER_FROM_SCRIPT) {
-
+        if (doc->nodeFlags & DELETE_AFTER_FROM_SCRIPT) {
+            DOC_CMD(objCmdName, doc);
+            if (Tcl_GetCommandInfo (interp, objCmdName, &cmd_info)) {
+                if (cmd_info.objProc == tcldom_DocObjCmd) {
+                    clientData = cmd_info.objClientData;
+                }
+            } 
+            if (clientData != NULL || doc->nodeFlags & DOCUMENT_CMD) {
+                Tcl_DeleteCommand(interp, objCmdName);
+            } else {
+                tcldom_deleteDoc(interp, doc);
+            }
+            return TCL_BREAK;
         } else {
             node->ownerDocument->nodeFlags &= ~INSIDE_FROM_SCRIPT;
         }

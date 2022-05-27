@@ -1668,7 +1668,7 @@ test domNode-13.27 {delete doc in appendFromScript script} {
         }
     }
     info commands $doc
-} 0
+} {}
 
 
 test domNode-14.1 {appendFromList} {

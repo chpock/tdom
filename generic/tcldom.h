@@ -56,6 +56,8 @@ int tcldom_setInterpAndReturnVar (Tcl_Interp *interp, domNode *node,
                                   int setVariable, Tcl_Obj *var_name);
 
 void tcldom_initialize(void);
+void tcldom_deleteDoc (Tcl_Interp *interp, domDocument *doc);
+
 
 Tcl_ObjCmdProc tcldom_DomObjCmd;
 Tcl_ObjCmdProc tcldom_DocObjCmd;
