@@ -492,6 +492,10 @@ void tcldom_deleteDoc (
 {
     int deleted = 1;
 
+    if (doc->nodeFlags & INSIDE_FROM_SCRIPT) {
+        doc->nodeFlags |= DELETE_AFTER_FROM_SCRIPT;
+        return;
+    }
     TDomThreaded(deleted = tcldom_UnregisterDocShared(interp, doc));
     if (deleted) {
         domFreeDocument(doc, tcldom_deleteNode, interp);
@@ -5791,14 +5795,10 @@ int tcldom_DocObjCmd (
 
         case m_delete:
             CheckArgs(2,2,2,"");
-            if (doc->nodeFlags & INSIDE_FROM_SCRIPT) {
-                doc->nodeFlags |= DELETE_AFTER_FROM_SCRIPT;
+            if (clientData != NULL || doc->nodeFlags & DOCUMENT_CMD) {
+                Tcl_DeleteCommand(interp, Tcl_GetString (objv[0]));
             } else {
-                if (clientData != NULL || doc->nodeFlags & DOCUMENT_CMD) {
-                    Tcl_DeleteCommand(interp, Tcl_GetString (objv[0]));
-                } else {
-                    tcldom_deleteDoc(interp, doc);
-                }
+                tcldom_deleteDoc(interp, doc);
             }
             SetResult("");
             return TCL_OK;

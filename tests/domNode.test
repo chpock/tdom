@@ -1662,14 +1662,33 @@ test domNode-13.26 {appendFromScript with default namespace in scope} {
 test domNode-13.27 {delete doc in appendFromScript script} {
     set doc [dom createDocument doc]
     set root [$doc documentElement]
+    set result ""
+    $root appendFromScript {
+        ::nodeCmds::e1 {
+            ::nodeCmds::e1 {
+                $doc delete
+            }
+        }
+        lappend result [info commands $doc]
+        ::nodeCmds::e1
+    }
+    lappend result [info commands $doc]
+} {{} {}}
+
+proc domNode-13.28 {} {
+    dom createDocument doc doc
+    set root [$doc documentElement]
     $root appendFromScript {
         ::nodeCmds::e1 {
             $doc delete
         }
     }
     info commands $doc
-} {}
+}
 
+test domNode-13.28 {delete doc in appendFromScript script} {
+    domNode-13.28
+} {}
 
 test domNode-14.1 {appendFromList} {
     set doc [dom createDocument root]
