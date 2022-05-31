@@ -485,7 +485,6 @@ tcldom_deleteNode (
 |   tcldom_deleteDoc
 |
 \---------------------------------------------------------------------------*/
-static
 void tcldom_deleteDoc (
     Tcl_Interp  * interp,
     domDocument * doc
@@ -493,6 +492,10 @@ void tcldom_deleteDoc (
 {
     int deleted = 1;
 
+    if (doc->nodeFlags & INSIDE_FROM_SCRIPT) {
+        doc->nodeFlags |= DELETE_AFTER_FROM_SCRIPT;
+        return;
+    }
     TDomThreaded(deleted = tcldom_UnregisterDocShared(interp, doc));
     if (deleted) {
         domFreeDocument(doc, tcldom_deleteNode, interp);
@@ -5010,7 +5013,12 @@ int tcldom_NodeObjCmd (
 
         case m_appendFromScript:
             CheckArgs(3,3,2,"script");
-            if (nodecmd_appendFromScript(interp, node, objv[2]) != TCL_OK) {
+            result = nodecmd_appendFromScript(interp, node, objv[2]);
+            if (result == TCL_BREAK) {
+                SetResult("");
+                return TCL_OK;
+            }
+            if (result != TCL_OK) {            
                 return TCL_ERROR;
             }
             return tcldom_setInterpAndReturnVar(interp, node, 0, NULL);
@@ -5030,8 +5038,13 @@ int tcldom_NodeObjCmd (
                     }
                 }
             }
-            if (nodecmd_insertBeforeFromScript(interp, node, objv[2], refChild)
-                != TCL_OK) {
+            result = nodecmd_insertBeforeFromScript(interp, node, objv[2],
+                                                    refChild);
+            if (result == TCL_BREAK) {
+                SetResult("");
+                return TCL_OK;
+            }
+            if (result != TCL_OK) {
                 return TCL_ERROR;
             }
             return tcldom_setInterpAndReturnVar (interp, node, 0, NULL);

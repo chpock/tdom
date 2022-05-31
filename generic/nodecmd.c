@@ -780,17 +780,23 @@ nodecmd_appendFromScript (
     domNode    *node,                  /* Parent dom node */
     Tcl_Obj    *cmdObj                 /* Argument objects. */
 ) {
-    int ret;
+    int ret, insideEval;
     domNode *oldLastChild, *child, *nextChild;
-
+    domDocument *doc;
+    
     if (node->nodeType != ELEMENT_NODE) {
         Tcl_SetResult (interp, "NOT_AN_ELEMENT : can't append nodes", NULL);
         return TCL_ERROR;
     }
     
+    doc = node->ownerDocument;
     oldLastChild = node->lastChild;
 
     StackPush((void *)node);
+    insideEval = (doc->nodeFlags & INSIDE_FROM_SCRIPT);
+    if (!insideEval) {
+        doc->nodeFlags |= INSIDE_FROM_SCRIPT;
+    }
     Tcl_AllowExceptions(interp);
     ret = Tcl_EvalObjEx(interp, cmdObj, 0);
     if (ret != TCL_ERROR) {
@@ -817,7 +823,15 @@ nodecmd_appendFromScript (
             node->lastChild = NULL;
         }
     }
-            
+
+    if (!insideEval) {
+        /* Top level reached */
+        node->ownerDocument->nodeFlags &= ~INSIDE_FROM_SCRIPT;
+        if (doc->nodeFlags & DELETE_AFTER_FROM_SCRIPT) {
+            tcldom_deleteDoc(interp, doc);
+            return TCL_BREAK;
+        }
+    }
     return (ret == TCL_BREAK) ? TCL_OK : ret;
 }
 
