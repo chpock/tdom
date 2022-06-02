@@ -1675,6 +1675,19 @@ test domNode-13.27 {delete doc in appendFromScript script} {
     lappend result [info commands $doc]
 } {{} {}}
 
+test domNode-13.28 {tdom::fsinsertNode} {
+    set doc [dom createDocument doc]
+    set root [$doc documentElement]
+    $root appendFromScript {
+        ::nodeCmds::e1 {
+            tdom::fsinsertNode [$doc createElement some]
+        }
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc><e1><some/></e1></doc>}
+
 proc domNode-13.28 {} {
     dom createDocument doc doc
     set root [$doc documentElement]

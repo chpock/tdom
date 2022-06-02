@@ -448,7 +448,6 @@ tDOM_fsinsertNodeCmd (
         Tcl_AppendResult(interp, "called outside domNode context", NULL);
         return TCL_ERROR;
     }
-    return TCL_OK;
 
     newNode = tcldom_getNodeFromObj (interp, objv[1]);
     if (!newNode) {
@@ -459,6 +458,7 @@ tDOM_fsinsertNodeCmd (
         Tcl_AppendResult (interp, domException2String(exception), NULL);
         return TCL_ERROR;
     }
+    tcldom_setInterpAndReturnVar (interp, newNode, 0, NULL);
     return TCL_OK;
 }
 
