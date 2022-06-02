@@ -41,7 +41,6 @@
 #include <tcldom.h>
 #include <tclpull.h>
 #include <schema.h>
-#include <nodecmd.h>
 
 extern TdomStubs tdomStubs;
 

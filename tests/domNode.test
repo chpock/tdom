@@ -1675,19 +1675,6 @@ test domNode-13.27 {delete doc in appendFromScript script} {
     lappend result [info commands $doc]
 } {{} {}}
 
-test domNode-13.28 {tdom::fsinsertNode} {
-    set doc [dom createDocument doc]
-    set root [$doc documentElement]
-    $root appendFromScript {
-        ::nodeCmds::e1 {
-            tdom::fsinsertNode [$doc createElement some]
-        }
-    }
-    set result [$doc asXML -indent none]
-    $doc delete
-    set result
-} {<doc><e1><some/></e1></doc>}
-
 proc domNode-13.28 {} {
     dom createDocument doc doc
     set root [$doc documentElement]
@@ -1702,6 +1689,48 @@ proc domNode-13.28 {} {
 test domNode-13.28 {delete doc in appendFromScript script} {
     domNode-13.28
 } {}
+
+test domNode-13.29 {tdom::fsinsertNode} {
+    set doc [dom createDocument doc]
+    set root [$doc documentElement]
+    $root appendFromScript {
+        ::nodeCmds::e1 {
+            tdom::fsinsertNode [$doc createElement some]
+        }
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc><e1><some/></e1></doc>}
+
+
+test domNode-13.30 {tdom::fsnewNode} {
+    set doc [dom createDocument doc]
+    set root [$doc documentElement]
+    $root appendFromScript {
+        tdom::fsnewNode e1 {
+            tdom::fsinsertNode [$doc createElement some]
+        }
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc><e1><some/></e1></doc>}
+
+test domNode-13.31 {tdom::fsnewNode} {
+    set doc [dom createDocument doc]
+    set root [$doc documentElement]
+    $root appendFromScript {
+        tdom::fsnewNode e1 {
+            tdom::fsnewNode some att1 "att1 value" {
+                ::nodeCmds::e1
+            }
+        }
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc><e1><some att1="att1 value"><e1/></some></e1></doc>}
 
 test domNode-14.1 {appendFromList} {
     set doc [dom createDocument root]

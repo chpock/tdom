@@ -6105,6 +6105,189 @@ int tcldom_DocObjCmd (
     return TCL_ERROR;
 }
 
+/*----------------------------------------------------------------------------
+|   tDOM_fsnewNodeCmd
+|
+\---------------------------------------------------------------------------*/
+int
+tDOM_fsnewNodeCmd (
+    ClientData      clientData,
+    Tcl_Interp    * interp,
+    int             objc,
+    Tcl_Obj *const  objv[]
+) {
+    domNode *parent, *newNode = NULL;
+    int index, jsonType, haveJsonType = 0, len, type, ret;
+    int checkName, checkCharData;
+    Tcl_Obj *cmdObj;
+    char *namespace = NULL, *option, *tag;
+
+    GetTcldomTSD()
+
+    static const char *options[] = {
+        "-jsonType", "-namespace", "--", NULL
+    };
+
+    enum option {
+        o_jsonType, o_namespace, o_Last
+    };
+
+    static const char *jsonTypes[] = {
+        "NONE",
+        "ARRAY",
+        "OBJECT",
+        "NULL",
+        "TRUE",
+        "FALSE",
+        "STRING",
+        "NUMBER"
+    };
+
+    Tcl_ResetResult (interp);
+
+    /*------------------------------------------------------------------------
+    |   Need parent node to get the owner document and to append new 
+    |   child tag to it. The current parent node is stored on the stack.
+    |
+    \-----------------------------------------------------------------------*/
+
+    parent = nodecmd_currentNode();    
+    if (parent == NULL) {
+        Tcl_AppendResult(interp, "called outside domNode context", NULL);
+        return TCL_ERROR;
+    }
+
+    if (objc < 2) {
+        Tcl_AppendResult(interp, "::tdom::fsnewNode \n"
+                         "\t?-jsonType <jsonType>?\n"
+                         "\t?-namespace <namespace>?\n"
+                         " tagName ?attributes? ?script?", NULL);
+        return TCL_ERROR;
+    }
+    while (objc > 2) {
+        option = Tcl_GetString (objv[1]);
+        if (option[0] != '-') {
+            break;
+        }
+        if (Tcl_GetIndexFromObj (interp, objv[1], options, "option",
+                                 0, &index) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        switch ((enum option) index) {
+        case o_jsonType:
+            if (Tcl_GetIndexFromObj (interp, objv[2], jsonTypes, "jsonType",
+                                     1, &jsonType) != TCL_OK) {
+                return TCL_ERROR;
+            }
+            haveJsonType = 1;
+            objc -= 2;
+            objv += 2;
+            break;
+            
+        case o_namespace:
+            namespace = Tcl_GetString (objv[2]);
+            objc -= 2;
+            objv += 2;
+            break;
+            
+        case o_Last:
+            objv++;  objc--; break;
+
+        }
+    }
+    if (objc < 2) {
+        Tcl_AppendResult(interp, "::tdom::fsnewNode \n"
+                         "\t?-jsonType <jsonType>?\n"
+                         "\t?-namespace <namespace>?\n"
+                         " tagName ?attributes? ?script?", NULL);
+        return TCL_ERROR;
+    }
+    tag = Tcl_GetStringFromObj(objv[1], &len);
+    objv++;  objc--;
+
+    newNode = domAppendNewElementNode (parent, tag, namespace);
+    if (haveJsonType) {
+        newNode->info = jsonType;
+    }
+
+    cmdObj = NULL;
+    checkName = !TSD(dontCheckName);
+    checkCharData = !TSD(dontCheckCharData);
+    
+    if (objc > 1) {
+        if (haveJsonType) {
+            type = ELEMENT_NODE;
+        } else {
+            if (checkName && checkCharData) {
+                type = ELEMENT_NODE_CHK;
+            } else if (checkName) {
+                type = ELEMENT_NODE_ANAME_CHK;
+            } else if (checkCharData) {
+                type = ELEMENT_NODE_AVALUE_CHK;
+            } else {
+                type = ELEMENT_NODE;
+            }
+        }
+        if (nodecmd_processAttributes (interp, newNode, type, objc, objv,
+                                         &cmdObj) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        if (cmdObj) {
+            ret = nodecmd_appendFromScript(interp, newNode, cmdObj);
+            if (ret == TCL_OK) {
+                parent->ownerDocument->nodeFlags |= NEEDS_RENUMBERING;
+            }
+            return ret;
+        }
+    }
+    return TCL_OK;
+}
+
+/*----------------------------------------------------------------------------
+|   tDOM_fsinsertNodeCmd
+|
+\---------------------------------------------------------------------------*/
+int
+tDOM_fsinsertNodeCmd (
+    ClientData      clientData,
+    Tcl_Interp    * interp,
+    int             objc,
+    Tcl_Obj *const  objv[]
+) {
+    domNode *parent, *newNode = NULL;
+    domException exception;
+
+    Tcl_ResetResult (interp);
+
+    if (objc != 2) {
+        Tcl_AppendResult (interp, "::tdom::fsinsertNode <node>", NULL);
+        return TCL_ERROR;
+    }
+
+    /*------------------------------------------------------------------------
+    |   Need parent node to get the owner document and to append new 
+    |   child tag to it. The current parent node is stored on the stack.
+    |
+    \-----------------------------------------------------------------------*/
+
+    parent = nodecmd_currentNode();    
+    if (parent == NULL) {
+        Tcl_AppendResult(interp, "called outside domNode context", NULL);
+        return TCL_ERROR;
+    }
+
+    newNode = tcldom_getNodeFromObj (interp, objv[1]);
+    if (!newNode) {
+        return TCL_ERROR;
+    }
+    exception = domAppendChild (parent, newNode);
+    if (exception != OK) {
+        Tcl_AppendResult (interp, domException2String(exception), NULL);
+        return TCL_ERROR;
+    }
+    tcldom_setInterpAndReturnVar (interp, newNode, 0, NULL);
+    return TCL_OK;
+}
 
 /*----------------------------------------------------------------------------
 |   tcldom_createDocument

@@ -387,6 +387,21 @@ typedef enum {
 
 #endif
 
+/* The following defines used for NodeObjCmd */
+#define PARSER_NODE 9999 /* Hack so that we can invoke XML parser */
+/* More hacked domNodeTypes - used to signal, that we want to check
+   name/data of the node to create. */
+#define ELEMENT_NODE_ANAME_CHK 10000
+#define ELEMENT_NODE_AVALUE_CHK 10001
+#define ELEMENT_NODE_CHK 10002
+#define TEXT_NODE_CHK 10003
+#define COMMENT_NODE_CHK 10004
+#define CDATA_SECTION_NODE_CHK 10005
+#define PROCESSING_INSTRUCTION_NODE_NAME_CHK 10006
+#define PROCESSING_INSTRUCTION_NODE_VALUE_CHK 10007
+#define PROCESSING_INSTRUCTION_NODE_CHK 10008
+
+
 /*--------------------------------------------------------------------------
 |   flags   -  indicating some internal features about nodes
 |

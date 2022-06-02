@@ -45,15 +45,14 @@ int nodecmd_insertBeforeFromScript (Tcl_Interp *interp,
                                     Tcl_Obj    *cmdObj,
                                     domNode    *refChild);
 
-int tDOM_fsnewNodeCmd (ClientData clientData,
-                       Tcl_Interp    * interp,
-                       int             objc,
-                       Tcl_Obj *const  objv[]);
+int nodecmd_processAttributes (Tcl_Interp    *interp,
+                               domNode       *node,
+                               int            type,
+                               int            objc,
+                               Tcl_Obj *const objv[],
+                               Tcl_Obj      **cmdObj);
 
-int tDOM_fsinsertNodeCmd (ClientData clientData,
-                          Tcl_Interp    * interp,
-                          int             objc,
-                          Tcl_Obj *const  objv[]);
+domNode * nodecmd_currentNode(void);
 
 /* EOF $RCSfile $ */
 
