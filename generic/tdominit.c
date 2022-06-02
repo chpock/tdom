@@ -96,6 +96,9 @@ Tdom_Init (
     Tcl_CreateObjCommand(interp, "tdom::pullparser", tDOM_PullParserCmd, NULL, NULL );    
 #endif
 
+    Tcl_CreateObjCommand(interp, "tdom::fsnewNode", tDOM_fsnewNodeCmd, NULL, NULL );    
+    Tcl_CreateObjCommand(interp, "tdom::fsinsertNode", tDOM_fsinsertNodeCmd, NULL, NULL );    
+
 #ifndef TDOM_NO_SCHEMA
     tDOM_SchemaInit (interp);
 #endif

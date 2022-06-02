@@ -40,19 +40,6 @@
 #include <tcl.h>
 #include <nodecmd.h>
 
-#define PARSER_NODE 9999 /* Hack so that we can invoke XML parser */
-/* More hacked domNodeTypes - used to signal, that we want to check
-   name/data of the node to create. */
-#define ELEMENT_NODE_ANAME_CHK 10000
-#define ELEMENT_NODE_AVALUE_CHK 10001
-#define ELEMENT_NODE_CHK 10002
-#define TEXT_NODE_CHK 10003
-#define COMMENT_NODE_CHK 10004
-#define CDATA_SECTION_NODE_CHK 10005
-#define PROCESSING_INSTRUCTION_NODE_NAME_CHK 10006
-#define PROCESSING_INSTRUCTION_NODE_VALUE_CHK 10007
-#define PROCESSING_INSTRUCTION_NODE_CHK 10008
-
 /*----------------------------------------------------------------------------
 |   Types
 |
@@ -272,6 +259,74 @@ NodeObjCmdDeleteProc (
 }
 
 /*----------------------------------------------------------------------------
+|   nodecmd_processAttributes
+|
+\---------------------------------------------------------------------------*/
+int
+nodecmd_processAttributes (
+    Tcl_Interp *interp,
+    domNode *node,
+    int type,
+    int             objc,
+    Tcl_Obj *const  objv[],
+    Tcl_Obj **cmdObj
+    )
+{
+    Tcl_Obj **opts;
+    int len, i;
+    char *tval, *aval;
+    
+    /*
+     * Allow for following syntax:
+     *   cmd ?-option value ...? ?script?
+     *   cmd ?opton value ...? ?script?
+     *   cmd key_value_list script
+     *       where list contains "-key value ..." or "key value ..."
+     */
+
+    if ((objc % 2) == 0) {
+        *cmdObj = objv[objc-1];
+        len  = objc - 2; /* skip both command and script */
+        opts = (Tcl_Obj**)objv + 1;
+    } else if((objc == 3)
+              && Tcl_ListObjGetElements(interp,objv[1],&len,&opts)==TCL_OK
+              && (len == 0 || len > 1)) {
+        if ((len % 2)) {
+            Tcl_AppendResult(interp, "list must have "
+                             "an even number of elements", NULL);
+            return TCL_ERROR;
+        }
+        *cmdObj = objv[2];
+    } else {
+        cmdObj = NULL;
+        len  = objc - 1; /* skip command */
+        opts = (Tcl_Obj**)objv + 1;
+    }
+    for (i = 0; i < len; i += 2) {
+        tval = Tcl_GetString(opts[i]);
+        if (*tval == '-') {
+            tval++;
+        }
+        if (abs(type) == ELEMENT_NODE_ANAME_CHK
+            || abs(type) == ELEMENT_NODE_CHK) {
+            if (!tcldom_nameCheck (interp, tval, "attribute", 0)) {
+                return TCL_ERROR;
+            }
+        }
+        aval = Tcl_GetString(opts[i+1]);
+        if (abs(type) == ELEMENT_NODE_AVALUE_CHK
+            || abs(type) == ELEMENT_NODE_CHK) {
+            if (!tcldom_textCheck (interp, aval, "attribute")) {
+                return TCL_ERROR;
+            }
+        }
+        domSetAttribute(node, tval, aval);
+    }
+    return TCL_OK;
+}
+
+
+/*----------------------------------------------------------------------------
 |   NodeObjCmd
 |
 \---------------------------------------------------------------------------*/
@@ -282,13 +337,13 @@ NodeObjCmd (
     int             objc,               /* Number of arguments. */
     Tcl_Obj *const  objv[]             /* Argument objects. */
 ) {
-    int type, createType, len, dlen, i, ret, disableOutputEscaping = 0, 
+    int type, createType, len, dlen, ret, disableOutputEscaping = 0, 
         index = 1;
     char *tag, *p, *tval, *aval;
     domNode *parent, *newNode = NULL;
     domTextNode *textNode = NULL;
     domDocument *doc;
-    Tcl_Obj *cmdObj, **opts;
+    Tcl_Obj *cmdObj;
     NodeInfo *nodeInfo = (NodeInfo*) arg;
 
     /*------------------------------------------------------------------------
@@ -416,52 +471,11 @@ NodeObjCmd (
 
         newNode = domAppendNewElementNode (parent, tag, nodeInfo->namespace);
         newNode->info = nodeInfo->jsonType;
-        
-        /*
-         * Allow for following syntax:
-         *   cmd ?-option value ...? ?script?
-         *   cmd ?opton value ...? ?script?
-         *   cmd key_value_list script
-         *       where list contains "-key value ..." or "key value ..."
-         */
 
-        if ((objc % 2) == 0) {
-            cmdObj = objv[objc-1];
-            len  = objc - 2; /* skip both command and script */
-            opts = (Tcl_Obj**)objv + 1;
-        } else if((objc == 3)
-                  && Tcl_ListObjGetElements(interp,objv[1],&len,&opts)==TCL_OK
-                  && (len == 0 || len > 1)) {
-            if ((len % 2)) {
-                Tcl_AppendResult(interp, "list must have "
-                                 "an even number of elements", NULL);
-                return TCL_ERROR;
-            }
-            cmdObj = objv[2];
-        } else {
-            cmdObj = NULL;
-            len  = objc - 1; /* skip command */
-            opts = (Tcl_Obj**)objv + 1;
-        }
-        for (i = 0; i < len; i += 2) {
-            tval = Tcl_GetString(opts[i]);
-            if (*tval == '-') {
-                tval++;
-            }
-            if (abs(type) == ELEMENT_NODE_ANAME_CHK
-                || abs(type) == ELEMENT_NODE_CHK) {
-                if (!tcldom_nameCheck (interp, tval, "attribute", 0)) {
-                    return TCL_ERROR;
-                }
-            }
-            aval = Tcl_GetString(opts[i+1]);
-            if (abs(type) == ELEMENT_NODE_AVALUE_CHK
-                || abs(type) == ELEMENT_NODE_CHK) {
-                if (!tcldom_textCheck (interp, aval, "attribute")) {
-                    return TCL_ERROR;
-                }
-            }
-            domSetAttribute(newNode, tval, aval);
+        cmdObj = NULL;
+        if (nodecmd_processAttributes (interp, newNode, type, objc, objv,
+                                         &cmdObj) != TCL_OK) {
+            return TCL_ERROR;
         }
         if (cmdObj) {
             ret = nodecmd_appendFromScript(interp, newNode, cmdObj);
@@ -931,7 +945,7 @@ nodecmd_insertBeforeFromScript (
 |
 \---------------------------------------------------------------------------*/
 
-void *
+domNode *
 nodecmd_currentNode(void)
 {
     return StackTop();

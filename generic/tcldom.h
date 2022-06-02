@@ -65,6 +65,17 @@ Tcl_ObjCmdProc tcldom_NodeObjCmd;
 Tcl_ObjCmdProc tcldom_unknownCmd;
 Tcl_ObjCmdProc TclTdomObjCmd;
 
+int tDOM_fsnewNodeCmd (ClientData clientData,
+                       Tcl_Interp    * interp,
+                       int             objc,
+                       Tcl_Obj *const  objv[]);
+
+int tDOM_fsinsertNodeCmd (ClientData clientData,
+                          Tcl_Interp    * interp,
+                          int             objc,
+                          Tcl_Obj *const  objv[]);
+
+
 #if defined(_MSC_VER) || defined(__MINGW32__)
 #  undef TCL_STORAGE_CLASS
 #  define TCL_STORAGE_CLASS DLLEXPORT
