@@ -272,6 +272,197 @@ NodeObjCmdDeleteProc (
 }
 
 /*----------------------------------------------------------------------------
+|   tDOM_fsnewNodeCmd
+|
+\---------------------------------------------------------------------------*/
+int
+tDOM_fsnewNodeCmd (
+    ClientData      clientData,
+    Tcl_Interp    * interp,
+    int             objc,
+    Tcl_Obj *const  objv[]
+) {
+    domNode *parent, *newNode = NULL;
+    int index, jsonType, haveJsonType = 0, len, i;
+    Tcl_Obj *thisObj;
+    char *namespace = NULL, *option, *tag, *attname, *attvalue;
+
+    static const char *options[] = {
+        "-jsonType", "-namespace", "--", NULL
+    };
+
+    enum option {
+        o_jsonType, o_namespace, o_Last
+    };
+
+    static const char *jsonTypes[] = {
+        "NONE",
+        "ARRAY",
+        "OBJECT",
+        "NULL",
+        "TRUE",
+        "FALSE",
+        "STRING",
+        "NUMBER"
+    };
+
+    Tcl_ResetResult (interp);
+
+    /*------------------------------------------------------------------------
+    |   Need parent node to get the owner document and to append new 
+    |   child tag to it. The current parent node is stored on the stack.
+    |
+    \-----------------------------------------------------------------------*/
+
+    parent = (domNode *)StackTop();    
+    if (parent == NULL) {
+        Tcl_AppendResult(interp, "called outside domNode context", NULL);
+        return TCL_ERROR;
+    }
+
+    if (objc < 2) {
+        Tcl_AppendResult(interp, "::tdom::fsnewNode \n"
+                         "\t?-jsonType <jsonType>?\n"
+                         "\t?-namespace <namespace>?\n"
+                         " tagName ?attributes? ?script?", NULL);
+        return TCL_ERROR;
+    }
+    while (objc > 2) {
+        option = Tcl_GetString (objv[1]);
+        if (option[0] != '-') {
+            break;
+        }
+        if (Tcl_GetIndexFromObj (interp, objv[1], options, "option",
+                                 0, &index) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        switch ((enum option) index) {
+        case o_jsonType:
+            if (Tcl_GetIndexFromObj (interp, objv[2], jsonTypes, "jsonType",
+                                     1, &jsonType) != TCL_OK) {
+                return TCL_ERROR;
+            }
+            haveJsonType = 1;
+            objc -= 2;
+            objv += 2;
+            break;
+            
+        case o_namespace:
+            namespace = Tcl_GetString (objv[2]);
+            objc -= 2;
+            objv += 2;
+            break;
+            
+        case o_Last:
+            objv++;  objc--; break;
+
+        }
+    }
+    if (objc < 2) {
+        Tcl_AppendResult(interp, "::tdom::fsnewNode \n"
+                         "\t?-jsonType <jsonType>?\n"
+                         "\t?-namespace <namespace>?\n"
+                         " tagName ?attributes? ?script?", NULL);
+        return TCL_ERROR;
+    }
+    tag = Tcl_GetStringFromObj(objv[1], &len);
+    objv++;  objc--;
+
+    newNode = domAppendNewElementNode (parent, tag, namespace);
+    if (haveJsonType) {
+        newNode->info = jsonType;
+    }
+    /*
+     * Allow for following syntax:
+     *   ?attname attvalue ...?
+     *   ?name_value_list?
+     */
+
+    if (objc == 1) {
+        return TCL_OK;
+    }
+    if (objc == 2) {
+        /* May be either an attribute value pairs list and a script or
+         * an attribute name and value without a script. */
+        /* A valid attribute name is also a valid Tcl list. */
+        if (Tcl_ListObjLength (interp, objv[0], &len) != TCL_OK) {
+            Tcl_AppendResult(interp, "invalid argument '",
+                             Tcl_GetString (objv[0]), "'", NULL);
+            return TCL_ERROR;
+        }
+        if (len == 1) {
+            /* Seems not to be a name/value pairs list. Assume
+             * attribute name and attribute value as argument without
+             * script. */
+        }
+        for (i = 0; i < len; i += 2) {
+            Tcl_ListObjIndex (interp, objv[0], i, &thisObj);
+            attname = Tcl_GetString (thisObj);
+            Tcl_ListObjIndex (interp, objv[0], i+1, &thisObj);
+            attvalue = Tcl_GetString (thisObj);
+            domSetAttribute(newNode, attname, attvalue);
+        }
+    } else {
+        if (objc % 2 != 0) {
+            Tcl_AppendResult(interp, "missing attribute value", NULL);
+            return TCL_ERROR;
+        }
+        for (i = 0; i < objc; i += 2) {
+            attname = Tcl_GetString (objv[i]);
+            attvalue = Tcl_GetString (objv[i+1]);
+            domSetAttribute(newNode, attname, attvalue);
+        }
+    }
+    return TCL_OK;
+}
+
+/*----------------------------------------------------------------------------
+|   tDOM_fsinsertNodeCmd
+|
+\---------------------------------------------------------------------------*/
+int
+tDOM_fsinsertNodeCmd (
+    ClientData      clientData,
+    Tcl_Interp    * interp,
+    int             objc,
+    Tcl_Obj *const  objv[]
+) {
+    domNode *parent, *newNode = NULL;
+    domException exception;
+
+    Tcl_ResetResult (interp);
+
+    if (objc != 2) {
+        Tcl_AppendResult (interp, "::tdom::fsinsertNode <node>", NULL);
+        return TCL_ERROR;
+    }
+
+    /*------------------------------------------------------------------------
+    |   Need parent node to get the owner document and to append new 
+    |   child tag to it. The current parent node is stored on the stack.
+    |
+    \-----------------------------------------------------------------------*/
+
+    parent = (domNode *)StackTop();    
+    if (parent == NULL) {
+        Tcl_AppendResult(interp, "called outside domNode context", NULL);
+        return TCL_ERROR;
+    }
+    return TCL_OK;
+
+    newNode = tcldom_getNodeFromObj (interp, objv[1]);
+    if (!newNode) {
+        return TCL_ERROR;
+    }
+    exception = domAppendChild (parent, newNode);
+    if (exception != OK) {
+        Tcl_AppendResult (interp, domException2String(exception), NULL);
+        return TCL_ERROR;
+    }
+    return TCL_OK;
+}
+
+/*----------------------------------------------------------------------------
 |   NodeObjCmd
 |
 \---------------------------------------------------------------------------*/
