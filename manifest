@@ -1,5 +1,5 @@
-C Added\stdom::fsnewNode\sund\stdom::fsinsertNode.
-D 2022-06-02T22:34:01.974
+C More\stests.
+D 2022-06-02T22:49:50.916
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -197,7 +197,7 @@ F tests/dom.bench 5446ce379127b8d5700f18a5a0848e580313d0d7
 F tests/dom.test e6c51f6585f94dc9fb9bf2ac18fc14d1b6454bc08024aecf67e457bddb974e4f
 F tests/domDoc.test cb833d2139c8d9671e50f3cf4155b85e082674bcc534562128be0dee3419e71d
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
-F tests/domNode.test f59eafd1ff7f46253578a69fe2d1fa42199eb9bb46e380ba2595f42457525ba7
+F tests/domNode.test 7d307d78f2323a82881aa0e968b2b5e4c795991f48167879bec5eeab4c65a1f3
 F tests/domjson.test bdfbe938f33931f56f9496aac425b2183373f4cb926b95a04fa095bd3b75cd3d
 F tests/domnamespace.test f68dee13e2325518e96b318bf9fe76ae6903dc38d5602c4b0f48f90c0dc3038c
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
@@ -237,8 +237,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c73a4ec636c1e9ee7d8b980ca4d86ea88412981f8bf2ac02939191b381b73eca
-R c9639659954da2af22746917904fc84c
+P 21c47bb0c6db62eddab5f7e7e197c3ed9e0138871ac8c1fac3119b1186e99f13
+R 9b926b15c0b8c9984c41ee024a7bc6fe
 U rolf
-Z bf161c449be20c30cf04c4dd482be240
+Z 15b29e3e7c5cb3088f69b0b722c91777
 # Remove this line to create a well-formed Fossil manifest.
