@@ -1,5 +1,5 @@
-C Added\scommands\stdom::fsnewNode\sand\stdom::fsinsertNode.
-D 2022-06-02T22:54:57.803
+C Added\snon-standard\sXPath\sfunction\slaststring()\swhich\sbehaves\slike\sstring(),\sjust\sreturing\sthe\sstring\svalue\sof\sthe\slast\sstring\sin\scase\sof\sa\snode\sset\sresult.
+D 2022-06-08T23:49:02.685
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -136,7 +136,7 @@ F generic/domhtml5.h 5cca562a556e7662f2dce222640c32abb2777146
 F generic/domjson.c 1c33b0f4a2f022b69ae3d39f908081fa9724b75213a1b7f425cc0f093742dd64
 F generic/domjson.h b10c42af9ef7fc9d0ad4fac733ef6461df0cdd90
 F generic/domlock.c 5bc199269c92217b7f0f3cd713a5cfe6b51672cc577dd54d7e5b2364605ca30f
-F generic/domxpath.c 88a12a2b45d5090f9fffe54e0d5962d8d47029497e18ff2b292665b1683e3d2b
+F generic/domxpath.c 521a901268ba535bd577bbd10521cbe4ddc7920a783731f2ed100b27b01197ef
 F generic/domxpath.h 7d37b763e4e90d3e97c985c73d893b6ca26198ad1e61fad937d8147a254a2f0d
 F generic/domxslt.c 30bf1929c764b6eb46df861e68f71b3bfee1f001f25b3ca9223c2cb8f6458bc7
 F generic/domxslt.h 0cb8e327683a0ffeb2a7094add6cd82ec1ae49c7c704f20d8d6f7d6523e74da8
@@ -197,7 +197,7 @@ F tests/dom.bench 5446ce379127b8d5700f18a5a0848e580313d0d7
 F tests/dom.test e6c51f6585f94dc9fb9bf2ac18fc14d1b6454bc08024aecf67e457bddb974e4f
 F tests/domDoc.test cb833d2139c8d9671e50f3cf4155b85e082674bcc534562128be0dee3419e71d
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
-F tests/domNode.test 7d307d78f2323a82881aa0e968b2b5e4c795991f48167879bec5eeab4c65a1f3
+F tests/domNode.test b0d28fd5a14e203cfcba33666e7c544daa20115c69f8c06ddeaf11df40f9ce05
 F tests/domjson.test bdfbe938f33931f56f9496aac425b2183373f4cb926b95a04fa095bd3b75cd3d
 F tests/domnamespace.test f68dee13e2325518e96b318bf9fe76ae6903dc38d5602c4b0f48f90c0dc3038c
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
@@ -237,9 +237,11 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 092ad67e81d49d3463336842e038f0100372b433bee667748efd5d024aff736d 49b088df68a1fe7c55a0a4e3c39799f800ce5e6aba1162171ffdd5d6b6fa3e37
-R 1dc033c1ec42c864aeff852c651748ca
-T +closed 49b088df68a1fe7c55a0a4e3c39799f800ce5e6aba1162171ffdd5d6b6fa3e37
+P 0595f7faca31dcbf29dfa63e668d9a8578bf59fb5d713ca81a5909be7362bf7e
+R 2b115925b2673b2e88005e4c8669feee
+T *branch * xpath-func-laststring
+T *sym-xpath-func-laststring *
+T -sym-trunk *
 U rolf
-Z 2a5e0abb081b060f0e66144294f46968
+Z ee914f21efa26ea53b816df39dc439f3
 # Remove this line to create a well-formed Fossil manifest.
