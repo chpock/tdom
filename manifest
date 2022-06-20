@@ -1,5 +1,5 @@
-C Added\scommands\stdom::fsnewNode\sand\stdom::fsinsertNode.
-D 2022-06-02T22:54:57.803
+C Adapted\scode\sto\sdeal\swith\sTip\s543.
+D 2022-06-20T20:12:00.007
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -145,7 +145,7 @@ F generic/nodecmd.c ffdd025077748bd9e4b5d499a0e3ce995754a7edf77fb7c4ef45688f1677
 F generic/nodecmd.h d44c88bcf23f32e1258b9bdbec0d26cc11d9aa1f7a6644bf524723dac5eb9047
 F generic/schema.c 1cb3f0885aba24fc9b129970efe659b036cbedd6360ff7a6bb305d61d0f7ba1d
 F generic/schema.h 3992eadd156c57a6c70708c26e17d8611594ee03fee56a173c45a2ca7e5e2c6c
-F generic/tcldom.c 2d7b6cb6fc06fdf62443867608b7165bbbfd638f76e8a8c174d217802b4e26b5
+F generic/tcldom.c 7c80aeb1bd435b04df0532fd1019440cf0d4f3000edbe7cc9ffe3fe9245456a1
 F generic/tcldom.h fc61477bdd07440e17a8f11cc898e5c07c8c7c3592014213a5e50eca85393374
 F generic/tclexpat.c 6c034bf882c575c26a33bc722f9202b1ae9f54657e56a02aae4e8f37d4344074
 F generic/tclexpat.h 95d915d74bb4b99ef3b80de00b0adce28931e6015ac63226b99db4817d9e313c
@@ -237,9 +237,12 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 092ad67e81d49d3463336842e038f0100372b433bee667748efd5d024aff736d 49b088df68a1fe7c55a0a4e3c39799f800ce5e6aba1162171ffdd5d6b6fa3e37
-R 1dc033c1ec42c864aeff852c651748ca
-T +closed 49b088df68a1fe7c55a0a4e3c39799f800ce5e6aba1162171ffdd5d6b6fa3e37
+P 0595f7faca31dcbf29dfa63e668d9a8578bf59fb5d713ca81a5909be7362bf7e
+Q +f1dbc9d96c680b9c9a4c64443abc4bac26c11a98d41ca0e8a3b1bc364b0b1fac
+R 65adb73ab90a18f159002e52650752e7
+T *branch * prepare-release
+T *sym-prepare-release *
+T -sym-trunk *
 U rolf
-Z 2a5e0abb081b060f0e66144294f46968
+Z 8288eb23b9691225b207b5b666fa1e4d
 # Remove this line to create a well-formed Fossil manifest.
