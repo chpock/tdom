@@ -1,5 +1,5 @@
-C Adapted\scode\sto\sdeal\swith\sTip\s543.
-D 2022-06-20T20:12:00.007
+C Made\stest\ssuite\swork\swith\s8.4.
+D 2022-06-21T00:45:00.997
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -197,14 +197,14 @@ F tests/dom.bench 5446ce379127b8d5700f18a5a0848e580313d0d7
 F tests/dom.test e6c51f6585f94dc9fb9bf2ac18fc14d1b6454bc08024aecf67e457bddb974e4f
 F tests/domDoc.test cb833d2139c8d9671e50f3cf4155b85e082674bcc534562128be0dee3419e71d
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
-F tests/domNode.test 7d307d78f2323a82881aa0e968b2b5e4c795991f48167879bec5eeab4c65a1f3
+F tests/domNode.test fe7b7cd5cbb5dd837e2c8d9463e3b653751bec1218b38e25662681a870c8042c
 F tests/domjson.test bdfbe938f33931f56f9496aac425b2183373f4cb926b95a04fa095bd3b75cd3d
 F tests/domnamespace.test f68dee13e2325518e96b318bf9fe76ae6903dc38d5602c4b0f48f90c0dc3038c
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 065c6c1af854db838faf9ad56151342eee478f8501a5f65778a144b106108574
 F tests/html5reader.test 9e17b12e5bc027d40b65cbab3937643d22dcbbd93620f416473d71934376b981
 F tests/htmlreader.test da450eaedf6764823123fd290012d01e08616e36aaab332a87657d2c95a1fb28
-F tests/i18n.test 68643e220f65147bc51c12daa86339aac905ac547d6a2888c7f7527518f8b1d5
+F tests/i18n.test 421e3998480ed5ce9420f4b596c384b8d5261e7fb4b33c0a7c12ef126d476939
 F tests/loadtdom.tcl e9d3251af57fce2b88f64882e9c0891dde6e60335a3b21876754265f878c10e6
 F tests/namespace.test 0a13b2bf59bb088525ca7b64d0b2bce6a349c627ca3dd1c17a4cc969d16fe57c
 F tests/parser.test 56679245bd20e1c292e549c86d230ccca988a13be662a582e029a428f2ae82c3
@@ -212,7 +212,7 @@ F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
 F tests/pullparser.test df079ff6a5a6b11b4d0f409ca3fc17cc4a5956d31801872f9f1f95e35032dec5
 F tests/pushpull.bench 664e8f512917537d96c4b71933d4d9a6da65fc6fe85bd7c459483830dc7d2faf
-F tests/schema.test 4f226062e82e5e92ce8f122064fa5d4a7fdbf320d1ea5969f2d74abf94e180dc
+F tests/schema.test 6a88819516d5eb6cbe4490f21d1535c7fd378c71ce9384da57cad598bafd2657
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
 F tests/tdomcmd.bench b07448ed4de08ccaa9734cf3fe15c695fd7066c993da58ff48d465747940e417
 F tests/tdomcmd.test 092401adf0609906d710f3ef8997cb4ca29bc208
@@ -237,12 +237,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 0595f7faca31dcbf29dfa63e668d9a8578bf59fb5d713ca81a5909be7362bf7e
-Q +f1dbc9d96c680b9c9a4c64443abc4bac26c11a98d41ca0e8a3b1bc364b0b1fac
-R 65adb73ab90a18f159002e52650752e7
-T *branch * prepare-release
-T *sym-prepare-release *
-T -sym-trunk *
+P 162bfdac1682480661ee37233e78890ce21c91ce6dd27e24efcef7b443388ab0
+R 1334e2d0eac7258fb84b5c8184810767
 U rolf
-Z 8288eb23b9691225b207b5b666fa1e4d
+Z b9df2d1aefc6f9fd25ee0c3927a7cc3a
 # Remove this line to create a well-formed Fossil manifest.
