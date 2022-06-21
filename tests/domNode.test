@@ -3669,6 +3669,17 @@ test domNode-39.1 {text} {
      set result
 } {text  more text}
 
+
+test domNode-40.1 {laststring} {
+     set doc [dom parse {<doc><e>foo</e><e>bar</e></doc>}]
+     $doc documentElement root
+     set result [$root selectNodes string(e)]
+     lappend result [$root selectNodes laststring(e)]
+     lappend result [$root selectNodes laststring(dontExists)]
+     $doc delete
+     set result
+} {foo bar {}}
+
 test domNode-999.1 {move nodes from one doc to another} {
     set doc1 [dom parse {<root/>}]
     set doc2 [dom parse {<root><e>text</e></root>}]
