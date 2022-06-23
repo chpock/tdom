@@ -1431,7 +1431,7 @@ example schema:
     
 .CE
 .PP
-A likely one-to-one translation of that into a tDOM schema
+A simple one-to-one translation of that into a tDOM schema
 definition script would be:
 .CS
 
@@ -1461,17 +1461,17 @@ schema define {
         element city
         element state
         element zip ! {text number}
-        attribute country ! {fixed "US"}
+        attribute country {fixed "US"}
     }
 
     defelement items {
         element item * {
             element product
-            element quantity ! {text integer}
+            element quantity ! {text positiveInteger}
             element USPrice ! {text number}
             element comment
             element shipDate ? {text date}
-            attribute partNum ! {pattern "^\ed{3}-[A-Z]{2}$"}
+            attribute partNum {regexp "^\ed{3}-[A-Z]{2}$"}
         }
     }
 }
