@@ -35,8 +35,13 @@ source [file join [file dir [info script]] loadtdom.tcl]
 
 if {[dom featureinfo schema]} {
 
-testConstraint 8.5 [package vsatisfies [package present Tcl] 8.5-]
-testConstraint listformat [package vsatisfies [package present Tcl] 8.5-]
+if {[join [lrange [split [package present Tcl] .] 0 1] .] <= 8.4} {
+    testConstraint 8.5 false
+    testConstraint listformat false
+} else {
+    testConstraint 8.5 false
+    testConstraint listformat false
+}
 
 proc dummycallback {args} {}
 

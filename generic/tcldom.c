@@ -545,7 +545,7 @@ char * tcldom_docTrace (
     DBG(fprintf(stderr, "--> tcldom_docTrace %x %p\n", flags, doc));
 
     if (doc == NULL) {
-        if (!(flags & TCL_INTERP_DESTROYED)) {
+        if (!Tcl_InterpDeleted (interp)) {
             Tcl_UntraceVar(dinfo->interp, dinfo->traceVarName,
                            TCL_TRACE_WRITES|TCL_TRACE_UNSETS,
                            tcldom_docTrace, clientData);
