@@ -1,5 +1,5 @@
-C Postponed\sthe\srelease\sfor\sa\sfew\slast\sminute\sfeature\sadds\sand\stweaks.
-D 2022-07-14T23:51:13.648
+C Pacified\sa\scouple\sof\scomparsion\sbetween\ssigned\sand\sunsigned\scompiler\swarnings,\swhich\shad\sground.
+D 2022-07-15T01:00:45.007
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -143,7 +143,7 @@ F generic/domxslt.h 0cb8e327683a0ffeb2a7094add6cd82ec1ae49c7c704f20d8d6f7d6523e7
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c ffdd025077748bd9e4b5d499a0e3ce995754a7edf77fb7c4ef45688f1677d5a9
 F generic/nodecmd.h d44c88bcf23f32e1258b9bdbec0d26cc11d9aa1f7a6644bf524723dac5eb9047
-F generic/schema.c 1cb3f0885aba24fc9b129970efe659b036cbedd6360ff7a6bb305d61d0f7ba1d
+F generic/schema.c 38882a4e4a83f7aca1414430f8815e8afdf9b4a8e80d60b54c5c3605a17d4427
 F generic/schema.h 3992eadd156c57a6c70708c26e17d8611594ee03fee56a173c45a2ca7e5e2c6c
 F generic/tcldom.c 7c80aeb1bd435b04df0532fd1019440cf0d4f3000edbe7cc9ffe3fe9245456a1
 F generic/tcldom.h fc61477bdd07440e17a8f11cc898e5c07c8c7c3592014213a5e50eca85393374
@@ -237,9 +237,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 27598e33da8c2c7c308ff16566eab0099f1ad85720822c6bccfa5464fa8ad898 91873c239893ddec3bbb85ce30fff1b59c560742aae2437174a26a53c2c8a3b6
-R dee0e63a1782c6a66d2c728516246888
-T +closed 91873c239893ddec3bbb85ce30fff1b59c560742aae2437174a26a53c2c8a3b6
+P 1db99effe6c89eb53143179e9f4f50fc7a47cf812cc34147ac704a29137cd1a6
+R 984736095f48401758da440e26233343
 U rolf
-Z 92fa2c2980f6295ece870458a60a9674
+Z 6a4830e0d5edd73fba066a4e2724ad0b
 # Remove this line to create a well-formed Fossil manifest.

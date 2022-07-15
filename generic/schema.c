@@ -604,7 +604,7 @@ static void freeSchemaCP (
     SchemaCP *pattern
     )
 {
-    int i;
+    unsigned int i;
     SchemaConstraint *sc;
     
     switch (pattern->type) {
@@ -1371,7 +1371,7 @@ checkText (
     char *text
     )
 {
-    int i;
+    unsigned int i;
     SchemaCP *cp = (SchemaCP *) clientData;
     SchemaConstraint *sc;
 
@@ -1497,8 +1497,8 @@ matchElementStart (
     )
 {
     SchemaCP *cp, *candidate, *icp;
-    int hm, ac, i, mayskip, thismayskip, rc;
-    int isName = 0;
+    int hm, mayskip, thismayskip, rc, isName = 0;
+    unsigned int ac, i;
     SchemaValidationStack *se;
     Tcl_HashEntry *h;
 
@@ -2017,7 +2017,7 @@ int probeAttribute (
     int *isrequired
     )
 {
-    int i;
+    unsigned int i;
     SchemaCP *cp;
     Tcl_HashTable *t;
     Tcl_HashEntry *h;
@@ -2074,7 +2074,8 @@ int tDOM_probeAttributes (
     )
 {
     char   **atPtr, *ln, *namespace, *ns;
-    int i, j, found, nsatt, req, reqAttr = 0;
+    int j, found, nsatt, req, reqAttr = 0;
+    unsigned int i;
     SchemaCP *cp;
     Tcl_HashEntry *h;
 
@@ -2187,7 +2188,8 @@ int tDOM_probeDomAttributes (
     )
 {
     domAttrNode *atPtr;
-    int i, found, req, reqAttr = 0;
+    int found, req, reqAttr = 0;
+    unsigned int i;
     const char *ns, *ln;
     SchemaCP *cp;
     Tcl_HashEntry *h;
@@ -2386,7 +2388,8 @@ static int checkElementEnd (
 {
     SchemaValidationStack *se;
     SchemaCP *cp, *ic;
-    int hm, ac, i, thismayskip, mayskip = 0, rc;
+    int hm, thismayskip, mayskip = 0, rc;
+    unsigned int ac, i;
     int isName = 0;
 
     DBG(fprintf (stderr, "checkElementEnd:\n");
@@ -2727,8 +2730,9 @@ matchText (
 {
     SchemaCP *cp, *candidate, *ic;
     SchemaValidationStack *se;
-    int ac, hm, isName = 0, i, mayskip;
-
+    int hm, isName = 0, mayskip;
+    unsigned int ac, i;
+    
     DBG(fprintf (stderr, "matchText called with text '%s'\n", text));
     
     se = sdata->stack;
@@ -3771,8 +3775,8 @@ getNextExpectedWorker (
     int expectedFlags
     )
 {
-    int ac, hm, i, hnew, mustMatch, mayskip, rc = 1;
-    int probeMayskip = 0;
+    int hm, hnew, mustMatch, mayskip, rc = 1, probeMayskip = 0;
+    unsigned int ac, i;
     SchemaCP *cp, *ic, *jc;
     SchemaValidationStack *se1;
 
@@ -4490,7 +4494,8 @@ attributeLookupPreparation (
     )
 {
     Tcl_HashTable *t;
-    int i, hnew;
+    unsigned int i;
+    int hnew;
     Tcl_HashEntry *h;
     SchemaAttr *attr;
     
@@ -5053,9 +5058,9 @@ tDOM_schemaInstanceCmd (
     )
 {
     int            methodIndex, keywordIndex, hnew, patternIndex;
-    int            result = TCL_OK, forwardDef = 0, i = 0, j;
+    int            result = TCL_OK, forwardDef = 0, j;
     int            savedDefineToplevel, type, len, n;
-    unsigned int   savedNumPatternList, nrTypeInstances, typeInstancesLen;
+    unsigned int   i = 0, savedNumPatternList, nrTypeInstances, typeInstancesLen;
     SchemaData    *savedsdata = NULL, *sdata = (SchemaData *) clientData;
     Tcl_HashTable *hashTable;
     Tcl_HashEntry *h, *h1;
@@ -5960,9 +5965,9 @@ evalDefinition (
 {
     SchemaCP *savedCP;
     SchemaAttr **savedCurrentAttrs;
-    unsigned int savedContenSize;
+    unsigned int savedContenSize, i;
     unsigned int savedAttrSize, savedNumAttr, savedNumReqAttr;
-    int result, i, onlyName, hnew;
+    int result, onlyName, hnew;
     Tcl_HashEntry *h;
     Tcl_HashTable *t;
 
@@ -6338,7 +6343,8 @@ static int maybeAddAttr (
     )
 {
     Tcl_HashEntry *h;
-    int hnew, i, result = TCL_OK;
+    int hnew, result = TCL_OK;
+    unsigned int i;
     char *name, *namespace = NULL;
     SchemaAttr *attr;
     SchemaCP *cp;
@@ -7802,8 +7808,8 @@ maxLengthImpl (
     char *text
     )
 {
-    unsigned int maxlen = PTR2UINT(constraintData);
-    int len = 0, clen;
+    unsigned int len = 0, maxlen = PTR2UINT(constraintData);
+    int clen;
 
     while (*text != '\0') {
         clen = UTF8_CHAR_LEN (*text);
@@ -7852,8 +7858,8 @@ minLengthImpl (
     char *text
     )
 {
-    unsigned int minlen = PTR2UINT(constraintData);
-    int len = 0, clen;
+    unsigned int len = 0, minlen = PTR2UINT(constraintData);
+    int clen;
     while (*text != '\0') {
         clen = UTF8_CHAR_LEN (*text);
         if (!clen) {
@@ -7903,7 +7909,7 @@ oneOfImpl (
 {
     SchemaCP *cp = (SchemaCP *) constraintData;
     SchemaConstraint *sc;
-    int i;
+    unsigned int i;
 
     /* Look also at checkText */
     for (i = 0; i < cp->nc; i++) {
@@ -8985,7 +8991,7 @@ notImpl (
 {
     SchemaCP *cp = (SchemaCP *) constraintData;
     SchemaConstraint *sc;
-    int i;
+    unsigned int i;
 
     /* Look also at checkText and oneOfImpl */
     for (i = 0; i < cp->nc; i++) {
@@ -9110,8 +9116,8 @@ lengthImpl (
     char *text
     )
 {
-    unsigned int length = PTR2UINT(constraintData);
-    int len = 0, clen;
+    unsigned int len = 0, length = PTR2UINT(constraintData);
+    int clen;
     while (*text != '\0') {
         clen = UTF8_CHAR_LEN (*text);
         if (!clen) {
