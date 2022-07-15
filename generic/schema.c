@@ -1154,7 +1154,7 @@ finalizeElement (
 {
     SchemaValidationStack *se;
     SchemaCP *cp, *cp1;
-    int i;
+    unsigned int i;
 
     se = sdata->stack;
     cp = se->pattern;
@@ -5058,9 +5058,9 @@ tDOM_schemaInstanceCmd (
     )
 {
     int            methodIndex, keywordIndex, hnew, patternIndex;
-    int            result = TCL_OK, forwardDef = 0, j;
+    int            result = TCL_OK, forwardDef = 0, j, k = 0;
     int            savedDefineToplevel, type, len, n;
-    unsigned int   i = 0, savedNumPatternList, nrTypeInstances, typeInstancesLen;
+    unsigned int   i, savedNumPatternList, nrTypeInstances, typeInstancesLen;
     SchemaData    *savedsdata = NULL, *sdata = (SchemaData *) clientData;
     Tcl_HashTable *hashTable;
     Tcl_HashEntry *h, *h1;
@@ -5112,15 +5112,15 @@ tDOM_schemaInstanceCmd (
             SetResult ("Command not allowed in nested schema define script");
             return TCL_ERROR;
         }
-        i = 1;
+        k = 1;
     }
-    if (objc + i < 2) {
+    if (objc + k < 2) {
         Tcl_WrongNumArgs (interp, 1, objv, "subcommand ?arguments?");
         return TCL_ERROR;
     }
 
 
-    if (Tcl_GetIndexFromObj (interp, objv[1-i], schemaInstanceMethods,
+    if (Tcl_GetIndexFromObj (interp, objv[1-k], schemaInstanceMethods,
                              "method", 0, &methodIndex)
         != TCL_OK) {
         return TCL_ERROR;
@@ -5131,8 +5131,8 @@ tDOM_schemaInstanceCmd (
     case m_defelement:
     case m_defpattern:
         CHECK_RECURSIVE_CALL
-        if (objc != 4-i && objc != 5-i) {
-            Tcl_WrongNumArgs (interp, 2-i, objv, "<name>"
+        if (objc != 4-k && objc != 5-k) {
+            Tcl_WrongNumArgs (interp, 2-k, objv, "<name>"
                  " ?<namespace>? pattern");
             return TCL_ERROR;
         }
@@ -5145,12 +5145,12 @@ tDOM_schemaInstanceCmd (
         }
         savedNumPatternList = sdata->numPatternList;
         namespacePtr = NULL;
-        patternIndex = 3-i;
-        if (objc == 5-i) {
-            patternIndex = 4-i;
-            namespacePtr = getNamespacePtr (sdata, Tcl_GetString (objv[3-i]));
+        patternIndex = 3-k;
+        if (objc == 5-k) {
+            patternIndex = 4-k;
+            namespacePtr = getNamespacePtr (sdata, Tcl_GetString (objv[3-k]));
         }
-        h = Tcl_CreateHashEntry (hashTable, Tcl_GetString (objv[2-i]), &hnew);
+        h = Tcl_CreateHashEntry (hashTable, Tcl_GetString (objv[2-k]), &hnew);
         pattern = NULL;
         if (!hnew) {
             pattern = (SchemaCP *) Tcl_GetHashValue (h);
@@ -5261,12 +5261,12 @@ tDOM_schemaInstanceCmd (
 
     case m_deftexttype:
         CHECK_RECURSIVE_CALL
-        if (objc !=  4-i) {
-            Tcl_WrongNumArgs (interp, 2-i, objv, "<name>"
+        if (objc !=  4-k) {
+            Tcl_WrongNumArgs (interp, 2-k, objv, "<name>"
                               " <constraints script>");
             return TCL_ERROR;
         }
-        h = Tcl_CreateHashEntry (&sdata->textDef, Tcl_GetString (objv[2-i]),
+        h = Tcl_CreateHashEntry (&sdata->textDef, Tcl_GetString (objv[2-k]),
                                  &hnew);
         if (!hnew) {
             pattern = Tcl_GetHashValue (h);
@@ -5284,7 +5284,7 @@ tDOM_schemaInstanceCmd (
         }
         SETASI(sdata);
         savedDefineToplevel = sdata->defineToplevel;
-        result = evalConstraints (interp, sdata, pattern, objv[3-i]);
+        result = evalConstraints (interp, sdata, pattern, objv[3-k]);
         sdata->defineToplevel = savedDefineToplevel;
         if (!savedDefineToplevel) {
             SETASI(savedsdata);
@@ -5305,23 +5305,23 @@ tDOM_schemaInstanceCmd (
         
     case m_start:
         CHECK_RECURSIVE_CALL
-        if (objc < 3-i || objc > 4-i) {
-            Tcl_WrongNumArgs (interp, 2-i, objv, "<documentElement>"
+        if (objc < 3-k || objc > 4-k) {
+            Tcl_WrongNumArgs (interp, 2-k, objv, "<documentElement>"
                               " ?<namespace>?");
             return TCL_ERROR;
         }
         if (sdata->start) {
             FREE (sdata->start);
         }
-        if (objc == 3-i && strcmp (Tcl_GetString (objv[2-i]), "") == 0) {
+        if (objc == 3-k && strcmp (Tcl_GetString (objv[2-k]), "") == 0) {
             sdata->startNamespace = NULL;
             sdata->start = NULL;
             break;
         }
-        sdata->start = tdomstrdup (Tcl_GetString (objv[2-i]));
-        if (objc == 4-i) {
+        sdata->start = tdomstrdup (Tcl_GetString (objv[2-k]));
+        if (objc == 4-k) {
             sdata->startNamespace =
-                getNamespacePtr (sdata, Tcl_GetString (objv[3-i]));
+                getNamespacePtr (sdata, Tcl_GetString (objv[3-k]));
         }
         break;
 
@@ -5497,11 +5497,11 @@ tDOM_schemaInstanceCmd (
 
     case m_prefixns:
         CHECK_RECURSIVE_CALL
-        if (objc != 2-i && objc != 3-i) {
-            Tcl_WrongNumArgs (interp, 2-i, objv, "?prefixUriList?");
+        if (objc != 2-k && objc != 3-k) {
+            Tcl_WrongNumArgs (interp, 2-k, objv, "?prefixUriList?");
             return TCL_ERROR;
         }
-        if (!i) {objc--; objv++;}
+        if (!k) {objc--; objv++;}
         result = tcldom_prefixNSlist (&sdata->prefixns, interp, objc, objv,
                                       "prefixns");
         if (sdata->prefix.numEntries) {
@@ -5527,19 +5527,19 @@ tDOM_schemaInstanceCmd (
 
     case m_defelementtype:
         CHECK_RECURSIVE_CALL
-        if (objc != 4-i && objc != 5-i) {
-            Tcl_WrongNumArgs (interp, 2-i, objv, "<type_name> "
+        if (objc != 4-k && objc != 5-k) {
+            Tcl_WrongNumArgs (interp, 2-k, objv, "<type_name> "
                  " ?<namespace>? pattern");
             return TCL_ERROR;
         }
         savedNumPatternList = sdata->numPatternList;
         namespacePtr = NULL;
-        patternIndex = 3-i;
-        if (objc == 5-i) {
-            namespacePtr = getNamespacePtr (sdata, Tcl_GetString (objv[3-i]));
-            patternIndex = 4-i;
+        patternIndex = 3-k;
+        if (objc == 5-k) {
+            namespacePtr = getNamespacePtr (sdata, Tcl_GetString (objv[3-k]));
+            patternIndex = 4-k;
         }
-        h = Tcl_CreateHashEntry (&sdata->elementType , Tcl_GetString (objv[2-i]),
+        h = Tcl_CreateHashEntry (&sdata->elementType , Tcl_GetString (objv[2-k]),
                                  &hnew);
         pattern = NULL;
         if (!hnew) {
