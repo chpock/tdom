@@ -1265,6 +1265,7 @@ getFunctionTag (char *funcName)
         break;
     case 'i':
         if (strcmp (funcName, "id")==0) return f_id;
+        break;
     case 'l':
         if (strcmp (funcName, "lang")==0) return f_lang;
         else if (strcmp (funcName, "last")==0) return f_last;

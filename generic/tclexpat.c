@@ -339,7 +339,7 @@ CHandlerSetCreate (
 
 int
 TclExpatObjCmd(
-    ClientData dummy,
+    ClientData UNUSED(dummy),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -2241,7 +2241,7 @@ static int
 TclExpatGet (
     Tcl_Interp *interp,
     TclGenExpatInfo *expat,
-    int objc,
+    int UNUSED(objc),
     Tcl_Obj *const objv[]
 )
 {
@@ -2263,6 +2263,7 @@ TclExpatGet (
   int switchIndex;
   Tcl_Obj *resultPtr;
 
+  /* objc is already checked by caller */
   if (Tcl_GetIndexFromObj(interp, objv[0], getSwitches,
 			  "switch", 0, &switchIndex) != TCL_OK) {
     return TCL_ERROR;

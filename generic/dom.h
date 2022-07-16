@@ -103,6 +103,36 @@
 # define Tcl_GetString(a) Tcl_GetStringFromObj((a), NULL)
 #endif
 
+/* The following is the machinery to have an UNUSED macro which
+ * signals that a function parameter is known to be not used. This
+ * works for some open source compiler. */
+
+/*
+ * Define __GNUC_PREREQ for determine available features of gcc and clang
+ */
+#undef  __GNUC_PREREQ
+#if defined __GNUC__ && defined __GNUC_MINOR__
+# define __GNUC_PREREQ(maj, min) \
+	((__GNUC__ << 16) + __GNUC_MINOR__ >= ((maj) << 16) + (min))
+#else
+# define __GNUC_PREREQ(maj, min) (0)
+#endif
+
+/*
+ * UNUSED uses the gcc __attribute__ unused and mangles the name, so the
+ * attribute could not be used, if declared as unused.
+ */
+#ifdef UNUSED
+#elif __GNUC_PREREQ(2, 7)
+# define UNUSED(x) UNUSED_ ## x __attribute__((unused))
+#elif defined(__LCLINT__)
+# define UNUSED(x) /*@unused@*/ (x)
+#else
+# define UNUSED(x) (x)
+#endif
+
+/* UNUSED stuff end */
+
 #define domPanic(msg) Tcl_Panic((msg));
 
 /*
