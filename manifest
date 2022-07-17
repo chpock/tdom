@@ -1,5 +1,5 @@
-C Started\scompiler\swarnings\sreduce\s(a\sfew\swith\sbetter\sreasons,\sothers\swith\slesser).
-D 2022-07-16T14:03:19.496
+C More\scompiler\swarnings\sprocessed.
+D 2022-07-17T22:52:19.967
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -143,8 +143,8 @@ F generic/domxslt.h 0cb8e327683a0ffeb2a7094add6cd82ec1ae49c7c704f20d8d6f7d6523e7
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c ffdd025077748bd9e4b5d499a0e3ce995754a7edf77fb7c4ef45688f1677d5a9
 F generic/nodecmd.h d44c88bcf23f32e1258b9bdbec0d26cc11d9aa1f7a6644bf524723dac5eb9047
-F generic/schema.c 6ee29fecf04db7948da700f3ffca824c3548c35820815072a0c7f27943f891fb
-F generic/schema.h 3992eadd156c57a6c70708c26e17d8611594ee03fee56a173c45a2ca7e5e2c6c
+F generic/schema.c 0d446d851db420d4b28e887a51f2efb1a832e9a594183fd617c39f9936143c64
+F generic/schema.h 9820583e70d7d404645da5df19156b6de59a26b77687e5f44970d511f6f8dc26
 F generic/tcldom.c 517aed0392cc4cc4b52dedaaaa636eb497ba954eea2a634367b59eac150a7d23
 F generic/tcldom.h fc61477bdd07440e17a8f11cc898e5c07c8c7c3592014213a5e50eca85393374
 F generic/tclexpat.c 3a188a78f636d89267217791e3ee007399f23643f59c1ddd75179c4c4d90a3bb
@@ -237,11 +237,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a59ab6f112b2f784b8db2976d5aa2c9b3d9a9ae84907c72d99a7ba5cb1edf2ba
-R 25c1ff370421396d995a047dc6eb3e8e
-T *branch * compiler-nits
-T *sym-compiler-nits *
-T -sym-trunk *
+P e572014487b8bf714bf75d9e9be1851c847d744d0e492f52b3e89b5756340a85
+R 8f5ce3795650e1dbd6e33fb94c0f51b9
 U rolf
-Z 6839cac23af80c3c9950cbd8e7083233
+Z fca7d1289be9909838d03ac16615f99c
 # Remove this line to create a well-formed Fossil manifest.

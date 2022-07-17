@@ -1411,7 +1411,7 @@ evalVirtual (
 
 /* Check, if the pattern to probe does not call itself (even
  * indirectly) without a match inbetween.*/
-static int inline
+static inline int 
 recursivePattern (
     SchemaValidationStack *se,
     SchemaCP *pattern
@@ -1431,9 +1431,7 @@ recursivePattern (
 
 static int
 matchingAny (
-    char *name,
     char *namespace,
-    SchemaData *sdata,
     SchemaCP *candidate
     )
 {
@@ -1529,7 +1527,7 @@ matchElementStart (
                 break;
 
             case SCHEMA_CTYPE_ANY:
-                if (!matchingAny (name, namespace, sdata, candidate)) break;
+                if (!matchingAny (namespace, candidate)) break;
                 updateStack (sdata, se, ac);
                 sdata->skipDeep = 1;
                 /* See comment in tDOM_probeElement: sdata->vname and
@@ -1573,7 +1571,7 @@ matchElementStart (
                         break;
 
                     case SCHEMA_CTYPE_ANY:
-                        if (!matchingAny (name, namespace, sdata, icp)) break;
+                        if (!matchingAny (namespace, icp)) break;
                         updateStack (sdata, se, ac);
                         sdata->skipDeep = 1;
                         /* See comment in tDOM_probeElement: sdata->vname
@@ -1732,7 +1730,7 @@ matchElementStart (
                 break;
 
             case SCHEMA_CTYPE_ANY:
-                if (!matchingAny (name, namespace, sdata, icp)) break;
+                if (!matchingAny (namespace, icp)) break;
                 sdata->skipDeep = 1;
                 se->hasMatched = 1;
                 se->interleaveState[i] = 1;
@@ -2074,8 +2072,8 @@ int tDOM_probeAttributes (
     )
 {
     char   **atPtr, *ln, *namespace, *ns;
-    int j, found, nsatt, req, reqAttr = 0;
-    unsigned int i;
+    int j, found, nsatt, req;
+    unsigned int i, reqAttr = 0;
     SchemaCP *cp;
     Tcl_HashEntry *h;
 
@@ -2188,8 +2186,8 @@ int tDOM_probeDomAttributes (
     )
 {
     domAttrNode *atPtr;
-    int found, req, reqAttr = 0;
-    unsigned int i;
+    int found, req;
+    unsigned int i, reqAttr = 0;
     const char *ns, *ln;
     SchemaCP *cp;
     Tcl_HashEntry *h;
@@ -2312,7 +2310,8 @@ int probeEventAttribute (
     int len
     )
 {
-    int i, found, req, reqAttr = 0;
+    int i, found, req;
+    unsigned int reqAttr = 0;
     char *name, *ns;
     SchemaCP *cp;
     Tcl_HashEntry *h;
@@ -3099,7 +3098,7 @@ startElement(
 static void
 endElement (
     void        *userData,
-    const char  *name
+    const char  *UNUSED(name)
 )
 {
     ValidateMethodData *vdata = (ValidateMethodData *) userData;
@@ -3679,8 +3678,7 @@ serializeAnyCP (
  * SCHEMA_CTYPE_TEXT for useful results */
 static Tcl_Obj*
 serializeTextCP (
-    Tcl_Interp *interp,
-    SchemaCP *cp
+    Tcl_Interp *interp
     )
 {
     Tcl_Obj *rObj;
@@ -3871,7 +3869,7 @@ getNextExpectedWorker (
                 if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
                     || mayskip == 0) {
                     Tcl_ListObjAppendElement (interp, rObj,
-                                              serializeTextCP (interp, ic));
+                                              serializeTextCP (interp));
                 }
                 break;
                 
@@ -3913,7 +3911,7 @@ getNextExpectedWorker (
                 if (ic->flags & MIXED_CONTENT) {
                     if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)) {
                         Tcl_ListObjAppendElement (
-                            interp, rObj, serializeTextCP (interp, NULL));
+                            interp, rObj, serializeTextCP (interp));
                     }
                 }
                 for (i = 0; i < ic->nc; i++) {
@@ -3955,7 +3953,7 @@ getNextExpectedWorker (
                         if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
                             || minOne (cp->quants[i])) {
                             Tcl_ListObjAppendElement (
-                                interp, rObj, serializeTextCP (interp, jc)
+                                interp, rObj, serializeTextCP (interp)
                                 );
                         }
                         break;
@@ -4251,6 +4249,7 @@ schemaInstanceInfoCmd (
             Tcl_SetObjResult (interp, se->pattern->associated);
             return TCL_OK;
         }
+        break;
         
     case m_toplevel:
         if (objc != 2) {
@@ -4882,22 +4881,19 @@ static int validateSource (
                 paramEntityParsing = XML_PARAM_ENTITY_PARSING_UNLESS_STANDALONE;
                 break;
             }
+            break;
         case o_useForeignDTD:
             if (Tcl_GetBooleanFromObj(interp, objv[1], &useForeignDTD)
                 != TCL_OK) {
-                Tcl_DecrRefCount (vdata->externalentitycommandObj);
                 return TCL_ERROR;
             }
+            break;
         case o_forrest:
             if (Tcl_GetBooleanFromObj(interp, objv[1], &forrest)
                 != TCL_OK) {
-                Tcl_DecrRefCount (vdata->externalentitycommandObj);
                 return TCL_ERROR;
             }
-            objc -= 1;
-            objv += 1;
-            continue;
-            
+            break;
         }
         objc -= 2;
         objv += 2;
@@ -5712,7 +5708,7 @@ tDOM_schemaInstanceCmd (
 
 int
 tDOM_SchemaObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -5768,7 +5764,6 @@ tDOM_SchemaObjCmd (
 static SchemaQuant
 getQuant (
     Tcl_Interp *interp,
-    SchemaData *sdata,
     Tcl_Obj *quantObj,
     int *n,
     int *m
@@ -5861,7 +5856,7 @@ getQuant (
 /* Implements the schema definition command "any" */
 static int
 AnyPatternObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -5906,13 +5901,13 @@ AnyPatternObjCmd (
         n = 0; m = 0;
         goto createpattern;
     } else if (objc == 2) {    
-        quant = getQuant (interp, sdata, objv[1], &n, &m);
+        quant = getQuant (interp, objv[1], &n, &m);
         if (quant != SCHEMA_CQUANT_ERROR) {
             goto createpattern;
         }
         quant = SCHEMA_CQUANT_ONE;
     } else {
-        quant = getQuant (interp, sdata, objv[2], &n, &m);
+        quant = getQuant (interp, objv[2], &n, &m);
         if (quant == SCHEMA_CQUANT_ERROR) {
             return TCL_ERROR;
         }
@@ -6051,7 +6046,7 @@ evalDefinition (
 /* Implements the schema definition commands "element" */
 static int
 ElementPatternObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -6069,7 +6064,7 @@ ElementPatternObjCmd (
     checkNrArgs (2,5,"Expected: elementName ?quant? ?(pattern|\"type\" "
                  "typename)?");
 
-    quant = getQuant (interp, sdata, objc == 2 ? NULL : objv[2], &n, &m);
+    quant = getQuant (interp, objc == 2 ? NULL : objv[2], &n, &m);
     if (quant == SCHEMA_CQUANT_ERROR) {
         /* May be default quant with local definition or type. */
         if (objc != 3 && objc != 4) {
@@ -6236,7 +6231,7 @@ ElementPatternObjCmd (
 /* Implements the schema definition commands "ref" */
 static int
 RefPatternObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -6253,7 +6248,7 @@ RefPatternObjCmd (
         
     checkNrArgs (2,3,"Expected: patternName ?quant?");
 
-    quant = getQuant (interp, sdata, objc == 2 ? NULL : objv[2], &n, &m);
+    quant = getQuant (interp, objc == 2 ? NULL : objv[2], &n, &m);
     if (quant == SCHEMA_CQUANT_ERROR) {
         return TCL_ERROR;
     }
@@ -6306,7 +6301,7 @@ AnonPatternObjCmd (
     CHECK_TOPLEVEL
     checkNrArgs (2,3,"Expected: ?quant? definition");
     
-    quant = getQuant (interp, sdata, objc == 2 ? NULL : objv[1], &n, &m);
+    quant = getQuant (interp, objc == 2 ? NULL : objv[1], &n, &m);
     if (quant == SCHEMA_CQUANT_ERROR) {
         return TCL_ERROR;
     }
@@ -6498,7 +6493,7 @@ AttributePatternObjCmd (
 
 static int
 NamespacePatternObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -6524,7 +6519,7 @@ NamespacePatternObjCmd (
 
 static int
 TextPatternObjCmd  (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -6574,7 +6569,7 @@ TextPatternObjCmd  (
 
 static int
 VirtualPatternObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -6613,10 +6608,10 @@ VirtualPatternObjCmd (
 
 static int
 SelfObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
-    Tcl_Obj *const objv[]
+    Tcl_Obj *const UNUSED(objv[])
     )
 {
     SchemaData *sdata = GETASI;
@@ -6633,7 +6628,7 @@ SelfObjCmd (
 
 static int
 domuniquePatternObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -6725,7 +6720,7 @@ domuniquePatternObjCmd (
 
 static int
 domxpathbooleanPatternObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -6774,7 +6769,7 @@ domxpathbooleanPatternObjCmd (
 
 static int
 keyspacePatternObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -6840,7 +6835,7 @@ keyspacePatternObjCmd (
 
 static int
 associatePatternObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -6872,7 +6867,7 @@ associatePatternObjCmd (
 
 static int
 integerImplXsd (
-    Tcl_Interp *interp,
+    Tcl_Interp *UNUSED(interp),
     void *constraintData,
     char *text
     )
@@ -7062,7 +7057,7 @@ tclImpl (
 
 static int
 tclTCObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -7103,7 +7098,7 @@ fixedImplFree (
 
 static int
 fixedImpl (
-    Tcl_Interp *interp,
+    Tcl_Interp *UNUSED(interp),
     void *constraintData,
     char *text
     )
@@ -7116,7 +7111,7 @@ fixedImpl (
 
 static int
 fixedTCObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -7147,7 +7142,7 @@ enumerationImplFree (
 
 static int
 enumerationImpl (
-    Tcl_Interp *interp,
+    Tcl_Interp *UNUSED(interp),
     void *constraintData,
     char *text
     )
@@ -7160,7 +7155,7 @@ enumerationImpl (
 
 static int
 enumerationTCObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -7201,7 +7196,7 @@ matchImplFree (
 
 static int
 matchImpl (
-    Tcl_Interp *interp,
+    Tcl_Interp *UNUSED(interp),
     void *constraintData,
     char *text
     )
@@ -7213,7 +7208,7 @@ matchImpl (
 
 static int
 matchNocaseImpl (
-    Tcl_Interp *interp,
+    Tcl_Interp *UNUSED(interp),
     void *constraintData,
     char *text
     )
@@ -7226,7 +7221,7 @@ matchNocaseImpl (
 
 static int
 matchTCObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -7287,7 +7282,7 @@ regexpImpl (
 
 static int
 regexpTCObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -7314,7 +7309,7 @@ regexpTCObjCmd (
 static int
 nmtokenImpl (
     Tcl_Interp *interp,
-    void *constraintData,
+    void *UNUSED(constraintData),
     char *text
     )
 {
@@ -7356,10 +7351,10 @@ nmtokenImpl (
 
 static int
 nmtokenTCObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
-    Tcl_Obj *const objv[]
+    Tcl_Obj *const UNUSED(objv[])
     )
 {
     SchemaData *sdata = GETASI;
@@ -7375,7 +7370,7 @@ nmtokenTCObjCmd (
 static int
 nmtokensImpl (
     Tcl_Interp *interp,
-    void *constraintData,
+    void *UNUSED(constraintData),
     char *text
     )
 {
@@ -7413,10 +7408,10 @@ nmtokensImpl (
 
 static int
 nmtokensTCObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
-    Tcl_Obj *const objv[]
+    Tcl_Obj *const UNUSED(objv[])
     )
 {
     SchemaData *sdata = GETASI;
@@ -7431,8 +7426,8 @@ nmtokensTCObjCmd (
 
 static int
 numberImplXsd (
-    Tcl_Interp *interp,
-    void *constraintData,
+    Tcl_Interp *UNUSED(interp),
+    void *UNUSED(constraintData),
     char *text
     )
 {
@@ -7453,7 +7448,7 @@ numberImplXsd (
 static int
 numberImplTcl (
     Tcl_Interp *interp,
-    void *constraintData,
+    void *UNUSED(constraintData),
     char *text
     )
 {
@@ -7467,7 +7462,7 @@ numberImplTcl (
 
 static int
 numberTCObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -7508,8 +7503,8 @@ numberTCObjCmd (
 
 static int
 booleanImplXsd (
-    Tcl_Interp *interp,
-    void *constraintData,
+    Tcl_Interp *UNUSED(interp),
+    void *UNUSED(constraintData),
     char *text
     )
 {
@@ -7533,7 +7528,7 @@ booleanImplXsd (
 static int
 booleanImplTcl (
     Tcl_Interp *interp,
-    void *constraintData,
+    void *UNUSED(constraintData),
     char *text
     )
 {
@@ -7547,7 +7542,7 @@ booleanImplTcl (
 
 static int
 booleanTCObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -7588,7 +7583,7 @@ booleanTCObjCmd (
 
 static int
 isodateImpl (
-    Tcl_Interp *interp,
+    Tcl_Interp *UNUSED(interp),
     void *constraintData,
     char *text
     )
@@ -7746,10 +7741,10 @@ isodateImpl (
 
 static int
 dateTCObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
-    Tcl_Obj *const objv[]
+    Tcl_Obj *const UNUSED(objv[])
     )
 {
     SchemaData *sdata = GETASI;
@@ -7765,10 +7760,10 @@ dateTCObjCmd (
 
 static int
 dateTimeTCObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
-    Tcl_Obj *const objv[]
+    Tcl_Obj *const UNUSED(objv[])
     )
 {
     SchemaData *sdata = GETASI;
@@ -7784,10 +7779,10 @@ dateTimeTCObjCmd (
 
 static int
 timeTCObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
-    Tcl_Obj *const objv[]
+    Tcl_Obj *const UNUSED(objv[])
     )
 {
     SchemaData *sdata = GETASI;
@@ -7826,7 +7821,7 @@ maxLengthImpl (
 
 static int
 maxLengthTCObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -7875,7 +7870,7 @@ minLengthImpl (
 
 static int
 minLengthTCObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -7923,7 +7918,7 @@ oneOfImpl (
 
 static int
 oneOfTCObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -7952,7 +7947,7 @@ oneOfTCObjCmd (
 
 static int
 allOfTCObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -8007,7 +8002,7 @@ stripImpl (
 
 static int
 stripTCObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -8127,7 +8122,7 @@ splitTclImplFree (
 
 static int
 splitTCObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -8206,7 +8201,7 @@ splitTCObjCmd (
 
 static int
 idImpl (
-    Tcl_Interp *interp,
+    Tcl_Interp *UNUSED(interp),
     void *constraintData,
     char *text
     )
@@ -8232,7 +8227,7 @@ idImpl (
 
 static int
 docidImpl (
-    Tcl_Interp *interp,
+    Tcl_Interp *UNUSED(interp),
     void *constraintData,
     char *text
     )
@@ -8257,7 +8252,7 @@ docidImpl (
 
 static int
 idTCObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -8294,7 +8289,7 @@ idTCObjCmd (
 
 static int
 idrefImpl (
-    Tcl_Interp *interp,
+    Tcl_Interp *UNUSED(interp),
     void *constraintData,
     char *text
     )
@@ -8313,7 +8308,7 @@ idrefImpl (
 
 static int
 docidrefImpl (
-    Tcl_Interp *interp,
+    Tcl_Interp *UNUSED(interp),
     void *constraintData,
     char *text
     )
@@ -8332,7 +8327,7 @@ docidrefImpl (
 
 static int
 idrefTCObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -8369,7 +8364,7 @@ idrefTCObjCmd (
 
 static int
 keyImpl (
-    Tcl_Interp *interp,
+    Tcl_Interp *UNUSED(interp),
     void *constraintData,
     char *text
     )
@@ -8396,7 +8391,7 @@ keyImpl (
 
 static int
 keyTCObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -8427,7 +8422,7 @@ keyTCObjCmd (
 
 static int
 keyrefImpl (
-    Tcl_Interp *interp,
+    Tcl_Interp *UNUSED(interp),
     void *constraintData,
     char *text
     )
@@ -8447,7 +8442,7 @@ keyrefImpl (
 
 static int
 keyrefTCObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -8479,8 +8474,8 @@ keyrefTCObjCmd (
 
 static int
 base64Impl (
-    Tcl_Interp *interp,
-    void *constraintData,
+    Tcl_Interp *UNUSED(interp),
+    void *UNUSED(constraintData),
     char *text
     )
 {
@@ -8518,10 +8513,10 @@ base64Impl (
 
 static int
 base64TCObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
-    Tcl_Obj *const objv[]
+    Tcl_Obj *const UNUSED(objv[])
     )
 {
     SchemaData *sdata = GETASI;
@@ -8536,8 +8531,8 @@ base64TCObjCmd (
 
 static int
 nameImpl (
-    Tcl_Interp *interp,
-    void *constraintData,
+    Tcl_Interp *UNUSED(interp),
+    void *UNUSED(constraintData),
     char *text
     )
 {
@@ -8546,10 +8541,10 @@ nameImpl (
 
 static int
 nameTCObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
-    Tcl_Obj *const objv[]
+    Tcl_Obj *const UNUSED(objv[])
     )
 {
     SchemaData *sdata = GETASI;
@@ -8564,8 +8559,8 @@ nameTCObjCmd (
 
 static int
 ncnameImpl (
-    Tcl_Interp *interp,
-    void *constraintData,
+    Tcl_Interp *UNUSED(interp),
+    void *UNUSED(constraintData),
     char *text
     )
 {
@@ -8574,10 +8569,10 @@ ncnameImpl (
 
 static int
 ncnameTCObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
-    Tcl_Obj *const objv[]
+    Tcl_Obj *const UNUSED(objv[])
     )
 {
     SchemaData *sdata = GETASI;
@@ -8592,8 +8587,8 @@ ncnameTCObjCmd (
 
 static int
 qnameImpl (
-    Tcl_Interp *interp,
-    void *constraintData,
+    Tcl_Interp *UNUSED(interp),
+    void *UNUSED(constraintData),
     char *text
     )
 {
@@ -8602,10 +8597,10 @@ qnameImpl (
 
 static int
 qnameTCObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
-    Tcl_Obj *const objv[]
+    Tcl_Obj *const UNUSED(objv[])
     )
 {
     SchemaData *sdata = GETASI;
@@ -8620,8 +8615,8 @@ qnameTCObjCmd (
 
 static int
 hexBinaryImpl (
-    Tcl_Interp *interp,
-    void *constraintData,
+    Tcl_Interp *UNUSED(interp),
+    void *UNUSED(constraintData),
     char *text
     )
 {
@@ -8642,10 +8637,10 @@ hexBinaryImpl (
 
 static int
 hexBinaryTCObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
-    Tcl_Obj *const objv[]
+    Tcl_Obj *const UNUSED(objv[])
     )
 {
     SchemaData *sdata = GETASI;
@@ -8660,7 +8655,7 @@ hexBinaryTCObjCmd (
 
 static int
 unsignedIntTypesImpl (
-    Tcl_Interp *interp,
+    Tcl_Interp *UNUSED(interp),
     void *constraintData,
     char *text
     )
@@ -8703,7 +8698,7 @@ unsignedIntTypesTCObjCmd (
     ClientData clientData,
     Tcl_Interp *interp,
     int objc,
-    Tcl_Obj *const objv[]
+    Tcl_Obj *const UNUSED(objv[])
     )
 {
     SchemaData *sdata = GETASI;
@@ -8719,7 +8714,7 @@ unsignedIntTypesTCObjCmd (
 
 static int
 intTypesImpl (
-    Tcl_Interp *interp,
+    Tcl_Interp *UNUSED(interp),
     void *constraintData,
     char *text
     )
@@ -8772,7 +8767,7 @@ intTypesTCObjCmd (
     ClientData clientData,
     Tcl_Interp *interp,
     int objc,
-    Tcl_Obj *const objv[]
+    Tcl_Obj *const UNUSED(objv[])
     )
 {
     SchemaData *sdata = GETASI;
@@ -8811,7 +8806,7 @@ setvarImpl (
 
 static int
 setvarTCObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -8926,7 +8921,7 @@ whitespaceImplCollapse (
 
 static int
 whitespaceTCObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -9005,7 +9000,7 @@ notImpl (
 
 static int
 notTCObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -9034,8 +9029,8 @@ notTCObjCmd (
 
 static int
 durationImpl (
-    Tcl_Interp *interp,
-    void *constraintData,
+    Tcl_Interp *UNUSED(interp),
+    void *UNUSED(constraintData),
     char *text
     )
 {
@@ -9093,10 +9088,10 @@ durationImpl (
 
 static int
 durationTCObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
-    Tcl_Obj *const objv[]
+    Tcl_Obj *const UNUSED(objv[])
     )
 {
     SchemaData *sdata = GETASI;
@@ -9134,7 +9129,7 @@ lengthImpl (
 
 static int
 lengthTCObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -9171,7 +9166,7 @@ typeImpl (
 
 static int
 typeTCObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -9202,7 +9197,7 @@ typeTCObjCmd (
 
 static int
 dateObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -9218,7 +9213,7 @@ dateObjCmd (
 
 static int
 dateTimeObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -9234,7 +9229,7 @@ dateTimeObjCmd (
 
 static int
 timeObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -9250,7 +9245,7 @@ timeObjCmd (
 
 static int
 durationObjCmd (
-    ClientData clientData,
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
