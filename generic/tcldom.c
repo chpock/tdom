@@ -6039,7 +6039,7 @@ int tcldom_DocObjCmd (
         case m_appendFromScript:
         case m_insertBeforeFromScript:
             setDocumentElement = 1;
-            /* Fall throuh */
+            /* fall through */
         case m_firstChild:
         case m_lastChild:
         case m_hasChildNodes:

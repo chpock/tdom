@@ -946,7 +946,8 @@ static XPathTokens xpathLexer (
                            break;
                        }
                        /* DOT followed by digit, i.e. a REAL.
-                          Handled by default. Fall throu */
+                          Handled by default. */
+                       /* fall through */
 
             default:   if ( isNCNameStart (&xpath[i])) {
                            ps = &(xpath[i]);
@@ -3761,7 +3762,7 @@ xpathEvalFunction (
             Tcl_DStringFree (&dStr);
             return XPATH_EVAL_ERR;
         }
-        /* fall throu */
+        /* fall through */
            
     default:
         if (cbs->funcCB == NULL) {
@@ -3950,7 +3951,8 @@ static int xpathEvalStep (
             break;
         }
         /* without following Pred step, // is the same as 
-           AxisDescendantOrSelf, fall throu */
+           AxisDescendantOrSelf */
+        /* fall through */
 
     case AxisDescendantLit:
     case AxisDescendantOrSelfLit:
@@ -4431,7 +4433,7 @@ static int xpathEvalStep (
                 switch (step->type) {
                 case Subtract:
                     NaN1 = -1 * NaN1;
-                    /* fall throu */   
+                    /* fall through */   
                 case Add:
                     if (NaN == NaN1) {
                         if (NaN == 1) rsSetInf (result);
@@ -4499,10 +4501,10 @@ static int xpathEvalStep (
             if ((int)dRight == 0) {
                 rsSetNaN (result);
             } else {
-                if (dRight < LONG_MIN - 0.1
-                    || dRight > LONG_MAX + 0.1
-                    || dLeft < LONG_MIN - 0.1
-                    || dLeft > LONG_MAX + 0.1) {
+                if (dRight < (double)LONG_MIN - 0.1
+                    || dRight > (double)LONG_MAX + 0.1
+                    || dLeft < (double)LONG_MIN - 0.1
+                    || dLeft > (double)LONG_MAX + 0.1) {
                     rsSetNaN (result);
                 } else {
                     rsSetInt  (result, ((long)dLeft) % ((long)dRight));

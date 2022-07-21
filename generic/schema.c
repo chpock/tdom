@@ -628,7 +628,7 @@ static void freeSchemaCP (
             }
             FREE (pattern->content[i]);
         }
-        /* Fall throu */
+        /* fall through */
     default:
         if (pattern->flags & TYPED_ELEMENT) break;
         FREE (pattern->content);
@@ -1591,14 +1591,16 @@ matchElementStart (
                         break;
 
                     case SCHEMA_CTYPE_CHOICE:
-                        Tcl_Panic ("MIXED or CHOICE child of MIXED or CHOICE");
+                        SetResult ("MIXED or CHOICE child of MIXED or CHOICE");
+                        sdata->evalError = 1;
+                        return 0;
 
                     case SCHEMA_CTYPE_PATTERN:
                         if (recursivePattern (se, icp)) {
                             mayskip = 1;
                             continue;
                         }
-                        /* fall throu */
+                        /* fall through */
                     case SCHEMA_CTYPE_INTERLEAVE:
                         pushToStack (sdata, icp);
                         rc = matchElementStart (interp, sdata, name, namespace);
@@ -1611,11 +1613,15 @@ matchElementStart (
                         break;
 
                     case SCHEMA_CTYPE_VIRTUAL:
-                        Tcl_Panic ("Virtual constrain in MIXED or CHOICE");
+                        SetResult ("Virtual constrain in MIXED or CHOICE");
+                        sdata->evalError = 1;
+                        return 0;
                         
                     case SCHEMA_CTYPE_KEYSPACE_END:
                     case SCHEMA_CTYPE_KEYSPACE:
-                        Tcl_Panic ("Keyspace constrain in MIXED or CHOICE");
+                        SetResult ("Keyspace constrain in MIXED or CHOICE");
+                        sdata->evalError = 1;
+                        return 0;
                         
                     }
                     if (!mayskip && mayMiss (candidate->quants[i]))
@@ -1635,7 +1641,7 @@ matchElementStart (
                     mayskip = 1;
                     break;
                 }
-                /* fall throu */
+                /* fall through */
             case SCHEMA_CTYPE_INTERLEAVE:
                 pushToStack (sdata, candidate);
                 rc = matchElementStart (interp, sdata, name, namespace);
@@ -1708,7 +1714,9 @@ matchElementStart (
     case SCHEMA_CTYPE_TEXT:
     case SCHEMA_CTYPE_ANY:
         /* Never pushed onto stack */
-        Tcl_Panic ("Invalid CTYPE onto the validation stack!");
+        SetResult ("Invalid CTYPE onto the validation stack!");
+        sdata->evalError = 1;
+        return 0;
 
     case SCHEMA_CTYPE_INTERLEAVE:
         mayskip = 1;
@@ -1751,14 +1759,16 @@ matchElementStart (
                 break;
 
             case SCHEMA_CTYPE_CHOICE:
-                Tcl_Panic ("MIXED or CHOICE child of INTERLEAVE");
+                SetResult ("MIXED or CHOICE child of INTERLEAVE");
+                sdata->evalError = 1;
+                return 0;
 
             case SCHEMA_CTYPE_PATTERN:
                 if (recursivePattern (se, icp)) {
                     thismayskip = 1;
                     break;
                 }
-                /* fall throu */
+                /* fall through */
             case SCHEMA_CTYPE_INTERLEAVE:
                 pushToStack (sdata, icp);
                 rc = matchElementStart (interp, sdata, name, namespace);
@@ -1774,13 +1784,15 @@ matchElementStart (
                 break;
 
             case SCHEMA_CTYPE_VIRTUAL:
-                Tcl_Panic ("Virtual constraint child of INTERLEAVE");
-                break;
+                SetResult ("Virtual constraint child of INTERLEAVE");
+                sdata->evalError = 1;
+                return 0;
 
             case SCHEMA_CTYPE_KEYSPACE_END:
             case SCHEMA_CTYPE_KEYSPACE:
-                Tcl_Panic ("Keyspace constraint child of INTERLEAVE");
-                break;
+                SetResult ("Keyspace constraint child of INTERLEAVE");
+                sdata->evalError = 1;
+                return 0;
 
             }
             if (!thismayskip && minOne (cp->quants[i])) mayskip = 0;
@@ -2487,7 +2499,7 @@ static int checkElementEnd (
                             thismayskip = 1;
                             break;
                         }
-                        /* fall throu */
+                        /* fall through */
                     case SCHEMA_CTYPE_INTERLEAVE:
                         pushToStack (sdata, ic);
                         if (checkElementEnd (interp, sdata) == -1) {
@@ -2500,7 +2512,9 @@ static int checkElementEnd (
                     case SCHEMA_CTYPE_KEYSPACE:
                     case SCHEMA_CTYPE_VIRTUAL:
                     case SCHEMA_CTYPE_CHOICE:
-                        Tcl_Panic ("Invalid CTYPE in MIXED or CHOICE");
+                        SetResult ("Invalid CTYPE in MIXED or CHOICE");
+                        sdata->evalError = 1;
+                        return 0;
                         
                     }
                     if (thismayskip) break;
@@ -2524,7 +2538,7 @@ static int checkElementEnd (
                 if (recursivePattern (se, cp->content[ac])) {
                     break;
                 }
-                /* fall throu */
+                /* fall through */
             case SCHEMA_CTYPE_INTERLEAVE:
                 pushToStack (sdata, cp->content[ac]);
                 rc = checkElementEnd (interp, sdata);
@@ -2579,7 +2593,9 @@ static int checkElementEnd (
     case SCHEMA_CTYPE_TEXT:
     case SCHEMA_CTYPE_ANY:
         /* Never pushed onto stack */
-        Tcl_Panic ("Invalid CTYPE onto the validation stack!");
+        SetResult ("Invalid CTYPE onto the validation stack!");
+        sdata->evalError = 1;
+        return 0;
 
     }
     /* Not reached */
@@ -2740,7 +2756,7 @@ matchText (
         switch (cp->type) {
         case SCHEMA_CTYPE_NAME:
             isName = 1;
-            /* Fall through */
+            /* fall through */
         case SCHEMA_CTYPE_PATTERN:
             while (ac < cp->nc) {
                 candidate = cp->content[ac];
@@ -2782,7 +2798,7 @@ matchText (
                             if (recursivePattern (se, ic)) {
                                 break;
                             }
-                            /* fall throu */
+                            /* fall through */
                         case SCHEMA_CTYPE_INTERLEAVE:
                             pushToStack (sdata, ic);
                             if (matchText (interp, sdata, text)) {
@@ -2793,17 +2809,23 @@ matchText (
                             break;
 
                         case SCHEMA_CTYPE_VIRTUAL:
-                            Tcl_Panic ("Virtual constrain in MIXED or"
+                            SetResult ("Virtual constrain in MIXED or"
                                        " CHOICE");
+                            sdata->evalError = 1;
+                            return 0;
                             
                         case SCHEMA_CTYPE_CHOICE:
-                            Tcl_Panic ("MIXED or CHOICE child of MIXED or"
+                            SetResult ("MIXED or CHOICE child of MIXED or"
                                        " CHOICE");
+                            sdata->evalError = 1;
+                            return 0;
 
                         case SCHEMA_CTYPE_KEYSPACE_END:
                         case SCHEMA_CTYPE_KEYSPACE:
-                            Tcl_Panic ("Keyspace constrain in MIXED or"
+                            SetResult ("Keyspace constrain in MIXED or"
                                        " CHOICE");
+                            sdata->evalError = 1;
+                            return 0;
                             
                         }
                     }
@@ -2821,7 +2843,7 @@ matchText (
                     if (recursivePattern (se, candidate)) {
                         break;
                     }
-                    /* fall throu */
+                    /* fall through */
                 case SCHEMA_CTYPE_INTERLEAVE:
                     pushToStack (sdata, candidate);
                     if (matchText (interp, sdata, text)) {
@@ -2905,8 +2927,9 @@ matchText (
         case SCHEMA_CTYPE_TEXT:
         case SCHEMA_CTYPE_ANY:
             /* Never pushed onto stack */
-            Tcl_Panic ("Invalid CTYPE onto the validation stack!");
-            break;
+            SetResult ("Invalid CTYPE onto the validation stack!");
+            sdata->evalError = 1;
+            return 0;
 
         case SCHEMA_CTYPE_INTERLEAVE:
             mayskip = 1;
@@ -2936,7 +2959,7 @@ matchText (
                     if (recursivePattern (se, ic)) {
                         break;
                     }
-                    /* fall throu */
+                    /* fall through */
                 case SCHEMA_CTYPE_INTERLEAVE:
                     pushToStack (sdata, ic);
                     if (matchText (interp, sdata, text)) {
@@ -2947,11 +2970,15 @@ matchText (
                     break;
 
                 case SCHEMA_CTYPE_CHOICE:
-                    Tcl_Panic ("MIXED or CHOICE child of INTERLEAVE");
+                    SetResult ("MIXED or CHOICE child of INTERLEAVE");
+                    sdata->evalError = 1;
+                    return 0;
 
                 case SCHEMA_CTYPE_KEYSPACE_END:
                 case SCHEMA_CTYPE_KEYSPACE:
-                    Tcl_Panic ("Keyspace child of INTERLEAVE");
+                    SetResult ("Keyspace child of INTERLEAVE");
+                    sdata->evalError = 1;
+                    return 0;
 
                 case SCHEMA_CTYPE_VIRTUAL:
                     break;
@@ -3797,7 +3824,7 @@ getNextExpectedWorker (
     case SCHEMA_CTYPE_INTERLEAVE:
         ac = 0;
         mustMatch = 0;
-        /* Fall through */
+        /* fall through */
     case SCHEMA_CTYPE_NAME:
     case SCHEMA_CTYPE_PATTERN:
         while (ac < cp->nc) {
@@ -3826,7 +3853,7 @@ getNextExpectedWorker (
                 if (recursivePattern (se, ic)) {
                     break;
                 }
-                /* Fall through */
+                /* fall through */
             case SCHEMA_CTYPE_INTERLEAVE:
                 if (expectedFlags & EXPECTED_ONLY_MANDATORY
                     && !se->hasMatched) {
@@ -3887,7 +3914,7 @@ getNextExpectedWorker (
                                 mayskip = 1;
                                 break;
                             }
-                            /* fall throu */
+                            /* fall through */
                         case SCHEMA_CTYPE_INTERLEAVE:
                             se1 = getStackElement (sdata, ic);
                             mayskip = getNextExpectedWorker (
@@ -3929,7 +3956,7 @@ getNextExpectedWorker (
                         if (recursivePattern (se, jc)) {
                             break;
                         }
-                        /* Fall through */
+                        /* fall through */
                     case SCHEMA_CTYPE_INTERLEAVE:
                         Tcl_CreateHashEntry (seenCPs, jc, &hnew);
                         if (hnew) {
@@ -3958,7 +3985,9 @@ getNextExpectedWorker (
                         }
                         break;
                     case SCHEMA_CTYPE_CHOICE:
-                        Tcl_Panic ("MIXED or CHOICE child of MIXED or CHOICE");
+                        SetResult ("MIXED or CHOICE child of MIXED or CHOICE");
+                        sdata->evalError = 1;
+                        return 0;
 
                     case SCHEMA_CTYPE_VIRTUAL:
                     case SCHEMA_CTYPE_KEYSPACE:
@@ -4006,7 +4035,9 @@ getNextExpectedWorker (
     case SCHEMA_CTYPE_VIRTUAL:
     case SCHEMA_CTYPE_KEYSPACE:
     case SCHEMA_CTYPE_KEYSPACE_END:
-        Tcl_Panic ("Invalid CTYPE onto the validation stack!");
+        SetResult ("Invalid CTYPE onto the validation stack!");
+        sdata->evalError = 1;
+        return 0;
     }
     return rc;
 }
@@ -5659,6 +5690,8 @@ tDOM_schemaInstanceCmd (
                 sdata->choiceHashThreshold = n;
             }
             SetIntResult (sdata->choiceHashThreshold);
+            break;
+            
         case s_attributeHashThreshold:
             if (objc == 4) {
                 if (Tcl_GetIntFromObj (interp, objv[3], &n) != TCL_OK) {
@@ -5672,6 +5705,7 @@ tDOM_schemaInstanceCmd (
                 sdata->attributeHashThreshold = n;
             }
             SetIntResult (sdata->attributeHashThreshold);
+            break;
         }
         break;
         

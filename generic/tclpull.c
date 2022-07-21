@@ -667,7 +667,8 @@ tDOM_PullParserInstanceCmd (
                 break;
             }
         }
-        /* Fall throu to reporting state */
+        /* To report state:*/
+        /* fall through */
     case m_state:
         if (objc != 2) {
             Tcl_WrongNumArgs (interp, 2, objv, "");

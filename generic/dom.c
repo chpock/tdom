@@ -2320,7 +2320,7 @@ domReadDocument (
             if (info.status == TCL_BREAK) {
                 Tcl_ResetResult(interp);
             }
-        /* fall throu */
+        /* fall through */
     case XML_STATUS_ERROR:
         DBG(fprintf(stderr, "XML_STATUS_ERROR\n");)
         domFreeDocument (doc, NULL, NULL);
