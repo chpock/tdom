@@ -327,7 +327,7 @@ test parser-1.25 {billion laughs attact proctection options} {
         -billionLaughsAttackProtectionActivationThreshold bar
         -billionLaughsAttackProtectionActivationThreshold 0
         -billionLaughsAttackProtectionActivationThreshold -7
-        -billionLaughsAttackProtectionActivationThreshold 20000000000
+        -billionLaughsAttackProtectionActivationThreshold 2000000000
     } {
         lappend result [catch {
             xml::parser-1.25 configure $option $value
