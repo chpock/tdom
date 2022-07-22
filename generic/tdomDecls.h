@@ -63,7 +63,7 @@ EXTERN domNode *	tcldom_getNodeFromName(Tcl_Interp *interp,
 EXTERN domDocument *	tcldom_getDocumentFromName(Tcl_Interp *interp,
 				char *docName, char **errMsg);
 /* 18 */
-EXTERN SchemaData *	tdomGetSchemadata(void);
+EXTERN SchemaData *	tdomGetSchemadata(Tcl_Interp *interp);
 
 typedef struct TdomStubs {
     int magic;
@@ -87,7 +87,7 @@ typedef struct TdomStubs {
     int (*xML_GetIdAttributeIndex) (XML_Parser parser); /* 15 */
     domNode * (*tcldom_getNodeFromName) (Tcl_Interp *interp, char *nodeName, char **errMsg); /* 16 */
     domDocument * (*tcldom_getDocumentFromName) (Tcl_Interp *interp, char *docName, char **errMsg); /* 17 */
-    SchemaData * (*tdomGetSchemadata) (void); /* 18 */
+    SchemaData * (*tdomGetSchemadata) (Tcl_Interp *interp); /* 18 */
 } TdomStubs;
 
 extern const TdomStubs *tdomStubsPtr;

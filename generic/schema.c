@@ -285,14 +285,17 @@ static char *Schema_Quant_Type2str[] = {
 };
 #endif
 
-
 #ifndef TCL_THREADS
   static SchemaData *activeSchemaData = 0;
 # define GETASI activeSchemaData
 # define SETASI(v) activeSchemaData = v
 #else
-  static Tcl_ThreadDataKey activeSchemaData;
-# define GETASI  *(SchemaData**) Tcl_GetThreadData(&activeSchemaData, \
+# ifndef SCHEMA_NO_TCL_ASSOC
+#  define GETASI (SchemaData*)Tcl_GetAssocData(interp, "tdom_schema", NULL);
+#  define SETASI(v) Tcl_SetAssocData (interp, "tdom_schema", NULL, v)
+# else 
+static Tcl_ThreadDataKey activeSchemaData;
+#  define GETASI  ((SchemaData*)Tcl_GetThreadData(&activeSchemaData,    \
                                                      sizeof(SchemaData*))
 static void SetActiveSchemaData (SchemaData *v)
 {
@@ -300,7 +303,8 @@ static void SetActiveSchemaData (SchemaData *v)
                                                         sizeof (SchemaData*));
     *schemaInfoPtr = v;
 }
-# define SETASI(v) SetActiveSchemaData (v)
+#  define SETASI(v) SetActiveSchemaData (v)
+# endif
 #endif
 
 #define CHECK_SI                                                        \
@@ -431,7 +435,7 @@ tdomGetSchemadata (Tcl_Interp *interp)
 }
 #else
 SchemaData *
-tdomGetSchemadata (void) 
+tdomGetSchemadata (Tcl_Interp *interp) 
 {
     return GETASI;
 }
@@ -5129,7 +5133,7 @@ tDOM_schemaInstanceCmd (
     {
         s_choiceHashThreshold, s_attributeHashThreshold
     };
-        
+
     if (sdata == NULL) {
         /* Inline defined defelement, defelementtype, defpattern,
          * deftexttype, start or prefixns */
@@ -9298,6 +9302,9 @@ tDOM_SchemaInit (
     Tcl_Interp *interp
     )
 {
+#ifdef SCHEMA_TCL_ASSOC
+    Tcl_SetAssocData (interp, "tdom_schema", NULL, NULL);
+#endif
     Tcl_CreateObjCommand (interp, "tdom::schema", tDOM_SchemaObjCmd,
                           NULL, NULL);
 
@@ -9476,7 +9483,7 @@ tDOM_SchemaInit (
 #else   /* #ifndef TDOM_NO_SCHEMA */
 
 SchemaData *
-tdomGetSchemadata (void) 
+tdomGetSchemadata (Tcl_Interp *interp) 
 {
     return 0;
 }
