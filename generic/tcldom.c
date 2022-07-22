@@ -6730,7 +6730,7 @@ int tcldom_parse (
                           "\" requires a float >= 1.0 as argument.");
                 return TCL_ERROR;
             }
-            if (maximumAmplification > FLT_MAX || maximumAmplification < 1.0) {
+            if (maximumAmplification > (double)FLT_MAX || maximumAmplification < 1.0) {
                 SetResult("The \"dom parse\" option \""
                           "-billionLaughsAttackProtectionMaximumAmplification"
                           "\" requires a float >= 1.0 as argument.");
@@ -6950,7 +6950,7 @@ int tcldom_parse (
 #ifdef XML_DTD
     if (maximumAmplification >= 1.0f) {
         if (XML_SetBillionLaughsAttackProtectionMaximumAmplification (
-                parser, maximumAmplification) == XML_FALSE) {
+                parser, (float)maximumAmplification) == XML_FALSE) {
             SetResult("The \"dom parse\" option \""
                       "-billionLaughsAttackProtectionMaximumAmplification"
                       "\" requires a float >= 1.0 as argument.");
