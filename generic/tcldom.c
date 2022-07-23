@@ -430,7 +430,7 @@ static int tcldom_UnregisterDocShared(Tcl_Interp* interp, domDocument* doc);
 
 static void 
 tcldom_Finalize(
-    ClientData unused
+    ClientData UNUSED(unused)
 )
 {
     DBG(fprintf(stderr, "--> tcldom_Finalize\n"));
@@ -1394,7 +1394,7 @@ int tcldom_xpathFuncCallBack (
     domNode         *ctxNode,
     int              position,
     xpathResultSet  *nodeList,
-    domNode         *exprContext,
+    domNode         *UNUSED(exprContext),
     int              argc,
     xpathResultSets *args,
     xpathResultSet  *result,
@@ -5527,7 +5527,7 @@ int tcldom_NodeObjCmd (
                 SetIntResult(jsonType);
                 return TCL_OK;
             }
-            if (node->info < 0 || node->info > 7) {
+            if (node->info > 7) {
                 SetResult(jsonTypes[0]);
             } else {
                 SetResult(jsonTypes[node->info]);
@@ -6039,7 +6039,7 @@ int tcldom_DocObjCmd (
         case m_appendFromScript:
         case m_insertBeforeFromScript:
             setDocumentElement = 1;
-            /* Fall throuh */
+            /* fall through */
         case m_firstChild:
         case m_lastChild:
         case m_hasChildNodes:
@@ -6111,7 +6111,7 @@ int tcldom_DocObjCmd (
 \---------------------------------------------------------------------------*/
 int
 tDOM_fsnewNodeCmd (
-    ClientData      clientData,
+    ClientData      UNUSED(clientData),
     Tcl_Interp    * interp,
     int             objc,
     Tcl_Obj *const  objv[]
@@ -6249,7 +6249,7 @@ tDOM_fsnewNodeCmd (
 \---------------------------------------------------------------------------*/
 int
 tDOM_fsinsertNodeCmd (
-    ClientData      clientData,
+    ClientData      UNUSED(clientData),
     Tcl_Interp    * interp,
     int             objc,
     Tcl_Obj *const  objv[]
@@ -6295,7 +6295,7 @@ tDOM_fsinsertNodeCmd (
 \---------------------------------------------------------------------------*/
 static
 int tcldom_createDocument (
-    ClientData  clientData,
+    ClientData  UNUSED(clientData),
     Tcl_Interp *interp,
     int         objc,
     Tcl_Obj    * const objv[]
@@ -6326,7 +6326,7 @@ int tcldom_createDocument (
 \---------------------------------------------------------------------------*/
 static
 int tcldom_createDocumentNode (
-    ClientData  clientData,
+    ClientData  UNUSED(clientData),
     Tcl_Interp *interp,
     int         objc,
     Tcl_Obj    * const objv[]
@@ -6373,7 +6373,7 @@ int tcldom_createDocumentNode (
 \---------------------------------------------------------------------------*/
 static
 int tcldom_createDocumentNS (
-    ClientData  clientData,
+    ClientData  UNUSED(clientData),
     Tcl_Interp *interp,
     int         objc,
     Tcl_Obj    * const objv[]
@@ -6416,7 +6416,7 @@ int tcldom_createDocumentNS (
 \---------------------------------------------------------------------------*/
 static
 int tcldom_parse (
-    ClientData  clientData,
+    ClientData  UNUSED(clientData),
     Tcl_Interp *interp,
     int         objc,
     Tcl_Obj    * const objv[]
@@ -6730,7 +6730,7 @@ int tcldom_parse (
                           "\" requires a float >= 1.0 as argument.");
                 return TCL_ERROR;
             }
-            if (maximumAmplification > FLT_MAX || maximumAmplification < 1.0) {
+            if (maximumAmplification > (double)FLT_MAX || maximumAmplification < 1.0) {
                 SetResult("The \"dom parse\" option \""
                           "-billionLaughsAttackProtectionMaximumAmplification"
                           "\" requires a float >= 1.0 as argument.");
@@ -6950,7 +6950,7 @@ int tcldom_parse (
 #ifdef XML_DTD
     if (maximumAmplification >= 1.0f) {
         if (XML_SetBillionLaughsAttackProtectionMaximumAmplification (
-                parser, maximumAmplification) == XML_FALSE) {
+                parser, (float)maximumAmplification) == XML_FALSE) {
             SetResult("The \"dom parse\" option \""
                       "-billionLaughsAttackProtectionMaximumAmplification"
                       "\" requires a float >= 1.0 as argument.");
@@ -7086,9 +7086,9 @@ int tcldom_parse (
 \---------------------------------------------------------------------------*/
 static
 int tcldom_featureinfo (
-    ClientData  clientData,
+    ClientData  UNUSED(clientData),
     Tcl_Interp *interp,
-    int         objc,
+    int         UNUSED(objc),
     Tcl_Obj    * const objv[]
 )
 {
@@ -7110,6 +7110,7 @@ int tcldom_featureinfo (
         o_pullparser,        o_TCL_UTF_MAX,        o_schema
     };
 
+    /* objc is already checked by caller */
     if (Tcl_GetIndexFromObj(interp, objv[1], features, "feature", 0,
                             &featureIndex) != TCL_OK) {
         return TCL_ERROR;

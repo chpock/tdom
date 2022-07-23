@@ -1461,7 +1461,7 @@ elemNSfound:
 static void
 endElement (
     void        *userData,
-    const char  *name
+    const char  *UNUSED(name)
 )
 {
     domReadInfo  *info = userData;
@@ -1841,12 +1841,12 @@ static void
 entityDeclHandler (
     void       *userData,
     const char *entityName,
-    int         is_parameter_entity,
-    const char *value,
-    int         value_length,
-    const char *base,
+    int         UNUSED(is_parameter_entity),
+    const char *UNUSED(value),
+    int         UNUSED(value_length),
+    const char *UNUSED(base),
     const char *systemId,
-    const char *publicId,
+    const char *UNUSED(publicId),
     const char *notationName
 )
 {
@@ -2138,10 +2138,10 @@ externalEntityRefHandler (
 static void
 startDoctypeDeclHandler (
     void       *userData,
-    const char *doctypeName,
+    const char *UNUSED(doctypeName),
     const char *sysid,
     const char *pubid,
-    int         has_internal_subset
+    int         UNUSED(has_internal_subset)
 )
 {
     domReadInfo                  *info = (domReadInfo *) userData;
@@ -2320,7 +2320,7 @@ domReadDocument (
             if (info.status == TCL_BREAK) {
                 Tcl_ResetResult(interp);
             }
-        /* fall throu */
+        /* fall through */
     case XML_STATUS_ERROR:
         DBG(fprintf(stderr, "XML_STATUS_ERROR\n");)
         domFreeDocument (doc, NULL, NULL);
@@ -5237,7 +5237,7 @@ int tcldom_returnDocumentObj (Tcl_Interp *interp,
 
 void
 tdom_freeProc (
-    Tcl_Interp *interp,
+    Tcl_Interp *UNUSED(interp),
     void       *userData
 )
 {
@@ -5303,7 +5303,7 @@ tdom_resetProc (
 
 void
 tdom_initParseProc (
-    Tcl_Interp *interp,
+    Tcl_Interp *UNUSED(interp),
     void       *userData
     )
 {
@@ -5336,11 +5336,12 @@ tdom_charDataHandler (
 }
 
 int
-TclTdomObjCmd (dummy, interp, objc, objv)
-     ClientData dummy;
-     Tcl_Interp *interp;
-     int objc;
-     Tcl_Obj *const objv[];
+TclTdomObjCmd (
+    ClientData UNUSED(dummy),
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
 {
     CHandlerSet     *handlerSet;
     int              methodIndex, result, bool;

@@ -339,7 +339,7 @@ CHandlerSetCreate (
 
 int
 TclExpatObjCmd(
-    ClientData dummy,
+    ClientData UNUSED(dummy),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -1313,7 +1313,7 @@ TclExpatConfigure (
         }
         /* This option is a creation time / set once one */
         if (!expat->parser) {
-            expat->nsSeparator = uniChar;
+            expat->nsSeparator = (XML_Char)uniChar;
         }
         break;
 
@@ -1326,7 +1326,7 @@ TclExpatConfigure (
                             "\" requires a float >= 1.0 as argument.", NULL);
               return TCL_ERROR;
           }
-          if (maximumAmplification > FLT_MAX || maximumAmplification < 1.0) {
+          if (maximumAmplification > (double)FLT_MAX || maximumAmplification < 1.0) {
               Tcl_SetResult(interp, "The option \""
                             "-billionLaughsAttackProtectionMaximumAmplification"
                             "\" requires a float >= 1.0 as argument.", NULL);
@@ -1335,7 +1335,7 @@ TclExpatConfigure (
 #ifdef XML_DTD
           if (expat->parser) {
               if (XML_SetBillionLaughsAttackProtectionMaximumAmplification (
-                      expat->parser, maximumAmplification) == XML_FALSE) {
+                      expat->parser, (float)maximumAmplification) == XML_FALSE) {
                   Tcl_SetResult(interp, "The option \""
                                 "-billionLaughsAttackProtectionMaximumAmplification"
                                 "\" requires a float >= 1.0 as argument.",
@@ -1343,7 +1343,7 @@ TclExpatConfigure (
                   return TCL_ERROR;
               }
           } else {
-              expat->maximumAmplification = maximumAmplification;
+              expat->maximumAmplification = (float) maximumAmplification;
           }
 #endif          
           break;
@@ -2241,7 +2241,7 @@ static int
 TclExpatGet (
     Tcl_Interp *interp,
     TclGenExpatInfo *expat,
-    int objc,
+    int UNUSED(objc),
     Tcl_Obj *const objv[]
 )
 {
@@ -2263,6 +2263,7 @@ TclExpatGet (
   int switchIndex;
   Tcl_Obj *resultPtr;
 
+  /* objc is already checked by caller */
   if (Tcl_GetIndexFromObj(interp, objv[0], getSwitches,
 			  "switch", 0, &switchIndex) != TCL_OK) {
     return TCL_ERROR;
