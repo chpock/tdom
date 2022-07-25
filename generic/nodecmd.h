@@ -52,7 +52,7 @@ int nodecmd_processAttributes (Tcl_Interp    *interp,
                                Tcl_Obj *const objv[],
                                Tcl_Obj      **cmdObj);
 
-domNode * nodecmd_currentNode(void);
+domNode * nodecmd_currentNode (Tcl_Interp *interp);
 
 /* EOF $RCSfile $ */
 
