@@ -1,5 +1,5 @@
-C Correted\sversion\snumber.
-D 2022-07-25T16:57:39.211
+C It's\sa\stad\s(but\sstable)\sslower\soverall\sthe\stest\ssuite.\sBut\sits\smore\scorrect.\sAt\sleast\sit\sfixes\sa\sproblem\snobody\shas\sshowed\sa\stest\scase\sfor.
+D 2022-07-25T22:38:35.130
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -141,11 +141,11 @@ F generic/domxpath.h 7d37b763e4e90d3e97c985c73d893b6ca26198ad1e61fad937d8147a254
 F generic/domxslt.c 30bf1929c764b6eb46df861e68f71b3bfee1f001f25b3ca9223c2cb8f6458bc7
 F generic/domxslt.h 0cb8e327683a0ffeb2a7094add6cd82ec1ae49c7c704f20d8d6f7d6523e74da8
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F generic/nodecmd.c ffdd025077748bd9e4b5d499a0e3ce995754a7edf77fb7c4ef45688f1677d5a9
-F generic/nodecmd.h d44c88bcf23f32e1258b9bdbec0d26cc11d9aa1f7a6644bf524723dac5eb9047
-F generic/schema.c 250052f365bb6b876386d801c6381c5ed95781b4259006a4143d5e00a1e4ce94
+F generic/nodecmd.c 62060f6e1b0bb0a63affb9078b17e670939642e35db8ba9908da06fdab4cb9a4
+F generic/nodecmd.h 78904ebdaea4be2ea2f554fc0a594af5449cccfa3904bdfa8b08381ad36f9ef8
+F generic/schema.c 13ded9dfdd0ed2029d25f39975ea30934dc437d33fb9d6e8f9d41d1a34d41c6c
 F generic/schema.h 9820583e70d7d404645da5df19156b6de59a26b77687e5f44970d511f6f8dc26
-F generic/tcldom.c 829d78076428e5a4ede82703116cdc0eb3590165f343d5456008d623e717a0ea
+F generic/tcldom.c c22f6d9d6ca778fd55e23f6325bfef2a84e75741ff1b4d88e29e9b59d3412477
 F generic/tcldom.h fc61477bdd07440e17a8f11cc898e5c07c8c7c3592014213a5e50eca85393374
 F generic/tclexpat.c 60e133fb8502d853257c2de0ac62b9365850e525920a72590f38524d93199f5c
 F generic/tclexpat.h 95d915d74bb4b99ef3b80de00b0adce28931e6015ac63226b99db4817d9e313c
@@ -237,8 +237,9 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P df977eb8057b530634ef0203f0dcd736d1bc7f47934562c9d793379ec0e35b12
-R 9aa150f2c81c45df8f8c404bd5ad9c97
+P aae300c935c2967e993ce53ab9207bb55185df17db4b454987888cd975056797 097bfb4a817afb0884890c119ea234c231a2bfc0760645121f08f3861c746dea
+R bd333b5d52f6610be967b35598aa332f
+T +closed 097bfb4a817afb0884890c119ea234c231a2bfc0760645121f08f3861c746dea
 U rolf
-Z 232ab7cb8b81353447d69408af59b855
+Z 68f14ec24fbc56a93c70cf1ee46cf33c
 # Remove this line to create a well-formed Fossil manifest.

@@ -77,25 +77,17 @@ typedef struct NodeInfo {
     char *tagName;
 } NodeInfo;
 
-#ifndef TCL_THREADS
-  static CurrentStack dataKey;
-# define TSDPTR(a) a
-#else
-  static Tcl_ThreadDataKey dataKey;
-# define TSDPTR(a) (CurrentStack*)Tcl_GetThreadData((a),sizeof(CurrentStack))
-#endif
-
 /*----------------------------------------------------------------------------
 |   Forward declarations
 |
 \---------------------------------------------------------------------------*/
-static void * StackPush  (void *);
-static void * StackPop   (void);
-static void * StackTop   (void);
-static int    NodeObjCmd (ClientData,Tcl_Interp*,int,Tcl_Obj *const o[]);
-static void   StackFinalize (ClientData);
+static void * StackPush  (Tcl_Interp *, void *);
+static void * StackPop   (Tcl_Interp *);
+static void * StackTop   (Tcl_Interp *);
+static int    NodeObjCmd (ClientData, Tcl_Interp *, int, Tcl_Obj *const o[]);
+static void   StackFinalize (ClientData, Tcl_Interp *);
 
-extern int tcldom_appendXML (Tcl_Interp*, domNode*, Tcl_Obj*);
+extern int tcldom_appendXML (Tcl_Interp *, domNode *, Tcl_Obj *);
 
 
 /*----------------------------------------------------------------------------
@@ -104,18 +96,27 @@ extern int tcldom_appendXML (Tcl_Interp*, domNode*, Tcl_Obj*);
 \---------------------------------------------------------------------------*/
 static void *
 StackPush (
+    Tcl_Interp *interp,
     void *element
 ) {
     StackSlot *newElement;
-    CurrentStack *tsdPtr = TSDPTR(&dataKey);
+    CurrentStack *csPtr =
+	(CurrentStack *) Tcl_GetAssocData(interp, "tdom_stk", NULL);
+
+    if (csPtr == NULL) {
+	csPtr = (CurrentStack *) MALLOC(sizeof(CurrentStack));
+	csPtr->elementStack = NULL;
+	csPtr->currentSlot = NULL;
+	Tcl_SetAssocData(interp, "tdom_stk", StackFinalize, (ClientData) csPtr);
+    }
 
     /*-------------------------------------------------------------------
     |   Reuse already allocated stack slots, if any
     |
     \------------------------------------------------------------------*/
-    if (tsdPtr->currentSlot && tsdPtr->currentSlot->nextPtr) {
-        tsdPtr->currentSlot = tsdPtr->currentSlot->nextPtr;
-        tsdPtr->currentSlot->element = element;
+    if (csPtr->currentSlot && csPtr->currentSlot->nextPtr) {
+        csPtr->currentSlot = csPtr->currentSlot->nextPtr;
+        csPtr->currentSlot->element = element;
         return element;
     }
 
@@ -123,23 +124,18 @@ StackPush (
     |   Allocate new stack slot
     |
     \------------------------------------------------------------------*/
-    newElement = (StackSlot *)MALLOC(sizeof(StackSlot));
+    newElement = (StackSlot *) MALLOC(sizeof(StackSlot));
     memset(newElement, 0, sizeof(StackSlot));
 
-    if (tsdPtr->elementStack == NULL) {
-        tsdPtr->elementStack = newElement;
-#ifdef TCL_THREADS
-        Tcl_CreateThreadExitHandler(StackFinalize, tsdPtr->elementStack);
-#else
-        Tcl_CreateExitHandler (StackFinalize, tsdPtr->elementStack);
-#endif
+    if (csPtr->elementStack == NULL) {
+        csPtr->elementStack = newElement;
     } else {
-        tsdPtr->currentSlot->nextPtr = newElement;
-        newElement->prevPtr = tsdPtr->currentSlot;
+        csPtr->currentSlot->nextPtr = newElement;
+        newElement->prevPtr = csPtr->currentSlot;
     }
 
-    tsdPtr->currentSlot = newElement;
-    tsdPtr->currentSlot->element = element;
+    csPtr->currentSlot = newElement;
+    csPtr->currentSlot->element = element;
 
     return element;
 }
@@ -149,16 +145,17 @@ StackPush (
 |
 \---------------------------------------------------------------------------*/
 static void *
-StackPop (void)
+StackPop (Tcl_Interp *interp)
 {
     void *element;
-    CurrentStack *tsdPtr = TSDPTR(&dataKey);
+    CurrentStack *csPtr =
+	(CurrentStack *) Tcl_GetAssocData(interp, "tdom_stk", NULL);
 
-    element = tsdPtr->currentSlot->element;
-    if (tsdPtr->currentSlot->prevPtr) {
-        tsdPtr->currentSlot = tsdPtr->currentSlot->prevPtr;
+    element = csPtr->currentSlot->element;
+    if (csPtr->currentSlot->prevPtr) {
+        csPtr->currentSlot = csPtr->currentSlot->prevPtr;
     } else {
-        tsdPtr->currentSlot->element = NULL;
+        csPtr->currentSlot->element = NULL;
     }
 
     return element;
@@ -169,15 +166,16 @@ StackPop (void)
 |
 \---------------------------------------------------------------------------*/
 static void *
-StackTop (void)
+StackTop (Tcl_Interp *interp)
 {
-    CurrentStack *tsdPtr = TSDPTR(&dataKey);
+    CurrentStack *csPtr =
+	(CurrentStack *) Tcl_GetAssocData(interp, "tdom_stk", NULL);
 
-    if (tsdPtr->currentSlot == NULL) {
+    if (csPtr->currentSlot == NULL) {
         return NULL;
     }
 
-    return tsdPtr->currentSlot->element;
+    return csPtr->currentSlot->element;
 }
 
 
@@ -187,15 +185,18 @@ StackTop (void)
 \---------------------------------------------------------------------------*/
 static void
 StackFinalize (
-    ClientData clientData
+    ClientData clientData,
+    Tcl_Interp *interp
 ) {
-    StackSlot *tmp, *stack = (StackSlot *)clientData;
+    CurrentStack *csPtr = (CurrentStack *) clientData;
+    StackSlot *tmp, *stack = csPtr->elementStack;
 
     while (stack) {
         tmp = stack->nextPtr;
-        FREE((char*)stack);
+        FREE((char *) stack);
         stack = tmp;
     }
+    FREE((char *) csPtr);
 }
 
 /*
@@ -352,7 +353,7 @@ NodeObjCmd (
     |
     \-----------------------------------------------------------------------*/
 
-    parent = (domNode *)StackTop();    
+    parent = (domNode *) StackTop(interp);
     if (parent == NULL) {
         Tcl_AppendResult(interp, "called outside domNode context", NULL);
         return TCL_ERROR;
@@ -806,7 +807,7 @@ nodecmd_appendFromScript (
     doc = node->ownerDocument;
     oldLastChild = node->lastChild;
 
-    StackPush((void *)node);
+    StackPush(interp, (void *) node);
     insideEval = (doc->nodeFlags & INSIDE_FROM_SCRIPT);
     if (!insideEval) {
         doc->nodeFlags |= INSIDE_FROM_SCRIPT;
@@ -816,7 +817,7 @@ nodecmd_appendFromScript (
     if (ret != TCL_ERROR) {
         Tcl_ResetResult(interp);
     }
-    StackPop();
+    StackPop(interp);
 
     if (ret == TCL_ERROR) {
         if (oldLastChild) {
@@ -946,9 +947,9 @@ nodecmd_insertBeforeFromScript (
 \---------------------------------------------------------------------------*/
 
 domNode *
-nodecmd_currentNode(void)
+nodecmd_currentNode(Tcl_Interp *interp)
 {
-    return StackTop();
+    return StackTop(interp);
 }
 
 /* EOF $RCSfile $ */

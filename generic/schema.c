@@ -427,19 +427,12 @@ static const char *unknownNS = "<unknownNamespace";
 static char *emptyStr = "";
 
 
-#ifndef TCL_THREADS
-SchemaData *
-tdomGetSchemadata (Tcl_Interp *interp) 
-{
-    return activeSchemaData;
-}
-#else
 SchemaData *
 tdomGetSchemadata (Tcl_Interp *interp) 
 {
     return GETASI;
 }
-#endif
+
 
 static SchemaCP*
 initSchemaCP (
