@@ -24,6 +24,7 @@
 #include <tdom.h>
 #include <tcldom.h>
 #include <domxpath.h>
+#include <domjson.h>
 #include <schema.h>
 
 #ifndef TDOM_NO_SCHEMA
@@ -9227,6 +9228,18 @@ typeTCObjCmd (
 }
 
 static int
+json_ttTCObjCmdTCObjCmd (
+    ClientData clientData,
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    
+}
+
+static int
 dateObjCmd (
     ClientData UNUSED(clientData),
     Tcl_Interp *interp,
@@ -9461,6 +9474,23 @@ tDOM_SchemaInit (
     Tcl_CreateObjCommand (interp,"tdom::schema::text::type",
                           typeTCObjCmd, NULL, NULL);
 
+    /* The json text type tests*/
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::json_null",
+                          json_typeTCObjCmdTCObjCmd, (ClientData) JSON_NULL,
+                          NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::json_null",
+                          json_typeTCObjCmdTCObjCmd, (ClientData) JSON_TRUE,
+                          NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::json_null",
+                          json_typeTCObjCmdTCObjCmd, (ClientData) JSON_FALSE,
+                          NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::json_null",
+                          json_typeTCObjCmdTCObjCmd, (ClientData) JSON_STRING,
+                          NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::json_null",
+                          json_typeTCObjCmdTCObjCmd, (ClientData) JSON_NUMBER,
+                          NULL);
+    
     /* Exposed text type commands */
     Tcl_CreateObjCommand (interp,"tdom::type::date",
                           dateObjCmd, NULL, NULL);
