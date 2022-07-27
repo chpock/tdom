@@ -28,8 +28,9 @@
 #    schema-25.*: domxpathboolean
 #    schema-26.*: info domNode
 #    schema-27.*: Text constraint commands available outsite schema context
+#    schema-28,*: tdom and interp
 #
-# Copyright (c) 2018-2020 Rolf Ade.
+# Copyright (c) 2018-2022 Rolf Ade.
 
 source [file join [file dir [info script]] loadtdom.tcl]
 
@@ -10940,4 +10941,32 @@ test schema-27.9 {duration outside schema context} {
     set result
 } {0 0 0 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0}
 
-}
+test schema-28.1 {schema use in child interp while in schema context} {
+    
+    tdom::schema s
+    set result [catch {s defelement doc {
+        interp create childinterp
+        load {} tdom childinterp
+        childinterp eval {
+            ::tdom::schema::element fromchild
+        }
+        element this
+    }}]
+    if {$result} {
+        s defelement doc {
+            element this
+        }
+    }
+    set result [s validate {
+        <doc><fromchild/><this/></doc>
+    }]
+    s delete
+    interp delete childinterp    
+    set result
+} 0
+
+
+test schema-28.2 {
+    catch {::tdom::schema::element elm}
+} 1
+
