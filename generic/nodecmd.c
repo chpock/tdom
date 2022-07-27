@@ -103,12 +103,7 @@ StackPush (
     CurrentStack *csPtr =
 	(CurrentStack *) Tcl_GetAssocData(interp, "tdom_stk", NULL);
 
-    if (csPtr == NULL) {
-	csPtr = (CurrentStack *) MALLOC(sizeof(CurrentStack));
-	csPtr->elementStack = NULL;
-	csPtr->currentSlot = NULL;
-	Tcl_SetAssocData(interp, "tdom_stk", StackFinalize, (ClientData) csPtr);
-    }
+    /* nodecmd_init() initialize "tdom_stk", so csPtr never will be NULL. */
 
     /*-------------------------------------------------------------------
     |   Reuse already allocated stack slots, if any
@@ -186,7 +181,7 @@ StackTop (Tcl_Interp *interp)
 static void
 StackFinalize (
     ClientData clientData,
-    Tcl_Interp *interp
+    Tcl_Interp *UNUSED(interp)
 ) {
     CurrentStack *csPtr = (CurrentStack *) clientData;
     StackSlot *tmp, *stack = csPtr->elementStack;
@@ -951,6 +946,17 @@ nodecmd_currentNode(Tcl_Interp *interp)
 {
     return StackTop(interp);
 }
+
+
+void
+nodecmd_init (Tcl_Interp *interp) 
+{
+    CurrentStack *csPtr = (CurrentStack *) MALLOC(sizeof(CurrentStack));
+    csPtr->elementStack = NULL;
+    csPtr->currentSlot = NULL;
+    Tcl_SetAssocData(interp, "tdom_stk", StackFinalize, (ClientData) csPtr);
+}
+
 
 /* EOF $RCSfile $ */
 

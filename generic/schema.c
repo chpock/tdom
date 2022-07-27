@@ -286,27 +286,8 @@ static char *Schema_Quant_Type2str[] = {
 };
 #endif
 
-#ifndef TCL_THREADS
-  static SchemaData *activeSchemaData = 0;
-# define GETASI activeSchemaData
-# define SETASI(v) activeSchemaData = v
-#else
-# ifndef SCHEMA_NO_TCL_ASSOC
-#  define GETASI (SchemaData*)Tcl_GetAssocData(interp, "tdom_schema", NULL);
-#  define SETASI(v) Tcl_SetAssocData (interp, "tdom_schema", NULL, v)
-# else 
-static Tcl_ThreadDataKey activeSchemaData;
-#  define GETASI  ((SchemaData*)Tcl_GetThreadData(&activeSchemaData,    \
-                                                     sizeof(SchemaData*))
-static void SetActiveSchemaData (SchemaData *v)
-{
-    SchemaData **schemaInfoPtr = Tcl_GetThreadData(&activeSchemaData,
-                                                        sizeof (SchemaData*));
-    *schemaInfoPtr = v;
-}
-#  define SETASI(v) SetActiveSchemaData (v)
-# endif
-#endif
+#define GETASI (SchemaData*)Tcl_GetAssocData(interp, "tdom_schema", NULL);
+#define SETASI(v) Tcl_SetAssocData (interp, "tdom_schema", NULL, v)
 
 #define CHECK_SI                                                        \
     if (!sdata) {                                                       \
@@ -9308,9 +9289,6 @@ tDOM_SchemaInit (
     Tcl_Interp *interp
     )
 {
-#ifdef SCHEMA_TCL_ASSOC
-    Tcl_SetAssocData (interp, "tdom_schema", NULL, NULL);
-#endif
     Tcl_CreateObjCommand (interp, "tdom::schema", tDOM_SchemaObjCmd,
                           NULL, NULL);
 

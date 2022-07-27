@@ -54,6 +54,9 @@ int nodecmd_processAttributes (Tcl_Interp    *interp,
 
 domNode * nodecmd_currentNode (Tcl_Interp *interp);
 
+void nodecmd_init (Tcl_Interp *interp);
+
+
 /* EOF $RCSfile $ */
 
 /* Emacs Setup Variables */

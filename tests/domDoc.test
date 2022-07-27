@@ -1247,6 +1247,73 @@ test domDoc-22.3 {appendFromScript} {
     expr {$nrOfNodeCmdsBefore == $nrOfNodeCmdsAfter}
 } {1}
 
+test domDoc-22.4 {nodeCmd called outside of *FromScript context} {
+    dom createNodeCmd elementNode e
+    catch e
+} 1
+
+test domDoc-22.5 {nodeCmd use in child interp while in nodeCmd context} {
+    set doc [dom createDocument this]
+    set root [$doc documentElement]
+    dom createNodeCmd elementNode thise
+    dom createNodeCmd textNode t
+
+    interp create childinterp
+    load {} tdom childinterp
+    childinterp eval {
+        dom createNodeCmd elementNode childe
+        dom createNodeCmd textNode t
+    }
+
+    set result [catch {$root appendFromScript {
+        thise {
+            childinterp eval {
+                childe {
+                    t "other"
+                }
+            }
+            t "some"
+        }
+    }}]
+    $doc delete
+    interp delete childinterp
+    set result
+} {1}
+
+test domDoc-22.6 {nodeCmd use in child interp while in nodeCmd context} {
+    set doc [dom createDocument this]
+    set root [$doc documentElement]
+    dom createNodeCmd elementNode thise
+    dom createNodeCmd textNode t
+
+    interp create childinterp
+    load {} tdom childinterp
+    childinterp eval {
+        dom createNodeCmd elementNode childe
+        dom createNodeCmd textNode t
+        set doc [dom createDocument child]
+        set root [$doc documentElement]
+    }
+
+    $root appendFromScript {
+        thise {
+            childinterp eval {
+                $root appendFromScript {
+                    childe {
+                        t "other"
+                    }
+                }
+            }
+            t "some"
+        }
+    }
+    set result [$doc asXML -indent none]
+    append result [childinterp eval {$doc asXML -indent none}]
+    $doc delete
+    interp delete childinterp
+    set result
+} {<this><thise>some</thise></this><child><childe>other</childe></child>}
+
 test domDoc-23.1 {getElementsByTagNameNS} {
     dom createNodeCmd elementNode child
 
