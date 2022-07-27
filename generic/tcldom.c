@@ -454,7 +454,7 @@ void tcldom_initialize(void)
 \---------------------------------------------------------------------------*/
 static void tcldom_findata(
     ClientData clientData,
-    Tcl_Interp *interp
+    Tcl_Interp *UNUSED(interp)
 )
 {
     ckfree((char *) clientData);

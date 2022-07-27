@@ -181,7 +181,7 @@ StackTop (Tcl_Interp *interp)
 static void
 StackFinalize (
     ClientData clientData,
-    Tcl_Interp *interp
+    Tcl_Interp *UNUSED(interp)
 ) {
     CurrentStack *csPtr = (CurrentStack *) clientData;
     StackSlot *tmp, *stack = csPtr->elementStack;
