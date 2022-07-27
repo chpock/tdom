@@ -10965,8 +10965,8 @@ test schema-28.1 {schema use in child interp while in schema context} {
     set result
 } 0
 
-
-test schema-28.2 {
+test schema-28.2 {called outside schema context} {
     catch {::tdom::schema::element elm}
 } 1
 
+}
