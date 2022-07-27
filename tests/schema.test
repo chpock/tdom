@@ -40,8 +40,8 @@ if {[join [lrange [split [package present Tcl] .] 0 1] .] <= 8.4} {
     testConstraint 8.5 false
     testConstraint listformat false
 } else {
-    testConstraint 8.5 false
-    testConstraint listformat false
+    testConstraint 8.5 true
+    testConstraint listformat true
 }
 
 proc dummycallback {args} {}
@@ -10942,7 +10942,6 @@ test schema-27.9 {duration outside schema context} {
 } {0 0 0 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0}
 
 test schema-28.1 {schema use in child interp while in schema context} {
-    
     tdom::schema s
     set result [catch {s defelement doc {
         interp create childinterp
@@ -10968,5 +10967,42 @@ test schema-28.1 {schema use in child interp while in schema context} {
 test schema-28.2 {called outside schema context} {
     catch {::tdom::schema::element elm}
 } 1
+
+test schema-28.3 {schema use in child interp while in schema context} {
+    tdom::schema s
+    s defelement doc {
+        interp create childinterp
+        load {} tdom childinterp
+        childinterp eval {
+            tdom::schema s
+            s defelement doc {
+                element child
+                element this
+            }
+        }        
+        element this
+    }
+    set result ""
+    foreach xml {
+        <doc><child/><this/></doc>
+        <doc><this/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    lappend result {*}[childinterp eval {
+        set result ""
+        foreach xml {
+            <doc><child/><this/></doc>
+            <doc><this/></doc>
+        } {
+            lappend result [s validate $xml]
+        }
+        set result
+        return {1 0}
+    }]
+    s delete
+    interp delete childinterp
+    set result
+} {0 1 1 0}
 
 }

@@ -1610,7 +1610,54 @@ test dom-7.19 {setNameCheck / createDocument} {
     dom setNameCheck 1
     set result
 } {<foo bar/>}
-    
+
+test dom-7.20 {set*Check, setStoreLineColumn and setObjectCommands in child interp} {
+    set storedNameCheck [dom setNameCheck]
+    set storedTextCheck [dom setTextCheck]
+    set storedLineColumn [dom setStoreLineColumn]
+    set storedObjectCommands [dom setObjectCommands]
+    dom setNameCheck 1
+    dom setTextCheck 1
+    dom setStoreLineColumn 0
+    dom setObjectCommands command
+    interp create childinterp
+    load {} tdom childinterp
+    childinterp eval {
+        dom setNameCheck 0
+        dom setTextCheck 0
+        dom setStoreLineColumn 1
+    }
+    set nrCommands [llength [info commands]]
+    set doc [dom parse {<doc>some</doc>}]
+    set result [expr {[llength [info commands]] - $nrCommands}]
+    lappend result [catch {$doc createElement "foo bar" node}]
+    lappend result [catch {$doc createTextNode "a\u0001z" textnode}]
+    lappend result [catch {[$doc documentElement] getLine}]
+    lappend result [catch {[$doc documentElement] getColumn}]
+    if {[catch {$doc delete}]} {
+        domDoc $doc delete
+    }
+    childinterp eval {
+        dom setObjectCommands token
+    }
+    dom setNameCheck $storedNameCheck
+    dom setTextCheck $storedTextCheck
+    dom setStoreLineColumn $storedLineColumn
+    dom setObjectCommands $storedObjectCommands
+    lappend result {*}[childinterp eval {
+        set nrCommands [llength [info commands]]
+        set doc [dom parse {<doc>some</doc>}]
+        set result [expr {[llength [info commands]] - $nrCommands}]
+        lappend result [catch {domDoc $doc createElement "foo bar" node}]
+        lappend result [catch {domDoc $doc createTextNode "a\u0001z" textnode}]
+        lappend result [catch {domNode [domDoc $doc documentElement] getLine}]
+        lappend result [catch {domNode [domDoc $doc documentElement] getColumn}]
+        domDoc $doc delete
+        set result
+    }]
+    interp delete childinterp
+    set result
+} {1 1 1 1 1 0 0 0 0 0}
 
 test dom-8.1 {createDocumentNode} {
     set result [catch {dom createDocumentNode foo bar}]
