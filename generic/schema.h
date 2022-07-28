@@ -200,6 +200,7 @@ typedef struct SchemaData_
     XML_Parser parser;
     domNode *node;
     domNode *insideNode;
+    domTextNode *textNode;
     unsigned int choiceHashThreshold;
     unsigned int attributeHashThreshold;
     char *wsbuf;

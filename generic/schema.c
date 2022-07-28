@@ -3404,6 +3404,8 @@ validateDOM (
 {
     char *ln;
     domNode *savednode, *savedinsideNode;
+    Tcl_Obj *str;
+    int rc;
 
     if (node->namespace) {
         if (node->ownerDocument->namespaces[node->namespace-1]->prefix[0] == '\0') {
@@ -3477,15 +3479,15 @@ validateDOM (
 
         case TEXT_NODE:
         case CDATA_SECTION_NODE:
-            Tcl_DStringAppend (sdata->cdata,
-                               ((domTextNode *) node)->nodeValue,
-                               ((domTextNode *) node)->valueLength);
-            if (tDOM_probeText (interp, sdata,
-                                Tcl_DStringValue (sdata->cdata), NULL) != TCL_OK) {
-                Tcl_DStringSetLength (sdata->cdata, 0);
+            str = Tcl_NewStringObj (((domTextNode *) node)->nodeValue,
+                                    ((domTextNode *) node)->valueLength);
+            sdata->textNode = (domTextNode *)node;
+            rc = tDOM_probeText (interp, sdata, Tcl_GetString (str), NULL);
+            Tcl_DecrRefCount (str);
+            sdata->textNode = NULL;
+            if (rc != TCL_OK) {
                 return TCL_ERROR;
             }
-            Tcl_DStringSetLength (sdata->cdata, 0);
             break;
 
         case COMMENT_NODE:
@@ -3559,6 +3561,7 @@ schemaReset (
     sdata->parser = NULL;
     sdata->node = NULL;
     sdata->insideNode = NULL;
+    sdata->textNode = NULL;
 }
 
 void
@@ -9208,16 +9211,89 @@ typeTCObjCmd (
     return TCL_OK;
 }
 
+static const char *jsonTextTypes[] = {
+    "NULL",
+    "TRUE",
+    "FALSE",
+    "STRING",
+    "NUMBER",
+    NULL
+};
+
+enum jsonTextType {
+    jt_null, jt_true, jt_false, jt_string, jt_number
+};
+
+typedef struct {
+    enum jsonTextType type;
+    SchemaData *sdata;
+} jsontypeTCData;
+
+static void
+jsontypeImplFree (
+    void *constraintData
+    )
+{
+    jsontypeTCData *cd = (jsontypeTCData *) constraintData;
+
+    FREE (cd);
+}
+
 static int
-json_ttTCObjCmdTCObjCmd (
-    ClientData clientData,
+jsontypeImpl (
+    Tcl_Interp *UNUSED(interp),
+    void *constraintData,
+    char *UNUSED(text)
+    )
+{
+    jsontypeTCData *cd = (jsontypeTCData *) constraintData;
+    domTextNode *textNode = cd->sdata->textNode;
+
+    if (!textNode) {
+        return 1;
+    }
+    switch (cd->type) {
+    case jt_null:
+        return textNode->info == JSON_NULL ? 1 : 0;
+    case jt_true:
+        return textNode->info == JSON_TRUE ? 1 : 0;
+    case jt_false:
+        return textNode->info == JSON_FALSE ? 1 : 0;
+    case jt_string:
+        return textNode->info == JSON_STRING ? 1 : 0;
+    case jt_number:
+        return textNode->info == JSON_NUMBER ? 1 : 0;
+    }
+    return 0;
+}
+
+static int
+jsontypeTCObjCmd (
+    ClientData UNUSED(clientData),
     Tcl_Interp *interp,
     int objc,
-    Tcl_Obj objv[]
+    Tcl_Obj *const objv[]
     )
 {
     SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+    int jsonType;
+    jsontypeTCData *cd;
     
+    CHECK_TI
+    checkNrArgs (2,2,"Expected: <JSON type>");
+    if (Tcl_GetIndexFromObj (interp, objv[1], jsonTextTypes, "jsonType",
+                             1, &jsonType) != TCL_OK) {
+        return TCL_ERROR;
+    }
+    cd = TMALLOC (jsontypeTCData);
+    cd->sdata = sdata;
+    cd->type = jsonType;
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = jsontypeImpl;
+    sc->constraintData = cd;
+    sc->freeData = jsontypeImplFree;
+    return TCL_OK;
 }
 
 static int
@@ -9451,23 +9527,8 @@ tDOM_SchemaInit (
                           lengthTCObjCmd, (ClientData) 3, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::type",
                           typeTCObjCmd, NULL, NULL);
-
-    /* The json text type tests*/
-    Tcl_CreateObjCommand (interp,"tdom::schema::text::json_null",
-                          json_typeTCObjCmdTCObjCmd, (ClientData) JSON_NULL,
-                          NULL);
-    Tcl_CreateObjCommand (interp,"tdom::schema::text::json_null",
-                          json_typeTCObjCmdTCObjCmd, (ClientData) JSON_TRUE,
-                          NULL);
-    Tcl_CreateObjCommand (interp,"tdom::schema::text::json_null",
-                          json_typeTCObjCmdTCObjCmd, (ClientData) JSON_FALSE,
-                          NULL);
-    Tcl_CreateObjCommand (interp,"tdom::schema::text::json_null",
-                          json_typeTCObjCmdTCObjCmd, (ClientData) JSON_STRING,
-                          NULL);
-    Tcl_CreateObjCommand (interp,"tdom::schema::text::json_null",
-                          json_typeTCObjCmdTCObjCmd, (ClientData) JSON_NUMBER,
-                          NULL);
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::jsontype",
+                          jsontypeTCObjCmd, NULL, NULL);
     
     /* Exposed text type commands */
     Tcl_CreateObjCommand (interp,"tdom::type::date",

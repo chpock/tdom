@@ -29,6 +29,7 @@
 #    schema-26.*: info domNode
 #    schema-27.*: Text constraint commands available outsite schema context
 #    schema-28,*: tdom and interp
+#    schema-29.*: text constrain jsontype
 #
 # Copyright (c) 2018-2022 Rolf Ade.
 
@@ -11006,3 +11007,38 @@ test schema-28.3 {schema use in child interp while in schema context} {
 } {0 1 1 0}
 
 }
+test schema-29.1 {text constrain jsontype} {
+    tdom::schema s
+    s defelement JSON {
+        element astring {text {jsontype STRING}}
+        element anumber {text {jsontype NUMBER}}
+        element atrue {text {jsontype TRUE}}
+        element afalse {text {jsontype FALSE}}
+        element anull {text {jsontype NULL}}
+    }
+
+    set result ""
+    foreach json {
+        {{
+            "astring": "0.123",
+            "anumber": 0.123,
+            "atrue": true,
+            "afalse": false,
+            "anull": null
+        }}
+        {{
+            "astring": "0.123",
+            "anumber": "0.123",
+            "atrue": true,
+            "afalse": false,
+            "anull": null
+        }}
+    } {        
+        set jdoc [dom parse -json -jsonroot JSON $json]
+        lappend result [s domvalidate [$jdoc documentElement]]
+        $jdoc delete
+    }
+    s delete
+    set result
+} {1 0}
+            
