@@ -11006,7 +11006,6 @@ test schema-28.3 {schema use in child interp while in schema context} {
     set result
 } {0 1 1 0}
 
-}
 test schema-29.1 {text constrain jsontype} {
     tdom::schema s
     s defelement JSON {
@@ -11049,6 +11048,7 @@ test schema-29.2 {text constrain jsontype} {
         defelement JSON {
             element astring {text type jsonString}
             element anumber {text type jsonNumber}
+        }
     }
     set result ""
     foreach json {
@@ -11069,3 +11069,4 @@ test schema-29.2 {text constrain jsontype} {
     set result
 } {1 0}
 
+}

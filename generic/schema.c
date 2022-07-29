@@ -6433,7 +6433,8 @@ AttributePatternObjCmd (
     CHECK_TOPLEVEL
 
     if (sdata->cp->type != SCHEMA_CTYPE_NAME) {
-        SetResult ("The commands attribute and nsattribute are only allowed toplevel in element definition scripts");
+        SetResult ("The commands attribute and nsattribute are only allowed "
+                   "toplevel in element definition scripts");
         return TCL_ERROR;
     }
     if (clientData) {
@@ -6783,6 +6784,44 @@ domxpathbooleanPatternObjCmd (
     return TCL_OK;
 }
 
+static const char *jsonStructTypes[] = {
+    "NONE",
+    "OBJECT",
+    "ARRAY",
+    NULL
+};
+
+enum jsonStructType {
+    jt_none, jt_object, jt_array
+};
+
+static int
+jsontypePatternObjCmd (
+    ClientData UNUSED(clientData),
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    int jsonType; 
+
+    CHECK_SI
+    CHECK_TOPLEVEL
+    if (sdata->cp->type != SCHEMA_CTYPE_NAME) {
+        SetResult ("The command jsontype is only allowed toplevel in element "
+                   "definition scripts");
+        return TCL_ERROR;
+    }
+    checkNrArgs (2,2,"Expected: <JSON type>");
+    if (Tcl_GetIndexFromObj (interp, objv[1], jsonStructTypes, "jsonType",
+                             1, &jsonType) != TCL_OK) {
+        return TCL_ERROR;
+    }
+    
+    return TCL_OK;
+}
+    
 static int
 keyspacePatternObjCmd (
     ClientData UNUSED(clientData),
@@ -9425,6 +9464,10 @@ tDOM_SchemaInit (
                           domuniquePatternObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::domxpathboolean",
                           domxpathbooleanPatternObjCmd, NULL, NULL);
+
+    /* JSON types for DOM validation */
+    Tcl_CreateObjCommand (interp,"tdom::schema::jsontype",
+                          jsontypePatternObjCmd, NULL, NULL);
 
     /* Local key constraints */
     Tcl_CreateObjCommand (interp, "tdom::schema::keyspace",
