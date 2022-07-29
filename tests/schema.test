@@ -11114,4 +11114,53 @@ test schema-29.3 {structure constraint jsontype} {
     set result
 } {1 0}
 
+test schema-29.4 {structure constraint jsontype} {
+    tdom::schema s
+    s define {
+        defelement JSON {
+            element aobject {jsontype ARRAY}
+        }
+    }
+    set result ""
+    foreach json {
+        {{
+            "aobject": {}
+        }}
+        {{
+            "aobject": []
+        }}
+    } {
+        set jdoc [dom parse -json -jsonroot JSON $json]
+        lappend result [s domvalidate [$jdoc documentElement]]
+        $jdoc delete
+    }
+    s delete
+    set result
+} {0 1}
+
+test schema-29.5 {structure constraint jsontype} {
+    tdom::schema s
+    s define {
+        defelement JSON {
+            element aobject type jsonarry
+        }
+        defelementtype jsonarry {jsontype ARRAY}
+    }
+    set result ""
+    foreach json {
+        {{
+            "aobject": {}
+        }}
+        {{
+            "aobject": []
+        }}
+    } {
+        set jdoc [dom parse -json -jsonroot JSON $json]
+        lappend result [s domvalidate [$jdoc documentElement]]
+        $jdoc delete
+    }
+    s delete
+    set result
+} {0 0}
+
 }

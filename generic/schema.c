@@ -2575,7 +2575,7 @@ static int checkElementEnd (
                 else return 0;
 
             case SCHEMA_CTYPE_JSON_STRUCT:
-                if (checkJsonStructType (interp, sdata, cp)) break;
+                if (checkJsonStructType (interp, sdata, cp->content[ac])) break;
                 else return 0;
                 
             case SCHEMA_CTYPE_PATTERN:
