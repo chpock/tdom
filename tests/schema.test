@@ -11016,7 +11016,6 @@ test schema-29.1 {text constrain jsontype} {
         element afalse {text {jsontype FALSE}}
         element anull {text {jsontype NULL}}
     }
-
     set result ""
     foreach json {
         {{
@@ -11041,4 +11040,32 @@ test schema-29.1 {text constrain jsontype} {
     s delete
     set result
 } {1 0}
-            
+
+test schema-29.2 {text constrain jsontype} {
+    tdom::schema s
+    s define {
+        deftexttype jsonString {jsontype STRING}
+        deftexttype jsonNumber {jsontype NUMBER}
+        defelement JSON {
+            element astring {text type jsonString}
+            element anumber {text type jsonNumber}
+    }
+    set result ""
+    foreach json {
+        {{
+            "astring": "0.123",
+            "anumber": 0.123
+        }}
+        {{
+            "astring": "0.123",
+            "anumber": "0.123"
+        }}
+    } {        
+        set jdoc [dom parse -json -jsonroot JSON $json]
+        lappend result [s domvalidate [$jdoc documentElement]]
+        $jdoc delete
+    }
+    s delete
+    set result
+} {1 0}
+
