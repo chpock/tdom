@@ -6711,10 +6711,6 @@ test schema-14.62 {Empty element} {
 test schema-14.63 {type} {
     tdom::schema s
     s define {
-        deftexttype len2-4 {
-            minLength 2
-            maxLength 4
-        }
         defelement doc {
             element e + {
                 text {
@@ -6722,6 +6718,10 @@ test schema-14.63 {type} {
                     integer
                 }
             }
+        }
+        deftexttype len2-4 {
+            minLength 2
+            maxLength 4
         }
     }
     set result [list]
@@ -11006,7 +11006,7 @@ test schema-28.3 {schema use in child interp while in schema context} {
     set result
 } {0 1 1 0}
 
-test schema-29.1 {text constrain jsontype} {
+test schema-29.1 {text constraint jsontype} {
     tdom::schema s
     s defelement JSON {
         element astring {text {jsontype STRING}}
@@ -11040,15 +11040,15 @@ test schema-29.1 {text constrain jsontype} {
     set result
 } {1 0}
 
-test schema-29.2 {text constrain jsontype} {
+test schema-29.2 {text constraint jsontype} {
     tdom::schema s
     s define {
-        deftexttype jsonString {jsontype STRING}
-        deftexttype jsonNumber {jsontype NUMBER}
         defelement JSON {
             element astring {text type jsonString}
             element anumber {text type jsonNumber}
         }
+        deftexttype jsonString {jsontype STRING}
+        deftexttype jsonNumber {jsontype NUMBER}
     }
     set result ""
     foreach json {
@@ -11063,6 +11063,51 @@ test schema-29.2 {text constrain jsontype} {
     } {        
         set jdoc [dom parse -json -jsonroot JSON $json]
         lappend result [s domvalidate [$jdoc documentElement]]
+        $jdoc delete
+    }
+    s delete
+    set result
+} {1 0}
+
+test schema-29.3 {structure constraint jsontype} {
+    tdom::schema s
+    s define {
+        defelement JSON {
+            element aarray {
+                jsontype ARRAY
+                text {jsontype STRING}
+                text {jsontype NUMBER}
+            }
+            element aobject {
+                jsontype OBJECT
+                interleave {
+                    element astring {text type jsonString}
+                    element anumber {text type jsonNumber}
+                }
+            }
+        }
+        deftexttype jsonString {jsontype STRING}
+        deftexttype jsonNumber {jsontype NUMBER}
+    }
+    set result ""
+    foreach json {
+        {{
+            "aarray": ["some text", -23.45],
+            "aobject": {
+                "anumber": 3,
+                "astring": "foo bar"
+            }
+        }}
+        {{
+            "aarray": {"some key": -23.45},
+            "aobject": {
+                "anumber": 3,
+                "astring": "foo bar"
+            }
+        }}
+    } {
+        set jdoc [dom parse -json -jsonroot JSON $json]
+        lappend result [s domvalidate [$jdoc documentElement] errMsg]
         $jdoc delete
     }
     s delete

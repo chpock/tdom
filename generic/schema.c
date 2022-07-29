@@ -207,6 +207,17 @@ typedef enum {
     VALIDATE_CHANNEL
 } ValidationInput;
 
+static const char *jsonStructTypes[] = {
+    "NONE",
+    "OBJECT",
+    "ARRAY",
+    NULL
+};
+
+typedef enum {
+    jt_none, jt_object, jt_array
+} jsonStructType;
+
 /*----------------------------------------------------------------------------
 |   Recovering related flage
 |
@@ -274,7 +285,8 @@ static char *Schema_CP_Type2str[] = {
     "TEXT",
     "VIRTUAL",
     "KEYSPACE_START",
-    "KEYSPACE_END"
+    "KEYSPACE_END",
+    "JSON_STRUCT_TYPE"
 };
 static char *Schema_Quant_Type2str[] = {
     "ONE",
@@ -457,6 +469,7 @@ initSchemaCP (
         pattern->namespace = namespace;
         break;
     case SCHEMA_CTYPE_VIRTUAL:
+    case SCHEMA_CTYPE_JSON_STRUCT:
         /* Do nothing */
         break;
     }
@@ -507,11 +520,12 @@ static void serializeCP (
         }
         if (pattern->typedata) {
             fprintf (stderr, "\t%d namespaces\n",
-                     (Tcl_HashTable*)pattern->typedata->numEntries);
+                     ((Tcl_HashTable*)pattern->typedata)->numEntries);
         }            
         break;
     case SCHEMA_CTYPE_TEXT:
     case SCHEMA_CTYPE_VIRTUAL:
+    case SCHEMA_CTYPE_JSON_STRUCT:
         /* Do nothing */
         break;
     }
@@ -619,7 +633,7 @@ static void freeSchemaCP (
             FREE (pattern->attrs);
         }
         freedomKeyConstraints (pattern->domKeys);
-        if (pattern->typedata) {
+        if (pattern->type != SCHEMA_CTYPE_JSON_STRUCT && pattern->typedata) {
             Tcl_DeleteHashTable ((Tcl_HashTable *) pattern->typedata);
             FREE (pattern->typedata);
         }
@@ -1409,6 +1423,37 @@ recursivePattern (
 }
 
 static int
+checkJsonStructType (
+    Tcl_Interp *interp,
+    SchemaData *sdata,
+    SchemaCP *cp
+    )
+{
+    jsonStructType jsonType;
+
+    if (!sdata->insideNode) return 1;
+    jsonType = (intptr_t) cp->typedata;
+    switch (jsonType) {
+    case jt_none:
+        if (sdata->insideNode->info > 0
+            && sdata->insideNode->info < 8) return 0;
+        break;
+    case jt_object:
+        if (sdata->insideNode->info != JSON_OBJECT) return 0;
+        break;
+    case jt_array:
+        if (sdata->insideNode->info != JSON_ARRAY) return 0;
+        break;
+    default:
+        SetResult ("Internal error: invalid JSON structure type!");
+        sdata->evalError = 1;
+        return 0;
+    }
+    return 1;
+}
+
+
+static int
 matchingAny (
     char *namespace,
     SchemaCP *candidate
@@ -1602,6 +1647,10 @@ matchElementStart (
                         sdata->evalError = 1;
                         return 0;
                         
+                    case SCHEMA_CTYPE_JSON_STRUCT:
+                        SetResult ("JSON structure constrain in MIXED or CHOICE");
+                        sdata->evalError = 1;
+                        return 0;
                     }
                     if (!mayskip && mayMiss (candidate->quants[i]))
                         mayskip = 1;
@@ -1614,6 +1663,12 @@ matchElementStart (
                     break;
                 }
                 else return 0;
+
+            case SCHEMA_CTYPE_JSON_STRUCT:
+                if (!checkJsonStructType (interp, sdata, candidate)) return 0;
+                ac++;
+                hm = 0;
+                continue;
 
             case SCHEMA_CTYPE_PATTERN:
                 if (recursivePattern (se, candidate)) {
@@ -1692,6 +1747,7 @@ matchElementStart (
     case SCHEMA_CTYPE_CHOICE:
     case SCHEMA_CTYPE_TEXT:
     case SCHEMA_CTYPE_ANY:
+    case SCHEMA_CTYPE_JSON_STRUCT:
         /* Never pushed onto stack */
         SetResult ("Invalid CTYPE onto the validation stack!");
         sdata->evalError = 1;
@@ -1773,6 +1829,10 @@ matchElementStart (
                 sdata->evalError = 1;
                 return 0;
 
+            case SCHEMA_CTYPE_JSON_STRUCT:
+                SetResult ("JSON structure constraint child of INTERLEAVE");
+                sdata->evalError = 1;
+                return 0;
             }
             if (!thismayskip && minOne (cp->quants[i])) mayskip = 0;
         }
@@ -2358,8 +2418,8 @@ int probeEventAttribute (
 
 /* Returns either -1, 0, 1, 2
 
-   -1 means a pattern or an interleave ended may end, look further at
-   parents next sibling.
+   -1 means a pattern or an interleave ended without error, look
+   further at parents next sibling.
 
    0 means rewind with validation error.
 
@@ -2490,6 +2550,7 @@ static int checkElementEnd (
                     case SCHEMA_CTYPE_KEYSPACE_END:
                     case SCHEMA_CTYPE_KEYSPACE:
                     case SCHEMA_CTYPE_VIRTUAL:
+                    case SCHEMA_CTYPE_JSON_STRUCT:
                     case SCHEMA_CTYPE_CHOICE:
                         SetResult ("Invalid CTYPE in MIXED or CHOICE");
                         sdata->evalError = 1;
@@ -2511,6 +2572,10 @@ static int checkElementEnd (
                 
             case SCHEMA_CTYPE_VIRTUAL:
                 if (evalVirtual (interp, sdata, ac)) break;
+                else return 0;
+
+            case SCHEMA_CTYPE_JSON_STRUCT:
+                if (checkJsonStructType (interp, sdata, cp)) break;
                 else return 0;
                 
             case SCHEMA_CTYPE_PATTERN:
@@ -2571,6 +2636,7 @@ static int checkElementEnd (
     case SCHEMA_CTYPE_CHOICE:
     case SCHEMA_CTYPE_TEXT:
     case SCHEMA_CTYPE_ANY:
+    case SCHEMA_CTYPE_JSON_STRUCT:
         /* Never pushed onto stack */
         SetResult ("Invalid CTYPE onto the validation stack!");
         sdata->evalError = 1;
@@ -2806,6 +2872,11 @@ matchText (
                             sdata->evalError = 1;
                             return 0;
                             
+                        case SCHEMA_CTYPE_JSON_STRUCT:
+                            SetResult ("JSON structure constrain in MIXED or"
+                                       " CHOICE");
+                            sdata->evalError = 1;
+                            return 0;
                         }
                     }
                     if (mustMatch (cp->quants[ac], hm)) {
@@ -2844,6 +2915,13 @@ matchText (
                     if (!evalVirtual (interp, sdata, ac)) return 0;
                     break;
 
+                case SCHEMA_CTYPE_JSON_STRUCT:
+                    if (checkJsonStructType (interp, sdata, candidate)) {
+                        ac++;
+                        continue;
+                    }
+                    else return 0;
+                    
                 case SCHEMA_CTYPE_KEYSPACE:
                     if (!cp->content[ac]->keySpace->active) {
                         Tcl_InitHashTable (&cp->content[ac]->keySpace->ids,
@@ -2902,6 +2980,7 @@ matchText (
         case SCHEMA_CTYPE_KEYSPACE:
         case SCHEMA_CTYPE_KEYSPACE_END:
         case SCHEMA_CTYPE_VIRTUAL:
+        case SCHEMA_CTYPE_JSON_STRUCT:
         case SCHEMA_CTYPE_CHOICE:
         case SCHEMA_CTYPE_TEXT:
         case SCHEMA_CTYPE_ANY:
@@ -2962,6 +3041,11 @@ matchText (
                 case SCHEMA_CTYPE_VIRTUAL:
                     break;
                     
+                case SCHEMA_CTYPE_JSON_STRUCT:
+                    SetResult ("JSON structure constraint child of"
+                               "INTERLEAVE");
+                    sdata->evalError = 1;
+                    return 0;
                 }
             }
             if (!mayskip) {
@@ -3972,6 +4056,7 @@ getNextExpectedWorker (
                         return 0;
 
                     case SCHEMA_CTYPE_VIRTUAL:
+                    case SCHEMA_CTYPE_JSON_STRUCT:
                     case SCHEMA_CTYPE_KEYSPACE:
                     case SCHEMA_CTYPE_KEYSPACE_END:
                         break;
@@ -3980,6 +4065,7 @@ getNextExpectedWorker (
                 break;
 
             case SCHEMA_CTYPE_VIRTUAL:
+            case SCHEMA_CTYPE_JSON_STRUCT:
             case SCHEMA_CTYPE_KEYSPACE:
             case SCHEMA_CTYPE_KEYSPACE_END:
                 mayskip = 1;
@@ -4015,6 +4101,7 @@ getNextExpectedWorker (
     case SCHEMA_CTYPE_CHOICE:
     case SCHEMA_CTYPE_TEXT:
     case SCHEMA_CTYPE_VIRTUAL:
+    case SCHEMA_CTYPE_JSON_STRUCT:
     case SCHEMA_CTYPE_KEYSPACE:
     case SCHEMA_CTYPE_KEYSPACE_END:
         SetResult ("Invalid CTYPE onto the validation stack!");
@@ -6546,7 +6633,7 @@ TextPatternObjCmd  (
     SchemaQuant quant = SCHEMA_CQUANT_OPT;
     SchemaCP *pattern;
     Tcl_HashEntry *h;
-    int result = TCL_OK;
+    int hnew, result = TCL_OK;
 
     CHECK_SI
     CHECK_TOPLEVEL
@@ -6562,10 +6649,15 @@ TextPatternObjCmd  (
             SetResult ("Expected: ?<definition script>? | type <name>");
             return TCL_ERROR;
         }
-        h = Tcl_FindHashEntry (&sdata->textDef, Tcl_GetString (objv[2]));
-        if (!h) {
-            SetResult3 ("Unknown text type \"", Tcl_GetString (objv[2]), "\"");
-            return TCL_ERROR;
+        h = Tcl_CreateHashEntry (&sdata->textDef, Tcl_GetString (objv[2]),
+                                 &hnew);
+        if (hnew) {
+            pattern = initSchemaCP (SCHEMA_CTYPE_CHOICE, NULL, NULL);
+            pattern->type = SCHEMA_CTYPE_TEXT;
+            REMEMBER_PATTERN (pattern)
+                pattern->flags |= FORWARD_PATTERN_DEF;
+            sdata->forwardPatternDefs++;
+            Tcl_SetHashValue (h, pattern);
         }
         quant = SCHEMA_CQUANT_ONE;
         pattern = (SchemaCP *) Tcl_GetHashValue (h);
@@ -6784,17 +6876,6 @@ domxpathbooleanPatternObjCmd (
     return TCL_OK;
 }
 
-static const char *jsonStructTypes[] = {
-    "NONE",
-    "OBJECT",
-    "ARRAY",
-    NULL
-};
-
-enum jsonStructType {
-    jt_none, jt_object, jt_array
-};
-
 static int
 jsontypePatternObjCmd (
     ClientData UNUSED(clientData),
@@ -6805,6 +6886,7 @@ jsontypePatternObjCmd (
 {
     SchemaData *sdata = GETASI;
     int jsonType; 
+    SchemaCP *pattern;
 
     CHECK_SI
     CHECK_TOPLEVEL
@@ -6818,7 +6900,10 @@ jsontypePatternObjCmd (
                              1, &jsonType) != TCL_OK) {
         return TCL_ERROR;
     }
-    
+    pattern = initSchemaCP (SCHEMA_CTYPE_JSON_STRUCT, NULL, NULL);
+    pattern->typedata = (void *) (intptr_t) jsonType;
+    REMEMBER_PATTERN (pattern);
+    addToContent (sdata, pattern, SCHEMA_CQUANT_ONE, 0, 0);
     return TCL_OK;
 }
     
@@ -9465,7 +9550,7 @@ tDOM_SchemaInit (
     Tcl_CreateObjCommand (interp,"tdom::schema::domxpathboolean",
                           domxpathbooleanPatternObjCmd, NULL, NULL);
 
-    /* JSON types for DOM validation */
+    /* JSON structure types for DOM validation */
     Tcl_CreateObjCommand (interp,"tdom::schema::jsontype",
                           jsontypePatternObjCmd, NULL, NULL);
 
