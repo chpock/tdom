@@ -1694,6 +1694,8 @@ matchElementStart (
                         if (!recover (interp, sdata,
                                       INVALID_KEYREF_MATCH_START, name,
                                       namespace, NULL, ac)) {
+                            SetResultV ("Invalid key ref.");
+                            sdata->evalError = 1;
                             return 0;
                         }
                         candidate->keySpace->unknownIDrefs = 0;
@@ -2478,6 +2480,8 @@ static int checkElementEnd (
                         if (!recover (interp, sdata, INVALID_KEYREF_MATCH_END,
                                       NULL, NULL,
                                       cp->content[ac]->keySpace->name, 0)) {
+                            SetResultV ("Invalid key ref.");
+                            sdata->evalError = 1;
                             return 0;
                         }
                         cp->content[ac]->keySpace->unknownIDrefs = 0;
@@ -2941,6 +2945,8 @@ matchText (
                                           INVALID_KEYREF_MATCH_TEXT, NULL,
                                           NULL, text, ac)) {
                                 return 0;
+                                SetResultV ("Invalid key ref.");
+                                sdata->evalError = 1;
                             }
                             cp->content[ac]->keySpace->unknownIDrefs = 0;
                         }

@@ -9783,6 +9783,7 @@ proc postValidation {g xml} {
     return $rc
 }
 
+puts "HIER $errMsg"
 test schema-19.1 {keyspace} {
     tdom::schema s
     s define {
@@ -9807,7 +9808,9 @@ test schema-19.1 {keyspace} {
         {<doc><items><item ref="1"/><item ref="foo"/></items><items><item ref="2"/><item ref="bar"/></items></doc>}
         {<doc><items><item ref="1"/><item ref="foo"/></items><items><item ref="bar"/><item ref="bar"/></items></doc>}
     } {
-        lappend result [s validate $xml]
+        set errMsg ""
+        lappend result [s validate $xml errMsg]
+        puts $errMsg
     }
     s delete
     set result
@@ -11143,6 +11146,7 @@ test schema-29.5 {structure constraint jsontype} {
     s define {
         defelement JSON {
             element aobject type jsonarry
+            jsontype OBJECT
         }
         defelementtype jsonarry {jsontype ARRAY}
     }
@@ -11161,6 +11165,6 @@ test schema-29.5 {structure constraint jsontype} {
     }
     s delete
     set result
-} {0 0}
+} {0 1}
 
 }
