@@ -11160,7 +11160,8 @@ test schema-29.5 {structure constraint jsontype} {
         }}
     } {
         set jdoc [dom parse -json -jsonroot JSON $json]
-        lappend result [s domvalidate [$jdoc documentElement]]
+        lappend result [s domvalidate [$jdoc documentElement] errMsg]
+        puts $errMsg
         $jdoc delete
     }
     s delete

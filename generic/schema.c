@@ -176,7 +176,10 @@ typedef enum {
     UNKNOWN_GLOBAL_ID,
     UNKNOWN_ID,
     INVALID_ATTRIBUTE_VALUE,
-    INVALID_VALUE
+    INVALID_VALUE,
+    INVALID_JSON_TYPE_MATCH_START,
+    INVALID_JSON_TYPE_MATCH_END,
+    INVALID_JSON_TYPE_MATCH_TEXT
 } ValidationErrorType;
 
 static char *ValidationErrorType2str[] = {
@@ -198,7 +201,10 @@ static char *ValidationErrorType2str[] = {
     "UNKNOWN_GLOBAL_ID",
     "UNKNOWN_ID",
     "INVALID_ATTRIBUTE_VALUE",
-    "INVALID_VALUE"
+    "INVALID_VALUE",
+    "INVALID_JSON_TYPE",
+    "INVALID_JSON_TYPE",
+    "INVALID_JSON_TYPE"
 };
 
 typedef enum {
@@ -1251,9 +1257,21 @@ recover (
     case UNEXPECTED_ELEMENT:
         sdata->vaction = MATCH_ELEMENT_START;
         break;
+    case INVALID_JSON_TYPE_MATCH_START:
+        sdata->vaction = MATCH_ELEMENT_START;
+        if (sdata->stack) {
+            se = sdata->stack;
+            while (se->pattern->type != SCHEMA_CTYPE_NAME) {
+                se = se->down;
+            }
+            sdata->vname = se->pattern->name;
+            sdata->vns = se->pattern->namespace;
+        }
+        break;
     case MISSING_TEXT_MATCH_END:
     case INVALID_KEYREF_MATCH_END:
     case MISSING_ELEMENT_MATCH_END:
+    case INVALID_JSON_TYPE_MATCH_END:
         if (sdata->stack) {
             se = sdata->stack;
             while (se->pattern->type != SCHEMA_CTYPE_NAME) {
@@ -1269,6 +1287,7 @@ recover (
         break;
     case INVALID_KEYREF_MATCH_TEXT:
     case INVALID_VALUE:
+    case INVALID_JSON_TYPE_MATCH_TEXT:
         if (sdata->stack) {
             se = sdata->stack;
             while (se->pattern->type != SCHEMA_CTYPE_NAME) {
@@ -1351,6 +1370,9 @@ recover (
     case UNKNOWN_ID:
     case INVALID_ATTRIBUTE_VALUE:
     case INVALID_VALUE:
+    case INVALID_JSON_TYPE_MATCH_START:
+    case INVALID_JSON_TYPE_MATCH_END:
+    case INVALID_JSON_TYPE_MATCH_TEXT:
         break;
     }
     return 1;
@@ -1436,13 +1458,13 @@ checkJsonStructType (
     switch (jsonType) {
     case jt_none:
         if (sdata->insideNode->info > 0
-            && sdata->insideNode->info < 8) return 0;
+            && sdata->insideNode->info < 8) goto error;
         break;
     case jt_object:
-        if (sdata->insideNode->info != JSON_OBJECT) return 0;
+        if (sdata->insideNode->info != JSON_OBJECT) goto error;
         break;
     case jt_array:
-        if (sdata->insideNode->info != JSON_ARRAY) return 0;
+        if (sdata->insideNode->info != JSON_ARRAY) goto error;
         break;
     default:
         SetResult ("Internal error: invalid JSON structure type!");
@@ -1450,6 +1472,8 @@ checkJsonStructType (
         return 0;
     }
     return 1;
+error:
+    if (!recover (interp, sdata, 
 }
 
 
@@ -1665,7 +1689,13 @@ matchElementStart (
                 else return 0;
 
             case SCHEMA_CTYPE_JSON_STRUCT:
-                if (!checkJsonStructType (interp, sdata, candidate)) return 0;
+                if (!checkJsonStructType (interp, sdata, candidate)) {
+                    if (!recover (interp, sdata, INVALID_JSON_TYPE_MATCH_START,
+                                  name, namespace, NULL, ac)) {
+                    sdata->evalError = 1;
+                    SetResult ("Wrong JSON type");
+                    return 0;
+                };
                 ac++;
                 hm = 0;
                 continue;
@@ -2579,8 +2609,12 @@ static int checkElementEnd (
                 else return 0;
 
             case SCHEMA_CTYPE_JSON_STRUCT:
-                if (checkJsonStructType (interp, sdata, cp->content[ac])) break;
-                else return 0;
+                if (!checkJsonStructType (interp, sdata, cp->content[ac])) {
+                    sdata->evalError = 1;
+                    SetResult ("Wrong JSON type");
+                    return 0;
+                }
+                break;
                 
             case SCHEMA_CTYPE_PATTERN:
                 if (recursivePattern (se, cp->content[ac])) {
@@ -2924,7 +2958,9 @@ matchText (
                         ac++;
                         continue;
                     }
-                    else return 0;
+                    sdata->evalError = 1;
+                    SetResult ("Wrong JSON type");
+                    return 0;
                     
                 case SCHEMA_CTYPE_KEYSPACE:
                     if (!cp->content[ac]->keySpace->active) {
