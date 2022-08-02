@@ -1448,10 +1448,14 @@ static int
 checkJsonStructType (
     Tcl_Interp *interp,
     SchemaData *sdata,
-    SchemaCP *cp
+    SchemaCP *cp,
+    ValidationErrorType errorType,
+    int ac
     )
 {
     jsonStructType jsonType;
+    char *str;
+    Tcl_Obj *strObj;
 
     if (!sdata->insideNode) return 1;
     jsonType = (intptr_t) cp->typedata;
@@ -1473,7 +1477,17 @@ checkJsonStructType (
     }
     return 1;
 error:
-    if (!recover (interp, sdata, 
+    if (!recover (interp, sdata, errorType, sdata->insideNode->nodeName,
+                  domNamespaceURI(sdata->insideNode), NULL, ac)) {
+        str = xpathNodeToXPath (sdata->insideNode, 0);
+        strObj = Tcl_NewStringObj (str, -1);
+        Tcl_AppendStringsToObj (strObj, ": Wrong JSON type", NULL);
+        Tcl_SetObjResult (interp, strObj);
+        FREE (str);
+        sdata->evalError = 2;
+        return 0;
+    }
+    return 1;
 }
 
 
@@ -1673,7 +1687,7 @@ matchElementStart (
                         
                     case SCHEMA_CTYPE_JSON_STRUCT:
                         SetResult ("JSON structure constrain in MIXED or CHOICE");
-                        sdata->evalError = 1;
+                        sdata->evalError = 2;
                         return 0;
                     }
                     if (!mayskip && mayMiss (candidate->quants[i]))
@@ -1689,11 +1703,8 @@ matchElementStart (
                 else return 0;
 
             case SCHEMA_CTYPE_JSON_STRUCT:
-                if (!checkJsonStructType (interp, sdata, candidate)) {
-                    if (!recover (interp, sdata, INVALID_JSON_TYPE_MATCH_START,
-                                  name, namespace, NULL, ac)) {
-                    sdata->evalError = 1;
-                    SetResult ("Wrong JSON type");
+                if (!checkJsonStructType (interp, sdata, candidate,
+                                          INVALID_JSON_TYPE_MATCH_START, ac)) {
                     return 0;
                 };
                 ac++;
@@ -1725,7 +1736,7 @@ matchElementStart (
                                       INVALID_KEYREF_MATCH_START, name,
                                       namespace, NULL, ac)) {
                             SetResultV ("Invalid key ref.");
-                            sdata->evalError = 1;
+                            sdata->evalError = 2;
                             return 0;
                         }
                         candidate->keySpace->unknownIDrefs = 0;
@@ -2121,6 +2132,7 @@ int probeAttribute (
                               ns, value, 0)) {
                     SetResult3V ("Attribute value doesn't match for "
                                  "attribute '", name , "'");
+                    sdata->evalError = 2;
                     return 0;
                 }
             }
@@ -2137,6 +2149,7 @@ int probeAttribute (
                                   ns, value, i)) {
                         SetResult3V ("Attribute value doesn't match for "
                                     "attribute '", name , "'");
+                        sdata->evalError = 2;
                         return 0;
                     }
                 }
@@ -2188,6 +2201,9 @@ int tDOM_probeAttributes (
             ns = Tcl_GetHashKey (&sdata->namespace, h);
         }
         found = probeAttribute (interp, sdata, ln, ns, atPtr[1], &req);
+        if (sdata->evalError) {
+            return TCL_ERROR;
+        }
         reqAttr += req;
     unknowncleanup:
         if (!found) {
@@ -2511,7 +2527,7 @@ static int checkElementEnd (
                                       NULL, NULL,
                                       cp->content[ac]->keySpace->name, 0)) {
                             SetResultV ("Invalid key ref.");
-                            sdata->evalError = 1;
+                            sdata->evalError = 2;
                             return 0;
                         }
                         cp->content[ac]->keySpace->unknownIDrefs = 0;
@@ -2609,9 +2625,8 @@ static int checkElementEnd (
                 else return 0;
 
             case SCHEMA_CTYPE_JSON_STRUCT:
-                if (!checkJsonStructType (interp, sdata, cp->content[ac])) {
-                    sdata->evalError = 1;
-                    SetResult ("Wrong JSON type");
+                if (!checkJsonStructType (interp, sdata, cp->content[ac],
+                                          INVALID_JSON_TYPE_MATCH_END, ac)) {
                     return 0;
                 }
                 break;
@@ -2954,12 +2969,12 @@ matchText (
                     break;
 
                 case SCHEMA_CTYPE_JSON_STRUCT:
-                    if (checkJsonStructType (interp, sdata, candidate)) {
+                    if (checkJsonStructType (interp, sdata, candidate,
+                                             INVALID_JSON_TYPE_MATCH_TEXT,
+                                             ac)) {
                         ac++;
                         continue;
                     }
-                    sdata->evalError = 1;
-                    SetResult ("Wrong JSON type");
                     return 0;
                     
                 case SCHEMA_CTYPE_KEYSPACE:
@@ -2982,7 +2997,7 @@ matchText (
                                           NULL, text, ac)) {
                                 return 0;
                                 SetResultV ("Invalid key ref.");
-                                sdata->evalError = 1;
+                                sdata->evalError = 2;
                             }
                             cp->content[ac]->keySpace->unknownIDrefs = 0;
                         }
@@ -3521,6 +3536,27 @@ booleanErrorCleanup:
     return TCL_ERROR;
 }
 
+static void 
+validateDOMerrorReport (
+    Tcl_Interp *interp,
+    SchemaData *sdata,
+    domNode    *node
+    ) 
+{
+    char *str;
+    Tcl_Obj *strObj;
+
+    if (node) {
+        str = xpathNodeToXPath (node, 0);
+        strObj = Tcl_NewStringObj (str, -1);
+        Tcl_AppendStringsToObj (strObj, ": ", Tcl_GetStringResult (interp),
+                                NULL);
+        Tcl_SetObjResult (interp, strObj);
+        FREE (str);
+    }
+    sdata->evalError = 2;
+}
+    
 static int
 validateDOM (
     Tcl_Interp *interp,
@@ -3558,6 +3594,7 @@ validateDOM (
                       node->ownerDocument->namespaces[node->namespace-1]->uri
                       : NULL)
         != TCL_OK) {
+        validateDOMerrorReport (interp, sdata, node);
         return TCL_ERROR;
     }
     /* In case of UNKNOWN_ROOT_ELEMENT and reportCmd is set
@@ -3567,6 +3604,7 @@ validateDOM (
         if (node->firstAttr) {
             if (tDOM_probeDomAttributes (interp, sdata, node->firstAttr)
                 != TCL_OK) {
+                validateDOMerrorReport (interp, sdata, node);
                 return TCL_ERROR;
             }
         } else {
@@ -3577,6 +3615,7 @@ validateDOM (
                  * tDOM_probeDomAttributes() returns only error in the
                  * case of error in called scripts. */
                 if (tDOM_probeDomAttributes (interp, sdata, NULL) != TCL_OK) {
+                    validateDOMerrorReport (interp, sdata, node);
                     return TCL_ERROR;
                 }
             }
@@ -3584,8 +3623,10 @@ validateDOM (
     }
 
     if (sdata->stack->pattern->domKeys) {
-        if (checkdomKeyConstraints (interp, sdata, node) != TCL_OK)
+        if (checkdomKeyConstraints (interp, sdata, node) != TCL_OK) {
+            validateDOMerrorReport (interp, sdata, node);
             return TCL_ERROR;
+        }
     }
 
     savedinsideNode = sdata->insideNode;
@@ -3596,11 +3637,16 @@ validateDOM (
         case ELEMENT_NODE:
             if (Tcl_DStringLength (sdata->cdata)) {
                 if (tDOM_probeText (interp, sdata,
-                               Tcl_DStringValue (sdata->cdata), NULL) != TCL_OK)
+                               Tcl_DStringValue (sdata->cdata), NULL)
+                    != TCL_OK) {
+                    validateDOMerrorReport (interp, sdata, node);
                     return TCL_ERROR;
+                }
                 Tcl_DStringSetLength (sdata->cdata, 0);
             }
-            if (validateDOM (interp, sdata, node) != TCL_OK) return TCL_ERROR;
+            if (validateDOM (interp, sdata, node) != TCL_OK) {
+                return TCL_ERROR;
+            }
             break;
 
         case TEXT_NODE:
@@ -3612,6 +3658,7 @@ validateDOM (
             Tcl_DecrRefCount (str);
             sdata->textNode = NULL;
             if (rc != TCL_OK) {
+                validateDOMerrorReport (interp, sdata, node);
                 return TCL_ERROR;
             }
             break;
@@ -3623,11 +3670,16 @@ validateDOM (
 
         default:
             SetResult ("Unexpected node type in validateDOM!");
+            validateDOMerrorReport (interp, sdata, node);
             return TCL_ERROR;
         }
         node = node->nextSibling;
     }
-    if (tDOM_probeElementEnd (interp, sdata) != TCL_OK) return TCL_ERROR;
+    if (tDOM_probeElementEnd (interp, sdata) != TCL_OK) {
+        validateDOMerrorReport (interp, sdata, node);
+        return TCL_ERROR;
+    }
+    
     sdata->node = savednode;
     sdata->insideNode = savedinsideNode;
     return TCL_OK;
@@ -5156,8 +5208,11 @@ static int validateSource (
     FREE (vdata->uri);
     Tcl_DStringFree (&cdata);
     Tcl_DecrRefCount (vdata->externalentitycommandObj);
-    
-    if (sdata->evalError) {
+
+    /* sdata->evalError == 1 means Tcl evaluation error in called
+     * script. sdata->evalError == 2 is used to signal "abort but
+     * leave interp result alone, it is set". */
+    if (sdata->evalError == 1) {
         result = TCL_ERROR;
     } else {
         if (result == TCL_OK) {

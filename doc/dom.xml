@@ -408,7 +408,7 @@ node. <m>objVar</m> controls the memory handling as explained above.</desc>
           any other context, it will return error. The created command
           <m>commandName</m> replaces any existing command or
           procedure with that name. If the <m>commandName</m> includes
-          any namespace qualifiers, it is created in the specified
+          any Tcl namespace qualifiers, it is created in the specified
           namespace. The <m>-tagName</m> option is only allowed for
           the elementNode type. The <m>-jsonType</m> option is only
           allowed for elementNode and textNode types.
@@ -427,7 +427,7 @@ command depends on the type of the node it creates.</p>
 <p>If the command type to create is <m>elementNode</m>, the created
 command will create an element node, if called. Without the
 <m>-tagName</m> option the tag name of the created node is
-<m>commandName</m> without namespace qualifiers. If the
+<m>commandName</m> without Tcl namespace qualifiers. If the
 <m>-tagName</m> option was given then the created command the created
 elements will have this tag name. If the <m>-jsonType</m> option was
 given then the created node elements will have the given JSON type. If

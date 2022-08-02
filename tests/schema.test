@@ -4091,7 +4091,7 @@ test schema-12.2 {domvalidate} {
     $doc delete
     s delete
     set result
-} {0 {Element "some" doesn't match}}
+} {0 {/addressBook/card[2]/some: Element "some" doesn't match}}
 
 test schema-12.3 {domvalidate w/ attribute} {
     tdom::schema s
@@ -9783,7 +9783,6 @@ proc postValidation {g xml} {
     return $rc
 }
 
-puts "HIER $errMsg"
 test schema-19.1 {keyspace} {
     tdom::schema s
     s define {
@@ -9808,9 +9807,7 @@ test schema-19.1 {keyspace} {
         {<doc><items><item ref="1"/><item ref="foo"/></items><items><item ref="2"/><item ref="bar"/></items></doc>}
         {<doc><items><item ref="1"/><item ref="foo"/></items><items><item ref="bar"/><item ref="bar"/></items></doc>}
     } {
-        set errMsg ""
-        lappend result [s validate $xml errMsg]
-        puts $errMsg
+        lappend result [s validate $xml]
     }
     s delete
     set result
@@ -11160,8 +11157,7 @@ test schema-29.5 {structure constraint jsontype} {
         }}
     } {
         set jdoc [dom parse -json -jsonroot JSON $json]
-        lappend result [s domvalidate [$jdoc documentElement] errMsg]
-        puts $errMsg
+        lappend result [s domvalidate [$jdoc documentElement]]
         $jdoc delete
     }
     s delete
