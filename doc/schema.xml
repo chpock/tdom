@@ -760,7 +760,7 @@ s define {
         <m>domvalidate</m> this constraint always matches. If
         postvalidating the constraint matches if the enclosing element
         has the JSON type given as argument to the structure
-        constraint. The possible JSON structure types <m>NONE</m>,
+        constraint. The possible JSON structure types are <m>NONE</m>,
         <m>OBJECT</m> and <m>ARRAY</m>. This constraint is only
         allowed as direct child of a defelement, defelementtype or
         local element definition.</p>
@@ -1307,7 +1307,7 @@ s define {
             <m>domvalidate</m> this constraint always matches. If
             postvalidating the current TEXT_NODE to check must have
             the JSON text type given as argument to the text
-            constraint command. The possible types are: <m>NULL</m>,
+            constraint command. The possible types are <m>NULL</m>,
             <m>TRUE</m>, <m>FALSE</m>, <m>STRING</m> and
             <m>NUMBER</m>.</desc>
         </commanddef>

@@ -1,5 +1,5 @@
-C Added\serror\sreporting\sfor\sand\srecovering\sfrom\sjsontype\sstructure\sconstraints.\sImproved\sthe\serror\sreporting\sfor\sdom\spostvalidation\swithout\sreportcmd.
-D 2022-08-02T22:10:04.039
+C Doc\sfix.
+D 2022-08-02T22:27:01.373
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -41,7 +41,7 @@ F doc/pullparser.n 45c9bc45edf706595a130aa2afcf9890a80fe64eb492df6e88514ab8e3162
 F doc/pullparser.xml 4060ebb3744090b95e9e93551c23d8b5213ed58a7ad1fce2437fef617f3ba528
 F doc/schema.html c3370367973a9f5a82bc1b84f0112f47d388c45e2a304f2330176f46c98fc5a9
 F doc/schema.n 33996916977d13a2caca2a9eb1501accdc7887d757841543293418a4258fdfb0
-F doc/schema.xml c0395cce9fe9a86a36d89e5e2fbca550b8f1f17dac8c678ac29b0838dc32a06f
+F doc/schema.xml b93dbe4a6153e8239962abbdedbea39557d7cc9e1d584ad81bc10c39bb25e197
 F doc/tDOM.xml 04db7d0ccfea39aae21f4fe07b8f05d5bff8a84193cfce2aa5faa2f42c076377
 F doc/tdomcmd.html 3f96630823dbeff586dd3fb7e5cc6214a40f0219e2ba37e6986353cbcfc7d665
 F doc/tdomcmd.n c06a5ff035f16a2a52636b69d9ebe6ba84ff5101922ed27b551146c4d61d6cda
@@ -237,8 +237,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 5515d71d3e37f5e1587464f424dfcdc2a4371fc3337eb6eeed1c86b6690084e2
-R f73ac0aa4ec192f8a3d072722c28a848
+P fd44f8cac2b0b2e033531b15ee97cabb8ecbeda9620197ae27dff68c99d4250c
+R 6c2381fc9bcc852fe9a8b36ec992091b
 U rolf
-Z ec75b9b8574a65928d490e8ee984d501
+Z b43db7fcfb438d7d96003b544a652dd0
 # Remove this line to create a well-formed Fossil manifest.
