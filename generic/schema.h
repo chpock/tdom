@@ -37,6 +37,7 @@ typedef enum {
   SCHEMA_CTYPE_VIRTUAL,
   SCHEMA_CTYPE_KEYSPACE,
   SCHEMA_CTYPE_KEYSPACE_END,
+  SCHEMA_CTYPE_JSON_STRUCT,
 } Schema_CP_Type;
 
 typedef enum {
@@ -200,6 +201,7 @@ typedef struct SchemaData_
     XML_Parser parser;
     domNode *node;
     domNode *insideNode;
+    domTextNode *textNode;
     unsigned int choiceHashThreshold;
     unsigned int attributeHashThreshold;
     char *wsbuf;

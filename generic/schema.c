@@ -24,6 +24,7 @@
 #include <tdom.h>
 #include <tcldom.h>
 #include <domxpath.h>
+#include <domjson.h>
 #include <schema.h>
 
 #ifndef TDOM_NO_SCHEMA
@@ -175,7 +176,10 @@ typedef enum {
     UNKNOWN_GLOBAL_ID,
     UNKNOWN_ID,
     INVALID_ATTRIBUTE_VALUE,
-    INVALID_VALUE
+    INVALID_VALUE,
+    INVALID_JSON_TYPE_MATCH_START,
+    INVALID_JSON_TYPE_MATCH_END,
+    INVALID_JSON_TYPE_MATCH_TEXT
 } ValidationErrorType;
 
 static char *ValidationErrorType2str[] = {
@@ -197,7 +201,10 @@ static char *ValidationErrorType2str[] = {
     "UNKNOWN_GLOBAL_ID",
     "UNKNOWN_ID",
     "INVALID_ATTRIBUTE_VALUE",
-    "INVALID_VALUE"
+    "INVALID_VALUE",
+    "INVALID_JSON_TYPE",
+    "INVALID_JSON_TYPE",
+    "INVALID_JSON_TYPE"
 };
 
 typedef enum {
@@ -205,6 +212,17 @@ typedef enum {
     VALIDATE_FILENAME,
     VALIDATE_CHANNEL
 } ValidationInput;
+
+static const char *jsonStructTypes[] = {
+    "NONE",
+    "OBJECT",
+    "ARRAY",
+    NULL
+};
+
+typedef enum {
+    jt_none, jt_object, jt_array
+} jsonStructType;
 
 /*----------------------------------------------------------------------------
 |   Recovering related flage
@@ -273,7 +291,8 @@ static char *Schema_CP_Type2str[] = {
     "TEXT",
     "VIRTUAL",
     "KEYSPACE_START",
-    "KEYSPACE_END"
+    "KEYSPACE_END",
+    "JSON_STRUCT_TYPE"
 };
 static char *Schema_Quant_Type2str[] = {
     "ONE",
@@ -456,6 +475,7 @@ initSchemaCP (
         pattern->namespace = namespace;
         break;
     case SCHEMA_CTYPE_VIRTUAL:
+    case SCHEMA_CTYPE_JSON_STRUCT:
         /* Do nothing */
         break;
     }
@@ -506,11 +526,12 @@ static void serializeCP (
         }
         if (pattern->typedata) {
             fprintf (stderr, "\t%d namespaces\n",
-                     (Tcl_HashTable*)pattern->typedata->numEntries);
+                     ((Tcl_HashTable*)pattern->typedata)->numEntries);
         }            
         break;
     case SCHEMA_CTYPE_TEXT:
     case SCHEMA_CTYPE_VIRTUAL:
+    case SCHEMA_CTYPE_JSON_STRUCT:
         /* Do nothing */
         break;
     }
@@ -618,7 +639,7 @@ static void freeSchemaCP (
             FREE (pattern->attrs);
         }
         freedomKeyConstraints (pattern->domKeys);
-        if (pattern->typedata) {
+        if (pattern->type != SCHEMA_CTYPE_JSON_STRUCT && pattern->typedata) {
             Tcl_DeleteHashTable ((Tcl_HashTable *) pattern->typedata);
             FREE (pattern->typedata);
         }
@@ -1236,9 +1257,21 @@ recover (
     case UNEXPECTED_ELEMENT:
         sdata->vaction = MATCH_ELEMENT_START;
         break;
+    case INVALID_JSON_TYPE_MATCH_START:
+        sdata->vaction = MATCH_ELEMENT_START;
+        if (sdata->stack) {
+            se = sdata->stack;
+            while (se->pattern->type != SCHEMA_CTYPE_NAME) {
+                se = se->down;
+            }
+            sdata->vname = se->pattern->name;
+            sdata->vns = se->pattern->namespace;
+        }
+        break;
     case MISSING_TEXT_MATCH_END:
     case INVALID_KEYREF_MATCH_END:
     case MISSING_ELEMENT_MATCH_END:
+    case INVALID_JSON_TYPE_MATCH_END:
         if (sdata->stack) {
             se = sdata->stack;
             while (se->pattern->type != SCHEMA_CTYPE_NAME) {
@@ -1254,6 +1287,7 @@ recover (
         break;
     case INVALID_KEYREF_MATCH_TEXT:
     case INVALID_VALUE:
+    case INVALID_JSON_TYPE_MATCH_TEXT:
         if (sdata->stack) {
             se = sdata->stack;
             while (se->pattern->type != SCHEMA_CTYPE_NAME) {
@@ -1336,6 +1370,9 @@ recover (
     case UNKNOWN_ID:
     case INVALID_ATTRIBUTE_VALUE:
     case INVALID_VALUE:
+    case INVALID_JSON_TYPE_MATCH_START:
+    case INVALID_JSON_TYPE_MATCH_END:
+    case INVALID_JSON_TYPE_MATCH_TEXT:
         break;
     }
     return 1;
@@ -1406,6 +1443,53 @@ recursivePattern (
     }
     return rc;
 }
+
+static int
+checkJsonStructType (
+    Tcl_Interp *interp,
+    SchemaData *sdata,
+    SchemaCP *cp,
+    ValidationErrorType errorType,
+    int ac
+    )
+{
+    jsonStructType jsonType;
+    char *str;
+    Tcl_Obj *strObj;
+
+    if (!sdata->insideNode) return 1;
+    jsonType = (intptr_t) cp->typedata;
+    switch (jsonType) {
+    case jt_none:
+        if (sdata->insideNode->info > 0
+            && sdata->insideNode->info < 8) goto error;
+        break;
+    case jt_object:
+        if (sdata->insideNode->info != JSON_OBJECT) goto error;
+        break;
+    case jt_array:
+        if (sdata->insideNode->info != JSON_ARRAY) goto error;
+        break;
+    default:
+        SetResult ("Internal error: invalid JSON structure type!");
+        sdata->evalError = 1;
+        return 0;
+    }
+    return 1;
+error:
+    if (!recover (interp, sdata, errorType, sdata->insideNode->nodeName,
+                  domNamespaceURI(sdata->insideNode), NULL, ac)) {
+        str = xpathNodeToXPath (sdata->insideNode, 0);
+        strObj = Tcl_NewStringObj (str, -1);
+        Tcl_AppendStringsToObj (strObj, ": Wrong JSON type", NULL);
+        Tcl_SetObjResult (interp, strObj);
+        FREE (str);
+        sdata->evalError = 2;
+        return 0;
+    }
+    return 1;
+}
+
 
 static int
 matchingAny (
@@ -1601,6 +1685,10 @@ matchElementStart (
                         sdata->evalError = 1;
                         return 0;
                         
+                    case SCHEMA_CTYPE_JSON_STRUCT:
+                        SetResult ("JSON structure constrain in MIXED or CHOICE");
+                        sdata->evalError = 2;
+                        return 0;
                     }
                     if (!mayskip && mayMiss (candidate->quants[i]))
                         mayskip = 1;
@@ -1613,6 +1701,15 @@ matchElementStart (
                     break;
                 }
                 else return 0;
+
+            case SCHEMA_CTYPE_JSON_STRUCT:
+                if (!checkJsonStructType (interp, sdata, candidate,
+                                          INVALID_JSON_TYPE_MATCH_START, ac)) {
+                    return 0;
+                };
+                ac++;
+                hm = 0;
+                continue;
 
             case SCHEMA_CTYPE_PATTERN:
                 if (recursivePattern (se, candidate)) {
@@ -1638,6 +1735,8 @@ matchElementStart (
                         if (!recover (interp, sdata,
                                       INVALID_KEYREF_MATCH_START, name,
                                       namespace, NULL, ac)) {
+                            SetResultV ("Invalid key ref.");
+                            sdata->evalError = 2;
                             return 0;
                         }
                         candidate->keySpace->unknownIDrefs = 0;
@@ -1691,6 +1790,7 @@ matchElementStart (
     case SCHEMA_CTYPE_CHOICE:
     case SCHEMA_CTYPE_TEXT:
     case SCHEMA_CTYPE_ANY:
+    case SCHEMA_CTYPE_JSON_STRUCT:
         /* Never pushed onto stack */
         SetResult ("Invalid CTYPE onto the validation stack!");
         sdata->evalError = 1;
@@ -1772,6 +1872,10 @@ matchElementStart (
                 sdata->evalError = 1;
                 return 0;
 
+            case SCHEMA_CTYPE_JSON_STRUCT:
+                SetResult ("JSON structure constraint child of INTERLEAVE");
+                sdata->evalError = 1;
+                return 0;
             }
             if (!thismayskip && minOne (cp->quants[i])) mayskip = 0;
         }
@@ -2028,6 +2132,7 @@ int probeAttribute (
                               ns, value, 0)) {
                     SetResult3V ("Attribute value doesn't match for "
                                  "attribute '", name , "'");
+                    sdata->evalError = 2;
                     return 0;
                 }
             }
@@ -2044,6 +2149,7 @@ int probeAttribute (
                                   ns, value, i)) {
                         SetResult3V ("Attribute value doesn't match for "
                                     "attribute '", name , "'");
+                        sdata->evalError = 2;
                         return 0;
                     }
                 }
@@ -2095,6 +2201,9 @@ int tDOM_probeAttributes (
             ns = Tcl_GetHashKey (&sdata->namespace, h);
         }
         found = probeAttribute (interp, sdata, ln, ns, atPtr[1], &req);
+        if (sdata->evalError) {
+            return TCL_ERROR;
+        }
         reqAttr += req;
     unknowncleanup:
         if (!found) {
@@ -2357,8 +2466,8 @@ int probeEventAttribute (
 
 /* Returns either -1, 0, 1, 2
 
-   -1 means a pattern or an interleave ended may end, look further at
-   parents next sibling.
+   -1 means a pattern or an interleave ended without error, look
+   further at parents next sibling.
 
    0 means rewind with validation error.
 
@@ -2417,6 +2526,8 @@ static int checkElementEnd (
                         if (!recover (interp, sdata, INVALID_KEYREF_MATCH_END,
                                       NULL, NULL,
                                       cp->content[ac]->keySpace->name, 0)) {
+                            SetResultV ("Invalid key ref.");
+                            sdata->evalError = 2;
                             return 0;
                         }
                         cp->content[ac]->keySpace->unknownIDrefs = 0;
@@ -2489,6 +2600,7 @@ static int checkElementEnd (
                     case SCHEMA_CTYPE_KEYSPACE_END:
                     case SCHEMA_CTYPE_KEYSPACE:
                     case SCHEMA_CTYPE_VIRTUAL:
+                    case SCHEMA_CTYPE_JSON_STRUCT:
                     case SCHEMA_CTYPE_CHOICE:
                         SetResult ("Invalid CTYPE in MIXED or CHOICE");
                         sdata->evalError = 1;
@@ -2511,6 +2623,13 @@ static int checkElementEnd (
             case SCHEMA_CTYPE_VIRTUAL:
                 if (evalVirtual (interp, sdata, ac)) break;
                 else return 0;
+
+            case SCHEMA_CTYPE_JSON_STRUCT:
+                if (!checkJsonStructType (interp, sdata, cp->content[ac],
+                                          INVALID_JSON_TYPE_MATCH_END, ac)) {
+                    return 0;
+                }
+                break;
                 
             case SCHEMA_CTYPE_PATTERN:
                 if (recursivePattern (se, cp->content[ac])) {
@@ -2570,6 +2689,7 @@ static int checkElementEnd (
     case SCHEMA_CTYPE_CHOICE:
     case SCHEMA_CTYPE_TEXT:
     case SCHEMA_CTYPE_ANY:
+    case SCHEMA_CTYPE_JSON_STRUCT:
         /* Never pushed onto stack */
         SetResult ("Invalid CTYPE onto the validation stack!");
         sdata->evalError = 1;
@@ -2805,6 +2925,11 @@ matchText (
                             sdata->evalError = 1;
                             return 0;
                             
+                        case SCHEMA_CTYPE_JSON_STRUCT:
+                            SetResult ("JSON structure constrain in MIXED or"
+                                       " CHOICE");
+                            sdata->evalError = 1;
+                            return 0;
                         }
                     }
                     if (mustMatch (cp->quants[ac], hm)) {
@@ -2843,6 +2968,15 @@ matchText (
                     if (!evalVirtual (interp, sdata, ac)) return 0;
                     break;
 
+                case SCHEMA_CTYPE_JSON_STRUCT:
+                    if (checkJsonStructType (interp, sdata, candidate,
+                                             INVALID_JSON_TYPE_MATCH_TEXT,
+                                             ac)) {
+                        ac++;
+                        continue;
+                    }
+                    return 0;
+                    
                 case SCHEMA_CTYPE_KEYSPACE:
                     if (!cp->content[ac]->keySpace->active) {
                         Tcl_InitHashTable (&cp->content[ac]->keySpace->ids,
@@ -2862,6 +2996,8 @@ matchText (
                                           INVALID_KEYREF_MATCH_TEXT, NULL,
                                           NULL, text, ac)) {
                                 return 0;
+                                SetResultV ("Invalid key ref.");
+                                sdata->evalError = 2;
                             }
                             cp->content[ac]->keySpace->unknownIDrefs = 0;
                         }
@@ -2901,6 +3037,7 @@ matchText (
         case SCHEMA_CTYPE_KEYSPACE:
         case SCHEMA_CTYPE_KEYSPACE_END:
         case SCHEMA_CTYPE_VIRTUAL:
+        case SCHEMA_CTYPE_JSON_STRUCT:
         case SCHEMA_CTYPE_CHOICE:
         case SCHEMA_CTYPE_TEXT:
         case SCHEMA_CTYPE_ANY:
@@ -2961,6 +3098,11 @@ matchText (
                 case SCHEMA_CTYPE_VIRTUAL:
                     break;
                     
+                case SCHEMA_CTYPE_JSON_STRUCT:
+                    SetResult ("JSON structure constraint child of"
+                               "INTERLEAVE");
+                    sdata->evalError = 1;
+                    return 0;
                 }
             }
             if (!mayskip) {
@@ -3394,6 +3536,27 @@ booleanErrorCleanup:
     return TCL_ERROR;
 }
 
+static void 
+validateDOMerrorReport (
+    Tcl_Interp *interp,
+    SchemaData *sdata,
+    domNode    *node
+    ) 
+{
+    char *str;
+    Tcl_Obj *strObj;
+
+    if (node) {
+        str = xpathNodeToXPath (node, 0);
+        strObj = Tcl_NewStringObj (str, -1);
+        Tcl_AppendStringsToObj (strObj, ": ", Tcl_GetStringResult (interp),
+                                NULL);
+        Tcl_SetObjResult (interp, strObj);
+        FREE (str);
+    }
+    sdata->evalError = 2;
+}
+    
 static int
 validateDOM (
     Tcl_Interp *interp,
@@ -3403,6 +3566,8 @@ validateDOM (
 {
     char *ln;
     domNode *savednode, *savedinsideNode;
+    Tcl_Obj *str;
+    int rc;
 
     if (node->namespace) {
         if (node->ownerDocument->namespaces[node->namespace-1]->prefix[0] == '\0') {
@@ -3429,6 +3594,7 @@ validateDOM (
                       node->ownerDocument->namespaces[node->namespace-1]->uri
                       : NULL)
         != TCL_OK) {
+        validateDOMerrorReport (interp, sdata, node);
         return TCL_ERROR;
     }
     /* In case of UNKNOWN_ROOT_ELEMENT and reportCmd is set
@@ -3438,6 +3604,7 @@ validateDOM (
         if (node->firstAttr) {
             if (tDOM_probeDomAttributes (interp, sdata, node->firstAttr)
                 != TCL_OK) {
+                validateDOMerrorReport (interp, sdata, node);
                 return TCL_ERROR;
             }
         } else {
@@ -3448,6 +3615,7 @@ validateDOM (
                  * tDOM_probeDomAttributes() returns only error in the
                  * case of error in called scripts. */
                 if (tDOM_probeDomAttributes (interp, sdata, NULL) != TCL_OK) {
+                    validateDOMerrorReport (interp, sdata, node);
                     return TCL_ERROR;
                 }
             }
@@ -3455,8 +3623,10 @@ validateDOM (
     }
 
     if (sdata->stack->pattern->domKeys) {
-        if (checkdomKeyConstraints (interp, sdata, node) != TCL_OK)
+        if (checkdomKeyConstraints (interp, sdata, node) != TCL_OK) {
+            validateDOMerrorReport (interp, sdata, node);
             return TCL_ERROR;
+        }
     }
 
     savedinsideNode = sdata->insideNode;
@@ -3467,24 +3637,30 @@ validateDOM (
         case ELEMENT_NODE:
             if (Tcl_DStringLength (sdata->cdata)) {
                 if (tDOM_probeText (interp, sdata,
-                               Tcl_DStringValue (sdata->cdata), NULL) != TCL_OK)
+                               Tcl_DStringValue (sdata->cdata), NULL)
+                    != TCL_OK) {
+                    validateDOMerrorReport (interp, sdata, node);
                     return TCL_ERROR;
+                }
                 Tcl_DStringSetLength (sdata->cdata, 0);
             }
-            if (validateDOM (interp, sdata, node) != TCL_OK) return TCL_ERROR;
+            if (validateDOM (interp, sdata, node) != TCL_OK) {
+                return TCL_ERROR;
+            }
             break;
 
         case TEXT_NODE:
         case CDATA_SECTION_NODE:
-            Tcl_DStringAppend (sdata->cdata,
-                               ((domTextNode *) node)->nodeValue,
-                               ((domTextNode *) node)->valueLength);
-            if (tDOM_probeText (interp, sdata,
-                                Tcl_DStringValue (sdata->cdata), NULL) != TCL_OK) {
-                Tcl_DStringSetLength (sdata->cdata, 0);
+            str = Tcl_NewStringObj (((domTextNode *) node)->nodeValue,
+                                    ((domTextNode *) node)->valueLength);
+            sdata->textNode = (domTextNode *)node;
+            rc = tDOM_probeText (interp, sdata, Tcl_GetString (str), NULL);
+            Tcl_DecrRefCount (str);
+            sdata->textNode = NULL;
+            if (rc != TCL_OK) {
+                validateDOMerrorReport (interp, sdata, node);
                 return TCL_ERROR;
             }
-            Tcl_DStringSetLength (sdata->cdata, 0);
             break;
 
         case COMMENT_NODE:
@@ -3494,11 +3670,16 @@ validateDOM (
 
         default:
             SetResult ("Unexpected node type in validateDOM!");
+            validateDOMerrorReport (interp, sdata, node);
             return TCL_ERROR;
         }
         node = node->nextSibling;
     }
-    if (tDOM_probeElementEnd (interp, sdata) != TCL_OK) return TCL_ERROR;
+    if (tDOM_probeElementEnd (interp, sdata) != TCL_OK) {
+        validateDOMerrorReport (interp, sdata, node);
+        return TCL_ERROR;
+    }
+    
     sdata->node = savednode;
     sdata->insideNode = savedinsideNode;
     return TCL_OK;
@@ -3558,6 +3739,7 @@ schemaReset (
     sdata->parser = NULL;
     sdata->node = NULL;
     sdata->insideNode = NULL;
+    sdata->textNode = NULL;
 }
 
 void
@@ -3968,6 +4150,7 @@ getNextExpectedWorker (
                         return 0;
 
                     case SCHEMA_CTYPE_VIRTUAL:
+                    case SCHEMA_CTYPE_JSON_STRUCT:
                     case SCHEMA_CTYPE_KEYSPACE:
                     case SCHEMA_CTYPE_KEYSPACE_END:
                         break;
@@ -3976,6 +4159,7 @@ getNextExpectedWorker (
                 break;
 
             case SCHEMA_CTYPE_VIRTUAL:
+            case SCHEMA_CTYPE_JSON_STRUCT:
             case SCHEMA_CTYPE_KEYSPACE:
             case SCHEMA_CTYPE_KEYSPACE_END:
                 mayskip = 1;
@@ -4011,6 +4195,7 @@ getNextExpectedWorker (
     case SCHEMA_CTYPE_CHOICE:
     case SCHEMA_CTYPE_TEXT:
     case SCHEMA_CTYPE_VIRTUAL:
+    case SCHEMA_CTYPE_JSON_STRUCT:
     case SCHEMA_CTYPE_KEYSPACE:
     case SCHEMA_CTYPE_KEYSPACE_END:
         SetResult ("Invalid CTYPE onto the validation stack!");
@@ -5023,8 +5208,11 @@ static int validateSource (
     FREE (vdata->uri);
     Tcl_DStringFree (&cdata);
     Tcl_DecrRefCount (vdata->externalentitycommandObj);
-    
-    if (sdata->evalError) {
+
+    /* sdata->evalError == 1 means Tcl evaluation error in called
+     * script. sdata->evalError == 2 is used to signal "abort but
+     * leave interp result alone, it is set". */
+    if (sdata->evalError == 1) {
         result = TCL_ERROR;
     } else {
         if (result == TCL_OK) {
@@ -6429,7 +6617,8 @@ AttributePatternObjCmd (
     CHECK_TOPLEVEL
 
     if (sdata->cp->type != SCHEMA_CTYPE_NAME) {
-        SetResult ("The commands attribute and nsattribute are only allowed toplevel in element definition scripts");
+        SetResult ("The commands attribute and nsattribute are only allowed "
+                   "toplevel in element definition scripts");
         return TCL_ERROR;
     }
     if (clientData) {
@@ -6541,7 +6730,7 @@ TextPatternObjCmd  (
     SchemaQuant quant = SCHEMA_CQUANT_OPT;
     SchemaCP *pattern;
     Tcl_HashEntry *h;
-    int result = TCL_OK;
+    int hnew, result = TCL_OK;
 
     CHECK_SI
     CHECK_TOPLEVEL
@@ -6557,10 +6746,15 @@ TextPatternObjCmd  (
             SetResult ("Expected: ?<definition script>? | type <name>");
             return TCL_ERROR;
         }
-        h = Tcl_FindHashEntry (&sdata->textDef, Tcl_GetString (objv[2]));
-        if (!h) {
-            SetResult3 ("Unknown text type \"", Tcl_GetString (objv[2]), "\"");
-            return TCL_ERROR;
+        h = Tcl_CreateHashEntry (&sdata->textDef, Tcl_GetString (objv[2]),
+                                 &hnew);
+        if (hnew) {
+            pattern = initSchemaCP (SCHEMA_CTYPE_CHOICE, NULL, NULL);
+            pattern->type = SCHEMA_CTYPE_TEXT;
+            REMEMBER_PATTERN (pattern)
+                pattern->flags |= FORWARD_PATTERN_DEF;
+            sdata->forwardPatternDefs++;
+            Tcl_SetHashValue (h, pattern);
         }
         quant = SCHEMA_CQUANT_ONE;
         pattern = (SchemaCP *) Tcl_GetHashValue (h);
@@ -6779,6 +6973,37 @@ domxpathbooleanPatternObjCmd (
     return TCL_OK;
 }
 
+static int
+jsontypePatternObjCmd (
+    ClientData UNUSED(clientData),
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    int jsonType; 
+    SchemaCP *pattern;
+
+    CHECK_SI
+    CHECK_TOPLEVEL
+    if (sdata->cp->type != SCHEMA_CTYPE_NAME) {
+        SetResult ("The command jsontype is only allowed toplevel in element "
+                   "definition scripts");
+        return TCL_ERROR;
+    }
+    checkNrArgs (2,2,"Expected: <JSON type>");
+    if (Tcl_GetIndexFromObj (interp, objv[1], jsonStructTypes, "jsonType",
+                             1, &jsonType) != TCL_OK) {
+        return TCL_ERROR;
+    }
+    pattern = initSchemaCP (SCHEMA_CTYPE_JSON_STRUCT, NULL, NULL);
+    pattern->typedata = (void *) (intptr_t) jsonType;
+    REMEMBER_PATTERN (pattern);
+    addToContent (sdata, pattern, SCHEMA_CQUANT_ONE, 0, 0);
+    return TCL_OK;
+}
+    
 static int
 keyspacePatternObjCmd (
     ClientData UNUSED(clientData),
@@ -9207,6 +9432,91 @@ typeTCObjCmd (
     return TCL_OK;
 }
 
+static const char *jsonTextTypes[] = {
+    "NULL",
+    "TRUE",
+    "FALSE",
+    "STRING",
+    "NUMBER",
+    NULL
+};
+
+enum jsonTextType {
+    jt_null, jt_true, jt_false, jt_string, jt_number
+};
+
+typedef struct {
+    enum jsonTextType type;
+    SchemaData *sdata;
+} jsontypeTCData;
+
+static void
+jsontypeImplFree (
+    void *constraintData
+    )
+{
+    jsontypeTCData *cd = (jsontypeTCData *) constraintData;
+
+    FREE (cd);
+}
+
+static int
+jsontypeImpl (
+    Tcl_Interp *UNUSED(interp),
+    void *constraintData,
+    char *UNUSED(text)
+    )
+{
+    jsontypeTCData *cd = (jsontypeTCData *) constraintData;
+    domTextNode *textNode = cd->sdata->textNode;
+
+    if (!textNode) {
+        return 1;
+    }
+    switch (cd->type) {
+    case jt_null:
+        return textNode->info == JSON_NULL ? 1 : 0;
+    case jt_true:
+        return textNode->info == JSON_TRUE ? 1 : 0;
+    case jt_false:
+        return textNode->info == JSON_FALSE ? 1 : 0;
+    case jt_string:
+        return textNode->info == JSON_STRING ? 1 : 0;
+    case jt_number:
+        return textNode->info == JSON_NUMBER ? 1 : 0;
+    }
+    return 0;
+}
+
+static int
+jsontypeTCObjCmd (
+    ClientData UNUSED(clientData),
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    SchemaData *sdata = GETASI;
+    SchemaConstraint *sc;
+    int jsonType;
+    jsontypeTCData *cd;
+    
+    CHECK_TI
+    checkNrArgs (2,2,"Expected: <JSON type>");
+    if (Tcl_GetIndexFromObj (interp, objv[1], jsonTextTypes, "jsonType",
+                             1, &jsonType) != TCL_OK) {
+        return TCL_ERROR;
+    }
+    cd = TMALLOC (jsontypeTCData);
+    cd->sdata = sdata;
+    cd->type = jsonType;
+    ADD_CONSTRAINT (sdata, sc)
+    sc->constraint = jsontypeImpl;
+    sc->constraintData = cd;
+    sc->freeData = jsontypeImplFree;
+    return TCL_OK;
+}
+
 static int
 dateObjCmd (
     ClientData UNUSED(clientData),
@@ -9337,6 +9647,10 @@ tDOM_SchemaInit (
     Tcl_CreateObjCommand (interp,"tdom::schema::domxpathboolean",
                           domxpathbooleanPatternObjCmd, NULL, NULL);
 
+    /* JSON structure types for DOM validation */
+    Tcl_CreateObjCommand (interp,"tdom::schema::jsontype",
+                          jsontypePatternObjCmd, NULL, NULL);
+
     /* Local key constraints */
     Tcl_CreateObjCommand (interp, "tdom::schema::keyspace",
                           keyspacePatternObjCmd, NULL, NULL);
@@ -9438,7 +9752,9 @@ tDOM_SchemaInit (
                           lengthTCObjCmd, (ClientData) 3, NULL);
     Tcl_CreateObjCommand (interp,"tdom::schema::text::type",
                           typeTCObjCmd, NULL, NULL);
-
+    Tcl_CreateObjCommand (interp,"tdom::schema::text::jsontype",
+                          jsontypeTCObjCmd, NULL, NULL);
+    
     /* Exposed text type commands */
     Tcl_CreateObjCommand (interp,"tdom::type::date",
                           dateObjCmd, NULL, NULL);
