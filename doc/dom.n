@@ -494,7 +494,7 @@ a command created with \fIcreateNodeCmd\fR is invoked in
 any other context, it will return error. The created command
 \&\fIcommandName\fR replaces any existing command or
 procedure with that name. If the \fIcommandName\fR includes
-any namespace qualifiers, it is created in the specified
+any Tcl namespace qualifiers, it is created in the specified
 namespace. The \fI-tagName\fR option is only allowed for
 the elementNode type. The \fI-jsonType\fR option is only
 allowed for elementNode and textNode types.
@@ -514,7 +514,7 @@ command depends on the type of the node it creates.
 If the command type to create is \fIelementNode\fR, the created
 command will create an element node, if called. Without the
 \&\fI-tagName\fR option the tag name of the created node is
-\&\fIcommandName\fR without namespace qualifiers. If the
+\&\fIcommandName\fR without Tcl namespace qualifiers. If the
 \&\fI-tagName\fR option was given then the created command the created
 elements will have this tag name. If the \fI-jsonType\fR option was
 given then the created node elements will have the given JSON type. If

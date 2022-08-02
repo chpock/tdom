@@ -818,7 +818,21 @@ s define {
 .CE
 .RE
 .TP
-\&\fB\fBprefixns\fP \fI?prefixUriList?\fB
+\&\fB\fBjsontype\fP \fIJSON structure type\fB
+\&\fR
+.RS
+.PP
+If not postvalidating a DOM tree with
+\&\fIdomvalidate\fR this constraint always matches. If
+postvalidating the constraint matches if the enclosing element
+has the JSON type given as argument to the structure
+constraint. The possible JSON structure types are \fINONE\fR,
+\&\fIOBJECT\fR and \fIARRAY\fR. This constraint is only
+allowed as direct child of a defelement, defelementtype or
+local element definition.
+.RE
+.TP
+\&\fB\fBprefixns\fP         \fI?prefixUriList?\fB
 \&\fRThis defines a prefix to namespace URI mapping exactly
 as a \fIschemacmd prefixns\fR would. It is meant as top-level
 command of a \fIschemacmd define\fR script. This command is
@@ -1260,6 +1274,15 @@ argument.
 reference to an ID within the document. The referenced ID may
 appear later in the document, that the reference. Several
 references within the document to one ID are possible.
+.TP
+\&\fB\fBjsontype\fP \fI<JSON text type>\fB
+\&\fRIf not postvalidating a DOM tree with
+\&\fIdomvalidate\fR this constraint always matches. If
+postvalidating the current TEXT_NODE to check must have
+the JSON text type given as argument to the text
+constraint command. The possible types are \fINULL\fR,
+\&\fITRUE\fR, \fIFALSE\fR, \fISTRING\fR and
+\&\fINUMBER\fR.
 .SH "Local key constraints"
 .PP
 Document wide uniqueness and foreign key constraints are
