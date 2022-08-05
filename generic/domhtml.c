@@ -620,7 +620,7 @@ HTML_SimpleParse (
     domDocument *doc,
     domNode     *parent,
     int          ignoreWhiteSpaces,
-    int          forrest,
+    int          forest,
     char       **errStr
 ) {
     register int   c;          /* Next character of the input file */
@@ -1390,7 +1390,7 @@ HTML_SimpleParse (
         /* we return to main node and so finished parsing */
         return TCL_OK;
     }
-    if (forrest && parent_node == parent) {
+    if (forest && parent_node == parent) {
         return TCL_OK;
     }
     RetError("Unexpected end",(x - html) );
@@ -1409,7 +1409,7 @@ domDocument *
 HTML_SimpleParseDocument (
     char   *html,              /* Complete text of the file being parsed  */
     int     ignoreWhiteSpaces,
-    int     forrest,
+    int     forest,
     int    *pos,
     char  **errStr
 ) {
@@ -1418,9 +1418,9 @@ HTML_SimpleParseDocument (
     Tcl_HashEntry *h;
     int hnew;
 
-    if (forrest) {
+    if (forest) {
         // Create umbrella tag
-        h = Tcl_CreateHashEntry(&HASHTAB(doc,tdom_tagNames), "forrestroot",
+        h = Tcl_CreateHashEntry(&HASHTAB(doc,tdom_tagNames), "forestroot",
                                 &hnew);
         node = (domNode*) domAlloc(sizeof(domNode));
         memset(node, 0, sizeof(domNode));
@@ -1432,9 +1432,9 @@ HTML_SimpleParseDocument (
     }
 
     *pos = 0;
-    HTML_SimpleParse (html, pos, doc, node, ignoreWhiteSpaces, forrest,
+    HTML_SimpleParse (html, pos, doc, node, ignoreWhiteSpaces, forest,
                       errStr);
-    if (forrest) {
+    if (forest) {
         doc->rootNode->firstChild = node->firstChild;
         doc->rootNode->lastChild = node->lastChild;
         domFree ((void*)node);

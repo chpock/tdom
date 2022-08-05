@@ -618,7 +618,7 @@ typedef struct {
     long errorLine;
     long errorColumn;
     long byteIndex;
-} domParseForrestErrorData;
+} domParseForestErrorData;
 
 
 /*--------------------------------------------------------------------------
@@ -783,13 +783,13 @@ domDocument *  domReadDocument   (XML_Parser parser,
                                   const char *baseurl,
                                   Tcl_Obj *extResolver,
                                   int   useForeignDTD,
-                                  int   forrest,
+                                  int   forest,
                                   int   paramEntityParsing,
 #ifndef TDOM_NO_SCHEMA
                                   SchemaData *sdata,
 #endif
                                   Tcl_Interp *interp,
-                                  domParseForrestErrorData *forrestError,
+                                  domParseForestErrorData *forestError,
                                   int  *status);
 
 void           domFreeDocument   (domDocument *doc, 

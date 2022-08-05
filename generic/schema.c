@@ -4992,7 +4992,7 @@ static int validateSource (
     Tcl_Obj *bufObj;
     char *xmlstr, *filename, *str, *baseurl = NULL;
     int result, len, fd, mode, done, tclLen, rc, value, useForeignDTD = 0;
-    int forrest = 0;
+    int forest = 0;
     int paramEntityParsing = XML_PARAM_ENTITY_PARSING_ALWAYS;
     Tcl_DString translatedFilename;
     int optionIndex;
@@ -5000,11 +5000,11 @@ static int validateSource (
     
     static const char *validateOptions[] = {
         "-baseurl", "-externalentitycommand", "-paramentityparsing",
-        "-useForeignDTD", "-forrest", NULL
+        "-useForeignDTD", "-forest", NULL
     };
     enum validateOption {
         o_baseurl, o_externalentitycommand, o_paramentityparsing,
-        o_useForeignDTD, o_forrest
+        o_useForeignDTD, o_forest
     };
 
     static const char *paramEntityParsingValues[] = {
@@ -5082,8 +5082,8 @@ static int validateSource (
                 return TCL_ERROR;
             }
             break;
-        case o_forrest:
-            if (Tcl_GetBooleanFromObj(interp, objv[1], &forrest)
+        case o_forest:
+            if (Tcl_GetBooleanFromObj(interp, objv[1], &forest)
                 != TCL_OK) {
                 return TCL_ERROR;
             }

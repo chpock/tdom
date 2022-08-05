@@ -5690,7 +5690,7 @@ getExternalDocument (
     XML_Parser    parser;
     Tcl_Channel   chan;
     Tcl_DString   dStr;
-    domParseForrestErrorData forrestError;
+    domParseForestErrorData forestError;
     
     
     if (isStylesheet && (href[0] == '\0')) {
@@ -5800,7 +5800,7 @@ getExternalDocument (
 #ifndef TDOM_NO_SCHEMA
                            NULL,
 #endif
-                           interp, &forrestError, &resultcode);
+                           interp, &forestError, &resultcode);
     if (xsltDoc->extResolver) {
         Tcl_DecrRefCount (extResolver);
     }

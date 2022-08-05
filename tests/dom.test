@@ -15,7 +15,7 @@
 #    dom-10.*: createNodeCmd
 #    dom-11.*: featureinfo
 #    dom-12.*: -feedbackAfter
-#    dom-13.*: -forrest
+#    dom-13.*: -forest
 #
 # Copyright (c) 2002, 2003, 2004 Rolf Ade.
 
@@ -1404,7 +1404,7 @@ proc dom-5.9 {args} {
     return [list string "" {text<one>1</one><two>2</two>more text}]
 }
 
-test dom-5.9 {-externalentitycommand - external entity is a forrest} {
+test dom-5.9 {-externalentitycommand - external entity is a forest} {
     set doc [dom parse -externalentitycommand dom-5.9 \
                  {<!DOCTYPE doc [<!ENTITY e1 PUBLIC "e1" "e1.xml">]>
                      <doc>&e1;</doc>}]
@@ -2273,29 +2273,29 @@ test dom-12.16 {-feedbackcmd setting interp result w/ invalid XML} -body {
 } -result [list 1 {error "unclosed token" at line 1 character 19
 "<doc><e1/><e1/><e1>< <--Error-- /doc"}]
 
-test dom-13.1 {-forrest} -body {
-    dom parse -forrest {<one>1</one><two>2</two>} doc
+test dom-13.1 {-forest} -body {
+    dom parse -forest {<one>1</one><two>2</two>} doc
     set result [$doc asXML -indent none]
     $doc delete
     set result
 } -result {<one>1</one><two>2</two>}
 
-test dom-13.2 {-forrest} -body {
-    catch {dom parse -forrest {<one>1</one><two>2}}
+test dom-13.2 {-forest} -body {
+    catch {dom parse -forest {<one>1</one><two>2}}
 } -result {1}
 
-test dom-13.3 {-forrest} -body {
-    dom parse -forrest {<one>1</one><two>2</two>some text} doc
+test dom-13.3 {-forest} -body {
+    dom parse -forest {<one>1</one><two>2</two>some text} doc
     set result [$doc asXML -indent none]
     $doc delete
     set result
 } -result {<one>1</one><two>2</two>some text}
 
-test dom-13.4 {-forrest -channel} -setup {
+test dom-13.4 {-forest -channel} -setup {
     set xmlfile [makeFile {<one>1</one><two>2</two>} dom.xml]
 } -body {
     set fd [open $xmlfile]
-    set doc [dom parse -channel $fd -forrest]
+    set doc [dom parse -channel $fd -forest]
     close $fd
     set result [$doc asXML -indent none]
     $doc delete
@@ -2304,23 +2304,23 @@ test dom-13.4 {-forrest -channel} -setup {
     removeFile dom.xml
 } -result {<one>1</one><two>2</two>}
 
-test dom-13.5 {-forrest -channel} -setup {
+test dom-13.5 {-forest -channel} -setup {
     set xmlfile [makeFile {<one>1</one><two>2} dom.xml]
 } -body {
     set fd [open $xmlfile]
-    set result [catch {set doc [dom parse -channel $fd -forrest]} errMsg]
+    set result [catch {set doc [dom parse -channel $fd -forest]} errMsg]
     close $fd
     list $result $errMsg
 } -cleanup {
     removeFile dom.xml
 } -result {1 {error "asynchronous entity" at line 2 character 0}}
 
-test dom-13.6 {-forrest -channel} -setup {
+test dom-13.6 {-forest -channel} -setup {
     # makeFile appends a newline at end
     set xmlfile [makeFile {<one>1</one><two>2</two>some text} dom.xml]
 } -body {
     set fd [open $xmlfile]
-    set doc [dom parse -channel $fd -forrest]
+    set doc [dom parse -channel $fd -forest]
     close $fd
     set result [$doc asXML -indent none]
     $doc delete
@@ -2330,19 +2330,19 @@ test dom-13.6 {-forrest -channel} -setup {
 } -result {<one>1</one><two>2</two>some text
 }
 
-test dom-13.7 {-forrest} -body {
-    catch {dom parse -forrest {<one>1</one><two>2<two></notopen>}}
+test dom-13.7 {-forest} -body {
+    catch {dom parse -forest {<one>1</one><two>2<two></notopen>}}
 } -result {1}
 
-test dom-13.8 {-forrest} {
+test dom-13.8 {-forest} {
     set xml {<one><two></one>}
     catch {dom parse $xml} errMsg1
-    catch {dom parse -forrest $xml} errMsg2
+    catch {dom parse -forest $xml} errMsg2
     expr {$errMsg1 eq $errMsg2}
 } {1}
 
-test dom-13.9 {-forrest} {
-    catch {dom parse -forrest {<one></two></one><one></two></one></wrong>}}
+test dom-13.9 {-forest} {
+    catch {dom parse -forest {<one></two></one><one></two></one></wrong>}}
 } 1
 
 

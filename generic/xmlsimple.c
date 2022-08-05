@@ -338,7 +338,7 @@ XML_SimpleParse (
     domNode     *parent,
     int          ignoreWhiteSpaces,
     int          keepCDATA,
-    int          forrest,
+    int          forest,
     char       **errStr
 ) {
     register int   c;          /* Next character of the input file */
@@ -1029,7 +1029,7 @@ XML_SimpleParse (
             }
         }
     }
-    if (forrest && parent_node == parent) {
+    if (forest && parent_node == parent) {
         FREE ((char *) activeNS);
         return TCL_OK;
     }
@@ -1051,7 +1051,7 @@ XML_SimpleParseDocument (
     char    *xml,              /* Complete text of the file being parsed  */
     int      ignoreWhiteSpaces,
     int      keepCDATA,
-    int      forrest,
+    int      forest,
     char    *baseURI,
     Tcl_Obj *extResolver,
     int     *pos,
@@ -1066,9 +1066,9 @@ XML_SimpleParseDocument (
         doc->extResolver = tdomstrdup (Tcl_GetString (extResolver));
     }
 
-    if (forrest) {
+    if (forest) {
         // Create umbreall tag
-        h = Tcl_CreateHashEntry(&HASHTAB(doc,tdom_tagNames), "forrestroot",
+        h = Tcl_CreateHashEntry(&HASHTAB(doc,tdom_tagNames), "forestroot",
                                 &hnew);
         node = (domNode*) domAlloc(sizeof(domNode));
         memset(node, 0, sizeof(domNode));
@@ -1081,8 +1081,8 @@ XML_SimpleParseDocument (
     
     *pos = 0;
     XML_SimpleParse (xml, pos, doc, node, ignoreWhiteSpaces, keepCDATA,
-                     forrest, errStr);
-    if (forrest) {
+                     forest, errStr);
+    if (forest) {
         doc->rootNode->firstChild = node->firstChild;
         doc->rootNode->lastChild = node->lastChild;
         domFree ((void*)node);

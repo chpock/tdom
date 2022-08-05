@@ -4,17 +4,17 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x55e0eca0a460">NAME</a> · <a href="#SECTid0x55e0eca415d0">SYNOPSIS</a> · <a href="#SECTid0x55e0ecae6860">DESCRIPTION </a> · <a href="#SECTid0x55e0ecb4ef30">KEYWORDS</a>
+<a href="#SECTid0x5616e7c6e4b0">NAME</a> · <a href="#SECTid0x5616e7ca9630">SYNOPSIS</a> · <a href="#SECTid0x5616e7d4a850">DESCRIPTION </a> · <a href="#SECTid0x5616e7db2f90">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x55e0eca0a460">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x5616e7c6e4b0">NAME</a></h2><p class="namesection">
 <b class="names">dom - </b><br>Create an in-memory DOM tree from XML</p>
   
-  <h2><a name="SECTid0x55e0eca415d0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x5616e7ca9630">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">dom</b> <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
 
-  <h2><a name="SECTid0x55e0ecae6860">DESCRIPTION </a></h2><p>This command provides the creation of DOM trees in memory. In
+  <h2><a name="SECTid0x5616e7d4a850">DESCRIPTION </a></h2><p>This command provides the creation of DOM trees in memory. In
 the usual case a string containing a XML information is parsed and converted
 into a DOM tree. Other possible parse input may be HTML or JSON.
 The <i class="m">method</i> indicates a specific subcommand. </p><p>The valid methods are:</p><dl class="commandlist">
@@ -66,18 +66,19 @@ rename $document ""</pre>
                 if the according attribute declaration is in the
                 internal subset. It also doesn't expand internal or
                 external entity references other than the predefined
-                entities and character references. If the HTML
-                document given to parse does not have a single root
-                element (as it was leagl up to HTML 4.01) and the
-                -forrest option is not used then a html node will be
-                inserted as document element, with the HTML input data
-                top level elements as childs.</dd>
+                entities and character references </dd>
               
 
               
                 <dt><b>-html</b></dt>
-                <dd>If <i class="m">-html</i> is specified, a fast HTML parser is 
-used, which tries to even parse badly formed HTML into a DOM tree.</dd>
+                <dd>If <i class="m">-html</i> is specified, a fast HTML parser
+                is used, which tries to even parse badly formed HTML
+                into a DOM tree. If the HTML document given to parse
+                does not have a single root element (as it was legal
+                up to HTML 4.01) and the -forest option is not used
+                then a html node will be inserted as document element,
+                with the HTML input data top level elements as
+                childs.</dd>
               
 
               
@@ -312,9 +313,9 @@ needed.</dd>
 
 
               
-                <dt><b>-forrest</b></dt>
+                <dt><b>-forest</b></dt>
                 <dd>If this option is given, there is no need for a
-                single root, any sequence of well-formed, balanced
+                single root; any sequence of well-formed, balanced
                 subtrees will be parsed into a DOM tree. This works
                 for the expat DOM builder, the simple xml parser
                 enabled with <i class="m">-simple</i> and the simple HTML parser
@@ -739,7 +740,7 @@ recommendation. Otherwise it returns 0.</dd>
         
     </dl>
 
-<h2><a name="SECTid0x55e0ecb4ef30">KEYWORDS</a></h2><p class="keywords">
+<h2><a name="SECTid0x5616e7db2f90">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-XML">XML</a>, <a class="keyword" href="keyword-index.html#KW-DOM">DOM</a>, <a class="keyword" href="keyword-index.html#KW-document">document</a>, <a class="keyword" href="keyword-index.html#KW-node">node</a>, <a class="keyword" href="keyword-index.html#KW-parsing">parsing</a>
 </p>
 </div><hr class="navsep"><div class="navbar" align="center">

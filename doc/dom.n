@@ -237,15 +237,16 @@ include defaulted attribute values into the tree, even
 if the according attribute declaration is in the
 internal subset. It also doesn't expand internal or
 external entity references other than the predefined
-entities and character references. If the HTML
-document given to parse does not have a single root
-element (as it was leagl up to HTML 4.01) and the
--forrest option is not used then a html node will be
-inserted as document element, with the HTML input data
-top level elements as childs.
+entities and character references
 .IP "\fB-html\fR"
-If \fI-html\fR is specified, a fast HTML parser is
-used, which tries to even parse badly formed HTML into a DOM tree.
+If \fI-html\fR is specified, a fast HTML parser
+is used, which tries to even parse badly formed HTML
+into a DOM tree. If the HTML document given to parse
+does not have a single root element (as it was legal
+up to HTML 4.01) and the -forest option is not used
+then a html node will be inserted as document element,
+with the HTML input data top level elements as
+childs.
 .IP "\fB-html5\fR"
 This option is only available if tDOM was build
 with --enable-html5. Try the \fIfeatureinfo\fR method
@@ -411,9 +412,9 @@ subset) will be resolved and parsed. The value
 be resolved and parsed, with the exception of
 documents, which explicitly states standalone="yes" in
 their XML declaration.
-.IP "\fB-forrest\fR"
+.IP "\fB-forest\fR"
 If this option is given, there is no need for a
-single root, any sequence of well-formed, balanced
+single root; any sequence of well-formed, balanced
 subtrees will be parsed into a DOM tree. This works
 for the expat DOM builder, the simple xml parser
 enabled with \fI-simple\fR and the simple HTML parser

@@ -2192,13 +2192,13 @@ domReadDocument (
     const char *baseurl,
     Tcl_Obj    *extResolver,
     int         useForeignDTD,
-    int         forrest,
+    int         forest,
     int         paramEntityParsing,
 #ifndef TDOM_NO_SCHEMA
     SchemaData *sdata,
 #endif
     Tcl_Interp *interp,
-    domParseForrestErrorData *forrestError,
+    domParseForestErrorData *forestError,
     int        *resultcode
 )
 {
@@ -2272,10 +2272,10 @@ domReadDocument (
         XML_SetCdataSectionHandler(parser, startCDATA, endCDATA);
     }
     
-    if (forrest) {
+    if (forest) {
         /* The created external entity parser inherits all the
-         * configuration and will happily parse a forrest. */
-        parser = XML_ExternalEntityParserCreate (parser, "forrest", 0);
+         * configuration and will happily parse a forest. */
+        parser = XML_ExternalEntityParserCreate (parser, "forest", 0);
         info.parser = parser;
         info.currentNode = doc->rootNode;
     }
@@ -2326,15 +2326,15 @@ domReadDocument (
         domFreeDocument (doc, NULL, NULL);
         *resultcode = info.status;
         doc = NULL;
-        if (forrest) {
-            forrestError->errorLine = XML_GetCurrentLineNumber(parser);
-            forrestError->errorColumn = XML_GetCurrentColumnNumber(parser);
-            forrestError->byteIndex = XML_GetCurrentByteIndex(parser);
-            forrestError->errorCode = XML_GetErrorCode(parser);
+        if (forest) {
+            forestError->errorLine = XML_GetCurrentLineNumber(parser);
+            forestError->errorColumn = XML_GetCurrentColumnNumber(parser);
+            forestError->byteIndex = XML_GetCurrentByteIndex(parser);
+            forestError->errorCode = XML_GetErrorCode(parser);
         }
         break;
     case XML_STATUS_OK:
-        if (forrest) {
+        if (forest) {
             info.currentNode = doc->rootNode;
             DispatchPCDATA (&info);
             thisNode = doc->rootNode->firstChild;
@@ -2353,7 +2353,7 @@ cleanup:
     FREE ( info.baseURIstack );
     Tcl_DStringFree (info.cdata);
     FREE ( info.cdata);
-    if (forrest) {
+    if (forest) {
         /* This is the external entity parser, the main parser will be
          * freed in caller context. */
         XML_ParserFree (parser);

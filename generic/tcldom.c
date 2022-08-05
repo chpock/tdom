@@ -1213,7 +1213,7 @@ int tcldom_appendXML (
     domDocument *doc;
     domNode     *nodeToAppend;
     XML_Parser   parser;
-    domParseForrestErrorData forrestError;
+    domParseForestErrorData forestError;
 
     GetTcldomDATA;
 
@@ -1252,7 +1252,7 @@ int tcldom_appendXML (
                           NULL,
 #endif
                           interp,
-                          &forrestError,
+                          &forestError,
                           &resultcode);
     if (extResolver) {
         Tcl_DecrRefCount(extResolver);
@@ -6458,11 +6458,11 @@ int tcldom_parse (
     int          useForeignDTD       = 0;
     int          paramEntityParsing  = (int)XML_PARAM_ENTITY_PARSING_ALWAYS;
     int          keepCDATA           = 0;
-    int          forrest             = 0;
+    int          forest              = 0;
     int          status              = 0;
     double       maximumAmplification = 0.0;
     long         activationThreshold = 0;
-    domParseForrestErrorData forrestError;
+    domParseForestErrorData forestError;
     domDocument *doc;
     Tcl_Obj     *newObjName = NULL;
     XML_Parser   parser;
@@ -6486,7 +6486,7 @@ int tcldom_parse (
         "-keepCDATA",
         "-billionLaughsAttackProtectionMaximumAmplification",
         "-billionLaughsAttackProtectionActivationThreshold",
-        "-forrest",
+        "-forest",
         NULL
     };
     enum parseOption {
@@ -6504,7 +6504,7 @@ int tcldom_parse (
         o_keepCDATA,
         o_billionLaughsAttackProtectionMaximumAmplification,
         o_billionLaughsAttackProtectionActivationThreshold,
-        o_forrest
+        o_forest
     };
 
     static const char *paramEntityParsingValues[] = {
@@ -6801,12 +6801,12 @@ int tcldom_parse (
             sdata = (SchemaData *) cmdInfo.objClientData;
             objv++;  objc--; continue;
 #endif
-        case o_forrest:
-            forrest = 1;
-            forrestError.errorLine = 0;
-            forrestError.errorColumn = 0;
-            forrestError.byteIndex = 0;
-            forrestError.errorCode = 0;
+        case o_forest:
+            forest = 1;
+            forestError.errorLine = 0;
+            forestError.errorColumn = 0;
+            forestError.byteIndex = 0;
+            forestError.errorCode = 0;
             objv++;  objc--; continue;
             
         }
@@ -6906,10 +6906,10 @@ int tcldom_parse (
 
         if (takeHTMLParser) {
             doc = HTML_SimpleParseDocument(xml_string, ignoreWhiteSpaces,
-                                           forrest, &byteIndex, &errStr);
+                                           forest, &byteIndex, &errStr);
         } else {
             doc = XML_SimpleParseDocument(xml_string, ignoreWhiteSpaces,
-                                          keepCDATA, forrest,
+                                          keepCDATA, forest,
                                           baseURI, extResolver,
                                           &byteIndex, &errStr);
         }
@@ -6999,13 +6999,13 @@ int tcldom_parse (
                           baseURI,
                           extResolver,
                           useForeignDTD,
-                          forrest,
+                          forest,
                           paramEntityParsing,
 #ifndef TDOM_NO_SCHEMA
                           sdata,
 #endif
                           interp,
-                          &forrestError,
+                          &forestError,
                           &status);
 #ifndef TDOM_NO_SCHEMA
     if (sdata) {
@@ -7035,11 +7035,11 @@ int tcldom_parse (
                    error msg. If we don't got a document, but interp result is
                    empty, the error occurred in the main document and we
                    build the error msg as follows. */
-                if (forrest) {
-                    sprintf(sl, "%ld", forrestError.errorLine);
-                    sprintf(sc, "%ld", forrestError.errorColumn);
-                    byteIndex = forrestError.byteIndex;
-                    expatErrorCode = forrestError.errorCode;
+                if (forest) {
+                    sprintf(sl, "%ld", forestError.errorLine);
+                    sprintf(sc, "%ld", forestError.errorColumn);
+                    byteIndex = forestError.byteIndex;
+                    expatErrorCode = forestError.errorCode;
                 } else {
                     sprintf(sl, "%ld", XML_GetCurrentLineNumber(parser));
                     sprintf(sc, "%ld", XML_GetCurrentColumnNumber(parser));
