@@ -153,7 +153,7 @@ attribute is not available <m>defaultValue</m> is returned.</desc>
         <m>attributeName</m> is set to the corresponding
         <m>newValue</m>. If there isn't an attribute for one or more
         of the <m>attributeName</m>, this will create that attribute.
-        It is not recommended to set attributes that look like xml
+        It is not recommended to set attributes that look like XML
         namespace declarations.</desc>
       </commanddef>
 
@@ -199,7 +199,7 @@ prefix, this method has the same effect as the method
 
 <p>With the exceptions of the special prefixes "xmlns" and "xml" you
 always must provide a non empty <m>uri</m> if your <m>qualifiedName</m> has a
-prefix. It is not recommended to set xml namespace declarations. The effects are complicated and not always obvious up to resulting a not well-formed serializations after further processing.</p></desc>
+prefix. It is not recommended to set XML namespace declarations. The effects are complicated and not always obvious up to resulting a not well-formed serializations after further processing.</p></desc>
       </commanddef>
 
       <commanddef>
@@ -218,7 +218,7 @@ prefix. It is not recommended to set xml namespace declarations. The effects are
         element sublists for namespaced attributes. n case of an
         "ordinary" namespaced attribute, the sublist elements are
         {&lt;localname&gt; &lt;prefix&gt; &lt;namespace_uri&gt;}. In the special case of
-        an xml namespace declaration it is {&lt;the prefix defined&gt;
+        an XML namespace declaration it is {&lt;the prefix defined&gt;
         &lt;localname&gt; ""}.
         </desc>
       </commanddef>
@@ -377,13 +377,13 @@ another data type, if needed.</p>
 <p>Similar to the way described above to inject literals in a secure
 way into the XPath expression using tcl variable references there is a
 syntax to inject element names from tcl variables. At every place
-where the XPath syntax allows a node test there could be a tcl
+where the XPath syntax allows a node test there could be a Tcl
 variable reference (in any form), just the leading $ replaced with %.
 This allows one to select nodes with 'strange' (invalid, according to the
 appropriate XML production rule) node names which may be needed in
 case of working with JSON data.</p>
 
-<p>The option <m>-namespaces</m> expects a tcl list with prefix /
+<p>The option <m>-namespaces</m> expects a Tcl list with prefix /
 namespace pairs as argument. If this option is not given, then any
 namespace prefix within the xpath expression will be first resolved
 against the list of prefix / namespace pairs set with the
@@ -405,12 +405,12 @@ for use in further calls. Please note that the <m>xpathQuery</m>
 given as string is used as key for the cache. This means, that equal
 XPath expressions, which differ only in white space are treated as
 different cache entries. Special care is needed, if the XPath
-expression includes namespace prefixes or references to tcl variables.
-Both namespace prefixes and tcl variable references will be resolved
-according to the XML prefix namespace mappings and tcl variable values
+expression includes namespace prefixes or references to Tcl variables.
+Both namespace prefixes and Tcl variable references will be resolved
+according to the XML prefix namespace mappings and Tcl variable values
 at expression compilation time. If the same XPath expression is used
 later on in a context with other XML prefix namespace mappings or
-values of the used tcl variables, make sure to first remove the
+values of the used Tcl variables, make sure to first remove the
 compiled expression from the cache with the help of the
 <method>deleteXPathCache</method> method, to force a recompilation.
 Without using the <m>-cache</m> option such consideration is never
@@ -470,7 +470,7 @@ channelId?</option> <option>?-escapeNonASCII?</option> <option>?-htmlEntities?</
         without end tags for empty HTML elements etc.), as string or
         sends the output directly to the given channelId.</p>
 
-        <p>See the documentation of the the <command>domDoc</command>
+        <p>See the documentation of the <command>domDoc</command>
         method <method>asHTML</method> for a detailed description of
         the arguments.</p>
         </desc>
@@ -588,7 +588,7 @@ result document of that transformation and stores it in the optional
 <m>outputVar</m>. 
 
 <p>The optional <m>-parameters</m> option sets top level
-&lt;xsl:param&gt; to string values. The <m>parameterList</m> has to be a tcl
+&lt;xsl:param&gt; to string values. The <m>parameterList</m> has to be a Tcl
 list consisting of parameter name and value pairs.</p>
 
 <p>If the option <m>-ignoreUndeclaredParameters</m> is given, then parameter
@@ -598,7 +598,7 @@ ignored. Without this option, an error is raised if the user tries to set a
 top-level parameter which is not declared in the stylesheet.</p>
 
 <p>The option <m>-maxApplyDepth</m> expects a positive integer as
-argument. By default, the xslt engine allows xslt templates to nest up
+argument. By default, the XSLT engine allows XSLT templates to nest up
 to 3000 levels (and raises error if they nest deeper). This limit can
 be set by the <m>-maxApplyDepth</m> option.</p>
 
@@ -608,7 +608,7 @@ to the option, appended with the XML Fragment from instantiating the
 xsl:message element content as string (as if the XPath string() function would
 have been applied to the XML Fragment) and a flag, which indicates whether the
 xsl:message has an attribute "terminate" with the value "yes". If the
-called script returns anything else then TCL_OK then the xslt
+called script returns anything else then TCL_OK then the XSLT
 transformation will be aborted, returning error. If the called script
 returns -code break the error message is empty, otherwise the result
 code is reported. In case of terminated transformation the outputVar,

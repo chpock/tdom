@@ -872,7 +872,7 @@ nodecmd_insertBeforeFromScript (
     Tcl_Interp *interp,                 /* Current interpreter. */
     domNode    *node,                   /* Parent dom node */
     Tcl_Obj    *cmdObj,                 /* Argument objects. */
-    domNode    *refChild                /* Insert new childs before this
+    domNode    *refChild                /* Insert new children before this
                                          * node; may be NULL */
 ) {
     int      ret;

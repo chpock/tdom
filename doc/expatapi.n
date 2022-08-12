@@ -206,7 +206,7 @@ A Tcl Object containing the name of a expat parser object
 .PP
 The functions described in this manual allows one to add C level coded event
 handler to an tDOM Tcl expat parser objects. A tDOM Tcl expat parser object is
-able to have several Tcl scripts and C functions associated with an specific
+able to have several Tcl scripts and C functions associated with a specific
 event. If the event occurs, first the Tcl scripts then the C functions
 associated with the event are called in turn.
 .PP

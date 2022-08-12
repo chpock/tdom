@@ -718,8 +718,8 @@ default handler (with the -defaultcommand option) for every handler set of the
 parser all internal entities are silent lost for the handler sets without a
 default handler.
 .RE
-.IP "\fB-useForeignDTD  \fI<boolen>\fP\fR"
-If <boolen> is true and the document does not have an
+.IP "\fB-useForeignDTD  \fI<boolean>\fP\fR"
+If <boolean> is true and the document does not have an
 external subset, the parser will call the -externalentitycommand script with
 empty values for the systemId and publicID arguments. This option must be set,
 before the first piece of data is parsed. Setting this option, after the
@@ -882,7 +882,7 @@ the parser to be used and will raise an error in this case.
 .RS
 .PP
 Reads the XML data directly out of the file with the
-filename \fIfilename\fR and parses that data. This is done with low level file
+filename \fIfilename\fR and parses that data. This is done with low-level file
 operations. The XML data must be in US-ASCII, ISO-8859-1, UTF-8 or UTF-16
 encoding. If applicable, this is the fastest way, to parse XML data. This
 method cannot be used from within a callback (neither directly nor indirectly)

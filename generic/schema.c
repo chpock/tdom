@@ -918,7 +918,7 @@ cleanupLastPattern (
                                 /* Later noted pattern are allocated
                                  * later than this and will be freed
                                  * later on in this cleanupLastPattern
-                                 * call, so this is save and
+                                 * call, so this is safe and
                                  * efficient. */
                                 typePattern->nc = k;
                                 break;
@@ -2505,7 +2505,7 @@ static int checkElementEnd (
     case SCHEMA_CTYPE_INTERLEAVE:
     case SCHEMA_CTYPE_PATTERN:
         if (ac < cp->nc && (hasMatched (cp->quants[ac], hm))) {
-            DBG(fprintf (stderr, "ac %d has matched, skiping to next ac\n", ac));
+            DBG(fprintf (stderr, "ac %d has matched, skipping to next ac\n", ac));
             ac++; hm = 0;
         }
         while (ac < cp->nc) {
@@ -5762,10 +5762,10 @@ tDOM_schemaInstanceCmd (
             Tcl_SetHashValue (h, pattern);
         }
         if (forwardDef) {
-            /* The type was already forward defined. Save the witht
+            /* The type was already forward defined. Save the with
              the forward defined pattern stored instance elements to
              be able to set the actual content of the instance pattern
-             after the type content is eventually definded below. */
+             after the type content is eventually defined below. */
             typeInstances = pattern->content;
             nrTypeInstances = pattern->nc;
             typeInstancesLen = pattern->numAttr;

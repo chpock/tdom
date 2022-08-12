@@ -4,15 +4,15 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x5592bca83d10">NAME</a> · <a href="#SECTid0x5592bc9a6e50">SYNOPSIS</a> · <a href="#SECTid0x5592bc9c4680">DESCRIPTION </a> · <a href="#SECTid0x5592bcacb7a0">SEE ALSO</a> · <a href="#SECTid0x5592bcacbb30">KEYWORDS</a>
+<a href="#SECTid0x562e3eca85e0">NAME</a> · <a href="#SECTid0x562e3ecb0930">SYNOPSIS</a> · <a href="#SECTid0x562e3ec2de70">DESCRIPTION </a> · <a href="#SECTid0x562e3ec36420">SEE ALSO</a> · <a href="#SECTid0x562e3ec367b0">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x5592bca83d10">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x562e3eca85e0">NAME</a></h2><p class="namesection">
 <b class="names">domDoc - </b><br>Manipulates an instance of a DOM document object</p>
   
-  <h2><a name="SECTid0x5592bc9a6e50">SYNOPSIS</a></h2><pre class="syntax">domDocObjCmd <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
+  <h2><a name="SECTid0x562e3ecb0930">SYNOPSIS</a></h2><pre class="syntax">domDocObjCmd <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
 
-  <h2><a name="SECTid0x5592bc9c4680">DESCRIPTION </a></h2><p>This command manipulates one particular instance of a document
+  <h2><a name="SECTid0x562e3ec2de70">DESCRIPTION </a></h2><p>This command manipulates one particular instance of a document
 object. <i class="m">method</i> indicates a specific method of the document class. These
 methods should closely conform to the W3C recommendation "Document Object Model
 (Core) Level 1" (<a href="http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html">http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html</a>). Look
@@ -333,7 +333,7 @@ document, if there is one, otherwise the empty string. If there is a value
 given to the method, the internal subset of the document is set to this
 value. Note that none of the parsing methods preserve the internal subset
 of a document; a freshly parsed document will always have an empty internal
-subset. Also note, that the method doesn't do any syntactical check on a
+subset. Also note that the method doesn't do any syntactical check on a
 given internal subset.</dd>
       
 
@@ -407,7 +407,7 @@ ignored. Without this option, an error is raised if the user tries to set a
 top-level parameter that is not declared in the stylesheet.</p>
 
 <p>The option <i class="m">-maxApplyDepth</i> expects a positiv integer as
-argument. By default, the xslt engine allows xslt templates to nest up
+argument. By default, the XSLT engine allows XSLT templates to nest up
 to 3000 levels (and raises error if they nest deeper). This limit can
 be set by the <i class="m">-maxApplyDepth</i> option.</p>
 
@@ -417,7 +417,7 @@ to the option, appended with the XML Fragment from instantiating the
 xsl:message element content as string (as if the XPath string() function would
 have been applied to the XML Fragment) and a flag, which indicates, if the
 xsl:message has an attribute "terminate" with the value "yes". If the
-called script returns anything else then TCL_OK then the xslt
+called script returns anything else then TCL_OK then the XSLT
 transformation will be aborted, returning error. If the called script
 returns -code break, the error message is empty, otherwise the result
 code is reported. In case of terminated transformation, the outputVar,
@@ -430,7 +430,7 @@ if given, is set to the empty string.</p>
 <b class="method">toXSLTcmd</b> ?<i class="m">objVar</i>?</dt>
      
         <dd>If the DOM tree represents a valid XSLT stylesheet, this method
-transforms the DOM tree into an xslt command, otherwise it returns error. The
+transforms the DOM tree into an XSLT command, otherwise it returns error. The
 created xsltCmd is returned and stored in the <i class="m">objVar</i>, if a var name was
 given. A successful transformation of the DOM tree to an xsltCmd removes the
 domDoc cmd and all nodeCmds of the document. 
@@ -468,7 +468,7 @@ ignored. Without this option, an error is raised if the user tries to set a
 top-level parameter, which is not declared in the stylesheet.</p>
 
 <p>The option <i class="m">-maxApplyDepth</i> expects a positiv integer as
-argument. By default, the xslt engine allows xslt templates to nest up
+argument. By default, the XSLT engine allows XSLT templates to nest up
 to 3000 levels (and raises error if they nest deeper). This limit can
 be set by the <i class="m">-maxApplyDepth</i> option.</p>
 
@@ -668,9 +668,9 @@ tried to be executed. This allows quick method additions on Tcl level.</p><p>New
 are not moved into the tree they are automatically deleted as soon as the whole
 document gets deleted.</p>
 
-    <h2><a name="SECTid0x5592bcacb7a0">SEE ALSO</a></h2><p class="seealso">dom, domNode</p>
+    <h2><a name="SECTid0x562e3ec36420">SEE ALSO</a></h2><p class="seealso">dom, domNode</p>
 
-    <h2><a name="SECTid0x5592bcacbb30">KEYWORDS</a></h2><p class="keywords">
+    <h2><a name="SECTid0x562e3ec367b0">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-DOMnodecreation">DOM node creation</a>, <a class="keyword" href="keyword-index.html#KW-documentelement">document element</a>
 </p>
 

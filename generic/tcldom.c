@@ -3153,7 +3153,7 @@ void tcldom_AppendEscapedJSON (
 }
 
 static
-void tcldom_childsAsJSON (
+void tcldom_childrenAsJSON (
     Tcl_Obj     *jstring,
     domNode     *node, /* Must be an ELEMENT_NODE */
     Tcl_Channel  channel,
@@ -3441,26 +3441,26 @@ void tcldom_treeAsJSON (
     case ELEMENT_NODE:
         switch (inside) {
         case JSON_OBJECT:
-            /* Write the member name and recurse to the childs for the
-             * value. */
+            /* Write the member name and recurse to the children for
+             * the value. */
             tcldom_AppendEscapedJSON (jstring, channel,
                                       node->nodeName, -1);
             writeChars (jstring, channel, ":", 1);
             if (indent > -1 || outputFlags & SERIALIZE_INDENT_WITH_TAB) {
                 writeChars (jstring, channel, " ", 1);
             }
-            tcldom_childsAsJSON (jstring, node, channel, indent,
+            tcldom_childrenAsJSON (jstring, node, channel, indent,
                                  outputFlags, level, inside);
             break;
         case JSON_ARRAY:
             /* Since we're already inside of an array, the element can
                only be interpreted as a container for a nested JSON
                object or array. */
-            tcldom_childsAsJSON (jstring, node, channel, indent,
+            tcldom_childrenAsJSON (jstring, node, channel, indent,
                                  outputFlags, level, inside);
             break;
         case JSON_START:
-            tcldom_childsAsJSON (jstring, node, channel, indent,
+            tcldom_childrenAsJSON (jstring, node, channel, indent,
                                  outputFlags, level, inside);            
             break;
         }

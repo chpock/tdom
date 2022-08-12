@@ -580,8 +580,8 @@ default handler.</p>
 
         <optdef>
           <optname>-useForeignDTD</optname>
-          <optarg>&lt;boolen&gt;</optarg>
-          <desc>If &lt;boolen&gt; is true and the document does not have an
+          <optarg>&lt;boolean&gt;</optarg>
+          <desc>If &lt;boolean&gt; is true and the document does not have an
 external subset, the parser will call the -externalentitycommand script with
 empty values for the systemId and publicID arguments. This option must be set,
 before the first piece of data is parsed. Setting this option, after the
@@ -750,7 +750,7 @@ the parser to be used and will raise an error in this case.</p></desc>
           <command><cmd>parser</cmd> <method>parsefile</method> <m>filename</m></command>
 
           <desc><p>Reads the XML data directly out of the file with the
-filename <m>filename</m> and parses that data. This is done with low level file
+filename <m>filename</m> and parses that data. This is done with low-level file
 operations. The XML data must be in US-ASCII, ISO-8859-1, UTF-8 or UTF-16
 encoding. If applicable, this is the fastest way, to parse XML data. This
 method cannot be used from within a callback (neither directly nor indirectly)

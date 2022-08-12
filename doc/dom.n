@@ -232,7 +232,7 @@ generation speed. The encoding of the data is not
 transformed inside the parser. The simple parser does
 not respect any encoding information in the XML
 declaration. It skips over the internal DTD subset and
-ignores any information in it. Therefore it doesn't
+ignores any information in it. Therefore, it doesn't
 include defaulted attribute values into the tree, even
 if the according attribute declaration is in the
 internal subset. It also doesn't expand internal or
@@ -246,7 +246,7 @@ does not have a single root element (as it was legal
 up to HTML 4.01) and the -forest option is not used
 then a html node will be inserted as document element,
 with the HTML input data top level elements as
-childs.
+children.
 .IP "\fB-html5\fR"
 This option is only available if tDOM was build
 with --enable-html5. Try the \fIfeatureinfo\fR method
@@ -340,13 +340,13 @@ resolved relative to this base URI. This base URI is
 also stored within the DOM tree.
 .IP "\fB-feedbackAfter  \fI<#bytes>\fP\fR"
 If \fI-feedbackAfter <#bytes>\fR is
-specified, the tcl command given by
+specified, the Tcl command given by
 \&\fI-feedbackcmd\fR is evaluated at the first element
 start within the document (or an external entity)
 after the start of the document or external entity or
 the last such call after #bytes. For backward
 compatibility if no -feedbackcmd is given but there is
-a tcl proc named ::dom::domParseFeedback this proc is
+a Tcl proc named ::dom::domParseFeedback this proc is
 used as -feedbackcmd. If there isn't such a proc and
 -feedbackAfter is used it is an error to not also use
 -feedbackcmd. If the called script raises error, then
@@ -370,18 +370,18 @@ error msg as error msg. If the called script \fIreturn
 parse\fR call will return the empty string.
 .IP "\fB-externalentitycommand  \fI<script>\fP\fR"
 If \fI-externalentitycommand <script>\fR is
-specified, the specified tcl script is called to resolve any external entities
+specified, the specified Tcl script is called to resolve any external entities
 of the document. The actual evaluated command consists of this option followed
 by three arguments: the base uri, the system identifier of the entity and the
 public identifier of the entity. The base uri and the public identifier may be
-the empty list. The script has to return a tcl list consisting of three
+the empty list. The script has to return a Tcl list consisting of three
 elements. The first element of this list signals how the external entity is
 returned to the processor. Currently the two allowed types are "string"
 and "channel". The second element of the list has to be the (absolute) base URI
 of the external entity to be parsed.  The third element of the list are data,
 either the already read data out of the external entity as string in the case
-of type "string", or the name of a tcl channel, in the case of type
-"channel". Note that if the script returns a tcl channel, it will not be closed
+of type "string", or the name of a Tcl channel, in the case of type
+"channel". Note that if the script returns a Tcl channel, it will not be closed
 by the processor.  It must be closed separately if it is no longer
 needed.
 .IP "\fB-useForeignDTD  \fI<boolean>\fP\fR"
@@ -624,12 +624,12 @@ command will check its arguments, otherwise not.The
 TextCheck flag state. The default state for TextCheck is true.
 .TP
 \&\fB\fBdom\fP \fBsetObjectCommands\fP ?\fI(automatic|token|command)\fB?
-\&\fRControls if documents and nodes are created as tcl commands or
+\&\fRControls if documents and nodes are created as Tcl commands or
 as token to be
 used with the domNode and domDoc commands. If the mode is
-\&'automatic', then methods used at tcl commands will create tcl
+\&'automatic', then methods used at Tcl commands will create Tcl
 commands and methods used at doc or node tokes will create tokens. If
-the mode is 'command' then always tcl commands will be created. If
+the mode is 'command' then always Tcl commands will be created. If
 the mode is 'token', then always token will be created. The method
 returns the current mode. This method is an experimental interface.
 .TP
@@ -719,7 +719,7 @@ Returns as boolean if build with
 Returns as boolean if build with
 \&\fI--enable-lessns\fR.
 .IP "\fBTCL_UTF_MAX\fR"
-Returns the TCL_UTF_MAX value of the tcl
+Returns the TCL_UTF_MAX value of the Tcl
 core, tDOM was build with as integer
 .IP "\fBhtml5\fR"
 Returns as boolean, if build with

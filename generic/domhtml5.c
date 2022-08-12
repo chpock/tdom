@@ -205,7 +205,7 @@ convertGumboToDom (
                         }
                         continue;
                     case GUMBO_ATTR_NAMESPACE_XML:
-                        /* The xml namespace is always in scope, nothing
+                        /* The XML namespace is always in scope, nothing
                          * to do. */
                         continue;
                     default:
