@@ -247,7 +247,7 @@ startElement(
 )
 {
     tDOM_PullParserInfo *pullInfo = userData;
-    int hnew;
+    int i, hnew;
     int match;
     Tcl_HashEntry *h;
     
@@ -264,7 +264,7 @@ startElement(
         return;
     case PULLPARSEMODE_FIND:
         match = 0;
-        for (int i=0 ; i < pullInfo->countFindElement ; i++) {
+        for (i=0 ; i < pullInfo->countFindElement ; i++) {
             char * findElement = Tcl_GetString(pullInfo->firstFindElement[i]);
 
             DBG(fprintf (stderr, "PULLPARSEMODE_FIND this %s search for %s\n",

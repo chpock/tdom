@@ -1,5 +1,5 @@
-C Automaticall\sproovereading.
-D 2022-08-12T00:28:03.404
+C Replaced\sC99\sidiom\sfor\scompatibility\swith\solder\scompiler\s(as\sgcc4.9.2).
+D 2022-08-12T07:52:05.908
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -149,7 +149,7 @@ F generic/tcldom.c f53dda4687c349eecdc5a891b74d3854aa9ed43b186c04c16f64592b42d7c
 F generic/tcldom.h fc61477bdd07440e17a8f11cc898e5c07c8c7c3592014213a5e50eca85393374
 F generic/tclexpat.c 60e133fb8502d853257c2de0ac62b9365850e525920a72590f38524d93199f5c
 F generic/tclexpat.h 95d915d74bb4b99ef3b80de00b0adce28931e6015ac63226b99db4817d9e313c
-F generic/tclpull.c 7b00fefc78ffa3c5222514a69ad64882653ce724f091f639354a9fb6383162e2
+F generic/tclpull.c ac1ff8332e2cdb20b6ce8c7fc733863fe0dbc61bc421ec643b1fc053fb778665
 F generic/tclpull.h 8e1aac98bdad497c669c901494939eecd6c2f57ea51c4f5d4dac502db48527d4
 F generic/tdom.decls b60863867ae6d7daf8ce3fc330ba375cd5111c21f58fbe556561327634da787b
 F generic/tdom.h bce1f220f5ab0719579fddce1bb7bc28c6a77a322d3cd2d0a4022984d44df028
@@ -237,8 +237,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 3eb60c75dad1df566c9bcf9dab7e64b39f3c5eac78d4ea82668e62b49267476f
-R ebfd9d6b386caccda2425eb2821ac8fa
+P e36a320c65bcc86836d9fc6f04fc4235c14264bf3c708f932b3bd4a5f6d2f504
+R 7ff8a26dcea00ee3f419143cf1d1267c
 U rolf
-Z f051fe213a1cbd3a8be21538f2404a60
+Z 35e70e0bec1b1322d467b64e70f72f29
 # Remove this line to create a well-formed Fossil manifest.
