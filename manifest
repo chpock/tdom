@@ -1,5 +1,5 @@
-C Replaced\sC99\sidiom\sfor\scompatibility\swith\solder\scompiler\s(as\sgcc4.9.2).
-D 2022-08-12T07:52:05.908
+C Split\sschema.c\sinto\stwo\sfiles\sschema.c\sand\sdatatypes.c.
+D 2022-08-14T19:53:47.947
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -13,8 +13,8 @@ F README.md 602e95b37fe72b07f0a776c29c86dc5060093f2208c193677b78fc3bdfd5bbce
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/toschema.tcl d9cb806e8f1a10ee9a6d6e8b3bd5944124a12001a086b5bc8511b6e92f9af620
 F apps/xslt.tcl 64103132fbe0a1fbf61cf3506608cb7ea5cbfddd247d207d95d8e96a071e1846
-F configure b03ca5e2c6e3bc2d620c64b608e453bc18c79b013def3a0d40d44cccc7c82e6a x
-F configure.ac 1ab4f46d2501e7feec71ac70fcbcb5f5866ceb6fa47ed1e5b02969dd958eb618
+F configure c0b4390328c1671f58db48f2758c4716099aeadefe181cd5fd48d5b710def955 x
+F configure.ac 1880ab97ab97e615014e24aa605074ad074035a413398182430e65e995eaa362
 F doc/INDEX.MAP 8b9f0c2e18efc29fcf581669e175dec860f54026ef7fef4b8d7403bca442fb71
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html b4a8d2a4b261d8380849b9fa2b4026f1e08248aab543551db47a34b60a43c69a
@@ -125,6 +125,8 @@ F extensions/tnc/win/rules-ext.vc e788fcfc1e69b11946e18b8f67e0870b3bd38913
 F extensions/tnc/win/rules.vc 8157e2a811cf5e93683d6b0fbf5d91d153aa4535
 F extensions/tnc/win/targets.vc 79dea1c6a94a94e6ed8bae9e0195149b25a69923
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
+F generic/datatypes.c 0f194f78b0b1a233df0097f569e0b36b3fa3736bd2196b0eef5e3aac58a9fa17
+F generic/datatypes.h 3e41d07bcf50cf6959b6e14416dfcb0d7b5aafc65683322978ec185c2a259332
 F generic/dom.c 88a9f4b4c1c319f173161d9973de4270b6617223df5453f7dfa5ba0043cd5abe
 F generic/dom.h e4c6fba86dbd8e597f1336b12ce5638a6bd811b041633228e82790de3d6cc28a
 F generic/domalloc.c 7a6a2fdde25d04ffef0330259ceb781ffa2150c2314dd88784f924f6f331ef9e
@@ -143,8 +145,8 @@ F generic/domxslt.h 0cb8e327683a0ffeb2a7094add6cd82ec1ae49c7c704f20d8d6f7d6523e7
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c e8b237d7069eee5a505e1d845de0974e0e533173ec0b39f278137f1a557419a7
 F generic/nodecmd.h 36056ca2c262cb1991cabef8d27992ad628db718d09ff0eeaeaffd150f1549ec
-F generic/schema.c 3cc963392e867b61818f4a6294c0451962c55755b69f2ed9df2b327477edc444
-F generic/schema.h 6e743b4b91a5b495ff2f8c68a0ed74c559e3f98744adb79547e5bd39246216ee
+F generic/schema.c dabb455999d1dd73d07345c0090e52a18fe76b80baa0fc7fe64c9861db1491e3
+F generic/schema.h b9ac464aa9de11b1c8df77466d9156fc6b7ffa72f282f3eea4b25e4254eed23c
 F generic/tcldom.c f53dda4687c349eecdc5a891b74d3854aa9ed43b186c04c16f64592b42d7c4a4
 F generic/tcldom.h fc61477bdd07440e17a8f11cc898e5c07c8c7c3592014213a5e50eca85393374
 F generic/tclexpat.c 60e133fb8502d853257c2de0ac62b9365850e525920a72590f38524d93199f5c
@@ -226,7 +228,7 @@ F unix/speed-check.sh 7a8d91e7edf1cdc9bcfad5f28e1a068cb2843d05e49d8bd89d9b30a465
 F unix/tclAppInit.c df2bcb1b98ffead12f8a55d0e084f780fef9ec21e9597a9bab1aaefb2f7c3a60
 F win/README 69a6da038cb99711a2c95fd44e314e9ce74bb2c4ed8ed319dac6fd6daff2c13d
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F win/makefile.vc 665565e2e00b64134027e02115d467730a6f6a5ef245e5f5aaf40d87c743cba6
+F win/makefile.vc bcf9831a0b10019b66e27720239e0c3101b883ca5394cbb396529ac4d5fdc246
 F win/nmakehlp.c 194ae7c24886245c679cb4c9ea7e6daaaebb5fcd
 F win/pkgIndex.tcl 6cf3b356ced9c987a6c0c3cb3f798b779c03d9afb4bb39a3f3962b4ff7440324
 F win/rules-ext.vc 3c02944b3199014d35de617a1c146d0944af16395870da423374fb013ef57ecf
@@ -237,8 +239,11 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P e36a320c65bcc86836d9fc6f04fc4235c14264bf3c708f932b3bd4a5f6d2f504
-R 7ff8a26dcea00ee3f419143cf1d1267c
+P 2f99526c444997283d85ef2894bad0a5733f1d446db5cbddf4ad2c11699bfd1e
+R 1d295f357216a7b8ee85ab592b1dd811
+T *branch * splitschemacode
+T *sym-splitschemacode *
+T -sym-trunk *
 U rolf
-Z 35e70e0bec1b1322d467b64e70f72f29
+Z 48c75dde03697e1a1acf19f52a5d6d88
 # Remove this line to create a well-formed Fossil manifest.

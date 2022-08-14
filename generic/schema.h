@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------
-|   Copyright (c) 2018  Rolf Ade (rolf@pointsman.de)
+|   Copyright (c) 2018-2022  Rolf Ade (rolf@pointsman.de)
 |-----------------------------------------------------------------------------
 |
 |
@@ -17,7 +17,7 @@
 |
 |
 |   written by Rolf Ade
-|   2018-2020
+|   2018-2022
 |
 \---------------------------------------------------------------------------*/
 
@@ -26,6 +26,21 @@
 
 #include <tcldom.h>
 #include <domxpath.h>
+
+#if !defined(SetResult)
+#define SetResult(str) Tcl_ResetResult(interp);                         \
+                     Tcl_SetStringObj(Tcl_GetObjResult(interp), (str), -1)
+#endif
+
+#define SPACE(c) IS_XML_WHITESPACE ((c))
+    
+
+#if !defined(checkNrArgs)
+#define checkNrArgs(l,h,err) if (objc < l || objc > h) {      \
+        SetResult (err);                                      \
+        return TCL_ERROR;                                     \
+    }
+#endif
 
 typedef enum {
   SCHEMA_CTYPE_ANY,
@@ -207,6 +222,60 @@ typedef struct SchemaData_
     char *wsbuf;
     int wsbufLen;
 } SchemaData;
+
+#define GETASI (SchemaData*)Tcl_GetAssocData(interp, "tdom_schema", NULL);
+#define SETASI(v) Tcl_SetAssocData (interp, "tdom_schema", NULL, v)
+
+#define ADD_CONSTRAINT(sdata, sc)                                       \
+    sc = TMALLOC (SchemaConstraint);                                    \
+    memset (sc, 0, sizeof (SchemaConstraint));                          \
+    if (sdata->cp->nc == sdata->contentSize) {                          \
+        sdata->cp->content =                                            \
+            REALLOC (sdata->cp->content,                                \
+                     2 * sdata->contentSize                             \
+                     * sizeof (SchemaCP*));                             \
+        sdata->cp->quants =                                             \
+            REALLOC (sdata->cp->quants,                                 \
+                     2 * sdata->contentSize                             \
+                     * sizeof (SchemaQuant));                           \
+        sdata->contentSize *= 2;                                        \
+    }                                                                   \
+    sdata->cp->content[sdata->cp->nc] = (SchemaCP *) sc;                \
+    sdata->cp->quants[sdata->cp->nc] = SCHEMA_CQUANT_ONE;               \
+    sdata->cp->nc++;                                                    \
+
+#define REMEMBER_PATTERN(pattern)                                       \
+    if (sdata->numPatternList == sdata->patternListSize) {              \
+        sdata->patternList = (SchemaCP **) REALLOC (                    \
+            sdata->patternList,                                         \
+            sizeof (SchemaCP*) * sdata->patternListSize * 2);           \
+        sdata->patternListSize *= 2;                                    \
+    }                                                                   \
+    sdata->patternList[sdata->numPatternList] = pattern;                \
+    sdata->numPatternList++;
+
+
+SchemaCP*
+initSchemaCP (
+    Schema_CP_Type type,
+    void *namespace,
+    char *name
+    );
+
+int
+evalConstraints (
+    Tcl_Interp *interp,
+    SchemaData *sdata,
+    SchemaCP *cp,
+    Tcl_Obj *script
+    );
+
+int
+checkText (
+    Tcl_Interp *interp,
+    void *clientData,
+    char *text
+    );
 
 int 
 tDOM_schemaInstanceCmd (
