@@ -3734,6 +3734,46 @@ cleanup:
     return TCL_ERROR;
 }
 
+static void
+treeAsCanonicalXML (
+    Tcl_Obj  *result,
+    domNode  *node,
+    Tcl_Channel channel
+    )
+{
+    return;
+}
+
+
+/*----------------------------------------------------------------------------
+|   serializeAsCanonicalXML
+|
+\---------------------------------------------------------------------------*/
+static int serializeAsCanonicalXML (
+    domNode    *node,
+    Tcl_Interp *interp,
+    int         objc,
+    Tcl_Obj    *const objv[]
+)
+{
+    int mode;
+    Tcl_Channel chan = NULL;
+    
+    if (objc > 2) {
+        Tcl_WrongNumArgs(interp, 1, objv, "?Tcl-Channel?");
+        return TCL_ERROR;
+    }
+    if (objc == 2) {
+        chan = Tcl_GetChannel (interp, Tcl_GetString (objv[1]), &mode);
+        if (chan == NULL) {
+            SetResult ("argument must be a Tcl channel");
+            return TCL_ERROR;
+        }
+    }
+    treeAsCanonicalXML(Tcl_GetObjResult (interp), node, chan);
+    return TCL_OK;
+}
+
 /*----------------------------------------------------------------------------
 |   serializeAsHTML
 |
@@ -4498,7 +4538,7 @@ int tcldom_NodeObjCmd (
         "getElementsByTagName",              "getElementsByTagNameNS",
         "disableOutputEscaping",             "precedes",         "asText",
         "insertBeforeFromScript",            "normalize",        "baseURI",
-        "asJSON",          "jsonType",       "attributeNames",
+        "asJSON",          "jsonType",       "attributeNames",   "asCanonicalXML",
 #ifdef TCL_THREADS
         "readlock",        "writelock",
 #endif
@@ -4521,7 +4561,7 @@ int tcldom_NodeObjCmd (
         m_getElementsByTagName,              m_getElementsByTagNameNS,
         m_disableOutputEscaping,             m_precedes,        m_asText,
         m_insertBeforeFromScript,            m_normalize,       m_baseURI,
-        m_asJSON,          m_jsonType,       m_attributeNames
+        m_asJSON,          m_jsonType,       m_attributeNames,  m_asCanonicalXML
 #ifdef TCL_THREADS
         ,m_readlock,       m_writelock
 #endif
@@ -4807,6 +4847,12 @@ int tcldom_NodeObjCmd (
             }
             break;
 
+        case m_asCanonicalXML:
+            Tcl_ResetResult(interp);
+            if (serializeAsCanonicalXML(node, interp, objc, objv) != TCL_OK) {
+                return TCL_ERROR;
+            }
+            break;
         case m_asHTML:
             Tcl_ResetResult(interp);
             if (serializeAsHTML(node, interp, objc, objv) != TCL_OK) {
@@ -5601,7 +5647,7 @@ int tcldom_DocObjCmd (
         "standalone",      "mediaType",                  "nodeType",
         "cdataSectionElements",
         "selectNodesNamespaces",
-        "renameNode",      "deleteXPathCache", 
+        "renameNode",      "deleteXPathCache",
         /* The following methods will be dispatched to tcldom_NodeObjCmd */
         "getElementById",  "firstChild",                 "lastChild",
         "appendChild",     "removeChild",                "hasChildNodes",
@@ -5609,7 +5655,7 @@ int tcldom_DocObjCmd (
         "replaceChild",    "appendFromList",             "appendXML",
         "selectNodes",     "baseURI",                    "appendFromScript",
         "insertBeforeFromScript",                        "asJSON",
-        "jsonType",
+        "jsonType",        "asCanonicalXML",
 #ifdef TCL_THREADS
         "readlock",        "writelock",                  "renumber",
 #endif
@@ -5635,7 +5681,7 @@ int tcldom_DocObjCmd (
         m_replaceChild,     m_appendFromList,             m_appendXML,
         m_selectNodes,      m_baseURI,                    m_appendFromScript,
         m_insertBeforeFromScript,                         m_asJSON,
-        m_jsonType
+        m_jsonType,         m_asCanonicalXML
 #ifdef TCL_THREADS
        ,m_readlock,         m_writelock,                  m_renumber
 #endif
@@ -6065,6 +6111,7 @@ int tcldom_DocObjCmd (
         case m_baseURI:
         case m_asJSON:
         case m_jsonType:
+        case m_asCanonicalXML:
         case m_getElementById:
             /* We dispatch the method call to tcldom_NodeObjCmd */
             if (TcldomDATA(domCreateCmdMode) == DOM_CREATECMDMODE_AUTO) {

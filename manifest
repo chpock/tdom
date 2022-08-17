@@ -1,5 +1,5 @@
-C Split\sschema.c\sinto\stwo\sfiles\sschema.c\sand\sdatatypes.c.
-D 2022-08-17T16:53:18.754
+C Started.
+D 2022-08-17T23:34:36.178
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -147,7 +147,7 @@ F generic/nodecmd.c e8b237d7069eee5a505e1d845de0974e0e533173ec0b39f278137f1a5574
 F generic/nodecmd.h 36056ca2c262cb1991cabef8d27992ad628db718d09ff0eeaeaffd150f1549ec
 F generic/schema.c 1dd80805e668119e743308a67fca5b98152be25a3824a71137bdcb72ca6e1a13
 F generic/schema.h 57aa371b7571f3fd09b565961dca6375deabb07bab15b0441277d111b3ec4ea4
-F generic/tcldom.c f53dda4687c349eecdc5a891b74d3854aa9ed43b186c04c16f64592b42d7c4a4
+F generic/tcldom.c 3dd2e111458fee6b659b2e6b51ff72ce2f9e7024a1222a70fd0021df788a64f6
 F generic/tcldom.h fc61477bdd07440e17a8f11cc898e5c07c8c7c3592014213a5e50eca85393374
 F generic/tclexpat.c 60e133fb8502d853257c2de0ac62b9365850e525920a72590f38524d93199f5c
 F generic/tclexpat.h 95d915d74bb4b99ef3b80de00b0adce28931e6015ac63226b99db4817d9e313c
@@ -239,9 +239,11 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 2f99526c444997283d85ef2894bad0a5733f1d446db5cbddf4ad2c11699bfd1e 3c0f3c584c7e0d8b6207ba01a106b9e00eac93fd702d0a076545cd9f71fab4a8
-R bd69de9d779f972808e6de564ce07dd6
-T +closed 3c0f3c584c7e0d8b6207ba01a106b9e00eac93fd702d0a076545cd9f71fab4a8
+P 0eb4796366153165e5c4e48268f5176dc58e3b6495317d1ec93116e5318a809c
+R d21b54909511ae0adb36b2134e2e9c3c
+T *branch * c14n
+T *sym-c14n *
+T -sym-trunk *
 U rolf
-Z 0ec231d64d1e3d8b6a8e26c6f329f035
+Z d82920475a7e85176708fcdef2a1782f
 # Remove this line to create a well-formed Fossil manifest.
