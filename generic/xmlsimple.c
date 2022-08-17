@@ -60,7 +60,6 @@
 #else 
 # define RetError(m,p) *errStr=m; *pos=p; return TCL_ERROR;
 #endif
-#define SPACE(c)       ((c)==' ' || (c)=='\n' || (c)=='\t' || (c)=='\r')
 
 /*----------------------------------------------------------------------------
 |   Begin Character Entity Translator

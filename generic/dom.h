@@ -367,6 +367,7 @@ static const unsigned char CharBit[] = {
 #define isNCNameChar(x)  UTF8_GET_NAMING_NCNMTOKEN((x),UTF8_CHAR_LEN(*(x)))
 
 #define IS_XML_WHITESPACE(c)  ((c)==' ' || (c)=='\n' || (c)=='\r' || (c)=='\t')
+#define SPACE(c) IS_XML_WHITESPACE ((c))
 
 /*--------------------------------------------------------------------------
 |   DOMString

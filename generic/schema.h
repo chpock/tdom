@@ -27,11 +27,6 @@
 #include <tcldom.h>
 #include <domxpath.h>
 
-#if !defined(SetResult)
-#define SetResult(str) Tcl_ResetResult(interp);                         \
-                     Tcl_SetStringObj(Tcl_GetObjResult(interp), (str), -1)
-#endif
-
 #define SPACE(c) IS_XML_WHITESPACE ((c))
     
 
@@ -256,26 +251,35 @@ typedef struct SchemaData_
 
 
 SchemaCP*
-initSchemaCP (
+tDOM_initSchemaCP (
     Schema_CP_Type type,
     void *namespace,
     char *name
     );
 
+#define initSchemaCP(type,namespace,name) \
+    tDOM_initSchemaCP(type,namespace,name)
+
 int
-evalConstraints (
+tDOM_evalConstraints (
     Tcl_Interp *interp,
     SchemaData *sdata,
     SchemaCP *cp,
     Tcl_Obj *script
     );
 
+#define evalConstraints(interp,sdata,cp,script) \
+    tDOM_evalConstraints(interp,sdata,cp,script)
+
 int
-checkText (
+tDOM_checkText (
     Tcl_Interp *interp,
     void *clientData,
     char *text
     );
+
+#define checkText(interp,clientData,text) \
+    tDOM_checkText(interp,clientData,text)
 
 int 
 tDOM_schemaInstanceCmd (

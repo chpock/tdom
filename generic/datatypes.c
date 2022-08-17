@@ -55,6 +55,9 @@
 #  define WHITESPACETC_BUFFER_LEN_INIT 200
 #endif
 
+#define SetResult(str) Tcl_ResetResult(interp);  \
+                     Tcl_SetStringObj(Tcl_GetObjResult(interp), (str), -1)
+
 static int
 integerImplXsd (
     Tcl_Interp *UNUSED(interp),
@@ -1157,7 +1160,7 @@ allOfTCObjCmd (
     rc = evalConstraints (interp, sdata, cp, objv[1]);
     if (rc == TCL_OK) {
         ADD_CONSTRAINT (sdata, sc)
-        sc->constraint = checkText;
+        sc->constraint = tDOM_checkText;
         sc->constraintData = (void *)cp;
         return TCL_OK;
     }
@@ -2145,7 +2148,7 @@ whitespaceTCObjCmd (
     }
     if (type == t_preserve) {
         ADD_CONSTRAINT (sdata, sc)
-        sc->constraint = checkText;
+        sc->constraint = tDOM_checkText;
         sc->constraintData = (void *)cp;
         return TCL_OK;
     }

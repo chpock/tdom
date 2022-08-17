@@ -39,6 +39,9 @@
 #include <unistd.h>
 #endif
 
+#define SetResult(str) Tcl_ResetResult(interp);                         \
+                     Tcl_SetStringObj(Tcl_GetObjResult(interp), (str), -1)
+
 /* #define DEBUG */
 /* #define DDEBUG */
 /*----------------------------------------------------------------------------
@@ -374,7 +377,7 @@ tdomGetSchemadata (Tcl_Interp *interp)
 
 
 SchemaCP*
-initSchemaCP (
+tDOM_initSchemaCP (
     Schema_CP_Type type,
     void *namespace,
     char *name
@@ -1319,7 +1322,7 @@ recover (
 
 /* The cp argument must be type SCHEMA_CTYPE_TEXT */
 int
-checkText (
+tDOM_checkText (
     Tcl_Interp *interp,
     void *clientData,
     char *text
@@ -3698,7 +3701,7 @@ tDOM_schemaReset (
 }
 
 int
-evalConstraints (
+tDOM_evalConstraints (
     Tcl_Interp *interp,
     SchemaData *sdata,
     SchemaCP *cp,
