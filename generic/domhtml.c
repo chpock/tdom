@@ -59,7 +59,6 @@
 \---------------------------------------------------------------------------*/
 #define DBG(x)          
 #define RetError(m,p)   *errStr = tdomstrdup(m); *pos = p; return TCL_ERROR;
-#define SPACE(c)        ((c)==' ' || (c)=='\n' || (c)=='\t' || (c)=='\r')
 #define IsLetter(c)     ( ((c)>='A' && (c)<='Z') || ((c)>='a' && (c)<='z') || ((c) >= '0' && (c) <= '9') )
 #define TU(c)           toupper((unsigned char)c)
 
