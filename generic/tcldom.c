@@ -3611,7 +3611,7 @@ static int serializeAsXML (
             }
             if ((mode & TCL_WRITABLE) == 0) {
                 Tcl_AppendResult(interp, "channel \"", channelId,
-                                "\" isnt't opened for writing", (char*)NULL);
+                                "\" is not opened for writing", (char*)NULL);
                 goto cleanup;
             }
             objc -= 2;
@@ -3738,9 +3738,47 @@ static void
 treeAsCanonicalXML (
     Tcl_Obj  *result,
     domNode  *node,
-    Tcl_Channel channel
+    Tcl_Channel chan,
+    int comments
     )
 {
+    domAttrNode   *attrs;
+    domNode       *child;
+    int outputFlags = 0;
+
+    switch (node->nodeType) {
+    case ELEMENT_NODE:
+        break;
+    case TEXT_NODE:
+    case CDATA_SECTION_NODE:
+        tcldom_AppendEscaped(result, chan,
+                             ((domTextNode*)node)->nodeValue,
+                             ((domTextNode*)node)->valueLength,
+                             outputFlags);
+        break;
+    case COMMENT_NODE:
+        if (comments) {
+            writeChars(result, chan, "<!--", 4);
+            writeChars(result, chan, ((domTextNode*)node)->nodeValue,
+                       ((domTextNode*)node)->valueLength);
+            writeChars(result, chan, "-->", 3);
+        }
+        break;
+    case PROCESSING_INSTRUCTION_NODE:
+        writeChars(result, chan, "<?", 2);
+        writeChars(result, chan, 
+                    ((domProcessingInstructionNode*)node)->targetValue,
+                    ((domProcessingInstructionNode*)node)->targetLength);
+        writeChars(result, chan, " ", 1);
+        writeChars(result, chan, 
+                   ((domProcessingInstructionNode*)node)->dataValue,
+                   ((domProcessingInstructionNode*)node)->dataLength);
+        writeChars(result, chan, "?>", 2);
+        break;
+    default:
+        /* Nothing to output */
+        break;
+    }
     return;
 }
 
@@ -3756,21 +3794,60 @@ static int serializeAsCanonicalXML (
     Tcl_Obj    *const objv[]
 )
 {
-    int mode;
+    int optionIndex, mode, comments = 0;
     Tcl_Channel chan = NULL;
+    domNode *docChild;
     
-    if (objc > 2) {
-        Tcl_WrongNumArgs(interp, 1, objv, "?Tcl-Channel?");
-        return TCL_ERROR;
-    }
-    if (objc == 2) {
-        chan = Tcl_GetChannel (interp, Tcl_GetString (objv[1]), &mode);
-        if (chan == NULL) {
-            SetResult ("argument must be a Tcl channel");
+    static const char *asCanonicalXMLOptions[] = {
+        "-channel", "-comments", NULL
+    };
+    enum asCanonicalXMLOption {
+        m_channel, m_comments
+    };
+    
+    while (objc > 3) {
+        if (Tcl_GetIndexFromObj(interp, objv[2], asCanonicalXMLOptions,
+                                "option", 0, &optionIndex) != TCL_OK) {
             return TCL_ERROR;
         }
+        switch ((enum asCanonicalXMLOption) optionIndex) {
+        case m_channel:
+            chan = Tcl_GetChannel (interp, Tcl_GetString (objv[3]), &mode);
+            if (chan == NULL) {
+                SetResult("the -channel option must have a Tcl channel"
+                          " argument");
+                return TCL_ERROR;
+            }
+            if ((mode & TCL_WRITABLE) == 0) {
+                SetResult ("channel is not opened for writing");
+                return TCL_ERROR;
+            }
+            objc -= 2;
+            objv += 2;
+            break;
+            
+        case m_comments:
+            if (Tcl_GetBooleanFromObj(interp, objv[3], &comments) != TCL_OK) {
+                return TCL_ERROR;
+            }
+            break;
+        }
     }
-    treeAsCanonicalXML(Tcl_GetObjResult (interp), node, chan);
+        
+    if (objc > 2) {
+        SetResult ("unexpected argument(s) after options");
+        return TCL_ERROR;
+    }
+    if (node->nodeType == DOCUMENT_NODE) {
+        docChild = ((domDocument*)node)->rootNode->firstChild;
+        while (docChild) {
+            treeAsCanonicalXML(Tcl_GetObjResult (interp), docChild, chan,
+                               comments);
+            docChild = docChild->nextSibling;
+        }
+    } else {
+        treeAsCanonicalXML(Tcl_GetObjResult (interp), node, chan, comments);
+    }
     return TCL_OK;
 }
 
