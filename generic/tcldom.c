@@ -3762,6 +3762,7 @@ treeAsCanonicalXML (
                 tcldom_AppendEscaped(xmlString, chan, attrs->nodeValue, 
                                      attrs->valueLength,
                                      outputFlags | SERIALIZE_FOR_ATTR);
+                writeChars(xmlString, chan, "\"", 1);
                 attrs = attrs->nextSibling;
             }
         }

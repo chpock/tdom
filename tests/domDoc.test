@@ -1689,7 +1689,7 @@ test domDoc-29.1 {asCanonicalXML} {
 <doc>Hello, world!</doc>
 <?pi-without-data?>}
 
-test domDoc-29.1 {asCanonicalXML} {
+test domDoc-29.2 {asCanonicalXML} {
     set doc [dom parse -keepEmpties {<?xml version="1.0"?>
 
 <?xml-stylesheet   href="doc.xsl"
@@ -1713,6 +1713,139 @@ test domDoc-29.1 {asCanonicalXML} {
 <?pi-without-data?>
 <!-- Comment 2 -->
 <!-- Comment 3 -->}
+
+test domDoc-29.3 {asCanonicalXML} {
+    set doc [dom parse -keepEmpties {<doc>
+   <clean>   </clean>
+   <dirty>   A   B   </dirty>
+   <mixed>
+      A
+      <clean>   </clean>
+      B
+      <dirty>   A   B   </dirty>
+      C
+   </mixed>
+</doc>}]
+    set result [$doc asCanonicalXML]
+    $doc delete
+    set result
+} {<doc>
+   <clean>   </clean>
+   <dirty>   A   B   </dirty>
+   <mixed>
+      A
+      <clean>   </clean>
+      B
+      <dirty>   A   B   </dirty>
+      C
+   </mixed>
+</doc>}
+
+test domDoc-29.5 {asCanonicalXML} {
+    set doc [dom parse -keepEmpties {<!DOCTYPE doc [<!ATTLIST e9 attr CDATA "default">]>
+<doc>
+   <e1   />
+   <e2   ></e2>
+   <e3   name = "elem3"   id="elem3"   />
+   <e4   name="elem4"   id="elem4"   ></e4>
+   <e5 a:attr="out" b:attr="sorted" attr2="all" attr="I'm"
+      xmlns:b="http://www.ietf.org"
+      xmlns:a="http://www.w3.org"
+      xmlns="http://example.org"/>
+   <e6 xmlns="" xmlns:a="http://www.w3.org">
+      <e7 xmlns="http://www.ietf.org">
+         <e8 xmlns="" xmlns:a="http://www.w3.org">
+            <e9 xmlns="" xmlns:a="http://www.ietf.org"/>
+         </e8>
+      </e7>
+   </e6>
+</doc>}]
+    set result [$doc asCanonicalXML]
+    $doc delete
+    set result
+} {<doc>
+   <e1></e1>
+   <e2></e2>
+   <e3 id="elem3" name="elem3"></e3>
+   <e4 id="elem4" name="elem4"></e4>
+   <e5 xmlns="http://example.org" xmlns:a="http://www.w3.org" xmlns:b="http://www.ietf.org" attr="I'm" attr2="all" b:attr="sorted" a:attr="out"></e5>
+   <e6 xmlns:a="http://www.w3.org">
+      <e7 xmlns="http://www.ietf.org">
+         <e8 xmlns="">
+            <e9 xmlns:a="http://www.ietf.org" attr="default"></e9>
+         </e8>
+      </e7>
+   </e6>
+</doc>}
+
+test domDoc-29.6 {asCanonicalXML} {
+    set doc [dom parse -keepEmpties {<!DOCTYPE doc [
+<!ATTLIST normId id ID #IMPLIED>
+<!ATTLIST normNames attr NMTOKENS #IMPLIED>
+]>
+<doc>
+   <text>First line&#x0d;&#10;Second line</text>
+   <value>&#x32;</value>
+   <compute><![CDATA[value>"0" && value<"10" ?"valid":"error"]]></compute>
+   <compute expr='value>"0" &amp;&amp; value&lt;"10" ?"valid":"error"'>valid</compute>
+   <norm attr=' &apos;   &#x20;&#13;&#xa;&#9;   &apos; '/>
+   <normNames attr='   A   &#x20;&#13;&#xa;&#9;   B   '/>
+   <normId id=' &apos;   &#x20;&#13;&#xa;&#9;   &apos; '/>
+</doc>}]
+    set result [$doc asCanonicalXML]
+    $doc delete
+    set result
+} {<doc>
+   <text>First line&#xD;
+Second line</text>
+   <value>2</value>
+   <compute>value&gt;"0" &amp;&amp; value&lt;"10" ?"valid":"error"</compute>
+   <compute expr="value>&quot;0&quot; &amp;&amp; value&lt;&quot;10&quot; ?&quot;valid&quot;:&quot;error&quot;">valid</compute>
+   <norm attr=" '    &#xD;&#xA;&#x9;   ' "></norm>
+   <normNames attr="A &#xD;&#xA;&#x9; B"></normNames>
+   <normId id="' &#xD;&#xA;&#x9; '"></normId>
+</doc>}
+
+proc 29.7 {base system public} {
+    switch $system {
+        "world.txt" {
+            return [list "string" "" "world"]
+        }
+        "earth.gif" {
+            return [list "string" "" ""]
+        }
+        default {
+            error "unexpected system URL '$system'"
+        }
+    }
+}
+
+test domDoc-29.7 {asCanonicalXML} {
+    set doc [dom parse -externalentitycommand 29.7 -keepEmpties {<!DOCTYPE doc [
+<!ATTLIST doc attrExtEnt ENTITY #IMPLIED>
+<!ENTITY ent1 "Hello">
+<!ENTITY ent2 SYSTEM "world.txt">
+<!ENTITY entExt SYSTEM "earth.gif" NDATA gif>
+<!NOTATION gif SYSTEM "viewgif.exe">
+]>
+<doc attrExtEnt="entExt">
+   &ent1;, &ent2;!
+</doc>
+
+<!-- Let world.txt contain "world" (excluding the quotes) -->}]
+    set result [$doc asCanonicalXML]
+    $doc delete
+    set result
+} {<doc attrExtEnt="entExt">
+   Hello, world!
+</doc>}
+
+# test domDoc-29.8 {asCanonicalXML} {
+#     set doc [dom parse -keepEmpties {}]
+#     set result [$doc asCanonicalXML]
+#     $doc delete
+#     set result
+# } {}
 
 # cleanup
 ::tcltest::cleanupTests
