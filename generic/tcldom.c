@@ -235,6 +235,7 @@ static char doc_usage[] =
     "    createComment text ?objVar?             \n"
     "    createProcessingInstruction target data ?objVar? \n"
     "    asXML ?-indent <none,tabs,0..8>? ?-channel <channel>? ?-escapeNonASCII? ?-escapeAllQuot? ?-doctypeDeclaration <boolean>?\n"
+    "    asCanonicalXML ?-channel <channel>? ?-comments <boolean>\n"
     "    asHTML ?-channel <channelId>? ?-escapeNonASCII? ?-htmlEntities?\n"
     "    asText                                  \n"
     "    asJSON ?-indent <none,0..8>?            \n"
@@ -332,6 +333,7 @@ static char node_usage[] =
     "    @<attrName> ?defaultValue?   \n"
     "    asList                       \n"
     "    asXML ?-indent <none,tabs,0..8>? ?-channel <channel>? ?-escapeNonASCII? ?-escapeAllQuot? ?-doctypeDeclaration <boolean>?\n"
+    "    asCanonicalXML ?-channel <channel>? ?-comments <boolean>\n"
     "    asHTML ?-channel <channelId>? ?-escapeNonASCII? ?-htmlEntities?\n"
     "    asText                       \n"
     "    asJSON ?-indent <none,0..8>? \n"
@@ -3736,7 +3738,7 @@ cleanup:
 
 static void
 treeAsCanonicalXML (
-    Tcl_Obj  *result,
+    Tcl_Obj  *xmlString,
     domNode  *node,
     Tcl_Channel chan,
     int comments
@@ -3748,32 +3750,58 @@ treeAsCanonicalXML (
 
     switch (node->nodeType) {
     case ELEMENT_NODE:
+        writeChars(xmlString, chan, "<", 1);
+        writeChars(xmlString, chan, node->nodeName, -1);
+        attrs = node->firstAttr;
+        if (attrs) {
+            /* TODO: sort */
+            while (attrs) {
+                writeChars(xmlString, chan, " ", 1);
+                writeChars(xmlString, chan, attrs->nodeName, -1);
+                writeChars(xmlString, chan, "=\"", 2);
+                tcldom_AppendEscaped(xmlString, chan, attrs->nodeValue, 
+                                     attrs->valueLength,
+                                     outputFlags | SERIALIZE_FOR_ATTR);
+                attrs = attrs->nextSibling;
+            }
+        }
+        writeChars(xmlString, chan, ">", 1);
+        child = node->firstChild;
+        while (child != NULL) {
+            treeAsCanonicalXML (xmlString, child, chan, comments);
+            child = child->nextSibling;
+        }
+        writeChars(xmlString, chan, "</", 2);
+        writeChars(xmlString, chan, node->nodeName, -1);
+        writeChars(xmlString, chan, ">", 1);
         break;
     case TEXT_NODE:
     case CDATA_SECTION_NODE:
-        tcldom_AppendEscaped(result, chan,
+        tcldom_AppendEscaped(xmlString, chan,
                              ((domTextNode*)node)->nodeValue,
                              ((domTextNode*)node)->valueLength,
                              outputFlags);
         break;
     case COMMENT_NODE:
         if (comments) {
-            writeChars(result, chan, "<!--", 4);
-            writeChars(result, chan, ((domTextNode*)node)->nodeValue,
+            writeChars(xmlString, chan, "<!--", 4);
+            writeChars(xmlString, chan, ((domTextNode*)node)->nodeValue,
                        ((domTextNode*)node)->valueLength);
-            writeChars(result, chan, "-->", 3);
+            writeChars(xmlString, chan, "-->", 3);
         }
         break;
     case PROCESSING_INSTRUCTION_NODE:
-        writeChars(result, chan, "<?", 2);
-        writeChars(result, chan, 
+        writeChars(xmlString, chan, "<?", 2);
+        writeChars(xmlString, chan, 
                     ((domProcessingInstructionNode*)node)->targetValue,
                     ((domProcessingInstructionNode*)node)->targetLength);
-        writeChars(result, chan, " ", 1);
-        writeChars(result, chan, 
-                   ((domProcessingInstructionNode*)node)->dataValue,
-                   ((domProcessingInstructionNode*)node)->dataLength);
-        writeChars(result, chan, "?>", 2);
+        if (((domProcessingInstructionNode*)node)->dataLength) {
+            writeChars(xmlString, chan, " ", 1);
+            writeChars(xmlString, chan, 
+                       ((domProcessingInstructionNode*)node)->dataValue,
+                       ((domProcessingInstructionNode*)node)->dataLength);
+        }
+        writeChars(xmlString, chan, "?>", 2);
         break;
     default:
         /* Nothing to output */
@@ -3794,10 +3822,11 @@ static int serializeAsCanonicalXML (
     Tcl_Obj    *const objv[]
 )
 {
-    int optionIndex, mode, comments = 0;
+    int optionIndex, mode, comments = 0, first= 1;
     Tcl_Channel chan = NULL;
     domNode *docChild;
-    
+    Tcl_Obj *resultObj;
+
     static const char *asCanonicalXMLOptions[] = {
         "-channel", "-comments", NULL
     };
@@ -3830,6 +3859,8 @@ static int serializeAsCanonicalXML (
             if (Tcl_GetBooleanFromObj(interp, objv[3], &comments) != TCL_OK) {
                 return TCL_ERROR;
             }
+            objc -= 2;
+            objv += 2;
             break;
         }
     }
@@ -3840,9 +3871,16 @@ static int serializeAsCanonicalXML (
     }
     if (node->nodeType == DOCUMENT_NODE) {
         docChild = ((domDocument*)node)->rootNode->firstChild;
+        resultObj = Tcl_GetObjResult (interp);
         while (docChild) {
-            treeAsCanonicalXML(Tcl_GetObjResult (interp), docChild, chan,
-                               comments);
+            if (first) {
+                first = 0;
+            } else {
+                if ((docChild->nodeType != COMMENT_NODE) || comments) {
+                    writeChars(resultObj, chan, "\n", 1);
+                }
+            }
+            treeAsCanonicalXML(resultObj, docChild, chan, comments);
             docChild = docChild->nextSibling;
         }
     } else {
@@ -5724,7 +5762,7 @@ int tcldom_DocObjCmd (
         "standalone",      "mediaType",                  "nodeType",
         "cdataSectionElements",
         "selectNodesNamespaces",
-        "renameNode",      "deleteXPathCache",
+        "renameNode",      "deleteXPathCache",           "asCanonicalXML",
         /* The following methods will be dispatched to tcldom_NodeObjCmd */
         "getElementById",  "firstChild",                 "lastChild",
         "appendChild",     "removeChild",                "hasChildNodes",
@@ -5732,7 +5770,7 @@ int tcldom_DocObjCmd (
         "replaceChild",    "appendFromList",             "appendXML",
         "selectNodes",     "baseURI",                    "appendFromScript",
         "insertBeforeFromScript",                        "asJSON",
-        "jsonType",        "asCanonicalXML",
+        "jsonType",        
 #ifdef TCL_THREADS
         "readlock",        "writelock",                  "renumber",
 #endif
@@ -5750,7 +5788,7 @@ int tcldom_DocObjCmd (
         m_standalone,       m_mediaType,                  m_nodeType,
         m_cdataSectionElements,
         m_selectNodesNamespaces,
-        m_renameNode,       m_deleteXPathCache,
+        m_renameNode,       m_deleteXPathCache,           m_asCanonicalXML,
         /* The following methods will be dispatched to tcldom_NodeObjCmd */
         m_getElementById,   m_firstChild,                 m_lastChild,
         m_appendChild,      m_removeChild,                m_hasChildNodes,
@@ -5758,7 +5796,7 @@ int tcldom_DocObjCmd (
         m_replaceChild,     m_appendFromList,             m_appendXML,
         m_selectNodes,      m_baseURI,                    m_appendFromScript,
         m_insertBeforeFromScript,                         m_asJSON,
-        m_jsonType,         m_asCanonicalXML
+        m_jsonType
 #ifdef TCL_THREADS
        ,m_readlock,         m_writelock,                  m_renumber
 #endif
@@ -5953,6 +5991,13 @@ int tcldom_DocObjCmd (
 
         case m_asXML:
             if (serializeAsXML((domNode*)doc, interp, objc, objv) != TCL_OK) {
+                return TCL_ERROR;
+            }
+            return TCL_OK;
+
+        case m_asCanonicalXML:
+            if (serializeAsCanonicalXML((domNode*)doc, interp, objc, objv)
+                != TCL_OK) {
                 return TCL_ERROR;
             }
             return TCL_OK;
@@ -6188,7 +6233,6 @@ int tcldom_DocObjCmd (
         case m_baseURI:
         case m_asJSON:
         case m_jsonType:
-        case m_asCanonicalXML:
         case m_getElementById:
             /* We dispatch the method call to tcldom_NodeObjCmd */
             if (TcldomDATA(domCreateCmdMode) == DOM_CREATECMDMODE_AUTO) {

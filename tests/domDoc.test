@@ -32,6 +32,7 @@
 #    domDoc-26.*: fragments list
 #    domDoc-27.*: deleteXPathCache
 #    domDoc-28.*: createElementNS
+#    domDoc-29.*: asCanonicalXML
 #
 # Copyright (c) 2004 - 2007 Rolf Ade.
 
@@ -1665,6 +1666,53 @@ test domDoc-28.3 {createElementNS} {
     set errMsg
 } {Missing URI in Namespace declaration}
 
+test domDoc-29.1 {asCanonicalXML} {
+    set doc [dom parse -keepEmpties {<?xml version="1.0"?>
+
+<?xml-stylesheet   href="doc.xsl"
+   type="text/xsl"   ?>
+
+<!DOCTYPE doc SYSTEM "doc.dtd">
+
+<doc>Hello, world!<!-- Comment 1 --></doc>
+
+<?pi-without-data     ?>
+
+<!-- Comment 2 -->
+
+<!-- Comment 3 -->}]
+    set result [$doc asCanonicalXML]
+    $doc delete
+    set result
+} {<?xml-stylesheet href="doc.xsl"
+   type="text/xsl"   ?>
+<doc>Hello, world!</doc>
+<?pi-without-data?>}
+
+test domDoc-29.1 {asCanonicalXML} {
+    set doc [dom parse -keepEmpties {<?xml version="1.0"?>
+
+<?xml-stylesheet   href="doc.xsl"
+   type="text/xsl"   ?>
+
+<!DOCTYPE doc SYSTEM "doc.dtd">
+
+<doc>Hello, world!<!-- Comment 1 --></doc>
+
+<?pi-without-data     ?>
+
+<!-- Comment 2 -->
+
+<!-- Comment 3 -->}]
+    set result [$doc asCanonicalXML -comments 1]
+    $doc delete
+    set result
+} {<?xml-stylesheet href="doc.xsl"
+   type="text/xsl"   ?>
+<doc>Hello, world!<!-- Comment 1 --></doc>
+<?pi-without-data?>
+<!-- Comment 2 -->
+<!-- Comment 3 -->}
 
 # cleanup
 ::tcltest::cleanupTests
