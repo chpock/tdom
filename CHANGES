@@ -1,4 +1,6 @@
 
+--- Release 0.9.3, 8. Aug. 2022 ---
+
 2022-06-03  Rolf Ade  <rolf@pointsman.de>
 
         Added commands tdom::fsnewNode and tdom::fsinsertNode.
