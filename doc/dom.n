@@ -516,13 +516,13 @@ If the command type to create is \fIelementNode\fR, the created
 command will create an element node, if called. Without the
 \&\fI-tagName\fR option the tag name of the created node is
 \&\fIcommandName\fR without Tcl namespace qualifiers. If the
-\&\fI-tagName\fR option was given then the created command the created
-elements will have this tag name. If the \fI-jsonType\fR option was
-given then the created node elements will have the given JSON type. If
-the \fI-namespace\fR option is given the created element node will be
-XML namespaced and in the namespace given by the option. The element
-name will be literal as given either by the command name or the
-\&\fI-tagname\fR option, if that was given. An appropriate XML
+\&\fI-tagName\fR option was given then the created elements will have
+the value of this option as tag name. If the \fI-jsonType\fR option
+was given then the created node elements will have the given JSON
+type. If the \fI-namespace\fR option is given the created element
+node will be XML namespaced and in the namespace given by the option.
+The element name will be literal as given either by the command name
+or the \fI-tagname\fR option, if that was given. An appropriate XML
 namespace declaration will be automatically added, to bind the prefix
 (if the element name has one) or the default namespace (if the element
 name hasn't a prefix) to the namespace if such a binding isn't in
@@ -594,6 +594,39 @@ command is:
 \&\fBpiNodeCmd\fP \fItarget data\fR
 
 .CE
+.PP
+Beside the with \fBdom\fP \fBcreateNodeCmd\fP calls
+created node commands there are two more commands which automatically
+insert nodes into the tree inside a \fBappendFromScript\fP
+script.
+
+
+
+.CS
+
+\&\fBtdom::fsnewNode\fP \fI?-jsonType <jsonType>?\fR \fI?-namespace <namespace>?\fR \fItagName\fR \fI?attributes?\fR \fI?script?\fR
+
+.CE
+.PP
+If called inside a fromScript context this command creates a new
+node \fItagName\fR in the XML namespace \fInamespace\fR if the
+\&\fI-namespace\fR option was given and with the JSON type
+\&\fIjsonType\fR if the \fI-jsonType\fR option was given and appends
+this node at the end of the child list of the invoking element node.
+The \fIattributes\fR and \fIscript\fR arguments will be processed as
+if given to an element creating node command.
+
+
+
+.CS
+
+\&\fBtdom::fsinsertNode\fP \fInode\fR
+
+.CE
+.PP
+Instead of creating a new node this appends the as argument given
+node at the end of the child list of the invoking element node. The
+node is unlinked from its previous place.
 .RE
 .TP
 \&\fB\fBdom\fP \fBsetStoreLineColumn\fP \fI?boolean\fB?

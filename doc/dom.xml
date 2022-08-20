@@ -429,13 +429,13 @@ command depends on the type of the node it creates.</p>
 command will create an element node, if called. Without the
 <m>-tagName</m> option the tag name of the created node is
 <m>commandName</m> without Tcl namespace qualifiers. If the
-<m>-tagName</m> option was given then the created command the created
-elements will have this tag name. If the <m>-jsonType</m> option was
-given then the created node elements will have the given JSON type. If
-the <m>-namespace</m> option is given the created element node will be
-XML namespaced and in the namespace given by the option. The element
-name will be literal as given either by the command name or the
-<m>-tagname</m> option, if that was given. An appropriate XML
+<m>-tagName</m> option was given then the created elements will have
+the value of this option as tag name. If the <m>-jsonType</m> option
+was given then the created node elements will have the given JSON
+type. If the <m>-namespace</m> option is given the created element
+node will be XML namespaced and in the namespace given by the option.
+The element name will be literal as given either by the command name
+or the <m>-tagname</m> option, if that was given. An appropriate XML
 namespace declaration will be automatically added, to bind the prefix
 (if the element name has one) or the default namespace (if the element
 name hasn't a prefix) to the namespace if such a binding isn't in
@@ -491,6 +491,34 @@ command is:</p>
 <syntax>
 <cmd>piNodeCmd</cmd> <m>target data</m>
 </syntax>
+
+<p>Beside the with <cmd>dom</cmd> <method>createNodeCmd</method> calls
+created node commands there are two more commands which automatically
+insert nodes into the tree inside a <method>appendFromScript</method>
+script.</p>
+
+<syntax>
+<cmd>tdom::fsnewNode</cmd> <m>?-jsonType &lt;jsonType>?</m> <m>?-namespace &lt;namespace>?</m> <m>tagName</m> <m>?attributes?</m> <m>?script?</m>
+</syntax>
+
+<p>If called inside a fromScript context this command creates a new
+node <m>tagName</m> in the XML namespace <m>namespace</m> if the
+<m>-namespace</m> option was given and with the JSON type
+<m>jsonType</m> if the <m>-jsonType</m> option was given and appends
+this node at the end of the child list of the invoking element node.
+The <m>attributes</m> and <m>script</m> arguments will be processed as
+if given to an element creating node command.
+</p>
+
+<syntax>
+<cmd>tdom::fsinsertNode</cmd> <m>node</m>
+</syntax>
+
+<p>Instead of creating a new node this appends the as argument given
+node at the end of the child list of the invoking element node. The
+node is unlinked from its previous place.
+</p>
+
 
 </desc>
         </commanddef>
