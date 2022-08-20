@@ -597,7 +597,7 @@ command is:
 .PP
 Beside the with \fBdom\fP \fBcreateNodeCmd\fP calls
 created node commands there are two more commands which automatically
-insert nodes into the tree inside a \fBappendFromScript\fP
+insert nodes into the tree inside an \fBappendFromScript\fP
 script.
 
 
@@ -614,7 +614,8 @@ node \fItagName\fR in the XML namespace \fInamespace\fR if the
 \&\fIjsonType\fR if the \fI-jsonType\fR option was given and appends
 this node at the end of the child list of the invoking element node.
 The \fIattributes\fR and \fIscript\fR arguments will be processed as
-if given to an element creating node command.
+if given to an element creating node command. If called outside a
+fromScript context this command will raise error.
 
 
 
@@ -624,9 +625,11 @@ if given to an element creating node command.
 
 .CE
 .PP
-Instead of creating a new node this appends the as argument given
-node at the end of the child list of the invoking element node. The
-node is unlinked from its previous place.
+If called inside o fromScript context this comannd instead of
+creating a new node appends the as argument given node at the end of
+the child list of the invoking element node. The node is unlinked from
+its previous place. If called outside a fromScript context this
+command will raise error.
 .RE
 .TP
 \&\fB\fBdom\fP \fBsetStoreLineColumn\fP \fI?boolean\fB?

@@ -494,7 +494,7 @@ command is:</p>
 
 <p>Beside the with <cmd>dom</cmd> <method>createNodeCmd</method> calls
 created node commands there are two more commands which automatically
-insert nodes into the tree inside a <method>appendFromScript</method>
+insert nodes into the tree inside an <method>appendFromScript</method>
 script.</p>
 
 <syntax>
@@ -507,16 +507,19 @@ node <m>tagName</m> in the XML namespace <m>namespace</m> if the
 <m>jsonType</m> if the <m>-jsonType</m> option was given and appends
 this node at the end of the child list of the invoking element node.
 The <m>attributes</m> and <m>script</m> arguments will be processed as
-if given to an element creating node command.
+if given to an element creating node command. If called outside a
+fromScript context this command will raise error.
 </p>
 
 <syntax>
 <cmd>tdom::fsinsertNode</cmd> <m>node</m>
 </syntax>
 
-<p>Instead of creating a new node this appends the as argument given
-node at the end of the child list of the invoking element node. The
-node is unlinked from its previous place.
+<p>If called inside o fromScript context this comannd instead of
+creating a new node appends the as argument given node at the end of
+the child list of the invoking element node. The node is unlinked from
+its previous place. If called outside a fromScript context this
+command will raise error.
 </p>
 
 

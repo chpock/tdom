@@ -1,5 +1,5 @@
-C Added\sdocumentation\sfor\sthe\scommands\stdom::fsnewNode\sand\stdom::fsinsertNode.
-D 2022-08-20T00:30:04.232
+C More\sof\sthe\ssame.
+D 2022-08-20T00:36:43.634
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -18,9 +18,9 @@ F configure.ac 1880ab97ab97e615014e24aa605074ad074035a413398182430e65e995eaa362
 F doc/INDEX.MAP 8b9f0c2e18efc29fcf581669e175dec860f54026ef7fef4b8d7403bca442fb71
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html b4a8d2a4b261d8380849b9fa2b4026f1e08248aab543551db47a34b60a43c69a
-F doc/dom.html 01613e213063decf3c4544f357ec9f9e5dee1097ae2d530525f8689038364a16
-F doc/dom.n 7ba191d4f547a9005cc450d765005bb4702438f4ec264537ed225f5c89771ed8
-F doc/dom.xml d2e3c5c7f2ed2b1e542f113061ce99faa40b289989e006ee48955f1c755fcb28
+F doc/dom.html 1d11385ca4813443eed963e0086bd477c0d11dadf3a0006c10116263f17597ad
+F doc/dom.n 362d1ac1b59c8d21d6155fa9a59cc91278e898791a5b7fc3325f97a559714ae2
+F doc/dom.xml 566521cc37eb4e8aa5ded41cf71ab00e85ede1b0f08b6fb990dbb8d8e9bd74c1
 F doc/domDoc.html 058900aec136f8c1ff14e29c05a2da893166133d9d5d77c6ae97229b11a12bff
 F doc/domDoc.n ddefbfe5a657c1e2b569155d69cdb07ad801b204059f5aa537617dcd5a76ef86
 F doc/domDoc.xml d445b6947b0c33a3aa951f3e8e769b099cbe4c66d10fd31aaf7ebfb16f272ae6
@@ -239,8 +239,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 9c8a034db37a9cd14257fed418bc390e205ba8d3da01fa9653a6ebbf03ae3ef1
-R f40078d0a445ebf2c9bb19dc56cc746b
+P f1cb932bba9a9b7c3b1251cad18243b6ed783a9a1aa547fe9125728db0434bb5
+R 6e5333d9e2610c0aaa4c0b0230216e09
 U rolf
-Z 3e5f68ba45021983fd1f10dfd4fc7100
+Z 5d36bb568af031d0396733e4994e20e6
 # Remove this line to create a well-formed Fossil manifest.
