@@ -3746,6 +3746,8 @@ treeAsCanonicalXML (
 {
     domAttrNode   *attrs;
     domNode       *child;
+    domDocument   *doc;
+    domNS         *ns, *ns1;
     int outputFlags = 0;
 
     switch (node->nodeType) {
@@ -3754,8 +3756,21 @@ treeAsCanonicalXML (
         writeChars(xmlString, chan, node->nodeName, -1);
         attrs = node->firstAttr;
         if (attrs) {
+            doc = node->ownerDocument;
             /* TODO: sort */
             while (attrs) {
+                if(attrs->nodeFlags & IS_NS_NODE) {
+                    ns = doc->namespaces[attrs->namespace];
+                    if (ns) {
+                        ns1 = domLookupPrefix (node, ns->prefix);
+                        if (ns1 && strcmp (ns->uri, ns1->uri) == 0) {
+                            /* Namespace declaration already in scope,
+                             * suppress it */
+                            attrs = attrs->nextSibling;
+                            continue;
+                        }
+                    }
+                }
                 writeChars(xmlString, chan, " ", 1);
                 writeChars(xmlString, chan, attrs->nodeName, -1);
                 writeChars(xmlString, chan, "=\"", 2);
