@@ -4,17 +4,17 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x562e3eb554c0">NAME</a> · <a href="#SECTid0x562e3eb905e0">SYNOPSIS</a> · <a href="#SECTid0x562e3ec2d890">DESCRIPTION </a> · <a href="#SECTid0x562e3ec99f80">KEYWORDS</a>
+<a href="#SECTid0x55e7844b14c0">NAME</a> · <a href="#SECTid0x55e7844e4580">SYNOPSIS</a> · <a href="#SECTid0x55e784589850">DESCRIPTION </a> · <a href="#SECTid0x55e7845f3c00">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x562e3eb554c0">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x55e7844b14c0">NAME</a></h2><p class="namesection">
 <b class="names">dom - </b><br>Create an in-memory DOM tree from XML</p>
   
-  <h2><a name="SECTid0x562e3eb905e0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x55e7844e4580">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">dom</b> <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
 
-  <h2><a name="SECTid0x562e3ec2d890">DESCRIPTION </a></h2><p>This command provides the creation of DOM trees in memory. In
+  <h2><a name="SECTid0x55e784589850">DESCRIPTION </a></h2><p>This command provides the creation of DOM trees in memory. In
 the usual case a string containing a XML information is parsed and converted
 into a DOM tree. Other possible parse input may be HTML or JSON.
 The <i class="m">method</i> indicates a specific subcommand. </p><p>The valid methods are:</p><dl class="commandlist">
@@ -445,13 +445,13 @@ command depends on the type of the node it creates.</p>
 command will create an element node, if called. Without the
 <i class="m">-tagName</i> option the tag name of the created node is
 <i class="m">commandName</i> without Tcl namespace qualifiers. If the
-<i class="m">-tagName</i> option was given then the created command the created
-elements will have this tag name. If the <i class="m">-jsonType</i> option was
-given then the created node elements will have the given JSON type. If
-the <i class="m">-namespace</i> option is given the created element node will be
-XML namespaced and in the namespace given by the option. The element
-name will be literal as given either by the command name or the
-<i class="m">-tagname</i> option, if that was given. An appropriate XML
+<i class="m">-tagName</i> option was given then the created elements will have
+the value of this option as tag name. If the <i class="m">-jsonType</i> option
+was given then the created node elements will have the given JSON
+type. If the <i class="m">-namespace</i> option is given the created element
+node will be XML namespaced and in the namespace given by the option.
+The element name will be literal as given either by the command name
+or the <i class="m">-tagname</i> option, if that was given. An appropriate XML
 namespace declaration will be automatically added, to bind the prefix
 (if the element name has one) or the default namespace (if the element
 name hasn't a prefix) to the namespace if such a binding isn't in
@@ -507,6 +507,37 @@ command is:</p>
 <pre class="syntax">
 <b class="cmd">piNodeCmd</b> <i class="m">target data</i>
 </pre>
+
+<p>Beside the with <b class="cmd">dom</b> <b class="method">createNodeCmd</b> calls
+created node commands there are two more commands which automatically
+insert nodes into the tree inside an <b class="method">appendFromScript</b>
+script.</p>
+
+<pre class="syntax">
+<b class="cmd">tdom::fsnewNode</b> <i class="m">?-jsonType &lt;jsonType&gt;?</i> <i class="m">?-namespace &lt;namespace&gt;?</i> <i class="m">tagName</i> <i class="m">?attributes?</i> <i class="m">?script?</i>
+</pre>
+
+<p>If called inside a fromScript context this command creates a new
+node <i class="m">tagName</i> in the XML namespace <i class="m">namespace</i> if the
+<i class="m">-namespace</i> option was given and with the JSON type
+<i class="m">jsonType</i> if the <i class="m">-jsonType</i> option was given and appends
+this node at the end of the child list of the invoking element node.
+The <i class="m">attributes</i> and <i class="m">script</i> arguments will be processed as
+if given to an element creating node command. If called outside a
+fromScript context this command will raise error.
+</p>
+
+<pre class="syntax">
+<b class="cmd">tdom::fsinsertNode</b> <i class="m">node</i>
+</pre>
+
+<p>If called inside o fromScript context this comannd instead of
+creating a new node appends the as argument given node at the end of
+the child list of the invoking element node. The node is unlinked from
+its previous place. If called outside a fromScript context this
+command will raise error.
+</p>
+
 
 </dd>
         
@@ -740,7 +771,7 @@ recommendation. Otherwise it returns 0.</dd>
         
     </dl>
 
-<h2><a name="SECTid0x562e3ec99f80">KEYWORDS</a></h2><p class="keywords">
+<h2><a name="SECTid0x55e7845f3c00">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-XML">XML</a>, <a class="keyword" href="keyword-index.html#KW-DOM">DOM</a>, <a class="keyword" href="keyword-index.html#KW-document">document</a>, <a class="keyword" href="keyword-index.html#KW-node">node</a>, <a class="keyword" href="keyword-index.html#KW-parsing">parsing</a>
 </p>
 </div><hr class="navsep"><div class="navbar" align="center">
