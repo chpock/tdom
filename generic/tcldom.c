@@ -2258,8 +2258,7 @@ void tcldom_AppendEscaped (
         if ((*pc == '\r') && outputFlags & SERIALIZE_ESCAPE_CR) {
             AP('&') AP('#') AP('x') AP('D') AP(';')
         } else 
-        if ((*pc == '\t') && outputFlags & SERIALIZE_FOR_ATTR
-            && outputFlags & SERIALIZE_ESCAPE_TAB) {
+        if ((*pc == '\t') && outputFlags & SERIALIZE_ESCAPE_TAB) {
             AP('&') AP('#') AP('x') AP('9') AP(';')
         } else 
         {
@@ -3545,13 +3544,13 @@ static int serializeAsXML (
     static const char *asXMLOptions[] = {
         "-indent", "-channel", "-escapeNonASCII", "-doctypeDeclaration",
         "-xmlDeclaration", "-encString", "-escapeAllQuot", "-indentAttrs",
-        "-nogtescape", "-noEmptyElementTag",
+        "-nogtescape", "-noEmptyElementTag", "-escapeCR", "-escapeTab",
         NULL
     };
     enum asXMLOption {
         m_indent, m_channel, m_escapeNonASCII, m_doctypeDeclaration,
         m_xmlDeclaration, m_encString, m_escapeAllQuot, m_indentAttrs,
-        m_nogtescape, m_noEmptyElementTag
+        m_nogtescape, m_noEmptyElementTag, m_escapeCR, m_escapeTab
     };
     
     indent = 4;
@@ -3702,6 +3701,18 @@ static int serializeAsXML (
 
         case m_noEmptyElementTag:
             outputFlags |= SERIALIZE_NO_EMPTY_ELEMENT_TAG;
+            objc -= 1;
+            objv += 1;
+            break;
+
+        case m_escapeCR:
+            outputFlags |= SERIALIZE_ESCAPE_CR;
+            objc -= 1;
+            objv += 1;
+            break;
+
+        case m_escapeTab:
+            outputFlags |= SERIALIZE_ESCAPE_TAB;
             objc -= 1;
             objv += 1;
             break;
@@ -3905,8 +3916,7 @@ treeAsCanonicalXML (
     domNode       *child;
     domDocument   *doc;
     domNS         *ns, *ns1;
-    int            outputFlags = (SERIALIZE_ESCAPE_CR | SERIALIZE_ESCAPE_TAB);
-    int            attNr = 0;
+    int            outputFlags = SERIALIZE_ESCAPE_CR, attNr = 0;
 
     switch (node->nodeType) {
     case ELEMENT_NODE:
@@ -3973,7 +3983,8 @@ treeAsCanonicalXML (
                                      attr->valueLength,
                                      outputFlags
                                      | SERIALIZE_FOR_ATTR
-                                     | SERIALIZE_NO_GT_ESCAPE);
+                                     | SERIALIZE_NO_GT_ESCAPE
+                                     | SERIALIZE_ESCAPE_TAB);
                 writeChars(xmlString, chan, "\"", 1);
                 attr = attr->nextSibling;
             }

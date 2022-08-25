@@ -1,5 +1,5 @@
-C More\swork\son\sencoding\sof\sspecial\scharacters\sas\scharacter\sreferences\sin\sattribute\svalues\sand\stext.
-D 2022-08-25T22:48:45.316
+C As\sfall-out\sof\snew\sfunctionalities\sneeded\sfor\sc14n\sXML\snew\soptiongs\s-escapeCR\sand\s-escapeTab\sfor\sthe\smethod\sasXML.
+D 2022-08-25T23:30:03.386
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -21,9 +21,9 @@ F doc/category-index.html b4a8d2a4b261d8380849b9fa2b4026f1e08248aab543551db47a34
 F doc/dom.html 1d11385ca4813443eed963e0086bd477c0d11dadf3a0006c10116263f17597ad
 F doc/dom.n 362d1ac1b59c8d21d6155fa9a59cc91278e898791a5b7fc3325f97a559714ae2
 F doc/dom.xml 566521cc37eb4e8aa5ded41cf71ab00e85ede1b0f08b6fb990dbb8d8e9bd74c1
-F doc/domDoc.html 058900aec136f8c1ff14e29c05a2da893166133d9d5d77c6ae97229b11a12bff
-F doc/domDoc.n ddefbfe5a657c1e2b569155d69cdb07ad801b204059f5aa537617dcd5a76ef86
-F doc/domDoc.xml d445b6947b0c33a3aa951f3e8e769b099cbe4c66d10fd31aaf7ebfb16f272ae6
+F doc/domDoc.html 32a8a444d710daf9609d1132cd09144b2130f43addf8740fe408cb05c55bad9e
+F doc/domDoc.n 06235fa9a461e36d51f63324fbdb3aeb5ddb2f1660e5110eb7c6571ebdb4a9b2
+F doc/domDoc.xml 9f18dbdc468357725a59c4740a076917e20a5055cf4090aa3071ba4a8e109052
 F doc/domNode.html 5d97efa6dd972cd083adde415133d323cc8728bb08028a8bc188318f3d83a30d
 F doc/domNode.n 1a47c7d55473a020737d28c88bc824d2479cb2a7f6b62c4f70a501af9b3b9188
 F doc/domNode.xml c19fef79ed938c7d6d064b26c07e7a9ae809184e483975f607c612749685e6f1
@@ -147,7 +147,7 @@ F generic/nodecmd.c e8b237d7069eee5a505e1d845de0974e0e533173ec0b39f278137f1a5574
 F generic/nodecmd.h 36056ca2c262cb1991cabef8d27992ad628db718d09ff0eeaeaffd150f1549ec
 F generic/schema.c 1dd80805e668119e743308a67fca5b98152be25a3824a71137bdcb72ca6e1a13
 F generic/schema.h 57aa371b7571f3fd09b565961dca6375deabb07bab15b0441277d111b3ec4ea4
-F generic/tcldom.c f32b9c07caf6916d220413b5b52f9907a764f913c3288147d310e14035f5d058
+F generic/tcldom.c f659e1765f25b7b366de6cf642aac5a72fb302a767487608fd12f4d4311764a8
 F generic/tcldom.h fc61477bdd07440e17a8f11cc898e5c07c8c7c3592014213a5e50eca85393374
 F generic/tclexpat.c 60e133fb8502d853257c2de0ac62b9365850e525920a72590f38524d93199f5c
 F generic/tclexpat.h 95d915d74bb4b99ef3b80de00b0adce28931e6015ac63226b99db4817d9e313c
@@ -197,7 +197,7 @@ F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.bench 5446ce379127b8d5700f18a5a0848e580313d0d7
 F tests/dom.test febf5b98ac25f50346e87d479378d6166af69bcac6e83d6273fae6f29c752056
-F tests/domDoc.test f2eb8cb4ac940d952641623530bf2ba233e9657be001a8587878f769c4ebbe66
+F tests/domDoc.test 8b78ad099200a5be8149e9c3b53be09c1446b95dc64b9b7fe65fa7ea58376518
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test 4975751b16ff54c004b7594a38ca68b81cffa7d70f2a8f850943fe5220dc1a8b
 F tests/domjson.test bdfbe938f33931f56f9496aac425b2183373f4cb926b95a04fa095bd3b75cd3d
@@ -239,8 +239,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 7181ead46c047abacb9e012044cd948173ddeb8d2c7cac389399d80429bef9c5
-R 4c72655abaf9fbc0010012a4848ed754
+P 1681a545420b4248cd9faab76ae7b12bd352ccf380ce3620894020a8aecfe628
+R 4ecbf3ea0ca9400d70908656b150c91e
 U rolf
-Z 4524795cb6174abdd934a198d91162cb
+Z a7d93cc0b0c6acf9e84ad5e4f3dbf82b
 # Remove this line to create a well-formed Fossil manifest.

@@ -294,6 +294,16 @@ If the option \fI-noEmptyElementTag\fR is given then no
 empty tag syntax will be used. Instead, if an element has
 empty content it will be serialized with an element start tag
 and an immediately following element end tag.
+.PP
+If the option \fI-escapeCR\fR is given then the character
+\&'\er' will be escaped as character reference in attribute
+values and text content of elements. The default is to not do
+this.
+.PP
+If the option \fI-escapeTab\fR is given then the character
+\&'\et' will be escaped as character reference in attribute
+values and text content of elements. The default is to not do
+this.
 .RE
 .TP
 \&\fB\fBasHTML\fP \fB?-channel channelId?\fP \fB?-escapeNonASCII?\fP \fB?-htmlEntities?\fP \fB?-doctypeDeclaration <boolean>?\fP \fB?-breakLines?\fP \fB?-onlyContents?\fP

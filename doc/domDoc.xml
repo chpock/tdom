@@ -166,8 +166,18 @@ usually a result of a XSLT transformation.</desc>
         <p>If the option <m>-noEmptyElementTag</m> is given then no
         empty tag syntax will be used. Instead, if an element has
         empty content it will be serialized with an element start tag
-        and an immediately following element end tag.</p></desc>
+        and an immediately following element end tag.</p>
 
+        <p>If the option <m>-escapeCR</m> is given then the character
+        '\r' will be escaped as character reference in attribute
+        values and text content of elements. The default is to not do
+        this.</p>
+
+        <p>If the option <m>-escapeTab</m> is given then the character
+        '\t' will be escaped as character reference in attribute
+        values and text content of elements. The default is to not do
+        this.</p>
+        </desc>
       </commanddef>
 
       <commanddef>
