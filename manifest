@@ -1,5 +1,5 @@
-C wip
-D 2022-08-25T06:52:07.036
+C Made\sattribute\ssort\swork.
+D 2022-08-25T15:33:10.306
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -147,7 +147,7 @@ F generic/nodecmd.c e8b237d7069eee5a505e1d845de0974e0e533173ec0b39f278137f1a5574
 F generic/nodecmd.h 36056ca2c262cb1991cabef8d27992ad628db718d09ff0eeaeaffd150f1549ec
 F generic/schema.c 1dd80805e668119e743308a67fca5b98152be25a3824a71137bdcb72ca6e1a13
 F generic/schema.h 57aa371b7571f3fd09b565961dca6375deabb07bab15b0441277d111b3ec4ea4
-F generic/tcldom.c d8977ece5150c25c05c637c48cbf89e28b278715c18fc79aa3de8efd0593a040
+F generic/tcldom.c 280a944d6e29dcaf93e8e9614838d0bf4751680aa4d6edba528e7fb00410c1d8
 F generic/tcldom.h fc61477bdd07440e17a8f11cc898e5c07c8c7c3592014213a5e50eca85393374
 F generic/tclexpat.c 60e133fb8502d853257c2de0ac62b9365850e525920a72590f38524d93199f5c
 F generic/tclexpat.h 95d915d74bb4b99ef3b80de00b0adce28931e6015ac63226b99db4817d9e313c
@@ -239,11 +239,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 43e4e0a0c461e0e1174eb122d1ca0c83143e2acbcc66e70a3b1c11dc9cb9a083
-R 7d7d01d470a4450bd5d73e0da0e7bdfe
-T *branch * wip
-T *sym-wip *
-T -sym-c14n *
+P 3febcb12fb2d774e4a2334b0964fd169ea41585611c289d016b6c5cf2f0c0b10
+R ecc3de8879faec45ca9a033895587337
 U rolf
-Z 018e039954d6f085e26e6c288ec998a5
+Z 99a92fdf88965dfa28502677614fea68
 # Remove this line to create a well-formed Fossil manifest.

@@ -3892,7 +3892,7 @@ treeAsCanonicalXML (
     int  *lengthAttOrderArray
     )
 {
-    domAttrNode   *attr, *thisAtt, *previousAtt;
+    domAttrNode   *attr, *thisAtt, *previousAtt, *attOrder;
     domNode       *child;
     domDocument   *doc;
     domNS         *ns, *ns1;
@@ -3903,6 +3903,7 @@ treeAsCanonicalXML (
         writeChars(xmlString, chan, "<", 1);
         writeChars(xmlString, chan, node->nodeName, -1);
     restartAttOrder:
+        attOrder = *attOrderArray;
         attr = node->firstAttr;
         if (attr) {
             doc = node->ownerDocument;
@@ -3940,10 +3941,11 @@ treeAsCanonicalXML (
                     attNr = 0;
                     goto restartAttOrder;
                 }
-                thisAtt = memcpy (attOrderArray[attNr], attr,
+
+                thisAtt = memcpy (&attOrder[attNr], attr,
                                   sizeof (domAttrNode));
                 if (attNr) {
-                    previousAtt = attOrderArray[attNr-1];
+                    previousAtt = &attOrder[attNr-1];
                     previousAtt->nextSibling = thisAtt;
                 }
                 attNr++;
@@ -3954,14 +3956,9 @@ treeAsCanonicalXML (
             }
             attr = mergeSortAtt (attOrderArray[0], attNr) ;
             while (attr) {
-                Tcl_Obj *tmp;
-                tmp = Tcl_NewStringObj (attr->nodeValue, attr->valueLength);
-                fprintf (stderr, "node %s att %s %d %s\n", node->nodeName, attr->nodeName,
-                         attr->valueLength, Tcl_GetString(tmp));
                 writeChars(xmlString, chan, " ", 1);
                 writeChars(xmlString, chan, attr->nodeName, -1);
                 writeChars(xmlString, chan, "=\"", 2);
-                fprintf (stderr, "HIER\n");
                 tcldom_AppendEscaped(xmlString, chan, attr->nodeValue, 
                                      attr->valueLength,
                                      outputFlags | SERIALIZE_FOR_ATTR);
