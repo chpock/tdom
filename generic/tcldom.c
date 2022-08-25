@@ -169,6 +169,7 @@
 #define SERIALIZE_INDENT_WITH_TAB 256
 #define SERIALIZE_INDENT_ATTR_WITH_TAB 512
 #define SERIALIZE_ESCAPE_CR 1024
+#define SERIALIZE_ESCAPE_TAB 2048
 
 /*----------------------------------------------------------------------------
 |   Module Globals
@@ -2257,7 +2258,10 @@ void tcldom_AppendEscaped (
         if ((*pc == '\r') && outputFlags & SERIALIZE_ESCAPE_CR) {
             AP('&') AP('#') AP('x') AP('D') AP(';')
         } else 
-                
+        if ((*pc == '\t') && outputFlags & SERIALIZE_FOR_ATTR
+            && outputFlags & SERIALIZE_ESCAPE_TAB) {
+            AP('&') AP('#') AP('x') AP('9') AP(';')
+        } else 
         {
             charDone = 0;
             if (outputFlags & SERIALIZE_HTML_ENTITIES) {
@@ -3901,7 +3905,8 @@ treeAsCanonicalXML (
     domNode       *child;
     domDocument   *doc;
     domNS         *ns, *ns1;
-    int            outputFlags = SERIALIZE_ESCAPE_CR, attNr = 0;
+    int            outputFlags = (SERIALIZE_ESCAPE_CR | SERIALIZE_ESCAPE_TAB);
+    int            attNr = 0;
 
     switch (node->nodeType) {
     case ELEMENT_NODE:
@@ -3966,7 +3971,9 @@ treeAsCanonicalXML (
                 writeChars(xmlString, chan, "=\"", 2);
                 tcldom_AppendEscaped(xmlString, chan, attr->nodeValue, 
                                      attr->valueLength,
-                                     outputFlags | SERIALIZE_FOR_ATTR);
+                                     outputFlags
+                                     | SERIALIZE_FOR_ATTR
+                                     | SERIALIZE_NO_GT_ESCAPE);
                 writeChars(xmlString, chan, "\"", 1);
                 attr = attr->nextSibling;
             }
@@ -3987,7 +3994,7 @@ treeAsCanonicalXML (
         tcldom_AppendEscaped(xmlString, chan,
                              ((domTextNode*)node)->nodeValue,
                              ((domTextNode*)node)->valueLength,
-                             outputFlags | SERIALIZE_NO_GT_ESCAPE);
+                             outputFlags);
         break;
     case COMMENT_NODE:
         if (comments) {
