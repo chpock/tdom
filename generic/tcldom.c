@@ -168,6 +168,7 @@
 #define SERIALIZE_NO_EMPTY_ELEMENT_TAG 128
 #define SERIALIZE_INDENT_WITH_TAB 256
 #define SERIALIZE_INDENT_ATTR_WITH_TAB 512
+#define SERIALIZE_ESCAPE_CR 1024
 
 /*----------------------------------------------------------------------------
 |   Module Globals
@@ -2253,6 +2254,10 @@ void tcldom_AppendEscaped (
         if ((*pc == '\n') && outputFlags & SERIALIZE_FOR_ATTR) {
             AP('&') AP('#') AP('x') AP('A') AP(';')
         } else
+        if ((*pc == '\r') && outputFlags & SERIALIZE_ESCAPE_CR) {
+            AP('&') AP('#') AP('x') AP('D') AP(';')
+        } else 
+                
         {
             charDone = 0;
             if (outputFlags & SERIALIZE_HTML_ENTITIES) {
@@ -3896,7 +3901,7 @@ treeAsCanonicalXML (
     domNode       *child;
     domDocument   *doc;
     domNS         *ns, *ns1;
-    int outputFlags = 0, attNr = 0;
+    int            outputFlags = SERIALIZE_ESCAPE_CR, attNr = 0;
 
     switch (node->nodeType) {
     case ELEMENT_NODE:
@@ -3982,7 +3987,7 @@ treeAsCanonicalXML (
         tcldom_AppendEscaped(xmlString, chan,
                              ((domTextNode*)node)->nodeValue,
                              ((domTextNode*)node)->valueLength,
-                             outputFlags);
+                             outputFlags | SERIALIZE_NO_GT_ESCAPE);
         break;
     case COMMENT_NODE:
         if (comments) {
