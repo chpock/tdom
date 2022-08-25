@@ -1840,7 +1840,16 @@ test domDoc-29.7 {asCanonicalXML} {
    Hello, world!
 </doc>}
 
-# test domDoc-29.8 {asCanonicalXML} {
+test domDoc-29.8 {asCanonicalXML} {
+    set doc [dom parse -keepEmpties {<?xml version="1.0" encoding="ISO-8859-1"?>
+<doc>&#169;</doc>}]
+    set result [$doc asCanonicalXML]
+    $doc delete
+    set result
+} {<doc>©</doc>}
+
+
+# test domDoc-29.9 {asCanonicalXML} {
 #     set doc [dom parse -keepEmpties {}]
 #     set result [$doc asCanonicalXML]
 #     $doc delete
