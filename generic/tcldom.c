@@ -63,6 +63,9 @@
 # define DBG(x) 
 #endif
 
+#ifndef C14N_ATTR_SORT_SIZE_INIT
+#  define C14N_ATTR_SORT_SIZE_INIT 8
+#endif
 
 /*----------------------------------------------------------------------------
 |   Macros
@@ -3736,55 +3739,238 @@ cleanup:
     return TCL_ERROR;
 }
 
+static int compareNSAtts (
+    domAttrNode *a,
+    domAttrNode *b
+    ) 
+{
+    if (strcmp (a->nodeName, "xmlns") == 0) {
+        return -1;
+    } else if (strcmp (b->nodeName, "xmlns") == 0) {
+        return 1;
+    }
+    return (strcmp (&a->nodeName[6], &b->nodeName[6]));
+}
+
+static int compareAtts (
+    domAttrNode *a,
+    domAttrNode *b
+    ) 
+{
+    domNS *ans, *bns;
+    domDocument *doc;
+    const char *alocalname, *blocalname;
+    int res;
+
+
+    if (a->nodeFlags & IS_NS_NODE) {
+        if (b->nodeFlags & IS_NS_NODE) {
+            return compareNSAtts (a, b);
+        } else {
+            return -1;
+        }
+    } else {
+        if (a->nodeFlags & IS_NS_NODE) {
+            return 1;
+        }
+    }
+    if (a->namespace) {
+        if (b->namespace) {
+            doc = a->parentNode->ownerDocument;
+            ans = domGetNamespaceByIndex (doc, a->namespace);
+            bns = domGetNamespaceByIndex (doc, b->namespace);
+            res = strcmp (ans->uri, bns->uri);
+            if (res == 0) {
+                alocalname = domGetLocalName (a->nodeName);
+                blocalname = domGetLocalName (b->nodeName);
+                return strcmp (alocalname, blocalname);
+            } else {
+                return res;
+            }
+        } else {
+            return 1;
+        }
+    } else {
+        if (b->namespace) {
+            return -1;
+        } else {
+            alocalname = domGetLocalName (a->nodeName);
+            blocalname = domGetLocalName (b->nodeName);
+            return strcmp (alocalname, blocalname);
+        }
+    }
+}
+
+static domAttrNode* mergeAtt (
+    domAttrNode *a,
+    int len_a,
+    domAttrNode *b,
+    int len_b
+    ) 
+{
+    domAttrNode *start, *head;
+    int pos_a = 0;
+    int pos_b = 0;
+
+    
+    if (!len_a) {
+        return b;
+    }
+    if (!len_b) {
+        return a;
+    }
+    if (compareAtts (a, b) < 0) {
+        pos_a++;
+        start = a;
+        a = a->nextSibling;
+    } else {
+        pos_b++;
+        start = b;
+        b = b->nextSibling;
+    }
+    head = start;
+    while (pos_a < len_a && pos_b < len_b) {
+        if (compareAtts (a, b) < 0) {
+            pos_a++;
+            head->nextSibling = a;
+            head = a;
+            a = a->nextSibling;
+        } else {
+            pos_b++;
+            head->nextSibling = b;
+            head = b;
+            b = b->nextSibling;
+        }
+    }
+    while (pos_a < len_a) {
+        pos_a++;
+        head->nextSibling = a;
+        head = a;
+        a = a->nextSibling;
+    }
+    while (pos_b < len_b) {
+        pos_b++;
+        head->nextSibling = b;
+        head = b;
+        b = b->nextSibling;
+    }
+    head->nextSibling = NULL;
+    return start;
+}
+
+
+static domAttrNode* mergeSortAtt (
+    domAttrNode *attr,
+    int len
+    )
+{
+    domAttrNode *attr_a, *attr_b;
+    int half, count = 1;
+
+    if (len <= 1) {
+        return attr;
+    }
+    half = len/2;
+    attr_b = attr->nextSibling;
+    while (count < half) {
+        attr_b = attr_b->nextSibling;
+        count++;
+    }
+    attr_a = attr;
+    return mergeAtt (mergeSortAtt (attr_a, half), half,
+                     mergeSortAtt (attr_b, len - half), len - half);
+}
+    
+    
 static void
 treeAsCanonicalXML (
     Tcl_Obj  *xmlString,
     domNode  *node,
     Tcl_Channel chan,
-    int comments
+    int comments,
+    domAttrNode **attOrderArray,
+    int  *lengthAttOrderArray
     )
 {
-    domAttrNode   *attrs;
+    domAttrNode   *attr, *thisAtt, *previousAtt, *attOrder;
     domNode       *child;
     domDocument   *doc;
     domNS         *ns, *ns1;
-    int outputFlags = 0;
+    int outputFlags = 0, attNr = 0;
 
     switch (node->nodeType) {
     case ELEMENT_NODE:
         writeChars(xmlString, chan, "<", 1);
         writeChars(xmlString, chan, node->nodeName, -1);
-        attrs = node->firstAttr;
-        if (attrs) {
+    restartAttOrder:
+        attOrder = *attOrderArray;
+        attr = node->firstAttr;
+        if (attr) {
             doc = node->ownerDocument;
-            /* TODO: sort */
-            while (attrs) {
-                if(attrs->nodeFlags & IS_NS_NODE) {
-                    ns = doc->namespaces[attrs->namespace];
-                    if (ns) {
-                        ns1 = domLookupPrefix (node, ns->prefix);
-                        if (ns1 && strcmp (ns->uri, ns1->uri) == 0) {
+            /* Attribute sort: It would be possible to sort the
+             * attributes linked list in place, but this would mean
+             * that two asXML serializations with an asCanonicalXML
+             * serialization inbetween may be different, which would
+             * be surprsing. */
+            while (attr) {
+                if(attr->nodeFlags & IS_NS_NODE) {
+                    ns = domGetNamespaceByIndex(doc, attr->namespace);
+                    ns1 = domLookupPrefix (node->parentNode, ns->prefix);
+                    if (ns1) {
+                        if (strcmp (ns->uri, ns1->uri) == 0) {
                             /* Namespace declaration already in scope,
                              * suppress it */
-                            attrs = attrs->nextSibling;
+                            attr = attr->nextSibling;
+                            continue;
+                        }
+                    } else {
+                        if (ns->uri[0] == '\0') {
+                            /* This is a superfluous unsetting of the
+                             * default namespace because there isn't
+                             * default namespace in scope. */
+                            attr = attr->nextSibling;
                             continue;
                         }
                     }
                 }
+                if (attNr >= *lengthAttOrderArray) {
+                    FREE (*attOrderArray);
+                    *attOrderArray = MALLOC (sizeof (domAttrNode)
+                                            * *lengthAttOrderArray * 2);
+                    *lengthAttOrderArray *= 2;
+                    attNr = 0;
+                    goto restartAttOrder;
+                }
+
+                thisAtt = memcpy (&attOrder[attNr], attr,
+                                  sizeof (domAttrNode));
+                if (attNr) {
+                    previousAtt = &attOrder[attNr-1];
+                    previousAtt->nextSibling = thisAtt;
+                }
+                attNr++;
+                attr = attr->nextSibling;
+            }
+            if (attNr) {
+                thisAtt->nextSibling = NULL;
+            }
+            attr = mergeSortAtt (attOrderArray[0], attNr) ;
+            while (attr) {
                 writeChars(xmlString, chan, " ", 1);
-                writeChars(xmlString, chan, attrs->nodeName, -1);
+                writeChars(xmlString, chan, attr->nodeName, -1);
                 writeChars(xmlString, chan, "=\"", 2);
-                tcldom_AppendEscaped(xmlString, chan, attrs->nodeValue, 
-                                     attrs->valueLength,
+                tcldom_AppendEscaped(xmlString, chan, attr->nodeValue, 
+                                     attr->valueLength,
                                      outputFlags | SERIALIZE_FOR_ATTR);
                 writeChars(xmlString, chan, "\"", 1);
-                attrs = attrs->nextSibling;
+                attr = attr->nextSibling;
             }
         }
         writeChars(xmlString, chan, ">", 1);
         child = node->firstChild;
         while (child != NULL) {
-            treeAsCanonicalXML (xmlString, child, chan, comments);
+            treeAsCanonicalXML (xmlString, child, chan, comments,
+                                attOrderArray, lengthAttOrderArray);
             child = child->nextSibling;
         }
         writeChars(xmlString, chan, "</", 2);
@@ -3839,9 +4025,11 @@ static int serializeAsCanonicalXML (
 )
 {
     int optionIndex, mode, comments = 0, first= 1;
+    int lengthAttOrderArray = C14N_ATTR_SORT_SIZE_INIT;
     Tcl_Channel chan = NULL;
     domNode *docChild;
     Tcl_Obj *resultObj;
+    domAttrNode *attOrderArray;
 
     static const char *asCanonicalXMLOptions[] = {
         "-channel", "-comments", NULL
@@ -3885,6 +4073,8 @@ static int serializeAsCanonicalXML (
         SetResult ("unexpected argument(s) after options");
         return TCL_ERROR;
     }
+    attOrderArray = (domAttrNode *) MALLOC (sizeof (domAttrNode)
+                                            * C14N_ATTR_SORT_SIZE_INIT);
     if (node->nodeType == DOCUMENT_NODE) {
         docChild = ((domDocument*)node)->rootNode->firstChild;
         resultObj = Tcl_GetObjResult (interp);
@@ -3896,12 +4086,15 @@ static int serializeAsCanonicalXML (
                     writeChars(resultObj, chan, "\n", 1);
                 }
             }
-            treeAsCanonicalXML(resultObj, docChild, chan, comments);
+            treeAsCanonicalXML(resultObj, docChild, chan, comments,
+                               &attOrderArray, &lengthAttOrderArray);
             docChild = docChild->nextSibling;
         }
     } else {
-        treeAsCanonicalXML(Tcl_GetObjResult (interp), node, chan, comments);
+        treeAsCanonicalXML(Tcl_GetObjResult (interp), node, chan, comments,
+                           &attOrderArray, &lengthAttOrderArray);
     }
+    FREE (attOrderArray);
     return TCL_OK;
 }
 
