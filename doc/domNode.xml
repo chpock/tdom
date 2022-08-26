@@ -443,7 +443,7 @@ XML.</desc>
 
       <commanddef>
         <command><method>asList</method></command>
-        <desc>Returns the DOM substree starting form the current node as a
+        <desc>Returns the DOM substree starting from the current node as a
 nested Tcl list.</desc>
       </commanddef>
 
