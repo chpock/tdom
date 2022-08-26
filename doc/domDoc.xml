@@ -110,7 +110,7 @@ usually a result of a XSLT transformation.</desc>
         </commanddef>
 
       <commanddef>
-        <command><method>asXML</method> <option>?-indent none/tabs/1..8?</option> <option>?-channel channelId?</option> <option>?-escapeNonASCII?</option> <option>?-doctypeDeclaration &lt;boolean&gt;?</option> <option>-xmlDeclaration &lt;boolean&gt;?</option> <option>-encString &lt;string&gt;</option> <option>?-escapeAllQuot?</option> <option>?-indentAttrs?</option> <option>?-nogtescape?</option> <option>?-noEmptyElementTag?</option></command>
+        <command><method>asXML</method> <option>?-indent none/tabs/1..8?</option> <option>?-channel channelId?</option> <option>?-escapeNonASCII?</option> <option>?-doctypeDeclaration &lt;boolean&gt;?</option> <option>-xmlDeclaration &lt;boolean&gt;?</option> <option>-encString &lt;string&gt;</option> <option>?-escapeAllQuot?</option> <option>?-indentAttrs?</option> <option>?-nogtescape?</option> <option>?-noEmptyElementTag?</option> <option>?-escapeCR?</option> <option>?-escapeTab</option></command>
         <desc><p>Returns the DOM tree as an (optional indented) XML
         string or sends the output directly to the given
         channelId.</p>
@@ -180,6 +180,26 @@ usually a result of a XSLT transformation.</desc>
         </desc>
       </commanddef>
 
+      <commanddef>
+        <command><method>asCanonicalXML</method> <option>?-channel channelId?</option> <option>?-comment?</option></command>
+        <desc><p>Returns the DOM tree as canonical XML string
+        according to the "<ref
+        href="http://www.w3.org/TR/2001/REC-xml-c14n-20010315">Canonical
+        XML Version 1.0 W3C Recommendation 15 March 2001</ref>" or
+        sends the output directly to the given channelId.</p>
+
+        <p>If the -channel option is given then the output is send
+        directly to the Tcl channel given as argument. It is the up to
+        the caller to ensure that the channel is correctly
+        fconfigured. If this option is not given then the
+        serialization is returned.</p>
+        
+        <p>If the option <m>-comment</m> is given then the
+        serialization includes comments according to the rules of the
+        recommendation.</p>
+        </desc>
+      </commanddef>
+      
       <commanddef>
         <command><method>asHTML</method> <option>?-channel
 channelId?</option> <option>?-escapeNonASCII?</option> <option>?-htmlEntities?</option> <option>?-doctypeDeclaration &lt;boolean&gt;?</option> <option>?-breakLines?</option> <option>?-onlyContents?</option></command> 
