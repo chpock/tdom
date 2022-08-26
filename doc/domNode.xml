@@ -454,7 +454,7 @@ nested Tcl list.</desc>
         XML string or sends the output directly to the given
         channelId.</p>
 
-        <p>See the documentation of the of the
+        <p>See the documentation of the
         <command>domDoc</command> command method
         <method>asXML</method> for a detailed description of the
         arguments.</p>
@@ -469,7 +469,7 @@ nested Tcl list.</desc>
         XML Version 1.0 W3C Recommendation 15 March 2001</ref>" or
         sends the output directly to the given channelId.</p>
 
-        <p>See the documentation of the of the
+        <p>See the documentation of the
         <command>domDoc</command> command method
         <method>asCanonicalXML</method> for a detailed description of the
         arguments.</p>

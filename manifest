@@ -1,5 +1,5 @@
-C Fixed\stypo.
-D 2022-08-26T08:44:00.797
+C Fixed\smore\stypos.
+D 2022-08-26T09:15:28.424
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -26,7 +26,7 @@ F doc/domDoc.n 06235fa9a461e36d51f63324fbdb3aeb5ddb2f1660e5110eb7c6571ebdb4a9b2
 F doc/domDoc.xml 46bcf75a109fdc64fb872174c82315e2b5dca4f863e50ce8f32cb0ab47b544c2
 F doc/domNode.html 5d97efa6dd972cd083adde415133d323cc8728bb08028a8bc188318f3d83a30d
 F doc/domNode.n 1a47c7d55473a020737d28c88bc824d2479cb2a7f6b62c4f70a501af9b3b9188
-F doc/domNode.xml c73be664850ac6ce7fc710cf303ab19be89d769381b32a894f31a7573a3b1d9f
+F doc/domNode.xml 564d5be51b94035d1a17807c73fce6f97a177f8c5af5ebf77b744ed32fc6c3ad
 F doc/expat.html ae3f1ac88d842111044af222ac409d49b258b2cac722ba381a73a097ca9d1c8d
 F doc/expat.n beb49450554fcc5bc840b4ec1fcceaaf89f9e9859b9cf0a005db12fdccf8d55f
 F doc/expat.xml 0e02b628d4c0667cb153df852be075ee220cddbcb529c1807a182407692bc020
@@ -239,8 +239,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 472185897ecdadfa81df7593b0217e1756eb87fe39c7462fc67b6f173ba403df
-R 014c467ae2480ad929a724f48fc10808
+P 0cb0cc16eba9eb625a04db8cfae4d14b9b3aee139e7edba90d8160c087f12192
+R 4011780fd0c67009727733c34e4f6955
 U rolf
-Z 6ceef88f238d78d027fe34ab27ca52bf
+Z 5872d084ec9e9252d3fecd0a91b69189
 # Remove this line to create a well-formed Fossil manifest.
