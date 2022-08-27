@@ -1,7 +1,7 @@
 
 2022-08-27  Rolf Ade  <rolf@pointsman.de>
 
-        Added method asCanonicalXML to the domDoc and domNode
+        Added the method asCanonicalXML to the domDoc and domNode
         commands. Added the options -escapeCR and -escapeTab to the
         method asXML of the domDoc and domNode commands.
 
