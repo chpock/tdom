@@ -63,6 +63,9 @@
 # define DBG(x) 
 #endif
 
+#ifndef C14N_ATTR_SORT_SIZE_INIT
+#  define C14N_ATTR_SORT_SIZE_INIT 8
+#endif
 
 /*----------------------------------------------------------------------------
 |   Macros
@@ -165,6 +168,8 @@
 #define SERIALIZE_NO_EMPTY_ELEMENT_TAG 128
 #define SERIALIZE_INDENT_WITH_TAB 256
 #define SERIALIZE_INDENT_ATTR_WITH_TAB 512
+#define SERIALIZE_ESCAPE_CR 1024
+#define SERIALIZE_ESCAPE_TAB 2048
 
 /*----------------------------------------------------------------------------
 |   Module Globals
@@ -234,7 +239,8 @@ static char doc_usage[] =
     "    createTextNode text ?objVar?            \n"
     "    createComment text ?objVar?             \n"
     "    createProcessingInstruction target data ?objVar? \n"
-    "    asXML ?-indent <none,tabs,0..8>? ?-channel <channel>? ?-escapeNonASCII? ?-escapeAllQuot? ?-doctypeDeclaration <boolean>?\n"
+    "    asXML ?-indent <none,tabs,0..8>? ?-channel <channel>? ?other options - see manual?>\n"
+    "    asCanonicalXML ?-channel <channel>? ?-comments <boolean>\n"
     "    asHTML ?-channel <channelId>? ?-escapeNonASCII? ?-htmlEntities?\n"
     "    asText                                  \n"
     "    asJSON ?-indent <none,0..8>?            \n"
@@ -331,7 +337,8 @@ static char node_usage[] =
     "    getColumn                    \n"
     "    @<attrName> ?defaultValue?   \n"
     "    asList                       \n"
-    "    asXML ?-indent <none,tabs,0..8>? ?-channel <channel>? ?-escapeNonASCII? ?-escapeAllQuot? ?-doctypeDeclaration <boolean>?\n"
+    "    asXML ?-indent <none,tabs,0..8>? ?-channel <channel>? ?other options - see manual?>\n"
+    "    asCanonicalXML ?-channel <channel>? ?-comments <boolean>\n"
     "    asHTML ?-channel <channelId>? ?-escapeNonASCII? ?-htmlEntities?\n"
     "    asText                       \n"
     "    asJSON ?-indent <none,0..8>? \n"
@@ -2248,6 +2255,12 @@ void tcldom_AppendEscaped (
         if ((*pc == '\n') && outputFlags & SERIALIZE_FOR_ATTR) {
             AP('&') AP('#') AP('x') AP('A') AP(';')
         } else
+        if ((*pc == '\r') && outputFlags & SERIALIZE_ESCAPE_CR) {
+            AP('&') AP('#') AP('x') AP('D') AP(';')
+        } else 
+        if ((*pc == '\t') && outputFlags & SERIALIZE_ESCAPE_TAB) {
+            AP('&') AP('#') AP('x') AP('9') AP(';')
+        } else 
         {
             charDone = 0;
             if (outputFlags & SERIALIZE_HTML_ENTITIES) {
@@ -3531,13 +3544,13 @@ static int serializeAsXML (
     static const char *asXMLOptions[] = {
         "-indent", "-channel", "-escapeNonASCII", "-doctypeDeclaration",
         "-xmlDeclaration", "-encString", "-escapeAllQuot", "-indentAttrs",
-        "-nogtescape", "-noEmptyElementTag",
+        "-nogtescape", "-noEmptyElementTag", "-escapeCR", "-escapeTab",
         NULL
     };
     enum asXMLOption {
         m_indent, m_channel, m_escapeNonASCII, m_doctypeDeclaration,
         m_xmlDeclaration, m_encString, m_escapeAllQuot, m_indentAttrs,
-        m_nogtescape, m_noEmptyElementTag
+        m_nogtescape, m_noEmptyElementTag, m_escapeCR, m_escapeTab
     };
     
     indent = 4;
@@ -3611,7 +3624,7 @@ static int serializeAsXML (
             }
             if ((mode & TCL_WRITABLE) == 0) {
                 Tcl_AppendResult(interp, "channel \"", channelId,
-                                "\" isnt't opened for writing", (char*)NULL);
+                                "\" is not opened for writing", (char*)NULL);
                 goto cleanup;
             }
             objc -= 2;
@@ -3691,6 +3704,18 @@ static int serializeAsXML (
             objc -= 1;
             objv += 1;
             break;
+
+        case m_escapeCR:
+            outputFlags |= SERIALIZE_ESCAPE_CR;
+            objc -= 1;
+            objv += 1;
+            break;
+
+        case m_escapeTab:
+            outputFlags |= SERIALIZE_ESCAPE_TAB;
+            objc -= 1;
+            objv += 1;
+            break;
         }
     }
     if (indent > 8)  indent = 8;
@@ -3732,6 +3757,368 @@ cleanup:
         Tcl_DecrRefCount(encString);
     }
     return TCL_ERROR;
+}
+
+static int compareNSAtts (
+    domAttrNode *a,
+    domAttrNode *b
+    ) 
+{
+    if (strcmp (a->nodeName, "xmlns") == 0) {
+        return -1;
+    } else if (strcmp (b->nodeName, "xmlns") == 0) {
+        return 1;
+    }
+    return (strcmp (&a->nodeName[6], &b->nodeName[6]));
+}
+
+static int compareAtts (
+    domAttrNode *a,
+    domAttrNode *b
+    ) 
+{
+    domNS *ans, *bns;
+    domDocument *doc;
+    const char *alocalname, *blocalname;
+    int res;
+
+
+    if (a->nodeFlags & IS_NS_NODE) {
+        if (b->nodeFlags & IS_NS_NODE) {
+            return compareNSAtts (a, b);
+        } else {
+            return -1;
+        }
+    } else {
+        if (a->nodeFlags & IS_NS_NODE) {
+            return 1;
+        }
+    }
+    if (a->namespace) {
+        if (b->namespace) {
+            doc = a->parentNode->ownerDocument;
+            ans = domGetNamespaceByIndex (doc, a->namespace);
+            bns = domGetNamespaceByIndex (doc, b->namespace);
+            res = strcmp (ans->uri, bns->uri);
+            if (res == 0) {
+                alocalname = domGetLocalName (a->nodeName);
+                blocalname = domGetLocalName (b->nodeName);
+                return strcmp (alocalname, blocalname);
+            } else {
+                return res;
+            }
+        } else {
+            return 1;
+        }
+    } else {
+        if (b->namespace) {
+            return -1;
+        } else {
+            alocalname = domGetLocalName (a->nodeName);
+            blocalname = domGetLocalName (b->nodeName);
+            return strcmp (alocalname, blocalname);
+        }
+    }
+}
+
+static domAttrNode* mergeAtt (
+    domAttrNode *a,
+    int len_a,
+    domAttrNode *b,
+    int len_b
+    ) 
+{
+    domAttrNode *start, *head;
+    int pos_a = 0;
+    int pos_b = 0;
+
+    
+    if (!len_a) {
+        return b;
+    }
+    if (!len_b) {
+        return a;
+    }
+    if (compareAtts (a, b) < 0) {
+        pos_a++;
+        start = a;
+        a = a->nextSibling;
+    } else {
+        pos_b++;
+        start = b;
+        b = b->nextSibling;
+    }
+    head = start;
+    while (pos_a < len_a && pos_b < len_b) {
+        if (compareAtts (a, b) < 0) {
+            pos_a++;
+            head->nextSibling = a;
+            head = a;
+            a = a->nextSibling;
+        } else {
+            pos_b++;
+            head->nextSibling = b;
+            head = b;
+            b = b->nextSibling;
+        }
+    }
+    while (pos_a < len_a) {
+        pos_a++;
+        head->nextSibling = a;
+        head = a;
+        a = a->nextSibling;
+    }
+    while (pos_b < len_b) {
+        pos_b++;
+        head->nextSibling = b;
+        head = b;
+        b = b->nextSibling;
+    }
+    head->nextSibling = NULL;
+    return start;
+}
+
+
+static domAttrNode* mergeSortAtt (
+    domAttrNode *attr,
+    int len
+    )
+{
+    domAttrNode *attr_a, *attr_b;
+    int half, count = 1;
+
+    if (len <= 1) {
+        return attr;
+    }
+    half = len/2;
+    attr_b = attr->nextSibling;
+    while (count < half) {
+        attr_b = attr_b->nextSibling;
+        count++;
+    }
+    attr_a = attr;
+    return mergeAtt (mergeSortAtt (attr_a, half), half,
+                     mergeSortAtt (attr_b, len - half), len - half);
+}
+    
+    
+static void
+treeAsCanonicalXML (
+    Tcl_Obj  *xmlString,
+    domNode  *node,
+    Tcl_Channel chan,
+    int comments,
+    domAttrNode **attOrderArray,
+    int  *lengthAttOrderArray
+    )
+{
+    domAttrNode   *attr, *thisAtt, *previousAtt, *attOrder;
+    domNode       *child;
+    domDocument   *doc;
+    domNS         *ns, *ns1;
+    int            outputFlags = SERIALIZE_ESCAPE_CR, attNr = 0;
+
+    switch (node->nodeType) {
+    case ELEMENT_NODE:
+        writeChars(xmlString, chan, "<", 1);
+        writeChars(xmlString, chan, node->nodeName, -1);
+    restartAttOrder:
+        attOrder = *attOrderArray;
+        attr = node->firstAttr;
+        if (attr) {
+            doc = node->ownerDocument;
+            /* Attribute sort: It would be possible to sort the
+             * attributes linked list in place, but this would mean
+             * that two asXML serializations with an asCanonicalXML
+             * serialization inbetween may be different, which would
+             * be surprsing. */
+            while (attr) {
+                if(attr->nodeFlags & IS_NS_NODE) {
+                    ns = domGetNamespaceByIndex(doc, attr->namespace);
+                    ns1 = domLookupPrefix (node->parentNode, ns->prefix);
+                    if (ns1) {
+                        if (strcmp (ns->uri, ns1->uri) == 0) {
+                            /* Namespace declaration already in scope,
+                             * suppress it */
+                            attr = attr->nextSibling;
+                            continue;
+                        }
+                    } else {
+                        if (ns->uri[0] == '\0') {
+                            /* This is a superfluous unsetting of the
+                             * default namespace because there isn't
+                             * default namespace in scope. */
+                            attr = attr->nextSibling;
+                            continue;
+                        }
+                    }
+                }
+                if (attNr >= *lengthAttOrderArray) {
+                    FREE (*attOrderArray);
+                    *attOrderArray = MALLOC (sizeof (domAttrNode)
+                                            * *lengthAttOrderArray * 2);
+                    *lengthAttOrderArray *= 2;
+                    attNr = 0;
+                    goto restartAttOrder;
+                }
+
+                thisAtt = memcpy (&attOrder[attNr], attr,
+                                  sizeof (domAttrNode));
+                if (attNr) {
+                    previousAtt = &attOrder[attNr-1];
+                    previousAtt->nextSibling = thisAtt;
+                }
+                attNr++;
+                attr = attr->nextSibling;
+            }
+            if (attNr) {
+                thisAtt->nextSibling = NULL;
+            }
+            attr = mergeSortAtt (attOrderArray[0], attNr) ;
+            while (attr) {
+                writeChars(xmlString, chan, " ", 1);
+                writeChars(xmlString, chan, attr->nodeName, -1);
+                writeChars(xmlString, chan, "=\"", 2);
+                tcldom_AppendEscaped(xmlString, chan, attr->nodeValue, 
+                                     attr->valueLength,
+                                     outputFlags
+                                     | SERIALIZE_FOR_ATTR
+                                     | SERIALIZE_NO_GT_ESCAPE
+                                     | SERIALIZE_ESCAPE_TAB);
+                writeChars(xmlString, chan, "\"", 1);
+                attr = attr->nextSibling;
+            }
+        }
+        writeChars(xmlString, chan, ">", 1);
+        child = node->firstChild;
+        while (child != NULL) {
+            treeAsCanonicalXML (xmlString, child, chan, comments,
+                                attOrderArray, lengthAttOrderArray);
+            child = child->nextSibling;
+        }
+        writeChars(xmlString, chan, "</", 2);
+        writeChars(xmlString, chan, node->nodeName, -1);
+        writeChars(xmlString, chan, ">", 1);
+        break;
+    case TEXT_NODE:
+    case CDATA_SECTION_NODE:
+        tcldom_AppendEscaped(xmlString, chan,
+                             ((domTextNode*)node)->nodeValue,
+                             ((domTextNode*)node)->valueLength,
+                             outputFlags);
+        break;
+    case COMMENT_NODE:
+        if (comments) {
+            writeChars(xmlString, chan, "<!--", 4);
+            writeChars(xmlString, chan, ((domTextNode*)node)->nodeValue,
+                       ((domTextNode*)node)->valueLength);
+            writeChars(xmlString, chan, "-->", 3);
+        }
+        break;
+    case PROCESSING_INSTRUCTION_NODE:
+        writeChars(xmlString, chan, "<?", 2);
+        writeChars(xmlString, chan, 
+                    ((domProcessingInstructionNode*)node)->targetValue,
+                    ((domProcessingInstructionNode*)node)->targetLength);
+        if (((domProcessingInstructionNode*)node)->dataLength) {
+            writeChars(xmlString, chan, " ", 1);
+            writeChars(xmlString, chan, 
+                       ((domProcessingInstructionNode*)node)->dataValue,
+                       ((domProcessingInstructionNode*)node)->dataLength);
+        }
+        writeChars(xmlString, chan, "?>", 2);
+        break;
+    default:
+        /* Nothing to output */
+        break;
+    }
+    return;
+}
+
+
+/*----------------------------------------------------------------------------
+|   serializeAsCanonicalXML
+|
+\---------------------------------------------------------------------------*/
+static int serializeAsCanonicalXML (
+    domNode    *node,
+    Tcl_Interp *interp,
+    int         objc,
+    Tcl_Obj    *const objv[]
+)
+{
+    int optionIndex, mode, comments = 0, first= 1;
+    int lengthAttOrderArray = C14N_ATTR_SORT_SIZE_INIT;
+    Tcl_Channel chan = NULL;
+    domNode *docChild;
+    Tcl_Obj *resultObj;
+    domAttrNode *attOrderArray;
+
+    static const char *asCanonicalXMLOptions[] = {
+        "-channel", "-comments", NULL
+    };
+    enum asCanonicalXMLOption {
+        m_channel, m_comments
+    };
+    
+    while (objc > 3) {
+        if (Tcl_GetIndexFromObj(interp, objv[2], asCanonicalXMLOptions,
+                                "option", 0, &optionIndex) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        switch ((enum asCanonicalXMLOption) optionIndex) {
+        case m_channel:
+            chan = Tcl_GetChannel (interp, Tcl_GetString (objv[3]), &mode);
+            if (chan == NULL) {
+                SetResult("the -channel option must have a Tcl channel"
+                          " argument");
+                return TCL_ERROR;
+            }
+            if ((mode & TCL_WRITABLE) == 0) {
+                SetResult ("channel is not opened for writing");
+                return TCL_ERROR;
+            }
+            objc -= 2;
+            objv += 2;
+            break;
+            
+        case m_comments:
+            if (Tcl_GetBooleanFromObj(interp, objv[3], &comments) != TCL_OK) {
+                return TCL_ERROR;
+            }
+            objc -= 2;
+            objv += 2;
+            break;
+        }
+    }
+        
+    if (objc > 2) {
+        SetResult ("unexpected argument(s) after options");
+        return TCL_ERROR;
+    }
+    attOrderArray = (domAttrNode *) MALLOC (sizeof (domAttrNode)
+                                            * C14N_ATTR_SORT_SIZE_INIT);
+    if (node->nodeType == DOCUMENT_NODE) {
+        docChild = ((domDocument*)node)->rootNode->firstChild;
+        resultObj = Tcl_GetObjResult (interp);
+        while (docChild) {
+            if (first) {
+                first = 0;
+            } else {
+                if ((docChild->nodeType != COMMENT_NODE) || comments) {
+                    writeChars(resultObj, chan, "\n", 1);
+                }
+            }
+            treeAsCanonicalXML(resultObj, docChild, chan, comments,
+                               &attOrderArray, &lengthAttOrderArray);
+            docChild = docChild->nextSibling;
+        }
+    } else {
+        treeAsCanonicalXML(Tcl_GetObjResult (interp), node, chan, comments,
+                           &attOrderArray, &lengthAttOrderArray);
+    }
+    FREE (attOrderArray);
+    return TCL_OK;
 }
 
 /*----------------------------------------------------------------------------
@@ -4498,7 +4885,7 @@ int tcldom_NodeObjCmd (
         "getElementsByTagName",              "getElementsByTagNameNS",
         "disableOutputEscaping",             "precedes",         "asText",
         "insertBeforeFromScript",            "normalize",        "baseURI",
-        "asJSON",          "jsonType",       "attributeNames",
+        "asJSON",          "jsonType",       "attributeNames",   "asCanonicalXML",
 #ifdef TCL_THREADS
         "readlock",        "writelock",
 #endif
@@ -4521,7 +4908,7 @@ int tcldom_NodeObjCmd (
         m_getElementsByTagName,              m_getElementsByTagNameNS,
         m_disableOutputEscaping,             m_precedes,        m_asText,
         m_insertBeforeFromScript,            m_normalize,       m_baseURI,
-        m_asJSON,          m_jsonType,       m_attributeNames
+        m_asJSON,          m_jsonType,       m_attributeNames,  m_asCanonicalXML
 #ifdef TCL_THREADS
         ,m_readlock,       m_writelock
 #endif
@@ -4807,6 +5194,12 @@ int tcldom_NodeObjCmd (
             }
             break;
 
+        case m_asCanonicalXML:
+            Tcl_ResetResult(interp);
+            if (serializeAsCanonicalXML(node, interp, objc, objv) != TCL_OK) {
+                return TCL_ERROR;
+            }
+            break;
         case m_asHTML:
             Tcl_ResetResult(interp);
             if (serializeAsHTML(node, interp, objc, objv) != TCL_OK) {
@@ -5601,7 +5994,7 @@ int tcldom_DocObjCmd (
         "standalone",      "mediaType",                  "nodeType",
         "cdataSectionElements",
         "selectNodesNamespaces",
-        "renameNode",      "deleteXPathCache", 
+        "renameNode",      "deleteXPathCache",           "asCanonicalXML",
         /* The following methods will be dispatched to tcldom_NodeObjCmd */
         "getElementById",  "firstChild",                 "lastChild",
         "appendChild",     "removeChild",                "hasChildNodes",
@@ -5609,7 +6002,7 @@ int tcldom_DocObjCmd (
         "replaceChild",    "appendFromList",             "appendXML",
         "selectNodes",     "baseURI",                    "appendFromScript",
         "insertBeforeFromScript",                        "asJSON",
-        "jsonType",
+        "jsonType",        
 #ifdef TCL_THREADS
         "readlock",        "writelock",                  "renumber",
 #endif
@@ -5627,7 +6020,7 @@ int tcldom_DocObjCmd (
         m_standalone,       m_mediaType,                  m_nodeType,
         m_cdataSectionElements,
         m_selectNodesNamespaces,
-        m_renameNode,       m_deleteXPathCache,
+        m_renameNode,       m_deleteXPathCache,           m_asCanonicalXML,
         /* The following methods will be dispatched to tcldom_NodeObjCmd */
         m_getElementById,   m_firstChild,                 m_lastChild,
         m_appendChild,      m_removeChild,                m_hasChildNodes,
@@ -5830,6 +6223,13 @@ int tcldom_DocObjCmd (
 
         case m_asXML:
             if (serializeAsXML((domNode*)doc, interp, objc, objv) != TCL_OK) {
+                return TCL_ERROR;
+            }
+            return TCL_OK;
+
+        case m_asCanonicalXML:
+            if (serializeAsCanonicalXML((domNode*)doc, interp, objc, objv)
+                != TCL_OK) {
                 return TCL_ERROR;
             }
             return TCL_OK;

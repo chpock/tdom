@@ -443,7 +443,7 @@ XML.</desc>
 
       <commanddef>
         <command><method>asList</method></command>
-        <desc>Returns the DOM substree starting form the current node as a
+        <desc>Returns the DOM substree starting from the current node as a
 nested Tcl list.</desc>
       </commanddef>
 
@@ -454,13 +454,28 @@ nested Tcl list.</desc>
         XML string or sends the output directly to the given
         channelId.</p>
 
-        <p>See the documentation of the of the
+        <p>See the documentation of the
         <command>domDoc</command> command method
         <method>asXML</method> for a detailed description of the
         arguments.</p>
         </desc>
       </commanddef>
 
+      <commanddef>
+        <command><method>asCanonicalXML</method> <option>?-channel channelId?</option> <option>?-comment?</option></command>
+        <desc><p>Returns the DOM tree as canonical XML string
+        according to the "<ref
+        href="http://www.w3.org/TR/2001/REC-xml-c14n-20010315">Canonical
+        XML Version 1.0 W3C Recommendation 15 March 2001</ref>" or
+        sends the output directly to the given channelId.</p>
+
+        <p>See the documentation of the
+        <command>domDoc</command> command method
+        <method>asCanonicalXML</method> for a detailed description of the
+        arguments.</p>
+        </desc>
+      </commanddef>
+      
       <commanddef>
         <command><method>asHTML</method> <option>?-channel
 channelId?</option> <option>?-escapeNonASCII?</option> <option>?-htmlEntities?</option> <option>?-doctypeDeclaration &lt;boolean&gt;?</option> <option>?-breakLines?</option> <option>?-onlyContents?</option></command>

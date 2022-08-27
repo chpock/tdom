@@ -702,6 +702,26 @@ test dom-2.43 {billion laughs attact proctection options} {
     set result
 } {1 1 1 0 1 1 1 0}
 
+test dom-2.44 {attribute order and XML namespace declaration} {
+    set doc [dom parse -simple {
+        <doc foo="bar" grill="bar" xmlns:p="some" bar="bar" xmlns="url">foo</doc>
+    }]
+    set root [$doc documentElement]
+    set result [$root attributeNames]
+    $doc delete
+    set result
+} {xmlns:p xmlns foo grill bar}
+
+test dom-2.45 {attribute order and XML namespace declaration} {
+    set doc [dom parse {
+        <doc foo="bar" grill="bar" xmlns:p="some" bar="bar" xmlns="url"/>
+    }]
+    set root [$doc documentElement]
+    set result [$root attributeNames]
+    $doc delete
+    set result
+} {xmlns:p xmlns foo grill bar}
+
 test dom-3.1 {isName} {
     dom isName ":foo"
 } {1}
