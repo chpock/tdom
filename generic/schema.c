@@ -123,16 +123,6 @@ typedef struct
     Tcl_Obj       *externalentitycommandObj;
 } ValidateMethodData;
 
-typedef enum {
-    MATCH_GLOBAL = 1,
-    MATCH_ELEMENT_START,
-    MATCH_ELEMENT_END,
-    MATCH_TEXT,
-    MATCH_ATTRIBUTE_TEXT,
-    MATCH_DOM_KEYCONSTRAINT,
-    MATCH_DOM_XPATH_BOOLEAN
-} ValidationAction;
-
 static char *ValidationAction2str[] = {
     "NOT_USED",
     "MATCH_GLOBAL",
@@ -148,25 +138,19 @@ typedef enum {
     DOM_KEYCONSTRAINT,
     DOM_XPATH_BOOLEAN,
     MISSING_ATTRIBUTE,
-    MISSING_ELEMENT_MATCH_START,
-    MISSING_ELEMENT_MATCH_END,
+    MISSING_ELEMENT,
     UNEXPECTED_TEXT,
-    MISSING_TEXT_MATCH_START,
-    MISSING_TEXT_MATCH_END,
+    MISSING_TEXT,
     UNEXPECTED_ROOT_ELEMENT,
     UNEXPECTED_ELEMENT,
     UNKNOWN_ATTRIBUTE,
-    INVALID_KEYREF_MATCH_START,
-    INVALID_KEYREF_MATCH_END,
-    INVALID_KEYREF_MATCH_TEXT,
+    INVALID_KEYREF,
     UNKNOWN_ROOT_ELEMENT,
     UNKNOWN_GLOBAL_ID,
     UNKNOWN_ID,
     INVALID_ATTRIBUTE_VALUE,
     INVALID_VALUE,
-    INVALID_JSON_TYPE_MATCH_START,
-    INVALID_JSON_TYPE_MATCH_END,
-    INVALID_JSON_TYPE_MATCH_TEXT
+    INVALID_JSON_TYPE,
 } ValidationErrorType;
 
 static char *ValidationErrorType2str[] = {
@@ -174,23 +158,17 @@ static char *ValidationErrorType2str[] = {
     "DOM_XPATH_BOOLEAN",
     "MISSING_ATTRIBUTE",
     "MISSING_ELEMENT",
-    "MISSING_ELEMENT",
     "UNEXPECTED_TEXT",
-    "MISSING_TEXT",
     "MISSING_TEXT",
     "UNEXPECTED_ROOT_ELEMENT",
     "UNEXPECTED_ELEMENT",
     "UNKNOWN_ATTRIBUTE",
-    "INVALID_KEYREF",
-    "INVALID_KEYREF",
     "INVALID_KEYREF",
     "UNKNOWN_ROOT_ELEMENT",
     "UNKNOWN_GLOBAL_ID",
     "UNKNOWN_ID",
     "INVALID_ATTRIBUTE_VALUE",
     "INVALID_VALUE",
-    "INVALID_JSON_TYPE",
-    "INVALID_JSON_TYPE",
     "INVALID_JSON_TYPE"
 };
 
@@ -1147,6 +1125,7 @@ recover (
     Tcl_Interp *interp,
     SchemaData *sdata,
     ValidationErrorType errorType,
+    ValidationAction action,
     const char *name,
     const char *ns,
     char *text,
@@ -1182,54 +1161,12 @@ recover (
     if (name) sdata->vname = name;
     if (ns) sdata->vns = ns;
     sdata->vtext = text;
+    sdata->vaction = action;
     switch (errorType) {
-    case DOM_KEYCONSTRAINT:
-        sdata->vaction = MATCH_DOM_KEYCONSTRAINT;
-        break;
-    case DOM_XPATH_BOOLEAN:
-        sdata->vaction = MATCH_DOM_XPATH_BOOLEAN;
-        break;
-    case MISSING_ATTRIBUTE:
-    case UNKNOWN_ATTRIBUTE:
-    case MISSING_ELEMENT_MATCH_START:
-    case MISSING_TEXT_MATCH_START:
-    case INVALID_KEYREF_MATCH_START:
-    case UNEXPECTED_ROOT_ELEMENT:
-    case UNKNOWN_ROOT_ELEMENT:
-    case UNEXPECTED_ELEMENT:
-        sdata->vaction = MATCH_ELEMENT_START;
-        break;
-    case INVALID_JSON_TYPE_MATCH_START:
-        sdata->vaction = MATCH_ELEMENT_START;
-        if (sdata->stack) {
-            se = sdata->stack;
-            while (se->pattern->type != SCHEMA_CTYPE_NAME) {
-                se = se->down;
-            }
-            sdata->vname = se->pattern->name;
-            sdata->vns = se->pattern->namespace;
-        }
-        break;
-    case MISSING_TEXT_MATCH_END:
-    case INVALID_KEYREF_MATCH_END:
-    case MISSING_ELEMENT_MATCH_END:
-    case INVALID_JSON_TYPE_MATCH_END:
-        if (sdata->stack) {
-            se = sdata->stack;
-            while (se->pattern->type != SCHEMA_CTYPE_NAME) {
-                se = se->down;
-            }
-            sdata->vname = se->pattern->name;
-            sdata->vns = se->pattern->namespace;
-        }
-        sdata->vaction = MATCH_ELEMENT_END;
-        break;
-    case UNEXPECTED_TEXT:
-        sdata->vaction = MATCH_TEXT;
-        break;
-    case INVALID_KEYREF_MATCH_TEXT:
+    case INVALID_JSON_TYPE:
+    case MISSING_TEXT:
+    case INVALID_KEYREF:
     case INVALID_VALUE:
-    case INVALID_JSON_TYPE_MATCH_TEXT:
         if (sdata->stack) {
             se = sdata->stack;
             while (se->pattern->type != SCHEMA_CTYPE_NAME) {
@@ -1238,14 +1175,20 @@ recover (
             sdata->vname = se->pattern->name;
             sdata->vns = se->pattern->namespace;
         }
-        sdata->vaction = MATCH_TEXT;
         break;
-    case UNKNOWN_GLOBAL_ID:
-    case UNKNOWN_ID:
-        sdata->vaction = MATCH_GLOBAL;
+    case MISSING_ELEMENT:
+        if (action == MATCH_ELEMENT_END) {
+            if (sdata->stack) {
+                se = sdata->stack;
+                while (se->pattern->type != SCHEMA_CTYPE_NAME) {
+                    se = se->down;
+                }
+                sdata->vname = se->pattern->name;
+                sdata->vns = se->pattern->namespace;
+            }
+        }
         break;
-    case INVALID_ATTRIBUTE_VALUE:
-        sdata->vaction = MATCH_ATTRIBUTE_TEXT;
+    default:
         break;
     }
     sdata->currentEvals++;
@@ -1262,21 +1205,40 @@ recover (
         return 0;
     }
     switch (errorType) {
-    case MISSING_ELEMENT_MATCH_START:
-        if (strcmp (Tcl_GetStringResult (interp), "ignore") == 0) {
-            sdata->recoverFlags |= RECOVER_FLAG_IGNORE;
-            return 1;
-        } else if (strcmp (Tcl_GetStringResult (interp), "vanish") == 0) {
-            sdata->recoverFlags |= RECOVER_FLAG_REWIND;
-            sdata->skipDeep = 1;
-            return 1;
-        } else {
-            /* Rewind stack to last match and ignore the just opened
-             * Element. */
-           finalizeElement (sdata, ac+1);
-            sdata->skipDeep = 2;
+    case MISSING_ELEMENT:
+        if (action == MATCH_ELEMENT_START) {
+            if (strcmp (Tcl_GetStringResult (interp), "ignore") == 0) {
+                sdata->recoverFlags |= RECOVER_FLAG_IGNORE;
+                return 1;
+            } else if (strcmp (Tcl_GetStringResult (interp), "vanish") == 0) {
+                sdata->recoverFlags |= RECOVER_FLAG_REWIND;
+                sdata->skipDeep = 1;
+                return 1;
+            } else {
+                /* Rewind stack to last match and ignore the just opened
+                 * Element. */
+                finalizeElement (sdata, ac+1);
+                sdata->skipDeep = 2;
+            }
+        } else if (action == MATCH_ELEMENT_END) {
+            if (strcmp (Tcl_GetStringResult (interp), "ignore") == 0) {
+                sdata->recoverFlags |= RECOVER_FLAG_MATCH_END_CONTINUE;
+            } else {
+                sdata->recoverFlags |= RECOVER_FLAG_DONT_REPORT;
+            }
         }
         break;
+
+    case MISSING_TEXT:
+        if (action == MATCH_ELEMENT_END) {
+            if (strcmp (Tcl_GetStringResult (interp), "ignore") == 0) {
+                sdata->recoverFlags |= RECOVER_FLAG_MATCH_END_CONTINUE;
+            } else {
+                sdata->recoverFlags |= RECOVER_FLAG_DONT_REPORT;
+            }
+        }
+        break;
+        
     case UNEXPECTED_ELEMENT:
         if (strcmp (Tcl_GetStringResult (interp), "vanish") == 0) {
             sdata->recoverFlags |= RECOVER_FLAG_REWIND;
@@ -1287,34 +1249,12 @@ recover (
             sdata->skipDeep = 2;
         }
         break;
+
     case UNEXPECTED_TEXT:
         sdata->recoverFlags |= RECOVER_FLAG_REWIND;
         break;
-    case MISSING_ELEMENT_MATCH_END:
-    case MISSING_TEXT_MATCH_END:
-        if (strcmp (Tcl_GetStringResult (interp), "ignore") == 0) {
-            sdata->recoverFlags |= RECOVER_FLAG_MATCH_END_CONTINUE;
-        } else {
-            sdata->recoverFlags |= RECOVER_FLAG_DONT_REPORT;
-        }
-        break;        
-    case DOM_KEYCONSTRAINT:
-    case DOM_XPATH_BOOLEAN:
-    case MISSING_ATTRIBUTE:
-    case MISSING_TEXT_MATCH_START:
-    case UNEXPECTED_ROOT_ELEMENT:
-    case UNKNOWN_ATTRIBUTE:
-    case INVALID_KEYREF_MATCH_START:
-    case INVALID_KEYREF_MATCH_END:
-    case INVALID_KEYREF_MATCH_TEXT:
-    case UNKNOWN_ROOT_ELEMENT:
-    case UNKNOWN_GLOBAL_ID:
-    case UNKNOWN_ID:
-    case INVALID_ATTRIBUTE_VALUE:
-    case INVALID_VALUE:
-    case INVALID_JSON_TYPE_MATCH_START:
-    case INVALID_JSON_TYPE_MATCH_END:
-    case INVALID_JSON_TYPE_MATCH_TEXT:
+
+    default:
         break;
     }
     return 1;
@@ -1392,6 +1332,7 @@ checkJsonStructType (
     SchemaData *sdata,
     SchemaCP *cp,
     ValidationErrorType errorType,
+    ValidationAction action,
     int ac
     )
 {
@@ -1419,7 +1360,8 @@ checkJsonStructType (
     }
     return 1;
 error:
-    if (!recover (interp, sdata, errorType, sdata->insideNode->nodeName,
+    if (!recover (interp, sdata, errorType, action,
+                  sdata->insideNode->nodeName,
                   domNamespaceURI(sdata->insideNode), NULL, ac)) {
         str = xpathNodeToXPath (sdata->insideNode, 0);
         strObj = Tcl_NewStringObj (str, -1);
@@ -1520,8 +1462,9 @@ matchElementStart (
             case SCHEMA_CTYPE_TEXT:
                 if (candidate->nc) {
                     if (!checkText (interp, candidate, "")) {
-                        if (recover (interp, sdata, MISSING_TEXT_MATCH_START,
-                                     name, namespace, NULL, ac)) {
+                        if (recover (interp, sdata, MISSING_TEXT,
+                                     MATCH_ELEMENT_START, name, namespace,
+                                     NULL, ac)) {
                             mayskip = 1;
                             break;
                         }            
@@ -1645,8 +1588,10 @@ matchElementStart (
                 else return 0;
 
             case SCHEMA_CTYPE_JSON_STRUCT:
-                if (!checkJsonStructType (interp, sdata, candidate,
-                                          INVALID_JSON_TYPE_MATCH_START, ac)) {
+                if (!checkJsonStructType (
+                        interp, sdata, candidate, INVALID_JSON_TYPE,
+                        MATCH_ELEMENT_START, ac)
+                    ) {
                     return 0;
                 };
                 ac++;
@@ -1675,8 +1620,8 @@ matchElementStart (
                 if (!candidate->keySpace->active) {
                     if (candidate->keySpace->unknownIDrefs) {
                         if (!recover (interp, sdata,
-                                      INVALID_KEYREF_MATCH_START, name,
-                                      namespace, NULL, ac)) {
+                                      INVALID_KEYREF, MATCH_ELEMENT_START,
+                                      name, namespace, NULL, ac)) {
                             SetResultV ("Invalid key ref.");
                             sdata->evalError = 2;
                             return 0;
@@ -1703,8 +1648,8 @@ matchElementStart (
                 continue;
             }
             if (!mayskip && mustMatch (cp->quants[ac], hm)) {
-                if (recover (interp, sdata, MISSING_ELEMENT_MATCH_START, name,
-                             namespace, NULL, ac)) {
+                if (recover (interp, sdata, MISSING_ELEMENT,
+                             MATCH_ELEMENT_START, name, namespace, NULL, ac)) {
                     if (sdata->recoverFlags & RECOVER_FLAG_IGNORE) {
                         /* We pretend the ac content particle had
                          * matched. */
@@ -1718,8 +1663,8 @@ matchElementStart (
             hm = 0;
         }
         if (isName) {
-            if (recover (interp, sdata, UNEXPECTED_ELEMENT, name, namespace,
-                         NULL, 0)) {
+            if (recover (interp, sdata, UNEXPECTED_ELEMENT,
+                         MATCH_ELEMENT_START, name, namespace, NULL, 0)) {
                 return 1;
             }
             return 0;
@@ -1822,8 +1767,8 @@ matchElementStart (
             if (!thismayskip && minOne (cp->quants[i])) mayskip = 0;
         }
         if (mayskip) break;
-        if (recover (interp, sdata, MISSING_ELEMENT_MATCH_START, name,
-                     namespace, NULL, cp->nc)) {
+        if (recover (interp, sdata, MISSING_ELEMENT, MATCH_ELEMENT_START,
+                     name, namespace, NULL, cp->nc)) {
             if (sdata->recoverFlags & RECOVER_FLAG_IGNORE) {
                 /* We mark the first so far not matched mandatory
                  * interleave child cp as matched */
@@ -1935,8 +1880,8 @@ tDOM_probeElement (
         /* The root of the tree to check. */
         if (sdata->start) {
             if (strcmp (name, sdata->start) != 0) {
-                if (recover (interp, sdata, UNEXPECTED_ROOT_ELEMENT, name,
-                             namespace, NULL, 0)) {
+                if (recover (interp, sdata, UNEXPECTED_ROOT_ELEMENT,
+                             MATCH_ELEMENT_START, name, namespace, NULL, 0)) {
                     sdata->validationState = VALIDATION_FINISHED;
                     return TCL_OK;
                 }
@@ -1946,8 +1891,9 @@ tDOM_probeElement (
             if (namespace) {
                 if (!sdata->startNamespace||
                     strcmp (namespace, sdata->startNamespace) != 0) {
-                    if (recover (interp, sdata, UNEXPECTED_ROOT_ELEMENT, name,
-                                 namespace, NULL, 0)) {
+                    if (recover (interp, sdata, UNEXPECTED_ROOT_ELEMENT,
+                                 MATCH_ELEMENT_START, name, namespace,
+                                 NULL, 0)) {
                         sdata->validationState = VALIDATION_FINISHED;
                         return TCL_OK;
                     }
@@ -1956,8 +1902,9 @@ tDOM_probeElement (
                 }
             } else {
                 if (sdata->startNamespace) {
-                    if (recover (interp, sdata, UNEXPECTED_ROOT_ELEMENT, name,
-                                 namespace, NULL, 0)) {
+                    if (recover (interp, sdata, UNEXPECTED_ROOT_ELEMENT,
+                                 MATCH_ELEMENT_START, name, namespace,
+                                 NULL, 0)) {
                         sdata->validationState = VALIDATION_FINISHED;
                         return TCL_OK;
                     }
@@ -1984,8 +1931,8 @@ tDOM_probeElement (
         }
         sdata->validationState = VALIDATION_STARTED;
         if (reportError || pattern == NULL) {
-            if (recover (interp, sdata, UNKNOWN_ROOT_ELEMENT, name, namespace,
-                         NULL, 0)) {
+            if (recover (interp, sdata, UNKNOWN_ROOT_ELEMENT,
+                         MATCH_ELEMENT_START, name, namespace, NULL, 0)) {
                 sdata->skipDeep = 1;
                 return TCL_OK;
             }
@@ -2070,8 +2017,8 @@ int probeAttribute (
         if (!attr) return 0;
         if (attr->cp) {
             if (!checkText (interp, attr->cp, value)) {
-                if (!recover (interp, sdata, INVALID_ATTRIBUTE_VALUE, name,
-                              ns, value, 0)) {
+                if (!recover (interp, sdata, INVALID_ATTRIBUTE_VALUE,
+                              MATCH_ELEMENT_START, name, ns, value, 0)) {
                     SetResult3V ("Attribute value doesn't match for "
                                  "attribute '", name , "'");
                     sdata->evalError = 2;
@@ -2087,8 +2034,8 @@ int probeAttribute (
             && cp->attrs[i]->name == name) {
             if (cp->attrs[i]->cp) {
                 if (!checkText (interp, cp->attrs[i]->cp, value)) {
-                    if (!recover (interp, sdata, INVALID_ATTRIBUTE_VALUE, name,
-                                  ns, value, i)) {
+                    if (!recover (interp, sdata, INVALID_ATTRIBUTE_VALUE,
+                                  MATCH_ATTRIBUTE_TEXT, name, ns, value, i)) {
                         SetResult3V ("Attribute value doesn't match for "
                                     "attribute '", name , "'");
                         sdata->evalError = 2;
@@ -2149,8 +2096,8 @@ int tDOM_probeAttributes (
         reqAttr += req;
     unknowncleanup:
         if (!found) {
-            if (!recover (interp, sdata, UNKNOWN_ATTRIBUTE, ln, namespace,
-                          NULL, 0)) {
+            if (!recover (interp, sdata, UNKNOWN_ATTRIBUTE,
+                          MATCH_ELEMENT_START, ln, namespace, NULL, 0)) {
                 if (!sdata->evalError) {
                     if (nsatt) {
                         SetResult ("Unknown attribute \"");
@@ -2202,8 +2149,8 @@ int tDOM_probeAttributes (
             }
             if (!found) {
                 if (!recover (interp, sdata, MISSING_ATTRIBUTE,
-                              cp->attrs[i]->name, cp->attrs[i]->namespace,
-                              NULL, i)) {
+                              MATCH_ELEMENT_START, cp->attrs[i]->name,
+                              cp->attrs[i]->namespace, NULL, i)) {
                     if (cp->attrs[i]->namespace) {
                         Tcl_AppendResult (interp, " ", cp->attrs[i]->namespace,
                                           ":", cp->attrs[i]->name, NULL);
@@ -2267,7 +2214,8 @@ int tDOM_probeDomAttributes (
         reqAttr += req;
     unknown:
         if (!found) {
-            if (!recover (interp, sdata, UNKNOWN_ATTRIBUTE, ln, ns, NULL, 0)) {
+            if (!recover (interp, sdata, UNKNOWN_ATTRIBUTE,
+                          MATCH_ELEMENT_START, ln, ns, NULL, 0)) {
                 if (!sdata->evalError) {
                     if (ns) {
                         SetResult ("Unknown attribute \"");
@@ -2322,8 +2270,8 @@ int tDOM_probeDomAttributes (
             }
             if (!found) {
                 if (!recover (interp, sdata, MISSING_ATTRIBUTE,
-                              cp->attrs[i]->name, cp->attrs[i]->namespace,
-                              NULL, i)) {
+                              MATCH_ELEMENT_START, cp->attrs[i]->name,
+                              cp->attrs[i]->namespace, NULL, i)) {
                     if (!sdata->evalError) {
                         if (cp->attrs[i]->namespace) {
                             Tcl_AppendResult (interp, " ",
@@ -2386,8 +2334,8 @@ int probeEventAttribute (
     unknown:
         if (!found) {
             if (!recover (interp, sdata, UNKNOWN_ATTRIBUTE,
-                          Tcl_GetString (attname), Tcl_GetString (attns),
-                          NULL, 0)) {
+                          MATCH_ELEMENT_START, Tcl_GetString (attname),
+                          Tcl_GetString (attns), NULL, 0)) {
                 if (ns) {
                     SetResult ("Unknown attribute \"");
                     Tcl_AppendResult (interp, ns, ":", name, "\"", NULL);
@@ -2465,8 +2413,8 @@ static int checkElementEnd (
                 cp->content[ac]->keySpace->active--;
                 if (!cp->content[ac]->keySpace->active) {
                     if (cp->content[ac]->keySpace->unknownIDrefs) {
-                        if (!recover (interp, sdata, INVALID_KEYREF_MATCH_END,
-                                      NULL, NULL,
+                        if (!recover (interp, sdata, INVALID_KEYREF,
+                                      MATCH_ELEMENT_END, NULL, NULL,
                                       cp->content[ac]->keySpace->name, 0)) {
                             SetResultV ("Invalid key ref.");
                             sdata->evalError = 2;
@@ -2493,8 +2441,9 @@ static int checkElementEnd (
             case SCHEMA_CTYPE_TEXT:
                 if (cp->content[ac]->nc) {
                     if (!checkText (interp, cp->content[ac], "")) {
-                        if (recover (interp, sdata, MISSING_TEXT_MATCH_END,
-                                     NULL, NULL, NULL, ac)) {
+                        if (recover (interp, sdata, MISSING_TEXT,
+                                     MATCH_ELEMENT_END, NULL, NULL, NULL,
+                                     ac)) {
                             break;
                         }
                         return 0;
@@ -2552,8 +2501,8 @@ static int checkElementEnd (
                     if (thismayskip) break;
                 }
                 if (thismayskip) break;
-                if (!recover (interp, sdata, MISSING_ELEMENT_MATCH_END, NULL,
-                              NULL, NULL, 0)) {
+                if (!recover (interp, sdata, MISSING_ELEMENT,
+                              MATCH_ELEMENT_END, NULL, NULL, NULL, 0)) {
                     return 0;
                 }
                 if (sdata->recoverFlags & RECOVER_FLAG_MATCH_END_CONTINUE) {
@@ -2568,7 +2517,7 @@ static int checkElementEnd (
 
             case SCHEMA_CTYPE_JSON_STRUCT:
                 if (!checkJsonStructType (interp, sdata, cp->content[ac],
-                                          INVALID_JSON_TYPE_MATCH_END, ac)) {
+                                          INVALID_JSON_TYPE, MATCH_ELEMENT_END, ac)) {
                     return 0;
                 }
                 break;
@@ -2586,8 +2535,8 @@ static int checkElementEnd (
                     if (sdata->stack->pattern->type == SCHEMA_CTYPE_NAME
                         || sdata->stack->activeChild
                         || sdata->stack->hasMatched) {
-                        if (recover (interp, sdata, MISSING_ELEMENT_MATCH_END,
-                                     NULL, NULL, NULL, 0)) {
+                        if (recover (interp, sdata, MISSING_ELEMENT,
+                                     MATCH_ELEMENT_END, NULL, NULL, NULL, 0)) {
                             if (sdata->recoverFlags &
                                 RECOVER_FLAG_MATCH_END_CONTINUE) {
                                 updateStack (sdata, se, ac);
@@ -2607,7 +2556,7 @@ static int checkElementEnd (
                 
             case SCHEMA_CTYPE_ANY:
             case SCHEMA_CTYPE_NAME:
-                if (recover (interp, sdata, MISSING_ELEMENT_MATCH_END,
+                if (recover (interp, sdata, MISSING_ELEMENT, MATCH_ELEMENT_END,
                              NULL, NULL, NULL, 0)) {
                     if (sdata->recoverFlags & RECOVER_FLAG_MATCH_END_CONTINUE) {
                         updateStack (sdata, se, ac);
@@ -2655,7 +2604,8 @@ checkDocKeys (
 
     if (sdata->evalError) return 0;
     if (sdata->unknownIDrefs) {
-        if (!recover (interp, sdata, UNKNOWN_ID, NULL, NULL, NULL, 0)) {
+        if (!recover (interp, sdata, UNKNOWN_ID, MATCH_GLOBAL, NULL, NULL,
+                      NULL, 0)) {
             haveErrMsg = 1;
             SetResult ("References to unknown IDs:");
             for (h = Tcl_FirstHashEntry (&sdata->ids, &search);
@@ -2675,8 +2625,8 @@ checkDocKeys (
              h = Tcl_NextHashEntry (&search)) {
             dk = Tcl_GetHashValue (h);
             if (dk->unknownIDrefs) {
-                if (!recover (interp, sdata, UNKNOWN_GLOBAL_ID, NULL, NULL,
-                              NULL, 0)) {
+                if (!recover (interp, sdata, UNKNOWN_GLOBAL_ID, MATCH_GLOBAL,
+                              NULL, NULL, NULL, 0)) {
                     if (haveErrMsg) {
                         Tcl_AppendResult (interp, "\n", NULL);
                     } else {
@@ -2807,8 +2757,8 @@ matchText (
                         return 1;
                     }
                     if (sdata->evalError) return 0;
-                    if (recover (interp, sdata, INVALID_VALUE, NULL, NULL,
-                                 text, ac)) {
+                    if (recover (interp, sdata, INVALID_VALUE, MATCH_TEXT,
+                                 NULL, NULL, text, ac)) {
                         updateStack (sdata, se, ac);
                         return 1;
                     }
@@ -2876,7 +2826,7 @@ matchText (
                     }
                     if (mustMatch (cp->quants[ac], hm)) {
                         if (recover (interp, sdata, UNEXPECTED_TEXT,
-                                     NULL, NULL, text, 0)) {
+                                     MATCH_TEXT, NULL, NULL, text, 0)) {
                             return 1;
                         }
                         SetResultV ("Unexpected text content");
@@ -2898,7 +2848,7 @@ matchText (
                     popStack (sdata);
                     if (mustMatch (cp->quants[ac], hm)) {
                         if (recover (interp, sdata, UNEXPECTED_TEXT,
-                                     NULL, NULL, text, 0)) {
+                                     MATCH_TEXT, NULL, NULL, text, 0)) {
                             return 1;
                         }
                         SetResultV ("Unexpected text content");
@@ -2912,7 +2862,7 @@ matchText (
 
                 case SCHEMA_CTYPE_JSON_STRUCT:
                     if (checkJsonStructType (interp, sdata, candidate,
-                                             INVALID_JSON_TYPE_MATCH_TEXT,
+                                             INVALID_JSON_TYPE, MATCH_TEXT,
                                              ac)) {
                         ac++;
                         continue;
@@ -2935,7 +2885,7 @@ matchText (
                     if (!cp->content[ac]->keySpace->active) {
                         if (cp->content[ac]->keySpace->unknownIDrefs) {
                             if (!recover (interp, sdata,
-                                          INVALID_KEYREF_MATCH_TEXT, NULL,
+                                          INVALID_KEYREF, MATCH_TEXT, NULL,
                                           NULL, text, ac)) {
                                 return 0;
                                 SetResultV ("Invalid key ref.");
@@ -2951,7 +2901,7 @@ matchText (
                 case SCHEMA_CTYPE_ANY:
                     if (mustMatch (cp->quants[ac], hm)) {
                         if (recover (interp, sdata, UNEXPECTED_TEXT,
-                                     NULL, NULL, text, ac)) {
+                                     MATCH_TEXT, NULL, NULL, text, ac)) {
                             return 1;
                         }
                         SetResultV ("Unexpected text content");
@@ -2963,7 +2913,7 @@ matchText (
                 ac++;
             }
             if (isName) {
-                if (recover (interp, sdata, UNEXPECTED_TEXT, NULL,
+                if (recover (interp, sdata, UNEXPECTED_TEXT, MATCH_TEXT, NULL,
                              NULL, text, 0)) {
                     return 1;
                 }
@@ -3048,7 +2998,7 @@ matchText (
                 }
             }
             if (!mayskip) {
-                if (recover (interp, sdata, UNEXPECTED_TEXT, NULL, NULL, text,
+                if (recover (interp, sdata, UNEXPECTED_TEXT, MATCH_TEXT, NULL, NULL, text,
                              ac)) {
                     return 1;
                 }
@@ -3297,8 +3247,9 @@ checkdomKeyConstraints (
         if (kc->flags & DKC_FLAG_BOOLEAN) {
             i = xpathFuncBoolean (&rs);
             if (!i) {
-                if (!recover (interp, sdata, DOM_XPATH_BOOLEAN, kc->name,
-                              NULL, NULL, 0)) {
+                if (!recover (interp, sdata, DOM_XPATH_BOOLEAN,
+                              MATCH_DOM_KEYCONSTRAINT, kc->name, NULL,
+                              NULL, 0)) {
                     SetResultV ("INVALID_DOM_XPATH_BOOLEAN");
                     goto booleanErrorCleanup;
                 }
@@ -3342,7 +3293,8 @@ checkdomKeyConstraints (
                     Tcl_CreateHashEntry (&htable, efsv, &hnew);
                     if (!hnew) {
                         if (recover (interp, sdata, DOM_KEYCONSTRAINT,
-                                     kc->name, NULL, efsv, 0)) {
+                                     MATCH_DOM_KEYCONSTRAINT, kc->name, NULL,
+                                     efsv, 0)) {
                             break;
                         }
                         SetResultV ("DOM_KEYCONSTRAINT");
@@ -3351,7 +3303,8 @@ checkdomKeyConstraints (
                     continue;
                 }
                 if (frs.nr_nodes != 1) {
-                    if (recover (interp, sdata, DOM_KEYCONSTRAINT, kc->name,
+                    if (recover (interp, sdata, DOM_KEYCONSTRAINT,
+                                 MATCH_DOM_KEYCONSTRAINT, kc->name,
                                  NULL, NULL, 0)) {
                         break;
                     }
@@ -3368,6 +3321,7 @@ checkdomKeyConstraints (
                     Tcl_CreateHashEntry (&htable, attr->nodeValue, &hnew);
                     if (!hnew) {
                         if (recover (interp, sdata, DOM_KEYCONSTRAINT,
+                                     MATCH_DOM_KEYCONSTRAINT,
                                      kc->name, NULL, attr->nodeValue, 0)) {
                             break;
                         }
@@ -3379,6 +3333,7 @@ checkdomKeyConstraints (
                     Tcl_CreateHashEntry (&htable, keystr, &hnew);
                     if (!hnew) {
                         if (recover (interp, sdata, DOM_KEYCONSTRAINT,
+                                     MATCH_DOM_KEYCONSTRAINT,
                                      kc->name, NULL, keystr, 0)) {
                             FREE(keystr);
                             break;
@@ -3423,6 +3378,7 @@ checkdomKeyConstraints (
                     }
                     if (frs.nr_nodes != 1) {
                         if (recover (interp, sdata, DOM_KEYCONSTRAINT,
+                                     MATCH_DOM_KEYCONSTRAINT,
                                      kc->name, NULL, NULL, 0)) {
                             skip = 1;
                             break;
@@ -3451,8 +3407,8 @@ checkdomKeyConstraints (
                 Tcl_CreateHashEntry (&htable, Tcl_DStringValue (&dStr), &hnew);
                 if (!hnew) {
                     if (recover (interp, sdata, DOM_KEYCONSTRAINT, 
-                                 kc->name, NULL, Tcl_DStringValue (&dStr),
-                                 0)) {
+                                 MATCH_DOM_KEYCONSTRAINT, kc->name,
+                                 NULL, Tcl_DStringValue (&dStr),0)) {
                         break;
                     }
                     SetResultV ("DOM_KEYCONSTRAINT");

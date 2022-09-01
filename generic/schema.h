@@ -59,6 +59,17 @@ typedef enum {
   SCHEMA_CQUANT_ERROR,
 } SchemaQuant;
 
+typedef enum {
+    MATCH_GLOBAL = 1,
+    MATCH_ELEMENT_START,
+    MATCH_ELEMENT_END,
+    MATCH_TEXT,
+    MATCH_ATTRIBUTE_TEXT,
+    MATCH_DOM_KEYCONSTRAINT,
+    MATCH_DOM_XPATH_BOOLEAN
+} ValidationAction;
+
+
 typedef int (*SchemaConstraintFunc) (Tcl_Interp *interp,
                                      void *constraintData, char *text);
 typedef void (*SchemaConstraintFreeFunc) (void *constraintData);
@@ -198,7 +209,7 @@ typedef struct SchemaData_
     SchemaValidationStack *stack;
     SchemaValidationStack *stackPool;
     ValidationState validationState;
-    int vaction;
+    ValidationAction vaction;
     const char *vname;
     const char *vns;
     const char *vtext;
