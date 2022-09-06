@@ -1,5 +1,5 @@
-C De-crufted\srecover()\sinternals.
-D 2022-09-01T11:55:20.260
+C Restored\sconfigure\soption\s--disable-schema\swhich\swas\sbrocken\safter\sthe\ssplit\sof\sthe\sschema\scode.
+D 2022-09-06T17:06:48.393
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -125,7 +125,7 @@ F extensions/tnc/win/rules-ext.vc e788fcfc1e69b11946e18b8f67e0870b3bd38913
 F extensions/tnc/win/rules.vc 8157e2a811cf5e93683d6b0fbf5d91d153aa4535
 F extensions/tnc/win/targets.vc 79dea1c6a94a94e6ed8bae9e0195149b25a69923
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
-F generic/datatypes.c 2deb8ad5be46457d04b93a1f47fe998bc38e6f3e01db2c932bdd7bf17309b446
+F generic/datatypes.c 4a33e0c8de5fd1c20d1f549cc513af4b6e72c5c80b817f42c94d277cba8dec38
 F generic/datatypes.h 3e41d07bcf50cf6959b6e14416dfcb0d7b5aafc65683322978ec185c2a259332
 F generic/dom.c 88a9f4b4c1c319f173161d9973de4270b6617223df5453f7dfa5ba0043cd5abe
 F generic/dom.h aade5edbc08d0ffb7fa61c40171f66b705bf40f4f97e91adddfdb33120c111d3
@@ -239,8 +239,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 935e6cfb505bba13e747979b278441a855b40b5c88d2d0664c89e92dae9e0c30
-R 83c3849d308c47ac78e0917093d81248
+P 949b0142a684834da804433da70a8a503ecde3a7b993e59d9baa3920b8940679
+R 784b8adf56d62e92e277affd3f410d15
 U rolf
-Z 07178d56484400dc092873cdbda5a606
+Z e6b9ccb0836cb590ecd775a4ceecaca0
 # Remove this line to create a well-formed Fossil manifest.

@@ -26,6 +26,8 @@
 #include <domjson.h>
 #include <schema.h>
 
+#ifndef TDOM_NO_SCHEMA
+
 #define CHECK_TI                                                        \
     if (!sdata) {                                                       \
         SetResult ("Command called outside of schema context");         \
@@ -2650,3 +2652,4 @@ tDOM_DatatypesInit (
                           durationObjCmd, NULL, NULL);
 
 }
+#endif
