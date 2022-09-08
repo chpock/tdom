@@ -28,6 +28,7 @@
 
 #include <dom.h>
 #include <domjson.h>
+#include <schema.h>
 #include <ctype.h>
 
 static const char jsonIsSpace[] = {
@@ -57,6 +58,7 @@ typedef enum {
     JSON_OK,
     JSON_MAX_NESTING_REACHED,
     JSON_SYNTAX_ERR,
+    JSON_SCHEMA_ERROR
 } JSONParseState;
 
 /* Error string constants, indexed by JSONParseState. */
@@ -237,6 +239,10 @@ static int jsonParseValue(
     char      *json,
     int        i,
     JSONParse *jparse
+#ifndef TDOM_NO_SCHEMA
+    ,SchemaData *sdata,
+    Tcl_Interp  *interp
+#endif
     )
 {
     char c, save;
@@ -259,6 +265,13 @@ static int jsonParseValue(
             node->info = JSON_OBJECT;
             domAppendChild(parent, node);
             parent = node;
+#ifndef TDOM_NO_SCHEMA
+            if (sdata
+                && tDOM_probeElement (interp, sdata, node->nodeName, NULL)
+                != TCL_OK) {
+                errReturn(i,JSON_SCHEMA_ERROR);
+            }
+#endif
         } else {
             parent->info  = JSON_OBJECT;
         }
@@ -292,7 +305,11 @@ static int jsonParseValue(
             if (json[i] != ':') errReturn(i,JSON_SYNTAX_ERR);
             i++;
             skipspace(i);
-            j = jsonParseValue (node, json, i, jparse);
+            j = jsonParseValue (node, json, i, jparse
+#ifndef TDOM_NO_SCHEMA
+                                ,sdata, interp
+#endif
+                );
             rc(j);
             i = j;
             skipspace(i);
@@ -332,7 +349,11 @@ static int jsonParseValue(
         for (;;) {
             DBG(fprintf(stderr, "Next array value node '%s'\n", &json[i]););
             skipspace(i);
-            i = jsonParseValue (node, json, i, jparse);
+            i = jsonParseValue (node, json, i, jparse
+#ifndef TDOM_NO_SCHEMA
+                                ,sdata, interp
+#endif
+                );
             rc(i);
             skipspace(i);
             if (json[i] == ']') {
@@ -441,6 +462,10 @@ domDocument *
 JSON_Parse (
     char *json,    /* Complete text of the json string being parsed */
     char *documentElement, /* name of the root element, may be NULL */
+#ifndef TDOM_NO_SCHEMA
+    SchemaData *sdata, /* NULL if not validating the tree on the fly */
+    Tcl_Interp  *interp,
+#endif
     int   maxnesting,
     char **errStr,
     int  *byteIndex
@@ -460,7 +485,6 @@ JSON_Parse (
     jparse.arrItemElm = (char*)&h->key;
     jparse.buf = NULL;
     jparse.len = 0;
-
     skipspace(pos);
     if (json[pos] == '\0') {
         *byteIndex = pos;
@@ -473,7 +497,11 @@ JSON_Parse (
     } else {
         root = doc->rootNode;
     }
-    *byteIndex = jsonParseValue (root, json, pos, &jparse );
+    *byteIndex = jsonParseValue (root, json, pos, &jparse
+#ifndef TDOM_NO_SCHEMA
+                                 ,sdata, interp
+#endif
+        );
     if (jparse.state != JSON_OK) goto reportError;
     if (*byteIndex > 0) {
         pos = *byteIndex;

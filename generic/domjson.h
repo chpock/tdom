@@ -30,6 +30,10 @@ domDocument *
 JSON_Parse (
     char *json,    /* Complete text of the json string being parsed */
     char *documentElement, /* name of the root element, may be NULL */
+#ifndef TDOM_NO_SCHEMA
+    SchemaData *sdata, /* NULL if not validating the tree on the fly */
+    Tcl_Interp  *interp,
+#endif
     int   maxnesting,
     char **errStr,
     int  *byteIndex

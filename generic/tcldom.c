@@ -7268,8 +7268,12 @@ int tcldom_parse (
 
         errStr = NULL;
 
-        doc = JSON_Parse (xml_string, jsonRoot, jsonmaxnesting, &errStr,
-                          &byteIndex);
+        doc = JSON_Parse (xml_string, jsonRoot,
+#ifndef TDOM_NO_SCHEMA
+                          sdata, interp,
+#endif
+                          jsonmaxnesting,
+                          &errStr, &byteIndex);
         if (doc) {
             return tcldom_returnDocumentObj (interp, doc, setVariable,
                                              newObjName, 1, 0);
