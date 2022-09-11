@@ -1,4 +1,9 @@
 
+2022-09-11  Rolf Ade  <rolf@pointsman.de>
+
+        Added the node command method getByteIndex. Added the
+        submethod byteIndex to the info method of the schema commands.
+
 2022-08-27  Rolf Ade  <rolf@pointsman.de>
 
         Added the method asCanonicalXML to the domDoc and domNode

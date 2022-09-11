@@ -4201,7 +4201,7 @@ schemaInstanceInfoCmd (
     )
 {
     int methodIndex, expectedFlags;
-    long line, column;
+    long line, column, byteIndex;
     Tcl_HashEntry *h;
     SchemaCP *cp;
     SchemaValidationStack *se;
@@ -4211,14 +4211,16 @@ schemaInstanceInfoCmd (
     static const char *schemaInstanceInfoMethods[] = {
         "validationstate", "vstate", "definedElements", "stack", "toplevel",
         "expected", "definition", "validationaction", "vaction", "line",
-        "column", "domNode", "nrForwardDefinitions", "typedefinition",
-        "definedElementtypes", "patterndefinition", "definedPatterns", NULL
+        "column", "byteIndex", "domNode", "nrForwardDefinitions",
+        "typedefinition", "definedElementtypes", "patterndefinition",
+        "definedPatterns", NULL
     };
     enum schemaInstanceInfoMethod {
         m_validationstate, m_vstate, m_definedElements, m_stack, m_toplevel,
         m_expected, m_definition, m_validationaction, m_vaction, m_line,
-        m_column, m_domNode, m_nrForwardDefinitions, m_typedefinition,
-        m_definedElementtypes, m_patterndefinition, m_definedPatterns
+        m_column, m_byteIndex, m_domNode, m_nrForwardDefinitions,
+        m_typedefinition, m_definedElementtypes, m_patterndefinition,
+        m_definedPatterns
     };
 
     static const char *schemaInstanceInfoStackMethods[] = {
@@ -4539,7 +4541,8 @@ schemaInstanceInfoCmd (
             SetLongResult (XML_GetCurrentLineNumber (sdata->parser));
             break;
         }
-        if (domGetLineColumn(sdata->node, &line, &column) < 0) break;
+        if (domGetLineColumn(sdata->node, &line, &column, &byteIndex) < 0)
+            break;
         SetLongResult (line);
         break;
         
@@ -4549,8 +4552,20 @@ schemaInstanceInfoCmd (
             SetLongResult (XML_GetCurrentColumnNumber (sdata->parser));
             break;
         }
-        if (domGetLineColumn(sdata->node, &line, &column) < 0) break;
+        if (domGetLineColumn(sdata->node, &line, &column, &byteIndex) < 0)
+            break;
         SetLongResult (column);
+        break;
+
+    case m_byteIndex:
+        if (!sdata->parser && !sdata->node) break;
+        if (sdata->parser) {
+            SetLongResult (XML_GetCurrentByteIndex (sdata->parser));
+            break;
+        }
+        if (domGetLineColumn(sdata->node, &line, &column, &byteIndex) < 0)
+            break;
+        SetLongResult (byteIndex);
         break;
 
     case m_domNode:

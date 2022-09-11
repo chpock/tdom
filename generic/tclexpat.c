@@ -2284,12 +2284,12 @@ TclExpatGet (
 
     case EXPAT_CURRENTLINENUMBER:
 
-      Tcl_SetIntObj(resultPtr, XML_GetCurrentLineNumber(expat->parser));
+      Tcl_SetLongObj(resultPtr, XML_GetCurrentLineNumber(expat->parser));
       break;
 
     case EXPAT_CURRENTCOLUMNNUMBER:
 
-      Tcl_SetIntObj(resultPtr, XML_GetCurrentColumnNumber(expat->parser));
+      Tcl_SetLongObj(resultPtr, XML_GetCurrentColumnNumber(expat->parser));
       break;
 
     case EXPAT_CURRENTBYTEINDEX:
