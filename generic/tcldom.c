@@ -90,8 +90,8 @@
 #define SetIntResult(i) Tcl_ResetResult(interp);                        \
                      Tcl_SetIntObj(Tcl_GetObjResult(interp), (i))
                      
-#define SetWideResult(i) Tcl_ResetResult(interp);                        \
-                     Tcl_SetWideIntObj(Tcl_GetObjResult(interp), (i))
+#define SetLongResult(i) Tcl_ResetResult(interp);                        \
+                     Tcl_SetLongObj(Tcl_GetObjResult(interp), (i))
 
 #define SetDoubleResult(d) Tcl_ResetResult(interp);                     \
                      Tcl_SetDoubleObj(Tcl_GetObjResult(interp), (d))
@@ -5806,7 +5806,7 @@ int tcldom_NodeObjCmd (
                 SetResult("no line/column information available!");
                 return TCL_ERROR;
             }
-            SetWideResult(line);
+            SetLongResult(line);
             break;
 
         case m_getColumn:
@@ -5815,7 +5815,7 @@ int tcldom_NodeObjCmd (
                 SetResult("no line/column information available!");
                 return TCL_ERROR;
             }
-            SetWideResult(column);
+            SetLongResult(column);
             break;
 
         case m_getByteIndex:
@@ -5824,7 +5824,7 @@ int tcldom_NodeObjCmd (
                 SetResult("no position information available!");
                 return TCL_ERROR;
             }
-            SetWideResult(byteIndex);
+            SetLongResult(byteIndex);
             break;
 
         case m_getBaseURI:

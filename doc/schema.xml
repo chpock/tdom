@@ -369,6 +369,16 @@
                   empty string is returned in these cases.</desc>
               </optdef>
               <optdef>
+                  <optname>byteIndex</optname>
+                  <desc>If the schema command is currently validating
+                  this method returns the byte position of the parsing
+                  position information, and the empty string in all
+                  other cases. If the schema command is currently
+                  post-validating a DOM tree, there may be no position
+                  information stored at some or all nodes. The
+                  empty string is returned in these cases.</desc>
+              </optdef>
+              <optdef>
                   <optname>domNode</optname>
                   <desc>If the schema command isn't currently
                   post-validating a DOM tree this method returns the
