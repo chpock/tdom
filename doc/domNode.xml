@@ -431,14 +431,20 @@ set childNodes [$root selectNodes -namespaces {default http://www.defaultnamespa
 
       <commanddef>
         <command><method>getLine</method></command>
-        <desc>Returns the line number of that node in the originally parsed
-XML.</desc>
+        <desc>Returns the line number of that node in the originally
+        parsed XML. The counting starts with 1</desc>
       </commanddef>
       
       <commanddef>
         <command><method>getColumn</method></command>
-        <desc>Returns the column number of that node in the originally parsed
-XML.</desc>
+        <desc>Returns the column number of that node in the originally
+        parsed XML. The counting starts with 0</desc>
+      </commanddef>
+
+      <commanddef>
+        <command><method>getByteIndex</method></command>
+        <desc>Returns the byte position of that node in the originally
+        parsed XML. The counting starts with 0.</desc>
       </commanddef>
 
       <commanddef>

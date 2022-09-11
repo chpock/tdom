@@ -542,7 +542,7 @@ reportError (
     Tcl_DString dStr;
     char buffer[1024];
     const char *baseURI;
-    long  line, column;
+    long  line, column, byteIndex;
 
     Tcl_DStringInit (&dStr);
     baseURI = findBaseURI (node);
@@ -551,7 +551,7 @@ reportError (
         Tcl_DStringAppend (&dStr, baseURI, -1);
     }
     if (node->nodeFlags & HAS_LINE_COLUMN) {
-        domGetLineColumn (node, &line, &column);
+        domGetLineColumn (node, &line, &column, &byteIndex);
         sprintf (buffer, " at line %ld, column %ld:\n", line, column);
         Tcl_DStringAppend (&dStr, buffer, -1);
         Tcl_DStringAppend (&dStr, str, -1);

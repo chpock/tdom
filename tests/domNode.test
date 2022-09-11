@@ -27,7 +27,7 @@
 #    domNode-21.*: hasChildNodes
 #    domNode-22.*: localName, prefix
 #    domNode-23.*: replaceChild
-#    domNode-24.*: getLine, getColumn
+#    domNode-24.*: getLine, getColumn, getByteIndex
 #    domNode-25.*: hasAttribute, hasAttributeNS
 #    domNode-26.*: appendXML
 #    domNode-27.*: target, data
@@ -2406,6 +2406,22 @@ test domNode-24.1 {getLine} {
     set result
 } {1}
 
+test domNode-24.1.1 {getColumn} {
+    set doc [dom parse <root/>]
+    set root [$doc documentElement]
+    set result [catch {$root getColumn} errMsg]
+    $doc delete
+    lappend result $errMsg
+} {1 {no line/column information available!}}
+
+test domNode-24.1.2 {getByteIndex} {
+    set doc [dom parse <root/>]
+    set root [$doc documentElement]
+    set result [catch {$root getByteIndex} errMsg]
+    $doc delete
+    lappend result $errMsg
+} {1 {no position information available!}}
+    
 dom setStoreLineColumn 1
 set doc [dom parse {<root>
 <e1><e2/></e1></root>}]
@@ -2429,6 +2445,11 @@ test domNode-24.5 {getLine getColumn} {
     set result [$node getLine].[$node getColumn]
 } {2.4}
 
+test domNode-24.6 {getByteIndex} {
+    set node [$root selectNodes //e2]
+    set result [$node getByteIndex]
+} {11}
+    
 $doc delete
 
 set doc [dom parse {<root attr1="bingbaz"
