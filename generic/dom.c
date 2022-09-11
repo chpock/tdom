@@ -1231,7 +1231,8 @@ startElement(
         lc = (domLineColumn*) ( ((char*)node) + sizeof(domNode));
         node->nodeFlags |= HAS_LINE_COLUMN;
         lc->line         = XML_GetCurrentLineNumber (info->parser);
-        lc->column       = XML_GetCurrentColumnNumber(info->parser);
+        lc->column       = XML_GetCurrentColumnNumber (info->parser);
+        lc->byteIndex    = XML_GetCurrentByteIndex (info->parser);
     }
 
 
@@ -1654,6 +1655,7 @@ DispatchPCDATA (
             node->nodeFlags |= HAS_LINE_COLUMN;
             lc->line         = XML_GetCurrentLineNumber (info->parser);
             lc->column       = XML_GetCurrentColumnNumber(info->parser);
+            lc->byteIndex    = XML_GetCurrentByteIndex (info->parser);
         }
     }
 checkTextConstraints:
@@ -1743,6 +1745,7 @@ commentHandler (
         node->nodeFlags |= HAS_LINE_COLUMN;
         lc->line         = XML_GetCurrentLineNumber (info->parser);
         lc->column       = XML_GetCurrentColumnNumber(info->parser);
+        lc->byteIndex    = XML_GetCurrentByteIndex (info->parser);
     }
 }
 
@@ -1830,6 +1833,7 @@ processingInstructionHandler(
         node->nodeFlags |= HAS_LINE_COLUMN;
         lc->line         = XML_GetCurrentLineNumber (info->parser);
         lc->column       = XML_GetCurrentColumnNumber(info->parser);
+        lc->byteIndex    = XML_GetCurrentByteIndex (info->parser);
     }
 }
 
@@ -2389,7 +2393,8 @@ int
 domGetLineColumn (
     domNode *node,
     long     *line,
-    long     *column
+    long     *column,
+    long     *byteIndex
 )
 {
     char *v;
@@ -2421,6 +2426,7 @@ domGetLineColumn (
         lc = (domLineColumn *)v;
         *line   = lc->line;
         *column = lc->column;
+        *byteIndex = lc->byteIndex;
         return 0;
     } else {
         return -1;
@@ -2527,6 +2533,7 @@ domCreateDoc (
         rootNode->nodeFlags |= HAS_LINE_COLUMN;
         lc->line            = 0;
         lc->column          = 0;
+        lc->byteIndex       = 0;
     }
     doc->rootNode = rootNode;
 

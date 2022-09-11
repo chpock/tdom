@@ -90,7 +90,10 @@
 #define SetIntResult(i) Tcl_ResetResult(interp);                        \
                      Tcl_SetIntObj(Tcl_GetObjResult(interp), (i))
                      
-#define SetDoubleResult(d) Tcl_ResetResult(interp); \
+#define SetWideResult(i) Tcl_ResetResult(interp);                        \
+                     Tcl_SetWideIntObj(Tcl_GetObjResult(interp), (i))
+
+#define SetDoubleResult(d) Tcl_ResetResult(interp);                     \
                      Tcl_SetDoubleObj(Tcl_GetObjResult(interp), (d))
 
 #define SetBooleanResult(i) Tcl_ResetResult(interp); \
@@ -4861,7 +4864,7 @@ int tcldom_NodeObjCmd (
                  *str, *attr_name, *attr_val, *filter;
     const char  *localName, *uri, *nsStr;
     int          result, length, methodIndex, i;
-    long         line, column;
+    long         line, column, byteIndex;
     int          nsIndex, bool, hnew, legacy, jsonType;
     Tcl_Obj     *namePtr, *resultPtr;
     Tcl_Obj     *mobjv[MAX_REWRITE_ARGS];
@@ -4886,6 +4889,7 @@ int tcldom_NodeObjCmd (
         "disableOutputEscaping",             "precedes",         "asText",
         "insertBeforeFromScript",            "normalize",        "baseURI",
         "asJSON",          "jsonType",       "attributeNames",   "asCanonicalXML",
+        "getByteIndex",
 #ifdef TCL_THREADS
         "readlock",        "writelock",
 #endif
@@ -4908,7 +4912,8 @@ int tcldom_NodeObjCmd (
         m_getElementsByTagName,              m_getElementsByTagNameNS,
         m_disableOutputEscaping,             m_precedes,        m_asText,
         m_insertBeforeFromScript,            m_normalize,       m_baseURI,
-        m_asJSON,          m_jsonType,       m_attributeNames,  m_asCanonicalXML
+        m_asJSON,          m_jsonType,       m_attributeNames,  m_asCanonicalXML,
+        m_getByteIndex
 #ifdef TCL_THREADS
         ,m_readlock,       m_writelock
 #endif
@@ -5797,20 +5802,29 @@ int tcldom_NodeObjCmd (
 
         case m_getLine:
             CheckArgs(2,2,2,"");
-            if (domGetLineColumn(node, &line, &column) < 0) {
+            if (domGetLineColumn(node, &line, &column, &byteIndex) < 0) {
                 SetResult("no line/column information available!");
                 return TCL_ERROR;
             }
-            SetIntResult(line);
+            SetWideResult(line);
             break;
 
         case m_getColumn:
             CheckArgs(2,2,2,"");
-            if (domGetLineColumn (node, &line, &column) < 0) {
+            if (domGetLineColumn (node, &line, &column, &byteIndex) < 0) {
                 SetResult("no line/column information available!");
                 return TCL_ERROR;
             }
-            SetIntResult(column);
+            SetWideResult(column);
+            break;
+
+        case m_getByteIndex:
+            CheckArgs(2,2,2,"");
+            if (domGetLineColumn (node, &line, &column, &byteIndex) < 0) {
+                SetResult("no position information available!");
+                return TCL_ERROR;
+            }
+            SetWideResult(byteIndex);
             break;
 
         case m_getBaseURI:

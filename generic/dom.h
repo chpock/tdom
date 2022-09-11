@@ -611,6 +611,7 @@ typedef struct domLineColumn {
 
     long  line;
     long  column;
+    long  byteIndex;
 
 } domLineColumn;
 
@@ -865,7 +866,8 @@ domNS *        domLookupURI     (domNode *node, char *uri);
 domNS *        domGetNamespaceByIndex (domDocument *doc, int nsIndex);
 domNS *        domNewNamespace (domDocument *doc, const char *prefix,
                                 const char *namespaceURI);
-int            domGetLineColumn (domNode *node, long *line, long *column);
+int            domGetLineColumn (domNode *node, long *line, long *column,
+                                 long *byteIndex);
 
 int            domXPointerChild (domNode * node, int all, int instance, domNodeType type,
                                  char *element, char *attrName, char *attrValue,
