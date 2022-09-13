@@ -544,7 +544,7 @@ TclExpatInitializeParser(
     expat->parsingState           = 0;
 #ifndef TDOM_NO_SCHEMA
     if (expat->sdata) {
-        tDOM_schemaReset (expat->sdata, 1);
+        tDOM_schemaReset (expat->sdata);
     }
 #endif
 
@@ -813,7 +813,7 @@ TclExpatInstanceCmd (
 #ifndef TDOM_NO_SCHEMA
             if (expat->sdata) {
                 expat->sdata->inuse--;
-                tDOM_schemaReset (expat->sdata, 1);
+                tDOM_schemaReset (expat->sdata);
             }
 #endif
             Tcl_DeleteCommand(interp, Tcl_GetString(expat->name));
@@ -942,7 +942,7 @@ TclExpatInstanceCmd (
 
 #ifndef TDOM_NO_SCHEMA
   if (resetsdata && expat->sdata) {
-      tDOM_schemaReset (expat->sdata, 1);
+      tDOM_schemaReset (expat->sdata);
   }
 #endif
   return result;
@@ -1767,13 +1767,13 @@ TclExpatConfigure (
         if (schemacmd[0] == '\0') {
             if (expat->sdata) {
                 expat->sdata->inuse--;
-                tDOM_schemaReset (expat->sdata, 1);
+                tDOM_schemaReset (expat->sdata);
                 expat->sdata = NULL;
             }
         } else {
             if (expat->sdata) {
                 expat->sdata->inuse--;
-                tDOM_schemaReset (expat->sdata, 1);
+                tDOM_schemaReset (expat->sdata);
                 expat->sdata = NULL;
             }                
             if (!Tcl_GetCommandInfo(interp, schemacmd, &cmdInfo)) {

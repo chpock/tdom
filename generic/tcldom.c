@@ -7424,7 +7424,7 @@ int tcldom_parse (
 #ifndef TDOM_NO_SCHEMA
     if (sdata) {
         sdata->inuse--;
-        tDOM_schemaReset (sdata, 1);
+        tDOM_schemaReset (sdata);
     }
 #endif
     if (doc == NULL) {

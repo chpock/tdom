@@ -1,5 +1,5 @@
-C Added\sthe\snode\scommand\smethod\sgetByteIndex.\sAdded\sthe\ssubmethod\sbyteIndex\sto\sthe\sinfo\smethod\sof\sthe\sschema\scommands.
-D 2022-09-11T15:08:02.017
+C Simplified\sfunction\s-\sall\scallers\sused\sthe\ssame\ssecond\sarg\s(for\sreasons).
+D 2022-09-13T13:10:25.940
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -145,11 +145,11 @@ F generic/domxslt.h 0cb8e327683a0ffeb2a7094add6cd82ec1ae49c7c704f20d8d6f7d6523e7
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c e8b237d7069eee5a505e1d845de0974e0e533173ec0b39f278137f1a557419a7
 F generic/nodecmd.h 36056ca2c262cb1991cabef8d27992ad628db718d09ff0eeaeaffd150f1549ec
-F generic/schema.c ee12af915040dfe549a1a61a7628ab57c3ad1331e04fb13775551abc2be052db
-F generic/schema.h d034d5c11ac0873a5eaeb6ff5350e3d09ba2c148aa506f88c33491b20c125895
-F generic/tcldom.c 7657db6d6d7e91fb0af55dd2f402846f32b6a6daca4bed0eca945a4b882cf9aa
+F generic/schema.c 2a28faf2ac152e73bfdd926c91e3e06fbfc20aabb9de5113224466f8c2810aec
+F generic/schema.h 7d8c6ffbb3e99d9cb7636c66194a48e4311d1e3014a708d58f194bf44733a7f3
+F generic/tcldom.c 2989e2f62b261f549d75218d3f0fcdc55b6727fb2f18419fed790040274d444e
 F generic/tcldom.h fc61477bdd07440e17a8f11cc898e5c07c8c7c3592014213a5e50eca85393374
-F generic/tclexpat.c dbf0a81731146449dfc74a1e7b07816ca8997f7a8e4596bf61fac9e07c71ee79
+F generic/tclexpat.c 05ee40449a59e3efb7bf400c34baab9910890f143aaf383a2f456c83eb5ca67a
 F generic/tclexpat.h 95d915d74bb4b99ef3b80de00b0adce28931e6015ac63226b99db4817d9e313c
 F generic/tclpull.c ac1ff8332e2cdb20b6ce8c7fc733863fe0dbc61bc421ec643b1fc053fb778665
 F generic/tclpull.h 8e1aac98bdad497c669c901494939eecd6c2f57ea51c4f5d4dac502db48527d4
@@ -239,9 +239,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P d94520ac921d67aac3b531980fcbb22eee63c43fcee3ce5bb289803c8a89685d b31054bdb7c4c01b693a2a626a85e643a3f02a8beadd13f494fc05147021852e
-R 4a6e921e57017b4ef1c23c960b54fe04
-T +closed b31054bdb7c4c01b693a2a626a85e643a3f02a8beadd13f494fc05147021852e
+P 26f437e97f71d3f1391fb2cb6995c6394ebdc6fa29c2c0a9f06f5f5d2fa91849
+R 3e0f30406e31bacabe2f3fd6d3e9ab05
 U rolf
-Z a6a11113e1950af9f510832be392b040
+Z 1c55dd35e6eae245665adfa4c4ef8e4b
 # Remove this line to create a well-formed Fossil manifest.

@@ -3642,16 +3642,13 @@ schemaReset (
 
 void
 tDOM_schemaReset (
-    SchemaData *sdata,
-    int lookforCleanup
+    SchemaData *sdata
     )
 {
-    if (lookforCleanup) {
-        if (sdata->cleanupAfterUse && sdata->inuse == 0
-            && sdata->currentEvals == 0) {
-            schemaInstanceDelete (sdata);
-            return;
-        }
+    if (sdata->cleanupAfterUse && sdata->inuse == 0
+        && sdata->currentEvals == 0) {
+        schemaInstanceDelete (sdata);
+        return;
     }
     schemaReset (sdata);
 }

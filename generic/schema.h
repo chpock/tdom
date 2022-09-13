@@ -341,8 +341,7 @@ tDOM_probeText (
 
 void
 tDOM_schemaReset (
-    SchemaData *sdata,
-    int lookforCleanup
+    SchemaData *sdata
     );
 
 #endif 
