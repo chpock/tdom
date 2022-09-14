@@ -5140,6 +5140,43 @@ static int validateSource (
     return result;
 }
 
+static SchemaCP*
+getPattern (
+    Tcl_HashTable *t,
+    char *name,
+    char *namespace,
+    SchemaData *sdata
+    )
+{
+    Tcl_HashEntry *h;
+    int hnew;
+    SchemaCP *pattern = NULL, *current;
+
+    h = Tcl_CreateHashEntry (t, name, &hnew);
+    if (!hnew) {
+        pattern = (SchemaCP *) Tcl_GetHashValue (h);
+        while (pattern) {
+            if (pattern->namespace == namespace) {
+                break;
+            }
+            pattern = pattern->next;
+        }
+    }
+    if (!pattern) {
+        pattern = initSchemaCP (SCHEMA_CTYPE_PATTERN, namespace,
+                                Tcl_GetHashKey (t, h));
+        pattern->flags |= FORWARD_PATTERN_DEF;
+        sdata->forwardPatternDefs++;
+        if (!hnew) {
+            current = (SchemaCP *) Tcl_GetHashValue (h);
+            pattern->next = current;
+        }
+        REMEMBER_PATTERN (pattern);
+        Tcl_SetHashValue (h, pattern);
+    }
+    return pattern;
+}
+
 /* This implements the script interface to the created schema commands.
 
    Since validation may call out to Tcl scripts those scripts may
@@ -5171,7 +5208,7 @@ tDOM_schemaInstanceCmd (
     void          *namespacePtr, *savedNamespacePtr;
     char          *errMsg;
     domDocument   *doc;
-    domNode       *node;
+    domNode       *node; 
     Tcl_Obj       *attData;
     SchemaCP     **typeInstances;
     ValidateMethodData vdata;
@@ -5181,13 +5218,14 @@ tDOM_schemaInstanceCmd (
         "reset",      "define",     "validate", "domvalidate",  "deftexttype",
         "info",       "reportcmd",  "prefixns", "validatefile",
         "validatechannel",          "defelementtype",           "set",
-        NULL
+        "startpattern", NULL
     };
     enum schemaInstanceMethod {
         m_defelement, m_defpattern, m_start,    m_event,        m_delete,
         m_reset,      m_define,     m_validate, m_domvalidate,  m_deftexttype,
         m_info,       m_reportcmd,  m_prefixns, m_validatefile,
-        m_validatechannel,          m_defelementtype,           m_set
+        m_validatechannel,          m_defelementtype,           m_set,
+        m_startpattern
     };
 
     static const char *eventKeywords[] = {
@@ -5428,6 +5466,27 @@ tDOM_schemaInstanceCmd (
         }
         break;
 
+    case m_startpattern:
+        CHECK_RECURSIVE_CALL
+        if (objc < 3-k || objc > 4-k) {
+            Tcl_WrongNumArgs (interp, 2-k, objv, "<pattern>"
+                              " ?<namespace>?");
+            return TCL_ERROR;
+        }
+        if (objc == 3-k && strcmp (Tcl_GetString (objv[2-k]), "") == 0) {
+            sdata->startNamespace = NULL;
+            sdata->startpattern = NULL;
+            break;
+        }
+        if (objc == 4-k) {
+            sdata->startNamespace =
+                getNamespacePtr (sdata, Tcl_GetString (objv[3-k]));
+        }
+        sdata->startpattern = getPattern (&sdata->pattern,
+                                          Tcl_GetString (objv[2-k]),
+                                          sdata->startNamespace, sdata);
+        break;
+        
     case m_event:
         CHECK_EVAL
         if (objc < 3) {
@@ -6348,10 +6407,9 @@ RefPatternObjCmd (
     )
 {
     SchemaData *sdata = GETASI;
-    Tcl_HashEntry *h;
-    SchemaCP *pattern = NULL, *current;
+    SchemaCP *pattern;
     SchemaQuant quant;
-    int hnew, n, m;
+    int n, m;
 
     CHECK_SI
     CHECK_TOPLEVEL
@@ -6362,31 +6420,8 @@ RefPatternObjCmd (
     if (quant == SCHEMA_CQUANT_ERROR) {
         return TCL_ERROR;
     }
-    h = Tcl_CreateHashEntry (&sdata->pattern, Tcl_GetString(objv[1]), &hnew);
-    if (!hnew) {
-        pattern = (SchemaCP *) Tcl_GetHashValue (h);
-        while (pattern) {
-            if (pattern->namespace == sdata->currentNamespace) {
-                break;
-            }
-            pattern = pattern->next;
-        }
-    }
-    if (!pattern) {
-        pattern = initSchemaCP (
-            SCHEMA_CTYPE_PATTERN,
-            sdata->currentNamespace,
-            Tcl_GetHashKey (&sdata->pattern, h)
-            );
-        pattern->flags |= FORWARD_PATTERN_DEF;
-        sdata->forwardPatternDefs++;
-        if (!hnew) {
-            current = (SchemaCP *) Tcl_GetHashValue (h);
-            pattern->next = current;
-        }
-        REMEMBER_PATTERN (pattern);
-        Tcl_SetHashValue (h, pattern);
-    }
+    pattern = getPattern (&sdata->pattern, Tcl_GetString(objv[1]),
+                          sdata->currentNamespace, sdata);
     addToContent (sdata, pattern, quant, n, m);
     return TCL_OK;
 }

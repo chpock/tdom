@@ -173,6 +173,7 @@ typedef struct SchemaData_
     Tcl_Obj *self;
     char *start;
     char *startNamespace;
+    SchemaCP *startpattern;
     Tcl_HashTable element;
     Tcl_HashTable elementType;
     Tcl_HashTable elementTypeInstance;

@@ -1,5 +1,5 @@
-C Simplified\sfunction\s-\sall\scallers\sused\sthe\ssame\ssecond\sarg\s(for\sreasons).
-D 2022-09-13T13:10:25.940
+C Started.
+D 2022-09-14T12:24:01.507
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -145,8 +145,8 @@ F generic/domxslt.h 0cb8e327683a0ffeb2a7094add6cd82ec1ae49c7c704f20d8d6f7d6523e7
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c e8b237d7069eee5a505e1d845de0974e0e533173ec0b39f278137f1a557419a7
 F generic/nodecmd.h 36056ca2c262cb1991cabef8d27992ad628db718d09ff0eeaeaffd150f1549ec
-F generic/schema.c 2a28faf2ac152e73bfdd926c91e3e06fbfc20aabb9de5113224466f8c2810aec
-F generic/schema.h 7d8c6ffbb3e99d9cb7636c66194a48e4311d1e3014a708d58f194bf44733a7f3
+F generic/schema.c b10a28cc2525a5b568b4705cd0ebdfc7349d7bdb2f4d8e7640eb99959e51d32b
+F generic/schema.h a09916a4ca4c00868a167c2c9efedcdcb50f987df2f80527c8e2901c3c85857c
 F generic/tcldom.c 2989e2f62b261f549d75218d3f0fcdc55b6727fb2f18419fed790040274d444e
 F generic/tcldom.h fc61477bdd07440e17a8f11cc898e5c07c8c7c3592014213a5e50eca85393374
 F generic/tclexpat.c 05ee40449a59e3efb7bf400c34baab9910890f143aaf383a2f456c83eb5ca67a
@@ -239,8 +239,11 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 26f437e97f71d3f1391fb2cb6995c6394ebdc6fa29c2c0a9f06f5f5d2fa91849
-R 3e0f30406e31bacabe2f3fd6d3e9ab05
+P 5ee08522283bfc9edeb1ebed3612fd128eb3358836a7d7a4b87db1aaefeb4681
+R 6145d90b6c234918119339aa557c5b62
+T *branch * startpattern
+T *sym-startpattern *
+T -sym-trunk *
 U rolf
-Z 1c55dd35e6eae245665adfa4c4ef8e4b
+Z c803d3abca0aa9e5032c53053c87198a
 # Remove this line to create a well-formed Fossil manifest.
