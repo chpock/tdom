@@ -30,6 +30,7 @@
 #    schema-27.*: Text constraint commands available outsite schema context
 #    schema-28,*: tdom and interp
 #    schema-29.*: text constrain jsontype
+#    schema-30.*: startpattern
 #
 # Copyright (c) 2018-2022 Rolf Ade.
 
@@ -11163,5 +11164,41 @@ test schema-29.5 {structure constraint jsontype} {
     s delete
     set result
 } {0 1}
+
+test schema-30.1 {startpattern} {
+    tdom::schema s
+    s define {
+        defelement a {
+            element a1
+        }
+        defelement b {
+            element b1
+        }
+        defelement c {
+            element c1
+        }
+        defelement d {
+            element d1
+        }
+        defpattern rootelements {
+            choice {
+                element a
+                element b
+            }
+        }
+    }
+    s startpattern rootelements
+    set result [list]
+    foreach xml {
+        <a><a1/></a>
+        <b><b1/></b>
+        <c><c1/></c>
+        <d><d1/></d>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {1 1 0 0}
 
 }

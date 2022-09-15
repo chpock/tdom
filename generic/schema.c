@@ -343,7 +343,7 @@ static char *Schema_Quant_Type2str[] = {
     }                                                   \
 
 
-static const char *unknownNS = "<unknownNamespace";
+static const char *unknownNS = "<unknownNamespace>";
 static char *emptyStr = "";
 
 
@@ -1878,71 +1878,76 @@ tDOM_probeElement (
     
     if (sdata->validationState == VALIDATION_READY) {
         /* The root of the tree to check. */
-        if (sdata->start) {
-            if (strcmp (name, sdata->start) != 0) {
-                if (recover (interp, sdata, UNEXPECTED_ROOT_ELEMENT,
-                             MATCH_ELEMENT_START, name, namespace, NULL, 0)) {
-                    sdata->validationState = VALIDATION_FINISHED;
-                    return TCL_OK;
-                }
-                SetResult ("Root element doesn't match");
-                return TCL_ERROR;
-            }
-            if (namespace) {
-                if (!sdata->startNamespace||
-                    strcmp (namespace, sdata->startNamespace) != 0) {
+        if (sdata->startpattern) {
+            pushToStack (sdata, sdata->startpattern);
+            sdata->validationState = VALIDATION_STARTED;
+        } else {
+            if (sdata->start) {
+                if (strcmp (name, sdata->start) != 0) {
                     if (recover (interp, sdata, UNEXPECTED_ROOT_ELEMENT,
-                                 MATCH_ELEMENT_START, name, namespace,
-                                 NULL, 0)) {
+                                 MATCH_ELEMENT_START, name, namespace, NULL, 0)) {
                         sdata->validationState = VALIDATION_FINISHED;
                         return TCL_OK;
                     }
-                    SetResult ("Root element namespace doesn't match");
+                    SetResult ("Root element doesn't match");
                     return TCL_ERROR;
+                }
+                if (namespace) {
+                    if (!sdata->startNamespace ||
+                        strcmp (namespace, sdata->startNamespace) != 0) {
+                        if (recover (interp, sdata, UNEXPECTED_ROOT_ELEMENT,
+                                     MATCH_ELEMENT_START, name, namespace,
+                                     NULL, 0)) {
+                            sdata->validationState = VALIDATION_FINISHED;
+                            return TCL_OK;
+                        }
+                        SetResult ("Root element namespace doesn't match");
+                        return TCL_ERROR;
+                    }
+                } else {
+                    if (sdata->startNamespace) {
+                        if (recover (interp, sdata, UNEXPECTED_ROOT_ELEMENT,
+                                     MATCH_ELEMENT_START, name, namespace,
+                                     NULL, 0)) {
+                            sdata->validationState = VALIDATION_FINISHED;
+                            return TCL_OK;
+                        }
+                        SetResult ("Root element namespace doesn't match");
+                        return TCL_ERROR;
+                    }
+                }
+            }
+            reportError = 0;
+            if (h) {
+                pattern = (SchemaCP *) Tcl_GetHashValue (h);
+                while (pattern) {
+                    if (pattern->namespace == namespacePtr) {
+                        if (pattern->flags & PLACEHOLDER_PATTERN_DEF
+                            || pattern->flags & FORWARD_PATTERN_DEF) {
+                            reportError = 1;
+                        }
+                        break;
+                    }
+                    pattern = pattern->next;
                 }
             } else {
-                if (sdata->startNamespace) {
-                    if (recover (interp, sdata, UNEXPECTED_ROOT_ELEMENT,
-                                 MATCH_ELEMENT_START, name, namespace,
-                                 NULL, 0)) {
-                        sdata->validationState = VALIDATION_FINISHED;
-                        return TCL_OK;
-                    }
-                    SetResult ("Root element namespace doesn't match");
-                    return TCL_ERROR;
+                pattern = NULL;
+            }
+            sdata->validationState = VALIDATION_STARTED;
+            if (reportError || pattern == NULL) {
+                if (recover (interp, sdata, UNKNOWN_ROOT_ELEMENT,
+                             MATCH_ELEMENT_START, name, namespace, NULL, 0)) {
+                    sdata->skipDeep = 1;
+                    return TCL_OK;
                 }
+                SetResult ("Unknown element");
+                return TCL_ERROR;
             }
+            pushToStack (sdata, pattern);
+            return TCL_OK;
         }
-        reportError = 0;
-        if (h) {
-            pattern = (SchemaCP *) Tcl_GetHashValue (h);
-            while (pattern) {
-                if (pattern->namespace == namespacePtr) {
-                    if (pattern->flags & PLACEHOLDER_PATTERN_DEF
-                        || pattern->flags & FORWARD_PATTERN_DEF) {
-                        reportError = 1;
-                    }
-                    break;
-                }
-                pattern = pattern->next;
-            }
-        } else {
-            pattern = NULL;
-        }
-        sdata->validationState = VALIDATION_STARTED;
-        if (reportError || pattern == NULL) {
-            if (recover (interp, sdata, UNKNOWN_ROOT_ELEMENT,
-                         MATCH_ELEMENT_START, name, namespace, NULL, 0)) {
-                sdata->skipDeep = 1;
-                return TCL_OK;
-            }
-            SetResult ("Unknown element");
-            return TCL_ERROR;
-        }
-        pushToStack (sdata, pattern);
-        return TCL_OK;
     }
-
+    
     /* The normal case: we're inside the tree */
     /* In case of recovering and if the user wants a required cp to be
      * treated as matched (or in other words: that the validation
