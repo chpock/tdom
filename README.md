@@ -4,7 +4,7 @@
 
 ### tDOM contains:
 
-   *  for convenience expat 2.4.8, the XML parser originated from
+   *  for convenience expat 2.4.9, the XML parser originated from
       James Clark, although you're able to link tDOM with other
       expat versions or the library provided by the system.
 
