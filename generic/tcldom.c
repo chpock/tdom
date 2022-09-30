@@ -1323,7 +1323,7 @@ static
 int tcldom_xpathResultSet (
     Tcl_Interp      *interp,
     xpathResultSet  *rs,
-    Tcl_Obj         *type,
+    xpathResultType *type,
     Tcl_Obj         *value
 )
 {
@@ -1335,42 +1335,42 @@ int tcldom_xpathResultSet (
 
     switch (rs->type) {
         case EmptyResult:
-             Tcl_SetStringObj(type, "empty", -1);
+            *type = EmptyResult;
              Tcl_SetStringObj(value, "", -1);
              break;
 
         case BoolResult:
-             Tcl_SetStringObj(type, "bool", -1);
+            *type = BoolResult;
              Tcl_SetIntObj(value, rs->intvalue);
              break;
 
         case IntResult:
-             Tcl_SetStringObj(type, "number", -1);
+            *type = IntResult;
              Tcl_SetIntObj(value, rs->intvalue);
              break;
 
         case RealResult:
-             Tcl_SetStringObj(type, "number", -1);
+            *type = RealResult;
              Tcl_SetDoubleObj(value, rs->realvalue);
              break;
              
         case NaNResult:
-             Tcl_SetStringObj(type, "number", -1);
+            *type = NaNResult;
              Tcl_SetStringObj(value, "NaN", -1);
              break;
 
         case InfResult:
-             Tcl_SetStringObj(type, "number", -1);
+            *type = InfResult;
              Tcl_SetStringObj(value, "Infinity", -1);
              break;
 
         case NInfResult:
-             Tcl_SetStringObj(type, "number", -1);
+            *type = NInfResult;
              Tcl_SetStringObj(value, "-Infinity", -1);
              break;
              
         case StringResult:
-             Tcl_SetStringObj(type, "string", -1);
+            *type = StringResult;
              Tcl_SetStringObj(value, rs->string, rs->string_len);
              break;
 
@@ -1396,17 +1396,22 @@ int tcldom_xpathResultSet (
                  }
              }
              if (mixedNodeSet) {
-                 Tcl_SetStringObj(type, "mixed", 5);
+                 *type = MixedResult;
              } else {
                  if (startType == ATTRIBUTE_NODE)
-                     Tcl_SetStringObj(type, "attrnodes",-1);
+                     *type = AttrnodesResult;
                  else
-                     Tcl_SetStringObj(type, "nodes", 5);
+                     *type = NodesResult;
              }
              break;
 
-     }
-     return TCL_OK;
+        default:
+            Tcl_Panic("Invalid xpathResultType %s in tcldom_xpathResultSet!",
+                      xpathResultTypes[rs->type]);
+            break;
+            
+    }
+    return TCL_OK;
 }
 
 
@@ -1434,6 +1439,7 @@ int tcldom_xpathFuncCallBack (
                 *tmpObj;
     Tcl_CmdInfo  cmdInfo;
     int          objc, rc, i, errStrLen, listLen, intValue, res;
+    xpathResultType rstype;
     double       doubleValue;
     domNode     *node;
 
@@ -1485,20 +1491,17 @@ int tcldom_xpathFuncCallBack (
 
     objv[objc] = Tcl_NewIntObj(position);
     Tcl_IncrRefCount(objv[objc++]);
-
-    type  = Tcl_NewObj();
     value = Tcl_NewObj();
-    tcldom_xpathResultSet(interp, nodeList, type, value);
-    objv[objc] = type;
+    tcldom_xpathResultSet(interp, nodeList, &rstype, value);
+    objv[objc] = Tcl_NewStringObj(xpathResultTypes[rstype], -1);
     Tcl_IncrRefCount(objv[objc++]);
     objv[objc] = value;
     Tcl_IncrRefCount(objv[objc++]);
 
     for (i=0; i<argc; i++) {
-        type  = Tcl_NewObj();
         value = Tcl_NewObj();
-        tcldom_xpathResultSet(interp, args[i], type, value);
-        objv[objc] = type;
+        tcldom_xpathResultSet(interp, args[i], &rstype, value);
+        objv[objc] = Tcl_NewStringObj (xpathResultTypes[rstype], -1);
         Tcl_IncrRefCount(objv[objc++]);
         objv[objc] = value;
         Tcl_IncrRefCount(objv[objc++]);
@@ -1681,6 +1684,111 @@ char * tcldom_xpathResolveVar (
     return (char*)varValue;
 }
 
+static
+int selectNodesQueryList (
+    Tcl_Interp       * interp,
+    domNode          * node,
+    Tcl_Obj          * queryList,
+    ast                tt, 
+    int                queryListInd,
+    int                queryListLen,
+    char            ** prefixMappings,
+    xpathCBs         * cbs,
+    xpathParseVarCB  * parseVarCB,
+    Tcl_HashTable    * cache,
+    Tcl_Obj          * result
+)
+{
+
+    Tcl_Obj       *queryObj, *thisResult;
+    char          *query, *errMsg = NULL;
+    xpathResultSet nodeList, rs;
+    int            rc, hnew = 1, docOrder = 1, i;
+    ast            t;
+    Tcl_HashEntry *h = NULL;
+    xpathResultType rstype;
+
+    xpathRSInit( &nodeList);
+    rsAddNodeFast( &nodeList, node);
+    xpathRSInit(&rs);
+
+    rc = xpathEvalSteps( tt, &nodeList, node, node, 0, &docOrder, cbs,
+                         &rs, &errMsg);
+    xpathRSFree( &nodeList );
+    if (rc) {
+        Tcl_ResetResult (interp);
+        Tcl_AppendResult (interp, "invalid XPath query: '",
+                          errMsg, "'", NULL);
+        if (errMsg) {
+            FREE(errMsg);
+        }
+        xpathRSFree( &rs );
+        return TCL_ERROR;
+    }
+    queryListInd++;
+    if (queryListInd < queryListLen) {
+        if (rs.type != xNodeSetResult && rs.type != EmptyResult) {
+            Tcl_ResetResult (interp);
+            Tcl_AppendResult (interp, "only the last XPath query in the query "
+                              "list is allowed to select something else then "
+                              "nodes", NULL);
+            xpathRSFree( &rs );
+            return TCL_ERROR;
+        }
+        Tcl_ListObjIndex(interp, queryList, queryListInd, &queryObj);
+        query = Tcl_GetString (queryObj);
+
+        if (cache) {
+            h = Tcl_CreateHashEntry (cache, query, &hnew);
+        }
+        if (hnew) {
+            rc = xpathParse(query, node, XPATH_EXPR, prefixMappings,
+                            parseVarCB, &t, &errMsg);
+            if (rc) {
+                if (h != NULL) {
+                    Tcl_DeleteHashEntry(h);
+                }
+                Tcl_ResetResult (interp);
+                Tcl_AppendResult (interp, "invalid XPath query '", query, "': ",
+                                  errMsg, NULL);
+                FREE (errMsg);
+                xpathRSFree( &rs );
+                return TCL_ERROR;
+            }
+            if (cache) {
+                Tcl_SetHashValue(h, t);
+            }
+        } else {
+            t = (ast)Tcl_GetHashValue(h);
+        }
+        rc = TCL_OK;
+        for (i=0; i < rs.nr_nodes; i++) {
+            rc = selectNodesQueryList (interp, rs.nodes[i], queryList, t,
+                                       queryListInd, queryListLen,
+                                       prefixMappings, cbs, parseVarCB, cache,
+                                       result);
+            if (rc != TCL_OK) {
+                break;
+            }                
+        }
+        if (!cache) {
+            xpathFreeAst(t);
+        }
+        if (rc != TCL_OK) {
+            xpathRSFree (&rs);
+            return TCL_ERROR;
+        }
+    } else {
+        thisResult = Tcl_NewListObj (0, NULL);
+        Tcl_IncrRefCount (thisResult);
+        tcldom_xpathResultSet(interp, &rs, &rstype, thisResult);
+        Tcl_ListObjAppendElement (interp, result, thisResult);
+        Tcl_DecrRefCount (thisResult);
+    }
+    xpathRSFree (&rs);
+    return TCL_OK;
+}
+
 /*----------------------------------------------------------------------------
 |   tcldom_selectNodes
 |
@@ -1693,20 +1801,25 @@ int tcldom_selectNodes (
     Tcl_Obj    *const objv[]
 )
 {
-    char          *xpathQuery, *typeVar, *option;
+    char          *xpathQuery, *typeVar, *option, *query;
     char          *errMsg = NULL, **mappings = NULL;
     int            rc, i, len, optionIndex, localmapping = 0, cache = 0;
-    int            mappingListObjLen = 0;
+    int            mappingListObjLen = 0, list = 0, xpathListLen, hnew;
     xpathResultSet rs;
-    Tcl_Obj       *type, *objPtr, *objPtr1, *mappingListObj = NULL;
+    Tcl_Obj       *objPtr, *objPtr1, *mappingListObj = NULL;
+    Tcl_Obj       *queryObj, *result;
     xpathCBs       cbs;
     xpathParseVarCB parseVarCB;
+    Tcl_HashTable *xpathCache = NULL;
+    Tcl_HashEntry *h = NULL;
+    ast            t;
+    xpathResultType rstype;
 
     static const char *selectNodesOptions[] = {
-        "-namespaces", "-cache", NULL
+        "-namespaces", "-cache", "-list", NULL
     };
     enum selectNodesOption {
-        o_namespaces, o_cache
+        o_namespaces, o_cache, o_list
     };
 
     if (objc < 2) {
@@ -1761,12 +1874,18 @@ int tcldom_selectNodes (
             objc -= 2;
             objv += 2;
             break;
+
+        case o_list:
+            list = 1;
+            objc--;
+            objv++;
+            break;
             
         default:
             Tcl_ResetResult (interp);
             Tcl_AppendResult (interp, "bad option \"", 
                               Tcl_GetString (objv[1]), "\"; must be "
-                              "-namespaces", NULL);
+                              "-namespaces, -cache or -list", NULL);
             return TCL_ERROR;
         }
     }
@@ -1798,12 +1917,63 @@ int tcldom_selectNodes (
             Tcl_InitHashTable (node->ownerDocument->xpathCache,
                                TCL_STRING_KEYS);
         }
-        rc = xpathEval (node, node, xpathQuery, mappings, &cbs, &parseVarCB,
-                        node->ownerDocument->xpathCache, &errMsg, &rs);
-    } else {
-        rc = xpathEval (node, node, xpathQuery, mappings, &cbs, &parseVarCB,
-                        NULL, &errMsg, &rs);
+        xpathCache = node->ownerDocument->xpathCache;
     }
+
+    if (list) {
+        if (Tcl_ListObjLength (interp, objv[1], &xpathListLen) != TCL_OK) {
+            SetResult ("If the -list option is given the xpathQuery argument "
+                       "must be a valid Tcl list of XPath expressions.");
+            return TCL_ERROR;
+        }
+        if (xpathListLen == 0) {
+            Tcl_ResetResult (interp);
+            return TCL_OK;
+        }
+        Tcl_ListObjIndex(interp, objv[1], 0, &queryObj);
+        query = Tcl_GetString (queryObj);
+
+        if (cache) {
+            h = Tcl_CreateHashEntry (xpathCache, query, &hnew);
+        } else {
+            hnew = 1;
+        }
+        if (hnew) {
+            rc = xpathParse(query, node, XPATH_EXPR, mappings,
+                            &parseVarCB, &t, &errMsg);
+            if (rc) {
+                if (h != NULL) {
+                    Tcl_DeleteHashEntry(h);
+                }
+                Tcl_ResetResult (interp);
+                Tcl_AppendResult (interp, "invalid XPath query '", query, "': ",
+                                  errMsg, NULL);
+                FREE (errMsg);
+                return TCL_ERROR;
+            }
+            if (cache) {
+                Tcl_SetHashValue(h, t);
+            }
+        } else {
+            t = (ast)Tcl_GetHashValue(h);
+        }
+        result = Tcl_NewListObj (0, NULL);
+        rc = selectNodesQueryList (interp, node, objv[1], t, 0, xpathListLen,
+                                   mappings, &cbs, &parseVarCB, xpathCache,
+                                   result);
+        if (!xpathCache) {
+            xpathFreeAst (t);
+        }
+        if (rc != TCL_OK) {
+            Tcl_DecrRefCount (result);
+            return TCL_ERROR;
+        }
+        Tcl_SetObjResult (interp, result);
+        return TCL_OK;
+    }
+
+    rc = xpathEval (node, node, xpathQuery, mappings, &cbs, &parseVarCB,
+                    xpathCache, &errMsg, &rs);
 
     if (rc != XPATH_OK) {
         xpathRSFree(&rs);
@@ -1823,16 +1993,13 @@ int tcldom_selectNodes (
     if (objc > 2) {
         typeVar = Tcl_GetString(objv[2]);
     }
-    type = Tcl_NewObj();
-    Tcl_IncrRefCount(type);
     DBG(fprintf(stderr, "before tcldom_xpathResultSet \n");)
-    tcldom_xpathResultSet(interp, &rs, type, Tcl_GetObjResult(interp));
+    tcldom_xpathResultSet(interp, &rs, &rstype, Tcl_GetObjResult(interp));
     DBG(fprintf(stderr, "after tcldom_xpathResultSet \n");)
     if (typeVar) {
-        Tcl_SetVar(interp,typeVar, Tcl_GetString(type), 0);
+        Tcl_SetVar(interp, typeVar, xpathResultTypes[rstype], 0);
     }
     rc = TCL_OK;
-    Tcl_DecrRefCount(type);
 
     xpathRSFree( &rs );
 cleanup:

@@ -4726,6 +4726,11 @@ static int xpathEvalStep (
                 }
                 FREE(rightStr);
                 break;
+            default:
+                Tcl_Panic("Invalid xpathResultType %s in xpathEvalStep!",
+                          xpathResultTypes[prightResult->type]);
+                break;
+                
             }
         } else
         if (leftResult.type == BoolResult || rightResult.type == BoolResult) {
@@ -4903,6 +4908,10 @@ static int xpathEvalStep (
 
                     if (res) break;
                 }
+                break;
+            default:
+                Tcl_Panic("Invalid xpathResultType %s in xpathEvalStep!",
+                          xpathResultTypes[prightResult->type]);
                 break;
             }
         } else {

@@ -1182,6 +1182,41 @@ test domDoc-20.7 {selectNodes with -namespaces option} {
     set errMsg
 } {The "-namespaces" option requires a 'prefix namespace' pairs list as argument}
 
+test domDoc-20.8 {selectNodes with -list option} {
+    set doc [dom parse {
+        <doc>
+        <product><descshort>one</descshort></product>
+        <product><descshort>two</descshort></product>
+        <product><descshort>three four</descshort></product>
+        </doc>
+    }]
+    set result [$doc selectNodes -list {
+        doc/product/descshort
+        string()
+    }]
+    $doc delete
+    set result
+} {one two {three four}}
+
+test domDoc-20.9 {selectNodes - type result} {
+    set doc [dom parse {
+        <doc>
+        <product><descshort>one</descshort></product>
+        <product><descshort></descshort></product>
+        <product></product>
+        </doc>
+    }]
+    set result ""
+    lappend result [$doc selectNodes {string(doc/product[1]/descshort)} typeVar]
+    lappend result $typeVar
+    lappend result [$doc selectNodes {string(doc/product[2]/descshort)} typeVar]
+    lappend result $typeVar
+    lappend result [$doc selectNodes {string(doc/product[3]/descshort)} typeVar]
+    lappend result $typeVar
+    $doc delete
+    set result
+} {one string {} string {} string}
+             
 test domDoc-21.1 {baseURI} {
     set doc [dom createDocumentNode]
     set result [$doc baseURI]
