@@ -4,17 +4,17 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x562e3eca8820">NAME</a> · <a href="#SECTid0x562e3ec855b0">SYNOPSIS</a> · <a href="#SECTid0x562e3ec81ad0"> DESCRIPTION </a> · <a href="#SECTid0x562e3ecbb300">SEE ALSO</a> · <a href="#SECTid0x562e3ecbb690">KEYWORDS</a>
+<a href="#SECTid0x5578696ab4b0">NAME</a> · <a href="#SECTid0x5578696e6600">SYNOPSIS</a> · <a href="#SECTid0x557869787790"> DESCRIPTION </a> · <a href="#SECTid0x5578697f2ca0">SEE ALSO</a> · <a href="#SECTid0x5578697f3030">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x562e3eca8820">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x5578696ab4b0">NAME</a></h2><p class="namesection">
 <b class="names">domNode - </b><br>Manipulates an instance of a DOM node object</p>
 
 
 
-  <h2><a name="SECTid0x562e3ec855b0">SYNOPSIS</a></h2><pre class="syntax"> $nodeObject <i class="m">method</i>  <i class="m">arg arg ...</i>
+  <h2><a name="SECTid0x5578696e6600">SYNOPSIS</a></h2><pre class="syntax"> $nodeObject <i class="m">method</i>  <i class="m">arg arg ...</i>
 </pre>
-  <h2><a name="SECTid0x562e3ec81ad0"> DESCRIPTION </a></h2><p>This command manipulates one particular instance of a DOM node object.
+  <h2><a name="SECTid0x557869787790"> DESCRIPTION </a></h2><p>This command manipulates one particular instance of a DOM node object.
 <i class="m">method</i> indicates a specific method of the node class. These methods
 should closely conform to the W3C recommendation "Document Object Model
 (Core) Level 1" (<a href="http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html">http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html</a>)
@@ -406,7 +406,7 @@ Otherwise an error is generated.</dd>
 
       
           <dt>
-<b class="method">selectNodes</b> <b class="option">?-namespaces prefixUriList?</b> <b class="option">?-cache &lt;boolean&gt;?</b> <i class="m">xpathQuery</i> <b class="option">?typeVar?</b>
+<b class="method">selectNodes</b> <b class="option">?-namespaces prefixUriList?</b> <b class="option">?-cache &lt;boolean&gt;?</b> <b class="option">?-list?</b> <i class="m">xpathQuery</i> <b class="option">?typeVar?</b>
 </dt>
           <dd>
 <p>Returns the result of applying the XPath query
@@ -469,6 +469,15 @@ compiled expression from the cache with the help of the
 Without using the <i class="m">-cache</i> option such consideration is never
 needed.</p>
 
+<p>If the <i class="m">-list</i> option is given then the <i class="m">xpathQuery</i> is
+expected to be a Tcl list of XPath queries. Every XPath query in this
+list other than the last element must return a node set result. Using
+the context and namespace resolution rules as without the <i class="m">-list</i>
+option the first query out of the list is run. Every node out of the
+result set of this query is used as context node for the next XPath
+query out of the list and so on. It returns the result sets of the
+last query in the query list concatenated together.</p>
+
 <p>Examples:</p>
           <pre class="example">set paragraphNodes [$node selectNodes {chapter[3]//para[@type='warning' or @type='error'} ]
 foreach paragraph $paragraphNodes {
@@ -484,19 +493,25 @@ set childNodes [$root selectNodes -namespaces {default http://www.defaultnamespa
 
       
         <dt><b class="method">getLine</b></dt>
-        <dd>Returns the line number of that node in the originally parsed
-XML.</dd>
+        <dd>Returns the line number of that node in the originally
+        parsed XML. The counting starts with 1</dd>
       
       
       
         <dt><b class="method">getColumn</b></dt>
-        <dd>Returns the column number of that node in the originally parsed
-XML.</dd>
+        <dd>Returns the column number of that node in the originally
+        parsed XML. The counting starts with 0</dd>
+      
+
+      
+        <dt><b class="method">getByteIndex</b></dt>
+        <dd>Returns the byte position of that node in the originally
+        parsed XML. The counting starts with 0.</dd>
       
 
       
         <dt><b class="method">asList</b></dt>
-        <dd>Returns the DOM substree starting form the current node as a
+        <dd>Returns the DOM substree starting from the current node as a
 nested Tcl list.</dd>
       
 
@@ -510,13 +525,30 @@ nested Tcl list.</dd>
         XML string or sends the output directly to the given
         channelId.</p>
 
-        <p>See the documentation of the of the
+        <p>See the documentation of the
         <b class="command">domDoc</b> command method
         <b class="method">asXML</b> for a detailed description of the
         arguments.</p>
         </dd>
       
 
+      
+        <dt>
+<b class="method">asCanonicalXML</b> <b class="option">?-channel channelId?</b> <b class="option">?-comment?</b>
+</dt>
+        <dd>
+<p>Returns the DOM tree as canonical XML string
+        according to the "<a href="http://www.w3.org/TR/2001/REC-xml-c14n-20010315">Canonical
+        XML Version 1.0 W3C Recommendation 15 March 2001</a>" or
+        sends the output directly to the given channelId.</p>
+
+        <p>See the documentation of the
+        <b class="command">domDoc</b> command method
+        <b class="method">asCanonicalXML</b> for a detailed description of the
+        arguments.</p>
+        </dd>
+      
+      
       
         <dt>
 <b class="method">asHTML</b> <b class="option">?-channel
@@ -722,9 +754,9 @@ name as the given method within the namespace <tt class="l">::dom::domNode</tt> 
 be executed. This allows quick method additions on Tcl level.</p>
 
 
-  <h2><a name="SECTid0x562e3ecbb300">SEE ALSO</a></h2><p class="seealso">dom, domDoc</p>
+  <h2><a name="SECTid0x5578697f2ca0">SEE ALSO</a></h2><p class="seealso">dom, domDoc</p>
   
-  <h2><a name="SECTid0x562e3ecbb690">KEYWORDS</a></h2><p class="keywords">
+  <h2><a name="SECTid0x5578697f3030">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-XML">XML</a>, <a class="keyword" href="keyword-index.html#KW-DOM">DOM</a>, <a class="keyword" href="keyword-index.html#KW-document">document</a>, <a class="keyword" href="keyword-index.html#KW-node">node</a>, <a class="keyword" href="keyword-index.html#KW-parsing">parsing</a>
 </p>
   

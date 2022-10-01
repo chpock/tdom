@@ -355,7 +355,7 @@ Otherwise an error is generated.</desc>
       </commanddef>
 
       <commanddef>
-          <command><method>selectNodes</method> <option>?-namespaces prefixUriList?</option> <option>?-cache &lt;boolean&gt;?</option> <m>xpathQuery</m> <option>?typeVar?</option></command>
+          <command><method>selectNodes</method> <option>?-namespaces prefixUriList?</option> <option>?-cache &lt;boolean&gt;?</option> <option>?-list?</option> <m>xpathQuery</m> <option>?typeVar?</option></command>
           <desc><p>Returns the result of applying the XPath query
 <m>xpathQuery</m> to the subtree. This can be a
 string/value, a list of strings, a list of nodes or a list
@@ -415,6 +415,15 @@ compiled expression from the cache with the help of the
 <method>deleteXPathCache</method> method, to force a recompilation.
 Without using the <m>-cache</m> option such consideration is never
 needed.</p>
+
+<p>If the <m>-list</m> option is given then the <m>xpathQuery</m> is
+expected to be a Tcl list of XPath queries. Every XPath query in this
+list other than the last element must return a node set result. Using
+the context and namespace resolution rules as without the <m>-list</m>
+option the first query out of the list is run. Every node out of the
+result set of this query is used as context node for the next XPath
+query out of the list and so on. It returns the result sets of the
+last query in the query list concatenated together.</p>
 
 <p>Examples:</p>
           <example>set paragraphNodes [$node selectNodes {chapter[3]//para[@type='warning' or @type='error'} ]
