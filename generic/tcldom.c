@@ -1696,7 +1696,8 @@ int selectNodesQueryList (
     xpathCBs         * cbs,
     xpathParseVarCB  * parseVarCB,
     Tcl_HashTable    * cache,
-    Tcl_Obj          * result
+    Tcl_Obj          * result,
+    xpathResultType  * type
 )
 {
 
@@ -1735,6 +1736,16 @@ int selectNodesQueryList (
             xpathRSFree( &rs );
             return TCL_ERROR;
         }
+        if (rs.type == EmptyResult) {
+            if (*type) {
+                if (*type != EmptyResult) {
+                    *type = MixedResult;
+                }
+            } else {
+                *type = EmptyResult;
+            }
+            return TCL_OK;
+        }
         Tcl_ListObjIndex(interp, queryList, queryListInd, &queryObj);
         query = Tcl_GetString (queryObj);
 
@@ -1766,7 +1777,7 @@ int selectNodesQueryList (
             rc = selectNodesQueryList (interp, rs.nodes[i], queryList, t,
                                        queryListInd, queryListLen,
                                        prefixMappings, cbs, parseVarCB, cache,
-                                       result);
+                                       result, type);
             if (rc != TCL_OK) {
                 break;
             }                
@@ -1783,6 +1794,13 @@ int selectNodesQueryList (
         Tcl_IncrRefCount (thisResult);
         tcldom_xpathResultSet(interp, &rs, &rstype, thisResult);
         Tcl_ListObjAppendElement (interp, result, thisResult);
+        if (*type) {
+            if (*type != rstype) {
+                *type = MixedResult;
+            }
+        } else {
+            *type = rstype;
+        }
         Tcl_DecrRefCount (thisResult);
     }
     xpathRSFree (&rs);
@@ -1911,6 +1929,11 @@ int tcldom_selectNodes (
         mappings = node->ownerDocument->prefixNSMappings;
     }
 
+    typeVar = NULL;
+    if (objc > 2) {
+        typeVar = Tcl_GetString(objv[2]);
+    }
+
     if (cache) {
         if (!node->ownerDocument->xpathCache) {
             node->ownerDocument->xpathCache = MALLOC (sizeof (Tcl_HashTable));
@@ -1958,15 +1981,19 @@ int tcldom_selectNodes (
             t = (ast)Tcl_GetHashValue(h);
         }
         result = Tcl_NewListObj (0, NULL);
+        rstype = UnknownResult;
         rc = selectNodesQueryList (interp, node, objv[1], t, 0, xpathListLen,
                                    mappings, &cbs, &parseVarCB, xpathCache,
-                                   result);
+                                   result, &rstype);
         if (!xpathCache) {
             xpathFreeAst (t);
         }
         if (rc != TCL_OK) {
             Tcl_DecrRefCount (result);
             return TCL_ERROR;
+        }
+        if (typeVar) {
+            Tcl_SetVar(interp, typeVar, xpathResultTypes[rstype], 0);
         }
         Tcl_SetObjResult (interp, result);
         return TCL_OK;
@@ -1988,10 +2015,6 @@ int tcldom_selectNodes (
     if (errMsg) {
         fprintf (stderr, "Why this: '%s'\n", errMsg);
         FREE(errMsg);
-    }
-    typeVar = NULL;
-    if (objc > 2) {
-        typeVar = Tcl_GetString(objv[2]);
     }
     DBG(fprintf(stderr, "before tcldom_xpathResultSet \n");)
     tcldom_xpathResultSet(interp, &rs, &rstype, Tcl_GetObjResult(interp));

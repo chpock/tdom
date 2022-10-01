@@ -1217,6 +1217,38 @@ test domDoc-20.9 {selectNodes - type result} {
     set result
 } {one string {} string {} string}
              
+test domDoc-20.10 {selectNodes with -list option} {
+    set doc [dom parse {
+        <doc>
+        <product><descshort>one</descshort></product>
+        <product><descshort>two</descshort></product>
+        <product><descshort>three four</descshort></product>
+        </doc>
+    }]
+    set result [$doc selectNodes -list {
+        doc/product/descshort
+        string()
+    } typeVar]
+    $doc delete
+    lappend result $typeVar
+} {one two {three four} string}
+
+test domDoc-20.11 {selectNodes with -list option} {
+    set doc [dom parse {
+        <doc>
+        <product><descshort>one</descshort></product>
+        <product><descshort>two</descshort></product>
+        <product><descshort>three four</descshort></product>
+        </doc>
+    }]
+    set result [$doc selectNodes -list {
+        doc/product/dontexists
+        string()
+    } typeVar]
+    $doc delete
+    list $result $typeVar
+} {{} empty}
+
 test domDoc-21.1 {baseURI} {
     set doc [dom createDocumentNode]
     set result [$doc baseURI]

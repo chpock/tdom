@@ -106,13 +106,13 @@ typedef astElem *ast;
 |
 \---------------------------------------------------------------------------*/
 typedef enum { 
-    EmptyResult, BoolResult, IntResult, RealResult, StringResult, 
+    UnknownResult = 0, EmptyResult, BoolResult, IntResult, RealResult, StringResult, 
     xNodeSetResult, NaNResult, InfResult, NInfResult, NodesResult,
     AttrnodesResult, MixedResult
 } xpathResultType;
 
 static const char *xpathResultTypes[] = {
-    "empty", "bool", "number", "number", "string",
+    "unknown", "empty", "bool", "number", "number", "string",
     "xNodeSet", "number", "number", "number", "nodes", "attrnodes", "mixed",
     NULL
 };
