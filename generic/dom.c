@@ -2282,6 +2282,9 @@ domReadDocument (
         parser = XML_ExternalEntityParserCreate (parser, "forest", 0);
         info.parser = parser;
         info.currentNode = doc->rootNode;
+#ifndef TDOM_NO_SCHEMA
+        sdata->parser = parser;
+#endif
     }
     
     if (channel == NULL) {

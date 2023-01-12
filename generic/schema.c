@@ -1984,6 +1984,7 @@ tDOM_probeElement (
         serializeStack (sdata);
         fprintf (stderr, "\n");
         );
+    fprintf (stderr, "HIIIIER\n");
     if (!sdata->evalError) {
         SetResult ("Element \"");
         if (namespacePtr) {
@@ -3142,7 +3143,11 @@ startElement(
 static void
 endElement (
     void        *userData,
+#ifdef DEBUG
+    const char  *name
+#else
     const char  *UNUSED(name)
+#endif
 )
 {
     ValidateMethodData *vdata = (ValidateMethodData *) userData;
@@ -3497,6 +3502,7 @@ validateDOM (
                       node->ownerDocument->namespaces[node->namespace-1]->uri
                       : NULL)
         != TCL_OK) {
+        fprintf (stderr, "HIIIIER 2\n");
         validateDOMerrorReport (interp, sdata, node);
         return TCL_ERROR;
     }

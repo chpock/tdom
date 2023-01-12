@@ -7445,7 +7445,7 @@ int tcldom_parse (
             interpResult = Tcl_GetStringResult(interp);
             if (interpResult[0] == '\0') {
                 /* If the interp result isn't empty, then there was an error
-                   in an enternal entity and the interp result has already the
+                   in an external entity and the interp result has already the
                    error msg. If we don't got a document, but interp result is
                    empty, the error occurred in the main document and we
                    build the error msg as follows. */
@@ -7491,11 +7491,15 @@ int tcldom_parse (
                      * error was in an external entity. Therefore, we
                      * just add the place of the referencing entity in
                      * the main document.*/
-                    sprintf(sl, "%ld", XML_GetCurrentLineNumber(parser));
+                    if (forest) {
+                        sprintf(sl, "%ld", forestError.errorLine);
+                        sprintf(sc, "%ld", forestError.errorColumn);
+                    } else {
+                        sprintf(sl, "%ld", XML_GetCurrentLineNumber(parser));
+                        sprintf(sc, "%ld", XML_GetCurrentColumnNumber(parser));
+                    }
                     Tcl_AppendResult(interp, ", referenced at line ", sl,
-                                     NULL);
-                    sprintf(sc, "%ld", XML_GetCurrentColumnNumber(parser));
-                    Tcl_AppendResult(interp, " character ", sc, NULL);
+                                     " character ", sc, NULL);
                 }
             }
             XML_ParserFree(parser);

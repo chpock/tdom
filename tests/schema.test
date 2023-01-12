@@ -11195,10 +11195,236 @@ test schema-30.1 {startpattern} {
         <c><c1/></c>
         <d><d1/></d>
     } {
-        lappend result [s validate $xml]
+        lappend result [s validate $xml errMsg]
+        #puts $errMsg
     }
     s delete
     set result
 } {1 1 0 0}
+
+test schema-30.2 {startpattern} {
+    tdom::schema s
+    s define {
+        defelement a {
+            element a1
+        }
+        defelement b {
+            element b1
+        }
+        defelement c {
+            element c1
+        }
+        defelement d {
+            element d1
+        }
+        defpattern rootelements {
+            choice {
+                group {
+                    element a
+                    element b
+                }
+                group {
+                    element c
+                    element d
+                }
+            }
+        }
+    }
+    s startpattern rootelements
+    set result [list]
+    foreach xml {
+        <a><a1/></a><b><b1/></b>
+        <c><c1/></c><d><d1/></d>
+        <a><a2/></a><c><b1/></b>
+        <d><d1/></d><c><c1/></c>
+    } {
+        set errMsg ""
+        lappend result [catch {dom parse -forest -validateCmd s $xml} errMsg]
+        puts $errMsg
+    }
+    s delete
+    set result
+} {0 0 1 1}
+
+test schema-30.2 {startpattern} {
+    tdom::schema s
+    s define {
+        defelement a {
+            element a1
+        }
+        defelement b {
+            element b1
+        }
+        defelement c {
+            element c1
+        }
+        defelement d {
+            element d1
+        }
+        defpattern rootelements {
+            choice {
+                group {
+                    element a
+                    element b
+                }
+                group {
+                    element c
+                    element d
+                }
+            }
+        }
+    }
+    s startpattern rootelements
+    set result [list]
+    foreach xml {
+        <a><a1/></a><b><b1/></b>
+        <c><c1/></c><d><d1/></d>
+        <a><a2/></a><c><b1/></b>
+        <d><d1/></d><c><c1/></c>
+    } {
+        set errMsg ""
+        lappend result [catch {dom parse -forest -validateCmd s $xml} errMsg]
+        puts $errMsg
+    }
+    s delete
+    set result
+} {0 0 1 1}
+
+test schema-30.3 {startpattern} {
+    tdom::schema s
+    s define {
+        defelement a {
+            element a1
+        }
+        defelement b {
+            element b1
+        }
+        defelement c {
+            element c1
+        }
+        defelement d {
+            element d1
+        }
+        defpattern rootelements {
+            choice {
+                group {
+                    element a
+                    element b
+                }
+                group {
+                    element c
+                    element d
+                }
+            }
+        }
+    }
+    #s startpattern rootelements
+    set result [list]
+        # <a><a1/></a>
+        # <c><c1/></c>
+        # <a><a2/></a>
+        # <d><d1/></d>
+    foreach xml {
+        <a><a2/></a>
+        <a><a2></a2></a>
+    } {
+        set errMsg ""
+        lappend result [catch {dom parse -validateCmd s $xml} errMsg]
+        puts $errMsg
+    }
+    s delete
+    set result
+} {1 1}
+
+test schema-30.4 {startpattern} {
+    tdom::schema s
+    s define {
+        defelement a {
+            element a1
+        }
+        defelement b {
+            element b1
+        }
+        defelement c {
+            element c1
+        }
+        defelement d {
+            element d1
+        }
+        defpattern rootelements {
+            choice {
+                group {
+                    element a
+                    element b
+                }
+                group {
+                    element c
+                    element d
+                }
+            }
+        }
+    }
+    #s startpattern rootelements
+    set result [list]
+    foreach xml {
+        <a><a1/></a>
+        <c><c1/></c>
+        <a><a2/></a>
+        <d><d1/></d>
+    } {
+        set errMsg ""
+        lappend result [s validate $xml errMsg]
+        puts $errMsg
+    }
+    s delete
+    set result
+} {1 1 0 1}
+
+test schema-30.5 {startpattern} {
+    tdom::schema s
+    s define {
+        defelement a {
+            element a1
+        }
+        defelement b {
+            element b1
+        }
+        defelement c {
+            element c1
+        }
+        defelement d {
+            element d1
+        }
+        defpattern rootelements {
+            choice {
+                group {
+                    element a
+                    element b
+                }
+                group {
+                    element c
+                    element d
+                }
+            }
+        }
+    }
+    #s startpattern rootelements
+    set result [list]
+    xml::parser p -validateCmd s
+    foreach xml {
+        <a><a1/></a>
+        <c><c1/></c>
+        <a><a2/></a>
+        <d><d1/></d>
+    } {
+        set errMsg ""
+        lappend result [catch {p parse $xml} errMsg]
+        puts $errMsg
+        p reset
+    }
+    s delete
+    set result
+} {0 0 1 0}
+
 
 }
