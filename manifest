@@ -1,5 +1,5 @@
-C Fixed\stest\ssuite\smachinery\sto\sload\sthe\ssource\stree\sversion.
-D 2023-01-26T01:20:13.702
+C Adapting\sto\sTcl\s9:\sReduce\sthe\sfall-out\sof\sTIP\s595.
+D 2023-01-28T01:39:48.506
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -196,8 +196,8 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.bench 5446ce379127b8d5700f18a5a0848e580313d0d7
-F tests/dom.test febf5b98ac25f50346e87d479378d6166af69bcac6e83d6273fae6f29c752056
-F tests/domDoc.test c333f0dc75ad4fea5b3f203a2a163b1c0a9a7c2390fed186dd6dd5aaae51babd
+F tests/dom.test 2faf765431967e8a8c629da990b117625e76370b45bf7e8c8b73ef3acdeed04f
+F tests/domDoc.test 6dec2f6d9b4b3a2577af556cb2d49b152e8a34c518fb51a6dc5677229c077cbd
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test 46d67b521a9d84d5d982340c545d830ce65be6e5c69e4271e613d2182b71a321
 F tests/domjson.test bdfbe938f33931f56f9496aac425b2183373f4cb926b95a04fa095bd3b75cd3d
@@ -214,7 +214,7 @@ F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
 F tests/pullparser.test df079ff6a5a6b11b4d0f409ca3fc17cc4a5956d31801872f9f1f95e35032dec5
 F tests/pushpull.bench 664e8f512917537d96c4b71933d4d9a6da65fc6fe85bd7c459483830dc7d2faf
-F tests/schema.test 3d0a4160e0260e386d2d04eed5c014c15bf11d79ce2be45de5aa61c935c9cb03
+F tests/schema.test bc98d97f924b20ab3e120af65bef4030d79272c347d962f7092640c5a3c15813
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
 F tests/tdomcmd.bench b07448ed4de08ccaa9734cf3fe15c695fd7066c993da58ff48d465747940e417
 F tests/tdomcmd.test 092401adf0609906d710f3ef8997cb4ca29bc208
@@ -225,7 +225,7 @@ F tests/xpath.test d46b16e82170cfa5722bd5985e167f915fd1fbbd33913d5429c3dcb885a96
 F tests/xslt.test 35a5408426b098bcc07bdecfb52f1ec4c8ac3e984224ba497e700420047621a4
 F unix/CONFIG 431b82a51451df40e38261b91e1a37060797ef655e8f981fab761de59f1e01e9
 F unix/speed-check.sh 7a8d91e7edf1cdc9bcfad5f28e1a068cb2843d05e49d8bd89d9b30a46511497d
-F unix/tclAppInit.c df2bcb1b98ffead12f8a55d0e084f780fef9ec21e9597a9bab1aaefb2f7c3a60
+F unix/tclAppInit.c 175ce89049340bcaa0747bf91336b7e64dc0ddbb457989ac39df60e7f3259074
 F win/README 69a6da038cb99711a2c95fd44e314e9ce74bb2c4ed8ed319dac6fd6daff2c13d
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F win/makefile.vc bcf9831a0b10019b66e27720239e0c3101b883ca5394cbb396529ac4d5fdc246
@@ -239,8 +239,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 58c4d6ae633ebdd04c5c373a758581a353f5d98a873aa0cb2aff30be7e4286b8
-R 09e05abd73fc114cb932f2d131a59e10
+P 21c4691c2c81df8b84f9b63e9ed926717830554fc236e9500c6418984388cd67
+R 9bf8c1b32949f8d79b61d8ab14b98896
 U rolf
-Z 651e7f26f163dfa2719351d2fcf25ef1
+Z ba3da076ac4e3a66c829ef55c4c7f142
 # Remove this line to create a well-formed Fossil manifest.

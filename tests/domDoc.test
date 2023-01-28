@@ -1260,7 +1260,7 @@ test domDoc-22.5 {nodeCmd use in child interp while in nodeCmd context} {
     dom createNodeCmd textNode t
 
     interp create childinterp
-    load {} tdom childinterp
+    load {} Tdom childinterp
     childinterp eval {
         dom createNodeCmd elementNode childe
         dom createNodeCmd textNode t
@@ -1288,7 +1288,7 @@ test domDoc-22.6 {nodeCmd use in child interp while in nodeCmd context} {
     dom createNodeCmd textNode t
 
     interp create childinterp
-    load {} tdom childinterp
+    load {} Tdom childinterp
     childinterp eval {
         dom createNodeCmd elementNode childe
         dom createNodeCmd textNode t
