@@ -2365,6 +2365,16 @@ test dom-13.9 {-forest} {
     catch {dom parse -forest {<one></two></one><one></two></one></wrong>}}
 } 1
 
+test dom-13.10 {-forest} {
+    set xml {<div>something</div><div>something else</div>}
+    set doc [dom parse -forest $xml]
+    set result ""
+    foreach child [$doc selectNodes /*] {
+        lappend result [$child parentNode]
+    }
+    $doc delete
+    set result
+} {{} {}}
 
 # cleanup
 ::tcltest::cleanupTests

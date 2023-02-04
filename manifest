@@ -1,5 +1,5 @@
-C Simple\sparser:\sadjust\sthe\sparent\snodes\sof\sthe\sfirst\slevel\schildren\swhile\sremoving\sthe\sumbrella\snode\sto\simplement\s-forest.
-D 2023-02-03T01:26:27.177
+C Fix\sfor\sthe\spreious\sfix:\sThe\sparent\snodes\sof\sthe\sroot\snodes\sof\sa\sforest\sdocument\shave\sto\sbe\sempty.
+D 2023-02-04T01:55:03.542
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -159,7 +159,7 @@ F generic/tdomDecls.h c6ae15034e63f1c76e47b30d524ce4c218fcdb8b0d8313a4bca1966a57
 F generic/tdomStubInit.c 4bd8265b7d7e5a031bb9f2ca182f735a8f67ea9a4051e82105a002e89821b4ac
 F generic/tdomStubLib.c 4a055f9c974246a9f7dd99de1a7686d1a96be8f02be699fdf4a760fdc813eb45
 F generic/tdominit.c 952423a6090fb77ffc218280b5fb44007ef2a79392f39c6b4ac0a8b3983df9d3
-F generic/xmlsimple.c 46695e54397c7cf1a2d0025dd782941785facd6868aeb1b6e2fa2723bb65f5f2
+F generic/xmlsimple.c 47ef721d570d8d6c4e33b72c4ec8088596d7bd0e48998543306dbc904ed302dc
 F generic/xmlsimple.h a98d573260b7ebbd188143b4731c931da4c77a618c33c80e487a5f51e6a58111
 F lib/tdom.tcl 58715dc8192134af2d7aef618c07787b8fe5ad60b738a3b470c3e7398c275ff3
 F macosx/README 75fe1f6617f6cb7e4480cff5367b5c26fcd8dd207e2321f35dceebafccf4c99c
@@ -196,7 +196,7 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.bench 5446ce379127b8d5700f18a5a0848e580313d0d7
-F tests/dom.test 2faf765431967e8a8c629da990b117625e76370b45bf7e8c8b73ef3acdeed04f
+F tests/dom.test 6e67b6cad519f42ed2db52cb97b51933bb00f4c69b0854d0c3c84eddc280eb22
 F tests/domDoc.test 6dec2f6d9b4b3a2577af556cb2d49b152e8a34c518fb51a6dc5677229c077cbd
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test 46d67b521a9d84d5d982340c545d830ce65be6e5c69e4271e613d2182b71a321
@@ -218,7 +218,7 @@ F tests/schema.test bc98d97f924b20ab3e120af65bef4030d79272c347d962f7092640c5a3c1
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
 F tests/tdomcmd.bench b07448ed4de08ccaa9734cf3fe15c695fd7066c993da58ff48d465747940e417
 F tests/tdomcmd.test 092401adf0609906d710f3ef8997cb4ca29bc208
-F tests/xmlsimple.test 68a69b71f72eed62c33ac98f505d619e73b6b8f2e806c4ee94a04f96073249c0
+F tests/xmlsimple.test 916da0520d9849c63da9a1261313d3e14fe2c9b8e981456e73e917528b029632
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.bench a8a90cbce1e276d05c6ff2c54ef04ffb3166c16e4094a543c694256ea4d68355
 F tests/xpath.test d46b16e82170cfa5722bd5985e167f915fd1fbbd33913d5429c3dcb885a96a53
@@ -239,8 +239,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 258cbe5a2420b203af40bef212cc18debbbf4cd7e19fdbe919897299157d77c4
-R 602c2c62c380d699d6b501c8acfe5f94
+P 09226b62bd7468f9464777282dee48a9940e82f9f2b782c59e060b8514a75e9d
+R 6a9fc4a109f7de5cbc6381d1669e4023
 U rolf
-Z 1e59c04475643df6e288fa0054056b84
+Z eb7f90d3c87dcd7e29fc21d2f645ba31
 # Remove this line to create a well-formed Fossil manifest.

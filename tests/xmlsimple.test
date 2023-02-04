@@ -216,6 +216,17 @@ test simple-1.27 {-forest} {
     set result
 } 1
 
+test simple-1.28 {-forest} {
+    set xml {<div>something</div><div>something else</div>}
+    set doc [dom parse -simple -forest $xml]
+    set result ""
+    foreach child [$doc selectNodes /*] {
+        lappend result [$child parentNode]
+    }
+    $doc delete
+    set result
+} {{} {}}
+
 test simple-2.1 {XML build in entities} {
     set doc [dom parse -simple {<doc>&lt;&gt;&amp;&apos;&quot;</doc>}]
     set root [$doc documentElement]

@@ -1088,7 +1088,7 @@ XML_SimpleParseDocument (
         for (node = doc->rootNode->firstChild;
              node != NULL;
              node = node->nextSibling) {
-            node->parentNode = doc->rootNode;
+            node->parentNode = NULL;
         }
         domFree ((void*)save);
     }
