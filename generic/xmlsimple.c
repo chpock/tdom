@@ -1057,7 +1057,7 @@ XML_SimpleParseDocument (
     char   **errStr
 ) {
     domDocument   *doc = domCreateDoc(baseURI, 0);
-    domNode *node = NULL;
+    domNode *save, *node = NULL;
     Tcl_HashEntry *h;
     int hnew;
     
@@ -1066,7 +1066,7 @@ XML_SimpleParseDocument (
     }
 
     if (forest) {
-        // Create umbreall tag
+        // Create umbrella tag
         h = Tcl_CreateHashEntry(&HASHTAB(doc,tdom_tagNames), "forestroot",
                                 &hnew);
         node = (domNode*) domAlloc(sizeof(domNode));
@@ -1084,7 +1084,13 @@ XML_SimpleParseDocument (
     if (forest) {
         doc->rootNode->firstChild = node->firstChild;
         doc->rootNode->lastChild = node->lastChild;
-        domFree ((void*)node);
+        save = node;
+        for (node = doc->rootNode->firstChild;
+             node != NULL;
+             node = node->nextSibling) {
+            node->parentNode = NULL;
+        }
+        domFree ((void*)save);
     }
     domSetDocumentElement (doc);
 

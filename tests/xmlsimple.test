@@ -1,4 +1,4 @@
-# Features covered: simple parser
+## Features covered: simple parser
 #
 # This file contains a collection of tests for the simple parser.
 # Tested functionalities:
@@ -206,6 +206,26 @@ test simple-1.26 {-forest} {
     catch {dom parse -simple -forest $xml} errMsg2
     expr {$errMsg1 eq $errMsg2}
 } {1}
+
+test simple-1.27 {-forest} {
+    set xml {<one><two/></one>}
+    set doc [dom parse -simple -forest $xml]
+    $doc documentElement root
+    set result [llength [$root selectNodes //two]]
+    $doc delete
+    set result
+} 1
+
+test simple-1.28 {-forest} {
+    set xml {<div>something</div><div>something else</div>}
+    set doc [dom parse -simple -forest $xml]
+    set result ""
+    foreach child [$doc selectNodes /*] {
+        lappend result [$child parentNode]
+    }
+    $doc delete
+    set result
+} {{} {}}
 
 test simple-2.1 {XML build in entities} {
     set doc [dom parse -simple {<doc>&lt;&gt;&amp;&apos;&quot;</doc>}]

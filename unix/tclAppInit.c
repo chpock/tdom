@@ -70,7 +70,10 @@ Tcl_AppInit(interp)
     if (Tdom_Init(interp) == TCL_ERROR) {
         return TCL_ERROR;
     }
+    /* This double announce of tDOM with two names tries to reduce the
+     * fall-out of TIP 595. */
     Tcl_StaticPackage(interp, "tdom", Tdom_Init, Tdom_SafeInit);
+    Tcl_StaticPackage(interp, "Tdom", Tdom_Init, Tdom_SafeInit);
     Tcl_SetVar(interp, "tcl_rcFileName", "~/.tcldomshrc", TCL_GLOBAL_ONLY);
     return TCL_OK;
 }

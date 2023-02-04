@@ -463,7 +463,7 @@ nested Tcl list.</desc>
       </commanddef>
 
       <commanddef>
-        <command><method>asXML</method> <option>?-indent none/tabs/1..8?</option> <option>?-channel channelId?</option> <option>?-escapeNonASCII?</option> <option>?-doctypeDeclaration &lt;boolean&gt;?</option> <option>-xmlDeclaration &lt;boolean&gt;?</option> <option>-encString &lt;string&gt;</option> <option>?-escapeAllQuot?</option> <option>?-indentAttrs?</option> <option>?-nogtescape?</option> <option>?-noEmptyElementTag?</option></command>
+        <command><method>asXML</method> <option>?-indent none/tabs/1..8?</option> <option>?-channel channelId?</option> <option>?-escapeNonASCII?</option> <option>?-doctypeDeclaration &lt;boolean&gt;?</option> <option>-xmlDeclaration &lt;boolean&gt;?</option> <option>-encString &lt;string&gt;</option> <option>?-escapeAllQuot?</option> <option>?-indentAttrs?</option> <option>?-nogtescape?</option> <option>?-noEmptyElementTag?</option> <option>?-escapeCR?</option> <option>?-escapeTab?</option></command>
         <desc><p>Returns the DOM substree starting from the current
         node as the root node of the result as an (optional indented)
         XML string or sends the output directly to the given

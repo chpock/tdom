@@ -1435,7 +1435,7 @@ test dom-5.9 {-externalentitycommand - external entity is a forest} {
 
 test dom-6.1 {use in slave interpreter} {
     set slave [interp create]
-    load {} tdom $slave
+    load {} Tdom $slave
     interp eval $slave {
         dom parse <root>foo</root> doc
         $doc documentElement root
@@ -1445,7 +1445,7 @@ test dom-6.1 {use in slave interpreter} {
 
 test dom-6.2 {use in slave interpreter} {
     set slave [interp create]
-    load {} tdom $slave
+    load {} Tdom $slave
     interp eval $slave {
         set doc [dom parse <root>foo</root>]
         set root [$doc documentElement]
@@ -1641,7 +1641,7 @@ test dom-7.20 {set*Check, setStoreLineColumn and setObjectCommands in child inte
     dom setStoreLineColumn 0
     dom setObjectCommands command
     interp create childinterp
-    load {} tdom childinterp
+    load {} Tdom childinterp
     childinterp eval {
         dom setNameCheck 0
         dom setTextCheck 0
@@ -2365,6 +2365,16 @@ test dom-13.9 {-forest} {
     catch {dom parse -forest {<one></two></one><one></two></one></wrong>}}
 } 1
 
+test dom-13.10 {-forest} {
+    set xml {<div>something</div><div>something else</div>}
+    set doc [dom parse -forest $xml]
+    set result ""
+    foreach child [$doc selectNodes /*] {
+        lappend result [$child parentNode]
+    }
+    $doc delete
+    set result
+} {{} {}}
 
 # cleanup
 ::tcltest::cleanupTests
