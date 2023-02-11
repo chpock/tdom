@@ -45,6 +45,13 @@
 
 extern TdomStubs tdomStubs;
 
+#if TCL_MAJOR_VERSION == 8
+# define STUB_VERSION "8.4"
+#else
+# define STUB_VERSION "9.0"
+#endif
+
+
 /*
  *----------------------------------------------------------------------------
  *
@@ -67,7 +74,7 @@ Tdom_Init (
 ) {
         
 #ifdef USE_TCL_STUBS
-    if (Tcl_InitStubs(interp, "8.4", 0) == NULL) {
+    if (Tcl_InitStubs(interp, STUB_VERSION, 0) == NULL) {
         return TCL_ERROR;
     }
 #endif

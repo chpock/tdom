@@ -26,6 +26,7 @@
  * sqlite JSON parser
  * (https://www.sqlite.org/src/artifact/312b4ddf4c7399dc) */
 
+#include <tcl.h>
 #include <dom.h>
 #include <domjson.h>
 #include <ctype.h>

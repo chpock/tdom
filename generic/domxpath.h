@@ -115,7 +115,7 @@ typedef struct xpathResultSet {
 
     xpathResultType type;
     char           *string;
-    int             string_len;
+    domLength       string_len;
     long            intvalue;
     double          realvalue;          
     domNode       **nodes;
@@ -196,7 +196,7 @@ char * xpathFuncString   (xpathResultSet *rs);
 char * xpathFuncStringForNode (domNode *node);
 int    xpathRound        (double r);
 
-char * xpathGetStringValue (domNode *node, int *strLen);
+char * xpathGetStringValue (domNode *node, domLength *strLen);
 
 char * xpathNodeToXPath  (domNode *node, int legacy);
     

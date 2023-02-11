@@ -219,7 +219,7 @@ namespaceTail (
 )    
 {
     char *name,*p;
-    int   len;
+    domLength len;
     
     name = Tcl_GetStringFromObj(nameObj, &len);
     p = name + len;
@@ -333,8 +333,9 @@ NodeObjCmd (
     int             objc,               /* Number of arguments. */
     Tcl_Obj *const  objv[]             /* Argument objects. */
 ) {
-    int type, createType, len, dlen, ret, disableOutputEscaping = 0, 
+    int type, createType, ret, disableOutputEscaping = 0, 
         index = 1;
+    domLength len, dlen;
     char *tag, *p, *tval, *aval;
     domNode *parent, *newNode = NULL;
     domTextNode *textNode = NULL;

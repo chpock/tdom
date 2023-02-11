@@ -49,10 +49,10 @@
 #include <math.h>
 #include <limits.h>
 #include <locale.h>
+#include <tcl.h>         /* for hash tables */
 #include <dom.h>
 #include <domxpath.h>
 #include <domxslt.h>
-#include <tcl.h>         /* for hash tables */
 
 /*----------------------------------------------------------------------------
 |   Defines
@@ -1140,7 +1140,7 @@ static int xsltFormatNumber (
     char              * formatStr,
     xsltDecimalFormat * df,
     char             ** resultStr,
-    int               * resultLen,
+    domLength         * resultLen,
     char             ** errMsg
 )
 {
@@ -1889,7 +1889,8 @@ static int xsltXPathFuncs (
     char              * keyId, *filterValue, *str = NULL;
     char                prefix[MAX_PREFIX_LEN];
     const char        * localName, *baseURI, *nsStr;
-    int                 rc, i, len, NaN, freeStr, x;
+    int                 rc, i, NaN, freeStr, x;
+    domLength           len;
     double              n;
     xsltNodeSet       * keyValues;
     Tcl_HashEntry     * h;
@@ -3731,7 +3732,8 @@ static int ExecAction (
     char           *str, *str2, *select, *pc, *nsAT, *out;
     const char     *mode, *modeURI, *localName, *uri, *nsStr;
     char            prefix[MAX_PREFIX_LEN], tmpErr[200];
-    int             rc, b, i, len, terminate, chooseState, disableEsc = 0;
+    int             rc, b, i, terminate, chooseState, disableEsc = 0;
+    domLength       len;
     double          currentPrio, currentPrec;
     Tcl_HashEntry  *h;
 
@@ -5680,7 +5682,8 @@ getExternalDocument (
 {
     Tcl_Obj      *cmdPtr, *resultObj, *extbaseObj, *xmlstringObj;
     Tcl_Obj      *channelIdObj, *resultTypeObj;
-    int           len, mode, result, storeLineColumn;
+    int           mode, result, storeLineColumn;
+    domLength     len;
     int           resultcode = 0;
     char         *resultType, *extbase, *xmlstring, *channelId, s[20];
     Tcl_Obj      *extResolver = NULL;

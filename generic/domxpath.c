@@ -304,8 +304,7 @@ void rsPrint ( xpathResultSet *rs ) {
              break;
 
         case StringResult:
-             fprintf(stderr, "string result: -%*s-\n", rs->string_len,
-                                                       rs->string);
+             fprintf(stderr, "string result: -%80s-\n", rs->string);
              break;
 
         case xNodeSetResult:
@@ -344,9 +343,8 @@ void rsPrint ( xpathResultSet *rs ) {
                              i,  (void *)rs->nodes[i], tmp);
                  } else
                  if (rs->nodes[i]->nodeType == ATTRIBUTE_NODE) {
-                     fprintf(stderr, "%2d Attr %s='%*s'\n", i,
+                     fprintf(stderr, "%2d Attr %s='%80s'\n", i,
                              ((domAttrNode*)rs->nodes[i])->nodeName,
-                             ((domAttrNode*)rs->nodes[i])->valueLength,
                              ((domAttrNode*)rs->nodes[i])->nodeValue);
                  }
              }
@@ -2630,12 +2628,12 @@ double xpathFuncNumber (
 |
 \---------------------------------------------------------------------------*/
 char * xpathGetStringValueForElement (
-    domNode *node,
-    int     *len
+    domNode   *node,
+    domLength *len
 )
 {
     char        *pc, *t;
-    int          l;
+    domLength    l;
     domNode     *child;
 
     if (node->nodeType == ELEMENT_NODE) {
@@ -2667,12 +2665,12 @@ char * xpathGetStringValueForElement (
 }
 
 char * xpathGetStringValue (
-    domNode *node,
-    int     *len
+    domNode    *node,
+    domLength  *len
 )
 {
-    char         *pc, *t;
-    int          l;
+    char        *pc, *t;
+    domLength    l;
     domNode     *child;
     domAttrNode *attr;
 
@@ -2731,7 +2729,7 @@ char * xpathFuncString (
 )
 {
     char         tmp[80], *pc;
-    int          len;
+    domLength    len;
 
     switch (rs->type) {
         case BoolResult:
@@ -2790,7 +2788,7 @@ char * xpathFuncStringForNode (
     domNode *node
 )
 {
-    int          len;
+    domLength len;
 
     return xpathGetStringValue (node, &len);
 }
@@ -2931,7 +2929,8 @@ xpathEvalFunction (
     )
 {
     xpathResultSet   leftResult, rightResult, replaceResult;
-    int              i, rc, pwhite, len,  NaN;
+    int              i, rc, pwhite, NaN;
+    domLength        len;
     char            *replaceStr, *pfrom, *pto, tmp[80], tmp1[80];
     domNode         *node;
     domAttrNode     *attr;

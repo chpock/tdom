@@ -231,7 +231,7 @@ typedef enum {
         Tcl_AppendResult(interp, (str1), (str2), (str3), NULL);         \
     }
 #define SetIntResult(i) Tcl_ResetResult(interp);                        \
-                     Tcl_SetIntObj(Tcl_GetObjResult(interp), (i))
+                     Tcl_SetDomLengthObj(Tcl_GetObjResult(interp), (i))
 #define SetLongResult(i) Tcl_ResetResult(interp);                        \
                      Tcl_SetLongObj(Tcl_GetObjResult(interp), (i))
 #define SetBooleanResult(i) Tcl_ResetResult(interp); \
@@ -579,7 +579,7 @@ initSchemaData (
     Tcl_Obj *cmdNameObj)
 {
     SchemaData *sdata;
-    int len;
+    domLength len;
     char *name;
 
     sdata = TMALLOC (SchemaData);
@@ -3218,7 +3218,8 @@ checkdomKeyConstraints (
     domKeyConstraint *kc;
     domNode *n;
     domAttrNode *attr;
-    int rc, i, j, hnew, len, skip, first;
+    int rc, i, j, hnew, skip, first;
+    domLength len;
     char *errMsg = NULL, *keystr, *efsv;
     Tcl_HashTable htable;
     Tcl_DString dStr;
@@ -4656,8 +4657,7 @@ externalEntityRefHandler (
     Tcl_Obj *channelIdObj;
     int result, mode, done, byteIndex, i;
     int keepresult = 0;
-    size_t len;
-    int tclLen;
+    domLength len, tclLen;
     XML_Parser extparser, oldparser = NULL;
     char buf[4096], *resultType, *extbase, *xmlstring, *channelId, s[50];
     Tcl_Channel chan = (Tcl_Channel) NULL;
@@ -4732,7 +4732,7 @@ externalEntityRefHandler (
 
     if (strcmp (resultType, "string") == 0) {
         result = Tcl_ListObjIndex (vdata->interp, resultObj, 2, &xmlstringObj);
-        xmlstring = Tcl_GetStringFromObj (xmlstringObj, (int*)&len);
+        xmlstring = Tcl_GetStringFromObj (xmlstringObj, &len);
     } else if (strcmp (resultType, "channel") == 0) {
         xmlstring = NULL;
         len = 0;
@@ -4901,7 +4901,8 @@ static int validateSource (
     Tcl_DString cdata;
     Tcl_Obj *bufObj;
     char *xmlstr, *filename, *str, *baseurl = NULL;
-    int result, len, fd, mode, done, tclLen, rc, value, useForeignDTD = 0;
+    int result, fd, mode, done, rc, value, useForeignDTD = 0;
+    domLength len, tclLen;
     int forest = 0;
     int paramEntityParsing = XML_PARAM_ENTITY_PARSING_ALWAYS;
     Tcl_DString translatedFilename;
@@ -5880,7 +5881,7 @@ getQuant (
     )
 {
     char *quantStr;
-    int len;
+    domLength len;
     Tcl_Obj *thisObj;
 
     *n = 0;
@@ -6518,7 +6519,8 @@ AttributePatternObjCmd (
 {
     SchemaData *sdata = GETASI;
     char *str;
-    int len, required = 1;
+    int required = 1;
+    domLength len;
     Tcl_Obj *nsObj, *nameObj;
     Tcl_HashEntry *h;
     SchemaCP *type;

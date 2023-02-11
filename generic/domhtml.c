@@ -449,7 +449,7 @@ static void ErInit (void)
 \---------------------------------------------------------------------------*/
 static void TranslateEntityRefs (
     char *z,
-    int  *newLen
+    domLength  *newLen
 )
 {
     int from;    /* Read characters from this position in z[] */

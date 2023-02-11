@@ -88,7 +88,7 @@
                      Tcl_AppendResult(interp, (str1), (str2), (str3), NULL)
 
 #define SetIntResult(i) Tcl_ResetResult(interp);                        \
-                     Tcl_SetIntObj(Tcl_GetObjResult(interp), (i))
+                     Tcl_SetDomLengthObj(Tcl_GetObjResult(interp), (i))
                      
 #define SetLongResult(i) Tcl_ResetResult(interp);                        \
                      Tcl_SetLongObj(Tcl_GetObjResult(interp), (i))
@@ -996,7 +996,7 @@ int tcldom_xpointerSearch (
     char *element   = NULL;
     char *attrName  = NULL;
     char *attrValue = NULL;
-    int   attrLen;
+    domLength attrLen;
 
 
     str = Tcl_GetString(objv[2]);
@@ -1217,7 +1217,7 @@ int tcldom_appendXML (
 {
     char        *xml_string;
     Tcl_Obj     *extResolver = NULL;
-    int          xml_string_len;
+    domLength    xml_string_len;
     int          resultcode = 0;
     int          ignorexmlns = 0;
     domDocument *doc;
@@ -1346,7 +1346,7 @@ int tcldom_xpathResultSet (
 
         case IntResult:
              Tcl_SetStringObj(type, "number", -1);
-             Tcl_SetIntObj(value, rs->intvalue);
+             Tcl_SetLongObj(value, rs->intvalue);
              break;
 
         case RealResult:
@@ -1433,7 +1433,8 @@ int tcldom_xpathFuncCallBack (
     Tcl_Obj     *resultPtr, *objv[MAX_REWRITE_ARGS], *type, *value, *nodeObj,
                 *tmpObj;
     Tcl_CmdInfo  cmdInfo;
-    int          objc, rc, i, errStrLen, listLen, intValue, res;
+    int          objc, rc, i, listLen, intValue, res;
+    domLength    errStrLen;
     double       doubleValue;
     domNode     *node;
 
@@ -1978,12 +1979,12 @@ int tcldom_appendFromTclList (
     Tcl_Obj    *obj
 )
 {
-    int      i, rc, length, valueLength, attrLength, attrValueLength;
-    int      childListLength;
-    Tcl_Obj *lnode, *tagNameObj, *piNameObj, *valueObj,
-            *attrListObj, *attrObj, *childListObj, *childObj;
-    char    *tag_name, *pi_name, *value, *attrName, *attrValue;
-    domNode *newnode;
+    int       i, rc, attrLength, childListLength;
+    domLength valueLength, length, attrValueLength;
+    Tcl_Obj  *lnode, *tagNameObj, *piNameObj, *valueObj,
+             *attrListObj, *attrObj, *childListObj, *childObj;
+    char     *tag_name, *pi_name, *value, *attrName, *attrValue;
+    domNode  *newnode;
 
     GetTcldomDATA;
 
@@ -4863,7 +4864,8 @@ int tcldom_NodeObjCmd (
     char         tmp[200], prefix[MAX_PREFIX_LEN], *method, *nodeName,
                  *str, *attr_name, *attr_val, *filter;
     const char  *localName, *uri, *nsStr;
-    int          result, length, methodIndex, i;
+    int          result, methodIndex, i;
+    domLength    length;
     long         line, column, byteIndex;
     int          nsIndex, bool, hnew, legacy, jsonType;
     Tcl_Obj     *namePtr, *resultPtr;
@@ -5989,9 +5991,9 @@ int tcldom_DocObjCmd (
     domDocument         * doc;
     char                * method, *tag, *data, *target, *uri, tmp[100];
     char                * str, *docName, *errMsg;
-    int                   methodIndex, result, data_length, target_length, i;
-    int                   nsIndex, forXPath, bool, setDocumentElement = 0;
-    int                   restoreDomCreateCmdMode = 0;
+    int                   methodIndex, result, i, nsIndex, forXPath, bool;
+    int                   setDocumentElement = 0, restoreDomCreateCmdMode = 0;
+    domLength             data_length, target_length;
     domNode             * n;
     Tcl_CmdInfo           cmdInfo;
     Tcl_Obj             * mobjv[MAX_REWRITE_ARGS];
@@ -6547,8 +6549,9 @@ tDOM_fsnewNodeCmd (
     Tcl_Obj *const  objv[]
 ) {
     domNode *parent, *newNode = NULL;
-    int index, jsonType, haveJsonType = 0, len, type, ret;
+    int index, jsonType, haveJsonType = 0, type, ret;
     int checkName, checkCharData;
+    domLength len;
     Tcl_Obj *cmdObj;
     char *namespace = NULL, *option, *tag;
 
@@ -6809,7 +6812,8 @@ int tcldom_createDocumentNS (
     Tcl_Obj    * const objv[]
 )
 {
-    int          setVariable = 0, len;
+    int          setVariable = 0;
+    domLength    len;
     char        *uri;
     domDocument *doc;
     Tcl_Obj     *newObjName = NULL;
@@ -6859,7 +6863,8 @@ int tcldom_parse (
     Tcl_Obj     *extResolver = NULL;
     Tcl_Obj     *feedbackCmd = NULL;
     const char  *interpResult;
-    int          optionIndex, value, xml_string_len, mode;
+    int          optionIndex, value, mode;
+    domLength    xml_string_len;
     int          jsonmaxnesting = JSON_MAX_NESTING;
     int          ignoreWhiteSpaces   = 1;
     int          takeJSONParser      = 0;
@@ -8080,7 +8085,8 @@ int tcldom_unknownCmd (
     Tcl_Obj    * const objv[]
 )
 {
-    int          len, i, rc, openedParen, count, args;
+    int          i, rc, openedParen, count, args;
+    domLength    len;
     char        *cmd, *dot, *paren, *arg[MAX_REWRITE_ARGS], *object, *method;
     Tcl_DString  callString;
     Tcl_CmdInfo  cmdInfo;

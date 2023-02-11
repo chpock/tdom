@@ -93,14 +93,14 @@
 # define Tcl_GetErrorLine(interp) (interp)->errorLine
 #endif
 
-/*
- * Starting with Tcl 8.2 the Tcl_Panic() is defined properly
- * over the stubs table.
- * Also, we have a proper Tcl_GetString() shortcut afterwards.
- */
-#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION < 2)
-# define Tcl_Panic panic
-# define Tcl_GetString(a) Tcl_GetStringFromObj((a), NULL)
+/* Beginning with Tcl 9.0 the string representation of a Tcl_Obj may
+ * be bigger thant 2 GByte. Therefore some API functions differ. */
+#if (TCL_MAJOR_VERSION > 8)
+#  define domLength size_t
+#  define Tcl_SetDomLengthObj Tcl_SetWideIntObj
+#else
+#  define domLength int
+#  define Tcl_SetDomLengthObj Tcl_SetIntObj
 #endif
 
 /* The following is the machinery to have an UNUSED macro which
@@ -689,7 +689,7 @@ typedef struct domTextNode {
     struct domNode     *nextSibling;
 
     domString           nodeValue;   /* now the text node specific fields */
-    int                 valueLength;
+    domLength           valueLength;
 
 } domTextNode;
 
@@ -716,12 +716,12 @@ typedef struct domProcessingInstructionNode {
     struct domNode     *nextSibling;
 
     domString           targetValue;   /* now the pi specific fields */
-    int                 targetLength;
+    domLength           targetLength;
 #ifndef TDOM_LESS_NS
     domNameSpaceIndex   namespace;
 #endif
     domString           dataValue;
-    int                 dataLength;
+    domLength           dataLength;
 
 } domProcessingInstructionNode;
 
@@ -744,7 +744,7 @@ typedef struct domAttrNode {
 #endif
     domString           nodeName;
     domString           nodeValue;
-    int                 valueLength;
+    domLength           valueLength;
     struct domNode     *parentNode;
     struct domAttrNode *nextSibling;
 
@@ -774,7 +774,7 @@ void           domSetDocumentElement (domDocument *doc);
 
 domDocument *  domReadDocument   (XML_Parser parser,
                                   char *xml,
-                                  int   length,
+                                  domLength  length,
                                   int   ignoreWhiteSpaces,
                                   int   keepCDATA,
                                   int   storeLineColumn,
@@ -805,7 +805,7 @@ void           domFreeNode       (domNode *node,
 
 domTextNode *  domNewTextNode    (domDocument *doc,
                                   const char  *value,
-                                  int          length,
+                                  domLength    length,
                                   domNodeType  nodeType);
 
 domNode *      domNewElementNode (domDocument *doc,
@@ -818,9 +818,9 @@ domNode *      domNewElementNodeNS (domDocument *doc,
 domProcessingInstructionNode * domNewProcessingInstructionNode (
                                   domDocument *doc,
                                   const char  *targetValue,
-                                  int          targetLength,
+                                  domLength    targetLength,
                                   const char  *dataValue,
-                                  int          dataLength);
+                                  domLength    dataLength);
 
 domAttrNode *  domSetAttribute (domNode *node, const char *attributeName,
                                                const char *attributeValue);
@@ -845,7 +845,7 @@ domException   domSetNodeValue (domNode *node, const char *nodeValue,
                                 int valueLen);
 domNode *      domCloneNode (domNode *node, int deep);
 
-domTextNode *  domAppendNewTextNode (domNode *parent, char *value, int length, domNodeType nodeType, int disableOutputEscaping);
+domTextNode *  domAppendNewTextNode (domNode *parent, char *value, domLength length, domNodeType nodeType, int disableOutputEscaping);
 domNode *      domAppendNewElementNode (domNode *parent, const char *tagName,
                                         const char *uri);
 domNode *      domAppendLiteralNode (domNode *parent, domNode *node);
@@ -909,7 +909,7 @@ void           domRenumberTree (domNode *node);
 int            domPrecedes (domNode *node, domNode *other);
 void           domNormalize (domNode *node, int forXPath, 
                              domFreeCallback freeCB, void *clientData);
-domException   domAppendData (domTextNode *node, char *value, int length, 
+domException   domAppendData (domTextNode *node, char *value, domLength length, 
                               int disableOutputEscaping);
 
 #ifdef TCL_THREADS

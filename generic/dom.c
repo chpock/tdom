@@ -2185,7 +2185,7 @@ domDocument *
 domReadDocument (
     XML_Parser  parser,
     char       *xml,
-    int         length,
+    domLength      length,
     int         ignoreWhiteSpaces,
     int         keepCDATA,
     int         storeLineColumn,
@@ -2206,7 +2206,8 @@ domReadDocument (
     int        *resultcode
 )
 {
-    int             done, tclLen;
+    int             done;
+    domLength       tclLen;
     enum XML_Status status;
     size_t          len;
     domReadInfo     info;
@@ -3999,7 +4000,7 @@ domTextNode *
 domNewTextNode(
     domDocument *doc,
     const char  *value,
-    int          length,
+    domLength    length,
     domNodeType  nodeType	
 )
 {
@@ -4070,7 +4071,7 @@ domTextNode *
 domAppendNewTextNode(
     domNode     *parent,
     char        *value,
-    int          length,
+    domLength    length,
     domNodeType  nodeType,
     int          disableOutputEscaping
 )
@@ -4231,7 +4232,7 @@ domAppendData (
                                    a TEXT_NODE, COMMENT_NODE or 
                                    CDATA_SECTION_NODE*/
     char        *value,         /* The data to append */ 
-    int          length,        /* The length of value in byte */
+    domLength    length,        /* The length of value in byte */
     int          disableOutputEscaping   /* If true, disable output 
                                             escaping on the node */
     )
@@ -4514,9 +4515,9 @@ domProcessingInstructionNode *
 domNewProcessingInstructionNode(
     domDocument *doc,
     const char  *targetValue,
-    int          targetLength,
+    domLength    targetLength,
     const char  *dataValue,
-    int          dataLength
+    domLength    dataLength
 )
 {
     domProcessingInstructionNode   *node;
@@ -5475,7 +5476,7 @@ TclTdomObjCmd (
             Tcl_SetResult (interp, "parser object isn't tdom enabled.", NULL);
             return TCL_ERROR;
         }
-        Tcl_SetIntObj (Tcl_GetObjResult (interp), info->storeLineColumn);
+        Tcl_SetLongObj (Tcl_GetObjResult (interp), info->storeLineColumn);
         if (objc == 4) {
             if (Tcl_GetBooleanFromObj (interp, objv[3], &bool) != TCL_OK) {
                 return TCL_ERROR;
