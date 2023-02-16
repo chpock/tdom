@@ -724,7 +724,7 @@ test dom-2.45 {attribute order and XML namespace declaration} {
 
 test dom-2.46 {parse long string} {Tcl9} {
     set doc [dom parse "<doc>[string repeat [string repeat [string repeat abc 1000] 1000] 1000]</doc>"]
-    set result [string length [$doc selectNodes string(doc)]]
+    set result [string length [$doc selectNodes string(/doc)]]
     $doc delete
     set result
 } 3000000000

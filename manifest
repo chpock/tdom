@@ -1,5 +1,5 @@
-C Not\syet\sthere.
-D 2023-02-11T01:08:42.329
+C wip
+D 2023-02-16T18:29:54.633
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -127,7 +127,7 @@ F extensions/tnc/win/targets.vc 79dea1c6a94a94e6ed8bae9e0195149b25a69923
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
 F generic/datatypes.c 4a33e0c8de5fd1c20d1f549cc513af4b6e72c5c80b817f42c94d277cba8dec38
 F generic/datatypes.h 3e41d07bcf50cf6959b6e14416dfcb0d7b5aafc65683322978ec185c2a259332
-F generic/dom.c 7f29cb1906c4b02001637bfeb8fe359cc8032efc5e41f7474f061718be6e89b1
+F generic/dom.c 1a1a4ae9661c9af8cdf57a39fbf19b1923fe9075db18267a0a1b3a388def212a
 F generic/dom.h f52541cc57863e5a3520b001813164d721d3f4f7ef386914fc777d8cbecef169
 F generic/domalloc.c 7a6a2fdde25d04ffef0330259ceb781ffa2150c2314dd88784f924f6f331ef9e
 F generic/domalloc.h 961f83bb46dec27dbcf36ed430ed81b1f485a1fdfaa2f7df8b60bbcf861d0fe3
@@ -196,7 +196,7 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.bench 5446ce379127b8d5700f18a5a0848e580313d0d7
-F tests/dom.test cd9de8810b52c98767651f93bdf03eeb6d43ef7acf262841e31d4d71b9d9c29f
+F tests/dom.test 9574e7bcfc20ad87c25fe6ac79597b987343b92f9b8ba9c708a8d1bbd109299e
 F tests/domDoc.test 6dec2f6d9b4b3a2577af556cb2d49b152e8a34c518fb51a6dc5677229c077cbd
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test 46d67b521a9d84d5d982340c545d830ce65be6e5c69e4271e613d2182b71a321
@@ -239,11 +239,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 41026c0cbd959280cfcb3f72882c0047bb2d931f61a7ecb6849e96cdd17480c7
-R a539e3f94aaec1f3482b9395eebdad5f
-T *branch * towardsTcl9
-T *sym-towardsTcl9 *
-T -sym-trunk *
+P 68220d504d5d9930aebc7c7279e19c616182bdd112971ea987b73405d3561fae
+R bea805d0ee59954971c22ee5774f47dd
 U rolf
-Z c767dcb9470994e22cd5bb6fb1460854
+Z 840631006779d9031b17eac6ec05f078
 # Remove this line to create a well-formed Fossil manifest.

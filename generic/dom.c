@@ -2185,7 +2185,7 @@ domDocument *
 domReadDocument (
     XML_Parser  parser,
     char       *xml,
-    domLength      length,
+    domLength   length,
     int         ignoreWhiteSpaces,
     int         keepCDATA,
     int         storeLineColumn,
@@ -2286,7 +2286,15 @@ domReadDocument (
     }
     
     if (channel == NULL) {
-        status = XML_Parse (parser, xml, length, 1);
+        /* status = XML_Parse (parser, xml, length, 1); */
+        do {
+            done = (length < 2147483647);
+            status = XML_Parse (parser, xml, done ? length : 2147483647, done);
+            if (!done) {
+                xml += 2147483647;
+                length -= 2147483647;
+            }
+        }  while (!done && status == XML_STATUS_OK);
     } else {
         Tcl_DStringInit (&dStr);
         if (Tcl_GetChannelOption (interp, channel, "-encoding", &dStr)
@@ -2317,7 +2325,7 @@ domReadDocument (
             } else {
                 status = XML_Parse (parser, str, tclLen, done);
             }
-        } while (!done);
+        } while (!done && status == XML_STATUS_OK);
     }
     switch (status) {
     case XML_STATUS_SUSPENDED:
