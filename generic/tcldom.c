@@ -605,7 +605,7 @@ UpdateStringOfTdomNode(
     Tcl_Obj *objPtr)
 {
     char nodeName[80];
-    int  len;
+    domLength  len;
     
     NODE_CMD(nodeName, objPtr->internalRep.otherValuePtr);
     len = strlen(nodeName);
@@ -918,7 +918,7 @@ domNode * tcldom_find (
     domNode    *node,
     char       *attrName,
     char       *attrVal,
-    int         length
+    domLength   length
 )
 {
     domNode     *child, *result;
@@ -1612,7 +1612,7 @@ static
 int tcldom_xsltMsgCB (
     void *clientData,
     char *str,
-    int   length,
+    domLength length,
     int   terminate
     )
 {
@@ -2223,7 +2223,7 @@ void tcldom_AppendEscaped (
     Tcl_Obj    *xmlString,
     Tcl_Channel chan,
     char       *value,
-    int         value_length,
+    domLength   value_length,
     int         outputFlags
 )
 {
@@ -3103,7 +3103,7 @@ void tcldom_AppendEscapedJSON (
     Tcl_Obj    *jstring,
     Tcl_Channel chan,
     char       *value,
-    int         value_length
+    domLength   value_length
 )
 {
     char  buf[APESC_BUF_SIZE+80], *b, *bLimit,  *pc, *pEnd;

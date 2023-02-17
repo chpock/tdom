@@ -846,7 +846,7 @@ domLookupURI (
 domNS *
 domGetNamespaceByIndex (
     domDocument *doc,
-    int          nsIndex
+    unsigned int nsIndex
 )
 {
     if (!nsIndex) return NULL;
@@ -1561,7 +1561,8 @@ DispatchPCDATA (
     domLineColumn *lc;
     Tcl_HashEntry *h;
     char          *s;
-    int            len, hnew, only_whites;
+    int            hnew, only_whites;
+    domLength      len;
     
     len = Tcl_DStringLength (info->cdata);
 #ifndef TDOM_NO_SCHEMA
@@ -3427,7 +3428,7 @@ domException
 domSetNodeValue (
     domNode    *node,
     const char *nodeValue,
-    int         valueLen
+    domLength   valueLen
 )
 {
     domTextNode   *textnode;
@@ -4880,7 +4881,7 @@ domXPointerChild (
     char         * element,
     char         * attrName,
     char         * attrValue,
-    int            attrLen,
+    domLength      attrLen,
     domAddCallback addCallback,
     void         * clientData
 )
@@ -4959,7 +4960,7 @@ domXPointerXSibling (
     char         * element,
     char         * attrName,
     char         * attrValue,
-    int            attrLen,
+    domLength      attrLen,
     domAddCallback addCallback,
     void         * clientData
 )
@@ -5054,7 +5055,7 @@ domXPointerDescendant (
     char         * element,
     char         * attrName,
     char         * attrValue,
-    int            attrLen,
+    domLength      attrLen,
     domAddCallback addCallback,
     void         * clientData
 )
@@ -5146,7 +5147,7 @@ domXPointerAncestor (
     char         * element,
     char         * attrName,
     char         * attrValue,
-    int            attrLen,
+    domLength      attrLen,
     domAddCallback addCallback,
     void         * clientData
 )

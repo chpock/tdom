@@ -842,7 +842,7 @@ domException   domAppendChild  (domNode *node, domNode *childToAppend);
 domException   domInsertBefore (domNode *node, domNode *childToInsert, domNode *refChild);
 domException   domReplaceChild (domNode *node, domNode *newChild, domNode *oldChild);
 domException   domSetNodeValue (domNode *node, const char *nodeValue,
-                                int valueLen);
+                                domLength valueLen);
 domNode *      domCloneNode (domNode *node, int deep);
 
 domTextNode *  domAppendNewTextNode (domNode *parent, char *value, domLength length, domNodeType nodeType, int disableOutputEscaping);
@@ -863,7 +863,7 @@ int            domIsNamespaceInScope (domActiveNS *NSstack, int NSstackPos,
 const char *   domLookupPrefixWithMappings (domNode *node, const char *prefix,
                                             char **prefixMappings);
 domNS *        domLookupURI     (domNode *node, char *uri);
-domNS *        domGetNamespaceByIndex (domDocument *doc, int nsIndex);
+domNS *        domGetNamespaceByIndex (domDocument *doc, unsigned int nsIndex);
 domNS *        domNewNamespace (domDocument *doc, const char *prefix,
                                 const char *namespaceURI);
 int            domGetLineColumn (domNode *node, long *line, long *column,
@@ -871,22 +871,22 @@ int            domGetLineColumn (domNode *node, long *line, long *column,
 
 int            domXPointerChild (domNode * node, int all, int instance, domNodeType type,
                                  char *element, char *attrName, char *attrValue,
-                                 int attrLen, domAddCallback addCallback,
+                                 domLength attrLen, domAddCallback addCallback,
                                  void * clientData);
 
 int            domXPointerDescendant (domNode * node, int all, int instance,
                                       int * i, domNodeType type, char *element,
-                                      char *attrName, char *attrValue, int attrLen,
+                                      char *attrName, char *attrValue, domLength attrLen,
                                       domAddCallback addCallback, void * clientData);
 
 int            domXPointerAncestor (domNode * node, int all, int instance,
                                     int * i, domNodeType type, char *element,
-                                    char *attrName, char *attrValue, int attrLen,
+                                    char *attrName, char *attrValue, domLength attrLen,
                                     domAddCallback addCallback, void * clientData);
 
 int            domXPointerXSibling (domNode * node, int forward_mode, int all, int instance,
                                     domNodeType type, char *element, char *attrName,
-                                    char *attrValue, int attrLen,
+                                    char *attrValue, domLength attrLen,
                                     domAddCallback addCallback, void * clientData);
 
 const char *   findBaseURI (domNode *node);
