@@ -2844,11 +2844,11 @@ static int xpathArityCheck (
 |   xpathRound
 |
 \---------------------------------------------------------------------------*/
-int xpathRound (double r) {
+domLength xpathRound (double r) {
     if (r < 0.0) {
-        return (int)floor (r + 0.5);
+        return (domLength)floor (r + 0.5);
     } else {
-        return (int)(r + 0.5);
+        return (domLength)(r + 0.5);
     }
 }
 
@@ -2930,13 +2930,14 @@ xpathEvalFunction (
 {
     xpathResultSet   leftResult, rightResult, replaceResult;
     int              i, rc, pwhite, NaN;
-    domLength        len;
+    domLength        len, lenstr, fromlen;
     char            *replaceStr, *pfrom, *pto, tmp[80], tmp1[80];
     domNode         *node;
     domAttrNode     *attr;
     double           leftReal;
     ast              nextStep;
-    int              argc, savedDocOrder, from;
+    int              argc, savedDocOrder;
+    domLength        from;
     xpathResultSets *args;
     xpathResultSet  *arg;
     Tcl_HashTable   *ids;
@@ -2946,8 +2947,7 @@ xpathEvalFunction (
     char            *leftStr = NULL, *rightStr = NULL;
     const char      *str;
     Tcl_DString      dStr;
-    int              found, j;
-    int              lenstr, fromlen, utfCharLen;
+    int              found, j, utfCharLen;
     char             utfBuf[TCL_UTF_MAX];
     Tcl_DString      tstr, tfrom, tto, tresult;
     Tcl_UniChar     *ufStr, *upfrom, unichar;

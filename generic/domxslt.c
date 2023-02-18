@@ -3420,8 +3420,8 @@ static int xsltNumber (
 )
 {
     xpathResultSet    rs;
-    int               rc, vs[20], NaN, hnew, i, useFormatToken, vVals = 0;
-    int              *v, *vd = NULL;
+    int               rc, NaN, hnew, i, useFormatToken, vVals = 0;
+    domLength         vs[20], *v, *vd = NULL;
     long              groupingSize = 0;
     char             *value, *level, *count, *from, *str, *str1, *format;
     char             *groupingSeparator = NULL, *groupingSizeStr = NULL;
@@ -3617,7 +3617,7 @@ static int xsltNumber (
                 else node = node->parentNode;
             }
             if (rs.nr_nodes > 20) {
-                vd = (int *)MALLOC(sizeof (int) * rs.nr_nodes);
+                vd = (int *)MALLOC(sizeof (domLength) * rs.nr_nodes);
                 v = vd;
             }
             vVals = rs.nr_nodes;
