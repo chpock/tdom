@@ -2929,8 +2929,8 @@ xpathEvalFunction (
     )
 {
     xpathResultSet   leftResult, rightResult, replaceResult;
-    int              i, rc, pwhite, NaN;
-    domLength        len, lenstr, fromlen;
+    int              rc, pwhite, NaN, attrcount;
+    domLength        len, lenstr, fromlen, i, j;
     char            *replaceStr, *pfrom, *pto, tmp[80], tmp1[80];
     domNode         *node;
     domAttrNode     *attr;
@@ -2947,7 +2947,7 @@ xpathEvalFunction (
     char            *leftStr = NULL, *rightStr = NULL;
     const char      *str;
     Tcl_DString      dStr;
-    int              found, j, utfCharLen;
+    int              found, utfCharLen;
     char             utfBuf[TCL_UTF_MAX];
     Tcl_DString      tstr, tfrom, tto, tresult;
     Tcl_UniChar     *ufStr, *upfrom, unichar;
@@ -3637,14 +3637,14 @@ xpathEvalFunction (
             }
             if (leftResult.nodes[0]->nodeType == ATTRIBUTE_NODE) {
                 node = ((domAttrNode*)leftResult.nodes[0])->parentNode;
-                i = 0;
+                attrcount = 0;
                 attr = node->firstAttr;
                 while (attr) {
                     if ((domNode*)attr == leftResult.nodes[0]) break;
                     attr = attr->nextSibling;
-                    i++;
+                    attrcount++;
                 }
-                sprintf(tmp,"id%p-%d", (void *)node, i);
+                sprintf(tmp,"id%p-%d", (void *)node, attrcount);
             } else {
                 sprintf(tmp,"id%p", (void *)leftResult.nodes[0]);
             }

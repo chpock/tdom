@@ -4040,11 +4040,11 @@ domNewTextNode(
 void
 domEscapeCData (
     char        *value,
-    int          length,
+    domLength    length,
     Tcl_DString *escapedData
 )
 {
-    int i, start = 0;
+    domLength i, start = 0;
     char *pc;
 
     Tcl_DStringInit (escapedData);

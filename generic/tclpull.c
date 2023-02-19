@@ -179,7 +179,7 @@ endElement (
 
     if (Tcl_DStringLength (pullInfo->cdata) > 0) {
         if (pullInfo->ignoreWhiteSpaces) {
-            char *pc; int len;
+            char *pc; domLength len;
             len = Tcl_DStringLength(pullInfo->cdata);
             for (pc = Tcl_DStringValue (pullInfo->cdata);
                  len > 0;
@@ -287,7 +287,7 @@ startElement(
     }
     if (Tcl_DStringLength (pullInfo->cdata) > 0) {
         if (pullInfo->ignoreWhiteSpaces) {
-            char *pc; int len, wso = 1;
+            char *pc; domLength len, wso = 1;
             len = Tcl_DStringLength(pullInfo->cdata);
             for (pc = Tcl_DStringValue (pullInfo->cdata);
                  len > 0;

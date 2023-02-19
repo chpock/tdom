@@ -3617,7 +3617,7 @@ static int xsltNumber (
                 else node = node->parentNode;
             }
             if (rs.nr_nodes > 20) {
-                vd = (int *)MALLOC(sizeof (domLength) * rs.nr_nodes);
+                vd = (domLength *)MALLOC(sizeof (domLength) * rs.nr_nodes);
                 v = vd;
             }
             vVals = rs.nr_nodes;
