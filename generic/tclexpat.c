@@ -127,7 +127,7 @@ static int      TclExpatInitializeParser (Tcl_Interp *interp,
                     TclGenExpatInfo *expat, int resetOptions );
 static void     TclExpatFreeParser  (TclGenExpatInfo *expat);
 static int      TclExpatParse (Tcl_Interp *interp,
-                    TclGenExpatInfo *expat, char *data, int len,
+                    TclGenExpatInfo *expat, char *data, domLength len,
                                TclExpat_InputType type);
 static int      TclExpatConfigure (Tcl_Interp *interp,
                     TclGenExpatInfo *expat, int objc, Tcl_Obj *const objv[]);
@@ -971,7 +971,7 @@ TclExpatParse (
     Tcl_Interp *interp,
     TclGenExpatInfo *expat,
     char *data,
-    int len,
+    domLength len,
     TclExpat_InputType type
 ) {
   int result, mode, done;
@@ -1013,9 +1013,15 @@ TclExpatParse (
 
   case EXPAT_INPUT_STRING:
       expat->parsingState = 2;
-      result = XML_Parse(expat->parser,
-                         data, len,
-                         expat->final);
+      do {
+          done = (len < 2147483647);
+          result = XML_Parse(expat->parser, data, len,
+                             done ? expat->final : 0);
+          if (!done) {
+              data += 2147483647;
+              len -= 2147483647;
+          }
+      } while (!done && result == XML_STATUS_OK);
       expat->parsingState = 1;
       break;
 
@@ -3605,7 +3611,14 @@ TclGenExpatExternalEntityRefHandler(
       dataStr = Tcl_GetStringFromObj (dataObj, &tclLen);
       switch (inputType) {
       case EXPAT_INPUT_STRING:
-          result = XML_Parse (extparser, dataStr, tclLen, 1);
+          do {
+              done = (tclLen < 2147483647);
+              result = XML_Parse(extparser, dataStr, tclLen, done);
+              if (!done) {
+                  dataStr += 2147483647;
+                  tclLen -= 2147483647;
+              }
+          } while (!done && result == XML_STATUS_OK);
           break;
 
       case EXPAT_INPUT_CHANNEL:

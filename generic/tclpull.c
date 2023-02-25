@@ -486,7 +486,8 @@ tDOM_PullParserInstanceCmd (
     )
 {
     tDOM_PullParserInfo *pullInfo = clientdata;
-    int methodIndex, len, result, mode, fd, optionIndex;
+    int methodIndex, result, mode, fd, optionIndex, done;
+    domLength len;
     char *data;
     const char **atts;
     Tcl_Obj *resultPtr;
@@ -640,7 +641,14 @@ tDOM_PullParserInstanceCmd (
                     } while (result == XML_STATUS_OK);
                 } else {
                     data = Tcl_GetStringFromObj(pullInfo->inputString, &len);
-                    result = XML_Parse (pullInfo->parser, data, len, 1);
+                    do {
+                        done = (len < 2147483647);
+                        result = XML_Parse (pullInfo->parser, data, len, done);
+                        if (!done) {
+                            data += 2147483647;
+                            len -= 2147483647;
+                        }
+                    } while (!done && result == XML_STATUS_OK);
                 }
                 switch (result) {
                 case XML_STATUS_OK:

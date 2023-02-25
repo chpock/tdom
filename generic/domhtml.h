@@ -1,4 +1,4 @@
 
 domDocument *  HTML_SimpleParseDocument ( char *html, int ignoreWhiteSpaces, 
-                                          int forrest, int *pos,
+                                          int forrest, domLength *pos,
                                           char **errStr );

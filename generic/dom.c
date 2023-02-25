@@ -1890,8 +1890,8 @@ externalEntityRefHandler (
 
     Tcl_Obj *cmdPtr, *resultObj, *resultTypeObj, *extbaseObj, *xmlstringObj;
     Tcl_Obj *channelIdObj;
-    int result, mode, done, byteIndex, i;
-    int keepresult = 0;
+    int result, mode, done, keepresult = 0;
+    ssize_t i, byteIndex;
     size_t len;
     int tclLen;
     XML_Parser extparser, oldparser = NULL;
@@ -1973,8 +1973,7 @@ externalEntityRefHandler (
 
     if (strcmp (resultType, "string") == 0) {
         result = Tcl_ListObjIndex (info->interp, resultObj, 2, &xmlstringObj);
-        xmlstring = Tcl_GetString(xmlstringObj);
-        len = strlen (xmlstring);
+        xmlstring = Tcl_GetStringFromObj (xmlstringObj, &len);
         chan = NULL;
     } else if (strcmp (resultType, "channel") == 0) {
         xmlstring = NULL;
@@ -2020,7 +2019,14 @@ externalEntityRefHandler (
     Tcl_ResetResult (info->interp);
     result = 1;
     if (chan == NULL) {
-        status = XML_Parse(extparser, xmlstring, strlen (xmlstring), 1);
+        do {
+            done = (len < 2147483647);
+            status = XML_Parse (extparser, xmlstring, done ? len : 2147483647, done);
+            if (!done) {
+                xmlstring += 2147483647;
+                len -= 2147483647;
+            }
+        }  while (!done && status == XML_STATUS_OK);
         switch (status) {
         case XML_STATUS_ERROR:
             interpResult = Tcl_GetStringResult(info->interp);
@@ -2287,7 +2293,6 @@ domReadDocument (
     }
     
     if (channel == NULL) {
-        /* status = XML_Parse (parser, xml, length, 1); */
         do {
             done = (length < 2147483647);
             status = XML_Parse (parser, xml, done ? length : 2147483647, done);

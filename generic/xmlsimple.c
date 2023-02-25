@@ -332,7 +332,7 @@ static int TranslateEntityRefs (
 static int
 XML_SimpleParse (
     char        *xml,   /* XML string  */
-    int         *pos,   /* Index of next unparsed character in xml */
+    domLength   *pos,   /* Index of next unparsed character in xml */
     domDocument *doc,
     domNode     *parent,
     int          ignoreWhiteSpaces,
@@ -1053,7 +1053,7 @@ XML_SimpleParseDocument (
     int      forest,
     char    *baseURI,
     Tcl_Obj *extResolver,
-    int     *pos,
+    domLength *pos,
     char   **errStr
 ) {
     domDocument   *doc = domCreateDoc(baseURI, 0);

@@ -4655,8 +4655,8 @@ externalEntityRefHandler (
     ValidateMethodData *vdata;
     Tcl_Obj *cmdPtr, *resultObj, *resultTypeObj, *extbaseObj, *xmlstringObj;
     Tcl_Obj *channelIdObj;
-    int result, mode, done, byteIndex, i;
-    int keepresult = 0;
+    int result, mode, done, keepresult = 0;
+    ssize_t i, byteIndex;
     domLength len, tclLen;
     XML_Parser extparser, oldparser = NULL;
     char buf[4096], *resultType, *extbase, *xmlstring, *channelId, s[50];
@@ -4775,7 +4775,14 @@ externalEntityRefHandler (
     Tcl_ResetResult (vdata->interp);
     result = 1;
     if (chan == NULL) {
-        status = XML_Parse(extparser, xmlstring, strlen (xmlstring), 1);
+        do {
+            done = (len < 2147483647);
+            status = XML_Parse (extparser, xmlstring, done ? len : 2147483647, done);
+            if (!done) {
+                xmlstring += 2147483647;
+                len -= 2147483647;
+            }
+        }  while (!done && status == XML_STATUS_OK);
         switch (status) {
         case XML_STATUS_ERROR:
             interpResult = Tcl_GetStringResult(vdata->interp);
@@ -5027,13 +5034,20 @@ static int validateSource (
     switch (source) {
     case VALIDATE_STRING:
         xmlstr = Tcl_GetStringFromObj (objv[0], &len);
-        if (XML_Parse (parser, xmlstr, len, 1) != XML_STATUS_OK
-            || sdata->validationState == VALIDATION_ERROR) {
-            validateReportError (interp, sdata, parser);
-            result = TCL_ERROR;
-        } else {
-            result = TCL_OK;
-        }
+        result = TCL_OK;
+        do {
+            done = (len < 2147483647);
+            if (XML_Parse (parser, xmlstr, len, done) != XML_STATUS_OK
+                || sdata->validationState == VALIDATION_ERROR) {
+                validateReportError (interp, sdata, parser);
+                result = TCL_ERROR;
+                break;
+            }
+            if (!done) {
+                xmlstr += 2147483647;
+                len -= 2147483647;
+            }
+        }  while (!done);
         break;
         
     case VALIDATE_FILENAME:
