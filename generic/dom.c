@@ -2020,11 +2020,12 @@ externalEntityRefHandler (
     result = 1;
     if (chan == NULL) {
         do {
-            done = (len < 2147483647);
-            status = XML_Parse (extparser, xmlstring, done ? len : 2147483647, done);
+            done = (len < INT_MAX);
+            status = XML_Parse (extparser, xmlstring, done ? len : INT_MAX,
+                                done);
             if (!done) {
-                xmlstring += 2147483647;
-                len -= 2147483647;
+                xmlstring += INT_MAX;
+                len -= INT_MAX;
             }
         }  while (!done && status == XML_STATUS_OK);
         switch (status) {
@@ -2294,11 +2295,11 @@ domReadDocument (
     
     if (channel == NULL) {
         do {
-            done = (length < 2147483647);
-            status = XML_Parse (parser, xml, done ? length : 2147483647, done);
+            done = (length < INT_MAX);
+            status = XML_Parse (parser, xml, done ? length : INT_MAX, done);
             if (!done) {
-                xml += 2147483647;
-                length -= 2147483647;
+                xml += INT_MAX;
+                length -= INT_MAX;
             }
         }  while (!done && status == XML_STATUS_OK);
     } else {

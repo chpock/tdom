@@ -1014,12 +1014,12 @@ TclExpatParse (
   case EXPAT_INPUT_STRING:
       expat->parsingState = 2;
       do {
-          done = (len < 2147483647);
+          done = (len < INT_MAX);
           result = XML_Parse(expat->parser, data, len,
                              done ? expat->final : 0);
           if (!done) {
-              data += 2147483647;
-              len -= 2147483647;
+              data += INT_MAX;
+              len -= INT_MAX;
           }
       } while (!done && result == XML_STATUS_OK);
       expat->parsingState = 1;
@@ -3612,11 +3612,11 @@ TclGenExpatExternalEntityRefHandler(
       switch (inputType) {
       case EXPAT_INPUT_STRING:
           do {
-              done = (tclLen < 2147483647);
+              done = (tclLen < INT_MAX);
               result = XML_Parse(extparser, dataStr, tclLen, done);
               if (!done) {
-                  dataStr += 2147483647;
-                  tclLen -= 2147483647;
+                  dataStr += INT_MAX;
+                  tclLen -= INT_MAX;
               }
           } while (!done && result == XML_STATUS_OK);
           break;

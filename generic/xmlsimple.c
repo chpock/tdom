@@ -1041,8 +1041,8 @@ XML_SimpleParse (
 /*----------------------------------------------------------------------------
 |   XML_SimpleParseDocument
 |
-|       Create a document, parses the XML string starting at 'pos' and
-|       continuing to the first encountered error.
+|       Create a document, parses the XML string and continuing to the
+|       first encountered error.
 |
 \---------------------------------------------------------------------------*/
 domDocument *

@@ -6845,7 +6845,7 @@ int tcldom_createDocumentNS (
 }
 
 static
-void appendErrorLocation (
+void reportErrorLocation (
     Tcl_Interp *interp,
     int range,
     char *xmlstring,
@@ -6865,7 +6865,8 @@ void appendErrorLocation (
     }
     Tcl_ResetResult(interp);
     sprintf(s, "%lu", byteIndex);
-    Tcl_AppendResult(interp, "error \"", errStr, "\" at position ", s, NULL);
+    Tcl_AppendResult(interp, "error \"", errStr, "\" at position ", s, "\n\"",
+                     NULL);
     ind = 0;
     buf[0] = '\0';
     for (i = (byteIndex < range/2 ? 0 : byteIndex - range/2);
@@ -6879,7 +6880,7 @@ void appendErrorLocation (
     buf[0] = '\0';
     for (i = byteIndex + 1; i < byteIndex + range - range/2; i++) {
         buf[ind] = xmlstring[i];
-        if (xmlstring[i]) {
+        if (!xmlstring[i]) {
             break;
         }
         ind++;
@@ -7339,14 +7340,13 @@ int tcldom_parse (
             return tcldom_returnDocumentObj (interp, doc, setVariable,
                                              newObjName, 1, 0);
         } else {
-            appendErrorLocation(interp, 40, xml_string, byteIndex, errStr);
+            reportErrorLocation(interp, 40, xml_string, byteIndex, errStr);
             return TCL_ERROR;
         }
     }
     
     if (takeSimpleParser) {
-        char s[50];
-        domLength byteIndex, i;
+        domLength byteIndex;
 
         errStr = NULL;
 
@@ -7361,29 +7361,7 @@ int tcldom_parse (
         }
         if (errStr != NULL) {
             domFreeDocument (doc, NULL, interp);
-
-            Tcl_ResetResult(interp);
-            sprintf(s, "%ld", byteIndex);
-            Tcl_AppendResult(interp, "error \"", errStr, "\" at position ", 
-                             s, NULL);
-            if (byteIndex != -1) {
-                Tcl_AppendResult(interp, "\n\"", NULL);
-                s[1] = '\0';
-                for (i=-80; i < 80; i++) {
-                    if ((byteIndex+i)>=0) {
-                        if (xml_string[byteIndex+i]) {
-                            s[0] = xml_string[byteIndex+i];
-                            Tcl_AppendResult(interp, s, NULL);
-                            if (i==0) {
-                                Tcl_AppendResult(interp, " <--Error-- ", NULL);
-                            }
-                        } else {
-                            break;
-                        }
-                    }
-                }
-                Tcl_AppendResult(interp, "\"",NULL);
-            }
+            reportErrorLocation(interp, 160, xml_string, byteIndex, errStr);
             if (takeHTMLParser) {
                 FREE(errStr);
             }

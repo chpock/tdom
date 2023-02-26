@@ -39,6 +39,7 @@
 #include <ctype.h>
 #include <expat.h>
 #include <domalloc.h>
+#include <limits.h>
 
 /*
  * tDOM provides it's own memory allocator which is optimized for
