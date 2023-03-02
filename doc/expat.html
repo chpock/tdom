@@ -4,21 +4,21 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x5575961dc910">NAME</a> · <a href="#SECTid0x55759612bd60">SYNOPSIS</a> · <a href="#SECTid0x5575961d3ef0">DESCRIPTION</a> · <a href="#SECTid0x5575961d4cc0">COMMAND OPTIONS</a> · <a href="#SECTid0x557596234b50"> COMMAND METHODS </a> · <a href="#SECTid0x55759623b630">Callback Command Return Codes</a> · <a href="#SECTid0x55759623c1c0">SEE ALSO</a> · <a href="#SECTid0x55759623c580">KEYWORDS</a>
+<a href="#SECTid0x562e3ec86820">NAME</a> · <a href="#SECTid0x562e3ec6eb80">SYNOPSIS</a> · <a href="#SECTid0x562e3ec8ba20">DESCRIPTION</a> · <a href="#SECTid0x562e3eb54340">COMMAND OPTIONS</a> · <a href="#SECTid0x562e3ec7f930"> COMMAND METHODS </a> · <a href="#SECTid0x562e3eca68a0">Callback Command Return Codes</a> · <a href="#SECTid0x562e3ecd80c0">SEE ALSO</a> · <a href="#SECTid0x562e3ecd8480">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-    <h2><a name="SECTid0x5575961dc910">NAME</a></h2><p class="namesection">
+    <h2><a name="SECTid0x562e3ec86820">NAME</a></h2><p class="namesection">
 <b class="names">expat - </b><br>Creates an instance of an expat parser object</p>
 
 
 
-    <h2><a name="SECTid0x55759612bd60">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+    <h2><a name="SECTid0x562e3ec6eb80">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">expat</b> ?<i class="m">parsername</i>? ?<i class="m">-namespace</i>? ?<i class="m">arg arg ..</i>
 
 <b class="cmd">xml::parser</b> ?<i class="m">parsername</i>? ?<i class="m">-namespace</i>? ?<i class="m">arg arg ..</i>
 </pre>
-    <h2><a name="SECTid0x5575961d3ef0">DESCRIPTION</a></h2><p>The parser created with <i class="m">expat</i> or <i class="m">xml::parser</i>
+    <h2><a name="SECTid0x562e3ec8ba20">DESCRIPTION</a></h2><p>The parser created with <i class="m">expat</i> or <i class="m">xml::parser</i>
 (which is just another name for the same command in an own namespace) are able
 to parse any kind of well-formed XML. The parsers are stream oriented XML
 parser. This means that you register handler scripts with the parser prior to
@@ -37,7 +37,7 @@ in memory "tDOM" DOM tree, while the parser is parsing the input.</p><p>It is po
 and C level handlers for most of the events. If the event occurs, they are
 called in turn.</p>
 
-    <h2><a name="SECTid0x5575961d4cc0">COMMAND OPTIONS</a></h2><dl class="optlist">
+    <h2><a name="SECTid0x562e3eb54340">COMMAND OPTIONS</a></h2><dl class="optlist">
         
           <dt><b>-namespace</b></dt>
 
@@ -632,10 +632,10 @@ default handler.</p>
 
         
           <dt>
-<b>-useForeignDTD</b> <i>&lt;boolen&gt;</i>
+<b>-useForeignDTD</b> <i>&lt;boolean&gt;</i>
 </dt>
           
-          <dd>If &lt;boolen&gt; is true and the document does not have an
+          <dd>If &lt;boolean&gt; is true and the document does not have an
 external subset, the parser will call the -externalentitycommand script with
 empty values for the systemId and publicID arguments. This option must be set,
 before the first piece of data is parsed. Setting this option, after the
@@ -647,8 +647,42 @@ doesn't have an internal subset, the -startdoctypedeclcommand and
 enddoctypedeclcommand scripts, if set, are not called.</dd>
         
 
+        
+            <dt>
+<b>-billionLaughsAttackProtectionMaximumAmplification</b> <i>&lt;float&gt;</i>
+</dt>
+            
+            <dd>This option together with
+            <i class="m">-billionLaughsAttackProtectionActivationThreshold</i>
+            gives control over the parser limits that protects
+            against billion laugh attacks
+            (<a href="https://en.wikipedia.org/wiki/Billion_laughs_attack">https://en.wikipedia.org/wiki/Billion_laughs_attack</a>).
+            This option expects a float &gt;= 1.0 as argument. You
+            should never need to use this option, because the
+            default value (100.0) should work for any real data.
+            If you ever need to increase this value for non-attack
+            payload, please report.</dd>
+        
+    
+        
+            <dt>
+<b>-billionLaughsAttackProtectionActivationThreshold</b> <i>&lt;long&gt;</i>
+</dt>
+            
+            <dd>This option together with
+            <i class="m">-billionLaughsAttackProtectionMaximumAmplification</i>
+            gives control over the parser limits that protects
+            against billion laugh attacks
+            (<a href="https://en.wikipedia.org/wiki/Billion_laughs_attack">https://en.wikipedia.org/wiki/Billion_laughs_attack</a>).
+            This option expects a positiv integer as argument. You
+            should never need to use this option, because the
+            default value (8388608) should work for any real data.
+            If you ever need to increase this value for non-attack
+            payload, please report.</dd>
+        
+
       </dl>
-    <h2><a name="SECTid0x557596234b50"> COMMAND METHODS </a></h2><dl class="commandlist">
+    <h2><a name="SECTid0x562e3ec7f930"> COMMAND METHODS </a></h2><dl class="commandlist">
         
           <dt>
 <b class="cmd">parser</b> <b class="method">configure</b> <i class="m">option value ?option value?</i>
@@ -789,7 +823,7 @@ the parser to be used and will raise an error in this case.</p></dd>
 </dt>
 
           <dd><p>Reads the XML data directly out of the file with the
-filename <i class="m">filename</i> and parses that data. This is done with low level file
+filename <i class="m">filename</i> and parses that data. This is done with low-level file
 operations. The XML data must be in US-ASCII, ISO-8859-1, UTF-8 or UTF-16
 encoding. If applicable, this is the fastest way, to parse XML data. This
 method cannot be used from within a callback (neither directly nor indirectly)
@@ -808,7 +842,7 @@ cases.</p></dd>
         
       </dl>
 
-    <h2><a name="SECTid0x55759623b630">Callback Command Return Codes</a></h2><p>A script invoked for any of the parser callback commands, such as
+    <h2><a name="SECTid0x562e3eca68a0">Callback Command Return Codes</a></h2><p>A script invoked for any of the parser callback commands, such as
 -elementstartcommand, -elementendcommand, etc, may return an error code other
 than "ok" or "error". All callbacks may in addition return
 "break" or "continue".</p><p>If a callback script returns an "error" error code then
@@ -822,11 +856,11 @@ script out of this Tcl handler set and processing continues with the next
 (sibling) element. This does not influence any other handler set.</p><p>If a callback script returns a "return" error
 code then parsing is canceled altogether, but no error is raised.</p>
 
-    <h2><a name="SECTid0x55759623c1c0">SEE ALSO</a></h2><p class="seealso">
+    <h2><a name="SECTid0x562e3ecd80c0">SEE ALSO</a></h2><p class="seealso">
 <a href="expatapi.html">expatapi</a>, <a href="tdomcmd.html">tdom</a>
 </p>
 
-    <h2><a name="SECTid0x55759623c580">KEYWORDS</a></h2><p class="keywords">
+    <h2><a name="SECTid0x562e3ecd8480">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-SAX">SAX</a>, <a class="keyword" href="keyword-index.html#KW-push">push</a>, <a class="keyword" href="keyword-index.html#KW-pushparser">pushparser</a>
 </p>
   </div><hr class="navsep"><div class="navbar" align="center">

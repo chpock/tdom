@@ -208,7 +208,7 @@ all: binaries libraries doc
 #========================================================================
 
 $(TDOMSHELL): binaries $(srcdir)/unix/tclAppInit.c
-	$(COMPILE) -c `@CYGPATH@ $(srcdir)/unix/tclAppInit.c`
+	$(COMPILE) -UUSE_TCL_STUBS -c `@CYGPATH@ $(srcdir)/unix/tclAppInit.c`
 	$(CC) @LDFLAGS@ -o $@ tclAppInit.$(OBJEXT) $(PKG_OBJECTS) \
 	  $(TCL_LIB_SPEC) $(TDOMSHELL_LIBS) $(TDOM_LD_SEARCH_FLAGS)
 

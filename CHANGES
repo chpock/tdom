@@ -1,4 +1,43 @@
 
+2022-09-11  Rolf Ade  <rolf@pointsman.de>
+
+        Added the node command method getByteIndex. Added the
+        submethod byteIndex to the info method of the schema commands.
+
+2022-08-27  Rolf Ade  <rolf@pointsman.de>
+
+        Added the method asCanonicalXML to the domDoc and domNode
+        commands. Added the options -escapeCR and -escapeTab to the
+        method asXML of the domDoc and domNode commands.
+
+--- Release 0.9.3, 8. Aug. 2022 ---
+
+2022-06-03  Rolf Ade  <rolf@pointsman.de>
+
+        Added commands tdom::fsnewNode and tdom::fsinsertNode.
+
+2022-05-14  Rolf Ade  <rolf@pointsman.de>
+
+        Updated to expat 2.4.8.
+
+2022-04-17  Rolf Ade  <rolf@pointsman.de>
+
+        Added option -forest to dom parse.
+
+2022-03-19  Rolf Ade  <rolf@pointsman.de>
+
+        Schema command methods validate, validatefile and
+        validatechannel enhanced with options to control external
+        entity resolving.
+
+2022-02-19  Rolf Ade  <rolf@pointsman.de>
+
+        Added the options
+        -billionLaughsAttackProtectionMaximumAmplification and
+        -billionLaughsAttackProtectionActivationThreshold to dom parse
+        and the by the xml::parser/expat command created parser
+        commands.
+            
 2022-02-14  Rolf Ade  <rolf@pointsman.de>
 
         Updated to expat 2.4.4.

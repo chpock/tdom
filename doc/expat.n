@@ -718,8 +718,8 @@ default handler (with the -defaultcommand option) for every handler set of the
 parser all internal entities are silent lost for the handler sets without a
 default handler.
 .RE
-.IP "\fB-useForeignDTD  \fI<boolen>\fP\fR"
-If <boolen> is true and the document does not have an
+.IP "\fB-useForeignDTD  \fI<boolean>\fP\fR"
+If <boolean> is true and the document does not have an
 external subset, the parser will call the -externalentitycommand script with
 empty values for the systemId and publicID arguments. This option must be set,
 before the first piece of data is parsed. Setting this option, after the
@@ -729,6 +729,34 @@ default is restored, after resetting the parser. Pleace notice, that a
 to the -externalentitycommand script. Pleace notice, that, if the document also
 doesn't have an internal subset, the -startdoctypedeclcommand and
 enddoctypedeclcommand scripts, if set, are not called.
+.IP "\fB-billionLaughsAttackProtectionMaximumAmplification  \fI<float>\fP\fR"
+.UR "https://en.wikipedia.org/wiki/Billion_laughs_attack"
+<URL: https://en.wikipedia.org/wiki/Billion_laughs_attack>
+.UE
+This option together with
+\&\fI-billionLaughsAttackProtectionActivationThreshold\fR
+gives control over the parser limits that protects
+against billion laugh attacks
+().
+This option expects a float >= 1.0 as argument. You
+should never need to use this option, because the
+default value (100.0) should work for any real data.
+If you ever need to increase this value for non-attack
+payload, please report.
+.IP "\fB-billionLaughsAttackProtectionActivationThreshold  \fI<long>\fP\fR"
+.UR "https://en.wikipedia.org/wiki/Billion_laughs_attack"
+<URL: https://en.wikipedia.org/wiki/Billion_laughs_attack>
+.UE
+This option together with
+\&\fI-billionLaughsAttackProtectionMaximumAmplification\fR
+gives control over the parser limits that protects
+against billion laugh attacks
+().
+This option expects a positiv integer as argument. You
+should never need to use this option, because the
+default value (8388608) should work for any real data.
+If you ever need to increase this value for non-attack
+payload, please report.
 .SH " COMMAND METHODS "
 .TP
 \&\fB\fBparser\fP \fBconfigure\fP \fIoption value ?option value?\fB
@@ -854,7 +882,7 @@ the parser to be used and will raise an error in this case.
 .RS
 .PP
 Reads the XML data directly out of the file with the
-filename \fIfilename\fR and parses that data. This is done with low level file
+filename \fIfilename\fR and parses that data. This is done with low-level file
 operations. The XML data must be in US-ASCII, ISO-8859-1, UTF-8 or UTF-16
 encoding. If applicable, this is the fastest way, to parse XML data. This
 method cannot be used from within a callback (neither directly nor indirectly)

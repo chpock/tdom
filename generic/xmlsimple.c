@@ -60,7 +60,6 @@
 #else 
 # define RetError(m,p) *errStr=m; *pos=p; return TCL_ERROR;
 #endif
-#define SPACE(c)       ((c)==' ' || (c)=='\n' || (c)=='\t' || (c)=='\r')
 
 /*----------------------------------------------------------------------------
 |   Begin Character Entity Translator
@@ -335,9 +334,10 @@ XML_SimpleParse (
     char        *xml,   /* XML string  */
     int         *pos,   /* Index of next unparsed character in xml */
     domDocument *doc,
-    domNode     *parent_nodeOld,
+    domNode     *parent,
     int          ignoreWhiteSpaces,
     int          keepCDATA,
+    int          forest,
     char       **errStr
 ) {
     register int   c;          /* Next character of the input file */
@@ -346,7 +346,7 @@ XML_SimpleParse (
     int            saved;
     int            hasContent;
     domNode       *node;
-    domNode       *parent_node = NULL;
+    domNode       *parent_node = parent;
     domTextNode   *tnode;
     domAttrNode   *attrnode, *lastAttr, *attrList;
     int            ampersandSeen = 0;
@@ -1028,6 +1028,10 @@ XML_SimpleParse (
             }
         }
     }
+    if (forest && parent_node == parent) {
+        FREE ((char *) activeNS);
+        return TCL_OK;
+    }
     RetError("Unexpected end",(x - xml) );
 
 } /* XML_SimpleParse */
@@ -1046,19 +1050,48 @@ XML_SimpleParseDocument (
     char    *xml,              /* Complete text of the file being parsed  */
     int      ignoreWhiteSpaces,
     int      keepCDATA,
+    int      forest,
     char    *baseURI,
     Tcl_Obj *extResolver,
     int     *pos,
     char   **errStr
 ) {
     domDocument   *doc = domCreateDoc(baseURI, 0);
-
+    domNode *save, *node = NULL;
+    Tcl_HashEntry *h;
+    int hnew;
+    
     if (extResolver) {
         doc->extResolver = tdomstrdup (Tcl_GetString (extResolver));
     }
+
+    if (forest) {
+        // Create umbrella tag
+        h = Tcl_CreateHashEntry(&HASHTAB(doc,tdom_tagNames), "forestroot",
+                                &hnew);
+        node = (domNode*) domAlloc(sizeof(domNode));
+        memset(node, 0, sizeof(domNode));
+        node->nodeType      = ELEMENT_NODE;
+        node->nodeName      = (char *)&(h->key);
+        node->ownerDocument = doc;
+        doc->rootNode->firstChild = node;
+        doc->rootNode->lastChild = node;
+    }
     
     *pos = 0;
-    XML_SimpleParse (xml, pos, doc, NULL, ignoreWhiteSpaces, keepCDATA, errStr);
+    XML_SimpleParse (xml, pos, doc, node, ignoreWhiteSpaces, keepCDATA,
+                     forest, errStr);
+    if (forest) {
+        doc->rootNode->firstChild = node->firstChild;
+        doc->rootNode->lastChild = node->lastChild;
+        save = node;
+        for (node = doc->rootNode->firstChild;
+             node != NULL;
+             node = node->nextSibling) {
+            node->parentNode = NULL;
+        }
+        domFree ((void*)save);
+    }
     domSetDocumentElement (doc);
 
     return doc;

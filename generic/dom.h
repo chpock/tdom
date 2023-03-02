@@ -103,6 +103,36 @@
 # define Tcl_GetString(a) Tcl_GetStringFromObj((a), NULL)
 #endif
 
+/* The following is the machinery to have an UNUSED macro which
+ * signals that a function parameter is known to be not used. This
+ * works for some open source compiler. */
+
+/*
+ * Define __GNUC_PREREQ for determine available features of gcc and clang
+ */
+#undef  __GNUC_PREREQ
+#if defined __GNUC__ && defined __GNUC_MINOR__
+# define __GNUC_PREREQ(maj, min) \
+	((__GNUC__ << 16) + __GNUC_MINOR__ >= ((maj) << 16) + (min))
+#else
+# define __GNUC_PREREQ(maj, min) (0)
+#endif
+
+/*
+ * UNUSED uses the gcc __attribute__ unused and mangles the name, so the
+ * attribute could not be used, if declared as unused.
+ */
+#ifdef UNUSED
+#elif __GNUC_PREREQ(2, 7)
+# define UNUSED(x) UNUSED_ ## x __attribute__((unused))
+#elif defined(__LCLINT__)
+# define UNUSED(x) /*@unused@*/ (x)
+#else
+# define UNUSED(x) (x)
+#endif
+
+/* UNUSED stuff end */
+
 #define domPanic(msg) Tcl_Panic((msg));
 
 /*
@@ -337,6 +367,7 @@ static const unsigned char CharBit[] = {
 #define isNCNameChar(x)  UTF8_GET_NAMING_NCNMTOKEN((x),UTF8_CHAR_LEN(*(x)))
 
 #define IS_XML_WHITESPACE(c)  ((c)==' ' || (c)=='\n' || (c)=='\r' || (c)=='\t')
+#define SPACE(c) IS_XML_WHITESPACE ((c))
 
 /*--------------------------------------------------------------------------
 |   DOMString
@@ -387,6 +418,21 @@ typedef enum {
 
 #endif
 
+/* The following defines used for NodeObjCmd */
+#define PARSER_NODE 9999 /* Hack so that we can invoke XML parser */
+/* More hacked domNodeTypes - used to signal, that we want to check
+   name/data of the node to create. */
+#define ELEMENT_NODE_ANAME_CHK 10000
+#define ELEMENT_NODE_AVALUE_CHK 10001
+#define ELEMENT_NODE_CHK 10002
+#define TEXT_NODE_CHK 10003
+#define COMMENT_NODE_CHK 10004
+#define CDATA_SECTION_NODE_CHK 10005
+#define PROCESSING_INSTRUCTION_NODE_NAME_CHK 10006
+#define PROCESSING_INSTRUCTION_NODE_VALUE_CHK 10007
+#define PROCESSING_INSTRUCTION_NODE_CHK 10008
+
+
 /*--------------------------------------------------------------------------
 |   flags   -  indicating some internal features about nodes
 |
@@ -406,12 +452,14 @@ typedef unsigned int domAttrFlags;
 
 typedef unsigned int domDocFlags;
 
-#define OUTPUT_DEFAULT_INDENT     1
-#define NEEDS_RENUMBERING         2
-#define DONT_FREE                 4
-#define IGNORE_XMLNS              8
-#define DOCUMENT_CMD             16
-#define VAR_TRACE                32
+#define OUTPUT_DEFAULT_INDENT      1
+#define NEEDS_RENUMBERING          2
+#define DONT_FREE                  4
+#define IGNORE_XMLNS               8
+#define DOCUMENT_CMD              16
+#define VAR_TRACE                 32
+#define INSIDE_FROM_SCRIPT        64
+#define DELETE_AFTER_FROM_SCRIPT 128
 
 /*--------------------------------------------------------------------------
 |   an index to the namespace records
@@ -563,8 +611,16 @@ typedef struct domLineColumn {
 
     long  line;
     long  column;
+    long  byteIndex;
 
 } domLineColumn;
+
+typedef struct {
+    int  errorCode;
+    long errorLine;
+    long errorColumn;
+    long byteIndex;
+} domParseForestErrorData;
 
 
 /*--------------------------------------------------------------------------
@@ -729,11 +785,13 @@ domDocument *  domReadDocument   (XML_Parser parser,
                                   const char *baseurl,
                                   Tcl_Obj *extResolver,
                                   int   useForeignDTD,
+                                  int   forest,
                                   int   paramEntityParsing,
 #ifndef TDOM_NO_SCHEMA
                                   SchemaData *sdata,
 #endif
                                   Tcl_Interp *interp,
+                                  domParseForestErrorData *forestError,
                                   int  *status);
 
 void           domFreeDocument   (domDocument *doc, 
@@ -808,7 +866,8 @@ domNS *        domLookupURI     (domNode *node, char *uri);
 domNS *        domGetNamespaceByIndex (domDocument *doc, int nsIndex);
 domNS *        domNewNamespace (domDocument *doc, const char *prefix,
                                 const char *namespaceURI);
-int            domGetLineColumn (domNode *node, long *line, long *column);
+int            domGetLineColumn (domNode *node, long *line, long *column,
+                                 long *byteIndex);
 
 int            domXPointerChild (domNode * node, int all, int instance, domNodeType type,
                                  char *element, char *attrName, char *attrValue,

@@ -56,12 +56,25 @@ int tcldom_setInterpAndReturnVar (Tcl_Interp *interp, domNode *node,
                                   int setVariable, Tcl_Obj *var_name);
 
 void tcldom_initialize(void);
+void tcldom_deleteDoc (Tcl_Interp *interp, domDocument *doc);
+
 
 Tcl_ObjCmdProc tcldom_DomObjCmd;
 Tcl_ObjCmdProc tcldom_DocObjCmd;
 Tcl_ObjCmdProc tcldom_NodeObjCmd;
 Tcl_ObjCmdProc tcldom_unknownCmd;
 Tcl_ObjCmdProc TclTdomObjCmd;
+
+int tDOM_fsnewNodeCmd (ClientData clientData,
+                       Tcl_Interp    * interp,
+                       int             objc,
+                       Tcl_Obj *const  objv[]);
+
+int tDOM_fsinsertNodeCmd (ClientData clientData,
+                          Tcl_Interp    * interp,
+                          int             objc,
+                          Tcl_Obj *const  objv[]);
+
 
 #if defined(_MSC_VER) || defined(__MINGW32__)
 #  undef TCL_STORAGE_CLASS

@@ -289,7 +289,7 @@ CHandlerSetCreate (
 
 int
 TclExpatObjCmd(
-    ClientData dummy,
+    ClientData UNUSED(dummy),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -327,6 +327,8 @@ TclExpatObjCmd(
 
   genexpat->paramentityparsing = XML_PARAM_ENTITY_PARSING_NEVER;
   genexpat->nsSeparator = ':';
+  genexpat->maximumAmplification = 0.0;
+  genexpat->activationThreshold = 0;
 
   if (objc > 0) {
       /*
@@ -447,6 +449,28 @@ TclExpatInitializeParser(
                 return TCL_ERROR;
             }
         }
+#ifdef XML_DTD
+        if (expat->maximumAmplification >= 1.0f) {
+            if (XML_SetBillionLaughsAttackProtectionMaximumAmplification (
+                    expat->parser, expat->maximumAmplification) == XML_FALSE) {
+                XML_ParserFree(expat->parser);
+                Tcl_SetResult(interp, "The option \""
+                              "-billionLaughsAttackProtectionMaximumAmplification"
+                              "\" requires a float >= 1.0 as argument.", NULL);
+                return TCL_ERROR;
+            }
+        }
+        if (expat->activationThreshold > 0) {
+            if (XML_SetBillionLaughsAttackProtectionActivationThreshold (
+                    expat->parser, expat->activationThreshold) == XML_FALSE) {
+                XML_ParserFree(expat->parser);
+                Tcl_SetResult(interp, "The \""
+                              "-billionLaughsAttackProtectionActivationThreshold"
+                              "\" requires a long > 0 as argument.", NULL);
+                return TCL_ERROR;
+            }
+        }
+#endif
     }
     
     expat->status                 = TCL_OK;
@@ -470,7 +494,7 @@ TclExpatInitializeParser(
     expat->parsingState           = 0;
 #ifndef TDOM_NO_SCHEMA
     if (expat->sdata) {
-        tDOM_schemaReset (expat->sdata, 1);
+        tDOM_schemaReset (expat->sdata);
     }
 #endif
 
@@ -740,7 +764,7 @@ TclExpatInstanceCmd (
 #ifndef TDOM_NO_SCHEMA
             if (expat->sdata) {
                 expat->sdata->inuse--;
-                tDOM_schemaReset (expat->sdata, 1);
+                tDOM_schemaReset (expat->sdata);
             }
 #endif
             Tcl_DeleteCommand(interp, Tcl_GetString(expat->name));
@@ -869,7 +893,7 @@ TclExpatInstanceCmd (
 
 #ifndef TDOM_NO_SCHEMA
   if (resetsdata && expat->sdata) {
-      tDOM_schemaReset (expat->sdata, 1);
+      tDOM_schemaReset (expat->sdata);
   }
 #endif
   return result;
@@ -1128,6 +1152,8 @@ TclExpatConfigure (
     "-useForeignDTD",
     "-namespace",
     "-namespaceseparator",
+    "-billionLaughsAttackProtectionMaximumAmplification",
+    "-billionLaughsAttackProtectionActivationThreshold",
 
     "-commentcommand",
     "-notstandalonecommand",
@@ -1162,6 +1188,8 @@ TclExpatConfigure (
     EXPAT_USEFOREIGNDTD,
     EXPAT_NAMESPACE,
     EXPAT_NAMESPACESEPARATOR,
+    EXPAT_BLAPMAXIMUMAMPLIFICATION,
+    EXPAT_BLAPACTIVATIONTHRESHOLD,
 
     EXPAT_COMMENTCMD, EXPAT_NOTSTANDALONECMD,
     EXPAT_STARTCDATASECTIONCMD, EXPAT_ENDCDATASECTIONCMD,
@@ -1196,6 +1224,8 @@ TclExpatConfigure (
   char *handlerSetName = NULL;
   TclHandlerSet *tmpTclHandlerSet, *activeTclHandlerSet = NULL;
   Tcl_UniChar uniChar;
+  double maximumAmplification;
+  long activationThreshold;
 #ifndef TDOM_NO_SCHEMA
   char *schemacmd;
 #endif
@@ -1248,10 +1278,71 @@ TclExpatConfigure (
         }
         /* This option is a creation time / set once one */
         if (!expat->parser) {
-            expat->nsSeparator = uniChar;
+            expat->nsSeparator = (XML_Char)uniChar;
         }
         break;
-        
+
+      case EXPAT_BLAPMAXIMUMAMPLIFICATION:
+          /* -billionLaughsAttackProtectionMaximumAmplification */
+          if (Tcl_GetDoubleFromObj (interp, objv[1], &maximumAmplification)
+              != TCL_OK) {
+              Tcl_SetResult(interp, "The option \""
+                            "-billionLaughsAttackProtectionMaximumAmplification"
+                            "\" requires a float >= 1.0 as argument.", NULL);
+              return TCL_ERROR;
+          }
+          if (maximumAmplification > (double)FLT_MAX || maximumAmplification < 1.0) {
+              Tcl_SetResult(interp, "The option \""
+                            "-billionLaughsAttackProtectionMaximumAmplification"
+                            "\" requires a float >= 1.0 as argument.", NULL);
+              return TCL_ERROR;
+          }
+#ifdef XML_DTD
+          if (expat->parser) {
+              if (XML_SetBillionLaughsAttackProtectionMaximumAmplification (
+                      expat->parser, (float)maximumAmplification) == XML_FALSE) {
+                  Tcl_SetResult(interp, "The option \""
+                                "-billionLaughsAttackProtectionMaximumAmplification"
+                                "\" requires a float >= 1.0 as argument.",
+                                NULL);
+                  return TCL_ERROR;
+              }
+          } else {
+              expat->maximumAmplification = (float) maximumAmplification;
+          }
+#endif          
+          break;
+
+      case EXPAT_BLAPACTIVATIONTHRESHOLD:
+          /* -billionLaughsAttackProtectionActivationThreshold */
+          if (Tcl_GetLongFromObj (interp, objv[1], &activationThreshold)
+              != TCL_OK) {
+              Tcl_SetResult (interp, "The option \""
+                            "-billionLaughsAttackProtectionActivationThreshold"
+                             "\" requires a long > 0 as argument.", NULL);
+              return TCL_ERROR;
+          }
+          if (activationThreshold < 1) {
+              Tcl_SetResult (interp, "The option \""
+                             "-billionLaughsAttackProtectionActivationThreshold"
+                             "\" requires a long > 0 as argument.", NULL);
+              return TCL_ERROR;
+          }
+#ifdef XML_DTD
+          if (expat->parser) {
+              if (XML_SetBillionLaughsAttackProtectionActivationThreshold (
+                      expat->parser, activationThreshold) == XML_FALSE) {
+                  Tcl_SetResult(interp, "The option \""
+                                "-billionLaughsAttackProtectionActivationThreshold"
+                                "\" requires a long > 0 as argument.", NULL);
+                  return TCL_ERROR;
+              }
+          } else {
+              expat->activationThreshold = activationThreshold;
+          }
+#endif          
+          break;
+          
       case EXPAT_FINAL:			/* -final */
 
 	if (Tcl_GetBooleanFromObj(interp, objPtr[1], &bool) != TCL_OK) {
@@ -1657,13 +1748,13 @@ TclExpatConfigure (
         if (schemacmd[0] == '\0') {
             if (expat->sdata) {
                 expat->sdata->inuse--;
-                tDOM_schemaReset (expat->sdata, 1);
+                tDOM_schemaReset (expat->sdata);
                 expat->sdata = NULL;
             }
         } else {
             if (expat->sdata) {
                 expat->sdata->inuse--;
-                tDOM_schemaReset (expat->sdata, 1);
+                tDOM_schemaReset (expat->sdata);
                 expat->sdata = NULL;
             }                
             if (!Tcl_GetCommandInfo(interp, schemacmd, &cmdInfo)) {
@@ -2142,7 +2233,7 @@ static int
 TclExpatGet (
     Tcl_Interp *interp,
     TclGenExpatInfo *expat,
-    int objc,
+    int UNUSED(objc),
     Tcl_Obj *const objv[]
 )
 {
@@ -2164,6 +2255,7 @@ TclExpatGet (
   int switchIndex;
   Tcl_Obj *resultPtr;
 
+  /* objc is already checked by caller */
   if (Tcl_GetIndexFromObj(interp, objv[0], getSwitches,
 			  "switch", 0, &switchIndex) != TCL_OK) {
     return TCL_ERROR;
@@ -2184,12 +2276,12 @@ TclExpatGet (
 
     case EXPAT_CURRENTLINENUMBER:
 
-      Tcl_SetIntObj(resultPtr, XML_GetCurrentLineNumber(expat->parser));
+      Tcl_SetLongObj(resultPtr, XML_GetCurrentLineNumber(expat->parser));
       break;
 
     case EXPAT_CURRENTCOLUMNNUMBER:
 
-      Tcl_SetIntObj(resultPtr, XML_GetCurrentColumnNumber(expat->parser));
+      Tcl_SetLongObj(resultPtr, XML_GetCurrentColumnNumber(expat->parser));
       break;
 
     case EXPAT_CURRENTBYTEINDEX:

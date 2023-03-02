@@ -40,19 +40,6 @@
 #include <tcl.h>
 #include <nodecmd.h>
 
-#define PARSER_NODE 9999 /* Hack so that we can invoke XML parser */
-/* More hacked domNodeTypes - used to signal, that we want to check
-   name/data of the node to create. */
-#define ELEMENT_NODE_ANAME_CHK 10000
-#define ELEMENT_NODE_AVALUE_CHK 10001
-#define ELEMENT_NODE_CHK 10002
-#define TEXT_NODE_CHK 10003
-#define COMMENT_NODE_CHK 10004
-#define CDATA_SECTION_NODE_CHK 10005
-#define PROCESSING_INSTRUCTION_NODE_NAME_CHK 10006
-#define PROCESSING_INSTRUCTION_NODE_VALUE_CHK 10007
-#define PROCESSING_INSTRUCTION_NODE_CHK 10008
-
 /*----------------------------------------------------------------------------
 |   Types
 |
@@ -90,25 +77,17 @@ typedef struct NodeInfo {
     char *tagName;
 } NodeInfo;
 
-#ifndef TCL_THREADS
-  static CurrentStack dataKey;
-# define TSDPTR(a) a
-#else
-  static Tcl_ThreadDataKey dataKey;
-# define TSDPTR(a) (CurrentStack*)Tcl_GetThreadData((a),sizeof(CurrentStack))
-#endif
-
 /*----------------------------------------------------------------------------
 |   Forward declarations
 |
 \---------------------------------------------------------------------------*/
-static void * StackPush  (void *);
-static void * StackPop   (void);
-static void * StackTop   (void);
-static int    NodeObjCmd (ClientData,Tcl_Interp*,int,Tcl_Obj *const o[]);
-static void   StackFinalize (ClientData);
+static void * StackPush  (Tcl_Interp *, void *);
+static void * StackPop   (Tcl_Interp *);
+static void * StackTop   (Tcl_Interp *);
+static int    NodeObjCmd (ClientData, Tcl_Interp *, int, Tcl_Obj *const o[]);
+static void   StackFinalize (ClientData, Tcl_Interp *);
 
-extern int tcldom_appendXML (Tcl_Interp*, domNode*, Tcl_Obj*);
+extern int tcldom_appendXML (Tcl_Interp *, domNode *, Tcl_Obj *);
 
 
 /*----------------------------------------------------------------------------
@@ -117,18 +96,22 @@ extern int tcldom_appendXML (Tcl_Interp*, domNode*, Tcl_Obj*);
 \---------------------------------------------------------------------------*/
 static void *
 StackPush (
+    Tcl_Interp *interp,
     void *element
 ) {
     StackSlot *newElement;
-    CurrentStack *tsdPtr = TSDPTR(&dataKey);
+    CurrentStack *csPtr =
+	(CurrentStack *) Tcl_GetAssocData(interp, "tdom_stk", NULL);
+
+    /* nodecmd_init() initialize "tdom_stk", so csPtr never will be NULL. */
 
     /*-------------------------------------------------------------------
     |   Reuse already allocated stack slots, if any
     |
     \------------------------------------------------------------------*/
-    if (tsdPtr->currentSlot && tsdPtr->currentSlot->nextPtr) {
-        tsdPtr->currentSlot = tsdPtr->currentSlot->nextPtr;
-        tsdPtr->currentSlot->element = element;
+    if (csPtr->currentSlot && csPtr->currentSlot->nextPtr) {
+        csPtr->currentSlot = csPtr->currentSlot->nextPtr;
+        csPtr->currentSlot->element = element;
         return element;
     }
 
@@ -136,23 +119,18 @@ StackPush (
     |   Allocate new stack slot
     |
     \------------------------------------------------------------------*/
-    newElement = (StackSlot *)MALLOC(sizeof(StackSlot));
+    newElement = (StackSlot *) MALLOC(sizeof(StackSlot));
     memset(newElement, 0, sizeof(StackSlot));
 
-    if (tsdPtr->elementStack == NULL) {
-        tsdPtr->elementStack = newElement;
-#ifdef TCL_THREADS
-        Tcl_CreateThreadExitHandler(StackFinalize, tsdPtr->elementStack);
-#else
-        Tcl_CreateExitHandler (StackFinalize, tsdPtr->elementStack);
-#endif
+    if (csPtr->elementStack == NULL) {
+        csPtr->elementStack = newElement;
     } else {
-        tsdPtr->currentSlot->nextPtr = newElement;
-        newElement->prevPtr = tsdPtr->currentSlot;
+        csPtr->currentSlot->nextPtr = newElement;
+        newElement->prevPtr = csPtr->currentSlot;
     }
 
-    tsdPtr->currentSlot = newElement;
-    tsdPtr->currentSlot->element = element;
+    csPtr->currentSlot = newElement;
+    csPtr->currentSlot->element = element;
 
     return element;
 }
@@ -162,16 +140,17 @@ StackPush (
 |
 \---------------------------------------------------------------------------*/
 static void *
-StackPop (void)
+StackPop (Tcl_Interp *interp)
 {
     void *element;
-    CurrentStack *tsdPtr = TSDPTR(&dataKey);
+    CurrentStack *csPtr =
+	(CurrentStack *) Tcl_GetAssocData(interp, "tdom_stk", NULL);
 
-    element = tsdPtr->currentSlot->element;
-    if (tsdPtr->currentSlot->prevPtr) {
-        tsdPtr->currentSlot = tsdPtr->currentSlot->prevPtr;
+    element = csPtr->currentSlot->element;
+    if (csPtr->currentSlot->prevPtr) {
+        csPtr->currentSlot = csPtr->currentSlot->prevPtr;
     } else {
-        tsdPtr->currentSlot->element = NULL;
+        csPtr->currentSlot->element = NULL;
     }
 
     return element;
@@ -182,15 +161,16 @@ StackPop (void)
 |
 \---------------------------------------------------------------------------*/
 static void *
-StackTop (void)
+StackTop (Tcl_Interp *interp)
 {
-    CurrentStack *tsdPtr = TSDPTR(&dataKey);
+    CurrentStack *csPtr =
+	(CurrentStack *) Tcl_GetAssocData(interp, "tdom_stk", NULL);
 
-    if (tsdPtr->currentSlot == NULL) {
+    if (csPtr->currentSlot == NULL) {
         return NULL;
     }
 
-    return tsdPtr->currentSlot->element;
+    return csPtr->currentSlot->element;
 }
 
 
@@ -200,15 +180,18 @@ StackTop (void)
 \---------------------------------------------------------------------------*/
 static void
 StackFinalize (
-    ClientData clientData
+    ClientData clientData,
+    Tcl_Interp *UNUSED(interp)
 ) {
-    StackSlot *tmp, *stack = (StackSlot *)clientData;
+    CurrentStack *csPtr = (CurrentStack *) clientData;
+    StackSlot *tmp, *stack = csPtr->elementStack;
 
     while (stack) {
         tmp = stack->nextPtr;
-        FREE((char*)stack);
+        FREE((char *) stack);
         stack = tmp;
     }
+    FREE((char *) csPtr);
 }
 
 /*
@@ -272,6 +255,74 @@ NodeObjCmdDeleteProc (
 }
 
 /*----------------------------------------------------------------------------
+|   nodecmd_processAttributes
+|
+\---------------------------------------------------------------------------*/
+int
+nodecmd_processAttributes (
+    Tcl_Interp *interp,
+    domNode *node,
+    int type,
+    int             objc,
+    Tcl_Obj *const  objv[],
+    Tcl_Obj **cmdObj
+    )
+{
+    Tcl_Obj **opts;
+    int len, i;
+    char *tval, *aval;
+    
+    /*
+     * Allow for following syntax:
+     *   cmd ?-option value ...? ?script?
+     *   cmd ?opton value ...? ?script?
+     *   cmd key_value_list script
+     *       where list contains "-key value ..." or "key value ..."
+     */
+
+    if ((objc % 2) == 0) {
+        *cmdObj = objv[objc-1];
+        len  = objc - 2; /* skip both command and script */
+        opts = (Tcl_Obj**)objv + 1;
+    } else if((objc == 3)
+              && Tcl_ListObjGetElements(interp,objv[1],&len,&opts)==TCL_OK
+              && (len == 0 || len > 1)) {
+        if ((len % 2)) {
+            Tcl_AppendResult(interp, "list must have "
+                             "an even number of elements", NULL);
+            return TCL_ERROR;
+        }
+        *cmdObj = objv[2];
+    } else {
+        cmdObj = NULL;
+        len  = objc - 1; /* skip command */
+        opts = (Tcl_Obj**)objv + 1;
+    }
+    for (i = 0; i < len; i += 2) {
+        tval = Tcl_GetString(opts[i]);
+        if (*tval == '-') {
+            tval++;
+        }
+        if (abs(type) == ELEMENT_NODE_ANAME_CHK
+            || abs(type) == ELEMENT_NODE_CHK) {
+            if (!tcldom_nameCheck (interp, tval, "attribute", 0)) {
+                return TCL_ERROR;
+            }
+        }
+        aval = Tcl_GetString(opts[i+1]);
+        if (abs(type) == ELEMENT_NODE_AVALUE_CHK
+            || abs(type) == ELEMENT_NODE_CHK) {
+            if (!tcldom_textCheck (interp, aval, "attribute")) {
+                return TCL_ERROR;
+            }
+        }
+        domSetAttribute(node, tval, aval);
+    }
+    return TCL_OK;
+}
+
+
+/*----------------------------------------------------------------------------
 |   NodeObjCmd
 |
 \---------------------------------------------------------------------------*/
@@ -282,13 +333,13 @@ NodeObjCmd (
     int             objc,               /* Number of arguments. */
     Tcl_Obj *const  objv[]             /* Argument objects. */
 ) {
-    int type, createType, len, dlen, i, ret, disableOutputEscaping = 0, 
+    int type, createType, len, dlen, ret, disableOutputEscaping = 0, 
         index = 1;
     char *tag, *p, *tval, *aval;
     domNode *parent, *newNode = NULL;
     domTextNode *textNode = NULL;
     domDocument *doc;
-    Tcl_Obj *cmdObj, **opts;
+    Tcl_Obj *cmdObj;
     NodeInfo *nodeInfo = (NodeInfo*) arg;
 
     /*------------------------------------------------------------------------
@@ -297,7 +348,7 @@ NodeObjCmd (
     |
     \-----------------------------------------------------------------------*/
 
-    parent = (domNode *)StackTop();    
+    parent = (domNode *) StackTop(interp);
     if (parent == NULL) {
         Tcl_AppendResult(interp, "called outside domNode context", NULL);
         return TCL_ERROR;
@@ -416,52 +467,11 @@ NodeObjCmd (
 
         newNode = domAppendNewElementNode (parent, tag, nodeInfo->namespace);
         newNode->info = nodeInfo->jsonType;
-        
-        /*
-         * Allow for following syntax:
-         *   cmd ?-option value ...? ?script?
-         *   cmd ?opton value ...? ?script?
-         *   cmd key_value_list script
-         *       where list contains "-key value ..." or "key value ..."
-         */
 
-        if ((objc % 2) == 0) {
-            cmdObj = objv[objc-1];
-            len  = objc - 2; /* skip both command and script */
-            opts = (Tcl_Obj**)objv + 1;
-        } else if((objc == 3)
-                  && Tcl_ListObjGetElements(interp,objv[1],&len,&opts)==TCL_OK
-                  && (len == 0 || len > 1)) {
-            if ((len % 2)) {
-                Tcl_AppendResult(interp, "list must have "
-                                 "an even number of elements", NULL);
-                return TCL_ERROR;
-            }
-            cmdObj = objv[2];
-        } else {
-            cmdObj = NULL;
-            len  = objc - 1; /* skip command */
-            opts = (Tcl_Obj**)objv + 1;
-        }
-        for (i = 0; i < len; i += 2) {
-            tval = Tcl_GetString(opts[i]);
-            if (*tval == '-') {
-                tval++;
-            }
-            if (abs(type) == ELEMENT_NODE_ANAME_CHK
-                || abs(type) == ELEMENT_NODE_CHK) {
-                if (!tcldom_nameCheck (interp, tval, "attribute", 0)) {
-                    return TCL_ERROR;
-                }
-            }
-            aval = Tcl_GetString(opts[i+1]);
-            if (abs(type) == ELEMENT_NODE_AVALUE_CHK
-                || abs(type) == ELEMENT_NODE_CHK) {
-                if (!tcldom_textCheck (interp, aval, "attribute")) {
-                    return TCL_ERROR;
-                }
-            }
-            domSetAttribute(newNode, tval, aval);
+        cmdObj = NULL;
+        if (nodecmd_processAttributes (interp, newNode, type, objc, objv,
+                                         &cmdObj) != TCL_OK) {
+            return TCL_ERROR;
         }
         if (cmdObj) {
             ret = nodecmd_appendFromScript(interp, newNode, cmdObj);
@@ -780,23 +790,29 @@ nodecmd_appendFromScript (
     domNode    *node,                  /* Parent dom node */
     Tcl_Obj    *cmdObj                 /* Argument objects. */
 ) {
-    int ret;
+    int ret, insideEval;
     domNode *oldLastChild, *child, *nextChild;
-
+    domDocument *doc;
+    
     if (node->nodeType != ELEMENT_NODE) {
         Tcl_SetResult (interp, "NOT_AN_ELEMENT : can't append nodes", NULL);
         return TCL_ERROR;
     }
     
+    doc = node->ownerDocument;
     oldLastChild = node->lastChild;
 
-    StackPush((void *)node);
+    StackPush(interp, (void *) node);
+    insideEval = (doc->nodeFlags & INSIDE_FROM_SCRIPT);
+    if (!insideEval) {
+        doc->nodeFlags |= INSIDE_FROM_SCRIPT;
+    }
     Tcl_AllowExceptions(interp);
     ret = Tcl_EvalObjEx(interp, cmdObj, 0);
     if (ret != TCL_ERROR) {
         Tcl_ResetResult(interp);
     }
-    StackPop();
+    StackPop(interp);
 
     if (ret == TCL_ERROR) {
         if (oldLastChild) {
@@ -817,7 +833,15 @@ nodecmd_appendFromScript (
             node->lastChild = NULL;
         }
     }
-            
+
+    if (!insideEval) {
+        /* Top level reached */
+        node->ownerDocument->nodeFlags &= ~INSIDE_FROM_SCRIPT;
+        if (doc->nodeFlags & DELETE_AFTER_FROM_SCRIPT) {
+            tcldom_deleteDoc(interp, doc);
+            return TCL_BREAK;
+        }
+    }
     return (ret == TCL_BREAK) ? TCL_OK : ret;
 }
 
@@ -848,7 +872,7 @@ nodecmd_insertBeforeFromScript (
     Tcl_Interp *interp,                 /* Current interpreter. */
     domNode    *node,                   /* Parent dom node */
     Tcl_Obj    *cmdObj,                 /* Argument objects. */
-    domNode    *refChild                /* Insert new childs before this
+    domNode    *refChild                /* Insert new children before this
                                          * node; may be NULL */
 ) {
     int      ret;
@@ -917,11 +941,22 @@ nodecmd_insertBeforeFromScript (
 |
 \---------------------------------------------------------------------------*/
 
-void *
-nodecmd_currentNode(void)
+domNode *
+nodecmd_currentNode(Tcl_Interp *interp)
 {
-    return StackTop();
+    return StackTop(interp);
 }
+
+
+void
+nodecmd_init (Tcl_Interp *interp) 
+{
+    CurrentStack *csPtr = (CurrentStack *) MALLOC(sizeof(CurrentStack));
+    csPtr->elementStack = NULL;
+    csPtr->currentSlot = NULL;
+    Tcl_SetAssocData(interp, "tdom_stk", StackFinalize, (ClientData) csPtr);
+}
+
 
 /* EOF $RCSfile $ */
 

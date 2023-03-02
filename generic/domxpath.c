@@ -215,9 +215,9 @@ typedef enum {
 
     f_unknown = 1,
     f_boolean, f_ceiling, f_concat, f_contains, f_count, f_false, f_floor,
-    f_generateId, f_id, f_lang, f_last, f_localName, f_name, f_namespaceUri,
-    f_normalizeSpace, f_not, f_number, f_position, f_round, f_startsWith,
-    f_string, f_stringLength, f_substring, f_substringAfter,
+    f_generateId, f_id, f_lang, f_last, f_laststring, f_localName, f_name,
+    f_namespaceUri, f_normalizeSpace, f_not, f_number, f_position, f_round,
+    f_startsWith, f_string, f_stringLength, f_substring, f_substringAfter,
     f_substringBefore, f_sum, f_translate, f_true, f_unparsedEntityUri,
     f_fqfunction
 
@@ -946,7 +946,8 @@ static XPathTokens xpathLexer (
                            break;
                        }
                        /* DOT followed by digit, i.e. a REAL.
-                          Handled by default. Fall throu */
+                          Handled by default. */
+                       /* fall through */
 
             default:   if ( isNCNameStart (&xpath[i])) {
                            ps = &(xpath[i]);
@@ -1265,9 +1266,11 @@ getFunctionTag (char *funcName)
         break;
     case 'i':
         if (strcmp (funcName, "id")==0) return f_id;
+        break;
     case 'l':
         if (strcmp (funcName, "lang")==0) return f_lang;
         else if (strcmp (funcName, "last")==0) return f_last;
+        else if (strcmp (funcName, "laststring")==0) return f_laststring;
         else if (strcmp (funcName, "local-name")==0) return f_localName;
         break;
     case 'n':
@@ -1808,6 +1811,7 @@ static int usesPositionInformation ( ast a) {
         if (a->type == ExecFunction 
             && (a->intvalue == f_position
                 || a->intvalue == f_last
+                || a->intvalue == f_laststring
                 || a->intvalue == f_unknown)) {
             return 1;
         }
@@ -3037,6 +3041,7 @@ xpathEvalFunction (
     case f_string:
     case f_normalizeSpace:
     case f_stringLength:
+    case f_laststring:
         xpathRSInit (&leftResult);
         if (step->child == NULL) {
             /*  no parameter, the context node is the nodeset to
@@ -3058,10 +3063,23 @@ xpathEvalFunction (
                 )
         }
 
-        leftStr = xpathFuncString (&leftResult );
+        if (step->intvalue == f_laststring) {
+            if (leftResult.type == xNodeSetResult) {
+                if (leftResult.nr_nodes == 0) {
+                    leftStr = tdomstrdup ("");
+                } else {
+                    leftStr = xpathGetStringValue (
+                        leftResult.nodes[leftResult.nr_nodes-1], &len);
+                }
+            } else {
+                leftStr = xpathFuncString (&leftResult );
+            }
+        } else {
+            leftStr = xpathFuncString (&leftResult );
+        }
         xpathRSFree( &leftResult );
         DBG(fprintf(stderr, "leftStr='%s'\n", leftStr);)
-        if      (step->intvalue == f_string)
+        if (step->intvalue == f_string)
             rsSetString (result, leftStr);
         else if (step->intvalue == f_stringLength) {
             pto = leftStr;
@@ -3744,7 +3762,7 @@ xpathEvalFunction (
             Tcl_DStringFree (&dStr);
             return XPATH_EVAL_ERR;
         }
-        /* fall throu */
+        /* fall through */
            
     default:
         if (cbs->funcCB == NULL) {
@@ -3933,7 +3951,8 @@ static int xpathEvalStep (
             break;
         }
         /* without following Pred step, // is the same as 
-           AxisDescendantOrSelf, fall throu */
+           AxisDescendantOrSelf */
+        /* fall through */
 
     case AxisDescendantLit:
     case AxisDescendantOrSelfLit:
@@ -4414,7 +4433,7 @@ static int xpathEvalStep (
                 switch (step->type) {
                 case Subtract:
                     NaN1 = -1 * NaN1;
-                    /* fall throu */   
+                    /* fall through */   
                 case Add:
                     if (NaN == NaN1) {
                         if (NaN == 1) rsSetInf (result);
@@ -4482,10 +4501,10 @@ static int xpathEvalStep (
             if ((int)dRight == 0) {
                 rsSetNaN (result);
             } else {
-                if (dRight < LONG_MIN - 0.1
-                    || dRight > LONG_MAX + 0.1
-                    || dLeft < LONG_MIN - 0.1
-                    || dLeft > LONG_MAX + 0.1) {
+                if (dRight < (double)LONG_MIN - 0.1
+                    || dRight > (double)LONG_MAX + 0.1
+                    || dLeft < (double)LONG_MIN - 0.1
+                    || dLeft > (double)LONG_MAX + 0.1) {
                     rsSetNaN (result);
                 } else {
                     rsSetInt  (result, ((long)dLeft) % ((long)dRight));

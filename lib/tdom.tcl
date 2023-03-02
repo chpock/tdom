@@ -1006,6 +1006,7 @@ foreach ::tdom::cmd {
     xmlReadFileForSimple
     extRefHandler
     baseURL
+    IANAEncoding2TclEncoding
 } {
     interp alias {} tDOM::$::tdom::cmd {} tdom::$::tdom::cmd
 }

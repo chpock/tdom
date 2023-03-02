@@ -153,7 +153,7 @@ domLocksDetach(domDocument *doc)
 |
 \---------------------------------------------------------------------------*/
 void
-domLocksFinalize(ClientData dummy)
+domLocksFinalize(ClientData UNUSED(dummy))
 {
     domlock *tmp, *dl;
 

@@ -225,19 +225,28 @@ rename $document ""
 .PP
 The valid options are:
 .IP "\fB-simple\fR"
-If \fI-simple\fR is
-specified, a simple but fast parser is used (conforms not fully to XML
-recommendation). That should double parsing and DOM generation speed. The
-encoding of the data is not transformed inside the parser. The simple parser
-does not respect any encoding information in the XML declaration. It skips over
-the internal DTD subset and ignores any information in it. Therefore it doesn't
-include defaulted attribute values into the tree, even if the according
-attribute declaration is in the internal subset. It also doesn't expand
-internal or external entity references other than the predefined entities and
-character references.
+If \fI-simple\fR is specified, a simple but
+fast parser is used (conforms not fully to XML
+recommendation). That should double parsing and DOM
+generation speed. The encoding of the data is not
+transformed inside the parser. The simple parser does
+not respect any encoding information in the XML
+declaration. It skips over the internal DTD subset and
+ignores any information in it. Therefore, it doesn't
+include defaulted attribute values into the tree, even
+if the according attribute declaration is in the
+internal subset. It also doesn't expand internal or
+external entity references other than the predefined
+entities and character references
 .IP "\fB-html\fR"
-If \fI-html\fR is specified, a fast HTML parser is
-used, which tries to even parse badly formed HTML into a DOM tree.
+If \fI-html\fR is specified, a fast HTML parser
+is used, which tries to even parse badly formed HTML
+into a DOM tree. If the HTML document given to parse
+does not have a single root element (as it was legal
+up to HTML 4.01) and the -forest option is not used
+then a html node will be inserted as document element,
+with the HTML input data top level elements as
+children.
 .IP "\fB-html5\fR"
 This option is only available if tDOM was build
 with --enable-html5. Try the \fIfeatureinfo\fR method
@@ -286,8 +295,8 @@ allow.
 .IP "\fB-jsonroot <document element name>\fR"
 If given makes the given element name the
 document element of the resulting doc. The parsed
-content of the JSON string will be the childs of this
-document element node.
+content of the JSON string will be the children of
+this document element node.
 .IP "\fB-jsonmaxnesting  \fIinteger\fP\fR"
 This option only has effect if used together
 with the \fI-json\fR option. The current
@@ -331,13 +340,13 @@ resolved relative to this base URI. This base URI is
 also stored within the DOM tree.
 .IP "\fB-feedbackAfter  \fI<#bytes>\fP\fR"
 If \fI-feedbackAfter <#bytes>\fR is
-specified, the tcl command given by
+specified, the Tcl command given by
 \&\fI-feedbackcmd\fR is evaluated at the first element
 start within the document (or an external entity)
 after the start of the document or external entity or
 the last such call after #bytes. For backward
 compatibility if no -feedbackcmd is given but there is
-a tcl proc named ::dom::domParseFeedback this proc is
+a Tcl proc named ::dom::domParseFeedback this proc is
 used as -feedbackcmd. If there isn't such a proc and
 -feedbackAfter is used it is an error to not also use
 -feedbackcmd. If the called script raises error, then
@@ -361,27 +370,30 @@ error msg as error msg. If the called script \fIreturn
 parse\fR call will return the empty string.
 .IP "\fB-externalentitycommand  \fI<script>\fP\fR"
 If \fI-externalentitycommand <script>\fR is
-specified, the specified tcl script is called to resolve any external entities
+specified, the specified Tcl script is called to resolve any external entities
 of the document. The actual evaluated command consists of this option followed
 by three arguments: the base uri, the system identifier of the entity and the
 public identifier of the entity. The base uri and the public identifier may be
-the empty list. The script has to return a tcl list consisting of three
+the empty list. The script has to return a Tcl list consisting of three
 elements. The first element of this list signals how the external entity is
 returned to the processor. Currently the two allowed types are "string"
 and "channel". The second element of the list has to be the (absolute) base URI
 of the external entity to be parsed.  The third element of the list are data,
 either the already read data out of the external entity as string in the case
-of type "string", or the name of a tcl channel, in the case of type
-"channel". Note that if the script returns a tcl channel, it will not be closed
+of type "string", or the name of a Tcl channel, in the case of type
+"channel". Note that if the script returns a Tcl channel, it will not be closed
 by the processor.  It must be closed separately if it is no longer
 needed.
 .IP "\fB-useForeignDTD  \fI<boolean>\fP\fR"
-If <boolean> is true and the document does not have
-an external subset, the parser will call the -externalentitycommand script with
-empty values for the systemId and publicID arguments. Please note that if
-the document also doesn't have an internal subset, the
--startdoctypedeclcommand and -enddoctypedeclcommand scripts, if set, are not
-called. The \fI-useForeignDTD\fR respects
+If
+<boolean> is true and the document does not have
+an external subset, the parser will call the
+-externalentitycommand script with empty values for
+the systemId and publicID arguments. Please note that
+if the document also doesn't have an internal subset,
+the -startdoctypedeclcommand and
+-enddoctypedeclcommand scripts, if set, are not
+called.
 .IP "\fB-paramentityparsing  \fI<always|never|notstandalone>\fP\fR"
 The \fI-paramentityparsing\fR option controls,
 if the parser tries to resolve the external entities
@@ -400,6 +412,14 @@ subset) will be resolved and parsed. The value
 be resolved and parsed, with the exception of
 documents, which explicitly states standalone="yes" in
 their XML declaration.
+.IP "\fB-forest\fR"
+If this option is given, there is no need for a
+single root; any sequence of well-formed, balanced
+subtrees will be parsed into a DOM tree. This works
+for the expat DOM builder, the simple xml parser
+enabled with \fI-simple\fR and the simple HTML parser
+enabled -with \fI-html\fR. If used together with
+\&\fI-json\fR or \fI-html5\fR this option is ignored.
 .IP "\fB-ignorexmlns\fR"
 It is recommended, that you only use this option
 with the \fI-html5\fR option. If this option is
@@ -420,6 +440,34 @@ described in the documentation of the of the
 \&\fBdomNode
 \&\fR command method
 \&\fB>selectNodes\fP.
+.IP "\fB-billionLaughsAttackProtectionMaximumAmplification  \fI<float>\fP\fR"
+.UR "https://en.wikipedia.org/wiki/Billion_laughs_attack"
+<URL: https://en.wikipedia.org/wiki/Billion_laughs_attack>
+.UE
+This option together with
+\&\fI-billionLaughsAttackProtectionActivationThreshold\fR
+gives control over the parser limits that protects
+against billion laugh attacks
+().
+This option expects a float >= 1.0 as argument. You
+should never need to use this option, because the
+default value (100.0) should work for any real data.
+If you ever need to increase this value for non-attack
+payload, please report.
+.IP "\fB-billionLaughsAttackProtectionActivationThreshold  \fI<long>\fP\fR"
+.UR "https://en.wikipedia.org/wiki/Billion_laughs_attack"
+<URL: https://en.wikipedia.org/wiki/Billion_laughs_attack>
+.UE
+This option together with
+\&\fI-billionLaughsAttackProtectionMaximumAmplification\fR
+gives control over the parser limits that protects
+against billion laugh attacks
+().
+This option expects a positiv integer as argument. You
+should never need to use this option, because the
+default value (8388608) should work for any real data.
+If you ever need to increase this value for non-attack
+payload, please report.
 .PP
 .RE
 .TP
@@ -447,7 +495,7 @@ a command created with \fIcreateNodeCmd\fR is invoked in
 any other context, it will return error. The created command
 \&\fIcommandName\fR replaces any existing command or
 procedure with that name. If the \fIcommandName\fR includes
-any namespace qualifiers, it is created in the specified
+any Tcl namespace qualifiers, it is created in the specified
 namespace. The \fI-tagName\fR option is only allowed for
 the elementNode type. The \fI-jsonType\fR option is only
 allowed for elementNode and textNode types.
@@ -467,14 +515,14 @@ command depends on the type of the node it creates.
 If the command type to create is \fIelementNode\fR, the created
 command will create an element node, if called. Without the
 \&\fI-tagName\fR option the tag name of the created node is
-\&\fIcommandName\fR without namespace qualifiers. If the
-\&\fI-tagName\fR option was given then the created command the created
-elements will have this tag name. If the \fI-jsonType\fR option was
-given then the created node elements will have the given JSON type. If
-the \fI-namespace\fR option is given the created element node will be
-XML namespaced and in the namespace given by the option. The element
-name will be literal as given either by the command name or the
-\&\fI-tagname\fR option, if that was given. An appropriate XML
+\&\fIcommandName\fR without Tcl namespace qualifiers. If the
+\&\fI-tagName\fR option was given then the created elements will have
+the value of this option as tag name. If the \fI-jsonType\fR option
+was given then the created node elements will have the given JSON
+type. If the \fI-namespace\fR option is given the created element
+node will be XML namespaced and in the namespace given by the option.
+The element name will be literal as given either by the command name
+or the \fI-tagname\fR option, if that was given. An appropriate XML
 namespace declaration will be automatically added, to bind the prefix
 (if the element name has one) or the default namespace (if the element
 name hasn't a prefix) to the namespace if such a binding isn't in
@@ -546,6 +594,42 @@ command is:
 \&\fBpiNodeCmd\fP \fItarget data\fR
 
 .CE
+.PP
+Beside the with \fBdom\fP \fBcreateNodeCmd\fP calls
+created node commands there are two more commands which automatically
+insert nodes into the tree inside an \fBappendFromScript\fP
+script.
+
+
+
+.CS
+
+\&\fBtdom::fsnewNode\fP \fI?-jsonType <jsonType>?\fR \fI?-namespace <namespace>?\fR \fItagName\fR \fI?attributes?\fR \fI?script?\fR
+
+.CE
+.PP
+If called inside a fromScript context this command creates a new
+node \fItagName\fR in the XML namespace \fInamespace\fR if the
+\&\fI-namespace\fR option was given and with the JSON type
+\&\fIjsonType\fR if the \fI-jsonType\fR option was given and appends
+this node at the end of the child list of the invoking element node.
+The \fIattributes\fR and \fIscript\fR arguments will be processed as
+if given to an element creating node command. If called outside a
+fromScript context this command will raise error.
+
+
+
+.CS
+
+\&\fBtdom::fsinsertNode\fP \fInode\fR
+
+.CE
+.PP
+If called inside o fromScript context this comannd instead of
+creating a new node appends the as argument given node at the end of
+the child list of the invoking element node. The node is unlinked from
+its previous place. If called outside a fromScript context this
+command will raise error.
 .RE
 .TP
 \&\fB\fBdom\fP \fBsetStoreLineColumn\fP \fI?boolean\fB?
@@ -576,12 +660,12 @@ command will check its arguments, otherwise not.The
 TextCheck flag state. The default state for TextCheck is true.
 .TP
 \&\fB\fBdom\fP \fBsetObjectCommands\fP ?\fI(automatic|token|command)\fB?
-\&\fRControls if documents and nodes are created as tcl commands or
+\&\fRControls if documents and nodes are created as Tcl commands or
 as token to be
 used with the domNode and domDoc commands. If the mode is
-\&'automatic', then methods used at tcl commands will create tcl
+\&'automatic', then methods used at Tcl commands will create Tcl
 commands and methods used at doc or node tokes will create tokens. If
-the mode is 'command' then always tcl commands will be created. If
+the mode is 'command' then always Tcl commands will be created. If
 the mode is 'token', then always token will be created. The method
 returns the current mode. This method is an experimental interface.
 .TP
@@ -671,7 +755,7 @@ Returns as boolean if build with
 Returns as boolean if build with
 \&\fI--enable-lessns\fR.
 .IP "\fBTCL_UTF_MAX\fR"
-Returns the TCL_UTF_MAX value of the tcl
+Returns the TCL_UTF_MAX value of the Tcl
 core, tDOM was build with as integer
 .IP "\fBhtml5\fR"
 Returns as boolean, if build with

@@ -542,7 +542,7 @@ reportError (
     Tcl_DString dStr;
     char buffer[1024];
     const char *baseURI;
-    long  line, column;
+    long  line, column, byteIndex;
 
     Tcl_DStringInit (&dStr);
     baseURI = findBaseURI (node);
@@ -551,7 +551,7 @@ reportError (
         Tcl_DStringAppend (&dStr, baseURI, -1);
     }
     if (node->nodeFlags & HAS_LINE_COLUMN) {
-        domGetLineColumn (node, &line, &column);
+        domGetLineColumn (node, &line, &column, &byteIndex);
         sprintf (buffer, " at line %ld, column %ld:\n", line, column);
         Tcl_DStringAppend (&dStr, buffer, -1);
         Tcl_DStringAppend (&dStr, str, -1);
@@ -5690,6 +5690,8 @@ getExternalDocument (
     XML_Parser    parser;
     Tcl_Channel   chan;
     Tcl_DString   dStr;
+    domParseForestErrorData forestError;
+    
     
     if (isStylesheet && (href[0] == '\0')) {
         *errMsg = tdomstrdup("Recursive import/include: stylesheet tries "
@@ -5793,12 +5795,12 @@ getExternalDocument (
     /* keep white space, no fiddling with the encoding (is this
        a good idea?) */
     doc = domReadDocument (parser, xmlstring, len, 0, 0, storeLineColumn,
-                           0, 0, NULL, chan, extbase, extResolver, 0, 
+                           0, 0, NULL, chan, extbase, extResolver, 0, 0,
                            (int) XML_PARAM_ENTITY_PARSING_ALWAYS,
 #ifndef TDOM_NO_SCHEMA
                            NULL,
 #endif
-                           interp, &resultcode);
+                           interp, &forestError, &resultcode);
     if (xsltDoc->extResolver) {
         Tcl_DecrRefCount (extResolver);
     }

@@ -59,7 +59,6 @@
 \---------------------------------------------------------------------------*/
 #define DBG(x)          
 #define RetError(m,p)   *errStr = tdomstrdup(m); *pos = p; return TCL_ERROR;
-#define SPACE(c)        ((c)==' ' || (c)=='\n' || (c)=='\t' || (c)=='\r')
 #define IsLetter(c)     ( ((c)>='A' && (c)<='Z') || ((c)>='a' && (c)<='z') || ((c) >= '0' && (c) <= '9') )
 #define TU(c)           toupper((unsigned char)c)
 
@@ -618,8 +617,9 @@ HTML_SimpleParse (
     char        *html,  /* HTML string  */
     int         *pos,   /* Index of next unparsed character in xml */
     domDocument *doc,
-    domNode     *parent_nodeOld,
+    domNode     *parent,
     int          ignoreWhiteSpaces,
+    int          forest,
     char       **errStr
 ) {
     register int   c;          /* Next character of the input file */
@@ -628,7 +628,7 @@ HTML_SimpleParse (
     int            saved;
     int            hasContent;
     domNode       *pnode;
-    domNode       *node = NULL, *parent_node = NULL;
+    domNode       *node = NULL, *parent_node = parent;
     domTextNode   *tnode;
     domAttrNode   *attrnode, *lastAttr;
     int            ampersandSeen = 0;
@@ -1389,6 +1389,9 @@ HTML_SimpleParse (
         /* we return to main node and so finished parsing */
         return TCL_OK;
     }
+    if (forest && parent_node == parent) {
+        return TCL_OK;
+    }
     RetError("Unexpected end",(x - html) );
 
 } /* HTML_SimpleParse */
@@ -1405,14 +1408,36 @@ domDocument *
 HTML_SimpleParseDocument (
     char   *html,              /* Complete text of the file being parsed  */
     int     ignoreWhiteSpaces,
+    int     forest,
     int    *pos,
     char  **errStr
 ) {
     domDocument   *doc = domCreateDoc(NULL, 0);
+    domNode *node = NULL;
+    Tcl_HashEntry *h;
+    int hnew;
+
+    if (forest) {
+        // Create umbrella tag
+        h = Tcl_CreateHashEntry(&HASHTAB(doc,tdom_tagNames), "forestroot",
+                                &hnew);
+        node = (domNode*) domAlloc(sizeof(domNode));
+        memset(node, 0, sizeof(domNode));
+        node->nodeType      = ELEMENT_NODE;
+        node->nodeName      = (char *)&(h->key);
+        node->ownerDocument = doc;
+        doc->rootNode->firstChild = node;
+        doc->rootNode->lastChild = node;
+    }
 
     *pos = 0;
-    HTML_SimpleParse (html, pos, doc, NULL, ignoreWhiteSpaces, errStr);
-
+    HTML_SimpleParse (html, pos, doc, node, ignoreWhiteSpaces, forest,
+                      errStr);
+    if (forest) {
+        doc->rootNode->firstChild = node->firstChild;
+        doc->rootNode->lastChild = node->lastChild;
+        domFree ((void*)node);
+    }
     domSetDocumentElement (doc);
     return doc;
 

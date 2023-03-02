@@ -15,6 +15,7 @@
 #    dom-10.*: createNodeCmd
 #    dom-11.*: featureinfo
 #    dom-12.*: -feedbackAfter
+#    dom-13.*: -forest
 #
 # Copyright (c) 2002, 2003, 2004 Rolf Ade.
 
@@ -678,6 +679,48 @@ test dom-2.42 {namespaces} {
     }]
     $doc delete
 } {}
+
+test dom-2.43 {billion laughs attact proctection options} {
+    set result ""
+    foreach {option value} {
+        -billionLaughsAttackProtectionMaximumAmplification foo
+        -billionLaughsAttackProtectionMaximumAmplification 0
+        -billionLaughsAttackProtectionMaximumAmplification -2.0
+        -billionLaughsAttackProtectionMaximumAmplification 23
+        -billionLaughsAttackProtectionActivationThreshold bar
+        -billionLaughsAttackProtectionActivationThreshold 0
+        -billionLaughsAttackProtectionActivationThreshold -7
+        -billionLaughsAttackProtectionActivationThreshold 2000000000
+    } {
+        lappend result [catch {
+            set doc [dom parse $option $value <doc/>]
+        }]
+        if {![lindex $result end]} {
+            $doc delete
+        }
+    }
+    set result
+} {1 1 1 0 1 1 1 0}
+
+test dom-2.44 {attribute order and XML namespace declaration} {
+    set doc [dom parse -simple {
+        <doc foo="bar" grill="bar" xmlns:p="some" bar="bar" xmlns="url">foo</doc>
+    }]
+    set root [$doc documentElement]
+    set result [$root attributeNames]
+    $doc delete
+    set result
+} {xmlns:p xmlns foo grill bar}
+
+test dom-2.45 {attribute order and XML namespace declaration} {
+    set doc [dom parse {
+        <doc foo="bar" grill="bar" xmlns:p="some" bar="bar" xmlns="url"/>
+    }]
+    set root [$doc documentElement]
+    set result [$root attributeNames]
+    $doc delete
+    set result
+} {xmlns:p xmlns foo grill bar}
 
 test dom-3.1 {isName} {
     dom isName ":foo"
@@ -1377,9 +1420,22 @@ test dom-5.9 {Wrong option after -externalentitycommand} -body {
                            -useForeignDTD foo}]
 } -result 1
 
+proc dom-5.9 {args} {
+    return [list string "" {text<one>1</one><two>2</two>more text}]
+}
+
+test dom-5.9 {-externalentitycommand - external entity is a forest} {
+    set doc [dom parse -externalentitycommand dom-5.9 \
+                 {<!DOCTYPE doc [<!ENTITY e1 PUBLIC "e1" "e1.xml">]>
+                     <doc>&e1;</doc>}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc>text<one>1</one><two>2</two>more text</doc>}
+
 test dom-6.1 {use in slave interpreter} {
     set slave [interp create]
-    load {} tdom $slave
+    load {} Tdom $slave
     interp eval $slave {
         dom parse <root>foo</root> doc
         $doc documentElement root
@@ -1389,7 +1445,7 @@ test dom-6.1 {use in slave interpreter} {
 
 test dom-6.2 {use in slave interpreter} {
     set slave [interp create]
-    load {} tdom $slave
+    load {} Tdom $slave
     interp eval $slave {
         set doc [dom parse <root>foo</root>]
         set root [$doc documentElement]
@@ -1574,7 +1630,54 @@ test dom-7.19 {setNameCheck / createDocument} {
     dom setNameCheck 1
     set result
 } {<foo bar/>}
-    
+
+test dom-7.20 {set*Check, setStoreLineColumn and setObjectCommands in child interp} {
+    set storedNameCheck [dom setNameCheck]
+    set storedTextCheck [dom setTextCheck]
+    set storedLineColumn [dom setStoreLineColumn]
+    set storedObjectCommands [dom setObjectCommands]
+    dom setNameCheck 1
+    dom setTextCheck 1
+    dom setStoreLineColumn 0
+    dom setObjectCommands command
+    interp create childinterp
+    load {} Tdom childinterp
+    childinterp eval {
+        dom setNameCheck 0
+        dom setTextCheck 0
+        dom setStoreLineColumn 1
+    }
+    set nrCommands [llength [info commands]]
+    set doc [dom parse {<doc>some</doc>}]
+    set result [expr {[llength [info commands]] - $nrCommands}]
+    lappend result [catch {$doc createElement "foo bar" node}]
+    lappend result [catch {$doc createTextNode "a\u0001z" textnode}]
+    lappend result [catch {[$doc documentElement] getLine}]
+    lappend result [catch {[$doc documentElement] getColumn}]
+    if {[catch {$doc delete}]} {
+        domDoc $doc delete
+    }
+    childinterp eval {
+        dom setObjectCommands token
+    }
+    dom setNameCheck $storedNameCheck
+    dom setTextCheck $storedTextCheck
+    dom setStoreLineColumn $storedLineColumn
+    dom setObjectCommands $storedObjectCommands
+    lappend result {*}[childinterp eval {
+        set nrCommands [llength [info commands]]
+        set doc [dom parse {<doc>some</doc>}]
+        set result [expr {[llength [info commands]] - $nrCommands}]
+        lappend result [catch {domDoc $doc createElement "foo bar" node}]
+        lappend result [catch {domDoc $doc createTextNode "a\u0001z" textnode}]
+        lappend result [catch {domNode [domDoc $doc documentElement] getLine}]
+        lappend result [catch {domNode [domDoc $doc documentElement] getColumn}]
+        domDoc $doc delete
+        set result
+    }]
+    interp delete childinterp
+    set result
+} {1 1 1 1 1 0 0 0 0 0}
 
 test dom-8.1 {createDocumentNode} {
     set result [catch {dom createDocumentNode foo bar}]
@@ -2189,6 +2292,89 @@ test dom-12.16 {-feedbackcmd setting interp result w/ invalid XML} -body {
     list $result $msg
 } -result [list 1 {error "unclosed token" at line 1 character 19
 "<doc><e1/><e1/><e1>< <--Error-- /doc"}]
+
+test dom-13.1 {-forest} -body {
+    dom parse -forest {<one>1</one><two>2</two>} doc
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} -result {<one>1</one><two>2</two>}
+
+test dom-13.2 {-forest} -body {
+    catch {dom parse -forest {<one>1</one><two>2}}
+} -result {1}
+
+test dom-13.3 {-forest} -body {
+    dom parse -forest {<one>1</one><two>2</two>some text} doc
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} -result {<one>1</one><two>2</two>some text}
+
+test dom-13.4 {-forest -channel} -setup {
+    set xmlfile [makeFile {<one>1</one><two>2</two>} dom.xml]
+} -body {
+    set fd [open $xmlfile]
+    set doc [dom parse -channel $fd -forest]
+    close $fd
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} -cleanup {
+    removeFile dom.xml
+} -result {<one>1</one><two>2</two>}
+
+test dom-13.5 {-forest -channel} -setup {
+    set xmlfile [makeFile {<one>1</one><two>2} dom.xml]
+} -body {
+    set fd [open $xmlfile]
+    set result [catch {set doc [dom parse -channel $fd -forest]} errMsg]
+    close $fd
+    list $result $errMsg
+} -cleanup {
+    removeFile dom.xml
+} -result {1 {error "asynchronous entity" at line 2 character 0}}
+
+test dom-13.6 {-forest -channel} -setup {
+    # makeFile appends a newline at end
+    set xmlfile [makeFile {<one>1</one><two>2</two>some text} dom.xml]
+} -body {
+    set fd [open $xmlfile]
+    set doc [dom parse -channel $fd -forest]
+    close $fd
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} -cleanup {
+    removeFile dom.xml
+} -result {<one>1</one><two>2</two>some text
+}
+
+test dom-13.7 {-forest} -body {
+    catch {dom parse -forest {<one>1</one><two>2<two></notopen>}}
+} -result {1}
+
+test dom-13.8 {-forest} {
+    set xml {<one><two></one>}
+    catch {dom parse $xml} errMsg1
+    catch {dom parse -forest $xml} errMsg2
+    expr {$errMsg1 eq $errMsg2}
+} {1}
+
+test dom-13.9 {-forest} {
+    catch {dom parse -forest {<one></two></one><one></two></one></wrong>}}
+} 1
+
+test dom-13.10 {-forest} {
+    set xml {<div>something</div><div>something else</div>}
+    set doc [dom parse -forest $xml]
+    set result ""
+    foreach child [$doc selectNodes /*] {
+        lappend result [$child parentNode]
+    }
+    $doc delete
+    set result
+} {{} {}}
 
 # cleanup
 ::tcltest::cleanupTests

@@ -288,35 +288,102 @@ Checks if the current validation state allows the
 given text content. It raises error if not.
 .RE
 .TP
-\&\fB\fBvalidate\fP \fI<XML string>\fB \fI?objVar?\fB
-\&\fRReturns true if the \fI<XML string>\fR is valid, or
+\&\fB\fBvalidate\fP ?\fIoptions\fB? \fI<XML string>\fB \fI?objVar?\fB
+\&\fR
+.RS
+.PP
+Returns true if the \fI<XML string>\fR is valid, or
 false, otherwise. If validation has failed and the optional
 \&\fIobjVar\fR argument is given, the variable with that
 name is set to a validation error message. If the XML string
 is valid and the optional \fIobjVar\fR argument is given,
-the variable with that name is set to the empty string.
+the variable will be untouched.
+.PP
+The valid options are:
+.IP "\fB-baseurl  \fI<baseURI>\fP\fR"
+If \fI-baseurl <baseURI>\fR is specified,
+the baseURI is used as the base URI of the document.
+External entities references in the document are
+resolved relative to this base URI. This base URI is
+also stored within the DOM tree.
+.IP "\fB-externalentitycommand  \fI<script>\fP\fR"
+If \fI-externalentitycommand <script>\fR
+is specified, the specified Tcl script is called to
+resolve any external entities of the document. The
+default is "::tdom::extRefHandler", which is a simple
+file URL resolver defined by the script part of the
+package. Setting the option value to the empty string
+disables resolving of external entities. The actual
+evaluated command consists of this option followed by
+three arguments: the base uri, the system identifier
+of the entity and the public identifier of the entity.
+The base uri and the public identifier may be the
+empty list. The script has to return a Tcl list
+consisting of three elements. The first element of
+this list signals how the external entity is returned
+to the processor. Currently the two allowed types are
+"string" and "channel". The second element of the list
+has to be the (absolute) base URI of the external
+entity to be parsed. The third element of the list are
+data, either the already read data out of the external
+entity as string in the case of type "string", or the
+name of a Tcl channel, in the case of type "channel".
+Note that if the script returns a Tcl channel, it will
+not be closed by the processor. It must be closed
+separately if it is no longer needed.
+.IP "\fB-paramentityparsing  \fI<always|never|notstandalone>\fP\fR"
+The \fI-paramentityparsing\fR option controls,
+if the parser tries to resolve the external entities
+(including the external DTD subset) of the document
+while building the DOM tree.
+\&\fI-paramentityparsing\fR requires an argument, which
+must be either "always", "never", or "notstandalone".
+The value "always" means that the parser tries to
+resolves (recursively) all external entities of the
+XML source. This is the default in case
+\&\fI-paramentityparsing\fR is omitted. The value
+"never" means that only the given XML source is
+parsed and no external entity (including the external
+subset) will be resolved and parsed. The value
+"notstandalone" means, that all external entities will
+be resolved and parsed, with the exception of
+documents, which explicitly states standalone="yes" in
+their XML declaration.
+.IP "\fB-useForeignDTD  \fI<boolean>\fP\fR"
+If <boolean> is true and the document does
+not have an external subset, the parser will call the
+-externalentitycommand script with empty values for
+the systemId and publicID arguments. Please note that
+if the document also doesn't have an internal subset,
+the -startdoctypedeclcommand and
+-enddoctypedeclcommand scripts, if set, are not
+called.
+.RE
 .TP
-\&\fB\fBvalidatefile\fP \fIfilename\fB \fI?objVar?\fB
+\&\fB\fBvalidatefile\fP ?\fIoptions\fB? \fIfilename\fB \fI?objVar?\fB
 \&\fRReturns true if the content of \fIfilename\fR is valid,
-or false, otherwise. The given file is fed as binary stream
-to expat, therefore only US-ASCII, ISO-8859-1, UTF-8 or UTF-16
+or false, otherwise. The given file is fed as binary stream to
+expat, therefore, only US-ASCII, ISO-8859-1, UTF-8 or UTF-16
 encoded data will work with this method. If validation has
 failed and the optional \fIobjVar\fR argument is given, the
 variable with that name is set to a validation error message.
-If the XML string is valid and the optional \fIobjVar\fR
-argument is given, the variable with that name is set to the
-empty string.
+If the XML data is valid and the optional \fIobjVar\fR
+argument is given, the variable will be untouched. The allowed
+options and their meaning are the same as for the
+\&\fIvalidate\fR method; see there for a description.
 .TP
-\&\fB\fBvalidatechannel\fP \fIchannel\fB \fI?objVar?\fB
+\&\fB\fBvalidatechannel\fP ?\fIoptions\fB? \fIchannel\fB \fI?objVar?\fB
 \&\fRReturns true if the content read from the Tcl channel
 \&\fIchannel\fR is valid, or false, otherwise. Since data read
 out of a Tcl channel is UTF-8 encoded, any misleading encoding
 declaration at the beginning of the data will lead to errors.
 If the validation fails and the optional \fIobjVar\fR
 argument is given, the variable with that name is set to a
-validation error message. If the XML string is valid and the
-optional \fIobjVar\fR argument is given, the variable with
-that name is set to the empty string.
+validation error message. If the XML data is valid and the
+optional \fIobjVar\fR argument is given, the variable will be
+untouched. The allowed options and their meaning are the same
+as for the \fIvalidate\fR method; see there for a
+description.
 .TP
 \&\fB\fBdomvalidate\fP \fIdomNode\fB \fI?objVar?\fB
 \&\fRReturns true if the first argument is a valid tree, or
@@ -640,15 +707,19 @@ With \fIconstraint script\fR or with a given text type
 argument a text matching this script or the text type is
 expected.
 .TP
-\&\fB\fBany\fP \fI?namespace?\fB \fI?quant?\fB
-\&\fRThe any command matches every element (in the namespace
-\&\fInamespace\fR, if that is given) (with whatever attributes)
-or subtree, no matter if known within the schema or not.
+\&\fB\fBany\fP ?\fIoptions\fB? \fI?<namespace list>?\fB \fI?quant?\fB
+\&\fRWithout arguments the any command matches every element.
+If the \fI<namespace list>\fR argument is given, this
+matches any element in a namespace out of that list. The empty
+string means elements with no namespace. If additionally the
+option \fI-not\fR is given then this maches every element
+with a namespace not in the list. The only other recognized
+option is \fI--\fR which signals the end of any options.
 Please note that in case of no \fInamespace\fR argument is
 given that means that the quantifier * and + will eat up any
 elements until the enclosing element ends. If you really have
-a namespace that looks like a valid tDOM schema quantifier
-you will have to spell out always both arguments.
+a namespace that looks like a valid tDOM schema quantifier you
+will have to spell out always both arguments.
 .TP
 \&\fB\fBattribute\fP \fIname\fB \fI?quant?\fB \fI(?<constraint script>|\*(lqtype\*(lq typename?)\fB
 \&\fRThe attribute command defines an attribute (in no
@@ -663,7 +734,7 @@ script, defining the value constraints of the attribute.
 Otherwise, if there are two more arguments and the first of
 them is the bare-word "type" the following argument is used as
 a text type name. This command is only allowed at top level in
-the definition script of an defelement/element script.
+the definition script of a defelement/element script.
 .TP
 \&\fB\fBnsattribute\fP \fIname\fB \fInamespace\fB \fI?quant?\fB \fI(?<constraint script>|\*(lqtype\*(lq typename?)\fB
 \&\fRThis command does the same as the command
@@ -682,7 +753,7 @@ empty string as \fIURI\fR means no namespace.
 This validation command is only allowed in strict sequential
 context (not in choice, mixed and interleave). If the return
 code is something else than TCL_OK, this is an error (which
-is not catched and reported by reportcmd).
+is not caught and reported by reportcmd).
 .TP
 \&\fB\fBself\fP
 \&\fRReturns the schema command.
@@ -747,7 +818,21 @@ s define {
 .CE
 .RE
 .TP
-\&\fB\fBprefixns\fP \fI?prefixUriList?\fB
+\&\fB\fBjsontype\fP \fIJSON structure type\fB
+\&\fR
+.RS
+.PP
+If not postvalidating a DOM tree with
+\&\fIdomvalidate\fR this constraint always matches. If
+postvalidating the constraint matches if the enclosing element
+has the JSON type given as argument to the structure
+constraint. The possible JSON structure types are \fINONE\fR,
+\&\fIOBJECT\fR and \fIARRAY\fR. This constraint is only
+allowed as direct child of a defelement, defelementtype or
+local element definition.
+.RE
+.TP
+\&\fB\fBprefixns\fP         \fI?prefixUriList?\fB
 \&\fRThis defines a prefix to namespace URI mapping exactly
 as a \fIschemacmd prefixns\fR would. It is meant as top-level
 command of a \fIschemacmd define\fR script. This command is
@@ -1031,6 +1116,31 @@ zeros.
 xsd:unsignedLong. This is an integer between 0 and
 18446744073709551615, both included, optionally preceded by a
 + sign and leading zeros.
+.TP
+\&\fB\fBbyte\fP
+\&\fRThis text constraint matches if the text value
+is a xsd:byte. This is an integer between -128 and
+127, both included, optionally preceded by a + or a -
+sign and leading zeros.
+.TP
+\&\fB\fBshort\fP
+\&\fRThis text constraint matches if the text value is a
+xsd:short. This is an integer between -32768 and 32767,
+both included, optionally preceded by a + or a - sign and leading
+zeros.
+.TP
+\&\fB\fBint\fP
+\&\fRThis text constraint matches if the text value
+is a xsd:int. This is an integer between -2147483648
+and 2147483647, both included, optionally preceded by
+a + or a - sign and leading zeros.
+.TP
+\&\fB\fBlong\fP
+\&\fRThis text constraint matches if the text value
+is a xsd:long. This is an integer between
+-9223372036854775808 and 9223372036854775807, both
+included, optionally preceded by a + or a - sign and
+leading zeros.
 .SS "Logical constructs"
 .TP
 \&\fB\fBoneOf\fP \fI<constraint script>\fB
@@ -1164,6 +1274,15 @@ argument.
 reference to an ID within the document. The referenced ID may
 appear later in the document, that the reference. Several
 references within the document to one ID are possible.
+.TP
+\&\fB\fBjsontype\fP \fI<JSON text type>\fB
+\&\fRIf not postvalidating a DOM tree with
+\&\fIdomvalidate\fR this constraint always matches. If
+postvalidating the current TEXT_NODE to check must have
+the JSON text type given as argument to the text
+constraint command. The possible types are \fINULL\fR,
+\&\fITRUE\fR, \fIFALSE\fR, \fISTRING\fR and
+\&\fINUMBER\fR.
 .SH "Local key constraints"
 .PP
 Document wide uniqueness and foreign key constraints are
@@ -1208,14 +1327,14 @@ validation recovers from the error and continues. For some
 validation errors the recover strategy can be determined with
 the script result of the reportcmd.
 .PP
-With a \fIreportcmd\fR (which does not throw error if
-called) the validation engine will never report validation
-failure to its caller. The validation engine recovers,
-continues, and reports the next error (if occurrin)g and so on
-until the end of the input. The schema command will return true
-and the SAX parser and DOM builder will process normally until
-the end of the input, as if there had not been a validation
-error.
+With a \fIreportcmd\fR (as long as the \fIreportcmd\fR does
+not throw error while called) the validation engine will never
+report validation failure to its caller. The validation engine
+recovers, continues, and reports the next error (if occurring)
+and so on until the end of the input. The schema command will
+return true and the SAX parser and DOM builder will process
+normally until the end of the input, as if there had not been a
+validation error.
 .PP
 Please note that this happens only for validation errors. It
 is not possible to recover from well-formedness errors. If the
@@ -1250,7 +1369,7 @@ element end event of the subtree.
 .PP
 Returning "ignore" from the recovering script in case of
 error type MISSING_ELEMENT recovers by ignoring the failed
-contraint and continues to match the event further against the
+constraint and continues to match the event further against the
 schema.
 .PP
 Returning "vanish" from the recover script in case of the
@@ -1335,7 +1454,7 @@ example schema:
     
 .CE
 .PP
-A likely one-to-one translation of that into a tDOM schema
+A simple one-to-one translation of that into a tDOM schema
 definition script would be:
 .CS
 
@@ -1365,17 +1484,17 @@ schema define {
         element city
         element state
         element zip ! {text number}
-        attribute country ! {fixed "US"}
+        attribute country {fixed "US"}
     }
 
     defelement items {
         element item * {
             element product
-            element quantity ! {text integer}
+            element quantity ! {text positiveInteger}
             element USPrice ! {text number}
             element comment
             element shipDate ? {text date}
-            attribute partNum ! {pattern "^\ed{3}-[A-Z]{2}$"}
+            attribute partNum {regexp "^\ed{3}-[A-Z]{2}$"}
         }
     }
 }

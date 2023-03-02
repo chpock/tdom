@@ -4,17 +4,17 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x5579b5f8c910">NAME</a> · <a href="#SECTid0x5579b5edbb80">SYNOPSIS</a> · <a href="#SECTid0x5579b5f83930">DESCRIPTION </a> · <a href="#SECTid0x5579b5ff2110">KEYWORDS</a>
+<a href="#SECTid0x55e7844b14c0">NAME</a> · <a href="#SECTid0x55e7844e4580">SYNOPSIS</a> · <a href="#SECTid0x55e784589850">DESCRIPTION </a> · <a href="#SECTid0x55e7845f3c00">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x5579b5f8c910">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x55e7844b14c0">NAME</a></h2><p class="namesection">
 <b class="names">dom - </b><br>Create an in-memory DOM tree from XML</p>
   
-  <h2><a name="SECTid0x5579b5edbb80">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x55e7844e4580">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">dom</b> <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
 
-  <h2><a name="SECTid0x5579b5f83930">DESCRIPTION </a></h2><p>This command provides the creation of DOM trees in memory. In
+  <h2><a name="SECTid0x55e784589850">DESCRIPTION </a></h2><p>This command provides the creation of DOM trees in memory. In
 the usual case a string containing a XML information is parsed and converted
 into a DOM tree. Other possible parse input may be HTML or JSON.
 The <i class="m">method</i> indicates a specific subcommand. </p><p>The valid methods are:</p><dl class="commandlist">
@@ -54,22 +54,31 @@ rename $document ""</pre>
 <dl class="optlist">
               
                 <dt><b>-simple</b></dt> 
-                <dd>If <i class="m">-simple</i> is
-specified, a simple but fast parser is used (conforms not fully to XML
-recommendation). That should double parsing and DOM generation speed. The
-encoding of the data is not transformed inside the parser. The simple parser
-does not respect any encoding information in the XML declaration. It skips over
-the internal DTD subset and ignores any information in it. Therefore it doesn't
-include defaulted attribute values into the tree, even if the according
-attribute declaration is in the internal subset. It also doesn't expand
-internal or external entity references other than the predefined entities and
-character references.</dd>
+                <dd>If <i class="m">-simple</i> is specified, a simple but
+                fast parser is used (conforms not fully to XML
+                recommendation). That should double parsing and DOM
+                generation speed. The encoding of the data is not
+                transformed inside the parser. The simple parser does
+                not respect any encoding information in the XML
+                declaration. It skips over the internal DTD subset and
+                ignores any information in it. Therefore, it doesn't
+                include defaulted attribute values into the tree, even
+                if the according attribute declaration is in the
+                internal subset. It also doesn't expand internal or
+                external entity references other than the predefined
+                entities and character references </dd>
               
 
               
                 <dt><b>-html</b></dt>
-                <dd>If <i class="m">-html</i> is specified, a fast HTML parser is 
-used, which tries to even parse badly formed HTML into a DOM tree.</dd>
+                <dd>If <i class="m">-html</i> is specified, a fast HTML parser
+                is used, which tries to even parse badly formed HTML
+                into a DOM tree. If the HTML document given to parse
+                does not have a single root element (as it was legal
+                up to HTML 4.01) and the -forest option is not used
+                then a html node will be inserted as document element,
+                with the HTML input data top level elements as
+                children.</dd>
               
 
               
@@ -127,8 +136,8 @@ used, which tries to even parse badly formed HTML into a DOM tree.</dd>
                 <dt><b>-jsonroot &lt;document element name&gt;</b></dt>
                 <dd>If given makes the given element name the
                 document element of the resulting doc. The parsed
-                content of the JSON string will be the childs of this
-                document element node.</dd>
+                content of the JSON string will be the children of
+                this document element node.</dd>
               
               
               
@@ -205,13 +214,13 @@ data is parsed.</dd>
 </dt>
                 
                 <dd>If <i class="m">-feedbackAfter &lt;#bytes&gt;</i> is
-                specified, the tcl command given by
+                specified, the Tcl command given by
                 <i class="m">-feedbackcmd</i> is evaluated at the first element
                 start within the document (or an external entity)
                 after the start of the document or external entity or
                 the last such call after #bytes. For backward
                 compatibility if no -feedbackcmd is given but there is
-                a tcl proc named ::dom::domParseFeedback this proc is
+                a Tcl proc named ::dom::domParseFeedback this proc is
                 used as -feedbackcmd. If there isn't such a proc and
                 -feedbackAfter is used it is an error to not also use
                 -feedbackcmd. If the called script raises error, then
@@ -247,18 +256,18 @@ parse</i> call will return the empty string.</dd>
 </dt>
                 
                 <dd>If <i class="m">-externalentitycommand &lt;script&gt;</i> is
-specified, the specified tcl script is called to resolve any external entities
+specified, the specified Tcl script is called to resolve any external entities
 of the document. The actual evaluated command consists of this option followed
 by three arguments: the base uri, the system identifier of the entity and the
 public identifier of the entity. The base uri and the public identifier may be
-the empty list. The script has to return a tcl list consisting of three
+the empty list. The script has to return a Tcl list consisting of three
 elements. The first element of this list signals how the external entity is
 returned to the processor. Currently the two allowed types are "string"
 and "channel". The second element of the list has to be the (absolute) base URI
 of the external entity to be parsed.  The third element of the list are data,
 either the already read data out of the external entity as string in the case
-of type "string", or the name of a tcl channel, in the case of type
-"channel". Note that if the script returns a tcl channel, it will not be closed
+of type "string", or the name of a Tcl channel, in the case of type
+"channel". Note that if the script returns a Tcl channel, it will not be closed
 by the processor.  It must be closed separately if it is no longer
 needed.</dd>
               
@@ -267,13 +276,15 @@ needed.</dd>
                 <dt>
 <b>-useForeignDTD</b> <i>&lt;boolean&gt;</i>
 </dt>
-                
-                <dd>If &lt;boolean&gt; is true and the document does not have
-an external subset, the parser will call the -externalentitycommand script with
-empty values for the systemId and publicID arguments. Please note that if
-the document also doesn't have an internal subset, the
--startdoctypedeclcommand and -enddoctypedeclcommand scripts, if set, are not
-called. The <i class="m">-useForeignDTD</i> respects </dd>
+                 <dd>If
+                &lt;boolean&gt; is true and the document does not have
+                an external subset, the parser will call the
+                -externalentitycommand script with empty values for
+                the systemId and publicID arguments. Please note that
+                if the document also doesn't have an internal subset,
+                the -startdoctypedeclcommand and
+                -enddoctypedeclcommand scripts, if set, are not
+                called.</dd>
               
 
               
@@ -302,6 +313,18 @@ called. The <i class="m">-useForeignDTD</i> respects </dd>
 
 
               
+                <dt><b>-forest</b></dt>
+                <dd>If this option is given, there is no need for a
+                single root; any sequence of well-formed, balanced
+                subtrees will be parsed into a DOM tree. This works
+                for the expat DOM builder, the simple xml parser
+                enabled with <i class="m">-simple</i> and the simple HTML parser
+                enabled -with <i class="m">-html</i>. If used together with
+                <i class="m">-json</i> or <i class="m">-html5</i> this option is ignored.
+                </dd>
+              
+              
+              
                 <dt><b>-ignorexmlns</b></dt>
                 <dd>It is recommended, that you only use this option
                 with the <i class="m">-html5</i> option. If this option is
@@ -323,7 +346,41 @@ called. The <i class="m">-useForeignDTD</i> respects </dd>
                 </dd>
               
 
-            </dl>
+              
+                <dt>
+<b>-billionLaughsAttackProtectionMaximumAmplification</b> <i>&lt;float&gt;</i>
+</dt>
+                
+                <dd>This option together with
+                <i class="m">-billionLaughsAttackProtectionActivationThreshold</i>
+                gives control over the parser limits that protects
+                against billion laugh attacks
+                (<a href="https://en.wikipedia.org/wiki/Billion_laughs_attack">https://en.wikipedia.org/wiki/Billion_laughs_attack</a>).
+                This option expects a float &gt;= 1.0 as argument. You
+                should never need to use this option, because the
+                default value (100.0) should work for any real data.
+                If you ever need to increase this value for non-attack
+                payload, please report.</dd>
+              
+              
+              
+                <dt>
+<b>-billionLaughsAttackProtectionActivationThreshold</b> <i>&lt;long&gt;</i>
+</dt>
+                
+                <dd>This option together with
+                <i class="m">-billionLaughsAttackProtectionMaximumAmplification</i>
+                gives control over the parser limits that protects
+                against billion laugh attacks
+                (<a href="https://en.wikipedia.org/wiki/Billion_laughs_attack">https://en.wikipedia.org/wiki/Billion_laughs_attack</a>).
+                This option expects a positiv integer as argument. You
+                should never need to use this option, because the
+                default value (8388608) should work for any real data.
+                If you ever need to increase this value for non-attack
+                payload, please report.</dd>
+              
+
+          </dl>
 <p></p>
 </dd>
         
@@ -368,7 +425,7 @@ node. <i class="m">objVar</i> controls the memory handling as explained above.</
           any other context, it will return error. The created command
           <i class="m">commandName</i> replaces any existing command or
           procedure with that name. If the <i class="m">commandName</i> includes
-          any namespace qualifiers, it is created in the specified
+          any Tcl namespace qualifiers, it is created in the specified
           namespace. The <i class="m">-tagName</i> option is only allowed for
           the elementNode type. The <i class="m">-jsonType</i> option is only
           allowed for elementNode and textNode types.
@@ -387,14 +444,14 @@ command depends on the type of the node it creates.</p>
 <p>If the command type to create is <i class="m">elementNode</i>, the created
 command will create an element node, if called. Without the
 <i class="m">-tagName</i> option the tag name of the created node is
-<i class="m">commandName</i> without namespace qualifiers. If the
-<i class="m">-tagName</i> option was given then the created command the created
-elements will have this tag name. If the <i class="m">-jsonType</i> option was
-given then the created node elements will have the given JSON type. If
-the <i class="m">-namespace</i> option is given the created element node will be
-XML namespaced and in the namespace given by the option. The element
-name will be literal as given either by the command name or the
-<i class="m">-tagname</i> option, if that was given. An appropriate XML
+<i class="m">commandName</i> without Tcl namespace qualifiers. If the
+<i class="m">-tagName</i> option was given then the created elements will have
+the value of this option as tag name. If the <i class="m">-jsonType</i> option
+was given then the created node elements will have the given JSON
+type. If the <i class="m">-namespace</i> option is given the created element
+node will be XML namespaced and in the namespace given by the option.
+The element name will be literal as given either by the command name
+or the <i class="m">-tagname</i> option, if that was given. An appropriate XML
 namespace declaration will be automatically added, to bind the prefix
 (if the element name has one) or the default namespace (if the element
 name hasn't a prefix) to the namespace if such a binding isn't in
@@ -451,6 +508,37 @@ command is:</p>
 <b class="cmd">piNodeCmd</b> <i class="m">target data</i>
 </pre>
 
+<p>Beside the with <b class="cmd">dom</b> <b class="method">createNodeCmd</b> calls
+created node commands there are two more commands which automatically
+insert nodes into the tree inside an <b class="method">appendFromScript</b>
+script.</p>
+
+<pre class="syntax">
+<b class="cmd">tdom::fsnewNode</b> <i class="m">?-jsonType &lt;jsonType&gt;?</i> <i class="m">?-namespace &lt;namespace&gt;?</i> <i class="m">tagName</i> <i class="m">?attributes?</i> <i class="m">?script?</i>
+</pre>
+
+<p>If called inside a fromScript context this command creates a new
+node <i class="m">tagName</i> in the XML namespace <i class="m">namespace</i> if the
+<i class="m">-namespace</i> option was given and with the JSON type
+<i class="m">jsonType</i> if the <i class="m">-jsonType</i> option was given and appends
+this node at the end of the child list of the invoking element node.
+The <i class="m">attributes</i> and <i class="m">script</i> arguments will be processed as
+if given to an element creating node command. If called outside a
+fromScript context this command will raise error.
+</p>
+
+<pre class="syntax">
+<b class="cmd">tdom::fsinsertNode</b> <i class="m">node</i>
+</pre>
+
+<p>If called inside o fromScript context this comannd instead of
+creating a new node appends the as argument given node at the end of
+the child list of the invoking element node. The node is unlinked from
+its previous place. If called outside a fromScript context this
+command will raise error.
+</p>
+
+
 </dd>
         
 
@@ -493,12 +581,12 @@ TextCheck flag state. The default state for TextCheck is true.</dd>
         
           <dt>
 <b class="cmd">dom</b> <b class="method">setObjectCommands</b> ?<i class="m">(automatic|token|command)</i>?</dt>
-          <dd>Controls if documents and nodes are created as tcl commands or
+          <dd>Controls if documents and nodes are created as Tcl commands or
 as token to be
 used with the domNode and domDoc commands. If the mode is
-'automatic', then methods used at tcl commands will create tcl
+'automatic', then methods used at Tcl commands will create Tcl
 commands and methods used at doc or node tokes will create tokens. If
-the mode is 'command' then always tcl commands will be created. If
+the mode is 'command' then always Tcl commands will be created. If
 the mode is 'token', then always token will be created. The method
 returns the current mode. This method is an experimental interface.</dd>
       
@@ -656,7 +744,7 @@ recommendation. Otherwise it returns 0.</dd>
                 
                 
                     <dt><b>TCL_UTF_MAX</b></dt>
-                    <dd>Returns the TCL_UTF_MAX value of the tcl
+                    <dd>Returns the TCL_UTF_MAX value of the Tcl
                     core, tDOM was build with as integer</dd>
                 
                 
@@ -683,7 +771,7 @@ recommendation. Otherwise it returns 0.</dd>
         
     </dl>
 
-<h2><a name="SECTid0x5579b5ff2110">KEYWORDS</a></h2><p class="keywords">
+<h2><a name="SECTid0x55e7845f3c00">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-XML">XML</a>, <a class="keyword" href="keyword-index.html#KW-DOM">DOM</a>, <a class="keyword" href="keyword-index.html#KW-document">document</a>, <a class="keyword" href="keyword-index.html#KW-node">node</a>, <a class="keyword" href="keyword-index.html#KW-parsing">parsing</a>
 </p>
 </div><hr class="navsep"><div class="navbar" align="center">

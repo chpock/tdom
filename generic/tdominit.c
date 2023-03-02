@@ -41,6 +41,7 @@
 #include <tcldom.h>
 #include <tclpull.h>
 #include <schema.h>
+#include <nodecmd.h>
 
 extern TdomStubs tdomStubs;
 
@@ -95,6 +96,11 @@ Tdom_Init (
 #ifndef TDOM_NO_PULL
     Tcl_CreateObjCommand(interp, "tdom::pullparser", tDOM_PullParserCmd, NULL, NULL );    
 #endif
+
+    Tcl_CreateObjCommand(interp, "tdom::fsnewNode", tDOM_fsnewNodeCmd, NULL, NULL );    
+    Tcl_CreateObjCommand(interp, "tdom::fsinsertNode", tDOM_fsinsertNodeCmd, NULL, NULL );    
+
+    nodecmd_init(interp);
 
 #ifndef TDOM_NO_SCHEMA
     tDOM_SchemaInit (interp);

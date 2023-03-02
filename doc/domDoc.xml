@@ -110,7 +110,7 @@ usually a result of a XSLT transformation.</desc>
         </commanddef>
 
       <commanddef>
-        <command><method>asXML</method> <option>?-indent none/tabs/1..8?</option> <option>?-channel channelId?</option> <option>?-escapeNonASCII?</option> <option>?-doctypeDeclaration &lt;boolean&gt;?</option> <option>-xmlDeclaration &lt;boolean&gt;?</option> <option>-encString &lt;string&gt;</option> <option>?-escapeAllQuot?</option> <option>?-indentAttrs?</option> <option>?-nogtescape?</option> <option>?-noEmptyElementTag?</option></command>
+        <command><method>asXML</method> <option>?-indent none/tabs/1..8?</option> <option>?-channel channelId?</option> <option>?-escapeNonASCII?</option> <option>?-doctypeDeclaration &lt;boolean&gt;?</option> <option>-xmlDeclaration &lt;boolean&gt;?</option> <option>-encString &lt;string&gt;</option> <option>?-escapeAllQuot?</option> <option>?-indentAttrs?</option> <option>?-nogtescape?</option> <option>?-noEmptyElementTag?</option> <option>?-escapeCR?</option> <option>?-escapeTab?</option></command>
         <desc><p>Returns the DOM tree as an (optional indented) XML
         string or sends the output directly to the given
         channelId.</p>
@@ -166,10 +166,54 @@ usually a result of a XSLT transformation.</desc>
         <p>If the option <m>-noEmptyElementTag</m> is given then no
         empty tag syntax will be used. Instead, if an element has
         empty content it will be serialized with an element start tag
-        and an immediately following element end tag.</p></desc>
+        and an immediately following element end tag.</p>
 
+        <p>If the option <m>-escapeCR</m> is given then the character
+        '\r' will be escaped as character reference in attribute
+        values and text content of elements. The default is to not do
+        this.</p>
+
+        <p>If the option <m>-escapeTab</m> is given then the character
+        '\t' will be escaped as character reference in attribute
+        values and text content of elements. The default is to not do
+        this.</p>
+        </desc>
       </commanddef>
 
+      <commanddef>
+        <command><method>asCanonicalXML</method> <option>?-channel channelId?</option> <option>?-comments &lt;boolean&gt;?</option></command>
+        <desc><p>Returns the DOM tree as canonical XML string
+        according to the "<ref
+        href="http://www.w3.org/TR/2001/REC-xml-c14n-20010315">Canonical
+        XML Version 1.0 W3C Recommendation 15 March 2001</ref>" or
+        sends the output directly to the given channelId.</p>
+
+        <p>If the goal is to get a canonical XML serialization of the
+        XML file from which the DOM tree was parsed there are a few
+        prerequisites. The XML data must be parsed with the
+        <m>-keepEmpties</m> option. If the XML data includes a DTD
+        which defines attribute defaults or external parsed entity
+        references it is necessary to use the expat parser (not the
+        <m>-simple</m> one). For any supported Tcl version lesser then
+        9.0 if the XML data includes characters outside the BMP a Tcl
+        build with TCL_UTF_MAX defined to 6 (and a tDOM build with
+        this Tcl) is necessary.
+        </p>
+
+        <p>If the -channel option is given then the output is send
+        directly to the Tcl channel given as argument. It is the up to
+        the caller to ensure that the channel is correctly
+        fconfigured. If this option is not given then the command
+        returns the serialization as string.</p>
+        
+        <p>If the option <m>-comments</m> is given with a true value
+        then the serialization includes comments according to the
+        rules of the recommendation. If the value is false or this
+        option is omitted then comments are removed from the
+        serialization.</p>
+        </desc>
+      </commanddef>
+      
       <commanddef>
         <command><method>asHTML</method> <option>?-channel
 channelId?</option> <option>?-escapeNonASCII?</option> <option>?-htmlEntities?</option> <option>?-doctypeDeclaration &lt;boolean&gt;?</option> <option>?-breakLines?</option> <option>?-onlyContents?</option></command> 
@@ -315,7 +359,7 @@ document, if there is one, otherwise the empty string. If there is a value
 given to the method, the internal subset of the document is set to this
 value. Note that none of the parsing methods preserve the internal subset
 of a document; a freshly parsed document will always have an empty internal
-subset. Also note, that the method doesn't do any syntactical check on a
+subset. Also note that the method doesn't do any syntactical check on a
 given internal subset.</desc>
       </commanddef>
 
@@ -383,7 +427,7 @@ ignored. Without this option, an error is raised if the user tries to set a
 top-level parameter that is not declared in the stylesheet.</p>
 
 <p>The option <m>-maxApplyDepth</m> expects a positiv integer as
-argument. By default, the xslt engine allows xslt templates to nest up
+argument. By default, the XSLT engine allows XSLT templates to nest up
 to 3000 levels (and raises error if they nest deeper). This limit can
 be set by the <m>-maxApplyDepth</m> option.</p>
 
@@ -393,7 +437,7 @@ to the option, appended with the XML Fragment from instantiating the
 xsl:message element content as string (as if the XPath string() function would
 have been applied to the XML Fragment) and a flag, which indicates, if the
 xsl:message has an attribute "terminate" with the value "yes". If the
-called script returns anything else then TCL_OK then the xslt
+called script returns anything else then TCL_OK then the XSLT
 transformation will be aborted, returning error. If the called script
 returns -code break, the error message is empty, otherwise the result
 code is reported. In case of terminated transformation, the outputVar,
@@ -405,7 +449,7 @@ if given, is set to the empty string.</p>
         <command><method>toXSLTcmd</method> ?<m>objVar</m>?</command>
      
         <desc>If the DOM tree represents a valid XSLT stylesheet, this method
-transforms the DOM tree into an xslt command, otherwise it returns error. The
+transforms the DOM tree into an XSLT command, otherwise it returns error. The
 created xsltCmd is returned and stored in the <m>objVar</m>, if a var name was
 given. A successful transformation of the DOM tree to an xsltCmd removes the
 domDoc cmd and all nodeCmds of the document. 
@@ -441,7 +485,7 @@ ignored. Without this option, an error is raised if the user tries to set a
 top-level parameter, which is not declared in the stylesheet.</p>
 
 <p>The option <m>-maxApplyDepth</m> expects a positiv integer as
-argument. By default, the xslt engine allows xslt templates to nest up
+argument. By default, the XSLT engine allows XSLT templates to nest up
 to 3000 levels (and raises error if they nest deeper). This limit can
 be set by the <m>-maxApplyDepth</m> option.</p>
 
