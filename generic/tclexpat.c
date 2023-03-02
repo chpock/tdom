@@ -931,6 +931,9 @@ TclExpatParse (
           }
           activeCHandlerSet = activeCHandlerSet->nextHandlerSet;
       }
+      if (expat->needWSCheck) {
+          XML_IgnoreSpace(expat->parser);
+      }
       expat->parsingState = 1;
   }
       

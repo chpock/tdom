@@ -1223,6 +1223,11 @@ XML_ParserReset(XML_Parser parser, const XML_Char *encodingName) {
   return XML_TRUE;
 }
 
+void XMLCALL
+XML_IgnoreSpace(XML_Parser parser) {
+  XmlPrologStateIgnoreSpace(&parser->m_prologState);
+}
+
 enum XML_Status XMLCALL
 XML_SetEncoding(XML_Parser parser, const XML_Char *encodingName) {
   if (parser == NULL)
