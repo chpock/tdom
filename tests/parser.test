@@ -1026,6 +1026,28 @@ test parser-13.4 {bulk parsing - stop on return in XML-end handler} -setup {
     unset -nocomplain ::res
 } -result Y
 
+test parser-13.5 {bulk parsing - bulk xml's exactly at buffer range} -setup {
+    set ::count 0
+    set ::res {}
+} -body {
+    set p [xml::parser]
+    $p configure -final 0 -bulkxmlendcommand [list apply {p {
+        lappend ::res [incr ::count] [$p get -currentbyteindex]
+    }} $p]
+    # simulate the bulk parts are exactly at range of read buffer (e. g. matching buffer end):
+    $p parse {<?xml version="1.0"?><X/>}
+    $p parse {<?xml version="1.0"?><Y/>}
+    $p parse {<?xml version="1.0"?><Z/>}
+    # the same considering white spaces at range of buffer:
+    $p parse "<?xml version=\"1.0\"?><X/> "
+    $p parse "\n<?xml version=\"1.0\"?><Y/>"
+    $p parse " \n<?xml version=\"1.0\"?><Z/>\n"
+    set ::res
+} -cleanup {
+    $p free
+    unset -nocomplain ::res ::count
+} -result {1 25 2 50 3 75 4 101 5 127 6 155}
+
 # cleanup
 ::tcltest::cleanupTests
 return

@@ -1,5 +1,5 @@
-C compat,\sfixes\stest\sfor\ssystems\swith\snon-utf8\sdefault\sencoding\s(©\s->\s\\xA9)
-D 2023-03-02T17:30:01.626
+C test\scase\sillustrating\sissue\swith\s-bulkxmlendcommand\shandler\scalled\stwice\sif\sxml\sis\sexactly\sat\srange\sof\sread\sbuffer\s(e.\sg.\smatching\sbuffer\send)
+D 2023-03-02T17:31:07.711
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -209,7 +209,7 @@ F tests/htmlreader.test a36f523cd3160caffafa9362332379e8f0a025a43183063501b6beeb
 F tests/i18n.test 421e3998480ed5ce9420f4b596c384b8d5261e7fb4b33c0a7c12ef126d476939
 F tests/loadtdom.tcl 89af532a1e803f83049e290827804f3787f3056008a129d72f02936fea884db2
 F tests/namespace.test 0a13b2bf59bb088525ca7b64d0b2bce6a349c627ca3dd1c17a4cc969d16fe57c
-F tests/parser.test d4f7668fcb8a4c77d289ef040d29d5806fe0fa419f48bbcca06dfefacd609e61
+F tests/parser.test de4a24ce634b2e8e9d4c6096000034a6036598842a9d54bb0595c57007167e95
 F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
 F tests/pullparser.test df079ff6a5a6b11b4d0f409ca3fc17cc4a5956d31801872f9f1f95e35032dec5
@@ -239,8 +239,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 57af92be5ea9fe60650e50bece918612bc3e25d4f4ad53d869d2627871879405
-R 4ae8f782ee4eba6f3951bc62ec0d99d7
+P ed0604378cd584d3334dd5c472348098029043ed76bc78d636ad37895827fd0e
+R ca955ecaa3a13e215150576967acc29e
 U sebres
-Z adeed4ee3571c3e5c0e2dec4775646dd
+Z c43db0e2902b5168acdc8c3080e75909
 # Remove this line to create a well-formed Fossil manifest.
