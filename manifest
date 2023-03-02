@@ -1,5 +1,5 @@
-C test\scase\sillustrating\sissue\swith\s-bulkxmlendcommand\shandler\scalled\stwice\sif\sxml\sis\sexactly\sat\srange\sof\sread\sbuffer\s(e.\sg.\smatching\sbuffer\send)
-D 2023-03-02T17:31:07.711
+C fixes\sunexpected\sinvocation\sof\sbulkxmlendcommand,\sif\sxml\sis\sexactly\sat\srange\sof\sread\sbuffer\s(e.\sg.\smatching\sbuffer\send),\ssee\stest\sparser-13.5
+D 2023-03-02T17:32:12.195
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -67,7 +67,7 @@ F expat/nametab.h 30cd38454c40812806f55053f58791c8b1db8ce293d83e10b5d31ed517add4
 F expat/siphash.h 390cf7fc82add7e03f7767f2e51357b92b1e03be5deed9f2136619226c3e6974
 F expat/utf8tab.h 2f04b270d7c0d005f203477515a1a054e7538e1ed013cb48ecd4a4e2489b208b
 F expat/winconfig.h d6e2291c3526d9187d6ee4a7815eece93d4f9a456b8ae2a8ce66c56a75a4c563
-F expat/xmlparse.c bd766693d8ea776c11a55d0864d11f2fa198f5eb85279f3104e208f8cb133a45
+F expat/xmlparse.c fc964240c5167759fbcf4651f2001bea4b4336ed479fb69f16df7a759b0dda5c
 F expat/xmlrole.c af9955e114d91f77b1054f32f767d4a39f4e1454dae1b57a530747c6834b2477
 F expat/xmlrole.h b234bee2df5b368e4b546f91d178bffc2a41e70fb4d69061561bfcb5857e51ef
 F expat/xmltok.c 660f84ef7703ebd6de5ee8c5d12cd17cb965e894d01bd89d19b4f7c00e8816c6
@@ -239,8 +239,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ed0604378cd584d3334dd5c472348098029043ed76bc78d636ad37895827fd0e
-R ca955ecaa3a13e215150576967acc29e
+P 24edbe7a341bca2e9ae0cdf0011d9aa920246546adf6e7d8e026e03f2f5a46f8
+R a0a554ad2cb741f8c5b15008cbdbf2d3
 U sebres
-Z c43db0e2902b5168acdc8c3080e75909
+Z d8680b4e8e21e6fce185a480acd49c4f
 # Remove this line to create a well-formed Fossil manifest.

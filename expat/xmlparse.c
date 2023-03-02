@@ -5745,8 +5745,10 @@ epilogProcessor(XML_Parser parser, const char *s, const char *end,
         return XML_ERROR_JUNK_AFTER_DOC_ELEMENT;
       }
       /* bulk mode - call XML-end handler */
-      parser->m_bulkXMLEndHandler(parser->m_handlerArg);
-      parser->m_xmlStarted = XML_FALSE;
+      if (parser->m_xmlStarted && s != parser->m_positionPtr) {
+        parser->m_bulkXMLEndHandler(parser->m_handlerArg);
+        parser->m_xmlStarted = XML_FALSE;
+      }
       /* continue processing of next XML chunk
        * todo: check what additionally we'd need to reset or reinitialize here properly */
       XmlPrologStateInit(&parser->m_prologState);
