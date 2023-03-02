@@ -1846,7 +1846,7 @@ test domDoc-29.8 {asCanonicalXML} {
     set result [$doc asCanonicalXML]
     $doc delete
     set result
-} {<doc>©</doc>}
+} "<doc>\xA9</doc>"
 
 
 # test domDoc-29.9 {asCanonicalXML} {

@@ -1,5 +1,5 @@
-C merge\strunk\sto\sbulk-xml-parse
-D 2023-03-02T17:29:04.410
+C compat,\sfixes\stest\sfor\ssystems\swith\snon-utf8\sdefault\sencoding\s(©\s->\s\\xA9)
+D 2023-03-02T17:30:01.626
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -197,7 +197,7 @@ F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.bench 5446ce379127b8d5700f18a5a0848e580313d0d7
 F tests/dom.test 6e67b6cad519f42ed2db52cb97b51933bb00f4c69b0854d0c3c84eddc280eb22
-F tests/domDoc.test 6dec2f6d9b4b3a2577af556cb2d49b152e8a34c518fb51a6dc5677229c077cbd
+F tests/domDoc.test 013c38965191d22b218f9f08b7726bee3a9df4e6d1b73ff84dd91cc2db7d673e
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test 46d67b521a9d84d5d982340c545d830ce65be6e5c69e4271e613d2182b71a321
 F tests/domjson.test bdfbe938f33931f56f9496aac425b2183373f4cb926b95a04fa095bd3b75cd3d
@@ -239,8 +239,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P aad9fc752626e043e9912486ffaf5468e3d06b03d3528e189c88c1e12c8dda03 41026c0cbd959280cfcb3f72882c0047bb2d931f61a7ecb6849e96cdd17480c7
-R 06c89d513ff1633daf8eaebfa7520e75
+P 57af92be5ea9fe60650e50bece918612bc3e25d4f4ad53d869d2627871879405
+R 4ae8f782ee4eba6f3951bc62ec0d99d7
 U sebres
-Z 3670a5506bbef8a980388546cd7cb687
+Z adeed4ee3571c3e5c0e2dec4775646dd
 # Remove this line to create a well-formed Fossil manifest.
