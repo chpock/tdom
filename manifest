@@ -1,5 +1,5 @@
 C wip
-D 2023-02-26T01:47:49.048
+D 2023-03-04T15:56:54.086
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -127,7 +127,7 @@ F extensions/tnc/win/targets.vc 79dea1c6a94a94e6ed8bae9e0195149b25a69923
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
 F generic/datatypes.c 4a33e0c8de5fd1c20d1f549cc513af4b6e72c5c80b817f42c94d277cba8dec38
 F generic/datatypes.h 3e41d07bcf50cf6959b6e14416dfcb0d7b5aafc65683322978ec185c2a259332
-F generic/dom.c a8b3691547ee012b043653dc27791e87b9ddf4b3c81f0b819413c4ddbd289118
+F generic/dom.c f5982b98b88d08903f71a15759339b1ca8fabd3ca68e8de0c8e55b764d7ceb94
 F generic/dom.h 1f29225bfda1064342f3847229719562d3a7f8b0264309379840e3d91974fd05
 F generic/domalloc.c 7a6a2fdde25d04ffef0330259ceb781ffa2150c2314dd88784f924f6f331ef9e
 F generic/domalloc.h 961f83bb46dec27dbcf36ed430ed81b1f485a1fdfaa2f7df8b60bbcf861d0fe3
@@ -147,8 +147,8 @@ F generic/nodecmd.c f8edb490c2bae96fa6eb281626e3da3bc8c532990bde2835e725d13b56f3
 F generic/nodecmd.h 36056ca2c262cb1991cabef8d27992ad628db718d09ff0eeaeaffd150f1549ec
 F generic/schema.c 0f6103b280a16dc98cf6f89722f273e9bfa6cf7d4c4dfd8a5fc54a4d3593dd5f
 F generic/schema.h 7d8c6ffbb3e99d9cb7636c66194a48e4311d1e3014a708d58f194bf44733a7f3
-F generic/tcldom.c 2d3a1037f65a7789131d02173535dd76b58f08feac9b8e41dc4a8f26099b29b5
-F generic/tcldom.h fc61477bdd07440e17a8f11cc898e5c07c8c7c3592014213a5e50eca85393374
+F generic/tcldom.c ee886b63c56e0e0c76e5361a7c13af8973476f1bc9494e7d795bcbd4ad5881a5
+F generic/tcldom.h 90ab0b6fa85d52df4d1e6ba3bb5bfea88e0242693b9f031b9474ce94b7dc9573
 F generic/tclexpat.c 431aed48fb4317f2bad451de366c7e31d839e180edca13d6e4462caa355b6724
 F generic/tclexpat.h 95d915d74bb4b99ef3b80de00b0adce28931e6015ac63226b99db4817d9e313c
 F generic/tclpull.c 3d53f4e92f45a5408d76ac47f595ceab5aa327ffcf3ffe593d295d718cd00c44
@@ -239,8 +239,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c8b0e877bce8c053ddc75b6df1edeb59494ca4943fe3b61e59f922899b2be886
-R 411407f5eb1bbf8a7ea76428e516be1c
+P e0507ae8c4115cfbf9731ddb69b83c4a9f1854fde4a2e3fe99869d4cfcc7e038
+R f3787653aff26a67df820651bf0a5ab6
 U rolf
-Z 4cb10a204e740b52a47645118ff8afd9
+Z 6f4f9f8d0a37daf2058b0cec397acc48
 # Remove this line to create a well-formed Fossil manifest.

@@ -6844,33 +6844,51 @@ int tcldom_createDocumentNS (
                                     0);
 }
 
-static
-void reportErrorLocation (
+/* Helper function to build up the error string message in a central
+ * place. Caller must provide byteIndex; line is expected to be > 0 if
+ * line/column information is given. */
+void tcldom_reportErrorLocation (
     Tcl_Interp *interp,
-    int range,
+    int before,
+    int after,
+    domLength line,
+    domLength column,
     char *xmlstring,
+    const char *entity,
     domLength byteIndex,
     char *errStr
     )
 {
-    char s[200];
+    char s[200], sb[25], sl[25], sc[25];
     char *d = NULL, *buf;
     domLength i, ind;
 
-    if (range > 197) {
-        d = MALLOC (sizeof (char) * (range + 3));
+    if (before > 197 || after > 197) {
+        d = MALLOC (sizeof (char) * ((before > after ? before + 3 : after + 1)));
         buf = d;
     } else {
         buf = s;
     }
     Tcl_ResetResult(interp);
-    sprintf(s, "%lu", byteIndex);
-    Tcl_AppendResult(interp, "error \"", errStr, "\" at position ", s, "\n\"",
-                     NULL);
+    Tcl_AppendResult (interp, "error \"", errStr, "\"", NULL);
+    if (entity) {
+        Tcl_AppendResult (interp, " in entity \"", entity, "\"", NULL);
+    }
+    if (line) {
+        sprintf(sl, "%lu", line);
+        sprintf(sc, "%lu", column);
+        Tcl_AppendResult (interp, " at line ", sl, " character \n\"", sc,
+                          NULL);
+        
+    } else {
+        sprintf(sb, "%lu", byteIndex);
+        Tcl_AppendResult (interp, " at position ", sb, "\n\"", NULL);
+    }
     ind = 0;
     buf[0] = '\0';
-    for (i = (byteIndex < range/2 ? 0 : byteIndex - range/2);
-         i <= byteIndex;  i++) {
+    for (i = (byteIndex < before ? 0 : byteIndex - before);
+         i <= byteIndex;
+         i++) {
         buf[ind] = xmlstring[i];
         ind++;
     }
@@ -6878,7 +6896,7 @@ void reportErrorLocation (
     Tcl_AppendResult(interp, buf, " <--Error-- ", NULL);
     ind = 0;
     buf[0] = '\0';
-    for (i = byteIndex + 1; i < byteIndex + range - range/2; i++) {
+    for (i = byteIndex + 1; i < byteIndex + after; i++) {
         buf[ind] = xmlstring[i];
         if (!xmlstring[i]) {
             break;
@@ -7340,7 +7358,8 @@ int tcldom_parse (
             return tcldom_returnDocumentObj (interp, doc, setVariable,
                                              newObjName, 1, 0);
         } else {
-            reportErrorLocation(interp, 40, xml_string, byteIndex, errStr);
+            tcldom_reportErrorLocation(interp, 20, 20, 0, 0, xml_string, NULL,
+                                       byteIndex, errStr);
             return TCL_ERROR;
         }
     }
@@ -7361,7 +7380,8 @@ int tcldom_parse (
         }
         if (errStr != NULL) {
             domFreeDocument (doc, NULL, interp);
-            reportErrorLocation(interp, 160, xml_string, byteIndex, errStr);
+            tcldom_reportErrorLocation(interp, 80, 80, 0, 0, xml_string, NULL,
+                                       byteIndex, errStr);
             if (takeHTMLParser) {
                 FREE(errStr);
             }

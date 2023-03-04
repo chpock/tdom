@@ -2030,37 +2030,16 @@ externalEntityRefHandler (
         }  while (!done && status == XML_STATUS_OK);
         switch (status) {
         case XML_STATUS_ERROR:
-            interpResult = Tcl_GetStringResult(info->interp);
-            sprintf(s, "%ld", XML_GetCurrentLineNumber(extparser));
             if (interpResult[0] == '\0') {
-                Tcl_ResetResult (info->interp);
-                Tcl_AppendResult(info->interp, "error \"",
-                                 XML_ErrorString(XML_GetErrorCode(extparser)),
-                                 "\" in entity \"", systemId,
-                                 "\" at line ", s, " character ", NULL);
-                sprintf(s, "%ld", XML_GetCurrentColumnNumber(extparser));
-                Tcl_AppendResult(info->interp, s, NULL);
-                byteIndex = XML_GetCurrentByteIndex(extparser);
-                if (byteIndex != -1) {
-                    Tcl_AppendResult(info->interp, "\n\"", NULL);
-                    s[1] = '\0';
-                    for (i=-20; i < 40; i++) {
-                        if ((byteIndex+i)>=0) {
-                            if (xmlstring[byteIndex+i]) {
-                                s[0] = xmlstring[byteIndex+i];
-                                Tcl_AppendResult(info->interp, s, NULL);
-                                if (i==0) {
-                                    Tcl_AppendResult(info->interp,
-                                                     " <--Error-- ", NULL);
-                                }
-                            } else {
-                                break;
-                            }
-                        }
-                    }
-                    Tcl_AppendResult(info->interp, "\"",NULL);
-                }
+                tcldom_reportErrorLocation (
+                    info->interp, 20, 40, XML_GetCurrentColumnNumber(extparser),
+                    XML_GetCurrentLineNumber(extparser), xmlstring, systemId,
+                    XML_GetCurrentByteIndex(extparser),
+                    XML_ErrorString(XML_GetErrorCode(extparser))
+                    );
             } else {
+                Tcl_ResetResult (info->interp);
+                sprintf(s, "%ld", XML_GetCurrentLineNumber(extparser));
                 Tcl_AppendResult(info->interp, ", referenced in entity \"",
                                  systemId, 
                                  "\" at line ", s, " character ", NULL);
