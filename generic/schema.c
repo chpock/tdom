@@ -4656,7 +4656,6 @@ externalEntityRefHandler (
     Tcl_Obj *cmdPtr, *resultObj, *resultTypeObj, *extbaseObj, *xmlstringObj;
     Tcl_Obj *channelIdObj;
     int result, mode, done, keepresult = 0;
-    ssize_t i, byteIndex;
     domLength len, tclLen;
     XML_Parser extparser, oldparser = NULL;
     char buf[4096], *resultType, *extbase, *xmlstring, *channelId, s[50];
@@ -4787,36 +4786,14 @@ externalEntityRefHandler (
         switch (status) {
         case XML_STATUS_ERROR:
             interpResult = Tcl_GetStringResult(vdata->interp);
-            sprintf(s, "%ld", XML_GetCurrentLineNumber(extparser));
             if (interpResult[0] == '\0') {
-                Tcl_ResetResult (vdata->interp);
-                Tcl_AppendResult(vdata->interp, "error \"",
-                                 XML_ErrorString(XML_GetErrorCode(extparser)),
-                                 "\" in entity \"", systemId,
-                                 "\" at line ", s, " character ", NULL);
-                sprintf(s, "%ld", XML_GetCurrentColumnNumber(extparser));
-                Tcl_AppendResult(vdata->interp, s, NULL);
-                byteIndex = XML_GetCurrentByteIndex(extparser);
-                if (byteIndex != -1) {
-                    Tcl_AppendResult(vdata->interp, "\n\"", NULL);
-                    s[1] = '\0';
-                    for (i=-20; i < 40; i++) {
-                        if ((byteIndex+i)>=0) {
-                            if (xmlstring[byteIndex+i]) {
-                                s[0] = xmlstring[byteIndex+i];
-                                Tcl_AppendResult(vdata->interp, s, NULL);
-                                if (i==0) {
-                                    Tcl_AppendResult(vdata->interp,
-                                                     " <--Error-- ", NULL);
-                                }
-                            } else {
-                                break;
-                            }
-                        }
-                    }
-                    Tcl_AppendResult(vdata->interp, "\"",NULL);
-                }
+                tcldom_reportErrorLocation (
+                    vdata->interp, 20, 40, XML_GetCurrentLineNumber(extparser),
+                    XML_GetCurrentColumnNumber(extparser), xmlstring,
+                    systemId, XML_GetCurrentByteIndex(extparser),
+                    XML_ErrorString(XML_GetErrorCode(extparser)));
             } else {
+                sprintf(s, "%ld", XML_GetCurrentLineNumber(extparser));
                 Tcl_AppendResult(vdata->interp, ", referenced in entity \"",
                                  systemId, 
                                  "\" at line ", s, " character ", NULL);

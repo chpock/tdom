@@ -1891,7 +1891,6 @@ externalEntityRefHandler (
     Tcl_Obj *cmdPtr, *resultObj, *resultTypeObj, *extbaseObj, *xmlstringObj;
     Tcl_Obj *channelIdObj;
     int result, mode, done, keepresult = 0;
-    ssize_t i, byteIndex;
     size_t len;
     int tclLen;
     XML_Parser extparser, oldparser = NULL;
@@ -2030,15 +2029,15 @@ externalEntityRefHandler (
         }  while (!done && status == XML_STATUS_OK);
         switch (status) {
         case XML_STATUS_ERROR:
+            interpResult = Tcl_GetStringResult(info->interp);
             if (interpResult[0] == '\0') {
                 tcldom_reportErrorLocation (
-                    info->interp, 20, 40, XML_GetCurrentColumnNumber(extparser),
-                    XML_GetCurrentLineNumber(extparser), xmlstring, systemId,
+                    info->interp, 20, 40, XML_GetCurrentLineNumber(extparser),
+                    XML_GetCurrentColumnNumber(extparser), xmlstring, systemId,
                     XML_GetCurrentByteIndex(extparser),
                     XML_ErrorString(XML_GetErrorCode(extparser))
                     );
             } else {
-                Tcl_ResetResult (info->interp);
                 sprintf(s, "%ld", XML_GetCurrentLineNumber(extparser));
                 Tcl_AppendResult(info->interp, ", referenced in entity \"",
                                  systemId, 

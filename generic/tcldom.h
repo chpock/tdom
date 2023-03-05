@@ -84,7 +84,7 @@ void tcldom_reportErrorLocation (
     char *xmlstring,
     const char *entity,
     domLength byteIndex,
-    char *errStr
+    const char *errStr
     );
 
 

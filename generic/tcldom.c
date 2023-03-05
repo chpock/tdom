@@ -1268,40 +1268,15 @@ int tcldom_appendXML (
         Tcl_DecrRefCount(extResolver);
     }
     if (doc == NULL) {
-        char s[50];
-        long byteIndex, i;
-
-        Tcl_ResetResult(interp);
-        sprintf(s, "%ld", XML_GetCurrentLineNumber(parser));
-        Tcl_AppendResult(interp, "error \"",
-                         XML_ErrorString(XML_GetErrorCode(parser)),
-                         "\" at line ", s, " character ", NULL);
-        sprintf(s, "%ld", XML_GetCurrentColumnNumber(parser));
-        Tcl_AppendResult(interp, s, NULL);
-        byteIndex = XML_GetCurrentByteIndex(parser);
-        if (byteIndex != -1) {
-             Tcl_AppendResult(interp, "\n\"", NULL);
-             s[1] = '\0';
-             for (i=-20; i < 40; i++) {
-                 if ((byteIndex+i)>=0) {
-                     if (xml_string[byteIndex+i]) {
-                         s[0] = xml_string[byteIndex+i];
-                         Tcl_AppendResult(interp, s, NULL);
-                         if (i==0) {
-                             Tcl_AppendResult(interp, " <--Error-- ", NULL);
-                         }
-                     } else {
-                         break;
-                     }
-                 }
-             }
-             Tcl_AppendResult(interp, "\"",NULL);
-        }
+        tcldom_reportErrorLocation (
+            interp, 20, 40, XML_GetCurrentLineNumber(parser),
+            XML_GetCurrentColumnNumber(parser), xml_string, NULL,
+            XML_GetCurrentByteIndex(parser),
+            XML_ErrorString(XML_GetErrorCode(parser)));
         XML_ParserFree(parser);
         return TCL_ERROR;
     }
     XML_ParserFree(parser);
-
     
     nodeToAppend = doc->rootNode->firstChild;
     while (nodeToAppend) {
@@ -6856,7 +6831,7 @@ void tcldom_reportErrorLocation (
     char *xmlstring,
     const char *entity,
     domLength byteIndex,
-    char *errStr
+    const char *errStr
     )
 {
     char s[200], sb[25], sl[25], sc[25];
@@ -6877,7 +6852,7 @@ void tcldom_reportErrorLocation (
     if (line) {
         sprintf(sl, "%lu", line);
         sprintf(sc, "%lu", column);
-        Tcl_AppendResult (interp, " at line ", sl, " character \n\"", sc,
+        Tcl_AppendResult (interp, " at line ", sl, " character ", sc, "\n\"",
                           NULL);
         
     } else {
