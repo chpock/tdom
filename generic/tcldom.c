@@ -6852,34 +6852,39 @@ void tcldom_reportErrorLocation (
     if (line) {
         sprintf(sl, "%lu", line);
         sprintf(sc, "%lu", column);
-        Tcl_AppendResult (interp, " at line ", sl, " character ", sc, "\n\"",
-                          NULL);
+        Tcl_AppendResult (interp, " at line ", sl, " character ", sc, NULL);
         
     } else {
         sprintf(sb, "%lu", byteIndex);
-        Tcl_AppendResult (interp, " at position ", sb, "\n\"", NULL);
+        Tcl_AppendResult (interp, " at position ", sb, NULL);
     }
-    ind = 0;
-    buf[0] = '\0';
-    for (i = (byteIndex < before ? 0 : byteIndex - before);
-         i <= byteIndex;
-         i++) {
-        buf[ind] = xmlstring[i];
-        ind++;
-    }
-    buf[ind] = '\0';
-    Tcl_AppendResult(interp, buf, " <--Error-- ", NULL);
-    ind = 0;
-    buf[0] = '\0';
-    for (i = byteIndex + 1; i < byteIndex + after; i++) {
-        buf[ind] = xmlstring[i];
-        if (!xmlstring[i]) {
-            break;
+    if (xmlstring) {
+        Tcl_AppendResult (interp, "\n\"", NULL);
+        ind = 0;
+        buf[0] = '\0';
+        for (i = (byteIndex < before ? 0 : byteIndex - before);
+             i <= byteIndex;
+             i++) {
+            buf[ind] = xmlstring[i];
+            ind++;
         }
-        ind++;
+        buf[ind] = '\0';
+        Tcl_AppendResult(interp, buf, " <--Error-- ", NULL);
+        ind = 0;
+        buf[0] = '\0';
+        if (xmlstring[byteIndex]) {
+            for (i = byteIndex + 1; i < byteIndex + after; i++) {
+                if (!xmlstring[i]) {
+                    break;
+                }
+                buf[ind] = xmlstring[i];
+                ind++;
+            }
+            buf[ind] = '\0';
+            Tcl_AppendResult(interp, buf, NULL);
+        }
+        Tcl_AppendResult(interp, "\"",NULL);
     }
-    buf[ind] = '\0';
-    Tcl_AppendResult(interp, buf, "\"",NULL);
     if (d) {
         FREE (d);
     }
@@ -7435,10 +7440,6 @@ int tcldom_parse (
     if (doc == NULL) {
         char sl[50];
         char sc[50];
-        char sb[2];
-        int expatErrorCode;
-        
-        long byteIndex, i;
         
         switch (status) {
         case TCL_BREAK:
@@ -7454,38 +7455,13 @@ int tcldom_parse (
                    error msg. If we don't got a document, but interp result is
                    empty, the error occurred in the main document and we
                    build the error msg as follows. */
-                if (forest) {
-                    sprintf(sl, "%ld", forestError.errorLine);
-                    sprintf(sc, "%ld", forestError.errorColumn);
-                    byteIndex = forestError.byteIndex;
-                    expatErrorCode = forestError.errorCode;
-                } else {
-                    sprintf(sl, "%ld", XML_GetCurrentLineNumber(parser));
-                    sprintf(sc, "%ld", XML_GetCurrentColumnNumber(parser));
-                    byteIndex = XML_GetCurrentByteIndex(parser);
-                    expatErrorCode = XML_GetErrorCode(parser);
-                }
-                Tcl_AppendResult(interp, "error \"",
-                                 XML_ErrorString(expatErrorCode),
-                                 "\" at line ", sl, " character ", sc, NULL);
-                if ((byteIndex != -1) && (chan == NULL)) {
-                    Tcl_AppendResult(interp, "\n\"", NULL);
-                    sb[1] = '\0';
-                    for (i=-20; i < 40; i++) {
-                        if ((byteIndex+i)>=0) {
-                            if (xml_string[byteIndex+i]) {
-                                sb[0] = xml_string[byteIndex+i];
-                                Tcl_AppendResult(interp, sb, NULL);
-                                if (i==0) {
-                                    Tcl_AppendResult(interp, " <--Error-- ", NULL);
-                                }
-                            } else {
-                                break;
-                            }
-                        }
-                    }
-                    Tcl_AppendResult(interp, "\"",NULL);
-                }
+                tcldom_reportErrorLocation (
+                    interp, 20, 40,
+                    (forest ? forestError.errorLine : XML_GetCurrentLineNumber(parser)),
+                    (forest ? forestError.errorColumn : XML_GetCurrentColumnNumber(parser)),
+                    xml_string, NULL,
+                    (forest ? forestError.byteIndex : XML_GetCurrentByteIndex(parser)),
+                    XML_ErrorString((forest ? forestError.errorCode : XML_GetErrorCode(parser))));
             } else {
                 if (status == TCL_OK) {
                     /* For Tcl errors (in -externalentitycommand or
