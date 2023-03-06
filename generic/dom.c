@@ -5469,7 +5469,7 @@ TclTdomObjCmd (
             Tcl_SetResult (interp, "parser object isn't tdom enabled.", NULL);
             return TCL_ERROR;
         }
-        Tcl_SetLongObj (Tcl_GetObjResult (interp), info->storeLineColumn);
+        Tcl_SetIntObj (Tcl_GetObjResult (interp), info->storeLineColumn);
         if (objc == 4) {
             if (Tcl_GetBooleanFromObj (interp, objv[3], &bool) != TCL_OK) {
                 return TCL_ERROR;

@@ -2627,7 +2627,8 @@ double xpathFuncNumber (
 |   xpathGetStringValue
 |
 \---------------------------------------------------------------------------*/
-char * xpathGetStringValueForElement (
+static char *
+xpathGetStringValueForElement (
     domNode   *node,
     domLength *len
 )
