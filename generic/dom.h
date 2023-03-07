@@ -99,9 +99,11 @@
 #if (TCL_MAJOR_VERSION > 8)
 #  define domLength Tcl_Size
 #  define Tcl_SetDomLengthObj Tcl_SetWideIntObj
+#  define domLengthConversion "%lu"
 #else
 #  define domLength int
 #  define Tcl_SetDomLengthObj Tcl_SetIntObj
+#  define domLengthConversion "%d"
 #endif
 
 /* The following is the machinery to have an UNUSED macro which

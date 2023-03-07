@@ -1891,7 +1891,7 @@ externalEntityRefHandler (
     Tcl_Obj *cmdPtr, *resultObj, *resultTypeObj, *extbaseObj, *xmlstringObj;
     Tcl_Obj *channelIdObj;
     int result, mode, done, keepresult = 0;
-    size_t len;
+    domLength len;
     int tclLen;
     XML_Parser extparser, oldparser = NULL;
     char buf[4096], *resultType, *extbase, *xmlstring, *channelId, s[50];

@@ -1,5 +1,5 @@
-C Save\sminor\schanges.
-D 2023-03-06T00:20:56.354
+C Build\swith\s8.6
+D 2023-03-07T02:08:21.293
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -127,8 +127,8 @@ F extensions/tnc/win/targets.vc 79dea1c6a94a94e6ed8bae9e0195149b25a69923
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
 F generic/datatypes.c 4a33e0c8de5fd1c20d1f549cc513af4b6e72c5c80b817f42c94d277cba8dec38
 F generic/datatypes.h 3e41d07bcf50cf6959b6e14416dfcb0d7b5aafc65683322978ec185c2a259332
-F generic/dom.c bfc58dee47fcb71f08f775dea013d14496c171c2637b66915d0f43f5a8fafa61
-F generic/dom.h 1f29225bfda1064342f3847229719562d3a7f8b0264309379840e3d91974fd05
+F generic/dom.c 66f226bacfb103653ad8527850bf329953a39b8bf69a38f3cac670af568f4b12
+F generic/dom.h 6e1005afdb0ff22e1283f089cda7c48d7f80c4f391f3fb1ffc1e9e55ac92da6d
 F generic/domalloc.c 7a6a2fdde25d04ffef0330259ceb781ffa2150c2314dd88784f924f6f331ef9e
 F generic/domalloc.h 961f83bb46dec27dbcf36ed430ed81b1f485a1fdfaa2f7df8b60bbcf861d0fe3
 F generic/domhtml.c 790323f9cf1be3e3b63f5d0569ead4526f262c0df730a9bcd3670420dd2f81cc
@@ -239,8 +239,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 36e620001015e80267ed6da1837a0890419d129c40ce5baf9beb0e286c385410
-R 703db9016b616bc4d4c3df5b7afbcba9
+P 4411a6ae7199589519ff4a50729d788996640c08177ebf1b995468face81c082
+R 36999e49c52a369d44928bedc4294ef6
 U rolf
-Z ee858286f198a37b09cc3416577a6765
+Z bfe310f98a8c0181f5ee2d5971b168f1
 # Remove this line to create a well-formed Fossil manifest.
