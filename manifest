@@ -1,5 +1,5 @@
-C fixes\sunexpected\sinvocation\sof\sbulkxmlendcommand,\sif\sxml\sis\sexactly\sat\srange\sof\sread\sbuffer\s(e.\sg.\smatching\sbuffer\send),\ssee\stest\sparser-13.5
-D 2023-03-02T17:32:12.195
+C don't\scompare\scurrent\sposition\s(s\s!=\sm_positionPtr)\sto\scall\sbulk-xml\shandler,\scan\sbe\stoo\serror-prone\s(parsing\sacross\sbuffers),\scheck\sof\sm_xmlStarted\sis\sfully\senough
+D 2023-03-09T17:08:16.521
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -67,7 +67,7 @@ F expat/nametab.h 30cd38454c40812806f55053f58791c8b1db8ce293d83e10b5d31ed517add4
 F expat/siphash.h 390cf7fc82add7e03f7767f2e51357b92b1e03be5deed9f2136619226c3e6974
 F expat/utf8tab.h 2f04b270d7c0d005f203477515a1a054e7538e1ed013cb48ecd4a4e2489b208b
 F expat/winconfig.h d6e2291c3526d9187d6ee4a7815eece93d4f9a456b8ae2a8ce66c56a75a4c563
-F expat/xmlparse.c fc964240c5167759fbcf4651f2001bea4b4336ed479fb69f16df7a759b0dda5c
+F expat/xmlparse.c 7216ee43d7304b430f8da5acf7d6550acd317ab5f22fdae7dd93244d509c8383
 F expat/xmlrole.c af9955e114d91f77b1054f32f767d4a39f4e1454dae1b57a530747c6834b2477
 F expat/xmlrole.h b234bee2df5b368e4b546f91d178bffc2a41e70fb4d69061561bfcb5857e51ef
 F expat/xmltok.c 660f84ef7703ebd6de5ee8c5d12cd17cb965e894d01bd89d19b4f7c00e8816c6
@@ -209,7 +209,7 @@ F tests/htmlreader.test a36f523cd3160caffafa9362332379e8f0a025a43183063501b6beeb
 F tests/i18n.test 421e3998480ed5ce9420f4b596c384b8d5261e7fb4b33c0a7c12ef126d476939
 F tests/loadtdom.tcl 89af532a1e803f83049e290827804f3787f3056008a129d72f02936fea884db2
 F tests/namespace.test 0a13b2bf59bb088525ca7b64d0b2bce6a349c627ca3dd1c17a4cc969d16fe57c
-F tests/parser.test de4a24ce634b2e8e9d4c6096000034a6036598842a9d54bb0595c57007167e95
+F tests/parser.test 691c40826b8048f1bd795f7afdb27bd99b2b7a6f4de72188d8b160d49469e349
 F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
 F tests/pullparser.test df079ff6a5a6b11b4d0f409ca3fc17cc4a5956d31801872f9f1f95e35032dec5
@@ -239,8 +239,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 24edbe7a341bca2e9ae0cdf0011d9aa920246546adf6e7d8e026e03f2f5a46f8
-R a0a554ad2cb741f8c5b15008cbdbf2d3
+P 7d5ad25fc7bebb641ead83d6e225f3578baa17a1e4b9f32ffcacbe8d5f4d6fd1
+R f0cc08efc98bec54c8284fdba101e344
 U sebres
-Z d8680b4e8e21e6fce185a480acd49c4f
+Z 3a60fcc9f6c29ff45154d3bd0a580972
 # Remove this line to create a well-formed Fossil manifest.

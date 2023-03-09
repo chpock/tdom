@@ -5706,7 +5706,7 @@ epilogProcessor(XML_Parser parser, const char *s, const char *end,
       *nextPtr = s;
       /* in bulk mode we must call XML-end handler for last XML parsed, but bypass it on a 
        * repeated call for buffer of 0 bytes length (e. g. XML_ParseBuffer invoked at end of file) */
-      if (parser->m_bulkXMLEndHandler && parser->m_xmlStarted && s != parser->m_positionPtr) {
+      if (parser->m_bulkXMLEndHandler && parser->m_xmlStarted) {
         /* bulk mode - call XML-end handler */
         parser->m_bulkXMLEndHandler(parser->m_handlerArg);
         parser->m_xmlStarted = XML_FALSE;
@@ -5745,7 +5745,7 @@ epilogProcessor(XML_Parser parser, const char *s, const char *end,
         return XML_ERROR_JUNK_AFTER_DOC_ELEMENT;
       }
       /* bulk mode - call XML-end handler */
-      if (parser->m_xmlStarted && s != parser->m_positionPtr) {
+      if (parser->m_xmlStarted) {
         parser->m_bulkXMLEndHandler(parser->m_handlerArg);
         parser->m_xmlStarted = XML_FALSE;
       }

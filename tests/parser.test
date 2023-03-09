@@ -1038,10 +1038,14 @@ test parser-13.5 {bulk parsing - bulk xml's exactly at buffer range} -setup {
     $p parse {<?xml version="1.0"?><X/>}
     $p parse {<?xml version="1.0"?><Y/>}
     $p parse {<?xml version="1.0"?><Z/>}
+    $p parse ""; # simulate call on empty buffer (can be caused at eof from parsechannel / parsefile), should don't generate empty dataset
     # the same considering white spaces at range of buffer:
     $p parse "<?xml version=\"1.0\"?><X/> "
     $p parse "\n<?xml version=\"1.0\"?><Y/>"
     $p parse " \n<?xml version=\"1.0\"?><Z/>\n"
+    # simulate call on small whitespace and empty buffer, should don't generate empty dataset:
+    $p parse "\n"
+    $p parse ""
     set ::res
 } -cleanup {
     $p free
