@@ -25,3 +25,12 @@ if {[info commands ::tdom::xmlReadFile] == ""} {
     # tcldomsh without the script library. Source the lib.
     source [file join [file dir [info script]] ../lib tdom.tcl]
 }
+
+# Package internal test constraints
+if {[info procs ::tdom::extRefHandler] != ""} {
+    testConstraint need_uri 1
+}
+if {[package vsatisfies [package present Tcl] 9]} {
+    testConstraint Tcl9 1
+}
+

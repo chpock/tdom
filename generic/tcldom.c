@@ -7320,6 +7320,11 @@ int tcldom_parse (
 
 #ifdef TDOM_HAVE_GUMBO
     if (takeGUMBOParser) {
+        if (xml_string_len > UINT_MAX) {
+            SetResult ("The Gumbo library doesn't support strings longer than"
+                       " 4 gigabytes.");
+            return TCL_ERROR;
+        }
         doc = HTML_GumboParseDocument(xml_string, ignoreWhiteSpaces,
                                       ignorexmlns);
         return tcldom_returnDocumentObj (interp, doc, setVariable, newObjName,
