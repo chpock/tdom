@@ -365,7 +365,9 @@ domIsChar (
 char *
 domClearString (
     char *str,
-    int *haveToFree
+    int *haveToFree,
+    int replace,
+    int length
     )
 {
     const char *p, *s;
@@ -386,13 +388,16 @@ domClearString (
         return str;
     }
     s = p;
-    p += clen;
-    while (*p) p++;
-    clearedstr = MALLOC (sizeof(char) * (p-str));
+    clearedstr = MALLOC (sizeof(char) * (length + (length - (s-str)) * 2) + 1);
     p1 = clearedstr;
     while (str < s) {
         *p1 = *str;
         p1++; str++;
+    }
+    if (replace) {
+        *p1 = '\xEF'; p1++;
+        *p1 = '\xBF'; p1++;
+        *p1 = '\xBD'; p1++;
     }
     str += clen;
     while (*str) {
@@ -403,6 +408,11 @@ domClearString (
                 p1++; str++;
             }
         } else {
+            if (replace) {
+                *p1 = '\xEF'; p1++;
+                *p1 = '\xBF'; p1++;
+                *p1 = '\xBD'; p1++;
+            }
             str += clen;
         }
     }
