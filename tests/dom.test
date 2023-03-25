@@ -1140,11 +1140,12 @@ test dom-3.44 {clearString -replace} {
         \uD800\uD801\uD802_foo_bar_baz\uD802_didum\uE000
         \u0004\u0005\uDABC
         abc
+        \u0004\u0005\u0001
     } {
         lappend result [dom clearString -replace $str]
     }
     set result
-} [list \ufffd a\ufffd \ufffdb a\ufffdb a\ufffd\ufffdb a\ufffdc\ufffdb a\ufffdd\ufffd\ufffdb a\ufffdd\ufffd\ufffd\ufffd\ufffd_foo_bar \ufffd\ufffd\ufffd_foo_bar_baz\ufffd_didum\ufffd \ufffd\ufffd\ufffd_foo_bar_baz\ufffd_didum\uE000 \ufffd\ufffd\ufffd abc]
+} [list \ufffd a\ufffd \ufffdb a\ufffdb a\ufffd\ufffdb a\ufffdc\ufffdb a\ufffdd\ufffd\ufffdb a\ufffdd\ufffd\ufffd\ufffd\ufffd_foo_bar \ufffd\ufffd\ufffd_foo_bar_baz\ufffd_didum\ufffd \ufffd\ufffd\ufffd_foo_bar_baz\ufffd_didum\uE000 \ufffd\ufffd\ufffd abc \ufffd\ufffd\ufffd]
 
 
 test dom-4.1 {-useForeignDTD 0} {

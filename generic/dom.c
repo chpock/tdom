@@ -370,8 +370,8 @@ domClearString (
     int length
     )
 {
-    const char *p, *s;
-    char *p1, *clearedstr;
+    const char *s;
+    char *p, *clearedstr;
     int   clen, i, rewrite = 0;
     
     p = str;
@@ -388,35 +388,44 @@ domClearString (
         return str;
     }
     s = p;
-    clearedstr = MALLOC (sizeof(char) * (length + (length - (s-str)) * 2) + 1);
-    p1 = clearedstr;
-    while (str < s) {
-        *p1 = *str;
-        p1++; str++;
-    }
     if (replace) {
-        *p1 = '\xEF'; p1++;
-        *p1 = '\xBF'; p1++;
-        *p1 = '\xBD'; p1++;
+        /* Worst case: every char from the first illegal one up to the
+         * end are a single byte one and will be replaced with a three
+         * byte one. So we need (to the one that is already included
+         * in length two additional bytes for every outstandig
+         * char. */
+        clearedstr = MALLOC (sizeof(char) * (length+(length-(s-str))*2)+1);
+    } else {
+        /* We have at least on code-point to skip so lenght alone will
+         * be enoug for the result string including the closing \0. */
+        clearedstr = MALLOC (sizeof(char) * length);
+    }
+    memcpy (clearedstr, str, (s-str));
+    p = clearedstr + (s-str);
+    str += (s-str);
+    if (replace) {
+        *p = '\xEF'; p++;
+        *p = '\xBF'; p++;
+        *p = '\xBD'; p++;
     }
     str += clen;
     while (*str) {
         clen = UTF8_CHAR_LEN(*str);
         if (clen <= 4 && UTF8_XMLCHAR((unsigned const char*)str,clen)) {
             for (i = 0; i < clen; i++) {
-                *p1 = *str;
-                p1++; str++;
+                *p = *str;
+                p++; str++;
             }
         } else {
             if (replace) {
-                *p1 = '\xEF'; p1++;
-                *p1 = '\xBF'; p1++;
-                *p1 = '\xBD'; p1++;
+                *p = '\xEF'; p++;
+                *p = '\xBF'; p++;
+                *p = '\xBD'; p++;
             }
             str += clen;
         }
     }
-    *p1 = '\0';
+    *p = '\0';
     *haveToFree = 1;
     return clearedstr;
 }
