@@ -1,4 +1,9 @@
 
+2023-03-25  Rolf Ade  <rolf@pointsman.de>
+
+        Added the option -replace to the dom command method
+        clearString.
+
 2022-09-11  Rolf Ade  <rolf@pointsman.de>
 
         Added the node command method getByteIndex. Added the

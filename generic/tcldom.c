@@ -7636,8 +7636,9 @@ int tcldom_DomObjCmd (
 {
     GetTcldomDATA;
 
-    char        * method, tmp[300], *clearedStr;
-    int           methodIndex, result, i, bool;
+    char        * method, tmp[300], *clearedStr, *string, *option;
+    int           methodIndex, result, i, bool, replace = 0;
+    domLength     len;
     Tcl_CmdInfo   cmdInfo;
     Tcl_Obj     * mobjv[MAX_REWRITE_ARGS], *newObj;
 
@@ -7674,6 +7675,13 @@ int tcldom_DomObjCmd (
         v_automatic, v_command, v_token
     };
 
+    static const char *clearStringOptions[] = {
+        "automatic", "-replace", NULL
+    };
+    enum clearStringOption {
+        o_replace
+    };
+    
     if (objc < 2) {
         SetResult(dom_usage);
         return TCL_ERROR;
@@ -7893,8 +7901,25 @@ int tcldom_DomObjCmd (
             return TCL_OK;
 
         case m_clearString:
-            CheckArgs(3,3,2,"string");
-            clearedStr = domClearString (Tcl_GetString (objv[2]), &bool);
+            CheckArgs(3,4,2,"?-replace? string");
+            if (objc == 4) {
+                option = Tcl_GetString (objv[2]);
+                if (option[0] == '-' && option[1] == 'r') {
+                    if (Tcl_GetIndexFromObj (interp, objv[2],
+                                             clearStringOptions, "option",
+                                             0, &i) != TCL_OK) {
+                        return TCL_ERROR;
+                    }
+                } else {
+                    SetResult("expected: clearString ?-replace? string");
+                    return TCL_ERROR;
+                }
+                replace = 1;
+                objc--;
+                objv++;
+            }
+            string = Tcl_GetStringFromObj (objv[2], &len);
+            clearedStr = domClearString (string, &bool, replace, len);
             if (bool) {
                 newObj = Tcl_NewStringObj (clearedStr, -1);
                 FREE (clearedStr);

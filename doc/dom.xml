@@ -613,9 +613,11 @@ recommendation. Otherwise it returns 0.</desc>
         </commanddef>
 
         <commanddef>
-          <command><cmd>dom</cmd> <method>clearString</method> <m>string</m></command>
-          <desc>Returns the string given as argument cleared out from any characters not
-          allowed as XML parsed character data.</desc>
+          <command><cmd>dom</cmd> <method>clearString</method> ?<m>-replace</m>? <m>string</m></command>
+          <desc>Returns the string given as argument cleared out from
+          any characters not allowed as XML parsed character data. If
+          the <m>-replace</m> option is given then instead of removing
+          such characters are replaced with \uFFFD.</desc>
         </commanddef>
         
         <commanddef>
