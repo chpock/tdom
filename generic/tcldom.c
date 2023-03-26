@@ -7676,7 +7676,7 @@ int tcldom_DomObjCmd (
     };
 
     static const char *clearStringOptions[] = {
-        "automatic", "-replace", NULL
+        "-replace", NULL
     };
     enum clearStringOption {
         o_replace
