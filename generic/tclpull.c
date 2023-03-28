@@ -98,7 +98,7 @@ typedef struct tDOM_PullParserInfo
     PullParseMode   mode;
     int             skipDepth;
     Tcl_Obj       **firstFindElement;
-    int             countFindElement;
+    domLength       countFindElement;
 #ifdef EXPAT_RESUME_BUG
     long            elmStartCounter;
 #endif

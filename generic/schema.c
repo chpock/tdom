@@ -2292,14 +2292,16 @@ int tDOM_probeDomAttributes (
     }
     return TCL_OK;
 }
-int probeEventAttribute (
+
+static int probeEventAttribute (
     Tcl_Interp *interp,
     SchemaData *sdata,
     Tcl_Obj *attr,
-    int len
+    domLength len
     )
 {
-    int i, found, req;
+    int found, req;
+    domLength i;
     unsigned int reqAttr = 0;
     char *name, *ns;
     SchemaCP *cp;
@@ -4108,7 +4110,8 @@ unifyMatchList (
     Tcl_Obj *list
     )
 {
-    int len, i, hnew;
+    domLength len, i;
+    int hnew;
     Tcl_HashEntry *h;
     Tcl_Obj *rObj, *thisObj;
     Tcl_HashSearch search;
@@ -5155,7 +5158,8 @@ tDOM_schemaInstanceCmd (
 {
     int            methodIndex, keywordIndex, hnew, patternIndex;
     int            result = TCL_OK, forwardDef = 0, j, k = 0;
-    int            savedDefineToplevel, type, len, n;
+    int            savedDefineToplevel, type, n;
+    domLength      len;
     unsigned int   i, savedNumPatternList, nrTypeInstances, typeInstancesLen;
     SchemaData    *savedsdata = NULL, *sdata = (SchemaData *) clientData;
     Tcl_HashTable *hashTable;
@@ -5969,7 +5973,8 @@ AnyPatternObjCmd (
     SchemaCP *pattern;
     SchemaQuant quant;
     char *ns = NULL, *ns1;
-    int n, m, nrns, i, hnew, revert, optionIndex;
+    int n, m, hnew, revert, optionIndex;
+    domLength nrns, i;
     Tcl_Obj *nsObj;
     Tcl_HashTable *t = NULL;
 
@@ -6748,7 +6753,8 @@ domuniquePatternObjCmd (
     ast t;
     char *errMsg = NULL;
     domKeyConstraint *kc, *kc1;
-    int i, nrFields, flags = 0;
+    domLength i, nrFields;
+    int flags = 0;
     Tcl_Obj *elm;
 
     CHECK_SI
@@ -6918,7 +6924,8 @@ keyspacePatternObjCmd (
 {
     SchemaData *sdata = GETASI;
     SchemaCP *pattern;
-    int nrKeyspaces, i, hnew;
+    domLength nrKeyspaces, i;
+    int hnew;
     Tcl_Obj *ksObj;
     SchemaKeySpace *ks;
     Tcl_HashEntry *h;

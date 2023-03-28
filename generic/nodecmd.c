@@ -269,7 +269,7 @@ nodecmd_processAttributes (
     )
 {
     Tcl_Obj **opts;
-    int len, i;
+    domLength i, len;
     char *tval, *aval;
     
     /*

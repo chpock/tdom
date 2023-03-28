@@ -359,7 +359,8 @@ enumerationTCObjCmd (
     SchemaData *sdata = GETASI;
     SchemaConstraint *sc;
     Tcl_HashTable *values;
-    int len, i, hnew;
+    domLength len, i;
+    int hnew;
     Tcl_Obj *value;
 
     CHECK_TI
@@ -1268,7 +1269,8 @@ splitTclImpl (
     )
 {
     splitTclTCData *tcdata = (splitTclTCData *) constraintData;
-    int rc, listlen, i;
+    domLength listlen, i;
+    int rc;
     Tcl_Obj *list, *listelm;
 
     tcdata->evalStub[tcdata->nrArg-1] = Tcl_NewStringObj(text, -1);

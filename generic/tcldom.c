@@ -1408,8 +1408,8 @@ int tcldom_xpathFuncCallBack (
     Tcl_Obj     *resultPtr, *objv[MAX_REWRITE_ARGS], *type, *value, *nodeObj,
                 *tmpObj;
     Tcl_CmdInfo  cmdInfo;
-    int          objc, rc, i, listLen, intValue, res;
-    domLength    errStrLen;
+    int          objc, rc, i, intValue, res;
+    domLength    errStrLen, listLen;
     double       doubleValue;
     domNode     *node;
 
@@ -1671,8 +1671,9 @@ int tcldom_selectNodes (
 {
     char          *xpathQuery, *typeVar, *option;
     char          *errMsg = NULL, **mappings = NULL;
-    int            rc, i, len, optionIndex, localmapping = 0, cache = 0;
+    int            rc, optionIndex, localmapping = 0, cache = 0;
     int            mappingListObjLen = 0;
+    domLength      i, len;
     xpathResultSet rs;
     Tcl_Obj       *type, *objPtr, *objPtr1, *mappingListObj = NULL;
     xpathCBs       cbs;
@@ -1954,8 +1955,9 @@ int tcldom_appendFromTclList (
     Tcl_Obj    *obj
 )
 {
-    int       i, rc, attrLength, childListLength;
-    domLength valueLength, length, attrValueLength;
+    int       i, rc;
+    domLength valueLength, length, attrLength, attrValueLength;
+    domLength childListLength;
     Tcl_Obj  *lnode, *tagNameObj, *piNameObj, *valueObj,
              *attrListObj, *attrObj, *childListObj, *childObj;
     char     *tag_name, *pi_name, *value, *attrName, *attrValue;
@@ -4415,7 +4417,8 @@ int tcldom_prefixNSlist (
     )
 {
     char   **prefixns = *prefixnsPtr;
-    int      len, i, result;
+    domLength len, i;
+    int result;
     Tcl_Obj *objPtr, *listPtr;
 
     i = 0;
@@ -4474,7 +4477,8 @@ static int renameNodes (
     Tcl_Obj     *const objv[] 
     )
 {
-    int      len, i, hnew;
+    domLength len, i;
+    int hnew;
     Tcl_HashEntry *h;
     Tcl_Obj *objPtr;
     domNode     *node;
@@ -6850,12 +6854,12 @@ void tcldom_reportErrorLocation (
         Tcl_AppendResult (interp, " in entity \"", entity, "\"", NULL);
     }
     if (line) {
-        sprintf(sl, "%lu", line);
-        sprintf(sc, "%lu", column);
+        sprintf(sl, domLengthConversion, line);
+        sprintf(sc, domLengthConversion, column);
         Tcl_AppendResult (interp, " at line ", sl, " character ", sc, NULL);
         
     } else {
-        sprintf(sb, "%lu", byteIndex);
+        sprintf(sb, domLengthConversion, byteIndex);
         Tcl_AppendResult (interp, " at position ", sb, NULL);
     }
     if (xmlstring) {
