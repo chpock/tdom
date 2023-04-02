@@ -194,7 +194,7 @@ int    xpathFuncBoolean  (xpathResultSet *rs);
 double xpathFuncNumber   (xpathResultSet *rs, int *NaN);
 char * xpathFuncString   (xpathResultSet *rs); 
 char * xpathFuncStringForNode (domNode *node);
-domLength xpathRound        (double r);
+long xpathRound        (double r);
 
 char * xpathGetStringValue (domNode *node, domLength *strLen);
 

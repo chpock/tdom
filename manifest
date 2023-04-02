@@ -1,5 +1,5 @@
-C Fixed\sTcl\s9\sdetection.
-D 2023-04-01T00:55:11.488
+C Fixed\sgross\smigration\sto\sTcl\s9\smistake.
+D 2023-04-02T23:46:28.215
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -138,8 +138,8 @@ F generic/domhtml5.h 5cca562a556e7662f2dce222640c32abb2777146
 F generic/domjson.c 0b5d64c598858d2bbd9ccaed4f3f1487593cb021c4bb11a9059874655061a12b
 F generic/domjson.h ff31d0fd1d6eb3e6490fb456d42b73e304a6f0c386a074db42d8b84ad8c925b3
 F generic/domlock.c f8e235892bb9dc771e844c47701ded81c10967dc6ca420b14ab54067211bdb8f
-F generic/domxpath.c 1747d911df3066b1b7149e2f648b46af92bc46e2c09c1c89579f5adfe2bad552
-F generic/domxpath.h 2df1abaaeadb1c7b83aaa0899778c32f639bab6022ae8882d953ad9fb72aad72
+F generic/domxpath.c 5f8bb6c5933c5b062f717c6793847d24c793096e68edd98ff474aba09ada0cf3
+F generic/domxpath.h 49b64c0db19a3f62128b2eec8fb31e068ab0be4305e86118b4aa8c368dcf4494
 F generic/domxslt.c 450b36add34b538deccc9acb11010b41d06b7985094adb8397310adb60328294
 F generic/domxslt.h aeaf957ee38a9e7564bd9f1bed1781de108767df476a0d0776615988d8f04e0f
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -239,8 +239,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P e3ef6358ddc1703391ff537cc8b22ec1758d0a03ea3cd7d51338a8a084dd3b2b
-R 373e425d5bd9bb704170b0ec117bf956
+P 110a96a81fb9a4b073f72834d0866ef8a48feba5119ca8d72397ea3f7837e16b
+R f5450570bdb00f97bd7474de8f761601
 U rolf
-Z 8809eefc99d09c89372ac32535b2bcc9
+Z cce51cd587ee0e1f32fe2c467eca2d1f
 # Remove this line to create a well-formed Fossil manifest.

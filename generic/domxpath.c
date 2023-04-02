@@ -2845,11 +2845,11 @@ static int xpathArityCheck (
 |   xpathRound
 |
 \---------------------------------------------------------------------------*/
-domLength xpathRound (double r) {
+long xpathRound (double r) {
     if (r < 0.0) {
-        return (domLength)floor (r + 0.5);
+        return (long)floor (r + 0.5);
     } else {
-        return (domLength)(r + 0.5);
+        return (long)(r + 0.5);
     }
 }
 
