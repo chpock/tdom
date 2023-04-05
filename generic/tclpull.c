@@ -406,7 +406,8 @@ tDOM_resumeParseing (
     ) 
 {
     XML_ParsingStatus pstatus;
-    int len, done, result;
+    int done, result;
+    domLength len;
     char *data;
     
 
