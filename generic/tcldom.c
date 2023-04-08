@@ -4557,9 +4557,9 @@ static int applyXSLT (
 {
     char          *usage, **parameters = NULL, *errMsg, *option;
     Tcl_Obj       *objPtr, *localListPtr = (Tcl_Obj *)NULL;
-    int            i, result, length, optionIndex;
-    int            ignoreUndeclaredParameters = 0;
+    int            result, optionIndex, ignoreUndeclaredParameters = 0;
     int            maxApplyDepth = MAX_XSLT_APPLY_DEPTH;
+    domLength      i, length;
     domDocument   *xsltDoc, *xmlDoc, *resultDoc = NULL;
     XsltMsgCBInfo  xsltMsgInfo;
 
