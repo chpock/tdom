@@ -1,9 +1,9 @@
-C Fixed\sclearString\soption\sarray.
-D 2023-03-26T01:50:13.149
+C The\sXPath\sfunctions\sfloor,\sceiling\sand\sround\snow\sreturn\san\sinteger\s(up\sto\ssize\slong).\sUp\sto\snow\sthey\sappended\sa\s.0.\sIt's\sthe\sright\sthing\sbut\sit\sis\sa\suser\svisible\schange.
+D 2023-05-09T21:50:14.547
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
-F CHANGES 2939d64ff70687c038de136b055c35e3081cb94f10315ad8f86893103289e168
+F CHANGES 49b672b9c85e033a759f4ecf989218a11bdd7309fc64cfd4a57577c95de8fed9
 F ChangeLog 9b60ec8bfbae84e4f1a97aaee24be00ccea212b7
 F LICENSE 7c00b00fe8e88c48498a54c103dd7df03faeeb039c783279d5fb54dfca307b77
 F MPL_2.0.html 326b847674d6f5846c5b260fb437372e21232c23e3911f3a94f766a62459126c
@@ -138,8 +138,8 @@ F generic/domhtml5.h 5cca562a556e7662f2dce222640c32abb2777146
 F generic/domjson.c 1c33b0f4a2f022b69ae3d39f908081fa9724b75213a1b7f425cc0f093742dd64
 F generic/domjson.h b10c42af9ef7fc9d0ad4fac733ef6461df0cdd90
 F generic/domlock.c f8e235892bb9dc771e844c47701ded81c10967dc6ca420b14ab54067211bdb8f
-F generic/domxpath.c 6ac18ad3fde594ea6313090ab15637fcd04fa4d77d910c408f4ef336c68c581c
-F generic/domxpath.h 7d37b763e4e90d3e97c985c73d893b6ca26198ad1e61fad937d8147a254a2f0d
+F generic/domxpath.c 38f47d69ba8f38cb8f2fb2a29d5e9b78b7ec7262d3d8a9d0f4ab4174be93b30f
+F generic/domxpath.h 4cc90305f725a131430557cf7e9f1514640f6fb75ca150e8cbd80adb4ba65903
 F generic/domxslt.c bf07499917501ba1d8a401ed3f780f8228b392a6b3c59e64c00076885582cfcc
 F generic/domxslt.h 0cb8e327683a0ffeb2a7094add6cd82ec1ae49c7c704f20d8d6f7d6523e74da8
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -221,7 +221,7 @@ F tests/tdomcmd.test 092401adf0609906d710f3ef8997cb4ca29bc208
 F tests/xmlsimple.test 916da0520d9849c63da9a1261313d3e14fe2c9b8e981456e73e917528b029632
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.bench a8a90cbce1e276d05c6ff2c54ef04ffb3166c16e4094a543c694256ea4d68355
-F tests/xpath.test d46b16e82170cfa5722bd5985e167f915fd1fbbd33913d5429c3dcb885a96a53
+F tests/xpath.test 67045f566582c565d292180f759294614f0848d09292db2a1137ce48ed0cafd9
 F tests/xslt.test 35a5408426b098bcc07bdecfb52f1ec4c8ac3e984224ba497e700420047621a4
 F unix/CONFIG 431b82a51451df40e38261b91e1a37060797ef655e8f981fab761de59f1e01e9
 F unix/speed-check.sh 7a8d91e7edf1cdc9bcfad5f28e1a068cb2843d05e49d8bd89d9b30a46511497d
@@ -239,8 +239,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 38ad77e7cdae4d6679866db7d19b104767c26bf29b43452ae9be7488e9985ba8
-R 02dd30cdee5a0b2de59163f414cd1d58
+P 651a5b664b0425652177394fc4016c9f0bac43a7e86cf187c84c9acfeea69f2f
+R 4ceb831b9644c440722c60b341a313e8
 U rolf
-Z 7c0359d996a00f2ef4df81f0b9b9dd0f
+Z 1aa5f2ba51fdb6d092fa70095e4ac3d6
 # Remove this line to create a well-formed Fossil manifest.

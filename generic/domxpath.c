@@ -362,9 +362,17 @@ void rsPrint ( xpathResultSet *rs ) {
     }
 }
 void rsSetReal ( xpathResultSet *rs, double d) {
-
     rs->type = RealResult;
     rs->realvalue = d;
+}
+void rsSetReal2 ( xpathResultSet *rs, double d) {
+    if (d <= LONG_MIN || d >= LONG_MAX || d != (long)d) {
+        rs->type = RealResult;
+        rs->realvalue = d;
+    } else {
+        rs->type = IntResult;
+        rs->intvalue = (long)d;
+    }
 }
 void rsSetNaN ( xpathResultSet *rs ) {
     rs->type = NaNResult;
@@ -376,17 +384,14 @@ void rsSetNInf ( xpathResultSet *rs ) {
     rs->type = NInfResult;
 }
 void rsSetInt ( xpathResultSet *rs, long i) {
-
     rs->type = IntResult;
     rs->intvalue = i;
 }
 void rsSetBool ( xpathResultSet *rs, long i) {
-
     rs->type = BoolResult;
     rs->intvalue = (i ? 1 : 0);
 }
 void rsSetString ( xpathResultSet *rs, const char *s) {
-
     rs->type = StringResult;
     if (s) {
         rs->string     = tdomstrdup(s);
@@ -3019,7 +3024,7 @@ xpathEvalFunction (
             else if (step->intvalue == f_ceiling) leftReal = ceil(leftReal);
             else                                  leftReal = 
                                                       xpathRound(leftReal);
-            rsSetReal (result, leftReal);
+            rsSetReal2 (result, leftReal);
         }
         xpathRSFree( &leftResult );
         break;

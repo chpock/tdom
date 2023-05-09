@@ -203,6 +203,7 @@ char * xpathNodeToXPath  (domNode *node, int legacy);
 void rsSetBool      ( xpathResultSet *rs, long         i    );
 void rsSetInt       ( xpathResultSet *rs, long         i    );
 void rsSetReal      ( xpathResultSet *rs, double       d    );
+void rsSetReal2     ( xpathResultSet *rs, double       d    );
 void rsSetString    ( xpathResultSet *rs, const char  *s    );
 void rsAddNode      ( xpathResultSet *rs, domNode     *node );
 void rsAddNodeFast  ( xpathResultSet *rs, domNode     *node );
