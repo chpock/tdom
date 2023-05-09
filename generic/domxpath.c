@@ -234,7 +234,7 @@ DeclProduction(AbsoluteLocationPath);
 
 char *xpathFuncString (xpathResultSet  *rs );
 static int xpathEvalStep (ast step, domNode *ctxNode, domNode *exprContext,
-                          int position, xpathResultSet *nodeList,
+                          domLength position, xpathResultSet *nodeList,
                           xpathCBs *cbs, xpathResultSet *result,
                           int *docOrder, char **errMsg);
 
@@ -2926,7 +2926,7 @@ xpathEvalFunction (
     ast                step,
     domNode           *ctxNode,
     domNode           *exprContext,
-    int                position,
+    domLength          position,
     xpathResultSet    *nodeList,
     xpathCBs          *cbs,
     xpathResultSet    *result,
@@ -3840,7 +3840,7 @@ static int xpathEvalStep (
     ast                step,
     domNode           *ctxNode,
     domNode           *exprContext,
-    int                position,
+    domLength          position,
     xpathResultSet    *nodeList,
     xpathCBs          *cbs,
     xpathResultSet    *result,
@@ -5030,7 +5030,8 @@ static int xpathEvalPredicate (
 )
 {
     xpathResultSet predResult, tmpResult;
-    int            i, rc, savedDocOrder, useFastAdd;
+    int            rc, savedDocOrder, useFastAdd;
+    domLength      i;
 
     if (result->nr_nodes == 0) useFastAdd = 1;
     else useFastAdd = 0;
@@ -5109,7 +5110,7 @@ static int xpathEvalStepAndPredicates (
     xpathResultSet    *nodeList,
     domNode           *currentNode,
     domNode           *exprContext,
-    int                currentPos,
+    domLength          currentPos,
     int               *docOrder,
     xpathCBs          *cbs,
     xpathResultSet    *result,
@@ -5160,14 +5161,15 @@ int xpathEvalSteps (
     xpathResultSet    *nodeList,
     domNode           *currentNode,
     domNode           *exprContext,
-    int                currentPos,
+    domLength          currentPos,
     int               *docOrder,
     xpathCBs          *cbs,
     xpathResultSet    *result,
     char              **errMsg
 )
 {
-    int i, rc, first = 1;
+    int rc, first = 1;
+    domLength i;
     xpathResultSet savedContext;
 
     DBG (fprintf (stderr, "xpathEvalSteps start\n");)
@@ -5293,7 +5295,8 @@ xpathEvalAst (
     char          **errMsg
     )
 {
-    int i, rc, first = 1, docOrder = 1;
+    int rc, first = 1, docOrder = 1;
+    domLength i;
     xpathResultSet savedContext;
     savedContext = *nodeList;
 
@@ -5358,7 +5361,8 @@ int xpathMatches (
 {
     xpathResultSet  stepResult, nodeList, newNodeList;
     ast             childSteps;
-    int             rc, i, j, currentPos = 0, nodeMatches, docOrder = 1;
+    int             rc, nodeMatches, docOrder = 1;
+    domLength       currentPos = 0, i, j;
     int             useFastAdd;
     const char     *localName = NULL, *nodeUri;
     domAttrNode    *attr;

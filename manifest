@@ -1,5 +1,5 @@
-C Merged\sfrom\strunk.
-D 2023-05-09T21:51:30.281
+C Lifted\snodeset\smax\slength\sto\sTcl_Size.
+D 2023-05-09T23:47:08.099
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -138,9 +138,9 @@ F generic/domhtml5.h 5cca562a556e7662f2dce222640c32abb2777146
 F generic/domjson.c 0b5d64c598858d2bbd9ccaed4f3f1487593cb021c4bb11a9059874655061a12b
 F generic/domjson.h ff31d0fd1d6eb3e6490fb456d42b73e304a6f0c386a074db42d8b84ad8c925b3
 F generic/domlock.c f8e235892bb9dc771e844c47701ded81c10967dc6ca420b14ab54067211bdb8f
-F generic/domxpath.c 9db81f3e3055b44b266d2c05f1b44d793e4b741acc1b8cde47fb86d446c8bf48
-F generic/domxpath.h c88423cddee3263e5157c32fae9df9515d51ec5737919be92920f2128b56de08
-F generic/domxslt.c 450b36add34b538deccc9acb11010b41d06b7985094adb8397310adb60328294
+F generic/domxpath.c 73401fbf0761acdbef5d81574d1a9299062912ee9a40dfa47283ea5a5216bf53
+F generic/domxpath.h 45eb0e42726209a8a97d5f3087beda14ec415308f8c3dbed58f493f23def7705
+F generic/domxslt.c 60ca616fe58d9001c7e6239a6c5d05014ace990b071d61666aeb832f32595723
 F generic/domxslt.h aeaf957ee38a9e7564bd9f1bed1781de108767df476a0d0776615988d8f04e0f
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c f51c9d52a5294c07ad18aac19227886c901e8abaed94ec0d61c2e7d04d065628
@@ -239,8 +239,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f443503fd252372feb654002bc096e7acc231cef6107080dc1972db6b7a38c75 874bd8e5f001f800b6b0bea9404cce322ea608dc3ce999cca79aa623e2e1741a
-R e72895ce1ddc41d784da3488e334e5ab
+P db1be8b781b651ac94c366491a5b4c2f1273e3afb63f88d17077a6b10ae3b167
+R 62d82db2ae9858e6079c66c6dffffb82
 U rolf
-Z ae9f7958e4f5324f4481f047ee70f1bf
+Z 634c2f0bd6aea44fe6e80a2c60afb5ee
 # Remove this line to create a well-formed Fossil manifest.

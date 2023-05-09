@@ -179,8 +179,8 @@ int    xpathMatches (ast steps, domNode * exprContext, domNode *nodeToMatch,
                     );
                      
 int xpathEvalSteps (ast steps, xpathResultSet *nodeList,
-                    domNode *currentNode, domNode *exprContext, int currentPos,
-                    int *docOrder,
+                    domNode *currentNode, domNode *exprContext,
+                    domLength currentPos,  int *docOrder,
                     xpathCBs *cbs,
                     xpathResultSet *result, char **errMsg);
                     

@@ -215,8 +215,8 @@ typedef struct xsltAttrSet {
 typedef struct xsltNodeSet {
     
     domNode       **nodes;
-    int             nr_nodes;
-    int             allocated;
+    domLength       nr_nodes;
+    domLength       allocated;
     
 } xsltNodeSet;
 
@@ -440,11 +440,11 @@ static int ApplyTemplates ( xsltState *xs, xpathResultSet *context,
 
 static int ApplyTemplate (  xsltState *xs, xpathResultSet *context,
                             domNode *currentNode, domNode *exprContext,
-                            int currentPos, const char *mode, 
+                            domLength currentPos, const char *mode, 
                             const char *modeURI, char **errMsg);
 
 static int ExecActions (xsltState *xs, xpathResultSet *context,
-                        domNode *currentNode, int currentPos,
+                        domNode *currentNode, domLength currentPos,
                         domNode *actionNode,  char **errMsg);
 
 static domDocument * getExternalDocument (Tcl_Interp *interp, xsltState *xs,
@@ -1550,7 +1550,7 @@ static void nsAddNode (
     domNode *node 
     ) 
 {
-    int insertIndex, i;
+    domLength insertIndex, i;
     
     insertIndex = ns->nr_nodes;
     for (i = ns->nr_nodes - 1; i >= 0; i--) {
@@ -1889,8 +1889,8 @@ static int xsltXPathFuncs (
     char              * keyId, *filterValue, *str = NULL;
     char                prefix[MAX_PREFIX_LEN];
     const char        * localName, *baseURI, *nsStr;
-    int                 rc, i, NaN, freeStr, x;
-    domLength           len;
+    int                 rc, NaN, freeStr;
+    domLength           i, len, x;
     double              n;
     xsltNodeSet       * keyValues;
     Tcl_HashEntry     * h;
@@ -2237,7 +2237,7 @@ static int evalXPath (
     xsltState       * xs,
     xpathResultSet  * context,
     domNode         * currentNode,
-    int               currentPos,
+    domLength         currentPos,
     char            * xpath,
     xpathResultSet  * rs,
     char           ** errMsg
@@ -2359,14 +2359,14 @@ static int fastMergeSort (
     int         asc,
     int         upperFirst,
     domNode   * a[],
-    int       * posa,
+    domLength * posa,
     domNode   * b[],
-    int       * posb,
+    domLength * posb,
     char     ** vs,
     double    * vd,
     char     ** vstmp,
     double    * vdtmp,
-    int         size,
+    domLength   size,
     char     ** errMsg
 ) {
     domNode *tmp;
@@ -2458,15 +2458,15 @@ static int sortNodeSetFastMerge(
     int         asc,
     int         upperFirst,
     domNode   * nodes[],
-    int         n,
+    domLength   n,
     char     ** vs,
     double    * vd,
-    int       * pos,
+    domLength * pos,
     char     ** errMsg
 )
 {
     domNode **b;
-    int      *posb;
+    domLength *posb;
     char    **vstmp;
     double   *vdtmp;
     int       rc;
@@ -2495,7 +2495,7 @@ static int xsltSetVar (
     char            * variableName,
     xpathResultSet  * context,
     domNode         * currentNode,
-    int               currentPos,
+    domLength         currentPos,
     char            * select,
     domNode         * actionNode,
     int               active,
@@ -3023,7 +3023,7 @@ static int ExecUseAttributeSets (
     xsltState         * xs,
     xpathResultSet    * context,
     domNode           * currentNode,
-    int                 currentPos,
+    domLength           currentPos,
     domNode           * actionNode,
     char              * styles,
     char             ** errMsg
@@ -3107,7 +3107,7 @@ static int evalAttrTemplates (
     xsltState       * xs,
     xpathResultSet  * context,
     domNode         * currentNode,
-    int               currentPos,
+    domLength         currentPos,
     char            * str,
     char           ** out,
     char           ** errMsg
@@ -3115,7 +3115,8 @@ static int evalAttrTemplates (
 {
     xpathResultSet  rs;
     char           *tplStart = NULL, *tplResult, *pc, literalChar;
-    int             rc, aLen, inTpl = 0, p = 0, inLiteral = 0;
+    domLength       aLen, p = 0;
+    int             rc, inTpl = 0, inLiteral = 0;
 
     aLen = 500;
     *out = MALLOC(aLen);
@@ -3210,7 +3211,7 @@ static int setParamVars (
     xsltState       * xs,
     xpathResultSet  * context,
     domNode         * currentNode,
-    int               currentPos,
+    domLength         currentPos,
     domNode         * actionNode,
     char           ** errMsg
 )
@@ -3262,7 +3263,7 @@ static int doSortActions (
     domNode         * actionNode,
     xpathResultSet  * context,
     domNode         * currentNode,
-    int               currentPos,
+    domLength         currentPos,
     char           ** errMsg
 )
 {
@@ -3274,7 +3275,8 @@ static int doSortActions (
     char           prefix[MAX_PREFIX_LEN];
     const char    *localName;
     double        *vd = NULL;
-    int            rc = 0, typeText, ascending, upperFirst, *pos = NULL, i, NaN;
+    int            rc = 0, typeText, ascending, upperFirst, NaN;
+    domLength      i, *pos = NULL;
     xpathResultSet rs;
 
     child = actionNode->lastChild; /* do it backwards, so that multiple sort
@@ -3359,7 +3361,7 @@ static int doSortActions (
                        select, typeText, ascending, nodelist->nr_nodes);
                 CHECK_RC;
                 if (!pos)
-                    pos = (int*)MALLOC(sizeof(int) * nodelist->nr_nodes);
+                    pos = (domLength*)MALLOC(sizeof(int) * nodelist->nr_nodes);
                 for (i=0; i<nodelist->nr_nodes;i++) pos[i] = i;
 
                 xs->currentXSLTNode = child;
@@ -3414,7 +3416,7 @@ static int xsltNumber (
     xsltState       * xs,
     xpathResultSet  * context,
     domNode         * currentNode,
-    int               currentPos,
+    domLength         currentPos,
     domNode         * actionNode,
     char           ** errMsg
 )
@@ -3713,7 +3715,7 @@ static int ExecAction (
     xsltState       * xs,
     xpathResultSet  * context,
     domNode         * currentNode,
-    int               currentPos,
+    domLength         currentPos,
     domNode         * actionNode,
     char           ** errMsg
 )
@@ -5057,7 +5059,7 @@ static int ExecActions (
     xsltState       * xs,
     xpathResultSet  * context,
     domNode         * currentNode,
-    int               currentPos,
+    domLength         currentPos,
     domNode         * actionNode,
     char           ** errMsg
 )
@@ -5093,7 +5095,7 @@ static int ApplyTemplate (
     xpathResultSet * context,
     domNode        * currentNode,
     domNode        * exprContext,
-    int              currentPos,
+    domLength        currentPos,
     const char     * mode,
     const char     * modeURI,
     char          ** errMsg
@@ -5271,7 +5273,7 @@ static int ApplyTemplates (
     xsltState      * xs,
     xpathResultSet * context,
     domNode        * currentNode,
-    int              currentPos,
+    domLength        currentPos,
     domNode        * actionNode,
     xpathResultSet * nodeList,
     const char     * mode,
@@ -5280,7 +5282,8 @@ static int ApplyTemplates (
 )
 {
     domNode  * savedLastNode;
-    int        i, rc, needNewVarFrame = 1;
+    int        rc, needNewVarFrame = 1;
+    domLength  i;
 
     if (nodeList->type == xNodeSetResult) {
         if (xs->nestedApplyTemplates > xs->maxNestedApplyTemplates) {
