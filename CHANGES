@@ -1,4 +1,10 @@
 
+2023-05-09  Rolf Ade  <rolf@pointsman.de>
+
+        The XPath functions floor, ceiling and round now return an
+        integer (up to size long). Up to now they appended a .0. It's
+        the right thing but it is a user visible change.
+
 2023-03-25  Rolf Ade  <rolf@pointsman.de>
 
         Added the option -replace to the dom command method

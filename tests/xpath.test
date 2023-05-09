@@ -86,6 +86,54 @@ test xpath-1.15 {ceiling, according errata to section 4.4} {
     $root selectNodes {ceiling('3.2e2')}
 } {NaN}
 
+test xpath-1.16 {floor} {
+    $root selectNodes floor(1.1)
+} 1
+
+test xpath-1.17 {floor} {
+    $root selectNodes floor('1.1')
+} 1
+
+test xpath-1.18 {floor} {
+    $root selectNodes floor(1.9999)
+} 1
+
+test xpath-1.19 {floor} {
+    $root selectNodes floor(-1.9999)
+} -2
+
+test xpath-1.20 {ceiling} {
+    $root selectNodes ceiling(1.1)
+} 2
+
+test xpath-1.21 {ceiling} {
+    $root selectNodes ceiling('1.1')
+} 2
+
+test xpath-1.22 {ceiling} {
+    $root selectNodes ceiling(1.9999)
+} 2
+
+test xpath-1.23 {ceiling} {
+    $root selectNodes ceiling(-1.9999)
+} -1
+
+test xpath-1.24 {round} {
+    $root selectNodes round(1.1)
+} 1
+
+test xpath-1.25 {round} {
+    $root selectNodes round('1.1')
+} 1
+
+test xpath-1.26 {round} {
+    $root selectNodes round(1.9999)
+} 2
+
+test xpath-1.27 {round} {
+    $root selectNodes round(-1.9999)
+} -2
+
 $doc delete
 
 test xpath-2.1 {non ASCII chars in element names} {
