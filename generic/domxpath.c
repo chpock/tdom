@@ -285,7 +285,8 @@ xpathRSReset (
 }
 
 void rsPrint ( xpathResultSet *rs ) {
-    int i = 0,l;  char tmp[80];
+    domLength i = 0,l;
+    char tmp[80];
     switch (rs->type) {
         case EmptyResult:
              fprintf(stderr, "empty result \n");
@@ -308,7 +309,7 @@ void rsPrint ( xpathResultSet *rs ) {
              break;
 
         case xNodeSetResult:
-             if (!i) fprintf(stderr,"nodeSet result (len %d):\n",rs->nr_nodes);
+             if (!i) fprintf(stderr,"nodeSet result (len %ld):\n",rs->nr_nodes);
              for (i=0; i<rs->nr_nodes; i++) {
                  if (rs->nodes[i]->nodeType == ELEMENT_NODE) {
                      fprintf(stderr, "%2d domNode%p %s ",
@@ -364,7 +365,7 @@ void rsSetReal ( xpathResultSet *rs, double d) {
     rs->realvalue = d;
 }
 void rsSetReal2 ( xpathResultSet *rs, double d) {
-    if (d <= LONG_MIN || d >= LONG_MAX || d != (long)d) {
+    if (d <= (double)LONG_MIN || d >= (double)LONG_MAX || d != (long)d) {
         rs->type = RealResult;
         rs->realvalue = d;
     } else {
@@ -381,7 +382,7 @@ void rsSetInf ( xpathResultSet *rs ) {
 void rsSetNInf ( xpathResultSet *rs ) {
     rs->type = NInfResult;
 }
-void rsSetInt ( xpathResultSet *rs, long i) {
+void rsSetLong ( xpathResultSet *rs, long i) {
     rs->type = IntResult;
     rs->intvalue = i;
 }
@@ -478,7 +479,7 @@ void rsAddNodeFast ( xpathResultSet *rs, domNode *node) {
 
 void rsCopy ( xpathResultSet *to, xpathResultSet *from ) {
 
-    int i;
+    domLength i;
 
     to->type       = from->type;
     to->intvalue   = from->intvalue;
@@ -697,8 +698,7 @@ static XPathTokens xpathLexer (
     char    **errMsg
 )
 {
-    int  l, allocated;
-    int  i, k, start, offset;
+    domLength  l, allocated, i, k, start, offset;
     char delim, *ps, save, tmpErr[80], *tailptr;
     const char *uri;
     XPathTokens tokens;
@@ -1113,7 +1113,7 @@ static XPathTokens xpathLexer (
                            if (xpath[i]=='.') {
                                if (token == REALNUMBER) {
                                    sprintf (tmpErr, "Unexpected character "
-                                            "'%c' at position %d", xpath[i],
+                                            "'%c' at position %ld", xpath[i],
                                             i);
                                    *errMsg = tdomstrdup (tmpErr);
                                    return tokens;
@@ -1138,13 +1138,13 @@ static XPathTokens xpathLexer (
                            xpath[i--] = save;
                            if (tokens[l].realvalue == 0.0 && tailptr == ps) {
                                sprintf (tmpErr, "Number value too large "
-                                        "at position %d", i);
+                                        "at position %ld", i);
                                *errMsg = tdomstrdup (tmpErr);
                                return tokens;
                            }
                        } else {
                            sprintf (tmpErr, "Unexpected character '%c' at "
-                                    "position %d", xpath[i], i);
+                                    "position %ld", xpath[i], i);
                            *errMsg = tdomstrdup (tmpErr);
                            return tokens;
                        }
@@ -2963,15 +2963,15 @@ xpathEvalFunction (
     case f_position:
         XPATH_ARITYCHECK(step,0,errMsg);
         if (*docOrder) {
-            rsSetInt (result, position+1);
+            rsSetLong (result, position+1);
         } else {
-            rsSetInt (result, nodeList->nr_nodes - position);
+            rsSetLong (result, nodeList->nr_nodes - position);
         }
         break;
 
     case f_last:
         XPATH_ARITYCHECK(step,0,errMsg);
-        rsSetInt (result, nodeList->nr_nodes);
+        rsSetLong (result, nodeList->nr_nodes);
         break;
 
     case f_number:
@@ -3100,7 +3100,7 @@ xpathEvalFunction (
                 }
                 pto += i;
             }
-            rsSetInt (result, len);
+            rsSetLong (result, len);
         }
         else {
             pwhite = 1;
@@ -3203,7 +3203,7 @@ xpathEvalFunction (
         }
         if (leftResult.type != xNodeSetResult) {
             if (leftResult.type == EmptyResult) {
-                rsSetInt (result, 0);
+                rsSetLong (result, 0);
                 return XPATH_OK;
             } else {
                 xpathRSFree( &leftResult );
@@ -3574,7 +3574,7 @@ xpathEvalFunction (
             return rc;
         }
         if (leftResult.type == EmptyResult) {
-            rsSetInt (result, 0);
+            rsSetLong (result, 0);
             return XPATH_OK;
         }
         if (leftResult.type != xNodeSetResult) {
@@ -3582,7 +3582,7 @@ xpathEvalFunction (
             xpathRSFree( &leftResult );
             return XPATH_EVAL_ERR;
         }
-        rsSetInt (result, leftResult.nr_nodes);
+        rsSetLong (result, leftResult.nr_nodes);
         xpathRSFree (&leftResult);
         break;
 
@@ -3850,7 +3850,8 @@ static int xpathEvalStep (
 {
     xpathResultSet   leftResult, rightResult;
     xpathResultSet  *pleftResult, *prightResult, tResult;
-    int              i, j, k, rc, res, NaN, NaN1, switchResult, count = 0;
+    int              rc, res, NaN, NaN1, switchResult;
+    domLength        i, j, k, count = 0;
     domNode         *node, *child, *startingNode, *ancestor;
     domAttrNode     *attr;
     int              savedDocOrder, predLimit;
@@ -4341,7 +4342,8 @@ static int xpathEvalStep (
                 }
                 rc = 0;
                 for (i = 0; i < result->nr_nodes; i++) {
-                    if (strcmp (attr->nodeName, ((domAttrNode*)result->nodes[i])->nodeName)==0) {
+                    if (strcmp (attr->nodeName,
+                                ((domAttrNode*)result->nodes[i])->nodeName)==0) {
                         rc = 1; break;
                     }
                 }
@@ -4383,7 +4385,7 @@ static int xpathEvalStep (
         break;
 
     case Int:
-        rsSetInt (result, step->intvalue);
+        rsSetLong (result, step->intvalue);
         break;
 
     case Real:
@@ -4465,7 +4467,7 @@ static int xpathEvalStep (
                     break;
                 case Div:
                     if (NaN && NaN1)   rsSetNaN (result);
-                    else if (NaN1)     rsSetInt (result, 0);
+                    else if (NaN1)     rsSetLong (result, 0);
                     else {
                         if (dRight == 0.0) dTmp = NaN;
                         else dTmp = NaN * dRight;
@@ -4512,7 +4514,7 @@ static int xpathEvalStep (
                     || dLeft > (double)LONG_MAX + 0.1) {
                     rsSetNaN (result);
                 } else {
-                    rsSetInt  (result, ((long)dLeft) % ((long)dRight));
+                    rsSetLong  (result, ((long)dLeft) % ((long)dRight));
                 }
             }
             break;
@@ -4987,7 +4989,7 @@ static int xpathEvalStep (
                 break;
             case BoolResult:   rsSetBool(result, leftResult.intvalue);
                                break;
-            case IntResult:    rsSetInt(result, leftResult.intvalue);
+            case IntResult:    rsSetLong(result, leftResult.intvalue);
                                break;
             case RealResult:   rsSetReal(result, leftResult.realvalue);
                                break;
@@ -5189,7 +5191,7 @@ int xpathEvalSteps (
             CHECK_RC;
             first = 0;
         } else {
-            DBG( fprintf(stderr, "doing location step nodeList->nr_nodes=%d \n",
+            DBG( fprintf(stderr, "doing location step nodeList->nr_nodes=%ld \n",
                                  nodeList->nr_nodes);
             )
             if (result->type != xNodeSetResult) {
@@ -5314,7 +5316,7 @@ xpathEvalAst (
             CHECK_RC;
             first = 0;
         } else {
-            DBG( fprintf(stderr, "doing location step nodeList->nr_nodes=%d \n",
+            DBG( fprintf(stderr, "doing location step nodeList->nr_nodes=%ld \n",
                                  nodeList->nr_nodes);
             )
             if (rs->type != xNodeSetResult) {

@@ -119,8 +119,8 @@ typedef struct xpathResultSet {
     long            intvalue;
     double          realvalue;          
     domNode       **nodes;
-    int             nr_nodes;
-    int             allocated;
+    domLength       nr_nodes;
+    domLength       allocated;
 
 } xpathResultSet;
 
@@ -146,7 +146,7 @@ typedef struct xpathCBs {               /* all xpath callbacks + clientData */
 } xpathCBs;
 
 typedef char * (*xpathParseVarCallback)
-    (void *clientData, char *strToParse, int *offset, char **errMsg);
+    (void *clientData, char *strToParse, domLength *offset, char **errMsg);
 
 typedef struct xpathParseVarCB {
     xpathParseVarCallback parseVarCB;
@@ -201,7 +201,7 @@ char * xpathGetStringValue (domNode *node, domLength *strLen);
 char * xpathNodeToXPath  (domNode *node, int legacy);
     
 void rsSetBool      ( xpathResultSet *rs, long         i    );
-void rsSetInt       ( xpathResultSet *rs, long         i    );
+void rsSetLong      ( xpathResultSet *rs, long         i    );
 void rsSetReal      ( xpathResultSet *rs, double       d    );
 void rsSetReal2     ( xpathResultSet *rs, double       d    );
 void rsSetString    ( xpathResultSet *rs, const char  *s    );

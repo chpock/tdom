@@ -1408,8 +1408,8 @@ int tcldom_xpathFuncCallBack (
     Tcl_Obj     *resultPtr, *objv[MAX_REWRITE_ARGS], *type, *value, *nodeObj,
                 *tmpObj;
     Tcl_CmdInfo  cmdInfo;
-    int          objc, rc, i, intValue, res;
-    domLength    errStrLen, listLen;
+    int          objc, rc, res;
+    domLength    errStrLen, listLen, intValue, i;
     double       doubleValue;
     domNode     *node;
 
@@ -1505,9 +1505,9 @@ int tcldom_xpathFuncCallBack (
                 rsSetBool(result, intValue );
             } else
             if (strcmp(typeStr, "number")==0) {
-                rc = Tcl_GetIntFromObj(interp, value, &intValue);
+                rc = Tcl_GetLongFromObj(interp, value, &intValue);
                 if (rc == TCL_OK) {
-                    rsSetInt(result, intValue);
+                    rsSetLong(result, intValue);
                 } else {
                     rc = Tcl_GetDoubleFromObj(interp, value, &doubleValue);
                     rsSetReal(result, doubleValue);
@@ -1630,7 +1630,7 @@ static
 char * tcldom_xpathResolveVar (
     void  *clientData,
     char  *strToParse,
-    int   *offset,
+    domLength *offset,
     char **errMsg
     )
 {

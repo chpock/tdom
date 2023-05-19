@@ -433,7 +433,7 @@ typedef struct {
 |
 \-------------------------------------------------------------------------*/
 static int ApplyTemplates ( xsltState *xs, xpathResultSet *context,
-                            domNode *currentNode, int currentPos,
+                            domNode *currentNode, domLength currentPos,
                             domNode *actionNode, xpathResultSet *nodeList,
                             const char *mode, const char *modeURI, 
                             char **errMsg);
@@ -1704,10 +1704,10 @@ static int buildKeyInfoForDoc (
 \---------------------------------------------------------------------------*/
 static void sortNodeSetByNodeNumber(
     domNode *nodes[],
-    int      n
+    domLength n
 )
 {
-    int i, j, ln, rn;
+    domLength i, j, ln, rn;
     domNode *tmp;
 
     while (n > 1) {
@@ -2370,7 +2370,8 @@ static int fastMergeSort (
     char     ** errMsg
 ) {
     domNode *tmp;
-    int tmpPos, lptr, rptr, middle, i, j, gt, rc;
+    domLength tmpPos, lptr, rptr, middle, i, j;
+    int gt, rc;
     char    *tmpVs;
     double   tmpVd;
 
@@ -2447,7 +2448,7 @@ static int fastMergeSort (
         }
     }
     memcpy(a,    b,     size*sizeof(domNode*));
-    memcpy(posa, posb,  size*sizeof(int));
+    memcpy(posa, posb,  size*sizeof(domLength));
     memcpy(vs,   vstmp, size*sizeof(char*));
     memcpy(vd,   vdtmp, size*sizeof(double));
     return 0;
@@ -2472,7 +2473,7 @@ static int sortNodeSetFastMerge(
     int       rc;
 
     b = (domNode **)MALLOC(n * sizeof(domNode *));
-    posb = (int *)MALLOC(n * sizeof(int));
+    posb = (domLength *)MALLOC(n * sizeof(domLength));
     vstmp = (char **)MALLOC(sizeof (char *) * n);
     vdtmp = (double *)MALLOC(sizeof (double) * n);
 
