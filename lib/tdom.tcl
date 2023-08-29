@@ -54,6 +54,7 @@ namespace eval ::dom {
 namespace eval ::tdom { 
     variable extRefHandlerDebug 0
     variable useForeignDTD ""
+    variable utf8bom 0
 
     namespace export xmlOpenFile xmlReadFile xmlReadFileForSimple \
         extRefHandler baseURL
@@ -740,7 +741,8 @@ proc ::tdom::IANAEncoding2TclEncoding {IANAName} {
 #
 #----------------------------------------------------------------------------
 proc ::tdom::xmlOpenFileWorker {filename {encodingString {}} {forSimple 0} {forRead 0}} {
-
+    variable utf8bom
+    
     # This partly (mis-)use the encoding of a channel handed to [dom
     # parse -channel ..] as a marker: if the channel encoding is utf-8
     # then behind the scene Tcl_Read() is used, otherwise
@@ -791,6 +793,20 @@ proc ::tdom::xmlOpenFileWorker {filename {encodingString {}} {forSimple 0} {forR
         }
     }
     
+    if {$utf8bom} {
+        # According to the Unicode standard
+        # (http://www.unicode.org/versions/Unicode5.0.0/ch02.pdf) the
+        # "[u]se of a BOM is neither required nor recommended for
+        # UTF-8". Nevertheless such files exits. If the programmer
+        # explcitely enables this by setting ::tdom::utf8bom to true
+        # this is handled here.
+        if {[string range $firstBytes 0 5] eq "efbbbf"} {
+            set encString UTF-8
+            seek $fd 3 start
+            fconfigure $fd -encoding utf-8
+            return $fd
+        }
+    }
     
     # If the entity has a XML Declaration, the first four characters
     # must be "<?xm".
