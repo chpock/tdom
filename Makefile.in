@@ -220,6 +220,7 @@ $(TDOMSHELL): binaries $(srcdir)/unix/tclAppInit.c
 #========================================================================
 
 binaries: $(top_builddir)/versionhash.h $(BINARIES)
+	@cp $(srcdir)/lib/tdom.tcl .
 
 libraries:
 
