@@ -309,10 +309,11 @@ void rsPrint ( xpathResultSet *rs ) {
              break;
 
         case xNodeSetResult:
-             if (!i) fprintf(stderr,"nodeSet result (len %ld):\n",rs->nr_nodes);
+             if (!i) fprintf(stderr,"nodeSet result (len %" Tcl_Size_Conv "):\n",
+                             rs->nr_nodes);
              for (i=0; i<rs->nr_nodes; i++) {
                  if (rs->nodes[i]->nodeType == ELEMENT_NODE) {
-                     fprintf(stderr, "%2d domNode%p %s ",
+                     fprintf(stderr, "%2" Tcl_Size_Conv " domNode%p %s ",
                              i, (void *)rs->nodes[i], rs->nodes[i]->nodeName);
                      if (rs->nodes[i]->firstChild &&
                          rs->nodes[i]->firstChild->nodeType == TEXT_NODE)
@@ -330,7 +331,7 @@ void rsPrint ( xpathResultSet *rs ) {
                      if (l > 60) l = 60;
                      memcpy(tmp, ((domTextNode*)rs->nodes[i])->nodeValue, l);
                      tmp[l] = '\0';
-                     fprintf(stderr, "%2d domNode%p text:'%s' \n",
+                     fprintf(stderr, "%2" Tcl_Size_Conv " domNode%p text:'%s' \n",
                              i,  (void *)rs->nodes[i], tmp);
                  } else
                  if (rs->nodes[i]->nodeType == COMMENT_NODE) {
@@ -340,11 +341,11 @@ void rsPrint ( xpathResultSet *rs ) {
                      memcpy(&tmp[4], ((domTextNode*)rs->nodes[i])->nodeValue, l);
                      memcpy(&tmp[4+l], "-->", 3);
                      tmp[7+l] = '\0';
-                     fprintf(stderr, "%2d domNode%p text:'%s' \n",
+                     fprintf(stderr, "%2" Tcl_Size_Conv " domNode%p text:'%s' \n",
                              i,  (void *)rs->nodes[i], tmp);
                  } else
                  if (rs->nodes[i]->nodeType == ATTRIBUTE_NODE) {
-                     fprintf(stderr, "%2d Attr %s='%80s'\n", i,
+                     fprintf(stderr, "%2" Tcl_Size_Conv " Attr %s='%80s'\n", i,
                              ((domAttrNode*)rs->nodes[i])->nodeName,
                              ((domAttrNode*)rs->nodes[i])->nodeValue);
                  }
@@ -1113,8 +1114,8 @@ static XPathTokens xpathLexer (
                            if (xpath[i]=='.') {
                                if (token == REALNUMBER) {
                                    sprintf (tmpErr, "Unexpected character "
-                                            "'%c' at position %ld", xpath[i],
-                                            i);
+                                            "'%c' at position %" Tcl_Size_Conv,
+                                            xpath[i], i);
                                    *errMsg = tdomstrdup (tmpErr);
                                    return tokens;
                                }                                    
@@ -1138,13 +1139,13 @@ static XPathTokens xpathLexer (
                            xpath[i--] = save;
                            if (tokens[l].realvalue == 0.0 && tailptr == ps) {
                                sprintf (tmpErr, "Number value too large "
-                                        "at position %ld", i);
+                                        "at position %" Tcl_Size_Conv, i);
                                *errMsg = tdomstrdup (tmpErr);
                                return tokens;
                            }
                        } else {
                            sprintf (tmpErr, "Unexpected character '%c' at "
-                                    "position %ld", xpath[i], i);
+                                    "position %" Tcl_Size_Conv, xpath[i], i);
                            *errMsg = tdomstrdup (tmpErr);
                            return tokens;
                        }

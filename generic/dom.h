@@ -100,10 +100,12 @@
 #  define domLength Tcl_Size
 #  define Tcl_SetDomLengthObj Tcl_SetWideIntObj
 #  define domLengthConversion "%lu"
+#  define Tcl_Size_Conv  "ld"
 #else
 #  define domLength int
 #  define Tcl_SetDomLengthObj Tcl_SetIntObj
 #  define domLengthConversion "%d"
+#  define Tcl_Size_Conv  "d"
 #endif
 
 /* The following is the machinery to have an UNUSED macro which

@@ -1505,7 +1505,11 @@ int tcldom_xpathFuncCallBack (
                 rsSetBool(result, intValue );
             } else
             if (strcmp(typeStr, "number")==0) {
+#if TCL_MAJOR_VERSION > 8
                 rc = Tcl_GetLongFromObj(interp, value, &intValue);
+#else
+                rc = Tcl_GetIntFromObj(interp, value, &intValue);
+#endif
                 if (rc == TCL_OK) {
                     rsSetLong(result, intValue);
                 } else {
@@ -3893,7 +3897,7 @@ treeAsCanonicalXML (
     int  *lengthAttOrderArray
     )
 {
-    domAttrNode   *attr, *thisAtt, *previousAtt, *attOrder;
+    domAttrNode   *attr, *thisAtt = NULL, *previousAtt, *attOrder;
     domNode       *child;
     domDocument   *doc;
     domNS         *ns, *ns1;
@@ -3952,7 +3956,7 @@ treeAsCanonicalXML (
                 attNr++;
                 attr = attr->nextSibling;
             }
-            if (attNr) {
+            if (attNr && thisAtt) {
                 thisAtt->nextSibling = NULL;
             }
             attr = mergeSortAtt (attOrderArray[0], attNr) ;
