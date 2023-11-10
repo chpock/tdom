@@ -1408,7 +1408,7 @@ int tcldom_xpathFuncCallBack (
     Tcl_Obj     *resultPtr, *objv[MAX_REWRITE_ARGS], *type, *value, *nodeObj,
                 *tmpObj;
     Tcl_CmdInfo  cmdInfo;
-    int          objc, rc, res;
+    int          objc, rc, res, boolValue;
     domLength    errStrLen, listLen, intValue, i;
     double       doubleValue;
     domNode     *node;
@@ -1501,8 +1501,8 @@ int tcldom_xpathFuncCallBack (
             rc = Tcl_ListObjIndex(interp, resultPtr, 1, &value);
             typeStr = Tcl_GetString(type);
             if (strcmp(typeStr, "bool")==0) {
-                rc = Tcl_GetBooleanFromObj(interp, value, &intValue);
-                rsSetBool(result, intValue );
+                rc = Tcl_GetBooleanFromObj(interp, value, &boolValue);
+                rsSetBool(result, boolValue );
             } else
             if (strcmp(typeStr, "number")==0) {
 #if TCL_MAJOR_VERSION > 8

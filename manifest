@@ -1,5 +1,5 @@
-C More\stweaks\sto\smake\sthe\scode\sbuild\swithout\swarning\son\s8.5.19,\s8.6.13\sand\s9.
-D 2023-11-09T23:24:07.003
+C Fixed\swrong\sTcl_GetBooleanFromObj()\sargument\stype\swith\sTcl\s9\swhich\sslipped\sthrou\sbecause\sof\sno\scompiler\swarning\sdue\sto\sTIP\s618.
+D 2023-11-10T11:42:34.921
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -147,7 +147,7 @@ F generic/nodecmd.c f51c9d52a5294c07ad18aac19227886c901e8abaed94ec0d61c2e7d04d06
 F generic/nodecmd.h 36056ca2c262cb1991cabef8d27992ad628db718d09ff0eeaeaffd150f1549ec
 F generic/schema.c 710c95c2c297280e6a18eca7f7d528755f173a973591bff3e67187fb90040396
 F generic/schema.h 7d8c6ffbb3e99d9cb7636c66194a48e4311d1e3014a708d58f194bf44733a7f3
-F generic/tcldom.c ef4f7c2f876027fa4fe92be96fec58137b7afe5bab4931bd18d78c15e79190ba
+F generic/tcldom.c d4254ba459cc3a35e9a1a5ed30ced0076b44fbf4666d8daabf94f96f755ce206
 F generic/tcldom.h 713780ad20c20ac97cf0223679e50747a5472a70c2623eeae631f5d779e0a89d
 F generic/tclexpat.c 431aed48fb4317f2bad451de366c7e31d839e180edca13d6e4462caa355b6724
 F generic/tclexpat.h 95d915d74bb4b99ef3b80de00b0adce28931e6015ac63226b99db4817d9e313c
@@ -239,8 +239,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ba286c7c7dfab730a17ca284398d46cb4e147d537b19e2e405ceb0350acc86ac
-R 69ea840731bf926f1ec44d4860fea9b0
+P f26d9b32ab94726eee603c602cfb5627f647f7a7743dcd108aedc30b3eda8bd5
+R 3c88f4befc4db1da50df925c6d0e74f9
 U rolf
-Z 4848b6b7cdf48f32c57b58b3d1925b8a
+Z 328e41c24bc3670850d8aed9dad7b01b
 # Remove this line to create a well-formed Fossil manifest.
