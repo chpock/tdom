@@ -1,5 +1,5 @@
-C Made\san\suninstalled\stdom\sjust\s“package\srequire"able\sfrom\sthe\sbuild\sdirectory.
-D 2023-08-29T22:08:58.265
+C Fix\sfor\s[474e7b1408].
+D 2023-11-12T00:17:52.212
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -131,7 +131,7 @@ F generic/dom.c 7c5e1278c7fd36b3d518ff155f2cb35ecc5e85e7589e81b08afd0b3304cd5739
 F generic/dom.h 7269dffe8e6fa73b05fa38316441a524a81dbca01c4813ebc06c7c4ac9c4d19b
 F generic/domalloc.c 7a6a2fdde25d04ffef0330259ceb781ffa2150c2314dd88784f924f6f331ef9e
 F generic/domalloc.h 961f83bb46dec27dbcf36ed430ed81b1f485a1fdfaa2f7df8b60bbcf861d0fe3
-F generic/domhtml.c 9eb48d936e674a307b5ac3ce6d5d812ac0804e58a9840e46cd323e89d6c88926
+F generic/domhtml.c 0be23c0b57fb8bc7cd6ffdd092f0e1b3dc08a4b9b064bee6c1a65b4697c1151d
 F generic/domhtml.h 99d487e05835df0a792ec7dcdfdce2dced57e531da200aca49522e8d0f8b92d8
 F generic/domhtml5.c 067e23062b17f3cf0dced7fea29c598389fa48ec058340de625fc66b84800eb6
 F generic/domhtml5.h 5cca562a556e7662f2dce222640c32abb2777146
@@ -239,8 +239,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 9e47f857997c0cde6bc5ff20f2672f4c38d292327461c0d179abcf3c9f8fa2fb
-R 1012d08f01a106f336aa8fbd48524d00
+P ab58d6f480ad2c66b54011057cefe1b20a0f9c57d231d1e03281e8a137c64201
+R ed9d9b8ef5acd0dbd524d10a984f83a0
 U rolf
-Z b9133073601dadfe2647d2a81dd33526
+Z bfa5bb335ebc2aae509ae2328c112c27
 # Remove this line to create a well-formed Fossil manifest.
