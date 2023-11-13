@@ -1,5 +1,5 @@
-C Fix\sfor\s[474e7b1408].
-D 2023-11-12T00:17:52.212
+C Added\sa\stest\srelated\sto\s[474e7b1408].
+D 2023-11-13T11:04:12.567
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -205,7 +205,7 @@ F tests/domnamespace.test f68dee13e2325518e96b318bf9fe76ae6903dc38d5602c4b0f48f9
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 065c6c1af854db838faf9ad56151342eee478f8501a5f65778a144b106108574
 F tests/html5reader.test 9e17b12e5bc027d40b65cbab3937643d22dcbbd93620f416473d71934376b981
-F tests/htmlreader.test a36f523cd3160caffafa9362332379e8f0a025a43183063501b6beebd6625db5
+F tests/htmlreader.test 134134924bc659f844c759444135bf0a7cdb5dd27ae64fd7fc4ed15faa0ac5dd
 F tests/i18n.test 421e3998480ed5ce9420f4b596c384b8d5261e7fb4b33c0a7c12ef126d476939
 F tests/loadtdom.tcl 89af532a1e803f83049e290827804f3787f3056008a129d72f02936fea884db2
 F tests/namespace.test 0a13b2bf59bb088525ca7b64d0b2bce6a349c627ca3dd1c17a4cc969d16fe57c
@@ -239,8 +239,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ab58d6f480ad2c66b54011057cefe1b20a0f9c57d231d1e03281e8a137c64201
-R ed9d9b8ef5acd0dbd524d10a984f83a0
+P ec0c93694a172c1bb2ba5c6c935ad0a20e677326570278f9f5414eda57baec88
+R 1fda9e0f8e07ea543fe86c27b8ccb4cd
 U rolf
-Z bfa5bb335ebc2aae509ae2328c112c27
+Z d81c8a40e7ce9578575c2b96122c1da3
 # Remove this line to create a well-formed Fossil manifest.
