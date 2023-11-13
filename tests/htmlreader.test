@@ -549,6 +549,12 @@ test html-4.4 {ID Attribute handling} {
     set result
 } {1}
 
+test html-4.5 {-forest} {
+    set doc [dom parse -html -forest {<d><a><b>Some</b><b>Other</b></a></d>}]
+    set result [llength [$doc selectNodes //b]]
+    $doc delete
+    set result
+} 2
 
 # cleanup
 ::tcltest::cleanupTests
