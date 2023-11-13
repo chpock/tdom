@@ -399,7 +399,7 @@ dist: dist-clean
 	    $(srcdir)/ChangeLog \
 	    $(srcdir)/LICENSE \
 	    $(srcdir)/MPL_2.0.html \
-	    $(srcdir)/README \
+	    $(srcdir)/README.md \
 	    $(srcdir)/README.AOL \
 	    $(srcdir)/manifest \
 	    $(srcdir)/manifest.uuid \
