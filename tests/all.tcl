@@ -11,10 +11,6 @@
 
 source [file join [file dir [info script]] loadtdom.tcl]
 
-if {[info procs ::tdom::extRefHandler] != ""} {
-    testConstraint need_uri 1
-}
-
 singleProcess 1
 if {$tcl_version < 8.5} {
     # We still support 8.4 to some degree

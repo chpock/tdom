@@ -234,7 +234,7 @@ DeclProduction(AbsoluteLocationPath);
 
 char *xpathFuncString (xpathResultSet  *rs );
 static int xpathEvalStep (ast step, domNode *ctxNode, domNode *exprContext,
-                          int position, xpathResultSet *nodeList,
+                          domLength position, xpathResultSet *nodeList,
                           xpathCBs *cbs, xpathResultSet *result,
                           int *docOrder, char **errMsg);
 
@@ -285,7 +285,8 @@ xpathRSReset (
 }
 
 void rsPrint ( xpathResultSet *rs ) {
-    int i = 0,l;  char tmp[80];
+    domLength i = 0,l;
+    char tmp[80];
     switch (rs->type) {
         case EmptyResult:
              fprintf(stderr, "empty result \n");
@@ -304,15 +305,15 @@ void rsPrint ( xpathResultSet *rs ) {
              break;
 
         case StringResult:
-             fprintf(stderr, "string result: -%*s-\n", rs->string_len,
-                                                       rs->string);
+             fprintf(stderr, "string result: -%80s-\n", rs->string);
              break;
 
         case xNodeSetResult:
-             if (!i) fprintf(stderr,"nodeSet result (len %d):\n",rs->nr_nodes);
+             if (!i) fprintf(stderr,"nodeSet result (len %" Tcl_Size_Conv "):\n",
+                             rs->nr_nodes);
              for (i=0; i<rs->nr_nodes; i++) {
                  if (rs->nodes[i]->nodeType == ELEMENT_NODE) {
-                     fprintf(stderr, "%2d domNode%p %s ",
+                     fprintf(stderr, "%2" Tcl_Size_Conv " domNode%p %s ",
                              i, (void *)rs->nodes[i], rs->nodes[i]->nodeName);
                      if (rs->nodes[i]->firstChild &&
                          rs->nodes[i]->firstChild->nodeType == TEXT_NODE)
@@ -330,7 +331,7 @@ void rsPrint ( xpathResultSet *rs ) {
                      if (l > 60) l = 60;
                      memcpy(tmp, ((domTextNode*)rs->nodes[i])->nodeValue, l);
                      tmp[l] = '\0';
-                     fprintf(stderr, "%2d domNode%p text:'%s' \n",
+                     fprintf(stderr, "%2" Tcl_Size_Conv " domNode%p text:'%s' \n",
                              i,  (void *)rs->nodes[i], tmp);
                  } else
                  if (rs->nodes[i]->nodeType == COMMENT_NODE) {
@@ -340,13 +341,12 @@ void rsPrint ( xpathResultSet *rs ) {
                      memcpy(&tmp[4], ((domTextNode*)rs->nodes[i])->nodeValue, l);
                      memcpy(&tmp[4+l], "-->", 3);
                      tmp[7+l] = '\0';
-                     fprintf(stderr, "%2d domNode%p text:'%s' \n",
+                     fprintf(stderr, "%2" Tcl_Size_Conv " domNode%p text:'%s' \n",
                              i,  (void *)rs->nodes[i], tmp);
                  } else
                  if (rs->nodes[i]->nodeType == ATTRIBUTE_NODE) {
-                     fprintf(stderr, "%2d Attr %s='%*s'\n", i,
+                     fprintf(stderr, "%2" Tcl_Size_Conv " Attr %s='%80s'\n", i,
                              ((domAttrNode*)rs->nodes[i])->nodeName,
-                             ((domAttrNode*)rs->nodes[i])->valueLength,
                              ((domAttrNode*)rs->nodes[i])->nodeValue);
                  }
              }
@@ -366,7 +366,7 @@ void rsSetReal ( xpathResultSet *rs, double d) {
     rs->realvalue = d;
 }
 void rsSetReal2 ( xpathResultSet *rs, double d) {
-    if (d <= LONG_MIN || d >= LONG_MAX || d != (long)d) {
+    if (d <= (double)LONG_MIN || d >= (double)LONG_MAX || d != (long)d) {
         rs->type = RealResult;
         rs->realvalue = d;
     } else {
@@ -383,7 +383,7 @@ void rsSetInf ( xpathResultSet *rs ) {
 void rsSetNInf ( xpathResultSet *rs ) {
     rs->type = NInfResult;
 }
-void rsSetInt ( xpathResultSet *rs, long i) {
+void rsSetLong ( xpathResultSet *rs, long i) {
     rs->type = IntResult;
     rs->intvalue = i;
 }
@@ -480,7 +480,7 @@ void rsAddNodeFast ( xpathResultSet *rs, domNode *node) {
 
 void rsCopy ( xpathResultSet *to, xpathResultSet *from ) {
 
-    int i;
+    domLength i;
 
     to->type       = from->type;
     to->intvalue   = from->intvalue;
@@ -699,8 +699,7 @@ static XPathTokens xpathLexer (
     char    **errMsg
 )
 {
-    int  l, allocated;
-    int  i, k, start, offset;
+    domLength  l, allocated, i, k, start, offset;
     char delim, *ps, save, tmpErr[80], *tailptr;
     const char *uri;
     XPathTokens tokens;
@@ -1115,8 +1114,8 @@ static XPathTokens xpathLexer (
                            if (xpath[i]=='.') {
                                if (token == REALNUMBER) {
                                    sprintf (tmpErr, "Unexpected character "
-                                            "'%c' at position %d", xpath[i],
-                                            i);
+                                            "'%c' at position %" Tcl_Size_Conv,
+                                            xpath[i], i);
                                    *errMsg = tdomstrdup (tmpErr);
                                    return tokens;
                                }                                    
@@ -1140,13 +1139,13 @@ static XPathTokens xpathLexer (
                            xpath[i--] = save;
                            if (tokens[l].realvalue == 0.0 && tailptr == ps) {
                                sprintf (tmpErr, "Number value too large "
-                                        "at position %d", i);
+                                        "at position %" Tcl_Size_Conv, i);
                                *errMsg = tdomstrdup (tmpErr);
                                return tokens;
                            }
                        } else {
                            sprintf (tmpErr, "Unexpected character '%c' at "
-                                    "position %d", xpath[i], i);
+                                    "position %" Tcl_Size_Conv, xpath[i], i);
                            *errMsg = tdomstrdup (tmpErr);
                            return tokens;
                        }
@@ -2634,13 +2633,14 @@ double xpathFuncNumber (
 |   xpathGetStringValue
 |
 \---------------------------------------------------------------------------*/
-char * xpathGetStringValueForElement (
-    domNode *node,
-    int     *len
+static char *
+xpathGetStringValueForElement (
+    domNode   *node,
+    domLength *len
 )
 {
     char        *pc, *t;
-    int          l;
+    domLength    l;
     domNode     *child;
 
     if (node->nodeType == ELEMENT_NODE) {
@@ -2672,12 +2672,12 @@ char * xpathGetStringValueForElement (
 }
 
 char * xpathGetStringValue (
-    domNode *node,
-    int     *len
+    domNode    *node,
+    domLength  *len
 )
 {
-    char         *pc, *t;
-    int          l;
+    char        *pc, *t;
+    domLength    l;
     domNode     *child;
     domAttrNode *attr;
 
@@ -2736,7 +2736,7 @@ char * xpathFuncString (
 )
 {
     char         tmp[80], *pc;
-    int          len;
+    domLength    len;
 
     switch (rs->type) {
         case BoolResult:
@@ -2795,7 +2795,7 @@ char * xpathFuncStringForNode (
     domNode *node
 )
 {
-    int          len;
+    domLength len;
 
     return xpathGetStringValue (node, &len);
 }
@@ -2851,11 +2851,11 @@ static int xpathArityCheck (
 |   xpathRound
 |
 \---------------------------------------------------------------------------*/
-int xpathRound (double r) {
+long xpathRound (double r) {
     if (r < 0.0) {
-        return (int)floor (r + 0.5);
+        return (long)floor (r + 0.5);
     } else {
-        return (int)(r + 0.5);
+        return (long)(r + 0.5);
     }
 }
 
@@ -2927,7 +2927,7 @@ xpathEvalFunction (
     ast                step,
     domNode           *ctxNode,
     domNode           *exprContext,
-    int                position,
+    domLength          position,
     xpathResultSet    *nodeList,
     xpathCBs          *cbs,
     xpathResultSet    *result,
@@ -2936,13 +2936,15 @@ xpathEvalFunction (
     )
 {
     xpathResultSet   leftResult, rightResult, replaceResult;
-    int              i, rc, pwhite, len,  NaN;
+    int              rc, pwhite, NaN, attrcount;
+    domLength        len, lenstr, fromlen, i, j;
     char            *replaceStr, *pfrom, *pto, tmp[80], tmp1[80];
     domNode         *node;
     domAttrNode     *attr;
     double           leftReal;
     ast              nextStep;
-    int              argc, savedDocOrder, from;
+    int              argc, savedDocOrder;
+    domLength        from;
     xpathResultSets *args;
     xpathResultSet  *arg;
     Tcl_HashTable   *ids;
@@ -2952,8 +2954,7 @@ xpathEvalFunction (
     char            *leftStr = NULL, *rightStr = NULL;
     const char      *str;
     Tcl_DString      dStr;
-    int              found, j;
-    int              lenstr, fromlen, utfCharLen;
+    int              found, utfCharLen;
     char             utfBuf[TCL_UTF_MAX];
     Tcl_DString      tstr, tfrom, tto, tresult;
     Tcl_UniChar     *ufStr, *upfrom, unichar;
@@ -2963,15 +2964,15 @@ xpathEvalFunction (
     case f_position:
         XPATH_ARITYCHECK(step,0,errMsg);
         if (*docOrder) {
-            rsSetInt (result, position+1);
+            rsSetLong (result, position+1);
         } else {
-            rsSetInt (result, nodeList->nr_nodes - position);
+            rsSetLong (result, nodeList->nr_nodes - position);
         }
         break;
 
     case f_last:
         XPATH_ARITYCHECK(step,0,errMsg);
-        rsSetInt (result, nodeList->nr_nodes);
+        rsSetLong (result, nodeList->nr_nodes);
         break;
 
     case f_number:
@@ -3100,7 +3101,7 @@ xpathEvalFunction (
                 }
                 pto += i;
             }
-            rsSetInt (result, len);
+            rsSetLong (result, len);
         }
         else {
             pwhite = 1;
@@ -3203,7 +3204,7 @@ xpathEvalFunction (
         }
         if (leftResult.type != xNodeSetResult) {
             if (leftResult.type == EmptyResult) {
-                rsSetInt (result, 0);
+                rsSetLong (result, 0);
                 return XPATH_OK;
             } else {
                 xpathRSFree( &leftResult );
@@ -3574,7 +3575,7 @@ xpathEvalFunction (
             return rc;
         }
         if (leftResult.type == EmptyResult) {
-            rsSetInt (result, 0);
+            rsSetLong (result, 0);
             return XPATH_OK;
         }
         if (leftResult.type != xNodeSetResult) {
@@ -3582,7 +3583,7 @@ xpathEvalFunction (
             xpathRSFree( &leftResult );
             return XPATH_EVAL_ERR;
         }
-        rsSetInt (result, leftResult.nr_nodes);
+        rsSetLong (result, leftResult.nr_nodes);
         xpathRSFree (&leftResult);
         break;
 
@@ -3643,14 +3644,14 @@ xpathEvalFunction (
             }
             if (leftResult.nodes[0]->nodeType == ATTRIBUTE_NODE) {
                 node = ((domAttrNode*)leftResult.nodes[0])->parentNode;
-                i = 0;
+                attrcount = 0;
                 attr = node->firstAttr;
                 while (attr) {
                     if ((domNode*)attr == leftResult.nodes[0]) break;
                     attr = attr->nextSibling;
-                    i++;
+                    attrcount++;
                 }
-                sprintf(tmp,"id%p-%d", (void *)node, i);
+                sprintf(tmp,"id%p-%d", (void *)node, attrcount);
             } else {
                 sprintf(tmp,"id%p", (void *)leftResult.nodes[0]);
             }
@@ -3840,7 +3841,7 @@ static int xpathEvalStep (
     ast                step,
     domNode           *ctxNode,
     domNode           *exprContext,
-    int                position,
+    domLength          position,
     xpathResultSet    *nodeList,
     xpathCBs          *cbs,
     xpathResultSet    *result,
@@ -3850,7 +3851,8 @@ static int xpathEvalStep (
 {
     xpathResultSet   leftResult, rightResult;
     xpathResultSet  *pleftResult, *prightResult, tResult;
-    int              i, j, k, rc, res, NaN, NaN1, switchResult, count = 0;
+    int              rc, res, NaN, NaN1, switchResult;
+    domLength        i, j, k, count = 0;
     domNode         *node, *child, *startingNode, *ancestor;
     domAttrNode     *attr;
     int              savedDocOrder, predLimit;
@@ -4341,7 +4343,8 @@ static int xpathEvalStep (
                 }
                 rc = 0;
                 for (i = 0; i < result->nr_nodes; i++) {
-                    if (strcmp (attr->nodeName, ((domAttrNode*)result->nodes[i])->nodeName)==0) {
+                    if (strcmp (attr->nodeName,
+                                ((domAttrNode*)result->nodes[i])->nodeName)==0) {
                         rc = 1; break;
                     }
                 }
@@ -4383,7 +4386,7 @@ static int xpathEvalStep (
         break;
 
     case Int:
-        rsSetInt (result, step->intvalue);
+        rsSetLong (result, step->intvalue);
         break;
 
     case Real:
@@ -4465,7 +4468,7 @@ static int xpathEvalStep (
                     break;
                 case Div:
                     if (NaN && NaN1)   rsSetNaN (result);
-                    else if (NaN1)     rsSetInt (result, 0);
+                    else if (NaN1)     rsSetLong (result, 0);
                     else {
                         if (dRight == 0.0) dTmp = NaN;
                         else dTmp = NaN * dRight;
@@ -4512,7 +4515,7 @@ static int xpathEvalStep (
                     || dLeft > (double)LONG_MAX + 0.1) {
                     rsSetNaN (result);
                 } else {
-                    rsSetInt  (result, ((long)dLeft) % ((long)dRight));
+                    rsSetLong  (result, ((long)dLeft) % ((long)dRight));
                 }
             }
             break;
@@ -4987,7 +4990,7 @@ static int xpathEvalStep (
                 break;
             case BoolResult:   rsSetBool(result, leftResult.intvalue);
                                break;
-            case IntResult:    rsSetInt(result, leftResult.intvalue);
+            case IntResult:    rsSetLong(result, leftResult.intvalue);
                                break;
             case RealResult:   rsSetReal(result, leftResult.realvalue);
                                break;
@@ -5030,7 +5033,8 @@ static int xpathEvalPredicate (
 )
 {
     xpathResultSet predResult, tmpResult;
-    int            i, rc, savedDocOrder, useFastAdd;
+    int            rc, savedDocOrder, useFastAdd;
+    domLength      i;
 
     if (result->nr_nodes == 0) useFastAdd = 1;
     else useFastAdd = 0;
@@ -5109,7 +5113,7 @@ static int xpathEvalStepAndPredicates (
     xpathResultSet    *nodeList,
     domNode           *currentNode,
     domNode           *exprContext,
-    int                currentPos,
+    domLength          currentPos,
     int               *docOrder,
     xpathCBs          *cbs,
     xpathResultSet    *result,
@@ -5160,14 +5164,15 @@ int xpathEvalSteps (
     xpathResultSet    *nodeList,
     domNode           *currentNode,
     domNode           *exprContext,
-    int                currentPos,
+    domLength          currentPos,
     int               *docOrder,
     xpathCBs          *cbs,
     xpathResultSet    *result,
     char              **errMsg
 )
 {
-    int i, rc, first = 1;
+    int rc, first = 1;
+    domLength i;
     xpathResultSet savedContext;
 
     DBG (fprintf (stderr, "xpathEvalSteps start\n");)
@@ -5187,7 +5192,7 @@ int xpathEvalSteps (
             CHECK_RC;
             first = 0;
         } else {
-            DBG( fprintf(stderr, "doing location step nodeList->nr_nodes=%d \n",
+            DBG( fprintf(stderr, "doing location step nodeList->nr_nodes=%ld \n",
                                  nodeList->nr_nodes);
             )
             if (result->type != xNodeSetResult) {
@@ -5293,7 +5298,8 @@ xpathEvalAst (
     char          **errMsg
     )
 {
-    int i, rc, first = 1, docOrder = 1;
+    int rc, first = 1, docOrder = 1;
+    domLength i;
     xpathResultSet savedContext;
     savedContext = *nodeList;
 
@@ -5311,7 +5317,7 @@ xpathEvalAst (
             CHECK_RC;
             first = 0;
         } else {
-            DBG( fprintf(stderr, "doing location step nodeList->nr_nodes=%d \n",
+            DBG( fprintf(stderr, "doing location step nodeList->nr_nodes=%ld \n",
                                  nodeList->nr_nodes);
             )
             if (rs->type != xNodeSetResult) {
@@ -5358,7 +5364,8 @@ int xpathMatches (
 {
     xpathResultSet  stepResult, nodeList, newNodeList;
     ast             childSteps;
-    int             rc, i, j, currentPos = 0, nodeMatches, docOrder = 1;
+    int             rc, nodeMatches, docOrder = 1;
+    domLength       currentPos = 0, i, j;
     int             useFastAdd;
     const char     *localName = NULL, *nodeUri;
     domAttrNode    *attr;

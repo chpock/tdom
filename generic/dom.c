@@ -367,7 +367,7 @@ domClearString (
     char *str,
     int *haveToFree,
     int replace,
-    int length
+    domLength length
     )
 {
     const char *s;
@@ -865,7 +865,7 @@ domLookupURI (
 domNS *
 domGetNamespaceByIndex (
     domDocument *doc,
-    int          nsIndex
+    unsigned int nsIndex
 )
 {
     if (!nsIndex) return NULL;
@@ -1580,7 +1580,8 @@ DispatchPCDATA (
     domLineColumn *lc;
     Tcl_HashEntry *h;
     char          *s;
-    int            len, hnew, only_whites;
+    int            hnew, only_whites;
+    domLength      len;
     
     len = Tcl_DStringLength (info->cdata);
 #ifndef TDOM_NO_SCHEMA
@@ -1908,10 +1909,8 @@ externalEntityRefHandler (
 
     Tcl_Obj *cmdPtr, *resultObj, *resultTypeObj, *extbaseObj, *xmlstringObj;
     Tcl_Obj *channelIdObj;
-    int result, mode, done, byteIndex, i;
-    int keepresult = 0;
-    size_t len;
-    int tclLen;
+    int result, mode, done, keepresult = 0;
+    domLength len, tclLen;
     XML_Parser extparser, oldparser = NULL;
     char buf[4096], *resultType, *extbase, *xmlstring, *channelId, s[50];
     Tcl_Channel chan = (Tcl_Channel) NULL;
@@ -1991,8 +1990,7 @@ externalEntityRefHandler (
 
     if (strcmp (resultType, "string") == 0) {
         result = Tcl_ListObjIndex (info->interp, resultObj, 2, &xmlstringObj);
-        xmlstring = Tcl_GetString(xmlstringObj);
-        len = strlen (xmlstring);
+        xmlstring = Tcl_GetStringFromObj (xmlstringObj, &len);
         chan = NULL;
     } else if (strcmp (resultType, "channel") == 0) {
         xmlstring = NULL;
@@ -2038,40 +2036,27 @@ externalEntityRefHandler (
     Tcl_ResetResult (info->interp);
     result = 1;
     if (chan == NULL) {
-        status = XML_Parse(extparser, xmlstring, strlen (xmlstring), 1);
+        do {
+            done = (len < INT_MAX);
+            status = XML_Parse (extparser, xmlstring, done ? len : INT_MAX,
+                                done);
+            if (!done) {
+                xmlstring += INT_MAX;
+                len -= INT_MAX;
+            }
+        }  while (!done && status == XML_STATUS_OK);
         switch (status) {
         case XML_STATUS_ERROR:
             interpResult = Tcl_GetStringResult(info->interp);
-            sprintf(s, "%ld", XML_GetCurrentLineNumber(extparser));
             if (interpResult[0] == '\0') {
-                Tcl_ResetResult (info->interp);
-                Tcl_AppendResult(info->interp, "error \"",
-                                 XML_ErrorString(XML_GetErrorCode(extparser)),
-                                 "\" in entity \"", systemId,
-                                 "\" at line ", s, " character ", NULL);
-                sprintf(s, "%ld", XML_GetCurrentColumnNumber(extparser));
-                Tcl_AppendResult(info->interp, s, NULL);
-                byteIndex = XML_GetCurrentByteIndex(extparser);
-                if (byteIndex != -1) {
-                    Tcl_AppendResult(info->interp, "\n\"", NULL);
-                    s[1] = '\0';
-                    for (i=-20; i < 40; i++) {
-                        if ((byteIndex+i)>=0) {
-                            if (xmlstring[byteIndex+i]) {
-                                s[0] = xmlstring[byteIndex+i];
-                                Tcl_AppendResult(info->interp, s, NULL);
-                                if (i==0) {
-                                    Tcl_AppendResult(info->interp,
-                                                     " <--Error-- ", NULL);
-                                }
-                            } else {
-                                break;
-                            }
-                        }
-                    }
-                    Tcl_AppendResult(info->interp, "\"",NULL);
-                }
+                tcldom_reportErrorLocation (
+                    info->interp, 20, 40, XML_GetCurrentLineNumber(extparser),
+                    XML_GetCurrentColumnNumber(extparser), xmlstring, systemId,
+                    XML_GetCurrentByteIndex(extparser),
+                    XML_ErrorString(XML_GetErrorCode(extparser))
+                    );
             } else {
+                sprintf(s, "%ld", XML_GetCurrentLineNumber(extparser));
                 Tcl_AppendResult(info->interp, ", referenced in entity \"",
                                  systemId, 
                                  "\" at line ", s, " character ", NULL);
@@ -2204,7 +2189,7 @@ domDocument *
 domReadDocument (
     XML_Parser  parser,
     char       *xml,
-    int         length,
+    domLength   length,
     int         ignoreWhiteSpaces,
     int         keepCDATA,
     int         storeLineColumn,
@@ -2225,7 +2210,8 @@ domReadDocument (
     int        *resultcode
 )
 {
-    int             done, tclLen;
+    int             done;
+    domLength       tclLen;
     enum XML_Status status;
     size_t          len;
     domReadInfo     info;
@@ -2304,7 +2290,14 @@ domReadDocument (
     }
     
     if (channel == NULL) {
-        status = XML_Parse (parser, xml, length, 1);
+        do {
+            done = (length < INT_MAX);
+            status = XML_Parse (parser, xml, done ? length : INT_MAX, done);
+            if (!done) {
+                xml += INT_MAX;
+                length -= INT_MAX;
+            }
+        }  while (!done && status == XML_STATUS_OK);
     } else {
         Tcl_DStringInit (&dStr);
         if (Tcl_GetChannelOption (interp, channel, "-encoding", &dStr)
@@ -2335,7 +2328,7 @@ domReadDocument (
             } else {
                 status = XML_Parse (parser, str, tclLen, done);
             }
-        } while (!done);
+        } while (!done && status == XML_STATUS_OK);
     }
     switch (status) {
     case XML_STATUS_SUSPENDED:
@@ -3437,7 +3430,7 @@ domException
 domSetNodeValue (
     domNode    *node,
     const char *nodeValue,
-    int         valueLen
+    domLength   valueLen
 )
 {
     domTextNode   *textnode;
@@ -4018,7 +4011,7 @@ domTextNode *
 domNewTextNode(
     domDocument *doc,
     const char  *value,
-    int          length,
+    domLength    length,
     domNodeType  nodeType	
 )
 {
@@ -4049,11 +4042,11 @@ domNewTextNode(
 void
 domEscapeCData (
     char        *value,
-    int          length,
+    domLength    length,
     Tcl_DString *escapedData
 )
 {
-    int i, start = 0;
+    domLength i, start = 0;
     char *pc;
 
     Tcl_DStringInit (escapedData);
@@ -4089,7 +4082,7 @@ domTextNode *
 domAppendNewTextNode(
     domNode     *parent,
     char        *value,
-    int          length,
+    domLength    length,
     domNodeType  nodeType,
     int          disableOutputEscaping
 )
@@ -4250,7 +4243,7 @@ domAppendData (
                                    a TEXT_NODE, COMMENT_NODE or 
                                    CDATA_SECTION_NODE*/
     char        *value,         /* The data to append */ 
-    int          length,        /* The length of value in byte */
+    domLength    length,        /* The length of value in byte */
     int          disableOutputEscaping   /* If true, disable output 
                                             escaping on the node */
     )
@@ -4533,9 +4526,9 @@ domProcessingInstructionNode *
 domNewProcessingInstructionNode(
     domDocument *doc,
     const char  *targetValue,
-    int          targetLength,
+    domLength    targetLength,
     const char  *dataValue,
-    int          dataLength
+    domLength    dataLength
 )
 {
     domProcessingInstructionNode   *node;
@@ -4890,7 +4883,7 @@ domXPointerChild (
     char         * element,
     char         * attrName,
     char         * attrValue,
-    int            attrLen,
+    domLength      attrLen,
     domAddCallback addCallback,
     void         * clientData
 )
@@ -4969,7 +4962,7 @@ domXPointerXSibling (
     char         * element,
     char         * attrName,
     char         * attrValue,
-    int            attrLen,
+    domLength      attrLen,
     domAddCallback addCallback,
     void         * clientData
 )
@@ -5064,7 +5057,7 @@ domXPointerDescendant (
     char         * element,
     char         * attrName,
     char         * attrValue,
-    int            attrLen,
+    domLength      attrLen,
     domAddCallback addCallback,
     void         * clientData
 )
@@ -5156,7 +5149,7 @@ domXPointerAncestor (
     char         * element,
     char         * attrName,
     char         * attrValue,
-    int            attrLen,
+    domLength      attrLen,
     domAddCallback addCallback,
     void         * clientData
 )

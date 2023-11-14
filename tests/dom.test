@@ -722,6 +722,16 @@ test dom-2.45 {attribute order and XML namespace declaration} {
     set result
 } {xmlns:p xmlns foo grill bar}
 
+test dom-2.46 {parse long string} {Tcl9 longRunning} {
+    set str "<doc>[string repeat abc 1000000000]</doc>"
+    set doc [dom parse $str]
+    set result [string length [$doc selectNodes string(/doc)]]
+    lappend result [string length [$doc selectNodes substring(doc,2999999999)]]
+    lappend result [$doc selectNodes substring(doc,2999999995,3)]
+    $doc delete
+    set result
+} {3000000000 2 abc}
+
 test dom-3.1 {isName} {
     dom isName ":foo"
 } {1}

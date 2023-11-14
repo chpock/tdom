@@ -75,6 +75,18 @@ int tDOM_fsinsertNodeCmd (ClientData clientData,
                           int             objc,
                           Tcl_Obj *const  objv[]);
 
+void tcldom_reportErrorLocation (
+    Tcl_Interp *interp,
+    int before,
+    int after,
+    domLength line,
+    domLength column,
+    char *xmlstring,
+    const char *entity,
+    domLength byteIndex,
+    const char *errStr
+    );
+
 
 #if defined(_MSC_VER) || defined(__MINGW32__)
 #  undef TCL_STORAGE_CLASS

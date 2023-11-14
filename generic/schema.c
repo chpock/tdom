@@ -231,7 +231,7 @@ typedef enum {
         Tcl_AppendResult(interp, (str1), (str2), (str3), NULL);         \
     }
 #define SetIntResult(i) Tcl_ResetResult(interp);                        \
-                     Tcl_SetIntObj(Tcl_GetObjResult(interp), (i))
+                     Tcl_SetDomLengthObj(Tcl_GetObjResult(interp), (i))
 #define SetLongResult(i) Tcl_ResetResult(interp);                        \
                      Tcl_SetLongObj(Tcl_GetObjResult(interp), (i))
 #define SetBooleanResult(i) Tcl_ResetResult(interp); \
@@ -579,7 +579,7 @@ initSchemaData (
     Tcl_Obj *cmdNameObj)
 {
     SchemaData *sdata;
-    int len;
+    domLength len;
     char *name;
 
     sdata = TMALLOC (SchemaData);
@@ -2292,14 +2292,16 @@ int tDOM_probeDomAttributes (
     }
     return TCL_OK;
 }
-int probeEventAttribute (
+
+static int probeEventAttribute (
     Tcl_Interp *interp,
     SchemaData *sdata,
     Tcl_Obj *attr,
-    int len
+    domLength len
     )
 {
-    int i, found, req;
+    int found, req;
+    domLength i;
     unsigned int reqAttr = 0;
     char *name, *ns;
     SchemaCP *cp;
@@ -3218,7 +3220,8 @@ checkdomKeyConstraints (
     domKeyConstraint *kc;
     domNode *n;
     domAttrNode *attr;
-    int rc, i, j, hnew, len, skip, first;
+    int rc, i, j, hnew, skip, first;
+    domLength len;
     char *errMsg = NULL, *keystr, *efsv;
     Tcl_HashTable htable;
     Tcl_DString dStr;
@@ -4107,7 +4110,8 @@ unifyMatchList (
     Tcl_Obj *list
     )
 {
-    int len, i, hnew;
+    domLength len, i;
+    int hnew;
     Tcl_HashEntry *h;
     Tcl_Obj *rObj, *thisObj;
     Tcl_HashSearch search;
@@ -4654,10 +4658,8 @@ externalEntityRefHandler (
     ValidateMethodData *vdata;
     Tcl_Obj *cmdPtr, *resultObj, *resultTypeObj, *extbaseObj, *xmlstringObj;
     Tcl_Obj *channelIdObj;
-    int result, mode, done, byteIndex, i;
-    int keepresult = 0;
-    size_t len;
-    int tclLen;
+    int result, mode, done, keepresult = 0;
+    domLength len, tclLen;
     XML_Parser extparser, oldparser = NULL;
     char buf[4096], *resultType, *extbase, *xmlstring, *channelId, s[50];
     Tcl_Channel chan = (Tcl_Channel) NULL;
@@ -4732,7 +4734,7 @@ externalEntityRefHandler (
 
     if (strcmp (resultType, "string") == 0) {
         result = Tcl_ListObjIndex (vdata->interp, resultObj, 2, &xmlstringObj);
-        xmlstring = Tcl_GetStringFromObj (xmlstringObj, (int*)&len);
+        xmlstring = Tcl_GetStringFromObj (xmlstringObj, &len);
     } else if (strcmp (resultType, "channel") == 0) {
         xmlstring = NULL;
         len = 0;
@@ -4775,40 +4777,26 @@ externalEntityRefHandler (
     Tcl_ResetResult (vdata->interp);
     result = 1;
     if (chan == NULL) {
-        status = XML_Parse(extparser, xmlstring, strlen (xmlstring), 1);
+        do {
+            done = (len < INT_MAX);
+            status = XML_Parse (extparser, xmlstring, done ? len : INT_MAX,
+                                done);
+            if (!done) {
+                xmlstring += INT_MAX;
+                len -= INT_MAX;
+            }
+        }  while (!done && status == XML_STATUS_OK);
         switch (status) {
         case XML_STATUS_ERROR:
             interpResult = Tcl_GetStringResult(vdata->interp);
-            sprintf(s, "%ld", XML_GetCurrentLineNumber(extparser));
             if (interpResult[0] == '\0') {
-                Tcl_ResetResult (vdata->interp);
-                Tcl_AppendResult(vdata->interp, "error \"",
-                                 XML_ErrorString(XML_GetErrorCode(extparser)),
-                                 "\" in entity \"", systemId,
-                                 "\" at line ", s, " character ", NULL);
-                sprintf(s, "%ld", XML_GetCurrentColumnNumber(extparser));
-                Tcl_AppendResult(vdata->interp, s, NULL);
-                byteIndex = XML_GetCurrentByteIndex(extparser);
-                if (byteIndex != -1) {
-                    Tcl_AppendResult(vdata->interp, "\n\"", NULL);
-                    s[1] = '\0';
-                    for (i=-20; i < 40; i++) {
-                        if ((byteIndex+i)>=0) {
-                            if (xmlstring[byteIndex+i]) {
-                                s[0] = xmlstring[byteIndex+i];
-                                Tcl_AppendResult(vdata->interp, s, NULL);
-                                if (i==0) {
-                                    Tcl_AppendResult(vdata->interp,
-                                                     " <--Error-- ", NULL);
-                                }
-                            } else {
-                                break;
-                            }
-                        }
-                    }
-                    Tcl_AppendResult(vdata->interp, "\"",NULL);
-                }
+                tcldom_reportErrorLocation (
+                    vdata->interp, 20, 40, XML_GetCurrentLineNumber(extparser),
+                    XML_GetCurrentColumnNumber(extparser), xmlstring,
+                    systemId, XML_GetCurrentByteIndex(extparser),
+                    XML_ErrorString(XML_GetErrorCode(extparser)));
             } else {
+                sprintf(s, "%ld", XML_GetCurrentLineNumber(extparser));
                 Tcl_AppendResult(vdata->interp, ", referenced in entity \"",
                                  systemId, 
                                  "\" at line ", s, " character ", NULL);
@@ -4901,7 +4889,8 @@ static int validateSource (
     Tcl_DString cdata;
     Tcl_Obj *bufObj;
     char *xmlstr, *filename, *str, *baseurl = NULL;
-    int result, len, fd, mode, done, tclLen, rc, value, useForeignDTD = 0;
+    int result, fd, mode, done, rc, value, useForeignDTD = 0;
+    domLength len, tclLen;
     int forest = 0;
     int paramEntityParsing = XML_PARAM_ENTITY_PARSING_ALWAYS;
     Tcl_DString translatedFilename;
@@ -5026,13 +5015,20 @@ static int validateSource (
     switch (source) {
     case VALIDATE_STRING:
         xmlstr = Tcl_GetStringFromObj (objv[0], &len);
-        if (XML_Parse (parser, xmlstr, len, 1) != XML_STATUS_OK
-            || sdata->validationState == VALIDATION_ERROR) {
-            validateReportError (interp, sdata, parser);
-            result = TCL_ERROR;
-        } else {
-            result = TCL_OK;
-        }
+        result = TCL_OK;
+        do {
+            done = (len < INT_MAX);
+            if (XML_Parse (parser, xmlstr, len, done) != XML_STATUS_OK
+                || sdata->validationState == VALIDATION_ERROR) {
+                validateReportError (interp, sdata, parser);
+                result = TCL_ERROR;
+                break;
+            }
+            if (!done) {
+                xmlstr += INT_MAX;
+                len -= INT_MAX;
+            }
+        }  while (!done);
         break;
         
     case VALIDATE_FILENAME:
@@ -5162,7 +5158,8 @@ tDOM_schemaInstanceCmd (
 {
     int            methodIndex, keywordIndex, hnew, patternIndex;
     int            result = TCL_OK, forwardDef = 0, j, k = 0;
-    int            savedDefineToplevel, type, len, n;
+    int            savedDefineToplevel, type, n;
+    domLength      len;
     unsigned int   i, savedNumPatternList, nrTypeInstances, typeInstancesLen;
     SchemaData    *savedsdata = NULL, *sdata = (SchemaData *) clientData;
     Tcl_HashTable *hashTable;
@@ -5880,7 +5877,7 @@ getQuant (
     )
 {
     char *quantStr;
-    int len;
+    domLength len;
     Tcl_Obj *thisObj;
 
     *n = 0;
@@ -5976,7 +5973,8 @@ AnyPatternObjCmd (
     SchemaCP *pattern;
     SchemaQuant quant;
     char *ns = NULL, *ns1;
-    int n, m, nrns, i, hnew, revert, optionIndex;
+    int n, m, hnew, revert, optionIndex;
+    domLength nrns, i;
     Tcl_Obj *nsObj;
     Tcl_HashTable *t = NULL;
 
@@ -6518,7 +6516,8 @@ AttributePatternObjCmd (
 {
     SchemaData *sdata = GETASI;
     char *str;
-    int len, required = 1;
+    int required = 1;
+    domLength len;
     Tcl_Obj *nsObj, *nameObj;
     Tcl_HashEntry *h;
     SchemaCP *type;
@@ -6754,7 +6753,8 @@ domuniquePatternObjCmd (
     ast t;
     char *errMsg = NULL;
     domKeyConstraint *kc, *kc1;
-    int i, nrFields, flags = 0;
+    domLength i, nrFields;
+    int flags = 0;
     Tcl_Obj *elm;
 
     CHECK_SI
@@ -6924,7 +6924,8 @@ keyspacePatternObjCmd (
 {
     SchemaData *sdata = GETASI;
     SchemaCP *pattern;
-    int nrKeyspaces, i, hnew;
+    domLength nrKeyspaces, i;
+    int hnew;
     Tcl_Obj *ksObj;
     SchemaKeySpace *ks;
     Tcl_HashEntry *h;

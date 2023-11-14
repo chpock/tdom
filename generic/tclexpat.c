@@ -72,7 +72,7 @@
 #define SetResult(interp,str) \
                      (Tcl_SetStringObj (Tcl_GetObjResult (interp), (str), -1))
 #define SetIntResult(interp,i) \
-                     (Tcl_SetIntObj (Tcl_GetObjResult (interp), (i) ))
+                     (Tcl_SetDomLengthObj (Tcl_GetObjResult (interp), (i) ))
 #define AppendResult(interp,str) \
                      (Tcl_AppendToObj (Tcl_GetObjResult (interp), (str), -1))
 #define CheckArgs(min,max,n,msg) \
@@ -121,13 +121,13 @@ static int      TclExpatInstanceCmd (ClientData dummy,
 static void     TclExpatDeleteCmd (ClientData clientData);
 
 static Tcl_Obj* FindUniqueCmdName (Tcl_Interp *interp);
-static int      TclExpatCheckWhiteData (char *pc, int len);
+static int      TclExpatCheckWhiteData (char *pc, domLength len);
 
 static int      TclExpatInitializeParser (Tcl_Interp *interp,
                     TclGenExpatInfo *expat, int resetOptions );
 static void     TclExpatFreeParser  (TclGenExpatInfo *expat);
 static int      TclExpatParse (Tcl_Interp *interp,
-                    TclGenExpatInfo *expat, char *data, int len,
+                    TclGenExpatInfo *expat, char *data, domLength len,
                                TclExpat_InputType type);
 static int      TclExpatConfigure (Tcl_Interp *interp,
                     TclGenExpatInfo *expat, int objc, Tcl_Obj *const objv[]);
@@ -724,7 +724,8 @@ TclExpatInstanceCmd (
 ) {
   TclGenExpatInfo *expat = (TclGenExpatInfo *) clientData;
   char *data;
-  int len = 0, optionIndex, result = TCL_OK;
+  int optionIndex, result = TCL_OK;
+  domLength len = 0;
 #ifndef TDOM_NO_SCHEMA
   int resetsdata = 0;
 #endif
@@ -970,10 +971,11 @@ TclExpatParse (
     Tcl_Interp *interp,
     TclGenExpatInfo *expat,
     char *data,
-    int len,
+    domLength len,
     TclExpat_InputType type
 ) {
   int result, mode, done;
+  domLength strlen;
   size_t bytesread;
   char s[255], buf[8*1024];
   int fd;
@@ -1011,9 +1013,15 @@ TclExpatParse (
 
   case EXPAT_INPUT_STRING:
       expat->parsingState = 2;
-      result = XML_Parse(expat->parser,
-                         data, len,
-                         expat->final);
+      do {
+          done = (len < INT_MAX);
+          result = XML_Parse(expat->parser, data, len,
+                             done ? expat->final : 0);
+          if (!done) {
+              data += INT_MAX;
+              len -= INT_MAX;
+          }
+      } while (!done && result == XML_STATUS_OK);
       expat->parsingState = 1;
       break;
 
@@ -1055,8 +1063,8 @@ TclExpatParse (
           do {
               len = Tcl_ReadChars (channel, bufObj, 1024, 0);
               done = (len < 1024);
-              str = Tcl_GetStringFromObj (bufObj, &len);
-              result = XML_Parse (expat->parser, str, len, done);
+              str = Tcl_GetStringFromObj (bufObj, &strlen);
+              result = XML_Parse (expat->parser, str, strlen, done);
               if (result != XML_STATUS_OK) break;
           } while (!done);
           /* In case of a parsing error we need the string rep of the
@@ -2279,22 +2287,22 @@ TclExpatGet (
 
     case EXPAT_CURRENTBYTECOUNT:
 
-      Tcl_SetIntObj(resultPtr, XML_GetCurrentByteCount(expat->parser));
+      Tcl_SetWideIntObj(resultPtr, XML_GetCurrentByteCount(expat->parser));
       break;
 
     case EXPAT_CURRENTLINENUMBER:
 
-      Tcl_SetLongObj(resultPtr, XML_GetCurrentLineNumber(expat->parser));
+      Tcl_SetWideIntObj(resultPtr, XML_GetCurrentLineNumber(expat->parser));
       break;
 
     case EXPAT_CURRENTCOLUMNNUMBER:
 
-      Tcl_SetLongObj(resultPtr, XML_GetCurrentColumnNumber(expat->parser));
+      Tcl_SetWideIntObj(resultPtr, XML_GetCurrentColumnNumber(expat->parser));
       break;
 
     case EXPAT_CURRENTBYTEINDEX:
 
-      Tcl_SetLongObj(resultPtr, XML_GetCurrentByteIndex(expat->parser));
+      Tcl_SetWideIntObj(resultPtr, XML_GetCurrentByteIndex(expat->parser));
       break;
 
   }
@@ -2834,7 +2842,7 @@ TclGenExpatEndNamespaceDeclHandler(
 static int
 TclExpatCheckWhiteData (
     char         *pc,
-    int           len
+    domLength     len
 ) {
     for (; len > 0; len--, pc++) {
         if ( (*pc != ' ')  &&
@@ -2905,7 +2913,8 @@ static void
 TclExpatDispatchPCDATA(
     TclGenExpatInfo *expat
 ) {
-  int len, result, onlyWhiteSpace = 0;
+  int result, onlyWhiteSpace = 0;
+  domLength len;
   Tcl_Obj *vector[2];
   TclHandlerSet *activeTclHandlerSet;
   CHandlerSet *activeCHandlerSet;
@@ -3456,7 +3465,8 @@ TclGenExpatExternalEntityRefHandler(
 ) {
   TclGenExpatInfo *expat = (TclGenExpatInfo *) XML_GetUserData(parser);
   Tcl_Obj *cmdPtr, *resultObj, *resultTypeObj, *extbaseObj, *dataObj;
-  int result, mode, done, fd, tclLen;
+  int result, mode, done, fd;
+  domLength tclLen;
   size_t len;
   TclHandlerSet *activeTclHandlerSet;
   CHandlerSet *activeCHandlerSet;
@@ -3601,7 +3611,14 @@ TclGenExpatExternalEntityRefHandler(
       dataStr = Tcl_GetStringFromObj (dataObj, &tclLen);
       switch (inputType) {
       case EXPAT_INPUT_STRING:
-          result = XML_Parse (extparser, dataStr, tclLen, 1);
+          do {
+              done = (tclLen < INT_MAX);
+              result = XML_Parse(extparser, dataStr, tclLen, done);
+              if (!done) {
+                  dataStr += INT_MAX;
+                  tclLen -= INT_MAX;
+              }
+          } while (!done && result == XML_STATUS_OK);
           break;
 
       case EXPAT_INPUT_CHANNEL:

@@ -88,7 +88,7 @@
                      Tcl_AppendResult(interp, (str1), (str2), (str3), NULL)
 
 #define SetIntResult(i) Tcl_ResetResult(interp);                        \
-                     Tcl_SetIntObj(Tcl_GetObjResult(interp), (i))
+                     Tcl_SetDomLengthObj(Tcl_GetObjResult(interp), (i))
                      
 #define SetLongResult(i) Tcl_ResetResult(interp);                        \
                      Tcl_SetLongObj(Tcl_GetObjResult(interp), (i))
@@ -605,7 +605,7 @@ UpdateStringOfTdomNode(
     Tcl_Obj *objPtr)
 {
     char nodeName[80];
-    int  len;
+    domLength  len;
     
     NODE_CMD(nodeName, objPtr->internalRep.otherValuePtr);
     len = strlen(nodeName);
@@ -918,7 +918,7 @@ domNode * tcldom_find (
     domNode    *node,
     char       *attrName,
     char       *attrVal,
-    int         length
+    domLength   length
 )
 {
     domNode     *child, *result;
@@ -996,7 +996,7 @@ int tcldom_xpointerSearch (
     char *element   = NULL;
     char *attrName  = NULL;
     char *attrValue = NULL;
-    int   attrLen;
+    domLength attrLen;
 
 
     str = Tcl_GetString(objv[2]);
@@ -1217,7 +1217,7 @@ int tcldom_appendXML (
 {
     char        *xml_string;
     Tcl_Obj     *extResolver = NULL;
-    int          xml_string_len;
+    domLength    xml_string_len;
     int          resultcode = 0;
     int          ignorexmlns = 0;
     domDocument *doc;
@@ -1268,40 +1268,15 @@ int tcldom_appendXML (
         Tcl_DecrRefCount(extResolver);
     }
     if (doc == NULL) {
-        char s[50];
-        long byteIndex, i;
-
-        Tcl_ResetResult(interp);
-        sprintf(s, "%ld", XML_GetCurrentLineNumber(parser));
-        Tcl_AppendResult(interp, "error \"",
-                         XML_ErrorString(XML_GetErrorCode(parser)),
-                         "\" at line ", s, " character ", NULL);
-        sprintf(s, "%ld", XML_GetCurrentColumnNumber(parser));
-        Tcl_AppendResult(interp, s, NULL);
-        byteIndex = XML_GetCurrentByteIndex(parser);
-        if (byteIndex != -1) {
-             Tcl_AppendResult(interp, "\n\"", NULL);
-             s[1] = '\0';
-             for (i=-20; i < 40; i++) {
-                 if ((byteIndex+i)>=0) {
-                     if (xml_string[byteIndex+i]) {
-                         s[0] = xml_string[byteIndex+i];
-                         Tcl_AppendResult(interp, s, NULL);
-                         if (i==0) {
-                             Tcl_AppendResult(interp, " <--Error-- ", NULL);
-                         }
-                     } else {
-                         break;
-                     }
-                 }
-             }
-             Tcl_AppendResult(interp, "\"",NULL);
-        }
+        tcldom_reportErrorLocation (
+            interp, 20, 40, XML_GetCurrentLineNumber(parser),
+            XML_GetCurrentColumnNumber(parser), xml_string, NULL,
+            XML_GetCurrentByteIndex(parser),
+            XML_ErrorString(XML_GetErrorCode(parser)));
         XML_ParserFree(parser);
         return TCL_ERROR;
     }
     XML_ParserFree(parser);
-
     
     nodeToAppend = doc->rootNode->firstChild;
     while (nodeToAppend) {
@@ -1346,7 +1321,7 @@ int tcldom_xpathResultSet (
 
         case IntResult:
              Tcl_SetStringObj(type, "number", -1);
-             Tcl_SetIntObj(value, rs->intvalue);
+             Tcl_SetLongObj(value, rs->intvalue);
              break;
 
         case RealResult:
@@ -1433,7 +1408,8 @@ int tcldom_xpathFuncCallBack (
     Tcl_Obj     *resultPtr, *objv[MAX_REWRITE_ARGS], *type, *value, *nodeObj,
                 *tmpObj;
     Tcl_CmdInfo  cmdInfo;
-    int          objc, rc, i, errStrLen, listLen, intValue, res;
+    int          objc, rc, res, boolValue;
+    domLength    errStrLen, listLen, intValue, i;
     double       doubleValue;
     domNode     *node;
 
@@ -1525,13 +1501,17 @@ int tcldom_xpathFuncCallBack (
             rc = Tcl_ListObjIndex(interp, resultPtr, 1, &value);
             typeStr = Tcl_GetString(type);
             if (strcmp(typeStr, "bool")==0) {
-                rc = Tcl_GetBooleanFromObj(interp, value, &intValue);
-                rsSetBool(result, intValue );
+                rc = Tcl_GetBooleanFromObj(interp, value, &boolValue);
+                rsSetBool(result, boolValue );
             } else
             if (strcmp(typeStr, "number")==0) {
+#if TCL_MAJOR_VERSION > 8
+                rc = Tcl_GetLongFromObj(interp, value, &intValue);
+#else
                 rc = Tcl_GetIntFromObj(interp, value, &intValue);
+#endif
                 if (rc == TCL_OK) {
-                    rsSetInt(result, intValue);
+                    rsSetLong(result, intValue);
                 } else {
                     rc = Tcl_GetDoubleFromObj(interp, value, &doubleValue);
                     rsSetReal(result, doubleValue);
@@ -1611,7 +1591,7 @@ static
 int tcldom_xsltMsgCB (
     void *clientData,
     char *str,
-    int   length,
+    domLength length,
     int   terminate
     )
 {
@@ -1654,7 +1634,7 @@ static
 char * tcldom_xpathResolveVar (
     void  *clientData,
     char  *strToParse,
-    int   *offset,
+    domLength *offset,
     char **errMsg
     )
 {
@@ -1695,8 +1675,9 @@ int tcldom_selectNodes (
 {
     char          *xpathQuery, *typeVar, *option;
     char          *errMsg = NULL, **mappings = NULL;
-    int            rc, i, len, optionIndex, localmapping = 0, cache = 0;
+    int            rc, optionIndex, localmapping = 0, cache = 0;
     int            mappingListObjLen = 0;
+    domLength      i, len;
     xpathResultSet rs;
     Tcl_Obj       *type, *objPtr, *objPtr1, *mappingListObj = NULL;
     xpathCBs       cbs;
@@ -1978,12 +1959,13 @@ int tcldom_appendFromTclList (
     Tcl_Obj    *obj
 )
 {
-    int      i, rc, length, valueLength, attrLength, attrValueLength;
-    int      childListLength;
-    Tcl_Obj *lnode, *tagNameObj, *piNameObj, *valueObj,
-            *attrListObj, *attrObj, *childListObj, *childObj;
-    char    *tag_name, *pi_name, *value, *attrName, *attrValue;
-    domNode *newnode;
+    int       i, rc;
+    domLength valueLength, length, attrLength, attrValueLength;
+    domLength childListLength;
+    Tcl_Obj  *lnode, *tagNameObj, *piNameObj, *valueObj,
+             *attrListObj, *attrObj, *childListObj, *childObj;
+    char     *tag_name, *pi_name, *value, *attrName, *attrValue;
+    domNode  *newnode;
 
     GetTcldomDATA;
 
@@ -2222,7 +2204,7 @@ void tcldom_AppendEscaped (
     Tcl_Obj    *xmlString,
     Tcl_Channel chan,
     char       *value,
-    int         value_length,
+    domLength   value_length,
     int         outputFlags
 )
 {
@@ -3102,7 +3084,7 @@ void tcldom_AppendEscapedJSON (
     Tcl_Obj    *jstring,
     Tcl_Channel chan,
     char       *value,
-    int         value_length
+    domLength   value_length
 )
 {
     char  buf[APESC_BUF_SIZE+80], *b, *bLimit,  *pc, *pEnd;
@@ -3915,7 +3897,7 @@ treeAsCanonicalXML (
     int  *lengthAttOrderArray
     )
 {
-    domAttrNode   *attr, *thisAtt, *previousAtt, *attOrder;
+    domAttrNode   *attr, *thisAtt = NULL, *previousAtt, *attOrder;
     domNode       *child;
     domDocument   *doc;
     domNS         *ns, *ns1;
@@ -3974,7 +3956,7 @@ treeAsCanonicalXML (
                 attNr++;
                 attr = attr->nextSibling;
             }
-            if (attNr) {
+            if (attNr && thisAtt) {
                 thisAtt->nextSibling = NULL;
             }
             attr = mergeSortAtt (attOrderArray[0], attNr) ;
@@ -4439,7 +4421,8 @@ int tcldom_prefixNSlist (
     )
 {
     char   **prefixns = *prefixnsPtr;
-    int      len, i, result;
+    domLength len, i;
+    int result;
     Tcl_Obj *objPtr, *listPtr;
 
     i = 0;
@@ -4498,7 +4481,8 @@ static int renameNodes (
     Tcl_Obj     *const objv[] 
     )
 {
-    int      len, i, hnew;
+    domLength len, i;
+    int hnew;
     Tcl_HashEntry *h;
     Tcl_Obj *objPtr;
     domNode     *node;
@@ -4577,9 +4561,9 @@ static int applyXSLT (
 {
     char          *usage, **parameters = NULL, *errMsg, *option;
     Tcl_Obj       *objPtr, *localListPtr = (Tcl_Obj *)NULL;
-    int            i, result, length, optionIndex;
-    int            ignoreUndeclaredParameters = 0;
+    int            result, optionIndex, ignoreUndeclaredParameters = 0;
     int            maxApplyDepth = MAX_XSLT_APPLY_DEPTH;
+    domLength      i, length;
     domDocument   *xsltDoc, *xmlDoc, *resultDoc = NULL;
     XsltMsgCBInfo  xsltMsgInfo;
 
@@ -4863,7 +4847,8 @@ int tcldom_NodeObjCmd (
     char         tmp[200], prefix[MAX_PREFIX_LEN], *method, *nodeName,
                  *str, *attr_name, *attr_val, *filter;
     const char  *localName, *uri, *nsStr;
-    int          result, length, methodIndex, i;
+    int          result, methodIndex, i;
+    domLength    length;
     long         line, column, byteIndex;
     int          nsIndex, bool, hnew, legacy, jsonType;
     Tcl_Obj     *namePtr, *resultPtr;
@@ -5989,9 +5974,9 @@ int tcldom_DocObjCmd (
     domDocument         * doc;
     char                * method, *tag, *data, *target, *uri, tmp[100];
     char                * str, *docName, *errMsg;
-    int                   methodIndex, result, data_length, target_length, i;
-    int                   nsIndex, forXPath, bool, setDocumentElement = 0;
-    int                   restoreDomCreateCmdMode = 0;
+    int                   methodIndex, result, i, nsIndex, forXPath, bool;
+    int                   setDocumentElement = 0, restoreDomCreateCmdMode = 0;
+    domLength             data_length, target_length;
     domNode             * n;
     Tcl_CmdInfo           cmdInfo;
     Tcl_Obj             * mobjv[MAX_REWRITE_ARGS];
@@ -6547,8 +6532,9 @@ tDOM_fsnewNodeCmd (
     Tcl_Obj *const  objv[]
 ) {
     domNode *parent, *newNode = NULL;
-    int index, jsonType, haveJsonType = 0, len, type, ret;
+    int index, jsonType, haveJsonType = 0, type, ret;
     int checkName, checkCharData;
+    domLength len;
     Tcl_Obj *cmdObj;
     char *namespace = NULL, *option, *tag;
 
@@ -6809,7 +6795,8 @@ int tcldom_createDocumentNS (
     Tcl_Obj    * const objv[]
 )
 {
-    int          setVariable = 0, len;
+    int          setVariable = 0;
+    domLength    len;
     char        *uri;
     domDocument *doc;
     Tcl_Obj     *newObjName = NULL;
@@ -6840,6 +6827,77 @@ int tcldom_createDocumentNS (
                                     0);
 }
 
+/* Helper function to build up the error string message in a central
+ * place. Caller must provide byteIndex; line is expected to be > 0 if
+ * line/column information is given. */
+void tcldom_reportErrorLocation (
+    Tcl_Interp *interp,
+    int before,
+    int after,
+    domLength line,
+    domLength column,
+    char *xmlstring,
+    const char *entity,
+    domLength byteIndex,
+    const char *errStr
+    )
+{
+    char s[200], sb[25], sl[25], sc[25];
+    char *d = NULL, *buf;
+    domLength i, ind;
+
+    if (before > 197 || after > 197) {
+        d = MALLOC (sizeof (char) * ((before > after ? before + 3 : after + 1)));
+        buf = d;
+    } else {
+        buf = s;
+    }
+    Tcl_ResetResult(interp);
+    Tcl_AppendResult (interp, "error \"", errStr, "\"", NULL);
+    if (entity) {
+        Tcl_AppendResult (interp, " in entity \"", entity, "\"", NULL);
+    }
+    if (line) {
+        sprintf(sl, domLengthConversion, line);
+        sprintf(sc, domLengthConversion, column);
+        Tcl_AppendResult (interp, " at line ", sl, " character ", sc, NULL);
+        
+    } else {
+        sprintf(sb, domLengthConversion, byteIndex);
+        Tcl_AppendResult (interp, " at position ", sb, NULL);
+    }
+    if (xmlstring) {
+        Tcl_AppendResult (interp, "\n\"", NULL);
+        ind = 0;
+        buf[0] = '\0';
+        for (i = (byteIndex < before ? 0 : byteIndex - before);
+             i <= byteIndex;
+             i++) {
+            buf[ind] = xmlstring[i];
+            ind++;
+        }
+        buf[ind] = '\0';
+        Tcl_AppendResult(interp, buf, " <--Error-- ", NULL);
+        ind = 0;
+        buf[0] = '\0';
+        if (xmlstring[byteIndex]) {
+            for (i = byteIndex + 1; i < byteIndex + after; i++) {
+                if (!xmlstring[i]) {
+                    break;
+                }
+                buf[ind] = xmlstring[i];
+                ind++;
+            }
+            buf[ind] = '\0';
+            Tcl_AppendResult(interp, buf, NULL);
+        }
+        Tcl_AppendResult(interp, "\"",NULL);
+    }
+    if (d) {
+        FREE (d);
+    }
+}
+
 /*----------------------------------------------------------------------------
 |   tcldom_parse
 |
@@ -6859,7 +6917,8 @@ int tcldom_parse (
     Tcl_Obj     *extResolver = NULL;
     Tcl_Obj     *feedbackCmd = NULL;
     const char  *interpResult;
-    int          optionIndex, value, xml_string_len, mode;
+    int          optionIndex, value, mode;
+    domLength    xml_string_len;
     int          jsonmaxnesting = JSON_MAX_NESTING;
     int          ignoreWhiteSpaces   = 1;
     int          takeJSONParser      = 0;
@@ -7269,6 +7328,11 @@ int tcldom_parse (
 
 #ifdef TDOM_HAVE_GUMBO
     if (takeGUMBOParser) {
+        if (xml_string_len > UINT_MAX) {
+            SetResult ("The Gumbo library doesn't support strings longer than"
+                       " 4 gigabytes.");
+            return TCL_ERROR;
+        }
         doc = HTML_GumboParseDocument(xml_string, ignoreWhiteSpaces,
                                       ignorexmlns);
         return tcldom_returnDocumentObj (interp, doc, setVariable, newObjName,
@@ -7277,8 +7341,7 @@ int tcldom_parse (
 #endif
     
     if (takeJSONParser) {
-        char s[50];
-        int byteIndex, i;
+        domLength byteIndex;
 
         errStr = NULL;
 
@@ -7288,33 +7351,14 @@ int tcldom_parse (
             return tcldom_returnDocumentObj (interp, doc, setVariable,
                                              newObjName, 1, 0);
         } else {
-            Tcl_ResetResult(interp);
-            sprintf(s, "%d", byteIndex);
-            Tcl_AppendResult(interp, "error \"", errStr, "\" at position ", 
-                             s, NULL);
-            Tcl_AppendResult(interp, "\n\"", NULL);
-            s[1] = '\0';
-            for (i=-20; i < 40; i++) {
-                if (byteIndex+i>=0) {
-                    if (xml_string[byteIndex+i]) {
-                        s[0] = xml_string[byteIndex+i];
-                        Tcl_AppendResult(interp, s, NULL);
-                        if (i==0) {
-                            Tcl_AppendResult(interp, " <--Error-- ", NULL);
-                        }
-                    } else {
-                        break;
-                    }
-                }
-            }
-            Tcl_AppendResult(interp, "\"",NULL);
+            tcldom_reportErrorLocation(interp, 20, 20, 0, 0, xml_string, NULL,
+                                       byteIndex, errStr);
             return TCL_ERROR;
         }
     }
     
     if (takeSimpleParser) {
-        char s[50];
-        int  byteIndex, i;
+        domLength byteIndex;
 
         errStr = NULL;
 
@@ -7329,29 +7373,8 @@ int tcldom_parse (
         }
         if (errStr != NULL) {
             domFreeDocument (doc, NULL, interp);
-
-            Tcl_ResetResult(interp);
-            sprintf(s, "%d", byteIndex);
-            Tcl_AppendResult(interp, "error \"", errStr, "\" at position ", 
-                             s, NULL);
-            if (byteIndex != -1) {
-                Tcl_AppendResult(interp, "\n\"", NULL);
-                s[1] = '\0';
-                for (i=-80; i < 80; i++) {
-                    if ((byteIndex+i)>=0) {
-                        if (xml_string[byteIndex+i]) {
-                            s[0] = xml_string[byteIndex+i];
-                            Tcl_AppendResult(interp, s, NULL);
-                            if (i==0) {
-                                Tcl_AppendResult(interp, " <--Error-- ", NULL);
-                            }
-                        } else {
-                            break;
-                        }
-                    }
-                }
-                Tcl_AppendResult(interp, "\"",NULL);
-            }
+            tcldom_reportErrorLocation(interp, 80, 80, 0, 0, xml_string, NULL,
+                                       byteIndex, errStr);
             if (takeHTMLParser) {
                 FREE(errStr);
             }
@@ -7430,10 +7453,6 @@ int tcldom_parse (
     if (doc == NULL) {
         char sl[50];
         char sc[50];
-        char sb[2];
-        int expatErrorCode;
-        
-        long byteIndex, i;
         
         switch (status) {
         case TCL_BREAK:
@@ -7449,38 +7468,13 @@ int tcldom_parse (
                    error msg. If we don't got a document, but interp result is
                    empty, the error occurred in the main document and we
                    build the error msg as follows. */
-                if (forest) {
-                    sprintf(sl, "%ld", forestError.errorLine);
-                    sprintf(sc, "%ld", forestError.errorColumn);
-                    byteIndex = forestError.byteIndex;
-                    expatErrorCode = forestError.errorCode;
-                } else {
-                    sprintf(sl, "%ld", XML_GetCurrentLineNumber(parser));
-                    sprintf(sc, "%ld", XML_GetCurrentColumnNumber(parser));
-                    byteIndex = XML_GetCurrentByteIndex(parser);
-                    expatErrorCode = XML_GetErrorCode(parser);
-                }
-                Tcl_AppendResult(interp, "error \"",
-                                 XML_ErrorString(expatErrorCode),
-                                 "\" at line ", sl, " character ", sc, NULL);
-                if ((byteIndex != -1) && (chan == NULL)) {
-                    Tcl_AppendResult(interp, "\n\"", NULL);
-                    sb[1] = '\0';
-                    for (i=-20; i < 40; i++) {
-                        if ((byteIndex+i)>=0) {
-                            if (xml_string[byteIndex+i]) {
-                                sb[0] = xml_string[byteIndex+i];
-                                Tcl_AppendResult(interp, sb, NULL);
-                                if (i==0) {
-                                    Tcl_AppendResult(interp, " <--Error-- ", NULL);
-                                }
-                            } else {
-                                break;
-                            }
-                        }
-                    }
-                    Tcl_AppendResult(interp, "\"",NULL);
-                }
+                tcldom_reportErrorLocation (
+                    interp, 20, 40,
+                    (forest ? forestError.errorLine : XML_GetCurrentLineNumber(parser)),
+                    (forest ? forestError.errorColumn : XML_GetCurrentColumnNumber(parser)),
+                    xml_string, NULL,
+                    (forest ? forestError.byteIndex : XML_GetCurrentByteIndex(parser)),
+                    XML_ErrorString((forest ? forestError.errorCode : XML_GetErrorCode(parser))));
             } else {
                 if (status == TCL_OK) {
                     /* For Tcl errors (in -externalentitycommand or
@@ -7651,7 +7645,8 @@ int tcldom_DomObjCmd (
     GetTcldomDATA;
 
     char        * method, tmp[300], *clearedStr, *string, *option;
-    int           methodIndex, result, i, bool, replace = 0, len;
+    int           methodIndex, result, i, bool, replace = 0;
+    domLength     len;
     Tcl_CmdInfo   cmdInfo;
     Tcl_Obj     * mobjv[MAX_REWRITE_ARGS], *newObj;
 
@@ -8104,7 +8099,8 @@ int tcldom_unknownCmd (
     Tcl_Obj    * const objv[]
 )
 {
-    int          len, i, rc, openedParen, count, args;
+    int          i, rc, openedParen, count, args;
+    domLength    len;
     char        *cmd, *dot, *paren, *arg[MAX_REWRITE_ARGS], *object, *method;
     Tcl_DString  callString;
     Tcl_CmdInfo  cmdInfo;

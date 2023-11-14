@@ -201,7 +201,7 @@ static void ErInit (void)
 \---------------------------------------------------------------------------*/
 static int TranslateEntityRefs (
     char *z,
-    int  *newLen
+    domLength *newLen
 )
 {
     int from;    /* Read characters from this position in z[] */
@@ -332,7 +332,7 @@ static int TranslateEntityRefs (
 static int
 XML_SimpleParse (
     char        *xml,   /* XML string  */
-    int         *pos,   /* Index of next unparsed character in xml */
+    domLength   *pos,   /* Index of next unparsed character in xml */
     domDocument *doc,
     domNode     *parent,
     int          ignoreWhiteSpaces,
@@ -1041,8 +1041,8 @@ XML_SimpleParse (
 /*----------------------------------------------------------------------------
 |   XML_SimpleParseDocument
 |
-|       Create a document, parses the XML string starting at 'pos' and
-|       continuing to the first encountered error.
+|       Create a document, parses the XML string and continuing to the
+|       first encountered error.
 |
 \---------------------------------------------------------------------------*/
 domDocument *
@@ -1053,7 +1053,7 @@ XML_SimpleParseDocument (
     int      forest,
     char    *baseURI,
     Tcl_Obj *extResolver,
-    int     *pos,
+    domLength *pos,
     char   **errStr
 ) {
     domDocument   *doc = domCreateDoc(baseURI, 0);

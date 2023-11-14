@@ -98,7 +98,7 @@ typedef struct tDOM_PullParserInfo
     PullParseMode   mode;
     int             skipDepth;
     Tcl_Obj       **firstFindElement;
-    int             countFindElement;
+    domLength       countFindElement;
 #ifdef EXPAT_RESUME_BUG
     long            elmStartCounter;
 #endif
@@ -179,7 +179,7 @@ endElement (
 
     if (Tcl_DStringLength (pullInfo->cdata) > 0) {
         if (pullInfo->ignoreWhiteSpaces) {
-            char *pc; int len;
+            char *pc; domLength len;
             len = Tcl_DStringLength(pullInfo->cdata);
             for (pc = Tcl_DStringValue (pullInfo->cdata);
                  len > 0;
@@ -287,7 +287,7 @@ startElement(
     }
     if (Tcl_DStringLength (pullInfo->cdata) > 0) {
         if (pullInfo->ignoreWhiteSpaces) {
-            char *pc; int len, wso = 1;
+            char *pc; domLength len, wso = 1;
             len = Tcl_DStringLength(pullInfo->cdata);
             for (pc = Tcl_DStringValue (pullInfo->cdata);
                  len > 0;
@@ -406,7 +406,8 @@ tDOM_resumeParseing (
     ) 
 {
     XML_ParsingStatus pstatus;
-    int len, done, result;
+    int done, result;
+    domLength len;
     char *data;
     
 
@@ -486,7 +487,8 @@ tDOM_PullParserInstanceCmd (
     )
 {
     tDOM_PullParserInfo *pullInfo = clientdata;
-    int methodIndex, len, result, mode, fd, optionIndex;
+    int methodIndex, result, mode, fd, optionIndex, done;
+    domLength len;
     char *data;
     const char **atts;
     Tcl_Obj *resultPtr;
@@ -640,7 +642,14 @@ tDOM_PullParserInstanceCmd (
                     } while (result == XML_STATUS_OK);
                 } else {
                     data = Tcl_GetStringFromObj(pullInfo->inputString, &len);
-                    result = XML_Parse (pullInfo->parser, data, len, 1);
+                    do {
+                        done = (len < INT_MAX);
+                        result = XML_Parse (pullInfo->parser, data, len, done);
+                        if (!done) {
+                            data += INT_MAX;
+                            len -= INT_MAX;
+                        }
+                    } while (!done && result == XML_STATUS_OK);
                 }
                 switch (result) {
                 case XML_STATUS_OK:
@@ -861,10 +870,10 @@ tDOM_PullParserInstanceCmd (
         case PULLPARSERSTATE_PARSE_ERROR:
             if ((enum method) methodIndex == m_line) {
                 Tcl_SetObjResult(interp,
-                    Tcl_NewLongObj (XML_GetCurrentLineNumber(pullInfo->parser)));
+                    Tcl_NewWideIntObj (XML_GetCurrentLineNumber(pullInfo->parser)));
             } else {
                 Tcl_SetObjResult(interp,
-                    Tcl_NewLongObj (XML_GetCurrentColumnNumber(pullInfo->parser)));
+                    Tcl_NewWideIntObj (XML_GetCurrentColumnNumber(pullInfo->parser)));
             }
             break;
         case PULLPARSERSTATE_START_DOCUMENT:

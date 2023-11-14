@@ -449,7 +449,7 @@ static void ErInit (void)
 \---------------------------------------------------------------------------*/
 static void TranslateEntityRefs (
     char *z,
-    int  *newLen
+    domLength  *newLen
 )
 {
     int from;    /* Read characters from this position in z[] */
@@ -615,7 +615,7 @@ static int getDeep (domNode *n) {
 static int
 HTML_SimpleParse (
     char        *html,  /* HTML string  */
-    int         *pos,   /* Index of next unparsed character in xml */
+    domLength   *pos,   /* Index of next unparsed character in xml */
     domDocument *doc,
     domNode     *parent,
     int          ignoreWhiteSpaces,
@@ -1409,7 +1409,7 @@ HTML_SimpleParseDocument (
     char   *html,              /* Complete text of the file being parsed  */
     int     ignoreWhiteSpaces,
     int     forest,
-    int    *pos,
+    domLength *pos,
     char  **errStr
 ) {
     domDocument   *doc = domCreateDoc(NULL, 0);

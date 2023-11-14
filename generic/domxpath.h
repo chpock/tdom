@@ -115,12 +115,12 @@ typedef struct xpathResultSet {
 
     xpathResultType type;
     char           *string;
-    int             string_len;
+    domLength       string_len;
     long            intvalue;
     double          realvalue;          
     domNode       **nodes;
-    int             nr_nodes;
-    int             allocated;
+    domLength       nr_nodes;
+    domLength       allocated;
 
 } xpathResultSet;
 
@@ -146,7 +146,7 @@ typedef struct xpathCBs {               /* all xpath callbacks + clientData */
 } xpathCBs;
 
 typedef char * (*xpathParseVarCallback)
-    (void *clientData, char *strToParse, int *offset, char **errMsg);
+    (void *clientData, char *strToParse, domLength *offset, char **errMsg);
 
 typedef struct xpathParseVarCB {
     xpathParseVarCallback parseVarCB;
@@ -179,8 +179,8 @@ int    xpathMatches (ast steps, domNode * exprContext, domNode *nodeToMatch,
                     );
                      
 int xpathEvalSteps (ast steps, xpathResultSet *nodeList,
-                    domNode *currentNode, domNode *exprContext, int currentPos,
-                    int *docOrder,
+                    domNode *currentNode, domNode *exprContext,
+                    domLength currentPos,  int *docOrder,
                     xpathCBs *cbs,
                     xpathResultSet *result, char **errMsg);
                     
@@ -194,14 +194,14 @@ int    xpathFuncBoolean  (xpathResultSet *rs);
 double xpathFuncNumber   (xpathResultSet *rs, int *NaN);
 char * xpathFuncString   (xpathResultSet *rs); 
 char * xpathFuncStringForNode (domNode *node);
-int    xpathRound        (double r);
+long xpathRound        (double r);
 
-char * xpathGetStringValue (domNode *node, int *strLen);
+char * xpathGetStringValue (domNode *node, domLength *strLen);
 
 char * xpathNodeToXPath  (domNode *node, int legacy);
     
 void rsSetBool      ( xpathResultSet *rs, long         i    );
-void rsSetInt       ( xpathResultSet *rs, long         i    );
+void rsSetLong      ( xpathResultSet *rs, long         i    );
 void rsSetReal      ( xpathResultSet *rs, double       d    );
 void rsSetReal2     ( xpathResultSet *rs, double       d    );
 void rsSetString    ( xpathResultSet *rs, const char  *s    );

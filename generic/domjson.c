@@ -26,6 +26,7 @@
  * sqlite JSON parser
  * (https://www.sqlite.org/src/artifact/312b4ddf4c7399dc) */
 
+#include <tcl.h>
 #include <dom.h>
 #include <domjson.h>
 #include <ctype.h>
@@ -73,7 +74,7 @@ typedef struct {
     int  maxnesting;
     char *arrItemElm;
     char *buf;
-    int len;
+    domLength len;
 } JSONParse;
 
 
@@ -100,14 +101,15 @@ static int jsonIs4Hex(const char *z){
  * at json[i]. Return the index of the closing '"' of the string
  * parsed. */
 
-static int jsonParseString (
+static domLength jsonParseString (
     char *json,
-    int   i,
+    domLength i,
     JSONParse *jparse
     )
 {
     unsigned char c;
-    int clen, j, k, savedStart;
+    int clen;
+    domLength j, k, savedStart;
     unsigned int u;
     
     DBG(fprintf(stderr, "jsonParseString start: '%s'\n", &json[i]););
@@ -145,7 +147,7 @@ static int jsonParseString (
     DBG(fprintf (stderr, "Continue with unescaping ..\n"););
     /* If we here, then i points to the first backslash in the string
      * to parse */
-    if (i - savedStart > jparse->len - 200) {
+    if (i - savedStart + 200 > jparse->len) {
         jparse->buf = REALLOC(jparse->buf, i-savedStart+200);
         jparse->len = i-savedStart+200;
     }
@@ -232,15 +234,15 @@ static int jsonParseString (
 /* Parse a single JSON value which begins at json[i]. Return the index
  * of the first character past the end of the value parsed. */
 
-static int jsonParseValue(
+static domLength jsonParseValue(
     domNode   *parent,
     char      *json,
-    int        i,
+    domLength  i,
     JSONParse *jparse
     )
 {
     char c, save;
-    int j;
+    domLength j;
     domNode *node;
     domTextNode *newTextNode;
     JSONWithin savedWithin = jparse->within;
@@ -443,14 +445,15 @@ JSON_Parse (
     char *documentElement, /* name of the root element, may be NULL */
     int   maxnesting,
     char **errStr,
-    int  *byteIndex
+    domLength *byteIndex
     )
 {
     domDocument *doc = domCreateDoc (NULL, 0);
     domNode *root;
     Tcl_HashEntry *h;
     JSONParse jparse;
-    int hnew, pos = 0;
+    int hnew;
+    domLength pos = 0;
 
     h = Tcl_CreateHashEntry(&HASHTAB(doc, tdom_tagNames), "item", &hnew);
     jparse.state = JSON_OK;

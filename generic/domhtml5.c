@@ -53,7 +53,8 @@ convertGumboToDom (
     int ignorexmlns
     ) 
 {
-    int i, j, hnew;
+    int hnew;
+    unsigned int i, j;
     GumboVector *children = &gumboParent->v.element.children;
     GumboNode *child;
     GumboElement *gumboElm;

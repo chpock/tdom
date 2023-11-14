@@ -49,10 +49,10 @@
 #include <math.h>
 #include <limits.h>
 #include <locale.h>
+#include <tcl.h>         /* for hash tables */
 #include <dom.h>
 #include <domxpath.h>
 #include <domxslt.h>
-#include <tcl.h>         /* for hash tables */
 
 /*----------------------------------------------------------------------------
 |   Defines
@@ -215,8 +215,8 @@ typedef struct xsltAttrSet {
 typedef struct xsltNodeSet {
     
     domNode       **nodes;
-    int             nr_nodes;
-    int             allocated;
+    domLength       nr_nodes;
+    domLength       allocated;
     
 } xsltNodeSet;
 
@@ -433,18 +433,18 @@ typedef struct {
 |
 \-------------------------------------------------------------------------*/
 static int ApplyTemplates ( xsltState *xs, xpathResultSet *context,
-                            domNode *currentNode, int currentPos,
+                            domNode *currentNode, domLength currentPos,
                             domNode *actionNode, xpathResultSet *nodeList,
                             const char *mode, const char *modeURI, 
                             char **errMsg);
 
 static int ApplyTemplate (  xsltState *xs, xpathResultSet *context,
                             domNode *currentNode, domNode *exprContext,
-                            int currentPos, const char *mode, 
+                            domLength currentPos, const char *mode, 
                             const char *modeURI, char **errMsg);
 
 static int ExecActions (xsltState *xs, xpathResultSet *context,
-                        domNode *currentNode, int currentPos,
+                        domNode *currentNode, domLength currentPos,
                         domNode *actionNode,  char **errMsg);
 
 static domDocument * getExternalDocument (Tcl_Interp *interp, xsltState *xs,
@@ -1140,7 +1140,7 @@ static int xsltFormatNumber (
     char              * formatStr,
     xsltDecimalFormat * df,
     char             ** resultStr,
-    int               * resultLen,
+    domLength         * resultLen,
     char             ** errMsg
 )
 {
@@ -1550,7 +1550,7 @@ static void nsAddNode (
     domNode *node 
     ) 
 {
-    int insertIndex, i;
+    domLength insertIndex, i;
     
     insertIndex = ns->nr_nodes;
     for (i = ns->nr_nodes - 1; i >= 0; i--) {
@@ -1704,10 +1704,10 @@ static int buildKeyInfoForDoc (
 \---------------------------------------------------------------------------*/
 static void sortNodeSetByNodeNumber(
     domNode *nodes[],
-    int      n
+    domLength n
 )
 {
-    int i, j, ln, rn;
+    domLength i, j, ln, rn;
     domNode *tmp;
 
     while (n > 1) {
@@ -1889,7 +1889,8 @@ static int xsltXPathFuncs (
     char              * keyId, *filterValue, *str = NULL;
     char                prefix[MAX_PREFIX_LEN];
     const char        * localName, *baseURI, *nsStr;
-    int                 rc, i, len, NaN, freeStr, x;
+    int                 rc, NaN, freeStr;
+    domLength           i, len, x;
     double              n;
     xsltNodeSet       * keyValues;
     Tcl_HashEntry     * h;
@@ -2236,7 +2237,7 @@ static int evalXPath (
     xsltState       * xs,
     xpathResultSet  * context,
     domNode         * currentNode,
-    int               currentPos,
+    domLength         currentPos,
     char            * xpath,
     xpathResultSet  * rs,
     char           ** errMsg
@@ -2358,18 +2359,19 @@ static int fastMergeSort (
     int         asc,
     int         upperFirst,
     domNode   * a[],
-    int       * posa,
+    domLength * posa,
     domNode   * b[],
-    int       * posb,
+    domLength * posb,
     char     ** vs,
     double    * vd,
     char     ** vstmp,
     double    * vdtmp,
-    int         size,
+    domLength   size,
     char     ** errMsg
 ) {
     domNode *tmp;
-    int tmpPos, lptr, rptr, middle, i, j, gt, rc;
+    domLength tmpPos, lptr, rptr, middle, i, j;
+    int gt, rc;
     char    *tmpVs;
     double   tmpVd;
 
@@ -2446,7 +2448,7 @@ static int fastMergeSort (
         }
     }
     memcpy(a,    b,     size*sizeof(domNode*));
-    memcpy(posa, posb,  size*sizeof(int));
+    memcpy(posa, posb,  size*sizeof(domLength));
     memcpy(vs,   vstmp, size*sizeof(char*));
     memcpy(vd,   vdtmp, size*sizeof(double));
     return 0;
@@ -2457,21 +2459,21 @@ static int sortNodeSetFastMerge(
     int         asc,
     int         upperFirst,
     domNode   * nodes[],
-    int         n,
+    domLength   n,
     char     ** vs,
     double    * vd,
-    int       * pos,
+    domLength * pos,
     char     ** errMsg
 )
 {
     domNode **b;
-    int      *posb;
+    domLength *posb;
     char    **vstmp;
     double   *vdtmp;
     int       rc;
 
     b = (domNode **)MALLOC(n * sizeof(domNode *));
-    posb = (int *)MALLOC(n * sizeof(int));
+    posb = (domLength *)MALLOC(n * sizeof(domLength));
     vstmp = (char **)MALLOC(sizeof (char *) * n);
     vdtmp = (double *)MALLOC(sizeof (double) * n);
 
@@ -2494,7 +2496,7 @@ static int xsltSetVar (
     char            * variableName,
     xpathResultSet  * context,
     domNode         * currentNode,
-    int               currentPos,
+    domLength         currentPos,
     char            * select,
     domNode         * actionNode,
     int               active,
@@ -3022,7 +3024,7 @@ static int ExecUseAttributeSets (
     xsltState         * xs,
     xpathResultSet    * context,
     domNode           * currentNode,
-    int                 currentPos,
+    domLength           currentPos,
     domNode           * actionNode,
     char              * styles,
     char             ** errMsg
@@ -3106,7 +3108,7 @@ static int evalAttrTemplates (
     xsltState       * xs,
     xpathResultSet  * context,
     domNode         * currentNode,
-    int               currentPos,
+    domLength         currentPos,
     char            * str,
     char           ** out,
     char           ** errMsg
@@ -3114,7 +3116,8 @@ static int evalAttrTemplates (
 {
     xpathResultSet  rs;
     char           *tplStart = NULL, *tplResult, *pc, literalChar;
-    int             rc, aLen, inTpl = 0, p = 0, inLiteral = 0;
+    domLength       aLen, p = 0;
+    int             rc, inTpl = 0, inLiteral = 0;
 
     aLen = 500;
     *out = MALLOC(aLen);
@@ -3209,7 +3212,7 @@ static int setParamVars (
     xsltState       * xs,
     xpathResultSet  * context,
     domNode         * currentNode,
-    int               currentPos,
+    domLength         currentPos,
     domNode         * actionNode,
     char           ** errMsg
 )
@@ -3261,7 +3264,7 @@ static int doSortActions (
     domNode         * actionNode,
     xpathResultSet  * context,
     domNode         * currentNode,
-    int               currentPos,
+    domLength         currentPos,
     char           ** errMsg
 )
 {
@@ -3273,7 +3276,8 @@ static int doSortActions (
     char           prefix[MAX_PREFIX_LEN];
     const char    *localName;
     double        *vd = NULL;
-    int            rc = 0, typeText, ascending, upperFirst, *pos = NULL, i, NaN;
+    int            rc = 0, typeText, ascending, upperFirst, NaN;
+    domLength      i, *pos = NULL;
     xpathResultSet rs;
 
     child = actionNode->lastChild; /* do it backwards, so that multiple sort
@@ -3358,7 +3362,7 @@ static int doSortActions (
                        select, typeText, ascending, nodelist->nr_nodes);
                 CHECK_RC;
                 if (!pos)
-                    pos = (int*)MALLOC(sizeof(int) * nodelist->nr_nodes);
+                    pos = (domLength*)MALLOC(sizeof(int) * nodelist->nr_nodes);
                 for (i=0; i<nodelist->nr_nodes;i++) pos[i] = i;
 
                 xs->currentXSLTNode = child;
@@ -3413,14 +3417,14 @@ static int xsltNumber (
     xsltState       * xs,
     xpathResultSet  * context,
     domNode         * currentNode,
-    int               currentPos,
+    domLength         currentPos,
     domNode         * actionNode,
     char           ** errMsg
 )
 {
     xpathResultSet    rs;
-    int               rc, vs[20], NaN, hnew, i, useFormatToken, vVals = 0;
-    int              *v, *vd = NULL;
+    int               rc, NaN, hnew, i, useFormatToken, vVals = 0;
+    domLength         vs[20], *v, *vd = NULL;
     long              groupingSize = 0;
     char             *value, *level, *count, *from, *str, *str1, *format;
     char             *groupingSeparator = NULL, *groupingSizeStr = NULL;
@@ -3616,7 +3620,7 @@ static int xsltNumber (
                 else node = node->parentNode;
             }
             if (rs.nr_nodes > 20) {
-                vd = (int *)MALLOC(sizeof (int) * rs.nr_nodes);
+                vd = (domLength *)MALLOC(sizeof (domLength) * rs.nr_nodes);
                 v = vd;
             }
             vVals = rs.nr_nodes;
@@ -3712,7 +3716,7 @@ static int ExecAction (
     xsltState       * xs,
     xpathResultSet  * context,
     domNode         * currentNode,
-    int               currentPos,
+    domLength         currentPos,
     domNode         * actionNode,
     char           ** errMsg
 )
@@ -3731,7 +3735,8 @@ static int ExecAction (
     char           *str, *str2, *select, *pc, *nsAT, *out;
     const char     *mode, *modeURI, *localName, *uri, *nsStr;
     char            prefix[MAX_PREFIX_LEN], tmpErr[200];
-    int             rc, b, i, len, terminate, chooseState, disableEsc = 0;
+    int             rc, b, i, terminate, chooseState, disableEsc = 0;
+    domLength       len;
     double          currentPrio, currentPrec;
     Tcl_HashEntry  *h;
 
@@ -5055,7 +5060,7 @@ static int ExecActions (
     xsltState       * xs,
     xpathResultSet  * context,
     domNode         * currentNode,
-    int               currentPos,
+    domLength         currentPos,
     domNode         * actionNode,
     char           ** errMsg
 )
@@ -5091,7 +5096,7 @@ static int ApplyTemplate (
     xpathResultSet * context,
     domNode        * currentNode,
     domNode        * exprContext,
-    int              currentPos,
+    domLength        currentPos,
     const char     * mode,
     const char     * modeURI,
     char          ** errMsg
@@ -5269,7 +5274,7 @@ static int ApplyTemplates (
     xsltState      * xs,
     xpathResultSet * context,
     domNode        * currentNode,
-    int              currentPos,
+    domLength        currentPos,
     domNode        * actionNode,
     xpathResultSet * nodeList,
     const char     * mode,
@@ -5278,7 +5283,8 @@ static int ApplyTemplates (
 )
 {
     domNode  * savedLastNode;
-    int        i, rc, needNewVarFrame = 1;
+    int        rc, needNewVarFrame = 1;
+    domLength  i;
 
     if (nodeList->type == xNodeSetResult) {
         if (xs->nestedApplyTemplates > xs->maxNestedApplyTemplates) {
@@ -5680,7 +5686,8 @@ getExternalDocument (
 {
     Tcl_Obj      *cmdPtr, *resultObj, *extbaseObj, *xmlstringObj;
     Tcl_Obj      *channelIdObj, *resultTypeObj;
-    int           len, mode, result, storeLineColumn;
+    int           mode, result, storeLineColumn;
+    domLength     len;
     int           resultcode = 0;
     char         *resultType, *extbase, *xmlstring, *channelId, s[20];
     Tcl_Obj      *extResolver = NULL;

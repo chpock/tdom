@@ -32,6 +32,6 @@ JSON_Parse (
     char *documentElement, /* name of the root element, may be NULL */
     int   maxnesting,
     char **errStr,
-    int  *byteIndex
+    domLength *byteIndex
     );
 
