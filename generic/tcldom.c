@@ -6858,7 +6858,7 @@ void tcldom_reportErrorLocation (
         Tcl_AppendResult (interp, " in entity \"", entity, "\"", NULL);
     }
     if (line) {
-        sprintf(sl, domLengthConversion, line);
+        sprintf(sl, "%" TCL_SIZE_MODIFIER "d", line);
         sprintf(sc, domLengthConversion, column);
         Tcl_AppendResult (interp, " at line ", sl, " character ", sc, NULL);
         
