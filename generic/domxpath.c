@@ -2854,11 +2854,11 @@ static int xpathArityCheck (
 |   xpathRound
 |
 \---------------------------------------------------------------------------*/
-long xpathRound (double r) {
+domLength xpathRound (double r) {
     if (r < 0.0) {
-        return (long)floor (r + 0.5);
+        return (domLength)floor (r + 0.5);
     } else {
-        return (long)(r + 0.5);
+        return (domLength)(r + 0.5);
     }
 }
 
@@ -2939,27 +2939,21 @@ xpathEvalFunction (
     )
 {
     xpathResultSet   leftResult, rightResult, replaceResult;
-    int              rc, pwhite, NaN, attrcount;
-    domLength        len, lenstr, fromlen, i, j;
-    char            *replaceStr, *pfrom, *pto, tmp[80], tmp1[80];
+    int              rc, pwhite, NaN, attrcount, argc, savedDocOrder, found,
+                     utfCharLen, untilEnd, left = 0;
+    domLength        len, lenstr, fromlen, i, j, from;
+    char            *replaceStr, *pfrom, *pto, tmp[80], tmp1[80],
+                    *leftStr = NULL, *rightStr = NULL, utfBuf[TCL_UTF_MAX];
     domNode         *node;
     domAttrNode     *attr;
-    double           leftReal;
+    double           leftReal, dRight = 0.0;
     ast              nextStep;
-    int              argc, savedDocOrder;
-    domLength        from;
     xpathResultSets *args;
     xpathResultSet  *arg;
     Tcl_HashTable   *ids;
     Tcl_HashEntry   *entryPtr;
-    int              left = 0;
-    double           dRight = 0.0;
-    char            *leftStr = NULL, *rightStr = NULL;
     const char      *str;
-    Tcl_DString      dStr;
-    int              found, utfCharLen;
-    char             utfBuf[TCL_UTF_MAX];
-    Tcl_DString      tstr, tfrom, tto, tresult;
+    Tcl_DString      dStr, tstr, tfrom, tto, tresult;
     Tcl_UniChar     *ufStr, *upfrom, unichar;
 
     switch (step->intvalue) {
@@ -3430,6 +3424,7 @@ xpathEvalFunction (
         }
 
         if (step->child->next->next) {
+            untilEnd = 0;
             xpathRSInit (&rightResult);
             savedDocOrder = *docOrder;
             rc = xpathEvalStep( step->child->next->next, ctxNode, exprContext,
@@ -3443,7 +3438,7 @@ xpathEvalFunction (
             xpathRSFree (&rightResult);
             if (NaN) {
                 if (NaN == 1) {
-                    len = INT_MAX;
+                    untilEnd = 1;
                 } else {
                     FREE(leftStr);
                     rsSetString (result, "");
@@ -3462,7 +3457,7 @@ xpathEvalFunction (
             }
         } else {
             if (from < 0) from = 0;
-            len = INT_MAX;
+            untilEnd = 1;
         }
 
         pfrom = leftStr;
@@ -3477,7 +3472,7 @@ xpathEvalFunction (
             pfrom += i;
             from--;
         }
-        if (len < INT_MAX) {
+        if (!untilEnd) {
             pto = pfrom;
             while (*pto && (len > 0)) {
                 i = UTF8_CHAR_LEN (*pto);

@@ -1,5 +1,5 @@
-C wip
-D 2023-12-10T01:19:05.347
+C Fixed\sa\sbug\son\swindows\swith\sxpath\sstrings\slonger\sthan\s2GByte.
+D 2023-12-10T18:52:35.443
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -138,8 +138,8 @@ F generic/domhtml5.h 5cca562a556e7662f2dce222640c32abb2777146
 F generic/domjson.c 0b5d64c598858d2bbd9ccaed4f3f1487593cb021c4bb11a9059874655061a12b
 F generic/domjson.h ff31d0fd1d6eb3e6490fb456d42b73e304a6f0c386a074db42d8b84ad8c925b3
 F generic/domlock.c f8e235892bb9dc771e844c47701ded81c10967dc6ca420b14ab54067211bdb8f
-F generic/domxpath.c 3d48f3ee57abfb517e506bb827288b6932e4cc0924b625a7ae4da0ae049a84a1
-F generic/domxpath.h 597c24b09eee21951f8a532d1fc02f00501f75ad628bcd64a9d04e2682d26c73
+F generic/domxpath.c 4a2167f2f7f0437ea1c148e8e0931be3acc2eabb446fcd7a054f6cbec7cf4412
+F generic/domxpath.h dbedcd0456d545b3b0ecbe245f5afad9521b579451b44029d5502cf99ce24888
 F generic/domxslt.c ceda411bd70a513aa18f75d5e4e25923d60c946bbeef012e7a4bdd0ecd254080
 F generic/domxslt.h aeaf957ee38a9e7564bd9f1bed1781de108767df476a0d0776615988d8f04e0f
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -239,8 +239,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 3063b4d0c94eb96f8757685ab692cad3892207df2c209b7fa4a7f4f0bd085689
-R 0a4eeec8fa84e7d3d10738d9bd62d029
+P 566a033db7403772a751628fa200bf5cc48ae578abba5e84f5227171f102a987
+R c4ed6b8051bc1ab16a8235d9ac7d686c
 U user
-Z cf412ffdd97f3744b5eb1cc870d00ed8
+Z 650bd0cd4bf4799edf07d8fb0a67fce3
 # Remove this line to create a well-formed Fossil manifest.
