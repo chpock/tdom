@@ -1,5 +1,5 @@
-C Fixed\sa\sbug\son\swindows\swith\sxpath\sstrings\slonger\sthan\s2GByte.
-D 2023-12-10T18:52:35.443
+C Tweaked\sthe\svc\sbuild\sgenerated\spkgIndex.tcl.
+D 2023-12-11T01:05:42.418
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -228,7 +228,7 @@ F unix/speed-check.sh 7a8d91e7edf1cdc9bcfad5f28e1a068cb2843d05e49d8bd89d9b30a465
 F unix/tclAppInit.c cd5fa5bcb9f4648e9bf7108727b99e20cd02c33713df359efb1da298715940b9
 F win/README 69a6da038cb99711a2c95fd44e314e9ce74bb2c4ed8ed319dac6fd6daff2c13d
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F win/makefile.vc bcf9831a0b10019b66e27720239e0c3101b883ca5394cbb396529ac4d5fdc246
+F win/makefile.vc ae8161746a61175a4823a0ea4fc7ae94d5ba3a465210f3007b9361b710ac2844
 F win/nmakehlp.c 194ae7c24886245c679cb4c9ea7e6daaaebb5fcd
 F win/pkgIndex.tcl 33c8ec37ad3dd9af012d01f9817436adeaf8bf9d4ffda29df2c6bc1cccb67176
 F win/rules-ext.vc 3c02944b3199014d35de617a1c146d0944af16395870da423374fb013ef57ecf
@@ -239,8 +239,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 566a033db7403772a751628fa200bf5cc48ae578abba5e84f5227171f102a987
-R c4ed6b8051bc1ab16a8235d9ac7d686c
-U user
-Z 650bd0cd4bf4799edf07d8fb0a67fce3
+P 7808bbf7c639db24ada3a05aa4e764e666f323b9d12dc09c5a3e37af597c51ed
+R 7536f9663643a60f75d3fc67450df8a8
+U rolf
+Z 65cdfae7cd4f5dc71e6b37a26661ca7a
 # Remove this line to create a well-formed Fossil manifest.
