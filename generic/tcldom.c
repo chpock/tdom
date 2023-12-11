@@ -1409,7 +1409,8 @@ int tcldom_xpathFuncCallBack (
                 *tmpObj;
     Tcl_CmdInfo  cmdInfo;
     int          objc, rc, res, boolValue;
-    domLength    errStrLen, listLen, intValue, i;
+    long         longValue;
+    domLength    errStrLen, listLen, i;
     double       doubleValue;
     domNode     *node;
 
@@ -1506,12 +1507,12 @@ int tcldom_xpathFuncCallBack (
             } else
             if (strcmp(typeStr, "number")==0) {
 #if TCL_MAJOR_VERSION > 8
-                rc = Tcl_GetLongFromObj(interp, value, &intValue);
+                rc = Tcl_GetLongFromObj(interp, value, &longValue);
 #else
-                rc = Tcl_GetIntFromObj(interp, value, &intValue);
+                rc = Tcl_GetIntFromObj(interp, value, &longValue);
 #endif
                 if (rc == TCL_OK) {
-                    rsSetLong(result, intValue);
+                    rsSetLong(result, longValue);
                 } else {
                     rc = Tcl_GetDoubleFromObj(interp, value, &doubleValue);
                     rsSetReal(result, doubleValue);
@@ -6858,7 +6859,7 @@ void tcldom_reportErrorLocation (
         Tcl_AppendResult (interp, " in entity \"", entity, "\"", NULL);
     }
     if (line) {
-        sprintf(sl, domLengthConversion, line);
+        sprintf(sl, "%" TCL_SIZE_MODIFIER "d", line);
         sprintf(sc, domLengthConversion, column);
         Tcl_AppendResult (interp, " at line ", sl, " character ", sc, NULL);
         

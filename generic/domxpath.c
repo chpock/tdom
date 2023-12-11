@@ -309,11 +309,11 @@ void rsPrint ( xpathResultSet *rs ) {
              break;
 
         case xNodeSetResult:
-             if (!i) fprintf(stderr,"nodeSet result (len %" Tcl_Size_Conv "):\n",
-                             rs->nr_nodes);
+             if (!i) fprintf(stderr,"nodeSet result (len " domLengthConversion
+                             "):\n", rs->nr_nodes);
              for (i=0; i<rs->nr_nodes; i++) {
                  if (rs->nodes[i]->nodeType == ELEMENT_NODE) {
-                     fprintf(stderr, "%2" Tcl_Size_Conv " domNode%p %s ",
+                     fprintf(stderr, "%2" TCL_SIZE_MODIFIER "i domNode%p %s ",
                              i, (void *)rs->nodes[i], rs->nodes[i]->nodeName);
                      if (rs->nodes[i]->firstChild &&
                          rs->nodes[i]->firstChild->nodeType == TEXT_NODE)
@@ -331,7 +331,7 @@ void rsPrint ( xpathResultSet *rs ) {
                      if (l > 60) l = 60;
                      memcpy(tmp, ((domTextNode*)rs->nodes[i])->nodeValue, l);
                      tmp[l] = '\0';
-                     fprintf(stderr, "%2" Tcl_Size_Conv " domNode%p text:'%s' \n",
+                     fprintf(stderr, "%2" TCL_SIZE_MODIFIER "i domNode%p text:'%s' \n",
                              i,  (void *)rs->nodes[i], tmp);
                  } else
                  if (rs->nodes[i]->nodeType == COMMENT_NODE) {
@@ -341,11 +341,11 @@ void rsPrint ( xpathResultSet *rs ) {
                      memcpy(&tmp[4], ((domTextNode*)rs->nodes[i])->nodeValue, l);
                      memcpy(&tmp[4+l], "-->", 3);
                      tmp[7+l] = '\0';
-                     fprintf(stderr, "%2" Tcl_Size_Conv " domNode%p text:'%s' \n",
+                     fprintf(stderr, "%2" TCL_SIZE_MODIFIER "i domNode%p text:'%s' \n",
                              i,  (void *)rs->nodes[i], tmp);
                  } else
                  if (rs->nodes[i]->nodeType == ATTRIBUTE_NODE) {
-                     fprintf(stderr, "%2" Tcl_Size_Conv " Attr %s='%80s'\n", i,
+                     fprintf(stderr, "%2" TCL_SIZE_MODIFIER "i Attr %s='%80s'\n", i,
                              ((domAttrNode*)rs->nodes[i])->nodeName,
                              ((domAttrNode*)rs->nodes[i])->nodeValue);
                  }
@@ -1114,7 +1114,8 @@ static XPathTokens xpathLexer (
                            if (xpath[i]=='.') {
                                if (token == REALNUMBER) {
                                    sprintf (tmpErr, "Unexpected character "
-                                            "'%c' at position %" Tcl_Size_Conv,
+                                            "'%c' at position %"
+                                            TCL_SIZE_MODIFIER "i",
                                             xpath[i], i);
                                    *errMsg = tdomstrdup (tmpErr);
                                    return tokens;
@@ -1139,13 +1140,15 @@ static XPathTokens xpathLexer (
                            xpath[i--] = save;
                            if (tokens[l].realvalue == 0.0 && tailptr == ps) {
                                sprintf (tmpErr, "Number value too large "
-                                        "at position %" Tcl_Size_Conv, i);
+                                        "at position %" TCL_SIZE_MODIFIER
+                                        "i", i);
                                *errMsg = tdomstrdup (tmpErr);
                                return tokens;
                            }
                        } else {
                            sprintf (tmpErr, "Unexpected character '%c' at "
-                                    "position %" Tcl_Size_Conv, xpath[i], i);
+                                    "position %" TCL_SIZE_MODIFIER "i",
+                                    xpath[i], i);
                            *errMsg = tdomstrdup (tmpErr);
                            return tokens;
                        }
@@ -2851,11 +2854,11 @@ static int xpathArityCheck (
 |   xpathRound
 |
 \---------------------------------------------------------------------------*/
-long xpathRound (double r) {
+domLength xpathRound (double r) {
     if (r < 0.0) {
-        return (long)floor (r + 0.5);
+        return (domLength)floor (r + 0.5);
     } else {
-        return (long)(r + 0.5);
+        return (domLength)(r + 0.5);
     }
 }
 
@@ -2936,27 +2939,21 @@ xpathEvalFunction (
     )
 {
     xpathResultSet   leftResult, rightResult, replaceResult;
-    int              rc, pwhite, NaN, attrcount;
-    domLength        len, lenstr, fromlen, i, j;
-    char            *replaceStr, *pfrom, *pto, tmp[80], tmp1[80];
+    int              rc, pwhite, NaN, attrcount, argc, savedDocOrder, found,
+                     utfCharLen, untilEnd, left = 0;
+    domLength        len, lenstr, fromlen, i, j, from;
+    char            *replaceStr, *pfrom, *pto, tmp[80], tmp1[80],
+                    *leftStr = NULL, *rightStr = NULL, utfBuf[TCL_UTF_MAX];
     domNode         *node;
     domAttrNode     *attr;
-    double           leftReal;
+    double           leftReal, dRight = 0.0;
     ast              nextStep;
-    int              argc, savedDocOrder;
-    domLength        from;
     xpathResultSets *args;
     xpathResultSet  *arg;
     Tcl_HashTable   *ids;
     Tcl_HashEntry   *entryPtr;
-    int              left = 0;
-    double           dRight = 0.0;
-    char            *leftStr = NULL, *rightStr = NULL;
     const char      *str;
-    Tcl_DString      dStr;
-    int              found, utfCharLen;
-    char             utfBuf[TCL_UTF_MAX];
-    Tcl_DString      tstr, tfrom, tto, tresult;
+    Tcl_DString      dStr, tstr, tfrom, tto, tresult;
     Tcl_UniChar     *ufStr, *upfrom, unichar;
 
     switch (step->intvalue) {
@@ -3427,6 +3424,7 @@ xpathEvalFunction (
         }
 
         if (step->child->next->next) {
+            untilEnd = 0;
             xpathRSInit (&rightResult);
             savedDocOrder = *docOrder;
             rc = xpathEvalStep( step->child->next->next, ctxNode, exprContext,
@@ -3440,7 +3438,7 @@ xpathEvalFunction (
             xpathRSFree (&rightResult);
             if (NaN) {
                 if (NaN == 1) {
-                    len = INT_MAX;
+                    untilEnd = 1;
                 } else {
                     FREE(leftStr);
                     rsSetString (result, "");
@@ -3459,7 +3457,7 @@ xpathEvalFunction (
             }
         } else {
             if (from < 0) from = 0;
-            len = INT_MAX;
+            untilEnd = 1;
         }
 
         pfrom = leftStr;
@@ -3474,7 +3472,7 @@ xpathEvalFunction (
             pfrom += i;
             from--;
         }
-        if (len < INT_MAX) {
+        if (!untilEnd) {
             pto = pfrom;
             while (*pto && (len > 0)) {
                 i = UTF8_CHAR_LEN (*pto);

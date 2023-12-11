@@ -99,13 +99,11 @@
 #if TCL_MAJOR_VERSION > 8
 #  define domLength Tcl_Size
 #  define Tcl_SetDomLengthObj Tcl_SetWideIntObj
-#  define domLengthConversion "%lu"
-#  define Tcl_Size_Conv  "ld"
+#  define domLengthConversion "%" TCL_SIZE_MODIFIER "d"
 #else
 #  define domLength int
 #  define Tcl_SetDomLengthObj Tcl_SetIntObj
 #  define domLengthConversion "%d"
-#  define Tcl_Size_Conv  "d"
 #endif
 
 /* The following is the machinery to have an UNUSED macro which
@@ -160,7 +158,7 @@
 # define TDomThreaded(x)    x
 # define HASHTAB(doc,tab)   (doc)->tab
 # define NODE_NO(doc)       ((doc)->nodeCounter)++
-# define DOC_NO(doc)        (unsigned long)(doc)
+# define DOC_NO(doc)        (Tcl_WideInt)(doc)
 #endif /* TCL_THREADS */
 
 #define DOC_CMD(s,doc)      sprintf((s), "domDoc%p", (void *)(doc))
@@ -527,7 +525,7 @@ typedef struct domDocument {
     domNodeType       nodeType  : 8;
     domDocFlags       nodeFlags : 8;
     domNameSpaceIndex dummy     : 16;
-    unsigned long     documentNumber;
+    Tcl_WideInt       documentNumber;
     struct domNode   *documentElement;
     struct domNode   *fragments;
 #ifdef TCL_THREADS
