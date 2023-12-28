@@ -1409,8 +1409,7 @@ int tcldom_xpathFuncCallBack (
                 *tmpObj;
     Tcl_CmdInfo  cmdInfo;
     int          objc, rc, res, boolValue;
-    long         longValue;
-    domLength    errStrLen, listLen, i;
+    domLength    errStrLen, listLen, i, longValue;
     double       doubleValue;
     domNode     *node;
 
@@ -1506,11 +1505,7 @@ int tcldom_xpathFuncCallBack (
                 rsSetBool(result, boolValue );
             } else
             if (strcmp(typeStr, "number")==0) {
-#if TCL_MAJOR_VERSION > 8
-                rc = Tcl_GetLongFromObj(interp, value, &longValue);
-#else
-                rc = Tcl_GetIntFromObj(interp, value, &longValue);
-#endif
+                rc = Tcl_GetSizeIntFromObj(interp, value, &longValue);
                 if (rc == TCL_OK) {
                     rsSetLong(result, longValue);
                 } else {

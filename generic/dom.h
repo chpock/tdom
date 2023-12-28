@@ -104,6 +104,8 @@
 #  define domLength int
 #  define Tcl_SetDomLengthObj Tcl_SetIntObj
 #  define domLengthConversion "%d"
+#  define TCL_SIZE_MODIFIER ""
+#  define Tcl_GetSizeIntFromObj Tcl_GetIntFromObj
 #endif
 
 /* The following is the machinery to have an UNUSED macro which
