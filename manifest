@@ -1,5 +1,5 @@
-C Restored\sbuild\swith\s8.6.
-D 2023-12-28T14:55:41.917
+C Smaller\scorrections\sand\sadditions\sto\sthe\spull\sparser\sdocumentation.
+D 2024-01-11T10:56:28.844
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -38,7 +38,7 @@ F doc/keyword-index.html 154e20dd68e7b79579bd35374451ba9e1d1b74c571b63a66cfd5dfb
 F doc/manpage.css 3b4ec1d641048933a7e6bffc659de9519030a959
 F doc/pullparser.html e131f93bb7e28261f35c0614e598ec876411ec96d840c396a921042d61345a20
 F doc/pullparser.n 45c9bc45edf706595a130aa2afcf9890a80fe64eb492df6e88514ab8e316278b
-F doc/pullparser.xml 4060ebb3744090b95e9e93551c23d8b5213ed58a7ad1fce2437fef617f3ba528
+F doc/pullparser.xml 30132bb8d2afe3b3ab568da3145dcde6f090197be86bee74f8d028b83fdcfe8f
 F doc/schema.html 0981f61df83343407a937a29c0f491875047e3d66ddd9cba746a80c3d1fccb3e
 F doc/schema.n 3512f30cb0eec5e287b8f10ca80c0e633222381cfe79ff90fbc1df10c4b428bd
 F doc/schema.xml 426edda0cdd6787e61ad86ef5b04915591684b680a1e6c20cec779694b42306b
@@ -239,8 +239,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f41570cf61434096272f8a0e2aff257179ba128b7640c767fa66786e247fbbed
-R b172e0f573a1cf02c2d898ded5075d39
+P 246a80804e46cf2cd3ecf3e929cab94fb70bf68895137e9ab980922d2ce3a525
+R 142ed70e1a69866af98dd2fc1c494668
 U rolf
-Z 40b2b906c4a968c48d10ff1ad601f01b
+Z fb97d6d366c66fa039c9826fba5dceb2
 # Remove this line to create a well-formed Fossil manifest.
