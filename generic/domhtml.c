@@ -99,7 +99,7 @@ struct Er {
 |   character entity references known to the system.
 |
 \---------------------------------------------------------------------------*/
-#define ER_HASH_SIZE 257
+#define ER_HASH_SIZE 307
 
 /*----------------------------------------------------------------------------
 |   The following flag is TRUE if entity reference hash table needs
@@ -151,7 +151,8 @@ static int ErHash(
 |   new character entities, add entries to this table.
 |
 |   Note: For the decoder to work, the name of the entity reference
-|   must not be shorter than the value.
+|   (including the leading & and closing ;) must not be shorter than
+|   the value.
 |
 \---------------------------------------------------------------------------*/
 static Er er_sequences[] = {
@@ -256,6 +257,53 @@ static Er er_sequences[] = {
     { "yacute",    "\xC3\xBD",    0 },
     { "thorn",     "\xC3\xBE",    0 },
     { "yuml",      "\xC3\xBF",    0 },
+    /* Entities added by HTML 5, if not already covered */
+    { "Tab",             "\t",           0 },
+    { "NewLine",         "\n",           0 },
+    { "DownBreve",       "\xCC\x91",     0 },
+    { "tdot",            "\xE2\x83\x9B", 0 },
+    { "TripleDot",       "\xE2\x83\x9B", 0 },
+    { "excl",            "!",            0 },
+    { "QUOT",            "\"",           0 },
+    { "num",             "#",            0 },
+    { "dollar",          "$",            0 },
+    { "percent",         "%",            0 },
+    { "AMP",             "&",            0 },
+    { "lpar",            "(",            0 },
+    { "rpar",            ")",            0 },
+    { "ast",             "*",            0 },
+    { "midast",          "*",            0 },
+    { "plus",            "+",            0 },
+    { "comma",           ",",            0 },
+    { "period",          ".",            0 },
+    { "sol",             "/",            0 },
+    { "colon",           ":",            0 },
+    { "semi",            ";",            0 },
+    { "LT",              "<",            0 },
+    { "nvgt",            "<\x10\x44\x32",0 },
+    { "bne",             "=\xE2\x83\xA5",0 },
+    { "GT",              ">",            0 },
+    { "nvgt",            ">\x10\x44\x32",0 },
+    { "quest",           "?",            0 },
+    { "commat",          "@",            0 },
+    { "lsqb",            "[",            0 },
+    { "lbrack",          "[",            0 },
+    { "bsol",            "\\",           0 },
+    { "rsqb",            "]",            0 },
+    { "rbrack",          "]",            0 },
+    { "Hat",             "^",            0 },
+    { "lowbar",          "_",            0 },
+    { "UnderBar",        "_",            0 },
+    { "grave",           "`",            0 },
+    { "DiacriticalGrave","`",            0 },
+    { "fjlig",           "fj",           0 },
+    { "lcub",            "{",            0 },
+    { "lbrace",          "{",            0 },
+    { "vertbar",         "|",            0 },
+    { "verticalLine",    "|",            0 },
+    { "rcub",            "}",            0 },
+    { "rbrace",          "}",            0 },
+    { "NonBreakingSpace","\xC2\xA0",     0 },
     /* "Special" chars, according to XHTML xhtml-special.ent */
     { "OElig",     "\xC5\x92",    0 },
     { "oelig",     "\xC5\x93",    0 },
