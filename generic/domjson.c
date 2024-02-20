@@ -110,7 +110,7 @@ static domLength jsonParseString (
     unsigned char c;
     int clen;
     domLength j, k, savedStart;
-    unsigned int u;
+    unsigned int u, u2;
     
     DBG(fprintf(stderr, "jsonParseString start: '%s'\n", &json[i]););
     if (jparse->len) jparse->buf[0] = '\0';
@@ -159,7 +159,7 @@ static domLength jsonParseString (
         /* Unescaped control characters are not allowed in JSON
          * strings. */
         if (c <= 0x1f) errReturn(i,JSON_SYNTAX_ERR);
-        if (jparse->len - j < 8) {
+        if (jparse->len - j < 14) {
             jparse->buf = REALLOC (jparse->buf, jparse->len * 2);
             jparse->len *= 2;
         }
@@ -187,10 +187,32 @@ static domLength jsonParseString (
                     jparse->buf[j++] = 0x80 | (u&0x3f);
                     clen = 2;
                 } else {
-                    jparse->buf[j++] = (char)(0xe0 | (u>>12));
-                    jparse->buf[j++] = 0x80 | ((u>>6)&0x3f);
-                    jparse->buf[j++] = 0x80 | (u&0x3f);
-                    clen = 3;
+                    if ((u&0xfc00)==0xd800
+                        && jparse->buf[j+6] == '\\'
+                        && jparse->buf[j+7] == 'u'
+                        && jsonIs4Hex(&json[i+8]))
+                    {
+                        /* A surrogate pair */
+                        u2 = 0;
+                        for (k = 8; k < 12; k++) {
+                            c = json[i+k];
+                            if (c <= '9') u2 = u2*16 + c - '0';
+                            else if (c <= 'F') u2 = u2*16 + c - 'A' + 10;
+                            else u2 = u2*16 + c - 'a' + 10;
+                        }
+                        u = ((u&0x3ff)<<10) + (u2&0x3ff) + 0x10000;
+                        i += 6;
+                        jparse->buf[j++] = 0xf0 | (u>>18);
+                        jparse->buf[j++] = 0x80 | ((u>>12)&0x3f);
+                        jparse->buf[j++] = 0x80 | ((u>>6)&0x3f);
+                        jparse->buf[j++] = 0x80 | (u&0x3f);
+                        
+                    } else {
+                        jparse->buf[j++] = (char)(0xe0 | (u>>12));
+                        jparse->buf[j++] = 0x80 | ((u>>6)&0x3f);
+                        jparse->buf[j++] = 0x80 | (u&0x3f);
+                        clen = 3;
+                    }
                 }
                 i += 6;
             } else {
