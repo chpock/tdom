@@ -177,19 +177,16 @@ static domLength jsonParseString (
                     if (u == 0) {
                         jparse->buf[j++] = (char)0xC0;
                         jparse->buf[j++] = (char)0x80;
-                        clen = 2;
                     } else {
                         jparse->buf[j++] = (char)u;
-                        clen = 1;
                     }
                 } else if (u <= 0x7ff) {
                     jparse->buf[j++] = (char)(0xc0 | (u>>6));
                     jparse->buf[j++] = 0x80 | (u&0x3f);
-                    clen = 2;
                 } else {
                     if ((u&0xfc00)==0xd800
-                        && jparse->buf[j+6] == '\\'
-                        && jparse->buf[j+7] == 'u'
+                        && (char)json[i+6] == '\\'
+                        && (char)json[i+7] == 'u'
                         && jsonIs4Hex(&json[i+8]))
                     {
                         /* A surrogate pair */
@@ -206,12 +203,10 @@ static domLength jsonParseString (
                         jparse->buf[j++] = 0x80 | ((u>>12)&0x3f);
                         jparse->buf[j++] = 0x80 | ((u>>6)&0x3f);
                         jparse->buf[j++] = 0x80 | (u&0x3f);
-                        
                     } else {
                         jparse->buf[j++] = (char)(0xe0 | (u>>12));
                         jparse->buf[j++] = 0x80 | ((u>>6)&0x3f);
                         jparse->buf[j++] = 0x80 | (u&0x3f);
-                        clen = 3;
                     }
                 }
                 i += 6;

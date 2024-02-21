@@ -161,8 +161,32 @@ test json-1.18 {Escaped binary 0 (NUL, '\0') is OK} {
     set result
 } "\"a\\u0000\""
 
-test json-1.19 {Invalid input - uncompled \u escape} {
-    catch {dom parse -json {"ab\u00"}}
+test json-1.19 {Invalid input - incomplete \u escape} {
+    set result 1
+    foreach jsonstr {
+        "ab\u00"
+        "ab\ua"
+        "ab\u12"
+        "ab\u123"
+        "ab\u123g"
+        "ab\u12g"
+        "ab\u1g"
+        "ab\ug"
+        "\u00"
+        "\ua"
+        "\u12"
+        "\u123"
+        "\u123g"
+        "\u12g"
+        "\u1g"
+        "\ug"
+    } {
+        if {![catch {dom parse -json $jsonstr}]} {
+            set result 0
+            break
+        }
+    }
+    set result
 } 1
 
 test json-1.20 {Escaped binary 0} {needExpand} {
@@ -174,6 +198,20 @@ test json-1.20 {Escaped binary 0} {needExpand} {
     $doc delete
     set result
 } {2 97 0}
+
+test json-1.21 {Single \u encoded surrogate} {
+    dom parse -json {"abc\uD835"} doc
+    set result [$doc asXML -escapeNonASCII -indent none]
+    $doc delete
+    set result
+} {abc&#55349;}
+
+test json-1.22 {\u encoded surrogate pair} {
+    dom parse -json {"abc\uD835\uDD38"} doc
+    set result [$doc asXML -escapeNonASCII -indent none]
+    $doc delete
+    set result
+} {abc&#120120;}
 
 test json-2.1 {invalid xml name} {
     set doc [dom parse -json {{"a":"a value","1b":"1value", "a\nb":"a\nb", "":"empty string"}}]

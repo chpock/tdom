@@ -1,5 +1,5 @@
-C wip
-D 2024-02-20T23:55:36.154
+C Added\srecognition\sof\soutside\sBMP\scharacters\sgiven\sas\s\\u\sescaped\ssurrogate\spair.
+D 2024-02-21T20:08:49.498
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -135,7 +135,7 @@ F generic/domhtml.c 5b31199bedc4e0fe647402820cb41a0f5e6971e4a361845d4c3b0b9254f7
 F generic/domhtml.h cb031185e99066889bec37b32239ab0f932d673a5701c94429902b2332ff3784
 F generic/domhtml5.c 6a841ebf1f13b8dcaf10f4bc60ec04dec4807b7dc37bdd229e73cf976ff1e357
 F generic/domhtml5.h 5cca562a556e7662f2dce222640c32abb2777146
-F generic/domjson.c fdd0645fc8dda2dfaeef1aadb1e7719a0a9edd3fc87e030a653211599a57e757
+F generic/domjson.c 1124afebaf5f4e299e40a6fd31bdaca7e3363ea86cfdd455c2fd76183413c10d
 F generic/domjson.h ff31d0fd1d6eb3e6490fb456d42b73e304a6f0c386a074db42d8b84ad8c925b3
 F generic/domlock.c f8e235892bb9dc771e844c47701ded81c10967dc6ca420b14ab54067211bdb8f
 F generic/domxpath.c 4a2167f2f7f0437ea1c148e8e0931be3acc2eabb446fcd7a054f6cbec7cf4412
@@ -200,7 +200,7 @@ F tests/dom.test 1e557c76b607345b3f598efcf8b1d7b6dc70f85877a47d804c4864f40c83275
 F tests/domDoc.test 6dec2f6d9b4b3a2577af556cb2d49b152e8a34c518fb51a6dc5677229c077cbd
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test 46d67b521a9d84d5d982340c545d830ce65be6e5c69e4271e613d2182b71a321
-F tests/domjson.test bdfbe938f33931f56f9496aac425b2183373f4cb926b95a04fa095bd3b75cd3d
+F tests/domjson.test d9553f43c6da02ddf225ad97b396903fe025656480fc77717faa0d7dcef33f21
 F tests/domnamespace.test f68dee13e2325518e96b318bf9fe76ae6903dc38d5602c4b0f48f90c0dc3038c
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 065c6c1af854db838faf9ad56151342eee478f8501a5f65778a144b106108574
@@ -239,11 +239,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 68f3d22657cf58fa0639bfd1e10002d4141e4cdfc0a4863e8a619b5d681e7bb2
-R ad39171f83d6d259103bc5fc24da9fa7
-T *branch * jsonsurrogates
-T *sym-jsonsurrogates *
-T -sym-trunk *
+P 280667024c2a7f972fa9bb2d0a5ef7364fc7eedb4d1d59767401ee6c03872ae7
+R f740a6262f9c82fc5855bf034caf21fa
 U rolf
-Z 86ba24bed725ed0950c5cb55b99a7a7b
+Z 18cb0a7b6ba07d338ec179d20a2acb22
 # Remove this line to create a well-formed Fossil manifest.
