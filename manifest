@@ -1,5 +1,5 @@
-C Started\sto\sadd\sthe\snamed\sentities\sadded\swith\sHTML\s5.
-D 2024-02-18T19:32:31.198
+C wip
+D 2024-02-22T14:15:05.216
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -131,7 +131,7 @@ F generic/dom.c 65a4150708062a891fdd56fd805a37aa5e785ccc5094d9f0315306c0c5751bcb
 F generic/dom.h d54b310180f44d87355d8d242f1c01d96c49ba75eb0f057bb479e2787a9b57f5
 F generic/domalloc.c 7a6a2fdde25d04ffef0330259ceb781ffa2150c2314dd88784f924f6f331ef9e
 F generic/domalloc.h 961f83bb46dec27dbcf36ed430ed81b1f485a1fdfaa2f7df8b60bbcf861d0fe3
-F generic/domhtml.c e2d33b5067b3d65bbb37bd45e5823b781cda0ce900af7061b1edb1026ac4d1cb
+F generic/domhtml.c 4582be0143243b477e258ba90f221bdd871e80518ef1e58e69dec2b04ff202ea
 F generic/domhtml.h cb031185e99066889bec37b32239ab0f932d673a5701c94429902b2332ff3784
 F generic/domhtml5.c 6a841ebf1f13b8dcaf10f4bc60ec04dec4807b7dc37bdd229e73cf976ff1e357
 F generic/domhtml5.h 5cca562a556e7662f2dce222640c32abb2777146
@@ -239,11 +239,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 68f3d22657cf58fa0639bfd1e10002d4141e4cdfc0a4863e8a619b5d681e7bb2
-R a8ec23d1baf14dc7e19354025c07374c
-T *branch * HTML5Entities
-T *sym-HTML5Entities *
-T -sym-trunk *
+P 56f04d0119ffdbc6718662f4ca7a61667fcf3afaa2a93aa0ccfe7994d3f63179
+R c5b2fb3f744a8bb70659cd20c6398a22
 U rolf
-Z 82444ba95d2395c85a32f1ed62f189f2
+Z 62eba33a49a625d690e290ccf7b5ab49
 # Remove this line to create a well-formed Fossil manifest.
