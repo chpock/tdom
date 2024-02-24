@@ -2305,8 +2305,13 @@ static void ErInit (void)
 /*----------------------------------------------------------------------------
 |    TranslateEntityRefs  --
 |
-|        Translate entity references and character references in the string
-|        "z".  "z" is overwritten with the translated sequence.
+|        Translate entity references and character references in the
+|        nodeValue of the domTextNode or domAttrNode given as
+|        argument. Since all character references and almost all
+|        entity references are longer or equal in length as the
+|        referenced UTF-8 byte sequence the translation is basically
+|        done by rewriting the nodeValue in place and with special
+|        handling of the few conterexamples.
 |
 |        Unrecognized entity references are unaltered.
 |
@@ -2317,17 +2322,25 @@ static void ErInit (void)
 |
 \---------------------------------------------------------------------------*/
 static void TranslateEntityRefs (
-    char *z,
-    domLength  *newLen
+    domTextNode *textOrAtt
 )
 {
+    char *z;     /* Pointer to nodeValue to rewrite */
     int from;    /* Read characters from this position in z[] */
     int to;      /* Write characters into this position in z[] */
     int h;       /* A hash on the entity reference */
     char *zVal;  /* The substituted value */
     Er *p;       /* For looping down the entity reference collision chain */
-    int value;
-
+    int value, zlen, overlen, entitylen; 
+    char *ole, *newNodeValue;
+    
+    if (textOrAtt->nodeType == ATTRIBUTE_NODE) {
+        z = ((domAttrNode*)textOrAtt)->nodeValue;
+        zlen = ((domAttrNode*)textOrAtt)->valueLength;
+    } else {
+        z = textOrAtt->nodeValue;
+        zlen = textOrAtt->valueLength;
+    }
     from = to = 0;
 
     if (bErNeedsInit) {
@@ -2418,7 +2431,10 @@ static void TranslateEntityRefs (
                     z[to++] = (char) (((value >> 6) | 0x80) & 0xBF);
                     z[to++] = (char) ((value | 0x80) & 0xBF);
                 } else {
-                    /* error */
+                    z[to++] = (char) ((value >> 18) | 0xf0);
+                    z[to++] = (char) (((value >> 12) & 0x3f) | 0x80);
+                    z[to++] = (char) (((value >> 6) & 0x3f) | 0x80);
+                    z[to++] = (char) ((value & 0x3f) | 0x80);
                 }
 		    from = i+1;
 		}
@@ -2433,6 +2449,21 @@ static void TranslateEntityRefs (
                 while (p && strcmp(p->zName,&z[from+1])!=0 ) {
                     p = p->pNext;
                 }
+                if (!p && c == ';') {
+                    /* Entity name not found. It may be one of the few
+                     * entities with a referenced UTF-8 byte sequence
+                     * which is longer than the reference. */
+                    ole = NULL;
+                    if (strcmp("nGt",&z[from+1]) == 0) {
+                        ole = "\xE2\x89\xAB\xE2\x83\x92\x00";
+                        overlen = 1;
+                        entitylen = 5;
+                    } else if (strcmp("nLt",&z[from+1]) == 0) {
+                        ole = "\xE2\x89\xAA\xE2\x83\x92\x00";
+                        overlen = 1;
+                        entitylen = 5;
+                    }
+                }
                 z[i] = c;
                 if (p) {
                     zVal = p->zValue;
@@ -2442,7 +2473,31 @@ static void TranslateEntityRefs (
                     from = i;
                     if (c==';') from++;
                 } else {
-                    z[to++] = z[from++];
+                    if (ole) {
+                        /* Over-long entity reference */
+                        newNodeValue = MALLOC(zlen + 1 + overlen - (from - to));
+                        memmove(newNodeValue,z,to);
+                        while (*ole) {
+                            newNodeValue[to++] = *(ole++);
+                        }
+                        memmove(newNodeValue + to, z + from + entitylen,
+                                zlen + 1 - from - entitylen);
+                        z = newNodeValue;
+                        zlen = zlen + overlen - (from - to);
+                        if (textOrAtt->nodeType == ATTRIBUTE_NODE) {
+                            FREE (((domAttrNode*)textOrAtt)->nodeValue);
+                            ((domAttrNode*)textOrAtt)->nodeValue = z;
+                            ((domAttrNode*)textOrAtt)->valueLength = zlen;
+                        } else {
+                            FREE (textOrAtt->nodeValue);
+                            textOrAtt->nodeValue = z;
+                            textOrAtt->valueLength = zlen;
+                        }
+                        from += entitylen + overlen;
+                        i++;
+                    } else {
+                        z[to++] = z[from++];
+                    }
                 }
             }
         } else {
@@ -2450,7 +2505,11 @@ static void TranslateEntityRefs (
         }
     }
     z[to] = 0;
-    *newLen = to;
+    if (textOrAtt->nodeType == ATTRIBUTE_NODE) {
+        ((domAttrNode*)textOrAtt)->valueLength = to;
+    } else {
+        textOrAtt->valueLength = to;
+    }
 }
 /*----------------------------------------------------------------------------
 |   End Of Character Entity Translator
@@ -2543,7 +2602,7 @@ HTML_SimpleParse (
                 *(tnode->nodeValue + (x - start)) = 0;
                 DBG(fprintf(stderr, "New text node: '%s'\n", tnode->nodeValue);)
                 if (ampersandSeen) {
-                    TranslateEntityRefs(tnode->nodeValue, &(tnode->valueLength) );
+                    TranslateEntityRefs (tnode);
                 }
                 tnode->parentNode = parent_node;
                 if (parent_node->firstChild)  {
@@ -3095,8 +3154,7 @@ HTML_SimpleParse (
                 memmove(attrnode->nodeValue, ArgVal, nArgVal);
                 *(attrnode->nodeValue + nArgVal) = 0;
                 if (ampersandSeen) {
-                    TranslateEntityRefs(attrnode->nodeValue, 
-                                        &(attrnode->valueLength) );
+                    TranslateEntityRefs ((domTextNode*)attrnode);
                 }
                 if (!strcmp(ArgName, "id")) {
                     if (!doc->ids) {
