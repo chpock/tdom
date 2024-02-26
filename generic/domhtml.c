@@ -2331,7 +2331,7 @@ static void TranslateEntityRefs (
     int h;       /* A hash on the entity reference */
     char *zVal;  /* The substituted value */
     Er *p;       /* For looping down the entity reference collision chain */
-    int value, zlen, overlen, entitylen; 
+    int value, zlen, overlen; 
     char *ole, *newNodeValue;
     
     if (textOrAtt->nodeType == ATTRIBUTE_NODE) {
@@ -2449,19 +2449,17 @@ static void TranslateEntityRefs (
                 while (p && strcmp(p->zName,&z[from+1])!=0 ) {
                     p = p->pNext;
                 }
+                ole = NULL;
                 if (!p && c == ';') {
                     /* Entity name not found. It may be one of the few
                      * entities with a referenced UTF-8 byte sequence
                      * which is longer than the reference. */
-                    ole = NULL;
                     if (strcmp("nGt",&z[from+1]) == 0) {
                         ole = "\xE2\x89\xAB\xE2\x83\x92\x00";
                         overlen = 1;
-                        entitylen = 5;
                     } else if (strcmp("nLt",&z[from+1]) == 0) {
                         ole = "\xE2\x89\xAA\xE2\x83\x92\x00";
                         overlen = 1;
-                        entitylen = 5;
                     }
                 }
                 z[i] = c;
@@ -2475,15 +2473,16 @@ static void TranslateEntityRefs (
                 } else {
                     if (ole) {
                         /* Over-long entity reference */
-                        newNodeValue = MALLOC(zlen + 1 + overlen - (from - to));
+                        from = i;
+                        newNodeValue = MALLOC(zlen + 1 + overlen);
                         memmove(newNodeValue,z,to);
                         while (*ole) {
                             newNodeValue[to++] = *(ole++);
                         }
-                        memmove(newNodeValue + to, z + from + entitylen,
-                                zlen + 1 - from - entitylen);
+                        memmove(newNodeValue + to, z + from + 1 ,
+                                zlen - from);
                         z = newNodeValue;
-                        zlen = zlen + overlen - (from - to);
+                        zlen = zlen + overlen;
                         if (textOrAtt->nodeType == ATTRIBUTE_NODE) {
                             FREE (((domAttrNode*)textOrAtt)->nodeValue);
                             ((domAttrNode*)textOrAtt)->nodeValue = z;
@@ -2493,8 +2492,7 @@ static void TranslateEntityRefs (
                             textOrAtt->nodeValue = z;
                             textOrAtt->valueLength = zlen;
                         }
-                        from += entitylen + overlen;
-                        i++;
+                        from = to;
                     } else {
                         z[to++] = z[from++];
                     }

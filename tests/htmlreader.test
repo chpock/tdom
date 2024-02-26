@@ -2256,6 +2256,14 @@ test html-1.13 {Entity reference with overlong repacement} {Tcl9} {
     set result
 } "\u226B\u20D2abc\u226B\u20D2\u2221\u226A\u20D2\u226B\u20D2foobar"
 
+test html-1.14 {Entity reference with overlong repacement} {Tcl9} {
+    set doc [dom parse -html {<html>&nGt;abc</html>}]
+    set root [$doc documentElement]
+    set result [$root text]
+    $doc delete
+    set result
+} "\u226B\u20D2abc"
+
 test html-2.1 {not closed p tags} {
     set doc [dom parse -html {
         <html><body><p>Para 1<p>Para 2<p>Para 3</body></html>
