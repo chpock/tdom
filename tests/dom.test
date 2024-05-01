@@ -722,7 +722,7 @@ test dom-2.45 {attribute order and XML namespace declaration} {
     set result
 } {xmlns:p xmlns foo grill bar}
 
-test dom-2.46 {parse long string} {Tcl9 longRunning} {
+test dom-2.46 {parse long string} {64bit Tcl9 longRunning} {
     set str "<doc>[string repeat abc 1000000000]</doc>"
     set doc [dom parse $str]
     set result [string length [$doc selectNodes string(/doc)]]
