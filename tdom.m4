@@ -19,10 +19,10 @@
 #------------------------------------------------------------------------
 
 AC_DEFUN(TDOM_ENABLE_DTD, [
-    AC_MSG_CHECKING([whether to enable dtd support])
+    AC_MSG_CHECKING([whether to enable expat dtd support])
     AC_ARG_ENABLE(dtd,
         AC_HELP_STRING([--enable-dtd],
-            [build with dtd support (default: on)]),
+            [build expat with dtd support (default: on)]),
         [tcl_ok=$enableval], [tcl_ok=yes])
 
     if test "${enable_dtd+set}" = set; then
@@ -38,6 +38,77 @@ AC_DEFUN(TDOM_ENABLE_DTD, [
     else
         AC_MSG_RESULT([no])
     fi
+])
+
+#------------------------------------------------------------------------
+# TDOM_ENABLE_GE --
+#
+#   Allows the building with GE support
+#
+# Arguments:
+#   None
+#   
+# Results:
+#
+#   Adds the following arguments to configure:
+#       --enable-ge=yes|no
+#
+#   Defines the following vars:
+#
+#   Sets the following vars:
+#
+#------------------------------------------------------------------------
+
+AC_DEFUN(TDOM_ENABLE_GE, [
+    AC_MSG_CHECKING([whether to enable expat general entities support])
+    AC_ARG_ENABLE(ge,
+        AC_HELP_STRING([--enable-ge],
+            [build expat with general entities support (default: on)]),
+        [tcl_ok=$enableval], [tcl_ok=yes])
+
+    if test "${enable_ge+set}" = set; then
+        enableval="$enable_ge"
+        tcl_ok=$enableval
+    else
+        tcl_ok=yes
+    fi
+
+    if test "$tcl_ok" = "yes" ; then
+        AC_MSG_RESULT([yes])
+        AC_DEFINE(XML_GE)
+    else
+        AC_MSG_RESULT([no])
+    fi
+])
+
+#------------------------------------------------------------------------
+# TDOM_CONTEXT_BYTES --
+#
+#   Allows to adjust the context bytes buffer size
+#
+# Arguments:
+#   None
+#   
+# Results:
+#
+#   Adds the following arguments to configure:
+#       --with-context-bytes=
+#
+#   Defines the following vars:
+#
+#   Sets the following vars:
+#
+#------------------------------------------------------------------------
+
+AC_DEFUN(TDOM_CONTEXT_BYTES, [
+    AC_MSG_CHECKING([expat context bytes buffer size])
+    AC_ARG_WITH(contextbytes,
+        AC_HELP_STRING([--with-context-bytes],
+            [configure expat context bytes buffer size (default: 1024)]),
+        , [with_contextbytes=1024])
+
+    AC_MSG_RESULT([${with_contextbytes}])
+    AC_DEFINE_UNQUOTED(XML_CONTEXT_BYTES, [${with_contextbytes}])
 ])
 
 #------------------------------------------------------------------------

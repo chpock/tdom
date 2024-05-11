@@ -758,6 +758,8 @@ enable_64bit_vis
 enable_rpath
 enable_symbols
 enable_dtd
+enable_ge
+with_contextbytes
 enable_ns
 enable_ucmd
 enable_tdomalloc
@@ -1402,7 +1404,9 @@ Optional Features:
   --enable-64bit-vis      enable 64bit Sparc VIS support (default: off)
   --disable-rpath         disable rpath support (default: on)
   --enable-symbols        build with debugging symbols (default: off)
-  --enable-dtd            build with dtd support (default: on)
+  --enable-dtd            build expat with dtd support (default: on)
+  --enable-ge             build expat with general entities support (default:
+                          on)
   --enable-ns             build with XML namespace support (default: on)
   --enable-unknown        enable built-in unknown command (default: off)
   --enable-tdomalloc      build with the tDOM allocator (default: off)
@@ -1420,6 +1424,8 @@ Optional Packages:
   --with-expat            directory with expat installation
   --with-entropy          source of entropy to use
   --with-tclinclude       directory containing the public Tcl header files
+  --with-context-bytes    configure expat context bytes buffer size (default:
+                          1024)
 
 Some influential environment variables:
   CC          C compiler command
@@ -8852,8 +8858,8 @@ $as_echo "${TCLSH_PROG}" >&6; }
 #--------------------------------------------------------------------
 
 
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable dtd support" >&5
-$as_echo_n "checking whether to enable dtd support... " >&6; }
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable expat dtd support" >&5
+$as_echo_n "checking whether to enable expat dtd support... " >&6; }
     # Check whether --enable-dtd was given.
 if test "${enable_dtd+set}" = set; then :
   enableval=$enable_dtd; tcl_ok=$enableval
@@ -8878,6 +8884,53 @@ $as_echo "yes" >&6; }
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
     fi
+
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable expat general entities support" >&5
+$as_echo_n "checking whether to enable expat general entities support... " >&6; }
+    # Check whether --enable-ge was given.
+if test "${enable_ge+set}" = set; then :
+  enableval=$enable_ge; tcl_ok=$enableval
+else
+  tcl_ok=yes
+fi
+
+
+    if test "${enable_ge+set}" = set; then
+        enableval="$enable_ge"
+        tcl_ok=$enableval
+    else
+        tcl_ok=yes
+    fi
+
+    if test "$tcl_ok" = "yes" ; then
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+        $as_echo "#define XML_GE 1" >>confdefs.h
+
+    else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+    fi
+
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking expat context bytes buffer size" >&5
+$as_echo_n "checking expat context bytes buffer size... " >&6; }
+
+# Check whether --with-contextbytes was given.
+if test "${with_contextbytes+set}" = set; then :
+  withval=$with_contextbytes;
+else
+  with_contextbytes=1024
+fi
+
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: ${with_contextbytes}" >&5
+$as_echo "${with_contextbytes}" >&6; }
+    cat >>confdefs.h <<_ACEOF
+#define XML_CONTEXT_BYTES ${with_contextbytes}
+_ACEOF
+
 
 
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable namespace support" >&5
