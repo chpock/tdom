@@ -1,5 +1,5 @@
-C Update\sto\sexpat\s2.6.2.
-D 2024-05-11T15:08:48.806
+C Added\sthe\snew\s(by\sexpat)\sexpected\sdefines\sto\sthe\svc\smakefile.
+D 2024-05-11T15:40:22.465
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -229,7 +229,7 @@ F unix/speed-check.sh 7a8d91e7edf1cdc9bcfad5f28e1a068cb2843d05e49d8bd89d9b30a465
 F unix/tclAppInit.c cd5fa5bcb9f4648e9bf7108727b99e20cd02c33713df359efb1da298715940b9
 F win/README 69a6da038cb99711a2c95fd44e314e9ce74bb2c4ed8ed319dac6fd6daff2c13d
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F win/makefile.vc ae8161746a61175a4823a0ea4fc7ae94d5ba3a465210f3007b9361b710ac2844
+F win/makefile.vc 4eaa51401505ef5c50f504005127f5b4d42bd303f6c014676e635a155cd0cdde
 F win/nmakehlp.c 194ae7c24886245c679cb4c9ea7e6daaaebb5fcd
 F win/pkgIndex.tcl 33c8ec37ad3dd9af012d01f9817436adeaf8bf9d4ffda29df2c6bc1cccb67176
 F win/rules-ext.vc 3c02944b3199014d35de617a1c146d0944af16395870da423374fb013ef57ecf
@@ -240,11 +240,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P f6d486c6eb77fe7dd9badc20c57a7f1c1a71bbb48528b5a1d2f15e41d8d629bd
-R 873ce4d17c7a37b0fc127db86d1b7eb9
-T *branch * expat-2.6.2
-T *sym-expat-2.6.2 *
-T -sym-trunk *
+P 0f6fcbe2d31ba1c29312c5049bb2e35bb1db043e8bf51e0092d7e6f056fa07cb
+R bcddd636e6049c2b056723a77bb97e9e
 U rolf
-Z fa743d8a247b246cc7aff236ced43f31
+Z 55e0fdb0091d24e25f2c91a43de1370d
 # Remove this line to create a well-formed Fossil manifest.
