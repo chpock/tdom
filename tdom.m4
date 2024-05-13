@@ -41,47 +41,6 @@ AC_DEFUN(TDOM_ENABLE_DTD, [
 ])
 
 #------------------------------------------------------------------------
-# TDOM_ENABLE_GE --
-#
-#   Allows the building with GE support
-#
-# Arguments:
-#   None
-#   
-# Results:
-#
-#   Adds the following arguments to configure:
-#       --enable-ge=yes|no
-#
-#   Defines the following vars:
-#
-#   Sets the following vars:
-#
-#------------------------------------------------------------------------
-
-AC_DEFUN(TDOM_ENABLE_GE, [
-    AC_MSG_CHECKING([whether to enable expat general entities support])
-    AC_ARG_ENABLE(ge,
-        AC_HELP_STRING([--enable-ge],
-            [build expat with general entities support (default: on)]),
-        [tcl_ok=$enableval], [tcl_ok=yes])
-
-    if test "${enable_ge+set}" = set; then
-        enableval="$enable_ge"
-        tcl_ok=$enableval
-    else
-        tcl_ok=yes
-    fi
-
-    if test "$tcl_ok" = "yes" ; then
-        AC_MSG_RESULT([yes])
-        AC_DEFINE(XML_GE)
-    else
-        AC_MSG_RESULT([no])
-    fi
-])
-
-#------------------------------------------------------------------------
 # TDOM_CONTEXT_BYTES --
 #
 #   Allows to adjust the context bytes buffer size

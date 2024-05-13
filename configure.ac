@@ -239,8 +239,10 @@ TEA_PROG_TCLSH
 #--------------------------------------------------------------------
 
 TDOM_ENABLE_DTD
-TDOM_ENABLE_GE
-TDOM_CONTEXT_BYTES
+# If we expose XML_GetInputContext() at script level
+#TDOM_CONTEXT_BYTES
+AC_DEFINE(XML_CONTEXT_BYTES, 0)
+AC_DEFINE(XML_GE, 1)
 TDOM_ENABLE_NS
 TDOM_ENABLE_UNKNOWN
 TDOM_ENABLE_TDOMALLOC

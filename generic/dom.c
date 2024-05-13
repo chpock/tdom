@@ -37,8 +37,6 @@
 |
 \--------------------------------------------------------------------------*/
 
-
-
 /*---------------------------------------------------------------------------
 |   Includes
 |
@@ -49,6 +47,9 @@
 #include <schema.h>
 #include <tclexpat.h>
 
+#ifndef PARSE_CHUNK_SIZE
+# define PARSE_CHUNK_SIZE 8096
+#endif
 
 /* #define DEBUG */
 /*----------------------------------------------------------------------------
@@ -2038,11 +2039,11 @@ externalEntityRefHandler (
     if (chan == NULL) {
         do {
             done = (len < INT_MAX);
-            status = XML_Parse (extparser, xmlstring, done ? len : INT_MAX,
+            status = XML_Parse (extparser, xmlstring, done ? len : PARSE_CHUNK_SIZE,
                                 done);
             if (!done) {
-                xmlstring += INT_MAX;
-                len -= INT_MAX;
+                xmlstring += PARSE_CHUNK_SIZE;
+                len -= PARSE_CHUNK_SIZE;
             }
         }  while (!done && status == XML_STATUS_OK);
         switch (status) {
@@ -2291,11 +2292,11 @@ domReadDocument (
     
     if (channel == NULL) {
         do {
-            done = (length < INT_MAX);
-            status = XML_Parse (parser, xml, done ? length : INT_MAX, done);
+            done = (length < PARSE_CHUNK_SIZE);
+            status = XML_Parse (parser, xml, done ? length : PARSE_CHUNK_SIZE, done);
             if (!done) {
-                xml += INT_MAX;
-                length -= INT_MAX;
+                xml += PARSE_CHUNK_SIZE;
+                length -= PARSE_CHUNK_SIZE;
             }
         }  while (!done && status == XML_STATUS_OK);
     } else {

@@ -732,6 +732,14 @@ test dom-2.46 {parse long string} {64bit Tcl9 longRunning} {
     set result
 } {3000000000 2 abc}
 
+test dom-2.47 {parse chunk ends in multbyte char} {
+    set str "<doc>[string repeat \u1D8B 3000]</doc>"
+    set doc [dom parse $str]
+    set new [$doc asXML -indent none]
+    $doc delete
+    expr {$str eq $new ? 1 : 0} 
+} 1
+
 test dom-3.1 {isName} {
     dom isName ":foo"
 } {1}
