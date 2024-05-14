@@ -106,10 +106,10 @@ typedef astElem *ast;
 |
 \---------------------------------------------------------------------------*/
 typedef enum { 
-    EmptyResult, BoolResult, IntResult, RealResult, StringResult, 
-    xNodeSetResult, NaNResult, InfResult, NInfResult
+    UnknownResult = 0, EmptyResult, BoolResult, IntResult, RealResult, StringResult, 
+    xNodeSetResult, NaNResult, InfResult, NInfResult, NodesResult,
+    AttrnodesResult, MixedResult
 } xpathResultType;
-
 
 typedef struct xpathResultSet {
 
@@ -211,6 +211,8 @@ void rsCopy         ( xpathResultSet *to, xpathResultSet *from );
 
 /* This function is only used for debugging code */
 void rsPrint        ( xpathResultSet *rs );
+
+const char * xpathResultType2string (xpathResultType type);
 
 /* This function is used (outside of tcldom.c) only by schema.c. It
  * has to have a prototype somewhere. */

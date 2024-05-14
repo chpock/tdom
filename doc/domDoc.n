@@ -234,7 +234,7 @@ and the underlying DOM tree.
 \&\fRReturns the default output method of the document. This is
 usually a result of a XSLT transformation.
 .TP
-\&\fB\fBasXML\fP \fB?-indent none/tabs/1..8?\fP \fB?-channel channelId?\fP \fB?-escapeNonASCII?\fP \fB?-doctypeDeclaration <boolean>?\fP \fB-xmlDeclaration <boolean>?\fP \fB-encString <string>\fP \fB?-escapeAllQuot?\fP \fB?-indentAttrs?\fP \fB?-nogtescape?\fP \fB?-noEmptyElementTag?\fP \fB?-escapeCR?\fP \fB?-escapeTab\fP
+\&\fB\fBasXML\fP \fB?-indent none/tabs/1..8?\fP \fB?-channel channelId?\fP \fB?-escapeNonASCII?\fP \fB?-doctypeDeclaration <boolean>?\fP \fB-xmlDeclaration <boolean>?\fP \fB-encString <string>\fP \fB?-escapeAllQuot?\fP \fB?-indentAttrs?\fP \fB?-nogtescape?\fP \fB?-noEmptyElementTag?\fP \fB?-escapeCR?\fP \fB?-escapeTab?\fP
 \&\fR
 .RS
 .PP
@@ -675,7 +675,7 @@ appends this subtree at the end of the current list of top level nodes of the do
 \&\fRParses \fIXMLstring\fR, creates an according DOM subtree and
 appends this subtree at the end of the current list of top level nodes of the document.
 .TP
-\&\fB\fBselectNodes\fP \fB?-namespaces prefixUriList?\fP \fB?-cache <boolean>?\fP \fIxpathQuery\fB \fB?typeVar?\fP
+\&\fB\fBselectNodes\fP \fB?-namespaces prefixUriList?\fP \fB?-cache <boolean>?\fP \fB?-list?\fP \fIxpathQuery\fB \fB?typeVar?\fP
 \&\fR
 .RS
 .PP
