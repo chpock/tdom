@@ -643,11 +643,11 @@ tDOM_PullParserInstanceCmd (
                 } else {
                     data = Tcl_GetStringFromObj(pullInfo->inputString, &len);
                     do {
-                        done = (len < INT_MAX);
+                        done = (len < PARSE_CHUNK_SIZE);
                         result = XML_Parse (pullInfo->parser, data, len, done);
                         if (!done) {
-                            data += INT_MAX;
-                            len -= INT_MAX;
+                            data += PARSE_CHUNK_SIZE;
+                            len -= PARSE_CHUNK_SIZE;
                         }
                     } while (!done && result == XML_STATUS_OK);
                 }

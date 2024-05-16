@@ -47,9 +47,6 @@
 #include <schema.h>
 #include <tclexpat.h>
 
-#ifndef PARSE_CHUNK_SIZE
-# define PARSE_CHUNK_SIZE 8096
-#endif
 
 /* #define DEBUG */
 /*----------------------------------------------------------------------------
@@ -2038,7 +2035,7 @@ externalEntityRefHandler (
     result = 1;
     if (chan == NULL) {
         do {
-            done = (len < INT_MAX);
+            done = (len < PARSE_CHUNK_SIZE);
             status = XML_Parse (extparser, xmlstring, done ? len : PARSE_CHUNK_SIZE,
                                 done);
             if (!done) {
