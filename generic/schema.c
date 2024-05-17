@@ -4778,12 +4778,12 @@ externalEntityRefHandler (
     result = 1;
     if (chan == NULL) {
         do {
-            done = (len < INT_MAX);
-            status = XML_Parse (extparser, xmlstring, done ? len : INT_MAX,
+            done = (len < PARSE_CHUNK_SIZE);
+            status = XML_Parse (extparser, xmlstring, done ? len : PARSE_CHUNK_SIZE,
                                 done);
             if (!done) {
-                xmlstring += INT_MAX;
-                len -= INT_MAX;
+                xmlstring += PARSE_CHUNK_SIZE;
+                len -= PARSE_CHUNK_SIZE;
             }
         }  while (!done && status == XML_STATUS_OK);
         switch (status) {
@@ -5017,16 +5017,17 @@ static int validateSource (
         xmlstr = Tcl_GetStringFromObj (objv[0], &len);
         result = TCL_OK;
         do {
-            done = (len < INT_MAX);
-            if (XML_Parse (parser, xmlstr, len, done) != XML_STATUS_OK
+            done = (len < PARSE_CHUNK_SIZE);
+            if (XML_Parse (parser, xmlstr, done ? len : PARSE_CHUNK_SIZE, done)
+                != XML_STATUS_OK
                 || sdata->validationState == VALIDATION_ERROR) {
                 validateReportError (interp, sdata, parser);
                 result = TCL_ERROR;
                 break;
             }
             if (!done) {
-                xmlstr += INT_MAX;
-                len -= INT_MAX;
+                xmlstr += PARSE_CHUNK_SIZE;
+                len -= PARSE_CHUNK_SIZE;
             }
         }  while (!done);
         break;

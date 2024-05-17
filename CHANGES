@@ -1,4 +1,8 @@
 
+2023-05-17  Rolf Ade  <rolf@pointsman.de>
+
+        Updated to expat 2.6.2.
+
 2024-05-09  Rolf Ade  <rolf@pointsman.de>
 
         Added the -list option to the selectNodes method (cascading
