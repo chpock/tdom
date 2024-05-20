@@ -1165,6 +1165,27 @@ test dom-3.44 {clearString -replace} {
     set result
 } [list \ufffd a\ufffd \ufffdb a\ufffdb a\ufffd\ufffdb a\ufffdc\ufffdb a\ufffdd\ufffd\ufffdb a\ufffdd\ufffd\ufffd\ufffd\ufffd_foo_bar \ufffd\ufffd\ufffd_foo_bar_baz\ufffd_didum\ufffd \ufffd\ufffd\ufffd_foo_bar_baz\ufffd_didum\uE000 \ufffd\ufffd\ufffd abc \ufffd\ufffd\ufffd]
 
+test dom-3.45 {clearString -replace with replacement} {
+    set result [list]
+    foreach str {
+        \u0001
+        a\u0002
+        \u0003b
+        a\u0004b
+        a\u0004\u0005b
+        a\u0004c\u0005b
+        a\u0004d\u0005\u0006b
+        a\u0004d\u0005\uD800\uD801\uD802_foo_bar
+        \uD800\uD801\uD802_foo_bar_baz\uD802_didum\uDFFF
+        \uD800\uD801\uD802_foo_bar_baz\uD802_didum\uE000
+        \u0004\u0005\uDABC
+        abc
+        \u0004\u0005\u0001
+    } {
+        lappend result [dom clearString -replace some $str]
+    }
+    set result
+} [list some asome someb asomeb asomesomeb asomecsomeb asomedsomesomeb asomedsomesomesomesome_foo_bar somesomesome_foo_bar_bazsome_didumsome somesomesome_foo_bar_bazsome_didum\uE000 somesomesome abc somesomesome]
 
 test dom-4.1 {-useForeignDTD 0} {
     set doc [dom parse -useForeignDTD 0 {<root/>}]

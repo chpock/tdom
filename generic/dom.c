@@ -370,20 +370,20 @@ domClearString (
     )
 {
     char *p, *s;
-    int   clen, rewrite = 0;
+    int   clen;
     
+    *changed = 0;
     p = str;
     while (*p) {
         clen = UTF8_CHAR_LEN(*p);
         if (!clen || !UTF8_XMLCHAR((unsigned const char*)p,clen)) {
-            rewrite = 1;
             *changed = 1;
             Tcl_DStringInit (clearedstr);
             break;
         }
         p += clen;
     }
-    if (!rewrite) {
+    if (!*changed) {
         return;
     }
     Tcl_DStringAppend (clearedstr, str, p-str);

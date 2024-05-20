@@ -8126,7 +8126,6 @@ int tcldom_DomObjCmd (
                 repllen = 0;
             }
             string = Tcl_GetString (objv[2]);
-            changed = 0;
             domClearString (string, replacement, repllen, &cleardString,
                             &changed);
             if (changed) {
