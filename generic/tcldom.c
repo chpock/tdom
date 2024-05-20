@@ -219,7 +219,7 @@ static char dom_usage[] =
     "    setTextCheck ?boolean?                           \n"
     "    setObjectCommands ?(automatic|token|command)?    \n"
     "    isCharData string                                \n"
-    "    clearString string                               \n"
+    "    clearString ?-replace ?replacement?? string      \n"
     "    isBMPCharData string                             \n"
     "    isComment string                                 \n"
     "    isCDATA string                                   \n"
@@ -7830,11 +7830,13 @@ int tcldom_DomObjCmd (
 {
     GetTcldomDATA;
 
-    char        * method, tmp[300], *clearedStr, *string, *option;
-    int           methodIndex, result, i, bool, replace = 0;
-    domLength     len;
+    char        * method, tmp[300], *string, *option,
+                 *replacement;
+    int           methodIndex, result, i, bool, changed;
+    domLength     repllen;
     Tcl_CmdInfo   cmdInfo;
     Tcl_Obj     * mobjv[MAX_REWRITE_ARGS], *newObj;
+    Tcl_DString   cleardString;
 
     static const char *domMethods[] = {
         "createDocument",  "createDocumentNS",   "createNodeCmd",
@@ -8095,8 +8097,8 @@ int tcldom_DomObjCmd (
             return TCL_OK;
 
         case m_clearString:
-            CheckArgs(3,4,2,"?-replace? string");
-            if (objc == 4) {
+            CheckArgs(3,5,2,"?-replace ?replacement?? string");
+            if (objc >= 4) {
                 option = Tcl_GetString (objv[2]);
                 if (option[0] == '-' && option[1] == 'r') {
                     if (Tcl_GetIndexFromObj (interp, objv[2],
@@ -8105,24 +8107,38 @@ int tcldom_DomObjCmd (
                         return TCL_ERROR;
                     }
                 } else {
-                    SetResult("expected: clearString ?-replace? string");
+                    SetResult("expected: clearString ?-replace ?replacement?"
+                              " string");
                     return TCL_ERROR;
                 }
-                replace = 1;
                 objc--;
                 objv++;
+                if (objc == 4) {
+                    replacement = Tcl_GetStringFromObj (objv[2], &repllen);
+                    objc--;
+                    objv++;
+                } else {
+                    replacement = "\xEF\xBF\xBD\0";
+                    repllen = 3;
+                }
+            } else {
+                replacement = NULL;
+                repllen = 0;
             }
-            string = Tcl_GetStringFromObj (objv[2], &len);
-            clearedStr = domClearString (string, &bool, replace, len);
-            if (bool) {
-                newObj = Tcl_NewStringObj (clearedStr, -1);
-                FREE (clearedStr);
+            string = Tcl_GetString (objv[2]);
+            changed = 0;
+            domClearString (string, replacement, repllen, &cleardString,
+                            &changed);
+            if (changed) {
+                newObj = Tcl_NewStringObj (
+                    Tcl_DStringValue (&cleardString),
+                    Tcl_DStringLength (&cleardString));
+                Tcl_DStringFree (&cleardString);
                 Tcl_SetObjResult (interp, newObj);
             } else {
                 Tcl_SetObjResult (interp, objv[2]);
             }
             return TCL_OK;
-                
     }
     SetResult( dom_usage);
     return TCL_ERROR;
