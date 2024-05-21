@@ -411,18 +411,18 @@ Otherwise an error is generated.
 \&\fB\fBlocalName\fP
 \&\fRReturns the localName from the tag name of the given node.
 .TP
-\&\fB\fBselectNodes\fP \fB?-namespaces prefixUriList?\fP \fB?-cache <boolean>?\fP \fIxpathQuery\fB \fB?typeVar?\fP
+\&\fB\fBselectNodes\fP \fB?-namespaces prefixUriList?\fP \fB?-cache <boolean>?\fP \fB?-list?\fP \fIxpathQuery\fB \fB?typeVar?\fP
 \&\fR
 .RS
 .PP
 Returns the result of applying the XPath query
-\&\fIxpathQuery\fR to the subtree. This can be a
+\&\fIxpathQuery\fR to the subtree. This result can be a
 string/value, a list of strings, a list of nodes or a list
-of attribute name / value pairs. If \fItypeVar\fR is given
+of attribute name / value pairs. If \fItypeVar\fR argument is given
 the result type name is stored into that variable (empty,
 bool, number, string, nodes, attrnodes or mixed).
 .PP
-The argument \fIxpathQuery\fR has to be a valid XPath expression.
+The argument \fIxpathQuery\fR has to be a valid XPath 1.0 expression.
 However there are a few exceptions to that rule. Tcl variable
 references (in the usual tcl syntax: $varname) may appear in the XPath
 statement at any position where it is legal according to the rules of
@@ -475,6 +475,15 @@ compiled expression from the cache with the help of the
 Without using the \fI-cache\fR option such consideration is never
 needed.
 .PP
+If the \fI-list\fR option is given then the \fIxpathQuery\fR
+argument is expected to be a Tcl list of XPath queries. Every XPath
+query in this list other than the last one must return a node set
+result. Using the context and namespace resolution rules as without
+the \fI-list\fR option the first query out of the list is run. Every
+node out of the result set of this query is used as context node for
+the next XPath query out of the list and so on. It returns the result
+sets of the last query in the query list concatenated together.
+.PP
 Examples:
 
           
@@ -491,18 +500,22 @@ set childNodes [$root selectNodes -namespaces {default http://www.defaultnamespa
 .RE
 .TP
 \&\fB\fBgetLine\fP
-\&\fRReturns the line number of that node in the originally parsed
-XML.
+\&\fRReturns the line number of that node in the originally
+parsed XML. The counting starts with 1
 .TP
 \&\fB\fBgetColumn\fP
-\&\fRReturns the column number of that node in the originally parsed
-XML.
+\&\fRReturns the column number of that node in the originally
+parsed XML. The counting starts with 0
+.TP
+\&\fB\fBgetByteIndex\fP
+\&\fRReturns the byte position of that node in the originally
+parsed XML. The counting starts with 0.
 .TP
 \&\fB\fBasList\fP
-\&\fRReturns the DOM substree starting form the current node as a
+\&\fRReturns the DOM substree starting from the current node as a
 nested Tcl list.
 .TP
-\&\fB\fBasXML\fP \fB?-indent none/tabs/1..8?\fP \fB?-channel channelId?\fP \fB?-escapeNonASCII?\fP \fB?-doctypeDeclaration <boolean>?\fP \fB-xmlDeclaration <boolean>?\fP \fB-encString <string>\fP \fB?-escapeAllQuot?\fP \fB?-indentAttrs?\fP \fB?-nogtescape?\fP \fB?-noEmptyElementTag?\fP
+\&\fB\fBasXML\fP \fB?-indent none/tabs/1..8?\fP \fB?-channel channelId?\fP \fB?-escapeNonASCII?\fP \fB?-doctypeDeclaration <boolean>?\fP \fB-xmlDeclaration <boolean>?\fP \fB-encString <string>\fP \fB?-escapeAllQuot?\fP \fB?-indentAttrs?\fP \fB?-nogtescape?\fP \fB?-noEmptyElementTag?\fP \fB?-escapeCR?\fP \fB?-escapeTab?\fP
 \&\fR
 .RS
 .PP
@@ -511,11 +524,28 @@ node as the root node of the result as an (optional indented)
 XML string or sends the output directly to the given
 channelId.
 .PP
-See the documentation of the of the
+See the documentation of the
 .TP
 \&\fBdomDoc
 \&\fR command method
 \&\fBasXML\fP for a detailed description of the
+arguments.
+.RE
+.TP
+\&\fB\fBasCanonicalXML\fP \fB?-channel channelId?\fP \fB?-comment?\fP
+\&\fR
+.RS
+.PP
+Returns the DOM tree as canonical XML string
+according to the "Canonical
+XML Version 1.0 W3C Recommendation 15 March 2001" or
+sends the output directly to the given channelId.
+.PP
+See the documentation of the
+.TP
+\&\fBdomDoc
+\&\fR command method
+\&\fBasCanonicalXML\fP for a detailed description of the
 arguments.
 .RE
 .TP

@@ -1,4 +1,25 @@
 
+2023-05-17  Rolf Ade  <rolf@pointsman.de>
+
+        Updated to expat 2.6.2.
+
+2024-05-09  Rolf Ade  <rolf@pointsman.de>
+
+        Added the -list option to the selectNodes method (cascading
+        XPath expressions).
+
+2023-12-29  Rolf Ade  <rolf@pointsman.de>
+
+        Updated to expat 2.5.0.
+
+2023-11-14  Rolf Ade  <rolf@pointsman.de>
+
+        Made tDOM work with Tcl 9.
+	
+2023-09-28  Rolf Ade  <rolf@pointsman.de>
+
+        Updated to expat 2.4.9.
+
 2023-05-09  Rolf Ade  <rolf@pointsman.de>
 
         The XPath functions floor, ceiling and round now return an
@@ -48,7 +69,7 @@
         -billionLaughsAttackProtectionActivationThreshold to dom parse
         and the by the xml::parser/expat command created parser
         commands.
-            
+
 2022-02-14  Rolf Ade  <rolf@pointsman.de>
 
         Updated to expat 2.4.4.
@@ -67,7 +88,7 @@
 
         Updated to expat 2.2.10.
 
---- Release 0.9.2, 27. Aug. 2020 --- 
+--- Release 0.9.2, 27. Aug. 2020 ---
 
 2020-08-21  Rolf Ade  <rolf@pointsman.de>
 
@@ -107,7 +128,7 @@
 
         Changed the license to MPL 2.0.
 
---- Release 0.9.1, 24. Jul. 2018 --- 
+--- Release 0.9.1, 24. Jul. 2018 ---
 
 2018-07-16  Rolf Ade  <rolf@pointsman.de>
 
@@ -175,7 +196,7 @@
 
         Added [dom featureinfo versionhash], which returns the fossil
         repository version hash of the sources build from.
-        
+
 2018-02-03  Rolf Ade  <rolf@pointsman.de>
 
         In a bunch of spell fixes a few changes (partly even marginal,
@@ -186,7 +207,7 @@
 
         New flag -keepCDATA for [dom parse ...].
 
---- Release 0.9.0, 24. Aug. 2017 --- 
+--- Release 0.9.0, 24. Aug. 2017 ---
 
 2017-08-21 Ashok Nadkarni
 
@@ -219,7 +240,7 @@
 
         Added HTM5 parser (new -html5 option to [dom parse]). Requires
         gumbo lib and must be enabled at configure time.
-        
+
 2016-10-01 Rolf Ade  <rolf@pointsman.de>
 
         Updated to expat 2.2.0.
@@ -240,7 +261,7 @@
 
 2015-04-01 Rolf Ade  <rolf@pointsman.de>
 
-        Added new expat parser cmd method currentmarkup. 
+        Added new expat parser cmd method currentmarkup.
 
 2015-03-26 Rolf Ade  <rolf@pointsman.de>
 
@@ -248,7 +269,7 @@
         asXML. Thanks goes to evilotto.
 
 2014-10-16 Rolf Ade  <rolf@pointsman.de>
-	
+
         Added configure option --with-expat, to build and link against
         the system or a custom expat lib. Default is, to use the
         included sources.
@@ -260,8 +281,8 @@
 
 2013-12-24 Rolf Ade  <rolf@pointsman.de>
 
-        Improved handling of characters beyond BMP. 
-        
+        Improved handling of characters beyond BMP.
+
 2013-12-20 Rolf Ade  <rolf@pointsman.de>
 
         Added option -feedbackcmd to the dom parse method. This option
@@ -273,7 +294,7 @@
         use -feedbackcmd. A return -code break from the -feedbackcmd
         causes the parser to almost immediately abort parsing and let
         the [dom parse] call return the empty string (instead of a
-        document) without raising error. 
+        document) without raising error.
 
         For expat parser objects: If a handler script returns -code
         return, then parsing is aborted, but no error is raised.
@@ -282,7 +303,7 @@
 
         tDOM now cross-compiles on linux for windows (w32/w64) with
         mingw-w64.
-        
+
 2013-09-26 Rolf Ade  <rolf@pointsman.de>
 
         Added dom method featureinfo.
@@ -344,7 +365,7 @@
         with newer bash shells.
 
 2005-03-18  Rolf Ade  <rolf@pointsman.de>
-        
+
         Added the 'selectNodesNamespace' to documents, to provide a
         global XPath prefix / namespace mapping. See the user
         documentation for details.
@@ -357,7 +378,7 @@
 2005-01-06  Rolf Ade  <rolf@pointsman.de>
 
         Added the methods 'transform' and 'delete' to xsltCmds.
-    
+
 2004-09-21  Rolf Ade  <rolf@pointsman.de>
 
         Added the '-namespaces' option to the selectNodes
@@ -367,7 +388,7 @@
 
 2004-08-20  Rolf Ade  <rolf@pointsman.pointsman.de>
 
-        Update to expat 1.95.8.        
+        Update to expat 1.95.8.
 
 2004-08-19  Rolf Ade  <rolf@pointsman.de>
 
@@ -392,7 +413,7 @@
         New (experimental) method setObjectCommands.
 
 2004-05-26  Rolf Ade  <rolf@pointsman.de>
- 
+
         Added isPIName, isComment, isCDATA and isPIValue method to the
         dom command. Created new global (thread wide) flags for name
         and value checks (Names and FQ Names (element, attribute and
@@ -423,7 +444,7 @@
 2003-10-10  Rolf Ade  <rolf@pointsman.de>
 
         Added method normalize to domNode and domDoc commands.
-    
+
 2003-10-07  Rolf Ade  <rolf@pointsman.de>
 
         Added method insertBeforeFromScript to domNode commands.
@@ -437,7 +458,7 @@
         Enhanced insertBefore method: If the refNode argument of that
         method is the empty string, the newNode argument will be
         inserted at the end of the list of children of the node.
-    
+
 2003-09-17  Rolf Ade  <rolf@pointsman.de>
 
         Added the up to now missing implementation of expatObj method
@@ -453,7 +474,7 @@
         already included in the 0.7.7 release, only the documentation
         was not included in that release.
 
-        Added option -paramentityparsing to the dom parse method.        
+        Added option -paramentityparsing to the dom parse method.
 
 --- Release 0.7.7, 25. Mar. 2003 --- See ChangeLog for details ---
 
@@ -472,13 +493,13 @@
 
 2003-02-09  Rolf Ade  <rolf@pointsman.de>
 
-        Update to expat 1.95.6.    
+        Update to expat 1.95.6.
 
 2003-02-09  Rolf Ade  <rolf@pointsman.de>
 
         Added 'systemId' and 'publicId' methods to the domDoc
         commands. Added flag -doctypeDeclaration to the asXML and
-        asHTML methods of the domDoc commands.     
+        asHTML methods of the domDoc commands.
 
 2003-01-29  Rolf Ade  <rolf@pointsman.de>
 
@@ -505,9 +526,8 @@
 	The library file lib/tdomhtml.tcl is now moved to a separate
 	package in "extensions" directory. This is a simple, yet very
 	"clever" HTML generator, using advanced tdom HTML capabilities.
- 	To use, please change to "extensions/tdomhtml" directory and 
+ 	To use, please change to "extensions/tdomhtml" directory and
 	invoke "configure" followed by "make", followed by "make install".
         Be sure, however, to build and install the tdom package first.
 
 -EOF-
-

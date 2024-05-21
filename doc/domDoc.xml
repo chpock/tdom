@@ -599,7 +599,7 @@ appends this subtree at the end of the current list of top level nodes of the do
       </commanddef>
 
       <commanddef>
-          <command><method>selectNodes</method> <option>?-namespaces prefixUriList?</option> <option>?-cache &lt;boolean&gt;?</option> <m>xpathQuery</m> <option>?typeVar?</option></command>
+          <command><method>selectNodes</method> <option>?-namespaces prefixUriList?</option> <option>?-cache &lt;boolean&gt;?</option> <option>?-list?</option> <m>xpathQuery</m> <option>?typeVar?</option></command>
           <desc><p>Returns the result of applying the XPath query
 <m>xpathQuery</m> to the document. The context node of the query is the root
 node in the sense of the XPath recommendation (not the document element). The

@@ -108,6 +108,14 @@
 #  define Tcl_GetSizeIntFromObj Tcl_GetIntFromObj
 #endif
 
+/* Since the len argument of XML_Parse() is of type int, parsing of
+ * strings has to be done in chunks anyway for Tcl 9 with its strings
+ * potentially longer than 2 GByte. Because of internal changes in
+ * exapt a chunk size of INT_MAX led to out of memory errors. */
+#ifndef PARSE_CHUNK_SIZE
+# define PARSE_CHUNK_SIZE 8096
+#endif
+
 /* The following is the machinery to have an UNUSED macro which
  * signals that a function parameter is known to be not used. This
  * works for some open source compiler. */

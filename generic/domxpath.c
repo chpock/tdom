@@ -207,6 +207,12 @@ static char *astType2str[] = {
     "ExecIdKey"
 };
 
+static const char *xpathResultTypes[] = {
+    "unknown", "empty", "bool", "number", "number", "string",
+    "xNodeSet", "number", "number", "number", "nodes", "attrnodes", "mixed",
+    NULL
+};
+
 /*----------------------------------------------------------------------------
 |   functionTag
 |
@@ -243,6 +249,16 @@ static int xpathEvalPredicate (ast steps, domNode *exprContext,
                                xpathResultSet *stepResult,
                                xpathCBs *cbs, int *docOrder, char **errMsg);
 
+
+/*----------------------------------------------------------------------------
+|   xpathResultType2string
+|
+\---------------------------------------------------------------------------*/
+const char *
+xpathResultType2string ( xpathResultType type ) {
+    return xpathResultTypes[type];
+}
+    
 /*----------------------------------------------------------------------------
 |   XPath result set functions
 |
@@ -4732,6 +4748,11 @@ static int xpathEvalStep (
                 }
                 FREE(rightStr);
                 break;
+            default:
+                Tcl_Panic("Invalid xpathResultType %s in xpathEvalStep!",
+                          xpathResultType2string(prightResult->type));
+                break;
+                
             }
         } else
         if (leftResult.type == BoolResult || rightResult.type == BoolResult) {
@@ -4909,6 +4930,10 @@ static int xpathEvalStep (
 
                     if (res) break;
                 }
+                break;
+            default:
+                Tcl_Panic("Invalid xpathResultType %s in xpathEvalStep!",
+                          xpathResultType2string(prightResult->type));
                 break;
             }
         } else {

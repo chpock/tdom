@@ -19,7 +19,7 @@ dnl	to configure the system for the local environment.
 # so that we create the export library with the dll.
 #-----------------------------------------------------------------------
 
-AC_INIT([tdom], [0.9.3])
+AC_INIT([tdom],[0.9.3])
 
 #--------------------------------------------------------------------
 # Call TEA_INIT as the first TEA_ macro to set up initial vars.
@@ -239,6 +239,10 @@ TEA_PROG_TCLSH
 #--------------------------------------------------------------------
 
 TDOM_ENABLE_DTD
+# If we expose XML_GetInputContext() at script level
+#TDOM_CONTEXT_BYTES
+AC_DEFINE(XML_CONTEXT_BYTES, 0)
+AC_DEFINE(XML_GE, 1)
 TDOM_ENABLE_NS
 TDOM_ENABLE_UNKNOWN
 TDOM_ENABLE_TDOMALLOC
@@ -256,4 +260,5 @@ TDOM_EXPORT_CONFIG
 # which require substituting the AC variables in. Include these here.
 #--------------------------------------------------------------------
 
-AC_OUTPUT([Makefile pkgIndex.tcl tdomConfig.sh])
+AC_CONFIG_FILES([Makefile pkgIndex.tcl tdomConfig.sh])
+AC_OUTPUT

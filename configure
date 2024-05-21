@@ -1402,7 +1402,7 @@ Optional Features:
   --enable-64bit-vis      enable 64bit Sparc VIS support (default: off)
   --disable-rpath         disable rpath support (default: on)
   --enable-symbols        build with debugging symbols (default: off)
-  --enable-dtd            build with dtd support (default: on)
+  --enable-dtd            build expat with dtd support (default: on)
   --enable-ns             build with XML namespace support (default: on)
   --enable-unknown        enable built-in unknown command (default: off)
   --enable-tdomalloc      build with the tDOM allocator (default: off)
@@ -8852,8 +8852,8 @@ $as_echo "${TCLSH_PROG}" >&6; }
 #--------------------------------------------------------------------
 
 
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable dtd support" >&5
-$as_echo_n "checking whether to enable dtd support... " >&6; }
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable expat dtd support" >&5
+$as_echo_n "checking whether to enable expat dtd support... " >&6; }
     # Check whether --enable-dtd was given.
 if test "${enable_dtd+set}" = set; then :
   enableval=$enable_dtd; tcl_ok=$enableval
@@ -8878,6 +8878,12 @@ $as_echo "yes" >&6; }
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
     fi
+
+# If we expose XML_GetInputContext() at script level
+#TDOM_CONTEXT_BYTES
+$as_echo "#define XML_CONTEXT_BYTES 0" >>confdefs.h
+
+$as_echo "#define XML_GE 1" >>confdefs.h
 
 
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable namespace support" >&5
