@@ -2397,9 +2397,10 @@ void tcldom_AppendEscaped (
 #define APESC_BUF_SIZE 512
 #define AP(c)  *b++ = c;
 #define AE(s)  pc1 = s; while(*pc1) *b++ = *pc1++;
-    char  buf[APESC_BUF_SIZE+80], *b, *bLimit,  *pc, *pc1, *pEnd, charRef[10];
+    char  buf[APESC_BUF_SIZE+80], *b, *bLimit,  *pc, *pc1, *pc2, *pEnd,
+          charRef[10];
     int   charDone, i;
-    int   clen = 0;
+    int   clen = 0, clen2 = 0;
     int   unicode;
     Tcl_UniChar uniChar;
     
@@ -2434,6 +2435,7 @@ void tcldom_AppendEscaped (
         } else 
         {
             charDone = 0;
+            clen = UTF8_CHAR_LEN(*pc);
             if (outputFlags & SERIALIZE_HTML_ENTITIES) {
                 charDone = 1;
                 Tcl_UtfToUniChar(pc, &uniChar);
@@ -2692,17 +2694,14 @@ void tcldom_AppendEscaped (
                 default: charDone = 0; 
                 }
                 if (charDone) {
-                    clen = UTF8_CHAR_LEN(*pc);
                     pc += (clen - 1);
                 }
             }
             if (!charDone) {
                 if ((unsigned char)*pc > 127) {
-                    clen = UTF8_CHAR_LEN(*pc);
                     if (!clen) {
                         domPanic("tcldom_AppendEscaped: can only handle "
                                  "UTF-8 chars up to 4 bytes length");
-
                     }
                     if (clen == 4 || outputFlags & SERIALIZE_ESCAPE_NON_ASCII) {
                         if (clen == 4) {
