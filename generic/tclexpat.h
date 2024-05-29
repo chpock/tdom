@@ -1,5 +1,7 @@
 #include <tcl.h>
 #include <expat.h>
+#include "dom.h"
+#include "schema.h"
 
 struct TclGenExpatInfo;
 
