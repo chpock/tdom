@@ -1,5 +1,5 @@
-C Cleanup.
-D 2024-05-29T16:17:03.984
+C Updated\sthe\s"example"\stdom\sextension.
+D 2024-05-30T22:16:43.205
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -79,8 +79,8 @@ F extensions/example/Makefile.in 74af47e4786c4a89ba4a0df8655b474314c5c4902b4a65b
 F extensions/example/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
 F extensions/example/configure 4236423d0319e1b25c0ab06ef1fc32dd2a81f915 x
 F extensions/example/configure.in 68a3a3201a8a8b6ba56b40ba5feee1072b03dede
-F extensions/example/example.c a8d16832ce63ed38438e6d0ef12299c288bce3f4
-F extensions/example/exampletest.tcl c699cc2c17a2baa598e56b2e760ddfaeb5769e8e
+F extensions/example/example.c d866b87b725b6897decaae13152ddf4479b8d8e01bfe225deaca983bee7cefab
+F extensions/example/exampletest.tcl c03ecc705aeed9a189160f2ac45a9012b1042c3265f07ed89352d35f15be1202
 F extensions/example/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F extensions/example/pkgIndex.tcl.in e6cc33c6f45df109209f4d8412cf2d5ea434e34e
 F extensions/example/tcl.m4 9404ac273b962ddaf946d3170c5183e55d0984b3
@@ -240,11 +240,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P e37386009b16693f6b031af15022afedbd063084dc48a0eb01de6b2d50a4f118
-R 6d998cc23f55524b7f065f99fdfb3d43
-T *branch * cleanup
-T *sym-cleanup *
-T -sym-trunk *
+P f68fcd7e4147502b7e2e9a158721ef3cb6de82dc7604440df7ede7f57c7394ad
+R 2438276fd5a1f5020b3afe36961a73f3
 U rolf
-Z a0a2a3660e727cf1401a4eabf87035bc
+Z e26a9a5b113a57be7ef5bf25bb653278
 # Remove this line to create a well-formed Fossil manifest.
