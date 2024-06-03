@@ -1,5 +1,7 @@
 #include <tcl.h>
 #include <expat.h>
+#include "dom.h"
+#include "schema.h"
 
 struct TclGenExpatInfo;
 
@@ -77,7 +79,8 @@ typedef struct TclHandlerSet {
     int status;                     /* handler set status */
     int continueCount;		    /* reference count for continue */
     int ignoreWhiteCDATAs;          /* ignore 'white' CDATA sections */
-
+    int fastCall;                   /* do fast ("Welch") handler calls */
+    
     Tcl_Obj *elementstartcommand;      /* Script for element start */
     Tcl_ObjCmdProc *elementstartObjProc;
     ClientData      elementstartclientData;

@@ -1,5 +1,14 @@
 
-2023-05-17  Rolf Ade  <rolf@pointsman.de>
+2024-06-01  Rolf Ade  <rolf@pointsman.de>
+
+        Added an optional replacement string argument to the -replace option of
+        the dom command method clearString.
+
+2024-06-01  Rolf Ade  <rolf@pointsman.de>
+
+        Added the -fastcall option to the expat SAX parser.
+
+2024-05-17  Rolf Ade  <rolf@pointsman.de>
 
         Updated to expat 2.6.2.
 

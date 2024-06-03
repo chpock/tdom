@@ -1,6 +1,10 @@
 #!tclsh
 
-load ../../unix/libtdom0.8.3.so
+if {[info tclversion] >= 9.0} {
+    load ../../unix/libtcl9tdom0.9.3.so
+} else {
+    load ../../unix/libtdom0.9.3.so
+}
 load ./libexample1.0.so
 
 set counter1 0
@@ -45,10 +49,6 @@ puts "DOM result tree root: [$root nodeName]"
 
 puts "\nOK, reset the parser..."
 $parser reset
-puts "\nSome senseless fiddling with the result encoding"
-puts [tdom $parser setResultEncoding]
-puts [tdom $parser setResultEncoding iso8859-1]
-puts [tdom $parser setResultEncoding]
 
 puts "\nRemove the tdom handler set and parse again"
 tdom $parser remove

@@ -2,13 +2,6 @@
 #include <tdom.h>
 #include <string.h>
 
-/*
- * Beginning with 8.4, Tcl API is CONST'ified
- */
-#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION <= 3)
-# define CONST84
-#endif
-
 extern char *Tdom_InitStubs (Tcl_Interp *interp, char *version, int exact);
 
 typedef struct simpleCounter 
@@ -132,14 +125,14 @@ TclExampleObjCmd(dummy, interp, objc, objv)
      ClientData dummy;
      Tcl_Interp *interp;
      int objc;
-     Tcl_Obj *CONST objv[];
+     Tcl_Obj *const objv[];
 {
     CHandlerSet   *handlerSet;
     int            methodIndex, result;
     simpleCounter *counter;
     
 
-    static CONST84 char *exampleMethods[] = {
+    static char *exampleMethods[] = {
         "enable", "getresult", "remove",
         NULL
     };

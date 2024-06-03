@@ -6160,7 +6160,7 @@ static int processTopLevel (
                 str = getAttr(node, "decimal-separator",  a_decimalSeparator);
                 if (str) {
                     clen = UTF8_CHAR_LEN (str[0]);
-                    if (str[clen] != '\0') {
+                    if (!clen || str[clen] != '\0') {
                         reportError (node, "decimal-separator has to be a"
                                      " single char", errMsg);
                         if (newdf) FREE((char*)df);
@@ -6171,7 +6171,7 @@ static int processTopLevel (
                 str = getAttr(node, "grouping-separator", a_groupingSeparator);
                 if (str) {
                     clen = UTF8_CHAR_LEN (str[0]);
-                    if (str[clen] != '\0') {
+                    if (!clen || str[clen] != '\0') {
                         reportError (node, "groupingSeparator has to be a"
                                      " single char", errMsg);
                         if (newdf) FREE((char*)df);
@@ -6184,7 +6184,7 @@ static int processTopLevel (
                 str = getAttr(node, "minus-sign",         a_minusSign);
                 if (str) {
                     clen = UTF8_CHAR_LEN (str[0]);
-                    if (str[clen] != '\0') {
+                    if (!clen || str[clen] != '\0') {
                         reportError (node, "minus-sign has to be a single"
                                      " char", errMsg);
                         if (newdf) FREE((char*)df);
@@ -6203,7 +6203,7 @@ static int processTopLevel (
                     }
                     df->percent = str[0];
                     clen = UTF8_CHAR_LEN (str[0]);
-                    if (str[clen] != '\0') {
+                    if (!clen || str[clen] != '\0') {
                         reportError (node, "percent has to be a single"
                                      " char", errMsg);
                         if (newdf) FREE((char*)df);
@@ -6214,7 +6214,7 @@ static int processTopLevel (
                 str = getAttr(node, "per-mille",          a_perMille);
                 if (str) {
                     clen = UTF8_CHAR_LEN (str[0]);
-                    if (str[clen] != '\0') {
+                    if (!clen || str[clen] != '\0') {
                         reportError (node, "per-mille has to be a single"
                                      " char", errMsg);
                         if (newdf) FREE((char*)df);
@@ -6225,7 +6225,7 @@ static int processTopLevel (
                 str = getAttr(node, "zero-digit",         a_zeroDigit);
                 if (str) {
                     clen = UTF8_CHAR_LEN (str[0]);
-                    if (str[clen] != '\0') {
+                    if (!clen || str[clen] != '\0') {
                         reportError (node, "zero-digit has to be a single"
                                      " char", errMsg);
                         if (newdf) FREE((char*)df);
@@ -6236,7 +6236,7 @@ static int processTopLevel (
                 str = getAttr(node, "digit",              a_digit);
                 if (str) {
                     clen = UTF8_CHAR_LEN (str[0]);
-                    if (str[clen] != '\0') {
+                    if (!clen || str[clen] != '\0') {
                         reportError (node, "digit has to be a single char",
                                      errMsg);
                         if (newdf) FREE((char*)df);
@@ -6247,7 +6247,7 @@ static int processTopLevel (
                 str = getAttr(node, "pattern-separator",  a_patternSeparator);
                 if (str) {
                     clen = UTF8_CHAR_LEN (str[0]);
-                    if (str[clen] != '\0') {
+                    if (!clen || str[clen] != '\0') {
                         reportError (node, "pattern-separator has to be a"
                                      " single char", errMsg);
                         return -1;
