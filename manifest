@@ -1,5 +1,5 @@
-C Added\san\soptional\sreplacement\sstring\sargument\sto\sthe\s-replace\soption\sof\sthe\sdom\scommand\smethod\sclearString.
-D 2024-06-01T23:10:20.820
+C Fixed\ssyntax\serror.
+D 2024-06-11T23:28:34.617
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -29,7 +29,7 @@ F doc/domNode.n 08f5bd7eb673f6ee8a1f0bea4e15dcfe5ef416a6e7418ff5e16abd93f358d24d
 F doc/domNode.xml 0ff33744c1437ba2809b364dfd7d4936ccef712a99b7a2a1dacda427893d8081
 F doc/expat.html ae3f1ac88d842111044af222ac409d49b258b2cac722ba381a73a097ca9d1c8d
 F doc/expat.n beb49450554fcc5bc840b4ec1fcceaaf89f9e9859b9cf0a005db12fdccf8d55f
-F doc/expat.xml 3ae3fbc8c2490c55fceb4f200940217d2aeec47c5f940bca4be6874a3ee9e065
+F doc/expat.xml e0d6eb618800a5cdc94c2732d8bcb866c28fb3dd877721d683d4a757684a0c42
 F doc/expatapi.html c42bcf06d4ec55729dd770c9796d1c774fbbc0beb409b15f16975a69ce8a68d1
 F doc/expatapi.n 593e3175e9e797498c597b11eafc34327f00a1f6790fddbe9d2f1046c658d722
 F doc/expatapi.xml 167fca5f81a6eea40a63384c7264288358e5b67ab7d8196711f9649f8c335523
@@ -240,9 +240,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P cca4d12b7eb672fce3dfa6678420906f9ea44e106455a0e01ed444317e9fe462 522169e2ea43d1e3cc9d0c57713976bec7da0494d0fcfc25172d2ebd9f1b899e
-R bb71f0e6755c5abadabf0624d59312e3
-T +closed 522169e2ea43d1e3cc9d0c57713976bec7da0494d0fcfc25172d2ebd9f1b899e
+P 945ee29db25bb863491e1be53ffa2e68a58de19b70afe0e3ac525c57c1024ffa
+R 3235cd51673a2bc694609dc753b621ee
 U rolf
-Z d0d20cf03ef1eeb9ddf4e9b57b9e663c
+Z 1138b57967b679bbcedb886e72f68077
 # Remove this line to create a well-formed Fossil manifest.
