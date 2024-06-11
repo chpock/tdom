@@ -138,7 +138,7 @@ parser.</p></desc>
           but also may execute arbitrary code.</p>
 
           <p>The callback handler installed while this option is on
-          will not be traced by executing them. <p></desc>
+          will not be traced by executing them. </p></desc>
         </optdef>
         
         <optdef>
