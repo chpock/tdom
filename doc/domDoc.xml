@@ -227,9 +227,18 @@ channelId?</option> <option>?-escapeNonASCII?</option> <option>?-htmlEntities?</
         content will be escaped as character reference in decimal
         representation.</p>
         
-        <p>If the option <m>-htmlEntities</m> is given, a character is
-        written using its HTML 4.01 character entity reference, if it
-        has one.</p>
+        <p>If the option <m>-htmlEntities</m> is given, a character or
+        a pair of characters is written using its HTML 5 character
+        entity reference, if it has one. Some HTML 5 character entity
+        references encode the same character or code points. From the
+        possible entity names the shortest is choosen. If there are
+        more than one shortest name and this names differ only in case
+        then the lowercase alternative is choosen. Otherwise frist
+        name in lexical ASCII order is choosen. There is one HTML5
+        entitiy (ThickSpace), which escapes two characters for which
+        the first and the second character have an entity name by
+        itself. If the two characters are to be serialized then the
+        one two-characters entity ThickSpace will be choosen.</p>
 
         <p>If the option <m>-breakLines</m> is given the serialization
         outputs "\n>" instead of ">" for the opening tags of

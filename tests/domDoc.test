@@ -64,6 +64,32 @@ test domDoc-1.3 {asHTML -escapeNonASCII -htmlEntities} {
     set result
 } {<html><body>&auml;&uuml;&bdquo;&#8223;&dagger;</body></html>}
 
+test domDoc-1.3.1 {asHTML -htmlEntities} {
+    set doc [dom parse -html {<html>&AMP;</html>}]
+    set result [$doc asHTML -htmlEntities]
+    $doc delete
+    set result
+} {<html>&amp;</html>}
+
+test domDoc-1.3.2 {asHTML -htmlEntities} {
+    set doc [dom parse -html "<html>\u205F\u200A</html>"]
+    set result [$doc asHTML -htmlEntities]
+    $doc delete
+    set doc [dom parse -html "<html>\u205F</html>"]
+    append result [$doc asHTML -htmlEntities]
+    $doc delete
+    set doc [dom parse -html "<html>\u200A</html>"]
+    append result [$doc asHTML -htmlEntities]
+    $doc delete    
+    set result
+} {<html>&ThickSpace;</html><html>&MediumSpace;</html><html>&hairsp;</html>}
+
+test domDoc-1.3.3 {asHTML -htmlEntities} {
+    set doc [dom parse -html "<html>fj</html>"]
+    set result [$doc asHTML -htmlEntities]
+    $doc delete
+    set result
+} {<html>&fjlig;</html>}
 
 set doc [dom parse <root/>]
 
