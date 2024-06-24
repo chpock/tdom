@@ -91,6 +91,13 @@ test domDoc-1.3.3 {asHTML -htmlEntities} {
     set result
 } {<html>&fjlig;</html>}
 
+test domDoc-1.3.4 {asHTML -htmlEntities} {
+    set doc [dom parse -html "<html>&NotLessLess;&ll;&nLt;\u226A\u20D2</html>"]
+    set result [$doc asHTML -htmlEntities]
+    $doc delete
+    set result
+} {<html>&nLtv;&ll;&nLt;&nLt;</html>}
+
 set doc [dom parse <root/>]
 
 test domDoc-1.4 {asXML -doctypeDeclaration} {
