@@ -1,5 +1,5 @@
-C Fixed\ssyntax\serror.
-D 2024-06-11T23:28:34.617
+C Prepare\sfor\supcoming\score\schanges.
+D 2024-06-24T23:39:11.226
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -161,7 +161,7 @@ F generic/tdomStubLib.c 4a055f9c974246a9f7dd99de1a7686d1a96be8f02be699fdf4a760fd
 F generic/tdominit.c 156100c1d070fafdf59d219d8aa12257b831645dc01648f5934f0c52aafb9262
 F generic/xmlsimple.c 17d50648a6cd652f8d1d938cf5ee2629c032d4c72e1e30d5f2769e1164067da8
 F generic/xmlsimple.h 6cbbc9208bcaec273624fd5e24aff3de07ef98d1da3be4576f3e6d4951516054
-F lib/tdom.tcl 139f58425dbc00c10d19df4ec4f824e90a900d52d0c97f5cc6f2cf0ca4323dfa
+F lib/tdom.tcl 9a5194179279179532703eb48b316694ee5ec928f69171c28c7c9ce6f44a8421
 F macosx/README 75fe1f6617f6cb7e4480cff5367b5c26fcd8dd207e2321f35dceebafccf4c99c
 F pkgIndex.tcl.in 2c2ecfb3b4176ae61af4445e022b34bb9071efdbf0446c2aa2d0f6cfcce3f120
 F tclconfig/README.txt 180f4215d59309ec5645aa5f4565557dac484945
@@ -240,8 +240,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 945ee29db25bb863491e1be53ffa2e68a58de19b70afe0e3ac525c57c1024ffa
-R 3235cd51673a2bc694609dc753b621ee
+P 0ffa8c350f0ba36c555436e0a4abaaf2da3143f2223bcd11a7e02e032602fda8
+R 1c4f5997de8567a80deb2700e12de652
 U rolf
-Z 1138b57967b679bbcedb886e72f68077
+Z 81c5465a53703dc863dcdb87ec5b302e
 # Remove this line to create a well-formed Fossil manifest.
