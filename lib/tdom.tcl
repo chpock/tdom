@@ -1024,7 +1024,7 @@ foreach ::tdom::cmd {
     baseURL
     IANAEncoding2TclEncoding
 } {
-    interp alias {} tDOM::$::tdom::cmd {} tdom::$::tdom::cmd
+    interp alias {} tDOM::$::tdom::cmd {} ::tdom::$::tdom::cmd
 }
 
 # EOF
