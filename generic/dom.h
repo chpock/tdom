@@ -910,8 +910,8 @@ int            domIsPINAME (const char *name);
 int            domIsQNAME (const char *name);
 int            domIsNCNAME (const char *name);
 int            domIsChar (const char *str);
-char *         domClearString (char *str, int *haveToFree, int replace,
-                               domLength length);
+void           domClearString (char *str, char *replacement, domLength repllen,
+                               Tcl_DString *clearedstr, int *changed);
 int            domIsBMPChar (const char *str);
 int            domIsComment (const char *str);
 int            domIsCDATA (const char *str);

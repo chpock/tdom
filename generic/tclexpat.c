@@ -239,6 +239,7 @@ CreateTclHandlerSet (
     handlerSet->status                    = TCL_OK;
     handlerSet->continueCount             = 0;
     handlerSet->nextHandlerSet            = NULL;
+    handlerSet->fastCall                  = 0;
 
     handlerSet->elementstartcommand      = NULL;
     handlerSet->elementendcommand        = NULL;
@@ -1214,6 +1215,7 @@ TclExpatConfigure (
     "-ignorewhitespace",
     "-handlerset",
     "-noexpand",
+    "-fastcall",
 #ifndef TDOM_NO_SCHEMA
     "-validateCmd",
 #endif
@@ -1244,7 +1246,8 @@ TclExpatConfigure (
     EXPAT_ENTITYDECLCOMMAND,
     EXPAT_NOWHITESPACE,
     EXPAT_HANDLERSET,
-    EXPAT_NOEXPAND
+    EXPAT_NOEXPAND,
+    EXPAT_FASTCALL
 #ifndef TDOM_NO_SCHEMA
     ,EXPAT_VALIDATECMD
 #endif
@@ -1424,11 +1427,15 @@ TclExpatConfigure (
 
 	activeTclHandlerSet->elementstartcommand = objPtr[1];
 	Tcl_IncrRefCount(activeTclHandlerSet->elementstartcommand);
-        rc = Tcl_GetCommandInfo(interp, Tcl_GetString(objPtr[1]), &cmdInfo);
-        if (rc && cmdInfo.isNativeObjectProc) {
-            activeTclHandlerSet->elementstartObjProc = cmdInfo.objProc;
-            activeTclHandlerSet->elementstartclientData 
-                = cmdInfo.objClientData;
+        if (activeTclHandlerSet->fastCall) {
+            rc = Tcl_GetCommandInfo(interp, Tcl_GetString(objPtr[1]), &cmdInfo);
+            if (rc && cmdInfo.isNativeObjectProc) {
+                activeTclHandlerSet->elementstartObjProc = cmdInfo.objProc;
+                activeTclHandlerSet->elementstartclientData 
+                    = cmdInfo.objClientData;
+            } else {
+                activeTclHandlerSet->elementstartObjProc = NULL;
+            }
         } else {
             activeTclHandlerSet->elementstartObjProc = NULL;
         }
@@ -1443,10 +1450,14 @@ TclExpatConfigure (
 
 	activeTclHandlerSet->elementendcommand = objPtr[1];
 	Tcl_IncrRefCount(activeTclHandlerSet->elementendcommand);
-        rc = Tcl_GetCommandInfo(interp, Tcl_GetString(objPtr[1]), &cmdInfo);
-        if (rc && cmdInfo.isNativeObjectProc) {
-            activeTclHandlerSet->elementendObjProc = cmdInfo.objProc;
-            activeTclHandlerSet->elementendclientData = cmdInfo.objClientData;
+        if (activeTclHandlerSet->fastCall) {
+            rc = Tcl_GetCommandInfo(interp, Tcl_GetString(objPtr[1]), &cmdInfo);
+            if (rc && cmdInfo.isNativeObjectProc) {
+                activeTclHandlerSet->elementendObjProc = cmdInfo.objProc;
+                activeTclHandlerSet->elementendclientData = cmdInfo.objClientData;
+            } else {
+                activeTclHandlerSet->elementendObjProc = NULL;
+            }
         } else {
             activeTclHandlerSet->elementendObjProc = NULL;
         }
@@ -1485,10 +1496,14 @@ TclExpatConfigure (
 
 	activeTclHandlerSet->datacommand = objPtr[1];
 	Tcl_IncrRefCount(activeTclHandlerSet->datacommand);
-        rc = Tcl_GetCommandInfo (interp, Tcl_GetString(objPtr[1]), &cmdInfo);
-        if (rc && cmdInfo.isNativeObjectProc) {
-            activeTclHandlerSet->datacommandObjProc = cmdInfo.objProc;
-            activeTclHandlerSet->datacommandclientData = cmdInfo.objClientData;
+        if (activeTclHandlerSet->fastCall) {
+            rc = Tcl_GetCommandInfo (interp, Tcl_GetString(objPtr[1]), &cmdInfo);
+            if (rc && cmdInfo.isNativeObjectProc) {
+                activeTclHandlerSet->datacommandObjProc = cmdInfo.objProc;
+                activeTclHandlerSet->datacommandclientData = cmdInfo.objClientData;
+            } else {
+                activeTclHandlerSet->datacommandObjProc = NULL;
+            }
         } else {
             activeTclHandlerSet->datacommandObjProc = NULL;
         }
@@ -1769,6 +1784,14 @@ TclExpatConfigure (
         expat->noexpand = bool;
         break;
 
+    case EXPAT_FASTCALL:
+        if (Tcl_GetBooleanFromObj (interp, objPtr[1], &bool) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        CheckDefaultTclHandlerSet;
+        activeTclHandlerSet->fastCall = bool;
+        break;
+        
 #ifndef TDOM_NO_SCHEMA
     case EXPAT_VALIDATECMD:
         schemacmd = Tcl_GetString (objv[1]);

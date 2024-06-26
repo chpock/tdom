@@ -759,7 +759,7 @@ proc ::tdom::xmlOpenFileWorker {filename {encodingString {}} {forSimple 0} {forR
     # The autodetection of the encoding follows
     # XML Recomendation, Appendix F
 
-    fconfigure $fd -encoding binary
+    fconfigure $fd -translation binary
     if {![binary scan [read $fd 4] "H8" firstBytes]} {
         # very short (< 4 Bytes) file
         seek $fd 0 start
