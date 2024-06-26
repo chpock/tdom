@@ -1,4 +1,8 @@
 
+2024-06-26  Rolf Ade  <rolf@pointsman.de>
+
+        Enhanced the set of recognised entities to HTML 5.
+
 2024-06-01  Rolf Ade  <rolf@pointsman.de>
 
         Added an optional replacement string argument to the -replace option of
