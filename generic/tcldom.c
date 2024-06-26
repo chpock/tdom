@@ -2381,6 +2381,42 @@ Tcl_Obj * tcldom_treeAsTclList (
     return Tcl_NewListObj(3, objv);
 }
 
+#if TCL_MAJOR_VERSION < 9
+static
+int tcldom_UtfToUniChar (
+    const char *src,
+    int *uniChar
+    )
+{
+    int clen;
+    Tcl_UniChar uni16;
+
+    clen = UTF8_CHAR_LEN(*src);
+    if (clen && clen < 4) {
+        clen = Tcl_UtfToUniChar (src, &uni16);
+        *uniChar = uni16;
+        return clen;
+    } else if (clen == 4) {
+        /* This resembles exactly what Tcl 9 does */
+	if (((src[1] & 0xC0) == 0x80) && ((src[2] & 0xC0) == 0x80)
+            && ((src[3] & 0xC0) == 0x80)) {
+	    /*
+	     * Four-byte-character lead byte followed by three trail bytes.
+	     */
+	    *uniChar = (((src[0] & 0x07) << 18) | ((src[1] & 0x3F) << 12)
+		    | ((src[2] & 0x3F) << 6) | (src[3] & 0x3F));
+	    if ((unsigned)(*uniChar - 0x10000) <= 0xFFFFF) {
+		return 4;
+	    }
+	}
+    }
+    *uniChar = src[0];
+    return 1;
+}
+#else
+# define tcldom_UtfToUniChar Tcl_UtfToUniChar
+#endif
+
 /*----------------------------------------------------------------------------
 |   tcldom_AppendEscaped
 |
@@ -2398,14 +2434,14 @@ void tcldom_AppendEscaped (
 #define AP(c)  *b++ = c;
 #define AE(s)  pc1 = s; while(*pc1) *b++ = *pc1++;
 #define TWOCPE clen2 = UTF8_CHAR_LEN(*(pc+clen)); \
-    if (clen) Tcl_UtfToUniChar(pc+clen, &uniChar2);
+    if (clen) tcldom_UtfToUniChar(pc+clen, &uniChar2);
 #define MCP    pc += clen; clen = clen2;
     char  buf[APESC_BUF_SIZE+80], *b, *bLimit,  *pc, *pc1, *pEnd,
           charRef[10];
     int   charDone, i;
     int   clen = 0, clen2 = 0;
     int   unicode;
-    Tcl_UniChar uniChar, uniChar2;
+    int   uniChar, uniChar2;
     
     b = buf;
     bLimit = b + APESC_BUF_SIZE;
@@ -2441,7 +2477,7 @@ void tcldom_AppendEscaped (
             clen = UTF8_CHAR_LEN(*pc);
             if (outputFlags & SERIALIZE_HTML_ENTITIES) {
                 charDone = 1;
-                Tcl_UtfToUniChar(pc, &uniChar);
+                tcldom_UtfToUniChar(pc, &uniChar);
                 switch (uniChar) {
                     #include "HTML5ent.inc"
                 default: charDone = 0; 
