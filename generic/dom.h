@@ -199,7 +199,7 @@ We need 8 bits to index into pages, 3 bits to add to that index and
     (namingBitmap[((pages)[(((byte)[0]) >> 2) & 7] << 3) \
                       + ((((byte)[0]) & 3) << 1) \
                       + ((((byte)[1]) >> 5) & 1)] \
-         & (1 << (((byte)[1]) & 0x1F)))
+         & (1u << (((byte)[1]) & 0x1F)))
 
 /* A 3 byte UTF-8 representation splits the characters 16 bits
 between the bottom 4, 6 and 6 bits of the bytes.
@@ -211,7 +211,7 @@ We need 8 bits to index into pages, 3 bits to add to that index and
                        << 3) \
                       + ((((byte)[1]) & 3) << 1) \
                       + ((((byte)[2]) >> 5) & 1)] \
-         & (1 << (((byte)[2]) & 0x1F)))
+         & (1u << (((byte)[2]) & 0x1F)))
 
 #define UTF8_GET_NAMING_NMTOKEN(p, n) \
   ((n) == 1 \

@@ -1,5 +1,5 @@
-C Now\sin\sfact\sfixed\s\s[5fec5cdc5d].
-D 2024-06-26T10:22:55.720
+C Updated\sto\sdefines\sto\swhat\sexpat\suses.
+D 2024-06-28T00:07:11.997
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -129,7 +129,7 @@ F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
 F generic/datatypes.c e8a3410e1e1b98cf9464cd2b4ef5e1d27f34ced77d642ab020ec48ca30eb2a9a
 F generic/datatypes.h 3e41d07bcf50cf6959b6e14416dfcb0d7b5aafc65683322978ec185c2a259332
 F generic/dom.c 6fc77359eec40ac1d2416b50932ab44215a6577fb6be1c27bc36b6e83c6d244e
-F generic/dom.h 4634ae48e135d5ca7d1cf1403a585e52b29e5142c05642111bd226eca50dbb80
+F generic/dom.h 1d1a25f1e0d503889299638b514542cbc756052477897c4cf620eab582b956ff
 F generic/domalloc.c 7a6a2fdde25d04ffef0330259ceb781ffa2150c2314dd88784f924f6f331ef9e
 F generic/domalloc.h 961f83bb46dec27dbcf36ed430ed81b1f485a1fdfaa2f7df8b60bbcf861d0fe3
 F generic/domhtml.c c91c60084e92a52179f7cf4648aedd2af51babed378e7ff36a508ac9e09ba196
@@ -241,8 +241,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P bf595d313d13bf9a5a43964174928d86b06e87193dfca9d60b43b417a6420846
-R abee8713700dd78bd1ed13805199c19d
+P d1f90f5c0e73ad70ccded4d2f00812a391171c4a1911d7a7e051af6935516188
+R f85c575edfada99c230c296a192ab93b
 U rolf
-Z cf8db1e07c71dc1ff64b5aa3bd8f9008
+Z 39d3dc6a6dd1c869f0312a6f7508d9f0
 # Remove this line to create a well-formed Fossil manifest.
