@@ -916,6 +916,7 @@ int            domIsBMPChar (const char *str);
 int            domIsComment (const char *str);
 int            domIsCDATA (const char *str);
 int            domIsPIValue (const char *str);
+int            domIsHTMLCustomName (const char *str);
 void           domCopyTo (domNode *node, domNode *parent, int copyNS);
 void           domCopyNS (domNode *from, domNode *to);
 domAttrNode *  domCreateXMLNamespaceNode (domNode *parent);

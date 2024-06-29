@@ -2559,7 +2559,7 @@ HTML_SimpleParse (
     domAttrNode   *attrnode, *lastAttr;
     int            ampersandSeen = 0;
     int            only_whites   = 0;
-    int            hnew, autoclose, ignore;
+    int            hnew, autoclose, ignore, maybeCustomName, rc;
     char           tmp[250], *y = NULL;
     Tcl_HashEntry *h;
     domProcessingInstructionNode *pinode;
@@ -2978,10 +2978,28 @@ HTML_SimpleParse (
             |   new tag/element
             |
             \---------------------------------------------------------------*/
+            maybeCustomName = 0;
             while ((c=*x)!=0 && c!='/' && c!='>' && c!='<' && !SPACE(c) ) {
-                if (!isalnum(c)) goto readText;
-                *x = tolower(c);
+                if (!maybeCustomName && !isalnum(c)) maybeCustomName = 1;
                 x++;
+            }
+            if (!maybeCustomName) {
+                c = *x;
+                *x = '\0'; /* temporarily terminate the string */
+                x = start + 1;
+                while (*x) {
+                    *x = tolower(*x);
+                    x++;
+                }
+                *x = c;
+            } else {
+                c = *x;
+                *x = '\0'; /* temporarily terminate the string */
+                rc = domIsHTMLCustomName (start+1);
+                *x = c;
+                if (!rc) {
+                    goto readText;
+                }
             }
             hasContent = 1;
             if (c==0) {

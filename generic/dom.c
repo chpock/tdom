@@ -357,6 +357,74 @@ domIsChar (
 }
 
 /*---------------------------------------------------------------------------
+|   domIsHTMLCustomChar 
+|
+\--------------------------------------------------------------------------*/
+int
+domIsHTMLCustomName (
+    const char *str
+    )
+{
+    const char *p;
+    int clen, dashseen = 0;
+    Tcl_UniChar uniChar;
+
+    p = str;
+    if (*p < 'a' || *p > 'z') {
+        return 0;
+    }
+    p++;
+    while (*p) {
+        clen = UTF8_CHAR_LEN(*p);
+        if (clen == 0) return 0;
+        if (clen == 1) {
+            if (*p == '-') {
+                dashseen = 1;
+                p++;
+                continue;
+            } else if (*p == '.'
+                       || (*p >= '0' && *p <= '9')
+                       || *p == '_'
+                       || (*p >= 'a' && *p <= 'z')) {
+                p++;
+                continue;
+            }
+            return 0;
+        } 
+        if (clen == 4) return 1;
+        clen = Tcl_UtfToUniChar (str, &uniChar);
+        if (uniChar == 0xB7
+            || (uniChar >= 0xC0 && uniChar <= 0xD6)
+            || (uniChar >= 0xD8 && uniChar <= 0xF6) 
+            || (uniChar >= 0xF8 && uniChar <= 0x37D) 
+            || (uniChar >= 0x37F && uniChar <= 0x1FFF) 
+            || (uniChar >= 0x200C && uniChar <= 0x200D) 
+            || (uniChar >= 0x203F && uniChar <= 0x2040)
+            || (uniChar >= 0x2070 && uniChar <= 0x218F)
+            || (uniChar >= 0x2C00 && uniChar <= 0x2FEF)
+            || (uniChar >= 0x3001 && uniChar <= 0xD7FF)
+            || (uniChar >= 0xF900 && uniChar <= 0xFDCF)
+            || (uniChar >= 0xFDF0 && uniChar <= 0xFFFD)) {
+            p += clen;
+            continue;
+        }
+        return 0;
+    }
+    if (!dashseen) return 0;
+    switch (str[0]) {
+    case 'a': if (!strcmp(str,"annotation-xml")) {return 0;} break;
+    case 'c': if (!strcmp(str,"color-profile")) {return 0;} break;
+    case 'f': if (!strcmp(str,"font-face")        ||
+                  !strcmp(str,"font-face-src")    ||
+                  !strcmp(str,"font-face-uri")    ||
+                  !strcmp(str,"font-face-format") ||
+                  !strcmp(str,"font-face-name")) {return 0;} break;
+    case 'm': if (!strcmp(str,"missing-glyph")) {return 0;} break;
+    }
+    return 1;
+}
+
+/*---------------------------------------------------------------------------
 |   domClearString
 |
 \--------------------------------------------------------------------------*/
