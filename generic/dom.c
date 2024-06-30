@@ -357,11 +357,11 @@ domIsChar (
 }
 
 /*---------------------------------------------------------------------------
-|   domIsHTMLCustomChar 
+|   domIsHTML5CustomName 
 |
 \--------------------------------------------------------------------------*/
 int
-domIsHTMLCustomName (
+domIsHTML5CustomName (
     const char *str
     )
 {

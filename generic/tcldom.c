@@ -228,6 +228,7 @@ static char dom_usage[] =
     "    isQName string                                   \n"
     "    isNCName string                                  \n"
     "    isPIName string                                  \n"
+    "    isHTML5CustomName string                         \n"
     "    featureinfo feature                              \n"
 ;
 
@@ -7634,6 +7635,7 @@ int tcldom_DomObjCmd (
         "isPIValue",       "isNCName",           "createDocumentNode",
         "setNameCheck",    "setTextCheck",       "setObjectCommands",
         "featureinfo",     "isBMPCharData",      "clearString",
+        "isHTML5CustomName",
 #ifdef TCL_THREADS
         "attachDocument",  "detachDocument",
 #endif
@@ -7646,7 +7648,8 @@ int tcldom_DomObjCmd (
         m_isQName,           m_isComment,          m_isCDATA,
         m_isPIValue,         m_isNCName,           m_createDocumentNode,
         m_setNameCheck,      m_setTextCheck,       m_setObjectCommands,
-        m_featureinfo,       m_isBMPCharData,      m_clearString
+        m_featureinfo,       m_isBMPCharData,      m_clearString,
+        m_isHTML5CustomName
 #ifdef TCL_THREADS
         ,m_attachDocument,   m_detachDocument
 #endif
@@ -7884,6 +7887,11 @@ int tcldom_DomObjCmd (
             SetBooleanResult(domIsBMPChar(Tcl_GetString(objv[2])));
             return TCL_OK;
 
+        case m_isHTML5CustomName:
+            CheckArgs(3,3,2,"string");
+            SetBooleanResult(domIsHTMLCustomChar(Tcl_GetString(objv[2])));
+            return TCL_OK;
+        
         case m_clearString:
             CheckArgs(3,5,2,"?-replace ?replacement?? string");
             if (objc >= 4) {

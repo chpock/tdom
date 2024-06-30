@@ -2405,7 +2405,7 @@ test html-2.9 {HTML parsing} {
     set result [$doc asHTML]
     $doc delete
     set result
-} {<html>&lt;MATH-field&gt;x = 1 + 1&lt;/MATH-field></html&gt;}
+} {<html>&lt;MATH-field&gt;x = 1 + 1&lt;/MATH-field&gt;</html&gt;}
 
 test html-2.10 {HTML parsing} {
     set doc [dom parse -html {<HTML><mytag>foo</mytag></HTML>}]
@@ -2419,7 +2419,7 @@ test html-2.11 {HTML parsing} {
     set result [$doc asHTML]
     $doc delete
     set result
-} {<HTML><math-field>x = 1 + 1</math-field></HTML>}
+} {<html><math-field>x = 1 + 1</math-field></html>}
 
 
 test html-3.1 {Bad data} {

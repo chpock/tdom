@@ -2995,7 +2995,7 @@ HTML_SimpleParse (
             } else {
                 c = *x;
                 *x = '\0'; /* temporarily terminate the string */
-                rc = domIsHTMLCustomName (start+1);
+                rc = domIsHTML5CustomName (start+1);
                 *x = c;
                 if (!rc) {
                     goto readText;
