@@ -2400,6 +2400,28 @@ test html-2.8 {HTML parsing} {
 </select></form></body>
 </html>}
 
+test html-2.9 {HTML parsing} {knownBug} {
+    set doc [dom parse -html {<HTML><MATH-field>x = 1 + 1</MATH-field></HTML>}]
+    set result [$doc asHTML]
+    $doc delete
+    set result
+} {<html>&lt;MATH-field&gt;x = 1 + 1&lt;/MATH-field&gt;</html&gt;}
+
+test html-2.10 {HTML parsing} {
+    set doc [dom parse -html {<HTML><mytag>foo</mytag></HTML>}]
+    set result [$doc asHTML]
+    $doc delete
+    set result
+} {<html><mytag>foo</mytag></html>}
+
+test html-2.11 {HTML parsing} {
+    set doc [dom parse -html {<HTML><math-field>x = 1 + 1</math-field></HTML>}]
+    set result [$doc asHTML]
+    $doc delete
+    set result
+} {<html><math-field>x = 1 + 1</math-field></html>}
+
+
 test html-3.1 {Bad data} {
     set data {line 6 column 17 - Warning: <script> lacks "type" attribute
 line 10 column 17 - Warning: <script> lacks "type" attribute
