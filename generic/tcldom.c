@@ -7889,7 +7889,7 @@ int tcldom_DomObjCmd (
 
         case m_isHTML5CustomName:
             CheckArgs(3,3,2,"string");
-            SetBooleanResult(domIsHTMLCustomChar(Tcl_GetString(objv[2])));
+            SetBooleanResult(domIsHTML5CustomName(Tcl_GetString(objv[2])));
             return TCL_OK;
         
         case m_clearString:

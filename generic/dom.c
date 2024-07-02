@@ -381,18 +381,23 @@ domIsHTML5CustomName (
             if (*p == '-') {
                 dashseen = 1;
                 p++;
-                continue;
-            } else if (*p == '.'
-                       || (*p >= '0' && *p <= '9')
-                       || *p == '_'
-                       || (*p >= 'a' && *p <= 'z')) {
-                p++;
-                continue;
+            } else {
+                if (*p == '.'
+                    || (*p >= '0' && *p <= '9')
+                    || *p == '_'
+                    || (*p >= 'a' && *p <= 'z')) {
+                    p++;
+                } else {
+                    return 0;
+                }
             }
-            return 0;
+            continue;
         } 
-        if (clen == 4) return 1;
-        clen = Tcl_UtfToUniChar (str, &uniChar);
+        if (clen == 4) {
+            p += clen;
+            continue;
+        }
+        clen = Tcl_UtfToUniChar (p, &uniChar);
         if (uniChar == 0xB7
             || (uniChar >= 0xC0 && uniChar <= 0xD6)
             || (uniChar >= 0xD8 && uniChar <= 0xF6) 
@@ -406,9 +411,9 @@ domIsHTML5CustomName (
             || (uniChar >= 0xF900 && uniChar <= 0xFDCF)
             || (uniChar >= 0xFDF0 && uniChar <= 0xFFFD)) {
             p += clen;
-            continue;
+        } else {
+            return 0;
         }
-        return 0;
     }
     if (!dashseen) return 0;
     switch (str[0]) {

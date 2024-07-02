@@ -5,7 +5,7 @@
 #
 #    dom-1.*:  createDocument, createDocumentNS
 #    dom-2.*:  parse
-#    dom-3.*:  isName, isNCName, isCharData, isPIName, isComment, isCDATA
+#    dom-3.*:  is* methods, clearString
 #    dom-4.*:  parse -useForeignDTD
 #    dom-5.*:  external entities
 #    dom-6.*:  use in slave interpreter
@@ -1186,6 +1186,32 @@ test dom-3.45 {clearString -replace with replacement} {
     }
     set result
 } [list some asome someb asomeb asomesomeb asomecsomeb asomedsomesomeb asomedsomesomesomesome_foo_bar somesomesome_foo_bar_bazsome_didumsome somesomesome_foo_bar_bazsome_didum\uE000 somesomesome abc somesomesome]
+
+test dom-3.46 {isHTML5CustomName} {
+    set result [list]
+    foreach str {
+        abc
+        ab-c
+        ab-C
+        -ab
+        äb-c
+        ab---c
+        ab-
+        ab-ᴨ
+        aÄ-b
+        aA-b
+        aä-b
+        0n-foo
+        A-b
+        font-face
+        m\u00B7-.
+        n-\uFDF0
+        o-\u3000
+    } {
+        lappend result [dom isHTML5CustomName $str]
+    }
+    set result
+} {0 1 0 0 0 1 1 1 1 0 1 0 0 0 1 1 0}
 
 test dom-4.1 {-useForeignDTD 0} {
     set doc [dom parse -useForeignDTD 0 {<root/>}]

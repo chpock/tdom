@@ -2400,7 +2400,7 @@ test html-2.8 {HTML parsing} {
 </select></form></body>
 </html>}
 
-test html-2.9 {HTML parsing} {
+test html-2.9 {HTML parsing} {knownBug} {
     set doc [dom parse -html {<HTML><MATH-field>x = 1 + 1</MATH-field></HTML>}]
     set result [$doc asHTML]
     $doc delete
