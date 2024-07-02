@@ -1,5 +1,5 @@
-C Updated\sthe\sCHANGES\sfile.
-D 2024-07-02T22:09:58.157
+C Temporary\swork\saround\sfor\sa\sbug\sof\sthe\sgcc\sbuild\schain\son\sRiscV.\sSee\s[faa62e0934].
+D 2024-07-02T22:35:36.257
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -132,7 +132,7 @@ F generic/dom.c 7eec062a3803e8fec4ce15aa591617fa2d4f371c830f5c613f925fce420bf87f
 F generic/dom.h ffd1238037b87f7d1007a9b3ced9adeb7d4cbc109004db7326699a1a24c00544
 F generic/domalloc.c 7a6a2fdde25d04ffef0330259ceb781ffa2150c2314dd88784f924f6f331ef9e
 F generic/domalloc.h 961f83bb46dec27dbcf36ed430ed81b1f485a1fdfaa2f7df8b60bbcf861d0fe3
-F generic/domhtml.c e41a97fd9a935aeaa3155fa6d37f63445f38226bad74c04d438f860887d7db8e
+F generic/domhtml.c cc380aaebb3621c799b9d5773b8c10c8b453e5f367db5f707d3854f2c12a67a2
 F generic/domhtml.h cb031185e99066889bec37b32239ab0f932d673a5701c94429902b2332ff3784
 F generic/domhtml5.c 6a841ebf1f13b8dcaf10f4bc60ec04dec4807b7dc37bdd229e73cf976ff1e357
 F generic/domhtml5.h 5cca562a556e7662f2dce222640c32abb2777146
@@ -241,8 +241,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 9d8f28621bbf19a174ca8e3bb6c02ffa80dda5ed967dd2deac665ebd1ec2ae58
-R 63ff6639ddee1d2677b7105363673a3b
+P d02dcd66ea7081f765a4332653e94aaea5e093d4447c7b286350c437cc0fe8be
+R 945b5aad7e7ecd16c573b50f727bea64
 U rolf
-Z 0e977de4b5cf3413b441fe7ce1cfec09
+Z 6b2d9dd164fd70a6f02cc5a4a7e98edb
 # Remove this line to create a well-formed Fossil manifest.
