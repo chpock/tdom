@@ -1,4 +1,9 @@
 
+2024-07-02  Rolf Ade  <rolf@pointsman.de>
+
+        Added the isHTML5CustomName method to the dom command. The
+        simple HTML reader now accept HTML5 custom element names.
+        
 2024-06-26  Rolf Ade  <rolf@pointsman.de>
 
         Enhanced the set of recognised entities to HTML 5.
