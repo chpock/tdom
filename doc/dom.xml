@@ -613,6 +613,15 @@ recommendation. Otherwise it returns 0.</desc>
         </commanddef>
 
         <commanddef>
+          <command><cmd>dom</cmd> <method>isHTML5CustomName</method> <m>string</m></command>
+          <desc>Returns 1 if <m>string</m> is a HTML5 valid custom
+          element name (according to
+          https://html.spec.whatwg.org/#valid-custom-element-name at
+          26 June 2024, it's a living standard). Otherwise it returns
+          0.</desc>
+        </commanddef>
+        
+        <commanddef>
           <command><cmd>dom</cmd> <method>clearString</method> ?<m>-replace</m>? <m>string</m></command>
           <desc>Returns the string given as argument cleared out from
           any characters not allowed as XML parsed character data. If
