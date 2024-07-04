@@ -1,5 +1,5 @@
-C Temporary\swork\saround\sfor\sa\sbug\sof\sthe\sgcc\sbuild\schain\son\sRiscV.\sSee\s[faa62e0934].
-D 2024-07-02T22:35:36.257
+C Added\sdocumentation\sfor\sisHTML5CustonName.
+D 2024-07-04T01:32:47.876
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -20,7 +20,7 @@ F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html b4a8d2a4b261d8380849b9fa2b4026f1e08248aab543551db47a34b60a43c69a
 F doc/dom.html 1d11385ca4813443eed963e0086bd477c0d11dadf3a0006c10116263f17597ad
 F doc/dom.n 362d1ac1b59c8d21d6155fa9a59cc91278e898791a5b7fc3325f97a559714ae2
-F doc/dom.xml 470622e695afc4f1e34b7e471ad7a77265754e7ad95c94efc88a5c7f9b5efd24
+F doc/dom.xml dc946cc14dda05833d923f5934862bf5025b9f66f27dced99705fac54b6d0567
 F doc/domDoc.html 3649972038c76f688d28afeef5e6e3fe66ec355d71259d94f69c9601a1400586
 F doc/domDoc.n 891aff0fba581c2d67ae619f5777161b65de8316be97f4b94747ae7a210aecf5
 F doc/domDoc.xml 38cb05ec03286ee73a00bb653bbb12d3e2668c389e3b0febcfb939662821d2af
@@ -241,8 +241,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P d02dcd66ea7081f765a4332653e94aaea5e093d4447c7b286350c437cc0fe8be
-R 945b5aad7e7ecd16c573b50f727bea64
+P 55d88884ed73c699bbacc60e68b63adc1bc1f1bedee8bc1900f69648edcf7a83
+R c2a6ab0a1d3b99a6e98b30fd33ff9d66
 U rolf
-Z 6b2d9dd164fd70a6f02cc5a4a7e98edb
+Z 13d9ad7d81b212cf8e40b567913bed04
 # Remove this line to create a well-formed Fossil manifest.
