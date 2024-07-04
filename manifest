@@ -1,5 +1,5 @@
-C More\sversion\snumber\supdates.
-D 2024-07-04T13:31:54.188
+C Better\sonly\s7-bit\sASCII\scharacters\sin\stest\sfiles.
+D 2024-07-04T14:09:03.856
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -198,8 +198,8 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.bench 5446ce379127b8d5700f18a5a0848e580313d0d7
-F tests/dom.test 606d8e6ef2ef3777dcce7694c0af43328ff05f4c372771abad7839560c6e1cad
-F tests/domDoc.test 0b987786010faabea50d18d7bf8b44fae1b3e5d50279fc04a677aaab6b6b4923
+F tests/dom.test f60b08e489c81a0c01434646b53caa3d710c85268e27a757fc1c8c210b1fd12c
+F tests/domDoc.test 52181fe77cece2de6089c8ae0bacd1501bd5d5a4212bbb37c7d2e868c5253b46
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test 46d67b521a9d84d5d982340c545d830ce65be6e5c69e4271e613d2182b71a321
 F tests/domjson.test d49495ca345847cf548f9ee83883948af2391b68184047338ea5bbf853e1f6d5
@@ -241,8 +241,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P e54a5f4ff4a9aeb63e93429a57bd019baac02dea85b4ced17f98b793fc30396d
-R a72acfd0bbe782d2eb7951391f241778
+P b1097ab0860e604e2359aba4570ffed6a9efe4a31afc912d536aebc3fe3074ba
+R cadd3b4dfee8d2135700f92f133276af
 U rolf
-Z 2497b80c1b1ef69e2b95b574baee79e1
+Z f2fa5def2fe2de4ea778dc5c32cd8fdc
 # Remove this line to create a well-formed Fossil manifest.
