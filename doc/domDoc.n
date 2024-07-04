@@ -353,9 +353,18 @@ bit ASCII character in attribute values or element PCDATA
 content will be escaped as character reference in decimal
 representation.
 .PP
-If the option \fI-htmlEntities\fR is given, a character is
-written using its HTML 4.01 character entity reference, if it
-has one.
+If the option \fI-htmlEntities\fR is given, a character or
+a pair of characters is written using its HTML 5 character
+entity reference, if it has one. Some HTML 5 character entity
+references encode the same character or code points. From the
+possible entity names the shortest is choosen. If there are
+more than one shortest name and this names differ only in case
+then the lowercase alternative is choosen. Otherwise frist
+name in lexical ASCII order is choosen. There is one HTML5
+entitiy (ThickSpace), which escapes two characters for which
+the first and the second character have an entity name by
+itself. If the two characters are to be serialized then the
+one two-characters entity ThickSpace will be choosen.
 .PP
 If the option \fI-breakLines\fR is given the serialization
 outputs "\en>" instead of ">" for the opening tags of
