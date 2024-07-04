@@ -1,20 +1,20 @@
-C Temporary\swork\saround\sfor\sa\sbug\sof\sthe\sgcc\sbuild\schain\son\sRiscV.\sSee\s[faa62e0934].
-D 2024-07-02T22:35:36.257
+C Started\srelease\swork.
+D 2024-07-04T01:17:23.664
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
-F CHANGES e2fe2e01a6cd468891d061257d85a5b55d62fbc031bb93dbb77206dc643529a3
+F CHANGES 84a75809a964d2affe310ff2085c9a3c80d3b874a2337fa6b427070426fec7f7
 F ChangeLog 9b60ec8bfbae84e4f1a97aaee24be00ccea212b7
 F LICENSE 7c00b00fe8e88c48498a54c103dd7df03faeeb039c783279d5fb54dfca307b77
 F MPL_2.0.html 326b847674d6f5846c5b260fb437372e21232c23e3911f3a94f766a62459126c
 F Makefile.in 8752adb175f09928e5ed7d1b27f145691491ee10413ad0679028f013a56bb1bc
-F README.AOL 60c1b681acde3a3396a1598164f42f429fde721bfde8ac8b2654b851ac68b01c
-F README.md 77a501d547dfcd3bb6040efa74eeaf0bd3e69559deabd7696ffc93decc4ef28f
+F README.AOL 553e7e3816fb60d15ae629eefccecd237c9e41a1b9fac7c1c32090520a2e83b0
+F README.md 723bd978209d7a61f59e4e474e67caa342e3642f617d712f25c904f849f51b4c
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/toschema.tcl d9cb806e8f1a10ee9a6d6e8b3bd5944124a12001a086b5bc8511b6e92f9af620
 F apps/xslt.tcl 64103132fbe0a1fbf61cf3506608cb7ea5cbfddd247d207d95d8e96a071e1846
-F configure ee3dca5feb5d98276cb235b1a19427a824f1d9a5e6ea4c38f6aa7080ca5b86ca x
-F configure.ac b9f8ef16d16f5f815a069479da44b2753887c4d03b857f997bcfd93dbad7cd7c
+F configure 7e1e1eadc799afe77b0bec012f900f800c3ef43804c4d562e26d76631de4fba0 x
+F configure.ac 38272402876945a3c6973a6811dc86bcc10565c5c97b32519dcdb5135eab7656
 F doc/INDEX.MAP 8b9f0c2e18efc29fcf581669e175dec860f54026ef7fef4b8d7403bca442fb71
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html b4a8d2a4b261d8380849b9fa2b4026f1e08248aab543551db47a34b60a43c69a
@@ -232,7 +232,7 @@ F win/README 69a6da038cb99711a2c95fd44e314e9ce74bb2c4ed8ed319dac6fd6daff2c13d
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F win/makefile.vc bc2196b02ac1719d855dcc5cde7403bc2621c735e0287f40cd012ab67c73d262
 F win/nmakehlp.c 194ae7c24886245c679cb4c9ea7e6daaaebb5fcd
-F win/pkgIndex.tcl 33c8ec37ad3dd9af012d01f9817436adeaf8bf9d4ffda29df2c6bc1cccb67176
+F win/pkgIndex.tcl 6b771900759ee238ec7da969bf44e6bc7506da139f726a665aa2c7fe8eea4854
 F win/rules-ext.vc 3c02944b3199014d35de617a1c146d0944af16395870da423374fb013ef57ecf
 F win/rules.vc afa89d3b334f5958efc447c985949447a9b05f6c891c7e1e8c0423ed226e89dc
 F win/targets.vc 3627f336071161bfb6bbaea40465b731e42f4ad750189a967e58b1ce40b4eb0b
@@ -241,8 +241,11 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P d02dcd66ea7081f765a4332653e94aaea5e093d4447c7b286350c437cc0fe8be
-R 945b5aad7e7ecd16c573b50f727bea64
+P 55d88884ed73c699bbacc60e68b63adc1bc1f1bedee8bc1900f69648edcf7a83
+R ca604f3dae2664eaebfbd9a0c16f9ec5
+T *branch * prepare-release
+T *sym-prepare-release *
+T -sym-trunk *
 U rolf
-Z 6b2d9dd164fd70a6f02cc5a4a7e98edb
+Z 71f8166ffae243299df5717f84065f84
 # Remove this line to create a well-formed Fossil manifest.

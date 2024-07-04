@@ -1,6 +1,6 @@
 
 ## tDOM - a XML / DOM / XPath / XSLT / HTML / JSON implementation for Tcl
-### Version 0.9.3
+### Version 0.9.4
 
 ### tDOM contains:
 
@@ -63,13 +63,13 @@ which you get as
 [tarball](http://tdom.org/index.html/tarball/trunk/tdom-trunk.tar.gz)
 or as [zip archive](http://tdom.org/index.html/zip/trunk/tdom-trunk.zip)
 
-The latest release is 0.9.3. Get the source code as
-[tarball](http://tdom.org/downloads/tdom-0.9.3-src.tgz) or
-as [zip archive](http://tdom.org/downloads/tdom-0.9.3-src.zip).
+The latest release is 0.9.4. Get the source code as
+[tarball](http://tdom.org/downloads/tdom-0.9.4-src.tgz) or
+as [zip archive](http://tdom.org/downloads/tdom-0.9.4-src.zip).
 
-Windows binaries of the 0.9.3 release are also available. Get it for
-[64 bit](http://tdom.org/downloads/tdom-0.9.3-windows-x64.zip) or [32
-bit](http://tdom.org/downloads/tdom-0.9.3-windows-x86.zip).
+Windows binaries of the 0.9.4 release are also available. Get it for
+[64 bit](http://tdom.org/downloads/tdom-0.9.4-windows-x64.zip) or [32
+bit](http://tdom.org/downloads/tdom-0.9.4-windows-x86.zip).
 
 The provided windows binaries include (statically linked) the
 HTML5 parser.
