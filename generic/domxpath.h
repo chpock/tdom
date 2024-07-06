@@ -128,7 +128,7 @@ typedef xpathResultSet *xpathResultSets;
 
 typedef int (*xpathFuncCallback) 
                 (void *clientData, char *functionName, 
-                 domNode *ctxNode, int position, xpathResultSet *nodeList,
+                 domNode *ctxNode, domLength position, xpathResultSet *nodeList,
                  domNode *exprContext, int argc, xpathResultSets *args,
                  xpathResultSet *result, char  **errMsg);
                               

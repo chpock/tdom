@@ -5048,7 +5048,7 @@ static int validateSource (
             goto cleanup;
         }
         for (;;) {
-            int nread;
+            domLength nread;
             char *fbuf = XML_GetBuffer (parser, TDOM_EXPAT_READ_SIZE);
             if (!fbuf) {
                 close (fd);

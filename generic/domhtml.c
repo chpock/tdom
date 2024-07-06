@@ -2563,7 +2563,7 @@ HTML_SimpleParse (
     register int   c;          /* Next character of the input file */
     register char *pn, *e;
     register char *x, *start, *piSep;
-    int            saved;
+    char           savedChar;
     int            hasContent;
     domNode       *pnode;
     domNode       *node = NULL, *parent_node = parent;
@@ -3107,9 +3107,9 @@ HTML_SimpleParse (
             lastAttr = NULL;
             while ( (c=*x) && (c!='/') && (c!='>') && (c!='<') ) {
                 char *ArgName = x;
-                int nArgName;
+                domLength nArgName;
                 char *ArgVal = NULL;
-                int nArgVal = 0;
+                domLength nArgVal = 0;
 
                 while ((c=*x)!=0 && c!='=' && c!='>' && !SPACE(c) ) {
                     *x = tolower(c);

@@ -921,15 +921,15 @@ static xsltNumberFormat* xsltNumberFormatTokenizer (
 static void formatValue (
     xsltNumberFormat *f,
     int              *useFormatToken,
-    int               value,
+    domLength         value,
     Tcl_DString      *str,
     char             *groupingSeparator,
     long              groupingSize,
     int               addSeparater
 )
 {
-    size_t      len, fulllen, gslen;
-    int         upper = 0, e, m, b, i, z, v;
+    size_t      len, fulllen, gslen, m, i;
+    int         upper = 0, e, b, z, v;
     char        tmp[80], *pt;
     Tcl_DString tmp1;
     static struct { char *digit; char *ldigit; int value; } RomanDigit[] = {
@@ -3426,8 +3426,8 @@ static int xsltNumber (
 )
 {
     xpathResultSet    rs;
-    int               rc, NaN, hnew, i, useFormatToken, vVals = 0;
-    domLength         vs[20], *v, *vd = NULL;
+    int               rc, NaN, hnew, i, useFormatToken;
+    domLength         vs[20], *v, *vd = NULL, vVals = 0;
     long              groupingSize = 0;
     char             *value, *level, *count, *from, *str, *str1, *format;
     char             *groupingSeparator = NULL, *groupingSizeStr = NULL;
@@ -5514,7 +5514,8 @@ static void StripXSLTSpace (
 )
 {
     domNode *child, *newChild, *parent;
-    int     i, len, onlySpace;
+    domLength i, len;
+    int onlySpace;
     char   *p;
 
     if (node->nodeType == TEXT_NODE) {

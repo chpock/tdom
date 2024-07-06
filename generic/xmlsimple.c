@@ -343,6 +343,7 @@ XML_SimpleParse (
     register int   c;          /* Next character of the input file */
     register char *pn;
     register char *x, *start, *piSep;
+    char           savedChar;
     domLength      saved;
     int            hasContent;
     domNode       *node;
@@ -788,7 +789,7 @@ XML_SimpleParse (
                 if (*x=='=') {
                     x++;
                 }
-                saved = *(ArgName + nArgName);
+                savedChar = *(ArgName + nArgName);
                 *(ArgName + nArgName) = '\0'; /* terminate arg name */
 
                 while (SPACE(*x)) {
@@ -925,7 +926,7 @@ XML_SimpleParse (
 #ifdef TDOM_NS
                 }
 #endif 
-                *(ArgName + nArgName) = saved;
+                *(ArgName + nArgName) = savedChar;
                 while (SPACE(*x)) {
                     x++;
                 }

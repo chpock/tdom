@@ -1090,7 +1090,7 @@ TclExpatParse (
       parser = expat->parser;
       expat->parsingState = 2;
       for (;;) {
-          int nread;
+          domLength nread;
           char *fbuf = XML_GetBuffer (parser, TDOM_EXPAT_READ_SIZE);
           if (!fbuf) {
               close (fd);
@@ -3687,7 +3687,7 @@ TclGenExpatExternalEntityRefHandler(
           }
           result = 1;
           for (;;) {
-              int nread;
+              size_t nread;
               char *fbuf = XML_GetBuffer (extparser, TDOM_EXPAT_READ_SIZE);
               if (!fbuf) {
                   close (fd);

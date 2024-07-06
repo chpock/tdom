@@ -2369,7 +2369,7 @@ int xpathParse (
         memmove(*errMsg + len+6+newlen, "' ", 3);
 
         for (i=0; tokens[i].token != EOS; i++) {
-            sprintf(tmp, "%s\n%3s%3d %-12s %5ld %09.3g %5d  ",
+            sprintf(tmp, "%s\n%3s%3d %-12s %5ld %09.3g %5ld  ",
                          (i==0) ? "\n\nParsed symbols:" : "",
                          (i==l) ? "-->" : "   ",
                           i,
@@ -5886,17 +5886,17 @@ double xpathGetPrio (
 |
 \---------------------------------------------------------------------------*/
 static void nodeToXPath (
-    domNode  * node,
-    char    ** xpath,
-    int      * xpathLen,
-    int      * xpathAllocated,
-    int        legacy
+    domNode   * node,
+    char     ** xpath,
+    domLength * xpathLen,
+    domLength * xpathAllocated,
+    int         legacy
 )
 {
     domNode *parent, *child;
     char    step[200], *nTest;
-    int     sameNodes, nodeIndex, len;
-
+    size_t  len;
+    int     sameNodes, nodeIndex;
 
     parent = node->parentNode;
     if (parent == NULL) {
