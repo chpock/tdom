@@ -1,5 +1,5 @@
-C Fixed\sprevious\scommit.
-D 2024-07-04T14:15:51.964
+C wip
+D 2024-07-06T01:49:44.141
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -128,7 +128,7 @@ F generic/HTML5ent.inc c122e35eb1be8e325f8846080bbccc166978cfe7136e850d7e8aa4778
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
 F generic/datatypes.c e8a3410e1e1b98cf9464cd2b4ef5e1d27f34ced77d642ab020ec48ca30eb2a9a
 F generic/datatypes.h 3e41d07bcf50cf6959b6e14416dfcb0d7b5aafc65683322978ec185c2a259332
-F generic/dom.c 7eec062a3803e8fec4ce15aa591617fa2d4f371c830f5c613f925fce420bf87f
+F generic/dom.c a9c117614d5c96070c4134c666b462ca1e4c77a987a8dc23034b7ec4969a5cc3
 F generic/dom.h ffd1238037b87f7d1007a9b3ced9adeb7d4cbc109004db7326699a1a24c00544
 F generic/domalloc.c 7a6a2fdde25d04ffef0330259ceb781ffa2150c2314dd88784f924f6f331ef9e
 F generic/domalloc.h 961f83bb46dec27dbcf36ed430ed81b1f485a1fdfaa2f7df8b60bbcf861d0fe3
@@ -241,8 +241,11 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 177bc743cb276238452d3186c38848538115626b6b880b4d3241dbc96de84b76
-R 3b652df5ed9f59afdded65b06b0983a8
+P 400fccf209ee18005ac8bb25f9fe579e864548ed63f6f13050c560024a9adaad
+R 639c655709a5ce4aba51896dae0814d0
+T *branch * wip
+T *sym-wip *
+T -sym-prepare-release *
 U rolf
-Z b68d8b2aa282e4cef6e4eae452931d04
+Z 167d2335f20d67831a19e1af87f7ff21
 # Remove this line to create a well-formed Fossil manifest.

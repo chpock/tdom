@@ -366,7 +366,8 @@ domIsHTML5CustomName (
     )
 {
     const char *p;
-    int clen, dashseen = 0;
+    domLength clen;
+    int dashseen = 0;
     Tcl_UniChar uniChar;
 
     p = str;
