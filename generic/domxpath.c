@@ -177,7 +177,7 @@ typedef struct {
     char  *strvalue;
     long   intvalue;
     double realvalue;
-    int    pos;
+    long   pos;
 
 } XPathToken;
 
@@ -433,8 +433,7 @@ void rsAddNode ( xpathResultSet *rs, domNode *node) {
         rs->nodes[0]  = node;
 
     } else {
-        int insertIndex;
-        int i;
+        domLength insertIndex, i;
 
         if (rs->intvalue) {
             /* we must do a copy-on-write */

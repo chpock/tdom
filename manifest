@@ -1,5 +1,5 @@
 C wip
-D 2024-07-06T01:51:15.371
+D 2024-07-06T13:01:23.384
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -139,7 +139,7 @@ F generic/domhtml5.h 5cca562a556e7662f2dce222640c32abb2777146
 F generic/domjson.c 1124afebaf5f4e299e40a6fd31bdaca7e3363ea86cfdd455c2fd76183413c10d
 F generic/domjson.h ff31d0fd1d6eb3e6490fb456d42b73e304a6f0c386a074db42d8b84ad8c925b3
 F generic/domlock.c f8e235892bb9dc771e844c47701ded81c10967dc6ca420b14ab54067211bdb8f
-F generic/domxpath.c 2a537a38d5fc66b3d61fe71db4c5074bd1167fc8eb1d3dcbbad27a8b0c13cde7
+F generic/domxpath.c 3e92222100a1936e8540a6a1eaf5edc59ed860c7c6b7be4ce305219270ddd886
 F generic/domxpath.h c7579a8d313602a6456d5034bc8b0720d2f7ea6a391a3d17b91136fd9cedb35c
 F generic/domxslt.c 118a3b435cacd7e1e34a22bd76d169c52a3e2ebc23871887426ba0ab6230bc1e
 F generic/domxslt.h aeaf957ee38a9e7564bd9f1bed1781de108767df476a0d0776615988d8f04e0f
@@ -241,8 +241,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P e337d16a06f9c554aca53d561c56c5aba54d155b93f2b2aec588ad62ac5ce361
-R f5559e8e17a3bbf43779430ed88bfe71
+P 4e69c38f1c2ca10c26ce9e357a458145a27371ca9c11218d8d6ecd5c9f24e4e6
+R cf2ca19781545c33b7cb91856a1b8eae
 U rolf
-Z a6362a9e52d5018d3e6214d6bd81b65e
+Z fa39825fbe0709f745d12b210d09cc7d
 # Remove this line to create a well-formed Fossil manifest.
