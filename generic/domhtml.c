@@ -2342,7 +2342,8 @@ static void TranslateEntityRefs (
     int h;       /* A hash on the entity reference */
     char *zVal;  /* The substituted value */
     Er *p;       /* For looping down the entity reference collision chain */
-    int value, zlen, overlen; 
+    int value, overlen;
+    domLength  zlen;
     char *ole, *newNodeValue;
     
     if (textOrAtt->nodeType == ATTRIBUTE_NODE) {

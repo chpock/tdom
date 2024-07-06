@@ -928,7 +928,8 @@ static void formatValue (
     int               addSeparater
 )
 {
-    int         len, fulllen, gslen, upper = 0, e, m, b, i, z, v;
+    size_t      len, fulllen, gslen;
+    int         upper = 0, e, m, b, i, z, v;
     char        tmp[80], *pt;
     Tcl_DString tmp1;
     static struct { char *digit; char *ldigit; int value; } RomanDigit[] = {
@@ -1149,11 +1150,12 @@ static int xsltFormatNumber (
     Tcl_UniChar uniCharNull = '\0';
     char stmp[240], ftmp[80], *tstr;
     char wrongFormat[] = "Unable to interpret format pattern.";
-    int i, j, k, l, zl, g, nHash, nZero, fHash, fZero, gLen, isNeg;
+    size_t l, zl, gLen;
+    int i, j, k, g, nHash, nZero, fHash, fZero, isNeg;
     int prefixMinux, percentMul = 0, perMilleMul = 0;
     Tcl_DString  dStr, s;
     Tcl_UniChar *format, *negformat = NULL, *p, *p1;
-    DBG(Tcl_DString dbStr;)
+    DBG(Tcl_DString bStr;)
 
     DBG(fprintf(stderr, "number: '%f'\nformatStr='%s' \n", number, formatStr);)
     prefix1[0] = '\0';
@@ -1758,7 +1760,8 @@ static void StripXMLSpace (
 )
 {
     domNode       *child, *newChild, *parent;
-    int            i, len, onlySpace, found, strip;
+    size_t         i, len;
+    int            onlySpace, found, strip;
     char          *p, prefix[MAX_PREFIX_LEN];
     const char    *localName;
     double        *f;
@@ -2295,7 +2298,7 @@ static int nodeGreater (
 {
     int             rc;
     char           *strAptr, *strBptr;
-    int             lenA, lenB, len;
+    domLength       lenA, lenB, len;
     Tcl_UniChar     unicharA, unicharB;
 
     *greater = 0;

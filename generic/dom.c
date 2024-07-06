@@ -523,7 +523,7 @@ domIsComment (
     )
 {
     const char *p;
-    int   len, i = 0;
+    size_t len, i = 0;
     
     p = str;
     len = strlen (str);
@@ -548,7 +548,7 @@ domIsCDATA (
     )
 {
     const char *p;
-    int   len, i = 0;
+    size_t len, i = 0;
 
     p = str;
     len = strlen (str);
@@ -571,7 +571,7 @@ domIsPIValue (
     )
 {
     const char *p;
-    int   len, i = 0;
+    size_t len, i = 0;
 
     p = str;
     len = strlen (str);
@@ -1221,7 +1221,8 @@ startElement(
     domAttrNode   *attrnode, *lastAttr;
     const char   **atPtr, **idAttPtr;
     Tcl_HashEntry *h;
-    int            hnew, len, pos, idatt, newNS, result;
+    size_t         len;
+    int            hnew, pos, idatt, newNS, result;
     const char    *xmlns, *localname;
     char           tagPrefix[MAX_PREFIX_LEN];
     char           prefix[MAX_PREFIX_LEN];
@@ -1767,7 +1768,8 @@ commentHandler (
     domTextNode   *node;
     domNode       *parentNode;
     domLineColumn *lc;
-    int            len, hnew;
+    size_t         len;
+    int            hnew;
     Tcl_HashEntry *h;
 
     if (info->insideDTD) {
@@ -1847,7 +1849,8 @@ processingInstructionHandler(
     domReadInfo                  *info = userData;
     domNode                      *parentNode;
     domLineColumn                *lc;
-    int                           len,hnew;
+    size_t                        len;
+    int                           hnew;
     Tcl_HashEntry                *h;
 
     if (info->insideDTD) {

@@ -353,7 +353,7 @@ domFree (
     domAllocBlock * block;
     domAllocBlock * hashedBlock;
     domAllocBlock * prevBlock;
-    int             slotNr, i, foundInCache;
+    domLength       slotNr, i, foundInCache;
     unsigned int  * usedBitmap;
     unsigned int    mask;
 

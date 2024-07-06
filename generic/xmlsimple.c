@@ -343,7 +343,7 @@ XML_SimpleParse (
     register int   c;          /* Next character of the input file */
     register char *pn;
     register char *x, *start, *piSep;
-    int            saved;
+    domLength      saved;
     int            hasContent;
     domNode       *node;
     domNode       *parent_node = parent;
@@ -774,9 +774,9 @@ XML_SimpleParse (
 #endif            
             while ( (c=*x) && (c!='/') && (c!='>') ) {
                 char *ArgName = x;
-                int nArgName;
+                domLength nArgName;
                 char *ArgVal = NULL;
-                int nArgVal = 0;
+                domLength nArgVal = 0;
 
                 while ((c=*x)!=0 && c!='=' && c!='>' && !SPACE(c) ) {
                     x++;
