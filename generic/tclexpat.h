@@ -1,3 +1,7 @@
+
+#ifndef __TCL_EXPAT_H__
+#define __TCL_EXPAT_H__
+
 #include <tcl.h>
 #include <expat.h>
 #include "dom.h"
@@ -179,3 +183,4 @@ void * CHandlerSetGetUserData (Tcl_Interp *interp,
 
 TclGenExpatInfo * GetExpatInfo (Tcl_Interp *interp,
 				       Tcl_Obj *const expatObj);
+#endif 
