@@ -3127,7 +3127,7 @@ HTML_SimpleParse (
                     while (SPACE(*x)) {
                         x++;
                     }
-                    saved = *(ArgName + nArgName);
+                    savedChar = *(ArgName + nArgName);
                     *(ArgName + nArgName) = '\0'; /* terminate arg name */
 
                     if (*x=='>' || *x==0) {
@@ -3161,7 +3161,7 @@ HTML_SimpleParse (
                     }
                 } else {
                     /* attribute without value, like 'nowrap' */
-                    saved = *(ArgName + nArgName);
+                    savedChar = *(ArgName + nArgName);
                     *(ArgName + nArgName) = '\0'; /* terminate arg name */
                     ArgVal = ArgName;
                     nArgVal = nArgName;
@@ -3207,7 +3207,7 @@ HTML_SimpleParse (
                 }
                 lastAttr = attrnode;
 
-                *(ArgName + nArgName) = saved;
+                *(ArgName + nArgName) = savedChar;
 
                 while (SPACE(*x)) {
                     x++;
