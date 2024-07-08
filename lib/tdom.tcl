@@ -430,7 +430,7 @@ proc ::dom::domNode::substringData { node offset count } {
     } {
         return -code error "NOT_SUPPORTED_ERR: node is not a cdata node"
     }
-    set endOffset [expr $offset + $count - 1]
+    set endOffset {[expr $offset + $count - 1]}
     return [string range [$node nodeValue] $offset $endOffset]
 }
 
@@ -900,7 +900,7 @@ proc ::tdom::xmlOpenFileWorker {filename {encodingString {}} {forSimple 0} {forR
         "4c6fa794" {
             # EBCDIC in some flavor
             if {[package vsatisfies [package provide Tcl] 9-]} {
-                set $fd 0 start
+                seek $fd 0 start
                 set encoding ebcdic
             } else {
                 error "EBCDIC not supported"

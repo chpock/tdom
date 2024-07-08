@@ -276,7 +276,7 @@ skips to the corresponding end tag and ignores all events (but
 not XML parsing errors) on the way and returns the new state
 END_TAG.
 .TP
-\&\fB\fBfind-element\fP  \fR?\fP tagname \fR?\fP   \fR?\fP tagname | -names tagnames \fR?\fP
+\&\fB\fBfind-element\fP  \fR?\fP tagname | -names tagnames \fR?\fP
 \&\fRThis method is only valid in states
 \&\fISTART_DOCUMENT\fR, \fISTART_TAG\fR and \fIEND_TAG\fR. It
 skips forward until the next element start tag with tag name
@@ -299,11 +299,12 @@ Miscellaneous methods:
 \&\fB\fBline\fP
 \&\fRThis method is valid in all parser states except READY
 and TEXT. It returns the line number of the parsing
-position.
+position. Line counting starts with 1.
 .TP
 \&\fB\fBcolumn\fP
 \&\fRThis method is valid in all parser states except READY
 and TEXT. It returns the offset, from the beginning of the
-current line, of the parsing position.
+current line, of the parsing position. Column counting starts
+with 0.
 .SH KEYWORDS
 XML, pull, parsing

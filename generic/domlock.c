@@ -25,10 +25,10 @@
 |
 \---------------------------------------------------------------------------*/
 
-#ifdef TCL_THREADS
 
 #include <dom.h>
 
+#ifdef TCL_THREADS
 
 /*----------------------------------------------------------------------------
 |   Global list of document lock structures. These should be finalized

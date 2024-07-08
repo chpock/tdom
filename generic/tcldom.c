@@ -1399,7 +1399,7 @@ int tcldom_xpathFuncCallBack (
     void            *clientData,
     char            *functionName,
     domNode         *ctxNode,
-    int              position,
+    domLength        position,
     xpathResultSet  *nodeList,
     domNode         *UNUSED(exprContext),
     int              argc,
@@ -1667,8 +1667,8 @@ int selectNodesQueryList (
     domNode          * node,
     Tcl_Obj          * queryList,
     ast                tt, 
-    int                queryListInd,
-    int                queryListLen,
+    domLength          queryListInd,
+    domLength          queryListLen,
     char            ** prefixMappings,
     xpathCBs         * cbs,
     xpathParseVarCB  * parseVarCB,
@@ -1799,8 +1799,8 @@ int tcldom_selectNodes (
     char          *xpathQuery, *typeVar, *option, *query;
     char          *errMsg = NULL, **mappings = NULL;
     int            rc, optionIndex, localmapping = 0, cache = 0;
-    int            mappingListObjLen = 0, list = 0, hnew;
-    domLength      i, len, xpathListLen;
+    int            list = 0, hnew;
+    domLength      i, len, xpathListLen, mappingListObjLen = 0;
     xpathResultSet rs;
     Tcl_Obj       *objPtr, *objPtr1, *mappingListObj = NULL;
     Tcl_Obj       *queryObj, *result;

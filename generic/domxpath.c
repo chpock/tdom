@@ -173,11 +173,11 @@ static char *token2str[] = {
 
 typedef struct {
 
-    Token  token;
-    char  *strvalue;
-    long   intvalue;
-    double realvalue;
-    int    pos;
+    Token      token;
+    char      *strvalue;
+    dom_minl   intvalue;
+    double     realvalue;
+    domLength  pos;
 
 } XPathToken;
 
@@ -309,11 +309,21 @@ void rsPrint ( xpathResultSet *rs ) {
              break;
 
         case BoolResult:
-             fprintf(stderr, "boolean result: %ld \n", rs->intvalue);
+#if TCL_MAJOR_VERSION > 8
+            fprintf(stderr, "boolean result: %" TCL_SIZE_MODIFIER "d \n",
+#else
+            fprintf(stderr, "boolean result: %ld \n",
+#endif
+                     rs->intvalue);
              break;
 
         case IntResult:
-             fprintf(stderr, "int result: %ld \n", rs->intvalue);
+#if TCL_MAJOR_VERSION > 8
+            fprintf(stderr, "boolean result: %" TCL_SIZE_MODIFIER "d \n",
+#else
+            fprintf(stderr, "boolean result: %ld \n",
+#endif
+                     rs->intvalue);
              break;
 
         case RealResult:
@@ -399,11 +409,11 @@ void rsSetInf ( xpathResultSet *rs ) {
 void rsSetNInf ( xpathResultSet *rs ) {
     rs->type = NInfResult;
 }
-void rsSetLong ( xpathResultSet *rs, long i) {
+void rsSetLong ( xpathResultSet *rs, dom_minl i) {
     rs->type = IntResult;
     rs->intvalue = i;
 }
-void rsSetBool ( xpathResultSet *rs, long i) {
+void rsSetBool ( xpathResultSet *rs, dom_minl i) {
     rs->type = BoolResult;
     rs->intvalue = (i ? 1 : 0);
 }
@@ -433,8 +443,7 @@ void rsAddNode ( xpathResultSet *rs, domNode *node) {
         rs->nodes[0]  = node;
 
     } else {
-        int insertIndex;
-        int i;
+        domLength insertIndex, i;
 
         if (rs->intvalue) {
             /* we must do a copy-on-write */
@@ -576,7 +585,7 @@ static ast New2( astType type, ast a, ast b ) {
     return t;
 }
 
-static ast NewInt( long i ) {
+static ast NewInt( dom_minl i ) {
     ast t = NEWCONS;
 
     t->type      = Int;
@@ -668,7 +677,12 @@ void printAst (int depth, ast t)
         fprintf(stderr, "%s ", astType2str[t->type]);
         switch (t->type) {
 
-            case Int :        fprintf(stderr, "%ld", t->intvalue);   break;
+            case Int :
+#if TCL_MAJOR_VERSION > 8
+                fprintf(stderr, "%" TCL_SIZE_MODIFIER "d", t->intvalue);   break;
+#else
+                fprintf(stderr, "%ld", t->intvalue);   break;
+#endif
             case Real:        fprintf(stderr, "%f", t->realvalue);  break;
             case IsElement:
             case IsFQElement:
@@ -1659,9 +1673,9 @@ EndProduction
 |   Step  production
 |
 \----------------------------------------------------------------*/
-static long IsStepPredOptimizable (ast a) {
+static dom_minl IsStepPredOptimizable (ast a) {
     ast b;
-    long left;
+    dom_minl left;
     
     /* Must be called with a != NULL */
     DBG (
@@ -1847,7 +1861,7 @@ static int usesPositionInformation ( ast a) {
 }
 
 /* Must be called with a != NULL */
-static int checkStepPatternPredOptimizability ( ast a , long *max) {
+static int checkStepPatternPredOptimizability ( ast a , dom_minl *max) {
     ast b;
 
     switch (a->type) {
@@ -1947,7 +1961,7 @@ static int checkStepPatternPredOptimizability ( ast a , long *max) {
 }
 
 /* Must be called with a != NULL */
-static long IsStepPatternPredOptimizable ( ast a, long *max ) {
+static long IsStepPatternPredOptimizable ( ast a, dom_minl *max ) {
     long f;
 
     *max = 0;
@@ -2005,7 +2019,7 @@ Production(StepPattern)
     {
         ast b = NULL, c = NULL, aCopy = NULL;
         int stepIsOptimizable = 1, isFirst = 1;
-        long max, savedmax;
+        dom_minl max, savedmax;
         while (LA==LBRACKET) {
             b = Recurse (Predicate);
             if (!b) return a;
@@ -2322,7 +2336,8 @@ int xpathParse (
 )
 {
     XPathTokens tokens;
-    int  i, l, len, newlen, slen;
+    int  i, l;
+    size_t len, newlen, slen;
     int  useNamespaceAxis = 0;
     char tmp[200];
 
@@ -2336,7 +2351,7 @@ int xpathParse (
     }
     DDBG(
         for (i=0; tokens[i].token != EOS; i++) {
-            fprintf(stderr, "%3d %-12s %5ld %8.3g %5d  %s\n",
+            fprintf(stderr, "%3d %-12s %5ld %8.3g %5ld  %s\n",
                             i,
                             token2str[tokens[i].token-LPAR],
                             tokens[i].intvalue,
@@ -2369,7 +2384,11 @@ int xpathParse (
         memmove(*errMsg + len+6+newlen, "' ", 3);
 
         for (i=0; tokens[i].token != EOS; i++) {
+#if TCL_MAJOR_VERSION > 8
+            sprintf(tmp, "%s\n%3s%3d %-12s %5" TCL_SIZE_MODIFIER "d %09.3g %5" TCL_SIZE_MODIFIER "d  ",
+#else
             sprintf(tmp, "%s\n%3s%3d %-12s %5ld %09.3g %5d  ",
+#endif
                          (i==0) ? "\n\nParsed symbols:" : "",
                          (i==l) ? "-->" : "   ",
                           i,
@@ -2600,7 +2619,7 @@ double xpathFuncNumber (
     *NaN = 0;
     switch (rs->type) {
         case BoolResult:   return (rs->intvalue? 1.0 : 0.0);
-        case IntResult:    return rs->intvalue;
+    case IntResult:        return (double)rs->intvalue;
         case RealResult:   
             if (IS_NAN(rs->realvalue)) *NaN = 2;
             else if (IS_INF(rs->realvalue)!=0) *NaN = IS_INF(rs->realvalue);
@@ -2762,7 +2781,11 @@ char * xpathFuncString (
             if (rs->intvalue) return (tdomstrdup("true"));
                          else return (tdomstrdup("false"));
         case IntResult:
+#if TCL_MAJOR_VERSION > 8
+            sprintf(tmp, "%" TCL_SIZE_MODIFIER "d", rs->intvalue);
+#else
             sprintf(tmp, "%ld", rs->intvalue);
+#endif
             return (tdomstrdup(tmp));
 
         case RealResult:
@@ -3037,7 +3060,7 @@ xpathEvalFunction (
             if      (step->intvalue == f_floor)   leftReal = floor(leftReal);
             else if (step->intvalue == f_ceiling) leftReal = ceil(leftReal);
             else                                  leftReal = 
-                                                      xpathRound(leftReal);
+                                                      (double)xpathRound(leftReal);
             rsSetReal2 (result, leftReal);
         }
         xpathRSFree( &leftResult );
@@ -3558,11 +3581,11 @@ xpathEvalFunction (
             if (found) {
                 if (j < len) {
                     unichar = Tcl_UniCharAtIndex (replaceStr, j);
-                    utfCharLen = Tcl_UniCharToUtf (unichar, utfBuf);
+                    utfCharLen = (int)Tcl_UniCharToUtf (unichar, utfBuf);
                     Tcl_DStringAppend (&tresult, utfBuf, utfCharLen);
                 }
             } else {
-                utfCharLen = Tcl_UniCharToUtf (*upfrom, utfBuf);
+                utfCharLen = (int)Tcl_UniCharToUtf (*upfrom, utfBuf);
                 Tcl_DStringAppend (&tresult, utfBuf, utfCharLen);
             }
             upfrom++;
@@ -5886,17 +5909,17 @@ double xpathGetPrio (
 |
 \---------------------------------------------------------------------------*/
 static void nodeToXPath (
-    domNode  * node,
-    char    ** xpath,
-    int      * xpathLen,
-    int      * xpathAllocated,
-    int        legacy
+    domNode   * node,
+    char     ** xpath,
+    domLength * xpathLen,
+    domLength * xpathAllocated,
+    int         legacy
 )
 {
-    domNode *parent, *child;
-    char    step[200], *nTest;
-    int     sameNodes, nodeIndex, len;
-
+    domNode  *parent, *child;
+    char      step[200], *nTest;
+    domLength len;
+    int       sameNodes, nodeIndex;
 
     parent = node->parentNode;
     if (parent == NULL) {
@@ -5996,7 +6019,7 @@ char * xpathNodeToXPath (
 )
 {
     char  * xpath;
-    int     xpathLen, xpathAllocated;
+    domLength xpathLen, xpathAllocated;
 
 
     xpathAllocated = 100;

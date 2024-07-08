@@ -1,9 +1,9 @@
 #!tclsh
 
 if {[info tclversion] >= 9.0} {
-    load ../../unix/libtcl9tdom0.9.3.so
+    load ../../unix/libtcl9tdom0.9.4.so
 } else {
-    load ../../unix/libtdom0.9.3.so
+    load ../../unix/libtdom0.9.4.so
 }
 load ./libexample1.0.so
 

@@ -366,7 +366,8 @@ domIsHTML5CustomName (
     )
 {
     const char *p;
-    int clen, dashseen = 0;
+    domLength clen;
+    int dashseen = 0;
     Tcl_UniChar uniChar;
 
     p = str;
@@ -522,7 +523,7 @@ domIsComment (
     )
 {
     const char *p;
-    int   len, i = 0;
+    domLength len, i = 0;
     
     p = str;
     len = strlen (str);
@@ -547,7 +548,7 @@ domIsCDATA (
     )
 {
     const char *p;
-    int   len, i = 0;
+    domLength len, i = 0;
 
     p = str;
     len = strlen (str);
@@ -570,7 +571,7 @@ domIsPIValue (
     )
 {
     const char *p;
-    int   len, i = 0;
+    domLength len, i = 0;
 
     p = str;
     len = strlen (str);
@@ -1220,7 +1221,8 @@ startElement(
     domAttrNode   *attrnode, *lastAttr;
     const char   **atPtr, **idAttPtr;
     Tcl_HashEntry *h;
-    int            hnew, len, pos, idatt, newNS, result;
+    size_t         len;
+    int            hnew, pos, idatt, newNS, result;
     const char    *xmlns, *localname;
     char           tagPrefix[MAX_PREFIX_LEN];
     char           prefix[MAX_PREFIX_LEN];
@@ -1766,7 +1768,8 @@ commentHandler (
     domTextNode   *node;
     domNode       *parentNode;
     domLineColumn *lc;
-    int            len, hnew;
+    size_t         len;
+    int            hnew;
     Tcl_HashEntry *h;
 
     if (info->insideDTD) {
@@ -1846,7 +1849,8 @@ processingInstructionHandler(
     domReadInfo                  *info = userData;
     domNode                      *parentNode;
     domLineColumn                *lc;
-    int                           len,hnew;
+    size_t                        len;
+    int                           hnew;
     Tcl_HashEntry                *h;
 
     if (info->insideDTD) {
@@ -2099,8 +2103,8 @@ externalEntityRefHandler (
     if (chan == NULL) {
         do {
             done = (len < PARSE_CHUNK_SIZE);
-            status = XML_Parse (extparser, xmlstring, done ? len : PARSE_CHUNK_SIZE,
-                                done);
+            status = XML_Parse (extparser, xmlstring,
+                                (int)(done ? len : PARSE_CHUNK_SIZE), done);
             if (!done) {
                 xmlstring += PARSE_CHUNK_SIZE;
                 len -= PARSE_CHUNK_SIZE;
@@ -2138,7 +2142,7 @@ externalEntityRefHandler (
         do {
             len = Tcl_Read (chan, buf, sizeof(buf));
             done = len < sizeof(buf);
-            status = XML_Parse (extparser, buf, len, done);
+            status = XML_Parse (extparser, buf, (int)len, done);
             switch (status) {
             case XML_STATUS_ERROR:
                 interpResult = Tcl_GetStringResult(info->interp);
@@ -2272,9 +2276,8 @@ domReadDocument (
 )
 {
     int             done;
-    domLength       tclLen;
+    domLength       tclLen, len;
     enum XML_Status status;
-    size_t          len;
     domReadInfo     info;
     char            buf[8192];
     Tcl_Obj        *bufObj;
@@ -2353,7 +2356,8 @@ domReadDocument (
     if (channel == NULL) {
         do {
             done = (length < PARSE_CHUNK_SIZE);
-            status = XML_Parse (parser, xml, done ? length : PARSE_CHUNK_SIZE, done);
+            status = XML_Parse (parser, xml,
+                                (int)(done ? length : PARSE_CHUNK_SIZE), done);
             if (!done) {
                 xml += PARSE_CHUNK_SIZE;
                 length -= PARSE_CHUNK_SIZE;
@@ -2385,9 +2389,9 @@ domReadDocument (
                 str = Tcl_GetStringFromObj (bufObj, &tclLen);
             }
             if (useBinary) {
-                status = XML_Parse (parser, buf, len, done);
+                status = XML_Parse (parser, buf, (int)len, done);
             } else {
-                status = XML_Parse (parser, str, tclLen, done);
+                status = XML_Parse (parser, str, (int)tclLen, done);
             }
         } while (!done && status == XML_STATUS_OK);
     }

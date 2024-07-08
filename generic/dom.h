@@ -97,6 +97,10 @@
 /* Beginning with Tcl 9.0 the string representation of a Tcl_Obj may
  * be bigger thant 2 GByte. Therefore some API functions differ. */
 #if TCL_MAJOR_VERSION > 8
+/* Starting with Tcl 9 there are only threaded builds */
+#  ifndef TCL_THREADS
+#    define TCL_THREADS
+#  endif
 #  define domLength Tcl_Size
 #  define Tcl_SetDomLengthObj Tcl_SetWideIntObj
 #  define domLengthConversion "%" TCL_SIZE_MODIFIER "d"

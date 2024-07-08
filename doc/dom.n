@@ -249,22 +249,25 @@ with the HTML input data top level elements as
 children.
 .IP "\fB-html5\fR"
 This option is only available if tDOM was build
-with --enable-html5. Try the \fIfeatureinfo\fR method
+with --enable-html5. Use the \fIfeatureinfo\fR method
 if you need to know if this feature is build in. If
 \&\fI-html5\fR is specified, the gumbo lib html5 parser
 (https://github.com/google/gumbo-parser) is used to
 build the DOM tree. This is, as far as it goes, XML
-namespace-aware. Since this probably isn't wanted by a
-lot of users and adds only burden for no good in a lot
-of use cases \fI-html5\fR can be combined with
-\&\fI-ignorexmlns\fR, in which case all nodes and
-attributes in the DOM tree are not in an XML
-namespace. All tag and attribute names in the DOM tree
-will be lower case, even for foreign elements not in
-the xhtml, svg or mathml namespace. The DOM tree may
-include nodes, that the parser inserted because they
-are implied by the context (as <head>,
-<tbody>, etc.).
+namespace-aware (which means for example that all HTML
+elements are in the html5 namespace). Since this
+probably isn't wanted by a lot of users and adds only
+burden for no good in a lot of use cases \fI-html5\fR
+can be combined with \fI-ignorexmlns\fR, in which
+case all nodes and attributes in the DOM tree are not
+in an XML namespace. All tag and attribute names in
+the DOM tree will be lower case, even for foreign
+elements not in the xhtml, svg or mathml namespace.
+The DOM tree may include nodes, that the parser
+inserted because they are implied by the context (as
+<head>, <tbody>, etc.). Input longer than
+4 GByte byte length is not supported by the underlying
+gumbo parser.
 .IP "\fB-json\fR"
 If \fI-json\fR is specified, the \fIdata\fR is
 expected to be a valid JSON string (according to RFC
@@ -695,9 +698,18 @@ to production 6 of the of the Namespaces in XML recommendation. Otherwise it ret
 a valid XML Char according to production 2 of the XML 1.0
 recommendation. Otherwise it returns 0.
 .TP
-\&\fB\fBdom\fP \fBclearString\fP \fIstring\fB
-\&\fRReturns the string given as argument cleared out from any characters not
-allowed as XML parsed character data.
+\&\fB\fBdom\fP \fBisHTML5CustomName\fP \fIstring\fB
+\&\fRReturns 1 if \fIstring\fR is a HTML5 valid custom
+element name (according to
+https://html.spec.whatwg.org/#valid-custom-element-name at
+26 June 2024, it's a living standard). Otherwise it returns
+0.
+.TP
+\&\fB\fBdom\fP \fBclearString\fP ?\fI-replace\fB? \fIstring\fB
+\&\fRReturns the string given as argument cleared out from
+any characters not allowed as XML parsed character data. If
+the \fI-replace\fR option is given then instead of removing
+such characters are replaced with \euFFFD.
 .TP
 \&\fB\fBdom\fP \fBisBMPCharData\fP \fIstring\fB
 \&\fRReturns 1 if every character in \fIstring\fR is

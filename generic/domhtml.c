@@ -2342,7 +2342,8 @@ static void TranslateEntityRefs (
     int h;       /* A hash on the entity reference */
     char *zVal;  /* The substituted value */
     Er *p;       /* For looping down the entity reference collision chain */
-    int value, zlen, overlen; 
+    int value, overlen;
+    domLength  zlen;
     char *ole, *newNodeValue;
     
     if (textOrAtt->nodeType == ATTRIBUTE_NODE) {
@@ -2562,7 +2563,7 @@ HTML_SimpleParse (
     register int   c;          /* Next character of the input file */
     register char *pn, *e;
     register char *x, *start, *piSep;
-    int            saved;
+    char           savedChar;
     int            hasContent;
     domNode       *pnode;
     domNode       *node = NULL, *parent_node = parent;
@@ -3106,9 +3107,9 @@ HTML_SimpleParse (
             lastAttr = NULL;
             while ( (c=*x) && (c!='/') && (c!='>') && (c!='<') ) {
                 char *ArgName = x;
-                int nArgName;
+                domLength nArgName;
                 char *ArgVal = NULL;
-                int nArgVal = 0;
+                domLength nArgVal = 0;
 
                 while ((c=*x)!=0 && c!='=' && c!='>' && !SPACE(c) ) {
                     *x = tolower(c);
@@ -3126,7 +3127,7 @@ HTML_SimpleParse (
                     while (SPACE(*x)) {
                         x++;
                     }
-                    saved = *(ArgName + nArgName);
+                    savedChar = *(ArgName + nArgName);
                     *(ArgName + nArgName) = '\0'; /* terminate arg name */
 
                     if (*x=='>' || *x==0) {
@@ -3160,7 +3161,7 @@ HTML_SimpleParse (
                     }
                 } else {
                     /* attribute without value, like 'nowrap' */
-                    saved = *(ArgName + nArgName);
+                    savedChar = *(ArgName + nArgName);
                     *(ArgName + nArgName) = '\0'; /* terminate arg name */
                     ArgVal = ArgName;
                     nArgVal = nArgName;
@@ -3206,7 +3207,7 @@ HTML_SimpleParse (
                 }
                 lastAttr = attrnode;
 
-                *(ArgName + nArgName) = saved;
+                *(ArgName + nArgName) = savedChar;
 
                 while (SPACE(*x)) {
                     x++;

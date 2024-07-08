@@ -1194,13 +1194,13 @@ test dom-3.46 {isHTML5CustomName} {
         ab-c
         ab-C
         -ab
-        äb-c
+        \u00E4b-c
         ab---c
         ab-
-        ab-ᴨ
-        aÄ-b
+        ab-\u1d28
+        a\u00C4-b
         aA-b
-        aä-b
+        a\u00E4-b
         0n-foo
         A-b
         font-face

@@ -4,17 +4,17 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x55e7844b14c0">NAME</a> · <a href="#SECTid0x55e7844e4580">SYNOPSIS</a> · <a href="#SECTid0x55e784589850">DESCRIPTION </a> · <a href="#SECTid0x55e7845f3c00">KEYWORDS</a>
+<a href="#SECTid0x5607ea0eccd0">NAME</a> · <a href="#SECTid0x5607ea120250">SYNOPSIS</a> · <a href="#SECTid0x5607ea120850">DESCRIPTION </a> · <a href="#SECTid0x5607ea09d0c0">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x55e7844b14c0">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x5607ea0eccd0">NAME</a></h2><p class="namesection">
 <b class="names">dom - </b><br>Create an in-memory DOM tree from XML</p>
   
-  <h2><a name="SECTid0x55e7844e4580">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x5607ea120250">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">dom</b> <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
 
-  <h2><a name="SECTid0x55e784589850">DESCRIPTION </a></h2><p>This command provides the creation of DOM trees in memory. In
+  <h2><a name="SECTid0x5607ea120850">DESCRIPTION </a></h2><p>This command provides the creation of DOM trees in memory. In
 the usual case a string containing a XML information is parsed and converted
 into a DOM tree. Other possible parse input may be HTML or JSON.
 The <i class="m">method</i> indicates a specific subcommand. </p><p>The valid methods are:</p><dl class="commandlist">
@@ -84,22 +84,25 @@ rename $document ""</pre>
               
                 <dt><b>-html5</b></dt>
                 <dd>This option is only available if tDOM was build
-                with --enable-html5. Try the <i class="m">featureinfo</i> method
+                with --enable-html5. Use the <i class="m">featureinfo</i> method
                 if you need to know if this feature is build in. If
                 <i class="m">-html5</i> is specified, the gumbo lib html5 parser
                 (https://github.com/google/gumbo-parser) is used to
                 build the DOM tree. This is, as far as it goes, XML
-                namespace-aware. Since this probably isn't wanted by a
-                lot of users and adds only burden for no good in a lot
-                of use cases <i class="m">-html5</i> can be combined with
-                <i class="m">-ignorexmlns</i>, in which case all nodes and
-                attributes in the DOM tree are not in an XML
-                namespace. All tag and attribute names in the DOM tree
-                will be lower case, even for foreign elements not in
-                the xhtml, svg or mathml namespace. The DOM tree may
-                include nodes, that the parser inserted because they
-                are implied by the context (as &lt;head&gt;,
-                &lt;tbody&gt;, etc.).</dd>
+                namespace-aware (which means for example that all HTML
+                elements are in the html5 namespace). Since this
+                probably isn't wanted by a lot of users and adds only
+                burden for no good in a lot of use cases <i class="m">-html5</i>
+                can be combined with <i class="m">-ignorexmlns</i>, in which
+                case all nodes and attributes in the DOM tree are not
+                in an XML namespace. All tag and attribute names in
+                the DOM tree will be lower case, even for foreign
+                elements not in the xhtml, svg or mathml namespace.
+                The DOM tree may include nodes, that the parser
+                inserted because they are implied by the context (as
+                &lt;head&gt;, &lt;tbody&gt;, etc.). Input longer than
+                4 GByte byte length is not supported by the underlying
+                gumbo parser. </dd>
               
 
               
@@ -640,10 +643,23 @@ recommendation. Otherwise it returns 0.</dd>
 
         
           <dt>
-<b class="cmd">dom</b> <b class="method">clearString</b> <i class="m">string</i>
+<b class="cmd">dom</b> <b class="method">isHTML5CustomName</b> <i class="m">string</i>
 </dt>
-          <dd>Returns the string given as argument cleared out from any characters not
-          allowed as XML parsed character data.</dd>
+          <dd>Returns 1 if <i class="m">string</i> is a HTML5 valid custom
+          element name (according to
+          https://html.spec.whatwg.org/#valid-custom-element-name at
+          26 June 2024, it's a living standard). Otherwise it returns
+          0.</dd>
+        
+        
+        
+          <dt>
+<b class="cmd">dom</b> <b class="method">clearString</b> ?<i class="m">-replace</i>? <i class="m">string</i>
+</dt>
+          <dd>Returns the string given as argument cleared out from
+          any characters not allowed as XML parsed character data. If
+          the <i class="m">-replace</i> option is given then instead of removing
+          such characters are replaced with \uFFFD.</dd>
         
         
         
@@ -771,7 +787,7 @@ recommendation. Otherwise it returns 0.</dd>
         
     </dl>
 
-<h2><a name="SECTid0x55e7845f3c00">KEYWORDS</a></h2><p class="keywords">
+<h2><a name="SECTid0x5607ea09d0c0">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-XML">XML</a>, <a class="keyword" href="keyword-index.html#KW-DOM">DOM</a>, <a class="keyword" href="keyword-index.html#KW-document">document</a>, <a class="keyword" href="keyword-index.html#KW-node">node</a>, <a class="keyword" href="keyword-index.html#KW-parsing">parsing</a>
 </p>
 </div><hr class="navsep"><div class="navbar" align="center">

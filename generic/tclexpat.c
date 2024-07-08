@@ -976,8 +976,7 @@ TclExpatParse (
     TclExpat_InputType type
 ) {
   int result, mode, done;
-  domLength strlen;
-  size_t bytesread;
+  domLength strlen, bytesread;
   char s[255], buf[8*1024];
   int fd;
   XML_Parser  parser;
@@ -1016,7 +1015,7 @@ TclExpatParse (
       expat->parsingState = 2;
       do {
           done = (len < PARSE_CHUNK_SIZE);
-          result = XML_Parse(expat->parser, data, len,
+          result = XML_Parse(expat->parser, data, (int)len,
                              done ? expat->final : 0);
           if (!done) {
               data += PARSE_CHUNK_SIZE;
@@ -1054,7 +1053,7 @@ TclExpatParse (
           do {
               bytesread = Tcl_Read (channel, buf, sizeof (buf));
               done = bytesread < sizeof (buf);
-              result = XML_Parse (expat->parser, buf, bytesread, done);
+              result = XML_Parse (expat->parser, buf, (int)bytesread, done);
               if (result != XML_STATUS_OK) break;
           } while (!done);
       } else {
@@ -1065,7 +1064,7 @@ TclExpatParse (
               len = Tcl_ReadChars (channel, bufObj, 1024, 0);
               done = (len < 1024);
               str = Tcl_GetStringFromObj (bufObj, &strlen);
-              result = XML_Parse (expat->parser, str, strlen, done);
+              result = XML_Parse (expat->parser, str, (int)strlen, done);
               if (result != XML_STATUS_OK) break;
           } while (!done);
           /* In case of a parsing error we need the string rep of the
@@ -1090,7 +1089,7 @@ TclExpatParse (
       parser = expat->parser;
       expat->parsingState = 2;
       for (;;) {
-          int nread;
+          domLength nread;
           char *fbuf = XML_GetBuffer (parser, TDOM_EXPAT_READ_SIZE);
           if (!fbuf) {
               close (fd);
@@ -1108,7 +1107,7 @@ TclExpatParse (
               expat->parsingState = 1;
               return TCL_ERROR;
           }
-          result = XML_ParseBuffer (parser, nread, nread == 0);
+          result = XML_ParseBuffer (parser, (int)nread, nread == 0);
           if (result != XML_STATUS_OK || !nread) {
               close (fd);
               break;
@@ -1266,7 +1265,8 @@ TclExpatConfigure (
   int optionIndex, value, bool;
   Tcl_Obj *const *objPtr = objv;
   Tcl_CmdInfo cmdInfo;
-  int rc, len;
+  int rc;
+  domLength len;
   char *handlerSetName = NULL;
   TclHandlerSet *tmpTclHandlerSet, *activeTclHandlerSet = NULL;
   Tcl_UniChar uniChar;
@@ -2021,7 +2021,7 @@ TclExpatCget (
 
         if (expat->nsSeparator) {
             uniChar = expat->nsSeparator;
-            len = Tcl_UniCharToUtf (uniChar, utfBuf);
+            len = (int) Tcl_UniCharToUtf (uniChar, utfBuf);
             Tcl_DStringInit (&dStr);
             Tcl_DStringAppend (&dStr, utfBuf, len);
             Tcl_DStringResult (interp, &dStr);
@@ -3636,7 +3636,7 @@ TclGenExpatExternalEntityRefHandler(
       case EXPAT_INPUT_STRING:
           do {
               done = (tclLen < PARSE_CHUNK_SIZE);
-              result = XML_Parse(extparser, dataStr, tclLen, done);
+              result = XML_Parse(extparser, dataStr, (int)tclLen, done);
               if (!done) {
                   dataStr += PARSE_CHUNK_SIZE;
                   tclLen -= PARSE_CHUNK_SIZE;
@@ -3666,7 +3666,7 @@ TclGenExpatExternalEntityRefHandler(
           do {
               len = Tcl_Read (chan, buf, sizeof (buf));
               done = len < sizeof (buf);
-              result = XML_Parse (extparser, buf, len, done);
+              result = XML_Parse (extparser, buf, (int)len, done);
               if (result != XML_STATUS_OK) break;
           } while (!done);
           Tcl_UnregisterChannel (expat->interp, chan);
@@ -3687,7 +3687,7 @@ TclGenExpatExternalEntityRefHandler(
           }
           result = 1;
           for (;;) {
-              int nread;
+              size_t nread;
               char *fbuf = XML_GetBuffer (extparser, TDOM_EXPAT_READ_SIZE);
               if (!fbuf) {
                   close (fd);
@@ -3708,7 +3708,7 @@ TclGenExpatExternalEntityRefHandler(
                                          ERROR_IN_EXTREFHANDLER);
                   return 0;
               }
-              result = XML_ParseBuffer (extparser, nread, nread == 0);
+              result = XML_ParseBuffer (extparser, (int)nread, nread == 0);
               if (result != XML_STATUS_OK || !nread) {
                   close (fd);
                   break;

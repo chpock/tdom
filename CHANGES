@@ -1,4 +1,6 @@
 
+--- Release 0.9.4,  <tbd> ---
+
 2024-07-02  Rolf Ade  <rolf@pointsman.de>
 
         Added the isHTML5CustomName method to the dom command. The

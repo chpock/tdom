@@ -921,14 +921,15 @@ static xsltNumberFormat* xsltNumberFormatTokenizer (
 static void formatValue (
     xsltNumberFormat *f,
     int              *useFormatToken,
-    int               value,
+    domLength         value,
     Tcl_DString      *str,
     char             *groupingSeparator,
     long              groupingSize,
     int               addSeparater
 )
 {
-    int         len, fulllen, gslen, upper = 0, e, m, b, i, z, v;
+    domLength   len, fulllen, gslen, m, i;
+    int         upper = 0, e, b, v, z;
     char        tmp[80], *pt;
     Tcl_DString tmp1;
     static struct { char *digit; char *ldigit; int value; } RomanDigit[] = {
@@ -949,7 +950,7 @@ static void formatValue (
 
     switch (f->tokens[*useFormatToken].type) {
     case latin_number:
-        sprintf (tmp, "%d", value);
+        sprintf (tmp, "%" TCL_SIZE_MODIFIER "d", value);
         fulllen = len = strlen (tmp);
         if (f->tokens[*useFormatToken].minlength > fulllen) {
             fulllen = f->tokens[*useFormatToken].minlength;
@@ -1002,7 +1003,7 @@ static void formatValue (
                What to do? One of the several cases, not mentioned
                by the spec. */
             /* fall back to latin numbers */
-            sprintf (tmp, "%d", value);
+            sprintf (tmp, "%" TCL_SIZE_MODIFIER "d", value);
             break;
         }
         e = 1;
@@ -1016,7 +1017,7 @@ static void formatValue (
         value -= m;
         for (i = 0; i < e; i++) {
             b /= 26;
-            z = value / b;
+            z = (int)(value / b);
             value = value - z*b;
             if (i < e -1) {
                 if (value == 0) {
@@ -1047,7 +1048,7 @@ static void formatValue (
 
         if (value > 3999 || value <= 0) {
             /* fall back to latin numbers */
-            sprintf (tmp, "%d", value);
+            sprintf (tmp, "%" TCL_SIZE_MODIFIER "d", value);
             break;
         }
         if (value == 0) {
@@ -1067,7 +1068,7 @@ static void formatValue (
         break;
 
     default:
-        sprintf (tmp, "%d", value);
+        sprintf (tmp, "%" TCL_SIZE_MODIFIER "d", value);
         break;
     }
     len = strlen (tmp);
@@ -1149,11 +1150,12 @@ static int xsltFormatNumber (
     Tcl_UniChar uniCharNull = '\0';
     char stmp[240], ftmp[80], *tstr;
     char wrongFormat[] = "Unable to interpret format pattern.";
-    int i, j, k, l, zl, g, nHash, nZero, fHash, fZero, gLen, isNeg;
+    domLength l, zl, gLen;
+    int i, j, k, g, nHash, nZero, fHash, fZero, isNeg;
     int prefixMinux, percentMul = 0, perMilleMul = 0;
     Tcl_DString  dStr, s;
     Tcl_UniChar *format, *negformat = NULL, *p, *p1;
-    DBG(Tcl_DString dbStr;)
+    DBG(Tcl_DString bStr;)
 
     DBG(fprintf(stderr, "number: '%f'\nformatStr='%s' \n", number, formatStr);)
     prefix1[0] = '\0';
@@ -1758,7 +1760,8 @@ static void StripXMLSpace (
 )
 {
     domNode       *child, *newChild, *parent;
-    int            i, len, onlySpace, found, strip;
+    size_t         i, len;
+    int            onlySpace, found, strip;
     char          *p, prefix[MAX_PREFIX_LEN];
     const char    *localName;
     double        *f;
@@ -1876,7 +1879,7 @@ static int xsltXPathFuncs (
     void            * clientData,
     char            * funcName,
     domNode         * ctxNode,
-    int               ctxPos,
+    domLength         ctxPos,
     xpathResultSet  * ctx,
     domNode         * exprContext,
     int               argc,
@@ -2295,7 +2298,7 @@ static int nodeGreater (
 {
     int             rc;
     char           *strAptr, *strBptr;
-    int             lenA, lenB, len;
+    domLength       lenA, lenB, len;
     Tcl_UniChar     unicharA, unicharB;
 
     *greater = 0;
@@ -3423,8 +3426,8 @@ static int xsltNumber (
 )
 {
     xpathResultSet    rs;
-    int               rc, NaN, hnew, i, useFormatToken, vVals = 0;
-    domLength         vs[20], *v, *vd = NULL;
+    int               rc, NaN, hnew, i, useFormatToken;
+    domLength         vs[20], *v, *vd = NULL, vVals = 0;
     long              groupingSize = 0;
     char             *value, *level, *count, *from, *str, *str1, *format;
     char             *groupingSeparator = NULL, *groupingSizeStr = NULL;
@@ -5511,7 +5514,8 @@ static void StripXSLTSpace (
 )
 {
     domNode *child, *newChild, *parent;
-    int     i, len, onlySpace;
+    domLength i, len;
+    int onlySpace;
     char   *p;
 
     if (node->nodeType == TEXT_NODE) {
