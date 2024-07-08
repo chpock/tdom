@@ -35,6 +35,9 @@
 
 #include <tcl.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* The following procs are defined in tcldom.c - since they are used
  * in nodecmd.c these need a prototype somewhere. The prototypes can
@@ -50,8 +53,10 @@ void tcldom_createNodeObj(Tcl_Interp * interp, domNode *node,
                           char *objCmdName);
 
 domNode * tcldom_getNodeFromObj(Tcl_Interp  *interp, Tcl_Obj *nodeObj);
+#ifndef __TDOM_H
 domDocument * tcldom_getDocumentFromName(Tcl_Interp *interp,
 				char *docName, char **errMsg);
+#endif
 int tcldom_prefixNSlist (char ***prefixnsPtr, Tcl_Interp *interp, int objc,
                          Tcl_Obj *const objv[], const char *methodName);
 int tcldom_setInterpAndReturnVar (Tcl_Interp *interp, domNode *node,
@@ -89,6 +94,9 @@ void tcldom_reportErrorLocation (
     const char *errStr
     );
 
+#ifdef __cplusplus
+}
+#endif
 
 #if defined(_MSC_VER) || defined(__MINGW32__)
 #  undef TCL_STORAGE_CLASS
@@ -100,6 +108,7 @@ void tcldom_reportErrorLocation (
 EXTERN int Tdom_Init     (Tcl_Interp *interp);
 EXTERN int Tdom_SafeInit (Tcl_Interp *interp);
 
+    
 #endif
 
 

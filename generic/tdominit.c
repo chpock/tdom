@@ -35,8 +35,6 @@
 |   Includes
 |
 \---------------------------------------------------------------------------*/
-#include <tcl.h>
-#include <dom.h>
 #include <tdom.h>
 #include <tcldom.h>
 #include <tclpull.h>
