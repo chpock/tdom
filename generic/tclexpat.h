@@ -1,3 +1,7 @@
+
+#ifndef __TCL_EXPAT_H__
+#define __TCL_EXPAT_H__
+
 #include <tcl.h>
 #include <expat.h>
 #include "dom.h"
@@ -154,11 +158,7 @@ typedef struct TclGenExpatInfo {
 |
 \-------------------------------------------------------------------------*/
 
-#if defined(_MSC_VER) || defined(BUILD_tdom) || defined(__MINGW32__) 
-#  undef TCL_STORAGE_CLASS
-#  define TCL_STORAGE_CLASS DLLEXPORT
-#endif
-
+#ifndef __TDOM_H
 Tcl_ObjCmdProc TclExpatObjCmd;
 
 int CheckExpatParserObj (Tcl_Interp *interp,
@@ -179,3 +179,6 @@ void * CHandlerSetGetUserData (Tcl_Interp *interp,
 
 TclGenExpatInfo * GetExpatInfo (Tcl_Interp *interp,
 				       Tcl_Obj *const expatObj);
+#endif
+
+#endif 

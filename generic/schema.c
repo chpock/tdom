@@ -21,7 +21,7 @@
 |
 \---------------------------------------------------------------------------*/
 
-#include <tdom.h>
+#include <dom.h>
 #include <tcldom.h>
 #include <domxpath.h>
 #include <domjson.h>
@@ -4779,8 +4779,8 @@ externalEntityRefHandler (
     if (chan == NULL) {
         do {
             done = (len < PARSE_CHUNK_SIZE);
-            status = XML_Parse (extparser, xmlstring, done ? len : PARSE_CHUNK_SIZE,
-                                done);
+            status = XML_Parse (extparser, xmlstring,
+                                (int)(done ? len : PARSE_CHUNK_SIZE), done);
             if (!done) {
                 xmlstring += PARSE_CHUNK_SIZE;
                 len -= PARSE_CHUNK_SIZE;
@@ -4817,7 +4817,7 @@ externalEntityRefHandler (
         do {
             len = Tcl_Read (chan, buf, sizeof(buf));
             done = len < sizeof(buf);
-            status = XML_Parse (extparser, buf, len, done);
+            status = XML_Parse (extparser, buf, (int)len, done);
             switch (status) {
             case XML_STATUS_ERROR:
                 interpResult = Tcl_GetStringResult(vdata->interp);
@@ -5018,7 +5018,8 @@ static int validateSource (
         result = TCL_OK;
         do {
             done = (len < PARSE_CHUNK_SIZE);
-            if (XML_Parse (parser, xmlstr, done ? len : PARSE_CHUNK_SIZE, done)
+            if (XML_Parse (parser, xmlstr,
+                           (int)(done ? len : PARSE_CHUNK_SIZE), done)
                 != XML_STATUS_OK
                 || sdata->validationState == VALIDATION_ERROR) {
                 validateReportError (interp, sdata, parser);
@@ -5048,7 +5049,7 @@ static int validateSource (
             goto cleanup;
         }
         for (;;) {
-            int nread;
+            domLength nread;
             char *fbuf = XML_GetBuffer (parser, TDOM_EXPAT_READ_SIZE);
             if (!fbuf) {
                 close (fd);
@@ -5066,7 +5067,7 @@ static int validateSource (
                 result = TCL_ERROR;
                 goto cleanup;
             }
-            result = XML_ParseBuffer (parser, nread, nread == 0);
+            result = XML_ParseBuffer (parser, (int)nread, nread == 0);
             if (result != XML_STATUS_OK || !nread
                 || sdata->validationState == VALIDATION_ERROR) {
                 close (fd);
@@ -5098,7 +5099,7 @@ static int validateSource (
             len = Tcl_ReadChars (channel, bufObj, 1024, 0);
             done = (len < 1024);
             str = Tcl_GetStringFromObj(bufObj, &tclLen);
-            rc = XML_Parse (parser, str, tclLen, done);
+            rc = XML_Parse (parser, str, (int)tclLen, done);
             if (rc != XML_STATUS_OK 
                 || sdata->validationState == VALIDATION_ERROR) {
                 validateReportError (interp, sdata, parser);

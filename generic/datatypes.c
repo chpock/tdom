@@ -21,7 +21,7 @@
 |
 \---------------------------------------------------------------------------*/
 
-#include <tdom.h>
+#include <dom.h>
 #include <stdint.h>
 #include <domjson.h>
 #include <schema.h>

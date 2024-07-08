@@ -106,13 +106,13 @@ typedef unsigned int SchemaFlags;
 #define ANY_NOT              1024 
 
 typedef struct domKeyConstraint {
-    char  *name;
-    ast    selector;
-    ast   *fields;
-    int    nrFields;
-    int    flags;
-    char  *emptyFieldSetValue;
-    int    efsv_len;
+    char     *name;
+    ast       selector;
+    ast      *fields;
+    domLength nrFields;
+    int       flags;
+    char     *emptyFieldSetValue;
+    size_t    efsv_len;
     struct domKeyConstraint *next;
 } domKeyConstraint;
 

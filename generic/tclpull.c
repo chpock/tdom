@@ -23,7 +23,7 @@
 
 #ifndef TDOM_NO_PULL
 
-#include <tdom.h>
+#include <dom.h>
 #include <fcntl.h>
 #ifdef _MSC_VER
 #include <io.h>
@@ -435,7 +435,7 @@ tDOM_resumeParseing (
                     pullInfo->channelReadBuf, &len
                     );
                 result = XML_Parse (pullInfo->parser, data,
-                                    len, done);
+                                    (int)len, done);
             } while (result == XML_STATUS_OK && !done);
         } else {
             /* inputfile */
@@ -447,7 +447,7 @@ tDOM_resumeParseing (
                             TDOM_EXPAT_READ_SIZE);
                 done = (len < TDOM_EXPAT_READ_SIZE);
                 result = XML_ParseBuffer (pullInfo->parser,
-                                          len, done);
+                                          (int)len, done);
             } while (result == XML_STATUS_OK && !done);
         }
         if (result == XML_STATUS_ERROR) {
@@ -629,7 +629,7 @@ tDOM_PullParserInstanceCmd (
                         len = read(pullInfo->inputfd, fbuf,
                                    TDOM_EXPAT_READ_SIZE);
                         result = XML_ParseBuffer (pullInfo->parser,
-                                                  len, len == 0);
+                                                  (int)len, len == 0);
                     } while (result == XML_STATUS_OK);
                 } else if (pullInfo->inputChannel) {
                     do {
@@ -637,14 +637,15 @@ tDOM_PullParserInstanceCmd (
                                              pullInfo->channelReadBuf,
                                              1024, 0);
                         data = Tcl_GetString (pullInfo->channelReadBuf);
-                        result = XML_Parse (pullInfo->parser, data, len,
+                        result = XML_Parse (pullInfo->parser, data, (int)len,
                                             len == 0);
                     } while (result == XML_STATUS_OK);
                 } else {
                     data = Tcl_GetStringFromObj(pullInfo->inputString, &len);
                     do {
                         done = (len < PARSE_CHUNK_SIZE);
-                        result = XML_Parse (pullInfo->parser, data, len, done);
+                        result = XML_Parse (pullInfo->parser, data, (int)len,
+                                            done);
                         if (!done) {
                             data += PARSE_CHUNK_SIZE;
                             len -= PARSE_CHUNK_SIZE;
