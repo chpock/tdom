@@ -523,7 +523,7 @@ domIsComment (
     )
 {
     const char *p;
-    size_t len, i = 0;
+    domLength len, i = 0;
     
     p = str;
     len = strlen (str);
@@ -548,7 +548,7 @@ domIsCDATA (
     )
 {
     const char *p;
-    size_t len, i = 0;
+    domLength len, i = 0;
 
     p = str;
     len = strlen (str);
@@ -571,7 +571,7 @@ domIsPIValue (
     )
 {
     const char *p;
-    size_t len, i = 0;
+    domLength len, i = 0;
 
     p = str;
     len = strlen (str);

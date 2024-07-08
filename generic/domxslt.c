@@ -1150,7 +1150,7 @@ static int xsltFormatNumber (
     Tcl_UniChar uniCharNull = '\0';
     char stmp[240], ftmp[80], *tstr;
     char wrongFormat[] = "Unable to interpret format pattern.";
-    size_t l, zl, gLen;
+    domLength l, zl, gLen;
     int i, j, k, g, nHash, nZero, fHash, fZero, isNeg;
     int prefixMinux, percentMul = 0, perMilleMul = 0;
     Tcl_DString  dStr, s;
