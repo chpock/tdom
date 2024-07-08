@@ -1399,7 +1399,7 @@ int tcldom_xpathFuncCallBack (
     void            *clientData,
     char            *functionName,
     domNode         *ctxNode,
-    int              position,
+    domLength        position,
     xpathResultSet  *nodeList,
     domNode         *UNUSED(exprContext),
     int              argc,

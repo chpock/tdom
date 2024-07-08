@@ -928,8 +928,8 @@ static void formatValue (
     int               addSeparater
 )
 {
-    size_t      len, fulllen, gslen, m, i;
-    int         upper = 0, e, b, z, v;
+    domLength   len, fulllen, gslen, m, i;
+    int         upper = 0, e, b, v, z;
     char        tmp[80], *pt;
     Tcl_DString tmp1;
     static struct { char *digit; char *ldigit; int value; } RomanDigit[] = {
@@ -950,7 +950,7 @@ static void formatValue (
 
     switch (f->tokens[*useFormatToken].type) {
     case latin_number:
-        sprintf (tmp, "%d", value);
+        sprintf (tmp, "%" TCL_SIZE_MODIFIER "d", value);
         fulllen = len = strlen (tmp);
         if (f->tokens[*useFormatToken].minlength > fulllen) {
             fulllen = f->tokens[*useFormatToken].minlength;
@@ -1003,7 +1003,7 @@ static void formatValue (
                What to do? One of the several cases, not mentioned
                by the spec. */
             /* fall back to latin numbers */
-            sprintf (tmp, "%d", value);
+            sprintf (tmp, "%" TCL_SIZE_MODIFIER "d", value);
             break;
         }
         e = 1;
@@ -1017,7 +1017,7 @@ static void formatValue (
         value -= m;
         for (i = 0; i < e; i++) {
             b /= 26;
-            z = value / b;
+            z = (int)(value / b);
             value = value - z*b;
             if (i < e -1) {
                 if (value == 0) {
@@ -1048,7 +1048,7 @@ static void formatValue (
 
         if (value > 3999 || value <= 0) {
             /* fall back to latin numbers */
-            sprintf (tmp, "%d", value);
+            sprintf (tmp, "%" TCL_SIZE_MODIFIER "d", value);
             break;
         }
         if (value == 0) {
@@ -1068,7 +1068,7 @@ static void formatValue (
         break;
 
     default:
-        sprintf (tmp, "%d", value);
+        sprintf (tmp, "%" TCL_SIZE_MODIFIER "d", value);
         break;
     }
     len = strlen (tmp);
@@ -1879,7 +1879,7 @@ static int xsltXPathFuncs (
     void            * clientData,
     char            * funcName,
     domNode         * ctxNode,
-    int               ctxPos,
+    domLength         ctxPos,
     xpathResultSet  * ctx,
     domNode         * exprContext,
     int               argc,

@@ -2103,8 +2103,8 @@ externalEntityRefHandler (
     if (chan == NULL) {
         do {
             done = (len < PARSE_CHUNK_SIZE);
-            status = XML_Parse (extparser, xmlstring, done ? len : PARSE_CHUNK_SIZE,
-                                done);
+            status = XML_Parse (extparser, xmlstring,
+                                (int)(done ? len : PARSE_CHUNK_SIZE), done);
             if (!done) {
                 xmlstring += PARSE_CHUNK_SIZE;
                 len -= PARSE_CHUNK_SIZE;
@@ -2142,7 +2142,7 @@ externalEntityRefHandler (
         do {
             len = Tcl_Read (chan, buf, sizeof(buf));
             done = len < sizeof(buf);
-            status = XML_Parse (extparser, buf, len, done);
+            status = XML_Parse (extparser, buf, (int)len, done);
             switch (status) {
             case XML_STATUS_ERROR:
                 interpResult = Tcl_GetStringResult(info->interp);
@@ -2276,9 +2276,8 @@ domReadDocument (
 )
 {
     int             done;
-    domLength       tclLen;
+    domLength       tclLen, len;
     enum XML_Status status;
-    size_t          len;
     domReadInfo     info;
     char            buf[8192];
     Tcl_Obj        *bufObj;
@@ -2357,7 +2356,8 @@ domReadDocument (
     if (channel == NULL) {
         do {
             done = (length < PARSE_CHUNK_SIZE);
-            status = XML_Parse (parser, xml, done ? length : PARSE_CHUNK_SIZE, done);
+            status = XML_Parse (parser, xml,
+                                (int)(done ? length : PARSE_CHUNK_SIZE), done);
             if (!done) {
                 xml += PARSE_CHUNK_SIZE;
                 length -= PARSE_CHUNK_SIZE;
@@ -2389,9 +2389,9 @@ domReadDocument (
                 str = Tcl_GetStringFromObj (bufObj, &tclLen);
             }
             if (useBinary) {
-                status = XML_Parse (parser, buf, len, done);
+                status = XML_Parse (parser, buf, (int)len, done);
             } else {
-                status = XML_Parse (parser, str, tclLen, done);
+                status = XML_Parse (parser, str, (int)tclLen, done);
             }
         } while (!done && status == XML_STATUS_OK);
     }

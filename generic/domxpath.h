@@ -94,7 +94,7 @@ typedef struct astElem {
     struct astElem *child;
     struct astElem *next;
     char           *strvalue;
-    long            intvalue;
+    domLength       intvalue;
     double          realvalue;
 } astElem;
 
@@ -116,7 +116,7 @@ typedef struct xpathResultSet {
     xpathResultType type;
     char           *string;
     domLength       string_len;
-    long            intvalue;
+    domLength       intvalue;
     double          realvalue;          
     domNode       **nodes;
     domLength       nr_nodes;
@@ -200,8 +200,8 @@ char * xpathGetStringValue (domNode *node, domLength *strLen);
 
 char * xpathNodeToXPath  (domNode *node, int legacy);
     
-void rsSetBool      ( xpathResultSet *rs, long         i    );
-void rsSetLong      ( xpathResultSet *rs, long         i    );
+void rsSetBool      ( xpathResultSet *rs, domLength    i    );
+void rsSetLong      ( xpathResultSet *rs, domLength    i    );
 void rsSetReal      ( xpathResultSet *rs, double       d    );
 void rsSetReal2     ( xpathResultSet *rs, double       d    );
 void rsSetString    ( xpathResultSet *rs, const char  *s    );
@@ -220,7 +220,7 @@ int tcldom_xpathFuncCallBack (
     void            *clientData,
     char            *functionName,
     domNode         *ctxNode,
-    int              position,
+    domLength       position,
     xpathResultSet  *nodeList,
     domNode         *exprContext,
     int              argc,

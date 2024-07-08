@@ -173,11 +173,11 @@ static char *token2str[] = {
 
 typedef struct {
 
-    Token  token;
-    char  *strvalue;
-    long   intvalue;
-    double realvalue;
-    long   pos;
+    Token      token;
+    char      *strvalue;
+    domLength  intvalue;
+    double     realvalue;
+    domLength  pos;
 
 } XPathToken;
 
@@ -309,11 +309,13 @@ void rsPrint ( xpathResultSet *rs ) {
              break;
 
         case BoolResult:
-             fprintf(stderr, "boolean result: %ld \n", rs->intvalue);
+             fprintf(stderr, "boolean result: %" TCL_SIZE_MODIFIER "d \n",
+                     rs->intvalue);
              break;
 
         case IntResult:
-             fprintf(stderr, "int result: %ld \n", rs->intvalue);
+             fprintf(stderr, "int result: %" TCL_SIZE_MODIFIER "d \n",
+                     rs->intvalue);
              break;
 
         case RealResult:
@@ -399,11 +401,11 @@ void rsSetInf ( xpathResultSet *rs ) {
 void rsSetNInf ( xpathResultSet *rs ) {
     rs->type = NInfResult;
 }
-void rsSetLong ( xpathResultSet *rs, long i) {
+void rsSetLong ( xpathResultSet *rs, domLength i) {
     rs->type = IntResult;
     rs->intvalue = i;
 }
-void rsSetBool ( xpathResultSet *rs, long i) {
+void rsSetBool ( xpathResultSet *rs, domLength i) {
     rs->type = BoolResult;
     rs->intvalue = (i ? 1 : 0);
 }
@@ -575,7 +577,7 @@ static ast New2( astType type, ast a, ast b ) {
     return t;
 }
 
-static ast NewInt( long i ) {
+static ast NewInt( domLength i ) {
     ast t = NEWCONS;
 
     t->type      = Int;
@@ -667,7 +669,8 @@ void printAst (int depth, ast t)
         fprintf(stderr, "%s ", astType2str[t->type]);
         switch (t->type) {
 
-            case Int :        fprintf(stderr, "%ld", t->intvalue);   break;
+            case Int :
+                fprintf(stderr, "%" TCL_SIZE_MODIFIER "d", t->intvalue);   break;
             case Real:        fprintf(stderr, "%f", t->realvalue);  break;
             case IsElement:
             case IsFQElement:
@@ -1658,9 +1661,9 @@ EndProduction
 |   Step  production
 |
 \----------------------------------------------------------------*/
-static long IsStepPredOptimizable (ast a) {
+static domLength IsStepPredOptimizable (ast a) {
     ast b;
-    long left;
+    domLength left;
     
     /* Must be called with a != NULL */
     DBG (
@@ -1846,7 +1849,7 @@ static int usesPositionInformation ( ast a) {
 }
 
 /* Must be called with a != NULL */
-static int checkStepPatternPredOptimizability ( ast a , long *max) {
+static int checkStepPatternPredOptimizability ( ast a , domLength *max) {
     ast b;
 
     switch (a->type) {
@@ -1946,7 +1949,7 @@ static int checkStepPatternPredOptimizability ( ast a , long *max) {
 }
 
 /* Must be called with a != NULL */
-static long IsStepPatternPredOptimizable ( ast a, long *max ) {
+static long IsStepPatternPredOptimizable ( ast a, domLength *max ) {
     long f;
 
     *max = 0;
@@ -2004,7 +2007,7 @@ Production(StepPattern)
     {
         ast b = NULL, c = NULL, aCopy = NULL;
         int stepIsOptimizable = 1, isFirst = 1;
-        long max, savedmax;
+        domLength max, savedmax;
         while (LA==LBRACKET) {
             b = Recurse (Predicate);
             if (!b) return a;
@@ -2369,7 +2372,7 @@ int xpathParse (
         memmove(*errMsg + len+6+newlen, "' ", 3);
 
         for (i=0; tokens[i].token != EOS; i++) {
-            sprintf(tmp, "%s\n%3s%3d %-12s %5ld %09.3g %5ld  ",
+            sprintf(tmp, "%s\n%3s%3d %-12s %5" TCL_SIZE_MODIFIER "d %09.3g %5" TCL_SIZE_MODIFIER "d  ",
                          (i==0) ? "\n\nParsed symbols:" : "",
                          (i==l) ? "-->" : "   ",
                           i,
@@ -2600,7 +2603,7 @@ double xpathFuncNumber (
     *NaN = 0;
     switch (rs->type) {
         case BoolResult:   return (rs->intvalue? 1.0 : 0.0);
-        case IntResult:    return rs->intvalue;
+    case IntResult:        return (double)rs->intvalue;
         case RealResult:   
             if (IS_NAN(rs->realvalue)) *NaN = 2;
             else if (IS_INF(rs->realvalue)!=0) *NaN = IS_INF(rs->realvalue);
@@ -2762,7 +2765,7 @@ char * xpathFuncString (
             if (rs->intvalue) return (tdomstrdup("true"));
                          else return (tdomstrdup("false"));
         case IntResult:
-            sprintf(tmp, "%ld", rs->intvalue);
+            sprintf(tmp, "%" TCL_SIZE_MODIFIER "d", rs->intvalue);
             return (tdomstrdup(tmp));
 
         case RealResult:
@@ -3037,7 +3040,7 @@ xpathEvalFunction (
             if      (step->intvalue == f_floor)   leftReal = floor(leftReal);
             else if (step->intvalue == f_ceiling) leftReal = ceil(leftReal);
             else                                  leftReal = 
-                                                      xpathRound(leftReal);
+                                                      (double)xpathRound(leftReal);
             rsSetReal2 (result, leftReal);
         }
         xpathRSFree( &leftResult );
@@ -3558,11 +3561,11 @@ xpathEvalFunction (
             if (found) {
                 if (j < len) {
                     unichar = Tcl_UniCharAtIndex (replaceStr, j);
-                    utfCharLen = Tcl_UniCharToUtf (unichar, utfBuf);
+                    utfCharLen = (int)Tcl_UniCharToUtf (unichar, utfBuf);
                     Tcl_DStringAppend (&tresult, utfBuf, utfCharLen);
                 }
             } else {
-                utfCharLen = Tcl_UniCharToUtf (*upfrom, utfBuf);
+                utfCharLen = (int)Tcl_UniCharToUtf (*upfrom, utfBuf);
                 Tcl_DStringAppend (&tresult, utfBuf, utfCharLen);
             }
             upfrom++;
@@ -5893,10 +5896,10 @@ static void nodeToXPath (
     int         legacy
 )
 {
-    domNode *parent, *child;
-    char    step[200], *nTest;
-    size_t  len;
-    int     sameNodes, nodeIndex;
+    domNode  *parent, *child;
+    char      step[200], *nTest;
+    domLength len;
+    int       sameNodes, nodeIndex;
 
     parent = node->parentNode;
     if (parent == NULL) {
@@ -5996,7 +5999,7 @@ char * xpathNodeToXPath (
 )
 {
     char  * xpath;
-    int     xpathLen, xpathAllocated;
+    domLength xpathLen, xpathAllocated;
 
 
     xpathAllocated = 100;
