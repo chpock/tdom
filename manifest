@@ -1,5 +1,5 @@
-C Again\smore\stype\smassage\sand\sfixes.
-D 2024-07-08T00:53:08.366
+C Fixed\sebcdic\sencoding\shandling.\sBraced\san\sexpr.
+D 2024-07-08T09:34:46.642
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -162,7 +162,7 @@ F generic/tdomStubLib.c 4a055f9c974246a9f7dd99de1a7686d1a96be8f02be699fdf4a760fd
 F generic/tdominit.c 156100c1d070fafdf59d219d8aa12257b831645dc01648f5934f0c52aafb9262
 F generic/xmlsimple.c b6c0ea2a7d0bfc8d89128b7baa64b5b2d18ff41d5c2f1bd1239823f22df11d30
 F generic/xmlsimple.h 6cbbc9208bcaec273624fd5e24aff3de07ef98d1da3be4576f3e6d4951516054
-F lib/tdom.tcl a7e0524a0fb71a077bc14da315ea209ba533867f577f93275d9ef2d64ef840c6
+F lib/tdom.tcl 0f31a59638cf3fbc0f04c8bf7e6000731e5070f535d003e5ceaa47c24fbe4d34
 F macosx/README 75fe1f6617f6cb7e4480cff5367b5c26fcd8dd207e2321f35dceebafccf4c99c
 F pkgIndex.tcl.in 2c2ecfb3b4176ae61af4445e022b34bb9071efdbf0446c2aa2d0f6cfcce3f120
 F tclconfig/README.txt 180f4215d59309ec5645aa5f4565557dac484945
@@ -241,8 +241,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 85bc8c68e6b9e14f590a84b2c81d79eaf2b167cd5e15eeaa6374a4c7825669da
-R 5b22c8ef397cc71e1f75cd698e9721fd
+P 48173f10adebc505fa2b22e54db3d684a9ec04662cb6d39e856c883db41bcb43
+R 96ad9a66fa917389b77f841fb3dd6626
 U rolf
-Z 356b2c00a318ad9dff53b64bcc727fb7
+Z 2d4a05d4c4041b2f5a0aeb77187d487b
 # Remove this line to create a well-formed Fossil manifest.
