@@ -64,6 +64,12 @@
 #   define IS_INF(v) 0
 #endif
 
+#if TCL_MAJOR_VERSION > 8
+# define dom_minl domLength
+#else
+# define dom_minl long
+#endif
+
 /*----------------------------------------------------------------------------
 |   Types for abstract syntax trees
 |
@@ -94,7 +100,7 @@ typedef struct astElem {
     struct astElem *child;
     struct astElem *next;
     char           *strvalue;
-    domLength       intvalue;
+    dom_minl        intvalue;
     double          realvalue;
 } astElem;
 
@@ -116,7 +122,7 @@ typedef struct xpathResultSet {
     xpathResultType type;
     char           *string;
     domLength       string_len;
-    domLength       intvalue;
+    dom_minl        intvalue;
     double          realvalue;          
     domNode       **nodes;
     domLength       nr_nodes;
@@ -200,8 +206,8 @@ char * xpathGetStringValue (domNode *node, domLength *strLen);
 
 char * xpathNodeToXPath  (domNode *node, int legacy);
     
-void rsSetBool      ( xpathResultSet *rs, domLength    i    );
-void rsSetLong      ( xpathResultSet *rs, domLength    i    );
+void rsSetBool      ( xpathResultSet *rs, dom_minl     i    );
+void rsSetLong      ( xpathResultSet *rs, dom_minl     i    );
 void rsSetReal      ( xpathResultSet *rs, double       d    );
 void rsSetReal2     ( xpathResultSet *rs, double       d    );
 void rsSetString    ( xpathResultSet *rs, const char  *s    );

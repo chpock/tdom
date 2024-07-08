@@ -1,5 +1,5 @@
-C Fixed\sebcdic\sencoding\shandling.\sBraced\san\sexpr.
-D 2024-07-08T09:34:46.642
+C In\sa\sfew\scases\sTcl\s9\sneeds\sTcl_Size\sand\sTcl\s8\slong.
+D 2024-07-08T12:30:26.367
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -139,8 +139,8 @@ F generic/domhtml5.h 5cca562a556e7662f2dce222640c32abb2777146
 F generic/domjson.c 1124afebaf5f4e299e40a6fd31bdaca7e3363ea86cfdd455c2fd76183413c10d
 F generic/domjson.h ff31d0fd1d6eb3e6490fb456d42b73e304a6f0c386a074db42d8b84ad8c925b3
 F generic/domlock.c f8e235892bb9dc771e844c47701ded81c10967dc6ca420b14ab54067211bdb8f
-F generic/domxpath.c 15b4ef042759f223d46395f980b5453fae5e5e4ae2d56d9bd43be299334dba10
-F generic/domxpath.h d1801c3068ef72ee8049a55fadbc31e8129d7d270b5fda8589cb0317db9eed0a
+F generic/domxpath.c 34d5b2977da3e71ec97b79055ab02a8f600ce78994f44ce70dc4158e53168f5f
+F generic/domxpath.h a98836ef133283a20855968b76821042bce16b57b664689a15c017e3fecdae2f
 F generic/domxslt.c 6c68b0bdf0664fe43885a3e2316252c506706bcee4119c2ec8d6d55423a73cba
 F generic/domxslt.h aeaf957ee38a9e7564bd9f1bed1781de108767df476a0d0776615988d8f04e0f
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
@@ -241,8 +241,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 48173f10adebc505fa2b22e54db3d684a9ec04662cb6d39e856c883db41bcb43
-R 96ad9a66fa917389b77f841fb3dd6626
+P 688dbe0d8addb4a01003517f460352f8b1ae176b07097056e692c1c3f7cc2cbc
+R 0a4e5ed4f0805f563a14b57ff372c4db
 U rolf
-Z 2d4a05d4c4041b2f5a0aeb77187d487b
+Z 985b60b3a7f9b45ca94ff00a82feb4b1
 # Remove this line to create a well-formed Fossil manifest.
