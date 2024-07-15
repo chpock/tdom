@@ -28,7 +28,7 @@ EXTERN int		CHandlerSetRemove(Tcl_Interp *interp,
 				Tcl_Obj *const expatObj,
 				char *handlerSetName);
 /* 4 */
-EXTERN CHandlerSet *	CHandlerSetCreate(char *name);
+EXTERN CHandlerSet *	CHandlerSetCreate(const char *name);
 /* 5 */
 EXTERN CHandlerSet *	CHandlerSetGet(Tcl_Interp *interp,
 				Tcl_Obj *const expatObj,
@@ -73,7 +73,7 @@ typedef struct TdomStubs {
     int (*checkExpatParserObj) (Tcl_Interp *interp, Tcl_Obj *const nameObj); /* 1 */
     int (*cHandlerSetInstall) (Tcl_Interp *interp, Tcl_Obj *const expatObj, CHandlerSet *handlerSet); /* 2 */
     int (*cHandlerSetRemove) (Tcl_Interp *interp, Tcl_Obj *const expatObj, char *handlerSetName); /* 3 */
-    CHandlerSet * (*cHandlerSetCreate) (char *name); /* 4 */
+    CHandlerSet * (*cHandlerSetCreate) (const char *name); /* 4 */
     CHandlerSet * (*cHandlerSetGet) (Tcl_Interp *interp, Tcl_Obj *const expatObj, char *handlerSetName); /* 5 */
     void * (*cHandlerSetGetUserData) (Tcl_Interp *interp, Tcl_Obj *const expatObj, char *handlerSetName); /* 6 */
     TclGenExpatInfo * (*getExpatInfo) (Tcl_Interp *interp, Tcl_Obj *const expatObj); /* 7 */

@@ -83,13 +83,13 @@
 
 /*----------------------------------------------------------------------------
 |   Each entity reference is recorded as an instance of the following
-|   tructure
+|   structure
 \---------------------------------------------------------------------------*/
 typedef struct Er Er;
 struct Er {
-    char *zName;     /* The name of this entity reference.  ex:  "amp" */
-    char *zValue;    /* The value for this entity.          ex:  "&"   */
-    Er *pNext;       /* Next entity with the same hash on zName        */
+    const char *zName;     /* The name of this entity reference.  ex:  "amp" */
+    const char *zValue;    /* The value for this entity.          ex:  "&"   */
+    Er *pNext;             /* Next entity with the same hash on zName        */
 };
 
 
@@ -2336,12 +2336,12 @@ static void TranslateEntityRefs (
     domTextNode *textOrAtt
 )
 {
-    char *z;     /* Pointer to nodeValue to rewrite */
-    int from;    /* Read characters from this position in z[] */
-    int to;      /* Write characters into this position in z[] */
-    int h;       /* A hash on the entity reference */
-    char *zVal;  /* The substituted value */
-    Er *p;       /* For looping down the entity reference collision chain */
+    char *z;           /* Pointer to nodeValue to rewrite */
+    int from;          /* Read characters from this position in z[] */
+    int to;            /* Write characters into this position in z[] */
+    int h;             /* A hash on the entity reference */
+    const char *zVal;  /* The substituted value */
+    Er *p;             /* For looping down the entity reference collision chain */
     int value, overlen;
     domLength  zlen;
     char *ole, *newNodeValue;
@@ -3025,7 +3025,7 @@ HTML_SimpleParse (
 
 
             /*-----------------------------------------------------------
-            |   check, whether new starting element close an other
+            |   check, whether new starting element close another
             |   currently open one
             \----------------------------------------------------------*/
             e = start+1;
@@ -3192,7 +3192,7 @@ HTML_SimpleParse (
                     }
                     h = Tcl_CreateHashEntry (doc->ids, attrnode->nodeValue,
                                              &hnew);
-                    /* How to resolve in case of dublicates?  We
+                    /* How to resolve in case of duplicates?  We
                        follow, what the core dom building code does:
                        the first value in document order wins. */
                     if (hnew) {

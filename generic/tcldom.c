@@ -7167,7 +7167,7 @@ int tcldom_parse (
                 return TCL_ERROR;
             }
             if (jsonmaxnesting < 0) {
-                SetResult("The value of -jsonmaxnesting cannot be negativ");
+                SetResult("The value of -jsonmaxnesting cannot be negative");
                 return TCL_ERROR;
             }
             objv++;  objc--; continue;
@@ -7439,7 +7439,7 @@ int tcldom_parse (
             interpResult = Tcl_GetStringResult(interp);
             if (interpResult[0] == '\0') {
                 /* If the interp result isn't empty, then there was an error
-                   in an enternal entity and the interp result has already the
+                   in an external entity and the interp result has already the
                    error msg. If we don't got a document, but interp result is
                    empty, the error occurred in the main document and we
                    build the error msg as follows. */

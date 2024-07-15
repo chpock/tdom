@@ -275,7 +275,7 @@ nodecmd_processAttributes (
     /*
      * Allow for following syntax:
      *   cmd ?-option value ...? ?script?
-     *   cmd ?opton value ...? ?script?
+     *   cmd ?option value ...? ?script?
      *   cmd key_value_list script
      *       where list contains "-key value ..." or "key value ..."
      */

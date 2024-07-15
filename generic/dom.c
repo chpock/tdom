@@ -88,7 +88,7 @@
 static int domModuleIsInitialized = 0;
 TDomThreaded(static Tcl_Mutex initMutex;)
 
-static char *domException2StringTable [] = {
+static const char *domException2StringTable [] = {
 
     "OK - no exception",
     "INDEX_SIZE_ERR",
@@ -467,7 +467,7 @@ domClearString (
     if (clen) {
         p += clen;
     } else {
-        /* If it isn't an UTF-8 encoded character what is it? And how
+        /* If it isn't a UTF-8 encoded character what is it? And how
          * many of whatever it is? */
         p++;
     }
@@ -3819,7 +3819,7 @@ domInsertBefore (
                and to insert all children of that rootNode before the
                referenceChild.  This would result in a document
                without documentElement, which then should be
-               handled right by other methods. This is planed, but
+               handled right by other methods. This is planned, but
                not carefully considered, yet.  */
             return NOT_SUPPORTED_ERR;
         }
@@ -4248,7 +4248,7 @@ domAppendNewElementNode(
     }
 
     /*--------------------------------------------------------
-    |   re-use existing namespace or create a new one
+    |   reuse existing namespace or create a new one
     \-------------------------------------------------------*/
     if (uri) {
         domSplitQName (tagName, prefix, &localname);

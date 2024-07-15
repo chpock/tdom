@@ -90,7 +90,7 @@ gtinImpl (
  *	A standard Tcl result.
  *
  * Side effects:
- *	The ususal schema text constraint command machinery.
+ *	The usual schema text constraint command machinery.
  *
  *----------------------------------------------------------------------------
  */

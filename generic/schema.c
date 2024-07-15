@@ -123,7 +123,7 @@ typedef struct
     Tcl_Obj       *externalentitycommandObj;
 } ValidateMethodData;
 
-static char *ValidationAction2str[] = {
+static const char *ValidationAction2str[] = {
     "NOT_USED",
     "MATCH_GLOBAL",
     "MATCH_ELEMENT_START",
@@ -153,7 +153,7 @@ typedef enum {
     INVALID_JSON_TYPE,
 } ValidationErrorType;
 
-static char *ValidationErrorType2str[] = {
+static const char *ValidationErrorType2str[] = {
     "DOM_KEYCONSTRAINT",
     "DOM_XPATH_BOOLEAN",
     "MISSING_ATTRIBUTE",
@@ -190,7 +190,7 @@ typedef enum {
 } jsonStructType;
 
 /*----------------------------------------------------------------------------
-|   Recovering related flage
+|   Recovering related flags
 |
 \---------------------------------------------------------------------------*/
 
@@ -209,7 +209,7 @@ typedef enum {
 #define EXPECTED_PROBE_MAYSKIP 4
 
 /*----------------------------------------------------------------------------
-|   domKeyConstraint related flage
+|   domKeyConstraint related flags
 |
 \---------------------------------------------------------------------------*/
 
@@ -243,7 +243,7 @@ typedef enum {
     }
 
 #if defined(DEBUG) || defined(DDEBUG)
-static char *Schema_CP_Type2str[] = {
+static const char *Schema_CP_Type2str[] = {
     "ANY",
     "NAME",
     "CHOICE",
@@ -255,7 +255,7 @@ static char *Schema_CP_Type2str[] = {
     "KEYSPACE_END",
     "JSON_STRUCT_TYPE"
 };
-static char *Schema_Quant_Type2str[] = {
+static const char *Schema_Quant_Type2str[] = {
     "ONE",
     "OPT",
     "REP",
@@ -684,7 +684,7 @@ static void schemaInstanceDelete (
     }
     while (sdata->stackPool) {
         down = sdata->stackPool->down;
-        /* interleaveState always got cleand up at putting se back to
+        /* interleaveState always got cleaned up at putting se back to
          * pool */
         FREE (sdata->stackPool);
         sdata->stackPool = down;
@@ -7047,7 +7047,7 @@ tDOM_SchemaInit (
     Tcl_CreateObjCommand (interp, "tdom::schema::ref",
                           RefPatternObjCmd, NULL, NULL);
 
-    /* The anonymous pattern commands "choise", "mixed", "interleave"
+    /* The anonymous pattern commands "choice", "mixed", "interleave"
      * and "group". */
     Tcl_CreateObjCommand (interp, "tdom::schema::choice",
                           AnonPatternObjCmd, (ClientData) 0, NULL);
