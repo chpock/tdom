@@ -1,5 +1,5 @@
-C Added\ssome\sconst\sdeclaration\sand\sspell\sfixes.\sBow\sto\sGustaf.
-D 2024-07-15T22:54:38.072
+C Picky\scompiler\sflags.
+D 2024-07-18T01:23:32.088
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -7,7 +7,7 @@ F CHANGES 815d45efc1c2b59f8dcb96fade67e82b8eb5ead816470ddfcaf331104a3fe844
 F ChangeLog 9b60ec8bfbae84e4f1a97aaee24be00ccea212b7
 F LICENSE 7c00b00fe8e88c48498a54c103dd7df03faeeb039c783279d5fb54dfca307b77
 F MPL_2.0.html 326b847674d6f5846c5b260fb437372e21232c23e3911f3a94f766a62459126c
-F Makefile.in 8752adb175f09928e5ed7d1b27f145691491ee10413ad0679028f013a56bb1bc
+F Makefile.in 0d84d4978c6fc02a35b140b6067725c332ed2eb38cb75d31b8d2eb0d13214046
 F README.AOL 553e7e3816fb60d15ae629eefccecd237c9e41a1b9fac7c1c32090520a2e83b0
 F README.md 723bd978209d7a61f59e4e474e67caa342e3642f617d712f25c904f849f51b4c
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
@@ -241,8 +241,11 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P de5237af97f2c1cfc50c49bd97c96384d79661cb3d66c1f5f45a214c556cc414
-R 31b160f9cfd20e2a9ea04ed88f576e41
+P 046fbf0195bbece62694df4e9ae90cdb235503abc049579a2a768000663a57f9
+R 387ff6a4a1d724150f271e0e7e8450bb
+T *branch * picky
+T *sym-picky *
+T -sym-trunk *
 U rolf
-Z 82bfad69062e8f0c70a19e4513037f24
+Z 92b35bb236f9a9fcc79240452fd966f2
 # Remove this line to create a well-formed Fossil manifest.
