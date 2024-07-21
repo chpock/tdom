@@ -251,7 +251,7 @@ convertGumboToDom (
                             node->ownerDocument->ids,
                             gumboAtt->value,
                             &hnew);
-                        /* How to resolve in case of dublicates?  We
+                        /* How to resolve in case of duplicates?  We
                            follow, what the core dom building code does:
                            the first value in document order wins. */
                         if (hnew) {

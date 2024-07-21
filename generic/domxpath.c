@@ -160,7 +160,7 @@ typedef enum {
     EOS
 } Token;
 
-static char *token2str[] = {
+static const char *token2str[] = {
     "LPAR", "RPAR", "LBRACKET", "RBRACKET", "DOT", "DOTDOT", "ATTRIBUTEPREFIX",
     "ATTRIBUTE", "COMMA", "COLONCOLON", "LITERAL", "NSPREFIX", "NSWC",
     "INTNUMBER", "REALNUMBER", "SLASH", "SLASHSLASH",
@@ -188,7 +188,7 @@ typedef XPathToken *XPathTokens;
 |   Types for abstract syntax trees
 |
 \---------------------------------------------------------------------------*/
-static char *astType2str[] = {
+static const char *astType2str[] = {
     "Int", "Real", "Mult", "Div", "Mod", "UnaryMinus", "IsNSElement",
     "IsNode", "IsComment", "IsText", "IsPI", "IsSpecificPI", "IsElement",
     "IsFQElement", "GetVar", "GetFQVar", "Literal", "ExecFunction", "Pred",
@@ -4657,7 +4657,7 @@ static int xpathEvalStep (
         )
 
         /*----------------------------------------------
-        |   short circuit evalution for AND/OR
+        |   short circuit evaluation for AND/OR
         \---------------------------------------------*/
         if (step->type == And) {
             left = xpathFuncBoolean(&leftResult);
@@ -5704,7 +5704,7 @@ int xpathMatches (
 
             case Pred:
                 xpathRSInit (&stepResult);
-                DBG(fprintf(stderr, "Befor Pred inner EvalStep. currentPos = %d\n", currentPos);)
+                DBG(fprintf(stderr, "Before Pred inner EvalStep. currentPos = %d\n", currentPos);)
                 rc = xpathEvalStep (step->child, nodeToMatch, exprContext,
                                     currentPos, &nodeList, cbs, &stepResult,
                                     &docOrder, errMsg);

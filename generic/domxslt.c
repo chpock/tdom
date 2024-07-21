@@ -28,7 +28,7 @@
 |                           document() plus several bug fixes
 |
 |       Fall/Winter 01 Rolf Ade rewrite of xsl:number, xsl:key/key(),
-|                               handling of toplevel var/parameter,
+|                               handling of top-level var/parameter,
 |                               plenty of fixes and enhancements all
 |                               over the place.
 |
@@ -932,7 +932,7 @@ static void formatValue (
     int         upper = 0, e, b, v, z;
     char        tmp[80], *pt;
     Tcl_DString tmp1;
-    static struct { char *digit; char *ldigit; int value; } RomanDigit[] = {
+    static struct { const char *digit; const char *ldigit; int value; } RomanDigit[] = {
           { "M" , "m" , 1000, },
           { "CM", "cm",  900, },
           { "D" , "d" ,  500, },
@@ -3004,10 +3004,10 @@ static int xsltAddTemplate (
         if (rc < 0) {
             if (tpl->name) {
                 /* The template is already stored in the namedTemplates
-                   hash table. Therefor we don't free tpl here, but
+                   hash table. Therefore, we don't free tpl here, but
                    set tpl->match to NULL, which ensures, that the
                    tpl will be freed while the namedTemplates hash table
-                   is cleand up. */
+                   is cleaned up. */
                 tpl->match = NULL;
             } else {
                 FREE ((char*)tpl);
@@ -3466,7 +3466,7 @@ static int xsltNumber (
                 /* This covers both cases: non integer value after evaluation
                    and wrong (<= 0) integer value. */
                 reportError (actionNode, "The value of \"grouping-size\" must"
-                             " evaluate to a positiv integer.", errMsg);
+                             " evaluate to a positive integer.", errMsg);
                 goto xsltNumberError;
             }
         }
@@ -4430,7 +4430,7 @@ static int ExecAction (
 
         case decimalFormat: 
             reportError (actionNode, "xsl:decimal-format is only allowed"
-                         " at toplevel.", errMsg);
+                         " at top-level.", errMsg);
             return -1;
 
         case element:
@@ -4608,15 +4608,15 @@ static int ExecAction (
             break;
 
         case import:
-            reportError (actionNode, "xsl:import is only allowed at toplevel.",
+            reportError (actionNode, "xsl:import is only allowed at top-level.",
                          errMsg);
             return -1;
         case include:
             reportError (actionNode, "xsl:include is only allowed at"
-                         " toplevel.", errMsg);
+                         " top-level.", errMsg);
             return -1;
         case key:
-            reportError (actionNode, "xsl:key is only allowed at toplevel.", 
+            reportError (actionNode, "xsl:key is only allowed at top-level.", 
                          errMsg);
             return -1;
 
@@ -4662,7 +4662,7 @@ static int ExecAction (
             }
         case namespaceAlias: 
             reportError (actionNode, "xsl:namespaceAlias is only allowed"
-                         " at toplevel.", errMsg);
+                         " at top-level.", errMsg);
             return -1;
 
         case number:
@@ -4895,7 +4895,7 @@ static int ExecAction (
                 attr = n->firstAttr;
                 while (attr && (attr->nodeFlags & IS_NS_NODE)) {
                     /* XSLT namespace isn't copied */
-                    /* Well, XSLT implementors doesn't seem to agree
+                    /* Well, XSLT implementers doesn't seem to agree
                        at which point this rule out of the second paragraph
                        of 7.1.1 must be applied: before or after applying
                        the namespace aliases (or, in other words: is this
@@ -6631,7 +6631,7 @@ static int processTopLevel (
                     /* Since imported stylesheets are processed at the
                        point at which they encounters the definitions are
                        already in increasing order of import precedence.
-                       Therefor we have only to check, if there is a
+                       Therefore, we have only to check, if there is a
                        top level var or parm with the same precedence */
                     if (topLevelVar->precedence == precedence) {
                         reportError (node, "There is already a variable"

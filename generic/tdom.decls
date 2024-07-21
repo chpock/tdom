@@ -25,7 +25,7 @@ declare 3 generic {
                             char *handlerSetName)
 }
 declare 4 generic {
-    CHandlerSet * CHandlerSetCreate (char *name)
+    CHandlerSet * CHandlerSetCreate (const char *name)
 }
 declare 5 generic {
     CHandlerSet * CHandlerSetGet (Tcl_Interp *interp, Tcl_Obj *const expatObj,

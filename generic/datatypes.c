@@ -900,7 +900,7 @@ isodateImpl (
         if (h == 24 && (min > 0 || s > 0)) return 0;
     }
     if (*text == '\0') return 1;
-    /* Parse optional time zone part */
+    /* Parse optional timezone part */
     switch (*text) {
     case 'Z':
         text++;
@@ -1860,7 +1860,7 @@ unsignedIntTypesImpl (
     char *c;
     int count = 0;
     int nrDigits[] = {3, 5, 10, 20};
-    char *max[] = {
+    const char *max[] = {
         "255",
         "65535",
         "4294967295",
@@ -1919,14 +1919,14 @@ intTypesImpl (
     char *c;
     int count = 0;
     int nrDigits[] = {3, 5, 10, 20};
-    char *compare;
-    char *max[] = {
+    const char *compare;
+    const char *max[] = {
         "127",
         "32767",
         "2147483647",
         "9223372036854775807"
     };
-    char *min[] = {
+    const char *min[] = {
         "128",
         "32768",
         "2147483648",
