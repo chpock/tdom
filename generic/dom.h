@@ -97,10 +97,6 @@
 /* Beginning with Tcl 9.0 the string representation of a Tcl_Obj may
  * be bigger thant 2 GByte. Therefore some API functions differ. */
 #if TCL_MAJOR_VERSION > 8
-/* Starting with Tcl 9 there are only threaded builds */
-#  ifndef TCL_THREADS
-#    define TCL_THREADS
-#  endif
 #  define domLength Tcl_Size
 #  define Tcl_SetDomLengthObj Tcl_SetWideIntObj
 #  define domLengthConversion "%" TCL_SIZE_MODIFIER "d"
@@ -172,7 +168,11 @@
 # define TDomThreaded(x)    x
 # define HASHTAB(doc,tab)   (doc)->tab
 # define NODE_NO(doc)       ((doc)->nodeCounter)++
-# define DOC_NO(doc)        (Tcl_WideInt)(doc)
+# ifdef _WIN32
+#  define DOC_NO(doc)        (unsigned long long)(doc)
+# else
+#  define DOC_NO(doc)        (unsigned long)(doc)
+# endif
 #endif /* TCL_THREADS */
 
 #define DOC_CMD(s,doc)      sprintf((s), "domDoc%p", (void *)(doc))
@@ -539,7 +539,11 @@ typedef struct domDocument {
     domNodeType       nodeType  : 8;
     domDocFlags       nodeFlags : 8;
     domNameSpaceIndex dummy     : 16;
-    Tcl_WideInt       documentNumber;
+#ifdef _WIN32
+    unsigned long long documentNumber;
+#else
+    unsigned long     documentNumber;
+#endif
     struct domNode   *documentElement;
     struct domNode   *fragments;
 #ifdef TCL_THREADS
