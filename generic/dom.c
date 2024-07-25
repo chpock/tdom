@@ -1433,7 +1433,7 @@ elemNSfound:
     \-------------------------------------------------------------*/
     if ((idatt = XML_GetIdAttributeIndex (info->parser)) != -1) {
         if (!info->document->ids) {
-            info->document->ids = MALLOC (sizeof (Tcl_HashTable));
+            info->document->ids = TMALLOC (Tcl_HashTable);
             Tcl_InitHashTable (info->document->ids, TCL_STRING_KEYS);
         }
         h = Tcl_CreateHashEntry (info->document->ids,
@@ -1945,7 +1945,7 @@ entityDeclHandler (
 
     if (notationName) {
         if (!info->document->unparsedEntities) {
-            info->document->unparsedEntities = MALLOC (sizeof (Tcl_HashTable));
+            info->document->unparsedEntities = TMALLOC (Tcl_HashTable);
             Tcl_InitHashTable (info->document->unparsedEntities, 
                                TCL_STRING_KEYS);
         }
@@ -2576,7 +2576,7 @@ domCreateDoc (
     
     /* We malloc and initialize the baseURIs hash table here to avoid
        cluttering of the code all over the place with checks. */
-    doc->baseURIs = MALLOC (sizeof (Tcl_HashTable));
+    doc->baseURIs = TMALLOC (Tcl_HashTable);
     Tcl_InitHashTable (doc->baseURIs, TCL_ONE_WORD_KEYS);
 
     TDomThreaded(
