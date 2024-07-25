@@ -1,5 +1,5 @@
-C Added\ssome\sconst\sdeclaration\sand\sspell\sfixes.\sBow\sto\sGustaf.
-D 2024-07-15T22:54:38.072
+C Added\sa\sfew\stype\scasts\sto\smalloc\sreturns\sto\ssuppress\swarnings\swith\snon-standard\s-W\sflags.
+D 2024-07-25T17:16:45.660
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -128,7 +128,7 @@ F generic/HTML5ent.inc c122e35eb1be8e325f8846080bbccc166978cfe7136e850d7e8aa4778
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
 F generic/datatypes.c 7c9f9edb50b4592b2317dfde3db6feaa342e80f1322aee4b747eb98c486d959b
 F generic/datatypes.h 3e41d07bcf50cf6959b6e14416dfcb0d7b5aafc65683322978ec185c2a259332
-F generic/dom.c e4ffed30e89e0df034afd1678720c3e6dfb9bcff2f33b3c0ee590fc9313ac175
+F generic/dom.c 529681b1b383fef138744d0d5383f77baae932081af244949c91d7e127f575bc
 F generic/dom.h cb6edd34f0ca057cf681fd83b6cf9a1c9e7bd094326384d789d6190266414db5
 F generic/domalloc.c ce41b8a16e855ee3a3db1d4b797f835a77f1f9260f24db4cb7dc73a07ee4670b
 F generic/domalloc.h 961f83bb46dec27dbcf36ed430ed81b1f485a1fdfaa2f7df8b60bbcf861d0fe3
@@ -241,8 +241,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P de5237af97f2c1cfc50c49bd97c96384d79661cb3d66c1f5f45a214c556cc414
-R 31b160f9cfd20e2a9ea04ed88f576e41
+P 046fbf0195bbece62694df4e9ae90cdb235503abc049579a2a768000663a57f9
+R dbe06c07b4f44bd9795b909933a46846
 U rolf
-Z 82bfad69062e8f0c70a19e4513037f24
+Z 0ef63be5804ff488f47c95e1d95b155a
 # Remove this line to create a well-formed Fossil manifest.
