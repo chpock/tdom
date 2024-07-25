@@ -1,5 +1,5 @@
-C Merged\sfrom\strunk.
-D 2024-07-25T17:17:39.492
+C The\sVC\sbuild\schain\sneed\sthe\sTCL_THREADS\sdefine\swith\sTcl\s9.
+D 2024-07-25T21:01:22.610
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -129,7 +129,7 @@ F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
 F generic/datatypes.c 7c9f9edb50b4592b2317dfde3db6feaa342e80f1322aee4b747eb98c486d959b
 F generic/datatypes.h 3e41d07bcf50cf6959b6e14416dfcb0d7b5aafc65683322978ec185c2a259332
 F generic/dom.c 529681b1b383fef138744d0d5383f77baae932081af244949c91d7e127f575bc
-F generic/dom.h a38f11614e2f56d6a80168c7c042e15fac4dea777091bbb779e4670671dad658
+F generic/dom.h 3c0bc10de04440ecabb53f36c7e45788bdbed2b22f509abc1b0de0ebeea0f6ec
 F generic/domalloc.c ce41b8a16e855ee3a3db1d4b797f835a77f1f9260f24db4cb7dc73a07ee4670b
 F generic/domalloc.h 961f83bb46dec27dbcf36ed430ed81b1f485a1fdfaa2f7df8b60bbcf861d0fe3
 F generic/domhtml.c 6f93ccbe36aaa78ce013d8c244a1810e33f2a755cd04fe3847e348d2d8df4048
@@ -241,8 +241,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 52fb81d275630eb0fd7c13d432ab82da508ec9e38d90efa87b2cf2c5fa1fc533 abf9aa08cfd3579a27927c3390fb6141a7291356abb0c725d32603cb9089eea7
-R ba711a9f536ccd15256e617bba106ee1
-U rolf
-Z 207e8fc4c16f168b081b98c2b0e0dd4f
+P b585c0cb692d904cc660d697003449cdf4a1c30ebbf3bd8b92d0ff5c9f02adcc
+R 65a57e447eeaa6a72bf36f852f481cf2
+U user
+Z b59c9f160d23754a0ca59e63a1343b68
 # Remove this line to create a well-formed Fossil manifest.
