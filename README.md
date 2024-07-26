@@ -68,8 +68,10 @@ The latest release is 0.9.4. Get the source code as
 as [zip archive](http://tdom.org/downloads/tdom-0.9.4-src.zip).
 
 Windows binaries of the 0.9.4 release are also available. Get it for
-[64 bit](http://tdom.org/downloads/tdom-0.9.4-windows-x64.zip) or [32
-bit](http://tdom.org/downloads/tdom-0.9.4-windows-x86.zip).
+[Tcl 8.6 / 64 bit](http://tdom.org/downloads/tdom-0.9.4-windows-x64.zip) or [Tcl 8.6
+/ 32 bit](http://tdom.org/downloads/tdom-0.9.4-windows-x86.zip) or
+[Tcl 9 / 64 bit](http://tdom.org/downloads/tcl9-tdom-0.9.4-windows-x64.zip)
+or [Tcl 9 / 32 bit](http://tdom.org/downloads/tcl9-tdom-0.9.4-windows-x86.zip)
 
 The provided windows binaries include (statically linked) the
 HTML5 parser.
