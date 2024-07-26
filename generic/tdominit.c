@@ -44,7 +44,7 @@
 extern TdomStubs tdomStubs;
 
 #if TCL_MAJOR_VERSION == 8
-# define STUB_VERSION "8.4"
+# define STUB_VERSION "8.5"
 #else
 # define STUB_VERSION "9.0"
 #endif

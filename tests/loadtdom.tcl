@@ -6,12 +6,7 @@
 # RCS: @(#) $Id$
 #
 
-if {$tcl_version < 8.5} {
-    # We still support 8.4 to some degree
-    package require Tcl 8.4
-} else {
-    package require Tcl 8.4-
-}
+package require Tcl 8.5-
 package require tcltest 2.2
 namespace import ::tcltest::*
 catch {tcltest::loadTestedCommands}
