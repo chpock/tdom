@@ -1038,6 +1038,47 @@ proc ::tdom::baseURL {path} {
     }
 }
 
+namespace eval ::tdom::json {
+    namespace export asDict
+}
+
+# The argument node may be an element node as well as a document node.
+proc ::tdom::json::asDict {node} {
+    return [nodesAsDict [$node childNodes] [$node jsonType]]
+}
+
+proc ::tdom::json::nodesAsDict {nodes parentType} {
+    set result ""
+    foreach n $nodes {
+        set children [$n childNodes]
+        set jsonType [$n jsonType]
+        set childrendValue [nodesAsDict $children $jsonType]
+
+        switch $jsonType {
+            OBJECT {
+                if {[$n nodeName] ne "objectcontainer" || $parentType eq "OBJECT"} {
+                    lappend result [$n nodeName]
+                }
+                lappend result $childrendValue
+            }
+            NONE {
+                lappend result [$n nodeName] $childrendValue
+            }
+            ARRAY {
+                if {[$n nodeName] ne "arraycontainer" || $parentType eq "OBJECT"} {
+                    lappend result [$n nodeName]
+                }
+                lappend result $childrendValue
+            }
+            default {
+                set op [expr {[llength $nodes] > 1 ? "lappend" : "set"} ]
+                $op result [$n nodeValue]
+            }
+        }
+    }
+    return $result
+}
+
 namespace eval ::tDOM { 
     variable extRefHandlerDebug 0
     variable useForeignDTD ""

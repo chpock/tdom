@@ -2764,3 +2764,29 @@ test json-9.3 {cloneNode} {
     $other delete
     set result
 } {{"bar"} 1 true {[1,2,3]} {{"foo":"bar","baz":"boo"}}}
+
+test json-10.1 {asDict} {
+    set json {{
+        "Titel": "Wirtschaftsinformatik",
+        "Keywords": "Documentation for Keywords",
+        "Keywords": ["Introduction","Basics"]    
+    }}
+    set doc [dom parse -json $json]
+    set dict [::tdom::json::asDict $doc]
+    $doc delete
+    dict get $dict Keywords
+} {Introduction Basics}
+
+test json-10.2 {asDict object members named objectcontainer and arraycontainer} {
+    set json {{
+        "Titel": "Wirtschaftsinformatik",
+        "objectcontainer": {"a":"b","c":"d"},
+        "arraycontainer": ["Introduction","Basics"]    
+    }}
+    set doc [dom parse -json $json]
+    set dict [::tdom::json::asDict $doc]
+    $doc delete
+    set result ""
+    lappend result [dict get $dict objectcontainer]
+    lappend result [dict get $dict arraycontainer]
+} {{a b c d} {Introduction Basics}}
