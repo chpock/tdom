@@ -2,6 +2,8 @@
 ## tDOM - a XML / DOM / XPath / XSLT / HTML / JSON implementation for Tcl
 ### Version 0.9.4
 
+tDOM 0.9.4 works with Tcl 8.5, 8.6 and 9.0.
+
 ### tDOM contains:
 
    *  for convenience expat 2.6.2, the XML parser originated from
@@ -119,7 +121,7 @@ individual login write Rolf a mail.
 tDOM was started by Jochen Loewer (loewerj@hotmail.com) and
 developed by Jochen and Rolf Ade (rolf@pointsman.de) with
 contributions by Zoran Vasiljevic (zv@archiware.com). Since more
-than a dozen years it is maintained and developed by Rolf Ade.
+than two decades it is maintained and developed by Rolf Ade.
 
 
 ### ... ahh, Licensing!!
