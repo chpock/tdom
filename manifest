@@ -1,5 +1,5 @@
-C Note\sthe\ssupported\sTcl\sversions.\sUpdated\shistory\ssection.
-D 2024-07-28T21:21:24.459
+C Fixed\s[e4ce2078f994].
+D 2024-07-30T22:25:06.093
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -150,7 +150,7 @@ F generic/schema.c 3a1062e1da5f111759a59c00915bc0c044069611b37fa39535cbc0c09a1da
 F generic/schema.h 5e20a348c3f98724e9c118760c8d9fcd661ae8f27d21652d90ab49492d001c75
 F generic/tcldom.c 0e55d25888bcd637e1d6bd475c7c739931b813835e6f195cbbac897cbf50eaaa
 F generic/tcldom.h fbc095f534bba6ce67e72fcd54122b67a6030338eee046617ac652a64da2e75e
-F generic/tclexpat.c 0c94c58d3d39132bd234512d8ec5fb0f29d75b920a7684f801aa9a0a989c161b
+F generic/tclexpat.c acc4785ce6458a1e68987c043655ad12a2e81819fcfa45c76e17f13779d4b37c
 F generic/tclexpat.h 80b7da613f99a61e9a2f3f5e062b3995ff050d68a5a4c93ca31ccd5a986e355f
 F generic/tclpull.c 82b0c67c87482c84f21d1cac934abf0888d5d6082034b0e1997a9ff843bbe31f
 F generic/tclpull.h 8e1aac98bdad497c669c901494939eecd6c2f57ea51c4f5d4dac502db48527d4
@@ -241,8 +241,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P cef3da36f8bbe7ccca1d2edc3c92a531c3c69d178543c8b0fc98bf525fca477d
-R 1427f48c3f4d78b47ada4b935153079b
+P 2db06c810f39187be1f9d55ca31cbfdc0346986e4c864bd632bde042ad673cdf
+R ff870fd5ad7a4693b8e595043266e3b7
 U rolf
-Z 879be11a5ce6301d37273424ede77a43
+Z 755c2cb8fb5614157ab98817fde3cc9d
 # Remove this line to create a well-formed Fossil manifest.

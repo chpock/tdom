@@ -976,7 +976,7 @@ TclExpatParse (
     TclExpat_InputType type
 ) {
   int result, mode, done;
-  domLength strlen, bytesread;
+  domLength strl, bytesread;
   char s[255], buf[8*1024];
   int fd;
   XML_Parser  parser;
@@ -1063,8 +1063,8 @@ TclExpatParse (
           do {
               len = Tcl_ReadChars (channel, bufObj, 1024, 0);
               done = (len < 1024);
-              str = Tcl_GetStringFromObj (bufObj, &strlen);
-              result = XML_Parse (expat->parser, str, (int)strlen, done);
+              str = Tcl_GetStringFromObj (bufObj, &strl);
+              result = XML_Parse (expat->parser, str, (int)strl, done);
               if (result != XML_STATUS_OK) break;
           } while (!done);
           /* In case of a parsing error we need the string rep of the
