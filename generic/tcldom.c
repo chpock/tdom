@@ -6974,6 +6974,10 @@ int tcldom_parse (
         }
         if (Tcl_GetIndexFromObj(interp, objv[1], parseOptions, "option", 0,
                                  &optionIndex) != TCL_OK) {
+            if (chan == NULL && (takeJSONParser || objc <= 3)) {
+                /* A string starting with '-' may be a valid JSON document. */
+                break;
+            }
             return TCL_ERROR;
         }
 
