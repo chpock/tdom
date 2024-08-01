@@ -169,10 +169,11 @@ rename $document ""</example>
                 <optname>--</optname> 
                 <desc>The option <m>--</m> marks the end of options.
                 To give this option isn't strictly necessary even in
-                the case of JSON parsing, for with valid data may
+                the case of JSON parsing, for which valid data may
                 start with a "-". If parsing json and if the second to
-                last or last argument start with a "-" and isn't a now
-                option name it will be treated as JSON data.</desc>
+                last or last argument start with a "-" and isn't a
+                known option name it will be treated as JSON
+                data.</desc>
               </optdef>
 
               <optdef>
