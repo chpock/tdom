@@ -3460,75 +3460,63 @@ Tcl_Obj * tcldom_treeAsDictWorker (
 {
     domNode *this;
     domTextNode *textNode;
-    Tcl_Obj *resultObj, *childObj, *nameObj;
+    Tcl_Obj *resultObj, *nameObj, *valueObj;
 
-    if (parentType == JSON_OBJECT) {
-        resultObj = Tcl_NewDictObj ();
-    } else {
-        resultObj = Tcl_NewListObj (0, NULL);
-    }
     this = node->firstChild;
-    while (this) {
-        if (this->nodeType != ELEMENT_NODE && this->nodeType != TEXT_NODE) {
-            this = this->nextSibling;
-            continue;
-        }
-        if (this->nodeType == TEXT_NODE) {
-            if (parentType != JSON_OBJECT) {
-                /* No text nodes childs in an object context */
+    switch (node->info) {
+    case JSON_ARRAY:
+        resultObj = Tcl_NewListObj (0, NULL);
+        while (this) {
+            if (this->nodeType != ELEMENT_NODE && this->nodeType != TEXT_NODE) {
+                this = this->nextSibling;
+                continue;
+            }
+            if (this->nodeType == TEXT_NODE) {
                 textNode = (domTextNode *)this;
-                Tcl_ListObjAppendElement (
-                    interp, resultObj,
-                    Tcl_NewStringObj (textNode->nodeValue,
-                                      textNode->valueLength)
-                    );
+                valueObj = Tcl_NewStringObj (textNode->nodeValue,
+                                             textNode->valueLength);
+            } else {
+                valueObj = tcldom_treeAsDictWorker (interp, this, JSON_ARRAY);
             }
+            Tcl_ListObjAppendElement (interp, resultObj, valueObj);
+            this = this->nextSibling;            
+        }
+        break;
+    case JSON_OBJECT:
+        resultObj = Tcl_NewDictObj ();
+        while (this) {
+            if (this->nodeType != ELEMENT_NODE) {
+                /* There are no valid TEXT_NODE elements as children
+                 * of a JSON_OBJECT. */
+                this = this->nextSibling;
+                continue;
+            }
+            valueObj = tcldom_treeAsDictWorker (interp, this, JSON_OBJECT);
+            nameObj = Tcl_NewStringObj (this->nodeName, -1);
+            Tcl_DictObjPut (interp, resultObj, nameObj, valueObj);
             this = this->nextSibling;
-            continue;
         }
-        childObj = tcldom_treeAsDictWorker (interp, this, this->info);
-        Tcl_IncrRefCount (childObj);
-        switch (node->info) {
-        case JSON_OBJECT:
-            if (parentType == JSON_OBJECT
-                || strcmp (this->nodeName, JSON_OBJECT_CONTAINER) != 0) {
-                nameObj = Tcl_NewStringObj (this->nodeName, -1);
-                Tcl_IncrRefCount (nameObj);
-                Tcl_DictObjPut (interp, resultObj, nameObj, childObj);
-                Tcl_DecrRefCount (nameObj);
-            } else {
-                Tcl_ListObjAppendElement (interp, resultObj, childObj);
+        break;
+    case 0:
+        while (this) {
+            if (this->nodeType != TEXT_NODE) {
+                this = this->nextSibling;
+                continue;
             }
-            break;                    
-        case JSON_NULL:
-            if (parentType == JSON_OBJECT) {
-                nameObj = Tcl_NewStringObj (this->nodeName, -1);
-                Tcl_IncrRefCount (nameObj);
-                Tcl_DictObjPut (interp, resultObj, nameObj, childObj);
-                Tcl_DecrRefCount (nameObj);
-            } else {
-                Tcl_ListObjAppendElement (interp, resultObj,
-                                          Tcl_NewStringObj (this->nodeName, -1));
-                Tcl_ListObjAppendElement (interp, resultObj, childObj);
-            }
-            break;
-        case JSON_ARRAY:
-            if (parentType == JSON_OBJECT
-                || strcmp (this->nodeName, JSON_ARRAY_CONTAINER) != 0) {
-                nameObj = Tcl_NewStringObj (this->nodeName, -1);
-                Tcl_IncrRefCount (nameObj);
-                Tcl_DictObjPut (interp, resultObj, nameObj, childObj);
-                Tcl_DecrRefCount (nameObj);
-            } else {
-                Tcl_ListObjAppendElement (interp, resultObj, childObj);
-            }
-            break;
-        default:
-            Tcl_ListObjAppendElement (interp, resultObj, childObj);
+            /* We take the first text child */
             break;
         }
-        this = this->nextSibling;
-        Tcl_DecrRefCount (childObj);
+        if (this) {
+            textNode = (domTextNode *)this;
+            resultObj = Tcl_NewStringObj (textNode->nodeValue,
+                                         textNode->valueLength);
+        } else {
+            resultObj = Tcl_NewObj ();
+        }
+        break;
+    default:
+        fprintf (stderr, "Should not see that");
+        break;
     }
     return resultObj;
 }
