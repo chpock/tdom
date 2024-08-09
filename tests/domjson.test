@@ -11,6 +11,7 @@
 #    json-7.*: jsonType
 #    json-8.*: appendFromScript
 #    json-9.*: cloneNode
+#    json-10.*: asDict
 # Copyright (c) 2017 Rolf Ade.
 
 source [file join [file dir [info script]] loadtdom.tcl]
@@ -2790,3 +2791,172 @@ test json-10.2 {asDict object members named objectcontainer and arraycontainer} 
     lappend result [dict get $dict objectcontainer]
     lappend result [dict get $dict arraycontainer]
 } {{a b c d} {Introduction Basics}}
+
+test json-10.1 {asDict} {
+    set json {{
+        "Titel": "Wirtschaftsinformatik",
+        "Keywords": "Documentation for Keywords",
+        "Keywords": ["Introduction","Basics"]    
+    }}
+    set doc [dom parse -json $json]
+    set dict [::tdom::json::asDict $doc]
+    $doc delete
+    dict get $dict Keywords
+} {Introduction Basics}
+
+test json-10.2 {asDict object members named objectcontainer and arraycontainer} {
+    set json {{
+        "Titel": "Wirtschaftsinformatik",
+        "objectcontainer": {"a":"b","c":"d"},
+        "arraycontainer": ["Introduction","Basics"]    
+    }}
+    set doc [dom parse -json $json]
+    set dict [::tdom::json::asDict $doc]
+    $doc delete
+    set result ""
+    lappend result [dict get $dict objectcontainer]
+    lappend result [dict get $dict arraycontainer]
+} {{a b c d} {Introduction Basics}}
+
+test json-10.3 {asDict} {
+    set json {{
+        "Titel": "Wirtschaftsinformatik",
+        "Keywords": "Documentation for Keywords",
+        "Keywords": ["Introduction","Basics"]    
+    }}
+    set doc [dom parse -json $json]
+    set dict [$doc asDict]
+    $doc delete
+    dict get $dict Keywords
+} {Introduction Basics}
+
+test json-10.3.1 {asDict} {
+    set json {{
+        "Titel": "Wirtschaftsinformatik",
+        "Keywords": "Documentation for Keywords",
+        "Keywords": ["Introduction","Basics"]    
+    }}
+    set doc [dom parse -json -jsonroot myjson $json]
+    set myjson [$doc documentElement]
+    set dict [$myjson asDict]
+    $doc delete
+    dict get $dict Keywords
+} {Introduction Basics}
+
+test json-10.4 {asDict object members named objectcontainer and arraycontainer} {
+    set json {{
+        "Titel": "Wirtschaftsinformatik",
+        "objectcontainer": {"a":"b","c":"d"},
+        "arraycontainer": ["Introduction","Basics"]    
+    }}
+    set doc [dom parse -json $json]
+    set dict [$doc asDict]
+    $doc delete
+    set result ""
+    lappend result [dict get $dict objectcontainer]
+    lappend result [dict get $dict arraycontainer]
+} {{a b c d} {Introduction Basics}}
+
+test json-10.4.1 {asDict object members named objectcontainer and arraycontainer} {
+    set json {{
+        "Titel": "Wirtschaftsinformatik",
+        "objectcontainer": {"a":"b","c":"d"},
+        "arraycontainer": ["Introduction","Basics"]    
+    }}
+    set doc [dom parse -json -jsonroot myjson $json]
+    set myjson [$doc documentElement]
+    set dict [$myjson asDict]
+    $doc delete
+    set result ""
+    lappend result [dict get $dict objectcontainer]
+    lappend result [dict get $dict arraycontainer]
+} {{a b c d} {Introduction Basics}}
+
+test json-10.5 {asDict} {
+    set result ""
+    foreach json {
+        \"foo\"
+        -1.23
+        null
+        false
+        true
+    } {
+        set doc [dom parse -json $json]
+        lappend result [$doc asDict resulttype] $resulttype
+        $doc delete
+    }
+    set result
+} {foo string -1.23 string null string false string true string}
+
+test json-10.5.1 {asDict} {
+    set result ""
+    foreach json {
+        \"foo\"
+        -1.23
+        null
+        false
+        true
+    } {
+        set doc [dom parse -json -jsonroot myjson $json]
+        set myjson [$doc documentElement]
+        lappend result [$myjson asDict resulttype] $resulttype
+        $doc delete
+    }
+    set result
+} {foo string -1.23 string null string false string true string}
+
+test json-10.6 {asDict} {
+    set result ""
+    foreach json {
+        ["bar"]
+        [1,2]
+        [null,true,false]
+    } {
+        set doc [dom parse -json $json]
+        set thisresult [$doc asDict resulttype]
+        lappend result $thisresult $resulttype [llength $thisresult]
+        $doc delete
+    }
+    set result
+} {bar list 1 {1 2} list 2 {null true false} list 3}
+
+test json-10.6.1 {asDict} {
+    set result ""
+    foreach json {
+        ["bar"]
+        [1,2]
+        [null,true,false]
+    } {
+        set doc [dom parse -json -jsonroot myjson $json]
+        set myjson [$doc documentElement]
+        set thisresult [$myjson asDict resulttype]
+        lappend result $thisresult $resulttype [llength $thisresult]
+        $doc delete
+    }
+    set result
+} {bar list 1 {1 2} list 2 {null true false} list 3}
+
+test json-10.7 {asDict} {
+    set json {{
+        "Titel": "Wirtschaftsinformatik",
+        "Keywords": ["Introduction","Basics"],
+        "Year": 2022
+    }}
+    set doc [dom parse -json $json]
+    set dict [$doc asDict resulttype]
+    $doc delete
+    list $dict $resulttype
+} {{Titel Wirtschaftsinformatik Keywords {Introduction Basics} Year 2022} dict}
+
+test json-10.7.1 {asDict} {
+    set json {{
+        "Titel": "Wirtschaftsinformatik",
+        "Keywords": ["Introduction","Basics"],
+        "Year": 2022
+    }}
+    set doc [dom parse -json -jsonroot myjson $json]
+    set myjson [$doc documentElement]
+    set dict [$myjson asDict resulttype]
+    $doc delete
+    list $dict $resulttype
+} {{Titel Wirtschaftsinformatik Keywords {Introduction Basics} Year 2022} dict}

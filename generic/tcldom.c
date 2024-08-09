@@ -3525,15 +3525,51 @@ Tcl_Obj * tcldom_treeAsDictWorker (
 |   tcldom_treeAsDict
 |
 \---------------------------------------------------------------------------*/
-static void
+static int
 tcldom_treeAsDict (
     Tcl_Interp *interp,
-    domNode     *node
+    domNode    *node,
+    Tcl_Obj    *var_name
     )
 {
-    Tcl_SetObjResult (
-        interp,
-        tcldom_treeAsDictWorker (interp, node, node->info));
+    char        *type;
+    int          typelen;
+    Tcl_Obj     *resultObj;
+    domTextNode *textnode;
+    
+    if (var_name) {
+        if (node->nodeType == ELEMENT_NODE) {
+            if (node->info == JSON_OBJECT) {
+                type = "dict";
+                typelen = 4;
+            } else if (node->info == JSON_ARRAY) {
+                type = "list";
+                typelen = 4;
+            } else {
+                type = "string";
+                typelen = 6;
+            }
+        } else {
+            type = "string";
+            typelen = 6;
+        }
+        if (!Tcl_ObjSetVar2 (interp, var_name, NULL,
+                             Tcl_NewStringObj (type, typelen),
+                             TCL_LEAVE_ERR_MSG)) {
+            return TCL_ERROR;
+        }
+    }
+    if (node->nodeType == ELEMENT_NODE) {
+        resultObj = tcldom_treeAsDictWorker (interp, node, node->info);
+    } else if (node->nodeType == TEXT_NODE) {
+        textnode = (domTextNode*)node;
+        resultObj = Tcl_NewStringObj (textnode->nodeValue,
+                                      textnode->valueLength);
+    } else {
+        resultObj = Tcl_NewObj ();
+    }
+    Tcl_SetObjResult (interp, resultObj);
+    return TCL_OK;
 }
 
 /*----------------------------------------------------------------------------
@@ -5270,8 +5306,11 @@ int tcldom_NodeObjCmd (
             break;
 
         case m_asDict:
-            CheckArgs(2,2,2,"");
-            tcldom_treeAsDict (interp, node);
+            CheckArgs(2,3,2,"?typeVar?");
+            if (tcldom_treeAsDict (interp, node, (objc == 3) ? objv[2] : NULL)
+                != TCL_OK) {
+                return TCL_ERROR;
+            }
             break;
             
         case m_getAttribute:

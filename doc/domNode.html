@@ -4,17 +4,17 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x5607ea0f83c0">NAME</a> · <a href="#SECTid0x5607ea0eaec0">SYNOPSIS</a> · <a href="#SECTid0x5607ea11fc60"> DESCRIPTION </a> · <a href="#SECTid0x5607ea104e80">SEE ALSO</a> · <a href="#SECTid0x5607ea105210">KEYWORDS</a>
+<a href="#SECTid0x559c19750370">NAME</a> · <a href="#SECTid0x559c1963dda0">SYNOPSIS</a> · <a href="#SECTid0x559c1974f4c0"> DESCRIPTION </a> · <a href="#SECTid0x559c19703200">SEE ALSO</a> · <a href="#SECTid0x559c19703590">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x5607ea0f83c0">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x559c19750370">NAME</a></h2><p class="namesection">
 <b class="names">domNode - </b><br>Manipulates an instance of a DOM node object</p>
 
 
 
-  <h2><a name="SECTid0x5607ea0eaec0">SYNOPSIS</a></h2><pre class="syntax"> $nodeObject <i class="m">method</i>  <i class="m">arg arg ...</i>
+  <h2><a name="SECTid0x559c1963dda0">SYNOPSIS</a></h2><pre class="syntax"> $nodeObject <i class="m">method</i>  <i class="m">arg arg ...</i>
 </pre>
-  <h2><a name="SECTid0x5607ea11fc60"> DESCRIPTION </a></h2><p>This command manipulates one particular instance of a DOM node object.
+  <h2><a name="SECTid0x559c1974f4c0"> DESCRIPTION </a></h2><p>This command manipulates one particular instance of a DOM node object.
 <i class="m">method</i> indicates a specific method of the node class. These methods
 should closely conform to the W3C recommendation "Document Object Model
 (Core) Level 1" (<a href="http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html">http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html</a>)
@@ -552,7 +552,7 @@ nested Tcl list.</dd>
       
         <dt>
 <b class="method">asHTML</b> <b class="option">?-channel
-channelId?</b> <b class="option">?-escapeNonASCII?</b> <b class="option">?-htmlEntities?</b> <b class="option">?-doctypeDeclaration &lt;boolean&gt;?</b> <b class="option">?-breakLines?</b> <b class="option">?-onlyContents?</b>
+channelId?</b> <b class="option">b?-escapeNonASCII?</b> <b class="option">?-htmlEntities?</b> <b class="option">?-doctypeDeclaration &lt;boolean&gt;?</b> <b class="option">?-breakLines?</b> <b class="option">?-onlyContents?</b>
 </dt>
         <dd>
 <p>Returns the DOM substree starting from the current
@@ -574,6 +574,34 @@ the string-value of every text node descendant of node in document
 order without any escaping. For every other node type, this method outputs the XPath string value of that node.</dd>
       
 
+      
+        <dt>
+<b class="method">asJSON</b> <b class="option">?-indent none/0..8?</b> <b class="option">?-channel channelId?</b>
+</dt>
+          <dd>
+<p>The asJSON method serializes the subtree starting with the node the method was called on into a valid
+          JSON data string.</p>
+          
+          <p>See the documentation of the <b class="command">domDoc</b>
+          method <b class="method">asDict</b> for a detailed description of
+          the method</p>
+          </dd>
+      
+
+      
+        <dt>
+<b class="method">asDict</b> <b class="option">?typevariable?</b>
+</dt>
+        <dd>
+<p>In case the subtree starting with the node the method
+        was called on includes JSON type information this method
+        returns the JSON data as nested Tcl data structure.</p>
+        <p>See the documentation of the <b class="command">domDoc</b>
+        method <b class="method">asDict</b> for a detailed description of
+        the method</p>
+        </dd>
+      
+      
       
         <dt>
 <b class="method">appendFromList</b> <i class="m">list</i>
@@ -754,9 +782,9 @@ name as the given method within the namespace <tt class="l">::dom::domNode</tt> 
 be executed. This allows quick method additions on Tcl level.</p>
 
 
-  <h2><a name="SECTid0x5607ea104e80">SEE ALSO</a></h2><p class="seealso">dom, domDoc</p>
+  <h2><a name="SECTid0x559c19703200">SEE ALSO</a></h2><p class="seealso">dom, domDoc</p>
   
-  <h2><a name="SECTid0x5607ea105210">KEYWORDS</a></h2><p class="keywords">
+  <h2><a name="SECTid0x559c19703590">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-XML">XML</a>, <a class="keyword" href="keyword-index.html#KW-DOM">DOM</a>, <a class="keyword" href="keyword-index.html#KW-document">document</a>, <a class="keyword" href="keyword-index.html#KW-node">node</a>, <a class="keyword" href="keyword-index.html#KW-parsing">parsing</a>
 </p>
   
