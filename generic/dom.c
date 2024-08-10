@@ -5316,7 +5316,7 @@ typedef struct _tdomCmdReadInfo {
 
 int tcldom_returnDocumentObj (Tcl_Interp *interp, 
                               domDocument *document,
-                              int setVariable, Tcl_Obj *var_name,
+                              Tcl_Obj *var_name,
                               int trace, int forOwnerDocument);
 
 void
@@ -5541,7 +5541,7 @@ TclTdomObjCmd (
             return TCL_ERROR;
         }
         domSetDocumentElement (info->document);
-        result = tcldom_returnDocumentObj (interp, info->document, 0,
+        result = tcldom_returnDocumentObj (interp, info->document,
                                            newObjName, 0, 0);
         info->document = NULL;
         return result;

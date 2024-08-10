@@ -625,7 +625,7 @@ test dom-2.33.2 {JSON data starting with a dash (-)} {
 test dom-2.33.3 {JSON data starting with a dash (-)} {
     dom parse -json -0.123 -0.123 
     set result [${-0.123} asXML -indent none]
-    $doc delete
+    ${-0.123} delete
     set result
 } -0.123
 
