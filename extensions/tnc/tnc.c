@@ -2969,6 +2969,13 @@ TclTncObjCmd(dummy, interp, objc, objv)
 #  define TCL_STORAGE_CLASS DLLEXPORT
 #endif
 
+#if TCL_MAJOR_VERSION == 8
+# define STUB_VERSION "8.5"
+#else
+# define STUB_VERSION "9.0"
+#endif
+
+
 EXTERN int
 Tnc_Init (interp)
     Tcl_Interp *interp;

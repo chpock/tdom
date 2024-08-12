@@ -1,5 +1,5 @@
-C Simplyfied\sa\sfew\sfunctions.
-D 2024-08-10T01:06:15.610
+C Missed\sto\scall\sTcl_InitStubs()\sin\stnc\saccoding\sto\sthe\sTcl\smajor\sversion.
+D 2024-08-12T10:21:47.650
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -118,7 +118,7 @@ F extensions/tnc/test.tcl 545cdec17e6702cef9f79184fdf1ce0166b8c412
 F extensions/tnc/tests/all.tcl 845c9dab65c294c3570f69cc731d6fef62efbd03
 F extensions/tnc/tests/loadtnc.tcl c9b49c87af627263d40dcfbdd005bfddbc2a6ab5c8636d25618034c724e91c71
 F extensions/tnc/tests/tnc.test 3a144815194f81b3ec4222e868e0832c009ebd707fefa598dfcfa5d3ec1debb8
-F extensions/tnc/tnc.c f065f6b52220896530e27033322b01d3736868edc71124ea28eec049d4615aca
+F extensions/tnc/tnc.c 8b0e92648c8977b2cbbc95564f499c63ccf13524a1be015cfb861e10c9f50a48
 F extensions/tnc/win/makefile.vc 51edf6f542aa90a9195b4a217d15ae7a4df488faa15c4ca723bc2705640b6bc9
 F extensions/tnc/win/nmakehlp.c 194ae7c24886245c679cb4c9ea7e6daaaebb5fcd
 F extensions/tnc/win/rules-ext.vc e788fcfc1e69b11946e18b8f67e0870b3bd38913
@@ -241,8 +241,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 33631b4af3439c07efe746b180cef7075c28d4719844d79daeb53a4a50514c43
-R a026a8fba5efca1b834b291315aa34b4
+P a701f2951207cb221cc2bd8261e00649ade9568fa95c9f746176ba1c9cf9c1f7
+R 1aee85f4c6c6d97735d16befe228c250
 U rolf
-Z 1dab27c730b35c9378805054bc76e3de
+Z e8e278e2077f480186f5c0a062c1d966
 # Remove this line to create a well-formed Fossil manifest.
