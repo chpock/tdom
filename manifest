@@ -1,5 +1,5 @@
-C Regenerated\stnc\sconfigure.
-D 2024-08-13T20:30:36.504
+C Updated\sthe\snmake\sbuild\sinfrastructure.
+D 2024-08-13T20:34:39.158
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -121,9 +121,9 @@ F extensions/tnc/tests/tnc.test 3a144815194f81b3ec4222e868e0832c009ebd707fefa598
 F extensions/tnc/tnc.c 8b0e92648c8977b2cbbc95564f499c63ccf13524a1be015cfb861e10c9f50a48
 F extensions/tnc/win/makefile.vc 51edf6f542aa90a9195b4a217d15ae7a4df488faa15c4ca723bc2705640b6bc9
 F extensions/tnc/win/nmakehlp.c 194ae7c24886245c679cb4c9ea7e6daaaebb5fcd
-F extensions/tnc/win/rules-ext.vc e788fcfc1e69b11946e18b8f67e0870b3bd38913
-F extensions/tnc/win/rules.vc 8157e2a811cf5e93683d6b0fbf5d91d153aa4535
-F extensions/tnc/win/targets.vc 79dea1c6a94a94e6ed8bae9e0195149b25a69923
+F extensions/tnc/win/rules-ext.vc 3c02944b3199014d35de617a1c146d0944af16395870da423374fb013ef57ecf
+F extensions/tnc/win/rules.vc afa89d3b334f5958efc447c985949447a9b05f6c891c7e1e8c0423ed226e89dc
+F extensions/tnc/win/targets.vc 3627f336071161bfb6bbaea40465b731e42f4ad750189a967e58b1ce40b4eb0b
 F generic/HTML5ent.inc c122e35eb1be8e325f8846080bbccc166978cfe7136e850d7e8aa477824d2b8f
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
 F generic/datatypes.c 7c9f9edb50b4592b2317dfde3db6feaa342e80f1322aee4b747eb98c486d959b
@@ -241,8 +241,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 5beb22ffe8b34884eb4c9190c339ae60fe1eaffdfe4e2d3acc28957c3e2593bd
-R cc3a27b1b7fe124b49536b68eb71d860
+P 5e12d0cccd634a1fd3f207582a6047dd2529a9cea9d62de31fd5519e687277cc
+R 3ed98343386808b8836e0c2bd60b9d80
 U rolf
-Z 0b431d5a2bfa44fadff1360dac2e52f7
+Z 6c315d11dfcd5f12d0eb66662112b9e5
 # Remove this line to create a well-formed Fossil manifest.
