@@ -1,5 +1,5 @@
-C Missed\sto\scall\sTcl_InitStubs()\sin\stnc\saccoding\sto\sthe\sTcl\smajor\sversion.
-D 2024-08-12T10:21:47.650
+C Rename\stnc\sconfigure.in\sto\sconfigure.ac\sto\sfollow\snowadays\shabits.
+D 2024-08-13T20:21:25.809
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -111,7 +111,7 @@ F extensions/tdomhtml/win/makefile.vc a6ba491c8f63a88c607c443e7a80f1369cb3c40c
 F extensions/tnc/Makefile.in c51faf11e968837f696422a9b051c3544d59c495cece41e2b24921dbe1c2946c
 F extensions/tnc/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
 F extensions/tnc/configure 67ced6d84ab6e1dd814a265e7648d8e856b91b695aabb20195c4575b42291686 x
-F extensions/tnc/configure.in d15ed29caa0e95f17f9df4686553dd6636549c61
+F extensions/tnc/configure.ac d15ed29caa0e95f17f9df4686553dd6636549c61 w extensions/tnc/configure.in
 F extensions/tnc/install-sh bdd5e293591621ae60d9824d86a4b1c5f22c3d00 x
 F extensions/tnc/pkgIndex.tcl.in 6c224c2cdbb494f621ec008f96fe4a552a79a7b7
 F extensions/tnc/test.tcl 545cdec17e6702cef9f79184fdf1ce0166b8c412
@@ -241,8 +241,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a701f2951207cb221cc2bd8261e00649ade9568fa95c9f746176ba1c9cf9c1f7
-R 1aee85f4c6c6d97735d16befe228c250
+P 08a419c8239acf32cd09e9242c24769a625806a936b5c7e10e1cc90606a7b8b5
+R e694ecd718111a31beeb0b60ad38651b
 U rolf
-Z e8e278e2077f480186f5c0a062c1d966
+Z e7474f06af35c8a3f830a9cea2d35a36
 # Remove this line to create a well-formed Fossil manifest.
