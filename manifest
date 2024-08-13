@@ -1,5 +1,5 @@
-C Rename\stnc\sconfigure.in\sto\sconfigure.ac\sto\sfollow\snowadays\shabits.
-D 2024-08-13T20:21:25.809
+C Regenerated\stnc\sconfigure.
+D 2024-08-13T20:30:36.504
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -110,8 +110,8 @@ F extensions/tdomhtml/tdomhtml.tcl 6901a0fb8db80954dd635e181934b9e3ba3a186455115
 F extensions/tdomhtml/win/makefile.vc a6ba491c8f63a88c607c443e7a80f1369cb3c40c
 F extensions/tnc/Makefile.in c51faf11e968837f696422a9b051c3544d59c495cece41e2b24921dbe1c2946c
 F extensions/tnc/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
-F extensions/tnc/configure 67ced6d84ab6e1dd814a265e7648d8e856b91b695aabb20195c4575b42291686 x
-F extensions/tnc/configure.ac d15ed29caa0e95f17f9df4686553dd6636549c61 w extensions/tnc/configure.in
+F extensions/tnc/configure 948aa7934f862944394da2ba10e63c4936065701389ad2153415a07fac7df2b4 x
+F extensions/tnc/configure.ac 72ce2231e040d38f6a146fb1dfa3ed187bebbeaecc85ab3811acf0a986900aac
 F extensions/tnc/install-sh bdd5e293591621ae60d9824d86a4b1c5f22c3d00 x
 F extensions/tnc/pkgIndex.tcl.in 6c224c2cdbb494f621ec008f96fe4a552a79a7b7
 F extensions/tnc/test.tcl 545cdec17e6702cef9f79184fdf1ce0166b8c412
@@ -241,8 +241,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 08a419c8239acf32cd09e9242c24769a625806a936b5c7e10e1cc90606a7b8b5
-R e694ecd718111a31beeb0b60ad38651b
+P 5beb22ffe8b34884eb4c9190c339ae60fe1eaffdfe4e2d3acc28957c3e2593bd
+R cc3a27b1b7fe124b49536b68eb71d860
 U rolf
-Z e7474f06af35c8a3f830a9cea2d35a36
+Z 0b431d5a2bfa44fadff1360dac2e52f7
 # Remove this line to create a well-formed Fossil manifest.
