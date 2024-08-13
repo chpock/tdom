@@ -5,9 +5,11 @@
 #include <expat.h>
 #include <tclexpat.h>
 
+#undef TCL_STORAGE_CLASS
 #ifdef BUILD_tdom
-# undef TCL_STORAGE_CLASS
 # define TCL_STORAGE_CLASS DLLEXPORT
+#else
+# define TCL_STORAGE_CLASS DLLIMPORT
 #endif
 
 #include "dom.h"
