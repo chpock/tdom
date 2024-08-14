@@ -1,5 +1,10 @@
 # tnc Tcl package index file
-
-package ifneeded tnc @PACKAGE_VERSION@        \
-    "package require tdom; \
-     [list load [file join $dir @PKG_LIB_FILE@] tnc]"
+if {[package vsatisfies [package provide Tcl] 9.0-]} {
+    package ifneeded tnc @PACKAGE_VERSION@        \
+        "package require tdom; \
+         [list load [file join $dir @PKG_LIB_FILE9@] tnc]"
+} else {
+    package ifneeded tnc @PACKAGE_VERSION@        \
+        "package require tdom; \
+         [list load [file join $dir @PKG_LIB_FILE8@] tnc]"
+}

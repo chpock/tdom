@@ -1,5 +1,5 @@
-C At\ssome\spoint\sin\stime\sthe\stest\sdata\sfile\sREC-xslt-19991116.xml\sgot\slocally\smodified\sfor\stesting\spurpose\sand\sthat\schanges\sgot\scommited\sby\smistake.\sChanged\sthe\sdata\sfile\sso\sthat\sis\sis\svalid\sand\sadded\sthe\smodified\sto\sbe\sinvalid\sversion\sto\shave\sa\stest\sfor\sthat\swith\sa\slarger\sfile.
-D 2024-08-14T13:01:11.368
+C Modified\spkgIndex.tcl.in\sso\sthat\sit\sis\susable\sfor\sa\sside\sby\sside\sinstallation\sof\stnc\sfor\sTcl\s8.6\sand\sTcl\s9.\sCompleted\s[08a419c823].
+D 2024-08-14T14:47:14.351
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -113,12 +113,12 @@ F extensions/tnc/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
 F extensions/tnc/configure 948aa7934f862944394da2ba10e63c4936065701389ad2153415a07fac7df2b4 x
 F extensions/tnc/configure.ac 72ce2231e040d38f6a146fb1dfa3ed187bebbeaecc85ab3811acf0a986900aac
 F extensions/tnc/install-sh bdd5e293591621ae60d9824d86a4b1c5f22c3d00 x
-F extensions/tnc/pkgIndex.tcl.in 6c224c2cdbb494f621ec008f96fe4a552a79a7b7
+F extensions/tnc/pkgIndex.tcl.in 31af385a73fa5544343c6b2749c762697c6c5123ac37dc2230bf5fe0f8f849e7
 F extensions/tnc/test.tcl 545cdec17e6702cef9f79184fdf1ce0166b8c412
 F extensions/tnc/tests/all.tcl 845c9dab65c294c3570f69cc731d6fef62efbd03
 F extensions/tnc/tests/loadtnc.tcl c9b49c87af627263d40dcfbdd005bfddbc2a6ab5c8636d25618034c724e91c71
 F extensions/tnc/tests/tnc.test 689eb32d186e04de0b0809333ad39f8a23ec1467fa545b790e7959ed7b09556c
-F extensions/tnc/tnc.c 8b0e92648c8977b2cbbc95564f499c63ccf13524a1be015cfb861e10c9f50a48
+F extensions/tnc/tnc.c 227230a34d9d8de3745be885ae8b9cb2911c7a7eba8cf72d84e522750d75121b
 F extensions/tnc/win/makefile.vc 51edf6f542aa90a9195b4a217d15ae7a4df488faa15c4ca723bc2705640b6bc9
 F extensions/tnc/win/nmakehlp.c 194ae7c24886245c679cb4c9ea7e6daaaebb5fcd
 F extensions/tnc/win/rules-ext.vc 3c02944b3199014d35de617a1c146d0944af16395870da423374fb013ef57ecf
@@ -242,8 +242,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 613b2d7f5662a8acad0ef9665a16b8272d64cf2a0234f27cd9b6486d6324eb18
-R 4d314444bc95dbe859da1de71ab656e4
+P c744ce9b1b732ea3ff8e12411a75340311cb8d10f438439fd948d95f996cb2a7
+R 2ee25cc41a017d15472a967b6b197b66
 U rolf
-Z 5a4ab035a12fc65645251d9d3557c8d9
+Z 6ab9a1f634c474618c04606e81daa847
 # Remove this line to create a well-formed Fossil manifest.
