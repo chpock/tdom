@@ -583,11 +583,11 @@ See the documentation of the
 .TP
 \&\fBdomDoc
 \&\fR
-method \fBasDict\fP for a detailed description of
+method \fBasJSON\fP for a detailed description of
 the method
 .RE
 .TP
-\&\fB\fBasDict\fP \fB?typevariable?\fP
+\&\fB\fBasTclValue\fP \fB?typevariable?\fP
 \&\fR
 .RS
 .PP
@@ -599,7 +599,7 @@ See the documentation of the
 .TP
 \&\fBdomDoc
 \&\fR
-method \fBasDict\fP for a detailed description of
+method \fBasTclValue\fP for a detailed description of
 the method
 .RE
 .TP

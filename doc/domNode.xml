@@ -519,18 +519,18 @@ order without any escaping. For every other node type, this method outputs the X
           JSON data string.</p>
           
           <p>See the documentation of the <command>domDoc</command>
-          method <method>asDict</method> for a detailed description of
+          method <method>asJSON</method> for a detailed description of
           the method</p>
           </desc>
       </commanddef>
 
       <commanddef>
-        <command><method>asDict</method> <option>?typevariable?</option></command>
+        <command><method>asTclValue</method> <option>?typevariable?</option></command>
         <desc><p>In case the subtree starting with the node the method
         was called on includes JSON type information this method
         returns the JSON data as nested Tcl data structure.</p>
         <p>See the documentation of the <command>domDoc</command>
-        method <method>asDict</method> for a detailed description of
+        method <method>asTclValue</method> for a detailed description of
         the method</p>
         </desc>
       </commanddef>

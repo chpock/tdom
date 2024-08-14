@@ -4972,7 +4972,7 @@ int tcldom_NodeObjCmd (
         "getElementsByTagName",              "getElementsByTagNameNS",
         "disableOutputEscaping",             "precedes",         "asText",
         "insertBeforeFromScript",            "normalize",        "baseURI",
-        "asJSON",          "asDict",         "jsonType",       "attributeNames",
+        "asJSON",          "asTclValue",     "jsonType",       "attributeNames",
         "asCanonicalXML",  "getByteIndex",
 #ifdef TCL_THREADS
         "readlock",        "writelock",
@@ -4996,7 +4996,7 @@ int tcldom_NodeObjCmd (
         m_getElementsByTagName,              m_getElementsByTagNameNS,
         m_disableOutputEscaping,             m_precedes,        m_asText,
         m_insertBeforeFromScript,            m_normalize,       m_baseURI,
-        m_asJSON,          m_asDict,         m_jsonType,        m_attributeNames,
+        m_asJSON,          m_asTclValue,         m_jsonType,        m_attributeNames,
         m_asCanonicalXML,  m_getByteIndex
 #ifdef TCL_THREADS
         ,m_readlock,       m_writelock
@@ -5302,7 +5302,7 @@ int tcldom_NodeObjCmd (
             }
             break;
 
-        case m_asDict:
+        case m_asTclValue:
             CheckArgs(2,3,2,"?typeVar?");
             if (tcldom_treeAsDict (interp, node, (objc == 3) ? objv[2] : NULL)
                 != TCL_OK) {
@@ -6106,7 +6106,7 @@ int tcldom_DocObjCmd (
         "replaceChild",    "appendFromList",             "appendXML",
         "selectNodes",     "baseURI",                    "appendFromScript",
         "insertBeforeFromScript",                        "asJSON",
-        "jsonType",        "asDict",
+        "jsonType",        "asTclValue",
 #ifdef TCL_THREADS
         "readlock",        "writelock",                  "renumber",
 #endif
@@ -6132,7 +6132,7 @@ int tcldom_DocObjCmd (
         m_replaceChild,     m_appendFromList,             m_appendXML,
         m_selectNodes,      m_baseURI,                    m_appendFromScript,
         m_insertBeforeFromScript,                         m_asJSON,
-        m_jsonType,         m_asDict
+        m_jsonType,         m_asTclValue
 #ifdef TCL_THREADS
        ,m_readlock,         m_writelock,                  m_renumber
 #endif
@@ -6567,7 +6567,7 @@ int tcldom_DocObjCmd (
         case m_selectNodes:
         case m_baseURI:
         case m_asJSON:
-        case m_asDict:
+        case m_asTclValue:
         case m_jsonType:
         case m_getElementById:
             /* We dispatch the method call to tcldom_NodeObjCmd */
