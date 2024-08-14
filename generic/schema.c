@@ -4575,10 +4575,10 @@ schemaInstanceInfoCmd (
          * (from scripts called with the tcl cmd). */
         if (sdata->vaction) {
             /* This is the case: called from reportCmd. */
-            return tcldom_setInterpAndReturnVar (interp, sdata->node, 0, NULL);
+            return tcldom_setInterpAndReturnVar (interp, sdata->node, NULL);
         } else {
             /* This is the case: called from a with tcl called script. */
-            return tcldom_setInterpAndReturnVar (interp, sdata->insideNode, 0, NULL);
+            return tcldom_setInterpAndReturnVar (interp, sdata->insideNode, NULL);
         }
         break;
         
