@@ -173,6 +173,19 @@ test tnc-2.8 {Validate REC-xslt-19991116.xml} {
     $parser free
 } {}
 
+test tnc-2.8.1 {Validate REC-xslt-19991116-mod.xml} {
+    set ::tDOM::extRefHandlerDebug 1
+    set parser [expat -externalentitycommand 2.8-resolver  \
+                    -paramentityparsing always]
+    tnc $parser enable
+    set result [catch {
+        $parser parsefile [file join [file dir [info script]] \
+                               ../../../tests/data/REC-xslt-19991116-mod.xml]
+    }]
+    $parser free
+    set result
+} 1
+
 test tnc-2.9 {check #PCDATA only element} {
     set parser [expat]
     tnc $parser enable
