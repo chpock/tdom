@@ -549,7 +549,7 @@ See the documentation of the
 arguments.
 .RE
 .TP
-\&\fB\fBasHTML\fP \fB?-channel channelId?\fP \fB?-escapeNonASCII?\fP \fB?-htmlEntities?\fP \fB?-doctypeDeclaration <boolean>?\fP \fB?-breakLines?\fP \fB?-onlyContents?\fP
+\&\fB\fBasHTML\fP \fB?-channel channelId?\fP \fBb?-escapeNonASCII?\fP \fB?-htmlEntities?\fP \fB?-doctypeDeclaration <boolean>?\fP \fB?-breakLines?\fP \fB?-onlyContents?\fP
 \&\fR
 .RS
 .PP
@@ -571,6 +571,37 @@ the arguments.
 \&\fRFor ELEMENT_NODEs, the asText method outputs
 the string-value of every text node descendant of node in document
 order without any escaping. For every other node type, this method outputs the XPath string value of that node.
+.TP
+\&\fB\fBasJSON\fP \fB?-indent none/0..8?\fP \fB?-channel channelId?\fP
+\&\fR
+.RS
+.PP
+The asJSON method serializes the subtree starting with the node the method was called on into a valid
+JSON data string.
+.PP
+See the documentation of the
+.TP
+\&\fBdomDoc
+\&\fR
+method \fBasJSON\fP for a detailed description of
+the method
+.RE
+.TP
+\&\fB\fBasTclValue\fP \fB?typevariable?\fP
+\&\fR
+.RS
+.PP
+In case the subtree starting with the node the method
+was called on includes JSON type information this method
+returns the JSON data as nested Tcl data structure.
+.PP
+See the documentation of the
+.TP
+\&\fBdomDoc
+\&\fR
+method \fBasTclValue\fP for a detailed description of
+the method
+.RE
 .TP
 \&\fB\fBappendFromList\fP \fIlist\fB
 \&\fRParses \fIlist\fR , creates an according DOM subtree and
