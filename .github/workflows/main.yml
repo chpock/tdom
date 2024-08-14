@@ -1,0 +1,45 @@
+name: Daily sync
+on:
+  schedule:
+    - cron: 0 0 * * *
+
+jobs:
+  sync:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+
+      - name: Setup Environment
+        run: |
+          sudo apt-get install -y fossil
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+#          ref: master
+
+      - name: Clone http://www.tdom.org
+        run: |
+          fossil clone http://www.tdom.org $HOME/tdom.fossil
+
+      - name: Sync
+        run: |
+          fossil git export -R $HOME/tdom.fossil . --autopush off --quiet
+
+#      - name: Fetch sync branch
+#        run: |
+#          git fetch origin sync
+#          git checkout sync
+
+      - name: Update sync branch
+        run: |
+          git -c "user.email=no@email.com" -c "user.name=sync" rebase master
+
+      - name: Push
+        run: |
+          git push --mirror
+
+
+
