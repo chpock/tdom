@@ -1,5 +1,5 @@
-C Added\sthe\sasTclValue\smethod\sto\sthe\sdomDoc\sand\sdomNode\scommands.
-D 2024-08-14T23:17:16.266
+C Made\sasTclValue\smore\srobust.
+D 2024-08-17T01:02:00.836
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -148,7 +148,7 @@ F generic/nodecmd.c 6f8118cb8044fa44ab839736c8246bab9798999c775dcc616e91660e9e06
 F generic/nodecmd.h 36056ca2c262cb1991cabef8d27992ad628db718d09ff0eeaeaffd150f1549ec
 F generic/schema.c 52485bd21a5eb9b94713179ee743914f3c9215e4378f95517e1a46dc8d704806
 F generic/schema.h 5e20a348c3f98724e9c118760c8d9fcd661ae8f27d21652d90ab49492d001c75
-F generic/tcldom.c 67133ab61c3bd2cd995fe4f5727802ca589d3cff7022f4649aad410598ed987e
+F generic/tcldom.c 550e7e6ebdc7eb31f3289f16fdcf3ca252611848bd2b7c2749734755fb53faa9
 F generic/tcldom.h b723e7ceeac1954c26469ec43a7f67de5368f0bb03c7e9fdea0da220b2b8d60c
 F generic/tclexpat.c acc4785ce6458a1e68987c043655ad12a2e81819fcfa45c76e17f13779d4b37c
 F generic/tclexpat.h 80b7da613f99a61e9a2f3f5e062b3995ff050d68a5a4c93ca31ccd5a986e355f
@@ -242,9 +242,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 106ba756258cc6b7bbb6e5b6702389b099e4c9c8cabb977d5174f8f1b2212d30 f1e4c3a745d64991e495902b58b542acb41a0a3fbdcfa4194064e7ffff064238
-R f514a4a6a30c0e448e9d9b6b78fba4b8
-T +closed f1e4c3a745d64991e495902b58b542acb41a0a3fbdcfa4194064e7ffff064238
+P 4cdcbd63e3de140ea57f885dbae39e16872d929c434bde92c491a81cb118f858
+R 855c8560cb2c0d216d6e7aedde96f9e3
 U rolf
-Z f3c98417af7783df8cc1298630f27739
+Z f0966eb09f2856019ce925d37a6b7696
 # Remove this line to create a well-formed Fossil manifest.

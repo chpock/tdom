@@ -3513,7 +3513,8 @@ Tcl_Obj * tcldom_treeAsDictWorker (
         }
         break;
     default:
-        fprintf (stderr, "Should not see that");
+        DBG (fprintf (stderr, "tcldom_treeAsDictWorker: Should not reach that!"));
+        resultObj = Tcl_NewObj ();     
         break;
     }
     return resultObj;
