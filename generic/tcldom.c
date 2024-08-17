@@ -194,44 +194,6 @@ typedef struct TcldomData {
     static int               tcldomInitialized;
 #endif /* TCL_THREADS */
 
-static char dom_usage[] =
-    "Usage dom <subCommand> <args>, where subCommand can be:    \n"
-    "    parse ?-keepEmpties? ?-channel <channel> ?-baseurl <baseurl>?  \n"
-    "        ?-feedbackAfter <#Bytes>?                    \n"
-    "        ?-feedbackcmd <cmd>?                         \n"
-    "        ?-externalentitycommand <cmd>?               \n"
-    "        ?-useForeignDTD <boolean>?                   \n"
-    "        ?-paramentityparsing <none|always|standalone>\n"
-    "        ?-simple? ?-html? ?-html5? ?-json?           \n"
-    "        ?-jsonmaxnesting <#nr>?                      \n"
-    "        ?-jsonroot name?                             \n"
-    "        ?<xml|html|json>? ?<objVar>?                 \n"
-    "    createDocument docElemName ?objVar?              \n"
-    "    createDocumentNS uri docElemName ?objVar?        \n"
-    "    createDocumentNode ?objVar?                      \n"
-    TDomThreaded(
-    "    attachDocument domDoc ?objVar?                   \n"
-    "    detachDocument domDoc                            \n"
-    )
-    "    createNodeCmd ?-returnNodeCmd? ?-tagName name? ?-jsonType jsonType? ?-namespace URI? (element|comment|text|cdata|pi)Node cmdName \n"
-    "    setStoreLineColumn ?boolean?                     \n"
-    "    setNameCheck ?boolean?                           \n"
-    "    setTextCheck ?boolean?                           \n"
-    "    setObjectCommands ?(automatic|token|command)?    \n"
-    "    isCharData string                                \n"
-    "    clearString ?-replace ?replacement?? string      \n"
-    "    isBMPCharData string                             \n"
-    "    isComment string                                 \n"
-    "    isCDATA string                                   \n"
-    "    isPIValue string                                 \n"
-    "    isName string                                    \n"
-    "    isQName string                                   \n"
-    "    isNCName string                                  \n"
-    "    isPIName string                                  \n"
-    "    isHTML5CustomName string                         \n"
-    "    featureinfo feature                              \n"
-;
-
 static char doc_usage[] =
     "Usage domDoc <method> <args>, where method can be:\n"
     "    documentElement ?objVar?                \n"
@@ -7229,7 +7191,8 @@ int tcldom_parse (
                     return TCL_ERROR;
                 }
             } else {
-                SetResult(dom_usage);
+                SetResult("The \"dom parse\" option \"-useForeignDTD\" "
+                          "requires a boolean as argument.");
                 return TCL_ERROR;
             }
             objv++; objc--;
@@ -7396,7 +7359,7 @@ int tcldom_parse (
     }
     if (chan == NULL) {
         if (objc < 2) {
-            SetResult(dom_usage);
+            SetResult("Missing the data to parse argument.");
             return TCL_ERROR;
         }
         xml_string = Tcl_GetStringFromObj( objv[1], &xml_string_len);
@@ -7405,7 +7368,7 @@ int tcldom_parse (
         }
     } else {
         if (objc > 2) {
-            SetResult(dom_usage);
+            SetResult("Too much arguments.");
             return TCL_ERROR;
         }
         xml_string = NULL;
@@ -7743,7 +7706,7 @@ int tcldom_DomObjCmd (
     int           methodIndex, result, i, bool, changed;
     domLength     repllen;
     Tcl_CmdInfo   cmdInfo;
-    Tcl_Obj     * mobjv[MAX_REWRITE_ARGS], *newObj;
+    Tcl_Obj     * mobjv[MAX_REWRITE_ARGS], *newObj, *storedErrMsg;
     Tcl_DString   cleardString;
 
     static const char *domMethods[] = {
@@ -7789,14 +7752,14 @@ int tcldom_DomObjCmd (
     };
     
     if (objc < 2) {
-        SetResult(dom_usage);
+        SetResult("Missing method call.");
         return TCL_ERROR;
     }
     if (TcldomDATA(domCreateCmdMode) == DOM_CREATECMDMODE_AUTO) {
         TcldomDATA(dontCreateObjCommands) = 0;
     }
     method = Tcl_GetString(objv[1]);
-    if (Tcl_GetIndexFromObj(NULL, objv[1], domMethods, "method", 0,
+    if (Tcl_GetIndexFromObj(interp, objv[1], domMethods, "method", 0,
                             &methodIndex) != TCL_OK) {
         /*--------------------------------------------------------
         |   try to find method implemented as normal Tcl proc
@@ -7807,11 +7770,15 @@ int tcldom_DomObjCmd (
         }
         sprintf(tmp, "::dom::DOMImplementation::%s", method);
         DBG(fprintf(stderr, "testing %s\n", tmp));
+        storedErrMsg = Tcl_GetObjResult (interp);
+        Tcl_IncrRefCount (storedErrMsg);
         result = Tcl_GetCommandInfo(interp, tmp, &cmdInfo);
         if (!result) {
-            SetResult(dom_usage);
+            SetResult(Tcl_GetString (storedErrMsg));
+            Tcl_DecrRefCount (storedErrMsg);
             return TCL_ERROR;
         }
+        Tcl_DecrRefCount (storedErrMsg);
         if (!cmdInfo.isNativeObjectProc) {
             SetResult("can't access Tcl level method!");
             return TCL_ERROR;
@@ -7824,8 +7791,9 @@ int tcldom_DomObjCmd (
         mobjv[1] = objv[0];
         for (i=2; i<objc; i++) mobjv[i] = objv[i];
         return cmdInfo.objProc(cmdInfo.objClientData, interp, objc, mobjv);
+        
     }
-    CheckArgs(2,12,1,dom_usage);
+    CheckArgs(2,12,1,"Too may arguments.");
     switch ((enum domMethod) methodIndex) {
 
         case m_createDocument:
@@ -7850,7 +7818,7 @@ int tcldom_DomObjCmd (
                 char *cmdName, *errMsg;
                 domDocument *doc;
                 if (objc < 3) {
-                    SetResult(dom_usage);
+                    SetResult("Missing argument to attachDocument method.");
                     return TCL_ERROR;
                 }
                 cmdName = Tcl_GetString(objv[2]);
@@ -7870,7 +7838,7 @@ int tcldom_DomObjCmd (
                 Tcl_CmdInfo cmdInfo;
                 domDocument *doc;
                 if (objc < 3) {
-                    SetResult(dom_usage);
+                    SetResult("Missing argument to detachDocument method.");
                     return TCL_ERROR;
                 }
                 cmdName = Tcl_GetString(objv[2]);
@@ -8054,7 +8022,6 @@ int tcldom_DomObjCmd (
             }
             return TCL_OK;
     }
-    SetResult( dom_usage);
     return TCL_ERROR;
 }
 
