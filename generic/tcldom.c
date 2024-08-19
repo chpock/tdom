@@ -248,7 +248,7 @@ static char doc_usage[] =
     "    asHTML ?-channel <channelId>? ?-escapeNonASCII? ?-htmlEntities?\n"
     "    asText                                  \n"
     "    asJSON ?-indent <none,0..8>?            \n"
-    "    asDict                                  \n"
+    "    asTclValue                              \n"
     "    getDefaultOutputMethod                  \n"
     "    publicId ?publicId?                     \n"
     "    systemId ?systemId?                     \n"
@@ -347,7 +347,7 @@ static char node_usage[] =
     "    asHTML ?-channel <channelId>? ?-escapeNonASCII? ?-htmlEntities?\n"
     "    asText                       \n"
     "    asJSON ?-indent <none,0..8>? \n"
-    "    asDict                       \n"
+    "    asTclValue                   \n"
     "    appendFromList nestedList    \n"
     "    appendFromScript script      \n"
     "    insertBeforeFromScript script ref \n"
@@ -3446,11 +3446,11 @@ void tcldom_treeAsJSON (
 }
 
 /*----------------------------------------------------------------------------
-|   tcldom_treeAsDictWorker
+|   tcldom_treeAsTclValueWorker
 |
 \---------------------------------------------------------------------------*/
 static
-Tcl_Obj * tcldom_treeAsDictWorker (
+Tcl_Obj * tcldom_treeAsTclValueWorker (
     Tcl_Interp *interp,
     domNode    *node,
     int         parentType    
@@ -3474,7 +3474,7 @@ Tcl_Obj * tcldom_treeAsDictWorker (
                 valueObj = Tcl_NewStringObj (textNode->nodeValue,
                                              textNode->valueLength);
             } else {
-                valueObj = tcldom_treeAsDictWorker (interp, this, JSON_ARRAY);
+                valueObj = tcldom_treeAsTclValueWorker (interp, this, JSON_ARRAY);
             }
             Tcl_ListObjAppendElement (interp, resultObj, valueObj);
             this = this->nextSibling;            
@@ -3489,7 +3489,7 @@ Tcl_Obj * tcldom_treeAsDictWorker (
                 this = this->nextSibling;
                 continue;
             }
-            valueObj = tcldom_treeAsDictWorker (interp, this, JSON_OBJECT);
+            valueObj = tcldom_treeAsTclValueWorker (interp, this, JSON_OBJECT);
             nameObj = Tcl_NewStringObj (this->nodeName, -1);
             Tcl_DictObjPut (interp, resultObj, nameObj, valueObj);
             this = this->nextSibling;
@@ -3513,7 +3513,7 @@ Tcl_Obj * tcldom_treeAsDictWorker (
         }
         break;
     default:
-        DBG (fprintf (stderr, "tcldom_treeAsDictWorker: Should not reach that!"));
+        DBG (fprintf (stderr, "tcldom_treeAsTclValueWorker: Should not reach that!"));
         resultObj = Tcl_NewObj ();     
         break;
     }
@@ -3521,11 +3521,11 @@ Tcl_Obj * tcldom_treeAsDictWorker (
 }
 
 /*----------------------------------------------------------------------------
-|   tcldom_treeAsDict
+|   tcldom_treeAsTclValue
 |
 \---------------------------------------------------------------------------*/
 static int
-tcldom_treeAsDict (
+tcldom_treeAsTclValue (
     Tcl_Interp *interp,
     domNode    *node,
     Tcl_Obj    *var_name
@@ -3559,7 +3559,7 @@ tcldom_treeAsDict (
         }
     }
     if (node->nodeType == ELEMENT_NODE) {
-        resultObj = tcldom_treeAsDictWorker (interp, node, node->info);
+        resultObj = tcldom_treeAsTclValueWorker (interp, node, node->info);
     } else if (node->nodeType == TEXT_NODE) {
         textnode = (domTextNode*)node;
         resultObj = Tcl_NewStringObj (textnode->nodeValue,
@@ -5305,7 +5305,7 @@ int tcldom_NodeObjCmd (
 
         case m_asTclValue:
             CheckArgs(2,3,2,"?typeVar?");
-            if (tcldom_treeAsDict (interp, node, (objc == 3) ? objv[2] : NULL)
+            if (tcldom_treeAsTclValue (interp, node, (objc == 3) ? objv[2] : NULL)
                 != TCL_OK) {
                 return TCL_ERROR;
             }
