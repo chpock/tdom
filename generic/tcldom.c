@@ -194,81 +194,6 @@ typedef struct TcldomData {
     static int               tcldomInitialized;
 #endif /* TCL_THREADS */
 
-static char node_usage[] =
-    "Usage nodeObj <method> <args>, where method can be:\n"
-    "    nodeType                     \n"
-    "    nodeName                     \n"
-    "    nodeValue ?newValue?         \n"
-    "    hasChildNodes                \n"
-    "    childNodes                   \n"
-    "    childNodesLive               \n"
-    "    parentNode                   \n"
-    "    firstChild ?nodeObjVar?      \n"
-    "    lastChild ?nodeObjVar?       \n"
-    "    nextSibling ?nodeObjVar?     \n"
-    "    previousSibling ?nodeObjVar? \n"
-    "    hasAttribute attrName        \n"
-    "    getAttribute attrName ?defaultValue? \n"
-    "    setAttribute attrName value ?attrName value ...? \n"
-    "    removeAttribute attrName     \n"
-    "    hasAttributeNS uri localName \n"
-    "    getAttributeNS uri localName ?defaultValue? \n"
-    "    setAttributeNS uri attrName value ?attrName value ...? \n"
-    "    removeAttributeNS uri attrName \n"
-    "    attributes ?attrNamePattern?   \n"
-    "    attributeNames ?attrNamePattern?   \n"
-    "    appendChild new              \n"
-    "    insertBefore new ref         \n"
-    "    replaceChild new old         \n"
-    "    removeChild child            \n"
-    "    cloneNode ?-deep?            \n"
-    "    ownerDocument                \n"
-    "    getElementsByTagName name    \n"
-    "    getElementsByTagNameNS uri localname \n"
-    "    getElementById id            \n"
-    "    find attrName attrValue ?nodeObjVar?   \n"
-    "    child      number|all ?type? ?attrName attrValue? \n"
-    "    descendant number|all ?type? ?attrName attrValue? \n"
-    "    ancestor   number|all ?type? ?attrName attrValue? \n"
-    "    fsibling   number|all ?type? ?attrName attrValue? \n"
-    "    psibling   number|all ?type? ?attrName attrValue? \n"
-    "    root ?nodeObjVar?            \n"
-    "    target                       \n"
-    "    data                         \n"
-    "    text                         \n"
-    "    prefix                       \n"
-    "    namespaceURI                 \n"
-    "    getBaseURI                   \n"
-    "    baseURI ?URI?                \n"
-    "    localName                    \n"
-    "    delete                       \n"
-    "    getLine                      \n"
-    "    getColumn                    \n"
-    "    @<attrName> ?defaultValue?   \n"
-    "    asList                       \n"
-    "    asXML ?-indent <none,tabs,0..8>? ?-channel <channel>? ?other options - see manual?>\n"
-    "    asCanonicalXML ?-channel <channel>? ?-comments <boolean>\n"
-    "    asHTML ?-channel <channelId>? ?-escapeNonASCII? ?-htmlEntities?\n"
-    "    asText                       \n"
-    "    asJSON ?-indent <none,0..8>? \n"
-    "    asDict                       \n"
-    "    appendFromList nestedList    \n"
-    "    appendFromScript script      \n"
-    "    insertBeforeFromScript script ref \n"
-    "    appendXML xmlString          \n"
-    "    selectNodes ?-namespaces prefixUriList? ?-cache <boolean>? xpathQuery ?typeVar? \n"
-    "    toXPath ?-legacy?            \n"
-    "    disableOutputEscaping ?boolean? \n"
-    "    precedes node                \n"
-    "    normalize ?-forXPath?        \n"
-    "    xslt ?-parameters parameterList? <xsltDocNode>\n"
-    "    jsonType ?jsonType?          \n"
-    TDomThreaded(
-    "    readlock                     \n"
-    "    writelock                    \n"
-    )
-;
-
 static const char *jsonTypes[] = {
     "NONE",
     "ARRAY",
@@ -4856,7 +4781,7 @@ int tcldom_NodeObjCmd (
     long         line, column, byteIndex;
     int          nsIndex, bool, hnew, legacy, jsonType;
     Tcl_Obj     *namePtr, *resultPtr;
-    Tcl_Obj     *mobjv[MAX_REWRITE_ARGS];
+    Tcl_Obj     *mobjv[MAX_REWRITE_ARGS], *storedErrMsg;
     Tcl_CmdInfo  cmdInfo;
     Tcl_HashEntry *h;
 
@@ -4914,7 +4839,8 @@ int tcldom_NodeObjCmd (
     }
     if (node == NULL) {
         if (objc < 3) {
-            SetResult(node_usage);
+            Tcl_WrongNumArgs (interp, 1, objv,
+                              "nodetoken subcommand ?arg ...?");
             return TCL_ERROR;
         }
         if (TcldomDATA(domCreateCmdMode) == DOM_CREATECMDMODE_AUTO) {
@@ -4928,10 +4854,10 @@ int tcldom_NodeObjCmd (
         objv++;
     }
     if (objc < 2) {
-        SetResult(node_usage);
+        Tcl_WrongNumArgs (interp, 1, objv, "subcommand ?arg ...?");
         return TCL_ERROR;
     }
-    if (Tcl_GetIndexFromObj(NULL, objv[1], nodeMethods, "method", 0,
+    if (Tcl_GetIndexFromObj(interp, objv[1], nodeMethods, "method", 0,
                             &methodIndex) != TCL_OK) {
 
         method = Tcl_GetString(objv[1]);
@@ -4941,6 +4867,8 @@ int tcldom_NodeObjCmd (
             |   try to find method implemented as normal Tcl proc
             \-------------------------------------------------------*/
             result = 0;
+            storedErrMsg = Tcl_GetObjResult (interp);
+            Tcl_IncrRefCount (storedErrMsg);
             if (node->nodeType == ELEMENT_NODE) {
                 /*----------------------------------------------------
                 |   try to find Tcl level node specific method proc
@@ -4965,9 +4893,11 @@ int tcldom_NodeObjCmd (
                 result = Tcl_GetCommandInfo(interp, tmp, &cmdInfo);
             }
             if (!result) {
-                SetResult(node_usage);
+                SetResult(Tcl_GetString (storedErrMsg));
+                Tcl_DecrRefCount (storedErrMsg);
                 return TCL_ERROR;
             }
+            Tcl_DecrRefCount (storedErrMsg);
             if (!cmdInfo.isNativeObjectProc) {
                 SetResult("can't access Tcl level method!");
                 return TCL_ERROR;

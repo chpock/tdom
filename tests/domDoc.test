@@ -1977,7 +1977,6 @@ test domDoc-30.3 {cmd argument parsing} -body {
     set doc [dom parse {<doc><e/></doc>}]
     catch {$doc} result
     $doc delete
-    dom setObjectCommands $storedMode
     set result
 } -match regexp -result {wrong # args: should be "domDoc[^ ]+ subcommand \?arg ...\?"}
 
@@ -1995,7 +1994,6 @@ test domDoc-30.5 {cmd argument parsing} -body {
     set doc [dom parse {<doc><e/></doc>}]
     catch {$doc invalid-method} result
     $doc delete
-    dom setObjectCommands $storedMode
     set result
 } -match glob -result {bad method "invalid-method": must be *}
 

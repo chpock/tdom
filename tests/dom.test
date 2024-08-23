@@ -2497,7 +2497,7 @@ test dom-14.2 {wrong subcommand} -body {
 } -match glob -result {bad method "invalid-method": must be *}
 
 test dom-14.3 {Too less arguments to method parse} {
-    catch {dom invalid-method} errMsg
+    catch {dom parse} errMsg
     set errMsg
 } {wrong # args: should be "parse ?options? ?data? ?objvar?"}
 
