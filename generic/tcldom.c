@@ -3491,6 +3491,7 @@ Tcl_Obj * tcldom_treeAsTclValueWorker (
             }
             valueObj = tcldom_treeAsTclValueWorker (interp, this, JSON_OBJECT);
             nameObj = Tcl_NewStringObj (this->nodeName, -1);
+            Tcl_IncrRefCount (nameObj);
             Tcl_DictObjPut (interp, resultObj, nameObj, valueObj);
             Tcl_DecrRefCount (nameObj);
             this = this->nextSibling;
