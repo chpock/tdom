@@ -1,4 +1,9 @@
 
+2024-08-26  Rolf Ade  <rolf@pointsman.de>
+
+        Changed the error messages of the dom, domDoc and domNode
+        commands to mostly confirm to ususal Tcl behaviour.
+
 2024-08-14  Rolf Ade  <rolf@pointsman.de>
 
         Added the asTclValue method to the domDoc and domNode

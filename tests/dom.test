@@ -16,6 +16,7 @@
 #    dom-11.*: featureinfo
 #    dom-12.*: -feedbackAfter
 #    dom-13.*: -forest
+#    dom-14.*: command argument parsing
 #
 # Copyright (c) 2002, 2003, 2004 Rolf Ade.
 
@@ -2484,6 +2485,21 @@ test dom-13.10 {-forest} {
     $doc delete
     set result
 } {{} {}}
+
+test dom-14.1 {called without arguments} {
+    set result [catch {dom} errMsg]
+    lappend result $errMsg
+} {1 {wrong # args: should be "dom subcommand ?arg ...?"}}
+
+test dom-14.2 {wrong subcommand} -body {
+    catch {dom invalid-method} errMsg
+    set errMsg
+} -match glob -result {bad method "invalid-method": must be *}
+
+test dom-14.3 {Too less arguments to method parse} {
+    catch {dom parse} errMsg
+    set errMsg
+} {wrong # args: should be "parse ?options? ?data? ?objvar?"}
 
 # cleanup
 ::tcltest::cleanupTests

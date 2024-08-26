@@ -194,177 +194,6 @@ typedef struct TcldomData {
     static int               tcldomInitialized;
 #endif /* TCL_THREADS */
 
-static char dom_usage[] =
-    "Usage dom <subCommand> <args>, where subCommand can be:    \n"
-    "    parse ?-keepEmpties? ?-channel <channel> ?-baseurl <baseurl>?  \n"
-    "        ?-feedbackAfter <#Bytes>?                    \n"
-    "        ?-feedbackcmd <cmd>?                         \n"
-    "        ?-externalentitycommand <cmd>?               \n"
-    "        ?-useForeignDTD <boolean>?                   \n"
-    "        ?-paramentityparsing <none|always|standalone>\n"
-    "        ?-simple? ?-html? ?-html5? ?-json?           \n"
-    "        ?-jsonmaxnesting <#nr>?                      \n"
-    "        ?-jsonroot name?                             \n"
-    "        ?<xml|html|json>? ?<objVar>?                 \n"
-    "    createDocument docElemName ?objVar?              \n"
-    "    createDocumentNS uri docElemName ?objVar?        \n"
-    "    createDocumentNode ?objVar?                      \n"
-    TDomThreaded(
-    "    attachDocument domDoc ?objVar?                   \n"
-    "    detachDocument domDoc                            \n"
-    )
-    "    createNodeCmd ?-returnNodeCmd? ?-tagName name? ?-jsonType jsonType? ?-namespace URI? (element|comment|text|cdata|pi)Node cmdName \n"
-    "    setStoreLineColumn ?boolean?                     \n"
-    "    setNameCheck ?boolean?                           \n"
-    "    setTextCheck ?boolean?                           \n"
-    "    setObjectCommands ?(automatic|token|command)?    \n"
-    "    isCharData string                                \n"
-    "    clearString ?-replace ?replacement?? string      \n"
-    "    isBMPCharData string                             \n"
-    "    isComment string                                 \n"
-    "    isCDATA string                                   \n"
-    "    isPIValue string                                 \n"
-    "    isName string                                    \n"
-    "    isQName string                                   \n"
-    "    isNCName string                                  \n"
-    "    isPIName string                                  \n"
-    "    isHTML5CustomName string                         \n"
-    "    featureinfo feature                              \n"
-;
-
-static char doc_usage[] =
-    "Usage domDoc <method> <args>, where method can be:\n"
-    "    documentElement ?objVar?                \n"
-    "    getElementsByTagName name               \n"
-    "    getElementsByTagNameNS uri localname    \n"
-    "    createElement tagName ?objVar?          \n"
-    "    createElementNS uri tagName ?objVar?    \n"
-    "    createCDATASection data ?objVar?        \n"
-    "    createTextNode text ?objVar?            \n"
-    "    createComment text ?objVar?             \n"
-    "    createProcessingInstruction target data ?objVar? \n"
-    "    asXML ?-indent <none,tabs,0..8>? ?-channel <channel>? ?other options - see manual?>\n"
-    "    asCanonicalXML ?-channel <channel>? ?-comments <boolean>\n"
-    "    asHTML ?-channel <channelId>? ?-escapeNonASCII? ?-htmlEntities?\n"
-    "    asText                                  \n"
-    "    asJSON ?-indent <none,0..8>?            \n"
-    "    asTclValue                              \n"
-    "    getDefaultOutputMethod                  \n"
-    "    publicId ?publicId?                     \n"
-    "    systemId ?systemId?                     \n"
-    "    internalSubset ?internalSubset?         \n"
-    "    indent ?boolean?                        \n"
-    "    omit-xml-declaration ?boolean?          \n"
-    "    encoding ?value?                        \n"
-    "    standalone ?boolean?                    \n"
-    "    mediaType ?value?                       \n"
-    "    delete                                  \n"
-    "    xslt ?-parameters parameterList? ?-ignoreUndeclaredParameters? ?-xsltmessagecmd cmd? <xsltDocNode> ?objVar?\n"
-    "    toXSLTcmd                               \n"
-    "    cdataSectionElements (?URI:?localname|*) ?boolean?\n"
-    "    normalize ?-forXPath?                   \n"
-    "    nodeType                                \n"
-    "    hasChildNodes                           \n"
-    "    childNodes                              \n"
-    "    firstChild ?nodeObjVar?                 \n"
-    "    lastChild ?nodeObjVar?                  \n"
-    "    appendChild new                         \n"
-    "    insertBefore new ref                    \n"
-    "    replaceChild new old                    \n"
-    "    removeChild child                       \n"
-    "    ownerDocument                           \n"
-    "    getElementById id                       \n"
-    "    baseURI ?URI?                           \n"
-    "    appendFromList nestedList               \n"
-    "    appendFromScript script                 \n"        
-    "    insertBeforeFromScript script ref       \n"
-    "    appendXML xmlString                     \n"
-    "    selectNodesNamespaces ?prefixUriList?   \n" 
-    "    selectNodes ?-namespaces prefixUriList? ?-cache <boolean>? xpathQuery ?typeVar? \n"
-    "    renameNode <nodelist> <newName>         \n"
-    "    deleteXPathCache ?xpathQuery?           \n"
-    TDomThreaded(
-    "    readlock                                \n"
-    "    writelock                               \n"
-    "    renumber                                \n"
-    )
-;
-
-static char node_usage[] =
-    "Usage nodeObj <method> <args>, where method can be:\n"
-    "    nodeType                     \n"
-    "    nodeName                     \n"
-    "    nodeValue ?newValue?         \n"
-    "    hasChildNodes                \n"
-    "    childNodes                   \n"
-    "    childNodesLive               \n"
-    "    parentNode                   \n"
-    "    firstChild ?nodeObjVar?      \n"
-    "    lastChild ?nodeObjVar?       \n"
-    "    nextSibling ?nodeObjVar?     \n"
-    "    previousSibling ?nodeObjVar? \n"
-    "    hasAttribute attrName        \n"
-    "    getAttribute attrName ?defaultValue? \n"
-    "    setAttribute attrName value ?attrName value ...? \n"
-    "    removeAttribute attrName     \n"
-    "    hasAttributeNS uri localName \n"
-    "    getAttributeNS uri localName ?defaultValue? \n"
-    "    setAttributeNS uri attrName value ?attrName value ...? \n"
-    "    removeAttributeNS uri attrName \n"
-    "    attributes ?attrNamePattern?   \n"
-    "    attributeNames ?attrNamePattern?   \n"
-    "    appendChild new              \n"
-    "    insertBefore new ref         \n"
-    "    replaceChild new old         \n"
-    "    removeChild child            \n"
-    "    cloneNode ?-deep?            \n"
-    "    ownerDocument                \n"
-    "    getElementsByTagName name    \n"
-    "    getElementsByTagNameNS uri localname \n"
-    "    getElementById id            \n"
-    "    find attrName attrValue ?nodeObjVar?   \n"
-    "    child      number|all ?type? ?attrName attrValue? \n"
-    "    descendant number|all ?type? ?attrName attrValue? \n"
-    "    ancestor   number|all ?type? ?attrName attrValue? \n"
-    "    fsibling   number|all ?type? ?attrName attrValue? \n"
-    "    psibling   number|all ?type? ?attrName attrValue? \n"
-    "    root ?nodeObjVar?            \n"
-    "    target                       \n"
-    "    data                         \n"
-    "    text                         \n"
-    "    prefix                       \n"
-    "    namespaceURI                 \n"
-    "    getBaseURI                   \n"
-    "    baseURI ?URI?                \n"
-    "    localName                    \n"
-    "    delete                       \n"
-    "    getLine                      \n"
-    "    getColumn                    \n"
-    "    @<attrName> ?defaultValue?   \n"
-    "    asList                       \n"
-    "    asXML ?-indent <none,tabs,0..8>? ?-channel <channel>? ?other options - see manual?>\n"
-    "    asCanonicalXML ?-channel <channel>? ?-comments <boolean>\n"
-    "    asHTML ?-channel <channelId>? ?-escapeNonASCII? ?-htmlEntities?\n"
-    "    asText                       \n"
-    "    asJSON ?-indent <none,0..8>? \n"
-    "    asTclValue                   \n"
-    "    appendFromList nestedList    \n"
-    "    appendFromScript script      \n"
-    "    insertBeforeFromScript script ref \n"
-    "    appendXML xmlString          \n"
-    "    selectNodes ?-namespaces prefixUriList? ?-cache <boolean>? xpathQuery ?typeVar? \n"
-    "    toXPath ?-legacy?            \n"
-    "    disableOutputEscaping ?boolean? \n"
-    "    precedes node                \n"
-    "    normalize ?-forXPath?        \n"
-    "    xslt ?-parameters parameterList? <xsltDocNode>\n"
-    "    jsonType ?jsonType?          \n"
-    TDomThreaded(
-    "    readlock                     \n"
-    "    writelock                    \n"
-    )
-;
-
 static const char *jsonTypes[] = {
     "NONE",
     "ARRAY",
@@ -4954,7 +4783,7 @@ int tcldom_NodeObjCmd (
     long         line, column, byteIndex;
     int          nsIndex, bool, hnew, legacy, jsonType;
     Tcl_Obj     *namePtr, *resultPtr;
-    Tcl_Obj     *mobjv[MAX_REWRITE_ARGS];
+    Tcl_Obj     *mobjv[MAX_REWRITE_ARGS], *storedErrMsg;
     Tcl_CmdInfo  cmdInfo;
     Tcl_HashEntry *h;
 
@@ -5012,7 +4841,8 @@ int tcldom_NodeObjCmd (
     }
     if (node == NULL) {
         if (objc < 3) {
-            SetResult(node_usage);
+            Tcl_WrongNumArgs (interp, 1, objv,
+                              "nodetoken subcommand ?arg ...?");
             return TCL_ERROR;
         }
         if (TcldomDATA(domCreateCmdMode) == DOM_CREATECMDMODE_AUTO) {
@@ -5026,10 +4856,10 @@ int tcldom_NodeObjCmd (
         objv++;
     }
     if (objc < 2) {
-        SetResult(node_usage);
+        Tcl_WrongNumArgs (interp, 1, objv, "subcommand ?arg ...?");
         return TCL_ERROR;
     }
-    if (Tcl_GetIndexFromObj(NULL, objv[1], nodeMethods, "method", 0,
+    if (Tcl_GetIndexFromObj(interp, objv[1], nodeMethods, "method", 0,
                             &methodIndex) != TCL_OK) {
 
         method = Tcl_GetString(objv[1]);
@@ -5039,6 +4869,8 @@ int tcldom_NodeObjCmd (
             |   try to find method implemented as normal Tcl proc
             \-------------------------------------------------------*/
             result = 0;
+            storedErrMsg = Tcl_GetObjResult (interp);
+            Tcl_IncrRefCount (storedErrMsg);
             if (node->nodeType == ELEMENT_NODE) {
                 /*----------------------------------------------------
                 |   try to find Tcl level node specific method proc
@@ -5063,9 +4895,11 @@ int tcldom_NodeObjCmd (
                 result = Tcl_GetCommandInfo(interp, tmp, &cmdInfo);
             }
             if (!result) {
-                SetResult(node_usage);
+                SetResult(Tcl_GetString (storedErrMsg));
+                Tcl_DecrRefCount (storedErrMsg);
                 return TCL_ERROR;
             }
+            Tcl_DecrRefCount (storedErrMsg);
             if (!cmdInfo.isNativeObjectProc) {
                 SetResult("can't access Tcl level method!");
                 return TCL_ERROR;
@@ -6087,7 +5921,7 @@ int tcldom_DocObjCmd (
     domLength             data_length, target_length;
     domNode             * n;
     Tcl_CmdInfo           cmdInfo;
-    Tcl_Obj             * mobjv[MAX_REWRITE_ARGS];
+    Tcl_Obj             * mobjv[MAX_REWRITE_ARGS], *storedErrMsg;
 
     static const char *docMethods[] = {
         "documentElement", "getElementsByTagName",       "delete",
@@ -6147,7 +5981,8 @@ int tcldom_DocObjCmd (
     }
     if (dinfo == NULL) {
         if (objc < 3) {
-            SetResult(doc_usage);
+            Tcl_WrongNumArgs (interp, 1, objv,
+                              "doctoken subcommand ?arg ...?");
             return TCL_ERROR;
         }
         if (TcldomDATA(domCreateCmdMode) == DOM_CREATECMDMODE_AUTO) {
@@ -6166,11 +6001,11 @@ int tcldom_DocObjCmd (
     }
 
     if (objc < 2) {
-        SetResult(doc_usage);
+        Tcl_WrongNumArgs (interp, 1, objv, "subcommand ?arg ...?");
         return TCL_ERROR;
     }
     method = Tcl_GetString(objv[1]);
-    if (Tcl_GetIndexFromObj(NULL, objv[1], docMethods, "method", 0,
+    if (Tcl_GetIndexFromObj(interp, objv[1], docMethods, "method", 0,
                             &methodIndex) != TCL_OK)
     {
         /*--------------------------------------------------------
@@ -6178,11 +6013,15 @@ int tcldom_DocObjCmd (
         \-------------------------------------------------------*/
         sprintf(tmp, "::dom::domDoc::%s", method);
         DBG(fprintf(stderr, "testing %s\n", tmp));
+        storedErrMsg = Tcl_GetObjResult (interp);
+        Tcl_IncrRefCount (storedErrMsg);
         result = Tcl_GetCommandInfo(interp, tmp, &cmdInfo);
         if (!result) {
-            SetResult(doc_usage);
+            SetResult(Tcl_GetString (storedErrMsg));
+            Tcl_DecrRefCount (storedErrMsg);
             return TCL_ERROR;
         }
+        Tcl_DecrRefCount (storedErrMsg);
         if (!cmdInfo.isNativeObjectProc) {
             SetResult( "can't access Tcl level method!");
             return TCL_ERROR;
@@ -6199,7 +6038,7 @@ int tcldom_DocObjCmd (
         return cmdInfo.objProc(cmdInfo.objClientData, interp, objc, mobjv);
     }
 
-    CheckArgs (2,10,1,doc_usage);
+    CheckArgs (2,20,1,"Too many arguments.");
     Tcl_ResetResult (interp);
 
     /*----------------------------------------------------------------------
@@ -6624,7 +6463,7 @@ int tcldom_DocObjCmd (
         )
     }
 
-    SetResult(doc_usage);
+    /* Not reached */
     return TCL_ERROR;
 }
 
@@ -7231,7 +7070,8 @@ int tcldom_parse (
                     return TCL_ERROR;
                 }
             } else {
-                SetResult(dom_usage);
+                SetResult("The \"dom parse\" option \"-useForeignDTD\" "
+                          "requires a boolean as argument.");
                 return TCL_ERROR;
             }
             objv++; objc--;
@@ -7398,7 +7238,7 @@ int tcldom_parse (
     }
     if (chan == NULL) {
         if (objc < 2) {
-            SetResult(dom_usage);
+            Tcl_WrongNumArgs (interp, 1, objv, "?options? ?data? ?objvar?");
             return TCL_ERROR;
         }
         xml_string = Tcl_GetStringFromObj( objv[1], &xml_string_len);
@@ -7407,7 +7247,7 @@ int tcldom_parse (
         }
     } else {
         if (objc > 2) {
-            SetResult(dom_usage);
+            SetResult("Too much arguments.");
             return TCL_ERROR;
         }
         xml_string = NULL;
@@ -7745,7 +7585,7 @@ int tcldom_DomObjCmd (
     int           methodIndex, result, i, bool, changed;
     domLength     repllen;
     Tcl_CmdInfo   cmdInfo;
-    Tcl_Obj     * mobjv[MAX_REWRITE_ARGS], *newObj;
+    Tcl_Obj     * mobjv[MAX_REWRITE_ARGS], *newObj, *storedErrMsg;
     Tcl_DString   cleardString;
 
     static const char *domMethods[] = {
@@ -7791,14 +7631,14 @@ int tcldom_DomObjCmd (
     };
     
     if (objc < 2) {
-        SetResult(dom_usage);
+        Tcl_WrongNumArgs (interp, 1, objv, "subcommand ?arg ...?");
         return TCL_ERROR;
     }
     if (TcldomDATA(domCreateCmdMode) == DOM_CREATECMDMODE_AUTO) {
         TcldomDATA(dontCreateObjCommands) = 0;
     }
     method = Tcl_GetString(objv[1]);
-    if (Tcl_GetIndexFromObj(NULL, objv[1], domMethods, "method", 0,
+    if (Tcl_GetIndexFromObj(interp, objv[1], domMethods, "method", 0,
                             &methodIndex) != TCL_OK) {
         /*--------------------------------------------------------
         |   try to find method implemented as normal Tcl proc
@@ -7809,11 +7649,15 @@ int tcldom_DomObjCmd (
         }
         sprintf(tmp, "::dom::DOMImplementation::%s", method);
         DBG(fprintf(stderr, "testing %s\n", tmp));
+        storedErrMsg = Tcl_GetObjResult (interp);
+        Tcl_IncrRefCount (storedErrMsg);
         result = Tcl_GetCommandInfo(interp, tmp, &cmdInfo);
         if (!result) {
-            SetResult(dom_usage);
+            SetResult(Tcl_GetString (storedErrMsg));
+            Tcl_DecrRefCount (storedErrMsg);
             return TCL_ERROR;
         }
+        Tcl_DecrRefCount (storedErrMsg);
         if (!cmdInfo.isNativeObjectProc) {
             SetResult("can't access Tcl level method!");
             return TCL_ERROR;
@@ -7826,8 +7670,9 @@ int tcldom_DomObjCmd (
         mobjv[1] = objv[0];
         for (i=2; i<objc; i++) mobjv[i] = objv[i];
         return cmdInfo.objProc(cmdInfo.objClientData, interp, objc, mobjv);
+        
     }
-    CheckArgs(2,12,1,dom_usage);
+    CheckArgs(2,12,1,"Too may arguments.");
     switch ((enum domMethod) methodIndex) {
 
         case m_createDocument:
@@ -7852,7 +7697,7 @@ int tcldom_DomObjCmd (
                 char *cmdName, *errMsg;
                 domDocument *doc;
                 if (objc < 3) {
-                    SetResult(dom_usage);
+                    SetResult("Missing argument to attachDocument method.");
                     return TCL_ERROR;
                 }
                 cmdName = Tcl_GetString(objv[2]);
@@ -7872,7 +7717,7 @@ int tcldom_DomObjCmd (
                 Tcl_CmdInfo cmdInfo;
                 domDocument *doc;
                 if (objc < 3) {
-                    SetResult(dom_usage);
+                    SetResult("Missing argument to detachDocument method.");
                     return TCL_ERROR;
                 }
                 cmdName = Tcl_GetString(objv[2]);
@@ -8056,7 +7901,6 @@ int tcldom_DomObjCmd (
             }
             return TCL_OK;
     }
-    SetResult( dom_usage);
     return TCL_ERROR;
 }
 
