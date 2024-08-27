@@ -1015,7 +1015,8 @@ TclExpatParse (
       expat->parsingState = 2;
       do {
           done = (len < PARSE_CHUNK_SIZE);
-          result = XML_Parse(expat->parser, data, (int)len,
+          result = XML_Parse(expat->parser, data,
+                             (int)(done ? len : PARSE_CHUNK_SIZE),
                              done ? expat->final : 0);
           if (!done) {
               data += PARSE_CHUNK_SIZE;
@@ -3636,7 +3637,8 @@ TclGenExpatExternalEntityRefHandler(
       case EXPAT_INPUT_STRING:
           do {
               done = (tclLen < PARSE_CHUNK_SIZE);
-              result = XML_Parse(extparser, dataStr, (int)tclLen, done);
+              result = XML_Parse(extparser, dataStr,
+                                 (int)(done ? tclLen : PARSE_CHUNK_SIZE), done);
               if (!done) {
                   dataStr += PARSE_CHUNK_SIZE;
                   tclLen -= PARSE_CHUNK_SIZE;

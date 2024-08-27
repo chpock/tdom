@@ -4661,7 +4661,8 @@ externalEntityRefHandler (
     int result, mode, done, keepresult = 0;
     domLength len, tclLen;
     XML_Parser extparser, oldparser = NULL;
-    char buf[4096], *resultType, *extbase, *xmlstring, *channelId, s[50];
+    char buf[4096], *resultType, *extbase, *xmlstring, *xmlstringstart,
+        *channelId, s[50];
     Tcl_Channel chan = (Tcl_Channel) NULL;
     enum XML_Status status;
     const char *interpResult;
@@ -4776,6 +4777,7 @@ externalEntityRefHandler (
 
     Tcl_ResetResult (vdata->interp);
     result = 1;
+    xmlstringstart = xmlstring;
     if (chan == NULL) {
         do {
             done = (len < PARSE_CHUNK_SIZE);
@@ -4792,7 +4794,7 @@ externalEntityRefHandler (
             if (interpResult[0] == '\0') {
                 tcldom_reportErrorLocation (
                     vdata->interp, 20, 40, XML_GetCurrentLineNumber(extparser),
-                    XML_GetCurrentColumnNumber(extparser), xmlstring,
+                    XML_GetCurrentColumnNumber(extparser), xmlstringstart,
                     systemId, XML_GetCurrentByteIndex(extparser),
                     XML_ErrorString(XML_GetErrorCode(extparser)));
             } else {
