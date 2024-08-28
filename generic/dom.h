@@ -395,7 +395,7 @@ static const unsigned char CharBit[] = {
 |   DOMString
 |
 \-------------------------------------------------------------------------*/
-typedef char* domString;   /* should 16-bit unicode character !!*/
+typedef char* domString;   
 
 
 /*--------------------------------------------------------------------------
