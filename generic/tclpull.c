@@ -449,14 +449,14 @@ tDOM_resumeParseing (
             } while (result == XML_STATUS_OK && !done);
         } else {
             do {
-                done = (pullInfo->inputStrLen < PARSE_CHUNK_SIZE);
+                done = (pullInfo->inputStrLen < TDOM_PCS);
                 result = XML_Parse (
                     pullInfo->parser, pullInfo->inputStr,
-                    (int)(done ? pullInfo->inputStrLen : PARSE_CHUNK_SIZE),
+                    (int)(done ? pullInfo->inputStrLen : TDOM_PCS),
                     done);
                 if (!done) {
-                    pullInfo->inputStr += PARSE_CHUNK_SIZE;
-                    pullInfo->inputStrLen -= PARSE_CHUNK_SIZE;
+                    pullInfo->inputStr += TDOM_PCS;
+                    pullInfo->inputStrLen -= TDOM_PCS;
                 }
             } while (!done && result == XML_STATUS_OK);
         }
@@ -654,14 +654,14 @@ tDOM_PullParserInstanceCmd (
                     } while (result == XML_STATUS_OK);
                 } else {
                     do {
-                        done = (pullInfo->inputStrLen < PARSE_CHUNK_SIZE);
+                        done = (pullInfo->inputStrLen < TDOM_PCS);
                         result = XML_Parse (
                             pullInfo->parser, pullInfo->inputStr,
-                            (int)(done ? pullInfo->inputStrLen : PARSE_CHUNK_SIZE),
+                            (int)(done ? pullInfo->inputStrLen : TDOM_PCS),
                             done);
                         if (!done) {
-                            pullInfo->inputStr += PARSE_CHUNK_SIZE;
-                            pullInfo->inputStrLen -= PARSE_CHUNK_SIZE;
+                            pullInfo->inputStr += TDOM_PCS;
+                            pullInfo->inputStrLen -= TDOM_PCS;
                         }
                     } while (!done && result == XML_STATUS_OK);
                 }

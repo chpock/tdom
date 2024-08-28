@@ -1014,13 +1014,13 @@ TclExpatParse (
   case EXPAT_INPUT_STRING:
       expat->parsingState = 2;
       do {
-          done = (len < PARSE_CHUNK_SIZE);
+          done = (len < TDOM_PCS);
           result = XML_Parse(expat->parser, data,
-                             (int)(done ? len : PARSE_CHUNK_SIZE),
+                             (int)(done ? len : TDOM_PCS),
                              done ? expat->final : 0);
           if (!done) {
-              data += PARSE_CHUNK_SIZE;
-              len -= PARSE_CHUNK_SIZE;
+              data += TDOM_PCS;
+              len -= TDOM_PCS;
           }
       } while (!done && result == XML_STATUS_OK);
       expat->parsingState = 1;
@@ -3636,12 +3636,12 @@ TclGenExpatExternalEntityRefHandler(
       switch (inputType) {
       case EXPAT_INPUT_STRING:
           do {
-              done = (tclLen < PARSE_CHUNK_SIZE);
+              done = (tclLen < TDOM_PCS);
               result = XML_Parse(extparser, dataStr,
-                                 (int)(done ? tclLen : PARSE_CHUNK_SIZE), done);
+                                 (int)(done ? tclLen : TDOM_PCS), done);
               if (!done) {
-                  dataStr += PARSE_CHUNK_SIZE;
-                  tclLen -= PARSE_CHUNK_SIZE;
+                  dataStr += TDOM_PCS;
+                  tclLen -= TDOM_PCS;
               }
           } while (!done && result == XML_STATUS_OK);
           break;

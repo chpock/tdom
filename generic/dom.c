@@ -2104,12 +2104,12 @@ externalEntityRefHandler (
     xmlstringstart = xmlstring;
     if (chan == NULL) {
         do {
-            done = (len < PARSE_CHUNK_SIZE);
+            done = (len < TDOM_PCS);
             status = XML_Parse (extparser, xmlstring,
-                                (int)(done ? len : PARSE_CHUNK_SIZE), done);
+                                (int)(done ? len : TDOM_PCS), done);
             if (!done) {
-                xmlstring += PARSE_CHUNK_SIZE;
-                len -= PARSE_CHUNK_SIZE;
+                xmlstring += TDOM_PCS;
+                len -= TDOM_PCS;
             }
         }  while (!done && status == XML_STATUS_OK);
         switch (status) {
@@ -2357,12 +2357,12 @@ domReadDocument (
     
     if (channel == NULL) {
         do {
-            done = (length < PARSE_CHUNK_SIZE);
+            done = (length < TDOM_PCS);
             status = XML_Parse (parser, xml,
-                                (int)(done ? length : PARSE_CHUNK_SIZE), done);
+                                (int)(done ? length : TDOM_PCS), done);
             if (!done) {
-                xml += PARSE_CHUNK_SIZE;
-                length -= PARSE_CHUNK_SIZE;
+                xml += TDOM_PCS;
+                length -= TDOM_PCS;
             }
         }  while (!done && status == XML_STATUS_OK);
     } else {
