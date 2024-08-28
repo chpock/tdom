@@ -1,5 +1,5 @@
-C Fixed\sSAX\sparser.\sRestore\sthe\scontext\sin\swell-formdness\serror\seven\sif\sthe\serror\sis\searly\sin\sparse\schunk.
-D 2024-08-28T08:52:34.848
+C Fixed\spull\sparser.
+D 2024-08-28T12:49:52.991
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -152,7 +152,7 @@ F generic/tcldom.c e0a3d3639e12e877eab12163077514d3439632d5dfb0920a83a88872e50a5
 F generic/tcldom.h b723e7ceeac1954c26469ec43a7f67de5368f0bb03c7e9fdea0da220b2b8d60c
 F generic/tclexpat.c b250109bb0e764269047c23223c4bc028dc22f28425cc0d44fd1c04478955cd0
 F generic/tclexpat.h 80b7da613f99a61e9a2f3f5e062b3995ff050d68a5a4c93ca31ccd5a986e355f
-F generic/tclpull.c 4ae652d21b2ae3805a6409bac0d1d830d73642254550d472ebcddfa25f6a9bb4
+F generic/tclpull.c 25cc26f4c1b70e4c2b3aa6bf19a3be8526c3907509638c6b7e7d9d2a15be0078
 F generic/tclpull.h 8e1aac98bdad497c669c901494939eecd6c2f57ea51c4f5d4dac502db48527d4
 F generic/tdom.decls e41c101c51f9a988ef799442e6082283ac21a28ed1105b21b228a4913c13eb95
 F generic/tdom.h 0ce348a4e4ae4c5a5e11d02ca2079ce2e8f1f705aecceb83c8d29b3ec80e5617
@@ -242,8 +242,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ca5fda987ed9155b4e7cc5de88c204891f0feff862c20800796d4bf56ef50c12 2be5494ceaf5c6eff29ad7899b2f1c09b7c9d2edd427667bec6135b9199f25c6
-R 84962a5fe00a0aa4ea7979cb80738441
+P ed687966dfb6e5a546ec1431fa8cc951691c31cf0b27b0192f50f0d153a5a0d3
+R b0dbb5c465267709f7d2bdf76bca5902
 U rolf
-Z ac2c269fa27f67f4c856e88f2e016570
+Z 0303e449fdcc0536b7bfe47b5174c5bf
 # Remove this line to create a well-formed Fossil manifest.
