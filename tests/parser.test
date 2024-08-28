@@ -360,11 +360,30 @@ test parser-1.26 {-fastcall} {
         -elementendcommand eend-1.26 \
         -characterdatacommand cdata-1.26
     xml::parser-1.26 parse <doc><a>foo</a>
+    xml::parser-1.26 configure -fastcall 0 -final 1 \
+        -elementstartcommand estart-1.26 \
+        -elementendcommand eend-1.26 \
+        -characterdatacommand cdata-1.26
+    xml::parser-1.26 parse <a>foo</a></doc>
+    xml::parser-1.26 delete
+    set result
+} {{estart-1.26 doc} {estart-1.26 a} {cdata-1.26 foo} {eend-1.26 a} {cmdtracer {estart-1.26 a {}} enter} {estart-1.26 a} {cmdtracer {cdata-1.26 foo} enter} {cdata-1.26 foo} {cmdtracer {eend-1.26 a} enter} {eend-1.26 a} {cmdtracer {eend-1.26 doc} enter} {eend-1.26 doc}}
+
+test parser-1.26.1 {-fastcall} {
+    catch {xml::parser-1.26}
+    set result ""
+    xml::parser xml::parser-1.26 -final 0 -fastcall 1
+    xml::parser-1.26 configure -elementstartcommand estart-1.26 \
+        -elementendcommand eend-1.26 \
+        -characterdatacommand cdata-1.26
+    xml::parser-1.26 parse <doc><a>foo</a>
     xml::parser-1.26 configure -fastcall 0 \
         -elementstartcommand estart-1.26 \
         -elementendcommand eend-1.26 \
         -characterdatacommand cdata-1.26
     xml::parser-1.26 parse <a>foo</a></doc>
+    xml::parser-1.26 configure -final 1
+    xml::parser-1.26 parse ""
     xml::parser-1.26 delete
     set result
 } {{estart-1.26 doc} {estart-1.26 a} {cdata-1.26 foo} {eend-1.26 a} {cmdtracer {estart-1.26 a {}} enter} {estart-1.26 a} {cmdtracer {cdata-1.26 foo} enter} {cdata-1.26 foo} {cmdtracer {eend-1.26 a} enter} {eend-1.26 a} {cmdtracer {eend-1.26 doc} enter} {eend-1.26 doc}}

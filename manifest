@@ -1,5 +1,5 @@
-C Fixed\spull\sparser.
-D 2024-08-28T12:49:52.991
+C Added\sa\stest.
+D 2024-08-28T21:41:46.605
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -212,7 +212,7 @@ F tests/htmlreader.test 1a7d62ad1bfd1066349b1115a8e7a561befb3d97fcd207cf312b7f56
 F tests/i18n.test 421e3998480ed5ce9420f4b596c384b8d5261e7fb4b33c0a7c12ef126d476939
 F tests/loadtdom.tcl 361af40e1a62e7b19b7cf2eb7a8430bf98553226a5a2bd30a42e2f6407d68705
 F tests/namespace.test 0a13b2bf59bb088525ca7b64d0b2bce6a349c627ca3dd1c17a4cc969d16fe57c
-F tests/parser.test 3c3684d4ee2a6a649364fa931edf8856321ddae7c495ba170f7629c1befa86be
+F tests/parser.test d65f71a2a3683cded15276d1e42ff01e1e916f4e65278ea016bcd2ae7ce0607b
 F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
 F tests/pullparser.test df079ff6a5a6b11b4d0f409ca3fc17cc4a5956d31801872f9f1f95e35032dec5
@@ -242,8 +242,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ed687966dfb6e5a546ec1431fa8cc951691c31cf0b27b0192f50f0d153a5a0d3
-R b0dbb5c465267709f7d2bdf76bca5902
+P 4a521d02da72d8c6e66d9afc65b24405fda3466b669bace00a160886a4790df6
+R 329e1c68bf444f5d10a5aca0362d6b40
 U rolf
-Z 0303e449fdcc0536b7bfe47b5174c5bf
+Z ed8210c3833e901894aae6c727778055
 # Remove this line to create a well-formed Fossil manifest.
