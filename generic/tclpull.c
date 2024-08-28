@@ -644,7 +644,8 @@ tDOM_PullParserInstanceCmd (
                     data = Tcl_GetStringFromObj(pullInfo->inputString, &len);
                     do {
                         done = (len < PARSE_CHUNK_SIZE);
-                        result = XML_Parse (pullInfo->parser, data, (int)len,
+                        result = XML_Parse (pullInfo->parser, data,
+                                            (int)(done ? len : PARSE_CHUNK_SIZE),
                                             done);
                         if (!done) {
                             data += PARSE_CHUNK_SIZE;
