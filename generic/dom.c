@@ -137,6 +137,9 @@ typedef struct _domReadInfo {
     int               cdataSection;
     Tcl_DString      *cdata;
     int               storeLineColumn;
+    domLength         textStartLine;
+    domLength         textStartColumn;
+    domLength         textStartByteIndex;
     int               ignorexmlns;
     int               feedbackAfter;
     Tcl_Obj          *feedbackCmd;
@@ -1593,8 +1596,20 @@ characterDataHandler (
 )
 {
     domReadInfo   *info = userData;
-
+    Tcl_Obj *sobj;
+    
     Tcl_DStringAppend (info->cdata, s, len);
+    sobj = Tcl_NewStringObj (s, len);
+    if (info->storeLineColumn) {
+        /* This works because the result of XML_GetCurrentLineNumber()
+         * is always at least 1 */
+        if (!info->textStartLine) {
+            info->textStartLine = XML_GetCurrentLineNumber (info->parser);
+            info->textStartColumn = XML_GetCurrentColumnNumber (info->parser);
+            info->textStartByteIndex = XML_GetCurrentByteIndex (info->parser);
+        }
+    }
+    
     return;
     
 }
@@ -1651,10 +1666,15 @@ DispatchPCDATA (
     if (!len && !info->cdataSection
         && !(info->sdata
              && info->sdata->stack
-             && info->sdata->stack->pattern->flags & CONSTRAINT_TEXT_CHILD))
+             && info->sdata->stack->pattern->flags & CONSTRAINT_TEXT_CHILD)) {
+        info->textStartColumn = 0;
         return;
+    }
 #else
-    if (!len && !info->cdataSection) return;
+    if (!len && !info->cdataSection) {
+        info->textStartColumn = 0;
+        return;
+    }
 #endif
     s = Tcl_DStringValue (info->cdata);
     
@@ -1736,11 +1756,12 @@ DispatchPCDATA (
         if (info->storeLineColumn) {
             lc = (domLineColumn*) ( ((char*)node) + sizeof(domTextNode) );
             node->nodeFlags |= HAS_LINE_COLUMN;
-            lc->line         = XML_GetCurrentLineNumber (info->parser);
-            lc->column       = XML_GetCurrentColumnNumber(info->parser);
-            lc->byteIndex    = XML_GetCurrentByteIndex (info->parser);
+            lc->line         = info->textStartLine;
+            lc->column       = info->textStartColumn;
+            lc->byteIndex    = info->textStartByteIndex;
         }
     }
+    info->textStartColumn = 0;
 checkTextConstraints:
 #ifndef TDOM_NO_SCHEMA
     if (info->sdata) {
@@ -2305,6 +2326,7 @@ domReadDocument (
     Tcl_DStringInit (info.cdata);
     info.cdataSection         = 0;
     info.storeLineColumn      = storeLineColumn;
+    info.textStartLine        = 0;
     info.ignorexmlns          = ignorexmlns;
     info.feedbackAfter        = feedbackAfter;
     info.feedbackCmd          = feedbackCmd;
@@ -5294,6 +5316,9 @@ typedef struct _tdomCmdReadInfo {
     int               cdataSection;
     Tcl_DString      *cdata;
     int               storeLineColumn;
+    domLength         textStartLine;
+    domLength         textStartColumn;
+    domLength         textStartByteIndex;
     int               ignorexmlns;
     int               feedbackAfter;
     Tcl_Obj          *feedbackCmd;
@@ -5378,6 +5403,7 @@ tdom_resetProc (
     info->feedbackAfter     = 0;
     info->ignorexmlns       = 0;
     Tcl_DStringSetLength (info->cdata, 0);
+    info->textStartLine     = 0;
     info->nextFeedbackPosition = info->feedbackAfter;
     info->interp            = interp;
     info->activeNSpos       = -1;
@@ -5497,35 +5523,19 @@ TclTdomObjCmd (
         handlerSet->endDoctypeDeclCommand   = endDoctypeDeclHandler;
 
         info = (tdomCmdReadInfo *) MALLOC (sizeof (tdomCmdReadInfo));
+        memset(info, 0, sizeof(tdomCmdReadInfo));
         info->parser            = expat->parser;
-        info->document          = NULL;
-        info->currentNode       = NULL;
-        info->depth             = 0;
         info->ignoreWhiteSpaces = 1;
-        info->cdataSection      = 0;
         info->cdata             = (Tcl_DString*) MALLOC (sizeof (Tcl_DString));
         Tcl_DStringInit (info->cdata);
-        info->storeLineColumn   = 0;
-        info->ignorexmlns       = 0;
-        info->feedbackAfter     = 0;
-        info->feedbackCmd       = NULL;
-        info->nextFeedbackPosition = 0;
         info->interp            = interp;
         info->activeNSpos       = -1;
         info->activeNSsize      = 8;
         info->activeNS          = 
             (domActiveNS*) MALLOC(sizeof(domActiveNS) * info->activeNSsize);
-        info->baseURIstackPos   = 0;
         info->baseURIstackSize  = INITIAL_BASEURISTACK_SIZE;
         info->baseURIstack      = (domActiveBaseURI*) 
             MALLOC (sizeof(domActiveBaseURI) * info->baseURIstackSize);
-        info->insideDTD         = 0;
-        info->tdomStatus        = 0;
-        info->extResolver       = NULL;
-#ifndef TDOM_NO_SCHEMA
-        info->sdata             = NULL;
-#endif
-        info->status            = 0;
         handlerSet->userData    = info;
 
         CHandlerSetInstall (interp, objv[1], handlerSet);

@@ -2496,6 +2496,19 @@ test domNode-24.6 {getByteIndex} {
     
 $doc delete
 
+dom setStoreLineColumn 1
+set doc [dom parse {<root>
+Hello<e1><e2/></e1></root>}]
+set root [$doc documentElement]
+dom setStoreLineColumn 0
+
+test domNode-24.7 {getLine getColumn} {
+    set node [$root firstChild]
+    set result [$node getLine].[$node getColumn]
+} {1.6}
+
+$doc delete
+
 set doc [dom parse {<root attr1="bingbaz"
                           attr2="ab &amp; zu"
                           attr3=""
