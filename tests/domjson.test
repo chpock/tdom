@@ -2728,6 +2728,19 @@ test json-8.5 {createNodeCmd - wrong jsonType} {
     catch {dom createNodeCmd -jsonType OBJECT textNode textNodeWithJsonTypeObject}
 } 1
 
+test json-8.6 {text nodes with json type NULL, TRUE or FALSE} {
+    set doc [dom createDocumentNode]
+    $doc jsonType ARRAY
+    $doc appendFromScript {
+        nodeCmds::null
+        nodeCmds::true
+        nodeCmds::false
+    }
+    set result [$doc asJSON]
+    $doc delete
+    set result
+} {[null,true,false]}
+
 test json-9.1 {cloneNode -deep} {
     dom parse -json {[["a",1,"b",{"foo":"bar","baz":"boo"},null],"",null]} doc
     dom createDocument some other
