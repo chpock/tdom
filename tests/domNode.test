@@ -2497,17 +2497,48 @@ test domNode-24.6 {getByteIndex} {
 $doc delete
 
 dom setStoreLineColumn 1
-set doc [dom parse {<root>
-Hello<e1><e2/></e1></root>}]
-set root [$doc documentElement]
-dom setStoreLineColumn 0
 
-test domNode-24.7 {getLine getColumn} {
+test domNode-24.7 {getLine etc text node} {
+    set doc [dom parse {<root>
+        Hello<e1><e2/></e1></root>}]
+    set root [$doc documentElement]
     set node [$root firstChild]
     set result [$node getLine].[$node getColumn]
+    $doc delete
+    set result
 } {1.6}
 
-$doc delete
+test  domNode-24.8 {getLine etc cdatasection node} {
+    set doc [dom parse {<root><![CDATA[
+        Hello]]><e1><e2/></e1></root>}]
+    set root [$doc documentElement]
+    set node [$root firstChild]
+    set result [$node getLine].[$node getColumn]
+    $doc delete
+    set result
+} {1.6}
+
+test  domNode-24.9 {getLine etc pi node} {
+    set doc [dom parse {<root><?pi1 do this?>
+        <e1><e2/></e1></root>}]
+    set root [$doc documentElement]
+    set node [$root firstChild]
+    set result [$node getLine].[$node getColumn]
+    $doc delete
+    set result
+} {1.6}
+
+test  domNode-24.10 {getLine etc comment node} {
+    set doc [dom parse {<root>
+        <!-- comment --><e1><e2/></e1></root>}]
+    set root [$doc documentElement]
+    set node [$root firstChild]
+    set result [$node getLine].[$node getColumn]
+    $doc delete
+    set result
+} {2.8}
+
+dom setStoreLineColumn 0
 
 set doc [dom parse {<root attr1="bingbaz"
                           attr2="ab &amp; zu"

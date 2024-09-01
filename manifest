@@ -1,5 +1,5 @@
-C Started.
-D 2024-08-30T12:10:05.022
+C Tests\sto\scheck\sthe\sresults\sof\sgetLine/Column/ByteIndex\sfor\sother\snode\stypes.\sThe\sresult\sfor\sCDATA\ssection\snodes\sseems\sdebatable.
+D 2024-09-01T12:42:28.447
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -202,7 +202,7 @@ F tests/dom.bench 5446ce379127b8d5700f18a5a0848e580313d0d7
 F tests/dom.test b9f10b31f3ed7f67032bb19be19b3e3ad8df923515bd690dfcd0f54a5e04682d
 F tests/domDoc.test 03082c24746147cc0a5f048820ee3da5c730054828e2a1cdf99b58053ff660f0
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
-F tests/domNode.test f7b3de278450777fd501f43ef153d3e5ab91ef89a6dd379ad473bfa2efc3d5d1
+F tests/domNode.test 0dea313212dbfafe1d8f55e16aafa1528181e1bf1aec6a86241124a590bff6d6
 F tests/domjson.test f384ea9396fe6eb50ce7647ae4d15fafda4452d88796c76e04070be8145df555
 F tests/domnamespace.test f68dee13e2325518e96b318bf9fe76ae6903dc38d5602c4b0f48f90c0dc3038c
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
@@ -242,11 +242,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 51a41c94c6cc02ece135d35451b8917534384c036faffe12133bddca623aa977
-R b19f3674604b57c6ec53ed38294d6e16
-T *branch * linecolumn
-T *sym-linecolumn *
-T -sym-trunk *
+P 91db5407c42a50b2240658d119a2c8086ad0128d009cc5fe87fc3cd299b7fba3
+R b4e699b52f27def828dfcad4f04ed516
 U rolf
-Z d75cf6f3ad2e843563885ffa061436cb
+Z 44470970fced0e64859e15c27413e444
 # Remove this line to create a well-formed Fossil manifest.
