@@ -1596,10 +1596,8 @@ characterDataHandler (
 )
 {
     domReadInfo   *info = userData;
-    Tcl_Obj *sobj;
     
     Tcl_DStringAppend (info->cdata, s, len);
-    sobj = Tcl_NewStringObj (s, len);
     if (info->storeLineColumn) {
         /* This works because the result of XML_GetCurrentLineNumber()
          * is always at least 1 */
@@ -1627,6 +1625,13 @@ startCDATA (
 
     DispatchPCDATA (info);
     info->cdataSection = 1;
+    if (info->storeLineColumn) {
+        if (!info->textStartLine) {
+            info->textStartLine = XML_GetCurrentLineNumber (info->parser);
+            info->textStartColumn = XML_GetCurrentColumnNumber (info->parser);
+            info->textStartByteIndex = XML_GetCurrentByteIndex (info->parser);
+        }
+    }
 }
 
 /*---------------------------------------------------------------------------
@@ -5652,8 +5657,8 @@ TclTdomObjCmd (
             handlerSet->startCdataSectionCommand = startCDATA;
             handlerSet->endCdataSectionCommand = endCDATA;
         } else {
-            handlerSet->startCdataSectionCommand = startCDATA;
-            handlerSet->endCdataSectionCommand = endCDATA;
+            handlerSet->startCdataSectionCommand = NULL;
+            handlerSet->endCdataSectionCommand = NULL;
         }
         info->tdomStatus = 1;
         break;

@@ -2509,7 +2509,7 @@ test domNode-24.7 {getLine etc text node} {
 } {1.6}
 
 test  domNode-24.8 {getLine etc cdatasection node} {
-    set doc [dom parse {<root><![CDATA[
+    set doc [dom parse -keepCDATA {<root><![CDATA[
         Hello]]><e1><e2/></e1></root>}]
     set root [$doc documentElement]
     set node [$root firstChild]
@@ -2517,6 +2517,16 @@ test  domNode-24.8 {getLine etc cdatasection node} {
     $doc delete
     set result
 } {1.6}
+
+test  domNode-24.8.1 {getLine etc cdatasection node without -keepCDATA} {
+    set doc [dom parse {<root><![CDATA[
+        Hello]]><e1><e2/></e1></root>}]
+    set root [$doc documentElement]
+    set node [$root firstChild]
+    set result [$node getLine].[$node getColumn]
+    $doc delete
+    set result
+} {1.15}
 
 test  domNode-24.9 {getLine etc pi node} {
     set doc [dom parse {<root><?pi1 do this?>
