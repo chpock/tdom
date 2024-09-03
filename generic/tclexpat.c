@@ -1200,6 +1200,7 @@ TclExpatConfigure (
     "-namespaceseparator",
     "-billionLaughsAttackProtectionMaximumAmplification",
     "-billionLaughsAttackProtectionActivationThreshold",
+    "-keepcdataStart",
 
     "-commentcommand",
     "-notstandalonecommand",
@@ -1236,6 +1237,7 @@ TclExpatConfigure (
     EXPAT_NAMESPACESEPARATOR,
     EXPAT_BLAPMAXIMUMAMPLIFICATION,
     EXPAT_BLAPACTIVATIONTHRESHOLD,
+    EXPAT_KEEPCDATASTART,
 
     EXPAT_COMMENTCMD, EXPAT_NOTSTANDALONECMD,
     EXPAT_STARTCDATASECTIONCMD, EXPAT_ENDCDATASECTIONCMD,
@@ -1792,7 +1794,15 @@ TclExpatConfigure (
         CheckDefaultTclHandlerSet;
         activeTclHandlerSet->fastCall = bool;
         break;
-        
+                  
+    case EXPAT_KEEPCDATASTART:
+        if (Tcl_GetBooleanFromObj(interp, objPtr[1], &bool) != TCL_OK) {
+            return TCL_ERROR;
+	}
+
+        expat->keepcdataStart = bool;
+	break;
+
 #ifndef TDOM_NO_SCHEMA
     case EXPAT_VALIDATECMD:
         schemacmd = Tcl_GetString (objv[1]);
@@ -2911,6 +2921,11 @@ TclGenExpatCharacterDataHandler(
   if (!expat->cdata) {
       expat->cdata = Tcl_NewObj();
       Tcl_IncrRefCount (expat->cdata);
+      if (expat->keepcdataStart) {
+          expat->cdataStartLine = XML_GetCurrentLineNumber (expat->parser);
+          expat->cdataStartColumn = XML_GetCurrentColumnNumber (expat->parser);
+          expat->cdataStartByteIndex = XML_GetCurrentByteIndex (expat->parser);
+      }
   }
   Tcl_AppendToObj (expat->cdata, s, len);
   return;

@@ -5471,13 +5471,15 @@ TclTdomObjCmd (
         "setStoreLineColumn",
         "setExternalEntityResolver", "keepEmpties",
         "remove", "ignorexmlns", "keepCDATA",
+        "keepTextStart",
         NULL
     };
     enum tdomMethod {
         m_enable, m_getdoc,
         m_setStoreLineColumn,
         m_setExternalEntityResolver, m_keepEmpties,
-        m_remove, m_ignorexmlns, m_keepCDATA
+        m_remove, m_ignorexmlns, m_keepCDATA,
+        m_keepTextStart
     };
 
     if (objc < 3 || objc > 4) {
@@ -5663,6 +5665,29 @@ TclTdomObjCmd (
         info->tdomStatus = 1;
         break;
         
+    case m_keepTextStart:
+        if (objc != 4) {
+            Tcl_SetResult (interp, "wrong # of args for method keepCDATA.",
+                           NULL);
+            return TCL_ERROR;
+        }
+        handlerSet = CHandlerSetGet (interp, objv[1], "tdom");
+        if (!handlerSet) {
+            Tcl_SetResult (interp, "parser object isn't tdom enabled.", NULL);
+            return TCL_ERROR;
+        }
+        info = handlerSet->userData;
+        if (!info) {
+            Tcl_SetResult (interp, "parser object isn't tdom enabled.", NULL);
+            return TCL_ERROR;
+        }
+        if (Tcl_GetBooleanFromObj (interp, objv[3], &bool) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        expat = GetExpatInfo (interp, objv[1]);
+        expat->keepcdataStart = bool;
+        break;
+        
     case m_ignorexmlns:
         info = CHandlerSetGetUserData (interp, objv[1], "tdom");
         if (!info) {
@@ -5678,7 +5703,6 @@ TclTdomObjCmd (
         }
         info->tdomStatus = 1;
         break;
-        
 
     }
 

@@ -130,6 +130,10 @@ typedef struct TclGenExpatInfo {
     Tcl_Obj *result;		/* application return result */
     const char *context;        /* reference to the context pointer */  
     Tcl_Obj *cdata;             /* Accumulates character data */ 
+    domLength cdataStartLine;   /* Line number of the start of cdata */
+    domLength cdataStartColumn; /* Column number of the start of cdata */
+    domLength cdataStartByteIndex; /* Byte index of the start of cdata */
+    int keepcdataStart;         /* Keep the cdata start line/column/byteIndex */
     ExpatElemContent *eContents;/* The reported XML_Contents as linked list */
     int ns_mode;                /* namespace mode */
     Tcl_Obj *baseURI;
