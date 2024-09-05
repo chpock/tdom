@@ -1,4 +1,9 @@
 
+2024-08-31  Rolf Ade  <rolf@pointsman.de>
+
+        Text node commands created by createNodeCmd of the json type
+        NULL, TRUE or FALSE may be called without argument.
+
 2024-08-26  Rolf Ade  <rolf@pointsman.de>
 
         Changed the error messages of the dom, domDoc and domNode
