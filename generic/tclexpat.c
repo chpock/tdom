@@ -25,7 +25,7 @@
  * all claims, expenses, losses, damages and costs any user may incur
  * as a result of using, copying or modifying the software.
  *
- * 2001-2007  Rolf Ade          All changes and enhancements.
+ * 2001-2024  Rolf Ade          All changes and enhancements.
  *
  */
 
@@ -1200,7 +1200,7 @@ TclExpatConfigure (
     "-namespaceseparator",
     "-billionLaughsAttackProtectionMaximumAmplification",
     "-billionLaughsAttackProtectionActivationThreshold",
-    "-keepcdataStart",
+    "-keepTextStart",
 
     "-commentcommand",
     "-notstandalonecommand",
@@ -1237,7 +1237,7 @@ TclExpatConfigure (
     EXPAT_NAMESPACESEPARATOR,
     EXPAT_BLAPMAXIMUMAMPLIFICATION,
     EXPAT_BLAPACTIVATIONTHRESHOLD,
-    EXPAT_KEEPCDATASTART,
+    EXPAT_KEEPTEXTSTART,
 
     EXPAT_COMMENTCMD, EXPAT_NOTSTANDALONECMD,
     EXPAT_STARTCDATASECTIONCMD, EXPAT_ENDCDATASECTIONCMD,
@@ -1795,12 +1795,12 @@ TclExpatConfigure (
         activeTclHandlerSet->fastCall = bool;
         break;
                   
-    case EXPAT_KEEPCDATASTART:
+    case EXPAT_KEEPTEXTSTART:
         if (Tcl_GetBooleanFromObj(interp, objPtr[1], &bool) != TCL_OK) {
             return TCL_ERROR;
 	}
 
-        expat->keepcdataStart = bool;
+        expat->keepTextStart = bool;
 	break;
 
 #ifndef TDOM_NO_SCHEMA
@@ -2325,18 +2325,44 @@ TclExpatGet (
       break;
 
     case EXPAT_CURRENTLINENUMBER:
-
-      Tcl_SetWideIntObj(resultPtr, XML_GetCurrentLineNumber(expat->parser));
+        if (expat->keepTextStart && expat->cdata) {
+            /* TclGenExpatCharacterDataHandler() was called and
+             * initialized expat->cdata, but expat->cdata isn't reset by
+             * TclExpatDispatchPCDATA(), so we're called from
+             * -characterdatacommand */
+            Tcl_SetWideIntObj(resultPtr, expat->cdataStartLine);
+        } else {
+            Tcl_SetWideIntObj(resultPtr,
+                              XML_GetCurrentLineNumber(expat->parser));
+        }
+        
       break;
 
     case EXPAT_CURRENTCOLUMNNUMBER:
-
-      Tcl_SetWideIntObj(resultPtr, XML_GetCurrentColumnNumber(expat->parser));
+        if (expat->keepTextStart && expat->cdata) {
+            /* TclGenExpatCharacterDataHandler() was called and
+             * initialized expat->cdata, but expat->cdata isn't reset by
+             * TclExpatDispatchPCDATA(), so we're called from
+             * -characterdatacommand */
+            Tcl_SetWideIntObj(resultPtr, expat->cdataStartColumn);
+        } else {
+            Tcl_SetWideIntObj(resultPtr,
+                              XML_GetCurrentColumnNumber(expat->parser));
+        }
       break;
 
     case EXPAT_CURRENTBYTEINDEX:
 
-      Tcl_SetWideIntObj(resultPtr, XML_GetCurrentByteIndex(expat->parser));
+        if (expat->keepTextStart && expat->cdata) {
+            /* TclGenExpatCharacterDataHandler() was called and
+             * initialized expat->cdata, but expat->cdata isn't reset by
+             * TclExpatDispatchPCDATA(), so we're called from
+             * -characterdatacommand */
+            Tcl_SetWideIntObj(resultPtr, expat->cdataStartByteIndex);
+        } else {
+            Tcl_SetWideIntObj(resultPtr,
+                              XML_GetCurrentByteIndex(expat->parser));
+        }
       break;
 
   }
@@ -2921,10 +2947,12 @@ TclGenExpatCharacterDataHandler(
   if (!expat->cdata) {
       expat->cdata = Tcl_NewObj();
       Tcl_IncrRefCount (expat->cdata);
-      if (expat->keepcdataStart) {
-          expat->cdataStartLine = XML_GetCurrentLineNumber (expat->parser);
-          expat->cdataStartColumn = XML_GetCurrentColumnNumber (expat->parser);
-          expat->cdataStartByteIndex = XML_GetCurrentByteIndex (expat->parser);
+      if (expat->keepTextStart) {
+          if (!expat->cdataStartLine) {
+              expat->cdataStartLine = XML_GetCurrentLineNumber (expat->parser);
+              expat->cdataStartColumn = XML_GetCurrentColumnNumber (expat->parser);
+              expat->cdataStartByteIndex = XML_GetCurrentByteIndex (expat->parser);
+          }
       }
   }
   Tcl_AppendToObj (expat->cdata, s, len);

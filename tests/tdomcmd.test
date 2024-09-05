@@ -30,6 +30,7 @@ proc dom {args} {
             set uplevelVar ""
             tdom $::_main_parser keepEmpties 0
             tdom $::_main_parser keepCDATA 0
+            tdom $::_main_parser keepTextStart 1
             for {set x 1} {$x < [llength $args]} {incr x} {
                 switch -- [lindex $args $x] {
                     "-channel" {

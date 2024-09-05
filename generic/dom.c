@@ -5343,6 +5343,7 @@ typedef struct _tdomCmdReadInfo {
     /* Now the tdom cmd specific elements */
     int               tdomStatus;
     Tcl_Obj          *extResolver;
+    TclGenExpatInfo  *expatinfo;  /* Use read-only ! */
 
 } tdomCmdReadInfo;
 
@@ -5436,6 +5437,7 @@ tdom_initParseProc (
     info->baseURIstack[0].depth = 0;
     info->tdomStatus = 2;
     info->status = 0;
+    info->expatinfo->cdataStartLine = 0;
 }
 
 static void
@@ -5445,11 +5447,34 @@ tdom_charDataHandler (
     int          len
 )
 {
-    domReadInfo   *info = userData;
+    tdomCmdReadInfo *info = (tdomCmdReadInfo *) userData;
 
     Tcl_DStringAppend (info->cdata, s, len);
-    DispatchPCDATA (info);
+    if (info->storeLineColumn) {
+        if (!info->textStartLine) {
+            info->textStartLine = info->expatinfo->cdataStartLine;
+            info->textStartColumn = info->expatinfo->cdataStartColumn;
+            info->textStartByteIndex = info->expatinfo->cdataStartByteIndex;
+        }
+    }
+    DispatchPCDATA ((domReadInfo*) info);
     return;
+}
+
+static void
+tdom_startCDATA (
+    void        *userData
+    )
+{
+    tdomCmdReadInfo   *info = (tdomCmdReadInfo *) userData;
+
+    DispatchPCDATA ((domReadInfo*) info);
+    info->cdataSection = 1;
+    if (info->storeLineColumn) {
+        info->textStartLine = XML_GetCurrentLineNumber (info->parser);
+        info->textStartColumn = XML_GetCurrentColumnNumber (info->parser);
+        info->textStartByteIndex = XML_GetCurrentByteIndex (info->parser);
+    }
 }
 
 int
@@ -5543,6 +5568,7 @@ TclTdomObjCmd (
         info->baseURIstackSize  = INITIAL_BASEURISTACK_SIZE;
         info->baseURIstack      = (domActiveBaseURI*) 
             MALLOC (sizeof(domActiveBaseURI) * info->baseURIstackSize);
+        info->expatinfo         = expat;
         handlerSet->userData    = info;
 
         CHandlerSetInstall (interp, objv[1], handlerSet);
@@ -5656,7 +5682,7 @@ TclTdomObjCmd (
             return TCL_ERROR;
         }
         if (bool) {
-            handlerSet->startCdataSectionCommand = startCDATA;
+            handlerSet->startCdataSectionCommand = tdom_startCDATA;
             handlerSet->endCdataSectionCommand = endCDATA;
         } else {
             handlerSet->startCdataSectionCommand = NULL;
@@ -5685,7 +5711,8 @@ TclTdomObjCmd (
             return TCL_ERROR;
         }
         expat = GetExpatInfo (interp, objv[1]);
-        expat->keepcdataStart = bool;
+        expat->keepTextStart = bool;
+        expat->cdataStartLine = 0;
         break;
         
     case m_ignorexmlns:
