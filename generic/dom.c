@@ -1672,12 +1672,12 @@ DispatchPCDATA (
         && !(info->sdata
              && info->sdata->stack
              && info->sdata->stack->pattern->flags & CONSTRAINT_TEXT_CHILD)) {
-        info->textStartColumn = 0;
+        info->textStartLine = 0;
         return;
     }
 #else
     if (!len && !info->cdataSection) {
-        info->textStartColumn = 0;
+        info->textStartLine = 0;
         return;
     }
 #endif
@@ -1766,7 +1766,6 @@ DispatchPCDATA (
             lc->byteIndex    = info->textStartByteIndex;
         }
     }
-    info->textStartColumn = 0;
 checkTextConstraints:
 #ifndef TDOM_NO_SCHEMA
     if (info->sdata) {
@@ -1776,6 +1775,7 @@ checkTextConstraints:
         }
     }
 #endif
+    info->textStartLine = 0;
     Tcl_DStringSetLength (info->cdata, 0);
 }
 

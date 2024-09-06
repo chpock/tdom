@@ -3080,6 +3080,7 @@ TclExpatDispatchPCDATA(
 #endif
   Tcl_DecrRefCount (expat->cdata);
   expat->cdata = NULL;
+  expat->cdataStartLine = 0;
   return;
 }
 
