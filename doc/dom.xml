@@ -399,9 +399,11 @@ memory handling as explained above.</desc>
 
         <commanddef>
           <command><cmd>dom</cmd> <method>createDocumentNode</method>
-?<m>objVar</m>?</command>
-          <desc>Creates a new 'empty' DOM document object without any element
-node. <m>objVar</m> controls the memory handling as explained above.</desc>
+?<m>-jsonType jsonType</m>? ?<m>objVar</m>?</command>
+          <desc>Creates a new 'empty' DOM document object without any
+          element node. <m>objVar</m> controls the memory handling as
+          explained above. If the option -jsonType is given the
+          created document node will be of the given JSON type.</desc>
         </commanddef>
 
         <commanddef>

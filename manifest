@@ -1,5 +1,5 @@
-C Corrected\stypo.
-D 2024-09-01T12:45:18.882
+C Added\sdocumentation\sfor\sthe\sdom\screateDocumentNode\s-jsonType\sflag\s(which\swas\sintroduced\sin\s2017\s...)
+D 2024-09-07T23:12:10.616
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -20,7 +20,7 @@ F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html b4a8d2a4b261d8380849b9fa2b4026f1e08248aab543551db47a34b60a43c69a
 F doc/dom.html 27091fc5af64c7ad6b049a7b7f685015b08d64f2354620834e9e3837a82f8a3e
 F doc/dom.n 59904494c57155c795164652e1d9fb6739b884b650c2e3198d15936229bab192
-F doc/dom.xml e1729f06dfeecd7df903b0d88905186705395e52ee68f19553253207aa7b5a7b
+F doc/dom.xml 0c6c2707936a2a103d68c5f96b829b5fabaeb05b1f68b4bc0bfbcd9aa31916d4
 F doc/domDoc.html e5a43a5e66b4a0fc8d6f93748177519370b3ec7c2e7f829c9b0b2e9e49b3718b
 F doc/domDoc.n 93bf650b2464dbbe728936272e4c1785fbf829800919dcd6b768cfe62982ef8e
 F doc/domDoc.xml b03d5ef30931e59c58ac2bed86f6928e31f1a97f7f1bf0fd6d70e7867f38060f
@@ -242,8 +242,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ba9e3cb1273ab2f58ad36c3a168a8b83fe14224041973e7354997eedc8509cd3
-R 954896e41775f386127313c7480e7565
+P ff1ad5f8be64aa6be30efe51a99141ce22bddeff38deaf34fdb3f28af09a8c40
+R caad28cb7191c303237987d3bff1d59c
 U rolf
-Z 8be0679dcb1d82e84a582e613de1f51b
+Z 990fcdfdd529587f2d640fe1ac0952cd
 # Remove this line to create a well-formed Fossil manifest.
