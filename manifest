@@ -1,5 +1,5 @@
-C Added\sdocumentation\sfor\sthe\sdom\screateDocumentNode\s-jsonType\sflag\s(which\swas\sintroduced\sin\s2017\s...)
-D 2024-09-07T23:12:10.616
+C Started.
+D 2024-09-08T22:11:43.948
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -148,7 +148,7 @@ F generic/nodecmd.c 5bc75cdc1796459a943d397a15c8d52170cc38cb9e3452af9cfb8f12a6d9
 F generic/nodecmd.h 36056ca2c262cb1991cabef8d27992ad628db718d09ff0eeaeaffd150f1549ec
 F generic/schema.c 7acf44a50e38ffc048d140a2595202c1f350c9db55ce3f96fb44e962cf971159
 F generic/schema.h 5e20a348c3f98724e9c118760c8d9fcd661ae8f27d21652d90ab49492d001c75
-F generic/tcldom.c e0a3d3639e12e877eab12163077514d3439632d5dfb0920a83a88872e50a591c
+F generic/tcldom.c f3c2426af64131bfd42c3fd11bb97f95d78cacb8f65c101038e8c8c32b9711fe
 F generic/tcldom.h b723e7ceeac1954c26469ec43a7f67de5368f0bb03c7e9fdea0da220b2b8d60c
 F generic/tclexpat.c d10c8316c4096198d354b0caef4763de57886c4d339b17dffadc1dbc76d31426
 F generic/tclexpat.h 80b7da613f99a61e9a2f3f5e062b3995ff050d68a5a4c93ca31ccd5a986e355f
@@ -242,8 +242,11 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ff1ad5f8be64aa6be30efe51a99141ce22bddeff38deaf34fdb3f28af09a8c40
-R caad28cb7191c303237987d3bff1d59c
+P 2bd5a941442ca2fc4b0a2581172259d9abe306a73717e233196e4d6c53080691
+R 1b1cb55124900f442081726873a79785
+T *branch * asTypedList
+T *sym-asTypedList *
+T -sym-trunk *
 U rolf
-Z 990fcdfdd529587f2d640fe1ac0952cd
+Z 644e980385cd7cad18d3f26ed7fe90b3
 # Remove this line to create a well-formed Fossil manifest.
