@@ -14,9 +14,10 @@
 #    parser-10.*: return code 'return' from callback
 #    parser-11.*: parser input from filename
 #    parser-12.*: parser currentmarkup
+#    parser-13.*: getline/column/byteindex
 #
 # Copyright (c) 1999-2000 Zveno Pty Ltd.
-# Copyright (c) 2002-2015 Rolf Ade
+# Copyright (c) 2002-2024 Rolf Ade
 #
 # $Id$
 
@@ -980,6 +981,35 @@ test parser-12.9 {currentmarkup method - comment} {
     $p free
     set result
 } {comment: <!-- A comment -->}
+
+proc gethdl-13 {p args} {
+    global result
+    append result "/[$p get -currentlinenumber].[$p get -currentcolumnnumber]/"
+}
+
+test parser-13.1 {get -current*} {
+    catch {unset result}
+    set result ""
+    set p [expat parser-13.1]
+    $p configure \
+        -elementstartcommand [list gethdl-13 $p]
+    $p parse {<root>
+        <e1><e2/></e1></root>}
+    $p free
+    set result
+} /1.0//2.8//2.12/
+
+test parser-13.2 {get -current*} {
+    catch {unset result}
+    set result ""
+    set p [expat parser-13.2 -keepTextStart 1]
+    $p configure \
+        -characterdatacommand [list gethdl-13 $p]
+    $p parse {<root>
+        Hello</root>}
+    $p free
+    set result
+} /1.6/
 
 
 # cleanup

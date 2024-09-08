@@ -2496,6 +2496,87 @@ test domNode-24.6 {getByteIndex} {
     
 $doc delete
 
+dom setStoreLineColumn 1
+
+test domNode-24.7 {getLine etc text node} {
+    set doc [dom parse {<root>
+        Hello<e1><e2/></e1></root>}]
+    set root [$doc documentElement]
+    set node [$root firstChild]
+    set result [$node getLine].[$node getColumn]
+    $doc delete
+    set result
+} {1.6}
+
+test domNode-24.8 {getLine etc cdatasection node} {
+    set doc [dom parse -keepCDATA {<root><![CDATA[
+        Hello]]><e1><e2/></e1></root>}]
+    set root [$doc documentElement]
+    set node [$root firstChild]
+    set result [$node getLine].[$node getColumn]
+    $doc delete
+    set result
+} {1.6}
+
+test domNode-24.8.1 {getLine etc cdatasection node without -keepCDATA} {
+    set doc [dom parse {<root><![CDATA[
+        Hello]]><e1><e2/></e1></root>}]
+    set root [$doc documentElement]
+    set node [$root firstChild]
+    set result [$node getLine].[$node getColumn]
+    $doc delete
+    set result
+} {1.15}
+
+test domNode-24.9 {getLine etc pi node} {
+    set doc [dom parse {<root><?pi1 do this?>
+        <e1><e2/></e1></root>}]
+    set root [$doc documentElement]
+    set node [$root firstChild]
+    set result [$node getLine].[$node getColumn]
+    $doc delete
+    set result
+} {1.6}
+
+test domNode-24.10 {getLine etc comment node} {
+    set doc [dom parse {<root>
+        <!-- comment --><e1><e2/></e1></root>}]
+    set root [$doc documentElement]
+    set node [$root firstChild]
+    set result [$node getLine].[$node getColumn]
+    $doc delete
+    set result
+} {2.8}
+
+test domNode-24.11 {getLine etc multple text/CDATA nodes} {
+    set doc [dom parse -keepCDATA {<root>
+        <e1>text</e1></root>}]
+    set root [$doc documentElement]
+    set e1 [$root firstChild]
+    set node [$e1 firstChild]
+    set result [$node getLine].[$node getColumn]
+    $doc delete
+    set result
+} {2.12}
+
+test domNode-24.12 {getLine etc multple text/CDATA nodes} {
+    set doc [dom parse -keepCDATA {<root>
+        <e1>text<![CDATA[
+        Hello out]]>more text</e1></root>}]
+    set root [$doc documentElement]
+    set e1 [$root firstChild]
+    set node [$e1 firstChild]
+    set result [$node getLine].[$node getColumn]/
+    set node [$node nextSibling]
+    append result [$node getLine].[$node getColumn]/
+    set node [$node nextSibling]
+    append result [$node getLine].[$node getColumn]
+    $doc delete
+    set result
+} {2.12/2.16/3.20}
+
+dom setStoreLineColumn 0
+
 set doc [dom parse {<root attr1="bingbaz"
                           attr2="ab &amp; zu"
                           attr3=""

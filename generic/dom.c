@@ -137,6 +137,9 @@ typedef struct _domReadInfo {
     int               cdataSection;
     Tcl_DString      *cdata;
     int               storeLineColumn;
+    domLength         textStartLine;
+    domLength         textStartColumn;
+    domLength         textStartByteIndex;
     int               ignorexmlns;
     int               feedbackAfter;
     Tcl_Obj          *feedbackCmd;
@@ -1593,8 +1596,18 @@ characterDataHandler (
 )
 {
     domReadInfo   *info = userData;
-
+    
     Tcl_DStringAppend (info->cdata, s, len);
+    if (info->storeLineColumn) {
+        /* This works because the result of XML_GetCurrentLineNumber()
+         * is always at least 1 */
+        if (!info->textStartLine) {
+            info->textStartLine = XML_GetCurrentLineNumber (info->parser);
+            info->textStartColumn = XML_GetCurrentColumnNumber (info->parser);
+            info->textStartByteIndex = XML_GetCurrentByteIndex (info->parser);
+        }
+    }
+    
     return;
     
 }
@@ -1612,6 +1625,13 @@ startCDATA (
 
     DispatchPCDATA (info);
     info->cdataSection = 1;
+    if (info->storeLineColumn) {
+        if (!info->textStartLine) {
+            info->textStartLine = XML_GetCurrentLineNumber (info->parser);
+            info->textStartColumn = XML_GetCurrentColumnNumber (info->parser);
+            info->textStartByteIndex = XML_GetCurrentByteIndex (info->parser);
+        }
+    }
 }
 
 /*---------------------------------------------------------------------------
@@ -1651,10 +1671,15 @@ DispatchPCDATA (
     if (!len && !info->cdataSection
         && !(info->sdata
              && info->sdata->stack
-             && info->sdata->stack->pattern->flags & CONSTRAINT_TEXT_CHILD))
+             && info->sdata->stack->pattern->flags & CONSTRAINT_TEXT_CHILD)) {
+        info->textStartLine = 0;
         return;
+    }
 #else
-    if (!len && !info->cdataSection) return;
+    if (!len && !info->cdataSection) {
+        info->textStartLine = 0;
+        return;
+    }
 #endif
     s = Tcl_DStringValue (info->cdata);
     
@@ -1736,9 +1761,9 @@ DispatchPCDATA (
         if (info->storeLineColumn) {
             lc = (domLineColumn*) ( ((char*)node) + sizeof(domTextNode) );
             node->nodeFlags |= HAS_LINE_COLUMN;
-            lc->line         = XML_GetCurrentLineNumber (info->parser);
-            lc->column       = XML_GetCurrentColumnNumber(info->parser);
-            lc->byteIndex    = XML_GetCurrentByteIndex (info->parser);
+            lc->line         = info->textStartLine;
+            lc->column       = info->textStartColumn;
+            lc->byteIndex    = info->textStartByteIndex;
         }
     }
 checkTextConstraints:
@@ -1750,6 +1775,7 @@ checkTextConstraints:
         }
     }
 #endif
+    info->textStartLine = 0;
     Tcl_DStringSetLength (info->cdata, 0);
 }
 
@@ -2305,6 +2331,7 @@ domReadDocument (
     Tcl_DStringInit (info.cdata);
     info.cdataSection         = 0;
     info.storeLineColumn      = storeLineColumn;
+    info.textStartLine        = 0;
     info.ignorexmlns          = ignorexmlns;
     info.feedbackAfter        = feedbackAfter;
     info.feedbackCmd          = feedbackCmd;
@@ -5294,6 +5321,9 @@ typedef struct _tdomCmdReadInfo {
     int               cdataSection;
     Tcl_DString      *cdata;
     int               storeLineColumn;
+    domLength         textStartLine;
+    domLength         textStartColumn;
+    domLength         textStartByteIndex;
     int               ignorexmlns;
     int               feedbackAfter;
     Tcl_Obj          *feedbackCmd;
@@ -5313,6 +5343,7 @@ typedef struct _tdomCmdReadInfo {
     /* Now the tdom cmd specific elements */
     int               tdomStatus;
     Tcl_Obj          *extResolver;
+    TclGenExpatInfo  *expatinfo;  /* Use read-only ! */
 
 } tdomCmdReadInfo;
 
@@ -5378,6 +5409,7 @@ tdom_resetProc (
     info->feedbackAfter     = 0;
     info->ignorexmlns       = 0;
     Tcl_DStringSetLength (info->cdata, 0);
+    info->textStartLine     = 0;
     info->nextFeedbackPosition = info->feedbackAfter;
     info->interp            = interp;
     info->activeNSpos       = -1;
@@ -5405,6 +5437,7 @@ tdom_initParseProc (
     info->baseURIstack[0].depth = 0;
     info->tdomStatus = 2;
     info->status = 0;
+    info->expatinfo->cdataStartLine = 0;
 }
 
 static void
@@ -5414,11 +5447,34 @@ tdom_charDataHandler (
     int          len
 )
 {
-    domReadInfo   *info = userData;
+    tdomCmdReadInfo *info = (tdomCmdReadInfo *) userData;
 
     Tcl_DStringAppend (info->cdata, s, len);
-    DispatchPCDATA (info);
+    if (info->storeLineColumn) {
+        if (!info->textStartLine) {
+            info->textStartLine = info->expatinfo->cdataStartLine;
+            info->textStartColumn = info->expatinfo->cdataStartColumn;
+            info->textStartByteIndex = info->expatinfo->cdataStartByteIndex;
+        }
+    }
+    DispatchPCDATA ((domReadInfo*) info);
     return;
+}
+
+static void
+tdom_startCDATA (
+    void        *userData
+    )
+{
+    tdomCmdReadInfo   *info = (tdomCmdReadInfo *) userData;
+
+    DispatchPCDATA ((domReadInfo*) info);
+    info->cdataSection = 1;
+    if (info->storeLineColumn) {
+        info->textStartLine = XML_GetCurrentLineNumber (info->parser);
+        info->textStartColumn = XML_GetCurrentColumnNumber (info->parser);
+        info->textStartByteIndex = XML_GetCurrentByteIndex (info->parser);
+    }
 }
 
 int
@@ -5440,13 +5496,15 @@ TclTdomObjCmd (
         "setStoreLineColumn",
         "setExternalEntityResolver", "keepEmpties",
         "remove", "ignorexmlns", "keepCDATA",
+        "keepTextStart",
         NULL
     };
     enum tdomMethod {
         m_enable, m_getdoc,
         m_setStoreLineColumn,
         m_setExternalEntityResolver, m_keepEmpties,
-        m_remove, m_ignorexmlns, m_keepCDATA
+        m_remove, m_ignorexmlns, m_keepCDATA,
+        m_keepTextStart
     };
 
     if (objc < 3 || objc > 4) {
@@ -5497,35 +5555,20 @@ TclTdomObjCmd (
         handlerSet->endDoctypeDeclCommand   = endDoctypeDeclHandler;
 
         info = (tdomCmdReadInfo *) MALLOC (sizeof (tdomCmdReadInfo));
+        memset(info, 0, sizeof(tdomCmdReadInfo));
         info->parser            = expat->parser;
-        info->document          = NULL;
-        info->currentNode       = NULL;
-        info->depth             = 0;
         info->ignoreWhiteSpaces = 1;
-        info->cdataSection      = 0;
         info->cdata             = (Tcl_DString*) MALLOC (sizeof (Tcl_DString));
         Tcl_DStringInit (info->cdata);
-        info->storeLineColumn   = 0;
-        info->ignorexmlns       = 0;
-        info->feedbackAfter     = 0;
-        info->feedbackCmd       = NULL;
-        info->nextFeedbackPosition = 0;
         info->interp            = interp;
         info->activeNSpos       = -1;
         info->activeNSsize      = 8;
         info->activeNS          = 
             (domActiveNS*) MALLOC(sizeof(domActiveNS) * info->activeNSsize);
-        info->baseURIstackPos   = 0;
         info->baseURIstackSize  = INITIAL_BASEURISTACK_SIZE;
         info->baseURIstack      = (domActiveBaseURI*) 
             MALLOC (sizeof(domActiveBaseURI) * info->baseURIstackSize);
-        info->insideDTD         = 0;
-        info->tdomStatus        = 0;
-        info->extResolver       = NULL;
-#ifndef TDOM_NO_SCHEMA
-        info->sdata             = NULL;
-#endif
-        info->status            = 0;
+        info->expatinfo         = expat;
         handlerSet->userData    = info;
 
         CHandlerSetInstall (interp, objv[1], handlerSet);
@@ -5639,13 +5682,37 @@ TclTdomObjCmd (
             return TCL_ERROR;
         }
         if (bool) {
-            handlerSet->startCdataSectionCommand = startCDATA;
+            handlerSet->startCdataSectionCommand = tdom_startCDATA;
             handlerSet->endCdataSectionCommand = endCDATA;
         } else {
-            handlerSet->startCdataSectionCommand = startCDATA;
-            handlerSet->endCdataSectionCommand = endCDATA;
+            handlerSet->startCdataSectionCommand = NULL;
+            handlerSet->endCdataSectionCommand = NULL;
         }
         info->tdomStatus = 1;
+        break;
+        
+    case m_keepTextStart:
+        if (objc != 4) {
+            Tcl_SetResult (interp, "wrong # of args for method keepCDATA.",
+                           NULL);
+            return TCL_ERROR;
+        }
+        handlerSet = CHandlerSetGet (interp, objv[1], "tdom");
+        if (!handlerSet) {
+            Tcl_SetResult (interp, "parser object isn't tdom enabled.", NULL);
+            return TCL_ERROR;
+        }
+        info = handlerSet->userData;
+        if (!info) {
+            Tcl_SetResult (interp, "parser object isn't tdom enabled.", NULL);
+            return TCL_ERROR;
+        }
+        if (Tcl_GetBooleanFromObj (interp, objv[3], &bool) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        expat = GetExpatInfo (interp, objv[1]);
+        expat->keepTextStart = bool;
+        expat->cdataStartLine = 0;
         break;
         
     case m_ignorexmlns:
@@ -5663,7 +5730,6 @@ TclTdomObjCmd (
         }
         info->tdomStatus = 1;
         break;
-        
 
     }
 
