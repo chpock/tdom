@@ -1,4 +1,8 @@
 
+2024-09-08  Rolf Ade  <rolf@pointsman.de>
+
+        Added the flag -keepTextStart to the expat command.
+
 2024-08-31  Rolf Ade  <rolf@pointsman.de>
 
         Text node commands created by createNodeCmd of the json type
