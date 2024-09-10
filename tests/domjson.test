@@ -12,6 +12,7 @@
 #    json-8.*: appendFromScript
 #    json-9.*: cloneNode
 #    json-10.*: asTclValue
+#    json-11.*: asTypedList
 # Copyright (c) 2017 Rolf Ade.
 
 source [file join [file dir [info script]] loadtdom.tcl]
@@ -2973,3 +2974,43 @@ test json-10.7.1 {asTclValue} {
     $doc delete
     list $dict $resulttype
 } {{Titel Wirtschaftsinformatik Keywords {Introduction Basics} Year 2022} dict}
+
+test json-11.1 {asTypedList} {
+    set json {{
+        "Titel": "Wirtschaftsinformatik",
+        "Keywords": ["Introduction","Basics"],
+        "Year": 2022
+    }}
+    set doc [dom parse -json $json]
+    set result [$doc asTypedList]
+    $doc delete
+    set result
+} {OBJECT {Titel {STRING Wirtschaftsinformatik} Keywords {ARRAY {{STRING Introduction} {STRING Basics}}} Year {NUMBER 2022}}}
+
+test json-11.2 {asTypedList} {
+    set json {{
+        "stringproperty": "abc",
+        "objectproperty": {"one": 1, "two": "two"},
+        "array": ["foo", -2.23, null, true, false, {"one": 1, "two": "two"}, [2,16,24]],
+        "number": 2022,
+        "null": null,
+        "true": true,
+        "false": false
+    }}
+    set doc [dom parse -json $json]
+    set result [$doc asTypedList]
+    $doc delete
+    set result
+} {OBJECT {stringproperty {STRING abc} objectproperty {OBJECT {one {NUMBER 1} two {STRING two}}} array {ARRAY {{STRING foo} {NUMBER -2.23} NULL TRUE FALSE {OBJECT {one {NUMBER 1} two {STRING two}}} {ARRAY {{NUMBER 2} {NUMBER 16} {NUMBER 24}}}}} number {NUMBER 2022} null NULL true TRUE false FALSE}}
+
+test json-11.3 {asTypedList} {
+    set json {{
+        "one two": "abc",
+        "one\u007btwo": "abc",
+        " one two ": "edf"
+    }}
+    set doc [dom parse -json $json]
+    set result [$doc asTypedList]
+    $doc delete
+    set result
+} {OBJECT {{one two} {STRING abc} one\{two {STRING abc} { one two } {STRING edf}}}
