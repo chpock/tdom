@@ -3522,6 +3522,166 @@ tcldom_treeAsTypedList (
     return resultObj;
 }
 
+typedef struct 
+{
+    Tcl_Obj  *object;
+    Tcl_Obj  *array;
+    Tcl_Obj  *null;
+    Tcl_Obj  *true;
+    Tcl_Obj  *false;
+    Tcl_Obj  *number;
+    Tcl_Obj  *string;
+} asTypedListTypes;
+
+
+/*----------------------------------------------------------------------------
+|   tcldom_treeAsTypedList
+|
+\---------------------------------------------------------------------------*/
+static Tcl_Obj*
+tcldom_treeAsTypedListWorker (
+    Tcl_Interp *interp,
+    domNode    *node,
+    const asTypedListTypes *c    /* c for string constants */
+    )
+{
+    Tcl_Obj *listObj, *resultObj = Tcl_NewListObj (0, NULL);
+    domNode *child, *childchild;
+    domTextNode *textNode;
+    
+    switch (node->info) {
+    case JSON_ARRAY:
+        listObj = Tcl_NewListObj (0, NULL);
+        child = node->firstChild;
+        while (child) {
+            if (child->nodeType == ELEMENT_NODE
+                || child->nodeType == TEXT_NODE) {
+                Tcl_ListObjAppendElement (interp, listObj,
+                                          tcldom_treeAsTypedListWorker (
+                                              interp, child, c));
+            }
+            child = child->nextSibling;
+        }
+        Tcl_ListObjAppendElement(interp, resultObj, c->array);
+        Tcl_ListObjAppendElement(interp, resultObj, listObj);
+        break;
+    case JSON_OBJECT:
+        listObj = Tcl_NewListObj (0, NULL);
+        child = node->firstChild;
+        while (child) {
+            Tcl_ListObjAppendElement(interp, listObj,
+                                     Tcl_NewStringObj(child->nodeName, -1));
+            if (child->nodeType == ELEMENT_NODE) {
+                if (child->info == 0) {
+                    childchild = child->firstChild;
+                    while (childchild) {
+                        if (childchild->nodeType == TEXT_NODE) {
+                            Tcl_ListObjAppendElement(
+                                interp, listObj,
+                                tcldom_treeAsTypedListWorker (
+                                    interp, childchild, c));
+                            break;
+                        }
+                        childchild = childchild->nextSibling;
+                    }
+                } else {
+                    Tcl_ListObjAppendElement(interp, listObj,
+                                             tcldom_treeAsTypedListWorker (
+                                                 interp, child, c));
+                }
+            }
+            child = child->nextSibling;
+        }
+        Tcl_ListObjAppendElement(interp, resultObj, c->object);
+        Tcl_ListObjAppendElement(interp, resultObj, listObj);
+        break;
+    case 0:
+        child = node->firstChild;
+        while (child) {
+            if (child->nodeType == TEXT_NODE) {
+                textNode = (domTextNode *)child;
+                Tcl_ListObjAppendElement(
+                    interp, resultObj, Tcl_NewStringObj(textNode->nodeValue,
+                                                        textNode->valueLength));
+                break;
+            }
+            child = child->nextSibling;
+        }
+        break;
+    case JSON_NULL:
+        Tcl_ListObjAppendElement (interp, resultObj, c->null);
+        break;
+    case JSON_TRUE:
+        Tcl_ListObjAppendElement (interp, resultObj, c->true);
+        break;
+    case JSON_FALSE:
+        Tcl_ListObjAppendElement (interp, resultObj, c->false);
+        break;
+    case JSON_NUMBER:
+        if (node->nodeType != TEXT_NODE) break;
+        textNode = (domTextNode *)node;
+        if (isJSONNumber (textNode->nodeValue, textNode->valueLength)) {
+            Tcl_ListObjAppendElement(interp, resultObj, c->number);
+            Tcl_ListObjAppendElement(
+                interp, resultObj, Tcl_NewStringObj(textNode->nodeValue,
+                                                    textNode->valueLength));
+            break;
+        }
+        /* fall through */
+    case JSON_STRING:
+    default:
+        if (node->nodeType != TEXT_NODE) break;
+        textNode = (domTextNode *)node;
+        Tcl_ListObjAppendElement(interp, resultObj, c->string);
+        Tcl_ListObjAppendElement(
+            interp, resultObj, Tcl_NewStringObj(textNode->nodeValue,
+                                                textNode->valueLength));
+        break;
+    }
+    return resultObj;
+}
+
+static void
+tcldom_treeAsTypedList2 (
+    Tcl_Interp *interp,
+    domNode    *node
+    )
+{
+    asTypedListTypes c;
+    
+    if (node->nodeType != ELEMENT_NODE && node->nodeType != TEXT_NODE) {
+        Tcl_ResetResult (interp);
+        return;
+    }
+
+    c.object = Tcl_NewStringObj ("OBJECT", 6);
+    c.array = Tcl_NewStringObj ("ARRAY", 5);
+    c.null = Tcl_NewStringObj ("NULL", 4);
+    c.true = Tcl_NewStringObj ("TRUE", 4);
+    c.false = Tcl_NewStringObj ("FALSE", 5);
+    c.number = Tcl_NewStringObj ("NUMBER", 6);
+    c.string = Tcl_NewStringObj ("STRING", 6);
+
+    Tcl_IncrRefCount (c.object);
+    Tcl_IncrRefCount (c.array);
+    Tcl_IncrRefCount (c.null);
+    Tcl_IncrRefCount (c.true);
+    Tcl_IncrRefCount (c.false);
+    Tcl_IncrRefCount (c.number);
+    Tcl_IncrRefCount (c.string);
+
+    Tcl_SetObjResult (interp, 
+                      tcldom_treeAsTypedListWorker (interp, node, &c));
+
+    Tcl_DecrRefCount (c.object);
+    Tcl_DecrRefCount (c.array);
+    Tcl_DecrRefCount (c.null);
+    Tcl_DecrRefCount (c.true);
+    Tcl_DecrRefCount (c.false);
+    Tcl_DecrRefCount (c.number);
+    Tcl_DecrRefCount (c.string);
+}
+
 /*----------------------------------------------------------------------------
 |   findBaseURI
 |
@@ -5269,7 +5429,7 @@ int tcldom_NodeObjCmd (
 
         case m_asTypedList:
             CheckArgs(2,2,2,"");
-            Tcl_SetObjResult (interp, tcldom_treeAsTypedList (interp, node));
+            tcldom_treeAsTypedList2 (interp, node);
             break;
             
         case m_getAttribute:
