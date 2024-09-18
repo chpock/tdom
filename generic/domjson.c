@@ -455,6 +455,268 @@ static domLength jsonParseValue(
     }
 }
 
+static inline int
+getJSONTypeFromList (
+    Tcl_Interp *interp,
+    Tcl_Obj *list,
+    Tcl_Obj **typeValue
+    )
+{
+    Tcl_Obj *symbol;
+    char *s;
+    domLength slen;
+    
+    if (Tcl_ListObjIndex (interp, list, 0, &symbol) != TCL_OK) {
+        return -1;
+    }
+    if (!symbol) {
+        /* Empty lists are not allowed.
+         TODO: appropriate error msg */
+        return -1;
+    }
+    s = Tcl_GetStringFromObj (symbol, &slen);
+    if (strcmp (s, "STRING") == 0) {
+        Tcl_ListObjIndex (interp, list, 1, typeValue);
+        if (*typeValue == NULL) {
+            /* Missing value element 
+               TODO: appropriate error msg */
+            return -1;
+        }
+        return JSON_STRING;
+    } else if (strcmp (s, "OBJECT") == 0) {
+        Tcl_ListObjIndex (interp, list, 1, typeValue);
+        if (*typeValue == NULL) {
+            /* Missing value element 
+               TODO: appropriate error msg */
+            return -1;
+        }
+        return JSON_OBJECT;
+    } else if (strcmp (s, "NUMBER") == 0) {
+        Tcl_ListObjIndex (interp, list, 1, typeValue);
+        if (*typeValue == NULL) {
+            /* Missing value element 
+               TODO: appropriate error msg */
+            return -1;
+        }
+        return JSON_NUMBER;
+    } else if (strcmp (s, "ARRAY") == 0) {
+        Tcl_ListObjIndex (interp, list, 1, typeValue);
+        if (*typeValue == NULL) {
+            /* Missing value element 
+               TODO: appropriate error msg */
+            return -1;
+        }
+        return JSON_ARRAY;
+    } else if (strcmp (s, "TRUE") == 0) {
+        return JSON_TRUE;
+    } else if (strcmp (s, "FALSE") == 0) {
+        return JSON_FALSE;
+    } else if (strcmp (s, "NULL") == 0) {
+        return JSON_NULL;
+    } else {
+        return -1;
+    }            
+}
+
+static int
+TypedList2DOMWorker (
+    Tcl_Interp *interp,
+    domNode *parent,
+    Tcl_Obj *value
+    )
+{
+    Tcl_Obj *property, *pvalue, *pdetail, *aelm, *adetail;
+    domLength llen, i, strl;
+    domNode *pnode, *container;
+    domTextNode *textNode;
+    char *str;
+    int jsonType;
+    
+    switch (parent->info) {
+    case JSON_OBJECT:
+        if (Tcl_ListObjLength (interp, value, &llen) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        if (llen % 2 != 0) {
+            Tcl_ResetResult (interp);
+            Tcl_AppendResult (interp, "An OBJECT value must be a Tcl "
+                              "list with an even number of elements.",
+                              (char *) NULL);
+            return TCL_ERROR;
+        }
+        for (i = 0; i < llen; i += 2) {
+            /* Since we loop over all elements every element is
+             * present and there is no need to check property or
+             * pvalue for NULL. */
+            Tcl_ListObjIndex (interp, value, i, &property);
+            Tcl_ListObjIndex (interp, value, i+1, &pvalue);
+            pnode = domAppendNewElementNode (parent, Tcl_GetString (property),
+                                             NULL);
+            jsonType = getJSONTypeFromList (interp, pvalue, &pdetail);
+            if (jsonType < 0) {
+                return TCL_ERROR;
+            }
+            if (jsonType < 3) {
+                /* JSON_OBJECT or JSON_ARRAY */
+                pnode->info = jsonType;
+                if (TypedList2DOMWorker (interp, pnode, pdetail) != TCL_OK) {
+                    return TCL_ERROR;
+                }
+            } else {
+                /* The other json types are represented by a text node.*/
+                switch (jsonType) {
+                case JSON_NUMBER:
+                    /* TODO check number */
+                    /* fall through */
+                case JSON_STRING:
+                    str = Tcl_GetStringFromObj (pdetail, &strl);
+                    break;
+                default:
+                    str = "";
+                    strl = 0;
+                    break;
+                }
+                textNode = domNewTextNode (parent->ownerDocument,
+                                           str, strl, TEXT_NODE);
+                textNode->info = jsonType;
+                domAppendChild (pnode, (domNode *) textNode);
+            }
+        }
+        break;
+    case JSON_ARRAY:
+        if (Tcl_ListObjLength (interp, value, &llen) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        for (i = 0; i < llen; i++) {
+            Tcl_ListObjIndex (interp, value, i, &aelm);
+            jsonType = getJSONTypeFromList (interp, aelm, &adetail);
+            if (jsonType < 0) {
+                return TCL_ERROR;
+            }
+            switch (jsonType) {
+            case JSON_OBJECT:
+                container = domAppendNewElementNode (parent,
+                                                     JSON_OBJECT_CONTAINER,
+                                                     NULL);
+                container->info = JSON_OBJECT;                
+                TypedList2DOMWorker (interp, container, adetail);
+                break;
+            case JSON_ARRAY:
+                container = domAppendNewElementNode (parent,
+                                                     JSON_ARRAY_CONTAINER,
+                                                     NULL);
+                container->info = JSON_ARRAY;                
+                TypedList2DOMWorker (interp, container, adetail);
+                break;
+            default:
+                /* The other json types are represented by a text node.*/
+                switch (jsonType) {
+                case JSON_NUMBER:
+                    /* TODO check number */
+                    /* fall through */
+                case JSON_STRING:
+                    str = Tcl_GetStringFromObj (adetail, &strl);
+                    break;
+                default:
+                    str = "";
+                    strl = 0;
+                    break;
+                }
+                textNode = domNewTextNode (parent->ownerDocument,
+                                           str, strl, TEXT_NODE);
+                textNode->info = jsonType;
+                domAppendChild (parent, (domNode *) textNode);
+                break;
+            }
+        }
+        break;
+    case JSON_NULL:
+        textNode = domNewTextNode (parent->ownerDocument,
+                                   "", 0, TEXT_NODE);
+        textNode->info = JSON_NULL;
+        domAppendChild (parent, (domNode *) textNode);
+        break;
+    case JSON_TRUE:
+        textNode = domNewTextNode (parent->ownerDocument,
+                                   "", 0, TEXT_NODE);
+        textNode->info = JSON_TRUE;
+        domAppendChild (parent, (domNode *) textNode);
+        break;
+    case JSON_FALSE:
+        textNode = domNewTextNode (parent->ownerDocument,
+                                   "", 0, TEXT_NODE);
+        textNode->info = JSON_FALSE;
+        domAppendChild (parent, (domNode *) textNode);
+        break;
+    case JSON_NUMBER:
+        str = Tcl_GetStringFromObj (value, &strl);
+        break;
+    case JSON_STRING:
+        str = Tcl_GetStringFromObj (value, &strl);
+        textNode = domNewTextNode (parent->ownerDocument, str, strl,
+                                   TEXT_NODE);
+        textNode->info = JSON_STRING;
+        break;
+    }
+    return TCL_OK;
+}
+    
+domDocument *
+TypedList2DOM (
+    Tcl_Interp *interp,
+    Tcl_Obj *typedList
+    )
+{
+    domDocument *doc;
+    domNode *rootNode;
+    domTextNode *textNode;
+    Tcl_Obj *value;
+    char *str;
+    domLength strl;
+    int jsonType;
+
+    jsonType = getJSONTypeFromList (interp, typedList, &value);
+    if (jsonType < 0) {
+        return NULL;
+    }
+    doc  = domCreateDoc (NULL, 0);
+    rootNode = doc->rootNode;
+    switch (jsonType) {
+    case JSON_OBJECT:
+        rootNode->info = JSON_OBJECT;
+        if (TypedList2DOMWorker (interp, rootNode, value) != TCL_OK) {
+            goto error;
+        }
+        break;
+    case JSON_ARRAY:
+        rootNode->info = JSON_ARRAY;
+        if (TypedList2DOMWorker (interp, rootNode, value) != TCL_OK) {
+            goto error;
+        }
+    default:
+        /* The other json types are represented by a text node.*/
+        switch (jsonType) {
+        case JSON_NUMBER:
+            /* TODO check number */
+            /* fall through */
+        case JSON_STRING:
+            str = Tcl_GetStringFromObj (value, &strl);
+            break;
+        default:
+            str = "";
+            strl = 0;
+            break;
+        }
+        textNode = domNewTextNode (doc, str, strl, TEXT_NODE);
+        textNode->info = jsonType;
+        domAppendChild (rootNode, (domNode *) textNode);
+        break;
+    }
+    return doc;
+error:
+    tcldom_deleteDoc (interp, doc);
+    return NULL;
+}
 
 domDocument *
 JSON_Parse (

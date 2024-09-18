@@ -13,6 +13,7 @@
 #    json-9.*: cloneNode
 #    json-10.*: asTclValue
 #    json-11.*: asTypedList
+#    json-12.*: createDocumentFromTypedList
 # Copyright (c) 2017 Rolf Ade.
 
 source [file join [file dir [info script]] loadtdom.tcl]
@@ -3014,3 +3015,18 @@ test json-11.3 {asTypedList} {
     $doc delete
     set result
 } {OBJECT {{one two} {STRING abc} one\{two {STRING abc} { one two } {STRING edf}}}
+
+test json-12.1 {createDocumentFromTypedList} {
+    set doc [dom createDocumentFromTypedList {OBJECT {Titel {STRING Wirtschaftsinformatik} Keywords {ARRAY {{STRING Introduction} {STRING Basics}}} Year {NUMBER 2022}}}]
+    set result [$doc asJSON]
+    $doc delete
+    set result
+} {{"Titel":"Wirtschaftsinformatik","Keywords":["Introduction","Basics"],"Year":2022}}
+
+test json-12.2 {createDocumentFromTypedList} {
+    set typedList {OBJECT {Titel {STRING Wirtschaftsinformatik} Keywords {ARRAY {{STRING Introduction} {STRING Basics}}} Year {NUMBER 2022}}}
+    set doc [dom createDocumentFromTypedList $typedList]
+    set result [$doc asTypedList]
+    $doc delete
+    expr {$typedList eq $result}
+} 1

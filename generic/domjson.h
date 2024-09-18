@@ -35,3 +35,8 @@ JSON_Parse (
     domLength *byteIndex
     );
 
+domDocument *
+TypedList2DOM (
+    Tcl_Interp *interp,
+    Tcl_Obj *typedList
+    );

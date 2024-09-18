@@ -6877,7 +6877,7 @@ int tcldom_createDocumentNode (
             return TCL_ERROR;
         }
         Tcl_ResetResult(interp);
-            if (Tcl_GetIndexFromObj(interp, objv[2], jsonTypes, "jsonType",
+        if (Tcl_GetIndexFromObj(interp, objv[2], jsonTypes, "jsonType",
                                 0, &jsonType) != TCL_OK) {
             return TCL_ERROR;
         }
@@ -6931,6 +6931,34 @@ int tcldom_createDocumentNS (
         doc = domCreateDocument (uri, Tcl_GetString(objv[2]));
     }
     return tcldom_returnDocumentObj (interp, doc, newObjName, 1, 0);
+}
+
+/*----------------------------------------------------------------------------
+|   tcldom_createDocumentFromTypedList
+|
+\---------------------------------------------------------------------------*/
+static
+int tcldom_createDocumentFromTypedList (
+    ClientData  UNUSED(clientData),
+    Tcl_Interp *interp,
+    int         objc,
+    Tcl_Obj    * const objv[]
+)
+{
+    domDocument *doc;
+    Tcl_Obj     *newObjName = NULL;
+
+    CheckArgs(2,3,1,"typedList ?newObjVar?");
+
+    if (objc == 3) {
+        newObjName = objv[1];
+    }
+
+    doc = TypedList2DOM (interp, objv[1]);
+    if (doc == NULL) {
+        return TCL_ERROR;
+    }
+    return tcldom_returnDocumentObj(interp, doc, newObjName, 1, 0);
 }
 
 /* Helper function to build up the error string message in a central
@@ -7758,7 +7786,7 @@ int tcldom_DomObjCmd (
 
     static const char *domMethods[] = {
         "createDocument",  "createDocumentNS",   "createNodeCmd",
-        "parse",                                 "setStoreLineColumn",
+        "createDocumentFromTypedList", "parse",  "setStoreLineColumn",
         "isCharData",      "isName",             "isPIName",
         "isQName",         "isComment",          "isCDATA",
         "isPIValue",       "isNCName",           "createDocumentNode",
@@ -7772,7 +7800,7 @@ int tcldom_DomObjCmd (
     };
     enum domMethod {
         m_createDocument,    m_createDocumentNS,   m_createNodeCmd,
-        m_parse,                                   m_setStoreLineColumn,
+        m_createDocumentFromTypedList, m_parse,    m_setStoreLineColumn,
         m_isCharData,        m_isName,             m_isPIName,
         m_isQName,           m_isComment,          m_isCDATA,
         m_isPIValue,         m_isNCName,           m_createDocumentNode,
@@ -7852,6 +7880,9 @@ int tcldom_DomObjCmd (
         case m_createDocumentNode:
             return tcldom_createDocumentNode (clientData, interp, --objc,
                                               objv+1);
+        case m_createDocumentFromTypedList:
+            return tcldom_createDocumentFromTypedList (clientData, interp,
+                                                       --objc, objv+1);
         case m_createNodeCmd:
             return nodecmd_createNodeCmd(interp, --objc, objv+1,
                                          !TcldomDATA(dontCheckName),
