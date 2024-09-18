@@ -6951,7 +6951,7 @@ int tcldom_createDocumentFromTypedList (
     CheckArgs(2,3,1,"typedList ?newObjVar?");
 
     if (objc == 3) {
-        newObjName = objv[1];
+        newObjName = objv[2];
     }
 
     doc = TypedList2DOM (interp, objv[1]);

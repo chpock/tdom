@@ -3030,3 +3030,16 @@ test json-12.2 {createDocumentFromTypedList} {
     $doc delete
     expr {$typedList eq $result}
 } 1
+
+proc createFromTypedList {list} {
+    dom createDocumentFromTypedList $list doc
+    if {$list eq [$doc asTypedList]} {
+        return ""
+    }
+    error "Invalid turnaround."
+}
+test json-12.3 {createDocumentFromTypedList} {
+    createFromTypedList {OBJECT {Titel {STRING Wirtschaftsinformatik} Keywords {ARRAY {{STRING Introduction} {STRING Basics}}} Year {NUMBER 2022}}}
+} {}
+
+   
