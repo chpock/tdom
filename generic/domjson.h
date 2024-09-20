@@ -40,3 +40,9 @@ TypedList2DOM (
     Tcl_Interp *interp,
     Tcl_Obj *typedList
     );
+
+int
+isJSONNumber (
+    char *num,
+    domLength numlen
+    );

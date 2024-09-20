@@ -3016,6 +3016,22 @@ test json-11.3 {asTypedList} {
     set result
 } {OBJECT {{one two} {STRING abc} one\{two {STRING abc} { one two } {STRING edf}}}
 
+test json-11.4 {asTypedList} {
+    set result ""
+    foreach json {
+        {"string foo"}
+        null
+        true
+        false
+        -1.23
+    } {
+        set doc [dom parse -json $json]
+        lappend result [$doc asTypedList]
+        $doc delete
+    }
+    set result
+} {{STRING {string foo}} NULL TRUE FALSE {NUMBER -1.23}}
+
 test json-12.1 {createDocumentFromTypedList} {
     set doc [dom createDocumentFromTypedList {OBJECT {Titel {STRING Wirtschaftsinformatik} Keywords {ARRAY {{STRING Introduction} {STRING Basics}}} Year {NUMBER 2022}}}]
     set result [$doc asJSON]
@@ -3042,4 +3058,26 @@ test json-12.3 {createDocumentFromTypedList} {
     createFromTypedList {OBJECT {Titel {STRING Wirtschaftsinformatik} Keywords {ARRAY {{STRING Introduction} {STRING Basics}}} Year {NUMBER 2022}}}
 } {}
 
+test json-12.4 {createDocumentFromTypedList} {
+    set result ""
+    foreach json {
+        {STRING foo}
+        NULL
+        TRUE
+        FALSE
+        {NUMBER -1.23}
+    } {
+        set doc [dom createDocumentFromTypedList $json]
+        set this [$doc asTypedList]
+        if {$json ne $this} {
+            lappend result "json $json this $this"
+        } else {
+            lappend result 1
+        }
+        $doc delete
+    }
+    set result
+} {1 1 1 1 1}
+
+        
    

@@ -77,10 +77,11 @@ typedef struct {
     domLength len;
 } JSONParse;
 
+#define SetResult(str) Tcl_ResetResult(interp); \
+                     Tcl_SetStringObj(Tcl_GetObjResult(interp), (str), -1)
 
 #define errReturn(i,j) {jparse->state = j; return (i);}
     
-
 /* #define DEBUG */
 #ifdef DEBUG
 # define DBG(x) x
@@ -251,7 +252,7 @@ static domLength jsonParseString (
 /* Parse a single JSON value which begins at json[i]. Return the index
  * of the first character past the end of the value parsed. */
 
-static domLength jsonParseValue(
+static domLength jsonParseValue (
     domNode   *parent,
     char      *json,
     domLength  i,
@@ -455,6 +456,62 @@ static domLength jsonParseValue(
     }
 }
 
+/* Helper function which checks if a given string is a JSON number. */
+int
+isJSONNumber (
+    char *num,
+    domLength numlen
+    )
+{
+    domLength i;
+    int seenDP, seenE;
+    unsigned char c;
+    
+    if (numlen == 0) return 0;
+    seenDP = 0;
+    seenE = 0;
+    i = 0;
+    c = num[0];
+    if (!(c == '-' || (c>='0' && c<='9'))) return 0;
+    if (c<='0') {
+        i = (c == '-' ? i+1 : i);
+        if (i+1 < numlen) {
+            if (num[i] == '0' && num[i+1] >= '0' && num[i+1] <= '9') {
+                return 0;
+            }
+        }
+    }
+    i = 1;
+    for (; i < numlen; i++) {
+        c = num[i];
+        if (c >= '0' && c <= '9') continue;
+        if (c == '.') {
+            if (num[i-1] == '-') return 0;
+            if (seenDP) return 0;
+            seenDP = 1;
+            continue;
+        }
+        if (c == 'e' || c == 'E') {
+            if (num[i-1] < '0') return 0;
+            if (seenE) return 0;
+            seenDP = seenE = 1;
+            c = num[i+1];
+            if (c == '+' || c == '-') {
+                i++;
+                c = num[i+1];
+            }
+            if (c < '0' || c > '9') return 0;
+            continue;
+        }
+        break;
+    }
+    /* Catches a plain '-' without following digits */
+    if (num[i-1] < '0') return 0;
+    /* Catches trailing chars */
+    if (i < numlen) return 0;
+    return 1;
+}
+
 static inline int
 getJSONTypeFromList (
     Tcl_Interp *interp,
@@ -470,50 +527,62 @@ getJSONTypeFromList (
         return -1;
     }
     if (!symbol) {
-        /* Empty lists are not allowed.
-         TODO: appropriate error msg */
+        /* Empty lists are not allowed. */
+        SetResult ("Invalid list format: Empty list.");
         return -1;
     }
+    Tcl_ListObjIndex (interp, list, 1, typeValue);
     s = Tcl_GetStringFromObj (symbol, &slen);
     if (strcmp (s, "STRING") == 0) {
-        Tcl_ListObjIndex (interp, list, 1, typeValue);
         if (*typeValue == NULL) {
-            /* Missing value element 
-               TODO: appropriate error msg */
+            SetResult ("Invalid list format: Missing value for STRING.");
             return -1;
         }
         return JSON_STRING;
     } else if (strcmp (s, "OBJECT") == 0) {
-        Tcl_ListObjIndex (interp, list, 1, typeValue);
         if (*typeValue == NULL) {
-            /* Missing value element 
-               TODO: appropriate error msg */
+            SetResult ("Invalid list format: Missing value for OBJECT.");
             return -1;
         }
         return JSON_OBJECT;
     } else if (strcmp (s, "NUMBER") == 0) {
-        Tcl_ListObjIndex (interp, list, 1, typeValue);
         if (*typeValue == NULL) {
-            /* Missing value element 
+            SetResult ("Invalid list format: Missing value for NUMBER.");
+            return -1;
+        }
+        s = Tcl_GetStringFromObj (*typeValue, &slen);
+        if (!isJSONNumber (s, slen)) {
+            /* Invalid JSON nummber 
                TODO: appropriate error msg */
+            SetResult ("Invalid list format: Not a valid NUMBER value.");
             return -1;
         }
         return JSON_NUMBER;
     } else if (strcmp (s, "ARRAY") == 0) {
-        Tcl_ListObjIndex (interp, list, 1, typeValue);
         if (*typeValue == NULL) {
-            /* Missing value element 
-               TODO: appropriate error msg */
+            SetResult ("Invalid list format: Missing value for ARRAY.");
             return -1;
         }
         return JSON_ARRAY;
     } else if (strcmp (s, "TRUE") == 0) {
+        if (*typeValue != NULL) {
+            SetResult ("Invalid list format: No value expected for NULL.");
+        }
         return JSON_TRUE;
     } else if (strcmp (s, "FALSE") == 0) {
+        if (*typeValue != NULL) {
+            SetResult ("Invalid list format: No value expected for NULL.");
+        }
         return JSON_FALSE;
     } else if (strcmp (s, "NULL") == 0) {
+        if (*typeValue != NULL) {
+            SetResult ("Invalid list format: No value expected for NULL.");
+        }
         return JSON_NULL;
     } else {
+        if (*typeValue != NULL) {
+            SetResult ("Invalid list format.");
+        }
         return -1;
     }            
 }
@@ -566,8 +635,6 @@ TypedList2DOMWorker (
                 /* The other json types are represented by a text node.*/
                 switch (jsonType) {
                 case JSON_NUMBER:
-                    /* TODO check number */
-                    /* fall through */
                 case JSON_STRING:
                     str = Tcl_GetStringFromObj (pdetail, &strl);
                     break;
@@ -612,8 +679,6 @@ TypedList2DOMWorker (
                 /* The other json types are represented by a text node.*/
                 switch (jsonType) {
                 case JSON_NUMBER:
-                    /* TODO check number */
-                    /* fall through */
                 case JSON_STRING:
                     str = Tcl_GetStringFromObj (adetail, &strl);
                     break;
@@ -630,33 +695,12 @@ TypedList2DOMWorker (
             }
         }
         break;
-    case JSON_NULL:
-        textNode = domNewTextNode (parent->ownerDocument,
-                                   "", 0, TEXT_NODE);
-        textNode->info = JSON_NULL;
-        domAppendChild (parent, (domNode *) textNode);
-        break;
-    case JSON_TRUE:
-        textNode = domNewTextNode (parent->ownerDocument,
-                                   "", 0, TEXT_NODE);
-        textNode->info = JSON_TRUE;
-        domAppendChild (parent, (domNode *) textNode);
-        break;
-    case JSON_FALSE:
-        textNode = domNewTextNode (parent->ownerDocument,
-                                   "", 0, TEXT_NODE);
-        textNode->info = JSON_FALSE;
-        domAppendChild (parent, (domNode *) textNode);
-        break;
-    case JSON_NUMBER:
-        str = Tcl_GetStringFromObj (value, &strl);
-        break;
-    case JSON_STRING:
-        str = Tcl_GetStringFromObj (value, &strl);
-        textNode = domNewTextNode (parent->ownerDocument, str, strl,
-                                   TEXT_NODE);
-        textNode->info = JSON_STRING;
-        break;
+    default:
+        /* Every "text node" JSON values are either done directly by
+         * TypedList2DOM() or inline in the OBJECT and ARRAY cases in
+         * this function. */
+        /* TODO: appropriate error msg */
+        return TCL_ERROR;
     }
     return TCL_OK;
 }
@@ -681,36 +725,24 @@ TypedList2DOM (
     }
     doc  = domCreateDoc (NULL, 0);
     rootNode = doc->rootNode;
-    switch (jsonType) {
-    case JSON_OBJECT:
-        rootNode->info = JSON_OBJECT;
+    if (jsonType < 3) {
+        /* JSON_OBJECT or JSON_ARRAY */
+        rootNode->info = jsonType;
         if (TypedList2DOMWorker (interp, rootNode, value) != TCL_OK) {
             goto error;
         }
-        break;
-    case JSON_ARRAY:
-        rootNode->info = JSON_ARRAY;
-        if (TypedList2DOMWorker (interp, rootNode, value) != TCL_OK) {
-            goto error;
-        }
-    default:
+    } else {
         /* The other json types are represented by a text node.*/
-        switch (jsonType) {
-        case JSON_NUMBER:
-            /* TODO check number */
-            /* fall through */
-        case JSON_STRING:
+        if (jsonType > 5) {
+            /* JSON_STRING or JSON_NUMBER */
             str = Tcl_GetStringFromObj (value, &strl);
-            break;
-        default:
+        } else {
             str = "";
             strl = 0;
-            break;
         }
         textNode = domNewTextNode (doc, str, strl, TEXT_NODE);
         textNode->info = jsonType;
         domAppendChild (rootNode, (domNode *) textNode);
-        break;
     }
     return doc;
 error:

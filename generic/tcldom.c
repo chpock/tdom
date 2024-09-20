@@ -3136,63 +3136,6 @@ void tcldom_childrenAsJSON (
     }
 }
 
-/* Helper function which checks if a given string is a JSON number. */
-
-static int
-isJSONNumber (
-    char *num,
-    domLength numlen
-    )
-{
-    domLength i;
-    int seenDP, seenE;
-    unsigned char c;
-    
-    if (numlen == 0) return 0;
-    seenDP = 0;
-    seenE = 0;
-    i = 0;
-    c = num[0];
-    if (!(c == '-' || (c>='0' && c<='9'))) return 0;
-    if (c<='0') {
-        i = (c == '-' ? i+1 : i);
-        if (i+1 < numlen) {
-            if (num[i] == '0' && num[i+1] >= '0' && num[i+1] <= '9') {
-                return 0;
-            }
-        }
-    }
-    i = 1;
-    for (; i < numlen; i++) {
-        c = num[i];
-        if (c >= '0' && c <= '9') continue;
-        if (c == '.') {
-            if (num[i-1] == '-') return 0;
-            if (seenDP) return 0;
-            seenDP = 1;
-            continue;
-        }
-        if (c == 'e' || c == 'E') {
-            if (num[i-1] < '0') return 0;
-            if (seenE) return 0;
-            seenDP = seenE = 1;
-            c = num[i+1];
-            if (c == '+' || c == '-') {
-                i++;
-                c = num[i+1];
-            }
-            if (c < '0' || c > '9') return 0;
-            continue;
-        }
-        break;
-    }
-    /* Catches a plain '-' without following digits */
-    if (num[i-1] < '0') return 0;
-    /* Catches trailing chars */
-    if (i < numlen) return 0;
-    return 1;
-}
-
 
 /*----------------------------------------------------------------------------
 |   tcldom_treeAsJSON
@@ -3552,6 +3495,14 @@ tcldom_treeAsTypedList (
     Tcl_IncrRefCount (c.number);
     Tcl_IncrRefCount (c.string);
 
+    if (node->nodeType == ELEMENT_NODE
+        && node->info == 0
+        && node->firstChild->nodeType == TEXT_NODE) {
+        /* Either a value only json document or a OBJECT propertiy
+         * element node.*/ 
+        node = node->firstChild;
+    }
+    
     Tcl_SetObjResult (interp, 
                       tcldom_treeAsTypedListWorker (node, &c));
 

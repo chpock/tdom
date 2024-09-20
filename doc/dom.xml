@@ -414,7 +414,7 @@ memory handling as explained above.</desc>
 
           <p>The <m>typedList</m> argument must be a Tcl list and must
           follow the format of the output of the document command
-          method <m>asTypedList</m>, see there.</desc>
+          method <m>asTypedList</m>, see there.</p></desc>
         </commanddef>
         
         <commanddef>
