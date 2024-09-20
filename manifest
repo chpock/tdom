@@ -1,5 +1,5 @@
-C Improved\sdetection\sof\sinvalid\styped\slists.\sFixed\sXML\swell-formed\serror\sin\sdocumentation.\sImproved\sasTypedList\sin\scase\sof\svalue\sonly\sjson\sdocuments.
-D 2024-09-20T11:59:03.271
+C Fixes\sand\san\simprovement\sto\sthe\serror\smessages\sin\scase\sof\sinvalid\styped\slist.
+D 2024-09-20T16:57:05.364
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -136,7 +136,7 @@ F generic/domhtml.c 6f93ccbe36aaa78ce013d8c244a1810e33f2a755cd04fe3847e348d2d8df
 F generic/domhtml.h cb031185e99066889bec37b32239ab0f932d673a5701c94429902b2332ff3784
 F generic/domhtml5.c 53c3f44545864e51ddd6022e6de71c24bc5768ec009e5447c7a5e7bed556c6be
 F generic/domhtml5.h 5cca562a556e7662f2dce222640c32abb2777146
-F generic/domjson.c 98674f0ecc2ee1f92ed8e8d531e60b6926cf3df91f59c8ced394ac02b1338f42
+F generic/domjson.c d732bfa1de3965b27f23870aad0be511fc24970c5074a7965065dc7eb2f62911
 F generic/domjson.h 5cf49e967a4127b1c706ea2d7f5bf8be227cb59bfbdaae26cfcb9267b710fdf7
 F generic/domlock.c 60f6c6f4dc95d6525f77cd589a07f6ec78f2068b12821067c5a075a2740abacb
 F generic/domxpath.c 02e6f1281b93113a48f02a36c5865578298b8ea120da28d96c199993397f28f5
@@ -242,8 +242,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 24f228477d9c9845aefa0ab7a954b44499e009c13dc21e301434f5da6856232f
-R 4e53081c0473454c5bd74fef87bcb64f
+P 5d007b5c736d6f0f673862445fe99247248da982833caead7a893604ea260175
+R 045aecfddb239a989da27ebe65a99427
 U rolf
-Z 7c203d30eb0fdd15e5202c5ca0084846
+Z e0572407b9dccb27758f1f7e4603935c
 # Remove this line to create a well-formed Fossil manifest.

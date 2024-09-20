@@ -79,6 +79,8 @@ typedef struct {
 
 #define SetResult(str) Tcl_ResetResult(interp); \
                      Tcl_SetStringObj(Tcl_GetObjResult(interp), (str), -1)
+#define SetResult3(str1,str2,str3) Tcl_ResetResult(interp);     \
+                     Tcl_AppendResult(interp, (str1), (str2), (str3), NULL)
 
 #define errReturn(i,j) {jparse->state = j; return (i);}
     
@@ -566,12 +568,12 @@ getJSONTypeFromList (
         return JSON_ARRAY;
     } else if (strcmp (s, "TRUE") == 0) {
         if (*typeValue != NULL) {
-            SetResult ("Invalid list format: No value expected for NULL.");
+            SetResult ("Invalid list format: No value expected for TRUE.");
         }
         return JSON_TRUE;
     } else if (strcmp (s, "FALSE") == 0) {
         if (*typeValue != NULL) {
-            SetResult ("Invalid list format: No value expected for NULL.");
+            SetResult ("Invalid list format: No value expected for FALSE.");
         }
         return JSON_FALSE;
     } else if (strcmp (s, "NULL") == 0) {
@@ -581,7 +583,7 @@ getJSONTypeFromList (
         return JSON_NULL;
     } else {
         if (*typeValue != NULL) {
-            SetResult ("Invalid list format.");
+            SetResult3 ("Invalid list format: Invalid symbol \"", s, "\".");
         }
         return -1;
     }            
