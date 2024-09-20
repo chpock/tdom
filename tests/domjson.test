@@ -3079,5 +3079,59 @@ test json-12.4 {createDocumentFromTypedList} {
     set result
 } {1 1 1 1 1}
 
+testConstraint rekursiv 1
+test json-12.5 {createDocumentFromTypedList} {rekursiv} {
+    if {[info commands _dom] eq ""} {
+        rename dom _dom
+        proc dom {args} {
+            if {[lindex $args 0] != "parse" || [lsearch $args "-json"] < 0} {
+                return [uplevel 1 [linsert $args 0 _dom]]
+            }
+            set haveData 0
+            set uplevelVar ""
+            for {set x 1} {$x < [llength $args]} {incr x} {
+                switch -- [lindex $args $x] {
+                    "-jsonroot" -
+                    "-jsonmaxnesting" -
+                    "-channel" -
+                    "-baseurl" -
+                    "-externalentitycommand" {
+                        incr x
+                    }
+                    "-json" -
+                    "-keepEmpties" -
+                    "-keepCDATA" {
+                        # do nothing, the options are flags
+                    }
+                    default {
+                        if {$haveData} {
+                            set uplevelVar [lindex $args $x]
+                        } else {
+                            set data [lindex $args $x]
+                            set haveData 1
+                        }
+                    }                
+                }
+            }
+            if {[catch {
+                set doc [_dom parse -json $data]
+            } errMsg]} {
+                puts "json $data\n$errMsg"
+                return [uplevel 1 [linsert $args 0 _dom]]
+            }
+            set njson [$doc asJSON]
+            set typedList [$doc asTypedList]
+            set docFromTyped [_dom createDocumentFromTypedList $typedList]
+            if {$njson ne [$docFromTyped asJSON]} {
+                puts "Normalized json differs from normalized json created with createDocumentFromTypedList"
+            } else {
+                puts "equal"
+            }
+            return [uplevel 1 [linsert $args 0 _dom]]
+        }
+        source [file join [file dir [info script]] domjson.test]
         
-   
+        rename dom {}
+        rename _dom dom
+    }
+} {}
