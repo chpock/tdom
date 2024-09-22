@@ -3079,5 +3079,56 @@ test json-12.4 {createDocumentFromTypedList} {
     set result
 } {1 1 1 1 1}
 
-        
-   
+if {[info commands _dom] eq ""} {
+    rename dom _dom
+    proc dom {args} {
+        if {[lindex $args 0] != "parse" || [lsearch $args "-json"] < 0} {
+            return [uplevel 1 [linsert $args 0 _dom]]
+        }
+        set haveData 0
+        set uplevelVar ""
+        for {set x 1} {$x < [llength $args]} {incr x} {
+            switch -- [lindex $args $x] {
+                "-jsonroot" -
+                "-jsonmaxnesting" -
+                "-channel" -
+                "-baseurl" -
+                "-externalentitycommand" {
+                    incr x
+                }
+                "-json" -
+                "--" -
+                "-keepEmpties" -
+                "-keepCDATA" {
+                    # do nothing, the options are flags
+                }
+                default {
+                    if {$haveData} {
+                        set uplevelVar [lindex $args $x]
+                    } else {
+                        set data [lindex $args $x]
+                        set haveData 1
+                    }
+                }                
+            }
+        }
+        if {[catch {
+            _dom parse -json $data $doc
+        } errMsg]} {
+            # Some tests check if invalid json data is detected. Since
+            # we need valid json data for our test there is nothing we
+            # can do here.
+            return [uplevel 1 [linsert $args 0 _dom]]
+        }
+        set njson [$doc asJSON]
+        set typedList [$doc asTypedList]
+        _dom createDocumentFromTypedList $typedList docFromTyped
+        if {$njson ne [$docFromTyped asJSON]} {
+            error "Normalized json '$data' differs from normalized json created with createDocumentFromTypedList"
+        }
+        return [uplevel 1 [linsert $args 0 _dom]]
+    }
+    source [file join [file dir [info script]] domjson.test]
+    rename dom {}
+    rename _dom dom
+}

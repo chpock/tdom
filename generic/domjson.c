@@ -554,8 +554,6 @@ getJSONTypeFromList (
         }
         s = Tcl_GetStringFromObj (*typeValue, &slen);
         if (!isJSONNumber (s, slen)) {
-            /* Invalid JSON nummber 
-               TODO: appropriate error msg */
             SetResult ("Invalid list format: Not a valid NUMBER value.");
             return -1;
         }
@@ -701,7 +699,7 @@ TypedList2DOMWorker (
         /* Every "text node" JSON values are either done directly by
          * TypedList2DOM() or inline in the OBJECT and ARRAY cases in
          * this function. */
-        /* TODO: appropriate error msg */
+        SetResult ("Internal error. Please report.")
         return TCL_ERROR;
     }
     return TCL_OK;
