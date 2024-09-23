@@ -22,7 +22,12 @@ testConstraint needExpand 1
 if {$tcl_version < 8.5} {
     testConstraint needExpand 0
 }
-
+# See below the comment in proc dom for explanation
+if {[info commands _dom] eq ""} {
+    testConstraint failtest 1
+} else {
+    testConstraint failtest 0
+}
 namespace eval nodeCmds {
     dom createNodeCmd elementNode e1
     dom createNodeCmd -jsonType ARRAY elementNode jae1
@@ -93,37 +98,37 @@ test json-1.8 {Parse JSON - true, false, null} {
     set result
 } {<JSONObject><a>true</a><b>false</b><c>null</c><d>true</d><e></e></JSONObject>}
 
-test json-1.9 {JSON syntax error} {
+test json-1.9 {JSON syntax error} {failtest} {
     set result [catch {dom parse -json {{"a" "a value"}}} errMsg]
     list $result $errMsg
 } {1 {error "JSON syntax error" at position 5
 "{"a" " <--Error-- a value"}"}}
 
-test json-1.10 {JSON syntax error} {
+test json-1.10 {JSON syntax error} {failtest} {
     set result [catch {dom parse -json {{"a":00.23}}} errMsg]
     list $result $errMsg
 } {1 {error "JSON syntax error" at position 6
 "{"a":00 <--Error-- .23}"}}
 
-test json-1.11 {JSON syntax error} {
+test json-1.11 {JSON syntax error} {failtest} {
     set result [catch {dom parse -json {{"a":-00.23}}} errMsg]
     list $result $errMsg
 } {1 {error "JSON syntax error" at position 7
 "{"a":-00 <--Error-- .23}"}}
 
-test json-1.12 {JSON syntax error} {
+test json-1.12 {JSON syntax error} {failtest} {
     set result [catch {dom parse -json {{"a":.23}}} errMsg]
     list $result $errMsg
 } {1 {error "JSON syntax error" at position 5
 "{"a":. <--Error-- 23}"}}
 
-test json-1.13 {JSON syntax error} {
+test json-1.13 {JSON syntax error} {failtest} {
     set result [catch {dom parse -json {{"a":-.23}}} errMsg]
     list $result $errMsg
 } {1 {error "JSON syntax error" at position 6
 "{"a":-. <--Error-- 23}"}}
 
-test json-1.14 {JSON syntax error} {
+test json-1.14 {JSON syntax error} {failtest} {
     set result [catch {dom parse -json {{"a":-}}} errMsg]
     list $result $errMsg
 } {1 {error "JSON syntax error" at position 5
@@ -142,7 +147,7 @@ set notJsons {
     {{"string"}}
     {{"e":}}
 }
-test json-1.16 {Invalid input} {
+test json-1.16 {Invalid input} {failtest} {
     set result ""
     set ind 0
     foreach notJson $notJsons {
@@ -153,7 +158,7 @@ test json-1.16 {Invalid input} {
     set result
 } ""
 
-test json-1.17 {Literal binary 0 (NUL, '\0') is not allowed in input} {
+test json-1.17 {Literal binary 0 (NUL, '\0') is not allowed in input} {failtest} {
     catch {dom parse -json "\"a\u0000\""}
 } 1
 
@@ -164,7 +169,7 @@ test json-1.18 {Escaped binary 0 (NUL, '\0') is OK} {
     set result
 } "\"a\\u0000\""
 
-test json-1.19 {Invalid input - incomplete \u escape} {
+test json-1.19 {Invalid input - incomplete \u escape} {failtest} {
     set result 1
     foreach jsonstr {
         "ab\u00"
@@ -263,7 +268,7 @@ test json-3.4.1 {unescaping} {
     set result
 } {<json>\aq</json>}
 
-test json-3.5 {unescaping} {
+test json-3.5 {unescaping} {failtest} {
     set result [catch {dom parse -json {{"this":"a\lb"}}} errMsg]
     list $result $errMsg
 } {1 {error "JSON syntax error" at position 11
@@ -3082,7 +3087,7 @@ test json-12.4 {createDocumentFromTypedList} {
 if {[info commands _dom] eq ""} {
     rename dom _dom
     proc dom {args} {
-        if {[lindex $args 0] != "parse" || [lsearch $args "-json"] < 0} {
+        if {[lindex $args 0] != "parse" || [lsearch -exact $args "-json"] < 0} {
             return [uplevel 1 [linsert $args 0 _dom]]
         }
         set haveData 0
@@ -3113,12 +3118,15 @@ if {[info commands _dom] eq ""} {
             }
         }
         if {[catch {
-            _dom parse -json $data $doc
+            _dom parse -json $data doc
         } errMsg]} {
             # Some tests check if invalid json data is detected. Since
-            # we need valid json data for our test there is nothing we
-            # can do here.
-            return [uplevel 1 [linsert $args 0 _dom]]
+            # we need valid json data for what is tested here that
+            # tests should be marked with constraint failtest. To
+            # raise error here does not help much because if the test
+            # data is expected to be invalid the command will be
+            # [catch]ed. Therefore the puts to catch attention.
+            puts  "Unexpeced invalid json data '$data'"
         }
         set njson [$doc asJSON]
         set typedList [$doc asTypedList]
