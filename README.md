@@ -6,7 +6,7 @@ tDOM 0.9.4 works with Tcl 8.5, 8.6 and 9.0.
 
 ### tDOM contains:
 
-   *  for convenience expat 2.6.2, the XML parser originated from
+   *  for convenience expat 2.6.3, the XML parser originated from
       James Clark, although you're able to link tDOM with other
       expat versions or the library provided by the system.
 
