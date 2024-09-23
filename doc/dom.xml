@@ -407,7 +407,7 @@ memory handling as explained above.</desc>
         </commanddef>
 
         <commanddef>
-        <command><cmd>dom</cmd> <method>createDocumentFromTypedList</method> <m>typedList</m> ?<m>objVar</m>?</command>
+        <command><cmd>dom</cmd> <method>createFromTypedList</method> <m>typedList</m> ?<m>objVar</m>?</command>
           <desc><p>Creates a new DOM document from the argument <m>typedList</m>.
           The <m>objVar</m> argument controls the memory handling as
           explained above.</p>

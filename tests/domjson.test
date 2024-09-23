@@ -13,7 +13,7 @@
 #    json-9.*: cloneNode
 #    json-10.*: asTclValue
 #    json-11.*: asTypedList
-#    json-12.*: createDocumentFromTypedList
+#    json-12.*: createFromTypedList
 # Copyright (c) 2017 Rolf Ade.
 
 source [file join [file dir [info script]] loadtdom.tcl]
@@ -3037,33 +3037,33 @@ test json-11.4 {asTypedList} {
     set result
 } {{STRING {string foo}} NULL TRUE FALSE {NUMBER -1.23}}
 
-test json-12.1 {createDocumentFromTypedList} {
-    set doc [dom createDocumentFromTypedList {OBJECT {Titel {STRING Wirtschaftsinformatik} Keywords {ARRAY {{STRING Introduction} {STRING Basics}}} Year {NUMBER 2022}}}]
+test json-12.1 {createFromTypedList} {
+    set doc [dom createFromTypedList {OBJECT {Titel {STRING Wirtschaftsinformatik} Keywords {ARRAY {{STRING Introduction} {STRING Basics}}} Year {NUMBER 2022}}}]
     set result [$doc asJSON]
     $doc delete
     set result
 } {{"Titel":"Wirtschaftsinformatik","Keywords":["Introduction","Basics"],"Year":2022}}
 
-test json-12.2 {createDocumentFromTypedList} {
+test json-12.2 {createFromTypedList} {
     set typedList {OBJECT {Titel {STRING Wirtschaftsinformatik} Keywords {ARRAY {{STRING Introduction} {STRING Basics}}} Year {NUMBER 2022}}}
-    set doc [dom createDocumentFromTypedList $typedList]
+    set doc [dom createFromTypedList $typedList]
     set result [$doc asTypedList]
     $doc delete
     expr {$typedList eq $result}
 } 1
 
 proc createFromTypedList {list} {
-    dom createDocumentFromTypedList $list doc
+    dom createFromTypedList $list doc
     if {$list eq [$doc asTypedList]} {
         return ""
     }
     error "Invalid turnaround."
 }
-test json-12.3 {createDocumentFromTypedList} {
+test json-12.3 {createFromTypedList} {
     createFromTypedList {OBJECT {Titel {STRING Wirtschaftsinformatik} Keywords {ARRAY {{STRING Introduction} {STRING Basics}}} Year {NUMBER 2022}}}
 } {}
 
-test json-12.4 {createDocumentFromTypedList} {
+test json-12.4 {createFromTypedList} {
     set result ""
     foreach json {
         {STRING foo}
@@ -3072,7 +3072,7 @@ test json-12.4 {createDocumentFromTypedList} {
         FALSE
         {NUMBER -1.23}
     } {
-        set doc [dom createDocumentFromTypedList $json]
+        set doc [dom createFromTypedList $json]
         set this [$doc asTypedList]
         if {$json ne $this} {
             lappend result "json $json this $this"
@@ -3130,9 +3130,9 @@ if {[info commands _dom] eq ""} {
         }
         set njson [$doc asJSON]
         set typedList [$doc asTypedList]
-        _dom createDocumentFromTypedList $typedList docFromTyped
+        _dom createFromTypedList $typedList docFromTyped
         if {$njson ne [$docFromTyped asJSON]} {
-            error "Normalized json '$data' differs from normalized json created with createDocumentFromTypedList"
+            error "Normalized json '$data' differs from normalized json created with createFromTypedList"
         }
         return [uplevel 1 [linsert $args 0 _dom]]
     }

@@ -6885,11 +6885,11 @@ int tcldom_createDocumentNS (
 }
 
 /*----------------------------------------------------------------------------
-|   tcldom_createDocumentFromTypedList
+|   tcldom_createFromTypedList
 |
 \---------------------------------------------------------------------------*/
 static
-int tcldom_createDocumentFromTypedList (
+int tcldom_createFromTypedList (
     ClientData  UNUSED(clientData),
     Tcl_Interp *interp,
     int         objc,
@@ -7737,7 +7737,7 @@ int tcldom_DomObjCmd (
 
     static const char *domMethods[] = {
         "createDocument",  "createDocumentNS",   "createNodeCmd",
-        "createDocumentFromTypedList", "parse",  "setStoreLineColumn",
+        "createFromTypedList", "parse",          "setStoreLineColumn",
         "isCharData",      "isName",             "isPIName",
         "isQName",         "isComment",          "isCDATA",
         "isPIValue",       "isNCName",           "createDocumentNode",
@@ -7751,7 +7751,7 @@ int tcldom_DomObjCmd (
     };
     enum domMethod {
         m_createDocument,    m_createDocumentNS,   m_createNodeCmd,
-        m_createDocumentFromTypedList, m_parse,    m_setStoreLineColumn,
+        m_createFromTypedList, m_parse,            m_setStoreLineColumn,
         m_isCharData,        m_isName,             m_isPIName,
         m_isQName,           m_isComment,          m_isCDATA,
         m_isPIValue,         m_isNCName,           m_createDocumentNode,
@@ -7831,9 +7831,9 @@ int tcldom_DomObjCmd (
         case m_createDocumentNode:
             return tcldom_createDocumentNode (clientData, interp, --objc,
                                               objv+1);
-        case m_createDocumentFromTypedList:
-            return tcldom_createDocumentFromTypedList (clientData, interp,
-                                                       --objc, objv+1);
+        case m_createFromTypedList:
+            return tcldom_createFromTypedList (clientData, interp, --objc,
+                                               objv+1);
         case m_createNodeCmd:
             return nodecmd_createNodeCmd(interp, --objc, objv+1,
                                          !TcldomDATA(dontCheckName),
