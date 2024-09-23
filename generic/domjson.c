@@ -699,7 +699,7 @@ TypedList2DOMWorker (
         /* Every "text node" JSON values are either done directly by
          * TypedList2DOM() or inline in the OBJECT and ARRAY cases in
          * this function. */
-        SetResult ("Internal error. Please report.")
+        SetResult ("Internal error. Please report.");
         return TCL_ERROR;
     }
     return TCL_OK;

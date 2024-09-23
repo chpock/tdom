@@ -1,5 +1,5 @@
-C A\sbit\strickery\sto\sonly\srun\stests\swith\svalid\sjson\sdata\sif\stesting\sasTypedList\s/\screateDocumentFromTypedList.
-D 2024-09-23T18:45:45.423
+C Fixed\ssyntax\serror.
+D 2024-09-23T18:49:59.139
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -136,7 +136,7 @@ F generic/domhtml.c 6f93ccbe36aaa78ce013d8c244a1810e33f2a755cd04fe3847e348d2d8df
 F generic/domhtml.h cb031185e99066889bec37b32239ab0f932d673a5701c94429902b2332ff3784
 F generic/domhtml5.c 53c3f44545864e51ddd6022e6de71c24bc5768ec009e5447c7a5e7bed556c6be
 F generic/domhtml5.h 5cca562a556e7662f2dce222640c32abb2777146
-F generic/domjson.c bd961e9847167eeba26f0a79b23f6883c261ac2b7028b97e09be4b9a8a70f9c3
+F generic/domjson.c 9e15256fdbedd131613ed2ae51eec1429b7fb4d46e56dee72dc17d6a99a0075f
 F generic/domjson.h 5cf49e967a4127b1c706ea2d7f5bf8be227cb59bfbdaae26cfcb9267b710fdf7
 F generic/domlock.c 60f6c6f4dc95d6525f77cd589a07f6ec78f2068b12821067c5a075a2740abacb
 F generic/domxpath.c 02e6f1281b93113a48f02a36c5865578298b8ea120da28d96c199993397f28f5
@@ -242,8 +242,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 43f6e491572133646740279c14149ba93ab4ef9d4fe4e73cee4012d2799d04ca
-R 9b5bc164bfc717d833f936dac5b61a99
+P 2493c54646e063d9d7358b85802e90573b0f736da6bea2d984c82bddd7118e9d
+R 397bd3c8a57ba3ffec9176381695672d
 U rolf
-Z aa3dacbb841ea438a391c1bbb6f9ccf1
+Z b4b4a710a7d87a4e7d4ee2b4bde29686
 # Remove this line to create a well-formed Fossil manifest.
