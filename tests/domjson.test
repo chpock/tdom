@@ -3040,6 +3040,23 @@ test json-11.4 {asTypedList} {
     set result
 } {{STRING {string foo}} NULL TRUE FALSE {NUMBER -1.23}}
 
+test json-11.5 {asTypedList} {
+    set result ""
+    set json {{
+        "Keywords": ["Introduction","Basics"],
+        "Data": {"one": "two", "three": true},
+        "Titel": "Wirtschaftsinformatik"
+    }}
+    set doc [dom parse -json $json]
+    set node [$doc firstChild]
+    while {$node ne ""} {
+        lappend result [$node asTypedList]
+        set node [$node nextSibling]
+    }
+    $doc delete
+    set result
+} {{ARRAY {{STRING Introduction} {STRING Basics}}} {OBJECT {one {STRING two} three TRUE}} {STRING Wirtschaftsinformatik}}
+
 if {[info commands _dom] eq ""} {
 
 test json-12.1 {createFromTypedList} {
