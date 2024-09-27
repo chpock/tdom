@@ -77,10 +77,13 @@ typedef struct {
     domLength len;
 } JSONParse;
 
+#define SetResult(str) Tcl_ResetResult(interp); \
+                     Tcl_SetStringObj(Tcl_GetObjResult(interp), (str), -1)
+#define SetResult3(str1,str2,str3) Tcl_ResetResult(interp);     \
+                     Tcl_AppendResult(interp, (str1), (str2), (str3), NULL)
 
 #define errReturn(i,j) {jparse->state = j; return (i);}
     
-
 /* #define DEBUG */
 #ifdef DEBUG
 # define DBG(x) x
@@ -251,7 +254,7 @@ static domLength jsonParseString (
 /* Parse a single JSON value which begins at json[i]. Return the index
  * of the first character past the end of the value parsed. */
 
-static domLength jsonParseValue(
+static domLength jsonParseValue (
     domNode   *parent,
     char      *json,
     domLength  i,
@@ -455,6 +458,352 @@ static domLength jsonParseValue(
     }
 }
 
+/* Helper function which checks if a given string is a JSON number. */
+int
+isJSONNumber (
+    char *num,
+    domLength numlen
+    )
+{
+    domLength i;
+    int seenDP, seenE;
+    unsigned char c;
+    
+    if (numlen == 0) return 0;
+    seenDP = 0;
+    seenE = 0;
+    i = 0;
+    c = num[0];
+    if (!(c == '-' || (c>='0' && c<='9'))) return 0;
+    if (c<='0') {
+        i = (c == '-' ? i+1 : i);
+        if (i+1 < numlen) {
+            if (num[i] == '0' && num[i+1] >= '0' && num[i+1] <= '9') {
+                return 0;
+            }
+        }
+    }
+    i = 1;
+    for (; i < numlen; i++) {
+        c = num[i];
+        if (c >= '0' && c <= '9') continue;
+        if (c == '.') {
+            if (num[i-1] == '-') return 0;
+            if (seenDP) return 0;
+            seenDP = 1;
+            continue;
+        }
+        if (c == 'e' || c == 'E') {
+            if (num[i-1] < '0') return 0;
+            if (seenE) return 0;
+            seenDP = seenE = 1;
+            c = num[i+1];
+            if (c == '+' || c == '-') {
+                i++;
+                c = num[i+1];
+            }
+            if (c < '0' || c > '9') return 0;
+            continue;
+        }
+        break;
+    }
+    /* Catches a plain '-' without following digits */
+    if (num[i-1] < '0') return 0;
+    /* Catches trailing chars */
+    if (i < numlen) return 0;
+    return 1;
+}
+
+static inline int
+getJSONTypeFromList (
+    Tcl_Interp *interp,
+    Tcl_Obj *list,
+    Tcl_Obj **typeValue
+    )
+{
+    Tcl_Obj *symbol;
+    char *s;
+    domLength slen, llen;
+    
+    if (Tcl_ListObjIndex (interp, list, 0, &symbol) != TCL_OK) {
+        return -1;
+    }
+    if (!symbol) {
+        /* Empty lists are not allowed. */
+        SetResult ("Empty list.");
+        return -1;
+    }
+    Tcl_ListObjLength (interp, list, &llen);
+    if (llen > 2) {
+        SetResult ("Too much list elements.");
+        return -1;
+    }
+    Tcl_ListObjIndex (interp, list, 1, typeValue);
+    s = Tcl_GetStringFromObj (symbol, &slen);
+    if (strcmp (s, "STRING") == 0) {
+        if (*typeValue == NULL) {
+            SetResult ("Missing value for STRING.");
+            return -1;
+        }
+        return JSON_STRING;
+    } else if (strcmp (s, "OBJECT") == 0) {
+        if (*typeValue == NULL) {
+            SetResult ("Missing value for OBJECT.");
+            return -1;
+        }
+        return JSON_OBJECT;
+    } else if (strcmp (s, "NUMBER") == 0) {
+        if (*typeValue == NULL) {
+            SetResult ("Missing value for NUMBER.");
+            return -1;
+        }
+        s = Tcl_GetStringFromObj (*typeValue, &slen);
+        if (!isJSONNumber (s, slen)) {
+            SetResult ("Not a valid NUMBER value.");
+            return -1;
+        }
+        return JSON_NUMBER;
+    } else if (strcmp (s, "ARRAY") == 0) {
+        if (*typeValue == NULL) {
+            SetResult ("Missing value for ARRAY.");
+            return -1;
+        }
+        return JSON_ARRAY;
+    } else if (strcmp (s, "TRUE") == 0) {
+        if (*typeValue != NULL) {
+            SetResult ("No value expected for TRUE.");
+            return -1;
+        }
+        return JSON_TRUE;
+    } else if (strcmp (s, "FALSE") == 0) {
+        if (*typeValue != NULL) {
+            SetResult ("No value expected for FALSE.");
+            return -1;
+        }
+        return JSON_FALSE;
+    } else if (strcmp (s, "NULL") == 0) {
+        if (*typeValue != NULL) {
+            SetResult ("No value expected for NULL.");
+            return -1;
+        }
+        return JSON_NULL;
+    } else {
+        SetResult3 ("Unkown symbol \"", s, "\".");
+        return -1;
+    }            
+}
+
+static void objectErrMsg (
+    Tcl_Interp *interp,
+    domNode *node
+    ) 
+{
+    Tcl_Obj *msg;
+
+    msg = Tcl_GetObjResult (interp);
+    Tcl_IncrRefCount (msg);
+    Tcl_ResetResult (interp);
+    Tcl_AppendResult (interp, "object property \"", node->nodeName,
+                      "\": ", Tcl_GetString (msg), (char *)NULL);
+    Tcl_DecrRefCount (msg);
+}
+
+static void arrayErrMsg (
+    Tcl_Interp *interp,
+    domLength i
+    ) 
+{
+    Tcl_Obj *msg;
+    char buf[20];
+
+    msg = Tcl_GetObjResult (interp);
+    Tcl_IncrRefCount (msg);
+    Tcl_ResetResult (interp);
+    sprintf (buf, domLengthConversion, i + 1);
+    Tcl_AppendResult (interp, "array element ", buf, ": ",
+                      Tcl_GetString (msg), (char *) NULL);
+    Tcl_DecrRefCount (msg);
+}
+
+static int
+TypedList2DOMWorker (
+    Tcl_Interp *interp,
+    domNode *parent,
+    Tcl_Obj *value
+    )
+{
+    Tcl_Obj *property, *pvalue, *pdetail, *aelm, *adetail;
+    domLength llen, i, strl;
+    domNode *pnode, *container;
+    domTextNode *textNode;
+    char *str;
+    int jsonType;
+    
+    switch (parent->info) {
+    case JSON_OBJECT:
+        if (Tcl_ListObjLength (interp, value, &llen) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        if (llen % 2 != 0) {
+            SetResult ("An OBJECT value must be a Tcl list with an even "
+                       "number of elements.");
+            return TCL_ERROR;
+        }
+        for (i = 0; i < llen; i += 2) {
+            /* Since we loop over all elements every element is
+             * present and there is no need to check property or
+             * pvalue for NULL. */
+            Tcl_ListObjIndex (interp, value, i, &property);
+            Tcl_ListObjIndex (interp, value, i+1, &pvalue);
+            pnode = domAppendNewElementNode (parent, Tcl_GetString (property),
+                                             NULL);
+            jsonType = getJSONTypeFromList (interp, pvalue, &pdetail);
+            if (jsonType < 0) {
+                objectErrMsg (interp, pnode);
+                return TCL_ERROR;
+            }
+            if (jsonType < 3) {
+                /* JSON_OBJECT or JSON_ARRAY */
+                pnode->info = jsonType;
+                if (TypedList2DOMWorker (interp, pnode, pdetail) != TCL_OK) {
+                    objectErrMsg (interp, pnode);
+                    return TCL_ERROR;
+                }
+            } else {
+                /* The other json types are represented by a text node.*/
+                switch (jsonType) {
+                case JSON_NUMBER:
+                case JSON_STRING:
+                    str = Tcl_GetStringFromObj (pdetail, &strl);
+                    break;
+                default:
+                    str = "";
+                    strl = 0;
+                    break;
+                }
+                textNode = domNewTextNode (parent->ownerDocument,
+                                           str, strl, TEXT_NODE);
+                textNode->info = jsonType;
+                domAppendChild (pnode, (domNode *) textNode);
+            }
+        }
+        break;
+    case JSON_ARRAY:
+        if (Tcl_ListObjLength (interp, value, &llen) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        for (i = 0; i < llen; i++) {
+            Tcl_ListObjIndex (interp, value, i, &aelm);
+            jsonType = getJSONTypeFromList (interp, aelm, &adetail);
+            if (jsonType < 0) {
+                arrayErrMsg (interp, i);
+                return TCL_ERROR;
+            }
+            switch (jsonType) {
+            case JSON_OBJECT:
+                container = domAppendNewElementNode (parent,
+                                                     JSON_OBJECT_CONTAINER,
+                                                     NULL);
+                container->info = JSON_OBJECT;                
+                if (TypedList2DOMWorker (interp, container, adetail) != TCL_OK) {
+                    arrayErrMsg (interp, i);
+                    return TCL_ERROR;
+                }
+                break;
+            case JSON_ARRAY:
+                container = domAppendNewElementNode (parent,
+                                                     JSON_ARRAY_CONTAINER,
+                                                     NULL);
+                container->info = JSON_ARRAY;                
+                if (TypedList2DOMWorker (interp, container, adetail) != TCL_OK) {
+                    arrayErrMsg (interp, i);
+                    return TCL_ERROR;
+                }
+                break;
+            default:
+                /* The other json types are represented by a text node.*/
+                switch (jsonType) {
+                case JSON_NUMBER:
+                case JSON_STRING:
+                    str = Tcl_GetStringFromObj (adetail, &strl);
+                    break;
+                default:
+                    str = "";
+                    strl = 0;
+                    break;
+                }
+                textNode = domNewTextNode (parent->ownerDocument,
+                                           str, strl, TEXT_NODE);
+                textNode->info = jsonType;
+                domAppendChild (parent, (domNode *) textNode);
+                break;
+            }
+        }
+        break;
+    default:
+        /* Every "text node" JSON values are either done directly by
+         * TypedList2DOM() or inline in the OBJECT and ARRAY cases in
+         * this function. */
+        SetResult ("Internal error. Please report.");
+        return TCL_ERROR;
+    }
+    return TCL_OK;
+}
+    
+domDocument *
+TypedList2DOM (
+    Tcl_Interp *interp,
+    Tcl_Obj *typedList
+    )
+{
+    domDocument *doc;
+    domNode *rootNode;
+    domTextNode *textNode;
+    Tcl_Obj *value, *msg;
+    char *str;
+    domLength strl;
+    int jsonType;
+
+    jsonType = getJSONTypeFromList (interp, typedList, &value);
+    if (jsonType < 0) {
+        msg = Tcl_GetObjResult (interp);
+        Tcl_IncrRefCount (msg);
+        Tcl_ResetResult (interp);
+        Tcl_AppendResult (interp, "Invalid typed list format: ",
+                          Tcl_GetString (msg), (char *) NULL);
+        Tcl_DecrRefCount (msg);
+        return NULL;
+    }
+    doc  = domCreateDoc (NULL, 0);
+    rootNode = doc->rootNode;
+    if (jsonType < 3) {
+        /* JSON_OBJECT or JSON_ARRAY */
+        rootNode->info = jsonType;
+        if (TypedList2DOMWorker (interp, rootNode, value) != TCL_OK) {
+            msg = Tcl_GetObjResult (interp);
+            Tcl_IncrRefCount (msg);
+            domFreeDocument(doc, NULL, interp);
+            Tcl_ResetResult (interp);
+            Tcl_AppendResult (interp, "Invalid typed list format: ",
+                              Tcl_GetString (msg), (char *) NULL);
+            Tcl_DecrRefCount (msg);
+            return NULL;
+        }
+    } else {
+        /* The other json types are represented by a text node.*/
+        if (jsonType > 5) {
+            /* JSON_STRING or JSON_NUMBER */
+            str = Tcl_GetStringFromObj (value, &strl);
+        } else {
+            str = "";
+            strl = 0;
+        }
+        textNode = domNewTextNode (doc, str, strl, TEXT_NODE);
+        textNode->info = jsonType;
+        domAppendChild (rootNode, (domNode *) textNode);
+    }
+    return doc;
+}
 
 domDocument *
 JSON_Parse (

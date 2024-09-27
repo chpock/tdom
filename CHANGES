@@ -1,4 +1,11 @@
 
+2024-09-27  Rolf Ade  <rolf@pointsman.de>
+
+        Added the asTypedList method to the domDoc and domNode
+        commands.
+
+        Added the createFromTypedList method to the dom command.
+
 2024-09-23  Rolf Ade  <rolf@pointsman.de>
 
         Updated to expat 2.6.3.

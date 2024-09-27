@@ -407,6 +407,17 @@ memory handling as explained above.</desc>
         </commanddef>
 
         <commanddef>
+        <command><cmd>dom</cmd> <method>createFromTypedList</method> <m>typedList</m> ?<m>objVar</m>?</command>
+          <desc><p>Creates a new DOM document from the argument <m>typedList</m>.
+          The <m>objVar</m> argument controls the memory handling as
+          explained above.</p>
+
+          <p>The <m>typedList</m> argument must be a Tcl list and must
+          follow the format of the output of the document command
+          method <m>asTypedList</m>, see there.</p></desc>
+        </commanddef>
+        
+        <commanddef>
           <command><cmd>dom</cmd> <method>createNodeCmd</method>
 <m>?-returnNodeCmd?</m> <m>?-tagName name?</m> <m>?-jsonType jsonType?</m> <m>?-namespace URI?</m> <m>(element|comment|text|cdata|pi)Node</m> <m>commandName</m></command>
           <desc>This method creates Tcl commands, which in turn create

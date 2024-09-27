@@ -12,6 +12,8 @@
 #    json-8.*: appendFromScript
 #    json-9.*: cloneNode
 #    json-10.*: asTclValue
+#    json-11.*: asTypedList
+#    json-12.*: createFromTypedList
 # Copyright (c) 2017 Rolf Ade.
 
 source [file join [file dir [info script]] loadtdom.tcl]
@@ -20,7 +22,12 @@ testConstraint needExpand 1
 if {$tcl_version < 8.5} {
     testConstraint needExpand 0
 }
-
+# See below the comment in proc dom for explanation
+if {[info commands _dom] eq ""} {
+    testConstraint nonetest 1
+} else {
+    testConstraint nonetest 0
+}
 namespace eval nodeCmds {
     dom createNodeCmd elementNode e1
     dom createNodeCmd -jsonType ARRAY elementNode jae1
@@ -91,37 +98,37 @@ test json-1.8 {Parse JSON - true, false, null} {
     set result
 } {<JSONObject><a>true</a><b>false</b><c>null</c><d>true</d><e></e></JSONObject>}
 
-test json-1.9 {JSON syntax error} {
+test json-1.9 {JSON syntax error} {nonetest} {
     set result [catch {dom parse -json {{"a" "a value"}}} errMsg]
     list $result $errMsg
 } {1 {error "JSON syntax error" at position 5
 "{"a" " <--Error-- a value"}"}}
 
-test json-1.10 {JSON syntax error} {
+test json-1.10 {JSON syntax error} {nonetest} {
     set result [catch {dom parse -json {{"a":00.23}}} errMsg]
     list $result $errMsg
 } {1 {error "JSON syntax error" at position 6
 "{"a":00 <--Error-- .23}"}}
 
-test json-1.11 {JSON syntax error} {
+test json-1.11 {JSON syntax error} {nonetest} {
     set result [catch {dom parse -json {{"a":-00.23}}} errMsg]
     list $result $errMsg
 } {1 {error "JSON syntax error" at position 7
 "{"a":-00 <--Error-- .23}"}}
 
-test json-1.12 {JSON syntax error} {
+test json-1.12 {JSON syntax error} {nonetest} {
     set result [catch {dom parse -json {{"a":.23}}} errMsg]
     list $result $errMsg
 } {1 {error "JSON syntax error" at position 5
 "{"a":. <--Error-- 23}"}}
 
-test json-1.13 {JSON syntax error} {
+test json-1.13 {JSON syntax error} {nonetest} {
     set result [catch {dom parse -json {{"a":-.23}}} errMsg]
     list $result $errMsg
 } {1 {error "JSON syntax error" at position 6
 "{"a":-. <--Error-- 23}"}}
 
-test json-1.14 {JSON syntax error} {
+test json-1.14 {JSON syntax error} {nonetest} {
     set result [catch {dom parse -json {{"a":-}}} errMsg]
     list $result $errMsg
 } {1 {error "JSON syntax error" at position 5
@@ -140,7 +147,7 @@ set notJsons {
     {{"string"}}
     {{"e":}}
 }
-test json-1.16 {Invalid input} {
+test json-1.16 {Invalid input} {nonetest} {
     set result ""
     set ind 0
     foreach notJson $notJsons {
@@ -151,7 +158,7 @@ test json-1.16 {Invalid input} {
     set result
 } ""
 
-test json-1.17 {Literal binary 0 (NUL, '\0') is not allowed in input} {
+test json-1.17 {Literal binary 0 (NUL, '\0') is not allowed in input} {nonetest} {
     catch {dom parse -json "\"a\u0000\""}
 } 1
 
@@ -162,7 +169,7 @@ test json-1.18 {Escaped binary 0 (NUL, '\0') is OK} {
     set result
 } "\"a\\u0000\""
 
-test json-1.19 {Invalid input - incomplete \u escape} {
+test json-1.19 {Invalid input - incomplete \u escape} {nonetest} {
     set result 1
     foreach jsonstr {
         "ab\u00"
@@ -261,7 +268,7 @@ test json-3.4.1 {unescaping} {
     set result
 } {<json>\aq</json>}
 
-test json-3.5 {unescaping} {
+test json-3.5 {unescaping} {nonetest} {
     set result [catch {dom parse -json {{"this":"a\lb"}}} errMsg]
     list $result $errMsg
 } {1 {error "JSON syntax error" at position 11
@@ -2640,6 +2647,8 @@ test json-6.7 {asJSON -indent} {
 	"b": "bvalue"
 }}
 
+if {[info commands _dom] eq ""} {
+
 test json-7.1 {jsonType} {
     set doc [dom parse {<j>foo</j>}]
     set root [$doc documentElement]
@@ -2740,6 +2749,7 @@ test json-8.6 {text nodes with json type NULL, TRUE or FALSE} {
     $doc delete
     set result
 } {[null,true,false]}
+}
 
 test json-9.1 {cloneNode -deep} {
     dom parse -json {[["a",1,"b",{"foo":"bar","baz":"boo"},null],"",null]} doc
@@ -2973,3 +2983,208 @@ test json-10.7.1 {asTclValue} {
     $doc delete
     list $dict $resulttype
 } {{Titel Wirtschaftsinformatik Keywords {Introduction Basics} Year 2022} dict}
+
+test json-11.1 {asTypedList} {
+    set json {{
+        "Titel": "Wirtschaftsinformatik",
+        "Keywords": ["Introduction","Basics"],
+        "Year": 2022
+    }}
+    set doc [dom parse -json $json]
+    set result [$doc asTypedList]
+    $doc delete
+    set result
+} {OBJECT {Titel {STRING Wirtschaftsinformatik} Keywords {ARRAY {{STRING Introduction} {STRING Basics}}} Year {NUMBER 2022}}}
+
+test json-11.2 {asTypedList} {
+    set json {{
+        "stringproperty": "abc",
+        "objectproperty": {"one": 1, "two": "two"},
+        "array": ["foo", -2.23, null, true, false, {"one": 1, "two": "two"}, [2,16,24]],
+        "number": 2022,
+        "null": null,
+        "true": true,
+        "false": false
+    }}
+    set doc [dom parse -json $json]
+    set result [$doc asTypedList]
+    $doc delete
+    set result
+} {OBJECT {stringproperty {STRING abc} objectproperty {OBJECT {one {NUMBER 1} two {STRING two}}} array {ARRAY {{STRING foo} {NUMBER -2.23} NULL TRUE FALSE {OBJECT {one {NUMBER 1} two {STRING two}}} {ARRAY {{NUMBER 2} {NUMBER 16} {NUMBER 24}}}}} number {NUMBER 2022} null NULL true TRUE false FALSE}}
+
+test json-11.3 {asTypedList} {
+    set json {{
+        "one two": "abc",
+        "one\u007btwo": "abc",
+        " one two ": "edf"
+    }}
+    set doc [dom parse -json $json]
+    set result [$doc asTypedList]
+    $doc delete
+    set result
+} {OBJECT {{one two} {STRING abc} one\{two {STRING abc} { one two } {STRING edf}}}
+
+test json-11.4 {asTypedList} {
+    set result ""
+    foreach json {
+        {"string foo"}
+        null
+        true
+        false
+        -1.23
+    } {
+        set doc [dom parse -json $json]
+        lappend result [$doc asTypedList]
+        $doc delete
+    }
+    set result
+} {{STRING {string foo}} NULL TRUE FALSE {NUMBER -1.23}}
+
+test json-11.5 {asTypedList} {
+    set result ""
+    set json {{
+        "Keywords": ["Introduction","Basics"],
+        "Data": {"one": "two", "three": true},
+        "Titel": "Wirtschaftsinformatik"
+    }}
+    set doc [dom parse -json $json]
+    set node [$doc firstChild]
+    while {$node ne ""} {
+        lappend result [$node asTypedList]
+        set node [$node nextSibling]
+    }
+    $doc delete
+    set result
+} {{ARRAY {{STRING Introduction} {STRING Basics}}} {OBJECT {one {STRING two} three TRUE}} {STRING Wirtschaftsinformatik}}
+
+if {[info commands _dom] eq ""} {
+
+test json-12.1 {createFromTypedList} {
+    set doc [dom createFromTypedList {OBJECT {Titel {STRING Wirtschaftsinformatik} Keywords {ARRAY {{STRING Introduction} {STRING Basics}}} Year {NUMBER 2022}}}]
+    set result [$doc asJSON]
+    $doc delete
+    set result
+} {{"Titel":"Wirtschaftsinformatik","Keywords":["Introduction","Basics"],"Year":2022}}
+
+test json-12.2 {createFromTypedList} {
+    set typedList {OBJECT {Titel {STRING Wirtschaftsinformatik} Keywords {ARRAY {{STRING Introduction} {STRING Basics}}} Year {NUMBER 2022}}}
+    set doc [dom createFromTypedList $typedList]
+    set result [$doc asTypedList]
+    $doc delete
+    expr {$typedList eq $result}
+} 1
+
+proc createFromTypedList {list} {
+    dom createFromTypedList $list doc
+    if {$list eq [$doc asTypedList]} {
+        return ""
+    }
+    error "Invalid turnaround."
+}
+test json-12.3 {createFromTypedList} {
+    createFromTypedList {OBJECT {Titel {STRING Wirtschaftsinformatik} Keywords {ARRAY {{STRING Introduction} {STRING Basics}}} Year {NUMBER 2022}}}
+} {}
+
+test json-12.4 {createFromTypedList} {
+    set result ""
+    foreach json {
+        {STRING foo}
+        NULL
+        TRUE
+        FALSE
+        {NUMBER -1.23}
+    } {
+        set doc [dom createFromTypedList $json]
+        set this [$doc asTypedList]
+        if {$json ne $this} {
+            lappend result "json $json this $this"
+        } else {
+            lappend result 1
+        }
+        $doc delete
+    }
+    set result
+} {1 1 1 1 1}
+
+test json-12.5 {createFromTypedList} {
+    set result ""
+    foreach wrong {
+        NUL
+        ""
+        {one two}
+        {STRING two three}
+    } {
+        catch {dom createFromTypedList $wrong} errMsg
+        lappend result $errMsg
+    }
+    set result
+} {{Invalid typed list format: Unkown symbol "NUL".} {Invalid typed list format: Empty list.} {Invalid typed list format: Unkown symbol "one".} {Invalid typed list format: Too much list elements.}}
+
+test json-12.6 {createFromTypedList} {
+    catch {dom createFromTypedList {OBJECT {one {STRING two} two {}}}} errMsg
+    set errMsg
+} {Invalid typed list format: object property "two": Empty list.}
+
+test json-12.7 {createFromTypedList} {
+    catch {dom createFromTypedList {OBJECT {one {STRING two} two {ARRAY {{NUMBER 1} {NULL foo}}}}}} errMsg
+    set errMsg
+} {Invalid typed list format: object property "two": array element 2: No value expected for NULL.}
+
+}
+
+if {[info commands _dom] eq ""} {
+    rename dom _dom
+    proc dom {args} {
+        if {[lindex $args 0] != "parse" || [lsearch -exact $args "-json"] < 0} {
+            return [uplevel 1 [linsert $args 0 _dom]]
+        }
+        set haveData 0
+        set uplevelVar ""
+        for {set x 1} {$x < [llength $args]} {incr x} {
+            switch -- [lindex $args $x] {
+                "-jsonroot" -
+                "-jsonmaxnesting" -
+                "-channel" -
+                "-baseurl" -
+                "-externalentitycommand" {
+                    incr x
+                }
+                "-json" -
+                "--" -
+                "-keepEmpties" -
+                "-keepCDATA" {
+                    # do nothing, the options are flags
+                }
+                default {
+                    if {$haveData} {
+                        set uplevelVar [lindex $args $x]
+                    } else {
+                        set data [lindex $args $x]
+                        set haveData 1
+                    }
+                }                
+            }
+        }
+        if {[catch {
+            _dom parse -json $data doc
+        } errMsg]} {
+            # Some tests check if invalid json data is detected. Since
+            # we need valid json data for what is tested here that
+            # tests should be marked with constraint nonetest. To
+            # raise error here does not help much because if the test
+            # data is expected to be invalid the command will be
+            # [catch]ed. Therefore the puts to catch attention.
+            puts  "Unexpeced invalid json data '$data'"
+        }
+        set njson [$doc asJSON]
+        set typedList [$doc asTypedList]
+        _dom createFromTypedList $typedList docFromTyped
+        if {$njson ne [$docFromTyped asJSON]} {
+            error "Normalized json '$data' differs from normalized json created with createFromTypedList"
+        }
+        return [uplevel 1 [linsert $args 0 _dom]]
+    }
+    source [file join [file dir [info script]] domjson.test]
+    rename dom {}
+    rename _dom dom
+}

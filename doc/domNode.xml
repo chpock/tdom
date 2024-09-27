@@ -675,7 +675,7 @@ for <m>getAttribute</m>.</desc>
       </commanddef>
 
       <commanddef>
-        <command><method>jsonType</method> <m>?OBJECT|ARRAY|NONE)|(STRING|NUMBER|TRUE|FALSE|NULL|NONE)?</m></command>
+        <command><method>jsonType</method> <m>?(OBJECT|ARRAY|NONE)|(STRING|NUMBER|TRUE|FALSE|NULL|NONE)?</m></command>
         <desc>Only element and text nodes may have a JSON type and
         only this types of nodes support the <m>jsonType</m> method;
         the other node types return error if called with this method.

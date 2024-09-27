@@ -2990,8 +2990,8 @@ void tcldom_childrenAsJSON (
             return;
         case JSON_START:
         case JSON_ARRAY:
-            /* The children, we serialize are the value of an array
-             * element. The node is a container for either a
+            /* The children we are serializing are the value of an
+             * array element. The node is a container for either a
              * (nested, in case of JSON_ARRAY) array or an object. */
             /* Look, if the name of the container gives a hint.*/
             if (strcmp (node->nodeName, JSON_ARRAY_CONTAINER)==0) {
@@ -3153,9 +3153,6 @@ void tcldom_treeAsJSON (
     )
 {
     domTextNode *textNode;
-    int i, seenDP, seenE;
-    unsigned char c;
-    char *num;
     
     switch (node->nodeType) {
     case TEXT_NODE:
@@ -3171,56 +3168,14 @@ void tcldom_treeAsJSON (
             /* Check, if the text value is a JSON number and fall back
              * to string token, if not. This is to ensure, the
              * serialization is always a valid JSON string. */
-            if (textNode->valueLength == 0) goto notANumber;
-            seenDP = 0;
-            seenE = 0;
-            i = 0;
-            num = textNode->nodeValue;
-            c = num[0];
-            if (!(c == '-' || (c>='0' && c<='9'))) goto notANumber;
-            if (c<='0') {
-                i = (c == '-' ? i+1 : i);
-                if (i+1 < textNode->valueLength) {
-                    if (num[i] == '0' && num[i+1] >= '0' && num[i+1] <= '9') {
-                        goto notANumber;
-                    }
-                }
+            if (isJSONNumber (textNode->nodeValue, textNode->valueLength)) {
+                writeChars(jstring, channel, textNode->nodeValue,
+                           textNode->valueLength);
+            } else {
+                tcldom_AppendEscapedJSON (jstring, channel,
+                                          textNode->nodeValue,
+                                          textNode->valueLength);
             }
-            i = 1;
-            for (; i < textNode->valueLength; i++) {
-                c = num[i];
-                if (c >= '0' && c <= '9') continue;
-                if (c == '.') {
-                    if (num[i-1] == '-') goto notANumber;
-                    if (seenDP) goto notANumber;
-                    seenDP = 1;
-                    continue;
-                }
-                if (c == 'e' || c == 'E') {
-                    if (num[i-1] < '0') goto notANumber;
-                    if (seenE) goto notANumber;
-                    seenDP = seenE = 1;
-                    c = num[i+1];
-                    if (c == '+' || c == '-') {
-                        i++;
-                        c = num[i+1];
-                    }
-                    if (c < '0' || c > '9') goto notANumber;
-                    continue;
-                }
-                break;
-            }
-            /* Catches a plain '-' without following digits */
-            if (num[i-1] < '0') goto notANumber;
-            /* Catches trailing chars */
-            if (i < textNode->valueLength) goto notANumber;
-            writeChars(jstring, channel, textNode->nodeValue,
-                       textNode->valueLength);
-            break;
-            notANumber:
-            tcldom_AppendEscapedJSON (jstring, channel,
-                                      textNode->nodeValue,
-                                      textNode->valueLength);
             break;
         case JSON_NULL:
             writeChars(jstring, channel, "null",4);
@@ -3400,6 +3355,164 @@ tcldom_treeAsTclValue (
     }
     Tcl_SetObjResult (interp, resultObj);
     return TCL_OK;
+}
+
+typedef struct 
+{
+    Tcl_Obj  *object;
+    Tcl_Obj  *array;
+    Tcl_Obj  *null;
+    Tcl_Obj  *true;
+    Tcl_Obj  *false;
+    Tcl_Obj  *number;
+    Tcl_Obj  *string;
+} asTypedListTypes;
+
+
+/*----------------------------------------------------------------------------
+|   tcldom_treeAsTypedList
+|
+\---------------------------------------------------------------------------*/
+static Tcl_Obj*
+tcldom_treeAsTypedListWorker (
+    domNode    *node,          /* Must be ELEMENT_NODE or TEXT_NODE */
+    const asTypedListTypes *c  /* c for string constants */
+    )
+{
+    Tcl_Obj *listObj, *resultObj = Tcl_NewListObj (0, NULL);
+    domNode *child, *childchild;
+    domTextNode *textNode;
+
+    if (node->nodeType == ELEMENT_NODE) {
+        switch (node->info) {
+        case JSON_ARRAY:
+            listObj = Tcl_NewListObj (0, NULL);
+            child = node->firstChild;
+            while (child) {
+                if (child->nodeType == ELEMENT_NODE
+                    || child->nodeType == TEXT_NODE) {
+                    Tcl_ListObjAppendElement (
+                        NULL, listObj, tcldom_treeAsTypedListWorker (child, c)
+                        );
+                }
+                child = child->nextSibling;
+            }
+            Tcl_ListObjAppendElement(NULL, resultObj, c->array);
+            Tcl_ListObjAppendElement(NULL, resultObj, listObj);
+            break;
+        case JSON_OBJECT:
+            listObj = Tcl_NewListObj (0, NULL);
+            child = node->firstChild;
+            while (child) {
+                Tcl_ListObjAppendElement(NULL, listObj,
+                                         Tcl_NewStringObj(child->nodeName, -1));
+                if (child->nodeType == ELEMENT_NODE) {
+                    if (child->info == 0) {
+                        childchild = child->firstChild;
+                        while (childchild) {
+                            if (childchild->nodeType == TEXT_NODE) {
+                                Tcl_ListObjAppendElement(
+                                    NULL, listObj,
+                                    tcldom_treeAsTypedListWorker (
+                                        childchild, c));
+                                break;
+                            }
+                            childchild = childchild->nextSibling;
+                        }
+                    } else {
+                        Tcl_ListObjAppendElement(NULL, listObj,
+                                                 tcldom_treeAsTypedListWorker (
+                                                     child, c));
+                    }
+                }
+                child = child->nextSibling;
+            }
+            Tcl_ListObjAppendElement(NULL, resultObj, c->object);
+            Tcl_ListObjAppendElement(NULL, resultObj, listObj);
+            break;
+        }
+    } else {
+        /* Text node */
+        switch (node->info) {
+        case JSON_NULL:
+            Tcl_ListObjAppendElement (NULL, resultObj, c->null);
+            break;
+        case JSON_TRUE:
+            Tcl_ListObjAppendElement (NULL, resultObj, c->true);
+            break;
+        case JSON_FALSE:
+            Tcl_ListObjAppendElement (NULL, resultObj, c->false);
+            break;
+        case JSON_NUMBER:
+            textNode = (domTextNode *)node;
+            if (isJSONNumber (textNode->nodeValue, textNode->valueLength)) {
+                Tcl_ListObjAppendElement(NULL, resultObj, c->number);
+                Tcl_ListObjAppendElement(
+                    NULL, resultObj, Tcl_NewStringObj(textNode->nodeValue,
+                                                      textNode->valueLength));
+                break;
+            }
+            /* fall through */
+        case JSON_STRING:
+        default:
+            textNode = (domTextNode *)node;
+            Tcl_ListObjAppendElement(NULL, resultObj, c->string);
+            Tcl_ListObjAppendElement(
+                NULL, resultObj, Tcl_NewStringObj(textNode->nodeValue,
+                                                  textNode->valueLength));
+            break;
+        }
+    }
+    return resultObj;
+}
+
+static void
+tcldom_treeAsTypedList (
+    Tcl_Interp *interp,
+    domNode    *node
+    )
+{
+    asTypedListTypes c;
+    
+    if (node->nodeType != ELEMENT_NODE && node->nodeType != TEXT_NODE) {
+        Tcl_ResetResult (interp);
+        return;
+    }
+
+    c.object = Tcl_NewStringObj ("OBJECT", 6);
+    c.array = Tcl_NewStringObj ("ARRAY", 5);
+    c.null = Tcl_NewStringObj ("NULL", 4);
+    c.true = Tcl_NewStringObj ("TRUE", 4);
+    c.false = Tcl_NewStringObj ("FALSE", 5);
+    c.number = Tcl_NewStringObj ("NUMBER", 6);
+    c.string = Tcl_NewStringObj ("STRING", 6);
+
+    Tcl_IncrRefCount (c.object);
+    Tcl_IncrRefCount (c.array);
+    Tcl_IncrRefCount (c.null);
+    Tcl_IncrRefCount (c.true);
+    Tcl_IncrRefCount (c.false);
+    Tcl_IncrRefCount (c.number);
+    Tcl_IncrRefCount (c.string);
+
+    if (node->nodeType == ELEMENT_NODE
+        && node->info == 0
+        && node->firstChild->nodeType == TEXT_NODE) {
+        /* Either a value only json document or a OBJECT propertiy
+         * element node.*/ 
+        node = node->firstChild;
+    }
+    
+    Tcl_SetObjResult (interp, 
+                      tcldom_treeAsTypedListWorker (node, &c));
+
+    Tcl_DecrRefCount (c.object);
+    Tcl_DecrRefCount (c.array);
+    Tcl_DecrRefCount (c.null);
+    Tcl_DecrRefCount (c.true);
+    Tcl_DecrRefCount (c.false);
+    Tcl_DecrRefCount (c.number);
+    Tcl_DecrRefCount (c.string);
 }
 
 /*----------------------------------------------------------------------------
@@ -4804,8 +4917,8 @@ int tcldom_NodeObjCmd (
         "getElementsByTagName",              "getElementsByTagNameNS",
         "disableOutputEscaping",             "precedes",         "asText",
         "insertBeforeFromScript",            "normalize",        "baseURI",
-        "asJSON",          "asTclValue",     "jsonType",       "attributeNames",
-        "asCanonicalXML",  "getByteIndex",
+        "asJSON",          "asTclValue",     "asTypedList",      "jsonType",
+        "attributeNames",  "asCanonicalXML", "getByteIndex",
 #ifdef TCL_THREADS
         "readlock",        "writelock",
 #endif
@@ -4828,8 +4941,8 @@ int tcldom_NodeObjCmd (
         m_getElementsByTagName,              m_getElementsByTagNameNS,
         m_disableOutputEscaping,             m_precedes,        m_asText,
         m_insertBeforeFromScript,            m_normalize,       m_baseURI,
-        m_asJSON,          m_asTclValue,         m_jsonType,        m_attributeNames,
-        m_asCanonicalXML,  m_getByteIndex
+        m_asJSON,          m_asTclValue,     m_asTypedList,     m_jsonType,
+        m_attributeNames,  m_asCanonicalXML, m_getByteIndex
 #ifdef TCL_THREADS
         ,m_readlock,       m_writelock
 #endif
@@ -5146,7 +5259,12 @@ int tcldom_NodeObjCmd (
                 return TCL_ERROR;
             }
             break;
-            
+
+        case m_asTypedList:
+            CheckArgs(2,2,2,"");
+            tcldom_treeAsTypedList (interp, node);
+            break;
+
         case m_getAttribute:
             CheckArgs(3,4,2,"attrName ?defaultValue?");
             if (node->nodeType != ELEMENT_NODE) {
@@ -5943,7 +6061,7 @@ int tcldom_DocObjCmd (
         "replaceChild",    "appendFromList",             "appendXML",
         "selectNodes",     "baseURI",                    "appendFromScript",
         "insertBeforeFromScript",                        "asJSON",
-        "jsonType",        "asTclValue",
+        "jsonType",        "asTclValue",                 "asTypedList",
 #ifdef TCL_THREADS
         "readlock",        "writelock",                  "renumber",
 #endif
@@ -5969,7 +6087,7 @@ int tcldom_DocObjCmd (
         m_replaceChild,     m_appendFromList,             m_appendXML,
         m_selectNodes,      m_baseURI,                    m_appendFromScript,
         m_insertBeforeFromScript,                         m_asJSON,
-        m_jsonType,         m_asTclValue
+        m_jsonType,         m_asTclValue,                 m_asTypedList
 #ifdef TCL_THREADS
        ,m_readlock,         m_writelock,                  m_renumber
 #endif
@@ -6410,6 +6528,7 @@ int tcldom_DocObjCmd (
         case m_baseURI:
         case m_asJSON:
         case m_asTclValue:
+        case m_asTypedList:
         case m_jsonType:
         case m_getElementById:
             /* We dispatch the method call to tcldom_NodeObjCmd */
@@ -6709,7 +6828,7 @@ int tcldom_createDocumentNode (
             return TCL_ERROR;
         }
         Tcl_ResetResult(interp);
-            if (Tcl_GetIndexFromObj(interp, objv[2], jsonTypes, "jsonType",
+        if (Tcl_GetIndexFromObj(interp, objv[2], jsonTypes, "jsonType",
                                 0, &jsonType) != TCL_OK) {
             return TCL_ERROR;
         }
@@ -6763,6 +6882,34 @@ int tcldom_createDocumentNS (
         doc = domCreateDocument (uri, Tcl_GetString(objv[2]));
     }
     return tcldom_returnDocumentObj (interp, doc, newObjName, 1, 0);
+}
+
+/*----------------------------------------------------------------------------
+|   tcldom_createFromTypedList
+|
+\---------------------------------------------------------------------------*/
+static
+int tcldom_createFromTypedList (
+    ClientData  UNUSED(clientData),
+    Tcl_Interp *interp,
+    int         objc,
+    Tcl_Obj    * const objv[]
+)
+{
+    domDocument *doc;
+    Tcl_Obj     *newObjName = NULL;
+
+    CheckArgs(2,3,1,"typedList ?newObjVar?");
+
+    if (objc == 3) {
+        newObjName = objv[2];
+    }
+
+    doc = TypedList2DOM (interp, objv[1]);
+    if (doc == NULL) {
+        return TCL_ERROR;
+    }
+    return tcldom_returnDocumentObj(interp, doc, newObjName, 1, 0);
 }
 
 /* Helper function to build up the error string message in a central
@@ -7590,7 +7737,7 @@ int tcldom_DomObjCmd (
 
     static const char *domMethods[] = {
         "createDocument",  "createDocumentNS",   "createNodeCmd",
-        "parse",                                 "setStoreLineColumn",
+        "createFromTypedList", "parse",          "setStoreLineColumn",
         "isCharData",      "isName",             "isPIName",
         "isQName",         "isComment",          "isCDATA",
         "isPIValue",       "isNCName",           "createDocumentNode",
@@ -7604,7 +7751,7 @@ int tcldom_DomObjCmd (
     };
     enum domMethod {
         m_createDocument,    m_createDocumentNS,   m_createNodeCmd,
-        m_parse,                                   m_setStoreLineColumn,
+        m_createFromTypedList, m_parse,            m_setStoreLineColumn,
         m_isCharData,        m_isName,             m_isPIName,
         m_isQName,           m_isComment,          m_isCDATA,
         m_isPIValue,         m_isNCName,           m_createDocumentNode,
@@ -7684,6 +7831,9 @@ int tcldom_DomObjCmd (
         case m_createDocumentNode:
             return tcldom_createDocumentNode (clientData, interp, --objc,
                                               objv+1);
+        case m_createFromTypedList:
+            return tcldom_createFromTypedList (clientData, interp, --objc,
+                                               objv+1);
         case m_createNodeCmd:
             return nodecmd_createNodeCmd(interp, --objc, objv+1,
                                          !TcldomDATA(dontCheckName),
