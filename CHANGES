@@ -1,4 +1,8 @@
 
+2024-09-23  Rolf Ade  <rolf@pointsman.de>
+
+        Updated to expat 2.6.3.
+
 2024-09-08  Rolf Ade  <rolf@pointsman.de>
 
         Added the flag -keepTextStart to the expat command.
