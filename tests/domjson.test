@@ -24,9 +24,9 @@ if {$tcl_version < 8.5} {
 }
 # See below the comment in proc dom for explanation
 if {[info commands _dom] eq ""} {
-    testConstraint failtest 1
+    testConstraint nonetest 1
 } else {
-    testConstraint failtest 0
+    testConstraint nonetest 0
 }
 namespace eval nodeCmds {
     dom createNodeCmd elementNode e1
@@ -98,37 +98,37 @@ test json-1.8 {Parse JSON - true, false, null} {
     set result
 } {<JSONObject><a>true</a><b>false</b><c>null</c><d>true</d><e></e></JSONObject>}
 
-test json-1.9 {JSON syntax error} {failtest} {
+test json-1.9 {JSON syntax error} {nonetest} {
     set result [catch {dom parse -json {{"a" "a value"}}} errMsg]
     list $result $errMsg
 } {1 {error "JSON syntax error" at position 5
 "{"a" " <--Error-- a value"}"}}
 
-test json-1.10 {JSON syntax error} {failtest} {
+test json-1.10 {JSON syntax error} {nonetest} {
     set result [catch {dom parse -json {{"a":00.23}}} errMsg]
     list $result $errMsg
 } {1 {error "JSON syntax error" at position 6
 "{"a":00 <--Error-- .23}"}}
 
-test json-1.11 {JSON syntax error} {failtest} {
+test json-1.11 {JSON syntax error} {nonetest} {
     set result [catch {dom parse -json {{"a":-00.23}}} errMsg]
     list $result $errMsg
 } {1 {error "JSON syntax error" at position 7
 "{"a":-00 <--Error-- .23}"}}
 
-test json-1.12 {JSON syntax error} {failtest} {
+test json-1.12 {JSON syntax error} {nonetest} {
     set result [catch {dom parse -json {{"a":.23}}} errMsg]
     list $result $errMsg
 } {1 {error "JSON syntax error" at position 5
 "{"a":. <--Error-- 23}"}}
 
-test json-1.13 {JSON syntax error} {failtest} {
+test json-1.13 {JSON syntax error} {nonetest} {
     set result [catch {dom parse -json {{"a":-.23}}} errMsg]
     list $result $errMsg
 } {1 {error "JSON syntax error" at position 6
 "{"a":-. <--Error-- 23}"}}
 
-test json-1.14 {JSON syntax error} {failtest} {
+test json-1.14 {JSON syntax error} {nonetest} {
     set result [catch {dom parse -json {{"a":-}}} errMsg]
     list $result $errMsg
 } {1 {error "JSON syntax error" at position 5
@@ -147,7 +147,7 @@ set notJsons {
     {{"string"}}
     {{"e":}}
 }
-test json-1.16 {Invalid input} {failtest} {
+test json-1.16 {Invalid input} {nonetest} {
     set result ""
     set ind 0
     foreach notJson $notJsons {
@@ -158,7 +158,7 @@ test json-1.16 {Invalid input} {failtest} {
     set result
 } ""
 
-test json-1.17 {Literal binary 0 (NUL, '\0') is not allowed in input} {failtest} {
+test json-1.17 {Literal binary 0 (NUL, '\0') is not allowed in input} {nonetest} {
     catch {dom parse -json "\"a\u0000\""}
 } 1
 
@@ -169,7 +169,7 @@ test json-1.18 {Escaped binary 0 (NUL, '\0') is OK} {
     set result
 } "\"a\\u0000\""
 
-test json-1.19 {Invalid input - incomplete \u escape} {failtest} {
+test json-1.19 {Invalid input - incomplete \u escape} {nonetest} {
     set result 1
     foreach jsonstr {
         "ab\u00"
@@ -268,7 +268,7 @@ test json-3.4.1 {unescaping} {
     set result
 } {<json>\aq</json>}
 
-test json-3.5 {unescaping} {failtest} {
+test json-3.5 {unescaping} {nonetest} {
     set result [catch {dom parse -json {{"this":"a\lb"}}} errMsg]
     list $result $errMsg
 } {1 {error "JSON syntax error" at position 11
@@ -2647,6 +2647,8 @@ test json-6.7 {asJSON -indent} {
 	"b": "bvalue"
 }}
 
+if {[info commands _dom] eq ""} {
+
 test json-7.1 {jsonType} {
     set doc [dom parse {<j>foo</j>}]
     set root [$doc documentElement]
@@ -2747,6 +2749,7 @@ test json-8.6 {text nodes with json type NULL, TRUE or FALSE} {
     $doc delete
     set result
 } {[null,true,false]}
+}
 
 test json-9.1 {cloneNode -deep} {
     dom parse -json {[["a",1,"b",{"foo":"bar","baz":"boo"},null],"",null]} doc
@@ -3037,6 +3040,8 @@ test json-11.4 {asTypedList} {
     set result
 } {{STRING {string foo}} NULL TRUE FALSE {NUMBER -1.23}}
 
+if {[info commands _dom] eq ""} {
+
 test json-12.1 {createFromTypedList} {
     set doc [dom createFromTypedList {OBJECT {Titel {STRING Wirtschaftsinformatik} Keywords {ARRAY {{STRING Introduction} {STRING Basics}}} Year {NUMBER 2022}}}]
     set result [$doc asJSON]
@@ -3084,6 +3089,32 @@ test json-12.4 {createFromTypedList} {
     set result
 } {1 1 1 1 1}
 
+test json-12.5 {createFromTypedList} {
+    set result ""
+    foreach wrong {
+        NUL
+        ""
+        {one two}
+        {STRING two three}
+    } {
+        catch {dom createFromTypedList $wrong} errMsg
+        lappend result $errMsg
+    }
+    set result
+} {{Invalid typed list format: Unkown symbol "NUL".} {Invalid typed list format: Empty list.} {Invalid typed list format: Unkown symbol "one".} {Invalid typed list format: Too much list elements.}}
+
+test json-12.6 {createFromTypedList} {
+    catch {dom createFromTypedList {OBJECT {one {STRING two} two {}}}} errMsg
+    set errMsg
+} {Invalid typed list format: object property "two": Empty list.}
+
+test json-12.7 {createFromTypedList} {
+    catch {dom createFromTypedList {OBJECT {one {STRING two} two {ARRAY {{NUMBER 1} {NULL foo}}}}}} errMsg
+    set errMsg
+} {Invalid typed list format: object property "two": array element 2: No value expected for NULL.}
+
+}
+
 if {[info commands _dom] eq ""} {
     rename dom _dom
     proc dom {args} {
@@ -3122,7 +3153,7 @@ if {[info commands _dom] eq ""} {
         } errMsg]} {
             # Some tests check if invalid json data is detected. Since
             # we need valid json data for what is tested here that
-            # tests should be marked with constraint failtest. To
+            # tests should be marked with constraint nonetest. To
             # raise error here does not help much because if the test
             # data is expected to be invalid the command will be
             # [catch]ed. Therefore the puts to catch attention.

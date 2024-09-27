@@ -523,68 +523,106 @@ getJSONTypeFromList (
 {
     Tcl_Obj *symbol;
     char *s;
-    domLength slen;
+    domLength slen, llen;
     
     if (Tcl_ListObjIndex (interp, list, 0, &symbol) != TCL_OK) {
         return -1;
     }
     if (!symbol) {
         /* Empty lists are not allowed. */
-        SetResult ("Invalid list format: Empty list.");
+        SetResult ("Empty list.");
+        return -1;
+    }
+    Tcl_ListObjLength (interp, list, &llen);
+    if (llen > 2) {
+        SetResult ("Too much list elements.");
         return -1;
     }
     Tcl_ListObjIndex (interp, list, 1, typeValue);
     s = Tcl_GetStringFromObj (symbol, &slen);
     if (strcmp (s, "STRING") == 0) {
         if (*typeValue == NULL) {
-            SetResult ("Invalid list format: Missing value for STRING.");
+            SetResult ("Missing value for STRING.");
             return -1;
         }
         return JSON_STRING;
     } else if (strcmp (s, "OBJECT") == 0) {
         if (*typeValue == NULL) {
-            SetResult ("Invalid list format: Missing value for OBJECT.");
+            SetResult ("Missing value for OBJECT.");
             return -1;
         }
         return JSON_OBJECT;
     } else if (strcmp (s, "NUMBER") == 0) {
         if (*typeValue == NULL) {
-            SetResult ("Invalid list format: Missing value for NUMBER.");
+            SetResult ("Missing value for NUMBER.");
             return -1;
         }
         s = Tcl_GetStringFromObj (*typeValue, &slen);
         if (!isJSONNumber (s, slen)) {
-            SetResult ("Invalid list format: Not a valid NUMBER value.");
+            SetResult ("Not a valid NUMBER value.");
             return -1;
         }
         return JSON_NUMBER;
     } else if (strcmp (s, "ARRAY") == 0) {
         if (*typeValue == NULL) {
-            SetResult ("Invalid list format: Missing value for ARRAY.");
+            SetResult ("Missing value for ARRAY.");
             return -1;
         }
         return JSON_ARRAY;
     } else if (strcmp (s, "TRUE") == 0) {
         if (*typeValue != NULL) {
-            SetResult ("Invalid list format: No value expected for TRUE.");
+            SetResult ("No value expected for TRUE.");
+            return -1;
         }
         return JSON_TRUE;
     } else if (strcmp (s, "FALSE") == 0) {
         if (*typeValue != NULL) {
-            SetResult ("Invalid list format: No value expected for FALSE.");
+            SetResult ("No value expected for FALSE.");
+            return -1;
         }
         return JSON_FALSE;
     } else if (strcmp (s, "NULL") == 0) {
         if (*typeValue != NULL) {
-            SetResult ("Invalid list format: No value expected for NULL.");
+            SetResult ("No value expected for NULL.");
+            return -1;
         }
         return JSON_NULL;
     } else {
-        if (*typeValue != NULL) {
-            SetResult3 ("Invalid list format: Invalid symbol \"", s, "\".");
-        }
+        SetResult3 ("Unkown symbol \"", s, "\".");
         return -1;
     }            
+}
+
+static void objectErrMsg (
+    Tcl_Interp *interp,
+    domNode *node
+    ) 
+{
+    Tcl_Obj *msg;
+
+    msg = Tcl_GetObjResult (interp);
+    Tcl_IncrRefCount (msg);
+    Tcl_ResetResult (interp);
+    Tcl_AppendResult (interp, "object property \"", node->nodeName,
+                      "\": ", Tcl_GetString (msg), (char *)NULL);
+    Tcl_DecrRefCount (msg);
+}
+
+static void arrayErrMsg (
+    Tcl_Interp *interp,
+    domLength i
+    ) 
+{
+    Tcl_Obj *msg;
+    char buf[20];
+
+    msg = Tcl_GetObjResult (interp);
+    Tcl_IncrRefCount (msg);
+    Tcl_ResetResult (interp);
+    sprintf (buf, domLengthConversion, i + 1);
+    Tcl_AppendResult (interp, "array element ", buf, ": ",
+                      Tcl_GetString (msg), (char *) NULL);
+    Tcl_DecrRefCount (msg);
 }
 
 static int
@@ -607,10 +645,8 @@ TypedList2DOMWorker (
             return TCL_ERROR;
         }
         if (llen % 2 != 0) {
-            Tcl_ResetResult (interp);
-            Tcl_AppendResult (interp, "An OBJECT value must be a Tcl "
-                              "list with an even number of elements.",
-                              (char *) NULL);
+            SetResult ("An OBJECT value must be a Tcl list with an even "
+                       "number of elements.");
             return TCL_ERROR;
         }
         for (i = 0; i < llen; i += 2) {
@@ -623,12 +659,14 @@ TypedList2DOMWorker (
                                              NULL);
             jsonType = getJSONTypeFromList (interp, pvalue, &pdetail);
             if (jsonType < 0) {
+                objectErrMsg (interp, pnode);
                 return TCL_ERROR;
             }
             if (jsonType < 3) {
                 /* JSON_OBJECT or JSON_ARRAY */
                 pnode->info = jsonType;
                 if (TypedList2DOMWorker (interp, pnode, pdetail) != TCL_OK) {
+                    objectErrMsg (interp, pnode);
                     return TCL_ERROR;
                 }
             } else {
@@ -658,6 +696,7 @@ TypedList2DOMWorker (
             Tcl_ListObjIndex (interp, value, i, &aelm);
             jsonType = getJSONTypeFromList (interp, aelm, &adetail);
             if (jsonType < 0) {
+                arrayErrMsg (interp, i);
                 return TCL_ERROR;
             }
             switch (jsonType) {
@@ -666,14 +705,20 @@ TypedList2DOMWorker (
                                                      JSON_OBJECT_CONTAINER,
                                                      NULL);
                 container->info = JSON_OBJECT;                
-                TypedList2DOMWorker (interp, container, adetail);
+                if (TypedList2DOMWorker (interp, container, adetail) != TCL_OK) {
+                    arrayErrMsg (interp, i);
+                    return TCL_ERROR;
+                }
                 break;
             case JSON_ARRAY:
                 container = domAppendNewElementNode (parent,
                                                      JSON_ARRAY_CONTAINER,
                                                      NULL);
                 container->info = JSON_ARRAY;                
-                TypedList2DOMWorker (interp, container, adetail);
+                if (TypedList2DOMWorker (interp, container, adetail) != TCL_OK) {
+                    arrayErrMsg (interp, i);
+                    return TCL_ERROR;
+                }
                 break;
             default:
                 /* The other json types are represented by a text node.*/
@@ -714,13 +759,19 @@ TypedList2DOM (
     domDocument *doc;
     domNode *rootNode;
     domTextNode *textNode;
-    Tcl_Obj *value;
+    Tcl_Obj *value, *msg;
     char *str;
     domLength strl;
     int jsonType;
 
     jsonType = getJSONTypeFromList (interp, typedList, &value);
     if (jsonType < 0) {
+        msg = Tcl_GetObjResult (interp);
+        Tcl_IncrRefCount (msg);
+        Tcl_ResetResult (interp);
+        Tcl_AppendResult (interp, "Invalid typed list format: ",
+                          Tcl_GetString (msg), (char *) NULL);
+        Tcl_DecrRefCount (msg);
         return NULL;
     }
     doc  = domCreateDoc (NULL, 0);
@@ -729,7 +780,14 @@ TypedList2DOM (
         /* JSON_OBJECT or JSON_ARRAY */
         rootNode->info = jsonType;
         if (TypedList2DOMWorker (interp, rootNode, value) != TCL_OK) {
-            goto error;
+            msg = Tcl_GetObjResult (interp);
+            Tcl_IncrRefCount (msg);
+            domFreeDocument(doc, NULL, interp);
+            Tcl_ResetResult (interp);
+            Tcl_AppendResult (interp, "Invalid typed list format: ",
+                              Tcl_GetString (msg), (char *) NULL);
+            Tcl_DecrRefCount (msg);
+            return NULL;
         }
     } else {
         /* The other json types are represented by a text node.*/
@@ -745,9 +803,6 @@ TypedList2DOM (
         domAppendChild (rootNode, (domNode *) textNode);
     }
     return doc;
-error:
-    tcldom_deleteDoc (interp, doc);
-    return NULL;
 }
 
 domDocument *
