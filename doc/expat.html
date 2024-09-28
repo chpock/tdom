@@ -4,21 +4,21 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x5607ea0e6b50">NAME</a> · <a href="#SECTid0x5607ea113710">SYNOPSIS</a> · <a href="#SECTid0x5607ea096f40">DESCRIPTION</a> · <a href="#SECTid0x5607ea0f5a00">COMMAND OPTIONS</a> · <a href="#SECTid0x5607ea11dac0"> COMMAND METHODS </a> · <a href="#SECTid0x5607e9fa88b0">Callback Command Return Codes</a> · <a href="#SECTid0x5607e9fa90b0">SEE ALSO</a> · <a href="#SECTid0x5607e9fa9470">KEYWORDS</a>
+<a href="#SECTid0x5587897674b0">NAME</a> · <a href="#SECTid0x5587897a6530">SYNOPSIS</a> · <a href="#SECTid0x558789873440">DESCRIPTION</a> · <a href="#SECTid0x558789874030">COMMAND OPTIONS</a> · <a href="#SECTid0x5587898d0a30"> COMMAND METHODS </a> · <a href="#SECTid0x5587898d8160">Callback Command Return Codes</a> · <a href="#SECTid0x5587898d8cf0">SEE ALSO</a> · <a href="#SECTid0x5587898d90b0">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-    <h2><a name="SECTid0x5607ea0e6b50">NAME</a></h2><p class="namesection">
+    <h2><a name="SECTid0x5587897674b0">NAME</a></h2><p class="namesection">
 <b class="names">expat - </b><br>Creates an instance of an expat parser object</p>
 
 
 
-    <h2><a name="SECTid0x5607ea113710">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+    <h2><a name="SECTid0x5587897a6530">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">expat</b> ?<i class="m">parsername</i>? ?<i class="m">-namespace</i>? ?<i class="m">arg arg ..</i>
 
 <b class="cmd">xml::parser</b> ?<i class="m">parsername</i>? ?<i class="m">-namespace</i>? ?<i class="m">arg arg ..</i>
 </pre>
-    <h2><a name="SECTid0x5607ea096f40">DESCRIPTION</a></h2><p>The parser created with <i class="m">expat</i> or <i class="m">xml::parser</i>
+    <h2><a name="SECTid0x558789873440">DESCRIPTION</a></h2><p>The parser created with <i class="m">expat</i> or <i class="m">xml::parser</i>
 (which is just another name for the same command in an own namespace) are able
 to parse any kind of well-formed XML. The parsers are stream oriented XML
 parser. This means that you register handler scripts with the parser prior to
@@ -37,7 +37,7 @@ in memory "tDOM" DOM tree, while the parser is parsing the input.</p><p>It is po
 and C level handlers for most of the events. If the event occurs, they are
 called in turn.</p>
 
-    <h2><a name="SECTid0x5607ea0f5a00">COMMAND OPTIONS</a></h2><dl class="optlist">
+    <h2><a name="SECTid0x558789874030">COMMAND OPTIONS</a></h2><dl class="optlist">
         
           <dt><b>-namespace</b></dt>
 
@@ -139,6 +139,24 @@ parser.</p></dd>
           will not be traced by executing them. </p>
 </dd>
         
+
+        
+          <dt>
+<b>-keepTextStart</b> <i>boolean</i>
+</dt>
+          
+
+          <dd><p>By default this option is 0 (off). If this option
+          is on then the position information of the start of a text
+          or CDATA node is keeped over collecting the sometimes by
+          expat delivered cdata pieces. With this option on the
+          position information returned by the parser in a
+          -characterdatacommand proc will be correct, otherwise not.
+          Called in all other handler code the parser always return
+          the correct position results, no matter what value this
+          option have. It is off by default because it is rarely
+          needed and saves a few cpu cyles this way.</p></dd>
+        
         
         
           <dt>
@@ -212,10 +230,9 @@ HandleEnd test
 the document, ie. text. The actual command consists of this option followed by
 one argument: the text.</p>
 
-<p>It is not guaranteed that character data will be passed to the application
-in a single call to this command. That is, the application should be prepared
-to receive multiple invocations of this callback with no intervening callbacks
-from other features.</p>
+<p>Other than with the C API of the expat parser it is guaranteed that
+character data will be passed to the application in a single call to
+this command.</p>
 
 <p>Example: </p>
 
@@ -709,7 +726,7 @@ enddoctypedeclcommand scripts, if set, are not called.</dd>
         
 
       </dl>
-    <h2><a name="SECTid0x5607ea11dac0"> COMMAND METHODS </a></h2><dl class="commandlist">
+    <h2><a name="SECTid0x5587898d0a30"> COMMAND METHODS </a></h2><dl class="commandlist">
         
           <dt>
 <b class="cmd">parser</b> <b class="method">configure</b> <i class="m">option value ?option value?</i>
@@ -791,29 +808,49 @@ attributes list passed to the elementstartcommand.</p></dd>
               
                 <dt><b>-currentbytecount</b></dt>
 
-                <dd><p>Return the number of bytes in the current event.
-Returns 0 if the event is in an internal entity.</p></dd>
+                <dd>
+<p>Return the number of bytes in the current event.
+                Returns 0 if the event is in an internal entity.</p>
+
+                <p>If you use this option consider if you may need the
+                parser option <i class="m">-keepTextStart</i>.</p>
+                </dd>
               
 
               
                 <dt><b>-currentlinenumber</b></dt>
 
-                <dd><p> Returns the line number of the current parse
-location.</p></dd>
+                <dd>
+<p> Returns the line number of the current parse
+                location.</p>
+
+                <p>If you use this option consider if you may need the
+                parser option <i class="m">-keepTextStart</i>.</p>
+                </dd>
               
 
               
                 <dt><b>-currentcolumnnumber</b></dt>
 
-                <dd><p> Returns the column number of the current parse
-location.</p></dd>
+                <dd>
+<p> Returns the column number of the current
+                parse location.</p>
+
+                <p>If you use this option consider if you may need the
+                parser option <i class="m">-keepTextStart</i>.</p>
+                </dd>
               
 
               
                 <dt><b>-currentbyteindex</b></dt>
 
-                <dd><p> Returns the byte index of the current parse
-location.</p></dd>
+                <dd>
+<p> Returns the byte index of the current parse
+                location.</p>
+
+                <p>If you use this option consider if you may need the
+                parser option <i class="m">-keepTextStart</i>.</p>
+                </dd>
               
             </dl>
 <p>Only one value may be requested at a time.</p>
@@ -869,7 +906,7 @@ cases.</p></dd>
         
       </dl>
 
-    <h2><a name="SECTid0x5607e9fa88b0">Callback Command Return Codes</a></h2><p>A script invoked for any of the parser callback commands, such as
+    <h2><a name="SECTid0x5587898d8160">Callback Command Return Codes</a></h2><p>A script invoked for any of the parser callback commands, such as
 -elementstartcommand, -elementendcommand, etc, may return an error code other
 than "ok" or "error". All callbacks may in addition return
 "break" or "continue".</p><p>If a callback script returns an "error" error code then
@@ -883,11 +920,11 @@ script out of this Tcl handler set and processing continues with the next
 (sibling) element. This does not influence any other handler set.</p><p>If a callback script returns a "return" error
 code then parsing is canceled altogether, but no error is raised.</p>
 
-    <h2><a name="SECTid0x5607e9fa90b0">SEE ALSO</a></h2><p class="seealso">
+    <h2><a name="SECTid0x5587898d8cf0">SEE ALSO</a></h2><p class="seealso">
 <a href="expatapi.html">expatapi</a>, <a href="tdomcmd.html">tdom</a>
 </p>
 
-    <h2><a name="SECTid0x5607e9fa9470">KEYWORDS</a></h2><p class="keywords">
+    <h2><a name="SECTid0x5587898d90b0">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-SAX">SAX</a>, <a class="keyword" href="keyword-index.html#KW-push">push</a>, <a class="keyword" href="keyword-index.html#KW-pushparser">pushparser</a>
 </p>
   </div><hr class="navsep"><div class="navbar" align="center">

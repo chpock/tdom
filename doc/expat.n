@@ -272,6 +272,20 @@ but also may execute arbitrary code.
 The callback handler installed while this option is on
 will not be traced by executing them.
 .RE
+.IP "\fB-keepTextStart  \fIboolean\fP\fR"
+.RS
+.PP
+By default this option is 0 (off). If this option
+is on then the position information of the start of a text
+or CDATA node is keeped over collecting the sometimes by
+expat delivered cdata pieces. With this option on the
+position information returned by the parser in a
+-characterdatacommand proc will be correct, otherwise not.
+Called in all other handler code the parser always return
+the correct position results, no matter what value this
+option have. It is off by default because it is rarely
+needed and saves a few cpu cyles this way.
+.RE
 .IP "\fB-elementstartcommand  \fIscript\fP\fR"
 .RS
 .PP
@@ -343,10 +357,9 @@ Specifies a Tcl command to associate with character data in
 the document, ie. text. The actual command consists of this option followed by
 one argument: the text.
 .PP
-It is not guaranteed that character data will be passed to the application
-in a single call to this command. That is, the application should be prepared
-to receive multiple invocations of this callback with no intervening callbacks
-from other features.
+Other than with the C API of the expat parser it is guaranteed that
+character data will be passed to the application in a single call to
+this command.
 .PP
 Example:
 
@@ -852,24 +865,36 @@ attributes list passed to the elementstartcommand.
 .PP
 Return the number of bytes in the current event.
 Returns 0 if the event is in an internal entity.
+.PP
+If you use this option consider if you may need the
+parser option \fI-keepTextStart\fR.
 .RE
 .IP "\fB-currentlinenumber\fR"
 .RS
 .PP
 Returns the line number of the current parse
 location.
+.PP
+If you use this option consider if you may need the
+parser option \fI-keepTextStart\fR.
 .RE
 .IP "\fB-currentcolumnnumber\fR"
 .RS
 .PP
-Returns the column number of the current parse
-location.
+Returns the column number of the current
+parse location.
+.PP
+If you use this option consider if you may need the
+parser option \fI-keepTextStart\fR.
 .RE
 .IP "\fB-currentbyteindex\fR"
 .RS
 .PP
 Returns the byte index of the current parse
 location.
+.PP
+If you use this option consider if you may need the
+parser option \fI-keepTextStart\fR.
 .RE
 .PP
 Only one value may be requested at a time.

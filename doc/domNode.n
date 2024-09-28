@@ -712,7 +712,7 @@ if given, is set to the empty string.
 \&\fRReturns the value of the attribute \fIattrName\fR.  Short cut
 for \fIgetAttribute\fR.
 .TP
-\&\fB\fBjsonType\fP \fI?OBJECT|ARRAY|NONE)|(STRING|NUMBER|TRUE|FALSE|NULL|NONE)?\fB
+\&\fB\fBjsonType\fP \fI?(OBJECT|ARRAY|NONE)|(STRING|NUMBER|TRUE|FALSE|NULL|NONE)?\fB
 \&\fROnly element and text nodes may have a JSON type and
 only this types of nodes support the \fIjsonType\fR method;
 the other node types return error if called with this method.
