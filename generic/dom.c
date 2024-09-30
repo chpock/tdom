@@ -2498,9 +2498,9 @@ domException2String (
 int
 domGetLineColumn (
     domNode *node,
-    long     *line,
-    long     *column,
-    long     *byteIndex
+    Tcl_WideInt *line,
+    Tcl_WideInt *column,
+    Tcl_WideInt *byteIndex
 )
 {
     char *v;

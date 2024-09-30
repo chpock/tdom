@@ -892,8 +892,8 @@ domNS *        domLookupURI     (domNode *node, char *uri);
 domNS *        domGetNamespaceByIndex (domDocument *doc, unsigned int nsIndex);
 domNS *        domNewNamespace (domDocument *doc, const char *prefix,
                                 const char *namespaceURI);
-int            domGetLineColumn (domNode *node, long *line, long *column,
-                                 long *byteIndex);
+int            domGetLineColumn (domNode *node, Tcl_WideInt *line,
+                                 Tcl_WideInt *column, Tcl_WideInt *byteIndex);
 
 int            domXPointerChild (domNode * node, int all, int instance, domNodeType type,
                                  char *element, char *attrName, char *attrValue,
