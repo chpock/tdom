@@ -5444,7 +5444,7 @@ static void
 tdom_charDataHandler (
     void        *userData,
     const char  *s,
-    int          len
+    domLength    len
 )
 {
     tdomCmdReadInfo *info = (tdomCmdReadInfo *) userData;
@@ -5547,7 +5547,6 @@ TclTdomObjCmd (
         handlerSet->elementstartcommand     = startElement;
         handlerSet->elementendcommand       = endElement;
         handlerSet->datacommand             = tdom_charDataHandler;
-/*         handlerSet->datacommand             = characterDataHandler; */
         handlerSet->commentCommand          = commentHandler;
         handlerSet->picommand               = processingInstructionHandler;
         handlerSet->entityDeclCommand       = entityDeclHandler;
