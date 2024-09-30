@@ -635,17 +635,17 @@ typedef struct _domActiveNS {
 \-------------------------------------------------------------------------*/
 typedef struct domLineColumn {
 
-    long  line;
-    long  column;
-    long  byteIndex;
+    Tcl_WideInt  line;
+    Tcl_WideInt  column;
+    Tcl_WideInt  byteIndex;
 
 } domLineColumn;
 
 typedef struct {
     int  errorCode;
-    long errorLine;
-    long errorColumn;
-    long byteIndex;
+    Tcl_WideInt errorLine;
+    Tcl_WideInt errorColumn;
+    Tcl_WideInt byteIndex;
 } domParseForestErrorData;
 
 

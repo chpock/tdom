@@ -2174,7 +2174,7 @@ void
 TncCharacterdataCommand (
     void       *userData,
     const char *data,
-    int         len
+    domLength   len
 )
 {
     TNC_Data *tncdata = (TNC_Data *) userData;
