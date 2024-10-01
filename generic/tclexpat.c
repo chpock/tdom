@@ -1124,11 +1124,13 @@ TclExpatParse (
       }
       else {
           Tcl_ResetResult(interp);
-          sprintf(s, "%ld", XML_GetCurrentLineNumber(expat->parser));
+          sprintf(s, "%" TCL_LL_MODIFIER "d",
+                  XML_GetCurrentLineNumber(expat->parser));
           Tcl_AppendResult(interp, "error \"",
                            XML_ErrorString(XML_GetErrorCode(expat->parser)),
                            "\" at line ", s, " character ", NULL);
-          sprintf(s, "%ld", XML_GetCurrentColumnNumber(expat->parser));
+          sprintf(s, "%" TCL_LL_MODIFIER "d",
+                  XML_GetCurrentColumnNumber(expat->parser));
           Tcl_AppendResult(interp, s, NULL);
       }
       if (bufObj) {
@@ -3766,12 +3768,14 @@ TclGenExpatExternalEntityRefHandler(
       Tcl_DecrRefCount (resultObj);
       if (!result) {
           Tcl_ResetResult (expat->interp);
-          sprintf(s, "%ld", XML_GetCurrentLineNumber(extparser));
+          sprintf(s, "%" TCL_LL_MODIFIER "d",
+                  XML_GetCurrentLineNumber(extparser));
           Tcl_AppendResult(expat->interp, "Not wellformed error \"",
                            XML_ErrorString(XML_GetErrorCode(extparser)),
                            "\" while parsing external entity: \n\t",
                            systemId, "\nat line ", s, " character ", NULL);
-          sprintf(s, "%ld", XML_GetCurrentColumnNumber(extparser));
+          sprintf(s, "%" TCL_LL_MODIFIER "d",
+                  XML_GetCurrentColumnNumber(extparser));
           Tcl_AppendResult(expat->interp, s, NULL);
           XML_ParserFree (extparser);
           expat->parser = oldparser;
