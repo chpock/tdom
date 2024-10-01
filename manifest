@@ -1,5 +1,5 @@
-C Attempt\sto\sclean\sup\sthe\sfall\sout\sof\sthe\srecent\stype\schanges.
-D 2024-10-01T22:58:53.889
+C Adapted\stest\sto\sthe\schanged\serror\smessage.
+D 2024-10-01T23:16:53.981
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -215,7 +215,7 @@ F tests/namespace.test 0a13b2bf59bb088525ca7b64d0b2bce6a349c627ca3dd1c17a4cc969d
 F tests/parser.test 87eed84aec743e2ac02959a7276cd715bb764c2f479f566a69fb243ff2d72f5e
 F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
 F tests/pi.test 22a24ce658e1c84b05b986c0b2e010c5a94076fe
-F tests/pullparser.test df079ff6a5a6b11b4d0f409ca3fc17cc4a5956d31801872f9f1f95e35032dec5
+F tests/pullparser.test 4ca2b332ec1eb31efb294b9e6556a58148a1d28a3c3d1cbb6800dc19f3887b79
 F tests/pushpull.bench 664e8f512917537d96c4b71933d4d9a6da65fc6fe85bd7c459483830dc7d2faf
 F tests/schema.test bc98d97f924b20ab3e120af65bef4030d79272c347d962f7092640c5a3c15813
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
@@ -242,8 +242,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a14d20c7c137035608796d2a5ca66bdce0b86e462c0e6f92349b874ceb99b74f
-R 9ec07b8db36cd623a0d02983469e57bb
+P 908f9bb47d158a9eba9750ea2c1c627d6aa91b63e919df759d297dd62ec960a5
+R 1f16669a067909fbdb6903cf9184305c
 U rolf
-Z 2c93b2d0a9be03563ab08decd574a666
+Z 584df7f3ef43dacf630be0b896fe2691
 # Remove this line to create a well-formed Fossil manifest.
