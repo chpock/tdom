@@ -542,7 +542,7 @@ reportError (
     Tcl_DString dStr;
     char buffer[1024];
     const char *baseURI;
-    long  line, column, byteIndex;
+    Tcl_WideInt line, column, byteIndex;
 
     Tcl_DStringInit (&dStr);
     baseURI = findBaseURI (node);
@@ -552,7 +552,8 @@ reportError (
     }
     if (node->nodeFlags & HAS_LINE_COLUMN) {
         domGetLineColumn (node, &line, &column, &byteIndex);
-        sprintf (buffer, " at line %ld, column %ld:\n", line, column);
+        sprintf (buffer, " at line %" TCL_LL_MODIFIER "d, column %"
+                 TCL_LL_MODIFIER "d:\n", line, column);
         Tcl_DStringAppend (&dStr, buffer, -1);
         Tcl_DStringAppend (&dStr, str, -1);
     } else {
@@ -5826,10 +5827,12 @@ getExternalDocument (
         str = Tcl_GetStringResult (interp);
         if (str[0] == '\0') {
             Tcl_DStringAppend (&dStr, "At line ", -1);
-            sprintf (s, "%ld", XML_GetCurrentLineNumber (parser));
+            sprintf (s, "%" TCL_LL_MODIFIER "d",
+                     XML_GetCurrentLineNumber (parser));
             Tcl_DStringAppend (&dStr, s, -1);
             Tcl_DStringAppend (&dStr, " character ", -1);
-            sprintf (s, "%ld", XML_GetCurrentColumnNumber (parser));
+            sprintf (s, "%" TCL_LL_MODIFIER "d",
+                     XML_GetCurrentColumnNumber (parser));
             Tcl_DStringAppend (&dStr, s, -1);
             Tcl_DStringAppend (&dStr, ": ", 2);
             Tcl_DStringAppend (&dStr, 

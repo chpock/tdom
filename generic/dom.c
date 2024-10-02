@@ -2149,11 +2149,13 @@ externalEntityRefHandler (
                     XML_ErrorString(XML_GetErrorCode(extparser))
                     );
             } else {
-                sprintf(s, "%ld", XML_GetCurrentLineNumber(extparser));
+                sprintf(s, "%" TCL_LL_MODIFIER "d",
+                        XML_GetCurrentLineNumber(extparser));
                 Tcl_AppendResult(info->interp, ", referenced in entity \"",
                                  systemId, 
                                  "\" at line ", s, " character ", NULL);
-                sprintf(s, "%ld", XML_GetCurrentColumnNumber(extparser));
+                sprintf(s, "%" TCL_LL_MODIFIER "d",
+                        XML_GetCurrentColumnNumber(extparser));
                 Tcl_AppendResult(info->interp, s, NULL);
             }
             keepresult = 1;
@@ -2174,20 +2176,23 @@ externalEntityRefHandler (
             switch (status) {
             case XML_STATUS_ERROR:
                 interpResult = Tcl_GetStringResult(info->interp);
-                sprintf(s, "%ld", XML_GetCurrentLineNumber(extparser));
+                sprintf(s, "%" TCL_LL_MODIFIER "d",
+                        XML_GetCurrentLineNumber(extparser));
                 if (interpResult[0] == '\0') {
                     Tcl_ResetResult (info->interp);
                     Tcl_AppendResult(info->interp, "error \"",
                                      XML_ErrorString(XML_GetErrorCode(extparser)),
                                      "\" in entity \"", systemId,
                                      "\" at line ", s, " character ", NULL);
-                    sprintf(s, "%ld", XML_GetCurrentColumnNumber(extparser));
+                    sprintf(s, "%" TCL_LL_MODIFIER "d",
+                            XML_GetCurrentColumnNumber(extparser));
                     Tcl_AppendResult(info->interp, s, NULL);
                 } else {
                     Tcl_AppendResult(info->interp, ", referenced in entity \"",
                                      systemId, 
                                      "\" at line ", s, " character ", NULL);
-                    sprintf(s, "%ld", XML_GetCurrentColumnNumber(extparser));
+                    sprintf(s, "%" TCL_LL_MODIFIER "d",
+                            XML_GetCurrentColumnNumber(extparser));
                     Tcl_AppendResult(info->interp, s, NULL);
                 }
                 result = 0;
@@ -2498,9 +2503,9 @@ domException2String (
 int
 domGetLineColumn (
     domNode *node,
-    long     *line,
-    long     *column,
-    long     *byteIndex
+    Tcl_WideInt *line,
+    Tcl_WideInt *column,
+    Tcl_WideInt *byteIndex
 )
 {
     char *v;

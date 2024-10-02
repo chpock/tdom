@@ -4893,7 +4893,7 @@ int tcldom_NodeObjCmd (
     const char  *localName, *uri, *nsStr;
     int          result, methodIndex, i;
     domLength    length;
-    long         line, column, byteIndex;
+    Tcl_WideInt  line, column, byteIndex;
     int          nsIndex, bool, hnew, legacy, jsonType;
     Tcl_Obj     *namePtr, *resultPtr;
     Tcl_Obj     *mobjv[MAX_REWRITE_ARGS], *storedErrMsg;
@@ -7554,11 +7554,15 @@ int tcldom_parse (
                    build the error msg as follows. */
                 tcldom_reportErrorLocation (
                     interp, 20, 40,
-                    (forest ? forestError.errorLine : XML_GetCurrentLineNumber(parser)),
-                    (forest ? forestError.errorColumn : XML_GetCurrentColumnNumber(parser)),
+                    (forest ? forestError.errorLine
+                     : XML_GetCurrentLineNumber(parser)),
+                    (forest ? forestError.errorColumn
+                     : XML_GetCurrentColumnNumber(parser)),
                     xml_string, NULL,
-                    (forest ? forestError.byteIndex : XML_GetCurrentByteIndex(parser)),
-                    XML_ErrorString((forest ? forestError.errorCode : XML_GetErrorCode(parser))));
+                    (forest ? forestError.byteIndex
+                     : XML_GetCurrentByteIndex(parser)),
+                    XML_ErrorString((forest ? forestError.errorCode
+                                     : XML_GetErrorCode(parser))));
             } else {
                 if (status == TCL_OK) {
                     /* For Tcl errors (in -externalentitycommand or
@@ -7569,10 +7573,12 @@ int tcldom_parse (
                      * error was in an external entity. Therefore, we
                      * just add the place of the referencing entity in
                      * the main document.*/
-                    sprintf(sl, "%ld", XML_GetCurrentLineNumber(parser));
+                    sprintf(sl, "%" TCL_LL_MODIFIER "d",
+                            XML_GetCurrentLineNumber(parser));
                     Tcl_AppendResult(interp, ", referenced at line ", sl,
                                      NULL);
-                    sprintf(sc, "%ld", XML_GetCurrentColumnNumber(parser));
+                    sprintf(sc, "%" TCL_LL_MODIFIER "d",
+                            XML_GetCurrentColumnNumber(parser));
                     Tcl_AppendResult(interp, " character ", sc, NULL);
                 }
             }

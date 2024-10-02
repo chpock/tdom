@@ -4202,7 +4202,7 @@ schemaInstanceInfoCmd (
     )
 {
     int methodIndex, expectedFlags;
-    long line, column, byteIndex;
+    Tcl_WideInt line, column, byteIndex;
     Tcl_HashEntry *h;
     SchemaCP *cp;
     SchemaValidationStack *se;
@@ -4632,8 +4632,8 @@ static void validateReportError (
     char sl[50], sc[50];
 
     resultObj = Tcl_NewObj ();
-    sprintf(sl, "%ld", XML_GetCurrentLineNumber(parser));
-    sprintf(sc, "%ld", XML_GetCurrentColumnNumber(parser));
+    sprintf(sl, "%" TCL_LL_MODIFIER "d", XML_GetCurrentLineNumber(parser));
+    sprintf(sc, "%" TCL_LL_MODIFIER "d", XML_GetCurrentColumnNumber(parser));
     if (sdata->validationState == VALIDATION_ERROR) {
         Tcl_AppendStringsToObj (resultObj, "error \"",
                                 Tcl_GetStringResult (interp),
@@ -4798,11 +4798,13 @@ externalEntityRefHandler (
                     systemId, XML_GetCurrentByteIndex(extparser),
                     XML_ErrorString(XML_GetErrorCode(extparser)));
             } else {
-                sprintf(s, "%ld", XML_GetCurrentLineNumber(extparser));
+                sprintf(s, "%" TCL_LL_MODIFIER "d",
+                        XML_GetCurrentLineNumber(extparser));
                 Tcl_AppendResult(vdata->interp, ", referenced in entity \"",
                                  systemId, 
                                  "\" at line ", s, " character ", NULL);
-                sprintf(s, "%ld", XML_GetCurrentColumnNumber(extparser));
+                sprintf(s, "%" TCL_LL_MODIFIER "d",
+                        XML_GetCurrentColumnNumber(extparser));
                 Tcl_AppendResult(vdata->interp, s, NULL);
             }
             keepresult = 1;
@@ -4823,20 +4825,26 @@ externalEntityRefHandler (
             switch (status) {
             case XML_STATUS_ERROR:
                 interpResult = Tcl_GetStringResult(vdata->interp);
-                sprintf(s, "%ld", XML_GetCurrentLineNumber(extparser));
+                sprintf(s, "%" TCL_LL_MODIFIER "d",
+                        XML_GetCurrentLineNumber(extparser));
                 if (interpResult[0] == '\0') {
                     Tcl_ResetResult (vdata->interp);
-                    Tcl_AppendResult(vdata->interp, "error \"",
-                                     XML_ErrorString(XML_GetErrorCode(extparser)),
-                                     "\" in entity \"", systemId,
-                                     "\" at line ", s, " character ", NULL);
-                    sprintf(s, "%ld", XML_GetCurrentColumnNumber(extparser));
+                    Tcl_AppendResult(
+                        vdata->interp, "error \"",
+                        XML_ErrorString(XML_GetErrorCode(extparser)),
+                        "\" in entity \"", systemId, "\" at line ", s,
+                        " character ", NULL
+                        );
+                    sprintf(s, "%" TCL_LL_MODIFIER "d",
+                            XML_GetCurrentColumnNumber(extparser));
                     Tcl_AppendResult(vdata->interp, s, NULL);
                 } else {
-                    Tcl_AppendResult(vdata->interp, ", referenced in entity \"",
-                                     systemId, 
-                                     "\" at line ", s, " character ", NULL);
-                    sprintf(s, "%ld", XML_GetCurrentColumnNumber(extparser));
+                    Tcl_AppendResult(
+                        vdata->interp, ", referenced in entity \"", systemId,
+                        "\" at line ", s, " character ", NULL
+                        );
+                    sprintf(s, "%" TCL_LL_MODIFIER "d",
+                            XML_GetCurrentColumnNumber(extparser));
                     Tcl_AppendResult(vdata->interp, s, NULL);
                 }
                 result = 0;

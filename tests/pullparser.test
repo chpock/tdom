@@ -481,7 +481,7 @@ test pp-3.7 {skip} {
     lappend result $errMsg
     pp delete
     set result
-} {START_TAG TEXT START_TAG e END_TAG e START_TAG e 1 {error "mismatched tag" at line 1 character 24}}
+} {START_TAG TEXT START_TAG e END_TAG e START_TAG e 1 {error "mismatched tag" at line 1 column 24}}
 
 test pp-3.8 {skip} {
     tdom::pullparser pp
