@@ -243,7 +243,14 @@ TDOM_ENABLE_DTD
 #TDOM_CONTEXT_BYTES
 AC_DEFINE(XML_CONTEXT_BYTES, 0)
 AC_DEFINE(XML_GE, 1)
-#AC_DEFINE(XML_LARGE_SIZE, 1)
+# This try to detect if we build with mingw 64-bit
+if test "${TEA_PLATFORM}" = "windows" ; then
+    case `gcc -v` in
+        *x86_64*)
+            AC_DEFINE(XML_LARGE_SIZE, 1)
+            ;;
+    esac
+fi
 TDOM_ENABLE_NS
 TDOM_ENABLE_UNKNOWN
 TDOM_ENABLE_TDOMALLOC
