@@ -2149,12 +2149,12 @@ externalEntityRefHandler (
                     XML_ErrorString(XML_GetErrorCode(extparser))
                     );
             } else {
-                sprintf(s, "%" TCL_LL_MODIFIER "d",
+                sprintf(s, "%" TDOM_LS_MODIFIER "d",
                         XML_GetCurrentLineNumber(extparser));
                 Tcl_AppendResult(info->interp, ", referenced in entity \"",
                                  systemId, 
                                  "\" at line ", s, " character ", NULL);
-                sprintf(s, "%" TCL_LL_MODIFIER "d",
+                sprintf(s, "%" TDOM_LS_MODIFIER "d",
                         XML_GetCurrentColumnNumber(extparser));
                 Tcl_AppendResult(info->interp, s, NULL);
             }
@@ -2176,7 +2176,7 @@ externalEntityRefHandler (
             switch (status) {
             case XML_STATUS_ERROR:
                 interpResult = Tcl_GetStringResult(info->interp);
-                sprintf(s, "%" TCL_LL_MODIFIER "d",
+                sprintf(s, "%" TDOM_LS_MODIFIER "d",
                         XML_GetCurrentLineNumber(extparser));
                 if (interpResult[0] == '\0') {
                     Tcl_ResetResult (info->interp);
@@ -2184,14 +2184,14 @@ externalEntityRefHandler (
                                      XML_ErrorString(XML_GetErrorCode(extparser)),
                                      "\" in entity \"", systemId,
                                      "\" at line ", s, " character ", NULL);
-                    sprintf(s, "%" TCL_LL_MODIFIER "d",
+                    sprintf(s, "%" TDOM_LS_MODIFIER "d",
                             XML_GetCurrentColumnNumber(extparser));
                     Tcl_AppendResult(info->interp, s, NULL);
                 } else {
                     Tcl_AppendResult(info->interp, ", referenced in entity \"",
                                      systemId, 
                                      "\" at line ", s, " character ", NULL);
-                    sprintf(s, "%" TCL_LL_MODIFIER "d",
+                    sprintf(s, "%" TDOM_LS_MODIFIER "d",
                             XML_GetCurrentColumnNumber(extparser));
                     Tcl_AppendResult(info->interp, s, NULL);
                 }

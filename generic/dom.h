@@ -111,6 +111,14 @@
 #  define Tcl_GetSizeIntFromObj Tcl_GetIntFromObj
 #endif
 
+#ifndef TDOM_LS_MODIFIER
+#  if defined(_WIN32) && defined(XML_LARGE_SIZE)
+#    define TDOM_LS_MODIFIER TCL_LL_MODIFIER
+#  else
+#    define TDOM_LS_MODIFIER "l"
+#  endif
+#endif
+
 /* Since the len argument of XML_Parse() is of type int, parsing of
  * strings has to be done in chunks anyway for Tcl 9 with its strings
  * potentially longer than 2 GByte. Because of internal changes in

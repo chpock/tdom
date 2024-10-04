@@ -7573,11 +7573,11 @@ int tcldom_parse (
                      * error was in an external entity. Therefore, we
                      * just add the place of the referencing entity in
                      * the main document.*/
-                    sprintf(sl, "%" TCL_LL_MODIFIER "d",
+                    sprintf(sl, "%" TDOM_LS_MODIFIER "d",
                             XML_GetCurrentLineNumber(parser));
                     Tcl_AppendResult(interp, ", referenced at line ", sl,
                                      NULL);
-                    sprintf(sc, "%" TCL_LL_MODIFIER "d",
+                    sprintf(sc, "%" TDOM_LS_MODIFIER "d",
                             XML_GetCurrentColumnNumber(parser));
                     Tcl_AppendResult(interp, " character ", sc, NULL);
                 }
