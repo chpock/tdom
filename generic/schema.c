@@ -4632,8 +4632,8 @@ static void validateReportError (
     char sl[50], sc[50];
 
     resultObj = Tcl_NewObj ();
-    sprintf(sl, "%" TCL_LL_MODIFIER "d", XML_GetCurrentLineNumber(parser));
-    sprintf(sc, "%" TCL_LL_MODIFIER "d", XML_GetCurrentColumnNumber(parser));
+    sprintf(sl, "%" TDOM_LS_MODIFIER "d", XML_GetCurrentLineNumber(parser));
+    sprintf(sc, "%" TDOM_LS_MODIFIER "d", XML_GetCurrentColumnNumber(parser));
     if (sdata->validationState == VALIDATION_ERROR) {
         Tcl_AppendStringsToObj (resultObj, "error \"",
                                 Tcl_GetStringResult (interp),
@@ -4798,12 +4798,12 @@ externalEntityRefHandler (
                     systemId, XML_GetCurrentByteIndex(extparser),
                     XML_ErrorString(XML_GetErrorCode(extparser)));
             } else {
-                sprintf(s, "%" TCL_LL_MODIFIER "d",
+                sprintf(s, "%" TDOM_LS_MODIFIER "d",
                         XML_GetCurrentLineNumber(extparser));
                 Tcl_AppendResult(vdata->interp, ", referenced in entity \"",
                                  systemId, 
                                  "\" at line ", s, " character ", NULL);
-                sprintf(s, "%" TCL_LL_MODIFIER "d",
+                sprintf(s, "%" TDOM_LS_MODIFIER "d",
                         XML_GetCurrentColumnNumber(extparser));
                 Tcl_AppendResult(vdata->interp, s, NULL);
             }
@@ -4825,7 +4825,7 @@ externalEntityRefHandler (
             switch (status) {
             case XML_STATUS_ERROR:
                 interpResult = Tcl_GetStringResult(vdata->interp);
-                sprintf(s, "%" TCL_LL_MODIFIER "d",
+                sprintf(s, "%" TDOM_LS_MODIFIER "d",
                         XML_GetCurrentLineNumber(extparser));
                 if (interpResult[0] == '\0') {
                     Tcl_ResetResult (vdata->interp);
@@ -4835,7 +4835,7 @@ externalEntityRefHandler (
                         "\" in entity \"", systemId, "\" at line ", s,
                         " character ", NULL
                         );
-                    sprintf(s, "%" TCL_LL_MODIFIER "d",
+                    sprintf(s, "%" TDOM_LS_MODIFIER "d",
                             XML_GetCurrentColumnNumber(extparser));
                     Tcl_AppendResult(vdata->interp, s, NULL);
                 } else {
@@ -4843,7 +4843,7 @@ externalEntityRefHandler (
                         vdata->interp, ", referenced in entity \"", systemId,
                         "\" at line ", s, " character ", NULL
                         );
-                    sprintf(s, "%" TCL_LL_MODIFIER "d",
+                    sprintf(s, "%" TDOM_LS_MODIFIER "d",
                             XML_GetCurrentColumnNumber(extparser));
                     Tcl_AppendResult(vdata->interp, s, NULL);
                 }
