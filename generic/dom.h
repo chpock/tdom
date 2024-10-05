@@ -35,6 +35,7 @@
 
 #include <tcl.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 #include <ctype.h>
 #include <expat.h>
@@ -181,11 +182,7 @@
 # define TDomThreaded(x)    x
 # define HASHTAB(doc,tab)   (doc)->tab
 # define NODE_NO(doc)       ((doc)->nodeCounter)++
-# ifdef _WIN32
-#  define DOC_NO(doc)        (unsigned long long)(doc)
-# else
-#  define DOC_NO(doc)        (unsigned long)(doc)
-# endif
+# define DOC_NO(doc)         (uintptr_t)(doc)
 #endif /* TCL_THREADS */
 
 #define DOC_CMD(s,doc)      sprintf((s), "domDoc%p", (void *)(doc))
@@ -552,11 +549,7 @@ typedef struct domDocument {
     domNodeType       nodeType  : 8;
     domDocFlags       nodeFlags : 8;
     domNameSpaceIndex dummy     : 16;
-#ifdef _WIN32
-    unsigned long long documentNumber;
-#else
-    unsigned long     documentNumber;
-#endif
+    uintptr_t         documentNumber;
     struct domNode   *documentElement;
     struct domNode   *fragments;
 #ifdef TCL_THREADS

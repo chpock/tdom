@@ -1,5 +1,5 @@
-C wip
-D 2024-10-05T01:17:00.662
+C Do\sthis\sdetail\sas\sit\sshould\sbe\salthough\sthis\sprobably\smeans\sthat\snow\sa\sC99\scompiler\sis\sneeded.
+D 2024-10-05T14:41:52.335
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -129,7 +129,7 @@ F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
 F generic/datatypes.c 7c9f9edb50b4592b2317dfde3db6feaa342e80f1322aee4b747eb98c486d959b
 F generic/datatypes.h 3e41d07bcf50cf6959b6e14416dfcb0d7b5aafc65683322978ec185c2a259332
 F generic/dom.c 1e16280525133bb1e443f66c441fd788a8081bbbc4b230164619cad4731dfdef
-F generic/dom.h 5797be73772daa8762ba4c0bc14b1c63b620297988acabc5e82392ca672ea31d
+F generic/dom.h c7e50ee751e4671e78708589d06d84cce0c9b699241b9dfd88377ae89f196bf3
 F generic/domalloc.c ce41b8a16e855ee3a3db1d4b797f835a77f1f9260f24db4cb7dc73a07ee4670b
 F generic/domalloc.h 961f83bb46dec27dbcf36ed430ed81b1f485a1fdfaa2f7df8b60bbcf861d0fe3
 F generic/domhtml.c 6f93ccbe36aaa78ce013d8c244a1810e33f2a755cd04fe3847e348d2d8df4048
@@ -242,8 +242,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 838a1568fac894904a281b509e31e57ff3217087f9ba0341c2bed3cf26288be0
-R de7507835a13504e457a107030168e04
+P 59660aa0959a279092f688542e553c3254382fd2080e764b5bae110f7442d82c
+R 4bf1dfe6a99f07a00e1112bb9bb901d4
 U rolf
-Z a723cd760bdf2601ee942179145c7d91
+Z fd2f76d9c72369ba8799822f1106e232
 # Remove this line to create a well-formed Fossil manifest.
