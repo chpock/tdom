@@ -552,8 +552,8 @@ reportError (
     }
     if (node->nodeFlags & HAS_LINE_COLUMN) {
         domGetLineColumn (node, &line, &column, &byteIndex);
-        sprintf (buffer, " at line %" TCL_LL_MODIFIER "d, column %"
-                 TCL_LL_MODIFIER "d:\n", line, column);
+        sprintf (buffer, " at line %" TDOM_LS_MODIFIER "d, column %"
+                 TDOM_LS_MODIFIER "d:\n", line, column);
         Tcl_DStringAppend (&dStr, buffer, -1);
         Tcl_DStringAppend (&dStr, str, -1);
     } else {
