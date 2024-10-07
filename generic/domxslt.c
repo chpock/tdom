@@ -542,7 +542,8 @@ reportError (
     Tcl_DString dStr;
     char buffer[1024];
     const char *baseURI;
-    Tcl_WideInt line, column, byteIndex;
+    XML_Size line, column;
+    XML_Index byteIndex;
 
     Tcl_DStringInit (&dStr);
     baseURI = findBaseURI (node);

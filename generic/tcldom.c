@@ -4893,7 +4893,8 @@ int tcldom_NodeObjCmd (
     const char  *localName, *uri, *nsStr;
     int          result, methodIndex, i;
     domLength    length;
-    Tcl_WideInt  line, column, byteIndex;
+    XML_Size     line, column;
+    XML_Index    byteIndex;
     int          nsIndex, bool, hnew, legacy, jsonType;
     Tcl_Obj     *namePtr, *resultPtr;
     Tcl_Obj     *mobjv[MAX_REWRITE_ARGS], *storedErrMsg;

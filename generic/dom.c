@@ -2503,9 +2503,9 @@ domException2String (
 int
 domGetLineColumn (
     domNode *node,
-    Tcl_WideInt *line,
-    Tcl_WideInt *column,
-    Tcl_WideInt *byteIndex
+    XML_Size *line,
+    XML_Size *column,
+    XML_Index *byteIndex
 )
 {
     char *v;

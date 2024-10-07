@@ -59,12 +59,6 @@ PRJ_DEFINES = \
 # define WIN32 ourselves
 PRJ_DEFINES = $(PRJ_DEFINES) -DWIN32
 
-!if $(TCL_MAJOR_VERSION) == 9
-	!if "$(MACHINE)" == "AMD64"
-		PRJ_DEFINES = $(PRJ_DEFINES) -DXML_LARGE_SIZE=1
-	!endif
-!endif
-
 PRJ_INCLUDES	= -I"$(EXPATDIR)" -I"$(TMP_DIR)"
 
 !if "$(GUMBODIR)" != ""

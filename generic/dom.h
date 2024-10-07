@@ -113,11 +113,7 @@
 #endif
 
 #ifndef TDOM_LS_MODIFIER
-#  if defined(_WIN32) && defined(XML_LARGE_SIZE)
-#    define TDOM_LS_MODIFIER TCL_LL_MODIFIER
-#  else
-#    define TDOM_LS_MODIFIER "l"
-#  endif
+#  define TDOM_LS_MODIFIER "ll"
 #endif
 
 /* Since the len argument of XML_Parse() is of type int, parsing of
@@ -893,8 +889,8 @@ domNS *        domLookupURI     (domNode *node, char *uri);
 domNS *        domGetNamespaceByIndex (domDocument *doc, unsigned int nsIndex);
 domNS *        domNewNamespace (domDocument *doc, const char *prefix,
                                 const char *namespaceURI);
-int            domGetLineColumn (domNode *node, Tcl_WideInt *line,
-                                 Tcl_WideInt *column, Tcl_WideInt *byteIndex);
+int            domGetLineColumn (domNode *node, XML_Size *line,
+                                 XML_Size *column, XML_Index *byteIndex);
 
 int            domXPointerChild (domNode * node, int all, int instance, domNodeType type,
                                  char *element, char *attrName, char *attrValue,
