@@ -3927,7 +3927,7 @@ getNextExpectedWorker (
                     if (mayskip) break;
                 }
                 if (probeMayskip) break;
-                Tcl_CreateHashEntry (seenCPs, ic, &hnew);
+                Tcl_CreateHashEntry (seenCPs, (char *)ic, &hnew);
                 if (hnew) {
                     se1 = getStackElement (sdata, ic);
                     mayskip = getNextExpectedWorker (sdata, se1, interp,
@@ -4016,7 +4016,7 @@ getNextExpectedWorker (
                         }
                         /* fall through */
                     case SCHEMA_CTYPE_INTERLEAVE:
-                        Tcl_CreateHashEntry (seenCPs, jc, &hnew);
+                        Tcl_CreateHashEntry (seenCPs, (char *)jc, &hnew);
                         if (hnew) {
                             se1 = getStackElement (sdata, jc);
                             mayskip = getNextExpectedWorker (

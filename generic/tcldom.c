@@ -220,7 +220,7 @@ typedef struct XsltMsgCBInfo {
 static void UpdateStringOfTdomNode(Tcl_Obj *objPtr);
 static int  SetTdomNodeFromAny(Tcl_Interp *interp, Tcl_Obj *objPtr);
 
-const Tcl_ObjType tdomNodeType = {
+Tcl_ObjType tdomNodeType = {
     "tdom-node",
     NULL,
     NULL,
