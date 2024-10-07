@@ -5332,7 +5332,7 @@ typedef struct _tdomCmdReadInfo {
     int               ignorexmlns;
     int               feedbackAfter;
     Tcl_Obj          *feedbackCmd;
-    int               nextFeedbackPosition;
+    XML_Index         nextFeedbackPosition;
     Tcl_Interp       *interp;
     int               activeNSsize;
     int               activeNSpos;
