@@ -1,5 +1,5 @@
-C More\stweaks\sto\ssilence\scompiler\swarnings.
-D 2024-10-07T13:23:50.596
+C And\sagain\smore\stweaks\sto\ssilence\scompiler\swarnings.
+D 2024-10-07T13:26:12.692
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -146,7 +146,7 @@ F generic/domxslt.h aeaf957ee38a9e7564bd9f1bed1781de108767df476a0d0776615988d8f0
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 5bc75cdc1796459a943d397a15c8d52170cc38cb9e3452af9cfb8f12a6d9ef68
 F generic/nodecmd.h 36056ca2c262cb1991cabef8d27992ad628db718d09ff0eeaeaffd150f1549ec
-F generic/schema.c 2b53b49500764201c0614f3f86f2f3eda886856175fba6238d8be242ffddf252
+F generic/schema.c cd76242e82263741d6d1c98580c32fd7b9c0ae2a645c6dd0c4849066dbb23eed
 F generic/schema.h 5e20a348c3f98724e9c118760c8d9fcd661ae8f27d21652d90ab49492d001c75
 F generic/tcldom.c de8133c0df1d64162511e2349907e542b8d327b3b2ee25d2172aea9190064ca9
 F generic/tcldom.h b723e7ceeac1954c26469ec43a7f67de5368f0bb03c7e9fdea0da220b2b8d60c
@@ -242,8 +242,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 29beb92f07a73dfac6f6f4b743a5233eeb5f041f4529a9b4b75215373130ebfc
-R 3668545018d4695aa16cc5d92b2a189a
+P 69f821599b0ab157e06d3dc9099fcbdf12aabb8e5d4aad3762e7775edc187fa9
+R f08418e2d790058fd4b4f7213dcc3bcc
 U rolf
-Z 647e79d828a843ce9f77a77a2a9dd086
+Z 4908763e47e655ad4b02503cf472d6a4
 # Remove this line to create a well-formed Fossil manifest.

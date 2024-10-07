@@ -4202,7 +4202,8 @@ schemaInstanceInfoCmd (
     )
 {
     int methodIndex, expectedFlags;
-    Tcl_WideInt line, column, byteIndex;
+    XML_Size line, column;
+    XML_Index byteIndex;
     Tcl_HashEntry *h;
     SchemaCP *cp;
     SchemaValidationStack *se;
