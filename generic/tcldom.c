@@ -6920,11 +6920,11 @@ void tcldom_reportErrorLocation (
     Tcl_Interp *interp,
     int before,
     int after,
-    domLength line,
-    domLength column,
+    XML_Size line,
+    XML_Size column,
     char *xmlstring,
     const char *entity,
-    domLength byteIndex,
+    XML_Index byteIndex,
     const char *errStr
     )
 {
@@ -6944,12 +6944,12 @@ void tcldom_reportErrorLocation (
         Tcl_AppendResult (interp, " in entity \"", entity, "\"", NULL);
     }
     if (line) {
-        sprintf(sl, "%" TCL_SIZE_MODIFIER "d", line);
-        sprintf(sc, domLengthConversion, column);
+        sprintf(sl, "%" TDOM_LS_MODIFIER "d", line);
+        sprintf(sc, "%" TDOM_LS_MODIFIER "d", column);
         Tcl_AppendResult (interp, " at line ", sl, " character ", sc, NULL);
         
     } else {
-        sprintf(sb, domLengthConversion, byteIndex);
+        sprintf(sb, "%" TDOM_LS_MODIFIER "d", byteIndex);
         Tcl_AppendResult (interp, " at position ", sb, NULL);
     }
     if (xmlstring) {
