@@ -713,42 +713,6 @@ AC_DEFUN(TDOM_LOAD_CONFIG, [
     AC_SUBST(TDOM_SRC_DIR)
 ])
 
-#------------------------------------------------------------------------
-# TDOM_EXPORT_CONFIG --
-#
-#	Define the data to insert into the ${PACKAGE_NAME}Config.sh file
-#
-# Arguments:
-#	None
-#
-# Results:
-#	Subst the following vars:
-#
-#------------------------------------------------------------------------
-
-AC_DEFUN(TDOM_EXPORT_CONFIG, [
-    #--------------------------------------------------------------------
-    # These are for ${PACKAGE_NAME}Config.sh
-    #--------------------------------------------------------------------
-
-    # pkglibdir must be a fully qualified path and (not ${exec_prefix}/lib)
-    eval pkglibdir="[$]{libdir}/${PACKAGE_NAME}${PACKAGE_VERSION}"
-    if test "${TCL_LIB_VERSIONS_OK}" = "ok"; then
-	eval PKG_STUB_LIB_FLAG="-l${PACKAGE_NAME}stub${PACKAGE_VERSION}"
-    else
-	eval PKG_STUB_LIB_FLAG="-l${PACKAGE_NAME}stub`echo ${PACKAGE_VERSION} | tr -d .`"
-    fi
-    PKG_BUILD_STUB_LIB_SPEC="-L`pwd` ${PKG_STUB_LIB_FLAG}"
-    PKG_STUB_LIB_SPEC="-L${pkglibdir} ${PKG_STUB_LIB_FLAG}"
-    PKG_BUILD_STUB_LIB_PATH="`pwd`/[$]{PKG_STUB_LIB_FILE}"
-    PKG_STUB_LIB_PATH="${pkglibdir}/[$]{PKG_STUB_LIB_FILE}"
-
-    AC_SUBST(PKG_BUILD_STUB_LIB_SPEC)
-    AC_SUBST(PKG_STUB_LIB_SPEC)
-    AC_SUBST(PKG_BUILD_STUB_LIB_PATH)
-    AC_SUBST(PKG_STUB_LIB_PATH)
-])
-
 # Local Variables:
 # mode: autoconf
 # End:

@@ -35,6 +35,7 @@
 
 #include <tcl.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 #include <ctype.h>
 #include <expat.h>
@@ -111,6 +112,14 @@
 #  define Tcl_GetSizeIntFromObj Tcl_GetIntFromObj
 #endif
 
+#ifndef TDOM_LS_MODIFIER
+#  ifdef _WIN32
+#    define TDOM_LS_MODIFIER "I64"
+#  else 
+#    define TDOM_LS_MODIFIER "ll"
+#  endif
+#endif
+
 /* Since the len argument of XML_Parse() is of type int, parsing of
  * strings has to be done in chunks anyway for Tcl 9 with its strings
  * potentially longer than 2 GByte. Because of internal changes in
@@ -173,11 +182,7 @@
 # define TDomThreaded(x)    x
 # define HASHTAB(doc,tab)   (doc)->tab
 # define NODE_NO(doc)       ((doc)->nodeCounter)++
-# ifdef _WIN32
-#  define DOC_NO(doc)        (unsigned long long)(doc)
-# else
-#  define DOC_NO(doc)        (unsigned long)(doc)
-# endif
+# define DOC_NO(doc)         (uintptr_t)(doc)
 #endif /* TCL_THREADS */
 
 #define DOC_CMD(s,doc)      sprintf((s), "domDoc%p", (void *)(doc))
@@ -544,11 +549,7 @@ typedef struct domDocument {
     domNodeType       nodeType  : 8;
     domDocFlags       nodeFlags : 8;
     domNameSpaceIndex dummy     : 16;
-#ifdef _WIN32
-    unsigned long long documentNumber;
-#else
-    unsigned long     documentNumber;
-#endif
+    uintptr_t         documentNumber;
     struct domNode   *documentElement;
     struct domNode   *fragments;
 #ifdef TCL_THREADS
@@ -635,17 +636,17 @@ typedef struct _domActiveNS {
 \-------------------------------------------------------------------------*/
 typedef struct domLineColumn {
 
-    Tcl_WideInt  line;
-    Tcl_WideInt  column;
-    Tcl_WideInt  byteIndex;
+    XML_Size  line;
+    XML_Size  column;
+    XML_Index  byteIndex;
 
 } domLineColumn;
 
 typedef struct {
     int  errorCode;
-    Tcl_WideInt errorLine;
-    Tcl_WideInt errorColumn;
-    Tcl_WideInt byteIndex;
+    XML_Size errorLine;
+    XML_Size errorColumn;
+    XML_Index byteIndex;
 } domParseForestErrorData;
 
 
@@ -892,8 +893,8 @@ domNS *        domLookupURI     (domNode *node, char *uri);
 domNS *        domGetNamespaceByIndex (domDocument *doc, unsigned int nsIndex);
 domNS *        domNewNamespace (domDocument *doc, const char *prefix,
                                 const char *namespaceURI);
-int            domGetLineColumn (domNode *node, Tcl_WideInt *line,
-                                 Tcl_WideInt *column, Tcl_WideInt *byteIndex);
+int            domGetLineColumn (domNode *node, XML_Size *line,
+                                 XML_Size *column, XML_Index *byteIndex);
 
 int            domXPointerChild (domNode * node, int all, int instance, domNodeType type,
                                  char *element, char *attrName, char *attrValue,

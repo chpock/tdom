@@ -421,7 +421,7 @@ void rsSetString ( xpathResultSet *rs, const char *s) {
     rs->type = StringResult;
     if (s) {
         rs->string     = tdomstrdup(s);
-        rs->string_len = strlen(s);
+        rs->string_len = (domLength)strlen(s);
     } else {
         rs->string     = tdomstrdup("");
         rs->string_len = 0;
@@ -2796,7 +2796,7 @@ char * xpathFuncString (
             }
             sprintf(tmp, "%g", rs->realvalue);
             /* strip trailing 0 and . */
-            len = strlen(tmp);
+            len = (domLength)strlen(tmp);
             for (; (len > 0) && (tmp[len-1] == '0'); len--) tmp[len-1] = '\0';
             if ((len > 0) && (tmp[len-1] == '.'))   tmp[len-1] = '\0';
             return (tdomstrdup(tmp));
@@ -3387,7 +3387,7 @@ xpathEvalFunction (
             }
         } else {
             /* starts-with */
-            i = strlen(rightStr);
+            i = (domLength)strlen(rightStr);
             if(strncmp(leftStr, rightStr, i)==0) {
                 rsSetBool (result, 1);
             } else {
@@ -3423,7 +3423,7 @@ xpathEvalFunction (
             leftStr  = xpathFuncString( &leftResult  );
             pto = (char*)REALLOC(pto, 1+len+strlen(leftStr));
             memmove(pto + len, leftStr, strlen(leftStr));
-            len += strlen(leftStr);
+            len += (domLength)strlen(leftStr);
             *(pto + len) = '\0';
             xpathRSFree( &leftResult );
             FREE(leftStr);
@@ -5998,7 +5998,7 @@ static void nodeToXPath (
     default:
         break;
     }
-    len = strlen(step);
+    len = (domLength)strlen(step);
     if ( (len + *xpathLen) > *xpathAllocated ) {
         *xpathAllocated = *xpathAllocated * 2;
         *xpath = REALLOC(*xpath, *xpathAllocated + 1);

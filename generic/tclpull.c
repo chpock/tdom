@@ -376,13 +376,13 @@ tDOM_ReportXMLError (
     char s[255];
 
     Tcl_ResetResult (interp);
-    sprintf(s, "%" TCL_LL_MODIFIER "d",
+    sprintf(s, "%" TDOM_LS_MODIFIER "d",
             XML_GetCurrentLineNumber(pullInfo->parser));
     Tcl_AppendResult(interp, "error \"",
                      XML_ErrorString(
                          XML_GetErrorCode(pullInfo->parser)),
                      "\" at line ", s, " column ", NULL);
-    sprintf(s, "%" TCL_LL_MODIFIER "d",
+    sprintf(s, "%" TDOM_LS_MODIFIER "d",
             XML_GetCurrentColumnNumber(pullInfo->parser));
     Tcl_AppendResult(interp, s, NULL);
 }

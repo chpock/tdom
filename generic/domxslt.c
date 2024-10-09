@@ -542,7 +542,8 @@ reportError (
     Tcl_DString dStr;
     char buffer[1024];
     const char *baseURI;
-    Tcl_WideInt line, column, byteIndex;
+    XML_Size line, column;
+    XML_Index byteIndex;
 
     Tcl_DStringInit (&dStr);
     baseURI = findBaseURI (node);
@@ -552,8 +553,8 @@ reportError (
     }
     if (node->nodeFlags & HAS_LINE_COLUMN) {
         domGetLineColumn (node, &line, &column, &byteIndex);
-        sprintf (buffer, " at line %" TCL_LL_MODIFIER "d, column %"
-                 TCL_LL_MODIFIER "d:\n", line, column);
+        sprintf (buffer, " at line %" TDOM_LS_MODIFIER "d, column %"
+                 TDOM_LS_MODIFIER "d:\n", line, column);
         Tcl_DStringAppend (&dStr, buffer, -1);
         Tcl_DStringAppend (&dStr, str, -1);
     } else {
@@ -952,12 +953,12 @@ static void formatValue (
     switch (f->tokens[*useFormatToken].type) {
     case latin_number:
         sprintf (tmp, "%" TCL_SIZE_MODIFIER "d", value);
-        fulllen = len = strlen (tmp);
+        fulllen = len = (domLength)strlen (tmp);
         if (f->tokens[*useFormatToken].minlength > fulllen) {
             fulllen = f->tokens[*useFormatToken].minlength;
         }
         if (groupingSeparator) {
-            gslen = strlen (groupingSeparator);
+            gslen = (domLength)strlen (groupingSeparator);
             Tcl_DStringInit (&tmp1);
             if (len < f->tokens[*useFormatToken].minlength) {
                 for (i = 0; i <  f->tokens[*useFormatToken].minlength - len; i++) {
@@ -1072,7 +1073,7 @@ static void formatValue (
         sprintf (tmp, "%" TCL_SIZE_MODIFIER "d", value);
         break;
     }
-    len = strlen (tmp);
+    len = (domLength)strlen (tmp);
     Tcl_DStringAppend (str, tmp, len);
  appendSeperator:
     if (addSeparater) {
@@ -1392,7 +1393,7 @@ static int xsltFormatNumber (
     /* fill in grouping char */
     if (gLen > 0) {
         sprintf(stmp,"%0*d", nZero, i);
-        l = strlen (stmp);
+        l = (domLength)strlen (stmp);
         for (j = 0; j < l; j++) {
             t = df->zeroDigit + stmp[j] - 48;
             Tcl_DStringAppend (&s, (char*)&t, sizeof (Tcl_UniChar));
@@ -1437,7 +1438,7 @@ static int xsltFormatNumber (
         )
     } else {
         sprintf(stmp,"%0*d", nZero, i);
-        l = strlen (stmp);
+        l = (domLength)strlen (stmp);
         for (j = 0; j < l; j++) {
             n[j] = df->zeroDigit + (int) stmp[j] - 48;
         }
@@ -1452,7 +1453,7 @@ static int xsltFormatNumber (
     DBG(fprintf(stderr, "number=%f fHash=%d fZero=%d \n", number, fHash, 
                 fZero);)
     if ((fHash+fZero) > 0) {
-        l = strlen(ftmp);
+        l = (domLength)strlen(ftmp);
         while (l>0 && fHash>0) {   /* strip not need 0's */
             if (ftmp[l-1] == '0') {
                 ftmp[l-1]='\0'; l--; fHash--;
@@ -1518,7 +1519,7 @@ static int xsltFormatNumber (
     *resultStr = tdomstrdup(tstr);
     Tcl_DStringFree (&dStr);
     Tcl_DStringFree (&s);
-    *resultLen = strlen(*resultStr);
+    *resultLen = (domLength)strlen(*resultStr);
     return 0;
 
  xsltFormatNumberError:
@@ -4422,7 +4423,7 @@ static int ExecAction (
             } else {
                 str = xpathFuncString( &rs );
                 TRACE1("copyOf: xpathString='%s' \n", str);
-                domAppendNewTextNode(xs->lastNode, str, strlen(str),
+                domAppendNewTextNode(xs->lastNode, str, (domLength)strlen(str),
                                      TEXT_NODE, 0);
                 FREE(str);
             }
@@ -4761,7 +4762,7 @@ static int ExecAction (
             xs->lastNode = savedLastNode;
             
             n = (domNode*)domNewProcessingInstructionNode( 
-                xs->resultDoc, str2, strlen(str2), str, len);
+                xs->resultDoc, str2, (domLength)strlen(str2), str, len);
             domAppendChild(xs->lastNode, n);
             domDeleteNode (fragmentNode, NULL, NULL);
             FREE(str2);
@@ -4808,7 +4809,7 @@ static int ExecAction (
                 DBG(rsPrint(&rs));
                 str = xpathFuncString( &rs );
                 TRACE1("valueOf: xpathString='%s' \n", str);
-                domAppendNewTextNode(xs->lastNode, str, strlen(str),
+                domAppendNewTextNode(xs->lastNode, str, (domLength)strlen(str),
                                      TEXT_NODE, disableEsc);
                 xpathRSFree( &rs );
                 FREE(str);
@@ -5720,13 +5721,13 @@ getExternalDocument (
     if (baseURI) {
         Tcl_ListObjAppendElement(interp, cmdPtr,
                                  Tcl_NewStringObj (baseURI,
-                                                   strlen(baseURI)));
+                                                   (domLength)strlen(baseURI)));
     } else {
         Tcl_ListObjAppendElement(interp, cmdPtr,
                                  Tcl_NewStringObj ("", 0));
     }
     Tcl_ListObjAppendElement (interp, cmdPtr, (href ?
-                              Tcl_NewStringObj (href, strlen (href))
+                              Tcl_NewStringObj (href, (domLength)strlen (href))
                               : Tcl_NewStringObj ("", 0)));
     Tcl_ListObjAppendElement (interp, cmdPtr,
                               Tcl_NewStringObj ("", 0));
@@ -5827,11 +5828,11 @@ getExternalDocument (
         str = Tcl_GetStringResult (interp);
         if (str[0] == '\0') {
             Tcl_DStringAppend (&dStr, "At line ", -1);
-            sprintf (s, "%" TCL_LL_MODIFIER "d",
+            sprintf (s, "%" TDOM_LS_MODIFIER "d",
                      XML_GetCurrentLineNumber (parser));
             Tcl_DStringAppend (&dStr, s, -1);
             Tcl_DStringAppend (&dStr, " character ", -1);
-            sprintf (s, "%" TCL_LL_MODIFIER "d",
+            sprintf (s, "%" TDOM_LS_MODIFIER "d",
                      XML_GetCurrentColumnNumber (parser));
             Tcl_DStringAppend (&dStr, s, -1);
             Tcl_DStringAppend (&dStr, ": ", 2);

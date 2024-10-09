@@ -86,11 +86,11 @@ void tcldom_reportErrorLocation (
     Tcl_Interp *interp,
     int before,
     int after,
-    domLength line,
-    domLength column,
+    XML_Size line,
+    XML_Size column,
     char *xmlstring,
     const char *entity,
-    domLength byteIndex,
+    XML_Index byteIndex,
     const char *errStr
     );
 

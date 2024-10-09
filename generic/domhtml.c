@@ -2606,7 +2606,7 @@ HTML_SimpleParse (
                 tnode->nodeType    = TEXT_NODE;
                 tnode->ownerDocument = doc;
                 tnode->nodeNumber  = NODE_NO(doc);
-                tnode->valueLength = (x - start);
+                tnode->valueLength = (domLength)(x - start);
                 tnode->nodeValue   = (char*)MALLOC((x - start)+1);
                 memmove(tnode->nodeValue, start, (x - start));
                 *(tnode->nodeValue + (x - start)) = 0;
@@ -2635,10 +2635,10 @@ HTML_SimpleParse (
                 x++;
             }
             if (c==0) {
-                RetError("Missing \">\"",(start-html) );
+                RetError("Missing \">\"",(domLength)(start-html) );
             }
             if ( (x-start)==2) {
-                RetError("Null markup name",(start-html) );
+                RetError("Null markup name",(domLength)(start-html) );
             }
             *x = '\0'; /* temporarily terminate the string */
 
@@ -2759,7 +2759,7 @@ HTML_SimpleParse (
                         }
                         sprintf(tmp, "Unterminated element '%s' (within '%s')", start+2, pn);
                         *x = c;  /* remove temporarily termination */
-                        RetError(tmp,(x - html));
+                        RetError(tmp,(domLength)(x - html));
                     }
                     break;
                 }
@@ -2781,7 +2781,7 @@ HTML_SimpleParse (
                 if (*x == '<') {
                     /* start of new tag, ends closing tag */
                 } else {
-                    RetError("Missing \">\"",(x - html)-1);
+                    RetError("Missing \">\"",(domLength)(x - html)-1);
                 }
             }            
             if (parent_node == NULL) {
@@ -2813,7 +2813,7 @@ HTML_SimpleParse (
                         tnode->ownerDocument = doc;
                         tnode->nodeNumber    = NODE_NO(doc);
                         tnode->parentNode    = parent_node;
-                        tnode->valueLength   = x - start - 4;
+                        tnode->valueLength   = (domLength)(x - start - 4);
                         tnode->nodeValue     = (char*)MALLOC(tnode->valueLength+1);
                         memmove(tnode->nodeValue, start+4, tnode->valueLength);
                         *(tnode->nodeValue + tnode->valueLength) = 0;
@@ -2838,7 +2838,7 @@ HTML_SimpleParse (
                         }
                         x += 3;
                     } else {
-                        RetError("Unterminated comment",(start-html));
+                        RetError("Unterminated comment",(domLength)(start-html));
                     }
                     continue;
 
@@ -2864,7 +2864,7 @@ HTML_SimpleParse (
                     if (*x) {
                         x++;
                     } else {
-                        RetError("Unterminated DOCTYPE definition",(start-html));
+                        RetError("Unterminated DOCTYPE definition",(domLength)(start-html));
                     }
                     continue;
 
@@ -2891,7 +2891,7 @@ HTML_SimpleParse (
                             tnode->ownerDocument = doc;
                             tnode->nodeNumber    = NODE_NO(doc);
                             tnode->parentNode    = parent_node;
-                            tnode->valueLength   = (x - start);
+                            tnode->valueLength   = (domLength)(x - start);
                             tnode->nodeValue     = (char*)MALLOC((x - start)+1);
                             memmove(tnode->nodeValue, start, (x - start));
                             *(tnode->nodeValue + (x - start)) = 0;
@@ -2905,11 +2905,11 @@ HTML_SimpleParse (
                         }
                         x += 3;
                     } else {
-                        RetError("Unterminated CDATA definition",(start-html) );
+                        RetError("Unterminated CDATA definition",(domLength)(start-html) );
                     }
                     continue;
                  } else {
-                        RetError("Incorrect <!... tag",(start-html) );
+                        RetError("Incorrect <!... tag",(domLength)(start-html) );
                  }
 
             } else if (*x=='?') {
@@ -2944,7 +2944,7 @@ HTML_SimpleParse (
                     }
                     *piSep = '\0'; /* temporarily terminate the string */
 
-                    pinode->targetLength = strlen(start);
+                    pinode->targetLength = (domLength)strlen(start);
                     pinode->targetValue  = (char*)MALLOC(pinode->targetLength);
                     memmove(pinode->targetValue, start, pinode->targetLength);
 
@@ -2956,7 +2956,7 @@ HTML_SimpleParse (
                     while (SPACE(*piSep)) {
                         piSep++;
                     }
-                    pinode->dataLength = x - piSep;
+                    pinode->dataLength = (domLength)(x - piSep);
                     pinode->dataValue  = (char*)MALLOC(pinode->dataLength);
                     memmove(pinode->dataValue, piSep, pinode->dataLength);
 
@@ -2980,7 +2980,7 @@ HTML_SimpleParse (
                     }
                     x += 2;
                 } else {
-                    RetError("Unterminated processing instruction(PI)",(start-html) );
+                    RetError("Unterminated processing instruction(PI)",(domLength)(start-html));
                 }
                 continue;
             }
@@ -3015,10 +3015,10 @@ HTML_SimpleParse (
             }
             hasContent = 1;
             if (c==0) {
-                RetError("Missing \">\"",(start-html) );
+                RetError("Missing \">\"",(domLength)(start-html));
             }
             if ( (x-start)==1) {
-                RetError("Null markup name",(start-html) );
+                RetError("Null markup name",(domLength)(start-html));
             }
             DBG(fprintf(stderr, "\nnew tag '%70.70s...' \n", start);)
             *x = '\0'; /* temporarily terminate the string */
@@ -3115,7 +3115,7 @@ HTML_SimpleParse (
                     *x = tolower(c);
                     x++;
                 }
-                nArgName = x - ArgName;
+                nArgName = (domLength)(x - ArgName);
                 while (SPACE(*x)) {
                     x++;
                 }
@@ -3142,9 +3142,9 @@ HTML_SimpleParse (
                             if (c=='&') ampersandSeen = 1;
                             x++;
                         }
-                        nArgVal = x - ArgVal;
+                        nArgVal = (domLength)(x - ArgVal);
                         if (c==0) {
-                            RetError("Unterminated string",(ArgVal - html - 1) );
+                            RetError("Unterminated string",(domLength)(ArgVal - html - 1));
                         } else {
                             x++;
                         }
@@ -3155,9 +3155,9 @@ HTML_SimpleParse (
                             x++;
                         }
                         if (c==0) {
-                            RetError("Missing \">\"",(start-html));
+                            RetError("Missing \">\"",(domLength)(start-html));
                         }
-                        nArgVal = x - ArgVal;
+                        nArgVal = (domLength)(x - ArgVal);
                     }
                 } else {
                     /* attribute without value, like 'nowrap' */
@@ -3240,7 +3240,7 @@ HTML_SimpleParse (
                 hasContent = 0;
                 x++;
                 if (*x!='>') {
-                    RetError("Syntax Error",(x - html - 1) );
+                    RetError("Syntax Error",(domLength)(x - html - 1));
                 }
             }
             if (*x=='>') {
@@ -3287,7 +3287,7 @@ HTML_SimpleParse (
                     tnode->ownerDocument = doc;
                     tnode->nodeNumber    = NODE_NO(doc);
                     tnode->parentNode    = node;
-                    tnode->valueLength   = (x - start);
+                    tnode->valueLength   = (domLength)(x - start);
                     tnode->nodeValue     = (char*)MALLOC((x - start)+1);
                     memmove(tnode->nodeValue, start, (x - start));
                     *(tnode->nodeValue + (x - start)) = 0;
@@ -3347,7 +3347,7 @@ HTML_SimpleParse (
     if (forest && parent_node == parent) {
         return TCL_OK;
     }
-    RetError("Unexpected end",(x - html) );
+    RetError("Unexpected end",(domLength)(x - html));
 
 } /* HTML_SimpleParse */
 
