@@ -6967,7 +6967,7 @@ void tcldom_reportErrorLocation (
         ind = 0;
         buf[0] = '\0';
         if (xmlstring[byteIndex]) {
-            for (i = byteIndex + 1; i < (domLength)(byteIndex + after); i++) {
+            for (i = (domLength)(byteIndex + 1); i < (domLength)(byteIndex + after); i++) {
                 if (!xmlstring[i]) {
                     break;
                 }
