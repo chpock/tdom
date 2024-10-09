@@ -3372,7 +3372,7 @@ checkdomKeyConstraints (
                             if (first) first = 0;
                             else Tcl_DStringAppend (&dStr, ":", 1);
                             Tcl_DStringAppend (&dStr, kc->emptyFieldSetValue,
-                                               kc->efsv_len);
+                                               (domLength)kc->efsv_len);
                         } else {
                             if (first) first = 0;
                             else Tcl_DStringAppend (&dStr, ":", 1);
@@ -4540,34 +4540,34 @@ schemaInstanceInfoCmd (
     case m_line:
         if (!sdata->parser && !sdata->node) break;
         if (sdata->parser) {
-            SetLongResult (XML_GetCurrentLineNumber (sdata->parser));
+            SetLongResult ((domLength)XML_GetCurrentLineNumber (sdata->parser));
             break;
         }
         if (domGetLineColumn(sdata->node, &line, &column, &byteIndex) < 0)
             break;
-        SetLongResult (line);
+        SetLongResult ((domLength)line);
         break;
         
     case m_column:
         if (!sdata->parser && !sdata->node) break;
         if (sdata->parser) {
-            SetLongResult (XML_GetCurrentColumnNumber (sdata->parser));
+            SetLongResult ((domLength)XML_GetCurrentColumnNumber (sdata->parser));
             break;
         }
         if (domGetLineColumn(sdata->node, &line, &column, &byteIndex) < 0)
             break;
-        SetLongResult (column);
+        SetLongResult ((domLength)column);
         break;
 
     case m_byteIndex:
         if (!sdata->parser && !sdata->node) break;
         if (sdata->parser) {
-            SetLongResult (XML_GetCurrentByteIndex (sdata->parser));
+            SetLongResult ((domLength)XML_GetCurrentByteIndex (sdata->parser));
             break;
         }
         if (domGetLineColumn(sdata->node, &line, &column, &byteIndex) < 0)
             break;
-        SetLongResult (byteIndex);
+        SetLongResult ((domLength)byteIndex);
         break;
 
     case m_domNode:
@@ -4681,7 +4681,7 @@ externalEntityRefHandler (
 
     if (base) {
         Tcl_ListObjAppendElement(vdata->interp, cmdPtr,
-                                 Tcl_NewStringObj(base, strlen(base)));
+                                 Tcl_NewStringObj(base, (domLength)strlen(base)));
     } else {
         Tcl_ListObjAppendElement(vdata->interp, cmdPtr,
                                  Tcl_NewObj());
@@ -4694,7 +4694,7 @@ externalEntityRefHandler (
        == NULL. */
     if (systemId) {
         Tcl_ListObjAppendElement(vdata->interp, cmdPtr,
-                                 Tcl_NewStringObj(systemId, strlen(systemId)));
+                                 Tcl_NewStringObj(systemId, (domLength)strlen(systemId)));
     } else {
         Tcl_ListObjAppendElement(vdata->interp, cmdPtr,
                                  Tcl_NewObj());
@@ -4702,7 +4702,7 @@ externalEntityRefHandler (
 
     if (publicId) {
         Tcl_ListObjAppendElement(vdata->interp, cmdPtr,
-                                 Tcl_NewStringObj(publicId, strlen(publicId)));
+                                 Tcl_NewStringObj(publicId, (domLength)strlen(publicId)));
     } else {
         Tcl_ListObjAppendElement(vdata->interp, cmdPtr,
                                  Tcl_NewObj());

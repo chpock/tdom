@@ -463,7 +463,7 @@ domClearString (
     if (!*changed) {
         return;
     }
-    Tcl_DStringAppend (clearedstr, str, p-str);
+    Tcl_DStringAppend (clearedstr, str, (domLength)(p-str));
     if (repllen) {
         Tcl_DStringAppend (clearedstr, replacement, repllen);
     }
@@ -478,7 +478,7 @@ domClearString (
     while (*p) {
         clen = UTF8_CHAR_LEN(*p);
         if (!clen || !UTF8_XMLCHAR((unsigned const char*)p,clen)) {
-            Tcl_DStringAppend (clearedstr, s, p-s);
+            Tcl_DStringAppend (clearedstr, s, (domLength)(p-s));
             if (repllen) {
                 Tcl_DStringAppend (clearedstr, replacement, repllen);
             }
@@ -492,7 +492,7 @@ domClearString (
             p += clen;
         }
     }
-    Tcl_DStringAppend (clearedstr, s, p-s);
+    Tcl_DStringAppend (clearedstr, s, (domLength)(p-s));
 }
 
 /*---------------------------------------------------------------------------
@@ -529,7 +529,7 @@ domIsComment (
     domLength len, i = 0;
     
     p = str;
-    len = strlen (str);
+    len = (domLength)strlen (str);
     while (i < len) {
         if (*p == '-') {
             if (i == len - 1) return 0;
@@ -554,7 +554,7 @@ domIsCDATA (
     domLength len, i = 0;
 
     p = str;
-    len = strlen (str);
+    len = (domLength)strlen (str);
     while (i < len - 2) {
         if (  *p == ']'
             && p[1] == ']'
@@ -577,7 +577,7 @@ domIsPIValue (
     domLength len, i = 0;
 
     p = str;
-    len = strlen (str);
+    len = (domLength)strlen (str);
     while (i < len - 1) {
         if (*p == '?' && p[1] == '>') return 0;
         p++; i++;
@@ -1373,7 +1373,7 @@ startElement(
                 attrnode->nodeName    = (char *)&(h->key);
                 attrnode->parentNode  = node;
                 len = strlen(atPtr[1]);
-                attrnode->valueLength = len;
+                attrnode->valueLength = (domLength)len;
                 attrnode->nodeValue   = (char*)MALLOC(len+1);
                 strcpy(attrnode->nodeValue, atPtr[1]);
                 if (node->firstAttr) {
@@ -1475,7 +1475,7 @@ elemNSfound:
         attrnode->nodeName    = (char *)&(h->key);
         attrnode->parentNode  = node;
         len = strlen(atPtr[1]);
-        attrnode->valueLength = len;
+        attrnode->valueLength = (domLength)len;
         attrnode->nodeValue   = (char*)MALLOC(len+1);
         strcpy(attrnode->nodeValue, (char *)atPtr[1]);
 
@@ -1602,9 +1602,9 @@ characterDataHandler (
         /* This works because the result of XML_GetCurrentLineNumber()
          * is always at least 1 */
         if (!info->textStartLine) {
-            info->textStartLine = XML_GetCurrentLineNumber (info->parser);
-            info->textStartColumn = XML_GetCurrentColumnNumber (info->parser);
-            info->textStartByteIndex = XML_GetCurrentByteIndex (info->parser);
+            info->textStartLine = (domLength)XML_GetCurrentLineNumber (info->parser);
+            info->textStartColumn = (domLength)XML_GetCurrentColumnNumber (info->parser);
+            info->textStartByteIndex = (domLength)XML_GetCurrentByteIndex (info->parser);
         }
     }
     
@@ -1627,9 +1627,9 @@ startCDATA (
     info->cdataSection = 1;
     if (info->storeLineColumn) {
         if (!info->textStartLine) {
-            info->textStartLine = XML_GetCurrentLineNumber (info->parser);
-            info->textStartColumn = XML_GetCurrentColumnNumber (info->parser);
-            info->textStartByteIndex = XML_GetCurrentByteIndex (info->parser);
+            info->textStartLine = (domLength)XML_GetCurrentLineNumber (info->parser);
+            info->textStartColumn = (domLength)XML_GetCurrentColumnNumber (info->parser);
+            info->textStartByteIndex = (domLength)XML_GetCurrentByteIndex (info->parser);
         }
     }
 }
@@ -1817,7 +1817,7 @@ commentHandler (
     memset(node, 0, sizeof(domTextNode));
     node->nodeType    = COMMENT_NODE;
     node->nodeNumber  = NODE_NO(info->document);
-    node->valueLength = len;
+    node->valueLength = (domLength)len;
     node->nodeValue   = (char*)MALLOC(len);
     memmove(node->nodeValue, s, len);
 
@@ -1911,12 +1911,12 @@ processingInstructionHandler(
     }
 
     len = strlen(target);
-    node->targetLength = len;
+    node->targetLength = (domLength)len;
     node->targetValue  = (char*)MALLOC(len);
     memmove(node->targetValue, target, len);
 
     len = strlen(data);
-    node->dataLength = len;
+    node->dataLength = (domLength)len;
     node->dataValue  = (char*)MALLOC(len);
     memmove(node->dataValue, data, len);
 
@@ -2027,7 +2027,7 @@ externalEntityRefHandler (
 
     if (base) {
         Tcl_ListObjAppendElement(info->interp, cmdPtr,
-                                 Tcl_NewStringObj(base, strlen(base)));
+                                 Tcl_NewStringObj(base, (domLength)strlen(base)));
     } else {
         Tcl_ListObjAppendElement(info->interp, cmdPtr,
                                  Tcl_NewObj());
@@ -2040,7 +2040,7 @@ externalEntityRefHandler (
        == NULL. */
     if (systemId) {
         Tcl_ListObjAppendElement(info->interp, cmdPtr,
-                                 Tcl_NewStringObj(systemId, strlen(systemId)));
+                                 Tcl_NewStringObj(systemId, (domLength)strlen(systemId)));
     } else {
         Tcl_ListObjAppendElement(info->interp, cmdPtr,
                                  Tcl_NewObj());
@@ -2048,7 +2048,7 @@ externalEntityRefHandler (
 
     if (publicId) {
         Tcl_ListObjAppendElement(info->interp, cmdPtr,
-                                 Tcl_NewStringObj(publicId, strlen(publicId)));
+                                 Tcl_NewStringObj(publicId, (domLength)strlen(publicId)));
     } else {
         Tcl_ListObjAppendElement(info->interp, cmdPtr,
                                  Tcl_NewObj());
@@ -2564,7 +2564,7 @@ domCreateXMLNamespaceNode (
     attr->namespace     = ns->index;
     attr->nodeName      = (char *)&(h->key);
     attr->parentNode    = parent;
-    attr->valueLength   = strlen (XML_NAMESPACE);
+    attr->valueLength   = (domLength)strlen (XML_NAMESPACE);
     attr->nodeValue     = tdomstrdup (XML_NAMESPACE);
     return attr;
 }
@@ -3110,7 +3110,7 @@ domSetAttribute (
             }
         }
         FREE (attr->nodeValue);
-        attr->valueLength = strlen(attributeValue);
+        attr->valueLength = (domLength)strlen(attributeValue);
         attr->nodeValue   = (char*)MALLOC(attr->valueLength+1);
         strcpy(attr->nodeValue, attributeValue);
     } else {
@@ -3126,7 +3126,7 @@ domSetAttribute (
         attr->namespace   = 0;
         attr->nodeName    = (char *)&(h->key);
         attr->parentNode  = node;
-        attr->valueLength = strlen(attributeValue);
+        attr->valueLength = (domLength)strlen(attributeValue);
         attr->nodeValue   = (char*)MALLOC(attr->valueLength+1);
         strcpy(attr->nodeValue, attributeValue);
 
@@ -3242,7 +3242,7 @@ domSetAttributeNS (
             }
         }
         FREE (attr->nodeValue);
-        attr->valueLength = strlen(attributeValue);
+        attr->valueLength = (domLength)strlen(attributeValue);
         attr->nodeValue   = (char*)MALLOC(attr->valueLength+1);
         strcpy(attr->nodeValue, attributeValue);
     } else {
@@ -3294,7 +3294,7 @@ domSetAttributeNS (
         }
         attr->nodeName    = (char *)&(h->key);
         attr->parentNode  = node;
-        attr->valueLength = strlen(attributeValue);
+        attr->valueLength = (domLength)strlen(attributeValue);
         attr->nodeValue   = (char*)MALLOC(attr->valueLength+1);
         strcpy(attr->nodeValue, attributeValue);
 
@@ -4548,7 +4548,7 @@ domAddNSToNode (
     attr->namespace   = ns->index;
     attr->nodeName    = (char *)&(h->key);
     attr->parentNode  = node;
-    attr->valueLength = strlen(nsToAdd->uri);
+    attr->valueLength = (domLength)strlen(nsToAdd->uri);
     attr->nodeValue   = (char*)MALLOC(attr->valueLength+1);
     strcpy(attr->nodeValue, nsToAdd->uri);
 
@@ -5476,9 +5476,9 @@ tdom_startCDATA (
     DispatchPCDATA ((domReadInfo*) info);
     info->cdataSection = 1;
     if (info->storeLineColumn) {
-        info->textStartLine = XML_GetCurrentLineNumber (info->parser);
-        info->textStartColumn = XML_GetCurrentColumnNumber (info->parser);
-        info->textStartByteIndex = XML_GetCurrentByteIndex (info->parser);
+        info->textStartLine = (domLength)XML_GetCurrentLineNumber (info->parser);
+        info->textStartColumn = (domLength)XML_GetCurrentColumnNumber (info->parser);
+        info->textStartByteIndex = (domLength)XML_GetCurrentByteIndex (info->parser);
     }
 }
 

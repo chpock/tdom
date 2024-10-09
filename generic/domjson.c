@@ -375,7 +375,7 @@ static domLength jsonParseValue (
         if (jparse->len && jparse->buf[0]) {
             DBG(fprintf(stderr, "New unescaped text node '%s'\n", jparse->buf));
             newTextNode = domNewTextNode (parent->ownerDocument,
-                                          jparse->buf, strlen(jparse->buf),
+                                          jparse->buf, (domLength)strlen(jparse->buf),
                                           TEXT_NODE);
             domAppendChild (parent, (domNode *) newTextNode);
         } else {
