@@ -33,23 +33,23 @@ TDOM_STUB_LIB_FILE=@PKG_STUB_LIB_FILE@
 # String to pass to linker to pick up the tDOM library from
 # its build directory.
 #
-TDOM_BUILD_STUB_LIB_SPEC='@PKG_BUILD_STUB_LIB_SPEC@'
+TDOM_BUILD_STUB_LIB_SPEC='@tdom_BUILD_STUB_LIB_SPEC@'
 
 #
 # String to pass to linker to pick up the tDOM library from
 # its installed directory.
 #
-TDOM_STUB_LIB_SPEC='@PKG_STUB_LIB_SPEC@'
+TDOM_STUB_LIB_SPEC='@tdom_STUB_LIB_SPEC@'
 
 # String to pass to linker to pick up the TDOM stub library from its
 # build directory.
 #
-TDOM_BUILD_STUB_LIB_PATH='@PKG_BUILD_STUB_LIB_PATH@'
+TDOM_BUILD_STUB_LIB_PATH='@tdom_BUILD_STUB_LIB_PATH@'
 
 # String to pass to linker to pick up the TDOM stub library from its
 # installed directory.
 #
-TDOM_STUB_LIB_PATH='@PKG_STUB_LIB_PATH@'
+TDOM_STUB_LIB_PATH='@tdom_STUB_LIB_PATH@'
 
 #
 # Location of the top-level source directories from which tDOM

@@ -494,7 +494,7 @@ NodeObjCmd (
     if (type < 0 && newNode != NULL) {
         char buf[64];
         tcldom_createNodeObj(interp, newNode, buf);
-        Tcl_SetObjResult(interp, Tcl_NewStringObj(buf, strlen(buf)));
+        Tcl_SetObjResult(interp, Tcl_NewStringObj(buf, (domLength)strlen(buf)));
     }
     
     if (ret == TCL_OK) doc->nodeFlags |= NEEDS_RENUMBERING;

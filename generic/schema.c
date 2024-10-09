@@ -3372,7 +3372,7 @@ checkdomKeyConstraints (
                             if (first) first = 0;
                             else Tcl_DStringAppend (&dStr, ":", 1);
                             Tcl_DStringAppend (&dStr, kc->emptyFieldSetValue,
-                                               kc->efsv_len);
+                                               (domLength)kc->efsv_len);
                         } else {
                             if (first) first = 0;
                             else Tcl_DStringAppend (&dStr, ":", 1);
@@ -3927,7 +3927,7 @@ getNextExpectedWorker (
                     if (mayskip) break;
                 }
                 if (probeMayskip) break;
-                Tcl_CreateHashEntry (seenCPs, ic, &hnew);
+                Tcl_CreateHashEntry (seenCPs, (char *)ic, &hnew);
                 if (hnew) {
                     se1 = getStackElement (sdata, ic);
                     mayskip = getNextExpectedWorker (sdata, se1, interp,
@@ -4016,7 +4016,7 @@ getNextExpectedWorker (
                         }
                         /* fall through */
                     case SCHEMA_CTYPE_INTERLEAVE:
-                        Tcl_CreateHashEntry (seenCPs, jc, &hnew);
+                        Tcl_CreateHashEntry (seenCPs, (char *)jc, &hnew);
                         if (hnew) {
                             se1 = getStackElement (sdata, jc);
                             mayskip = getNextExpectedWorker (
@@ -4202,7 +4202,8 @@ schemaInstanceInfoCmd (
     )
 {
     int methodIndex, expectedFlags;
-    Tcl_WideInt line, column, byteIndex;
+    XML_Size line, column;
+    XML_Index byteIndex;
     Tcl_HashEntry *h;
     SchemaCP *cp;
     SchemaValidationStack *se;
@@ -4539,34 +4540,34 @@ schemaInstanceInfoCmd (
     case m_line:
         if (!sdata->parser && !sdata->node) break;
         if (sdata->parser) {
-            SetLongResult (XML_GetCurrentLineNumber (sdata->parser));
+            SetLongResult ((domLength)XML_GetCurrentLineNumber (sdata->parser));
             break;
         }
         if (domGetLineColumn(sdata->node, &line, &column, &byteIndex) < 0)
             break;
-        SetLongResult (line);
+        SetLongResult ((domLength)line);
         break;
         
     case m_column:
         if (!sdata->parser && !sdata->node) break;
         if (sdata->parser) {
-            SetLongResult (XML_GetCurrentColumnNumber (sdata->parser));
+            SetLongResult ((domLength)XML_GetCurrentColumnNumber (sdata->parser));
             break;
         }
         if (domGetLineColumn(sdata->node, &line, &column, &byteIndex) < 0)
             break;
-        SetLongResult (column);
+        SetLongResult ((domLength)column);
         break;
 
     case m_byteIndex:
         if (!sdata->parser && !sdata->node) break;
         if (sdata->parser) {
-            SetLongResult (XML_GetCurrentByteIndex (sdata->parser));
+            SetLongResult ((domLength)XML_GetCurrentByteIndex (sdata->parser));
             break;
         }
         if (domGetLineColumn(sdata->node, &line, &column, &byteIndex) < 0)
             break;
-        SetLongResult (byteIndex);
+        SetLongResult ((domLength)byteIndex);
         break;
 
     case m_domNode:
@@ -4632,8 +4633,8 @@ static void validateReportError (
     char sl[50], sc[50];
 
     resultObj = Tcl_NewObj ();
-    sprintf(sl, "%" TCL_LL_MODIFIER "d", XML_GetCurrentLineNumber(parser));
-    sprintf(sc, "%" TCL_LL_MODIFIER "d", XML_GetCurrentColumnNumber(parser));
+    sprintf(sl, "%" TDOM_LS_MODIFIER "d", XML_GetCurrentLineNumber(parser));
+    sprintf(sc, "%" TDOM_LS_MODIFIER "d", XML_GetCurrentColumnNumber(parser));
     if (sdata->validationState == VALIDATION_ERROR) {
         Tcl_AppendStringsToObj (resultObj, "error \"",
                                 Tcl_GetStringResult (interp),
@@ -4680,7 +4681,7 @@ externalEntityRefHandler (
 
     if (base) {
         Tcl_ListObjAppendElement(vdata->interp, cmdPtr,
-                                 Tcl_NewStringObj(base, strlen(base)));
+                                 Tcl_NewStringObj(base, (domLength)strlen(base)));
     } else {
         Tcl_ListObjAppendElement(vdata->interp, cmdPtr,
                                  Tcl_NewObj());
@@ -4693,7 +4694,7 @@ externalEntityRefHandler (
        == NULL. */
     if (systemId) {
         Tcl_ListObjAppendElement(vdata->interp, cmdPtr,
-                                 Tcl_NewStringObj(systemId, strlen(systemId)));
+                                 Tcl_NewStringObj(systemId, (domLength)strlen(systemId)));
     } else {
         Tcl_ListObjAppendElement(vdata->interp, cmdPtr,
                                  Tcl_NewObj());
@@ -4701,7 +4702,7 @@ externalEntityRefHandler (
 
     if (publicId) {
         Tcl_ListObjAppendElement(vdata->interp, cmdPtr,
-                                 Tcl_NewStringObj(publicId, strlen(publicId)));
+                                 Tcl_NewStringObj(publicId, (domLength)strlen(publicId)));
     } else {
         Tcl_ListObjAppendElement(vdata->interp, cmdPtr,
                                  Tcl_NewObj());
@@ -4798,12 +4799,12 @@ externalEntityRefHandler (
                     systemId, XML_GetCurrentByteIndex(extparser),
                     XML_ErrorString(XML_GetErrorCode(extparser)));
             } else {
-                sprintf(s, "%" TCL_LL_MODIFIER "d",
+                sprintf(s, "%" TDOM_LS_MODIFIER "d",
                         XML_GetCurrentLineNumber(extparser));
                 Tcl_AppendResult(vdata->interp, ", referenced in entity \"",
                                  systemId, 
                                  "\" at line ", s, " character ", NULL);
-                sprintf(s, "%" TCL_LL_MODIFIER "d",
+                sprintf(s, "%" TDOM_LS_MODIFIER "d",
                         XML_GetCurrentColumnNumber(extparser));
                 Tcl_AppendResult(vdata->interp, s, NULL);
             }
@@ -4825,7 +4826,7 @@ externalEntityRefHandler (
             switch (status) {
             case XML_STATUS_ERROR:
                 interpResult = Tcl_GetStringResult(vdata->interp);
-                sprintf(s, "%" TCL_LL_MODIFIER "d",
+                sprintf(s, "%" TDOM_LS_MODIFIER "d",
                         XML_GetCurrentLineNumber(extparser));
                 if (interpResult[0] == '\0') {
                     Tcl_ResetResult (vdata->interp);
@@ -4835,7 +4836,7 @@ externalEntityRefHandler (
                         "\" in entity \"", systemId, "\" at line ", s,
                         " character ", NULL
                         );
-                    sprintf(s, "%" TCL_LL_MODIFIER "d",
+                    sprintf(s, "%" TDOM_LS_MODIFIER "d",
                             XML_GetCurrentColumnNumber(extparser));
                     Tcl_AppendResult(vdata->interp, s, NULL);
                 } else {
@@ -4843,7 +4844,7 @@ externalEntityRefHandler (
                         vdata->interp, ", referenced in entity \"", systemId,
                         "\" at line ", s, " character ", NULL
                         );
-                    sprintf(s, "%" TCL_LL_MODIFIER "d",
+                    sprintf(s, "%" TDOM_LS_MODIFIER "d",
                             XML_GetCurrentColumnNumber(extparser));
                     Tcl_AppendResult(vdata->interp, s, NULL);
                 }

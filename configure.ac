@@ -253,7 +253,7 @@ TDOM_ENABLE_SCHEMA
 TDOMSHELL=tcldomsh
 AC_SUBST(TDOMSHELL)
 
-TDOM_EXPORT_CONFIG
+TEA_EXPORT_CONFIG([tdom])
 
 #--------------------------------------------------------------------
 # Finally, substitute all of the various values into the Makefile.

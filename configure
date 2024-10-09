@@ -619,10 +619,15 @@ ac_includes_default="\
 #endif"
 
 ac_subst_vars='LTLIBOBJS
-PKG_STUB_LIB_PATH
-PKG_BUILD_STUB_LIB_PATH
-PKG_STUB_LIB_SPEC
-PKG_BUILD_STUB_LIB_SPEC
+PATCHLEVEL
+MINOR_VERSION
+MAJOR_VERSION
+tdom_STUB_LIB_PATH
+tdom_BUILD_STUB_LIB_PATH
+tdom_STUB_LIB_SPEC
+tdom_BUILD_STUB_LIB_SPEC
+tdom_LIB_SPEC
+tdom_BUILD_LIB_SPEC
 TDOMSHELL
 TCLSH_PROG
 VC_MANIFEST_EMBED_EXE
@@ -9080,20 +9085,34 @@ TDOMSHELL=tcldomsh
 
 
     #--------------------------------------------------------------------
-    # These are for ${PACKAGE_NAME}Config.sh
+    # These are for tdomConfig.sh
     #--------------------------------------------------------------------
 
     # pkglibdir must be a fully qualified path and (not ${exec_prefix}/lib)
-    eval pkglibdir="${libdir}/${PACKAGE_NAME}${PACKAGE_VERSION}"
+    eval pkglibdir="${libdir}/tdom${PACKAGE_VERSION}"
     if test "${TCL_LIB_VERSIONS_OK}" = "ok"; then
-	eval PKG_STUB_LIB_FLAG="-l${PACKAGE_NAME}stub${PACKAGE_VERSION}"
+	eval tdom_LIB_FLAG="-ltdom${PACKAGE_VERSION}"
+	eval tdom_STUB_LIB_FLAG="-ltdomstub${PACKAGE_VERSION}"
     else
-	eval PKG_STUB_LIB_FLAG="-l${PACKAGE_NAME}stub`echo ${PACKAGE_VERSION} | tr -d .`"
+	eval tdom_LIB_FLAG="-ltdom`echo ${PACKAGE_VERSION} | tr -d .`"
+	eval tdom_STUB_LIB_FLAG="-ltdomstub`echo ${PACKAGE_VERSION} | tr -d .`"
     fi
-    PKG_BUILD_STUB_LIB_SPEC="-L`pwd` ${PKG_STUB_LIB_FLAG}"
-    PKG_STUB_LIB_SPEC="-L${pkglibdir} ${PKG_STUB_LIB_FLAG}"
-    PKG_BUILD_STUB_LIB_PATH="`pwd`/${PKG_STUB_LIB_FILE}"
-    PKG_STUB_LIB_PATH="${pkglibdir}/${PKG_STUB_LIB_FILE}"
+    if test "${TCL_MAJOR_VERSION}" -gt 8 -a x"${with_tcl8}" = x; then
+	eval tdom_STUB_LIB_FLAG="-ltdomstub"
+    fi
+
+    tdom_BUILD_LIB_SPEC="-L`$CYGPATH $(pwd)` ${tdom_LIB_FLAG}"
+    tdom_LIB_SPEC="-L`$CYGPATH ${pkglibdir}` ${tdom_LIB_FLAG}"
+    tdom_BUILD_STUB_LIB_SPEC="-L`$CYGPATH $(pwd)` ${tdom_STUB_LIB_FLAG}"
+    tdom_STUB_LIB_SPEC="-L`$CYGPATH ${pkglibdir}` ${tdom_STUB_LIB_FLAG}"
+    tdom_BUILD_STUB_LIB_PATH="`$CYGPATH $(pwd)`/${PKG_STUB_LIB_FILE}"
+    tdom_STUB_LIB_PATH="`$CYGPATH ${pkglibdir}`/${PKG_STUB_LIB_FILE}"
+
+
+
+
+
+
 
 
 
