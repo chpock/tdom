@@ -113,7 +113,11 @@
 #endif
 
 #ifndef TDOM_LS_MODIFIER
-#  define TDOM_LS_MODIFIER "ll"
+#  ifdef _WIN32
+#    define TDOM_LS_MODIFIER "I64"
+#  else 
+#    define TDOM_LS_MODIFIER "ll"
+#  endif
 #endif
 
 /* Since the len argument of XML_Parse() is of type int, parsing of
