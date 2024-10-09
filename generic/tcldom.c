@@ -440,7 +440,7 @@ UpdateStringOfTdomNode(
     domLength  len;
     
     NODE_CMD(nodeName, objPtr->internalRep.otherValuePtr);
-    len = strlen(nodeName);
+    len = (domLength)strlen(nodeName);
     objPtr->bytes = (ckalloc((unsigned char) len+1));
     memcpy(objPtr->bytes, nodeName, len+1);
     objPtr->length = len;
@@ -1474,7 +1474,7 @@ char * tcldom_xpathResolveVar (
     *offset = 0;
     varValue = Tcl_ParseVar(interp, strToParse, &termPtr);
     if (varValue) {
-        *offset = termPtr - strToParse;
+        *offset = (domLength)(termPtr - strToParse);
         /* If strToParse start with a single '$' without a following
          * var name (according to Tcl var name rules), Tcl_ParseVar()
          * doesn't report a parsing error but returns just a pointer
@@ -2356,13 +2356,13 @@ void tcldom_AppendEscaped (
             }
         }
         if (b >= bLimit) {
-            writeChars(xmlString, chan, buf, b - buf);
+            writeChars(xmlString, chan, buf, (domLength)(b - buf));
             b = buf;
         }
         pc++;
     }
     if (b > buf) {
-        writeChars(xmlString, chan, buf, b - buf);
+        writeChars(xmlString, chan, buf, (domLength)(b - buf));
     }
 }
 
@@ -2681,7 +2681,7 @@ void tcldom_treeAsXML (
                         p++; i++;
                         if (i >= ((domTextNode*)node)->valueLength) break;
                         if (*p == '>') {
-                            writeChars(xmlString, chan, start, p-start);
+                            writeChars(xmlString, chan, start, (domLength)(p-start));
                             writeChars(xmlString, chan, "]]><![CDATA[>", 13);
                             start = p+1;
                         }
@@ -2689,7 +2689,7 @@ void tcldom_treeAsXML (
                 }
                 p++; i++;
             }
-            writeChars(xmlString, chan, start, p-start);
+            writeChars(xmlString, chan, start, (domLength)(p-start));
             writeChars(xmlString, chan, "]]>", 3);
         } else {
             if (node->nodeFlags & DISABLE_OUTPUT_ESCAPING) {
@@ -2946,12 +2946,12 @@ void tcldom_AppendEscapedJSON (
             }
         }
         if (b >= bLimit) {
-            writeChars(jstring, chan, buf, b - buf);
+            writeChars(jstring, chan, buf, (domLength)(b - buf));
             b = buf;
         }
     }
     AP('"');
-    writeChars(jstring, chan, buf, b - buf);
+    writeChars(jstring, chan, buf, (domLength)(b - buf));
 }
 
 static
@@ -5852,7 +5852,7 @@ int tcldom_NodeObjCmd (
                 SetResult("no line/column information available!");
                 return TCL_ERROR;
             }
-            SetLongResult(line);
+            SetLongResult((domLength)line);
             break;
 
         case m_getColumn:
@@ -5861,7 +5861,7 @@ int tcldom_NodeObjCmd (
                 SetResult("no line/column information available!");
                 return TCL_ERROR;
             }
-            SetLongResult(column);
+            SetLongResult((domLength)column);
             break;
 
         case m_getByteIndex:
@@ -5870,7 +5870,7 @@ int tcldom_NodeObjCmd (
                 SetResult("no position information available!");
                 return TCL_ERROR;
             }
-            SetLongResult(byteIndex);
+            SetLongResult((domLength)byteIndex);
             break;
 
         case m_getBaseURI:
@@ -6956,7 +6956,7 @@ void tcldom_reportErrorLocation (
         Tcl_AppendResult (interp, "\n\"", NULL);
         ind = 0;
         buf[0] = '\0';
-        for (i = (byteIndex < before ? 0 : byteIndex - before);
+        for (i = (byteIndex < before ? 0 : (domLength)(byteIndex - before));
              i <= byteIndex;
              i++) {
             buf[ind] = xmlstring[i];
@@ -6967,7 +6967,7 @@ void tcldom_reportErrorLocation (
         ind = 0;
         buf[0] = '\0';
         if (xmlstring[byteIndex]) {
-            for (i = byteIndex + 1; i < byteIndex + after; i++) {
+            for (i = byteIndex + 1; i < (domLength)(byteIndex + after); i++) {
                 if (!xmlstring[i]) {
                     break;
                 }
