@@ -514,7 +514,7 @@ isJSONNumber (
     return 1;
 }
 
-static inline int
+static TDOM_INLINE int
 getJSONTypeFromList (
     Tcl_Interp *interp,
     Tcl_Obj *list,

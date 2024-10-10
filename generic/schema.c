@@ -1308,7 +1308,7 @@ evalVirtual (
 
 /* Check, if the pattern to probe does not call itself (even
  * indirectly) without a match inbetween.*/
-static inline int 
+static TDOM_INLINE int 
 recursivePattern (
     SchemaValidationStack *se,
     SchemaCP *pattern

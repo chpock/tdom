@@ -302,7 +302,7 @@ static void tcldom_findata(
     ckfree((char *) clientData);
 }
 
-static inline TcldomData * tcldom_getdata(
+static TDOM_INLINE TcldomData * tcldom_getdata(
     Tcl_Interp * interp
 )
 {
