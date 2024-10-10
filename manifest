@@ -1,5 +1,5 @@
-C First\sround\sof\sbuild\stests\son\sa\scouple\sof\splatforms\sand\sOS.
-D 2024-10-09T22:54:30.105
+C Fixed\sindentation.
+D 2024-10-10T12:21:58.004
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -229,7 +229,7 @@ F tests/xslt.test 35a5408426b098bcc07bdecfb52f1ec4c8ac3e984224ba497e700420047621
 F unix/CONFIG 431b82a51451df40e38261b91e1a37060797ef655e8f981fab761de59f1e01e9
 F unix/speed-check.sh 7a8d91e7edf1cdc9bcfad5f28e1a068cb2843d05e49d8bd89d9b30a46511497d
 F unix/tclAppInit.c cd5fa5bcb9f4648e9bf7108727b99e20cd02c33713df359efb1da298715940b9
-F win/README 69a6da038cb99711a2c95fd44e314e9ce74bb2c4ed8ed319dac6fd6daff2c13d
+F win/README d480e01bbb3f480184671f66b4025d7e94e5a6fccb603d6559f6ad92d398d919
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F win/makefile.vc 305808a83bed1240b802508262365381ffb73e452f8e2150054b0bd60cb7fe25
 F win/nmakehlp.c 194ae7c24886245c679cb4c9ea7e6daaaebb5fcd
@@ -242,9 +242,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 4abf418fab07e012b01e00f8e9c01ea2f42107e3e080a7dba5f7a6f8a876e324 b3b0b78e14b5c0dca685f6d23000005d8cc0f5860c36c811214cf08111fc7c30
-R 8e1387887df31bb2afbbfb0376d248a9
-T +closed b3b0b78e14b5c0dca685f6d23000005d8cc0f5860c36c811214cf08111fc7c30
+P d4df8c007285cec677057dcd03a4690fbce50e485c135ec839c03eb6df77d19e
+R 9797e3f50beb6ec00cd53d4244cb101c
 U rolf
-Z 03b0f777e3c7a18dd262291e662c4150
+Z cdfb167bada3c1943ec93ed1ee5fc841
 # Remove this line to create a well-formed Fossil manifest.
