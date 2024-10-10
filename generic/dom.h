@@ -120,6 +120,14 @@
 #  endif
 #endif
 
+#ifndef TDOM_INLINE
+#ifdef _MSC_VER
+# define TDOM_INLINE __inline
+#else
+# define TDOM_INLINE inline
+#endif
+#endif
+
 /* Since the len argument of XML_Parse() is of type int, parsing of
  * strings has to be done in chunks anyway for Tcl 9 with its strings
  * potentially longer than 2 GByte. Because of internal changes in
