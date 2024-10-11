@@ -66,8 +66,8 @@ which you get as
 or as [zip archive](http://tdom.org/index.html/zip/trunk/tdom-trunk.zip)
 
 The latest release is 0.9.5. Get the source code as
-[tarball](http://tdom.org/downloads/tdom-0.9.4-src.tgz) or
-as [zip archive](http://tdom.org/downloads/tdom-0.9.4-src.zip).
+[tarball](http://tdom.org/downloads/tdom-0.9.5-src.tgz) or
+as [zip archive](http://tdom.org/downloads/tdom-0.9.5-src.zip).
 
 Windows binaries of the 0.9.5 release are also available. Get it for
 [Tcl 8.6 / 64 bit](http://tdom.org/downloads/tdom-0.9.5-windows-x64.zip) or [Tcl 8.6
