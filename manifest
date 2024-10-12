@@ -1,5 +1,5 @@
-C Use\sthe\sconfigure\screated\spkgIndex.tcl\sfor\stnc.\sRemoved\san\snot\sused\svariable.
-D 2024-10-12T01:16:52.455
+C Corrected\sthe\stnc\spkgIndex.tcl.in.
+D 2024-10-12T15:07:38.495
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -113,7 +113,7 @@ F extensions/tnc/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
 F extensions/tnc/configure e4340f98323fdc8e4abba3bd37ea02405455aacc4c8bf8ffa7731e3399b79dbf x
 F extensions/tnc/configure.ac 4fd59a3f8af1b8ff8db46c2fb007e692e43a55088d00ad0b4d8b5328f8888d10
 F extensions/tnc/install-sh bdd5e293591621ae60d9824d86a4b1c5f22c3d00 x
-F extensions/tnc/pkgIndex.tcl.in 31af385a73fa5544343c6b2749c762697c6c5123ac37dc2230bf5fe0f8f849e7
+F extensions/tnc/pkgIndex.tcl.in 5c4022af93826a1d4f13f6105e86600d20b914b8bc9a0f48c0d98b3108b00a06
 F extensions/tnc/test.tcl 545cdec17e6702cef9f79184fdf1ce0166b8c412
 F extensions/tnc/tests/all.tcl 845c9dab65c294c3570f69cc731d6fef62efbd03
 F extensions/tnc/tests/loadtnc.tcl c9b49c87af627263d40dcfbdd005bfddbc2a6ab5c8636d25618034c724e91c71
@@ -242,8 +242,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 8b95c3d54f3948b741c38fea066782b6c0a589291ea79ead1642293824ba0718
-R 4e60e41941153dd572e5c81edd74e3d2
+P 9887c93bab5eb3e9d52fd59e832da0af456f98e592549df4d9597ec352eb0e91
+R e8699c8fec8c6e8adc6fc3866ab6b1a0
 U rolf
-Z c77b101ee0b7f6557cf6a6019b504787
+Z f2d5a502d00431860e9175c74ae524b1
 # Remove this line to create a well-formed Fossil manifest.
