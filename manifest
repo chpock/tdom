@@ -1,5 +1,5 @@
-C Improved\scompatibility\swith\solder\sVC\scompiler.
-D 2024-10-10T23:08:24.243
+C Use\sthe\sconfigure\screated\spkgIndex.tcl\sfor\stnc.\sRemoved\san\snot\sused\svariable.
+D 2024-10-12T01:16:52.455
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -108,10 +108,10 @@ F extensions/tdomhtml/install-sh b087e5c4b92820c60bffb74acc1d9c2d40d80b8f x
 F extensions/tdomhtml/pkgIndex.tcl.in 2612d2a8fd5a213a1379ad5570c229d82810dcb5
 F extensions/tdomhtml/tdomhtml.tcl 6901a0fb8db80954dd635e181934b9e3ba3a1864551155f3d5c01355ddbf0a45
 F extensions/tdomhtml/win/makefile.vc a6ba491c8f63a88c607c443e7a80f1369cb3c40c
-F extensions/tnc/Makefile.in c51faf11e968837f696422a9b051c3544d59c495cece41e2b24921dbe1c2946c
+F extensions/tnc/Makefile.in c7f74cda510a493a7c1539f1db9118be38b9482b57d4f9b51618c9aaf38c4a9a
 F extensions/tnc/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
-F extensions/tnc/configure d7dab65df6549e42532c6bc90753334d5fd7825c0221a9fa13b11d7d1a74339a x
-F extensions/tnc/configure.ac 72ce2231e040d38f6a146fb1dfa3ed187bebbeaecc85ab3811acf0a986900aac
+F extensions/tnc/configure e4340f98323fdc8e4abba3bd37ea02405455aacc4c8bf8ffa7731e3399b79dbf x
+F extensions/tnc/configure.ac 4fd59a3f8af1b8ff8db46c2fb007e692e43a55088d00ad0b4d8b5328f8888d10
 F extensions/tnc/install-sh bdd5e293591621ae60d9824d86a4b1c5f22c3d00 x
 F extensions/tnc/pkgIndex.tcl.in 31af385a73fa5544343c6b2749c762697c6c5123ac37dc2230bf5fe0f8f849e7
 F extensions/tnc/test.tcl 545cdec17e6702cef9f79184fdf1ce0166b8c412
@@ -141,7 +141,7 @@ F generic/domjson.h 5cf49e967a4127b1c706ea2d7f5bf8be227cb59bfbdaae26cfcb9267b710
 F generic/domlock.c 60f6c6f4dc95d6525f77cd589a07f6ec78f2068b12821067c5a075a2740abacb
 F generic/domxpath.c 9cc53657befca50d78ae9ef4aa97dc671f889d7732eab6a1b41adda1d480d9ec
 F generic/domxpath.h a98836ef133283a20855968b76821042bce16b57b664689a15c017e3fecdae2f
-F generic/domxslt.c 0ae9bb14d96e0b95d28a83da760826fb432e2d8472562892f5ea58c0ec5d3080
+F generic/domxslt.c 7f9ce337cd2c261192395d1ae94e1967b5a735a0afc84fc809623546ab9443fb
 F generic/domxslt.h aeaf957ee38a9e7564bd9f1bed1781de108767df476a0d0776615988d8f04e0f
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c cd86d79364a11fd67444a82f8a1de2ad10c01a33154c1bed767d58fec6142547
@@ -242,8 +242,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 0749516c84eb70945abc2ae1f460888e548ef38dc084c584d0c66b89568ecb0b
-R 30dd42db6851c2b7b2e960d267bcdd9e
+P 8b95c3d54f3948b741c38fea066782b6c0a589291ea79ead1642293824ba0718
+R 4e60e41941153dd572e5c81edd74e3d2
 U rolf
-Z 988eea5fa35691a6bd2a13e3baaffcf4
+Z c77b101ee0b7f6557cf6a6019b504787
 # Remove this line to create a well-formed Fossil manifest.

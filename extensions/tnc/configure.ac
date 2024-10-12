@@ -100,11 +100,11 @@ TEA_ADD_TCL_SOURCES([])
 
 if test "${TEA_PLATFORM}" = "windows" ; then
     #AC_DEFINE(BUILD_tnc, 1, [Build windows export dll])
-    CLEANFILES="pkgIndex.tcl *.lib *.dll *.exp *.ilk *.pdb vc*.pch"
+    CLEANFILES="*.lib *.dll *.exp *.ilk *.pdb vc*.pch"
     #TEA_ADD_SOURCES([win/winFile.c])
     #TEA_ADD_INCLUDES([-I\"$(${CYGPATH} ${srcdir}/win)\"])
 else
-    CLEANFILES="pkgIndex.tcl"
+    CLEANFILES=""
     #TEA_ADD_SOURCES([unix/unixFile.c])
     #TEA_ADD_LIBS([-lsuperfly])
 fi

@@ -1153,7 +1153,7 @@ static int xsltFormatNumber (
     char stmp[240], ftmp[80], *tstr;
     char wrongFormat[] = "Unable to interpret format pattern.";
     domLength l, zl, gLen;
-    int i, j, k, g, nHash, nZero, fHash, fZero, isNeg;
+    int i, j, k, g, nZero, fHash, fZero, isNeg;
     int prefixMinux, percentMul = 0, perMilleMul = 0;
     Tcl_DString  dStr, s;
     Tcl_UniChar *format, *negformat = NULL, *p, *p1;
@@ -1220,7 +1220,7 @@ static int xsltFormatNumber (
         p++;
     }
     prefix1[i] = '\0';
-    nHash = nZero = fHash = fZero = 0;
+    nZero = fHash = fZero = 0;
     gLen = -2222;
     while (*p) {
         if (*p==df->digit) {
@@ -1228,7 +1228,6 @@ static int xsltFormatNumber (
                 *errMsg = tdomstrdup(wrongFormat);
                 goto xsltFormatNumberError;
             }
-            nHash++; 
         }
         else if (*p==df->zeroDigit) { nZero++; }
         else if (*p==df->groupingSeparator) { gLen=-1; }
