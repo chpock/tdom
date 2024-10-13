@@ -1,4 +1,6 @@
 
+--- Release 0.9.5, 13. Oct 2024 ---
+
 2024-09-27  Rolf Ade  <rolf@pointsman.de>
 
         Added the asTypedList method to the domDoc and domNode
