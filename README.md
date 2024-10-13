@@ -70,10 +70,10 @@ The latest release is 0.9.5. Get the source code as
 as [zip archive](http://tdom.org/downloads/tdom-0.9.5-src.zip).
 
 Windows binaries of the 0.9.5 release are also available. Get it for
-[Tcl 8.6 / 64 bit](http://tdom.org/downloads/tdom-0.9.5-windows-x64.zip) or [Tcl 8.6
-/ 32 bit](http://tdom.org/downloads/tdom-0.9.5-windows-x86.zip) or
-[Tcl 9 / 64 bit](http://tdom.org/downloads/tcl9-tdom-0.9.5-windows-x64.zip)
-or [Tcl 9 / 32 bit](http://tdom.org/downloads/tcl9-tdom-0.9.5-windows-x86.zip)
+[64 bit](http://tdom.org/downloads/tdom-0.9.5-windows-64.zip) or
+[32_bit](http://tdom.org/downloads/tdom-0.9.5-windows-32.zip). The zip
+archives include binaries for tDOM and the tDOM extension tcl for Tcl
+8.6 and Tcl 9.
 
 The provided windows binaries include (statically linked) the
 HTML5 parser.
