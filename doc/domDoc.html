@@ -4,15 +4,15 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x55a7f53164b0">NAME</a> · <a href="#SECTid0x55a7f5355690">SYNOPSIS</a> · <a href="#SECTid0x55a7f5421ee0">DESCRIPTION </a> · <a href="#SECTid0x55a7f548caf0">SEE ALSO</a> · <a href="#SECTid0x55a7f548ce80">KEYWORDS</a>
+<a href="#SECTid0x561c909884b0">NAME</a> · <a href="#SECTid0x561c909c3660">SYNOPSIS</a> · <a href="#SECTid0x561c90a93f00">DESCRIPTION </a> · <a href="#SECTid0x561c90afb8f0">SEE ALSO</a> · <a href="#SECTid0x561c90afbc80">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x55a7f53164b0">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x561c909884b0">NAME</a></h2><p class="namesection">
 <b class="names">domDoc - </b><br>Manipulates an instance of a DOM document object</p>
   
-  <h2><a name="SECTid0x55a7f5355690">SYNOPSIS</a></h2><pre class="syntax">domDocObjCmd <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
+  <h2><a name="SECTid0x561c909c3660">SYNOPSIS</a></h2><pre class="syntax">domDocObjCmd <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
 
-  <h2><a name="SECTid0x55a7f5421ee0">DESCRIPTION </a></h2><p>This command manipulates one particular instance of a document
+  <h2><a name="SECTid0x561c90a93f00">DESCRIPTION </a></h2><p>This command manipulates one particular instance of a document
 object. <i class="m">method</i> indicates a specific method of the document class. These
 methods should closely conform to the W3C recommendation "Document Object Model
 (Core) Level 1" (<a href="http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html">http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html</a>). Look
@@ -383,6 +383,31 @@ channelId?</b> <b class="option">?-escapeNonASCII?</b> <b class="option">?-htmlE
         list or a string.</p>
         </dd>
       
+
+      
+        <dt><b class="method">asTypedList</b></dt>
+        <dd>
+<p>In case the DOM tree includes JSON type information
+        this method returns the JSON data as a nested Tcl list.</p>
+
+        <p>The first element of every of this lists describes the type
+        of the value. The types are: OBJECT, ARRAY, STRING, NUMBER,
+        TRUE, FALSE or NULL.</p>
+
+        <p>If the type is NUMBER or STRING, then the second (and last)
+        element is the value. If the type is NULL, TRUE or FALSE the
+        list does not have any other elements.</p>
+        
+        <p>If the type is OBJECT the second value will be a Tcl list
+        of property name and value pairs, which means the second
+        element could be used as dict. The value will be a Tcl list
+        build by the rules of the <i class="m">asTypedList</i> method.</p>
+
+        <p>If the type is ARRAY the second value will be a Tcl list of
+        the JSON array values, each one build by the rules of the
+        <i class="m">asTypedList</i> method.</p>
+        </dd>
+      
       
       
         <dt>
@@ -748,9 +773,9 @@ tried to be executed. This allows quick method additions on Tcl level.</p><p>New
 are not moved into the tree they are automatically deleted as soon as the whole
 document gets deleted.</p>
 
-    <h2><a name="SECTid0x55a7f548caf0">SEE ALSO</a></h2><p class="seealso">dom, domNode</p>
+    <h2><a name="SECTid0x561c90afb8f0">SEE ALSO</a></h2><p class="seealso">dom, domNode</p>
 
-    <h2><a name="SECTid0x55a7f548ce80">KEYWORDS</a></h2><p class="keywords">
+    <h2><a name="SECTid0x561c90afbc80">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-DOMnodecreation">DOM node creation</a>, <a class="keyword" href="keyword-index.html#KW-documentelement">document element</a>
 </p>
 

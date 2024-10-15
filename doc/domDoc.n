@@ -495,6 +495,31 @@ the elements of a JSON array list may be a Tcl dict or a Tcl
 list or a string.
 .RE
 .TP
+\&\fB\fBasTypedList\fP
+\&\fR
+.RS
+.PP
+In case the DOM tree includes JSON type information
+this method returns the JSON data as a nested Tcl list.
+.PP
+The first element of every of this lists describes the type
+of the value. The types are: OBJECT, ARRAY, STRING, NUMBER,
+TRUE, FALSE or NULL.
+.PP
+If the type is NUMBER or STRING, then the second (and last)
+element is the value. If the type is NULL, TRUE or FALSE the
+list does not have any other elements.
+.PP
+If the type is OBJECT the second value will be a Tcl list
+of property name and value pairs, which means the second
+element could be used as dict. The value will be a Tcl list
+build by the rules of the \fIasTypedList\fR method.
+.PP
+If the type is ARRAY the second value will be a Tcl list of
+the JSON array values, each one build by the rules of the
+\&\fIasTypedList\fR method.
+.RE
+.TP
 \&\fB\fBpublicId\fP \fI?publicId?\fB
 \&\fRReturns the public identifier of the doctype declaration of the
 document, if there is one, otherwise the empty string. If there is a value
