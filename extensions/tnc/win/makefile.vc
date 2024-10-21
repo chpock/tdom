@@ -28,6 +28,9 @@ PRJ_OBJS = $(TMP_DIR)\tnc.obj
 !endif
 !include versions.vc
 TDOMVER             = $(TDOM_DOTVERSION:.=)
+!if $(TCL_MAJOR_VERSION) <= 8
+TDOMSTUBVER = $(TDOMVER)
+!endif
 
 # tdom root
 TDOMROOT            = ..\..\..
@@ -45,7 +48,7 @@ PRJ_INCLUDES = -I$(TDOMROOT)\generic -I$(TDOMROOT)\expat
 TNCDIR         = $(TDOMROOT)\extensions\tnc
 
 !if !$(STATIC_BUILD)
-PRJ_LIBS  = $(TDOMLIBPATH)\tdomstub$(TDOMVER).lib
+PRJ_LIBS  = $(TDOMLIBPATH)\tdomstub$(TDOMSTUBVER).lib
 !endif
 
 !include "$(_RULESDIR)\targets.vc"
