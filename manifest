@@ -1,5 +1,5 @@
-C Updated\sthe\sVC\sbuild\stool\schain\srelated\sfiles.
-D 2024-10-17T23:50:42.132
+C Integrated\sthe\sfix\sfor\stnc\snmake\sfor\sTcl\s9.\sThanks.
+D 2024-10-24T23:27:37.584
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -120,7 +120,7 @@ F extensions/tnc/tests/all.tcl 845c9dab65c294c3570f69cc731d6fef62efbd03
 F extensions/tnc/tests/loadtnc.tcl c9b49c87af627263d40dcfbdd005bfddbc2a6ab5c8636d25618034c724e91c71
 F extensions/tnc/tests/tnc.test 689eb32d186e04de0b0809333ad39f8a23ec1467fa545b790e7959ed7b09556c
 F extensions/tnc/tnc.c 48ad58bc421cd51e29e30890d4fb8707dbb4dfe56c88dfae0e52f30f8b8fa03a
-F extensions/tnc/win/makefile.vc 51edf6f542aa90a9195b4a217d15ae7a4df488faa15c4ca723bc2705640b6bc9
+F extensions/tnc/win/makefile.vc d39ba2e6180a84a4d31415b9996577d88e5dd18c2cb50748afd179f9c0546421
 F extensions/tnc/win/nmakehlp.c 194ae7c24886245c679cb4c9ea7e6daaaebb5fcd
 F extensions/tnc/win/rules-ext.vc 3c02944b3199014d35de617a1c146d0944af16395870da423374fb013ef57ecf
 F extensions/tnc/win/rules.vc afa89d3b334f5958efc447c985949447a9b05f6c891c7e1e8c0423ed226e89dc
@@ -243,8 +243,9 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 3df582dd2d2a9fbefe4a9e675e27c198c8396d27b080a0af3e3cea62448b31d5
-R a4791092bb7c2df43791e73fbe5589ae
+P 1ab5070709e0bf987cd0ceb28920441433c33e8dad42273417baa56c918f5981 61d4f56d62db4f3b8f1666c8539cee2cb81ff2c3c7799614546f44b814d1c9a8
+R 58e1883870a7eb235db88480447f14c8
+T +closed 61d4f56d62db4f3b8f1666c8539cee2cb81ff2c3c7799614546f44b814d1c9a8
 U rolf
-Z 15f1d96946d34e1ca4ae81bfd82d5951
+Z c4eb3aee41640106fb23d1a18f53dabd
 # Remove this line to create a well-formed Fossil manifest.
