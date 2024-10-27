@@ -3130,6 +3130,13 @@ test json-12.7 {createFromTypedList} {
     set errMsg
 } {Invalid typed list format: object property "two": array element 2: No value expected for NULL.}
 
+test json-12.8 {createFromTypedList} {
+    set doc [dom createFromTypedList {OBJECT {"Titel with spaces" {STRING Wirtschaftsinformatik} Keywords {ARRAY {{STRING Introduction} {STRING Basics}}} Year {NUMBER 2022}}}]
+    set result [$doc asJSON]
+    $doc delete
+    set result
+} {{"Titel with spaces":"Wirtschaftsinformatik","Keywords":["Introduction","Basics"],"Year":2022}}
+
 }
 
 if {[info commands _dom] eq ""} {
