@@ -14,6 +14,9 @@ typedef void (*CHandlerSet_userDataFree)(Tcl_Interp *interp, void *userData);
 typedef void (*CHandlerSet_parserReset)(XML_Parser parser, void *userData);
 typedef void (*CHandlerSet_initParse)(Tcl_Interp *interp, void *userData);
 
+typedef void(XMLCALL *tdom_CharacterDataHandler)(void *userData,
+                                                  const XML_Char *s, domLength len);
+
 typedef struct CHandlerSet {
     struct CHandlerSet *nextHandlerSet;
     char *name;                     /* refname of the handler set */
@@ -35,7 +38,7 @@ typedef struct CHandlerSet {
     /* C func for element end */
     XML_EndElementHandler            elementendcommand;
     /* C func for character data */
-    XML_CharacterDataHandler         datacommand;
+    tdom_CharacterDataHandler        datacommand;
     /* C func for namespace decl start */
     XML_StartNamespaceDeclHandler    startnsdeclcommand;
     /* C func for namespace decl end */
@@ -130,6 +133,10 @@ typedef struct TclGenExpatInfo {
     Tcl_Obj *result;		/* application return result */
     const char *context;        /* reference to the context pointer */  
     Tcl_Obj *cdata;             /* Accumulates character data */ 
+    domLength cdataStartLine;   /* Line number of the start of cdata */
+    domLength cdataStartColumn; /* Column number of the start of cdata */
+    domLength cdataStartByteIndex; /* Byte index of the start of cdata */
+    int keepTextStart;          /* Keep the cdata start line/column/byteIndex */
     ExpatElemContent *eContents;/* The reported XML_Contents as linked list */
     int ns_mode;                /* namespace mode */
     Tcl_Obj *baseURI;

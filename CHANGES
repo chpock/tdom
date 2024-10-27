@@ -1,5 +1,37 @@
 
---- Release 0.9.4,  <tbd> ---
+--- Release 0.9.5, 13. Oct 2024 ---
+
+2024-09-27  Rolf Ade  <rolf@pointsman.de>
+
+        Added the asTypedList method to the domDoc and domNode
+        commands.
+
+        Added the createFromTypedList method to the dom command.
+
+2024-09-23  Rolf Ade  <rolf@pointsman.de>
+
+        Updated to expat 2.6.3.
+
+2024-09-08  Rolf Ade  <rolf@pointsman.de>
+
+        Added the flag -keepTextStart to the expat command.
+
+2024-08-31  Rolf Ade  <rolf@pointsman.de>
+
+        Text node commands created by createNodeCmd of the json type
+        NULL, TRUE or FALSE may be called without argument.
+
+2024-08-26  Rolf Ade  <rolf@pointsman.de>
+
+        Changed the error messages of the dom, domDoc and domNode
+        commands to mostly confirm to ususal Tcl behaviour.
+
+2024-08-14  Rolf Ade  <rolf@pointsman.de>
+
+        Added the asTclValue method to the domDoc and domNode
+        commands.
+
+--- Release 0.9.4, 26. Jul 2024 ---
 
 2024-07-02  Rolf Ade  <rolf@pointsman.de>
 

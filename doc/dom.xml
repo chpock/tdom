@@ -168,9 +168,12 @@ rename $document ""</example>
               <optdef>
                 <optname>--</optname> 
                 <desc>The option <m>--</m> marks the end of options.
-                While respected in general this option is only needed
-                in case of parsing JSON data, which may start with a
-                "-".</desc>
+                To give this option isn't strictly necessary even in
+                the case of JSON parsing, for which valid data may
+                start with a "-". If parsing json and if the second to
+                last or last argument start with a "-" and isn't a
+                known option name it will be treated as JSON
+                data.</desc>
               </optdef>
 
               <optdef>
@@ -396,11 +399,24 @@ memory handling as explained above.</desc>
 
         <commanddef>
           <command><cmd>dom</cmd> <method>createDocumentNode</method>
-?<m>objVar</m>?</command>
-          <desc>Creates a new 'empty' DOM document object without any element
-node. <m>objVar</m> controls the memory handling as explained above.</desc>
+?<m>-jsonType jsonType</m>? ?<m>objVar</m>?</command>
+          <desc>Creates a new 'empty' DOM document object without any
+          element node. <m>objVar</m> controls the memory handling as
+          explained above. If the option -jsonType is given the
+          created document node will be of the given JSON type.</desc>
         </commanddef>
 
+        <commanddef>
+        <command><cmd>dom</cmd> <method>createFromTypedList</method> <m>typedList</m> ?<m>objVar</m>?</command>
+          <desc><p>Creates a new DOM document from the argument <m>typedList</m>.
+          The <m>objVar</m> argument controls the memory handling as
+          explained above.</p>
+
+          <p>The <m>typedList</m> argument must be a Tcl list and must
+          follow the format of the output of the document command
+          method <m>asTypedList</m>, see there.</p></desc>
+        </commanddef>
+        
         <commanddef>
           <command><cmd>dom</cmd> <method>createNodeCmd</method>
 <m>?-returnNodeCmd?</m> <m>?-tagName name?</m> <m>?-jsonType jsonType?</m> <m>?-namespace URI?</m> <m>(element|comment|text|cdata|pi)Node</m> <m>commandName</m></command>
@@ -472,8 +488,12 @@ the created text node will have that JSON type. The syntax of the
 created command is:</p>
 
 <syntax>
-<cmd>textNodeCmd</cmd> ?-disableOutputEscaping? <m>data</m>
+<cmd>textNodeCmd</cmd> ?-disableOutputEscaping? <m>?data?</m>
 </syntax>
+
+<p>If the json type of the created text node is NULL, TRUE or FALSE
+then the <m>data</m> argument is optional, otherwise it this argument
+must be given.</p>
 
 <p>If the optional flag <m>-disableOutputEscaping</m> is given, the
 escaping of the ampersand character (&amp;) and the left angle bracket (&lt;)

@@ -344,6 +344,53 @@ channelId?</option> <option>?-escapeNonASCII?</option> <option>?-htmlEntities?</
           level. The default is to not emit any additional
           white space.</p></desc>
       </commanddef>
+
+      <commanddef>
+        <command><method>asTclValue</method> <option>?typevariable?</option></command>
+        <desc><p>In case the DOM tree includes JSON type information
+        this method returns the JSON data as nested Tcl data
+        structure.</p>
+
+        <p>The returned value may be a Tcl dict, a Tcl list or a
+        string. If the optional argument <m>typevariable</m> is given
+        then the variable with that name is set to the value
+        <m>dict</m>, <m>list</m> or <m>string</m> respectively to
+        signal the type of the result.</p>
+
+        <p>A JSON object is returned as Tcl dict, a JSON array is
+        returned as list and JSON strings and numbers as well as the
+        symbolic JSON values null, true and false are returned as
+        string (with the strings null, true and false for the
+        respectively JSON symbol). The value of a member of a JSON
+        object may be also a Tcl dict, or a Tcl list or a string and
+        the elements of a JSON array list may be a Tcl dict or a Tcl
+        list or a string.</p>
+        </desc>
+      </commanddef>
+
+      <commanddef>
+        <command><method>asTypedList</method></command>
+        <desc><p>In case the DOM tree includes JSON type information
+        this method returns the JSON data as a nested Tcl list.</p>
+
+        <p>The first element of every of this lists describes the type
+        of the value. The types are: OBJECT, ARRAY, STRING, NUMBER,
+        TRUE, FALSE or NULL.</p>
+
+        <p>If the type is NUMBER or STRING, then the second (and last)
+        element is the value. If the type is NULL, TRUE or FALSE the
+        list does not have any other elements.</p>
+        
+        <p>If the type is OBJECT the second value will be a Tcl list
+        of property name and value pairs, which means the second
+        element could be used as dict. The value will be a Tcl list
+        build by the rules of the <m>asTypedList</m> method.</p>
+
+        <p>If the type is ARRAY the second value will be a Tcl list of
+        the JSON array values, each one build by the rules of the
+        <m>asTypedList</m> method.</p>
+        </desc>
+      </commanddef>
       
       <commanddef>
         <command><method>publicId</method> <m>?publicId?</m></command>

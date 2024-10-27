@@ -39,6 +39,7 @@
 #include <tcldom.h>
 #include <tcl.h>
 #include <nodecmd.h>
+#include <domjson.h>
 
 /*----------------------------------------------------------------------------
 |   Types
@@ -275,7 +276,7 @@ nodecmd_processAttributes (
     /*
      * Allow for following syntax:
      *   cmd ?-option value ...? ?script?
-     *   cmd ?option value ...? ?script?
+     *   cmd ?opton value ...? ?script?
      *   cmd key_value_list script
      *       where list contains "-key value ..." or "key value ..."
      */
@@ -373,9 +374,17 @@ NodeObjCmd (
     case COMMENT_NODE_CHK:       
     case TEXT_NODE:              
     case TEXT_NODE_CHK:
+        tval = NULL;
         if (objc != 2) {
             if (abs(type) == TEXT_NODE || abs(type) == TEXT_NODE_CHK) {
-                if (objc != 3 ||
+                if (objc == 1 &&
+                    (nodeInfo->jsonType == JSON_NULL
+                     || nodeInfo->jsonType == JSON_TRUE
+                     || nodeInfo->jsonType == JSON_FALSE)) {
+                    tval = "";
+                    len = 0;
+                }
+                else if (objc != 3 ||
                     strcmp ("-disableOutputEscaping",
                             Tcl_GetStringFromObj (objv[1], &len))!=0) {
                     Tcl_WrongNumArgs(interp, 1, objv,
@@ -390,7 +399,9 @@ NodeObjCmd (
                 return TCL_ERROR;
             }
         }
-        tval = Tcl_GetStringFromObj(objv[index], &len);
+        if (!tval) {
+            tval = Tcl_GetStringFromObj(objv[index], &len);
+        }
         switch (abs(type)) {
         case TEXT_NODE_CHK:
             if (!tcldom_textCheck (interp, tval, "text")) return TCL_ERROR;
@@ -483,7 +494,7 @@ NodeObjCmd (
     if (type < 0 && newNode != NULL) {
         char buf[64];
         tcldom_createNodeObj(interp, newNode, buf);
-        Tcl_SetObjResult(interp, Tcl_NewStringObj(buf, strlen(buf)));
+        Tcl_SetObjResult(interp, Tcl_NewStringObj(buf, (domLength)strlen(buf)));
     }
     
     if (ret == TCL_OK) doc->nodeFlags |= NEEDS_RENUMBERING;

@@ -60,7 +60,7 @@ domDocument * tcldom_getDocumentFromName(Tcl_Interp *interp,
 int tcldom_prefixNSlist (char ***prefixnsPtr, Tcl_Interp *interp, int objc,
                          Tcl_Obj *const objv[], const char *methodName);
 int tcldom_setInterpAndReturnVar (Tcl_Interp *interp, domNode *node,
-                                  int setVariable, Tcl_Obj *var_name);
+                                  Tcl_Obj *var_name);
 
 void tcldom_initialize(void);
 void tcldom_deleteDoc (Tcl_Interp *interp, domDocument *doc);
@@ -86,11 +86,11 @@ void tcldom_reportErrorLocation (
     Tcl_Interp *interp,
     int before,
     int after,
-    domLength line,
-    domLength column,
+    XML_Size line,
+    XML_Size column,
     char *xmlstring,
     const char *entity,
-    domLength byteIndex,
+    XML_Index byteIndex,
     const char *errStr
     );
 

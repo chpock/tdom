@@ -4,17 +4,17 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x5607ea0eccd0">NAME</a> · <a href="#SECTid0x5607ea120250">SYNOPSIS</a> · <a href="#SECTid0x5607ea120850">DESCRIPTION </a> · <a href="#SECTid0x5607ea09d0c0">KEYWORDS</a>
+<a href="#SECTid0x55a5a8a45a40">NAME</a> · <a href="#SECTid0x55a5a8a637a0">SYNOPSIS</a> · <a href="#SECTid0x55a5a8a3edf0">DESCRIPTION </a> · <a href="#SECTid0x55a5a8a61600">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x5607ea0eccd0">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x55a5a8a45a40">NAME</a></h2><p class="namesection">
 <b class="names">dom - </b><br>Create an in-memory DOM tree from XML</p>
   
-  <h2><a name="SECTid0x5607ea120250">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x55a5a8a637a0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">dom</b> <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
 
-  <h2><a name="SECTid0x5607ea120850">DESCRIPTION </a></h2><p>This command provides the creation of DOM trees in memory. In
+  <h2><a name="SECTid0x55a5a8a3edf0">DESCRIPTION </a></h2><p>This command provides the creation of DOM trees in memory. In
 the usual case a string containing a XML information is parsed and converted
 into a DOM tree. Other possible parse input may be HTML or JSON.
 The <i class="m">method</i> indicates a specific subcommand. </p><p>The valid methods are:</p><dl class="commandlist">
@@ -161,9 +161,12 @@ rename $document ""</pre>
               
                 <dt><b>--</b></dt> 
                 <dd>The option <i class="m">--</i> marks the end of options.
-                While respected in general this option is only needed
-                in case of parsing JSON data, which may start with a
-                "-".</dd>
+                To give this option isn't strictly necessary even in
+                the case of JSON parsing, for which valid data may
+                start with a "-". If parsing json and if the second to
+                last or last argument start with a "-" and isn't a
+                known option name it will be treated as JSON
+                data.</dd>
               
 
               
@@ -410,11 +413,27 @@ memory handling as explained above.</dd>
         
           <dt>
 <b class="cmd">dom</b> <b class="method">createDocumentNode</b>
-?<i class="m">objVar</i>?</dt>
-          <dd>Creates a new 'empty' DOM document object without any element
-node. <i class="m">objVar</i> controls the memory handling as explained above.</dd>
+?<i class="m">-jsonType jsonType</i>? ?<i class="m">objVar</i>?</dt>
+          <dd>Creates a new 'empty' DOM document object without any
+          element node. <i class="m">objVar</i> controls the memory handling as
+          explained above. If the option -jsonType is given the
+          created document node will be of the given JSON type.</dd>
         
 
+        
+        <dt>
+<b class="cmd">dom</b> <b class="method">createFromTypedList</b> <i class="m">typedList</i> ?<i class="m">objVar</i>?</dt>
+          <dd>
+<p>Creates a new DOM document from the argument <i class="m">typedList</i>.
+          The <i class="m">objVar</i> argument controls the memory handling as
+          explained above.</p>
+
+          <p>The <i class="m">typedList</i> argument must be a Tcl list and must
+          follow the format of the output of the document command
+          method <i class="m">asTypedList</i>, see there.</p>
+</dd>
+        
+        
         
           <dt>
 <b class="cmd">dom</b> <b class="method">createNodeCmd</b>
@@ -488,8 +507,12 @@ the created text node will have that JSON type. The syntax of the
 created command is:</p>
 
 <pre class="syntax">
-<b class="cmd">textNodeCmd</b> ?-disableOutputEscaping? <i class="m">data</i>
+<b class="cmd">textNodeCmd</b> ?-disableOutputEscaping? <i class="m">?data?</i>
 </pre>
+
+<p>If the json type of the created text node is NULL, TRUE or FALSE
+then the <i class="m">data</i> argument is optional, otherwise it this argument
+must be given.</p>
 
 <p>If the optional flag <i class="m">-disableOutputEscaping</i> is given, the
 escaping of the ampersand character (&amp;) and the left angle bracket (&lt;)
@@ -787,7 +810,7 @@ recommendation. Otherwise it returns 0.</dd>
         
     </dl>
 
-<h2><a name="SECTid0x5607ea09d0c0">KEYWORDS</a></h2><p class="keywords">
+<h2><a name="SECTid0x55a5a8a61600">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-XML">XML</a>, <a class="keyword" href="keyword-index.html#KW-DOM">DOM</a>, <a class="keyword" href="keyword-index.html#KW-document">document</a>, <a class="keyword" href="keyword-index.html#KW-node">node</a>, <a class="keyword" href="keyword-index.html#KW-parsing">parsing</a>
 </p>
 </div><hr class="navsep"><div class="navbar" align="center">

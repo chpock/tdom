@@ -35,6 +35,7 @@
 
 #include <tcl.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 #include <ctype.h>
 #include <expat.h>
@@ -97,9 +98,8 @@
 /* Beginning with Tcl 9.0 the string representation of a Tcl_Obj may
  * be bigger thant 2 GByte. Therefore some API functions differ. */
 #if TCL_MAJOR_VERSION > 8
-/* Starting with Tcl 9 there are only threaded builds */
-#  ifndef TCL_THREADS
-#    define TCL_THREADS
+#  ifdef _WIN32
+#    define TCL_THREADS 1
 #  endif
 #  define domLength Tcl_Size
 #  define Tcl_SetDomLengthObj Tcl_SetWideIntObj
@@ -112,12 +112,30 @@
 #  define Tcl_GetSizeIntFromObj Tcl_GetIntFromObj
 #endif
 
+#ifndef TDOM_LS_MODIFIER
+#  ifdef _WIN32
+#    define TDOM_LS_MODIFIER "I64"
+#  else 
+#    define TDOM_LS_MODIFIER "ll"
+#  endif
+#endif
+
+#ifndef TDOM_INLINE
+#ifdef _MSC_VER
+# define TDOM_INLINE __inline
+#else
+# define TDOM_INLINE inline
+#endif
+#endif
+
 /* Since the len argument of XML_Parse() is of type int, parsing of
  * strings has to be done in chunks anyway for Tcl 9 with its strings
  * potentially longer than 2 GByte. Because of internal changes in
- * exapt a chunk size of INT_MAX led to out of memory errors. */
-#ifndef PARSE_CHUNK_SIZE
-# define PARSE_CHUNK_SIZE 8096
+ * exapt a chunk size of INT_MAX led to out of memory errors.
+ * (TDOM_PCS = TDOM_PARSE_CHUNK_SIZE) */
+
+#ifndef TDOM_PCS
+# define TDOM_PCS INT_MAX / 2
 #endif
 
 /* The following is the machinery to have an UNUSED macro which
@@ -172,7 +190,7 @@
 # define TDomThreaded(x)    x
 # define HASHTAB(doc,tab)   (doc)->tab
 # define NODE_NO(doc)       ((doc)->nodeCounter)++
-# define DOC_NO(doc)        (Tcl_WideInt)(doc)
+# define DOC_NO(doc)         (uintptr_t)(doc)
 #endif /* TCL_THREADS */
 
 #define DOC_CMD(s,doc)      sprintf((s), "domDoc%p", (void *)(doc))
@@ -390,7 +408,7 @@ static const unsigned char CharBit[] = {
 |   DOMString
 |
 \-------------------------------------------------------------------------*/
-typedef char* domString;   /* should 16-bit unicode character !!*/
+typedef char* domString;   
 
 
 /*--------------------------------------------------------------------------
@@ -539,7 +557,7 @@ typedef struct domDocument {
     domNodeType       nodeType  : 8;
     domDocFlags       nodeFlags : 8;
     domNameSpaceIndex dummy     : 16;
-    Tcl_WideInt       documentNumber;
+    uintptr_t         documentNumber;
     struct domNode   *documentElement;
     struct domNode   *fragments;
 #ifdef TCL_THREADS
@@ -626,17 +644,17 @@ typedef struct _domActiveNS {
 \-------------------------------------------------------------------------*/
 typedef struct domLineColumn {
 
-    long  line;
-    long  column;
-    long  byteIndex;
+    XML_Size  line;
+    XML_Size  column;
+    XML_Index  byteIndex;
 
 } domLineColumn;
 
 typedef struct {
     int  errorCode;
-    long errorLine;
-    long errorColumn;
-    long byteIndex;
+    XML_Size errorLine;
+    XML_Size errorColumn;
+    XML_Index byteIndex;
 } domParseForestErrorData;
 
 
@@ -883,8 +901,8 @@ domNS *        domLookupURI     (domNode *node, char *uri);
 domNS *        domGetNamespaceByIndex (domDocument *doc, unsigned int nsIndex);
 domNS *        domNewNamespace (domDocument *doc, const char *prefix,
                                 const char *namespaceURI);
-int            domGetLineColumn (domNode *node, long *line, long *column,
-                                 long *byteIndex);
+int            domGetLineColumn (domNode *node, XML_Size *line,
+                                 XML_Size *column, XML_Index *byteIndex);
 
 int            domXPointerChild (domNode * node, int all, int instance, domNodeType type,
                                  char *element, char *attrName, char *attrValue,

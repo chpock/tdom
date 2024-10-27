@@ -80,7 +80,9 @@ typedef enum {
 typedef struct tDOM_PullParserInfo 
 {
     XML_Parser      parser;
-    Tcl_Obj        *inputString;
+    Tcl_Obj        *inputStringObj;
+    char           *inputStr;
+    domLength       inputStrLen;
     Tcl_Channel     inputChannel;
     int             inputfd;
     PullParserState state;
@@ -341,8 +343,8 @@ tDOM_PullParserDeleteCmd (
     Tcl_HashSearch search;
 
     XML_ParserFree (pullInfo->parser);
-    if (pullInfo->inputString) {
-        Tcl_DecrRefCount (pullInfo->inputString);
+    if (pullInfo->inputStringObj) {
+        Tcl_DecrRefCount (pullInfo->inputStringObj);
     }
     if (pullInfo->inputfd) {
         close (pullInfo->inputfd);
@@ -374,12 +376,14 @@ tDOM_ReportXMLError (
     char s[255];
 
     Tcl_ResetResult (interp);
-    sprintf(s, "%ld", XML_GetCurrentLineNumber(pullInfo->parser));
+    sprintf(s, "%" TDOM_LS_MODIFIER "d",
+            XML_GetCurrentLineNumber(pullInfo->parser));
     Tcl_AppendResult(interp, "error \"",
                      XML_ErrorString(
                          XML_GetErrorCode(pullInfo->parser)),
-                     "\" at line ", s, " character ", NULL);
-    sprintf(s, "%ld", XML_GetCurrentColumnNumber(pullInfo->parser));
+                     "\" at line ", s, " column ", NULL);
+    sprintf(s, "%" TDOM_LS_MODIFIER "d",
+            XML_GetCurrentColumnNumber(pullInfo->parser));
     Tcl_AppendResult(interp, s, NULL);
 }
 
@@ -388,9 +392,11 @@ tDOM_CleanupInputSource (
     tDOM_PullParserInfo *pullInfo
     )
 {
-    if (pullInfo->inputString) {
-        Tcl_DecrRefCount (pullInfo->inputString);
-        pullInfo->inputString = NULL;
+    if (pullInfo->inputStringObj) {
+        Tcl_DecrRefCount (pullInfo->inputStringObj);
+        pullInfo->inputStringObj = NULL;
+        pullInfo->inputStr = NULL;
+        pullInfo->inputStrLen = 0;
     }
     pullInfo->inputChannel = NULL;
     if (pullInfo->inputfd) {
@@ -413,12 +419,6 @@ tDOM_resumeParseing (
 
     switch (XML_ResumeParser (pullInfo->parser)) {
     case XML_STATUS_OK:
-        if (pullInfo->inputString) {
-            Tcl_DecrRefCount (pullInfo->inputString);
-            pullInfo->inputString = NULL;
-            pullInfo->state = PULLPARSERSTATE_END_DOCUMENT;
-            break;
-        }
         XML_GetParsingStatus (pullInfo->parser, &pstatus);
         if (pstatus.parsing == XML_FINISHED) {
             tDOM_CleanupInputSource (pullInfo);
@@ -437,7 +437,7 @@ tDOM_resumeParseing (
                 result = XML_Parse (pullInfo->parser, data,
                                     (int)len, done);
             } while (result == XML_STATUS_OK && !done);
-        } else {
+        } else if (pullInfo->inputfd) {
             /* inputfile */
             do {
                 char *fbuf = 
@@ -449,6 +449,18 @@ tDOM_resumeParseing (
                 result = XML_ParseBuffer (pullInfo->parser,
                                           (int)len, done);
             } while (result == XML_STATUS_OK && !done);
+        } else {
+            do {
+                done = (pullInfo->inputStrLen < TDOM_PCS);
+                result = XML_Parse (
+                    pullInfo->parser, pullInfo->inputStr,
+                    (int)(done ? pullInfo->inputStrLen : TDOM_PCS),
+                    done);
+                if (!done) {
+                    pullInfo->inputStr += TDOM_PCS;
+                    pullInfo->inputStrLen -= TDOM_PCS;
+                }
+            } while (!done && result == XML_STATUS_OK);
         }
         if (result == XML_STATUS_ERROR) {
             tDOM_CleanupInputSource (pullInfo);
@@ -532,7 +544,9 @@ tDOM_PullParserInstanceCmd (
             return TCL_ERROR;
         }
         Tcl_IncrRefCount (objv[2]);
-        pullInfo->inputString = objv[2];
+        pullInfo->inputStringObj = objv[2];
+        pullInfo->inputStr = Tcl_GetStringFromObj(pullInfo->inputStringObj,
+                                                  &pullInfo->inputStrLen);
         pullInfo->state = PULLPARSERSTATE_START_DOCUMENT;
         break;
 
@@ -641,14 +655,15 @@ tDOM_PullParserInstanceCmd (
                                             len == 0);
                     } while (result == XML_STATUS_OK);
                 } else {
-                    data = Tcl_GetStringFromObj(pullInfo->inputString, &len);
                     do {
-                        done = (len < PARSE_CHUNK_SIZE);
-                        result = XML_Parse (pullInfo->parser, data, (int)len,
-                                            done);
+                        done = (pullInfo->inputStrLen < TDOM_PCS);
+                        result = XML_Parse (
+                            pullInfo->parser, pullInfo->inputStr,
+                            (int)(done ? pullInfo->inputStrLen : TDOM_PCS),
+                            done);
                         if (!done) {
-                            data += PARSE_CHUNK_SIZE;
-                            len -= PARSE_CHUNK_SIZE;
+                            pullInfo->inputStr += TDOM_PCS;
+                            pullInfo->inputStrLen -= TDOM_PCS;
                         }
                     } while (!done && result == XML_STATUS_OK);
                 }

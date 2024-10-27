@@ -19,7 +19,7 @@ dnl	to configure the system for the local environment.
 # so that we create the export library with the dll.
 #-----------------------------------------------------------------------
 
-AC_INIT([tdom],[0.9.4])
+AC_INIT([tdom],[0.9.5])
 
 #--------------------------------------------------------------------
 # Call TEA_INIT as the first TEA_ macro to set up initial vars.
@@ -243,6 +243,7 @@ TDOM_ENABLE_DTD
 #TDOM_CONTEXT_BYTES
 AC_DEFINE(XML_CONTEXT_BYTES, 0)
 AC_DEFINE(XML_GE, 1)
+AC_DEFINE(XML_LARGE_SIZE, 1)
 TDOM_ENABLE_NS
 TDOM_ENABLE_UNKNOWN
 TDOM_ENABLE_TDOMALLOC
@@ -252,7 +253,7 @@ TDOM_ENABLE_SCHEMA
 TDOMSHELL=tcldomsh
 AC_SUBST(TDOMSHELL)
 
-TDOM_EXPORT_CONFIG
+TEA_EXPORT_CONFIG([tdom])
 
 #--------------------------------------------------------------------
 # Finally, substitute all of the various values into the Makefile.

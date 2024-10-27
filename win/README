@@ -90,7 +90,7 @@ usually from
 
 3. Change to the tdom\win directory and type the command
 
-     nmake /s /nologo /f makefile.vc INSTALLDIR=c:\tcl\85-vs2017\x64 GUMBODIR=C:\src\gumbo
+    nmake /s /nologo /f makefile.vc INSTALLDIR=c:\tcl\85-vs2017\x64 GUMBODIR=C:\src\gumbo
     nmake /s /nologo /f makefile.vc INSTALLDIR=c:\tcl\85-vs2017\x64 GUMBODIR=C:\src\gumbo install
 
 Here INSTALLDIR is the path to your Tcl installation and GUMBODIR is

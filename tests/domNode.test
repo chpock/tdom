@@ -130,12 +130,56 @@ test domNode-1.7 {error in trace on nodeObjVar} {
     set result
 } {1 {can't set "resultVar": error in nodeObjVar trace}}
 
+test domNode-1.8 {cmd argument parsing} {
+    set result [catch {domNode} errMsg]
+    lappend result $errMsg
+    catch {domNode foo} errMsg
+    lappend result $errMsg
+} {1 {wrong # args: should be "domNode nodetoken subcommand ?arg ...?"} {wrong # args: should be "domNode nodetoken subcommand ?arg ...?"}}
+
+test domNode-1.9 {cmd argument parsing} {
+    set storedMode [dom setObjectCommands]
+    dom setObjectCommands token
+    set doc [dom parse {<doc><e/></doc>}]
+    set root [domDoc $doc documentElement]
+    catch {domNode $root} result
+    domDoc $doc delete
+    dom setObjectCommands $storedMode
+    set result
+} {wrong # args: should be "domNode nodetoken subcommand ?arg ...?"}
+
+test domNode-1.10 {cmd argument parsing} -body {
+    set doc [dom parse {<doc><e/></doc>}]
+    set root [$doc documentElement]
+    catch {$root} result
+    $doc delete
+    set result
+} -match regexp -result {wrong # args: should be "domNode[^ ]+ subcommand \?arg ...\?"}
+
+test domNode-1.11 {cmd argument parsing} -body {
+    set storedMode [dom setObjectCommands]
+    dom setObjectCommands token
+    set doc [dom parse {<doc><e/></doc>}]
+    set root [domDoc $doc documentElement]
+    catch {domNode $root invalid-method} result
+    domDoc $doc delete
+    dom setObjectCommands $storedMode
+    set result
+} -match glob -result {bad method "invalid-method": must be *}
+
+test domNode-1.12 {cmd argument parsing} -body {
+    set doc [dom parse {<doc><e/></doc>}]
+    set root [$doc documentElement]
+    catch {$root invalid-method} result
+    $doc delete
+    set result
+} -match glob -result {bad method "invalid-method": must be *}
+
 set doc [dom parse {<root xmlns="rootdefaultNS">
     <elem1 xmlns="elem1NS"><elem11/></elem1>
     <elem2 xmlns="elem2NS"/>
     </root>}]
 set root [$doc documentElement]
-
 test domNode-2.1 {selectNodes - -namespace option: syntax} {
     set result [catch {$root selectNodes -namespaces elem1ns:elem1} errMsg]
     lappend result $errMsg
@@ -2451,6 +2495,87 @@ test domNode-24.6 {getByteIndex} {
 } {11}
     
 $doc delete
+
+dom setStoreLineColumn 1
+
+test domNode-24.7 {getLine etc text node} {
+    set doc [dom parse {<root>
+        Hello<e1><e2/></e1></root>}]
+    set root [$doc documentElement]
+    set node [$root firstChild]
+    set result [$node getLine].[$node getColumn]
+    $doc delete
+    set result
+} {1.6}
+
+test domNode-24.8 {getLine etc cdatasection node} {
+    set doc [dom parse -keepCDATA {<root><![CDATA[
+        Hello]]><e1><e2/></e1></root>}]
+    set root [$doc documentElement]
+    set node [$root firstChild]
+    set result [$node getLine].[$node getColumn]
+    $doc delete
+    set result
+} {1.6}
+
+test domNode-24.8.1 {getLine etc cdatasection node without -keepCDATA} {
+    set doc [dom parse {<root><![CDATA[
+        Hello]]><e1><e2/></e1></root>}]
+    set root [$doc documentElement]
+    set node [$root firstChild]
+    set result [$node getLine].[$node getColumn]
+    $doc delete
+    set result
+} {1.15}
+
+test domNode-24.9 {getLine etc pi node} {
+    set doc [dom parse {<root><?pi1 do this?>
+        <e1><e2/></e1></root>}]
+    set root [$doc documentElement]
+    set node [$root firstChild]
+    set result [$node getLine].[$node getColumn]
+    $doc delete
+    set result
+} {1.6}
+
+test domNode-24.10 {getLine etc comment node} {
+    set doc [dom parse {<root>
+        <!-- comment --><e1><e2/></e1></root>}]
+    set root [$doc documentElement]
+    set node [$root firstChild]
+    set result [$node getLine].[$node getColumn]
+    $doc delete
+    set result
+} {2.8}
+
+test domNode-24.11 {getLine etc multple text/CDATA nodes} {
+    set doc [dom parse -keepCDATA {<root>
+        <e1>text</e1></root>}]
+    set root [$doc documentElement]
+    set e1 [$root firstChild]
+    set node [$e1 firstChild]
+    set result [$node getLine].[$node getColumn]
+    $doc delete
+    set result
+} {2.12}
+
+test domNode-24.12 {getLine etc multple text/CDATA nodes} {
+    set doc [dom parse -keepCDATA {<root>
+        <e1>text<![CDATA[
+        Hello out]]>more text</e1></root>}]
+    set root [$doc documentElement]
+    set e1 [$root firstChild]
+    set node [$e1 firstChild]
+    set result [$node getLine].[$node getColumn]/
+    set node [$node nextSibling]
+    append result [$node getLine].[$node getColumn]/
+    set node [$node nextSibling]
+    append result [$node getLine].[$node getColumn]
+    $doc delete
+    set result
+} {2.12/2.16/3.20}
+
+dom setStoreLineColumn 0
 
 set doc [dom parse {<root attr1="bingbaz"
                           attr2="ab &amp; zu"

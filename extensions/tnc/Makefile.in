@@ -191,7 +191,7 @@ all: binaries libraries
 # of the Makefile, in the "BINARIES" variable.
 #========================================================================
 
-binaries: $(BINARIES) pkgIndex.tcl-hand
+binaries: $(BINARIES)
 
 libraries:
 
