@@ -61,8 +61,9 @@ main(
 |
 \---------------------------------------------------------------------------*/
 int
-Tcl_AppInit(interp)
-    Tcl_Interp *interp;
+Tcl_AppInit(
+    Tcl_Interp *interp
+    )
 {
     if ((Tcl_Init)(interp) == TCL_ERROR) {
         return TCL_ERROR;

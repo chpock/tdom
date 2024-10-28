@@ -1,5 +1,5 @@
-C Merged\sfrom\strunk.
-D 2024-10-27T19:06:30.531
+C wip
+D 2024-10-28T09:20:10.745
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -112,7 +112,7 @@ F extensions/tdomhtml/win/makefile.vc a6ba491c8f63a88c607c443e7a80f1369cb3c40c
 F extensions/tnc/Makefile.in c7f74cda510a493a7c1539f1db9118be38b9482b57d4f9b51618c9aaf38c4a9a
 F extensions/tnc/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
 F extensions/tnc/configure e4340f98323fdc8e4abba3bd37ea02405455aacc4c8bf8ffa7731e3399b79dbf x
-F extensions/tnc/configure.ac 4fd59a3f8af1b8ff8db46c2fb007e692e43a55088d00ad0b4d8b5328f8888d10 w extensions/tnc/configure.in
+F extensions/tnc/configure.ac 4fd59a3f8af1b8ff8db46c2fb007e692e43a55088d00ad0b4d8b5328f8888d10
 F extensions/tnc/install-sh bdd5e293591621ae60d9824d86a4b1c5f22c3d00 x
 F extensions/tnc/pkgIndex.tcl.in 5c4022af93826a1d4f13f6105e86600d20b914b8bc9a0f48c0d98b3108b00a06
 F extensions/tnc/test.tcl 545cdec17e6702cef9f79184fdf1ce0166b8c412
@@ -161,7 +161,7 @@ F generic/tdomDecls.h 93563f54a18aa836498d4e44587e42561518e59c6ba68c356ead6a715f
 F generic/tdomStubInit.c e68ec41b2430f23300e37c584a043bcfc6f2cdf38d9f1e97059366ba4ed42e17
 F generic/tdomStubLib.c 4a055f9c974246a9f7dd99de1a7686d1a96be8f02be699fdf4a760fdc813eb45
 F generic/tdominit.c 925c91ddc69f9eda3f8eabe73b3f9d6260a4c4503b11e09c563964f7718849bd
-F generic/xmlsimple.c abb069b9e3754efa2830b2535e234670229b8c4c6e81b68754d7c2aca3fa3eda
+F generic/xmlsimple.c f2164ff109cb1618e1425e9b850bc31e5c70dc75440e906fac0b350dcda4a671
 F generic/xmlsimple.h 6cbbc9208bcaec273624fd5e24aff3de07ef98d1da3be4576f3e6d4951516054
 F lib/tdom.tcl cd3bdc7a05ea9c6d0d17fd12d68e72c92e64f501106ec74c19e85ac963ade570
 F macosx/README 75fe1f6617f6cb7e4480cff5367b5c26fcd8dd207e2321f35dceebafccf4c99c
@@ -229,7 +229,7 @@ F tests/xpath.test 67045f566582c565d292180f759294614f0848d09292db2a1137ce48ed0ca
 F tests/xslt.test 35a5408426b098bcc07bdecfb52f1ec4c8ac3e984224ba497e700420047621a4
 F unix/CONFIG 431b82a51451df40e38261b91e1a37060797ef655e8f981fab761de59f1e01e9
 F unix/speed-check.sh 7a8d91e7edf1cdc9bcfad5f28e1a068cb2843d05e49d8bd89d9b30a46511497d
-F unix/tclAppInit.c cd5fa5bcb9f4648e9bf7108727b99e20cd02c33713df359efb1da298715940b9
+F unix/tclAppInit.c 9fe2bb19c1ec9651443ebec83ad621da66563b79de7d80d1e2a0f64ddf0e510d
 F win/README d480e01bbb3f480184671f66b4025d7e94e5a6fccb603d6559f6ad92d398d919
 F win/config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F win/makefile.vc 305808a83bed1240b802508262365381ffb73e452f8e2150054b0bd60cb7fe25
@@ -243,8 +243,11 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 07488c2a681a94c0bb5773285b2cf7483c4e943e83f1055566868b43d8d9c10b e4affdf3bdf7ebf43b581e049553f9182d853d56e88357db0edf3ac3d1e1ce43
-R 228c9707dd16fbb94786eed4e1ac1001
+P cade607cbadbda6d28cdbdd031c5d34009e17e78d114ff2cc721551492021249
+R dd4e84dab0aefcd8187456a81441bf9b
+T *branch * picky-wip
+T *sym-picky-wip *
+T -sym-picky *
 U rolf
-Z b1859e00655bae0c8dcea9b0e132474c
+Z 17efde43a2586b9dbf933a2bc4a0231f
 # Remove this line to create a well-formed Fossil manifest.

@@ -229,7 +229,7 @@ static int TranslateEntityRefs (
     while (z[from]) {
         if (z[from]=='&') {
             int i = from+1;
-            int c;
+            char c;
 
             if (z[i] == '#') {
                 /*---------------------------------------------
@@ -272,7 +272,7 @@ static int TranslateEntityRefs (
                 }
                 from = i+1;
                 if (value < 0x80) {
-                    z[to++] = value;
+                    z[to++] = (char) value;
                 } else if (value <= 0x7FF) {
                     z[to++] = (char) ((value >> 6) | 0xC0);
                     z[to++] = (char) ((value | 0x80) & 0xBF);
@@ -338,7 +338,7 @@ XML_SimpleParse (
     int          ignoreWhiteSpaces,
     int          keepCDATA,
     int          forest,
-    char       **errStr
+    const char **errStr
 ) {
     register int   c;          /* Next character of the input file */
     register char *pn;
@@ -355,13 +355,15 @@ XML_SimpleParse (
     domProcessingInstructionNode *pinode;
     int            hnew;
     Tcl_HashEntry *h;
+    long unsigned int length;
 
 #ifdef TDOM_NS    
     int            nspos, newNS;
     int            depth = 0;
     int            activeNSpos  = -1;
-    int            activeNSsize = 8;
-    domActiveNS   *activeNS     = (domActiveNS*) MALLOC (sizeof(domActiveNS) * activeNSsize);
+    unsigned int   activeNSsize = 8;
+    domActiveNS   *activeNS     = (domActiveNS*) MALLOC (sizeof(domActiveNS)
+                                                         * activeNSsize);
     const char    *xmlns, *localname;
     domNS         *ns;
     char           tagPrefix[MAX_PREFIX_LEN];
@@ -393,17 +395,18 @@ XML_SimpleParse (
                 x++;
             }
             if (!(only_whites && ignoreWhiteSpaces) && parent_node) {
+                /* This cast is OK because x is always >= start */
+                length = (long unsigned int) (x -start);
                 if (parent_node->lastChild
                     && parent_node->lastChild->nodeType == TEXT_NODE) {
                     /* normalize text node, i.e. there are no adjacent
                      * text nodes */
                     tnode = (domTextNode*)parent_node->lastChild;
-                    tnode->nodeValue = REALLOC(tnode->nodeValue,
-                                               tnode->valueLength + x - start + 1);
-                    memmove(tnode->nodeValue + tnode->valueLength,
-                            start, x - start);
+                    tnode->nodeValue = REALLOC(tnode->nodeValue, length + 1);
+                    memmove(tnode->nodeValue + tnode->valueLength, start,
+                            length);
                     saved = tnode->valueLength;
-                    tnode->valueLength += (domLength)(x - start);
+                    tnode->valueLength += (domLength)length;
                     *(tnode->nodeValue + tnode->valueLength) = 0;
                     if (ampersandSeen) {
                         if (!TranslateEntityRefs(tnode->nodeValue + saved, 
@@ -421,10 +424,10 @@ XML_SimpleParse (
                     tnode->nodeType    = TEXT_NODE;
                     tnode->ownerDocument = doc;
                     tnode->nodeNumber  = NODE_NO(doc);
-                    tnode->valueLength = (domLength)(x - start);
-                    tnode->nodeValue   = (char*)MALLOC((x - start)+1);
-                    memmove(tnode->nodeValue, start, (x - start));
-                    *(tnode->nodeValue + (x - start)) = 0;
+                    tnode->valueLength = (domLength)length;
+                    tnode->nodeValue   = (char*)MALLOC(length + 1);
+                    memmove(tnode->nodeValue, start, length);
+                    *(tnode->nodeValue + length) = 0;
                     tnode->parentNode = parent_node;
                     if (parent_node->firstChild)  {
                         parent_node->lastChild->nextSibling = (domNode*)tnode;
@@ -585,20 +588,22 @@ XML_SimpleParse (
                         x++;
                     }
                     if (*x) {
-                        if (parent_node && ((x - start) || keepCDATA)) {
+                        /* This cast is OK because x is always >= start */
+                        length = (long unsigned int) (x -start);
+                        if (parent_node && (length || keepCDATA)) {
                             if (parent_node->lastChild
                                 && parent_node->lastChild->nodeType == TEXT_NODE
                                 && !keepCDATA) {
-                                if ((x - start) && !(only_whites && ignoreWhiteSpaces)) {
+                                if (length && !(only_whites && ignoreWhiteSpaces)) {
                                     /* normalize text node, i.e. there
                                      * are no adjacent text nodes */
                                     tnode = (domTextNode*)parent_node->lastChild;
                                     tnode->nodeValue =
                                         REALLOC(tnode->nodeValue,
-                                                tnode->valueLength + x - start + 1);
+                                                tnode->valueLength + length + 1);
                                     memmove(tnode->nodeValue + tnode->valueLength,
                                             start, (x - start));
-                                    tnode->valueLength += (domLength)(x - start);
+                                    tnode->valueLength += (domLength)length;
                                     *(tnode->nodeValue + tnode->valueLength) = 0;
                                 }
                             } else {
