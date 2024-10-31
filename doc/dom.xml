@@ -465,7 +465,7 @@ scope.</p>
 <syntax>
 <cmd>elementNodeCmd</cmd> <m>?attributeName attributeValue ...? ?script?</m>
 <cmd>elementNodeCmd</cmd> <m>?-attributeName attributeValue ...? ?script?</m>
-<cmd>elementNodeCmd</cmd> <m>name_value_list script</m>
+<cmd>elementNodeCmd</cmd> <m>?name_value_list? ?script?</m>
 </syntax>
 
 <p>The command syntax allows three different ways to specify the attributes of
@@ -538,7 +538,7 @@ fromScript context this command will raise error.
 <cmd>tdom::fsinsertNode</cmd> <m>node</m>
 </syntax>
 
-<p>If called inside o fromScript context this comannd instead of
+<p>If called inside a fromScript context this command instead of
 creating a new node appends the as argument given node at the end of
 the child list of the invoking element node. The node is unlinked from
 its previous place. If called outside a fromScript context this
