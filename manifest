@@ -1,5 +1,5 @@
-C wip
-D 2024-10-28T09:20:10.745
+C Fixed\sediting\serror.
+D 2024-10-31T10:21:49.274
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -161,7 +161,7 @@ F generic/tdomDecls.h 93563f54a18aa836498d4e44587e42561518e59c6ba68c356ead6a715f
 F generic/tdomStubInit.c e68ec41b2430f23300e37c584a043bcfc6f2cdf38d9f1e97059366ba4ed42e17
 F generic/tdomStubLib.c 4a055f9c974246a9f7dd99de1a7686d1a96be8f02be699fdf4a760fdc813eb45
 F generic/tdominit.c 925c91ddc69f9eda3f8eabe73b3f9d6260a4c4503b11e09c563964f7718849bd
-F generic/xmlsimple.c f2164ff109cb1618e1425e9b850bc31e5c70dc75440e906fac0b350dcda4a671
+F generic/xmlsimple.c 1703eac43dbc09118f8bb5bf38ad82e9bde77e9d59257dc740fc3ca8868211eb
 F generic/xmlsimple.h 6cbbc9208bcaec273624fd5e24aff3de07ef98d1da3be4576f3e6d4951516054
 F lib/tdom.tcl cd3bdc7a05ea9c6d0d17fd12d68e72c92e64f501106ec74c19e85ac963ade570
 F macosx/README 75fe1f6617f6cb7e4480cff5367b5c26fcd8dd207e2321f35dceebafccf4c99c
@@ -243,11 +243,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P cade607cbadbda6d28cdbdd031c5d34009e17e78d114ff2cc721551492021249
-R dd4e84dab0aefcd8187456a81441bf9b
-T *branch * picky-wip
-T *sym-picky-wip *
-T -sym-picky *
+P 007fb02a5cb05bfa1fd868ac3b5f880572594e1de1776f64f4b5297d1da0ba24
+R 6dd112a3e7011b2f14807bc283414688
 U rolf
-Z 17efde43a2586b9dbf933a2bc4a0231f
+Z 385293191f7af1c98a32d5d3d0540f44
 # Remove this line to create a well-formed Fossil manifest.

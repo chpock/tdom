@@ -402,7 +402,8 @@ XML_SimpleParse (
                     /* normalize text node, i.e. there are no adjacent
                      * text nodes */
                     tnode = (domTextNode*)parent_node->lastChild;
-                    tnode->nodeValue = REALLOC(tnode->nodeValue, length + 1);
+                    tnode->nodeValue = REALLOC(tnode->nodeValue,
+                                               tnode->valueLength + length + 1);
                     memmove(tnode->nodeValue + tnode->valueLength, start,
                             length);
                     saved = tnode->valueLength;
