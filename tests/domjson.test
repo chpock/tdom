@@ -3141,59 +3141,28 @@ test json-12.8 {createFromTypedList} {
 
 test json-13.1 {jsonEscape} {
     set result ""
-    foreach str {
-        \u0000
-        \u0001
-        \u0002
-        \u0003
-        \u0004
-        \u0005
-        \u0006
-        \u0007
-        \u0008
-        \u0009
-        \u000a
-        \u000b
-        \u000c
-        \u000d
-        \u000e
-        \u000f
-        \u0010
-        \u0011
-        \u0012
-        \u0013
-        \u0014
-        \u0015
-        \u0016
-        \u0017
-        \u0018
-        \u0019
-        \u001a
-        \u001b
-        \u001c
-        \u001d
-        \u001e
-        \u001f
-    } {
+    set strings ""
+    for {set i 0} {$i < 32} {incr i} {
+        lappend strings [subst [format "\\u00%02x" $i]]
+    }
+    foreach str $strings {
         lappend result [dom jsonEscape $str]
     }
     set result
-} {{\u0000} {u\0001} {u\0002} {u\0003} {u\0004} {u\0005} {u\0006} {u\0007} {\b} {\t} {\n} {u\000b} {\f} {\r} {u\000e} {u\000f} {u\0010} {u\0011} {u\0012} {u\0013} {u\0014} {u\0015} {u\0016} {u\0017} {u\0018} {u\0019} {u\001a} {u\001b} {u\001c} {u\001d} {u\001e} {u\001f}}
+} {{\u0000} {\u0001} {\u0002} {\u0003} {\u0004} {\u0005} {\u0006} {\u0007} {\b} {\t} {\n} {\u000b} {\f} {\r} {\u000e} {\u000f} {\u0010} {\u0011} {\u0012} {\u0013} {\u0014} {\u0015} {\u0016} {\u0017} {\u0018} {\u0019} {\u001a} {\u001b} {\u001c} {\u001d} {\u001e} {\u001f}}
 
 test json-13.2 {jsonEscape} {
-    set result ""
-                     # a\u0000 \
-                     # b\f \
-                     # ä\u001a \
-                     # abc\n\r \
-                     # abc\n\rfoo\u0002 
     foreach str [list \
+                     a\u0000 \
+                     b\f \
                      ä\u001a \
+                     abc\n\r \
+                     abc\n\rfoo\u0002 \
                     ] {
         lappend result [dom jsonEscape $str]
     }
     set result
-} {}
+} {{a\u0000} {b\f} {ä\u001a} {abc\n\r} {abc\n\rfoo\u0002}}
 
 }
 

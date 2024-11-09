@@ -805,6 +805,14 @@ TypedList2DOM (
     return doc;
 }
 
+#define initescape(esc,esclen) *changed = 1; Tcl_DStringInit(escapedStr);     \
+    Tcl_DStringAppend (escapedStr, str, (domLength)(p-str));       \
+    Tcl_DStringAppend (escapedStr, (esc), (esclen));       \
+    p += clen; str = p; break;
+#define escape(esc,esclen) Tcl_DStringAppend (escapedStr, str, (domLength)(p-str)); \
+    Tcl_DStringAppend (escapedStr, (esc), (esclen));       \
+    p += clen; str = p; continue;
+
 int jsonEscape (
     Tcl_Interp *interp,
     char *str, 
@@ -814,7 +822,7 @@ int jsonEscape (
 {
     char *p;
     int   clen;
-    char buf[6];
+    char buf[6] = "\\u00";
     
     *changed = 0;
     p = str;
@@ -825,39 +833,38 @@ int jsonEscape (
             return TCL_ERROR;
         }
         if (clen == 1) {
-            if (*p == '\\'
-                || *p == '"'
-                || *p == '\b'
-                || *p == '\f'
-                || *p == '\n'
-                || *p == '\r'
-                || *p == '\t'
-                || (unsigned char)*p < 0x20) {
-                *changed = 1;
-                break;
-            }
+            if (*p == '\\') {
+                initescape("\\\\",2);
+            } else if (*p == '"') {
+                initescape("\\\"",2);
+            } else if (*p == '\b') {
+                initescape("\\b",2);
+            } else if (*p == '\f') {
+                initescape("\\f",2);
+            } else if (*p == '\n') {
+                initescape("\\n",2);
+            } else if (*p == '\r') {
+                initescape("\\r",2);
+            } else if (*p == '\t') {
+                initescape("\\t",2);
+            } else if ((unsigned char)*p < 0x20) {
+                buf[4] = '0' + (*p>>4);
+                buf[5] = "0123456789abcdef"[*p&0xf];
+                initescape(buf,6);
+            } 
+            p++;
         } else {
             if ((unsigned char)*p == 0xC0 && (unsigned char)*(p+1) == 0x80) {
-                *changed = 1;
-                break;
+                initescape("\\u0000",6);
+                p++;p++;
+            } else {
+                p += clen;
             }
         }
-        p += clen;
     }
     if (!*changed) {
         return TCL_OK;
     }
-    Tcl_DStringInit (escapedStr);
-    Tcl_DStringAppend (escapedStr, str, (domLength)(p-str));
-    fprintf (stderr, "prefix %s\n", Tcl_DStringValue (escapedStr));
-    fprintf (stderr, "prefix str byte len %ld\n", p-str);      \
-    str = p;
-#define escape(esc) Tcl_DStringAppend (escapedStr, str, (domLength)(p-str)); \
-    fprintf (stderr, "str byte len %ld\n", p-str); \
-    Tcl_DStringAppend (escapedStr, (esc), strlen((esc)));       \
-    p += clen; str = p; continue;
-    fprintf (stderr, "prefix 2 %s\n", Tcl_DStringValue (escapedStr));
-
     while (*p) {
         clen = UTF8_CHAR_LEN(*p);
         if (!clen) {
@@ -866,38 +873,28 @@ int jsonEscape (
         }
         if (clen == 1) {
             if (*p == '\\') {
-                escape("\\\\");
+                escape("\\\\",2);
             } else if (*p == '"') {
-                escape("\\\"");
+                escape("\\\"",2);
             } else if (*p == '\b') {
-                escape("\\b");
+                escape("\\b",2);
             } else if (*p == '\f') {
-                escape("\\f");
+                escape("\\f",2);
             } else if (*p == '\n') {
-                escape("\\n");
+                escape("\\n",2);
             } else if (*p == '\r') {
-                escape("\\r");
+                escape("\\r",2);
             } else if (*p == '\t') {
-                escape("\\t");
+                escape("\\t",2);
             } else if ((unsigned char)*p < 0x20) {
-                fprintf (stderr, "prefix 3 %s\n", Tcl_DStringValue(escapedStr));
-                /* Tcl_DStringAppend (escapedStr, str, (domLength)(p-str)); */
-                /* fprintf (stderr, "str byte len %ld\n", p-str); */
-                buf[0] = 'u';
-                buf[1] = '\\';
-                buf[2] = '0';
-                buf[3] = '0';
                 buf[4] = '0' + (*p>>4);
                 buf[5] = "0123456789abcdef"[*p&0xf];
-                Tcl_DStringAppend (escapedStr, buf, 6);
-                p++;
-                str = p;
-                continue;
+                escape(buf,6);
             } 
             p++;
         } else {
             if ((unsigned char)*p == 0xC0 && (unsigned char)*(p+1) == 0x80) {
-                escape("\\u0000");
+                escape("\\u0000",6);
                 p++;p++;
             } else {
                 p += clen;

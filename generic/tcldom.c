@@ -8022,7 +8022,6 @@ int tcldom_DomObjCmd (
                 return TCL_ERROR;
             }
             if (changed) {
-                fprintf (stderr, "HIER %s\n", Tcl_DStringValue (&escapedStr));
                 newObj = Tcl_NewStringObj (
                     Tcl_DStringValue (&escapedStr),
                     Tcl_DStringLength (&escapedStr));
