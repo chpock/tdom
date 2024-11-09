@@ -46,3 +46,10 @@ isJSONNumber (
     char *num,
     domLength numlen
     );
+
+int
+jsonEscape (
+    Tcl_Interp *interp,
+    char *str, 
+    Tcl_DString *clearedstr,
+    int *changed);

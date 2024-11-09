@@ -805,6 +805,109 @@ TypedList2DOM (
     return doc;
 }
 
+int jsonEscape (
+    Tcl_Interp *interp,
+    char *str, 
+    Tcl_DString *escapedStr,
+    int *changed
+    )
+{
+    char *p;
+    int   clen;
+    char buf[6];
+    
+    *changed = 0;
+    p = str;
+    while (*p) {
+        clen = UTF8_CHAR_LEN(*p);
+        if (!clen) {
+            SetResult ("invalid internal string representation");
+            return TCL_ERROR;
+        }
+        if (clen == 1) {
+            if (*p == '\\'
+                || *p == '"'
+                || *p == '\b'
+                || *p == '\f'
+                || *p == '\n'
+                || *p == '\r'
+                || *p == '\t'
+                || (unsigned char)*p < 0x20) {
+                *changed = 1;
+                break;
+            }
+        } else {
+            if ((unsigned char)*p == 0xC0 && (unsigned char)*(p+1) == 0x80) {
+                *changed = 1;
+                break;
+            }
+        }
+        p += clen;
+    }
+    if (!*changed) {
+        return TCL_OK;
+    }
+    Tcl_DStringInit (escapedStr);
+    Tcl_DStringAppend (escapedStr, str, (domLength)(p-str));
+    fprintf (stderr, "prefix %s\n", Tcl_DStringValue (escapedStr));
+    fprintf (stderr, "prefix str byte len %ld\n", p-str);      \
+    str = p;
+#define escape(esc) Tcl_DStringAppend (escapedStr, str, (domLength)(p-str)); \
+    fprintf (stderr, "str byte len %ld\n", p-str); \
+    Tcl_DStringAppend (escapedStr, (esc), strlen((esc)));       \
+    p += clen; str = p; continue;
+    fprintf (stderr, "prefix 2 %s\n", Tcl_DStringValue (escapedStr));
+
+    while (*p) {
+        clen = UTF8_CHAR_LEN(*p);
+        if (!clen) {
+            SetResult ("invalid internal string representation");
+            return TCL_ERROR;
+        }
+        if (clen == 1) {
+            if (*p == '\\') {
+                escape("\\\\");
+            } else if (*p == '"') {
+                escape("\\\"");
+            } else if (*p == '\b') {
+                escape("\\b");
+            } else if (*p == '\f') {
+                escape("\\f");
+            } else if (*p == '\n') {
+                escape("\\n");
+            } else if (*p == '\r') {
+                escape("\\r");
+            } else if (*p == '\t') {
+                escape("\\t");
+            } else if ((unsigned char)*p < 0x20) {
+                fprintf (stderr, "prefix 3 %s\n", Tcl_DStringValue(escapedStr));
+                /* Tcl_DStringAppend (escapedStr, str, (domLength)(p-str)); */
+                /* fprintf (stderr, "str byte len %ld\n", p-str); */
+                buf[0] = 'u';
+                buf[1] = '\\';
+                buf[2] = '0';
+                buf[3] = '0';
+                buf[4] = '0' + (*p>>4);
+                buf[5] = "0123456789abcdef"[*p&0xf];
+                Tcl_DStringAppend (escapedStr, buf, 6);
+                p++;
+                str = p;
+                continue;
+            } 
+            p++;
+        } else {
+            if ((unsigned char)*p == 0xC0 && (unsigned char)*(p+1) == 0x80) {
+                escape("\\u0000");
+                p++;p++;
+            } else {
+                p += clen;
+            }
+        }
+    }
+    Tcl_DStringAppend (escapedStr, str, (domLength)(p-str));
+    return TCL_OK;
+}
+
 domDocument *
 JSON_Parse (
     char *json,    /* Complete text of the json string being parsed */
