@@ -1145,6 +1145,49 @@ test domDoc-19.3 {appendXML} {
     set result
 } {<foo/><test>foo<child><childchild>text</childchild></child></test>}
     
+test domDoc-19.4 {appendXML XML namespaces} {
+    dom createDocumentNS ns:a docroot doc
+    $doc documentElement root
+    $root setAttributeNS "" xmlns:b "ns:b" "" xmlns:c "ns:c"
+    $root appendXML {<person xmlns="ns:c"><name>John</name></person>}
+    $doc selectNodesNamespaces "a ns:a b ns:b c ns:c"
+    set name [$doc selectNodes string(a:docroot/c:person/c:name)]
+    $doc delete
+    set name
+} {John}
+
+test domDoc-19.5 {appendXML XML namespaces} {
+    dom createDocumentNS ns:a docroot doc
+    $doc documentElement root
+    $root setAttributeNS "" xmlns:b "ns:b" "" xmlns:c "ns:c"
+    $root appendXML {<person xmlns="ns:c" xmlns:d="ns:a"><d:name>John</d:name></person>}
+    $doc selectNodesNamespaces "a ns:a b ns:b c ns:c"
+    set name [$doc selectNodes string(a:docroot/c:person/a:name)]
+    $doc delete
+    set name
+} {John}
+
+test domDoc-19.6 {appendXML XML namespaces} {
+    dom createDocumentNS ns:c docroot doc
+    $doc documentElement root
+    $root setAttributeNS "" xmlns:b "ns:b" "" xmlns:a "ns:a"
+    $root appendXML {<person xmlns="ns:c"><name>Eve</name></person>}
+    $doc selectNodesNamespaces "a ns:a b ns:b c ns:c"
+    set name [$doc selectNodes string(c:docroot/c:person/c:name)]
+    $doc delete
+    set name
+} {Eve}
+
+test domDoc-19.7 {appendXML XML namespaces} {
+    dom createDocument docroot doc
+    $doc documentElement root
+    $root setAttributeNS "" xmlns:b "ns:b" "" xmlns:c "ns:c"
+    $root appendXML {<person xmlns="ns:c"><name>Eve</name></person>}
+    $doc selectNodesNamespaces "foo ns:c"
+    set name [$doc selectNodes string(docroot/foo:person/foo:name)]
+    $doc delete
+    set name
+} {Eve}
 
 test domDoc-20.1 {selectNodes} {
     set doc [dom parse {<root><child id="1"/><child id="2"/></root>}]
