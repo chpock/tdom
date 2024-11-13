@@ -1,5 +1,5 @@
-C Added\sa\sfew\stests\sfor\sappendXML\swith\sXML\snamespaced\snodes\sin\sdocument\sand\sthe\sappendXML\sXML\sdata.
-D 2024-11-10T19:11:13.232
+C wip
+D 2024-11-13T21:47:19.193
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -149,7 +149,7 @@ F generic/nodecmd.c cd86d79364a11fd67444a82f8a1de2ad10c01a33154c1bed767d58fec614
 F generic/nodecmd.h 36056ca2c262cb1991cabef8d27992ad628db718d09ff0eeaeaffd150f1549ec
 F generic/schema.c fc5ca4010cdca4737741ddd733b6e3dcd74e7010ffbb68edeeefa181fa2367af
 F generic/schema.h 5e20a348c3f98724e9c118760c8d9fcd661ae8f27d21652d90ab49492d001c75
-F generic/tcldom.c 9ecc27300a81e9b0fc12029e75e92922562cde82c6f46c10ccf1d5a0d4892739
+F generic/tcldom.c efa0e06934860379fb1395dc0cedaf28210da250e841d290736c6b4d9ca6e8de
 F generic/tcldom.h d8a198375e823af7d95b78f2ef695ac84b3f6d50232ab33ad82fcaa2502ea5e7
 F generic/tclexpat.c dde665d8791e4e5f0dba6f695b842f270e0f45acacad1584f99e722e56e8e20b
 F generic/tclexpat.h 3844441852af770876f2de9b7444a0445e9c5c7f1fd5cc3a50e7455538d4e912
@@ -243,8 +243,11 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 0d5f6825de87f91f13acb2f092ec53b79f3c7b9cc605ea0e4791220cc6af6c20
-R b54766e7aba5f49cfaffb2b7b43122be
+P bc76f0eb716f32965a26fa662fcdc8b11d40d83a02f29756692e3c679d0f3a7a
+R 987b26dc0475fb26963a633e46c43607
+T *branch * appendXML
+T *sym-appendXML *
+T -sym-trunk *
 U rolf
-Z 7486b068fc35723fabe7b17e7c522d1a
+Z 43d3bbe3dc317809497d2ca2901f80b6
 # Remove this line to create a well-formed Fossil manifest.

@@ -173,6 +173,8 @@
 #define SERIALIZE_INDENT_ATTR_WITH_TAB 512
 #define SERIALIZE_ESCAPE_CR 1024
 #define SERIALIZE_ESCAPE_TAB 2048
+#define SERIALIZE_LEGACY_SUBTREE 4096
+#define SERIALIZE_SUBTREE_ROOT 8192
 
 /*----------------------------------------------------------------------------
 |   Module Globals
@@ -3575,12 +3577,14 @@ static int serializeAsXML (
         "-indent", "-channel", "-escapeNonASCII", "-doctypeDeclaration",
         "-xmlDeclaration", "-encString", "-escapeAllQuot", "-indentAttrs",
         "-nogtescape", "-noEmptyElementTag", "-escapeCR", "-escapeTab",
+        "-legacySubtree",
         NULL
     };
     enum asXMLOption {
         m_indent, m_channel, m_escapeNonASCII, m_doctypeDeclaration,
         m_xmlDeclaration, m_encString, m_escapeAllQuot, m_indentAttrs,
-        m_nogtescape, m_noEmptyElementTag, m_escapeCR, m_escapeTab
+        m_nogtescape, m_noEmptyElementTag, m_escapeCR, m_escapeTab,
+        m_legacySubtree        
     };
     
     indent = 4;
@@ -3746,33 +3750,41 @@ static int serializeAsXML (
             objc -= 1;
             objv += 1;
             break;
+
+        case m_legacySubtree:
+            outputFlags |= SERIALIZE_LEGACY_SUBTREE;
+            objc -= 1;
+            objv += 1;
+            break;
         }
     }
     if (indent > 8)  indent = 8;
     if (indent < -1) indent = -1;
 
     resultPtr = Tcl_NewStringObj("", 0);
-    cdataChild = 0;
-    if (node->nodeType == ELEMENT_NODE
-        && node->ownerDocument->doctype 
-        && node->ownerDocument->doctype->cdataSectionElements) {
-        if (node->namespace) {
-            Tcl_DStringInit (&dStr);
-            Tcl_DStringAppend (&dStr, domNamespaceURI(node), -1);
-            Tcl_DStringAppend (&dStr, ":", 1);
-            domSplitQName (node->nodeName, prefix, &localName);
-            Tcl_DStringAppend (&dStr, localName, -1);
-            h = Tcl_FindHashEntry (
-                node->ownerDocument->doctype->cdataSectionElements,
-                Tcl_DStringValue (&dStr));
-            Tcl_DStringFree (&dStr);
-        } else {
-            h = Tcl_FindHashEntry (
-                node->ownerDocument->doctype->cdataSectionElements,
-                node->nodeName);
-        }
-        if (h) {
-            cdataChild = 1;
+    cdataChild = 0; 
+    if (node->nodeType == ELEMENT_NODE) {
+        outputFlags |= SERIALIZE_SUBTREE_ROOT;
+        if (node->ownerDocument->doctype 
+            && node->ownerDocument->doctype->cdataSectionElements) {
+            if (node->namespace) {
+                Tcl_DStringInit (&dStr);
+                Tcl_DStringAppend (&dStr, domNamespaceURI(node), -1);
+                Tcl_DStringAppend (&dStr, ":", 1);
+                domSplitQName (node->nodeName, prefix, &localName);
+                Tcl_DStringAppend (&dStr, localName, -1);
+                h = Tcl_FindHashEntry (
+                    node->ownerDocument->doctype->cdataSectionElements,
+                    Tcl_DStringValue (&dStr));
+                Tcl_DStringFree (&dStr);
+            } else {
+                h = Tcl_FindHashEntry (
+                    node->ownerDocument->doctype->cdataSectionElements,
+                    node->nodeName);
+            }
+            if (h) {
+                cdataChild = 1;
+            }
         }
     }
     tcldom_treeAsXML(resultPtr, node, indent, 0, 1, chan, encString,
