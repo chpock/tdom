@@ -419,7 +419,7 @@ memory handling as explained above.</desc>
         
         <commanddef>
           <command><cmd>dom</cmd> <method>createNodeCmd</method>
-<m>?-returnNodeCmd?</m> <m>?-tagName name?</m> <m>?-jsonType jsonType?</m> <m>?-namespace URI?</m> <m>(element|comment|text|cdata|pi)Node</m> <m>commandName</m></command>
+<m>?-returnNodeCmd?</m> <m>?-tagName name?</m> <m>?-jsonType jsonType?</m> <m>?-namespace URI?</m> <m>?-noNamespacedAttributes?</m> <m>(element|comment|text|cdata|pi)Node</m> <m>commandName</m></command>
           <desc>This method creates Tcl commands, which in turn create
           tDOM nodes. Tcl commands created by this command are only
           available inside a script given to the domNode methods
@@ -476,6 +476,12 @@ syntactical sugar and will be stripped off) or as a Tcl list with elements
 interpreted as attribute name and the corresponding attribute value.
 The attribute name elements in the list may have a leading '-' character, which
 will be stripped off.</p>
+
+<p>If the <m>attributeName</m> is a valid Tcl list with two elements
+then the first element of the list will be the XML namespace of the
+attribute and the second element will be the attribute name (which has
+to be a prefix name). If you have only not namespaced attributes this
+can be disabled with the option <m>-noNamespacedAttributes</m>.
 
 <p>Every <m>elementNodeCmd</m> accepts an optional Tcl script as last
 argument. This script is evaluated as recursive <m>appendFromScript</m> script

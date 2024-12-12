@@ -76,6 +76,7 @@ typedef struct NodeInfo {
     char *namespace;
     int   jsonType;
     char *tagName;
+    int   simpleAtts;
 } NodeInfo;
 
 /*----------------------------------------------------------------------------
@@ -266,12 +267,15 @@ nodecmd_processAttributes (
     int type,
     int             objc,
     Tcl_Obj *const  objv[],
-    Tcl_Obj **cmdObj
+    Tcl_Obj **cmdObj,
+    int simpleAtts
     )
 {
-    Tcl_Obj **opts;
+    Tcl_Obj **opts, *tvalObj, *nsvalObj;
     domLength i, len;
     char *tval, *aval;
+    Tcl_Size tvallen;
+    
     
     /*
      * Allow for following syntax:
@@ -300,13 +304,23 @@ nodecmd_processAttributes (
         opts = (Tcl_Obj**)objv + 1;
     }
     for (i = 0; i < len; i += 2) {
-        tval = Tcl_GetString(opts[i]);
+        tvallen = 0;
+        if (!simpleAtts
+            && Tcl_ListObjLength (NULL, opts[i], &tvallen) == TCL_OK
+            && tvallen == 2) {
+            Tcl_ListObjIndex (interp, opts[i], 0, &nsvalObj);
+            Tcl_ListObjIndex (interp, opts[i], 1, &tvalObj);
+            tval = Tcl_GetString (tvalObj);
+        } else {
+            tval = Tcl_GetString(opts[i]);
+        }
         if (*tval == '-') {
             tval++;
         }
         if (abs(type) == ELEMENT_NODE_ANAME_CHK
             || abs(type) == ELEMENT_NODE_CHK) {
-            if (!tcldom_nameCheck (interp, tval, "attribute", 0)) {
+            if (!tcldom_nameCheck (interp, tval, "attribute",
+                                   tvallen == 2 ? 1 : 0)) {
                 return TCL_ERROR;
             }
         }
@@ -317,7 +331,11 @@ nodecmd_processAttributes (
                 return TCL_ERROR;
             }
         }
-        domSetAttribute(node, tval, aval);
+        if (tvallen == 2) {
+            domSetAttributeNS (node, tval, aval, Tcl_GetString (nsvalObj), 1);
+        } else {
+            domSetAttribute(node, tval, aval);
+        }
     }
     return TCL_OK;
 }
@@ -482,7 +500,8 @@ NodeObjCmd (
 
         cmdObj = NULL;
         if (nodecmd_processAttributes (interp, newNode, type, objc, objv,
-                                         &cmdObj) != TCL_OK) {
+                                       &cmdObj, nodeInfo->simpleAtts)
+            != TCL_OK) {
             return TCL_ERROR;
         }
         if (cmdObj) {
@@ -545,7 +564,7 @@ nodecmd_createNodeCmd (
     int             checkCharData       /* Flag: Data checks? */
 ) {
     int index, ret, type, nodecmd = 0, jsonType = 0, haveJsonType = 0;
-    int isElement = 0;
+    int isElement = 0, noNamespacedAttributes = 0;
     char *nsName, buf[64];
     Tcl_Obj *tagName = NULL, *namespace = NULL;
     Tcl_DString cmdName;
@@ -567,11 +586,13 @@ nodecmd_createNodeCmd (
     };
 
     static const char *options[] = {
-        "-returnNodeCmd", "-jsonType", "-tagName", "-namespace", NULL
+        "-returnNodeCmd", "-jsonType", "-tagName", "-namespace",
+        "-noNamespacedAttributes", NULL
     };
 
     enum option {
-        o_returnNodeCmd, o_jsonType, o_tagName, o_namespace
+        o_returnNodeCmd, o_jsonType, o_tagName, o_namespace,
+        o_noNamespacedAttributes        
     };
 
     static const char *jsonTypes[] = {
@@ -622,7 +643,12 @@ nodecmd_createNodeCmd (
             objc -= 2;
             objv += 2;
             break;
-            
+
+        case o_noNamespacedAttributes:
+            noNamespacedAttributes = 1;
+            objc--;
+            objv++;
+            break;            
         }
     }
     if (objc != 3) {
@@ -733,13 +759,19 @@ nodecmd_createNodeCmd (
     if (tagName && !isElement) {
         Tcl_SetResult(interp, "The -tagName option is allowed only for "
                       "element node commands.", NULL);
-        return TCL_ERROR;        
+        return TCL_ERROR;
     }
 
     if (namespace && !isElement) {
         Tcl_SetResult(interp, "The -namespace option is allowed only for "
                       "element node commands.", NULL);
-        return TCL_ERROR;        
+        return TCL_ERROR;
+    }
+
+    if (noNamespacedAttributes && !isElement) {
+        Tcl_SetResult(interp, "The -noNamespacedAttributes option is allowed "
+                      "only for element node commands.", NULL);
+        return TCL_ERROR;
     }
     
     if (haveJsonType && type != ELEMENT_NODE && type != TEXT_NODE) {
@@ -750,6 +782,7 @@ nodecmd_createNodeCmd (
     
     nodeInfo = (NodeInfo *) MALLOC (sizeof (NodeInfo));
     nodeInfo->namespace = NULL;
+    nodeInfo->simpleAtts = 0;
     nodeInfo->type = type;
     if (nodecmd) {
         nodeInfo->type *= -1; /* Signal this fact */
@@ -761,6 +794,9 @@ nodecmd_createNodeCmd (
     }
     if (tagName) {
         nodeInfo->tagName = tdomstrdup (Tcl_GetString(tagName));
+    }
+    if (noNamespacedAttributes) {
+        nodeInfo->simpleAtts = 1;
     }
     Tcl_CreateObjCommand(interp, Tcl_DStringValue(&cmdName), NodeObjCmd,
                          (ClientData)nodeInfo, NodeObjCmdDeleteProc);

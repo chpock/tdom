@@ -6600,7 +6600,7 @@ tDOM_fsnewNodeCmd (
 ) {
     domNode *parent, *newNode = NULL;
     int index, jsonType, haveJsonType = 0, type, ret;
-    int checkName, checkCharData;
+    int checkName, checkCharData, simpleAtts = 0;
     domLength len;
     Tcl_Obj *cmdObj;
     char *namespace = NULL, *option, *tag;
@@ -6608,11 +6608,11 @@ tDOM_fsnewNodeCmd (
     GetTcldomDATA;
 
     static const char *options[] = {
-        "-jsonType", "-namespace", "--", NULL
+        "-jsonType", "-namespace", "-noNamespacedAttributes", "--", NULL
     };
 
     enum option {
-        o_jsonType, o_namespace, o_Last
+        o_jsonType, o_namespace, o_noNamespacedAttributes, o_Last
     };
 
     static const char *jsonTypes[] = {
@@ -6672,6 +6672,12 @@ tDOM_fsnewNodeCmd (
             objc -= 2;
             objv += 2;
             break;
+
+        case o_noNamespacedAttributes:
+            simpleAtts = 1;
+            objc --;
+            objv ++;
+            break;
             
         case o_Last:
             objv++;  objc--; break;
@@ -6682,6 +6688,7 @@ tDOM_fsnewNodeCmd (
         Tcl_AppendResult(interp, "::tdom::fsnewNode \n"
                          "\t?-jsonType <jsonType>?\n"
                          "\t?-namespace <namespace>?\n"
+                         "\t?-noNamespacedAttributes?\n"
                          " tagName ?attributes? ?script?", NULL);
         return TCL_ERROR;
     }
@@ -6712,7 +6719,7 @@ tDOM_fsnewNodeCmd (
             }
         }
         if (nodecmd_processAttributes (interp, newNode, type, objc, objv,
-                                         &cmdObj) != TCL_OK) {
+                                       &cmdObj, simpleAtts) != TCL_OK) {
             return TCL_ERROR;
         }
         if (cmdObj) {

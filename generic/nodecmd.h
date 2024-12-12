@@ -50,7 +50,8 @@ int nodecmd_processAttributes (Tcl_Interp    *interp,
                                int            type,
                                int            objc,
                                Tcl_Obj *const objv[],
-                               Tcl_Obj      **cmdObj);
+                               Tcl_Obj      **cmdObj,
+                               int            simpleAtts);
 
 domNode * nodecmd_currentNode (Tcl_Interp *interp);
 
