@@ -3171,6 +3171,16 @@ test json-13.2 {jsonEscape} {
 
 }
 
+test json-13.3 {jsonEscape} {
+    set str ""
+    set expresult ""
+    for {set i 0 } {$i < 20} {incr i} {
+        append str "abc\"\\\u0000\u000c\u001c123+"
+        append expresult "abc\\\"\\\\\\u0000\\f\\u001c123+"
+    }
+    expr {[dom jsonEscape $str] == $expresult ? 1 : 0}
+} 1
+
 if {[info commands _dom] eq ""} {
     rename dom _dom
     proc dom {args} {

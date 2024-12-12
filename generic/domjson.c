@@ -827,6 +827,9 @@ int jsonEscape (
     *changed = 0;
     p = str;
     while (*p) {
+        /* The loop is left at the first character in the input string
+         * which must be escaped (by a break in the initescape
+         * define. */
         clen = UTF8_CHAR_LEN(*p);
         if (!clen) {
             SetResult ("invalid internal string representation");
@@ -865,6 +868,8 @@ int jsonEscape (
     if (!*changed) {
         return TCL_OK;
     }
+    /* There was already a character to escape. We process the
+     * remaning of the string and return the build up Tcl_DString. */
     while (*p) {
         clen = UTF8_CHAR_LEN(*p);
         if (!clen) {
