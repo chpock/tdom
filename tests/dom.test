@@ -1159,11 +1159,13 @@ test dom-3.43 {clearString} {
         \uD800\uD801\uD802_foo_bar_baz\uD802_didum\uE000
         \u0004\u0005\uDABC
         abc
+        \u00e4\u0004b
+        \u00e4\u0004\u00f6
     } {
         lappend result [dom clearString $str]
     }
     set result
-} [list {} a b ab ab acb adb ad_foo_bar _foo_bar_baz_didum _foo_bar_baz_didum\uE000 {} abc]
+} [list {} a b ab ab acb adb ad_foo_bar _foo_bar_baz_didum _foo_bar_baz_didum\uE000 {} abc \u00e4b  \u00e4\u00f6]
 
 test dom-3.44 {clearString -replace} {
     set result [list]

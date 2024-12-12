@@ -7740,7 +7740,7 @@ int tcldom_DomObjCmd (
     domLength     repllen;
     Tcl_CmdInfo   cmdInfo;
     Tcl_Obj     * mobjv[MAX_REWRITE_ARGS], *newObj, *storedErrMsg;
-    Tcl_DString   cleardString;
+    Tcl_DString   cleardString, escapedStr;
 
     static const char *domMethods[] = {
         "createDocument",  "createDocumentNS",   "createNodeCmd",
@@ -7750,7 +7750,7 @@ int tcldom_DomObjCmd (
         "isPIValue",       "isNCName",           "createDocumentNode",
         "setNameCheck",    "setTextCheck",       "setObjectCommands",
         "featureinfo",     "isBMPCharData",      "clearString",
-        "isHTML5CustomName",
+        "isHTML5CustomName", "jsonEscape",
 #ifdef TCL_THREADS
         "attachDocument",  "detachDocument",
 #endif
@@ -7764,7 +7764,7 @@ int tcldom_DomObjCmd (
         m_isPIValue,         m_isNCName,           m_createDocumentNode,
         m_setNameCheck,      m_setTextCheck,       m_setObjectCommands,
         m_featureinfo,       m_isBMPCharData,      m_clearString,
-        m_isHTML5CustomName
+        m_isHTML5CustomName, m_jsonEscape
 #ifdef TCL_THREADS
         ,m_attachDocument,   m_detachDocument
 #endif
@@ -8014,7 +8014,24 @@ int tcldom_DomObjCmd (
             CheckArgs(3,3,2,"string");
             SetBooleanResult(domIsHTML5CustomName(Tcl_GetString(objv[2])));
             return TCL_OK;
-        
+
+        case m_jsonEscape:
+            CheckArgs(3,3,2,"string");
+            if (jsonEscape (interp, Tcl_GetString(objv[2]), &escapedStr,
+                            &changed) != TCL_OK) {
+                return TCL_ERROR;
+            }
+            if (changed) {
+                newObj = Tcl_NewStringObj (
+                    Tcl_DStringValue (&escapedStr),
+                    Tcl_DStringLength (&escapedStr));
+                Tcl_DStringFree (&escapedStr);
+                Tcl_SetObjResult (interp, newObj);
+            } else {
+                Tcl_SetObjResult (interp, objv[2]);
+            }
+            return TCL_OK;
+                    
         case m_clearString:
             CheckArgs(3,5,2,"?-replace ?replacement?? string");
             if (objc >= 4) {

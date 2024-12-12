@@ -1,4 +1,9 @@
 
+2024-12-13  Rolf Ade  <rolf@pointsman.de>
+
+        Added the dom command method jsonEscape which escapes the
+        string argument for literally use in a JSON string.
+
 2024-11-09  Rolf Ade  <rolf@pointsman.de>
 
         Updated to expat 2.6.4.
