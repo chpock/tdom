@@ -689,6 +689,15 @@ recommendation. Otherwise it returns 0.</desc>
         </commanddef>
 
         <commanddef>
+          <command><cmd>dom</cmd> <method>jsonEscape</method>
+<m>string</m></command>
+          <desc>Returns the given <m>string</m> argument escaped in a
+          way that if the returned string is used literary in a JSON
+          document it is read by any confirming JSON parser as the
+          original string.</desc>
+        </commanddef>
+        
+        <commanddef>
             <command><cmd>dom</cmd> <method>featureinfo</method> <m>feature</m></command>
             <desc>This method provides information about the used
             build options and the expat version. The valid values for

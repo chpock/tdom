@@ -805,6 +805,111 @@ TypedList2DOM (
     return doc;
 }
 
+#define initescape(esc,esclen) *changed = 1; Tcl_DStringInit(escapedStr);     \
+    Tcl_DStringAppend (escapedStr, str, (domLength)(p-str));       \
+    Tcl_DStringAppend (escapedStr, (esc), (esclen));       \
+    p += clen; str = p; break;
+#define escape(esc,esclen) Tcl_DStringAppend (escapedStr, str, (domLength)(p-str)); \
+    Tcl_DStringAppend (escapedStr, (esc), (esclen));       \
+    p += clen; str = p; continue;
+
+int jsonEscape (
+    Tcl_Interp *interp,
+    char *str, 
+    Tcl_DString *escapedStr,
+    int *changed
+    )
+{
+    char *p;
+    int   clen;
+    char buf[6] = "\\u00";
+    
+    *changed = 0;
+    p = str;
+    while (*p) {
+        /* The loop is left at the first character in the input string
+         * which must be escaped (by a break in the initescape
+         * define. */
+        clen = UTF8_CHAR_LEN(*p);
+        if (!clen) {
+            SetResult ("invalid internal string representation");
+            return TCL_ERROR;
+        }
+        if (clen == 1) {
+            if (*p == '\\') {
+                initescape("\\\\",2);
+            } else if (*p == '"') {
+                initescape("\\\"",2);
+            } else if (*p == '\b') {
+                initescape("\\b",2);
+            } else if (*p == '\f') {
+                initescape("\\f",2);
+            } else if (*p == '\n') {
+                initescape("\\n",2);
+            } else if (*p == '\r') {
+                initescape("\\r",2);
+            } else if (*p == '\t') {
+                initescape("\\t",2);
+            } else if ((unsigned char)*p < 0x20) {
+                buf[4] = '0' + (*p>>4);
+                buf[5] = "0123456789abcdef"[*p&0xf];
+                initescape(buf,6);
+            } 
+            p++;
+        } else {
+            if ((unsigned char)*p == 0xC0 && (unsigned char)*(p+1) == 0x80) {
+                initescape("\\u0000",6);
+                p++;p++;
+            } else {
+                p += clen;
+            }
+        }
+    }
+    if (!*changed) {
+        return TCL_OK;
+    }
+    /* There was already a character to escape. We process the
+     * remaning of the string and return the build up Tcl_DString. */
+    while (*p) {
+        clen = UTF8_CHAR_LEN(*p);
+        if (!clen) {
+            SetResult ("invalid internal string representation");
+            return TCL_ERROR;
+        }
+        if (clen == 1) {
+            if (*p == '\\') {
+                escape("\\\\",2);
+            } else if (*p == '"') {
+                escape("\\\"",2);
+            } else if (*p == '\b') {
+                escape("\\b",2);
+            } else if (*p == '\f') {
+                escape("\\f",2);
+            } else if (*p == '\n') {
+                escape("\\n",2);
+            } else if (*p == '\r') {
+                escape("\\r",2);
+            } else if (*p == '\t') {
+                escape("\\t",2);
+            } else if ((unsigned char)*p < 0x20) {
+                buf[4] = '0' + (*p>>4);
+                buf[5] = "0123456789abcdef"[*p&0xf];
+                escape(buf,6);
+            } 
+            p++;
+        } else {
+            if ((unsigned char)*p == 0xC0 && (unsigned char)*(p+1) == 0x80) {
+                escape("\\u0000",6);
+                p++;p++;
+            } else {
+                p += clen;
+            }
+        }
+    }
+    Tcl_DStringAppend (escapedStr, str, (domLength)(p-str));
+    return TCL_OK;
+}
+
 domDocument *
 JSON_Parse (
     char *json,    /* Complete text of the json string being parsed */

@@ -14,6 +14,7 @@
 #    json-10.*: asTclValue
 #    json-11.*: asTypedList
 #    json-12.*: createFromTypedList
+#    json-13.*: jsonEscape
 # Copyright (c) 2017 Rolf Ade.
 
 source [file join [file dir [info script]] loadtdom.tcl]
@@ -3137,7 +3138,48 @@ test json-12.8 {createFromTypedList} {
     set result
 } {{"Titel with spaces":"Wirtschaftsinformatik","Keywords":["Introduction","Basics"],"Year":2022}}
 
+
+test json-13.1 {jsonEscape} {
+    set result ""
+    set strings ""
+    for {set i 0} {$i < 32} {incr i} {
+        lappend strings [subst [format "\\u00%02x" $i]]
+    }
+    foreach str $strings {
+        lappend result [dom jsonEscape $str]
+    }
+    set result
+} {{\u0000} {\u0001} {\u0002} {\u0003} {\u0004} {\u0005} {\u0006} {\u0007} {\b} {\t} {\n} {\u000b} {\f} {\r} {\u000e} {\u000f} {\u0010} {\u0011} {\u0012} {\u0013} {\u0014} {\u0015} {\u0016} {\u0017} {\u0018} {\u0019} {\u001a} {\u001b} {\u001c} {\u001d} {\u001e} {\u001f}}
+
+test json-13.2 {jsonEscape} {
+    set result ""
+    foreach str [list \
+                     a\u0000 \
+                     b\u000c \
+                     ä\u001a \
+                     abc\n\r \
+                     abc\n\rfoo\u0002 \
+                     some\u0000\u000C\u0018\n\u001felse\"other \
+                     \\\\ \
+                     foo\\\\bar \
+                     \\\"
+                    ] {
+        lappend result [dom jsonEscape $str]
+    }
+    set result
+} {{a\u0000} {b\f} {ä\u001a} {abc\n\r} {abc\n\rfoo\u0002} {some\u0000\f\u0018\n\u001felse\"other} {\\\\} {foo\\\\bar} {\\\"}}
+
 }
+
+test json-13.3 {jsonEscape} {
+    set str ""
+    set expresult ""
+    for {set i 0 } {$i < 20} {incr i} {
+        append str "abc\"\\\u0000\u000c\u001c123+"
+        append expresult "abc\\\"\\\\\\u0000\\f\\u001c123+"
+    }
+    expr {[dom jsonEscape $str] == $expresult ? 1 : 0}
+} 1
 
 if {[info commands _dom] eq ""} {
     rename dom _dom

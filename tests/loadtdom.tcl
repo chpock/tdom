@@ -7,7 +7,7 @@
 #
 
 package require Tcl 8.5-
-package require tcltest 2.2
+package require tcltest 2.2-
 namespace import ::tcltest::*
 catch {tcltest::loadTestedCommands}
 
