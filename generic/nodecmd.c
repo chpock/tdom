@@ -273,9 +273,9 @@ nodecmd_processAttributes (
 {
     Tcl_Obj **opts, *tvalObj, *nsvalObj;
     domLength i, len;
-    char *tval, *aval;
+    char *tval, *aval, *p;
     Tcl_Size tvallen;
-    
+    int colonseen;
     
     /*
      * Allow for following syntax:
@@ -311,6 +311,24 @@ nodecmd_processAttributes (
             Tcl_ListObjIndex (interp, opts[i], 0, &nsvalObj);
             Tcl_ListObjIndex (interp, opts[i], 1, &tvalObj);
             tval = Tcl_GetString (tvalObj);
+            if (abs(type) == ELEMENT_NODE_ANAME_CHK
+                || abs(type) == ELEMENT_NODE_CHK) {
+                colonseen = 0;
+                p = tval;
+                while (*p) {
+                    if (*p == ':') {
+                        colonseen = 1;
+                        break;
+                    }
+                    p++;
+                }
+                if (!colonseen) {
+                    Tcl_ResetResult (interp);
+                    Tcl_AppendResult (interp, "invalid name '", tval,
+                                      "' for a namespaced attribute", NULL);
+                    return TCL_ERROR;
+                }
+            }
         } else {
             tval = Tcl_GetString(opts[i]);
         }
