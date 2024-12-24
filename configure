@@ -8902,8 +8902,10 @@ $as_echo "#define XML_CONTEXT_BYTES 0" >>confdefs.h
 
 $as_echo "#define XML_GE 1" >>confdefs.h
 
-$as_echo "#define XML_LARGE_SIZE 1" >>confdefs.h
+if test "${TEA_PLATFORM}" = "windows" ; then
+    $as_echo "#define XML_LARGE_SIZE 1" >>confdefs.h
 
+fi
 
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable namespace support" >&5
 $as_echo_n "checking whether to enable namespace support... " >&6; }
