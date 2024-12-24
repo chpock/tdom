@@ -1,5 +1,5 @@
-C Added\sthe\sdom\scommand\smethod\sjsonEscape\swhich\sescapes\sthe\sstring\sargument\sfor\sliterally\suse\sin\sa\sJSON\sstring.
-D 2024-12-12T23:39:38.850
+C Do\snot\stinker\saround\sthe\sexpat\sdefault\s-Ds\son\sunix\slike\splatforms\ssince\sthis\smay\sclash\sif\sthe\suser\sprefers\sto\suse\sthe\ssystem\sexpat.
+D 2024-12-24T01:19:36.588
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -15,7 +15,7 @@ F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/toschema.tcl d9cb806e8f1a10ee9a6d6e8b3bd5944124a12001a086b5bc8511b6e92f9af620
 F apps/xslt.tcl 64103132fbe0a1fbf61cf3506608cb7ea5cbfddd247d207d95d8e96a071e1846
 F configure 29a0707314c2c667ddd9b79bf891dca5a1cc45d8de252ff0992bc60c04803c0e x
-F configure.ac 181ec174cdeba32ab0843ea0ac185f651fe4a85cd9d077342ad4e38747012648
+F configure.ac 4936941add82e47c1c8a58de98b17d8e45f85af4eeaae5bdf2a636e6f3c8e34a
 F doc/INDEX.MAP 8b9f0c2e18efc29fcf581669e175dec860f54026ef7fef4b8d7403bca442fb71
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html b4a8d2a4b261d8380849b9fa2b4026f1e08248aab543551db47a34b60a43c69a
@@ -243,9 +243,11 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P bc76f0eb716f32965a26fa662fcdc8b11d40d83a02f29756692e3c679d0f3a7a 31b80440febfb285e054b423ce24fc4b9438d359009eae10a88b5634568ca520
-R 03a15d6f95bd18057ed3208c54c8d3ba
-T +closed 31b80440febfb285e054b423ce24fc4b9438d359009eae10a88b5634568ca520
+P 223e8f6680b9a2031f099bbb1bf3a35eca088beebda4ead13ed5ab8483b7089b
+R 3b67596c5cbdad2da559e7e67b751691
+T *branch * expatdefs
+T *sym-expatdefs *
+T -sym-trunk *
 U rolf
-Z b418f97e0053bbc35f1c4b0177f484cd
+Z 7c1a984bc889ad86820c3f76c9515c99
 # Remove this line to create a well-formed Fossil manifest.
