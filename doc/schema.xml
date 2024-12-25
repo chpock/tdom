@@ -432,7 +432,7 @@
                   next event, the list entry will be a two elements
                   list, with #text as first element and the empty
                   string as second. If an any element constraint is
-                  possible. the list entry will be a two elements list,
+                  possible the list entry will be a two elements list,
                   with &lt;any> as first element and the empty string
                   as second. If an any element in a certain namespace
                   constraint is possible, the list entry will be a two
