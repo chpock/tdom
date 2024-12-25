@@ -1,5 +1,5 @@
-C Added\sthe\sdom\scommand\smethod\sjsonEscape\swhich\sescapes\sthe\sstring\sargument\sfor\sliterally\suse\sin\sa\sJSON\sstring.
-D 2024-12-12T23:39:38.850
+C Minor\stypo\sfixes.
+D 2024-12-25T01:15:47.214
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -42,7 +42,7 @@ F doc/pullparser.n 4d47099aa552d6513b1a269247acd69df6488014d5bf0f51525187a875fd3
 F doc/pullparser.xml 30132bb8d2afe3b3ab568da3145dcde6f090197be86bee74f8d028b83fdcfe8f
 F doc/schema.html 4ed42a9320a306b17bf2cec0535ca931f2af0b702bc513f441f9129f1d2ae035
 F doc/schema.n 46cf6fc78cb23a252cf2d8f3024c8b867831fbb91def7575ca5efa65783fbc34
-F doc/schema.xml 426edda0cdd6787e61ad86ef5b04915591684b680a1e6c20cec779694b42306b
+F doc/schema.xml 6ba28adee852ca877d9f29a50653cff9aade60f4143bbc15bd975f05ae8fe6fb
 F doc/tDOM.xml 04db7d0ccfea39aae21f4fe07b8f05d5bff8a84193cfce2aa5faa2f42c076377
 F doc/tdomcmd.html 4b954693f3994714c2b9bbe54d298b1330924a2b518e43029949e264e6bc7834
 F doc/tdomcmd.n c06a5ff035f16a2a52636b69d9ebe6ba84ff5101922ed27b551146c4d61d6cda
@@ -243,9 +243,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P bc76f0eb716f32965a26fa662fcdc8b11d40d83a02f29756692e3c679d0f3a7a 31b80440febfb285e054b423ce24fc4b9438d359009eae10a88b5634568ca520
-R 03a15d6f95bd18057ed3208c54c8d3ba
-T +closed 31b80440febfb285e054b423ce24fc4b9438d359009eae10a88b5634568ca520
+P 223e8f6680b9a2031f099bbb1bf3a35eca088beebda4ead13ed5ab8483b7089b
+R bbae4cf67cb02f7899818bf1a45f1359
 U rolf
-Z b418f97e0053bbc35f1c4b0177f484cd
+Z 8d103401af3c01ef46524c910fe9a1c5
 # Remove this line to create a well-formed Fossil manifest.
