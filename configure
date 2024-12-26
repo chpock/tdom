@@ -5144,6 +5144,93 @@ $as_echo "Using bundled expat distribution" >&6; }
 $as_echo "#define XML_POOR_ENTROPY 1" >>confdefs.h
 
     else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking expat version" >&5
+$as_echo_n "checking expat version... " >&6; }
+if ${tdom_cv_expat_build+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+            cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+                #include <expat.h>
+                #include <stdio.h>
+                int main (int argc, char *argv[])
+                {
+                    XML_Expat_Version expatVersion;
+                    return 0;
+                }
+
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  tdom_cv_expat_build=yes
+else
+  tdom_cv_expat_build=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $tdom_cv_expat_build" >&5
+$as_echo "$tdom_cv_expat_build" >&6; }
+        if test $tdom_cv_expat_build = no; then
+            { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Do not build with ${with_expat} directory" >&5
+$as_echo "$as_me: WARNING: Do not build with ${with_expat} directory" >&2;}
+        fi
+        if test $tdom_cv_expat_build = crosscomp; then
+            { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Cannot test build with ${with_expat}" >&5
+$as_echo "$as_me: WARNING: Cannot test build with ${with_expat}" >&2;}
+        fi
+        if test $tdom_cv_expat_build = yes; then
+            STOREDLIBS=$LIBS
+            LIBS="-lexpat"
+            { $as_echo "$as_me:${as_lineno-$LINENO}: checking expat version" >&5
+$as_echo_n "checking expat version... " >&6; }
+if ${tdom_cv_expat_version+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+                if test "$cross_compiling" = yes; then :
+  tdom_cv_expat_version=crosscomp
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+                    #include <expat.h>
+                    #include <stdio.h>
+                    int main (int argc, char *argv[])
+                    {
+                        XML_Expat_Version expatVersion;
+                        expatVersion = XML_ExpatVersionInfo();
+                        if (expatVersion.major < 2
+                            || expatVersion.minor < 6
+                            || expatVersion.micro < 4) {
+                            return 1;
+                        };
+                        return 0;
+                    }
+
+_ACEOF
+if ac_fn_c_try_run "$LINENO"; then :
+  tdom_cv_expat_version=yes
+else
+  tdom_cv_expat_version=older
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $tdom_cv_expat_version" >&5
+$as_echo "$tdom_cv_expat_version" >&6; }
+            LIBS=$STOREDLIBS
+            if test $tdom_cv_expat_version = older; then
+                { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Bundled expat version is more recent" >&5
+$as_echo "$as_me: WARNING: Bundled expat version is more recent" >&2;}
+            fi
+            if test $tdom_cv_expat_build = crosscomp; then
+                { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Cannot check version" >&5
+$as_echo "$as_me: WARNING: Cannot check version" >&2;}
+            fi
+        fi
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: Using shared expat found in ${ac_cv_c_expat}" >&5
 $as_echo "Using shared expat found in ${ac_cv_c_expat}" >&6; }
 

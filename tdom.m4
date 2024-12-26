@@ -444,6 +444,55 @@ AC_DEFUN(TDOM_PATH_EXPAT, [
         AC_DEFINE([XML_POOR_ENTROPY], 1,
           [Define to use poor entropy in lack of better source.])
     else
+        AC_CACHE_CHECK([expat version], tdom_cv_expat_build, [
+            AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+                #include <expat.h>
+                #include <stdio.h>
+                int main (int argc, char *argv[])
+                {
+                    XML_Expat_Version expatVersion;
+                    return 0;
+                }
+                ]])],
+                [tdom_cv_expat_build=yes],
+                [tdom_cv_expat_build=no],
+                [tdom_cv_expat_build=crosscomp])])
+        if test $tdom_cv_expat_build = no; then
+            AC_MSG_WARN([Do not build with ${with_expat} directory])
+        fi
+        if test $tdom_cv_expat_build = crosscomp; then
+            AC_MSG_WARN([Cannot test build with ${with_expat}])
+        fi
+        if test $tdom_cv_expat_build = yes; then
+            STOREDLIBS=$LIBS
+            LIBS="-lexpat"
+            AC_CACHE_CHECK([expat version], tdom_cv_expat_version, [
+                AC_RUN_IFELSE([AC_LANG_SOURCE([[
+                    #include <expat.h>
+                    #include <stdio.h>
+                    int main (int argc, char *argv[])
+                    {
+                        XML_Expat_Version expatVersion;
+                        expatVersion = XML_ExpatVersionInfo();
+                        if (expatVersion.major < 2
+                            || expatVersion.minor < 6
+                            || expatVersion.micro < 4) {
+                            return 1;
+                        };
+                        return 0;
+                    }
+                    ]])],
+                    [tdom_cv_expat_version=yes],
+                    [tdom_cv_expat_version=older],
+                    [tdom_cv_expat_version=crosscomp])])
+            LIBS=$STOREDLIBS        
+            if test $tdom_cv_expat_version = older; then
+                AC_MSG_WARN([Bundled expat version is more recent])
+            fi
+            if test $tdom_cv_expat_build = crosscomp; then
+                AC_MSG_WARN([Cannot check version])
+            fi
+        fi
         AC_MSG_RESULT([Using shared expat found in ${ac_cv_c_expat}])
         TEA_ADD_INCLUDES(-I${ac_cv_c_expat}/include)
         TEA_ADD_LIBS([-lexpat])
