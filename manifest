@@ -1,5 +1,5 @@
-C Request\sthe\sanswer\sto\sa\sfew\sdom\sfeatureinfo\scalls\sfrom\sthe\sactually\sused\slibrary\sand\snot\sfrom\sdefines\sat\sbuild\stime,\swhich\sare\sonly\strue,\sif\sbuild\swith\sthe\sbundled\sexpat.
-D 2024-12-27T00:11:54.355
+C test
+D 2024-12-27T12:13:58.615
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -14,8 +14,8 @@ F README.md 53171cdf688c9164f05e123fb1a4fa1314e7aeb5739ec97b65e19d97360890ff
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/toschema.tcl d9cb806e8f1a10ee9a6d6e8b3bd5944124a12001a086b5bc8511b6e92f9af620
 F apps/xslt.tcl 64103132fbe0a1fbf61cf3506608cb7ea5cbfddd247d207d95d8e96a071e1846
-F configure 29a0707314c2c667ddd9b79bf891dca5a1cc45d8de252ff0992bc60c04803c0e x
-F configure.ac 181ec174cdeba32ab0843ea0ac185f651fe4a85cd9d077342ad4e38747012648
+F configure 24481d70e9b225b67dfce05ce1200eb8aa739e4bfc40b6a22b2c038d24401f5d x
+F configure.ac 4936941add82e47c1c8a58de98b17d8e45f85af4eeaae5bdf2a636e6f3c8e34a
 F doc/INDEX.MAP 8b9f0c2e18efc29fcf581669e175dec860f54026ef7fef4b8d7403bca442fb71
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html b4a8d2a4b261d8380849b9fa2b4026f1e08248aab543551db47a34b60a43c69a
@@ -130,7 +130,7 @@ F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
 F generic/datatypes.c 7c9f9edb50b4592b2317dfde3db6feaa342e80f1322aee4b747eb98c486d959b
 F generic/datatypes.h 3e41d07bcf50cf6959b6e14416dfcb0d7b5aafc65683322978ec185c2a259332
 F generic/dom.c 4c6b86394c6a12f1d96aa0bbee278be905a29e0edb65aa9493aab00a29cc1652
-F generic/dom.h 2f733ca4b641c2b7eb85a59a81ec661d948c81bee4bacc901c1a56170360b6cb
+F generic/dom.h 3f127d670908dfc7ef1ad5174b570db39d6efe8b92743f69d46aaa95c5efefae
 F generic/domalloc.c ce41b8a16e855ee3a3db1d4b797f835a77f1f9260f24db4cb7dc73a07ee4670b
 F generic/domalloc.h 961f83bb46dec27dbcf36ed430ed81b1f485a1fdfaa2f7df8b60bbcf861d0fe3
 F generic/domhtml.c 29adbc4af3af84881a8e97b151f8bc5add56e20d73821ae25d4c46f7e66483a1
@@ -243,8 +243,11 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 18a44e3ed43a04d2c9ab829709dfe136cee4c95008b2b69a99d7000ee0c2c57a
-R ec834b5c6ecb7e2a4d699752e919df95
+P 618b4508fd3d2fa6cb86f32f2996cba1bd3981bde0e31c7456c5f3087161804f
+R 39a858d9fcf9cbd984f7661b949a75a3
+T *branch * test
+T *sym-test *
+T -sym-trunk *
 U rolf
-Z 2dc56e2631cf21fbf716c53ca4f62035
+Z c796fde1978bcabfb89b7120eafa5397
 # Remove this line to create a well-formed Fossil manifest.

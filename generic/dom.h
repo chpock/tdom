@@ -116,7 +116,7 @@
 #  ifdef _WIN32
 #    define TDOM_LS_MODIFIER "I64"
 #  else 
-#    define TDOM_LS_MODIFIER "ll"
+#    define TDOM_LS_MODIFIER "l"
 #  endif
 #endif
 
