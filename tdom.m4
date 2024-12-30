@@ -444,8 +444,8 @@ AC_DEFUN(TDOM_PATH_EXPAT, [
         AC_DEFINE([XML_POOR_ENTROPY], 1,
           [Define to use poor entropy in lack of better source.])
     else
-        AC_CACHE_CHECK([expat version], tdom_cv_expat_build, [
-            AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+        AC_CACHE_CHECK([linking], tdom_cv_expat_build, [
+            AC_LINK_IFELSE([AC_LANG_SOURCE([[
                 #include <expat.h>
                 #include <stdio.h>
                 int main (int argc, char *argv[])
@@ -482,7 +482,7 @@ AC_DEFUN(TDOM_PATH_EXPAT, [
                         return 0;
                     }
                     ]])],
-                    [tdom_cv_expat_version=yes],
+                    [tdom_cv_expat_version=ok],
                     [tdom_cv_expat_version=older],
                     [tdom_cv_expat_version=crosscomp])])
             LIBS=$STOREDLIBS        

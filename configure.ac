@@ -74,13 +74,6 @@ AC_CHECK_FUNCS(memmove bcopy)
 TDOM_PATH_AOLSERVER
 
 #--------------------------------------------------------------------
-# Add shared expat includes and expat entropy
-#--------------------------------------------------------------------
-
-TDOM_PATH_EXPAT
-TDOM_EXPAT_ENTROPY
-
-#--------------------------------------------------------------------
 # We need the UINT2PTR and PTR2UINT macros, so make sure that intptr_t
 # is defined.
 #--------------------------------------------------------------------
@@ -216,6 +209,13 @@ AC_SUBST(TDOM_LD_SEARCH_FLAGS)
 TEA_ENABLE_SYMBOLS
 
 #--------------------------------------------------------------------
+# Add shared expat includes and expat entropy
+#--------------------------------------------------------------------
+
+TDOM_EXPAT_ENTROPY
+TDOM_PATH_EXPAT
+
+#--------------------------------------------------------------------
 # This macro generates a line to use when building a library.  It
 # depends on values set by the TEA_ENABLE_SHARED, TEA_ENABLE_SYMBOLS,
 # and TEA_LOAD_TCLCONFIG macros above.
@@ -254,6 +254,7 @@ TDOM_ENABLE_SCHEMA
 
 TDOMSHELL=tcldomsh
 AC_SUBST(TDOMSHELL)
+
 
 TEA_EXPORT_CONFIG([tdom])
 

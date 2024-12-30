@@ -1,5 +1,5 @@
-C Merged\sfrom\stest.
-D 2024-12-30T00:50:17.372
+C Moved\sthe\s"check\swhich\sexpat\sto\suse"\spart\snearer\sto\send\sof\sconfigure\sso\sthat\sit\sstands\sout\smore.\sWe\swant\sto\scheck\sfor\slinking.\sBetter\sreturn\scodes.
+D 2024-12-30T22:09:23.498
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -14,8 +14,8 @@ F README.md 53171cdf688c9164f05e123fb1a4fa1314e7aeb5739ec97b65e19d97360890ff
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/toschema.tcl d9cb806e8f1a10ee9a6d6e8b3bd5944124a12001a086b5bc8511b6e92f9af620
 F apps/xslt.tcl 64103132fbe0a1fbf61cf3506608cb7ea5cbfddd247d207d95d8e96a071e1846
-F configure 49429bb339b5527925d8ddd9714468ebc9adee3e00d6c8428de4bfb472961be3 x
-F configure.ac 4936941add82e47c1c8a58de98b17d8e45f85af4eeaae5bdf2a636e6f3c8e34a
+F configure 46ff85d913ac3c02328ae2fac796b9e1d773446d2c8a7c4ced139d7d52995efc x
+F configure.ac a8b22fdb46e5c2f7e18a934f99a10008a51eca7242fd126db8f9fe4d5098f3e5
 F doc/INDEX.MAP 8b9f0c2e18efc29fcf581669e175dec860f54026ef7fef4b8d7403bca442fb71
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html b4a8d2a4b261d8380849b9fa2b4026f1e08248aab543551db47a34b60a43c69a
@@ -169,7 +169,7 @@ F pkgIndex.tcl.in 2c2ecfb3b4176ae61af4445e022b34bb9071efdbf0446c2aa2d0f6cfcce3f1
 F tclconfig/README.txt 22e2b8305785370b08ef9c18aa62408f5fe972655f3a4fbb0dc55bc8beb60e67
 F tclconfig/install-sh 2182b3705d92e25753411e2c28cf788c69e35a48fbb8aa332e342dfc6b95b80d x
 F tclconfig/tcl.m4 284faa1d9cf66c1efb42817beb5c8a63626fb35bf903993d4f11fde75677cc1a
-F tdom.m4 b6151cfa74b44ee3d5fba6b073b2c2bc4f3df6643934b0e49d0e27305a884aef
+F tdom.m4 8f17d6c136c288ad3d0e3647deb9691b5b7dee7f983c23e10ccdd6466328ae40
 F tdomConfig.sh.in 1f2f873de2a2a84a93949372767a78c56ee72e0700a156b87a2769884ad5ccf1
 F tests/JSONTestSuite.tcl 907228f9bd31855951b9033df74c9c15778765af
 F tests/OASIS-suite.tcl 1da66ffffee97dd7c39d3f14482f5a9382000d4233668c7f2ed1c5825752904e
@@ -243,8 +243,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c1aeac88e2f65624336159b69a50868e024ae024e19b0c6c123d20543b718578 178cd5e28bf944258341d02ace164750d07294102f1b77fab7c869e195d4a84b
-R 44c2ba15e0cf5b3c5181276963f91771
+P 31e3014be6fae9b4bee04178df42a0a07dda2f82e582521bb6b42fd7fd7ca0be
+R bcece6f90900a5cf9c2a3d3b9d8ddda2
 U rolf
-Z c46df5d640db8fde63b9f81750da8301
+Z 5c00cf7b4f754fd3e309b3d345998312
 # Remove this line to create a well-formed Fossil manifest.
