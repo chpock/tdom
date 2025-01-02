@@ -7485,7 +7485,7 @@ int tcldom_parse (
         sdata->parser = parser;
     }
 #endif
-#ifdef XML_DTD
+#if defined(XML_DTD) && (XML_MAJOR_VERSION == 2) && (XML_MINOR_VERSION >= 4)
     if (maximumAmplification >= 1.0f) {
         if (XML_SetBillionLaughsAttackProtectionMaximumAmplification (
                 parser, (float)maximumAmplification) == XML_FALSE) {

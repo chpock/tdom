@@ -115,8 +115,12 @@
 #ifndef TDOM_LS_MODIFIER
 #  ifdef _WIN32
 #    define TDOM_LS_MODIFIER "I64"
-#  else 
-#    define TDOM_LS_MODIFIER "l"
+#  else
+#    ifdef XML_LARGE_SIZE
+#      define TDOM_LS_MODIFIER "ll"
+#    else
+#      define TDOM_LS_MODIFIER "l"
+#    endif
 #  endif
 #endif
 

@@ -629,7 +629,6 @@ tdom_BUILD_STUB_LIB_SPEC
 tdom_LIB_SPEC
 tdom_BUILD_LIB_SPEC
 TDOMSHELL
-TCLSH_PROG
 VC_MANIFEST_EMBED_EXE
 VC_MANIFEST_EMBED_DLL
 RANLIB_STUB
@@ -638,6 +637,7 @@ MAKE_STUB_LIB
 MAKE_STATIC_LIB
 MAKE_SHARED_LIB
 MAKE_LIB
+TCLSH_PROG
 LDFLAGS_DEFAULT
 CFLAGS_DEFAULT
 TDOM_LD_SEARCH_FLAGS
@@ -760,8 +760,8 @@ enable_64bit
 enable_64bit_vis
 enable_rpath
 enable_symbols
-with_entropy
 with_expat
+with_entropy
 enable_dtd
 enable_ns
 enable_ucmd
@@ -1423,8 +1423,8 @@ Optional Packages:
   --with-tcl8             Compile for Tcl8 in Tcl9 environment
   --with-aolserver        directory with AOLserver distribution
   --with-tclinclude       directory containing the public Tcl header files
-  --with-entropy          source of entropy to use
   --with-expat            directory with expat installation
+  --with-entropy          source of entropy to use
 
 Some influential environment variables:
   CC          C compiler command
@@ -8379,143 +8379,6 @@ $as_echo "enabled $tcl_ok debugging" >&6; }
 
 
 #--------------------------------------------------------------------
-# This macro generates a line to use when building a library.  It
-# depends on values set by the TEA_ENABLE_SHARED, TEA_ENABLE_SYMBOLS,
-# and TEA_LOAD_TCLCONFIG macros above.
-#--------------------------------------------------------------------
-
-
-    if test "${TEA_PLATFORM}" = "windows" -a "$GCC" != "yes"; then
-	MAKE_STATIC_LIB="\${STLIB_LD} -out:\$@ \$(PKG_OBJECTS)"
-	MAKE_SHARED_LIB="\${SHLIB_LD} \${LDFLAGS} \${LDFLAGS_DEFAULT} -out:\$@ \$(PKG_OBJECTS) \${SHLIB_LD_LIBS}"
-	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-#if defined(_MSC_VER) && _MSC_VER >= 1400
-print("manifest needed")
-#endif
-
-_ACEOF
-if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
-  $EGREP "manifest needed" >/dev/null 2>&1; then :
-
-	# Could do a CHECK_PROG for mt, but should always be with MSVC8+
-	VC_MANIFEST_EMBED_DLL="if test -f \$@.manifest ; then mt.exe -nologo -manifest \$@.manifest -outputresource:\$@\;2 ; fi"
-	VC_MANIFEST_EMBED_EXE="if test -f \$@.manifest ; then mt.exe -nologo -manifest \$@.manifest -outputresource:\$@\;1 ; fi"
-	MAKE_SHARED_LIB="${MAKE_SHARED_LIB} ; ${VC_MANIFEST_EMBED_DLL}"
-
-    CLEANFILES="$CLEANFILES *.manifest"
-
-
-fi
-rm -f conftest*
-
-	MAKE_STUB_LIB="\${STLIB_LD} -nodefaultlib -out:\$@ \$(PKG_STUB_OBJECTS)"
-    else
-	MAKE_STATIC_LIB="\${STLIB_LD} \$@ \$(PKG_OBJECTS)"
-	MAKE_SHARED_LIB="\${SHLIB_LD} \${LDFLAGS} \${LDFLAGS_DEFAULT} -o \$@ \$(PKG_OBJECTS) \${SHLIB_LD_LIBS}"
-	MAKE_STUB_LIB="\${STLIB_LD} \$@ \$(PKG_STUB_OBJECTS)"
-    fi
-
-    if test "${SHARED_BUILD}" = "1" ; then
-	MAKE_LIB="${MAKE_SHARED_LIB} "
-    else
-	MAKE_LIB="${MAKE_STATIC_LIB} "
-    fi
-
-    #--------------------------------------------------------------------
-    # Shared libraries and static libraries have different names.
-    # Use the double eval to make sure any variables in the suffix is
-    # substituted. (@@@ Might not be necessary anymore)
-    #--------------------------------------------------------------------
-
-    PACKAGE_LIB_PREFIX8="${PACKAGE_LIB_PREFIX}"
-    PACKAGE_LIB_PREFIX9="${PACKAGE_LIB_PREFIX}tcl9"
-    if test "${TCL_MAJOR_VERSION}" -gt 8 -a x"${with_tcl8}" = x; then
-	PACKAGE_LIB_PREFIX="${PACKAGE_LIB_PREFIX9}"
-    else
-	PACKAGE_LIB_PREFIX="${PACKAGE_LIB_PREFIX8}"
-
-$as_echo "#define TCL_MAJOR_VERSION 8" >>confdefs.h
-
-    fi
-    if test "${TEA_PLATFORM}" = "windows" ; then
-	if test "${SHARED_BUILD}" = "1" ; then
-	    # We force the unresolved linking of symbols that are really in
-	    # the private libraries of Tcl and Tk.
-	    if test x"${TK_BIN_DIR}" != x ; then
-		SHLIB_LD_LIBS="${SHLIB_LD_LIBS} \"`${CYGPATH} ${TK_BIN_DIR}/${TK_STUB_LIB_FILE}`\""
-	    fi
-	    SHLIB_LD_LIBS="${SHLIB_LD_LIBS} \"`${CYGPATH} ${TCL_BIN_DIR}/${TCL_STUB_LIB_FILE}`\""
-	    if test "$GCC" = "yes"; then
-		SHLIB_LD_LIBS="${SHLIB_LD_LIBS} -static-libgcc"
-	    fi
-	    eval eval "PKG_LIB_FILE8=${PACKAGE_LIB_PREFIX8}${PACKAGE_NAME}${SHARED_LIB_SUFFIX}"
-	    eval eval "PKG_LIB_FILE9=${PACKAGE_LIB_PREFIX9}${PACKAGE_NAME}${SHARED_LIB_SUFFIX}"
-	    eval eval "PKG_LIB_FILE=${PACKAGE_LIB_PREFIX}${PACKAGE_NAME}${SHARED_LIB_SUFFIX}"
-	else
-	    if test "$GCC" = "yes"; then
-		PACKAGE_LIB_PREFIX=lib${PACKAGE_LIB_PREFIX}
-	    fi
-	    eval eval "PKG_LIB_FILE8=${PACKAGE_LIB_PREFIX8}${PACKAGE_NAME}${UNSHARED_LIB_SUFFIX}"
-	    eval eval "PKG_LIB_FILE9=${PACKAGE_LIB_PREFIX9}${PACKAGE_NAME}${UNSHARED_LIB_SUFFIX}"
-	    eval eval "PKG_LIB_FILE=${PACKAGE_LIB_PREFIX}${PACKAGE_NAME}${UNSHARED_LIB_SUFFIX}"
-	fi
-	# Some packages build their own stubs libraries
-	if test "${TCL_MAJOR_VERSION}" -gt 8 -a x"${with_tcl8}" = x; then
-	    eval eval "PKG_STUB_LIB_FILE=${PACKAGE_LIB_PREFIX8}${PACKAGE_NAME}stub.a"
-	else
-	    eval eval "PKG_STUB_LIB_FILE=${PACKAGE_LIB_PREFIX8}${PACKAGE_NAME}stub${UNSHARED_LIB_SUFFIX}"
-	fi
-	if test "$GCC" = "yes"; then
-	    PKG_STUB_LIB_FILE=lib${PKG_STUB_LIB_FILE}
-	fi
-	# These aren't needed on Windows (either MSVC or gcc)
-	RANLIB=:
-	RANLIB_STUB=:
-    else
-	RANLIB_STUB="${RANLIB}"
-	if test "${SHARED_BUILD}" = "1" ; then
-	    SHLIB_LD_LIBS="${SHLIB_LD_LIBS} ${TCL_STUB_LIB_SPEC}"
-	    if test x"${TK_BIN_DIR}" != x ; then
-		SHLIB_LD_LIBS="${SHLIB_LD_LIBS} ${TK_STUB_LIB_SPEC}"
-	    fi
-	    eval eval "PKG_LIB_FILE8=lib${PACKAGE_LIB_PREFIX8}${PACKAGE_NAME}${SHARED_LIB_SUFFIX}"
-	    eval eval "PKG_LIB_FILE9=lib${PACKAGE_LIB_PREFIX9}${PACKAGE_NAME}${SHARED_LIB_SUFFIX}"
-	    eval eval "PKG_LIB_FILE=lib${PACKAGE_LIB_PREFIX}${PACKAGE_NAME}${SHARED_LIB_SUFFIX}"
-	    RANLIB=:
-	else
-	    eval eval "PKG_LIB_FILE8=lib${PACKAGE_LIB_PREFIX8}${PACKAGE_NAME}${UNSHARED_LIB_SUFFIX}"
-	    eval eval "PKG_LIB_FILE9=lib${PACKAGE_LIB_PREFIX9}${PACKAGE_NAME}${UNSHARED_LIB_SUFFIX}"
-	    eval eval "PKG_LIB_FILE=lib${PACKAGE_LIB_PREFIX}${PACKAGE_NAME}${UNSHARED_LIB_SUFFIX}"
-	fi
-	# Some packages build their own stubs libraries
-	if test "${TCL_MAJOR_VERSION}" -gt 8 -a x"${with_tcl8}" = x; then
-	    eval eval "PKG_STUB_LIB_FILE=lib${PACKAGE_LIB_PREFIX8}${PACKAGE_NAME}stub.a"
-	else
-	    eval eval "PKG_STUB_LIB_FILE=lib${PACKAGE_LIB_PREFIX8}${PACKAGE_NAME}stub${UNSHARED_LIB_SUFFIX}"
-	fi
-    fi
-
-    # These are escaped so that only CFLAGS is picked up at configure time.
-    # The other values will be substituted at make time.
-    CFLAGS="${CFLAGS} \${CFLAGS_DEFAULT} \${CFLAGS_WARNING}"
-    if test "${SHARED_BUILD}" = "1" ; then
-	CFLAGS="${CFLAGS} \${SHLIB_CFLAGS}"
-    fi
-
-
-
-
-
-    # Substitute STUB_LIB_FILE in case package creates a stub library too.
-
-
-
-
-
-
-#--------------------------------------------------------------------
 # Determine the name of the tclsh and/or wish executables in the
 # Tcl and Tk build directories or the location they were installed
 # into. These paths are used to support running test cases only,
@@ -8563,12 +8426,346 @@ $as_echo_n "checking for tclsh... " >&6; }
 $as_echo "${TCLSH_PROG}" >&6; }
 
 
-#TEA_PROG_WISH
 
 #--------------------------------------------------------------------
 # Add shared expat includes and expat entropy
 #--------------------------------------------------------------------
 
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for expat" >&5
+$as_echo_n "checking for expat... " >&6; }
+
+# Check whether --with-expat was given.
+if test "${with_expat+set}" = set; then :
+  withval=$with_expat;
+else
+  with_expat=no
+fi
+
+
+    if ${ac_cv_c_expat+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+        case $with_expat in
+            no) ;;
+            yes)
+                for f in /usr/local /usr; do
+                    if test -f "$f/include/expat.h" ; then
+                        ac_cv_c_expat=`(cd $f; pwd)`
+                        break
+                    fi
+                done
+                ;;
+            *)
+                if test -f "$with_expat/include/expat.h"; then
+                    ac_cv_c_expat=`(cd $with_expat; pwd)`
+                else
+                     as_fn_error $? "${with_expat} directory doesn't contain expat.h" "$LINENO" 5
+                fi
+        esac
+
+fi
+
+    if test x"${ac_cv_c_expat}" = x ; then
+        TDOM_EXPAT=bundled
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: Using bundled expat distribution" >&5
+$as_echo "Using bundled expat distribution" >&6; }
+
+    vars="expat/xmlrole.c \
+                         expat/xmltok.c \
+                         expat/xmlparse.c"
+    for i in $vars; do
+	case $i in
+	    \$*)
+		# allow $-var names
+		PKG_SOURCES="$PKG_SOURCES $i"
+		PKG_OBJECTS="$PKG_OBJECTS $i"
+		;;
+	    *)
+		# check for existence - allows for generic/win/unix VPATH
+		# To add more dirs here (like 'src'), you have to update VPATH
+		# in Makefile.in as well
+		if test ! -f "${srcdir}/$i" -a ! -f "${srcdir}/generic/$i" \
+		    -a ! -f "${srcdir}/win/$i" -a ! -f "${srcdir}/unix/$i" \
+		    -a ! -f "${srcdir}/macosx/$i" \
+		    ; then
+		    as_fn_error $? "could not find source file '$i'" "$LINENO" 5
+		fi
+		PKG_SOURCES="$PKG_SOURCES $i"
+		# this assumes it is in a VPATH dir
+		i=`basename $i`
+		# handle user calling this before or after TEA_SETUP_COMPILER
+		if test x"${OBJEXT}" != x ; then
+		    j="`echo $i | sed -e 's/\.[^.]*$//'`.${OBJEXT}"
+		else
+		    j="`echo $i | sed -e 's/\.[^.]*$//'`.\${OBJEXT}"
+		fi
+		PKG_OBJECTS="$PKG_OBJECTS $j"
+		;;
+	esac
+    done
+
+
+
+
+    vars="-I${srcdir}/expat"
+    for i in $vars; do
+	PKG_INCLUDES="$PKG_INCLUDES $i"
+    done
+
+
+
+$as_echo "#define XML_POOR_ENTROPY 1" >>confdefs.h
+
+    else
+        TDOM_EXPAT=external
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking linking" >&5
+$as_echo_n "checking linking... " >&6; }
+if ${tdom_cv_expat_build+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+            cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+                #include <expat.h>
+                #include <stdio.h>
+                int main (int argc, char *argv[])
+                {
+                    XML_Expat_Version expatVersion;
+                    return 0;
+                }
+
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  tdom_cv_expat_build=yes
+else
+  tdom_cv_expat_build=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $tdom_cv_expat_build" >&5
+$as_echo "$tdom_cv_expat_build" >&6; }
+        if test $tdom_cv_expat_build = no; then
+            { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Do not build with ${with_expat} directory" >&5
+$as_echo "$as_me: WARNING: Do not build with ${with_expat} directory" >&2;}
+        fi
+        if test $tdom_cv_expat_build = crosscomp; then
+            { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Cannot test build with ${with_expat}" >&5
+$as_echo "$as_me: WARNING: Cannot test build with ${with_expat}" >&2;}
+        fi
+        if test $tdom_cv_expat_build = yes; then
+            # The following tests for certain features of the expat
+            # lib to use could easily be done with one AC_RUN_IFELSE
+            # (with the result code as bitfield of the findings). But
+            # I was not able to find out if sh bit operations (to
+            # analyse the result) are portable enough. If you know
+            # for sure they would please let me know so that I can
+            # strip down this longish checks.
+            STOREDLIBS=$LIBS
+            LIBS="-lexpat"
+            { $as_echo "$as_me:${as_lineno-$LINENO}: checking expat library XML_CHAR size" >&5
+$as_echo_n "checking expat library XML_CHAR size... " >&6; }
+if ${tdom_cv_expat_usability+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+                if test "$cross_compiling" = yes; then :
+  tdom_cv_expat_usability=crosscomp
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+                    #include <expat.h>
+                    int main (int argc, char *argv[])
+                    {
+                        XML_Feature const *featureArray = XML_GetFeatureList();
+                        /* The first XML_Feature in the array is XML_FEATURE_SIZEOF_XML_CHAR */
+                        if (featureArray->value != 1) {
+                            return 1;
+                        }
+                        return 0;
+                    }
+
+_ACEOF
+if ac_fn_c_try_run "$LINENO"; then :
+  tdom_cv_expat_usability=ok
+else
+  tdom_cv_expat_usability=failed
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $tdom_cv_expat_usability" >&5
+$as_echo "$tdom_cv_expat_usability" >&6; }
+            if test $tdom_cv_expat_usability = failed ; then
+                as_fn_error $? "expat library cannot be used because of sizeof(XML_Char) != 1" "$LINENO" 5
+            fi
+            if test $tdom_cv_expat_usability = crosscomp ; then
+                { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: crosscompiling - cannot check the expat library features, assuming defaults" >&5
+$as_echo "$as_me: WARNING: crosscompiling - cannot check the expat library features, assuming defaults" >&2;}
+                $as_echo "#define XML_DTD 1" >>confdefs.h
+
+                $as_echo "#define XML_GE 1" >>confdefs.h
+
+                $as_echo "#define XML_CONTEXT_BYTES 1024" >>confdefs.h
+
+            fi
+            if test $tdom_cv_expat_usability = ok ; then
+                { $as_echo "$as_me:${as_lineno-$LINENO}: checking expat library version" >&5
+$as_echo_n "checking expat library version... " >&6; }
+if ${tdom_cv_expat_version+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+                    if test "$cross_compiling" = yes; then :
+  tdom_cv_expat_version=crosscomp
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+                        #include <expat.h>
+                        int main (int argc, char *argv[])
+                        {
+                            XML_Expat_Version expatVersion;
+                            expatVersion = XML_ExpatVersionInfo();
+                            if (expatVersion.major < 2
+                                || expatVersion.minor < 6
+                                || expatVersion.micro < 4) {
+                                return 1;
+                            };
+                            return 0;
+                        }
+
+_ACEOF
+if ac_fn_c_try_run "$LINENO"; then :
+  tdom_cv_expat_version=ok
+else
+  tdom_cv_expat_version=older
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $tdom_cv_expat_version" >&5
+$as_echo "$tdom_cv_expat_version" >&6; }
+                if test $tdom_cv_expat_version = older; then
+                    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Bundled expat version is more recent" >&5
+$as_echo "$as_me: WARNING: Bundled expat version is more recent" >&2;}
+                fi
+                { $as_echo "$as_me:${as_lineno-$LINENO}: checking expat library XML_DTD" >&5
+$as_echo_n "checking expat library XML_DTD... " >&6; }
+if ${tdom_cv_expat_dtd+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+                    if test "$cross_compiling" = yes; then :
+  tdom_cv_expat_dtd=crosscomp
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+                        #include <expat.h>
+                        int main (int argc, char *argv[])
+                        {
+                            XML_Feature const *featureArray = XML_GetFeatureList();
+                            while (featureArray->feature != XML_FEATURE_END) {
+                                if (featureArray->feature == XML_FEATURE_DTD)
+                                    return 0;
+                                featureArray++;
+                            }
+                            return 1;
+                        }
+
+_ACEOF
+if ac_fn_c_try_run "$LINENO"; then :
+  tdom_cv_expat_dtd=yes
+else
+  tdom_cv_expat_dtd=no
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $tdom_cv_expat_dtd" >&5
+$as_echo "$tdom_cv_expat_dtd" >&6; }
+                if test $tdom_cv_expat_dtd = yes; then
+                    $as_echo "#define XML_DTD 1" >>confdefs.h
+
+                fi
+                { $as_echo "$as_me:${as_lineno-$LINENO}: checking expat library XML_LARGE_SIZE" >&5
+$as_echo_n "checking expat library XML_LARGE_SIZE... " >&6; }
+if ${tdom_cv_expat_large_size+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+                    if test "$cross_compiling" = yes; then :
+  tdom_cv_expat_large_size=crosscomp
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+                        #include <expat.h>
+                        int main (int argc, char *argv[])
+                        {
+                            XML_Feature const *featureArray = XML_GetFeatureList();
+                            while (featureArray->feature != XML_FEATURE_END) {
+                                if (featureArray->feature == XML_FEATURE_LARGE_SIZE)
+                                    return 1;
+                                featureArray++;
+                            }
+                            return 0;
+                        }
+
+_ACEOF
+if ac_fn_c_try_run "$LINENO"; then :
+  tdom_cv_expat_large_size=no
+else
+  tdom_cv_expat_large_size=yes
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $tdom_cv_expat_large_size" >&5
+$as_echo "$tdom_cv_expat_large_size" >&6; }
+                if test $tdom_cv_expat_large_size = yes ; then
+                    $as_echo "#define XML_LARGE_SIZE 1" >>confdefs.h
+
+                fi
+            fi
+            LIBS=$STOREDLIBS
+        fi
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: Using shared expat found in ${ac_cv_c_expat}" >&5
+$as_echo "Using shared expat found in ${ac_cv_c_expat}" >&6; }
+
+    vars="-I${ac_cv_c_expat}/include"
+    for i in $vars; do
+	PKG_INCLUDES="$PKG_INCLUDES $i"
+    done
+
+
+
+    vars="-lexpat"
+    for i in $vars; do
+	if test "${TEA_PLATFORM}" = "windows" -a "$GCC" = "yes" ; then
+	    # Convert foo.lib to -lfoo for GCC.  No-op if not *.lib
+	    i=`echo "$i" | sed -e 's/^\([^-].*\)\.[lL][iI][bB]$/-l\1/'`
+	fi
+	PKG_LIBS="$PKG_LIBS $i"
+    done
+
+
+    fi
+
+if test "${TDOM_EXPAT}" = "bundled"; then
 
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking which source of entropy to use" >&5
 $as_echo "$as_me: checking which source of entropy to use" >&6;}
@@ -8754,208 +8951,150 @@ $as_echo "#define XML_POOR_ENTROPY 1" >>confdefs.h
                 as_fn_error $? "${with_entropy} not known." "$LINENO" 5
         esac
 
-
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for expat" >&5
-$as_echo_n "checking for expat... " >&6; }
-
-# Check whether --with-expat was given.
-if test "${with_expat+set}" = set; then :
-  withval=$with_expat;
-else
-  with_expat=no
 fi
 
+#--------------------------------------------------------------------
+# This macro generates a line to use when building a library.  It
+# depends on values set by the TEA_ENABLE_SHARED, TEA_ENABLE_SYMBOLS,
+# and TEA_LOAD_TCLCONFIG macros above.
+#--------------------------------------------------------------------
 
-    if ${ac_cv_c_expat+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
 
-        case $with_expat in
-            no) ;;
-            yes)
-                for f in /usr/local /usr; do
-                    if test -f "$f/include/expat.h" ; then
-                        ac_cv_c_expat=`(cd $f; pwd)`
-                        break
-                    fi
-                done
-                ;;
-            *)
-                if test -f "$with_expat/include/expat.h"; then
-                    ac_cv_c_expat=`(cd $with_expat; pwd)`
-                else
-                     as_fn_error $? "${with_expat} directory doesn't contain expat.h" "$LINENO" 5
-                fi
-        esac
+    if test "${TEA_PLATFORM}" = "windows" -a "$GCC" != "yes"; then
+	MAKE_STATIC_LIB="\${STLIB_LD} -out:\$@ \$(PKG_OBJECTS)"
+	MAKE_SHARED_LIB="\${SHLIB_LD} \${LDFLAGS} \${LDFLAGS_DEFAULT} -out:\$@ \$(PKG_OBJECTS) \${SHLIB_LD_LIBS}"
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+print("manifest needed")
+#endif
+
+_ACEOF
+if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
+  $EGREP "manifest needed" >/dev/null 2>&1; then :
+
+	# Could do a CHECK_PROG for mt, but should always be with MSVC8+
+	VC_MANIFEST_EMBED_DLL="if test -f \$@.manifest ; then mt.exe -nologo -manifest \$@.manifest -outputresource:\$@\;2 ; fi"
+	VC_MANIFEST_EMBED_EXE="if test -f \$@.manifest ; then mt.exe -nologo -manifest \$@.manifest -outputresource:\$@\;1 ; fi"
+	MAKE_SHARED_LIB="${MAKE_SHARED_LIB} ; ${VC_MANIFEST_EMBED_DLL}"
+
+    CLEANFILES="$CLEANFILES *.manifest"
+
 
 fi
+rm -f conftest*
 
-    if test x"${ac_cv_c_expat}" = x ; then
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: Using bundled expat distribution" >&5
-$as_echo "Using bundled expat distribution" >&6; }
-
-    vars="expat/xmlrole.c \
-                         expat/xmltok.c \
-                         expat/xmlparse.c"
-    for i in $vars; do
-	case $i in
-	    \$*)
-		# allow $-var names
-		PKG_SOURCES="$PKG_SOURCES $i"
-		PKG_OBJECTS="$PKG_OBJECTS $i"
-		;;
-	    *)
-		# check for existence - allows for generic/win/unix VPATH
-		# To add more dirs here (like 'src'), you have to update VPATH
-		# in Makefile.in as well
-		if test ! -f "${srcdir}/$i" -a ! -f "${srcdir}/generic/$i" \
-		    -a ! -f "${srcdir}/win/$i" -a ! -f "${srcdir}/unix/$i" \
-		    -a ! -f "${srcdir}/macosx/$i" \
-		    ; then
-		    as_fn_error $? "could not find source file '$i'" "$LINENO" 5
-		fi
-		PKG_SOURCES="$PKG_SOURCES $i"
-		# this assumes it is in a VPATH dir
-		i=`basename $i`
-		# handle user calling this before or after TEA_SETUP_COMPILER
-		if test x"${OBJEXT}" != x ; then
-		    j="`echo $i | sed -e 's/\.[^.]*$//'`.${OBJEXT}"
-		else
-		    j="`echo $i | sed -e 's/\.[^.]*$//'`.\${OBJEXT}"
-		fi
-		PKG_OBJECTS="$PKG_OBJECTS $j"
-		;;
-	esac
-    done
-
-
-
-
-    vars="-I${srcdir}/expat"
-    for i in $vars; do
-	PKG_INCLUDES="$PKG_INCLUDES $i"
-    done
-
-
-
-$as_echo "#define XML_POOR_ENTROPY 1" >>confdefs.h
-
+	MAKE_STUB_LIB="\${STLIB_LD} -nodefaultlib -out:\$@ \$(PKG_STUB_OBJECTS)"
     else
-        { $as_echo "$as_me:${as_lineno-$LINENO}: checking linking" >&5
-$as_echo_n "checking linking... " >&6; }
-if ${tdom_cv_expat_build+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
+	MAKE_STATIC_LIB="\${STLIB_LD} \$@ \$(PKG_OBJECTS)"
+	MAKE_SHARED_LIB="\${SHLIB_LD} \${LDFLAGS} \${LDFLAGS_DEFAULT} -o \$@ \$(PKG_OBJECTS) \${SHLIB_LD_LIBS}"
+	MAKE_STUB_LIB="\${STLIB_LD} \$@ \$(PKG_STUB_OBJECTS)"
+    fi
 
-            cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
+    if test "${SHARED_BUILD}" = "1" ; then
+	MAKE_LIB="${MAKE_SHARED_LIB} "
+    else
+	MAKE_LIB="${MAKE_STATIC_LIB} "
+    fi
 
-                #include <expat.h>
-                #include <stdio.h>
-                int main (int argc, char *argv[])
-                {
-                    XML_Expat_Version expatVersion;
-                    return 0;
-                }
+    #--------------------------------------------------------------------
+    # Shared libraries and static libraries have different names.
+    # Use the double eval to make sure any variables in the suffix is
+    # substituted. (@@@ Might not be necessary anymore)
+    #--------------------------------------------------------------------
 
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  tdom_cv_expat_build=yes
-else
-  tdom_cv_expat_build=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $tdom_cv_expat_build" >&5
-$as_echo "$tdom_cv_expat_build" >&6; }
-        if test $tdom_cv_expat_build = no; then
-            { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Do not build with ${with_expat} directory" >&5
-$as_echo "$as_me: WARNING: Do not build with ${with_expat} directory" >&2;}
-        fi
-        if test $tdom_cv_expat_build = crosscomp; then
-            { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Cannot test build with ${with_expat}" >&5
-$as_echo "$as_me: WARNING: Cannot test build with ${with_expat}" >&2;}
-        fi
-        if test $tdom_cv_expat_build = yes; then
-            STOREDLIBS=$LIBS
-            LIBS="-lexpat"
-            { $as_echo "$as_me:${as_lineno-$LINENO}: checking expat version" >&5
-$as_echo_n "checking expat version... " >&6; }
-if ${tdom_cv_expat_version+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
+    PACKAGE_LIB_PREFIX8="${PACKAGE_LIB_PREFIX}"
+    PACKAGE_LIB_PREFIX9="${PACKAGE_LIB_PREFIX}tcl9"
+    if test "${TCL_MAJOR_VERSION}" -gt 8 -a x"${with_tcl8}" = x; then
+	PACKAGE_LIB_PREFIX="${PACKAGE_LIB_PREFIX9}"
+    else
+	PACKAGE_LIB_PREFIX="${PACKAGE_LIB_PREFIX8}"
 
-                if test "$cross_compiling" = yes; then :
-  tdom_cv_expat_version=crosscomp
-else
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-                    #include <expat.h>
-                    #include <stdio.h>
-                    int main (int argc, char *argv[])
-                    {
-                        XML_Expat_Version expatVersion;
-                        expatVersion = XML_ExpatVersionInfo();
-                        if (expatVersion.major < 2
-                            || expatVersion.minor < 6
-                            || expatVersion.micro < 4) {
-                            return 1;
-                        };
-                        return 0;
-                    }
-
-_ACEOF
-if ac_fn_c_try_run "$LINENO"; then :
-  tdom_cv_expat_version=ok
-else
-  tdom_cv_expat_version=older
-fi
-rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
-  conftest.$ac_objext conftest.beam conftest.$ac_ext
-fi
-
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $tdom_cv_expat_version" >&5
-$as_echo "$tdom_cv_expat_version" >&6; }
-            LIBS=$STOREDLIBS
-            if test $tdom_cv_expat_version = older; then
-                { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Bundled expat version is more recent" >&5
-$as_echo "$as_me: WARNING: Bundled expat version is more recent" >&2;}
-            fi
-            if test $tdom_cv_expat_build = crosscomp; then
-                { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Cannot check version" >&5
-$as_echo "$as_me: WARNING: Cannot check version" >&2;}
-            fi
-        fi
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: Using shared expat found in ${ac_cv_c_expat}" >&5
-$as_echo "Using shared expat found in ${ac_cv_c_expat}" >&6; }
-
-    vars="-I${ac_cv_c_expat}/include"
-    for i in $vars; do
-	PKG_INCLUDES="$PKG_INCLUDES $i"
-    done
-
-
-
-    vars="-lexpat"
-    for i in $vars; do
-	if test "${TEA_PLATFORM}" = "windows" -a "$GCC" = "yes" ; then
-	    # Convert foo.lib to -lfoo for GCC.  No-op if not *.lib
-	    i=`echo "$i" | sed -e 's/^\([^-].*\)\.[lL][iI][bB]$/-l\1/'`
-	fi
-	PKG_LIBS="$PKG_LIBS $i"
-    done
-
+$as_echo "#define TCL_MAJOR_VERSION 8" >>confdefs.h
 
     fi
+    if test "${TEA_PLATFORM}" = "windows" ; then
+	if test "${SHARED_BUILD}" = "1" ; then
+	    # We force the unresolved linking of symbols that are really in
+	    # the private libraries of Tcl and Tk.
+	    if test x"${TK_BIN_DIR}" != x ; then
+		SHLIB_LD_LIBS="${SHLIB_LD_LIBS} \"`${CYGPATH} ${TK_BIN_DIR}/${TK_STUB_LIB_FILE}`\""
+	    fi
+	    SHLIB_LD_LIBS="${SHLIB_LD_LIBS} \"`${CYGPATH} ${TCL_BIN_DIR}/${TCL_STUB_LIB_FILE}`\""
+	    if test "$GCC" = "yes"; then
+		SHLIB_LD_LIBS="${SHLIB_LD_LIBS} -static-libgcc"
+	    fi
+	    eval eval "PKG_LIB_FILE8=${PACKAGE_LIB_PREFIX8}${PACKAGE_NAME}${SHARED_LIB_SUFFIX}"
+	    eval eval "PKG_LIB_FILE9=${PACKAGE_LIB_PREFIX9}${PACKAGE_NAME}${SHARED_LIB_SUFFIX}"
+	    eval eval "PKG_LIB_FILE=${PACKAGE_LIB_PREFIX}${PACKAGE_NAME}${SHARED_LIB_SUFFIX}"
+	else
+	    if test "$GCC" = "yes"; then
+		PACKAGE_LIB_PREFIX=lib${PACKAGE_LIB_PREFIX}
+	    fi
+	    eval eval "PKG_LIB_FILE8=${PACKAGE_LIB_PREFIX8}${PACKAGE_NAME}${UNSHARED_LIB_SUFFIX}"
+	    eval eval "PKG_LIB_FILE9=${PACKAGE_LIB_PREFIX9}${PACKAGE_NAME}${UNSHARED_LIB_SUFFIX}"
+	    eval eval "PKG_LIB_FILE=${PACKAGE_LIB_PREFIX}${PACKAGE_NAME}${UNSHARED_LIB_SUFFIX}"
+	fi
+	# Some packages build their own stubs libraries
+	if test "${TCL_MAJOR_VERSION}" -gt 8 -a x"${with_tcl8}" = x; then
+	    eval eval "PKG_STUB_LIB_FILE=${PACKAGE_LIB_PREFIX8}${PACKAGE_NAME}stub.a"
+	else
+	    eval eval "PKG_STUB_LIB_FILE=${PACKAGE_LIB_PREFIX8}${PACKAGE_NAME}stub${UNSHARED_LIB_SUFFIX}"
+	fi
+	if test "$GCC" = "yes"; then
+	    PKG_STUB_LIB_FILE=lib${PKG_STUB_LIB_FILE}
+	fi
+	# These aren't needed on Windows (either MSVC or gcc)
+	RANLIB=:
+	RANLIB_STUB=:
+    else
+	RANLIB_STUB="${RANLIB}"
+	if test "${SHARED_BUILD}" = "1" ; then
+	    SHLIB_LD_LIBS="${SHLIB_LD_LIBS} ${TCL_STUB_LIB_SPEC}"
+	    if test x"${TK_BIN_DIR}" != x ; then
+		SHLIB_LD_LIBS="${SHLIB_LD_LIBS} ${TK_STUB_LIB_SPEC}"
+	    fi
+	    eval eval "PKG_LIB_FILE8=lib${PACKAGE_LIB_PREFIX8}${PACKAGE_NAME}${SHARED_LIB_SUFFIX}"
+	    eval eval "PKG_LIB_FILE9=lib${PACKAGE_LIB_PREFIX9}${PACKAGE_NAME}${SHARED_LIB_SUFFIX}"
+	    eval eval "PKG_LIB_FILE=lib${PACKAGE_LIB_PREFIX}${PACKAGE_NAME}${SHARED_LIB_SUFFIX}"
+	    RANLIB=:
+	else
+	    eval eval "PKG_LIB_FILE8=lib${PACKAGE_LIB_PREFIX8}${PACKAGE_NAME}${UNSHARED_LIB_SUFFIX}"
+	    eval eval "PKG_LIB_FILE9=lib${PACKAGE_LIB_PREFIX9}${PACKAGE_NAME}${UNSHARED_LIB_SUFFIX}"
+	    eval eval "PKG_LIB_FILE=lib${PACKAGE_LIB_PREFIX}${PACKAGE_NAME}${UNSHARED_LIB_SUFFIX}"
+	fi
+	# Some packages build their own stubs libraries
+	if test "${TCL_MAJOR_VERSION}" -gt 8 -a x"${with_tcl8}" = x; then
+	    eval eval "PKG_STUB_LIB_FILE=lib${PACKAGE_LIB_PREFIX8}${PACKAGE_NAME}stub.a"
+	else
+	    eval eval "PKG_STUB_LIB_FILE=lib${PACKAGE_LIB_PREFIX8}${PACKAGE_NAME}stub${UNSHARED_LIB_SUFFIX}"
+	fi
+    fi
+
+    # These are escaped so that only CFLAGS is picked up at configure time.
+    # The other values will be substituted at make time.
+    CFLAGS="${CFLAGS} \${CFLAGS_DEFAULT} \${CFLAGS_WARNING}"
+    if test "${SHARED_BUILD}" = "1" ; then
+	CFLAGS="${CFLAGS} \${SHLIB_CFLAGS}"
+    fi
+
+
+
+
+
+    # Substitute STUB_LIB_FILE in case package creates a stub library too.
+
+
+
+
 
 
 #--------------------------------------------------------------------
 # Add some private preprocessor options
 #--------------------------------------------------------------------
 
+if test "${TDOM_EXPAT}" = "bundled"; then
 
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable expat dtd support" >&5
 $as_echo_n "checking whether to enable expat dtd support... " >&6; }
@@ -8984,16 +9123,18 @@ $as_echo "yes" >&6; }
 $as_echo "no" >&6; }
     fi
 
-# If we expose XML_GetInputContext() at script level
-#TDOM_CONTEXT_BYTES
-$as_echo "#define XML_CONTEXT_BYTES 0" >>confdefs.h
+    # If we expose XML_GetInputContext() at script level
+    #TDOM_CONTEXT_BYTES
+    $as_echo "#define XML_CONTEXT_BYTES 0" >>confdefs.h
 
-$as_echo "#define XML_GE 1" >>confdefs.h
+    $as_echo "#define XML_GE 1" >>confdefs.h
 
-if test "${TEA_PLATFORM}" = "windows" ; then
-    $as_echo "#define XML_LARGE_SIZE 1" >>confdefs.h
+    if test "${TEA_PLATFORM}" = "windows" ; then
+        $as_echo "#define XML_STATIC 1" >>confdefs.h
 
-fi
+        $as_echo "#define XML_LARGE_SIZE 1" >>confdefs.h
+
+    fi
 
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable namespace support" >&5
 $as_echo_n "checking whether to enable namespace support... " >&6; }
@@ -9022,6 +9163,7 @@ $as_echo "yes" >&6; }
 $as_echo "no" >&6; }
     fi
 
+fi
 
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable built-in unknown command" >&5
 $as_echo_n "checking whether to enable built-in unknown command... " >&6; }
