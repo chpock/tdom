@@ -215,7 +215,7 @@ prefix. It is not recommended to set XML namespace declarations. The effects are
         isn't given, information about all attributes are returned.
         The return value is a Tcl list, the elements just the
         attribute name in case of non namespaced attributes and three
-        element sublists for namespaced attributes. n case of an
+        element sublists for namespaced attributes. In case of an
         "ordinary" namespaced attribute, the sublist elements are
         {&lt;localname&gt; &lt;prefix&gt; &lt;namespace_uri&gt;}. In the special case of
         an XML namespace declaration it is {&lt;the prefix defined&gt;
