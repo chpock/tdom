@@ -74,13 +74,6 @@ AC_CHECK_FUNCS(memmove bcopy)
 TDOM_PATH_AOLSERVER
 
 #--------------------------------------------------------------------
-# Add shared expat includes and expat entropy
-#--------------------------------------------------------------------
-
-TDOM_PATH_EXPAT
-TDOM_EXPAT_ENTROPY
-
-#--------------------------------------------------------------------
 # We need the UINT2PTR and PTR2UINT macros, so make sure that intptr_t
 # is defined.
 #--------------------------------------------------------------------
@@ -216,14 +209,6 @@ AC_SUBST(TDOM_LD_SEARCH_FLAGS)
 TEA_ENABLE_SYMBOLS
 
 #--------------------------------------------------------------------
-# This macro generates a line to use when building a library.  It
-# depends on values set by the TEA_ENABLE_SHARED, TEA_ENABLE_SYMBOLS,
-# and TEA_LOAD_TCLCONFIG macros above.
-#--------------------------------------------------------------------
-
-TEA_MAKE_LIB
-
-#--------------------------------------------------------------------
 # Determine the name of the tclsh and/or wish executables in the
 # Tcl and Tk build directories or the location they were installed
 # into. These paths are used to support running test cases only,
@@ -232,19 +217,40 @@ TEA_MAKE_LIB
 #--------------------------------------------------------------------
 
 TEA_PROG_TCLSH
-#TEA_PROG_WISH
+
+#--------------------------------------------------------------------
+# Add shared expat includes and expat entropy
+#--------------------------------------------------------------------
+
+TDOM_PATH_EXPAT
+if test "${TDOM_EXPAT}" = "bundled"; then
+    TDOM_EXPAT_ENTROPY
+fi
+
+#--------------------------------------------------------------------
+# This macro generates a line to use when building a library.  It
+# depends on values set by the TEA_ENABLE_SHARED, TEA_ENABLE_SYMBOLS,
+# and TEA_LOAD_TCLCONFIG macros above.
+#--------------------------------------------------------------------
+
+TEA_MAKE_LIB
 
 #--------------------------------------------------------------------
 # Add some private preprocessor options
 #--------------------------------------------------------------------
 
-TDOM_ENABLE_DTD
-# If we expose XML_GetInputContext() at script level
-#TDOM_CONTEXT_BYTES
-AC_DEFINE(XML_CONTEXT_BYTES, 0)
-AC_DEFINE(XML_GE, 1)
-AC_DEFINE(XML_LARGE_SIZE, 1)
-TDOM_ENABLE_NS
+if test "${TDOM_EXPAT}" = "bundled"; then
+    TDOM_ENABLE_DTD
+    # If we expose XML_GetInputContext() at script level
+    #TDOM_CONTEXT_BYTES
+    AC_DEFINE(XML_CONTEXT_BYTES, 0)
+    AC_DEFINE(XML_GE, 1)
+    if test "${TEA_PLATFORM}" = "windows" ; then
+        AC_DEFINE(XML_STATIC, 1)
+        AC_DEFINE(XML_LARGE_SIZE, 1)
+    fi
+    TDOM_ENABLE_NS
+fi
 TDOM_ENABLE_UNKNOWN
 TDOM_ENABLE_TDOMALLOC
 TDOM_ENABLE_LESS_NS
@@ -252,6 +258,7 @@ TDOM_ENABLE_SCHEMA
 
 TDOMSHELL=tcldomsh
 AC_SUBST(TDOMSHELL)
+
 
 TEA_EXPORT_CONFIG([tdom])
 

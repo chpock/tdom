@@ -500,7 +500,7 @@ TclExpatInitializeParser(
                 return TCL_ERROR;
             }
         }
-#ifdef XML_DTD
+#if defined(XML_DTD) && (XML_MAJOR_VERSION == 2) && (XML_MINOR_VERSION >= 4)
         if (expat->maximumAmplification >= 1.0f) {
             if (XML_SetBillionLaughsAttackProtectionMaximumAmplification (
                     expat->parser, expat->maximumAmplification) == XML_FALSE) {
@@ -1348,7 +1348,7 @@ TclExpatConfigure (
                             "\" requires a float >= 1.0 as argument.", NULL);
               return TCL_ERROR;
           }
-#ifdef XML_DTD
+#if defined(XML_DTD) && (XML_MAJOR_VERSION == 2) && (XML_MINOR_VERSION >= 4)
           if (expat->parser) {
               if (XML_SetBillionLaughsAttackProtectionMaximumAmplification (
                       expat->parser, (float)maximumAmplification) == XML_FALSE) {
@@ -1379,7 +1379,7 @@ TclExpatConfigure (
                              "\" requires a long > 0 as argument.", NULL);
               return TCL_ERROR;
           }
-#ifdef XML_DTD
+#if defined(XML_DTD) && (XML_MAJOR_VERSION == 2) && (XML_MINOR_VERSION >= 4)
           if (expat->parser) {
               if (XML_SetBillionLaughsAttackProtectionActivationThreshold (
                       expat->parser, activationThreshold) == XML_FALSE) {

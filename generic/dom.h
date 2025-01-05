@@ -113,10 +113,14 @@
 #endif
 
 #ifndef TDOM_LS_MODIFIER
-#  ifdef _WIN32
-#    define TDOM_LS_MODIFIER "I64"
-#  else 
-#    define TDOM_LS_MODIFIER "ll"
+#  ifdef XML_LARGE_SIZE
+#    ifdef _WIN32
+#      define TDOM_LS_MODIFIER "I64"
+#    else
+#      define TDOM_LS_MODIFIER "ll"
+#    endif
+#  else
+#    define TDOM_LS_MODIFIER "l"
 #  endif
 #endif
 
