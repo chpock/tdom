@@ -1,5 +1,5 @@
-C Added\sa\sway\sto\screate\sXML\snamespaced\sattributens\sin\s*FromScripts.
-D 2025-01-09T00:31:07.327
+C Started\snodecmds\swhich\sinserts\sa\snode\sonly,\sif\sit\shas\scontent.
+D 2025-01-09T02:00:17.043
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -145,7 +145,7 @@ F generic/domxpath.h a98836ef133283a20855968b76821042bce16b57b664689a15c017e3fec
 F generic/domxslt.c 7f9ce337cd2c261192395d1ae94e1967b5a735a0afc84fc809623546ab9443fb
 F generic/domxslt.h aeaf957ee38a9e7564bd9f1bed1781de108767df476a0d0776615988d8f04e0f
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F generic/nodecmd.c 4807d98ba4bd87d3cf86c5a469771592c503a34fe24dd1aa9008c9bc71d3880e
+F generic/nodecmd.c e542f15ca20f075104e1a5feda2f8ad97846efea611ab72c67f6452084d47ceb
 F generic/nodecmd.h d5ac52d3bf9134ade881aa35ef3f29e2a124590852660ae19e353e6ace365029
 F generic/schema.c fc5ca4010cdca4737741ddd733b6e3dcd74e7010ffbb68edeeefa181fa2367af
 F generic/schema.h 5e20a348c3f98724e9c118760c8d9fcd661ae8f27d21652d90ab49492d001c75
@@ -243,9 +243,11 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P e8c6063a7c0b3115a9ef12b6c294e59e03d6a3472b7612e3c417b7eaef840921 f8172d3ff9ea16b761fd7abc0b4ada120e2a463e95741c1cdb0e25fc1b100679
-R dc62e146642b212c9dce7a6bd87d9a8e
-T +closed f8172d3ff9ea16b761fd7abc0b4ada120e2a463e95741c1cdb0e25fc1b100679
+P 94aade4ec1bde13cab289a9f64a9ca6e7699b18e7074fe5dee50614867b0779f
+R 9c7607b52b1e37288319dcbe3e22a6e7
+T *branch * fsnotempty
+T *sym-fsnotempty *
+T -sym-trunk *
 U rolf
-Z c82f0dcf9c9128e965a9e42f153f9195
+Z efc4e7df02135b2b1fbc2208c90b2ae0
 # Remove this line to create a well-formed Fossil manifest.
