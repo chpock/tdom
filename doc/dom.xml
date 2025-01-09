@@ -341,7 +341,7 @@ needed.</desc>
                 node names into an XPath expression use the '%' syntax
                 described in the documentation of the of the
                 <command>domNode</command> command method
-                <method>>selectNodes</method>.
+                <method>selectNodes</method>.
                 </desc>
               </optdef>
 

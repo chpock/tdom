@@ -124,7 +124,7 @@
         <command><method>define</method> <m>&lt;definition script></m></command>
         <desc>This method defines several elements or patterns or a
         whole schema with one call, by evaluating the <m>definition
-        script></m>. All schema command methods so far
+        script</m>. All schema command methods so far
         (<m>prefixns</m>, <m>defelement</m>, <m>defelementtype</m>,
         <m>defpattern</m>, <m>deftexttype</m> and <m>start</m>) are
         allowed top level in the <m>definition script</m>. The
@@ -432,7 +432,7 @@
                   next event, the list entry will be a two elements
                   list, with #text as first element and the empty
                   string as second. If an any element constraint is
-                  possible. the list entry will be a two elements list,
+                  possible the list entry will be a two elements list,
                   with &lt;any> as first element and the empty string
                   as second. If an any element in a certain namespace
                   constraint is possible, the list entry will be a two
@@ -605,14 +605,14 @@
       <commanddef>
         <command><method>group</method> <m>?quant?</m> <m>&lt;definition script></m></command>
         <desc>This method group a sequence of content particles
-        defined by the <m>definition script></m>, which have to match
+        defined by the <m>definition script</m>, which have to match
         in this sequence order.</desc>
       </commanddef>
       
       <commanddef>
         <command><method>choice</method> <m>?quant?</m> <m>&lt;definition script></m></command>
         <desc>This schema constraint matches if one of the top level
-        content particles defined by the <m>definition script></m>
+        content particles defined by the <m>definition script</m>
         matches. If one of this top level content particle is optional
         this constraint matches the "empty match".
         </desc>
@@ -622,7 +622,7 @@
         <command><method>interleave</method> <m>?quant?</m> <m>&lt;definition script></m></command>
         <desc>This schema constraint matches after every of the required
         top level content particles defined by the <m>definition
-        script></m> have matched (and, optional, some or all other) in
+        script</m> have matched (and, optional, some or all other) in
         any arbitrary order.</desc>
       </commanddef>
 
@@ -630,7 +630,7 @@
         <command><method>mixed</method> <m>?quant?</m> <m>&lt;definition script></m></command>
         <desc>This schema constraint matches for any text (including the
         empty one) and every top level content particle defined by the
-        <m>definition script></m> with default quantifier *.</desc>
+        <m>definition script</m> with default quantifier *.</desc>
       </commanddef>
 
       <commanddef>
@@ -1223,7 +1223,7 @@ s define {
             <desc><p>This text constraint command splits the text to test
             into a list of values and tests all elements of that list for
             the text constraints in the evaluated <m>constraint
-            script></m>.</p>
+            script</m>.</p>
             <p>The available types are:</p>
             <dl>
                 <dt>whitespace</dt><dd>The text to split is stripped
@@ -1241,7 +1241,7 @@ s define {
         <commanddef>
             <command><cmd>strip</cmd> <m>&lt;constraint script></m></command>
             <desc>This text constraint command tests all text constraints
-            in the evaluated <m>constraint script></m> with the text to
+            in the evaluated <m>constraint script</m> with the text to
             test stripped of all white space at start and end.</desc>
         </commanddef>
         </commandlist>

@@ -7492,7 +7492,7 @@ int tcldom_parse (
         sdata->parser = parser;
     }
 #endif
-#ifdef XML_DTD
+#if defined(XML_DTD) && (XML_MAJOR_VERSION == 2) && (XML_MINOR_VERSION >= 4)
     if (maximumAmplification >= 1.0f) {
         if (XML_SetBillionLaughsAttackProtectionMaximumAmplification (
                 parser, (float)maximumAmplification) == XML_FALSE) {
@@ -7601,6 +7601,21 @@ int tcldom_parse (
 
 }
 
+static
+int tcldom_expatfeature (
+    int feature
+    ) 
+{
+    XML_Feature const *features = XML_GetFeatureList ();
+    while (features->feature != XML_FEATURE_END) {
+        if (features->feature == feature) {
+            return 1;
+        }
+        features++;
+    }
+    return 0;
+}
+
 /*----------------------------------------------------------------------------
 |   tcldom_featureinfo
 |
@@ -7651,19 +7666,11 @@ int tcldom_featureinfo (
         SetIntResult(XML_MICRO_VERSION);
         break;
     case o_dtd:
-#ifdef XML_DTD
-        result = 1;
-#else
-        result = 0;
-#endif
+        result = tcldom_expatfeature (XML_FEATURE_DTD);
         SetBooleanResult(result);
         break;
     case o_ns:
-#ifdef XML_NS
-        result = 1;
-#else
-        result = 0;
-#endif
+        result = tcldom_expatfeature (XML_FEATURE_NS);
         SetBooleanResult(result);
         break;
     case o_unknown:       

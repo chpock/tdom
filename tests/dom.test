@@ -946,7 +946,7 @@ set nameChars [lsort -command sortCmd \
 # Append stop char needed by the test code to work properly.
 lappend nameChars 0x10000
 
-test dom-3.9 {isName} {
+test dom-3.9 {isName} {longRunning} {
     set ind 0
     set nr 0
     while {$nr < 65536} {
