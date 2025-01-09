@@ -1,5 +1,5 @@
-C Started\snodecmds\swhich\sinserts\sa\snode\sonly,\sif\sit\shas\scontent.
-D 2025-01-09T02:00:17.043
+C Added\sa\sfew\stests.
+D 2025-01-09T11:24:12.635
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -203,7 +203,7 @@ F tests/dom.bench 5446ce379127b8d5700f18a5a0848e580313d0d7
 F tests/dom.test bdf1b91a72e3dc5871099bfe60cc2c998b4df5e56c9f5687a62af9584c73b432
 F tests/domDoc.test 095f2df0dda3afb96574c585b292b5ae061d0134ae78bd31a58dedda002a6fa5
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
-F tests/domNode.test da16714203bece4eb94bb2566fd9d27d92d9f283d98384433ccd004302f73199
+F tests/domNode.test 4347e85482d6d953bc91679fb60610f32c93e95d763ca291ebcd10dc6cdab5cb
 F tests/domjson.test f4910821bc346eb9912d13e2a8f7031bfb039264a7db4751a35cb2dffff44aa0
 F tests/domnamespace.test e679916393ea7f2a6118f8043808d0c6615ed21f57975c35113cbec62e1181e7
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
@@ -243,11 +243,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 94aade4ec1bde13cab289a9f64a9ca6e7699b18e7074fe5dee50614867b0779f
-R 9c7607b52b1e37288319dcbe3e22a6e7
-T *branch * fsnotempty
-T *sym-fsnotempty *
-T -sym-trunk *
+P 5093812b770f4df771fc94f75abddb81fcdbd4ea1298b940f866b1fae011a46f
+R 8ba2a840745811ae865322fa970119c3
 U rolf
-Z efc4e7df02135b2b1fbc2208c90b2ae0
+Z 024bfcb8aabde883a007bab53af3812d
 # Remove this line to create a well-formed Fossil manifest.
