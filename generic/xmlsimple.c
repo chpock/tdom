@@ -862,6 +862,8 @@ XML_SimpleParse (
                         if (!TranslateEntityRefs(attrnode->nodeValue,
                                                  &(attrnode->valueLength) )) {
                             *(ArgName + nArgName) = savedChar;
+                            FREE (attrnode->nodeValue);
+                            FREE (attrnode);
                             RetError("Entity parsing error",(domLength)(x - xml));
                         }
                     }
@@ -924,6 +926,8 @@ XML_SimpleParse (
                         if (!TranslateEntityRefs(attrnode->nodeValue,
                                                  &(attrnode->valueLength) )) {
                             *(ArgName + nArgName) = savedChar;
+                            FREE (attrnode->nodeValue);
+                            FREE (attrnode);
                             RetError("Entity parsing error", (domLength)(x - xml));
                         }
                     }
