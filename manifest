@@ -1,5 +1,5 @@
-C Plugged\smemory\sleak\sin\scase\sof\sselectNodes\swith\s-namespaces\sand\s-list\sand\sempty\sXPath\sexpression\slist.\sPlugged\smemory\sleaks\sin\serror\scase\sof\sselectNodes\swith\s-namespaces\sand\s-list\s(XPath\sexpression\slist\sargument\sis\snot\sa\sproper\sTcl\slist\sor\sone\sof\sthe\sXPath\sexpressions\sin\sthe\slist\sis\sinvalid).
-D 2025-01-10T10:51:26.956
+C Pacify\sscan-build\swarning.
+D 2025-01-10T11:11:49.020
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -149,7 +149,7 @@ F generic/nodecmd.c 4807d98ba4bd87d3cf86c5a469771592c503a34fe24dd1aa9008c9bc71d3
 F generic/nodecmd.h d5ac52d3bf9134ade881aa35ef3f29e2a124590852660ae19e353e6ace365029
 F generic/schema.c fc5ca4010cdca4737741ddd733b6e3dcd74e7010ffbb68edeeefa181fa2367af
 F generic/schema.h 5e20a348c3f98724e9c118760c8d9fcd661ae8f27d21652d90ab49492d001c75
-F generic/tcldom.c 3e061b28a23c82bfcd6c45eebcd2c9248586dadc66ffc4ff432c6e50c6186231
+F generic/tcldom.c 101cbd38af31287525cf60d541396ab2b1a45522ab7b36c3b5920d80ac9dc912
 F generic/tcldom.h d8a198375e823af7d95b78f2ef695ac84b3f6d50232ab33ad82fcaa2502ea5e7
 F generic/tclexpat.c 25405462c5ac9aa6d848f3a179c879edd9a72339f3d4604d49573145bbc93775
 F generic/tclexpat.h 3844441852af770876f2de9b7444a0445e9c5c7f1fd5cc3a50e7455538d4e912
@@ -243,8 +243,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P c35d3e9b52e42656e7dbaaf8fa4146664cfeb0130345d3f6c81b06d46b5b2418
-R d0f871af2db2c8474a7d99257cc18c55
+P c0d9083f9459c60a9cd821f99af36b1aeea49cb41847a33d095aae48d7065243
+R 4d4381473fbde53b97e9a70f4ddd55bb
 U rolf
-Z 6eee8274eb888c5cd6d34d522be77a5e
+Z 5eae06bfa0e642e9474634af6c39359b
 # Remove this line to create a well-formed Fossil manifest.

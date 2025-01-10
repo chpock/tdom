@@ -826,7 +826,7 @@ int tcldom_xpointerSearch (
     char *element   = NULL;
     char *attrName  = NULL;
     char *attrValue = NULL;
-    domLength attrLen;
+    domLength attrLen = 0;
 
 
     str = Tcl_GetString(objv[2]);
