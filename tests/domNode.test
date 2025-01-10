@@ -266,13 +266,24 @@ test domNode-2.11 {selectNodes - -cache option} {
 } {1 1 1 1 1 1}
 
 test domNode-2.12 {selectNodes - -cache option} {
-     # Second usage of an invalid XPath expr with -cache 1
-     # See 97c0994ae4
-     catch {$root selectNodes -cache 1 "/foo bar"}
-     catch {$root selectNodes -cache 1 "/foo bar"}
+    # Second usage of an invalid XPath expr with -cache 1
+    # See 97c0994ae4
+    catch {$root selectNodes -cache 1 "/foo bar"}
+    catch {$root selectNodes -cache 1 "/foo bar"}
 } 1
 
 $doc delete
+
+test domNode-2.13 {selectNodes - -cache option with invalid value} {
+    set doc [dom parse {<html xmlns="http://www.w3.org/1999/xhtml"><body><p>foo</p></body></html>}]
+    set root [$doc documentElement]
+    set result [catch {$root selectNodes \
+                           -namespaces {xhtml http://www.w3.org/1999/xhtml} \
+                           -cache nonboolean \
+                           string(xhtml:body/xhtml:p)}]
+    $doc delete
+    set result
+} 1
 
 test domNode-3.1 {repetitived documentElement with objVar, then delete} {
     dom createDocument "root" doc 

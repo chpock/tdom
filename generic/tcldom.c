@@ -1694,7 +1694,8 @@ int tcldom_selectNodes (
 
         case o_cache:
             if (Tcl_GetBooleanFromObj (interp, objv[2], &cache) != TCL_OK) {
-                return TCL_ERROR;
+                rc = TCL_ERROR;
+                goto cleanup;
             }
             objc -= 2;
             objv += 2;
