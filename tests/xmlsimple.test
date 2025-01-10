@@ -261,7 +261,24 @@ test simple-2.3 {character entities} {
     set result
 } "\u00d6\u00c4\u00c4"
 
-    
+test simple-2.4 {invalid entity reference in attribute} {
+    catch {dom parse -simple {<doc><e att="a&ampc"/></doc>}} errMsg
+    set errMsg
+} {error "Entity parsing error" at position 20
+"<doc><e att="a&ampc"/ <--Error-- ></doc>"}
+
+test simple-2.5 {invalid entity reference in element content} {
+    catch {dom parse -simple {<doc>foo&ampl;bar"/></doc>}} errMsg
+    set errMsg
+} {error "Entity parsing error" at position 13
+"<doc>foo&ampl; <--Error-- bar"/></doc>"}
+
+test simple-2.6 {invalid character entity reference in element content} {
+    catch {dom parse -simple {<doc>foo&#l;bar"/></doc>}} errMsg
+    set errMsg
+} {error "Entity parsing error" at position 10
+"<doc>foo&#l <--Error-- ;bar"/></doc>"}
+
 # cleanup
 ::tcltest::cleanupTests
 return
