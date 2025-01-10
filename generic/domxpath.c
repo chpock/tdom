@@ -3469,7 +3469,10 @@ xpathEvalFunction (
             rc = xpathEvalStep( step->child->next->next, ctxNode, exprContext,
                                 position, nodeList, cbs, &rightResult,
                                 docOrder, errMsg);
-            CHECK_RC;
+            if (rc) {
+                FREE (leftStr);
+                return rc;
+            }
             *docOrder = savedDocOrder;
 
             dRight = xpathFuncNumber (&rightResult, &NaN);

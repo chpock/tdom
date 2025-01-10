@@ -1,5 +1,5 @@
-C Fixed\serror\shandling\sof\sinvalid\sreturn\sof\sscripted\sXPath\sfunctions\sin\scase\sof\sbool\sresult\swith\sinvalid\sboolean\svalue\san\sin\scase\sof\snumber\sresult\swith\snot-a-number\svalue.
-D 2025-01-10T15:34:47.154
+C Plugged\smemory\sleak\sin\scase\sof\sXPath\ssubstring()\scall\swith\sinvalid,\sspecial\scrafted\sthird\sargument.
+D 2025-01-10T16:36:52.315
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -140,7 +140,7 @@ F generic/domhtml5.h 5cca562a556e7662f2dce222640c32abb2777146
 F generic/domjson.c ee631e7ad15d092ff288b750e1ff53a8656ce5bf256804afdbf7311e2b131503
 F generic/domjson.h 47bfd8d791ed27d81ac245beb2b1a825ecb5326c39fbd1fb5d75d2d4c636260b
 F generic/domlock.c 60f6c6f4dc95d6525f77cd589a07f6ec78f2068b12821067c5a075a2740abacb
-F generic/domxpath.c 0a0b6f39254574859866c591e83f2ad66da5998b2b2412b083559d378272caa1
+F generic/domxpath.c 9c39c385de215401c8281590f6f6ada2535fbea0f75d9d2820c6f9be4573882d
 F generic/domxpath.h a98836ef133283a20855968b76821042bce16b57b664689a15c017e3fecdae2f
 F generic/domxslt.c 0469c94b3fabc47f3eb0be594f3d04edb1811124f6ca5523c218b367a2133db4
 F generic/domxslt.h aeaf957ee38a9e7564bd9f1bed1781de108767df476a0d0776615988d8f04e0f
@@ -225,7 +225,7 @@ F tests/tdomcmd.test e65bef309a8d7022fba8ca6808c1d0a8029e1e2063df6cdf9b651653b35
 F tests/xmlsimple.test c533b70910b40f91b2dcbd7c7e7ac5345a70b185370a7ae029a824b0a5fdb430
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.bench a8a90cbce1e276d05c6ff2c54ef04ffb3166c16e4094a543c694256ea4d68355
-F tests/xpath.test 1ced4ae986be206ee97e6f50dfaeba7a28469d1a77ca46c5009ba23dd36d644e
+F tests/xpath.test 0c489335d6069bb58b3877773388923cd54932a3271ffcb26018989fbb9aafc1
 F tests/xslt.test 35a5408426b098bcc07bdecfb52f1ec4c8ac3e984224ba497e700420047621a4
 F unix/CONFIG 431b82a51451df40e38261b91e1a37060797ef655e8f981fab761de59f1e01e9
 F unix/speed-check.sh 7a8d91e7edf1cdc9bcfad5f28e1a068cb2843d05e49d8bd89d9b30a46511497d
@@ -243,8 +243,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a0993eab807293165a77ac01ddcc3a79debf2f2077986e0f504c85ce47c704df
-R cab3a835e4ed99f8a8dd01ad3af59e55
+P 38cd600963a9234dd468517ca86234618b15b255b0eabddceadfb6f473ba9592
+R 25bf1a3a2786134cd8e029a07d5e460a
 U rolf
-Z fa4c7e88eb58135e6cb421a293e66cc6
+Z 14c453236951914a8cdd906293ac39a1
 # Remove this line to create a well-formed Fossil manifest.

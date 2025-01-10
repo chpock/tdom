@@ -1487,6 +1487,15 @@ test xpath-7.14 {local-name value of processing-instruction} -setup {
     $doc delete
 } -result {mypi}
 
+test xpath-7.15 {substring() with invalid third argument} {
+    set doc [dom parse {<doc><e1>foo</e1><e2/></doc>}]
+    set result [catch {
+        $doc selectNodes {substring("abcd", 1, string(/doc/e1) | /doc/e2)}
+    }]
+    $doc delete
+    set result
+} 1
+    
 # cleanup
 ::tcltest::cleanupTests
 return
