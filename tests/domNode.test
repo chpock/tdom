@@ -285,6 +285,61 @@ test domNode-2.13 {selectNodes - -cache option with invalid value} {
     set result
 } 1
 
+test domNode-2.14 {selectNodes -namespaces and -list with invalid xpath list} {
+    set doc [dom parse {<html xmlns="http://www.w3.org/1999/xhtml"><body><p>foo</p></body></html>}]
+    set root [$doc documentElement]
+    set result [catch {$root selectNodes \
+                           -namespaces {xhtml http://www.w3.org/1999/xhtml} \
+                           -list \
+                           "\{xhtml:body string(xhtml:p)"}]
+    $doc delete
+    set result
+} 1
+
+test domNode-2.15 {selectNodes -namespaces and -list with empty xpaths list} {
+    set doc [dom parse {<html xmlns="http://www.w3.org/1999/xhtml"><body><p>foo</p></body></html>}]
+    set root [$doc documentElement]
+    set result [$root selectNodes \
+        -namespaces {xhtml http://www.w3.org/1999/xhtml} \
+        -list \
+        {}]
+    $doc delete
+    set result
+} ""
+
+test domNode-2.16 {selectNodes -namespaces and -list} {
+    set doc [dom parse {<html xmlns="http://www.w3.org/1999/xhtml"><body><p>foo</p></body></html>}]
+    set root [$doc documentElement]
+    set result [$root selectNodes \
+                    -namespaces {xhtml http://www.w3.org/1999/xhtml} \
+                    -list \
+                    {xhtml:body string(xhtml:p)}]
+    $doc delete
+    set result
+} foo
+
+test domNode-2.17 {selectNodes -namespaces and -list with first XPath expr invalid} {
+    set doc [dom parse {<html xmlns="http://www.w3.org/1999/xhtml"><body><p>foo</p></body></html>}]
+    set root [$doc documentElement]
+    set result [catch {$root selectNodes \
+                           -namespaces {xhtml http://www.w3.org/1999/xhtml} \
+                           -list \
+                           {xhtml::body string(xhtml:p)}}]
+    $doc delete
+    set result
+} 1
+
+test domNode-2.18 {selectNodes -namespaces and -list with second XPath expr invalid} {
+    set doc [dom parse {<html xmlns="http://www.w3.org/1999/xhtml"><body><p>foo</p></body></html>}]
+    set root [$doc documentElement]
+    set result [catch {$root selectNodes \
+                           -namespaces {xhtml http://www.w3.org/1999/xhtml} \
+                           -list \
+                           {xhtml:body string(xhtml:p}}]
+    $doc delete
+    set result
+} 1
+
 test domNode-3.1 {repetitived documentElement with objVar, then delete} {
     dom createDocument "root" doc 
     $doc documentElement root

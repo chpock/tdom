@@ -1755,11 +1755,13 @@ int tcldom_selectNodes (
         if (Tcl_ListObjLength (interp, objv[1], &xpathListLen) != TCL_OK) {
             SetResult ("If the -list option is given the xpathQuery argument "
                        "must be a valid Tcl list of XPath expressions.");
-            return TCL_ERROR;
+            rc = TCL_ERROR;
+            goto cleanup;
         }
         if (xpathListLen == 0) {
             Tcl_ResetResult (interp);
-            return TCL_OK;
+            rc = TCL_OK;
+            goto cleanup;
         }
         Tcl_ListObjIndex(interp, objv[1], 0, &queryObj);
         query = Tcl_GetString (queryObj);
@@ -1780,7 +1782,8 @@ int tcldom_selectNodes (
                 Tcl_AppendResult (interp, "invalid XPath query '", query, "': ",
                                   errMsg, NULL);
                 FREE (errMsg);
-                return TCL_ERROR;
+                rc = TCL_ERROR;
+                goto cleanup;
             }
             if (cache) {
                 Tcl_SetHashValue(h, t);
@@ -1798,13 +1801,15 @@ int tcldom_selectNodes (
         }
         if (rc != TCL_OK) {
             Tcl_DecrRefCount (result);
-            return TCL_ERROR;
+            rc = TCL_ERROR;
+            goto cleanup;
         }
         if (typeVar) {
             Tcl_SetVar(interp, typeVar, xpathResultType2string(rstype), 0);
         }
         Tcl_SetObjResult (interp, result);
-        return TCL_OK;
+        rc = TCL_OK;
+        goto cleanup;
     }
 
     rc = xpathEval (node, node, xpathQuery, mappings, &cbs, &parseVarCB,
@@ -1821,7 +1826,7 @@ int tcldom_selectNodes (
         goto cleanup;
     }
     if (errMsg) {
-        fprintf (stderr, "Why this: '%s'\n", errMsg);
+        DBG(fprintf(stderr,"No error signaled but errMsg set: '%s'\n",errMsg);)
         FREE(errMsg);
     }
     DBG(fprintf(stderr, "before tcldom_xpathResultSet \n");)
@@ -1831,8 +1836,8 @@ int tcldom_selectNodes (
         Tcl_SetVar(interp, typeVar, xpathResultType2string(rstype), 0);
     }
     rc = TCL_OK;
-
     xpathRSFree( &rs );
+
 cleanup:
     if (localmapping) {
         for (i = 0; i < mappingListObjLen; i++) {
