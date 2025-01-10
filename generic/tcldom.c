@@ -1241,7 +1241,7 @@ int tcldom_xpathFuncCallBack (
     char         tclxpathFuncName[220], objCmdName[80];
     char         *errStr, *typeStr;
     Tcl_Obj     *resultPtr, *objv[MAX_REWRITE_ARGS], *type, *value, *nodeObj,
-                *tmpObj;
+                *tmpObj, *errObj;
     Tcl_CmdInfo  cmdInfo;
     int          objc, rc, res, boolValue;
     domLength    errStrLen, listLen, i, longValue;
@@ -1334,7 +1334,16 @@ int tcldom_xpathFuncCallBack (
             Tcl_ListObjIndex(interp, resultPtr, 1, &value);
             typeStr = Tcl_GetString(type);
             if (strcmp(typeStr, "bool")==0) {
-                rc = Tcl_GetBooleanFromObj(interp, value, &boolValue);
+                if (Tcl_GetBooleanFromObj(interp, value, &boolValue)
+                    != TCL_OK) {
+                    errObj = Tcl_NewStringObj ("bool result of scripted XPath function "
+                                               "with invalid boolean value '", -1);
+                    Tcl_AppendStringsToObj (errObj, Tcl_GetString(value), "'", NULL);
+                    *errMsg = (char*)tdomstrdup(Tcl_GetString(errObj));
+                    Tcl_DecrRefCount (errObj);
+                    res = XPATH_EVAL_ERR;
+                    goto funcCallCleanup;
+                }
                 rsSetBool(result, boolValue );
             } else
             if (strcmp(typeStr, "number")==0) {
@@ -1342,7 +1351,15 @@ int tcldom_xpathFuncCallBack (
                 if (rc == TCL_OK) {
                     rsSetLong(result, longValue);
                 } else {
-                    rc = Tcl_GetDoubleFromObj(interp, value, &doubleValue);
+                    if (Tcl_GetDoubleFromObj(interp, value, &doubleValue) != TCL_OK) {
+                        errObj = Tcl_NewStringObj ("number result of scripted XPath function "
+                                                   "with invalid number value '", -1);
+                        Tcl_AppendStringsToObj (errObj, Tcl_GetString(value), "'", NULL);
+                        *errMsg = (char*)tdomstrdup(Tcl_GetString(errObj));
+                        Tcl_DecrRefCount (errObj);
+                        res = XPATH_EVAL_ERR;
+                        goto funcCallCleanup;
+                    }
                     rsSetReal(result, doubleValue);
                 }
             } else
@@ -1357,7 +1374,7 @@ int tcldom_xpathFuncCallBack (
                     goto funcCallCleanup;
                 }
                 for (i=0; i < listLen; i++) {
-                    rc = Tcl_ListObjIndex(interp, value, i, &nodeObj);
+                    Tcl_ListObjIndex(interp, value, i, &nodeObj);
                     node = tcldom_getNodeFromObj(interp, nodeObj);
                     if (node == NULL) {
                         *errMsg = tdomstrdup(Tcl_GetStringResult(interp));
