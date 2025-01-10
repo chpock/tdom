@@ -4093,7 +4093,6 @@ static int ExecAction (
 
         case callTemplate:
             tplChoosen = NULL;
-            currentPrec = INT_MIN;
             str = getAttr(actionNode, "name", a_name);
             if (!str) {
                 reportError (actionNode, "xsl:call-template must have a"
@@ -4272,11 +4271,8 @@ static int ExecAction (
             if (currentNode->nodeType == TEXT_NODE) {
                 DBG(fprintf(stderr, "node is TEXT_NODE \n");)
                 tnode = (domTextNode*)currentNode;
-                n = (domNode*)
-                    domAppendNewTextNode(xs->lastNode,
-                                         tnode->nodeValue,
-                                         tnode->valueLength,
-                                         TEXT_NODE, 0);
+                domAppendNewTextNode(xs->lastNode, tnode->nodeValue,
+                                     tnode->valueLength, TEXT_NODE, 0);
             } else
             if (currentNode->nodeType == ELEMENT_NODE) {
                 DBG(fprintf(stderr, "node is ELEMENT_NODE \n");)
@@ -4318,10 +4314,8 @@ static int ExecAction (
             if (currentNode->nodeType == COMMENT_NODE) {
                 DBG(fprintf(stderr, "node is COMMENT_NODE \n");)
                 tnode = (domTextNode *)currentNode;
-                n = (domNode *) domAppendNewTextNode (xs->lastNode,
-                                                      tnode->nodeValue,
-                                                      tnode->valueLength,
-                                                      COMMENT_NODE, 0);
+                domAppendNewTextNode (xs->lastNode, tnode->nodeValue,
+                                      tnode->valueLength, COMMENT_NODE, 0);
             } else
             if (currentNode->nodeType == ATTRIBUTE_NODE) {
                 DBG(fprintf(stderr, "node is ATTRIBUTE_NODE \n");)
@@ -4736,7 +4730,10 @@ static int ExecAction (
             rc = ExecActions(xs, context, currentNode, currentPos,
                              actionNode->firstChild, errMsg);
             xsltPopVarFrame (xs);
-            CHECK_RC;
+            if (rc < 0) {
+                FREE (str2);
+                return rc;
+            }
             child = fragmentNode->firstChild;
             while (child) {
                 if (child->nodeType != TEXT_NODE) {
@@ -5751,13 +5748,13 @@ getExternalDocument (
     }
     resultType = Tcl_GetString(resultTypeObj);
     if (strcmp (resultType, "string") == 0) {
-        result = Tcl_ListObjIndex (interp, resultObj, 2, &xmlstringObj);
+        Tcl_ListObjIndex (interp, resultObj, 2, &xmlstringObj);
         xmlstring = Tcl_GetStringFromObj (xmlstringObj, &len);
         chan = NULL;
     } else if (strcmp (resultType, "channel") == 0) {
         xmlstring = NULL;
         len = 0;
-        result = Tcl_ListObjIndex (interp, resultObj, 2, &channelIdObj);
+        Tcl_ListObjIndex (interp, resultObj, 2, &channelIdObj);
         channelId = Tcl_GetString(channelIdObj);
         chan = Tcl_GetChannel (interp, channelId, &mode);
         if (chan == (Tcl_Channel) NULL) {
@@ -5773,7 +5770,7 @@ getExternalDocument (
     } else {
         goto wrongScriptResult;
     }
-    result = Tcl_ListObjIndex (interp, resultObj, 1, &extbaseObj);
+    Tcl_ListObjIndex (interp, resultObj, 1, &extbaseObj);
     extbase = Tcl_GetString(extbaseObj);
 
     /* Since stylesheets and source docouments have different white space

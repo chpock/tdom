@@ -2753,7 +2753,6 @@ HTML_SimpleParse (
                             if (parent_node != NULL) {
                                 node = parent_node;
                                 parent_node = node->parentNode;
-                                pn = (char*)node->nodeName;
                                 break; 
                             }
                         }

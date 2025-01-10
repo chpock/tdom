@@ -1330,8 +1330,8 @@ int tcldom_xpathFuncCallBack (
                 res = XPATH_EVAL_ERR;
                 goto funcCallCleanup;
             }
-            rc = Tcl_ListObjIndex(interp, resultPtr, 0, &type);
-            rc = Tcl_ListObjIndex(interp, resultPtr, 1, &value);
+            Tcl_ListObjIndex(interp, resultPtr, 0, &type);
+            Tcl_ListObjIndex(interp, resultPtr, 1, &value);
             typeStr = Tcl_GetString(type);
             if (strcmp(typeStr, "bool")==0) {
                 rc = Tcl_GetBooleanFromObj(interp, value, &boolValue);

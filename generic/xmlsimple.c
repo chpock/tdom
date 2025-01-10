@@ -433,7 +433,7 @@ XML_SimpleParse (
                     memmove(tnode->nodeValue, start, (x - start));
                     *(tnode->nodeValue + (x - start)) = 0;
                     tnode->parentNode = parent_node;
-                    if (parent_node->firstChild)  {
+                    if (parent_node->lastChild)  {
                         parent_node->lastChild->nextSibling = (domNode*)tnode;
                         tnode->previousSibling = parent_node->lastChild;
                         parent_node->lastChild = (domNode*)tnode;
@@ -628,7 +628,7 @@ XML_SimpleParse (
                                     tnode->nodeValue     = (char*)MALLOC((x - start)+1);
                                     memmove(tnode->nodeValue, start, (x - start));
                                     *(tnode->nodeValue + (x - start)) = 0;
-                                    if (parent_node->firstChild)  {
+                                    if (parent_node->lastChild)  {
                                         parent_node->lastChild->nextSibling = (domNode*)tnode;
                                         tnode->previousSibling = parent_node->lastChild;
                                         parent_node->lastChild = (domNode*)tnode;
