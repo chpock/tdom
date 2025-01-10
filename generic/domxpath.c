@@ -2019,7 +2019,7 @@ Production(StepPattern)
     {
         ast b = NULL, c = NULL, aCopy = NULL;
         int stepIsOptimizable = 1, isFirst = 1;
-        dom_minl max, savedmax;
+        dom_minl max, savedmax = 0;
         while (LA==LBRACKET) {
             b = Recurse (Predicate);
             if (!b) return a;

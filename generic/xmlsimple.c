@@ -204,8 +204,8 @@ static int TranslateEntityRefs (
     domLength *newLen
 )
 {
-    int from;         /* Read characters from this position in z[] */
-    int to;           /* Write characters into this position in z[] */
+    domLength from;   /* Read characters from this position in z[] */
+    domLength to;     /* Write characters into this position in z[] */
     int h;            /* A hash on the entity reference */
     const char *zVal; /* The substituted value */
     Er *p;            /* For looping down the entity reference collision chain */
@@ -250,6 +250,7 @@ static int TranslateEntityRefs (
                             value += c-'a' + 10;
                         } else {
                             /* error */
+                            *newLen = i;
                             return 0;
                         }
                         i++;
@@ -261,14 +262,16 @@ static int TranslateEntityRefs (
                             value += c-'0';
                         } else {
                             /* error */
+                            *newLen = i;
                             return 0;
                         }
                         i++;
                     }
                 }
                 if (!z[i] || (z[i]!=';')) {
-                    return 0;
                     /* error */
+                    *newLen = i;
+                    return 0;
                 }
                 from = i+1;
                 if (value < 0x80) {
@@ -282,6 +285,7 @@ static int TranslateEntityRefs (
                     z[to++] = (char) ((value | 0x80) & 0xBF);
                 } else {
                     /* error */
+                    *newLen = i;
                     return 0;
                 }
             } else {
@@ -289,6 +293,7 @@ static int TranslateEntityRefs (
                    i++;
                 }
                 if (!z[i] || (z[i]!=';')) {
+                    *newLen = i;
                     return 0;
                 }
                 c = z[i];
@@ -307,7 +312,8 @@ static int TranslateEntityRefs (
                     from = i;
                     if (c==';') from++;
                 } else {
-                    z[to++] = z[from++];
+                    *newLen = i;
+                    return 0;
                 }
             }
         } else {
@@ -408,7 +414,8 @@ XML_SimpleParse (
                     if (ampersandSeen) {
                         if (!TranslateEntityRefs(tnode->nodeValue + saved, 
                                                  &(tnode->valueLength) )) {
-                            RetError("Entity parsing error", (domLength)(x - xml));
+                            RetError("Entity parsing error",
+                                     (domLength)(start - xml + tnode->valueLength));
                         }
                         tnode->valueLength += saved;
                     }
@@ -426,7 +433,7 @@ XML_SimpleParse (
                     memmove(tnode->nodeValue, start, (x - start));
                     *(tnode->nodeValue + (x - start)) = 0;
                     tnode->parentNode = parent_node;
-                    if (parent_node->firstChild)  {
+                    if (parent_node->lastChild)  {
                         parent_node->lastChild->nextSibling = (domNode*)tnode;
                         tnode->previousSibling = parent_node->lastChild;
                         parent_node->lastChild = (domNode*)tnode;
@@ -437,7 +444,8 @@ XML_SimpleParse (
                     if (ampersandSeen) {
                         if (!TranslateEntityRefs(tnode->nodeValue, 
                                                  &(tnode->valueLength) )) {
-                            RetError("Entity parsing error", (domLength)(x - xml));
+                            RetError("Entity parsing error",
+                                     (domLength)(start - xml + tnode->valueLength));
                         }
                     }
                 }
@@ -620,7 +628,7 @@ XML_SimpleParse (
                                     tnode->nodeValue     = (char*)MALLOC((x - start)+1);
                                     memmove(tnode->nodeValue, start, (x - start));
                                     *(tnode->nodeValue + (x - start)) = 0;
-                                    if (parent_node->firstChild)  {
+                                    if (parent_node->lastChild)  {
                                         parent_node->lastChild->nextSibling = (domNode*)tnode;
                                         tnode->previousSibling = parent_node->lastChild;
                                         parent_node->lastChild = (domNode*)tnode;
@@ -829,7 +837,6 @@ XML_SimpleParse (
                     }
                     nArgVal = (domLength)(x - ArgVal);
                 }
-
                 
 #ifdef TDOM_NS
                 /*------------------------------------------------------------
@@ -854,7 +861,10 @@ XML_SimpleParse (
                     if (ampersandSeen) {
                         if (!TranslateEntityRefs(attrnode->nodeValue,
                                                  &(attrnode->valueLength) )) {
-                            RetError("Entity parsing error",(domLength)(start-xml));
+                            *(ArgName + nArgName) = savedChar;
+                            FREE (attrnode->nodeValue);
+                            FREE (attrnode);
+                            RetError("Entity parsing error",(domLength)(x - xml));
                         }
                     }
                     
@@ -915,7 +925,10 @@ XML_SimpleParse (
                     if (ampersandSeen) {
                         if (!TranslateEntityRefs(attrnode->nodeValue,
                                                  &(attrnode->valueLength) )) {
-                            RetError("Entity parsing error", (domLength)(start - xml));
+                            *(ArgName + nArgName) = savedChar;
+                            FREE (attrnode->nodeValue);
+                            FREE (attrnode);
+                            RetError("Entity parsing error", (domLength)(x - xml));
                         }
                     }
                     if (attrList) {
