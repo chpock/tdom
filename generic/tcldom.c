@@ -7659,6 +7659,8 @@ int tcldom_featureinfo (
         "unknown",           "tdomalloc",          "lessns",
         "html5",             "jsonmaxnesting",     "versionhash",
         "pullparser",        "TCL_UTF_MAX",        "schema",
+        "largedata",
+        
         NULL
     };
     enum feature {
@@ -7666,7 +7668,8 @@ int tcldom_featureinfo (
         o_expatmicroversion, o_dtd,                o_ns,
         o_unknown,           o_tdomalloc,          o_lessns,
         o_html5,             o_jsonmaxnesting,     o_versionhash,
-        o_pullparser,        o_TCL_UTF_MAX,        o_schema
+        o_pullparser,        o_TCL_UTF_MAX,        o_schema,
+        o_largedata
     };
 
     /* objc is already checked by caller */
@@ -7753,6 +7756,30 @@ int tcldom_featureinfo (
         break;
     case o_TCL_UTF_MAX:
         SetIntResult(TCL_UTF_MAX);
+        break;
+    case o_largedata:
+#if TCL_MAJOR_VERSION < 9
+        result = 0;
+#else
+        if (sizeof (void *) >= 8) {
+#  ifdef _WIN32
+#    ifdef XML_LARGE_SIZE
+            result = 1;
+#    else
+            result = 0;
+#    endif
+#  else
+#    if defined XML_LARGE_SIZE || XML_CONTEXT_BYTES == 0
+            result = 1;
+#    else
+            result = 0;
+#    endif            
+#  endif            
+        } else {
+            result = 0;
+        }
+#endif        
+        SetBooleanResult(result);
         break;
     }
     return TCL_OK;
