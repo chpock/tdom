@@ -2184,7 +2184,7 @@ static int xsltXPathFuncs (
                         nsStr = str;
                     }
                     if (*nsStr == '\0') {
-                        FREE(str);
+                        if (freeStr) FREE(str);
                         freeStr = 0;
                         nsStr = baseURI;
                     }

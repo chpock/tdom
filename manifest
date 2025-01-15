@@ -1,5 +1,5 @@
-C Added\sdom\sfeatureinfo\slargedata,\sreturning\sa\sboolean.\sIf\sthe\sresult\sis\strue\sthen\stdom\sis\sable\sto\sparse\spcdata\scontent\sof\san\selement\sgreater\s2\sGByte\swith\sthe\sexpat\sparser\s(which\srequires\sTcl\s9\sand\sa\s64-bit\splatform\sand\sdepends\son\sthe\splatform\sand\sthe\sbuild\sflags\sof\sthe\sused\sexpat\slibrary).\sIf\sthe\sresult\sis\sfalse\sthen\san\sattempt\sto\sparse\spcdata\scontent\sof\san\selement\slarger\sthan\s2\sGByte\swill\sresult\sin\san\serror.
-D 2025-01-12T01:43:35.528
+C Fixed\sdriver\sscript\sfor\sthe\sOASIS\sxslt\stest\ssuite.\sFixed\sa\spotential\sseg\sfault.
+D 2025-01-15T00:49:20.943
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -142,7 +142,7 @@ F generic/domjson.h 47bfd8d791ed27d81ac245beb2b1a825ecb5326c39fbd1fb5d75d2d4c636
 F generic/domlock.c 60f6c6f4dc95d6525f77cd589a07f6ec78f2068b12821067c5a075a2740abacb
 F generic/domxpath.c 9c39c385de215401c8281590f6f6ada2535fbea0f75d9d2820c6f9be4573882d
 F generic/domxpath.h a98836ef133283a20855968b76821042bce16b57b664689a15c017e3fecdae2f
-F generic/domxslt.c 0469c94b3fabc47f3eb0be594f3d04edb1811124f6ca5523c218b367a2133db4
+F generic/domxslt.c 27648bd8cf52de3745c44741b592e0fe9c1e82b017a05e51531f8b230852e8b3
 F generic/domxslt.h aeaf957ee38a9e7564bd9f1bed1781de108767df476a0d0776615988d8f04e0f
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 4807d98ba4bd87d3cf86c5a469771592c503a34fe24dd1aa9008c9bc71d3880e
@@ -172,7 +172,7 @@ F tclconfig/tcl.m4 284faa1d9cf66c1efb42817beb5c8a63626fb35bf903993d4f11fde75677c
 F tdom.m4 24fab1aa28c28e3d9a69b2c29af894aabd22d0cc6c68ecf27bcd626488194476
 F tdomConfig.sh.in 1f2f873de2a2a84a93949372767a78c56ee72e0700a156b87a2769884ad5ccf1
 F tests/JSONTestSuite.tcl 907228f9bd31855951b9033df74c9c15778765af
-F tests/OASIS-suite.tcl 1da66ffffee97dd7c39d3f14482f5a9382000d4233668c7f2ed1c5825752904e
+F tests/OASIS-suite.tcl f695f8fa1102461b7c308ed6d87664ba866970fbb3695f2e07ea0b70321c2ddc
 F tests/all-bench.tcl 1444cd15eb49d934cb08f75f59b244363372dd23cff13470f5b14580cc33ca47
 F tests/all.tcl 14e2ccb0550ad38328f58ad79b3353e6cc110779ed94ce21ecdd42853be0637a
 F tests/attribute.test 53ac8fb043e79b638c8c6f5e7da848f6103552d6
@@ -243,8 +243,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 4b7845bf626ef986149788367866f995b4cd084d7b3283fe8e71cb334ac2e5cc
-R 971cecbd76fcd3920db08bc663ca722e
+P dcb1e6b10e86376561a9c311f8d1909eae9a59fb4f8d41531ef7c861ee9de290
+R 692f672e19687b4957cbb6ea505dd617
 U rolf
-Z 78967ad959e40d8a2b5ab03d5ca6fd14
+Z 0b38acb1e19d113ddea812c72710f36e
 # Remove this line to create a well-formed Fossil manifest.
