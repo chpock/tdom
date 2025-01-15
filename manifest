@@ -1,5 +1,5 @@
-C Fixed\sdriver\sscript\sfor\sthe\sOASIS\sxslt\stest\ssuite.\sFixed\sa\spotential\sseg\sfault.
-D 2025-01-15T00:49:20.943
+C Documented\sthe\slately\sadded\sdom\sfeatureinfo\slargedata\soption.
+D 2025-01-15T00:57:15.797
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -21,7 +21,7 @@ F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html b4a8d2a4b261d8380849b9fa2b4026f1e08248aab543551db47a34b60a43c69a
 F doc/dom.html 08088b66afb73d14e90bb40f9a8e8820799ddbfea31f0c44f740c032e0a97b43
 F doc/dom.n 36039c609ba666385150dc5670d6b448541e92ed7c2ab903046b73df5f31d057
-F doc/dom.xml 5fba1ef178feb3770671838bce1f62879d5139a2c6c9407ebf5cf3ef96a43b59
+F doc/dom.xml 528bd523e5deba8e564687e9c6ab740c00e7503e197d843f7524265360f15e14
 F doc/domDoc.html 4bfb6ca4d655e8276aa1ec772450e2dc8f4f4a5ff182cbbff95d67579c63a5ec
 F doc/domDoc.n e6a096be1d924465b005718228ccc212c81da2d678ee4abcc5805585c66f0b6f
 F doc/domDoc.xml 0f02b326fae96fa07567195a4276d1b10586445fb1dca27f6a6f34b18160448e
@@ -243,8 +243,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P dcb1e6b10e86376561a9c311f8d1909eae9a59fb4f8d41531ef7c861ee9de290
-R 692f672e19687b4957cbb6ea505dd617
+P 0615b5c0572968cb3796f6ddbdbcba1b9ea61b0ebf9c498366eab24d9db6aff6
+R f2ce5c7cae92bb9f448b5ac663e92ab4
 U rolf
-Z 0b38acb1e19d113ddea812c72710f36e
+Z 6a037064fb2ca637f0f0ce92f0a8f53a
 # Remove this line to create a well-formed Fossil manifest.
