@@ -1364,6 +1364,8 @@ namespace eval nodeCmds {
     dom createNodeCmd cdataNode   cdata
     dom createNodeCmd piNode      pi
     dom createNodeCmd parserNode  parser
+    dom createNodeCmd -notempty elementNode e3
+    dom createNodeCmd -notempty elementNode e4
 }
 
 test domNode-13.1 {appendFromScript - elementNode} {
@@ -1875,6 +1877,84 @@ test domNode-13.33 {tdom::fsnewNode} {
     $doc delete
     set result
 } {<doc><e1><some att1="att1 value" att2="att2 value"><e1/></some></e1></doc>}
+
+test domNode-13.34 {-notempty} {
+    set doc [dom createDocument doc]
+    set root [$doc documentElement]
+    $root appendFromScript {
+        ::nodeCmds::e3
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc/>}
+
+test domNode-13.35 {-notempty} {
+    set doc [dom parse {<doc><e1/><e2/></doc>}]
+    set root [$doc documentElement]
+    $root insertBeforeFromScript {
+        ::nodeCmds::e3
+    } [$root lastChild]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc><e1/><e2/></doc>}
+
+test domNode-13.36 {-notempty} {
+    set doc [dom createDocument doc]
+    set root [$doc documentElement]
+    $root appendFromScript {
+        ::nodeCmds::e3 {
+            ::nodeCmds::e4
+            ::nodeCmds::e3
+        }
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc/>}
+
+test domNode-13.37 {-notempty} {
+    set doc [dom parse {<doc><e1/><e2/></doc>}]
+    set root [$doc documentElement]
+    $root insertBeforeFromScript {
+        ::nodeCmds::e3 {
+            ::nodeCmds::e3
+            ::nodeCmds::e4
+        }
+    } [$root lastChild]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc><e1/><e2/></doc>}
+
+test domNode-13.38 {-notempty} {
+    set doc [dom createDocument doc]
+    set root [$doc documentElement]
+    $root appendFromScript {
+        ::nodeCmds::e3 {
+            ::nodeCmds::e4
+            ::nodeCmds::e3 {::nodeCmds::t foo}
+        }
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc><e3><e3>foo</e3></e3></doc>}
+
+test domNode-13.39 {-notempty} {
+    set doc [dom parse {<doc><e1/><e2/></doc>}]
+    set root [$doc documentElement]
+    $root insertBeforeFromScript {
+        ::nodeCmds::e3 {
+            ::nodeCmds::e3
+            ::nodeCmds::e4 {::nodeCmds::t bar}
+        }
+    } [$root lastChild]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc><e1/><e3><e4>bar</e4></e3><e2/></doc>}
 
 test domNode-14.1 {appendFromList} {
     set doc [dom createDocument root]

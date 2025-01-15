@@ -419,7 +419,7 @@ memory handling as explained above.</desc>
         
         <commanddef>
           <command><cmd>dom</cmd> <method>createNodeCmd</method>
-<m>?-returnNodeCmd?</m> <m>?-tagName name?</m> <m>?-jsonType jsonType?</m> <m>?-namespace URI?</m> <m>?-noNamespacedAttributes?</m> <m>(element|comment|text|cdata|pi)Node</m> <m>commandName</m></command>
+<m>?-returnNodeCmd?</m> <m>?-tagName name?</m> <m>?-jsonType jsonType?</m> <m>?-namespace URI?</m> <m>?-noNamespacedAttributes?</m> <m>?-notempty?</m> <m>(element|comment|text|cdata|pi)Node</m> <m>commandName</m></command>
           <desc>This method creates Tcl commands, which in turn create
           tDOM nodes. Tcl commands created by this command are only
           available inside a script given to the domNode methods
@@ -445,7 +445,9 @@ first argument to the <m>createNodeCmd</m>. The syntax of the created
 command depends on the type of the node it creates.</p>
 
 <p>If the command type to create is <m>elementNode</m>, the created
-command will create an element node, if called. Without the
+command will create an element node, if called. Though, if the
+<m>-notempty</m> flag was used in creating the node command the
+element node will only be created if it is not empty. Without the
 <m>-tagName</m> option the tag name of the created node is
 <m>commandName</m> without Tcl namespace qualifiers. If the
 <m>-tagName</m> option was given then the created elements will have

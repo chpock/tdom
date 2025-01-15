@@ -76,8 +76,16 @@ typedef struct NodeInfo {
     char *namespace;
     int   jsonType;
     char *tagName;
-    int   simpleAtts;
+    int   flags;
 } NodeInfo;
+
+/*----------------------------------------------------------------------------
+|   Attribute creation in *FromScript related flags
+|
+\---------------------------------------------------------------------------*/
+
+#define FS_ATT_NO_NAMESPACED 1
+#define FS_NOT_EMPTY 2
 
 /*----------------------------------------------------------------------------
 |   Forward declarations
@@ -268,7 +276,7 @@ nodecmd_processAttributes (
     int             objc,
     Tcl_Obj *const  objv[],
     Tcl_Obj **cmdObj,
-    int simpleAtts
+    int flags
     )
 {
     Tcl_Obj **opts, *tvalObj, *nsvalObj;
@@ -305,7 +313,7 @@ nodecmd_processAttributes (
     }
     for (i = 0; i < len; i += 2) {
         tvallen = 0;
-        if (!simpleAtts
+        if (!(flags & FS_ATT_NO_NAMESPACED)
             && Tcl_ListObjLength (NULL, opts[i], &tvallen) == TCL_OK
             && tvallen == 2) {
             Tcl_ListObjIndex (interp, opts[i], 0, &nsvalObj);
@@ -518,12 +526,15 @@ NodeObjCmd (
 
         cmdObj = NULL;
         if (nodecmd_processAttributes (interp, newNode, type, objc, objv,
-                                       &cmdObj, nodeInfo->simpleAtts)
+                                       &cmdObj, nodeInfo->flags)
             != TCL_OK) {
             return TCL_ERROR;
         }
         if (cmdObj) {
             ret = nodecmd_appendFromScript(interp, newNode, cmdObj);
+        }
+        if (newNode->firstChild == NULL && nodeInfo->flags & FS_NOT_EMPTY) {
+            domDeleteNode (newNode, NULL, NULL);
         }
         break;
     }
@@ -582,7 +593,7 @@ nodecmd_createNodeCmd (
     int             checkCharData       /* Flag: Data checks? */
 ) {
     int index, ret, type, nodecmd = 0, jsonType = 0, haveJsonType = 0;
-    int isElement = 0, noNamespacedAttributes = 0;
+    int isElement = 0, flags = 0;
     char *nsName, buf[64];
     Tcl_Obj *tagName = NULL, *namespace = NULL;
     Tcl_DString cmdName;
@@ -605,12 +616,12 @@ nodecmd_createNodeCmd (
 
     static const char *options[] = {
         "-returnNodeCmd", "-jsonType", "-tagName", "-namespace",
-        "-noNamespacedAttributes", NULL
+        "-noNamespacedAttributes", "-notempty", NULL
     };
 
     enum option {
         o_returnNodeCmd, o_jsonType, o_tagName, o_namespace,
-        o_noNamespacedAttributes        
+        o_noNamespacedAttributes, o_notempty
     };
 
     static const char *jsonTypes[] = {
@@ -663,10 +674,17 @@ nodecmd_createNodeCmd (
             break;
 
         case o_noNamespacedAttributes:
-            noNamespacedAttributes = 1;
+            flags  |= FS_ATT_NO_NAMESPACED;
             objc--;
             objv++;
-            break;            
+            break;
+
+        case o_notempty:
+            flags  |= FS_NOT_EMPTY;
+            objc--;
+            objv++;
+            
+            break;
         }
     }
     if (objc != 3) {
@@ -786,7 +804,7 @@ nodecmd_createNodeCmd (
         return TCL_ERROR;
     }
 
-    if (noNamespacedAttributes && !isElement) {
+    if ((flags & ~FS_ATT_NO_NAMESPACED) && !isElement) {
         Tcl_SetResult(interp, "The -noNamespacedAttributes option is allowed "
                       "only for element node commands.", NULL);
         return TCL_ERROR;
@@ -800,7 +818,7 @@ nodecmd_createNodeCmd (
     
     nodeInfo = (NodeInfo *) MALLOC (sizeof (NodeInfo));
     nodeInfo->namespace = NULL;
-    nodeInfo->simpleAtts = 0;
+    nodeInfo->flags = flags;
     nodeInfo->type = type;
     if (nodecmd) {
         nodeInfo->type *= -1; /* Signal this fact */
@@ -812,9 +830,6 @@ nodecmd_createNodeCmd (
     }
     if (tagName) {
         nodeInfo->tagName = tdomstrdup (Tcl_GetString(tagName));
-    }
-    if (noNamespacedAttributes) {
-        nodeInfo->simpleAtts = 1;
     }
     Tcl_CreateObjCommand(interp, Tcl_DStringValue(&cmdName), NodeObjCmd,
                          (ClientData)nodeInfo, NodeObjCmdDeleteProc);

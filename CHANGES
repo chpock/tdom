@@ -1,4 +1,10 @@
 
+2025-01-15  Rolf Ade  <rolf@pointsman.de>
+
+        Added the flag -notempty to dom createNodeCmd. If this flag is
+        used the element will only appear in the tree if it is not
+        empty. 
+
 2025-01-09  Rolf Ade  <rolf@pointsman.de>
 
         Added a way to create XML namespaced attributens in
