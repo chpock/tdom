@@ -295,6 +295,7 @@ proc runTest {testcase} {
             return
         }
     }
+    set xslfile [file join $catalogDir $majorpath $filepath $xslfile]
     if {![file readable $xslfile]} {
         set xslfile [findFile $xslfile \
                          [file join $catalogDir $majorpath $filepath]]
@@ -305,7 +306,6 @@ proc runTest {testcase} {
             return
         }
     }
-    set xslfile [file join $catalogDir $majorpath $filepath $xslfile]
     set xmlout [$scenario selectNodes \
                     {string(output-file[@role="principal" and @compare="XML"])}]
     set xmloutfile ""
@@ -321,7 +321,7 @@ proc runTest {testcase} {
                         [xmlReadFile $xmlfile] ]
     } errMsg]} {
         incr failedXML
-        log 0 "Unable to parse xml file '$xmlfile'. Reason:\n$errMsg"
+        log 0 "Unable to parse xml file '$xmlfile'."
         return
     }
     dom setStoreLineColumn 1
@@ -333,7 +333,7 @@ proc runTest {testcase} {
     } errMsg]} {
         dom setStoreLineColumn 0
         incr failedXSLT
-        log 0 "Unable to parse xsl file '$xslfile'. Reason:\n$errMsg"
+        log 0 "Unable to parse xsl file '$xslfile'."
         return
     }
     dom setStoreLineColumn 0
@@ -374,7 +374,7 @@ proc runTest {testcase} {
             $resultinfosetdoc delete
         } else {
             incr compareFAILED
-            log 3 "Unable to parse REF doc. Reason:\n$errMsg"
+            log 3 "Unable to parse REF doc."
         }
     }
     $xmldoc delete

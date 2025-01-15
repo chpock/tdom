@@ -774,6 +774,17 @@ recommendation. Otherwise it returns 0.</desc>
                     <desc>Returns as boolean if the tDOM schema features
                     are build in.</desc>
                 </optdef>
+                <optdef>
+                    <optname>largedata</optname>
+                    <desc>Returns as boolean if the expat library
+                    configuration allows pcdata content of an XML
+                    element. Could be true only if build with Tcl 9
+                    for a 64-bit architecture and then depends if the
+                    build-in expat version is used with default
+                    configuration or if the used system expat library
+                    is capable enough for this (typically not). are
+                    build in.</desc>
+                </optdef>
             </optlist>
             </desc>   
         </commanddef>

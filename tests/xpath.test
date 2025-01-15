@@ -605,6 +605,22 @@ test xpath-4.24 {tcl coded additional XPath function - long XPath function name}
     catch {$doc1 selectNodes toolong0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789name()}
 } {1}
 
+proc ::dom::xpathFunc::invalidBoolResult {ctxNode pos nodeListNode nodeList args} {
+    return [list bool foo]
+}
+
+test xpath-4.25 {tcl coded additional XPath function -invalid bool result} {
+    catch {$doc selectNodes invalidBoolResult()}
+} 1
+
+proc ::dom::xpathFunc::invalidNumberResult {ctxNode pos nodeListNode nodeList args} {
+    return [list number "foo"]
+}
+
+test xpath-4.26 {tcl coded additional XPath function -invalid number result} {
+    catch {$doc selectNodes invalidNumberResult()}
+} 1
+
 $doc1 delete
 
 test xpath-5.1 {erroneous XPath expr: missing right brace in predicate} {
@@ -1471,6 +1487,15 @@ test xpath-7.14 {local-name value of processing-instruction} -setup {
     $doc delete
 } -result {mypi}
 
+test xpath-7.15 {substring() with invalid third argument} {
+    set doc [dom parse {<doc><e1>foo</e1><e2/></doc>}]
+    set result [catch {
+        $doc selectNodes {substring("abcd", 1, string(/doc/e1) | /doc/e2)}
+    }]
+    $doc delete
+    set result
+} 1
+    
 # cleanup
 ::tcltest::cleanupTests
 return
