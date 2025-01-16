@@ -1740,7 +1740,7 @@ DispatchPCDATA (
             node->parentNode = parentNode;
         }
         if (parentNode->nodeType == ELEMENT_NODE) {
-            if (parentNode->firstChild)  {
+            if (parentNode->lastChild)  {
                 parentNode->lastChild->nextSibling = (domNode*)node;
                 node->previousSibling = parentNode->lastChild;
             } else {
@@ -2081,13 +2081,13 @@ externalEntityRefHandler (
     resultType = Tcl_GetString(resultTypeObj);
 
     if (strcmp (resultType, "string") == 0) {
-        result = Tcl_ListObjIndex (info->interp, resultObj, 2, &xmlstringObj);
+        Tcl_ListObjIndex (info->interp, resultObj, 2, &xmlstringObj);
         xmlstring = Tcl_GetStringFromObj (xmlstringObj, &len);
         chan = NULL;
     } else if (strcmp (resultType, "channel") == 0) {
         xmlstring = NULL;
         len = 0;
-        result = Tcl_ListObjIndex (info->interp, resultObj, 2, &channelIdObj);
+        Tcl_ListObjIndex (info->interp, resultObj, 2, &channelIdObj);
         channelId = Tcl_GetString(channelIdObj);
         chan = Tcl_GetChannel (info->interp, channelId, &mode);
         if (chan == (Tcl_Channel) NULL) {

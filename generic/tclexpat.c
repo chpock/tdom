@@ -988,7 +988,7 @@ TclExpatParse (
   char          *str;
 
   if (expat->finished) {
-      if ((result = TclExpatInitializeParser (interp, expat, 0)) != TCL_OK) 
+      if (TclExpatInitializeParser (interp, expat, 0) != TCL_OK) 
           return TCL_ERROR;
   }
 

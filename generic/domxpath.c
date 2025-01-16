@@ -5492,6 +5492,7 @@ int xpathMatches (
                     break;
                 }
                 DBG(fprintf(stderr, "strange: AxisChild with no IsElement, IsFQElement or IsNSElement below!\n");)
+                xpathRSFree (&nodeList);
                 return 0;
 
             case IsElement:
@@ -5758,6 +5759,7 @@ int xpathMatches (
                                             &stepResult, &docOrder, errMsg);
                         if (rc) {
                             xpathRSFree (&stepResult);
+                            xpathRSFree (&newNodeList);
                             xpathRSFree (&nodeList);
                             return rc;
                         }

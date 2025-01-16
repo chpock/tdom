@@ -1,5 +1,5 @@
-C Added\sthe\sflag\s-notempty\sto\sdom\screateNodeCmd.\sIf\sthis\sflag\sis\sused\sthe\selement\swill\sonly\sappear\sin\sthe\stree\sif\sit\sis\snot\sempty.
-D 2025-01-15T22:40:16.402
+C Plugged\spotentially\smemory\sleaks.\sCode\sclean-up.
+D 2025-01-16T00:04:40.960
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -129,7 +129,7 @@ F generic/HTML5ent.inc c122e35eb1be8e325f8846080bbccc166978cfe7136e850d7e8aa4778
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
 F generic/datatypes.c 7c9f9edb50b4592b2317dfde3db6feaa342e80f1322aee4b747eb98c486d959b
 F generic/datatypes.h 3e41d07bcf50cf6959b6e14416dfcb0d7b5aafc65683322978ec185c2a259332
-F generic/dom.c 4c6b86394c6a12f1d96aa0bbee278be905a29e0edb65aa9493aab00a29cc1652
+F generic/dom.c 71031cb1e5393111348fda6efa7f08f7da972c91483f8f8167d228838bdcea4c
 F generic/dom.h 59888afc7129c74c1ee4e5d1312027b0053f4fdabcd221e1363d9731e3b4668a
 F generic/domalloc.c ce41b8a16e855ee3a3db1d4b797f835a77f1f9260f24db4cb7dc73a07ee4670b
 F generic/domalloc.h 961f83bb46dec27dbcf36ed430ed81b1f485a1fdfaa2f7df8b60bbcf861d0fe3
@@ -140,7 +140,7 @@ F generic/domhtml5.h 5cca562a556e7662f2dce222640c32abb2777146
 F generic/domjson.c ee631e7ad15d092ff288b750e1ff53a8656ce5bf256804afdbf7311e2b131503
 F generic/domjson.h 47bfd8d791ed27d81ac245beb2b1a825ecb5326c39fbd1fb5d75d2d4c636260b
 F generic/domlock.c 60f6c6f4dc95d6525f77cd589a07f6ec78f2068b12821067c5a075a2740abacb
-F generic/domxpath.c 9c39c385de215401c8281590f6f6ada2535fbea0f75d9d2820c6f9be4573882d
+F generic/domxpath.c 2696e9203004346ae9e058f094973a5fe6fe3a5124791a0c1a25aa1f7bbdf50c
 F generic/domxpath.h a98836ef133283a20855968b76821042bce16b57b664689a15c017e3fecdae2f
 F generic/domxslt.c 27648bd8cf52de3745c44741b592e0fe9c1e82b017a05e51531f8b230852e8b3
 F generic/domxslt.h aeaf957ee38a9e7564bd9f1bed1781de108767df476a0d0776615988d8f04e0f
@@ -151,7 +151,7 @@ F generic/schema.c fc5ca4010cdca4737741ddd733b6e3dcd74e7010ffbb68edeeefa181fa236
 F generic/schema.h 5e20a348c3f98724e9c118760c8d9fcd661ae8f27d21652d90ab49492d001c75
 F generic/tcldom.c a37872efa6c46c31f8e868b09516526e78dcf79ea01702a4ee024e21a30940b3
 F generic/tcldom.h d8a198375e823af7d95b78f2ef695ac84b3f6d50232ab33ad82fcaa2502ea5e7
-F generic/tclexpat.c 25405462c5ac9aa6d848f3a179c879edd9a72339f3d4604d49573145bbc93775
+F generic/tclexpat.c eb9632746adc5e140824b8e4bd8d9fdf723d95958f654a9640afbb72496bacac
 F generic/tclexpat.h 3844441852af770876f2de9b7444a0445e9c5c7f1fd5cc3a50e7455538d4e912
 F generic/tclpull.c 8f7b6cca2519e19aeb68fff50c16238b4a68ed86b1db2c5927452f9e8d936629
 F generic/tclpull.h 8e1aac98bdad497c669c901494939eecd6c2f57ea51c4f5d4dac502db48527d4
@@ -243,9 +243,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P a5fc26049ba1cb15e3d28b4224e7ebca517811128022a2da339f84f52e63a3c8 7ee053934dde987d192c5b0428ad4e2d6a5e9c01c5a36e56b3d9340d8bf34502
-R ef3058e316150e40609326ee6d81d57a
-T +closed 7ee053934dde987d192c5b0428ad4e2d6a5e9c01c5a36e56b3d9340d8bf34502
+P 971050ce5a892151c0d85a739849d28c822b9659c682894e477672dd00b45b49
+R 0d0b5a705213d5ff599557561c14607d
 U rolf
-Z 9a887388b0780fa65fd27cf92a180c5e
+Z e29169dec8f32e66ed4ddeb0258823b4
 # Remove this line to create a well-formed Fossil manifest.
