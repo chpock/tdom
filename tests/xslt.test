@@ -1333,6 +1333,45 @@ test xslt-8.9 {format-number} {knownBug} {
     set result <out>001</out>
 } {<out>001</out>}
 
+test xslt-8.10 {Namespace axis} {
+    set xmlDoc {<n:doc xmlns:n="foo.bar">
+    <n:e>foo</n:e>
+    <n:e>bar</n:e>
+    <n:e>grill</n:e>
+</n:doc>}
+    set xsltDoc {<?xml version="1.0"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+
+<xsl:output method="xml" encoding="UTF-8" indent="no" />
+
+<xsl:template match="/">
+  <out>
+    <xsl:text>&#10;</xsl:text>
+    <xsl:apply-templates select="*"/>
+    <xsl:text>&#10;</xsl:text>
+  </out>
+</xsl:template>
+
+<xsl:template match="*">
+  <xsl:for-each select="namespace::n">
+    <xsl:element name="{name(.)}"><xsl:value-of select="."/></xsl:element>
+  </xsl:for-each>
+</xsl:template>
+
+</xsl:stylesheet>
+}
+    dom parse -keepEmpties $xmlDoc xmldoc
+    dom parse -keepEmpties $xsltDoc xsltdoc
+    $xmldoc xslt $xsltdoc resultDoc
+    set result [$resultDoc asXML -indent none]
+    $xmldoc delete
+    $xsltdoc delete
+    $resultDoc delete
+    set result
+} {<out>
+<n>foo.bar</n>
+</out>}
+    
 proc ::dom::xpathFunc::xslt-9.1 {ctxNode pos nodeListType nodeList args} {
     if {[llength $ctxNode] != 2} {
         error "::dom::xpathFunc::xslt-9.1: expected parent node / attribute \

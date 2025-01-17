@@ -1,5 +1,5 @@
-C Plugged\spotentially\smemory\sleaks.\sCode\sclean-up.
-D 2025-01-16T00:04:40.960
+C Fix\sfor\sthe\snamespace\saxis:\sresolve\sthe\sprefix\swith\sthe\scontext\snode,\snot\swith\sthe\sXPath\sexpression\scontext\snode.\sWith\smay\smake\sa\sdifference\sin\scase\sof\sxslt.
+D 2025-01-17T01:08:15.850
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -140,7 +140,7 @@ F generic/domhtml5.h 5cca562a556e7662f2dce222640c32abb2777146
 F generic/domjson.c ee631e7ad15d092ff288b750e1ff53a8656ce5bf256804afdbf7311e2b131503
 F generic/domjson.h 47bfd8d791ed27d81ac245beb2b1a825ecb5326c39fbd1fb5d75d2d4c636260b
 F generic/domlock.c 60f6c6f4dc95d6525f77cd589a07f6ec78f2068b12821067c5a075a2740abacb
-F generic/domxpath.c 2696e9203004346ae9e058f094973a5fe6fe3a5124791a0c1a25aa1f7bbdf50c
+F generic/domxpath.c b8fe5043008765a40fa6d82f7d3dc99348634a78b834fb629b60742e822786e5
 F generic/domxpath.h a98836ef133283a20855968b76821042bce16b57b664689a15c017e3fecdae2f
 F generic/domxslt.c 27648bd8cf52de3745c44741b592e0fe9c1e82b017a05e51531f8b230852e8b3
 F generic/domxslt.h aeaf957ee38a9e7564bd9f1bed1781de108767df476a0d0776615988d8f04e0f
@@ -226,7 +226,7 @@ F tests/xmlsimple.test c533b70910b40f91b2dcbd7c7e7ac5345a70b185370a7ae029a824b0a
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.bench a8a90cbce1e276d05c6ff2c54ef04ffb3166c16e4094a543c694256ea4d68355
 F tests/xpath.test 0c489335d6069bb58b3877773388923cd54932a3271ffcb26018989fbb9aafc1
-F tests/xslt.test 35a5408426b098bcc07bdecfb52f1ec4c8ac3e984224ba497e700420047621a4
+F tests/xslt.test 84b53c3c28e0d9ad6f2f202c84e540a1d7cf8556874ffa5748ad81cae7cdf216
 F unix/CONFIG 431b82a51451df40e38261b91e1a37060797ef655e8f981fab761de59f1e01e9
 F unix/speed-check.sh 7a8d91e7edf1cdc9bcfad5f28e1a068cb2843d05e49d8bd89d9b30a46511497d
 F unix/tclAppInit.c cd5fa5bcb9f4648e9bf7108727b99e20cd02c33713df359efb1da298715940b9
@@ -243,8 +243,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 971050ce5a892151c0d85a739849d28c822b9659c682894e477672dd00b45b49
-R 0d0b5a705213d5ff599557561c14607d
+P 1de4b995f65f05f62294dab6f1ae3b8bfa6b7a2b6c5ff5c0e22f6959654bdb39
+R fb21b6ee00e1c608540e7f881bb86e5c
 U rolf
-Z e29169dec8f32e66ed4ddeb0258823b4
+Z 6881f2d79c3e4cde269af73c325049ea
 # Remove this line to create a well-formed Fossil manifest.

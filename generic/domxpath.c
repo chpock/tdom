@@ -2244,29 +2244,12 @@ int xpathParsePostProcess (
     char        **errMsg
     )
 {
-    const char *uri;
-    
     DBG(
         fprintf(stderr, "xpathParsePostProcess start:\n");
         printAst (0, t);
         )
     while (t) {
         DBG(printAst (4, t);)
-        if (t->type == AxisNamespace) {
-            if (t->child->type == IsElement
-                && t->child->strvalue[0] != '*'
-                && t->child->intvalue == 0) {
-                uri = domLookupPrefixWithMappings (exprContext, 
-                                                   t->child->strvalue, 
-                                                   prefixMappings);
-                if (!uri) {
-                    *errMsg = tdomstrdup ("Prefix doesn't resolve");
-                    return 0;
-                }
-                FREE (t->child->strvalue);
-                t->child->strvalue = tdomstrdup (uri);
-            }
-        }
         if (type != XPATH_EXPR) {
             if (type != XPATH_KEY_USE_EXPR) {
                 /* 12.4: "It is an error to use the current function in a
@@ -3896,10 +3879,11 @@ static int xpathEvalStep (
     domNode         *node, *child, *startingNode, *ancestor;
     domAttrNode     *attr;
     int              savedDocOrder, predLimit;
-    int              left = 0, right = 0, useFastAdd;
+    int              left = 0, right = 0, useFastAdd, wildcard = 0;
     double           dLeft = 0.0, dRight = 0.0, dTmp;
     char            *leftStr = NULL, *rightStr = NULL;
     astType          savedAstType;
+    domNS           *ns;
 
     if (result->type == EmptyResult) useFastAdd = 1;
     else useFastAdd = 0;
@@ -4368,14 +4352,29 @@ static int xpathEvalStep (
             return XPATH_OK;
         }
         node = ctxNode;
-
+        /* The namespace axis is special because it resolves the
+         * prefix not in the expression context but in the context
+         * node, which may make a difference in case of xslt. */
+        if (step->child->type == IsElement) {
+            if (step->child->strvalue[0] != '*') {
+                ns = domLookupPrefix (node, step->child->strvalue);
+                if (!ns) {
+                    /* The prefix doesn't resolve, there is nothing to
+                     * select. */
+                    return XPATH_OK;
+                }
+            } else {
+                wildcard = 1;
+            }
+        }
         while (node) {
             attr = node->firstAttr;
+            /* fprintf (stderr, "AxisNamespace: step->child->strvalue %s\n", */
+            /*          step->child->strvalue); */
             while (attr && (attr->nodeFlags & IS_NS_NODE)) {
                 if (step->child->type == IsElement) {
-                    if ((step->child->strvalue[0] != '*')) {
-                        if (strcmp(attr->nodeValue, 
-                                   step->child->strvalue)!=0) {
+                    if (!wildcard) {
+                        if (strcmp(attr->nodeValue, ns->uri) != 0) {
                             attr = attr->nextSibling;
                             continue;
                         }
@@ -4383,6 +4382,8 @@ static int xpathEvalStep (
                 }
                 rc = 0;
                 for (i = 0; i < result->nr_nodes; i++) {
+                    if (result->nodes[i]->nodeType != ATTRIBUTE_NODE)
+                        continue;
                     if (strcmp (attr->nodeName,
                                 ((domAttrNode*)result->nodes[i])->nodeName)==0) {
                         rc = 1; break;
