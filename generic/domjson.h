@@ -24,7 +24,7 @@ typedef enum {
 #define JSON_FALSE 5
 #define JSON_STRING 6
 #define JSON_NUMBER 7
-
+#define JSON_BOOLEAN 8
 
 domDocument *
 JSON_Parse (

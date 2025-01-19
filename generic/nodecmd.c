@@ -632,7 +632,8 @@ nodecmd_createNodeCmd (
         "TRUE",
         "FALSE",
         "STRING",
-        "NUMBER"
+        "NUMBER",
+        "BOOLEAN"
     };
 
     if (objc < 3 ) {
@@ -755,7 +756,7 @@ nodecmd_createNodeCmd (
             if (jsonType < 3 && jsonType > 0) {
                 Tcl_SetResult(interp, "For a text node the jsonType "
                               "argument must be one out of this list: "
-                              "TRUE FALSE NULL NUMBER STRING NONE",
+                              "TRUE FALSE NULL NUMBER STRING NONE or BOOLEAN",
                               NULL);
                 return TCL_ERROR;
             }
