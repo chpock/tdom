@@ -1046,7 +1046,7 @@ TclExpatParse (
           != TCL_OK) {
           return TCL_ERROR;
       }
-      if (strcmp (Tcl_DStringValue (&dStr), "binary")==0 ) useBinary = 1;
+      if (strcmp (Tcl_DStringValue (&dStr), "utf-8")==0 ) useBinary = 1;
       else useBinary = 0;
       Tcl_DStringFree (&dStr);
       expat->parsingState = 2;
