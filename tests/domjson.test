@@ -41,6 +41,7 @@ namespace eval nodeCmds {
     dom createNodeCmd -jsonType NUMBER textNode number
     dom createNodeCmd cdataNode   cdata
     dom createNodeCmd piNode      pi
+    dom createNodeCmd -jsonType BOOLEAN textNode boolean
 }
 
 test json-1.1 {Parse JSON} {
@@ -2750,6 +2751,45 @@ test json-8.6 {text nodes with json type NULL, TRUE or FALSE} {
     $doc delete
     set result
 } {[null,true,false]}
+
+test json-8.7 {text node json type BOOLEAN} {
+    set doc [dom createDocumentNode]
+    $doc jsonType ARRAY
+    $doc appendFromScript {
+        nodeCmds::boolean foo
+        nodeCmds::boolean true
+        nodeCmds::boolean false
+    }
+    set result [$doc asJSON]
+    $doc delete
+    set result
+} {["foo",true,false]}
+
+test json-8.8 {text node json type BOOLEAN} {
+    set doc [dom createDocumentNode]
+    $doc jsonType ARRAY
+    foreach value {foo 1 0} {
+        set newtextnode [$doc createTextNode $value]
+        $newtextnode jsonType BOOLEAN
+        $doc appendChild $newtextnode
+    }
+    set result [$doc asJSON]
+    $doc delete
+    set result
+} {["foo",true,false]}
+
+test json-8.9 {text node json type BOOLEAN} {
+    set doc [dom createDocumentNode]
+    $doc jsonType ARRAY
+    $doc appendFromScript {
+        foreach value {foo 1 0 true false TRue falSE yes no YES NO bar} {
+            nodeCmds::boolean $value
+        }
+    }
+    set result [$doc asJSON]
+    $doc delete
+    set result
+} {["foo",true,false,true,false,true,false,true,false,true,false,"bar"]}
 }
 
 test json-9.1 {cloneNode -deep} {

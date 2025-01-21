@@ -1,5 +1,5 @@
-C Maybe\sa\svirtual\sboolean\sjson\stype\sfor\stext\snodes\swould\sbe\suseful.
-D 2025-01-19T23:08:54.010
+C Fixed\sthe\simplementation,\sadded\sdocumentation\sand\sa\sfew\stests.
+D 2025-01-21T00:29:51.440
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -21,7 +21,7 @@ F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html b4a8d2a4b261d8380849b9fa2b4026f1e08248aab543551db47a34b60a43c69a
 F doc/dom.html 08088b66afb73d14e90bb40f9a8e8820799ddbfea31f0c44f740c032e0a97b43
 F doc/dom.n 36039c609ba666385150dc5670d6b448541e92ed7c2ab903046b73df5f31d057
-F doc/dom.xml 7a15250855b811cf38c6dab29bf707916713e7741adcef2b4fe85772805c4404
+F doc/dom.xml 40992864bb81524bbd7ccd497bbdad5232e2a605bb7aaec26ed79fccf0d24a89
 F doc/domDoc.html 4bfb6ca4d655e8276aa1ec772450e2dc8f4f4a5ff182cbbff95d67579c63a5ec
 F doc/domDoc.n e6a096be1d924465b005718228ccc212c81da2d678ee4abcc5805585c66f0b6f
 F doc/domDoc.xml 0f02b326fae96fa07567195a4276d1b10586445fb1dca27f6a6f34b18160448e
@@ -149,7 +149,7 @@ F generic/nodecmd.c 90b1535fd9fb19457fe243da0e67549c553ba9388e22974871e8746a3172
 F generic/nodecmd.h d5ac52d3bf9134ade881aa35ef3f29e2a124590852660ae19e353e6ace365029
 F generic/schema.c fc5ca4010cdca4737741ddd733b6e3dcd74e7010ffbb68edeeefa181fa2367af
 F generic/schema.h 5e20a348c3f98724e9c118760c8d9fcd661ae8f27d21652d90ab49492d001c75
-F generic/tcldom.c 7155d0708d2f909d539cfec49c2d6158655b2639a3001dde7d0151cec8a081a1
+F generic/tcldom.c 3110815d55544d93176ace42790440f7e64547cad7b550ef11904ea83bfa049e
 F generic/tcldom.h d8a198375e823af7d95b78f2ef695ac84b3f6d50232ab33ad82fcaa2502ea5e7
 F generic/tclexpat.c eb9632746adc5e140824b8e4bd8d9fdf723d95958f654a9640afbb72496bacac
 F generic/tclexpat.h 3844441852af770876f2de9b7444a0445e9c5c7f1fd5cc3a50e7455538d4e912
@@ -204,7 +204,7 @@ F tests/dom.test 0332bb2b402444d1c8bd6ffc726cf5096ff86169e65a0e6f747d09f18c46d93
 F tests/domDoc.test 095f2df0dda3afb96574c585b292b5ae061d0134ae78bd31a58dedda002a6fa5
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test a689e3a646a60d024d09f86cbc3408fb999d6e2a5f8e570efffede6649b4dd5d
-F tests/domjson.test f4910821bc346eb9912d13e2a8f7031bfb039264a7db4751a35cb2dffff44aa0
+F tests/domjson.test 58b09dc3f5a376dac0273deff2a7f48d36b7baf9f02127bf36c3a116d5dd9f52
 F tests/domnamespace.test e679916393ea7f2a6118f8043808d0c6615ed21f57975c35113cbec62e1181e7
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 065c6c1af854db838faf9ad56151342eee478f8501a5f65778a144b106108574
@@ -243,11 +243,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ddbcc3c8c8d329d324b3e0b050b3aa018d6001aec0179e349161534883271be8
-R 5249216e7a063fb3a05e7562dc9d5873
-T *branch * jsonbool
-T *sym-jsonbool *
-T -sym-trunk *
+P f1104138561862c2bca9085d34340a2e076e7be4d2a7f3cff899365a042d153c
+R 4264fb05d66330ea5370de1f93d1d5a3
 U rolf
-Z b1ffe094e11095cdfb3fda0827ee3958
+Z 8612c9e40fc944cb6bd107fc38399cf8
 # Remove this line to create a well-formed Fossil manifest.

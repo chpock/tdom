@@ -3177,6 +3177,7 @@ void tcldom_treeAsJSON (
     )
 {
     domTextNode *textNode;
+    Tcl_Obj *valueObj;
     int bool;
     
     switch (node->nodeType) {
@@ -3212,14 +3213,18 @@ void tcldom_treeAsJSON (
             writeChars(jstring, channel, "false",5);
             break;
         case JSON_BOOLEAN:
-            if (Tcl_GetBooleanFromObj(NULL, jstring, &bool) == TCL_OK) {
+            valueObj = Tcl_NewStringObj (textNode->nodeValue,
+                                         textNode->valueLength);
+            if (Tcl_GetBooleanFromObj(NULL, valueObj, &bool) == TCL_OK) {
                 if (bool) {
                     writeChars(jstring, channel, "true",4);
                 } else {
                     writeChars(jstring, channel, "false",5);
                 }
+                Tcl_DecrRefCount (valueObj);
                 break;
             }
+            Tcl_DecrRefCount (valueObj);
             /* Fall through */
         case JSON_STRING:
             /* Fall through */
