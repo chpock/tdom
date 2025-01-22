@@ -1,8 +1,8 @@
 
 ## tDOM - a XML / DOM / XPath / XSLT / HTML / JSON implementation for Tcl
-### Version 0.9.5
+### Version 0.9.6
 
-tDOM 0.9.5 works with Tcl 8.5, 8.6 and 9.0.
+tDOM 0.9.6 works with Tcl 8.5, 8.6 and 9.0.
 
 ### tDOM contains:
 
@@ -65,13 +65,13 @@ which you get as
 [tarball](http://tdom.org/index.html/tarball/trunk/tdom-trunk.tar.gz)
 or as [zip archive](http://tdom.org/index.html/zip/trunk/tdom-trunk.zip)
 
-The latest release is 0.9.5. Get the source code as
-[tarball](http://tdom.org/downloads/tdom-0.9.5-src.tgz) or
-as [zip archive](http://tdom.org/downloads/tdom-0.9.5-src.zip).
+The latest release is 0.9.6. Get the source code as
+[tarball](http://tdom.org/downloads/tdom-0.9.6-src.tgz) or
+as [zip archive](http://tdom.org/downloads/tdom-0.9.6-src.zip).
 
-Windows binaries of the 0.9.5 release are also available. Get it for
-[64 bit](http://tdom.org/downloads/tdom-0.9.5-windows-64.zip) or
-[32_bit](http://tdom.org/downloads/tdom-0.9.5-windows-32.zip). The zip
+Windows binaries of the 0.9.6 release are also available. Get it for
+[64 bit](http://tdom.org/downloads/tdom-0.9.6-windows-64.zip) or
+[32_bit](http://tdom.org/downloads/tdom-0.9.6-windows-32.zip). The zip
 archives include binaries for tDOM and the tDOM extension tcl for Tcl
 8.6 and Tcl 9.
 

@@ -11,7 +11,7 @@ package require tcltest 2.2-
 namespace import ::tcltest::*
 catch {tcltest::loadTestedCommands}
 
-if {[catch {package require -exact tdom 0.9.5}]} {
+if {[catch {package require -exact tdom 0.9.6}]} {
     if {[package vsatisfies [package provide Tcl] 9.0-]} {
         set libname libtcl9tdom0.9.5[info sharedlibextension]
     } else {
