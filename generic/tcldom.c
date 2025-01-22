@@ -203,6 +203,7 @@ static const char *jsonTypes[] = {
     "FALSE",
     "STRING",
     "NUMBER",
+    "BOOLEAN",
     NULL
 };
 
@@ -3176,6 +3177,8 @@ void tcldom_treeAsJSON (
     )
 {
     domTextNode *textNode;
+    Tcl_Obj *valueObj;
+    int bool;
     
     switch (node->nodeType) {
     case TEXT_NODE:
@@ -3209,6 +3212,20 @@ void tcldom_treeAsJSON (
         case JSON_FALSE:
             writeChars(jstring, channel, "false",5);
             break;
+        case JSON_BOOLEAN:
+            valueObj = Tcl_NewStringObj (textNode->nodeValue,
+                                         textNode->valueLength);
+            if (Tcl_GetBooleanFromObj(NULL, valueObj, &bool) == TCL_OK) {
+                if (bool) {
+                    writeChars(jstring, channel, "true",4);
+                } else {
+                    writeChars(jstring, channel, "false",5);
+                }
+                Tcl_DecrRefCount (valueObj);
+                break;
+            }
+            Tcl_DecrRefCount (valueObj);
+            /* Fall through */
         case JSON_STRING:
             /* Fall through */
         default:
@@ -6019,7 +6036,7 @@ int tcldom_NodeObjCmd (
                 SetIntResult(jsonType);
                 return TCL_OK;
             }
-            if (node->info > 7) {
+            if (node->info > 8) {
                 SetResult(jsonTypes[0]);
             } else {
                 SetResult(jsonTypes[node->info]);
@@ -6646,7 +6663,8 @@ tDOM_fsnewNodeCmd (
         "TRUE",
         "FALSE",
         "STRING",
-        "NUMBER"
+        "NUMBER",
+        "BOOLEAN"
     };
 
     Tcl_ResetResult (interp);

@@ -1878,7 +1878,7 @@ test dom-8.10 {createDocumentNode} {
 test dom-8.11 {createDocumentNode} {
     catch {dom createDocumentNode -jsonType FOO docNode} errMsg
     set errMsg
-} {bad jsonType "FOO": must be NONE, ARRAY, OBJECT, NULL, TRUE, FALSE, STRING, or NUMBER}
+} {bad jsonType "FOO": must be NONE, ARRAY, OBJECT, NULL, TRUE, FALSE, STRING, NUMBER, or BOOLEAN}
 
 test dom-8.12 {createDocumentNode - method check} {
     set docNode [dom createDocumentNode]

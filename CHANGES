@@ -1,4 +1,11 @@
 
+2025-01-22  Rolf Ade  <rolf@pointsman.de>
+
+        Added the "virtual" JSON type BOOLEAN for text nodes. If the
+        text node value is a boolean in the sense of Tcl then the node
+        serialize to the approprate JSON type. Otherwise it will be a
+        JSON string.
+
 2025-01-15  Rolf Ade  <rolf@pointsman.de>
 
         Added the flag -notempty to dom createNodeCmd. If this flag is
