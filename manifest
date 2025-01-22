@@ -1,5 +1,5 @@
-C Fixed\sthe\sexpat\sSAX\sinterface\s(commands\sexpat,xml:parser)\smethod\sparsechannel:\sif\sthe\sinput\schannel\sis\sencoded\sutf-8\sthen\sthe\sexpat\sutf-8\sdecoder\sis\sused\switch\sat\sleast\sensures\sparsing\sand\spass-throu.
-D 2025-01-20T00:06:40.650
+C Added\sa\sfew\stests.
+D 2025-01-22T22:04:22.177
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -204,7 +204,7 @@ F tests/dom.test ac7c042dd492d126fd57a1d55123fab68b0597f25c5814b92a3c0684e99af08
 F tests/domDoc.test 095f2df0dda3afb96574c585b292b5ae061d0134ae78bd31a58dedda002a6fa5
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test a689e3a646a60d024d09f86cbc3408fb999d6e2a5f8e570efffede6649b4dd5d
-F tests/domjson.test f4910821bc346eb9912d13e2a8f7031bfb039264a7db4751a35cb2dffff44aa0
+F tests/domjson.test ea90b56257bf50f175f704df812872af550a91efa17e3289d3442ab1c6547191
 F tests/domnamespace.test e679916393ea7f2a6118f8043808d0c6615ed21f57975c35113cbec62e1181e7
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 065c6c1af854db838faf9ad56151342eee478f8501a5f65778a144b106108574
@@ -243,8 +243,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ddbcc3c8c8d329d324b3e0b050b3aa018d6001aec0179e349161534883271be8
-R d96821409b6c32f8497d8a6da03cb588
+P 5ec5a96d8e3ca4fac47f6ae59875393883cf8514e6de9ca5b4db68c5ee90c521
+R 2491597bbf88a4cf14292c7c99fb064b
 U rolf
-Z e043564d29d2dc8a988cbfabcbd18c07
+Z 25ee518ecbe836581b8ba822eb4cedf6
 # Remove this line to create a well-formed Fossil manifest.

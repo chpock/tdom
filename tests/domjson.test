@@ -2750,6 +2750,45 @@ test json-8.6 {text nodes with json type NULL, TRUE or FALSE} {
     $doc delete
     set result
 } {[null,true,false]}
+
+test json-8.7 {text nodes with json type NULL, TRUE or FALSE} {
+    set doc [dom createDocument doc]
+    $doc jsonType ARRAY
+    $doc appendFromScript {
+        nodeCmds::null
+        nodeCmds::true
+        nodeCmds::false
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc/>}
+
+test json-8.8 {text nodes with json type NULL, TRUE or FALSE} {
+    set doc [dom createDocument doc]
+    set root [$doc documentElement]
+    $root appendFromScript {
+        nodeCmds::null
+        nodeCmds::true
+        nodeCmds::false
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc></doc>}
+
+test json-8.9 {text nodes with json type NULL, TRUE or FALSE} {
+    set doc [dom createDocument doc]
+    $doc jsonType ARRAY
+    $doc appendFromScript {
+        nodeCmds::null
+        nodeCmds::true
+        nodeCmds::false
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc></doc>}
 }
 
 test json-9.1 {cloneNode -deep} {
