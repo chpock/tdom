@@ -170,6 +170,18 @@ test tdomcmd-1.5 {keepCDATA} {
     set result
 } {<doc>text<![CDATA[Hello]]>more text</doc><doc>textHellomore text</doc>}
 
+test tdomcmd-1.6 {Character outside of BMP} {
+    set parser [expat]
+    tdom $parser enable
+    set fd [open [file join [file dir [info script]] data/data1.xml]]
+    fconfigure $fd -encoding "utf-8"
+    $parser parsechannel $fd
+    close $fd
+    set doc [tdom $parser getdoc]
+    set result [$doc asXML -indent none]
+} {<test>a&#128526;c</test>}
+
+
 # cleanup
 ::tcltest::cleanupTests
 return

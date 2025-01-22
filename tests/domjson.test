@@ -2752,7 +2752,46 @@ test json-8.6 {text nodes with json type NULL, TRUE or FALSE} {
     set result
 } {[null,true,false]}
 
-test json-8.7 {text node json type BOOLEAN} {
+test json-8.7 {text nodes with json type NULL, TRUE or FALSE} {
+    set doc [dom createDocument doc]
+    $doc jsonType ARRAY
+    $doc appendFromScript {
+        nodeCmds::null
+        nodeCmds::true
+        nodeCmds::false
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc/>}
+
+test json-8.8 {text nodes with json type NULL, TRUE or FALSE} {
+    set doc [dom createDocument doc]
+    set root [$doc documentElement]
+    $root appendFromScript {
+        nodeCmds::null
+        nodeCmds::true
+        nodeCmds::false
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc></doc>}
+
+test json-8.9 {text nodes with json type NULL, TRUE or FALSE} {
+    set doc [dom createDocument doc]
+    $doc jsonType ARRAY
+    $doc appendFromScript {
+        nodeCmds::null
+        nodeCmds::true
+        nodeCmds::false
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc/>}
+
+test json-8.10 {text node json type BOOLEAN} {
     set doc [dom createDocumentNode]
     $doc jsonType ARRAY
     $doc appendFromScript {
@@ -2765,7 +2804,7 @@ test json-8.7 {text node json type BOOLEAN} {
     set result
 } {["foo",true,false]}
 
-test json-8.8 {text node json type BOOLEAN} {
+test json-8.11 {text node json type BOOLEAN} {
     set doc [dom createDocumentNode]
     $doc jsonType ARRAY
     foreach value {foo 1 0} {
@@ -2778,7 +2817,7 @@ test json-8.8 {text node json type BOOLEAN} {
     set result
 } {["foo",true,false]}
 
-test json-8.9 {text node json type BOOLEAN} {
+test json-8.12 {text node json type BOOLEAN} {
     set doc [dom createDocumentNode]
     $doc jsonType ARRAY
     $doc appendFromScript {
