@@ -14,7 +14,7 @@
 
 2025-01-09  Rolf Ade  <rolf@pointsman.de>
 
-        Added a way to create XML namespaced attributens in
+        Added a way to create XML namespaced attributes in
         *FromScripts.
 
 2024-12-13  Rolf Ade  <rolf@pointsman.de>
