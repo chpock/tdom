@@ -1,5 +1,5 @@
-C Bumpt\sto\sthe\snext\srelease\sversion\s(not\sto\sbe\sreleased\sin\sshort\stime).
-D 2025-01-22T23:34:20.662
+C Modified\sthe\ssample\sxslt.tcl\sscript\sto\suse\s-channel\sin\sin-\sand\soutput.\sThis\senables\sto\stransform\sxml\sand/or\sxslt\sfiles\sbigger\sthan\s2\sGByte\s(or\sif\sthe\sresult\sXML\sis\sbigger\sthan\sthat)\seven\swith\stcl\s8.6\sand\sreduces\sthe\smemory\sneed\sof\sthe\sprocess\sby\ssome\spercent\sbecause\sthis\sdoesn't\sneed\sto\skeep\sthe\sinput\sand\soutput\sdata\sin\smemory\sbeside\sthe\sinevitable\sDOM\strees.
+D 2025-01-29T13:54:43.582
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -13,7 +13,7 @@ F README.AOL 80ae877757122817d25588f0ce22cc33ca1119d08fa4e446d6032bffabc3d5f4
 F README.md 796da47e9110460cffe54ed194b966c237c1e6aa9e85ca702632e05c016d4d23
 F aclocal.m4 5d1a079a02416ab1653487c02261ecf7b7a3c2b7
 F apps/toschema.tcl d9cb806e8f1a10ee9a6d6e8b3bd5944124a12001a086b5bc8511b6e92f9af620
-F apps/xslt.tcl 64103132fbe0a1fbf61cf3506608cb7ea5cbfddd247d207d95d8e96a071e1846
+F apps/xslt.tcl 5e5b959e926828ae4e145b45678132ab624767f77f1362d125f32a2bdb88fb7d
 F configure b39a12e2c0a0caa1db28fc1250bfdab1a110ccaf5f95f9e9c2be7ed27c470127 x
 F configure.ac 3419719d2e64e4f38fcf362b98b02da874a4d27e25aa943a53b10a988aad2afe
 F doc/INDEX.MAP 8b9f0c2e18efc29fcf581669e175dec860f54026ef7fef4b8d7403bca442fb71
@@ -243,8 +243,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 29b977cadc02f5184377b8cdb9afc6bcbf143aa7f089879bdd4c97f0391ca96f
-R 844204ffc1607af57498fbc3262a627d
+P 9d516309533f8ce428c01b04734fb831070e1c24372e6380a8f61617a41466b3
+R ffed908a598b49c29be879009ff0352d
 U rolf
-Z 1862af41bbe4e82efc209fd76d47ce15
+Z 97b0bcca3839b6a5bc875930569ceeea
 # Remove this line to create a well-formed Fossil manifest.
