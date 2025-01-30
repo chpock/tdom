@@ -1,5 +1,5 @@
-C Pacify\sa\s(pointless)\scompiler\swarning.
-D 2025-01-30T22:30:21.863
+C Added\sa\sso\sfar\smissing\sdata\sfile\sfor\sa\stest.
+D 2025-01-30T22:50:14.385
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -181,6 +181,7 @@ F tests/comment.test ff9d1abbbcde4d3532bf93b1eb7e819997fa8178
 F tests/data/REC-xslt-19991116-mod.xml f49602be921b5e3f24bf11fd3ce5cefd86d5afa94889a4071ed6638a65d2b64d
 F tests/data/REC-xslt-19991116.xml 037d39caac3e4cc8964848a7b0eb9a4b385520606a635e1f54f2aff9802b5fd4
 F tests/data/books.xml 0b1ae696b2bbc1035303f5637a6ef67f041d0b9e
+F tests/data/data1.xml 0f44f6ade4a2b91ae129882601790af23f1485ee51f894ca5b05d5296eb0b7cc
 F tests/data/domCmd1.dtd 2031a36d155dfac8f0a5ef3be69958d250f5459e
 F tests/data/domCmd2.dtd 42200fe458c04d2072e71d8fa00ade2cb1c59878
 F tests/data/dtd-5.1.dtd 8f16a5c1ff5181e7136cd0d0f1255ae269c38e3c
@@ -243,8 +244,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 05f935218b4e0a9cf01027c99bcf4ed0b2bae11507b3980375f9e22bae8ed379
-R 2c92009cd49fd0a928ea1d677bcd5b5c
+P d7e845b5af4c3369e70de1cf39801d886431dd06f1d5038cdcf859d6d5480b92
+R 6968d1d59876c2f5b24045d9aaf0c508
 U rolf
-Z 2d48d8e0e7cb4077bd4966c015573097
+Z 28cce633f2c28d294473cfc674bd9bbe
 # Remove this line to create a well-formed Fossil manifest.
