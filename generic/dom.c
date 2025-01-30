@@ -2313,7 +2313,7 @@ domReadDocument (
     enum XML_Status status;
     domReadInfo     info;
     char            buf[8192];
-    Tcl_Obj        *bufObj;
+    Tcl_Obj        *bufObj = NULL;
     Tcl_DString     dStr;
     int             useBinary = 0;
     char           *str;
@@ -2460,7 +2460,7 @@ domReadDocument (
         }
         break;
     }
-    if (!useBinary && channel != NULL) {
+    if (bufObj) {
         Tcl_DecrRefCount (bufObj);
     }
 cleanup:

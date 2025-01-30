@@ -1,5 +1,5 @@
-C Modified\sthe\ssample\sxslt.tcl\sscript\sto\suse\s-channel\sin\sin-\sand\soutput.\sThis\senables\sto\stransform\sxml\sand/or\sxslt\sfiles\sbigger\sthan\s2\sGByte\s(or\sif\sthe\sresult\sXML\sis\sbigger\sthan\sthat)\seven\swith\stcl\s8.6\sand\sreduces\sthe\smemory\sneed\sof\sthe\sprocess\sby\ssome\spercent\sbecause\sthis\sdoesn't\sneed\sto\skeep\sthe\sinput\sand\soutput\sdata\sin\smemory\sbeside\sthe\sinevitable\sDOM\strees.
-D 2025-01-29T13:54:43.582
+C Pacify\sa\s(pointless)\scompiler\swarning.
+D 2025-01-30T22:30:21.863
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -129,7 +129,7 @@ F generic/HTML5ent.inc c122e35eb1be8e325f8846080bbccc166978cfe7136e850d7e8aa4778
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
 F generic/datatypes.c 7c9f9edb50b4592b2317dfde3db6feaa342e80f1322aee4b747eb98c486d959b
 F generic/datatypes.h 3e41d07bcf50cf6959b6e14416dfcb0d7b5aafc65683322978ec185c2a259332
-F generic/dom.c 71031cb1e5393111348fda6efa7f08f7da972c91483f8f8167d228838bdcea4c
+F generic/dom.c dc0bd7c749a992aca3169cc8e8e85111c33105a0951ba1f3132bd7696bd098cc
 F generic/dom.h 59888afc7129c74c1ee4e5d1312027b0053f4fdabcd221e1363d9731e3b4668a
 F generic/domalloc.c ce41b8a16e855ee3a3db1d4b797f835a77f1f9260f24db4cb7dc73a07ee4670b
 F generic/domalloc.h 961f83bb46dec27dbcf36ed430ed81b1f485a1fdfaa2f7df8b60bbcf861d0fe3
@@ -243,8 +243,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 9d516309533f8ce428c01b04734fb831070e1c24372e6380a8f61617a41466b3
-R ffed908a598b49c29be879009ff0352d
+P 05f935218b4e0a9cf01027c99bcf4ed0b2bae11507b3980375f9e22bae8ed379
+R 2c92009cd49fd0a928ea1d677bcd5b5c
 U rolf
-Z 97b0bcca3839b6a5bc875930569ceeea
+Z 2d48d8e0e7cb4077bd4966c015573097
 # Remove this line to create a well-formed Fossil manifest.
