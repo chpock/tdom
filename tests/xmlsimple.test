@@ -227,7 +227,7 @@ test simple-1.28 {-forest} {
     set result
 } {{} {}}
 
-test simple-1.29 {parse long string} {64bit Tcl9 longRunning} {
+test simple-1.29 {parse long string} {64bit Tcl9 longRunning largedata groklargedata} {
     set doc [dom parse -simple "<doc>[string repeat [string repeat [string repeat abc 1000] 1000] 1000]</doc>"]
     set result [string length [$doc selectNodes string(/doc)]]
     lappend result [string length [$doc selectNodes substring(doc,2999999999)]]

@@ -1,5 +1,5 @@
-C Added\sa\sso\sfar\smissing\sdata\sfile\sfor\sa\stest.
-D 2025-01-30T22:50:14.385
+C Disable\stests\sby\sdefault\swhich\suse\shuge\samounts\sof\smemory.
+D 2025-01-31T00:53:03.933
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -201,7 +201,7 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.bench 5446ce379127b8d5700f18a5a0848e580313d0d7
-F tests/dom.test 0332bb2b402444d1c8bd6ffc726cf5096ff86169e65a0e6f747d09f18c46d93d
+F tests/dom.test 0e97d397ee3e688a10bd811cdab1d9f4fb7709a4516a04802a9ecf660cc65d72
 F tests/domDoc.test 095f2df0dda3afb96574c585b292b5ae061d0134ae78bd31a58dedda002a6fa5
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test a689e3a646a60d024d09f86cbc3408fb999d6e2a5f8e570efffede6649b4dd5d
@@ -212,7 +212,7 @@ F tests/entity.test 065c6c1af854db838faf9ad56151342eee478f8501a5f65778a144b10610
 F tests/html5reader.test 186ff343d2b75c8b784f3fe64fc664f8c83901f46c1f202077ce963f47b51983
 F tests/htmlreader.test 1a7d62ad1bfd1066349b1115a8e7a561befb3d97fcd207cf312b7f56a4a871bf
 F tests/i18n.test 421e3998480ed5ce9420f4b596c384b8d5261e7fb4b33c0a7c12ef126d476939
-F tests/loadtdom.tcl 3923c35ec3cc293906abfcbd5c63ce3b865f231b0a9ab42a4321a67ac5189222
+F tests/loadtdom.tcl 4c09719b09c09b5a7cbc584ae7856a5df3abd44b843ac78fe8f6c4042e476af0
 F tests/namespace.test 0a13b2bf59bb088525ca7b64d0b2bce6a349c627ca3dd1c17a4cc969d16fe57c
 F tests/parser.test 87eed84aec743e2ac02959a7276cd715bb764c2f479f566a69fb243ff2d72f5e
 F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
@@ -223,7 +223,7 @@ F tests/schema.test bc98d97f924b20ab3e120af65bef4030d79272c347d962f7092640c5a3c1
 F tests/stackedhdl.test a3efca3d0f095cfdeddc3e67734b9d79567b0fd1
 F tests/tdomcmd.bench b07448ed4de08ccaa9734cf3fe15c695fd7066c993da58ff48d465747940e417
 F tests/tdomcmd.test 425a031cd0696280faac1458815f75fb44e6ebf950891192df9bccdcfd7f4ac8
-F tests/xmlsimple.test c533b70910b40f91b2dcbd7c7e7ac5345a70b185370a7ae029a824b0a5fdb430
+F tests/xmlsimple.test 147a3b6826f6e6175fc8ed1a657253e7db587be61a4d8d4d3892db83722796f7
 F tests/xmltest.test f8598eb3ee6a35248af7193d229a1fccd2061109
 F tests/xpath.bench a8a90cbce1e276d05c6ff2c54ef04ffb3166c16e4094a543c694256ea4d68355
 F tests/xpath.test 0c489335d6069bb58b3877773388923cd54932a3271ffcb26018989fbb9aafc1
@@ -244,8 +244,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P d7e845b5af4c3369e70de1cf39801d886431dd06f1d5038cdcf859d6d5480b92
-R 6968d1d59876c2f5b24045d9aaf0c508
+P 1aa7a950c63a041de771148605dbac6d6dcc9344d7f4e5ece3a8bcb6c3514c44
+R 6550253fdfed05e731600d21108f2c3f
 U rolf
-Z 28cce633f2c28d294473cfc674bd9bbe
+Z e480ada53ed9e61428c73826414b04b1
 # Remove this line to create a well-formed Fossil manifest.

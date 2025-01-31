@@ -34,4 +34,5 @@ if {[package vsatisfies [package present Tcl] 9]} {
     testConstraint Tcl9 1
 }
 testConstraint 64bit [expr {$tcl_platform(pointerSize) >= 8}]
-testConstraint largedata [dom featureinfo largedata]
+testConstraint groklargedata [dom featureinfo largedata]
+
