@@ -1,5 +1,5 @@
-C Disable\stests\sby\sdefault\swhich\suse\shuge\samounts\sof\smemory.
-D 2025-01-31T00:53:03.933
+C Disable\sanother\stest\sby\sdefault\sbecause\sit\sworks\swith\slarge\sdata.
+D 2025-01-31T13:17:38.545
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -209,7 +209,7 @@ F tests/domjson.test daed40bb982a77e19cdf161026593bef0c020949938f87213e83fb1e10a
 F tests/domnamespace.test e679916393ea7f2a6118f8043808d0c6615ed21f57975c35113cbec62e1181e7
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 065c6c1af854db838faf9ad56151342eee478f8501a5f65778a144b106108574
-F tests/html5reader.test 186ff343d2b75c8b784f3fe64fc664f8c83901f46c1f202077ce963f47b51983
+F tests/html5reader.test 05b49514f3aed62b6b8fe4e55af24ed3a4e3168a2bd3b94e454d3752a8d12d1f
 F tests/htmlreader.test 1a7d62ad1bfd1066349b1115a8e7a561befb3d97fcd207cf312b7f56a4a871bf
 F tests/i18n.test 421e3998480ed5ce9420f4b596c384b8d5261e7fb4b33c0a7c12ef126d476939
 F tests/loadtdom.tcl 4c09719b09c09b5a7cbc584ae7856a5df3abd44b843ac78fe8f6c4042e476af0
@@ -244,8 +244,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 1aa7a950c63a041de771148605dbac6d6dcc9344d7f4e5ece3a8bcb6c3514c44
-R 6550253fdfed05e731600d21108f2c3f
+P 30670b161adb184f16dd200efa30d64bf0cd07c9a82103f1d9b1409e9894a63e
+R 1c3bc1da3626c644c4652fd5fb0c9871
 U rolf
-Z e480ada53ed9e61428c73826414b04b1
+Z 56273d01b2d7b814906af372048900cc
 # Remove this line to create a well-formed Fossil manifest.
