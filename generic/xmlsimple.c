@@ -228,7 +228,7 @@ static int TranslateEntityRefs (
 
     while (z[from]) {
         if (z[from]=='&') {
-            int i = from+1;
+            domLength i = from+1;
             int c;
 
             if (z[i] == '#') {
