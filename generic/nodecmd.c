@@ -80,14 +80,6 @@ typedef struct NodeInfo {
 } NodeInfo;
 
 /*----------------------------------------------------------------------------
-|   Attribute creation in *FromScript related flags
-|
-\---------------------------------------------------------------------------*/
-
-#define FS_ATT_NO_NAMESPACED 1
-#define FS_NOT_EMPTY 2
-
-/*----------------------------------------------------------------------------
 |   Forward declarations
 |
 \---------------------------------------------------------------------------*/
@@ -684,7 +676,6 @@ nodecmd_createNodeCmd (
             flags  |= FS_NOT_EMPTY;
             objc--;
             objv++;
-            
             break;
         }
     }
