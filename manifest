@@ -1,5 +1,5 @@
-C Resolved\smore\svariable\sname\sclashes\swith\snew\sC23\skeywords.
-D 2025-02-24T17:04:04.805
+C More\svariable\srenames\sbecause\sof\sclashes\swith\snew\sC23\skeywords.
+D 2025-02-24T17:08:09.796
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -151,7 +151,7 @@ F generic/schema.c fc5ca4010cdca4737741ddd733b6e3dcd74e7010ffbb68edeeefa181fa236
 F generic/schema.h 5e20a348c3f98724e9c118760c8d9fcd661ae8f27d21652d90ab49492d001c75
 F generic/tcldom.c 61cb41b72fe200e47a596d76ebfb7b6bd328e27163f0e0fa7808276520841279
 F generic/tcldom.h d8a198375e823af7d95b78f2ef695ac84b3f6d50232ab33ad82fcaa2502ea5e7
-F generic/tclexpat.c 377769ed2b8862f435ebcaef67d4b6cd86ff221335d6981086a2a2a6dccac184
+F generic/tclexpat.c d61eb77f556adfdc9aa459b255119d2e0e3cdef29032aa08bc37a18044cfd1c5
 F generic/tclexpat.h 3844441852af770876f2de9b7444a0445e9c5c7f1fd5cc3a50e7455538d4e912
 F generic/tclpull.c 8f7b6cca2519e19aeb68fff50c16238b4a68ed86b1db2c5927452f9e8d936629
 F generic/tclpull.h 8e1aac98bdad497c669c901494939eecd6c2f57ea51c4f5d4dac502db48527d4
@@ -244,8 +244,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P cf04bc2b8d9492cb0eba7ad6be141c1b65a8b7d5585a4d25093cfacccb68b71f
-R e22d2b0f243ead5ae862540b5b9e832a
+P ee17fba931cd8c2789bfb7f26bbc483894f54e3c522bd9a98cf25c907697ceb1
+R b043d25edeab1a418cd99833b7c8b575
 U rolf
-Z 79381c8ffe6673c4dbb5459120562380
+Z d67ce73e22cf5e28fcd1370b510a6732
 # Remove this line to create a well-formed Fossil manifest.
