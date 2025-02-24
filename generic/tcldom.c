@@ -6640,19 +6640,24 @@ tDOM_fsnewNodeCmd (
 ) {
     domNode *parent, *newNode = NULL;
     int index, jsonType, haveJsonType = 0, type, ret;
-    int checkName, checkCharData, simpleAtts = 0;
+    int checkName, checkCharData, flags = 0;
     domLength len;
     Tcl_Obj *cmdObj;
     char *namespace = NULL, *option, *tag;
+    char *usage = "::tdom::fsnewNode ?-jsonType <jsonType>? "
+        "?-namespace <namespace>? ?-noNamespacedAttributes? "
+        "?-notempty tagName ?attributes? ?script?";
 
     GetTcldomDATA;
 
     static const char *options[] = {
-        "-jsonType", "-namespace", "-noNamespacedAttributes", "--", NULL
+        "-jsonType", "-namespace", "-noNamespacedAttributes", "-notempty",
+        "--", NULL
     };
 
     enum option {
-        o_jsonType, o_namespace, o_noNamespacedAttributes, o_Last
+        o_jsonType, o_namespace, o_noNamespacedAttributes, o_notempty,
+        o_Last
     };
 
     static const char *jsonTypes[] = {
@@ -6682,10 +6687,7 @@ tDOM_fsnewNodeCmd (
     }
 
     if (objc < 2) {
-        Tcl_AppendResult(interp, "::tdom::fsnewNode \n"
-                         "\t?-jsonType <jsonType>?\n"
-                         "\t?-namespace <namespace>?\n"
-                         " tagName ?attributes? ?script?", NULL);
+        Tcl_AppendResult(interp, usage, NULL);
         return TCL_ERROR;
     }
     while (objc > 2) {
@@ -6715,22 +6717,26 @@ tDOM_fsnewNodeCmd (
             break;
 
         case o_noNamespacedAttributes:
-            simpleAtts = 1;
+            flags  |= FS_ATT_NO_NAMESPACED;
             objc --;
             objv ++;
             break;
             
+        case o_notempty:
+            flags  |= FS_NOT_EMPTY;
+            objc--;
+            objv++;
+            break;
+            
         case o_Last:
-            objv++;  objc--; break;
+            objv++;
+            objc--;
+            break;
 
         }
     }
     if (objc < 2) {
-        Tcl_AppendResult(interp, "::tdom::fsnewNode \n"
-                         "\t?-jsonType <jsonType>?\n"
-                         "\t?-namespace <namespace>?\n"
-                         "\t?-noNamespacedAttributes?\n"
-                         " tagName ?attributes? ?script?", NULL);
+        Tcl_AppendResult(interp, usage, NULL);
         return TCL_ERROR;
     }
     tag = Tcl_GetStringFromObj(objv[1], &len);
@@ -6760,15 +6766,24 @@ tDOM_fsnewNodeCmd (
             }
         }
         if (nodecmd_processAttributes (interp, newNode, type, objc, objv,
-                                       &cmdObj, simpleAtts) != TCL_OK) {
+                                       &cmdObj, flags) != TCL_OK) {
             return TCL_ERROR;
         }
         if (cmdObj) {
             ret = nodecmd_appendFromScript(interp, newNode, cmdObj);
             if (ret == TCL_OK) {
+                if (newNode->firstChild == NULL && flags & FS_NOT_EMPTY) {
+                    domDeleteNode (newNode, NULL, NULL);
+                    return TCL_OK;
+                }
                 parent->ownerDocument->nodeFlags |= NEEDS_RENUMBERING;
             }
             return ret;
+        } else {
+            if (flags & FS_NOT_EMPTY) {
+                domDeleteNode (newNode, NULL, NULL);
+                return TCL_OK;
+            }
         }
     }
     return TCL_OK;

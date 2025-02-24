@@ -30,6 +30,12 @@
 |
 \---------------------------------------------------------------------------*/
 
+
+/* append/insertbeforeFromScript related flags */
+#define FS_ATT_NO_NAMESPACED 1
+#define FS_NOT_EMPTY 2
+
+
 int nodecmd_createNodeCmd (Tcl_Interp    * interp,
                            int             objc,
                            Tcl_Obj *const  objv[],
@@ -51,7 +57,7 @@ int nodecmd_processAttributes (Tcl_Interp    *interp,
                                int            objc,
                                Tcl_Obj *const objv[],
                                Tcl_Obj      **cmdObj,
-                               int            simpleAtts);
+                               int            flags);
 
 domNode * nodecmd_currentNode (Tcl_Interp *interp);
 

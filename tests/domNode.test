@@ -1956,6 +1956,44 @@ test domNode-13.39 {-notempty} {
     set result
 } {<doc><e1/><e3><e4>bar</e4></e3><e2/></doc>}
 
+test domNode-13.40 {fsnewNode -notempty} {
+    set doc [dom parse <doc><e/></doc>]
+    set e [[$doc documentElement] firstChild]
+    $e appendFromScript {
+        tdom::fsnewNode -notempty echild att1 att1value
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc><e/></doc>}
+
+test domNode-13.41 {fsnewNode -notempty} {
+    set doc [dom parse <doc><e/></doc>]
+    set e [[$doc documentElement] firstChild]
+    $e appendFromScript {
+        tdom::fsnewNode -notempty echild att1 att1value {
+            ::nodeCmds::t bar
+        }
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc><e><echild att1="att1value">bar</echild></e></doc>}
+
+test domNode-13.42 {fsnewNode -notempty} {
+    set doc [dom parse <doc><e/></doc>]
+    set e [[$doc documentElement] firstChild]
+    $e appendFromScript {
+        tdom::fsnewNode -notempty echild att1 att1value {
+            # Do something else but don't create nodes
+            set sum [expr {1+2}]
+        }
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc><e/></doc>}
+
 test domNode-14.1 {appendFromList} {
     set doc [dom createDocument root]
     set root [$doc documentElement]

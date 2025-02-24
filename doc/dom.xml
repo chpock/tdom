@@ -535,7 +535,7 @@ insert nodes into the tree inside an <method>appendFromScript</method>
 script.</p>
 
 <syntax>
-<cmd>tdom::fsnewNode</cmd> <m>?-jsonType &lt;jsonType>?</m> <m>?-namespace &lt;namespace>?</m> <m>tagName</m> <m>?attributes?</m> <m>?script?</m>
+<cmd>tdom::fsnewNode</cmd> <m>?-jsonType &lt;jsonType>?</m> <m>?-namespace &lt;namespace>?</m> <m>?-noNamespacedAttributes?</m> <m>-notempty</m> <m>tagName</m> <m>?attributes?</m> <m>?script?</m>
 </syntax>
 
 <p>If called inside a fromScript context this command creates a new
