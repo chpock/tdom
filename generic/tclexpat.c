@@ -1267,7 +1267,7 @@ TclExpatConfigure (
       EXPAT_PARAMENTITYPARSINGNEVER,
       EXPAT_PARAMENTITYPARSINGNOTSTANDALONE
   };
-  int optionIndex, value, bool;
+  int optionIndex, value, boolVal;
   Tcl_Obj *const *objPtr = objv;
   Tcl_CmdInfo cmdInfo;
   int rc;
@@ -1396,11 +1396,11 @@ TclExpatConfigure (
           
       case EXPAT_FINAL:			/* -final */
 
-	if (Tcl_GetBooleanFromObj(interp, objPtr[1], &bool) != TCL_OK) {
+	if (Tcl_GetBooleanFromObj(interp, objPtr[1], &boolVal) != TCL_OK) {
             return TCL_ERROR;
 	}
 
-        expat->final = bool;
+        expat->final = boolVal;
 	break;
 
       case EXPAT_BASE:			/* -baseurl */
@@ -1593,18 +1593,18 @@ TclExpatConfigure (
 
       case EXPAT_USEFOREIGNDTD:                /* -useForeignDTD */
         
-        if (Tcl_GetBooleanFromObj (interp, objPtr[1], &bool) != TCL_OK) {
+        if (Tcl_GetBooleanFromObj (interp, objPtr[1], &boolVal) != TCL_OK) {
             return TCL_ERROR;
         }
         if (expat->parser) {
             /* Cannot be changed after parsing as started (which is
                kind of understandable). */
-            if (XML_UseForeignDTD (expat->parser, (unsigned char)bool)
+            if (XML_UseForeignDTD (expat->parser, (unsigned char)boolVal)
                 != XML_ERROR_NONE) {
-                expat->useForeignDTD = bool;
+                expat->useForeignDTD = boolVal;
             }
         } else {
-            expat->useForeignDTD = bool;
+            expat->useForeignDTD = boolVal;
         }
         break;
 
@@ -1776,33 +1776,33 @@ TclExpatConfigure (
         break;
 
     case EXPAT_NOEXPAND:
-        if (Tcl_GetBooleanFromObj (interp, objPtr[1], &bool) != TCL_OK) {
+        if (Tcl_GetBooleanFromObj (interp, objPtr[1], &boolVal) != TCL_OK) {
             return TCL_ERROR;
         }
-        if (bool) {
+        if (boolVal) {
             XML_SetDefaultHandler( expat->parser,
                                    TclGenExpatDefaultHandler);
         } else {
             XML_SetDefaultHandlerExpand( expat->parser,
                                          TclGenExpatDefaultHandler);
         }
-        expat->noexpand = bool;
+        expat->noexpand = boolVal;
         break;
 
     case EXPAT_FASTCALL:
-        if (Tcl_GetBooleanFromObj (interp, objPtr[1], &bool) != TCL_OK) {
+        if (Tcl_GetBooleanFromObj (interp, objPtr[1], &boolVal) != TCL_OK) {
             return TCL_ERROR;
         }
         CheckDefaultTclHandlerSet;
-        activeTclHandlerSet->fastCall = bool;
+        activeTclHandlerSet->fastCall = boolVal;
         break;
                   
     case EXPAT_KEEPTEXTSTART:
-        if (Tcl_GetBooleanFromObj(interp, objPtr[1], &bool) != TCL_OK) {
+        if (Tcl_GetBooleanFromObj(interp, objPtr[1], &boolVal) != TCL_OK) {
             return TCL_ERROR;
 	}
 
-        expat->keepTextStart = bool;
+        expat->keepTextStart = boolVal;
 	break;
 
 #ifndef TDOM_NO_SCHEMA

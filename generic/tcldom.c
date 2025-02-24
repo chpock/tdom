@@ -3178,7 +3178,7 @@ void tcldom_treeAsJSON (
 {
     domTextNode *textNode;
     Tcl_Obj *valueObj;
-    int bool;
+    int boolVal;
     
     switch (node->nodeType) {
     case TEXT_NODE:
@@ -3215,8 +3215,8 @@ void tcldom_treeAsJSON (
         case JSON_BOOLEAN:
             valueObj = Tcl_NewStringObj (textNode->nodeValue,
                                          textNode->valueLength);
-            if (Tcl_GetBooleanFromObj(NULL, valueObj, &bool) == TCL_OK) {
-                if (bool) {
+            if (Tcl_GetBooleanFromObj(NULL, valueObj, &boolVal) == TCL_OK) {
+                if (boolVal) {
                     writeChars(jstring, channel, "true",4);
                 } else {
                     writeChars(jstring, channel, "false",5);
@@ -3402,8 +3402,8 @@ typedef struct
     Tcl_Obj  *object;
     Tcl_Obj  *array;
     Tcl_Obj  *null;
-    Tcl_Obj  *true;
-    Tcl_Obj  *false;
+    Tcl_Obj  *trueVal;
+    Tcl_Obj  *falseVal;
     Tcl_Obj  *number;
     Tcl_Obj  *string;
 } asTypedListTypes;
@@ -3478,10 +3478,10 @@ tcldom_treeAsTypedListWorker (
             Tcl_ListObjAppendElement (NULL, resultObj, c->null);
             break;
         case JSON_TRUE:
-            Tcl_ListObjAppendElement (NULL, resultObj, c->true);
+            Tcl_ListObjAppendElement (NULL, resultObj, c->trueVal);
             break;
         case JSON_FALSE:
-            Tcl_ListObjAppendElement (NULL, resultObj, c->false);
+            Tcl_ListObjAppendElement (NULL, resultObj, c->falseVal);
             break;
         case JSON_NUMBER:
             textNode = (domTextNode *)node;
@@ -3522,16 +3522,16 @@ tcldom_treeAsTypedList (
     c.object = Tcl_NewStringObj ("OBJECT", 6);
     c.array = Tcl_NewStringObj ("ARRAY", 5);
     c.null = Tcl_NewStringObj ("NULL", 4);
-    c.true = Tcl_NewStringObj ("TRUE", 4);
-    c.false = Tcl_NewStringObj ("FALSE", 5);
+    c.trueVal = Tcl_NewStringObj ("TRUE", 4);
+    c.falseVal = Tcl_NewStringObj ("FALSE", 5);
     c.number = Tcl_NewStringObj ("NUMBER", 6);
     c.string = Tcl_NewStringObj ("STRING", 6);
 
     Tcl_IncrRefCount (c.object);
     Tcl_IncrRefCount (c.array);
     Tcl_IncrRefCount (c.null);
-    Tcl_IncrRefCount (c.true);
-    Tcl_IncrRefCount (c.false);
+    Tcl_IncrRefCount (c.trueVal);
+    Tcl_IncrRefCount (c.falseVal);
     Tcl_IncrRefCount (c.number);
     Tcl_IncrRefCount (c.string);
 
@@ -3549,8 +3549,8 @@ tcldom_treeAsTypedList (
     Tcl_DecrRefCount (c.object);
     Tcl_DecrRefCount (c.array);
     Tcl_DecrRefCount (c.null);
-    Tcl_DecrRefCount (c.true);
-    Tcl_DecrRefCount (c.false);
+    Tcl_DecrRefCount (c.trueVal);
+    Tcl_DecrRefCount (c.falseVal);
     Tcl_DecrRefCount (c.number);
     Tcl_DecrRefCount (c.string);
 }
@@ -3602,7 +3602,7 @@ static int serializeAsXML (
 {
     char          *channelId, prefix[MAX_PREFIX_LEN];
     const char    *localName;
-    int            indent, mode, bool;
+    int            indent, mode, boolVal;
     int            outputFlags = 0;
     int            optionIndex, cdataChild;
     Tcl_Obj       *resultPtr, *encString = NULL;
@@ -3718,11 +3718,11 @@ static int serializeAsXML (
                           "as argument");
                 goto cleanup;
             }
-            if (Tcl_GetBooleanFromObj(interp, objv[3], &bool)
+            if (Tcl_GetBooleanFromObj(interp, objv[3], &boolVal)
                 != TCL_OK) {
                 goto cleanup;
             }
-            if (bool) outputFlags |= SERIALIZE_DOCTYPE_DECLARATION;
+            if (boolVal) outputFlags |= SERIALIZE_DOCTYPE_DECLARATION;
             objc -= 2;
             objv += 2;
             break;
@@ -3733,11 +3733,11 @@ static int serializeAsXML (
                           "as argument");
                 goto cleanup;
             }
-            if (Tcl_GetBooleanFromObj(interp, objv[3], &bool)
+            if (Tcl_GetBooleanFromObj(interp, objv[3], &boolVal)
                 != TCL_OK) {
                 goto cleanup;
             }
-            if (bool) outputFlags |= SERIALIZE_XML_DECLARATION;
+            if (boolVal) outputFlags |= SERIALIZE_XML_DECLARATION;
             objc -= 2;
             objv += 2;
             break;
@@ -4935,7 +4935,7 @@ int tcldom_NodeObjCmd (
     domLength    length;
     XML_Size     line, column;
     XML_Index    byteIndex;
-    int          nsIndex, bool, hnew, legacy, jsonType;
+    int          nsIndex, boolVal, hnew, legacy, jsonType;
     Tcl_Obj     *namePtr, *resultPtr;
     Tcl_Obj     *mobjv[MAX_REWRITE_ARGS], *storedErrMsg;
     Tcl_CmdInfo  cmdInfo;
@@ -5947,10 +5947,10 @@ int tcldom_NodeObjCmd (
             SetIntResult(
                 (((node->nodeFlags & DISABLE_OUTPUT_ESCAPING) == 0) ? 0 : 1));
             if (objc == 3) {
-                if (Tcl_GetBooleanFromObj(interp, objv[2], &bool) != TCL_OK) {
+                if (Tcl_GetBooleanFromObj(interp, objv[2], &boolVal) != TCL_OK) {
                     return TCL_ERROR;
                 }
-                if (bool) {
+                if (boolVal) {
                     node->nodeFlags |= DISABLE_OUTPUT_ESCAPING;
                 } else {
                     node->nodeFlags &= (~DISABLE_OUTPUT_ESCAPING);
@@ -5992,16 +5992,16 @@ int tcldom_NodeObjCmd (
 
         case m_normalize:
             CheckArgs (2,3,2, "?-forXPath?");
-            bool = 0;
+            boolVal = 0;
             if (objc == 3) {
                 if (strcmp (Tcl_GetString(objv[2]), "-forXPath") == 0) {
-                    bool = 1;
+                    boolVal = 1;
                 } else {
                     SetResult("unknown option! Options: ?-forXPath?");
                     return TCL_ERROR;
                 }
             }
-            domNormalize (node, bool, tcldom_deleteNode, interp);
+            domNormalize (node, boolVal, tcldom_deleteNode, interp);
             return TCL_OK;
 
         case m_jsonType:
@@ -6075,7 +6075,7 @@ int tcldom_DocObjCmd (
     domDocument         * doc;
     char                * method, *tag, *data, *target, *uri, tmp[100];
     char                * str, *docName, *errMsg;
-    int                   methodIndex, result, i, nsIndex, forXPath, bool;
+    int                   methodIndex, result, i, nsIndex, forXPath, boolVal;
     int                   setDocumentElement = 0, restoreDomCreateCmdMode = 0;
     domLength             data_length, target_length;
     domNode             * n;
@@ -6422,10 +6422,10 @@ int tcldom_DocObjCmd (
                 SetBooleanResult(0);
             }
             if (objc == 3) {
-                if (Tcl_GetBooleanFromObj (interp, objv[2], &bool) != TCL_OK) {
+                if (Tcl_GetBooleanFromObj (interp, objv[2], &boolVal) != TCL_OK) {
                     return TCL_ERROR;
                 }
-                if (bool) {
+                if (boolVal) {
                     doc->nodeFlags |= OUTPUT_DEFAULT_INDENT;
                 } else {
                     doc->nodeFlags &= ~OUTPUT_DEFAULT_INDENT;
@@ -7833,7 +7833,7 @@ int tcldom_DomObjCmd (
 
     char        * method, tmp[300], *string, *option,
                  *replacement;
-    int           methodIndex, result, i, bool, changed;
+    int           methodIndex, result, i, boolVal, changed;
     domLength     repllen;
     Tcl_CmdInfo   cmdInfo;
     Tcl_Obj     * mobjv[MAX_REWRITE_ARGS], *newObj, *storedErrMsg;
@@ -7994,30 +7994,30 @@ int tcldom_DomObjCmd (
 
         case m_setStoreLineColumn:
             if (objc == 3) {
-                if (Tcl_GetBooleanFromObj(interp, objv[2], &bool) != TCL_OK) {
+                if (Tcl_GetBooleanFromObj(interp, objv[2], &boolVal) != TCL_OK) {
                     return TCL_ERROR;
                 }
-                TcldomDATA(storeLineColumn) = bool;
+                TcldomDATA(storeLineColumn) = boolVal;
             }
             SetBooleanResult(TcldomDATA(storeLineColumn));
             return TCL_OK;
 
         case m_setNameCheck:
             if (objc == 3) {
-                if (Tcl_GetBooleanFromObj(interp, objv[2], &bool) != TCL_OK) {
+                if (Tcl_GetBooleanFromObj(interp, objv[2], &boolVal) != TCL_OK) {
                     return TCL_ERROR;
                 }
-                TcldomDATA(dontCheckName) = !bool;
+                TcldomDATA(dontCheckName) = !boolVal;
             }
             SetBooleanResult(!TcldomDATA(dontCheckName));
             return TCL_OK;
             
         case m_setTextCheck:
             if (objc == 3) {
-                if (Tcl_GetBooleanFromObj(interp, objv[2], &bool) != TCL_OK) {
+                if (Tcl_GetBooleanFromObj(interp, objv[2], &boolVal) != TCL_OK) {
                     return TCL_ERROR;
                 }
-                TcldomDATA(dontCheckCharData) = !bool;
+                TcldomDATA(dontCheckCharData) = !boolVal;
             }
             SetBooleanResult(!TcldomDATA(dontCheckCharData));
             return TCL_OK;

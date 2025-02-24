@@ -5491,7 +5491,7 @@ TclTdomObjCmd (
     )
 {
     CHandlerSet     *handlerSet;
-    int              methodIndex, result, bool;
+    int              methodIndex, result, boolVal;
     tdomCmdReadInfo *info;
     TclGenExpatInfo *expat;
     Tcl_Obj         *newObjName = NULL;
@@ -5603,10 +5603,10 @@ TclTdomObjCmd (
         }
         Tcl_SetIntObj (Tcl_GetObjResult (interp), info->storeLineColumn);
         if (objc == 4) {
-            if (Tcl_GetBooleanFromObj (interp, objv[3], &bool) != TCL_OK) {
+            if (Tcl_GetBooleanFromObj (interp, objv[3], &boolVal) != TCL_OK) {
                 return TCL_ERROR;
             }
-            info->storeLineColumn = bool;
+            info->storeLineColumn = boolVal;
         }
         info->tdomStatus = 1;
         break;
@@ -5658,11 +5658,11 @@ TclTdomObjCmd (
             return TCL_ERROR;
         }
         Tcl_SetIntObj (Tcl_GetObjResult (interp), info->ignoreWhiteSpaces);
-        if (Tcl_GetBooleanFromObj (interp, objv[3], &bool) != TCL_OK) {
+        if (Tcl_GetBooleanFromObj (interp, objv[3], &boolVal) != TCL_OK) {
             return TCL_ERROR;
         }
-        info->ignoreWhiteSpaces = !bool;
-        handlerSet->ignoreWhiteCDATAs = !bool;
+        info->ignoreWhiteSpaces = !boolVal;
+        handlerSet->ignoreWhiteCDATAs = !boolVal;
         info->tdomStatus = 1;
         break;
 
@@ -5682,10 +5682,10 @@ TclTdomObjCmd (
             Tcl_SetResult (interp, "parser object isn't tdom enabled.", NULL);
             return TCL_ERROR;
         }
-        if (Tcl_GetBooleanFromObj (interp, objv[3], &bool) != TCL_OK) {
+        if (Tcl_GetBooleanFromObj (interp, objv[3], &boolVal) != TCL_OK) {
             return TCL_ERROR;
         }
-        if (bool) {
+        if (boolVal) {
             handlerSet->startCdataSectionCommand = tdom_startCDATA;
             handlerSet->endCdataSectionCommand = endCDATA;
         } else {
@@ -5711,11 +5711,11 @@ TclTdomObjCmd (
             Tcl_SetResult (interp, "parser object isn't tdom enabled.", NULL);
             return TCL_ERROR;
         }
-        if (Tcl_GetBooleanFromObj (interp, objv[3], &bool) != TCL_OK) {
+        if (Tcl_GetBooleanFromObj (interp, objv[3], &boolVal) != TCL_OK) {
             return TCL_ERROR;
         }
         expat = GetExpatInfo (interp, objv[1]);
-        expat->keepTextStart = bool;
+        expat->keepTextStart = boolVal;
         expat->cdataStartLine = 0;
         break;
         
@@ -5727,10 +5727,10 @@ TclTdomObjCmd (
         }
         Tcl_SetIntObj (Tcl_GetObjResult (interp), info->ignorexmlns);
         if (objc == 4) {
-            if (Tcl_GetBooleanFromObj (interp, objv[3], &bool) != TCL_OK) {
+            if (Tcl_GetBooleanFromObj (interp, objv[3], &boolVal) != TCL_OK) {
                 return TCL_ERROR;
             }
-            info->ignorexmlns = bool;
+            info->ignorexmlns = boolVal;
         }
         info->tdomStatus = 1;
         break;
