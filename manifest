@@ -1,5 +1,5 @@
-C Merged\sfrom\strunk\s(started\sbranch\snot\sfrom\strunk\stip\sby\smistake).
-D 2025-02-24T16:57:23.569
+C Resolved\smore\svariable\sname\sclashes\swith\snew\sC23\skeywords.
+D 2025-02-24T17:04:04.805
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -149,7 +149,7 @@ F generic/nodecmd.c 13760f0b9788a1cdf0d3205adfc13a5a5789e364b762ac5289098c688e7e
 F generic/nodecmd.h e9311269bd2f762cf419126ab0b7bc4951c6830a95aa82fe323c209292cde361
 F generic/schema.c fc5ca4010cdca4737741ddd733b6e3dcd74e7010ffbb68edeeefa181fa2367af
 F generic/schema.h 5e20a348c3f98724e9c118760c8d9fcd661ae8f27d21652d90ab49492d001c75
-F generic/tcldom.c e0b343b143131603456b4d74d5c226dd01e1bd942ca066afa8fc9e1a98b4be0f
+F generic/tcldom.c 61cb41b72fe200e47a596d76ebfb7b6bd328e27163f0e0fa7808276520841279
 F generic/tcldom.h d8a198375e823af7d95b78f2ef695ac84b3f6d50232ab33ad82fcaa2502ea5e7
 F generic/tclexpat.c 377769ed2b8862f435ebcaef67d4b6cd86ff221335d6981086a2a2a6dccac184
 F generic/tclexpat.h 3844441852af770876f2de9b7444a0445e9c5c7f1fd5cc3a50e7455538d4e912
@@ -244,8 +244,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 765ee3d90f5736ef37a6022f0239c8c9f2bfae1643c53bee96944e002063917e c7c21fe7268ad86b24dbd7d0e4491d0b90dc20b401098e7c829363e96085bb31
-R 1a74c32044368d183ef2a948082f4db9
+P cf04bc2b8d9492cb0eba7ad6be141c1b65a8b7d5585a4d25093cfacccb68b71f
+R e22d2b0f243ead5ae862540b5b9e832a
 U rolf
-Z f684098ad1b0d941e1e747b44c74a697
+Z 79381c8ffe6673c4dbb5459120562380
 # Remove this line to create a well-formed Fossil manifest.

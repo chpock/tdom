@@ -3402,8 +3402,8 @@ typedef struct
     Tcl_Obj  *object;
     Tcl_Obj  *array;
     Tcl_Obj  *null;
-    Tcl_Obj  *true;
-    Tcl_Obj  *false;
+    Tcl_Obj  *trueVal;
+    Tcl_Obj  *falseVal;
     Tcl_Obj  *number;
     Tcl_Obj  *string;
 } asTypedListTypes;
@@ -3478,10 +3478,10 @@ tcldom_treeAsTypedListWorker (
             Tcl_ListObjAppendElement (NULL, resultObj, c->null);
             break;
         case JSON_TRUE:
-            Tcl_ListObjAppendElement (NULL, resultObj, c->true);
+            Tcl_ListObjAppendElement (NULL, resultObj, c->trueVal);
             break;
         case JSON_FALSE:
-            Tcl_ListObjAppendElement (NULL, resultObj, c->false);
+            Tcl_ListObjAppendElement (NULL, resultObj, c->falseVal);
             break;
         case JSON_NUMBER:
             textNode = (domTextNode *)node;
@@ -3522,16 +3522,16 @@ tcldom_treeAsTypedList (
     c.object = Tcl_NewStringObj ("OBJECT", 6);
     c.array = Tcl_NewStringObj ("ARRAY", 5);
     c.null = Tcl_NewStringObj ("NULL", 4);
-    c.true = Tcl_NewStringObj ("TRUE", 4);
-    c.false = Tcl_NewStringObj ("FALSE", 5);
+    c.trueVal = Tcl_NewStringObj ("TRUE", 4);
+    c.falseVal = Tcl_NewStringObj ("FALSE", 5);
     c.number = Tcl_NewStringObj ("NUMBER", 6);
     c.string = Tcl_NewStringObj ("STRING", 6);
 
     Tcl_IncrRefCount (c.object);
     Tcl_IncrRefCount (c.array);
     Tcl_IncrRefCount (c.null);
-    Tcl_IncrRefCount (c.true);
-    Tcl_IncrRefCount (c.false);
+    Tcl_IncrRefCount (c.trueVal);
+    Tcl_IncrRefCount (c.falseVal);
     Tcl_IncrRefCount (c.number);
     Tcl_IncrRefCount (c.string);
 
@@ -3549,8 +3549,8 @@ tcldom_treeAsTypedList (
     Tcl_DecrRefCount (c.object);
     Tcl_DecrRefCount (c.array);
     Tcl_DecrRefCount (c.null);
-    Tcl_DecrRefCount (c.true);
-    Tcl_DecrRefCount (c.false);
+    Tcl_DecrRefCount (c.trueVal);
+    Tcl_DecrRefCount (c.falseVal);
     Tcl_DecrRefCount (c.number);
     Tcl_DecrRefCount (c.string);
 }
