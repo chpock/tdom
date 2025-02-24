@@ -1,5 +1,5 @@
-C More\svariable\srenames\sbecause\sof\sclashes\swith\snew\sC23\skeywords.
-D 2025-02-24T17:08:09.796
+C Again\smore\svariable\srenames\sbecause\sof\sclashes\swith\snew\sC23\skeywords.
+D 2025-02-24T17:10:24.283
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -127,7 +127,7 @@ F extensions/tnc/win/rules.vc afa89d3b334f5958efc447c985949447a9b05f6c891c7e1e8c
 F extensions/tnc/win/targets.vc 3627f336071161bfb6bbaea40465b731e42f4ad750189a967e58b1ce40b4eb0b
 F generic/HTML5ent.inc c122e35eb1be8e325f8846080bbccc166978cfe7136e850d7e8aa477824d2b8f
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
-F generic/datatypes.c 7c9f9edb50b4592b2317dfde3db6feaa342e80f1322aee4b747eb98c486d959b
+F generic/datatypes.c fdc99296910358a175c37f5f669f47e482b0de1afc609e995c8585fb009cf68a
 F generic/datatypes.h 3e41d07bcf50cf6959b6e14416dfcb0d7b5aafc65683322978ec185c2a259332
 F generic/dom.c 34ece24a9eec903161a21f47c23d9f6999abf100b6d9ca5ca77cdac01e0a1a09
 F generic/dom.h 59888afc7129c74c1ee4e5d1312027b0053f4fdabcd221e1363d9731e3b4668a
@@ -244,8 +244,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P ee17fba931cd8c2789bfb7f26bbc483894f54e3c522bd9a98cf25c907697ceb1
-R b043d25edeab1a418cd99833b7c8b575
+P 14eb61f9d41e2abb5a214e5017bc963dc776ab32326959deee63a37e9ff3a750
+R 4d5e19d4aaf74dcf01042e57f3ba43f6
 U rolf
-Z d67ce73e22cf5e28fcd1370b510a6732
+Z 4578af678e4379669a93cbeb47db0abe
 # Remove this line to create a well-formed Fossil manifest.

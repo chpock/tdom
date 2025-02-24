@@ -227,7 +227,7 @@ tclImpl (
     )
 {
     tclTCData *tcdata = constraintData;
-    int result, bool;
+    int result, boolVal;
 
     tcdata->evalStub[tcdata->nrArg-1] = Tcl_NewStringObj(text, -1);
     Tcl_IncrRefCount (tcdata->evalStub[tcdata->nrArg-1]);
@@ -240,11 +240,11 @@ tclImpl (
         tcdata->sdata->evalError = 1;
         return 0;
     }
-    result = Tcl_GetBooleanFromObj (interp, Tcl_GetObjResult (interp), &bool);
+    result = Tcl_GetBooleanFromObj (interp, Tcl_GetObjResult (interp), &boolVal);
     if (result != TCL_OK) {
         return 0;
     }
-    if (bool) {
+    if (boolVal) {
         return 1;
     } 
     return 0;
