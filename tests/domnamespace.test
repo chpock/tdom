@@ -382,41 +382,7 @@ test domnamespace-4.5 {createNodeCmd and namespace} {
     set result
 } {attValue}
 
-test domnamespace-4.6 {createNodeCmd and namespace} {
-    set xml {
-        <w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" >
-            <w:style w:type="paragraph" w:styleId="Normal">
-            </w:style>
-            <w:style w:type="paragraph" w:styleId="Heading">
-            </w:style>
-        </w:styles>
-    }
-    dom parse $xml doc
-    $doc selectNodesNamespaces {w http://schemas.openxmlformats.org/wordprocessingml/2006/main}
-    set result [$doc selectNodes -list {/w:styles/w:style string(@w:styleId)}]
-    $doc delete
-    set result
-} {Normal Heading}
-
-namespace eval nodeCmds {
-    dom createNodeCmd -namespace http://schemas.openxmlformats.org/wordprocessingml/2006/main elementNode w:style
-}
-
-test domnamespace-4.7 {createNodeCmd and namespace} {
-    dom createDocumentNS http://schemas.openxmlformats.org/wordprocessingml/2006/main w:styles doc
-    $doc documentElement root
-    $root appendFromScript {
-        nodeCmds::w:style {http://schemas.openxmlformats.org/wordprocessingml/2006/main w:type} paragraph \
-            {http://schemas.openxmlformats.org/wordprocessingml/2006/main w:styleId} Normal
-        nodeCmds::w:style {http://schemas.openxmlformats.org/wordprocessingml/2006/main w:type} paragraph \
-            {http://schemas.openxmlformats.org/wordprocessingml/2006/main w:styleId} Heading
-    }
-    $doc selectNodesNamespaces {w http://schemas.openxmlformats.org/wordprocessingml/2006/main}
-    set result [$doc selectNodes -list {/w:styles/w:style string(@w:styleId)}]
-    $doc delete
-    set result
-} {Normal Heading}
-
+    
 # cleanup
 ::tcltest::cleanupTests
 return

@@ -1,5 +1,5 @@
-C Some\sdocumentation\simprovements.
-D 2025-02-24T22:31:49.346
+C The\sfirst\sapproach\sto\sadd\sXML\snamespaced\sattributes\sto\sthe\s*fromScript\sfeature\sturned\sout\sto\sbe\scumbersome\sand\swith\sunwanted\sfall\sout\sso\sthis\sfirst\sbacks\sout\sthis\sto\sperhaps\sfind\ssomething\sbetter.
+D 2025-03-19T00:59:17.525
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -21,7 +21,7 @@ F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html b4a8d2a4b261d8380849b9fa2b4026f1e08248aab543551db47a34b60a43c69a
 F doc/dom.html 08088b66afb73d14e90bb40f9a8e8820799ddbfea31f0c44f740c032e0a97b43
 F doc/dom.n 36039c609ba666385150dc5670d6b448541e92ed7c2ab903046b73df5f31d057
-F doc/dom.xml 4125e0bec57bf25612090acc7767a1132d07ae72b1034e38329822119c8b8d00
+F doc/dom.xml 5426cbe9924ae1efa6533cd832ee97132f405b1990b533de4f8941c650a3556e
 F doc/domDoc.html 4bfb6ca4d655e8276aa1ec772450e2dc8f4f4a5ff182cbbff95d67579c63a5ec
 F doc/domDoc.n e6a096be1d924465b005718228ccc212c81da2d678ee4abcc5805585c66f0b6f
 F doc/domDoc.xml 0f02b326fae96fa07567195a4276d1b10586445fb1dca27f6a6f34b18160448e
@@ -145,7 +145,7 @@ F generic/domxpath.h a98836ef133283a20855968b76821042bce16b57b664689a15c017e3fec
 F generic/domxslt.c 27648bd8cf52de3745c44741b592e0fe9c1e82b017a05e51531f8b230852e8b3
 F generic/domxslt.h aeaf957ee38a9e7564bd9f1bed1781de108767df476a0d0776615988d8f04e0f
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F generic/nodecmd.c 13760f0b9788a1cdf0d3205adfc13a5a5789e364b762ac5289098c688e7e97f0
+F generic/nodecmd.c b5d7c194b9ede1634ec5e560b747bef55f416ec5dcddc0c11d250d6bfc144166
 F generic/nodecmd.h e9311269bd2f762cf419126ab0b7bc4951c6830a95aa82fe323c209292cde361
 F generic/schema.c fc5ca4010cdca4737741ddd733b6e3dcd74e7010ffbb68edeeefa181fa2367af
 F generic/schema.h 5e20a348c3f98724e9c118760c8d9fcd661ae8f27d21652d90ab49492d001c75
@@ -204,9 +204,9 @@ F tests/dom.bench 5446ce379127b8d5700f18a5a0848e580313d0d7
 F tests/dom.test 0e97d397ee3e688a10bd811cdab1d9f4fb7709a4516a04802a9ecf660cc65d72
 F tests/domDoc.test 095f2df0dda3afb96574c585b292b5ae061d0134ae78bd31a58dedda002a6fa5
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
-F tests/domNode.test ae5d3dcb62ff2bbcaa7ee89af497affe8ed01214d0e9582aaa0e2db836d15a0d
+F tests/domNode.test 843287a57fe1a58e327fcf3c8b94892d7553e14b3cb6920c5a7d3a3c93cb94f8
 F tests/domjson.test daed40bb982a77e19cdf161026593bef0c020949938f87213e83fb1e10a64559
-F tests/domnamespace.test e679916393ea7f2a6118f8043808d0c6615ed21f57975c35113cbec62e1181e7
+F tests/domnamespace.test f68dee13e2325518e96b318bf9fe76ae6903dc38d5602c4b0f48f90c0dc3038c
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 065c6c1af854db838faf9ad56151342eee478f8501a5f65778a144b106108574
 F tests/html5reader.test 05b49514f3aed62b6b8fe4e55af24ed3a4e3168a2bd3b94e454d3752a8d12d1f
@@ -244,8 +244,12 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 2db2c391674a7cc3594b504d3dbceda76cbd2346a4013a7a4defcf8549e72c2c
-R 0de2f2c1f632faf244dc04e2b8414f65
+P 3f550753d8feaff069e9769bc37190238cfbf0c88940599cffece28634077e2c
+Q -94aade4ec1bde13cab289a9f64a9ca6e7699b18e7074fe5dee50614867b0779f
+R 3318f1d9ce818f39a6ae6f1f5a727b77
+T *branch * otherfsatts
+T *sym-otherfsatts *
+T -sym-trunk *
 U rolf
-Z b68d33a7d051cfc62ed56ed4366748d5
+Z 10b6c4866082529164a895bc8c606fbd
 # Remove this line to create a well-formed Fossil manifest.
