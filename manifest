@@ -1,5 +1,5 @@
-C Try\sthe\s"natural"\sapproach:\sif\sthe\sattribute\sname\shas\sa\sprefix\sresolve\sthat\s(with\sfirst\slooking\sat\sthe\sselectNodesNamespaces\smapping\sfor\sfull\scontrol)\sand\serror\sout\sif\sit\sdoesn't\sresolve.\sStill\sto\sdecide\swhat\sto\sdo\swith\sXML\snamspace\sdeclaration\sattributes.
-D 2025-03-20T13:34:57.523
+C Revised.
+D 2025-03-20T23:24:14.646
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -145,7 +145,7 @@ F generic/domxpath.h a98836ef133283a20855968b76821042bce16b57b664689a15c017e3fec
 F generic/domxslt.c 27648bd8cf52de3745c44741b592e0fe9c1e82b017a05e51531f8b230852e8b3
 F generic/domxslt.h aeaf957ee38a9e7564bd9f1bed1781de108767df476a0d0776615988d8f04e0f
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
-F generic/nodecmd.c ebc0daf42257430bb584fe8a55e9473293990088300c0e0ce9ba95abd7a1d4fe
+F generic/nodecmd.c 92751187e49009fbef55d7b97b00e6522c2e34c6b435eb134e7bce9ba7ba511f
 F generic/nodecmd.h e9311269bd2f762cf419126ab0b7bc4951c6830a95aa82fe323c209292cde361
 F generic/schema.c fc5ca4010cdca4737741ddd733b6e3dcd74e7010ffbb68edeeefa181fa2367af
 F generic/schema.h 5e20a348c3f98724e9c118760c8d9fcd661ae8f27d21652d90ab49492d001c75
@@ -206,7 +206,7 @@ F tests/domDoc.test 095f2df0dda3afb96574c585b292b5ae061d0134ae78bd31a58dedda002a
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test 843287a57fe1a58e327fcf3c8b94892d7553e14b3cb6920c5a7d3a3c93cb94f8
 F tests/domjson.test daed40bb982a77e19cdf161026593bef0c020949938f87213e83fb1e10a64559
-F tests/domnamespace.test 3808c2318d52f23137acf5ac9b48bd3ab7ff0c769cfd9db65bd8b89f35cb3f08
+F tests/domnamespace.test 28bc5f9f365ca45e91c05af43c16bd5ea734ee393a81dd090a3e51ebc7cdf8e2
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 065c6c1af854db838faf9ad56151342eee478f8501a5f65778a144b106108574
 F tests/html5reader.test 05b49514f3aed62b6b8fe4e55af24ed3a4e3168a2bd3b94e454d3752a8d12d1f
@@ -244,8 +244,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P e05a9d62a567bd3acd7aff5ef8883c5dd30987db5eccb83fe838850ef446748c
-R 263da1b23f3541b00e4ff420de83e03e
+P 429712d6c811d91a8097b643a5dabf188bf8c22fe2df20bbb5c8288cf8f06bc2
+R f70160f29eee8851ea9cd3dffc1cec97
 U rolf
-Z 4dfded9f394e18126a0b6bf31dc51961
+Z 8c471e5cdda06aebd2dcfbd102f0af1f
 # Remove this line to create a well-formed Fossil manifest.

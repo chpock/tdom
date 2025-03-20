@@ -276,7 +276,7 @@ nodecmd_processAttributes (
     char *tval, *aval, *p;
     const char *uri;
     char **mappings;
-    int maybefq, colonseen;
+    int maybefq, fq;
     
     /*
      * Allow for following syntax:
@@ -315,34 +315,34 @@ nodecmd_processAttributes (
             tval++;
         }
         uri = NULL;
-        if (abs(type) == ELEMENT_NODE_ANAME_CHK
-            || abs(type) == ELEMENT_NODE_CHK) {
-            if (!tcldom_nameCheck (interp, tval, "attribute", maybefq)) {
-                return TCL_ERROR;
-            }
-        }
+        fq = 0;
         if (maybefq) {
-            colonseen = 0;
             p = tval;
             while (*p) {
                 if (*p == ':') {
-                    colonseen = 1;
-                    *p = '\0';
+                    fq = 1;
                     break;
                 }
                 p++;
             }
-            if (colonseen) {
-                uri = domLookupPrefixWithMappings (node, tval, mappings);
-                if (!uri) {
-                    Tcl_ResetResult (interp);
-                    Tcl_AppendResult (interp, "Attribute prefix '", tval,
-                                      "' does not resolve", NULL);
-                    *p = ':';
-                    return TCL_ERROR;
-                }
-                *p = ':';
+        }
+        if (abs(type) == ELEMENT_NODE_ANAME_CHK
+            || abs(type) == ELEMENT_NODE_CHK) {
+            if (!tcldom_nameCheck (interp, tval, "attribute", fq)) {
+                return TCL_ERROR;
             }
+        }
+        if (fq) {
+            *p = '\0';
+            uri = domLookupPrefixWithMappings (node, tval, mappings);
+            if (!uri) {
+                Tcl_ResetResult (interp);
+                Tcl_AppendResult (interp, "Attribute prefix '", tval,
+                                  "' does not resolve", NULL);
+                *p = ':';
+                return TCL_ERROR;
+            }
+            *p = ':';
         }
         aval = Tcl_GetString(opts[i+1]);
         if (abs(type) == ELEMENT_NODE_AVALUE_CHK
