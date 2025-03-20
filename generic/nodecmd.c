@@ -273,7 +273,10 @@ nodecmd_processAttributes (
 {
     Tcl_Obj **opts;
     domLength i, len;
-    char *tval, *aval;
+    char *tval, *aval, *p;
+    const char *uri;
+    char **mappings;
+    int maybefq, colonseen;
     
     /*
      * Allow for following syntax:
@@ -282,7 +285,12 @@ nodecmd_processAttributes (
      *   cmd key_value_list script
      *       where list contains "-key value ..." or "key value ..."
      */
-
+    if (flags & FS_ATT_NO_NAMESPACED) {
+        maybefq = 0;
+    } else {
+        maybefq = 1;
+    }
+    mappings = node->ownerDocument->prefixNSMappings;
     if ((objc % 2) == 0) {
         *cmdObj = objv[objc-1];
         len  = objc - 2; /* skip both command and script */
@@ -306,10 +314,34 @@ nodecmd_processAttributes (
         if (*tval == '-') {
             tval++;
         }
+        uri = NULL;
         if (abs(type) == ELEMENT_NODE_ANAME_CHK
             || abs(type) == ELEMENT_NODE_CHK) {
-            if (!tcldom_nameCheck (interp, tval, "attribute", 0)) {
+            if (!tcldom_nameCheck (interp, tval, "attribute", maybefq)) {
                 return TCL_ERROR;
+            }
+        }
+        if (maybefq) {
+            colonseen = 0;
+            p = tval;
+            while (*p) {
+                if (*p == ':') {
+                    colonseen = 1;
+                    *p = '\0';
+                    break;
+                }
+                p++;
+            }
+            if (colonseen) {
+                uri = domLookupPrefixWithMappings (node, tval, mappings);
+                if (!uri) {
+                    Tcl_ResetResult (interp);
+                    Tcl_AppendResult (interp, "Attribute prefix '", tval,
+                                      "' does not resolve", NULL);
+                    *p = ':';
+                    return TCL_ERROR;
+                }
+                *p = ':';
             }
         }
         aval = Tcl_GetString(opts[i+1]);
@@ -319,7 +351,11 @@ nodecmd_processAttributes (
                 return TCL_ERROR;
             }
         }
-        domSetAttribute(node, tval, aval);
+        if (uri) {
+            domSetAttributeNS (node, tval, aval, uri, 1);
+        } else {
+            domSetAttribute(node, tval, aval);
+        }
     }
     return TCL_OK;
 }
