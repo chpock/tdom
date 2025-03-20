@@ -1,4 +1,8 @@
 
+2025-03-21  Rolf Ade  <rolf@pointsman.de>
+
+        Updated to expat 2.7.0.
+
 2025-01-22  Rolf Ade  <rolf@pointsman.de>
 
         Added the "virtual" JSON type BOOLEAN for text nodes. If the
