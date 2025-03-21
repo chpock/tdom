@@ -479,6 +479,17 @@ interpreted as attribute name and the corresponding attribute value.
 The attribute name elements in the list may have a leading '-' character, which
 will be stripped off.</p>
 
+<p>If an <m>attributeName</m> is prefixed then by default the prefix
+will be first looked up in the <m>selectNodesNamespaces</m> prefix URI
+list and, if not found, looked up in the XML namespace scope of the
+node. If the prefix does not resolve error is raisen. If the prefix
+resolve then the attribute is created in this namespace (adding XML
+namespace declarations, if necessary). If <m>elementNodeCmd</m> was
+created with the flag <m>-noNamespacedAttributes</m> then no prefix
+lookup is done and the attribute is created with the name as given and
+in no XML namespace. It is recommended to not create XML namespace
+declarations with this.</p>
+
 <p>Every <m>elementNodeCmd</m> accepts an optional Tcl script as last
 argument. This script is evaluated as recursive <m>appendFromScript</m> script
 with the node created by the <m>elementNodeCmd</m> as parent of all nodes
