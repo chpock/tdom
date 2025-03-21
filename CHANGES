@@ -1,4 +1,9 @@
 
+2025-03-22  Rolf Ade  <rolf@pointsman.de>
+
+        Added a way to create XML namespaced attributes in
+        *FromScripts.
+
 2025-03-21  Rolf Ade  <rolf@pointsman.de>
 
         Updated to expat 2.7.0.
@@ -15,11 +20,6 @@
         Added the flag -notempty to dom createNodeCmd. If this flag is
         used the element will only appear in the tree if it is not
         empty. 
-
-2025-01-09  Rolf Ade  <rolf@pointsman.de>
-
-        Added a way to create XML namespaced attributes in
-        *FromScripts.
 
 2024-12-13  Rolf Ade  <rolf@pointsman.de>
 

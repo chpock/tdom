@@ -1357,7 +1357,7 @@ test domNode-12.11 {cloneNode -deep w/ disableOutputEscaping} {
 } {<doc><td>a&nbsp;b</td><td>a&nbsp;b</td></doc>}
 
 namespace eval nodeCmds {
-    dom createNodeCmd -noNamespacedAttributes elementNode e1
+    dom createNodeCmd elementNode e1
     dom createNodeCmd elementNode e2
     dom createNodeCmd commentNode c
     dom createNodeCmd textNode    t

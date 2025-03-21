@@ -399,23 +399,63 @@ test domnamespace-4.6 {createNodeCmd and namespace} {
 } {Normal Heading}
 
 namespace eval nodeCmds {
-    dom createNodeCmd -namespace http://schemas.openxmlformats.org/wordprocessingml/2006/main elementNode w:style
+    set w http://schemas.openxmlformats.org/wordprocessingml/2006/main
+    dom createNodeCmd -namespace $w  elementNode w:style
+    dom createNodeCmd -namespace $w -noNamespacedAttributes  elementNode w:stylenna
 }
 
 test domnamespace-4.7 {createNodeCmd and namespace} {
     dom createDocumentNS http://schemas.openxmlformats.org/wordprocessingml/2006/main w:styles doc
     $doc documentElement root
     $root appendFromScript {
-        nodeCmds::w:style {http://schemas.openxmlformats.org/wordprocessingml/2006/main w:type} paragraph \
-            {http://schemas.openxmlformats.org/wordprocessingml/2006/main w:styleId} Normal
-        nodeCmds::w:style {http://schemas.openxmlformats.org/wordprocessingml/2006/main w:type} paragraph \
-            {http://schemas.openxmlformats.org/wordprocessingml/2006/main w:styleId} Heading
+        nodeCmds::w:style w:type paragraph w:styleId Normal
+        nodeCmds::w:style w:type paragraph w:styleId Heading
     }
     $doc selectNodesNamespaces {w http://schemas.openxmlformats.org/wordprocessingml/2006/main}
     set result [$doc selectNodes -list {/w:styles/w:style string(@w:styleId)}]
     $doc delete
     set result
 } {Normal Heading}
+
+test domnamespace-4.8 {createNodeCmd and namespace} {
+    dom createDocumentNS http://schemas.openxmlformats.org/wordprocessingml/2006/main w:styles doc
+    $doc documentElement root
+    $doc selectNodesNamespaces {
+        w http://schemas.openxmlformats.org/wordprocessingml/2006/main
+        t http://schemas.openxmlformats.org/wordprocessingml/2006/main
+    }
+    $root appendFromScript {
+        nodeCmds::w:style t:type paragraph t:styleId Normal
+        nodeCmds::w:style w:type paragraph w:styleId Heading
+    }
+    set result [$doc selectNodes -list {/w:styles/w:style string(@w:styleId)}]
+    $doc delete
+    set result
+} {Normal Heading}
+
+test domnamespace-4.9 {createNodeCmd and namespace} {
+    dom createDocumentNS http://schemas.openxmlformats.org/wordprocessingml/2006/main w:styles doc
+    $doc documentElement root
+    $root appendFromScript {
+        nodeCmds::w:style w:type paragraph w:styleId Normal xml:space preserve
+        nodeCmds::w:style w:type paragraph w:styleId Heading
+    }
+    set result [$root selectNodes -list {w:style string(@w:styleId)}]
+    $doc delete
+    set result
+} {Normal Heading}
+
+test domnamespace-4.10 {createNodeCmd and namespace} {
+    dom createDocumentNS http://schemas.openxmlformats.org/wordprocessingml/2006/main w:styles doc
+    $doc documentElement root
+    $root appendFromScript {
+        nodeCmds::w:stylenna w:styleId Normal
+    }
+    set result [$root selectNodes -list {w:stylenna string(@w:styleId)}]
+    $doc delete
+    set result
+} {{}}
+                
 
 # cleanup
 ::tcltest::cleanupTests

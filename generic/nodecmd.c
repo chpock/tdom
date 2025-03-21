@@ -271,11 +271,12 @@ nodecmd_processAttributes (
     int flags
     )
 {
-    Tcl_Obj **opts, *tvalObj, *nsvalObj;
+    Tcl_Obj **opts;
     domLength i, len;
     char *tval, *aval, *p;
-    Tcl_Size tvallen;
-    int colonseen;
+    const char *uri;
+    char **mappings;
+    int maybefq, fq;
     
     /*
      * Allow for following syntax:
@@ -284,7 +285,12 @@ nodecmd_processAttributes (
      *   cmd key_value_list script
      *       where list contains "-key value ..." or "key value ..."
      */
-
+    if (flags & FS_ATT_NO_NAMESPACED) {
+        maybefq = 0;
+    } else {
+        maybefq = 1;
+    }
+    mappings = node->ownerDocument->prefixNSMappings;
     if ((objc % 2) == 0) {
         *cmdObj = objv[objc-1];
         len  = objc - 2; /* skip both command and script */
@@ -304,43 +310,39 @@ nodecmd_processAttributes (
         opts = (Tcl_Obj**)objv + 1;
     }
     for (i = 0; i < len; i += 2) {
-        tvallen = 0;
-        if (!(flags & FS_ATT_NO_NAMESPACED)
-            && Tcl_ListObjLength (NULL, opts[i], &tvallen) == TCL_OK
-            && tvallen == 2) {
-            Tcl_ListObjIndex (interp, opts[i], 0, &nsvalObj);
-            Tcl_ListObjIndex (interp, opts[i], 1, &tvalObj);
-            tval = Tcl_GetString (tvalObj);
-            if (abs(type) == ELEMENT_NODE_ANAME_CHK
-                || abs(type) == ELEMENT_NODE_CHK) {
-                colonseen = 0;
-                p = tval;
-                while (*p) {
-                    if (*p == ':') {
-                        colonseen = 1;
-                        break;
-                    }
-                    p++;
-                }
-                if (!colonseen) {
-                    Tcl_ResetResult (interp);
-                    Tcl_AppendResult (interp, "invalid name '", tval,
-                                      "' for a namespaced attribute", NULL);
-                    return TCL_ERROR;
-                }
-            }
-        } else {
-            tval = Tcl_GetString(opts[i]);
-        }
+        tval = Tcl_GetString(opts[i]);
         if (*tval == '-') {
             tval++;
         }
+        uri = NULL;
+        fq = 0;
+        if (maybefq) {
+            p = tval;
+            while (*p) {
+                if (*p == ':') {
+                    fq = 1;
+                    break;
+                }
+                p++;
+            }
+        }
         if (abs(type) == ELEMENT_NODE_ANAME_CHK
             || abs(type) == ELEMENT_NODE_CHK) {
-            if (!tcldom_nameCheck (interp, tval, "attribute",
-                                   tvallen == 2 ? 1 : 0)) {
+            if (!tcldom_nameCheck (interp, tval, "attribute", fq)) {
                 return TCL_ERROR;
             }
+        }
+        if (fq) {
+            *p = '\0';
+            uri = domLookupPrefixWithMappings (node, tval, mappings);
+            if (!uri) {
+                Tcl_ResetResult (interp);
+                Tcl_AppendResult (interp, "Attribute prefix '", tval,
+                                  "' does not resolve", NULL);
+                *p = ':';
+                return TCL_ERROR;
+            }
+            *p = ':';
         }
         aval = Tcl_GetString(opts[i+1]);
         if (abs(type) == ELEMENT_NODE_AVALUE_CHK
@@ -349,8 +351,8 @@ nodecmd_processAttributes (
                 return TCL_ERROR;
             }
         }
-        if (tvallen == 2) {
-            domSetAttributeNS (node, tval, aval, Tcl_GetString (nsvalObj), 1);
+        if (uri) {
+            domSetAttributeNS (node, tval, aval, uri, 1);
         } else {
             domSetAttribute(node, tval, aval);
         }
@@ -787,7 +789,7 @@ nodecmd_createNodeCmd (
     if (tagName && !isElement) {
         Tcl_SetResult(interp, "The -tagName option is allowed only for "
                       "element node commands.", NULL);
-        return TCL_ERROR;
+        return TCL_ERROR;        
     }
 
     if (namespace && !isElement) {
