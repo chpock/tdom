@@ -1,4 +1,8 @@
 
+2025-03-21  Rolf Ade  <rolf@pointsman.de>
+
+        Updated to expat 2.7.1.
+
 2025-03-22  Rolf Ade  <rolf@pointsman.de>
 
         Added a way to create XML namespaced attributes in
