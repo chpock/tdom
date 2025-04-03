@@ -7848,7 +7848,7 @@ int tcldom_DomObjCmd (
         "isPIValue",       "isNCName",           "createDocumentNode",
         "setNameCheck",    "setTextCheck",       "setObjectCommands",
         "featureinfo",     "isBMPCharData",      "clearString",
-        "isHTML5CustomName", "jsonEscape",       "fromScriptContext"
+        "isHTML5CustomName", "jsonEscape",       "fromScriptContext",
 #ifdef TCL_THREADS
         "attachDocument",  "detachDocument",
 #endif
