@@ -1,5 +1,5 @@
-C Added\sa\ssimple\sway\sto\sget\sthe\scurrent\sparent\snode\sin\sfromScript\scontext.
-D 2025-04-03T00:20:56.749
+C Added\ssome\sdocumentation\sand\sa\sfirst\stest.
+D 2025-04-03T00:47:47.548
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -21,7 +21,7 @@ F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html b4a8d2a4b261d8380849b9fa2b4026f1e08248aab543551db47a34b60a43c69a
 F doc/dom.html 08088b66afb73d14e90bb40f9a8e8820799ddbfea31f0c44f740c032e0a97b43
 F doc/dom.n 36039c609ba666385150dc5670d6b448541e92ed7c2ab903046b73df5f31d057
-F doc/dom.xml 503d2f0a42dccb8adb1d52caf3f6bbad631c9ed82d4f63e5e8dc48b24f609c97
+F doc/dom.xml fa6e560c235f528c9e8a135d00c6609e5dc6e2ddbd7fe7d5cce75f0a229bcda3
 F doc/domDoc.html 4bfb6ca4d655e8276aa1ec772450e2dc8f4f4a5ff182cbbff95d67579c63a5ec
 F doc/domDoc.n e6a096be1d924465b005718228ccc212c81da2d678ee4abcc5805585c66f0b6f
 F doc/domDoc.xml 0f02b326fae96fa07567195a4276d1b10586445fb1dca27f6a6f34b18160448e
@@ -201,7 +201,7 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.bench 5446ce379127b8d5700f18a5a0848e580313d0d7
-F tests/dom.test 0e97d397ee3e688a10bd811cdab1d9f4fb7709a4516a04802a9ecf660cc65d72
+F tests/dom.test ac4484fbed248f737c1d5b52813ba4189fe67ee88d5c5560e5b7613677b976c6
 F tests/domDoc.test 095f2df0dda3afb96574c585b292b5ae061d0134ae78bd31a58dedda002a6fa5
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test 843287a57fe1a58e327fcf3c8b94892d7553e14b3cb6920c5a7d3a3c93cb94f8
@@ -244,11 +244,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 82744078d0d76eb35fab08030e88809f5b26feb7d01c0c497e27b8dd8a49eee0
-R a1eebec968d261fb4dc32f27ea2eaeb5
-T *branch * fromScriptContext
-T *sym-fromScriptContext *
-T -sym-trunk *
+P bbb70f8365cc020efd9d336b98a96383ce2707cbd9a639d0ae83af4c30e39404
+R c8f61a6c7175e8ed7f7bea31638176f8
 U rolf
-Z 62bd4a4c50d5125411184095205904c6
+Z eab5cd18e9cb1f84c5cbe2fd2f9c561b
 # Remove this line to create a well-formed Fossil manifest.

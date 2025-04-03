@@ -17,6 +17,7 @@
 #    dom-12.*: -feedbackAfter
 #    dom-13.*: -forest
 #    dom-14.*: command argument parsing
+#    dom-15.*: fromScriptContext
 #
 # Copyright (c) 2002, 2003, 2004 Rolf Ade.
 
@@ -2502,6 +2503,17 @@ test dom-14.3 {Too less arguments to method parse} {
     catch {dom parse} errMsg
     set errMsg
 } {wrong # args: should be "parse ?options? ?data? ?objvar?"}
+
+test dom-15.1 {fromScriptContext} {
+    dom createDocument doc doc
+    set root [$doc documentElement]
+    $root appendFromScript {
+        set parent [dom fromScriptContext]
+    }
+    $doc delete
+    expr {$root == $parent}
+} 1
+
 
 # cleanup
 ::tcltest::cleanupTests
