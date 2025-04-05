@@ -6675,8 +6675,8 @@ tDOM_fsnewNodeCmd (
     Tcl_ResetResult (interp);
 
     /*------------------------------------------------------------------------
-    |   Need parent node to get the owner document and to append new 
-    |   child tag to it. The current parent node is stored on the stack.
+    |   Need parent node to append new child tag to it. The current parent
+    |   node is stored on the stack.
     |
     \-----------------------------------------------------------------------*/
 
@@ -7838,6 +7838,7 @@ int tcldom_DomObjCmd (
     Tcl_CmdInfo   cmdInfo;
     Tcl_Obj     * mobjv[MAX_REWRITE_ARGS], *newObj, *storedErrMsg;
     Tcl_DString   cleardString, escapedStr;
+    domNode     * parent;
 
     static const char *domMethods[] = {
         "createDocument",  "createDocumentNS",   "createNodeCmd",
@@ -7847,7 +7848,7 @@ int tcldom_DomObjCmd (
         "isPIValue",       "isNCName",           "createDocumentNode",
         "setNameCheck",    "setTextCheck",       "setObjectCommands",
         "featureinfo",     "isBMPCharData",      "clearString",
-        "isHTML5CustomName", "jsonEscape",
+        "isHTML5CustomName", "jsonEscape",       "fromScriptContext",
 #ifdef TCL_THREADS
         "attachDocument",  "detachDocument",
 #endif
@@ -7861,7 +7862,7 @@ int tcldom_DomObjCmd (
         m_isPIValue,         m_isNCName,           m_createDocumentNode,
         m_setNameCheck,      m_setTextCheck,       m_setObjectCommands,
         m_featureinfo,       m_isBMPCharData,      m_clearString,
-        m_isHTML5CustomName, m_jsonEscape
+        m_isHTML5CustomName, m_jsonEscape,         m_fromScriptContext
 #ifdef TCL_THREADS
         ,m_attachDocument,   m_detachDocument
 #endif
@@ -8171,6 +8172,19 @@ int tcldom_DomObjCmd (
                 Tcl_SetObjResult (interp, objv[2]);
             }
             return TCL_OK;
+
+        case m_fromScriptContext:
+            CheckArgs(2,3,2,"");
+            parent = nodecmd_currentNode (interp);
+            if (parent == NULL) {
+                Tcl_AppendResult (interp, "called outside fromScript context",
+                                  NULL);
+                return TCL_ERROR;
+            }
+            return tcldom_setInterpAndReturnVar (
+                interp, parent, (objc == 3) ? objv[2] : NULL
+                );
+        
     }
     return TCL_ERROR;
 }

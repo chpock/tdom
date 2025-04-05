@@ -571,6 +571,17 @@ command will raise error.
         </commanddef>
 
         <commanddef>
+          <command><cmd>dom</cmd> <method>fromScriptContext</method> ?<m>objVar</m>?</command>
+          <desc>If called inside a fromScript context this method
+          returns the node on which the script context appends nodes
+          to the child list. Otherwise it returns error.
+
+          <p>If you create nodeCmds with the -notempty the returned
+          node may have vanished outside the evaluation context if it
+          is still empty at the end of the evaluation.</p></desc>
+        </commanddef>
+        
+        <commanddef>
           <command><cmd>dom</cmd> <method>setStoreLineColumn</method> <m>?boolean</m>?</command>
           <desc>If switched on, the DOM nodes will contain line and column
 position information for the original XML document after parsing. The default

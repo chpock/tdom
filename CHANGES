@@ -1,4 +1,8 @@
 
+2025-04-05  Rolf Ade  <rolf@pointsman.de>
+
+        Added the dom command method fromScriptContext.
+
 2025-03-28  Rolf Ade  <rolf@pointsman.de>
 
         Updated to expat 2.7.1.
