@@ -2514,6 +2514,22 @@ test dom-15.1 {fromScriptContext} {
     expr {$root == $parent}
 } 1
 
+test dom-15.2 {fromScriptContext} {
+    dom createDocument doc doc
+    set root [$doc documentElement]
+    namespace eval nodeCmds {
+        dom createNodeCmd elementNode e1
+    }
+    $root appendFromScript {
+        set parent [dom fromScriptContext]
+        nodeCmds::e1 {
+            set ::e1 [dom fromScriptContext]
+        }
+    }
+    set result [expr {$root == $parent && [$root firstChild] == $e1}]
+    $doc delete
+    set result
+} 1
 
 # cleanup
 ::tcltest::cleanupTests

@@ -578,7 +578,7 @@ command will raise error.
 
           <p>If you create nodeCmds with the -notempty the returned
           node may have vanished outside the evaluation context if it
-          is still empty at the end of the evaluation.</desc>
+          is still empty at the end of the evaluation.</p></desc>
         </commanddef>
         
         <commanddef>
