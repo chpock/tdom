@@ -445,7 +445,7 @@ described in the documentation of the of the
 .TP
 \&\fBdomNode
 \&\fR command method
-\&\fB>selectNodes\fP.
+\&\fBselectNodes\fP.
 .IP "\fB-billionLaughsAttackProtectionMaximumAmplification  \fI<float>\fP\fR"
 .UR "https://en.wikipedia.org/wiki/Billion_laughs_attack"
 <URL: https://en.wikipedia.org/wiki/Billion_laughs_attack>
@@ -507,7 +507,7 @@ follow the format of the output of the document command
 method \fIasTypedList\fR, see there.
 .RE
 .TP
-\&\fB\fBdom\fP \fBcreateNodeCmd\fP \fI?-returnNodeCmd?\fB \fI?-tagName name?\fB \fI?-jsonType jsonType?\fB \fI?-namespace URI?\fB \fI(element|comment|text|cdata|pi)Node\fB \fIcommandName\fB
+\&\fB\fBdom\fP \fBcreateNodeCmd\fP           \fI?-returnNodeCmd?\fB \fI?-tagName name?\fB \fI?-jsonType jsonType?\fB \fI?-namespace URI?\fB \fI?-noNamespacedAttributes?\fB \fI?-notempty?\fB \fI(element|comment|text|cdata|pi)Node\fB \fIcommandName\fB
 \&\fRThis method creates Tcl commands, which in turn create
 tDOM nodes. Tcl commands created by this command are only
 available inside a script given to the domNode methods
@@ -534,7 +534,9 @@ first argument to the \fIcreateNodeCmd\fR. The syntax of the created
 command depends on the type of the node it creates.
 .PP
 If the command type to create is \fIelementNode\fR, the created
-command will create an element node, if called. Without the
+command will create an element node, if called. Though, if the
+\&\fI-notempty\fR flag was used in creating the node command the
+element node will only be created if it is not empty. Without the
 \&\fI-tagName\fR option the tag name of the created node is
 \&\fIcommandName\fR without Tcl namespace qualifiers. If the
 \&\fI-tagName\fR option was given then the created elements will have
@@ -557,7 +559,7 @@ The syntax of the created command is:
 
 \&\fBelementNodeCmd\fP \fI?attributeName attributeValue ...? ?script?\fR
 \&\fBelementNodeCmd\fP \fI?-attributeName attributeValue ...? ?script?\fR
-\&\fBelementNodeCmd\fP \fIname_value_list script\fR
+\&\fBelementNodeCmd\fP \fI?name_value_list? ?script?\fR
 
 .CE
 .PP
@@ -569,6 +571,17 @@ syntactical sugar and will be stripped off) or as a Tcl list with elements
 interpreted as attribute name and the corresponding attribute value.
 The attribute name elements in the list may have a leading '-' character, which
 will be stripped off.
+.PP
+If an \fIattributeName\fR is prefixed then by default the prefix
+will be first looked up in the \fIselectNodesNamespaces\fR prefix URI
+list and, if not found, looked up in the XML namespace scope of the
+node. If the prefix does not resolve error is raisen. If the prefix
+resolve then the attribute is created in this namespace (adding XML
+namespace declarations, if necessary). If \fIelementNodeCmd\fR was
+created with the flag \fI-noNamespacedAttributes\fR then no prefix
+lookup is done and the attribute is created with the name as given and
+in no XML namespace. It is recommended to not create XML namespace
+declarations with this.
 .PP
 Every \fIelementNodeCmd\fR accepts an optional Tcl script as last
 argument. This script is evaluated as recursive \fIappendFromScript\fR script
@@ -591,6 +604,12 @@ created command is:
 If the json type of the created text node is NULL, TRUE or FALSE
 then the \fIdata\fR argument is optional, otherwise it this argument
 must be given.
+.PP
+If the json type of the created text node is the virtual type
+BOOLEAN then if the text value is a boolean as recognized by
+Tcl_GetBooleanFromObj() the json value will according and if the text
+node value is not a boolean value understood by Tcl the value will be
+writen as json string.
 .PP
 If the optional flag \fI-disableOutputEscaping\fR is given, the
 escaping of the ampersand character (&) and the left angle bracket (<)
@@ -629,7 +648,7 @@ script.
 
 .CS
 
-\&\fBtdom::fsnewNode\fP \fI?-jsonType <jsonType>?\fR \fI?-namespace <namespace>?\fR \fItagName\fR \fI?attributes?\fR \fI?script?\fR
+\&\fBtdom::fsnewNode\fP \fI?-jsonType <jsonType>?\fR \fI?-namespace <namespace>?\fR \fI?-noNamespacedAttributes?\fR \fI-notempty\fR \fItagName\fR \fI?attributes?\fR \fI?script?\fR
 
 .CE
 .PP
@@ -638,9 +657,11 @@ node \fItagName\fR in the XML namespace \fInamespace\fR if the
 \&\fI-namespace\fR option was given and with the JSON type
 \&\fIjsonType\fR if the \fI-jsonType\fR option was given and appends
 this node at the end of the child list of the invoking element node.
-The \fIattributes\fR and \fIscript\fR arguments will be processed as
-if given to an element creating node command. If called outside a
-fromScript context this command will raise error.
+The other flags will also work as if given at the creation of an
+element creating command; see there. The \fIattributes\fR and
+\&\fIscript\fR arguments will also be processed as if given to an
+element creating node command. If called outside a fromScript context
+this command will raise error.
 
 
 
@@ -650,11 +671,22 @@ fromScript context this command will raise error.
 
 .CE
 .PP
-If called inside o fromScript context this comannd instead of
+If called inside a fromScript context this command instead of
 creating a new node appends the as argument given node at the end of
 the child list of the invoking element node. The node is unlinked from
 its previous place. If called outside a fromScript context this
 command will raise error.
+.RE
+.TP
+\&\fB\fBdom\fP \fBfromScriptContext\fP ?\fIobjVar\fB?
+\&\fRIf called inside a fromScript context this method
+returns the node on which the script context appends nodes
+to the child list. Otherwise it returns error.
+.RS
+.PP
+If you create nodeCmds with the -notempty the returned
+node may have vanished outside the evaluation context if it
+is still empty at the end of the evaluation.
 .RE
 .TP
 \&\fB\fBdom\fP \fBsetStoreLineColumn\fP \fI?boolean\fB?
@@ -754,6 +786,12 @@ recommendation. Otherwise it returns 0.
 valid according to production 16 of the XML 1.0
 recommendation. Otherwise it returns 0.
 .TP
+\&\fB\fBdom\fP \fBjsonEscape\fP \fIstring\fB
+\&\fRReturns the given \fIstring\fR argument escaped in a
+way that if the returned string is used literary in a JSON
+document it is read by any confirming JSON parser as the
+original string.
+.TP
 \&\fB\fBdom\fP \fBfeatureinfo\fP \fIfeature\fB
 \&\fRThis method provides information about the used
 build options and the expat version. The valid values for
@@ -802,6 +840,15 @@ is build in.
 .IP "\fBschema\fR"
 Returns as boolean if the tDOM schema features
 are build in.
+.IP "\fBlargedata\fR"
+Returns as boolean if the expat library
+configuration allows pcdata content of an XML
+element. Could be true only if build with Tcl 9
+for a 64-bit architecture and then depends if the
+build-in expat version is used with default
+configuration or if the used system expat library
+is capable enough for this (typically not). are
+build in.
 .RE
 .SH KEYWORDS
 XML, DOM, document, node, parsing

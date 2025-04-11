@@ -265,7 +265,7 @@ element will be valid as root of a tree to validate.
 \&\fB\fBdefine\fP \fI<definition script>\fB
 \&\fRThis method defines several elements or patterns or a
 whole schema with one call, by evaluating the \fIdefinition
-script>\fR. All schema command methods so far
+script\fR. All schema command methods so far
 (\fIprefixns\fR, \fIdefelement\fR, \fIdefelementtype\fR,
 \&\fIdefpattern\fR, \fIdeftexttype\fR and \fIstart\fR) are
 allowed top level in the \fIdefinition script\fR. The
@@ -529,7 +529,7 @@ namespace as second element. If text is a possible
 next event, the list entry will be a two elements
 list, with #text as first element and the empty
 string as second. If an any element constraint is
-possible. the list entry will be a two elements list,
+possible the list entry will be a two elements list,
 with <any> as first element and the empty string
 as second. If an any element in a certain namespace
 constraint is possible, the list entry will be a two
@@ -688,25 +688,25 @@ whatsoever is expected ("empty match").
 .TP
 \&\fB\fBgroup\fP \fI?quant?\fB \fI<definition script>\fB
 \&\fRThis method group a sequence of content particles
-defined by the \fIdefinition script>\fR, which have to match
+defined by the \fIdefinition script\fR, which have to match
 in this sequence order.
 .TP
 \&\fB\fBchoice\fP \fI?quant?\fB \fI<definition script>\fB
 \&\fRThis schema constraint matches if one of the top level
-content particles defined by the \fIdefinition script>\fR
+content particles defined by the \fIdefinition script\fR
 matches. If one of this top level content particle is optional
 this constraint matches the "empty match".
 .TP
 \&\fB\fBinterleave\fP \fI?quant?\fB \fI<definition script>\fB
 \&\fRThis schema constraint matches after every of the required
 top level content particles defined by the \fIdefinition
-script>\fR have matched (and, optional, some or all other) in
+script\fR have matched (and, optional, some or all other) in
 any arbitrary order.
 .TP
 \&\fB\fBmixed\fP \fI?quant?\fB \fI<definition script>\fB
 \&\fRThis schema constraint matches for any text (including the
 empty one) and every top level content particle defined by the
-\&\fIdefinition script>\fR with default quantifier *.
+\&\fIdefinition script\fR with default quantifier *.
 .TP
 \&\fB\fBtext\fP \fI?<constraint script>|\*(lqtype\*(lq typename?\fB
 \&\fRWithout the optional constraint script this validation
@@ -1201,7 +1201,7 @@ contiguous white-space are replaced by a single space.
 This text constraint command splits the text to test
 into a list of values and tests all elements of that list for
 the text constraints in the evaluated \fIconstraint
-script>\fR.
+script\fR.
 .PP
 The available types are:
 .TP
@@ -1223,7 +1223,7 @@ The default in case no split type argument is given is
 .TP
 \&\fB\fBstrip\fP \fI<constraint script>\fB
 \&\fRThis text constraint command tests all text constraints
-in the evaluated \fIconstraint script>\fR with the text to
+in the evaluated \fIconstraint script\fR with the text to
 test stripped of all white space at start and end.
 .SS "Various other string properties"
 .TP
@@ -1278,10 +1278,12 @@ space then the \fIid\fR command without keySpace
 argument.
 .TP
 \&\fB\fBidref\fP \fI?keySpace?\fB
-\&\fRThis text constraint command expects the text to be a
-reference to an ID within the document. The referenced ID may
-appear later in the document, that the reference. Several
-references within the document to one ID are possible.
+\&\fRThis text constraint command expects the text to be
+a reference to an ID within the document. The referenced
+ID may appear later in the document than the reference.
+Several references within the document to one ID are
+possible. For the optional \fIkeySpace\fR argument see
+\&\fIid\fR
 .TP
 \&\fB\fBjsontype\fP \fI<JSON text type>\fB
 \&\fRIf not postvalidating a DOM tree with

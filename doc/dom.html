@@ -4,17 +4,17 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x55a5a8a45a40">NAME</a> · <a href="#SECTid0x55a5a8a637a0">SYNOPSIS</a> · <a href="#SECTid0x55a5a8a3edf0">DESCRIPTION </a> · <a href="#SECTid0x55a5a8a61600">KEYWORDS</a>
+<a href="#SECTid0x5611107895c0">NAME</a> · <a href="#SECTid0x5611107c4710">SYNOPSIS</a> · <a href="#SECTid0x561110891060">DESCRIPTION </a> · <a href="#SECTid0x561110901750">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x55a5a8a45a40">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x5611107895c0">NAME</a></h2><p class="namesection">
 <b class="names">dom - </b><br>Create an in-memory DOM tree from XML</p>
   
-  <h2><a name="SECTid0x55a5a8a637a0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x5611107c4710">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">dom</b> <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
 
-  <h2><a name="SECTid0x55a5a8a3edf0">DESCRIPTION </a></h2><p>This command provides the creation of DOM trees in memory. In
+  <h2><a name="SECTid0x561110891060">DESCRIPTION </a></h2><p>This command provides the creation of DOM trees in memory. In
 the usual case a string containing a XML information is parsed and converted
 into a DOM tree. Other possible parse input may be HTML or JSON.
 The <i class="m">method</i> indicates a specific subcommand. </p><p>The valid methods are:</p><dl class="commandlist">
@@ -348,7 +348,7 @@ needed.</dd>
                 node names into an XPath expression use the '%' syntax
                 described in the documentation of the of the
                 <b class="command">domNode</b> command method
-                <b class="method">&gt;selectNodes</b>.
+                <b class="method">selectNodes</b>.
                 </dd>
               
 
@@ -437,7 +437,7 @@ memory handling as explained above.</dd>
         
           <dt>
 <b class="cmd">dom</b> <b class="method">createNodeCmd</b>
-<i class="m">?-returnNodeCmd?</i> <i class="m">?-tagName name?</i> <i class="m">?-jsonType jsonType?</i> <i class="m">?-namespace URI?</i> <i class="m">(element|comment|text|cdata|pi)Node</i> <i class="m">commandName</i>
+          <i class="m">?-returnNodeCmd?</i> <i class="m">?-tagName name?</i> <i class="m">?-jsonType jsonType?</i> <i class="m">?-namespace URI?</i> <i class="m">?-noNamespacedAttributes?</i> <i class="m">?-notempty?</i> <i class="m">(element|comment|text|cdata|pi)Node</i> <i class="m">commandName</i>
 </dt>
           <dd>This method creates Tcl commands, which in turn create
           tDOM nodes. Tcl commands created by this command are only
@@ -464,7 +464,9 @@ first argument to the <i class="m">createNodeCmd</i>. The syntax of the created
 command depends on the type of the node it creates.</p>
 
 <p>If the command type to create is <i class="m">elementNode</i>, the created
-command will create an element node, if called. Without the
+command will create an element node, if called. Though, if the
+<i class="m">-notempty</i> flag was used in creating the node command the
+element node will only be created if it is not empty. Without the
 <i class="m">-tagName</i> option the tag name of the created node is
 <i class="m">commandName</i> without Tcl namespace qualifiers. If the
 <i class="m">-tagName</i> option was given then the created elements will have
@@ -484,7 +486,7 @@ scope.</p>
 <pre class="syntax">
 <b class="cmd">elementNodeCmd</b> <i class="m">?attributeName attributeValue ...? ?script?</i>
 <b class="cmd">elementNodeCmd</b> <i class="m">?-attributeName attributeValue ...? ?script?</i>
-<b class="cmd">elementNodeCmd</b> <i class="m">name_value_list script</i>
+<b class="cmd">elementNodeCmd</b> <i class="m">?name_value_list? ?script?</i>
 </pre>
 
 <p>The command syntax allows three different ways to specify the attributes of
@@ -495,6 +497,17 @@ syntactical sugar and will be stripped off) or as a Tcl list with elements
 interpreted as attribute name and the corresponding attribute value.
 The attribute name elements in the list may have a leading '-' character, which
 will be stripped off.</p>
+
+<p>If an <i class="m">attributeName</i> is prefixed then by default the prefix
+will be first looked up in the <i class="m">selectNodesNamespaces</i> prefix URI
+list and, if not found, looked up in the XML namespace scope of the
+node. If the prefix does not resolve error is raisen. If the prefix
+resolve then the attribute is created in this namespace (adding XML
+namespace declarations, if necessary). If <i class="m">elementNodeCmd</i> was
+created with the flag <i class="m">-noNamespacedAttributes</i> then no prefix
+lookup is done and the attribute is created with the name as given and
+in no XML namespace. It is recommended to not create XML namespace
+declarations with this.</p>
 
 <p>Every <i class="m">elementNodeCmd</i> accepts an optional Tcl script as last
 argument. This script is evaluated as recursive <i class="m">appendFromScript</i> script
@@ -513,6 +526,12 @@ created command is:</p>
 <p>If the json type of the created text node is NULL, TRUE or FALSE
 then the <i class="m">data</i> argument is optional, otherwise it this argument
 must be given.</p>
+
+<p>If the json type of the created text node is the virtual type
+BOOLEAN then if the text value is a boolean as recognized by
+Tcl_GetBooleanFromObj() the json value will according and if the text
+node value is not a boolean value understood by Tcl the value will be
+writen as json string.</p>
 
 <p>If the optional flag <i class="m">-disableOutputEscaping</i> is given, the
 escaping of the ampersand character (&amp;) and the left angle bracket (&lt;)
@@ -540,7 +559,7 @@ insert nodes into the tree inside an <b class="method">appendFromScript</b>
 script.</p>
 
 <pre class="syntax">
-<b class="cmd">tdom::fsnewNode</b> <i class="m">?-jsonType &lt;jsonType&gt;?</i> <i class="m">?-namespace &lt;namespace&gt;?</i> <i class="m">tagName</i> <i class="m">?attributes?</i> <i class="m">?script?</i>
+<b class="cmd">tdom::fsnewNode</b> <i class="m">?-jsonType &lt;jsonType&gt;?</i> <i class="m">?-namespace &lt;namespace&gt;?</i> <i class="m">?-noNamespacedAttributes?</i> <i class="m">-notempty</i> <i class="m">tagName</i> <i class="m">?attributes?</i> <i class="m">?script?</i>
 </pre>
 
 <p>If called inside a fromScript context this command creates a new
@@ -548,16 +567,18 @@ node <i class="m">tagName</i> in the XML namespace <i class="m">namespace</i> if
 <i class="m">-namespace</i> option was given and with the JSON type
 <i class="m">jsonType</i> if the <i class="m">-jsonType</i> option was given and appends
 this node at the end of the child list of the invoking element node.
-The <i class="m">attributes</i> and <i class="m">script</i> arguments will be processed as
-if given to an element creating node command. If called outside a
-fromScript context this command will raise error.
+The other flags will also work as if given at the creation of an
+element creating command; see there. The <i class="m">attributes</i> and
+<i class="m">script</i> arguments will also be processed as if given to an
+element creating node command. If called outside a fromScript context
+this command will raise error.
 </p>
 
 <pre class="syntax">
 <b class="cmd">tdom::fsinsertNode</b> <i class="m">node</i>
 </pre>
 
-<p>If called inside o fromScript context this comannd instead of
+<p>If called inside a fromScript context this command instead of
 creating a new node appends the as argument given node at the end of
 the child list of the invoking element node. The node is unlinked from
 its previous place. If called outside a fromScript context this
@@ -568,6 +589,19 @@ command will raise error.
 </dd>
         
 
+        
+          <dt>
+<b class="cmd">dom</b> <b class="method">fromScriptContext</b> ?<i class="m">objVar</i>?</dt>
+          <dd>If called inside a fromScript context this method
+          returns the node on which the script context appends nodes
+          to the child list. Otherwise it returns error.
+
+          <p>If you create nodeCmds with the -notempty the returned
+          node may have vanished outside the evaluation context if it
+          is still empty at the end of the evaluation.</p>
+</dd>
+        
+        
         
           <dt>
 <b class="cmd">dom</b> <b class="method">setStoreLineColumn</b> <i class="m">?boolean</i>?</dt>
@@ -727,6 +761,17 @@ recommendation. Otherwise it returns 0.</dd>
         
 
         
+          <dt>
+<b class="cmd">dom</b> <b class="method">jsonEscape</b>
+<i class="m">string</i>
+</dt>
+          <dd>Returns the given <i class="m">string</i> argument escaped in a
+          way that if the returned string is used literary in a JSON
+          document it is read by any confirming JSON parser as the
+          original string.</dd>
+        
+        
+        
             <dt>
 <b class="cmd">dom</b> <b class="method">featureinfo</b> <i class="m">feature</i>
 </dt>
@@ -805,12 +850,23 @@ recommendation. Otherwise it returns 0.</dd>
                     <dd>Returns as boolean if the tDOM schema features
                     are build in.</dd>
                 
+                
+                    <dt><b>largedata</b></dt>
+                    <dd>Returns as boolean if the expat library
+                    configuration allows pcdata content of an XML
+                    element. Could be true only if build with Tcl 9
+                    for a 64-bit architecture and then depends if the
+                    build-in expat version is used with default
+                    configuration or if the used system expat library
+                    is capable enough for this (typically not). are
+                    build in.</dd>
+                
             </dl>
             </dd>   
         
     </dl>
 
-<h2><a name="SECTid0x55a5a8a61600">KEYWORDS</a></h2><p class="keywords">
+<h2><a name="SECTid0x561110901750">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-XML">XML</a>, <a class="keyword" href="keyword-index.html#KW-DOM">DOM</a>, <a class="keyword" href="keyword-index.html#KW-document">document</a>, <a class="keyword" href="keyword-index.html#KW-node">node</a>, <a class="keyword" href="keyword-index.html#KW-parsing">parsing</a>
 </p>
 </div><hr class="navsep"><div class="navbar" align="center">

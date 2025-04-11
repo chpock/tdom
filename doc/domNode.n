@@ -322,7 +322,7 @@ the namespace \fIuri\fR.
 isn't given, information about all attributes are returned.
 The return value is a Tcl list, the elements just the
 attribute name in case of non namespaced attributes and three
-element sublists for namespaced attributes. n case of an
+element sublists for namespaced attributes. In case of an
 "ordinary" namespaced attribute, the sublist elements are
 {<localname> <prefix> <namespace_uri>}. In the special case of
 an XML namespace declaration it is {<the prefix defined>
