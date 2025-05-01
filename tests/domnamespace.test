@@ -445,6 +445,18 @@ test domnamespace-4.9 {createNodeCmd and namespace} {
     set result
 } {Normal Heading}
 
+test domnamespace-4.9.1 {createNodeCmd and namespace} {
+    dom createDocumentNS http://schemas.openxmlformats.org/wordprocessingml/2006/main w:styles doc
+    $doc documentElement root
+    $root appendFromScript {
+        nodeCmds::w:style {w:type paragraph w:styleId Normal xml:space preserve} {}
+        nodeCmds::w:style {w:type paragraph w:styleId Heading} {}
+    }
+    set result [$root selectNodes -list {w:style string(@w:styleId)}]
+    $doc delete
+    set result
+} {Normal Heading}
+
 test domnamespace-4.10 {createNodeCmd and namespace} {
     dom createDocumentNS http://schemas.openxmlformats.org/wordprocessingml/2006/main w:styles doc
     $doc documentElement root

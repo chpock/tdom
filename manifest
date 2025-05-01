@@ -1,5 +1,5 @@
-C Re-generated\sdocs.
-D 2025-04-11T00:54:37.118
+C Added\sa\stest.
+D 2025-05-01T23:09:01.633
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -206,7 +206,7 @@ F tests/domDoc.test 095f2df0dda3afb96574c585b292b5ae061d0134ae78bd31a58dedda002a
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test 843287a57fe1a58e327fcf3c8b94892d7553e14b3cb6920c5a7d3a3c93cb94f8
 F tests/domjson.test daed40bb982a77e19cdf161026593bef0c020949938f87213e83fb1e10a64559
-F tests/domnamespace.test 28bc5f9f365ca45e91c05af43c16bd5ea734ee393a81dd090a3e51ebc7cdf8e2
+F tests/domnamespace.test 6fe1a86eed6906a51c2a2751f1d531642f6aedbae42a644a61cd9851a1c3ad1a
 F tests/element.test 4c5f0094543ee9167f86748e2d667347f57eb911
 F tests/entity.test 065c6c1af854db838faf9ad56151342eee478f8501a5f65778a144b106108574
 F tests/html5reader.test 05b49514f3aed62b6b8fe4e55af24ed3a4e3168a2bd3b94e454d3752a8d12d1f
@@ -244,8 +244,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P b33f6d7b8f0c4714c867af9964f0743f9908f4fc09ded6f16c7375920e862d2c
-R 57fb04f8e4bbb3a0548bc6e63b1499bf
+P 38d5a746d7a66e842c1030d30db0a7002ee41bc902494e3ce3560ce030bb5eb0
+R 390f261141b9256a6b66a1eb6f51ec15
 U rolf
-Z 119503177bca642b425846b65294a631
+Z 3ddfcbe3f62231f4f7bccc633d49698e
 # Remove this line to create a well-formed Fossil manifest.
