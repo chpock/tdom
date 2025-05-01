@@ -563,14 +563,16 @@ The syntax of the created command is:
 
 .CE
 .PP
-The command syntax allows three different ways to specify the attributes of
-the resulting element. These could be specified with \fIattributeName
-attributeValue\fR argument pairs, in an "option style" way with
-\&\fI-attriubteName attributeValue\fR argument pairs (the '-' character is only
-syntactical sugar and will be stripped off) or as a Tcl list with elements
-interpreted as attribute name and the corresponding attribute value.
-The attribute name elements in the list may have a leading '-' character, which
-will be stripped off.
+The command syntax allows three different ways to specify the
+attributes of the resulting element. These could be specified with
+\&\fIattributeName attributeValue\fR argument pairs, in an "option
+style" way with \fI-attriubteName attributeValue\fR argument pairs
+(the '-' character is only syntactical sugar and will be stripped off)
+or as a Tcl list with elements interpreted as attribute name and the
+corresponding attribute value. The attribute name elements in the list
+may have a leading '-' character, which will be stripped off. If the
+\&\fIelementNodeCmd\fR is called with only one argument this will be
+interpreted as content script.
 .PP
 If an \fIattributeName\fR is prefixed then by default the prefix
 will be first looked up in the \fIselectNodesNamespaces\fR prefix URI

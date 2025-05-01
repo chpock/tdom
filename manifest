@@ -1,5 +1,5 @@
-C Added\sa\stest.
-D 2025-05-01T23:09:01.633
+C Documented\sthe\sbehaviour\sin\scase\san\selement\screating\snode\scommand\sis\scalled\swith\sonly\sone\sargument.
+D 2025-05-01T23:29:19.673
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -19,9 +19,9 @@ F configure.ac 3419719d2e64e4f38fcf362b98b02da874a4d27e25aa943a53b10a988aad2afe
 F doc/INDEX.MAP 8b9f0c2e18efc29fcf581669e175dec860f54026ef7fef4b8d7403bca442fb71
 F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html b4a8d2a4b261d8380849b9fa2b4026f1e08248aab543551db47a34b60a43c69a
-F doc/dom.html 4a088aa622e5d5ef20fa323efd2ed8dc6aff4078c6d59faddc3febd34102e676
-F doc/dom.n b1b8c12179f807189cfe95208c77a3731e4f840c184cd876e43158c95893b57a
-F doc/dom.xml 2969f7ff2f63ded92d5e2c1df703be0d509b3a7c93c285f0a7b3bf641905e9b4
+F doc/dom.html cee5dccdc0e42057992df5175fbbb672675510b2f4f5150610580dc7a7fd0545
+F doc/dom.n 57411563693fbeb4470a9987a4faec8b30947cf7f24eb17ad764cf4c30da6d0b
+F doc/dom.xml 0005fffba663ef2aabc9a4319ee8ff9e5a241882501dedf244135ae394e0869b
 F doc/domDoc.html 4bfb6ca4d655e8276aa1ec772450e2dc8f4f4a5ff182cbbff95d67579c63a5ec
 F doc/domDoc.n e6a096be1d924465b005718228ccc212c81da2d678ee4abcc5805585c66f0b6f
 F doc/domDoc.xml 0f02b326fae96fa07567195a4276d1b10586445fb1dca27f6a6f34b18160448e
@@ -244,8 +244,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 38d5a746d7a66e842c1030d30db0a7002ee41bc902494e3ce3560ce030bb5eb0
-R 390f261141b9256a6b66a1eb6f51ec15
+P 38c34b979d1e90d87ea1ca53fc1b9f31eafb7b8c47d6c9b3ef8e69c91f27db51
+R e593098f36fc036ba058b315d8b5895d
 U rolf
-Z 3ddfcbe3f62231f4f7bccc633d49698e
+Z 472c71104509af42476489f7f54ae612
 # Remove this line to create a well-formed Fossil manifest.

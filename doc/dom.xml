@@ -470,14 +470,16 @@ scope.</p>
 <cmd>elementNodeCmd</cmd> <m>?name_value_list? ?script?</m>
 </syntax>
 
-<p>The command syntax allows three different ways to specify the attributes of
-the resulting element. These could be specified with <m>attributeName
-attributeValue</m> argument pairs, in an "option style" way with
-<m>-attriubteName attributeValue</m> argument pairs (the '-' character is only
-syntactical sugar and will be stripped off) or as a Tcl list with elements
-interpreted as attribute name and the corresponding attribute value.
-The attribute name elements in the list may have a leading '-' character, which
-will be stripped off.</p>
+<p>The command syntax allows three different ways to specify the
+attributes of the resulting element. These could be specified with
+<m>attributeName attributeValue</m> argument pairs, in an "option
+style" way with <m>-attriubteName attributeValue</m> argument pairs
+(the '-' character is only syntactical sugar and will be stripped off)
+or as a Tcl list with elements interpreted as attribute name and the
+corresponding attribute value. The attribute name elements in the list
+may have a leading '-' character, which will be stripped off. If the
+<m>elementNodeCmd</m> is called with only one argument this will be
+interpreted as content script.</p>
 
 <p>If an <m>attributeName</m> is prefixed then by default the prefix
 will be first looked up in the <m>selectNodesNamespaces</m> prefix URI
