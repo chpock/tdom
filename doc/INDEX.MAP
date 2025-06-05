@@ -17,10 +17,15 @@
     <DEF cat="manpage" name="domNode" manpage="domNode"/>
     <DEF cat="cmd" name="domNode" manpage="domNode"/>
     <KWD name="XML" manpage="domNode"/>
+    <KWD name="XPath" manpage="domNode"/>
     <KWD name="DOM" manpage="domNode"/>
     <KWD name="document" manpage="domNode"/>
     <KWD name="node" manpage="domNode"/>
     <KWD name="parsing" manpage="domNode"/>
+    <MAN id="xpathFunc" title="xpathFunc"/>
+    <DEF cat="manpage" name="xpathFunc" manpage="xpathFunc"/>
+    <DEF cat="misc" name="::dom::xpathFunc" manpage="xpathFunc"/>
+    <KWD name="XPath" manpage="xpathFunc"/>
     <MAN id="expat" title="expat"/>
     <DEF cat="manpage" name="expat" manpage="expat"/>
     <DEF cat="cmd" name="expat" manpage="expat"/>
