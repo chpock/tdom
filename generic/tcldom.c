@@ -77,7 +77,12 @@
 #define XP_FSIBLING      3
 #define XP_PSIBLING      4
 
-#define MAX_REWRITE_ARGS 50
+#ifndef MAX_REWRITE_ARGS
+# define MAX_REWRITE_ARGS 50
+#endif
+#ifndef MAX_XPATH_FUNC_NAME
+# define MAX_XPATH_FUNC_NAME 200
+#endif
 
 #define MAX_XSLT_APPLY_DEPTH 3000
 
@@ -1239,7 +1244,7 @@ int tcldom_xpathFuncCallBack (
 )
 {
     Tcl_Interp  *interp = (Tcl_Interp*) clientData;
-    char         tclxpathFuncName[220], objCmdName[80];
+    char         tclxpathFuncName[MAX_XPATH_FUNC_NAME+20], objCmdName[80];
     char         *errStr, *typeStr;
     Tcl_Obj     *resultPtr, *objv[MAX_REWRITE_ARGS], *type, *value, *nodeObj,
                 *tmpObj, *errObj;
@@ -1253,7 +1258,7 @@ int tcldom_xpathFuncCallBack (
     DBG(fprintf(stderr, "tcldom_xpathFuncCallBack functionName=%s "
                 "position=%d argc=%d\n", functionName, position, argc);)
 
-    if (strlen(functionName) > 200) {
+    if (strlen(functionName) > MAX_XPATH_FUNC_NAME) {
         *errMsg = (char*)MALLOC (80 + strlen (functionName));
         strcpy (*errMsg, "Unreasonable long XPath function name: \"");
         strcat (*errMsg, functionName);
@@ -8455,50 +8460,49 @@ int tcldom_unknownCmd (
         }
 
         method = cmd;
-            paren = strchr(cmd,'(');
-            args = 0;
-            if (paren) {
-                *paren = '\0';
-                paren++;
-                arg[args] = paren;
-                openedParen = 1;
-                while (*paren) {
-                    if (*paren == '\\') {
-                        (void) Tcl_Backslash(paren, &count);
-                        paren += count;
-                    } else if (*paren == ')') {
-                        openedParen--;
-                        if (openedParen==0) {
-                            *paren = '\0';
-                            args++;
-                            break;
-                        }
-                    } else if (*paren == '(') {
-                        openedParen++;
-                        paren++;
-                    } else if (*paren == ',') {
+        paren = strchr(cmd,'(');
+        args = 0;
+        if (paren) {
+            *paren = '\0';
+            paren++;
+            arg[args] = paren;
+            openedParen = 1;
+            while (*paren) {
+                if (*paren == '\\') {
+                    (void) Tcl_Backslash(paren, &count);
+                    paren += count;
+                } else if (*paren == ')') {
+                    openedParen--;
+                    if (openedParen==0) {
                         *paren = '\0';
-                        arg[++args] = paren+1;
-                        if (args >= MAX_REWRITE_ARGS) {
-                            SetResult( "too many args");
-                            return TCL_ERROR;
-                        }
-                        paren++;
-                    } else {
-                        paren++;
+                        args++;
+                        break;
                     }
-                }
-                if (openedParen!=0) {
-                    SetResult( "mismatched (");
-                    return TCL_ERROR;
+                } else if (*paren == '(') {
+                    openedParen++;
+                    paren++;
+                } else if (*paren == ',') {
+                    *paren = '\0';
+                    arg[++args] = paren+1;
+                    if (args >= MAX_REWRITE_ARGS) {
+                        SetResult( "too many args");
+                        return TCL_ERROR;
+                    }
+                    paren++;
+                } else {
+                    paren++;
                 }
             }
-            DBG(fprintf(stderr, "method=-%s- \n", method);
-                fprintf(stderr, "rest=-%s- \n", cmd);
-                for(i=0; i<args; i++) {
-                    fprintf(stderr, "args %d =-%s- \n", i, arg[i]);
-                }
-            )
+            if (openedParen!=0) {
+                SetResult( "mismatched (");
+                return TCL_ERROR;
+            }
+        }
+        DBG(fprintf(stderr, "method=-%s- \n", method);
+            fprintf(stderr, "rest=-%s- \n", cmd);
+            for(i=0; i<args; i++) {
+                fprintf(stderr, "args %d =-%s- \n", i, arg[i]);
+            })
 
         /*----------------------------------------------------------------
         |   final call

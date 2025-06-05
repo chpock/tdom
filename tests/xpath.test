@@ -621,6 +621,31 @@ test xpath-4.26 {tcl coded additional XPath function -invalid number result} {
     catch {$doc selectNodes invalidNumberResult()}
 } 1
 
+proc ::dom::xpathFunc::test427 {ctxNode pos nodeListNode nodeList args} {
+    if {![info exists ::test427]} {
+        set ::test427 $nodeList
+    } else {
+        if {$::test427 ne $nodeList} {
+            error "unexpected differing nodelists in test 4.27"
+        }
+    }
+    return [list bool 1]
+}
+
+test xpath-4.27 {tcl coded additional XPath function -nodeList arg content} {
+    catch {unset ::test427}
+    expr {[$doc1 selectNodes {/doc/e[position() mod 2 = 0][test427()]}] eq $::test427}
+} 1
+
+test xpath-4.27.1 {tcl coded additional XPath function -nodeList arg content} {
+    catch {unset ::test427}
+    set result ""
+    foreach node [$doc1 selectNodes {/doc/e[position() mod 2 = 0][test427()]}] {
+        lappend result [$node selectNodes string()]
+    }
+    set result
+} {2 4}
+
 $doc1 delete
 
 test xpath-5.1 {erroneous XPath expr: missing right brace in predicate} {

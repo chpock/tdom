@@ -703,6 +703,7 @@ be executed. This allows quick method additions on Tcl level.</p>
   
   <keywords>
     <keyword>XML</keyword>
+    <keyword>XPath</keyword>
     <keyword>DOM</keyword>
     <keyword>document</keyword>
     <keyword>node</keyword>

@@ -628,7 +628,9 @@ typedef struct domNS {
 } domNS;
 
 
-#define MAX_PREFIX_LEN   80
+#ifndef MAX_PREFIX_LEN
+# define MAX_PREFIX_LEN   80
+#endif
 
 /*---------------------------------------------------------------------------
 |   type domActiveNS
