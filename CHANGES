@@ -1,4 +1,10 @@
 
+2025-06-05  Rolf Ade  <rolf@pointsman.de>
+
+        Added documentation for the scripted additional XPath
+        functions feature. Thanks to Peter Piwowarski for his valuable
+        input.
+
 2025-04-05  Rolf Ade  <rolf@pointsman.de>
 
         Added the dom command method fromScriptContext.
