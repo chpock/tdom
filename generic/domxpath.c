@@ -4352,6 +4352,7 @@ static int xpathEvalStep (
             return XPATH_OK;
         }
         node = ctxNode;
+        ns = NULL;
         /* The namespace axis is special because it resolves the
          * prefix not in the expression context but in the context
          * node, which may make a difference in case of xslt. */
@@ -4367,6 +4368,7 @@ static int xpathEvalStep (
                 wildcard = 1;
             }
         }
+        if (!ns && !wildcard) return XPATH_OK;
         while (node) {
             attr = node->firstAttr;
             /* fprintf (stderr, "AxisNamespace: step->child->strvalue %s\n", */
