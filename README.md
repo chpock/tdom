@@ -72,7 +72,7 @@ as [zip archive](http://tdom.org/downloads/tdom-0.9.6-src.zip).
 Windows binaries of the 0.9.6 release are also available. Get it for
 [64 bit](http://tdom.org/downloads/tdom-0.9.6-windows-64.zip) or
 [32_bit](http://tdom.org/downloads/tdom-0.9.6-windows-32.zip). The zip
-archives include binaries for tDOM and the tDOM extension tcl for Tcl
+archives include binaries for tDOM and the tDOM extension tnc for Tcl
 8.6 and Tcl 9.
 
 The provided windows binaries include (statically linked) the
