@@ -1405,7 +1405,6 @@ matchingAny (
                 }
             }
         }
-        return 1;
     } else {
         if (candidate->namespace || candidate->typedata) {
             /* The any wildcard is limited to one or several
@@ -1428,8 +1427,11 @@ matchingAny (
                 }
             }
         }
-        return 1;
     }
+    if (candidate->flags & LAX) {
+        return 0;
+    }
+    return 1;
 }
 
 static int
@@ -5986,21 +5988,22 @@ AnyPatternObjCmd (
     SchemaCP *pattern;
     SchemaQuant quant;
     char *ns = NULL, *ns1;
-    int n, m, hnew, revert, optionIndex;
+    int n, m, hnew, revert, lax, optionIndex;
     domLength nrns, i;
     Tcl_Obj *nsObj;
     Tcl_HashTable *t = NULL;
 
     static const char *anyOptions[] = {
-        "-not", "--", NULL
+        "-lax", "-not", "--", NULL
     };
     enum anyOption {
-        o_not, o_Last
+        o_lax, o_not, o_Last
     };
     
     CHECK_SI
     CHECK_TOPLEVEL
     revert = 0;
+    lax = 0;
     while (objc > 1) {
         if (Tcl_GetIndexFromObj(interp, objv[1], anyOptions, "option", 0,
                                 &optionIndex) != TCL_OK) {
@@ -6009,6 +6012,9 @@ AnyPatternObjCmd (
         switch ((enum anyOption) optionIndex) {
         case o_not:
             revert = 1;
+            objv++;  objc--; continue;
+        case o_lax:
+            lax = 1;
             objv++;  objc--; continue;
         case o_Last:
             objv++;  objc--; break;
@@ -6063,6 +6069,7 @@ createpattern:
     pattern = initSchemaCP (SCHEMA_CTYPE_ANY, ns, NULL);
     if (t) pattern->typedata = (void*)t;
     if (revert) pattern->flags |= ANY_NOT;
+    if (lax) pattern->flags |= LAX;
     REMEMBER_PATTERN (pattern)
     addToContent(sdata, pattern, quant, n, m);
     return TCL_OK;
