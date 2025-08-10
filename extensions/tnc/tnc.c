@@ -2174,7 +2174,7 @@ void
 TncCharacterdataCommand (
     void       *userData,
     const char *data,
-    int         len
+    domLength   len
 )
 {
     TNC_Data *tncdata = (TNC_Data *) userData;
@@ -2969,12 +2969,19 @@ TclTncObjCmd(dummy, interp, objc, objv)
 #  define TCL_STORAGE_CLASS DLLEXPORT
 #endif
 
+#if TCL_MAJOR_VERSION == 8
+# define STUB_VERSION "8.5"
+#else
+# define STUB_VERSION "9.0"
+#endif
+
+
 EXTERN int
 Tnc_Init (interp)
     Tcl_Interp *interp;
 {
 #ifdef USE_TCL_STUBS
-    if (Tcl_InitStubs(interp, "8", 0) == NULL) {
+    if (Tcl_InitStubs(interp, STUB_VERSION, 0) == NULL) {
         return TCL_ERROR;
     }
 #endif

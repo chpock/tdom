@@ -68,7 +68,7 @@
 
 
 typedef int (*xsltMsgCB) (void *clientData, char *str, 
-                          int length, int terminate);
+                          domLength length, int terminate);
 
 /*----------------------------------------------------------------------------
 |   Prototypes

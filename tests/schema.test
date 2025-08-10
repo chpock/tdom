@@ -28,15 +28,22 @@
 #    schema-25.*: domxpathboolean
 #    schema-26.*: info domNode
 #    schema-27.*: Text constraint commands available outsite schema context
+#    schema-28,*: tdom and interp
+#    schema-29.*: text constrain jsontype
 #
-# Copyright (c) 2018-2020 Rolf Ade.
+# Copyright (c) 2018-2022 Rolf Ade.
 
 source [file join [file dir [info script]] loadtdom.tcl]
 
 if {[dom featureinfo schema]} {
 
-testConstraint 8.5 [package vsatisfies [package present Tcl] 8.5-]
-testConstraint listformat [package vsatisfies [package present Tcl] 8.5-]
+if {[join [lrange [split [package present Tcl] .] 0 1] .] <= 8.4} {
+    testConstraint 8.5 false
+    testConstraint listformat false
+} else {
+    testConstraint 8.5 true
+    testConstraint listformat true
+}
 
 proc dummycallback {args} {}
 
@@ -3253,6 +3260,202 @@ test schema-10.6 {any} {
     set result
 } {1}
 
+test schema-10.7 {any} {
+    set xmls {
+        {<doc><a/><something/><b/></doc>}
+        {<doc><a/><b/><b/></doc>}
+        {<doc><a/><b/></doc>}
+        {<doc><a/><a><b>text</b><c><c><c/></c></c></a><b/></doc>}
+        {<doc xmlns:ns="http://foo.bar"><a/><ns:b>some</ns:b><b/></doc>}
+        {<doc xmlns:ns="http://foo.bar" xmlns:ns1="http://foo.grill"><a/><ns1:a/><b/></doc>}
+    }
+    set result [list]
+    foreach schema {
+        {
+            defelement doc {
+                element a
+                any
+                element b
+            }
+        }
+        {
+            defelement doc {
+                element a
+                any {""}
+                element b
+            }
+        }
+        {
+            defelement doc {
+                element a
+                any {"" http://foo.grill}
+                element b
+            }
+        }
+        {
+            defelement doc {
+                element a
+                any {http://foo.grill http://foo.bar}
+                element b
+            }
+        }
+        {
+            prefixns {bar http://foo.bar grill http://foo.grill}
+            defelement doc {
+                element a
+                any {bar grill}
+                element b
+            }
+        }
+    } {
+        tdom::schema create s
+        s define $schema
+        foreach xml $xmls {
+            lappend result [s validate $xml]
+        }
+        s delete
+    }
+    set result
+} {1 1 0 1 1 1 1 1 0 1 0 0 1 1 0 1 0 1 0 0 0 0 1 1 0 0 0 0 1 1}
+
+test schema-10.8 {any -not} {
+    set xmls {
+        {<doc><a/><something/><b/></doc>}
+        {<doc><a/><b/><b/></doc>}
+        {<doc><a/><b/></doc>}
+        {<doc><a/><a><b>text</b><c><c><c/></c></c></a><b/></doc>}
+        {<doc xmlns:ns="http://foo.bar"><a/><ns:b>some</ns:b><b/></doc>}
+        {<doc xmlns:ns="http://foo.bar" xmlns:ns1="http://foo.grill"><a/><ns1:a/><b/></doc>}
+    }
+    set result [list]
+    foreach schema {
+        {
+            defelement doc {
+                element a
+                any -not {}
+                element b
+            }
+        }
+        {
+            defelement doc {
+                element a
+                any -not {""}
+                element b
+            }
+        }
+        {
+            defelement doc {
+                element a
+                any -not {"" http://foo.grill}
+                element b
+            }
+        }
+        {
+            defelement doc {
+                element a
+                any -not {http://foo.grill http://foo.bar}
+                element b
+            }
+        }
+        {
+            prefixns {bar http://foo.bar grill http://foo.grill}
+            defelement doc {
+                element a
+                any -not {bar grill}
+                element b
+            }
+        }
+    } {
+        tdom::schema create s
+        s define $schema
+        foreach xml $xmls {
+            lappend result [s validate $xml]
+        }
+        s delete
+    }
+    set result
+} {1 1 0 1 1 1 0 0 0 0 1 1 0 0 0 0 1 0 1 1 0 1 0 0 1 1 0 1 0 0}
+
+test schema-10.9 {any --} {
+    set xmls {
+        {<doc><a/><something/><b/></doc>}
+        {<doc xmlns:ns="-not"><a/><ns:b>some</ns:b><b/></doc>}
+        {<doc xmlns:ns="http://foo.bar"><a/><ns:b>some</ns:b><b/></doc>}
+    }
+    tdom::schema create s
+    s define {
+        defelement doc {
+            element a
+            any -- -not
+            element b
+        }
+    }
+    set result ""
+    foreach xml $xmls {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 1 0}        
+
+test schema-10.10 {any} {
+    set xmls {
+        {<doc><a/><something/><b/></doc>}
+        {<doc xmlns:ns="--"><a/><ns:b/><b/></doc>}
+        {<doc><a/><b/></doc>}
+        {<doc><a/><a><b>text</b><c><c><c/></c></c></a><b/></doc>}
+        {<doc xmlns:ns="http://foo.bar"><a/><ns:b>some</ns:b><b/></doc>}
+        {<doc xmlns:ns="http://foo.bar" xmlns:ns1="http://foo.grill"><a/><ns1:a/><b/></doc>}
+    }
+    set result [list]
+    foreach schema {
+        {
+            defelement doc {
+                element a
+                any --
+                element b
+            }
+        }
+        {
+            defelement doc {
+                element a
+                any -- {""}
+                element b
+            }
+        }
+        {
+            defelement doc {
+                element a
+                any -- {"" http://foo.grill}
+                element b
+            }
+        }
+        {
+            defelement doc {
+                element a
+                any -- {http://foo.grill http://foo.bar}
+                element b
+            }
+        }
+        {
+            prefixns {bar http://foo.bar grill http://foo.grill}
+            defelement doc {
+                element a
+                any -- {bar grill}
+                element b
+            }
+        }
+    } {
+        tdom::schema create s
+        s define $schema
+        foreach xml $xmls {
+            lappend result [s validate $xml]
+        }
+        s delete
+    }
+    set result
+} {1 1 0 1 1 1 1 0 0 1 0 0 1 0 0 1 0 1 0 0 0 0 1 1 0 0 0 0 1 1}
+
 test schema-11.1 {attribute} {
     tdom::schema create s
     s define {
@@ -3888,7 +4091,7 @@ test schema-12.2 {domvalidate} {
     $doc delete
     s delete
     set result
-} {0 {Element "some" doesn't match}}
+} {0 {/addressBook/card[2]/some: Element "some" doesn't match}}
 
 test schema-12.3 {domvalidate w/ attribute} {
     tdom::schema s
@@ -6508,10 +6711,6 @@ test schema-14.62 {Empty element} {
 test schema-14.63 {type} {
     tdom::schema s
     s define {
-        deftexttype len2-4 {
-            minLength 2
-            maxLength 4
-        }
         defelement doc {
             element e + {
                 text {
@@ -6519,6 +6718,10 @@ test schema-14.63 {type} {
                     integer
                 }
             }
+        }
+        deftexttype len2-4 {
+            minLength 2
+            maxLength 4
         }
     }
     set result [list]
@@ -8056,6 +8259,50 @@ test schema-17.12a {info expected} {8.5} {
     s delete
     set result
 } {{<any> {}} {<any> http://foo.bar} {<elementend> {}} b}
+
+test schema-17.12b {info expected} {8.5} {
+    tdom::schema s
+    s define {
+        prefixns {ns1 http://foo.bar}
+        defelement doc {
+            element a
+            any {""}
+            any ns1 ?
+            element b ?
+        }
+    }
+    s event start doc
+    s event start a
+    s event end
+    set result [lsort [s info expected]]
+    s event start something
+    s event end
+    lappend result {*}[lsort [s info expected]]
+    s delete
+    set result
+} {{<any> {{}}} {<any> http://foo.bar} {<elementend> {}} b}
+
+test schema-17.12b {info expected} {8.5} {
+    tdom::schema s
+    s define {
+        prefixns {ns1 http://foo.bar}
+        defelement doc {
+            element a
+            any {"" ns1}
+            any ns1 ?
+            element b ?
+        }
+    }
+    s event start doc
+    s event start a
+    s event end
+    set result [lsort [s info expected]]
+    s event start something
+    s event end
+    lappend result {*}[lsort [s info expected]]
+    s delete
+    set result
+} {{<any> {{} http://foo.bar}} {<any> http://foo.bar} {<elementend> {}} b}
 
 proc schema-17.13 {scmd args} {
     global fromReportCmd
@@ -10694,5 +10941,227 @@ test schema-27.9 {duration outside schema context} {
     }
     set result
 } {0 0 0 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0}
+
+test schema-28.1 {schema use in child interp while in schema context} {
+    tdom::schema s
+    set result [catch {s defelement doc {
+        interp create childinterp
+        load {} Tdom childinterp
+        childinterp eval {
+            ::tdom::schema::element fromchild
+        }
+        element this
+    }}]
+    if {$result} {
+        s defelement doc {
+            element this
+        }
+    }
+    set result [s validate {
+        <doc><fromchild/><this/></doc>
+    }]
+    s delete
+    interp delete childinterp    
+    set result
+} 0
+
+test schema-28.2 {called outside schema context} {
+    catch {::tdom::schema::element elm}
+} 1
+
+test schema-28.3 {schema use in child interp while in schema context} {
+    tdom::schema s
+    s defelement doc {
+        interp create childinterp
+        load {} Tdom childinterp
+        childinterp eval {
+            tdom::schema s
+            s defelement doc {
+                element child
+                element this
+            }
+        }        
+        element this
+    }
+    set result ""
+    foreach xml {
+        <doc><child/><this/></doc>
+        <doc><this/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    lappend result {*}[childinterp eval {
+        set result ""
+        foreach xml {
+            <doc><child/><this/></doc>
+            <doc><this/></doc>
+        } {
+            lappend result [s validate $xml]
+        }
+        set result
+        return {1 0}
+    }]
+    s delete
+    interp delete childinterp
+    set result
+} {0 1 1 0}
+
+test schema-29.1 {text constraint jsontype} {
+    tdom::schema s
+    s defelement JSON {
+        element astring {text {jsontype STRING}}
+        element anumber {text {jsontype NUMBER}}
+        element atrue {text {jsontype TRUE}}
+        element afalse {text {jsontype FALSE}}
+        element anull {text {jsontype NULL}}
+    }
+    set result ""
+    foreach json {
+        {{
+            "astring": "0.123",
+            "anumber": 0.123,
+            "atrue": true,
+            "afalse": false,
+            "anull": null
+        }}
+        {{
+            "astring": "0.123",
+            "anumber": "0.123",
+            "atrue": true,
+            "afalse": false,
+            "anull": null
+        }}
+    } {        
+        set jdoc [dom parse -json -jsonroot JSON $json]
+        lappend result [s domvalidate [$jdoc documentElement]]
+        $jdoc delete
+    }
+    s delete
+    set result
+} {1 0}
+
+test schema-29.2 {text constraint jsontype} {
+    tdom::schema s
+    s define {
+        defelement JSON {
+            element astring {text type jsonString}
+            element anumber {text type jsonNumber}
+        }
+        deftexttype jsonString {jsontype STRING}
+        deftexttype jsonNumber {jsontype NUMBER}
+    }
+    set result ""
+    foreach json {
+        {{
+            "astring": "0.123",
+            "anumber": 0.123
+        }}
+        {{
+            "astring": "0.123",
+            "anumber": "0.123"
+        }}
+    } {        
+        set jdoc [dom parse -json -jsonroot JSON $json]
+        lappend result [s domvalidate [$jdoc documentElement]]
+        $jdoc delete
+    }
+    s delete
+    set result
+} {1 0}
+
+test schema-29.3 {structure constraint jsontype} {
+    tdom::schema s
+    s define {
+        defelement JSON {
+            element aarray {
+                jsontype ARRAY
+                text {jsontype STRING}
+                text {jsontype NUMBER}
+            }
+            element aobject {
+                jsontype OBJECT
+                interleave {
+                    element astring {text type jsonString}
+                    element anumber {text type jsonNumber}
+                }
+            }
+        }
+        deftexttype jsonString {jsontype STRING}
+        deftexttype jsonNumber {jsontype NUMBER}
+    }
+    set result ""
+    foreach json {
+        {{
+            "aarray": ["some text", -23.45],
+            "aobject": {
+                "anumber": 3,
+                "astring": "foo bar"
+            }
+        }}
+        {{
+            "aarray": {"some key": -23.45},
+            "aobject": {
+                "anumber": 3,
+                "astring": "foo bar"
+            }
+        }}
+    } {
+        set jdoc [dom parse -json -jsonroot JSON $json]
+        lappend result [s domvalidate [$jdoc documentElement] errMsg]
+        $jdoc delete
+    }
+    s delete
+    set result
+} {1 0}
+
+test schema-29.4 {structure constraint jsontype} {
+    tdom::schema s
+    s define {
+        defelement JSON {
+            element aobject {jsontype ARRAY}
+        }
+    }
+    set result ""
+    foreach json {
+        {{
+            "aobject": {}
+        }}
+        {{
+            "aobject": []
+        }}
+    } {
+        set jdoc [dom parse -json -jsonroot JSON $json]
+        lappend result [s domvalidate [$jdoc documentElement]]
+        $jdoc delete
+    }
+    s delete
+    set result
+} {0 1}
+
+test schema-29.5 {structure constraint jsontype} {
+    tdom::schema s
+    s define {
+        defelement JSON {
+            element aobject type jsonarry
+            jsontype OBJECT
+        }
+        defelementtype jsonarry {jsontype ARRAY}
+    }
+    set result ""
+    foreach json {
+        {{
+            "aobject": {}
+        }}
+        {{
+            "aobject": []
+        }}
+    } {
+        set jdoc [dom parse -json -jsonroot JSON $json]
+        lappend result [s domvalidate [$jdoc documentElement]]
+        $jdoc delete
+    }
+    s delete
+    set result
+} {0 1}
 
 }

@@ -35,10 +35,12 @@
 
 #include <tcl.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 #include <ctype.h>
 #include <expat.h>
 #include <domalloc.h>
+#include <limits.h>
 
 /*
  * tDOM provides it's own memory allocator which is optimized for
@@ -93,15 +95,82 @@
 # define Tcl_GetErrorLine(interp) (interp)->errorLine
 #endif
 
-/*
- * Starting with Tcl 8.2 the Tcl_Panic() is defined properly
- * over the stubs table.
- * Also, we have a proper Tcl_GetString() shortcut afterwards.
- */
-#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION < 2)
-# define Tcl_Panic panic
-# define Tcl_GetString(a) Tcl_GetStringFromObj((a), NULL)
+/* Beginning with Tcl 9.0 the string representation of a Tcl_Obj may
+ * be bigger thant 2 GByte. Therefore some API functions differ. */
+#if TCL_MAJOR_VERSION > 8
+#  ifdef _WIN32
+#    define TCL_THREADS 1
+#  endif
+#  define domLength Tcl_Size
+#  define Tcl_SetDomLengthObj Tcl_SetWideIntObj
+#  define domLengthConversion "%" TCL_SIZE_MODIFIER "d"
+#else
+#  define domLength int
+#  define Tcl_SetDomLengthObj Tcl_SetIntObj
+#  define domLengthConversion "%d"
+#  define TCL_SIZE_MODIFIER ""
+#  define Tcl_GetSizeIntFromObj Tcl_GetIntFromObj
 #endif
+
+#ifndef TDOM_LS_MODIFIER
+#  ifdef XML_LARGE_SIZE
+#    ifdef _WIN32
+#      define TDOM_LS_MODIFIER "I64"
+#    else
+#      define TDOM_LS_MODIFIER "ll"
+#    endif
+#  else
+#    define TDOM_LS_MODIFIER "l"
+#  endif
+#endif
+
+#ifndef TDOM_INLINE
+#ifdef _MSC_VER
+# define TDOM_INLINE __inline
+#else
+# define TDOM_INLINE inline
+#endif
+#endif
+
+/* Since the len argument of XML_Parse() is of type int, parsing of
+ * strings has to be done in chunks anyway for Tcl 9 with its strings
+ * potentially longer than 2 GByte. Because of internal changes in
+ * exapt a chunk size of INT_MAX led to out of memory errors.
+ * (TDOM_PCS = TDOM_PARSE_CHUNK_SIZE) */
+
+#ifndef TDOM_PCS
+# define TDOM_PCS INT_MAX / 2
+#endif
+
+/* The following is the machinery to have an UNUSED macro which
+ * signals that a function parameter is known to be not used. This
+ * works for some open source compiler. */
+
+/*
+ * Define __GNUC_PREREQ for determine available features of gcc and clang
+ */
+#undef  __GNUC_PREREQ
+#if defined __GNUC__ && defined __GNUC_MINOR__
+# define __GNUC_PREREQ(maj, min) \
+	((__GNUC__ << 16) + __GNUC_MINOR__ >= ((maj) << 16) + (min))
+#else
+# define __GNUC_PREREQ(maj, min) (0)
+#endif
+
+/*
+ * UNUSED uses the gcc __attribute__ unused and mangles the name, so the
+ * attribute could not be used, if declared as unused.
+ */
+#ifdef UNUSED
+#elif __GNUC_PREREQ(2, 7)
+# define UNUSED(x) UNUSED_ ## x __attribute__((unused))
+#elif defined(__LCLINT__)
+# define UNUSED(x) /*@unused@*/ (x)
+#else
+# define UNUSED(x) (x)
+#endif
+
+/* UNUSED stuff end */
 
 #define domPanic(msg) Tcl_Panic((msg));
 
@@ -125,7 +194,7 @@
 # define TDomThreaded(x)    x
 # define HASHTAB(doc,tab)   (doc)->tab
 # define NODE_NO(doc)       ((doc)->nodeCounter)++
-# define DOC_NO(doc)        (unsigned long)(doc)
+# define DOC_NO(doc)         (uintptr_t)(doc)
 #endif /* TCL_THREADS */
 
 #define DOC_CMD(s,doc)      sprintf((s), "domDoc%p", (void *)(doc))
@@ -156,7 +225,7 @@ We need 8 bits to index into pages, 3 bits to add to that index and
     (namingBitmap[((pages)[(((byte)[0]) >> 2) & 7] << 3) \
                       + ((((byte)[0]) & 3) << 1) \
                       + ((((byte)[1]) >> 5) & 1)] \
-         & (1 << (((byte)[1]) & 0x1F)))
+         & (1u << (((byte)[1]) & 0x1F)))
 
 /* A 3 byte UTF-8 representation splits the characters 16 bits
 between the bottom 4, 6 and 6 bits of the bytes.
@@ -168,7 +237,7 @@ We need 8 bits to index into pages, 3 bits to add to that index and
                        << 3) \
                       + ((((byte)[1]) & 3) << 1) \
                       + ((((byte)[2]) >> 5) & 1)] \
-         & (1 << (((byte)[2]) & 0x1F)))
+         & (1u << (((byte)[2]) & 0x1F)))
 
 #define UTF8_GET_NAMING_NMTOKEN(p, n) \
   ((n) == 1 \
@@ -337,12 +406,13 @@ static const unsigned char CharBit[] = {
 #define isNCNameChar(x)  UTF8_GET_NAMING_NCNMTOKEN((x),UTF8_CHAR_LEN(*(x)))
 
 #define IS_XML_WHITESPACE(c)  ((c)==' ' || (c)=='\n' || (c)=='\r' || (c)=='\t')
+#define SPACE(c) IS_XML_WHITESPACE ((c))
 
 /*--------------------------------------------------------------------------
 |   DOMString
 |
 \-------------------------------------------------------------------------*/
-typedef char* domString;   /* should 16-bit unicode character !!*/
+typedef char* domString;   
 
 
 /*--------------------------------------------------------------------------
@@ -387,6 +457,21 @@ typedef enum {
 
 #endif
 
+/* The following defines used for NodeObjCmd */
+#define PARSER_NODE 9999 /* Hack so that we can invoke XML parser */
+/* More hacked domNodeTypes - used to signal, that we want to check
+   name/data of the node to create. */
+#define ELEMENT_NODE_ANAME_CHK 10000
+#define ELEMENT_NODE_AVALUE_CHK 10001
+#define ELEMENT_NODE_CHK 10002
+#define TEXT_NODE_CHK 10003
+#define COMMENT_NODE_CHK 10004
+#define CDATA_SECTION_NODE_CHK 10005
+#define PROCESSING_INSTRUCTION_NODE_NAME_CHK 10006
+#define PROCESSING_INSTRUCTION_NODE_VALUE_CHK 10007
+#define PROCESSING_INSTRUCTION_NODE_CHK 10008
+
+
 /*--------------------------------------------------------------------------
 |   flags   -  indicating some internal features about nodes
 |
@@ -406,12 +491,14 @@ typedef unsigned int domAttrFlags;
 
 typedef unsigned int domDocFlags;
 
-#define OUTPUT_DEFAULT_INDENT     1
-#define NEEDS_RENUMBERING         2
-#define DONT_FREE                 4
-#define IGNORE_XMLNS              8
-#define DOCUMENT_CMD             16
-#define VAR_TRACE                32
+#define OUTPUT_DEFAULT_INDENT      1
+#define NEEDS_RENUMBERING          2
+#define DONT_FREE                  4
+#define IGNORE_XMLNS               8
+#define DOCUMENT_CMD              16
+#define VAR_TRACE                 32
+#define INSIDE_FROM_SCRIPT        64
+#define DELETE_AFTER_FROM_SCRIPT 128
 
 /*--------------------------------------------------------------------------
 |   an index to the namespace records
@@ -474,7 +561,7 @@ typedef struct domDocument {
     domNodeType       nodeType  : 8;
     domDocFlags       nodeFlags : 8;
     domNameSpaceIndex dummy     : 16;
-    unsigned long     documentNumber;
+    uintptr_t         documentNumber;
     struct domNode   *documentElement;
     struct domNode   *fragments;
 #ifdef TCL_THREADS
@@ -541,7 +628,9 @@ typedef struct domNS {
 } domNS;
 
 
-#define MAX_PREFIX_LEN   80
+#ifndef MAX_PREFIX_LEN
+# define MAX_PREFIX_LEN   80
+#endif
 
 /*---------------------------------------------------------------------------
 |   type domActiveNS
@@ -561,10 +650,18 @@ typedef struct _domActiveNS {
 \-------------------------------------------------------------------------*/
 typedef struct domLineColumn {
 
-    long  line;
-    long  column;
+    XML_Size  line;
+    XML_Size  column;
+    XML_Index  byteIndex;
 
 } domLineColumn;
+
+typedef struct {
+    int  errorCode;
+    XML_Size errorLine;
+    XML_Size errorColumn;
+    XML_Index byteIndex;
+} domParseForestErrorData;
 
 
 /*--------------------------------------------------------------------------
@@ -633,7 +730,7 @@ typedef struct domTextNode {
     struct domNode     *nextSibling;
 
     domString           nodeValue;   /* now the text node specific fields */
-    int                 valueLength;
+    domLength           valueLength;
 
 } domTextNode;
 
@@ -660,12 +757,12 @@ typedef struct domProcessingInstructionNode {
     struct domNode     *nextSibling;
 
     domString           targetValue;   /* now the pi specific fields */
-    int                 targetLength;
+    domLength           targetLength;
 #ifndef TDOM_LESS_NS
     domNameSpaceIndex   namespace;
 #endif
     domString           dataValue;
-    int                 dataLength;
+    domLength           dataLength;
 
 } domProcessingInstructionNode;
 
@@ -688,7 +785,7 @@ typedef struct domAttrNode {
 #endif
     domString           nodeName;
     domString           nodeValue;
-    int                 valueLength;
+    domLength           valueLength;
     struct domNode     *parentNode;
     struct domAttrNode *nextSibling;
 
@@ -718,7 +815,7 @@ void           domSetDocumentElement (domDocument *doc);
 
 domDocument *  domReadDocument   (XML_Parser parser,
                                   char *xml,
-                                  int   length,
+                                  domLength  length,
                                   int   ignoreWhiteSpaces,
                                   int   keepCDATA,
                                   int   storeLineColumn,
@@ -729,11 +826,13 @@ domDocument *  domReadDocument   (XML_Parser parser,
                                   const char *baseurl,
                                   Tcl_Obj *extResolver,
                                   int   useForeignDTD,
+                                  int   forest,
                                   int   paramEntityParsing,
 #ifndef TDOM_NO_SCHEMA
                                   SchemaData *sdata,
 #endif
                                   Tcl_Interp *interp,
+                                  domParseForestErrorData *forestError,
                                   int  *status);
 
 void           domFreeDocument   (domDocument *doc, 
@@ -747,7 +846,7 @@ void           domFreeNode       (domNode *node,
 
 domTextNode *  domNewTextNode    (domDocument *doc,
                                   const char  *value,
-                                  int          length,
+                                  domLength    length,
                                   domNodeType  nodeType);
 
 domNode *      domNewElementNode (domDocument *doc,
@@ -760,9 +859,9 @@ domNode *      domNewElementNodeNS (domDocument *doc,
 domProcessingInstructionNode * domNewProcessingInstructionNode (
                                   domDocument *doc,
                                   const char  *targetValue,
-                                  int          targetLength,
+                                  domLength    targetLength,
                                   const char  *dataValue,
-                                  int          dataLength);
+                                  domLength    dataLength);
 
 domAttrNode *  domSetAttribute (domNode *node, const char *attributeName,
                                                const char *attributeValue);
@@ -784,10 +883,10 @@ domException   domAppendChild  (domNode *node, domNode *childToAppend);
 domException   domInsertBefore (domNode *node, domNode *childToInsert, domNode *refChild);
 domException   domReplaceChild (domNode *node, domNode *newChild, domNode *oldChild);
 domException   domSetNodeValue (domNode *node, const char *nodeValue,
-                                int valueLen);
+                                domLength valueLen);
 domNode *      domCloneNode (domNode *node, int deep);
 
-domTextNode *  domAppendNewTextNode (domNode *parent, char *value, int length, domNodeType nodeType, int disableOutputEscaping);
+domTextNode *  domAppendNewTextNode (domNode *parent, char *value, domLength length, domNodeType nodeType, int disableOutputEscaping);
 domNode *      domAppendNewElementNode (domNode *parent, const char *tagName,
                                         const char *uri);
 domNode *      domAppendLiteralNode (domNode *parent, domNode *node);
@@ -805,29 +904,30 @@ int            domIsNamespaceInScope (domActiveNS *NSstack, int NSstackPos,
 const char *   domLookupPrefixWithMappings (domNode *node, const char *prefix,
                                             char **prefixMappings);
 domNS *        domLookupURI     (domNode *node, char *uri);
-domNS *        domGetNamespaceByIndex (domDocument *doc, int nsIndex);
+domNS *        domGetNamespaceByIndex (domDocument *doc, unsigned int nsIndex);
 domNS *        domNewNamespace (domDocument *doc, const char *prefix,
                                 const char *namespaceURI);
-int            domGetLineColumn (domNode *node, long *line, long *column);
+int            domGetLineColumn (domNode *node, XML_Size *line,
+                                 XML_Size *column, XML_Index *byteIndex);
 
 int            domXPointerChild (domNode * node, int all, int instance, domNodeType type,
                                  char *element, char *attrName, char *attrValue,
-                                 int attrLen, domAddCallback addCallback,
+                                 domLength attrLen, domAddCallback addCallback,
                                  void * clientData);
 
 int            domXPointerDescendant (domNode * node, int all, int instance,
                                       int * i, domNodeType type, char *element,
-                                      char *attrName, char *attrValue, int attrLen,
+                                      char *attrName, char *attrValue, domLength attrLen,
                                       domAddCallback addCallback, void * clientData);
 
 int            domXPointerAncestor (domNode * node, int all, int instance,
                                     int * i, domNodeType type, char *element,
-                                    char *attrName, char *attrValue, int attrLen,
+                                    char *attrName, char *attrValue, domLength attrLen,
                                     domAddCallback addCallback, void * clientData);
 
 int            domXPointerXSibling (domNode * node, int forward_mode, int all, int instance,
                                     domNodeType type, char *element, char *attrName,
-                                    char *attrValue, int attrLen,
+                                    char *attrValue, domLength attrLen,
                                     domAddCallback addCallback, void * clientData);
 
 const char *   findBaseURI (domNode *node);
@@ -838,11 +938,13 @@ int            domIsPINAME (const char *name);
 int            domIsQNAME (const char *name);
 int            domIsNCNAME (const char *name);
 int            domIsChar (const char *str);
-char *         domClearString (char *str, int *haveToFree);
+void           domClearString (char *str, char *replacement, domLength repllen,
+                               Tcl_DString *clearedstr, int *changed);
 int            domIsBMPChar (const char *str);
 int            domIsComment (const char *str);
 int            domIsCDATA (const char *str);
 int            domIsPIValue (const char *str);
+int            domIsHTML5CustomName (const char *str);
 void           domCopyTo (domNode *node, domNode *parent, int copyNS);
 void           domCopyNS (domNode *from, domNode *to);
 domAttrNode *  domCreateXMLNamespaceNode (domNode *parent);
@@ -850,7 +952,7 @@ void           domRenumberTree (domNode *node);
 int            domPrecedes (domNode *node, domNode *other);
 void           domNormalize (domNode *node, int forXPath, 
                              domFreeCallback freeCB, void *clientData);
-domException   domAppendData (domTextNode *node, char *value, int length, 
+domException   domAppendData (domTextNode *node, char *value, domLength length, 
                               int disableOutputEscaping);
 
 #ifdef TCL_THREADS

@@ -64,6 +64,12 @@
 #   define IS_INF(v) 0
 #endif
 
+#if TCL_MAJOR_VERSION > 8
+# define dom_minl domLength
+#else
+# define dom_minl long
+#endif
+
 /*----------------------------------------------------------------------------
 |   Types for abstract syntax trees
 |
@@ -94,7 +100,7 @@ typedef struct astElem {
     struct astElem *child;
     struct astElem *next;
     char           *strvalue;
-    long            intvalue;
+    dom_minl        intvalue;
     double          realvalue;
 } astElem;
 
@@ -106,21 +112,21 @@ typedef astElem *ast;
 |
 \---------------------------------------------------------------------------*/
 typedef enum { 
-    EmptyResult, BoolResult, IntResult, RealResult, StringResult, 
-    xNodeSetResult, NaNResult, InfResult, NInfResult
+    UnknownResult = 0, EmptyResult, BoolResult, IntResult, RealResult, StringResult, 
+    xNodeSetResult, NaNResult, InfResult, NInfResult, NodesResult,
+    AttrnodesResult, MixedResult
 } xpathResultType;
-
 
 typedef struct xpathResultSet {
 
     xpathResultType type;
     char           *string;
-    int             string_len;
-    long            intvalue;
+    domLength       string_len;
+    dom_minl        intvalue;
     double          realvalue;          
     domNode       **nodes;
-    int             nr_nodes;
-    int             allocated;
+    domLength       nr_nodes;
+    domLength       allocated;
 
 } xpathResultSet;
 
@@ -128,7 +134,7 @@ typedef xpathResultSet *xpathResultSets;
 
 typedef int (*xpathFuncCallback) 
                 (void *clientData, char *functionName, 
-                 domNode *ctxNode, int position, xpathResultSet *nodeList,
+                 domNode *ctxNode, domLength position, xpathResultSet *nodeList,
                  domNode *exprContext, int argc, xpathResultSets *args,
                  xpathResultSet *result, char  **errMsg);
                               
@@ -146,7 +152,7 @@ typedef struct xpathCBs {               /* all xpath callbacks + clientData */
 } xpathCBs;
 
 typedef char * (*xpathParseVarCallback)
-    (void *clientData, char *strToParse, int *offset, char **errMsg);
+    (void *clientData, char *strToParse, domLength *offset, char **errMsg);
 
 typedef struct xpathParseVarCB {
     xpathParseVarCallback parseVarCB;
@@ -179,8 +185,8 @@ int    xpathMatches (ast steps, domNode * exprContext, domNode *nodeToMatch,
                     );
                      
 int xpathEvalSteps (ast steps, xpathResultSet *nodeList,
-                    domNode *currentNode, domNode *exprContext, int currentPos,
-                    int *docOrder,
+                    domNode *currentNode, domNode *exprContext,
+                    domLength currentPos,  int *docOrder,
                     xpathCBs *cbs,
                     xpathResultSet *result, char **errMsg);
                     
@@ -194,15 +200,16 @@ int    xpathFuncBoolean  (xpathResultSet *rs);
 double xpathFuncNumber   (xpathResultSet *rs, int *NaN);
 char * xpathFuncString   (xpathResultSet *rs); 
 char * xpathFuncStringForNode (domNode *node);
-int    xpathRound        (double r);
+domLength xpathRound        (double r);
 
-char * xpathGetStringValue (domNode *node, int *strLen);
+char * xpathGetStringValue (domNode *node, domLength *strLen);
 
 char * xpathNodeToXPath  (domNode *node, int legacy);
     
-void rsSetBool      ( xpathResultSet *rs, long         i    );
-void rsSetInt       ( xpathResultSet *rs, long         i    );
+void rsSetBool      ( xpathResultSet *rs, dom_minl     i    );
+void rsSetLong      ( xpathResultSet *rs, dom_minl     i    );
 void rsSetReal      ( xpathResultSet *rs, double       d    );
+void rsSetReal2     ( xpathResultSet *rs, double       d    );
 void rsSetString    ( xpathResultSet *rs, const char  *s    );
 void rsAddNode      ( xpathResultSet *rs, domNode     *node );
 void rsAddNodeFast  ( xpathResultSet *rs, domNode     *node );
@@ -211,13 +218,15 @@ void rsCopy         ( xpathResultSet *to, xpathResultSet *from );
 /* This function is only used for debugging code */
 void rsPrint        ( xpathResultSet *rs );
 
+const char * xpathResultType2string (xpathResultType type);
+
 /* This function is used (outside of tcldom.c) only by schema.c. It
  * has to have a prototype somewhere. */
 int tcldom_xpathFuncCallBack (
     void            *clientData,
     char            *functionName,
     domNode         *ctxNode,
-    int              position,
+    domLength       position,
     xpathResultSet  *nodeList,
     domNode         *exprContext,
     int              argc,

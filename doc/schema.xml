@@ -124,7 +124,7 @@
         <command><method>define</method> <m>&lt;definition script></m></command>
         <desc>This method defines several elements or patterns or a
         whole schema with one call, by evaluating the <m>definition
-        script></m>. All schema command methods so far
+        script</m>. All schema command methods so far
         (<m>prefixns</m>, <m>defelement</m>, <m>defelementtype</m>,
         <m>defpattern</m>, <m>deftexttype</m> and <m>start</m>) are
         allowed top level in the <m>definition script</m>. The
@@ -186,7 +186,7 @@
                 <optname>-externalentitycommand</optname>
                 <optarg>&lt;script&gt;</optarg>
                 <desc>If <m>-externalentitycommand &lt;script&gt;</m>
-                is specified, the specified tcl script is called to
+                is specified, the specified Tcl script is called to
                 resolve any external entities of the document. The
                 default is "::tdom::extRefHandler", which is a simple
                 file URL resolver defined by the script part of the
@@ -196,7 +196,7 @@
                 three arguments: the base uri, the system identifier
                 of the entity and the public identifier of the entity.
                 The base uri and the public identifier may be the
-                empty list. The script has to return a tcl list
+                empty list. The script has to return a Tcl list
                 consisting of three elements. The first element of
                 this list signals how the external entity is returned
                 to the processor. Currently the two allowed types are
@@ -205,8 +205,8 @@
                 entity to be parsed. The third element of the list are
                 data, either the already read data out of the external
                 entity as string in the case of type "string", or the
-                name of a tcl channel, in the case of type "channel".
-                Note that if the script returns a tcl channel, it will
+                name of a Tcl channel, in the case of type "channel".
+                Note that if the script returns a Tcl channel, it will
                 not be closed by the processor. It must be closed
                 separately if it is no longer needed.</desc>
             </optdef>
@@ -254,7 +254,7 @@
         <command><method>validatefile</method> ?<m>options</m>? <m>filename</m> <m>?objVar?</m></command>
         <desc>Returns true if the content of <m>filename</m> is valid,
         or false, otherwise. The given file is fed as binary stream to
-        expat, therefore only US-ASCII, ISO-8859-1, UTF-8 or UTF-16
+        expat, therefore, only US-ASCII, ISO-8859-1, UTF-8 or UTF-16
         encoded data will work with this method. If validation has
         failed and the optional <m>objVar</m> argument is given, the
         variable with that name is set to a validation error message.
@@ -369,6 +369,16 @@
                   empty string is returned in these cases.</desc>
               </optdef>
               <optdef>
+                  <optname>byteIndex</optname>
+                  <desc>If the schema command is currently validating
+                  this method returns the byte position of the parsing
+                  position information, and the empty string in all
+                  other cases. If the schema command is currently
+                  post-validating a DOM tree, there may be no position
+                  information stored at some or all nodes. The
+                  empty string is returned in these cases.</desc>
+              </optdef>
+              <optdef>
                   <optname>domNode</optname>
                   <desc>If the schema command isn't currently
                   post-validating a DOM tree this method returns the
@@ -422,7 +432,7 @@
                   next event, the list entry will be a two elements
                   list, with #text as first element and the empty
                   string as second. If an any element constraint is
-                  possible. the list entry will be a two elements list,
+                  possible the list entry will be a two elements list,
                   with &lt;any> as first element and the empty string
                   as second. If an any element in a certain namespace
                   constraint is possible, the list entry will be a two
@@ -595,14 +605,14 @@
       <commanddef>
         <command><method>group</method> <m>?quant?</m> <m>&lt;definition script></m></command>
         <desc>This method group a sequence of content particles
-        defined by the <m>definition script></m>, which have to match
+        defined by the <m>definition script</m>, which have to match
         in this sequence order.</desc>
       </commanddef>
       
       <commanddef>
         <command><method>choice</method> <m>?quant?</m> <m>&lt;definition script></m></command>
         <desc>This schema constraint matches if one of the top level
-        content particles defined by the <m>definition script></m>
+        content particles defined by the <m>definition script</m>
         matches. If one of this top level content particle is optional
         this constraint matches the "empty match".
         </desc>
@@ -612,7 +622,7 @@
         <command><method>interleave</method> <m>?quant?</m> <m>&lt;definition script></m></command>
         <desc>This schema constraint matches after every of the required
         top level content particles defined by the <m>definition
-        script></m> have matched (and, optional, some or all other) in
+        script</m> have matched (and, optional, some or all other) in
         any arbitrary order.</desc>
       </commanddef>
 
@@ -620,7 +630,7 @@
         <command><method>mixed</method> <m>?quant?</m> <m>&lt;definition script></m></command>
         <desc>This schema constraint matches for any text (including the
         empty one) and every top level content particle defined by the
-        <m>definition script></m> with default quantifier *.</desc>
+        <m>definition script</m> with default quantifier *.</desc>
       </commanddef>
 
       <commanddef>
@@ -633,15 +643,19 @@
       </commanddef>
 
       <commanddef>
-        <command><method>any</method> <m>?namespace?</m> <m>?quant?</m></command>
-        <desc>The any command matches every element (in the namespace
-        <m>namespace</m>, if that is given) (with whatever attributes)
-        or subtree, no matter if known within the schema or not.
+        <command><method>any</method> ?<m>options</m>? <m>?&lt;namespace list>?</m> <m>?quant?</m></command>
+        <desc>Without arguments the any command matches every element.
+        If the <m>&lt;namespace list></m> argument is given, this
+        matches any element in a namespace out of that list. The empty
+        string means elements with no namespace. If additionally the
+        option <m>-not</m> is given then this maches every element
+        with a namespace not in the list. The only other recognized
+        option is <m>--</m> which signals the end of any options.
         Please note that in case of no <m>namespace</m> argument is
         given that means that the quantifier * and + will eat up any
         elements until the enclosing element ends. If you really have
-        a namespace that looks like a valid tDOM schema quantifier
-        you will have to spell out always both arguments.</desc>
+        a namespace that looks like a valid tDOM schema quantifier you
+        will have to spell out always both arguments.</desc>
       </commanddef>
 
       <commanddef>
@@ -658,7 +672,7 @@
         Otherwise, if there are two more arguments and the first of
         them is the bare-word "type" the following argument is used as
         a text type name. This command is only allowed at top level in
-        the definition script of an defelement/element script.</desc>
+        the definition script of a defelement/element script.</desc>
       </commanddef>
 
       <commanddef>
@@ -683,7 +697,7 @@
         This validation command is only allowed in strict sequential
         context (not in choice, mixed and interleave). If the return
         code is something else than TCL_OK, this is an error (which
-        is not catched and reported by reportcmd).</desc>
+        is not caught and reported by reportcmd).</desc>
       </commanddef>
 
       <commanddef>
@@ -751,7 +765,21 @@ s define {
       </commanddef>
 
       <commanddef>
-        <command><method>prefixns</method> <m>?prefixUriList?</m></command>
+        <command><method>jsontype</method> <m>JSON structure type</m></command>
+        <desc><p>If not postvalidating a DOM tree with
+        <m>domvalidate</m> this constraint always matches. If
+        postvalidating the constraint matches if the enclosing element
+        has the JSON type given as argument to the structure
+        constraint. The possible JSON structure types are <m>NONE</m>,
+        <m>OBJECT</m> and <m>ARRAY</m>. This constraint is only
+        allowed as direct child of a defelement, defelementtype or
+        local element definition.</p>
+        </desc>
+      </commanddef>
+      
+      <commanddef>
+        <command><method>prefixns</method>
+        <m>?prefixUriList?</m></command>
         <desc>This defines a prefix to namespace URI mapping exactly
         as a <i>schemacmd prefixns</i> would. It is meant as top-level
         command of a <i>schemacmd define</i> script. This command is
@@ -1195,7 +1223,7 @@ s define {
             <desc><p>This text constraint command splits the text to test
             into a list of values and tests all elements of that list for
             the text constraints in the evaluated <m>constraint
-            script></m>.</p>
+            script</m>.</p>
             <p>The available types are:</p>
             <dl>
                 <dt>whitespace</dt><dd>The text to split is stripped
@@ -1213,7 +1241,7 @@ s define {
         <commanddef>
             <command><cmd>strip</cmd> <m>&lt;constraint script></m></command>
             <desc>This text constraint command tests all text constraints
-            in the evaluated <m>constraint script></m> with the text to
+            in the evaluated <m>constraint script</m> with the text to
             test stripped of all white space at start and end.</desc>
         </commanddef>
         </commandlist>
@@ -1278,10 +1306,22 @@ s define {
         </commanddef>
         <commanddef>
             <command><cmd>idref</cmd> <m>?keySpace?</m></command>
-            <desc>This text constraint command expects the text to be a
-            reference to an ID within the document. The referenced ID may
-            appear later in the document, that the reference. Several
-            references within the document to one ID are possible.</desc>
+            <desc>This text constraint command expects the text to be
+            a reference to an ID within the document. The referenced
+            ID may appear later in the document than the reference.
+            Several references within the document to one ID are
+            possible. For the optional <m>keySpace</m> argument see
+            <m>id</m></desc>
+        </commanddef>
+        <commanddef>
+            <command><cmd>jsontype</cmd> <m>&lt;JSON text type></m></command>
+            <desc>If not postvalidating a DOM tree with
+            <m>domvalidate</m> this constraint always matches. If
+            postvalidating the current TEXT_NODE to check must have
+            the JSON text type given as argument to the text
+            constraint command. The possible types are <m>NULL</m>,
+            <m>TRUE</m>, <m>FALSE</m>, <m>STRING</m> and
+            <m>NUMBER</m>.</desc>
         </commanddef>
         </commandlist>
     </subsection>
@@ -1387,7 +1427,7 @@ s define {
 
       <p>Returning "ignore" from the recovering script in case of
       error type MISSING_ELEMENT recovers by ignoring the failed
-      contraint and continues to match the event further against the
+      constraint and continues to match the event further against the
       schema.</p>
 
       <p>Returning "vanish" from the recover script in case of the
@@ -1472,7 +1512,7 @@ s define {
 &lt;/xsd:schema>
     </example>
 
-    <p>A likely one-to-one translation of that into a tDOM schema
+    <p>A simple one-to-one translation of that into a tDOM schema
     definition script would be:</p>
 
     <example>
@@ -1502,17 +1542,17 @@ schema define {
         element city
         element state
         element zip ! {text number}
-        attribute country ! {fixed "US"}
+        attribute country {fixed "US"}
     }
 
     defelement items {
         element item * {
             element product
-            element quantity ! {text integer}
+            element quantity ! {text positiveInteger}
             element USPrice ! {text number}
             element comment
             element shipDate ? {text date}
-            attribute partNum ! {pattern "^\d{3}-[A-Z]{2}$"}
+            attribute partNum {regexp "^\d{3}-[A-Z]{2}$"}
         }
     }
 }

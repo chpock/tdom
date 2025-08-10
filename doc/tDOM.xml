@@ -2,6 +2,7 @@
 <!ENTITY dom SYSTEM "dom.xml">
 <!ENTITY domDoc SYSTEM "domDoc.xml">
 <!ENTITY domNode SYSTEM "domNode.xml">
+<!ENTITY xpathFunc SYSTEM "xpathFunc.xml">
 <!ENTITY expat SYSTEM "expat.xml">
 <!ENTITY expatapi SYSTEM "expatapi.xml">
 <!ENTITY pullparser SYSTEM "pullparser.xml">
@@ -17,6 +18,8 @@
 &domDoc;
 
 &domNode;
+
+&xpathFunc;
 
 &expat;
 

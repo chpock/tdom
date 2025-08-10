@@ -54,6 +54,7 @@ namespace eval ::dom {
 namespace eval ::tdom { 
     variable extRefHandlerDebug 0
     variable useForeignDTD ""
+    variable utf8bom 0
 
     namespace export xmlOpenFile xmlReadFile xmlReadFileForSimple \
         extRefHandler baseURL
@@ -429,7 +430,7 @@ proc ::dom::domNode::substringData { node offset count } {
     } {
         return -code error "NOT_SUPPORTED_ERR: node is not a cdata node"
     }
-    set endOffset [expr $offset + $count - 1]
+    set endOffset {[expr $offset + $count - 1]}
     return [string range [$node nodeValue] $offset $endOffset]
 }
 
@@ -740,13 +741,19 @@ proc ::tdom::IANAEncoding2TclEncoding {IANAName} {
 #
 #----------------------------------------------------------------------------
 proc ::tdom::xmlOpenFileWorker {filename {encodingString {}} {forSimple 0} {forRead 0}} {
-
+    variable utf8bom
+    
     # This partly (mis-)use the encoding of a channel handed to [dom
     # parse -channel ..] as a marker: if the channel encoding is utf-8
     # then behind the scene Tcl_Read() is used, otherwise
     # Tcl_ReadChars(). This is used for the encodings understood (and
     # checked) by the used expat implementation: utf-8 and utf-16 (in
     # either byte order).
+    #
+    # The -translation auto used used in the fconfigure commands which
+    # set the encoding isn't strictly necessary in case the parser is
+    # expat (because it handles that internally) but it is the right
+    # thing for the simple parser.
     
     set fd [open $filename]
 
@@ -757,9 +764,11 @@ proc ::tdom::xmlOpenFileWorker {filename {encodingString {}} {forSimple 0} {forR
     # The autodetection of the encoding follows
     # XML Recomendation, Appendix F
 
-    fconfigure $fd -encoding binary
+    fconfigure $fd -translation binary
     if {![binary scan [read $fd 4] "H8" firstBytes]} {
-        # very short (< 4 Bytes) file
+        # very short (< 4 Bytes) file, that means not a well-formed
+        # XML at all (the shortes possible would be <[a-zA-Z]/>).
+        # Don't report that here but let the parser do that.
         seek $fd 0 start
         set encString UTF-8
         return $fd
@@ -770,11 +779,17 @@ proc ::tdom::xmlOpenFileWorker {filename {encodingString {}} {forSimple 0} {forR
         "feff" {
             # feff: UTF-16, big-endian BOM
             if {$forSimple || $forRead} {
-                error "UTF-16be is not supported"
+                if {[package vsatisfies [package provide Tcl] 9-]} {
+                    seek $fd 2 start
+                    fconfigure $fd -encoding utf-16be -translation auto
+                } else {
+                    error "UTF-16be is not supported"
+                }
+            } else {
+                seek $fd 0 start
+                set encString UTF-16be
+                fconfigure $fd -encoding utf-8 -translation auto
             }
-            seek $fd 0 start
-            set encString UTF-16be
-            fconfigure $fd -encoding utf-8
             return $fd
         }
         "fffe" {
@@ -782,15 +797,33 @@ proc ::tdom::xmlOpenFileWorker {filename {encodingString {}} {forSimple 0} {forR
             set encString UTF-16le          
             if {$forSimple || $forRead} {
                 seek $fd 2 start
-                fconfigure $fd -encoding unicode
+                if {[package vsatisfies [package provide Tcl] 9-]} {
+                    fconfigure $fd -encoding utf-16le -translation auto
+                } else {
+                    fconfigure $fd -encoding unicode -translation auto
+                }
             } else {
                 seek $fd 0 start
-                fconfigure $fd -encoding utf-8
+                fconfigure $fd -encoding utf-8 -translation auto
             }
             return $fd
         }
     }
     
+    if {$utf8bom} {
+        # According to the Unicode standard
+        # (http://www.unicode.org/versions/Unicode5.0.0/ch02.pdf) the
+        # "[u]se of a BOM is neither required nor recommended for
+        # UTF-8". Nevertheless such files exits. If the programmer
+        # explcitely enables this by setting ::tdom::utf8bom to true
+        # this is handled here.
+        if {[string range $firstBytes 0 5] eq "efbbbf"} {
+            set encString UTF-8
+            seek $fd 3 start
+            fconfigure $fd -encoding utf-8 -translation auto
+            return $fd
+        }
+    }
     
     # If the entity has a XML Declaration, the first four characters
     # must be "<?xm".
@@ -838,27 +871,40 @@ proc ::tdom::xmlOpenFileWorker {filename {encodingString {}} {forSimple 0} {forR
         }
             "003c003f" {
             # UTF-16, big-endian, no BOM
-            if {$forSimple} {
-                error "UTF-16be is not supported by the simple parser"
+            if {$forSimple || $forRead} {
+                if {[package vsatisfies [package provide Tcl] 9-]} {
+                    set encoding utf-16be
+                } else {
+                    error "UTF-16be is not supported by the simple parser"
+                }
+            } else {
+                set encoding utf-8
             }
             seek $fd 0 start
-            set encoding utf-8
             set encString UTF-16be
         }
         "3c003f00" {
             # UTF-16, little-endian, no BOM
-            if {$forSimple} {
-                seek $fd 2 start
-                set encoding unicode
+            if {$forSimple || $forRead} {
+                if {[package vsatisfies [package provide Tcl] 9-]} {
+                    set encoding utf-16le
+                } else {
+                    set encoding unicode
+                }
             } else {
-                seek $fd 0 start
                 set encoding utf-8
             }
+            seek $fd 0 start
             set encString UTF-16le          
         }
         "4c6fa794" {
             # EBCDIC in some flavor
-            error "EBCDIC not supported"
+            if {[package vsatisfies [package provide Tcl] 9-]} {
+                seek $fd 0 start
+                set encoding ebcdic
+            } else {
+                error "EBCDIC not supported"
+            }
         }
         default {
             # UTF-8 without an encoding declaration
@@ -867,7 +913,7 @@ proc ::tdom::xmlOpenFileWorker {filename {encodingString {}} {forSimple 0} {forR
             set encString "UTF-8"
         }
     }
-    fconfigure $fd -encoding $encoding
+    fconfigure $fd -encoding $encoding -translation auto
     return $fd
 }
 
@@ -992,6 +1038,47 @@ proc ::tdom::baseURL {path} {
     }
 }
 
+namespace eval ::tdom::json {
+    namespace export asDict
+}
+
+# The argument node may be an element node as well as a document node.
+proc ::tdom::json::asDict {node} {
+    return [nodesAsDict [$node childNodes] [$node jsonType]]
+}
+
+proc ::tdom::json::nodesAsDict {nodes parentType} {
+    set result ""
+    foreach n $nodes {
+        set children [$n childNodes]
+        set jsonType [$n jsonType]
+        set childrendValue [nodesAsDict $children $jsonType]
+
+        switch $jsonType {
+            OBJECT {
+                if {[$n nodeName] ne "objectcontainer" || $parentType eq "OBJECT"} {
+                    lappend result [$n nodeName]
+                }
+                lappend result $childrendValue
+            }
+            NONE {
+                lappend result [$n nodeName] $childrendValue
+            }
+            ARRAY {
+                if {[$n nodeName] ne "arraycontainer" || $parentType eq "OBJECT"} {
+                    lappend result [$n nodeName]
+                }
+                lappend result $childrendValue
+            }
+            default {
+                set op [expr {[llength $nodes] > 1 ? "lappend" : "set"} ]
+                $op result [$n nodeValue]
+            }
+        }
+    }
+    return $result
+}
+
 namespace eval ::tDOM { 
     variable extRefHandlerDebug 0
     variable useForeignDTD ""
@@ -1006,8 +1093,9 @@ foreach ::tdom::cmd {
     xmlReadFileForSimple
     extRefHandler
     baseURL
+    IANAEncoding2TclEncoding
 } {
-    interp alias {} tDOM::$::tdom::cmd {} tdom::$::tdom::cmd
+    interp alias {} ::tDOM::$::tdom::cmd {} ::tdom::$::tdom::cmd
 }
 
 # EOF

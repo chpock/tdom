@@ -19,10 +19,10 @@
 #------------------------------------------------------------------------
 
 AC_DEFUN(TDOM_ENABLE_DTD, [
-    AC_MSG_CHECKING([whether to enable dtd support])
+    AC_MSG_CHECKING([whether to enable expat dtd support])
     AC_ARG_ENABLE(dtd,
         AC_HELP_STRING([--enable-dtd],
-            [build with dtd support (default: on)]),
+            [build expat with dtd support (default: on)]),
         [tcl_ok=$enableval], [tcl_ok=yes])
 
     if test "${enable_dtd+set}" = set; then
@@ -38,6 +38,36 @@ AC_DEFUN(TDOM_ENABLE_DTD, [
     else
         AC_MSG_RESULT([no])
     fi
+])
+
+#------------------------------------------------------------------------
+# TDOM_CONTEXT_BYTES --
+#
+#   Allows to adjust the context bytes buffer size
+#
+# Arguments:
+#   None
+#   
+# Results:
+#
+#   Adds the following arguments to configure:
+#       --with-context-bytes=
+#
+#   Defines the following vars:
+#
+#   Sets the following vars:
+#
+#------------------------------------------------------------------------
+
+AC_DEFUN(TDOM_CONTEXT_BYTES, [
+    AC_MSG_CHECKING([expat context bytes buffer size])
+    AC_ARG_WITH(contextbytes,
+        AC_HELP_STRING([--with-context-bytes],
+            [configure expat context bytes buffer size (default: 1024)]),
+        , [with_contextbytes=1024])
+
+    AC_MSG_RESULT([${with_contextbytes}])
+    AC_DEFINE_UNQUOTED(XML_CONTEXT_BYTES, [${with_contextbytes}])
 ])
 
 #------------------------------------------------------------------------
@@ -406,6 +436,7 @@ AC_DEFUN(TDOM_PATH_EXPAT, [
         esac             
     ])
     if test x"${ac_cv_c_expat}" = x ; then
+        TDOM_EXPAT=bundled
         AC_MSG_RESULT([Using bundled expat distribution])
         TEA_ADD_SOURCES([expat/xmlrole.c \
                          expat/xmltok.c \
@@ -414,6 +445,126 @@ AC_DEFUN(TDOM_PATH_EXPAT, [
         AC_DEFINE([XML_POOR_ENTROPY], 1,
           [Define to use poor entropy in lack of better source.])
     else
+        TDOM_EXPAT=external
+        AC_CACHE_CHECK([linking], tdom_cv_expat_build, [
+            AC_LINK_IFELSE([AC_LANG_SOURCE([[
+                #include <expat.h>
+                #include <stdio.h>
+                int main (int argc, char *argv[])
+                {
+                    XML_Expat_Version expatVersion;
+                    return 0;
+                }
+                ]])],
+                [tdom_cv_expat_build=yes],
+                [tdom_cv_expat_build=no],
+                [tdom_cv_expat_build=crosscomp])])
+        if test $tdom_cv_expat_build = no; then
+            AC_MSG_WARN([Do not build with ${with_expat} directory])
+        fi
+        if test $tdom_cv_expat_build = crosscomp; then
+            AC_MSG_WARN([Cannot test build with ${with_expat}])
+        fi
+        if test $tdom_cv_expat_build = yes; then
+            # The following tests for certain features of the expat
+            # lib to use could easily be done with one AC_RUN_IFELSE
+            # (with the result code as bitfield of the findings). But
+            # I was not able to find out if sh bit operations (to
+            # analyse the result) are portable enough. If you know
+            # for sure they would please let me know so that I can
+            # strip down this longish checks.
+            STOREDLIBS=$LIBS
+            LIBS="-lexpat"
+            AC_CACHE_CHECK([expat library XML_CHAR size], tdom_cv_expat_usability, [
+                AC_RUN_IFELSE([AC_LANG_SOURCE([[
+                    #include <expat.h>
+                    int main (int argc, char *argv[])
+                    {
+                        XML_Feature const *featureArray = XML_GetFeatureList();
+                        /* The first XML_Feature in the array is XML_FEATURE_SIZEOF_XML_CHAR */
+                        if (featureArray->value != 1) {
+                            return 1;
+                        }
+                        return 0;
+                    }
+                    ]])],
+                    [tdom_cv_expat_usability=ok],
+                    [tdom_cv_expat_usability=failed],
+                    [tdom_cv_expat_usability=crosscomp])])
+            if test $tdom_cv_expat_usability = failed ; then
+                AC_MSG_ERROR([expat library cannot be used because of sizeof(XML_Char) != 1])
+            fi
+            if test $tdom_cv_expat_usability = crosscomp ; then
+                AC_MSG_WARN([crosscompiling - cannot check the expat library features, assuming defaults])
+                AC_DEFINE(XML_DTD)
+                AC_DEFINE(XML_GE, 1)
+                AC_DEFINE(XML_CONTEXT_BYTES, 1024)
+            fi
+            if test $tdom_cv_expat_usability = ok ; then
+                AC_CACHE_CHECK([expat library version], tdom_cv_expat_version, [
+                    AC_RUN_IFELSE([AC_LANG_SOURCE([[
+                        #include <expat.h>
+                        int main (int argc, char *argv[])
+                        {
+                            XML_Expat_Version expatVersion;
+                            expatVersion = XML_ExpatVersionInfo();
+                            if (expatVersion.major < 2
+                                || expatVersion.minor < 6
+                                || expatVersion.micro < 4) {
+                                return 1;
+                            };
+                            return 0;
+                        }
+                        ]])],
+                        [tdom_cv_expat_version=ok],
+                        [tdom_cv_expat_version=older],
+                        [tdom_cv_expat_version=crosscomp])])
+                if test $tdom_cv_expat_version = older; then
+                    AC_MSG_WARN([Bundled expat version is more recent])
+                fi
+                AC_CACHE_CHECK([expat library XML_DTD], tdom_cv_expat_dtd, [
+                    AC_RUN_IFELSE([AC_LANG_SOURCE([[
+                        #include <expat.h>
+                        int main (int argc, char *argv[])
+                        {
+                            XML_Feature const *featureArray = XML_GetFeatureList();
+                            while (featureArray->feature != XML_FEATURE_END) {
+                                if (featureArray->feature == XML_FEATURE_DTD)
+                                    return 0;
+                                featureArray++;
+                            }
+                            return 1;
+                        }
+                        ]])],
+                        [tdom_cv_expat_dtd=yes],
+                        [tdom_cv_expat_dtd=no],
+                        [tdom_cv_expat_dtd=crosscomp])])
+                if test $tdom_cv_expat_dtd = yes; then
+                    AC_DEFINE(XML_DTD)
+                fi
+                AC_CACHE_CHECK([expat library XML_LARGE_SIZE], tdom_cv_expat_large_size, [
+                    AC_RUN_IFELSE([AC_LANG_SOURCE([[
+                        #include <expat.h>
+                        int main (int argc, char *argv[])
+                        {
+                            XML_Feature const *featureArray = XML_GetFeatureList();
+                            while (featureArray->feature != XML_FEATURE_END) {
+                                if (featureArray->feature == XML_FEATURE_LARGE_SIZE) 
+                                    return 1;
+                                featureArray++;
+                            }
+                            return 0;
+                        }
+                        ]])],
+                        [tdom_cv_expat_large_size=no],
+                        [tdom_cv_expat_large_size=yes],
+                        [tdom_cv_expat_large_size=crosscomp])])
+                if test $tdom_cv_expat_large_size = yes ; then
+                    AC_DEFINE(XML_LARGE_SIZE, 1)
+                fi
+            fi
+            LIBS=$STOREDLIBS        
+        fi
         AC_MSG_RESULT([Using shared expat found in ${ac_cv_c_expat}])
         TEA_ADD_INCLUDES(-I${ac_cv_c_expat}/include)
         TEA_ADD_LIBS([-lexpat])
@@ -681,42 +832,6 @@ AC_DEFUN(TDOM_LOAD_CONFIG, [
     AC_SUBST(TDOM_VERSION)
     AC_SUBST(TDOM_STUB_LIB_SPEC)
     AC_SUBST(TDOM_SRC_DIR)
-])
-
-#------------------------------------------------------------------------
-# TDOM_EXPORT_CONFIG --
-#
-#	Define the data to insert into the ${PACKAGE_NAME}Config.sh file
-#
-# Arguments:
-#	None
-#
-# Results:
-#	Subst the following vars:
-#
-#------------------------------------------------------------------------
-
-AC_DEFUN(TDOM_EXPORT_CONFIG, [
-    #--------------------------------------------------------------------
-    # These are for ${PACKAGE_NAME}Config.sh
-    #--------------------------------------------------------------------
-
-    # pkglibdir must be a fully qualified path and (not ${exec_prefix}/lib)
-    eval pkglibdir="[$]{libdir}/${PACKAGE_NAME}${PACKAGE_VERSION}"
-    if test "${TCL_LIB_VERSIONS_OK}" = "ok"; then
-	eval PKG_STUB_LIB_FLAG="-l${PACKAGE_NAME}stub${PACKAGE_VERSION}"
-    else
-	eval PKG_STUB_LIB_FLAG="-l${PACKAGE_NAME}stub`echo ${PACKAGE_VERSION} | tr -d .`"
-    fi
-    PKG_BUILD_STUB_LIB_SPEC="-L`pwd` ${PKG_STUB_LIB_FLAG}"
-    PKG_STUB_LIB_SPEC="-L${pkglibdir} ${PKG_STUB_LIB_FLAG}"
-    PKG_BUILD_STUB_LIB_PATH="`pwd`/[$]{PKG_STUB_LIB_FILE}"
-    PKG_STUB_LIB_PATH="${pkglibdir}/[$]{PKG_STUB_LIB_FILE}"
-
-    AC_SUBST(PKG_BUILD_STUB_LIB_SPEC)
-    AC_SUBST(PKG_STUB_LIB_SPEC)
-    AC_SUBST(PKG_BUILD_STUB_LIB_PATH)
-    AC_SUBST(PKG_STUB_LIB_PATH)
 ])
 
 # Local Variables:

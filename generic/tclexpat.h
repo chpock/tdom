@@ -1,5 +1,11 @@
+
+#ifndef __TCL_EXPAT_H__
+#define __TCL_EXPAT_H__
+
 #include <tcl.h>
 #include <expat.h>
+#include "dom.h"
+#include "schema.h"
 
 struct TclGenExpatInfo;
 
@@ -7,6 +13,9 @@ typedef void (*CHandlerSet_userDataReset)(Tcl_Interp *interp, void *userData);
 typedef void (*CHandlerSet_userDataFree)(Tcl_Interp *interp, void *userData);
 typedef void (*CHandlerSet_parserReset)(XML_Parser parser, void *userData);
 typedef void (*CHandlerSet_initParse)(Tcl_Interp *interp, void *userData);
+
+typedef void(XMLCALL *tdom_CharacterDataHandler)(void *userData,
+                                                  const XML_Char *s, domLength len);
 
 typedef struct CHandlerSet {
     struct CHandlerSet *nextHandlerSet;
@@ -29,7 +38,7 @@ typedef struct CHandlerSet {
     /* C func for element end */
     XML_EndElementHandler            elementendcommand;
     /* C func for character data */
-    XML_CharacterDataHandler         datacommand;
+    tdom_CharacterDataHandler        datacommand;
     /* C func for namespace decl start */
     XML_StartNamespaceDeclHandler    startnsdeclcommand;
     /* C func for namespace decl end */
@@ -77,7 +86,8 @@ typedef struct TclHandlerSet {
     int status;                     /* handler set status */
     int continueCount;		    /* reference count for continue */
     int ignoreWhiteCDATAs;          /* ignore 'white' CDATA sections */
-
+    int fastCall;                   /* do fast ("Welch") handler calls */
+    
     Tcl_Obj *elementstartcommand;      /* Script for element start */
     Tcl_ObjCmdProc *elementstartObjProc;
     ClientData      elementstartclientData;
@@ -123,6 +133,10 @@ typedef struct TclGenExpatInfo {
     Tcl_Obj *result;		/* application return result */
     const char *context;        /* reference to the context pointer */  
     Tcl_Obj *cdata;             /* Accumulates character data */ 
+    domLength cdataStartLine;   /* Line number of the start of cdata */
+    domLength cdataStartColumn; /* Column number of the start of cdata */
+    domLength cdataStartByteIndex; /* Byte index of the start of cdata */
+    int keepTextStart;          /* Keep the cdata start line/column/byteIndex */
     ExpatElemContent *eContents;/* The reported XML_Contents as linked list */
     int ns_mode;                /* namespace mode */
     Tcl_Obj *baseURI;
@@ -151,11 +165,7 @@ typedef struct TclGenExpatInfo {
 |
 \-------------------------------------------------------------------------*/
 
-#if defined(_MSC_VER) || defined(BUILD_tdom) || defined(__MINGW32__) 
-#  undef TCL_STORAGE_CLASS
-#  define TCL_STORAGE_CLASS DLLEXPORT
-#endif
-
+#ifndef __TDOM_H
 Tcl_ObjCmdProc TclExpatObjCmd;
 
 int CheckExpatParserObj (Tcl_Interp *interp,
@@ -176,3 +186,6 @@ void * CHandlerSetGetUserData (Tcl_Interp *interp,
 
 TclGenExpatInfo * GetExpatInfo (Tcl_Interp *interp,
 				       Tcl_Obj *const expatObj);
+#endif
+
+#endif 

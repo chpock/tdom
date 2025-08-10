@@ -19,7 +19,7 @@ dnl	to configure the system for the local environment.
 # so that we create the export library with the dll.
 #-----------------------------------------------------------------------
 
-AC_INIT([tdom], [0.9.3])
+AC_INIT([tdom],[0.9.6])
 
 #--------------------------------------------------------------------
 # Call TEA_INIT as the first TEA_ macro to set up initial vars.
@@ -74,13 +74,6 @@ AC_CHECK_FUNCS(memmove bcopy)
 TDOM_PATH_AOLSERVER
 
 #--------------------------------------------------------------------
-# Add shared expat includes and expat entropy
-#--------------------------------------------------------------------
-
-TDOM_PATH_EXPAT
-TDOM_EXPAT_ENTROPY
-
-#--------------------------------------------------------------------
 # We need the UINT2PTR and PTR2UINT macros, so make sure that intptr_t
 # is defined.
 #--------------------------------------------------------------------
@@ -131,7 +124,8 @@ TEA_ADD_SOURCES([generic/xmlsimple.c \
                  generic/tdominit.c  \
                  generic/tclexpat.c  \
                  generic/tclpull.c   \
-                 generic/schema.c \
+                 generic/schema.c    \
+                 generic/datatypes.c \
                  generic/tdomStubInit.c])
 TEA_ADD_HEADERS([generic/tdom.h])
 TEA_ADD_INCLUDES([-I${srcdir}/generic ${AOL_INCLUDES} ${HTML5_INCLUDES}])
@@ -215,14 +209,6 @@ AC_SUBST(TDOM_LD_SEARCH_FLAGS)
 TEA_ENABLE_SYMBOLS
 
 #--------------------------------------------------------------------
-# This macro generates a line to use when building a library.  It
-# depends on values set by the TEA_ENABLE_SHARED, TEA_ENABLE_SYMBOLS,
-# and TEA_LOAD_TCLCONFIG macros above.
-#--------------------------------------------------------------------
-
-TEA_MAKE_LIB
-
-#--------------------------------------------------------------------
 # Determine the name of the tclsh and/or wish executables in the
 # Tcl and Tk build directories or the location they were installed
 # into. These paths are used to support running test cases only,
@@ -231,14 +217,40 @@ TEA_MAKE_LIB
 #--------------------------------------------------------------------
 
 TEA_PROG_TCLSH
-#TEA_PROG_WISH
+
+#--------------------------------------------------------------------
+# Add shared expat includes and expat entropy
+#--------------------------------------------------------------------
+
+TDOM_PATH_EXPAT
+if test "${TDOM_EXPAT}" = "bundled"; then
+    TDOM_EXPAT_ENTROPY
+fi
+
+#--------------------------------------------------------------------
+# This macro generates a line to use when building a library.  It
+# depends on values set by the TEA_ENABLE_SHARED, TEA_ENABLE_SYMBOLS,
+# and TEA_LOAD_TCLCONFIG macros above.
+#--------------------------------------------------------------------
+
+TEA_MAKE_LIB
 
 #--------------------------------------------------------------------
 # Add some private preprocessor options
 #--------------------------------------------------------------------
 
-TDOM_ENABLE_DTD
-TDOM_ENABLE_NS
+if test "${TDOM_EXPAT}" = "bundled"; then
+    TDOM_ENABLE_DTD
+    # If we expose XML_GetInputContext() at script level
+    #TDOM_CONTEXT_BYTES
+    AC_DEFINE(XML_CONTEXT_BYTES, 0)
+    AC_DEFINE(XML_GE, 1)
+    if test "${TEA_PLATFORM}" = "windows" ; then
+        AC_DEFINE(XML_STATIC, 1)
+        AC_DEFINE(XML_LARGE_SIZE, 1)
+    fi
+    TDOM_ENABLE_NS
+fi
 TDOM_ENABLE_UNKNOWN
 TDOM_ENABLE_TDOMALLOC
 TDOM_ENABLE_LESS_NS
@@ -247,7 +259,8 @@ TDOM_ENABLE_SCHEMA
 TDOMSHELL=tcldomsh
 AC_SUBST(TDOMSHELL)
 
-TDOM_EXPORT_CONFIG
+
+TEA_EXPORT_CONFIG([tdom])
 
 #--------------------------------------------------------------------
 # Finally, substitute all of the various values into the Makefile.
@@ -255,4 +268,5 @@ TDOM_EXPORT_CONFIG
 # which require substituting the AC variables in. Include these here.
 #--------------------------------------------------------------------
 
-AC_OUTPUT([Makefile pkgIndex.tcl tdomConfig.sh])
+AC_CONFIG_FILES([Makefile pkgIndex.tcl tdomConfig.sh])
+AC_OUTPUT

@@ -187,6 +187,20 @@ test html5-2.8 {HTML parsing} {html5} {
 </select></form></body>
 </html>}
 
+test html5-2.9 {HTML parsing} {64bit Tcl9 html5 longRunning largedata groklargedata} {
+    set result [catch {
+        dom parse -html5 "<doc>[string repeat [string repeat [string repeat abcde 1000] 1000] 1000]</doc>"
+    } errMsg]
+    lappend result $errMsg
+} {1 {The Gumbo library doesn't support strings longer than 4 gigabytes.}}
+
+# Gumbo has more limitations than just max 4 GByte input string length.
+# test html5-2.10 {HTML parsing} {64bit Tcl9 html5 knownBug} {
+#     set xml [string repeat [string repeat [string repeat a 1000] 1000] 1000]
+#     set doc [dom parse -html5 $xml]
+#     $doc delete
+# }  {}
+
 test html5-3.1 {Bad data} {html5} {
     set data {line 6 column 17 - Warning: <script> lacks "type" attribute
 line 10 column 17 - Warning: <script> lacks "type" attribute

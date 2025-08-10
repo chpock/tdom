@@ -1,4 +1,4 @@
-# Features covered: simple parser
+## Features covered: simple parser
 #
 # This file contains a collection of tests for the simple parser.
 # Tested functionalities:
@@ -182,6 +182,60 @@ test simple-1.22 {namespaces} {
     $doc delete
 } {}
 
+test simple-1.23 {-forest} {
+    set doc [dom parse -simple -forest {<one>1</one><two>2</two>}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<one>1</one><two>2</two>}
+
+test simple-1.24 {-forest} {
+    catch {dom parse -simple -forest {<one>1</one><two>2}}
+} {1}
+
+test simple-1.25 {-forest} {
+    set doc [dom parse -simple -forest {<one>1</one>some text<two>2</two>other text}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<one>1</one>some text<two>2</two>other text}
+
+test simple-1.26 {-forest} {
+    set xml {<one><two></one>}
+    catch {dom parse -simple $xml} errMsg1
+    catch {dom parse -simple -forest $xml} errMsg2
+    expr {$errMsg1 eq $errMsg2}
+} {1}
+
+test simple-1.27 {-forest} {
+    set xml {<one><two/></one>}
+    set doc [dom parse -simple -forest $xml]
+    $doc documentElement root
+    set result [llength [$root selectNodes //two]]
+    $doc delete
+    set result
+} 1
+
+test simple-1.28 {-forest} {
+    set xml {<div>something</div><div>something else</div>}
+    set doc [dom parse -simple -forest $xml]
+    set result ""
+    foreach child [$doc selectNodes /*] {
+        lappend result [$child parentNode]
+    }
+    $doc delete
+    set result
+} {{} {}}
+
+test simple-1.29 {parse long string} {64bit Tcl9 longRunning largedata groklargedata} {
+    set doc [dom parse -simple "<doc>[string repeat [string repeat [string repeat abc 1000] 1000] 1000]</doc>"]
+    set result [string length [$doc selectNodes string(/doc)]]
+    lappend result [string length [$doc selectNodes substring(doc,2999999999)]]
+    lappend result [$doc selectNodes substring(doc,2999999995,3)]
+    $doc delete
+    set result
+} {3000000000 2 abc}
+
 test simple-2.1 {XML build in entities} {
     set doc [dom parse -simple {<doc>&lt;&gt;&amp;&apos;&quot;</doc>}]
     set root [$doc documentElement]
@@ -207,7 +261,24 @@ test simple-2.3 {character entities} {
     set result
 } "\u00d6\u00c4\u00c4"
 
-    
+test simple-2.4 {invalid entity reference in attribute} {
+    catch {dom parse -simple {<doc><e att="a&ampc"/></doc>}} errMsg
+    set errMsg
+} {error "Entity parsing error" at position 20
+"<doc><e att="a&ampc"/ <--Error-- ></doc>"}
+
+test simple-2.5 {invalid entity reference in element content} {
+    catch {dom parse -simple {<doc>foo&ampl;bar"/></doc>}} errMsg
+    set errMsg
+} {error "Entity parsing error" at position 13
+"<doc>foo&ampl; <--Error-- bar"/></doc>"}
+
+test simple-2.6 {invalid character entity reference in element content} {
+    catch {dom parse -simple {<doc>foo&#l;bar"/></doc>}} errMsg
+    set errMsg
+} {error "Entity parsing error" at position 10
+"<doc>foo&#l <--Error-- ;bar"/></doc>"}
+
 # cleanup
 ::tcltest::cleanupTests
 return

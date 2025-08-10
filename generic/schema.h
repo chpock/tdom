@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------
-|   Copyright (c) 2018  Rolf Ade (rolf@pointsman.de)
+|   Copyright (c) 2018-2022  Rolf Ade (rolf@pointsman.de)
 |-----------------------------------------------------------------------------
 |
 |
@@ -17,7 +17,7 @@
 |
 |
 |   written by Rolf Ade
-|   2018-2020
+|   2018-2022
 |
 \---------------------------------------------------------------------------*/
 
@@ -26,6 +26,16 @@
 
 #include <tcldom.h>
 #include <domxpath.h>
+
+#define SPACE(c) IS_XML_WHITESPACE ((c))
+    
+
+#if !defined(checkNrArgs)
+#define checkNrArgs(l,h,err) if (objc < l || objc > h) {      \
+        SetResult (err);                                      \
+        return TCL_ERROR;                                     \
+    }
+#endif
 
 typedef enum {
   SCHEMA_CTYPE_ANY,
@@ -37,6 +47,7 @@ typedef enum {
   SCHEMA_CTYPE_VIRTUAL,
   SCHEMA_CTYPE_KEYSPACE,
   SCHEMA_CTYPE_KEYSPACE_END,
+  SCHEMA_CTYPE_JSON_STRUCT,
 } Schema_CP_Type;
 
 typedef enum {
@@ -47,6 +58,17 @@ typedef enum {
   SCHEMA_CQUANT_NM,
   SCHEMA_CQUANT_ERROR,
 } SchemaQuant;
+
+typedef enum {
+    MATCH_GLOBAL = 1,
+    MATCH_ELEMENT_START,
+    MATCH_ELEMENT_END,
+    MATCH_TEXT,
+    MATCH_ATTRIBUTE_TEXT,
+    MATCH_DOM_KEYCONSTRAINT,
+    MATCH_DOM_XPATH_BOOLEAN
+} ValidationAction;
+
 
 typedef int (*SchemaConstraintFunc) (Tcl_Interp *interp,
                                      void *constraintData, char *text);
@@ -81,15 +103,16 @@ typedef unsigned int SchemaFlags;
 #define FORWARD_TYPE_DEF      128
 #define TYPED_ELEMENT         256
 #define HASH_ENTRY_DELETED    512
+#define ANY_NOT              1024 
 
 typedef struct domKeyConstraint {
-    char  *name;
-    ast    selector;
-    ast   *fields;
-    int    nrFields;
-    int    flags;
-    char  *emptyFieldSetValue;
-    int    efsv_len;
+    char     *name;
+    ast       selector;
+    ast      *fields;
+    domLength nrFields;
+    int       flags;
+    char     *emptyFieldSetValue;
+    size_t    efsv_len;
     struct domKeyConstraint *next;
 } domKeyConstraint;
 
@@ -154,7 +177,6 @@ typedef struct SchemaData_
     Tcl_HashTable elementType;
     Tcl_HashTable elementTypeInstance;
     Tcl_HashTable namespace;
-    Tcl_HashEntry *emptyNamespace;
     char **prefixns;
     Tcl_HashTable prefix;
     Tcl_HashTable pattern;
@@ -187,7 +209,7 @@ typedef struct SchemaData_
     SchemaValidationStack *stack;
     SchemaValidationStack *stackPool;
     ValidationState validationState;
-    int vaction;
+    ValidationAction vaction;
     const char *vname;
     const char *vns;
     const char *vtext;
@@ -200,11 +222,75 @@ typedef struct SchemaData_
     XML_Parser parser;
     domNode *node;
     domNode *insideNode;
-    int choiceHashThreshold;
-    int attributeHashThreshold;
+    domTextNode *textNode;
+    unsigned int choiceHashThreshold;
+    unsigned int attributeHashThreshold;
     char *wsbuf;
     int wsbufLen;
 } SchemaData;
+
+#define GETASI (SchemaData*)Tcl_GetAssocData(interp, "tdom_schema", NULL);
+#define SETASI(v) Tcl_SetAssocData (interp, "tdom_schema", NULL, v)
+
+#define ADD_CONSTRAINT(sdata, sc)                                       \
+    sc = TMALLOC (SchemaConstraint);                                    \
+    memset (sc, 0, sizeof (SchemaConstraint));                          \
+    if (sdata->cp->nc == sdata->contentSize) {                          \
+        sdata->cp->content =                                            \
+            REALLOC (sdata->cp->content,                                \
+                     2 * sdata->contentSize                             \
+                     * sizeof (SchemaCP*));                             \
+        sdata->cp->quants =                                             \
+            REALLOC (sdata->cp->quants,                                 \
+                     2 * sdata->contentSize                             \
+                     * sizeof (SchemaQuant));                           \
+        sdata->contentSize *= 2;                                        \
+    }                                                                   \
+    sdata->cp->content[sdata->cp->nc] = (SchemaCP *) sc;                \
+    sdata->cp->quants[sdata->cp->nc] = SCHEMA_CQUANT_ONE;               \
+    sdata->cp->nc++;                                                    \
+
+#define REMEMBER_PATTERN(pattern)                                       \
+    if (sdata->numPatternList == sdata->patternListSize) {              \
+        sdata->patternList = (SchemaCP **) REALLOC (                    \
+            sdata->patternList,                                         \
+            sizeof (SchemaCP*) * sdata->patternListSize * 2);           \
+        sdata->patternListSize *= 2;                                    \
+    }                                                                   \
+    sdata->patternList[sdata->numPatternList] = pattern;                \
+    sdata->numPatternList++;
+
+
+SchemaCP*
+tDOM_initSchemaCP (
+    Schema_CP_Type type,
+    void *namespace,
+    char *name
+    );
+
+#define initSchemaCP(type,namespace,name) \
+    tDOM_initSchemaCP(type,namespace,name)
+
+int
+tDOM_evalConstraints (
+    Tcl_Interp *interp,
+    SchemaData *sdata,
+    SchemaCP *cp,
+    Tcl_Obj *script
+    );
+
+#define evalConstraints(interp,sdata,cp,script) \
+    tDOM_evalConstraints(interp,sdata,cp,script)
+
+int
+tDOM_checkText (
+    Tcl_Interp *interp,
+    void *clientData,
+    char *text
+    );
+
+#define checkText(interp,clientData,text) \
+    tDOM_checkText(interp,clientData,text)
 
 int 
 tDOM_schemaInstanceCmd (
@@ -255,8 +341,7 @@ tDOM_probeText (
 
 void
 tDOM_schemaReset (
-    SchemaData *sdata,
-    int lookforCleanup
+    SchemaData *sdata
     );
 
 #endif 

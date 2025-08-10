@@ -4,18 +4,18 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x5618df24a450">NAME</a> · <a href="#SECTid0x5618df2496b0">SYNOPSIS</a> · <a href="#SECTid0x5618df32a740">DESCRIPTION </a> · <a href="#SECTid0x5618df39b720">Schema definition scripts</a> · <a href="#SECTid0x5618df3aa9a0">Quantity specifier</a> · <a href="#SECTid0x5618df3ac9e0">Text constraint scripts</a> · <a href="#SECTid0x5618df3c1470">Local key constraints</a> · <a href="#SECTid0x5618df3c3290">Recovering</a> · <a href="#SECTid0x5618df3c5370">Examples</a> · <a href="#SECTid0x5618df3c6ed0">KEYWORDS</a>
+<a href="#SECTid0x563180f3e5c0">NAME</a> · <a href="#SECTid0x563180f795e0">SYNOPSIS</a> · <a href="#SECTid0x563181045f40">DESCRIPTION </a> · <a href="#SECTid0x5631810b9360">Schema definition scripts</a> · <a href="#SECTid0x5631810c9590">Quantity specifier</a> · <a href="#SECTid0x5631810cb5d0">Text constraint scripts</a> · <a href="#SECTid0x5631810e0f00">Local key constraints</a> · <a href="#SECTid0x5631810e2d20">Recovering</a> · <a href="#SECTid0x5631810e4e00">Examples</a> · <a href="#SECTid0x5631810e6960">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x5618df24a450">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x563180f3e5c0">NAME</a></h2><p class="namesection">
 <b class="names">tdom::schema - </b><br>Creates a schema validation command</p>
 
-  <h2><a name="SECTid0x5618df2496b0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x563180f795e0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">tdom::schema</b> <i class="m">?create?</i> <i class="m">cmdName</i>
     </pre>
 
-  <h2><a name="SECTid0x5618df32a740">DESCRIPTION </a></h2><p>Every call of this command creates a new validation command. A
+  <h2><a name="SECTid0x563181045f40">DESCRIPTION </a></h2><p>Every call of this command creates a new validation command. A
     validation command has methods to define a schema and is able
     to validate XML data or to post-validate a tDOM DOM tree (and to
     some degree other kind of hierarchical data) against this
@@ -132,7 +132,7 @@
 </dt>
         <dd>This method defines several elements or patterns or a
         whole schema with one call, by evaluating the <i class="m">definition
-        script&gt;</i>. All schema command methods so far
+        script</i>. All schema command methods so far
         (<i class="m">prefixns</i>, <i class="m">defelement</i>, <i class="m">defelementtype</i>,
         <i class="m">defpattern</i>, <i class="m">deftexttype</i> and <i class="m">start</i>) are
         allowed top level in the <i class="m">definition script</i>. The
@@ -207,7 +207,7 @@
 </dt>
                 
                 <dd>If <i class="m">-externalentitycommand &lt;script&gt;</i>
-                is specified, the specified tcl script is called to
+                is specified, the specified Tcl script is called to
                 resolve any external entities of the document. The
                 default is "::tdom::extRefHandler", which is a simple
                 file URL resolver defined by the script part of the
@@ -217,7 +217,7 @@
                 three arguments: the base uri, the system identifier
                 of the entity and the public identifier of the entity.
                 The base uri and the public identifier may be the
-                empty list. The script has to return a tcl list
+                empty list. The script has to return a Tcl list
                 consisting of three elements. The first element of
                 this list signals how the external entity is returned
                 to the processor. Currently the two allowed types are
@@ -226,8 +226,8 @@
                 entity to be parsed. The third element of the list are
                 data, either the already read data out of the external
                 entity as string in the case of type "string", or the
-                name of a tcl channel, in the case of type "channel".
-                Note that if the script returns a tcl channel, it will
+                name of a Tcl channel, in the case of type "channel".
+                Note that if the script returns a Tcl channel, it will
                 not be closed by the processor. It must be closed
                 separately if it is no longer needed.</dd>
             
@@ -281,7 +281,7 @@
 </dt>
         <dd>Returns true if the content of <i class="m">filename</i> is valid,
         or false, otherwise. The given file is fed as binary stream to
-        expat, therefore only US-ASCII, ISO-8859-1, UTF-8 or UTF-16
+        expat, therefore, only US-ASCII, ISO-8859-1, UTF-8 or UTF-16
         encoded data will work with this method. If validation has
         failed and the optional <i class="m">objVar</i> argument is given, the
         variable with that name is set to a validation error message.
@@ -347,7 +347,7 @@
             <dt>UNKNOWN_GLOBAL_ID</dt><dd></dd>
             <dt>UNKNOWN_ID</dt><dd></dd>
         </dl>
-        <p> For more detailed information see section <a href="#SECTid0x5618df3c3290">Recovering</a>.</p>
+        <p> For more detailed information see section <a href="#SECTid0x5631810e2d20">Recovering</a>.</p>
         </dd>
       
 
@@ -396,6 +396,16 @@
                   <dt><b>column</b></dt>
                   <dd>If the schema command is currently validating
                   this method returns the column part of the parsing
+                  position information, and the empty string in all
+                  other cases. If the schema command is currently
+                  post-validating a DOM tree, there may be no position
+                  information stored at some or all nodes. The
+                  empty string is returned in these cases.</dd>
+              
+              
+                  <dt><b>byteIndex</b></dt>
+                  <dd>If the schema command is currently validating
+                  this method returns the byte position of the parsing
                   position information, and the empty string in all
                   other cases. If the schema command is currently
                   post-validating a DOM tree, there may be no position
@@ -456,7 +466,7 @@
                   next event, the list entry will be a two elements
                   list, with #text as first element and the empty
                   string as second. If an any element constraint is
-                  possible. the list entry will be a two elements list,
+                  possible the list entry will be a two elements list,
                   with &lt;any&gt; as first element and the empty string
                   as second. If an any element in a certain namespace
                   constraint is possible, the list entry will be a two
@@ -576,7 +586,7 @@
 
     </dl>
 
-  <h2><a name="SECTid0x5618df39b720">Schema definition scripts</a></h2><p>Schema definition scripts are ordinary Tcl scripts evaluated in
+  <h2><a name="SECTid0x5631810b9360">Schema definition scripts</a></h2><p>Schema definition scripts are ordinary Tcl scripts evaluated in
     the namespace tdom::schema. The schema definition commands listed
     below in this Tcl namespace allow the definition of a wide variety
     of document structures. Every schema definition command
@@ -630,7 +640,7 @@
 <b class="method">group</b> <i class="m">?quant?</i> <i class="m">&lt;definition script&gt;</i>
 </dt>
         <dd>This method group a sequence of content particles
-        defined by the <i class="m">definition script&gt;</i>, which have to match
+        defined by the <i class="m">definition script</i>, which have to match
         in this sequence order.</dd>
       
       
@@ -639,7 +649,7 @@
 <b class="method">choice</b> <i class="m">?quant?</i> <i class="m">&lt;definition script&gt;</i>
 </dt>
         <dd>This schema constraint matches if one of the top level
-        content particles defined by the <i class="m">definition script&gt;</i>
+        content particles defined by the <i class="m">definition script</i>
         matches. If one of this top level content particle is optional
         this constraint matches the "empty match".
         </dd>
@@ -651,7 +661,7 @@
 </dt>
         <dd>This schema constraint matches after every of the required
         top level content particles defined by the <i class="m">definition
-        script&gt;</i> have matched (and, optional, some or all other) in
+        script</i> have matched (and, optional, some or all other) in
         any arbitrary order.</dd>
       
 
@@ -661,7 +671,7 @@
 </dt>
         <dd>This schema constraint matches for any text (including the
         empty one) and every top level content particle defined by the
-        <i class="m">definition script&gt;</i> with default quantifier *.</dd>
+        <i class="m">definition script</i> with default quantifier *.</dd>
       
 
       
@@ -677,16 +687,20 @@
 
       
         <dt>
-<b class="method">any</b> <i class="m">?namespace?</i> <i class="m">?quant?</i>
+<b class="method">any</b> ?<i class="m">options</i>? <i class="m">?&lt;namespace list&gt;?</i> <i class="m">?quant?</i>
 </dt>
-        <dd>The any command matches every element (in the namespace
-        <i class="m">namespace</i>, if that is given) (with whatever attributes)
-        or subtree, no matter if known within the schema or not.
+        <dd>Without arguments the any command matches every element.
+        If the <i class="m">&lt;namespace list&gt;</i> argument is given, this
+        matches any element in a namespace out of that list. The empty
+        string means elements with no namespace. If additionally the
+        option <i class="m">-not</i> is given then this maches every element
+        with a namespace not in the list. The only other recognized
+        option is <i class="m">--</i> which signals the end of any options.
         Please note that in case of no <i class="m">namespace</i> argument is
         given that means that the quantifier * and + will eat up any
         elements until the enclosing element ends. If you really have
-        a namespace that looks like a valid tDOM schema quantifier
-        you will have to spell out always both arguments.</dd>
+        a namespace that looks like a valid tDOM schema quantifier you
+        will have to spell out always both arguments.</dd>
       
 
       
@@ -705,7 +719,7 @@
         Otherwise, if there are two more arguments and the first of
         them is the bare-word "type" the following argument is used as
         a text type name. This command is only allowed at top level in
-        the definition script of an defelement/element script.</dd>
+        the definition script of a defelement/element script.</dd>
       
 
       
@@ -736,7 +750,7 @@
         This validation command is only allowed in strict sequential
         context (not in choice, mixed and interleave). If the return
         code is something else than TCL_OK, this is an error (which
-        is not catched and reported by reportcmd).</dd>
+        is not caught and reported by reportcmd).</dd>
       
 
       
@@ -812,7 +826,24 @@ s define {
 
       
         <dt>
-<b class="method">prefixns</b> <i class="m">?prefixUriList?</i>
+<b class="method">jsontype</b> <i class="m">JSON structure type</i>
+</dt>
+        <dd>
+<p>If not postvalidating a DOM tree with
+        <i class="m">domvalidate</i> this constraint always matches. If
+        postvalidating the constraint matches if the enclosing element
+        has the JSON type given as argument to the structure
+        constraint. The possible JSON structure types are <i class="m">NONE</i>,
+        <i class="m">OBJECT</i> and <i class="m">ARRAY</i>. This constraint is only
+        allowed as direct child of a defelement, defelementtype or
+        local element definition.</p>
+        </dd>
+      
+      
+      
+        <dt>
+<b class="method">prefixns</b>
+        <i class="m">?prefixUriList?</i>
 </dt>
         <dd>This defines a prefix to namespace URI mapping exactly
         as a <i>schemacmd prefixns</i> would. It is meant as top-level
@@ -877,7 +908,7 @@ s define {
       
     </dl>
 
-  <h2><a name="SECTid0x5618df3aa9a0">Quantity specifier</a></h2><p>Several schema definition commands expect a quantifier as
+  <h2><a name="SECTid0x5631810c9590">Quantity specifier</a></h2><p>Several schema definition commands expect a quantifier as
     one of their arguments which determines how often the content
     particle specified by the command is expected. The valid values
     for a <i class="m">quant</i> argument are:</p><dl class="optlist">
@@ -924,7 +955,7 @@ s define {
     </dl><p>If an optional quantifier is not given, it defaults to * in
     case of the <i class="m">mixed</i> command and to ! for all other commands.</p>
 
-  <h2><a name="SECTid0x5618df3ac9e0">Text constraint scripts</a></h2><p>Text (parsed character data, as XML calls it) sometimes has to
+  <h2><a name="SECTid0x5631810cb5d0">Text constraint scripts</a></h2><p>Text (parsed character data, as XML calls it) sometimes has to
     be of a certain kind or comply with certain rules to be valid. The
     text constraint script arguments to text, attribute, nsattribute
     and deftexttype commands are evaluated in the Tcl namespace
@@ -940,7 +971,7 @@ s define {
     command is available in the tdom::type namespace is recorded in
     its documentation.
     </p>
-        <h3><a name="SECTid0x5618df3ad3e0">The tcl text constraint command</a></h3>
+        <h3><a name="SECTid0x5631810cbfd0">The tcl text constraint command</a></h3>
         <p>The <i class="m">tcl</i> text constraint command dispatches the check
         to an arbitrary Tcl command, thus enable any programmable
         decision rules.</p>
@@ -955,7 +986,7 @@ s define {
             
         </dl>
     
-        <h3><a name="SECTid0x5618df3ae1c0">Basic XML types</a></h3>
+        <h3><a name="SECTid0x5631810ccdb0">Basic XML types</a></h3>
         <dl class="commandlist">
             
                 <dt><b class="cmd">name</b></dt>
@@ -1002,7 +1033,7 @@ s define {
             
         </dl>
     
-        <h3><a name="SECTid0x5618df3b01d0">Basic type tests</a></h3>
+        <h3><a name="SECTid0x5631810cedc0">Basic type tests</a></h3>
         <p>
         </p>
         <dl class="commandlist">
@@ -1202,7 +1233,7 @@ s define {
             
         </dl>
     
-        <h3><a name="SECTid0x5618df3b8700">Logical constructs</a></h3>
+        <h3><a name="SECTid0x5631810d72f0">Logical constructs</a></h3>
         <dl class="commandlist">
         
             <dt>
@@ -1247,7 +1278,7 @@ s define {
         
         </dl>
     
-        <h3><a name="SECTid0x5618df3baa50">Constraints on processed text value</a></h3>
+        <h3><a name="SECTid0x5631810d9640">Constraints on processed text value</a></h3>
         <dl class="commandlist">
             
             <dt>
@@ -1273,7 +1304,7 @@ s define {
 <p>This text constraint command splits the text to test
             into a list of values and tests all elements of that list for
             the text constraints in the evaluated <i class="m">constraint
-            script&gt;</i>.</p>
+            script</i>.</p>
             <p>The available types are:</p>
             <dl>
                 <dt>whitespace</dt><dd>The text to split is stripped
@@ -1294,12 +1325,12 @@ s define {
 <b class="cmd">strip</b> <i class="m">&lt;constraint script&gt;</i>
 </dt>
             <dd>This text constraint command tests all text constraints
-            in the evaluated <i class="m">constraint script&gt;</i> with the text to
+            in the evaluated <i class="m">constraint script</i> with the text to
             test stripped of all white space at start and end.</dd>
         
         </dl>
     
-        <h3><a name="SECTid0x5618df3bd410">Various other string properties</a></h3>
+        <h3><a name="SECTid0x5631810dc000">Various other string properties</a></h3>
         <dl class="commandlist">
         
             <dt>
@@ -1375,15 +1406,30 @@ s define {
             <dt>
 <b class="cmd">idref</b> <i class="m">?keySpace?</i>
 </dt>
-            <dd>This text constraint command expects the text to be a
-            reference to an ID within the document. The referenced ID may
-            appear later in the document, that the reference. Several
-            references within the document to one ID are possible.</dd>
+            <dd>This text constraint command expects the text to be
+            a reference to an ID within the document. The referenced
+            ID may appear later in the document than the reference.
+            Several references within the document to one ID are
+            possible. For the optional <i class="m">keySpace</i> argument see
+            <i class="m">id</i>
+</dd>
+        
+        
+            <dt>
+<b class="cmd">jsontype</b> <i class="m">&lt;JSON text type&gt;</i>
+</dt>
+            <dd>If not postvalidating a DOM tree with
+            <i class="m">domvalidate</i> this constraint always matches. If
+            postvalidating the current TEXT_NODE to check must have
+            the JSON text type given as argument to the text
+            constraint command. The possible types are <i class="m">NULL</i>,
+            <i class="m">TRUE</i>, <i class="m">FALSE</i>, <i class="m">STRING</i> and
+            <i class="m">NUMBER</i>.</dd>
         
         </dl>
     
 
-  <h2><a name="SECTid0x5618df3c1470">Local key constraints</a></h2><p>Document wide uniqueness and foreign key constraints are
+  <h2><a name="SECTid0x5631810e0f00">Local key constraints</a></h2><p>Document wide uniqueness and foreign key constraints are
     available with the text constraint commands id and idref.
     Keyspaces allow for sub-tree local uniqueness and foreign key
     constraints.</p><dl class="commandlist">
@@ -1419,7 +1465,7 @@ s define {
         
     </dl>
 
-  <h2><a name="SECTid0x5618df3c3290">Recovering</a></h2><p>By default the validation engine stops at the first detected
+  <h2><a name="SECTid0x5631810e2d20">Recovering</a></h2><p>By default the validation engine stops at the first detected
       validation violation and reports that finding. It does so by
       return false (and sets, if given, the result variable with an
       error message) in case the schema command itself is used to
@@ -1459,12 +1505,12 @@ s define {
       content within the current subtree and to continue with the
       element end event of the subtree.</p><p>Returning "ignore" from the recovering script in case of
       error type MISSING_ELEMENT recovers by ignoring the failed
-      contraint and continues to match the event further against the
+      constraint and continues to match the event further against the
       schema.</p><p>Returning "vanish" from the recover script in case of the
       error types MISSING_ELEMENT and UNEXPECTED_ELEMENT recovers by
       ignoring the event.</p>
 
-  <h2><a name="SECTid0x5618df3c5370">Examples</a></h2><p>The XML Schema Part 0: Primer Second Edition
+  <h2><a name="SECTid0x5631810e4e00">Examples</a></h2><p>The XML Schema Part 0: Primer Second Edition
     (<a href="https://www.w3.org/TR/xmlschema-0/">https://www.w3.org/TR/xmlschema-0/</a>) starts with this
     example schema:</p><pre class="example">
 &lt;xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
@@ -1533,7 +1579,7 @@ s define {
   &lt;/xsd:simpleType&gt;
 
 &lt;/xsd:schema&gt;
-    </pre><p>A likely one-to-one translation of that into a tDOM schema
+    </pre><p>A simple one-to-one translation of that into a tDOM schema
     definition script would be:</p><pre class="example">
 tdom::schema schema      
 schema define {
@@ -1561,17 +1607,17 @@ schema define {
         element city
         element state
         element zip ! {text number}
-        attribute country ! {fixed "US"}
+        attribute country {fixed "US"}
     }
 
     defelement items {
         element item * {
             element product
-            element quantity ! {text integer}
+            element quantity ! {text positiveInteger}
             element USPrice ! {text number}
             element comment
             element shipDate ? {text date}
-            attribute partNum ! {pattern "^\d{3}-[A-Z]{2}$"}
+            attribute partNum {regexp "^\d{3}-[A-Z]{2}$"}
         }
     }
 }
@@ -1633,7 +1679,7 @@ schema define {
       
     </pre>
 
-<h2><a name="SECTid0x5618df3c6ed0">KEYWORDS</a></h2><p class="keywords">
+<h2><a name="SECTid0x5631810e6960">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-Validation">Validation</a>, <a class="keyword" href="keyword-index.html#KW-Postvalidation">Postvalidation</a>, <a class="keyword" href="keyword-index.html#KW-DOM">DOM</a>, <a class="keyword" href="keyword-index.html#KW-SAX">SAX</a>
 </p>
 </div><hr class="navsep"><div class="navbar" align="center">

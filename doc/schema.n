@@ -265,7 +265,7 @@ element will be valid as root of a tree to validate.
 \&\fB\fBdefine\fP \fI<definition script>\fB
 \&\fRThis method defines several elements or patterns or a
 whole schema with one call, by evaluating the \fIdefinition
-script>\fR. All schema command methods so far
+script\fR. All schema command methods so far
 (\fIprefixns\fR, \fIdefelement\fR, \fIdefelementtype\fR,
 \&\fIdefpattern\fR, \fIdeftexttype\fR and \fIstart\fR) are
 allowed top level in the \fIdefinition script\fR. The
@@ -308,7 +308,7 @@ resolved relative to this base URI. This base URI is
 also stored within the DOM tree.
 .IP "\fB-externalentitycommand  \fI<script>\fP\fR"
 If \fI-externalentitycommand <script>\fR
-is specified, the specified tcl script is called to
+is specified, the specified Tcl script is called to
 resolve any external entities of the document. The
 default is "::tdom::extRefHandler", which is a simple
 file URL resolver defined by the script part of the
@@ -318,7 +318,7 @@ evaluated command consists of this option followed by
 three arguments: the base uri, the system identifier
 of the entity and the public identifier of the entity.
 The base uri and the public identifier may be the
-empty list. The script has to return a tcl list
+empty list. The script has to return a Tcl list
 consisting of three elements. The first element of
 this list signals how the external entity is returned
 to the processor. Currently the two allowed types are
@@ -327,8 +327,8 @@ has to be the (absolute) base URI of the external
 entity to be parsed. The third element of the list are
 data, either the already read data out of the external
 entity as string in the case of type "string", or the
-name of a tcl channel, in the case of type "channel".
-Note that if the script returns a tcl channel, it will
+name of a Tcl channel, in the case of type "channel".
+Note that if the script returns a Tcl channel, it will
 not be closed by the processor. It must be closed
 separately if it is no longer needed.
 .IP "\fB-paramentityparsing  \fI<always|never|notstandalone>\fP\fR"
@@ -363,7 +363,7 @@ called.
 \&\fB\fBvalidatefile\fP ?\fIoptions\fB? \fIfilename\fB \fI?objVar?\fB
 \&\fRReturns true if the content of \fIfilename\fR is valid,
 or false, otherwise. The given file is fed as binary stream to
-expat, therefore only US-ASCII, ISO-8859-1, UTF-8 or UTF-16
+expat, therefore, only US-ASCII, ISO-8859-1, UTF-8 or UTF-16
 encoded data will work with this method. If validation has
 failed and the optional \fIobjVar\fR argument is given, the
 variable with that name is set to a validation error message.
@@ -478,6 +478,14 @@ other cases. If the schema command is currently
 post-validating a DOM tree, there may be no position
 information stored at some or all nodes. The
 empty string is returned in these cases.
+.IP "\fBbyteIndex\fR"
+If the schema command is currently validating
+this method returns the byte position of the parsing
+position information, and the empty string in all
+other cases. If the schema command is currently
+post-validating a DOM tree, there may be no position
+information stored at some or all nodes. The
+empty string is returned in these cases.
 .IP "\fBdomNode\fR"
 If the schema command isn't currently
 post-validating a DOM tree this method returns the
@@ -521,7 +529,7 @@ namespace as second element. If text is a possible
 next event, the list entry will be a two elements
 list, with #text as first element and the empty
 string as second. If an any element constraint is
-possible. the list entry will be a two elements list,
+possible the list entry will be a two elements list,
 with <any> as first element and the empty string
 as second. If an any element in a certain namespace
 constraint is possible, the list entry will be a two
@@ -680,25 +688,25 @@ whatsoever is expected ("empty match").
 .TP
 \&\fB\fBgroup\fP \fI?quant?\fB \fI<definition script>\fB
 \&\fRThis method group a sequence of content particles
-defined by the \fIdefinition script>\fR, which have to match
+defined by the \fIdefinition script\fR, which have to match
 in this sequence order.
 .TP
 \&\fB\fBchoice\fP \fI?quant?\fB \fI<definition script>\fB
 \&\fRThis schema constraint matches if one of the top level
-content particles defined by the \fIdefinition script>\fR
+content particles defined by the \fIdefinition script\fR
 matches. If one of this top level content particle is optional
 this constraint matches the "empty match".
 .TP
 \&\fB\fBinterleave\fP \fI?quant?\fB \fI<definition script>\fB
 \&\fRThis schema constraint matches after every of the required
 top level content particles defined by the \fIdefinition
-script>\fR have matched (and, optional, some or all other) in
+script\fR have matched (and, optional, some or all other) in
 any arbitrary order.
 .TP
 \&\fB\fBmixed\fP \fI?quant?\fB \fI<definition script>\fB
 \&\fRThis schema constraint matches for any text (including the
 empty one) and every top level content particle defined by the
-\&\fIdefinition script>\fR with default quantifier *.
+\&\fIdefinition script\fR with default quantifier *.
 .TP
 \&\fB\fBtext\fP \fI?<constraint script>|\*(lqtype\*(lq typename?\fB
 \&\fRWithout the optional constraint script this validation
@@ -707,15 +715,19 @@ With \fIconstraint script\fR or with a given text type
 argument a text matching this script or the text type is
 expected.
 .TP
-\&\fB\fBany\fP \fI?namespace?\fB \fI?quant?\fB
-\&\fRThe any command matches every element (in the namespace
-\&\fInamespace\fR, if that is given) (with whatever attributes)
-or subtree, no matter if known within the schema or not.
+\&\fB\fBany\fP ?\fIoptions\fB? \fI?<namespace list>?\fB \fI?quant?\fB
+\&\fRWithout arguments the any command matches every element.
+If the \fI<namespace list>\fR argument is given, this
+matches any element in a namespace out of that list. The empty
+string means elements with no namespace. If additionally the
+option \fI-not\fR is given then this maches every element
+with a namespace not in the list. The only other recognized
+option is \fI--\fR which signals the end of any options.
 Please note that in case of no \fInamespace\fR argument is
 given that means that the quantifier * and + will eat up any
 elements until the enclosing element ends. If you really have
-a namespace that looks like a valid tDOM schema quantifier
-you will have to spell out always both arguments.
+a namespace that looks like a valid tDOM schema quantifier you
+will have to spell out always both arguments.
 .TP
 \&\fB\fBattribute\fP \fIname\fB \fI?quant?\fB \fI(?<constraint script>|\*(lqtype\*(lq typename?)\fB
 \&\fRThe attribute command defines an attribute (in no
@@ -730,7 +742,7 @@ script, defining the value constraints of the attribute.
 Otherwise, if there are two more arguments and the first of
 them is the bare-word "type" the following argument is used as
 a text type name. This command is only allowed at top level in
-the definition script of an defelement/element script.
+the definition script of a defelement/element script.
 .TP
 \&\fB\fBnsattribute\fP \fIname\fB \fInamespace\fB \fI?quant?\fB \fI(?<constraint script>|\*(lqtype\*(lq typename?)\fB
 \&\fRThis command does the same as the command
@@ -749,7 +761,7 @@ empty string as \fIURI\fR means no namespace.
 This validation command is only allowed in strict sequential
 context (not in choice, mixed and interleave). If the return
 code is something else than TCL_OK, this is an error (which
-is not catched and reported by reportcmd).
+is not caught and reported by reportcmd).
 .TP
 \&\fB\fBself\fP
 \&\fRReturns the schema command.
@@ -814,7 +826,21 @@ s define {
 .CE
 .RE
 .TP
-\&\fB\fBprefixns\fP \fI?prefixUriList?\fB
+\&\fB\fBjsontype\fP \fIJSON structure type\fB
+\&\fR
+.RS
+.PP
+If not postvalidating a DOM tree with
+\&\fIdomvalidate\fR this constraint always matches. If
+postvalidating the constraint matches if the enclosing element
+has the JSON type given as argument to the structure
+constraint. The possible JSON structure types are \fINONE\fR,
+\&\fIOBJECT\fR and \fIARRAY\fR. This constraint is only
+allowed as direct child of a defelement, defelementtype or
+local element definition.
+.RE
+.TP
+\&\fB\fBprefixns\fP         \fI?prefixUriList?\fB
 \&\fRThis defines a prefix to namespace URI mapping exactly
 as a \fIschemacmd prefixns\fR would. It is meant as top-level
 command of a \fIschemacmd define\fR script. This command is
@@ -1175,7 +1201,7 @@ contiguous white-space are replaced by a single space.
 This text constraint command splits the text to test
 into a list of values and tests all elements of that list for
 the text constraints in the evaluated \fIconstraint
-script>\fR.
+script\fR.
 .PP
 The available types are:
 .TP
@@ -1197,7 +1223,7 @@ The default in case no split type argument is given is
 .TP
 \&\fB\fBstrip\fP \fI<constraint script>\fB
 \&\fRThis text constraint command tests all text constraints
-in the evaluated \fIconstraint script>\fR with the text to
+in the evaluated \fIconstraint script\fR with the text to
 test stripped of all white space at start and end.
 .SS "Various other string properties"
 .TP
@@ -1252,10 +1278,21 @@ space then the \fIid\fR command without keySpace
 argument.
 .TP
 \&\fB\fBidref\fP \fI?keySpace?\fB
-\&\fRThis text constraint command expects the text to be a
-reference to an ID within the document. The referenced ID may
-appear later in the document, that the reference. Several
-references within the document to one ID are possible.
+\&\fRThis text constraint command expects the text to be
+a reference to an ID within the document. The referenced
+ID may appear later in the document than the reference.
+Several references within the document to one ID are
+possible. For the optional \fIkeySpace\fR argument see
+\&\fIid\fR
+.TP
+\&\fB\fBjsontype\fP \fI<JSON text type>\fB
+\&\fRIf not postvalidating a DOM tree with
+\&\fIdomvalidate\fR this constraint always matches. If
+postvalidating the current TEXT_NODE to check must have
+the JSON text type given as argument to the text
+constraint command. The possible types are \fINULL\fR,
+\&\fITRUE\fR, \fIFALSE\fR, \fISTRING\fR and
+\&\fINUMBER\fR.
 .SH "Local key constraints"
 .PP
 Document wide uniqueness and foreign key constraints are
@@ -1342,7 +1379,7 @@ element end event of the subtree.
 .PP
 Returning "ignore" from the recovering script in case of
 error type MISSING_ELEMENT recovers by ignoring the failed
-contraint and continues to match the event further against the
+constraint and continues to match the event further against the
 schema.
 .PP
 Returning "vanish" from the recover script in case of the
@@ -1427,7 +1464,7 @@ example schema:
     
 .CE
 .PP
-A likely one-to-one translation of that into a tDOM schema
+A simple one-to-one translation of that into a tDOM schema
 definition script would be:
 .CS
 
@@ -1457,17 +1494,17 @@ schema define {
         element city
         element state
         element zip ! {text number}
-        attribute country ! {fixed "US"}
+        attribute country {fixed "US"}
     }
 
     defelement items {
         element item * {
             element product
-            element quantity ! {text integer}
+            element quantity ! {text positiveInteger}
             element USPrice ! {text number}
             element comment
             element shipDate ? {text date}
-            attribute partNum ! {pattern "^\ed{3}-[A-Z]{2}$"}
+            attribute partNum {regexp "^\ed{3}-[A-Z]{2}$"}
         }
     }
 }

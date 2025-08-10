@@ -60,7 +60,6 @@
 #else 
 # define RetError(m,p) *errStr=m; *pos=p; return TCL_ERROR;
 #endif
-#define SPACE(c)       ((c)==' ' || (c)=='\n' || (c)=='\t' || (c)=='\r')
 
 /*----------------------------------------------------------------------------
 |   Begin Character Entity Translator
@@ -85,9 +84,9 @@
 \---------------------------------------------------------------------------*/
 typedef struct Er Er;
 struct Er {
-    char *zName;     /* The name of this entity reference.  ex:  "amp" */
-    char *zValue;    /* The value for this entity.          ex:  "&"   */
-    Er *pNext;       /* Next entity with the same hash on zName        */
+    const char *zName;     /* The name of this entity reference.  ex:  "amp" */
+    const char *zValue;    /* The value for this entity.          ex:  "&"   */
+    Er *pNext;             /* Next entity with the same hash on zName        */
 };
 
 
@@ -202,14 +201,14 @@ static void ErInit (void)
 \---------------------------------------------------------------------------*/
 static int TranslateEntityRefs (
     char *z,
-    int  *newLen
+    domLength *newLen
 )
 {
-    int from;    /* Read characters from this position in z[] */
-    int to;      /* Write characters into this position in z[] */
-    int h;       /* A hash on the entity reference */
-    char *zVal;  /* The substituted value */
-    Er *p;       /* For looping down the entity reference collision chain */
+    domLength from;   /* Read characters from this position in z[] */
+    domLength to;     /* Write characters into this position in z[] */
+    int h;            /* A hash on the entity reference */
+    const char *zVal; /* The substituted value */
+    Er *p;            /* For looping down the entity reference collision chain */
     int value;
 
     from = to = 0;
@@ -229,7 +228,7 @@ static int TranslateEntityRefs (
 
     while (z[from]) {
         if (z[from]=='&') {
-            int i = from+1;
+            domLength i = from+1;
             int c;
 
             if (z[i] == '#') {
@@ -251,6 +250,7 @@ static int TranslateEntityRefs (
                             value += c-'a' + 10;
                         } else {
                             /* error */
+                            *newLen = i;
                             return 0;
                         }
                         i++;
@@ -262,14 +262,16 @@ static int TranslateEntityRefs (
                             value += c-'0';
                         } else {
                             /* error */
+                            *newLen = i;
                             return 0;
                         }
                         i++;
                     }
                 }
                 if (!z[i] || (z[i]!=';')) {
-                    return 0;
                     /* error */
+                    *newLen = i;
+                    return 0;
                 }
                 from = i+1;
                 if (value < 0x80) {
@@ -283,6 +285,7 @@ static int TranslateEntityRefs (
                     z[to++] = (char) ((value | 0x80) & 0xBF);
                 } else {
                     /* error */
+                    *newLen = i;
                     return 0;
                 }
             } else {
@@ -290,6 +293,7 @@ static int TranslateEntityRefs (
                    i++;
                 }
                 if (!z[i] || (z[i]!=';')) {
+                    *newLen = i;
                     return 0;
                 }
                 c = z[i];
@@ -308,7 +312,8 @@ static int TranslateEntityRefs (
                     from = i;
                     if (c==';') from++;
                 } else {
-                    z[to++] = z[from++];
+                    *newLen = i;
+                    return 0;
                 }
             }
         } else {
@@ -333,20 +338,22 @@ static int TranslateEntityRefs (
 static int
 XML_SimpleParse (
     char        *xml,   /* XML string  */
-    int         *pos,   /* Index of next unparsed character in xml */
+    domLength   *pos,   /* Index of next unparsed character in xml */
     domDocument *doc,
-    domNode     *parent_nodeOld,
+    domNode     *parent,
     int          ignoreWhiteSpaces,
     int          keepCDATA,
+    int          forest,
     char       **errStr
 ) {
     register int   c;          /* Next character of the input file */
     register char *pn;
     register char *x, *start, *piSep;
-    int            saved;
+    char           savedChar;
+    domLength      saved;
     int            hasContent;
     domNode       *node;
-    domNode       *parent_node = NULL;
+    domNode       *parent_node = parent;
     domTextNode   *tnode;
     domAttrNode   *attrnode, *lastAttr, *attrList;
     int            ampersandSeen = 0;
@@ -402,12 +409,13 @@ XML_SimpleParse (
                     memmove(tnode->nodeValue + tnode->valueLength,
                             start, x - start);
                     saved = tnode->valueLength;
-                    tnode->valueLength += (x - start);
+                    tnode->valueLength += (domLength)(x - start);
                     *(tnode->nodeValue + tnode->valueLength) = 0;
                     if (ampersandSeen) {
                         if (!TranslateEntityRefs(tnode->nodeValue + saved, 
                                                  &(tnode->valueLength) )) {
-                            RetError("Entity parsing error", (x - xml));
+                            RetError("Entity parsing error",
+                                     (domLength)(start - xml + tnode->valueLength));
                         }
                         tnode->valueLength += saved;
                     }
@@ -420,12 +428,12 @@ XML_SimpleParse (
                     tnode->nodeType    = TEXT_NODE;
                     tnode->ownerDocument = doc;
                     tnode->nodeNumber  = NODE_NO(doc);
-                    tnode->valueLength = (x - start);
+                    tnode->valueLength = (domLength)(x - start);
                     tnode->nodeValue   = (char*)MALLOC((x - start)+1);
                     memmove(tnode->nodeValue, start, (x - start));
                     *(tnode->nodeValue + (x - start)) = 0;
                     tnode->parentNode = parent_node;
-                    if (parent_node->firstChild)  {
+                    if (parent_node->lastChild)  {
                         parent_node->lastChild->nextSibling = (domNode*)tnode;
                         tnode->previousSibling = parent_node->lastChild;
                         parent_node->lastChild = (domNode*)tnode;
@@ -436,7 +444,8 @@ XML_SimpleParse (
                     if (ampersandSeen) {
                         if (!TranslateEntityRefs(tnode->nodeValue, 
                                                  &(tnode->valueLength) )) {
-                            RetError("Entity parsing error", (x - xml));
+                            RetError("Entity parsing error",
+                                     (domLength)(start - xml + tnode->valueLength));
                         }
                     }
                 }
@@ -448,7 +457,7 @@ XML_SimpleParse (
             \-----------------------------------------------------------*/
             node = parent_node;
             if (!parent_node) {
-                RetError("Syntax error",(x - xml));
+                RetError("Syntax error", (domLength)(x - xml));
             }
             parent_node = node->parentNode;
             pn = (char*)node->nodeName;
@@ -456,7 +465,7 @@ XML_SimpleParse (
             x += 2;
             while (*x == *pn) { x++; pn++; }
             if ( *pn || (*x!='>' && !SPACE(*x) ) ) {
-                RetError("Unterminated element",(x - xml));
+                RetError("Unterminated element", (domLength)(x - xml));
             }
             while (SPACE(*x)) {
                 x++;
@@ -464,7 +473,7 @@ XML_SimpleParse (
             if (*x=='>') {
                 x++;
             } else {
-                RetError("Missing \">\"",(x - xml)-1);
+                RetError("Missing \">\"",((domLength)(x - xml))-1);
             }
 #ifdef TDOM_NS 
             depth--;
@@ -507,7 +516,7 @@ XML_SimpleParse (
                         tnode->ownerDocument = doc;
                         tnode->nodeNumber    = NODE_NO(doc);
                         tnode->parentNode    = parent_node;
-                        tnode->valueLength   = x - start - 4;
+                        tnode->valueLength   = (domLength)(x - start - 4);
                         tnode->nodeValue     = (char*)MALLOC(tnode->valueLength+1);
                         memmove(tnode->nodeValue, start+4, tnode->valueLength);
                         *(tnode->nodeValue + tnode->valueLength) = 0;
@@ -532,7 +541,7 @@ XML_SimpleParse (
                         }
                         x += 3;
                     } else {
-                        RetError("Unterminated comment",(start-xml));
+                        RetError("Unterminated comment",(domLength)(start-xml));
                     }
                     continue;
 
@@ -558,7 +567,8 @@ XML_SimpleParse (
                     if (*x) {
                         x++;
                     } else {
-                        RetError("Unterminated DOCTYPE definition",(start-xml));
+                        RetError("Unterminated DOCTYPE definition",
+                                 (domLength)(start-xml));
                     }
                     continue;
 
@@ -595,8 +605,8 @@ XML_SimpleParse (
                                         REALLOC(tnode->nodeValue,
                                                 tnode->valueLength + x - start + 1);
                                     memmove(tnode->nodeValue + tnode->valueLength,
-                                            start, x - start);
-                                    tnode->valueLength += (x - start);
+                                            start, (x - start));
+                                    tnode->valueLength += (domLength)(x - start);
                                     *(tnode->nodeValue + tnode->valueLength) = 0;
                                 }
                             } else {
@@ -614,11 +624,11 @@ XML_SimpleParse (
                                     tnode->ownerDocument = doc;
                                     tnode->nodeNumber    = NODE_NO(doc);
                                     tnode->parentNode    = parent_node;
-                                    tnode->valueLength   = (x - start);
+                                    tnode->valueLength   = (domLength)(x - start);
                                     tnode->nodeValue     = (char*)MALLOC((x - start)+1);
                                     memmove(tnode->nodeValue, start, (x - start));
                                     *(tnode->nodeValue + (x - start)) = 0;
-                                    if (parent_node->firstChild)  {
+                                    if (parent_node->lastChild)  {
                                         parent_node->lastChild->nextSibling = (domNode*)tnode;
                                         tnode->previousSibling = parent_node->lastChild;
                                         parent_node->lastChild = (domNode*)tnode;
@@ -630,11 +640,11 @@ XML_SimpleParse (
                         }
                         x += 3;
                     } else {
-                        RetError("Unterminated CDATA definition",(start-xml) );
+                        RetError("Unterminated CDATA definition",(domLength)(start-xml) );
                     }
                     continue;
                  } else {
-                        RetError("Incorrect <!... tag",(start-xml) );
+                        RetError("Incorrect <!... tag",(domLength)(start-xml));
                  }
 
             } else if (*x=='?') {
@@ -669,7 +679,7 @@ XML_SimpleParse (
                     }
                     *piSep = '\0'; /* temporarily terminate the string */
 
-                    pinode->targetLength = strlen(start);
+                    pinode->targetLength = (domLength)strlen(start);
                     pinode->targetValue  = (char*)MALLOC(pinode->targetLength);
                     memmove(pinode->targetValue, start, pinode->targetLength);
 
@@ -681,7 +691,7 @@ XML_SimpleParse (
                     while (SPACE(*piSep)) {
                         piSep++;
                     }
-                    pinode->dataLength = x - piSep;
+                    pinode->dataLength = (domLength)(x - piSep);
                     pinode->dataValue  = (char*)MALLOC(pinode->dataLength);
                     memmove(pinode->dataValue, piSep, pinode->dataLength);
 
@@ -705,7 +715,7 @@ XML_SimpleParse (
                     }
                     x += 2;
                 } else {
-                    RetError("Unterminated processing instruction(PI)",(start-xml) );
+                    RetError("Unterminated processing instruction(PI)",(domLength)(start-xml) );
                 }
                 continue;
             }
@@ -719,10 +729,10 @@ XML_SimpleParse (
                 x++;
             }
             if (c==0) {
-                RetError("Missing \">\"",(start-xml) );
+                RetError("Missing \">\"",(domLength)(start-xml) );
             }
             if ( (x-start)==1) {
-                RetError("Null markup name",(start-xml) );
+                RetError("Null markup name",(domLength)(start-xml) );
             }
             *x = '\0'; /* temporarily terminate the string */
 
@@ -774,21 +784,21 @@ XML_SimpleParse (
 #endif            
             while ( (c=*x) && (c!='/') && (c!='>') ) {
                 char *ArgName = x;
-                int nArgName;
+                domLength nArgName;
                 char *ArgVal = NULL;
-                int nArgVal = 0;
+                domLength nArgVal = 0;
 
                 while ((c=*x)!=0 && c!='=' && c!='>' && !SPACE(c) ) {
                     x++;
                 }
-                nArgName = x - ArgName;
+                nArgName = (domLength)(x - ArgName);
                 while (SPACE(*x)) {
                     x++;
                 }
                 if (*x=='=') {
                     x++;
                 }
-                saved = *(ArgName + nArgName);
+                savedChar = *(ArgName + nArgName);
                 *(ArgName + nArgName) = '\0'; /* terminate arg name */
 
                 while (SPACE(*x)) {
@@ -808,9 +818,9 @@ XML_SimpleParse (
                         }
                         x++;
                     }
-                    nArgVal = x - ArgVal;
+                    nArgVal = (domLength)(x - ArgVal);
                     if (c==0) {
-                        RetError("Unterminated string",(ArgVal - xml - 1) );
+                        RetError("Unterminated string",(domLength)(ArgVal - xml - 1));
                     } else {
                         x++;
                     }
@@ -823,11 +833,10 @@ XML_SimpleParse (
                         x++;
                     }
                     if (c==0) {
-                        RetError("Missing \">\"",(start-xml));
+                        RetError("Missing \">\"",(domLength)(start-xml));
                     }
-                    nArgVal = x - ArgVal;
+                    nArgVal = (domLength)(x - ArgVal);
                 }
-
                 
 #ifdef TDOM_NS
                 /*------------------------------------------------------------
@@ -852,7 +861,10 @@ XML_SimpleParse (
                     if (ampersandSeen) {
                         if (!TranslateEntityRefs(attrnode->nodeValue,
                                                  &(attrnode->valueLength) )) {
-                            RetError("Entity parsing error",(start-xml));
+                            *(ArgName + nArgName) = savedChar;
+                            FREE (attrnode->nodeValue);
+                            FREE (attrnode);
+                            RetError("Entity parsing error",(domLength)(x - xml));
                         }
                     }
                     
@@ -913,7 +925,10 @@ XML_SimpleParse (
                     if (ampersandSeen) {
                         if (!TranslateEntityRefs(attrnode->nodeValue,
                                                  &(attrnode->valueLength) )) {
-                            RetError("Entity parsing error", (start - xml));
+                            *(ArgName + nArgName) = savedChar;
+                            FREE (attrnode->nodeValue);
+                            FREE (attrnode);
+                            RetError("Entity parsing error", (domLength)(x - xml));
                         }
                     }
                     if (attrList) {
@@ -925,7 +940,7 @@ XML_SimpleParse (
 #ifdef TDOM_NS
                 }
 #endif 
-                *(ArgName + nArgName) = saved;
+                *(ArgName + nArgName) = savedChar;
                 while (SPACE(*x)) {
                     x++;
                 }
@@ -997,7 +1012,7 @@ XML_SimpleParse (
                 hasContent = 0;
                 x++;
                 if (*x!='>') {
-                    RetError("Syntax Error",(x - xml - 1) );
+                    RetError("Syntax Error",(domLength)(x - xml - 1));
                 }
 #ifdef TDOM_NS 
                 /* pop active namespaces */
@@ -1028,7 +1043,11 @@ XML_SimpleParse (
             }
         }
     }
-    RetError("Unexpected end",(x - xml) );
+    if (forest && parent_node == parent) {
+        FREE ((char *) activeNS);
+        return TCL_OK;
+    }
+    RetError("Unexpected end",(domLength)(x - xml));
 
 } /* XML_SimpleParse */
 
@@ -1037,8 +1056,8 @@ XML_SimpleParse (
 /*----------------------------------------------------------------------------
 |   XML_SimpleParseDocument
 |
-|       Create a document, parses the XML string starting at 'pos' and
-|       continuing to the first encountered error.
+|       Create a document, parses the XML string and continuing to the
+|       first encountered error.
 |
 \---------------------------------------------------------------------------*/
 domDocument *
@@ -1046,19 +1065,48 @@ XML_SimpleParseDocument (
     char    *xml,              /* Complete text of the file being parsed  */
     int      ignoreWhiteSpaces,
     int      keepCDATA,
+    int      forest,
     char    *baseURI,
     Tcl_Obj *extResolver,
-    int     *pos,
+    domLength *pos,
     char   **errStr
 ) {
     domDocument   *doc = domCreateDoc(baseURI, 0);
-
+    domNode *save, *node = NULL;
+    Tcl_HashEntry *h;
+    int hnew;
+    
     if (extResolver) {
         doc->extResolver = tdomstrdup (Tcl_GetString (extResolver));
     }
+
+    if (forest) {
+        // Create umbrella tag
+        h = Tcl_CreateHashEntry(&HASHTAB(doc,tdom_tagNames), "forestroot",
+                                &hnew);
+        node = (domNode*) domAlloc(sizeof(domNode));
+        memset(node, 0, sizeof(domNode));
+        node->nodeType      = ELEMENT_NODE;
+        node->nodeName      = (char *)&(h->key);
+        node->ownerDocument = doc;
+        doc->rootNode->firstChild = node;
+        doc->rootNode->lastChild = node;
+    }
     
     *pos = 0;
-    XML_SimpleParse (xml, pos, doc, NULL, ignoreWhiteSpaces, keepCDATA, errStr);
+    XML_SimpleParse (xml, pos, doc, node, ignoreWhiteSpaces, keepCDATA,
+                     forest, errStr);
+    if (forest) {
+        doc->rootNode->firstChild = node->firstChild;
+        doc->rootNode->lastChild = node->lastChild;
+        save = node;
+        for (node = doc->rootNode->firstChild;
+             node != NULL;
+             node = node->nextSibling) {
+            node->parentNode = NULL;
+        }
+        domFree ((void*)save);
+    }
     domSetDocumentElement (doc);
 
     return doc;

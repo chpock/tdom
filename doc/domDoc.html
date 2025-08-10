@@ -4,15 +4,15 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x5592bca83d10">NAME</a> · <a href="#SECTid0x5592bc9a6e50">SYNOPSIS</a> · <a href="#SECTid0x5592bc9c4680">DESCRIPTION </a> · <a href="#SECTid0x5592bcacb7a0">SEE ALSO</a> · <a href="#SECTid0x5592bcacbb30">KEYWORDS</a>
+<a href="#SECTid0x561c909884b0">NAME</a> · <a href="#SECTid0x561c909c3660">SYNOPSIS</a> · <a href="#SECTid0x561c90a93f00">DESCRIPTION </a> · <a href="#SECTid0x561c90afb8f0">SEE ALSO</a> · <a href="#SECTid0x561c90afbc80">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x5592bca83d10">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x561c909884b0">NAME</a></h2><p class="namesection">
 <b class="names">domDoc - </b><br>Manipulates an instance of a DOM document object</p>
   
-  <h2><a name="SECTid0x5592bc9a6e50">SYNOPSIS</a></h2><pre class="syntax">domDocObjCmd <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
+  <h2><a name="SECTid0x561c909c3660">SYNOPSIS</a></h2><pre class="syntax">domDocObjCmd <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
 
-  <h2><a name="SECTid0x5592bc9c4680">DESCRIPTION </a></h2><p>This command manipulates one particular instance of a document
+  <h2><a name="SECTid0x561c90a93f00">DESCRIPTION </a></h2><p>This command manipulates one particular instance of a document
 object. <i class="m">method</i> indicates a specific method of the document class. These
 methods should closely conform to the W3C recommendation "Document Object Model
 (Core) Level 1" (<a href="http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html">http://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html</a>). Look
@@ -110,7 +110,7 @@ usually a result of a XSLT transformation.</dd>
 
       
         <dt>
-<b class="method">asXML</b> <b class="option">?-indent none/tabs/1..8?</b> <b class="option">?-channel channelId?</b> <b class="option">?-escapeNonASCII?</b> <b class="option">?-doctypeDeclaration &lt;boolean&gt;?</b> <b class="option">-xmlDeclaration &lt;boolean&gt;?</b> <b class="option">-encString &lt;string&gt;</b> <b class="option">?-escapeAllQuot?</b> <b class="option">?-indentAttrs?</b> <b class="option">?-nogtescape?</b> <b class="option">?-noEmptyElementTag?</b>
+<b class="method">asXML</b> <b class="option">?-indent none/tabs/1..8?</b> <b class="option">?-channel channelId?</b> <b class="option">?-escapeNonASCII?</b> <b class="option">?-doctypeDeclaration &lt;boolean&gt;?</b> <b class="option">-xmlDeclaration &lt;boolean&gt;?</b> <b class="option">-encString &lt;string&gt;</b> <b class="option">?-escapeAllQuot?</b> <b class="option">?-indentAttrs?</b> <b class="option">?-nogtescape?</b> <b class="option">?-noEmptyElementTag?</b> <b class="option">?-escapeCR?</b> <b class="option">?-escapeTab?</b>
 </dt>
         <dd>
 <p>Returns the DOM tree as an (optional indented) XML
@@ -170,10 +170,55 @@ usually a result of a XSLT transformation.</dd>
         empty tag syntax will be used. Instead, if an element has
         empty content it will be serialized with an element start tag
         and an immediately following element end tag.</p>
-</dd>
 
+        <p>If the option <i class="m">-escapeCR</i> is given then the character
+        '\r' will be escaped as character reference in attribute
+        values and text content of elements. The default is to not do
+        this.</p>
+
+        <p>If the option <i class="m">-escapeTab</i> is given then the character
+        '\t' will be escaped as character reference in attribute
+        values and text content of elements. The default is to not do
+        this.</p>
+        </dd>
       
 
+      
+        <dt>
+<b class="method">asCanonicalXML</b> <b class="option">?-channel channelId?</b> <b class="option">?-comments &lt;boolean&gt;?</b>
+</dt>
+        <dd>
+<p>Returns the DOM tree as canonical XML string
+        according to the "<a href="http://www.w3.org/TR/2001/REC-xml-c14n-20010315">Canonical
+        XML Version 1.0 W3C Recommendation 15 March 2001</a>" or
+        sends the output directly to the given channelId.</p>
+
+        <p>If the goal is to get a canonical XML serialization of the
+        XML file from which the DOM tree was parsed there are a few
+        prerequisites. The XML data must be parsed with the
+        <i class="m">-keepEmpties</i> option. If the XML data includes a DTD
+        which defines attribute defaults or external parsed entity
+        references it is necessary to use the expat parser (not the
+        <i class="m">-simple</i> one). For any supported Tcl version lesser then
+        9.0 if the XML data includes characters outside the BMP a Tcl
+        build with TCL_UTF_MAX defined to 6 (and a tDOM build with
+        this Tcl) is necessary.
+        </p>
+
+        <p>If the -channel option is given then the output is send
+        directly to the Tcl channel given as argument. It is the up to
+        the caller to ensure that the channel is correctly
+        fconfigured. If this option is not given then the command
+        returns the serialization as string.</p>
+        
+        <p>If the option <i class="m">-comments</i> is given with a true value
+        then the serialization includes comments according to the
+        rules of the recommendation. If the value is false or this
+        option is omitted then comments are removed from the
+        serialization.</p>
+        </dd>
+      
+      
       
         <dt>
 <b class="method">asHTML</b> <b class="option">?-channel
@@ -190,9 +235,18 @@ channelId?</b> <b class="option">?-escapeNonASCII?</b> <b class="option">?-htmlE
         content will be escaped as character reference in decimal
         representation.</p>
         
-        <p>If the option <i class="m">-htmlEntities</i> is given, a character is
-        written using its HTML 4.01 character entity reference, if it
-        has one.</p>
+        <p>If the option <i class="m">-htmlEntities</i> is given, a character or
+        a pair of characters is written using its HTML 5 character
+        entity reference, if it has one. Some HTML 5 character entity
+        references encode the same character or code points. From the
+        possible entity names the shortest is choosen. If there are
+        more than one shortest name and this names differ only in case
+        then the lowercase alternative is choosen. Otherwise frist
+        name in lexical ASCII order is choosen. There is one HTML5
+        entitiy (ThickSpace), which escapes two characters for which
+        the first and the second character have an entity name by
+        itself. If the two characters are to be serialized then the
+        one two-characters entity ThickSpace will be choosen.</p>
 
         <p>If the option <i class="m">-breakLines</i> is given the serialization
         outputs "\n&gt;" instead of "&gt;" for the opening tags of
@@ -303,6 +357,57 @@ channelId?</b> <b class="option">?-escapeNonASCII?</b> <b class="option">?-htmlE
           white space.</p>
 </dd>
       
+
+      
+        <dt>
+<b class="method">asTclValue</b> <b class="option">?typevariable?</b>
+</dt>
+        <dd>
+<p>In case the DOM tree includes JSON type information
+        this method returns the JSON data as nested Tcl data
+        structure.</p>
+
+        <p>The returned value may be a Tcl dict, a Tcl list or a
+        string. If the optional argument <i class="m">typevariable</i> is given
+        then the variable with that name is set to the value
+        <i class="m">dict</i>, <i class="m">list</i> or <i class="m">string</i> respectively to
+        signal the type of the result.</p>
+
+        <p>A JSON object is returned as Tcl dict, a JSON array is
+        returned as list and JSON strings and numbers as well as the
+        symbolic JSON values null, true and false are returned as
+        string (with the strings null, true and false for the
+        respectively JSON symbol). The value of a member of a JSON
+        object may be also a Tcl dict, or a Tcl list or a string and
+        the elements of a JSON array list may be a Tcl dict or a Tcl
+        list or a string.</p>
+        </dd>
+      
+
+      
+        <dt><b class="method">asTypedList</b></dt>
+        <dd>
+<p>In case the DOM tree includes JSON type information
+        this method returns the JSON data as a nested Tcl list.</p>
+
+        <p>The first element of every of this lists describes the type
+        of the value. The types are: OBJECT, ARRAY, STRING, NUMBER,
+        TRUE, FALSE or NULL.</p>
+
+        <p>If the type is NUMBER or STRING, then the second (and last)
+        element is the value. If the type is NULL, TRUE or FALSE the
+        list does not have any other elements.</p>
+        
+        <p>If the type is OBJECT the second value will be a Tcl list
+        of property name and value pairs, which means the second
+        element could be used as dict. The value will be a Tcl list
+        build by the rules of the <i class="m">asTypedList</i> method.</p>
+
+        <p>If the type is ARRAY the second value will be a Tcl list of
+        the JSON array values, each one build by the rules of the
+        <i class="m">asTypedList</i> method.</p>
+        </dd>
+      
       
       
         <dt>
@@ -333,7 +438,7 @@ document, if there is one, otherwise the empty string. If there is a value
 given to the method, the internal subset of the document is set to this
 value. Note that none of the parsing methods preserve the internal subset
 of a document; a freshly parsed document will always have an empty internal
-subset. Also note, that the method doesn't do any syntactical check on a
+subset. Also note that the method doesn't do any syntactical check on a
 given internal subset.</dd>
       
 
@@ -407,7 +512,7 @@ ignored. Without this option, an error is raised if the user tries to set a
 top-level parameter that is not declared in the stylesheet.</p>
 
 <p>The option <i class="m">-maxApplyDepth</i> expects a positiv integer as
-argument. By default, the xslt engine allows xslt templates to nest up
+argument. By default, the XSLT engine allows XSLT templates to nest up
 to 3000 levels (and raises error if they nest deeper). This limit can
 be set by the <i class="m">-maxApplyDepth</i> option.</p>
 
@@ -417,7 +522,7 @@ to the option, appended with the XML Fragment from instantiating the
 xsl:message element content as string (as if the XPath string() function would
 have been applied to the XML Fragment) and a flag, which indicates, if the
 xsl:message has an attribute "terminate" with the value "yes". If the
-called script returns anything else then TCL_OK then the xslt
+called script returns anything else then TCL_OK then the XSLT
 transformation will be aborted, returning error. If the called script
 returns -code break, the error message is empty, otherwise the result
 code is reported. In case of terminated transformation, the outputVar,
@@ -430,7 +535,7 @@ if given, is set to the empty string.</p>
 <b class="method">toXSLTcmd</b> ?<i class="m">objVar</i>?</dt>
      
         <dd>If the DOM tree represents a valid XSLT stylesheet, this method
-transforms the DOM tree into an xslt command, otherwise it returns error. The
+transforms the DOM tree into an XSLT command, otherwise it returns error. The
 created xsltCmd is returned and stored in the <i class="m">objVar</i>, if a var name was
 given. A successful transformation of the DOM tree to an xsltCmd removes the
 domDoc cmd and all nodeCmds of the document. 
@@ -468,7 +573,7 @@ ignored. Without this option, an error is raised if the user tries to set a
 top-level parameter, which is not declared in the stylesheet.</p>
 
 <p>The option <i class="m">-maxApplyDepth</i> expects a positiv integer as
-argument. By default, the xslt engine allows xslt templates to nest up
+argument. By default, the XSLT engine allows XSLT templates to nest up
 to 3000 levels (and raises error if they nest deeper). This limit can
 be set by the <i class="m">-maxApplyDepth</i> option.</p>
 
@@ -605,7 +710,7 @@ appends this subtree at the end of the current list of top level nodes of the do
 
       
           <dt>
-<b class="method">selectNodes</b> <b class="option">?-namespaces prefixUriList?</b> <b class="option">?-cache &lt;boolean&gt;?</b> <i class="m">xpathQuery</i> <b class="option">?typeVar?</b>
+<b class="method">selectNodes</b> <b class="option">?-namespaces prefixUriList?</b> <b class="option">?-cache &lt;boolean&gt;?</b> <b class="option">?-list?</b> <i class="m">xpathQuery</i> <b class="option">?typeVar?</b>
 </dt>
           <dd>
 <p>Returns the result of applying the XPath query
@@ -668,9 +773,9 @@ tried to be executed. This allows quick method additions on Tcl level.</p><p>New
 are not moved into the tree they are automatically deleted as soon as the whole
 document gets deleted.</p>
 
-    <h2><a name="SECTid0x5592bcacb7a0">SEE ALSO</a></h2><p class="seealso">dom, domNode</p>
+    <h2><a name="SECTid0x561c90afb8f0">SEE ALSO</a></h2><p class="seealso">dom, domNode</p>
 
-    <h2><a name="SECTid0x5592bcacbb30">KEYWORDS</a></h2><p class="keywords">
+    <h2><a name="SECTid0x561c90afbc80">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-DOMnodecreation">DOM node creation</a>, <a class="keyword" href="keyword-index.html#KW-documentelement">document element</a>
 </p>
 

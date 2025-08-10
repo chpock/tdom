@@ -1,0 +1,328 @@
+'\"
+'\" Generated from xpathFunc.xml
+'\"
+'\" BEGIN man.macros
+.if t .wh -1.3i ^B
+.nr ^l \n(.l
+.ad b
+.de AP
+.ie !"\\$4"" .TP \\$4
+.el \{\
+.   ie !"\\$2"" .TP \\n()Cu
+.   el          .TP 15
+.\}
+.ta \\n()Au \\n()Bu
+.ie !"\\$3"" \{\
+\&\\$1	\\fI\\$2\\fP	(\\$3)
+.\".b
+.\}
+.el \{\
+.br
+.ie !"\\$2"" \{\
+\&\\$1	\\fI\\$2\\fP
+.\}
+.el \{\
+\&\\fI\\$1\\fP
+.\}
+.\}
+..
+.de AS
+.nr )A 10n
+.if !"\\$1"" .nr )A \\w'\\$1'u+3n
+.nr )B \\n()Au+15n
+.\"
+.if !"\\$2"" .nr )B \\w'\\$2'u+\\n()Au+3n
+.nr )C \\n()Bu+\\w'(in/out)'u+2n
+..
+.AS Tcl_Interp Tcl_CreateInterp in/out
+.de BS
+.br
+.mk ^y
+.nr ^b 1u
+.if n .nf
+.if n .ti 0
+.if n \l'\\n(.lu\(ul'
+.if n .fi
+..
+.de BE
+.nf
+.ti 0
+.mk ^t
+.ie n \l'\\n(^lu\(ul'
+.el \{\
+.\"	Draw four-sided box normally, but don't draw top of
+.\"	box if the box started on an earlier page.
+.ie !\\n(^b-1 \{\
+\h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.el \}\
+\h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\l'|0u-1.5n\(ul'
+.\}
+.\}
+.fi
+.br
+.nr ^b 0
+..
+.de VS
+.if !"\\$2"" .br
+.mk ^Y
+.ie n 'mc \s12\(br\s0
+.el .nr ^v 1u
+..
+.de VE
+.ie n 'mc
+.el \{\
+.ev 2
+.nf
+.ti 0
+.mk ^t
+\h'|\\n(^lu+3n'\L'|\\n(^Yu-1v\(bv'\v'\\n(^tu+1v-\\n(^Yu'\h'-|\\n(^lu+3n'
+.sp -1
+.fi
+.ev
+.\}
+.nr ^v 0
+..
+.de ^B
+.ev 2
+'ti 0
+'nf
+.mk ^t
+.if \\n(^b \{\
+.\"	Draw three-sided box if this is the box's first page,
+.\"	draw two sides but no top otherwise.
+.ie !\\n(^b-1 \h'-1.5n'\L'|\\n(^yu-1v'\l'\\n(^lu+3n\(ul'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.el \h'-1.5n'\L'|\\n(^yu-1v'\h'\\n(^lu+3n'\L'\\n(^tu+1v-\\n(^yu'\h'|0u'\c
+.\}
+.if \\n(^v \{\
+.nr ^x \\n(^tu+1v-\\n(^Yu
+\kx\h'-\\nxu'\h'|\\n(^lu+3n'\ky\L'-\\n(^xu'\v'\\n(^xu'\h'|0u'\c
+.\}
+.bp
+'fi
+.ev
+.if \\n(^b \{\
+.mk ^y
+.nr ^b 2
+.\}
+.if \\n(^v \{\
+.mk ^Y
+.\}
+..
+.de DS
+.RS
+.nf
+.sp
+..
+.de DE
+.fi
+.RE
+.sp
+..
+.de SO
+.SH "STANDARD OPTIONS"
+.LP
+.nf
+.ta 5.5c 11c
+.ft B
+..
+.de SE
+.fi
+.ft R
+.LP
+See the \\fBoptions\\fR manual entry for details on the standard options.
+..
+.de OP
+.LP
+.nf
+.ta 4c
+Command-Line Name:	\\fB\\$1\\fR
+Database Name:	\\fB\\$2\\fR
+Database Class:	\\fB\\$3\\fR
+.fi
+.IP
+..
+.de CS
+.RS
+.nf
+.ta .25i .5i .75i 1i
+.if t .ft C
+..
+.de CE
+.fi
+.if t .ft R
+.RE
+..
+.de UL
+\\$1\l'|0\(ul'\\$2
+..
+'\" END man.macros
+.TH xpathFunc n "" Tcl ""
+.BS
+.SH NAME
+::dom::xpathFunc \- Scripted XPath functions
+.SH SYNOPSIS
+.nf
+::dom::xpathFunc::\fIfuncName\fR \fIctxNode\fR \fIpos\fR \fInodeListType\fR \fInodeList\fR ?\fItype arg type arg...\fR?
+::dom::xpathFunc::\fInamespaceURL\fR::\fIfuncName\fR \fIctxNode\fR \fIpos\fR \fInodeListType\fR \fInodeList\fR ?\fItype arg type arg...\fR?
+.fi
+.BE
+.SH DESCRIPTION
+.PP
+tDOM's XPath engine supports custom XPath functions implemented by Tcl
+commands. When it encounters a function call to an unknown function name
+without a namespace qualifier, the XPath engine looks for a Tcl command of
+the same name in the \fB::dom::xpathFunc\fR namespace. If it encounters
+an unknown namespace-qualified function call, it looks for a Tcl namespace
+with a name equal to the function's full namespace URI inside
+\&\fB::dom::xpathFunc\fR, and a Tcl command named for the local part of the
+function's name inside that namespace. If it finds such a Tcl command, it
+is executed with at least the following arguments, to describe the current
+XPath context:
+.TP
+ctxNode
+The \fBdomNode\fR object command of the XPath context node.
+.TP
+pos
+The XPath context position, in zero-based form - that is, the return
+value of the standard XPath \fBposition()\fR function in the context
+would be \fB$pos - 1\fR.
+.TP
+nodeListType
+The type name for \fInodeList\fR, as for the
+\&\fBselectNodes\fP method's \fItypeVar\fR.
+.TP
+nodeList
+The list of the current worked on XPath step result (as \fBselectNodes\fP would return
+them) in document order. \fIctxNode\fR will be equal to \fB[lindex $nodeList $pos]\fR.
+.PP
+If the function call includes any arguments, two arguments will be
+appended to the command's argument list for each one:
+.TP
+type
+The argument's type name, as for \fBselectNodes\fP's
+\&\fItypeVar\fR.
+.TP
+val
+The argument's value, as \fBselectNodes\fP would return
+it in an XPath expression's result set.
+.PP
+The command is required to return a 1- or 2-element Tcl list to provide
+the result of the XPath function call. If the result list has two
+elements, the first is the result's XPath type name, and the second is an
+appropriately encoded value (note that the \fIattrnodes\fR type name is
+not supported):
+.TP
+bool
+Tcl boolean value acceptable to \fBTcl_GetBooleanFromObj\fP.
+.TP
+number
+Tcl numeric value acceptable to \fBTcl_GetSizeIntFromObj\fP or
+\&\fBTcl_GetDoubleFromObj\fP.
+.TP
+string
+Simple string.
+.TP
+nodes
+Tcl list of \fBdomNode\fR object commands.
+.TP
+attrvalues
+Alias for \fIstring\fR.
+.PP
+If the result list has only one element, it is treated as a simple string.
+It is an error for the result to have zero elements, more than two
+elements, or to be invalid as a Tcl list, and it is an error if the
+\&\fIval\fR of a two-part result does not match the requirements described
+above for its \fItype\fR.
+.SH EXAMPLES
+.PP
+A simple workalike for the XPath 2/3 \fBfn:matches()\fR function, not
+otherwise available in an XPath 1.0 engine such as tDOM's:
+.CS
+proc ::dom::xpathFunc::regmatch {
+    ctxNode pos nodeListType nodeList
+    inputType inputVal patternType patternVal
+} {
+    set input [::dom::xpathFuncHelper::coerce2string $inputType $inputVal]
+    set pattern [::dom::xpathFuncHelper::coerce2string $patternType $patternVal]
+    return [list bool [regexp -- $pattern $input]]
+}
+.CE
+.SH "HELPER PROCS"
+.PP
+The \fB::dom::xpathFuncHelper\fR namespace contains helper procs for the
+convenience of scripted XPath functions:
+.TP
+\&\fBcoerce2number \fItype\fB \fIval\fB
+\&\fR
+Given a \fItype\fR and \fIval\fR as provided to scripted XPath
+functions in their argument lists, convert the \fIval\fR to a number in a
+manner appropriate for its \fItype\fR:
+.RS
+.TP
+empty
+Always zero.
+.TP
+number
+Unchanged.
+.TP
+string
+Unchanged. (Note that no error is raised if \fIval\fR is not
+numeric.)
+.TP
+attrvalues
+\&\fIvalue\fR's first element.
+.TP
+nodes
+The result of the \fBnumber()\fR XPath function called on the
+first node in the list.
+.TP
+attrnodes
+The value of the single attribute assumed to be in \fIvalue\fR.
+Note that no error is raised if this value is non-numeric.
+.RE
+.TP
+\&\fBcoerce2string \fItype\fB \fIval\fB
+\&\fR
+As for \fBcoerce2number\fR, but convert \fIval\fR to a
+pure string:
+.RS
+.TP
+empty
+The empty string.
+.TP
+number
+Unchanged.
+.TP
+string
+Unchanged.
+.TP
+attrvalues
+\&\fIvalue\fR's first element.
+.TP
+nodes
+The result of the \fBstring()\fR XPath function called on the
+first node in the list.
+.TP
+attrnodes
+The value of the single attribute assumed to be in \fIvalue\fR.
+.RE
+.SH LIMITS
+.PP
+Custom XPath function names are limited to 200 characters,
+including any namespace URI and the \fB::\fR Tcl namespace
+separator between it and the local part. Function calls may have
+a maximum of 22 arguments (the argument values itself may be
+large nodesets). If you really need more this limits may be
+adjusted by build time defines. Tcl commands created with the
+deprecated \fBTcl_CreateCommand\fP interface cannot be used
+as scripted XPath functions.
+.PP
+You \fBmust not\fR alter any of the DOM trees from which nodes are
+provided to a scripted XPath function as argument (this is true
+for the ctxNode argument as well as for the nodes in the nodeList
+argument). Use them strictly read-only. Ignoring this advice may
+have any unpredictable results including segmentation faults or
+security problems.
+.SH KEYWORDS
+XPath

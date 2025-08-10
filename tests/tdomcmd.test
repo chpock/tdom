@@ -29,6 +29,8 @@ proc dom {args} {
             set haveData 0
             set uplevelVar ""
             tdom $::_main_parser keepEmpties 0
+            tdom $::_main_parser keepCDATA 0
+            tdom $::_main_parser keepTextStart 1
             for {set x 1} {$x < [llength $args]} {incr x} {
                 switch -- [lindex $args $x] {
                     "-channel" {
@@ -149,6 +151,36 @@ test tdomcmd-1.4 {keepCDATA} {
     $parser free
     set result
 } 1
+
+test tdomcmd-1.5 {keepCDATA} {
+    set parser [expat]
+    tdom $parser enable
+    tdom $parser keepCDATA 1
+    $parser parse {<doc>text<![CDATA[Hello]]>more text</doc>}
+    set doc [tdom $parser getdoc]
+    set result [$doc asXML -indent none]
+    $doc delete
+    $parser reset
+    tdom $parser keepCDATA 0
+    $parser parse {<doc>text<![CDATA[Hello]]>more text</doc>}
+    set doc [tdom $parser getdoc]
+    append result [$doc asXML -indent none]
+    $doc delete
+    $parser free
+    set result
+} {<doc>text<![CDATA[Hello]]>more text</doc><doc>textHellomore text</doc>}
+
+test tdomcmd-1.6 {Character outside of BMP} {
+    set parser [expat]
+    tdom $parser enable
+    set fd [open [file join [file dir [info script]] data/data1.xml]]
+    fconfigure $fd -encoding "utf-8"
+    $parser parsechannel $fd
+    close $fd
+    set doc [tdom $parser getdoc]
+    set result [$doc asXML -indent none]
+} {<test>a&#128526;c</test>}
+
 
 # cleanup
 ::tcltest::cleanupTests

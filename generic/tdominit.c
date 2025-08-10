@@ -35,14 +35,20 @@
 |   Includes
 |
 \---------------------------------------------------------------------------*/
-#include <tcl.h>
-#include <dom.h>
 #include <tdom.h>
 #include <tcldom.h>
 #include <tclpull.h>
 #include <schema.h>
+#include <nodecmd.h>
 
 extern TdomStubs tdomStubs;
+
+#if TCL_MAJOR_VERSION == 8
+# define STUB_VERSION "8.5"
+#else
+# define STUB_VERSION "9.0"
+#endif
+
 
 /*
  *----------------------------------------------------------------------------
@@ -66,7 +72,7 @@ Tdom_Init (
 ) {
         
 #ifdef USE_TCL_STUBS
-    if (Tcl_InitStubs(interp, "8.4", 0) == NULL) {
+    if (Tcl_InitStubs(interp, STUB_VERSION, 0) == NULL) {
         return TCL_ERROR;
     }
 #endif
@@ -95,6 +101,11 @@ Tdom_Init (
 #ifndef TDOM_NO_PULL
     Tcl_CreateObjCommand(interp, "tdom::pullparser", tDOM_PullParserCmd, NULL, NULL );    
 #endif
+
+    Tcl_CreateObjCommand(interp, "tdom::fsnewNode", tDOM_fsnewNodeCmd, NULL, NULL );    
+    Tcl_CreateObjCommand(interp, "tdom::fsinsertNode", tDOM_fsinsertNodeCmd, NULL, NULL );    
+
+    nodecmd_init(interp);
 
 #ifndef TDOM_NO_SCHEMA
     tDOM_SchemaInit (interp);

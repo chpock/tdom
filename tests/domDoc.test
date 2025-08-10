@@ -32,6 +32,8 @@
 #    domDoc-26.*: fragments list
 #    domDoc-27.*: deleteXPathCache
 #    domDoc-28.*: createElementNS
+#    domDoc-29.*: asCanonicalXML
+#    domDoc-30.*: command argument parsing
 #
 # Copyright (c) 2004 - 2007 Rolf Ade.
 
@@ -63,6 +65,46 @@ test domDoc-1.3 {asHTML -escapeNonASCII -htmlEntities} {
     set result
 } {<html><body>&auml;&uuml;&bdquo;&#8223;&dagger;</body></html>}
 
+test domDoc-1.3.1 {asHTML -htmlEntities} {
+    set doc [dom parse -html {<html>&AMP;</html>}]
+    set result [$doc asHTML -htmlEntities]
+    $doc delete
+    set result
+} {<html>&amp;</html>}
+
+test domDoc-1.3.2 {asHTML -htmlEntities} {
+    set doc [dom parse -html "<html>\u205F\u200A</html>"]
+    set result [$doc asHTML -htmlEntities]
+    $doc delete
+    set doc [dom parse -html "<html>\u205F</html>"]
+    append result [$doc asHTML -htmlEntities]
+    $doc delete
+    set doc [dom parse -html "<html>\u200A</html>"]
+    append result [$doc asHTML -htmlEntities]
+    $doc delete    
+    set result
+} {<html>&ThickSpace;</html><html>&MediumSpace;</html><html>&hairsp;</html>}
+
+test domDoc-1.3.3 {asHTML -htmlEntities} {
+    set doc [dom parse -html "<html>fj</html>"]
+    set result [$doc asHTML -htmlEntities]
+    $doc delete
+    set result
+} {<html>&fjlig;</html>}
+
+test domDoc-1.3.4 {asHTML -htmlEntities} {
+    set doc [dom parse -html "<html>&NotLessLess;&ll;&nLt;\u226A\u20D2</html>"]
+    set result [$doc asHTML -htmlEntities]
+    $doc delete
+    set result
+} {<html>&nLtv;&ll;&nLt;&nLt;</html>}
+
+test domDoc-1.3.3 {asHTML -htmlEntities} {
+    set doc [dom parse -html "<html>&zopf;</html>"]
+    set result [$doc asHTML -htmlEntities]
+    $doc delete
+    set result
+} {<html>&zopf;</html>}
 
 set doc [dom parse <root/>]
 
@@ -119,7 +161,7 @@ test domDoc-1.10 {asXML - unknown option} {
     catch {$doc asXML -fooOption 1} errMsg
     $doc delete
     set errMsg
-} {bad option "-fooOption": must be -indent, -channel, -escapeNonASCII, -doctypeDeclaration, -xmlDeclaration, -encString, -escapeAllQuot, -indentAttrs, -nogtescape, or -noEmptyElementTag}
+} {bad option "-fooOption": must be -indent, -channel, -escapeNonASCII, -doctypeDeclaration, -xmlDeclaration, -encString, -escapeAllQuot, -indentAttrs, -nogtescape, -noEmptyElementTag, -escapeCR, or -escapeTab}
 
 test domDoc-1.11 {asXML - non boolean value to -doctypeDeclaration} {
     set doc [dom parse {<!DOCTYPE root SYSTEM "file:///boo.baz"><root/>}]
@@ -1103,6 +1145,49 @@ test domDoc-19.3 {appendXML} {
     set result
 } {<foo/><test>foo<child><childchild>text</childchild></child></test>}
     
+test domDoc-19.4 {appendXML XML namespaces} {
+    dom createDocumentNS ns:a docroot doc
+    $doc documentElement root
+    $root setAttributeNS "" xmlns:b "ns:b" "" xmlns:c "ns:c"
+    $root appendXML {<person xmlns="ns:c"><name>John</name></person>}
+    $doc selectNodesNamespaces "a ns:a b ns:b c ns:c"
+    set name [$doc selectNodes string(a:docroot/c:person/c:name)]
+    $doc delete
+    set name
+} {John}
+
+test domDoc-19.5 {appendXML XML namespaces} {
+    dom createDocumentNS ns:a docroot doc
+    $doc documentElement root
+    $root setAttributeNS "" xmlns:b "ns:b" "" xmlns:c "ns:c"
+    $root appendXML {<person xmlns="ns:c" xmlns:d="ns:a"><d:name>John</d:name></person>}
+    $doc selectNodesNamespaces "a ns:a b ns:b c ns:c"
+    set name [$doc selectNodes string(a:docroot/c:person/a:name)]
+    $doc delete
+    set name
+} {John}
+
+test domDoc-19.6 {appendXML XML namespaces} {
+    dom createDocumentNS ns:c docroot doc
+    $doc documentElement root
+    $root setAttributeNS "" xmlns:b "ns:b" "" xmlns:a "ns:a"
+    $root appendXML {<person xmlns="ns:c"><name>Eve</name></person>}
+    $doc selectNodesNamespaces "a ns:a b ns:b c ns:c"
+    set name [$doc selectNodes string(c:docroot/c:person/c:name)]
+    $doc delete
+    set name
+} {Eve}
+
+test domDoc-19.7 {appendXML XML namespaces} {
+    dom createDocument docroot doc
+    $doc documentElement root
+    $root setAttributeNS "" xmlns:b "ns:b" "" xmlns:c "ns:c"
+    $root appendXML {<person xmlns="ns:c"><name>Eve</name></person>}
+    $doc selectNodesNamespaces "foo ns:c"
+    set name [$doc selectNodes string(docroot/foo:person/foo:name)]
+    $doc delete
+    set name
+} {Eve}
 
 test domDoc-20.1 {selectNodes} {
     set doc [dom parse {<root><child id="1"/><child id="2"/></root>}]
@@ -1181,6 +1266,73 @@ test domDoc-20.7 {selectNodes with -namespaces option} {
     set errMsg
 } {The "-namespaces" option requires a 'prefix namespace' pairs list as argument}
 
+test domDoc-20.8 {selectNodes with -list option} {
+    set doc [dom parse {
+        <doc>
+        <product><descshort>one</descshort></product>
+        <product><descshort>two</descshort></product>
+        <product><descshort>three four</descshort></product>
+        </doc>
+    }]
+    set result [$doc selectNodes -list {
+        doc/product/descshort
+        string()
+    }]
+    $doc delete
+    set result
+} {one two {three four}}
+
+test domDoc-20.9 {selectNodes - type result} {
+    set doc [dom parse {
+        <doc>
+        <product><descshort>one</descshort></product>
+        <product><descshort></descshort></product>
+        <product></product>
+        </doc>
+    }]
+    set result ""
+    lappend result [$doc selectNodes {string(doc/product[1]/descshort)} typeVar]
+    lappend result $typeVar
+    lappend result [$doc selectNodes {string(doc/product[2]/descshort)} typeVar]
+    lappend result $typeVar
+    lappend result [$doc selectNodes {string(doc/product[3]/descshort)} typeVar]
+    lappend result $typeVar
+    $doc delete
+    set result
+} {one string {} string {} string}
+             
+test domDoc-20.10 {selectNodes with -list option} {
+    set doc [dom parse {
+        <doc>
+        <product><descshort>one</descshort></product>
+        <product><descshort>two</descshort></product>
+        <product><descshort>three four</descshort></product>
+        </doc>
+    }]
+    set result [$doc selectNodes -list {
+        doc/product/descshort
+        string()
+    } typeVar]
+    $doc delete
+    lappend result $typeVar
+} {one two {three four} string}
+
+test domDoc-20.11 {selectNodes with -list option} {
+    set doc [dom parse {
+        <doc>
+        <product><descshort>one</descshort></product>
+        <product><descshort>two</descshort></product>
+        <product><descshort>three four</descshort></product>
+        </doc>
+    }]
+    set result [$doc selectNodes -list {
+        doc/product/dontexists
+        string()
+    } typeVar]
+    $doc delete
+    list $result $typeVar
+} {{} empty}
+
 test domDoc-21.1 {baseURI} {
     set doc [dom createDocumentNode]
     set result [$doc baseURI]
@@ -1246,6 +1398,73 @@ test domDoc-22.3 {appendFromScript} {
     set nrOfNodeCmdsAfter [info commands domNode*]
     expr {$nrOfNodeCmdsBefore == $nrOfNodeCmdsAfter}
 } {1}
+
+test domDoc-22.4 {nodeCmd called outside of *FromScript context} {
+    dom createNodeCmd elementNode e
+    catch e
+} 1
+
+test domDoc-22.5 {nodeCmd use in child interp while in nodeCmd context} {
+    set doc [dom createDocument this]
+    set root [$doc documentElement]
+    dom createNodeCmd elementNode thise
+    dom createNodeCmd textNode t
+
+    interp create childinterp
+    load {} Tdom childinterp
+    childinterp eval {
+        dom createNodeCmd elementNode childe
+        dom createNodeCmd textNode t
+    }
+
+    set result [catch {$root appendFromScript {
+        thise {
+            childinterp eval {
+                childe {
+                    t "other"
+                }
+            }
+            t "some"
+        }
+    }}]
+    $doc delete
+    interp delete childinterp
+    set result
+} {1}
+
+test domDoc-22.6 {nodeCmd use in child interp while in nodeCmd context} {
+    set doc [dom createDocument this]
+    set root [$doc documentElement]
+    dom createNodeCmd elementNode thise
+    dom createNodeCmd textNode t
+
+    interp create childinterp
+    load {} Tdom childinterp
+    childinterp eval {
+        dom createNodeCmd elementNode childe
+        dom createNodeCmd textNode t
+        set doc [dom createDocument child]
+        set root [$doc documentElement]
+    }
+
+    $root appendFromScript {
+        thise {
+            childinterp eval {
+                $root appendFromScript {
+                    childe {
+                        t "other"
+                    }
+                }
+            }
+            t "some"
+        }
+    }
+    set result [$doc asXML -indent none]
+    append result [childinterp eval {$doc asXML -indent none}]
+    $doc delete
+    interp delete childinterp
+    set result
+} {<this><thise>some</thise></this><child><childe>other</childe></child>}
 
 test domDoc-23.1 {getElementsByTagNameNS} {
     dom createNodeCmd elementNode child
@@ -1598,6 +1817,235 @@ test domDoc-28.3 {createElementNS} {
     set errMsg
 } {Missing URI in Namespace declaration}
 
+test domDoc-29.1 {asCanonicalXML} {
+    set doc [dom parse -keepEmpties {<?xml version="1.0"?>
+
+<?xml-stylesheet   href="doc.xsl"
+   type="text/xsl"   ?>
+
+<!DOCTYPE doc SYSTEM "doc.dtd">
+
+<doc>Hello, world!<!-- Comment 1 --></doc>
+
+<?pi-without-data     ?>
+
+<!-- Comment 2 -->
+
+<!-- Comment 3 -->}]
+    set result [$doc asCanonicalXML]
+    $doc delete
+    set result
+} {<?xml-stylesheet href="doc.xsl"
+   type="text/xsl"   ?>
+<doc>Hello, world!</doc>
+<?pi-without-data?>}
+
+test domDoc-29.2 {asCanonicalXML} {
+    set doc [dom parse -keepEmpties {<?xml version="1.0"?>
+
+<?xml-stylesheet   href="doc.xsl"
+   type="text/xsl"   ?>
+
+<!DOCTYPE doc SYSTEM "doc.dtd">
+
+<doc>Hello, world!<!-- Comment 1 --></doc>
+
+<?pi-without-data     ?>
+
+<!-- Comment 2 -->
+
+<!-- Comment 3 -->}]
+    set result [$doc asCanonicalXML -comments 1]
+    $doc delete
+    set result
+} {<?xml-stylesheet href="doc.xsl"
+   type="text/xsl"   ?>
+<doc>Hello, world!<!-- Comment 1 --></doc>
+<?pi-without-data?>
+<!-- Comment 2 -->
+<!-- Comment 3 -->}
+
+test domDoc-29.3 {asCanonicalXML} {
+    set doc [dom parse -keepEmpties {<doc>
+   <clean>   </clean>
+   <dirty>   A   B   </dirty>
+   <mixed>
+      A
+      <clean>   </clean>
+      B
+      <dirty>   A   B   </dirty>
+      C
+   </mixed>
+</doc>}]
+    set result [$doc asCanonicalXML]
+    $doc delete
+    set result
+} {<doc>
+   <clean>   </clean>
+   <dirty>   A   B   </dirty>
+   <mixed>
+      A
+      <clean>   </clean>
+      B
+      <dirty>   A   B   </dirty>
+      C
+   </mixed>
+</doc>}
+
+test domDoc-29.5 {asCanonicalXML} {
+    set doc [dom parse -keepEmpties {<!DOCTYPE doc [<!ATTLIST e9 attr CDATA "default">]>
+<doc>
+   <e1   />
+   <e2   ></e2>
+   <e3   name = "elem3"   id="elem3"   />
+   <e4   name="elem4"   id="elem4"   ></e4>
+   <e5 a:attr="out" b:attr="sorted" attr2="all" attr="I'm"
+      xmlns:b="http://www.ietf.org"
+      xmlns:a="http://www.w3.org"
+      xmlns="http://example.org"/>
+   <e6 xmlns="" xmlns:a="http://www.w3.org">
+      <e7 xmlns="http://www.ietf.org">
+         <e8 xmlns="" xmlns:a="http://www.w3.org">
+            <e9 xmlns="" xmlns:a="http://www.ietf.org"/>
+         </e8>
+      </e7>
+   </e6>
+</doc>}]
+    set result [$doc asCanonicalXML]
+    $doc delete
+    set result
+} {<doc>
+   <e1></e1>
+   <e2></e2>
+   <e3 id="elem3" name="elem3"></e3>
+   <e4 id="elem4" name="elem4"></e4>
+   <e5 xmlns="http://example.org" xmlns:a="http://www.w3.org" xmlns:b="http://www.ietf.org" attr="I'm" attr2="all" b:attr="sorted" a:attr="out"></e5>
+   <e6 xmlns:a="http://www.w3.org">
+      <e7 xmlns="http://www.ietf.org">
+         <e8 xmlns="">
+            <e9 xmlns:a="http://www.ietf.org" attr="default"></e9>
+         </e8>
+      </e7>
+   </e6>
+</doc>}
+
+test domDoc-29.6 {asCanonicalXML} {
+    set doc [dom parse -keepEmpties {<!DOCTYPE doc [
+<!ATTLIST normId id ID #IMPLIED>
+<!ATTLIST normNames attr NMTOKENS #IMPLIED>
+]>
+<doc>
+   <text>First line&#x0d;&#10;Second line</text>
+   <value>&#x32;</value>
+   <compute><![CDATA[value>"0" && value<"10" ?"valid":"error"]]></compute>
+   <compute expr='value>"0" &amp;&amp; value&lt;"10" ?"valid":"error"'>valid</compute>
+   <norm attr=' &apos;   &#x20;&#13;&#xa;&#9;   &apos; '/>
+   <normNames attr='   A   &#x20;&#13;&#xa;&#9;   B   '/>
+   <normId id=' &apos;   &#x20;&#13;&#xa;&#9;   &apos; '/>
+</doc>}]
+    set result [$doc asCanonicalXML]
+    $doc delete
+    set result
+} {<doc>
+   <text>First line&#xD;
+Second line</text>
+   <value>2</value>
+   <compute>value&gt;"0" &amp;&amp; value&lt;"10" ?"valid":"error"</compute>
+   <compute expr="value>&quot;0&quot; &amp;&amp; value&lt;&quot;10&quot; ?&quot;valid&quot;:&quot;error&quot;">valid</compute>
+   <norm attr=" '    &#xD;&#xA;&#x9;   ' "></norm>
+   <normNames attr="A &#xD;&#xA;&#x9; B"></normNames>
+   <normId id="' &#xD;&#xA;&#x9; '"></normId>
+</doc>}
+
+proc 29.7 {base system public} {
+    switch $system {
+        "world.txt" {
+            return [list "string" "" "world"]
+        }
+        "earth.gif" {
+            return [list "string" "" ""]
+        }
+        default {
+            error "unexpected system URL '$system'"
+        }
+    }
+}
+
+test domDoc-29.7 {asCanonicalXML} {
+    set doc [dom parse -externalentitycommand 29.7 -keepEmpties {<!DOCTYPE doc [
+<!ATTLIST doc attrExtEnt ENTITY #IMPLIED>
+<!ENTITY ent1 "Hello">
+<!ENTITY ent2 SYSTEM "world.txt">
+<!ENTITY entExt SYSTEM "earth.gif" NDATA gif>
+<!NOTATION gif SYSTEM "viewgif.exe">
+]>
+<doc attrExtEnt="entExt">
+   &ent1;, &ent2;!
+</doc>
+
+<!-- Let world.txt contain "world" (excluding the quotes) -->}]
+    set result [$doc asCanonicalXML]
+    $doc delete
+    set result
+} {<doc attrExtEnt="entExt">
+   Hello, world!
+</doc>}
+
+test domDoc-29.8 {asCanonicalXML} {
+    set doc [dom parse -keepEmpties {<?xml version="1.0" encoding="ISO-8859-1"?>
+<doc>&#169;</doc>}]
+    set result [$doc asCanonicalXML]
+    $doc delete
+    set result
+} "<doc>\u00A9</doc>"
+
+test domDoc-30.1 {cmd argument parsing} {
+    set result [catch {domDoc} errMsg]
+    lappend result $errMsg
+    catch {domDoc foo} errMsg
+    lappend result $errMsg
+} {1 {wrong # args: should be "domDoc doctoken subcommand ?arg ...?"} {wrong # args: should be "domDoc doctoken subcommand ?arg ...?"}}
+
+test domDoc-30.2 {cmd argument parsing} {
+    set storedMode [dom setObjectCommands]
+    dom setObjectCommands token
+    set doc [dom parse {<doc><e/></doc>}]
+    catch {domDoc $doc} result
+    domDoc $doc delete
+    dom setObjectCommands $storedMode
+    set result
+} {wrong # args: should be "domDoc doctoken subcommand ?arg ...?"}
+
+test domDoc-30.3 {cmd argument parsing} -body {
+    set doc [dom parse {<doc><e/></doc>}]
+    catch {$doc} result
+    $doc delete
+    set result
+} -match regexp -result {wrong # args: should be "domDoc[^ ]+ subcommand \?arg ...\?"}
+
+test domDoc-30.4 {cmd argument parsing} -body {
+    set storedMode [dom setObjectCommands]
+    dom setObjectCommands token
+    set doc [dom parse {<doc><e/></doc>}]
+    catch {domDoc $doc invalid-method} result
+    domDoc $doc delete
+    dom setObjectCommands $storedMode
+    set result
+} -match glob -result {bad method "invalid-method": must be *}
+
+test domDoc-30.5 {cmd argument parsing} -body {
+    set doc [dom parse {<doc><e/></doc>}]
+    catch {$doc invalid-method} result
+    $doc delete
+    set result
+} -match glob -result {bad method "invalid-method": must be *}
+
+# test domDoc-29.9 {asCanonicalXML} {
+#     set doc [dom parse -keepEmpties {}]
+#     set result [$doc asCanonicalXML]
+#     $doc delete
+#     set result
+# } {}
 
 # cleanup
 ::tcltest::cleanupTests

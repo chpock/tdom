@@ -35,6 +35,9 @@
 
 #include <tcl.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* The following procs are defined in tcldom.c - since they are used
  * in nodecmd.c these need a prototype somewhere. The prototypes can
@@ -50,18 +53,50 @@ void tcldom_createNodeObj(Tcl_Interp * interp, domNode *node,
                           char *objCmdName);
 
 domNode * tcldom_getNodeFromObj(Tcl_Interp  *interp, Tcl_Obj *nodeObj);
+#ifndef __TDOM_H
+domDocument * tcldom_getDocumentFromName(Tcl_Interp *interp,
+				char *docName, char **errMsg);
+#endif
 int tcldom_prefixNSlist (char ***prefixnsPtr, Tcl_Interp *interp, int objc,
                          Tcl_Obj *const objv[], const char *methodName);
 int tcldom_setInterpAndReturnVar (Tcl_Interp *interp, domNode *node,
-                                  int setVariable, Tcl_Obj *var_name);
+                                  Tcl_Obj *var_name);
 
 void tcldom_initialize(void);
+void tcldom_deleteDoc (Tcl_Interp *interp, domDocument *doc);
+
 
 Tcl_ObjCmdProc tcldom_DomObjCmd;
 Tcl_ObjCmdProc tcldom_DocObjCmd;
 Tcl_ObjCmdProc tcldom_NodeObjCmd;
 Tcl_ObjCmdProc tcldom_unknownCmd;
 Tcl_ObjCmdProc TclTdomObjCmd;
+
+int tDOM_fsnewNodeCmd (ClientData clientData,
+                       Tcl_Interp    * interp,
+                       int             objc,
+                       Tcl_Obj *const  objv[]);
+
+int tDOM_fsinsertNodeCmd (ClientData clientData,
+                          Tcl_Interp    * interp,
+                          int             objc,
+                          Tcl_Obj *const  objv[]);
+
+void tcldom_reportErrorLocation (
+    Tcl_Interp *interp,
+    int before,
+    int after,
+    XML_Size line,
+    XML_Size column,
+    char *xmlstring,
+    const char *entity,
+    XML_Index byteIndex,
+    const char *errStr
+    );
+
+#ifdef __cplusplus
+}
+#endif
 
 #if defined(_MSC_VER) || defined(__MINGW32__)
 #  undef TCL_STORAGE_CLASS
@@ -73,6 +108,7 @@ Tcl_ObjCmdProc TclTdomObjCmd;
 EXTERN int Tdom_Init     (Tcl_Interp *interp);
 EXTERN int Tdom_SafeInit (Tcl_Interp *interp);
 
+    
 #endif
 
 

@@ -53,7 +53,8 @@ convertGumboToDom (
     int ignorexmlns
     ) 
 {
-    int i, j, hnew;
+    int hnew;
+    unsigned int i, j;
     GumboVector *children = &gumboParent->v.element.children;
     GumboNode *child;
     GumboElement *gumboElm;
@@ -205,7 +206,7 @@ convertGumboToDom (
                         }
                         continue;
                     case GUMBO_ATTR_NAMESPACE_XML:
-                        /* The xml namespace is always in scope, nothing
+                        /* The XML namespace is always in scope, nothing
                          * to do. */
                         continue;
                     default:
@@ -250,7 +251,7 @@ convertGumboToDom (
                             node->ownerDocument->ids,
                             gumboAtt->value,
                             &hnew);
-                        /* How to resolve in case of dublicates?  We
+                        /* How to resolve in case of duplicates?  We
                            follow, what the core dom building code does:
                            the first value in document order wins. */
                         if (hnew) {

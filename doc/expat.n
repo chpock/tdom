@@ -251,6 +251,41 @@ well-formedness error).
 Reports the base url of the document to the
 parser.
 .RE
+.IP "\fB-fastcall  \fIboolean\fP\fR"
+.RS
+.PP
+By default this option is 0 (off). If this option
+is on then any handler installed by the options
+\&\fI-elementstartcommand\fR, \fI-elementendcommand\fR and
+\&\fI-characterdatacommand\fR from this moment on is
+installed in a way that calling it has lesser overhead as
+usual. This option may be switched between callback hander
+(re-)installion as desired.
+.PP
+However this has some requirenments. The handler proc has
+to be defined before used as callback. If it is not then
+the callback is installed as ususal. And the handler proc
+must not be removed or re-defined as long as it is used as
+callback. If this is done the programm probably will crash
+but also may execute arbitrary code.
+.PP
+The callback handler installed while this option is on
+will not be traced by executing them.
+.RE
+.IP "\fB-keepTextStart  \fIboolean\fP\fR"
+.RS
+.PP
+By default this option is 0 (off). If this option
+is on then the position information of the start of a text
+or CDATA node is keeped over collecting the sometimes by
+expat delivered cdata pieces. With this option on the
+position information returned by the parser in a
+-characterdatacommand proc will be correct, otherwise not.
+Called in all other handler code the parser always return
+the correct position results, no matter what value this
+option have. It is off by default because it is rarely
+needed and saves a few cpu cyles this way.
+.RE
 .IP "\fB-elementstartcommand  \fIscript\fP\fR"
 .RS
 .PP
@@ -322,10 +357,9 @@ Specifies a Tcl command to associate with character data in
 the document, ie. text. The actual command consists of this option followed by
 one argument: the text.
 .PP
-It is not guaranteed that character data will be passed to the application
-in a single call to this command. That is, the application should be prepared
-to receive multiple invocations of this callback with no intervening callbacks
-from other features.
+Other than with the C API of the expat parser it is guaranteed that
+character data will be passed to the application in a single call to
+this command.
 .PP
 Example:
 
@@ -718,8 +752,8 @@ default handler (with the -defaultcommand option) for every handler set of the
 parser all internal entities are silent lost for the handler sets without a
 default handler.
 .RE
-.IP "\fB-useForeignDTD  \fI<boolen>\fP\fR"
-If <boolen> is true and the document does not have an
+.IP "\fB-useForeignDTD  \fI<boolean>\fP\fR"
+If <boolean> is true and the document does not have an
 external subset, the parser will call the -externalentitycommand script with
 empty values for the systemId and publicID arguments. This option must be set,
 before the first piece of data is parsed. Setting this option, after the
@@ -831,24 +865,36 @@ attributes list passed to the elementstartcommand.
 .PP
 Return the number of bytes in the current event.
 Returns 0 if the event is in an internal entity.
+.PP
+If you use this option consider if you may need the
+parser option \fI-keepTextStart\fR.
 .RE
 .IP "\fB-currentlinenumber\fR"
 .RS
 .PP
 Returns the line number of the current parse
 location.
+.PP
+If you use this option consider if you may need the
+parser option \fI-keepTextStart\fR.
 .RE
 .IP "\fB-currentcolumnnumber\fR"
 .RS
 .PP
-Returns the column number of the current parse
-location.
+Returns the column number of the current
+parse location.
+.PP
+If you use this option consider if you may need the
+parser option \fI-keepTextStart\fR.
 .RE
 .IP "\fB-currentbyteindex\fR"
 .RS
 .PP
 Returns the byte index of the current parse
 location.
+.PP
+If you use this option consider if you may need the
+parser option \fI-keepTextStart\fR.
 .RE
 .PP
 Only one value may be requested at a time.
@@ -882,7 +928,7 @@ the parser to be used and will raise an error in this case.
 .RS
 .PP
 Reads the XML data directly out of the file with the
-filename \fIfilename\fR and parses that data. This is done with low level file
+filename \fIfilename\fR and parses that data. This is done with low-level file
 operations. The XML data must be in US-ASCII, ISO-8859-1, UTF-8 or UTF-16
 encoding. If applicable, this is the fastest way, to parse XML data. This
 method cannot be used from within a callback (neither directly nor indirectly)

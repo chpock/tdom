@@ -4,7 +4,6 @@
    
 #ifdef USE_TCL_STUBS
 
-#include <dom.h>
 #include <tdom.h>
 
 /* !BEGIN!: Do not edit below this line. */

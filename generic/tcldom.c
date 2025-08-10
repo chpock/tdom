@@ -63,6 +63,9 @@
 # define DBG(x) 
 #endif
 
+#ifndef C14N_ATTR_SORT_SIZE_INIT
+#  define C14N_ATTR_SORT_SIZE_INIT 8
+#endif
 
 /*----------------------------------------------------------------------------
 |   Macros
@@ -74,7 +77,12 @@
 #define XP_FSIBLING      3
 #define XP_PSIBLING      4
 
-#define MAX_REWRITE_ARGS 50
+#ifndef MAX_REWRITE_ARGS
+# define MAX_REWRITE_ARGS 50
+#endif
+#ifndef MAX_XPATH_FUNC_NAME
+# define MAX_XPATH_FUNC_NAME 200
+#endif
 
 #define MAX_XSLT_APPLY_DEPTH 3000
 
@@ -85,9 +93,12 @@
                      Tcl_AppendResult(interp, (str1), (str2), (str3), NULL)
 
 #define SetIntResult(i) Tcl_ResetResult(interp);                        \
-                     Tcl_SetIntObj(Tcl_GetObjResult(interp), (i))
+                     Tcl_SetDomLengthObj(Tcl_GetObjResult(interp), (i))
                      
-#define SetDoubleResult(d) Tcl_ResetResult(interp); \
+#define SetLongResult(i) Tcl_ResetResult(interp);                        \
+                     Tcl_SetLongObj(Tcl_GetObjResult(interp), (i))
+
+#define SetDoubleResult(d) Tcl_ResetResult(interp);                     \
                      Tcl_SetDoubleObj(Tcl_GetObjResult(interp), (d))
 
 #define SetBooleanResult(i) Tcl_ResetResult(interp); \
@@ -106,42 +117,42 @@
                          return TCL_ERROR; \
                      }
 #define CheckName(interp, name, errText, isFQ) \
-                     if (!TSD(dontCheckName)) { \
+                     if (!TcldomDATA(dontCheckName)) { \
                          if (!tcldom_nameCheck(interp, name, errText, isFQ)) {\
                              return TCL_ERROR; \
                          } \
                      }
 
 #define CheckPIName(interp, name) \
-                     if (!TSD(dontCheckName)) { \
+                     if (!TcldomDATA(dontCheckName)) { \
                          if (!tcldom_PINameCheck(interp, name)) {\
                              return TCL_ERROR; \
                          } \
                      }
 
 #define CheckText(interp, text, errText) \
-                     if (!TSD(dontCheckCharData)) { \
+                     if (!TcldomDATA(dontCheckCharData)) { \
                          if (!tcldom_textCheck(interp, text, errText)) {\
                              return TCL_ERROR; \
                          } \
                      }
 
 #define CheckComment(interp, text) \
-                     if (!TSD(dontCheckCharData)) { \
+                     if (!TcldomDATA(dontCheckCharData)) { \
                          if (!tcldom_commentCheck(interp, text)) {\
                              return TCL_ERROR; \
                          } \
                      }
 
 #define CheckCDATA(interp, text) \
-                     if (!TSD(dontCheckCharData)) { \
+                     if (!TcldomDATA(dontCheckCharData)) { \
                          if (!tcldom_CDATACheck(interp, text)) {\
                              return TCL_ERROR; \
                          } \
                      }
 
 #define CheckPIValue(interp, text) \
-                     if (!TSD(dontCheckCharData)) { \
+                     if (!TcldomDATA(dontCheckCharData)) { \
                          if (!tcldom_PIValueCheck(interp, text)) {\
                              return TCL_ERROR; \
                          } \
@@ -165,204 +176,28 @@
 #define SERIALIZE_NO_EMPTY_ELEMENT_TAG 128
 #define SERIALIZE_INDENT_WITH_TAB 256
 #define SERIALIZE_INDENT_ATTR_WITH_TAB 512
+#define SERIALIZE_ESCAPE_CR 1024
+#define SERIALIZE_ESCAPE_TAB 2048
 
 /*----------------------------------------------------------------------------
 |   Module Globals
 |
 \---------------------------------------------------------------------------*/
-#ifndef TCL_THREADS
-    static int        storeLineColumn       = 0;
-    static int        dontCreateObjCommands = 0;
-    static int        dontCheckCharData     = 0;
-    static int        dontCheckName         = 0;
-    static int        domCreateCmdMode      = 0;
-#   define TSD(x)     x
-#   define GetTcldomTSD()
-#else
-    typedef struct ThreadSpecificData {
-        int        storeLineColumn;
-        int        dontCreateObjCommands;
-        int        dontCheckCharData;
-        int        dontCheckName;
-        int        domCreateCmdMode;
-    } ThreadSpecificData;
-    static Tcl_ThreadDataKey dataKey;
+typedef struct TcldomData {
+    int        storeLineColumn;
+    int        dontCreateObjCommands;
+    int        dontCheckCharData;
+    int        dontCheckName;
+    int        domCreateCmdMode;
+} TcldomData;
+#define TcldomDATA(x)    tdPtr->x
+#define GetTcldomDATA    TcldomData *tdPtr = tcldom_getdata(interp)
+
+#ifdef TCL_THREADS
     static Tcl_HashTable     sharedDocs;
     static Tcl_Mutex         tableMutex;
     static int               tcldomInitialized;
-#   define TSD(x)            tsdPtr->x
-#   define GetTcldomTSD()  ThreadSpecificData *tsdPtr = \
-                                (ThreadSpecificData*)   \
-                                Tcl_GetThreadData(      \
-                                    &dataKey,           \
-                                    sizeof(ThreadSpecificData));
 #endif /* TCL_THREADS */
-
-static char dom_usage[] =
-    "Usage dom <subCommand> <args>, where subCommand can be:    \n"
-    "    parse ?-keepEmpties? ?-channel <channel> ?-baseurl <baseurl>?  \n"
-    "        ?-feedbackAfter <#Bytes>?                    \n"
-    "        ?-feedbackcmd <cmd>?                         \n"
-    "        ?-externalentitycommand <cmd>?               \n"
-    "        ?-useForeignDTD <boolean>?                   \n"
-    "        ?-paramentityparsing <none|always|standalone>\n"
-    "        ?-simple? ?-html? ?-html5? ?-json?           \n"
-    "        ?-jsonmaxnesting <#nr>?                      \n"
-    "        ?-jsonroot name?                             \n"
-    "        ?<xml|html|json>? ?<objVar>?                 \n"
-    "    createDocument docElemName ?objVar?              \n"
-    "    createDocumentNS uri docElemName ?objVar?        \n"
-    "    createDocumentNode ?objVar?                      \n"
-    TDomThreaded(
-    "    attachDocument domDoc ?objVar?                   \n"
-    "    detachDocument domDoc                            \n"
-    )
-    "    createNodeCmd ?-returnNodeCmd? ?-tagName name? ?-jsonType jsonType? ?-namespace URI? (element|comment|text|cdata|pi)Node cmdName \n"
-    "    setStoreLineColumn ?boolean?                     \n"
-    "    setNameCheck ?boolean?                           \n"
-    "    setTextCheck ?boolean?                           \n"
-    "    setObjectCommands ?(automatic|token|command)?    \n"
-    "    isCharData string                                \n"
-    "    clearString string                               \n"
-    "    isBMPCharData string                             \n"
-    "    isComment string                                 \n"
-    "    isCDATA string                                   \n"
-    "    isPIValue string                                 \n"
-    "    isName string                                    \n"
-    "    isQName string                                   \n"
-    "    isNCName string                                  \n"
-    "    isPIName string                                  \n"
-    "    featureinfo feature                              \n"
-;
-
-static char doc_usage[] =
-    "Usage domDoc <method> <args>, where method can be:\n"
-    "    documentElement ?objVar?                \n"
-    "    getElementsByTagName name               \n"
-    "    getElementsByTagNameNS uri localname    \n"
-    "    createElement tagName ?objVar?          \n"
-    "    createElementNS uri tagName ?objVar?    \n"
-    "    createCDATASection data ?objVar?        \n"
-    "    createTextNode text ?objVar?            \n"
-    "    createComment text ?objVar?             \n"
-    "    createProcessingInstruction target data ?objVar? \n"
-    "    asXML ?-indent <none,tabs,0..8>? ?-channel <channel>? ?-escapeNonASCII? ?-escapeAllQuot? ?-doctypeDeclaration <boolean>?\n"
-    "    asHTML ?-channel <channelId>? ?-escapeNonASCII? ?-htmlEntities?\n"
-    "    asText                                  \n"
-    "    asJSON ?-indent <none,0..8>?            \n"
-    "    getDefaultOutputMethod                  \n"
-    "    publicId ?publicId?                     \n"
-    "    systemId ?systemId?                     \n"
-    "    internalSubset ?internalSubset?         \n"
-    "    indent ?boolean?                        \n"
-    "    omit-xml-declaration ?boolean?          \n"
-    "    encoding ?value?                        \n"
-    "    standalone ?boolean?                    \n"
-    "    mediaType ?value?                       \n"
-    "    delete                                  \n"
-    "    xslt ?-parameters parameterList? ?-ignoreUndeclaredParameters? ?-xsltmessagecmd cmd? <xsltDocNode> ?objVar?\n"
-    "    toXSLTcmd                               \n"
-    "    cdataSectionElements (?URI:?localname|*) ?boolean?\n"
-    "    normalize ?-forXPath?                   \n"
-    "    nodeType                                \n"
-    "    hasChildNodes                           \n"
-    "    childNodes                              \n"
-    "    firstChild ?nodeObjVar?                 \n"
-    "    lastChild ?nodeObjVar?                  \n"
-    "    appendChild new                         \n"
-    "    insertBefore new ref                    \n"
-    "    replaceChild new old                    \n"
-    "    removeChild child                       \n"
-    "    ownerDocument                           \n"
-    "    getElementById id                       \n"
-    "    baseURI ?URI?                           \n"
-    "    appendFromList nestedList               \n"
-    "    appendFromScript script                 \n"        
-    "    insertBeforeFromScript script ref       \n"
-    "    appendXML xmlString                     \n"
-    "    selectNodesNamespaces ?prefixUriList?   \n" 
-    "    selectNodes ?-namespaces prefixUriList? ?-cache <boolean>? xpathQuery ?typeVar? \n"
-    "    renameNode <nodelist> <newName>         \n"
-    "    deleteXPathCache ?xpathQuery?           \n"
-    TDomThreaded(
-    "    readlock                                \n"
-    "    writelock                               \n"
-    "    renumber                                \n"
-    )
-;
-
-static char node_usage[] =
-    "Usage nodeObj <method> <args>, where method can be:\n"
-    "    nodeType                     \n"
-    "    nodeName                     \n"
-    "    nodeValue ?newValue?         \n"
-    "    hasChildNodes                \n"
-    "    childNodes                   \n"
-    "    childNodesLive               \n"
-    "    parentNode                   \n"
-    "    firstChild ?nodeObjVar?      \n"
-    "    lastChild ?nodeObjVar?       \n"
-    "    nextSibling ?nodeObjVar?     \n"
-    "    previousSibling ?nodeObjVar? \n"
-    "    hasAttribute attrName        \n"
-    "    getAttribute attrName ?defaultValue? \n"
-    "    setAttribute attrName value ?attrName value ...? \n"
-    "    removeAttribute attrName     \n"
-    "    hasAttributeNS uri localName \n"
-    "    getAttributeNS uri localName ?defaultValue? \n"
-    "    setAttributeNS uri attrName value ?attrName value ...? \n"
-    "    removeAttributeNS uri attrName \n"
-    "    attributes ?attrNamePattern?   \n"
-    "    attributeNames ?attrNamePattern?   \n"
-    "    appendChild new              \n"
-    "    insertBefore new ref         \n"
-    "    replaceChild new old         \n"
-    "    removeChild child            \n"
-    "    cloneNode ?-deep?            \n"
-    "    ownerDocument                \n"
-    "    getElementsByTagName name    \n"
-    "    getElementsByTagNameNS uri localname \n"
-    "    getElementById id            \n"
-    "    find attrName attrValue ?nodeObjVar?   \n"
-    "    child      number|all ?type? ?attrName attrValue? \n"
-    "    descendant number|all ?type? ?attrName attrValue? \n"
-    "    ancestor   number|all ?type? ?attrName attrValue? \n"
-    "    fsibling   number|all ?type? ?attrName attrValue? \n"
-    "    psibling   number|all ?type? ?attrName attrValue? \n"
-    "    root ?nodeObjVar?            \n"
-    "    target                       \n"
-    "    data                         \n"
-    "    text                         \n"
-    "    prefix                       \n"
-    "    namespaceURI                 \n"
-    "    getBaseURI                   \n"
-    "    baseURI ?URI?                \n"
-    "    localName                    \n"
-    "    delete                       \n"
-    "    getLine                      \n"
-    "    getColumn                    \n"
-    "    @<attrName> ?defaultValue?   \n"
-    "    asList                       \n"
-    "    asXML ?-indent <none,tabs,0..8>? ?-channel <channel>? ?-escapeNonASCII? ?-escapeAllQuot? ?-doctypeDeclaration <boolean>?\n"
-    "    asHTML ?-channel <channelId>? ?-escapeNonASCII? ?-htmlEntities?\n"
-    "    asText                       \n"
-    "    asJSON ?-indent <none,0..8>? \n"
-    "    appendFromList nestedList    \n"
-    "    appendFromScript script      \n"
-    "    insertBeforeFromScript script ref \n"
-    "    appendXML xmlString          \n"
-    "    selectNodes ?-namespaces prefixUriList? ?-cache <boolean>? xpathQuery ?typeVar? \n"
-    "    toXPath ?-legacy?            \n"
-    "    disableOutputEscaping ?boolean? \n"
-    "    precedes node                \n"
-    "    normalize ?-forXPath?        \n"
-    "    xslt ?-parameters parameterList? <xsltDocNode>\n"
-    "    jsonType ?jsonType?          \n"
-    TDomThreaded(
-    "    readlock                     \n"
-    "    writelock                    \n"
-    )
-;
 
 static const char *jsonTypes[] = {
     "NONE",
@@ -373,6 +208,7 @@ static const char *jsonTypes[] = {
     "FALSE",
     "STRING",
     "NUMBER",
+    "BOOLEAN",
     NULL
 };
 
@@ -390,7 +226,7 @@ typedef struct XsltMsgCBInfo {
 static void UpdateStringOfTdomNode(Tcl_Obj *objPtr);
 static int  SetTdomNodeFromAny(Tcl_Interp *interp, Tcl_Obj *objPtr);
 
-const Tcl_ObjType tdomNodeType = {
+Tcl_ObjType tdomNodeType = {
     "tdom-node",
     NULL,
     NULL,
@@ -430,7 +266,7 @@ static int tcldom_UnregisterDocShared(Tcl_Interp* interp, domDocument* doc);
 
 static void 
 tcldom_Finalize(
-    ClientData unused
+    ClientData UNUSED(unused)
 )
 {
     DBG(fprintf(stderr, "--> tcldom_Finalize\n"));
@@ -461,6 +297,34 @@ void tcldom_initialize(void)
 #endif /* TCL_THREADS */
 
 /*----------------------------------------------------------------------------
+|   tcldom_findata and tcldom_getdata
+|   Some interpreter global information is managed in an assoc data struct.
+\---------------------------------------------------------------------------*/
+static void tcldom_findata(
+    ClientData clientData,
+    Tcl_Interp *UNUSED(interp)
+)
+{
+    ckfree((char *) clientData);
+}
+
+static TDOM_INLINE TcldomData * tcldom_getdata(
+    Tcl_Interp * interp
+)
+{
+    TcldomData *tdPtr =
+	(TcldomData *) Tcl_GetAssocData(interp, "tdom_data", NULL);
+
+    if (tdPtr == NULL) {
+	tdPtr = (TcldomData *) ckalloc(sizeof(TcldomData));
+	memset(tdPtr, 0, sizeof(TcldomData));
+	Tcl_SetAssocData(interp, "tdom_data", tcldom_findata,
+			 (ClientData) tdPtr);
+    }
+    return tdPtr;
+}
+
+/*----------------------------------------------------------------------------
 |   tcldom_deleteNode
 |
 \---------------------------------------------------------------------------*/
@@ -485,7 +349,6 @@ tcldom_deleteNode (
 |   tcldom_deleteDoc
 |
 \---------------------------------------------------------------------------*/
-static
 void tcldom_deleteDoc (
     Tcl_Interp  * interp,
     domDocument * doc
@@ -493,6 +356,10 @@ void tcldom_deleteDoc (
 {
     int deleted = 1;
 
+    if (doc->nodeFlags & INSIDE_FROM_SCRIPT) {
+        doc->nodeFlags |= DELETE_AFTER_FROM_SCRIPT;
+        return;
+    }
     TDomThreaded(deleted = tcldom_UnregisterDocShared(interp, doc));
     if (deleted) {
         domFreeDocument(doc, tcldom_deleteNode, interp);
@@ -542,7 +409,7 @@ char * tcldom_docTrace (
     DBG(fprintf(stderr, "--> tcldom_docTrace %x %p\n", flags, doc));
 
     if (doc == NULL) {
-        if (!(flags & TCL_INTERP_DESTROYED)) {
+        if (!Tcl_InterpDeleted (interp)) {
             Tcl_UntraceVar(dinfo->interp, dinfo->traceVarName,
                            TCL_TRACE_WRITES|TCL_TRACE_UNSETS,
                            tcldom_docTrace, clientData);
@@ -576,10 +443,10 @@ UpdateStringOfTdomNode(
     Tcl_Obj *objPtr)
 {
     char nodeName[80];
-    int  len;
+    domLength  len;
     
     NODE_CMD(nodeName, objPtr->internalRep.otherValuePtr);
-    len = strlen(nodeName);
+    len = (domLength)strlen(nodeName);
     objPtr->bytes = (ckalloc((unsigned char) len+1));
     memcpy(objPtr->bytes, nodeName, len+1);
     objPtr->length = len;
@@ -646,11 +513,11 @@ void tcldom_createNodeObj (
     char       * objCmdName
 )
 {
-    GetTcldomTSD()
+    GetTcldomDATA;
 
     NODE_CMD(objCmdName, node);
 
-    if (TSD(dontCreateObjCommands) == 0) {
+    if (TcldomDATA(dontCreateObjCommands) == 0) {
         DBG(fprintf(stderr,"--> creating node %s\n", objCmdName));
         
         Tcl_CreateObjCommand(interp, objCmdName,
@@ -668,17 +535,16 @@ void tcldom_createNodeObj (
 int tcldom_setInterpAndReturnVar (
     Tcl_Interp *interp,
     domNode    *node,
-    int         setVariable,
     Tcl_Obj    *var_name
 )
 {
     char     objCmdName[80];
     Tcl_Obj *resultObj;
     
-    GetTcldomTSD()
+    GetTcldomDATA;
 
     if (node == NULL) {
-        if (setVariable) {
+        if (var_name) {
             if (!Tcl_ObjSetVar2 (interp, var_name, NULL,
                                  Tcl_NewStringObj("",0),
                                  TCL_LEAVE_ERR_MSG)) {
@@ -694,10 +560,10 @@ int tcldom_setInterpAndReturnVar (
     resultObj->internalRep.otherValuePtr = node;
     resultObj->typePtr = &tdomNodeType;
     Tcl_SetObjResult (interp, resultObj);
-    if (TSD(dontCreateObjCommands) == 0) {
+    if (TcldomDATA(dontCreateObjCommands) == 0) {
         tcldom_createNodeObj(interp, node, objCmdName);
     }
-    if (setVariable) {
+    if (var_name) {
         if (!Tcl_ObjSetVar2 (interp, var_name, NULL, resultObj,
                              TCL_LEAVE_ERR_MSG)) {
             return TCL_ERROR;
@@ -718,13 +584,13 @@ Tcl_Obj *tcldom_returnNodeObj (
     char     objCmdName[80];
     Tcl_Obj *resultObj;
     
-    GetTcldomTSD()
+    GetTcldomDATA;
 
     resultObj = Tcl_NewObj();
     if (node == NULL) {
         return resultObj;
     }
-    if (TSD(dontCreateObjCommands) == 0) {
+    if (TcldomDATA(dontCreateObjCommands) == 0) {
         tcldom_createNodeObj(interp, node, objCmdName);
     }
     resultObj->bytes = NULL;
@@ -741,7 +607,6 @@ Tcl_Obj *tcldom_returnNodeObj (
 int tcldom_returnDocumentObj (
     Tcl_Interp  *interp,
     domDocument *document,
-    int          setVariable,
     Tcl_Obj     *var_name,
     int          trace,
     int          forOwnerDocument
@@ -751,10 +616,10 @@ int tcldom_returnDocumentObj (
     domDeleteInfo *dinfo;
     Tcl_CmdInfo    cmd_info;
 
-    GetTcldomTSD()
+    GetTcldomDATA;
 
     if (document == NULL) {
-        if (setVariable) {
+        if (var_name) {
             objVar = Tcl_GetString(var_name);
             Tcl_UnsetVar(interp, objVar, 0);
             Tcl_SetVar  (interp, objVar, "", 0);
@@ -765,8 +630,8 @@ int tcldom_returnDocumentObj (
 
     DOC_CMD(objCmdName, document);
 
-    if (TSD(dontCreateObjCommands)) {
-        if (setVariable) {
+    if (TcldomDATA(dontCreateObjCommands)) {
+        if (var_name) {
             objVar = Tcl_GetString(var_name);
             Tcl_SetVar(interp, objVar, objCmdName, 0);
         }
@@ -784,7 +649,7 @@ int tcldom_returnDocumentObj (
         } else {
             dinfo = (domDeleteInfo*)cmd_info.objClientData;
         }
-        if (setVariable) {
+        if (var_name) {
             objVar = Tcl_GetString(var_name);
             Tcl_UnsetVar(interp, objVar, 0);
             Tcl_SetVar  (interp, objVar, objCmdName, 0);
@@ -889,7 +754,7 @@ domNode * tcldom_find (
     domNode    *node,
     char       *attrName,
     char       *attrVal,
-    int         length
+    domLength   length
 )
 {
     domNode     *child, *result;
@@ -967,7 +832,7 @@ int tcldom_xpointerSearch (
     char *element   = NULL;
     char *attrName  = NULL;
     char *attrValue = NULL;
-    int   attrLen;
+    domLength attrLen = 0;
 
 
     str = Tcl_GetString(objv[2]);
@@ -1064,13 +929,13 @@ domNode * tcldom_getNodeFromObj (
     char        *nodeName;
     char         eolcheck;
 
-    GetTcldomTSD()
+    GetTcldomDATA;
 
     if (nodeObj->typePtr == &tdomNodeType) {
         return (domNode*)nodeObj->internalRep.otherValuePtr;
     }
     
-    if (TSD(dontCreateObjCommands)) {
+    if (TcldomDATA(dontCreateObjCommands)) {
         if (SetTdomNodeFromAny (interp, nodeObj) == TCL_OK) {
             return (domNode*)nodeObj->internalRep.otherValuePtr;
         }
@@ -1188,14 +1053,15 @@ int tcldom_appendXML (
 {
     char        *xml_string;
     Tcl_Obj     *extResolver = NULL;
-    int          xml_string_len;
+    domLength    xml_string_len;
     int          resultcode = 0;
     int          ignorexmlns = 0;
     domDocument *doc;
     domNode     *nodeToAppend;
     XML_Parser   parser;
+    domParseForestErrorData forestError;
 
-    GetTcldomTSD()
+    GetTcldomDATA;
 
     xml_string = Tcl_GetStringFromObj(obj, &xml_string_len);
 
@@ -1218,7 +1084,7 @@ int tcldom_appendXML (
                           xml_string_len,
                           1,
                           0,
-                          TSD(storeLineColumn),
+                          TcldomDATA(storeLineColumn),
                           ignorexmlns,
                           0,
                           NULL,
@@ -1226,50 +1092,27 @@ int tcldom_appendXML (
                           NULL,
                           extResolver,
                           0,
+                          0,
                           (int) XML_PARAM_ENTITY_PARSING_ALWAYS,
 #ifndef TDOM_NO_SCHEMA
                           NULL,
 #endif
                           interp,
+                          &forestError,
                           &resultcode);
     if (extResolver) {
         Tcl_DecrRefCount(extResolver);
     }
     if (doc == NULL) {
-        char s[50];
-        long byteIndex, i;
-
-        Tcl_ResetResult(interp);
-        sprintf(s, "%ld", XML_GetCurrentLineNumber(parser));
-        Tcl_AppendResult(interp, "error \"",
-                         XML_ErrorString(XML_GetErrorCode(parser)),
-                         "\" at line ", s, " character ", NULL);
-        sprintf(s, "%ld", XML_GetCurrentColumnNumber(parser));
-        Tcl_AppendResult(interp, s, NULL);
-        byteIndex = XML_GetCurrentByteIndex(parser);
-        if (byteIndex != -1) {
-             Tcl_AppendResult(interp, "\n\"", NULL);
-             s[1] = '\0';
-             for (i=-20; i < 40; i++) {
-                 if ((byteIndex+i)>=0) {
-                     if (xml_string[byteIndex+i]) {
-                         s[0] = xml_string[byteIndex+i];
-                         Tcl_AppendResult(interp, s, NULL);
-                         if (i==0) {
-                             Tcl_AppendResult(interp, " <--Error-- ", NULL);
-                         }
-                     } else {
-                         break;
-                     }
-                 }
-             }
-             Tcl_AppendResult(interp, "\"",NULL);
-        }
+        tcldom_reportErrorLocation (
+            interp, 20, 40, XML_GetCurrentLineNumber(parser),
+            XML_GetCurrentColumnNumber(parser), xml_string, NULL,
+            XML_GetCurrentByteIndex(parser),
+            XML_ErrorString(XML_GetErrorCode(parser)));
         XML_ParserFree(parser);
         return TCL_ERROR;
     }
     XML_ParserFree(parser);
-
     
     nodeToAppend = doc->rootNode->firstChild;
     while (nodeToAppend) {
@@ -1278,7 +1121,7 @@ int tcldom_appendXML (
     }
     domFreeDocument(doc, NULL, NULL);
 
-    return tcldom_setInterpAndReturnVar(interp, node, 0, NULL);
+    return tcldom_setInterpAndReturnVar(interp, node, NULL);
 #endif
 }
 
@@ -1291,7 +1134,7 @@ static
 int tcldom_xpathResultSet (
     Tcl_Interp      *interp,
     xpathResultSet  *rs,
-    Tcl_Obj         *type,
+    xpathResultType *type,
     Tcl_Obj         *value
 )
 {
@@ -1303,42 +1146,42 @@ int tcldom_xpathResultSet (
 
     switch (rs->type) {
         case EmptyResult:
-             Tcl_SetStringObj(type, "empty", -1);
+            *type = EmptyResult;
              Tcl_SetStringObj(value, "", -1);
              break;
 
         case BoolResult:
-             Tcl_SetStringObj(type, "bool", -1);
+            *type = BoolResult;
              Tcl_SetIntObj(value, rs->intvalue);
              break;
 
         case IntResult:
-             Tcl_SetStringObj(type, "number", -1);
-             Tcl_SetIntObj(value, rs->intvalue);
+            *type = IntResult;
+             Tcl_SetLongObj(value, rs->intvalue);
              break;
 
         case RealResult:
-             Tcl_SetStringObj(type, "number", -1);
+            *type = RealResult;
              Tcl_SetDoubleObj(value, rs->realvalue);
              break;
              
         case NaNResult:
-             Tcl_SetStringObj(type, "number", -1);
+            *type = NaNResult;
              Tcl_SetStringObj(value, "NaN", -1);
              break;
 
         case InfResult:
-             Tcl_SetStringObj(type, "number", -1);
+            *type = InfResult;
              Tcl_SetStringObj(value, "Infinity", -1);
              break;
 
         case NInfResult:
-             Tcl_SetStringObj(type, "number", -1);
+            *type = NInfResult;
              Tcl_SetStringObj(value, "-Infinity", -1);
              break;
              
         case StringResult:
-             Tcl_SetStringObj(type, "string", -1);
+            *type = StringResult;
              Tcl_SetStringObj(value, rs->string, rs->string_len);
              break;
 
@@ -1364,17 +1207,22 @@ int tcldom_xpathResultSet (
                  }
              }
              if (mixedNodeSet) {
-                 Tcl_SetStringObj(type, "mixed", 5);
+                 *type = MixedResult;
              } else {
                  if (startType == ATTRIBUTE_NODE)
-                     Tcl_SetStringObj(type, "attrnodes",-1);
+                     *type = AttrnodesResult;
                  else
-                     Tcl_SetStringObj(type, "nodes", 5);
+                     *type = NodesResult;
              }
              break;
 
-     }
-     return TCL_OK;
+        default:
+            Tcl_Panic("Invalid xpathResultType %s in tcldom_xpathResultSet!",
+                      xpathResultType2string(rs->type));
+            break;
+            
+    }
+    return TCL_OK;
 }
 
 
@@ -1386,9 +1234,9 @@ int tcldom_xpathFuncCallBack (
     void            *clientData,
     char            *functionName,
     domNode         *ctxNode,
-    int              position,
+    domLength        position,
     xpathResultSet  *nodeList,
-    domNode         *exprContext,
+    domNode         *UNUSED(exprContext),
     int              argc,
     xpathResultSets *args,
     xpathResultSet  *result,
@@ -1396,19 +1244,21 @@ int tcldom_xpathFuncCallBack (
 )
 {
     Tcl_Interp  *interp = (Tcl_Interp*) clientData;
-    char         tclxpathFuncName[220], objCmdName[80];
+    char         tclxpathFuncName[MAX_XPATH_FUNC_NAME+20], objCmdName[80];
     char         *errStr, *typeStr;
     Tcl_Obj     *resultPtr, *objv[MAX_REWRITE_ARGS], *type, *value, *nodeObj,
-                *tmpObj;
+                *tmpObj, *errObj;
     Tcl_CmdInfo  cmdInfo;
-    int          objc, rc, i, errStrLen, listLen, intValue, res;
+    int          objc, rc, res, boolValue;
+    domLength    errStrLen, listLen, i, longValue;
+    xpathResultType rstype;
     double       doubleValue;
     domNode     *node;
 
     DBG(fprintf(stderr, "tcldom_xpathFuncCallBack functionName=%s "
                 "position=%d argc=%d\n", functionName, position, argc);)
 
-    if (strlen(functionName) > 200) {
+    if (strlen(functionName) > MAX_XPATH_FUNC_NAME) {
         *errMsg = (char*)MALLOC (80 + strlen (functionName));
         strcpy (*errMsg, "Unreasonable long XPath function name: \"");
         strcat (*errMsg, functionName);
@@ -1453,20 +1303,17 @@ int tcldom_xpathFuncCallBack (
 
     objv[objc] = Tcl_NewIntObj(position);
     Tcl_IncrRefCount(objv[objc++]);
-
-    type  = Tcl_NewObj();
     value = Tcl_NewObj();
-    tcldom_xpathResultSet(interp, nodeList, type, value);
-    objv[objc] = type;
+    tcldom_xpathResultSet(interp, nodeList, &rstype, value);
+    objv[objc] = Tcl_NewStringObj(xpathResultType2string(rstype), -1);
     Tcl_IncrRefCount(objv[objc++]);
     objv[objc] = value;
     Tcl_IncrRefCount(objv[objc++]);
 
     for (i=0; i<argc; i++) {
-        type  = Tcl_NewObj();
         value = Tcl_NewObj();
-        tcldom_xpathResultSet(interp, args[i], type, value);
-        objv[objc] = type;
+        tcldom_xpathResultSet(interp, args[i], &rstype, value);
+        objv[objc] = Tcl_NewStringObj (xpathResultType2string(rstype), -1);
         Tcl_IncrRefCount(objv[objc++]);
         objv[objc] = value;
         Tcl_IncrRefCount(objv[objc++]);
@@ -1489,19 +1336,36 @@ int tcldom_xpathFuncCallBack (
                 res = XPATH_EVAL_ERR;
                 goto funcCallCleanup;
             }
-            rc = Tcl_ListObjIndex(interp, resultPtr, 0, &type);
-            rc = Tcl_ListObjIndex(interp, resultPtr, 1, &value);
+            Tcl_ListObjIndex(interp, resultPtr, 0, &type);
+            Tcl_ListObjIndex(interp, resultPtr, 1, &value);
             typeStr = Tcl_GetString(type);
             if (strcmp(typeStr, "bool")==0) {
-                rc = Tcl_GetBooleanFromObj(interp, value, &intValue);
-                rsSetBool(result, intValue );
+                if (Tcl_GetBooleanFromObj(interp, value, &boolValue)
+                    != TCL_OK) {
+                    errObj = Tcl_NewStringObj ("bool result of scripted XPath function "
+                                               "with invalid boolean value '", -1);
+                    Tcl_AppendStringsToObj (errObj, Tcl_GetString(value), "'", NULL);
+                    *errMsg = (char*)tdomstrdup(Tcl_GetString(errObj));
+                    Tcl_DecrRefCount (errObj);
+                    res = XPATH_EVAL_ERR;
+                    goto funcCallCleanup;
+                }
+                rsSetBool(result, boolValue );
             } else
             if (strcmp(typeStr, "number")==0) {
-                rc = Tcl_GetIntFromObj(interp, value, &intValue);
+                rc = Tcl_GetSizeIntFromObj(interp, value, &longValue);
                 if (rc == TCL_OK) {
-                    rsSetInt(result, intValue);
+                    rsSetLong(result, longValue);
                 } else {
-                    rc = Tcl_GetDoubleFromObj(interp, value, &doubleValue);
+                    if (Tcl_GetDoubleFromObj(interp, value, &doubleValue) != TCL_OK) {
+                        errObj = Tcl_NewStringObj ("number result of scripted XPath function "
+                                                   "with invalid number value '", -1);
+                        Tcl_AppendStringsToObj (errObj, Tcl_GetString(value), "'", NULL);
+                        *errMsg = (char*)tdomstrdup(Tcl_GetString(errObj));
+                        Tcl_DecrRefCount (errObj);
+                        res = XPATH_EVAL_ERR;
+                        goto funcCallCleanup;
+                    }
                     rsSetReal(result, doubleValue);
                 }
             } else
@@ -1516,7 +1380,7 @@ int tcldom_xpathFuncCallBack (
                     goto funcCallCleanup;
                 }
                 for (i=0; i < listLen; i++) {
-                    rc = Tcl_ListObjIndex(interp, value, i, &nodeObj);
+                    Tcl_ListObjIndex(interp, value, i, &nodeObj);
                     node = tcldom_getNodeFromObj(interp, nodeObj);
                     if (node == NULL) {
                         *errMsg = tdomstrdup(Tcl_GetStringResult(interp));
@@ -1579,7 +1443,7 @@ static
 int tcldom_xsltMsgCB (
     void *clientData,
     char *str,
-    int   length,
+    domLength length,
     int   terminate
     )
 {
@@ -1622,7 +1486,7 @@ static
 char * tcldom_xpathResolveVar (
     void  *clientData,
     char  *strToParse,
-    int   *offset,
+    domLength *offset,
     char **errMsg
     )
 {
@@ -1633,7 +1497,7 @@ char * tcldom_xpathResolveVar (
     *offset = 0;
     varValue = Tcl_ParseVar(interp, strToParse, &termPtr);
     if (varValue) {
-        *offset = termPtr - strToParse;
+        *offset = (domLength)(termPtr - strToParse);
         /* If strToParse start with a single '$' without a following
          * var name (according to Tcl var name rules), Tcl_ParseVar()
          * doesn't report a parsing error but returns just a pointer
@@ -1649,6 +1513,129 @@ char * tcldom_xpathResolveVar (
     return (char*)varValue;
 }
 
+static
+int selectNodesQueryList (
+    Tcl_Interp       * interp,
+    domNode          * node,
+    Tcl_Obj          * queryList,
+    ast                tt, 
+    domLength          queryListInd,
+    domLength          queryListLen,
+    char            ** prefixMappings,
+    xpathCBs         * cbs,
+    xpathParseVarCB  * parseVarCB,
+    Tcl_HashTable    * cache,
+    Tcl_Obj          * result,
+    xpathResultType  * type
+)
+{
+
+    Tcl_Obj       *queryObj, *thisResult;
+    char          *query, *errMsg = NULL;
+    xpathResultSet nodeList, rs;
+    int            rc, hnew = 1, docOrder = 1, i;
+    ast            t;
+    Tcl_HashEntry *h = NULL;
+    xpathResultType rstype;
+
+    xpathRSInit( &nodeList);
+    rsAddNodeFast( &nodeList, node);
+    xpathRSInit(&rs);
+
+    rc = xpathEvalSteps( tt, &nodeList, node, node, 0, &docOrder, cbs,
+                         &rs, &errMsg);
+    xpathRSFree( &nodeList );
+    if (rc) {
+        Tcl_ResetResult (interp);
+        Tcl_AppendResult (interp, "invalid XPath query: '",
+                          errMsg, "'", NULL);
+        if (errMsg) {
+            FREE(errMsg);
+        }
+        xpathRSFree( &rs );
+        return TCL_ERROR;
+    }
+    queryListInd++;
+    if (queryListInd < queryListLen) {
+        if (rs.type != xNodeSetResult && rs.type != EmptyResult) {
+            Tcl_ResetResult (interp);
+            Tcl_AppendResult (interp, "only the last XPath query in the query "
+                              "list is allowed to select something else then "
+                              "nodes", NULL);
+            xpathRSFree( &rs );
+            return TCL_ERROR;
+        }
+        if (rs.type == EmptyResult) {
+            if (*type) {
+                if (*type != EmptyResult) {
+                    *type = MixedResult;
+                }
+            } else {
+                *type = EmptyResult;
+            }
+            return TCL_OK;
+        }
+        Tcl_ListObjIndex(interp, queryList, queryListInd, &queryObj);
+        query = Tcl_GetString (queryObj);
+
+        if (cache) {
+            h = Tcl_CreateHashEntry (cache, query, &hnew);
+        }
+        if (hnew) {
+            rc = xpathParse(query, node, XPATH_EXPR, prefixMappings,
+                            parseVarCB, &t, &errMsg);
+            if (rc) {
+                if (h != NULL) {
+                    Tcl_DeleteHashEntry(h);
+                }
+                Tcl_ResetResult (interp);
+                Tcl_AppendResult (interp, "invalid XPath query '", query, "': ",
+                                  errMsg, NULL);
+                FREE (errMsg);
+                xpathRSFree( &rs );
+                return TCL_ERROR;
+            }
+            if (cache) {
+                Tcl_SetHashValue(h, t);
+            }
+        } else {
+            t = (ast)Tcl_GetHashValue(h);
+        }
+        rc = TCL_OK;
+        for (i=0; i < rs.nr_nodes; i++) {
+            rc = selectNodesQueryList (interp, rs.nodes[i], queryList, t,
+                                       queryListInd, queryListLen,
+                                       prefixMappings, cbs, parseVarCB, cache,
+                                       result, type);
+            if (rc != TCL_OK) {
+                break;
+            }                
+        }
+        if (!cache) {
+            xpathFreeAst(t);
+        }
+        if (rc != TCL_OK) {
+            xpathRSFree (&rs);
+            return TCL_ERROR;
+        }
+    } else {
+        thisResult = Tcl_NewListObj (0, NULL);
+        Tcl_IncrRefCount (thisResult);
+        tcldom_xpathResultSet(interp, &rs, &rstype, thisResult);
+        Tcl_ListObjAppendElement (interp, result, thisResult);
+        if (*type) {
+            if (*type != rstype) {
+                *type = MixedResult;
+            }
+        } else {
+            *type = rstype;
+        }
+        Tcl_DecrRefCount (thisResult);
+    }
+    xpathRSFree (&rs);
+    return TCL_OK;
+}
+
 /*----------------------------------------------------------------------------
 |   tcldom_selectNodes
 |
@@ -1661,20 +1648,26 @@ int tcldom_selectNodes (
     Tcl_Obj    *const objv[]
 )
 {
-    char          *xpathQuery, *typeVar, *option;
+    char          *xpathQuery, *typeVar, *option, *query;
     char          *errMsg = NULL, **mappings = NULL;
-    int            rc, i, len, optionIndex, localmapping = 0, cache = 0;
-    int            mappingListObjLen = 0;
+    int            rc, optionIndex, localmapping = 0, cache = 0;
+    int            list = 0, hnew;
+    domLength      i, len, xpathListLen, mappingListObjLen = 0;
     xpathResultSet rs;
-    Tcl_Obj       *type, *objPtr, *objPtr1, *mappingListObj = NULL;
+    Tcl_Obj       *objPtr, *objPtr1, *mappingListObj = NULL;
+    Tcl_Obj       *queryObj, *result;
     xpathCBs       cbs;
     xpathParseVarCB parseVarCB;
+    Tcl_HashTable *xpathCache = NULL;
+    Tcl_HashEntry *h = NULL;
+    ast            t;
+    xpathResultType rstype;
 
     static const char *selectNodesOptions[] = {
-        "-namespaces", "-cache", NULL
+        "-namespaces", "-cache", "-list", NULL
     };
     enum selectNodesOption {
-        o_namespaces, o_cache
+        o_namespaces, o_cache, o_list
     };
 
     if (objc < 2) {
@@ -1724,17 +1717,24 @@ int tcldom_selectNodes (
 
         case o_cache:
             if (Tcl_GetBooleanFromObj (interp, objv[2], &cache) != TCL_OK) {
-                return TCL_ERROR;
+                rc = TCL_ERROR;
+                goto cleanup;
             }
             objc -= 2;
             objv += 2;
+            break;
+
+        case o_list:
+            list = 1;
+            objc--;
+            objv++;
             break;
             
         default:
             Tcl_ResetResult (interp);
             Tcl_AppendResult (interp, "bad option \"", 
                               Tcl_GetString (objv[1]), "\"; must be "
-                              "-namespaces", NULL);
+                              "-namespaces, -cache or -list", NULL);
             return TCL_ERROR;
         }
     }
@@ -1760,18 +1760,83 @@ int tcldom_selectNodes (
         mappings = node->ownerDocument->prefixNSMappings;
     }
 
+    typeVar = NULL;
+    if (objc > 2) {
+        typeVar = Tcl_GetString(objv[2]);
+    }
+
     if (cache) {
         if (!node->ownerDocument->xpathCache) {
             node->ownerDocument->xpathCache = MALLOC (sizeof (Tcl_HashTable));
             Tcl_InitHashTable (node->ownerDocument->xpathCache,
                                TCL_STRING_KEYS);
         }
-        rc = xpathEval (node, node, xpathQuery, mappings, &cbs, &parseVarCB,
-                        node->ownerDocument->xpathCache, &errMsg, &rs);
-    } else {
-        rc = xpathEval (node, node, xpathQuery, mappings, &cbs, &parseVarCB,
-                        NULL, &errMsg, &rs);
+        xpathCache = node->ownerDocument->xpathCache;
     }
+
+    if (list) {
+        if (Tcl_ListObjLength (interp, objv[1], &xpathListLen) != TCL_OK) {
+            SetResult ("If the -list option is given the xpathQuery argument "
+                       "must be a valid Tcl list of XPath expressions.");
+            rc = TCL_ERROR;
+            goto cleanup;
+        }
+        if (xpathListLen == 0) {
+            Tcl_ResetResult (interp);
+            rc = TCL_OK;
+            goto cleanup;
+        }
+        Tcl_ListObjIndex(interp, objv[1], 0, &queryObj);
+        query = Tcl_GetString (queryObj);
+
+        if (cache) {
+            h = Tcl_CreateHashEntry (xpathCache, query, &hnew);
+        } else {
+            hnew = 1;
+        }
+        if (hnew) {
+            rc = xpathParse(query, node, XPATH_EXPR, mappings,
+                            &parseVarCB, &t, &errMsg);
+            if (rc) {
+                if (h != NULL) {
+                    Tcl_DeleteHashEntry(h);
+                }
+                Tcl_ResetResult (interp);
+                Tcl_AppendResult (interp, "invalid XPath query '", query, "': ",
+                                  errMsg, NULL);
+                FREE (errMsg);
+                rc = TCL_ERROR;
+                goto cleanup;
+            }
+            if (cache) {
+                Tcl_SetHashValue(h, t);
+            }
+        } else {
+            t = (ast)Tcl_GetHashValue(h);
+        }
+        result = Tcl_NewListObj (0, NULL);
+        rstype = UnknownResult;
+        rc = selectNodesQueryList (interp, node, objv[1], t, 0, xpathListLen,
+                                   mappings, &cbs, &parseVarCB, xpathCache,
+                                   result, &rstype);
+        if (!xpathCache) {
+            xpathFreeAst (t);
+        }
+        if (rc != TCL_OK) {
+            Tcl_DecrRefCount (result);
+            rc = TCL_ERROR;
+            goto cleanup;
+        }
+        if (typeVar) {
+            Tcl_SetVar(interp, typeVar, xpathResultType2string(rstype), 0);
+        }
+        Tcl_SetObjResult (interp, result);
+        rc = TCL_OK;
+        goto cleanup;
+    }
+
+    rc = xpathEval (node, node, xpathQuery, mappings, &cbs, &parseVarCB,
+                    xpathCache, &errMsg, &rs);
 
     if (rc != XPATH_OK) {
         xpathRSFree(&rs);
@@ -1784,25 +1849,18 @@ int tcldom_selectNodes (
         goto cleanup;
     }
     if (errMsg) {
-        fprintf (stderr, "Why this: '%s'\n", errMsg);
+        DBG(fprintf(stderr,"No error signaled but errMsg set: '%s'\n",errMsg);)
         FREE(errMsg);
     }
-    typeVar = NULL;
-    if (objc > 2) {
-        typeVar = Tcl_GetString(objv[2]);
-    }
-    type = Tcl_NewObj();
-    Tcl_IncrRefCount(type);
     DBG(fprintf(stderr, "before tcldom_xpathResultSet \n");)
-    tcldom_xpathResultSet(interp, &rs, type, Tcl_GetObjResult(interp));
+    tcldom_xpathResultSet(interp, &rs, &rstype, Tcl_GetObjResult(interp));
     DBG(fprintf(stderr, "after tcldom_xpathResultSet \n");)
     if (typeVar) {
-        Tcl_SetVar(interp,typeVar, Tcl_GetString(type), 0);
+        Tcl_SetVar(interp, typeVar, xpathResultType2string(rstype), 0);
     }
     rc = TCL_OK;
-    Tcl_DecrRefCount(type);
-
     xpathRSFree( &rs );
+
 cleanup:
     if (localmapping) {
         for (i = 0; i < mappingListObjLen; i++) {
@@ -1946,14 +2004,15 @@ int tcldom_appendFromTclList (
     Tcl_Obj    *obj
 )
 {
-    int      i, rc, length, valueLength, attrLength, attrValueLength;
-    int      childListLength;
-    Tcl_Obj *lnode, *tagNameObj, *piNameObj, *valueObj,
-            *attrListObj, *attrObj, *childListObj, *childObj;
-    char    *tag_name, *pi_name, *value, *attrName, *attrValue;
-    domNode *newnode;
+    int       i, rc;
+    domLength valueLength, length, attrLength, attrValueLength;
+    domLength childListLength;
+    Tcl_Obj  *lnode, *tagNameObj, *piNameObj, *valueObj,
+             *attrListObj, *attrObj, *childListObj, *childObj;
+    char     *tag_name, *pi_name, *value, *attrName, *attrValue;
+    domNode  *newnode;
 
-    GetTcldomTSD();
+    GetTcldomDATA;
 
     /*------------------------------------------------------------------------
     |   check format of Tcl list node
@@ -2096,7 +2155,7 @@ int tcldom_appendFromTclList (
             return rc;
         }
     }
-    return tcldom_setInterpAndReturnVar(interp, node, 0, NULL);
+    return tcldom_setInterpAndReturnVar(interp, node, NULL);
 }
 
 
@@ -2181,6 +2240,42 @@ Tcl_Obj * tcldom_treeAsTclList (
     return Tcl_NewListObj(3, objv);
 }
 
+#if TCL_MAJOR_VERSION < 9
+static
+int tcldom_UtfToUniChar (
+    const char *src,
+    int *uniChar
+    )
+{
+    int clen;
+    Tcl_UniChar uni16;
+
+    clen = UTF8_CHAR_LEN(*src);
+    if (clen && clen < 4) {
+        clen = Tcl_UtfToUniChar (src, &uni16);
+        *uniChar = uni16;
+        return clen;
+    } else if (clen == 4) {
+        /* This resembles exactly what Tcl 9 does */
+	if (((src[1] & 0xC0) == 0x80) && ((src[2] & 0xC0) == 0x80)
+            && ((src[3] & 0xC0) == 0x80)) {
+	    /*
+	     * Four-byte-character lead byte followed by three trail bytes.
+	     */
+	    *uniChar = (((src[0] & 0x07) << 18) | ((src[1] & 0x3F) << 12)
+		    | ((src[2] & 0x3F) << 6) | (src[3] & 0x3F));
+	    if ((unsigned)(*uniChar - 0x10000) <= 0xFFFFF) {
+		return 4;
+	    }
+	}
+    }
+    *uniChar = src[0];
+    return 1;
+}
+#else
+# define tcldom_UtfToUniChar Tcl_UtfToUniChar
+#endif
+
 /*----------------------------------------------------------------------------
 |   tcldom_AppendEscaped
 |
@@ -2190,18 +2285,22 @@ void tcldom_AppendEscaped (
     Tcl_Obj    *xmlString,
     Tcl_Channel chan,
     char       *value,
-    int         value_length,
+    domLength   value_length,
     int         outputFlags
 )
 {
 #define APESC_BUF_SIZE 512
 #define AP(c)  *b++ = c;
 #define AE(s)  pc1 = s; while(*pc1) *b++ = *pc1++;
-    char  buf[APESC_BUF_SIZE+80], *b, *bLimit,  *pc, *pc1, *pEnd, charRef[10];
+#define TWOCPE clen2 = UTF8_CHAR_LEN(*(pc+clen)); \
+    if (clen) tcldom_UtfToUniChar(pc+clen, &uniChar2);
+#define MCP    pc += clen; clen = clen2;
+    char  buf[APESC_BUF_SIZE+80], *b, *bLimit,  *pc, *pc1, *pEnd,
+          charRef[10];
     int   charDone, i;
-    int   clen = 0;
+    int   clen = 0, clen2 = 0;
     int   unicode;
-    Tcl_UniChar uniChar;
+    int   uniChar, uniChar2;
     
     b = buf;
     bLimit = b + APESC_BUF_SIZE;
@@ -2226,277 +2325,31 @@ void tcldom_AppendEscaped (
         if ((*pc == '\n') && outputFlags & SERIALIZE_FOR_ATTR) {
             AP('&') AP('#') AP('x') AP('A') AP(';')
         } else
+        if ((*pc == '\r') && outputFlags & SERIALIZE_ESCAPE_CR) {
+            AP('&') AP('#') AP('x') AP('D') AP(';')
+        } else 
+        if ((*pc == '\t') && outputFlags & SERIALIZE_ESCAPE_TAB) {
+            AP('&') AP('#') AP('x') AP('9') AP(';')
+        } else 
         {
             charDone = 0;
+            clen = UTF8_CHAR_LEN(*pc);
             if (outputFlags & SERIALIZE_HTML_ENTITIES) {
                 charDone = 1;
-                Tcl_UtfToUniChar(pc, &uniChar);
-                switch (uniChar) 
-                {
-                case 0240: AE("&nbsp;");    break;     
-                case 0241: AE("&iexcl;");   break;    
-                case 0242: AE("&cent;");    break;     
-                case 0243: AE("&pound;");   break;    
-                case 0244: AE("&curren;");  break;   
-                case 0245: AE("&yen;");     break;      
-                case 0246: AE("&brvbar;");  break;   
-                case 0247: AE("&sect;");    break;     
-                case 0250: AE("&uml;");     break;      
-                case 0251: AE("&copy;");    break;     
-                case 0252: AE("&ordf;");    break;     
-                case 0253: AE("&laquo;");   break;    
-                case 0254: AE("&not;");     break;      
-                case 0255: AE("&shy;");     break;      
-                case 0256: AE("&reg;");     break;      
-                case 0257: AE("&macr;");    break;     
-                case 0260: AE("&deg;");     break;      
-                case 0261: AE("&plusmn;");  break;   
-                case 0262: AE("&sup2;");    break;     
-                case 0263: AE("&sup3;");    break;     
-                case 0264: AE("&acute;");   break;    
-                case 0265: AE("&micro;");   break;    
-                case 0266: AE("&para;");    break;     
-                case 0267: AE("&middot;");  break;   
-                case 0270: AE("&cedil;");   break;    
-                case 0271: AE("&sup1;");    break;     
-                case 0272: AE("&ordm;");    break;     
-                case 0273: AE("&raquo;");   break;    
-                case 0274: AE("&frac14;");  break;   
-                case 0275: AE("&frac12;");  break;   
-                case 0276: AE("&frac34;");  break;   
-                case 0277: AE("&iquest;");  break;   
-                case 0300: AE("&Agrave;");  break;   
-                case 0301: AE("&Aacute;");  break;   
-                case 0302: AE("&Acirc;");   break;    
-                case 0303: AE("&Atilde;");  break;   
-                case 0304: AE("&Auml;");    break;     
-                case 0305: AE("&Aring;");   break;    
-                case 0306: AE("&AElig;");   break;    
-                case 0307: AE("&Ccedil;");  break;   
-                case 0310: AE("&Egrave;");  break;   
-                case 0311: AE("&Eacute;");  break;   
-                case 0312: AE("&Ecirc;");   break;    
-                case 0313: AE("&Euml;");    break;     
-                case 0314: AE("&Igrave;");  break;   
-                case 0315: AE("&Iacute;");  break;   
-                case 0316: AE("&Icirc;");   break;    
-                case 0317: AE("&Iuml;");    break;     
-                case 0320: AE("&ETH;");     break;      
-                case 0321: AE("&Ntilde;");  break;   
-                case 0322: AE("&Ograve;");  break;   
-                case 0323: AE("&Oacute;");  break;   
-                case 0324: AE("&Ocirc;");   break;    
-                case 0325: AE("&Otilde;");  break;   
-                case 0326: AE("&Ouml;");    break;     
-                case 0327: AE("&times;");   break;    
-                case 0330: AE("&Oslash;");  break;   
-                case 0331: AE("&Ugrave;");  break;   
-                case 0332: AE("&Uacute;");  break;   
-                case 0333: AE("&Ucirc;");   break;    
-                case 0334: AE("&Uuml;");    break;     
-                case 0335: AE("&Yacute;");  break;   
-                case 0336: AE("&THORN;");   break;    
-                case 0337: AE("&szlig;");   break;    
-                case 0340: AE("&agrave;");  break;   
-                case 0341: AE("&aacute;");  break;   
-                case 0342: AE("&acirc;");   break;    
-                case 0343: AE("&atilde;");  break;   
-                case 0344: AE("&auml;");    break;     
-                case 0345: AE("&aring;");   break;    
-                case 0346: AE("&aelig;");   break;    
-                case 0347: AE("&ccedil;");  break;   
-                case 0350: AE("&egrave;");  break;   
-                case 0351: AE("&eacute;");  break;   
-                case 0352: AE("&ecirc;");   break;    
-                case 0353: AE("&euml;");    break;     
-                case 0354: AE("&igrave;");  break;   
-                case 0355: AE("&iacute;");  break;   
-                case 0356: AE("&icirc;");   break;    
-                case 0357: AE("&iuml;");    break;     
-                case 0360: AE("&eth;");     break;      
-                case 0361: AE("&ntilde;");  break;   
-                case 0362: AE("&ograve;");  break;   
-                case 0363: AE("&oacute;");  break;   
-                case 0364: AE("&ocirc;");   break;    
-                case 0365: AE("&otilde;");  break;   
-                case 0366: AE("&ouml;");    break;     
-                case 0367: AE("&divide;");  break;   
-                case 0370: AE("&oslash;");  break;   
-                case 0371: AE("&ugrave;");  break;   
-                case 0372: AE("&uacute;");  break;   
-                case 0373: AE("&ucirc;");   break;    
-                case 0374: AE("&uuml;");    break;     
-                case 0375: AE("&yacute;");  break;   
-                case 0376: AE("&thorn;");   break;    
-                case 0377: AE("&yuml;");    break;     
-                /* "Special" chars, according to XHTML xhtml-special.ent */
-                case 338:  AE("&OElig;");   break;
-                case 339:  AE("&oelig;");   break;
-                case 352:  AE("&Scaron;");  break;
-                case 353:  AE("&scaron;");  break;
-                case 376:  AE("&Yuml;");    break;
-                case 710:  AE("&circ;");    break;
-                case 732:  AE("&tilde;");   break;
-                case 8194: AE("&ensp;");    break;
-                case 8195: AE("&emsp;");    break;
-                case 8201: AE("&thinsp;");  break;
-                case 8204: AE("&zwnj;");    break;
-                case 8205: AE("&zwj;");     break;
-                case 8206: AE("&lrm;");     break;
-                case 8207: AE("&rlm;");     break;
-                case 8211: AE("&ndash;");   break;
-                case 8212: AE("&mdash;");   break;
-                case 8216: AE("&lsquo;");   break;
-                case 8217: AE("&rsquo;");   break;
-                case 8218: AE("&sbquo;");   break;
-                case 8220: AE("&ldquo;");   break;
-                case 8221: AE("&rdquo;");   break;
-                case 8222: AE("&bdquo;");   break;
-                case 8224: AE("&dagger;");  break;
-                case 8225: AE("&Dagger;");  break;
-                case 8240: AE("&permil;");  break;
-                case 8249: AE("&lsaquo;");  break;
-                case 8250: AE("&rsaquo;");  break;
-                case 8364: AE("&euro;");    break;
-                /* "Symbol" chars, according to XHTML xhtml-symbol.ent */
-                case 402:  AE("&fnof;");    break;     
-                case 913:  AE("&Alpha;");   break;    
-                case 914:  AE("&Beta;");    break;     
-                case 915:  AE("&Gamma;");   break;    
-                case 916:  AE("&Delta;");   break;    
-                case 917:  AE("&Epsilon;"); break;  
-                case 918:  AE("&Zeta;");    break;     
-                case 919:  AE("&Eta;");     break;      
-                case 920:  AE("&Theta;");   break;    
-                case 921:  AE("&Iota;");    break;     
-                case 922:  AE("&Kappa;");   break;    
-                case 923:  AE("&Lambda;");  break;   
-                case 924:  AE("&Mu;");      break;       
-                case 925:  AE("&Nu;");      break;       
-                case 926:  AE("&Xi;");      break;       
-                case 927:  AE("&Omicron;"); break;  
-                case 928:  AE("&Pi;");      break;       
-                case 929:  AE("&Rho;");     break;      
-                case 931:  AE("&Sigma;");   break;    
-                case 932:  AE("&Tau;");     break;      
-                case 933:  AE("&Upsilon;"); break;  
-                case 934:  AE("&Phi;");     break;      
-                case 935:  AE("&Chi;");     break;      
-                case 936:  AE("&Psi;");     break;      
-                case 937:  AE("&Omega;");   break;    
-                case 945:  AE("&alpha;");   break;    
-                case 946:  AE("&beta;");    break;     
-                case 947:  AE("&gamma;");   break;    
-                case 948:  AE("&delta;");   break;    
-                case 949:  AE("&epsilon;"); break;  
-                case 950:  AE("&zeta;");    break;     
-                case 951:  AE("&eta;");     break;      
-                case 952:  AE("&theta;");   break;    
-                case 953:  AE("&iota;");    break;     
-                case 954:  AE("&kappa;");   break;    
-                case 955:  AE("&lambda;");  break;   
-                case 956:  AE("&mu;");      break;       
-                case 957:  AE("&nu;");      break;       
-                case 958:  AE("&xi;");      break;       
-                case 959:  AE("&omicron;"); break;  
-                case 960:  AE("&pi;");      break;       
-                case 961:  AE("&rho;");     break;      
-                case 962:  AE("&sigmaf;");  break;   
-                case 963:  AE("&sigma;");   break;    
-                case 964:  AE("&tau;");     break;      
-                case 965:  AE("&upsilon;"); break;  
-                case 966:  AE("&phi;");     break;      
-                case 967:  AE("&chi;");     break;      
-                case 968:  AE("&psi;");     break;      
-                case 969:  AE("&omega;");   break;    
-                case 977:  AE("&thetasym;");break; 
-                case 978:  AE("&upsih;");   break;    
-                case 982:  AE("&piv;");     break;      
-                case 8226: AE("&bull;");    break;     
-                case 8230: AE("&hellip;");  break;   
-                case 8242: AE("&prime;");   break;    
-                case 8243: AE("&Prime;");   break;    
-                case 8254: AE("&oline;");   break;    
-                case 8260: AE("&frasl;");   break;    
-                case 8472: AE("&weierp;");  break;   
-                case 8465: AE("&image;");   break;    
-                case 8476: AE("&real;");    break;     
-                case 8482: AE("&trade;");   break;    
-                case 8501: AE("&alefsym;"); break;  
-                case 8592: AE("&larr;");    break;     
-                case 8593: AE("&uarr;");    break;     
-                case 8594: AE("&rarr;");    break;     
-                case 8595: AE("&darr;");    break;     
-                case 8596: AE("&harr;");    break;     
-                case 8629: AE("&crarr;");   break;    
-                case 8656: AE("&lArr;");    break;     
-                case 8657: AE("&uArr;");    break;     
-                case 8658: AE("&rArr;");    break;     
-                case 8659: AE("&dArr;");    break;     
-                case 8660: AE("&hArr;");    break;     
-                case 8704: AE("&forall;");  break;   
-                case 8706: AE("&part;");    break;     
-                case 8707: AE("&exist;");   break;    
-                case 8709: AE("&empty;");   break;    
-                case 8711: AE("&nabla;");   break;    
-                case 8712: AE("&isin;");    break;     
-                case 8713: AE("&notin;");   break;    
-                case 8715: AE("&ni;");      break;       
-                case 8719: AE("&prod;");    break;     
-                case 8721: AE("&sum;");     break;      
-                case 8722: AE("&minus;");   break;    
-                case 8727: AE("&lowast;");  break;   
-                case 8730: AE("&radic;");   break;    
-                case 8733: AE("&prop;");    break;     
-                case 8734: AE("&infin;");   break;    
-                case 8736: AE("&ang;");     break;      
-                case 8743: AE("&and;");     break;      
-                case 8744: AE("&or;");      break;       
-                case 8745: AE("&cap;");     break;      
-                case 8746: AE("&cup;");     break;      
-                case 8747: AE("&int;");     break;      
-                case 8756: AE("&there4;");  break;   
-                case 8764: AE("&sim;");     break;      
-                case 8773: AE("&cong;");    break;     
-                case 8776: AE("&asymp;");   break;    
-                case 8800: AE("&ne;");      break;       
-                case 8801: AE("&equiv;");   break;    
-                case 8804: AE("&le;");      break;       
-                case 8805: AE("&ge;");      break;       
-                case 8834: AE("&sub;");     break;      
-                case 8835: AE("&sup;");     break;      
-                case 8836: AE("&nsub;");    break;     
-                case 8838: AE("&sube;");    break;     
-                case 8839: AE("&supe;");    break;     
-                case 8853: AE("&oplus;");   break;    
-                case 8855: AE("&otimes;");  break;   
-                case 8869: AE("&perp;");    break;     
-                case 8901: AE("&sdot;");    break;     
-                case 8968: AE("&lceil;");   break;    
-                case 8969: AE("&rceil;");   break;    
-                case 8970: AE("&lfloor;");  break;   
-                case 8971: AE("&rfloor;");  break;   
-                case 9001: AE("&lang;");    break;     
-                case 9002: AE("&rang;");    break;     
-                case 9674: AE("&loz;");     break;      
-                case 9824: AE("&spades;");  break;   
-                case 9827: AE("&clubs;");   break;    
-                case 9829: AE("&hearts;");  break;   
-                case 9830: AE("&diams;");   break;    
+                tcldom_UtfToUniChar(pc, &uniChar);
+                switch (uniChar) {
+                    #include "HTML5ent.inc"
                 default: charDone = 0; 
                 }
                 if (charDone) {
-                    clen = UTF8_CHAR_LEN(*pc);
                     pc += (clen - 1);
                 }
             }
             if (!charDone) {
                 if ((unsigned char)*pc > 127) {
-                    clen = UTF8_CHAR_LEN(*pc);
                     if (!clen) {
                         domPanic("tcldom_AppendEscaped: can only handle "
                                  "UTF-8 chars up to 4 bytes length");
-
                     }
                     if (clen == 4 || outputFlags & SERIALIZE_ESCAPE_NON_ASCII) {
                         if (clen == 4) {
@@ -2532,13 +2385,13 @@ void tcldom_AppendEscaped (
             }
         }
         if (b >= bLimit) {
-            writeChars(xmlString, chan, buf, b - buf);
+            writeChars(xmlString, chan, buf, (domLength)(b - buf));
             b = buf;
         }
         pc++;
     }
     if (b > buf) {
-        writeChars(xmlString, chan, buf, b - buf);
+        writeChars(xmlString, chan, buf, (domLength)(b - buf));
     }
 }
 
@@ -2851,21 +2704,21 @@ void tcldom_treeAsXML (
             start = p = ((domTextNode*)node)->nodeValue;
             while (i < ((domTextNode*)node)->valueLength) {
                 if (*p == ']') {
-                    p++; i++;;
+                    p++; i++;
                     if (i >= ((domTextNode*)node)->valueLength) break;
                     if (*p == ']') {
-                        p++; i++;;
+                        p++; i++;
                         if (i >= ((domTextNode*)node)->valueLength) break;
                         if (*p == '>') {
-                            writeChars(xmlString, chan, start, p-start);
+                            writeChars(xmlString, chan, start, (domLength)(p-start));
                             writeChars(xmlString, chan, "]]><![CDATA[>", 13);
                             start = p+1;
                         }
                     }
                 }
-                p++; i++;;
+                p++; i++;
             }
-            writeChars(xmlString, chan, start, p-start);
+            writeChars(xmlString, chan, start, (domLength)(p-start));
             writeChars(xmlString, chan, "]]>", 3);
         } else {
             if (node->nodeFlags & DISABLE_OUTPUT_ESCAPING) {
@@ -3064,7 +2917,7 @@ void tcldom_AppendEscapedJSON (
     Tcl_Obj    *jstring,
     Tcl_Channel chan,
     char       *value,
-    int         value_length
+    domLength   value_length
 )
 {
     char  buf[APESC_BUF_SIZE+80], *b, *bLimit,  *pc, *pEnd;
@@ -3122,16 +2975,16 @@ void tcldom_AppendEscapedJSON (
             }
         }
         if (b >= bLimit) {
-            writeChars(jstring, chan, buf, b - buf);
+            writeChars(jstring, chan, buf, (domLength)(b - buf));
             b = buf;
         }
     }
     AP('"');
-    writeChars(jstring, chan, buf, b - buf);
+    writeChars(jstring, chan, buf, (domLength)(b - buf));
 }
 
 static
-void tcldom_childsAsJSON (
+void tcldom_childrenAsJSON (
     Tcl_Obj     *jstring,
     domNode     *node, /* Must be an ELEMENT_NODE */
     Tcl_Channel  channel,
@@ -3166,8 +3019,8 @@ void tcldom_childsAsJSON (
             return;
         case JSON_START:
         case JSON_ARRAY:
-            /* The children, we serialize are the value of an array
-             * element. The node is a container for either a
+            /* The children we are serializing are the value of an
+             * array element. The node is a container for either a
              * (nested, in case of JSON_ARRAY) array or an object. */
             /* Look, if the name of the container gives a hint.*/
             if (strcmp (node->nodeName, JSON_ARRAY_CONTAINER)==0) {
@@ -3329,9 +3182,8 @@ void tcldom_treeAsJSON (
     )
 {
     domTextNode *textNode;
-    int i, seenDP, seenE;
-    unsigned char c;
-    char *num;
+    Tcl_Obj *valueObj;
+    int boolVal;
     
     switch (node->nodeType) {
     case TEXT_NODE:
@@ -3347,56 +3199,14 @@ void tcldom_treeAsJSON (
             /* Check, if the text value is a JSON number and fall back
              * to string token, if not. This is to ensure, the
              * serialization is always a valid JSON string. */
-            if (textNode->valueLength == 0) goto notANumber;
-            seenDP = 0;
-            seenE = 0;
-            i = 0;
-            num = textNode->nodeValue;
-            c = num[0];
-            if (!(c == '-' || (c>='0' && c<='9'))) goto notANumber;
-            if (c<='0') {
-                i = (c == '-' ? i+1 : i);
-                if (i+1 < textNode->valueLength) {
-                    if (num[i] == '0' && num[i+1] >= '0' && num[i+1] <= '9') {
-                        goto notANumber;
-                    }
-                }
+            if (isJSONNumber (textNode->nodeValue, textNode->valueLength)) {
+                writeChars(jstring, channel, textNode->nodeValue,
+                           textNode->valueLength);
+            } else {
+                tcldom_AppendEscapedJSON (jstring, channel,
+                                          textNode->nodeValue,
+                                          textNode->valueLength);
             }
-            i = 1;
-            for (; i < textNode->valueLength; i++) {
-                c = num[i];
-                if (c >= '0' && c <= '9') continue;
-                if (c == '.') {
-                    if (num[i-1] == '-') goto notANumber;
-                    if (seenDP) goto notANumber;
-                    seenDP = 1;
-                    continue;
-                }
-                if (c == 'e' || c == 'E') {
-                    if (num[i-1] < '0') goto notANumber;
-                    if (seenE) goto notANumber;
-                    seenDP = seenE = 1;
-                    c = num[i+1];
-                    if (c == '+' || c == '-') {
-                        i++;
-                        c = num[i+1];
-                    }
-                    if (c < '0' || c > '9') goto notANumber;
-                    continue;
-                }
-                break;
-            }
-            /* Catches a plain '-' without following digits */
-            if (num[i-1] < '0') goto notANumber;
-            /* Catches trailing chars */
-            if (i < textNode->valueLength) goto notANumber;
-            writeChars(jstring, channel, textNode->nodeValue,
-                       textNode->valueLength);
-            break;
-            notANumber:
-            tcldom_AppendEscapedJSON (jstring, channel,
-                                      textNode->nodeValue,
-                                      textNode->valueLength);
             break;
         case JSON_NULL:
             writeChars(jstring, channel, "null",4);
@@ -3407,6 +3217,20 @@ void tcldom_treeAsJSON (
         case JSON_FALSE:
             writeChars(jstring, channel, "false",5);
             break;
+        case JSON_BOOLEAN:
+            valueObj = Tcl_NewStringObj (textNode->nodeValue,
+                                         textNode->valueLength);
+            if (Tcl_GetBooleanFromObj(NULL, valueObj, &boolVal) == TCL_OK) {
+                if (boolVal) {
+                    writeChars(jstring, channel, "true",4);
+                } else {
+                    writeChars(jstring, channel, "false",5);
+                }
+                Tcl_DecrRefCount (valueObj);
+                break;
+            }
+            Tcl_DecrRefCount (valueObj);
+            /* Fall through */
         case JSON_STRING:
             /* Fall through */
         default:
@@ -3419,26 +3243,26 @@ void tcldom_treeAsJSON (
     case ELEMENT_NODE:
         switch (inside) {
         case JSON_OBJECT:
-            /* Write the member name and recurse to the childs for the
-             * value. */
+            /* Write the member name and recurse to the children for
+             * the value. */
             tcldom_AppendEscapedJSON (jstring, channel,
                                       node->nodeName, -1);
             writeChars (jstring, channel, ":", 1);
             if (indent > -1 || outputFlags & SERIALIZE_INDENT_WITH_TAB) {
                 writeChars (jstring, channel, " ", 1);
             }
-            tcldom_childsAsJSON (jstring, node, channel, indent,
+            tcldom_childrenAsJSON (jstring, node, channel, indent,
                                  outputFlags, level, inside);
             break;
         case JSON_ARRAY:
             /* Since we're already inside of an array, the element can
                only be interpreted as a container for a nested JSON
                object or array. */
-            tcldom_childsAsJSON (jstring, node, channel, indent,
+            tcldom_childrenAsJSON (jstring, node, channel, indent,
                                  outputFlags, level, inside);
             break;
         case JSON_START:
-            tcldom_childsAsJSON (jstring, node, channel, indent,
+            tcldom_childrenAsJSON (jstring, node, channel, indent,
                                  outputFlags, level, inside);            
             break;
         }
@@ -3448,6 +3272,292 @@ void tcldom_treeAsJSON (
            PROCESSING_INSTRUCTION_NODE) are ignored. */
         return;
     }
+}
+
+/*----------------------------------------------------------------------------
+|   tcldom_treeAsTclValueWorker
+|
+\---------------------------------------------------------------------------*/
+static
+Tcl_Obj * tcldom_treeAsTclValueWorker (
+    Tcl_Interp *interp,
+    domNode    *node,
+    int         parentType    
+    )
+{
+    domNode *this;
+    domTextNode *textNode;
+    Tcl_Obj *resultObj, *nameObj, *valueObj;
+
+    this = node->firstChild;
+    switch (node->info) {
+    case JSON_ARRAY:
+        resultObj = Tcl_NewListObj (0, NULL);
+        while (this) {
+            if (this->nodeType != ELEMENT_NODE && this->nodeType != TEXT_NODE) {
+                this = this->nextSibling;
+                continue;
+            }
+            if (this->nodeType == TEXT_NODE) {
+                textNode = (domTextNode *)this;
+                valueObj = Tcl_NewStringObj (textNode->nodeValue,
+                                             textNode->valueLength);
+            } else {
+                valueObj = tcldom_treeAsTclValueWorker (interp, this, JSON_ARRAY);
+            }
+            Tcl_ListObjAppendElement (interp, resultObj, valueObj);
+            this = this->nextSibling;            
+        }
+        break;
+    case JSON_OBJECT:
+        resultObj = Tcl_NewDictObj ();
+        while (this) {
+            if (this->nodeType != ELEMENT_NODE) {
+                /* There are no valid TEXT_NODE elements as children
+                 * of a JSON_OBJECT. */
+                this = this->nextSibling;
+                continue;
+            }
+            valueObj = tcldom_treeAsTclValueWorker (interp, this, JSON_OBJECT);
+            nameObj = Tcl_NewStringObj (this->nodeName, -1);
+            Tcl_IncrRefCount (nameObj);
+            Tcl_DictObjPut (interp, resultObj, nameObj, valueObj);
+            Tcl_DecrRefCount (nameObj);
+            this = this->nextSibling;
+        }
+        break;
+    case 0:
+        while (this) {
+            if (this->nodeType != TEXT_NODE) {
+                this = this->nextSibling;
+                continue;
+            }
+            /* We take the first text child */
+            break;
+        }
+        if (this) {
+            textNode = (domTextNode *)this;
+            resultObj = Tcl_NewStringObj (textNode->nodeValue,
+                                         textNode->valueLength);
+        } else {
+            resultObj = Tcl_NewObj ();
+        }
+        break;
+    default:
+        DBG (fprintf (stderr, "tcldom_treeAsTclValueWorker: Should not reach that!"));
+        resultObj = Tcl_NewObj ();     
+        break;
+    }
+    return resultObj;
+}
+
+/*----------------------------------------------------------------------------
+|   tcldom_treeAsTclValue
+|
+\---------------------------------------------------------------------------*/
+static int
+tcldom_treeAsTclValue (
+    Tcl_Interp *interp,
+    domNode    *node,
+    Tcl_Obj    *var_name
+    )
+{
+    char        *type;
+    int          typelen;
+    Tcl_Obj     *resultObj;
+    domTextNode *textnode;
+    
+    if (var_name) {
+        if (node->nodeType == ELEMENT_NODE) {
+            if (node->info == JSON_OBJECT) {
+                type = "dict";
+                typelen = 4;
+            } else if (node->info == JSON_ARRAY) {
+                type = "list";
+                typelen = 4;
+            } else {
+                type = "string";
+                typelen = 6;
+            }
+        } else {
+            type = "string";
+            typelen = 6;
+        }
+        if (!Tcl_ObjSetVar2 (interp, var_name, NULL,
+                             Tcl_NewStringObj (type, typelen),
+                             TCL_LEAVE_ERR_MSG)) {
+            return TCL_ERROR;
+        }
+    }
+    if (node->nodeType == ELEMENT_NODE) {
+        resultObj = tcldom_treeAsTclValueWorker (interp, node, node->info);
+    } else if (node->nodeType == TEXT_NODE) {
+        textnode = (domTextNode*)node;
+        resultObj = Tcl_NewStringObj (textnode->nodeValue,
+                                      textnode->valueLength);
+    } else {
+        resultObj = Tcl_NewObj ();
+    }
+    Tcl_SetObjResult (interp, resultObj);
+    return TCL_OK;
+}
+
+typedef struct 
+{
+    Tcl_Obj  *object;
+    Tcl_Obj  *array;
+    Tcl_Obj  *null;
+    Tcl_Obj  *trueVal;
+    Tcl_Obj  *falseVal;
+    Tcl_Obj  *number;
+    Tcl_Obj  *string;
+} asTypedListTypes;
+
+
+/*----------------------------------------------------------------------------
+|   tcldom_treeAsTypedList
+|
+\---------------------------------------------------------------------------*/
+static Tcl_Obj*
+tcldom_treeAsTypedListWorker (
+    domNode    *node,          /* Must be ELEMENT_NODE or TEXT_NODE */
+    const asTypedListTypes *c  /* c for string constants */
+    )
+{
+    Tcl_Obj *listObj, *resultObj = Tcl_NewListObj (0, NULL);
+    domNode *child, *childchild;
+    domTextNode *textNode;
+
+    if (node->nodeType == ELEMENT_NODE) {
+        switch (node->info) {
+        case JSON_ARRAY:
+            listObj = Tcl_NewListObj (0, NULL);
+            child = node->firstChild;
+            while (child) {
+                if (child->nodeType == ELEMENT_NODE
+                    || child->nodeType == TEXT_NODE) {
+                    Tcl_ListObjAppendElement (
+                        NULL, listObj, tcldom_treeAsTypedListWorker (child, c)
+                        );
+                }
+                child = child->nextSibling;
+            }
+            Tcl_ListObjAppendElement(NULL, resultObj, c->array);
+            Tcl_ListObjAppendElement(NULL, resultObj, listObj);
+            break;
+        case JSON_OBJECT:
+            listObj = Tcl_NewListObj (0, NULL);
+            child = node->firstChild;
+            while (child) {
+                Tcl_ListObjAppendElement(NULL, listObj,
+                                         Tcl_NewStringObj(child->nodeName, -1));
+                if (child->nodeType == ELEMENT_NODE) {
+                    if (child->info == 0) {
+                        childchild = child->firstChild;
+                        while (childchild) {
+                            if (childchild->nodeType == TEXT_NODE) {
+                                Tcl_ListObjAppendElement(
+                                    NULL, listObj,
+                                    tcldom_treeAsTypedListWorker (
+                                        childchild, c));
+                                break;
+                            }
+                            childchild = childchild->nextSibling;
+                        }
+                    } else {
+                        Tcl_ListObjAppendElement(NULL, listObj,
+                                                 tcldom_treeAsTypedListWorker (
+                                                     child, c));
+                    }
+                }
+                child = child->nextSibling;
+            }
+            Tcl_ListObjAppendElement(NULL, resultObj, c->object);
+            Tcl_ListObjAppendElement(NULL, resultObj, listObj);
+            break;
+        }
+    } else {
+        /* Text node */
+        switch (node->info) {
+        case JSON_NULL:
+            Tcl_ListObjAppendElement (NULL, resultObj, c->null);
+            break;
+        case JSON_TRUE:
+            Tcl_ListObjAppendElement (NULL, resultObj, c->trueVal);
+            break;
+        case JSON_FALSE:
+            Tcl_ListObjAppendElement (NULL, resultObj, c->falseVal);
+            break;
+        case JSON_NUMBER:
+            textNode = (domTextNode *)node;
+            if (isJSONNumber (textNode->nodeValue, textNode->valueLength)) {
+                Tcl_ListObjAppendElement(NULL, resultObj, c->number);
+                Tcl_ListObjAppendElement(
+                    NULL, resultObj, Tcl_NewStringObj(textNode->nodeValue,
+                                                      textNode->valueLength));
+                break;
+            }
+            /* fall through */
+        case JSON_STRING:
+        default:
+            textNode = (domTextNode *)node;
+            Tcl_ListObjAppendElement(NULL, resultObj, c->string);
+            Tcl_ListObjAppendElement(
+                NULL, resultObj, Tcl_NewStringObj(textNode->nodeValue,
+                                                  textNode->valueLength));
+            break;
+        }
+    }
+    return resultObj;
+}
+
+static void
+tcldom_treeAsTypedList (
+    Tcl_Interp *interp,
+    domNode    *node
+    )
+{
+    asTypedListTypes c;
+    
+    if (node->nodeType != ELEMENT_NODE && node->nodeType != TEXT_NODE) {
+        Tcl_ResetResult (interp);
+        return;
+    }
+
+    c.object = Tcl_NewStringObj ("OBJECT", 6);
+    c.array = Tcl_NewStringObj ("ARRAY", 5);
+    c.null = Tcl_NewStringObj ("NULL", 4);
+    c.trueVal = Tcl_NewStringObj ("TRUE", 4);
+    c.falseVal = Tcl_NewStringObj ("FALSE", 5);
+    c.number = Tcl_NewStringObj ("NUMBER", 6);
+    c.string = Tcl_NewStringObj ("STRING", 6);
+
+    Tcl_IncrRefCount (c.object);
+    Tcl_IncrRefCount (c.array);
+    Tcl_IncrRefCount (c.null);
+    Tcl_IncrRefCount (c.trueVal);
+    Tcl_IncrRefCount (c.falseVal);
+    Tcl_IncrRefCount (c.number);
+    Tcl_IncrRefCount (c.string);
+
+    if (node->nodeType == ELEMENT_NODE
+        && node->info == 0
+        && node->firstChild->nodeType == TEXT_NODE) {
+        /* Either a value only json document or a OBJECT propertiy
+         * element node.*/ 
+        node = node->firstChild;
+    }
+    
+    Tcl_SetObjResult (interp, 
+                      tcldom_treeAsTypedListWorker (node, &c));
+
+    Tcl_DecrRefCount (c.object);
+    Tcl_DecrRefCount (c.array);
+    Tcl_DecrRefCount (c.null);
+    Tcl_DecrRefCount (c.trueVal);
+    Tcl_DecrRefCount (c.falseVal);
+    Tcl_DecrRefCount (c.number);
+    Tcl_DecrRefCount (c.string);
 }
 
 /*----------------------------------------------------------------------------
@@ -3497,7 +3607,7 @@ static int serializeAsXML (
 {
     char          *channelId, prefix[MAX_PREFIX_LEN];
     const char    *localName;
-    int            indent, mode, bool;
+    int            indent, mode, boolVal;
     int            outputFlags = 0;
     int            optionIndex, cdataChild;
     Tcl_Obj       *resultPtr, *encString = NULL;
@@ -3509,13 +3619,13 @@ static int serializeAsXML (
     static const char *asXMLOptions[] = {
         "-indent", "-channel", "-escapeNonASCII", "-doctypeDeclaration",
         "-xmlDeclaration", "-encString", "-escapeAllQuot", "-indentAttrs",
-        "-nogtescape", "-noEmptyElementTag",
+        "-nogtescape", "-noEmptyElementTag", "-escapeCR", "-escapeTab",
         NULL
     };
     enum asXMLOption {
         m_indent, m_channel, m_escapeNonASCII, m_doctypeDeclaration,
         m_xmlDeclaration, m_encString, m_escapeAllQuot, m_indentAttrs,
-        m_nogtescape, m_noEmptyElementTag
+        m_nogtescape, m_noEmptyElementTag, m_escapeCR, m_escapeTab
     };
     
     indent = 4;
@@ -3589,7 +3699,7 @@ static int serializeAsXML (
             }
             if ((mode & TCL_WRITABLE) == 0) {
                 Tcl_AppendResult(interp, "channel \"", channelId,
-                                "\" isnt't opened for writing", (char*)NULL);
+                                "\" is not opened for writing", (char*)NULL);
                 goto cleanup;
             }
             objc -= 2;
@@ -3613,11 +3723,11 @@ static int serializeAsXML (
                           "as argument");
                 goto cleanup;
             }
-            if (Tcl_GetBooleanFromObj(interp, objv[3], &bool)
+            if (Tcl_GetBooleanFromObj(interp, objv[3], &boolVal)
                 != TCL_OK) {
                 goto cleanup;
             }
-            if (bool) outputFlags |= SERIALIZE_DOCTYPE_DECLARATION;
+            if (boolVal) outputFlags |= SERIALIZE_DOCTYPE_DECLARATION;
             objc -= 2;
             objv += 2;
             break;
@@ -3628,11 +3738,11 @@ static int serializeAsXML (
                           "as argument");
                 goto cleanup;
             }
-            if (Tcl_GetBooleanFromObj(interp, objv[3], &bool)
+            if (Tcl_GetBooleanFromObj(interp, objv[3], &boolVal)
                 != TCL_OK) {
                 goto cleanup;
             }
-            if (bool) outputFlags |= SERIALIZE_XML_DECLARATION;
+            if (boolVal) outputFlags |= SERIALIZE_XML_DECLARATION;
             objc -= 2;
             objv += 2;
             break;
@@ -3666,6 +3776,18 @@ static int serializeAsXML (
 
         case m_noEmptyElementTag:
             outputFlags |= SERIALIZE_NO_EMPTY_ELEMENT_TAG;
+            objc -= 1;
+            objv += 1;
+            break;
+
+        case m_escapeCR:
+            outputFlags |= SERIALIZE_ESCAPE_CR;
+            objc -= 1;
+            objv += 1;
+            break;
+
+        case m_escapeTab:
+            outputFlags |= SERIALIZE_ESCAPE_TAB;
             objc -= 1;
             objv += 1;
             break;
@@ -3710,6 +3832,368 @@ cleanup:
         Tcl_DecrRefCount(encString);
     }
     return TCL_ERROR;
+}
+
+static int compareNSAtts (
+    domAttrNode *a,
+    domAttrNode *b
+    ) 
+{
+    if (strcmp (a->nodeName, "xmlns") == 0) {
+        return -1;
+    } else if (strcmp (b->nodeName, "xmlns") == 0) {
+        return 1;
+    }
+    return (strcmp (&a->nodeName[6], &b->nodeName[6]));
+}
+
+static int compareAtts (
+    domAttrNode *a,
+    domAttrNode *b
+    ) 
+{
+    domNS *ans, *bns;
+    domDocument *doc;
+    const char *alocalname, *blocalname;
+    int res;
+
+
+    if (a->nodeFlags & IS_NS_NODE) {
+        if (b->nodeFlags & IS_NS_NODE) {
+            return compareNSAtts (a, b);
+        } else {
+            return -1;
+        }
+    } else {
+        if (a->nodeFlags & IS_NS_NODE) {
+            return 1;
+        }
+    }
+    if (a->namespace) {
+        if (b->namespace) {
+            doc = a->parentNode->ownerDocument;
+            ans = domGetNamespaceByIndex (doc, a->namespace);
+            bns = domGetNamespaceByIndex (doc, b->namespace);
+            res = strcmp (ans->uri, bns->uri);
+            if (res == 0) {
+                alocalname = domGetLocalName (a->nodeName);
+                blocalname = domGetLocalName (b->nodeName);
+                return strcmp (alocalname, blocalname);
+            } else {
+                return res;
+            }
+        } else {
+            return 1;
+        }
+    } else {
+        if (b->namespace) {
+            return -1;
+        } else {
+            alocalname = domGetLocalName (a->nodeName);
+            blocalname = domGetLocalName (b->nodeName);
+            return strcmp (alocalname, blocalname);
+        }
+    }
+}
+
+static domAttrNode* mergeAtt (
+    domAttrNode *a,
+    int len_a,
+    domAttrNode *b,
+    int len_b
+    ) 
+{
+    domAttrNode *start, *head;
+    int pos_a = 0;
+    int pos_b = 0;
+
+    
+    if (!len_a) {
+        return b;
+    }
+    if (!len_b) {
+        return a;
+    }
+    if (compareAtts (a, b) < 0) {
+        pos_a++;
+        start = a;
+        a = a->nextSibling;
+    } else {
+        pos_b++;
+        start = b;
+        b = b->nextSibling;
+    }
+    head = start;
+    while (pos_a < len_a && pos_b < len_b) {
+        if (compareAtts (a, b) < 0) {
+            pos_a++;
+            head->nextSibling = a;
+            head = a;
+            a = a->nextSibling;
+        } else {
+            pos_b++;
+            head->nextSibling = b;
+            head = b;
+            b = b->nextSibling;
+        }
+    }
+    while (pos_a < len_a) {
+        pos_a++;
+        head->nextSibling = a;
+        head = a;
+        a = a->nextSibling;
+    }
+    while (pos_b < len_b) {
+        pos_b++;
+        head->nextSibling = b;
+        head = b;
+        b = b->nextSibling;
+    }
+    head->nextSibling = NULL;
+    return start;
+}
+
+
+static domAttrNode* mergeSortAtt (
+    domAttrNode *attr,
+    int len
+    )
+{
+    domAttrNode *attr_a, *attr_b;
+    int half, count = 1;
+
+    if (len <= 1) {
+        return attr;
+    }
+    half = len/2;
+    attr_b = attr->nextSibling;
+    while (count < half) {
+        attr_b = attr_b->nextSibling;
+        count++;
+    }
+    attr_a = attr;
+    return mergeAtt (mergeSortAtt (attr_a, half), half,
+                     mergeSortAtt (attr_b, len - half), len - half);
+}
+    
+    
+static void
+treeAsCanonicalXML (
+    Tcl_Obj  *xmlString,
+    domNode  *node,
+    Tcl_Channel chan,
+    int comments,
+    domAttrNode **attOrderArray,
+    int  *lengthAttOrderArray
+    )
+{
+    domAttrNode   *attr, *thisAtt = NULL, *previousAtt, *attOrder;
+    domNode       *child;
+    domDocument   *doc;
+    domNS         *ns, *ns1;
+    int            outputFlags = SERIALIZE_ESCAPE_CR, attNr = 0;
+
+    switch (node->nodeType) {
+    case ELEMENT_NODE:
+        writeChars(xmlString, chan, "<", 1);
+        writeChars(xmlString, chan, node->nodeName, -1);
+    restartAttOrder:
+        attOrder = *attOrderArray;
+        attr = node->firstAttr;
+        if (attr) {
+            doc = node->ownerDocument;
+            /* Attribute sort: It would be possible to sort the
+             * attributes linked list in place, but this would mean
+             * that two asXML serializations with an asCanonicalXML
+             * serialization inbetween may be different, which would
+             * be surprsing. */
+            while (attr) {
+                if(attr->nodeFlags & IS_NS_NODE) {
+                    ns = domGetNamespaceByIndex(doc, attr->namespace);
+                    ns1 = domLookupPrefix (node->parentNode, ns->prefix);
+                    if (ns1) {
+                        if (strcmp (ns->uri, ns1->uri) == 0) {
+                            /* Namespace declaration already in scope,
+                             * suppress it */
+                            attr = attr->nextSibling;
+                            continue;
+                        }
+                    } else {
+                        if (ns->uri[0] == '\0') {
+                            /* This is a superfluous unsetting of the
+                             * default namespace because there isn't
+                             * default namespace in scope. */
+                            attr = attr->nextSibling;
+                            continue;
+                        }
+                    }
+                }
+                if (attNr >= *lengthAttOrderArray) {
+                    FREE (*attOrderArray);
+                    *attOrderArray = MALLOC (sizeof (domAttrNode)
+                                            * *lengthAttOrderArray * 2);
+                    *lengthAttOrderArray *= 2;
+                    attNr = 0;
+                    goto restartAttOrder;
+                }
+
+                thisAtt = memcpy (&attOrder[attNr], attr,
+                                  sizeof (domAttrNode));
+                if (attNr) {
+                    previousAtt = &attOrder[attNr-1];
+                    previousAtt->nextSibling = thisAtt;
+                }
+                attNr++;
+                attr = attr->nextSibling;
+            }
+            if (attNr && thisAtt) {
+                thisAtt->nextSibling = NULL;
+            }
+            attr = mergeSortAtt (attOrderArray[0], attNr) ;
+            while (attr) {
+                writeChars(xmlString, chan, " ", 1);
+                writeChars(xmlString, chan, attr->nodeName, -1);
+                writeChars(xmlString, chan, "=\"", 2);
+                tcldom_AppendEscaped(xmlString, chan, attr->nodeValue, 
+                                     attr->valueLength,
+                                     outputFlags
+                                     | SERIALIZE_FOR_ATTR
+                                     | SERIALIZE_NO_GT_ESCAPE
+                                     | SERIALIZE_ESCAPE_TAB);
+                writeChars(xmlString, chan, "\"", 1);
+                attr = attr->nextSibling;
+            }
+        }
+        writeChars(xmlString, chan, ">", 1);
+        child = node->firstChild;
+        while (child != NULL) {
+            treeAsCanonicalXML (xmlString, child, chan, comments,
+                                attOrderArray, lengthAttOrderArray);
+            child = child->nextSibling;
+        }
+        writeChars(xmlString, chan, "</", 2);
+        writeChars(xmlString, chan, node->nodeName, -1);
+        writeChars(xmlString, chan, ">", 1);
+        break;
+    case TEXT_NODE:
+    case CDATA_SECTION_NODE:
+        tcldom_AppendEscaped(xmlString, chan,
+                             ((domTextNode*)node)->nodeValue,
+                             ((domTextNode*)node)->valueLength,
+                             outputFlags);
+        break;
+    case COMMENT_NODE:
+        if (comments) {
+            writeChars(xmlString, chan, "<!--", 4);
+            writeChars(xmlString, chan, ((domTextNode*)node)->nodeValue,
+                       ((domTextNode*)node)->valueLength);
+            writeChars(xmlString, chan, "-->", 3);
+        }
+        break;
+    case PROCESSING_INSTRUCTION_NODE:
+        writeChars(xmlString, chan, "<?", 2);
+        writeChars(xmlString, chan, 
+                    ((domProcessingInstructionNode*)node)->targetValue,
+                    ((domProcessingInstructionNode*)node)->targetLength);
+        if (((domProcessingInstructionNode*)node)->dataLength) {
+            writeChars(xmlString, chan, " ", 1);
+            writeChars(xmlString, chan, 
+                       ((domProcessingInstructionNode*)node)->dataValue,
+                       ((domProcessingInstructionNode*)node)->dataLength);
+        }
+        writeChars(xmlString, chan, "?>", 2);
+        break;
+    default:
+        /* Nothing to output */
+        break;
+    }
+    return;
+}
+
+
+/*----------------------------------------------------------------------------
+|   serializeAsCanonicalXML
+|
+\---------------------------------------------------------------------------*/
+static int serializeAsCanonicalXML (
+    domNode    *node,
+    Tcl_Interp *interp,
+    int         objc,
+    Tcl_Obj    *const objv[]
+)
+{
+    int optionIndex, mode, comments = 0, first= 1;
+    int lengthAttOrderArray = C14N_ATTR_SORT_SIZE_INIT;
+    Tcl_Channel chan = NULL;
+    domNode *docChild;
+    Tcl_Obj *resultObj;
+    domAttrNode *attOrderArray;
+
+    static const char *asCanonicalXMLOptions[] = {
+        "-channel", "-comments", NULL
+    };
+    enum asCanonicalXMLOption {
+        m_channel, m_comments
+    };
+    
+    while (objc > 3) {
+        if (Tcl_GetIndexFromObj(interp, objv[2], asCanonicalXMLOptions,
+                                "option", 0, &optionIndex) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        switch ((enum asCanonicalXMLOption) optionIndex) {
+        case m_channel:
+            chan = Tcl_GetChannel (interp, Tcl_GetString (objv[3]), &mode);
+            if (chan == NULL) {
+                SetResult("the -channel option must have a Tcl channel"
+                          " argument");
+                return TCL_ERROR;
+            }
+            if ((mode & TCL_WRITABLE) == 0) {
+                SetResult ("channel is not opened for writing");
+                return TCL_ERROR;
+            }
+            objc -= 2;
+            objv += 2;
+            break;
+            
+        case m_comments:
+            if (Tcl_GetBooleanFromObj(interp, objv[3], &comments) != TCL_OK) {
+                return TCL_ERROR;
+            }
+            objc -= 2;
+            objv += 2;
+            break;
+        }
+    }
+        
+    if (objc > 2) {
+        SetResult ("unexpected argument(s) after options");
+        return TCL_ERROR;
+    }
+    attOrderArray = (domAttrNode *) MALLOC (sizeof (domAttrNode)
+                                            * C14N_ATTR_SORT_SIZE_INIT);
+    if (node->nodeType == DOCUMENT_NODE) {
+        docChild = ((domDocument*)node)->rootNode->firstChild;
+        resultObj = Tcl_GetObjResult (interp);
+        while (docChild) {
+            if (first) {
+                first = 0;
+            } else {
+                if ((docChild->nodeType != COMMENT_NODE) || comments) {
+                    writeChars(resultObj, chan, "\n", 1);
+                }
+            }
+            treeAsCanonicalXML(resultObj, docChild, chan, comments,
+                               &attOrderArray, &lengthAttOrderArray);
+            docChild = docChild->nextSibling;
+        }
+    } else {
+        treeAsCanonicalXML(Tcl_GetObjResult (interp), node, chan, comments,
+                           &attOrderArray, &lengthAttOrderArray);
+    }
+    FREE (attOrderArray);
+    return TCL_OK;
 }
 
 /*----------------------------------------------------------------------------
@@ -4027,7 +4511,8 @@ int tcldom_prefixNSlist (
     )
 {
     char   **prefixns = *prefixnsPtr;
-    int      len, i, result;
+    domLength len, i;
+    int result;
     Tcl_Obj *objPtr, *listPtr;
 
     i = 0;
@@ -4086,7 +4571,8 @@ static int renameNodes (
     Tcl_Obj     *const objv[] 
     )
 {
-    int      len, i, hnew;
+    domLength len, i;
+    int hnew;
     Tcl_HashEntry *h;
     Tcl_Obj *objPtr;
     domNode     *node;
@@ -4165,9 +4651,9 @@ static int applyXSLT (
 {
     char          *usage, **parameters = NULL, *errMsg, *option;
     Tcl_Obj       *objPtr, *localListPtr = (Tcl_Obj *)NULL;
-    int            i, result, length, optionIndex;
-    int            ignoreUndeclaredParameters = 0;
+    int            result, optionIndex, ignoreUndeclaredParameters = 0;
     int            maxApplyDepth = MAX_XSLT_APPLY_DEPTH;
+    domLength      i, length;
     domDocument   *xsltDoc, *xmlDoc, *resultDoc = NULL;
     XsltMsgCBInfo  xsltMsgInfo;
 
@@ -4314,7 +4800,7 @@ static int applyXSLT (
     if (xsltMsgInfo.msgcmd) {
         Tcl_DecrRefCount(xsltMsgInfo.msgcmd);
     }
-    return tcldom_returnDocumentObj(interp, resultDoc, (objc == 2),
+    return tcldom_returnDocumentObj(interp, resultDoc,
                                     (objc == 2) ? objv[1] : NULL, 1, 0);
             
  applyXSLTCleanUP:
@@ -4395,7 +4881,6 @@ static int tcldom_XSLTObjCmd (
 static int convertToXSLTCmd (
     domDocument *doc,
     Tcl_Interp  *interp,
-    int          setVariable,
     Tcl_Obj     *var_name
     )
 {
@@ -4409,7 +4894,7 @@ static int convertToXSLTCmd (
     if (!clientData) {
         doc->nodeFlags &= ~DONT_FREE;
         SetResult(errMsg);
-        if (setVariable) {
+        if (var_name) {
             objVar = Tcl_GetString(var_name);
             Tcl_UnsetVar(interp, objVar, 0);
             Tcl_SetVar   (interp, objVar, "", 0);
@@ -4422,7 +4907,7 @@ static int convertToXSLTCmd (
     XSLT_CMD(objCmdName, doc);
     Tcl_CreateObjCommand(interp, objCmdName, tcldom_XSLTObjCmd, clientData,
                           xsltFreeStateWrapper);
-    if (setVariable) {
+    if (var_name) {
         objVar = Tcl_GetString(var_name);
         Tcl_UnsetVar (interp, objVar, 0);
         Tcl_SetVar   (interp, objVar, objCmdName, 0);
@@ -4442,7 +4927,7 @@ int tcldom_NodeObjCmd (
     Tcl_Obj    *const objv[]
 )
 {
-    GetTcldomTSD()
+    GetTcldomDATA;
 
     domNode     *node, *child, *refChild, *oldChild, *refNode;
     domNS       *ns;
@@ -4451,11 +4936,13 @@ int tcldom_NodeObjCmd (
     char         tmp[200], prefix[MAX_PREFIX_LEN], *method, *nodeName,
                  *str, *attr_name, *attr_val, *filter;
     const char  *localName, *uri, *nsStr;
-    int          result, length, methodIndex, i;
-    long         line, column;
-    int          nsIndex, bool, hnew, legacy, jsonType;
+    int          result, methodIndex, i;
+    domLength    length;
+    XML_Size     line, column;
+    XML_Index    byteIndex;
+    int          nsIndex, boolVal, hnew, legacy, jsonType;
     Tcl_Obj     *namePtr, *resultPtr;
-    Tcl_Obj     *mobjv[MAX_REWRITE_ARGS];
+    Tcl_Obj     *mobjv[MAX_REWRITE_ARGS], *storedErrMsg;
     Tcl_CmdInfo  cmdInfo;
     Tcl_HashEntry *h;
 
@@ -4476,7 +4963,8 @@ int tcldom_NodeObjCmd (
         "getElementsByTagName",              "getElementsByTagNameNS",
         "disableOutputEscaping",             "precedes",         "asText",
         "insertBeforeFromScript",            "normalize",        "baseURI",
-        "asJSON",          "jsonType",       "attributeNames",
+        "asJSON",          "asTclValue",     "asTypedList",      "jsonType",
+        "attributeNames",  "asCanonicalXML", "getByteIndex",
 #ifdef TCL_THREADS
         "readlock",        "writelock",
 #endif
@@ -4499,23 +4987,25 @@ int tcldom_NodeObjCmd (
         m_getElementsByTagName,              m_getElementsByTagNameNS,
         m_disableOutputEscaping,             m_precedes,        m_asText,
         m_insertBeforeFromScript,            m_normalize,       m_baseURI,
-        m_asJSON,          m_jsonType,       m_attributeNames
+        m_asJSON,          m_asTclValue,     m_asTypedList,     m_jsonType,
+        m_attributeNames,  m_asCanonicalXML, m_getByteIndex
 #ifdef TCL_THREADS
         ,m_readlock,       m_writelock
 #endif
     };
 
     node = (domNode*) clientData;
-    if (TSD(domCreateCmdMode) == DOM_CREATECMDMODE_AUTO) {
-        TSD(dontCreateObjCommands) = 0;
+    if (TcldomDATA(domCreateCmdMode) == DOM_CREATECMDMODE_AUTO) {
+        TcldomDATA(dontCreateObjCommands) = 0;
     }
     if (node == NULL) {
         if (objc < 3) {
-            SetResult(node_usage);
+            Tcl_WrongNumArgs (interp, 1, objv,
+                              "nodetoken subcommand ?arg ...?");
             return TCL_ERROR;
         }
-        if (TSD(domCreateCmdMode) == DOM_CREATECMDMODE_AUTO) {
-            TSD(dontCreateObjCommands) = 1;
+        if (TcldomDATA(domCreateCmdMode) == DOM_CREATECMDMODE_AUTO) {
+            TcldomDATA(dontCreateObjCommands) = 1;
         }
         node = tcldom_getNodeFromObj(interp, objv[1]);
         if (node == NULL) {
@@ -4525,10 +5015,10 @@ int tcldom_NodeObjCmd (
         objv++;
     }
     if (objc < 2) {
-        SetResult(node_usage);
+        Tcl_WrongNumArgs (interp, 1, objv, "subcommand ?arg ...?");
         return TCL_ERROR;
     }
-    if (Tcl_GetIndexFromObj(NULL, objv[1], nodeMethods, "method", 0,
+    if (Tcl_GetIndexFromObj(interp, objv[1], nodeMethods, "method", 0,
                             &methodIndex) != TCL_OK) {
 
         method = Tcl_GetString(objv[1]);
@@ -4538,6 +5028,8 @@ int tcldom_NodeObjCmd (
             |   try to find method implemented as normal Tcl proc
             \-------------------------------------------------------*/
             result = 0;
+            storedErrMsg = Tcl_GetObjResult (interp);
+            Tcl_IncrRefCount (storedErrMsg);
             if (node->nodeType == ELEMENT_NODE) {
                 /*----------------------------------------------------
                 |   try to find Tcl level node specific method proc
@@ -4562,9 +5054,11 @@ int tcldom_NodeObjCmd (
                 result = Tcl_GetCommandInfo(interp, tmp, &cmdInfo);
             }
             if (!result) {
-                SetResult(node_usage);
+                SetResult(Tcl_GetString (storedErrMsg));
+                Tcl_DecrRefCount (storedErrMsg);
                 return TCL_ERROR;
             }
+            Tcl_DecrRefCount (storedErrMsg);
             if (!cmdInfo.isNativeObjectProc) {
                 SetResult("can't access Tcl level method!");
                 return TCL_ERROR;
@@ -4656,7 +5150,7 @@ int tcldom_NodeObjCmd (
             attr_val  = Tcl_GetStringFromObj(objv[3], &length);
             return tcldom_setInterpAndReturnVar
                 (interp, tcldom_find(node, attr_name, attr_val, length),
-                 (objc == 5), (objc == 5) ? objv[4] : NULL);
+                 (objc == 5) ? objv[4] : NULL);
 
         case m_child:
             CheckArgs(3,6,2,"instance|all ?type? ?attr value?");
@@ -4683,7 +5177,7 @@ int tcldom_NodeObjCmd (
             while (node->parentNode) {
                 node = node->parentNode;
             }
-            return tcldom_setInterpAndReturnVar(interp, node, (objc == 3),
+            return tcldom_setInterpAndReturnVar(interp, node,
                                         (objc == 3) ? objv[2] : NULL);
 
         case m_text:
@@ -4785,6 +5279,12 @@ int tcldom_NodeObjCmd (
             }
             break;
 
+        case m_asCanonicalXML:
+            Tcl_ResetResult(interp);
+            if (serializeAsCanonicalXML(node, interp, objc, objv) != TCL_OK) {
+                return TCL_ERROR;
+            }
+            break;
         case m_asHTML:
             Tcl_ResetResult(interp);
             if (serializeAsHTML(node, interp, objc, objv) != TCL_OK) {
@@ -4797,7 +5297,20 @@ int tcldom_NodeObjCmd (
                 return TCL_ERROR;
             }
             break;
-            
+
+        case m_asTclValue:
+            CheckArgs(2,3,2,"?typeVar?");
+            if (tcldom_treeAsTclValue (interp, node, (objc == 3) ? objv[2] : NULL)
+                != TCL_OK) {
+                return TCL_ERROR;
+            }
+            break;
+
+        case m_asTypedList:
+            CheckArgs(2,2,2,"");
+            tcldom_treeAsTypedList (interp, node);
+            break;
+
         case m_getAttribute:
             CheckArgs(3,4,2,"attrName ?defaultValue?");
             if (node->nodeType != ELEMENT_NODE) {
@@ -4862,7 +5375,7 @@ int tcldom_NodeObjCmd (
                 CheckText (interp, attr_val, "attribute");
                 domSetAttribute(node, attr_name, attr_val);
             }
-            return tcldom_setInterpAndReturnVar(interp, node, 0, NULL);
+            return tcldom_setInterpAndReturnVar(interp, node, NULL);
 
         case m_setAttributeNS:
             if (node->nodeType != ELEMENT_NODE) {
@@ -4892,7 +5405,7 @@ int tcldom_NodeObjCmd (
                     return TCL_ERROR;
                 }
             }
-            return tcldom_setInterpAndReturnVar(interp, node, 0, NULL);
+            return tcldom_setInterpAndReturnVar(interp, node, NULL);
 
         case m_hasAttribute:
             CheckArgs(3,3,2,"attrName");
@@ -4950,7 +5463,7 @@ int tcldom_NodeObjCmd (
                 AppendResult("'");
                 return TCL_ERROR;
             }
-            return tcldom_setInterpAndReturnVar(interp, node, 0, NULL);
+            return tcldom_setInterpAndReturnVar(interp, node, NULL);
 
         case m_removeAttributeNS:
             CheckArgs(4,4,2,"uri attrName");
@@ -4967,39 +5480,35 @@ int tcldom_NodeObjCmd (
                 AppendResult("'");
                 return TCL_ERROR;
             }
-            return tcldom_setInterpAndReturnVar(interp, node, 0, NULL);
+            return tcldom_setInterpAndReturnVar(interp, node, NULL);
 
         case m_nextSibling:
             CheckArgs(2,3,2,"?nodeObjVar?");
             return tcldom_setInterpAndReturnVar(interp, node->nextSibling,
-                                        (objc == 3), 
                                         (objc == 3) ? objv[2] : NULL);
         case m_previousSibling:
             CheckArgs(2,3,2,"?nodeObjVar?");
             return tcldom_setInterpAndReturnVar(interp, node->previousSibling,
-                                        (objc == 3),
                                         (objc == 3) ? objv[2] : NULL);
         case m_firstChild:
             CheckArgs(2,3,2,"?nodeObjVar?");
             if (node->nodeType == ELEMENT_NODE) {
                 return tcldom_setInterpAndReturnVar(interp, node->firstChild,
-                                            (objc == 3),
                                             (objc == 3) ? objv[2] : NULL);
             }
-            return tcldom_setInterpAndReturnVar(interp, NULL, (objc == 3),
-                                        (objc == 3) ? objv[2] : NULL);
+            return tcldom_setInterpAndReturnVar(interp, NULL,
+                                                (objc == 3) ? objv[2] : NULL);
         case m_lastChild:
             CheckArgs(2,3,2,"?nodeObjVar?");
             if (node->nodeType == ELEMENT_NODE) {
                 return tcldom_setInterpAndReturnVar(interp, node->lastChild,
-                                            (objc == 3),
                                             (objc == 3) ? objv[2] : NULL);
             }
-            return tcldom_setInterpAndReturnVar(interp, NULL, (objc == 3),
+            return tcldom_setInterpAndReturnVar(interp, NULL,
                                         (objc == 3) ? objv[2] : NULL);
         case m_parentNode:
             CheckArgs(2,3,2,"?nodeObjVar?");
-            return tcldom_setInterpAndReturnVar(interp, node->parentNode, (objc == 3),
+            return tcldom_setInterpAndReturnVar(interp, node->parentNode,
                                         (objc == 3) ? objv[2] : NULL);
         case m_appendFromList:
             CheckArgs(3,3,2,"list");
@@ -5007,10 +5516,15 @@ int tcldom_NodeObjCmd (
 
         case m_appendFromScript:
             CheckArgs(3,3,2,"script");
-            if (nodecmd_appendFromScript(interp, node, objv[2]) != TCL_OK) {
+            result = nodecmd_appendFromScript(interp, node, objv[2]);
+            if (result == TCL_BREAK) {
+                SetResult("");
+                return TCL_OK;
+            }
+            if (result != TCL_OK) {            
                 return TCL_ERROR;
             }
-            return tcldom_setInterpAndReturnVar(interp, node, 0, NULL);
+            return tcldom_setInterpAndReturnVar(interp, node, NULL);
 
         case m_insertBeforeFromScript:
             CheckArgs(4,4,2, "script refChild");
@@ -5027,11 +5541,16 @@ int tcldom_NodeObjCmd (
                     }
                 }
             }
-            if (nodecmd_insertBeforeFromScript(interp, node, objv[2], refChild)
-                != TCL_OK) {
+            result = nodecmd_insertBeforeFromScript(interp, node, objv[2],
+                                                    refChild);
+            if (result == TCL_BREAK) {
+                SetResult("");
+                return TCL_OK;
+            }
+            if (result != TCL_OK) {
                 return TCL_ERROR;
             }
-            return tcldom_setInterpAndReturnVar (interp, node, 0, NULL);
+            return tcldom_setInterpAndReturnVar (interp, node, NULL);
             
         case m_appendXML:
             CheckArgs(3,3,2,"xmlString");
@@ -5048,19 +5567,22 @@ int tcldom_NodeObjCmd (
                 SetResult(domException2String(exception));
                 return TCL_ERROR;
             }
-            return tcldom_setInterpAndReturnVar(interp, child, 0, NULL);
+            return tcldom_setInterpAndReturnVar(interp, child, NULL);
 
         case m_cloneNode:
             CheckArgs(2,3,2,"?-deep?");
             if (objc == 3) {
                 if (!strcmp(Tcl_GetString(objv[2]), "-deep")) {
-                    return tcldom_setInterpAndReturnVar(interp, domCloneNode(node, 1),
-                                                0, NULL);
+                    return tcldom_setInterpAndReturnVar(
+                        interp, domCloneNode(node, 1), NULL
+                        );
                 }
                 SetResult("unknown option! Options: ?-deep? ");
                 return TCL_ERROR;
             }
-            return tcldom_setInterpAndReturnVar(interp, domCloneNode(node, 0), 0, NULL);
+            return tcldom_setInterpAndReturnVar(
+                interp, domCloneNode(node, 0), NULL
+                );
 
         case m_removeChild:
             CheckArgs(3,3,2,"childToRemove");
@@ -5073,7 +5595,7 @@ int tcldom_NodeObjCmd (
                 SetResult (domException2String (exception));
                 return TCL_ERROR;
             }
-            return tcldom_setInterpAndReturnVar(interp, child, 0, NULL);
+            return tcldom_setInterpAndReturnVar(interp, child, NULL);
 
         case m_insertBefore:
             CheckArgs(4,4,2,"childToInsert refChild");
@@ -5100,7 +5622,7 @@ int tcldom_NodeObjCmd (
                 SetResult(domException2String(exception));
                 return TCL_ERROR;
             }
-            return tcldom_setInterpAndReturnVar(interp, child, 0, NULL);
+            return tcldom_setInterpAndReturnVar(interp, child, NULL);
 
         case m_replaceChild:
             CheckArgs(4,4,2,"new old");
@@ -5117,7 +5639,7 @@ int tcldom_NodeObjCmd (
                 SetResult(domException2String(exception));
                 return TCL_ERROR;
             }
-            return tcldom_setInterpAndReturnVar(interp, oldChild, 0, NULL);
+            return tcldom_setInterpAndReturnVar(interp, oldChild, NULL);
 
         case m_hasChildNodes:
             CheckArgs(2,2,2,"");
@@ -5202,7 +5724,7 @@ int tcldom_NodeObjCmd (
                 h = Tcl_FindHashEntry(node->ownerDocument->ids, str);
                 if (h) {
                     domNode *node = Tcl_GetHashValue(h);
-                    return tcldom_setInterpAndReturnVar(interp, node, 0, NULL);
+                    return tcldom_setInterpAndReturnVar(interp, node, NULL);
                 }
             }
             SetResult("");
@@ -5324,7 +5846,6 @@ int tcldom_NodeObjCmd (
         case m_ownerDocument:
             CheckArgs(2,3,2,"?docObjVar?");
             return tcldom_returnDocumentObj(interp, node->ownerDocument,
-                                            (objc == 3),
                                             (objc == 3) ? objv[2] : NULL, 0, 
                                             1);
         case m_target:
@@ -5372,20 +5893,29 @@ int tcldom_NodeObjCmd (
 
         case m_getLine:
             CheckArgs(2,2,2,"");
-            if (domGetLineColumn(node, &line, &column) < 0) {
+            if (domGetLineColumn(node, &line, &column, &byteIndex) < 0) {
                 SetResult("no line/column information available!");
                 return TCL_ERROR;
             }
-            SetIntResult(line);
+            SetLongResult((domLength)line);
             break;
 
         case m_getColumn:
             CheckArgs(2,2,2,"");
-            if (domGetLineColumn (node, &line, &column) < 0) {
+            if (domGetLineColumn (node, &line, &column, &byteIndex) < 0) {
                 SetResult("no line/column information available!");
                 return TCL_ERROR;
             }
-            SetIntResult(column);
+            SetLongResult((domLength)column);
+            break;
+
+        case m_getByteIndex:
+            CheckArgs(2,2,2,"");
+            if (domGetLineColumn (node, &line, &column, &byteIndex) < 0) {
+                SetResult("no position information available!");
+                return TCL_ERROR;
+            }
+            SetLongResult((domLength)byteIndex);
             break;
 
         case m_getBaseURI:
@@ -5422,10 +5952,10 @@ int tcldom_NodeObjCmd (
             SetIntResult(
                 (((node->nodeFlags & DISABLE_OUTPUT_ESCAPING) == 0) ? 0 : 1));
             if (objc == 3) {
-                if (Tcl_GetBooleanFromObj(interp, objv[2], &bool) != TCL_OK) {
+                if (Tcl_GetBooleanFromObj(interp, objv[2], &boolVal) != TCL_OK) {
                     return TCL_ERROR;
                 }
-                if (bool) {
+                if (boolVal) {
                     node->nodeFlags |= DISABLE_OUTPUT_ESCAPING;
                 } else {
                     node->nodeFlags &= (~DISABLE_OUTPUT_ESCAPING);
@@ -5467,16 +5997,16 @@ int tcldom_NodeObjCmd (
 
         case m_normalize:
             CheckArgs (2,3,2, "?-forXPath?");
-            bool = 0;
+            boolVal = 0;
             if (objc == 3) {
                 if (strcmp (Tcl_GetString(objv[2]), "-forXPath") == 0) {
-                    bool = 1;
+                    boolVal = 1;
                 } else {
                     SetResult("unknown option! Options: ?-forXPath?");
                     return TCL_ERROR;
                 }
             }
-            domNormalize (node, bool, tcldom_deleteNode, interp);
+            domNormalize (node, boolVal, tcldom_deleteNode, interp);
             return TCL_OK;
 
         case m_jsonType:
@@ -5511,7 +6041,7 @@ int tcldom_NodeObjCmd (
                 SetIntResult(jsonType);
                 return TCL_OK;
             }
-            if (node->info < 0 || node->info > 7) {
+            if (node->info > 8) {
                 SetResult(jsonTypes[0]);
             } else {
                 SetResult(jsonTypes[node->info]);
@@ -5544,18 +6074,18 @@ int tcldom_DocObjCmd (
     Tcl_Obj    *const objv[]
 )
 {
-    GetTcldomTSD()
+    GetTcldomDATA;
 
     domDeleteInfo       * dinfo;
     domDocument         * doc;
     char                * method, *tag, *data, *target, *uri, tmp[100];
     char                * str, *docName, *errMsg;
-    int                   methodIndex, result, data_length, target_length, i;
-    int                   nsIndex, forXPath, bool, setDocumentElement = 0;
-    int                   restoreDomCreateCmdMode = 0;
+    int                   methodIndex, result, i, nsIndex, forXPath, boolVal;
+    int                   setDocumentElement = 0, restoreDomCreateCmdMode = 0;
+    domLength             data_length, target_length;
     domNode             * n;
     Tcl_CmdInfo           cmdInfo;
-    Tcl_Obj             * mobjv[MAX_REWRITE_ARGS];
+    Tcl_Obj             * mobjv[MAX_REWRITE_ARGS], *storedErrMsg;
 
     static const char *docMethods[] = {
         "documentElement", "getElementsByTagName",       "delete",
@@ -5569,7 +6099,7 @@ int tcldom_DocObjCmd (
         "standalone",      "mediaType",                  "nodeType",
         "cdataSectionElements",
         "selectNodesNamespaces",
-        "renameNode",      "deleteXPathCache", 
+        "renameNode",      "deleteXPathCache",           "asCanonicalXML",
         /* The following methods will be dispatched to tcldom_NodeObjCmd */
         "getElementById",  "firstChild",                 "lastChild",
         "appendChild",     "removeChild",                "hasChildNodes",
@@ -5577,7 +6107,7 @@ int tcldom_DocObjCmd (
         "replaceChild",    "appendFromList",             "appendXML",
         "selectNodes",     "baseURI",                    "appendFromScript",
         "insertBeforeFromScript",                        "asJSON",
-        "jsonType",
+        "jsonType",        "asTclValue",                 "asTypedList",
 #ifdef TCL_THREADS
         "readlock",        "writelock",                  "renumber",
 #endif
@@ -5595,7 +6125,7 @@ int tcldom_DocObjCmd (
         m_standalone,       m_mediaType,                  m_nodeType,
         m_cdataSectionElements,
         m_selectNodesNamespaces,
-        m_renameNode,       m_deleteXPathCache,
+        m_renameNode,       m_deleteXPathCache,           m_asCanonicalXML,
         /* The following methods will be dispatched to tcldom_NodeObjCmd */
         m_getElementById,   m_firstChild,                 m_lastChild,
         m_appendChild,      m_removeChild,                m_hasChildNodes,
@@ -5603,23 +6133,24 @@ int tcldom_DocObjCmd (
         m_replaceChild,     m_appendFromList,             m_appendXML,
         m_selectNodes,      m_baseURI,                    m_appendFromScript,
         m_insertBeforeFromScript,                         m_asJSON,
-        m_jsonType
+        m_jsonType,         m_asTclValue,                 m_asTypedList
 #ifdef TCL_THREADS
        ,m_readlock,         m_writelock,                  m_renumber
 #endif
     };
 
     dinfo = (domDeleteInfo*)clientData;
-    if (TSD(domCreateCmdMode) == DOM_CREATECMDMODE_AUTO) {
-        TSD(dontCreateObjCommands) = 0;
+    if (TcldomDATA(domCreateCmdMode) == DOM_CREATECMDMODE_AUTO) {
+        TcldomDATA(dontCreateObjCommands) = 0;
     }
     if (dinfo == NULL) {
         if (objc < 3) {
-            SetResult(doc_usage);
+            Tcl_WrongNumArgs (interp, 1, objv,
+                              "doctoken subcommand ?arg ...?");
             return TCL_ERROR;
         }
-        if (TSD(domCreateCmdMode) == DOM_CREATECMDMODE_AUTO) {    
-            TSD(dontCreateObjCommands) = 1;
+        if (TcldomDATA(domCreateCmdMode) == DOM_CREATECMDMODE_AUTO) {
+            TcldomDATA(dontCreateObjCommands) = 1;
         }
         docName = Tcl_GetString(objv[1]);
         doc = tcldom_getDocumentFromName(interp, docName, &errMsg);
@@ -5634,11 +6165,11 @@ int tcldom_DocObjCmd (
     }
 
     if (objc < 2) {
-        SetResult(doc_usage);
+        Tcl_WrongNumArgs (interp, 1, objv, "subcommand ?arg ...?");
         return TCL_ERROR;
     }
     method = Tcl_GetString(objv[1]);
-    if (Tcl_GetIndexFromObj(NULL, objv[1], docMethods, "method", 0,
+    if (Tcl_GetIndexFromObj(interp, objv[1], docMethods, "method", 0,
                             &methodIndex) != TCL_OK)
     {
         /*--------------------------------------------------------
@@ -5646,11 +6177,15 @@ int tcldom_DocObjCmd (
         \-------------------------------------------------------*/
         sprintf(tmp, "::dom::domDoc::%s", method);
         DBG(fprintf(stderr, "testing %s\n", tmp));
+        storedErrMsg = Tcl_GetObjResult (interp);
+        Tcl_IncrRefCount (storedErrMsg);
         result = Tcl_GetCommandInfo(interp, tmp, &cmdInfo);
         if (!result) {
-            SetResult(doc_usage);
+            SetResult(Tcl_GetString (storedErrMsg));
+            Tcl_DecrRefCount (storedErrMsg);
             return TCL_ERROR;
         }
+        Tcl_DecrRefCount (storedErrMsg);
         if (!cmdInfo.isNativeObjectProc) {
             SetResult( "can't access Tcl level method!");
             return TCL_ERROR;
@@ -5667,7 +6202,7 @@ int tcldom_DocObjCmd (
         return cmdInfo.objProc(cmdInfo.objClientData, interp, objc, mobjv);
     }
 
-    CheckArgs (2,10,1,doc_usage);
+    CheckArgs (2,20,1,"Too many arguments.");
     Tcl_ResetResult (interp);
 
     /*----------------------------------------------------------------------
@@ -5680,7 +6215,6 @@ int tcldom_DocObjCmd (
         case m_documentElement:
             CheckArgs(2,3,2,"");
             return tcldom_setInterpAndReturnVar(interp, doc->documentElement,
-                                        (objc == 3), 
                                         (objc == 3) ? objv[2] : NULL);
         case m_getElementsByTagName:
             CheckArgs(3,3,2,"elementName");
@@ -5724,8 +6258,8 @@ int tcldom_DocObjCmd (
             tag = Tcl_GetString(objv[2]);
             CheckName (interp, tag, "tag", 0);
             n = domNewElementNode(doc, tag);
-            return tcldom_setInterpAndReturnVar(interp, n, (objc == 4),
-                                        (objc == 4) ? objv[3] : NULL);
+            return tcldom_setInterpAndReturnVar(interp, n, 
+                                                (objc == 4) ? objv[3] : NULL);
 
         case m_createElementNS:
             CheckArgs(4,5,2,"elementName uri ?newObjVar?");
@@ -5737,16 +6271,16 @@ int tcldom_DocObjCmd (
                 SetResult("Missing URI in Namespace declaration");
                 return TCL_ERROR;
             }
-            return tcldom_setInterpAndReturnVar(interp, n, (objc == 5),
-                                        (objc == 5) ? objv[4] : NULL);
+            return tcldom_setInterpAndReturnVar(interp, n, 
+                                                (objc == 5) ? objv[4] : NULL);
 
         case m_createTextNode:
             CheckArgs(3,4,2,"data ?newObjVar?");
             data = Tcl_GetStringFromObj(objv[2], &data_length);
             CheckText (interp, data, "text");
             n = (domNode*)domNewTextNode(doc, data, data_length, TEXT_NODE);
-            return tcldom_setInterpAndReturnVar(interp, n, (objc == 4),
-                                        (objc == 4) ? objv[3] : NULL);
+            return tcldom_setInterpAndReturnVar(interp, n,
+                                                (objc == 4) ? objv[3] : NULL);
 
         case m_createCDATASection:
             CheckArgs(3,4,2,"data ?newObjVar?");
@@ -5754,16 +6288,16 @@ int tcldom_DocObjCmd (
             CheckCDATA (interp, data);
             n = (domNode*)domNewTextNode(doc, data, data_length, 
                                          CDATA_SECTION_NODE);
-            return tcldom_setInterpAndReturnVar(interp, n, (objc == 4),
-                                        (objc == 4) ? objv[3] : NULL);
+            return tcldom_setInterpAndReturnVar(interp, n, 
+                                                (objc == 4) ? objv[3] : NULL);
 
         case m_createComment:
             CheckArgs(3,4,2,"data ?newObjVar?");
             data = Tcl_GetStringFromObj(objv[2], &data_length);
             CheckComment(interp, data);
             n = (domNode*)domNewTextNode(doc, data, data_length, COMMENT_NODE);
-            return tcldom_setInterpAndReturnVar(interp, n, (objc == 4),
-                                        (objc == 4) ? objv[3] : NULL);
+            return tcldom_setInterpAndReturnVar(interp, n,
+                                                (objc == 4) ? objv[3] : NULL);
 
         case m_createProcessingInstruction:
             CheckArgs(4,5,2,"target data ?newObjVar?");
@@ -5774,8 +6308,8 @@ int tcldom_DocObjCmd (
             n = (domNode*)domNewProcessingInstructionNode(doc, target, 
                                                           target_length, data, 
                                                           data_length);
-            return tcldom_setInterpAndReturnVar(interp, n, (objc == 5),
-                                        (objc == 5) ? objv[4] : NULL);
+            return tcldom_setInterpAndReturnVar(interp, n,
+                                                (objc == 5) ? objv[4] : NULL);
 
         case m_delete:
             CheckArgs(2,2,2,"");
@@ -5802,6 +6336,13 @@ int tcldom_DocObjCmd (
             }
             return TCL_OK;
 
+        case m_asCanonicalXML:
+            if (serializeAsCanonicalXML((domNode*)doc, interp, objc, objv)
+                != TCL_OK) {
+                return TCL_ERROR;
+            }
+            return TCL_OK;
+
         case m_asHTML:
             if (serializeAsHTML((domNode*)doc, interp, objc, objv)
                 != TCL_OK) {
@@ -5819,7 +6360,7 @@ int tcldom_DocObjCmd (
 
         case m_toXSLTcmd:
             CheckArgs(2,3,2, "?objVar?");
-            return convertToXSLTCmd(doc, interp, (objc == 3),
+            return convertToXSLTCmd(doc, interp,
                                     (objc == 3) ? objv[2] : NULL);
             
         case m_publicId:
@@ -5886,10 +6427,10 @@ int tcldom_DocObjCmd (
                 SetBooleanResult(0);
             }
             if (objc == 3) {
-                if (Tcl_GetBooleanFromObj (interp, objv[2], &bool) != TCL_OK) {
+                if (Tcl_GetBooleanFromObj (interp, objv[2], &boolVal) != TCL_OK) {
                     return TCL_ERROR;
                 }
-                if (bool) {
+                if (boolVal) {
                     doc->nodeFlags |= OUTPUT_DEFAULT_INDENT;
                 } else {
                     doc->nodeFlags &= ~OUTPUT_DEFAULT_INDENT;
@@ -6023,7 +6564,7 @@ int tcldom_DocObjCmd (
         case m_appendFromScript:
         case m_insertBeforeFromScript:
             setDocumentElement = 1;
-            /* Fall throuh */
+            /* fall through */
         case m_firstChild:
         case m_lastChild:
         case m_hasChildNodes:
@@ -6032,10 +6573,12 @@ int tcldom_DocObjCmd (
         case m_selectNodes:
         case m_baseURI:
         case m_asJSON:
+        case m_asTclValue:
+        case m_asTypedList:
         case m_jsonType:
         case m_getElementById:
             /* We dispatch the method call to tcldom_NodeObjCmd */
-            if (TSD(domCreateCmdMode) == DOM_CREATECMDMODE_AUTO) {
+            if (TcldomDATA(domCreateCmdMode) == DOM_CREATECMDMODE_AUTO) {
                 if (dinfo == NULL) {
                     /* tcldom_DocObjCmd was called with a doc token.
                        Since the domCreateCmdMode is 'automatic'
@@ -6043,15 +6586,15 @@ int tcldom_DocObjCmd (
                        as 'clientData', we temporarily set domCreateCmdMode
                        to 'token', to get token results from that call
                        and later to set it back. */
-                    TSD(domCreateCmdMode) = DOM_CREATECMDMODE_TOKENS;
+                    TcldomDATA(domCreateCmdMode) = DOM_CREATECMDMODE_TOKENS;
                     restoreDomCreateCmdMode = 1;
                 }
             }
             if (tcldom_NodeObjCmd (doc->rootNode, interp, objc, objv) !=
                 TCL_OK) {
                 if (restoreDomCreateCmdMode) {
-                    TSD(domCreateCmdMode) = DOM_CREATECMDMODE_AUTO;
-                    TSD(dontCreateObjCommands) = 0;
+                    TcldomDATA(domCreateCmdMode) = DOM_CREATECMDMODE_AUTO;
+                    TcldomDATA(dontCreateObjCommands) = 0;
                 }
                 return TCL_ERROR;
             }
@@ -6061,8 +6604,8 @@ int tcldom_DocObjCmd (
                 domSetDocumentElement (doc);
             }
             if (restoreDomCreateCmdMode) {
-                TSD(domCreateCmdMode) = DOM_CREATECMDMODE_AUTO;
-                TSD(dontCreateObjCommands) = 0;
+                TcldomDATA(domCreateCmdMode) = DOM_CREATECMDMODE_AUTO;
+                TcldomDATA(dontCreateObjCommands) = 0;
             }
             return TCL_OK;
             
@@ -6085,10 +6628,217 @@ int tcldom_DocObjCmd (
         )
     }
 
-    SetResult(doc_usage);
+    /* Not reached */
     return TCL_ERROR;
 }
 
+/*----------------------------------------------------------------------------
+|   tDOM_fsnewNodeCmd
+|
+\---------------------------------------------------------------------------*/
+int
+tDOM_fsnewNodeCmd (
+    ClientData      UNUSED(clientData),
+    Tcl_Interp    * interp,
+    int             objc,
+    Tcl_Obj *const  objv[]
+) {
+    domNode *parent, *newNode = NULL;
+    int index, jsonType, haveJsonType = 0, type, ret;
+    int checkName, checkCharData, flags = 0;
+    domLength len;
+    Tcl_Obj *cmdObj;
+    char *namespace = NULL, *option, *tag;
+    char *usage = "::tdom::fsnewNode ?-jsonType <jsonType>? "
+        "?-namespace <namespace>? ?-noNamespacedAttributes? "
+        "?-notempty tagName ?attributes? ?script?";
+
+    GetTcldomDATA;
+
+    static const char *options[] = {
+        "-jsonType", "-namespace", "-noNamespacedAttributes", "-notempty",
+        "--", NULL
+    };
+
+    enum option {
+        o_jsonType, o_namespace, o_noNamespacedAttributes, o_notempty,
+        o_Last
+    };
+
+    static const char *jsonTypes[] = {
+        "NONE",
+        "ARRAY",
+        "OBJECT",
+        "NULL",
+        "TRUE",
+        "FALSE",
+        "STRING",
+        "NUMBER",
+        "BOOLEAN"
+    };
+
+    Tcl_ResetResult (interp);
+
+    /*------------------------------------------------------------------------
+    |   Need parent node to append new child tag to it. The current parent
+    |   node is stored on the stack.
+    |
+    \-----------------------------------------------------------------------*/
+
+    parent = nodecmd_currentNode(interp);
+    if (parent == NULL) {
+        Tcl_AppendResult(interp, "called outside domNode context", NULL);
+        return TCL_ERROR;
+    }
+
+    if (objc < 2) {
+        Tcl_AppendResult(interp, usage, NULL);
+        return TCL_ERROR;
+    }
+    while (objc > 2) {
+        option = Tcl_GetString (objv[1]);
+        if (option[0] != '-') {
+            break;
+        }
+        if (Tcl_GetIndexFromObj (interp, objv[1], options, "option",
+                                 0, &index) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        switch ((enum option) index) {
+        case o_jsonType:
+            if (Tcl_GetIndexFromObj (interp, objv[2], jsonTypes, "jsonType",
+                                     1, &jsonType) != TCL_OK) {
+                return TCL_ERROR;
+            }
+            haveJsonType = 1;
+            objc -= 2;
+            objv += 2;
+            break;
+            
+        case o_namespace:
+            namespace = Tcl_GetString (objv[2]);
+            objc -= 2;
+            objv += 2;
+            break;
+
+        case o_noNamespacedAttributes:
+            flags  |= FS_ATT_NO_NAMESPACED;
+            objc --;
+            objv ++;
+            break;
+            
+        case o_notempty:
+            flags  |= FS_NOT_EMPTY;
+            objc--;
+            objv++;
+            break;
+            
+        case o_Last:
+            objv++;
+            objc--;
+            break;
+
+        }
+    }
+    if (objc < 2) {
+        Tcl_AppendResult(interp, usage, NULL);
+        return TCL_ERROR;
+    }
+    tag = Tcl_GetStringFromObj(objv[1], &len);
+    objv++;  objc--;
+
+    newNode = domAppendNewElementNode (parent, tag, namespace);
+    if (haveJsonType) {
+        newNode->info = jsonType;
+    }
+
+    cmdObj = NULL;
+    checkName = !TcldomDATA(dontCheckName);
+    checkCharData = !TcldomDATA(dontCheckCharData);
+    
+    if (objc > 1) {
+        if (haveJsonType) {
+            type = ELEMENT_NODE;
+        } else {
+            if (checkName && checkCharData) {
+                type = ELEMENT_NODE_CHK;
+            } else if (checkName) {
+                type = ELEMENT_NODE_ANAME_CHK;
+            } else if (checkCharData) {
+                type = ELEMENT_NODE_AVALUE_CHK;
+            } else {
+                type = ELEMENT_NODE;
+            }
+        }
+        if (nodecmd_processAttributes (interp, newNode, type, objc, objv,
+                                       &cmdObj, flags) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        if (cmdObj) {
+            ret = nodecmd_appendFromScript(interp, newNode, cmdObj);
+            if (ret == TCL_OK) {
+                if (newNode->firstChild == NULL && flags & FS_NOT_EMPTY) {
+                    domDeleteNode (newNode, NULL, NULL);
+                    return TCL_OK;
+                }
+                parent->ownerDocument->nodeFlags |= NEEDS_RENUMBERING;
+            }
+            return ret;
+        } else {
+            if (flags & FS_NOT_EMPTY) {
+                domDeleteNode (newNode, NULL, NULL);
+                return TCL_OK;
+            }
+        }
+    }
+    return TCL_OK;
+}
+
+/*----------------------------------------------------------------------------
+|   tDOM_fsinsertNodeCmd
+|
+\---------------------------------------------------------------------------*/
+int
+tDOM_fsinsertNodeCmd (
+    ClientData      UNUSED(clientData),
+    Tcl_Interp    * interp,
+    int             objc,
+    Tcl_Obj *const  objv[]
+) {
+    domNode *parent, *newNode = NULL;
+    domException exception;
+
+    Tcl_ResetResult (interp);
+
+    if (objc != 2) {
+        Tcl_AppendResult (interp, "::tdom::fsinsertNode <node>", NULL);
+        return TCL_ERROR;
+    }
+
+    /*------------------------------------------------------------------------
+    |   Need parent node to get the owner document and to append new 
+    |   child tag to it. The current parent node is stored on the stack.
+    |
+    \-----------------------------------------------------------------------*/
+
+    parent = nodecmd_currentNode(interp);
+    if (parent == NULL) {
+        Tcl_AppendResult(interp, "called outside domNode context", NULL);
+        return TCL_ERROR;
+    }
+
+    newNode = tcldom_getNodeFromObj (interp, objv[1]);
+    if (!newNode) {
+        return TCL_ERROR;
+    }
+    exception = domAppendChild (parent, newNode);
+    if (exception != OK) {
+        Tcl_AppendResult (interp, domException2String(exception), NULL);
+        return TCL_ERROR;
+    }
+    tcldom_setInterpAndReturnVar (interp, newNode, NULL);
+    return TCL_OK;
+}
 
 /*----------------------------------------------------------------------------
 |   tcldom_createDocument
@@ -6096,29 +6846,26 @@ int tcldom_DocObjCmd (
 \---------------------------------------------------------------------------*/
 static
 int tcldom_createDocument (
-    ClientData  clientData,
+    ClientData  UNUSED(clientData),
     Tcl_Interp *interp,
     int         objc,
     Tcl_Obj    * const objv[]
 )
 {
-    int          setVariable = 0;
     domDocument *doc;
     Tcl_Obj     *newObjName = NULL;
 
-    GetTcldomTSD()
+    GetTcldomDATA;
 
     CheckArgs(2,3,1,"docElemName ?newObjVar?");
 
     if (objc == 3) {
         newObjName = objv[2];
-        setVariable = 1;
     }
 
     CheckName(interp, Tcl_GetString(objv[1]), "root element", 0);
     doc = domCreateDocument(NULL, Tcl_GetString(objv[1]));
-    return tcldom_returnDocumentObj(interp, doc, setVariable, newObjName, 1,
-                                    0);
+    return tcldom_returnDocumentObj(interp, doc, newObjName, 1, 0);
 }
 
 /*----------------------------------------------------------------------------
@@ -6127,13 +6874,13 @@ int tcldom_createDocument (
 \---------------------------------------------------------------------------*/
 static
 int tcldom_createDocumentNode (
-    ClientData  clientData,
+    ClientData  UNUSED(clientData),
     Tcl_Interp *interp,
     int         objc,
     Tcl_Obj    * const objv[]
 )
 {
-    int          setVariable = 0, jsonType = 0, index;
+    int          jsonType = 0, index;
     domDocument *doc;
     Tcl_Obj     *newObjName = NULL;
 
@@ -6143,7 +6890,6 @@ int tcldom_createDocumentNode (
 
     if (objc == 2) {
         newObjName = objv[1];
-        setVariable = 1;
     }
     if (objc > 2) {
         if (Tcl_GetIndexFromObj(interp, objv[1], options, "option",
@@ -6151,21 +6897,19 @@ int tcldom_createDocumentNode (
             return TCL_ERROR;
         }
         Tcl_ResetResult(interp);
-            if (Tcl_GetIndexFromObj(interp, objv[2], jsonTypes, "jsonType",
+        if (Tcl_GetIndexFromObj(interp, objv[2], jsonTypes, "jsonType",
                                 0, &jsonType) != TCL_OK) {
             return TCL_ERROR;
         }
         if (objc == 4) {
             newObjName = objv[3];
-            setVariable = 1;
         }
     }
 
     doc = domCreateDoc(NULL, 0);
     doc->rootNode->info = jsonType;
     
-    return tcldom_returnDocumentObj(interp, doc, setVariable, newObjName, 1,
-                                    0);
+    return tcldom_returnDocumentObj(interp, doc, newObjName, 1, 0);
 }
 
 /*----------------------------------------------------------------------------
@@ -6174,30 +6918,29 @@ int tcldom_createDocumentNode (
 \---------------------------------------------------------------------------*/
 static
 int tcldom_createDocumentNS (
-    ClientData  clientData,
+    ClientData  UNUSED(clientData),
     Tcl_Interp *interp,
     int         objc,
     Tcl_Obj    * const objv[]
 )
 {
-    int          setVariable = 0, len;
+    domLength    len;
     char        *uri;
     domDocument *doc;
     Tcl_Obj     *newObjName = NULL;
 
-    GetTcldomTSD()
+    GetTcldomDATA;
 
     CheckArgs(3,4,1,"uri docElemName ?newObjVar?");
 
     if (objc == 4) {
         newObjName = objv[3];
-        setVariable = 1;
     }
 
     CheckName(interp, Tcl_GetString(objv[2]), "root element", 1);
     uri = Tcl_GetStringFromObj (objv[1], &len);
     if (len == 0) {
-        if (!TSD(dontCheckName)) {
+        if (!TcldomDATA(dontCheckName)) {
             if (!domIsNCNAME (Tcl_GetString(objv[2]))) {
                 SetResult ("Missing URI in Namespace declaration");
                 return TCL_ERROR;
@@ -6207,8 +6950,106 @@ int tcldom_createDocumentNS (
     } else {
         doc = domCreateDocument (uri, Tcl_GetString(objv[2]));
     }
-    return tcldom_returnDocumentObj (interp, doc, setVariable, newObjName, 1,
-                                    0);
+    return tcldom_returnDocumentObj (interp, doc, newObjName, 1, 0);
+}
+
+/*----------------------------------------------------------------------------
+|   tcldom_createFromTypedList
+|
+\---------------------------------------------------------------------------*/
+static
+int tcldom_createFromTypedList (
+    ClientData  UNUSED(clientData),
+    Tcl_Interp *interp,
+    int         objc,
+    Tcl_Obj    * const objv[]
+)
+{
+    domDocument *doc;
+    Tcl_Obj     *newObjName = NULL;
+
+    CheckArgs(2,3,1,"typedList ?newObjVar?");
+
+    if (objc == 3) {
+        newObjName = objv[2];
+    }
+
+    doc = TypedList2DOM (interp, objv[1]);
+    if (doc == NULL) {
+        return TCL_ERROR;
+    }
+    return tcldom_returnDocumentObj(interp, doc, newObjName, 1, 0);
+}
+
+/* Helper function to build up the error string message in a central
+ * place. Caller must provide byteIndex; line is expected to be > 0 if
+ * line/column information is given. */
+void tcldom_reportErrorLocation (
+    Tcl_Interp *interp,
+    int before,
+    int after,
+    XML_Size line,
+    XML_Size column,
+    char *xmlstring,
+    const char *entity,
+    XML_Index byteIndex,
+    const char *errStr
+    )
+{
+    char s[200], sb[25], sl[25], sc[25];
+    char *d = NULL, *buf;
+    domLength i, ind;
+
+    if (before > 197 || after > 197) {
+        d = MALLOC (sizeof (char) * ((before > after ? before + 3 : after + 1)));
+        buf = d;
+    } else {
+        buf = s;
+    }
+    Tcl_ResetResult(interp);
+    Tcl_AppendResult (interp, "error \"", errStr, "\"", NULL);
+    if (entity) {
+        Tcl_AppendResult (interp, " in entity \"", entity, "\"", NULL);
+    }
+    if (line) {
+        sprintf(sl, "%" TDOM_LS_MODIFIER "d", line);
+        sprintf(sc, "%" TDOM_LS_MODIFIER "d", column);
+        Tcl_AppendResult (interp, " at line ", sl, " character ", sc, NULL);
+        
+    } else {
+        sprintf(sb, "%" TDOM_LS_MODIFIER "d", byteIndex);
+        Tcl_AppendResult (interp, " at position ", sb, NULL);
+    }
+    if (xmlstring) {
+        Tcl_AppendResult (interp, "\n\"", NULL);
+        ind = 0;
+        buf[0] = '\0';
+        for (i = (byteIndex < before ? 0 : (domLength)(byteIndex - before));
+             i <= byteIndex;
+             i++) {
+            buf[ind] = xmlstring[i];
+            ind++;
+        }
+        buf[ind] = '\0';
+        Tcl_AppendResult(interp, buf, " <--Error-- ", NULL);
+        ind = 0;
+        buf[0] = '\0';
+        if (xmlstring[byteIndex]) {
+            for (i = (domLength)(byteIndex + 1); i < (domLength)(byteIndex + after); i++) {
+                if (!xmlstring[i]) {
+                    break;
+                }
+                buf[ind] = xmlstring[i];
+                ind++;
+            }
+            buf[ind] = '\0';
+            Tcl_AppendResult(interp, buf, NULL);
+        }
+        Tcl_AppendResult(interp, "\"",NULL);
+    }
+    if (d) {
+        FREE (d);
+    }
 }
 
 /*----------------------------------------------------------------------------
@@ -6217,35 +7058,37 @@ int tcldom_createDocumentNS (
 \---------------------------------------------------------------------------*/
 static
 int tcldom_parse (
-    ClientData  clientData,
+    ClientData  UNUSED(clientData),
     Tcl_Interp *interp,
     int         objc,
     Tcl_Obj    * const objv[]
 )
 {
-    GetTcldomTSD()
+    GetTcldomDATA;
 
     char        *xml_string, *option, *errStr, *channelId, *baseURI = NULL;
     char        *jsonRoot = NULL;
     Tcl_Obj     *extResolver = NULL;
     Tcl_Obj     *feedbackCmd = NULL;
     const char  *interpResult;
-    int          optionIndex, value, xml_string_len, mode;
+    int          optionIndex, value, mode;
+    domLength    xml_string_len;
     int          jsonmaxnesting = JSON_MAX_NESTING;
     int          ignoreWhiteSpaces   = 1;
     int          takeJSONParser      = 0;
     int          takeSimpleParser    = 0;
     int          takeHTMLParser      = 0;
     int          takeGUMBOParser     = 0;
-    int          setVariable         = 0;
     int          ignorexmlns         = 0;
     int          feedbackAfter       = 0;
     int          useForeignDTD       = 0;
     int          paramEntityParsing  = (int)XML_PARAM_ENTITY_PARSING_ALWAYS;
     int          keepCDATA           = 0;
+    int          forest              = 0;
     int          status              = 0;
     double       maximumAmplification = 0.0;
     long         activationThreshold = 0;
+    domParseForestErrorData forestError;
     domDocument *doc;
     Tcl_Obj     *newObjName = NULL;
     XML_Parser   parser;
@@ -6269,6 +7112,7 @@ int tcldom_parse (
         "-keepCDATA",
         "-billionLaughsAttackProtectionMaximumAmplification",
         "-billionLaughsAttackProtectionActivationThreshold",
+        "-forest",
         NULL
     };
     enum parseOption {
@@ -6285,7 +7129,8 @@ int tcldom_parse (
         o_jsonmaxnesting,         o_ignorexmlns,    o_LAST,
         o_keepCDATA,
         o_billionLaughsAttackProtectionMaximumAmplification,
-        o_billionLaughsAttackProtectionActivationThreshold
+        o_billionLaughsAttackProtectionActivationThreshold,
+        o_forest
     };
 
     static const char *paramEntityParsingValues[] = {
@@ -6307,6 +7152,10 @@ int tcldom_parse (
         }
         if (Tcl_GetIndexFromObj(interp, objv[1], parseOptions, "option", 0,
                                  &optionIndex) != TCL_OK) {
+            if (chan == NULL && (takeJSONParser || objc <= 3)) {
+                /* A string starting with '-' may be a valid JSON document. */
+                break;
+            }
             return TCL_ERROR;
         }
 
@@ -6437,7 +7286,8 @@ int tcldom_parse (
                     return TCL_ERROR;
                 }
             } else {
-                SetResult(dom_usage);
+                SetResult("The \"dom parse\" option \"-useForeignDTD\" "
+                          "requires a boolean as argument.");
                 return TCL_ERROR;
             }
             objv++; objc--;
@@ -6500,7 +7350,7 @@ int tcldom_parse (
                 return TCL_ERROR;
             }
             if (jsonmaxnesting < 0) {
-                SetResult("The value of -jsonmaxnesting cannot be negativ");
+                SetResult("The value of -jsonmaxnesting cannot be negative");
                 return TCL_ERROR;
             }
             objv++;  objc--; continue;
@@ -6527,7 +7377,7 @@ int tcldom_parse (
                           "\" requires a float >= 1.0 as argument.");
                 return TCL_ERROR;
             }
-            if (maximumAmplification > FLT_MAX || maximumAmplification < 1.0) {
+            if (maximumAmplification > (double)FLT_MAX || maximumAmplification < 1.0) {
                 SetResult("The \"dom parse\" option \""
                           "-billionLaughsAttackProtectionMaximumAmplification"
                           "\" requires a float >= 1.0 as argument.");
@@ -6582,6 +7432,14 @@ int tcldom_parse (
             sdata = (SchemaData *) cmdInfo.objClientData;
             objv++;  objc--; continue;
 #endif
+        case o_forest:
+            forest = 1;
+            forestError.errorLine = 0;
+            forestError.errorColumn = 0;
+            forestError.byteIndex = 0;
+            forestError.errorCode = 0;
+            objv++;  objc--; continue;
+            
         }
         if ((enum parseOption) optionIndex == o_LAST) break;
     }
@@ -6596,17 +7454,16 @@ int tcldom_parse (
     }
     if (chan == NULL) {
         if (objc < 2) {
-            SetResult(dom_usage);
+            Tcl_WrongNumArgs (interp, 1, objv, "?options? ?data? ?objvar?");
             return TCL_ERROR;
         }
         xml_string = Tcl_GetStringFromObj( objv[1], &xml_string_len);
         if (objc == 3) {
             newObjName = objv[2];
-            setVariable = 1;
         }
     } else {
         if (objc > 2) {
-            SetResult(dom_usage);
+            SetResult("Too much arguments.");
             return TCL_ERROR;
         }
         xml_string = NULL;
@@ -6622,102 +7479,62 @@ int tcldom_parse (
         }
         if (objc == 2) {
             newObjName = objv[1];
-            setVariable = 1;
         }
     }
 
 #ifdef TDOM_HAVE_GUMBO
     if (takeGUMBOParser) {
+        if (xml_string_len > UINT_MAX) {
+            SetResult ("The Gumbo library doesn't support strings longer than"
+                       " 4 gigabytes.");
+            return TCL_ERROR;
+        }
         doc = HTML_GumboParseDocument(xml_string, ignoreWhiteSpaces,
                                       ignorexmlns);
-        return tcldom_returnDocumentObj (interp, doc, setVariable, newObjName,
-                                         1, 0);
+        return tcldom_returnDocumentObj (interp, doc, newObjName, 1, 0);
     }
 #endif
     
     if (takeJSONParser) {
-        char s[50];
-        int byteIndex, i;
+        domLength byteIndex;
 
         errStr = NULL;
 
         doc = JSON_Parse (xml_string, jsonRoot, jsonmaxnesting, &errStr,
                           &byteIndex);
         if (doc) {
-            return tcldom_returnDocumentObj (interp, doc, setVariable,
-                                             newObjName, 1, 0);
+            return tcldom_returnDocumentObj (interp, doc, newObjName, 1, 0);
         } else {
-            Tcl_ResetResult(interp);
-            sprintf(s, "%d", byteIndex);
-            Tcl_AppendResult(interp, "error \"", errStr, "\" at position ", 
-                             s, NULL);
-            Tcl_AppendResult(interp, "\n\"", NULL);
-            s[1] = '\0';
-            for (i=-20; i < 40; i++) {
-                if (byteIndex+i>=0) {
-                    if (xml_string[byteIndex+i]) {
-                        s[0] = xml_string[byteIndex+i];
-                        Tcl_AppendResult(interp, s, NULL);
-                        if (i==0) {
-                            Tcl_AppendResult(interp, " <--Error-- ", NULL);
-                        }
-                    } else {
-                        break;
-                    }
-                }
-            }
-            Tcl_AppendResult(interp, "\"",NULL);
+            tcldom_reportErrorLocation(interp, 20, 20, 0, 0, xml_string, NULL,
+                                       byteIndex, errStr);
             return TCL_ERROR;
         }
     }
     
     if (takeSimpleParser) {
-        char s[50];
-        int  byteIndex, i;
+        domLength byteIndex;
 
         errStr = NULL;
 
         if (takeHTMLParser) {
             doc = HTML_SimpleParseDocument(xml_string, ignoreWhiteSpaces,
-                                           &byteIndex, &errStr);
+                                           forest, &byteIndex, &errStr);
         } else {
             doc = XML_SimpleParseDocument(xml_string, ignoreWhiteSpaces,
-                                          keepCDATA,
+                                          keepCDATA, forest,
                                           baseURI, extResolver,
                                           &byteIndex, &errStr);
         }
         if (errStr != NULL) {
             domFreeDocument (doc, NULL, interp);
-
-            Tcl_ResetResult(interp);
-            sprintf(s, "%d", byteIndex);
-            Tcl_AppendResult(interp, "error \"", errStr, "\" at position ", 
-                             s, NULL);
-            if (byteIndex != -1) {
-                Tcl_AppendResult(interp, "\n\"", NULL);
-                s[1] = '\0';
-                for (i=-80; i < 80; i++) {
-                    if ((byteIndex+i)>=0) {
-                        if (xml_string[byteIndex+i]) {
-                            s[0] = xml_string[byteIndex+i];
-                            Tcl_AppendResult(interp, s, NULL);
-                            if (i==0) {
-                                Tcl_AppendResult(interp, " <--Error-- ", NULL);
-                            }
-                        } else {
-                            break;
-                        }
-                    }
-                }
-                Tcl_AppendResult(interp, "\"",NULL);
-            }
+            tcldom_reportErrorLocation(interp, 80, 80, 0, 0, xml_string, NULL,
+                                       byteIndex, errStr);
             if (takeHTMLParser) {
                 FREE(errStr);
             }
             return TCL_ERROR;
         }
-        return tcldom_returnDocumentObj (interp, doc, setVariable, newObjName,
-                                         1, 0);
+        return tcldom_returnDocumentObj (interp, doc, newObjName, 1, 0);
     }
 
 #ifdef TDOM_NO_EXPAT
@@ -6736,10 +7553,10 @@ int tcldom_parse (
         sdata->parser = parser;
     }
 #endif
-#ifdef XML_DTD
+#if defined(XML_DTD) && (XML_MAJOR_VERSION == 2) && (XML_MINOR_VERSION >= 4)
     if (maximumAmplification >= 1.0f) {
         if (XML_SetBillionLaughsAttackProtectionMaximumAmplification (
-                parser, maximumAmplification) == XML_FALSE) {
+                parser, (float)maximumAmplification) == XML_FALSE) {
             SetResult("The \"dom parse\" option \""
                       "-billionLaughsAttackProtectionMaximumAmplification"
                       "\" requires a float >= 1.0 as argument.");
@@ -6764,7 +7581,7 @@ int tcldom_parse (
                           xml_string_len,
                           ignoreWhiteSpaces,
                           keepCDATA,
-                          TSD(storeLineColumn),
+                          TcldomDATA(storeLineColumn),
                           ignorexmlns,
                           feedbackAfter,
                           feedbackCmd,
@@ -6772,21 +7589,23 @@ int tcldom_parse (
                           baseURI,
                           extResolver,
                           useForeignDTD,
+                          forest,
                           paramEntityParsing,
 #ifndef TDOM_NO_SCHEMA
                           sdata,
 #endif
                           interp,
+                          &forestError,
                           &status);
 #ifndef TDOM_NO_SCHEMA
     if (sdata) {
         sdata->inuse--;
-        tDOM_schemaReset (sdata, 1);
+        tDOM_schemaReset (sdata);
     }
 #endif
     if (doc == NULL) {
-        char s[50];
-        long byteIndex, i;
+        char sl[50];
+        char sc[50];
         
         switch (status) {
         case TCL_BREAK:
@@ -6796,37 +7615,23 @@ int tcldom_parse (
             return TCL_OK;
         default:
             interpResult = Tcl_GetStringResult(interp);
-            sprintf(s, "%ld", XML_GetCurrentLineNumber(parser));
             if (interpResult[0] == '\0') {
                 /* If the interp result isn't empty, then there was an error
-                   in an enternal entity and the interp result has already the
+                   in an external entity and the interp result has already the
                    error msg. If we don't got a document, but interp result is
                    empty, the error occurred in the main document and we
                    build the error msg as follows. */
-                Tcl_AppendResult(interp, "error \"", 
-                                 XML_ErrorString(XML_GetErrorCode(parser)),
-                                 "\" at line ", s, " character ", NULL);
-                sprintf(s, "%ld", XML_GetCurrentColumnNumber(parser));
-                Tcl_AppendResult(interp, s, NULL);
-                byteIndex = XML_GetCurrentByteIndex(parser);
-                if ((byteIndex != -1) && (chan == NULL)) {
-                    Tcl_AppendResult(interp, "\n\"", NULL);
-                    s[1] = '\0';
-                    for (i=-20; i < 40; i++) {
-                        if ((byteIndex+i)>=0) {
-                            if (xml_string[byteIndex+i]) {
-                                s[0] = xml_string[byteIndex+i];
-                                Tcl_AppendResult(interp, s, NULL);
-                                if (i==0) {
-                                    Tcl_AppendResult(interp, " <--Error-- ", NULL);
-                                }
-                            } else {
-                                break;
-                            }
-                        }
-                    }
-                    Tcl_AppendResult(interp, "\"",NULL);
-                }
+                tcldom_reportErrorLocation (
+                    interp, 20, 40,
+                    (forest ? forestError.errorLine
+                     : XML_GetCurrentLineNumber(parser)),
+                    (forest ? forestError.errorColumn
+                     : XML_GetCurrentColumnNumber(parser)),
+                    xml_string, NULL,
+                    (forest ? forestError.byteIndex
+                     : XML_GetCurrentByteIndex(parser)),
+                    XML_ErrorString((forest ? forestError.errorCode
+                                     : XML_GetErrorCode(parser))));
             } else {
                 if (status == TCL_OK) {
                     /* For Tcl errors (in -externalentitycommand or
@@ -6836,10 +7641,14 @@ int tcldom_parse (
                      * interp has already an error msg, that parsing
                      * error was in an external entity. Therefore, we
                      * just add the place of the referencing entity in
-                     * the mail document.*/
-                    Tcl_AppendResult(interp, ", referenced at line ", s, NULL);
-                    sprintf(s, "%ld", XML_GetCurrentColumnNumber(parser));
-                    Tcl_AppendResult(interp, " character ", s, NULL);
+                     * the main document.*/
+                    sprintf(sl, "%" TDOM_LS_MODIFIER "d",
+                            XML_GetCurrentLineNumber(parser));
+                    Tcl_AppendResult(interp, ", referenced at line ", sl,
+                                     NULL);
+                    sprintf(sc, "%" TDOM_LS_MODIFIER "d",
+                            XML_GetCurrentColumnNumber(parser));
+                    Tcl_AppendResult(interp, " character ", sc, NULL);
                 }
             }
             XML_ParserFree(parser);
@@ -6848,10 +7657,24 @@ int tcldom_parse (
     }
     XML_ParserFree(parser);
 
-    return tcldom_returnDocumentObj (interp, doc, setVariable, newObjName, 1,
-                                     0);
+    return tcldom_returnDocumentObj (interp, doc, newObjName, 1, 0);
 #endif
 
+}
+
+static
+int tcldom_expatfeature (
+    int feature
+    ) 
+{
+    XML_Feature const *features = XML_GetFeatureList ();
+    while (features->feature != XML_FEATURE_END) {
+        if (features->feature == feature) {
+            return 1;
+        }
+        features++;
+    }
+    return 0;
 }
 
 /*----------------------------------------------------------------------------
@@ -6860,9 +7683,9 @@ int tcldom_parse (
 \---------------------------------------------------------------------------*/
 static
 int tcldom_featureinfo (
-    ClientData  clientData,
+    ClientData  UNUSED(clientData),
     Tcl_Interp *interp,
-    int         objc,
+    int         UNUSED(objc),
     Tcl_Obj    * const objv[]
 )
 {
@@ -6874,6 +7697,8 @@ int tcldom_featureinfo (
         "unknown",           "tdomalloc",          "lessns",
         "html5",             "jsonmaxnesting",     "versionhash",
         "pullparser",        "TCL_UTF_MAX",        "schema",
+        "largedata",
+        
         NULL
     };
     enum feature {
@@ -6881,9 +7706,11 @@ int tcldom_featureinfo (
         o_expatmicroversion, o_dtd,                o_ns,
         o_unknown,           o_tdomalloc,          o_lessns,
         o_html5,             o_jsonmaxnesting,     o_versionhash,
-        o_pullparser,        o_TCL_UTF_MAX,        o_schema
+        o_pullparser,        o_TCL_UTF_MAX,        o_schema,
+        o_largedata
     };
 
+    /* objc is already checked by caller */
     if (Tcl_GetIndexFromObj(interp, objv[1], features, "feature", 0,
                             &featureIndex) != TCL_OK) {
         return TCL_ERROR;
@@ -6903,19 +7730,11 @@ int tcldom_featureinfo (
         SetIntResult(XML_MICRO_VERSION);
         break;
     case o_dtd:
-#ifdef XML_DTD
-        result = 1;
-#else
-        result = 0;
-#endif
+        result = tcldom_expatfeature (XML_FEATURE_DTD);
         SetBooleanResult(result);
         break;
     case o_ns:
-#ifdef XML_NS
-        result = 1;
-#else
-        result = 0;
-#endif
+        result = tcldom_expatfeature (XML_FEATURE_NS);
         SetBooleanResult(result);
         break;
     case o_unknown:       
@@ -6976,6 +7795,30 @@ int tcldom_featureinfo (
     case o_TCL_UTF_MAX:
         SetIntResult(TCL_UTF_MAX);
         break;
+    case o_largedata:
+#if TCL_MAJOR_VERSION < 9
+        result = 0;
+#else
+        if (sizeof (void *) >= 8) {
+#  ifdef _WIN32
+#    ifdef XML_LARGE_SIZE
+            result = 1;
+#    else
+            result = 0;
+#    endif
+#  else
+#    if defined XML_LARGE_SIZE || XML_CONTEXT_BYTES == 0
+            result = 1;
+#    else
+            result = 0;
+#    endif            
+#  endif            
+        } else {
+            result = 0;
+        }
+#endif        
+        SetBooleanResult(result);
+        break;
     }
     return TCL_OK;
 }
@@ -6991,21 +7834,26 @@ int tcldom_DomObjCmd (
     Tcl_Obj    * const objv[]
 )
 {
-    GetTcldomTSD()
+    GetTcldomDATA;
 
-    char        * method, tmp[300], *clearedStr;
-    int           methodIndex, result, i, bool;
+    char        * method, tmp[300], *string, *option,
+                 *replacement;
+    int           methodIndex, result, i, boolVal, changed;
+    domLength     repllen;
     Tcl_CmdInfo   cmdInfo;
-    Tcl_Obj     * mobjv[MAX_REWRITE_ARGS], *newObj;
+    Tcl_Obj     * mobjv[MAX_REWRITE_ARGS], *newObj, *storedErrMsg;
+    Tcl_DString   cleardString, escapedStr;
+    domNode     * parent;
 
     static const char *domMethods[] = {
         "createDocument",  "createDocumentNS",   "createNodeCmd",
-        "parse",                                 "setStoreLineColumn",
+        "createFromTypedList", "parse",          "setStoreLineColumn",
         "isCharData",      "isName",             "isPIName",
         "isQName",         "isComment",          "isCDATA",
         "isPIValue",       "isNCName",           "createDocumentNode",
         "setNameCheck",    "setTextCheck",       "setObjectCommands",
         "featureinfo",     "isBMPCharData",      "clearString",
+        "isHTML5CustomName", "jsonEscape",       "fromScriptContext",
 #ifdef TCL_THREADS
         "attachDocument",  "detachDocument",
 #endif
@@ -7013,12 +7861,13 @@ int tcldom_DomObjCmd (
     };
     enum domMethod {
         m_createDocument,    m_createDocumentNS,   m_createNodeCmd,
-        m_parse,                                   m_setStoreLineColumn,
+        m_createFromTypedList, m_parse,            m_setStoreLineColumn,
         m_isCharData,        m_isName,             m_isPIName,
         m_isQName,           m_isComment,          m_isCDATA,
         m_isPIValue,         m_isNCName,           m_createDocumentNode,
         m_setNameCheck,      m_setTextCheck,       m_setObjectCommands,
-        m_featureinfo,       m_isBMPCharData,      m_clearString
+        m_featureinfo,       m_isBMPCharData,      m_clearString,
+        m_isHTML5CustomName, m_jsonEscape,         m_fromScriptContext
 #ifdef TCL_THREADS
         ,m_attachDocument,   m_detachDocument
 #endif
@@ -7031,15 +7880,22 @@ int tcldom_DomObjCmd (
         v_automatic, v_command, v_token
     };
 
+    static const char *clearStringOptions[] = {
+        "-replace", NULL
+    };
+    enum clearStringOption {
+        o_replace
+    };
+    
     if (objc < 2) {
-        SetResult(dom_usage);
+        Tcl_WrongNumArgs (interp, 1, objv, "subcommand ?arg ...?");
         return TCL_ERROR;
     }
-    if (TSD(domCreateCmdMode) == DOM_CREATECMDMODE_AUTO) {
-        TSD(dontCreateObjCommands) = 0;
+    if (TcldomDATA(domCreateCmdMode) == DOM_CREATECMDMODE_AUTO) {
+        TcldomDATA(dontCreateObjCommands) = 0;
     }
     method = Tcl_GetString(objv[1]);
-    if (Tcl_GetIndexFromObj(NULL, objv[1], domMethods, "method", 0,
+    if (Tcl_GetIndexFromObj(interp, objv[1], domMethods, "method", 0,
                             &methodIndex) != TCL_OK) {
         /*--------------------------------------------------------
         |   try to find method implemented as normal Tcl proc
@@ -7050,11 +7906,15 @@ int tcldom_DomObjCmd (
         }
         sprintf(tmp, "::dom::DOMImplementation::%s", method);
         DBG(fprintf(stderr, "testing %s\n", tmp));
+        storedErrMsg = Tcl_GetObjResult (interp);
+        Tcl_IncrRefCount (storedErrMsg);
         result = Tcl_GetCommandInfo(interp, tmp, &cmdInfo);
         if (!result) {
-            SetResult(dom_usage);
+            SetResult(Tcl_GetString (storedErrMsg));
+            Tcl_DecrRefCount (storedErrMsg);
             return TCL_ERROR;
         }
+        Tcl_DecrRefCount (storedErrMsg);
         if (!cmdInfo.isNativeObjectProc) {
             SetResult("can't access Tcl level method!");
             return TCL_ERROR;
@@ -7067,8 +7927,9 @@ int tcldom_DomObjCmd (
         mobjv[1] = objv[0];
         for (i=2; i<objc; i++) mobjv[i] = objv[i];
         return cmdInfo.objProc(cmdInfo.objClientData, interp, objc, mobjv);
+        
     }
-    CheckArgs(2,12,1,dom_usage);
+    CheckArgs(2,12,1,"Too may arguments.");
     switch ((enum domMethod) methodIndex) {
 
         case m_createDocument:
@@ -7080,10 +7941,13 @@ int tcldom_DomObjCmd (
         case m_createDocumentNode:
             return tcldom_createDocumentNode (clientData, interp, --objc,
                                               objv+1);
+        case m_createFromTypedList:
+            return tcldom_createFromTypedList (clientData, interp, --objc,
+                                               objv+1);
         case m_createNodeCmd:
             return nodecmd_createNodeCmd(interp, --objc, objv+1,
-                                         !TSD(dontCheckName),
-                                         !TSD(dontCheckCharData));
+                                         !TcldomDATA(dontCheckName),
+                                         !TcldomDATA(dontCheckCharData));
         case m_parse:
             return tcldom_parse(clientData, interp, --objc, objv+1);
 
@@ -7093,7 +7957,7 @@ int tcldom_DomObjCmd (
                 char *cmdName, *errMsg;
                 domDocument *doc;
                 if (objc < 3) {
-                    SetResult(dom_usage);
+                    SetResult("Missing argument to attachDocument method.");
                     return TCL_ERROR;
                 }
                 cmdName = Tcl_GetString(objv[2]);
@@ -7102,7 +7966,7 @@ int tcldom_DomObjCmd (
                     SetResult(errMsg);
                     return TCL_ERROR;
                 }
-                return tcldom_returnDocumentObj(interp, doc, (objc == 4),
+                return tcldom_returnDocumentObj(interp, doc, 
                                                 (objc==4) ? objv[3] : NULL,
                                                 1, 0);
             }
@@ -7113,7 +7977,7 @@ int tcldom_DomObjCmd (
                 Tcl_CmdInfo cmdInfo;
                 domDocument *doc;
                 if (objc < 3) {
-                    SetResult(dom_usage);
+                    SetResult("Missing argument to detachDocument method.");
                     return TCL_ERROR;
                 }
                 cmdName = Tcl_GetString(objv[2]);
@@ -7136,32 +8000,32 @@ int tcldom_DomObjCmd (
 
         case m_setStoreLineColumn:
             if (objc == 3) {
-                if (Tcl_GetBooleanFromObj(interp, objv[2], &bool) != TCL_OK) {
+                if (Tcl_GetBooleanFromObj(interp, objv[2], &boolVal) != TCL_OK) {
                     return TCL_ERROR;
                 }
-                TSD(storeLineColumn) = bool;
+                TcldomDATA(storeLineColumn) = boolVal;
             }
-            SetBooleanResult(TSD(storeLineColumn));
+            SetBooleanResult(TcldomDATA(storeLineColumn));
             return TCL_OK;
 
         case m_setNameCheck:
             if (objc == 3) {
-                if (Tcl_GetBooleanFromObj(interp, objv[2], &bool) != TCL_OK) {
+                if (Tcl_GetBooleanFromObj(interp, objv[2], &boolVal) != TCL_OK) {
                     return TCL_ERROR;
                 }
-                TSD(dontCheckName) = !bool;
+                TcldomDATA(dontCheckName) = !boolVal;
             }
-            SetBooleanResult(!TSD(dontCheckName));
+            SetBooleanResult(!TcldomDATA(dontCheckName));
             return TCL_OK;
             
         case m_setTextCheck:
             if (objc == 3) {
-                if (Tcl_GetBooleanFromObj(interp, objv[2], &bool) != TCL_OK) {
+                if (Tcl_GetBooleanFromObj(interp, objv[2], &boolVal) != TCL_OK) {
                     return TCL_ERROR;
                 }
-                TSD(dontCheckCharData) = !bool;
+                TcldomDATA(dontCheckCharData) = !boolVal;
             }
-            SetBooleanResult(!TSD(dontCheckCharData));
+            SetBooleanResult(!TcldomDATA(dontCheckCharData));
             return TCL_OK;
             
         case m_setObjectCommands:
@@ -7172,20 +8036,20 @@ int tcldom_DomObjCmd (
                 }
                 switch ((enum nodeModeValue) i) {
                 case v_automatic:
-                    TSD(domCreateCmdMode) = DOM_CREATECMDMODE_AUTO;
-                    TSD(dontCreateObjCommands) = 0;
+                    TcldomDATA(domCreateCmdMode) = DOM_CREATECMDMODE_AUTO;
+                    TcldomDATA(dontCreateObjCommands) = 0;
                     break;
                 case v_command:
-                    TSD(domCreateCmdMode) = DOM_CREATECMDMODE_CMDS;
-                    TSD(dontCreateObjCommands) = 0;
+                    TcldomDATA(domCreateCmdMode) = DOM_CREATECMDMODE_CMDS;
+                    TcldomDATA(dontCreateObjCommands) = 0;
                     break;
                 case v_token:
-                    TSD(domCreateCmdMode) = DOM_CREATECMDMODE_TOKENS;
-                    TSD(dontCreateObjCommands) = 1;
+                    TcldomDATA(domCreateCmdMode) = DOM_CREATECMDMODE_TOKENS;
+                    TcldomDATA(dontCreateObjCommands) = 1;
                     break;
                 }
             }
-            switch (TSD(domCreateCmdMode)) {
+            switch (TcldomDATA(domCreateCmdMode)) {
             case DOM_CREATECMDMODE_AUTO:
                 SetResult("automatic");
                 break;
@@ -7249,20 +8113,84 @@ int tcldom_DomObjCmd (
             SetBooleanResult(domIsBMPChar(Tcl_GetString(objv[2])));
             return TCL_OK;
 
-        case m_clearString:
+        case m_isHTML5CustomName:
             CheckArgs(3,3,2,"string");
-            clearedStr = domClearString (Tcl_GetString (objv[2]), &bool);
-            if (bool) {
-                newObj = Tcl_NewStringObj (clearedStr, -1);
-                FREE (clearedStr);
+            SetBooleanResult(domIsHTML5CustomName(Tcl_GetString(objv[2])));
+            return TCL_OK;
+
+        case m_jsonEscape:
+            CheckArgs(3,3,2,"string");
+            if (jsonEscape (interp, Tcl_GetString(objv[2]), &escapedStr,
+                            &changed) != TCL_OK) {
+                return TCL_ERROR;
+            }
+            if (changed) {
+                newObj = Tcl_NewStringObj (
+                    Tcl_DStringValue (&escapedStr),
+                    Tcl_DStringLength (&escapedStr));
+                Tcl_DStringFree (&escapedStr);
                 Tcl_SetObjResult (interp, newObj);
             } else {
                 Tcl_SetObjResult (interp, objv[2]);
             }
             return TCL_OK;
-                
+                    
+        case m_clearString:
+            CheckArgs(3,5,2,"?-replace ?replacement?? string");
+            if (objc >= 4) {
+                option = Tcl_GetString (objv[2]);
+                if (option[0] == '-' && option[1] == 'r') {
+                    if (Tcl_GetIndexFromObj (interp, objv[2],
+                                             clearStringOptions, "option",
+                                             0, &i) != TCL_OK) {
+                        return TCL_ERROR;
+                    }
+                } else {
+                    SetResult("expected: clearString ?-replace ?replacement?"
+                              " string");
+                    return TCL_ERROR;
+                }
+                objc--;
+                objv++;
+                if (objc == 4) {
+                    replacement = Tcl_GetStringFromObj (objv[2], &repllen);
+                    objc--;
+                    objv++;
+                } else {
+                    replacement = "\xEF\xBF\xBD\0";
+                    repllen = 3;
+                }
+            } else {
+                replacement = NULL;
+                repllen = 0;
+            }
+            string = Tcl_GetString (objv[2]);
+            domClearString (string, replacement, repllen, &cleardString,
+                            &changed);
+            if (changed) {
+                newObj = Tcl_NewStringObj (
+                    Tcl_DStringValue (&cleardString),
+                    Tcl_DStringLength (&cleardString));
+                Tcl_DStringFree (&cleardString);
+                Tcl_SetObjResult (interp, newObj);
+            } else {
+                Tcl_SetObjResult (interp, objv[2]);
+            }
+            return TCL_OK;
+
+        case m_fromScriptContext:
+            CheckArgs(2,3,2,"");
+            parent = nodecmd_currentNode (interp);
+            if (parent == NULL) {
+                Tcl_AppendResult (interp, "called outside fromScript context",
+                                  NULL);
+                return TCL_ERROR;
+            }
+            return tcldom_setInterpAndReturnVar (
+                interp, parent, (objc == 3) ? objv[2] : NULL
+                );
+        
     }
-    SetResult( dom_usage);
     return TCL_ERROR;
 }
 
@@ -7423,7 +8351,8 @@ int tcldom_unknownCmd (
     Tcl_Obj    * const objv[]
 )
 {
-    int          len, i, rc, openedParen, count, args;
+    int          i, rc, openedParen, count, args;
+    domLength    len;
     char        *cmd, *dot, *paren, *arg[MAX_REWRITE_ARGS], *object, *method;
     Tcl_DString  callString;
     Tcl_CmdInfo  cmdInfo;
@@ -7531,50 +8460,49 @@ int tcldom_unknownCmd (
         }
 
         method = cmd;
-            paren = strchr(cmd,'(');
-            args = 0;
-            if (paren) {
-                *paren = '\0';
-                paren++;
-                arg[args] = paren;
-                openedParen = 1;
-                while (*paren) {
-                    if (*paren == '\\') {
-                        (void) Tcl_Backslash(paren, &count);
-                        paren += count;
-                    } else if (*paren == ')') {
-                        openedParen--;
-                        if (openedParen==0) {
-                            *paren = '\0';
-                            args++;
-                            break;
-                        }
-                    } else if (*paren == '(') {
-                        openedParen++;
-                        paren++;
-                    } else if (*paren == ',') {
+        paren = strchr(cmd,'(');
+        args = 0;
+        if (paren) {
+            *paren = '\0';
+            paren++;
+            arg[args] = paren;
+            openedParen = 1;
+            while (*paren) {
+                if (*paren == '\\') {
+                    (void) Tcl_Backslash(paren, &count);
+                    paren += count;
+                } else if (*paren == ')') {
+                    openedParen--;
+                    if (openedParen==0) {
                         *paren = '\0';
-                        arg[++args] = paren+1;
-                        if (args >= MAX_REWRITE_ARGS) {
-                            SetResult( "too many args");
-                            return TCL_ERROR;
-                        }
-                        paren++;
-                    } else {
-                        paren++;
+                        args++;
+                        break;
                     }
-                }
-                if (openedParen!=0) {
-                    SetResult( "mismatched (");
-                    return TCL_ERROR;
+                } else if (*paren == '(') {
+                    openedParen++;
+                    paren++;
+                } else if (*paren == ',') {
+                    *paren = '\0';
+                    arg[++args] = paren+1;
+                    if (args >= MAX_REWRITE_ARGS) {
+                        SetResult( "too many args");
+                        return TCL_ERROR;
+                    }
+                    paren++;
+                } else {
+                    paren++;
                 }
             }
-            DBG(fprintf(stderr, "method=-%s- \n", method);
-                fprintf(stderr, "rest=-%s- \n", cmd);
-                for(i=0; i<args; i++) {
-                    fprintf(stderr, "args %d =-%s- \n", i, arg[i]);
-                }
-            )
+            if (openedParen!=0) {
+                SetResult( "mismatched (");
+                return TCL_ERROR;
+            }
+        }
+        DBG(fprintf(stderr, "method=-%s- \n", method);
+            fprintf(stderr, "rest=-%s- \n", cmd);
+            for(i=0; i<args; i++) {
+                fprintf(stderr, "args %d =-%s- \n", i, arg[i]);
+            })
 
         /*----------------------------------------------------------------
         |   final call

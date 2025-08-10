@@ -28,7 +28,7 @@
 |                           document() plus several bug fixes
 |
 |       Fall/Winter 01 Rolf Ade rewrite of xsl:number, xsl:key/key(),
-|                               handling of toplevel var/parameter,
+|                               handling of top-level var/parameter,
 |                               plenty of fixes and enhancements all
 |                               over the place.
 |
@@ -49,10 +49,10 @@
 #include <math.h>
 #include <limits.h>
 #include <locale.h>
+#include <tcl.h>         /* for hash tables */
 #include <dom.h>
 #include <domxpath.h>
 #include <domxslt.h>
-#include <tcl.h>         /* for hash tables */
 
 /*----------------------------------------------------------------------------
 |   Defines
@@ -215,8 +215,8 @@ typedef struct xsltAttrSet {
 typedef struct xsltNodeSet {
     
     domNode       **nodes;
-    int             nr_nodes;
-    int             allocated;
+    domLength       nr_nodes;
+    domLength       allocated;
     
 } xsltNodeSet;
 
@@ -433,18 +433,18 @@ typedef struct {
 |
 \-------------------------------------------------------------------------*/
 static int ApplyTemplates ( xsltState *xs, xpathResultSet *context,
-                            domNode *currentNode, int currentPos,
+                            domNode *currentNode, domLength currentPos,
                             domNode *actionNode, xpathResultSet *nodeList,
                             const char *mode, const char *modeURI, 
                             char **errMsg);
 
 static int ApplyTemplate (  xsltState *xs, xpathResultSet *context,
                             domNode *currentNode, domNode *exprContext,
-                            int currentPos, const char *mode, 
+                            domLength currentPos, const char *mode, 
                             const char *modeURI, char **errMsg);
 
 static int ExecActions (xsltState *xs, xpathResultSet *context,
-                        domNode *currentNode, int currentPos,
+                        domNode *currentNode, domLength currentPos,
                         domNode *actionNode,  char **errMsg);
 
 static domDocument * getExternalDocument (Tcl_Interp *interp, xsltState *xs,
@@ -542,7 +542,8 @@ reportError (
     Tcl_DString dStr;
     char buffer[1024];
     const char *baseURI;
-    long  line, column;
+    XML_Size line, column;
+    XML_Index byteIndex;
 
     Tcl_DStringInit (&dStr);
     baseURI = findBaseURI (node);
@@ -551,8 +552,9 @@ reportError (
         Tcl_DStringAppend (&dStr, baseURI, -1);
     }
     if (node->nodeFlags & HAS_LINE_COLUMN) {
-        domGetLineColumn (node, &line, &column);
-        sprintf (buffer, " at line %ld, column %ld:\n", line, column);
+        domGetLineColumn (node, &line, &column, &byteIndex);
+        sprintf (buffer, " at line %" TDOM_LS_MODIFIER "d, column %"
+                 TDOM_LS_MODIFIER "d:\n", line, column);
         Tcl_DStringAppend (&dStr, buffer, -1);
         Tcl_DStringAppend (&dStr, str, -1);
     } else {
@@ -921,17 +923,18 @@ static xsltNumberFormat* xsltNumberFormatTokenizer (
 static void formatValue (
     xsltNumberFormat *f,
     int              *useFormatToken,
-    int               value,
+    domLength         value,
     Tcl_DString      *str,
     char             *groupingSeparator,
     long              groupingSize,
     int               addSeparater
 )
 {
-    int         len, fulllen, gslen, upper = 0, e, m, b, i, z, v;
+    domLength   len, fulllen, gslen, m, i;
+    int         upper = 0, e, b, v, z;
     char        tmp[80], *pt;
     Tcl_DString tmp1;
-    static struct { char *digit; char *ldigit; int value; } RomanDigit[] = {
+    static struct { const char *digit; const char *ldigit; int value; } RomanDigit[] = {
           { "M" , "m" , 1000, },
           { "CM", "cm",  900, },
           { "D" , "d" ,  500, },
@@ -949,13 +952,13 @@ static void formatValue (
 
     switch (f->tokens[*useFormatToken].type) {
     case latin_number:
-        sprintf (tmp, "%d", value);
-        fulllen = len = strlen (tmp);
+        sprintf (tmp, "%" TCL_SIZE_MODIFIER "d", value);
+        fulllen = len = (domLength)strlen (tmp);
         if (f->tokens[*useFormatToken].minlength > fulllen) {
             fulllen = f->tokens[*useFormatToken].minlength;
         }
         if (groupingSeparator) {
-            gslen = strlen (groupingSeparator);
+            gslen = (domLength)strlen (groupingSeparator);
             Tcl_DStringInit (&tmp1);
             if (len < f->tokens[*useFormatToken].minlength) {
                 for (i = 0; i <  f->tokens[*useFormatToken].minlength - len; i++) {
@@ -1002,7 +1005,7 @@ static void formatValue (
                What to do? One of the several cases, not mentioned
                by the spec. */
             /* fall back to latin numbers */
-            sprintf (tmp, "%d", value);
+            sprintf (tmp, "%" TCL_SIZE_MODIFIER "d", value);
             break;
         }
         e = 1;
@@ -1016,7 +1019,7 @@ static void formatValue (
         value -= m;
         for (i = 0; i < e; i++) {
             b /= 26;
-            z = value / b;
+            z = (int)(value / b);
             value = value - z*b;
             if (i < e -1) {
                 if (value == 0) {
@@ -1047,7 +1050,7 @@ static void formatValue (
 
         if (value > 3999 || value <= 0) {
             /* fall back to latin numbers */
-            sprintf (tmp, "%d", value);
+            sprintf (tmp, "%" TCL_SIZE_MODIFIER "d", value);
             break;
         }
         if (value == 0) {
@@ -1067,10 +1070,10 @@ static void formatValue (
         break;
 
     default:
-        sprintf (tmp, "%d", value);
+        sprintf (tmp, "%" TCL_SIZE_MODIFIER "d", value);
         break;
     }
-    len = strlen (tmp);
+    len = (domLength)strlen (tmp);
     Tcl_DStringAppend (str, tmp, len);
  appendSeperator:
     if (addSeparater) {
@@ -1140,7 +1143,7 @@ static int xsltFormatNumber (
     char              * formatStr,
     xsltDecimalFormat * df,
     char             ** resultStr,
-    int               * resultLen,
+    domLength         * resultLen,
     char             ** errMsg
 )
 {
@@ -1149,11 +1152,12 @@ static int xsltFormatNumber (
     Tcl_UniChar uniCharNull = '\0';
     char stmp[240], ftmp[80], *tstr;
     char wrongFormat[] = "Unable to interpret format pattern.";
-    int i, j, k, l, zl, g, nHash, nZero, fHash, fZero, gLen, isNeg;
+    domLength l, zl, gLen;
+    int i, j, k, g, nZero, fHash, fZero, isNeg;
     int prefixMinux, percentMul = 0, perMilleMul = 0;
     Tcl_DString  dStr, s;
     Tcl_UniChar *format, *negformat = NULL, *p, *p1;
-    DBG(Tcl_DString dbStr;)
+    DBG(Tcl_DString bStr;)
 
     DBG(fprintf(stderr, "number: '%f'\nformatStr='%s' \n", number, formatStr);)
     prefix1[0] = '\0';
@@ -1216,7 +1220,7 @@ static int xsltFormatNumber (
         p++;
     }
     prefix1[i] = '\0';
-    nHash = nZero = fHash = fZero = 0;
+    nZero = fHash = fZero = 0;
     gLen = -2222;
     while (*p) {
         if (*p==df->digit) {
@@ -1224,7 +1228,6 @@ static int xsltFormatNumber (
                 *errMsg = tdomstrdup(wrongFormat);
                 goto xsltFormatNumberError;
             }
-            nHash++; 
         }
         else if (*p==df->zeroDigit) { nZero++; }
         else if (*p==df->groupingSeparator) { gLen=-1; }
@@ -1389,7 +1392,7 @@ static int xsltFormatNumber (
     /* fill in grouping char */
     if (gLen > 0) {
         sprintf(stmp,"%0*d", nZero, i);
-        l = strlen (stmp);
+        l = (domLength)strlen (stmp);
         for (j = 0; j < l; j++) {
             t = df->zeroDigit + stmp[j] - 48;
             Tcl_DStringAppend (&s, (char*)&t, sizeof (Tcl_UniChar));
@@ -1434,7 +1437,7 @@ static int xsltFormatNumber (
         )
     } else {
         sprintf(stmp,"%0*d", nZero, i);
-        l = strlen (stmp);
+        l = (domLength)strlen (stmp);
         for (j = 0; j < l; j++) {
             n[j] = df->zeroDigit + (int) stmp[j] - 48;
         }
@@ -1449,7 +1452,7 @@ static int xsltFormatNumber (
     DBG(fprintf(stderr, "number=%f fHash=%d fZero=%d \n", number, fHash, 
                 fZero);)
     if ((fHash+fZero) > 0) {
-        l = strlen(ftmp);
+        l = (domLength)strlen(ftmp);
         while (l>0 && fHash>0) {   /* strip not need 0's */
             if (ftmp[l-1] == '0') {
                 ftmp[l-1]='\0'; l--; fHash--;
@@ -1515,7 +1518,7 @@ static int xsltFormatNumber (
     *resultStr = tdomstrdup(tstr);
     Tcl_DStringFree (&dStr);
     Tcl_DStringFree (&s);
-    *resultLen = strlen(*resultStr);
+    *resultLen = (domLength)strlen(*resultStr);
     return 0;
 
  xsltFormatNumberError:
@@ -1550,7 +1553,7 @@ static void nsAddNode (
     domNode *node 
     ) 
 {
-    int insertIndex, i;
+    domLength insertIndex, i;
     
     insertIndex = ns->nr_nodes;
     for (i = ns->nr_nodes - 1; i >= 0; i--) {
@@ -1704,10 +1707,10 @@ static int buildKeyInfoForDoc (
 \---------------------------------------------------------------------------*/
 static void sortNodeSetByNodeNumber(
     domNode *nodes[],
-    int      n
+    domLength n
 )
 {
-    int i, j, ln, rn;
+    domLength i, j, ln, rn;
     domNode *tmp;
 
     while (n > 1) {
@@ -1758,7 +1761,8 @@ static void StripXMLSpace (
 )
 {
     domNode       *child, *newChild, *parent;
-    int            i, len, onlySpace, found, strip;
+    size_t         i, len;
+    int            onlySpace, found, strip;
     char          *p, prefix[MAX_PREFIX_LEN];
     const char    *localName;
     double        *f;
@@ -1876,7 +1880,7 @@ static int xsltXPathFuncs (
     void            * clientData,
     char            * funcName,
     domNode         * ctxNode,
-    int               ctxPos,
+    domLength         ctxPos,
     xpathResultSet  * ctx,
     domNode         * exprContext,
     int               argc,
@@ -1889,7 +1893,8 @@ static int xsltXPathFuncs (
     char              * keyId, *filterValue, *str = NULL;
     char                prefix[MAX_PREFIX_LEN];
     const char        * localName, *baseURI, *nsStr;
-    int                 rc, i, len, NaN, freeStr, x;
+    int                 rc, NaN, freeStr;
+    domLength           i, len, x;
     double              n;
     xsltNodeSet       * keyValues;
     Tcl_HashEntry     * h;
@@ -2179,7 +2184,7 @@ static int xsltXPathFuncs (
                         nsStr = str;
                     }
                     if (*nsStr == '\0') {
-                        FREE(str);
+                        if (freeStr) FREE(str);
                         freeStr = 0;
                         nsStr = baseURI;
                     }
@@ -2236,7 +2241,7 @@ static int evalXPath (
     xsltState       * xs,
     xpathResultSet  * context,
     domNode         * currentNode,
-    int               currentPos,
+    domLength         currentPos,
     char            * xpath,
     xpathResultSet  * rs,
     char           ** errMsg
@@ -2294,7 +2299,7 @@ static int nodeGreater (
 {
     int             rc;
     char           *strAptr, *strBptr;
-    int             lenA, lenB, len;
+    domLength       lenA, lenB, len;
     Tcl_UniChar     unicharA, unicharB;
 
     *greater = 0;
@@ -2358,18 +2363,19 @@ static int fastMergeSort (
     int         asc,
     int         upperFirst,
     domNode   * a[],
-    int       * posa,
+    domLength * posa,
     domNode   * b[],
-    int       * posb,
+    domLength * posb,
     char     ** vs,
     double    * vd,
     char     ** vstmp,
     double    * vdtmp,
-    int         size,
+    domLength   size,
     char     ** errMsg
 ) {
     domNode *tmp;
-    int tmpPos, lptr, rptr, middle, i, j, gt, rc;
+    domLength tmpPos, lptr, rptr, middle, i, j;
+    int gt, rc;
     char    *tmpVs;
     double   tmpVd;
 
@@ -2446,7 +2452,7 @@ static int fastMergeSort (
         }
     }
     memcpy(a,    b,     size*sizeof(domNode*));
-    memcpy(posa, posb,  size*sizeof(int));
+    memcpy(posa, posb,  size*sizeof(domLength));
     memcpy(vs,   vstmp, size*sizeof(char*));
     memcpy(vd,   vdtmp, size*sizeof(double));
     return 0;
@@ -2457,21 +2463,21 @@ static int sortNodeSetFastMerge(
     int         asc,
     int         upperFirst,
     domNode   * nodes[],
-    int         n,
+    domLength   n,
     char     ** vs,
     double    * vd,
-    int       * pos,
+    domLength * pos,
     char     ** errMsg
 )
 {
     domNode **b;
-    int      *posb;
+    domLength *posb;
     char    **vstmp;
     double   *vdtmp;
     int       rc;
 
     b = (domNode **)MALLOC(n * sizeof(domNode *));
-    posb = (int *)MALLOC(n * sizeof(int));
+    posb = (domLength *)MALLOC(n * sizeof(domLength));
     vstmp = (char **)MALLOC(sizeof (char *) * n);
     vdtmp = (double *)MALLOC(sizeof (double) * n);
 
@@ -2494,7 +2500,7 @@ static int xsltSetVar (
     char            * variableName,
     xpathResultSet  * context,
     domNode         * currentNode,
-    int               currentPos,
+    domLength         currentPos,
     char            * select,
     domNode         * actionNode,
     int               active,
@@ -2999,10 +3005,10 @@ static int xsltAddTemplate (
         if (rc < 0) {
             if (tpl->name) {
                 /* The template is already stored in the namedTemplates
-                   hash table. Therefor we don't free tpl here, but
+                   hash table. Therefore, we don't free tpl here, but
                    set tpl->match to NULL, which ensures, that the
                    tpl will be freed while the namedTemplates hash table
-                   is cleand up. */
+                   is cleaned up. */
                 tpl->match = NULL;
             } else {
                 FREE ((char*)tpl);
@@ -3022,7 +3028,7 @@ static int ExecUseAttributeSets (
     xsltState         * xs,
     xpathResultSet    * context,
     domNode           * currentNode,
-    int                 currentPos,
+    domLength           currentPos,
     domNode           * actionNode,
     char              * styles,
     char             ** errMsg
@@ -3106,7 +3112,7 @@ static int evalAttrTemplates (
     xsltState       * xs,
     xpathResultSet  * context,
     domNode         * currentNode,
-    int               currentPos,
+    domLength         currentPos,
     char            * str,
     char           ** out,
     char           ** errMsg
@@ -3114,7 +3120,8 @@ static int evalAttrTemplates (
 {
     xpathResultSet  rs;
     char           *tplStart = NULL, *tplResult, *pc, literalChar;
-    int             rc, aLen, inTpl = 0, p = 0, inLiteral = 0;
+    domLength       aLen, p = 0;
+    int             rc, inTpl = 0, inLiteral = 0;
 
     aLen = 500;
     *out = MALLOC(aLen);
@@ -3209,7 +3216,7 @@ static int setParamVars (
     xsltState       * xs,
     xpathResultSet  * context,
     domNode         * currentNode,
-    int               currentPos,
+    domLength         currentPos,
     domNode         * actionNode,
     char           ** errMsg
 )
@@ -3261,7 +3268,7 @@ static int doSortActions (
     domNode         * actionNode,
     xpathResultSet  * context,
     domNode         * currentNode,
-    int               currentPos,
+    domLength         currentPos,
     char           ** errMsg
 )
 {
@@ -3273,7 +3280,8 @@ static int doSortActions (
     char           prefix[MAX_PREFIX_LEN];
     const char    *localName;
     double        *vd = NULL;
-    int            rc = 0, typeText, ascending, upperFirst, *pos = NULL, i, NaN;
+    int            rc = 0, typeText, ascending, upperFirst, NaN;
+    domLength      i, *pos = NULL;
     xpathResultSet rs;
 
     child = actionNode->lastChild; /* do it backwards, so that multiple sort
@@ -3358,7 +3366,7 @@ static int doSortActions (
                        select, typeText, ascending, nodelist->nr_nodes);
                 CHECK_RC;
                 if (!pos)
-                    pos = (int*)MALLOC(sizeof(int) * nodelist->nr_nodes);
+                    pos = (domLength*)MALLOC(sizeof(int) * nodelist->nr_nodes);
                 for (i=0; i<nodelist->nr_nodes;i++) pos[i] = i;
 
                 xs->currentXSLTNode = child;
@@ -3413,14 +3421,14 @@ static int xsltNumber (
     xsltState       * xs,
     xpathResultSet  * context,
     domNode         * currentNode,
-    int               currentPos,
+    domLength         currentPos,
     domNode         * actionNode,
     char           ** errMsg
 )
 {
     xpathResultSet    rs;
-    int               rc, vs[20], NaN, hnew, i, useFormatToken, vVals = 0;
-    int              *v, *vd = NULL;
+    int               rc, NaN, hnew, i, useFormatToken;
+    domLength         vs[20], *v, *vd = NULL, vVals = 0;
     long              groupingSize = 0;
     char             *value, *level, *count, *from, *str, *str1, *format;
     char             *groupingSeparator = NULL, *groupingSizeStr = NULL;
@@ -3459,7 +3467,7 @@ static int xsltNumber (
                 /* This covers both cases: non integer value after evaluation
                    and wrong (<= 0) integer value. */
                 reportError (actionNode, "The value of \"grouping-size\" must"
-                             " evaluate to a positiv integer.", errMsg);
+                             " evaluate to a positive integer.", errMsg);
                 goto xsltNumberError;
             }
         }
@@ -3616,7 +3624,7 @@ static int xsltNumber (
                 else node = node->parentNode;
             }
             if (rs.nr_nodes > 20) {
-                vd = (int *)MALLOC(sizeof (int) * rs.nr_nodes);
+                vd = (domLength *)MALLOC(sizeof (domLength) * rs.nr_nodes);
                 v = vd;
             }
             vVals = rs.nr_nodes;
@@ -3712,7 +3720,7 @@ static int ExecAction (
     xsltState       * xs,
     xpathResultSet  * context,
     domNode         * currentNode,
-    int               currentPos,
+    domLength         currentPos,
     domNode         * actionNode,
     char           ** errMsg
 )
@@ -3731,7 +3739,8 @@ static int ExecAction (
     char           *str, *str2, *select, *pc, *nsAT, *out;
     const char     *mode, *modeURI, *localName, *uri, *nsStr;
     char            prefix[MAX_PREFIX_LEN], tmpErr[200];
-    int             rc, b, i, len, terminate, chooseState, disableEsc = 0;
+    int             rc, b, i, terminate, chooseState, disableEsc = 0;
+    domLength       len;
     double          currentPrio, currentPrec;
     Tcl_HashEntry  *h;
 
@@ -4084,7 +4093,6 @@ static int ExecAction (
 
         case callTemplate:
             tplChoosen = NULL;
-            currentPrec = INT_MIN;
             str = getAttr(actionNode, "name", a_name);
             if (!str) {
                 reportError (actionNode, "xsl:call-template must have a"
@@ -4263,11 +4271,8 @@ static int ExecAction (
             if (currentNode->nodeType == TEXT_NODE) {
                 DBG(fprintf(stderr, "node is TEXT_NODE \n");)
                 tnode = (domTextNode*)currentNode;
-                n = (domNode*)
-                    domAppendNewTextNode(xs->lastNode,
-                                         tnode->nodeValue,
-                                         tnode->valueLength,
-                                         TEXT_NODE, 0);
+                domAppendNewTextNode(xs->lastNode, tnode->nodeValue,
+                                     tnode->valueLength, TEXT_NODE, 0);
             } else
             if (currentNode->nodeType == ELEMENT_NODE) {
                 DBG(fprintf(stderr, "node is ELEMENT_NODE \n");)
@@ -4309,10 +4314,8 @@ static int ExecAction (
             if (currentNode->nodeType == COMMENT_NODE) {
                 DBG(fprintf(stderr, "node is COMMENT_NODE \n");)
                 tnode = (domTextNode *)currentNode;
-                n = (domNode *) domAppendNewTextNode (xs->lastNode,
-                                                      tnode->nodeValue,
-                                                      tnode->valueLength,
-                                                      COMMENT_NODE, 0);
+                domAppendNewTextNode (xs->lastNode, tnode->nodeValue,
+                                      tnode->valueLength, COMMENT_NODE, 0);
             } else
             if (currentNode->nodeType == ATTRIBUTE_NODE) {
                 DBG(fprintf(stderr, "node is ATTRIBUTE_NODE \n");)
@@ -4413,7 +4416,7 @@ static int ExecAction (
             } else {
                 str = xpathFuncString( &rs );
                 TRACE1("copyOf: xpathString='%s' \n", str);
-                domAppendNewTextNode(xs->lastNode, str, strlen(str),
+                domAppendNewTextNode(xs->lastNode, str, (domLength)strlen(str),
                                      TEXT_NODE, 0);
                 FREE(str);
             }
@@ -4422,7 +4425,7 @@ static int ExecAction (
 
         case decimalFormat: 
             reportError (actionNode, "xsl:decimal-format is only allowed"
-                         " at toplevel.", errMsg);
+                         " at top-level.", errMsg);
             return -1;
 
         case element:
@@ -4600,15 +4603,15 @@ static int ExecAction (
             break;
 
         case import:
-            reportError (actionNode, "xsl:import is only allowed at toplevel.",
+            reportError (actionNode, "xsl:import is only allowed at top-level.",
                          errMsg);
             return -1;
         case include:
             reportError (actionNode, "xsl:include is only allowed at"
-                         " toplevel.", errMsg);
+                         " top-level.", errMsg);
             return -1;
         case key:
-            reportError (actionNode, "xsl:key is only allowed at toplevel.", 
+            reportError (actionNode, "xsl:key is only allowed at top-level.", 
                          errMsg);
             return -1;
 
@@ -4654,7 +4657,7 @@ static int ExecAction (
             }
         case namespaceAlias: 
             reportError (actionNode, "xsl:namespaceAlias is only allowed"
-                         " at toplevel.", errMsg);
+                         " at top-level.", errMsg);
             return -1;
 
         case number:
@@ -4727,7 +4730,10 @@ static int ExecAction (
             rc = ExecActions(xs, context, currentNode, currentPos,
                              actionNode->firstChild, errMsg);
             xsltPopVarFrame (xs);
-            CHECK_RC;
+            if (rc < 0) {
+                FREE (str2);
+                return rc;
+            }
             child = fragmentNode->firstChild;
             while (child) {
                 if (child->nodeType != TEXT_NODE) {
@@ -4752,7 +4758,7 @@ static int ExecAction (
             xs->lastNode = savedLastNode;
             
             n = (domNode*)domNewProcessingInstructionNode( 
-                xs->resultDoc, str2, strlen(str2), str, len);
+                xs->resultDoc, str2, (domLength)strlen(str2), str, len);
             domAppendChild(xs->lastNode, n);
             domDeleteNode (fragmentNode, NULL, NULL);
             FREE(str2);
@@ -4799,7 +4805,7 @@ static int ExecAction (
                 DBG(rsPrint(&rs));
                 str = xpathFuncString( &rs );
                 TRACE1("valueOf: xpathString='%s' \n", str);
-                domAppendNewTextNode(xs->lastNode, str, strlen(str),
+                domAppendNewTextNode(xs->lastNode, str, (domLength)strlen(str),
                                      TEXT_NODE, disableEsc);
                 xpathRSFree( &rs );
                 FREE(str);
@@ -4887,7 +4893,7 @@ static int ExecAction (
                 attr = n->firstAttr;
                 while (attr && (attr->nodeFlags & IS_NS_NODE)) {
                     /* XSLT namespace isn't copied */
-                    /* Well, XSLT implementors doesn't seem to agree
+                    /* Well, XSLT implementers doesn't seem to agree
                        at which point this rule out of the second paragraph
                        of 7.1.1 must be applied: before or after applying
                        the namespace aliases (or, in other words: is this
@@ -5055,7 +5061,7 @@ static int ExecActions (
     xsltState       * xs,
     xpathResultSet  * context,
     domNode         * currentNode,
-    int               currentPos,
+    domLength         currentPos,
     domNode         * actionNode,
     char           ** errMsg
 )
@@ -5091,7 +5097,7 @@ static int ApplyTemplate (
     xpathResultSet * context,
     domNode        * currentNode,
     domNode        * exprContext,
-    int              currentPos,
+    domLength        currentPos,
     const char     * mode,
     const char     * modeURI,
     char          ** errMsg
@@ -5269,7 +5275,7 @@ static int ApplyTemplates (
     xsltState      * xs,
     xpathResultSet * context,
     domNode        * currentNode,
-    int              currentPos,
+    domLength        currentPos,
     domNode        * actionNode,
     xpathResultSet * nodeList,
     const char     * mode,
@@ -5278,7 +5284,8 @@ static int ApplyTemplates (
 )
 {
     domNode  * savedLastNode;
-    int        i, rc, needNewVarFrame = 1;
+    int        rc, needNewVarFrame = 1;
+    domLength  i;
 
     if (nodeList->type == xNodeSetResult) {
         if (xs->nestedApplyTemplates > xs->maxNestedApplyTemplates) {
@@ -5505,7 +5512,8 @@ static void StripXSLTSpace (
 )
 {
     domNode *child, *newChild, *parent;
-    int     i, len, onlySpace;
+    domLength i, len;
+    int onlySpace;
     char   *p;
 
     if (node->nodeType == TEXT_NODE) {
@@ -5680,7 +5688,8 @@ getExternalDocument (
 {
     Tcl_Obj      *cmdPtr, *resultObj, *extbaseObj, *xmlstringObj;
     Tcl_Obj      *channelIdObj, *resultTypeObj;
-    int           len, mode, result, storeLineColumn;
+    int           mode, result, storeLineColumn;
+    domLength     len;
     int           resultcode = 0;
     char         *resultType, *extbase, *xmlstring, *channelId, s[20];
     Tcl_Obj      *extResolver = NULL;
@@ -5690,6 +5699,8 @@ getExternalDocument (
     XML_Parser    parser;
     Tcl_Channel   chan;
     Tcl_DString   dStr;
+    domParseForestErrorData forestError;
+    
     
     if (isStylesheet && (href[0] == '\0')) {
         *errMsg = tdomstrdup("Recursive import/include: stylesheet tries "
@@ -5706,13 +5717,13 @@ getExternalDocument (
     if (baseURI) {
         Tcl_ListObjAppendElement(interp, cmdPtr,
                                  Tcl_NewStringObj (baseURI,
-                                                   strlen(baseURI)));
+                                                   (domLength)strlen(baseURI)));
     } else {
         Tcl_ListObjAppendElement(interp, cmdPtr,
                                  Tcl_NewStringObj ("", 0));
     }
     Tcl_ListObjAppendElement (interp, cmdPtr, (href ?
-                              Tcl_NewStringObj (href, strlen (href))
+                              Tcl_NewStringObj (href, (domLength)strlen (href))
                               : Tcl_NewStringObj ("", 0)));
     Tcl_ListObjAppendElement (interp, cmdPtr,
                               Tcl_NewStringObj ("", 0));
@@ -5737,13 +5748,13 @@ getExternalDocument (
     }
     resultType = Tcl_GetString(resultTypeObj);
     if (strcmp (resultType, "string") == 0) {
-        result = Tcl_ListObjIndex (interp, resultObj, 2, &xmlstringObj);
+        Tcl_ListObjIndex (interp, resultObj, 2, &xmlstringObj);
         xmlstring = Tcl_GetStringFromObj (xmlstringObj, &len);
         chan = NULL;
     } else if (strcmp (resultType, "channel") == 0) {
         xmlstring = NULL;
         len = 0;
-        result = Tcl_ListObjIndex (interp, resultObj, 2, &channelIdObj);
+        Tcl_ListObjIndex (interp, resultObj, 2, &channelIdObj);
         channelId = Tcl_GetString(channelIdObj);
         chan = Tcl_GetChannel (interp, channelId, &mode);
         if (chan == (Tcl_Channel) NULL) {
@@ -5759,7 +5770,7 @@ getExternalDocument (
     } else {
         goto wrongScriptResult;
     }
-    result = Tcl_ListObjIndex (interp, resultObj, 1, &extbaseObj);
+    Tcl_ListObjIndex (interp, resultObj, 1, &extbaseObj);
     extbase = Tcl_GetString(extbaseObj);
 
     /* Since stylesheets and source docouments have different white space
@@ -5793,12 +5804,12 @@ getExternalDocument (
     /* keep white space, no fiddling with the encoding (is this
        a good idea?) */
     doc = domReadDocument (parser, xmlstring, len, 0, 0, storeLineColumn,
-                           0, 0, NULL, chan, extbase, extResolver, 0, 
+                           0, 0, NULL, chan, extbase, extResolver, 0, 0,
                            (int) XML_PARAM_ENTITY_PARSING_ALWAYS,
 #ifndef TDOM_NO_SCHEMA
                            NULL,
 #endif
-                           interp, &resultcode);
+                           interp, &forestError, &resultcode);
     if (xsltDoc->extResolver) {
         Tcl_DecrRefCount (extResolver);
     }
@@ -5813,10 +5824,12 @@ getExternalDocument (
         str = Tcl_GetStringResult (interp);
         if (str[0] == '\0') {
             Tcl_DStringAppend (&dStr, "At line ", -1);
-            sprintf (s, "%ld", XML_GetCurrentLineNumber (parser));
+            sprintf (s, "%" TDOM_LS_MODIFIER "d",
+                     XML_GetCurrentLineNumber (parser));
             Tcl_DStringAppend (&dStr, s, -1);
             Tcl_DStringAppend (&dStr, " character ", -1);
-            sprintf (s, "%ld", XML_GetCurrentColumnNumber (parser));
+            sprintf (s, "%" TDOM_LS_MODIFIER "d",
+                     XML_GetCurrentColumnNumber (parser));
             Tcl_DStringAppend (&dStr, s, -1);
             Tcl_DStringAppend (&dStr, ": ", 2);
             Tcl_DStringAppend (&dStr, 
@@ -6151,7 +6164,7 @@ static int processTopLevel (
                 str = getAttr(node, "decimal-separator",  a_decimalSeparator);
                 if (str) {
                     clen = UTF8_CHAR_LEN (str[0]);
-                    if (str[clen] != '\0') {
+                    if (!clen || str[clen] != '\0') {
                         reportError (node, "decimal-separator has to be a"
                                      " single char", errMsg);
                         if (newdf) FREE((char*)df);
@@ -6162,7 +6175,7 @@ static int processTopLevel (
                 str = getAttr(node, "grouping-separator", a_groupingSeparator);
                 if (str) {
                     clen = UTF8_CHAR_LEN (str[0]);
-                    if (str[clen] != '\0') {
+                    if (!clen || str[clen] != '\0') {
                         reportError (node, "groupingSeparator has to be a"
                                      " single char", errMsg);
                         if (newdf) FREE((char*)df);
@@ -6175,7 +6188,7 @@ static int processTopLevel (
                 str = getAttr(node, "minus-sign",         a_minusSign);
                 if (str) {
                     clen = UTF8_CHAR_LEN (str[0]);
-                    if (str[clen] != '\0') {
+                    if (!clen || str[clen] != '\0') {
                         reportError (node, "minus-sign has to be a single"
                                      " char", errMsg);
                         if (newdf) FREE((char*)df);
@@ -6194,7 +6207,7 @@ static int processTopLevel (
                     }
                     df->percent = str[0];
                     clen = UTF8_CHAR_LEN (str[0]);
-                    if (str[clen] != '\0') {
+                    if (!clen || str[clen] != '\0') {
                         reportError (node, "percent has to be a single"
                                      " char", errMsg);
                         if (newdf) FREE((char*)df);
@@ -6205,7 +6218,7 @@ static int processTopLevel (
                 str = getAttr(node, "per-mille",          a_perMille);
                 if (str) {
                     clen = UTF8_CHAR_LEN (str[0]);
-                    if (str[clen] != '\0') {
+                    if (!clen || str[clen] != '\0') {
                         reportError (node, "per-mille has to be a single"
                                      " char", errMsg);
                         if (newdf) FREE((char*)df);
@@ -6216,7 +6229,7 @@ static int processTopLevel (
                 str = getAttr(node, "zero-digit",         a_zeroDigit);
                 if (str) {
                     clen = UTF8_CHAR_LEN (str[0]);
-                    if (str[clen] != '\0') {
+                    if (!clen || str[clen] != '\0') {
                         reportError (node, "zero-digit has to be a single"
                                      " char", errMsg);
                         if (newdf) FREE((char*)df);
@@ -6227,7 +6240,7 @@ static int processTopLevel (
                 str = getAttr(node, "digit",              a_digit);
                 if (str) {
                     clen = UTF8_CHAR_LEN (str[0]);
-                    if (str[clen] != '\0') {
+                    if (!clen || str[clen] != '\0') {
                         reportError (node, "digit has to be a single char",
                                      errMsg);
                         if (newdf) FREE((char*)df);
@@ -6238,7 +6251,7 @@ static int processTopLevel (
                 str = getAttr(node, "pattern-separator",  a_patternSeparator);
                 if (str) {
                     clen = UTF8_CHAR_LEN (str[0]);
-                    if (str[clen] != '\0') {
+                    if (!clen || str[clen] != '\0') {
                         reportError (node, "pattern-separator has to be a"
                                      " single char", errMsg);
                         return -1;
@@ -6618,7 +6631,7 @@ static int processTopLevel (
                     /* Since imported stylesheets are processed at the
                        point at which they encounters the definitions are
                        already in increasing order of import precedence.
-                       Therefor we have only to check, if there is a
+                       Therefore, we have only to check, if there is a
                        top level var or parm with the same precedence */
                     if (topLevelVar->precedence == precedence) {
                         reportError (node, "There is already a variable"

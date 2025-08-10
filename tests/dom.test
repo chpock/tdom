@@ -5,7 +5,7 @@
 #
 #    dom-1.*:  createDocument, createDocumentNS
 #    dom-2.*:  parse
-#    dom-3.*:  isName, isNCName, isCharData, isPIName, isComment, isCDATA
+#    dom-3.*:  is* methods, clearString
 #    dom-4.*:  parse -useForeignDTD
 #    dom-5.*:  external entities
 #    dom-6.*:  use in slave interpreter
@@ -15,6 +15,9 @@
 #    dom-10.*: createNodeCmd
 #    dom-11.*: featureinfo
 #    dom-12.*: -feedbackAfter
+#    dom-13.*: -forest
+#    dom-14.*: command argument parsing
+#    dom-15.*: fromScriptContext
 #
 # Copyright (c) 2002, 2003, 2004 Rolf Ade.
 
@@ -607,6 +610,27 @@ test dom-2.33 {end of options option} {
     set result
 } -0.123
 
+test dom-2.33.1 {JSON data starting with a dash (-)} {
+    set doc [dom parse -json -0.123]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} -0.123
+
+test dom-2.33.2 {JSON data starting with a dash (-)} {
+    dom parse -json -0.123 doc
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} -0.123
+
+test dom-2.33.3 {JSON data starting with a dash (-)} {
+    dom parse -json -0.123 -0.123 
+    set result [${-0.123} asXML -indent none]
+    ${-0.123} delete
+    set result
+} -0.123
+
 test dom-2.34 {XML prefix declaration with empty namespace} {
     catch {dom parse {<foo:doc xmlns:foo=""><e1/></foo:doc>}} errMsg
     set errMsg
@@ -689,7 +713,7 @@ test dom-2.43 {billion laughs attact proctection options} {
         -billionLaughsAttackProtectionActivationThreshold bar
         -billionLaughsAttackProtectionActivationThreshold 0
         -billionLaughsAttackProtectionActivationThreshold -7
-        -billionLaughsAttackProtectionActivationThreshold 20000000000
+        -billionLaughsAttackProtectionActivationThreshold 2000000000
     } {
         lappend result [catch {
             set doc [dom parse $option $value <doc/>]
@@ -700,6 +724,44 @@ test dom-2.43 {billion laughs attact proctection options} {
     }
     set result
 } {1 1 1 0 1 1 1 0}
+
+test dom-2.44 {attribute order and XML namespace declaration} {
+    set doc [dom parse -simple {
+        <doc foo="bar" grill="bar" xmlns:p="some" bar="bar" xmlns="url">foo</doc>
+    }]
+    set root [$doc documentElement]
+    set result [$root attributeNames]
+    $doc delete
+    set result
+} {xmlns:p xmlns foo grill bar}
+
+test dom-2.45 {attribute order and XML namespace declaration} {
+    set doc [dom parse {
+        <doc foo="bar" grill="bar" xmlns:p="some" bar="bar" xmlns="url"/>
+    }]
+    set root [$doc documentElement]
+    set result [$root attributeNames]
+    $doc delete
+    set result
+} {xmlns:p xmlns foo grill bar}
+
+test dom-2.46 {parse long string} {64bit Tcl9 longRunning largedata groklargedata} {
+    set str "<doc>[string repeat abc 1000000000]</doc>"
+    set doc [dom parse $str]
+    set result [string length [$doc selectNodes string(/doc)]]
+    lappend result [string length [$doc selectNodes substring(doc,2999999999)]]
+    lappend result [$doc selectNodes substring(doc,2999999995,3)]
+    $doc delete
+    set result
+} {3000000000 2 abc}
+
+test dom-2.47 {parse chunk ends in multbyte char} {
+    set str "<doc>[string repeat \u1D8B 3000]</doc>"
+    set doc [dom parse $str]
+    set new [$doc asXML -indent none]
+    $doc delete
+    expr {$str eq $new ? 1 : 0} 
+} 1
 
 test dom-3.1 {isName} {
     dom isName ":foo"
@@ -885,7 +947,7 @@ set nameChars [lsort -command sortCmd \
 # Append stop char needed by the test code to work properly.
 lappend nameChars 0x10000
 
-test dom-3.9 {isName} {
+test dom-3.9 {isName} {longRunning} {
     set ind 0
     set nr 0
     while {$nr < 65536} {
@@ -1098,11 +1160,83 @@ test dom-3.43 {clearString} {
         \uD800\uD801\uD802_foo_bar_baz\uD802_didum\uE000
         \u0004\u0005\uDABC
         abc
+        \u00e4\u0004b
+        \u00e4\u0004\u00f6
     } {
         lappend result [dom clearString $str]
     }
     set result
-} [list {} a b ab ab acb adb ad_foo_bar _foo_bar_baz_didum _foo_bar_baz_didum\uE000 {} abc]
+} [list {} a b ab ab acb adb ad_foo_bar _foo_bar_baz_didum _foo_bar_baz_didum\uE000 {} abc \u00e4b  \u00e4\u00f6]
+
+test dom-3.44 {clearString -replace} {
+    set result [list]
+    foreach str {
+        \u0001
+        a\u0002
+        \u0003b
+        a\u0004b
+        a\u0004\u0005b
+        a\u0004c\u0005b
+        a\u0004d\u0005\u0006b
+        a\u0004d\u0005\uD800\uD801\uD802_foo_bar
+        \uD800\uD801\uD802_foo_bar_baz\uD802_didum\uDFFF
+        \uD800\uD801\uD802_foo_bar_baz\uD802_didum\uE000
+        \u0004\u0005\uDABC
+        abc
+        \u0004\u0005\u0001
+    } {
+        lappend result [dom clearString -replace $str]
+    }
+    set result
+} [list \ufffd a\ufffd \ufffdb a\ufffdb a\ufffd\ufffdb a\ufffdc\ufffdb a\ufffdd\ufffd\ufffdb a\ufffdd\ufffd\ufffd\ufffd\ufffd_foo_bar \ufffd\ufffd\ufffd_foo_bar_baz\ufffd_didum\ufffd \ufffd\ufffd\ufffd_foo_bar_baz\ufffd_didum\uE000 \ufffd\ufffd\ufffd abc \ufffd\ufffd\ufffd]
+
+test dom-3.45 {clearString -replace with replacement} {
+    set result [list]
+    foreach str {
+        \u0001
+        a\u0002
+        \u0003b
+        a\u0004b
+        a\u0004\u0005b
+        a\u0004c\u0005b
+        a\u0004d\u0005\u0006b
+        a\u0004d\u0005\uD800\uD801\uD802_foo_bar
+        \uD800\uD801\uD802_foo_bar_baz\uD802_didum\uDFFF
+        \uD800\uD801\uD802_foo_bar_baz\uD802_didum\uE000
+        \u0004\u0005\uDABC
+        abc
+        \u0004\u0005\u0001
+    } {
+        lappend result [dom clearString -replace some $str]
+    }
+    set result
+} [list some asome someb asomeb asomesomeb asomecsomeb asomedsomesomeb asomedsomesomesomesome_foo_bar somesomesome_foo_bar_bazsome_didumsome somesomesome_foo_bar_bazsome_didum\uE000 somesomesome abc somesomesome]
+
+test dom-3.46 {isHTML5CustomName} {
+    set result [list]
+    foreach str {
+        abc
+        ab-c
+        ab-C
+        -ab
+        \u00E4b-c
+        ab---c
+        ab-
+        ab-\u1d28
+        a\u00C4-b
+        aA-b
+        a\u00E4-b
+        0n-foo
+        A-b
+        font-face
+        m\u00B7-.
+        n-\uFDF0
+        o-\u3000
+    } {
+        lappend result [dom isHTML5CustomName $str]
+    }
+    set result
+} {0 1 0 0 0 1 1 1 1 0 1 0 0 0 1 1 0}
 
 test dom-4.1 {-useForeignDTD 0} {
     set doc [dom parse -useForeignDTD 0 {<root/>}]
@@ -1399,9 +1533,22 @@ test dom-5.9 {Wrong option after -externalentitycommand} -body {
                            -useForeignDTD foo}]
 } -result 1
 
+proc dom-5.9 {args} {
+    return [list string "" {text<one>1</one><two>2</two>more text}]
+}
+
+test dom-5.9 {-externalentitycommand - external entity is a forest} {
+    set doc [dom parse -externalentitycommand dom-5.9 \
+                 {<!DOCTYPE doc [<!ENTITY e1 PUBLIC "e1" "e1.xml">]>
+                     <doc>&e1;</doc>}]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc>text<one>1</one><two>2</two>more text</doc>}
+
 test dom-6.1 {use in slave interpreter} {
     set slave [interp create]
-    load {} tdom $slave
+    load {} Tdom $slave
     interp eval $slave {
         dom parse <root>foo</root> doc
         $doc documentElement root
@@ -1411,7 +1558,7 @@ test dom-6.1 {use in slave interpreter} {
 
 test dom-6.2 {use in slave interpreter} {
     set slave [interp create]
-    load {} tdom $slave
+    load {} Tdom $slave
     interp eval $slave {
         set doc [dom parse <root>foo</root>]
         set root [$doc documentElement]
@@ -1596,7 +1743,54 @@ test dom-7.19 {setNameCheck / createDocument} {
     dom setNameCheck 1
     set result
 } {<foo bar/>}
-    
+
+test dom-7.20 {set*Check, setStoreLineColumn and setObjectCommands in child interp} {
+    set storedNameCheck [dom setNameCheck]
+    set storedTextCheck [dom setTextCheck]
+    set storedLineColumn [dom setStoreLineColumn]
+    set storedObjectCommands [dom setObjectCommands]
+    dom setNameCheck 1
+    dom setTextCheck 1
+    dom setStoreLineColumn 0
+    dom setObjectCommands command
+    interp create childinterp
+    load {} Tdom childinterp
+    childinterp eval {
+        dom setNameCheck 0
+        dom setTextCheck 0
+        dom setStoreLineColumn 1
+    }
+    set nrCommands [llength [info commands]]
+    set doc [dom parse {<doc>some</doc>}]
+    set result [expr {[llength [info commands]] - $nrCommands}]
+    lappend result [catch {$doc createElement "foo bar" node}]
+    lappend result [catch {$doc createTextNode "a\u0001z" textnode}]
+    lappend result [catch {[$doc documentElement] getLine}]
+    lappend result [catch {[$doc documentElement] getColumn}]
+    if {[catch {$doc delete}]} {
+        domDoc $doc delete
+    }
+    childinterp eval {
+        dom setObjectCommands token
+    }
+    dom setNameCheck $storedNameCheck
+    dom setTextCheck $storedTextCheck
+    dom setStoreLineColumn $storedLineColumn
+    dom setObjectCommands $storedObjectCommands
+    lappend result {*}[childinterp eval {
+        set nrCommands [llength [info commands]]
+        set doc [dom parse {<doc>some</doc>}]
+        set result [expr {[llength [info commands]] - $nrCommands}]
+        lappend result [catch {domDoc $doc createElement "foo bar" node}]
+        lappend result [catch {domDoc $doc createTextNode "a\u0001z" textnode}]
+        lappend result [catch {domNode [domDoc $doc documentElement] getLine}]
+        lappend result [catch {domNode [domDoc $doc documentElement] getColumn}]
+        domDoc $doc delete
+        set result
+    }]
+    interp delete childinterp
+    set result
+} {1 1 1 1 1 0 0 0 0 0}
 
 test dom-8.1 {createDocumentNode} {
     set result [catch {dom createDocumentNode foo bar}]
@@ -1685,7 +1879,7 @@ test dom-8.10 {createDocumentNode} {
 test dom-8.11 {createDocumentNode} {
     catch {dom createDocumentNode -jsonType FOO docNode} errMsg
     set errMsg
-} {bad jsonType "FOO": must be NONE, ARRAY, OBJECT, NULL, TRUE, FALSE, STRING, or NUMBER}
+} {bad jsonType "FOO": must be NONE, ARRAY, OBJECT, NULL, TRUE, FALSE, STRING, NUMBER, or BOOLEAN}
 
 test dom-8.12 {createDocumentNode - method check} {
     set docNode [dom createDocumentNode]
@@ -2211,6 +2405,131 @@ test dom-12.16 {-feedbackcmd setting interp result w/ invalid XML} -body {
     list $result $msg
 } -result [list 1 {error "unclosed token" at line 1 character 19
 "<doc><e1/><e1/><e1>< <--Error-- /doc"}]
+
+test dom-13.1 {-forest} -body {
+    dom parse -forest {<one>1</one><two>2</two>} doc
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} -result {<one>1</one><two>2</two>}
+
+test dom-13.2 {-forest} -body {
+    catch {dom parse -forest {<one>1</one><two>2}}
+} -result {1}
+
+test dom-13.3 {-forest} -body {
+    dom parse -forest {<one>1</one><two>2</two>some text} doc
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} -result {<one>1</one><two>2</two>some text}
+
+test dom-13.4 {-forest -channel} -setup {
+    set xmlfile [makeFile {<one>1</one><two>2</two>} dom.xml]
+} -body {
+    set fd [open $xmlfile]
+    set doc [dom parse -channel $fd -forest]
+    close $fd
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} -cleanup {
+    removeFile dom.xml
+} -result {<one>1</one><two>2</two>}
+
+test dom-13.5 {-forest -channel} -setup {
+    set xmlfile [makeFile {<one>1</one><two>2} dom.xml]
+} -body {
+    set fd [open $xmlfile]
+    set result [catch {set doc [dom parse -channel $fd -forest]} errMsg]
+    close $fd
+    list $result $errMsg
+} -cleanup {
+    removeFile dom.xml
+} -result {1 {error "asynchronous entity" at line 2 character 0}}
+
+test dom-13.6 {-forest -channel} -setup {
+    # makeFile appends a newline at end
+    set xmlfile [makeFile {<one>1</one><two>2</two>some text} dom.xml]
+} -body {
+    set fd [open $xmlfile]
+    set doc [dom parse -channel $fd -forest]
+    close $fd
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} -cleanup {
+    removeFile dom.xml
+} -result {<one>1</one><two>2</two>some text
+}
+
+test dom-13.7 {-forest} -body {
+    catch {dom parse -forest {<one>1</one><two>2<two></notopen>}}
+} -result {1}
+
+test dom-13.8 {-forest} {
+    set xml {<one><two></one>}
+    catch {dom parse $xml} errMsg1
+    catch {dom parse -forest $xml} errMsg2
+    expr {$errMsg1 eq $errMsg2}
+} {1}
+
+test dom-13.9 {-forest} {
+    catch {dom parse -forest {<one></two></one><one></two></one></wrong>}}
+} 1
+
+test dom-13.10 {-forest} {
+    set xml {<div>something</div><div>something else</div>}
+    set doc [dom parse -forest $xml]
+    set result ""
+    foreach child [$doc selectNodes /*] {
+        lappend result [$child parentNode]
+    }
+    $doc delete
+    set result
+} {{} {}}
+
+test dom-14.1 {called without arguments} {
+    set result [catch {dom} errMsg]
+    lappend result $errMsg
+} {1 {wrong # args: should be "dom subcommand ?arg ...?"}}
+
+test dom-14.2 {wrong subcommand} -body {
+    catch {dom invalid-method} errMsg
+    set errMsg
+} -match glob -result {bad method "invalid-method": must be *}
+
+test dom-14.3 {Too less arguments to method parse} {
+    catch {dom parse} errMsg
+    set errMsg
+} {wrong # args: should be "parse ?options? ?data? ?objvar?"}
+
+test dom-15.1 {fromScriptContext} {
+    dom createDocument doc doc
+    set root [$doc documentElement]
+    $root appendFromScript {
+        set parent [dom fromScriptContext]
+    }
+    $doc delete
+    expr {$root == $parent}
+} 1
+
+test dom-15.2 {fromScriptContext} {
+    dom createDocument doc doc
+    set root [$doc documentElement]
+    namespace eval nodeCmds {
+        dom createNodeCmd elementNode e1
+    }
+    $root appendFromScript {
+        set parent [dom fromScriptContext]
+        nodeCmds::e1 {
+            set ::e1 [dom fromScriptContext]
+        }
+    }
+    set result [expr {$root == $parent && [$root firstChild] == $e1}]
+    $doc delete
+    set result
+} 1
 
 # cleanup
 ::tcltest::cleanupTests

@@ -1,0 +1,224 @@
+<html>
+<head>
+<link rel="stylesheet" href="manpage.css"><title>tDOM manual: xpathFunc</title><meta name="xsl-processor" content="Jochen Loewer (loewerj@hotmail.com), Rolf Ade (rolf@pointsman.de) et. al."><meta name="generator" content="$RCSfile: tmml-html.xsl,v $ $Revision: 1.11 $"><meta charset="utf-8">
+</head><body>
+<div class="header">
+<div class="navbar" align="center">
+<a href="#SECTid0x5632d0ffe5b0">NAME</a> · <a href="#SECTid0x5632d0f9cbb0">SYNOPSIS</a> · <a href="#SECTid0x5632d1112b60">DESCRIPTION</a> · <a href="#SECTid0x5632d1154020">EXAMPLES</a> · <a href="#SECTid0x5632d1154790">HELPER PROCS</a> · <a href="#SECTid0x5632d1159250">LIMITS</a> · <a href="#SECTid0x5632d1159d60">KEYWORDS</a>
+</div><hr class="navsep">
+</div><div class="body">
+  <h2><a name="SECTid0x5632d0ffe5b0">NAME</a></h2><p class="namesection">
+<b class="names">::dom::xpathFunc - </b><br>Scripted XPath functions</p>
+
+  <h2><a name="SECTid0x5632d0f9cbb0">SYNOPSIS</a></h2><pre class="syntax">::dom::xpathFunc::<i class="m">funcName</i> <i class="m">ctxNode</i> <i class="m">pos</i> <i class="m">nodeListType</i> <i class="m">nodeList</i> ?<i class="m">type arg type arg...</i>?
+::dom::xpathFunc::<i class="m">namespaceURL</i>::<i class="m">funcName</i> <i class="m">ctxNode</i> <i class="m">pos</i> <i class="m">nodeListType</i> <i class="m">nodeList</i> ?<i class="m">type arg type arg...</i>?</pre>
+
+  <h2><a name="SECTid0x5632d1112b60">DESCRIPTION</a></h2><p>
+      tDOM's XPath engine supports custom XPath functions implemented by Tcl
+      commands. When it encounters a function call to an unknown function name
+      without a namespace qualifier, the XPath engine looks for a Tcl command of
+      the same name in the <tt class="l">::dom::xpathFunc</tt> namespace. If it encounters
+      an unknown namespace-qualified function call, it looks for a Tcl namespace
+      with a name equal to the function's full namespace URI inside
+      <tt class="l">::dom::xpathFunc</tt>, and a Tcl command named for the local part of the
+      function's name inside that namespace. If it finds such a Tcl command, it
+      is executed with at least the following arguments, to describe the current
+      XPath context:
+    </p><dl>
+      
+        <dt>ctxNode</dt>
+        <dd>The <tt class="l">domNode</tt> object command of the XPath context node.</dd>
+      
+      
+        <dt>pos</dt>
+        <dd>
+          The XPath context position, in zero-based form - that is, the return
+          value of the standard XPath <tt class="l">position()</tt> function in the context
+          would be <tt class="l">$pos - 1</tt>.
+        </dd>
+      
+      
+        <dt>nodeListType</dt>
+        <dd>
+          The type name for <i class="m">nodeList</i>, as for the
+          <b class="method">selectNodes</b> method's <i class="m">typeVar</i>.
+        </dd>
+      
+      
+        <dt>nodeList</dt>
+        <dd>
+          The list of the current worked on XPath step result (as <b class="method">selectNodes</b> would return
+          them) in document order. <i class="m">ctxNode</i> will be equal to <tt class="l">[lindex $nodeList $pos]</tt>.
+        </dd>
+      
+    </dl><p>
+      If the function call includes any arguments, two arguments will be
+      appended to the command's argument list for each one:
+    </p><dl>
+      
+        <dt>type</dt>
+        <dd>
+          The argument's type name, as for <b class="method">selectNodes</b>'s
+          <i class="m">typeVar</i>.
+        </dd>
+      
+      
+        <dt>val</dt>
+        <dd>
+          The argument's value, as <b class="method">selectNodes</b> would return
+          it in an XPath expression's result set.
+        </dd>
+      
+    </dl><p>
+      The command is required to return a 1- or 2-element Tcl list to provide
+      the result of the XPath function call. If the result list has two
+      elements, the first is the result's XPath type name, and the second is an
+      appropriately encoded value (note that the <i class="m">attrnodes</i> type name is
+      not supported):
+    </p><dl>
+      
+        <dt>bool</dt>
+        <dd>Tcl boolean value acceptable to <b class="fun">Tcl_GetBooleanFromObj</b>.</dd>
+      
+      
+        <dt>number</dt>
+        <dd>
+          Tcl numeric value acceptable to <b class="fun">Tcl_GetSizeIntFromObj</b> or
+          <b class="fun">Tcl_GetDoubleFromObj</b>.
+        </dd>
+      
+      
+        <dt>string</dt><dd>Simple string.</dd>
+      
+      
+        <dt>nodes</dt><dd>Tcl list of <tt class="l">domNode</tt> object commands.</dd>
+      
+      
+        <dt>attrvalues</dt><dd>Alias for <i class="m">string</i>.</dd>
+      
+    </dl><p>
+      If the result list has only one element, it is treated as a simple string.
+      It is an error for the result to have zero elements, more than two
+      elements, or to be invalid as a Tcl list, and it is an error if the
+      <i class="m">val</i> of a two-part result does not match the requirements described
+      above for its <i class="m">type</i>.
+    </p>
+
+  <h2><a name="SECTid0x5632d1154020">EXAMPLES</a></h2><p>
+      A simple workalike for the XPath 2/3 <tt class="l">fn:matches()</tt> function, not
+      otherwise available in an XPath 1.0 engine such as tDOM's:
+    </p><pre class="example">proc ::dom::xpathFunc::regmatch {
+    ctxNode pos nodeListType nodeList
+    inputType inputVal patternType patternVal
+} {
+    set input [::dom::xpathFuncHelper::coerce2string $inputType $inputVal]
+    set pattern [::dom::xpathFuncHelper::coerce2string $patternType $patternVal]
+    return [list bool [regexp -- $pattern $input]]
+}</pre>
+
+  <h2><a name="SECTid0x5632d1154790">HELPER PROCS</a></h2><p>
+      The <tt class="l">::dom::xpathFuncHelper</tt> namespace contains helper procs for the
+      convenience of scripted XPath functions:
+    </p><dl class="commandlist">
+      
+        <dt>coerce2number <i class="m">type</i> <i class="m">val</i>
+</dt>
+        <dd>
+          Given a <i class="m">type</i> and <i class="m">val</i> as provided to scripted XPath
+          functions in their argument lists, convert the <i class="m">val</i> to a number in a
+          manner appropriate for its <i class="m">type</i>:
+          <dl>
+            
+              <dt>empty</dt><dd>Always zero.</dd>
+            
+            
+              <dt>number</dt><dd>Unchanged.</dd>
+            
+            
+              <dt>string</dt>
+              <dd>
+                Unchanged. (Note that no error is raised if <i class="m">val</i> is not
+                numeric.)
+              </dd>
+            
+            
+              <dt>attrvalues</dt><dd>
+<i class="m">value</i>'s first element.</dd>
+            
+            
+              <dt>nodes</dt>
+              <dd>
+                The result of the <tt class="l">number()</tt> XPath function called on the
+                first node in the list.
+              </dd>
+            
+            
+              <dt>attrnodes</dt>
+              <dd>
+                The value of the single attribute assumed to be in <i class="m">value</i>.
+                Note that no error is raised if this value is non-numeric.
+              </dd>
+            
+          </dl>
+        </dd>
+      
+      
+        <dt>coerce2string <i class="m">type</i> <i class="m">val</i>
+</dt>
+        <dd>
+          As for <tt class="l">coerce2number</tt>, but convert <i class="m">val</i> to a
+          pure string:
+          <dl>
+            
+              <dt>empty</dt><dd>The empty string.</dd>
+            
+            
+              <dt>number</dt><dd>Unchanged.</dd>
+            
+            
+              <dt>string</dt><dd>Unchanged.</dd>
+            
+            
+              <dt>attrvalues</dt><dd>
+<i class="m">value</i>'s first element.</dd>
+            
+            
+              <dt>nodes</dt>
+              <dd>
+                The result of the <tt class="l">string()</tt> XPath function called on the
+                first node in the list.
+              </dd>
+            
+            
+              <dt>attrnodes</dt>
+              <dd>
+                The value of the single attribute assumed to be in <i class="m">value</i>.
+              </dd>
+            
+          </dl>
+        </dd>
+      
+    </dl>
+  
+  <h2><a name="SECTid0x5632d1159250">LIMITS</a></h2><p>
+      Custom XPath function names are limited to 200 characters,
+      including any namespace URI and the <tt class="l">::</tt> Tcl namespace
+      separator between it and the local part. Function calls may have
+      a maximum of 22 arguments (the argument values itself may be
+      large nodesets). If you really need more this limits may be
+      adjusted by build time defines. Tcl commands created with the
+      deprecated <b class="fun">Tcl_CreateCommand</b> interface cannot be used
+      as scripted XPath functions.
+    </p><p>You <tt class="l">must not</tt> alter any of the DOM trees from which nodes are
+    provided to a scripted XPath function as argument (this is true
+    for the ctxNode argument as well as for the nodes in the nodeList
+    argument). Use them strictly read-only. Ignoring this advice may
+    have any unpredictable results including segmentation faults or
+    security problems. </p>
+
+  <h2><a name="SECTid0x5632d1159d60">KEYWORDS</a></h2><p class="keywords"><a class="keyword" href="keyword-index.html#KW-XPath">XPath</a></p>
+</div><hr class="navsep"><div class="navbar" align="center">
+<a class="navaid" href="index.html">Contents</a> · <a class="navaid" href="category-index.html">Index</a> · <a class="navaid" href="keyword-index.html">Keywords</a> · <a class="navaid" href="http://tdom.org">Repository</a>
+</div>
+</body>
+</html>

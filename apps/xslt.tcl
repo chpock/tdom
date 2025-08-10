@@ -64,19 +64,27 @@ proc xsltmsgcmd {msg terminate} {
     puts stderr "xslt message: $msg"
 }
 
-#set ::tDOM::extRefHandlerDebug 1
+# Set this variable to a true value if you want to see on stderr with
+# what arguments the scripted external entities handler will be
+# called.
+set ::tDOM::extRefHandlerDebug 0
 
+set xmlfd [xmlOpenFile $xmlFile]
 set xmldoc [dom parse -baseurl [baseURL $xmlFile] \
                       -externalentitycommand extRefHandler \
                       -keepEmpties \
-                      [xmlReadFile $xmlFile] ]
+                      -channel $xmlfd]
+close $xmlfd
 
+set xsltfd [xmlOpenFile $xsltFile]
 dom setStoreLineColumn 1
 set xsltdoc [dom parse -baseurl [baseURL $xsltFile] \
                        -externalentitycommand extRefHandler \
                        -keepEmpties \
-                       [xmlReadFile $xsltFile] ]
+                       -channel $xsltfd]
 dom setStoreLineColumn 0
+close $xsltfd
+
 if {[catch {$xmldoc xslt -xsltmessagecmd xsltmsgcmd $xsltdoc resultDoc} \
          errMsg]} {
     puts stderr $errMsg
@@ -100,13 +108,13 @@ switch $outputOpt {
         } else {
             set indent no
         }
-        puts [$resultDoc asXML -indent $indent -escapeNonASCII \
-                -doctypeDeclaration $doctypeDeclaration]
+        $resultDoc asXML -indent $indent -escapeNonASCII \
+            -channel stdout -doctypeDeclaration $doctypeDeclaration
     }
     asHTML -
     html {
-        puts [$resultDoc asHTML -escapeNonASCII -htmlEntities \
-                -doctypeDeclaration $doctypeDeclaration]
+        $resultDoc asHTML -escapeNonASCII -htmlEntities \
+            -channel stdout -doctypeDeclaration $doctypeDeclaration
     }
     asText -
     text {

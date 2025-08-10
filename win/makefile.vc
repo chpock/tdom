@@ -30,7 +30,6 @@ PRJ_OBJS = \
 	$(TMP_DIR)\xmlparse.obj    \
 	$(TMP_DIR)\xmlsimple.obj   \
 	$(TMP_DIR)\dom.obj         \
-	$(TMP_DIR)\domalloc.obj    \
 	$(TMP_DIR)\domhtml.obj     \
 	$(TMP_DIR)\domhtml5.obj    \
 	$(TMP_DIR)\domxslt.obj     \
@@ -41,6 +40,7 @@ PRJ_OBJS = \
 	$(TMP_DIR)\tclexpat.obj    \
 	$(TMP_DIR)\tcldom.obj      \
 	$(TMP_DIR)\tclpull.obj     \
+	$(TMP_DIR)\datatypes.obj   \
 	$(TMP_DIR)\schema.obj      \
 	$(TMP_DIR)\tdomStubInit.obj\
 	$(TMP_DIR)\tdomStubLib.obj \
@@ -51,7 +51,8 @@ PRJ_STUBOBJS = $(TMP_DIR)\tdomStubLib.obj
 PRJ_DEFINES = \
 	-D _CRT_SECURE_NO_DEPRECATE -D _CRT_NONSTDC_NO_DEPRECATE \
 	-DHAVE_MEMMOVE -DXML_DTD=1 -DXML_NS=1 -DTDOM_NO_UNKNOWN_CMD=1 \
-	-DXMLIMPORT=__declspec(dllexport)
+	-DXML_GE=1 -DXML_CONTEXT_BYTES=0 -DUSE_NORMAL_ALLOCATOR \
+	-DXML_LARGE_SIZE=1 -DXMLIMPORT=__declspec(dllexport)
 
 # TBD - some of the code, like expat checks for Windows using the
 # WIN32 macro. This should really be changed to check _WIN32. For now,
@@ -88,6 +89,6 @@ $<
 
 pkgindex:
         @type << >"$(OUT_DIR)\pkgIndex.tcl"
-    package ifneeded $(PROJECT) $(DOTVERSION) "[list load [file join $$dir $(PRJLIBNAME)] tdom]; [list source [file join $$dir tdom.tcl]]"
+    package ifneeded $(PROJECT) $(DOTVERSION) "[list load [file join $$dir $(PRJLIBNAME)] Tdom]; [list source [file join $$dir tdom.tcl]]"
 <<
 

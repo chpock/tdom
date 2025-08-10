@@ -28,7 +28,7 @@ EXTERN int		CHandlerSetRemove(Tcl_Interp *interp,
 				Tcl_Obj *const expatObj,
 				char *handlerSetName);
 /* 4 */
-EXTERN CHandlerSet *	CHandlerSetCreate(char *name);
+EXTERN CHandlerSet *	CHandlerSetCreate(const char *name);
 /* 5 */
 EXTERN CHandlerSet *	CHandlerSetGet(Tcl_Interp *interp,
 				Tcl_Obj *const expatObj,
@@ -63,7 +63,7 @@ EXTERN domNode *	tcldom_getNodeFromName(Tcl_Interp *interp,
 EXTERN domDocument *	tcldom_getDocumentFromName(Tcl_Interp *interp,
 				char *docName, char **errMsg);
 /* 18 */
-EXTERN SchemaData *	tdomGetSchemadata(void);
+EXTERN SchemaData *	tdomGetSchemadata(Tcl_Interp *interp);
 
 typedef struct TdomStubs {
     int magic;
@@ -73,7 +73,7 @@ typedef struct TdomStubs {
     int (*checkExpatParserObj) (Tcl_Interp *interp, Tcl_Obj *const nameObj); /* 1 */
     int (*cHandlerSetInstall) (Tcl_Interp *interp, Tcl_Obj *const expatObj, CHandlerSet *handlerSet); /* 2 */
     int (*cHandlerSetRemove) (Tcl_Interp *interp, Tcl_Obj *const expatObj, char *handlerSetName); /* 3 */
-    CHandlerSet * (*cHandlerSetCreate) (char *name); /* 4 */
+    CHandlerSet * (*cHandlerSetCreate) (const char *name); /* 4 */
     CHandlerSet * (*cHandlerSetGet) (Tcl_Interp *interp, Tcl_Obj *const expatObj, char *handlerSetName); /* 5 */
     void * (*cHandlerSetGetUserData) (Tcl_Interp *interp, Tcl_Obj *const expatObj, char *handlerSetName); /* 6 */
     TclGenExpatInfo * (*getExpatInfo) (Tcl_Interp *interp, Tcl_Obj *const expatObj); /* 7 */
@@ -87,7 +87,7 @@ typedef struct TdomStubs {
     int (*xML_GetIdAttributeIndex) (XML_Parser parser); /* 15 */
     domNode * (*tcldom_getNodeFromName) (Tcl_Interp *interp, char *nodeName, char **errMsg); /* 16 */
     domDocument * (*tcldom_getDocumentFromName) (Tcl_Interp *interp, char *docName, char **errMsg); /* 17 */
-    SchemaData * (*tdomGetSchemadata) (void); /* 18 */
+    SchemaData * (*tdomGetSchemadata) (Tcl_Interp *interp); /* 18 */
 } TdomStubs;
 
 extern const TdomStubs *tdomStubsPtr;

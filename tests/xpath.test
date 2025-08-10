@@ -86,6 +86,54 @@ test xpath-1.15 {ceiling, according errata to section 4.4} {
     $root selectNodes {ceiling('3.2e2')}
 } {NaN}
 
+test xpath-1.16 {floor} {
+    $root selectNodes floor(1.1)
+} 1
+
+test xpath-1.17 {floor} {
+    $root selectNodes floor('1.1')
+} 1
+
+test xpath-1.18 {floor} {
+    $root selectNodes floor(1.9999)
+} 1
+
+test xpath-1.19 {floor} {
+    $root selectNodes floor(-1.9999)
+} -2
+
+test xpath-1.20 {ceiling} {
+    $root selectNodes ceiling(1.1)
+} 2
+
+test xpath-1.21 {ceiling} {
+    $root selectNodes ceiling('1.1')
+} 2
+
+test xpath-1.22 {ceiling} {
+    $root selectNodes ceiling(1.9999)
+} 2
+
+test xpath-1.23 {ceiling} {
+    $root selectNodes ceiling(-1.9999)
+} -1
+
+test xpath-1.24 {round} {
+    $root selectNodes round(1.1)
+} 1
+
+test xpath-1.25 {round} {
+    $root selectNodes round('1.1')
+} 1
+
+test xpath-1.26 {round} {
+    $root selectNodes round(1.9999)
+} 2
+
+test xpath-1.27 {round} {
+    $root selectNodes round(-1.9999)
+} -2
+
 $doc delete
 
 test xpath-2.1 {non ASCII chars in element names} {
@@ -556,6 +604,47 @@ proc ::dom::xpathFunc::toolong01234567890123456789012345678901234567890123456789
 test xpath-4.24 {tcl coded additional XPath function - long XPath function name} {
     catch {$doc1 selectNodes toolong0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789name()}
 } {1}
+
+proc ::dom::xpathFunc::invalidBoolResult {ctxNode pos nodeListNode nodeList args} {
+    return [list bool foo]
+}
+
+test xpath-4.25 {tcl coded additional XPath function -invalid bool result} {
+    catch {$doc selectNodes invalidBoolResult()}
+} 1
+
+proc ::dom::xpathFunc::invalidNumberResult {ctxNode pos nodeListNode nodeList args} {
+    return [list number "foo"]
+}
+
+test xpath-4.26 {tcl coded additional XPath function -invalid number result} {
+    catch {$doc selectNodes invalidNumberResult()}
+} 1
+
+proc ::dom::xpathFunc::test427 {ctxNode pos nodeListNode nodeList args} {
+    if {![info exists ::test427]} {
+        set ::test427 $nodeList
+    } else {
+        if {$::test427 ne $nodeList} {
+            error "unexpected differing nodelists in test 4.27"
+        }
+    }
+    return [list bool 1]
+}
+
+test xpath-4.27 {tcl coded additional XPath function -nodeList arg content} {
+    catch {unset ::test427}
+    expr {[$doc1 selectNodes {/doc/e[position() mod 2 = 0][test427()]}] eq $::test427}
+} 1
+
+test xpath-4.27.1 {tcl coded additional XPath function -nodeList arg content} {
+    catch {unset ::test427}
+    set result ""
+    foreach node [$doc1 selectNodes {/doc/e[position() mod 2 = 0][test427()]}] {
+        lappend result [$node selectNodes string()]
+    }
+    set result
+} {2 4}
 
 $doc1 delete
 
@@ -1423,6 +1512,15 @@ test xpath-7.14 {local-name value of processing-instruction} -setup {
     $doc delete
 } -result {mypi}
 
+test xpath-7.15 {substring() with invalid third argument} {
+    set doc [dom parse {<doc><e1>foo</e1><e2/></doc>}]
+    set result [catch {
+        $doc selectNodes {substring("abcd", 1, string(/doc/e1) | /doc/e2)}
+    }]
+    $doc delete
+    set result
+} 1
+    
 # cleanup
 ::tcltest::cleanupTests
 return

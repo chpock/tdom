@@ -27,7 +27,7 @@
 #    domNode-21.*: hasChildNodes
 #    domNode-22.*: localName, prefix
 #    domNode-23.*: replaceChild
-#    domNode-24.*: getLine, getColumn
+#    domNode-24.*: getLine, getColumn, getByteIndex
 #    domNode-25.*: hasAttribute, hasAttributeNS
 #    domNode-26.*: appendXML
 #    domNode-27.*: target, data
@@ -51,8 +51,12 @@
 
 source [file join [file dir [info script]] loadtdom.tcl]
 
-testConstraint threaded [expr {[info exists tcl_platform(threaded)] 
-                               || [package vsatisfies [package present Tcl] 9.0-]}]
+if {[join [lrange [split [package present Tcl] .] 0 1] .] <= 8.4} {
+    testConstraint threaded [info exists tcl_platform(threaded)]
+} else {
+    testConstraint threaded [expr {[info exists tcl_platform(threaded)] 
+                                   || [package vsatisfies [package present Tcl] 9.0-]}]
+}
 
 test domNode-1.1 {too less arguments to nodecmd} {
     set doc [dom createDocument "root"]
@@ -126,12 +130,56 @@ test domNode-1.7 {error in trace on nodeObjVar} {
     set result
 } {1 {can't set "resultVar": error in nodeObjVar trace}}
 
+test domNode-1.8 {cmd argument parsing} {
+    set result [catch {domNode} errMsg]
+    lappend result $errMsg
+    catch {domNode foo} errMsg
+    lappend result $errMsg
+} {1 {wrong # args: should be "domNode nodetoken subcommand ?arg ...?"} {wrong # args: should be "domNode nodetoken subcommand ?arg ...?"}}
+
+test domNode-1.9 {cmd argument parsing} {
+    set storedMode [dom setObjectCommands]
+    dom setObjectCommands token
+    set doc [dom parse {<doc><e/></doc>}]
+    set root [domDoc $doc documentElement]
+    catch {domNode $root} result
+    domDoc $doc delete
+    dom setObjectCommands $storedMode
+    set result
+} {wrong # args: should be "domNode nodetoken subcommand ?arg ...?"}
+
+test domNode-1.10 {cmd argument parsing} -body {
+    set doc [dom parse {<doc><e/></doc>}]
+    set root [$doc documentElement]
+    catch {$root} result
+    $doc delete
+    set result
+} -match regexp -result {wrong # args: should be "domNode[^ ]+ subcommand \?arg ...\?"}
+
+test domNode-1.11 {cmd argument parsing} -body {
+    set storedMode [dom setObjectCommands]
+    dom setObjectCommands token
+    set doc [dom parse {<doc><e/></doc>}]
+    set root [domDoc $doc documentElement]
+    catch {domNode $root invalid-method} result
+    domDoc $doc delete
+    dom setObjectCommands $storedMode
+    set result
+} -match glob -result {bad method "invalid-method": must be *}
+
+test domNode-1.12 {cmd argument parsing} -body {
+    set doc [dom parse {<doc><e/></doc>}]
+    set root [$doc documentElement]
+    catch {$root invalid-method} result
+    $doc delete
+    set result
+} -match glob -result {bad method "invalid-method": must be *}
+
 set doc [dom parse {<root xmlns="rootdefaultNS">
     <elem1 xmlns="elem1NS"><elem11/></elem1>
     <elem2 xmlns="elem2NS"/>
     </root>}]
 set root [$doc documentElement]
-
 test domNode-2.1 {selectNodes - -namespace option: syntax} {
     set result [catch {$root selectNodes -namespaces elem1ns:elem1} errMsg]
     lappend result $errMsg
@@ -218,13 +266,79 @@ test domNode-2.11 {selectNodes - -cache option} {
 } {1 1 1 1 1 1}
 
 test domNode-2.12 {selectNodes - -cache option} {
-     # Second usage of an invalid XPath expr with -cache 1
-     # See 97c0994ae4
-     catch {$root selectNodes -cache 1 "/foo bar"}
-     catch {$root selectNodes -cache 1 "/foo bar"}
+    # Second usage of an invalid XPath expr with -cache 1
+    # See 97c0994ae4
+    catch {$root selectNodes -cache 1 "/foo bar"}
+    catch {$root selectNodes -cache 1 "/foo bar"}
 } 1
 
 $doc delete
+
+test domNode-2.13 {selectNodes - -cache option with invalid value} {
+    set doc [dom parse {<html xmlns="http://www.w3.org/1999/xhtml"><body><p>foo</p></body></html>}]
+    set root [$doc documentElement]
+    set result [catch {$root selectNodes \
+                           -namespaces {xhtml http://www.w3.org/1999/xhtml} \
+                           -cache nonboolean \
+                           string(xhtml:body/xhtml:p)}]
+    $doc delete
+    set result
+} 1
+
+test domNode-2.14 {selectNodes -namespaces and -list with invalid xpath list} {
+    set doc [dom parse {<html xmlns="http://www.w3.org/1999/xhtml"><body><p>foo</p></body></html>}]
+    set root [$doc documentElement]
+    set result [catch {$root selectNodes \
+                           -namespaces {xhtml http://www.w3.org/1999/xhtml} \
+                           -list \
+                           "\{xhtml:body string(xhtml:p)"}]
+    $doc delete
+    set result
+} 1
+
+test domNode-2.15 {selectNodes -namespaces and -list with empty xpaths list} {
+    set doc [dom parse {<html xmlns="http://www.w3.org/1999/xhtml"><body><p>foo</p></body></html>}]
+    set root [$doc documentElement]
+    set result [$root selectNodes \
+        -namespaces {xhtml http://www.w3.org/1999/xhtml} \
+        -list \
+        {}]
+    $doc delete
+    set result
+} ""
+
+test domNode-2.16 {selectNodes -namespaces and -list} {
+    set doc [dom parse {<html xmlns="http://www.w3.org/1999/xhtml"><body><p>foo</p></body></html>}]
+    set root [$doc documentElement]
+    set result [$root selectNodes \
+                    -namespaces {xhtml http://www.w3.org/1999/xhtml} \
+                    -list \
+                    {xhtml:body string(xhtml:p)}]
+    $doc delete
+    set result
+} foo
+
+test domNode-2.17 {selectNodes -namespaces and -list with first XPath expr invalid} {
+    set doc [dom parse {<html xmlns="http://www.w3.org/1999/xhtml"><body><p>foo</p></body></html>}]
+    set root [$doc documentElement]
+    set result [catch {$root selectNodes \
+                           -namespaces {xhtml http://www.w3.org/1999/xhtml} \
+                           -list \
+                           {xhtml::body string(xhtml:p)}}]
+    $doc delete
+    set result
+} 1
+
+test domNode-2.18 {selectNodes -namespaces and -list with second XPath expr invalid} {
+    set doc [dom parse {<html xmlns="http://www.w3.org/1999/xhtml"><body><p>foo</p></body></html>}]
+    set root [$doc documentElement]
+    set result [catch {$root selectNodes \
+                           -namespaces {xhtml http://www.w3.org/1999/xhtml} \
+                           -list \
+                           {xhtml:body string(xhtml:p}}]
+    $doc delete
+    set result
+} 1
 
 test domNode-3.1 {repetitived documentElement with objVar, then delete} {
     dom createDocument "root" doc 
@@ -1250,6 +1364,8 @@ namespace eval nodeCmds {
     dom createNodeCmd cdataNode   cdata
     dom createNodeCmd piNode      pi
     dom createNodeCmd parserNode  parser
+    dom createNodeCmd -notempty elementNode e3
+    dom createNodeCmd -notempty elementNode e4
 }
 
 test domNode-13.1 {appendFromScript - elementNode} {
@@ -1658,6 +1774,225 @@ test domNode-13.26 {appendFromScript with default namespace in scope} {
     $doc delete
     set result
 } {<doc xmlns="http://www.stock.org/stock"><e1 xmlns=""/></doc>}
+
+test domNode-13.27 {delete doc in appendFromScript script} {
+    set doc [dom createDocument doc]
+    set root [$doc documentElement]
+    set result ""
+    $root appendFromScript {
+        ::nodeCmds::e1 {
+            ::nodeCmds::e1 {
+                $doc delete
+            }
+        }
+        lappend result [info commands $doc]
+        ::nodeCmds::e1
+    }
+    lappend result [info commands $doc]
+} {{} {}}
+
+proc domNode-13.28 {} {
+    dom createDocument doc doc
+    set root [$doc documentElement]
+    $root appendFromScript {
+        ::nodeCmds::e1 {
+            $doc delete
+        }
+    }
+    info commands $doc
+}
+
+test domNode-13.28 {delete doc in appendFromScript script} {
+    domNode-13.28
+} {}
+
+test domNode-13.29 {tdom::fsinsertNode} {
+    set doc [dom createDocument doc]
+    set root [$doc documentElement]
+    $root appendFromScript {
+        ::nodeCmds::e1 {
+            tdom::fsinsertNode [$doc createElement some]
+        }
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc><e1><some/></e1></doc>}
+
+
+test domNode-13.30 {tdom::fsnewNode} {
+    set doc [dom createDocument doc]
+    set root [$doc documentElement]
+    $root appendFromScript {
+        tdom::fsnewNode e1 {
+            tdom::fsinsertNode [$doc createElement some]
+        }
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc><e1><some/></e1></doc>}
+
+test domNode-13.31 {tdom::fsnewNode} {
+    set doc [dom createDocument doc]
+    set root [$doc documentElement]
+    $root appendFromScript {
+        tdom::fsnewNode e1 {
+            tdom::fsnewNode some att1 "att1 value" {
+                ::nodeCmds::e1
+            }
+        }
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc><e1><some att1="att1 value"><e1/></some></e1></doc>}
+
+test domNode-13.32 {tdom::fsnewNode} {
+    set doc [dom createDocument doc]
+    set root [$doc documentElement]
+    $root appendFromScript {
+        tdom::fsnewNode e1 {
+            tdom::fsnewNode some {att1 "att1 value"} {
+                ::nodeCmds::e1
+            }
+        }
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc><e1><some att1="att1 value"><e1/></some></e1></doc>}
+
+test domNode-13.33 {tdom::fsnewNode} {
+    set doc [dom createDocument doc]
+    set root [$doc documentElement]
+    $root appendFromScript {
+        tdom::fsnewNode e1 {
+            tdom::fsnewNode some {-att1 "att1 value" -att2 "att2 value"} {
+                ::nodeCmds::e1
+            }
+        }
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc><e1><some att1="att1 value" att2="att2 value"><e1/></some></e1></doc>}
+
+test domNode-13.34 {-notempty} {
+    set doc [dom createDocument doc]
+    set root [$doc documentElement]
+    $root appendFromScript {
+        ::nodeCmds::e3
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc/>}
+
+test domNode-13.35 {-notempty} {
+    set doc [dom parse {<doc><e1/><e2/></doc>}]
+    set root [$doc documentElement]
+    $root insertBeforeFromScript {
+        ::nodeCmds::e3
+    } [$root lastChild]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc><e1/><e2/></doc>}
+
+test domNode-13.36 {-notempty} {
+    set doc [dom createDocument doc]
+    set root [$doc documentElement]
+    $root appendFromScript {
+        ::nodeCmds::e3 {
+            ::nodeCmds::e4
+            ::nodeCmds::e3
+        }
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc/>}
+
+test domNode-13.37 {-notempty} {
+    set doc [dom parse {<doc><e1/><e2/></doc>}]
+    set root [$doc documentElement]
+    $root insertBeforeFromScript {
+        ::nodeCmds::e3 {
+            ::nodeCmds::e3
+            ::nodeCmds::e4
+        }
+    } [$root lastChild]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc><e1/><e2/></doc>}
+
+test domNode-13.38 {-notempty} {
+    set doc [dom createDocument doc]
+    set root [$doc documentElement]
+    $root appendFromScript {
+        ::nodeCmds::e3 {
+            ::nodeCmds::e4
+            ::nodeCmds::e3 {::nodeCmds::t foo}
+        }
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc><e3><e3>foo</e3></e3></doc>}
+
+test domNode-13.39 {-notempty} {
+    set doc [dom parse {<doc><e1/><e2/></doc>}]
+    set root [$doc documentElement]
+    $root insertBeforeFromScript {
+        ::nodeCmds::e3 {
+            ::nodeCmds::e3
+            ::nodeCmds::e4 {::nodeCmds::t bar}
+        }
+    } [$root lastChild]
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc><e1/><e3><e4>bar</e4></e3><e2/></doc>}
+
+test domNode-13.40 {fsnewNode -notempty} {
+    set doc [dom parse <doc><e/></doc>]
+    set e [[$doc documentElement] firstChild]
+    $e appendFromScript {
+        tdom::fsnewNode -notempty echild att1 att1value
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc><e/></doc>}
+
+test domNode-13.41 {fsnewNode -notempty} {
+    set doc [dom parse <doc><e/></doc>]
+    set e [[$doc documentElement] firstChild]
+    $e appendFromScript {
+        tdom::fsnewNode -notempty echild att1 att1value {
+            ::nodeCmds::t bar
+        }
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc><e><echild att1="att1value">bar</echild></e></doc>}
+
+test domNode-13.42 {fsnewNode -notempty} {
+    set doc [dom parse <doc><e/></doc>]
+    set e [[$doc documentElement] firstChild]
+    $e appendFromScript {
+        tdom::fsnewNode -notempty echild att1 att1value {
+            # Do something else but don't create nodes
+            set sum [expr {1+2}]
+        }
+    }
+    set result [$doc asXML -indent none]
+    $doc delete
+    set result
+} {<doc><e/></doc>}
 
 test domNode-14.1 {appendFromList} {
     set doc [dom createDocument root]
@@ -2299,6 +2634,22 @@ test domNode-24.1 {getLine} {
     set result
 } {1}
 
+test domNode-24.1.1 {getColumn} {
+    set doc [dom parse <root/>]
+    set root [$doc documentElement]
+    set result [catch {$root getColumn} errMsg]
+    $doc delete
+    lappend result $errMsg
+} {1 {no line/column information available!}}
+
+test domNode-24.1.2 {getByteIndex} {
+    set doc [dom parse <root/>]
+    set root [$doc documentElement]
+    set result [catch {$root getByteIndex} errMsg]
+    $doc delete
+    lappend result $errMsg
+} {1 {no position information available!}}
+    
 dom setStoreLineColumn 1
 set doc [dom parse {<root>
 <e1><e2/></e1></root>}]
@@ -2322,7 +2673,93 @@ test domNode-24.5 {getLine getColumn} {
     set result [$node getLine].[$node getColumn]
 } {2.4}
 
+test domNode-24.6 {getByteIndex} {
+    set node [$root selectNodes //e2]
+    set result [$node getByteIndex]
+} {11}
+    
 $doc delete
+
+dom setStoreLineColumn 1
+
+test domNode-24.7 {getLine etc text node} {
+    set doc [dom parse {<root>
+        Hello<e1><e2/></e1></root>}]
+    set root [$doc documentElement]
+    set node [$root firstChild]
+    set result [$node getLine].[$node getColumn]
+    $doc delete
+    set result
+} {1.6}
+
+test domNode-24.8 {getLine etc cdatasection node} {
+    set doc [dom parse -keepCDATA {<root><![CDATA[
+        Hello]]><e1><e2/></e1></root>}]
+    set root [$doc documentElement]
+    set node [$root firstChild]
+    set result [$node getLine].[$node getColumn]
+    $doc delete
+    set result
+} {1.6}
+
+test domNode-24.8.1 {getLine etc cdatasection node without -keepCDATA} {
+    set doc [dom parse {<root><![CDATA[
+        Hello]]><e1><e2/></e1></root>}]
+    set root [$doc documentElement]
+    set node [$root firstChild]
+    set result [$node getLine].[$node getColumn]
+    $doc delete
+    set result
+} {1.15}
+
+test domNode-24.9 {getLine etc pi node} {
+    set doc [dom parse {<root><?pi1 do this?>
+        <e1><e2/></e1></root>}]
+    set root [$doc documentElement]
+    set node [$root firstChild]
+    set result [$node getLine].[$node getColumn]
+    $doc delete
+    set result
+} {1.6}
+
+test domNode-24.10 {getLine etc comment node} {
+    set doc [dom parse {<root>
+        <!-- comment --><e1><e2/></e1></root>}]
+    set root [$doc documentElement]
+    set node [$root firstChild]
+    set result [$node getLine].[$node getColumn]
+    $doc delete
+    set result
+} {2.8}
+
+test domNode-24.11 {getLine etc multple text/CDATA nodes} {
+    set doc [dom parse -keepCDATA {<root>
+        <e1>text</e1></root>}]
+    set root [$doc documentElement]
+    set e1 [$root firstChild]
+    set node [$e1 firstChild]
+    set result [$node getLine].[$node getColumn]
+    $doc delete
+    set result
+} {2.12}
+
+test domNode-24.12 {getLine etc multple text/CDATA nodes} {
+    set doc [dom parse -keepCDATA {<root>
+        <e1>text<![CDATA[
+        Hello out]]>more text</e1></root>}]
+    set root [$doc documentElement]
+    set e1 [$root firstChild]
+    set node [$e1 firstChild]
+    set result [$node getLine].[$node getColumn]/
+    set node [$node nextSibling]
+    append result [$node getLine].[$node getColumn]/
+    set node [$node nextSibling]
+    append result [$node getLine].[$node getColumn]
+    $doc delete
+    set result
+} {2.12/2.16/3.20}
+
+dom setStoreLineColumn 0
 
 set doc [dom parse {<root attr1="bingbaz"
                           attr2="ab &amp; zu"
@@ -3561,6 +3998,17 @@ test domNode-39.1 {text} {
      $doc delete
      set result
 } {text  more text}
+
+
+test domNode-40.1 {laststring} {
+     set doc [dom parse {<doc><e>foo</e><e>bar</e></doc>}]
+     $doc documentElement root
+     set result [$root selectNodes string(e)]
+     lappend result [$root selectNodes laststring(e)]
+     lappend result [$root selectNodes laststring(dontExists)]
+     $doc delete
+     set result
+} {foo bar {}}
 
 test domNode-999.1 {move nodes from one doc to another} {
     set doc1 [dom parse {<root/>}]

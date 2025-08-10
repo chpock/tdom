@@ -25,7 +25,7 @@
  * all claims, expenses, losses, damages and costs any user may incur
  * as a result of using, copying or modifying the software.
  *
- * 2001-2007  Rolf Ade          All changes and enhancements.
+ * 2001-2024  Rolf Ade          All changes and enhancements.
  *
  */
 
@@ -72,7 +72,7 @@
 #define SetResult(interp,str) \
                      (Tcl_SetStringObj (Tcl_GetObjResult (interp), (str), -1))
 #define SetIntResult(interp,i) \
-                     (Tcl_SetIntObj (Tcl_GetObjResult (interp), (i) ))
+                     (Tcl_SetDomLengthObj (Tcl_GetObjResult (interp), (i) ))
 #define AppendResult(interp,str) \
                      (Tcl_AppendToObj (Tcl_GetObjResult (interp), (str), -1))
 #define CheckArgs(min,max,n,msg) \
@@ -121,13 +121,13 @@ static int      TclExpatInstanceCmd (ClientData dummy,
 static void     TclExpatDeleteCmd (ClientData clientData);
 
 static Tcl_Obj* FindUniqueCmdName (Tcl_Interp *interp);
-static int      TclExpatCheckWhiteData (char *pc, int len);
+static int      TclExpatCheckWhiteData (char *pc, domLength len);
 
 static int      TclExpatInitializeParser (Tcl_Interp *interp,
                     TclGenExpatInfo *expat, int resetOptions );
 static void     TclExpatFreeParser  (TclGenExpatInfo *expat);
 static int      TclExpatParse (Tcl_Interp *interp,
-                    TclGenExpatInfo *expat, char *data, int len,
+                    TclGenExpatInfo *expat, char *data, domLength len,
                                TclExpat_InputType type);
 static int      TclExpatConfigure (Tcl_Interp *interp,
                     TclGenExpatInfo *expat, int objc, Tcl_Obj *const objv[]);
@@ -239,6 +239,7 @@ CreateTclHandlerSet (
     handlerSet->status                    = TCL_OK;
     handlerSet->continueCount             = 0;
     handlerSet->nextHandlerSet            = NULL;
+    handlerSet->fastCall                  = 0;
 
     handlerSet->elementstartcommand      = NULL;
     handlerSet->elementendcommand        = NULL;
@@ -339,7 +340,7 @@ CHandlerSetCreate (
 
 int
 TclExpatObjCmd(
-    ClientData dummy,
+    ClientData UNUSED(dummy),
     Tcl_Interp *interp,
     int objc,
     Tcl_Obj *const objv[]
@@ -499,7 +500,7 @@ TclExpatInitializeParser(
                 return TCL_ERROR;
             }
         }
-#ifdef XML_DTD
+#if defined(XML_DTD) && (XML_MAJOR_VERSION == 2) && (XML_MINOR_VERSION >= 4)
         if (expat->maximumAmplification >= 1.0f) {
             if (XML_SetBillionLaughsAttackProtectionMaximumAmplification (
                     expat->parser, expat->maximumAmplification) == XML_FALSE) {
@@ -544,7 +545,7 @@ TclExpatInitializeParser(
     expat->parsingState           = 0;
 #ifndef TDOM_NO_SCHEMA
     if (expat->sdata) {
-        tDOM_schemaReset (expat->sdata, 1);
+        tDOM_schemaReset (expat->sdata);
     }
 #endif
 
@@ -724,7 +725,8 @@ TclExpatInstanceCmd (
 ) {
   TclGenExpatInfo *expat = (TclGenExpatInfo *) clientData;
   char *data;
-  int len = 0, optionIndex, result = TCL_OK;
+  int optionIndex, result = TCL_OK;
+  domLength len = 0;
 #ifndef TDOM_NO_SCHEMA
   int resetsdata = 0;
 #endif
@@ -813,7 +815,7 @@ TclExpatInstanceCmd (
 #ifndef TDOM_NO_SCHEMA
             if (expat->sdata) {
                 expat->sdata->inuse--;
-                tDOM_schemaReset (expat->sdata, 1);
+                tDOM_schemaReset (expat->sdata);
             }
 #endif
             Tcl_DeleteCommand(interp, Tcl_GetString(expat->name));
@@ -942,7 +944,7 @@ TclExpatInstanceCmd (
 
 #ifndef TDOM_NO_SCHEMA
   if (resetsdata && expat->sdata) {
-      tDOM_schemaReset (expat->sdata, 1);
+      tDOM_schemaReset (expat->sdata);
   }
 #endif
   return result;
@@ -970,11 +972,11 @@ TclExpatParse (
     Tcl_Interp *interp,
     TclGenExpatInfo *expat,
     char *data,
-    int len,
+    domLength len,
     TclExpat_InputType type
 ) {
   int result, mode, done;
-  size_t bytesread;
+  domLength strl, bytesread;
   char s[255], buf[8*1024];
   int fd;
   XML_Parser  parser;
@@ -986,7 +988,7 @@ TclExpatParse (
   char          *str;
 
   if (expat->finished) {
-      if ((result = TclExpatInitializeParser (interp, expat, 0)) != TCL_OK) 
+      if (TclExpatInitializeParser (interp, expat, 0) != TCL_OK) 
           return TCL_ERROR;
   }
 
@@ -1011,9 +1013,16 @@ TclExpatParse (
 
   case EXPAT_INPUT_STRING:
       expat->parsingState = 2;
-      result = XML_Parse(expat->parser,
-                         data, len,
-                         expat->final);
+      do {
+          done = (len < TDOM_PCS);
+          result = XML_Parse(expat->parser, data,
+                             (int)(done ? len : TDOM_PCS),
+                             done ? expat->final : 0);
+          if (!done) {
+              data += TDOM_PCS;
+              len -= TDOM_PCS;
+          }
+      } while (!done && result == XML_STATUS_OK);
       expat->parsingState = 1;
       break;
 
@@ -1037,7 +1046,7 @@ TclExpatParse (
           != TCL_OK) {
           return TCL_ERROR;
       }
-      if (strcmp (Tcl_DStringValue (&dStr), "binary")==0 ) useBinary = 1;
+      if (strcmp (Tcl_DStringValue (&dStr), "utf-8")==0 ) useBinary = 1;
       else useBinary = 0;
       Tcl_DStringFree (&dStr);
       expat->parsingState = 2;
@@ -1045,7 +1054,7 @@ TclExpatParse (
           do {
               bytesread = Tcl_Read (channel, buf, sizeof (buf));
               done = bytesread < sizeof (buf);
-              result = XML_Parse (expat->parser, buf, bytesread, done);
+              result = XML_Parse (expat->parser, buf, (int)bytesread, done);
               if (result != XML_STATUS_OK) break;
           } while (!done);
       } else {
@@ -1055,8 +1064,8 @@ TclExpatParse (
           do {
               len = Tcl_ReadChars (channel, bufObj, 1024, 0);
               done = (len < 1024);
-              str = Tcl_GetStringFromObj (bufObj, &len);
-              result = XML_Parse (expat->parser, str, len, done);
+              str = Tcl_GetStringFromObj (bufObj, &strl);
+              result = XML_Parse (expat->parser, str, (int)strl, done);
               if (result != XML_STATUS_OK) break;
           } while (!done);
           /* In case of a parsing error we need the string rep of the
@@ -1081,7 +1090,7 @@ TclExpatParse (
       parser = expat->parser;
       expat->parsingState = 2;
       for (;;) {
-          int nread;
+          domLength nread;
           char *fbuf = XML_GetBuffer (parser, TDOM_EXPAT_READ_SIZE);
           if (!fbuf) {
               close (fd);
@@ -1099,7 +1108,7 @@ TclExpatParse (
               expat->parsingState = 1;
               return TCL_ERROR;
           }
-          result = XML_ParseBuffer (parser, nread, nread == 0);
+          result = XML_ParseBuffer (parser, (int)nread, nread == 0);
           if (result != XML_STATUS_OK || !nread) {
               close (fd);
               break;
@@ -1115,11 +1124,13 @@ TclExpatParse (
       }
       else {
           Tcl_ResetResult(interp);
-          sprintf(s, "%ld", XML_GetCurrentLineNumber(expat->parser));
+          sprintf(s, "%" TDOM_LS_MODIFIER "d",
+                  XML_GetCurrentLineNumber(expat->parser));
           Tcl_AppendResult(interp, "error \"",
                            XML_ErrorString(XML_GetErrorCode(expat->parser)),
                            "\" at line ", s, " character ", NULL);
-          sprintf(s, "%ld", XML_GetCurrentColumnNumber(expat->parser));
+          sprintf(s, "%" TDOM_LS_MODIFIER "d",
+                  XML_GetCurrentColumnNumber(expat->parser));
           Tcl_AppendResult(interp, s, NULL);
       }
       if (bufObj) {
@@ -1191,6 +1202,7 @@ TclExpatConfigure (
     "-namespaceseparator",
     "-billionLaughsAttackProtectionMaximumAmplification",
     "-billionLaughsAttackProtectionActivationThreshold",
+    "-keepTextStart",
 
     "-commentcommand",
     "-notstandalonecommand",
@@ -1206,6 +1218,7 @@ TclExpatConfigure (
     "-ignorewhitespace",
     "-handlerset",
     "-noexpand",
+    "-fastcall",
 #ifndef TDOM_NO_SCHEMA
     "-validateCmd",
 #endif
@@ -1226,6 +1239,7 @@ TclExpatConfigure (
     EXPAT_NAMESPACESEPARATOR,
     EXPAT_BLAPMAXIMUMAMPLIFICATION,
     EXPAT_BLAPACTIVATIONTHRESHOLD,
+    EXPAT_KEEPTEXTSTART,
 
     EXPAT_COMMENTCMD, EXPAT_NOTSTANDALONECMD,
     EXPAT_STARTCDATASECTIONCMD, EXPAT_ENDCDATASECTIONCMD,
@@ -1236,7 +1250,8 @@ TclExpatConfigure (
     EXPAT_ENTITYDECLCOMMAND,
     EXPAT_NOWHITESPACE,
     EXPAT_HANDLERSET,
-    EXPAT_NOEXPAND
+    EXPAT_NOEXPAND,
+    EXPAT_FASTCALL
 #ifndef TDOM_NO_SCHEMA
     ,EXPAT_VALIDATECMD
 #endif
@@ -1252,10 +1267,11 @@ TclExpatConfigure (
       EXPAT_PARAMENTITYPARSINGNEVER,
       EXPAT_PARAMENTITYPARSINGNOTSTANDALONE
   };
-  int optionIndex, value, bool;
+  int optionIndex, value, boolVal;
   Tcl_Obj *const *objPtr = objv;
   Tcl_CmdInfo cmdInfo;
-  int rc, len;
+  int rc;
+  domLength len;
   char *handlerSetName = NULL;
   TclHandlerSet *tmpTclHandlerSet, *activeTclHandlerSet = NULL;
   Tcl_UniChar uniChar;
@@ -1313,7 +1329,7 @@ TclExpatConfigure (
         }
         /* This option is a creation time / set once one */
         if (!expat->parser) {
-            expat->nsSeparator = uniChar;
+            expat->nsSeparator = (XML_Char)uniChar;
         }
         break;
 
@@ -1326,16 +1342,16 @@ TclExpatConfigure (
                             "\" requires a float >= 1.0 as argument.", NULL);
               return TCL_ERROR;
           }
-          if (maximumAmplification > FLT_MAX || maximumAmplification < 1.0) {
+          if (maximumAmplification > (double)FLT_MAX || maximumAmplification < 1.0) {
               Tcl_SetResult(interp, "The option \""
                             "-billionLaughsAttackProtectionMaximumAmplification"
                             "\" requires a float >= 1.0 as argument.", NULL);
               return TCL_ERROR;
           }
-#ifdef XML_DTD
+#if defined(XML_DTD) && (XML_MAJOR_VERSION == 2) && (XML_MINOR_VERSION >= 4)
           if (expat->parser) {
               if (XML_SetBillionLaughsAttackProtectionMaximumAmplification (
-                      expat->parser, maximumAmplification) == XML_FALSE) {
+                      expat->parser, (float)maximumAmplification) == XML_FALSE) {
                   Tcl_SetResult(interp, "The option \""
                                 "-billionLaughsAttackProtectionMaximumAmplification"
                                 "\" requires a float >= 1.0 as argument.",
@@ -1343,7 +1359,7 @@ TclExpatConfigure (
                   return TCL_ERROR;
               }
           } else {
-              expat->maximumAmplification = maximumAmplification;
+              expat->maximumAmplification = (float) maximumAmplification;
           }
 #endif          
           break;
@@ -1363,7 +1379,7 @@ TclExpatConfigure (
                              "\" requires a long > 0 as argument.", NULL);
               return TCL_ERROR;
           }
-#ifdef XML_DTD
+#if defined(XML_DTD) && (XML_MAJOR_VERSION == 2) && (XML_MINOR_VERSION >= 4)
           if (expat->parser) {
               if (XML_SetBillionLaughsAttackProtectionActivationThreshold (
                       expat->parser, activationThreshold) == XML_FALSE) {
@@ -1380,11 +1396,11 @@ TclExpatConfigure (
           
       case EXPAT_FINAL:			/* -final */
 
-	if (Tcl_GetBooleanFromObj(interp, objPtr[1], &bool) != TCL_OK) {
+	if (Tcl_GetBooleanFromObj(interp, objPtr[1], &boolVal) != TCL_OK) {
             return TCL_ERROR;
 	}
 
-        expat->final = bool;
+        expat->final = boolVal;
 	break;
 
       case EXPAT_BASE:			/* -baseurl */
@@ -1416,11 +1432,15 @@ TclExpatConfigure (
 
 	activeTclHandlerSet->elementstartcommand = objPtr[1];
 	Tcl_IncrRefCount(activeTclHandlerSet->elementstartcommand);
-        rc = Tcl_GetCommandInfo(interp, Tcl_GetString(objPtr[1]), &cmdInfo);
-        if (rc && cmdInfo.isNativeObjectProc) {
-            activeTclHandlerSet->elementstartObjProc = cmdInfo.objProc;
-            activeTclHandlerSet->elementstartclientData 
-                = cmdInfo.objClientData;
+        if (activeTclHandlerSet->fastCall) {
+            rc = Tcl_GetCommandInfo(interp, Tcl_GetString(objPtr[1]), &cmdInfo);
+            if (rc && cmdInfo.isNativeObjectProc) {
+                activeTclHandlerSet->elementstartObjProc = cmdInfo.objProc;
+                activeTclHandlerSet->elementstartclientData 
+                    = cmdInfo.objClientData;
+            } else {
+                activeTclHandlerSet->elementstartObjProc = NULL;
+            }
         } else {
             activeTclHandlerSet->elementstartObjProc = NULL;
         }
@@ -1435,10 +1455,14 @@ TclExpatConfigure (
 
 	activeTclHandlerSet->elementendcommand = objPtr[1];
 	Tcl_IncrRefCount(activeTclHandlerSet->elementendcommand);
-        rc = Tcl_GetCommandInfo(interp, Tcl_GetString(objPtr[1]), &cmdInfo);
-        if (rc && cmdInfo.isNativeObjectProc) {
-            activeTclHandlerSet->elementendObjProc = cmdInfo.objProc;
-            activeTclHandlerSet->elementendclientData = cmdInfo.objClientData;
+        if (activeTclHandlerSet->fastCall) {
+            rc = Tcl_GetCommandInfo(interp, Tcl_GetString(objPtr[1]), &cmdInfo);
+            if (rc && cmdInfo.isNativeObjectProc) {
+                activeTclHandlerSet->elementendObjProc = cmdInfo.objProc;
+                activeTclHandlerSet->elementendclientData = cmdInfo.objClientData;
+            } else {
+                activeTclHandlerSet->elementendObjProc = NULL;
+            }
         } else {
             activeTclHandlerSet->elementendObjProc = NULL;
         }
@@ -1477,10 +1501,14 @@ TclExpatConfigure (
 
 	activeTclHandlerSet->datacommand = objPtr[1];
 	Tcl_IncrRefCount(activeTclHandlerSet->datacommand);
-        rc = Tcl_GetCommandInfo (interp, Tcl_GetString(objPtr[1]), &cmdInfo);
-        if (rc && cmdInfo.isNativeObjectProc) {
-            activeTclHandlerSet->datacommandObjProc = cmdInfo.objProc;
-            activeTclHandlerSet->datacommandclientData = cmdInfo.objClientData;
+        if (activeTclHandlerSet->fastCall) {
+            rc = Tcl_GetCommandInfo (interp, Tcl_GetString(objPtr[1]), &cmdInfo);
+            if (rc && cmdInfo.isNativeObjectProc) {
+                activeTclHandlerSet->datacommandObjProc = cmdInfo.objProc;
+                activeTclHandlerSet->datacommandclientData = cmdInfo.objClientData;
+            } else {
+                activeTclHandlerSet->datacommandObjProc = NULL;
+            }
         } else {
             activeTclHandlerSet->datacommandObjProc = NULL;
         }
@@ -1565,18 +1593,18 @@ TclExpatConfigure (
 
       case EXPAT_USEFOREIGNDTD:                /* -useForeignDTD */
         
-        if (Tcl_GetBooleanFromObj (interp, objPtr[1], &bool) != TCL_OK) {
+        if (Tcl_GetBooleanFromObj (interp, objPtr[1], &boolVal) != TCL_OK) {
             return TCL_ERROR;
         }
         if (expat->parser) {
             /* Cannot be changed after parsing as started (which is
                kind of understandable). */
-            if (XML_UseForeignDTD (expat->parser, (unsigned char)bool)
+            if (XML_UseForeignDTD (expat->parser, (unsigned char)boolVal)
                 != XML_ERROR_NONE) {
-                expat->useForeignDTD = bool;
+                expat->useForeignDTD = boolVal;
             }
         } else {
-            expat->useForeignDTD = bool;
+            expat->useForeignDTD = boolVal;
         }
         break;
 
@@ -1748,18 +1776,34 @@ TclExpatConfigure (
         break;
 
     case EXPAT_NOEXPAND:
-        if (Tcl_GetBooleanFromObj (interp, objPtr[1], &bool) != TCL_OK) {
+        if (Tcl_GetBooleanFromObj (interp, objPtr[1], &boolVal) != TCL_OK) {
             return TCL_ERROR;
         }
-        if (bool) {
+        if (boolVal) {
             XML_SetDefaultHandler( expat->parser,
                                    TclGenExpatDefaultHandler);
         } else {
             XML_SetDefaultHandlerExpand( expat->parser,
                                          TclGenExpatDefaultHandler);
         }
-        expat->noexpand = bool;
+        expat->noexpand = boolVal;
         break;
+
+    case EXPAT_FASTCALL:
+        if (Tcl_GetBooleanFromObj (interp, objPtr[1], &boolVal) != TCL_OK) {
+            return TCL_ERROR;
+        }
+        CheckDefaultTclHandlerSet;
+        activeTclHandlerSet->fastCall = boolVal;
+        break;
+                  
+    case EXPAT_KEEPTEXTSTART:
+        if (Tcl_GetBooleanFromObj(interp, objPtr[1], &boolVal) != TCL_OK) {
+            return TCL_ERROR;
+	}
+
+        expat->keepTextStart = boolVal;
+	break;
 
 #ifndef TDOM_NO_SCHEMA
     case EXPAT_VALIDATECMD:
@@ -1767,13 +1811,13 @@ TclExpatConfigure (
         if (schemacmd[0] == '\0') {
             if (expat->sdata) {
                 expat->sdata->inuse--;
-                tDOM_schemaReset (expat->sdata, 1);
+                tDOM_schemaReset (expat->sdata);
                 expat->sdata = NULL;
             }
         } else {
             if (expat->sdata) {
                 expat->sdata->inuse--;
-                tDOM_schemaReset (expat->sdata, 1);
+                tDOM_schemaReset (expat->sdata);
                 expat->sdata = NULL;
             }                
             if (!Tcl_GetCommandInfo(interp, schemacmd, &cmdInfo)) {
@@ -1990,7 +2034,7 @@ TclExpatCget (
 
         if (expat->nsSeparator) {
             uniChar = expat->nsSeparator;
-            len = Tcl_UniCharToUtf (uniChar, utfBuf);
+            len = (int) Tcl_UniCharToUtf (uniChar, utfBuf);
             Tcl_DStringInit (&dStr);
             Tcl_DStringAppend (&dStr, utfBuf, len);
             Tcl_DStringResult (interp, &dStr);
@@ -2241,7 +2285,7 @@ static int
 TclExpatGet (
     Tcl_Interp *interp,
     TclGenExpatInfo *expat,
-    int objc,
+    int UNUSED(objc),
     Tcl_Obj *const objv[]
 )
 {
@@ -2263,6 +2307,7 @@ TclExpatGet (
   int switchIndex;
   Tcl_Obj *resultPtr;
 
+  /* objc is already checked by caller */
   if (Tcl_GetIndexFromObj(interp, objv[0], getSwitches,
 			  "switch", 0, &switchIndex) != TCL_OK) {
     return TCL_ERROR;
@@ -2278,22 +2323,48 @@ TclExpatGet (
 
     case EXPAT_CURRENTBYTECOUNT:
 
-      Tcl_SetIntObj(resultPtr, XML_GetCurrentByteCount(expat->parser));
+      Tcl_SetWideIntObj(resultPtr, XML_GetCurrentByteCount(expat->parser));
       break;
 
     case EXPAT_CURRENTLINENUMBER:
-
-      Tcl_SetIntObj(resultPtr, XML_GetCurrentLineNumber(expat->parser));
+        if (expat->keepTextStart && expat->cdata) {
+            /* TclGenExpatCharacterDataHandler() was called and
+             * initialized expat->cdata, but expat->cdata isn't reset by
+             * TclExpatDispatchPCDATA(), so we're called from
+             * -characterdatacommand */
+            Tcl_SetWideIntObj(resultPtr, expat->cdataStartLine);
+        } else {
+            Tcl_SetWideIntObj(resultPtr,
+                              XML_GetCurrentLineNumber(expat->parser));
+        }
+        
       break;
 
     case EXPAT_CURRENTCOLUMNNUMBER:
-
-      Tcl_SetIntObj(resultPtr, XML_GetCurrentColumnNumber(expat->parser));
+        if (expat->keepTextStart && expat->cdata) {
+            /* TclGenExpatCharacterDataHandler() was called and
+             * initialized expat->cdata, but expat->cdata isn't reset by
+             * TclExpatDispatchPCDATA(), so we're called from
+             * -characterdatacommand */
+            Tcl_SetWideIntObj(resultPtr, expat->cdataStartColumn);
+        } else {
+            Tcl_SetWideIntObj(resultPtr,
+                              XML_GetCurrentColumnNumber(expat->parser));
+        }
       break;
 
     case EXPAT_CURRENTBYTEINDEX:
 
-      Tcl_SetLongObj(resultPtr, XML_GetCurrentByteIndex(expat->parser));
+        if (expat->keepTextStart && expat->cdata) {
+            /* TclGenExpatCharacterDataHandler() was called and
+             * initialized expat->cdata, but expat->cdata isn't reset by
+             * TclExpatDispatchPCDATA(), so we're called from
+             * -characterdatacommand */
+            Tcl_SetWideIntObj(resultPtr, expat->cdataStartByteIndex);
+        } else {
+            Tcl_SetWideIntObj(resultPtr,
+                              XML_GetCurrentByteIndex(expat->parser));
+        }
       break;
 
   }
@@ -2453,8 +2524,8 @@ TclGenExpatElementStartHandler(
           atList = Tcl_NewListObj(0, NULL);
           Tcl_IncrRefCount (atList);
           for (atPtr = atts; atPtr[0] && atPtr[1]; atPtr += 2) {
-              Tcl_ListObjAppendElement(expat->interp, atList, Tcl_NewStringObj((char *)atPtr[0], strlen(atPtr[0])));
-              Tcl_ListObjAppendElement(expat->interp, atList, Tcl_NewStringObj((char *)atPtr[1], strlen(atPtr[1])));
+              Tcl_ListObjAppendElement(expat->interp, atList, Tcl_NewStringObj((char *)atPtr[0], (domLength)strlen(atPtr[0])));
+              Tcl_ListObjAppendElement(expat->interp, atList, Tcl_NewStringObj((char *)atPtr[1], (domLength)strlen(atPtr[1])));
           }
           vector[2] = atList;
       }
@@ -2833,7 +2904,7 @@ TclGenExpatEndNamespaceDeclHandler(
 static int
 TclExpatCheckWhiteData (
     char         *pc,
-    int           len
+    domLength     len
 ) {
     for (; len > 0; len--, pc++) {
         if ( (*pc != ' ')  &&
@@ -2878,6 +2949,13 @@ TclGenExpatCharacterDataHandler(
   if (!expat->cdata) {
       expat->cdata = Tcl_NewObj();
       Tcl_IncrRefCount (expat->cdata);
+      if (expat->keepTextStart) {
+          if (!expat->cdataStartLine) {
+              expat->cdataStartLine = (domLength)XML_GetCurrentLineNumber (expat->parser);
+              expat->cdataStartColumn = (domLength)XML_GetCurrentColumnNumber (expat->parser);
+              expat->cdataStartByteIndex = (domLength)XML_GetCurrentByteIndex (expat->parser);
+          }
+      }
   }
   Tcl_AppendToObj (expat->cdata, s, len);
   return;
@@ -2904,7 +2982,8 @@ static void
 TclExpatDispatchPCDATA(
     TclGenExpatInfo *expat
 ) {
-  int len, result, onlyWhiteSpace = 0;
+  int result, onlyWhiteSpace = 0;
+  domLength len;
   Tcl_Obj *vector[2];
   TclHandlerSet *activeTclHandlerSet;
   CHandlerSet *activeCHandlerSet;
@@ -3003,6 +3082,7 @@ TclExpatDispatchPCDATA(
 #endif
   Tcl_DecrRefCount (expat->cdata);
   expat->cdata = NULL;
+  expat->cdataStartLine = 0;
   return;
 }
 
@@ -3065,8 +3145,8 @@ TclGenExpatProcessingInstructionHandler(
       Tcl_IncrRefCount(cmdPtr);
       Tcl_Preserve((ClientData) expat->interp);
 
-      Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)target, strlen(target)));
-      Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)data, strlen(data)));
+      Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)target, (domLength)strlen(target)));
+      Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)data, (domLength)strlen(data)));
       result = Tcl_EvalObjEx(expat->interp, cmdPtr, 
                              TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT);
 
@@ -3235,7 +3315,7 @@ TclGenExpatEntityDeclHandler(
       Tcl_IncrRefCount(cmdPtr);
       Tcl_Preserve((ClientData) expat->interp);
 
-      Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)entityname, strlen(entityname)));
+      Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)entityname, (domLength)strlen(entityname)));
       Tcl_ListObjAppendElement (expat->interp, cmdPtr, Tcl_NewIntObj (is_param));
       if (value == NULL) {
           Tcl_ListObjAppendElement (expat->interp, cmdPtr, Tcl_NewListObj (0, NULL));
@@ -3247,22 +3327,22 @@ TclGenExpatEntityDeclHandler(
           Tcl_ListObjAppendElement (expat->interp, cmdPtr, Tcl_NewListObj (0, NULL));
       }
       else {
-          Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)base, strlen(base)));
+          Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)base, (domLength)strlen(base)));
       }
       if (systemId == NULL) {
           Tcl_ListObjAppendElement (expat->interp, cmdPtr, Tcl_NewListObj (0, NULL));
       } else {
-          Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)systemId, strlen(systemId)));
+          Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)systemId, (domLength)strlen(systemId)));
       }
       if (publicId == NULL) {
           Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewListObj(0, NULL));
       } else {
-          Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)publicId, strlen(publicId)));
+          Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)publicId, (domLength)strlen(publicId)));
       }
       if (notationName == NULL) {
           Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewListObj(0, NULL));
       } else {
-          Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)notationName, strlen(notationName)));
+          Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)notationName, (domLength)strlen(notationName)));
       }
       result = Tcl_EvalObjEx(expat->interp, cmdPtr,
                              TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT);
@@ -3347,17 +3427,17 @@ TclGenExpatNotationDeclHandler(
       Tcl_IncrRefCount(cmdPtr);
       Tcl_Preserve((ClientData) expat->interp);
 
-      Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)notationName, strlen(notationName)));
-      Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)base, strlen(base)));
+      Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)notationName, (domLength)strlen(notationName)));
+      Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)base, (domLength)strlen(base)));
       if (systemId == NULL) {
           Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewListObj(0, NULL));
       } else {
-          Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)systemId, strlen(systemId)));
+          Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)systemId, (domLength)strlen(systemId)));
       }
       if (publicId == NULL) {
           Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewListObj(0, NULL));
       } else {
-          Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)publicId, strlen(publicId)));
+          Tcl_ListObjAppendElement(expat->interp, cmdPtr, Tcl_NewStringObj((char *)publicId, (domLength)strlen(publicId)));
       }
       result = Tcl_EvalObjEx(expat->interp, cmdPtr, 
                              TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT);
@@ -3455,7 +3535,8 @@ TclGenExpatExternalEntityRefHandler(
 ) {
   TclGenExpatInfo *expat = (TclGenExpatInfo *) XML_GetUserData(parser);
   Tcl_Obj *cmdPtr, *resultObj, *resultTypeObj, *extbaseObj, *dataObj;
-  int result, mode, done, fd, tclLen;
+  int result, mode, done, fd;
+  domLength tclLen;
   size_t len;
   TclHandlerSet *activeTclHandlerSet;
   CHandlerSet *activeCHandlerSet;
@@ -3496,7 +3577,7 @@ TclGenExpatExternalEntityRefHandler(
 
       if (base) {
           Tcl_ListObjAppendElement(expat->interp, cmdPtr,
-	      Tcl_NewStringObj((char *)base, strlen(base)));
+	      Tcl_NewStringObj((char *)base, (domLength)strlen(base)));
       } else {
           Tcl_ListObjAppendElement(expat->interp, cmdPtr,
 	      Tcl_NewStringObj("", 0));
@@ -3504,7 +3585,7 @@ TclGenExpatExternalEntityRefHandler(
 
       if (systemId) {
           Tcl_ListObjAppendElement(expat->interp, cmdPtr,
-              Tcl_NewStringObj((char *)systemId, strlen(systemId)));
+              Tcl_NewStringObj((char *)systemId, (domLength)strlen(systemId)));
       } else {
           Tcl_ListObjAppendElement(expat->interp, cmdPtr,
               Tcl_NewStringObj("", 0));
@@ -3512,7 +3593,7 @@ TclGenExpatExternalEntityRefHandler(
 
       if (publicId) {
           Tcl_ListObjAppendElement(expat->interp, cmdPtr,
-	      Tcl_NewStringObj((char *)publicId, strlen(publicId)));
+	      Tcl_NewStringObj((char *)publicId, (domLength)strlen(publicId)));
       } else {
           Tcl_ListObjAppendElement(expat->interp, cmdPtr,
 	      Tcl_NewStringObj("", 0));
@@ -3600,7 +3681,15 @@ TclGenExpatExternalEntityRefHandler(
       dataStr = Tcl_GetStringFromObj (dataObj, &tclLen);
       switch (inputType) {
       case EXPAT_INPUT_STRING:
-          result = XML_Parse (extparser, dataStr, tclLen, 1);
+          do {
+              done = (tclLen < TDOM_PCS);
+              result = XML_Parse(extparser, dataStr,
+                                 (int)(done ? tclLen : TDOM_PCS), done);
+              if (!done) {
+                  dataStr += TDOM_PCS;
+                  tclLen -= TDOM_PCS;
+              }
+          } while (!done && result == XML_STATUS_OK);
           break;
 
       case EXPAT_INPUT_CHANNEL:
@@ -3625,7 +3714,7 @@ TclGenExpatExternalEntityRefHandler(
           do {
               len = Tcl_Read (chan, buf, sizeof (buf));
               done = len < sizeof (buf);
-              result = XML_Parse (extparser, buf, len, done);
+              result = XML_Parse (extparser, buf, (int)len, done);
               if (result != XML_STATUS_OK) break;
           } while (!done);
           Tcl_UnregisterChannel (expat->interp, chan);
@@ -3646,7 +3735,7 @@ TclGenExpatExternalEntityRefHandler(
           }
           result = 1;
           for (;;) {
-              int nread;
+              size_t nread;
               char *fbuf = XML_GetBuffer (extparser, TDOM_EXPAT_READ_SIZE);
               if (!fbuf) {
                   close (fd);
@@ -3667,7 +3756,7 @@ TclGenExpatExternalEntityRefHandler(
                                          ERROR_IN_EXTREFHANDLER);
                   return 0;
               }
-              result = XML_ParseBuffer (extparser, nread, nread == 0);
+              result = XML_ParseBuffer (extparser, (int)nread, nread == 0);
               if (result != XML_STATUS_OK || !nread) {
                   close (fd);
                   break;
@@ -3679,12 +3768,14 @@ TclGenExpatExternalEntityRefHandler(
       Tcl_DecrRefCount (resultObj);
       if (!result) {
           Tcl_ResetResult (expat->interp);
-          sprintf(s, "%ld", XML_GetCurrentLineNumber(extparser));
+          sprintf(s, "%" TDOM_LS_MODIFIER "d",
+                  XML_GetCurrentLineNumber(extparser));
           Tcl_AppendResult(expat->interp, "Not wellformed error \"",
                            XML_ErrorString(XML_GetErrorCode(extparser)),
                            "\" while parsing external entity: \n\t",
                            systemId, "\nat line ", s, " character ", NULL);
-          sprintf(s, "%ld", XML_GetCurrentColumnNumber(extparser));
+          sprintf(s, "%" TDOM_LS_MODIFIER "d",
+                  XML_GetCurrentColumnNumber(extparser));
           Tcl_AppendResult(expat->interp, s, NULL);
           XML_ParserFree (extparser);
           expat->parser = oldparser;
@@ -3740,7 +3831,7 @@ TclGenExpatExternalEntityRefHandler(
   }
   Tcl_AppendResult (expat->interp, "The -externalentitycommand script has",
                     " to return a Tcl list with 3 elements.\n",
-                    "Synatx: {string|channel|filename <baseurl> <data>}\n",
+                    "Syntax: {string|channel|filename <baseurl> <data>}\n",
                     NULL);
   TclExpatHandlerResult (expat, activeTclHandlerSet,
                          ERROR_IN_EXTREFHANDLER);
@@ -3802,7 +3893,7 @@ TclGenExpatCommentHandler(
       Tcl_Preserve((ClientData) expat->interp);
 
       Tcl_ListObjAppendElement(expat->interp, cmdPtr,
-                               Tcl_NewStringObj((char *)data, strlen(data)));
+                               Tcl_NewStringObj((char *)data, (domLength)strlen(data)));
 
       result = Tcl_EvalObjEx(expat->interp, cmdPtr, 
                              TCL_EVAL_GLOBAL | TCL_EVAL_DIRECT);
@@ -4177,7 +4268,7 @@ TclGenExpatElementDeclHandler(
       cmdPtr = Tcl_DuplicateObj(activeTclHandlerSet->elementDeclCommand);
       Tcl_IncrRefCount(cmdPtr);
       Tcl_ListObjAppendElement(expat->interp, cmdPtr,
-                               Tcl_NewStringObj((char *)name, strlen(name)));
+                               Tcl_NewStringObj((char *)name, (domLength)strlen(name)));
 
 
       content = Tcl_NewListObj (0, NULL);
@@ -4266,18 +4357,18 @@ TclGenExpatAttlistDeclHandler(
       Tcl_Preserve((ClientData) expat->interp);
 
       Tcl_ListObjAppendElement(expat->interp, cmdPtr,
-                               Tcl_NewStringObj((char *)elname, strlen (elname)));
+                               Tcl_NewStringObj((char *)elname, (domLength)strlen (elname)));
       Tcl_ListObjAppendElement(expat->interp, cmdPtr,
-                               Tcl_NewStringObj((char *)name, strlen (name)));
+                               Tcl_NewStringObj((char *)name, (domLength)strlen (name)));
       Tcl_ListObjAppendElement(expat->interp, cmdPtr,
-                               Tcl_NewStringObj((char *)type, strlen (type)));
+                               Tcl_NewStringObj((char *)type, (domLength)strlen (type)));
       if (!dflt) {
           Tcl_ListObjAppendElement (expat->interp, cmdPtr,
                                     Tcl_NewStringObj ("", 0));
       }
       else {
           Tcl_ListObjAppendElement (expat->interp, cmdPtr,
-                                    Tcl_NewStringObj ((char*)dflt, strlen (dflt)));
+                                    Tcl_NewStringObj ((char*)dflt, (domLength)strlen (dflt)));
       }
       Tcl_ListObjAppendElement (expat->interp, cmdPtr,
                                 Tcl_NewIntObj (isrequired));
@@ -4363,17 +4454,17 @@ TclGenExpatStartDoctypeDeclHandler(
       Tcl_Preserve((ClientData) expat->interp);
 
       Tcl_ListObjAppendElement(expat->interp, cmdPtr,
-          Tcl_NewStringObj((char *)doctypeName, strlen(doctypeName)));
+          Tcl_NewStringObj((char *)doctypeName, (domLength)strlen(doctypeName)));
       if (sysid != NULL) {
           Tcl_ListObjAppendElement(expat->interp, cmdPtr,
-                               Tcl_NewStringObj((char *)sysid, strlen(sysid)));
+                               Tcl_NewStringObj((char *)sysid, (domLength)strlen(sysid)));
       } else {
           Tcl_ListObjAppendElement(expat->interp, cmdPtr,
                                Tcl_NewStringObj("NULL", 4));
       }
       if (pubid != NULL) {
           Tcl_ListObjAppendElement(expat->interp, cmdPtr,
-                               Tcl_NewStringObj((char *)pubid, strlen(sysid)));
+                               Tcl_NewStringObj((char *)pubid, (domLength)strlen(sysid)));
       } else {
           Tcl_ListObjAppendElement(expat->interp, cmdPtr,
                                Tcl_NewStringObj("NULL", 4));

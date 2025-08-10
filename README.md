@@ -1,10 +1,12 @@
 
 ## tDOM - a XML / DOM / XPath / XSLT / HTML / JSON implementation for Tcl
-### Version 0.9.3
+### Version 0.9.6
+
+tDOM 0.9.6 works with Tcl 8.5, 8.6 and 9.0.
 
 ### tDOM contains:
 
-   *  for convenience expat 2.2.9, the XML parser originated from
+   *  for convenience expat 2.6.3, the XML parser originated from
       James Clark, although you're able to link tDOM with other
       expat versions or the library provided by the system.
 
@@ -24,9 +26,9 @@
    
    *  optional DTD validation.
 
-   *  a rich and Tcl'ish language to describe structures and to
-      validate XML data or DOM trees or other forms of hierarchically
-      data with that.
+   *  a rich and Tcl'ish language to describe structures and text
+      content and to validate XML data or DOM trees or other forms of
+      hierarchically data with that.
    
    *  a JSON parser which parses any possible JSON input into a DOM
       tree without losing information.
@@ -63,13 +65,15 @@ which you get as
 [tarball](http://tdom.org/index.html/tarball/trunk/tdom-trunk.tar.gz)
 or as [zip archive](http://tdom.org/index.html/zip/trunk/tdom-trunk.zip)
 
-The latest release is 0.9.2. Get the source code as
-[tarball](http://tdom.org/downloads/tdom-0.9.2-src.tgz) or
-as [zip archive](http://tdom.org/downloads/tdom-0.9.2-src.zip).
+The latest release is 0.9.6. Get the source code as
+[tarball](http://tdom.org/downloads/tdom-0.9.6-src.tgz) or
+as [zip archive](http://tdom.org/downloads/tdom-0.9.6-src.zip).
 
-Windows binaries of the 0.9.2 release are also available. Get it for
-[64 bit](http://tdom.org/downloads/tdom-0.9.2-windows-x64.zip) or [32
-bit](http://tdom.org/downloads/tdom-0.9.2-windows-x86.zip).
+Windows binaries of the 0.9.6 release are also available. Get it for
+[64 bit](http://tdom.org/downloads/tdom-0.9.6-windows-64.zip) or
+[32_bit](http://tdom.org/downloads/tdom-0.9.6-windows-32.zip). The zip
+archives include binaries for tDOM and the tDOM extension tnc for Tcl
+8.6 and Tcl 9.
 
 The provided windows binaries include (statically linked) the
 HTML5 parser.
@@ -117,7 +121,7 @@ individual login write Rolf a mail.
 tDOM was started by Jochen Loewer (loewerj@hotmail.com) and
 developed by Jochen and Rolf Ade (rolf@pointsman.de) with
 contributions by Zoran Vasiljevic (zv@archiware.com). Since more
-than a dozen years it is maintained and developed by Rolf Ade.
+than two decades it is maintained and developed by Rolf Ade.
 
 
 ### ... ahh, Licensing!!

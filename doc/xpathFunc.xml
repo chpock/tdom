@@ -1,0 +1,239 @@
+<manpage id="xpathFunc" title="xpathFunc" cat="misc">
+  <namesection>
+    <name>::dom::xpathFunc</name>
+    <desc>Scripted XPath functions</desc>
+  </namesection>
+
+  <synopsis>
+    <syntax>::dom::xpathFunc::<m>funcName</m> <m>ctxNode</m> <m>pos</m> <m>nodeListType</m> <m>nodeList</m> ?<m>type arg type arg...</m>?
+::dom::xpathFunc::<m>namespaceURL</m>::<m>funcName</m> <m>ctxNode</m> <m>pos</m> <m>nodeListType</m> <m>nodeList</m> ?<m>type arg type arg...</m>?</syntax>
+  </synopsis>
+
+  <section>
+    <title>DESCRIPTION</title>
+    <p>
+      tDOM's XPath engine supports custom XPath functions implemented by Tcl
+      commands. When it encounters a function call to an unknown function name
+      without a namespace qualifier, the XPath engine looks for a Tcl command of
+      the same name in the <l>::dom::xpathFunc</l> namespace. If it encounters
+      an unknown namespace-qualified function call, it looks for a Tcl namespace
+      with a name equal to the function's full namespace URI inside
+      <l>::dom::xpathFunc</l>, and a Tcl command named for the local part of the
+      function's name inside that namespace. If it finds such a Tcl command, it
+      is executed with at least the following arguments, to describe the current
+      XPath context:
+    </p>
+
+    <dl>
+      <dle>
+        <dt>ctxNode</dt>
+        <dd>The <l>domNode</l> object command of the XPath context node.</dd>
+      </dle>
+      <dle>
+        <dt>pos</dt>
+        <dd>
+          The XPath context position, in zero-based form - that is, the return
+          value of the standard XPath <l>position()</l> function in the context
+          would be <l>$pos - 1</l>.
+        </dd>
+      </dle>
+      <dle>
+        <dt>nodeListType</dt>
+        <dd>
+          The type name for <m>nodeList</m>, as for the
+          <method>selectNodes</method> method's <m>typeVar</m>.
+        </dd>
+      </dle>
+      <dle>
+        <dt>nodeList</dt>
+        <dd>
+          The list of the current worked on XPath step result (as <method>selectNodes</method> would return
+          them) in document order. <m>ctxNode</m> will be equal to <l>[lindex $nodeList $pos]</l>.
+        </dd>
+      </dle>
+    </dl>
+
+    <p>
+      If the function call includes any arguments, two arguments will be
+      appended to the command's argument list for each one:
+    </p>
+    <dl>
+      <dle>
+        <dt>type</dt>
+        <dd>
+          The argument's type name, as for <method>selectNodes</method>'s
+          <m>typeVar</m>.
+        </dd>
+      </dle>
+      <dle>
+        <dt>val</dt>
+        <dd>
+          The argument's value, as <method>selectNodes</method> would return
+          it in an XPath expression's result set.
+        </dd>
+      </dle>
+    </dl>
+
+    <p>
+      The command is required to return a 1- or 2-element Tcl list to provide
+      the result of the XPath function call. If the result list has two
+      elements, the first is the result's XPath type name, and the second is an
+      appropriately encoded value (note that the <m>attrnodes</m> type name is
+      not supported):
+    </p>
+    <dl>
+      <dle>
+        <dt>bool</dt>
+        <dd>Tcl boolean value acceptable to <fun>Tcl_GetBooleanFromObj</fun>.</dd>
+      </dle>
+      <dle>
+        <dt>number</dt>
+        <dd>
+          Tcl numeric value acceptable to <fun>Tcl_GetSizeIntFromObj</fun> or
+          <fun>Tcl_GetDoubleFromObj</fun>.
+        </dd>
+      </dle>
+      <dle>
+        <dt>string</dt><dd>Simple string.</dd>
+      </dle>
+      <dle>
+        <dt>nodes</dt><dd>Tcl list of <l>domNode</l> object commands.</dd>
+      </dle>
+      <dle>
+        <dt>attrvalues</dt><dd>Alias for <m>string</m>.</dd>
+      </dle>
+    </dl>
+    <p>
+      If the result list has only one element, it is treated as a simple string.
+      It is an error for the result to have zero elements, more than two
+      elements, or to be invalid as a Tcl list, and it is an error if the
+      <m>val</m> of a two-part result does not match the requirements described
+      above for its <m>type</m>.
+    </p>
+  </section>
+
+  <section>
+    <title>EXAMPLES</title>
+    <p>
+      A simple workalike for the XPath 2/3 <l>fn:matches()</l> function, not
+      otherwise available in an XPath 1.0 engine such as tDOM's:
+    </p>
+    <example>proc ::dom::xpathFunc::regmatch {
+    ctxNode pos nodeListType nodeList
+    inputType inputVal patternType patternVal
+} {
+    set input [::dom::xpathFuncHelper::coerce2string $inputType $inputVal]
+    set pattern [::dom::xpathFuncHelper::coerce2string $patternType $patternVal]
+    return [list bool [regexp -- $pattern $input]]
+}</example>
+  </section>
+
+  <section>
+    <title>HELPER PROCS</title>
+    <p>
+      The <l>::dom::xpathFuncHelper</l> namespace contains helper procs for the
+      convenience of scripted XPath functions:
+    </p>
+
+    <commandlist>
+      <commanddef>
+        <command>coerce2number <m>type</m> <m>val</m></command>
+        <desc>
+          Given a <m>type</m> and <m>val</m> as provided to scripted XPath
+          functions in their argument lists, convert the <m>val</m> to a number in a
+          manner appropriate for its <m>type</m>:
+          <dl>
+            <dle>
+              <dt>empty</dt><dd>Always zero.</dd>
+            </dle>
+            <dle>
+              <dt>number</dt><dd>Unchanged.</dd>
+            </dle>
+            <dle>
+              <dt>string</dt>
+              <dd>
+                Unchanged. (Note that no error is raised if <m>val</m> is not
+                numeric.)
+              </dd>
+            </dle>
+            <dle>
+              <dt>attrvalues</dt><dd><m>value</m>'s first element.</dd>
+            </dle>
+            <dle>
+              <dt>nodes</dt>
+              <dd>
+                The result of the <l>number()</l> XPath function called on the
+                first node in the list.
+              </dd>
+            </dle>
+            <dle>
+              <dt>attrnodes</dt>
+              <dd>
+                The value of the single attribute assumed to be in <m>value</m>.
+                Note that no error is raised if this value is non-numeric.
+              </dd>
+            </dle>
+          </dl>
+        </desc>
+      </commanddef>
+      <commanddef>
+        <command>coerce2string <m>type</m> <m>val</m></command>
+        <desc>
+          As for <l>coerce2number</l>, but convert <m>val</m> to a
+          pure string:
+          <dl>
+            <dle>
+              <dt>empty</dt><dd>The empty string.</dd>
+            </dle>
+            <dle>
+              <dt>number</dt><dd>Unchanged.</dd>
+            </dle>
+            <dle>
+              <dt>string</dt><dd>Unchanged.</dd>
+            </dle>
+            <dle>
+              <dt>attrvalues</dt><dd><m>value</m>'s first element.</dd>
+            </dle>
+            <dle>
+              <dt>nodes</dt>
+              <dd>
+                The result of the <l>string()</l> XPath function called on the
+                first node in the list.
+              </dd>
+            </dle>
+            <dle>
+              <dt>attrnodes</dt>
+              <dd>
+                The value of the single attribute assumed to be in <m>value</m>.
+              </dd>
+            </dle>
+          </dl>
+        </desc>
+      </commanddef>
+    </commandlist>
+  </section>
+  
+  <section>
+    <title>LIMITS</title>
+    <p>
+      Custom XPath function names are limited to 200 characters,
+      including any namespace URI and the <l>::</l> Tcl namespace
+      separator between it and the local part. Function calls may have
+      a maximum of 22 arguments (the argument values itself may be
+      large nodesets). If you really need more this limits may be
+      adjusted by build time defines. Tcl commands created with the
+      deprecated <fun>Tcl_CreateCommand</fun> interface cannot be used
+      as scripted XPath functions.
+    </p>
+    <p>You <l>must not</l> alter any of the DOM trees from which nodes are
+    provided to a scripted XPath function as argument (this is true
+    for the ctxNode argument as well as for the nodes in the nodeList
+    argument). Use them strictly read-only. Ignoring this advice may
+    have any unpredictable results including segmentation faults or
+    security problems. </p>
+  </section>
+
+  <keywords>
+    <keyword>XPath</keyword>
+  </keywords>
+</manpage>

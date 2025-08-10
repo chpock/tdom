@@ -6,18 +6,18 @@
 # RCS: @(#) $Id$
 #
 
-if {$tcl_version < 8.5} {
-    # We still support 8.4 to some degree
-    package require Tcl 8.4
-} else {
-    package require Tcl 8.4-
-}
-package require tcltest 2.2
+package require Tcl 8.5-
+package require tcltest 2.2-
 namespace import ::tcltest::*
 catch {tcltest::loadTestedCommands}
 
-if {[catch {package require -exact tdom 0.9.3}]} {
-    if {[catch {load [file join [file dir [info script]] ../unix/libtdom0.9.2.so]}]} {
+if {[catch {package require -exact tdom 0.9.6}]} {
+    if {[package vsatisfies [package provide Tcl] 9.0-]} {
+        set libname libtcl9tdom0.9.5[info sharedlibextension]
+    } else {
+        set libname libtdom0.9.5[info sharedlibextension]
+    }
+    if {[catch {load [file join [file dir [info script]] ../unix/$libname]}]} {
         error "Unable to load the appropriate tDOM version!"
     }
 }
@@ -25,3 +25,14 @@ if {[info commands ::tdom::xmlReadFile] == ""} {
     # tcldomsh without the script library. Source the lib.
     source [file join [file dir [info script]] ../lib tdom.tcl]
 }
+
+# Package internal test constraints
+if {[info procs ::tdom::extRefHandler] != ""} {
+    testConstraint need_uri 1
+}
+if {[package vsatisfies [package present Tcl] 9]} {
+    testConstraint Tcl9 1
+}
+testConstraint 64bit [expr {$tcl_platform(pointerSize) >= 8}]
+testConstraint groklargedata [dom featureinfo largedata]
+

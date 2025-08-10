@@ -24,7 +24,7 @@ typedef enum {
 #define JSON_FALSE 5
 #define JSON_STRING 6
 #define JSON_NUMBER 7
-
+#define JSON_BOOLEAN 8
 
 domDocument *
 JSON_Parse (
@@ -32,6 +32,24 @@ JSON_Parse (
     char *documentElement, /* name of the root element, may be NULL */
     int   maxnesting,
     char **errStr,
-    int  *byteIndex
+    domLength *byteIndex
     );
 
+domDocument *
+TypedList2DOM (
+    Tcl_Interp *interp,
+    Tcl_Obj *typedList
+    );
+
+int
+isJSONNumber (
+    char *num,
+    domLength numlen
+    );
+
+int
+jsonEscape (
+    Tcl_Interp *interp,
+    char *str, 
+    Tcl_DString *clearedstr,
+    int *changed);

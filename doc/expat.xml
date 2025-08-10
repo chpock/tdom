@@ -119,6 +119,45 @@ parser.</p></desc>
         </optdef>
 
         <optdef>
+          <optname>-fastcall</optname>
+          <optarg>boolean</optarg>
+
+          <desc><p>By default this option is 0 (off). If this option
+          is on then any handler installed by the options
+          <m>-elementstartcommand</m>, <m>-elementendcommand</m> and
+          <m>-characterdatacommand</m> from this moment on is
+          installed in a way that calling it has lesser overhead as
+          usual. This option may be switched between callback hander
+          (re-)installion as desired.</p>
+
+          <p>However this has some requirenments. The handler proc has
+          to be defined before used as callback. If it is not then
+          the callback is installed as ususal. And the handler proc
+          must not be removed or re-defined as long as it is used as
+          callback. If this is done the programm probably will crash
+          but also may execute arbitrary code.</p>
+
+          <p>The callback handler installed while this option is on
+          will not be traced by executing them. </p></desc>
+        </optdef>
+
+        <optdef>
+          <optname>-keepTextStart</optname>
+          <optarg>boolean</optarg>
+
+          <desc><p>By default this option is 0 (off). If this option
+          is on then the position information of the start of a text
+          or CDATA node is keeped over collecting the sometimes by
+          expat delivered cdata pieces. With this option on the
+          position information returned by the parser in a
+          -characterdatacommand proc will be correct, otherwise not.
+          Called in all other handler code the parser always return
+          the correct position results, no matter what value this
+          option have. It is off by default because it is rarely
+          needed and saves a few cpu cyles this way.</p></desc>
+        </optdef>
+        
+        <optdef>
           <optname>-elementstartcommand</optname>
           <optarg>script</optarg>
 
@@ -181,10 +220,9 @@ HandleEnd test
 the document, ie. text. The actual command consists of this option followed by
 one argument: the text.</p>
 
-<p>It is not guaranteed that character data will be passed to the application
-in a single call to this command. That is, the application should be prepared
-to receive multiple invocations of this callback with no intervening callbacks
-from other features.</p>
+<p>Other than with the C API of the expat parser it is guaranteed that
+character data will be passed to the application in a single call to
+this command.</p>
 
 <p>Example: </p>
 
@@ -580,8 +618,8 @@ default handler.</p>
 
         <optdef>
           <optname>-useForeignDTD</optname>
-          <optarg>&lt;boolen&gt;</optarg>
-          <desc>If &lt;boolen&gt; is true and the document does not have an
+          <optarg>&lt;boolean&gt;</optarg>
+          <desc>If &lt;boolean&gt; is true and the document does not have an
 external subset, the parser will call the -externalentitycommand script with
 empty values for the systemId and publicID arguments. This option must be set,
 before the first piece of data is parsed. Setting this option, after the
@@ -698,28 +736,44 @@ attributes list passed to the elementstartcommand.</p></desc>
                 <optname>-currentbytecount</optname>
 
                 <desc><p>Return the number of bytes in the current event.
-Returns 0 if the event is in an internal entity.</p></desc>
+                Returns 0 if the event is in an internal entity.</p>
+
+                <p>If you use this option consider if you may need the
+                parser option <m>-keepTextStart</m>.</p>
+                </desc>
               </optdef>
 
               <optdef>
                 <optname>-currentlinenumber</optname>
 
                 <desc><p> Returns the line number of the current parse
-location.</p></desc>
+                location.</p>
+
+                <p>If you use this option consider if you may need the
+                parser option <m>-keepTextStart</m>.</p>
+                </desc>
               </optdef>
 
               <optdef>
                 <optname>-currentcolumnnumber</optname>
 
-                <desc><p> Returns the column number of the current parse
-location.</p></desc>
+                <desc><p> Returns the column number of the current
+                parse location.</p>
+
+                <p>If you use this option consider if you may need the
+                parser option <m>-keepTextStart</m>.</p>
+                </desc>
               </optdef>
 
               <optdef>
                 <optname>-currentbyteindex</optname>
 
                 <desc><p> Returns the byte index of the current parse
-location.</p></desc>
+                location.</p>
+
+                <p>If you use this option consider if you may need the
+                parser option <m>-keepTextStart</m>.</p>
+                </desc>
               </optdef>
             </optlist>
 <p>Only one value may be requested at a time.</p>
@@ -750,7 +804,7 @@ the parser to be used and will raise an error in this case.</p></desc>
           <command><cmd>parser</cmd> <method>parsefile</method> <m>filename</m></command>
 
           <desc><p>Reads the XML data directly out of the file with the
-filename <m>filename</m> and parses that data. This is done with low level file
+filename <m>filename</m> and parses that data. This is done with low-level file
 operations. The XML data must be in US-ASCII, ISO-8859-1, UTF-8 or UTF-16
 encoding. If applicable, this is the fastest way, to parse XML data. This
 method cannot be used from within a callback (neither directly nor indirectly)
