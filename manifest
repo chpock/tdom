@@ -1,5 +1,5 @@
-C Merged\sfrom\strunk.
-D 2025-08-10T22:52:23.736
+C wip
+D 2025-08-15T15:43:14.022
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -19,7 +19,7 @@ F apps/validate.tcl 7c74bf0dd10843353a689d234147f484794333ea8ff75851673226048122
 F apps/walker.tcl 0a145c23c0bfe139e7615b67f3673ca7823fbb3eb9addea06b3cb53473ff3944
 F apps/xlink.xsd a0a645e68ffc743f8476de7d69a0d9e3fc77da99383651703d00fe620e35dc78
 F apps/xml.xsd 2d116a4bed570feb37ea5f0321b338c756222491b42f539b012edb2a617837a7
-F apps/xsd2schema.tcl 5c51459657cc39ac58021483d024ede9b09e87ea96dd42812b9ed2420f47e06e
+F apps/xsd2schema.tcl 6b3a981955a6c70e952db15bd9cfd3cdef4a644fa371fe075068c01bf845ef5f
 F apps/xslt.tcl 5e5b959e926828ae4e145b45678132ab624767f77f1362d125f32a2bdb88fb7d
 F configure b39a12e2c0a0caa1db28fc1250bfdab1a110ccaf5f95f9e9c2be7ed27c470127 x
 F configure.ac 3419719d2e64e4f38fcf362b98b02da874a4d27e25aa943a53b10a988aad2afe
@@ -122,7 +122,7 @@ F extensions/tdomhtml/win/makefile.vc a6ba491c8f63a88c607c443e7a80f1369cb3c40c
 F extensions/tnc/Makefile.in c7f74cda510a493a7c1539f1db9118be38b9482b57d4f9b51618c9aaf38c4a9a
 F extensions/tnc/aclocal.m4 4d6d980ca968b21ba6f8745304357edc44493e65
 F extensions/tnc/configure e4340f98323fdc8e4abba3bd37ea02405455aacc4c8bf8ffa7731e3399b79dbf x
-F extensions/tnc/configure.ac 4fd59a3f8af1b8ff8db46c2fb007e692e43a55088d00ad0b4d8b5328f8888d10 w extensions/tnc/configure.in
+F extensions/tnc/configure.ac 4fd59a3f8af1b8ff8db46c2fb007e692e43a55088d00ad0b4d8b5328f8888d10
 F extensions/tnc/install-sh bdd5e293591621ae60d9824d86a4b1c5f22c3d00 x
 F extensions/tnc/pkgIndex.tcl.in 5c4022af93826a1d4f13f6105e86600d20b914b8bc9a0f48c0d98b3108b00a06
 F extensions/tnc/test.tcl 545cdec17e6702cef9f79184fdf1ce0166b8c412
@@ -254,8 +254,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 6db85b4ea3279eada79436ce9e39abd2b3d617ad45aead6d571a2fc1d498524b 7de7413ea623bda05bd00c1f8e3afa1ebd34a8a47fa11517dcd40a53c8dae7b4
-R 6ba59788c1a374b80a2452f2ff97a5d4
+P 1fd55d51b50a77bc69eb2360ec8e9d31128b6bf42183b1d6ae93895f621bd3ca
+R ac0e75edbd10cd196d42c56c3d9832f7
 U rolf
-Z 8ae8e714451019d623f9f53453d1cc98
+Z 71f71cebc1c329e9cce3468b1b64d77e
 # Remove this line to create a well-formed Fossil manifest.

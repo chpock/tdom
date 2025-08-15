@@ -241,18 +241,20 @@ proc xsd::processNamespaces {} {
     set level 1
     set nr 1
     dict for {ns dummy} [dict get $xsddata namespace] {
-        if {$ns eq ""} {
-            dict set xsddata nsprefix $ns ""
+        if {[dict exists $xsddata nsprefix $ns]} {
+            sput "[dict get $xsddata nsprefix $ns] $ns"
         } else {
-            dict set xsddata nsprefix $ns "ns$nr"
-            sput "ns$nr $ns"
-            incr nr
+            if {$ns eq ""} {
+                dict set xsddata nsprefix $ns ""
+            } else {
+                dict set xsddata nsprefix $ns "ns$nr"
+                sput "ns$nr $ns"
+                incr nr
+            }
         }
     }
-    if {$nr > 1} {
-        append result "\}\n"
-        out
-    }
+    append result "\}\n"
+    out
     set level 0
 }
 
@@ -761,11 +763,11 @@ rproc xsd::group {node} {
     set ref [$node @ref ""]
     lassign [resolveFQ $ref $node] ns name
     if {$ns eq $targetNS} {
-        sput "ref ($name) [getQuant $node]"
+        sput "ref $name [getQuant $node]"
     } else {
         sput "namespace $ns \{"
         incr level
-        sput "ref ($name) [getQuant $node]"
+        sput "ref $name [getQuant $node]"
         incr level -1
         sput "\}"
     }
@@ -839,11 +841,17 @@ rproc xsd::elementWorker {node} {
 }
 
 rproc xsd::generateAttributes {_atts} {
+    variable targetNS
+    variable attributeFormDefault
     incr level
     dict for {ns nsattdata} $_atts {
         foreach name [dict keys $nsattdata] {
             if {$ns eq ""} {
-                set start "attribute $name [dict get $nsattdata $name quant]"
+                if {$attributeFormDefault} {
+                    set start "nsattribute $name [prefix $targetNS] [dict get $nsattdata $name quant]"
+                } else {
+                    set start "attribute $name [dict get $nsattdata $name quant]"
+                }
             } else {
                 set start "nsattribute $name $ns [dict get $nsattdata $name quant]"
             }
@@ -1037,8 +1045,10 @@ rproc xsd::extension {node} {
     foreach child [$xsd selectNodes xsd:*] {
         [$child localName] $child
     }
+    foreach child [$node selectNodes xsd:*] {
+        [$child localName] $child
+    }
     set currentBase $savedCurrentBase
-    sputce "extension not implemented"
 }
 
 rproc xsd::key {node} {
@@ -1230,7 +1240,7 @@ proc xsd::processGlobalGroup {} {
         if {![dict exists $nsdata group]} continue
         dict for {group data} [dict get $nsdata group] {
             set xsd [dict get $data xsd]
-            set result "\ndefpattern ($group) [prefix $targetNS] \{\n"
+            set result "\ndefpattern $group [prefix $targetNS] \{\n"
             foreach child [$xsd selectNodes xsd:*] {
                 [$child localName] $child
             }
@@ -1312,12 +1322,23 @@ proc xsd::processGlobalElements {} {
     }
 }
 
+proc xsd::nspreset {prefixns} {
+    variable xsddata
+    
+    foreach {prefix ns} $prefixns {
+        dict set xsddata nsprefix $ns $prefix
+    }
+}
+
 proc xsd::generateSchema {file} {
     variable level 0
     variable targetNS ""
+    variable attributeFormDefault
+    variable elementFormDefault
     variable mainTargetNS ""
     variable basedir
-    variable xsddata  [dict create]
+    variable xsddata
+#    variable xsddata  [dict create]
     variable output
     variable schema ""
     variable currentBase ""
@@ -1335,7 +1356,13 @@ proc xsd::generateSchema {file} {
     }
     set xsd [$xsddoc documentElement]
     set targetNS [$xsd @targetNamespace ""]
-    set mainTargetNS $targetNS
+    foreach var {elementFormDefault attributeFormDefault} {
+        set $var 0
+        if {[$xsd @$var ""] eq "qualified"} {
+            set $var 1
+        }
+    }
+2    set mainTargetNS $targetNS
     
     xsd::prolog
     xsd::processToplevel $xsd
@@ -1370,11 +1397,28 @@ foreach {namespace localCopy} {
 
 set xsd::standalone 0
 if {[info exists argv0] && [file tail [info script]] eq [file tail $argv0]} {
-    if {$argc != 1} {
-        puts stderr "Usage: $argv0 <xsd-file>"
+    if {$argc < 1 && $argc > 2} {
+        puts stderr "Usage: $argv0 ?prefixns? <xsd-file>"
         exit 1
     }
+    set xsdind 0
+    set xsd::xsddata [dict create]
+    if {$argc == 2} {
+        if {[llength [lindex $argv 0]] % 2 == 0} {
+            xsd::nspreset [lindex $argv 0]
+        } else {
+            if {[catch {
+                set fd [open [lindex $argv 0]]
+                xsd::nspreset [read $fd]
+                close $fd
+            }]} {
+                error "The first argument is not a prefix namespace list nor a\
+                       a filename pointing to such a list."
+            }
+        }
+        set xsdind 1
+    }
     set ::xsd::output ""
-    xsd::generateSchema [lindex $argv 0]
+    xsd::generateSchema [lindex $argv $xsdind]
     set xsd::standalone 1
 } 
