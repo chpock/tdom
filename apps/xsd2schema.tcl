@@ -294,6 +294,13 @@ rproc xsd::import {import} {
         }
         set xsd [$xsddoc documentElement]
         set targetNS [$xsd @targetNamespace ""]
+        foreach var {elementFormDefault attributeFormDefault} {
+            set $var 0
+            if {[$xsd @$var ""] eq "qualified"} {
+                set $var 1
+            }
+            dict set xsddata $var $targetNS [set $var]
+        }
         processToplevel $xsd
     } on error errMsg {
         sputce "Can't access\n[$import asXML]$errMsg"
@@ -725,13 +732,16 @@ rproc xsd::sequence {node} {
     set insideChoice 0
     if {[[$node parentNode] localName] eq "choice"} {
         set insideChoice 1
+    }
+    set quant [getQuant $node]
+    if {$insideChoice || $quant ne "!"} {
         sput "group [getQuant $node] \{"
         incr level
     }
     foreach child [$node selectNodes xsd:*] {
         [$child localName] $child
     }
-    if {$insideChoice} {
+    if {$insideChoice || $quant ne "!"} {
         sput "\}"
         incr level -1
     }
@@ -841,13 +851,13 @@ rproc xsd::elementWorker {node} {
 }
 
 rproc xsd::generateAttributes {_atts} {
+    variable xsddata
     variable targetNS
-    variable attributeFormDefault
     incr level
     dict for {ns nsattdata} $_atts {
         foreach name [dict keys $nsattdata] {
             if {$ns eq ""} {
-                if {$attributeFormDefault} {
+                if {[dict get $xsddata attributeFormDefault $targetNS]} {
                     set start "nsattribute $name [prefix $targetNS] [dict get $nsattdata $name quant]"
                 } else {
                     set start "attribute $name [dict get $nsattdata $name quant]"
@@ -1333,12 +1343,9 @@ proc xsd::nspreset {prefixns} {
 proc xsd::generateSchema {file} {
     variable level 0
     variable targetNS ""
-    variable attributeFormDefault
-    variable elementFormDefault
     variable mainTargetNS ""
     variable basedir
     variable xsddata
-#    variable xsddata  [dict create]
     variable output
     variable schema ""
     variable currentBase ""
@@ -1361,16 +1368,17 @@ proc xsd::generateSchema {file} {
         if {[$xsd @$var ""] eq "qualified"} {
             set $var 1
         }
+        dict set xsddata $var $targetNS [set $var]
     }
-2    set mainTargetNS $targetNS
+    set mainTargetNS $targetNS
     
     xsd::prolog
     xsd::processToplevel $xsd
     if {[dict exists $xsddata namespace]} {
         xsd::processNamespaces
         xsd::processGlobalSimpleTypes
-        xsd::processGlobalGroup
         xsd::processGlobalComplexTypes
+        xsd::processGlobalGroup
         xsd::processGlobalElements
     }
     foreach doc $schemadocs {
