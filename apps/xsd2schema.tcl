@@ -23,6 +23,7 @@ namespace eval xsd {
     variable xsd2schemaName [dict create {*}{
         base64Binary base64
         decimal number
+        double "number tcl"
         ID id
         IDREF idref
         Name name
@@ -420,6 +421,7 @@ proc xsd::mapXsdTypeToSchema {type} {
     switch $type {
         "base64Binary" -
         "decimal" -
+        "double" -
         "ID" -
         "IDREF" -
         "Name" -
@@ -429,7 +431,6 @@ proc xsd::mapXsdTypeToSchema {type} {
             return [dict get $xsd2schemaName $type]
         }
         "anyURI" -
-        "double" -
         "ENTITIES" -
         "ENTITY" -
         "float" -
@@ -455,7 +456,6 @@ proc xsd::mapXsdTypeToSchema {type} {
         "byte" -
         "date" -
         "dateTime" -
-        "double" -
         "duration" -
         "hexBinary" -
         "int" -
@@ -490,6 +490,7 @@ rproc xsd::restriction {node} {
     variable xsddata
     variable targetNS
     variable currentBase
+    variable xsdBaseType ""
 
     set savedCurrentBase $currentBase
     set currentBase [$node @base $currentBase]
@@ -524,9 +525,14 @@ rproc xsd::restriction {node} {
                     set currentBase $savedCurrentBase
                     return
                 }
+                set xsdBaseType $type
                 set tdomtype [mapXsdTypeToSchema $type]
                 if {$tdomtype ne ""} {
                     sput $tdomtype
+                } else {
+                    if {$type ni {"string" "token" "normalizedString"}} {
+                        error "xsd simpleType '$type' not handled!"
+                    }
                 }
             } else {
                 # Derived from another simple Type
@@ -552,6 +558,7 @@ rproc xsd::restriction {node} {
     foreach child [$node selectNodes xsd:*] {
         [$child localName] $child
     }
+    set xsdBaseType ""
     set currentBase $savedCurrentBase
 }
 
@@ -565,12 +572,17 @@ rproc xsd::fractionDigits {node} {
 }
 
 rproc xsd::length {node} {
-    # TODO Special handling of xs:hexBinary and xs:base64Binary and
-    # list types.
+    variable xsdBaseType
+    
+    # TODO Special handling of list types.
     foreach child [$node selectNodes xsd:*] {
         [$child localName] $child
     }
-    sput "length [$node @value]"
+    if {$xsdBaseType in {hexBinary base64Binary}} {
+        sput "length [expr {[$node @value] * 2}]"
+    } else {
+        sput "length [$node @value]"
+    }
 }
 
 rproc xsd::maxExclusive {node} {
@@ -742,8 +754,8 @@ rproc xsd::sequence {node} {
         [$child localName] $child
     }
     if {$insideChoice || $quant ne "!"} {
-        sput "\}"
         incr level -1
+        sput "\}"
     }
 }
 
@@ -824,13 +836,21 @@ rproc xsd::elementWorker {node} {
             if {[dict exists $xsddata namespace $thisns complexType $type atts]} {
                 set atts [dict get $xsddata namespace $thisns complexType $type atts]
             }
+            set onlyAttributes 0
+            if {[dict exists $xsddata namespace $thisns complexType $type onlyAttributes]} {
+                set onlyAttributes [dict get $xsddata namespace $thisns complexType $type onlyAttributes]
+            }
             if {$thisns eq $targetNS} {
                 generateAttributes $atts
-                sput "ref $type"
+                if {!$onlyAttributes} {
+                    sput "ref $type"
+                }
             } else {
                 sput "namespace [prefix $thisns] \{"
                 generateAttributes $atts
-                sput "ref $type"
+                if {!$onlyAttributes} {
+                    sput "ref $type"
+                }
                 sput "\}"
             }
             return
@@ -1280,6 +1300,14 @@ proc xsd::processGlobalComplexTypes {} {
             set atts ""
             set result ""
             set xsd [dict get $ctdata xsd]
+            if {![dict exists $ctdata onlyAttributes]} {
+                if {[$xsd selectNodes {count(xsd:*[local-name() != 'attribute'
+                                                   and local-name() != 'attributeGroup'])}]} {
+                    dict set xsddata namespace $targetNS complexType $complexType onlyAttributes 0
+                } else {
+                    dict set xsddata namespace $targetNS complexType $complexType onlyAttributes 1
+                }
+            }
             foreach child [$xsd selectNodes xsd:*] {
                 [$child localName] $child
             }
@@ -1292,13 +1320,16 @@ proc xsd::processGlobalComplexTypes {} {
         if {![dict exists $nsdata complexType]} continue
         dict for {complexType ctdata} [dict get $nsdata complexType] {
             set atts ""
+            set result ""
             set xsd [dict get $ctdata xsd]
-            set result "defpattern $complexType [prefix $targetNS] \{\n"
-            foreach child [$xsd selectNodes xsd:*] {
-                [$child localName] $child
+            if {![dict get $ctdata onlyAttributes]} {
+                set result "defpattern $complexType [prefix $targetNS] \{\n"
+                foreach child [$xsd selectNodes xsd:*] {
+                    [$child localName] $child
+                }
+                append result "\}"
+                out
             }
-            append result "\}"
-            out
         }
     }
     incr level -1
