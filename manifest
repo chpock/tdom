@@ -1,5 +1,5 @@
-C Able\snow\sto\sgenerate\sa\suseful\stdom\sschema\sfile\sfrom\sthe\swml.xsd.
-D 2025-08-19T00:18:23.050
+C Fixed\sargument\scheck.\sMore\suser\sfriendly\serror\sin\scase\sof\sinvalid\sargument.
+D 2025-08-22T00:56:58.722
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -19,7 +19,7 @@ F apps/validate.tcl 7c74bf0dd10843353a689d234147f484794333ea8ff75851673226048122
 F apps/walker.tcl 0a145c23c0bfe139e7615b67f3673ca7823fbb3eb9addea06b3cb53473ff3944
 F apps/xlink.xsd a0a645e68ffc743f8476de7d69a0d9e3fc77da99383651703d00fe620e35dc78
 F apps/xml.xsd 2d116a4bed570feb37ea5f0321b338c756222491b42f539b012edb2a617837a7
-F apps/xsd2schema.tcl 09eeaef148754df694fd3b630c38b4d7e23a558138ff6235ac325b9f939b0eb7
+F apps/xsd2schema.tcl 6838371d9c97dbea137dfc755514a2cfed580970fee3a19a1348b5b7fc6b9d7c
 F apps/xslt.tcl 5e5b959e926828ae4e145b45678132ab624767f77f1362d125f32a2bdb88fb7d
 F configure b39a12e2c0a0caa1db28fc1250bfdab1a110ccaf5f95f9e9c2be7ed27c470127 x
 F configure.ac 3419719d2e64e4f38fcf362b98b02da874a4d27e25aa943a53b10a988aad2afe
@@ -254,8 +254,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P eff20697a40b9eeba55c70a81c3efe4e1c4c33a1090c5231a7701e15701b1649
-R 8749049665272ad0efa449f29d610f45
+P 94b6150ae17cdad45934ff40cc724443b4bf754a903f8d2adf3234729725eedd
+R 50bcb2ee2d5ce55ec1e81b9aeebbbf3c
 U rolf
-Z 10f5471be8b819bdeaf8dcf71c56161f
+Z fa9d085812d7c190f48827f92dc71a5c
 # Remove this line to create a well-formed Fossil manifest.

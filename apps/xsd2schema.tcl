@@ -1387,7 +1387,11 @@ proc xsd::generateSchema {file} {
     variable nrLookAt 0
     
     set basedir [file dirname [file normalize [lindex $file 0]]]
-    set xsddoc [dom parse [xmlReadFile [lindex $file 0]]]
+    if {[catch {
+        set xsddoc [dom parse [xmlReadFile [lindex $file 0]]]
+    } errMsg]} {
+        return -code error "Cannot parse [lindex $file 0]: $errMsg"
+    }
     lappend schemadocs $xsddoc
     $xsddoc selectNodesNamespaces {
         xsd "http://www.w3.org/2001/XMLSchema"
@@ -1436,7 +1440,7 @@ foreach {namespace localCopy} {
 
 set xsd::standalone 0
 if {[info exists argv0] && [file tail [info script]] eq [file tail $argv0]} {
-    if {$argc < 1 && $argc > 2} {
+    if {$argc < 1 || $argc > 2} {
         puts stderr "Usage: $argv0 ?prefixns? <xsd-file>"
         exit 1
     }
