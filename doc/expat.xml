@@ -127,7 +127,7 @@ parser.</p></desc>
           <m>-elementstartcommand</m>, <m>-elementendcommand</m> and
           <m>-characterdatacommand</m> from this moment on is
           installed in a way that calling it has lesser overhead as
-          usual. This option may be switched between callback hander
+          usual. This option may be switched between callback handler
           (re-)installion as desired.</p>
 
           <p>However this has some requirenments. The handler proc has

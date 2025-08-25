@@ -1,5 +1,5 @@
-C Fixed\sdocumentation\sspelling\serrors\sreported\sby\sHector\sRomojaro\sand\sa\sbit\swording\simprovement.
-D 2025-08-25T15:50:44.816
+C One\smore\sspelling\serror\scorrected.
+D 2025-08-25T20:08:04.870
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -28,9 +28,9 @@ F doc/domDoc.xml 77a7814cb0ae530e6c4ff06ad1a6f6ff75821faa3b9189f6541aeafbe5e078a
 F doc/domNode.html a0b16ba8f6aceeaf35f5f66109cd753cac430aeb72aa1249dd6d7a5568126d14
 F doc/domNode.n a179fc0819ae012a6d4a3005de8164490edb0e0f6c7b5b5e5cc2164d33ba6ea1
 F doc/domNode.xml 800e4a95f2d41c55da096b72c84d3659b7fd4a7d73e9903707c03e0c236eea73
-F doc/expat.html ca8c2e9ea97e91d9edd7a1683486beb04f5b12d6484ae1d2d81530ac9aa3d8c8
-F doc/expat.n 2bccef085eb9cefcfbe3ffa4d681d0861062917a7944d688ce6af057e448a18d
-F doc/expat.xml 999a36e4e210acfe46f7d114b6414206bc9b5e01ba144089158803d57295f6d7
+F doc/expat.html 75f6973528a77320f48118905478cc3bd6a7bec40b0ec96fa9e71bed7d583575
+F doc/expat.n 244ed763d5947f4c4fea5d8944bf4d7309159b60e4182fd495c9c655ba8341a7
+F doc/expat.xml 8a1f9e45531e1f549520ee05dc0fc368cbf4b45edeedf6ab495ce4f889e7b224
 F doc/expatapi.html 7b3467af8fb48953e2474209ba25218b221e559cb3b1273a58ffc683d0068e53
 F doc/expatapi.n 593e3175e9e797498c597b11eafc34327f00a1f6790fddbe9d2f1046c658d722
 F doc/expatapi.xml 167fca5f81a6eea40a63384c7264288358e5b67ab7d8196711f9649f8c335523
@@ -247,8 +247,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 7de7413ea623bda05bd00c1f8e3afa1ebd34a8a47fa11517dcd40a53c8dae7b4
-R bfce8a157c6d577bdf18068542fa8f77
+P a073a834c4c79c3543765f27c4eee977f70541b731f1798b76160860ec8d7ef5
+R 68729ea2a144665cdcb1cd14a2b093bb
 U rolf
-Z a62f88da442e32088b50379197938506
+Z 7188893948fc4d66a569436777f5daeb
 # Remove this line to create a well-formed Fossil manifest.
