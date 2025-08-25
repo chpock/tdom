@@ -134,7 +134,7 @@ parser.</p></desc>
           to be defined before used as callback. If it is not then
           the callback is installed as ususal. And the handler proc
           must not be removed or re-defined as long as it is used as
-          callback. If this is done the programm probably will crash
+          callback. If this is done the program probably will crash
           but also may execute arbitrary code.</p>
 
           <p>The callback handler installed while this option is on

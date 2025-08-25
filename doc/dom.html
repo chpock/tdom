@@ -4,17 +4,17 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x5574a6bea5b0">NAME</a> · <a href="#SECTid0x5574a6c256c0">SYNOPSIS</a> · <a href="#SECTid0x5574a6cfa010">DESCRIPTION </a> · <a href="#SECTid0x5574a6d668d0">KEYWORDS</a>
+<a href="#SECTid0x55f14dc6f1c0">NAME</a> · <a href="#SECTid0x55f14dc5fca0">SYNOPSIS</a> · <a href="#SECTid0x55f14dc66f00">DESCRIPTION </a> · <a href="#SECTid0x55f14dc8ba10">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x5574a6bea5b0">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x55f14dc6f1c0">NAME</a></h2><p class="namesection">
 <b class="names">dom - </b><br>Create an in-memory DOM tree from XML</p>
   
-  <h2><a name="SECTid0x5574a6c256c0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x55f14dc5fca0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">dom</b> <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
 
-  <h2><a name="SECTid0x5574a6cfa010">DESCRIPTION </a></h2><p>This command provides the creation of DOM trees in memory. In
+  <h2><a name="SECTid0x55f14dc66f00">DESCRIPTION </a></h2><p>This command provides the creation of DOM trees in memory. In
 the usual case a string containing a XML information is parsed and converted
 into a DOM tree. Other possible parse input may be HTML or JSON.
 The <i class="m">method</i> indicates a specific subcommand. </p><p>The valid methods are:</p><dl class="commandlist">
@@ -531,9 +531,9 @@ must be given.</p>
 
 <p>If the json type of the created text node is the virtual type
 BOOLEAN then if the text value is a boolean as recognized by
-Tcl_GetBooleanFromObj() the json value will according and if the text
-node value is not a boolean value understood by Tcl the value will be
-writen as json string.</p>
+Tcl_GetBooleanFromObj() the json value will be the according JSON
+boolean value. If the text node value is not a boolean value
+understood by Tcl the value will be written as json string.</p>
 
 <p>If the optional flag <i class="m">-disableOutputEscaping</i> is given, the
 escaping of the ampersand character (&amp;) and the left angle bracket (&lt;)
@@ -868,7 +868,7 @@ recommendation. Otherwise it returns 0.</dd>
         
     </dl>
 
-<h2><a name="SECTid0x5574a6d668d0">KEYWORDS</a></h2><p class="keywords">
+<h2><a name="SECTid0x55f14dc8ba10">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-XML">XML</a>, <a class="keyword" href="keyword-index.html#KW-DOM">DOM</a>, <a class="keyword" href="keyword-index.html#KW-document">document</a>, <a class="keyword" href="keyword-index.html#KW-node">node</a>, <a class="keyword" href="keyword-index.html#KW-parsing">parsing</a>
 </p>
 </div><hr class="navsep"><div class="navbar" align="center">
