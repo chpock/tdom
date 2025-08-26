@@ -512,9 +512,9 @@ must be given.</p>
 
 <p>If the json type of the created text node is the virtual type
 BOOLEAN then if the text value is a boolean as recognized by
-Tcl_GetBooleanFromObj() the json value will according and if the text
-node value is not a boolean value understood by Tcl the value will be
-writen as json string.</p>
+Tcl_GetBooleanFromObj() the json value will be the according JSON
+boolean value. If the text node value is not a boolean value
+understood by Tcl the value will be written as json string.</p>
 
 <p>If the optional flag <m>-disableOutputEscaping</m> is given, the
 escaping of the ampersand character (&amp;) and the left angle bracket (&lt;)
