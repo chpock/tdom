@@ -1,4 +1,4 @@
-# Simple converter from (sane) xsd to tdom schema.
+## Simple converter from (sane) xsd to tdom schema.
 #
 # BEWARE: Within the xsd namespace in this code there is a 'list'
 # procedure. Refer to the core [list] command by ::list within code
@@ -12,7 +12,7 @@ if {[info commands ::tdom::xmlReadFile] == ""} {
 namespace import tdom::*
 
 namespace eval xsd {
-    variable indent 2
+    variable indent 4
     variable level 0
     variable xsddata
     variable basedir
@@ -107,10 +107,6 @@ proc rproc {name args body} {
 
 rproc xsd::sput {text} {
     append result "[indent]$text\n"
-}
-
-rproc xsd::sputnnl {text} {
-    append result "[indent]$text"
 }
 
 rproc xsd::sputc {text} {
@@ -775,7 +771,7 @@ rproc xsd::all {node} {
     foreach child [$node selectNodes xsd:*] {
         [$child localName] $child
     }
-    incr level
+    incr level -1
     sput "\}"
 }
 
@@ -813,7 +809,7 @@ rproc xsd::elementWorker {node} {
         if {$thisns eq "http://www.w3.org/2001/XMLSchema"} {
             set texttypecode [mapXsdTypeToSchema $type]
             if {$texttypecode eq ""} {
-                append result "text\n"
+                sput "text"
             } elseif {[string first " " $texttypecode] > -1} {
                 sput "text \{$texttypecode\}"
             } else {
@@ -873,7 +869,7 @@ rproc xsd::elementWorker {node} {
 rproc xsd::generateAttributes {_atts} {
     variable xsddata
     variable targetNS
-    incr level
+    #incr level
     dict for {ns nsattdata} $_atts {
         foreach name [dict keys $nsattdata] {
             if {$ns eq ""} {
@@ -886,14 +882,14 @@ rproc xsd::generateAttributes {_atts} {
                 set start "nsattribute $name $ns [dict get $nsattdata $name quant]"
             }
             set content \
-                [split [string trim [dict get $nsattdata $name content]] "\n"]
+                [split [dict get $nsattdata $name content] "\n"]
             if {[llength $content] > 1} {
                 sput "$start \{"
-                incr level
+                #incr level
                 foreach line $content {
                     sput $line
                 }
-                incr level -1
+                #incr level -1
                 sput "\}"
             } else {
                 set thiscontent [lindex $content 0]
@@ -905,7 +901,7 @@ rproc xsd::generateAttributes {_atts} {
             }
         }
     }
-    incr level -1
+    #incr level -1
 }
 
 rproc xsd::element {node} {
@@ -927,23 +923,31 @@ rproc xsd::element {node} {
         return
     }
     saveReset result atts
-    #sputnnl "element [$node @name] [getQuant $node] "
+    incr level
     elementWorker $node
+    incr level -1
     restoreSaved 1
     if {$_result eq ""} {
         if {$_atts eq ""} {
             sput "element [$node @name] [getQuant $node]"
         } else {
             sput "element [$node @name] [getQuant $node] \{"
+            saveReset result
             generateAttributes $_atts
+            restoreSaved 1
+            append result $_result
             sput "\}"
         }
     } else {
         sput "element [$node @name] [getQuant $node] \{"
-        generateAttributes $_atts
+        set savedcontent $_result
+        saveReset result
         incr level
-        sput $_result
+        generateAttributes $_atts
         incr level -1
+        restoreSaved 1
+        append result $_result
+        append result $savedcontent
         sput "\}"
     }
 }
@@ -1341,14 +1345,15 @@ proc xsd::processGlobalElements {} {
     variable level
     variable atts
     
-    incr level
     dict for {targetNS nsdata} [dict get $xsddata namespace] {
         if {![dict exists $nsdata element]} continue
         dict for {element elmdata} [dict get $nsdata element] {
             set atts ""
             set xsd [dict get $elmdata xsd]
             set result ""
+            incr level
             elementWorker $xsd
+            incr level -1
             set storedContent $result
             set result "defelement $element "
             if {$targetNS ne ""} {
@@ -1357,8 +1362,8 @@ proc xsd::processGlobalElements {} {
             append result "\{\n"
             generateAttributes $atts
             append result $storedContent
-            append result "\}\n"
-            out 1
+            append result "\}"
+            out
         }
     }
 }
@@ -1385,7 +1390,7 @@ proc xsd::generateSchema {file} {
     variable schemadocs ""
     variable attgroupStack ""
     variable nrLookAt 0
-    
+
     set basedir [file dirname [file normalize [lindex $file 0]]]
     if {[catch {
         set xsddoc [dom parse [xmlReadFile [lindex $file 0]]]

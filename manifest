@@ -1,5 +1,5 @@
-C Merged\sfrom\strunk.
-D 2025-08-26T21:26:06.908
+C Changes\sto\smake\sthe\sgenerated\stdom\sschema\soutput\smore\spretty.\sStill\ssome\stweaks\sto\sdo.
+D 2025-08-28T13:10:20.580
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -19,7 +19,7 @@ F apps/validate.tcl 7c74bf0dd10843353a689d234147f484794333ea8ff75851673226048122
 F apps/walker.tcl 0a145c23c0bfe139e7615b67f3673ca7823fbb3eb9addea06b3cb53473ff3944
 F apps/xlink.xsd a0a645e68ffc743f8476de7d69a0d9e3fc77da99383651703d00fe620e35dc78
 F apps/xml.xsd 2d116a4bed570feb37ea5f0321b338c756222491b42f539b012edb2a617837a7
-F apps/xsd2schema.tcl 6838371d9c97dbea137dfc755514a2cfed580970fee3a19a1348b5b7fc6b9d7c
+F apps/xsd2schema.tcl f425b2bb837c1b48a40ba03f4d88d7d5b2479407513188d1199454a660319ca0
 F apps/xslt.tcl 5e5b959e926828ae4e145b45678132ab624767f77f1362d125f32a2bdb88fb7d
 F configure b39a12e2c0a0caa1db28fc1250bfdab1a110ccaf5f95f9e9c2be7ed27c470127 x
 F configure.ac 3419719d2e64e4f38fcf362b98b02da874a4d27e25aa943a53b10a988aad2afe
@@ -254,8 +254,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P d2d0e6fafbb4e3dd50cbb32b8613a4b8021bc5e65b30130102ea628330948ae6 12cb49f7596b74489f401badf03d3196a1096832e052366622b8c71e67acf6ab
-R 06bc77fc1e9b976efdb3c2512e9fe35f
+P fdcf197b2e43f89ac15c0403a58b59b79a9291ab87e705c8d353a5bfd57017c6
+R 23a767177a531df23b9d9da5378820bb
 U rolf
-Z 674bae8162ebd7ca52bc3661a00df0e0
+Z 6c10dbec87ec3d2e63d2fffcb469e4e8
 # Remove this line to create a well-formed Fossil manifest.
