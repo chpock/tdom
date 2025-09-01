@@ -4,7 +4,7 @@
 # procedure. Refer to the core [list] command by ::list within code
 # evaluated within the xsd namespace.
 
-package require tdom
+package require tdom 0.9.6
 if {[info commands ::tdom::xmlReadFile] == ""} {
     # tcldomsh without the script library. Source the lib.
     source [file join [file dir [info script]] ../lib tdom.tcl]
@@ -527,7 +527,7 @@ rproc xsd::restriction {node} {
                     sput $tdomtype
                 } else {
                     if {$type ni {"string" "token" "normalizedString"}} {
-                        error "xsd simpleType '$type' not handled!"
+                        sputce "xsd simpleType '$type' not handled!"
                     }
                 }
             } else {
@@ -1377,6 +1377,7 @@ proc xsd::nspreset {prefixns} {
 }
 
 proc xsd::generateSchema {file} {
+    variable standalone
     variable level 0
     variable targetNS ""
     variable mainTargetNS ""
@@ -1391,6 +1392,9 @@ proc xsd::generateSchema {file} {
     variable attgroupStack ""
     variable nrLookAt 0
 
+    if {!$standalone && [info exists xsddata]} {
+        unset xsddata
+    }
     set basedir [file dirname [file normalize [lindex $file 0]]]
     if {[catch {
         set xsddoc [dom parse [xmlReadFile [lindex $file 0]]]
