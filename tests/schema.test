@@ -28,7 +28,7 @@
 #    schema-25.*: domxpathboolean
 #    schema-26.*: info domNode
 #    schema-27.*: Text constraint commands available outsite schema context
-#    schema-28,*: tdom and interp
+#    schema-28.*: tdom and interp
 #    schema-29.*: text constrain jsontype
 #
 # Copyright (c) 2018-2022 Rolf Ade.
@@ -2622,6 +2622,28 @@ test schema-7.23a {Whitespace in implicit defined element} {
     s delete
     set result
 } {0}
+
+test schema-7.24 {N-M quants} {
+    tdom::schema s
+    s defelement doc {
+        element a {3 5}
+    }
+    set result [list]
+    foreach xml {
+        <doc></doc>
+        <doc><a/></doc>
+        <doc><a/><a/></doc>
+        <doc><a/><a/><a/></doc>
+        <doc><a/><a/><a/><a/></doc>
+        <doc><a/><a/><a/><a/><a/></doc>
+        <doc><a/><a/><a/><a/><a/><a/></doc>
+        <doc><a/><a/><a/><a/><a/><a/><a/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} {0 0 0 1 1 1 0 0}
 
 test schema-8.1 {validate method} {
     tdom::schema create grammar
