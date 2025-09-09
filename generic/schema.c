@@ -667,7 +667,6 @@ static void schemaInstanceDelete (
         freeSchemaCP (sdata->patternList[i]);
     }
     FREE (sdata->patternList);
-    FREE (sdata->quants);
     while (sdata->stack) {
         down = sdata->stack->down;
         if (sdata->stack->interleaveState)
