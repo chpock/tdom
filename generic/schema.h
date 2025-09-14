@@ -56,7 +56,6 @@ typedef enum {
   SCHEMA_CQUANT_REP,
   SCHEMA_CQUANT_PLUS,
   SCHEMA_CQUANT_NM,
-  SCHEMA_CQUANT_ERROR,
 } SchemaQuant;
 
 typedef enum {
@@ -124,6 +123,13 @@ typedef struct
     int unknownIDrefs;
 } SchemaKeySpace;
 
+typedef struct 
+{
+    SchemaQuant quant;
+    int         min;
+    int         max;
+} SchemaQuantNM;
+
 typedef struct SchemaCP
 {
     Schema_CP_Type    type;
@@ -133,7 +139,7 @@ typedef struct SchemaCP
     struct SchemaCP  *next;
     SchemaFlags       flags;
     struct SchemaCP **content;
-    SchemaQuant      *quants;
+    SchemaQuantNM    *quants;
     unsigned int      nc;
     void             *typedata;
     SchemaAttr      **attrs;
@@ -242,7 +248,7 @@ typedef struct SchemaData_
         sdata->cp->quants =                                             \
             REALLOC (sdata->cp->quants,                                 \
                      2 * sdata->contentSize                             \
-                     * sizeof (SchemaQuant));                           \
+                     * sizeof (SchemaQuantNM));                           \
         sdata->contentSize *= 2;                                        \
     }                                                                   \
     sdata->cp->content[sdata->cp->nc] = (SchemaCP *) sc;                \

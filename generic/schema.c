@@ -306,25 +306,47 @@ static const char *Schema_Quant_Type2str[] = {
         sdata->recoverFlags &= ~RECOVER_FLAG_REWIND;                    \
     }                                                                   \
 
+static TDOM_INLINE int 
+maxOne (
+    SchemaQuantNM quant
+    )
+{
+    return (quant.quant == SCHEMA_CQUANT_ONE
+            || quant.quant == SCHEMA_CQUANT_OPT) ? 1 : 0;
+}
 
-#define maxOne(quant) \
-    ((quant) == SCHEMA_CQUANT_ONE || (quant) == SCHEMA_CQUANT_OPT) ? 1 : 0
+static TDOM_INLINE int 
+minOne (
+    SchemaQuantNM quant
+    )
+{
+    return (quant.quant == SCHEMA_CQUANT_ONE
+            || quant.quant == SCHEMA_CQUANT_PLUS) ? 1 : 0;
+}
 
-#define minOne(quant) \
-    ((quant) == SCHEMA_CQUANT_ONE || (quant) == SCHEMA_CQUANT_PLUS) ? 1 : 0
+static TDOM_INLINE int 
+mayRepeat (
+    SchemaQuantNM quant
+    )
+{
+    return (quant.quant == SCHEMA_CQUANT_REP
+            || quant.quant == SCHEMA_CQUANT_PLUS) ? 1 : 0;
+}
 
-#define mayRepeat(quant) \
-    ((quant) == SCHEMA_CQUANT_REP || (quant) == SCHEMA_CQUANT_PLUS) ? 1 : 0
-
-#define mayMiss(quant) \
-    ((quant) == SCHEMA_CQUANT_REP || (quant) == SCHEMA_CQUANT_OPT) ? 1 : 0
+static TDOM_INLINE int 
+mayMiss (
+    SchemaQuantNM quant
+    )
+{
+    return (quant.quant == SCHEMA_CQUANT_REP
+            || quant.quant == SCHEMA_CQUANT_OPT) ? 1 : 0;
+}
 
 #define hasMatched(quant,hm) \
     (hm) == 0 ?  mayMiss(quant) :  1
 
 #define mustMatch(quant,hm) \
     (hm) == 0 ? minOne(quant) : 0
-
 
 #define getContext(cp, ac, hm)                    \
     cp = se->pattern;                             \
@@ -379,8 +401,8 @@ tDOM_initSchemaCP (
         pattern->content = (SchemaCP**) MALLOC (
             sizeof(SchemaCP*) * CONTENT_ARRAY_SIZE_INIT
             );
-        pattern->quants = (SchemaQuant*) MALLOC (
-            sizeof (SchemaQuant) * CONTENT_ARRAY_SIZE_INIT
+        pattern->quants = (SchemaQuantNM*) MALLOC (
+            sizeof (SchemaQuantNM) * CONTENT_ARRAY_SIZE_INIT
             );
         break;
     case SCHEMA_CTYPE_TEXT:
@@ -856,9 +878,7 @@ static void
 addToContent (
     SchemaData *sdata,
     SchemaCP *pattern,
-    SchemaQuant quant,
-    int n,
-    int m
+    SchemaQuantNM quant
     )
 {
     SchemaCP *wrapperCP;
@@ -880,12 +900,12 @@ addToContent (
             wrapperCP = initSchemaCP (SCHEMA_CTYPE_PATTERN, NULL, NULL);
             REMEMBER_PATTERN (wrapperCP);
             wrapperCP->content[0] = pattern;
-            wrapperCP->quants[0] = SCHEMA_CQUANT_ONE;
+            wrapperCP->quants[0].quant = SCHEMA_CQUANT_ONE;
             wrapperCP->nc = 1;
             pattern = wrapperCP;
         }
         if (sdata->cp->type == SCHEMA_CTYPE_CHOICE
-            && quant != SCHEMA_CQUANT_ONE) {
+            && quant.quant != SCHEMA_CQUANT_ONE) {
             wrapperCP = initSchemaCP (SCHEMA_CTYPE_PATTERN, NULL, NULL);
             REMEMBER_PATTERN (wrapperCP);
             if (sdata->cp->nc == sdata->contentSize) {
@@ -900,7 +920,7 @@ addToContent (
                 sdata->contentSize *= 2;
             }
             sdata->cp->content[sdata->cp->nc] = wrapperCP;
-            sdata->cp->quants[sdata->cp->nc] = SCHEMA_CQUANT_ONE;
+            sdata->cp->quants[sdata->cp->nc].quant = SCHEMA_CQUANT_ONE;
             sdata->cp->nc++;
             savedCP = sdata->cp;
             savedContenSize = sdata->contentSize;
@@ -908,52 +928,22 @@ addToContent (
             sdata->contentSize = CONTENT_ARRAY_SIZE_INIT;
         }
     }
-    if (quant == SCHEMA_CQUANT_NM) {
-        int i, newChilds, thisquant;
-        if (m == -1) {
-            m = n + 1;
-            newChilds = m;
-            thisquant = SCHEMA_CQUANT_REP;
-        } else {
-            newChilds = (n >= m) ? n : m;
-            thisquant = SCHEMA_CQUANT_OPT;
-        }
-        while (sdata->cp->nc + newChilds >= sdata->contentSize) {
-            sdata->cp->content =
-                REALLOC (sdata->cp->content,
-                         2 * sdata->contentSize
-                         * sizeof (SchemaCP*));
-            sdata->cp->quants =
-                REALLOC (sdata->cp->quants,
-                         2 * sdata->contentSize
-                         * sizeof (SchemaQuant));
-            sdata->contentSize *= 2;
-        }
-        for (i = 0; i < n; i++) {
-            sdata->cp->content[sdata->cp->nc+i] = pattern;
-            sdata->cp->quants[sdata->cp->nc+i] = SCHEMA_CQUANT_ONE;
-        }
-        for (i = n; i < m; i++) {
-            sdata->cp->content[sdata->cp->nc+i] = pattern;
-            sdata->cp->quants[sdata->cp->nc+i] = thisquant;
-        }
-        sdata->cp->nc = sdata->cp->nc + newChilds;
-    } else {
-        if (sdata->cp->nc == sdata->contentSize) {
-            sdata->cp->content =
-                REALLOC (sdata->cp->content,
-                         2 * sdata->contentSize
-                         * sizeof (SchemaCP*));
-            sdata->cp->quants =
-                REALLOC (sdata->cp->quants,
-                         2 * sdata->contentSize
-                         * sizeof (SchemaQuant));
-            sdata->contentSize *= 2;
-        }
-        sdata->cp->content[sdata->cp->nc] = pattern;
-        sdata->cp->quants[sdata->cp->nc] = quant;
-        sdata->cp->nc++;
+    if (sdata->cp->nc == sdata->contentSize) {
+        sdata->cp->content =
+            REALLOC (sdata->cp->content,
+                     2 * sdata->contentSize
+                     * sizeof (SchemaCP*));
+        sdata->cp->quants =
+            REALLOC (sdata->cp->quants,
+                     2 * sdata->contentSize
+                     * sizeof (SchemaQuantNM));
+        sdata->contentSize *= 2;
     }
+    sdata->cp->content[sdata->cp->nc] = pattern;
+    sdata->cp->quants[sdata->cp->nc].quant = quant.quant;
+    sdata->cp->quants[sdata->cp->nc].min = quant.min;
+    sdata->cp->quants[sdata->cp->nc].max = quant.max;
+    sdata->cp->nc++;
     if (savedCP) {
         sdata->cp = savedCP;
         sdata->contentSize = savedContenSize;
@@ -5880,94 +5870,110 @@ tDOM_SchemaObjCmd (
     return result;
 }
 
-static SchemaQuant
+static int
 getQuant (
     Tcl_Interp *interp,
     Tcl_Obj *quantObj,
-    int *n,
-    int *m
+    SchemaQuantNM *quant
     )
 {
     char *quantStr;
     domLength len;
     Tcl_Obj *thisObj;
+    int min, max;
 
-    *n = 0;
-    *m = 0;
+    min = 0;
+    max = 0;
     if (!quantObj) {
-        return SCHEMA_CQUANT_ONE;
+        quant->quant = SCHEMA_CQUANT_ONE;
+        return 1;
     }
     quantStr = Tcl_GetStringFromObj (quantObj, &len);
     if (len == 1) {
         switch (quantStr[0]) {
         case '!':
-            return SCHEMA_CQUANT_ONE;
+            quant->quant = SCHEMA_CQUANT_ONE;
+            return 1;
         case '*':
-            return SCHEMA_CQUANT_REP;
+            quant->quant = SCHEMA_CQUANT_REP;
+            return 1;
         case '?':
-            return SCHEMA_CQUANT_OPT;
+            quant->quant = SCHEMA_CQUANT_OPT;
+            return 1;
         case '+':
-            return SCHEMA_CQUANT_PLUS;
+            quant->quant = SCHEMA_CQUANT_PLUS;
+            return 1;
         }
     }
     if (Tcl_ListObjLength (interp, quantObj, &len) != TCL_OK) {
         SetResult ("Invalid quant specifier");
-        return SCHEMA_CQUANT_ERROR;
+        return 0;
     }
     if (len != 1 && len != 2) {
         SetResult ("Invalid quant specifier");
-        return SCHEMA_CQUANT_ERROR;
+        return 0;
     }
     if (len == 1) {
-        if (Tcl_GetIntFromObj (interp, quantObj, n) != TCL_OK) {
+        if (Tcl_GetIntFromObj (interp, quantObj, &min) != TCL_OK) {
             SetResult ("Invalid quant specifier");
-            return SCHEMA_CQUANT_ERROR;
+            return 0;
         }
-        if (*n < 1) {
+        if (min < 1) {
             SetResult ("Invalid quant specifier");
-            return SCHEMA_CQUANT_ERROR;
+            return 0;
         }
-        if (*n == 1) {
-            return SCHEMA_CQUANT_ONE;
-            *n = 0;
+        if (min == 1) {
+            quant->quant = SCHEMA_CQUANT_ONE;
+            return 1;
         }
-        return SCHEMA_CQUANT_NM;
+        quant->quant = SCHEMA_CQUANT_NM;
+        quant->min = min;
+        quant->max = min;
+        return 1;
     }
     /* The "list-ness" of the quantObj is already checked by the
      * Tcl_ListObjLength() call above, no need to check result. */
     Tcl_ListObjIndex (interp, quantObj, 0, &thisObj);
-    if (Tcl_GetIntFromObj (interp, thisObj, n) != TCL_OK) {
+    if (Tcl_GetIntFromObj (interp, thisObj, &min) != TCL_OK) {
         SetResult ("Invalid quant specifier");
-        return SCHEMA_CQUANT_ERROR;
+        return 0;
     }
-    if (*n < 0) {
+    if (min < 0) {
         SetResult ("Invalid quant specifier");
-        return SCHEMA_CQUANT_ERROR;
+        return 0;
     }
     Tcl_ListObjIndex (interp, quantObj, 1, &thisObj);
-    if (Tcl_GetIntFromObj (interp, thisObj, m) == TCL_OK) {
-        if (*n > *m) {
+    if (Tcl_GetIntFromObj (interp, thisObj, &max) == TCL_OK) {
+        if (min > max) {
             SetResult ("Invalid quant specifier");
-            return SCHEMA_CQUANT_ERROR;
+            return 0;
         }
-        if (*n == 0 && *m == 1) {
-            return SCHEMA_CQUANT_OPT;
+        if (min == 0 && max == 1) {
+            quant->quant = SCHEMA_CQUANT_OPT;
+            return 1;
         }
-        if (*n == 1 && *m == 1) {
-            return SCHEMA_CQUANT_ONE;
+        if (min == 1 && max == 1) {
+            quant->quant = SCHEMA_CQUANT_ONE;
+            return 1;
         }
-        return SCHEMA_CQUANT_NM;
+        quant->quant = SCHEMA_CQUANT_NM;
+        quant->min = min;
+        quant->max = max;
+        return 1;
     } else {
         quantStr = Tcl_GetStringFromObj (thisObj, &len);
         if (len == 1 && quantStr[0] == '*') {
-            if (*n == 0) {
-                return SCHEMA_CQUANT_REP;
+            if (min == 0) {
+                quant->quant = SCHEMA_CQUANT_REP;
+                return 1;
             }
-            *m = -1;
-            return SCHEMA_CQUANT_NM;
+            quant->quant = SCHEMA_CQUANT_NM;
+            quant->min = min;
+            quant->max = -1;
+            return 1;
         } else {
             SetResult ("Invalid quant specifier");
-            return SCHEMA_CQUANT_ERROR;
+            return 0;
         }
     }
 }
@@ -5983,9 +5989,9 @@ AnyPatternObjCmd (
 {
     SchemaData *sdata = GETASI;
     SchemaCP *pattern;
-    SchemaQuant quant;
+    SchemaQuantNM quant;
     char *ns = NULL, *ns1;
-    int n, m, hnew, revert, optionIndex;
+    int hnew, revert, optionIndex;
     domLength nrns, i;
     Tcl_Obj *nsObj;
     Tcl_HashTable *t = NULL;
@@ -6016,19 +6022,16 @@ AnyPatternObjCmd (
     }
     checkNrArgs (1,3,"(options? ?namespace list? ?quant?");
     
-    quant = SCHEMA_CQUANT_ONE;
+    quant.quant = SCHEMA_CQUANT_ONE;
     if (objc == 1) {
-        n = 0; m = 0;
         goto createpattern;
     } else if (objc == 2) {    
-        quant = getQuant (interp, objv[1], &n, &m);
-        if (quant != SCHEMA_CQUANT_ERROR) {
+        if (getQuant (interp, objv[1], &quant)) {
             goto createpattern;
         }
-        quant = SCHEMA_CQUANT_ONE;
+        quant.quant = SCHEMA_CQUANT_ONE;
     } else {
-        quant = getQuant (interp, objv[2], &n, &m);
-        if (quant == SCHEMA_CQUANT_ERROR) {
+        if (!getQuant (interp, objv[2], &quant)) {
             return TCL_ERROR;
         }
     }
@@ -6063,7 +6066,7 @@ createpattern:
     if (t) pattern->typedata = (void*)t;
     if (revert) pattern->flags |= ANY_NOT;
     REMEMBER_PATTERN (pattern)
-    addToContent(sdata, pattern, quant, n, m);
+    addToContent(sdata, pattern, quant);
     return TCL_OK;
 }
 
@@ -6073,9 +6076,7 @@ evalDefinition (
     SchemaData *sdata,
     Tcl_Obj *definition,
     SchemaCP *pattern,
-    SchemaQuant quant,
-    int n,
-    int m
+    SchemaQuantNM quant
     )
 {
     SchemaCP *savedCP;
@@ -6159,7 +6160,7 @@ evalDefinition (
             }
         }
     }
-    addToContent (sdata, pattern, quant, n, m);
+    addToContent (sdata, pattern, quant);
     return TCL_OK;
 }
 
@@ -6175,8 +6176,8 @@ ElementPatternObjCmd (
     SchemaData *sdata = GETASI;
     Tcl_HashEntry *h;
     SchemaCP *pattern = NULL, *typePattern = NULL, *current;
-    SchemaQuant quant;
-    int hnew, n, m, typed = 0, ind = 3, localdef = 0;
+    SchemaQuantNM quant;
+    int hnew, typed = 0, ind = 3, localdef = 0;
     char *namePtr;
 
     CHECK_SI
@@ -6184,15 +6185,14 @@ ElementPatternObjCmd (
     checkNrArgs (2,5,"Expected: elementName ?quant? ?(pattern|\"type\" "
                  "typename)?");
 
-    quant = getQuant (interp, objc == 2 ? NULL : objv[2], &n, &m);
-    if (quant == SCHEMA_CQUANT_ERROR) {
+    if (!getQuant (interp, objc == 2 ? NULL : objv[2], &quant)) {
         /* May be default quant with local definition or type. */
         if (objc != 3 && objc != 4) {
             SetResult("Expected: elementName ?quant? ?(pattern|\"type\" "
                       "typename)?");
             return TCL_ERROR;
         }
-        quant = SCHEMA_CQUANT_ONE;
+        quant.quant = SCHEMA_CQUANT_ONE;
         if (objc == 4) {
             /* Reference to type */
             typed = 1;
@@ -6209,7 +6209,7 @@ ElementPatternObjCmd (
         }
     }
     if (typed) {
-            if (strcmp (Tcl_GetString (objv[ind-1]), "type") != 0) {
+        if (strcmp (Tcl_GetString (objv[ind-1]), "type") != 0) {
             SetResult("Expected: elementName ?quant? ?(pattern|\"type\" "
                       "typename)?");
             return TCL_ERROR;
@@ -6313,12 +6313,12 @@ ElementPatternObjCmd (
             pattern->keySpace = typePattern->keySpace;
             /* TODO: decide what to do with associated */
         }
-        addToContent (sdata, pattern, quant, n, m);
+        addToContent (sdata, pattern, quant);
     } else if (localdef) {
         pattern = initSchemaCP (SCHEMA_CTYPE_NAME, sdata->currentNamespace,
                                 namePtr);
         pattern->flags |= LOCAL_DEFINED_ELEMENT;
-        return evalDefinition (interp, sdata, objv[ind], pattern, quant, n, m);
+        return evalDefinition (interp, sdata, objv[ind], pattern, quant);
     } else {
         /* Reference to an element. */
         if (!hnew) {
@@ -6342,7 +6342,7 @@ ElementPatternObjCmd (
                 Tcl_SetHashValue (h, pattern);
             }
         }
-        addToContent (sdata, pattern, quant, n, m);
+        addToContent (sdata, pattern, quant);
     }
     return TCL_OK;
 }
@@ -6360,16 +6360,15 @@ RefPatternObjCmd (
     SchemaData *sdata = GETASI;
     Tcl_HashEntry *h;
     SchemaCP *pattern = NULL, *current;
-    SchemaQuant quant;
-    int hnew, n, m;
+    SchemaQuantNM quant;
+    int hnew;
 
     CHECK_SI
     CHECK_TOPLEVEL
         
     checkNrArgs (2,3,"Expected: patternName ?quant?");
 
-    quant = getQuant (interp, objc == 2 ? NULL : objv[2], &n, &m);
-    if (quant == SCHEMA_CQUANT_ERROR) {
+    if (!getQuant (interp, objc == 2 ? NULL : objv[2], &quant)) {
         return TCL_ERROR;
     }
     h = Tcl_CreateHashEntry (&sdata->pattern, Tcl_GetString(objv[1]), &hnew);
@@ -6397,7 +6396,7 @@ RefPatternObjCmd (
         REMEMBER_PATTERN (pattern);
         Tcl_SetHashValue (h, pattern);
     }
-    addToContent (sdata, pattern, quant, n, m);
+    addToContent (sdata, pattern, quant);
     return TCL_OK;
 }
 
@@ -6413,16 +6412,14 @@ AnonPatternObjCmd (
 {
     SchemaData *sdata = GETASI;
     Schema_CP_Type patternType;
-    SchemaQuant quant;
+    SchemaQuantNM quant;
     SchemaCP *pattern;
-    int n, m;
 
     CHECK_SI
     CHECK_TOPLEVEL
     checkNrArgs (2,3,"Expected: ?quant? definition");
     
-    quant = getQuant (interp, objc == 2 ? NULL : objv[1], &n, &m);
-    if (quant == SCHEMA_CQUANT_ERROR) {
+    if (!getQuant (interp, objc == 2 ? NULL : objv[1], &quant)) {
         return TCL_ERROR;
     }
     if (clientData == 0) {
@@ -6431,7 +6428,7 @@ AnonPatternObjCmd (
         patternType = SCHEMA_CTYPE_CHOICE;
         /* Default quant for mixed is * */
         if (objc == 2) {
-            quant = SCHEMA_CQUANT_REP;
+            quant.quant = SCHEMA_CQUANT_REP;
         }
     } else if (clientData == (ClientData) 2) {
         patternType = SCHEMA_CTYPE_INTERLEAVE;
@@ -6444,7 +6441,7 @@ AnonPatternObjCmd (
         pattern->flags |= MIXED_CONTENT;
     }
     return evalDefinition (interp, sdata, objc == 2 ? objv[1] : objv[2],
-                           pattern, quant, n, m);
+                           pattern, quant);
 }
 
 static int maybeAddAttr (
@@ -6648,7 +6645,7 @@ TextPatternObjCmd  (
     )
 {
     SchemaData *sdata = GETASI;
-    SchemaQuant quant = SCHEMA_CQUANT_OPT;
+    SchemaQuantNM quant;
     SchemaCP *pattern;
     Tcl_HashEntry *h;
     int hnew, result = TCL_OK;
@@ -6656,10 +6653,11 @@ TextPatternObjCmd  (
     CHECK_SI
     CHECK_TOPLEVEL
     checkNrArgs (1,3,"?<definition script>? | type <name>");
+    quant.quant = SCHEMA_CQUANT_OPT;
     if (objc == 1) {
         pattern = initSchemaCP (SCHEMA_CTYPE_TEXT, NULL, NULL);
     } else if (objc == 2) {
-        quant = SCHEMA_CQUANT_ONE;
+        quant.quant = SCHEMA_CQUANT_ONE;
         pattern = initSchemaCP (SCHEMA_CTYPE_CHOICE, NULL, NULL);
         pattern->type = SCHEMA_CTYPE_TEXT;
     } else {
@@ -6677,7 +6675,7 @@ TextPatternObjCmd  (
             sdata->forwardPatternDefs++;
             Tcl_SetHashValue (h, pattern);
         }
-        quant = SCHEMA_CQUANT_ONE;
+        quant.quant = SCHEMA_CQUANT_ONE;
         pattern = (SchemaCP *) Tcl_GetHashValue (h);
     }
     if (objc == 2) {
@@ -6687,7 +6685,7 @@ TextPatternObjCmd  (
         if (objc < 3) {
             REMEMBER_PATTERN (pattern)
         }
-        addToContent (sdata, pattern, quant, 0, 0);
+        addToContent (sdata, pattern, quant);
     } else {
         freeSchemaCP (pattern);
     }
@@ -6704,6 +6702,7 @@ VirtualPatternObjCmd (
 {
     SchemaData *sdata = GETASI;
     SchemaCP *pattern;
+    SchemaQuantNM quant;
     int i;
 
     CHECK_SI
@@ -6729,7 +6728,8 @@ VirtualPatternObjCmd (
         Tcl_IncrRefCount (objv[i+1]);
     }
     pattern->nc = objc-1;
-    addToContent (sdata, pattern, SCHEMA_CQUANT_ONE, 0, 0);
+    quant.quant = SCHEMA_CQUANT_ONE;
+    addToContent (sdata, pattern, quant);
     return TCL_OK;
 }
 
@@ -6906,6 +6906,7 @@ jsontypePatternObjCmd (
     SchemaData *sdata = GETASI;
     int jsonType; 
     SchemaCP *pattern;
+    SchemaQuantNM quant;
 
     CHECK_SI
     CHECK_TOPLEVEL
@@ -6922,7 +6923,8 @@ jsontypePatternObjCmd (
     pattern = initSchemaCP (SCHEMA_CTYPE_JSON_STRUCT, NULL, NULL);
     pattern->typedata = (void *) (intptr_t) jsonType;
     REMEMBER_PATTERN (pattern);
-    addToContent (sdata, pattern, SCHEMA_CQUANT_ONE, 0, 0);
+    quant.quant = SCHEMA_CQUANT_ONE;
+    addToContent (sdata, pattern, quant);
     return TCL_OK;
 }
     
@@ -6936,6 +6938,7 @@ keyspacePatternObjCmd (
 {
     SchemaData *sdata = GETASI;
     SchemaCP *pattern;
+    SchemaQuantNM quant;
     domLength nrKeyspaces, i;
     int hnew;
     Tcl_Obj *ksObj;
@@ -6974,7 +6977,8 @@ keyspacePatternObjCmd (
                                 Tcl_GetString (ksObj), NULL);
         pattern->keySpace = ks;
         REMEMBER_PATTERN (pattern);
-        addToContent (sdata, pattern, SCHEMA_CQUANT_ONE, 0, 0);
+        quant.quant = SCHEMA_CQUANT_ONE;
+        addToContent (sdata, pattern, quant);
     }
     sdata->currentEvals++;
     if (Tcl_EvalObjEx (interp, objv[2], TCL_EVAL_DIRECT) != TCL_OK) {
@@ -6988,7 +6992,8 @@ keyspacePatternObjCmd (
                                 Tcl_GetString (ksObj), NULL);
         REMEMBER_PATTERN (pattern);
         pattern->keySpace = Tcl_GetHashValue (h);
-        addToContent (sdata, pattern, SCHEMA_CQUANT_ONE, 0, 0);
+        quant.quant = SCHEMA_CQUANT_ONE;
+        addToContent (sdata, pattern, quant);
     }
     return TCL_OK;
 }
