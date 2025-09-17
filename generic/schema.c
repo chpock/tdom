@@ -42,8 +42,14 @@
 #define SetResult(str) Tcl_ResetResult(interp);                         \
                      Tcl_SetStringObj(Tcl_GetObjResult(interp), (str), -1)
 
+/* Uncomment the following line for some run-time debugging output on
+ * stderr */
 /* #define DEBUG */
+
+/* Uncomment additionaly the following line for nore run-time
+ * debugging output on stderr */
 /* #define DDEBUG */
+
 /*----------------------------------------------------------------------------
 |   Debug Macros
 |
@@ -255,14 +261,6 @@ static const char *Schema_CP_Type2str[] = {
     "KEYSPACE_END",
     "JSON_STRUCT_TYPE"
 };
-static const char *Schema_Quant_Type2str[] = {
-    "ONE",
-    "OPT",
-    "REP",
-    "PLUS",
-    "NM",
-    "ERROR"
-};
 #endif
 
 #define CHECK_SI                                                        \
@@ -455,14 +453,6 @@ static void serializeCP (
         /* Do nothing */
         break;
     }
-}
-
-static void serializeQuant (
-    SchemaQuant quant
-    )
-{
-    fprintf (stderr, "Quant type: %s\n",
-             Schema_Quant_Type2str[quant]);
 }
 
 static int getDeep (
@@ -3135,11 +3125,19 @@ startElement(
     }
 }
 
+#ifdef DEBUG
+static void
+endElement (
+    void        *userData,
+    const char  *name
+)
+#else
 static void
 endElement (
     void        *userData,
     const char  *UNUSED(name)
 )
+#endif
 {
     ValidateMethodData *vdata = (ValidateMethodData *) userData;
     SchemaData *sdata;
