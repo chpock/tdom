@@ -255,14 +255,6 @@ static const char *Schema_CP_Type2str[] = {
     "KEYSPACE_END",
     "JSON_STRUCT_TYPE"
 };
-static const char *Schema_Quant_Type2str[] = {
-    "ONE",
-    "OPT",
-    "REP",
-    "PLUS",
-    "NM",
-    "ERROR"
-};
 #endif
 
 #define CHECK_SI                                                        \
@@ -325,25 +317,34 @@ minOne (
 }
 
 static TDOM_INLINE int 
-mayRepeat (
-    SchemaQuantNM quant
-    )
-{
-    return (quant.quant == SCHEMA_CQUANT_REP
-            || quant.quant == SCHEMA_CQUANT_PLUS) ? 1 : 0;
-}
-
-static TDOM_INLINE int 
 mayMiss (
     SchemaQuantNM quant
     )
 {
     return (quant.quant == SCHEMA_CQUANT_REP
-            || quant.quant == SCHEMA_CQUANT_OPT) ? 1 : 0;
+            || quant.quant == SCHEMA_CQUANT_OPT
+            || (quant.quant == SCHEMA_CQUANT_NM && quant.min == 0)) ? 1 : 0;
 }
 
-#define hasMatched(quant,hm) \
-    (hm) == 0 ?  mayMiss(quant) :  1
+static TDOM_INLINE int 
+hasMatched (
+    SchemaQuantNM quant,
+    int hm
+    )
+{
+    if (hm == 0) {
+        return mayMiss (quant);
+    }
+    if (quant.quant == SCHEMA_CQUANT_NM) {
+        if (quant.max > -1 && quant.max >= hm) {
+            return 1;
+        } else {
+            return 0;
+        }
+    } else {
+        return 1;
+    }
+}
 
 #define mustMatch(quant,hm) \
     (hm) == 0 ? minOne(quant) : 0
@@ -361,7 +362,7 @@ mayMiss (
 #define updateStack(sdata,se,ac)                        \
     if (!(sdata->recoverFlags & RECOVER_FLAG_REWIND)) { \
         se->activeChild = ac;                           \
-        se->hasMatched = 1;                             \
+        se->hasMatched++;                             \
     }                                                   \
 
 
@@ -477,14 +478,6 @@ static void serializeCP (
         /* Do nothing */
         break;
     }
-}
-
-static void serializeQuant (
-    SchemaQuant quant
-    )
-{
-    fprintf (stderr, "Quant type: %s\n",
-             Schema_Quant_Type2str[quant]);
 }
 
 static int getDeep (
@@ -1694,7 +1687,7 @@ matchElementStart (
             case SCHEMA_CTYPE_ANY:
                 if (!matchingAny (namespace, icp)) break;
                 sdata->skipDeep = 1;
-                se->hasMatched = 1;
+                se->hasMatched++;
                 se->interleaveState[i] = 1;
                 /* See comment in tDOM_probeElement: sdata->vname and
                  * sdata->vns may be pre-filled. We reset it here.*/
@@ -1706,7 +1699,7 @@ matchElementStart (
                 if (icp->name == name
                     && icp->namespace == namespace) {
                     pushToStack (sdata, icp);
-                    se->hasMatched = 1;
+                    se->hasMatched++;
                     se->interleaveState[i] = 1;
                     return 1;
                 }
@@ -1728,7 +1721,7 @@ matchElementStart (
                 rc = matchElementStart (interp, sdata, name, namespace);
                 if (rc == 1) {
                     if (!(sdata->recoverFlags & RECOVER_FLAG_REWIND)) {
-                        se->hasMatched = 1;
+                        se->hasMatched++;
                         se->interleaveState[i] = 1;
                     }
                     return 1;
@@ -2942,8 +2935,8 @@ matchText (
                 case SCHEMA_CTYPE_TEXT:
                     if (checkText (interp, ic, text)) {
                         if (!(sdata->recoverFlags & RECOVER_FLAG_REWIND)) {
-                            se->hasMatched = 1;
-                            se->interleaveState[i] = 1;
+                            se->hasMatched++;
+                            se->interleaveState[i]++;
                         }
                         return 1;
                     }
@@ -3125,11 +3118,20 @@ startElement(
     }
 }
 
+
+#ifdef DEBUG
+static void
+endElement (
+    void        *userData,
+    const char  *name
+)
+#else
 static void
 endElement (
     void        *userData,
     const char  *UNUSED(name)
 )
+#endif
 {
     ValidateMethodData *vdata = (ValidateMethodData *) userData;
     SchemaData *sdata;

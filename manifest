@@ -1,5 +1,5 @@
-C Started\simplementation\sof\sanother\shandling\sof\smin/max\soccur\swhich\sworks\sbetter\sfor\sbig\smin/max\snumbers.
-D 2025-09-14T22:59:04.421
+C Started\sto\sadapt\sthe\svalidation\slogic.
+D 2025-09-17T01:06:43.801
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -150,7 +150,7 @@ F generic/domxslt.h aeaf957ee38a9e7564bd9f1bed1781de108767df476a0d0776615988d8f0
 F generic/expat_config.h 560c148d431f87fc99ae8553cf998f0d01b0db82
 F generic/nodecmd.c 92751187e49009fbef55d7b97b00e6522c2e34c6b435eb134e7bce9ba7ba511f
 F generic/nodecmd.h e9311269bd2f762cf419126ab0b7bc4951c6830a95aa82fe323c209292cde361
-F generic/schema.c e98d5284598c9ddea564ebbc8e53112294ceab987d3ca98d5cd713d09a960324
+F generic/schema.c af6817bcf03f7066c431a06814cf038fc315dfe84fddc0c05d58f8cfa9aa256a
 F generic/schema.h 85ad96865ee9689c0d534a1415fc0b96f64da6a3882fef3734a174c3b024d0a4
 F generic/tcldom.c 2aed8b2d00f94abf9b3258c4bbc97a7a840330328b3210cfb4e78b742ba17573
 F generic/tcldom.h d8a198375e823af7d95b78f2ef695ac84b3f6d50232ab33ad82fcaa2502ea5e7
@@ -247,11 +247,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 83898ee0c11a95da4ed2880a5283dfda9e61e95db6c9d0f81769e27cc26fde5e
-R 86d691520239f3b0a86e714c830636e3
-T *branch * quantnm
-T *sym-quantnm *
-T -sym-trunk *
+P e8cc58b43d16d2a23d54488ae082c7681b4327cf10bcc070d693e9c6458548cc
+R b78362496bdc73e63e577b3caf83e595
 U rolf
-Z 6ff650b551142fd87f9b6443e9fca001
+Z b80d3cc6a0114155c384964ffa7d01f2
 # Remove this line to create a well-formed Fossil manifest.
