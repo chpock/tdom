@@ -7651,6 +7651,24 @@ test schema-16.23 {interleave} {
     set result
 } {0 0 0 0 1 1 0 0}
 
+test schema-16.24 {interleave} {
+    tdom::schema s
+    s defelement doc {
+        interleave {
+            element a 
+            element b {1 2}
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc><b/><a/><b/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} 1
+
 test schema-17.1 {info} {
     tdom::schema s
     s define {

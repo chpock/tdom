@@ -42,7 +42,7 @@
 #define SetResult(str) Tcl_ResetResult(interp);                         \
                      Tcl_SetStringObj(Tcl_GetObjResult(interp), (str), -1)
 
-/* #define DEBUG */
+#define DEBUG
 /* #define DDEBUG */
 /*----------------------------------------------------------------------------
 |   Debug Macros
@@ -1670,7 +1670,10 @@ matchElementStart (
         for (i = 0; i < cp->nc; i++) {
             thismayskip = 0;
             if (se->interleaveState[i]) {
-                if (maxOne (cp->quants[i])) continue;
+                if (hasMatched (cp->quants[i],
+                                se->interleaveState[i])) {
+                    continue;
+                }
             }
             icp = cp->content[i];
             switch (icp->type) {
