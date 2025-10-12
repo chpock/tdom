@@ -1,5 +1,5 @@
-C expat-2.7.3
-D 2025-10-06T10:59:08.550
+C Merged\sfrom\strunk.
+D 2025-10-12T14:28:40.956
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -21,7 +21,7 @@ F doc/README 706bce83708ba3eb9a81452364ab445c79e63ace
 F doc/category-index.html accaaafe7a78cdeb049a78a3bb70a09fea74253412541d297b977fa965810d57
 F doc/dom.html 4e21146436bc4b7fe8ca69cf5ed377c364313f7716b69d2cd890d09560274d3d
 F doc/dom.n d071d25faa365561e7869c202d4f2c0d3dbb163468cddedc0e774da566d15d6a
-F doc/dom.xml 53566179f89fd8fc5b480f19f7703f6e442444b0f9c5577d377b2d324aa56afe
+F doc/dom.xml c644315e92689531c37b923d8936c9b857e6e46f9a8e349ea70c4ffe51ec382e
 F doc/domDoc.html 63ba2ed90bd5d546d082978b5e591b95a2a912e4fe1a8af745a6f09cbc01fd2d
 F doc/domDoc.n 78d50551ad7a3ac7bf4559607f96e6f774d011d28286aa1fcac5fbf515f5699c
 F doc/domDoc.xml 77a7814cb0ae530e6c4ff06ad1a6f6ff75821faa3b9189f6541aeafbe5e078a6
@@ -247,11 +247,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 9b847286c6f906afb92dd76c1e3b0ed2fa4c0ddc286753457e7e4713b4eca853
-R cca6742a6cef527265b67f53b97ef9e5
-T *branch * expat-update
-T *sym-expat-update *
-T -sym-trunk *
+P 2d7246a98002a652583253f082d0105c500cc4e064269fec5ebd15bde91caa97 293337c2741e6f80de2279ae0c191f104c919dc8aaacbfe956211820b798cf36
+R f1dfd3b920b26ad02ec938d1d63136c8
 U rolf
-Z 04c4e92c3c90a03b8a6115c905872709
+Z 7e9b151d45d379e141d6c0db1a5304d8
 # Remove this line to create a well-formed Fossil manifest.
