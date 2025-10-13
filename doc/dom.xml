@@ -395,7 +395,7 @@ needed.</desc>
                 for the parser limits to protect against the use of
                 disproportional amounts of dynamic memory due to
                 malicious crafted documents. This option expects a
-                positiv integer as argument. You should never need to
+                positive integer as argument. You should never need to
                 use this option, because the default value (100.0)
                 should work for any real data. If you ever need to
                 increase this value for non-attack payload, please
@@ -410,7 +410,7 @@ needed.</desc>
                 for the parser limits to protect against the use of
                 disproportional amounts of dynamic memory due to
                 malicious crafted documents. This option expects a
-                positiv integer as argument. You should never need to
+                positive integer as argument. You should never need to
                 use this option, because the default value (67108864,
                 that is 64 MiB) should work for any real data. If you
                 ever need to increase this value for non-attack

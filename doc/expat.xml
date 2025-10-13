@@ -661,6 +661,48 @@ enddoctypedeclcommand scripts, if set, are not called.</desc>
             payload, please report.</desc>
         </optdef>
 
+        <optdef>
+            <optname>-setReparseDeferralEnabled</optname>
+            <optarg>&lt;boolean&gt;</optarg>
+            <desc>Expat protects itself against quadratic parsing
+            time due to long tokens in malicious crafted
+            documents. This protection may have the side effect
+            that a parsing event is not triggered directly after
+            the end of the respective token but only after the
+            parser has processed some more bytes of the input.
+            This option allows disabling this behavior.</desc>
+        </optdef>
+        
+        <optdef>
+            <optname>-allocTrackerActivationThreshold</optname>
+            <optarg>&lt;float&gt;</optarg>
+            <desc>This option together with
+            <m>-allocTrackerMaximumAmplification</m> gives control
+            for the parser limits to protect against the use of
+            disproportional amounts of dynamic memory due to
+            malicious crafted documents. This option expects a
+            positive integer as argument. You should never need to
+            use this option, because the default value (100.0)
+            should work for any real data. If you ever need to
+            increase this value for non-attack payload, please
+            report.</desc>
+        </optdef>
+        
+        <optdef>
+            <optname>-allocTrackerMaximumAmplification</optname>
+            <optarg>&lt;long&gt;</optarg>
+            <desc>This option together with
+            <m>-allocTrackerActivationThreshold</m> gives control
+            for the parser limits to protect against the use of
+            disproportional amounts of dynamic memory due to
+            malicious crafted documents. This option expects a
+            positive integer as argument. You should never need to
+            use this option, because the default value (67108864,
+            that is 64 MiB) should work for any real data. If you
+            ever need to increase this value for non-attack
+            payload, please report.</desc>
+        </optdef>
+
       </optlist>
     </section>
     <section>

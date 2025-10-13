@@ -474,6 +474,36 @@ should never need to use this option, because the
 default value (8388608) should work for any real data.
 If you ever need to increase this value for non-attack
 payload, please report.
+.IP "\fB-setReparseDeferralEnabled  \fI<boolean>\fP\fR"
+Expat protects itself against quadratic parsing
+time due to long tokens in malicious crafted
+documents. This protection may have the side effect
+that a parsing event is not triggered directly after
+the end of the respective token but only after the
+parser has processed some more bytes of the input.
+This option allows disabling this behavior.
+.IP "\fB-allocTrackerActivationThreshold  \fI<float>\fP\fR"
+This option together with
+\&\fI-allocTrackerMaximumAmplification\fR gives control
+for the parser limits to protect against the use of
+disproportional amounts of dynamic memory due to
+malicious crafted documents. This option expects a
+positive integer as argument. You should never need to
+use this option, because the default value (100.0)
+should work for any real data. If you ever need to
+increase this value for non-attack payload, please
+report.
+.IP "\fB-allocTrackerMaximumAmplification  \fI<long>\fP\fR"
+This option together with
+\&\fI-allocTrackerActivationThreshold\fR gives control
+for the parser limits to protect against the use of
+disproportional amounts of dynamic memory due to
+malicious crafted documents. This option expects a
+positive integer as argument. You should never need to
+use this option, because the default value (67108864,
+that is 64 MiB) should work for any real data. If you
+ever need to increase this value for non-attack
+payload, please report.
 .PP
 .RE
 .TP
@@ -845,12 +875,12 @@ are build in.
 .IP "\fBlargedata\fR"
 Returns as boolean if the expat library
 configuration allows pcdata content of an XML
-element. Could be true only if build with Tcl 9
-for a 64-bit architecture and then depends if the
-build-in expat version is used with default
-configuration or if the used system expat library
-is capable enough for this (typically not). are
-build in.
+element greater than 2 GByte. Could be true only if
+build with Tcl 9 for a 64-bit architecture and
+then depends if the build-in expat version is used
+with default configuration or if the used system
+expat library is capable enough for this
+(typically not).
 .RE
 .SH KEYWORDS
 XML, DOM, document, node, parsing
