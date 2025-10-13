@@ -4,17 +4,17 @@
 </head><body>
 <div class="header">
 <div class="navbar" align="center">
-<a href="#SECTid0x55f14dc6f1c0">NAME</a> · <a href="#SECTid0x55f14dc5fca0">SYNOPSIS</a> · <a href="#SECTid0x55f14dc66f00">DESCRIPTION </a> · <a href="#SECTid0x55f14dc8ba10">KEYWORDS</a>
+<a href="#SECTid0x5592047876a0">NAME</a> · <a href="#SECTid0x5592047a0060">SYNOPSIS</a> · <a href="#SECTid0x5592047a2f40">DESCRIPTION </a> · <a href="#SECTid0x5592047b40e0">KEYWORDS</a>
 </div><hr class="navsep">
 </div><div class="body">
-  <h2><a name="SECTid0x55f14dc6f1c0">NAME</a></h2><p class="namesection">
+  <h2><a name="SECTid0x5592047876a0">NAME</a></h2><p class="namesection">
 <b class="names">dom - </b><br>Create an in-memory DOM tree from XML</p>
   
-  <h2><a name="SECTid0x55f14dc5fca0">SYNOPSIS</a></h2><pre class="syntax">package require tdom
+  <h2><a name="SECTid0x5592047a0060">SYNOPSIS</a></h2><pre class="syntax">package require tdom
 
 <b class="cmd">dom</b> <i class="m">method</i> ?<i class="m">arg arg ...</i>?</pre>
 
-  <h2><a name="SECTid0x55f14dc66f00">DESCRIPTION </a></h2><p>This command provides the creation of DOM trees in memory. In
+  <h2><a name="SECTid0x5592047a2f40">DESCRIPTION </a></h2><p>This command provides the creation of DOM trees in memory. In
 the usual case a string containing a XML information is parsed and converted
 into a DOM tree. Other possible parse input may be HTML or JSON.
 The <i class="m">method</i> indicates a specific subcommand. </p><p>The valid methods are:</p><dl class="commandlist">
@@ -386,7 +386,55 @@ needed.</dd>
                 payload, please report.</dd>
               
 
-          </dl>
+              
+                <dt>
+<b>-setReparseDeferralEnabled</b> <i>&lt;boolean&gt;</i>
+</dt>
+                
+                <dd>Expat protects itself against quadratic parsing
+                time due to long tokens in malicious crafted
+                documents. This protection may have the side effect
+                that a parsing event is not triggered directly after
+                the end of the respective token but only after the
+                parser has processed some more bytes of the input.
+                This option allows disabling this behavior.</dd>
+              
+              
+              
+                <dt>
+<b>-allocTrackerActivationThreshold</b> <i>&lt;float&gt;</i>
+</dt>
+                
+                <dd>This option together with
+                <i class="m">-allocTrackerMaximumAmplification</i> gives control
+                for the parser limits to protect against the use of
+                disproportional amounts of dynamic memory due to
+                malicious crafted documents. This option expects a
+                positive integer as argument. You should never need to
+                use this option, because the default value (100.0)
+                should work for any real data. If you ever need to
+                increase this value for non-attack payload, please
+                report.</dd>
+              
+              
+              
+                <dt>
+<b>-allocTrackerMaximumAmplification</b> <i>&lt;long&gt;</i>
+</dt>
+                
+                <dd>This option together with
+                <i class="m">-allocTrackerActivationThreshold</i> gives control
+                for the parser limits to protect against the use of
+                disproportional amounts of dynamic memory due to
+                malicious crafted documents. This option expects a
+                positive integer as argument. You should never need to
+                use this option, because the default value (67108864,
+                that is 64 MiB) should work for any real data. If you
+                ever need to increase this value for non-attack
+                payload, please report.</dd>
+              
+
+            </dl>
 <p></p>
 </dd>
         
@@ -856,19 +904,19 @@ recommendation. Otherwise it returns 0.</dd>
                     <dt><b>largedata</b></dt>
                     <dd>Returns as boolean if the expat library
                     configuration allows pcdata content of an XML
-                    element. Could be true only if build with Tcl 9
-                    for a 64-bit architecture and then depends if the
-                    build-in expat version is used with default
-                    configuration or if the used system expat library
-                    is capable enough for this (typically not). are
-                    build in.</dd>
+                    element greater than 2 GByte. Could be true only if
+                    build with Tcl 9 for a 64-bit architecture and
+                    then depends if the build-in expat version is used
+                    with default configuration or if the used system
+                    expat library is capable enough for this
+                    (typically not).</dd>
                 
             </dl>
             </dd>   
         
     </dl>
 
-<h2><a name="SECTid0x55f14dc8ba10">KEYWORDS</a></h2><p class="keywords">
+<h2><a name="SECTid0x5592047b40e0">KEYWORDS</a></h2><p class="keywords">
 <a class="keyword" href="keyword-index.html#KW-XML">XML</a>, <a class="keyword" href="keyword-index.html#KW-DOM">DOM</a>, <a class="keyword" href="keyword-index.html#KW-document">document</a>, <a class="keyword" href="keyword-index.html#KW-node">node</a>, <a class="keyword" href="keyword-index.html#KW-parsing">parsing</a>
 </p>
 </div><hr class="navsep"><div class="navbar" align="center">

@@ -7073,7 +7073,7 @@ int tcldom_parse (
     const char  *interpResult;
     int          optionIndex, value, mode;
     domLength    xml_string_len;
-    int          jsonmaxnesting = JSON_MAX_NESTING;
+    int          jsonmaxnesting      = JSON_MAX_NESTING;
     int          ignoreWhiteSpaces   = 1;
     int          takeJSONParser      = 0;
     int          takeSimpleParser    = 0;
@@ -7088,6 +7088,10 @@ int tcldom_parse (
     int          status              = 0;
     double       maximumAmplification = 0.0;
     long         activationThreshold = 0;
+    int          setReparseDeferralEnabled = -1;
+    double       allocMaximumAmplification = 0.0;
+    long         allocActivationThreshold = 0;
+
     domParseForestErrorData forestError;
     domDocument *doc;
     Tcl_Obj     *newObjName = NULL;
@@ -7109,10 +7113,12 @@ int tcldom_parse (
         "-validateCmd",
 #endif
         "-jsonmaxnesting",        "-ignorexmlns",   "--",
-        "-keepCDATA",
+        "-keepCDATA",             "-forest",
         "-billionLaughsAttackProtectionMaximumAmplification",
         "-billionLaughsAttackProtectionActivationThreshold",
-        "-forest",
+        "-setReparseDeferralEnabled",
+        "-allocTrackerMaximumAmplification",
+        "-allocTrackerActivationThreshold",
         NULL
     };
     enum parseOption {
@@ -7127,10 +7133,12 @@ int tcldom_parse (
         o_validateCmd,
 #endif
         o_jsonmaxnesting,         o_ignorexmlns,    o_LAST,
-        o_keepCDATA,
+        o_keepCDATA,              o_forest,
         o_billionLaughsAttackProtectionMaximumAmplification,
         o_billionLaughsAttackProtectionActivationThreshold,
-        o_forest
+        o_setReparseDeferralEnabled,
+        o_allocTrackerMaximumAmplification,
+        o_allocTrackerActivationThreshold,
     };
 
     static const char *paramEntityParsingValues[] = {
@@ -7407,7 +7415,69 @@ int tcldom_parse (
                 return TCL_ERROR;
             }
             objv++;  objc--; continue;
+
+        case o_setReparseDeferralEnabled:
+            objv++; objc--;
+            if (objc < 2) {
+                SetResult("The \"dom parse\" option \""
+                          "-setReparseDeferralEnabled requires\" a boolean "
+                          "as argument.");
+                return TCL_ERROR;
+            }
+            if (Tcl_GetBooleanFromObj(
+                    interp, objv[1], &setReparseDeferralEnabled
+                    ) != TCL_OK) {
+                return TCL_ERROR;
+            }
+            objv++;  objc--; continue;
             
+        case o_allocTrackerMaximumAmplification:
+            objv++; objc--;
+            if (objc < 2) {
+                SetResult("The \"dom parse\" option \""
+                          "-allocTrackerMaximumAmplification"
+                          "\" requires a float >= 1.0 as argument.");
+                return TCL_ERROR;
+            }
+            if (Tcl_GetDoubleFromObj (interp, objv[1], &allocMaximumAmplification)
+                != TCL_OK) {
+                SetResult("The \"dom parse\" option \""
+                          "-allocTrackerMaximumAmplification"
+                          "\" requires a float >= 1.0 as argument.");
+                return TCL_ERROR;
+            }
+            if (allocMaximumAmplification > (double)FLT_MAX
+                || allocMaximumAmplification < 1.0) {
+                SetResult("The \"dom parse\" option \""
+                          "-allocTrackerMaximumAmplification"
+                          "\" requires a float >= 1.0 as argument.");
+                return TCL_ERROR;
+            }
+            objv++;  objc--; continue;
+
+        case o_allocTrackerActivationThreshold:
+            objv++; objc--;
+            if (objc < 2) {
+                SetResult("The \"dom parse\" option \""
+                          "-allocTrackerActivationThreshold"
+                          "\" requires a long > 0 as argument.");
+                return TCL_ERROR;
+            }
+            if (Tcl_GetLongFromObj (interp, objv[1], &allocActivationThreshold)
+                != TCL_OK) {
+                SetResult("The \"dom parse\" option \""
+                          "-allocTrackerActivationThreshold"
+                          "\" requires a long > 0 as argument.");
+                return TCL_ERROR;
+            }
+            if (allocActivationThreshold < 1) {
+                SetResult("The \"dom parse\" option \""
+                          "-allocTrackerActivationThreshold"
+                          "\" requires a long > 0 as argument.");
+                return TCL_ERROR;
+            }
+            objv++;  objc--; continue;
+
 #ifndef TDOM_NO_SCHEMA
         case o_validateCmd:
             objv++; objc--;
@@ -7557,10 +7627,10 @@ int tcldom_parse (
     if (maximumAmplification >= 1.0f) {
         if (XML_SetBillionLaughsAttackProtectionMaximumAmplification (
                 parser, (float)maximumAmplification) == XML_FALSE) {
+            XML_ParserFree(parser);
             SetResult("The \"dom parse\" option \""
                       "-billionLaughsAttackProtectionMaximumAmplification"
                       "\" requires a float >= 1.0 as argument.");
-            XML_ParserFree(parser);
             return TCL_ERROR;
         }
     }
@@ -7575,7 +7645,39 @@ int tcldom_parse (
         }
     }
 #endif
-
+#if (XML_MAJOR_VERSION == 2) && (XML_MINOR_VERSION >= 6)
+    if (setReparseDeferralEnabled > -1) {
+        if (XML_SetReparseDeferralEnabled (parser, setReparseDeferralEnabled)
+            == XML_FALSE) {
+            XML_ParserFree(parser);
+            SetResult("Error reported by expat after calling "
+                      "XML_SetReparseDeferralEnabled.");
+            return TCL_ERROR;
+        }
+    }
+#endif
+#if (XML_MAJOR_VERSION == 2) && ((XML_MINOR_VERSION > 7) || ((XML_MINOR_VERSION == 7) && (XML_MICRO_VERSION >= 2)))
+    if (allocMaximumAmplification >= 1.0f) {
+        if (XML_SetAllocTrackerMaximumAmplification (
+                parser, (float)allocMaximumAmplification) == XML_FALSE) {
+            XML_ParserFree(parser);
+            SetResult("The \"dom parse\" option \""
+                      "-allocTrackerMaximumAmplification"
+                      "\" requires a float >= 1.0 as argument.");
+            return TCL_ERROR;
+        }
+    }
+    if (allocActivationThreshold > 0) {
+        if (XML_SetAllocTrackerActivationThreshold (
+                parser, allocActivationThreshold) == XML_FALSE) {
+            XML_ParserFree(parser);
+            SetResult("The \"dom parse\" option \""
+                      "-allocTrackerActivationThreshold"
+                      "\" requires a long > 0 as argument.");
+            return TCL_ERROR;
+        }
+    }
+#endif
     Tcl_ResetResult(interp);
     doc = domReadDocument(parser, xml_string,
                           xml_string_len,

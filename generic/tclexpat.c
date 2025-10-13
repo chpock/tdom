@@ -1202,6 +1202,9 @@ TclExpatConfigure (
     "-namespaceseparator",
     "-billionLaughsAttackProtectionMaximumAmplification",
     "-billionLaughsAttackProtectionActivationThreshold",
+    "-setReparseDeferralEnabled",
+    "-allocTrackerMaximumAmplification",
+    "-allocTrackerActivationThreshold",
     "-keepTextStart",
 
     "-commentcommand",
@@ -1239,6 +1242,9 @@ TclExpatConfigure (
     EXPAT_NAMESPACESEPARATOR,
     EXPAT_BLAPMAXIMUMAMPLIFICATION,
     EXPAT_BLAPACTIVATIONTHRESHOLD,
+    EXPAT_SETREPARSEDEFERRALENABLED,
+    EXPAT_ALLOCTRACKERMAXIMUMAMPLIFICATION,
+    EXPAT_ALLOCTRACKERACTIVATIONTHRESHOLD,
     EXPAT_KEEPTEXTSTART,
 
     EXPAT_COMMENTCMD, EXPAT_NOTSTANDALONECMD,
@@ -1275,8 +1281,9 @@ TclExpatConfigure (
   char *handlerSetName = NULL;
   TclHandlerSet *tmpTclHandlerSet, *activeTclHandlerSet = NULL;
   Tcl_UniChar uniChar;
-  double maximumAmplification;
-  long activationThreshold;
+  int setReparseDeferralEnabled;
+  double maximumAmplification, allocMaximumAmplification;
+  long activationThreshold, allocActivationThreshold;
 #ifndef TDOM_NO_SCHEMA
   char *schemacmd;
 #endif
@@ -1392,6 +1399,68 @@ TclExpatConfigure (
               expat->activationThreshold = activationThreshold;
           }
 #endif          
+          break;
+
+      case EXPAT_SETREPARSEDEFERRALENABLED:
+          if (Tcl_GetBooleanFromObj(
+                  interp, objv[1], &setReparseDeferralEnabled
+                  ) != TCL_OK) {
+              return TCL_ERROR;
+          }
+#if (XML_MAJOR_VERSION == 2) && (XML_MINOR_VERSION >= 6)
+          if (setReparseDeferralEnabled > -1) {
+              if (XML_SetReparseDeferralEnabled (expat->parser,
+                                                 setReparseDeferralEnabled)
+                  == XML_FALSE) {
+                  Tcl_SetResult(interp, "Error reported by expat after calling "
+                                "XML_SetReparseDeferralEnabled.", NULL);
+                  return TCL_ERROR;
+              }
+          }
+#endif
+          break;
+
+      case EXPAT_ALLOCTRACKERMAXIMUMAMPLIFICATION:
+          if (Tcl_GetDoubleFromObj (interp, objv[1], &allocMaximumAmplification)
+              != TCL_OK) {
+              Tcl_SetResult(interp, "The option \""
+                            "-allocTrackerMaximumAmplification"
+                            "\" requires a float >= 1.0 as argument.", NULL);
+              return TCL_ERROR;
+          }
+          if (allocMaximumAmplification > (double)FLT_MAX
+              || allocMaximumAmplification < 1.0) {
+              Tcl_SetResult(interp, "The option \""
+                            "-allocTrackerMaximumAmplification"
+                            "\" requires a float >= 1.0 as argument.", NULL);
+              return TCL_ERROR;
+          }
+#if (XML_MAJOR_VERSION == 2) && ((XML_MINOR_VERSION > 7) || ((XML_MINOR_VERSION == 7) && (XML_MICRO_VERSION >= 2)))
+          XML_SetAllocTrackerMaximumAmplification (
+              expat->parser,(float)allocMaximumAmplification
+              );
+#endif
+          break;
+
+      case EXPAT_ALLOCTRACKERACTIVATIONTHRESHOLD:
+          if (Tcl_GetLongFromObj (interp, objv[1], &allocActivationThreshold)
+              != TCL_OK) {
+              Tcl_SetResult(interp, "The option \""
+                            "-allocTrackerActivationThreshold"
+                            "\" requires a long > 0 as argument.", NULL);
+              return TCL_ERROR;
+          }
+          if (allocActivationThreshold < 1) {
+              Tcl_SetResult(interp, "The option \""
+                            "-allocTrackerActivationThreshold"
+                            "\" requires a long > 0 as argument.", NULL);
+              return TCL_ERROR;
+          }
+#if (XML_MAJOR_VERSION == 2) && ((XML_MINOR_VERSION > 7) || ((XML_MINOR_VERSION == 7) && (XML_MICRO_VERSION >= 2)))
+          XML_SetAllocTrackerActivationThreshold (
+              expat->parser, allocActivationThreshold
+              );
+#endif
           break;
           
       case EXPAT_FINAL:			/* -final */
