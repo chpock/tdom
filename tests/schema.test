@@ -10989,6 +10989,23 @@ test schema-27.9 {duration outside schema context} {
     set result
 } {0 0 0 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0}
 
+test schema-27.10 {base64 outside schema context} {
+    set result ""
+    foreach txt {
+        ""
+        ZVL1
+        zvL1
+        zvü1
+        "0a BED   E+9"
+        ub1sU3==
+        abc
+        ===
+    } {
+        lappend result [tdom::type::base64 $txt]
+    }
+    set result
+} {1 1 1 0 1 1 0 0}
+
 test schema-28.1 {schema use in child interp while in schema context} {
     tdom::schema s
     set result [catch {s defelement doc {
