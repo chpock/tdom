@@ -1,7 +1,7 @@
 
 
               tDOM - a XML/DOM/XPath/XSLT implementation for Tcl
-                          (Version 0.9.6)
+                          (Version 0.9.7)
 
 		    Jochen Loewer (loewerj@hotmail.com)
                        Rolf Ade (rolf@pointsman.de)
@@ -13,7 +13,7 @@
 
 This file contains some remarks about using tDOM package under the 
 AOLserver, a webserver from America Online. 
-For general information, look in the "README" file in this directory.
+For general information, look in the "README.md" file in this directory.
 
 
 COMPILING tDOM
