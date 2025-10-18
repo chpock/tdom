@@ -11006,6 +11006,27 @@ test schema-27.10 {base64 outside schema context} {
     set result
 } {1 1 1 0 1 1 0 0}
 
+test schema-27.10 {hexBinary outside schema context} {
+    set result ""
+    foreach txt {
+        ""
+        5782
+        3ABCDEF0
+        +2
+        2
+        abcd
+        abcde
+        abcdef
+        abcdefg
+        " a0123b"
+        "a0123b "
+        a0123b
+    } {
+        lappend result [tdom::type::hexBinary $txt]
+    }
+    set result
+} {0 1 1 0 0 1 0 1 0 0 0 1}
+
 test schema-28.1 {schema use in child interp while in schema context} {
     tdom::schema s
     set result [catch {s defelement doc {
