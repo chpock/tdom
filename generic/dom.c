@@ -1510,6 +1510,13 @@ elemNSfound:
                 if (strcmp (prefix, "xml")==0) {
                     attrnode->namespace = 
                         info->document->rootNode->firstAttr->namespace;
+                    if (strcmp (localname, "space")==0) {
+                        if (strcmp (atPtr[1], "preserve")==0) {
+                            node->nodeFlags |= SPACE_PRESERVE;
+                        } else if (strcmp (atPtr[1], "default")==0) {
+                            node->nodeFlags |= SPACE_DEFAULT;
+                        }
+                    }
                 } else {
                     /* Since where here, this means, the attribute has a
                        up to now not declared namespace prefix. We probably

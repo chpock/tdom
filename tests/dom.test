@@ -18,6 +18,7 @@
 #    dom-13.*: -forest
 #    dom-14.*: command argument parsing
 #    dom-15.*: fromScriptContext
+#    dom-16.*: xml:space
 #
 # Copyright (c) 2002, 2003, 2004 Rolf Ade.
 
@@ -2530,6 +2531,26 @@ test dom-15.2 {fromScriptContext} {
     $doc delete
     set result
 } 1
+
+test dom-16-1 {xml:space} {
+    set doc [dom parse {<doc xml:space="preserve"> </doc>}]
+    set root [$doc documentElement]
+    set result [$root selectNodes string()]
+    $doc delete
+    set result
+} { }
+
+test dom-16-2 {xml:space} {
+    set doc [dom parse {<doc xml:space="preserve"><es> </es><ed xml:space="default"> </ed> </doc>}]
+    set root [$doc documentElement]
+    set node [$root firstChild]
+    set result [$node selectNodes string()]
+    set node [$node nextSibling]
+    append result [$node selectNodes string()]
+    $doc delete
+    set result
+} { }
+
 
 # cleanup
 ::tcltest::cleanupTests
