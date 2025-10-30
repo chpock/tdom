@@ -133,7 +133,10 @@ typedef struct _domReadInfo {
     domDocument      *document;
     domNode          *currentNode;
     int               depth;
+    int               ignoreWhiteSpacesDefault;
     int               ignoreWhiteSpaces;
+    int               preserveDeep;
+    int               defaultDeep;
     int               cdataSection;
     Tcl_DString      *cdata;
     int               storeLineColumn;
@@ -1231,6 +1234,7 @@ startElement(
     char           prefix[MAX_PREFIX_LEN];
     domNS         *ns;
     char           feedbackCmd[24];
+    Tcl_Obj       *errObj;
 
     if (info->feedbackAfter) {
 
@@ -1421,8 +1425,11 @@ startElement(
             } else {
                 /* Since where here, this means, the element has a
                    up to now not declared namespace prefix. */
-                Tcl_SetResult (info->interp, "Namespace prefix is not "
-                               "defined", NULL);
+                errObj = Tcl_NewStringObj ("The namespace prefix of the "
+                                           "element ", -1);
+                Tcl_AppendToObj (errObj, name, -1);
+                Tcl_AppendToObj (errObj, " is not defined", -1);
+                Tcl_SetObjResult (info->interp, errObj);
                 XML_StopParser(info->parser, 0);
                 return;
             }
@@ -1510,17 +1517,33 @@ elemNSfound:
                 if (strcmp (prefix, "xml")==0) {
                     attrnode->namespace = 
                         info->document->rootNode->firstAttr->namespace;
-                    if (strcmp (localname, "space")==0) {
+                    /* Handling of xml:space attributes; only
+                     * necessary if the DOM builder basically works in
+                     * "skip whitespace only text nodes" mode. */
+                    if (info->ignoreWhiteSpacesDefault
+                        && strcmp (localname, "space")==0) {
                         if (strcmp (atPtr[1], "preserve")==0) {
                             node->nodeFlags |= SPACE_PRESERVE;
+                            info->preserveDeep++;
+                            info->ignoreWhiteSpaces = 0;
                         } else if (strcmp (atPtr[1], "default")==0) {
-                            node->nodeFlags |= SPACE_DEFAULT;
+                            if (info->preserveDeep) {
+                                node->nodeFlags |= SPACE_DEFAULT;
+                                info->defaultDeep++;
+                                info->ignoreWhiteSpaces = 1;
+                            }
                         }
                     }
                 } else {
                     /* Since where here, this means, the attribute has a
-                       up to now not declared namespace prefix. We probably
-                       should return this as an error, shouldn't we?*/
+                       up to now not declared namespace prefix. */
+                    errObj = Tcl_NewStringObj ("The namespace prefix of the "
+                                               "attribute ", -1);
+                    Tcl_AppendToObj (errObj, atPtr[0], -1);
+                    Tcl_AppendToObj (errObj, " is not defined", -1);
+                    Tcl_SetObjResult (info->interp, errObj);
+                    XML_StopParser(info->parser, 0);
+                    return;
                 }
             attrNSfound:
                 ;
@@ -1558,6 +1581,7 @@ endElement (
 )
 {
     domReadInfo  *info = userData;
+    domNode      *thisNode;
 
     DispatchPCDATA (info);
     
@@ -1570,7 +1594,45 @@ endElement (
             info->activeNSpos--;
         }
     }
-
+    if (info->preserveDeep) {
+        if (info->currentNode->nodeFlags & SPACE_PRESERVE) {
+            info->preserveDeep--;
+            if (info->preserveDeep) {
+                thisNode = info->currentNode->parentNode;
+                while (thisNode) {
+                    if (thisNode->nodeFlags & SPACE_PRESERVE) {
+                        break;
+                    }
+                    if (thisNode->nodeFlags & SPACE_DEFAULT) {
+                        info->ignoreWhiteSpaces = 1;
+                        break;
+                    }
+                    thisNode = thisNode->parentNode;
+                }
+            } else {
+                info->ignoreWhiteSpaces = 1;
+            }
+        } else if (info->currentNode->nodeFlags & SPACE_DEFAULT) {
+            info->defaultDeep--;
+            if (info->defaultDeep) {
+                thisNode = info->currentNode->parentNode;
+                while (thisNode) {
+                    if (thisNode->nodeFlags & SPACE_PRESERVE) {
+                        info->ignoreWhiteSpaces = 0;
+                        break;
+                    }
+                    if (thisNode->nodeFlags & SPACE_DEFAULT) {
+                        info->ignoreWhiteSpaces = 1;
+                        break;
+                    }
+                }
+            } else {
+                if (info->preserveDeep) {
+                    info->ignoreWhiteSpaces = 0;
+                }
+            }
+        }
+    }
     if (info->depth != -1) {
         info->currentNode = info->currentNode->parentNode;
     } else {
@@ -2338,6 +2400,9 @@ domReadDocument (
     info.document             = doc;
     info.currentNode          = NULL;
     info.depth                = 0;
+    info.ignoreWhiteSpacesDefault = ignoreWhiteSpaces;
+    info.preserveDeep         = 0;
+    info.defaultDeep          = 0;
     info.ignoreWhiteSpaces    = ignoreWhiteSpaces;
     info.cdata                = (Tcl_DString*) MALLOC (sizeof (Tcl_DString));
     Tcl_DStringInit (info.cdata);
@@ -5329,7 +5394,10 @@ typedef struct _tdomCmdReadInfo {
     domDocument      *document;
     domNode          *currentNode;
     int               depth;
+    int               ignoreWhiteSpacesDefault;
     int               ignoreWhiteSpaces;
+    int               preserveDeep;
+    int               defaultDeep;
     int               cdataSection;
     Tcl_DString      *cdata;
     int               storeLineColumn;
@@ -5568,7 +5636,11 @@ TclTdomObjCmd (
         info = (tdomCmdReadInfo *) MALLOC (sizeof (tdomCmdReadInfo));
         memset(info, 0, sizeof(tdomCmdReadInfo));
         info->parser            = expat->parser;
+        info->ignoreWhiteSpacesDefault = 1;
         info->ignoreWhiteSpaces = 1;
+        info->preserveDeep      = 0;
+        info->defaultDeep       = 0;
+
         info->cdata             = (Tcl_DString*) MALLOC (sizeof (Tcl_DString));
         Tcl_DStringInit (info->cdata);
         info->interp            = interp;
@@ -5668,6 +5740,7 @@ TclTdomObjCmd (
         if (Tcl_GetBooleanFromObj (interp, objv[3], &boolVal) != TCL_OK) {
             return TCL_ERROR;
         }
+        info->ignoreWhiteSpacesDefault = !boolVal;
         info->ignoreWhiteSpaces = !boolVal;
         handlerSet->ignoreWhiteCDATAs = !boolVal;
         info->tdomStatus = 1;

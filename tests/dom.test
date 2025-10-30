@@ -24,6 +24,37 @@
 
 source [file join [file dir [info script]] loadtdom.tcl]
 
+proc describeTree {node {level 0}} {
+    set indent [string repeat {    } $level]
+    foreach child [$node childNodes] {
+        switch [$child nodeType] {
+            ELEMENT_NODE {
+                puts -nonewline "${indent}ELEMENT_NODE [$child nodeName]"
+                foreach attr [$node attributeNames] {
+                    puts -nonewline " $attr '[$child getAttribute $attr]'"
+                }
+                puts ""
+                describeTree $child [expr {$level + 1}]
+            }
+            TEXT_NODE {
+                puts "[string repeat {    } $level]TEXT_NODE '[$child data]'"
+            }
+            CDATA_SECTION_NODE {
+                puts "[string repeat {    } $level]CDATA_SECTION_NODE '[$child data]'"
+            }
+            COMMENT_NODE {
+                puts "[string repeat {    } $level]COMMENT_NODE '[$child data]'"
+            }
+            PROCESSING_INSTRUCTION_NODE {
+                puts "[string repeat {    } $level]PROCESSING_INSTRUCTION_NODE '[$child target]' '[$child data]'"
+            }
+            default {
+                puts "unhandled node type [$node nodeType]
+            }
+        }
+    }
+}
+
 test dom-1.1 {createDocument with root node name not a XML Name} {
     list [catch {dom createDocument "root node"} msg] $msg
 } "1 {Invalid root element name 'root node'}"
@@ -564,18 +595,18 @@ test dom-2.27 {parse -ignorexmlns} {
 
 test dom-2.28 {parse document with undeclared xml prefix} {
     catch {dom parse {<doc><foo:e/></doc>}} errMsg
-    string range $errMsg 0 30
-} {Namespace prefix is not defined}
+    set errMsg
+} {The namespace prefix of the element foo:e is not defined, referenced at line 1 character 13}
 
 test dom-2.29 {parse not well-formed document with undeclared xml prefix} {
     catch {dom parse {<foo:e/>}} errMsg
-    string range $errMsg 0 30
-} {Namespace prefix is not defined}
+    set errMsg
+} {The namespace prefix of the element foo:e is not defined, referenced at line 1 character 8}
 
 test dom-2.30 {parse document with undeclared xml prefix} {
     catch {dom parse {<foo:e><a/></foo:e>}} errMsg
-    string range $errMsg 0 30
-} {Namespace prefix is not defined}
+    set errMsg
+} {The namespace prefix of the element foo:e is not defined, referenced at line 1 character 7}
 
 proc dom-2.31 {base systemId publicId} {
     switch $publicId {
@@ -594,8 +625,8 @@ test dom-2.31 {parse document with undeclared xml prefix} {
                 {<!DOCTYPE doc [<!ENTITY e1 PUBLIC "e1" "e1.xml">]>
                     <doc>&e1;</doc>}
     } errMsg
-    string range $errMsg 0 30
-} {Namespace prefix is not defined}
+    set errMsg
+} {The namespace prefix of the element foo:e is not defined, referenced in entity "e1.xml" at line 1 character 8, referenced at line 2 character 25}
     
 test dom-2.32 {parse document with undeclared xml prefix and -ignorexmlns} {
     set doc [dom parse -ignorexmlns {<foo:e><a/></foo:e>}]
@@ -763,6 +794,11 @@ test dom-2.47 {parse chunk ends in multbyte char} {
     $doc delete
     expr {$str eq $new ? 1 : 0} 
 } 1
+
+test dom-2.48 {parse document with undeclared attribute prefix} {
+    catch {dom parse {<doc><foo e:att="boo"/></doc>}} errMsg
+    set errMsg
+} {The namespace prefix of the attribute e:att is not defined, referenced at line 1 character 23}
 
 test dom-3.1 {isName} {
     dom isName ":foo"
@@ -2532,25 +2568,63 @@ test dom-15.2 {fromScriptContext} {
     set result
 } 1
 
-test dom-16-1 {xml:space} {
+test dom-16.1 {xml:space preserve} {
     set doc [dom parse {<doc xml:space="preserve"> </doc>}]
     set root [$doc documentElement]
-    set result [$root selectNodes string()]
+    set result [$root text]
     $doc delete
     set result
 } { }
 
-test dom-16-2 {xml:space} {
-    set doc [dom parse {<doc xml:space="preserve"><es> </es><ed xml:space="default"> </ed> </doc>}]
+test dom-16.2 {xml:space default} {
+    set doc [dom parse {<doc xml:space="default"> </doc>}]
+    set root [$doc documentElement]
+    set result [$root text]
+    $doc delete
+    set result
+} {}
+
+test dom-16.3 {xml:space default inside preserve} {
+    set doc [dom parse {<doc xml:space="preserve"><es> </es><ed xml:space="default"> </ed></doc>}]
     set root [$doc documentElement]
     set node [$root firstChild]
-    set result [$node selectNodes string()]
+    set result [$node text]
     set node [$node nextSibling]
-    append result [$node selectNodes string()]
+    append result [$node text]
+    $doc delete
+    set doc [dom parse {<doc xml:space="preserve"><es> </es><ed> </ed></doc>}]
+    set root [$doc documentElement]
+    set node [$root firstChild]
+    append result [$node text]
+    set node [$node nextSibling]
+    append result [$node text]
     $doc delete
     set result
-} { }
+} {   }
 
+test dom-16.4 {xml:space nested preserve} {
+    set doc [dom parse {<doc xml:space="preserve"><es> </es><ed xml:space="preserve"> </ed></doc>}]
+    set root [$doc documentElement]
+    set node [$root firstChild]
+    set result [$node text]
+    set node [$node nextSibling]
+    append result [$node text]
+    $doc delete
+    set result
+} {  }
+
+test dom-16.5 {xml:space nestend default in preserve} {
+    set doc [dom parse {<doc>
+        <el1 xml:space="preserve"> <el2 xml:space="preserve"> <el3 xml:space="default">
+             <el4 xml:space="default">
+                  <el5 xml:space="preserve"> </el5>
+             </el4>
+        </el3> </el2> </el1>   </doc>}]
+    set root [$doc documentElement]
+    set result [$root asText]
+    $doc delete
+    set result
+} {     }
 
 # cleanup
 ::tcltest::cleanupTests

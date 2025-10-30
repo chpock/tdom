@@ -1,5 +1,5 @@
-C Started.
-D 2025-10-27T00:14:58.781
+C Made\sthe\stDOM\sDOM\stree\sbuilder\sxml:space\saware.\sEven\swithout\s-keepEmpties\swhite\sspace\sonly\stext\snodes\swill\sbe\sinserted\sinto\sthe\stree\sif\sthey\sare\sin\sa\ssub-tree\sof\san\selement\swith\sxml:space\sattribute\swith\svalue\spreserve.\sSwitching\sback\sto\sdefault\s(ignoring\swhite\sspace\sonly\spcdata)\sfor\sa\ssub-tree\sinside\swith\san\sxml:space\sattribute\swith\svalue\sdefault\sand\snested\suse\sof\sxml:space\sis\ssupported.\sModernized\serror\sreporting\sfrom\sstartelement()\swhile\sin\sthis\scode\sand\sfilled\sthe\sso\sfar\smissing\serror\sraising\sin\scase\sof\snot\sdefined\sattribute\sprefix.\sFixed\sthe\sversion\sbump\sto\s0.9.7.
+D 2025-10-30T01:22:55.485
 F .fossil-settings/crlf-glob 3fc81610a0f32c43d5830d2e2b08d1a0cbfb74f5
 F .fossil-settings/ignore-glob bdfbbdd88f6c9099755206650cd164eb37aca373
 F .fossil-settings/manifest a09a968bf05a50058f3ad50132730b719bc39e76
@@ -132,7 +132,7 @@ F generic/HTML5ent.inc c122e35eb1be8e325f8846080bbccc166978cfe7136e850d7e8aa4778
 F generic/aolstub.cpp 0a4cd5a84d820496ca10237e934b8b4ccac8f827
 F generic/datatypes.c 1a8527338f505b9e7dc207ad0a43397b2c0d6ad2c863ac8bf36b686697b2d253
 F generic/datatypes.h 3e41d07bcf50cf6959b6e14416dfcb0d7b5aafc65683322978ec185c2a259332
-F generic/dom.c 356a231322aed94764a612da821a3b900798d12f00dc191982f0fc7c75dd1cd8
+F generic/dom.c a8c4115b1bb2b73354acc910cddcc0b71ff4f983cb7dffa148abe330aeecc470
 F generic/dom.h d636c1a2bd3ca4e21684a121ce8581dda0cb064912b3ee21c8a4678522bef75f
 F generic/domalloc.c ce41b8a16e855ee3a3db1d4b797f835a77f1f9260f24db4cb7dc73a07ee4670b
 F generic/domalloc.h 961f83bb46dec27dbcf36ed430ed81b1f485a1fdfaa2f7df8b60bbcf861d0fe3
@@ -204,7 +204,7 @@ F tests/data/xslt_1.xsl e96e4c1f0cd3467141815c97fe917333b09e8de9
 F tests/decls.test 06d0ba0cbc18e26a1524cb17a6ef9adf2a0fc864
 F tests/doctype.test 015c514bd8919467c1074dc3068a527abb3988b5
 F tests/dom.bench 5446ce379127b8d5700f18a5a0848e580313d0d7
-F tests/dom.test 6a1365bc7091def42bb99771f92bb72939c260ae950b92f21b0c5e4fac4075ee
+F tests/dom.test d88af4a6681b46d57e01e1b2234b685acbd8760879c05ad61ce8f15fbdc33ddf
 F tests/domDoc.test 095f2df0dda3afb96574c585b292b5ae061d0134ae78bd31a58dedda002a6fa5
 F tests/domNode.bench 3d457513be7908bab88ac0e23e1864f7341e3090
 F tests/domNode.test 843287a57fe1a58e327fcf3c8b94892d7553e14b3cb6920c5a7d3a3c93cb94f8
@@ -215,7 +215,7 @@ F tests/entity.test 065c6c1af854db838faf9ad56151342eee478f8501a5f65778a144b10610
 F tests/html5reader.test 05b49514f3aed62b6b8fe4e55af24ed3a4e3168a2bd3b94e454d3752a8d12d1f
 F tests/htmlreader.test 1a7d62ad1bfd1066349b1115a8e7a561befb3d97fcd207cf312b7f56a4a871bf
 F tests/i18n.test 421e3998480ed5ce9420f4b596c384b8d5261e7fb4b33c0a7c12ef126d476939
-F tests/loadtdom.tcl 4c09719b09c09b5a7cbc584ae7856a5df3abd44b843ac78fe8f6c4042e476af0
+F tests/loadtdom.tcl 6e3461a24b9a43d7ebea33eafab5bcdb4c273c1645a861828bddf7302be4741b
 F tests/namespace.test 0a13b2bf59bb088525ca7b64d0b2bce6a349c627ca3dd1c17a4cc969d16fe57c
 F tests/parser.test 87eed84aec743e2ac02959a7276cd715bb764c2f479f566a69fb243ff2d72f5e
 F tests/pcdata.test d24772594d762437300d6a48231f0eb16553855a
@@ -247,11 +247,8 @@ F xe/README 91626be10fa0b48c38184bb73b09eea074008fb082559eaf5c0fb8bb83997903
 F xe/xe 075a1f1c4a5758222c52a4688f9fe22dc3d925e366316cf50d84501c9ca3fdb1 x
 F xe/xe-input fb58cbefe5e3acceb9567a165ef7e655ad08b44e
 F xe/xe.bat 8622c5a70666a58d2316df568354c70593848098
-P 60530260a9a721374180fcd1a773c20ead22fc3a17ef64552bec9a8ca30177c9
-R 58a0a9ffc977c79f1e432fa9f1768d93
-T *branch * xml:space
-T *sym-xml:space *
-T -sym-trunk *
+P 5ca23da50bad4858ee5cfba76c83428a339cb47e10376625ad8cde4737e195b2
+R 3f7dc4beffab7ea5281b88be023f61e8
 U rolf
-Z 486420b580f4a74a4eca807b7982f11f
+Z fcde428c440cf21445aafa177ed97767
 # Remove this line to create a well-formed Fossil manifest.
