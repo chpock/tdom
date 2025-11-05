@@ -21,43 +21,50 @@
     <title>DESCRIPTION </title>    
 
     <p>This command provides the creation of DOM trees in memory. In
-the usual case a string containing a XML information is parsed and converted
-into a DOM tree. Other possible parse input may be HTML or JSON.
-The <m>method</m> indicates a specific subcommand. </p>
+    the usual case a string containing an XML document is parsed and
+    converted into a DOM tree. Other possible parse input may be HTML
+    or JSON. The <m>method</m> indicates a specific subcommand. </p>
 
     <p>The valid methods are:</p>
 
       <commandlist>
         <commanddef>
-          <command><cmd>dom</cmd> <method>parse</method> ?<m>options</m>? ?<m>data</m>?</command>
-          <desc>Parses the XML information and builds up the DOM tree in memory
+          <command><cmd>dom</cmd> <method>parse</method> ?<m>options</m>? ?<m>data</m>? ?objvar?</command>
+          <desc>Parses the <m>data</m> and builds up a DOM tree from that in memory
 providing a Tcl object command to this DOM document object. Example:
 
       <example>
 dom parse $xml doc
 $doc documentElement root</example>
 
-      <p>parses the XML in the variable xml, creates the DOM tree in memory,
+      <p>This parses the XML data in the variable xml, creates the DOM tree in memory,
 make a reference to the document object, visible in Tcl as a document object
-command, and assigns this new object name to the variable doc. When doc gets
-freed, the DOM tree and the associated Tcl command object (document and all
-node objects) are freed automatically.</p>
+command  and assigns this new object command to the variable doc. If the variable doc gets
+gets out of scope, the DOM tree and the associated Tcl command object (document and all
+      node objects) are freed automatically.</p>
+
+      <p>Instead of using the <m>objvar</m> argument you may just use
+      the returned object command:</p>
       
       <example>
 set document [dom parse $xml]
 set root     [$document documentElement]</example>
 
-      <p>parses the XML in the variable xml, creates the DOM tree in memory,
-make a reference to the document object, visible in Tcl as a document object
-command, and returns this new object name, which is then stored in
-<m>document</m>.  To free the underlying DOM tree and the associative Tcl
-object commands (document + nodes + fragment nodes) the document object command
-has to be explicitly deleted by:</p>
+      <p>This creates a persitent DOM tree which is not freed
+      automatically. To free the DOM tree and the related Tcl
+      object commands (document + nodes + fragment nodes) the document
+      object command has to be explicitly deleted by:</p>
 
       <example>
 $document delete
 </example>or<example>
 rename $document ""</example>
+
+      <p>By default no white space only text nodes are inserted into
+      the tree with respecting <m>xml:space="preserve"</m> attributes
+      (and reverting to default inside such a subtree with
+      <m>xml:space="default"</m>).
+</p>
 
 <p>The valid options are:</p>
 <optlist>
