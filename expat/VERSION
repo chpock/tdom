@@ -1,1 +1,3 @@
 expat-2.7.3
+# Note to maintainer:
+# Update tdom.m4 "expat library version" check accordingly.
