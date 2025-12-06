@@ -171,14 +171,14 @@ package require tdom
 .SH "DESCRIPTION "
 .PP
 This command provides the creation of DOM trees in memory. In
-the usual case a string containing a XML information is parsed and converted
-into a DOM tree. Other possible parse input may be HTML or JSON.
-The \fImethod\fR indicates a specific subcommand.
+the usual case a string containing an XML document is parsed and
+converted into a DOM tree. Other possible parse input may be HTML
+or JSON. The \fImethod\fR indicates a specific subcommand.
 .PP
 The valid methods are:
 .TP
-\&\fB\fBdom\fP \fBparse\fP ?\fIoptions\fB? ?\fIdata\fB?
-\&\fRParses the XML information and builds up the DOM tree in memory
+\&\fB\fBdom\fP \fBparse\fP ?\fIoptions\fB? ?\fIdata\fB? ?objvar?
+\&\fRParses the \fIdata\fR and builds up a DOM tree from that in memory
 providing a Tcl object command to this DOM document object. Example:
 
       
@@ -189,11 +189,14 @@ dom parse $xml doc
 $doc documentElement root
 .CE
 .PP
-parses the XML in the variable xml, creates the DOM tree in memory,
+This parses the XML data in the variable xml, creates the DOM tree in memory,
 make a reference to the document object, visible in Tcl as a document object
-command, and assigns this new object name to the variable doc. When doc gets
-freed, the DOM tree and the associated Tcl command object (document and all
+command  and assigns this new object command to the variable doc. If the variable doc gets
+gets out of scope, the DOM tree and the associated Tcl command object (document and all
 node objects) are freed automatically.
+.PP
+Instead of using the \fIobjvar\fR argument you may just use
+the returned object command:
 
       
       
@@ -203,12 +206,10 @@ set document [dom parse $xml]
 set root     [$document documentElement]
 .CE
 .PP
-parses the XML in the variable xml, creates the DOM tree in memory,
-make a reference to the document object, visible in Tcl as a document object
-command, and returns this new object name, which is then stored in
-\&\fIdocument\fR.  To free the underlying DOM tree and the associative Tcl
-object commands (document + nodes + fragment nodes) the document object command
-has to be explicitly deleted by:
+This creates a persitent DOM tree which is not freed
+automatically. To free the DOM tree and the related Tcl
+object commands (document + nodes + fragment nodes) the document
+object command has to be explicitly deleted by:
 
 
       
@@ -222,6 +223,11 @@ or
 
 rename $document ""
 .CE
+.PP
+By default no white space only text nodes are inserted into
+the tree with respecting \fIxml:space="preserve"\fR attributes
+(and reverting to default inside such a subtree with
+\&\fIxml:space="default"\fR).
 .PP
 The valid options are:
 .IP "\fB-simple\fR"
@@ -473,6 +479,36 @@ This option expects a positiv integer as argument. You
 should never need to use this option, because the
 default value (8388608) should work for any real data.
 If you ever need to increase this value for non-attack
+payload, please report.
+.IP "\fB-setReparseDeferralEnabled  \fI<boolean>\fP\fR"
+Expat protects itself against quadratic parsing
+time due to long tokens in malicious crafted
+documents. This protection may have the side effect
+that a parsing event is not triggered directly after
+the end of the respective token but only after the
+parser has processed some more bytes of the input.
+This option allows disabling this behavior.
+.IP "\fB-allocTrackerActivationThreshold  \fI<float>\fP\fR"
+This option together with
+\&\fI-allocTrackerMaximumAmplification\fR gives control
+for the parser limits to protect against the use of
+disproportional amounts of dynamic memory due to
+malicious crafted documents. This option expects a
+positive integer as argument. You should never need to
+use this option, because the default value (100.0)
+should work for any real data. If you ever need to
+increase this value for non-attack payload, please
+report.
+.IP "\fB-allocTrackerMaximumAmplification  \fI<long>\fP\fR"
+This option together with
+\&\fI-allocTrackerActivationThreshold\fR gives control
+for the parser limits to protect against the use of
+disproportional amounts of dynamic memory due to
+malicious crafted documents. This option expects a
+positive integer as argument. You should never need to
+use this option, because the default value (67108864,
+that is 64 MiB) should work for any real data. If you
+ever need to increase this value for non-attack
 payload, please report.
 .PP
 .RE
@@ -845,12 +881,12 @@ are build in.
 .IP "\fBlargedata\fR"
 Returns as boolean if the expat library
 configuration allows pcdata content of an XML
-element. Could be true only if build with Tcl 9
-for a 64-bit architecture and then depends if the
-build-in expat version is used with default
-configuration or if the used system expat library
-is capable enough for this (typically not). are
-build in.
+element greater than 2 GByte. Could be true only if
+build with Tcl 9 for a 64-bit architecture and
+then depends if the build-in expat version is used
+with default configuration or if the used system
+expat library is capable enough for this
+(typically not).
 .RE
 .SH KEYWORDS
 XML, DOM, document, node, parsing

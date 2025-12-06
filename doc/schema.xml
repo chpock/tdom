@@ -1092,8 +1092,9 @@ s define {
             </commanddef>
             <commanddef>
                 <command><cmd>base64</cmd></command>
-                <desc>This text constraint matches if text is valid according to
-                RFC 4648.</desc>
+                <desc>This text constraint matches if text is valid
+                according to RFC 4648. This is available as common Tcl
+                command tdom::type::base64.</desc>
             </commanddef>
             <commanddef>
                 <command><cmd>hexBinary</cmd></command>

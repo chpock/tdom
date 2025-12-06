@@ -1092,8 +1092,9 @@ integer. This is available as common Tcl command
 tdom::type::duration.
 .TP
 \&\fB\fBbase64\fP
-\&\fRThis text constraint matches if text is valid according to
-RFC 4648.
+\&\fRThis text constraint matches if text is valid
+according to RFC 4648. This is available as common Tcl
+command tdom::type::base64.
 .TP
 \&\fB\fBhexBinary\fP
 \&\fRThis text constraint matches if text is a sequence of

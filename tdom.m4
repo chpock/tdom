@@ -509,8 +509,8 @@ AC_DEFUN(TDOM_PATH_EXPAT, [
                             XML_Expat_Version expatVersion;
                             expatVersion = XML_ExpatVersionInfo();
                             if (expatVersion.major < 2
-                                || expatVersion.minor < 6
-                                || expatVersion.micro < 4) {
+                                || expatVersion.major == 2 && expatVersion.minor < 7
+                                || expatVersion.major == 2 && expatVersion.minor == 7 && expatVersion.micro < 3) {
                                 return 1;
                             };
                             return 0;

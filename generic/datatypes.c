@@ -2478,6 +2478,22 @@ jsontypeTCObjCmd (
 }
 
 static int
+base64ObjCmd (
+    ClientData UNUSED(clientData),
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    checkNrArgs (2,2,"<text>");
+    Tcl_SetObjResult (interp,
+                      Tcl_NewBooleanObj (
+                          base64Impl (interp, NULL,
+                                      Tcl_GetString (objv[1]))));
+    return TCL_OK;
+}
+
+static int
 dateObjCmd (
     ClientData UNUSED(clientData),
     Tcl_Interp *interp,
@@ -2506,6 +2522,22 @@ dateTimeObjCmd (
                       Tcl_NewBooleanObj (
                           isodateImpl (interp, (void *) 1,
                                        Tcl_GetString (objv[1]))));
+    return TCL_OK;
+}
+
+static int
+hexBinaryObjCmd (
+    ClientData UNUSED(clientData),
+    Tcl_Interp *interp,
+    int objc,
+    Tcl_Obj *const objv[]
+    )
+{
+    checkNrArgs (2,2,"<text>");
+    Tcl_SetObjResult (interp,
+                      Tcl_NewBooleanObj (
+                          hexBinaryImpl (interp, NULL,
+                                         Tcl_GetString (objv[1]))));
     return TCL_OK;
 }
 
@@ -2644,14 +2676,18 @@ tDOM_DatatypesInit (
                           jsontypeTCObjCmd, NULL, NULL);
     
     /* Exposed text type commands */
+    Tcl_CreateObjCommand (interp,"tdom::type::base64",
+                          base64ObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp,"tdom::type::date",
                           dateObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp,"tdom::type::dateTime",
                           dateTimeObjCmd, NULL, NULL);
-    Tcl_CreateObjCommand (interp,"tdom::type::time",
-                          timeObjCmd, NULL, NULL);
     Tcl_CreateObjCommand (interp,"tdom::type::duration",
                           durationObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::type::hexBinary",
+                          hexBinaryObjCmd, NULL, NULL);
+    Tcl_CreateObjCommand (interp,"tdom::type::time",
+                          timeObjCmd, NULL, NULL);
 
 }
 #endif

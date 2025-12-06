@@ -21,43 +21,50 @@
     <title>DESCRIPTION </title>    
 
     <p>This command provides the creation of DOM trees in memory. In
-the usual case a string containing a XML information is parsed and converted
-into a DOM tree. Other possible parse input may be HTML or JSON.
-The <m>method</m> indicates a specific subcommand. </p>
+    the usual case a string containing an XML document is parsed and
+    converted into a DOM tree. Other possible parse input may be HTML
+    or JSON. The <m>method</m> indicates a specific subcommand. </p>
 
     <p>The valid methods are:</p>
 
       <commandlist>
         <commanddef>
-          <command><cmd>dom</cmd> <method>parse</method> ?<m>options</m>? ?<m>data</m>?</command>
-          <desc>Parses the XML information and builds up the DOM tree in memory
+          <command><cmd>dom</cmd> <method>parse</method> ?<m>options</m>? ?<m>data</m>? ?objvar?</command>
+          <desc>Parses the <m>data</m> and builds up a DOM tree from that in memory
 providing a Tcl object command to this DOM document object. Example:
 
       <example>
 dom parse $xml doc
 $doc documentElement root</example>
 
-      <p>parses the XML in the variable xml, creates the DOM tree in memory,
+      <p>This parses the XML data in the variable xml, creates the DOM tree in memory,
 make a reference to the document object, visible in Tcl as a document object
-command, and assigns this new object name to the variable doc. When doc gets
-freed, the DOM tree and the associated Tcl command object (document and all
-node objects) are freed automatically.</p>
+command  and assigns this new object command to the variable doc. If the variable doc gets
+gets out of scope, the DOM tree and the associated Tcl command object (document and all
+      node objects) are freed automatically.</p>
+
+      <p>Instead of using the <m>objvar</m> argument you may just use
+      the returned object command:</p>
       
       <example>
 set document [dom parse $xml]
 set root     [$document documentElement]</example>
 
-      <p>parses the XML in the variable xml, creates the DOM tree in memory,
-make a reference to the document object, visible in Tcl as a document object
-command, and returns this new object name, which is then stored in
-<m>document</m>.  To free the underlying DOM tree and the associative Tcl
-object commands (document + nodes + fragment nodes) the document object command
-has to be explicitly deleted by:</p>
+      <p>This creates a persitent DOM tree which is not freed
+      automatically. To free the DOM tree and the related Tcl
+      object commands (document + nodes + fragment nodes) the document
+      object command has to be explicitly deleted by:</p>
 
       <example>
 $document delete
 </example>or<example>
 rename $document ""</example>
+
+      <p>By default no white space only text nodes are inserted into
+      the tree with respecting <m>xml:space="preserve"</m> attributes
+      (and reverting to default inside such a subtree with
+      <m>xml:space="default"</m>).
+</p>
 
 <p>The valid options are:</p>
 <optlist>
@@ -375,7 +382,49 @@ needed.</desc>
                 payload, please report.</desc>
               </optdef>
 
-          </optlist>
+              <optdef>
+                <optname>-setReparseDeferralEnabled</optname>
+                <optarg>&lt;boolean&gt;</optarg>
+                <desc>Expat protects itself against quadratic parsing
+                time due to long tokens in malicious crafted
+                documents. This protection may have the side effect
+                that a parsing event is not triggered directly after
+                the end of the respective token but only after the
+                parser has processed some more bytes of the input.
+                This option allows disabling this behavior.</desc>
+              </optdef>
+              
+              <optdef>
+                <optname>-allocTrackerActivationThreshold</optname>
+                <optarg>&lt;float&gt;</optarg>
+                <desc>This option together with
+                <m>-allocTrackerMaximumAmplification</m> gives control
+                for the parser limits to protect against the use of
+                disproportional amounts of dynamic memory due to
+                malicious crafted documents. This option expects a
+                positive integer as argument. You should never need to
+                use this option, because the default value (100.0)
+                should work for any real data. If you ever need to
+                increase this value for non-attack payload, please
+                report.</desc>
+              </optdef>
+              
+              <optdef>
+                <optname>-allocTrackerMaximumAmplification</optname>
+                <optarg>&lt;long&gt;</optarg>
+                <desc>This option together with
+                <m>-allocTrackerActivationThreshold</m> gives control
+                for the parser limits to protect against the use of
+                disproportional amounts of dynamic memory due to
+                malicious crafted documents. This option expects a
+                positive integer as argument. You should never need to
+                use this option, because the default value (67108864,
+                that is 64 MiB) should work for any real data. If you
+                ever need to increase this value for non-attack
+                payload, please report.</desc>
+              </optdef>
+
+            </optlist>
 <p/>
 </desc>
         </commanddef>
@@ -806,12 +855,12 @@ recommendation. Otherwise it returns 0.</desc>
                     <optname>largedata</optname>
                     <desc>Returns as boolean if the expat library
                     configuration allows pcdata content of an XML
-                    element. Could be true only if build with Tcl 9
-                    for a 64-bit architecture and then depends if the
-                    build-in expat version is used with default
-                    configuration or if the used system expat library
-                    is capable enough for this (typically not). are
-                    build in.</desc>
+                    element greater than 2 GByte. Could be true only if
+                    build with Tcl 9 for a 64-bit architecture and
+                    then depends if the build-in expat version is used
+                    with default configuration or if the used system
+                    expat library is capable enough for this
+                    (typically not).</desc>
                 </optdef>
             </optlist>
             </desc>   
