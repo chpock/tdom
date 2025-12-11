@@ -19,7 +19,6 @@ namespace eval xsd {
     variable targetNS
     variable schema
     variable output "collect"
-    variable nrLookAt 0
     variable xsd2schemaName [dict create {*}{
         base64Binary base64
         decimal number
@@ -116,7 +115,6 @@ rproc xsd::sputc {text} {
 }
 
 rproc xsd::sputce {text} {
-    incr ::xsd::nrLookAt
     foreach line [split $text "\n"] {
         append result "[indent]# LOOK_AT $line\n"
     }
@@ -193,7 +191,7 @@ rproc xsd::annotation {node} {
             set lang [$child getAttributeNS \
                           "http://www.w3.org/XML/1998/namespace" lang ""]
             if {$lang ne ""} {
-                 sputc "($lang:) [$child text]"
+                sputc "($lang:) [$child text]"
             } else {
                 sputc "[$child text]"
             }
@@ -883,21 +881,15 @@ rproc xsd::generateAttributes {_atts} {
             }
             set content \
                 [split [dict get $nsattdata $name content] "\n"]
-            if {[llength $content] > 1} {
+            if {[string trim $content] ne ""} {
                 sput "$start \{"
-                #incr level
+                incr level
                 foreach line $content {
+                    if {[string trim $line] eq ""} continue
                     sput $line
                 }
-                #incr level -1
+                incr level -1
                 sput "\}"
-            } else {
-                set thiscontent [lindex $content 0]
-                if {[string first " " $thiscontent] > 0} {
-                    sput "$start \{$thiscontent\}"
-                } else {
-                    sput "$start $thiscontent"
-                }
             }
         }
     }
@@ -1390,7 +1382,6 @@ proc xsd::generateSchema {file} {
     variable redefining 0
     variable schemadocs ""
     variable attgroupStack ""
-    variable nrLookAt 0
 
     if {!$standalone && [info exists xsddata]} {
         unset xsddata

@@ -267,7 +267,7 @@ proc fromDTDfile {file} {
 }
 
 proc usage {} {
-    puts "$argv0 <XML-with-DTD>"
+    puts "$::argv0 <XML-with-DTD>"
 }
 
 proc run {args} {
