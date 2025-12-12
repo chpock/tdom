@@ -255,6 +255,109 @@ static const char *Schema_CP_Type2str[] = {
     "KEYSPACE_END",
     "JSON_STRUCT_TYPE"
 };
+static const char *Schema_Quant_Type2str[] = {
+    "ONE",
+    "OPT",
+    "REP",
+    "PLUS",
+    "NM",
+    "ERROR"
+};
+static void serializeCP (
+    SchemaCP *pattern
+    )
+{
+    fprintf (stderr, "CP %p type: %s\n",
+             pattern, Schema_CP_Type2str[pattern->type]);
+    switch (pattern->type) {
+    case SCHEMA_CTYPE_KEYSPACE_END:
+    case SCHEMA_CTYPE_KEYSPACE:
+        fprintf (stderr, "\tName: '%s'\n", pattern->name);
+        break;
+    case SCHEMA_CTYPE_NAME:
+    case SCHEMA_CTYPE_PATTERN:
+        fprintf (stderr, "\tName: '%s' Namespace: '%s'\n",
+                 pattern->name, pattern->namespace);
+        if (pattern->flags & FORWARD_PATTERN_DEF) {
+            fprintf (stderr, "\tAnonymously defined NAME\n");
+        }
+        if (pattern->flags & PLACEHOLDER_PATTERN_DEF) {
+            fprintf (stderr, "\tAs placeholder defined NAME\n");
+        }
+        if (pattern->flags & LOCAL_DEFINED_ELEMENT) {
+            fprintf (stderr, "\tLocal defined NAME\n");
+        }
+        if (pattern->flags & ELEMENTTYPE_DEF) {
+            fprintf (stderr, "\tElementtype '%s'\n", pattern->name);
+        }
+        if (pattern->flags & TYPED_ELEMENT) {
+            fprintf (stderr, "\tTyped element - type '%s'\n",
+                     pattern->typeptr->name);
+        }
+        /* Fall through. */
+    case SCHEMA_CTYPE_CHOICE:
+    case SCHEMA_CTYPE_INTERLEAVE:
+        fprintf (stderr, "\t%d children\n", pattern->nc);
+        break;
+    case SCHEMA_CTYPE_ANY:
+        if (pattern->namespace) {
+            fprintf (stderr, "\tNamespace: '%s'\n",
+                     pattern->namespace);
+        }
+        if (pattern->typedata) {
+            fprintf (stderr, "\t%" TDOM_LS_MODIFIER "d  namespaces\n",
+                     ((Tcl_HashTable*)pattern->typedata)->numEntries);
+        }            
+        break;
+    case SCHEMA_CTYPE_TEXT:
+    case SCHEMA_CTYPE_VIRTUAL:
+    case SCHEMA_CTYPE_JSON_STRUCT:
+        /* Do nothing */
+        break;
+    }
+}
+
+static int getDeep (
+    SchemaValidationStack *se
+    )
+{
+    int i = 0;
+    while (se) {
+        if (se->pattern->type == SCHEMA_CTYPE_NAME) i++;
+        se = se->down;
+    }
+    return i;
+}
+    
+static void serializeQuant (
+    SchemaQuantNM quantnm
+    )
+{
+    fprintf (stderr, " Quant type: %s",
+             Schema_Quant_Type2str[quantnm.quant]);
+    if (quantnm.quant == SCHEMA_CQUANT_NM) {
+        fprintf (stderr, " n %d m %d\n", quantnm.min, quantnm.max);
+    } else {
+        fprintf (stderr, "\n");
+    }
+}
+
+static void serializeStack (
+    SchemaData *sdata
+    )
+{
+    SchemaValidationStack *se;
+
+    fprintf (stderr, "++++ Current validation stack:\n");
+    se = sdata->stack;
+    while (se) {
+        serializeCP (se->pattern);
+        fprintf (stderr, "\tdeep: %d ac: %d hm: %d\n",
+                 getDeep (se), se->activeChild, se->hasMatched);
+        se = se->down;
+    }
+    fprintf (stderr, "++++ Stack bottom\n");
+}
 #endif
 
 #define CHECK_SI                                                        \
@@ -313,7 +416,8 @@ minOne (
     )
 {
     return (quant.quant == SCHEMA_CQUANT_ONE
-            || quant.quant == SCHEMA_CQUANT_PLUS) ? 1 : 0;
+            || quant.quant == SCHEMA_CQUANT_PLUS
+            || (quant.quant == SCHEMA_CQUANT_NM && quant.min > 0)) ? 1 : 0;
 }
 
 static TDOM_INLINE int 
@@ -326,28 +430,52 @@ mayMiss (
             || (quant.quant == SCHEMA_CQUANT_NM && quant.min == 0)) ? 1 : 0;
 }
 
-static TDOM_INLINE int 
-hasMatched (
+static TDOM_INLINE int
+mayMatch (
     SchemaQuantNM quant,
     int hm
     )
 {
-    if (hm == 0) {
-        return mayMiss (quant);
-    }
-    if (quant.quant == SCHEMA_CQUANT_NM) {
-        if (quant.max > -1 && quant.max >= hm) {
-            return 1;
-        } else {
-            return 0;
-        }
-    } else {
-        return 1;
-    }
+    if (hm == 0) return mayMiss (quant);
+    if (quant.quant == SCHEMA_CQUANT_NM) return (hm >= quant.min ? 1 : 0);
+    return 1;
 }
 
-#define mustMatch(quant,hm) \
-    (hm) == 0 ? minOne(quant) : 0
+
+static TDOM_INLINE int 
+finished (
+    SchemaQuantNM quant,
+    int hm
+    )
+{
+    DBG(fprintf(stderr, "finished start: hm %d ",hm);serializeQuant(quant));
+    if (hm == 0) return 0;
+    switch (quant.quant) {
+    case SCHEMA_CQUANT_NM:
+        if (quant.max > -1 && hm >= quant.max) return 1;
+        else return 0;
+    case SCHEMA_CQUANT_ONE:
+    case SCHEMA_CQUANT_OPT:
+        if (hm) return 1;
+        break;
+    default:
+        return 0;
+    }
+    return 0;
+}
+
+static TDOM_INLINE int 
+mustMatch (
+    SchemaQuantNM quant,
+    int hm
+    )
+{
+    if (hm == 0) return minOne(quant);
+    if (quant.quant == SCHEMA_CQUANT_NM && hm < quant.min) {
+        return 1;
+    }
+    return 0;
+}
 
 #define getContext(cp, ac, hm)                    \
     cp = se->pattern;                             \
@@ -425,92 +553,6 @@ tDOM_initSchemaCP (
     return pattern;
 }
 
-DDBG(
-static void serializeCP (
-    SchemaCP *pattern
-    )
-{
-    fprintf (stderr, "CP %p type: %s\n",
-             pattern, Schema_CP_Type2str[pattern->type]);
-    switch (pattern->type) {
-    case SCHEMA_CTYPE_KEYSPACE_END:
-    case SCHEMA_CTYPE_KEYSPACE:
-        fprintf (stderr, "\tName: '%s'\n", pattern->name);
-        break;
-    case SCHEMA_CTYPE_NAME:
-    case SCHEMA_CTYPE_PATTERN:
-        fprintf (stderr, "\tName: '%s' Namespace: '%s'\n",
-                 pattern->name, pattern->namespace);
-        if (pattern->flags & FORWARD_PATTERN_DEF) {
-            fprintf (stderr, "\tAnonymously defined NAME\n");
-        }
-        if (pattern->flags & PLACEHOLDER_PATTERN_DEF) {
-            fprintf (stderr, "\tAs placeholder defined NAME\n");
-        }
-        if (pattern->flags & LOCAL_DEFINED_ELEMENT) {
-            fprintf (stderr, "\tLocal defined NAME\n");
-        }
-        if (pattern->flags & ELEMENTTYPE_DEF) {
-            fprintf (stderr, "\tElementtype '%s'\n", pattern->name);
-        }
-        if (pattern->flags & TYPED_ELEMENT) {
-            fprintf (stderr, "\tTyped element - type '%s'\n",
-                     pattern->typeptr->name);
-        }
-        /* Fall through. */
-    case SCHEMA_CTYPE_CHOICE:
-    case SCHEMA_CTYPE_INTERLEAVE:
-        fprintf (stderr, "\t%d children\n", pattern->nc);
-        break;
-    case SCHEMA_CTYPE_ANY:
-        if (pattern->namespace) {
-            fprintf (stderr, "\tNamespace: '%s'\n",
-                     pattern->namespace);
-        }
-        if (pattern->typedata) {
-            fprintf (stderr, "\t%d namespaces\n",
-                     ((Tcl_HashTable*)pattern->typedata)->numEntries);
-        }            
-        break;
-    case SCHEMA_CTYPE_TEXT:
-    case SCHEMA_CTYPE_VIRTUAL:
-    case SCHEMA_CTYPE_JSON_STRUCT:
-        /* Do nothing */
-        break;
-    }
-}
-
-static int getDeep (
-    SchemaValidationStack *se
-    )
-{
-    int i = 0;
-    while (se) {
-        if (se->pattern->type == SCHEMA_CTYPE_NAME) i++;
-        se = se->down;
-    }
-    return i;
-}
-    
-static void serializeStack (
-    SchemaData *sdata
-    )
-{
-    SchemaValidationStack *se;
-
-    fprintf (stderr, "++++ Current validation stack:\n");
-    se = sdata->stack;
-    while (se) {
-        serializeCP (se->pattern);
-        fprintf (stderr, "\tdeep: %d ac: %d hm: %d\n",
-                 getDeep (se), se->activeChild, se->hasMatched);
-        se = se->down;
-    }
-    fprintf (stderr, "++++ Stack bottom\n");
-}
-)
-
-/* DBG end */
 
 
 static void freedomKeyConstraints (
@@ -1429,6 +1471,8 @@ matchElementStart (
     Tcl_HashEntry *h;
 
     if (!sdata->stack) return 0;
+    DBG(fprintf (stderr, "matchElementStart:\n");
+        serializeStack(sdata););
     se = sdata->stack;
     getContext (cp, ac, hm);
 
@@ -1669,11 +1713,9 @@ matchElementStart (
         mayskip = 1;
         for (i = 0; i < cp->nc; i++) {
             thismayskip = 0;
-            if (se->interleaveState[i]) {
-                if (hasMatched (cp->quants[i],
-                                se->interleaveState[i])) {
-                    continue;
-                }
+            if (finished (cp->quants[i],
+                          se->interleaveState[i])) {
+                continue;
             }
             icp = cp->content[i];
             switch (icp->type) {
@@ -1691,7 +1733,7 @@ matchElementStart (
                 if (!matchingAny (namespace, icp)) break;
                 sdata->skipDeep = 1;
                 se->hasMatched++;
-                se->interleaveState[i] = 1;
+                se->interleaveState[i]++;
                 /* See comment in tDOM_probeElement: sdata->vname and
                  * sdata->vns may be pre-filled. We reset it here.*/
                 sdata->vname = NULL;
@@ -1703,7 +1745,7 @@ matchElementStart (
                     && icp->namespace == namespace) {
                     pushToStack (sdata, icp);
                     se->hasMatched++;
-                    se->interleaveState[i] = 1;
+                    se->interleaveState[i]++;
                     return 1;
                 }
                 break;
@@ -1725,7 +1767,7 @@ matchElementStart (
                 if (rc == 1) {
                     if (!(sdata->recoverFlags & RECOVER_FLAG_REWIND)) {
                         se->hasMatched++;
-                        se->interleaveState[i] = 1;
+                        se->interleaveState[i]++;
                     }
                     return 1;
                 }
@@ -2381,15 +2423,17 @@ static int checkElementEnd (
         /* Fall through */
     case SCHEMA_CTYPE_INTERLEAVE:
     case SCHEMA_CTYPE_PATTERN:
-        if (ac < cp->nc && (hasMatched (cp->quants[ac], hm))) {
+        if (ac < cp->nc && !(mustMatch (cp->quants[ac], hm))) {
             DBG(fprintf (stderr, "ac %d has matched, skipping to next ac\n", ac));
             ac++; hm = 0;
         }
         while (ac < cp->nc) {
             DBG(fprintf (stderr, "ac %d hm %d mayMiss: %d\n",
                          ac, hm, mayMiss (cp->quants[ac])));
-            if (se->interleaveState && se->interleaveState[ac]) {
-                ac++; continue;
+            if (se->interleaveState) {
+                if (mayMatch(cp->quants[ac], se->interleaveState[ac])) {
+                    ac++; continue;
+                }
             }
             if (mayMiss (cp->quants[ac])) {
                 ac++; continue;
@@ -2928,11 +2972,8 @@ matchText (
         case SCHEMA_CTYPE_INTERLEAVE:
             mayskip = 1;
             for (i = 0; i < cp->nc; i++) {
-                if (se->interleaveState[i]) {
-                    if (maxOne (cp->quants[i])) continue;
-                } else {
-                    if (minOne (cp->quants[i])) mayskip = 0;
-                }
+                if (finished (cp->quants[i], se->interleaveState[i])) continue;
+                if (minOne (cp->quants[i])) mayskip = 0;
                 ic = cp->content[i];
                 switch (ic->type) {
                 case SCHEMA_CTYPE_TEXT:
@@ -3852,7 +3893,7 @@ getNextExpectedWorker (
     int expectedFlags
     )
 {
-    int hm, hnew, mustMatch, mayskip, rc = 1, probeMayskip = 0;
+    int hm, hnew, mustM, mayskip, rc = 1, probeMayskip = 0;
     unsigned int ac, i;
     SchemaCP *cp, *ic, *jc;
     SchemaValidationStack *se1;
@@ -3875,7 +3916,7 @@ getNextExpectedWorker (
     switch (cp->type) {
     case SCHEMA_CTYPE_INTERLEAVE:
         ac = 0;
-        mustMatch = 0;
+        mustM = 0;
         /* fall through */
     case SCHEMA_CTYPE_NAME:
     case SCHEMA_CTYPE_PATTERN:
@@ -3888,7 +3929,7 @@ getNextExpectedWorker (
                 continue;
             }
             if (expectedFlags & EXPECTED_ONLY_MANDATORY
-                && !(mustMatch (cp->quants[ac], hm))) {
+                && !mustMatch(cp->quants[ac], hm)) {
                 ac++;
                 hm = 0;
                 continue;
@@ -4058,7 +4099,7 @@ getNextExpectedWorker (
                 break;
             }
             if (cp->type == SCHEMA_CTYPE_INTERLEAVE) {
-                if (!mustMatch && minOne(cp->quants[ac])) mustMatch = 1;
+                if (!mustM && minOne(cp->quants[ac])) mustM = 1;
             } else {
                 if (!mayskip && !hm && minOne (cp->quants[ac])) break;
             }
@@ -4076,7 +4117,7 @@ getNextExpectedWorker (
             }
             rc = 0;
         } else if (cp->type == SCHEMA_CTYPE_INTERLEAVE) {
-            if (mustMatch) rc = 0;
+            if (mustM) rc = 0;
         } else {
             /* SCHEMA_CTYPE_PATTERN */
             if (ac < cp->nc) rc = 0;

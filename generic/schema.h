@@ -248,11 +248,11 @@ typedef struct SchemaData_
         sdata->cp->quants =                                             \
             REALLOC (sdata->cp->quants,                                 \
                      2 * sdata->contentSize                             \
-                     * sizeof (SchemaQuantNM));                           \
+                     * sizeof (SchemaQuantNM));                         \
         sdata->contentSize *= 2;                                        \
     }                                                                   \
     sdata->cp->content[sdata->cp->nc] = (SchemaCP *) sc;                \
-    sdata->cp->quants[sdata->cp->nc] = SCHEMA_CQUANT_ONE;               \
+    sdata->cp->quants[sdata->cp->nc].quant = SCHEMA_CQUANT_ONE;         \
     sdata->cp->nc++;                                                    \
 
 #define REMEMBER_PATTERN(pattern)                                       \

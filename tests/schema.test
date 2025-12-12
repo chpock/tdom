@@ -2501,6 +2501,34 @@ test schema-7.19 {choice with quantified choice} {
     set result
 } {0 0 1 1 0 0 0 1 0 0 1}
 
+test schema-7.19.1 {choice with quantified choice} {
+    tdom::schema create s
+    s define {
+        defelement doc {
+            choice {
+                element a {0 2}
+                group {
+                    element aa
+                    element ab ?
+                }
+            }
+            element c
+        }
+        foreach e {a aa ab c} {
+            defelement $e {}
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc><a/><a/><a/><c/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} 0
+
+
 test schema-7.20 {group with only optional content} {
     tdom::schema create s
     s define {
