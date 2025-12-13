@@ -43,7 +43,11 @@
                      Tcl_SetStringObj(Tcl_GetObjResult(interp), (str), -1)
 
 #define DEBUG
+/* Uncomment the following line for some run-time debugging output on
+ * stderr */
+/* #define DEBUG */
 /* #define DDEBUG */
+
 /*----------------------------------------------------------------------------
 |   Debug Macros
 |
@@ -552,8 +556,6 @@ tDOM_initSchemaCP (
     }
     return pattern;
 }
-
-
 
 static void freedomKeyConstraints (
     domKeyConstraint *kc
@@ -3161,7 +3163,6 @@ startElement(
         }
     }
 }
-
 
 #ifdef DEBUG
 static void

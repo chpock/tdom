@@ -483,6 +483,8 @@ typedef unsigned int domNodeFlags;
 #define IS_DELETED                4
 #define HAS_BASEURI               8
 #define DISABLE_OUTPUT_ESCAPING  16
+#define SPACE_PRESERVE           32
+#define SPACE_DEFAULT            64
 
 typedef unsigned int domAttrFlags;
 

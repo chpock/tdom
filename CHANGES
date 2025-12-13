@@ -1,4 +1,12 @@
 
+2025-11-05  Rolf Ade  <rolf@pointsman.de>
+            
+        Made the tDOM DOM tree builder aware to xml:space attributes.
+
+2025-10-13  Rolf Ade  <rolf@pointsman.de>
+
+        Updated to expat 2.7.3.
+
 --- Release 0.9.6, 25. Jul 2025 ---
 
 2025-06-05  Rolf Ade  <rolf@pointsman.de>
