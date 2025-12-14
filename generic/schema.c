@@ -42,7 +42,6 @@
 #define SetResult(str) Tcl_ResetResult(interp);                         \
                      Tcl_SetStringObj(Tcl_GetObjResult(interp), (str), -1)
 
-#define DEBUG
 /* Uncomment the following line for some run-time debugging output on
  * stderr */
 /* #define DEBUG */
@@ -493,9 +492,12 @@ mustMatch (
 
 #define updateStack(sdata,se,ac)                        \
     if (!(sdata->recoverFlags & RECOVER_FLAG_REWIND)) { \
-        se->activeChild = ac;                           \
-        se->hasMatched++;                             \
-    }                                                   \
+        if (se->activeChild < ac) {                      \
+            se->activeChild = ac; se->hasMatched = 1;     \
+        } else {                                          \
+            se->hasMatched++;                             \
+        }                                                 \
+    }
 
 
 static const char *unknownNS = "<unknownNamespace";
@@ -1467,22 +1469,28 @@ matchElementStart (
     )
 {
     SchemaCP *cp, *candidate, *icp;
-    int hm, mayskip, thismayskip, rc, isName = 0;
+    int hm, mayskip, thismayskip, rc, hadMatched, isName = 0, restarted = 0;
     unsigned int ac, i;
-    SchemaValidationStack *se;
+    SchemaValidationStack *se, *dse;
     Tcl_HashEntry *h;
 
     if (!sdata->stack) return 0;
     DBG(fprintf (stderr, "matchElementStart:\n");
         serializeStack(sdata););
     se = sdata->stack;
+restart:
     getContext (cp, ac, hm);
+    if (ac || hm) hadMatched = 1;
+    else hadMatched = 0;
 
     switch (cp->type) {
     case SCHEMA_CTYPE_NAME:
         isName = 1;
         /* fall through */
     case SCHEMA_CTYPE_PATTERN:
+        if (finished (cp->quants[ac], hm)) {
+            ac++; hm = 0;
+        }
         while (ac < cp->nc) {
             candidate = cp->content[ac];
             mayskip = 0;
@@ -1675,7 +1683,7 @@ matchElementStart (
                 hm = 0;
                 continue;
             }
-            if (!mayskip && mustMatch (cp->quants[ac], hm)) {
+            if (!mayskip && !restarted && mustMatch (cp->quants[ac], hm)) {
                 if (recover (interp, sdata, MISSING_ELEMENT,
                              MATCH_ELEMENT_START, name, namespace, NULL, ac)) {
                     if (sdata->recoverFlags & RECOVER_FLAG_IGNORE) {
@@ -1689,6 +1697,21 @@ matchElementStart (
             }
             ac++;
             hm = 0;
+        }
+        if (restarted) return -1;
+        if (hadMatched) {
+            dse = se->down;
+            if (dse && dse->hasMatched) {
+                if (!finished(dse->pattern->quants[dse->activeChild],
+                              dse->hasMatched)) {
+                    dse->hasMatched++;
+                    hadMatched = 0;
+                    se->activeChild = 0;
+                    se->hasMatched = 0;
+                    restarted = 1;
+                    goto restart;
+                }
+            }
         }
         if (isName) {
             if (recover (interp, sdata, UNEXPECTED_ELEMENT,
