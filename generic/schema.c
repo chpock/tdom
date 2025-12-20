@@ -44,7 +44,7 @@
 
 /* Uncomment the following line for some run-time debugging output on
  * stderr */
-/* #define DEBUG */
+#define DEBUG
 /* #define DDEBUG */
 
 /*----------------------------------------------------------------------------
@@ -278,6 +278,7 @@ static void serializeCP (
         fprintf (stderr, "\tName: '%s'\n", pattern->name);
         break;
     case SCHEMA_CTYPE_NAME:
+    case SCHEMA_CTYPE_NAME_PATTERN:
     case SCHEMA_CTYPE_PATTERN:
         fprintf (stderr, "\tName: '%s' Namespace: '%s'\n",
                  pattern->name, pattern->namespace);
@@ -490,9 +491,9 @@ mustMatch (
     }                                             \
 
 
-#define updateStack(sdata,se,ac)                        \
-    if (!(sdata->recoverFlags & RECOVER_FLAG_REWIND)) { \
-        if (se->activeChild < ac) {                      \
+#define updateStack                                       \
+    if (!(sdata->recoverFlags & RECOVER_FLAG_REWIND)) {   \
+        if (se->activeChild < ac) {                       \
             se->activeChild = ac; se->hasMatched = 1;     \
         } else {                                          \
             se->hasMatched++;                             \
@@ -527,6 +528,7 @@ tDOM_initSchemaCP (
     case SCHEMA_CTYPE_NAME:
         pattern->flags |= CONSTRAINT_TEXT_CHILD;
         /* Fall through. */
+    case SCHEMA_CTYPE_NAME_PATTERN:
     case SCHEMA_CTYPE_PATTERN:
         pattern->namespace = (char *)namespace;
         pattern->name = name;
@@ -1040,6 +1042,7 @@ pushToStack (
         sdata->lastMatchse = NULL;
     }
     se = getStackElement (sdata, pattern);
+    se->patternType = pattern->type;
     se->down = sdata->stack;
     if (pattern->type == SCHEMA_CTYPE_INTERLEAVE) {
         se->interleaveState = MALLOC (sizeof (int) * pattern->nc);
@@ -1048,6 +1051,19 @@ pushToStack (
     sdata->stack = se;
 }
 
+static void
+pushRoot (
+    SchemaData *sdata,
+    SchemaCP *pattern
+    )
+{
+    SchemaValidationStack *se;
+    se = getStackElement (sdata, pattern);
+    se->patternType = SCHEMA_CTYPE_NAME_PATTERN;
+    sdata->stack = se;
+}
+
+    
 static void
 popFromStack (
     SchemaData *sdata,
@@ -1186,8 +1202,10 @@ recover (
     /* In case of unknown element the name/ns arguments of recover()
      * are NULL, but sdata->vname/sdata->vns are already
      * pre-filled. */
-    if (name) sdata->vname = name;
-    if (ns) sdata->vns = ns;
+    if (!sdata->vdataIsPreset) {
+        sdata->vname = name;
+        sdata->vns = ns;
+    }
     sdata->vtext = text;
     sdata->vaction = action;
     switch (errorType) {
@@ -1316,16 +1334,14 @@ static int
 evalVirtual (
     Tcl_Interp *interp,
     SchemaData *sdata,
-    int ac
+    int         objc,
+    Tcl_Obj   **objv
     )
 {
     int rc;
-    SchemaCP *cp;
 
-    cp = sdata->stack->pattern->content[ac];
     sdata->currentEvals++;
-    rc = Tcl_EvalObjv (interp, cp->nc, (Tcl_Obj **) cp->content,
-                       TCL_EVAL_GLOBAL);
+    rc = Tcl_EvalObjv (interp, objc, objv, TCL_EVAL_GLOBAL);
     sdata->currentEvals--;
     if (rc != TCL_OK) {
         sdata->evalError = 1;
@@ -1460,6 +1476,29 @@ matchingAny (
     }
 }
 
+static int directMatch (
+    SchemaCP *cp,
+    char *name,
+    char *namespace
+    )
+{
+    switch (cp->type) {
+    case SCHEMA_CTYPE_NAME:
+        if (cp->name == name && cp->namespace == namespace) {
+            return 1;
+        }
+        return 0;
+    default:
+        return -1;
+    }
+}
+
+/* Return values: */
+/*  1 The element match. */
+/*  0 The element does not match, perhaps recovering. */
+/* -1 The element doest not macht, but content particle do
+      not require a match     */
+
 static int
 matchElementStart (
     Tcl_Interp *interp,
@@ -1468,375 +1507,194 @@ matchElementStart (
     char *namespace
     )
 {
-    SchemaCP *cp, *candidate, *icp;
-    int hm, mayskip, thismayskip, rc, hadMatched, isName = 0, restarted = 0;
+    SchemaCP *cp, *icp;
+    int hm, mayskip, rc, isName = 0;
+    int errorType;
     unsigned int ac, i;
-    SchemaValidationStack *se, *dse;
+    SchemaValidationStack *se;
     Tcl_HashEntry *h;
 
     if (!sdata->stack) return 0;
-    DBG(fprintf (stderr, "matchElementStart:\n");
+    DBG(fprintf (stderr, "matchElementStart: try to match %s %s\n", name,
+            namespace);
         serializeStack(sdata););
     se = sdata->stack;
-restart:
     getContext (cp, ac, hm);
-    if (ac || hm) hadMatched = 1;
-    else hadMatched = 0;
 
-    switch (cp->type) {
+    DBG(fprintf (stderr, "matchElementStart stack top type %s, ac = %d hm = %d\n",
+                 Schema_CP_Type2str[cp->type], ac, hm));
+    switch (se->patternType) {
     case SCHEMA_CTYPE_NAME:
-        isName = 1;
-        /* fall through */
+        DBG(fprintf (stderr, "name: %s ns: %s candidate name: %s "
+                     "candidate ns: %s\n", name, namespace,
+                     cp->name, cp->namespace));
+        if (cp->name == name && cp->namespace == namespace) {
+            se->patternType = SCHEMA_CTYPE_NAME_PATTERN;
+            return 1;
+        }
+        return 0;
+
+    case SCHEMA_CTYPE_NAME_PATTERN:
     case SCHEMA_CTYPE_PATTERN:
-        if (finished (cp->quants[ac], hm)) {
+        if (ac < cp->nc && finished (cp->quants[ac], hm)) {
             ac++; hm = 0;
         }
         while (ac < cp->nc) {
-            candidate = cp->content[ac];
-            mayskip = 0;
-            switch (candidate->type) {
-            case SCHEMA_CTYPE_TEXT:
-                if (candidate->nc) {
-                    if (!checkText (interp, candidate, "")) {
-                        if (recover (interp, sdata, MISSING_TEXT,
-                                     MATCH_ELEMENT_START, name, namespace,
-                                     NULL, ac)) {
-                            mayskip = 1;
-                            break;
-                        }            
-                        return 0;
-                    }
-                }
-                break;
-
-            case SCHEMA_CTYPE_ANY:
-                if (!matchingAny (namespace, candidate)) break;
-                updateStack (sdata, se, ac);
-                sdata->skipDeep = 1;
-                /* See comment in tDOM_probeElement: sdata->vname and
-                 * sdata->vns may be pre-filled. We reset it here.*/
-                sdata->vname = NULL;
-                sdata->vns = NULL;
-                return 1;
-
-            case SCHEMA_CTYPE_NAME:
-                DBG(fprintf (stderr, "name: %s ns: %s candidate name: %s "
-                             "candidate ns: %s\n", name, namespace,
-                             candidate->name, candidate->namespace));
-                if (candidate->name == name
-                    && candidate->namespace == namespace) {
-                    pushToStack (sdata, candidate);
-                    updateStack (sdata, se, ac);
-                    return 1;
-                }
-                break;
-
-            case SCHEMA_CTYPE_CHOICE:
-                if (candidate->typedata) {
-                    h = Tcl_FindHashEntry ((Tcl_HashTable *)candidate->typedata,
-                                           name);
-                    if (h) {
-                        icp = Tcl_GetHashValue (h);
-                        if (icp->namespace == namespace) {
-                            pushToStack (sdata, icp);
-                            updateStack (sdata, se, ac);
-                            return 1;
-                        }
-                    }
-                    /* TODO: Short-cut in case of no match (looking
-                     * for empty match, recovering). For now fall
-                     * throu to simple, serial approach. */
-                }
-                for (i = 0; i < candidate->nc; i++) {
-                    icp = candidate->content[i];
-                    switch (icp->type) {
-                    case SCHEMA_CTYPE_TEXT:
-                        break;
-
-                    case SCHEMA_CTYPE_ANY:
-                        if (!matchingAny (namespace, icp)) break;
-                        updateStack (sdata, se, ac);
-                        sdata->skipDeep = 1;
-                        /* See comment in tDOM_probeElement: sdata->vname
-                         * and sdata->vns may be pre-filled. We reset it
-                         * here.*/
-                        sdata->vname = NULL;
-                        sdata->vns = NULL;
-                        return 1;
-
-                    case SCHEMA_CTYPE_NAME:
-                        if (icp->name == name
-                            && icp->namespace == namespace) {
-                            pushToStack (sdata, icp);
-                            updateStack (sdata, se, ac);
-                            return 1;
-                        }
-                        break;
-
-                    case SCHEMA_CTYPE_CHOICE:
-                        SetResult ("MIXED or CHOICE child of MIXED or CHOICE");
-                        sdata->evalError = 1;
-                        return 0;
-
-                    case SCHEMA_CTYPE_PATTERN:
-                        if (recursivePattern (se, icp)) {
-                            mayskip = 1;
-                            continue;
-                        }
-                        /* fall through */
-                    case SCHEMA_CTYPE_INTERLEAVE:
-                        pushToStack (sdata, icp);
-                        rc = matchElementStart (interp, sdata, name, namespace);
-                        if (rc == 1) {
-                            updateStack (sdata, se, ac);
-                            return 1;
-                        }
-                        popStack (sdata);
-                        if (rc == -1) mayskip = 1;
-                        break;
-
-                    case SCHEMA_CTYPE_VIRTUAL:
-                        SetResult ("Virtual constrain in MIXED or CHOICE");
-                        sdata->evalError = 1;
-                        return 0;
-                        
-                    case SCHEMA_CTYPE_KEYSPACE_END:
-                    case SCHEMA_CTYPE_KEYSPACE:
-                        SetResult ("Keyspace constrain in MIXED or CHOICE");
-                        sdata->evalError = 1;
-                        return 0;
-                        
-                    case SCHEMA_CTYPE_JSON_STRUCT:
-                        SetResult ("JSON structure constrain in MIXED or CHOICE");
-                        sdata->evalError = 2;
-                        return 0;
-                    }
-                    if (!mayskip && mayMiss (candidate->quants[i]))
-                        mayskip = 1;
-                }
-                break;
-
-            case SCHEMA_CTYPE_VIRTUAL:
-                if (evalVirtual (interp, sdata, ac)) {
-                    hm = 1;
-                    break;
-                }
-                else return 0;
-
-            case SCHEMA_CTYPE_JSON_STRUCT:
-                if (!checkJsonStructType (
-                        interp, sdata, candidate, INVALID_JSON_TYPE,
-                        MATCH_ELEMENT_START, ac)
-                    ) {
-                    return 0;
-                };
-                ac++;
-                hm = 0;
-                continue;
-
-            case SCHEMA_CTYPE_PATTERN:
-                if (recursivePattern (se, candidate)) {
-                    mayskip = 1;
-                    break;
-                }
-                /* fall through */
-            case SCHEMA_CTYPE_INTERLEAVE:
-                pushToStack (sdata, candidate);
-                rc = matchElementStart (interp, sdata, name, namespace);
+            rc = directMatch (cp->content[ac], name, namespace);
+            if (rc != -1) {
                 if (rc == 1) {
-                    updateStack (sdata, se, ac);
+                    updateStack;
                     return 1;
                 }
-                popStack (sdata);
-                if (rc == -1) mayskip = 1;
-                break;
-
-            case SCHEMA_CTYPE_KEYSPACE_END:
-                candidate->keySpace->active--;
-                if (!candidate->keySpace->active) {
-                    if (candidate->keySpace->unknownIDrefs) {
-                        if (!recover (interp, sdata,
-                                      INVALID_KEYREF, MATCH_ELEMENT_START,
-                                      name, namespace, NULL, ac)) {
-                            SetResultV ("Invalid key ref.");
-                            sdata->evalError = 2;
-                            return 0;
-                        }
-                        candidate->keySpace->unknownIDrefs = 0;
-                    }
-                    Tcl_DeleteHashTable (&candidate->keySpace->ids);
+                if (rc == 0) {
+                    errorType = MISSING_ELEMENT;
+                    goto recover;
                 }
+            }
+            pushToStack (sdata, cp->content[ac]);
+            rc = matchElementStart (interp, sdata, name, namespace);
+            if (rc == 1) {
+                updateStack;
+                return 1;
+            }
+            popStack (sdata);
+            if (rc == -1 || mayMatch (cp->quants[ac], hm)) {
                 ac++;
-                hm = 0;
-                continue;
-
-            case SCHEMA_CTYPE_KEYSPACE:
-                if (!candidate->keySpace->active) {
-                    Tcl_InitHashTable (&candidate->keySpace->ids,
-                                       TCL_STRING_KEYS);
-                    candidate->keySpace->active = 1;
-                    candidate->keySpace->unknownIDrefs = 0;
-                } else {
-                    candidate->keySpace->active++;
-                }
-                ac++;
-                hm = 0;
                 continue;
             }
-            if (!mayskip && !restarted && mustMatch (cp->quants[ac], hm)) {
-                if (recover (interp, sdata, MISSING_ELEMENT,
-                             MATCH_ELEMENT_START, name, namespace, NULL, ac)) {
-                    if (sdata->recoverFlags & RECOVER_FLAG_IGNORE) {
-                        /* We pretend the ac content particle had
-                         * matched. */
-                        updateStack (sdata, se, ac);
-                    }
-                    return 1;
-                }
-                return 0;
+            if (isName) {
+                errorType = MISSING_ELEMENT;
+            } else {
+                errorType = UNEXPECTED_ELEMENT;
             }
-            ac++;
-            hm = 0;
-        }
-        if (restarted) return -1;
-        if (hadMatched) {
-            dse = se->down;
-            if (dse && dse->hasMatched) {
-                if (!finished(dse->pattern->quants[dse->activeChild],
-                              dse->hasMatched)) {
-                    dse->hasMatched++;
-                    hadMatched = 0;
-                    se->activeChild = 0;
-                    se->hasMatched = 0;
-                    restarted = 1;
-                    goto restart;
-                }
-            }
-        }
-        if (isName) {
-            if (recover (interp, sdata, UNEXPECTED_ELEMENT,
-                         MATCH_ELEMENT_START, name, namespace, NULL, 0)) {
+        recover:
+            if (recover (interp, sdata, errorType, MATCH_ELEMENT_START,
+                         name, namespace, NULL, 0)) {
+                updateStack;
                 return 1;
             }
             return 0;
         }
-        return -1;
+        break;
+
+    case SCHEMA_CTYPE_ANY:
+        if (matchingAny (namespace, cp)) {
+            sdata->skipDeep = 1;
+            return 1;
+        }
+        return 0;
+        
+    case SCHEMA_CTYPE_TEXT:
+        if (cp->nc) {
+            if (!checkText (interp, cp, "")) {
+                if (recover (interp, sdata, MISSING_TEXT,
+                             MATCH_ELEMENT_START, name, namespace,
+                             NULL, ac)) {
+                    updateStack;
+                    return -1;
+                }            
+                return 0;
+            }
+        }
+        updateStack;
+        return 1;
+
+    case SCHEMA_CTYPE_CHOICE:
+        if (cp->typedata) {
+            h = Tcl_FindHashEntry ((Tcl_HashTable *)cp->typedata, name);
+            if (h) {
+                rc = 1;
+                icp = Tcl_GetHashValue (h);
+                if (icp->namespace == namespace) {
+                    pushToStack (sdata, icp);
+                    updateStack;
+                    return 1;
+                }
+            }
+            /* TODO: Short-cut in case of no match (looking
+             * for empty match, recovering). For now fall
+             * throu to simple, serial approach. */
+        }
+        mayskip = 0;
+        for (i = 0; i < cp->nc; i++) {
+            pushToStack (sdata, cp->content[i]);
+            rc = matchElementStart (interp, sdata, name, namespace);
+            if (rc == 1) {
+                updateStack;
+                return 1;
+            }
+            popStack (sdata);
+            if (rc == -1) {
+                mayskip = 1;
+            }
+        }
+        if (mayskip) return -1;
+        return 0;
+
+    case SCHEMA_CTYPE_VIRTUAL:
+        if (evalVirtual (interp, sdata, cp->nc, (Tcl_Obj**)cp->content)) {
+            hm++;
+            return 1;
+        }
+        return 0;
+
+    case SCHEMA_CTYPE_JSON_STRUCT:
+        if (!checkJsonStructType (
+                interp, sdata, cp, INVALID_JSON_TYPE,
+                MATCH_ELEMENT_START, ac)
+            ) {
+            return 0;
+        };
+        return 1;
+
+    case SCHEMA_CTYPE_KEYSPACE_END:
+        cp->keySpace->active--;
+        if (!cp->keySpace->active) {
+            if (cp->keySpace->unknownIDrefs) {
+                if (!recover (interp, sdata,
+                              INVALID_KEYREF, MATCH_ELEMENT_START,
+                              name, namespace, NULL, ac)) {
+                    SetResultV ("Invalid key ref.");
+                    sdata->evalError = 2;
+                    return 0;
+                }
+                cp->keySpace->unknownIDrefs = 0;
+            }
+            Tcl_DeleteHashTable (&cp->keySpace->ids);
+        }
+        return 1;
 
     case SCHEMA_CTYPE_KEYSPACE:
-    case SCHEMA_CTYPE_KEYSPACE_END:
-    case SCHEMA_CTYPE_VIRTUAL:
-    case SCHEMA_CTYPE_CHOICE:
-    case SCHEMA_CTYPE_TEXT:
-    case SCHEMA_CTYPE_ANY:
-    case SCHEMA_CTYPE_JSON_STRUCT:
-        /* Never pushed onto stack */
-        SetResult ("Invalid CTYPE onto the validation stack!");
-        sdata->evalError = 1;
-        return 0;
+        if (!cp->keySpace->active) {
+            Tcl_InitHashTable (&cp->keySpace->ids,
+                               TCL_STRING_KEYS);
+            cp->keySpace->active = 1;
+            cp->keySpace->unknownIDrefs = 0;
+        } else {
+            cp->keySpace->active++;
+        }
+        return 1;
 
     case SCHEMA_CTYPE_INTERLEAVE:
         mayskip = 1;
         for (i = 0; i < cp->nc; i++) {
-            thismayskip = 0;
-            if (finished (cp->quants[i],
-                          se->interleaveState[i])) {
-                continue;
-            }
-            icp = cp->content[i];
-            switch (icp->type) {
-            case SCHEMA_CTYPE_TEXT:
-                if (icp->nc) {
-                    if (checkText (interp, icp, "")) {
-                        thismayskip = 1;
-                    }
-                } else {
-                    thismayskip = 1;
-                }
-                break;
-
-            case SCHEMA_CTYPE_ANY:
-                if (!matchingAny (namespace, icp)) break;
-                sdata->skipDeep = 1;
+            pushToStack (sdata, cp->content[i]);
+            rc = matchElementStart (interp, sdata, name, namespace);
+            if (rc == 1) {
+                updateStack;
                 se->hasMatched++;
                 se->interleaveState[i]++;
-                /* See comment in tDOM_probeElement: sdata->vname and
-                 * sdata->vns may be pre-filled. We reset it here.*/
-                sdata->vname = NULL;
-                sdata->vns = NULL;
                 return 1;
-
-            case SCHEMA_CTYPE_NAME:
-                if (icp->name == name
-                    && icp->namespace == namespace) {
-                    pushToStack (sdata, icp);
-                    se->hasMatched++;
-                    se->interleaveState[i]++;
-                    return 1;
-                }
-                break;
-
-            case SCHEMA_CTYPE_CHOICE:
-                SetResult ("MIXED or CHOICE child of INTERLEAVE");
-                sdata->evalError = 1;
-                return 0;
-
-            case SCHEMA_CTYPE_PATTERN:
-                if (recursivePattern (se, icp)) {
-                    thismayskip = 1;
-                    break;
-                }
-                /* fall through */
-            case SCHEMA_CTYPE_INTERLEAVE:
-                pushToStack (sdata, icp);
-                rc = matchElementStart (interp, sdata, name, namespace);
-                if (rc == 1) {
-                    if (!(sdata->recoverFlags & RECOVER_FLAG_REWIND)) {
-                        se->hasMatched++;
-                        se->interleaveState[i]++;
-                    }
-                    return 1;
-                }
-                popStack (sdata);
-                if (rc == -1) thismayskip = 1;
-                break;
-
-            case SCHEMA_CTYPE_VIRTUAL:
-                SetResult ("Virtual constraint child of INTERLEAVE");
-                sdata->evalError = 1;
-                return 0;
-
-            case SCHEMA_CTYPE_KEYSPACE_END:
-            case SCHEMA_CTYPE_KEYSPACE:
-                SetResult ("Keyspace constraint child of INTERLEAVE");
-                sdata->evalError = 1;
-                return 0;
-
-            case SCHEMA_CTYPE_JSON_STRUCT:
-                SetResult ("JSON structure constraint child of INTERLEAVE");
-                sdata->evalError = 1;
-                return 0;
             }
-            if (!thismayskip && minOne (cp->quants[i])) mayskip = 0;
-        }
-        if (mayskip) break;
-        if (recover (interp, sdata, MISSING_ELEMENT, MATCH_ELEMENT_START,
-                     name, namespace, NULL, cp->nc)) {
-            if (sdata->recoverFlags & RECOVER_FLAG_IGNORE) {
-                /* We mark the first so far not matched mandatory
-                 * interleave child cp as matched */
-                for (i = 0; i < cp->nc; i++) {
-                    if (!se->interleaveState[i]) {
-                        if (minOne (cp->quants[i])) {
-                            se->interleaveState[i] = 1;
-                            break;
-                        }
-                    }
-                }
+            popStack (sdata);
+            if (rc == 0) {
+                mayskip = 0;
             }
-            return 1;
         }
+        if (mayskip) return -1;
         return 0;
     }
+
     return -1;
 }
 
@@ -1891,6 +1749,7 @@ tDOM_probeElement (
     } else {
         h = NULL;
     }
+    sdata->vdataIsPreset = 0;
     if (h) {
         namespacePtr = Tcl_GetHashKey (&sdata->namespace, h);
     } else {
@@ -1908,6 +1767,7 @@ tDOM_probeElement (
              * struct here.*/
             sdata->vname = name;
             sdata->vns = namespace;
+            sdata->vdataIsPreset = 1;
             namespacePtr = (void *) unknownNS;
         } else {
             namespacePtr = NULL;
@@ -1991,7 +1851,7 @@ tDOM_probeElement (
             SetResult ("Unknown element");
             return TCL_ERROR;
         }
-        pushToStack (sdata, pattern);
+        pushRoot (sdata, pattern);
         return TCL_OK;
     }
 
@@ -2429,25 +2289,24 @@ static int checkElementEnd (
     )
 {
     SchemaValidationStack *se;
-    SchemaCP *cp, *ic;
-    int hm, thismayskip, mayskip = 0, rc;
+    SchemaCP *cp;
+    int hm, rc;
     unsigned int ac, i;
-    int isName = 0;
 
     DBG(fprintf (stderr, "checkElementEnd:\n");
         serializeStack(sdata););
+    if (!sdata->stack) return 0;
     se = sdata->stack;
     getContext (cp, ac, hm);
 
-    if (cp->type == SCHEMA_CTYPE_INTERLEAVE) {
-        ac = 0; hm = 0; mayskip = 1;
-    }
     switch (cp->type) {
     case SCHEMA_CTYPE_NAME:
-        isName = 1;
-        /* Fall through */
+    case SCHEMA_CTYPE_NAME_PATTERN:
     case SCHEMA_CTYPE_INTERLEAVE:
     case SCHEMA_CTYPE_PATTERN:
+        if (cp->type == SCHEMA_CTYPE_INTERLEAVE) {
+            ac = 0; hm = 0;
+        }
         if (ac < cp->nc && !(mustMatch (cp->quants[ac], hm))) {
             DBG(fprintf (stderr, "ac %d has matched, skipping to next ac\n", ac));
             ac++; hm = 0;
@@ -2463,185 +2322,80 @@ static int checkElementEnd (
             if (mayMiss (cp->quants[ac])) {
                 ac++; continue;
             }
-            switch (cp->content[ac]->type) {
-            case SCHEMA_CTYPE_KEYSPACE_END:
-                /* Don't happen as INTERLEAVE child */
-                cp->content[ac]->keySpace->active--;
-                if (!cp->content[ac]->keySpace->active) {
-                    if (cp->content[ac]->keySpace->unknownIDrefs) {
-                        if (!recover (interp, sdata, INVALID_KEYREF,
-                                      MATCH_ELEMENT_END, NULL, NULL,
-                                      cp->content[ac]->keySpace->name, 0)) {
-                            SetResultV ("Invalid key ref.");
-                            sdata->evalError = 2;
-                            return 0;
-                        }
-                        cp->content[ac]->keySpace->unknownIDrefs = 0;
-                    }
-                    Tcl_DeleteHashTable (&cp->content[ac]->keySpace->ids);
-                }
-                break;
-
-            case SCHEMA_CTYPE_KEYSPACE:
-                /* Don't happen as INTERLEAVE child */
-                if (!cp->content[ac]->keySpace->active) {
-                    Tcl_InitHashTable (&cp->content[ac]->keySpace->ids,
-                                       TCL_STRING_KEYS);
-                    cp->content[ac]->keySpace->active = 1;
-                    cp->content[ac]->keySpace->unknownIDrefs = 0;
-                } else {
-                    cp->content[ac]->keySpace->active++;
-                }
-                break;
-                
-            case SCHEMA_CTYPE_TEXT:
-                if (cp->content[ac]->nc) {
-                    if (!checkText (interp, cp->content[ac], "")) {
-                        if (recover (interp, sdata, MISSING_TEXT,
-                                     MATCH_ELEMENT_END, NULL, NULL, NULL,
-                                     ac)) {
-                            break;
-                        }
-                        return 0;
-                    }
-                }
-                break;
-
-            case SCHEMA_CTYPE_CHOICE:
-                /* Don't happen as INTERLEAVE child */
-                thismayskip = 0;
-                for (i = 0; i < cp->content[ac]->nc; i++) {
-                    if (mayMiss (cp->content[ac]->quants[i])) {
-                        thismayskip = 1;
-                        break;
-                    }
-                    ic = cp->content[ac]->content[i];
-                    switch (ic->type) {
-                    case SCHEMA_CTYPE_TEXT:
-                        if (ic->nc) {
-                            if (!checkText (interp, ic, "")) {
-                                continue;
-                            }
-                        }
-                        thismayskip = 1;
-                        break;
-
-                    case SCHEMA_CTYPE_NAME:
-                    case SCHEMA_CTYPE_ANY:
-                        continue;
-                        
-                    case SCHEMA_CTYPE_PATTERN:
-                        if (recursivePattern (se, ic)) {
-                            thismayskip = 1;
-                            break;
-                        }
-                        /* fall through */
-                    case SCHEMA_CTYPE_INTERLEAVE:
-                        pushToStack (sdata, ic);
-                        if (checkElementEnd (interp, sdata) == -1) {
-                            thismayskip = 1;
-                        }
-                        popStack (sdata);
-                        break;
-                        
-                    case SCHEMA_CTYPE_KEYSPACE_END:
-                    case SCHEMA_CTYPE_KEYSPACE:
-                    case SCHEMA_CTYPE_VIRTUAL:
-                    case SCHEMA_CTYPE_JSON_STRUCT:
-                    case SCHEMA_CTYPE_CHOICE:
-                        SetResult ("Invalid CTYPE in MIXED or CHOICE");
-                        sdata->evalError = 1;
-                        return 0;
-                        
-                    }
-                    if (thismayskip) break;
-                }
-                if (thismayskip) break;
-                if (!recover (interp, sdata, MISSING_ELEMENT,
-                              MATCH_ELEMENT_END, NULL, NULL, NULL, 0)) {
+            return 0;
+        }
+        return -1;
+            
+    case SCHEMA_CTYPE_KEYSPACE_END:
+        /* Don't happen as INTERLEAVE child */
+        cp->content[ac]->keySpace->active--;
+        if (!cp->content[ac]->keySpace->active) {
+            if (cp->content[ac]->keySpace->unknownIDrefs) {
+                if (!recover (interp, sdata, INVALID_KEYREF,
+                              MATCH_ELEMENT_END, NULL, NULL,
+                              cp->content[ac]->keySpace->name, 0)) {
+                    SetResultV ("Invalid key ref.");
+                    sdata->evalError = 2;
                     return 0;
                 }
-                if (sdata->recoverFlags & RECOVER_FLAG_MATCH_END_CONTINUE) {
-                    updateStack (sdata, se, ac);
-                    return 2;
-                }
-                break;
-                
-            case SCHEMA_CTYPE_VIRTUAL:
-                if (evalVirtual (interp, sdata, ac)) break;
-                else return 0;
+                cp->content[ac]->keySpace->unknownIDrefs = 0;
+            }
+            Tcl_DeleteHashTable (&cp->content[ac]->keySpace->ids);
+        }
+        return -1;
 
-            case SCHEMA_CTYPE_JSON_STRUCT:
-                if (!checkJsonStructType (interp, sdata, cp->content[ac],
-                                          INVALID_JSON_TYPE, MATCH_ELEMENT_END, ac)) {
-                    return 0;
-                }
-                break;
+    case SCHEMA_CTYPE_KEYSPACE:
+        /* Don't happen as INTERLEAVE child */
+        if (!cp->content[ac]->keySpace->active) {
+            Tcl_InitHashTable (&cp->content[ac]->keySpace->ids,
+                               TCL_STRING_KEYS);
+            cp->content[ac]->keySpace->active = 1;
+            cp->content[ac]->keySpace->unknownIDrefs = 0;
+        } else {
+            cp->content[ac]->keySpace->active++;
+        }
+        return -1;
                 
-            case SCHEMA_CTYPE_PATTERN:
-                if (recursivePattern (se, cp->content[ac])) {
-                    break;
-                }
-                /* fall through */
-            case SCHEMA_CTYPE_INTERLEAVE:
-                pushToStack (sdata, cp->content[ac]);
-                rc = checkElementEnd (interp, sdata);
-                if (rc == 0) {
-                    popStack (sdata);
-                    if (sdata->stack->pattern->type == SCHEMA_CTYPE_NAME
-                        || sdata->stack->activeChild
-                        || sdata->stack->hasMatched) {
-                        if (recover (interp, sdata, MISSING_ELEMENT,
-                                     MATCH_ELEMENT_END, NULL, NULL, NULL, 0)) {
-                            if (sdata->recoverFlags &
-                                RECOVER_FLAG_MATCH_END_CONTINUE) {
-                                updateStack (sdata, se, ac);
-                                return 2;
-                            }
-                            break;
-                        }
-                    }
-                    return 0;
-                }
-                if (rc == 2) {
-                    updateStack (sdata, se, ac);
-                    return 2;
-                }
-                popStack (sdata);
-                break;
-                
-            case SCHEMA_CTYPE_ANY:
-            case SCHEMA_CTYPE_NAME:
-                if (recover (interp, sdata, MISSING_ELEMENT, MATCH_ELEMENT_END,
-                             NULL, NULL, NULL, 0)) {
-                    if (sdata->recoverFlags & RECOVER_FLAG_MATCH_END_CONTINUE) {
-                        updateStack (sdata, se, ac);
-                        return 2;
-                    }
+    case SCHEMA_CTYPE_TEXT:
+        if (cp->content[ac]->nc) {
+            if (!checkText (interp, cp->content[ac], "")) {
+                if (recover (interp, sdata, MISSING_TEXT,
+                             MATCH_ELEMENT_END, NULL, NULL, NULL,
+                             ac)) {
                     break;
                 }
                 return 0;
             }
-            ac++;
         }
-        if (se->interleaveState) {
-            if (!mayskip) return 0;
-        }
-        if (isName) return 1;
         return -1;
 
-    case SCHEMA_CTYPE_KEYSPACE_END:
-    case SCHEMA_CTYPE_KEYSPACE:
-    case SCHEMA_CTYPE_VIRTUAL:
     case SCHEMA_CTYPE_CHOICE:
-    case SCHEMA_CTYPE_TEXT:
-    case SCHEMA_CTYPE_ANY:
-    case SCHEMA_CTYPE_JSON_STRUCT:
-        /* Never pushed onto stack */
-        SetResult ("Invalid CTYPE onto the validation stack!");
-        sdata->evalError = 1;
+        /* If the choice itself is madatory; check, if there
+         * is one of the selections may be optional. */
+        for (i = 0; i < cp->content[ac]->nc; i++) {
+            if (mayMiss (cp->quants[ac])) return -1;
+            pushToStack (sdata, cp->content[ac]);
+            rc = checkElementEnd (interp, sdata);
+            popStack (sdata);
+            if (rc == -1) return -1;
+        }
         return 0;
+                
+    case SCHEMA_CTYPE_ANY:
+        return 0;
+                
+    case SCHEMA_CTYPE_VIRTUAL:
+        if (evalVirtual (interp, sdata, cp->nc,
+                         (Tcl_Obj**)cp->content)) return -1;
+        else return 0;
 
+    case SCHEMA_CTYPE_JSON_STRUCT:
+        if (!checkJsonStructType (interp, sdata, cp->content[ac],
+                                  INVALID_JSON_TYPE, MATCH_ELEMENT_END, ac)) {
+            return 0;
+        }
+        return -1;
+                
     }
     /* Not reached */
     return 0;
@@ -2803,19 +2557,20 @@ matchText (
         case SCHEMA_CTYPE_NAME:
             isName = 1;
             /* fall through */
+        case SCHEMA_CTYPE_NAME_PATTERN:
         case SCHEMA_CTYPE_PATTERN:
             while (ac < cp->nc) {
                 candidate = cp->content[ac];
                 switch (candidate->type) {
                 case SCHEMA_CTYPE_TEXT:
                     if (checkText (interp, candidate, text)) {
-                        updateStack (sdata, se, ac);
+                        updateStack;
                         return 1;
                     }
                     if (sdata->evalError) return 0;
                     if (recover (interp, sdata, INVALID_VALUE, MATCH_TEXT,
                                  NULL, NULL, text, ac)) {
-                        updateStack (sdata, se, ac);
+                        updateStack;
                         return 1;
                     }
                     SetResult ("Invalid text content");
@@ -2823,7 +2578,7 @@ matchText (
 
                 case SCHEMA_CTYPE_CHOICE:
                     if (candidate->flags & MIXED_CONTENT) {
-                        updateStack (sdata, se, ac);
+                        updateStack;
                         return 1;
                     }
                     for (i = 0; i < candidate->nc; i++) {
@@ -2831,12 +2586,13 @@ matchText (
                         switch (ic->type) {
                         case SCHEMA_CTYPE_TEXT:
                             if (checkText (interp, ic, text)) {
-                                updateStack (sdata, se, ac);
+                                updateStack;
                                 return 1;
                             }
                             break;
 
                         case SCHEMA_CTYPE_NAME:
+                        case SCHEMA_CTYPE_NAME_PATTERN:
                         case SCHEMA_CTYPE_ANY:
                             break;
 
@@ -2848,7 +2604,7 @@ matchText (
                         case SCHEMA_CTYPE_INTERLEAVE:
                             pushToStack (sdata, ic);
                             if (matchText (interp, sdata, text)) {
-                                updateStack (sdata, se, ac);
+                                updateStack;
                                 return 1;
                             }
                             popStack (sdata);
@@ -2890,6 +2646,7 @@ matchText (
                     }
                     break;
 
+                case SCHEMA_CTYPE_NAME_PATTERN:
                 case SCHEMA_CTYPE_PATTERN:
                     if (recursivePattern (se, candidate)) {
                         break;
@@ -2898,7 +2655,7 @@ matchText (
                 case SCHEMA_CTYPE_INTERLEAVE:
                     pushToStack (sdata, candidate);
                     if (matchText (interp, sdata, text)) {
-                        updateStack (sdata, se, ac);
+                        updateStack;
                         return 1;
                     }
                     popStack (sdata);
@@ -2913,8 +2670,10 @@ matchText (
                     break;
 
                 case SCHEMA_CTYPE_VIRTUAL:
-                    if (!evalVirtual (interp, sdata, ac)) return 0;
-                    break;
+                    ic = cp->content[ac];
+                    if (evalVirtual (interp, sdata, ic->nc,
+                                     (Tcl_Obj**)ic->content)) break;
+                    else return 0;
 
                 case SCHEMA_CTYPE_JSON_STRUCT:
                     if (checkJsonStructType (interp, sdata, candidate,
@@ -3012,6 +2771,7 @@ matchText (
                     break;
 
                 case SCHEMA_CTYPE_NAME:
+                case SCHEMA_CTYPE_NAME_PATTERN:
                 case SCHEMA_CTYPE_ANY:
                     break;
 
@@ -3023,7 +2783,7 @@ matchText (
                 case SCHEMA_CTYPE_INTERLEAVE:
                     pushToStack (sdata, ic);
                     if (matchText (interp, sdata, text)) {
-                        updateStack (sdata, se, ac);
+                        updateStack;
                         return 1;
                     }
                     popStack (sdata);
@@ -3662,6 +3422,7 @@ schemaReset (
     sdata->skipDeep = 0;
     sdata->evalError = 0;
     sdata->vaction = 0;
+    sdata->vdataIsPreset = 0;
     sdata->vname = NULL;
     sdata->vns = NULL;
     sdata->vtext = NULL;
@@ -3943,6 +3704,7 @@ getNextExpectedWorker (
         mustM = 0;
         /* fall through */
     case SCHEMA_CTYPE_NAME:
+    case SCHEMA_CTYPE_NAME_PATTERN:
     case SCHEMA_CTYPE_PATTERN:
         while (ac < cp->nc) {
             if (se->interleaveState
@@ -3961,6 +3723,7 @@ getNextExpectedWorker (
             ic = cp->content[ac];
             mayskip = 0;
             switch (ic->type) {
+            case SCHEMA_CTYPE_NAME_PATTERN:
             case SCHEMA_CTYPE_NAME:
                 if (probeMayskip) break;
                 Tcl_ListObjAppendElement (interp, rObj,
@@ -4061,6 +3824,7 @@ getNextExpectedWorker (
                 for (i = 0; i < ic->nc; i++) {
                     jc = ic->content[i];
                     switch (jc->type) {
+                    case SCHEMA_CTYPE_NAME_PATTERN:
                     case SCHEMA_CTYPE_NAME:
                         if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
                             || minOne (cp->quants[i])) {

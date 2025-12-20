@@ -270,6 +270,30 @@ test schema-1.14 {refer local element definition with element} {
     set result 
 } {1 0 0 1}
 
+test schema-1.14.1 {refer local element definition with element} {
+    tdom::schema create s
+    s define {
+        defelement elm1 {
+            element elm ! {
+                element a ! {
+                    text
+                }
+            }
+        }
+        defelement elm2 {
+            element elm
+        }
+    }
+    set result [list]
+    foreach xml {
+        <elm1><elm><a>foo</a></elm></elm1>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result 
+} 1
+
 test schema-1.14a1 {define start w/ namespace} {
     tdom::schema create s
     s start doc http://foo.bar

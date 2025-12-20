@@ -40,6 +40,7 @@
 typedef enum {
   SCHEMA_CTYPE_ANY,
   SCHEMA_CTYPE_NAME,
+  SCHEMA_CTYPE_NAME_PATTERN,
   SCHEMA_CTYPE_CHOICE,
   SCHEMA_CTYPE_INTERLEAVE,
   SCHEMA_CTYPE_PATTERN,
@@ -156,6 +157,7 @@ typedef struct SchemaValidationStack
     SchemaCP *pattern;
     struct SchemaValidationStack *next;
     struct SchemaValidationStack *down;
+    Schema_CP_Type    patternType;
     int               activeChild;
     int               hasMatched;
     int              *interleaveState;
@@ -215,6 +217,7 @@ typedef struct SchemaData_
     SchemaValidationStack *stackPool;
     ValidationState validationState;
     ValidationAction vaction;
+    int vdataIsPreset;
     const char *vname;
     const char *vns;
     const char *vtext;
