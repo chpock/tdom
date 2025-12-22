@@ -249,6 +249,7 @@ typedef enum {
 static const char *Schema_CP_Type2str[] = {
     "ANY",
     "NAME",
+    "NAME_PATTERN",
     "CHOICE",
     "INTERLEAVE",
     "PATTERN",
@@ -485,7 +486,7 @@ mustMatch (
     cp = se->pattern;                             \
     ac = se->activeChild;                         \
     hm = se->hasMatched;                          \
-    if (hm && maxOne (cp->quants[ac])) {          \
+    if (hm && cp->quants && maxOne (cp->quants[ac])) {  \
         ac += + 1;                                \
         hm = 0;                                   \
     }                                             \
@@ -498,6 +499,11 @@ mustMatch (
         } else {                                          \
             se->hasMatched++;                             \
         }                                                 \
+        if (sdata->stack->pattern->type == SCHEMA_CTYPE_NAME) {  \
+            sdata->stack->patternType = SCHEMA_CTYPE_NAME_PATTERN;  \
+        } else {                                                        \
+            sdata->stack->patternType = sdata->stack->pattern->type;    \
+        }                                                               \
     }
 
 
@@ -1476,23 +1482,6 @@ matchingAny (
     }
 }
 
-static int directMatch (
-    SchemaCP *cp,
-    char *name,
-    char *namespace
-    )
-{
-    switch (cp->type) {
-    case SCHEMA_CTYPE_NAME:
-        if (cp->name == name && cp->namespace == namespace) {
-            return 1;
-        }
-        return 0;
-    default:
-        return -1;
-    }
-}
-
 /* Return values: */
 /*  1 The element match. */
 /*  0 The element does not match, perhaps recovering. */
@@ -1540,17 +1529,6 @@ matchElementStart (
             ac++; hm = 0;
         }
         while (ac < cp->nc) {
-            rc = directMatch (cp->content[ac], name, namespace);
-            if (rc != -1) {
-                if (rc == 1) {
-                    updateStack;
-                    return 1;
-                }
-                if (rc == 0) {
-                    errorType = MISSING_ELEMENT;
-                    goto recover;
-                }
-            }
             pushToStack (sdata, cp->content[ac]);
             rc = matchElementStart (interp, sdata, name, namespace);
             if (rc == 1) {
@@ -1567,7 +1545,6 @@ matchElementStart (
             } else {
                 errorType = UNEXPECTED_ELEMENT;
             }
-        recover:
             if (recover (interp, sdata, errorType, MATCH_ELEMENT_START,
                          name, namespace, NULL, 0)) {
                 updateStack;
@@ -1580,6 +1557,7 @@ matchElementStart (
     case SCHEMA_CTYPE_ANY:
         if (matchingAny (namespace, cp)) {
             sdata->skipDeep = 1;
+            popStack (sdata);
             return 1;
         }
         return 0;
@@ -1596,8 +1574,7 @@ matchElementStart (
                 return 0;
             }
         }
-        updateStack;
-        return 1;
+        return -1;
 
     case SCHEMA_CTYPE_CHOICE:
         if (cp->typedata) {
@@ -1634,7 +1611,7 @@ matchElementStart (
     case SCHEMA_CTYPE_VIRTUAL:
         if (evalVirtual (interp, sdata, cp->nc, (Tcl_Obj**)cp->content)) {
             hm++;
-            return 1;
+            return -1;
         }
         return 0;
 
@@ -1645,7 +1622,7 @@ matchElementStart (
             ) {
             return 0;
         };
-        return 1;
+        return -1;
 
     case SCHEMA_CTYPE_KEYSPACE_END:
         cp->keySpace->active--;
@@ -1662,7 +1639,7 @@ matchElementStart (
             }
             Tcl_DeleteHashTable (&cp->keySpace->ids);
         }
-        return 1;
+        return -1;
 
     case SCHEMA_CTYPE_KEYSPACE:
         if (!cp->keySpace->active) {
@@ -1673,7 +1650,7 @@ matchElementStart (
         } else {
             cp->keySpace->active++;
         }
-        return 1;
+        return -1;
 
     case SCHEMA_CTYPE_INTERLEAVE:
         mayskip = 1;
@@ -2221,6 +2198,8 @@ static int probeEventAttribute (
     Tcl_Obj *attname, *attns, *attvalue;
 
     cp = sdata->stack->pattern;
+    DBG(fprintf (stderr, "probeEventAttribute:\n");
+        serializeStack(sdata););
     for (i = 0; i < len; i += 2) {
         found = 0;
         ns = NULL;
