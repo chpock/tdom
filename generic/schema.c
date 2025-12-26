@@ -44,7 +44,7 @@
 
 /* Uncomment the following line for some run-time debugging output on
  * stderr */
-#define DEBUG
+/* #define DEBUG */
 /* #define DDEBUG */
 
 /*----------------------------------------------------------------------------
@@ -499,12 +499,14 @@ mustMatch (
         } else {                                          \
             se->hasMatched++;                             \
         }                                                 \
-        if (sdata->stack->pattern->type == SCHEMA_CTYPE_NAME) {  \
-            sdata->stack->patternType = SCHEMA_CTYPE_NAME_PATTERN;  \
-        } else {                                                        \
-            sdata->stack->patternType = sdata->stack->pattern->type;    \
+        if (sdata->stack && sdata->stack->pattern) {                      \
+            if (sdata->stack->pattern->type == SCHEMA_CTYPE_NAME) { \
+                sdata->stack->patternType = SCHEMA_CTYPE_NAME_PATTERN;  \
+            } else {                                                    \
+                sdata->stack->patternType = sdata->stack->pattern->type; \
+            }                                                           \
         }                                                               \
-    }
+        }
 
 
 static const char *unknownNS = "<unknownNamespace";
@@ -1512,6 +1514,9 @@ matchElementStart (
 
     DBG(fprintf (stderr, "matchElementStart stack top type %s, ac = %d hm = %d\n",
                  Schema_CP_Type2str[cp->type], ac, hm));
+    if (recursivePattern (se, cp)) {
+        return -1;
+    }
     switch (se->patternType) {
     case SCHEMA_CTYPE_NAME:
         DBG(fprintf (stderr, "name: %s ns: %s candidate name: %s "
