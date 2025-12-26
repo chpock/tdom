@@ -1327,6 +1327,7 @@ tDOM_checkText (
     SchemaConstraint *sc;
 
     /* Look also at oneOfImpl */
+    DBG(fprintf(stderr, "tDOM_checkText:\n");serializeCP(cp));
     for (i = 0; i < cp->nc; i++) {
         sc = (SchemaConstraint *) cp->content[i];
         if (!(sc->constraint) (interp, sc->constraintData, text)) {
@@ -2274,7 +2275,7 @@ static int checkElementEnd (
 {
     SchemaValidationStack *se;
     SchemaCP *cp;
-    int hm, rc;
+    int hm, rc, isName = 0;
     unsigned int ac, i;
 
     DBG(fprintf (stderr, "checkElementEnd:\n");
@@ -2285,6 +2286,8 @@ static int checkElementEnd (
 
     switch (cp->type) {
     case SCHEMA_CTYPE_NAME:
+        isName = 1;
+        /* Fall through */
     case SCHEMA_CTYPE_NAME_PATTERN:
     case SCHEMA_CTYPE_INTERLEAVE:
     case SCHEMA_CTYPE_PATTERN:
@@ -2306,49 +2309,55 @@ static int checkElementEnd (
             if (mayMiss (cp->quants[ac])) {
                 ac++; continue;
             }
+            pushToStack (sdata, cp->content[ac]);
+            rc = checkElementEnd (interp, sdata);
+            popStack (sdata);
+            if (rc == -1) {
+                ac++; continue;
+            }
             return 0;
         }
+        if (isName) return 1;
         return -1;
             
     case SCHEMA_CTYPE_KEYSPACE_END:
         /* Don't happen as INTERLEAVE child */
-        cp->content[ac]->keySpace->active--;
-        if (!cp->content[ac]->keySpace->active) {
-            if (cp->content[ac]->keySpace->unknownIDrefs) {
+        cp->keySpace->active--;
+        if (!cp->keySpace->active) {
+            if (cp->keySpace->unknownIDrefs) {
                 if (!recover (interp, sdata, INVALID_KEYREF,
                               MATCH_ELEMENT_END, NULL, NULL,
-                              cp->content[ac]->keySpace->name, 0)) {
+                              cp->keySpace->name, 0)) {
                     SetResultV ("Invalid key ref.");
                     sdata->evalError = 2;
                     return 0;
                 }
-                cp->content[ac]->keySpace->unknownIDrefs = 0;
+                cp->keySpace->unknownIDrefs = 0;
             }
-            Tcl_DeleteHashTable (&cp->content[ac]->keySpace->ids);
+            Tcl_DeleteHashTable (&cp->keySpace->ids);
         }
         return -1;
 
     case SCHEMA_CTYPE_KEYSPACE:
         /* Don't happen as INTERLEAVE child */
-        if (!cp->content[ac]->keySpace->active) {
-            Tcl_InitHashTable (&cp->content[ac]->keySpace->ids,
+        if (!cp->keySpace->active) {
+            Tcl_InitHashTable (&cp->keySpace->ids,
                                TCL_STRING_KEYS);
-            cp->content[ac]->keySpace->active = 1;
-            cp->content[ac]->keySpace->unknownIDrefs = 0;
+            cp->keySpace->active = 1;
+            cp->keySpace->unknownIDrefs = 0;
         } else {
-            cp->content[ac]->keySpace->active++;
+            cp->keySpace->active++;
         }
         return -1;
                 
     case SCHEMA_CTYPE_TEXT:
-        if (cp->content[ac]->nc) {
-            if (!checkText (interp, cp->content[ac], "")) {
-                if (recover (interp, sdata, MISSING_TEXT,
-                             MATCH_ELEMENT_END, NULL, NULL, NULL,
-                             ac)) {
-                    break;
+        if (cp->nc) {
+            if (!checkText (interp, cp, "")) {
+                if (!recover (interp, sdata, MISSING_TEXT,
+                         MATCH_ELEMENT_END, NULL, NULL, NULL,
+                         ac)) {
+                    return 0;
                 }
-                return 0;
             }
         }
         return -1;

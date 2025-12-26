@@ -270,7 +270,7 @@ test schema-1.14 {refer local element definition with element} {
     set result 
 } {1 0 0 1}
 
-test schema-1.14.1 {refer local element definition with element} {
+test schema-1.14 {refer local element definition with element} {
     tdom::schema create s
     s define {
         defelement elm1 {
@@ -287,12 +287,15 @@ test schema-1.14.1 {refer local element definition with element} {
     set result [list]
     foreach xml {
         <elm1><elm><a>foo</a></elm></elm1>
+        <elm1><elm></elm></elm1>
+        <elm2><elm><a>foo</a></elm></elm2>
+        <elm2><elm></elm></elm2>
     } {
         lappend result [s validate $xml]
     }
     s delete
     set result 
-} 1
+} {1 0 0 1}
 
 test schema-1.14a1 {define start w/ namespace} {
     tdom::schema create s
