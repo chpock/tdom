@@ -1349,6 +1349,7 @@ evalVirtual (
 {
     int rc;
 
+    DBG(fprintf(stderr, "evalVirtual called, objc %d:\n", objc));
     sdata->currentEvals++;
     rc = Tcl_EvalObjv (interp, objc, objv, TCL_EVAL_GLOBAL);
     sdata->currentEvals--;
@@ -1367,16 +1368,15 @@ recursivePattern (
     SchemaCP *pattern
     )
 {
-    int rc = 0;
-    
+    if (!se) return 0;
+    se = se->down;
     while (se && se->pattern->type != SCHEMA_CTYPE_NAME) {
         if (!se->hasMatched && se->pattern == pattern) {
-            rc = 1;
-            break;
+            return 1;
         }
         se = se->down;
     }
-    return rc;
+    return 0;
 }
 
 static int
@@ -1515,7 +1515,8 @@ matchElementStart (
 
     DBG(fprintf (stderr, "matchElementStart stack top type %s, ac = %d hm = %d\n",
                  Schema_CP_Type2str[cp->type], ac, hm));
-    if (recursivePattern (se, cp)) {
+    if (cp->type == SCHEMA_CTYPE_PATTERN
+        && recursivePattern (se, cp)) {
         return -1;
     }
     switch (se->patternType) {
@@ -2321,7 +2322,7 @@ static int checkElementEnd (
         return -1;
             
     case SCHEMA_CTYPE_KEYSPACE_END:
-        /* Don't happen as INTERLEAVE child */
+        if (!cp->keySpace->active) return -1;
         cp->keySpace->active--;
         if (!cp->keySpace->active) {
             if (cp->keySpace->unknownIDrefs) {
@@ -2339,7 +2340,6 @@ static int checkElementEnd (
         return -1;
 
     case SCHEMA_CTYPE_KEYSPACE:
-        /* Don't happen as INTERLEAVE child */
         if (!cp->keySpace->active) {
             Tcl_InitHashTable (&cp->keySpace->ids,
                                TCL_STRING_KEYS);
@@ -2365,9 +2365,9 @@ static int checkElementEnd (
     case SCHEMA_CTYPE_CHOICE:
         /* If the choice itself is madatory; check, if there
          * is one of the selections may be optional. */
-        for (i = 0; i < cp->content[ac]->nc; i++) {
-            if (mayMiss (cp->quants[ac])) return -1;
-            pushToStack (sdata, cp->content[ac]);
+        for (i = 0; i < cp->nc; i++) {
+            if (mayMiss (cp->quants[i])) return -1;
+            pushToStack (sdata, cp->content[i]);
             rc = checkElementEnd (interp, sdata);
             popStack (sdata);
             if (rc == -1) return -1;
@@ -2383,7 +2383,7 @@ static int checkElementEnd (
         else return 0;
 
     case SCHEMA_CTYPE_JSON_STRUCT:
-        if (!checkJsonStructType (interp, sdata, cp->content[ac],
+        if (!checkJsonStructType (interp, sdata, cp,
                                   INVALID_JSON_TYPE, MATCH_ELEMENT_END, ac)) {
             return 0;
         }
