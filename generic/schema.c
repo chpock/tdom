@@ -126,7 +126,7 @@ typedef struct
     Tcl_Obj       *externalentitycommandObj;
 } ValidateMethodData;
 
-static const char *ValidationAction2str[] = {
+static const char *const ValidationAction2str[] = {
     "NOT_USED",
     "MATCH_GLOBAL",
     "MATCH_ELEMENT_START",
@@ -156,7 +156,7 @@ typedef enum {
     INVALID_JSON_TYPE,
 } ValidationErrorType;
 
-static const char *ValidationErrorType2str[] = {
+static const char *const ValidationErrorType2str[] = {
     "DOM_KEYCONSTRAINT",
     "DOM_XPATH_BOOLEAN",
     "MISSING_ATTRIBUTE",
@@ -181,7 +181,7 @@ typedef enum {
     VALIDATE_CHANNEL
 } ValidationInput;
 
-static const char *jsonStructTypes[] = {
+static const char *const jsonStructTypes[] = {
     "NONE",
     "OBJECT",
     "ARRAY",
@@ -246,7 +246,7 @@ typedef enum {
     }
 
 #if defined(DEBUG) || defined(DDEBUG)
-static const char *Schema_CP_Type2str[] = {
+static const char *const Schema_CP_Type2str[] = {
     "ANY",
     "NAME",
     "NAME_PATTERN",
@@ -259,7 +259,7 @@ static const char *Schema_CP_Type2str[] = {
     "KEYSPACE_END",
     "JSON_STRUCT_TYPE"
 };
-static const char *Schema_Quant_Type2str[] = {
+static const char *const Schema_Quant_Type2str[] = {
     "ONE",
     "OPT",
     "REP",
@@ -1531,8 +1531,10 @@ matchElementStart (
         return 0;
 
     case SCHEMA_CTYPE_NAME_PATTERN:
+        isName = 1;
+        /* fall through */
     case SCHEMA_CTYPE_PATTERN:
-        if (ac < cp->nc && finished (cp->quants[ac], hm)) {
+        if (hm && ac < cp->nc && finished (cp->quants[ac], hm)) {
             ac++; hm = 0;
         }
         while (ac < cp->nc) {
@@ -1544,7 +1546,7 @@ matchElementStart (
             }
             popStack (sdata);
             if (rc == -1 || mayMatch (cp->quants[ac], hm)) {
-                ac++;
+                ac++; hm = 0;
                 continue;
             }
             if (isName) {
@@ -1552,14 +1554,17 @@ matchElementStart (
             } else {
                 errorType = UNEXPECTED_ELEMENT;
             }
-            if (recover (interp, sdata, errorType, MATCH_ELEMENT_START,
-                         name, namespace, NULL, 0)) {
-                updateStack;
-                return 1;
-            }
-            return 0;
+            goto tryRecover;
         }
-        break;
+        if (!isName) return -1;
+        errorType = UNEXPECTED_ELEMENT;
+    tryRecover:
+        if (recover (interp, sdata, errorType, MATCH_ELEMENT_START,
+                     name, namespace, NULL, 0)) {
+            updateStack;
+            return 1;
+        }
+        return 0;
 
     case SCHEMA_CTYPE_ANY:
         if (matchingAny (namespace, cp)) {
@@ -1608,7 +1613,7 @@ matchElementStart (
                 return 1;
             }
             popStack (sdata);
-            if (rc == -1) {
+            if (rc == -1 || mayMiss (cp->quants[i])) {
                 mayskip = 1;
             }
         }
@@ -2536,291 +2541,147 @@ matchText (
     char *text
     )
 {
-    SchemaCP *cp, *candidate, *ic;
+    SchemaCP *cp;
     SchemaValidationStack *se;
-    int hm, isName = 0, mayskip;
+    int hm, isName = 0, mayskip, rc;
     unsigned int ac, i;
     
     DBG(fprintf (stderr, "matchText called with text '%s'\n", text));
     
     se = sdata->stack;
     getContext (cp, ac, hm);
-    while (1) {
-        switch (cp->type) {
-        case SCHEMA_CTYPE_NAME:
-            isName = 1;
-            /* fall through */
-        case SCHEMA_CTYPE_NAME_PATTERN:
-        case SCHEMA_CTYPE_PATTERN:
-            while (ac < cp->nc) {
-                candidate = cp->content[ac];
-                switch (candidate->type) {
-                case SCHEMA_CTYPE_TEXT:
-                    if (checkText (interp, candidate, text)) {
-                        updateStack;
-                        return 1;
-                    }
-                    if (sdata->evalError) return 0;
-                    if (recover (interp, sdata, INVALID_VALUE, MATCH_TEXT,
-                                 NULL, NULL, text, ac)) {
-                        updateStack;
-                        return 1;
-                    }
-                    SetResult ("Invalid text content");
-                    return 0;
-
-                case SCHEMA_CTYPE_CHOICE:
-                    if (candidate->flags & MIXED_CONTENT) {
-                        updateStack;
-                        return 1;
-                    }
-                    for (i = 0; i < candidate->nc; i++) {
-                        ic = candidate->content[i];
-                        switch (ic->type) {
-                        case SCHEMA_CTYPE_TEXT:
-                            if (checkText (interp, ic, text)) {
-                                updateStack;
-                                return 1;
-                            }
-                            break;
-
-                        case SCHEMA_CTYPE_NAME:
-                        case SCHEMA_CTYPE_NAME_PATTERN:
-                        case SCHEMA_CTYPE_ANY:
-                            break;
-
-                        case SCHEMA_CTYPE_PATTERN:
-                            if (recursivePattern (se, ic)) {
-                                break;
-                            }
-                            /* fall through */
-                        case SCHEMA_CTYPE_INTERLEAVE:
-                            pushToStack (sdata, ic);
-                            if (matchText (interp, sdata, text)) {
-                                updateStack;
-                                return 1;
-                            }
-                            popStack (sdata);
-                            break;
-
-                        case SCHEMA_CTYPE_VIRTUAL:
-                            SetResult ("Virtual constrain in MIXED or"
-                                       " CHOICE");
-                            sdata->evalError = 1;
-                            return 0;
-                            
-                        case SCHEMA_CTYPE_CHOICE:
-                            SetResult ("MIXED or CHOICE child of MIXED or"
-                                       " CHOICE");
-                            sdata->evalError = 1;
-                            return 0;
-
-                        case SCHEMA_CTYPE_KEYSPACE_END:
-                        case SCHEMA_CTYPE_KEYSPACE:
-                            SetResult ("Keyspace constrain in MIXED or"
-                                       " CHOICE");
-                            sdata->evalError = 1;
-                            return 0;
-                            
-                        case SCHEMA_CTYPE_JSON_STRUCT:
-                            SetResult ("JSON structure constrain in MIXED or"
-                                       " CHOICE");
-                            sdata->evalError = 1;
-                            return 0;
-                        }
-                    }
-                    if (mustMatch (cp->quants[ac], hm)) {
-                        if (recover (interp, sdata, UNEXPECTED_TEXT,
-                                     MATCH_TEXT, NULL, NULL, text, 0)) {
-                            return 1;
-                        }
-                        SetResultV ("Unexpected text content");
-                        return 0;
-                    }
-                    break;
-
-                case SCHEMA_CTYPE_NAME_PATTERN:
-                case SCHEMA_CTYPE_PATTERN:
-                    if (recursivePattern (se, candidate)) {
-                        break;
-                    }
-                    /* fall through */
-                case SCHEMA_CTYPE_INTERLEAVE:
-                    pushToStack (sdata, candidate);
-                    if (matchText (interp, sdata, text)) {
-                        updateStack;
-                        return 1;
-                    }
-                    popStack (sdata);
-                    if (mustMatch (cp->quants[ac], hm)) {
-                        if (recover (interp, sdata, UNEXPECTED_TEXT,
-                                     MATCH_TEXT, NULL, NULL, text, 0)) {
-                            return 1;
-                        }
-                        SetResultV ("Unexpected text content");
-                        return 0;
-                    }
-                    break;
-
-                case SCHEMA_CTYPE_VIRTUAL:
-                    ic = cp->content[ac];
-                    if (evalVirtual (interp, sdata, ic->nc,
-                                     (Tcl_Obj**)ic->content)) break;
-                    else return 0;
-
-                case SCHEMA_CTYPE_JSON_STRUCT:
-                    if (checkJsonStructType (interp, sdata, candidate,
-                                             INVALID_JSON_TYPE, MATCH_TEXT,
-                                             ac)) {
-                        ac++;
-                        continue;
-                    }
-                    return 0;
-                    
-                case SCHEMA_CTYPE_KEYSPACE:
-                    if (!cp->content[ac]->keySpace->active) {
-                        Tcl_InitHashTable (&cp->content[ac]->keySpace->ids,
-                                           TCL_STRING_KEYS);
-                        cp->content[ac]->keySpace->active = 1;
-                        cp->content[ac]->keySpace->unknownIDrefs = 0;
-                    } else {
-                        cp->content[ac]->keySpace->active++;
-                    }
-                    break;
-                    
-                case SCHEMA_CTYPE_KEYSPACE_END:
-                    cp->content[ac]->keySpace->active--;
-                    if (!cp->content[ac]->keySpace->active) {
-                        if (cp->content[ac]->keySpace->unknownIDrefs) {
-                            if (!recover (interp, sdata,
-                                          INVALID_KEYREF, MATCH_TEXT, NULL,
-                                          NULL, text, ac)) {
-                                return 0;
-                                SetResultV ("Invalid key ref.");
-                                sdata->evalError = 2;
-                            }
-                            cp->content[ac]->keySpace->unknownIDrefs = 0;
-                        }
-                        Tcl_DeleteHashTable (&cp->content[ac]->keySpace->ids);
-                    }
-                    break;
-                    
-                case SCHEMA_CTYPE_NAME:
-                case SCHEMA_CTYPE_ANY:
-                    if (mustMatch (cp->quants[ac], hm)) {
-                        if (recover (interp, sdata, UNEXPECTED_TEXT,
-                                     MATCH_TEXT, NULL, NULL, text, ac)) {
-                            return 1;
-                        }
-                        SetResultV ("Unexpected text content");
-                        return 0;
-                    }
-                    break;
-
-                }
-                ac++;
-            }
-            if (isName) {
-                if (recover (interp, sdata, UNEXPECTED_TEXT, MATCH_TEXT, NULL,
-                             NULL, text, 0)) {
-                    return 1;
-                }
-                SetResultV ("Unexpected text content");
-                return 0;
-            }
-            popStack (sdata);
-            se = sdata->stack;
-            getContext (cp, ac, hm);
-            ac++;
-            continue;
-
-        case SCHEMA_CTYPE_KEYSPACE:
-        case SCHEMA_CTYPE_KEYSPACE_END:
-        case SCHEMA_CTYPE_VIRTUAL:
-        case SCHEMA_CTYPE_JSON_STRUCT:
-        case SCHEMA_CTYPE_CHOICE:
-        case SCHEMA_CTYPE_TEXT:
-        case SCHEMA_CTYPE_ANY:
-            /* Never pushed onto stack */
-            SetResult ("Invalid CTYPE onto the validation stack!");
-            sdata->evalError = 1;
-            return 0;
-
-        case SCHEMA_CTYPE_INTERLEAVE:
-            mayskip = 1;
-            for (i = 0; i < cp->nc; i++) {
-                if (finished (cp->quants[i], se->interleaveState[i])) continue;
-                if (minOne (cp->quants[i])) mayskip = 0;
-                ic = cp->content[i];
-                switch (ic->type) {
-                case SCHEMA_CTYPE_TEXT:
-                    if (checkText (interp, ic, text)) {
-                        if (!(sdata->recoverFlags & RECOVER_FLAG_REWIND)) {
-                            se->hasMatched++;
-                            se->interleaveState[i]++;
-                        }
-                        return 1;
-                    }
-                    break;
-
-                case SCHEMA_CTYPE_NAME:
-                case SCHEMA_CTYPE_NAME_PATTERN:
-                case SCHEMA_CTYPE_ANY:
-                    break;
-
-                case SCHEMA_CTYPE_PATTERN:
-                    if (recursivePattern (se, ic)) {
-                        break;
-                    }
-                    /* fall through */
-                case SCHEMA_CTYPE_INTERLEAVE:
-                    pushToStack (sdata, ic);
-                    if (matchText (interp, sdata, text)) {
-                        updateStack;
-                        return 1;
-                    }
-                    popStack (sdata);
-                    break;
-
-                case SCHEMA_CTYPE_CHOICE:
-                    SetResult ("MIXED or CHOICE child of INTERLEAVE");
-                    sdata->evalError = 1;
-                    return 0;
-
-                case SCHEMA_CTYPE_KEYSPACE_END:
-                case SCHEMA_CTYPE_KEYSPACE:
-                    SetResult ("Keyspace child of INTERLEAVE");
-                    sdata->evalError = 1;
-                    return 0;
-
-                case SCHEMA_CTYPE_VIRTUAL:
-                    break;
-                    
-                case SCHEMA_CTYPE_JSON_STRUCT:
-                    SetResult ("JSON structure constraint child of"
-                               "INTERLEAVE");
-                    sdata->evalError = 1;
-                    return 0;
-                }
-            }
-            if (!mayskip) {
-                if (recover (interp, sdata, UNEXPECTED_TEXT, MATCH_TEXT, NULL, NULL, text,
-                             ac)) {
-                    return 1;
-                }
-                SetResultV ("Unexpected text content");
-                return 0;
-            }
-            popStack (sdata);
-            se = sdata->stack;
-            getContext (cp, ac, hm);
-            ac++;
-            continue;
+    switch (cp->type) {
+    case SCHEMA_CTYPE_NAME:
+        isName = 1;
+        /* fall through */
+    case SCHEMA_CTYPE_NAME_PATTERN:
+    case SCHEMA_CTYPE_PATTERN:
+        if (ac < cp->nc && finished (cp->quants[ac], hm)) {
+            ac++; hm = 0;
         }
-        /* Not reached, but this is inside a while (1) {} loop ...*/
-        break;
+        while (ac < cp->nc) {
+            pushToStack (sdata, cp->content[ac]);
+            rc = matchText (interp, sdata, text);
+            if (rc == 1) {
+                updateStack;
+                return 1;
+            }
+            popStack (sdata);
+            if (rc == -1 || mayMatch (cp->quants[ac], hm)) {
+                ac++; hm = 0;
+                continue;
+            }
+            break;
+        }
+        if (!isName) return -1;
+        if (recover (interp, sdata, UNEXPECTED_TEXT,
+                     MATCH_TEXT, NULL, NULL, text, 0)) {
+            return 1;
+        }
+        SetResultV ("Unexpected text content");
+        return 0;
+
+    case SCHEMA_CTYPE_TEXT:
+        if (checkText (interp, cp, text)) {
+            popStack (sdata);
+            return 1;
+        }
+        if (sdata->evalError) return 0;
+        if (recover (interp, sdata, INVALID_VALUE, MATCH_TEXT,
+                     NULL, NULL, text, ac)) {
+            popStack (sdata);
+            return 1;
+        }
+        SetResult ("Invalid text content");
+        return 0;
+
+    case SCHEMA_CTYPE_ANY:
+        return 0;
+        
+    case SCHEMA_CTYPE_CHOICE:
+        if (cp->flags & MIXED_CONTENT) {
+            updateStack;
+            return 1;
+        }
+        for (i = 0; i < cp->nc; i++) {
+            pushToStack (sdata, cp->content[ac]);
+            rc = matchText (interp, sdata, text);
+            if (rc == 1) {
+                updateStack;
+                return 1;
+            }
+            popStack (sdata);
+            if (rc == -1 || mayMiss (cp->quants[i])) {
+                mayskip = 1;
+            }
+        }
+        if (mayskip) return -1;
+        return 0;
+
+    case SCHEMA_CTYPE_VIRTUAL:
+        if (evalVirtual (interp, sdata, cp->nc, (Tcl_Obj**)cp->content)) {
+            hm++;
+            return -1;
+        }
+        return 0;
+
+    case SCHEMA_CTYPE_JSON_STRUCT:
+        if (!checkJsonStructType (
+                interp, sdata, cp, INVALID_JSON_TYPE,
+                MATCH_ELEMENT_START, ac)
+            ) {
+            return 0;
+        };
+        return -1;
+
+    case SCHEMA_CTYPE_KEYSPACE_END:
+        if (!cp->keySpace->active) return -1;
+        cp->keySpace->active--;
+        if (!cp->keySpace->active) {
+            Tcl_DeleteHashTable (&cp->keySpace->ids);
+            if (cp->keySpace->unknownIDrefs) {
+                if (!recover (interp, sdata, INVALID_KEYREF, MATCH_TEXT,
+                              NULL, NULL, text, 0)) {
+                    SetResultV ("Invalid key ref.");
+                    sdata->evalError = 2;
+                    return 0;
+                }
+            }
+        }
+        return -1;
+
+    case SCHEMA_CTYPE_KEYSPACE:
+        if (!cp->keySpace->active) {
+            Tcl_InitHashTable (&cp->keySpace->ids,
+                               TCL_STRING_KEYS);
+            cp->keySpace->active = 1;
+            cp->keySpace->unknownIDrefs = 0;
+        } else {
+            cp->keySpace->active++;
+        }
+        return -1;
+
+    case SCHEMA_CTYPE_INTERLEAVE:
+        mayskip = 1;
+        for (i = 0; i < cp->nc; i++) {
+            pushToStack (sdata, cp->content[i]);
+            rc = matchText (interp, sdata, text);
+            if (rc == 1) {
+                updateStack;
+                se->hasMatched++;
+                se->interleaveState[i]++;
+                return 1;
+            }
+            popStack (sdata);
+            if (rc == 0) {
+                mayskip = 0;
+            }
+        }
+        if (mayskip) return -1;
+        return 0;
     }
-    /* Not reached, but at least makes the compiler happy. */
+    
+    /* Not reached. */
     return 0;
 }
 
@@ -4026,7 +3887,7 @@ schemaInstanceInfoCmd (
     void *ns;
     Tcl_Obj *rObj;
     
-    static const char *schemaInstanceInfoMethods[] = {
+    static const char *const schemaInstanceInfoMethods[] = {
         "validationstate", "vstate", "definedElements", "stack", "toplevel",
         "expected", "definition", "validationaction", "vaction", "line",
         "column", "byteIndex", "domNode", "nrForwardDefinitions",
@@ -4041,21 +3902,21 @@ schemaInstanceInfoCmd (
         m_definedPatterns
     };
 
-    static const char *schemaInstanceInfoStackMethods[] = {
+    static const char *const schemaInstanceInfoStackMethods[] = {
         "top", "inside", "associated", NULL
     };
     enum schemaInstanceInfoStackMethod {
         m_top, m_inside, m_associated
     };
 
-    static const char *schemaInstanceInfoVactionMethods[] = {
+    static const char *const schemaInstanceInfoVactionMethods[] = {
         "name", "namespace", "text", NULL
     };
     enum schemaInstanceInfoVactionMethod {
         m_name, m_namespace, m_text
     };
 
-    static const char *schemaInstanceInfoExpectedOptions[] = {
+    static const char *const schemaInstanceInfoExpectedOptions[] = {
         "-ignorematched", "-onlymandatory", NULL
     };
     enum schemaInstanceInfoExpectedOption 
@@ -4724,7 +4585,7 @@ static int validateSource (
     int optionIndex;
     Tcl_Channel channel;
     
-    static const char *validateOptions[] = {
+    static const char *const validateOptions[] = {
         "-baseurl", "-externalentitycommand", "-paramentityparsing",
         "-useForeignDTD", "-forest", NULL
     };
@@ -4733,7 +4594,7 @@ static int validateSource (
         o_useForeignDTD, o_forest
     };
 
-    static const char *paramEntityParsingValues[] = {
+    static const char *const paramEntityParsingValues[] = {
         "always",
         "never",
         "notstandalone",
@@ -5002,7 +4863,7 @@ tDOM_schemaInstanceCmd (
     SchemaCP     **typeInstances;
     ValidateMethodData vdata;
 
-    static const char *schemaInstanceMethods[] = {
+    static const char *const schemaInstanceMethods[] = {
         "defelement", "defpattern", "start",    "event",        "delete",
         "reset",      "define",     "validate", "domvalidate",  "deftexttype",
         "info",       "reportcmd",  "prefixns", "validatefile",
@@ -5016,7 +4877,7 @@ tDOM_schemaInstanceCmd (
         m_validatechannel,          m_defelementtype,           m_set
     };
 
-    static const char *eventKeywords[] = {
+    static const char *const eventKeywords[] = {
         "start", "end", "text", NULL
     };
     enum eventKeyword
@@ -5024,7 +4885,7 @@ tDOM_schemaInstanceCmd (
         k_elementstart, k_elementend, k_text
     };
 
-    static const char *setKeywords[] = {
+    static const char *const setKeywords[] = {
         "choiceHashThreshold", "attributeHashThreshold", NULL
     };
     enum setKeyword
@@ -5653,7 +5514,7 @@ tDOM_SchemaObjCmd (
     int            methodIndex, ind, result = TCL_OK;
     SchemaData  *sdata;
 
-    static const char *schemaMethods[] = {
+    static const char *const schemaMethods[] = {
         "create", NULL
     };
     enum schemaMethod {
@@ -5823,7 +5684,7 @@ AnyPatternObjCmd (
     Tcl_Obj *nsObj;
     Tcl_HashTable *t = NULL;
 
-    static const char *anyOptions[] = {
+    static const char *const anyOptions[] = {
         "-not", "--", NULL
     };
     enum anyOption {

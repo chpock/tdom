@@ -2239,6 +2239,29 @@ test schema-7.14 {mixed} {
     set result
 } {1 1 1 1 1 0}
 
+test schema-7.14.1 {mixed} {
+    tdom::schema create s
+    s define {
+        defelement doc {
+            mixed {
+                element a
+                element b
+            }
+        }
+        foreach e {a b} {
+            defelement $e {}
+        }
+    }
+    set result [list]
+    foreach xml {
+        <doc>text<a/></doc>
+    } {
+        lappend result [s validate $xml]
+    }
+    s delete
+    set result
+} 1
+
 test schema-7.14a {mixed} {
     tdom::schema create s
     s define {
