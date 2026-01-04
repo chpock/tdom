@@ -499,14 +499,7 @@ mustMatch (
         } else {                                          \
             se->hasMatched++;                             \
         }                                                 \
-        if (sdata->stack && sdata->stack->pattern) {                      \
-            if (sdata->stack->pattern->type == SCHEMA_CTYPE_NAME) { \
-                sdata->stack->patternType = SCHEMA_CTYPE_NAME_PATTERN;  \
-            } else {                                                    \
-                sdata->stack->patternType = sdata->stack->pattern->type; \
-            }                                                           \
-        }                                                               \
-        }
+    }
 
 
 static const char *unknownNS = "<unknownNamespace";
@@ -1015,6 +1008,7 @@ getStackElement (
     }
     memset (stackElm, 0, sizeof (SchemaValidationStack));
     stackElm->pattern = pattern;
+    stackElm->patternType = pattern->type;
     return stackElm;
 }
 
@@ -1050,7 +1044,6 @@ pushToStack (
         sdata->lastMatchse = NULL;
     }
     se = getStackElement (sdata, pattern);
-    se->patternType = pattern->type;
     se->down = sdata->stack;
     if (pattern->type == SCHEMA_CTYPE_INTERLEAVE) {
         se->interleaveState = MALLOC (sizeof (int) * pattern->nc);
@@ -1488,7 +1481,7 @@ matchingAny (
 /* Return values: */
 /*  1 The element match. */
 /*  0 The element does not match, perhaps recovering. */
-/* -1 The element doest not macht, but content particle do
+/* -1 The element does not match, but content particle do
       not require a match     */
 
 static int
@@ -1507,14 +1500,13 @@ matchElementStart (
     Tcl_HashEntry *h;
 
     if (!sdata->stack) return 0;
-    DBG(fprintf (stderr, "matchElementStart: try to match %s %s\n", name,
-            namespace);
-        serializeStack(sdata););
     se = sdata->stack;
     getContext (cp, ac, hm);
 
-    DBG(fprintf (stderr, "matchElementStart stack top type %s, ac = %d hm = %d\n",
-                 Schema_CP_Type2str[cp->type], ac, hm));
+    DBG(fprintf (stderr, "matchElementStart: try to match %s %s, ac = %d "
+                 "hm = %d\n", name, namespace, ac, hm);
+        serializeStack(sdata););
+
     if (cp->type == SCHEMA_CTYPE_PATTERN
         && recursivePattern (se, cp)) {
         return -1;
@@ -1589,6 +1581,7 @@ matchElementStart (
         return -1;
 
     case SCHEMA_CTYPE_CHOICE:
+        if (se->hasMatched) return -1;
         if (cp->typedata) {
             h = Tcl_FindHashEntry ((Tcl_HashTable *)cp->typedata, name);
             if (h) {
@@ -1597,6 +1590,7 @@ matchElementStart (
                 if (icp->namespace == namespace) {
                     pushToStack (sdata, icp);
                     updateStack;
+                    sdata->stack->patternType = SCHEMA_CTYPE_NAME_PATTERN;
                     return 1;
                 }
             }
@@ -1667,6 +1661,10 @@ matchElementStart (
     case SCHEMA_CTYPE_INTERLEAVE:
         mayskip = 1;
         for (i = 0; i < cp->nc; i++) {
+            if (se->interleaveState[i]
+                && finished (cp->quants[i], se->interleaveState[i])) {
+                continue;
+            }
             pushToStack (sdata, cp->content[i]);
             rc = matchElementStart (interp, sdata, name, namespace);
             if (rc == 1) {
@@ -1676,7 +1674,7 @@ matchElementStart (
                 return 1;
             }
             popStack (sdata);
-            if (rc == 0) {
+            if (rc == 0 && mustMatch (cp->quants[i], se->interleaveState[i])) {
                 mayskip = 0;
             }
         }
@@ -1858,7 +1856,7 @@ tDOM_probeElement (
             popStack (sdata);
             rc = matchElementStart (interp, sdata, (char *) namePtr,
                                     namespacePtr);
-        };
+        }
         if (rc) {
             DBG(
                 fprintf (stderr, "tDOM_probeElement: element '%s' match\n",
@@ -2289,6 +2287,7 @@ static int checkElementEnd (
     if (!sdata->stack) return 0;
     se = sdata->stack;
     getContext (cp, ac, hm);
+    DBG(fprintf (stderr, "checkElementEnd: hm %d\n", hm));
 
     switch (cp->type) {
     case SCHEMA_CTYPE_NAME:
@@ -2368,6 +2367,9 @@ static int checkElementEnd (
         return -1;
 
     case SCHEMA_CTYPE_CHOICE:
+        if (se->hasMatched) {
+            return -1;
+        }
         /* If the choice itself is madatory; check, if there
          * is one of the selections may be optional. */
         for (i = 0; i < cp->nc; i++) {
@@ -2584,6 +2586,7 @@ matchText (
     case SCHEMA_CTYPE_TEXT:
         if (checkText (interp, cp, text)) {
             popStack (sdata);
+            DBG(fprintf (stderr, "matchText matched text '%s'\n", text));
             return 1;
         }
         if (sdata->evalError) return 0;
@@ -2599,12 +2602,14 @@ matchText (
         return 0;
         
     case SCHEMA_CTYPE_CHOICE:
+        if (se->hasMatched) return -1;
         if (cp->flags & MIXED_CONTENT) {
             updateStack;
             return 1;
         }
+        mayskip = 0;
         for (i = 0; i < cp->nc; i++) {
-            pushToStack (sdata, cp->content[ac]);
+            pushToStack (sdata, cp->content[i]);
             rc = matchText (interp, sdata, text);
             if (rc == 1) {
                 updateStack;
@@ -2693,7 +2698,7 @@ tDOM_probeText (
     int *only_whites
     )
 {
-    int myonly_whites;
+    int myonly_whites, rc;
     char *pc;
 
     DBG(fprintf (stderr, "tDOM_probeText started, text: '%s'\n", text);)
@@ -2713,10 +2718,7 @@ tDOM_probeText (
         if (!*text && sdata->stack->pattern->nc == 0) {
             return TCL_OK;
         }
-        if (matchText (interp, sdata, text)) {
-            CHECK_REWIND;
-            return TCL_OK;
-        }
+        goto probeStack;
     } else {
         if (only_whites) {
             myonly_whites = *only_whites;
@@ -2727,10 +2729,20 @@ tDOM_probeText (
             if (*pc) myonly_whites = 0;
         }
         if (myonly_whites)  return TCL_OK;
-        if (matchText (interp, sdata, text)) {
+        /* Fall through to probeStack */
+    }
+probeStack:
+    while (1) {
+        rc = matchText (interp, sdata, text);
+        while (rc == -1) {
+            popStack (sdata);
+            rc = matchText (interp, sdata, text);
+        }
+        if (rc) {
             CHECK_REWIND;
             return TCL_OK;
         }
+        break;
     }
     if (!sdata->evalError) {
         SetResult ("Text content doesn't match");
@@ -3532,252 +3544,160 @@ getNextExpectedWorker (
     int expectedFlags
     )
 {
-    int hm, hnew, mustM, mayskip, rc = 1, probeMayskip = 0;
+    int hm, hnew, mayskip, isName = 0, rc = 1, probeMayskip = 0;
     unsigned int ac, i;
-    SchemaCP *cp, *ic, *jc;
+    SchemaCP *cp, *ic;
     SchemaValidationStack *se1;
 
+    DBG(fprintf (stderr, "getNextExpectedWorker called, top stack type: '%s'\n",
+                 Schema_CP_Type2str[se->patternType]);)
     if (expectedFlags & EXPECTED_PROBE_MAYSKIP) {
         probeMayskip = 1;
     }
     getContext (cp, ac, hm);
-    if ((expectedFlags & EXPECTED_IGNORE_MATCHED
-         || expectedFlags & EXPECTED_ONLY_MANDATORY)
-        && hm) {
-        ac++;
-        hm = 0;
-    } else {
-        if (hm && maxOne(cp->quants[ac])) {
-            ac++;
-            hm = 0;
-        }
-    }
-    switch (cp->type) {
-    case SCHEMA_CTYPE_INTERLEAVE:
-        ac = 0;
-        mustM = 0;
-        /* fall through */
+    switch (se->patternType) {
     case SCHEMA_CTYPE_NAME:
+        if (probeMayskip) return 0;
+        Tcl_ListObjAppendElement (interp, rObj,
+                                  serializeElementName (interp, cp));
+        return 0;
     case SCHEMA_CTYPE_NAME_PATTERN:
+        isName = 1;
+        /* Fall through. */
     case SCHEMA_CTYPE_PATTERN:
-        while (ac < cp->nc) {
-            if (se->interleaveState
-                && se->interleaveState[ac]
-                && maxOne (cp->quants[ac])) {
-                ac++;
-                hm = 0;
-                continue;
-            }
-            if (expectedFlags & EXPECTED_ONLY_MANDATORY
-                && !mustMatch(cp->quants[ac], hm)) {
-                ac++;
-                hm = 0;
-                continue;
-            }
-            ic = cp->content[ac];
-            mayskip = 0;
-            switch (ic->type) {
-            case SCHEMA_CTYPE_NAME_PATTERN:
-            case SCHEMA_CTYPE_NAME:
-                if (probeMayskip) break;
-                Tcl_ListObjAppendElement (interp, rObj,
-                                          serializeElementName (interp, ic));
-                break;
-            case SCHEMA_CTYPE_PATTERN:
-                if (recursivePattern (se, ic)) {
-                    break;
-                }
-                /* fall through */
-            case SCHEMA_CTYPE_INTERLEAVE:
-                if (expectedFlags & EXPECTED_ONLY_MANDATORY
-                    && !se->hasMatched) {
-                    expectedFlags |= EXPECTED_PROBE_MAYSKIP;
-                    se1 = getStackElement (sdata, ic);
-                    mayskip = getNextExpectedWorker (sdata, se1, interp,
-                                                     seenCPs, rObj,
-                                                     expectedFlags);
-                    repoolStackElement (sdata, se1);
-                    if (!probeMayskip) {
-                        expectedFlags &= ~EXPECTED_PROBE_MAYSKIP;
-                    }
-                    if (mayskip) break;
-                }
-                if (probeMayskip) break;
-                Tcl_CreateHashEntry (seenCPs, (char *)ic, &hnew);
-                if (hnew) {
-                    se1 = getStackElement (sdata, ic);
-                    mayskip = getNextExpectedWorker (sdata, se1, interp,
-                                                     seenCPs, rObj,
-                                                     expectedFlags);
-                    repoolStackElement (sdata, se1);
-                }
-                break;
-
-            case SCHEMA_CTYPE_ANY:
-                if (probeMayskip) break;
-                if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
-                    || minOne (cp->quants[ac])) {
-                    Tcl_ListObjAppendElement (interp, rObj,
-                                              serializeAnyCP (interp, ic));
-                }
-                break;
-
-            case SCHEMA_CTYPE_TEXT:
-                if (ic->nc == 0 || checkText (interp, ic, "")) {
-                    mayskip = 1;
-                }
-                if (probeMayskip) break;
-                if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
-                    || mayskip == 0) {
-                    Tcl_ListObjAppendElement (interp, rObj,
-                                              serializeTextCP (interp));
-                }
-                break;
-                
-            case SCHEMA_CTYPE_CHOICE:
-                if (probeMayskip) {
-                    for (i = 0; i < ic->nc; i++) {
-                        if (mayMiss (ic->quants[i])) {
-                            mayskip = 1;
-                            break;
-                        }
-                        jc = ic->content[i];
-                        switch (jc->type) {
-                        case SCHEMA_CTYPE_PATTERN:
-                            if (recursivePattern (se, ic)) {
-                                mayskip = 1;
-                                break;
-                            }
-                            /* fall through */
-                        case SCHEMA_CTYPE_INTERLEAVE:
-                            se1 = getStackElement (sdata, ic);
-                            mayskip = getNextExpectedWorker (
-                                sdata, se1, interp, seenCPs, rObj,
-                                expectedFlags
-                                );
-                            repoolStackElement (sdata, se1);
-                            break;
-                        case SCHEMA_CTYPE_TEXT:
-                            if (ic->nc == 0 || checkText (interp, ic, "")) {
-                                mayskip = 1;
-                            }
-                            break;
-                        default:
-                            break;
-                        }
-                        if (mayskip) break;
-                    }
-                    break;
-                }
-                if (ic->flags & MIXED_CONTENT) {
-                    if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)) {
-                        Tcl_ListObjAppendElement (
-                            interp, rObj, serializeTextCP (interp));
-                    }
-                }
-                for (i = 0; i < ic->nc; i++) {
-                    jc = ic->content[i];
-                    switch (jc->type) {
-                    case SCHEMA_CTYPE_NAME_PATTERN:
-                    case SCHEMA_CTYPE_NAME:
-                        if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
-                            || minOne (cp->quants[i])) {
-                            Tcl_ListObjAppendElement (
-                                interp, rObj, serializeElementName (interp, jc)
-                                );
-                        }
-                        break;
-                    case SCHEMA_CTYPE_PATTERN:
-                        if (recursivePattern (se, jc)) {
-                            break;
-                        }
-                        /* fall through */
-                    case SCHEMA_CTYPE_INTERLEAVE:
-                        Tcl_CreateHashEntry (seenCPs, (char *)jc, &hnew);
-                        if (hnew) {
-                            se1 = getStackElement (sdata, jc);
-                            mayskip = getNextExpectedWorker (
-                                sdata, se1, interp, seenCPs, rObj,
-                                expectedFlags
-                                );
-                            repoolStackElement (sdata, se1);
-                        }
-                        break;
-                    case SCHEMA_CTYPE_ANY:
-                        if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
-                            || minOne (cp->quants[i])) {
-                            Tcl_ListObjAppendElement (
-                                interp, rObj, serializeAnyCP (interp, jc)
-                                );
-                        }
-                        break;
-                    case SCHEMA_CTYPE_TEXT:
-                        if (!(expectedFlags & EXPECTED_ONLY_MANDATORY)
-                            || minOne (cp->quants[i])) {
-                            Tcl_ListObjAppendElement (
-                                interp, rObj, serializeTextCP (interp)
-                                );
-                        }
-                        break;
-                    case SCHEMA_CTYPE_CHOICE:
-                        SetResult ("MIXED or CHOICE child of MIXED or CHOICE");
-                        sdata->evalError = 1;
-                        return 0;
-
-                    case SCHEMA_CTYPE_VIRTUAL:
-                    case SCHEMA_CTYPE_JSON_STRUCT:
-                    case SCHEMA_CTYPE_KEYSPACE:
-                    case SCHEMA_CTYPE_KEYSPACE_END:
-                        break;
-                    }
-                }
-                break;
-
-            case SCHEMA_CTYPE_VIRTUAL:
-            case SCHEMA_CTYPE_JSON_STRUCT:
-            case SCHEMA_CTYPE_KEYSPACE:
-            case SCHEMA_CTYPE_KEYSPACE_END:
-                mayskip = 1;
-                break;
-            }
-            if (cp->type == SCHEMA_CTYPE_INTERLEAVE) {
-                if (!mustM && minOne(cp->quants[ac])) mustM = 1;
-            } else {
-                if (!mayskip && !hm && minOne (cp->quants[ac])) break;
-            }
+        if ((expectedFlags & EXPECTED_IGNORE_MATCHED
+             || expectedFlags & EXPECTED_ONLY_MANDATORY)
+            && hm && mayMatch (cp->quants[ac], hm)) {
             ac++;
             hm = 0;
-        }
-        if (cp->type == SCHEMA_CTYPE_NAME) {
-            if (ac == cp->nc) {
-                /* The currently open element can end here, no
-                 * mandatory elements missing.
-                 * The element end is always mandatory.*/
-                Tcl_ListObjAppendElement (
-                    interp, rObj, serializeElementEnd (interp)
-                    );
-            }
-            rc = 0;
-        } else if (cp->type == SCHEMA_CTYPE_INTERLEAVE) {
-            if (mustM) rc = 0;
         } else {
-            /* SCHEMA_CTYPE_PATTERN */
-            if (ac < cp->nc) rc = 0;
+            if (hm && finished (cp->quants[ac], hm)) {
+                ac++;
+                hm = 0;
+            }
         }
-        break;
+        for (i = ac; i < cp->nc; i++) {
+            mayskip = !mustMatch(cp->quants[i], hm);
+            if (expectedFlags & EXPECTED_ONLY_MANDATORY && mayskip) {
+                hm = 0;
+                continue;
+            }
+            se1 = getStackElement (sdata, cp->content[i]);
+            rc = getNextExpectedWorker (sdata, se1, interp, seenCPs,
+                                             rObj, expectedFlags);
+            repoolStackElement (sdata, se1);
+            if (mayskip || rc) continue;
+            return 0;
+        }
+        if (isName) {
+            /* The currently open element can end here, no mandatory
+             * elements missing. Though, the element end is always
+             * mandatory.*/
+            Tcl_ListObjAppendElement (
+                interp, rObj, serializeElementEnd (interp)
+                );
+            return 0;
+        }
+        return 1;
+
+    case SCHEMA_CTYPE_INTERLEAVE:
+        mayskip = 1;
+        for (i = 0; i < cp->nc; i++) {
+            ic = cp->content[i];
+            if (expectedFlags & EXPECTED_ONLY_MANDATORY
+                && mayMatch (cp->quants[i], se->interleaveState[1])) {
+                continue;
+            }
+            expectedFlags |= EXPECTED_PROBE_MAYSKIP;
+            se1 = getStackElement (sdata, ic);
+            rc = getNextExpectedWorker (sdata, se1, interp, seenCPs, rObj,
+                                        expectedFlags);
+            repoolStackElement (sdata, se1);
+            if (!probeMayskip) {
+                expectedFlags &= ~EXPECTED_PROBE_MAYSKIP;
+            }
+            if (probeMayskip) return 0;
+            mayskip = 0;
+            Tcl_CreateHashEntry (seenCPs, (char *)ic, &hnew);
+            if (hnew) {
+                se1 = getStackElement (sdata, ic);
+                mayskip = getNextExpectedWorker (sdata, se1, interp,
+                                                 seenCPs, rObj,
+                                                 expectedFlags);
+                repoolStackElement (sdata, se1);
+            }
+        }
+        return mayskip;
         
     case SCHEMA_CTYPE_ANY:
-    case SCHEMA_CTYPE_CHOICE:
+        if (probeMayskip) return 0;
+        Tcl_ListObjAppendElement (interp, rObj,
+                                  serializeAnyCP (interp, cp));
+        return 0;
+
     case SCHEMA_CTYPE_TEXT:
+        mayskip = 0;
+        if (cp->nc == 0 || checkText (interp, cp, "")) {
+            mayskip = 1;
+        }
+        if (mayskip) {
+            if (probeMayskip) return 1;
+            if (expectedFlags & EXPECTED_ONLY_MANDATORY) return 1;
+        }
+        Tcl_ListObjAppendElement (interp, rObj, serializeTextCP (interp));
+        return 0;
+                
+    case SCHEMA_CTYPE_CHOICE:
+        if (probeMayskip) {
+            for (i = 0; i < cp->nc; i++) {
+                if (mayMiss (cp->quants[i])) {
+                    return 1;
+                }
+                ic = cp->content[i];
+                se1 = getStackElement (sdata, ic);
+                mayskip = getNextExpectedWorker (sdata, se1, interp, seenCPs,
+                                                 rObj, expectedFlags);
+                repoolStackElement (sdata, se1);
+                if (mayskip) return 1;
+            }
+            return 0;
+        }
+        mayskip = 0;
+        if (cp->flags & MIXED_CONTENT &&
+            !(expectedFlags & EXPECTED_ONLY_MANDATORY)) {
+            Tcl_ListObjAppendElement (
+                interp, rObj, serializeTextCP (interp));
+        }
+        for (i = 0; i < cp->nc; i++) {
+            if (mayMiss (cp->quants[i])) {
+                mayskip = 1;
+            }
+            if (expectedFlags & EXPECTED_ONLY_MANDATORY) {
+                continue;
+            }
+            ic = cp->content[i];
+            if (recursivePattern (se, ic)) {
+                continue;
+            }
+            se1 = getStackElement (sdata, ic);
+            rc = getNextExpectedWorker (sdata, se1, interp, seenCPs, rObj,
+                                        expectedFlags);
+            repoolStackElement (sdata, se1);
+            if (rc) {
+                mayskip = 1;
+            }
+        }
+        if (mayskip) return 1;
+        return 0;
+        
     case SCHEMA_CTYPE_VIRTUAL:
     case SCHEMA_CTYPE_JSON_STRUCT:
     case SCHEMA_CTYPE_KEYSPACE:
     case SCHEMA_CTYPE_KEYSPACE_END:
-        SetResult ("Invalid CTYPE onto the validation stack!");
-        sdata->evalError = 1;
-        return 0;
+        return 1;
     }
-    return rc;
+    /* Not reached */
+    return 0;
 }
 
 static Tcl_Obj *

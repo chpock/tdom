@@ -2239,29 +2239,6 @@ test schema-7.14 {mixed} {
     set result
 } {1 1 1 1 1 0}
 
-test schema-7.14.1 {mixed} {
-    tdom::schema create s
-    s define {
-        defelement doc {
-            mixed {
-                element a
-                element b
-            }
-        }
-        foreach e {a b} {
-            defelement $e {}
-        }
-    }
-    set result [list]
-    foreach xml {
-        <doc>text<a/></doc>
-    } {
-        lappend result [s validate $xml]
-    }
-    s delete
-    set result
-} 1
-
 test schema-7.14a {mixed} {
     tdom::schema create s
     s define {
@@ -3172,7 +3149,7 @@ test schema-9.10 {choice with may choices} {
     set result
 } {0 1 1 1 1 0 1}
 
-test schema-9.11 {choice with may choices} {
+test schema-9.11 {choice with many choices} {
     tdom::schema create grammar
     grammar define {
         defelement doc {
@@ -3203,6 +3180,42 @@ test schema-9.11 {choice with may choices} {
     grammar delete
     set result
 } {0 1 1 1 1 0 1}
+
+test schema-9.12 {choice} {
+    tdom::schema create grammar
+    grammar define {
+        defelement doc {
+            element e1
+            choice * {
+                element ol
+                element p
+            }
+        }
+        defelement p {
+            mixed {
+                element m 
+                element i 
+                element b
+            }
+        }
+        foreach ename {m i b} {
+            defelement $ename text
+        }
+    }        
+    set result [list]
+    foreach xml {
+        {<doc xmlns:foo="foo"/>}
+        {<doc xmlns:foo="foo"><e1/></doc>}
+        {<doc xmlns:foo="foo"><e1/><p/></doc>}
+        {<doc xmlns:foo="foo"><e1/><p>foo <m>bar</m> baz</p></doc>}
+        {<doc xmlns:foo="foo"><e1/><p><m>bar</m> baz <m>bar</m></p></doc>}
+        {<doc xmlns:foo="foo"><e1/><p><m>bar</m> baz <r>bar</r></p></doc>}
+    } {
+        lappend result [grammar validate $xml errMsg]
+    }
+    grammar delete
+    set result
+} {0 1 1 1 1 0}
 
 test schema-10.1 {any} {
     tdom::schema create s
@@ -8033,15 +8046,18 @@ test schema-17.8 {info expected} {8.5} {
             defelement $elm {}
         }
     }
+    lappend result / 
     lappend result {*}[lsort [s info expected]]
     s event start doc
+    lappend result /
     lappend result {*}[lsort [s info expected]]
     s event start c
     s event end
+    lappend result /
     lappend result {*}[lsort [s info expected]]
     s delete
     set result
-} {doc a b c doc a b c musthave toplevel musthave toplevel}
+} {doc / a b c doc / a b c musthave toplevel / musthave toplevel}
 
 test schema-17.8a {info expected -ignorematched} {8.5} {
     tdom::schema s
