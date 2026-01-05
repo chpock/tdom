@@ -11,6 +11,7 @@ set tmmlschema [read $fd]
 close $fd
 s define $tmmlschema
 
+set result ""
 foreach tmmlfile {
     domDoc.xml
     domNode.xml
@@ -25,9 +26,12 @@ foreach tmmlfile {
     set fd [open $file]
     set tmmldoc [read $fd]
     close $fd
+    set doc [dom parse $tmmldoc]
+    lappend result [s domvalidate $doc]
     puts [timerate {
-        s validate $tmmldoc
+        s domvalidate $doc
     }]
 }
 s delete
+puts $result
           
